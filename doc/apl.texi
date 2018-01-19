@@ -2058,7 +2058,8 @@ File I/O functions:
    Ze ← Ai ⎕FIO[47] Bh    setsockopt(Bh, A_level, A_optname, A_optval)
    Ze ← As ⎕FIO[48] Bh    fscanf(Bh, As)
    Zs ←    ⎕FIO[49] Bs    return entire file Bs as nested lines
-   Zs ← LO ⎕FIO[49] Bs    ⎕FIO[49] Bs and pipe each line through LO.   Zi ←    ⎕FIO[50] Bu    gettimeofday()
+   Zs ← LO ⎕FIO[49] Bs    ⎕FIO[49] Bs and pipe each line through LO.
+   Zi ←    ⎕FIO[50] Bu    gettimeofday()
    Zy4←    ⎕FIO[51] By67  mktime(By67)  Note: Jan 2, 2017 is: 2017 1 2 ...
    Zy9←    ⎕FIO[52] Bi    localtime(Bi) Note: Jan 2, 2017 is: 2017 1 2 ...
    Zy9←    ⎕FIO[53] Bi    gmtime(Bi)    Note: Jan 2, 2017 is: 2017 1 2 ...
@@ -2087,7 +2088,7 @@ Z←F ⎕FIO[49] 'filename'
 @end smallexample
 
 reads the file named filename line by line. For every line read, the conversion
-function F is called and the result returned by F is enclosed and stored in F.
+function F is called and the result returned by F is enclosed and stored in Z.
 In other words,
 
 @smallexample
@@ -2118,12 +2119,12 @@ used in the context of FFTs. The result has same shape as B and can be used for
 analyzing or troubleshooting FFTs:
 
 @itemize
-@item A=¯10: no FFT, return the Hann window of B
-@item A=¯11: no FFT, return the Hamming window of B
-@item A=¯12: no FFT, return the Blackman window of B
-@item A=¯13: no FFT, return the Blackman-Harris window of B
-@item A=¯14: no FFT, return the Blackman-Nuttal window of B
-@item A=¯15: no FFT, return the Flat-Top window of B
+@item A=¯10: no FFT, return the Hann window applied to B
+@item A=¯11: no FFT, return the Hamming window applied to B
+@item A=¯12: no FFT, return the Blackman window applied to B
+@item A=¯13: no FFT, return the Blackman-Harris window applied to B
+@item A=¯14: no FFT, return the Blackman-Nuttal window applied to B
+@item A=¯15: no FFT, return the Flat-Top window applied to B
 @end itemize
 
 The second range around 0 contains the computation of the forward and inverse
@@ -2139,11 +2140,11 @@ multiplies B with a window function and then computes the FFT:
 
 @itemize
 @item A=2: FFT(B × Hann window)
-@item A=3: FFT(B x Hamming window)
-@item A=4: FFT(B x Blackman window)
-@item A=5: FFT(B x Blackman-Harris window)
-@item A=6: FFT(B x Blackman-Nuttal window)
-@item A=7: FFT(B x Flat-Top window)
+@item A=3: FFT(B × Hamming window)
+@item A=4: FFT(B × Blackman window)
+@item A=5: FFT(B × Blackman-Harris window)
+@item A=6: FFT(B × Blackman-Nuttal window)
+@item A=7: FFT(B × Flat-Top window)
 @end itemize
 
 ⍴⍴B can be 1 (one-dimensional FFT, the most common case) or more. The

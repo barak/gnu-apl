@@ -1995,7 +1995,8 @@ File I/O functions:
    Ze ← Ai ⎕FIO[47] Bh    setsockopt(Bh, A_level, A_optname, A_optval)
    Ze ← As ⎕FIO[48] Bh    fscanf(Bh, As)
    Zs ←    ⎕FIO[49] Bs    return entire file Bs as nested lines
-   Zs ← LO ⎕FIO[49] Bs    ⎕FIO[49] Bs and pipe each line through LO.   Zi ←    ⎕FIO[50] Bu    gettimeofday()
+   Zs ← LO ⎕FIO[49] Bs    ⎕FIO[49] Bs and pipe each line through LO.
+   Zi ←    ⎕FIO[50] Bu    gettimeofday()
    Zy4←    ⎕FIO[51] By67  mktime(By67)  Note: Jan 2, 2017 is: 2017 1 2 ...
    Zy9←    ⎕FIO[52] Bi    localtime(Bi) Note: Jan 2, 2017 is: 2017 1 2 ...
    Zy9←    ⎕FIO[53] Bi    gmtime(Bi)    Note: Jan 2, 2017 is: 2017 1 2 ...
@@ -2021,7 +2022,7 @@ takes a monadic conversion function as function argument.  For example:
 
    reads the file named filename line by line.  For every line read, the
 conversion function F is called and the result returned by F is enclosed
-and stored in F. In other words,
+and stored in Z. In other words,
 
      Z←F ⎕FIO[49] 'filename'
 
@@ -2050,12 +2051,12 @@ the result of multiplying B with one of several window functions, that
 are frequently used in the context of FFTs.  The result has same shape
 as B and can be used for analyzing or troubleshooting FFTs:
 
-   • A=¯10: no FFT, return the Hann window of B
-   • A=¯11: no FFT, return the Hamming window of B
-   • A=¯12: no FFT, return the Blackman window of B
-   • A=¯13: no FFT, return the Blackman-Harris window of B
-   • A=¯14: no FFT, return the Blackman-Nuttal window of B
-   • A=¯15: no FFT, return the Flat-Top window of B
+   • A=¯10: no FFT, return the Hann window applied to B
+   • A=¯11: no FFT, return the Hamming window applied to B
+   • A=¯12: no FFT, return the Blackman window applied to B
+   • A=¯13: no FFT, return the Blackman-Harris window applied to B
+   • A=¯14: no FFT, return the Blackman-Nuttal window applied to B
+   • A=¯15: no FFT, return the Flat-Top window applied to B
 
    The second range around 0 contains the computation of the forward and
 inverse FFTs:
@@ -2068,11 +2069,11 @@ inverse FFTs:
 first multiplies B with a window function and then computes the FFT:
 
    • A=2: FFT(B × Hann window)
-   • A=3: FFT(B x Hamming window)
-   • A=4: FFT(B x Blackman window)
-   • A=5: FFT(B x Blackman-Harris window)
-   • A=6: FFT(B x Blackman-Nuttal window)
-   • A=7: FFT(B x Flat-Top window)
+   • A=3: FFT(B × Hamming window)
+   • A=4: FFT(B × Blackman window)
+   • A=5: FFT(B × Blackman-Harris window)
+   • A=6: FFT(B × Blackman-Nuttal window)
+   • A=7: FFT(B × Flat-Top window)
 
    ⍴⍴B can be 1 (one-dimensional FFT, the most common case) or more.
 The implementation of ⎕FFT uses libfftw3, aka.  "The fastest Fourier
@@ -4028,20 +4029,20 @@ Node: Section 3.1759487
 Node: Section 3.1859778
 Node: Section 3.1969690
 Node: Section 3.2069962
-Node: Section 3.2176539
-Node: Section 3.2278937
-Node: Section 3.2392499
-Node: Section 3.2493439
-Node: Section 3.2596543
-Node: Section 3.2698532
-Node: Chapter 4102910
-Node: Chapter 5104658
-Node: Chapter 6105787
-Node: Section 6.1106206
-Node: Section 6.2106893
-Node: Chapter 7107724
-Node: Section 7.1108227
-Node: Section 7.2133537
+Node: Section 3.2176540
+Node: Section 3.2278991
+Node: Section 3.2392553
+Node: Section 3.2493493
+Node: Section 3.2596597
+Node: Section 3.2698586
+Node: Chapter 4102964
+Node: Chapter 5104712
+Node: Chapter 6105841
+Node: Section 6.1106260
+Node: Section 6.2106947
+Node: Chapter 7107778
+Node: Section 7.1108281
+Node: Section 7.2133591
 
 End Tag Table
 

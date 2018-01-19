@@ -12,18 +12,20 @@ libemacs_la_SOURCES =						\
 		FnTagCommand.cc		FnTagCommand.hh		\
 		FollowCommand.cc	FollowCommand.hh	\
 		GetVarCommand.cc	GetVarCommand.hh	\
+		HelpCommand.cc		HelpCommand.hh		\
 		Listener.cc		Listener.hh		\
 		LockWrapper.cc		LockWrapper.hh		\
 		network.cc		network.hh		\
 		NetworkCommand.hh				\
 		NetworkConnection.cc	NetworkConnection.hh	\
-		SendCommand.cc		SendCommand.hh		\
+		RunCommand.cc		RunCommand.hh		\
 		SicCommand.cc		SicCommand.hh		\
 		SiCommand.cc		SiCommand.hh		\
+		SendCommand.cc		SendCommand.hh		\
 		SystemFnCommand.cc	SystemFnCommand.hh	\
 		SystemVariableCommand.cc SystemVariableCommand.hh \
 		TcpListener.cc		TcpListener.hh		\
-		TempFileWrapper.cc	TempFileWrapper.hh		\
+		TempFileWrapper.cc	TempFileWrapper.hh	\
 		TraceData.cc		TraceData.hh		\
 		UnixSocketListener.cc	UnixSocketListener.hh	\
 		util.cc			util.hh			\

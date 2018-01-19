@@ -125,11 +125,12 @@ am__installdirs = "$(DESTDIR)$(pkglibdir)"
 LTLIBRARIES = $(pkglib_LTLIBRARIES)
 libemacs_la_LIBADD =
 am_libemacs_la_OBJECTS = DefCommand.lo emacs.lo FnCommand.lo \
-	FnTagCommand.lo FollowCommand.lo GetVarCommand.lo Listener.lo \
-	LockWrapper.lo network.lo NetworkConnection.lo SendCommand.lo \
-	SicCommand.lo SiCommand.lo SystemFnCommand.lo \
-	SystemVariableCommand.lo TcpListener.lo TempFileWrapper.lo \
-	TraceData.lo UnixSocketListener.lo util.lo VariablesCommand.lo \
+	FnTagCommand.lo FollowCommand.lo GetVarCommand.lo \
+	HelpCommand.lo Listener.lo LockWrapper.lo network.lo \
+	NetworkConnection.lo RunCommand.lo SicCommand.lo SiCommand.lo \
+	SendCommand.lo SystemFnCommand.lo SystemVariableCommand.lo \
+	TcpListener.lo TempFileWrapper.lo TraceData.lo \
+	UnixSocketListener.lo util.lo VariablesCommand.lo \
 	VersionCommand.lo
 libemacs_la_OBJECTS = $(am_libemacs_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -376,18 +377,20 @@ libemacs_la_SOURCES = \
 		FnTagCommand.cc		FnTagCommand.hh		\
 		FollowCommand.cc	FollowCommand.hh	\
 		GetVarCommand.cc	GetVarCommand.hh	\
+		HelpCommand.cc		HelpCommand.hh		\
 		Listener.cc		Listener.hh		\
 		LockWrapper.cc		LockWrapper.hh		\
 		network.cc		network.hh		\
 		NetworkCommand.hh				\
 		NetworkConnection.cc	NetworkConnection.hh	\
-		SendCommand.cc		SendCommand.hh		\
+		RunCommand.cc		RunCommand.hh		\
 		SicCommand.cc		SicCommand.hh		\
 		SiCommand.cc		SiCommand.hh		\
+		SendCommand.cc		SendCommand.hh		\
 		SystemFnCommand.cc	SystemFnCommand.hh	\
 		SystemVariableCommand.cc SystemVariableCommand.hh \
 		TcpListener.cc		TcpListener.hh		\
-		TempFileWrapper.cc	TempFileWrapper.hh		\
+		TempFileWrapper.cc	TempFileWrapper.hh	\
 		TraceData.cc		TraceData.hh		\
 		UnixSocketListener.cc	UnixSocketListener.hh	\
 		util.cc			util.hh			\
@@ -478,9 +481,11 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FnTagCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/FollowCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/GetVarCommand.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/HelpCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/Listener.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/LockWrapper.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/NetworkConnection.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/RunCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SendCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SiCommand.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/SicCommand.Plo@am__quote@

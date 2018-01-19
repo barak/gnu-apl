@@ -33,7 +33,8 @@ void RunCommand::run_command( NetworkConnection &conn, const std::vector<std::st
         out << line << "\n";
     }
 
-    Token result = Bif_F1_EXECUTE::execute_statement( ucs_string_from_string( out.str() ) );
+    UCS_string uout = ucs_string_from_string(out.str());
+    Token result = Bif_F1_EXECUTE::execute_statement(uout);
     TokenTag tag = result.get_tag();
 
     stringstream result_stream;
