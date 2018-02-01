@@ -121,7 +121,7 @@ Output::ColorMode Output::color_mode = COLM_UNDEF;
 char Output::color_CIN[MAX_ESC_LEN] = CSI "0;30;47m";
 
 /// VT100 escape sequence to change to cout color
-char Output::color_COUT[MAX_ESC_LEN] = CSI "0;30;49m";
+char Output::color_COUT[MAX_ESC_LEN] = CSI "0;39;49m";
 
 /// VT100 escape sequence to change to cerr color
 char Output::color_CERR[MAX_ESC_LEN] = CSI "0;35;49m";
