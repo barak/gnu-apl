@@ -89,7 +89,10 @@ rlimit rl;
    total_memory = rl.rlim_cur;
 
    if (log_startup)
-      CERR << "sizeof(Cell) is          " << sizeof(Cell)          << endl
+      CERR
+           << "sizeof(int) is           " << sizeof(int)           << endl
+           << "sizeof(void *) is        " << sizeof(void *)        << endl
+           << "sizeof(Cell) is          " << sizeof(Cell)          << endl
            << "sizeof(Svar_record) is   " << sizeof(Svar_record)   << endl
            << "sizeof(Svar_partner) is   " << sizeof(Svar_partner) << endl;
 

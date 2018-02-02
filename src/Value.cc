@@ -79,6 +79,15 @@ const ShapeItem length = shape.get_volume();
 
    if (length > SHORT_VALUE_LENGTH_WANTED)
       {
+        // if the compiler uses 4-byte pointers, then do not allow APL
+        // values that are too large. The reason is that new[] may return
+        // a non-0 pointer (thus pretending everything is OK), but a subsequent
+        // attermpt to initialize the value might then throw a segfault.
+        //
+        enum { MAX_LEN = 2000000000 /  sizeof(Cell) };
+        if (length > MAX_LEN && sizeof(void *) < 6)
+           throw_apl_error(E_WS_FULL, alloc_loc);
+
         total_ravel_count += length;
         if (Quad_SYL::ravel_count_limit &&
             Quad_SYL::ravel_count_limit < total_ravel_count)
