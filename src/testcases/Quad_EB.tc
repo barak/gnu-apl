@@ -4,8 +4,8 @@
       '"CLEAN-UP"' ⎕EB '⍳4.5'
 CLEAN-UP
 DOMAIN ERROR
-      '"CLEAN-UP"' μ-Z__A_Quad_EB_B '⍳4.5'
-      ^                                  ^
+      "CLEAN-UP" μ-Z__A_Quad_EB_B '⍳4.5'
+      ^                                ^
 
       )SIC
       )ERASE FOO

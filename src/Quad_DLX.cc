@@ -315,7 +315,7 @@ DLX_Root_Node::DLX_Root_Node(ShapeItem rs, ShapeItem cs, ShapeItem max_sol,
      cover_count(0),
      first_0(0)
 {
-   // count the number of non-zero elemnts in the matrix
+   // count the number of non-zero elements in the matrix
    //
 const ShapeItem ec_B = B.element_count();
 const int qio = Workspace::get_IO();

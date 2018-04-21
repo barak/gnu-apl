@@ -515,22 +515,32 @@ UserFunction::set_locked_error_info(Error & error) const
 {
 UCS_string & message_2 = error.error_message_2;
 
+#define SHORT 0
    if (header.A())
       {
+#if SHORT
+        message_2.append(header.A()->get_name());
+        message_2.append(UNI_ASCII_SPACE);
+#else
         Value_P val_A = header.A()->get_value();
         if (!!val_A)
            {
-             PrintContext pctx(PR_APL_FUN);
+             PrintContext pctx(PR_BOXED_GRAPHIC);
              PrintBuffer pb(*val_A, pctx, 0);
              message_2.append(UCS_string(pb, 1, DEFAULT_Quad_PW));
              message_2.append(UNI_ASCII_SPACE);
            }
+#endif
       }
 
    message_2.append(header.get_name());
 
    if (header.B())
       {
+#if SHORT
+        message_2.append(UNI_ASCII_SPACE);
+        message_2.append(header.B()->get_name());
+#else
         Value_P val_B = header.B()->get_value();
         if (!!val_B)
            {
@@ -539,6 +549,7 @@ UCS_string & message_2 = error.error_message_2;
              PrintBuffer pb(*val_B, pctx, 0);
              message_2.append(UCS_string(pb, 1, DEFAULT_Quad_PW));
            }
+#endif
       }
 
    error.right_caret = error.left_caret + message_2.size() - 7;

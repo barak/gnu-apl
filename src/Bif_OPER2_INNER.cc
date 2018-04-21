@@ -222,33 +222,38 @@ ShapeItem z = tctx.get_N() * slice_len;
 ShapeItem end_z = z + slice_len;
    if (end_z > Z_len)   end_z = Z_len;
 
-Cell product;   // the result of LO, e.g. of × in +/×
-
    for (; z < end_z; ++z)
        {
         const ShapeItem zah = z/job.ZBl;         // z row = A row
         const ShapeItem zbl = z - zah*job.ZBl;   // z column = B column
-        const Cell * row_A = job.cA + job.incA*(zah * job.LO_len);
-        const Cell * col_B = job.cB + job.incB*zbl;
+        const Cell * row_A = job.cA + job.incA*((zah + 1) * job.LO_len);
+        const Cell * col_B = job.cB + job.incB*(zbl + job.LO_len*job.ZBl);
+
+        // compute Z[z] ← LO / (row_A RO colB)
+        //   e.g.  Z[z] ← +/ (row_A × colB)
+        //
+        // we use Z[z] as accumulator for LO /
+        //
+        Cell * sum = job.cZ + z;
         loop(l, job.LO_len)
            {
-             job.ec = (col_B->*job.RO)(&product, row_A);
-             if (job.ec != E_NO_ERROR)   return;
+             row_A -= job.incA;
+             col_B -= job.incB*job.ZBl;
 
-             if (l == 0)   // first element
+             if (l == 0)   // store first product in Z[z]
                 {
-                  job.ec = (col_B->*job.RO)(job.cZ + z, row_A);
+                  job.ec = (col_B->*job.RO)(sum, row_A);
                   if (job.ec != E_NO_ERROR)   return;
                 }
-             else
+             else          // add subsequent product to Z[z]
                 {
+                  Cell product;   // the result of RO, e.g. of × in +/×
                   job.ec = (col_B->*job.RO)(&product, row_A);
                   if (job.ec != E_NO_ERROR)   return;
-                  job.ec = (product.*job.LO)(job.cZ + z, job.cZ + z);
+
+                  job.ec = (product.*job.LO)(sum, sum);
                   if (job.ec != E_NO_ERROR)   return;
                 }
-            row_A += job.incA;
-            col_B += job.incB*job.ZBl;
            }
        }
 }

@@ -221,7 +221,7 @@ mac_def(Z__A_Quad_EA_B,
 "BRA: ⎕ES 10 ('→',⍕RES) 0       0             ⍝ →N\n"
 "ESC: ⎕ES 10 \"→\"        0       0             ⍝ →\n")
 
-/// ⎕EB helper
+/// ⎕EB (execute both) helper
 //
 mac_def(Z__A_Quad_EB_B,
   " Z←A Z__A_Quad_EB_B B;RC;ET;RES\n"

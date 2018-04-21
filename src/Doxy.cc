@@ -213,6 +213,7 @@ Doxy::functions_table(const Simple_string<const Symbol *, false> & functions,
 "      <TH>Header"                                                         CRLF
 "      <TH class=doxy_comment>Doxy Comments"                               CRLF;
 
+int total_lines = 0;
    loop(f, functions.size())
       {
         const Symbol * fun_sym = functions[f];
@@ -271,6 +272,7 @@ Doxy::functions_table(const Simple_string<const Symbol *, false> & functions,
               page <<
 "      <TD class='code center'>" << line_count <<                          CRLF;
 
+              total_lines += line_count;
               // column 5: function header (if any)
               //
               page <<
@@ -313,7 +315,11 @@ Doxy::functions_table(const Simple_string<const Symbol *, false> & functions,
             }
       }
 
+   // summary line
+   //
    page <<
+"      <TR><TD><TD colspan=2 class=code center>Total<TD class=code center>"
+        << total_lines <<                                                  CRLF
 "   </TABLE>"                                                              CRLF;
 }
 //-----------------------------------------------------------------------------
