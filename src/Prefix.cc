@@ -430,6 +430,28 @@ grow:
      if (size() > 0 && at0().get_Class() == TC_END)
         {
           Log(LOG_prefix_parser)   print_stack(CERR, LOC);
+
+          // provide help on some common cases...
+          //
+          for (int j = 1; j < (size() - 1); ++j)
+              {
+                if ( (at(j).tok.get_Class() == TC_ASSIGN)    &&
+                     (at(j + 1).tok.get_Class() == TC_VALUE))
+                   {
+                     if (at(j - 1).tok.get_Class() == TC_FUN0 ||
+                         at(j - 1).tok.get_Class() == TC_FUN12)
+                        {
+                           MORE_ERROR() <<
+                           "Cannot assign a value to a function";
+                        }
+                     else if (at(j - 1).tok.get_Class() == TC_OPER1 ||
+                             at(j - 1).tok.get_Class() == TC_OPER1)
+                        {
+                           MORE_ERROR() <<
+                           "Cannot assign a value to an operator";
+                        }
+                   }
+              }
           syntax_error(LOC);   // no more token
         }
 
