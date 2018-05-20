@@ -94,7 +94,7 @@ bool ErrOut::used = false;
 DiffOut DOUT_filebuf(false);
 DiffOut UERR_filebuf(true);
 
-// Android defines its own CIN, COUT, CERR, and UERR ostreams
+// Android is supposed to define its own CIN, COUT, CERR, and UERR ostreams
 #ifndef WANT_ANDROID
 
 CinOut CIN_filebuf;

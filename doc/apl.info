@@ -546,7 +546,7 @@ while 1/B means ’function compress’.
    In (i) and (ii) / is an operator thanks to ÷ left of it while in
 (iii) / is a function bound to operator \.
 
-   Both (ii) and (iii) are valid interpretations if (i).  The ISO
+   Both (ii) and (iii) are valid interpretations of (i).  The ISO
 standard defined the result after the decision if / should be treated as
 function or as operator was made but says nothing about how to decide
 that.
@@ -568,10 +568,10 @@ time’ similar to compile-time for compiler languages), or
    The advantage of (a) is less run-time overhead which is important
 because / is probably the most frequently used APL operator.  As will be
 explained below there are cases where (a) fails.  The advantage of (b),
-at first glance, seems to be that it always gives the correct (more
-precisely: the expected result because correct would require a valid
-specification).  A closer look reveals, however, that this is only true
-for the most simple cases but not in general.
+at first glance, seems to be that it always gives the correct result
+(more precisely: the expected result because ’correct’ would require a
+valid specification).  A closer look reveals, however, that this is only
+true for the most simple cases but not in general.
 
    To give you an idea where (b) becomes tricky is this (there are more
 of that kind):
@@ -4008,41 +4008,41 @@ Tag Table:
 Node: Top383
 Node: Chapter 11416
 Node: Chapter 217072
-Node: Chapter 321483
-Node: Section 3.122786
-Node: Section 3.233804
-Node: Section 3.334563
-Node: Section 3.435850
-Node: Section 3.538471
-Node: Section 3.638644
-Node: Section 3.739257
-Node: Section 3.843201
-Node: Section 3.944743
-Node: Section 3.1045340
-Node: Section 3.1147124
-Node: Section 3.1249064
-Node: Section 3.1350005
-Node: Section 3.1451401
-Node: Section 3.1553210
-Node: Section 3.1656205
-Node: Section 3.1759487
-Node: Section 3.1859778
-Node: Section 3.1969690
-Node: Section 3.2069962
-Node: Section 3.2176540
-Node: Section 3.2278991
-Node: Section 3.2392553
-Node: Section 3.2493493
-Node: Section 3.2596597
-Node: Section 3.2698586
-Node: Chapter 4102964
-Node: Chapter 5104712
-Node: Chapter 6105841
-Node: Section 6.1106260
-Node: Section 6.2106947
-Node: Chapter 7107778
-Node: Section 7.1108281
-Node: Section 7.2133591
+Node: Chapter 321496
+Node: Section 3.122799
+Node: Section 3.233817
+Node: Section 3.334576
+Node: Section 3.435863
+Node: Section 3.538484
+Node: Section 3.638657
+Node: Section 3.739270
+Node: Section 3.843214
+Node: Section 3.944756
+Node: Section 3.1045353
+Node: Section 3.1147137
+Node: Section 3.1249077
+Node: Section 3.1350018
+Node: Section 3.1451414
+Node: Section 3.1553223
+Node: Section 3.1656218
+Node: Section 3.1759500
+Node: Section 3.1859791
+Node: Section 3.1969703
+Node: Section 3.2069975
+Node: Section 3.2176553
+Node: Section 3.2279004
+Node: Section 3.2392566
+Node: Section 3.2493506
+Node: Section 3.2596610
+Node: Section 3.2698599
+Node: Chapter 4102977
+Node: Chapter 5104725
+Node: Chapter 6105854
+Node: Section 6.1106273
+Node: Section 6.2106960
+Node: Chapter 7107791
+Node: Section 7.1108294
+Node: Section 7.2133604
 
 End Tag Table
 

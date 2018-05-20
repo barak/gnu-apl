@@ -25,6 +25,21 @@
 #include <stdio.h>
 #include <stdint.h>
 
+/* NOTE: you may replace the following typedef for APL_Float by your own
+   class. In that case, please provide a complete class declaration here,
+
+   'complete' means that all functions used by GNU APL from external libraries
+   (such as libc or libm) that have arguments and/or return results of type
+   'double' values must either be:
+
+   a.   declared here (and linked later), or (even better)
+   b.   implemented here as (inline) functions.
+
+   See file APL_Float_as_class.h for an example which contains a list of all
+   functions needed.
+ */
+typedef double APL_Float;
+
 enum C_CellType
 {
    CCT_CHAR    = 0x02,
