@@ -530,18 +530,23 @@ IntCell::bif_divide(Cell * Z, const Cell * A) const
 {
    if (!A->is_numeric())   return E_DOMAIN_ERROR;
 
+const APL_Integer b = get_int_value();
+const bool A_zero = A->is_near_zero();
+   if (b == 0)   // division by 0
+      {
+        if (A_zero)   return IntCell::z1(Z);   // 0÷0 is 1 in APL
+        return E_DOMAIN_ERROR;
+      }
+
+   if (A_zero)   return IntCell::z0(Z);
+
+   // at this point both A and B are non-zero
+   //
    if (A->is_integer_cell())
       {
         // both cells are integers.
         //
-        APL_Integer a = A->get_int_value();
-        APL_Integer b =    get_int_value();
-
-        if (b == 0)   // a ÷ 0 is allowed iff a == 0
-           {
-             if (a != 0)   return E_DOMAIN_ERROR;
-             return IntCell::z1(Z);   // 0÷0 is 1 in APL
-           }
+        const APL_Integer a = A->get_int_value();
 
 #ifdef RATIONAL_NUMBERS_WANTED
         if (b < 0)   // make denominator positive
@@ -563,8 +568,8 @@ IntCell::bif_divide(Cell * Z, const Cell * A) const
 
    // delegate to A
    //
-   this->bif_reciprocal(Z);   // Z = ÷B
-   return A->bif_multiply(Z, Z);     // Z = A × Z = A × ÷B
+const ErrorCode ec = this->bif_reciprocal(Z);   // Z = ÷B
+   return ec ? ec : A->bif_multiply(Z, Z);      // Z = A × Z = A × ÷B
 }
 //-----------------------------------------------------------------------------
 ErrorCode

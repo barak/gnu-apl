@@ -516,10 +516,14 @@ ErrorCode
 FloatCell::bif_divide(Cell * Z, const Cell * A) const
 {
 #ifdef RATIONAL_NUMBERS_WANTED
-   if (const APL_Integer denom = get_denominator())
+   if (const APL_Integer B_denom = get_denominator())  // B is rational
       {
-        const APL_Integer numer = get_numerator();
-        if (numer == 0)   return E_DOMAIN_ERROR;
+        const APL_Integer B_numer = get_numerator();
+        if (B_numer == 0)   // A ÷ 0
+           {
+             if (A->is_near_zero())   return IntCell::z1(Z);   // 0÷0 is 1
+             return E_DOMAIN_ERROR;
+           }
         const FloatCell inv_B(denom, numer);
         return inv_B.bif_multiply(Z, A);
       }
