@@ -524,7 +524,7 @@ FloatCell::bif_divide(Cell * Z, const Cell * A) const
              if (A->is_near_zero())   return IntCell::z1(Z);   // 0÷0 is 1
              return E_DOMAIN_ERROR;
            }
-        const FloatCell inv_B(denom, numer);
+        const FloatCell inv_B(B_denom, B_numer);
         return inv_B.bif_multiply(Z, A);
       }
 #endif

@@ -530,7 +530,7 @@ IntCell::bif_divide(Cell * Z, const Cell * A) const
 {
    if (!A->is_numeric())   return E_DOMAIN_ERROR;
 
-const APL_Integer b = get_int_value();
+APL_Integer b = get_int_value();
 const bool A_zero = A->is_near_zero();
    if (b == 0)   // division by 0
       {
@@ -546,7 +546,7 @@ const bool A_zero = A->is_near_zero();
       {
         // both cells are integers.
         //
-        const APL_Integer a = A->get_int_value();
+        APL_Integer a = A->get_int_value();
 
 #ifdef RATIONAL_NUMBERS_WANTED
         if (b < 0)   // make denominator positive

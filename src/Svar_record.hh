@@ -180,7 +180,7 @@ struct Svar_record
    bool valid() const   { return get_coupling() != NO_COUPLING; }
 
    /// invalidate this entry
-   void clear()   { memset(this, 0, sizeof(*this)); }
+   void clear()   { memset(this, 0, sizeof(Svar_record)); }
 
    /// remove accepting partner
    void remove_accepting();

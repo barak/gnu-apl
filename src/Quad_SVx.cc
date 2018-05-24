@@ -121,10 +121,11 @@ char filename[APL_PATH_MAX + 1];
 bool found_executable = false;
    for (int d = 0; d < dircount; ++d)
        {
-         snprintf(filename, APL_PATH_MAX,
+         const int slen = snprintf(filename, APL_PATH_MAX,
                   "%s%s/AP%u --id %u --par %u --gra %u --auto%s",
                   LibPaths::get_APL_bin_path(), dirs[d], ap, ap,
                   own_ID, par_ID, verbose);
+         if (slen >= APL_PATH_MAX)   filename[APL_PATH_MAX] = 0;
 
          found_executable = is_executable(filename);
          if (found_executable)   break;
@@ -536,8 +537,10 @@ const char * dirs[] = { "", "/APs" };
    for (int d = 0; d < dircount; ++d)
        {
          char dirname[APL_PATH_MAX + 1];
-         snprintf(dirname, APL_PATH_MAX, "%s%s", LibPaths::get_APL_bin_path(),
+         int slen = snprintf(dirname, APL_PATH_MAX, "%s%s", LibPaths::get_APL_bin_path(),
                   dirs[d]);
+         if (slen >= APL_PATH_MAX)   dirname[APL_PATH_MAX] = 0;
+
          dirname[APL_PATH_MAX] = 0;
          DIR * dir = opendir(dirname);
 
@@ -565,9 +568,9 @@ const char * dirs[] = { "", "/APs" };
 #endif
 
                 char filename[APL_PATH_MAX + 1];
-                snprintf(filename, APL_PATH_MAX, "%s/%s", dirname,
-                         entry->d_name);
-                filename[APL_PATH_MAX] = 0;
+                int slen = snprintf(filename, APL_PATH_MAX, "%s/%s",
+                                    dirname, entry->d_name);
+                if (slen >= APL_PATH_MAX)   filename[APL_PATH_MAX] = 0;
 
                 if (!is_executable(filename))   continue;
 
@@ -575,7 +578,8 @@ const char * dirs[] = { "", "/APs" };
                 if (sscanf(entry->d_name, "AP%u", &apnum) != 1)   continue;
 
                 char expected[APL_PATH_MAX + 1];
-                snprintf(expected, sizeof(expected), "AP%u", apnum);
+                slen = snprintf(expected, sizeof(expected), "AP%u", apnum);
+                if (slen >= APL_PATH_MAX)   expected[APL_PATH_MAX] = 0;
                 if (strcmp(entry->d_name, expected))   continue;
 
                 processors.append(static_cast<AP_num>(apnum));
