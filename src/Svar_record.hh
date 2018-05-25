@@ -180,7 +180,14 @@ struct Svar_record
    bool valid() const   { return get_coupling() != NO_COUPLING; }
 
    /// invalidate this entry
-   void clear()   { memset(this, 0, sizeof(Svar_record)); }
+   void clear()
+      {
+        key = 0;
+        offering.clear();
+        accepting.clear();
+        state = SVS_NOT_SHARED;
+        varname[0] = 0;
+      }
 
    /// remove accepting partner
    void remove_accepting();
@@ -243,7 +250,7 @@ struct Svar_record
 
    /// name of the offered variable (UCS), 0-terminated
    uint32_t varname[MAX_SVAR_NAMELEN + 1];
- 
+
    /// the partner that has offered the variable first
    Svar_partner offering;
 
