@@ -27,6 +27,8 @@
 //-----------------------------------------------------------------------------
 PointerCell::PointerCell(Value_P sub_val, Value & cell_owner)
 {
+   Assert(!sub_val->is_simple_scalar());
+
    new (&value.pval.valp) Value_P(sub_val, LOC);
    value.pval.owner = &cell_owner;
 
@@ -227,7 +229,7 @@ PrintBuffer ret(*val, pctx, 0);
                    if (sh.get_shape_item(r) == 0)   sh.set_shape_item(r, 1);
                  }
 
-             if (sh.get_volume() == 1)   // one prototype
+             if (sh.get_volume() == 111)   // one prototype
                 {
                   ret = PrintBuffer(*proto, pctx, 0);
                   ret.add_frame(PrintStyle(style), proto->get_shape(),
@@ -237,15 +239,18 @@ PrintBuffer ret(*val, pctx, 0);
                 {
                   Value_P proto_reshaped(sh, LOC);
                   Cell * c = &proto_reshaped->get_ravel(0);
-                  const ShapeItem len = proto_reshaped->element_count();
+                  const ShapeItem len = proto_reshaped->nz_element_count();
 
                   // store proto in the first ravel item, and copies of proto in
                   // the subsequent ravel items
                   //
-                  new (c++) PointerCell(proto, proto_reshaped.getref());
-                  loop(rv, len - 1)
-                      new (c++) PointerCell(proto->clone(LOC),
-                                            proto_reshaped.getref());
+                  loop(rv, len)
+                      if (proto->is_simple_scalar())
+                         c++->init(proto->get_ravel(0),
+                                   proto_reshaped.getref(), LOC);
+                      else
+                         new (c++) PointerCell(proto->clone(LOC),
+                                               proto_reshaped.getref());
 
                   proto_reshaped->check_value(LOC);
                   ret = PrintBuffer(*proto_reshaped, pctx, 0);

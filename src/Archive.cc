@@ -1549,10 +1549,11 @@ const Unicode type = UTF8_string::toUni(first, len, true);
              first += len;
              {
                char * end = 0;
-               const int vid = strtol(reinterpret_cast<const char *>(first), &end, 10);
+               const int vid = strtol(reinterpret_cast<const char *>(first),
+                                      &end, 10);
                Assert(vid >= 0);
                Assert(vid < int(values.size()));
-               new (C++) PointerCell(values[vid], C_owner);
+               C++->init_from_value(values[vid], C_owner, LOC);
                first = reinterpret_cast<const UTF8 *>(end);
              }
              break;

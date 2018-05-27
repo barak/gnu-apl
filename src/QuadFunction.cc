@@ -813,8 +813,8 @@ Value_P Z(lines.size(), LOC);
          Value_P ZZ(val_count, LOC);
          loop(v, val_count)
             {
-              new (ZZ->next_ravel()) PointerCell(tos[2*v].get_apl_val(),
-                                                 ZZ.getref());
+              Value_P val = tos[2*v].get_apl_val();
+              ZZ->next_ravel()->init_from_value(val, ZZ.getref(), LOC);
             }
 
          ZZ->check_value(LOC);

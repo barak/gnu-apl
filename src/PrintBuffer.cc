@@ -59,7 +59,7 @@ PrintBuffer::PrintBuffer(const Value & value, const PrintContext & _pctx,
 PERFORMANCE_START(start_0)
 
    // Note: if ostream is non-0 then this value may be incomplete
-   // (as indicated by member complete if it is huge. This is to speed
+   // (as indicated by member complete if it is huge). This is to speed
    // up printing if the value is discarded after having been printed
 
 const PrintStyle outer_style = _pctx.get_style();

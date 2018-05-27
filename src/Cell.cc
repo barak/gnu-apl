@@ -43,7 +43,7 @@ Cell::operator new(std::size_t s, void * pos)
 void
 Cell::init_from_value(Value_P value, Value & cell_owner, const char * loc)
 {
-   if (value->is_scalar())
+   if (value->is_simple_scalar())
       {
         init(value->get_ravel(0), cell_owner, loc);
       }

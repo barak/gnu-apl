@@ -195,15 +195,13 @@ bool extra_frame = false;
 
    // common code for ⎕CR variants that only differ by print style...
    //
-   if (extra_frame)
+   if (extra_frame && !B->is_simple_scalar())
       {
-         // enclose B so that the entire B is boxed
-         //
-         Value_P B1(LOC);
-         new (&B1->get_ravel(0)) PointerCell(B->clone(LOC), B1.getref());
-         B1->check_value(LOC);
-         PrintBuffer pb(*B1, pctx, 0);
-         return Value_P(pb, LOC);
+        Value_P B1(LOC);
+        new (&B1->get_ravel(0)) PointerCell(B->clone(LOC), B1.getref());
+        B1->check_value(LOC);
+        PrintBuffer pb(*B1, pctx, 0);
+        return Value_P(pb, LOC);
       }
    else   // no frame
       {
