@@ -746,8 +746,10 @@ common_SOURCES = buildtag buildtag.hh ../config.h \
 pkglib_LTLIBRARIES = $(am__append_10)
 @WANT_LIBAPL_TRUE@pkginclude_HEADERS = libapl.h
 @WANT_LIBAPL_TRUE@libapl_la_SOURCES = $(common_SOURCES) libapl.h libapl.cc
-@WANT_LIBAPL_TRUE@libapl_la_LDFLAGS = $(common_LDFLAGS) -avoid-version \
-@WANT_LIBAPL_TRUE@	-module -shared -export-dynamic
+@WANT_LIBAPL_TRUE@libapl_la_LDFLAGS = $(common_LDFLAGS) -avoid-version
+# libapl_la_LDFLAGS += -module
+# libapl_la_LDFLAGS += -shared
+# libapl_la_LDFLAGS += -export-dynamic
 @WANT_LIBAPL_TRUE@libapl_la_CXXFLAGS = $(common_CXXFLAGS) \
 @WANT_LIBAPL_TRUE@	$(GPROF_WANTED) $(CXX_RDYNAMIC)
 @WANT_LIBAPL_FALSE@apl_SOURCES = main.cc $(common_SOURCES)

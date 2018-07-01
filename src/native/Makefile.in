@@ -135,17 +135,33 @@ lib_file_io_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(lib_file_io_la_CXXFLAGS) $(CXXFLAGS) \
 	$(lib_file_io_la_LDFLAGS) $(LDFLAGS) -o $@
 lib_template_F0_la_LIBADD =
-am_lib_template_F0_la_OBJECTS = template_F0.lo
+am_lib_template_F0_la_OBJECTS = lib_template_F0_la-template_F0.lo
 lib_template_F0_la_OBJECTS = $(am_lib_template_F0_la_OBJECTS)
+lib_template_F0_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+	$(lib_template_F0_la_CXXFLAGS) $(CXXFLAGS) \
+	$(lib_template_F0_la_LDFLAGS) $(LDFLAGS) -o $@
 lib_template_F12_la_LIBADD =
-am_lib_template_F12_la_OBJECTS = template_F12.lo
+am_lib_template_F12_la_OBJECTS = lib_template_F12_la-template_F12.lo
 lib_template_F12_la_OBJECTS = $(am_lib_template_F12_la_OBJECTS)
+lib_template_F12_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+	$(lib_template_F12_la_CXXFLAGS) $(CXXFLAGS) \
+	$(lib_template_F12_la_LDFLAGS) $(LDFLAGS) -o $@
 lib_template_OP1_la_LIBADD =
-am_lib_template_OP1_la_OBJECTS = template_OP1.lo
+am_lib_template_OP1_la_OBJECTS = lib_template_OP1_la-template_OP1.lo
 lib_template_OP1_la_OBJECTS = $(am_lib_template_OP1_la_OBJECTS)
+lib_template_OP1_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+	$(lib_template_OP1_la_CXXFLAGS) $(CXXFLAGS) \
+	$(lib_template_OP1_la_LDFLAGS) $(LDFLAGS) -o $@
 lib_template_OP2_la_LIBADD =
-am_lib_template_OP2_la_OBJECTS = template_OP2.lo
+am_lib_template_OP2_la_OBJECTS = lib_template_OP2_la-template_OP2.lo
 lib_template_OP2_la_OBJECTS = $(am_lib_template_OP2_la_OBJECTS)
+lib_template_OP2_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+	$(lib_template_OP2_la_CXXFLAGS) $(CXXFLAGS) \
+	$(lib_template_OP2_la_LDFLAGS) $(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -385,13 +401,30 @@ pkglib_LTLIBRARIES = lib_file_io.la		\
 			lib_template_OP1.la	\
 			lib_template_OP2.la	
 
+
+# set common_LDFLAGS to the LDFLAGS needed by your platform. MacOS seems
+# not to like one of the -module, -shared, or -export-dynamic options when
+# asked to build dylibs.
+#
+common_LDFLAGS = -avoid-version
+# common_LDFLAGS += -module
+# common_LDFLAGS += -shared
+# common_LDFLAGS += -export-dynamic
 lib_file_io_la_SOURCES = file_io.cc
 lib_file_io_la_CXXFLAGS = $(AM_CXXFLAGS)
-lib_file_io_la_LDFLAGS = -avoid-version -module -shared -export-dynamic
+lib_file_io_la_LDFLAGS = $(common_LDFLAGS)
 lib_template_F0_la_SOURCES = template_F0.cc template.hh
+lib_template_F0_la_CXXFLAGS = $(AM_CXXFLAGS)
+lib_template_F0_la_LDFLAGS = $(common_LDFLAGS)
 lib_template_F12_la_SOURCES = template_F12.cc template.hh
+lib_template_F12_la_CXXFLAGS = $(AM_CXXFLAGS)
+lib_template_F12_la_LDFLAGS = $(common_LDFLAGS)
 lib_template_OP1_la_SOURCES = template_OP1.cc template.hh
+lib_template_OP1_la_CXXFLAGS = $(AM_CXXFLAGS)
+lib_template_OP1_la_LDFLAGS = $(common_LDFLAGS)
 lib_template_OP2_la_SOURCES = template_OP2.cc template.hh
+lib_template_OP2_la_CXXFLAGS = $(AM_CXXFLAGS)
+lib_template_OP2_la_LDFLAGS = $(common_LDFLAGS)
 all: all-am
 
 .SUFFIXES:
@@ -466,16 +499,16 @@ lib_file_io.la: $(lib_file_io_la_OBJECTS) $(lib_file_io_la_DEPENDENCIES) $(EXTRA
 	$(AM_V_CXXLD)$(lib_file_io_la_LINK) -rpath $(pkglibdir) $(lib_file_io_la_OBJECTS) $(lib_file_io_la_LIBADD) $(LIBS)
 
 lib_template_F0.la: $(lib_template_F0_la_OBJECTS) $(lib_template_F0_la_DEPENDENCIES) $(EXTRA_lib_template_F0_la_DEPENDENCIES) 
-	$(AM_V_CXXLD)$(CXXLINK) -rpath $(pkglibdir) $(lib_template_F0_la_OBJECTS) $(lib_template_F0_la_LIBADD) $(LIBS)
+	$(AM_V_CXXLD)$(lib_template_F0_la_LINK) -rpath $(pkglibdir) $(lib_template_F0_la_OBJECTS) $(lib_template_F0_la_LIBADD) $(LIBS)
 
 lib_template_F12.la: $(lib_template_F12_la_OBJECTS) $(lib_template_F12_la_DEPENDENCIES) $(EXTRA_lib_template_F12_la_DEPENDENCIES) 
-	$(AM_V_CXXLD)$(CXXLINK) -rpath $(pkglibdir) $(lib_template_F12_la_OBJECTS) $(lib_template_F12_la_LIBADD) $(LIBS)
+	$(AM_V_CXXLD)$(lib_template_F12_la_LINK) -rpath $(pkglibdir) $(lib_template_F12_la_OBJECTS) $(lib_template_F12_la_LIBADD) $(LIBS)
 
 lib_template_OP1.la: $(lib_template_OP1_la_OBJECTS) $(lib_template_OP1_la_DEPENDENCIES) $(EXTRA_lib_template_OP1_la_DEPENDENCIES) 
-	$(AM_V_CXXLD)$(CXXLINK) -rpath $(pkglibdir) $(lib_template_OP1_la_OBJECTS) $(lib_template_OP1_la_LIBADD) $(LIBS)
+	$(AM_V_CXXLD)$(lib_template_OP1_la_LINK) -rpath $(pkglibdir) $(lib_template_OP1_la_OBJECTS) $(lib_template_OP1_la_LIBADD) $(LIBS)
 
 lib_template_OP2.la: $(lib_template_OP2_la_OBJECTS) $(lib_template_OP2_la_DEPENDENCIES) $(EXTRA_lib_template_OP2_la_DEPENDENCIES) 
-	$(AM_V_CXXLD)$(CXXLINK) -rpath $(pkglibdir) $(lib_template_OP2_la_OBJECTS) $(lib_template_OP2_la_LIBADD) $(LIBS)
+	$(AM_V_CXXLD)$(lib_template_OP2_la_LINK) -rpath $(pkglibdir) $(lib_template_OP2_la_OBJECTS) $(lib_template_OP2_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -484,10 +517,10 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_file_io_la-file_io.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/template_F0.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/template_F12.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/template_OP1.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/template_OP2.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_template_F0_la-template_F0.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_template_F12_la-template_F12.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_template_OP1_la-template_OP1.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_template_OP2_la-template_OP2.Plo@am__quote@
 
 .cc.o:
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)depbase=`echo $@ | sed 's|[^/]*$$|$(DEPDIR)/&|;s|\.o$$||'`;\
@@ -519,6 +552,34 @@ lib_file_io_la-file_io.lo: file_io.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='file_io.cc' object='lib_file_io_la-file_io.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_file_io_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_file_io_la-file_io.lo `test -f 'file_io.cc' || echo '$(srcdir)/'`file_io.cc
+
+lib_template_F0_la-template_F0.lo: template_F0.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_template_F0_la_CXXFLAGS) $(CXXFLAGS) -MT lib_template_F0_la-template_F0.lo -MD -MP -MF $(DEPDIR)/lib_template_F0_la-template_F0.Tpo -c -o lib_template_F0_la-template_F0.lo `test -f 'template_F0.cc' || echo '$(srcdir)/'`template_F0.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_template_F0_la-template_F0.Tpo $(DEPDIR)/lib_template_F0_la-template_F0.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='template_F0.cc' object='lib_template_F0_la-template_F0.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_template_F0_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_template_F0_la-template_F0.lo `test -f 'template_F0.cc' || echo '$(srcdir)/'`template_F0.cc
+
+lib_template_F12_la-template_F12.lo: template_F12.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_template_F12_la_CXXFLAGS) $(CXXFLAGS) -MT lib_template_F12_la-template_F12.lo -MD -MP -MF $(DEPDIR)/lib_template_F12_la-template_F12.Tpo -c -o lib_template_F12_la-template_F12.lo `test -f 'template_F12.cc' || echo '$(srcdir)/'`template_F12.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_template_F12_la-template_F12.Tpo $(DEPDIR)/lib_template_F12_la-template_F12.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='template_F12.cc' object='lib_template_F12_la-template_F12.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_template_F12_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_template_F12_la-template_F12.lo `test -f 'template_F12.cc' || echo '$(srcdir)/'`template_F12.cc
+
+lib_template_OP1_la-template_OP1.lo: template_OP1.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_template_OP1_la_CXXFLAGS) $(CXXFLAGS) -MT lib_template_OP1_la-template_OP1.lo -MD -MP -MF $(DEPDIR)/lib_template_OP1_la-template_OP1.Tpo -c -o lib_template_OP1_la-template_OP1.lo `test -f 'template_OP1.cc' || echo '$(srcdir)/'`template_OP1.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_template_OP1_la-template_OP1.Tpo $(DEPDIR)/lib_template_OP1_la-template_OP1.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='template_OP1.cc' object='lib_template_OP1_la-template_OP1.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_template_OP1_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_template_OP1_la-template_OP1.lo `test -f 'template_OP1.cc' || echo '$(srcdir)/'`template_OP1.cc
+
+lib_template_OP2_la-template_OP2.lo: template_OP2.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_template_OP2_la_CXXFLAGS) $(CXXFLAGS) -MT lib_template_OP2_la-template_OP2.lo -MD -MP -MF $(DEPDIR)/lib_template_OP2_la-template_OP2.Tpo -c -o lib_template_OP2_la-template_OP2.lo `test -f 'template_OP2.cc' || echo '$(srcdir)/'`template_OP2.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_template_OP2_la-template_OP2.Tpo $(DEPDIR)/lib_template_OP2_la-template_OP2.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='template_OP2.cc' object='lib_template_OP2_la-template_OP2.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_template_OP2_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_template_OP2_la-template_OP2.lo `test -f 'template_OP2.cc' || echo '$(srcdir)/'`template_OP2.cc
 
 mostlyclean-libtool:
 	-rm -f *.lo

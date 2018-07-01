@@ -160,7 +160,10 @@ pkglib_LTLIBRARIES += libapl.la
 pkginclude_HEADERS = libapl.h
 libapl_la_SOURCES = $(common_SOURCES) libapl.h libapl.cc
 libapl_la_LDFLAGS = $(common_LDFLAGS)
-libapl_la_LDFLAGS += -avoid-version -module -shared -export-dynamic
+libapl_la_LDFLAGS += -avoid-version
+# libapl_la_LDFLAGS += -module
+# libapl_la_LDFLAGS += -shared
+# libapl_la_LDFLAGS += -export-dynamic
 libapl_la_CXXFLAGS = $(common_CXXFLAGS)
 libapl_la_CXXFLAGS += $(GPROF_WANTED) $(CXX_RDYNAMIC)
 
