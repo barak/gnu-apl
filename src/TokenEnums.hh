@@ -162,4 +162,8 @@ enum TokenTag
 
 };
 
+inline void
+Hswap(TokenTag & t1, TokenTag & t2)
+{ const TokenTag tmp = t1;   t1 = t2;   t2 = tmp; }
+
 #endif // __TOKENENUMS_HH_DEFINED__

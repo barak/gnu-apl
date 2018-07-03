@@ -157,7 +157,7 @@ protected:
    /// functions and vars that shoule be )COPIED
    UCS_string_vector object_filter;
 
-   /// return true if current line belongs to a function. Cleared at final ∇
+   /// true if current line belongs to a function. Cleared at final ∇
    bool in_function;
 
    /// return true if current line belongs to a variable. Cleared by empty line

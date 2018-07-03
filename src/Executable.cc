@@ -788,16 +788,8 @@ ShapeItem from = 0;
 void
 Executable::reverse_all_token(Token_string & tos)
 {
-Token * t1 = &tos[0];
-Token * t2 = &tos[tos.size() - 1];
-
-   for (;t1 < t2; ++t1, --t2)
-       {
-         char tt[sizeof(Token)];
-         memcpy(tt, t1, sizeof(Token));
-         memcpy(t1, t2,   sizeof(Token));
-         memcpy(t2, tt, sizeof(Token));
-       }
+   for (Token * t1 = &tos[0], * t2 = &tos[tos.size() - 1]; t1 < t2;)
+       t1++->Hswap(*t2--);
 }
 //-----------------------------------------------------------------------------
 void

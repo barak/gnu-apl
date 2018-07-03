@@ -127,6 +127,16 @@ struct Svar_partner
      active(true)
    {}
 
+   /// copy other to \n this
+   void operator =(const Svar_partner & other)
+      {
+        id      = other.id;
+        tcp_fd  = other.tcp_fd;
+        flags   = other.flags;
+        events  = other.events;
+        active  = other.active;
+      }
+
    /// clear this partner
    void clear() { new (this) Svar_partner; }
 

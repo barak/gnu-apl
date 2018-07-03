@@ -604,9 +604,9 @@ Unicode_to_UTF8(int uni, char * dest, int * length)
 {
 UCS_string ucs(static_cast<Unicode>(uni));
 UTF8_string utf8(ucs);
-   memcpy(dest, &utf8[0], utf8.size());
-   if (length)   *length = utf8.size();
+   for (int d = 0; d < utf8.size(); ++d)   dest[d] = utf8[d];
    dest[utf8.size()] = 0;
+   if (length)   *length = utf8.size();
 }
 //-----------------------------------------------------------------------------
 extern void init_1(const char * argv0, bool log_startup);

@@ -121,6 +121,12 @@ public:
    ~Token()
      { extract_apl_val("~Token()");  }
 
+   inline void Hswap(Token & other)
+      { ::Hswap(tag, other.tag);
+        ::Hswap(value.int_vals[0], other.value.int_vals[0]);
+        ::Hswap(value.int_vals[1], other.value.int_vals[1]);
+      }
+
    /// return the TokenValueType of this token.
    TokenValueType get_ValueType() const
       { return TokenValueType(tag & TV_MASK); }
@@ -278,8 +284,8 @@ public:
    union sval
       {
         Unicode         char_val;        ///< the Unicode for CTV_CHARTV_
-        int64_t         int_vals[2];     ///< the integer for TV_INT
-        APL_Float_Base   float_vals[2];  ///< the doubles for TV_FLT and TV_CPX
+        APL_Integer     int_vals[2];     ///< the integer for TV_INT
+        APL_Float_Base  float_vals[2];   ///< the doubles for TV_FLT and TV_CPX
         Symbol        * sym_ptr;         ///< the symbol for TV_SYM
         Function_Line   fun_line;        ///< the function line for TV_LIN
         IndexExpr     * index_val;       ///< the index for TV_INDEX
@@ -309,6 +315,8 @@ private:
    // prevent accidental copying
    Token & operator =(const Token & other);
 };
+
+
 //-----------------------------------------------------------------------------
 /// A string of Token
 class Token_string : public  Simple_string<Token, true>

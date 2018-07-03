@@ -750,7 +750,7 @@ Token::class_name(TokenClass tc)
    return "*** Obscure token class ***";
 }
 //-----------------------------------------------------------------------------
-inline void 
+inline void
 Token::copy_N(const Token & src)
 {
    tag = src.tag;
@@ -805,7 +805,7 @@ Token::move_1(Token & src, const char * loc)
         const Value * val = src.value.apl_val.get();
         if (val)
            {
-	     ADD_EVENT(val, VHE_TokMove1, src.value_use_count() - 1, loc);
+             ADD_EVENT(val, VHE_TokMove1, src.value_use_count() - 1, loc);
              src.clear(loc);
            }
       }
@@ -837,13 +837,7 @@ Token * t2 = &at(to);
    Assert(from <= to);
    Assert(to <= size());
 
-   for (;t1 < t2; ++t1, --t2)
-       {
-         char tt[sizeof(Token)];
-         memcpy(tt, t1, sizeof(Token));
-         memcpy(t1, t2,   sizeof(Token));
-         memcpy(t2, tt, sizeof(Token));
-       }
+   while (t1 < t2)   t1++->Hswap(*t2--);
 }
 //-----------------------------------------------------------------------------
 void

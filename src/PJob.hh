@@ -52,7 +52,15 @@ public:
 
    /// assign \b other to \b this
    void operator =(const PJob_scalar_B & other)
-      { memcpy(this, &other, sizeof(*this)); }
+      {
+        value_Z = other.value_Z;
+        len_Z = other.len_Z;
+        error = other.error;
+        fun = other.fun;
+        fun1 = other.fun1;
+        cB = other.cB;
+        cZ = other.cZ;
+      }
 
    /// constructor
    PJob_scalar_B(Value * Z, const Value & B)
@@ -117,7 +125,16 @@ public:
    /// assign \b other to \b this
    void operator =(const PJob_scalar_AB & other)
       {
-        memcpy(this, &other, sizeof(*this));
+        value_Z = other.value_Z;
+        len_Z   = other.len_Z;
+        inc_A   = other.inc_A;
+        inc_B   = other.inc_B;
+        error   = other.error;
+        fun     = other.fun;
+        fun2    = other.fun2;
+        cA      = other.cA;
+        cB      = other.cB;
+        cZ      = other.cZ;
         Assert(cB);
       }
 
@@ -170,13 +187,13 @@ public:
 
 protected:
    /// ravel of the left argument
-   const Cell * const cA;
+   const Cell * cA;
 
    /// ravel of the right argument
-   const Cell * const cB;
+   const Cell * cB;
 
    /// ravel of the result
-   Cell * const cZ;
+   Cell * cZ;
 };
 //=============================================================================
 /// a number of jobs, where each job can be executed in parallel

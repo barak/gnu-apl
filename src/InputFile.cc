@@ -38,11 +38,29 @@ Simple_string<InputFile, true> InputFile::files_orig;
 int InputFile::stdin_line_no = 1;
 
 //-----------------------------------------------------------------------------
-InputFile & InputFile::operator =(const InputFile & other)
+InputFile &
+InputFile::operator =(const InputFile & other)
 {
-   memcpy(this, &other, sizeof(InputFile));   // illegally duplicates strings!
+   // copy element by element, but make sure that pointers to memories
+   // allocated by strings are NOT copied but that instead the strings
+   // are being duplicated.
+   //
+   // Otherwise the strings would be deleted twice.
+   //
+   file        = other.file;
+   new (&filename)   UTF8_string(&other.filename[0], other.filename.size());
+   test        = other.test;
+   echo        = other.echo;
+   is_script   = other.is_script;
+   with_LX     = other.with_LX;
+   line_no     = other.line_no;
+   in_html     = other.in_html;
    ::new (&object_filter)   UCS_string_vector(other.object_filter);
-   new (&filename) UTF8_string(&other.filename[0], other.filename.size());
+   in_function = other.in_function;
+   in_variable = other.in_variable;
+   in_matched  = other.in_matched;
+   from_COPY   = other.from_COPY;
+
    return *this;
 }
 //-----------------------------------------------------------------------------

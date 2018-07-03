@@ -60,6 +60,10 @@ typedef Unicode APL_Char;
 /// One APL integer value.
 typedef int64_t APL_Integer;
 
+inline void
+Hswap(APL_Integer & i1, APL_Integer & i2)
+{ const APL_Integer tmp = i1;   i1 = i2;   i2 = tmp; }
+
 /// One (real) APL floating point value.
 #if APL_Float_is_class // APL_Float is a class
 
@@ -499,7 +503,14 @@ struct AP_num3
      grand(gra)
    {}
 
-   /// ture if \b this AP_num3 is equal to \b other
+   void operator =(const AP_num3 & other)
+      {
+        proc   = other.proc;
+        parent = other.parent;
+        grand  = other.grand;
+      }
+
+   /// true if \b this AP_num3 is equal to \b other
    bool operator==(const AP_num3 & other) const
       { return proc   == other.proc   &&
                parent == other.parent &&

@@ -62,7 +62,9 @@ public:
    /// constructor: shape of another shape
    Shape(const Shape & other)
    {
-      memcpy(this, &other, sizeof (Shape));   // to avoid bogus warnings
+     rho_rho = other.rho_rho;
+     loop(r, MAX_RANK)   rho[r] = other.rho[r];
+     volume = other.volume;
    }
 
    /// constructor: shape defined by the ravel of an APL value \b val
@@ -152,7 +154,6 @@ public:
               rho_rho = new_rk;
             }
        }
-            
 
    /// possibly expand rank and increase axes so that B fits into this shape
    void expand(const Shape & B);
