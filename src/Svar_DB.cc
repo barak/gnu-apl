@@ -316,8 +316,10 @@ Signal_base * response = Signal_base::recv_TCP(sock, buffer, sizeof(buffer),
                                                del, log);
    if (response)
       {
-        memcpy(&cache, response->get__SVAR_RECORD_IS__record().data(),
+        memcpy(static_cast <void *>(&cache),
+               response->get__SVAR_RECORD_IS__record().data(),
                sizeof(Svar_record));
+
         delete response;
       }
    else   get_CERR() << "Svar_record_P() failed at " << LOC << endl;
