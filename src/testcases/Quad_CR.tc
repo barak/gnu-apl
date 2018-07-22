@@ -339,6 +339,12 @@ A ┌2─┐ 1 ┌2──┐ ┌3────────┐
 ┃                                        ┗━━━━━━━━━━━┛┃
 ┗∊━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
+      5 ⎕CR 33 ⎕CR 55,'Value'
+000000370000000556616C7565
+
+      34 ⎕CR ¯5 ⎕CR '000000370000000556616C7565'
+55 Value
+
       ⍝ invalid negative argument
       ⍝
       ¯1 ⎕CR A
@@ -353,9 +359,9 @@ A ⎕CR B with invalid A < 0
       ⍝ trigger a domain error if new left arguments are implemented
       ⍝ without adding a testcase
       ⍝
-      33 ⎕CR A
+      35 ⎕CR A
 DOMAIN ERROR+
-      33 ⎕CR A
+      35 ⎕CR A
       ^      ^
 
       )MORE

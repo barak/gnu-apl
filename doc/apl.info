@@ -1510,13 +1510,13 @@ arguments by several other ⎕FIO function.  Let Z←A ⎕CR B.
    A=0-4 or 7-9, or 29: various formatting styles (boxed, APL
 input/output, etc.).  Just try them out.
 
-   A=5/6: convert byte vector B to a string of uppercase/lowercase hex
-digits.
+   A=5 resp.  A=6: convert byte vector B to a string of uppercase resp.
+lowercase hex digits.  Every byte in B becomes 2 characters in Z.
 
    A=10: convert variable named in B to an APL expression producing it.
 
-   A=11: convert value B to byte vector Z in CDR format (similar to 3
-⎕TF).
+   A=11: convert value B to byte vector Z in CDR ("Common Data
+Representation", an IBM standard) format (similar to 3 ⎕TF).
 
    A=12: convert byte vector Z in CDR format to value Z.
 
@@ -1550,24 +1550,70 @@ format to Value)
 16: integer, 32: real number, 64: complex number.
 
    A=27: Z[I] is the primary data representation (for example the real
-part of a complex number) of the ravel elements of B[I].
+part of a complex number, or the numerator of a rational number) of
+B[I].
 
    A=28: Z[I] is the additional data representation (for example the
-imaginary part of a complex number) of the ravel elements of B[I].
+imaginary part of a complex number, or the denominator of a rational
+number) of B[I].
 
    A=30: Z is B with all top-level elements conformed to a common rank
-and shape (as required by the ⍤ operator)
+and shape (as required by the ⍤ operator).  This conversion is primarily
+used internally bu the GNU APL interpreter.
 
-   Conversions 14 to 17 can be used, for example, to store APL values as
-printable ASCII texts in databases.
+   A=31 or A=32: These conversions are used internally by ⎕INP.
 
-   For byte vector arguments, a DOMAIN ERROR is thrown if a ravel item
-is not a character.  It is, however not checked (for performance
-reasons) that the value of the character is in the range -128 to 255.
-Instead the low byte of the value is taken.  This is OK for ASCII
-strings but does not work for general APL text vectors.  Those need to
-be translated to bytes first and can then be used as input for e.g.
-byte vector → hex or byte vector → base64 conversions.
+   A=33: convert tagged byte vector to a TLV (Tag/Length/Value) buffer.
+The TLV buffer can be sent over a byte stream (socket) and easily
+decoded at the other end.  Say B = B[1], B[2], ..., B[n] such that B1 is
+an Integer (the tag) and B[j] is a character in the range 0.255 for j >
+1.  Let Z←33 ⎕CR B with Z = Z[1], Z[2], ...  Z[m].  Then Z[1 2 3 4] is
+the 4 byte tag, Z[5 6 7 8] is the 4 byte data length (n-1) == (m - 8)
+and 1↓B == 8 ↓ Z. In other words, the first 4 bytes of Z are the tag in
+big endian byte order, the next 4 bytes are the length of B except the
+tag, and the rest of Z is B except the tag.
+
+   Example:
+      Tag←55   ⍝ hex 37
+      5 ⎕CR 33 ⎕CR Tag,'Value'
+000000370000000556616C7565
+
+   A=34: this is the inverse of 33 ⎕CR. The intended use for 33 ⎕CR and
+34 ⎕CR is the transmission of a tagged byte vector over e.g a TCP
+socket:
+
+   Sender Receiver —— ——– T,Data →→→ 33 ⎕CR T,Data →→→TCP connection→→→
+34 ⎕CR T,Data →→→ T,Data
+
+   Example:
+      34 ⎕CR ¯5 ⎕CR '000000370000000556616C7565'
+55 Value
+
+   The TLVs constructed by 33 ⎕CR can be sent back-to-back over a TCP
+connection or similar in such a way that the receiver knows exactly
+after which byte a TLV ends, which is perfect for connections over which
+data is sent sporadically.
+
+   For byte vector arguments B of ⎕CR, a DOMAIN ERROR is thrown if a
+ravel item B[i] is not a character.  The conversions provided by ⎕CR are
+intended to be fast because they are frequently applied to large amounts
+of data like the content of large files.  For performance reasons some
+conversions only check that the ravel elements B[i] of an argument B are
+characters, but not that the code-point of the character is in the range
+-128 to 255.
+
+   Instead, these conversions take lower 8 bits of a code-point is used
+as the byte value that is being converted by ⎕CR. As a consequence,
+different characters B[i] can give the same result Z[i]:
+
+   ⎕UCS ’AŁɁ’ ⍝ some characters 65 321 577 256|⎕UCS ’AŁɁ’ ⍝ lower 8 bits
+are equal 65 65 65 5 ⎕CR ’AŁɁ’ ⍝ conversion to hex uses only the lower 8
+bits 414141
+
+   For strings containing only ASCII characters, there is no difference
+between strings and byte vectors.  But strings containing non-ASCII
+characters (like most APL characters) may need to be converted to before
+some other ⎕CR conversion can be used.
 
 
 File: apl.info,  Node: Section 3.16,  Next: Section 3.17,  Prev: Section 3.15,  Up: Chapter 3
@@ -4024,25 +4070,25 @@ Node: Section 3.1249077
 Node: Section 3.1350018
 Node: Section 3.1451414
 Node: Section 3.1553223
-Node: Section 3.1656218
-Node: Section 3.1759500
-Node: Section 3.1859791
-Node: Section 3.1969703
-Node: Section 3.2069975
-Node: Section 3.2176553
-Node: Section 3.2279004
-Node: Section 3.2392566
-Node: Section 3.2493506
-Node: Section 3.2596610
-Node: Section 3.2698599
-Node: Chapter 4102977
-Node: Chapter 5104725
-Node: Chapter 6105854
-Node: Section 6.1106273
-Node: Section 6.2106960
-Node: Chapter 7107791
-Node: Section 7.1108294
-Node: Section 7.2133604
+Node: Section 3.1658345
+Node: Section 3.1761627
+Node: Section 3.1861918
+Node: Section 3.1971830
+Node: Section 3.2072102
+Node: Section 3.2178680
+Node: Section 3.2281131
+Node: Section 3.2394693
+Node: Section 3.2495633
+Node: Section 3.2598737
+Node: Section 3.26100726
+Node: Chapter 4105104
+Node: Chapter 5106852
+Node: Chapter 6107981
+Node: Section 6.1108400
+Node: Section 6.2109087
+Node: Chapter 7109918
+Node: Section 7.1110421
+Node: Section 7.2135731
 
 End Tag Table
 

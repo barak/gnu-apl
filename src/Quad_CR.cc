@@ -137,6 +137,8 @@ Quad_CR::do_CR(APL_Integer a, const Value * B, PrintContext pctx)
         case -17: a = 16;   break;
         case -18: a = 19;   break;
         case -19: a = 18;   break;
+        case -33: a = 34;   break;
+        case -34: a = 33;   break;
         default: MORE_ERROR() << "A ⎕CR B with invalid A < 0";
                  DOMAIN_ERROR;
       }
@@ -188,6 +190,8 @@ bool extra_frame = false;
         case 30: return do_CR30(*B);             // conform B (for ⍤ macro)
         case 31: return do_CR31_32(true, *B);    // ⎕INP helper
         case 32: return do_CR31_32(false, *B);   // ⎕INP helper
+        case 33: return do_CR33(*B);             // TV to TLV byte vector
+        case 34: return do_CR34(*B);             // TLV byte vector to TV
 
         default: MORE_ERROR() << "A ⎕CR B with invalid A";
                  DOMAIN_ERROR;
@@ -1108,7 +1112,7 @@ Value_P Z(shape_Z, LOC);
              Shape sh_sub = B_sub->get_shape();
              sh_sub.expand_rank(conformed.get_rank());
              B_sub->set_shape(sh_sub);
-                
+
              Token T = Bif_F12_TAKE::do_take(conformed, B_sub);
              Value_P ZZ = T.get_apl_val();
              loop(zz, conformed_len)
@@ -1228,6 +1232,74 @@ Quad_CR::item_separator(UCS_string & line, V_mode from_mode, V_mode to_mode)
         if      (to_mode == Vm_UCS)    line.append_utf8("(,⎕UCS ");
         else if (to_mode == Vm_QUOT)   line.append_utf8("'");
       }
+}
+//-----------------------------------------------------------------------------
+Value_P
+Quad_CR::do_CR33(const Value & B)
+{
+   // convert B = Integer Tag, len bytes Data
+   // to      Z = 4-byte Tag, 4-byte Len, len bytes Data
+   //
+   if (B.get_rank() != 1)   RANK_ERROR;
+const ShapeItem len_B = B.element_count();
+   if (len_B < 1)   LENGTH_ERROR;
+const ShapeItem len_B1 = len_B - 1;
+const Cell * cB = &B.get_ravel(0);
+   if (!cB++->is_integer_cell())   DOMAIN_ERROR;
+   loop (b,  len_B1)
+       {
+         if (!cB->is_character_cell())   DOMAIN_ERROR;
+         const Unicode uni = cB++->get_char_value();
+         if (uni & 0xFFFFFF00)   DOMAIN_ERROR;
+       }
+
+Value_P Z(len_B + 7, LOC);
+const APL_Integer tag = B.get_ravel(0).get_int_value();
+    new (Z->next_ravel()) CharCell(Unicode(tag >> 24 & 0xFF));
+    new (Z->next_ravel()) CharCell(Unicode(tag >> 16 & 0xFF));
+    new (Z->next_ravel()) CharCell(Unicode(tag >>  8 & 0xFF));
+    new (Z->next_ravel()) CharCell(Unicode(tag       & 0xFF));
+    new (Z->next_ravel()) CharCell(Unicode(len_B1 >> 24 & 0xFF));
+    new (Z->next_ravel()) CharCell(Unicode(len_B1 >> 16 & 0xFF));
+    new (Z->next_ravel()) CharCell(Unicode(len_B1 >>  8 & 0xFF));
+    new (Z->next_ravel()) CharCell(Unicode(len_B1       & 0xFF));
+    loop(z, len_B1)
+       new (Z->next_ravel()) CharCell(B.get_ravel(z + 1).get_char_value());
+
+   return Z;
+}
+//-----------------------------------------------------------------------------
+Value_P
+Quad_CR::do_CR34(const Value & B)
+{
+   // convert B = 4-byte Tag, 4-byte Len, len bytes Data
+   // to      Z = Integer Tag, len bytes Data
+   //
+   //
+   if (B.get_rank() != 1)   RANK_ERROR;
+const ShapeItem len_B = B.element_count();
+   if (len_B < 8)   LENGTH_ERROR;
+const Cell * cB = &B.get_ravel(0);
+   loop (b,  len_B)
+       {
+         if (!cB->is_character_cell())   DOMAIN_ERROR;
+         const Unicode uni = cB++->get_char_value();
+         if (uni & 0xFFFFFF00)   DOMAIN_ERROR;
+       }
+
+   cB = &B.get_ravel(0);
+
+APL_Integer tag = 0;
+APL_Integer len = 0;
+   loop(bb, 4)   tag = tag << 8 | cB++->get_char_value();
+   loop(bb, 4)   len = len << 8 | cB++->get_char_value();
+   if (len != (len_B - 8))   LENGTH_ERROR;
+
+Value_P Z(len_B - 7, LOC);
+   new (Z->next_ravel())   IntCell(tag);
+   loop(z, len_B - 8)   new (Z->next_ravel())  CharCell(cB++->get_char_value());
+
+   return Z;
 }
 //-----------------------------------------------------------------------------
 
