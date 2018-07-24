@@ -170,6 +170,10 @@ m4_include([m4/ax_path_lib_pcre.m4])
 AM_CONDITIONAL(HAVE_LIBPCRE2_32,
                test "x$ac_cv_lib_pcre2_32_pcre2_compile_32" = xyes)
 
+# check for GTK 3
+m4_include([m4/gtk-3.0.m4])
+    AM_PATH_GTK_3_0([3.0.0])
+
 # check if rdtsc (read CPU cycle counter is available.
 # This is expected only on Intel CPUs
 AC_MSG_CHECKING([whether CPU has rdtsc (read CPU cycle counter) opcode])

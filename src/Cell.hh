@@ -96,6 +96,9 @@ public:
    /// Return the character value of a cell
    virtual Unicode get_char_value() const   { DOMAIN_ERROR; }
 
+   /// Return the byte value (-128..255 incl) of a cell
+   virtual int get_byte_value() const   { DOMAIN_ERROR; }
+
    /// Return the integer value of a cell
    virtual APL_Integer get_int_value() const   { DOMAIN_ERROR; }
 
@@ -228,7 +231,7 @@ public:
              union _flt_num
                 {
                   APL_Float_Base flt;   ///< the non-rational value
-	          APL_Integer    num;   ///< the numerator of the quotient
+                  APL_Integer    num;   ///< the numerator of the quotient
                 } u1;                   ///< primary value, 27 ⎕CR
 
              /// 0 for floating point value, or the denominator of a quotient

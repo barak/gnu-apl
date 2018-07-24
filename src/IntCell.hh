@@ -162,6 +162,9 @@ public:
    /// overloaded Cell::get_int_value()
    virtual APL_Integer get_int_value()  const   { return value.ival; }
 
+   /// overloaded Cell::get_byte_value()
+   virtual int get_byte_value() const;
+
 protected:
    /// overloaded Cell::get_cell_type()
    virtual CellType get_cell_type() const

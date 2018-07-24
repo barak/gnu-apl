@@ -81,7 +81,8 @@ build_triplet = @build@
 host_triplet = @host@
 noinst_PROGRAMS = APL_keyboard$(EXEEXT) APL_keyboard_learn$(EXEEXT) \
 	APL_keyboard_show$(EXEEXT) apl2html$(EXEEXT) \
-	phrase_gen$(EXEEXT) sockconst$(EXEEXT) $(am__EXEEXT_1)
+	phrase_gen$(EXEEXT) sockconst$(EXEEXT) TLV_server$(EXEEXT) \
+	$(am__EXEEXT_1)
 @HAVE_AFFINITY_NP_TRUE@@HAVE_RDTSC_TRUE@am__append_1 = memory_benchmark
 subdir = tools
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
@@ -91,7 +92,7 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/depend.m4 \
 	$(top_srcdir)/m4/ax_lib_sqlite3.m4 \
 	$(top_srcdir)/m4/ax_lib_postgresql.m4 \
 	$(top_srcdir)/m4/ax_path_lib_pcre.m4 \
-	$(top_srcdir)/configure.ac
+	$(top_srcdir)/m4/gtk-3.0.m4 $(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
@@ -113,6 +114,9 @@ APL_keyboard_learn_LDADD = $(LDADD)
 am_APL_keyboard_show_OBJECTS = APL_keyboard_show.$(OBJEXT)
 APL_keyboard_show_OBJECTS = $(am_APL_keyboard_show_OBJECTS)
 APL_keyboard_show_LDADD = $(LDADD)
+am_TLV_server_OBJECTS = TLV_server.$(OBJEXT)
+TLV_server_OBJECTS = $(am_TLV_server_OBJECTS)
+TLV_server_LDADD = $(LDADD)
 am_apl2html_OBJECTS = apl2html.$(OBJEXT)
 apl2html_OBJECTS = $(am_apl2html_OBJECTS)
 apl2html_LDADD = $(LDADD)
@@ -184,12 +188,13 @@ am__v_CXXLD_ = $(am__v_CXXLD_@AM_DEFAULT_V@)
 am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
 SOURCES = $(APL_keyboard_SOURCES) $(APL_keyboard_learn_SOURCES) \
-	$(APL_keyboard_show_SOURCES) $(apl2html_SOURCES) \
-	$(memory_benchmark_SOURCES) $(phrase_gen_SOURCES) sockconst.c
+	$(APL_keyboard_show_SOURCES) $(TLV_server_SOURCES) \
+	$(apl2html_SOURCES) $(memory_benchmark_SOURCES) \
+	$(phrase_gen_SOURCES) sockconst.c
 DIST_SOURCES = $(APL_keyboard_SOURCES) $(APL_keyboard_learn_SOURCES) \
-	$(APL_keyboard_show_SOURCES) $(apl2html_SOURCES) \
-	$(am__memory_benchmark_SOURCES_DIST) $(phrase_gen_SOURCES) \
-	sockconst.c
+	$(APL_keyboard_show_SOURCES) $(TLV_server_SOURCES) \
+	$(apl2html_SOURCES) $(am__memory_benchmark_SOURCES_DIST) \
+	$(phrase_gen_SOURCES) sockconst.c
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -255,6 +260,8 @@ EXEEXT = @EXEEXT@
 FGREP = @FGREP@
 GPROF_WANTED = @GPROF_WANTED@
 GREP = @GREP@
+GTK_CFLAGS = @GTK_CFLAGS@
+GTK_LIBS = @GTK_LIBS@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -291,6 +298,7 @@ PCRE_CFLAGS = @PCRE_CFLAGS@
 PCRE_LIBS = @PCRE_LIBS@
 PERFORMANCE_COUNTERS_WANTED = @PERFORMANCE_COUNTERS_WANTED@
 PG_CONFIG = @PG_CONFIG@
+PKG_CONFIG = @PKG_CONFIG@
 POSTGRESQL_CFLAGS = @POSTGRESQL_CFLAGS@
 POSTGRESQL_LDFLAGS = @POSTGRESQL_LDFLAGS@
 POSTGRESQL_VERSION = @POSTGRESQL_VERSION@
@@ -371,6 +379,7 @@ APL_keyboard_SOURCES = APL_keyboard.cc        APL_keyboard.def
 APL_keyboard_learn_SOURCES = APL_keyboard_learn.cc  APL_keyboard.orig.def
 APL_keyboard_show_SOURCES = APL_keyboard_show.cc
 apl2html_SOURCES = apl2html.cc
+TLV_server_SOURCES = TLV_server.c
 phrase_gen_SOURCES = phrase_gen.cc phrase_gen.def
 all: all-am
 
@@ -428,6 +437,10 @@ APL_keyboard_show$(EXEEXT): $(APL_keyboard_show_OBJECTS) $(APL_keyboard_show_DEP
 	@rm -f APL_keyboard_show$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(APL_keyboard_show_OBJECTS) $(APL_keyboard_show_LDADD) $(LIBS)
 
+TLV_server$(EXEEXT): $(TLV_server_OBJECTS) $(TLV_server_DEPENDENCIES) $(EXTRA_TLV_server_DEPENDENCIES) 
+	@rm -f TLV_server$(EXEEXT)
+	$(AM_V_CCLD)$(LINK) $(TLV_server_OBJECTS) $(TLV_server_LDADD) $(LIBS)
+
 apl2html$(EXEEXT): $(apl2html_OBJECTS) $(apl2html_DEPENDENCIES) $(EXTRA_apl2html_DEPENDENCIES) 
 	@rm -f apl2html$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(apl2html_OBJECTS) $(apl2html_LDADD) $(LIBS)
@@ -453,6 +466,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/APL_keyboard.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/APL_keyboard_learn.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/APL_keyboard_show.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TLV_server.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl2html.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/memory_benchmark-memory_benchmark.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/phrase_gen.Po@am__quote@

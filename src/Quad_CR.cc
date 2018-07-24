@@ -232,7 +232,7 @@ Value_P Z(shape_Z, LOC);
 const Cell * cB = &B.get_ravel(0);
    loop(b, B.element_count())
        {
-         const int val = cB++->get_char_value() & 0x00FF;
+         const int val = cB++->get_byte_value() & 0x00FF;
          const int h = alpha[val >> 4];
          const int l = alpha[val & 0x0F];
          new (Z->next_ravel())   CharCell(static_cast<Unicode>(h));
@@ -1246,12 +1246,7 @@ const ShapeItem len_B = B.element_count();
 const ShapeItem len_B1 = len_B - 1;
 const Cell * cB = &B.get_ravel(0);
    if (!cB++->is_integer_cell())   DOMAIN_ERROR;
-   loop (b,  len_B1)
-       {
-         if (!cB->is_character_cell())   DOMAIN_ERROR;
-         const Unicode uni = cB++->get_char_value();
-         if (uni & 0xFFFFFF00)   DOMAIN_ERROR;
-       }
+   loop (b,  len_B1)   cB++->get_byte_value();   // DOMAIN ERROR if not byte
 
 Value_P Z(len_B + 7, LOC);
 const APL_Integer tag = B.get_ravel(0).get_int_value();
@@ -1264,7 +1259,8 @@ const APL_Integer tag = B.get_ravel(0).get_int_value();
     new (Z->next_ravel()) CharCell(Unicode(len_B1 >>  8 & 0xFF));
     new (Z->next_ravel()) CharCell(Unicode(len_B1       & 0xFF));
     loop(z, len_B1)
-       new (Z->next_ravel()) CharCell(B.get_ravel(z + 1).get_char_value());
+       new (Z->next_ravel())
+           CharCell(Unicode(B.get_ravel(z + 1).get_byte_value()));
 
    return Z;
 }
@@ -1280,24 +1276,26 @@ Quad_CR::do_CR34(const Value & B)
 const ShapeItem len_B = B.element_count();
    if (len_B < 8)   LENGTH_ERROR;
 const Cell * cB = &B.get_ravel(0);
-   loop (b,  len_B)
+
+   // throwe DOMAIN ERROR if one of the vector items is not a byte
+   loop(b, len_B)
        {
-         if (!cB->is_character_cell())   DOMAIN_ERROR;
-         const Unicode uni = cB++->get_char_value();
-         if (uni & 0xFFFFFF00)   DOMAIN_ERROR;
+         cB++->get_byte_value();
        }
 
    cB = &B.get_ravel(0);
 
-APL_Integer tag = 0;
-APL_Integer len = 0;
-   loop(bb, 4)   tag = tag << 8 | cB++->get_char_value();
-   loop(bb, 4)   len = len << 8 | cB++->get_char_value();
+int32_t tag = 0;
+   loop(bb, 4)   tag = tag << 8 | cB++->get_byte_value();
+
+uint32_t len = 0;
+   loop(bb, 4)   len = len << 8 | cB++->get_byte_value();
    if (len != (len_B - 8))   LENGTH_ERROR;
 
 Value_P Z(len_B - 7, LOC);
    new (Z->next_ravel())   IntCell(tag);
-   loop(z, len_B - 8)   new (Z->next_ravel())  CharCell(cB++->get_char_value());
+   loop(z, len_B - 8)
+      new (Z->next_ravel())  CharCell(Unicode(cB++->get_byte_value()));
 
    return Z;
 }

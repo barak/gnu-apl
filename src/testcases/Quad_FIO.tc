@@ -272,9 +272,21 @@ World!
  22 3.14 C DEFGH st⍴ing 57 
 
 
+      ⍝ execve
+      ⍝
+      Filename←'/usr/lib/apl/TLV_server'  ⍝ whereever TLV_server was installed
+      Handle ← FIO∆execve Filename        ⍝ start & connect TLV_server
+      TLV ← 33 ⎕CR 42,'Forty-Two'         ⍝ encode a TLV buffer
+      ⊣TLV ⎕FIO[43] Handle                ⍝ send TLV buffer to TLV_server
+      TL ← 8 ⎕FIO[6] Handle               ⍝ read tag/lenght from TLV_server
+      Value ← (256⊥4↓TL) ⎕FIO[6] Handle   ⍝ read value  from TLV_server
+      34 ⎕CR TL,Value                     ⍝ display response tag and value
+¯42 owT-ytroF
+      ⊣(⎕FIO[4] Handle)                   ⍝ close connection (stops TLV_server)
+
       )ERASE FORMAT Handle Handle1 Handle2 Command AF_INET SOCK_STREAM
       )ERASE Error FSTAT Filename LOCALHOST Port Z Server IPPROTO_IP
-      )ERASE FMT DATA
+      )ERASE FMT DATA TL TLV Value
 
 ⍝     )VARS
 

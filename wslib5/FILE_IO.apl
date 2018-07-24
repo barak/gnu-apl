@@ -357,6 +357,28 @@
  Z←As ⎕FIO[56] Bs
 ∇
 
+∇Z ← FIO∆execve Bs
+ ⍝⍝ start program Bs with opening a connection between GNU APL and the new
+ ⍝⍝ program. The return value of FIO∆execve Bs is a handle (a file descriptor)
+ ⍝⍝ that can be used with FIO∆fread and FIO∆fwrite for receiving data from and
+ ⍝⍝ for sending data to the new program. The other end of the communition link
+ ⍝⍝ (in the new program) is file descriptor 3 (STERR + 1). The new program has
+ ⍝⍝ stdin closed (so that the program cannot steal keyboard input) but stdout
+ ⍝⍝ left open. It is possible (although asking for trouble) for the new program
+ ⍝⍝ to write to its stdout or stderr.
+ ⍝⍝
+ ⍝⍝ FIO∆execve is quite similar to FIO∆popen. The difference is that FIO∆popen
+ ⍝⍝ connects to either stdin or to stdout of the new program, but not both,
+ ⍝⍝ while FIO∆execve uses only one file descriptor (3) and the communication
+ ⍝⍝ over that file descriptor is bidirectional.
+ ⍝⍝
+ ⍝⍝ The GNU APL end of the connection is supposed to use FIO∆fread and
+ ⍝⍝ and FIO∆fwrite, but not FIO∆read or FIO∆write (otherwise bad things will
+ ⍝⍝ happen).
+ ⍝⍝
+ Z←⎕FIO[57] Bs
+∇
+
 ∇FIO∆clear_statistics Bi
  ⍝⍝ clear performance statistics with ID Bi
  Zn ← ⎕FIO[200] Bi
@@ -534,6 +556,8 @@ t←t⍪'INADDR_ANY' 0
  a←a, ('getpeername' 45) ('getsockopt' 46) ('setsockopt' 47) ('fscanf'      48)
  a←a, ('readlines'   49) ('gettimeofday' 50) ('mktime'   51) ('localtime'   52)
  a←a, ('gmtime'      53) ('chdir'      54) ('sscanf'     55) ('write_lines' 56)
+ a←a, ('execve'      57)
+
  a←a, ('open'         3) ('close'       4) ⍝ And some handy aliases
  →(0=↑⍴x←,⊃((⊂X) ≡¨↑¨a)/a)/Nomatch
  X←¯1↑x

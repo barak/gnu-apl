@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2018  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 
 //-----------------------------------------------------------------------------
 /*!
-    A cell containing a single APL character
+    A cell containing a single Unicode (most likely an APL character)
  */
 class CharCell : public Cell
 {
@@ -67,6 +67,9 @@ protected:
 
    /// overloaded Cell::get_char_value()
    virtual Unicode get_char_value() const   { return value.aval; }
+
+   /// overloaded Cell::get_byte_value()
+   virtual int get_byte_value() const;
 
    /// overloaded Cell::get_classname()
    virtual const char * get_classname()  const   { return "CharCell"; }

@@ -1592,28 +1592,24 @@ socket:
    The TLVs constructed by 33 ⎕CR can be sent back-to-back over a TCP
 connection or similar in such a way that the receiver knows exactly
 after which byte a TLV ends, which is perfect for connections over which
-data is sent sporadically.
+data is sent sporadically.  33 ⎕CR and 34 ⎕CR are particularly useful
+for encoding and decoding TLV byte buffers exchanged between GNU APL and
+processes that were forked by GNU APL with ⎕FIO[57] (aka.  fork() and
+execve()).
 
-   For byte vector arguments B of ⎕CR, a DOMAIN ERROR is thrown if a
-ravel item B[i] is not a character.  The conversions provided by ⎕CR are
-intended to be fast because they are frequently applied to large amounts
-of data like the content of large files.  For performance reasons some
-conversions only check that the ravel elements B[i] of an argument B are
-characters, but not that the code-point of the character is in the range
--128 to 255.
+   Most dyadic ⎕CR variants whose argument B is expected to be a byte
+vector throw:
 
-   Instead, these conversions take lower 8 bits of a code-point is used
-as the byte value that is being converted by ⎕CR. As a consequence,
-different characters B[i] can give the same result Z[i]:
+  1. RANK ERROR if 1≠⍴⍴B
+  2. DOMAIN ERROR if one of the B[j] is not a proper byte value
 
-   ⎕UCS ’AŁɁ’ ⍝ some characters 65 321 577 256|⎕UCS ’AŁɁ’ ⍝ lower 8 bits
-are equal 65 65 65 5 ⎕CR ’AŁɁ’ ⍝ conversion to hex uses only the lower 8
-bits 414141
-
-   For strings containing only ASCII characters, there is no difference
-between strings and byte vectors.  But strings containing non-ASCII
-characters (like most APL characters) may need to be converted to before
-some other ⎕CR conversion can be used.
+   A proper byte value is either an integer in the range -128...255
+including, or a (Unicode) character with a code point between U+FF80 and
+U+FFFF (including, corresponding to a negative signed char in C/C++) or
+between U+0000...U+00FF (including, corresponding to an unsigned char or
+to a signed positive char in C/C++).  Real, Complex, or rational numbers
+are never proper byte values even if their value is close to an integer.
+Nor are nested APL values or values being assigned.
 
 
 File: apl.info,  Node: Section 3.16,  Next: Section 3.17,  Prev: Section 3.15,  Up: Chapter 3
@@ -4070,25 +4066,25 @@ Node: Section 3.1249077
 Node: Section 3.1350018
 Node: Section 3.1451414
 Node: Section 3.1553223
-Node: Section 3.1658345
-Node: Section 3.1761627
-Node: Section 3.1861918
-Node: Section 3.1971830
-Node: Section 3.2072102
-Node: Section 3.2178680
-Node: Section 3.2281131
-Node: Section 3.2394693
-Node: Section 3.2495633
-Node: Section 3.2598737
-Node: Section 3.26100726
-Node: Chapter 4105104
-Node: Chapter 5106852
-Node: Chapter 6107981
-Node: Section 6.1108400
-Node: Section 6.2109087
-Node: Chapter 7109918
-Node: Section 7.1110421
-Node: Section 7.2135731
+Node: Section 3.1658122
+Node: Section 3.1761404
+Node: Section 3.1861695
+Node: Section 3.1971607
+Node: Section 3.2071879
+Node: Section 3.2178457
+Node: Section 3.2280908
+Node: Section 3.2394470
+Node: Section 3.2495410
+Node: Section 3.2598514
+Node: Section 3.26100503
+Node: Chapter 4104881
+Node: Chapter 5106629
+Node: Chapter 6107758
+Node: Section 6.1108177
+Node: Section 6.2108864
+Node: Chapter 7109695
+Node: Section 7.1110198
+Node: Section 7.2135508
 
 End Tag Table
 

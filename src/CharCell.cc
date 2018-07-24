@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2018  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 */
 
 #include "CharCell.hh"
+#include "Workspace.hh"
 
 //-----------------------------------------------------------------------------
 CellType
@@ -144,6 +145,30 @@ ColInfo info;
    info.real_len = info.int_len = ucs.size();
 
    return PrintBuffer(ucs, info);
+}
+//-----------------------------------------------------------------------------
+int
+CharCell::get_byte_value() const
+{
+   if (value.aval < -128)
+      {
+        char cc[20];
+        snprintf(cc, sizeof(cc), "' = U+%4.4X", value.aval & 0x0FFFF);
+        MORE_ERROR() << "Unicode character '" << value.aval << cc
+                     << " is too small (< U+FF80) for a byte value";
+        DOMAIN_ERROR;
+      }
+
+   if (value.aval > 255)
+      {
+        char cc[20];
+        snprintf(cc, sizeof(cc), "' = U+%4.4X", value.aval & 0x0FFFF);
+        MORE_ERROR() << "Unicode character '" << value.aval << cc
+                     << " is too large (> U+00FF) for a byte value";
+        DOMAIN_ERROR;
+      }
+
+   return value.aval;
 }
 //-----------------------------------------------------------------------------
 int

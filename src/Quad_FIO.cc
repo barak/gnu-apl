@@ -767,6 +767,7 @@ Quad_FIO::list_functions(ostream & out)
 "   Zi ←    ⎕FIO[54] Bs    chdir(Bs)\n"
 "   Ze ← As ⎕FIO[55] Bh    sscanf(Bs, As) As is the format string\n"
 "   Zs ← As ⎕FIO[56] Bs    write nested lines As to file named Bs\n"
+"   Zh ←    ⎕FIO[57] Bs    fork() and execve(Bs, { Bs, 0}, {0})\n"
 
 "\n"
 "Benchmarking functions:\n"
@@ -1335,7 +1336,7 @@ const APL_Integer function_number = X->get_ravel(0).get_near_int();
                 fe.fe_may_write = true;
                 open_files.append(fe);
                 return Token(TOK_APL_VALUE1, IntScalar(fe.fe_fd, LOC));
-	      }
+              }
 
          case 34:   // listen(Bh, 10)
               {
@@ -1718,7 +1719,63 @@ const APL_Integer function_number = X->get_ravel(0).get_near_int();
                 errno = chdir(path.c_str());
                 goto out_errno;
               }
- 
+
+         case 57:   // fork() + execve() in the child
+              {
+                int spair[2];
+                if (socketpair(AF_UNIX, SOCK_DGRAM, 0, spair))
+                   {
+                     MORE_ERROR() << "socketpair() failed: " << strerror(errno);
+                     DOMAIN_ERROR;
+                   }
+
+                const pid_t child = fork();
+                if (child == -1)
+                   {
+                     MORE_ERROR() << "fork() failed: " << strerror(errno);
+                     DOMAIN_ERROR;
+                   }
+
+                UTF8_string path(*B.get());
+                char * filename = strdup(path.c_str());
+                if (child)   // parent process: return handle
+                   {
+                     free(filename);
+                     file_entry fe(0, spair[0]);
+                     fe.fe_may_read = true;
+                     fe.fe_may_write = true;
+                     open_files.append(fe);
+                     return Token(TOK_APL_VALUE1, IntScalar(fe.fe_fd, LOC));
+                   }
+
+                // code executed in the forked child.,,
+                // Close some fds and then execve(Bs)
+                //
+                const int sock = spair[1];
+                ::close(STDIN_FILENO);
+                for (int j = 3; j < 100; ++j)
+                    {
+                      if (j != sock)   ::close(j);
+                    }
+
+                // make the communication socket file descriptor 3
+                //  (== STDERR + 1) in the client
+                //
+                dup2(sock, 3);
+
+                char * argv[] = { filename, 0 };
+                char * envp[] = { 0 };
+                execve(filename, argv, envp);   // no return on success
+
+                // execve() failed
+                //
+                ::close(3);
+
+                usleep(100000);
+                CERR << "*** execve() failed in 57 ⎕CR: " << strerror(errno);
+                exit(-1);
+              }
+
          case 202:   // get monadic parallel threshold
          case 203:   // get dyadic  parallel threshold
               {

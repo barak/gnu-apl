@@ -915,6 +915,26 @@ ColInfo info;
 }
 //-----------------------------------------------------------------------------
 int
+IntCell::get_byte_value() const
+{
+   if (value.ival < -128)
+      {
+        MORE_ERROR() << "integer " << value.ival
+                     << " is too small (< -128) for a byte value";
+        DOMAIN_ERROR;
+      }
+
+   if (value.ival > 255)
+      {
+        MORE_ERROR() << "integer " << value.ival
+                     << " is too large (> 255) for a byte value";
+        DOMAIN_ERROR;
+      }
+
+   return value.ival;
+}
+//-----------------------------------------------------------------------------
+int
 IntCell::CDR_size() const
 {
    // use 4 byte for small integers and 8 bytes for others (converted to float).
