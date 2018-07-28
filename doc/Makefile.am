@@ -49,7 +49,6 @@ dist_doc_DATA =			\
 	apl.texi		\
 	apl.info		\
 	apl.html		\
-	APL-on-Macintosh.pdf	\
 	libapl.texi		\
 	libapl.info		\
 	libapl.html

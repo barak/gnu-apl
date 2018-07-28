@@ -168,8 +168,8 @@ HELLO ⍋ ⌽ ⍒ ⍴ ⍵
       226 141 181
 
 
-      ⍝ socket communication: send 'Hello' from one socket to another
-      ⍝ and 'World!' back.
+      ⍝ socket communication: send 'Hello' from one socket to another socket
+      ⍝ and send 'World!' back.
       ⍝
       AF_INET     ← 2           ⍝ see /usr/include/.../bits/socket.h
       SOCK_STREAM ← 1           ⍝ see /usr/include/.../bits/socket_type.h

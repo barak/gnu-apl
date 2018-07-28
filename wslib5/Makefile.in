@@ -86,7 +86,7 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/depend.m4 \
 	$(top_srcdir)/m4/ax_lib_sqlite3.m4 \
 	$(top_srcdir)/m4/ax_lib_postgresql.m4 \
 	$(top_srcdir)/m4/ax_path_lib_pcre.m4 \
-	$(top_srcdir)/m4/gtk-3.0.m4 $(top_srcdir)/configure.ac
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 mkinstalldirs = $(install_sh) -d
@@ -243,8 +243,6 @@ EXEEXT = @EXEEXT@
 FGREP = @FGREP@
 GPROF_WANTED = @GPROF_WANTED@
 GREP = @GREP@
-GTK_CFLAGS = @GTK_CFLAGS@
-GTK_LIBS = @GTK_LIBS@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -281,7 +279,6 @@ PCRE_CFLAGS = @PCRE_CFLAGS@
 PCRE_LIBS = @PCRE_LIBS@
 PERFORMANCE_COUNTERS_WANTED = @PERFORMANCE_COUNTERS_WANTED@
 PG_CONFIG = @PG_CONFIG@
-PKG_CONFIG = @PKG_CONFIG@
 POSTGRESQL_CFLAGS = @POSTGRESQL_CFLAGS@
 POSTGRESQL_LDFLAGS = @POSTGRESQL_LDFLAGS@
 POSTGRESQL_VERSION = @POSTGRESQL_VERSION@

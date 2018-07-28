@@ -93,7 +93,7 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/depend.m4 \
 	$(top_srcdir)/m4/ax_lib_sqlite3.m4 \
 	$(top_srcdir)/m4/ax_lib_postgresql.m4 \
 	$(top_srcdir)/m4/ax_path_lib_pcre.m4 \
-	$(top_srcdir)/m4/gtk-3.0.m4 $(top_srcdir)/configure.ac
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
@@ -270,8 +270,6 @@ EXEEXT = @EXEEXT@
 FGREP = @FGREP@
 GPROF_WANTED = @GPROF_WANTED@
 GREP = @GREP@
-GTK_CFLAGS = @GTK_CFLAGS@
-GTK_LIBS = @GTK_LIBS@
 INSTALL = @INSTALL@
 INSTALL_DATA = @INSTALL_DATA@
 INSTALL_PROGRAM = @INSTALL_PROGRAM@
@@ -308,7 +306,6 @@ PCRE_CFLAGS = @PCRE_CFLAGS@
 PCRE_LIBS = @PCRE_LIBS@
 PERFORMANCE_COUNTERS_WANTED = @PERFORMANCE_COUNTERS_WANTED@
 PG_CONFIG = @PG_CONFIG@
-PKG_CONFIG = @PKG_CONFIG@
 POSTGRESQL_CFLAGS = @POSTGRESQL_CFLAGS@
 POSTGRESQL_LDFLAGS = @POSTGRESQL_LDFLAGS@
 POSTGRESQL_VERSION = @POSTGRESQL_VERSION@
@@ -384,7 +381,8 @@ top_srcdir = @top_srcdir@
 ACLOCAL_AMFLAGS = -I m4
 DISTCHECK_CONFIGURE_FLAGS = --enable-maintainer-mode=no
 APL_DIRS = workspaces wslib3 wslib4 wslib5
-SUBDIRS = build doc erlang gnu-apl.d src support-files tools $(APL_DIRS)
+SUBDIRS = $(APL_DIRS) build doc erlang gnu-apl.d HOWTOs src \
+	support-files tools
 DIST_SUBDIRS = $(SUBDIRS) rpm debian
 dist_doc_DATA = README			   \
 		README-1-prerequisites	   \
