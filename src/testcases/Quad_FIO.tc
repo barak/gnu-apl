@@ -274,7 +274,7 @@ World!
 
       ⍝ execve
       ⍝
-      Filename←'/usr/lib/apl/TLV_server'  ⍝ whereever TLV_server was installed
+      Filename←'/usr/local/lib/apl/TLV_server'  ⍝ whereever TLV_server lives
       Handle ← FIO∆execve Filename        ⍝ start & connect TLV_server
       TLV ← 33 ⎕CR 42,'Forty-Two'         ⍝ encode a TLV buffer
       ⊣TLV ⎕FIO[43] Handle                ⍝ send TLV buffer to TLV_server

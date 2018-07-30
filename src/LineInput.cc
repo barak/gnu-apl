@@ -966,6 +966,13 @@ again:
 const int b0 = fgetc(stdin);
    if (b0 == EOF)
       {
+        if (errno == EINTR)
+           {
+             clearerr(stdin);
+             CIN.unsetf(ios_base::unitbuf);
+             goto again;
+           }
+
        if (got_WINCH)
           {
             got_WINCH = false;
