@@ -2138,9 +2138,9 @@ File: apl.info,  Node: Section 3.22,  Next: Section 3.23,  Prev: Section 3.21,  
 
 GTK (Gimp Toolkit) is a rather powerful library for creating graphical
 user interfaces (GUIs).  ⎕GTK makes a subset of the almost 10000
-functions in the GTK library available to GNU APL programs.  With ⎕GTK a
-GNU APL program can, for example, replace the somewhat crude ⎕ or ⍞
-input methods of standard APL with a more intuitive GUI.
+functions in the different GTK libraries available to GNU APL programs.
+With ⎕GTK a GNU APL program can, for example, replace the somewhat crude
+⎕ or ⍞ input methods of standard APL with a more intuitive GUI.
 
    The details of using ⎕GTK would go far beyond the scope of this info
 manual and has therefore been put into a separate document.  See:
@@ -4090,19 +4090,19 @@ Node: Section 3.1971648
 Node: Section 3.2071920
 Node: Section 3.2178498
 Node: Section 3.2280949
-Node: Section 3.2381607
-Node: Section 3.2495169
-Node: Section 3.2596109
-Node: Section 3.2699213
-Node: Section 3.27101202
-Node: Chapter 4105580
-Node: Chapter 5107328
-Node: Chapter 6108457
-Node: Section 6.1108876
-Node: Section 6.2109563
-Node: Chapter 7110394
-Node: Section 7.1110897
-Node: Section 7.2136207
+Node: Section 3.2381618
+Node: Section 3.2495180
+Node: Section 3.2596120
+Node: Section 3.2699224
+Node: Section 3.27101213
+Node: Chapter 4105591
+Node: Chapter 5107339
+Node: Chapter 6108468
+Node: Section 6.1108887
+Node: Section 6.2109574
+Node: Chapter 7110405
+Node: Section 7.1110908
+Node: Section 7.2136218
 
 End Tag Table
 

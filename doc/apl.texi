@@ -2207,9 +2207,9 @@ few hours, though, so that creating it will not pay off for most mortals.
 
 GTK (Gimp Toolkit) is a rather powerful library for creating graphical user
 interfaces (GUIs). ⎕GTK makes a subset of the almost 10000 functions in the
-GTK library available to GNU APL programs. With ⎕GTK a GNU APL program can,
-for example, replace the somewhat crude ⎕ or ⍞ input methods of standard APL
-with a more intuitive GUI.
+different GTK libraries available to GNU APL programs. With ⎕GTK a GNU APL
+program can, for example, replace the somewhat crude ⎕ or ⍞ input methods
+of standard APL with a more intuitive GUI.
 
 The details of using ⎕GTK would go far beyond the scope of this info manual
 and has therefore been put into a separate document.
