@@ -298,7 +298,12 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 dist_doc_DATA = APL-on-Macintosh.pdf \
 		APL-Communication-Cookbook.html \
-		 Quad-GTK.html
+		 Quad-GTK.html \
+		glade-0.png \
+		glade-1.png \
+		glade-2.png \
+		glade-3.png \
+		glade-4.png
 
 all: all-am
 
@@ -520,7 +525,8 @@ uninstall-am: uninstall-dist_docDATA
 	if [ -z `which asciidoc` ] ; then touch -c $@ ; \
 	else asciidoc -o $@ $< ; fi
 
-.PRECIOUS: APL-Communication-Cookbook.html Quad-GTK.html
+.PRECIOUS: APL-Communication-Cookbook.html Quad-GTK.html glade-1.png \
+    glade-2.png glade-3.png glade-4.png
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

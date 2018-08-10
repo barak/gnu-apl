@@ -1525,13 +1525,15 @@ sheet) file as the (optional) left argument of dyadic ⎕GTK:</p></div>
 .BUTTON { color: #F00;      background: #4F4; }
 
 /* the OK button */
-#button1 { color: #F00; background: #FFF; }</code></pre>
+#OK-button { color: #F00; background: #FFF; }</code></pre>
 </div></div>
 <div class="paragraph"><p>It says that buttons should, in general have a green background and a red
-foreground (= text color), but that the button with id="button1" in the XML
-file my-application.ui shall have a white background instead.</p></div>
+foreground (= text color), but that the button with the name "OK-button"
+in the XML file my-application.ui shall have a white background instead.
+The relevant name in CSS is <strong>not</strong> the ID: in the <strong>General</strong> tab in glade,
+but the <strong>Widget Name:</strong> property in the <strong>Common</strong> tab in glade.</p></div>
 <div class="paragraph"><p>The "general button" has no effect in our simple example because it has only
-one button and the stronger #button1 clause wins over the more general (and
+one button and the stronger #OK-button clause wins over the more general (and
 thus weaker) .BUTTON  clause.</p></div>
 <div class="paragraph"><p>With the <strong>my-application.css</strong> example file above we now get this:</p></div>
 <div class="imageblock">
@@ -2238,7 +2240,7 @@ cellspacing="0" cellpadding="4">
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2018-08-10 18:46:31 CEST
+Last updated 2018-08-10 19:59:27 CEST
 </div>
 </div>
 </body>
