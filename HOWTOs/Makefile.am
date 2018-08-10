@@ -1,6 +1,6 @@
 
 dist_doc_DATA =	APL-on-Macintosh.pdf \
-		APL-Communication-Cookbook.html
+		APL-Communication-Cookbook.html \
 		 Quad-GTK.html
 
 .asciidoc.html:

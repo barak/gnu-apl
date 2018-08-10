@@ -1,0 +1,2245 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+    "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
+<title>The GNU APL ⎕GTK Cookbook</title>
+<style type="text/css">
+/* Shared CSS for AsciiDoc xhtml11 and html5 backends */
+
+/* Default font. */
+body {
+  font-family: Georgia,serif;
+}
+
+/* Title font. */
+h1, h2, h3, h4, h5, h6,
+div.title, caption.title,
+thead, p.table.header,
+#toctitle,
+#author, #revnumber, #revdate, #revremark,
+#footer {
+  font-family: Arial,Helvetica,sans-serif;
+}
+
+body {
+  margin: 1em 5% 1em 5%;
+}
+
+a {
+  color: blue;
+  text-decoration: underline;
+}
+a:visited {
+  color: fuchsia;
+}
+
+em {
+  font-style: italic;
+  color: navy;
+}
+
+strong {
+  font-weight: bold;
+  color: #083194;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #527bbd;
+  margin-top: 1.2em;
+  margin-bottom: 0.5em;
+  line-height: 1.3;
+}
+
+h1, h2, h3 {
+  border-bottom: 2px solid silver;
+}
+h2 {
+  padding-top: 0.5em;
+}
+h3 {
+  float: left;
+}
+h3 + * {
+  clear: left;
+}
+h5 {
+  font-size: 1.0em;
+}
+
+div.sectionbody {
+  margin-left: 0;
+}
+
+hr {
+  border: 1px solid silver;
+}
+
+p {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+ul, ol, li > p {
+  margin-top: 0;
+}
+ul > li     { color: #aaa; }
+ul > li > * { color: black; }
+
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
+  padding: 0;
+  margin: 0;
+}
+pre {
+  white-space: pre-wrap;
+}
+
+#author {
+  color: #527bbd;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+#email {
+}
+#revnumber, #revdate, #revremark {
+}
+
+#footer {
+  font-size: small;
+  border-top: 2px solid silver;
+  padding-top: 0.5em;
+  margin-top: 4.0em;
+}
+#footer-text {
+  float: left;
+  padding-bottom: 0.5em;
+}
+#footer-badges {
+  float: right;
+  padding-bottom: 0.5em;
+}
+
+#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
+div.imageblock, div.exampleblock, div.verseblock,
+div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
+div.admonitionblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+div.admonitionblock {
+  margin-top: 2.0em;
+  margin-bottom: 2.0em;
+  margin-right: 10%;
+  color: #606060;
+}
+
+div.content { /* Block element content. */
+  padding: 0;
+}
+
+/* Block element titles. */
+div.title, caption.title {
+  color: #527bbd;
+  font-weight: bold;
+  text-align: left;
+  margin-top: 1.0em;
+  margin-bottom: 0.5em;
+}
+div.title + * {
+  margin-top: 0;
+}
+
+td div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content + div.title {
+  margin-top: 0.0em;
+}
+
+div.sidebarblock > div.content {
+  background: #ffffee;
+  border: 1px solid #dddddd;
+  border-left: 4px solid #f0f0f0;
+  padding: 0.5em;
+}
+
+div.listingblock > div.content {
+  border: 1px solid #dddddd;
+  border-left: 5px solid #f0f0f0;
+  background: #f8f8f8;
+  padding: 0.5em;
+}
+
+div.quoteblock, div.verseblock {
+  padding-left: 1.0em;
+  margin-left: 1.0em;
+  margin-right: 10%;
+  border-left: 5px solid #f0f0f0;
+  color: #888;
+}
+
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock > pre.content {
+  font-family: inherit;
+  font-size: inherit;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
+div.verseblock + div.attribution {
+  text-align: left;
+}
+
+div.admonitionblock .icon {
+  vertical-align: top;
+  font-size: 1.1em;
+  font-weight: bold;
+  text-decoration: underline;
+  color: #527bbd;
+  padding-right: 0.5em;
+}
+div.admonitionblock td.content {
+  padding-left: 0.5em;
+  border-left: 3px solid #dddddd;
+}
+
+div.exampleblock > div.content {
+  border-left: 3px solid #dddddd;
+  padding-left: 0.5em;
+}
+
+div.imageblock div.content { padding-left: 0; }
+span.image img { border-style: none; vertical-align: text-bottom; }
+a.image:visited { color: white; }
+
+dl {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+dt {
+  margin-top: 0.5em;
+  margin-bottom: 0;
+  font-style: normal;
+  color: navy;
+}
+dd > *:first-child {
+  margin-top: 0.1em;
+}
+
+ul, ol {
+    list-style-position: outside;
+}
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
+  list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
+}
+
+tfoot {
+  font-weight: bold;
+}
+td > div.verse {
+  white-space: pre;
+}
+
+div.hdlist {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+div.hdlist tr {
+  padding-bottom: 15px;
+}
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
+  vertical-align: top;
+  font-style: normal;
+  padding-right: 0.8em;
+  color: navy;
+}
+td.hdlist2 {
+  vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
+}
+
+.footnote, .footnoteref {
+  font-size: 0.8em;
+}
+
+span.footnote, span.footnoteref {
+  vertical-align: super;
+}
+
+#footnotes {
+  margin: 20px 0 20px 0;
+  padding: 7px 0 0 0;
+}
+
+#footnotes div.footnote {
+  margin: 0 0 5px 0;
+}
+
+#footnotes hr {
+  border: none;
+  border-top: 1px solid silver;
+  height: 1px;
+  text-align: left;
+  margin-left: 0;
+  width: 20%;
+  min-width: 100px;
+}
+
+div.colist td {
+  padding-right: 0.5em;
+  padding-bottom: 0.3em;
+  vertical-align: top;
+}
+div.colist td img {
+  margin-top: 0.3em;
+}
+
+@media print {
+  #footer-badges { display: none; }
+}
+
+#toc {
+  margin-bottom: 2.5em;
+}
+
+#toctitle {
+  color: #527bbd;
+  font-size: 1.1em;
+  font-weight: bold;
+  margin-top: 1.0em;
+  margin-bottom: 0.1em;
+}
+
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+div.toclevel2 {
+  margin-left: 2em;
+  font-size: 0.9em;
+}
+div.toclevel3 {
+  margin-left: 4em;
+  font-size: 0.9em;
+}
+div.toclevel4 {
+  margin-left: 6em;
+  font-size: 0.9em;
+}
+
+span.aqua { color: aqua; }
+span.black { color: black; }
+span.blue { color: blue; }
+span.fuchsia { color: fuchsia; }
+span.gray { color: gray; }
+span.green { color: green; }
+span.lime { color: lime; }
+span.maroon { color: maroon; }
+span.navy { color: navy; }
+span.olive { color: olive; }
+span.purple { color: purple; }
+span.red { color: red; }
+span.silver { color: silver; }
+span.teal { color: teal; }
+span.white { color: white; }
+span.yellow { color: yellow; }
+
+span.aqua-background { background: aqua; }
+span.black-background { background: black; }
+span.blue-background { background: blue; }
+span.fuchsia-background { background: fuchsia; }
+span.gray-background { background: gray; }
+span.green-background { background: green; }
+span.lime-background { background: lime; }
+span.maroon-background { background: maroon; }
+span.navy-background { background: navy; }
+span.olive-background { background: olive; }
+span.purple-background { background: purple; }
+span.red-background { background: red; }
+span.silver-background { background: silver; }
+span.teal-background { background: teal; }
+span.white-background { background: white; }
+span.yellow-background { background: yellow; }
+
+span.big { font-size: 2em; }
+span.small { font-size: 0.6em; }
+
+span.underline { text-decoration: underline; }
+span.overline { text-decoration: overline; }
+span.line-through { text-decoration: line-through; }
+
+div.unbreakable { page-break-inside: avoid; }
+
+
+/*
+ * xhtml11 specific
+ *
+ * */
+
+div.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+div.tableblock > table {
+  border: 3px solid #527bbd;
+}
+thead, p.table.header {
+  font-weight: bold;
+  color: #527bbd;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
+
+
+/*
+ * html5 specific
+ *
+ * */
+
+table.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+thead, p.tableblock.header {
+  font-weight: bold;
+  color: #527bbd;
+}
+p.tableblock {
+  margin-top: 0;
+}
+table.tableblock {
+  border-width: 3px;
+  border-spacing: 0px;
+  border-style: solid;
+  border-color: #527bbd;
+  border-collapse: collapse;
+}
+th.tableblock, td.tableblock {
+  border-width: 1px;
+  padding: 4px;
+  border-style: solid;
+  border-color: #527bbd;
+}
+
+table.tableblock.frame-topbot {
+  border-left-style: hidden;
+  border-right-style: hidden;
+}
+table.tableblock.frame-sides {
+  border-top-style: hidden;
+  border-bottom-style: hidden;
+}
+table.tableblock.frame-none {
+  border-style: hidden;
+}
+
+th.tableblock.halign-left, td.tableblock.halign-left {
+  text-align: left;
+}
+th.tableblock.halign-center, td.tableblock.halign-center {
+  text-align: center;
+}
+th.tableblock.halign-right, td.tableblock.halign-right {
+  text-align: right;
+}
+
+th.tableblock.valign-top, td.tableblock.valign-top {
+  vertical-align: top;
+}
+th.tableblock.valign-middle, td.tableblock.valign-middle {
+  vertical-align: middle;
+}
+th.tableblock.valign-bottom, td.tableblock.valign-bottom {
+  vertical-align: bottom;
+}
+
+
+/*
+ * manpage specific
+ *
+ * */
+
+body.manpage h1 {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border-top: 2px solid silver;
+  border-bottom: 2px solid silver;
+}
+body.manpage h2 {
+  border-style: none;
+}
+body.manpage div.sectionbody {
+  margin-left: 3em;
+}
+
+@media print {
+  body.manpage div#toc { display: none; }
+}
+
+
+</style>
+<script type="text/javascript">
+/*<![CDATA[*/
+var asciidoc = {  // Namespace.
+
+/////////////////////////////////////////////////////////////////////
+// Table Of Contents generator
+/////////////////////////////////////////////////////////////////////
+
+/* Author: Mihai Bazon, September 2002
+ * http://students.infoiasi.ro/~mishoo
+ *
+ * Table Of Content generator
+ * Version: 0.4
+ *
+ * Feel free to use this script under the terms of the GNU General Public
+ * License, as long as you do not remove or alter this notice.
+ */
+
+ /* modified by Troy D. Hanson, September 2006. License: GPL */
+ /* modified by Stuart Rackham, 2006, 2009. License: GPL */
+
+// toclevels = 1..4.
+toc: function (toclevels) {
+
+  function getText(el) {
+    var text = "";
+    for (var i = el.firstChild; i != null; i = i.nextSibling) {
+      if (i.nodeType == 3 /* Node.TEXT_NODE */) // IE doesn't speak constants.
+        text += i.data;
+      else if (i.firstChild != null)
+        text += getText(i);
+    }
+    return text;
+  }
+
+  function TocEntry(el, text, toclevel) {
+    this.element = el;
+    this.text = text;
+    this.toclevel = toclevel;
+  }
+
+  function tocEntries(el, toclevels) {
+    var result = new Array;
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    // Function that scans the DOM tree for header elements (the DOM2
+    // nodeIterator API would be a better technique but not supported by all
+    // browsers).
+    var iterate = function (el) {
+      for (var i = el.firstChild; i != null; i = i.nextSibling) {
+        if (i.nodeType == 1 /* Node.ELEMENT_NODE */) {
+          var mo = re.exec(i.tagName);
+          if (mo && (i.getAttribute("class") || i.getAttribute("className")) != "float") {
+            result[result.length] = new TocEntry(i, getText(i), mo[1]-1);
+          }
+          iterate(i);
+        }
+      }
+    }
+    iterate(el);
+    return result;
+  }
+
+  var toc = document.getElementById("toc");
+  if (!toc) {
+    return;
+  }
+
+  // Delete existing TOC entries in case we're reloading the TOC.
+  var tocEntriesToRemove = [];
+  var i;
+  for (i = 0; i < toc.childNodes.length; i++) {
+    var entry = toc.childNodes[i];
+    if (entry.nodeName.toLowerCase() == 'div'
+     && entry.getAttribute("class")
+     && entry.getAttribute("class").match(/^toclevel/))
+      tocEntriesToRemove.push(entry);
+  }
+  for (i = 0; i < tocEntriesToRemove.length; i++) {
+    toc.removeChild(tocEntriesToRemove[i]);
+  }
+
+  // Rebuild TOC entries.
+  var entries = tocEntries(document.getElementById("content"), toclevels);
+  for (var i = 0; i < entries.length; ++i) {
+    var entry = entries[i];
+    if (entry.element.id == "")
+      entry.element.id = "_toc_" + i;
+    var a = document.createElement("a");
+    a.href = "#" + entry.element.id;
+    a.appendChild(document.createTextNode(entry.text));
+    var div = document.createElement("div");
+    div.appendChild(a);
+    div.className = "toclevel" + entry.toclevel;
+    toc.appendChild(div);
+  }
+  if (entries.length == 0)
+    toc.parentNode.removeChild(toc);
+},
+
+
+/////////////////////////////////////////////////////////////////////
+// Footnotes generator
+/////////////////////////////////////////////////////////////////////
+
+/* Based on footnote generation code from:
+ * http://www.brandspankingnew.net/archive/2005/07/format_footnote.html
+ */
+
+footnotes: function () {
+  // Delete existing footnote entries in case we're reloading the footnodes.
+  var i;
+  var noteholder = document.getElementById("footnotes");
+  if (!noteholder) {
+    return;
+  }
+  var entriesToRemove = [];
+  for (i = 0; i < noteholder.childNodes.length; i++) {
+    var entry = noteholder.childNodes[i];
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+      entriesToRemove.push(entry);
+  }
+  for (i = 0; i < entriesToRemove.length; i++) {
+    noteholder.removeChild(entriesToRemove[i]);
+  }
+
+  // Rebuild footnote entries.
+  var cont = document.getElementById("content");
+  var spans = cont.getElementsByTagName("span");
+  var refs = {};
+  var n = 0;
+  for (i=0; i<spans.length; i++) {
+    if (spans[i].className == "footnote") {
+      n++;
+      var note = spans[i].getAttribute("data-note");
+      if (!note) {
+        // Use [\s\S] in place of . so multi-line matches work.
+        // Because JavaScript has no s (dotall) regex flag.
+        note = spans[i].innerHTML.match(/\s*\[([\s\S]*)]\s*/)[1];
+        spans[i].innerHTML =
+          "[<a id='_footnoteref_" + n + "' href='#_footnote_" + n +
+          "' title='View footnote' class='footnote'>" + n + "</a>]";
+        spans[i].setAttribute("data-note", note);
+      }
+      noteholder.innerHTML +=
+        "<div class='footnote' id='_footnote_" + n + "'>" +
+        "<a href='#_footnoteref_" + n + "' title='Return to text'>" +
+        n + "</a>. " + note + "</div>";
+      var id =spans[i].getAttribute("id");
+      if (id != null) refs["#"+id] = n;
+    }
+  }
+  if (n == 0)
+    noteholder.parentNode.removeChild(noteholder);
+  else {
+    // Process footnoterefs.
+    for (i=0; i<spans.length; i++) {
+      if (spans[i].className == "footnoteref") {
+        var href = spans[i].getElementsByTagName("a")[0].getAttribute("href");
+        href = href.match(/#.*/)[0];  // Because IE return full URL.
+        n = refs[href];
+        spans[i].innerHTML =
+          "[<a href='#_footnote_" + n +
+          "' title='View footnote' class='footnote'>" + n + "</a>]";
+      }
+    }
+  }
+},
+
+install: function(toclevels) {
+  var timerId;
+
+  function reinstall() {
+    asciidoc.footnotes();
+    if (toclevels) {
+      asciidoc.toc(toclevels);
+    }
+  }
+
+  function reinstallAndRemoveTimer() {
+    clearInterval(timerId);
+    reinstall();
+  }
+
+  timerId = setInterval(reinstall, 500);
+  if (document.addEventListener)
+    document.addEventListener("DOMContentLoaded", reinstallAndRemoveTimer, false);
+  else
+    window.onload = reinstallAndRemoveTimer;
+}
+
+}
+asciidoc.install();
+/*]]>*/
+</script>
+</head>
+<body class="article">
+<div id="header">
+<h1>The GNU APL ⎕GTK Cookbook</h1>
+<span id="author">Jürgen Sauermann, GNU APL</span><br />
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="_abstract">Abstract</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>⎕GTK is a GNU APL system function that allows an APL program to create and
+control a graphical user interface (GUI). The GUI is based on Gtk+ (Gimp
+Toolkit) version 3+ (aka. GTK 3+). This document describes, by means of a
+simple GUI example, how ⎕GTK based GUIs can created and managed from GNU APL.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_philosophy">Philosophy</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>A modern GUI such as Gtk provides a powerful API for controlling almost every
+aspect of the GUI. A consequence of that power is an API that consists of
+thousands of functions. The entire Gtk API is spread over 11 different
+libraries:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>$ pkg-config gtk+-3.0 --libs
+-lgtk-3 -lgdk-3 -latk-1.0 -lgio-2.0 -lpangocairo-1.0 -lgdk_pixbuf-2.0
+-lcairo-gobject -lpango-1.0 -lcairo -lgobject-2.0 -lglib-2.0</code></pre>
+</div></div>
+<div class="paragraph"><p>Each library contains tens, hundreds, or even thousands of symbols. Every
+symbol represents either a function or a variable, and the vast majority of
+symbols in the different libraries represent functions.</p></div>
+<div class="tableblock">
+<table rules="all"
+width="60%"
+frame="border"
+cellspacing="0" cellpadding="4">
+<caption class="title">Table 1. Gtk API Symbols</caption>
+<col width="50%" />
+<col width="50%" />
+<thead>
+<tr>
+<th align="left" valign="top"> Gtk Library          </th>
+<th align="left" valign="top"> Number of Symbols</th>
+</tr>
+</thead>
+<tfoot>
+<tr>
+<td align="left" valign="top"><p class="table">TOTAL</p></td>
+<td align="left" valign="top"><p class="table">9950</p></td>
+</tr>
+</tfoot>
+<tbody>
+<tr>
+<td align="left" valign="top"><p class="table">libgtk-3.so</p></td>
+<td align="left" valign="top"><p class="table">4176</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">libgdk-3.so</p></td>
+<td align="left" valign="top"><p class="table">632</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">libatk-1.0.so</p></td>
+<td align="left" valign="top"><p class="table">265</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">libgio-2.0.so</p></td>
+<td align="left" valign="top"><p class="table">1872</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">libpangocairo-1.0.so</p></td>
+<td align="left" valign="top"><p class="table">33</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">libgdk_pixbuf-2.0.so</p></td>
+<td align="left" valign="top"><p class="table">117</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">libcairo-gobject.so</p></td>
+<td align="left" valign="top"><p class="table">33</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">libpango-1.0.so</p></td>
+<td align="left" valign="top"><p class="table">405</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">libcairo.so</p></td>
+<td align="left" valign="top"><p class="table">395</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">libgobject-2.0.so</p></td>
+<td align="left" valign="top"><p class="table">427</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">libglib-2.0.so</p></td>
+<td align="left" valign="top"><p class="table">1595</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="paragraph"><p>These numbers suggest that mapping every Gtk function to an APL function would
+create an almost unusable API at APL level. Even the approach
+used for ⎕FIO or ⎕SQL - using function numbers as APL axis elements - reaches
+its limits when used with almost 10000 functions.</p></div>
+<div class="paragraph"><p>Now, the huge number of API functions in Gtk contrasts considerably with the
+moderate number of widgets (around 80) in a GUI and even more with number of
+things that a user can do with each of the widgets.</p></div>
+<div class="paragraph"><p>If we look at <strong>glade</strong>, a Gtk GUI construction tool, then we see that there are
+12 top-level widgets (aka. "windows"), 20 containers (widgets containing other
+widgets), and 36 control widgets (most of them variants of the same base
+widget, like different types of buttons).</p></div>
+<div class="paragraph"><p>This discrepancy between the huge number of functions in provided by Gtk and
+rather small number of things that a user can do (like: click on a button,
+select an item in a selection box, enter text in some text entry, etc)
+or perceive (color, font, etc.) suggests that there might be a clever way to
+control a GUI without mapping each of the 10000+ Gtk function to a
+corresponding APL function in a 1:1 fashion.</p></div>
+<div class="paragraph"><p>⎕GTK uses a rigorous approach to reduce the number of functions:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Every GUI is required to be constructed with the GUI construction tool
+  <strong>glade</strong> (which comes with GTK), This requirement reduces the need for all
+  functions that are concerned with the instantiation of the GUI elements and
+  their properties. It also speeds up the design of the GUI itself.
+</p>
+</li>
+<li>
+<p>
+To the extent possible, visual widget aspects that are usually static (i.e.
+  do not change over time) such as colors or sizes are required to be specified
+  with CSS (Cascading Style Sheets). This requirement further reduces the need
+  for the according GTK functions. It also speeds up the design of the GUI
+  itself. The downside is a somewhat static look-and-feel of the GUI, because,
+  for example, colors cannot be changed after the GUI was instantiated.
+  However, the benefit of fancy dynamic GUIs (if any) seems not to justify the
+  complexity in the API that would be needed to support them.
+</p>
+</li>
+<li>
+<p>
+Implementation on demand. ⎕GTK starts with a rather small (and necessarily
+  incomplete) set of GTK widgets and events, but has a simple way to extend
+  that set. The mapping between ⎕GTK on one side and libgtk functions and
+  events on the other side is defined in a single macro file <strong>Gtk/Gtk_map.def</strong>
+  that can be easily extended to accommodate new widgets and signals,
+</p>
+</li>
+</ul></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_architecture">Architecture</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>The philosophy above has been implemented in the following architecture.</p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+The Gtk GUI itself has been implemented in a separate process running the
+program <strong>Gtk_server</strong>. The Gtk_server is linked with the different Gtk
+libraries, so that Gtk itself remains outside GNU APL.
+</p>
+</li>
+<li>
+<p>
+The <strong>Gtk_server</strong> is started by ⎕GTK, and after that ⎕GTK communicates with
+Gtk_server over a socket pair. The communication consists of a sequence of
+TLV (Tag/Length/Value) buffers encoded with 33 ⎕CR and decoded with 34 ⎕CR
+(aka. ¯33 ⎕CR) at the APL end. A user action (e.g. a button click) results
+in an "event" (= a TLV buffer) received by APL while an "command" (sent from
+APL to the Gtk_server results in some change in the GUI. However, many details
+such as a button changing its form or its color when being pressed are handled
+by the Gtk_server server process (resp. one of the Gtk libraries) and are not
+communicated to APL.
+</p>
+</li>
+</ol></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>                                                          ╔════════════════════════════╗
+                                                          ║ GUI-description.xml file   ║
+                                                          ║  ↓ GUI-stylesheet.css file ║
+                                                          ║  ↓  ↓                      ║
+                                                          ║  ↓  ↓   ┌───────────────┐  ║
+                                                          ║  ↓  ↓   │    GTK GUI    │  ║
+    ╔════════════════╗      Commands                      ║  ↓  ↓   └─┬─────────┬┬──┘  ║
+    ║ GNU APL     ┌──╨───┐  33⎕CR → → →         socket    ║┌──────────┴─┐   ┌───┼┴────┐║
+    ║ application │ ⎕GTK ├───────────────────────-----────╫┤ Gtk_server │ ┌─┴───┴────┐│║
+    ║ program.apl └───╥──┘  34⎕CR ← ← ←          pair     ║└────────────┘ │ GTK libs ├┘║
+    ╚═════════════════╝     Responses, Events             ║               └──────────┘ ║
+                                                          ╚════════════════════════════╝</code></pre>
+</div></div>
+<div class="olist arabic"><ol class="arabic" start="3">
+<li>
+<p>
+One Gtk_server can handle:
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+a single top-level window (the most common case), or
+</p>
+</li>
+<li>
+<p>
+several top-level windows, or even
+</p>
+</li>
+<li>
+<p>
+one or more lower-level widgets that are normally placed inside a
+    top-level window,
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+One apl interpreter process can start several Gtk_server processes.
+</p>
+</li>
+</ol></div>
+<div class="paragraph"><p>As a consequence a GUI with e.g. multiple top-level windows can be realized
+as:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+one Gtk_server with multiple windows. These multiple windows are created in
+   <strong>glade</strong> and are contained in one <strong>.ui</strong> XML file, or
+</p>
+</li>
+<li>
+<p>
+multiple Gtk_servers, each controlling one windows. In this case multiple
+  <strong>.ui</strong> XML files have to be created with <strong>glade</strong> (unless all windows are
+  identical), or
+</p>
+</li>
+<li>
+<p>
+a mix the above (although not necessarily a good idea).
+</p>
+</li>
+</ul></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_development_work_flow">Development Work-flow</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>The architecture above leads to the following work-flow.</p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+The programmer specifies the GUI by means of the <strong>glade</strong> GUI design tool
+   that comes with Gtk. The result is an XML file that describes the GUI, The
+   XML file can be changed later on as needed, so that the programmer can
+   start with a subset of the GUI functionality and then extend that
+   functionality in an incremental fashion.
+</p>
+</li>
+<li>
+<p>
+The programmer writes a CSS specification for the the widgets in the GUI.
+   The CSS file specifies the styling (i.e. colors. sizes etc.) of the
+   widgets. In theory, this step is optional, but in practice inevitable for a
+   somewhat good-looking GUI.
+</p>
+</li>
+<li>
+<p>
+The programmer write a brief start-up code for the GUI in which the files
+   created in steps 1. and 2. above are being loaded into the GUI.
+</p>
+</li>
+<li>
+<p>
+the programmer displays the GUI - either at the start of the APL
+   application if the GUI shall be permanently visible or at some time
+   if the GUI is, for example, only popped up in order to request input
+   from the user of the APL application. In the latter case the GUI is
+   a single window (a "modal dialog") which is polled from APL until some
+   final action of the user has occurred, while the former case the APL
+   application has to poll the GUI for events at rather short intervals.
+   to poll ⎕GTK at regular intervals.
+</p>
+</li>
+</ol></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>    ╔══════════════════════╗
+    ║  GUI Design (glade)  ║   →  my-application.ui
+    ╚══════════╤═══════════╝
+               │
+    ╔══════════╧═══════════╗
+    ║ Widget Details (CSS) ║   →  my-application.css
+    ╚══════════╤═══════════╝
+               │
+    ╔══════════╧═══════════╗
+    ║   APL application    ║   →  my-application.apl
+    ║ ──────────────────── ║
+    ║      GUI start       ║   → loads my-application.ui and my-application.css
+    ║ ──────────────────── ║
+    ║   GUI event loop     ║   × polls and reacts to events (user actions)
+    ╚══════════════════════╝</code></pre>
+</div></div>
+<div class="paragraph"><p>The example given below will be a modal dialog with the non-modal case left
+as an exercise for the reader.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_principles">Principles</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>As may have become obvious by now, there isn&#8217;t much coding left to be done
+for the APL application. After APL has started the GUI, the process running
+GNU APL and the Gtk_server send "signals" to each other in an asynchronous
+fashion and according to the following rules:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Every APL application that has a GUI (and uses ⎕GTK) starts its own
+  Gtk_server(s). In a GUI with several windows, each window uses the same
+  Gtk_server, and the same connection (handle) towards APL. Multiple
+  Gtk_servers are independant of each other, and the coordination between
+  the windows must be done in the APL application.
+</p>
+</li>
+<li>
+<p>
+GNU APL and Gtk_server then send signals to each other. A signal is a
+  sequence of bytes, starting with a 4-byte tag, followed by a 4-byte signal
+  length, and concluded with 0 or more signal data bytes as indicated by the
+  signal length.
+</p>
+</li>
+<li>
+<p>
+The encoding of the signals is the same in both directions, but we call
+  signals from APL to Gtk_server <strong>commands</strong> and signals from Gtk_server to APL
+  either <strong>responses</strong> (if they contain the result of a prior command), or else
+  <strong>events</strong> (which are caused by a user&#8217;s activity such as clicking a button.
+</p>
+</li>
+<li>
+<p>
+Commands are used to modify the GUI in some way, for example to enter an
+  initial value into a text-entry widget.
+</p>
+</li>
+<li>
+<p>
+Events are sent by the Gtk_server upon final user actions such as pushing a
+  button, or pressing ENTER after having modified the text in a text-entry
+  widget.
+</p>
+</li>
+<li>
+<p>
+Normally Gtk_server does not sent larger amounts of data to APL on its own,
+  but rather only informs APL that some data has changed and waits until APL
+  solicits the sending of the data. Most events contain only the widget that
+  has sent them and the type of event. Further information such as the content
+  of e.g. a text entry widget, has to be requested from Gtk_server by means of
+  commands. The reason for this is that often the APL side needs the functions
+  for retrieving the content anyhow, and instead of complicating the decoding
+  of events, the functions for retrieving the content can be reused, leading
+  to an overall simpler design.
+</p>
+</li>
+<li>
+<p>
+Every signal is a TLV buffer whose length is dictated by the length of the
+  Value component. Such a TLV buffer is therefore already determined by an
+  integer tags and the value bytes V; the length is then ⍴V. In APL it is
+  therefore sufficient to specify only T and V as a vector TV←Tag,Value
+  whose first element Tag = ↑TV identifies a particular command or event,
+  and the rest 1↓TV is a (frequently empty) argument of that command or event.
+  The GNU APL system functions 33 ⎕CR resp. 34 ⎕CR have been tailored to encode
+  resp. decode tag/value vectors TV into/from the TLV buffers exchanged between
+  APL and Gtk_server.
+</p>
+</li>
+<li>
+<p>
+Sending of a TLV from APL to Gtk_server is done by encoding the TLV with 33
+  ⎕FIO TLV, followed by a single write() (similar to ⎕FIO[42]) onto the
+  connection (the "Handle") between APL and Gtk_server. Sending of only part
+  of a TLV (for example, first the tag in one write() and then the length and
+  the value in a second write()) is not allowed in either direction because
+  that would hang the other side. That tags are divided into the following
+  rangesL
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+1&#8230;999: commands that have no response
+</p>
+</li>
+<li>
+<p>
+1001&#8230;1999: commands that have a response (i.e. that expect a result)
+</p>
+</li>
+<li>
+<p>
+-1999&#8230;-1000  error indications for commands 1000&#8230;1999. If command
+   1xxx fails in Gtk_server, then Gtk_server sends -1xxx to APL.
+</p>
+</li>
+<li>
+<p>
+2001-2999: responses (2xxx is the response for command 1xxx)
+</p>
+</li>
+<li>
+<p>
+3001-3999: events
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+Receiving from Gtk_server is done with single read() call (like ⎕FIO[43])
+  from the handle followed by decoding the received bytes with 34 ⎕CR.
+</p>
+</li>
+</ul></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_detailed_example">Detailed Example</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>In the following, the Implementation of a simple GUI will be described
+step-by-step. The GUI will consist of a window that contains a label (= a fixed
+text), a text entry box, and a button that the user can push to end the text
+entry.</p></div>
+<div class="sect2">
+<h3 id="_step_1_defining_the_gui_with_glade">Step 1: Defining the GUI with Glade</h3>
+<div class="paragraph"><p>Start <strong>glade</strong> without a filename:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>$ glade</code></pre>
+</div></div>
+<div class="paragraph"><p>A window with four larger areas pops up:</p></div>
+<div class="imageblock">
+<div class="content">
+<img src="glade-0.png" alt="glade-0.png" />
+</div>
+</div>
+<div class="paragraph"><p>The four areas are:</p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+A <strong>widget selection area</strong> on the left,
+</p>
+</li>
+<li>
+<p>
+A <strong>GUI visualization</strong> in the middle (empty)
+</p>
+</li>
+<li>
+<p>
+A <strong>GUI structure</strong> on the (top-) right (empty), and
+</p>
+</li>
+<li>
+<p>
+A <strong>widget property area</strong> on the (bottom-) right (empty).
+</p>
+</li>
+</ol></div>
+<div class="paragraph"><p>The <strong>widget selection area</strong> is divided into several groups named</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Actions,
+</p>
+</li>
+<li>
+<p>
+Toplevels,
+</p>
+</li>
+<li>
+<p>
+Containers,
+</p>
+</li>
+<li>
+<p>
+Control and Display, and
+</p>
+</li>
+<li>
+<p>
+GTK+ Unix Print Toplevels
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>If you move the mouse pointer over one of the widgets, then the widget
+is highlighted and a tooltip showing the type of the widget pops up.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_step_1a_add_top_level_window">Step 1a: Add top-level Window</h3>
+<div class="paragraph"><p>Drag the first widget of type <strong>Window</strong> from the Toplevels group and drop
+it into the <strong>GUI visualization area</strong>. That is, move the mouse pointer
+over the widget, push and hold down the left mouse button, move the mouse
+pointer to the <strong>GUI visualization area</strong> in the middle, and release the
+mouse button.</p></div>
+<div class="paragraph"><p>You will now see a new rectangular are in the <strong>GUI visualization area</strong>,
+a widget item named <strong>window1</strong> in the <strong>GUI structure</strong>, and
+the properties of the new widget below.</p></div>
+<div class="paragraph"><p>Your GUI now consists of one widget. You see the grid as child <strong>grid1</strong> of
+<strong>window1</strong> in the <strong>GUI structure</strong>.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_step_1b_add_a_positioning_grid">Step 1b: Add a positioning Grid</h3>
+<div class="paragraph"><p>Next, drag the widget of type <strong>Grid</strong> onto the <strong>window1</strong> in the
+middle and enter 6 rows / 10 columns in the dialog that pops up.</p></div>
+<div class="paragraph"><p>This grid is a helper-widget for controlling the placement of other widget
+inside the <strong>window1</strong>.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_step_1c_add_labels_and_text_entry_widgets_to_the_positioning_grid">Step 1c: Add labels and text entry widgets to the positioning Grid</h3>
+<div class="paragraph"><p>Next, drag the widget of type <strong>Label</strong> from the "Control and Display" group
+onto row 2, column 2 of the grid and another one of type <strong>Label</strong> onto row 3,
+column 2 of the grid. Similarly, drag 2 widgets of type "Text Entry" to
+rows 2 and 3, column 4,</p></div>
+<div class="paragraph"><p>Unfortunately this makes the grid uneven because the newly placed widgets are
+larger than the fields in the grid. You can fix that by:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+selecting each widget in the <strong>GUI structure</strong>,
+</p>
+</li>
+<li>
+<p>
+selecting the <strong>Packing</strong> tab in the properties area, and
+</p>
+</li>
+<li>
+<p>
+setting the <strong>Width</strong> property from its default 1 to, say, 6.
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>That tells <strong>glade</strong> to use 6 grid cells instead of 1, so that the grid looks
+almost normal again.</p></div>
+<div class="paragraph"><p>At this point you can change the property <strong>label</strong> under the <strong>General tab</strong> to
+that text that the label should have. We choose <strong>Employee</strong> for <strong>label2</strong> and
+<strong>Position</strong> for label2.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_step_1d_add_an_ok_button_and_save_the_gui">Step 1d: Add an OK button and save the GUI</h3>
+<div class="paragraph"><p>Finally, drag the widget of type <strong>Button</strong> from the <strong>Control and Display</strong> group
+to row 5, column 5, then set its <strong>width</strong> to <strong>2</strong>, and its <strong>label</strong> to <strong>OK</strong>
+(you need to scroll down in the General tab to see that property).</p></div>
+<div class="paragraph"><p>Then <strong>SAVE THE GUI !!!</strong> in <strong>glade</strong>'s menu-bar under <strong>File → Save As</strong> and give it
+the filename <strong>my-application.ui</strong>.</p></div>
+<div class="paragraph"><p>In <strong>glade</strong>, the GUI should now look like this:</p></div>
+<div class="imageblock">
+<div class="content">
+<img src="glade-1.png" alt="glade-1.png" />
+</div>
+</div>
+<div class="paragraph"><p>At this point you can exit <strong>glade</strong>. <strong>glade</strong> has produced the file
+<strong>my-application.ui</strong>, which is an XML file describing the GUI, Its content is
+this:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;!-- Generated with glade 3.16.1 --&gt;
+&lt;interface&gt;
+  &lt;requires lib="gtk+" version="3.10"/&gt;
+  &lt;object class="GtkWindow" id="window1"&gt;
+    &lt;property name="can_focus"&gt;False&lt;/property&gt;
+    &lt;child&gt;
+      &lt;object class="GtkGrid" id="grid1"&gt;
+        &lt;property name="visible"&gt;True&lt;/property&gt;
+        &lt;property name="can_focus"&gt;False&lt;/property&gt;
+        &lt;child&gt;
+          &lt;object class="GtkLabel" id="label1"&gt;
+            &lt;property name="visible"&gt;True&lt;/property&gt;
+            &lt;property name="can_focus"&gt;False&lt;/property&gt;
+            &lt;property name="label" translatable="yes"&gt;Employee&lt;/property&gt;
+          &lt;/object&gt;
+          &lt;packing&gt;
+            &lt;property name="left_attach"&gt;1&lt;/property&gt;
+            &lt;property name="top_attach"&gt;1&lt;/property&gt;
+            &lt;property name="width"&gt;1&lt;/property&gt;
+            &lt;property name="height"&gt;1&lt;/property&gt;
+          &lt;/packing&gt;
+        &lt;/child&gt;
+        &lt;child&gt;
+          &lt;object class="GtkLabel" id="label2"&gt;
+            &lt;property name="name"&gt;label2&lt;/property&gt;
+            &lt;property name="visible"&gt;True&lt;/property&gt;
+            &lt;property name="can_focus"&gt;False&lt;/property&gt;
+            &lt;property name="label" translatable="yes"&gt;Position&lt;/property&gt;
+          &lt;/object&gt;
+          &lt;packing&gt;
+            &lt;property name="left_attach"&gt;1&lt;/property&gt;
+            &lt;property name="top_attach"&gt;2&lt;/property&gt;
+            &lt;property name="width"&gt;1&lt;/property&gt;
+            &lt;property name="height"&gt;1&lt;/property&gt;
+          &lt;/packing&gt;
+        &lt;/child&gt;
+        &lt;child&gt;
+          &lt;object class="GtkEntry" id="entry1"&gt;
+            &lt;property name="visible"&gt;True&lt;/property&gt;
+            &lt;property name="can_focus"&gt;True&lt;/property&gt;
+          &lt;/object&gt;
+          &lt;packing&gt;
+            &lt;property name="left_attach"&gt;3&lt;/property&gt;
+            &lt;property name="top_attach"&gt;1&lt;/property&gt;
+            &lt;property name="width"&gt;6&lt;/property&gt;
+            &lt;property name="height"&gt;1&lt;/property&gt;
+          &lt;/packing&gt;
+        &lt;/child&gt;
+        &lt;child&gt;
+          &lt;object class="GtkEntry" id="entry2"&gt;
+            &lt;property name="visible"&gt;True&lt;/property&gt;
+            &lt;property name="can_focus"&gt;True&lt;/property&gt;
+          &lt;/object&gt;
+          &lt;packing&gt;
+            &lt;property name="left_attach"&gt;3&lt;/property&gt;
+            &lt;property name="top_attach"&gt;2&lt;/property&gt;
+            &lt;property name="width"&gt;6&lt;/property&gt;
+            &lt;property name="height"&gt;1&lt;/property&gt;
+          &lt;/packing&gt;
+        &lt;/child&gt;
+        &lt;child&gt;
+          &lt;object class="GtkButton" id="button1"&gt;
+            &lt;property name="label" translatable="yes"&gt;OK&lt;/property&gt;
+            &lt;property name="name"&gt;OK-button&lt;/property&gt;
+            &lt;property name="visible"&gt;True&lt;/property&gt;
+            &lt;property name="can_focus"&gt;True&lt;/property&gt;
+            &lt;property name="receives_default"&gt;True&lt;/property&gt;
+            &lt;signal name="clicked" handler="clicked" swapped="no"/&gt;
+          &lt;/object&gt;
+          &lt;packing&gt;
+            &lt;property name="left_attach"&gt;4&lt;/property&gt;
+            &lt;property name="top_attach"&gt;4&lt;/property&gt;
+            &lt;property name="width"&gt;2&lt;/property&gt;
+            &lt;property name="height"&gt;1&lt;/property&gt;
+          &lt;/packing&gt;
+        &lt;/child&gt;
+        &lt;child&gt;
+          &lt;placeholder/&gt;
+        &lt;/child&gt;
+        &lt;child&gt;
+          &lt;placeholder/&gt;
+        &lt;/child&gt;
+        &lt;child&gt;
+          &lt;placeholder/&gt;
+        &lt;/child&gt;
+        &lt;child&gt;
+          &lt;placeholder/&gt;
+        &lt;/child&gt;
+        &lt;child&gt;
+          &lt;placeholder/&gt;
+        &lt;/child&gt;
+        &lt;child&gt;
+          &lt;placeholder/&gt;
+        &lt;/child&gt;
+        &lt;child&gt;
+          &lt;placeholder/&gt;
+        &lt;/child&gt;
+        &lt;child&gt;
+          &lt;placeholder/&gt;
+        &lt;/child&gt;
+        &lt;child&gt;
+          &lt;placeholder/&gt;
+        &lt;/child&gt;
+        &lt;child&gt;
+          &lt;placeholder/&gt;
+        &lt;/child&gt;
+        &lt;child&gt;
+          &lt;placeholder/&gt;
+        &lt;/child&gt;
+        &lt;child&gt;
+          &lt;placeholder/&gt;
+        &lt;/child&gt;
+        &lt;child&gt;
+          &lt;placeholder/&gt;
+        &lt;/child&gt;
+        &lt;child&gt;
+          &lt;placeholder/&gt;
+        &lt;/child&gt;
+        &lt;child&gt;
+          &lt;placeholder/&gt;
+        &lt;/child&gt;
+        &lt;child&gt;
+          &lt;placeholder/&gt;
+        &lt;/child&gt;
+        &lt;child&gt;
+          &lt;placeholder/&gt;
+        &lt;/child&gt;
+        &lt;child&gt;
+          &lt;placeholder/&gt;
+        &lt;/child&gt;
+        &lt;child&gt;
+          &lt;placeholder/&gt;
+        &lt;/child&gt;
+        &lt;child&gt;
+          &lt;placeholder/&gt;
+        &lt;/child&gt;
+        &lt;child&gt;
+          &lt;placeholder/&gt;
+        &lt;/child&gt;
+        &lt;child&gt;
+          &lt;placeholder/&gt;
+        &lt;/child&gt;
+        &lt;child&gt;
+          &lt;placeholder/&gt;
+        &lt;/child&gt;
+        &lt;child&gt;
+          &lt;placeholder/&gt;
+        &lt;/child&gt;
+        &lt;child&gt;
+          &lt;placeholder/&gt;
+        &lt;/child&gt;
+        &lt;child&gt;
+          &lt;placeholder/&gt;
+        &lt;/child&gt;
+        &lt;child&gt;
+          &lt;placeholder/&gt;
+        &lt;/child&gt;
+        &lt;child&gt;
+          &lt;placeholder/&gt;
+        &lt;/child&gt;
+        &lt;child&gt;
+          &lt;placeholder/&gt;
+        &lt;/child&gt;
+      &lt;/object&gt;
+    &lt;/child&gt;
+  &lt;/object&gt;
+&lt;/interface&gt;</code></pre>
+</div></div>
+</div>
+<div class="sect2">
+<h3 id="_step_2_starting_the_gui_from_apl">Step 2: Starting the GUI from APL</h3>
+<div class="paragraph"><p>The GUI is not yet finished, but we can already look at it from APL. In the
+following we assume that:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+The GUI file is /home/eedjsa/projects/juergen/apl-1.7/HOWTOs/my-application.ui
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>You most likely need to adjust there paths on your machine. Then start
+GNU APL and enter the following:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>      GUI_path ← '/home/eedjsa/projects/juergen/apl-1.7/HOWTOs/my-application.ui'
+      Handle ← ⎕GTK GUI_path             ⍝ fork Gtk_server and connect to it</code></pre>
+</div></div>
+<div class="paragraph"><p>We see a new window at the top-left corner of the screen (that position can be
+changed by window properties in <strong>glade</strong> later on):</p></div>
+<div class="imageblock">
+<div class="content">
+<img src="glade-2.png" alt="glade-2.png" />
+</div>
+</div>
+<div class="paragraph"><p>You can then stop the GUI with <strong>)CLEAR</strong> before leaving APL with <strong>)OFF</strong>:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>      )CLEAR
+      )OFF</code></pre>
+</div></div>
+</div>
+<div class="sect2">
+<h3 id="_step_3_styling_the_gui_with_css">Step 3: Styling the GUI with CSS</h3>
+<div class="paragraph"><p>There exist numerous functions for controlling how widgets look line (colors,
+fonts, sizes, etc). However, constructing a GUI using these functions is a
+tedious and error-prone task.</p></div>
+<div class="paragraph"><p>For that reason, ⎕GTK does not provide access to all these functions. Instead,
+one can specify these properties by means of a standard CSS (cascading style
+sheet) file as the (optional) left argument of dyadic ⎕GTK:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>      GUI_path ← '/home/eedjsa/projects/juergen/apl-1.7/HOWTOs/my-application.ui'
+      CSS_path ← '/home/eedjsa/projects/juergen/apl-1.7/HOWTOs/my-application.css'
+      Handle ← CSS_path ⎕GTK GUI_path             ⍝ fork Gtk_server and connect to it</code></pre>
+</div></div>
+<div class="paragraph"><p>Consider the following CSS example, (file <strong>my-application.css</strong>):</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>/* general button */
+.BUTTON { color: #F00;      background: #4F4; }
+
+/* the OK button */
+#button1 { color: #F00; background: #FFF; }</code></pre>
+</div></div>
+<div class="paragraph"><p>It says that buttons should, in general have a green background and a red
+foreground (= text color), but that the button with id="button1" in the XML
+file my-application.ui shall have a white background instead.</p></div>
+<div class="paragraph"><p>The "general button" has no effect in our simple example because it has only
+one button and the stronger #button1 clause wins over the more general (and
+thus weaker) .BUTTON  clause.</p></div>
+<div class="paragraph"><p>With the <strong>my-application.css</strong> example file above we now get this:</p></div>
+<div class="imageblock">
+<div class="content">
+<img src="glade-3.png" alt="glade-3.png" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_step_4_managing_windows">Step 4: Managing windows</h3>
+<div class="paragraph"><p>Monadic ⎕GTK with integer argument 0 returns a (possibly empty) integer vector
+containing all window handles that are currently open.</p></div>
+<div class="paragraph"><p>Dyadic ⎕GTK with integer right argument 0 and integer left argument Ah closes the
+window whose handle is Ah.</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Note</div>
+</td>
+<td class="content">there is a summary of all ⎕GTK syntax variants
+(a ⎕GTK cheat sheet) in the Appendix of this document.</td>
+</tr></table>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre><code>      )CLEAR
+      ⎕GTK 0   ⍝ get window handles (empty)
+
+      GUI_path ← '/home/eedjsa/projects/juergen/apl-1.7/HOWTOs/my-application.ui'
+      CSS_path ← '/home/eedjsa/projects/juergen/apl-1.7/HOWTOs/my-application.css'
+      Handle ← CSS_path ⎕GTK GUI_path             ⍝ fork Gtk_server and connect to it
+
+      ⎕GTK 0   ⍝ get window handles (now there is one window)
+6
+
+      6 ⎕GTK 0   ⍝ close window handle 6
+0</code></pre>
+</div></div>
+<div class="paragraph"><p>The handle above (6) can, in theory, also be used with ⎕FIO functions like
+fread() if you now what you are doing. This practice is, however, dangerous
+because it might create inconsistencies between ⎕GTK and ⎕FIO. For example,
+closing a ⎕GTK handle with ⎕FIO is technically possible, but usually bad
+idea.</p></div>
+<div class="paragraph"><p>Please note that a window can normally closed from two ends: from APL with
+<strong>Ah ⎕GTK 0</strong> and from the GUI via <strong>Close</strong> in the top-left window menu.
+The latter may, however, close the window but leave the Gtk_server process
+that was running the window alive. You should therefore aim at always
+closing windows from APL, possibly by connecting window close signals to APL.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_step_5_managing_widgets">Step 5: Managing widgets</h3>
+<div class="paragraph"><p>A window is a (top-level) widget that usually contains other widgets. When you
+place a new widget in <strong>glade</strong>, then <strong>glade</strong> assigns a unique ID to the widget and
+makes sure that the id remains unique.</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<div class="title">Caution</div>
+</td>
+<td class="content">⎕GTK requires that you do not change the ID assigned by <strong>glade</strong> (even
+though <strong>glade</strong> allows you to do that). The ID assigned by <strong>glade</strong> is found as
+property <strong>ID:</strong> under the <strong>General</strong> tab and shall not be confused with the
+<strong>widget name:</strong> under the <strong>Common</strong> tab. The <strong>ID:</strong> property is used in the
+direction APL → Gtk_server to address widgets, while the <strong>widget name:</strong>
+property is used in the reverse direction APL ← Gtk_server to identify the
+widget that has sent a signal.</td>
+</tr></table>
+</div>
+<div class="paragraph"><p>The ID consists of class name followed by an instance number, for example
+"window1", ⎕GTK uses the class name in the ID to construct the function name
+in GTK that shall be called.</p></div>
+<div class="paragraph"><p>⎕GTK has different function signatures, which follow a simple rule:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+functions that address a GUI (opened with some .ui file) have no axis
+  argument
+</p>
+</li>
+<li>
+<p>
+functions that address widgets inside a GUI have an axis argument
+</p>
+</li>
+<li>
+<p>
+the axis argument is: H_ID ← H, ID where H is the GUI and ID is the ID
+  discussed above
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>address a GUI or window) have an axis argument. The axis argument is an
+integer H (which is the window handle returned by</p></div>
+<div class="paragraph"><p>All properties are strings, even though the content of some widgets can
+only be numbers. Currently only a small subset of the many existing GTK
+functions implemented in ⎕GTK resp. Gtk_server. However, the mapping from ⎕GTK
+functions to functions in libGtk can be easily extended by:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+adding new mappings to src/Gtk/Gtk_map.def
+</p>
+</li>
+<li>
+<p>
+recompiling and re-installing GNU APL
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>The second step also updates the ⎕GTK Cheat Sheet in the Appendix below.
+We extend our example to set the initial value of the employee to "John Doe",</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>      )CLEAR
+      GUI_path ← '/home/eedjsa/projects/juergen/apl-1.7/HOWTOs/my-application.ui'
+      CSS_path ← '/home/eedjsa/projects/juergen/apl-1.7/HOWTOs/my-application.css'
+      Handle ← CSS_path ⎕GTK GUI_path             ⍝ fork Gtk_server and connect to it
+
+      H_ID ← Handle, "entry1"            ⍝ the Employee: entry
+      "John Doe" ⎕GTK[H_ID] "set_text"   ⍝ set the entry to  "John Doe"
+
+      6 ⎕GTK 0   ⍝ close window handle 6
+0</code></pre>
+</div></div>
+<div class="paragraph"><p>The GUI now looks like this:</p></div>
+<div class="imageblock">
+<div class="content">
+<img src="glade-4.png" alt="glade-4.png" />
+</div>
+</div>
+<div class="paragraph"><p>Finally, we can read data back from widgets. The following example is rather
+crude (just good enough to demonstrate the access to a widget&#8217;s content), but we
+will see a smarter way in the next chapter (Managing Events). For the moment
+we simply give the user 20 seconds time to enter data in the "Position:" entry
+and read the entry data after that time has elapsed (and regardless of
+whether the user has entered any data or not).</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>      )CLEAR
+      GUI_path ← '/home/eedjsa/projects/juergen/apl-1.7/HOWTOs/my-application.ui'
+      CSS_path ← '/home/eedjsa/projects/juergen/apl-1.7/HOWTOs/my-application.css'
+      Handle ← CSS_path ⎕GTK GUI_path    ⍝ fork Gtk_server and connect to it
+
+      H_ID ← Handle, "entry1"            ⍝ the Employee: entry
+      "John Doe" ⎕GTK[H_ID] "set_text"   ⍝ set the entry to  "John Doe"
+
+      "Please enter the Position: within 20 seconds..."
+      ⊣⎕DL 20   ⍝ wait 20 seconds
+      "End of input interval"
+
+      H_ID ← Handle, "entry2"            ⍝ H_ID is the Position: entry
+      ⎕GTK[H_ID] "get_text"              ⍝ get the content of entry2
+
+      6 ⎕GTK 0   ⍝ close window handle 6
+0</code></pre>
+</div></div>
+<div class="paragraph"><p>Let <strong>Bint</strong> be:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+the (positive) function number B if B is a positive integer scalar, or
+</p>
+</li>
+<li>
+<p>
+the  function number corresponding to B if B is a function name like
+  "set_text" above.
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>Then result of <strong>⎕GTK[H_ID] B</strong> is:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong>Bint</strong> if the corresponding Gtk function was successful but returns no data
+  (which is typical is  for all set_XXX() functions like set_text() above), or
+</p>
+</li>
+<li>
+<p>
+<strong>-Bint</strong> if the corresponding Gtk function has failed, or
+</p>
+</li>
+<li>
+<p>
+a vector <strong>Bint, DATA</strong> if the corresponding Gtk function was successful and
+  has returned the result <strong>DATA</strong> (which is typical is  for all get_XXX()
+  functions like get_text() above).
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>Therefore, even though some Gtk functions (i.e. those having a C/C++ result
+type of <strong>void</strong>) do not return values, ⎕GTK always returns a value.</p></div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_step_6_managing_events">Step 6: Managing Events</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>In the example developed so far The transfer of data to and from widgets was
+initiated from APL. Of course, giving a user 20 seconds time to enter some
+data is a ridiculous approach for a serious application program. What is
+needed instead is a way for the GUI to indicate that something of interest has
+happened, such as the user pressing the OK button after she has finished her
+input. Another option would have been to indicate the end of input by hitting
+the return key.</p></div>
+<div class="paragraph"><p>If an application program having a GUI is written C/C+/+, then events such as
+pressing of a button or a key on the keyboard are usually forwarded to the
+application by means of callback functions. Whenever the events used by the
+application change - typically accompanied by a change of the GUI - then the
+application needs to be recompiled so that the callbacks are properly updated,</p></div>
+<div class="paragraph"><p>Since APL normally has no such thing as a callback function, and since we do
+not want to recompile Gtk_server for every APL application, the following
+approach is used:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Gtk_server currently provides a rather small set of callback functions:
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+clicked
+</p>
+</li>
+<li>
+<p>
+activate
+</p>
+</li>
+<li>
+<p>
+changed
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+in the <strong>glade</strong> GUI design, the "real" events (called "signals" in the Gtk
+  documentation) are connected to the above callback functions. An event
+  emitted by a widget then causes the connected callback function to be
+  called.
+</p>
+</li>
+<li>
+<p>
+every callback inserts a single event into an event queue inside ⎕GTK.
+</p>
+</li>
+<li>
+<p>
+⎕FTC is be used poll events out of the event queue. The event queue in ⎕GTK
+  decouples the creation of an event from the handling of the event.
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>Note: The Gtk widget class can currently emit around 70 different signals,
+while Gtk_server currently provides only a rather small set of callback
+functions. This set is supposed to grow over time as the need for new callbacks
+arises. However, the plan is <strong>not</strong> to end up with 70 callbacks in Gtk_server,</p></div>
+<div class="paragraph"><p>Technically speaking a set of callbacks is sufficient for sending and
+identifying every signal in APL if:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+for every signal with arguments a1, a2, &#8230; aN of type t1, t2, &#8230; tN in Gtk
+  there is at lease one matching callback in Gtk_server to which the signal
+  can be connected, and
+</p>
+</li>
+<li>
+<p>
+for every widgets that can emit N different signals with the same argument
+  types (i.e.  t1, t2, &#8230; tN) there are N different callbacks to which these
+  signals can be connected.
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>In short this means that every signal can be connected to a callback and all
+signals emitted by a widget can be connected to different callbacks. A set of
+callbacks satisfying the above then:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+makes Gtk_server more compact, and
+</p>
+</li>
+<li>
+<p>
+reduces the size of the APL function(s) decoding the events, but
+</p>
+</li>
+<li>
+<p>
+possibly decreases the readability of the event decoder because a signal
+  name may not reflect its true meaning,
+</p>
+</li>
+</ul></div>
+<div class="sect2">
+<h3 id="_6a_the_life_cycle_of_an_event">6a. The life-cycle of an Event</h3>
+<div class="paragraph"><p>It might be useful to briefly describe the entire life-cycle of an event.
+Details (like how to do things) will follow after that. We use the example
+discussed so far.</p></div>
+<div class="paragraph"><p>The entire life-cycle of an event is this:</p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+<strong>Prerequisite:</strong> In <strong>glade</strong>, the signal named <strong>clicked</strong> of the OK button was
+  connected to the callback function <strong>clicked</strong> in Gtk_server
+</p>
+</li>
+<li>
+<p>
+The user clicks the green OK button
+</p>
+</li>
+<li>
+<p>
+Gtk calls the function <strong>clicked()</strong> in the Gtk_server.
+</p>
+</li>
+<li>
+<p>
+function <strong>clicked()</strong> in the Gtk_server <strong>fries()</strong> the event onto the
+  connection between APL and Gtk_server.
+</p>
+</li>
+<li>
+<p>
+APL <strong>read()s</strong> the event from the connection between APL and
+  Gtk_server. and stores it into its event queue.
+</p>
+</li>
+<li>
+<p>
+the APL application polls the event queue out of the queue. At this point
+  the event has become an APL data structure in the APL workspace. The
+  life-time of the event ends here, but the (application-specific) processing
+  of the APL data usually continues a little further. In our example, the OK
+  button was meant to let the user tell when her input was finished, so the
+  next actions would be to read the contents of the <strong>entry1</strong> and <strong>entry2</strong>
+  widgets as already demonstrated above.
+</p>
+</li>
+</ol></div>
+<div class="paragraph"><p>Now to the details &#8230;</p></div>
+<div class="sect3">
+<h4 id="_6b_connecting_signals_to_gtk_server_callback_functions">6b. Connecting Signals to Gtk_server Callback Functions</h4>
+<div class="paragraph"><p>Every signal of a widget that shall be sent to APL needs to be connected in
+<strong>glade</strong>:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+start <strong>glade</strong> with our example GUI file:
+</p>
+</li>
+</ul></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>$ glade my-application.ui</code></pre>
+</div></div>
+<div class="ulist"><ul>
+<li>
+<p>
+select the <strong>button1</strong> widget by clicking onto the OK button in the
+  <strong>GUI visualization area</strong>. The single widget
+  <strong>window1</strong> in the widget structure area (top-right of the <strong>glade</strong> window) will
+  open and show its children. One of the children - <strong>button1</strong>  is now shown as
+  being selected.
+</p>
+</li>
+<li>
+<p>
+select the "Signals" tab in the widget property area (bottom-right of the
+  <strong>glade</strong> window)
+</p>
+</li>
+<li>
+<p>
+select the row with signal "clicked", which highlights the row in blue
+</p>
+</li>
+<li>
+<p>
+click on the selected row below the column "Handler", which opens a small
+  text entry field.
+</p>
+</li>
+<li>
+<p>
+in the text entry field, enter "clicked", which is the name of the handler
+  function in Gtk_server that shall be called when widget <strong>button1</strong> was clicked.
+  [If you need to pass another object to the callback, then enter "clicked_1"
+  instead of "clicked" and select the object in the dialog that pops up if
+  you click on "User Data:" in the blue row, Don&#8217;t do that in this example.]
+</p>
+</li>
+<li>
+<p>
+Finally, save the GUI in <strong>glade</strong>'s menu-bar under <strong>File → Save</strong>.
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>For those interested in the details, <strong>glade</strong> has added one line to our file
+<strong>my-application.ui</strong>:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>             &lt;signal name="clicked" handler="clicked" swapped="no"/&gt;</code></pre>
+</div></div>
+<div class="paragraph"><p>At this point the <strong>Prerequisite</strong> for sending the clicked signal from
+<strong>button1</strong> to APL is met, and steps 2-5 in the life-cycle of an event
+happen automatically at the proper point in time, What remains is step 6.</p></div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_6c_polling_the_event_loop_in_apl">6c. Polling the Event Loop in APL</h3>
+<div class="paragraph"><p>The event loop can be polled from APL in two fashions: <strong>blocking</strong> or
+<strong>non-blocking</strong>. <strong>Blocking</strong> means that the APL functions that do the poll
+returns an event to APL immediately if the event has occurred already (e.g.
+the user has clicked <strong>button1</strong> <em>before</em> the event queue was polled), and
+otherwise waits until that event has occurred. <strong>Non-blocking</strong> means that the
+APL functions that do the poll <em>always</em> return immediately, but return a
+special event with number 0 to indicate that the event queue was empty at the
+time when the poll function was called.</p></div>
+<div class="paragraph"><p>Non-blocking calls are inevitably performed in some kind of loop at APL level
+and therefore are more complicated. Blocking calls are simpler to program but
+stop the APL application until the next event (which may or not be the event
+that the application is waiting for) has occurred.</p></div>
+<div class="paragraph"><p>Another aspect is the scope of a poll. The APL application can either poll for
+an event from a single GUI, or for an event in any of the GUIs that were
+started from the interpreter instance.</p></div>
+<div class="paragraph"><p>The function for a blocking poll is <strong>Z←⎕GTK 1</strong>; The functions for a
+non-blocking poll is <strong>Z←⎕GTK 2</strong>.</p></div>
+<div class="paragraph"><p>The return value <strong>Z</strong> of a non-blocking poll is the integer scalar 0 if the
+event queue is empty. In all other cases Z is either a 3-element APL vector
+<strong>Gi,Ws,Es</strong>  or a 4-element APL vector <strong>Gi,Ws,Es,Us</strong> if an event with
+<strong>User Data:</strong> Us is received, where:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong>G</strong> is an integer scalar for the handle of the GUI handle in which the event
+  was created,
+</p>
+</li>
+<li>
+<p>
+<strong>Ws</strong> is the name of the widget that has created the event (<strong>button1</strong> in our
+  example),
+</p>
+</li>
+<li>
+<p>
+<strong>Ws</strong> is the name of the signal in <strong>glade</strong> (<strong>clicked</strong> in our example), and
+</p>
+</li>
+<li>
+<p>
+<strong>Us</strong> (if present) is the name of an object specified as <strong>User Data:</strong> in
+  <strong>glade</strong>.
+</p>
+</li>
+</ul></div>
+</div>
+<div class="sect2">
+<h3 id="_6d_waiting_for_a_click_event_from_the_ok_button">6d. Waiting for a Click Event from the OK Button</h3>
+<div class="paragraph"><p>We are now ready to replace the awkward 20 seconds interval in our example by a
+more appropriate one: we give the user as much time as she needs to fill out
+the Employee: and Position: fields until she pushes the OK-button to indicate
+that the entry of data is complete.</p></div>
+<div class="paragraph"><p>Since out GUI only has one relevant event (clicking the OK button; the editing
+of the Employee: and Position: fields is managed internally by Gtk),
+we keep things simple and use a blocking poll of the ⎕GTK event queue.
+The connection from the OK-button to the GTK callback clicked() was already
+done in Step 6b. above (and we assume that the updated my-application.ui is
+used). All that is needed then is to replace:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>      "Please enter the Position: within 20 seconds..."
+      ⊣⎕DL 20   ⍝ wait 20 seconds
+      "End of input interval</code></pre>
+</div></div>
+<div class="paragraph"><p>by:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>      ⊣Handle ⎕GTK 1   ⍝ wait for click on the OK button</code></pre>
+</div></div>
+<div class="paragraph"><p>The example therefore becomes:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>      )CLEAR
+      GUI_path ← '/home/eedjsa/projects/juergen/apl-1.7/HOWTOs/my-application.ui'
+      CSS_path ← '/home/eedjsa/projects/juergen/apl-1.7/HOWTOs/my-application.css'
+      Handle ← CSS_path ⎕GTK GUI_path    ⍝ fork Gtk_server and connect to it
+
+      H_ID ← Handle, "entry1"            ⍝ the Employee: entry
+      "John Doe" ⎕GTK[H_ID] "set_text"   ⍝ set the entry to  "John Doe"
+
+      ⎕GTK 1                             ⍝ wait until the OK button was pushed
+
+      ⍝ [ at this point the user enters "Engineer" into entry2 and then pushes the OK button ]
+
+      H_ID ← Handle, "entry2"            ⍝ H_ID is the Position: entry
+      ⎕GTK[H_ID] "get_text"              ⍝ get the content of entry2
+
+      Handle ⎕GTK 0                      ⍝ close window handle 6
+0</code></pre>
+</div></div>
+</div>
+<div class="sect2">
+<h3 id="_6e_wrap_up">6e. Wrap-up</h3>
+<div class="paragraph"><p>The last thing to do is to put our example code into a defined function. We
+remove the H_ID variable (which was only used to make Step 5 above explicit), and
+we hide useless return values from  <strong>⎕GTK 1</strong> and <strong>⎕GTK[] "get_text"</strong> with ⊣:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>∇Z←get_NAME_and_POSITION;GUI_path;CSS_path;Handle
+ GUI_path ← '/home/eedjsa/projects/juergen/apl-1.7/HOWTOs/my-application.ui'
+ CSS_path ← '/home/eedjsa/projects/juergen/apl-1.7/HOWTOs/my-application.css'
+ Handle ← CSS_path ⎕GTK GUI_path              ⍝ fork Gtk_server and connect to it
+ ⊣⎕GTK 1                                      ⍝ wait for click on the OK button
+ Z ←   ⊂1↓⎕GTK[Handle, "entry1"] "get_text"   ⍝ get the content of entry1
+ Z ← Z,⊂1↓⎕GTK[Handle, "entry2"] "get_text"   ⍝ get the content of entry2
+ ⊣Handle ⎕GTK 0                               ⍝ close the GUI handle
+∇</code></pre>
+</div></div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_appendix">Appendix</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_the_gtk_cheat_sheet">The ⎕GTK Cheat Sheet</h3>
+<div class="paragraph"><p>In the table below, it is assumed that:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre><code>      ⍝ H is a window handle (from H ← Zh←⎕GTK "filename.ui")
+      ⍝ ID is a string containing the id= property of some widget in filename.ui
+      H_ID ← H, ID   ⍝ e.g.  6,"entry1"; H_ID uniquely identifies a widget</code></pre>
+</div></div>
+<div class="tableblock">
+<table rules="all"
+width="100%"
+frame="border"
+cellspacing="0" cellpadding="4">
+<caption class="title">Table 2. ⎕GTK Syntax Variants (Signatures)</caption>
+<col width="27%" />
+<col width="9%" />
+<col width="63%" />
+<thead>
+<tr>
+<th align="left" valign="top"> Syntax    </th>
+<th align="center" valign="top"> Fun Bi </th>
+<th align="left" valign="top"> Result/Action</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left" valign="top"><p class="table">Zh←⎕GTK "file.ui"</p></td>
+<td align="center" valign="top"><p class="table">-</p></td>
+<td align="left" valign="top"><p class="table">Zh is a handle for a new window according to <strong>glade</strong> file file.ui (no CSS)</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">Zh← "file.css" ⎕GTK "file.ui"</p></td>
+<td align="center" valign="top"><p class="table">-</p></td>
+<td align="left" valign="top"><p class="table">Zh is a handle for a new window according to the CSS file <strong>file.css</strong> and
+<strong>glade</strong> XML file <strong>file.ui</strong></p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">Zi← ⎕GTK 0</p></td>
+<td align="center" valign="top"><p class="table">-</p></td>
+<td align="left" valign="top"><p class="table">Zi is an integer vector containing all open window handles</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">Zi← Ah ⎕GTK 0</p></td>
+<td align="center" valign="top"><p class="table">0</p></td>
+<td align="left" valign="top"><p class="table">close window handle Ah, return 0 on success, or errno otherwise</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">Zi←    ⎕GTK 1</p></td>
+<td align="center" valign="top"><p class="table">1</p></td>
+<td align="left" valign="top"><p class="table">blocking poll for the next event</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">Zi←    ⎕GTK 2</p></td>
+<td align="center" valign="top"><p class="table">2</p></td>
+<td align="left" valign="top"><p class="table">non-blocking poll for the next event</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">Zi←Ah  ⎕GTK 3</p></td>
+<td align="center" valign="top"><p class="table">3</p></td>
+<td align="left" valign="top"><p class="table">increment the (debug-) verbosity of Gtk_server</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">Zi←Ah  ⎕GTK 4</p></td>
+<td align="center" valign="top"><p class="table">4</p></td>
+<td align="left" valign="top"><p class="table">decrement the (debug-) verbosity of Gtk_server</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">Text ⎕GTK[H_ID] 1     <strong>--or--</strong><br />
+ Text ⎕GTK[H_ID] "set_text"</p></td>
+<td align="center" valign="top"><p class="table">1</p></td>
+<td align="left" valign="top"><p class="table">set the text in e.g. a text entry</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">Text ← ⎕GTK[H_ID] 2     <strong>--or--</strong><br />
+ Text ← ⎕GTK[H_ID] "get_text"</p></td>
+<td align="center" valign="top"><p class="table">2</p></td>
+<td align="left" valign="top"><p class="table">return the text in e.g. a text entry</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">Text ⎕GTK[H_ID] 3     <strong>--or--</strong><br />
+ Text ⎕GTK[H_ID] "set_label"</p></td>
+<td align="center" valign="top"><p class="table">3</p></td>
+<td align="left" valign="top"><p class="table">set the text of e.g. a label</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">Fraction ⎕GTK[H_ID] 4     <strong>--or--</strong><br />
+ Fraction ⎕GTK[H_ID] "set_fraction"</p></td>
+<td align="center" valign="top"><p class="table">4</p></td>
+<td align="left" valign="top"><p class="table">set the progress [range 0.0&#8230;1.0] shown by e.g. a progress bar</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">Fraction ← ⎕GTK[H_ID] 5     <strong>--or--</strong><br />
+ Fraction ← ⎕GTK[H_ID] "get_fraction"</p></td>
+<td align="center" valign="top"><p class="table">5</p></td>
+<td align="left" valign="top"><p class="table">return the progress [range 0.0&#8230;1.0] shown by e.g. a progress bar</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">Level ⎕GTK[H_ID] 6     <strong>--or--</strong><br />
+ Level ⎕GTK[H_ID] "set_value"</p></td>
+<td align="center" valign="top"><p class="table">6</p></td>
+<td align="left" valign="top"><p class="table">set the level [range min-value&#8230;max-value] shown by e.g. a level bar</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">Level ← ⎕GTK[H_ID] 7     <strong>--or--</strong><br />
+ Level ← ⎕GTK[H_ID] "get_value"</p></td>
+<td align="center" valign="top"><p class="table">7</p></td>
+<td align="left" valign="top"><p class="table">return the level [range min-value&#8230;max-value] shown by e.g. a level bar</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">Selected ⎕GTK[H_ID] 8     <strong>--or--</strong><br />
+ Selected ⎕GTK[H_ID] "set_active"</p></td>
+<td align="center" valign="top"><p class="table">8</p></td>
+<td align="left" valign="top"><p class="table">set the selected item of e.g. a combo box (-1 for none)</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">Selected ← ⎕GTK[H_ID] 9     <strong>--or--</strong><br />
+ Selected ← ⎕GTK[H_ID] "get_active"</p></td>
+<td align="center" valign="top"><p class="table">9</p></td>
+<td align="left" valign="top"><p class="table">return the selected item of e.g. a combo box (-1 for none)</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="tableblock">
+<table rules="all"
+width="100%"
+frame="border"
+cellspacing="0" cellpadding="4">
+<caption class="title">Table 3. ⎕GTK Events</caption>
+<col width="25%" />
+<col width="5%" />
+<col width="28%" />
+<col width="40%" />
+<thead>
+<tr>
+<th align="left" valign="top"> Callback (specified in <strong>glade</strong>) </th>
+<th align="center" valign="top"> argc</th>
+<th align="left" valign="top"> APL Structure of the <strong>⎕GTK 1</strong> Result</th>
+<th align="left" valign="top"> APL Example of a <strong>⎕GTK 1</strong> Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left" valign="top"><p class="table"><code><strong>clicked</strong></code></p></td>
+<td align="center" valign="top"><p class="table">1</p></td>
+<td align="left" valign="top"><p class="table">Gi, Ns, Es, Is, Cs</p></td>
+<td align="left" valign="top"><p class="table"><code>6</code>  <code>'OK-button1'</code>  <code>'GtkButton'</code>  <code>'clicked'</code>  <code>'button'</code></p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><code><strong>activate</strong></code></p></td>
+<td align="center" valign="top"><p class="table">1</p></td>
+<td align="left" valign="top"><p class="table">Gi, Ns, Es, Is, Cs</p></td>
+<td align="left" valign="top"><p class="table"><code>6</code>  <code>'Text-entry1'</code>  <code>'GtkEntry'</code>  <code>'activate'</code>  <code>'entry'</code></p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><code><strong>changed</strong></code></p></td>
+<td align="center" valign="top"><p class="table">1</p></td>
+<td align="left" valign="top"><p class="table">Gi, Ns, Es, Is, Cs</p></td>
+<td align="left" valign="top"><p class="table"><code>6</code>  <code>'Select-box1'</code>  <code>'GtkComboBox'</code>  <code>'changed'</code>  <code>'combobox'</code></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="paragraph"><p>See also:</p></div>
+<div class="paragraph"><p><a href="https://developer.gnome.org/gtk3/stable/">https://developer.gnome.org/gtk3/stable/</a></p></div>
+</div>
+</div>
+</div>
+</div>
+<div id="footnotes"><hr /></div>
+<div id="footer">
+<div id="footer-text">
+Last updated 2018-08-10 18:46:31 CEST
+</div>
+</div>
+</body>
+</html>

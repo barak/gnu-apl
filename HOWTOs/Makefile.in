@@ -297,7 +297,8 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 dist_doc_DATA = APL-on-Macintosh.pdf \
-		APL-Communication-Cookbook.html
+		APL-Communication-Cookbook.html \
+		 Quad-GTK.html
 
 all: all-am
 
@@ -514,7 +515,6 @@ uninstall-am: uninstall-dist_docDATA
 	mostlyclean-libtool pdf pdf-am ps ps-am tags-am uninstall \
 	uninstall-am uninstall-dist_docDATA
 
-		 Quad-GTK.html
 
 .asciidoc.html:
 	if [ -z `which asciidoc` ] ; then touch -c $@ ; \
