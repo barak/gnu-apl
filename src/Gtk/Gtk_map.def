@@ -15,11 +15,11 @@ gtk_fun_def(combo_box,    GtkComboBox,    get_active,   Selected, I, V, return t
 #undef gtk_fun_def
 
 // a mapping from GTK events (signals) to Gtk_server callbacks...
-//            callback   arg    optional      event
-//              name,   count,    args,     signature,   glade_ID prefix
-gtk_event_def(clicked,    1,          ,        GiWsEs,   button)
-gtk_event_def(activate,   1,          ,        GiWsEs,   entry)
-gtk_event_def(changed,    1,          ,        GiWsEs,   combobox)
+//            callback   arg    optional      event        widget     glade_ID     Gtk
+//              name,   count,    args,     signature,      name,      prefix,    class
+gtk_event_def(clicked,    1,          ,     GiNsEsIsCs,    OK-button,  button,   GtkButton)
+gtk_event_def(activate,   1,          ,     GiNsEsIsCs,    Text-entry, entry,    GtkEntry)
+gtk_event_def(changed,    1,          ,     GiNsEsIsCs,    Select-box, combobox,  GtkComboBox)
 
 #undef gtk_event_def
 

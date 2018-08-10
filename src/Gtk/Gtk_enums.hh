@@ -35,7 +35,7 @@ enum Gtk_Response_Tag
 
 enum Event_tag
 {
-   Event_widget = 3000,   // widget argument of the callback
-   Event_fun,             // function (callback) name
+   Event_widget_fun = 3000,    // H:widget:callback
+   Event_widget_fun_id_class   // H:widget:callback:glade_id:name
 };
 

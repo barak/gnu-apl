@@ -74,9 +74,13 @@ int handle = -1;
                   return Token(TOK_APL_VALUE1, IntScalar(-4, LOC));
                 }
              return Token(TOK_APL_VALUE1, IntScalar(0, LOC));
+
+        default: MORE_ERROR() << "Invalid function number Bi=" << function
+                              << " in A ⎕GTK Bi";
+                 DOMAIN_ERROR;
       }
 
-   MORE_ERROR() << "Bad function number Bi in Ah ⎕GTK Bi";
+   MORE_ERROR() << "Unexpected A or B in A ⎕GTK B";
    DOMAIN_ERROR;
 
 bad_handle:
@@ -106,45 +110,64 @@ const int function = B->get_ravel(0).get_int_value();
 
         case 1: // blocking poll for next event
         case 2: // non-blocking wait for next event
-
              poll_all();
              if (function == 2 && event_queue.size() == 0)   // non-blocking
                 return Token(TOK_APL_VALUE1, IntScalar(0, LOC));
 
              // blocking
              //
-             while (event_queue.size() == 0)   poll_all();
+             while (event_queue.size() == 0 && !interrupt_is_raised())
+                   poll_all();
 
-             UCS_string HWF = event_queue[0];   // handle / widget : fun
-             event_queue.erase(0);
-
-             // split (Unicode)Handle,"widget:function"
-             // into a 3-element APL vector Handle (⊂"widget") (⊂"function")
+             // at this point either event_queue.size() > 0 or an interrupt
+             // was raised
              //
-             Value_P Z(3, LOC);
-             new (Z->next_ravel()) IntCell(HWF[0]);                 // Z[1]
-             UCS_string ucs;
-             ShapeItem j = 1;
-             for (;j < HWF.size(); ++j)
-                 {
-                   if (HWF[j] == UNI_ASCII_COLON)
-                      {
-                        Value_P Z2(ucs, LOC);
-                        new (Z->next_ravel())                       // Z[2]
-                                    PointerCell(Z2, Z.getref());
-                        ucs.shrink(0);
-                      }
-                   else
-                      {
-                        ucs.append(HWF[j]);
-                      }
-                 }
-             Value_P Z3(ucs, LOC);
-             new (Z->next_ravel())   PointerCell(Z3, Z.getref());   // Z[3]
-             Z->check_value(LOC);
-             return Token(TOK_APL_VALUE1, Z);
+             if (event_queue.size() == 0)   // hence interrupt was raised
+                {
+                   clear_interrupt_raised(LOC);
+                   return Token(TOK_APL_VALUE1, IntScalar(0, LOC));
+                }
+
+             {
+               UCS_string HWF = event_queue[0];   // handle, widget : fun
+               event_queue.erase(0);
+
+               // split (Unicode)Handle,"widget:function"
+               // into a 3-element APL vector Handle (⊂"widget") (⊂"function")
+               //
+               UCS_string_vector args;
+               UCS_string arg;
+               for (ShapeItem j = 1; j < HWF.size(); ++j)
+                   {
+                     if (HWF[j] == UNI_ASCII_COLON)
+                        {
+                          args.append(arg);
+                          arg.shrink(0);
+                        }
+                     else
+                        {
+                          arg.append(HWF[j]);
+                        }
+                   }
+               args.append(arg);
+
+               Value_P Z(1 + args.size(), LOC);
+               new (Z->next_ravel()) IntCell(HWF[0]);
+               loop(a, args.size())
+                   {
+                     Value_P Za(args[a], LOC);
+                     new (Z->next_ravel())   PointerCell(Za, Z.getref());
+                   }
+               Z->check_value(LOC);
+               return Token(TOK_APL_VALUE1, Z);
+             }
+
+        default: MORE_ERROR() << "Invalid function number Bi=" << function
+                              << " in ⎕GTK Bi";
+                 DOMAIN_ERROR;
       }
 
+   MORE_ERROR() << "Unexpected B in ⎕GTK B";
    DOMAIN_ERROR;
 }
 //-----------------------------------------------------------------------------
@@ -274,25 +297,17 @@ Quad_GTK::poll_handle(int handle, int tag)
          Assert(rx_len == (V_len + 8));
 
          const char * V = TLV + 8;;
-         if (TLV_tag == Event_widget)   // an intermediate tag
-            {
-              UTF8_string widget_name_utf;
-              loop(v, V_len)   widget_name_utf.append(V[v]);
-              widget_name.shrink(0);
-              widget_name.append(Unicode(handle));
-              widget_name.append(UCS_string(widget_name_utf));
-              continue;
-            }
 
-         if (TLV_tag == Event_fun)   // the final tag
+         if (TLV_tag == Event_widget_fun ||          // "H:button1:clicked"
+             TLV_tag == Event_widget_fun_id_class)   // dito + :id:class
+                                                     //
             {
-              UTF8_string event_name_utf;
-              loop(v, V_len)   event_name_utf.append(V[v]);
-              UCS_string event_name_ucs(event_name_utf);
+              UTF8_string data_utf;   // H:widget:callback
+              loop(v, V_len)   data_utf.append(V[v]);
+              UCS_string data_ucs(data_utf);
+              data_ucs[0] = (static_cast<Unicode>(handle));
 
-              widget_name.append(UNI_ASCII_COLON);
-              widget_name.append(event_name_ucs);
-              event_queue.append(widget_name);
+              event_queue.append(data_ucs);
 
               if (tag == -1)   // not waiting for a specific tag
                    return Value_P();   // i.e. NULL

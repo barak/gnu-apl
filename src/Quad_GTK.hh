@@ -99,7 +99,6 @@ protected:
 
    Simple_string<window_entry, false> open_windows;
 
-   UCS_string widget_name;
    UCS_string_vector event_queue;
 };
 

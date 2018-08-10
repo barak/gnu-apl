@@ -38,42 +38,60 @@
 
 using namespace std;
 
-int verbosity = 0;
+int verbosity = 2;
 
 //-----------------------------------------------------------------------------
 static GtkBuilder * builder = 0;
 static GObject * window     = 0;
 static GObject * selected   = 0;
 
-//-----------------------------------------------------------------------------
-static const char *
-patch_GUI(const char * filename)
+// a mapping of glade IDs and Gtl objects
+static struct _ID_DB
 {
-struct stat st;
-   if (stat(filename, &st))
-      {
-        cerr << "fstat(" << filename << " failed: " << strerror(errno) << endl;
-        exit(1);
-      }
+  _ID_DB(const char * cls, const char * id, const char * wn, _ID_DB * nxt)
+  : next(nxt),
+    xml_class(strdup(cls)),
+    xml_id(strdup(id)),
+    widget_name(strdup(wn)),
+    obj(0)
+    {}
 
-const off_t buflen = st.st_size + st.st_size/10 + 1000;
-char * gui_buffer = new char[buflen];
-char * p = gui_buffer;
-const char * end = gui_buffer + buflen - 1;
+  /// the next _ID_DB entry
+  _ID_DB * next;
+
+  /// class in the XML .ui file, e.g. "GtkButton"
+  const char * xml_class;
+
+  /// id in the XML .ui file, e.g. "button1"
+  const char * xml_id;
+
+   /// widget name property in the XML .ui file, e.g. "OK-button"
+  const char * widget_name;
+
+   /// the Gtk object
+   GObject * obj;
+} * id_db = 0;
+
+//-----------------------------------------------------------------------------
+static bool
+init_id_db(const char * filename)
+{
 FILE * f = fopen(filename, "r");
+   if (f == 0)   return true;   // error
 
-char class_buf[100] = { 0 };
-char id_buf[100]    = { 0 };
+char class_buf[100]       = { 0 };
+char id_buf[100]          = { 0 };
+char widget_name_buf[100] = { 0 };
+char line[200];
 
-   while (gui_buffer < (end - 100))
+   for (;;)
        {
-         const char * s = fgets(p, end - p, f);
+         const char * s = fgets(line, sizeof(line) - 1, f);
+         line[sizeof(line) - 1] = 0;
          if (s == 0)   break;
-         gui_buffer[buflen - 1] = 0;   // just in case
-         const size_t slen = strlen(s);
 
-         if (2 == sscanf(p, " <object class=\"%s id=\"%s>",
-                                      class_buf, id_buf))
+         if (2 == sscanf(line, " <object class=\"%s id=\"%s>",
+                                         class_buf, id_buf))
             {
               if (char * qu = strchr(class_buf, '"'))   *qu = 0;
               if (char * qu = strchr(id_buf, '"'))      *qu = 0;
@@ -81,36 +99,42 @@ char id_buf[100]    = { 0 };
               verbosity > 1 && cerr << "See class='" << class_buf <<
                  "' and id='" << id_buf << "'" << endl;
             }
-         else if (strstr(p, "</object"))
+         else if (1 == sscanf(line, " <property name=\"name\">%s",
+                                                widget_name_buf))
             {
-              verbosity > 1 && cerr << "End of object" << endl;
+              if (char * ob = strchr(widget_name_buf, '<'))   *ob = 0;
+
+              verbosity > 1 && cerr << "See widget name='"
+                                    << widget_name_buf << endl;
+            }
+         else if (strstr(line, "</object"))
+            {
+              verbosity > 1 && cerr << "End of object class="
+                                    << class_buf << " id="
+                                    << id_buf << " widget-name="
+                                    << widget_name_buf << endl;
+
+              if (*class_buf || *id_buf || *widget_name_buf )
+                 {
+                   _ID_DB * new_db = new _ID_DB(class_buf, id_buf,
+                                                widget_name_buf, id_db);
+                    id_db = new_db;
+                    verbosity > 1 && cerr << endl;
+                 }
+
               *class_buf = 0;
               *id_buf = 0;
+              *widget_name_buf = 0;
             }
-         else if (strstr(p, " <property name=\"name\""))   // name= property
+         else if (strstr(line, " <property name=\"name\""))   // name= property
             {
               verbosity > 1 && cerr << "Existing name= property" << endl;
               continue;   // discard
             }
-         else if (strstr(p, " <property name=\""))       // some other property
-            {
-              verbosity > 1 && cerr << "Other property" << endl;
-              if (*id_buf)   // pending rename
-                 {
-                   p += slen;
-                   p += snprintf(p, end - p - 1, "            "
-                            "<property name=\"name\">%s</property>\n", id_buf);
-                   *id_buf = 0;
-                   continue;
-                 }
-            }
-
-         p += slen;
        }
 
    fclose(f);
-   *p = 0;
-   return gui_buffer;
+   return false;   // OK
 }
 //-----------------------------------------------------------------------------
 static void
@@ -118,28 +142,46 @@ cmd_1_load_GUI(const char * filename)
 {
    verbosity > 0 && cerr << "Loading GUI: " << filename << endl;
 
-const char * ui = patch_GUI(filename);
-   assert(ui);
-   verbosity > 1 && cerr << "patched " << filename << ":" << endl
-                         << ui << endl;
+   if (init_id_db(filename))
+      {
+        cerr << "*** reading " << filename << " failed: "
+          << strerror(errno) << endl;
+      }
 
-   builder = gtk_builder_new_from_string(ui, -1);
+   builder = gtk_builder_new_from_file(filename);
    assert(builder);
+
+   // insert objects into id_db...
+   //
+   for (_ID_DB * entry = id_db; entry; entry = entry->next)
+       {
+          GObject * obj = gtk_builder_get_object(builder, id_db->xml_id);
+          if (obj)
+             {
+               cerr << "object '" << entry->xml_id << "' mapped" << endl;
+               id_db->obj = obj;
+             }
+           else cerr << "object '" << entry->xml_id << "' not found" << endl;
+       }
+
 
    gtk_builder_connect_signals(builder, NULL);
    cerr << "GUI signals connected.\n";
 
-   for (GSList * objects = gtk_builder_get_objects(builder);
-        objects; objects = objects->next)
-       {
-          GObject * obj = reinterpret_cast<GObject *>(objects->data);
-          if (obj)
-             {
-               char * name = 0;
-               g_object_get (obj, "name\0", &name, NULL);
-               name && cerr << "NAME=" << name << endl;
-             }
-       }
+   if (verbosity > 2)
+      {
+        for (GSList * objects = gtk_builder_get_objects(builder);
+             objects; objects = objects->next)
+            {
+               GObject * obj = reinterpret_cast<GObject *>(objects->data);
+               if (obj)
+                  {
+                    char * name = 0;
+                    g_object_get (obj, "name\0", &name, NULL);
+                    name && cerr << "NAME=" << name << endl;
+                  }
+            }
+      }
 
 }
 //-----------------------------------------------------------------------------
@@ -245,7 +287,7 @@ print_funs()
 //-----------------------------------------------------------------------------
 static void
 print_ev2(const char * ev_name, int argc, const char * sig,
-          const char * wid_name)
+          const char * wid_name, const char * wid_id, const char *  wid_class)
 {
    cout << "| +*" << ev_name
         << "*+ | " << argc
@@ -264,8 +306,10 @@ const char * end = sig + strlen(sig);
         {
           cout << " +";
           if      (!strncmp(s, "Gi", 2))   cout << "6";
-          else if (!strncmp(s, "Ws", 2))   cout << "\\'" << wid_name << "1\\'";
-          else if (!strncmp(s, "Es", 2))   cout << "\\'" << ev_name << "'";
+          else if (!strncmp(s, "Ns", 2))   cout << "\\'" << wid_name << "1\\'";
+          else if (!strncmp(s, "Is", 2))   cout << "\\'" << ev_name << "'";
+          else if (!strncmp(s, "Cs", 2))   cout << "\\'" << wid_id << "'";
+          else if (!strncmp(s, "Es", 2))   cout << "\\'" << wid_class << "'";
           else assert(0 && "Bad signature");
           cout << "+ ";
         }
@@ -285,8 +329,8 @@ static print_evs(int which)
    else if (which == 2)   // details
       {
 #define gtk_fun_def(_glade_ID, _gtk_class, _gtk_function, _ZAname, _Z,_A, _help)
-#define gtk_event_def(ev_name, argc, _opt, sig, wid_name) \
-        print_ev2(#ev_name, argc, #sig, #wid_name);
+#define gtk_event_def(ev_name, argc, _opt, sig, wid_name, wid_id, wid_class) \
+        print_ev2(#ev_name, argc, #sig, #wid_name, #wid_id, #wid_class);
 #include "Gtk_map.def"
       }
    else assert(0 && "bad which");
@@ -518,14 +562,38 @@ generic_callback(GtkWidget * widget, const char * callback, const char * sig)
 {
    verbosity > 0 && cerr << "callback " << callback << "() called" << endl;
 
+   for (_ID_DB * entry = id_db; entry; entry = entry->next)
+       {
+         if (GTK_WIDGET(entry->obj) == widget)
+            {
+              verbosity > 1 && cerr << "callback " << callback
+                   << " found object in DB: class=" << entry->xml_class
+                   << " id=" << entry->xml_id << " name="
+                   << entry->widget_name << endl;
+
+              char data[strlen(10 + callback) + strlen(entry->xml_class)
+                        + strlen(entry->xml_id) + strlen(entry->widget_name)];
+              sprintf(data, "H%s:%s:%s:%s", entry->widget_name, callback,
+                             entry->xml_id, entry->xml_class);
+              send_TLV(Event_widget_fun_id_class, data);
+              verbosity > 0 &&
+                  cerr << "callback " << callback << "(1) done" << endl;
+              return;
+            }
+       }
+
+   // fallback: old-style
+   //
 gchar * widget_name = 0;
    g_object_get(widget, "name", &widget_name, NULL);
    verbosity > 0 && cerr << "    widget_name is: " << widget_name << endl
                          << "    callback is: " << callback << endl;
-   send_TLV(Event_widget, widget_name);
-   send_TLV(Event_fun, callback);
 
-   verbosity > 0 && cerr << "callback " << callback << "() done" << endl;
+char data[strlen(callback) + strlen(widget_name) + 10];
+   sprintf(data, "H%s:%s", widget_name, callback);
+   send_TLV(Event_widget_fun, data);
+
+   verbosity > 0 && cerr << "callback " << callback << "(2) done" << endl;
 }
 //-----------------------------------------------------------------------------
 
@@ -534,7 +602,7 @@ gchar * widget_name = 0;
 extern "C"
 {
 #define gtk_fun_def(_entry, ...)
-#define gtk_event_def(ev_name, _argc, opt, sig, _wid_name) \
+#define gtk_event_def(ev_name, _argc, opt, sig, _wid_name, _wid_id,_wid_class) \
 void ev_name(GtkWidget * button opt , gpointer user_data = 0) \
 { generic_callback(button, #ev_name, #sig); }
 
