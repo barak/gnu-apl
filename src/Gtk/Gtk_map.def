@@ -1,0 +1,25 @@
+
+// a mapping from ⎕GTK function names (Bs in ⎕GTK Bs) to Gtk functions
+//
+//          glade_ID,     gtk_class,      gtk_function, AZname,   Z, A, help
+gtk_fun_def(entry,        GtkEntry,       set_text,     Text,     V, S, set the text in e.g. a text entry)
+gtk_fun_def(entry,        GtkEntry,       get_text,     Text,     S, V, return the text in e.g. a text entry)
+gtk_fun_def(label,        GtkLabel,       set_label,    Text,     V, S, set the text of e.g. a label)
+gtk_fun_def(progress_bar, GtkProgressBar, set_fraction, Fraction, V, F, set the progress [range 0.0...1.0] shown by e.g. a progress bar)
+gtk_fun_def(progress_bar, GtkProgressBar, get_fraction, Fraction, F, V, return the progress [range 0.0...1.0] shown by e.g. a progress bar)
+gtk_fun_def(level_bar,    GtkLevelBar,    set_value,    Level,    V, F, set the level [range min-value...max-value] shown by e.g. a level bar)
+gtk_fun_def(level_bar,    GtkLevelBar,    get_value,    Level,    F, V, return the level [range min-value...max-value] shown by e.g. a level bar)
+gtk_fun_def(combo_box,    GtkComboBox,    set_active,   Selected, V, I, set the selected item of e.g. a combo box (-1 for none))
+gtk_fun_def(combo_box,    GtkComboBox,    get_active,   Selected, I, V, return the selected item of e.g. a combo box (-1 for none))
+
+#undef gtk_fun_def
+
+// a mapping from GTK events (signals) to Gtk_server callbacks...
+//            callback   arg    optional      event
+//              name,   count,    args,     signature,   glade_ID prefix
+gtk_event_def(clicked,    1,          ,        GiWsEs,   button)
+gtk_event_def(activate,   1,          ,        GiWsEs,   entry)
+gtk_event_def(changed,    1,          ,        GiWsEs,   combobox)
+
+#undef gtk_event_def
+

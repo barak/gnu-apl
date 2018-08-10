@@ -88,10 +88,8 @@ Quad_FIO::clear()
 }
 //-----------------------------------------------------------------------------
 Quad_FIO::file_entry &
-Quad_FIO::get_file(const Value & value)
+Quad_FIO::get_file_entry(int handle)
 {
-const APL_Integer handle = value.get_ravel(0).get_near_int();
-
    loop(h, open_files.size())
       {
         if (open_files[h].fe_fd == handle)   return open_files[h];
@@ -100,10 +98,38 @@ const APL_Integer handle = value.get_ravel(0).get_near_int();
    DOMAIN_ERROR;
 }
 //-----------------------------------------------------------------------------
-FILE *
-Quad_FIO::get_FILE(const Value & handle)
+int
+Quad_FIO::close_handle(int fd)
 {
-file_entry & fe = get_file(handle);
+   loop(h, open_files.size())
+      {
+        file_entry & fe = open_files[h];
+        if (fe.fe_fd != fd)   continue;
+
+        // never close stdin, stdout, or stderr
+        if (fe.fe_fd <= STDERR_FILENO)
+           {
+             MORE_ERROR() << "Attempt to close fd " << fe.fe_fd
+                          << " (stdin, stdout, or stderr)";
+             DOMAIN_ERROR;
+           }
+
+        if (fe.fe_FILE)   fclose(fe.fe_FILE);   // also closes fe.fe_fd
+        else              close(fe.fe_fd);
+
+        fe = open_files.last();       // move last file to fe
+        open_files.pop();        // erase last file
+        return 0;   // OK
+      }
+
+   MORE_ERROR() << "Invalid ⎕FIO handle " << fd;
+   return -EBADF;
+}
+//-----------------------------------------------------------------------------
+FILE *
+Quad_FIO::get_FILE(int handle)
+{
+file_entry & fe = get_file_entry(handle);
    if (fe.fe_FILE == 0)
       {
         if (fe.fe_may_read && fe.fe_may_write)
@@ -693,6 +719,7 @@ Quad_FIO::list_functions(ostream & out)
 "           A1, A2, ...  nested vector with elements A1, A2, ...\n"
 "\n"
 "           ⎕FIO     ''    print this text on stderr\n"
+"           ⎕FIO     0     return a list of open file descriptors\n"
 "        '' ⎕FIO     ''    print this text on stdout\n"
 "           ⎕FIO[ 0] ''    print this text on stderr\n"
 "        '' ⎕FIO[ 0] ''    print this text on stdout\n"
@@ -889,6 +916,18 @@ const APL_Integer what = B->get_ravel(0).get_int_value();
                return Token(TOK_APL_VALUE1, IntScalar(cycle_counter(), LOC));
              }
 
+        case 0:   // list of open file descriptors
+             {
+               Value_P Z(open_files.size(), LOC);
+               loop(z, open_files.size())
+                   {
+                     new (Z->next_ravel())   IntCell(open_files[z].fe_fd);
+                   }
+               Z->set_default_Int();
+               Z->check_value(LOC);
+               return Token(TOK_APL_VALUE1, Z);
+             }
+
         case 30:   // getcwd()
              {
                char buffer[APL_PATH_MAX + 1];
@@ -903,7 +942,6 @@ const APL_Integer what = B->get_ravel(0).get_int_value();
                Z->check_value(LOC);
                return Token(TOK_APL_VALUE1, Z);
              }
-
 
         default: break;
       }
@@ -1030,7 +1068,7 @@ const APL_Integer function_number = X->get_ravel(0).get_near_int();
          case 4:   // fclose(Bh)
               {
                 errno = 0;
-                file_entry & fe = get_file(*B.get());
+                file_entry & fe = get_file_entry(*B.get());
 
                 // never close stdin, stdout, or stderr
                 if (fe.fe_fd <= STDERR_FILENO)   DOMAIN_ERROR;
@@ -1046,7 +1084,7 @@ const APL_Integer function_number = X->get_ravel(0).get_near_int();
          case 5:   // errno of Bh
               {
                 errno = 0;
-                file_entry & fe = get_file(*B.get());
+                file_entry & fe = get_file_entry(*B.get());
                 return Token(TOK_APL_VALUE1, IntScalar(fe.fe_errno, LOC));
               }
 
@@ -1190,7 +1228,7 @@ const APL_Integer function_number = X->get_ravel(0).get_near_int();
          case 25:   // pclose(Bh)
               {
                 errno = 0;
-                file_entry & fe = get_file(*B.get());
+                file_entry & fe = get_file_entry(*B.get());
                 int err = EBADF;   /* Bad file number */
                 if (fe.fe_FILE)   err = pclose(fe.fe_FILE);
 
@@ -1722,58 +1760,9 @@ const APL_Integer function_number = X->get_ravel(0).get_near_int();
 
          case 57:   // fork() + execve() in the child
               {
-                int spair[2];
-                if (socketpair(AF_UNIX, SOCK_DGRAM, 0, spair))
-                   {
-                     MORE_ERROR() << "socketpair() failed: " << strerror(errno);
-                     DOMAIN_ERROR;
-                   }
-
-                const pid_t child = fork();
-                if (child == -1)
-                   {
-                     MORE_ERROR() << "fork() failed: " << strerror(errno);
-                     DOMAIN_ERROR;
-                   }
-
-                UTF8_string path(*B.get());
-                char * filename = strdup(path.c_str());
-                if (child)   // parent process: return handle
-                   {
-                     free(filename);
-                     file_entry fe(0, spair[0]);
-                     fe.fe_may_read = true;
-                     fe.fe_may_write = true;
-                     open_files.append(fe);
-                     return Token(TOK_APL_VALUE1, IntScalar(fe.fe_fd, LOC));
-                   }
-
-                // code executed in the forked child.,,
-                // Close some fds and then execve(Bs)
-                //
-                const int sock = spair[1];
-                ::close(STDIN_FILENO);
-                for (int j = 3; j < 100; ++j)
-                    {
-                      if (j != sock)   ::close(j);
-                    }
-
-                // make the communication socket file descriptor 3
-                //  (== STDERR + 1) in the client
-                //
-                dup2(sock, 3);
-
-                char * argv[] = { filename, 0 };
-                char * envp[] = { 0 };
-                execve(filename, argv, envp);   // no return on success
-
-                // execve() failed
-                //
-                ::close(3);
-
-                usleep(100000);
-                CERR << "*** execve() failed in 57 ⎕CR: " << strerror(errno);
-                exit(-1);
+                 const int fd = do_FIO_57(*B.get());
+                 if (fd == -1)   goto out_errno;
+                  return Token(TOK_APL_VALUE1, IntScalar(fd, LOC));
               }
 
          case 202:   // get monadic parallel threshold
@@ -1824,6 +1813,63 @@ const APL_Integer function_number = X->get_ravel(0).get_near_int();
 
 out_errno:
    return Token(TOK_APL_VALUE1, IntScalar(-errno, LOC));
+}
+//-----------------------------------------------------------------------------
+int
+Quad_FIO::do_FIO_57(const UCS_string & B)
+{
+int spair[2];
+   if (socketpair(AF_UNIX, SOCK_DGRAM, 0, spair))
+      {
+        MORE_ERROR() << "socketpair() failed: " << strerror(errno);
+        DOMAIN_ERROR;
+      }
+
+const pid_t child = fork();
+   if (child == -1)
+      {
+        MORE_ERROR() << "fork() failed: " << strerror(errno);
+        DOMAIN_ERROR;
+      }
+
+UTF8_string path(B);
+   char * filename = strdup(path.c_str());
+   if (child)   // parent process: return handle
+      {
+        free(filename);
+        file_entry fe(0, spair[0]);
+        fe.fe_may_read = true;
+        fe.fe_may_write = true;
+        open_files.append(fe);
+        return fe.fe_fd;
+      }
+
+   // code executed in the forked child.,,
+   // Close some fds and then execve(Bs)
+   //
+   const int sock = spair[1];
+   ::close(STDIN_FILENO);
+   for (int j = 3; j < 100; ++j)
+       {
+         if (j != sock)   ::close(j);
+       }
+
+   // make the communication socket file descriptor 3
+   //  (== STDERR + 1) in the client
+   //
+   dup2(sock, 3);
+
+   char * argv[] = { filename, 0 };
+   char * envp[] = { 0 };
+   execve(filename, argv, envp);   // no return on success
+
+   // execve() failed
+   //
+   ::close(3);
+
+   usleep(100000);
+   CERR << "*** execve() failed in 57 ⎕CR: " << strerror(errno);
+   exit(-1);
 }
 //-----------------------------------------------------------------------------
 Token

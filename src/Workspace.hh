@@ -280,7 +280,7 @@ public:
    static void push_Command(const UCS_string & command)
       { the_workspace.pushed_command = command; }
 
-   /// rturn the pushed command
+   /// return the pushed command
    static const UCS_string & get_pushed_Command()
       { return the_workspace.pushed_command; }
 

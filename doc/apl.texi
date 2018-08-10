@@ -711,11 +711,12 @@ between GNU APL and IBM APL2.
 * Section 3.19::  ⎕ENV - Environment Variable
 * Section 3.20::  ⎕FIO - File I/O Functions
 * Section 3.21::  ⎕FFT - Fast Fourier Transform
-* Section 3.22::  ⎕RE  - Regular Expressions
-* Section 3.23::  ⎕PS  - Print Style
-* Section 3.24::  ⎕SQL - SQL Database Interface
-* Section 3.25::  ⎕SI  - State Indicator
-* Section 3.26::  ⎕SYL - System limits
+* Section 3.22::  ⎕GTK - GTK Interface
+* Section 3.23::  ⎕RE  - Regular Expressions
+* Section 3.24::  ⎕PS  - Print Style
+* Section 3.25::  ⎕SQL - SQL Database Interface
+* Section 3.26::  ⎕SI  - State Indicator
+* Section 3.27::  ⎕SYL - System limits
 @end menu
 
 There are a few possibly useful features in GNU APL:
@@ -2202,6 +2203,19 @@ up the computations performed by ⎕FFT. Creating /etc/fftw/wisdom will take a
 few hours, though, so that creating it will not pay off for most mortals.
 
 @node    Section 3.22
+@section ⎕GTK - GTK Interface
+
+GTK (Gimp Toolkit) is a rather powerful library for creating graphical user
+interfaces (GUIs). ⎕GTK makes a subset of the almost 10000 functions in the
+GTK library available to GNU APL programs. With ⎕GTK a GNU APL program can,
+for example, replace the somewhat crude ⎕ or ⍞ input methods of standard APL
+with a more intuitive GUI.
+
+The details of using ⎕GTK would go far beyond the scope of this info manual
+and has therefore been put into a separate document.
+See: @b{HOWTOs/Quad-GTK.html}.
+
+@node    Section 3.23
 @section ⎕RE - Regular Expressions
 
 ⎕RE is a function that provides access to a subset of libpcre2, which is a
@@ -2502,7 +2516,7 @@ The same for the pos+len output format:
 @end verbatim
 
 
-@node    Section 3.23
+@node    Section 3.24
 @section ⎕PS - Print Style
 
 ⎕PS is an integer vector that currently (read: SVN 982) contains two integers
@@ -2527,14 +2541,14 @@ Note: For compatibility with older workspaces, Assigning a single value to
 ⎕PS assigns that value to ⎕PS[2] and sets ⎕PS[1] to 0.
 
 
-@node    Section 3.24
+@node    Section 3.25
 @section ⎕SQL - SQL Database Interface
 
 As of GNU APL 1.6, the native function SQL has been replaced by the
 system function ⎕SQL, described below.
 
 @verbatim 
-      ⎕sql[0]''
+      ⎕SQL[0]''
 Available function numbers:
 type  ⎕SQL[1] file      - open a database file, return reference ID for it
       ⎕SQL[2] ref       - close database
@@ -2647,7 +2661,7 @@ More columns containing extra information may be added in a future
 release.
 
 
-@node    Section 3.25
+@node    Section 3.26
 @section ⎕SI - State Indicator
 
 ⎕SI returns aspects of the current State Indicator, similar to the standard
@@ -2711,7 +2725,7 @@ For example, ¯1 ⎕SI refers to the currently executing context, ¯2 ⎕SI is
 the caller, and so on.
 
 
-@node    Section 3.26
+@node    Section 3.27
 @section ⎕SYL - System limits
 
 System variable ⎕SYL shows a number of system limits when referenced:

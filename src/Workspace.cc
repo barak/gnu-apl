@@ -34,6 +34,7 @@ using namespace std;
 #include "Output.hh"
 #include "Quad_FFT.hh"
 #include "Quad_FX.hh"
+#include "Quad_GTK.hh"
 #include "Quad_SQL.hh"
 #include "Quad_TF.hh"
 #include "SystemVariable.hh"
@@ -513,6 +514,9 @@ const int tz = the_workspace.v_Quad_TZ.get_offset();
    get_v_Quad_RL().reset_seed();
    Workspace::set_PW(pw, LOC);
    the_workspace.v_Quad_TZ.set_offset(tz);
+
+   // close open windows in ⎕GTK
+   Quad_GTK::fun->clear();
 
    // close open files in ⎕FIO
    Quad_FIO::fun->clear();

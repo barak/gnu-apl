@@ -63,8 +63,7 @@ Svar_DB::start_APserver(const char * server_sockname,
    // set APserver_path to the case that applies.
    //
 char APserver_path[APL_PATH_MAX + 1];
-   const int slen = snprintf(APserver_path, APL_PATH_MAX,
-                             "%s/APserver", bin_dir);
+const int slen = snprintf(APserver_path, APL_PATH_MAX, "%s/APserver", bin_dir);
    if (slen >= APL_PATH_MAX)   APserver_path[APL_PATH_MAX] = 0;
 
    APserver_path[APL_PATH_MAX] = 0;

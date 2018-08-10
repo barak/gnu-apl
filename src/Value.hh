@@ -268,6 +268,10 @@ public:
    void set_default_Spc()
       { if (is_empty())   new (&ravel[0]) CharCell(UNI_ASCII_SPACE); }
 
+   /// set the prototype to 0 if this value is empty.
+   void set_default_Int()
+      { if (is_empty())   new (&ravel[0]) IntCell(0); }
+
    /// Return the number of scalars in this value (enlist).
    ShapeItem get_enlist_count() const;
 

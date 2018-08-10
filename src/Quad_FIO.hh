@@ -64,11 +64,21 @@ public:
    /// close all open files
    void clear();
 
+   /// fork(), execve(), and return a connection to fd 3 of forked process
+   int do_FIO_57(const UCS_string & B);
+
+   /// close a file descriptor (and its FILE * if any)
+   int close_handle(int handle);
+
    /// get one Unicode from file
    static Unicode fget_utf8(FILE * file, ShapeItem & fget_count);
 
+   /// return the open FILE * for (APL integer) \b handle
+   FILE * get_FILE(int handle);
+
 protected:
-   /// one file (openend with open() or with fopen()
+   /// one file (openend with open(), fopen(), or fdopen()).
+   /// : handle == fd, and FILE * may or may not exist for fd
    struct file_entry
       {
         /// constructor
@@ -92,15 +102,20 @@ protected:
       };
 
    /// return the open file for (APL integer) \b handle
-   file_entry & get_file(const Value & handle);
+   file_entry & get_file_entry(int handle);
+
+   /// return the open file for (APL integer) \b handle
+   file_entry & get_file_entry(const Value & handle)
+      { return get_file_entry(handle.get_ravel(0).get_near_int()); }
 
    /// return the open FILE * (APL integer) \b handle
-   FILE * get_FILE(const Value & value);
+   FILE * get_FILE(const Value & handle)
+      { return get_FILE(handle.get_ravel(0).get_near_int()); }
 
    /// return the open file descriptor for (APL integer) \b handle
    int get_fd(const Value & value)
        {
-         file_entry & fe = get_file(value);   // may throw DOMAIN ERROR
+         file_entry & fe = get_file_entry(value);   // may throw DOMAIN ERROR
          return fe.fe_fd;
        }
 

@@ -3,6 +3,10 @@ if ! WANT_ANDROID
 EXTRA_DIRS += APs emacs_mode sql workspaces
 endif
 SUBDIRS = native $(EXTRA_DIRS)
+if HAVE_GTK3
+SUBDIRS += Gtk
+endif
+
 DIST_SUBDIRS = $(SUBDIRS) testcases
 
 datadir = @datadir@
@@ -87,6 +91,7 @@ Quad_DLX.cc					Quad_DLX.hh		\
 Quad_FFT.cc					Quad_FFT.hh		\
 Quad_FIO.cc					Quad_FIO.hh		\
 Quad_FX.cc					Quad_FX.hh		\
+Quad_GTK.cc					Quad_GTK.hh		\
 Quad_RE.cc					Quad_RE.hh		\
 Quad_RL.cc					Quad_RL.hh		\
 Quad_SQL.cc					Quad_SQL.hh		\

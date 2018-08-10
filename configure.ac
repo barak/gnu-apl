@@ -170,16 +170,24 @@ m4_include([m4/ax_path_lib_pcre.m4])
 AM_CONDITIONAL(HAVE_LIBPCRE2_32,
                test "x$ac_cv_lib_pcre2_32_pcre2_compile_32" = xyes)
 
-# check for GTK 3
-# m4_include([m4/gtk-3.0.m4])
-#    AM_PATH_GTK_3_0([3.0.0])
+# check for GTK+ version 3
+#
+AC_ARG_WITH([gtk3], AS_HELP_STRING([--with-gtk3],
+     [Build with ⎕GTK (interface to GTK+ version 3)]))
+PKG_CHECK_MODULES([GTK], [gtk+-3.0], [HAVE_gtk3=yes], [HAVE_gtk3=no])
+AM_CONDITIONAL(HAVE_GTK3, test "x$HAVE_gtk3" = xyes)
+if test "x$HAVE_gtk3" = xyes; then
+AC_DEFINE_UNQUOTED(HAVE_GTK3, [1], [GTK+ version 3 installed])
+else
+AC_DEFINE_UNQUOTED(HAVE_GTK3, [0], [GTK+ version 3 NOT installed])
+fi
 
 # check if rdtsc (read CPU cycle counter is available.
 # This is expected only on Intel CPUs
 AC_MSG_CHECKING([whether CPU has rdtsc (read CPU cycle counter) opcode])
 AC_COMPILE_IFELSE(
-	[AC_LANG_PROGRAM([[]],
-	[[unsigned int lo, hi;
+        [AC_LANG_PROGRAM([[]],
+        [[unsigned int lo, hi;
           __asm__ __volatile__ ("rdtsc" : "=a" (lo), "=d" (hi));]]
     )], [HAVE_rdtsc=yes], [HAVE_rdtsc=no])
 if test "x$HAVE_rdtsc" = "xyes"; then
@@ -303,22 +311,23 @@ AC_CONFIG_FILES([Makefile
                  gnu-apl.d/preferences
                  HOWTOs/Makefile
                  rpm/Makefile
-		 rpm/apl.spec
+                 rpm/apl.spec
                  src/Makefile
                  src/APs/Makefile
+                 src/Gtk/Makefile
                  src/emacs_mode/Makefile
                  src/native/Makefile
                  src/sql/Makefile
                  src/testcases/Makefile
                  src/workspaces/Makefile
-		 support-files/Makefile
-		 support-files/105-key-International-Keyboard/Makefile
-		 support-files/Dyalog-Keyboard/Makefile
-		 support-files/OS-X-Keyboard/Makefile
-		 support-files/Unicomp-Keyboard/Makefile
-		 support-files/WASD-Keyboard/Makefile
-		 support-files/old-Keyboard/Makefile
-		 support-files/Dirk/Makefile
+                 support-files/Makefile
+                 support-files/105-key-International-Keyboard/Makefile
+                 support-files/Dyalog-Keyboard/Makefile
+                 support-files/OS-X-Keyboard/Makefile
+                 support-files/Unicomp-Keyboard/Makefile
+                 support-files/WASD-Keyboard/Makefile
+                 support-files/old-Keyboard/Makefile
+                 support-files/Dirk/Makefile
                  tools/Makefile
                  workspaces/Makefile
                  wslib3/Makefile

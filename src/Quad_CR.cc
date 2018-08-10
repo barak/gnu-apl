@@ -1240,7 +1240,7 @@ Quad_CR::do_CR33(const Value & B)
    // convert B = Integer Tag, len bytes Data
    // to      Z = 4-byte Tag, 4-byte Len, len bytes Data
    //
-   if (B.get_rank() != 1)   RANK_ERROR;
+   if (B.get_rank() > 1)   RANK_ERROR;
 const ShapeItem len_B = B.element_count();
    if (len_B < 1)   LENGTH_ERROR;
 const ShapeItem len_B1 = len_B - 1;
