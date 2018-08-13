@@ -334,6 +334,9 @@ protected:
    /// write history when done
    bool write_history;
 
+   /// interrupt-safe fgetc()
+   static int safe_fgetc();
+
    /// get one character from user
    static Unicode get_uni();
 

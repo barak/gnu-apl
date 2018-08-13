@@ -958,29 +958,32 @@ bool add_hist = false;
    CIN << endl;
 }
 //-----------------------------------------------------------------------------
+int
+LineInput::safe_fgetc()
+{
+   for (;;)
+       {
+          const int ret = fgetc(stdin);
+          if (ret != EOF)       return ret;
+          if (errno == EINTR)   continue;
+
+          if (got_WINCH)
+             {
+               got_WINCH = false;
+               continue;
+             }
+
+         return EOF;
+       }
+}
+//-----------------------------------------------------------------------------
 Unicode
 LineInput::get_uni()
 {
 again:
 
-const int b0 = fgetc(stdin);
-   if (b0 == EOF)
-      {
-        if (errno == EINTR)
-           {
-             clearerr(stdin);
-             CIN.unsetf(ios_base::unitbuf);
-             goto again;
-           }
-
-       if (got_WINCH)
-          {
-            got_WINCH = false;
-            goto again;
-          }
-
-         return UNI_EOF;
-      }
+const int b0 = safe_fgetc();
+   if (b0 == EOF)   return UNI_EOF;
 
    if (b0 & 0x80)   // non-ASCII unicode
       {
@@ -1000,7 +1003,7 @@ const int b0 = fgetc(stdin);
         uint32_t uni = 0;
         loop(l, len - 1)
             {
-              const UTF8 subc = fgetc(stdin);
+              const UTF8 subc = safe_fgetc();
               if ((subc & 0xC0) != 0x80)
                  {
                    CERR << "Bad UTF8 sequence: " << HEX(b0)
@@ -1021,7 +1024,7 @@ const int b0 = fgetc(stdin);
         char seq[Output::MAX_ESC_LEN];   seq[0] = UNI_ASCII_ESC;
         for (int s = 1; s < Output::MAX_ESC_LEN; ++s)
             {
-              const int bs = fgetc(stdin);
+              const int bs = safe_fgetc();
               if (bs == EOF)   return UNI_EOF;
               seq[s] = bs;
 
