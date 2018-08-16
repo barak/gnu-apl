@@ -242,11 +242,11 @@ mac_def(  Z__vA_LO_INNER_RO_vB,
 /// monadic EACH with ⍎
 //
 mac_def(Z__EXEC_EACH_B,
- "Z← Z__EXEC_EACH_B B;⎕IO;∆IO;T;rho_Z;RC;ET;ZZ;J;N;N3;V3;N_max\n"
- " ∆IO←⎕IO ◊ N←⎕IO←0 ◊ rho_Z←⍴B ◊ N_max←⍴B←,B ◊ T←N_max⍴0 ◊ V3←N3←0\n"
+ "Z← Z__EXEC_EACH_B B;T;rho_Z;RC;ET;ZZ;J;N;N3;V3;N_max\n"
+ " N←⎕IO ◊ rho_Z←⍴B ◊ N_max←⎕IO+⍴B←,B ◊ T←N_max⍴0 ◊ V3←N3←⎕IO\n"
  " J←RC0, RC12, RC12, RC3, RC4, RC5\n"
- "LOOP: ⎕IO←∆IO ◊ (RC ET ZZ)←⎕EC ⊃B[N+∆IO] ◊ ⎕IO←0 ◊ →J[RC]\n"
- " RC0:  ((⊃ZZ)[0;], ' in macro ⍎¨') ⎕ES ⊃ET\n"
+ "LOOP:  (RC ET ZZ)←⎕EC ⊃B[N] ◊ →J[⎕IO+RC]\n"
+ " RC0:  ((⊃ZZ)[⎕IO;], ' in macro ⍎¨') ⎕ES ⊃ET\n"
  " RC12: T[N]←⊂ZZ ◊ N3←N3+1 ◊ →(N_max>N←N+1)⍴LOOP ◊ →DONE\n"
  " RC3:             V3←V3+1 ◊ →(N_max>N←N+1)⍴LOOP ◊ →DONE\n"
  " RC4: 'SYNTAX ERROR: →N in macro ⍎¨' ⎕ES 2 2\n"
