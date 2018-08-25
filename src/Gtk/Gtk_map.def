@@ -1,27 +1,51 @@
 
-// a mapping from ⎕GTK function names (Bs in ⎕GTK Bs) to Gtk functions
-//
-//          glade_ID,     gtk_class,      gtk_function, AZname,   Z, A, help
-gtk_fun_def(entry,        GtkEntry,       set_text,     Text,     V, S, set the text in e.g. a text entry)
-gtk_fun_def(entry,        GtkEntry,       get_text,     Text,     S, V, return the text in e.g. a text entry)
-gtk_fun_def(label,        GtkLabel,       set_label,    Text,     V, S, set the text of e.g. a label)
-gtk_fun_def(progress_bar, GtkProgressBar, set_fraction, Fraction, V, F, set the progress [range 0.0...1.0] shown by e.g. a progress bar)
-gtk_fun_def(progress_bar, GtkProgressBar, get_fraction, Fraction, F, V, return the progress [range 0.0...1.0] shown by e.g. a progress bar)
-gtk_fun_def(level_bar,    GtkLevelBar,    set_value,    Level,    V, F, set the level [range min-value...max-value] shown by e.g. a level bar)
-gtk_fun_def(level_bar,    GtkLevelBar,    get_value,    Level,    F, V, return the level [range min-value...max-value] shown by e.g. a level bar)
-gtk_fun_def(combo_box,    GtkComboBox,    set_active,   Selected, V, I, set the selected item of e.g. a combo box (-1 for none))
-gtk_fun_def(combo_box,    GtkComboBox,    get_active,   Selected, I, V, return the selected item of e.g. a combo box (-1 for none))
+/* a mapping from ⎕GTK function names (right string argument Bs in ⎕GTK Bs) to Gtk functions
+
+           ╔════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
+           ║                                               Macro Argument                                               ║
+╔══════════╬════════════╤══════════════╤═════════════╤════════╤═══╤══════════════════════════════════════════════════════╣
+║          ║            │              │             │  APL   │Typ│                                                      ║
+║ Used by  ║ glade_ID   │  gtk_class   │gtk_function │Variable│Z│A│                          help                        ║
+╠══════════╬════════════╪══════════════╪═════════════╪════════╪═╪═╪══════════════════════════════════════════════════════╣
+║ Quad_GTK ║     ✓      │              │             │        │ │✓│                                                      ║
+║Gtk_server║     ✓      │       ✓      │      ✓      │        │✓│✓│                                                      ║
+║ asciidoc ║     ✓      │       ✓      │      ✓      │   ✓    │✓│✓│                           ✓                          ║
+╚══════════╬════════════╪══════════════╪═════════════╪════════╪═╪═╪══════════════════════════════════════════════════════╣
+ *///      ║            │              │             │        │ │ │                                                      ║
+gtk_fun_def(entry       ,GtkEntry      ,set_text     ,Text    ,V,S, set the text in e.g. a text entry                    )
+gtk_fun_def(entry       ,GtkEntry      ,get_text     ,Text    ,S,V, return the text in e.g. a text entry                 )
+gtk_fun_def(label       ,GtkLabel      ,set_label    ,Text    ,V,S, set the text of e.g. a label                         )
+gtk_fun_def(progress_bar,GtkProgressBar,set_fraction ,Fraction,V,F, set the progress shown by a progress bar             )
+gtk_fun_def(progress_bar,GtkProgressBar,get_fraction ,Fraction,F,V, return the progress shown by a progress bar          )
+gtk_fun_def(level_bar   ,GtkLevelBar   ,set_value    ,Level   ,V,F, set the level shown by a level bar                   )
+gtk_fun_def(level_bar   ,GtkLevelBar   ,get_value    ,Level   ,F,V, return the level  shown by level bar                 )
+gtk_fun_def(combo_box   ,GtkComboBox   ,set_active   ,Selected,V,I, set the selected item of a combo box (-1 for none)   )
+gtk_fun_def(combo_box   ,GtkComboBox   ,get_active   ,Selected,I,V, return the selected item of a combo box (-1 for none))
+gtk_fun_def(drawingarea ,GtkDrawingArea,draw_commands,DrawCmd ,V,S, set the commands needed to draw a drawing area       )
+//         ║            │              │             │        │ │ │                                                      ║
+//         ╚════════════╧══════════════╧═════════════╧════════╧═╧═╧══════════════════════════════════════════════════════╝
 
 #undef gtk_fun_def
 
-// a mapping from GTK events (signals) to Gtk_server callbacks...
-//
-//            callback   arg    optional      event        widget     glade_ID     Gtk
-//              name,   count,    args,     signature,      name,      prefix,    class
-// ----------------------------------------------------------------------------------------
-gtk_event_def(clicked,    1,          ,     GiNsEsIsCs,    OK-button,  button,    GtkButton)
-gtk_event_def(activate,   1,          ,     GiNsEsIsCs,    Text-entry, entry,     GtkEntry)
-gtk_event_def(changed,    1,          ,     GiNsEsIsCs,    Select-box, combobox,  GtkComboBox)
+/* a mapping from GTK events (signals) to Gtk_server callbacks...
+
+             ╔══════════════════════════════════════════════════════════════════════════╗
+             ║                            Macro Argument                                ║
+╔════════════╬═════════╤═════╤════════╤══════════╤═══════════╤═══════════╤══════════════╣
+║            ║         │ arg │optional│  event   │  widget   │  glade_ID │     Gtk      ║
+║ Used By    ║ ev_name │count│  args  │signature │   name    │  prefix,  │    class     ║
+╠════════════╬═════════╪═════╪════════╪══════════╪═══════════╪═══════════╪══════════════╣
+║ Quad_GTK   ║    ✓    │     │        │          │           │           │              ║
+║ Gtk_server ║    ✓    │     │        │          │           │           │              ║
+║ asciidoc   ║    ✓    │  ✓  │   ✓    │    ✓     │    ✓      │     ✓     │     ✓        ║
+╚════════════╬═════════╪═════╪════════╪══════════╪═══════════╪═══════════╪══════════════╣
+ *///        ║         │     │        │          │           │           │              ║
+gtk_event_def( clicked ,  1  ,        ,GiNsEsIsCs, OK-button , button    ,GtkButton     )
+gtk_event_def( activate,  1  ,        ,GiNsEsIsCs, Text-entry, entry     ,GtkEntry      )
+gtk_event_def( changed ,  1  ,        ,GiNsEsIsCs, Select-box, combobox  ,GtkComboBox   )
+gtk_event_def( draw    ,  1  ,        ,GiNsEsIsCs, Canvas    ,drawingarea,GtkDrawingArea)
+//           ║         │     │        │          │           │           │              ║
+//           ╚═════════╧═════╧════════╧══════════╧═══════════╧═══════════╧══════════════╝
 
 #undef gtk_event_def
 

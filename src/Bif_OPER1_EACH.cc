@@ -32,7 +32,7 @@ Bif_OPER1_EACH * Bif_OPER1_EACH::fun = &Bif_OPER1_EACH::_fun;
 Token
 Bif_OPER1_EACH::eval_ALB(Value_P A, Token & _LO, Value_P B)
 {
-   // dyadic EACH
+   // dyadic EACH: call _LO for corresponding items of A and B
 
    if (!(A->is_scalar() || B->is_scalar() || A->same_shape(*B)))
       {
@@ -42,6 +42,11 @@ Bif_OPER1_EACH::eval_ALB(Value_P A, Token & _LO, Value_P B)
 
 Function * LO = _LO.get_function();
    Assert1(LO);
+
+   // for the ambiguous operators /. ⌿, \, and ⍀ is_operator() returns true,
+   // which is incorrect in this context. We use get_signature() instead.
+   //
+   if ((LO->get_signature() & SIG_DYA) != SIG_DYA)   VALENCE_ERROR;
 
    if (A->is_empty() || B->is_empty())
       {
@@ -163,10 +168,12 @@ ShapeItem len_Z = 0;
 Token
 Bif_OPER1_EACH::eval_LB(Token & _LO, Value_P B)
 {
-   // monadic EACH
+   // monadic EACH: call _LO for every item of B
 
 Function * LO = _LO.get_function();
    Assert1(LO);
+   if (LO->is_operator())                SYNTAX_ERROR;
+   if (!(LO->get_signature() & SIG_B))   VALENCE_ERROR;
 
    if (B->is_empty())
       {

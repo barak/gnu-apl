@@ -243,7 +243,7 @@ mac_def(  Z__vA_LO_INNER_RO_vB,
 //
 mac_def(Z__EXEC_EACH_B,
  "Z← Z__EXEC_EACH_B B;T;rho_Z;RC;ET;ZZ;J;N;N3;V3;N_max\n"
- " N←⎕IO ◊ rho_Z←⍴B ◊ N_max←⎕IO+⍴B←,B ◊ T←N_max⍴0 ◊ V3←N3←⎕IO\n"
+ " N←⎕IO ◊ rho_Z←⍴B ◊ N_max←N+⍴B←,B ◊ T←(⍴B)⍴0 ◊ V3←N3←⎕IO\n"
  " J←RC0, RC12, RC12, RC3, RC4, RC5\n"
  "LOOP:  (RC ET ZZ)←⎕EC ⊃B[N] ◊ →J[⎕IO+RC]\n"
  " RC0:  ((⊃ZZ)[⎕IO;], ' in macro ⍎¨') ⎕ES ⊃ET\n"

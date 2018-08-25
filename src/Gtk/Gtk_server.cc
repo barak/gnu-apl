@@ -21,6 +21,8 @@
 #include <assert.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <math.h>
+#include <semaphore.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -38,14 +40,28 @@
 
 using namespace std;
 
-int verbosity = 2;
+static int verbosity = 0;
+static bool verbose__calls = false;
+static bool verbose__draw_data = false;
+static bool verbose__do_draw = false;
+static bool verbose__draw_cmd = false;
+static bool verbose__reads = false;
+static bool verbose__writes = false;
+
+static sem_t drawarea_sema;
+
+static cairo_surface_t * surface = 0;
+
+static const char * drawarea_data = 0;
+static int drawarea_dlen = 0;
 
 //-----------------------------------------------------------------------------
 static GtkBuilder * builder = 0;
 static GObject * window     = 0;
 static GObject * selected   = 0;
+static const char * top_level_widget = 0;
 
-// a mapping of glade IDs and Gtl objects
+// a mapping netween glade IDs and Gtk objects
 static struct _ID_DB
 {
   _ID_DB(const char * cls, const char * id, const char * wn, _ID_DB * nxt)
@@ -69,7 +85,7 @@ static struct _ID_DB
   const char * widget_name;
 
    /// the Gtk object
-   GObject * obj;
+   const GObject * obj;
 } * id_db = 0;
 
 //-----------------------------------------------------------------------------
@@ -95,6 +111,13 @@ char line[200];
             {
               if (char * qu = strchr(class_buf, '"'))   *qu = 0;
               if (char * qu = strchr(id_buf, '"'))      *qu = 0;
+
+              if (top_level_widget == 0)
+                 {
+                    top_level_widget = strdup(id_buf);
+                    verbosity > 1 && cerr << "Top-level widget: "
+                                          << top_level_widget << endl;
+                 }
 
               verbosity > 1 && cerr << "See class='" << class_buf <<
                  "' and id='" << id_buf << "'" << endl;
@@ -155,10 +178,13 @@ cmd_1_load_GUI(const char * filename)
    //
    for (_ID_DB * entry = id_db; entry; entry = entry->next)
        {
-          GObject * obj = gtk_builder_get_object(builder, id_db->xml_id);
+          const GObject * obj =
+                G_OBJECT(gtk_builder_get_object(builder, id_db->xml_id));
           if (obj)
              {
-               cerr << "object '" << entry->xml_id << "' mapped" << endl;
+               verbosity > 0 && cerr <<
+                  "glade name '" << entry->xml_id << "' mapped to GObject "
+                                 << reinterpret_cast<const void *>(obj) << endl;
                id_db->obj = obj;
              }
            else cerr << "object '" << entry->xml_id << "' not found" << endl;
@@ -166,14 +192,14 @@ cmd_1_load_GUI(const char * filename)
 
 
    gtk_builder_connect_signals(builder, NULL);
-   cerr << "GUI signals connected.\n";
+   verbosity > 0 && cerr << "GUI signals connected.\n";
 
    if (verbosity > 2)
       {
         for (GSList * objects = gtk_builder_get_objects(builder);
              objects; objects = objects->next)
             {
-               GObject * obj = reinterpret_cast<GObject *>(objects->data);
+               GObject * obj = G_OBJECT(objects->data);
                if (obj)
                   {
                     char * name = 0;
@@ -182,7 +208,38 @@ cmd_1_load_GUI(const char * filename)
                   }
             }
       }
+}
+//-----------------------------------------------------------------------------
+void *
+gtk_drawingarea_draw_commands(GtkDrawingArea * widget, const char * data)
+{
+   // this function is called when apl does DrawCmd ⎕GTK[H_ID] "draw_commands"
 
+   verbose__calls && cerr << "gtk_drawingarea_draw_commands()..." << endl;
+   sem_wait(&drawarea_sema);
+
+   if (drawarea_data)   delete[] drawarea_data;
+
+   drawarea_dlen = strlen(data);
+
+char * cp = new char[drawarea_dlen + 1];
+   assert(cp);
+   memcpy(cp, data, drawarea_dlen + 1);   // + 1 for trailing 0
+   drawarea_data = cp;
+   verbose__draw_data && cerr << "draw_data[" << drawarea_dlen << "]:\n"
+                              << drawarea_data << endl;
+
+   sem_post(&drawarea_sema);
+
+   if (surface)   cairo_surface_destroy(surface);
+   surface = 0;
+
+   verbose__calls && cerr << "gtk_drawingarea_draw_commands() "
+                               "calls gtk_widget_queue_draw()." << endl;
+   gtk_widget_queue_draw(GTK_WIDGET(widget));
+
+   verbose__calls && cerr << "gtk_drawingarea_draw_commands() done." << endl;
+   return 0;
 }
 //-----------------------------------------------------------------------------
 static void
@@ -202,32 +259,29 @@ GError * err = 0;
       }
    else
       {
-        GtkStyleProvider * style_provider =
-               reinterpret_cast<GtkStyleProvider *>(css_provider);
+        GtkStyleProvider * style_provider = GTK_STYLE_PROVIDER(css_provider);
         GdkScreen * screen = gdk_screen_get_default();
         gtk_style_context_add_provider_for_screen(
                     screen, style_provider, GTK_STYLE_PROVIDER_PRIORITY_USER);
       }
 }
 //-----------------------------------------------------------------------------
-static void *
-gtk_main1(void *)
-{
-   gtk_main();
-   return 0;
-}
-//-----------------------------------------------------------------------------
 void
 static cmd_3_show_GUI()
 {
   assert(builder);
-  window = gtk_builder_get_object(builder, "window1");
+   if (top_level_widget)
+      window = gtk_builder_get_object(builder, top_level_widget);
+   else
+      window = gtk_builder_get_object(builder, "window1");
+
   assert(window);
-  gtk_widget_show_all((GtkWidget *)window);
+  gtk_widget_show_all(GTK_WIDGET(window));
 
 pthread_t thread = 0;
-   pthread_create(&thread, 0, gtk_main1, 0);
+   pthread_create(&thread, 0, reinterpret_cast<void *(*)(void *)>(gtk_main), 0);
    assert(thread);
+   usleep(200000);
 }
 //-----------------------------------------------------------------------------
 void
@@ -244,7 +298,8 @@ static cmd_6_select_widget(const char * id)
 {
   assert(builder);
   selected = gtk_builder_get_object(builder, id);
-   if (!selected)   cerr << "cmd_6_select_widget" << id << ") failed" << endl;
+   if (!selected)
+      cerr << "cmd_6_select_widget(id='" << id << "') failed" << endl;
 }
 //-----------------------------------------------------------------------------
 enum Gtype
@@ -334,14 +389,13 @@ static print_evs(int which)
 #include "Gtk_map.def"
       }
    else assert(0 && "bad which");
-
 }
 //-----------------------------------------------------------------------------
 static void
 send_TLV(int tag, const char * data)
 {
 const unsigned int Vlen = strlen(data);
-const unsigned int TLV_len = 8 + Vlen;
+const ssize_t TLV_len = 8 + Vlen;
 char TLV[TLV_len + 1];
    TLV[0] = tag >> 24 & 0xFF;
    TLV[1] = tag >> 16 & 0xFF;
@@ -352,8 +406,8 @@ char TLV[TLV_len + 1];
    TLV[6] = Vlen >>  8;
    TLV[7] = Vlen;
    TLV[TLV_len] = 0;
-   for (int l = 0; l < Vlen; ++l)   TLV[8 + l] = data[l];
-   if (verbosity > 0)
+   for (unsigned int l = 0; l < Vlen; ++l)   TLV[8 + l] = data[l];
+   if (verbose__writes)
       {
         cerr << "Gtk_server:   write(Tag=" << tag;
         if (Vlen)   cerr << ", Val[" << Vlen << "]=\"" << (TLV + 8) << "\"";
@@ -385,9 +439,9 @@ inline gdouble S2I(const gchar * s) { return strtod(s, 0); }
 static gchar * F2S(gdouble d)
 {
 static gchar buffer[40];
-int len = snprintf(buffer, sizeof(buffer) - 1, "%lf", d);
+unsigned int len = snprintf(buffer, sizeof(buffer) - 1, "%lf", d);
    if (len >= sizeof(buffer))   len = sizeof(buffer) - 1;
-   buffer[len] - 0;
+   buffer[len] = 0;
 
  return buffer;
 }
@@ -395,9 +449,10 @@ int len = snprintf(buffer, sizeof(buffer) - 1, "%lf", d);
 static gchar * I2S(gint i)
 {
 static gchar buffer[40];
-int len = snprintf(buffer, sizeof(buffer) - 1, "%ld", static_cast<long>(i));
+unsigned int len = snprintf(buffer, sizeof(buffer) - 1, "%ld",
+                            static_cast<long>(i));
    if (len >= sizeof(buffer))   len = sizeof(buffer) - 1;
-   buffer[len] - 0;
+   buffer[len] = 0;
 
  return buffer;
 }
@@ -413,7 +468,7 @@ int len = snprintf(buffer, sizeof(buffer) - 1, "%ld", static_cast<long>(i));
 #define TLV_arg_F , res
 #define TLV_arg_I , res
 
-#define result_V(fcall) const gchar * res = "";   fcall;
+#define result_V(fcall) fcall;
 #define result_S(fcall) const gchar * res = fcall;
 #define result_F(fcall) const gchar * res = F2S(fcall);
 #define result_I(fcall) const gchar * res = I2S(fcall);
@@ -421,6 +476,8 @@ int len = snprintf(buffer, sizeof(buffer) - 1, "%ld", static_cast<long>(i));
 int
 main(int argc, char * argv[])
 {
+   sem_init(&drawarea_sema, /* pshared */ 0, 1);
+
 bool do_funs = false;
 bool do_ev1 = false;
 bool do_ev2 = false;
@@ -476,7 +533,7 @@ const int flags = fcntl(3, F_GETFD);
   gtk_init(&argc, &argv);
 
 enum { TLV_socket = 3 };
-char TLV[1000];       // the entire TLV buffer
+char TLV[2000];       // the entire TLV buffer
 char * V = TLV + 8;   // the value part of the TLV buffer
 
    for (;;)
@@ -499,7 +556,7 @@ char * V = TLV + 8;   // the value part of the TLV buffer
           const int V_len = (TLV[4] & 0xFF) << 24 | (TLV[5] & 0xFF) << 16
                           | (TLV[6] & 0xFF) << 8 | (TLV[7] & 0xFF);
 
-          verbosity > 0 && cerr << "Gtk_server:   read(Tag=" << TLV_tag;
+          verbose__reads && cerr << "Gtk_server:   read(Tag=" << TLV_tag;
 
           if (rx_len != V_len + 8)
              {
@@ -511,12 +568,12 @@ char * V = TLV + 8;   // the value part of the TLV buffer
           if (V_len)
              {
                V[V_len] = 0;
-               verbosity > 0 && cerr << ", Val[" << V_len
+               verbose__reads && cerr << ", Val[" << V_len
                                      << "]=\"" << V << "\"" << endl;
              }
           else
              {
-               verbosity > 0 && cerr << ", no Val)" << endl;;
+               verbose__reads && cerr << ", no Val)" << endl;;
              }
 
           switch(TLV_tag)
@@ -596,6 +653,380 @@ char data[strlen(callback) + strlen(widget_name) + 10];
    verbosity > 0 && cerr << "callback " << callback << "(2) done" << endl;
 }
 //-----------------------------------------------------------------------------
+struct _draw_param
+{
+  _draw_param()
+  : line_width(100),   // 100% = 2.0 in cairo
+    font_size (20),   // 100% = 2.0 in cairo
+    font_slant(CAIRO_FONT_SLANT_NORMAL),
+    font_weight(CAIRO_FONT_WEIGHT_NORMAL)
+     {
+       fill_color.red   = 0;
+       fill_color.green = 0;
+       fill_color.blue  = 0;
+       fill_color.alpha = 0;
+
+       line_color.red   = 0;
+       line_color.green = 0;
+       line_color.blue  = 0;
+       line_color.alpha = 0;
+
+       strncpy(font_family, "sans-serif", sizeof(font_family) - 1);
+       font_family[sizeof(font_family) - 1] = 0;
+     }
+
+   bool line_visible() const
+      { return line_color.alpha && line_width; }
+
+   bool brush_visible() const
+      { return fill_color.alpha; }
+
+  GdkRGBA fill_color;
+  GdkRGBA line_color;
+  int line_width;   // 100% = 2.0 pixels in cairo
+  int font_size;    // 100% = 2.0 pixels in cairo
+  cairo_font_slant_t font_slant;
+  cairo_font_weight_t font_weight;
+  char font_family[100];
+} draw_param;
+
+//-----------------------------------------------------------------------------
+inline void
+cairo_set_source_rgba(cairo_t * cr, const GdkRGBA & color)
+{
+   cairo_set_source_rgba(cr, color.red   / 255.0,
+                             color.green / 255.0,
+                             color.blue  / 255.0,
+                             color.alpha / 100.0);
+}
+//-----------------------------------------------------------------------------
+
+void
+do_draw_cmd(GtkWidget * drawing_area, const char * cmd, const char * cmd_end)
+{
+int count, i1, i2, i3, i4;
+char s1[100];
+
+   while (cmd < cmd_end && *cmd == ' ')   ++cmd;   // delete leading spaces
+const int cmd_len = cmd_end - cmd;
+   if (cmd_len == 0)   return;                   // empty line
+
+   count = sscanf(cmd, "background %u %u %u %u", &i1, &i2, &i3, &i4);
+   if (count >= 3)
+      {
+        verbose__draw_cmd && cerr <<
+           "DRAW BACKGROUND " << i1 << " " << i2 << " " << i3 << endl;
+        const double width  = gtk_widget_get_allocated_width(drawing_area);
+        const double height = gtk_widget_get_allocated_height(drawing_area);
+        cairo_t * cr1 = cairo_create(surface);
+        cairo_rectangle(cr1, 0, 0, width, height);
+        cairo_close_path(cr1);
+        cairo_set_source_rgb(cr1, i1/255.0, i2/255.0, i3/255.0);
+        cairo_fill(cr1);
+        cairo_destroy(cr1);
+        return;
+      }
+
+   i4 = 100; count = sscanf(cmd, "fill-color %u %u %u %u", &i1, &i2, &i3, &i4);
+   if (count >= 3)
+      {
+        verbose__draw_cmd && cerr <<
+           "SET BRUSH COLOR (" << i1 << " " << i2 << " "
+                                << i3 << ")" << endl;
+        draw_param.fill_color.red   = i1;
+        draw_param.fill_color.green = i2;
+        draw_param.fill_color.blue  = i3;
+        draw_param.fill_color.alpha = i4;
+        return;
+      }
+
+   i4 = 100; count = sscanf(cmd, "line-color %u %u %u %u", &i1, &i2, &i3, &i4);
+   if (count >= 3)
+      {
+        verbose__draw_cmd && cerr <<
+           "SET LINE COLOR (" << i1 << " " << i2 << " " << i3 << ")" << endl;
+        draw_param.line_color.red   = i1;
+        draw_param.line_color.green = i2;
+        draw_param.line_color.blue  = i3;
+        draw_param.line_color.alpha = i4;
+        return;
+      }
+
+   count = sscanf(cmd, "font-size %u", &i1);
+   if (count == 1)
+      {
+        draw_param.font_size = i1;
+        return;
+      }
+
+   count = sscanf(cmd, "font-family %s", s1);
+   if (count == 1)
+      {
+        s1[sizeof(s1) - 1] = 0;
+        enum { FONT_LEN = sizeof(draw_param.font_family) };
+        strncpy(draw_param.font_family, s1, FONT_LEN - 1);
+        draw_param.font_family[FONT_LEN - 1] = 0;
+        return;
+      }
+
+   count = sscanf(cmd, "font-slant %s", s1);
+   if (count == 1)
+      {
+        s1[sizeof(s1) - 1] = 0;
+        if (!strcasecmp(s1, "NORMAL"))
+           draw_param.font_slant = CAIRO_FONT_SLANT_NORMAL;
+        else if (!strcasecmp(s1, "ITALIC"))
+           draw_param.font_slant = CAIRO_FONT_SLANT_ITALIC;
+        else if (!strcasecmp(s1, "OBLIQUE"))
+           draw_param.font_slant = CAIRO_FONT_SLANT_OBLIQUE;
+        else
+           cerr << "bad font-slant: " << s1 << endl;
+        return;
+      }
+
+   count = sscanf(cmd, "font-weight %s", s1);
+   if (count == 1)
+      {
+        s1[sizeof(s1) - 1] = 0;
+        if (!strcasecmp(s1, "NORMAL"))
+           draw_param.font_weight = CAIRO_FONT_WEIGHT_NORMAL;
+        else if (!strcasecmp(s1, "BOLD"))
+           draw_param.font_weight = CAIRO_FONT_WEIGHT_BOLD;
+        else
+           cerr << "bad font-weight: " << s1 << endl;
+        return;
+      }
+
+   count = sscanf(cmd, "line-width %u", &i1);
+   if (count == 1)
+      {
+        verbose__draw_cmd && cerr <<
+           "SET LINE WIDTH " << i1 << endl;
+        draw_param.line_width = i1;
+        return;
+      }
+
+   if  (3 == sscanf(cmd, "circle (%u %u) %u", &i1, &i2, &i3))
+      {
+        verbose__draw_cmd && cerr <<
+           "DRAW CIRCLE (" << i1 << ":" << i2 << ") " << i3 << endl;
+
+        const double x   = i1;   // center X
+        const double y   = i2;   // center Y
+        const double rad = i3;   // radius
+
+        if (draw_param.brush_visible())
+           {
+             cairo_t * cr1 = cairo_create(surface);
+
+             cairo_arc(cr1, x, y, rad, 0.0, 2*M_PI);
+             cairo_close_path(cr1);
+             cairo_set_source_rgba(cr1, draw_param.fill_color);
+             cairo_fill(cr1);
+             cairo_destroy(cr1);
+           }
+
+        if (draw_param.line_visible())
+           {
+             cairo_t * cr1 = cairo_create(surface);
+
+             cairo_arc(cr1, x, y, rad, 0.0, 2*M_PI);
+             cairo_set_source_rgba(cr1, draw_param.line_color);
+             cairo_set_line_width(cr1, draw_param.line_width*0.02);
+             cairo_stroke(cr1);
+             cairo_destroy(cr1);
+           }
+        return;
+      }
+
+   if  (4 == sscanf(cmd, "ellipse (%u %u) (%u %u)", &i1, &i2, &i3, &i4))
+      {
+        verbose__draw_cmd && cerr <<
+           "DRAW ELLIPSE (" << i1 << ":" << i2 << ") ("
+                            << i3 << ":" << i4 << ")" << endl;
+
+        const double x     = i1;   // center X
+        const double y     = i2;   // center I
+        const double rad_x = i3 ? i3 : 1.0;   // radius X
+        const double rad_y = i4 ? i4 : 1.0;   // radius Y
+
+        if (draw_param.brush_visible())
+           {
+             cairo_t * cr1 = cairo_create(surface);
+
+             cairo_save(cr1);
+             cairo_scale(cr1, rad_x, rad_y);
+             cairo_arc(cr1, x/rad_x, y/rad_y, 1.0, 0.0, 2*M_PI);
+             cairo_close_path(cr1);
+             cairo_set_source_rgba(cr1, draw_param.fill_color);
+             cairo_fill(cr1);
+             cairo_restore(cr1);
+             cairo_destroy(cr1);
+           }
+
+        if (draw_param.line_visible())
+           {
+             cairo_t * cr1 = cairo_create(surface);
+
+             cairo_save(cr1);
+             cairo_scale(cr1, rad_x, rad_y);
+             cairo_arc(cr1, x/rad_x, y/rad_y, 1.0, 0.0, 2*M_PI);
+             cairo_restore(cr1);
+             cairo_set_source_rgba(cr1, draw_param.line_color);
+             cairo_set_line_width(cr1, draw_param.line_width*0.02);
+             cairo_stroke(cr1);
+             cairo_destroy(cr1);
+           }
+
+        return;
+      }
+
+   if  (4 == sscanf(cmd, "line (%u %u) (%u %u)", &i1, &i2, &i3, &i4))
+      {
+        verbose__draw_cmd && cerr <<
+           "DRAW LINE (" << i1 << ":" << i2 << ") ("
+                              << i3 << ":" << i4 << ")" << endl;
+        const double x0 = i1;
+        const double y0 = i2;
+        const double x1 = i3;
+        const double y1 = i4;
+        cairo_t * cr1 = cairo_create(surface);
+        cairo_move_to(cr1, x0, y0);
+        cairo_line_to(cr1, x1, y1);
+        cairo_set_source_rgba(cr1, draw_param.line_color);
+        cairo_set_line_width(cr1, draw_param.line_width*0.02);
+        cairo_stroke(cr1);
+        cairo_destroy(cr1);
+        return;
+      }
+
+   if  (4 == sscanf(cmd, "rectangle (%u %u) (%u %u)", &i1, &i2, &i3, &i4))
+      {
+        verbose__draw_cmd && cerr <<
+           "DRAW RECTANGLE (" << i1 << ":" << i2 << ") ("
+                                   << i3 << ":" << i4 << ")" << endl;
+        const double x      = i1;
+        const double y      = i2;
+        const double width  = i3 - i1;
+        const double height = i4 - i2;
+
+        if (draw_param.brush_visible())
+           {
+             cairo_t * cr1 = cairo_create(surface);
+             cairo_rectangle(cr1, x, y, width, height);
+             cairo_close_path(cr1);
+             cairo_set_source_rgba(cr1, draw_param.fill_color);
+             cairo_fill(cr1);
+             cairo_destroy(cr1);
+           }
+
+        if (draw_param.line_visible())
+           {
+             cairo_t * cr1 = cairo_create(surface);
+             cairo_rectangle(cr1, x, y, width, height);
+             cairo_set_source_rgba(cr1, draw_param.line_color);
+             cairo_set_line_width(cr1, draw_param.line_width*0.02);
+             cairo_stroke(cr1);
+             cairo_destroy(cr1);
+           }
+        return;
+      }
+
+   if  (4 == sscanf(cmd, "polygon (%u %u) (%u %u)", &i1, &i2, &i3, &i4))
+      {
+        verbose__draw_cmd && cerr << "DRAW POLYGON";
+        int point_count = 0;
+        for (const char * p = cmd; p < cmd_end;)
+            {
+              p = strchr(p, '(');
+              if (p == 0)         break;   // no more points
+              if (p >= cmd_end)   break;   // point in next command
+              ++point_count;
+              ++p;   // skip (
+            }
+        double x[point_count];
+        double y[point_count];
+        int point_idx = 0;
+        for (const char * p = cmd; p < cmd_end;)
+            {
+              p = strchr(p, '(');
+              if (p == 0)         break;   // no more points
+              if (p >= cmd_end)   break;   // point in next command
+              if (2 != sscanf(p, "(%u %u)", &i1, &i2))
+                 {
+                   cerr << endl
+                        << "polygon: bad point " << point_count << endl
+                        << "    cmd: " << cmd << endl
+                        << "    p: "   << p << endl
+                        << p << endl;
+                   return;
+                 }
+             verbose__draw_cmd && cerr << " (" << i1 << " " << i2 << ")";
+             x[point_idx] = i1;
+             y[point_idx] = i2;
+             ++point_idx;
+             ++p;
+           }
+        verbose__draw_cmd && cerr << endl;
+
+        if (draw_param.brush_visible())
+           {
+             cairo_t * cr1 = cairo_create(surface);
+
+             cairo_save(cr1);
+             cairo_move_to(cr1, x[0], y[0]);
+             for (int j = 1; j < point_count; ++j)
+                 cairo_line_to(cr1, x[j], y[j]);
+             cairo_close_path(cr1);
+             cairo_set_source_rgba(cr1, draw_param.fill_color);
+             cairo_fill(cr1);
+             cairo_restore(cr1);
+             cairo_destroy(cr1);
+           }
+
+        if (draw_param.line_visible())
+           {
+             cairo_t * cr1 = cairo_create(surface);
+             cairo_move_to(cr1, x[0], y[0]);
+             for (int j = 1; j < point_count; ++j)
+                 cairo_line_to(cr1, x[j], y[j]);
+             cairo_close_path(cr1);
+             cairo_set_source_rgba(cr1, draw_param.line_color);
+             cairo_set_line_width(cr1, draw_param.line_width*0.02);
+             cairo_stroke(cr1);
+             cairo_destroy(cr1);
+           }
+        return;
+      }
+
+   count = sscanf(cmd, "text (%u %u) %n", &i1, &i2, &i3);
+   if (count == 2)
+      {
+        const double x = i1;
+        const double y = i2;
+
+        cairo_t * cr1 = cairo_create(surface);
+
+        cairo_move_to(cr1, x, y);
+        cairo_select_font_face(cr1, draw_param.font_family,
+                                    draw_param.font_slant,
+                                    draw_param.font_weight);
+        cairo_set_font_size(cr1, draw_param.font_size);
+        const char * start = cmd + i3;
+        const int slen = cmd_len - i3;
+        strncpy(s1, start, sizeof(s1) - 1);
+        s1[slen] = 0;
+        cairo_show_text(cr1, s1);
+        cairo_destroy(cr1);
+        return;
+      }
+
+   cerr << endl << "BAD DRAW COMMAND: ";
+   for (const char * s = cmd; s < cmd_end; ++s)   cerr << *s;
+   cerr << endl << endl;
+}
+//-----------------------------------------------------------------------------
+
 
 // callbacks that glade can connect to
 //
@@ -616,6 +1047,50 @@ clicked_0(GtkWidget * button, gpointer user_data = 0)
 }
  */
 
-}   // extern "C"
+//-----------------------------------------------------------------------------
+gboolean
+do_draw(GtkWidget * drawing_area, cairo_t * cr, gpointer user_data)
+{
+   verbose__calls && cerr << "*** callback do_draw()..." << endl ;
 
+   if (surface == 0)
+      {
+        if (drawarea_data == 0)   return false;
+
+        verbose__do_draw && cerr << "   new surface: cr="
+                                 << reinterpret_cast<const void *>(cr) << endl;
+
+        sem_wait(&drawarea_sema);
+        assert(drawarea_data);
+
+        // pretend configure event
+        //
+        {
+          GtkWidget * widget = GTK_WIDGET(drawing_area);
+          surface = gdk_window_create_similar_surface(
+                               gtk_widget_get_window(widget),
+                               CAIRO_CONTENT_COLOR,
+                               gtk_widget_get_allocated_width(widget),
+                               gtk_widget_get_allocated_height(widget));
+        }
+
+        const char * end = drawarea_data + drawarea_dlen;
+        for (const char * cmd = drawarea_data; cmd < end; )
+            {
+              const char * cmd_end = strchr(cmd, '\n');
+              assert(cmd_end);   // guaranteed by ⎕GTK
+              do_draw_cmd(drawing_area, cmd, cmd_end);
+              cmd = cmd_end + 1;
+            }
+
+        sem_post(&drawarea_sema);
+      }
+
+   cairo_set_source_surface(cr, surface, 0, 0);
+   cairo_paint(cr);
+   verbose__calls && cerr << "do_draw() done." << endl;
+   return false;
+}
+
+}   // extern "C"
 //-----------------------------------------------------------------------------

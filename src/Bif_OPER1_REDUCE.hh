@@ -24,7 +24,7 @@
 #include "PrimitiveOperator.hh"
 
 //-----------------------------------------------------------------------------
-/** Primitive operator reduce.
+/** Primitive operator reduce (common part for all reducr variants)
  */
 class Bif_REDUCE : public PrimitiveOperator
 {

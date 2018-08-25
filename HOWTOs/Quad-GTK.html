@@ -742,8 +742,8 @@ asciidoc.install();
 <div class="sectionbody">
 <div class="paragraph"><p>⎕GTK is a GNU APL system function that allows an APL program to create and
 control a graphical user interface (GUI). The GUI is based on Gtk+ (Gimp
-Toolkit) version 3+ (aka. GTK 3+). This document describes, by means of a
-simple GUI example, how ⎕GTK based GUIs can created and managed from GNU APL.</p></div>
+Toolkit) version 3+ (aka. GTK 3+). This document describes, by means of
+simple examples, how ⎕GTK based GUIs can created and managed from GNU APL.</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -755,9 +755,13 @@ thousands of functions. The entire Gtk API is spread over 11 different
 libraries:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ pkg-config gtk+-3.0 --libs
+<pre>
+
+<code>$ pkg-config gtk+-3.0 --libs
 -lgtk-3 -lgdk-3 -latk-1.0 -lgio-2.0 -lpangocairo-1.0 -lgdk_pixbuf-2.0
--lcairo-gobject -lpango-1.0 -lcairo -lgobject-2.0 -lglib-2.0</code></pre>
+-lcairo-gobject -lpango-1.0 -lcairo -lgobject-2.0 -lglib-2.0</code>
+
+</pre>
 </div></div>
 <div class="paragraph"><p>Each library contains tens, hundreds, or even thousands of symbols. Every
 symbol represents either a function or a variable, and the vast majority of
@@ -830,22 +834,24 @@ cellspacing="0" cellpadding="4">
 </tbody>
 </table>
 </div>
-<div class="paragraph"><p>These numbers suggest that mapping every Gtk function to an APL function would
-create an almost unusable API at APL level. Even the approach
+<div class="paragraph"><p>These numbers suggest that mapping every Gtk function to a corresponding APL
+function would create an almost unusable API at APL level. Even the approach
 used for ⎕FIO or ⎕SQL - using function numbers as APL axis elements - reaches
 its limits when used with almost 10000 functions.</p></div>
-<div class="paragraph"><p>Now, the huge number of API functions in Gtk contrasts considerably with the
-moderate number of widgets (around 80) in a GUI and even more with number of
-things that a user can do with each of the widgets.</p></div>
-<div class="paragraph"><p>If we look at <strong>glade</strong>, a Gtk GUI construction tool, then we see that there are
-12 top-level widgets (aka. "windows"), 20 containers (widgets containing other
-widgets), and 36 control widgets (most of them variants of the same base
-widget, like different types of buttons).</p></div>
+<div class="paragraph"><p>Now, the huge number of API functions in the different Gtk libraries contrasts
+considerably with the moderate number of widgets (around 80) in a GUI and even
+more with number of actions (like clicking, marking text, typing text, etc.)
+that a user can do with each of the widgets.</p></div>
+<div class="paragraph"><p>If we look at the program <strong>glade</strong>, which is the default tool for constructing
+Gtk based GUIs, then we see that there are 12 top-level widgets
+(aka. "windows"), 20 containers (widgets containing other widgets), and 36
+control widgets (most of them variants of the same base widget, like different
+types of buttons).</p></div>
 <div class="paragraph"><p>This discrepancy between the huge number of functions in provided by Gtk and
 rather small number of things that a user can do (like: click on a button,
 select an item in a selection box, enter text in some text entry, etc)
 or perceive (color, font, etc.) suggests that there might be a clever way to
-control a GUI without mapping each of the 10000+ Gtk function to a
+control a GUI without mapping each of the almost 10000 Gtk functions to a
 corresponding APL function in a 1:1 fashion.</p></div>
 <div class="paragraph"><p>⎕GTK uses a rigorous approach to reduce the number of functions:</p></div>
 <div class="ulist"><ul>
@@ -860,18 +866,18 @@ Every GUI is required to be constructed with the GUI construction tool
 <li>
 <p>
 To the extent possible, visual widget aspects that are usually static (i.e.
-  do not change over time) such as colors or sizes are required to be specified
-  with CSS (Cascading Style Sheets). This requirement further reduces the need
-  for the according GTK functions. It also speeds up the design of the GUI
-  itself. The downside is a somewhat static look-and-feel of the GUI, because,
-  for example, colors cannot be changed after the GUI was instantiated.
-  However, the benefit of fancy dynamic GUIs (if any) seems not to justify the
-  complexity in the API that would be needed to support them.
+  that do not change over time) such as colors or widget sizes are required to
+  be specified with CSS (Cascading Style Sheets). This requirement further
+  reduces the need for the according GTK functions. It also speeds up the
+  design of the GUI itself. The downside is a somewhat static look-and-feel of
+  the GUI, because, for example, colors cannot be changed after the GUI was
+  instantiated.  However, the benefit of fancy dynamic GUIs (if any) seems not
+  to justify the complexity in the API that would be needed to support them.
 </p>
 </li>
 <li>
 <p>
-Implementation on demand. ⎕GTK starts with a rather small (and necessarily
+Implementation on demand. ⎕GTK starts with a rather small (and therefore
   incomplete) set of GTK widgets and events, but has a simple way to extend
   that set. The mapping between ⎕GTK on one side and libgtk functions and
   events on the other side is defined in a single macro file <strong>Gtk/Gtk_map.def</strong>
@@ -896,20 +902,24 @@ libraries, so that Gtk itself remains outside GNU APL.
 <li>
 <p>
 The <strong>Gtk_server</strong> is started by ⎕GTK, and after that ⎕GTK communicates with
-Gtk_server over a socket pair. The communication consists of a sequence of
-TLV (Tag/Length/Value) buffers encoded with 33 ⎕CR and decoded with 34 ⎕CR
-(aka. ¯33 ⎕CR) at the APL end. A user action (e.g. a button click) results
-in an "event" (= a TLV buffer) received by APL while an "command" (sent from
-APL to the Gtk_server results in some change in the GUI. However, many details
-such as a button changing its form or its color when being pressed are handled
-by the Gtk_server server process (resp. one of the Gtk libraries) and are not
-communicated to APL.
+  Gtk_server over a socket pair. The communication consists of a sequence of
+  TLV (Tag/Length/Value) buffers encoded with 33 ⎕CR and decoded with 34 ⎕CR
+  (aka. ¯33 ⎕CR) at the APL end. A user action (e.g. a button click) results
+  in an "event" (= a TLV buffer) received by APL while an "command" (sent from
+  APL to the Gtk_server results in some change in the GUI. However, many
+  details such as a button changing its form or its color when being pressed
+  are handled by the Gtk_server server process (resp. one of the Gtk
+  libraries) and are not communicated to APL. The encoding and decoding of
+  TLVs that are between <strong>apl</strong> and &amp;Gtk_server takes place inside ⎕GTK so that
+  the APL programmer is not concerned with the details of this communication.
 </p>
 </li>
 </ol></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>                                                          ╔════════════════════════════╗
+<pre>
+
+<code>                                                          ╔════════════════════════════╗
                                                           ║ GUI-description.xml file   ║
                                                           ║  ↓ GUI-stylesheet.css file ║
                                                           ║  ↓  ↓                      ║
@@ -920,60 +930,24 @@ communicated to APL.
     ║ application │ ⎕GTK ├───────────────────────-----────╫┤ Gtk_server │ ┌─┴───┴────┐│║
     ║ program.apl └───╥──┘  34⎕CR ← ← ←          pair     ║└────────────┘ │ GTK libs ├┘║
     ╚═════════════════╝     Responses, Events             ║               └──────────┘ ║
-                                                          ╚════════════════════════════╝</code></pre>
+                                                          ╚════════════════════════════╝</code>
+
+</pre>
 </div></div>
 <div class="olist arabic"><ol class="arabic" start="3">
 <li>
 <p>
-One Gtk_server can handle:
-</p>
-<div class="ulist"><ul>
-<li>
-<p>
-a single top-level window (the most common case), or
+One Gtk_server handles a single top-level window and its children (see also
+  <a href="#TAG_caveats">Caveats</a>.
 </p>
 </li>
 <li>
 <p>
-several top-level windows, or even
-</p>
-</li>
-<li>
-<p>
-one or more lower-level widgets that are normally placed inside a
-    top-level window,
-</p>
-</li>
-</ul></div>
-</li>
-<li>
-<p>
-One apl interpreter process can start several Gtk_server processes.
+For GUIs that consist of multiple top-level windows, one apl interpreter
+  process can start several Gtk_server processes.
 </p>
 </li>
 </ol></div>
-<div class="paragraph"><p>As a consequence a GUI with e.g. multiple top-level windows can be realized
-as:</p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-one Gtk_server with multiple windows. These multiple windows are created in
-   <strong>glade</strong> and are contained in one <strong>.ui</strong> XML file, or
-</p>
-</li>
-<li>
-<p>
-multiple Gtk_servers, each controlling one windows. In this case multiple
-  <strong>.ui</strong> XML files have to be created with <strong>glade</strong> (unless all windows are
-  identical), or
-</p>
-</li>
-<li>
-<p>
-a mix the above (although not necessarily a good idea).
-</p>
-</li>
-</ul></div>
 </div>
 </div>
 <div class="sect1">
@@ -1019,7 +993,9 @@ the programmer displays the GUI - either at the start of the APL
 </ol></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>    ╔══════════════════════╗
+<pre>
+
+<code>    ╔══════════════════════╗
     ║  GUI Design (glade)  ║   →  my-application.ui
     ╚══════════╤═══════════╝
                │
@@ -1033,7 +1009,9 @@ the programmer displays the GUI - either at the start of the APL
     ║      GUI start       ║   → loads my-application.ui and my-application.css
     ║ ──────────────────── ║
     ║   GUI event loop     ║   × polls and reacts to events (user actions)
-    ╚══════════════════════╝</code></pre>
+    ╚══════════════════════╝</code>
+
+</pre>
 </div></div>
 <div class="paragraph"><p>The example given below will be a modal dialog with the non-modal case left
 as an exercise for the reader.</p></div>
@@ -1050,18 +1028,19 @@ fashion and according to the following rules:</p></div>
 <li>
 <p>
 Every APL application that has a GUI (and uses ⎕GTK) starts its own
-  Gtk_server(s). In a GUI with several windows, each window uses the same
-  Gtk_server, and the same connection (handle) towards APL. Multiple
-  Gtk_servers are independant of each other, and the coordination between
-  the windows must be done in the APL application.
+  Gtk_server(s). In a GUI with several top-level windows, each top-level
+  window uses its own Gtk_server which is identified bu an integer (handle) in
+  APL. Multiple Gtk_servers are independent of each other, and the
+  coordination of events from between the windows must be performed in the APL
+  application.
 </p>
 </li>
 <li>
 <p>
-GNU APL and Gtk_server then send signals to each other. A signal is a
-  sequence of bytes, starting with a 4-byte tag, followed by a 4-byte signal
-  length, and concluded with 0 or more signal data bytes as indicated by the
-  signal length.
+GNU APL and Gtk_server then send signals (aka, TLV buffers) to each other. A
+  signal is a sequence of bytes, starting with a 4-byte tag, followed by a
+  4-byte data length, and concluded with 0 or more data bytes as indicated by
+  the signal length.
 </p>
 </li>
 <li>
@@ -1071,7 +1050,7 @@ The encoding of the signals is the same in both directions, but we call
   either <strong>responses</strong> (if they contain the result of a prior command), or else
   <strong>events</strong> (which are caused by a user&#8217;s activity such as clicking a button.
 </p>
-</li>
+<div class="ulist"><ul>
 <li>
 <p>
 Commands are used to modify the GUI in some way, for example to enter an
@@ -1081,21 +1060,47 @@ Commands are used to modify the GUI in some way, for example to enter an
 <li>
 <p>
 Events are sent by the Gtk_server upon final user actions such as pushing a
-  button, or pressing ENTER after having modified the text in a text-entry
-  widget.
+button, or pressing ENTER after having modified the text in a text-entry
+widget.
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+Normally larger amounts of data are not sent in events, but in command
+  responses, Assume, for example, a user has entered some (possibly larger)
+  text into a (hypothetical) text-editor widget and leaves the text-editor.
+  The text-editor would then only send an event to APL indicating that some
+  new text is available. The new text itself, however, is not packed into that
+  event but needs to be fetched from the text-editor widget in the Gtk_server
+  by means of an according retrieval command. The new text is then sent from
+  the Gtk_server to APL in the response to the retrieval command. In other
+  words, larger amounts of data are usually pulled by apl from a Gtk_server
+  rather than pushed by the Gtk_server into APL. The reasons for this approach
+  are:
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+the retrieval commands are usually needed anyway, It is often easier
+  to specify the initial content of a widget in <strong>glade</strong> than to set it from
+  the APL application.
 </p>
 </li>
 <li>
 <p>
-Normally Gtk_server does not sent larger amounts of data to APL on its own,
-  but rather only informs APL that some data has changed and waits until APL
-  solicits the sending of the data. Most events contain only the widget that
-  has sent them and the type of event. Further information such as the content
-  of e.g. a text entry widget, has to be requested from Gtk_server by means of
-  commands. The reason for this is that often the APL side needs the functions
-  for retrieving the content anyhow, and instead of complicating the decoding
-  of events, the functions for retrieving the content can be reused, leading
-  to an overall simpler design.
+the events become more uniform (not differing by
+  different types of content). This, in turn, allows the same event to be used
+  by different widgets that differ only by the type of data that they produce.
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+As a consequence, most events contain only the type of event and the widget
+  that has sent the event.
 </p>
 </li>
 <li>
@@ -1103,12 +1108,12 @@ Normally Gtk_server does not sent larger amounts of data to APL on its own,
 Every signal is a TLV buffer whose length is dictated by the length of the
   Value component. Such a TLV buffer is therefore already determined by an
   integer tags and the value bytes V; the length is then ⍴V. In APL it is
-  therefore sufficient to specify only T and V as a vector TV←Tag,Value
-  whose first element Tag = ↑TV identifies a particular command or event,
-  and the rest 1↓TV is a (frequently empty) argument of that command or event.
-  The GNU APL system functions 33 ⎕CR resp. 34 ⎕CR have been tailored to encode
-  resp. decode tag/value vectors TV into/from the TLV buffers exchanged between
-  APL and Gtk_server.
+  therefore sufficient to specify only T and V as a vector TV←Tag,Value whose
+  first element Tag = ↑TV identifies a particular command or event, and the
+  rest 1↓TV is a (frequently empty) argument of that command or event.  The
+  GNU APL system functions 33 ⎕CR resp. 34 ⎕CR have been tailored to encode
+  resp. decode tag/value vectors TV into/from the TLV buffers exchanged
+  between APL and Gtk_server.
 </p>
 </li>
 <li>
@@ -1119,7 +1124,7 @@ Sending of a TLV from APL to Gtk_server is done by encoding the TLV with 33
   of a TLV (for example, first the tag in one write() and then the length and
   the value in a second write()) is not allowed in either direction because
   that would hang the other side. That tags are divided into the following
-  rangesL
+  ranges:
 </p>
 <div class="ulist"><ul>
 <li>
@@ -1157,21 +1162,34 @@ Receiving from Gtk_server is done with single read() call (like ⎕FIO[43])
 </p>
 </li>
 </ul></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<img src="/usr/share/asciidoc/icons/note.png" alt="Note" />
+</td>
+<td class="content">the details of TLV encoding and tag ranges are only mentioned for
+completeness and are not needed by the APL programmer.</td>
+</tr></table>
+</div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_detailed_example">Detailed Example</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>In the following, the Implementation of a simple GUI will be described
-step-by-step. The GUI will consist of a window that contains a label (= a fixed
-text), a text entry box, and a button that the user can push to end the text
-entry.</p></div>
+step-by-step. The GUI will consist of a window that contains two labels (=
+fixed texts), two text entry boxes, and a button that the user can push to end
+the text entry.</p></div>
 <div class="sect2">
 <h3 id="_step_1_defining_the_gui_with_glade">Step 1: Defining the GUI with Glade</h3>
 <div class="paragraph"><p>Start <strong>glade</strong> without a filename:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ glade</code></pre>
+<pre>
+
+<code>$ glade</code>
+
+</pre>
 </div></div>
 <div class="paragraph"><p>A window with four larger areas pops up:</p></div>
 <div class="imageblock">
@@ -1202,7 +1220,7 @@ A <strong>widget property area</strong> on the (bottom-) right (empty).
 </p>
 </li>
 </ol></div>
-<div class="paragraph"><p>The <strong>widget selection area</strong> is divided into several groups named</p></div>
+<div class="paragraph"><p>The <strong>widget selection area</strong> is divided into several widget groups named</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1230,8 +1248,15 @@ GTK+ Unix Print Toplevels
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>If you move the mouse pointer over one of the widgets, then the widget
-is highlighted and a tooltip showing the type of the widget pops up.</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<img src="/usr/share/asciidoc/icons/tip.png" alt="Tip" />
+</td>
+<td class="content">If you move the mouse pointer over one of the widgets, then the widget
+is highlighted and a tool-tip showing the type of the widget pops up.</td>
+</tr></table>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_step_1a_add_top_level_window">Step 1a: Add top-level Window</h3>
@@ -1302,7 +1327,9 @@ the filename <strong>my-application.ui</strong>.</p></div>
 this:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+<pre>
+
+<code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
 &lt;!-- Generated with glade 3.16.1 --&gt;
 &lt;interface&gt;
   &lt;requires lib="gtk+" version="3.10"/&gt;
@@ -1469,7 +1496,9 @@ this:</p></div>
       &lt;/object&gt;
     &lt;/child&gt;
   &lt;/object&gt;
-&lt;/interface&gt;</code></pre>
+&lt;/interface&gt;</code>
+
+</pre>
 </div></div>
 </div>
 <div class="sect2">
@@ -1487,8 +1516,12 @@ The GUI file is /home/eedjsa/projects/juergen/apl-1.7/HOWTOs/my-application.ui
 GNU APL and enter the following:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>      GUI_path ← '/home/eedjsa/projects/juergen/apl-1.7/HOWTOs/my-application.ui'
-      Handle ← ⎕GTK GUI_path             ⍝ fork Gtk_server and connect to it</code></pre>
+<pre>
+
+<code>      GUI_path ← '/home/eedjsa/projects/juergen/apl-1.7/HOWTOs/my-application.ui'
+      Handle ← ⎕GTK GUI_path             ⍝ fork Gtk_server and connect to it</code>
+
+</pre>
 </div></div>
 <div class="paragraph"><p>We see a new window at the top-left corner of the screen (that position can be
 changed by window properties in <strong>glade</strong> later on):</p></div>
@@ -1500,8 +1533,12 @@ changed by window properties in <strong>glade</strong> later on):</p></div>
 <div class="paragraph"><p>You can then stop the GUI with <strong>)CLEAR</strong> before leaving APL with <strong>)OFF</strong>:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>      )CLEAR
-      )OFF</code></pre>
+<pre>
+
+<code>      )CLEAR
+      )OFF</code>
+
+</pre>
 </div></div>
 </div>
 <div class="sect2">
@@ -1514,18 +1551,26 @@ one can specify these properties by means of a standard CSS (cascading style
 sheet) file as the (optional) left argument of dyadic ⎕GTK:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>      GUI_path ← '/home/eedjsa/projects/juergen/apl-1.7/HOWTOs/my-application.ui'
+<pre>
+
+<code>      GUI_path ← '/home/eedjsa/projects/juergen/apl-1.7/HOWTOs/my-application.ui'
       CSS_path ← '/home/eedjsa/projects/juergen/apl-1.7/HOWTOs/my-application.css'
-      Handle ← CSS_path ⎕GTK GUI_path             ⍝ fork Gtk_server and connect to it</code></pre>
+      Handle ← CSS_path ⎕GTK GUI_path             ⍝ fork Gtk_server and connect to it</code>
+
+</pre>
 </div></div>
 <div class="paragraph"><p>Consider the following CSS example, (file <strong>my-application.css</strong>):</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>/* general button */
+<pre>
+
+<code>/* general button */
 .BUTTON { color: #F00;      background: #4F4; }
 
 /* the OK button */
-#OK-button { color: #F00; background: #FFF; }</code></pre>
+#OK-button { color: #F00; background: #FFF; }</code>
+
+</pre>
 </div></div>
 <div class="paragraph"><p>It says that buttons should, in general have a green background and a red
 foreground (= text color), but that the button with the name "OK-button"
@@ -1544,22 +1589,24 @@ thus weaker) .BUTTON  clause.</p></div>
 </div>
 <div class="sect2">
 <h3 id="_step_4_managing_windows">Step 4: Managing windows</h3>
-<div class="paragraph"><p>Monadic ⎕GTK with integer argument 0 returns a (possibly empty) integer vector
-containing all window handles that are currently open.</p></div>
-<div class="paragraph"><p>Dyadic ⎕GTK with integer right argument 0 and integer left argument Ah closes the
-window whose handle is Ah.</p></div>
+<div class="paragraph"><p><strong>Monadic ⎕GTK</strong> with integer argument <strong>0</strong> returns a (possibly empty) integer
+vector containing all window handles that are currently open.</p></div>
+<div class="paragraph"><p><strong>Dyadic ⎕GTK</strong> with integer right argument <strong>0</strong> and integer left argument <strong>Ah</strong>
+closes the window whose handle is <strong>Ah</strong>.</p></div>
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
-<div class="title">Note</div>
+<img src="/usr/share/asciidoc/icons/note.png" alt="Note" />
 </td>
-<td class="content">there is a summary of all ⎕GTK syntax variants
-(a ⎕GTK cheat sheet) in the Appendix of this document.</td>
+<td class="content">there is a summary of all ⎕GTK syntax variants (a ⎕GTK cheat sheet)
+ in the <a href="#TAG_appendix">Appendix</a> of this document.</td>
 </tr></table>
 </div>
 <div class="listingblock">
 <div class="content">
-<pre><code>      )CLEAR
+<pre>
+
+<code>      )CLEAR
       ⎕GTK 0   ⍝ get window handles (empty)
 
       GUI_path ← '/home/eedjsa/projects/juergen/apl-1.7/HOWTOs/my-application.ui'
@@ -1570,7 +1617,9 @@ window whose handle is Ah.</p></div>
 6
 
       6 ⎕GTK 0   ⍝ close window handle 6
-0</code></pre>
+0</code>
+
+</pre>
 </div></div>
 <div class="paragraph"><p>The handle above (6) can, in theory, also be used with ⎕FIO functions like
 fread() if you now what you are doing. This practice is, however, dangerous
@@ -1591,7 +1640,7 @@ makes sure that the id remains unique.</p></div>
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
-<div class="title">Caution</div>
+<img src="/usr/share/asciidoc/icons/caution.png" alt="Caution" />
 </td>
 <td class="content">⎕GTK requires that you do not change the ID assigned by <strong>glade</strong> (even
 though <strong>glade</strong> allows you to do that). The ID assigned by <strong>glade</strong> is found as
@@ -1647,7 +1696,9 @@ recompiling and re-installing GNU APL
 We extend our example to set the initial value of the employee to "John Doe",</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>      )CLEAR
+<pre>
+
+<code>      )CLEAR
       GUI_path ← '/home/eedjsa/projects/juergen/apl-1.7/HOWTOs/my-application.ui'
       CSS_path ← '/home/eedjsa/projects/juergen/apl-1.7/HOWTOs/my-application.css'
       Handle ← CSS_path ⎕GTK GUI_path             ⍝ fork Gtk_server and connect to it
@@ -1656,7 +1707,9 @@ We extend our example to set the initial value of the employee to "John Doe",</p
       "John Doe" ⎕GTK[H_ID] "set_text"   ⍝ set the entry to  "John Doe"
 
       6 ⎕GTK 0   ⍝ close window handle 6
-0</code></pre>
+0</code>
+
+</pre>
 </div></div>
 <div class="paragraph"><p>The GUI now looks like this:</p></div>
 <div class="imageblock">
@@ -1672,7 +1725,9 @@ and read the entry data after that time has elapsed (and regardless of
 whether the user has entered any data or not).</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>      )CLEAR
+<pre>
+
+<code>      )CLEAR
       GUI_path ← '/home/eedjsa/projects/juergen/apl-1.7/HOWTOs/my-application.ui'
       CSS_path ← '/home/eedjsa/projects/juergen/apl-1.7/HOWTOs/my-application.css'
       Handle ← CSS_path ⎕GTK GUI_path    ⍝ fork Gtk_server and connect to it
@@ -1688,7 +1743,9 @@ whether the user has entered any data or not).</p></div>
       ⎕GTK[H_ID] "get_text"              ⍝ get the content of entry2
 
       6 ⎕GTK 0   ⍝ close window handle 6
-0</code></pre>
+0</code>
+
+</pre>
 </div></div>
 <div class="paragraph"><p>Let <strong>Bint</strong> be:</p></div>
 <div class="ulist"><ul>
@@ -1769,6 +1826,11 @@ activate
 changed
 </p>
 </li>
+<li>
+<p>
+draw
+</p>
+</li>
 </ul></div>
 </li>
 <li>
@@ -1786,7 +1848,7 @@ every callback inserts a single event into an event queue inside ⎕GTK.
 </li>
 <li>
 <p>
-⎕FTC is be used poll events out of the event queue. The event queue in ⎕GTK
+⎕GTK is be used poll events out of the event queue. The event queue in ⎕GTK
   decouples the creation of an event from the handling of the event.
 </p>
 </li>
@@ -1895,7 +1957,11 @@ start <strong>glade</strong> with our example GUI file:
 </ul></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ glade my-application.ui</code></pre>
+<pre>
+
+<code>$ glade my-application.ui</code>
+
+</pre>
 </div></div>
 <div class="ulist"><ul>
 <li>
@@ -1943,7 +2009,11 @@ Finally, save the GUI in <strong>glade</strong>'s menu-bar under <strong>File �
 <strong>my-application.ui</strong>:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>             &lt;signal name="clicked" handler="clicked" swapped="no"/&gt;</code></pre>
+<pre>
+
+<code>             &lt;signal name="clicked" handler="clicked" swapped="no"/&gt;</code>
+
+</pre>
 </div></div>
 <div class="paragraph"><p>At this point the <strong>Prerequisite</strong> for sending the clicked signal from
 <strong>button1</strong> to APL is met, and steps 2-5 in the life-cycle of an event
@@ -2013,19 +2083,29 @@ done in Step 6b. above (and we assume that the updated my-application.ui is
 used). All that is needed then is to replace:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>      "Please enter the Position: within 20 seconds..."
+<pre>
+
+<code>      "Please enter the Position: within 20 seconds..."
       ⊣⎕DL 20   ⍝ wait 20 seconds
-      "End of input interval</code></pre>
+      "End of input interval</code>
+
+</pre>
 </div></div>
 <div class="paragraph"><p>by:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>      ⊣⎕GTK 1   ⍝ wait for click on the OK button</code></pre>
+<pre>
+
+<code>      ⊣⎕GTK 1   ⍝ wait for click on the OK button</code>
+
+</pre>
 </div></div>
 <div class="paragraph"><p>The example therefore becomes:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>      )CLEAR
+<pre>
+
+<code>      )CLEAR
       GUI_path ← '/home/eedjsa/projects/juergen/apl-1.7/HOWTOs/my-application.ui'
       CSS_path ← '/home/eedjsa/projects/juergen/apl-1.7/HOWTOs/my-application.css'
       Handle ← CSS_path ⎕GTK GUI_path    ⍝ fork Gtk_server and connect to it
@@ -2041,7 +2121,9 @@ used). All that is needed then is to replace:</p></div>
       ⎕GTK[H_ID] "get_text"              ⍝ get the content of entry2
 
       Handle ⎕GTK 0                      ⍝ close window handle 6
-0</code></pre>
+0</code>
+
+</pre>
 </div></div>
 </div>
 <div class="sect2">
@@ -2051,7 +2133,9 @@ remove the H_ID variable (which was only used to make Step 5 above explicit), an
 we hide useless return values from  <strong>⎕GTK 1</strong> and <strong>⎕GTK[] "get_text"</strong> with ⊣:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>∇Z←get_NAME_and_POSITION;GUI_path;CSS_path;Handle
+<pre>
+
+<code>∇Z←get_NAME_and_POSITION;GUI_path;CSS_path;Handle
  GUI_path ← '/home/eedjsa/projects/juergen/apl-1.7/HOWTOs/my-application.ui'
  CSS_path ← '/home/eedjsa/projects/juergen/apl-1.7/HOWTOs/my-application.css'
  Handle ← CSS_path ⎕GTK GUI_path              ⍝ fork Gtk_server and connect to it
@@ -2059,36 +2143,363 @@ we hide useless return values from  <strong>⎕GTK 1</strong> and <strong>⎕GTK
  Z ←   ⊂1↓⎕GTK[Handle, "entry1"] "get_text"   ⍝ get the content of entry1
  Z ← Z,⊂1↓⎕GTK[Handle, "entry2"] "get_text"   ⍝ get the content of entry2
  ⊣Handle ⎕GTK 0                               ⍝ close the GUI handle
-∇</code></pre>
+∇</code>
+
+</pre>
 </div></div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_appendix">Appendix</h2>
+<h2 id="_step_7_optional_custom_drawings">Step 7 (optional): Custom Drawings</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Gtk provides the widget type GtkDrawingArea that can be used to create, for
+example, a canvas onto which one can draw lines, circles, texts, and so on.
+In order to simplify the drawing onto a canvas from APL, ⎕GTK provides special
+functions for this purpose. The simple example described in the following
+explains the steps needed to draw a red circle onto a white background.</p></div>
+<div class="sect2">
+<h3 id="_7a_the_gui">7a. The GUI</h3>
+<div class="paragraph"><p>In <strong>glade</strong>, design a GUI with a top-level widget of type <strong>Window</strong> that has one
+child of type <strong>DrawingArea</strong>. That child is the canvas on which the circle will
+be drawn. In the <strong>Common</strong> tab of the canvas, set the property <strong>Width request</strong>
+to 400 and <strong>Height request</strong> to 300, and store the GUI as file <strong>circle.ui</strong>.
+That defines the size of the canvas, In the <strong>Signals</strong> tab, set the handler for
+signal <strong>draw</strong> to <strong>do_draw</strong>. The resulting XML file <strong>circle.ui</strong> is then:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;!-- Generated with glade 3.16.1 --&gt;
+&lt;interface&gt;
+  &lt;requires lib="gtk+" version="3.10"/&gt;
+  &lt;object class="GtkWindow" id="window1"&gt;
+    &lt;property name="can_focus"&gt;False&lt;/property&gt;
+    &lt;child&gt;
+      &lt;object class="GtkDrawingArea" id="drawingarea1"&gt;
+        &lt;property name="width_request"&gt;400&lt;/property&gt;
+        &lt;property name="height_request"&gt;300&lt;/property&gt;
+        &lt;property name="visible"&gt;True&lt;/property&gt;
+        &lt;property name="can_focus"&gt;False&lt;/property&gt;
+        &lt;signal name="draw" handler="do_draw" swapped="no"/&gt;
+      &lt;/object&gt;
+    &lt;/child&gt;
+  &lt;/object&gt;
+&lt;/interface&gt;</code>
+
+</pre>
+</div></div>
+</div>
+<div class="sect2">
+<h3 id="_7b_apl_start_up_code">7b. APL Start-up Code</h3>
+<div class="paragraph"><p>The start-up code for the GUI is similar to the previous example, except that
+no CSS file is used:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>      )CLEAR
+      GUI_path ← '/home/eedjsa/projects/juergen/apl-1.7/HOWTOs/circle.ui'
+      Handle ← ⎕GTK GUI_path    ⍝ fork Gtk_server and connect to it</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>That code alone creates an empty canvas. That empty canvas can then be filled
+by means of drawing commands as described below.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_7c_apl_drawing_code">7c. APL Drawing Code</h3>
+<div class="paragraph"><p>A single drawing command is a string starting with a keyword followed by
+parameters.
+An entire drawing is a nested vector of drawing commands. Our simple example
+uses four drawing commands: two for filling the canvas background and two for
+drawing the red circle. A real-world example would, of course, consists of
+many more drawing commands. GNU APL provides two convenient methods for
+creating vectors of strings: ⎕INP for strings entered in immediate
+execution mode (and therefore also for apl scripts) and multi-line strings
+inside defined functions.</p></div>
+<div class="paragraph"><p>Our example in immediate execution mode or in an APL scripts could use a
+variable, say  <strong>DrawCmd</strong>, that is constructed with ⎕INP:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>      DrawCmd ← ⎕INP '▄'
+background  255 255 255          ⍝ white background
+fill -color 255 0 0              ⍝ red ellipse at 200:150 with radii 100 and 75
+ellipse     (200 150) (100 75)
+▄</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>An alternative to a variable is a niladic defined function using multi-line
+strings:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>∇Z←DrawCmd
+ Z←1↓"
+background  255 255 255          ⍝ white background
+fill -color 255 0 0              ⍝ red ellipse at 200:150 with radii 100 and 75
+ellipse     (200 150) (100 75)"
+∇</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>In both cases is <strong>DrawCmd</strong> a 4-element vector of strings. Once the
+<strong>DrawCmd</strong> are constructed they are send to the drawing area widget:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>      H_ID ← Handle, "drawingarea1"
+      DrawCmd ⎕GTK[H_ID] "draw_commands"</code>
+
+</pre>
+</div></div>
+</div>
+<div class="sect2">
+<h3 id="_7d_wrap_up">7d. Wrap-up</h3>
+<div class="paragraph"><p>Putting the pieces above together we get:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>      )CLEAR
+      GUI_path ← '/home/eedjsa/projects/juergen/apl-1.7/HOWTOs/circle.ui'
+      Handle ← ⎕GTK GUI_path    ⍝ fork Gtk_server and connect to it
+
+      DrawCmd ← ⎕INP '▄'
+background  255 255 255          ⍝ white background
+fill-color  255 0 0              ⍝ red ellipse at 200:150 with radii 100 and 75
+ellipse     (200 150) (100 75)
+▄
+
+      H_ID ← Handle, "drawingarea1"
+      DrawCmd ⎕GTK[H_ID] "draw_commands"</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>The GUI created by the APL code above then looks like this:</p></div>
+<div class="imageblock">
+<div class="content">
+<img src="glade-5.png" alt="glade-5.png" />
+</div>
+</div>
+<div class="paragraph"><p>A slightly more advanced example that uses the same XML file <strong>circle.ui</strong> but
+different drawing commands to show additional features (lines, text, objects
+with and without borders is:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>      )CLEAR
+      GUI_path ← '/home/eedjsa/projects/juergen/apl-1.7/HOWTOs/circle.ui'
+      Handle ← ⎕GTK GUI_path    ⍝ fork Gtk_server and connect to it
+
+      DrawCmd ← ⎕INP '▄'
+background  208 208 255    ⍝ blueish background
+line-color  0 0 0 255      ⍝ black opaque pen → areas have a border
+line-width  200%
+text        (40 20) shapes with line-width = 200%
+line        (0 140) (400 140)
+fill-color  0 160 0        ⍝ green rectangle...
+rectangle   (20 60) (80 100)
+fill-color  255 255 0      ⍝ yellow circle...
+circle      (130 80) 30
+fill-color  255 0 0        ⍝ red ellipse...
+ellipse     (250 80) (50 30)
+fill-color  128 128 255    ⍝ blue triangle...
+polygon     (320 60) (380 60)  (350 100)
+line-color  0 0 0 0   ⍝ transparent pen → areas have no border
+font-family monospace
+text        (40 170) shapes without a border
+fill-color  0 160 0        ⍝ green rectangle...
+rectangle   (20 210) (60 250)
+fill-color  255 255 0      ⍝ yellow circle...
+circle      (130 230) 30
+fill-color  255 0 0        ⍝ red ellipse...
+ellipse     (250 230) (50 30)
+fill-color  128 128 255    ⍝ blue triangle...
+polygon     (320 210) (380 210)  (350 250)·
+▄
+
+      H_ID ← Handle, "drawingarea1"
+      DrawCmd ⎕GTK[H_ID] "draw_commands"</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>It produces the following GUI:</p></div>
+<div class="imageblock">
+<div class="content">
+<img src="glade-6.png" alt="glade-6.png" />
+</div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_7e_notes">7e. Notes</h3>
+<div class="paragraph"><p>The following notes may be helpful when creating custom drawings.</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+The <a href="#TAG_appendix">Appendix</a> contains a <a href="#Tag_table4">table</a> that lists
+  the syntax of all drawing commands that are currently understood by ⎕GTK.
+</p>
+</li>
+<li>
+<p>
+Every call of <strong>DrawCommands ⎕GTK[] "draw_commands"</strong> overrides the previous
+  one. If a drawing cannot be created in one go (like above) then you need to
+  collect pieces into a single <strong>DrawCommands</strong> variable <strong>before</strong> calling ⎕GTK
+  (once). The need to construct a drawing in pieces typically occurs when the
+  drawing commands are being computed (e.g. when writing a data plotting
+  application).
+</p>
+</li>
+<li>
+<p>
+Opaque colors are specified as a 3-element vector containing the red, green,
+  and blue component of each color. Each color component is an integer value
+  between 0 and 255 (inclusive), The background is always opaque.
+</p>
+</li>
+<li>
+<p>
+Transparent colors are specified as a 4-element vector containing the red,
+  green, and blue component of each color (o-255), and an opacity value
+  between 0 (fully transparent) and 100 (fully opaque).
+</p>
+</li>
+<li>
+<p>
+Most graphical objects are controlled by two colors:
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+A line color (called the <strong>pen</strong> color in other places), and
+</p>
+</li>
+<li>
+<p>
+A fill color (called "brush* color elsewhere).
+</p>
+</li>
+<li>
+<p>
+The opaqueness of the line and fill colors can be used to control how a
+  2-dmensional object is being painted:
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+Fill color opacity = 0: (only) the border (in line color), or
+</p>
+</li>
+<li>
+<p>
+Line color opacity = 0: (only) the area inside the border (in fill color),
+   or else
+</p>
+</li>
+<li>
+<p>
+a combination of the above according to the two opacity values
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+A pen width of 0 has the same effect as a pen color opacity of 0, although
+   for different reasons.
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+Lines are 1-dimensional and therefore have no fill color. They are painted
+  with the line color.
+</p>
+</li>
+<li>
+<p>
+In order to simplify the drawing of objects, the colors are not assigned to
+  individual objects, but are sent once using the one of the following
+  commands:
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong>background R G B</strong>
+</p>
+</li>
+<li>
+<p>
+<strong>fill-color R G B [A]</strong>
+</p>
+</li>
+<li>
+<p>
+<strong>fill color R G B [A]</strong>
+</p>
+</li>
+<li>
+<p>
+the optional parameter A controls the opacity
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+these color commands are then applied to subsequent drawing commands,
+</p>
+</li>
+<li>
+<p>
+Valid font names are system-specific, but at least the generic names used in
+  CSS2 (i.e. <strong>serif</strong>, <strong>sans-serif</strong>, <strong>cursive</strong>, <strong>fantasy</strong>, <strong>monospace</strong> are
+  supposed to work,
+</p>
+</li>
+</ul></div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="TAG_appendix">Appendix</h2>
 <div class="sectionbody">
 <div class="sect2">
 <h3 id="_the_gtk_cheat_sheet">The ⎕GTK Cheat Sheet</h3>
 <div class="paragraph"><p>In the table below, it is assumed that:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>      ⍝ H is a window handle (from H ← Zh←⎕GTK "filename.ui")
+<pre>
+
+<code>      ⍝ H is a window handle (from H ← Zh←⎕GTK "filename.ui")
       ⍝ ID is a string containing the id= property of some widget in filename.ui
-      H_ID ← H, ID   ⍝ e.g.  6,"entry1"; H_ID uniquely identifies a widget</code></pre>
+      H_ID ← H, ID   ⍝ e.g.  6,"entry1"; H_ID uniquely identifies a widget</code>
+
+</pre>
 </div></div>
-<div class="tableblock">
+<div class="tableblock" id="Tag_table2">
 <table rules="all"
 width="100%"
 frame="border"
 cellspacing="0" cellpadding="4">
 <caption class="title">Table 2. ⎕GTK Syntax Variants (Signatures)</caption>
-<col width="27%" />
-<col width="9%" />
-<col width="63%" />
+<col width="31%" />
+<col width="7%" />
+<col width="61%" />
 <thead>
 <tr>
-<th align="left" valign="top"> Syntax    </th>
-<th align="center" valign="top"> Fun Bi </th>
+<th align="left" valign="top"> Syntax</th>
+<th align="center" valign="top"> Fun<br />
+(Bi)</th>
 <th align="left" valign="top"> Result/Action</th>
 </tr>
 </thead>
@@ -2101,7 +2512,7 @@ cellspacing="0" cellpadding="4">
 <tr>
 <td align="left" valign="top"><p class="table">Zh← "file.css" ⎕GTK "file.ui"</p></td>
 <td align="center" valign="top"><p class="table">-</p></td>
-<td align="left" valign="top"><p class="table">Zh is a handle for a new window according to the CSS file <strong>file.css</strong> and
+<td align="left" valign="top"><p class="table">Zh is a handle for a new window according to CSS file <strong>file.css</strong> and
 <strong>glade</strong> XML file <strong>file.ui</strong></p></td>
 </tr>
 <tr>
@@ -2127,12 +2538,12 @@ cellspacing="0" cellpadding="4">
 <tr>
 <td align="left" valign="top"><p class="table">Zi←Ah  ⎕GTK 3</p></td>
 <td align="center" valign="top"><p class="table">3</p></td>
-<td align="left" valign="top"><p class="table">increment the (debug-) verbosity of Gtk_server</p></td>
+<td align="left" valign="top"><p class="table">increment the (debug-) verbosity of Gtk_server (subject to be changed)</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table">Zi←Ah  ⎕GTK 4</p></td>
 <td align="center" valign="top"><p class="table">4</p></td>
-<td align="left" valign="top"><p class="table">decrement the (debug-) verbosity of Gtk_server</p></td>
+<td align="left" valign="top"><p class="table">decrement the (debug-) verbosity of Gtk_server (subject to be changed)</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table">Text ⎕GTK[H_ID] 1     <strong>--or--</strong><br />
@@ -2156,42 +2567,48 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table">Fraction ⎕GTK[H_ID] 4     <strong>--or--</strong><br />
  Fraction ⎕GTK[H_ID] "set_fraction"</p></td>
 <td align="center" valign="top"><p class="table">4</p></td>
-<td align="left" valign="top"><p class="table">set the progress [range 0.0&#8230;1.0] shown by e.g. a progress bar</p></td>
+<td align="left" valign="top"><p class="table">set the progress shown by a progress bar</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table">Fraction ← ⎕GTK[H_ID] 5     <strong>--or--</strong><br />
  Fraction ← ⎕GTK[H_ID] "get_fraction"</p></td>
 <td align="center" valign="top"><p class="table">5</p></td>
-<td align="left" valign="top"><p class="table">return the progress [range 0.0&#8230;1.0] shown by e.g. a progress bar</p></td>
+<td align="left" valign="top"><p class="table">return the progress shown by a progress bar</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table">Level ⎕GTK[H_ID] 6     <strong>--or--</strong><br />
  Level ⎕GTK[H_ID] "set_value"</p></td>
 <td align="center" valign="top"><p class="table">6</p></td>
-<td align="left" valign="top"><p class="table">set the level [range min-value&#8230;max-value] shown by e.g. a level bar</p></td>
+<td align="left" valign="top"><p class="table">set the level shown by a level bar</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table">Level ← ⎕GTK[H_ID] 7     <strong>--or--</strong><br />
  Level ← ⎕GTK[H_ID] "get_value"</p></td>
 <td align="center" valign="top"><p class="table">7</p></td>
-<td align="left" valign="top"><p class="table">return the level [range min-value&#8230;max-value] shown by e.g. a level bar</p></td>
+<td align="left" valign="top"><p class="table">return the level shown by level bar</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table">Selected ⎕GTK[H_ID] 8     <strong>--or--</strong><br />
  Selected ⎕GTK[H_ID] "set_active"</p></td>
 <td align="center" valign="top"><p class="table">8</p></td>
-<td align="left" valign="top"><p class="table">set the selected item of e.g. a combo box (-1 for none)</p></td>
+<td align="left" valign="top"><p class="table">set the selected item of a combo box (-1 for none)</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table">Selected ← ⎕GTK[H_ID] 9     <strong>--or--</strong><br />
  Selected ← ⎕GTK[H_ID] "get_active"</p></td>
 <td align="center" valign="top"><p class="table">9</p></td>
-<td align="left" valign="top"><p class="table">return the selected item of e.g. a combo box (-1 for none)</p></td>
+<td align="left" valign="top"><p class="table">return the selected item of a combo box (-1 for none)</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">DrawCmd ⎕GTK[H_ID] 10     <strong>--or--</strong><br />
+ DrawCmd ⎕GTK[H_ID] "draw_commands"</p></td>
+<td align="center" valign="top"><p class="table">10</p></td>
+<td align="left" valign="top"><p class="table">set the commands needed to draw a drawing area</p></td>
 </tr>
 </tbody>
 </table>
 </div>
-<div class="tableblock">
+<div class="tableblock" id="Tag_table3">
 <table rules="all"
 width="100%"
 frame="border"
@@ -2228,9 +2645,116 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table">Gi, Ns, Es, Is, Cs</p></td>
 <td align="left" valign="top"><p class="table"><code>6</code>  <code>'Select-box1'</code>  <code>'GtkComboBox'</code>  <code>'changed'</code>  <code>'combobox'</code></p></td>
 </tr>
+<tr>
+<td align="left" valign="top"><p class="table"><code><strong>draw</strong></code></p></td>
+<td align="center" valign="top"><p class="table">1</p></td>
+<td align="left" valign="top"><p class="table">Gi, Ns, Es, Is, Cs</p></td>
+<td align="left" valign="top"><p class="table"><code>6</code>  <code>'Canvas1'</code>  <code>'GtkDrawingArea'</code>  <code>'draw'</code>  <code>'drawingarea'</code></p></td>
+</tr>
 </tbody>
 </table>
 </div>
+<div class="tableblock" id="Tag_table4">
+<table rules="all"
+width="100%"
+frame="border"
+cellspacing="0" cellpadding="4">
+<caption class="title">Table 4. ⎕GTK Drawing Commands</caption>
+<col width="28%" />
+<col width="71%" />
+<thead>
+<tr>
+<th align="left" valign="top"> Command </th>
+<th align="left" valign="top"> Effect</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left" valign="top"><p class="table"><code><strong>background R G B</strong></code></p></td>
+<td align="left" valign="top"><p class="table">Set the background color of the drawing area widget. This command shall be
+the first command given.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><code><strong>line-width W</strong></code></p></td>
+<td align="left" valign="top"><p class="table">set the line width that is used to draw lines and borders. W=100 (%)
+gives the default line width in Gtk.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><code><strong>line-color R G B</strong></code></p></td>
+<td align="left" valign="top"><p class="table">same as <strong>line-color R G B 100</strong> (fully opaque color).</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><code><strong>line-color R G B A</strong></code></p></td>
+<td align="left" valign="top"><p class="table">set the line color to the color with red, green, and blue components of R,
+  G, and B resp, and opacity A (%).</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><code><strong>fill-color R G B</strong></code></p></td>
+<td align="left" valign="top"><p class="table">same as <strong>fill-color R G B 100</strong> (fully opaque color).</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><code><strong>fill-color R G B A</strong></code></p></td>
+<td align="left" valign="top"><p class="table">set the fill color to the color with red, green, and blue components of R,
+  G, and B resp. and opacity A (%).</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><code><strong>font-size S</strong></code></p></td>
+<td align="left" valign="top"><p class="table">set the font size used in subsequent <strong>text</strong> commands. S=100 (%) is the
+  default font size of Gtk.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><code><strong>font-family F</strong></code></p></td>
+<td align="left" valign="top"><p class="table">set the font family (<strong>serif</strong>, <strong>sans-serif</strong>, <strong>cursive</strong>, <strong>fantasy</strong>,
+  <strong>monospace</strong>) used in subsequent <strong>text</strong>
+commands.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><code><strong>font-slant S</strong></code></p></td>
+<td align="left" valign="top"><p class="table">set the font slant used in subsequent <strong>text</strong> commands. S is <strong>NORMAL</strong>,
+  <strong>ITALIC</strong>, or <strong>OBLIQUE</strong>.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><code><strong>font-weight W</strong></code></p></td>
+<td align="left" valign="top"><p class="table">set the font weight used in subsequent <strong>text</strong> commands. W is either <strong>NORMAL</strong>
+  or <strong>BOLD</strong></p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><code><strong>line (X0 Y0) (X1 Y1)</strong></code></p></td>
+<td align="left" valign="top"><p class="table">draw a line from point  (X0 Y0) to point (X1 Y1).</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><code><strong>rectangle (X0 Y0) (X1 Y1)</strong></code></p></td>
+<td align="left" valign="top"><p class="table">draw a rectangle with corners (X0 Y0) and (X1 Y1).</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><code><strong>circle (X Y) R</strong></code></p></td>
+<td align="left" valign="top"><p class="table">draw a circle with center (X Y) and radius R.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><code><strong>ellipse (X Y) (RX RY)</strong></code></p></td>
+<td align="left" valign="top"><p class="table">draw an ellipse with center (X Y) and radii RX and RY.</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><code><strong>polygon (X0 Y0) (X1 Y1) (X2 Y2) &#8230;</strong></code></p></td>
+<td align="left" valign="top"><p class="table">draw a polygon with points (X0 Y0), (X1 Y1), (X2 Y2) &#8230;</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><code><strong>text (X Y) T</strong></code></p></td>
+<td align="left" valign="top"><p class="table">draw the text <strong>T</strong> at position (X Y).</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="TAG_caveats">Caveats</h3>
+<div class="paragraph"><p>With <strong>glade</strong> it is possible to design a single GUI that contains multiple
+top-level windows or no top-level window. However, ⎕GTK currently supports
+only GUIs with one top-level widget of type "Window (the first widget in the
+top-level group).</p></div>
+</div>
+<div class="sect2">
+<h3 id="_references">References</h3>
 <div class="paragraph"><p>See also:</p></div>
 <div class="paragraph"><p><a href="https://developer.gnome.org/gtk3/stable/">https://developer.gnome.org/gtk3/stable/</a></p></div>
 </div>
@@ -2240,7 +2764,7 @@ cellspacing="0" cellpadding="4">
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2018-08-10 20:23:18 CEST
+Last updated 2018-08-25 19:36:57 CEST
 </div>
 </div>
 </body>

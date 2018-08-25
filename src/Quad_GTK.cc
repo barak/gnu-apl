@@ -1,5 +1,4 @@
 /*
-Q(LOC)
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
@@ -46,7 +45,12 @@ Quad_GTK::eval_AB(Value_P A, Value_P B)
          return Token(TOK_APL_VALUE1, IntScalar(handle, LOC));
       }
 
-   if (!B->is_int_scalar())   DOMAIN_ERROR;
+   if (!B->is_int_scalar())
+      {
+        MORE_ERROR() << "A ⎕GTK B expects B to be an integer scalar"
+                        " or a text vector";
+        DOMAIN_ERROR;
+      }
 
 const int function = B->get_ravel(0).get_int_value();
 int handle = -1;
@@ -100,7 +104,12 @@ Quad_GTK::eval_B(Value_P B)
          return Token(TOK_APL_VALUE1, IntScalar(handle, LOC));
       }
 
-   if (!B->is_int_scalar())   DOMAIN_ERROR;
+   if (!B->is_int_scalar())
+      {
+        MORE_ERROR() << "⎕GTK B expects B to be an integer scalar"
+                        " or a text vector";
+        DOMAIN_ERROR;
+      }
 
 const int function = B->get_ravel(0).get_int_value();
    switch(function)
@@ -174,9 +183,7 @@ const int function = B->get_ravel(0).get_int_value();
 Token
 Quad_GTK::eval_AXB(Value_P A, Value_P X, Value_P B)
 {
-   if (A->get_rank() > 1)   RANK_ERROR;
    if (B->get_rank() > 1)   RANK_ERROR;
-   if (!A->is_char_string())   DOMAIN_ERROR;
 
 UTF8_string window_id;                // e.g. "entry1"
 const int handle = resolve_window(X.get(), window_id);
@@ -185,7 +192,12 @@ const int handle = resolve_window(X.get(), window_id);
 int fun = FNUM_INVALID;
    if (B->is_int_scalar())         fun = B->get_ravel(0).get_int_value();
    else if (B->is_char_string())   fun = resolve_fun_name(window_id, B.get());
-   else                            DOMAIN_ERROR;
+   else
+      {
+        MORE_ERROR() << "A ⎕GTK[X] B expects B to be an integer scalar"
+                        " or a text vector";
+        DOMAIN_ERROR;
+      }
 
 int command_tag = -1;
 int response_tag = -1;
@@ -211,9 +223,37 @@ Gtype Atype = gtype_V;
               DOMAIN_ERROR;
       }
 
-   if (Atype == gtype_V)   VALENCE_ERROR;
+   if (Atype == gtype_V)    VALENCE_ERROR;
+   if (A->get_rank() > 1)   RANK_ERROR;
 
-UCS_string ucs_A(*A);
+UCS_string ucs_A;
+   if (fun == FNUM_GtkDrawingArea_draw_commands)
+      {
+        loop(a, A->element_count())
+            {
+              const Cell & cell = A->get_ravel(a);
+              if (!cell.is_pointer_cell())
+                 {
+                    MORE_ERROR() << "A ⎕GTK " << fun
+                                 << " expects A to be a vector of "
+                                    "draw commands (strings)";
+                    DOMAIN_ERROR;
+                 }
+              Value_P command = cell.get_pointer_value();
+              ucs_A.append(UCS_string(*command));
+              ucs_A.append(UNI_ASCII_LF);
+            }
+      }
+   else
+      {
+        if (!A->is_char_string())
+           {
+             MORE_ERROR() << "A ⎕GTK[X] B expects A to be a text vector";
+             DOMAIN_ERROR;
+           }
+
+        ucs_A = UCS_string(*A);
+      }
 UTF8_string utf_A(ucs_A);
    write_TLV(handle, command_tag, utf_A);
    return Token(TOK_APL_VALUE1, poll_handle(handle, response_tag));
@@ -427,6 +467,8 @@ const char * fun_name = utf_B.c_str();
 
 #include "Gtk/Gtk_map.def"
 
+   MORE_ERROR() << "function string class=" << wid_class
+        << ", function=" << fun_name << " could not be resolved";
    return FNUM_INVALID;
 }
 //-----------------------------------------------------------------------------
