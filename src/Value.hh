@@ -380,6 +380,14 @@ public:
         return true;
       }
 
+   /// return \b true iff \b this value has the same shape as \b other or one
+   /// of the values is a scalar
+   bool scalar_matching_shape(const Value & other) const
+      { return is_scalar_extensible()
+            || other.is_scalar_extensible()
+            || same_shape(other);
+      }
+
    /// returen true if \b sub == \b val or sub is contained in \b val
    static bool is_or_contains(const Value * val, const Value & sub);
 

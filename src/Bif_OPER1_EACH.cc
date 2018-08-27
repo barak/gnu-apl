@@ -63,6 +63,7 @@ Function * LO = _LO.get_function();
         else if (!B->is_scalar())   DOMAIN_ERROR;
 
         Value_P Z1 = LO->eval_fill_AB(Fill_A, Fill_B).get_apl_val();
+        if (Z1->is_simple_scalar())   return Token(TOK_APL_VALUE1, Z1);
 
         Value_P Z(shape_Z, LOC);
         new (&Z->get_ravel(0)) PointerCell(Z1, Z.getref());

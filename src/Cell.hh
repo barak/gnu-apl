@@ -411,6 +411,14 @@ public:
    virtual APL_Integer get_denominator() const { FIXME }
 #endif
 
+   /// the inverse of bif_add
+   virtual ErrorCode bif_add_inverse(Cell * Z, const Cell * A) const
+      { return E_DOMAIN_ERROR; }
+
+   /// the inverse of bif_bif_multiply
+   virtual ErrorCode bif_multiply_inverse(Cell * Z, const Cell * A) const
+      { return E_DOMAIN_ERROR; }
+
    /// return \b true if z = a + b had an overflow.
    static bool sum_overflow(APL_Integer z, APL_Integer a, APL_Integer b)
       {

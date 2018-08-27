@@ -44,7 +44,7 @@
 #include "UserFunction.hh"
 #include "Value.icc"
 #include "Workspace.hh"
-                                            
+
 // primitive function instances
 //
 Bif_F0_ZILDE      Bif_F0_ZILDE     ::_fun;    // ⍬
@@ -2971,6 +2971,52 @@ Bif_F12_UNION::eval_AB(Value_P A, Value_P B)
    //
 Token BwoA = Bif_F12_WITHOUT::fun->eval_AB(B, A);
    return Bif_F12_COMMA::fun->eval_AB(A, BwoA.get_apl_val());
+}
+//=============================================================================
+Token
+Bif_F2_RIGHT::eval_AXB(Value_P A, Value_P X, Value_P B)
+{
+   // select corresponding items of A or B according to X. A, B, and X
+   // must have matching shapes
+   //
+const int inc_A = A->is_scalar_extensible() ? 0 : 1;
+const int inc_B = B->is_scalar_extensible() ? 0 : 1;
+const int inc_X = X->is_scalar_extensible() ? 0 : 1;
+
+   if (inc_X == 0)   // single item X: pick entire A or B according to X
+      {
+        const APL_Integer x0 = X->get_ravel(0).get_int_value();
+        if (x0 == 0)   return Token(TOK_APL_VALUE1, A->clone(LOC));
+        if (x0 == 1)   return Token(TOK_APL_VALUE1, B->clone(LOC));
+        DOMAIN_ERROR;
+      }
+
+   // X is non-scalar, so it must match any non-scalar A and B
+   //
+   if (inc_A && ! X->same_shape(*A))
+      {
+        if (A->get_rank() != X->get_rank())   RANK_ERROR;
+        else                                  LENGTH_ERROR;
+      }
+
+   if (inc_B && ! X->same_shape(*B))
+      {
+        if (B->get_rank() != X->get_rank())   RANK_ERROR;
+        else                                  LENGTH_ERROR;
+      }
+
+Value_P Z(X->get_shape(), LOC);
+   loop(z, Z->nz_element_count())
+       {
+        const APL_Integer xz = X->get_ravel(z).get_int_value();
+        Cell * cZ = Z->next_ravel();
+        if      (xz == 0)   cZ->init(A->get_ravel(z*inc_A), Z.getref(), LOC);
+        else if (xz == 1)   cZ->init(B->get_ravel(z*inc_B), Z.getref(), LOC);
+        else                DOMAIN_ERROR;
+       }
+
+   Z->check_value(LOC);
+   return Token(TOK_APL_VALUE1, Z);
 }
 //=============================================================================
 

@@ -139,6 +139,12 @@ public:
    /// return true iff this cell needs scaling (exponential format) in pctx.
    virtual bool need_scaling(const PrintContext &pctx) const;
 
+   /// overloaded Cell::bif_add_inverse()
+   virtual ErrorCode bif_add_inverse(Cell * Z, const Cell * A) const;
+
+   /// overloaded Cell::bif_multiply_inverse()
+   virtual ErrorCode bif_multiply_inverse(Cell * Z, const Cell * A) const;
+
    /// the square of the magnitude of aJb (= a² + b²)
    APL_Float mag2() const
       { return value.cval[0] * value.cval[0] + value.cval[1] * value.cval[1]; }

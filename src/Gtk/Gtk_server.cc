@@ -266,6 +266,16 @@ GError * err = 0;
       }
 }
 //-----------------------------------------------------------------------------
+void *
+gtk_drawingarea_set_area_size(GtkDrawingArea * widget, long data)
+{
+const int width = data >> 16 & 0xFFFF;
+const int height = data & 0xFFFF;
+
+   gtk_widget_set_size_request(GTK_WIDGET(widget), width, height);
+   return 0;
+}
+//-----------------------------------------------------------------------------
 void
 static cmd_3_show_GUI()
 {
@@ -433,8 +443,8 @@ char TLV[TLV_len + 1];
 // _F (float):   a double value
 // I (integer):  an integer value
 //
-inline gdouble S2F(const gchar * s) { return strtof(s, 0); }
-inline gdouble S2I(const gchar * s) { return strtod(s, 0); }
+inline gdouble S2F(const gchar * s) { return strtod(s, 0); }
+inline long    S2I(const gchar * s) { return strtol(s, 0, 10); }
 
 static gchar * F2S(gdouble d)
 {
@@ -593,6 +603,7 @@ char * V = TLV + 8;   // the value part of the TLV buffer
                 // widget functions...
                 //
 #define gtk_event_def(ev_name, ...)
+
 #define gtk_fun_def(glade_ID, gtk_class, gtk_function, _ZAname, Z, A, _help)  \
          case Command_ ## gtk_class ## _ ## gtk_function:                     \
 { gtk_class * widget = reinterpret_cast<gtk_class *>(selected);               \

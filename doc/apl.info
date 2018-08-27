@@ -642,7 +642,7 @@ File: apl.info,  Node: Chapter 3,  Next: Chapter 4,  Prev: Chapter 2,  Up: Top
 * Section 3.11::  Logging Facilities
 * Section 3.12::  Rational Numbers
 * Section 3.13::  User-defined Commands
-* Section 3.14::  Monadic ⊢ and ⊣
+* Section 3.14::  Monadic ⊢ and ⊣, dyadic ⊢ with Axis
 * Section 3.15::  Dyadic ⎕CR
 * Section 3.16::  Dyadic ⎕FX (Native Functions)
 * Section 3.17::  ⎕ARG - Interpreter command line arguments
@@ -1456,8 +1456,8 @@ be deleted like this:
 
 File: apl.info,  Node: Section 3.14,  Next: Section 3.15,  Prev: Section 3.13,  Up: Chapter 3
 
-3.14 Monadic ⊢ and ⊣
-====================
+3.14 Monadic ⊢ and ⊣, dyadic ⊢ with Axis
+========================================
 
 Monadic ⊢ is the identity function.  It returns its (committed or
 non-committed) right argument as a non-committed value.
@@ -1490,6 +1490,34 @@ real-life purpose of ⊣ is to suppress the printing of B, the
 implementation of ⊣ was changed to returning an committed integer scalar
 0 instead of committed B. That reduced the run-time of ⊣B from O(,B) to
 O(1).  Also, ⊢B is marginally faster than ⎕←B.
+
+   Dyadic ⊢ with axis is a selection function that generalizes ⊣ and ⊢.
+
+   Let Z←A[X] B. Then:
+
+   • if X is a one-element vector and ↑X is 0 then Z ≡ A,
+   • if X is a one-element vector and ↑X is 1 then Z ≡ B,
+   • otherwise X selects coresponding items of A resp.  B if the
+     correspondingi elements of X are 0 or 1 respectively.  In that
+     case, the shapes of A and B must match the shape of X, but
+     one-elent A or B are scalar extended to the shape of X.
+
+   Example:
+
+      A←2 3⍴'abcdef'
+      B←2 3⍴⍳6
+      X←2 3⍴0 1 0 1 0
+      A ⊢[X] B
+a 2 c
+4 e 6
+
+   A ⊢[X] '*'
+a*c
+
+  '*' ⊢[X] B
+* 2 *
+4 * 6
+
 
 
 File: apl.info,  Node: Section 3.15,  Next: Section 3.16,  Prev: Section 3.14,  Up: Chapter 3
@@ -4068,41 +4096,41 @@ Node: Top383
 Node: Chapter 11416
 Node: Chapter 217072
 Node: Chapter 321496
-Node: Section 3.122840
-Node: Section 3.233858
-Node: Section 3.334617
-Node: Section 3.435904
-Node: Section 3.538525
-Node: Section 3.638698
-Node: Section 3.739311
-Node: Section 3.843255
-Node: Section 3.944797
-Node: Section 3.1045394
-Node: Section 3.1147178
-Node: Section 3.1249118
-Node: Section 3.1350059
-Node: Section 3.1451455
-Node: Section 3.1553264
-Node: Section 3.1658163
-Node: Section 3.1761445
-Node: Section 3.1861736
-Node: Section 3.1971648
-Node: Section 3.2071920
-Node: Section 3.2178498
-Node: Section 3.2280949
-Node: Section 3.2381618
-Node: Section 3.2495180
-Node: Section 3.2596120
-Node: Section 3.2699224
-Node: Section 3.27101213
-Node: Chapter 4105591
-Node: Chapter 5107339
-Node: Chapter 6108468
-Node: Section 6.1108887
-Node: Section 6.2109574
-Node: Chapter 7110405
-Node: Section 7.1110908
-Node: Section 7.2136218
+Node: Section 3.122862
+Node: Section 3.233880
+Node: Section 3.334639
+Node: Section 3.435926
+Node: Section 3.538547
+Node: Section 3.638720
+Node: Section 3.739333
+Node: Section 3.843277
+Node: Section 3.944819
+Node: Section 3.1045416
+Node: Section 3.1147200
+Node: Section 3.1249140
+Node: Section 3.1350081
+Node: Section 3.1451477
+Node: Section 3.1553987
+Node: Section 3.1658886
+Node: Section 3.1762168
+Node: Section 3.1862459
+Node: Section 3.1972371
+Node: Section 3.2072643
+Node: Section 3.2179221
+Node: Section 3.2281672
+Node: Section 3.2382341
+Node: Section 3.2495903
+Node: Section 3.2596843
+Node: Section 3.2699947
+Node: Section 3.27101936
+Node: Chapter 4106314
+Node: Chapter 5108062
+Node: Chapter 6109191
+Node: Section 6.1109610
+Node: Section 6.2110297
+Node: Chapter 7111128
+Node: Section 7.1111631
+Node: Section 7.2136941
 
 End Tag Table
 

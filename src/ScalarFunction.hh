@@ -525,8 +525,9 @@ class Bif_F12_PLUS : public ScalarFunction
 {
 public:
    /// Constructor.
-   Bif_F12_PLUS()
-   : ScalarFunction(PERF_AB(PLUS))
+   Bif_F12_PLUS(bool inv)
+   : ScalarFunction(PERF_AB(PLUS)),
+     inverse(inv)
    {}
 
    /// overloaded Function::eval_B().
@@ -535,17 +536,20 @@ public:
 
    /// overloaded Function::eval_AB().
    virtual Token eval_AB(Value_P A, Value_P B)
-      { return eval_scalar_AB(A, B, &Cell::bif_add); }
+      { return inverse ? eval_scalar_AB(A, B, &Cell::bif_add_inverse)
+                       : eval_scalar_AB(A, B, &Cell::bif_add); }
 
    /// overloaded Function::get_scalar_f2()
    virtual prim_f2 get_scalar_f2() const
-      { return &Cell::bif_add; }
+      { return inverse ? &Cell::bif_add_inverse : &Cell::bif_add; }
 
    /// return the associative cell function of this function
    virtual assoc_f2 get_assoc() const { return &Cell::bif_add; }
 
-   static Bif_F12_PLUS * fun;        ///< Built-in function.
-   static Bif_F12_PLUS  _fun;        ///< Built-in function.
+   static Bif_F12_PLUS * fun;           ///< Built-in function.
+   static Bif_F12_PLUS  _fun;           ///< Built-in function.
+   static Bif_F12_PLUS * fun_inverse;   ///< Built-in function.
+   static Bif_F12_PLUS  _fun_inverse;   ///< Built-in function.
 
 protected:
    /// overloaded Function::eval_identity_fun();
@@ -556,14 +560,16 @@ protected:
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B)
       { return eval_scalar_AXB(A, X, B, &Cell::bif_add); }
 
-   /// overloaded Function::get_monadic_inverse()
-   virtual Function * get_monadic_inverse() const;
-
    /// overloaded Function::get_dyadic_inverse()
    virtual Function * get_dyadic_inverse() const;
+
+   /// true if the inverse shall be computed. This allows Bif_F12_CIRCLE to
+   /// be instantiated twice: once for non-inverted operation and once for
+   /// inverted operation, and both instances can share some code in this class
+   const bool inverse;
 };
 //-----------------------------------------------------------------------------
-/** Scalar functions subtrct and negative.
+/** Scalar functions subtract and negative.
  */
 class Bif_F12_MINUS : public ScalarFunction
 {
@@ -667,12 +673,15 @@ class Bif_F12_TIMES : public ScalarFunction
 {
 public:
    /// Constructor.
-   Bif_F12_TIMES()
-   : ScalarFunction(PERF_AB(TIMES))
+   Bif_F12_TIMES(bool inv)
+   : ScalarFunction(PERF_AB(TIMES)),
+     inverse(inv)
    {}
 
-   static Bif_F12_TIMES * fun;       ///< Built-in function.
-   static Bif_F12_TIMES  _fun;       ///< Built-in function.
+   static Bif_F12_TIMES * fun;           ///< Built-in function.
+   static Bif_F12_TIMES  _fun;           ///< Built-in function.
+   static Bif_F12_TIMES * fun_inverse;   ///< Built-in function.
+   static Bif_F12_TIMES  _fun_inverse;   ///< Built-in function.
 
 protected:
    /// overloaded Function::eval_B().
@@ -681,11 +690,12 @@ protected:
 
    /// overloaded Function::eval_AB().
    virtual Token eval_AB(Value_P A, Value_P B)
-      { return eval_scalar_AB(A, B, &Cell::bif_multiply); }
+      { return inverse ? eval_scalar_AB(A, B, &Cell::bif_multiply_inverse)
+                       : eval_scalar_AB(A, B, &Cell::bif_multiply); }
 
    /// overloaded Function::get_scalar_f2()
    virtual prim_f2 get_scalar_f2() const
-      { return &Cell::bif_multiply; }
+      { return inverse ? &Cell::bif_multiply_inverse : &Cell::bif_multiply; }
 
    /// return the associative cell function of this function
    virtual assoc_f2 get_assoc() const { return &Cell::bif_multiply; }
@@ -698,11 +708,13 @@ protected:
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B)
       { return eval_scalar_AXB(A, X, B, &Cell::bif_multiply); }
 
-   /// overloaded Function::get_monadic_inverse()
-   virtual Function * get_monadic_inverse() const;
-
    /// overloaded Function::get_dyadic_inverse()
    virtual Function * get_dyadic_inverse() const;
+
+   /// true if the inverse shall be computed. This allows Bif_F12_CIRCLE to
+   /// be instantiated twice: once for non-inverted operation and once for
+   /// inverted operation, and both instances can share some code in this class
+   const bool inverse;
 };
 //-----------------------------------------------------------------------------
 /** Scalar functions divide and reciprocal.
@@ -765,18 +777,18 @@ public:
 protected:
    /// overloaded Function::eval_B().
    virtual Token eval_B(Value_P B)
-      { return (inverse) ? eval_scalar_B(B, &Cell::bif_pi_times_inverse)
-                         : eval_scalar_B(B, &Cell::bif_pi_times); }
+      { return inverse ? eval_scalar_B(B, &Cell::bif_pi_times_inverse)
+                       : eval_scalar_B(B, &Cell::bif_pi_times); }
 
    /// overloaded Function::eval_AB().
    virtual Token eval_AB(Value_P A, Value_P B)
-      { return (inverse) ? eval_scalar_AB(A, B, &Cell::bif_circle_fun_inverse)
-                         : eval_scalar_AB(A, B, &Cell::bif_circle_fun); }
+      { return inverse ? eval_scalar_AB(A, B, &Cell::bif_circle_fun_inverse)
+                       : eval_scalar_AB(A, B, &Cell::bif_circle_fun); }
 
    /// overloaded Function::get_scalar_f2
    virtual prim_f2 get_scalar_f2() const
-      { return (inverse) ? &Cell::bif_circle_fun_inverse
-                         : &Cell::bif_circle_fun; }
+      { return inverse ? &Cell::bif_circle_fun_inverse
+                       : &Cell::bif_circle_fun; }
 
    /// overloaded Function::get_monadic_inverse()
    virtual Function * get_monadic_inverse() const;

@@ -282,6 +282,12 @@ ComplexCell::bif_add(Cell * Z, const Cell * A) const
 }
 //-----------------------------------------------------------------------------
 ErrorCode
+ComplexCell::bif_add_inverse(Cell * Z, const Cell * A) const
+{
+   return A->bif_subtract(Z, this);
+}
+//-----------------------------------------------------------------------------
+ErrorCode
 ComplexCell::bif_subtract(Cell * Z, const Cell * A) const
 {
    return ComplexCell::zv(Z, A->get_complex_value() - get_complex_value());
@@ -296,6 +302,12 @@ const APL_Complex z = A->get_complex_value() * cval();
 
    new (Z) ComplexCell(z);
    return E_NO_ERROR;
+}
+//-----------------------------------------------------------------------------
+ErrorCode
+ComplexCell::bif_multiply_inverse(Cell * Z, const Cell * A) const
+{
+   return A->bif_divide(Z, this);
 }
 //-----------------------------------------------------------------------------
 ErrorCode

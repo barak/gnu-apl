@@ -207,6 +207,12 @@ public:
    virtual bool need_scaling(const PrintContext &pctx) const
       { return need_scaling(dfval(), pctx.get_PP()); }
 
+   /// overloaded Cell::bif_add_inverse()
+   virtual ErrorCode bif_add_inverse(Cell * Z, const Cell * A) const;
+
+   /// overloaded Cell::bif_multiply_inverse()
+   virtual ErrorCode bif_multiply_inverse(Cell * Z, const Cell * A) const;
+
    /// return true if the integer part of val is longer than ⎕PP
    static bool is_big(APL_Float val, int quad_pp);
 

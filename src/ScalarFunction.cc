@@ -46,12 +46,14 @@ Bif_F2_MEQ      Bif_F2_MEQ     ::_fun;                // ≥
 Bif_F2_UNEQ     Bif_F2_UNEQ    ::_fun;                // ≠
 Bif_F2_NOR      Bif_F2_NOR     ::_fun;                // ⍱
 Bif_F2_NAND     Bif_F2_NAND    ::_fun;                // ⍲
-Bif_F12_PLUS    Bif_F12_PLUS   ::_fun;                // +
+Bif_F12_PLUS    Bif_F12_PLUS   ::_fun(false);         // +
+Bif_F12_PLUS    Bif_F12_PLUS   ::_fun_inverse(true);  // +
 Bif_F12_POWER   Bif_F12_POWER  ::_fun;                // ⋆
 Bif_F12_BINOM   Bif_F12_BINOM  ::_fun;                // !
 Bif_F12_MINUS   Bif_F12_MINUS  ::_fun;                // -
 Bif_F12_ROLL    Bif_F12_ROLL   ::_fun;                // ? (monadic is scalar)
-Bif_F12_TIMES   Bif_F12_TIMES  ::_fun;                // ×
+Bif_F12_TIMES   Bif_F12_TIMES  ::_fun(false);         // ×
+Bif_F12_TIMES   Bif_F12_TIMES  ::_fun_inverse(true); // ×
 Bif_F12_DIVIDE  Bif_F12_DIVIDE ::_fun;                // ÷
 Bif_F12_CIRCLE  Bif_F12_CIRCLE ::_fun(false);         // ○
 Bif_F12_CIRCLE  Bif_F12_CIRCLE ::_fun_inverse(true);  // A inverted
@@ -75,11 +77,13 @@ Bif_F2_UNEQ     * Bif_F2_UNEQ    ::fun         = &Bif_F2_UNEQ    ::_fun;
 Bif_F2_NOR      * Bif_F2_NOR     ::fun         = &Bif_F2_NOR     ::_fun;
 Bif_F2_NAND     * Bif_F2_NAND    ::fun         = &Bif_F2_NAND    ::_fun;
 Bif_F12_PLUS    * Bif_F12_PLUS   ::fun         = &Bif_F12_PLUS   ::_fun;
+Bif_F12_PLUS    * Bif_F12_PLUS   ::fun_inverse = &Bif_F12_PLUS   ::_fun_inverse;
 Bif_F12_POWER   * Bif_F12_POWER  ::fun         = &Bif_F12_POWER  ::_fun;
 Bif_F12_BINOM   * Bif_F12_BINOM  ::fun         = &Bif_F12_BINOM  ::_fun;
 Bif_F12_MINUS   * Bif_F12_MINUS  ::fun         = &Bif_F12_MINUS  ::_fun;
 Bif_F12_ROLL    * Bif_F12_ROLL   ::fun         = &Bif_F12_ROLL   ::_fun;
 Bif_F12_TIMES   * Bif_F12_TIMES  ::fun         = &Bif_F12_TIMES  ::_fun;
+Bif_F12_TIMES   * Bif_F12_TIMES  ::fun_inverse = &Bif_F12_TIMES  ::_fun_inverse;
 Bif_F12_DIVIDE  * Bif_F12_DIVIDE ::fun         = &Bif_F12_DIVIDE ::_fun;
 Bif_F12_CIRCLE  * Bif_F12_CIRCLE ::fun         = &Bif_F12_CIRCLE ::_fun;
 Bif_F12_CIRCLE  * Bif_F12_CIRCLE ::fun_inverse = &Bif_F12_CIRCLE ::_fun_inverse;
@@ -1064,50 +1068,44 @@ Bif_F12_LOGA::get_dyadic_inverse() const
 }
 //-----------------------------------------------------------------------------
 Function *
-Bif_F12_TIMES::get_monadic_inverse() const
-{
-   return Bif_F12_DIVIDE::fun;
-}
-//-----------------------------------------------------------------------------
-Function *
 Bif_F12_TIMES::get_dyadic_inverse() const
 {
-   return Bif_F12_DIVIDE::fun;
+   if (this == fun)   return fun_inverse;
+   else               return fun;
 }
 //-----------------------------------------------------------------------------
 Function *
 Bif_F12_DIVIDE::get_monadic_inverse() const
 {
-   return Bif_F12_TIMES::fun;
+   // ÷ is self-inverse: B = ÷÷B
+   return Bif_F12_DIVIDE::fun;
 }
 //-----------------------------------------------------------------------------
 Function *
 Bif_F12_DIVIDE::get_dyadic_inverse() const
 {
-   return Bif_F12_TIMES::fun;
-}
-//-----------------------------------------------------------------------------
-Function *
-Bif_F12_PLUS::get_monadic_inverse() const
-{
-   return Bif_F12_MINUS::fun;
+   // ÷ is self-inverse: B = (A÷(A÷B))
+   return Bif_F12_DIVIDE::fun;
 }
 //-----------------------------------------------------------------------------
 Function *
 Bif_F12_PLUS::get_dyadic_inverse() const
 {
-   return Bif_F12_MINUS::fun;
+   if (this == fun)   return fun_inverse;
+   else               return fun;
 }
 //-----------------------------------------------------------------------------
 Function *
 Bif_F12_MINUS::get_monadic_inverse() const
 {
+   // - is self-inverse: B = --B
    return Bif_F12_PLUS::fun;
 }
 //-----------------------------------------------------------------------------
 Function *
 Bif_F12_MINUS::get_dyadic_inverse() const
 {
+   // - is self-inverse: B = (A-(A-B))
    return Bif_F12_PLUS::fun;
 }
 //-----------------------------------------------------------------------------

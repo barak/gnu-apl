@@ -135,6 +135,12 @@ public:
       { return 1; }
 #endif
 
+   /// overloaded Cell::bif_add_inverse()
+   virtual ErrorCode bif_add_inverse(Cell * Z, const Cell * A) const;
+
+   /// overloaded Cell::bif_multiply_inverse()
+   virtual ErrorCode bif_multiply_inverse(Cell * Z, const Cell * A) const;
+
    /// initialize Z to integer 0
    static ErrorCode z0(Cell * Z)
       { new (Z) IntCell(0);   return E_NO_ERROR; }

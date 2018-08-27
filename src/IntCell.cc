@@ -503,6 +503,12 @@ IntCell::bif_add(Cell * Z, const Cell * A) const
 }
 //-----------------------------------------------------------------------------
 ErrorCode
+IntCell::bif_add_inverse(Cell * Z, const Cell * A) const
+{
+   return A->bif_subtract(Z, this);
+}
+//-----------------------------------------------------------------------------
+ErrorCode
 IntCell::bif_subtract(Cell * Z, const Cell * A) const
 {
    if (A->is_integer_cell())   // integer A - integer B
@@ -592,6 +598,12 @@ IntCell::bif_multiply(Cell * Z, const Cell * A) const
    // delegate to A
    //
    return A->bif_multiply(Z, this);
+}
+//-----------------------------------------------------------------------------
+ErrorCode
+IntCell::bif_multiply_inverse(Cell * Z, const Cell * A) const
+{
+   return A->bif_divide(Z, this);
 }
 //-----------------------------------------------------------------------------
 ErrorCode

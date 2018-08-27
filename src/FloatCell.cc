@@ -411,6 +411,12 @@ FloatCell::bif_add(Cell * Z, const Cell * A) const
 }
 //-----------------------------------------------------------------------------
 ErrorCode
+FloatCell::bif_add_inverse(Cell * Z, const Cell * A) const
+{
+   return A->bif_subtract(Z, this);
+}
+//-----------------------------------------------------------------------------
+ErrorCode
 FloatCell::bif_subtract(Cell * Z, const Cell * A) const
 {
    if (A->is_real_cell())   // real result
@@ -511,6 +517,12 @@ const double zi = ai * dfval();
    if (!isfinite(zi))   return E_DOMAIN_ERROR;
    return ComplexCell::zv(Z, zr, zi);
 } 
+//-----------------------------------------------------------------------------
+ErrorCode
+FloatCell::bif_multiply_inverse(Cell * Z, const Cell * A) const
+{
+   return A->bif_divide(Z, this);
+}
 //-----------------------------------------------------------------------------
 ErrorCode
 FloatCell::bif_divide(Cell * Z, const Cell * A) const

@@ -814,6 +814,9 @@ public:
    virtual Token eval_AB(Value_P A, Value_P B)
       { return Token(TOK_APL_VALUE1, B->clone(LOC)); }
 
+   /// overloaded Function::eval_AXB()
+   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B);
+
    static Bif_F2_RIGHT * fun;   ///< Built-in function
    static Bif_F2_RIGHT  _fun;   ///< Built-in function
 protected:
