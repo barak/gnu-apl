@@ -98,9 +98,14 @@ Source<Unicode> src(input);
               case TC_END:   // chars without APL meaning
                    rest_2 = src.rest();
                    {
-                     UCS_string more("Tokenizer: No token for Unicode U+");
-                     more.append_hex(uni, true);
-                     throw_tokenize_error(E_NO_TOKEN, more);
+                     Log(LOG_error_throw)
+                     CERR << endl << "throwing "
+                          << Error::error_name(E_NO_TOKEN)
+                          << " in  Tokenizer" << endl;
+
+                     MORE_ERROR() << "Tokenizer: No token for Unicode U+";
+                     Error error(E_NO_TOKEN, LOC);
+                     throw error;
                    }
                    break;
 
@@ -770,7 +775,7 @@ Tokenizer::tokenize_real(Source<Unicode> & src, bool & need_float,
 {
    int_val = 0;
    need_float = false;
-   
+
 UTF8_string int_digits;
 UTF8_string fract_digits;
 UTF8_string expo_digits;
@@ -778,6 +783,28 @@ bool negative = false;
 bool expo_negative = false;
 bool skipped_0 = false;
 bool dot_seen = false;
+
+   // hexadecimal ?
+   //
+   if (src.rest() > 1 && *src == UNI_ASCII_DOLLAR_SIGN)
+      {
+        src.get();   // skip $
+        if (!Avec::is_hex_digit(*src))   return false;   // no hex after $
+        while (src.rest())
+           {
+             int digit;
+             if      (*src <  UNI_ASCII_0)   break;
+             else if (*src <= UNI_ASCII_9)   digit = src.get() - '0';
+             else if (*src <  UNI_ASCII_A)   break;
+             else if (*src <= UNI_ASCII_F)   digit = 10 + src.get() - 'A';
+             else if (*src <  UNI_ASCII_a)   break;
+             else if (*src <= UNI_ASCII_f)   digit = 10 + src.get() - 'a';
+             else                            break;
+             int_val = int_val << 4 | digit;
+           }
+        flt_val = int_val;
+        return true;   // OK
+      }
 
    // 1. split src into integer, fractional, and exponent parts, removing:
    // 1a. a leading sign of the integer part

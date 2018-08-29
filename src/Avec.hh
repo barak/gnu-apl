@@ -93,9 +93,15 @@ public:
    /// Return \b true iff \b av is a valid char in a user defined symbol
    static bool is_first_symbol_char(Unicode uni);
 
-   /// Return \b true iff \b av is a digit (.i.e. 0...9)
+   /// Return \b true iff \b av is a digit (i.e. 0 ≤ av ≤ 9)
    static bool is_digit(Unicode uni)
       { return (uni <= UNI_ASCII_9 && uni >= UNI_ASCII_0); }
+
+   /// Return \b true iff \b av is a digit (i.e. 0 ≤ av ≤ 9)
+   static bool is_hex_digit(Unicode uni)
+      { return is_digit(uni)
+            || (uni <= UNI_ASCII_F && uni >= UNI_ASCII_A)
+            || (uni <= UNI_ASCII_f && uni >= UNI_ASCII_a); }
 
    /// Return \b true iff \b av is a digit or a space
    static bool is_digit_or_space(Unicode uni)
