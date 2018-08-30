@@ -151,7 +151,7 @@
 ∇
 
 ∇Zi ← Ah FIO∆fprintf B
- ⍝⍝ fprintf(Ah, B1, B2...) format B1
+ ⍝⍝ fprintf(Ah, Bf, B2...) format Bf
  Zi ← B ⎕FIO[22] Ah
 ∇
 
@@ -379,6 +379,11 @@
  Z←⎕FIO[57] Bs
 ∇
 
+∇Z ← Af FIO∆sprintf Bs
+ ⍝⍝ sprintf( Af, B1...) format Af and data B1, ...
+ Z←Af ⎕FIO[58] Bs
+∇
+
 ∇FIO∆clear_statistics Bi
  ⍝⍝ clear performance statistics with ID Bi
  Zn ← ⎕FIO[200] Bi
@@ -556,7 +561,7 @@ t←t⍪'INADDR_ANY' 0
  a←a, ('getpeername' 45) ('getsockopt' 46) ('setsockopt' 47) ('fscanf'      48)
  a←a, ('readlines'   49) ('gettimeofday' 50) ('mktime'   51) ('localtime'   52)
  a←a, ('gmtime'      53) ('chdir'      54) ('sscanf'     55) ('write_lines' 56)
- a←a, ('execve'      57)
+ a←a, ('execve'      57) ('sprintf'    58)
 
  a←a, ('open'         3) ('close'       4) ⍝ And some handy aliases
  →(0=↑⍴x←,⊃((⊂X) ≡¨↑¨a)/a)/Nomatch

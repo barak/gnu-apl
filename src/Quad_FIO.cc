@@ -165,7 +165,7 @@ Value_P Z(ShapeItem(fd_count), LOC);
 }
 //-----------------------------------------------------------------------------
 Token
-Quad_FIO::do_printf(FILE * out, Value_P A)
+Quad_FIO::do_printf(FILE * outf, Value_P A)
 {
    // A is expected to be a nested APL value. The first element shall be a 
    // format string, followed by the values for each % field. Result is the
@@ -182,7 +182,7 @@ const Value & format = *A->get_ravel(a++).get_pointer_value();
             {
               UCS_string ucs(uni);
               UTF8_string utf(ucs);
-              fwrite(utf.c_str(), 1, utf.size(), out);
+              fwrite(utf.c_str(), 1, utf.size(), outf);
               out_len++;   // count 1 char
               continue;
             }
@@ -202,7 +202,7 @@ const Value & format = *A->get_ravel(a++).get_pointer_value();
                     // format char. We print the string and are done.
                     // (This was a mal-formed format string from the user)
                     //
-                    fwrite(fmt, 1, fm, out);
+                    fwrite(fmt, 1, fm, outf);
                     out_len += fm;
                     goto printf_done;
                   }
@@ -215,7 +215,7 @@ const Value & format = *A->get_ravel(a++).get_pointer_value();
                     // from the user; we assume it is)
                     //
                     //
-                    fwrite(fmt, 1, fm, out);
+                    fwrite(fmt, 1, fm, outf);
                     out_len += fm;
                     goto field_done;
                   }
@@ -263,7 +263,7 @@ const Value & format = *A->get_ravel(a++).get_pointer_value();
                                  else            iv = int(fv);
                                }
                             fmt[fm++] = un1;   fmt[fm] = 0;
-                            out_len += fprintf(out, fmt, iv);
+                            out_len += fprintf(outf, fmt, iv);
                           }
                           goto field_done;
 
@@ -273,7 +273,7 @@ const Value & format = *A->get_ravel(a++).get_pointer_value();
                             const APL_Float fv =
                                             A->get_ravel(a++).get_real_value();
                             fmt[fm++] = un1;   fmt[fm] = 0;
-                            out_len += fprintf(out, fmt, fv);
+                            out_len += fprintf(outf, fmt, fv);
                           }
                           goto field_done;
 
@@ -284,7 +284,7 @@ const Value & format = *A->get_ravel(a++).get_pointer_value();
                                         A->get_ravel(a++).get_pointer_value();
                                 UCS_string ucs(*str.get());
                                 UTF8_string utf(ucs);
-                                fwrite(utf.c_str(), 1, utf.size(), out);
+                                fwrite(utf.c_str(), 1, utf.size(), outf);
                                 out_len += ucs.size();   // not utf.size() !
                               }
                           goto field_done;
@@ -296,24 +296,24 @@ const Value & format = *A->get_ravel(a++).get_pointer_value();
                                             A->get_ravel(a++).get_char_value();
                             UCS_string ucs(cv);
                             UTF8_string utf(ucs);
-                            fwrite(utf.c_str(), 1, utf.size(), out);
+                            fwrite(utf.c_str(), 1, utf.size(), outf);
                             ++out_len;
                           }
                           goto field_done;
 
                      case 'n':
-                          out_len += fprintf(out, "%d", out_len);
+                          out_len += fprintf(outf, "%d", out_len);
                           goto field_done;
 
                      case 'm':
-                          out_len += fprintf(out, "%s", strerror(errno));
+                          out_len += fprintf(outf, "%s", strerror(errno));
                           goto field_done;
 
 
                      case '%':
                           if (fm == 0)   // %% is %
                              {
-                               fputc('%', out);
+                               fputc('%', outf);
                                ++out_len;
                                goto field_done;
                              }
@@ -332,6 +332,161 @@ const Value & format = *A->get_ravel(a++).get_pointer_value();
 printf_done:
 
    return Token(TOK_APL_VALUE1, IntScalar(out_len, LOC));
+}
+//-----------------------------------------------------------------------------
+Value_P
+Quad_FIO::do_sprintf(const Value * A_format, const Value * B)
+{
+UCS_string UZ;
+   // A is the format string, B is the nested APL values for each % field in A.
+   // Result is the formatted string.
+   //
+int b = 0;         // index into B (the next argument to be printed).
+char numbuf[50];
+
+   for (int f = 0; f < A_format->element_count(); /* no f++ */ )
+       {
+         const Unicode uni = A_format->get_ravel(f++).get_char_value();
+         if (uni != UNI_ASCII_PERCENT)   // not %
+            {
+              UZ.append(uni);
+              continue;
+            }
+
+         // % seen. copy the field in format to fmt and fprintf it with
+         // the next argument. That is for format = eg. "...%42.42llf..."
+         // we want fmt to be "%42.42llf"
+         //
+         char fmt[40];
+         unsigned int fm = 0;        // an index into fmt;
+         fmt[fm++] = '%';   // copy the '%'
+         for (;;)
+             {
+               if (f >= A_format->element_count())
+                  {
+                    // end of format string reached without seeing the
+                    // format char. We print the string and are done.
+                    // (This was a mal-formed format string from the user)
+                    //
+                    UCS_string ufmt(fmt);
+                    UZ.append(ufmt);
+                    goto sprintf_done;
+                  }
+
+               if (fm >= sizeof(fmt))
+                  {
+                    // end of fmt reached without seeing the format char.
+                    // We print the string and are done.
+                    // (This may or may not be a mal-formed format string
+                    // from the user; we assume it is)
+                    //
+                    //
+                    UCS_string ufmt(fmt);
+                    UZ.append(ufmt);
+                    goto field_done;
+                  }
+
+               const Unicode un1 = A_format->get_ravel(f++).get_char_value();
+               switch(un1)
+                  {
+                     // flag chars and field width/precision
+                     //
+                     case '#':
+                     case '0' ... '9':
+                     case '-':
+                     case ' ':
+                     case '+':
+                     case '\'':   // SUSE
+                     case 'I':    // glibc
+                     case '.':
+
+                     // length modifiers
+                     //
+                     case 'h':
+                     case 'l':
+                     case 'L':
+                     case 'q':
+                     case 'j':
+                     case 'z':
+                     case 't': fmt[fm++] = un1;   fmt[fm] = 0;
+                               continue;
+
+                         // conversion specifiers
+                         //
+                     case 'd':   case 'i':   case 'o':
+                     case 'u':   case 'x':   case 'X':   case 'p':
+                          {
+                            const Cell & cell = B->get_ravel(b++);
+                            APL_Integer iv;
+                            if (cell.is_integer_cell())
+                               {
+                                 iv = cell.get_int_value();
+                               }
+                            else
+                               {
+                                 const double fv = cell.get_real_value();
+                                 if (fv < 0.0)   iv = -int(-fv);
+                                 else            iv = int(fv);
+                               }
+                            fmt[fm++] = un1;   fmt[fm] = 0;
+                            sprintf(numbuf, fmt, iv);
+                            UZ.append_utf8(numbuf);
+                          }
+                          goto field_done;
+
+                     case 'e':   case 'E':   case 'f':   case 'F':
+                     case 'g':   case 'G':   case 'a':   case 'A':
+                          {
+                            const APL_Float fv =
+                                            B->get_ravel(b++).get_real_value();
+                            fmt[fm++] = un1;   fmt[fm] = 0;
+                            sprintf(numbuf, fmt, fv);
+                            UZ.append_utf8(numbuf);
+                          }
+                          goto field_done;
+
+                     case 's':   // string or char
+                          if (B->get_ravel(b).is_character_cell())   goto cval;
+                              {
+                                Value_P str =
+                                        B->get_ravel(b++).get_pointer_value();
+                                UCS_string ucs(*str.get());
+                                UZ.append(ucs);
+                              }
+                          goto field_done;
+
+                     case 'c':   // single char
+                     cval:
+                          UZ.append(B->get_ravel(b++).get_char_value());
+                          goto field_done;
+
+                     case 'm':
+                          sprintf(numbuf, "%s", strerror(errno));
+                          UZ.append_utf8(numbuf);
+                          goto field_done;
+
+                     case '%':
+                          if (fm == 0)   // %% is %
+                             {
+                               UZ.append(UNI_ASCII_PERCENT);
+                               goto field_done;
+                             }
+                          /* no break */
+
+                     default:
+                          MORE_ERROR() << "invalid format character " << un1
+                                       << " in function 22 (aka. printf())"
+                                         " in module file_io:: ";
+                          DOMAIN_ERROR;   // bad format char
+                  }
+             }
+         field_done: ;
+       }
+
+sprintf_done:
+Value_P Z(UZ, LOC);
+   Z->set_default_Spc();
+   return Z;
 }
 //-----------------------------------------------------------------------------
 Unicode
@@ -706,6 +861,7 @@ Quad_FIO::list_functions(ostream & out)
 "   Legend: a - address family, IPv4 address, port (or errno)\n"
 "           d - table of dirent structs\n"
 "           e - error code (integer as per errno.h)\n"
+"           f - format string (printf(), scanf())\n"
 "           h - file handle (integer)\n"
 "           i - integer\n"
 "           n - names (nested vector of strings)\n"
@@ -792,9 +948,10 @@ Quad_FIO::list_functions(ostream & out)
 "   Zy9←    ⎕FIO[52] Bi    localtime(Bi) Note: Jan 2, 2017 is: 2017 1 2 ...\n"
 "   Zy9←    ⎕FIO[53] Bi    gmtime(Bi)    Note: Jan 2, 2017 is: 2017 1 2 ...\n"
 "   Zi ←    ⎕FIO[54] Bs    chdir(Bs)\n"
-"   Ze ← As ⎕FIO[55] Bh    sscanf(Bs, As) As is the format string\n"
+"   Ze ← Af ⎕FIO[55] Bh    sscanf(Bs, As) Af is the format string\n"
 "   Zs ← As ⎕FIO[56] Bs    write nested lines As to file named Bs\n"
 "   Zh ←    ⎕FIO[57] Bs    fork() and execve(Bs, { Bs, 0}, {0})\n"
+"   Zh ← Af ⎕FIO[58] B     sprintf(Af, B...) As is the format string\n"
 
 "\n"
 "Benchmarking functions:\n"
@@ -2331,6 +2488,9 @@ const int function_number = X->get_ravel(0).get_near_int();
                 fclose(f);
                 return Token(TOK_APL_VALUE1, IntScalar(items_written, LOC));
               }
+
+         case 58:   // sprintf
+              return Token(TOK_APL_VALUE1, do_sprintf(A.get(), B.get()));
 
          case 202:   // set monadic parallel threshold
          case 203:   // set dyadicadic parallel threshold

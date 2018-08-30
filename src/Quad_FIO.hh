@@ -125,8 +125,11 @@ protected:
    /// convert bits set in \b fds to an APL integer vector
    Value_P fds_to_val(fd_set * fds, int max_fd);
 
-   /// print A to \b out
+   /// printf A to \b out
    Token do_printf(FILE * out, Value_P A);
+
+   /// printf A to \b out
+   Value_P do_sprintf(const Value * A_format, const Value * B);
 
    /// perform an fscanf() from file
    Token do_scanf(File_or_String & input, const UCS_string & format);

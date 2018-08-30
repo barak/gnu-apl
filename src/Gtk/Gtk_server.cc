@@ -672,16 +672,19 @@ struct _draw_param
     font_slant(CAIRO_FONT_SLANT_NORMAL),
     font_weight(CAIRO_FONT_WEIGHT_NORMAL)
      {
+       // default fill color: transparent
        fill_color.red   = 0;
        fill_color.green = 0;
        fill_color.blue  = 0;
        fill_color.alpha = 0;
 
+       // default line color: opaque black
        line_color.red   = 0;
        line_color.green = 0;
        line_color.blue  = 0;
-       line_color.alpha = 0;
+       line_color.alpha = 255;
 
+       // default font: sans-serif
        strncpy(font_family, "sans-serif", sizeof(font_family) - 1);
        font_family[sizeof(font_family) - 1] = 0;
      }
