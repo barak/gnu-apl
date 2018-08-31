@@ -597,69 +597,86 @@ Simple_string<bool, false> ts_lines;
 ErrorCode
 UserFunction::transform_multi_line_strings()
 {
-UCS_string accu;   // including "
-int multi_start_line = -1;
-bool appending = false;
+  /* convert a set of lines like
+
+     [k+1] PREFIX "L1
+     [k+2] L2 ...
+     [k+N] Ln" SUFFIX
+
+    into:
+
+    [k+1] PREFIX "L1" "L2" ... "LN" SUFFIX
+    [...] (empty)
+    [k+N] (empty)
+   */
+
+enum Line_status
+   {
+    Function_header,
+    APL_text,
+    Start_of_string,
+    Inside_string,
+    End_of_string
+   };
+
+char status[get_text_size()];   status[0] = Function_header;
+Line_status current = APL_text;
+
+   // determine line status of each line...
+   //
    for (int l = 1; l < get_text_size(); ++l)
        {
-         UCS_string line = get_text(l);
-         int quote_count = line.double_quote_count(appending);
-
-         if (appending)   // inside multi-line string
+         const int count = get_text(l).double_quote_count(false);
+         if (count & 1)   // start or end of string
             {
-              // discard leading \␣ (used for indentation)
-              if (line.size() >= 2               &&
-                  line[0] == UNI_ASCII_BACKSLASH &&
-                  line[1] == UNI_ASCII_SPACE)   line = line.drop(2);
-
-              if (quote_count == 0)   // append entire line
+              if (current == APL_text)   // start of multi-line string
                  {
-                   accu.append_utf8(" \"");
-                   accu.append(line);
-                   accu.append_utf8("\"");
-                   clear_text(l);
-                   continue;
+                    status[l] = Start_of_string;
+                    current = Inside_string;
                  }
-
-              // partial line: append up to first "
-              //
-              const ShapeItem quote = line.double_quote_first();
-              Assert(quote >= 0);
-              const UCS_string prefix(line, 0, quote);
-              set_text(l, line.drop(quote + 1));   // drop prefix and "
-              accu.append_utf8(" \"");
-              accu.append(prefix);
-              accu.append_utf8("\")");   // close ""
-              set_text(multi_start_line, accu);
-              multi_start_line = -1;
-              accu.shrink(0);
-              --quote_count;
-              appending = false;
+              else                       // end of multi-line string
+                 {
+                    status[l] = End_of_string;
+                    current = APL_text;
+                 }
             }
-
-         // not or no longer appending
-         //
-         if ((quote_count & 1) == 0)   continue;
-
-         // start of a new multi-line string
-         //
-         multi_start_line = l;
-         const ShapeItem quote = line.double_quote_last();
-         Assert(quote >= 0);
-         const UCS_string suffix(line, quote, line.size() - quote);
-         accu = UCS_string (line, 0, quote);
-         accu.append_utf8("(");
-         accu.append(suffix);   // close ""
-         accu.append_utf8("\"");   // close ""
-         appending = true;
+         else              // no status change
+            {
+              status[l] = current;
+            }
        }
 
-   if (appending)   // automatically close " at end of function text
-      {
-        set_text(multi_start_line, accu);
-        accu.append(UNI_ASCII_DOUBLE_QUOTE);
-      }
+   // modify lines...
+   //
+int l = 1;
+UCS_string accu;
+   while (l < get_text_size())
+       {
+         if (status[l] == APL_text)   continue;
+         const int start = l;
+         Assert1(status[l] == Start_of_string);
+         accu = get_text(l++);
+         accu.append_utf8("\" ");
+         while (status[l] == Inside_string)
+               {
+                 accu.append_utf8(" \"");
+                 accu.append(get_text(l));
+                 accu.append_utf8("\"");
+                 clear_text(l++);
+               }
+         Assert(status[l] == End_of_string);
+         accu.append_utf8("\"");
+         accu.append(get_text(l));
+         set_text(start, accu);
+         clear_text(l++);
+       }
 
+   // remove trailing empty lines...
+   //
+   while (get_text_size() && get_text(get_text_size() - 1).size() == 0)
+         text.shrink(get_text_size() - 1);
+
+// CERR << endl;
 // loop(l, get_text_size())   CERR << "[" << l << "]  " << get_text(l) << endl;
 
    return E_NO_ERROR;
@@ -674,7 +691,7 @@ UserFunction::parse_body(const char * loc, bool tolerant, bool macro)
    clear_body();
 
 UCS_string_vector original_text;    // before possibly transforming multilines
-   if (uprefs.multi_line_strings)   // user allows milti-line strings
+   if (uprefs.multi_line_strings)   // user allows multi-line strings
       {
         for (int l = 1; l < get_text_size(); ++l)
             {

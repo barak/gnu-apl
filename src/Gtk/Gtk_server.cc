@@ -41,12 +41,12 @@
 using namespace std;
 
 static int verbosity = 0;
-static bool verbose__calls = false;
+static bool verbose__calls     = false;
 static bool verbose__draw_data = false;
-static bool verbose__do_draw = false;
-static bool verbose__draw_cmd = false;
-static bool verbose__reads = false;
-static bool verbose__writes = false;
+static bool verbose__do_draw   = false;
+static bool verbose__draw_cmd  = true;
+static bool verbose__reads     = false;
+static bool verbose__writes    = false;
 
 static sem_t drawarea_sema;
 
@@ -218,18 +218,33 @@ gtk_drawingarea_draw_commands(GtkDrawingArea * widget, const char * data)
    verbose__calls && cerr << "gtk_drawingarea_draw_commands()..." << endl;
    sem_wait(&drawarea_sema);
 
-   if (drawarea_data)   delete[] drawarea_data;
+   while (*data && *data < ' ')   ++data;   // remove leading whitespace
 
-   drawarea_dlen = strlen(data);
+   if (!strncmp(data, "background", 10))   // fresh drawing
+      {
+        delete[] drawarea_data;
+        drawarea_dlen = strlen(data);
 
-char * cp = new char[drawarea_dlen + 1];
-   assert(cp);
-   memcpy(cp, data, drawarea_dlen + 1);   // + 1 for trailing 0
-   drawarea_data = cp;
-   verbose__draw_data && cerr << "draw_data[" << drawarea_dlen << "]:\n"
-                              << drawarea_data << endl;
+        char * cp = new char[drawarea_dlen + 1];
+        assert(cp);
+        memcpy(cp, data, drawarea_dlen + 1);   // + 1 for trailing 0
+        drawarea_data = cp;
+      }
+   else                                    // append to existing drawing
+      {
+        const int add_len = strlen(data);
+        char * cp = new char[drawarea_dlen + add_len + 1];
+        assert(cp);
+        memcpy(cp, drawarea_data, drawarea_dlen);        // existing
+        memcpy(cp + drawarea_dlen, data, add_len + 1);   // new data
+        delete[] drawarea_data;
+        drawarea_data = cp;
+        drawarea_dlen += add_len;
+      }
 
    sem_post(&drawarea_sema);
+   verbose__draw_data && cerr << "draw_data[" << drawarea_dlen << "]:\n"
+                              << drawarea_data << endl;
 
    if (surface)   cairo_surface_destroy(surface);
    surface = 0;
@@ -543,7 +558,7 @@ const int flags = fcntl(3, F_GETFD);
   gtk_init(&argc, &argv);
 
 enum { TLV_socket = 3 };
-char TLV[2000];       // the entire TLV buffer
+char TLV[66000];       // the entire TLV buffer
 char * V = TLV + 8;   // the value part of the TLV buffer
 
    for (;;)
@@ -571,7 +586,7 @@ char * V = TLV + 8;   // the value part of the TLV buffer
           if (rx_len != V_len + 8)
              {
                cerr << "TLV socked closed (2): "
-                    << strerror(errno) << endl;
+                    << strerror(errno) << ": V_len=" << V_len << " rx_len=" << rx_len << endl;
                close(3);
                return 0;
              }
