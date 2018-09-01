@@ -652,7 +652,7 @@ int l = 1;
 UCS_string accu;
    while (l < get_text_size())
        {
-         if (status[l] == APL_text)   continue;
+         if (status[l] == APL_text)   { ++l;   continue; }
          const int start = l;
          Assert1(status[l] == Start_of_string);
          accu = get_text(l++);
