@@ -44,7 +44,7 @@ static int verbosity = 0;
 static bool verbose__calls     = false;
 static bool verbose__draw_data = false;
 static bool verbose__do_draw   = false;
-static bool verbose__draw_cmd  = true;
+static bool verbose__draw_cmd  = false;
 static bool verbose__reads     = false;
 static bool verbose__writes    = false;
 
@@ -586,7 +586,8 @@ char * V = TLV + 8;   // the value part of the TLV buffer
           if (rx_len != V_len + 8)
              {
                cerr << "TLV socked closed (2): "
-                    << strerror(errno) << ": V_len=" << V_len << " rx_len=" << rx_len << endl;
+                    << strerror(errno) << ": V_len=" << V_len
+                                       << " rx_len=" << rx_len << endl;
                close(3);
                return 0;
              }
