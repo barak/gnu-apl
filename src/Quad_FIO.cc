@@ -49,7 +49,6 @@ extern long long top_of_memory();
 
 Quad_FIO  Quad_FIO::_fun;
 Quad_FIO * Quad_FIO::fun = &Quad_FIO::_fun;
-bool Quad_FIO::in_pipe = false;
 
 
    // CONVENTION: all functions must have an axis argument (like X
@@ -66,15 +65,19 @@ Quad_FIO::Quad_FIO()
    // init stdin, stdout, stderr, and maybe fd 3 
    //
 file_entry f0(stdin, STDIN_FILENO);
+   f0.path.append_str("stdin");
    open_files.append(f0);
 file_entry f1(stdout, STDOUT_FILENO);
+   f1.path.append_str("stdout");
    open_files.append(f1);
 file_entry f2(stderr, STDERR_FILENO);
+   f1.path.append_str("stderr");
    open_files.append(f2);
 
-   if (in_pipe)   // this interpreter was forked from another one
+   if (-1 != fcntl(3, F_GETFD))   // this process was forked from another APL
       {
         file_entry f3(0, 3);
+        f3.path.append_str("pipe-to_client");
         open_files.append(f3);
       }
 }
@@ -1841,11 +1844,8 @@ const pid_t child = fork();
         DOMAIN_ERROR;
       }
 
-UTF8_string path(B);
-   char * filename = strdup(path.c_str());
    if (child)   // parent process: return handle
       {
-        free(filename);
         file_entry fe(0, spair[0]);
         fe.fe_may_read = true;
         fe.fe_may_write = true;
@@ -1855,10 +1855,11 @@ UTF8_string path(B);
 
    // code executed in the forked child.,,
    // Close some fds and then execve(Bs)
+   // No need to free any strings allocated here
    //
-   const int sock = spair[1];
+const int sock = spair[1];
    ::close(STDIN_FILENO);
-   for (int j = 3; j < 100; ++j)
+   for (int j = STDERR_FILENO+2; j < 100; ++j)
        {
          if (j != sock)   ::close(j);
        }
@@ -1868,12 +1869,35 @@ UTF8_string path(B);
    //
    dup2(sock, 3);
 
-   char * argv[] = { filename, 0 };
+UTF8_string path(B);
+char * filename = strdup(path.c_str());
+int argc = 1;
+   for (const char * f = filename; *f; ++f)
+       if (f[0] == ' ' && f[1] != ' ')   ++ argc;
+
+char ** argv = new char *[argc + 2];
+int ai = 0;
+char * from = filename;
+   for (char * f = filename; *f; ++f)
+       {
+         if (*f == ' ')   // end of argument
+            {
+              argv[ai++] = from;
+              *f = 0;
+              while (f[1] == ' ')   ++f;
+              from = f + 1;
+            }
+       }
+
+   if (*from)  argv[ai++] = from;
+   argv[ai] = 0;
+
    char * envp[] = { 0 };
    execve(filename, argv, envp);   // no return on success
 
    // execve() failed
    //
+   free(filename);
    ::close(3);
 
    usleep(100000);

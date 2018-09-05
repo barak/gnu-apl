@@ -76,8 +76,6 @@ public:
    static Quad_FIO * fun;   ///< Built-in function.
    static Quad_FIO  _fun;   ///< Built-in function.
 
-   static bool in_pipe;
-
 protected:
    /// one file (openend with open(), fopen(), or fdopen()).
    /// : handle == fd, and FILE * may or may not exist for fd

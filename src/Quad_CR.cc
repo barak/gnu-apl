@@ -79,10 +79,10 @@ Quad_CR::list_functions(ostream & out)
 "   Z  ← 30 ⎕CR B     Z is B with all items expanded to the same shape\n"
 "   Zn ← 31 ⎕CR Bn    internal helper function for the ⎕INP macro\n"
 "   Zn ← 32 ⎕CR Bn    internal helper function for the ⎕INP macro\n"
-"   Zb ← 33 ⎕CR Bv    Zv is a TLV with Tag ↑B and Value 1↓B\n"
+"   Zb ← 33 ⎕CR Bv    Zb is a TLV with Tag ↑Bv and Value 1↓Bv\n"
 "   Zv ← 34 ⎕CR Bb    TLV Bb to Tag ↑Z and Value 1↓Z\n"
 "   Zn ← 35 ⎕CR Bl    string of lines Bl → nested vector of lines Zn\n"
-"   Zl ← 36 ⎕CR Bn    nested vector of lines Bn → string of lines Bl \n"
+"   Zl ← 36 ⎕CR Bn    nested vector of lines Bn → string of lines Bl\n"
 "\n"
 "   if N ⎕CR has an inverse M ⎕CR then -N can be used instead of M\n";
 

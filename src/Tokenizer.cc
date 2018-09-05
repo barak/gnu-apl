@@ -103,7 +103,10 @@ Source<Unicode> src(input);
                           << Error::error_name(E_NO_TOKEN)
                           << " in  Tokenizer" << endl;
 
-                     MORE_ERROR() << "Tokenizer: No token for Unicode U+";
+                     char cc[20];
+                     snprintf(cc, sizeof(cc), "U+%4.4X (", uni);
+                     MORE_ERROR() << "Tokenizer: No token for Unicode "
+                                  <<  cc << uni << ")\nInput: " << input;
                      Error error(E_NO_TOKEN, LOC);
                      throw error;
                    }

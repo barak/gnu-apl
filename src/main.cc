@@ -194,6 +194,13 @@ show_argv(int argc, const char ** argv)
       CERR << "stdin is: CLOSED" << endl;
    else
       CERR << "stdin is: OPEN" << endl;
+
+   // tell if fd 3 is open or closed
+   //
+   if (fcntl(3, F_GETFD))
+      CERR << "fd 3 is:  CLOSED" << endl;
+   else
+      CERR << "fd 3 is:  OPEN" << endl;
 }
 //-----------------------------------------------------------------------------
 /// print a welcome message (copyright notice)
@@ -267,12 +274,6 @@ const bool log_startup = uprefs.parse_argv_1();
 #ifdef DYNAMIC_LOG_WANTED
    if (log_startup)   Log_control(LID_startup, true);
 #endif // DYNAMIC_LOG_WANTED
-
-   if (-1 != fcntl(3, F_GETFD))
-      {
-        Quad_FIO::in_pipe = true;
-        Log(LOG_startup)    CERR << "started in pipe" << endl;
-      }
 
    init_1(argv[0], log_startup);
 
