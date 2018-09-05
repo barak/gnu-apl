@@ -1616,7 +1616,15 @@ a*c
 @section Dyadic ⎕CR
 
 The ⎕CR function has an optional left argument that selects one of several
-formatting styles and conversions in addition to the well-known monadic form.
+formatting styles and conversion functions in addition to the well-known
+monadic form.
+
+Calling ⎕CR monadically without an axis and with an empty right argument
+shows a list of all functions provided by ⎕FIO:
+
+@verbatim
+      ⎕CR ''
+@end verbatim
 
 Say a @b{byte vector} is an integer vector with numbers having a (signed or
 unsigned) 8-bit value (i.e. a value from -128 to 255 inclusive). Such byte

@@ -31,9 +31,72 @@ Quad_CR    * Quad_CR   ::fun = &Quad_CR   ::_fun;
 
 //-----------------------------------------------------------------------------
 Token
+Quad_CR::list_functions(ostream & out)
+{
+   out <<
+"   Functions provided by A ⎕CR B...\n"
+"\n"
+"   Legend: b - byte vector (vector of integers between -128 and 255)\n"
+"           h - hex string (characters 0-9 or A-F resp. a-f)\n"
+"           l - string of (\\n-terminated) lines\n"
+"           m - character matrix\n"
+"           n - nested vector of strings\n"
+"           i - integer vector\n"
+"           r - base64 string according to RFC 4648\n"
+"           v - T,V (integer tag T and byte vector V)\n"
+"           s - string\n"
+"\n"
+"   Zm ←  0 ⎕CR B     Zm is B in APL output format\n"
+"   Zs ←  1 ⎕CR B     Zs is B in APL input format\n"
+"   Zm ←  2 ⎕CR B     Zm is B boxed using ASCII characters\n"
+"   Zm ←  3 ⎕CR B     Zm is B boxed using line-drawing characters\n"
+"   Zm ←  4 ⎕CR B     3 ⎕CR B + extra frame\n"
+"   Zs ←  5 ⎕CR B     Zs is B in (uppercase) HEX\n"
+"   Zs ←  6 ⎕CR B     Zs is B in (lowercase) hex\n"
+"   Zm ←  7 ⎕CR B     like 3 ⎕CR B with thin lines\n"
+"   Zm ←  8 ⎕CR B     like 4 ⎕CR B with thin lines\n"
+"   Zm ←  9 ⎕CR B     like 4 ⎕CR B with double-line outer frame\n"
+"   Zs ← 10 ⎕CR Bs    Zs is an APL expression producing variable(-name) Bs\n"
+"   Zs ← 11 ⎕CR B     value B → CDR (Common Data Representation) string Zs\n"
+"   Z  ← 12 ⎕CR Bs    CDR string Bs → value Z\n"
+"   Zb ← 13 ⎕CR Bh    hex string Bh → byte vector Z\n"
+"   Zh ← 14 ⎕CR B     Zs is 6 ⎕CR 11 ⎕CR B (Value → CDR → HEX)\n"
+"   Z  ← 15 ⎕CR Bh    Z is 11 ⎕CR 6 ⎕CR B (HEX → CDR → Value)\n"
+"   Zr ← 16 ⎕CR Bs    string Bs → base64 string Z (RFC 4648)\n"
+"   Zs ← 17 ⎕CR Br    base64 string Br → string Zs (RFC 4648)\n"
+"   Zb ← 18 ⎕CR Bs    UCS string Bs → UTF8 encoded byte vector Zb (⍴Z ≥ ⍴B)\n"
+"   Zs ← 19 ⎕CR Bb    UTF8 encoded byte vector Bb → UCS string Zs (⍴Z ≤ ⍴B)\n"
+"   Zm ← 20 ⎕CR B     4 ⎕CR B, but in NARS style (length instead of ↓ or →)\n"
+"   Zm ← 21 ⎕CR B     20 ⎕CR B but using thin lines\n"
+"   Zm ← 22 ⎕CR B     20 ⎕CR B with double-line outer frame\n"
+"   Zm ← 23 ⎕CR B     20 ⎕CR B with thick lines + extra frame\n"
+"   Zm ← 24 ⎕CR B     20 ⎕CR B using thin lines + extra frame\n"
+"   Zm ← 25 ⎕CR B     20 ⎕CR B with double-line extra frame\n"
+"   Zi ← 26 ⎕CR B     Zi is the cell types of corresponding items in B\n"
+"   Zi ← 27 ⎕CR B     Zi is the primary values of Z items as integer\n"
+"   Zi ← 28 ⎕CR B     Zi is the secondary values of Z items as intege \n"
+"   Zm ← 29 ⎕CR B     4 ⎕CR B with strings being quoted + extra frame\n"
+"   Z  ← 30 ⎕CR B     Z is B with all items expanded to the same shape\n"
+"   Zn ← 31 ⎕CR Bn    internal helper function for the ⎕INP macro\n"
+"   Zn ← 32 ⎕CR Bn    internal helper function for the ⎕INP macro\n"
+"   Zb ← 33 ⎕CR Bv    Zv is a TLV with Tag ↑B and Value 1↓B\n"
+"   Zv ← 34 ⎕CR Bb    TLV Bb to Tag ↑Z and Value 1↓Z\n"
+"   Zn ← 35 ⎕CR Bl    string of lines Bl → nested vector of lines Zn\n"
+"   Zl ← 36 ⎕CR Bn    nested vector of lines Bn → string of lines Bl \n"
+"\n"
+"   if N ⎕CR has an inverse M ⎕CR then -N can be used instead of M\n";
+
+  return Token(TOK_APL_VALUE1, Str0(LOC));
+}
+//-----------------------------------------------------------------------------
+Token
 Quad_CR::eval_B(Value_P B)
 {
 UCS_string symbol_name(*B.get());
+   if (symbol_name.size() == 0)   // ⎕CR '' : print help
+      {
+        return list_functions(COUT);
+      }
 
    // remove trailing whitespaces in B
    //
@@ -88,7 +151,7 @@ int max_len = 0;
 Shape shape_Z;
    shape_Z.add_shape_item(tlines.size());
    shape_Z.add_shape_item(max_len);
-   
+
 Value_P Z(shape_Z, LOC);
    loop(row, tlines.size())
       {
@@ -139,6 +202,8 @@ Quad_CR::do_CR(APL_Integer a, const Value * B, PrintContext pctx)
         case -19: a = 18;   break;
         case -33: a = 34;   break;
         case -34: a = 33;   break;
+        case -35: a = 36;   break;
+        case -36: a = 35;   break;
         default: MORE_ERROR() << "A ⎕CR B with invalid A < 0";
                  DOMAIN_ERROR;
       }
@@ -192,6 +257,8 @@ bool extra_frame = false;
         case 32: return do_CR31_32(false, *B);   // ⎕INP helper
         case 33: return do_CR33(*B);             // TV to TLV byte vector
         case 34: return do_CR34(*B);             // TLV byte vector to TV
+        case 35: return do_CR35(*B);             // lines to nested strings
+        case 36: return do_CR36(*B);             // nested strings to lines
 
         default: MORE_ERROR() << "A ⎕CR B with invalid A";
                  DOMAIN_ERROR;
@@ -312,7 +379,7 @@ const Symbol * symbol = Workspace::lookup_existing_symbol(symbol_name);
                else
                   {
                     UCS_string res("∇");
-               
+
                     loop(u, text.size())
                        {
                          if (text[u] == '\n')
@@ -354,14 +421,14 @@ Quad_CR::do_CR10_rec(UCS_string_vector & result, const Value & value,
 {
    /*
       recursively encode var_name with value.
-     
+
       we emit one of 2 formats:
-     
+
       short format: dest ← (⍴ value) ⍴ value
-              
+
       long format:  dest ← (⍴ value) ⍴ 0                 " prolog "
                     dest[] ← partial value ...
-              
+
       short format (the default) requires a reasonably short value
 
       If value is nested then the short or long format is followed
@@ -627,7 +694,7 @@ const int level = shapes.size();
              Shape sh = shapes[s].offset_to_index(indices[s + 1]);
              if (sh.get_rank() > 1)   result.append_utf8("(");
              result.append_shape(sh);
-		     if (sh.get_rank() > 1)   result.append_utf8(")");
+             if (sh.get_rank() > 1)   result.append_utf8(")");
            }
       }
 
@@ -1297,6 +1364,84 @@ Value_P Z(len_B - 7, LOC);
    loop(z, len_B - 8)
       new (Z->next_ravel())  CharCell(Unicode(cB++->get_byte_value()));
 
+   return Z;
+}
+//-----------------------------------------------------------------------------
+Value_P
+Quad_CR::do_CR35(const Value & B)
+{
+   if (B.get_rank() != 1)   RANK_ERROR;
+
+const ShapeItem len_B = B.element_count();
+   if (len_B == 0)
+      {
+        Value_P Z1 = Str0(LOC);
+        Value_P Z(1, LOC);
+        new (&Z->get_ravel(0)) PointerCell(Z1, Z.getref());
+        Z->check_value(LOC);
+        return Z;
+      }
+
+ShapeItem lf_count = 0;
+   loop(b, len_B)
+       {
+         if (B.get_ravel(b).get_char_value() == UNI_ASCII_LF)   ++lf_count;
+       }
+
+   if (B.get_ravel(len_B - 1).get_char_value() != UNI_ASCII_LF)   ++lf_count;
+
+Value_P Z(lf_count, LOC);
+UCS_string line;
+   loop(b, len_B)
+       {
+         const Unicode uni = B.get_ravel(b).get_char_value();
+         if (uni == UNI_ASCII_LF)
+            {
+              Value_P Zb(line, LOC);
+              new (Z->next_ravel()) PointerCell(Zb, Z.getref());
+              line.shrink(0);
+            }
+         else
+            {
+              line.append(uni);
+            }
+       }
+
+   if (line.size())   // incomplete last line
+      {
+        Value_P Zb(line, LOC);
+        new (Z->next_ravel()) PointerCell(Zb, Z.getref());
+        line.shrink(0);
+      }
+
+   return Z;
+}
+//-----------------------------------------------------------------------------
+Value_P
+Quad_CR::do_CR36(const Value & B)
+{
+   if (B.get_rank() != 1)   RANK_ERROR;
+
+const ShapeItem len_B = B.element_count();
+ShapeItem len_Z = B.element_count();
+   loop(b, len_B)
+       {
+         const Value & Bb = *B.get_ravel(b).get_pointer_value().get();
+         if (Bb.get_rank() > 1)   RANK_ERROR;
+         len_Z += 1 + Bb.element_count();
+       }
+
+UCS_string UZ;
+   UZ.reserve(len_Z);
+   loop(b, len_B)
+       {
+         const Value & Bb = *B.get_ravel(b).get_pointer_value().get();
+         UCS_string Ub(Bb);
+         UZ.append(Ub);
+         UZ.append(UNI_ASCII_LF);
+       }
+
+Value_P Z(UZ, LOC);
    return Z;
 }
 //-----------------------------------------------------------------------------

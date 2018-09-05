@@ -43,9 +43,6 @@ public:
    /// Constructor.
    Quad_FIO();
 
-   static Quad_FIO * fun;   ///< Built-in function.
-   static Quad_FIO  _fun;   ///< Built-in function.
-
    /// overloaded Function::eval_B().
    virtual Token eval_B(Value_P B);
 
@@ -75,6 +72,11 @@ public:
 
    /// return the open FILE * for (APL integer) \b handle
    FILE * get_FILE(int handle);
+
+   static Quad_FIO * fun;   ///< Built-in function.
+   static Quad_FIO  _fun;   ///< Built-in function.
+
+   static bool in_pipe;
 
 protected:
    /// one file (openend with open(), fopen(), or fdopen()).
@@ -128,8 +130,9 @@ protected:
    /// printf A to \b out
    Token do_printf(FILE * out, Value_P A);
 
-   /// printf A to \b out
-   Value_P do_sprintf(const Value * A_format, const Value * B);
+   /// sprintf with format string A and Data items B
+   void do_sprintf(UCS_string & UZ, const UCS_string & A_format,
+                   const Value * B, int B_start);
 
    /// perform an fscanf() from file
    Token do_scanf(File_or_String & input, const UCS_string & format);

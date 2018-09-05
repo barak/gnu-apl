@@ -34,7 +34,7 @@ FILE_IO
       ⍝ close THIS file again (which is an error)
       ⍝
       FILE_IO[4] Handle
-DOMAIN ERROR
+DOMAIN ERROR+
       FILE_IO[4]Handle
       ^         ^
 

@@ -23,6 +23,7 @@ gtk_fun_def(combo_box   ,GtkComboBox   ,set_active   ,Selected,V,I, set the sele
 gtk_fun_def(combo_box   ,GtkComboBox   ,get_active   ,Selected,I,V, return the selected item of a combo box (-1 for none))
 gtk_fun_def(drawingarea ,GtkDrawingArea,draw_commands,DrawCmd ,V,S, set the commands needed to draw a drawing area       )
 gtk_fun_def(drawingarea ,GtkDrawingArea,set_area_size,SX_SY   ,V,I, set the area size to SX_SY >> 16 : SX_SY & 0xFFFF    )
+gtk_fun_def(drawingarea ,GtkDrawingArea,set_Y_origin ,Origin  ,V,I, set the Y-origin to the top (1) or to the bottom (0) )
 //         ║            │              │             │        │ │ │                                                      ║
 //         ╚════════════╧══════════════╧═════════════╧════════╧═╧═╧══════════════════════════════════════════════════════╝
 

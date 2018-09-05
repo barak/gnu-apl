@@ -340,7 +340,8 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 noinst_DATA = Gtk_functions.asciidoc Gtk_events1.asciidoc Gtk_events2.asciidoc
 Gtk_server_SOURCES = Gtk_server.cc Gtk_map.def Gtk_enums.hh
-AM_CXXFLAGS = -rdynamic $(GTK_CFLAGS) $(GTK_LIBS) $(am__append_1)
+AM_CXXFLAGS = -rdynamic $(GTK_CFLAGS) $(GTK_LIBS) -lX11 \
+	$(am__append_1)
 AM_MAKEFLAGS = -j $(MAKE_J)
 all: all-am
 

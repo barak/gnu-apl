@@ -202,7 +202,7 @@ show_welcome(ostream & out, const char * argv0)
 {
 char c1[200];
 char c2[200];
-   snprintf(c1, sizeof(c1), "Welcome to GNU APL version %s",build_tag[1]);
+   snprintf(c1, sizeof(c1), "Welcome to GNU APL version %s", build_tag[1]);
    snprintf(c2, sizeof(c2), "for details run: %s --gpl.", argv0);
 
 const char * lines[] =
@@ -267,6 +267,12 @@ const bool log_startup = uprefs.parse_argv_1();
 #ifdef DYNAMIC_LOG_WANTED
    if (log_startup)   Log_control(LID_startup, true);
 #endif // DYNAMIC_LOG_WANTED
+
+   if (-1 != fcntl(3, F_GETFD))
+      {
+        Quad_FIO::in_pipe = true;
+        Log(LOG_startup)    CERR << "started in pipe" << endl;
+      }
 
    init_1(argv[0], log_startup);
 

@@ -355,13 +355,24 @@ DOMAIN ERROR+
 A ⎕CR B with invalid A < 0
       →
 
+      4 ⎕CR 35 ⎕CR "Hello\nWorld\n"
+┏→━━━━━━━━━━━━━━┓
+┃┏→━━━━┓ ┏→━━━━┓┃
+┃┃Hello┃ ┃World┃┃
+┃┗━━━━━┛ ┗━━━━━┛┃
+┗∊━━━━━━━━━━━━━━┛
+
+      36 ⎕CR "Hello" "World"
+Hello
+World
+
 
       ⍝ trigger a domain error if new left arguments are implemented
       ⍝ without adding a testcase
       ⍝
-      35 ⎕CR A
+      37 ⎕CR A
 DOMAIN ERROR+
-      35 ⎕CR A
+      37 ⎕CR A
       ^      ^
 
       )MORE

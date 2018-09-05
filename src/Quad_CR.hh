@@ -59,6 +59,8 @@ public:
                            const Value & value);
 
 protected:
+   static Token list_functions(ostream & out);
+
    /// compute \b 5 ⎕CR \b B or \b 6 ⎕CR \b B
    static Value_P do_CR5_6(const char * alpha, const Value & B);
 
@@ -109,6 +111,12 @@ protected:
 
    /// compute \b 34 ⎕CR \b B
    static Value_P do_CR34(const Value & B);
+
+   /// compute \b 35 ⎕CR \b B
+   static Value_P do_CR35(const Value & B);
+
+   /// compute \b 36 ⎕CR \b B
+   static Value_P do_CR36(const Value & B);
 
    /// the left argument of Pick (⊃) which selects a sub-item of a variable
    /// being constructed

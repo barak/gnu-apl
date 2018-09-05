@@ -85,7 +85,11 @@ public:
    Value * get()
       { return value_p; }
 
-   /// return a pointer to the Value
+   /// return a const reference of the Value
+   const Value & getref() const
+      { return *value_p; }
+
+   /// return a reference of the Value
    Value & getref()
       { return *value_p; }
 

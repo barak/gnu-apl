@@ -89,6 +89,59 @@ static struct _ID_DB
 } * id_db = 0;
 
 //-----------------------------------------------------------------------------
+static struct _draw_param
+{
+  _draw_param()
+  : line_width (100),   // 100% = 2.0 in cairo
+    font_size  (20),   // 100% = 2.0 in cairo
+    font_slant (CAIRO_FONT_SLANT_NORMAL),
+    font_weight(CAIRO_FONT_WEIGHT_NORMAL),
+    area_width (-1),
+    area_height(-1),
+    upside_down(false)
+     {
+       // default fill color: transparent
+       fill_color.red   = 0;
+       fill_color.green = 0;
+       fill_color.blue  = 0;
+       fill_color.alpha = 0;
+
+       // default line color: opaque black
+       line_color.red   = 0;
+       line_color.green = 0;
+       line_color.blue  = 0;
+       line_color.alpha = 255;
+
+       // default font: sans-serif
+       strncpy(font_family, "sans-serif", sizeof(font_family) - 1);
+       font_family[sizeof(font_family) - 1] = 0;
+     }
+
+   bool line_visible() const
+      { return line_color.alpha && line_width; }
+
+   bool brush_visible() const
+      { return fill_color.alpha; }
+
+   int real_Y(int y)
+       {
+         return upside_down ? area_height - y : y;
+       }
+
+  GdkRGBA fill_color;
+  GdkRGBA line_color;
+  int line_width;   // 100% = 2.0 pixels in cairo
+  int font_size;    // 100% = 2.0 pixels in cairo
+  cairo_font_slant_t font_slant;
+  cairo_font_weight_t font_weight;
+  char font_family[100];
+
+   int area_width;
+   int area_height;
+   bool upside_down;
+} draw_param;
+
+//-----------------------------------------------------------------------------
 static bool
 init_id_db(const char * filename)
 {
@@ -257,6 +310,13 @@ gtk_drawingarea_draw_commands(GtkDrawingArea * widget, const char * data)
    return 0;
 }
 //-----------------------------------------------------------------------------
+void *
+gtk_drawingarea_set_Y_origin(GtkDrawingArea * widget, int data)
+{
+  draw_param.upside_down = true;
+   return 0;
+}
+//-----------------------------------------------------------------------------
 static void
 cmd_2_load_CSS(const char * filename)
 {
@@ -287,6 +347,8 @@ gtk_drawingarea_set_area_size(GtkDrawingArea * widget, long data)
 const int width = data >> 16 & 0xFFFF;
 const int height = data & 0xFFFF;
 
+   draw_param.area_width = width;
+   draw_param.area_height = height;
    gtk_widget_set_size_request(GTK_WIDGET(widget), width, height);
    return 0;
 }
@@ -680,47 +742,6 @@ char data[strlen(callback) + strlen(widget_name) + 10];
    verbosity > 0 && cerr << "callback " << callback << "(2) done" << endl;
 }
 //-----------------------------------------------------------------------------
-struct _draw_param
-{
-  _draw_param()
-  : line_width(100),   // 100% = 2.0 in cairo
-    font_size (20),   // 100% = 2.0 in cairo
-    font_slant(CAIRO_FONT_SLANT_NORMAL),
-    font_weight(CAIRO_FONT_WEIGHT_NORMAL)
-     {
-       // default fill color: transparent
-       fill_color.red   = 0;
-       fill_color.green = 0;
-       fill_color.blue  = 0;
-       fill_color.alpha = 0;
-
-       // default line color: opaque black
-       line_color.red   = 0;
-       line_color.green = 0;
-       line_color.blue  = 0;
-       line_color.alpha = 255;
-
-       // default font: sans-serif
-       strncpy(font_family, "sans-serif", sizeof(font_family) - 1);
-       font_family[sizeof(font_family) - 1] = 0;
-     }
-
-   bool line_visible() const
-      { return line_color.alpha && line_width; }
-
-   bool brush_visible() const
-      { return fill_color.alpha; }
-
-  GdkRGBA fill_color;
-  GdkRGBA line_color;
-  int line_width;   // 100% = 2.0 pixels in cairo
-  int font_size;    // 100% = 2.0 pixels in cairo
-  cairo_font_slant_t font_slant;
-  cairo_font_weight_t font_weight;
-  char font_family[100];
-} draw_param;
-
-//-----------------------------------------------------------------------------
 inline void
 cairo_set_source_rgba(cairo_t * cr, const GdkRGBA & color)
 {
@@ -730,7 +751,45 @@ cairo_set_source_rgba(cairo_t * cr, const GdkRGBA & color)
                              color.alpha / 100.0);
 }
 //-----------------------------------------------------------------------------
+void
+draw_line(cairo_t * cr, const GdkRGBA & color, int x0, int y0, int x1, int y1)
+{
+const int sdelta_x = x1 - x0;
+const int sdelta_y = y1 - y0;
+const int adelta_x = (sdelta_x >= 0) ? sdelta_x : -sdelta_x;
+const int adelta_y = (sdelta_y >= 0) ? sdelta_y : -sdelta_y;
+const double rad = 1.0;
 
+   cairo_set_source_rgba(cr, color);
+
+   if (adelta_x >= adelta_y)
+      {
+        const double dy_dx = double(sdelta_y) / sdelta_x;
+        for (int xx = x0; xx < x1; ++xx)
+            {
+              cairo_rectangle(cr, xx, y0 + (xx - x0)*dy_dx, rad, rad);
+            }
+        for (int xx = x1; xx < x0; ++xx)
+            {
+              cairo_rectangle(cr, xx, y0 + (xx - x1)*dy_dx, rad, rad);
+            }
+      }
+   else
+      {
+        const double dx_dy = double(sdelta_x) / sdelta_y;
+        for (int yy = y0; yy < y1; ++yy)
+            {
+              cairo_rectangle(cr, x0 + (yy - y0)*dx_dy, yy, rad, rad);
+            }
+        for (int yy = y1; yy < y0; ++yy)
+            {
+              cairo_rectangle(cr, x0 + (yy - y1)*dx_dy, yy, rad, rad);
+            }
+      }
+
+   cairo_fill(cr);
+}
+//-----------------------------------------------------------------------------
 void
 do_draw_cmd(GtkWidget * drawing_area, const char * cmd, const char * cmd_end)
 {
@@ -842,7 +901,7 @@ const int cmd_len = cmd_end - cmd;
            "DRAW CIRCLE (" << i1 << ":" << i2 << ") " << i3 << endl;
 
         const double x   = i1;   // center X
-        const double y   = i2;   // center Y
+        const double y   = draw_param.real_Y(i2);   // center Y
         const double rad = i3;   // radius
 
         if (draw_param.brush_visible())
@@ -876,7 +935,7 @@ const int cmd_len = cmd_end - cmd;
                             << i3 << ":" << i4 << ")" << endl;
 
         const double x     = i1;   // center X
-        const double y     = i2;   // center I
+        const double y     = draw_param.real_Y(i2);   // center I
         const double rad_x = i3 ? i3 : 1.0;   // radius X
         const double rad_y = i4 ? i4 : 1.0;   // radius Y
 
@@ -917,10 +976,15 @@ const int cmd_len = cmd_end - cmd;
            "DRAW LINE (" << i1 << ":" << i2 << ") ("
                               << i3 << ":" << i4 << ")" << endl;
         const double x0 = i1;
-        const double y0 = i2;
+        const double y0 = draw_param.real_Y(i2);
         const double x1 = i3;
-        const double y1 = i4;
+        const double y1 = draw_param.real_Y(i4);
         cairo_t * cr1 = cairo_create(surface);
+
+        draw_line(cr1, draw_param.line_color, x0, y0, x1, y1);
+        cairo_destroy(cr1);
+        return;
+
         cairo_move_to(cr1, x0, y0);
         cairo_line_to(cr1, x1, y1);
         cairo_set_source_rgba(cr1, draw_param.line_color);
@@ -935,15 +999,17 @@ const int cmd_len = cmd_end - cmd;
         verbose__draw_cmd && cerr <<
            "DRAW RECTANGLE (" << i1 << ":" << i2 << ") ("
                                    << i3 << ":" << i4 << ")" << endl;
-        const double x      = i1;
-        const double y      = i2;
-        const double width  = i3 - i1;
-        const double height = i4 - i2;
+        const double x0      = i1;
+        const double y0      = draw_param.real_Y(i2);
+        const double x1      = i3;
+        const double y1      = draw_param.real_Y(i4);
+        const double width  = x1 - x0;
+        const double height = y1 - y0;
 
         if (draw_param.brush_visible())
            {
              cairo_t * cr1 = cairo_create(surface);
-             cairo_rectangle(cr1, x, y, width, height);
+             cairo_rectangle(cr1, x0, y0, width, height);
              cairo_close_path(cr1);
              cairo_set_source_rgba(cr1, draw_param.fill_color);
              cairo_fill(cr1);
@@ -953,7 +1019,7 @@ const int cmd_len = cmd_end - cmd;
         if (draw_param.line_visible())
            {
              cairo_t * cr1 = cairo_create(surface);
-             cairo_rectangle(cr1, x, y, width, height);
+             cairo_rectangle(cr1, x0, y0, width, height);
              cairo_set_source_rgba(cr1, draw_param.line_color);
              cairo_set_line_width(cr1, draw_param.line_width*0.02);
              cairo_stroke(cr1);
@@ -993,7 +1059,7 @@ const int cmd_len = cmd_end - cmd;
                  }
              verbose__draw_cmd && cerr << " (" << i1 << " " << i2 << ")";
              x[point_idx] = i1;
-             y[point_idx] = i2;
+             y[point_idx] = draw_param.real_Y(i2);
              ++point_idx;
              ++p;
            }
@@ -1033,7 +1099,7 @@ const int cmd_len = cmd_end - cmd;
    if (count == 2)
       {
         const double x = i1;
-        const double y = i2;
+        const double y = draw_param.real_Y(i2);
 
         cairo_t * cr1 = cairo_create(surface);
 

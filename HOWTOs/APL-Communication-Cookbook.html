@@ -734,7 +734,7 @@ asciidoc.install();
 <body class="article">
 <div id="header">
 <h1>The GNU APL Communication Cookbook</h1>
-<span id="author">Jürgen Sauermann, GNU APL</span><br />
+<span id="author">Dr. Jürgen Sauermann, GNU APL</span><br />
 </div>
 <div id="content">
 <div class="sect1">
@@ -919,28 +919,40 @@ facilities from time to time.</p></div>
 <div class="paragraph"><p>The following is an example C program that demonstrates the use of libapl:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>#include "apl/libapl.h"
+<pre>
+
+<code>#include "apl/libapl.h"
 
 int
 main(int argc, char * argv[])
 {
    init_libapl(argv[0], 0);
    return apl_exec("⎕←2 3⍴⍳6");
-}</code></pre>
+}</code>
+
+</pre>
 </div></div>
 <div class="paragraph"><p>If the code above is stored in, say, file <strong>test_libapl.c</strong>, and if libapl was
 properly installed (and assuming the default installation prefix /usr/local of
 GNU APL), the following command should create an executable file test_libapl:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>gcc test_libapl.c -L /usr/local/lib/apl -lapl -o test_libapl</code></pre>
+<pre>
+
+<code>gcc test_libapl.c -L /usr/local/lib/apl -lapl -o test_libapl</code>
+
+</pre>
 </div></div>
 <div class="paragraph"><p>And running the newly created <strong>test_libapl</strong> gives what could be expected:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>$ ./test_libapl
+<pre>
+
+<code>$ ./test_libapl
 1 2 3
-4 5 6</code></pre>
+4 5 6</code>
+
+</pre>
 </div></div>
 </div>
 <div class="sect2">
@@ -1007,7 +1019,9 @@ Currently PostgreSQL and SQLite databases are supported. ⎕SQL is a
 container for a number of sub-functions that can be displayed with:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>      ⎕SQL""
+<pre>
+
+<code>      ⎕SQL""
 Available function numbers:
 type  ⎕SQL[1] file      - open a database file, return reference ID for it
       ⎕SQL[2] ref       - close database
@@ -1017,7 +1031,9 @@ query ⎕SQL[4,db] params - send SQL update
       ⎕SQL[6] ref       - commit current transaction
       ⎕SQL[7] ref       - rollback current transaction
       ⎕SQL[8] ref       - list tables
-ref   ⎕SQL[9] table     - list columns for table</code></pre>
+ref   ⎕SQL[9] table     - list columns for table</code>
+
+</pre>
 </div></div>
 <div class="paragraph"><p>More details on <strong>⎕SQL</strong> can be found in <strong>info apl</strong> (around Section 3.24).</p></div>
 </div>
@@ -1043,7 +1059,9 @@ value bytes mirrored.</p></div>
 <div class="paragraph"><p>Client side (APL):</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>      Path ← '/usr/lib/apl/TLV_server'    ⍝ wherever TLV_server was installed
+<pre>
+
+<code>      Path ← '/usr/lib/apl/TLV_server'    ⍝ wherever TLV_server was installed
       Handle ← ⎕FIO[57] Path              ⍝ start &amp; connect TLV_server
 
       ⍝ typically in a loop,,,
@@ -1055,12 +1073,16 @@ value bytes mirrored.</p></div>
 
       ⍝ cleanup (one time)
       ⊣(⎕FIO[4] Handle)                   ⍝ close connection (stops
-TLV_server)</code></pre>
+TLV_server)</code>
+
+</pre>
 </div></div>
 <div class="paragraph"><p>Server side (C, this example can also be found in file tools/TLV_server.c):</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>#include &lt;errno.h&gt;
+<pre>
+
+<code>#include &lt;errno.h&gt;
 #include &lt;stdint.h&gt;
 #include &lt;stdio.h&gt;
 #include &lt;string.h&gt;
@@ -1146,7 +1168,9 @@ FILE * f = fdopen(TLV_socket, "r");
                return 0;
              }
        }
-}</code></pre>
+}</code>
+
+</pre>
 </div></div>
 </div>
 <div class="sect2">
@@ -1182,11 +1206,15 @@ the pipe is closed with <strong>⎕FIO[24] Handle</strong> (aka. <strong>pclose<
 its output:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>      Command←"ls"
+<pre>
+
+<code>      Command←"ls"
       Handle←⎕FIO[24] Command    ⍝ PIPE = popen("ls")
       Data←⎕FIO[6] Handle        ⍝ fread(PIPE)
       ⎕UCS Data                  ⍝ display fread() output
-      ⎕FIO[25] Handle            ⍝ pclose(PIPE)</code></pre>
+      ⎕FIO[25] Handle            ⍝ pclose(PIPE)</code>
+
+</pre>
 </div></div>
 </div>
 <div class="sect2">
@@ -1243,7 +1271,11 @@ accessible via <strong>dlsym()</strong>.</p></div>
 the dynamic library, with:</p></div>
 <div class="listingblock">
 <div class="content">
-<pre><code>      'FOO.so' ⎕FX 'FOO'</code></pre>
+<pre>
+
+<code>      'FOO.so' ⎕FX 'FOO'</code>
+
+</pre>
 </div></div>
 <div class="paragraph"><p>That makes the 3 signatures implemented <strong>FOO.so</strong> available in APL (for the
 same signatures).</p></div>
@@ -1259,11 +1291,138 @@ be ⎕FXed later on.</p></div>
 </div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="_communication_over_streams">Communication over streams</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>The majority of the communication mechanisms above use - explicitly or
+implicitly - some sort of data framing between the communication partners.
+This data framing divides the entire communication between the partners into
+several transactions, where one transaction is, depending on the machanism:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+one libapl function call, or
+</p>
+</li>
+<li>
+<p>
+one shared variable assignment, or
+</p>
+</li>
+<li>
+<p>
+one write() to a ⎕FIO[57] pipe, or
+</p>
+</li>
+<li>
+<p>
+one SQL query, or
+</p>
+</li>
+<li>
+<p>
+one datagram sent over a socket of type SOCK_DGRAM, or
+</p>
+</li>
+<li>
+<p>
+one native function call.
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>The remaining mechanisms:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+popen(),
+</p>
+</li>
+<li>
+<p>
+sockets of type SOCK_STREAM
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>send their data in a byte-by-byte fashion, which may cause a problem for the
+receiver because the receiver cannot reliably detect the boundaries between
+different transactions. In these cases the division of the byte stream(s)
+between the communication partners into transactions has to be performed by
+the APL application, and GNU APL provides a few system functions that can
+be used to <strong>frame</strong> (read: encode) an item at the sender side into a sequence
+of bytes, and to <strong>de-frame</strong> (read: decode) the received byte stream back into
+the item that was sent at the receiver side. The <strong>frame</strong> and <strong>de-frame</strong>
+functions cooperate in such a way that;</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>      item ≡ decode encode item
+      decode ((encode A),(encode B)) ≡ (decode encode A), (decode encode B)</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>The <strong>frame</strong> and <strong>de-frame</strong> differ by the kind of item that is to be sent over
+a byte stream.</p></div>
+<div class="sect2">
+<h3 id="_tag_length_value_aka_tlv">Tag/Length/Value aka. TLV</h3>
+<div class="paragraph"><p>TLV is a frequantly used format for sending byte vectors over a stream. The
+byte vector is prepended by a tag field and a length field indicating the
+length of the byte vector. The tag and length fields have a fixed size
+(typically 1, 2, or 4 bytes) while the length of the byte vector can vary.
+Decoding of the TLV is very simple and efficient. The de-framing as such onlt
+requires the length field, but the tag is often required to distinguish
+different data types sent over the same stream.</p></div>
+<div class="paragraph"><p>System function <strong>33 ⎕CR</strong> converts <strong>TAG,byte-vector</strong> to a TLV (sender side)
+while its inverse function <strong>¯33 ⎕CR</strong>  converts a TLV back to
+<strong>TAG,byte-vector</strong>. Example:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>      5 ⎕CR  33 ⎕CR 42,"Hello"
+0000002A0000000548656C6C6F
+ │ │ │ │ │ │ │ │ │ │ │ │ │
+ │ │ │ │ │ │ │ │ └─┴─┴─┴─┴───── "Hello:
+ │ │ │ │ └─┴─┴─┴─────────────── 5 (lenght)
+ └─┴─┴─┴─────────────────────── 42 (tag)
+
+     ¯33 ⎕CR 33 ⎕CR 42,"Hello"
+42 Hello</code>
+
+</pre>
+</div></div>
+</div>
+<div class="sect2">
+<h3 id="_lines_terminated_by_line_feeds">Lines terminated by line-feeds</h3>
+<div class="paragraph"><p>Many programs, in particular operating system commands, write their output
+line-by-line to their <strong>stdout</strong>. If these programs are started from APL with
+<strong>Handle←24 ⎕FIO[24] Bs</strong> (aka. popen(Bs, "r") then the handle returned to APL
+is a stream of lines that are termnated by line-feeds (ASCII 10 or <strong>\n</strong>).
+The first step in the processing of such a streams in APL is usually to split
+the stream into a (nested) vector of lines. This can be easily and efficiently
+done with <strong>35 ⎕CR</strong>. The terminating line-feeds are removed in this conversion.</p></div>
+<div class="paragraph"><p>Example:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>      9 ⎕CR   35 ⎕CR "Hello\nWorld\n"
+╔═══════════════╗
+║┏→━━━━┓ ┏→━━━━┓║
+║┃Hello┃ ┃World┃║
+║┗━━━━━┛ ┗━━━━━┛║
+╚═══════════════╝</code>
+
+</pre>
+</div></div>
+</div>
+</div>
+</div>
 </div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2018-07-29 11:55:00 CEST
+Last updated 2018-09-04 20:08:54 CEST
 </div>
 </div>
 </body>

@@ -49,6 +49,8 @@ extern long long top_of_memory();
 
 Quad_FIO  Quad_FIO::_fun;
 Quad_FIO * Quad_FIO::fun = &Quad_FIO::_fun;
+bool Quad_FIO::in_pipe = false;
+
 
    // CONVENTION: all functions must have an axis argument (like X
    // in A fun[X] B); the axis argument is a function number that selects
@@ -61,7 +63,7 @@ Quad_FIO * Quad_FIO::fun = &Quad_FIO::_fun;
 Quad_FIO::Quad_FIO()
    : QuadFunction(TOK_Quad_FIO)
 {
-   // init stdin, stdout, and stderr
+   // init stdin, stdout, stderr, and maybe fd 3 
    //
 file_entry f0(stdin, STDIN_FILENO);
    open_files.append(f0);
@@ -69,6 +71,12 @@ file_entry f1(stdout, STDOUT_FILENO);
    open_files.append(f1);
 file_entry f2(stderr, STDERR_FILENO);
    open_files.append(f2);
+
+   if (in_pipe)   // this interpreter was forked from another one
+      {
+        file_entry f3(0, 3);
+        open_files.append(f3);
+      }
 }
 //-----------------------------------------------------------------------------
 void
@@ -95,6 +103,8 @@ Quad_FIO::get_file_entry(int handle)
         if (open_files[h].fe_fd == handle)   return open_files[h];
       }
 
+   MORE_ERROR() << handle
+                << " is not an open file handle managed by ⎕FIO, see ⎕FIO 0.";
    DOMAIN_ERROR;
 }
 //-----------------------------------------------------------------------------
@@ -171,182 +181,27 @@ Quad_FIO::do_printf(FILE * outf, Value_P A)
    // format string, followed by the values for each % field. Result is the
    // number of characters (not bytes!) printed.
    //
-int out_len = 0;   // the length of the output produced by all fprintf/fwrite
-int a = 0;         // index into A (the next argument to be printed).
-const Value & format = *A->get_ravel(a++).get_pointer_value();
-
-   for (int f = 0; f < format.element_count(); /* no f++ */ )
-       {
-         const Unicode uni = format.get_ravel(f++).get_char_value();
-         if (uni != UNI_ASCII_PERCENT)   // not %
-            {
-              UCS_string ucs(uni);
-              UTF8_string utf(ucs);
-              fwrite(utf.c_str(), 1, utf.size(), outf);
-              out_len++;   // count 1 char
-              continue;
-            }
-
-         // % seen. copy the field in format to fmt and fprintf it with
-         // the next argument. That is for format = eg. "...%42.42llf..."
-         // we want fmt to be "%42.42llf"
-         //
-         char fmt[40];
-         unsigned int fm = 0;        // an index into fmt;
-         fmt[fm++] = '%';   // copy the '%'
-         for (;;)
-             {
-               if (f >= format.element_count())
-                  {
-                    // end of format string reached without seeing the
-                    // format char. We print the string and are done.
-                    // (This was a mal-formed format string from the user)
-                    //
-                    fwrite(fmt, 1, fm, outf);
-                    out_len += fm;
-                    goto printf_done;
-                  }
-
-               if (fm >= sizeof(fmt))
-                  {
-                    // end of fmt reached without seeing the format char.
-                    // We print the string and are done.
-                    // (This may or may not be a mal-formed format string
-                    // from the user; we assume it is)
-                    //
-                    //
-                    fwrite(fmt, 1, fm, outf);
-                    out_len += fm;
-                    goto field_done;
-                  }
-
-               const Unicode un1 = format.get_ravel(f++).get_char_value();
-               switch(un1)
-                  {
-                     // flag chars and field width/precision
-                     //
-                     case '#':
-                     case '0' ... '9':
-                     case '-':
-                     case ' ':
-                     case '+':
-                     case '\'':   // SUSE
-                     case 'I':    // glibc
-                     case '.':
-
-                     // length modifiers
-                     //
-                     case 'h':
-                     case 'l':
-                     case 'L':
-                     case 'q':
-                     case 'j':
-                     case 'z':
-                     case 't': fmt[fm++] = un1;   fmt[fm] = 0;
-                               continue;
-
-                         // conversion specifiers
-                         //
-                     case 'd':   case 'i':   case 'o':
-                     case 'u':   case 'x':   case 'X':   case 'p':
-                          {
-                            const Cell & cell = A->get_ravel(a++);
-                            APL_Integer iv;
-                            if (cell.is_integer_cell())
-                               {
-                                 iv = cell.get_int_value();
-                               }
-                            else
-                               {
-                                 const double fv = cell.get_real_value();
-                                 if (fv < 0.0)   iv = -int(-fv);
-                                 else            iv = int(fv);
-                               }
-                            fmt[fm++] = un1;   fmt[fm] = 0;
-                            out_len += fprintf(outf, fmt, iv);
-                          }
-                          goto field_done;
-
-                     case 'e':   case 'E':   case 'f':   case 'F':
-                     case 'g':   case 'G':   case 'a':   case 'A':
-                          {
-                            const APL_Float fv =
-                                            A->get_ravel(a++).get_real_value();
-                            fmt[fm++] = un1;   fmt[fm] = 0;
-                            out_len += fprintf(outf, fmt, fv);
-                          }
-                          goto field_done;
-
-                     case 's':   // string or char
-                          if (A->get_ravel(a).is_character_cell())   goto cval;
-                              {
-                                Value_P str =
-                                        A->get_ravel(a++).get_pointer_value();
-                                UCS_string ucs(*str.get());
-                                UTF8_string utf(ucs);
-                                fwrite(utf.c_str(), 1, utf.size(), outf);
-                                out_len += ucs.size();   // not utf.size() !
-                              }
-                          goto field_done;
-
-                     case 'c':   // single char
-                     cval:
-                          {
-                            const Unicode cv =
-                                            A->get_ravel(a++).get_char_value();
-                            UCS_string ucs(cv);
-                            UTF8_string utf(ucs);
-                            fwrite(utf.c_str(), 1, utf.size(), outf);
-                            ++out_len;
-                          }
-                          goto field_done;
-
-                     case 'n':
-                          out_len += fprintf(outf, "%d", out_len);
-                          goto field_done;
-
-                     case 'm':
-                          out_len += fprintf(outf, "%s", strerror(errno));
-                          goto field_done;
-
-
-                     case '%':
-                          if (fm == 0)   // %% is %
-                             {
-                               fputc('%', outf);
-                               ++out_len;
-                               goto field_done;
-                             }
-                          /* no break */
-
-                     default:
-                          MORE_ERROR() << "invalid format character " << un1
-                                       << " in function 22 (aka. printf())"
-                                         " in module file_io:: ";
-                          DOMAIN_ERROR;   // bad format char
-                  }
-             }
-         field_done: ;
-       }
-
-printf_done:
-
-   return Token(TOK_APL_VALUE1, IntScalar(out_len, LOC));
+UCS_string UZ;
+const Value & A1 = *A->get_ravel(0).get_pointer_value();
+UCS_string A_format(A1);
+   do_sprintf(UZ, A_format, A.get(), 1);
+UTF8_string utf(UZ);
+   fwrite(utf.c_str(), 1, utf.size(), outf);
+   return Token(TOK_APL_VALUE1, IntScalar(UZ.size(), LOC));
 }
 //-----------------------------------------------------------------------------
-Value_P
-Quad_FIO::do_sprintf(const Value * A_format, const Value * B)
+void
+Quad_FIO::do_sprintf(UCS_string & UZ, const UCS_string & A_format,
+                    const Value * B, int b)
 {
-UCS_string UZ;
    // A is the format string, B is the nested APL values for each % field in A.
    // Result is the formatted string.
    //
-int b = 0;         // index into B (the next argument to be printed).
 char numbuf[50];
 
-   for (int f = 0; f < A_format->element_count(); /* no f++ */ )
+   for (int f = 0; f < A_format.size(); /* no f++ */ )
        {
-         const Unicode uni = A_format->get_ravel(f++).get_char_value();
+         const Unicode uni = A_format[f++];
          if (uni != UNI_ASCII_PERCENT)   // not %
             {
               UZ.append(uni);
@@ -362,7 +217,7 @@ char numbuf[50];
          fmt[fm++] = '%';   // copy the '%'
          for (;;)
              {
-               if (f >= A_format->element_count())
+               if (f >= A_format.size())
                   {
                     // end of format string reached without seeing the
                     // format char. We print the string and are done.
@@ -370,7 +225,7 @@ char numbuf[50];
                     //
                     UCS_string ufmt(fmt);
                     UZ.append(ufmt);
-                    goto sprintf_done;
+                    return;
                   }
 
                if (fm >= sizeof(fmt))
@@ -386,7 +241,7 @@ char numbuf[50];
                     goto field_done;
                   }
 
-               const Unicode un1 = A_format->get_ravel(f++).get_char_value();
+               const Unicode un1 = A_format[f++];
                switch(un1)
                   {
                      // flag chars and field width/precision
@@ -482,11 +337,6 @@ char numbuf[50];
              }
          field_done: ;
        }
-
-sprintf_done:
-Value_P Z(UZ, LOC);
-   Z->set_default_Spc();
-   return Z;
 }
 //-----------------------------------------------------------------------------
 Unicode
@@ -951,8 +801,8 @@ Quad_FIO::list_functions(ostream & out)
 "   Ze ← Af ⎕FIO[55] Bh    sscanf(Bs, As) Af is the format string\n"
 "   Zs ← As ⎕FIO[56] Bs    write nested lines As to file named Bs\n"
 "   Zh ←    ⎕FIO[57] Bs    fork() and execve(Bs, { Bs, 0}, {0})\n"
-"   Zh ← Af ⎕FIO[58] B     sprintf(Af, B...) As is the format string\n"
-
+"   Zs ← Af ⎕FIO[58] B     sprintf(Af, B...) As is the format string\n"
+"   Zi ← Ai ⎕FIO[59] Bh    fcntl(Bh, Ai...) file control\n"
 "\n"
 "Benchmarking functions:\n"
 "\n"
@@ -975,11 +825,11 @@ Quad_FIO::eval_B(Value_P B)
 
    if (!B->get_ravel(0).is_integer_cell())     return list_functions(COUT);
 
-const APL_Integer what = B->get_ravel(0).get_int_value();
-   switch(what)
+const APL_Integer function_number = B->get_ravel(0).get_int_value();
+   switch(function_number)
       {
-        // what < 0 are "hacker functions" that should not be used by
-        // normal mortals.
+        // function_number < 0 are "hacker functions" that should not be
+        // used by normal mortals.
         //
         case -14: // print stacks. SI_top is the ⎕FIO call, so dont show it.
                   for (StateIndicator * si = Workspace::SI_top()->get_parent();
@@ -1106,6 +956,8 @@ const APL_Integer what = B->get_ravel(0).get_int_value();
    return list_functions(COUT);
 
 out_errno:
+   MORE_ERROR() << "⎕FIO[" << function_number
+              << "] B failed: " << strerror(errno);
    return Token(TOK_APL_VALUE1, IntScalar(-errno, LOC));
 }
 //-----------------------------------------------------------------------------
@@ -1119,8 +971,8 @@ Quad_FIO::eval_AB(Value_P A, Value_P B)
 
    if (!B->get_ravel(0).is_integer_cell())     return list_functions(COUT);
 
-const APL_Integer what = B->get_ravel(0).get_int_value();
-   switch(what)
+const APL_Integer function_number = B->get_ravel(0).get_int_value();
+   switch(function_number)
       {
         case -3: // read probe A and clear it
              {
@@ -2176,6 +2028,7 @@ const int function_number = X->get_ravel(0).get_near_int();
          case 22:   // fprintf(Bh, A)
               {
                 errno = 0;
+                UCS_string UZ;
                 FILE * file = get_FILE(*B.get());
                 return do_printf(file, A);
               }
@@ -2489,8 +2342,36 @@ const int function_number = X->get_ravel(0).get_near_int();
                 return Token(TOK_APL_VALUE1, IntScalar(items_written, LOC));
               }
 
-         case 58:   // sprintf
-              return Token(TOK_APL_VALUE1, do_sprintf(A.get(), B.get()));
+         case 58:   // sprintf(Af, B...)
+              {
+                const UCS_string A_format(A.getref());
+                UCS_string UZ;
+                do_sprintf(UZ, A_format, B.get(), 0);
+                Value_P Z(UZ, LOC);
+                return Token(TOK_APL_VALUE1, Z);
+              }
+
+         case 59:   // fcntl(Bh, Ai...)
+              {
+                const int fd = get_fd(*B.get());
+                errno = 0;
+                int result = -1;
+                const Cell * cA = &A->get_ravel(0);
+                switch(A->element_count())
+                   {
+                      case 1: result = fcntl(fd, cA[0].get_int_value());
+                              break;
+
+                      case 2: result = fcntl(fd, cA[0].get_int_value(),
+                                                 cA[1].get_int_value());
+                              break;
+
+                      default: LENGTH_ERROR;
+                   }
+
+                if (result == -1 && errno)   goto out_errno;
+                return Token(TOK_APL_VALUE1, IntScalar(result, LOC));
+              }
 
          case 202:   // set monadic parallel threshold
          case 203:   // set dyadicadic parallel threshold
@@ -2536,6 +2417,8 @@ const int function_number = X->get_ravel(0).get_near_int();
    DOMAIN_ERROR;
 
 out_errno:
+   MORE_ERROR() << "A ⎕FIO[" << function_number
+              << "] B failed: " << strerror(errno);
    return Token(TOK_APL_VALUE1, IntScalar(-errno, LOC));
 }
 //-----------------------------------------------------------------------------

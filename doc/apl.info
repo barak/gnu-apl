@@ -1543,8 +1543,13 @@ File: apl.info,  Node: Section 3.16,  Next: Section 3.17,  Prev: Section 3.15,  
 ===============
 
 The ⎕CR function has an optional left argument that selects one of
-several formatting styles and conversions in addition to the well-known
-monadic form.
+several formatting styles and conversion functions in addition to the
+well-known monadic form.
+
+   Calling ⎕CR monadically without an axis and with an empty right
+argument shows a list of all functions provided by ⎕FIO:
+
+      ⎕CR ''
 
    Say a byte vector is an integer vector with numbers having a (signed
 or unsigned) 8-bit value (i.e.  a value from -128 to 255 inclusive).
@@ -4129,26 +4134,26 @@ Node: Section 3.1350111
 Node: Section 3.1450364
 Node: Section 3.1551760
 Node: Section 3.1654270
-Node: Section 3.1759169
-Node: Section 3.1862451
-Node: Section 3.1962742
-Node: Section 3.2072654
-Node: Section 3.2172926
-Node: Section 3.2279504
-Node: Section 3.2381955
-Node: Section 3.2482624
-Node: Section 3.2596186
-Node: Section 3.2697126
-Node: Section 3.27100230
-Node: Section 3.28102219
-Node: Chapter 4106597
-Node: Chapter 5108345
-Node: Chapter 6109474
-Node: Section 6.1109893
-Node: Section 6.2110580
-Node: Chapter 7111411
-Node: Section 7.1111914
-Node: Section 7.2137224
+Node: Section 3.1759323
+Node: Section 3.1862605
+Node: Section 3.1962896
+Node: Section 3.2072808
+Node: Section 3.2173080
+Node: Section 3.2279658
+Node: Section 3.2382109
+Node: Section 3.2482778
+Node: Section 3.2596340
+Node: Section 3.2697280
+Node: Section 3.27100384
+Node: Section 3.28102373
+Node: Chapter 4106751
+Node: Chapter 5108499
+Node: Chapter 6109628
+Node: Section 6.1110047
+Node: Section 6.2110734
+Node: Chapter 7111565
+Node: Section 7.1112068
+Node: Section 7.2137378
 
 End Tag Table
 

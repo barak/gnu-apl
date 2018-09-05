@@ -32,7 +32,7 @@ DUMPED ³
       ⍝ close this file again (which is an error)
       ⍝
       FIO∆fclose Handle
-DOMAIN ERROR
+DOMAIN ERROR+
 FIO∆fclose[2]  Ze←⎕FIO[4]Bh
                   ^      ^
       →
