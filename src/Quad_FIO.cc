@@ -1531,6 +1531,7 @@ const APL_Integer function_number = X->get_ravel(0).get_near_int();
 
                 Value_P Z(len, LOC);
                 loop(z, len)   new (Z->next_ravel()) IntCell(buffer[z] & 0xFF);
+                Z->set_default_Int();
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
               }
@@ -2260,7 +2261,7 @@ const int function_number = X->get_ravel(0).get_near_int();
                 if (bytes > sizeof(small_buffer))
                    buffer = del = new char[bytes];
 
-                loop(z, bytes)   buffer[z] = A->get_ravel(z).get_near_int();
+                loop(z, bytes)   buffer[z] = A->get_ravel(z).get_byte_value();
 
                 errno = 0;
                 const ssize_t len = write(fd, buffer, bytes);

@@ -143,6 +143,8 @@ ValueStackItem & vs = value_stack.last();
              if (monitor_callback)   monitor_callback(*this, SEV_ASSIGNED);
              return;
 
+        case NC_LABEL:
+             MORE_ERROR() << "attempt to assign a value to label " << get_name();
         case NC_VARIABLE:
              if (vs.apl_val == new_value)   return;   // X←X
 
