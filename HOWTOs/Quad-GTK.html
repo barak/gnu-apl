@@ -1831,6 +1831,11 @@ changed
 draw
 </p>
 </li>
+<li>
+<p>
+destroy
+</p>
+</li>
 </ul></div>
 </li>
 <li>
@@ -2475,7 +2480,7 @@ Valid font names are system-specific, but at least the generic names used in
 <div class="sectionbody">
 <div class="sect2">
 <h3 id="_the_gtk_cheat_sheet">The ⎕GTK Cheat Sheet</h3>
-<div class="paragraph"><p>In the table below, it is assumed that:</p></div>
+<div class="paragraph"><p>In dwhe Table 2 below, it is assumed that:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre>
@@ -2533,7 +2538,7 @@ cellspacing="0" cellpadding="4">
 <tr>
 <td align="left" valign="top"><p class="table">Zi←    ⎕GTK 2</p></td>
 <td align="center" valign="top"><p class="table">2</p></td>
-<td align="left" valign="top"><p class="table">non-blocking poll for the next event</p></td>
+<td align="left" valign="top"><p class="table">non-blocking poll for the next event (Zi≡0 means: no event)</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table">Zi←Ah  ⎕GTK 3</p></td>
@@ -2620,6 +2625,38 @@ cellspacing="0" cellpadding="4">
 </tbody>
 </table>
 </div>
+<div class="paragraph"><p><strong>⎕GTK 1</strong> and <strong>⎕GTK 2</strong> return events according to Table 3 below. The elements
+of the events have the following meaning:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Gi (integer): the handle (= Gtk_server instance) on which the event was
+  received (the handle was returned by <strong>⎕GTK "file.ui"</strong>).
+</p>
+</li>
+<li>
+<p>
+Ns (string): the widget property <strong>Widget Name</strong> if given in glade tab
+  <strong>Common</strong>, or <strong>""</strong> if not.
+</p>
+</li>
+<li>
+<p>
+Es (string): The event (callback name)
+</p>
+</li>
+<li>
+<p>
+Is (string): The ID of the widget that has sent the event (in glade tab
+  <strong>General</strong>)
+</p>
+</li>
+<li>
+<p>
+Cs (string): The Gtk class of the widget that has sent the event
+</p>
+</li>
+</ul></div>
 <div class="tableblock" id="Tag_table3">
 <table rules="all"
 width="100%"
@@ -2643,25 +2680,31 @@ cellspacing="0" cellpadding="4">
 <td align="left" valign="top"><p class="table"><code><strong>clicked</strong></code></p></td>
 <td align="center" valign="top"><p class="table">1</p></td>
 <td align="left" valign="top"><p class="table">Gi, Ns, Es, Is, Cs</p></td>
-<td align="left" valign="top"><p class="table"><code>6</code>  <code>'OK-button1'</code>  <code>'GtkButton'</code>  <code>'clicked'</code>  <code>'button'</code></p></td>
+<td align="left" valign="top"><p class="table"><code>6</code>  <code>'OK-button'</code>  <code>'clicked'</code>  <code>'button1'</code>  <code>'GtkButton'</code></p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table"><code><strong>activate</strong></code></p></td>
 <td align="center" valign="top"><p class="table">1</p></td>
 <td align="left" valign="top"><p class="table">Gi, Ns, Es, Is, Cs</p></td>
-<td align="left" valign="top"><p class="table"><code>6</code>  <code>'Text-entry1'</code>  <code>'GtkEntry'</code>  <code>'activate'</code>  <code>'entry'</code></p></td>
+<td align="left" valign="top"><p class="table"><code>6</code>  <code>'Text-entry'</code>  <code>'activate'</code>  <code>'entry1'</code>  <code>'GtkEntry'</code></p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table"><code><strong>changed</strong></code></p></td>
 <td align="center" valign="top"><p class="table">1</p></td>
 <td align="left" valign="top"><p class="table">Gi, Ns, Es, Is, Cs</p></td>
-<td align="left" valign="top"><p class="table"><code>6</code>  <code>'Select-box1'</code>  <code>'GtkComboBox'</code>  <code>'changed'</code>  <code>'combobox'</code></p></td>
+<td align="left" valign="top"><p class="table"><code>6</code>  <code>'Select-box'</code>  <code>'changed'</code>  <code>'combobox1'</code>  <code>'GtkComboBox'</code></p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table"><code><strong>draw</strong></code></p></td>
 <td align="center" valign="top"><p class="table">1</p></td>
 <td align="left" valign="top"><p class="table">Gi, Ns, Es, Is, Cs</p></td>
-<td align="left" valign="top"><p class="table"><code>6</code>  <code>'Canvas1'</code>  <code>'GtkDrawingArea'</code>  <code>'draw'</code>  <code>'drawingarea'</code></p></td>
+<td align="left" valign="top"><p class="table"><code>6</code>  <code>'Canvas'</code>  <code>'draw'</code>  <code>'drawingarea1'</code>  <code>'GtkDrawingArea'</code></p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table"><code><strong>destroy</strong></code></p></td>
+<td align="center" valign="top"><p class="table">1</p></td>
+<td align="left" valign="top"><p class="table">Gi, Ns, Es, Is, Cs</p></td>
+<td align="left" valign="top"><p class="table"><code>6</code>  <code>'Main-Window'</code>  <code>'destroy'</code>  <code>'window1'</code>  <code>'GtkWindow'</code></p></td>
 </tr>
 </tbody>
 </table>
@@ -2776,7 +2819,7 @@ top-level group).</p></div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2018-08-25 19:36:57 CEST
+Last updated 2018-09-07 18:16:59 CEST
 </div>
 </div>
 </body>

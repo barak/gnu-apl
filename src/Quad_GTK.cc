@@ -19,6 +19,8 @@
 */
 
 #include <errno.h>
+#include <fcntl.h>
+#include <poll.h>
 #include <sys/ioctl.h>
 
 #include "../config.h"
@@ -41,8 +43,8 @@ Quad_GTK::eval_AB(Value_P A, Value_P B)
       {
          const UCS_string css_filename = A->get_UCS_ravel();
          const UCS_string gui_filename = B->get_UCS_ravel();
-         const int handle = open_window(gui_filename, &css_filename);
-         return Token(TOK_APL_VALUE1, IntScalar(handle, LOC));
+         const int fd = open_window(gui_filename, &css_filename);
+         return Token(TOK_APL_VALUE1, IntScalar(fd, LOC));
       }
 
    if (!B->is_int_scalar())
@@ -53,17 +55,17 @@ Quad_GTK::eval_AB(Value_P A, Value_P B)
       }
 
 const int function = B->get_ravel(0).get_int_value();
-int handle = -1;
+int fd = -1;
    switch(function)
       {
         case 0: // close window/GUI
-             if (!A->is_int_scalar())   goto bad_handle;
-             handle = A->get_ravel(0).get_int_value();
-             return Token(TOK_APL_VALUE1, close_window(handle));
+             if (!A->is_int_scalar())   goto bad_fd;
+             fd = A->get_ravel(0).get_int_value();
+             return Token(TOK_APL_VALUE1, close_window(fd));
 
         case 3: // increase verbosity
-             if (!A->is_int_scalar())   goto bad_handle;
-             if (write_TL0(handle, 7))
+             if (!A->is_int_scalar())   goto bad_fd;
+             if (write_TL0(fd, 7))
                 {
                   CERR << "write( Tag 7) failed in Ah ⎕GTK 3";
                   return Token(TOK_APL_VALUE1, IntScalar(-3, LOC));
@@ -71,8 +73,8 @@ int handle = -1;
              return Token(TOK_APL_VALUE1, IntScalar(0, LOC));
 
         case 4: // decrease verbosity
-             if (!A->is_int_scalar())   goto bad_handle;
-             if (write_TL0(handle, 8))
+             if (!A->is_int_scalar())   goto bad_fd;
+             if (write_TL0(fd, 8))
                 {
                   CERR << "write( Tag 8) failed in Ah ⎕GTK 3";
                   return Token(TOK_APL_VALUE1, IntScalar(-4, LOC));
@@ -87,7 +89,7 @@ int handle = -1;
    MORE_ERROR() << "Unexpected A or B in A ⎕GTK B";
    DOMAIN_ERROR;
 
-bad_handle:
+bad_fd:
    MORE_ERROR() << "Ah ⎕GTK " << function
                 << " expects a handle (i.e. an integer scalar) Ah";
    DOMAIN_ERROR;
@@ -100,8 +102,8 @@ Quad_GTK::eval_B(Value_P B)
    if (B->is_char_array())
       {
          const UCS_string gui_filename = B->get_UCS_ravel();
-         const int handle = open_window(gui_filename, /* no CSS */ 0);
-         return Token(TOK_APL_VALUE1, IntScalar(handle, LOC));
+         const int fd = open_window(gui_filename, /* no CSS */ 0);
+         return Token(TOK_APL_VALUE1, IntScalar(fd, LOC));
       }
 
    if (!B->is_int_scalar())
@@ -114,7 +116,7 @@ Quad_GTK::eval_B(Value_P B)
 const int function = B->get_ravel(0).get_int_value();
    switch(function)
       {
-        case 0:   // list of open handles
+        case 0:   // list of open fds
              return Token(TOK_APL_VALUE1, window_list());
 
         case 1: // blocking poll for next event
@@ -138,7 +140,7 @@ const int function = B->get_ravel(0).get_int_value();
                 }
 
              {
-               UCS_string HWF = event_queue[0];   // handle, widget : fun
+               UCS_string HWF = event_queue[0];   // fd, widget : fun
                event_queue.erase(0);
 
                // split (Unicode)Handle,"widget:function"
@@ -186,8 +188,8 @@ Quad_GTK::eval_AXB(Value_P A, Value_P X, Value_P B)
    if (B->get_rank() > 1)   RANK_ERROR;
 
 UTF8_string window_id;                // e.g. "entry1"
-const int handle = resolve_window(X.get(), window_id);
-   write_TLV(handle, 6, window_id);   // select wodget
+const int fd = resolve_window(X.get(), window_id);
+   write_TLV(fd, 6, window_id);   // select wodget
 
 int fun = FNUM_INVALID;
    if (B->is_int_scalar())         fun = B->get_ravel(0).get_int_value();
@@ -206,7 +208,7 @@ Gtype Atype = gtype_V;
    switch(fun)
       {
          case FNUM_INVALID: DOMAIN_ERROR;
-         case FNUM_0:   return Token(TOK_APL_VALUE1, IntScalar(handle, LOC));
+         case FNUM_0:   return Token(TOK_APL_VALUE1, IntScalar(fd, LOC));
 
 #define gtk_event_def(ev_ename, ...)
 #define gtk_fun_def(glade_ID, gtk_class, gtk_function, _ZAname,_Z, A,_help) \
@@ -255,8 +257,8 @@ UCS_string ucs_A;
         ucs_A = UCS_string(*A);
       }
 UTF8_string utf_A(ucs_A);
-   write_TLV(handle, command_tag, utf_A);
-   return Token(TOK_APL_VALUE1, poll_handle(handle, response_tag));
+   write_TLV(fd, command_tag, utf_A);
+   return Token(TOK_APL_VALUE1, poll_response(fd, response_tag));
 }
 //-----------------------------------------------------------------------------
 Token
@@ -265,8 +267,8 @@ Quad_GTK::eval_XB(Value_P X, Value_P B)
    if (B->get_rank() > 1)   RANK_ERROR;
 
 UTF8_string window_id;                // e.g. "entry1"
-const int handle = resolve_window(X.get(), window_id);
-   write_TLV(handle, 6, window_id);   // select wodget
+const int fd = resolve_window(X.get(), window_id);
+   write_TLV(fd, 6, window_id);   // select wodget
 
 int fun = FNUM_INVALID;
    if (B->is_int_scalar())         fun = B->get_ravel(0).get_int_value();
@@ -280,8 +282,8 @@ Gtype Atype = gtype_V;
    switch(fun)
       {
         case 0:
-           write_TLV(handle, 4, window_id);
-           return Token(TOK_APL_VALUE1, IntScalar(handle, LOC));
+           write_TLV(fd, 4, window_id);
+           return Token(TOK_APL_VALUE1, IntScalar(fd, LOC));
 
 #define gtk_event_def(ev_ename, ...)
 #define gtk_fun_def(glade_ID, gtk_class, gtk_function, _ZAname, _Z, A, _help) \
@@ -295,104 +297,142 @@ Gtype Atype = gtype_V;
 
    if (Atype != gtype_V)   VALENCE_ERROR;
 
-   write_TL0(handle, command_tag);   // command
-   return Token(TOK_APL_VALUE1, poll_handle(handle, response_tag));
+   write_TL0(fd, command_tag);   // command
+   return Token(TOK_APL_VALUE1, poll_response(fd, response_tag));
 }
 //-----------------------------------------------------------------------------
 Value_P
-Quad_GTK::poll_handle(int handle, int tag)
+Quad_GTK::read_fd(int fd, int tag)
 {
    // tag == -1 indicates a poll for ANY tag (= an event as opposed to a
    // command response). In that case the poll is non-blocking.
+
+char TLV[1000];
+
+const ssize_t rx_len = read(fd, TLV, sizeof(TLV));
+
+   if (rx_len < 8)
+      {
+        MORE_ERROR() << "read() failed in Quad_GTK::read_fd(): "
+                     << strerror(errno);
+        DOMAIN_ERROR;
+      }
+
+const int TLV_tag = (TLV[0] & 0xFF) << 24 | (TLV[1] & 0xFF) << 16
+                  | (TLV[2] & 0xFF) <<  8 | (TLV[3] & 0xFF);
+
+
+const int V_len = (TLV[4] & 0xFF) << 24 | (TLV[5] & 0xFF) << 16
+                | (TLV[6] & 0xFF) <<  8 | (TLV[7] & 0xFF);
+
+   Assert(rx_len == (V_len + 8));
+
+char * V = TLV + 8;
+   V[V_len] = 0;
+
+   // 1. check for events from generic_callback()
    //
+   if (TLV_tag == Event_widget_fun ||            // "H:button1:clicked"
+       TLV_tag == Event_widget_fun_id_class ||   // dito + :id:class
+       TLV_tag == Event_toplevel_window_done)
+      {
+        // V is a string of the form H%s:%s:%s:% where H is a placeholder
+        // for the fd over which we have received V.
+        //
+        // replace H by the actual fd and store the result in event_queue.
+        //
+        UTF8_string data_utf;   // H:widget:callback
+        loop(v, V_len)   data_utf.append(V[v]);
+        UCS_string data_ucs(data_utf);
+        data_ucs[0] = (static_cast<Unicode>(fd));
 
-   for (;;)
-       {
-         char TLV[1000];
-         int bytes_available = 0;
-         ioctl(handle, FIONREAD, &bytes_available);
-         if (bytes_available < 8)   // no TLV yet
-            {
-              usleep(50000);
-              if (tag == -1)   return Value_P();
-              continue;
-            }
+        event_queue.append(data_ucs);
 
-         const ssize_t rx_len = read(handle, TLV, sizeof(TLV));
+        return Value_P();   // i.e. NULL
+      }
 
-         if (rx_len < 8)
-            {
-              MORE_ERROR() << "read() failed in Quad_GTK::poll_handle(): "
-                           << strerror(errno);
-              DOMAIN_ERROR;
-            }
+   if (tag == -1)   // not waiting for a specific tag
+      {
+        CERR << "*** ⎕GTK: ignoring event: " << V << endl;
+        return Value_P();   // i.e. NULL
+      }
 
-         const int TLV_tag = (TLV[0] & 0xFF) << 24 | (TLV[1] & 0xFF) << 16
-                           | (TLV[2] & 0xFF) <<  8 | (TLV[3] & 0xFF);
+   if (TLV_tag != tag)
+      {
+        CERR << "Got unexpected tag " << TLV_tag
+             << " when waiting for response " << tag << endl;
+        return Value_P();
+      }
 
+   // TLV_tag is the expected one. Strip off the response offset
+   // Response_0 (= 2000) from the TLV_tag to get the function number
+   // and return APL vector function,"result-value"
+   //
+UTF8_string utf;
+   loop(u, V_len)   utf.append(V[u]);
+   UCS_string ucs(utf);
 
-         const int V_len = (TLV[4] & 0xFF) << 24 | (TLV[5] & 0xFF) << 16
-                         | (TLV[6] & 0xFF) <<  8 | (TLV[7] & 0xFF);
-
-         Assert(rx_len == (V_len + 8));
-
-         const char * V = TLV + 8;;
-
-         if (TLV_tag == Event_widget_fun ||          // "H:button1:clicked"
-             TLV_tag == Event_widget_fun_id_class)   // dito + :id:class
-                                                     //
-            {
-              UTF8_string data_utf;   // H:widget:callback
-              loop(v, V_len)   data_utf.append(V[v]);
-              UCS_string data_ucs(data_utf);
-              data_ucs[0] = (static_cast<Unicode>(handle));
-
-              event_queue.append(data_ucs);
-
-              if (tag == -1)   // not waiting for a specific tag
-                   return Value_P();   // i.e. NULL
-              continue;
-            }
-
-         if (tag == -1)   // not waiting for a specific tag
-            return Value_P();   // i.e. NULL
-
-         if (TLV_tag != tag)
-            {
-               CERR << "Got unexpected tag " << TLV_tag
-                    << " when waiting for response " << tag << endl;
-               continue;
-            }
-
-         // TLV_tag is the expected one. Strip off the response offset
-         // Response_0 (= 2000) from the TLV_tag to get the function number
-         // and return APL vector function,"result-value"
-         //
-          UTF8_string utf;
-          loop(u, V_len)   utf.append(V[u]);
-          UCS_string ucs(utf);
-
-          Value_P Z(1 + ucs.size(), LOC);
-          new (Z->next_ravel())   IntCell(TLV_tag - Response_0);
-          loop(u, ucs.size())   new (Z->next_ravel())   CharCell(ucs[u]);
-          Z->check_value(LOC);
-          return  Z;
-       }
+Value_P Z(1 + ucs.size(), LOC);
+   new (Z->next_ravel())   IntCell(TLV_tag - Response_0);
+   loop(u, ucs.size())   new (Z->next_ravel())   CharCell(ucs[u]);
+   Z->check_value(LOC);
+   return  Z;
 }
 //-----------------------------------------------------------------------------
 void
 Quad_GTK::poll_all()
 {
-   for (;;)
+const int count = open_windows.size();
+pollfd fds[count];
+   loop(w, count)
        {
-          const ShapeItem events_before = event_queue.size();
-
-          for (int w = 0; w < open_windows.size(); ++w)
-              poll_handle(open_windows[w].handle, -1);
-
-          const ShapeItem events_after = event_queue.size();
-          if (events_before == events_after)   break;   // no new events
+         fds[w].fd = open_windows[w].fd;
+         fds[w].events = POLLIN | POLLRDHUP;
+         fds[w].revents = 0;
        }
+
+const int ready = poll(fds, count, 0);
+   if (ready == 0)   return;
+   if (ready > 0)
+      {
+        loop(w, count)
+            {
+              if (fds[w].revents)   read_fd(fds[w].fd, -1);
+             }
+      }
+   else
+      {
+        if (errno == EINTR)   return;   // user hits ^C
+        CERR << "*** poll() failed: " << strerror(errno) << endl;
+      }
+}
+//-----------------------------------------------------------------------------
+Value_P
+Quad_GTK::poll_response(int fd, int tag)
+{
+again:
+
+pollfd pfd;
+   pfd.fd = fd;
+   pfd.events = POLLIN | POLLRDHUP;
+   pfd.revents = 0;
+
+const int ready = poll(&pfd, 1, 0);
+   if (ready == 0)
+      {
+        usleep(100000);
+        goto again;
+      }
+
+   if (ready > 0 && pfd.revents)
+      {
+        Value_P Z = read_fd(fd, tag);
+        if (!Z)   goto again;
+        return Z;
+      }
+
+   CERR << "*** poll() failed" << endl;
+   DOMAIN_ERROR;
 }
 //-----------------------------------------------------------------------------
 Value_P
@@ -401,8 +441,8 @@ Quad_GTK::window_list() const
 Value_P Z(open_windows.size(), LOC);
    loop(w, open_windows.size())
       {
-        const APL_Integer handle = open_windows[w].handle;
-        new (Z->next_ravel()) IntCell(handle);
+        const APL_Integer fd = open_windows[w].fd;
+        new (Z->next_ravel()) IntCell(fd);
       }
 
    Z->set_default_Int();
@@ -414,14 +454,14 @@ int
 Quad_GTK::resolve_window(const Value * X, UTF8_string & window_id)
 {
    if (X->get_rank() > 1)   RANK_ERROR;
-const int handle = X->get_ravel(0).get_int_value();
+const int fd = X->get_ravel(0).get_int_value();
 
    // verify that ↑X is an open window...
    //
 bool window_valid = false;
    loop(w, open_windows.size())
        {
-         if (handle == open_windows[w].handle)
+         if (fd == open_windows[w].fd)
             {
               window_valid = true;
               break;
@@ -430,7 +470,7 @@ bool window_valid = false;
 
    if (!window_valid)
       {
-         MORE_ERROR() << "Invalid window " << handle
+         MORE_ERROR() << "Invalid window " << fd
                       << " in Quad_GTK::resolve_window()";
          DOMAIN_ERROR;
       }
@@ -440,7 +480,7 @@ bool window_valid = false;
          if (i)   window_id.append(X->get_ravel(i).get_char_value());
        }
 
-   return handle;
+   return fd;
 }
 //-----------------------------------------------------------------------------
 Quad_GTK::Fnum
@@ -475,34 +515,34 @@ const char * fun_name = utf_B.c_str();
 void
 Quad_GTK::clear()
 {
-   loop(w, open_windows.size())   close_window(open_windows[w].handle);
+   loop(w, open_windows.size())   close_window(open_windows[w].fd);
 }
 //-----------------------------------------------------------------------------
 Value_P
-Quad_GTK::close_window(int handle)
+Quad_GTK::close_window(int fd)
 {
    loop(w, open_windows.size())
       {
         window_entry & we = open_windows[w];
-        if (handle == we.handle)
+        if (fd == we.fd)
            {
              we = open_windows.last();
              open_windows.pop();
-             if (write_TL0(handle, 5))
+             if (write_TL0(fd, 5))
                 {
                   CERR << "write(close Tag) failed in ⎕GTK::close_window()";
                 }
-             const int err = Quad_FIO::fun->close_handle(handle);
+             const int err = Quad_FIO::fun->close_handle(fd);
              return IntScalar(err, LOC);
            }
       }
 
-   MORE_ERROR() << "Invalid ⎕GTK handle " << handle;
+   MORE_ERROR() << "Invalid ⎕GTK handle " << fd;
    DOMAIN_ERROR;
 }
 //-----------------------------------------------------------------------------
 int
-Quad_GTK::write_TL0(int handle, int tag)
+Quad_GTK::write_TL0(int fd, int tag)
 {
 unsigned char TLV[8];
    memset(TLV, 0, 8);
@@ -511,7 +551,7 @@ unsigned char TLV[8];
    TLV[2] = tag >> 8;
    TLV[3] = tag;
 
-    if (write(handle, TLV, 8) != 8)
+    if (write(fd, TLV, 8) != 8)
        {
          CERR << "write(Tag = " << tag << ") failed in ⎕GTK::write_TL0()";
          return -1;
@@ -521,7 +561,7 @@ unsigned char TLV[8];
 }
 //-----------------------------------------------------------------------------
 int
-Quad_GTK::write_TLV(int handle, int tag, const UTF8_string & value)
+Quad_GTK::write_TLV(int fd, int tag, const UTF8_string & value)
 {
 const int TLV_len = 8 + value.size();
 unsigned char TLV[TLV_len];
@@ -535,7 +575,7 @@ unsigned char TLV[TLV_len];
    TLV[7] = value.size();
    loop(s, value.size())   TLV[8 + s] = value[s];
 
-    if (write(handle, TLV, TLV_len) != TLV_len)
+    if (write(fd, TLV, TLV_len) != TLV_len)
        {
          CERR << "write(Tag = " << tag << ") failed in ⎕GTK::write_TLV()";
          return -1;
@@ -571,7 +611,7 @@ const char * path = 0;
         DOMAIN_ERROR;
       }
 
-const int handle = Quad_FIO::fun->do_FIO_57(path);
+const int fd = Quad_FIO::fun->do_FIO_57(path);
 
    // write TLVs 1 and 3 or 1, 2, and 3 to Gtk_server...
    //
@@ -582,10 +622,10 @@ UTF8_string gui_utf8(gui_filename);
    path1[3] = 1;   // tag = 1: gui filename
    path1[6] = gui_utf8.size() >> 8;
    path1[7] = gui_utf8.size() & 0xFF;
-   slen = write(handle, path1, 8 + gui_utf8.size());
+   slen = write(fd, path1, 8 + gui_utf8.size());
    if (slen == -1)
       {
-         Quad_FIO::fun->close_handle(handle);
+         Quad_FIO::fun->close_handle(fd);
          MORE_ERROR() << "write(Tag 1) failed in ⎕GTK";
          DOMAIN_ERROR;
       }
@@ -598,25 +638,25 @@ UTF8_string gui_utf8(gui_filename);
         path2[3] = 2;   // tag = 2: css filename
         path2[6] = css_utf8.size() >> 8;
         path2[7] = css_utf8.size() & 0xFF;
-        slen = write(handle, path2, 8 + css_utf8.size());
+        slen = write(fd, path2, 8 + css_utf8.size());
         if (slen == -1)
            {
-              Quad_FIO::fun->close_handle(handle);
+              Quad_FIO::fun->close_handle(fd);
               MORE_ERROR() << "write(Tag 2) failed in ⎕GTK";
               DOMAIN_ERROR;
            }
       }
 
-   if (write_TL0(handle, 3))
+   if (write_TL0(fd, 3))
       {
-         Quad_FIO::fun->close_handle(handle);
+         Quad_FIO::fun->close_handle(fd);
          MORE_ERROR() << "write(Tag 3) failed in ⎕GTK";
          DOMAIN_ERROR;
       }
 
-window_entry we = { handle };
+window_entry we = { fd };
    open_windows.append(we);
-   return handle;
+   return fd;
 }
 //-----------------------------------------------------------------------------
 

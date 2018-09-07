@@ -1013,6 +1013,20 @@ Quad_FIO::eval_LXB(Token & LO, Value_P X, Value_P B)
 {
    CHECK_SECURITY(disable_Quad_FIO);
 
+   /* a common "mistake" is to suppress the printout of ⎕FIO by e.g.
+
+      ⊣⎕FIO[X} B
+
+      which lands here instead of eval_XB. We "fix" that mistake...
+    */
+   if (LO.get_tag() == TOK_F2_LEFT)
+      {
+        Token result = eval_XB(X, B);
+        if (result.get_tag() == TOK_APL_VALUE1)
+           result.ChangeTag(TOK_APL_VALUE2);
+         return result;
+      }
+
 const ShapeItem function_number = X->get_ravel(0).get_int_value();
    switch (function_number)
       {

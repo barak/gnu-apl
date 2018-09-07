@@ -55,7 +55,7 @@ protected:
 
    struct window_entry
       {
-        int handle;
+        int fd;
       };
 
    /// overloaded Function::eval_AB()
@@ -78,24 +78,32 @@ protected:
    Fnum resolve_fun_name(UTF8_string & window_id, const Value * B);
 
    /// write a TLV with an empty V (thus L=0)
-   int write_TL0(int handle, int tag);
+   int write_TL0(int fd, int tag);
 
    /// write a TLV
-   int write_TLV(int handle, int tag, const UTF8_string & value);
+   int write_TLV(int fd, int tag, const UTF8_string & value);
 
 
    int open_window(const UCS_string & gui_filename,
                    const UCS_string * css_filename);
 
    Value_P window_list() const;
-   Value_P close_window(int handle);
 
-   // wait for a response-TLV (or any TLV if tag == -1)
-   Value_P poll_handle(int handle, int tag);
+   Value_P close_window(int fd);
 
-   // poll all handles and insert events into \b event_queue until no more
-   // events are pending
+   /// poll all fds and insert events into \b event_queue until no more
+   /// events are pending
    void poll_all();
+
+   /// poll for a TLV on fd with a specific (reponse-) tag
+   Value_P poll_response(int fd, int tag);
+
+   /** read a TLV with a given tag (or any TLV if tag == -1) on a fd
+       that is ready for reading. If the TLV is an event (i.e. unexpected)
+       then insert it into event_queue and return 0; otherwise the TLV
+       is a response that is returned.
+    **/
+   Value_P read_fd(int fd, int tag);
 
    Simple_string<window_entry, false> open_windows;
 

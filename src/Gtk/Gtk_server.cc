@@ -30,6 +30,7 @@
 #include <unistd.h>
 #include <sys/ioctl.h>
 #include <sys/stat.h>
+#include <sys/socket.h>
 #include <gtk/gtk.h>
 #include <unistd.h>
 
@@ -40,7 +41,7 @@
 
 using namespace std;
 
-static int verbosity = 0;
+static int verbosity = 2;
 static bool verbose__calls     = false;
 static bool verbose__draw_data = false;
 static bool verbose__do_draw   = false;
@@ -148,9 +149,14 @@ init_id_db(const char * filename)
 FILE * f = fopen(filename, "r");
    if (f == 0)   return true;   // error
 
-char class_buf[100]       = { 0 };
-char id_buf[100]          = { 0 };
-char widget_name_buf[100] = { 0 };
+enum { MAX_level = 10 };
+char class_buf      [100*MAX_level];
+   memset(class_buf, 0, sizeof(class_buf));
+char id_buf[100*MAX_level];
+   memset(id_buf, 0, sizeof(id_buf));
+char widget_name_buf[100*MAX_level];
+   memset(widget_name_buf, 0, sizeof(widget_name_buf));
+int level = -1;
 char line[200];
 
    for (;;)
@@ -159,29 +165,32 @@ char line[200];
          line[sizeof(line) - 1] = 0;
          if (s == 0)   break;
 
-         if (2 == sscanf(line, " <object class=\"%s id=\"%s>",
-                                         class_buf, id_buf))
+         while (*s == ' ')   ++s;
+         if (!strncmp(s, "<object", 7))   ++level;
+
+         char * cb = class_buf       + 100*level;
+         char * ib = id_buf          + 100*level;
+         char * wb = widget_name_buf + 100*level;
+         if (2 == sscanf(line, " <object class=\"%s id=\"%s>", cb, ib))
             {
-              if (char * qu = strchr(class_buf, '"'))   *qu = 0;
-              if (char * qu = strchr(id_buf, '"'))      *qu = 0;
+              if (char * qu = strchr(cb, '"'))   *qu = 0;
+              if (char * qu = strchr(ib, '"'))   *qu = 0;
 
               if (top_level_widget == 0)
                  {
-                    top_level_widget = strdup(id_buf);
+                    top_level_widget = strdup(ib);
                     verbosity > 1 && cerr << "Top-level widget: "
                                           << top_level_widget << endl;
                  }
 
-              verbosity > 1 && cerr << "See class='" << class_buf <<
-                 "' and id='" << id_buf << "'" << endl;
+              verbosity > 1 && cerr <<
+                 "See class='" << cb << "' and id='"  << ib << "'" << endl;
             }
-         else if (1 == sscanf(line, " <property name=\"name\">%s",
-                                                widget_name_buf))
+         else if (1 == sscanf(line, " <property name=\"name\">%s", wb))
             {
-              if (char * ob = strchr(widget_name_buf, '<'))   *ob = 0;
+              if (char * ob = strchr(wb, '<'))   *ob = 0;
 
-              verbosity > 1 && cerr << "See widget name='"
-                                    << widget_name_buf << endl;
+              verbosity > 1 && cerr << "See widget name='" << wb << endl;
             }
          else if (strstr(line, "</object"))
             {
@@ -190,17 +199,17 @@ char line[200];
                                     << id_buf << " widget-name="
                                     << widget_name_buf << endl;
 
-              if (*class_buf || *id_buf || *widget_name_buf )
+              if (*cb || *ib || *wb )
                  {
-                   _ID_DB * new_db = new _ID_DB(class_buf, id_buf,
-                                                widget_name_buf, id_db);
+                   _ID_DB * new_db = new _ID_DB(cb, ib, wb, id_db);
                     id_db = new_db;
                     verbosity > 1 && cerr << endl;
                  }
 
-              *class_buf = 0;
-              *id_buf = 0;
-              *widget_name_buf = 0;
+              *cb = 0;
+              *ib = 0;
+              *wb = 0;
+              --level;
             }
          else if (strstr(line, " <property name=\"name\""))   // name= property
             {
@@ -448,10 +457,10 @@ const char * end = sig + strlen(sig);
         {
           cout << " +";
           if      (!strncmp(s, "Gi", 2))   cout << "6";
-          else if (!strncmp(s, "Ns", 2))   cout << "\\'" << wid_name << "1\\'";
-          else if (!strncmp(s, "Is", 2))   cout << "\\'" << ev_name << "'";
-          else if (!strncmp(s, "Cs", 2))   cout << "\\'" << wid_id << "'";
-          else if (!strncmp(s, "Es", 2))   cout << "\\'" << wid_class << "'";
+          else if (!strncmp(s, "Ns", 2))   cout << "\\'" << wid_name << "'";
+          else if (!strncmp(s, "Is", 2))   cout << "\\'" << wid_id << "1\\'";
+          else if (!strncmp(s, "Cs", 2))   cout << "\\'" << wid_class << "'";
+          else if (!strncmp(s, "Es", 2))   cout << "\\'" << ev_name << "'";
           else assert(0 && "Bad signature");
           cout << "+ ";
         }
@@ -502,6 +511,7 @@ char TLV[TLV_len + 1];
         cerr << endl;
       }
 
+   errno = 0;
    if (TLV_len != write(3, TLV, TLV_len))
       {
         cerr << "Gtk_server: write(tag " << tag << " failed: "
@@ -583,23 +593,9 @@ bool do_ev2 = false;
              }
        }
 
-   if (do_funs)
-      {
-        print_funs();
-        return 0;
-      }
-
-   if (do_ev1)
-      {
-        print_evs(1);
-        return 0;
-      }
-
-   if (do_ev2)
-      {
-        print_evs(2);
-        return 0;
-      }
+   if (do_funs)   { print_funs(); return 0; }
+   if (do_ev1)    { print_evs(1); return 0; }
+   if (do_ev2)    { print_evs(2); return 0; }
 
 const int flags = fcntl(3, F_GETFD);
    if (flags == -1)
@@ -619,18 +615,46 @@ const int flags = fcntl(3, F_GETFD);
   setenv("DISPLAY", ":0", true);
   gtk_init(&argc, &argv);
 
-enum { TLV_socket = 3 };
-char TLV[66000];       // the entire TLV buffer
-char * V = TLV + 8;   // the value part of the TLV buffer
+enum { TLV_socket     = 3,
+       initial_buflen = 10000
+     };
+
+   // start with a buffer of 10k and extend it as needed
+   //
+unsigned int TLV_buflen = initial_buflen;
+char * TLV = new char[TLV_buflen];   // the entire TLV buffer
+   assert(TLV);
+char * V = TLV + 8;                  // the V part of the TLV buffer
 
    for (;;)
        {
-          // read the fixed size TL
-          //
-          const ssize_t rx_len = read(3, TLV, sizeof(TLV));
+          // expand buffer if needed
+          {
+            const ssize_t len = recv(3, TLV, 8, MSG_PEEK);
+            if (len != 8)
+               {
+                 cerr << "TLV socked closed (1): " << strerror(errno) << endl;
+                 close(3);
+                 return 0;
+               }
+
+            const int V_len = (TLV[4] & 0xFF) << 24 | (TLV[5] & 0xFF) << 16
+                            | (TLV[6] & 0xFF) << 8 | (TLV[7] & 0xFF);
+
+            if ((V_len + 8) > TLV_buflen)   // re-allocate a larger buffer
+               {
+                 delete [] TLV;
+                 TLV_buflen = V_len + 8;
+                 TLV = new char[TLV_buflen];
+                 assert(TLV);
+                 V = TLV + 8;
+               }
+          }
+
+          const ssize_t rx_len = read(3, TLV, TLV_buflen);
           if (rx_len < 8)
              {
-               cerr << "TLV socked closed (1): " << strerror(errno) << endl;
+               cerr << "TLV socked closed (2): " << strerror(errno) << endl;
                close(3);
                return 0;
              }
@@ -647,7 +671,7 @@ char * V = TLV + 8;   // the value part of the TLV buffer
 
           if (rx_len != V_len + 8)
              {
-               cerr << "TLV socked closed (2): "
+               cerr << "TLV socked closed (3): "
                     << strerror(errno) << ": V_len=" << V_len
                                        << " rx_len=" << rx_len << endl;
                close(3);
@@ -699,6 +723,7 @@ char * V = TLV + 8;   // the value part of the TLV buffer
           break;
        }
 
+   cerr << endl << "Gtk_server closed from client" << endl;
    close(3);
    return 0;
 }
@@ -1130,8 +1155,8 @@ extern "C"
 {
 #define gtk_fun_def(_entry, ...)
 #define gtk_event_def(ev_name, _argc, opt, sig, _wid_name, _wid_id,_wid_class) \
-void ev_name(GtkWidget * button opt , gpointer user_data = 0) \
-{ generic_callback(button, #ev_name, #sig); }
+void ev_name(GtkWidget * widget opt , gpointer user_data = 0) \
+{ generic_callback(widget, #ev_name, #sig); }
 
 #include "Gtk_map.def"
 
@@ -1185,7 +1210,27 @@ do_draw(GtkWidget * drawing_area, cairo_t * cr, gpointer user_data)
    cairo_set_source_surface(cr, surface, 0, 0);
    cairo_paint(cr);
    verbose__calls && cerr << "do_draw() done." << endl;
-   return false;
+
+   return false;   // propagate the event further
+}
+
+//-----------------------------------------------------------------------------
+gboolean
+top_level_done(GtkWidget * window, gpointer user_data)
+{
+   // top-level window has been closed
+   //
+char data[50];
+
+const int slen = snprintf(data, sizeof(data),
+                          "H%s:%s", "top-level", __FUNCTION__);
+   if (slen >= sizeof(data))   data[sizeof(data) - 1] = 0;
+
+   generic_callback(window, "destroy", __FUNCTION__);
+   // send_TLV(Event_widget_fun, data);
+   close(3);
+   exit(0);
+   return false;   // propagate the event further
 }
 
 }   // extern "C"

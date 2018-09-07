@@ -31,23 +31,24 @@ gtk_fun_def(drawingarea ,GtkDrawingArea,set_Y_origin ,Origin  ,V,I, set the Y-or
 
 /* a mapping from GTK events (signals) to Gtk_server callbacks...
 
-             ╔══════════════════════════════════════════════════════════════════════════╗
-             ║                            Macro Argument                                ║
-╔════════════╬═════════╤═════╤════════╤══════════╤═══════════╤═══════════╤══════════════╣
-║            ║         │ arg │optional│  event   │  widget   │  glade_ID │     Gtk      ║
-║ Used By    ║ ev_name │count│  args  │signature │   name    │  prefix,  │    class     ║
-╠════════════╬═════════╪═════╪════════╪══════════╪═══════════╪═══════════╪══════════════╣
-║ Quad_GTK   ║    ✓    │     │        │          │           │           │              ║
-║ Gtk_server ║    ✓    │     │        │          │           │           │              ║
-║ asciidoc   ║    ✓    │  ✓  │   ✓    │    ✓     │    ✓      │     ✓     │     ✓        ║
-╚════════════╬═════════╪═════╪════════╪══════════╪═══════════╪═══════════╪══════════════╣
- *///        ║         │     │        │          │           │           │              ║
-gtk_event_def( clicked ,  1  ,        ,GiNsEsIsCs, OK-button , button    ,GtkButton     )
-gtk_event_def( activate,  1  ,        ,GiNsEsIsCs, Text-entry, entry     ,GtkEntry      )
-gtk_event_def( changed ,  1  ,        ,GiNsEsIsCs, Select-box, combobox  ,GtkComboBox   )
-gtk_event_def( draw    ,  1  ,        ,GiNsEsIsCs, Canvas    ,drawingarea,GtkDrawingArea)
-//           ║         │     │        │          │           │           │              ║
-//           ╚═════════╧═════╧════════╧══════════╧═══════════╧═══════════╧══════════════╝
+             ╔═══════════════════════════════════════════════════════════════════════════╗
+             ║                              Macro Argument                               ║
+╔════════════╬═════════╤═════╤════════╤══════════╤════════════╤═══════════╤══════════════╣
+║            ║         │ arg │optional│  event   │   widget   │  glade_ID │     Gtk      ║
+║ Used By    ║ ev_name │count│  args  │signature │    name    │  prefix,  │    class     ║
+╠════════════╬═════════╪═════╪════════╪══════════╪════════════╪═══════════╪══════════════╣
+║ Quad_GTK   ║    ✓    │     │        │          │            │           │              ║
+║ Gtk_server ║    ✓    │     │        │          │            │           │              ║
+║ asciidoc   ║    ✓    │  ✓  │   ✓    │    ✓     │     ✓      │     ✓     │     ✓        ║
+╚════════════╬═════════╪═════╪════════╪══════════╪════════════╪═══════════╪══════════════╣
+ *///        ║         │     │        │          │            │           │              ║
+gtk_event_def( clicked ,  1  ,        ,GiNsEsIsCs, OK-button  , button    ,GtkButton     )
+gtk_event_def( activate,  1  ,        ,GiNsEsIsCs, Text-entry , entry     ,GtkEntry      )
+gtk_event_def( changed ,  1  ,        ,GiNsEsIsCs, Select-box , combobox  ,GtkComboBox   )
+gtk_event_def( draw    ,  1  ,        ,GiNsEsIsCs, Canvas     ,drawingarea,GtkDrawingArea)
+gtk_event_def( destroy ,  1  ,        ,GiNsEsIsCs, Main-Window,window     ,GtkWindow     )
+//           ║         │     │        │          │            │           │              ║
+//           ╚═════════╧═════╧════════╧══════════╧════════════╧═══════════╧══════════════╝
 
 #undef gtk_event_def
 
