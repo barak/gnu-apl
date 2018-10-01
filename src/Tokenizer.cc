@@ -283,7 +283,10 @@ Source<Unicode> src(input);
                    if (pmode != PM_FUNCTION)
                       {
                         rest_2 = src.rest();
-                        throw_parse_error(E_BAD_EXECUTE_CHAR, LOC, loc);
+                        if (pmode == PM_EXECUTE)
+                           throw_parse_error(E_ILLEGAL_COLON_EXEC, LOC, loc);
+                        else
+                           throw_parse_error(E_ILLEGAL_COLON_STAT, LOC, loc);
                       }
 
                    ++src;

@@ -517,7 +517,7 @@ bool have_curly = false;
    if (!have_curly)   return;   // no { ... } in this body
 
    // undo the token reversion of the body so that the body token and the
-   // text run in the same direction.
+   // function text run in the same direction.
    //
    reverse_statement_token(body);
 
@@ -526,7 +526,25 @@ int lambda_num = 0;
        {
          if (body[b].get_tag() != TOK_L_CURLY)   continue;   // not {
 
-         b = setup_one_lambda(b, ++lambda_num) - 1;   // -1 due to ++b in loop(b) above
+         ShapeItem end = -1;
+         int level = 1;   // since body[b] is {
+         for (ShapeItem b1 = b + 1; b1 < body.size(); ++b1)
+             {
+               switch(body[b1].get_tag())
+                  {
+                    default:                            continue;
+                    case TOK_L_CURLY:   ++level;        continue;
+                    case TOK_R_CURLY:   if (--level)    continue;
+                                        end = b1;
+                                        b1 = body.size();
+                                        break;
+                    case TOK_END:       MORE_ERROR() << "Illegal ◊ in {}";
+                                        DEFN_ERROR;
+                  }
+                break;   // for b1...
+             }
+         Assert(end != -1);
+         b = setup_one_lambda(b, end, ++lambda_num) - 1;   // -1 due to ++b in loop(b) above
        }
 
    // redo the token reversion of the body so that the body token and the
@@ -540,10 +558,8 @@ int lambda_num = 0;
 }
 //-----------------------------------------------------------------------------
 ShapeItem
-Executable::setup_one_lambda(ShapeItem b, int lambda_num)
+Executable::setup_one_lambda(ShapeItem b, ShapeItem bend, int lambda_num)
 {
-const ShapeItem bend = b + body[b].get_int_val2();   // the corresponding }
-   Assert(bend < body.size());
    Assert(body[bend].get_tag() == TOK_R_CURLY);
 
    body[b++].clear(LOC);    // invalidate {

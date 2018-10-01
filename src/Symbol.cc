@@ -905,7 +905,7 @@ ValueStackItem & vs = value_stack.last();
 const bool can_set = (vs.name_class == NC_FUNCTION) ||
                      (vs.name_class == NC_OPERATOR) ||
                      (vs.name_class == NC_UNUSED_USER_NAME);
-             
+
    Assert(nc == NC_FUNCTION || nc == NC_OPERATOR || nc == NC_UNUSED_USER_NAME);
 
    if (!can_set)   DEFN_ERROR;

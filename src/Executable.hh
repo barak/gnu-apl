@@ -161,7 +161,7 @@ protected:
   static void reverse_all_token(Token_string & tos);
 
    /// extract one lambda expressions from body and store it in lambdas
-   ShapeItem setup_one_lambda(ShapeItem b, int lambda_num);
+   ShapeItem setup_one_lambda(ShapeItem b, ShapeItem end, int lambda_num);
 
    /// body[b ... bend] is a lambda. Move these token from this body to the body
    /// of the lambda and clear them in \b this body.

@@ -819,7 +819,7 @@ char filename[FILENAME_MAX + 10];
    if (strlen(filename) > FILENAME_MAX)
       {
         CERR << "file name '" << filename << "' is too long" << endl;
-        throw_apl_error(E_SYSTEM_LIMIT_FILENAME, LOC);
+        throw_apl_error(E_SYS_LIMIT_FILENAME, LOC);
       }
 
 int in = open(filename, O_RDONLY);
