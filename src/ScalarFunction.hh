@@ -665,6 +665,15 @@ protected:
    /// overloaded Function::get_scalar_f2
    virtual prim_f2 get_scalar_f2() const
       { return 0; }
+
+   /// eval_AB for large A and/or B
+   Value_P large_eval_AB(const Value * A, const Value * B);
+
+   static bool compare(const Cell * const & A, const Cell * const & B,
+                       const void * comp_arg);
+
+   static bool compare_ptr(const Cell * const & A, const Cell * const & B,
+                       const void * comp_arg);
 };
 //-----------------------------------------------------------------------------
 /** Scalar functions times and direction.

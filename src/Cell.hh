@@ -499,6 +499,12 @@ Hswap(const Cell * & c1, const Cell * & c2)
 const Cell * tmp = c1;   c1 = c2;   c2 = tmp;
 }
 //-----------------------------------------------------------------------------
+inline void
+Hswap(Cell * & c1, Cell * & c2)
+{
+Cell * tmp = c1;   c1 = c2;   c2 = tmp;
+}
+//-----------------------------------------------------------------------------
 
 typedef ErrorCode (Cell::*prim_f1)(Cell *) const;
 typedef ErrorCode (Cell::*prim_f2)(Cell *, const Cell *) const;
