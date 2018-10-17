@@ -1005,9 +1005,10 @@ Token
 Bif_F12_WITHOUT::eval_AB(Value_P A, Value_P B)
 {
    if (A->get_rank() > 1)   RANK_ERROR;
+   if (B->get_rank() > 1)   RANK_ERROR;
 
-const uint32_t len_A = A->element_count();
-const uint32_t len_B = B->element_count();
+const ShapeItem len_A = A->element_count();
+const ShapeItem len_B = B->element_count();
 
    // if called with (⍳N) ∼ (⍳2×N) then the break-even point where
    // large_eval_AB() becomes faster than plain eval_AB() is N=61.
@@ -1050,8 +1051,8 @@ ShapeItem len_Z = 0;
 Value_P
 Bif_F12_WITHOUT::large_eval_AB(const Value * A, const Value * B)
 {
-const int64_t len_A = A->element_count();
-const int64_t len_B = B->element_count();
+const ShapeItem len_A = A->element_count();
+const ShapeItem len_B = B->element_count();
 const Cell ** cells_A = new const Cell *[2*len_A + len_B];
 const Cell ** cells_Z = cells_A + len_A;
 const Cell ** cells_B = cells_A + 2*len_A;
@@ -1065,33 +1066,28 @@ const Cell ** cells_B = cells_A + 2*len_A;
    // set pointers in A to 0 if they are also in B. Count remaining entries
    // in A in len_Z.
 ShapeItem len_Z = 0;
-ShapeItem idx_A = 0;
 ShapeItem idx_B = 0;
 const double qct = Workspace::get_CT();
 
-   for (;;)
+   loop(idx_A, len_A)
        {
-         if (idx_A >= len_A)   break;   // done (end of A reached)
-         if (idx_B >= len_B)            // done (keep rest of A)
-            {
-              cells_Z[len_Z++] = cells_A[idx_A++];
-              continue;
-            }
+         const Cell * ref = cells_A[idx_A];
+         while (idx_B < len_B)
+               {
+                 if (ref->equal(*cells_B[idx_B], qct))
+                    {
+                         break;   // for idx_B → next idx_A
+                    }
 
-         // normal case: compare A and B
-         //
-         if (cells_A[idx_A]->equal(*cells_B[idx_B], qct))
-            {
-              ++idx_A;
-            }
-         else if (cells_B[idx_B]->greater(*cells_A[idx_A]))
-            {
-              cells_Z[len_Z++] = cells_A[idx_A++];
-            }
-         else
-            {
-              ++idx_B;
-            }
+                 // B is much (by ⎕CT) smaller or greater than A
+                 //
+                 if (ref->greater(*cells_B[idx_B]))    ++idx_B;
+                 else   // B > A, so A is in A∼B
+                    {
+                      cells_Z[len_Z++] = ref;   // A is in B
+                      break;
+                    }
+               }
        }
 
    // sort cells_Z by position so that the original order in A is reconstructed

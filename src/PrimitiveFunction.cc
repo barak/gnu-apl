@@ -2926,10 +2926,37 @@ Bif_F12_UNION::eval_B(Value_P B)
 const double qct = Workspace::get_CT();
 const ShapeItem len_B = B->element_count();
    if (len_B <= 1)   return Token(TOK_APL_VALUE1, B->clone(LOC));
-   if (len_B >= SHORT_VALUE_LENGTH_WANTED && !B->is_complex(false))
-      return Macro::Z__UNIQUE_B->eval_B(B);
+   if (len_B >= 20)
+      {
+        const Cell ** cells_B = new const Cell *[2*len_B];
+        const Cell ** cells_Z = cells_B + len_B;
 
-   // B is small, so an itertive search of unique elements is faster
+        loop(b, len_B)   cells_B[b] = &B->get_ravel(b);
+
+        Heapsort<const Cell *>::sort(cells_B, len_B, 0, Cell::compare_stable);
+
+        ShapeItem idx_B = 0;
+        ShapeItem len_Z = 0;
+        while(idx_B < len_B)
+            {
+              const Cell * ref = cells_B[idx_B++];
+              cells_Z[len_Z++] = ref;   // always take first
+              while (idx_B < len_B && ref->equal(*cells_B[idx_B], qct)) ++idx_B;
+            }
+
+        // sort cells_Z by position so that the original order in B is
+        // reconstructed
+        //
+        Heapsort<const Cell *>::sort(cells_Z, len_Z, 0, Cell::compare_ptr);
+
+        Value_P Z(len_Z, LOC);
+        loop(z, len_Z)   Z->next_ravel()->init(*cells_Z[z], Z.getref(), LOC);
+        delete cells_B;
+        Z->check_value(LOC);
+        return Token(TOK_APL_VALUE1, Z);
+      }
+
+   // B is small, so an iterative search of unique elements is faster
    //
 Simple_string<const Cell *, false> items_Z;
    items_Z.reserve(len_B);
@@ -2955,10 +2982,82 @@ Bif_F2_INTER::eval_AB(Value_P A, Value_P B)
    if (A->get_rank() > 1)   RANK_ERROR;
    if (B->get_rank() > 1)   RANK_ERROR;
 
-   // A ∩ B ←→ (A∈B)/A
-   //
-Token AinB = Bif_F12_ELEMENT::fun->eval_AB(A, B);
-   return Bif_OPER1_REDUCE::fun->eval_AB(AinB.get_apl_val(), A);
+const ShapeItem len_A = A->element_count();
+const ShapeItem len_B = B->element_count();
+
+const double qct = Workspace::get_CT();
+
+   if (len_A*len_B > 60*60)
+      {
+        // large A or B: sort A and B to speed up searches
+        //
+        const Cell ** cells_A = new const Cell *[2*len_A + len_B];
+        const Cell ** cells_Z = cells_A + len_A;
+        const Cell ** cells_B = cells_A + 2*len_A;
+
+        loop(a, len_A)   cells_A[a] = &A->get_ravel(a);
+        loop(b, len_B)   cells_B[b] = &B->get_ravel(b);
+
+        Heapsort<const Cell *>::sort(cells_A, len_A, 0, Cell::compare_stable);
+        Heapsort<const Cell *>::sort(cells_B, len_B, 0, Cell::compare_stable);
+
+        ShapeItem len_Z = 0;
+        ShapeItem idx_B = 0;
+        loop(idx_A, len_A)
+            {
+              const Cell * ref = cells_A[idx_A];
+              while (idx_B < len_B)
+                  {
+                    if (ref->equal(*cells_B[idx_B], qct))
+                       {
+                         cells_Z[len_Z++] = ref;   // A is in B
+                         break;   // for idx_B → next idx_A
+                       }
+
+                    // B is much (by ⎕CT) smaller or greater than A
+                    //
+                    if (ref->greater(*cells_B[idx_B]))    ++idx_B;
+                    else                                  break;
+                 }
+            }
+
+        // sort cells_Z by position so that the original order in A is
+        //  reconstructed
+        //
+        Heapsort<const Cell *>::sort(cells_Z, len_Z, 0, Cell::compare_ptr);
+        Value_P Z(len_Z, LOC);
+        loop(z, len_Z)   Z->next_ravel()->init(*cells_Z[z], Z.getref(), LOC);
+
+        Z->set_default(*B, LOC);
+        Z->check_value(LOC);
+        delete cells_A;
+        return Token(TOK_APL_VALUE1, Z);
+      }
+    else
+      {
+        // small A and B: use quadratic algorithm.
+        //
+        const Cell ** cells_Z = new const Cell *[len_A];
+        ShapeItem len_Z = 0;
+
+        loop(a, len_A)
+        loop(b, len_B)
+            {
+              if (A->get_ravel(a).equal(B->get_ravel(b), qct))
+                 {
+                   cells_Z[len_Z++] = &A->get_ravel(a);
+                   break;   // loop(b)
+                 }
+            }
+        Value_P Z(len_Z, LOC);
+        loop(z, len_Z)
+            Z->next_ravel()->init(*cells_Z[z], Z.getref(), LOC);
+
+        Z->set_default(*B, LOC);
+        Z->check_value(LOC);
+        delete cells_Z;
+        return Token(TOK_APL_VALUE1, Z);
+      }
 }
 //-----------------------------------------------------------------------------
 Token
@@ -2970,6 +3069,15 @@ Bif_F12_UNION::eval_AB(Value_P A, Value_P B)
    // A ∪ B ←→ A,B∼A
    //
 Token BwoA = Bif_F12_WITHOUT::fun->eval_AB(B, A);
+
+const ShapeItem len_A = A->element_count();
+const ShapeItem len_B = BwoA.get_apl_val()->element_count();
+Value_P Z(len_A + len_B, LOC);
+
+   loop(a, len_A)   Z->next_ravel()->init(A->get_ravel(a), Z.getref(), LOC);
+   loop(b, len_B)   Z->next_ravel()->init(B->get_ravel(b), Z.getref(), LOC);
+   Z->set_default(*B, LOC);
+   Z->check_value(LOC);
    return Bif_F12_COMMA::fun->eval_AB(A, BwoA.get_apl_val());
 }
 //=============================================================================
