@@ -668,12 +668,6 @@ protected:
 
    /// eval_AB for large A and/or B
    Value_P large_eval_AB(const Value * A, const Value * B);
-
-   static bool compare(const Cell * const & A, const Cell * const & B,
-                       const void * comp_arg);
-
-   static bool compare_ptr(const Cell * const & A, const Cell * const & B,
-                       const void * comp_arg);
 };
 //-----------------------------------------------------------------------------
 /** Scalar functions times and direction.

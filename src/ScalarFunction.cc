@@ -1009,7 +1009,10 @@ Bif_F12_WITHOUT::eval_AB(Value_P A, Value_P B)
 const uint32_t len_A = A->element_count();
 const uint32_t len_B = B->element_count();
 
-   if (len_A*len_A >= 100)
+   // if called with (⍳N) ∼ (⍳2×N) then the break-even point where
+   // large_eval_AB() becomes faster than plain eval_AB() is N=61.
+   //
+   if (len_A*len_B > 60*60)
       return Token(TOK_APL_VALUE1, large_eval_AB(A.get(), B.get()));
 
 const double qct = Workspace::get_CT();
@@ -1044,22 +1047,6 @@ ShapeItem len_Z = 0;
    return Token(TOK_APL_VALUE1, Z);
 }
 //-----------------------------------------------------------------------------
-bool
-Bif_F12_WITHOUT::compare(const Cell * const & A, const Cell * const & B,
-                         const void *)
-{
-const Comp_result cr = A->compare(*B);
-   if (cr == COMP_EQ)   return A < B;
-   return cr == COMP_GT;
-}
-//-----------------------------------------------------------------------------
-bool
-Bif_F12_WITHOUT::compare_ptr(const Cell * const & A, const Cell * const & B,
-                         const void *)
-{
-   return A > B;
-}
-//-----------------------------------------------------------------------------
 Value_P
 Bif_F12_WITHOUT::large_eval_AB(const Value * A, const Value * B)
 {
@@ -1072,8 +1059,8 @@ const Cell ** cells_B = cells_A + 2*len_A;
    loop(a, len_A)   cells_A[a] = &A->get_ravel(a);
    loop(b, len_B)   cells_B[b] = &B->get_ravel(b);
 
-   Heapsort<const Cell *>::sort(cells_A, len_A, /* comp_arg */ 0, compare);
-   Heapsort<const Cell *>::sort(cells_B, len_B, /* comp_arg */ 0, compare);
+   Heapsort<const Cell *>::sort(cells_A, len_A, 0, Cell::compare_stable);
+   Heapsort<const Cell *>::sort(cells_B, len_B, 0, Cell::compare_stable);
 
    // set pointers in A to 0 if they are also in B. Count remaining entries
    // in A in len_Z.
@@ -1087,20 +1074,19 @@ const double qct = Workspace::get_CT();
          if (idx_A >= len_A)   break;   // done (end of A reached)
          if (idx_B >= len_B)            // done (keep rest of A)
             {
-              len_Z += len_A - idx_A;
-              break;
+              cells_Z[len_Z++] = cells_A[idx_A++];
+              continue;
             }
 
          // normal case: compare A and B
          //
          if (cells_A[idx_A]->equal(*cells_B[idx_B], qct))
             {
-              cells_A[idx_A++] = 0;
+              ++idx_A;
             }
          else if (cells_B[idx_B]->greater(*cells_A[idx_A]))
             {
-              ++len_Z;
-              ++idx_A;
+              cells_Z[len_Z++] = cells_A[idx_A++];
             }
          else
             {
@@ -1108,18 +1094,16 @@ const double qct = Workspace::get_CT();
             }
        }
 
-   // sort Z by position so that the original order in A is reconstructed
+   // sort cells_Z by position so that the original order in A is reconstructed
    //
-ShapeItem idx_Z = 0;
-   loop(a, len_A)
-        if (cells_A[a])   cells_Z[idx_Z++] = cells_A[a];
-   Heapsort<const Cell *>::sort(cells_Z, len_Z, /* comp_arg */ 0, compare_ptr);
+   Heapsort<const Cell *>::sort(cells_Z, len_Z, 0, Cell::compare_ptr);
 
 Value_P Z(len_Z, LOC);
 
    loop(z, len_Z)   Z->next_ravel()->init(*cells_Z[z], Z.getref(), LOC);
 
    delete cells_A;   // incl. cells_Z and cells_B
+
    Z->check_value(LOC);
    return Z;
 }

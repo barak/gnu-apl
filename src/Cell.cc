@@ -122,6 +122,22 @@ Cell::equal(const Cell & other, double qct) const
 }
 //-----------------------------------------------------------------------------
 bool
+Cell::compare_stable(const Cell * const & A, const Cell * const & B,
+                     const void *)
+{
+const Comp_result cr = A->compare(*B);
+   if (cr == COMP_EQ)   return A < B;
+   return cr == COMP_GT;
+}
+//-----------------------------------------------------------------------------
+bool
+Cell::compare_ptr(const Cell * const & A, const Cell * const & B,
+                  const void *)
+{
+   return A > B;
+}
+//-----------------------------------------------------------------------------
+bool
 Cell::is_near_int(APL_Float value)
 {
    if (value > LARGE_INT)   return true;

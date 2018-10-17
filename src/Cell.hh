@@ -481,6 +481,16 @@ public:
    /// raw pointer to the secondary value (for 28 ⎕CR)
    const void * get_u1() const   { return &value.cval[1]; }
 
+   /// a stable compare function to be used with Heapsort. Equal cells
+   /// are compared by their address
+   static bool compare_stable(const Cell * const & A, const Cell * const & B,
+                       const void * comp_arg);
+
+   /// a stable compare function to be used with Heapsort. The cell content
+   /// is ignore and only the cell addresses are being compared
+   static bool compare_ptr(const Cell * const & A, const Cell * const & B,
+                       const void * comp_arg);
+
 protected:
    /// the primary value of \b this cell
    SomeValue value;
