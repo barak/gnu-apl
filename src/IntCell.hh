@@ -45,6 +45,14 @@ public:
    virtual bool is_integer_cell() const
       { return true; }
 
+   /// overloaded Cell::bif_near_int64_t()
+   virtual ErrorCode bif_near_int64_t(Cell * Z) const
+      { return zv(Z, value.ival); }
+
+   /// overloaded Cell::bif_within_quad_CT()
+   virtual ErrorCode bif_within_quad_CT(Cell * Z) const
+      { return zv(Z, value.ival); }
+
    /// overloaded Cell::greater()
    virtual bool greater(const Cell & other) const;
 
@@ -213,6 +221,10 @@ protected:
 
    /// overloaded Cell::is_near_int()
    virtual bool is_near_int() const
+      { return true; }
+
+   /// overloaded Cell::is_near_int64_t()
+   virtual bool is_near_int64_t() const
       { return true; }
 
    /// overloaded Cell::is_near_real()

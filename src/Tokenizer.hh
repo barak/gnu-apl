@@ -23,7 +23,7 @@
 
 #include "Token.hh"
 
-/*!
+/**
      Functions related to tokenizing of input lines and user defined functions.
  */
 class Tokenizer

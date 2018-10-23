@@ -179,7 +179,17 @@ Parser::parse_statement(Token_string & tos)
         tos.print(CERR, true);
       }
 
-   // 5. update distances between (), [], and {}
+   // 5. replace bitwise functons ∧∧, ∨∨, ⍲⍲, and ⍱⍱ by their bitwise variant
+   //
+   replace_bitwise_functions(tos);
+   remove_void_token(tos);
+   Log(LOG_parse)
+      {
+        CERR << "parse 6 [" << tos.size() << "]: ";
+        tos.print(CERR, true);
+      }
+
+   // 6. update distances between (), [], and {}
    //
    {
      const ErrorCode ec = match_par_bra(tos, false);
@@ -472,6 +482,43 @@ Parser::remove_nongrouping_parantheses(Token_string & tos)
                tos[t].clear(LOC);
                ++t;   // skip tos[t + 1]
              }
+       }
+}
+//-----------------------------------------------------------------------------
+void
+Parser::replace_bitwise_functions(Token_string & tos)
+{
+   loop(t, int(tos.size()) - 1)
+       {
+         const TokenTag tag = tos[t].get_tag();
+         if (tag == tos[t+1].get_tag())   // duplicate
+            {
+              switch(tag)
+                 {
+                   case TOK_F2_AND:
+                        new (&tos[t]) Token(TOK_F2_AND_B, &Bif_F2_AND_B::_fun);
+                        tos[++t].clear(LOC);
+                        continue;
+
+                   case TOK_F2_OR:
+                        new (&tos[t]) Token(TOK_F2_OR_B, &Bif_F2_OR_B::_fun);
+                        tos[++t].clear(LOC);
+                        continue;
+
+                   case TOK_F2_NAND:
+                        new (&tos[t]) Token(TOK_F2_NAND_B,&Bif_F2_NAND_B::_fun);
+                        tos[++t].clear(LOC);
+                        continue;
+
+                   case TOK_F2_NOR:
+                        new (&tos[t]) Token(TOK_F2_NOR_B, &Bif_F2_NOR_B::_fun);
+                        tos[++t].clear(LOC);
+                        continue;
+
+                   default: break;
+                 }
+
+            }
        }
 }
 //-----------------------------------------------------------------------------

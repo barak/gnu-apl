@@ -705,19 +705,20 @@ between GNU APL and IBM APL2.
 * Section 3.13::  Hex Numbers
 * Section 3.14::  User-defined Commands
 * Section 3.15::  Monadic ⊢ and ⊣, dyadic ⊢ with Axis
-* Section 3.16::  Dyadic ⎕CR
-* Section 3.17::  Dyadic ⎕FX (Native Functions)
-* Section 3.18::  ⎕ARG - Interpreter command line arguments
-* Section 3.19::  ⎕DLX - Knuth's Dancing Links Algorithm
-* Section 3.20::  ⎕ENV - Environment Variable
-* Section 3.21::  ⎕FIO - File I/O Functions
-* Section 3.22::  ⎕FFT - Fast Fourier Transform
-* Section 3.23::  ⎕GTK - GTK Interface
-* Section 3.24::  ⎕RE  - Regular Expressions
-* Section 3.25::  ⎕PS  - Print Style
-* Section 3.26::  ⎕SQL - SQL Database Interface
-* Section 3.27::  ⎕SI  - State Indicator
-* Section 3.28::  ⎕SYL - System limits
+* Section 3.16::  Bit-wise Logical Functions ∧∧, ∨∨, ⍲⍲, and ⍱⍱
+* Section 3.17::  Dyadic ⎕CR
+* Section 3.18::  Dyadic ⎕FX (Native Functions)
+* Section 3.19::  ⎕ARG - Interpreter command line arguments
+* Section 3.20::  ⎕DLX - Knuth's Dancing Links Algorithm
+* Section 3.21::  ⎕ENV - Environment Variable
+* Section 3.22::  ⎕FIO - File I/O Functions
+* Section 3.23::  ⎕FFT - Fast Fourier Transform
+* Section 3.24::  ⎕GTK - GTK Interface
+* Section 3.25::  ⎕RE  - Regular Expressions
+* Section 3.26::  ⎕PS  - Print Style
+* Section 3.27::  ⎕SQL - SQL Database Interface
+* Section 3.28::  ⎕SI  - State Indicator
+* Section 3.29::  ⎕SYL - System limits
 @end menu
 
 There are a few possibly useful features in GNU APL:
@@ -1500,7 +1501,7 @@ be enabled via ./configure (see README-2-configure).
 @node    Section 3.13
 @section Hex Numbers
 
-GNU APL supports sedecimal numbersi. They start with $ and can be uppercase or
+GNU APL supports sedecimal numbers. They start with $ and can be uppercase or
 lowercase:
 
 @verbatim
@@ -1586,9 +1587,9 @@ Let @b{Z←A[X] B}. Then:
 @itemize
 @item if X is a one-element vector and ↑X is 0 then Z ≡ A,
 @item if X is a one-element vector and ↑X is 1 then Z ≡ B,
-@item otherwise X selects coresponding items of A resp. B if the correspondingi
+@item otherwise X selects corresponding items of A resp. B if the correspondent
  elements of X are 0 or 1 respectively. In that case, the shapes of A and B
- must match the shape of X, but one-elent A or B are scalar extended to the
+ must match the shape of X, but one-element A or B are scalar extended to the
  shape of X.
 @end itemize
 
@@ -1613,6 +1614,148 @@ a*c
 
 
 @node    Section 3.16
+@section Bit-wise Logical Functions ∧∧, ∨∨, ⍲⍲, and ⍱⍱
+
+The standard APL functions And (∧), Or (∨), Nand (⍲), and Nor (⍱) operate
+primarily on Boolean integers. Primarily means that the the LCM variant for ∧
+and the GCD variant for ∨ are not considered in this context. (The LCM and
+GCD variants are defined in the ISO standard and supported in GNU APL but
+not in IBM APL2).
+
+However, probably more often than not one needs to compute Boolean functions
+between the bits of (non-Boolean) integers and not between entire Boolean
+integers. Although that is possible to do in standard APL, the procedure is
+fairly awkward and, more importantly, inefficient:
+
+@itemize
+@item
+convert every integer argument X to a 64-item Boolean vector X←(64⍴2)⊤X,
+@item
+call the Boolean function ∧, ∨, ⍲, or ⍱, with the converted arguments, and
+@item
+convert the Boolean result vector R back to the integer result Z←2⊥R
+@end itemize
+
+For example (using  5 ⎕CR (4⍴256)⊤X to display X in hex):
+
+@verbatim
+      5 ⎕CR (4⍴256)⊤   A←$ABBADEAD
+ABBADEAD
+      5 ⎕CR (4⍴256)⊤   B←$00FF00FF
+00FF00FF
+
+      5 ⎕CR (4⍴256)⊤   2⊥ ((64⍴2)⊤A) ∧ (64⍴2)⊤B
+00BA00AD
+
+@end verbatim
+
+With the bit-wise @b{And} (∧∧) the same can be achieved in a simpler fashion
+and far more efficiently:
+
+@verbatim
+      5 ⎕CR (4⍴256)⊤   A←$ABBADEAD
+ABBADEAD
+      5 ⎕CR (4⍴256)⊤   B←$00FF00FF
+00FF00FF
+
+      5 ⎕CR (4⍴256)⊤   A ∧∧ B
+00BA00AD
+@end verbatim
+
+@subsection Dyadic ∧∧, ∨∨, ⍲⍲, and ⍱⍱
+
+The dyadic forms of @b{∧∧}, @b{∨∨}, @b{⍲⍲}, and @b{⍱⍱} are simply the bit-wise
+variants of their Boolean companions:
+
+@verbatim
+      A ∧∧ B    ←→    2⊥ ((64⍴2)⊤A) ∧ (64⍴2)⊤B
+      A ∨∨ B    ←→    2⊥ ((64⍴2)⊤A) ∨ (64⍴2)⊤B
+      A ⍲⍲ B    ←→    2⊥ ((64⍴2)⊤A) ⍲ (64⍴2)⊤B
+      A ⍱⍱ B    ←→    2⊥ ((64⍴2)⊤A) ⍱ (64⍴2)⊤B
+@end verbatim
+
+@subsection Monadic ∨∨ and ⍱⍱
+
+@b{⍲⍲} does not have a monadic form, but @b{∧∧}, @b{∨∨}, and @b{⍱⍱} do.
+Formally monadic @b{∨∨} resp, @b{⍱⍱} are dyadic @b{∨∨} resp, @b{⍱⍱} with
+a left argument of 0:
+
+@verbatim
+      ∨∨ B    ←→    0 ∨∨ B      ⍝ real B to nearby integer
+      ⍱⍱ B    ←→    0 ⍱⍱ B      ⍝ bit-wise Not
+@end verbatim
+
+Even though that Or-ing a boolean vector with 0 itself has no effect, the
+monadic ∨∨ and ⍱⍱ are still useful due to their side effects: conversion
+from near-in float values to integers for ∨∨ and inversion of the bits for ⍱⍱,
+The latter is needed since ∼ has a monadic form and therefore ∼∼ was not
+an option for a bit-wise @b{Not} function.
+
+Monadic @b{⍱⍱ B} is the bit-wise @b{Not} function of its argument:
+
+      ⍱⍱ B    ←→    2⊥ ~(64⍴2)⊤B
+
+Monadic @b{∨∨ B} converts near-integer values B into true integers:
+
+@verbatim
+      26 ⎕CR    1            ⍝ integer
+16
+      26 ⎕CR    1.1          ⍝ real
+32
+      26 ⎕CR    1÷1          ⍝ integer
+16
+      26 ⎕CR    1.1÷1.1      ⍝ real
+32
+      26 ⎕CR    ∨∨ 1.1÷1.1   ⍝ integer
+16
+@end verbatim
+
+That also works for complex numbers with a near-zero imaginary part:
+
+@verbatim
+      26 ⎕CR    1.1J0÷1.1      ⍝ real
+32
+      26 ⎕CR    ∨∨ 1.1J0÷1.1      ⍝ integer
+16
+@end verbatim
+
+As a matter of fact, @b{∨∨} works for all near-gaussian complex numbers,
+but the effect is not visible with 26 ⎕CR since gaussian and non-gaussian
+complex numbers have the same cell type.
+
+@subsection Monadic ∧∧
+
+The ISO standard defines two different concepts to decide if a real number R
+is close to an integer I,
+@itemize
+@item
+the real number R is said to be @b{near} to integer I if the absolute
+value of I-R is smaller than some small constant called the @b{integer
+tolerance} in ISO and @b{system tolerance} in IBM APL2. The @b{integer
+tolerance} s typically platform dependent and must be smaller than the minimal
+⎕CT. In GNU APL the @b{integer tolerance} is 1E¯10 while the max. ⎕CT is 1E¯9.
+
+@item
+the real number R is said to be @b{equal to integer I within ⎕CT} if the
+absolute value of (I-R)/I is smaller than ⎕CT.
+@end itemize
+
+The first concept is an absolute distance from a real R to a nearby integer I
+while the second concept is a relative distance (larger numbers are allowed to
+be farther way from a nearby integer than smaller numbers). The two concepts
+differ in the same way that absolute and relative errors do.
+
+Now, all bit-wise functions described so far use the first concept, i,e,
+if their their arguments are real or complex, then there must be not be
+farther away than @b{integer tolerance} from an integer. In some contexts that
+could be difficult to achieve and for that reason GNU APL provides monadic ∧∧∧
+which is like ⍱⍱ except that the arguments must be within ⎕CT to some integer.
+All bit-wise logical functions throw a DOMAIN ERROR if an argument is not close
+enough to an integer, with ∧∧ being a little more tolerant than ∨∨ regarding
+the distance to nearby integers, and ∧∧ giving the user more control over the
+tolerance (via ⎕CR).
+
+@node    Section 3.17
 @section Dyadic ⎕CR
 
 The ⎕CR function has an optional left argument that selects one of several
@@ -1735,7 +1878,7 @@ positive char in C/C++). Real, Complex, or rational numbers are never proper
 byte values even if their value is close to an integer. Nor are nested APL
 values or values being assigned.
 
-@node    Section 3.17
+@node    Section 3.18
 @section  Dyadic ⎕FX (Native Functions)
 
 A Native Function is a function that can be called in APL like a normal user
@@ -1811,14 +1954,14 @@ system function ⎕FIO. The syntax of ⎕FIO is the same as for FILE_IO. The
 )CLEAR workspace command will close all open files. 
 
 
-@node    Section 3.18
+@node    Section 3.19
 @section ⎕ARG - Interpreter command line arguments
 
 ⎕ARG contains the command line arguments with which GNU APL was invoked.
 @xref{Section 3.1}.
 
 
-@node    Section 3.19
+@node    Section 3.20
 @section ⎕DLX - Knuth's Dancing Links Algorithm
 
 ⎕DLX is an implementation of Donald Knuth's Dancing Links Algorithm (called
@@ -2052,14 +2195,14 @@ Another application of ⎕DLX is solving sudokus. The constraints matrix is
 a little more complicated, but the principle is the same.
 
 
-@node    Section 3.20
+@node    Section 3.21
 @section ⎕ENV - Environment Variables
 
 ⎕ENV contains the environment variables of the process that is running
 GNU APL. @xref{Section 3.1}.
 
 
-@node    Section 3.21
+@node    Section 3.22
 @section ⎕FIO - File I/O Functions
 
 As of GNU APL 1.6, the native function FILE_IO has been replaced by the
@@ -2204,7 +2347,7 @@ Z F¨Z←⎕FIO[49] 'filename'
 @end smallexample
 
 
-@node    Section 3.22
+@node    Section 3.23
 @section ⎕FFT - Fast Fourier Transform
 
 For those interested in signal processing and the like, GNU APL provides ⎕FFT:
@@ -2259,7 +2402,7 @@ if not then a DOMAIN ERROR will be raised when ⎕FFT is being used.
 up the computations performed by ⎕FFT. Creating /etc/fftw/wisdom will take a
 few hours, though, so that creating it will not pay off for most mortals.
 
-@node    Section 3.23
+@node    Section 3.24
 @section ⎕GTK - GTK Interface
 
 GTK (Gimp Toolkit) is a rather powerful library for creating graphical user
@@ -2272,7 +2415,7 @@ The details of using ⎕GTK would go far beyond the scope of this info manual
 and has therefore been put into a separate document.
 See: @b{HOWTOs/Quad-GTK.html}.
 
-@node    Section 3.24
+@node    Section 3.25
 @section ⎕RE - Regular Expressions
 
 ⎕RE is a function that provides access to a subset of libpcre2, which is a
@@ -2573,7 +2716,7 @@ The same for the pos+len output format:
 @end verbatim
 
 
-@node    Section 3.25
+@node    Section 3.26
 @section ⎕PS - Print Style
 
 ⎕PS is an integer vector that currently (read: SVN 982) contains two integers
@@ -2598,7 +2741,7 @@ Note: For compatibility with older workspaces, Assigning a single value to
 ⎕PS assigns that value to ⎕PS[2] and sets ⎕PS[1] to 0.
 
 
-@node    Section 3.26
+@node    Section 3.27
 @section ⎕SQL - SQL Database Interface
 
 As of GNU APL 1.6, the native function SQL has been replaced by the
@@ -2718,7 +2861,7 @@ More columns containing extra information may be added in a future
 release.
 
 
-@node    Section 3.27
+@node    Section 3.28
 @section ⎕SI - State Indicator
 
 ⎕SI returns aspects of the current State Indicator, similar to the standard
@@ -2782,7 +2925,7 @@ For example, ¯1 ⎕SI refers to the currently executing context, ¯2 ⎕SI is
 the caller, and so on.
 
 
-@node    Section 3.28
+@node    Section 3.29
 @section ⎕SYL - System limits
 
 System variable ⎕SYL shows a number of system limits when referenced:

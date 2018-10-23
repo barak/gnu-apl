@@ -118,6 +118,32 @@ FloatCell::compare(const Cell & other) const
 // monadic built-in functions...
 //-----------------------------------------------------------------------------
 ErrorCode
+FloatCell::bif_near_int64_t(Cell * Z) const
+{
+   if (!is_near_int64_t())       return E_DOMAIN_ERROR;
+
+   return IntCell::zv(Z, get_near_int());
+}
+//-----------------------------------------------------------------------------
+ErrorCode
+FloatCell::bif_within_quad_CT(Cell * Z) const
+{
+const double val = dfval();
+   if (val > LARGE_INT)   return E_DOMAIN_ERROR;
+   if (val < SMALL_INT)   return E_DOMAIN_ERROR;
+
+const double max_diff = Workspace::get_CT() * val;   // scale ⎕CT
+
+const APL_Float val_dn = floor(val);
+   if (val < (val_dn + max_diff))   return IntCell::zv(Z, val_dn);
+
+const APL_Float val_up = ceil(val);
+   if (val > (val_up - max_diff))   return IntCell::zv(Z, val_up);
+
+   return E_DOMAIN_ERROR;
+}
+//-----------------------------------------------------------------------------
+ErrorCode
 FloatCell::bif_factorial(Cell * Z) const
 {
    // max N! that fits into double is about 170
@@ -568,7 +594,7 @@ const double zar = ar / dfval();
 const double zai = ai / dfval();
    if (!isfinite(zar))   return E_DOMAIN_ERROR;
    if (!isfinite(zai))   return E_DOMAIN_ERROR;
-   return ComplexCell::zv(Z, ar, ai);
+   return ComplexCell::zv(Z, zar, zai);
 }
 //-----------------------------------------------------------------------------
 ErrorCode
@@ -634,7 +660,7 @@ const APL_Float quotient = P / Q;   // quotient←b÷a and check overflows
 
    {
      const double qct = Workspace::get_CT();
-     if ((qct != 0) && FloatCell::integral_within(quotient, qct))   return 0.0;
+     if ((qct != 0) && Cell::integral_within(quotient, qct))   return 0.0;
    }
 
 const APL_Float abs_quotient   = quotient < 0 ? -quotient : quotient;

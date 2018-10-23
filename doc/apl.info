@@ -644,19 +644,20 @@ File: apl.info,  Node: Chapter 3,  Next: Chapter 4,  Prev: Chapter 2,  Up: Top
 * Section 3.13::  Hex Numbers
 * Section 3.14::  User-defined Commands
 * Section 3.15::  Monadic ⊢ and ⊣, dyadic ⊢ with Axis
-* Section 3.16::  Dyadic ⎕CR
-* Section 3.17::  Dyadic ⎕FX (Native Functions)
-* Section 3.18::  ⎕ARG - Interpreter command line arguments
-* Section 3.19::  ⎕DLX - Knuth’s Dancing Links Algorithm
-* Section 3.20::  ⎕ENV - Environment Variable
-* Section 3.21::  ⎕FIO - File I/O Functions
-* Section 3.22::  ⎕FFT - Fast Fourier Transform
-* Section 3.23::  ⎕GTK - GTK Interface
-* Section 3.24::  ⎕RE  - Regular Expressions
-* Section 3.25::  ⎕PS  - Print Style
-* Section 3.26::  ⎕SQL - SQL Database Interface
-* Section 3.27::  ⎕SI  - State Indicator
-* Section 3.28::  ⎕SYL - System limits
+* Section 3.16::  Bit-wise Logical Functions ∧∧, ∨∨, ⍲⍲, and ⍱⍱
+* Section 3.17::  Dyadic ⎕CR
+* Section 3.18::  Dyadic ⎕FX (Native Functions)
+* Section 3.19::  ⎕ARG - Interpreter command line arguments
+* Section 3.20::  ⎕DLX - Knuth’s Dancing Links Algorithm
+* Section 3.21::  ⎕ENV - Environment Variable
+* Section 3.22::  ⎕FIO - File I/O Functions
+* Section 3.23::  ⎕FFT - Fast Fourier Transform
+* Section 3.24::  ⎕GTK - GTK Interface
+* Section 3.25::  ⎕RE  - Regular Expressions
+* Section 3.26::  ⎕PS  - Print Style
+* Section 3.27::  ⎕SQL - SQL Database Interface
+* Section 3.28::  ⎕SI  - State Indicator
+* Section 3.29::  ⎕SYL - System limits
 
 There are a few possibly useful features in GNU APL:
 
@@ -1425,7 +1426,7 @@ File: apl.info,  Node: Section 3.13,  Next: Section 3.14,  Prev: Section 3.12,  
 3.13 Hex Numbers
 ================
 
-GNU APL supports sedecimal numbersi.  They start with $ and can be
+GNU APL supports sedecimal numbers.  They start with $ and can be
 uppercase or lowercase:
 
       $2a
@@ -1514,10 +1515,10 @@ O(1).  Also, ⊢B is marginally faster than ⎕←B.
 
    • if X is a one-element vector and ↑X is 0 then Z ≡ A,
    • if X is a one-element vector and ↑X is 1 then Z ≡ B,
-   • otherwise X selects coresponding items of A resp.  B if the
-     correspondingi elements of X are 0 or 1 respectively.  In that
-     case, the shapes of A and B must match the shape of X, but
-     one-elent A or B are scalar extended to the shape of X.
+   • otherwise X selects corresponding items of A resp.  B if the
+     correspondent elements of X are 0 or 1 respectively.  In that case,
+     the shapes of A and B must match the shape of X, but one-element A
+     or B are scalar extended to the shape of X.
 
    Example:
 
@@ -1539,7 +1540,139 @@ a*c
 
 File: apl.info,  Node: Section 3.16,  Next: Section 3.17,  Prev: Section 3.15,  Up: Chapter 3
 
-3.16 Dyadic ⎕CR
+3.16 Bit-wise Logical Functions ∧∧, ∨∨, ⍲⍲, and ⍱⍱
+==================================================
+
+The standard APL functions And (∧), Or (∨), Nand (⍲), and Nor (⍱)
+operate primarily on Boolean integers.  Primarily means that the the LCM
+variant for ∧ and the GCD variant for ∨ are not considered in this
+context.  (The LCM and GCD variants are defined in the ISO standard and
+supported in GNU APL but not in IBM APL2).
+
+   However, probably more often than not one needs to compute Boolean
+functions between the bits of (non-Boolean) integers and not between
+entire Boolean integers.  Although that is possible to do in standard
+APL, the procedure is fairly awkward and, more importantly, inefficient:
+
+   • convert every integer argument X to a 64-item Boolean vector
+     X←(64⍴2)⊤X,
+   • call the Boolean function ∧, ∨, ⍲, or ⍱, with the converted
+     arguments, and
+   • convert the Boolean result vector R back to the integer result
+     Z←2⊥R
+
+   For example (using 5 ⎕CR (4⍴256)⊤X to display X in hex):
+
+      5 ⎕CR (4⍴256)⊤   A←$ABBADEAD
+ABBADEAD
+      5 ⎕CR (4⍴256)⊤   B←$00FF00FF
+00FF00FF
+
+      5 ⎕CR (4⍴256)⊤   2⊥ ((64⍴2)⊤A) ∧ (64⍴2)⊤B
+00BA00AD
+
+
+   With the bit-wise And (∧∧) the same can be achieved in a simpler
+fashion and far more efficiently:
+
+      5 ⎕CR (4⍴256)⊤   A←$ABBADEAD
+ABBADEAD
+      5 ⎕CR (4⍴256)⊤   B←$00FF00FF
+00FF00FF
+
+      5 ⎕CR (4⍴256)⊤   A ∧∧ B
+00BA00AD
+
+3.16.1 Dyadic ∧∧, ∨∨, ⍲⍲, and ⍱⍱
+--------------------------------
+
+The dyadic forms of ∧∧, ∨∨, ⍲⍲, and ⍱⍱ are simply the bit-wise variants
+of their Boolean companions:
+
+      A ∧∧ B    ←→    2⊥ ((64⍴2)⊤A) ∧ (64⍴2)⊤B
+      A ∨∨ B    ←→    2⊥ ((64⍴2)⊤A) ∨ (64⍴2)⊤B
+      A ⍲⍲ B    ←→    2⊥ ((64⍴2)⊤A) ⍲ (64⍴2)⊤B
+      A ⍱⍱ B    ←→    2⊥ ((64⍴2)⊤A) ⍱ (64⍴2)⊤B
+
+3.16.2 Monadic ∨∨ and ⍱⍱
+------------------------
+
+⍲⍲ does not have a monadic form, but ∧∧, ∨∨, and ⍱⍱ do.  Formally
+monadic ∨∨ resp, ⍱⍱ are dyadic ∨∨ resp, ⍱⍱ with a left argument of 0:
+
+      ∨∨ B    ←→    0 ∨∨ B      ⍝ real B to nearby integer
+      ⍱⍱ B    ←→    0 ⍱⍱ B      ⍝ bit-wise Not
+
+   Even though that Or-ing a boolean vector with 0 itself has no effect,
+the monadic ∨∨ and ⍱⍱ are still useful due to their side effects:
+conversion from near-in float values to integers for ∨∨ and inversion of
+the bits for ⍱⍱, The latter is needed since ∼ has a monadic form and
+therefore ∼∼ was not an option for a bit-wise Not function.
+
+   Monadic ⍱⍱ B is the bit-wise Not function of its argument:
+
+   ⍱⍱ B ←→ 2⊥ ~(64⍴2)⊤B
+
+   Monadic ∨∨ B converts near-integer values B into true integers:
+
+      26 ⎕CR    1            ⍝ integer
+16
+      26 ⎕CR    1.1          ⍝ real
+32
+      26 ⎕CR    1÷1          ⍝ integer
+16
+      26 ⎕CR    1.1÷1.1      ⍝ real
+32
+      26 ⎕CR    ∨∨ 1.1÷1.1   ⍝ integer
+16
+
+   That also works for complex numbers with a near-zero imaginary part:
+
+      26 ⎕CR    1.1J0÷1.1      ⍝ real
+32
+      26 ⎕CR    ∨∨ 1.1J0÷1.1      ⍝ integer
+16
+
+   As a matter of fact, ∨∨ works for all near-gaussian complex numbers,
+but the effect is not visible with 26 ⎕CR since gaussian and
+non-gaussian complex numbers have the same cell type.
+
+3.16.3 Monadic ∧∧
+-----------------
+
+The ISO standard defines two different concepts to decide if a real
+number R is close to an integer I,
+   • the real number R is said to be near to integer I if the absolute
+     value of I-R is smaller than some small constant called the integer
+     tolerance in ISO and system tolerance in IBM APL2.  The integer
+     tolerance s typically platform dependent and must be smaller than
+     the minimal ⎕CT. In GNU APL the integer tolerance is 1E¯10 while
+     the max.  ⎕CT is 1E¯9.
+
+   • the real number R is said to be equal to integer I within ⎕CT if
+     the absolute value of (I-R)/I is smaller than ⎕CT.
+
+   The first concept is an absolute distance from a real R to a nearby
+integer I while the second concept is a relative distance (larger
+numbers are allowed to be farther way from a nearby integer than smaller
+numbers).  The two concepts differ in the same way that absolute and
+relative errors do.
+
+   Now, all bit-wise functions described so far use the first concept,
+i,e, if their their arguments are real or complex, then there must be
+not be farther away than integer tolerance from an integer.  In some
+contexts that could be difficult to achieve and for that reason GNU APL
+provides monadic ∧∧∧ which is like ⍱⍱ except that the arguments must be
+within ⎕CT to some integer.  All bit-wise logical functions throw a
+DOMAIN ERROR if an argument is not close enough to an integer, with ∧∧
+being a little more tolerant than ∨∨ regarding the distance to nearby
+integers, and ∧∧ giving the user more control over the tolerance (via
+⎕CR).
+
+
+File: apl.info,  Node: Section 3.17,  Next: Section 3.18,  Prev: Section 3.16,  Up: Chapter 3
+
+3.17 Dyadic ⎕CR
 ===============
 
 The ⎕CR function has an optional left argument that selects one of
@@ -1663,9 +1796,9 @@ are never proper byte values even if their value is close to an integer.
 Nor are nested APL values or values being assigned.
 
 
-File: apl.info,  Node: Section 3.17,  Next: Section 3.18,  Prev: Section 3.16,  Up: Chapter 3
+File: apl.info,  Node: Section 3.18,  Next: Section 3.19,  Prev: Section 3.17,  Up: Chapter 3
 
-3.17 Dyadic ⎕FX (Native Functions)
+3.18 Dyadic ⎕FX (Native Functions)
 ==================================
 
 A Native Function is a function that can be called in APL like a normal
@@ -1739,18 +1872,18 @@ into the system function ⎕FIO. The syntax of ⎕FIO is the same as for
 FILE_IO. The )CLEAR workspace command will close all open files.
 
 
-File: apl.info,  Node: Section 3.18,  Next: Section 3.19,  Prev: Section 3.17,  Up: Chapter 3
+File: apl.info,  Node: Section 3.19,  Next: Section 3.20,  Prev: Section 3.18,  Up: Chapter 3
 
-3.18 ⎕ARG - Interpreter command line arguments
+3.19 ⎕ARG - Interpreter command line arguments
 ==============================================
 
 ⎕ARG contains the command line arguments with which GNU APL was invoked.
 *Note Section 3.1::.
 
 
-File: apl.info,  Node: Section 3.19,  Next: Section 3.20,  Prev: Section 3.18,  Up: Chapter 3
+File: apl.info,  Node: Section 3.20,  Next: Section 3.21,  Prev: Section 3.19,  Up: Chapter 3
 
-3.19 ⎕DLX - Knuth’s Dancing Links Algorithm
+3.20 ⎕DLX - Knuth’s Dancing Links Algorithm
 ===========================================
 
 ⎕DLX is an implementation of Donald Knuth’s Dancing Links Algorithm
@@ -1976,18 +2109,18 @@ problems that can be solved by ⎕DLX contain 3 steps:
 matrix is a little more complicated, but the principle is the same.
 
 
-File: apl.info,  Node: Section 3.20,  Next: Section 3.21,  Prev: Section 3.19,  Up: Chapter 3
+File: apl.info,  Node: Section 3.21,  Next: Section 3.22,  Prev: Section 3.20,  Up: Chapter 3
 
-3.20 ⎕ENV - Environment Variables
+3.21 ⎕ENV - Environment Variables
 =================================
 
 ⎕ENV contains the environment variables of the process that is running
 GNU APL. *Note Section 3.1::.
 
 
-File: apl.info,  Node: Section 3.21,  Next: Section 3.22,  Prev: Section 3.20,  Up: Chapter 3
+File: apl.info,  Node: Section 3.22,  Next: Section 3.23,  Prev: Section 3.21,  Up: Chapter 3
 
-3.21 ⎕FIO - File I/O Functions
+3.22 ⎕FIO - File I/O Functions
 ==============================
 
 As of GNU APL 1.6, the native function FILE_IO has been replaced by the
@@ -2124,9 +2257,9 @@ and stored in Z. In other words,
      Z F¨Z←⎕FIO[49] 'filename'
 
 
-File: apl.info,  Node: Section 3.22,  Next: Section 3.23,  Prev: Section 3.21,  Up: Chapter 3
+File: apl.info,  Node: Section 3.23,  Next: Section 3.24,  Prev: Section 3.22,  Up: Chapter 3
 
-3.22 ⎕FFT - Fast Fourier Transform
+3.23 ⎕FFT - Fast Fourier Transform
 ==================================
 
 For those interested in signal processing and the like, GNU APL provides
@@ -2181,9 +2314,9 @@ will take a few hours, though, so that creating it will not pay off for
 most mortals.
 
 
-File: apl.info,  Node: Section 3.23,  Next: Section 3.24,  Prev: Section 3.22,  Up: Chapter 3
+File: apl.info,  Node: Section 3.24,  Next: Section 3.25,  Prev: Section 3.23,  Up: Chapter 3
 
-3.23 ⎕GTK - GTK Interface
+3.24 ⎕GTK - GTK Interface
 =========================
 
 GTK (Gimp Toolkit) is a rather powerful library for creating graphical
@@ -2197,9 +2330,9 @@ manual and has therefore been put into a separate document.  See:
 HOWTOs/Quad-GTK.html.
 
 
-File: apl.info,  Node: Section 3.24,  Next: Section 3.25,  Prev: Section 3.23,  Up: Chapter 3
+File: apl.info,  Node: Section 3.25,  Next: Section 3.26,  Prev: Section 3.24,  Up: Chapter 3
 
-3.24 ⎕RE - Regular Expressions
+3.25 ⎕RE - Regular Expressions
 ==============================
 
 ⎕RE is a function that provides access to a subset of libpcre2, which is
@@ -2207,7 +2340,7 @@ a powerful regular expression matching library.  "pcre" is an acronym
 for "Perl compatible regular expressions".  libpcre2 is Copyright (c)
 1997-2017 University of Cambridge, England.
 
-3.24.1 Preconditions
+3.25.1 Preconditions
 --------------------
 
 libpcre2 is NOT shipped with GNU APL but must be installed before the
@@ -2218,7 +2351,7 @@ are found.
    If ./configure does not find libpcre2, then ⎕RE will raise a SYNTAX
 ERROR when ⎕RE is used in an APL program.
 
-3.24.2 Syntax
+3.25.2 Syntax
 -------------
 
 ⎕RE has two forms.  The short form (without an axis argument) is
@@ -2235,7 +2368,7 @@ Z ← A ⎕RE[X] B   (long form, with axis X)
    It therefore suffices to explain the long form.  The long form has 3
 different arguments A, B, and X.
 
-3.24.3 The Regular Expression A
+3.25.3 The Regular Expression A
 -------------------------------
 
 A is a simple character vector which is expected to be a regular
@@ -2249,7 +2382,7 @@ user of ⎕RE is referred to the description that comes with libpcre2.
 
    man pcre2pattern
 
-3.24.4 The String(s) B Being Matched
+3.25.4 The String(s) B Being Matched
 ------------------------------------
 
 B is either (1) a simple character vector (which is then also passed
@@ -2278,7 +2411,7 @@ character vector.
    Any string B that is passed to libpcre2 is called "Subject" in the
 libpcre2 documentation.
 
-3.24.5 The Flags X
+3.25.5 The Flags X
 ------------------
 
 Without any flags (or with an empty flag string X) ⎕RE returns the first
@@ -2290,7 +2423,7 @@ The different flag characters are either flags understood by (and then
 passed unmodified to) libpcre2 or flags understood by ⎕RE itself (and
 then not passed to libpcre2).
 
-3.24.5.1 libpcre2 flags: i, m, s, and x
+3.25.5.1 libpcre2 flags: i, m, s, and x
 .......................................
 
 The libpcre2 flags accepted by ⎕RE are: i, m, s, and x.  They correspond
@@ -2304,7 +2437,7 @@ to the following libpcre2 flags:
    Please also consult the libpcre2 documentation for a description of
 these flags.
 
-3.24.5.2 The APL output format flags ↓, ⊂, and /
+3.25.5.2 The APL output format flags ↓, ⊂, and /
 ................................................
 
 ⎕RE provides different output formats, some of which are tailored to
@@ -2354,7 +2487,7 @@ flags:
 formats ⊂ and / are identical; if ’g’ is present, however, then they may
 differ.
 
-3.24.5.3 the ⎕RE global flag g
+3.25.5.3 the ⎕RE global flag g
 ..............................
 
 The default behavior of ⎕RE is to return only the first match in B. The
@@ -2404,7 +2537,7 @@ The default behavior of ⎕RE is to return only the first match in B. The
 the output formats string and position/length, but not of the result of
 output formats partition and compress.
 
-3.24.5.4 the ⎕RE error flag E
+3.25.5.4 the ⎕RE error flag E
 .............................
 
 The default behavior of ⎕RE is to return an empty result if no match of
@@ -2429,7 +2562,7 @@ that case it is natural to check the length of the result:
        'g..' ⎕RE['Eg'] '__foo___fun____fox'
 
 
-3.24.6 Complex Matches
+3.25.6 Complex Matches
 ----------------------
 
 The regular expressions considered so far were simple, which means that
@@ -2497,9 +2630,9 @@ two 1-character sub-matches:
 ┗∊∊━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 
-File: apl.info,  Node: Section 3.25,  Next: Section 3.26,  Prev: Section 3.24,  Up: Chapter 3
+File: apl.info,  Node: Section 3.26,  Next: Section 3.27,  Prev: Section 3.25,  Up: Chapter 3
 
-3.25 ⎕PS - Print Style
+3.26 ⎕PS - Print Style
 ======================
 
 ⎕PS is an integer vector that currently (read: SVN 982) contains two
@@ -2525,9 +2658,9 @@ uses the same values.
 value to ⎕PS assigns that value to ⎕PS[2] and sets ⎕PS[1] to 0.
 
 
-File: apl.info,  Node: Section 3.26,  Next: Section 3.27,  Prev: Section 3.25,  Up: Chapter 3
+File: apl.info,  Node: Section 3.27,  Next: Section 3.28,  Prev: Section 3.26,  Up: Chapter 3
 
-3.26 ⎕SQL - SQL Database Interface
+3.27 ⎕SQL - SQL Database Interface
 ==================================
 
 As of GNU APL 1.6, the native function SQL has been replaced by the
@@ -2624,9 +2757,9 @@ table.  Currently, the column layout is as follows:
 release.
 
 
-File: apl.info,  Node: Section 3.27,  Next: Section 3.28,  Prev: Section 3.26,  Up: Chapter 3
+File: apl.info,  Node: Section 3.28,  Next: Section 3.29,  Prev: Section 3.27,  Up: Chapter 3
 
-3.27 ⎕SI - State Indicator
+3.28 ⎕SI - State Indicator
 ==========================
 
 ⎕SI returns aspects of the current State Indicator, similar to the
@@ -2690,9 +2823,9 @@ while negative A count from the latest to the oldest level.
 is the caller, and so on.
 
 
-File: apl.info,  Node: Section 3.28,  Prev: Section 3.27,  Up: Chapter 3
+File: apl.info,  Node: Section 3.29,  Prev: Section 3.28,  Up: Chapter 3
 
-3.28 ⎕SYL - System limits
+3.29 ⎕SYL - System limits
 =========================
 
 System variable ⎕SYL shows a number of system limits when referenced:
@@ -2730,7 +2863,7 @@ result in a SYNTAX ERROR. Indexed assignment to ⎕SYL will result in an
 INDEX ERROR unless the limit is writable.  Some read-only limits can be
 changed at compile-time via ./configure
 
-3.28.1 ⎕SYL[1 2 3 4 5 6;]
+3.29.1 ⎕SYL[1 2 3 4 5 6;]
 -------------------------
 
 The first three limits are writable; their purpose is to stop execution
@@ -2762,20 +2895,20 @@ bytes limits together.
    An attempt to set a too small limit, for example one that is close to
 the current value, is rejected with a DOMAIN ERROR.
 
-3.28.2 ⎕SYL[7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23;]
+3.29.2 ⎕SYL[7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23;]
 -------------------------------------------------------------
 
 These system limits are read-only.  Some of them can be changed at
 compile time via ./configure.  Most others can be changed in the source
 code of GNU APL, but doing so is not recommended.
 
-3.28.3 ⎕SYL[24 25 26;]
+3.29.3 ⎕SYL[24 25 26;]
 ----------------------
 
 These system limits have been added in preparation of multi-core GNU
 APL. They are currently not used.
 
-3.28.4 ⎕SYL[27;]
+3.29.4 ⎕SYL[27;]
 ----------------
 
 This is not a limit that raises a limit error.  Instead it limits the
@@ -4118,42 +4251,43 @@ Node: Top383
 Node: Chapter 11416
 Node: Chapter 217072
 Node: Chapter 321496
-Node: Section 3.122892
-Node: Section 3.233910
-Node: Section 3.334669
-Node: Section 3.435956
-Node: Section 3.538577
-Node: Section 3.638750
-Node: Section 3.739363
-Node: Section 3.843307
-Node: Section 3.944849
-Node: Section 3.1045446
-Node: Section 3.1147230
-Node: Section 3.1249170
-Node: Section 3.1350111
-Node: Section 3.1450364
-Node: Section 3.1551760
-Node: Section 3.1654270
-Node: Section 3.1759323
-Node: Section 3.1862605
-Node: Section 3.1962896
-Node: Section 3.2072808
-Node: Section 3.2173080
-Node: Section 3.2279658
-Node: Section 3.2382109
-Node: Section 3.2482778
-Node: Section 3.2596340
-Node: Section 3.2697280
-Node: Section 3.27100384
-Node: Section 3.28102373
-Node: Chapter 4106751
-Node: Chapter 5108499
-Node: Chapter 6109628
-Node: Section 6.1110047
-Node: Section 6.2110734
-Node: Chapter 7111565
-Node: Section 7.1112068
-Node: Section 7.2137378
+Node: Section 3.122972
+Node: Section 3.233990
+Node: Section 3.334749
+Node: Section 3.436036
+Node: Section 3.538657
+Node: Section 3.638830
+Node: Section 3.739443
+Node: Section 3.843387
+Node: Section 3.944929
+Node: Section 3.1045526
+Node: Section 3.1147310
+Node: Section 3.1249250
+Node: Section 3.1350191
+Node: Section 3.1450443
+Node: Section 3.1551839
+Node: Section 3.1654351
+Node: Section 3.1759578
+Node: Section 3.1864631
+Node: Section 3.1967913
+Node: Section 3.2068204
+Node: Section 3.2178116
+Node: Section 3.2278388
+Node: Section 3.2384966
+Node: Section 3.2487417
+Node: Section 3.2588086
+Node: Section 3.26101648
+Node: Section 3.27102588
+Node: Section 3.28105692
+Node: Section 3.29107681
+Node: Chapter 4112059
+Node: Chapter 5113807
+Node: Chapter 6114936
+Node: Section 6.1115355
+Node: Section 6.2116042
+Node: Chapter 7116873
+Node: Section 7.1117376
+Node: Section 7.2142686
 
 End Tag Table
 

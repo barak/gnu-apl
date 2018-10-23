@@ -40,6 +40,15 @@ NumericCell::bif_not(Cell * Z) const
    return E_NO_ERROR;
 }
 //-----------------------------------------------------------------------------
+ErrorCode
+NumericCell::bif_not_bitwise(Cell * Z) const
+{
+   if (!is_near_int64_t())       return E_DOMAIN_ERROR;
+
+   new (Z) IntCell(~get_near_int());
+   return E_NO_ERROR;
+}
+//-----------------------------------------------------------------------------
 
 const uint64_t N_choose_8[] = { (887), 1, 9, 45, 165, 495, 1287, 3003, 6435,
  12870, 24310, 43758, 75582, 0x1EC12, 0x31AE2, 0x4E11A, 0x77B4A, 0xB38EF,
@@ -1500,18 +1509,54 @@ const double qct = Workspace::get_CT();
 }
 //-----------------------------------------------------------------------------
 ErrorCode
+NumericCell::bif_and_bitwise(Cell * Z, const Cell * A) const
+{
+   if (!is_near_int64_t())       return E_DOMAIN_ERROR;
+   if (!A->is_near_int64_t())    return E_DOMAIN_ERROR;
+
+   new (Z) IntCell(A->get_near_int() & get_near_int());
+   return E_NO_ERROR;
+}
+//-----------------------------------------------------------------------------
+ErrorCode
 NumericCell::bif_nand(Cell * Z, const Cell * A) const
 {
+   if (!is_near_bool())      return E_DOMAIN_ERROR;
+   if (!A->is_near_bool())   return E_DOMAIN_ERROR;
+
    if (A->get_near_bool() && get_near_bool())   new (Z) IntCell(0);
    else                                         new (Z) IntCell(1);
    return E_NO_ERROR;
 }
 //-----------------------------------------------------------------------------
 ErrorCode
+NumericCell::bif_nand_bitwise(Cell * Z, const Cell * A) const
+{
+   if (!is_near_int64_t())       return E_DOMAIN_ERROR;
+   if (!A->is_near_int64_t())    return E_DOMAIN_ERROR;
+
+   new (Z) IntCell(~(A->get_near_int() & get_near_int()));
+   return E_NO_ERROR;
+}
+//-----------------------------------------------------------------------------
+ErrorCode
 NumericCell::bif_nor(Cell * Z, const Cell * A) const
 {
+   if (!is_near_bool())      return E_DOMAIN_ERROR;
+   if (!A->is_near_bool())   return E_DOMAIN_ERROR;
+
    if (A->get_near_bool() || get_near_bool())   new (Z) IntCell(0);
    else                                         new (Z) IntCell(1);
+   return E_NO_ERROR;
+}
+//-----------------------------------------------------------------------------
+ErrorCode
+NumericCell::bif_nor_bitwise(Cell * Z, const Cell * A) const
+{
+   if (!is_near_int64_t())       return E_DOMAIN_ERROR;
+   if (!A->is_near_int64_t())    return E_DOMAIN_ERROR;
+
+   new (Z) IntCell(~(A->get_near_int() | get_near_int()));
    return E_NO_ERROR;
 }
 //-----------------------------------------------------------------------------
@@ -1581,6 +1626,16 @@ const double qct = Workspace::get_CT();
       }
 
    return E_DOMAIN_ERROR;   // char ?
+}
+//-----------------------------------------------------------------------------
+ErrorCode
+NumericCell::bif_or_bitwise(Cell * Z, const Cell * A) const
+{
+   if (!is_near_int64_t())       return E_DOMAIN_ERROR;
+   if (!A->is_near_int64_t())    return E_DOMAIN_ERROR;
+
+   new (Z) IntCell(A->get_near_int() | get_near_int());
+   return E_NO_ERROR;
 }
 //-----------------------------------------------------------------------------
 APL_Complex

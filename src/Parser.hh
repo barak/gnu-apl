@@ -76,6 +76,9 @@ protected:
    /// Replace (X) by X and ((..) by (..) in \b string. (X is a single token)
    static void remove_nongrouping_parantheses(Token_string & tos);
 
+   /// Replace ∧∧, ∨∨, ⍲⍲, and ⍱⍱ by their bitwise variant
+   static void replace_bitwise_functions(Token_string & tos);
+
    /// check if tos[pos] is the end of a value or of a function
    static bool check_if_value(const Token_string & tos, int pos);
 

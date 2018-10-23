@@ -40,12 +40,16 @@ Bif_F2_EQUAL    Bif_F2_EQUAL   ::_fun;                // =
 Bif_F2_FIND     Bif_F2_FIND    ::_fun;                // ⋸ (almost scalar)
 Bif_F2_GREATER  Bif_F2_GREATER ::_fun;                // >
 Bif_F2_AND      Bif_F2_AND     ::_fun;                // ∧
+Bif_F2_AND_B    Bif_F2_AND_B   ::_fun;                // ∧∧
 Bif_F2_OR       Bif_F2_OR      ::_fun;                // ∨
+Bif_F2_OR_B     Bif_F2_OR_B    ::_fun;                // ∨∨
 Bif_F2_LEQ      Bif_F2_LEQ     ::_fun;                // ≤
 Bif_F2_MEQ      Bif_F2_MEQ     ::_fun;                // ≥
 Bif_F2_UNEQ     Bif_F2_UNEQ    ::_fun;                // ≠
 Bif_F2_NOR      Bif_F2_NOR     ::_fun;                // ⍱
+Bif_F2_NOR_B    Bif_F2_NOR_B   ::_fun;                // ⍱⍱
 Bif_F2_NAND     Bif_F2_NAND    ::_fun;                // ⍲
+Bif_F2_NAND_B   Bif_F2_NAND_B  ::_fun;                // ⍲⍲
 Bif_F12_PLUS    Bif_F12_PLUS   ::_fun(false);         // +
 Bif_F12_PLUS    Bif_F12_PLUS   ::_fun_inverse(true);  // +
 Bif_F12_POWER   Bif_F12_POWER  ::_fun;                // ⋆
@@ -70,12 +74,16 @@ Bif_F2_EQUAL    * Bif_F2_EQUAL   ::fun         = &Bif_F2_EQUAL   ::_fun;
 Bif_F2_FIND     * Bif_F2_FIND    ::fun         = &Bif_F2_FIND    ::_fun;
 Bif_F2_GREATER  * Bif_F2_GREATER ::fun         = &Bif_F2_GREATER ::_fun;
 Bif_F2_AND      * Bif_F2_AND     ::fun         = &Bif_F2_AND     ::_fun;
+Bif_F2_AND_B    * Bif_F2_AND_B   ::fun         = &Bif_F2_AND_B   ::_fun;
 Bif_F2_OR       * Bif_F2_OR      ::fun         = &Bif_F2_OR      ::_fun;
+Bif_F2_OR_B     * Bif_F2_OR_B    ::fun         = &Bif_F2_OR_B    ::_fun;
 Bif_F2_LEQ      * Bif_F2_LEQ     ::fun         = &Bif_F2_LEQ     ::_fun;
 Bif_F2_MEQ      * Bif_F2_MEQ     ::fun         = &Bif_F2_MEQ     ::_fun;
 Bif_F2_UNEQ     * Bif_F2_UNEQ    ::fun         = &Bif_F2_UNEQ    ::_fun;
 Bif_F2_NOR      * Bif_F2_NOR     ::fun         = &Bif_F2_NOR     ::_fun;
+Bif_F2_NOR_B    * Bif_F2_NOR_B   ::fun         = &Bif_F2_NOR_B   ::_fun;
 Bif_F2_NAND     * Bif_F2_NAND    ::fun         = &Bif_F2_NAND    ::_fun;
+Bif_F2_NAND_B   * Bif_F2_NAND_B  ::fun         = &Bif_F2_NAND_B  ::_fun;
 Bif_F12_PLUS    * Bif_F12_PLUS   ::fun         = &Bif_F12_PLUS   ::_fun;
 Bif_F12_PLUS    * Bif_F12_PLUS   ::fun_inverse = &Bif_F12_PLUS   ::_fun_inverse;
 Bif_F12_POWER   * Bif_F12_POWER  ::fun         = &Bif_F12_POWER  ::_fun;

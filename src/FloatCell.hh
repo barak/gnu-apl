@@ -297,6 +297,16 @@ protected:
    virtual bool is_near_int() const
       { return Cell::is_near_int(dfval()); }
 
+   /// Overloaded Cell::is_near_int64_t().
+   virtual bool is_near_int64_t() const
+      { return Cell::is_near_int64_t(dfval()); }
+
+   /// overloaded Cell::bif_near_int()
+   virtual ErrorCode bif_near_int64_t(Cell * Z) const;
+
+   /// overloaded Cell::bif_within_quad_CT()
+   virtual ErrorCode bif_within_quad_CT(Cell * Z) const;
+
    /// Overloaded Cell::is_near_zero().
    virtual bool is_near_zero() const
       { return dfval() >= -INTEGER_TOLERANCE

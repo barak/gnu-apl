@@ -38,8 +38,14 @@ protected:
    /// overloaded Cell::bif_not()
    virtual ErrorCode bif_not(Cell * Z) const;
 
+   /// overloaded Cell::bif_not_bitwise()
+   virtual ErrorCode bif_not_bitwise(Cell * Z) const;
+
    /// overloaded Cell::bif_and()
    virtual ErrorCode bif_and(Cell * Z, const Cell * A) const;
+
+   /// overloaded Cell::bif_and_bitwise()
+   virtual ErrorCode bif_and_bitwise(Cell * Z, const Cell * A) const;
 
    /// overloaded Cell::bif_binomial()
    virtual ErrorCode bif_binomial(Cell * Z, const Cell * A) const;
@@ -50,11 +56,20 @@ protected:
    /// overloaded Cell::bif_nand()
    virtual ErrorCode bif_nand(Cell * Z, const Cell * A) const;
 
+   /// overloaded Cell::bif_nand_bitwise()
+   virtual ErrorCode bif_nand_bitwise(Cell * Z, const Cell * A) const;
+
    /// overloaded Cell::bif_nor()
    virtual ErrorCode bif_nor(Cell * Z, const Cell * A) const;
 
+   /// overloaded Cell::bif_nor_bitwise()
+   virtual ErrorCode bif_nor_bitwise(Cell * Z, const Cell * A) const;
+
    /// overloaded Cell::bif_or()
    virtual ErrorCode bif_or(Cell * Z, const Cell * A) const;
+
+   /// overloaded Cell::bif_or_bitwise()
+   virtual ErrorCode bif_or_bitwise(Cell * Z, const Cell * A) const;
 
    /// overloaded Cell::get_classname()
    virtual const char * get_classname() const   { return "NumericCell"; }

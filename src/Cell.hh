@@ -153,6 +153,10 @@ public:
    virtual bool is_near_int() const
       { return false; }
 
+   /// True iff value is numeric and close to an int
+   virtual bool is_near_int64_t() const
+      { return false; }
+
    /// return true iff value is numeric and close to a real number
    virtual bool is_near_real() const
       { return false; }
@@ -301,6 +305,18 @@ public:
    virtual ErrorCode bif_not(Cell * Z) const
       { return E_DOMAIN_ERROR; }
 
+   /// store the bitwise complement of the value of this Cell in Z
+   virtual ErrorCode bif_not_bitwise(Cell * Z) const
+      { return E_DOMAIN_ERROR; }
+
+   /// store the nearby integer of the value of this Cell in Z
+   virtual ErrorCode bif_near_int64_t(Cell * Z) const
+      { return E_DOMAIN_ERROR; }
+
+   /// store the nearby integer of the value of this Cell in Z
+   virtual ErrorCode bif_within_quad_CT(Cell * Z) const
+      { return E_DOMAIN_ERROR; }
+
    /// store pi times the value of this Cell in Z
    virtual ErrorCode bif_pi_times(Cell * Z) const
       { return E_DOMAIN_ERROR; }
@@ -323,6 +339,10 @@ public:
 
    /// store the logical and of A and \b this cell in Z
    virtual ErrorCode bif_and(Cell * Z, const Cell * A) const
+      { return E_DOMAIN_ERROR; }
+
+   /// store the bitwise and of A and \b this cell in Z
+   virtual ErrorCode bif_and_bitwise(Cell * Z, const Cell * A) const
       { return E_DOMAIN_ERROR; }
 
    /// store the binomial (n over k) of A and \b this cell in Z
@@ -379,12 +399,24 @@ public:
    virtual ErrorCode bif_nand(Cell * Z, const Cell * A) const
       { return E_DOMAIN_ERROR; }
 
-   /// store the logical nor of A and \b this cell in Z
+   /// store the bitwise nand of A and \b this cell in Z
+   virtual ErrorCode bif_nand_bitwise(Cell * Z, const Cell * A) const
+      { return E_DOMAIN_ERROR; }
+
+   /// store the logical NOR of A and \b this cell in Z
    virtual ErrorCode bif_nor(Cell * Z, const Cell * A) const
       { return E_DOMAIN_ERROR; }
 
-   /// store the logical or of A and \b this cell in Z
+   /// store the bitwise NOR of A and \b this cell in Z
+   virtual ErrorCode bif_nor_bitwise(Cell * Z, const Cell * A) const
+      { return E_DOMAIN_ERROR; }
+
+   /// store the logical OR of A and \b this cell in Z
    virtual ErrorCode bif_or(Cell * Z, const Cell * A) const
+      { return E_DOMAIN_ERROR; }
+
+   /// store the bitwise or of A and \b this cell in Z
+   virtual ErrorCode bif_or_bitwise(Cell * Z, const Cell * A) const
       { return E_DOMAIN_ERROR; }
 
    /// store A to the power of \b this cell in Z
@@ -456,6 +488,9 @@ public:
 
    /// true iff value is close to an int (within +- qct)
    static bool is_near_int(APL_Float value);
+
+   /// true iff value is close to an int64_t (i.e. fots into an int64_t
+   static bool is_near_int64_t(APL_Float value);
 
    /// true iff value is close to 0 (within +- qct)
    static bool is_near_zero(APL_Float value)

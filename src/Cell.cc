@@ -151,6 +151,20 @@ const APL_Float diff = value - result;
    return true;
 }
 //-----------------------------------------------------------------------------
+bool
+Cell::is_near_int64_t(APL_Float value)
+{
+   if (value > LARGE_INT)   return false;
+   if (value < SMALL_INT)   return false;
+
+const APL_Float result = nearbyint(value);
+const APL_Float diff = value - result;
+   if (diff >= INTEGER_TOLERANCE)    return false;
+   if (diff <= -INTEGER_TOLERANCE)   return false;
+
+   return true;
+}
+//-----------------------------------------------------------------------------
 APL_Integer
 Cell::near_int(APL_Float value)
 {

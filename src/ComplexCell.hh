@@ -214,6 +214,15 @@ protected:
    /// overloaded Cell::is_near_int()
    virtual bool is_near_int() const;
 
+   /// overloaded Cell::is_near_int64_t()
+   virtual bool is_near_int64_t() const;
+
+   /// overloaded Cell::bif_near_int64_t()
+   virtual ErrorCode bif_near_int64_t(Cell * Z) const;
+
+   /// overloaded Cell::bif_within_quad_CT()
+   virtual ErrorCode bif_within_quad_CT(Cell * Z) const;
+
    /// overloaded Cell::is_near_zero()
    virtual bool is_near_zero() const;
 

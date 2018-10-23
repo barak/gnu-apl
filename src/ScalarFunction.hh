@@ -237,7 +237,7 @@ protected:
       { return eval_scalar_AXB(A, X, B, &Cell::bif_greater_than); }
 };
 //-----------------------------------------------------------------------------
-/** Scalar function and.
+/** Scalar function AND/LCM
  */
 class Bif_F2_AND : public ScalarFunction
 {
@@ -271,7 +271,45 @@ protected:
       { return eval_scalar_AXB(A, X, B, &Cell::bif_and); }
 };
 //-----------------------------------------------------------------------------
-/** Scalar function or.
+/** Scalar function AND bitwise
+ */
+class Bif_F2_AND_B : public ScalarFunction
+{
+public:
+   /// Constructor.
+   Bif_F2_AND_B()
+   : ScalarFunction(PERF_A(AND_B))
+   {}
+
+   static Bif_F2_AND_B * fun;          ///< Built-in function.
+   static Bif_F2_AND_B  _fun;          ///< Built-in function.
+
+protected:
+   /// overloaded Function::eval_B().
+   virtual Token eval_B(Value_P B)
+      { return eval_scalar_B(B, &Cell::bif_within_quad_CT); }
+
+   /// overloaded Function::eval_AB().
+   virtual Token eval_AB(Value_P A, Value_P B)
+      { return eval_scalar_AB(A, B, &Cell::bif_and_bitwise); }
+
+   /// overloaded Function::get_scalar_f2
+   virtual prim_f2 get_scalar_f2() const
+      { return &Cell::bif_and_bitwise; }
+
+   /// return the associative cell function of this function
+   virtual assoc_f2 get_assoc() const { return &Cell::bif_and_bitwise; }
+
+   /// overloaded Function::eval_identity_fun();
+   virtual Token eval_identity_fun(Value_P B, Axis axis)
+      { return eval_scalar_identity_fun(B, axis, IntScalar(1, LOC)); }
+
+   /// overloaded Function::eval_AXB().
+   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B)
+      { return eval_scalar_AXB(A, X, B, &Cell::bif_and_bitwise); }
+};
+//-----------------------------------------------------------------------------
+/** Scalar function OR/GCD
  */
 class Bif_F2_OR : public ScalarFunction
 {
@@ -303,6 +341,44 @@ protected:
    /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B)
       { return eval_scalar_AXB(A, X, B, &Cell::bif_or); }
+};
+//-----------------------------------------------------------------------------
+/** Scalar function OR bitwise
+ */
+class Bif_F2_OR_B : public ScalarFunction
+{
+public:
+   /// Constructor.
+   Bif_F2_OR_B()
+   : ScalarFunction(PERF_A(OR_B))
+   {}
+
+   static Bif_F2_OR_B * fun;           ///< Built-in function.
+   static Bif_F2_OR_B  _fun;           ///< Built-in function.
+
+protected:
+   /// overloaded Function::eval_B().
+   virtual Token eval_B(Value_P B)
+      { return eval_scalar_B(B, &Cell::bif_near_int64_t); }
+
+   /// overloaded Function::eval_AB().
+   virtual Token eval_AB(Value_P A, Value_P B)
+      { return eval_scalar_AB(A, B, &Cell::bif_or_bitwise); }
+
+   /// overloaded Function::get_scalar_f2
+   virtual prim_f2 get_scalar_f2() const
+      { return &Cell::bif_or_bitwise; }
+
+   /// return the associative cell function of this function
+   virtual assoc_f2 get_assoc() const { return &Cell::bif_or_bitwise; }
+
+   /// overloaded Function::eval_identity_fun();
+   virtual Token eval_identity_fun(Value_P B, Axis axis)
+      { return eval_scalar_identity_fun(B, axis, IntScalar(0, LOC)); }
+
+   /// overloaded Function::eval_AXB().
+   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B)
+      { return eval_scalar_AXB(A, X, B, &Cell::bif_or_bitwise); }
 };
 //-----------------------------------------------------------------------------
 /** Scalar function less or equal.
@@ -424,7 +500,7 @@ protected:
                          Value_P B, const Shape & idx_B, double qct);
 };
 //-----------------------------------------------------------------------------
-/** Scalar function nor.
+/** Scalar function NOR
  */
 class Bif_F2_NOR : public ScalarFunction
 {
@@ -449,6 +525,37 @@ protected:
    /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B)
       { return eval_scalar_AXB(A, X, B, &Cell::bif_nor); }
+};
+//-----------------------------------------------------------------------------
+/** Scalar function NOR bitwise
+ */
+class Bif_F2_NOR_B : public ScalarFunction
+{
+public:
+   /// Constructor.
+   Bif_F2_NOR_B()
+   : ScalarFunction(PERF_A(NOR_B))
+   {}
+
+   static Bif_F2_NOR_B * fun;          ///< Built-in function.
+   static Bif_F2_NOR_B  _fun;          ///< Built-in function.
+
+protected:
+   /// overloaded Function::eval_B().
+   virtual Token eval_B(Value_P B)
+      { return eval_scalar_B(B, &Cell::bif_not_bitwise); }
+
+   /// overloaded Function::eval_AB().
+   virtual Token eval_AB(Value_P A, Value_P B)
+      { return eval_scalar_AB(A, B, &Cell::bif_nor_bitwise); }
+
+   /// overloaded Function::get_scalar_f2()
+   virtual prim_f2 get_scalar_f2() const
+      { return &Cell::bif_nor_bitwise; }
+
+   /// overloaded Function::eval_AXB().
+   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B)
+      { return eval_scalar_AXB(A, X, B, &Cell::bif_nor_bitwise); }
 };
 //-----------------------------------------------------------------------------
 /** Scalar function nand.
@@ -476,6 +583,33 @@ protected:
    /// overloaded Function::eval_AXB().
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B)
       { return eval_scalar_AXB(A, X, B, &Cell::bif_nand); }
+};
+//-----------------------------------------------------------------------------
+/** Scalar function NAND bitwise
+ */
+class Bif_F2_NAND_B : public ScalarFunction
+{
+public:
+   /// Constructor.
+   Bif_F2_NAND_B()
+   : ScalarFunction(PERF_A(NAND_B))
+   {}
+
+   static Bif_F2_NAND_B * fun;         ///< Built-in function.
+   static Bif_F2_NAND_B  _fun;         ///< Built-in function.
+
+protected:
+   /// overloaded Function::eval_AB().
+   virtual Token eval_AB(Value_P A, Value_P B)
+      { return eval_scalar_AB(A, B, &Cell::bif_nand_bitwise); }
+
+   /// overloaded Function::get_scalar_f2()
+   virtual prim_f2 get_scalar_f2() const
+      { return &Cell::bif_nand_bitwise; }
+
+   /// overloaded Function::eval_AXB().
+   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B)
+      { return eval_scalar_AXB(A, X, B, &Cell::bif_nand_bitwise); }
 };
 //-----------------------------------------------------------------------------
 /** Scalar functions power and exponential.

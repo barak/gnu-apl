@@ -303,13 +303,17 @@ Token::print_function(ostream & out) const
         case TOK_F2_EQUAL:      return out << UNI_ASCII_EQUAL;
         case TOK_F2_GREATER:    return out << UNI_ASCII_GREATER;
         case TOK_F2_AND:        return out << UNI_AND;
+        case TOK_F2_AND_B:      return out << UNI_AND << UNI_AND;
         case TOK_F2_OR:         return out << UNI_OR;
+        case TOK_F2_OR_B:       return out << UNI_OR << UNI_OR;
         case TOK_F2_INDEX:      return out << UNI_SQUISH_Quad;
         case TOK_F2_LEQ:        return out << UNI_LESS_OR_EQUAL;
         case TOK_F2_MEQ:        return out << UNI_MORE_OR_EQUAL;
         case TOK_F2_UNEQ:       return out << UNI_NOT_EQUAL;
         case TOK_F2_NOR:        return out << UNI_NOR;
+        case TOK_F2_NOR_B:      return out << UNI_NOR << UNI_NOR;
         case TOK_F2_NAND:       return out << UNI_NAND;
+        case TOK_F2_NAND_B:     return out << UNI_NAND << UNI_NAND;
 
         case TOK_F12_BINOM:     return out << UNI_ASCII_EXCLAM;
         case TOK_F12_CIRCLE:    return out << UNI_CIRCLE;

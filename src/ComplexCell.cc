@@ -67,6 +67,61 @@ ComplexCell::is_near_int() const
 }
 //-----------------------------------------------------------------------------
 bool
+ComplexCell::is_near_int64_t() const
+{
+   return Cell::is_near_int64_t(value.cval[0]) &&
+          Cell::is_near_int64_t(value.cval[1]);
+}
+//-----------------------------------------------------------------------------
+ErrorCode
+ComplexCell::bif_near_int64_t(Cell * Z) const
+{
+   if (!is_near_int64_t())   return E_DOMAIN_ERROR;
+
+   // return an int Cell if the imaginary part is 0 and the number is not too
+   // large
+   //
+   if (value.cval[1] <  INTEGER_TOLERANCE &&
+       value.cval[1] > -INTEGER_TOLERANCE &&
+       value.cval[0] <  BIG_INT64_F       &&
+       value.cval[0] > -BIG_INT64_F)   return zv(Z, round(value.cval[0]));
+
+   return zv(Z, round(value.cval[0]), round(value.cval[1]));
+}
+//-----------------------------------------------------------------------------
+ErrorCode
+ComplexCell::bif_within_quad_CT(Cell * Z) const
+{
+const double val_r = value.cval[0];
+   if (val_r > LARGE_INT)   return E_DOMAIN_ERROR;
+   if (val_r < SMALL_INT)   return E_DOMAIN_ERROR;
+
+const double val_i = value.cval[1];
+   if (val_i > LARGE_INT)   return E_DOMAIN_ERROR;
+   if (val_i < SMALL_INT)   return E_DOMAIN_ERROR;
+
+const double max_diff_r = Workspace::get_CT() * val_r;   // scale ⎕CT
+const double max_diff_i = Workspace::get_CT() * val_i;   // scale ⎕CT
+
+const APL_Float val_dn_r = floor(val_r);
+const APL_Float val_up_r = ceil(val_r);
+const APL_Float val_dn_i = floor(val_i);
+const APL_Float val_up_i = ceil(val_i);
+
+double z_r;
+   if (val_r < (val_dn_r + max_diff_r))        z_r = val_dn_r;
+   else if (val_r < (val_up_r - max_diff_r))   z_r = val_up_r;
+   else                                        return E_DOMAIN_ERROR;
+
+double z_i;
+   if (val_i < (val_dn_i + max_diff_i))        z_i = val_dn_i;
+   else if (val_i < (val_up_i - max_diff_i))   z_i = val_up_i;
+   else                                        return E_DOMAIN_ERROR;
+
+   return zv(Z, z_r, z_i);
+}
+//-----------------------------------------------------------------------------
+bool
 ComplexCell::is_near_zero() const
 {
    if (value.cval[0]  >=  INTEGER_TOLERANCE)   return false;
@@ -89,14 +144,13 @@ ComplexCell::is_near_one() const
 bool
 ComplexCell::is_near_real() const
 {
-const APL_Float B = REAL_TOLERANCE*REAL_TOLERANCE;
-const APL_Float I = value.cval[1] * value.cval[1];
+const APL_Float B2 = REAL_TOLERANCE*REAL_TOLERANCE;
+const APL_Float I2 = value.cval[1] * value.cval[1];
 
-   if (I < B)     return true;   // I is absolutely small
+   if (I2 < B2)     return true;   // I is absolutely small
 
-const APL_Float R = value.cval[0] * value.cval[0];
-   if (I < R*B)   return true;   // I is relatively small
-   return false;
+const APL_Float R2 = value.cval[0] * value.cval[0];
+   return (I2 < R2*B2);   // I is relatively small
 }
 //-----------------------------------------------------------------------------
 bool
