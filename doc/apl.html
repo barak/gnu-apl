@@ -1861,9 +1861,10 @@ a left argument of 0:
 </pre>
 <p>Even though that Or-ing a boolean vector with 0 itself has no effect, the
 monadic ∨∨ and ⍱⍱ are still useful due to their side effects: conversion
-from near-in float values to integers for ∨∨ and inversion of the bits for ⍱⍱,
-The latter is needed since ∼ has a monadic form and therefore ∼∼ was not
-an option for a bit-wise <b>Not</b> function.
+from near-integer float values to integers (monadic <b>∨∨</b> and inversion
+of the bits (monadic <b>⍱⍱</b>, The latter is needed since ∼ has a monadic
+form and as a consequence ∼∼ was not an option for a bit-wise <b>Not</b>
+function.
 </p>
 <p>Monadic <b>⍱⍱ B</b> is the bit-wise <b>Not</b> function of its argument:
 </p>
@@ -1891,7 +1892,7 @@ an option for a bit-wise <b>Not</b> function.
 </pre>
 <p>As a matter of fact, <b>∨∨</b> works for all near-gaussian complex numbers,
 but the effect is not visible with 26 ⎕CR since gaussian and non-gaussian
-complex numbers have the same cell type.
+complex numbers have the same cell type in GNU APL.
 </p>
 <a name="Monadic-_005b_003f_005d_005b_003f_005d"></a>
 <h4 class="subsection">3.16.3 Monadic ∧∧</h4>
@@ -1902,8 +1903,7 @@ is close to an integer I,
 <li> the real number R is said to be <b>near</b> to integer I if the absolute
 value of I-R is smaller than some small constant called the <b>integer
 tolerance</b> in ISO and <b>system tolerance</b> in IBM APL2. The <b>integer
-tolerance</b> s typically platform dependent and must be smaller than the minimal
-⎕CT. In GNU APL the <b>integer tolerance</b> is 1E¯10 while the max. ⎕CT is 1E¯9.
+tolerance</b> is typically platform dependent (1E¯10 in GNU APL).
 
 </li><li> the real number R is said to be <b>equal to integer I within ⎕CT</b> if the
 absolute value of (I-R)/I is smaller than ⎕CT.

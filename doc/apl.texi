@@ -1687,9 +1687,10 @@ a left argument of 0:
 
 Even though that Or-ing a boolean vector with 0 itself has no effect, the
 monadic ∨∨ and ⍱⍱ are still useful due to their side effects: conversion
-from near-in float values to integers for ∨∨ and inversion of the bits for ⍱⍱,
-The latter is needed since ∼ has a monadic form and therefore ∼∼ was not
-an option for a bit-wise @b{Not} function.
+from near-integer float values to integers (monadic @b{∨∨} and inversion
+of the bits (monadic @b{⍱⍱}, The latter is needed since ∼ has a monadic
+form and as a consequence ∼∼ was not an option for a bit-wise @b{Not}
+function.
 
 Monadic @b{⍱⍱ B} is the bit-wise @b{Not} function of its argument:
 
@@ -1721,7 +1722,7 @@ That also works for complex numbers with a near-zero imaginary part:
 
 As a matter of fact, @b{∨∨} works for all near-gaussian complex numbers,
 but the effect is not visible with 26 ⎕CR since gaussian and non-gaussian
-complex numbers have the same cell type.
+complex numbers have the same cell type in GNU APL.
 
 @subsection Monadic ∧∧
 
@@ -1732,8 +1733,7 @@ is close to an integer I,
 the real number R is said to be @b{near} to integer I if the absolute
 value of I-R is smaller than some small constant called the @b{integer
 tolerance} in ISO and @b{system tolerance} in IBM APL2. The @b{integer
-tolerance} s typically platform dependent and must be smaller than the minimal
-⎕CT. In GNU APL the @b{integer tolerance} is 1E¯10 while the max. ⎕CT is 1E¯9.
+tolerance} is typically platform dependent (1E¯10 in GNU APL).
 
 @item
 the real number R is said to be @b{equal to integer I within ⎕CT} if the
