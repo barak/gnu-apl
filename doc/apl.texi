@@ -1746,14 +1746,17 @@ be farther away from a nearby integer than smaller numbers). The two concepts
 differ in the same way that absolute and relative errors do.
 
 Now, all bit-wise functions described so far use the first concept, i,e,
-if their their arguments are real or complex, then there must be not be
-farther away than @b{integer tolerance} from an integer. In some contexts that
-could be difficult to achieve and for that reason GNU APL provides monadic ∧∧∧
-which is like ⍱⍱ except that the arguments must be within ⎕CT to some integer.
+if their their arguments are real or complex, then the smallest distance to
+a (nearby) integer must not exceed the @b{integer tolerance}. In some contexts
+that could be difficult to achieve and for that reason GNU APL provides
+monadic ∧∧ which works like ∨∨ except that the permitted distance from a
+nearby integer is now controlled by ⎕CT rather than by the integer tolerance.
+
 All bit-wise logical functions throw a DOMAIN ERROR if an argument is not close
-enough to an integer, with ∧∧ being a little more tolerant than ∨∨ regarding
-the distance to nearby integers, and ∧∧ giving the user more control over the
-tolerance (via ⎕CR).
+enough to an integer. integer tolerance is typically sdmaller than ⎕CT and
+in that case is ∧∧ little more tolerant than ∨∨ regarding the distance to
+nearby integers. In addition ∧∧ gives the user (via ⎕CT) more control over
+the permitted tolerance for real numbers in the neighborhood of integers.
 
 @node    Section 3.17
 @section Dyadic ⎕CR
