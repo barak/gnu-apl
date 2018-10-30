@@ -110,9 +110,10 @@ ul.no-bullet {list-style: none}
     <li><a name="toc-Monadic-_005b_003f_005d-and-_22a3_002c-dyadic-_005b_003f_005d-with-Axis" href="#Section-3_002e15">3.15 Monadic ⊢ and ⊣, dyadic ⊢ with Axis</a></li>
     <li><a name="toc-Bit_002dwise-Logical-Functions-_005b_003f_005d_005b_003f_005d_002c-_005b_003f_005d_005b_003f_005d_002c-_005b_003f_005d_005b_003f_005d_002c-and-_005b_003f_005d_005b_003f_005d" href="#Section-3_002e16">3.16 Bit-wise Logical Functions ∧∧, ∨∨, ⍲⍲, and ⍱⍱</a>
     <ul class="no-bullet">
-      <li><a name="toc-Dyadic-_005b_003f_005d_005b_003f_005d_002c-_005b_003f_005d_005b_003f_005d_002c-_005b_003f_005d_005b_003f_005d_002c-and-_005b_003f_005d_005b_003f_005d" href="#Dyadic-_005b_003f_005d_005b_003f_005d_002c-_005b_003f_005d_005b_003f_005d_002c-_005b_003f_005d_005b_003f_005d_002c-and-_005b_003f_005d_005b_003f_005d">3.16.1 Dyadic ∧∧, ∨∨, ⍲⍲, and ⍱⍱</a></li>
+      <li><a name="toc-Dyadic-_005b_003f_005d_005b_003f_005d_002c-_005b_003f_005d_005b_003f_005d_002c-_005b_003f_005d_005b_003f_005d_002c-_005b_003f_005d_005b_003f_005d_002c-_003d_003d_002c-and-_005b_003f_005d_005b_003f_005d" href="#Dyadic-_005b_003f_005d_005b_003f_005d_002c-_005b_003f_005d_005b_003f_005d_002c-_005b_003f_005d_005b_003f_005d_002c-_005b_003f_005d_005b_003f_005d_002c-_003d_003d_002c-and-_005b_003f_005d_005b_003f_005d">3.16.1 Dyadic ∧∧, ∨∨, ⍲⍲, ⍱⍱, ==, and ≠≠</a></li>
       <li><a name="toc-Monadic-_005b_003f_005d_005b_003f_005d-and-_005b_003f_005d_005b_003f_005d" href="#Monadic-_005b_003f_005d_005b_003f_005d-and-_005b_003f_005d_005b_003f_005d">3.16.2 Monadic ∨∨ and ⍱⍱</a></li>
       <li><a name="toc-Monadic-_005b_003f_005d_005b_003f_005d" href="#Monadic-_005b_003f_005d_005b_003f_005d">3.16.3 Monadic ∧∧</a></li>
+      <li><a name="toc-Character-Arguments-for-Monadic-_005b_003f_005d_005b_003f_005d-and-Dyadic-_005b_003f_005d_005b_003f_005d_002c-_005b_003f_005d_005b_003f_005d_002c-_003d_003d_002c-and-_005b_003f_005d_005b_003f_005d" href="#Character-Arguments-for-Monadic-_005b_003f_005d_005b_003f_005d-and-Dyadic-_005b_003f_005d_005b_003f_005d_002c-_005b_003f_005d_005b_003f_005d_002c-_003d_003d_002c-and-_005b_003f_005d_005b_003f_005d">3.16.4 Character Arguments for Monadic ⍱⍱ and Dyadic ∧∧, ∨∨, ==, and ≠≠</a></li>
     </ul></li>
     <li><a name="toc-Dyadic-_005b_003f_005dCR" href="#Section-3_002e17">3.17 Dyadic ⎕CR</a></li>
     <li><a name="toc-Dyadic-_005b_003f_005dFX-_0028Native-Functions_0029" href="#Section-3_002e18">3.18 Dyadic ⎕FX (Native Functions)</a></li>
@@ -1838,16 +1839,18 @@ ABBADEAD
       5 ⎕CR (4⍴256)⊤   A ∧∧ B
 00BA00AD
 </pre>
-<a name="Dyadic-_005b_003f_005d_005b_003f_005d_002c-_005b_003f_005d_005b_003f_005d_002c-_005b_003f_005d_005b_003f_005d_002c-and-_005b_003f_005d_005b_003f_005d"></a>
-<h4 class="subsection">3.16.1 Dyadic ∧∧, ∨∨, ⍲⍲, and ⍱⍱</h4>
+<a name="Dyadic-_005b_003f_005d_005b_003f_005d_002c-_005b_003f_005d_005b_003f_005d_002c-_005b_003f_005d_005b_003f_005d_002c-_005b_003f_005d_005b_003f_005d_002c-_003d_003d_002c-and-_005b_003f_005d_005b_003f_005d"></a>
+<h4 class="subsection">3.16.1 Dyadic ∧∧, ∨∨, ⍲⍲, ⍱⍱, ==, and ≠≠</h4>
 
 <p>The dyadic forms of <b>∧∧</b>, <b>∨∨</b>, <b>⍲⍲</b>, and <b>⍱⍱</b> are simply the bit-wise
 variants of their Boolean companions:
 </p>
-<pre class="verbatim">      A ∧∧ B    ←→    2⊥ ((64⍴2)⊤A) ∧ (64⍴2)⊤B
-      A ∨∨ B    ←→    2⊥ ((64⍴2)⊤A) ∨ (64⍴2)⊤B
-      A ⍲⍲ B    ←→    2⊥ ((64⍴2)⊤A) ⍲ (64⍴2)⊤B
-      A ⍱⍱ B    ←→    2⊥ ((64⍴2)⊤A) ⍱ (64⍴2)⊤B
+<pre class="verbatim">      A ∧∧ B    ←→    2⊥ ((64⍴2)⊤A) ∧ (64⍴2)⊤B      ⍝ aka. AND
+      A ∨∨ B    ←→    2⊥ ((64⍴2)⊤A) ∨ (64⍴2)⊤B      ⍝ aka. OR
+      A ⍲⍲ B    ←→    2⊥ ((64⍴2)⊤A) ⍲ (64⍴2)⊤B      ⍝ aka. NAND
+      A ⍱⍱ B    ←→    2⊥ ((64⍴2)⊤A) ⍱ (64⍴2)⊤B      ⍝ aka. NOR
+      A ≠≠ B    ←→    2⊥ ((64⍴2)⊤A) ≠ (64⍴2)⊤B      ⍝ aka. XOR
+      A == B    ←→    2⊥ ((64⍴2)⊤A) = (64⍴2)⊤B      ⍝ not XOR
 </pre>
 <a name="Monadic-_005b_003f_005d_005b_003f_005d-and-_005b_003f_005d_005b_003f_005d"></a>
 <h4 class="subsection">3.16.2 Monadic ∨∨ and ⍱⍱</h4>
@@ -1927,6 +1930,26 @@ in that case is ∧∧ little more tolerant than ∨∨ regarding the distance t
 nearby integers. In addition ∧∧ gives the user (via ⎕CT) more control over
 the permitted tolerance for real numbers in the neighborhood of integers.
 </p>
+<a name="Character-Arguments-for-Monadic-_005b_003f_005d_005b_003f_005d-and-Dyadic-_005b_003f_005d_005b_003f_005d_002c-_005b_003f_005d_005b_003f_005d_002c-_003d_003d_002c-and-_005b_003f_005d_005b_003f_005d"></a>
+<h4 class="subsection">3.16.4 Character Arguments for Monadic ⍱⍱ and Dyadic ∧∧, ∨∨, ==, and ≠≠</h4>
+
+<p>Some of the bitwise operations are allowed to have characters as their right
+argument. If the right argument is a character then the result is a character
+as well. This can be useful for masking purposes such as extracting the lower
+7 bits of 8-bit bytes containing ASCII characters.
+</p>
+<p>The characters involved are treated as 32 bit quantities:
+</p>
+<pre class="verbatim">      5 ⎕CR 'A'
+41
+      5 ⎕CR ⍱⍱'A'                       ⍝ Note that 5 ⎕CR ANDs with $FF
+BE
+
+      256 256 256 256⊤ ⎕UCS ⍱⍱ 'A'      ⍝ ⍱⍱ 'A' is FFFFFFBE
+255 255 255 190
+      256 256 256 256⊤$FFFFFFBE
+255 255 255 190
+</pre>
 <hr>
 <a name="Section-3_002e17"></a>
 <div class="header">

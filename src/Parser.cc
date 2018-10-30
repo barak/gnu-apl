@@ -491,33 +491,41 @@ Parser::replace_bitwise_functions(Token_string & tos)
    loop(t, int(tos.size()) - 1)
        {
          const TokenTag tag = tos[t].get_tag();
-         if (tag == tos[t+1].get_tag())   // duplicate
+         if (tag != tos[t+1].get_tag())   continue;   // different
+
+         switch(tag)
             {
-              switch(tag)
-                 {
-                   case TOK_F2_AND:
-                        new (&tos[t]) Token(TOK_F2_AND_B, &Bif_F2_AND_B::_fun);
-                        tos[++t].clear(LOC);
-                        continue;
+              case TOK_F2_AND:
+                   new (&tos[t]) Token(TOK_F2_AND_B, &Bif_F2_AND_B::_fun);
+                   tos[++t].clear(LOC);
+                   continue;
 
-                   case TOK_F2_OR:
-                        new (&tos[t]) Token(TOK_F2_OR_B, &Bif_F2_OR_B::_fun);
-                        tos[++t].clear(LOC);
-                        continue;
+              case TOK_F2_OR:
+                   new (&tos[t]) Token(TOK_F2_OR_B, &Bif_F2_OR_B::_fun);
+                   tos[++t].clear(LOC);
+                   continue;
 
-                   case TOK_F2_NAND:
-                        new (&tos[t]) Token(TOK_F2_NAND_B,&Bif_F2_NAND_B::_fun);
-                        tos[++t].clear(LOC);
-                        continue;
+              case TOK_F2_NAND:
+                   new (&tos[t]) Token(TOK_F2_NAND_B,&Bif_F2_NAND_B::_fun);
+                   tos[++t].clear(LOC);
+                   continue;
 
-                   case TOK_F2_NOR:
-                        new (&tos[t]) Token(TOK_F2_NOR_B, &Bif_F2_NOR_B::_fun);
-                        tos[++t].clear(LOC);
-                        continue;
+              case TOK_F2_NOR:
+                   new (&tos[t]) Token(TOK_F2_NOR_B, &Bif_F2_NOR_B::_fun);
+                   tos[++t].clear(LOC);
+                   continue;
 
-                   default: break;
-                 }
+              case TOK_F2_EQUAL:
+                   new (&tos[t]) Token(TOK_F2_EQUAL_B, &Bif_F2_EQUAL_B::_fun);
+                   tos[++t].clear(LOC);
+                   continue;
 
+              case TOK_F2_UNEQ:
+                   new (&tos[t]) Token(TOK_F2_UNEQ_B, &Bif_F2_UNEQ_B::_fun);
+                   tos[++t].clear(LOC);
+                   continue;
+
+              default: break;
             }
        }
 }

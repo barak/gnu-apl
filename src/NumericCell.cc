@@ -1519,6 +1519,26 @@ NumericCell::bif_and_bitwise(Cell * Z, const Cell * A) const
 }
 //-----------------------------------------------------------------------------
 ErrorCode
+NumericCell::bif_equal_bitwise(Cell * Z, const Cell * A) const
+{
+   if (!is_near_int64_t())       return E_DOMAIN_ERROR;
+   if (!A->is_near_int64_t())    return E_DOMAIN_ERROR;
+
+   new (Z) IntCell(~(A->get_near_int() ^ get_near_int()));
+   return E_NO_ERROR;
+}
+//-----------------------------------------------------------------------------
+ErrorCode
+NumericCell::bif_not_equal_bitwise(Cell * Z, const Cell * A) const
+{
+   if (!is_near_int64_t())       return E_DOMAIN_ERROR;
+   if (!A->is_near_int64_t())    return E_DOMAIN_ERROR;
+
+   new (Z) IntCell(A->get_near_int() ^ get_near_int());
+   return E_NO_ERROR;
+}
+//-----------------------------------------------------------------------------
+ErrorCode
 NumericCell::bif_nand(Cell * Z, const Cell * A) const
 {
    if (!is_near_bool())      return E_DOMAIN_ERROR;

@@ -206,6 +206,68 @@ protected:
       { return eval_scalar_AXB(A, X, B, &Cell::bif_equal); }
 };
 //-----------------------------------------------------------------------------
+/** Scalar function EQ bitwise (i.e. bitwise not A xor B)
+ */
+class Bif_F2_EQUAL_B : public ScalarFunction
+{
+public:
+   /// Constructor.
+   Bif_F2_EQUAL_B()
+   : ScalarFunction(PERF_A(EQUAL_B))
+   {}
+
+   static Bif_F2_EQUAL_B * fun;          ///< Built-in function.
+   static Bif_F2_EQUAL_B  _fun;          ///< Built-in function.
+
+protected:
+   /// overloaded Function::eval_AB().
+   virtual Token eval_AB(Value_P A, Value_P B)
+      { return eval_scalar_AB(A, B, &Cell::bif_equal_bitwise); }
+
+   /// overloaded Function::get_scalar_f2
+   virtual prim_f2 get_scalar_f2() const
+      { return &Cell::bif_equal_bitwise; }
+
+   /// overloaded Function::eval_identity_fun();
+   virtual Token eval_identity_fun(Value_P B, Axis axis)
+      { return eval_scalar_identity_fun(B, axis, IntScalar(1, LOC)); }
+
+   /// overloaded Function::eval_AXB().
+   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B)
+      { return eval_scalar_AXB(A, X, B, &Cell::bif_equal_bitwise); }
+};
+//-----------------------------------------------------------------------------
+/** Scalar function NE bitwise (i.e. bitwise A xor B)
+ */
+class Bif_F2_UNEQ_B : public ScalarFunction
+{
+public:
+   /// Constructor.
+   Bif_F2_UNEQ_B()
+   : ScalarFunction(PERF_A(UNEQ_B))
+   {}
+
+   static Bif_F2_UNEQ_B * fun;          ///< Built-in function.
+   static Bif_F2_UNEQ_B  _fun;          ///< Built-in function.
+
+protected:
+   /// overloaded Function::eval_AB().
+   virtual Token eval_AB(Value_P A, Value_P B)
+      { return eval_scalar_AB(A, B, &Cell::bif_not_equal_bitwise); }
+
+   /// overloaded Function::get_scalar_f2
+   virtual prim_f2 get_scalar_f2() const
+      { return &Cell::bif_not_equal_bitwise; }
+
+   /// overloaded Function::eval_identity_fun();
+   virtual Token eval_identity_fun(Value_P B, Axis axis)
+      { return eval_scalar_identity_fun(B, axis, IntScalar(1, LOC)); }
+
+   /// overloaded Function::eval_AXB().
+   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B)
+      { return eval_scalar_AXB(A, X, B, &Cell::bif_not_equal_bitwise); }
+};
+//-----------------------------------------------------------------------------
 /** Scalar function greater than.
  */
 class Bif_F2_GREATER : public ScalarFunction

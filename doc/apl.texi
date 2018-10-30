@@ -1662,16 +1662,18 @@ ABBADEAD
 00BA00AD
 @end verbatim
 
-@subsection Dyadic ∧∧, ∨∨, ⍲⍲, and ⍱⍱
+@subsection Dyadic ∧∧, ∨∨, ⍲⍲, ⍱⍱, ==, and ≠≠
 
 The dyadic forms of @b{∧∧}, @b{∨∨}, @b{⍲⍲}, and @b{⍱⍱} are simply the bit-wise
 variants of their Boolean companions:
 
 @verbatim
-      A ∧∧ B    ←→    2⊥ ((64⍴2)⊤A) ∧ (64⍴2)⊤B
-      A ∨∨ B    ←→    2⊥ ((64⍴2)⊤A) ∨ (64⍴2)⊤B
-      A ⍲⍲ B    ←→    2⊥ ((64⍴2)⊤A) ⍲ (64⍴2)⊤B
-      A ⍱⍱ B    ←→    2⊥ ((64⍴2)⊤A) ⍱ (64⍴2)⊤B
+      A ∧∧ B    ←→    2⊥ ((64⍴2)⊤A) ∧ (64⍴2)⊤B      ⍝ aka. AND
+      A ∨∨ B    ←→    2⊥ ((64⍴2)⊤A) ∨ (64⍴2)⊤B      ⍝ aka. OR
+      A ⍲⍲ B    ←→    2⊥ ((64⍴2)⊤A) ⍲ (64⍴2)⊤B      ⍝ aka. NAND
+      A ⍱⍱ B    ←→    2⊥ ((64⍴2)⊤A) ⍱ (64⍴2)⊤B      ⍝ aka. NOR
+      A ≠≠ B    ←→    2⊥ ((64⍴2)⊤A) ≠ (64⍴2)⊤B      ⍝ aka. XOR
+      A == B    ←→    2⊥ ((64⍴2)⊤A) = (64⍴2)⊤B      ⍝ not XOR
 @end verbatim
 
 @subsection Monadic ∨∨ and ⍱⍱
@@ -1757,6 +1759,27 @@ enough to an integer. integer tolerance is typically sdmaller than ⎕CT and
 in that case is ∧∧ little more tolerant than ∨∨ regarding the distance to
 nearby integers. In addition ∧∧ gives the user (via ⎕CT) more control over
 the permitted tolerance for real numbers in the neighborhood of integers.
+
+@subsection Character Arguments for Monadic ⍱⍱ and Dyadic ∧∧, ∨∨, ==, and ≠≠
+
+Some of the bitwise operations are allowed to have characters as their right
+argument. If the right argument is a character then the result is a character
+as well. This can be useful for masking purposes such as extracting the lower
+7 bits of 8-bit bytes containing ASCII characters.
+
+The characters involved are treated as 32 bit quantities:
+
+@verbatim
+      5 ⎕CR 'A'
+41
+      5 ⎕CR ⍱⍱'A'                       ⍝ Note that 5 ⎕CR ANDs with $FF
+BE
+
+      256 256 256 256⊤ ⎕UCS ⍱⍱ 'A'      ⍝ ⍱⍱ 'A' is FFFFFFBE
+255 255 255 190
+      256 256 256 256⊤$FFFFFFBE
+255 255 255 190
+@end verbatim
 
 @node    Section 3.17
 @section Dyadic ⎕CR

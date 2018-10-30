@@ -57,6 +57,10 @@ public:
    /// the Quad_CR representation of this cell
    virtual PrintBuffer character_representation(const PrintContext &pctx) const;
 
+   /// initialize Z to character v
+   static ErrorCode zv(Cell * Z, Unicode av)
+      { new (Z) CharCell(av);   return E_NO_ERROR; }
+
 protected:
    /// overloaded Cell::get_cell_type()
    virtual CellType get_cell_type() const
@@ -76,6 +80,21 @@ protected:
 
    /// overloaded Cell::CDR_size()
    virtual int CDR_size() const;
+
+   /// overloaded Cell::bif_not_bitwise()
+   virtual ErrorCode bif_not_bitwise(Cell * Z) const;
+
+   /// overloaded Cell::bif_and_bitwise()
+   virtual ErrorCode bif_and_bitwise(Cell * Z, const Cell * A) const;
+
+   /// overloaded Cell::bif_and_bitwise()
+   virtual ErrorCode bif_or_bitwise(Cell * Z, const Cell * A) const;
+
+   /// overloaded Cell::bif_equal_bitwise()
+   virtual ErrorCode bif_equal_bitwise(Cell * Z, const Cell * A) const;
+
+   /// overloaded Cell::bif_not_equal_bitwise()
+   virtual ErrorCode bif_not_equal_bitwise(Cell * Z, const Cell * A) const;
 };
 //-----------------------------------------------------------------------------
 

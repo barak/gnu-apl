@@ -1583,16 +1583,18 @@ ABBADEAD
       5 ⎕CR (4⍴256)⊤   A ∧∧ B
 00BA00AD
 
-3.16.1 Dyadic ∧∧, ∨∨, ⍲⍲, and ⍱⍱
---------------------------------
+3.16.1 Dyadic ∧∧, ∨∨, ⍲⍲, ⍱⍱, ==, and ≠≠
+----------------------------------------
 
 The dyadic forms of ∧∧, ∨∨, ⍲⍲, and ⍱⍱ are simply the bit-wise variants
 of their Boolean companions:
 
-      A ∧∧ B    ←→    2⊥ ((64⍴2)⊤A) ∧ (64⍴2)⊤B
-      A ∨∨ B    ←→    2⊥ ((64⍴2)⊤A) ∨ (64⍴2)⊤B
-      A ⍲⍲ B    ←→    2⊥ ((64⍴2)⊤A) ⍲ (64⍴2)⊤B
-      A ⍱⍱ B    ←→    2⊥ ((64⍴2)⊤A) ⍱ (64⍴2)⊤B
+      A ∧∧ B    ←→    2⊥ ((64⍴2)⊤A) ∧ (64⍴2)⊤B      ⍝ aka. AND
+      A ∨∨ B    ←→    2⊥ ((64⍴2)⊤A) ∨ (64⍴2)⊤B      ⍝ aka. OR
+      A ⍲⍲ B    ←→    2⊥ ((64⍴2)⊤A) ⍲ (64⍴2)⊤B      ⍝ aka. NAND
+      A ⍱⍱ B    ←→    2⊥ ((64⍴2)⊤A) ⍱ (64⍴2)⊤B      ⍝ aka. NOR
+      A ≠≠ B    ←→    2⊥ ((64⍴2)⊤A) ≠ (64⍴2)⊤B      ⍝ aka. XOR
+      A == B    ←→    2⊥ ((64⍴2)⊤A) = (64⍴2)⊤B      ⍝ not XOR
 
 3.16.2 Monadic ∨∨ and ⍱⍱
 ------------------------
@@ -1605,9 +1607,10 @@ monadic ∨∨ resp, ⍱⍱ are dyadic ∨∨ resp, ⍱⍱ with a left argument 
 
    Even though that Or-ing a boolean vector with 0 itself has no effect,
 the monadic ∨∨ and ⍱⍱ are still useful due to their side effects:
-conversion from near-in float values to integers for ∨∨ and inversion of
-the bits for ⍱⍱, The latter is needed since ∼ has a monadic form and
-therefore ∼∼ was not an option for a bit-wise Not function.
+conversion from near-integer float values to integers (monadic ∨∨ and
+inversion of the bits (monadic ⍱⍱, The latter is needed since ∼ has a
+monadic form and as a consequence ∼∼ was not an option for a bit-wise
+Not function.
 
    Monadic ⍱⍱ B is the bit-wise Not function of its argument:
 
@@ -1635,7 +1638,7 @@ therefore ∼∼ was not an option for a bit-wise Not function.
 
    As a matter of fact, ∨∨ works for all near-gaussian complex numbers,
 but the effect is not visible with 26 ⎕CR since gaussian and
-non-gaussian complex numbers have the same cell type.
+non-gaussian complex numbers have the same cell type in GNU APL.
 
 3.16.3 Monadic ∧∧
 -----------------
@@ -1645,29 +1648,51 @@ number R is close to an integer I,
    • the real number R is said to be near to integer I if the absolute
      value of I-R is smaller than some small constant called the integer
      tolerance in ISO and system tolerance in IBM APL2.  The integer
-     tolerance s typically platform dependent and must be smaller than
-     the minimal ⎕CT. In GNU APL the integer tolerance is 1E¯10 while
-     the max.  ⎕CT is 1E¯9.
+     tolerance is typically platform dependent (1E¯10 in GNU APL).
 
    • the real number R is said to be equal to integer I within ⎕CT if
      the absolute value of (I-R)/I is smaller than ⎕CT.
 
    The first concept is an absolute distance from a real R to a nearby
 integer I while the second concept is a relative distance (larger
-numbers are allowed to be farther way from a nearby integer than smaller
-numbers).  The two concepts differ in the same way that absolute and
-relative errors do.
+numbers are allowed to be farther away from a nearby integer than
+smaller numbers).  The two concepts differ in the same way that absolute
+and relative errors do.
 
    Now, all bit-wise functions described so far use the first concept,
-i,e, if their their arguments are real or complex, then there must be
-not be farther away than integer tolerance from an integer.  In some
-contexts that could be difficult to achieve and for that reason GNU APL
-provides monadic ∧∧∧ which is like ⍱⍱ except that the arguments must be
-within ⎕CT to some integer.  All bit-wise logical functions throw a
-DOMAIN ERROR if an argument is not close enough to an integer, with ∧∧
-being a little more tolerant than ∨∨ regarding the distance to nearby
-integers, and ∧∧ giving the user more control over the tolerance (via
-⎕CR).
+i,e, if their their arguments are real or complex, then the smallest
+distance to a (nearby) integer must not exceed the integer tolerance.
+In some contexts that could be difficult to achieve and for that reason
+GNU APL provides monadic ∧∧ which works like ∨∨ except that the
+permitted distance from a nearby integer is now controlled by ⎕CT rather
+than by the integer tolerance.
+
+   All bit-wise logical functions throw a DOMAIN ERROR if an argument is
+not close enough to an integer.  integer tolerance is typically sdmaller
+than ⎕CT and in that case is ∧∧ little more tolerant than ∨∨ regarding
+the distance to nearby integers.  In addition ∧∧ gives the user (via
+⎕CT) more control over the permitted tolerance for real numbers in the
+neighborhood of integers.
+
+3.16.4 Character Arguments for Monadic ⍱⍱ and Dyadic ∧∧, ∨∨, ==, and ≠≠
+-----------------------------------------------------------------------
+
+Some of the bitwise operations are allowed to have characters as their
+right argument.  If the right argument is a character then the result is
+a character as well.  This can be useful for masking purposes such as
+extracting the lower 7 bits of 8-bit bytes containing ASCII characters.
+
+   The characters involved are treated as 32 bit quantities:
+
+      5 ⎕CR 'A'
+41
+      5 ⎕CR ⍱⍱'A'                       ⍝ Note that 5 ⎕CR ANDs with $FF
+BE
+
+      256 256 256 256⊤ ⎕UCS ⍱⍱ 'A'      ⍝ ⍱⍱ 'A' is FFFFFFBE
+255 255 255 190
+      256 256 256 256⊤$FFFFFFBE
+255 255 255 190
 
 
 File: apl.info,  Node: Section 3.17,  Next: Section 3.18,  Prev: Section 3.16,  Up: Chapter 3
@@ -4267,27 +4292,27 @@ Node: Section 3.1350191
 Node: Section 3.1450443
 Node: Section 3.1551839
 Node: Section 3.1654351
-Node: Section 3.1759578
-Node: Section 3.1864631
-Node: Section 3.1967913
-Node: Section 3.2068204
-Node: Section 3.2178116
-Node: Section 3.2278388
-Node: Section 3.2384966
-Node: Section 3.2487417
-Node: Section 3.2588086
-Node: Section 3.26101648
-Node: Section 3.27102588
-Node: Section 3.28105692
-Node: Section 3.29107681
-Node: Chapter 4112059
-Node: Chapter 5113807
-Node: Chapter 6114936
-Node: Section 6.1115355
-Node: Section 6.2116042
-Node: Chapter 7116873
-Node: Section 7.1117376
-Node: Section 7.2142686
+Node: Section 3.1760714
+Node: Section 3.1865767
+Node: Section 3.1969049
+Node: Section 3.2069340
+Node: Section 3.2179252
+Node: Section 3.2279524
+Node: Section 3.2386102
+Node: Section 3.2488553
+Node: Section 3.2589222
+Node: Section 3.26102784
+Node: Section 3.27103724
+Node: Section 3.28106828
+Node: Section 3.29108817
+Node: Chapter 4113195
+Node: Chapter 5114943
+Node: Chapter 6116072
+Node: Section 6.1116491
+Node: Section 6.2117178
+Node: Chapter 7118009
+Node: Section 7.1118512
+Node: Section 7.2143822
 
 End Tag Table
 

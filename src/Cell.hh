@@ -364,6 +364,14 @@ public:
    /// store 1 in Z if A == the value of \b this cell in Z, else 0
    ErrorCode bif_equal(Cell * Z, const Cell * A) const;
 
+   /// bitwise comparison of *this and A
+   virtual ErrorCode bif_equal_bitwise(Cell * Z, const Cell * A) const
+      { DOMAIN_ERROR; }
+
+   /// bitwise comparison of *this and A
+   virtual ErrorCode bif_not_equal_bitwise(Cell * Z, const Cell * A) const
+      { DOMAIN_ERROR; }
+
    /// store 1 in Z if A != the value of \b this cell in Z, else 0
    ErrorCode bif_not_equal(Cell * Z, const Cell * A) const;
 

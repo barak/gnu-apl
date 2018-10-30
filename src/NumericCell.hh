@@ -47,6 +47,12 @@ protected:
    /// overloaded Cell::bif_and_bitwise()
    virtual ErrorCode bif_and_bitwise(Cell * Z, const Cell * A) const;
 
+   /// overloaded Cell::bif_equal_bitwise()
+   virtual ErrorCode bif_equal_bitwise(Cell * Z, const Cell * A) const;
+
+   /// overloaded Cell::bif_not_equal_bitwise()
+   virtual ErrorCode bif_not_equal_bitwise(Cell * Z, const Cell * A) const;
+
    /// overloaded Cell::bif_binomial()
    virtual ErrorCode bif_binomial(Cell * Z, const Cell * A) const;
 

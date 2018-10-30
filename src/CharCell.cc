@@ -182,3 +182,58 @@ const Unicode uni = get_char_value();
    return 1;
 }
 //-----------------------------------------------------------------------------
+ErrorCode
+CharCell::bif_not_bitwise(Cell * Z) const
+{
+   return zv(Z, static_cast<Unicode>(get_char_value() ^ 0xFFFFFFFF));
+}
+//-----------------------------------------------------------------------------
+ErrorCode
+CharCell::bif_and_bitwise(Cell * Z, const Cell * A) const
+{
+   if (A->is_character_cell())
+     return zv(Z, static_cast<Unicode>(value.aval & A->get_char_value()));
+   else if (A->is_numeric())
+      return zv(Z, static_cast<Unicode>(value.aval & A->get_int_value()));
+   else
+      return E_DOMAIN_ERROR;
+}
+//-----------------------------------------------------------------------------
+ErrorCode
+CharCell::bif_or_bitwise(Cell * Z, const Cell * A) const
+{
+   if (A->is_character_cell())
+     return zv(Z, static_cast<Unicode>(value.aval | A->get_char_value()));
+   else if (A->is_numeric())
+      return zv(Z, static_cast<Unicode>(value.aval | A->get_int_value()));
+   else
+      return E_DOMAIN_ERROR;
+}
+//-----------------------------------------------------------------------------
+ErrorCode
+CharCell::bif_equal_bitwise(Cell * Z, const Cell * A) const
+{
+   if (A->is_character_cell())
+     return zv(Z, static_cast<Unicode>
+                             (0xFFFFFFFF & (value.aval ^ A->get_char_value())));
+   else if (A->is_numeric())
+      return zv(Z, static_cast<Unicode>
+                             (0xFFFFFFFF & (value.aval ^ A->get_int_value())));
+   else
+      return E_DOMAIN_ERROR;
+}
+//-----------------------------------------------------------------------------
+ErrorCode
+CharCell::bif_not_equal_bitwise(Cell * Z, const Cell * A) const
+{
+   if (A->is_character_cell())
+     return zv(Z, static_cast<Unicode>
+                             (value.aval ^ A->get_char_value()));
+   else if (A->is_numeric())
+      return zv(Z, static_cast<Unicode>
+                             (value.aval ^ A->get_int_value()));
+   else
+      return E_DOMAIN_ERROR;
+}
+//-----------------------------------------------------------------------------
+
