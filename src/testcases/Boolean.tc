@@ -75,15 +75,20 @@
 
       ⍝ bitwise boolean
       ⍝
-      5 ⎕CR (4⍴256)⊤  $FFCC ∧∧ $0CF0
+      5 ⎕CR (4⍴256)⊤  $FFCC ⊤∧ $0CF0
 00000CC0
-      5 ⎕CR (4⍴256)⊤  $FFCC ∨∨ $0CF0
+      5 ⎕CR (4⍴256)⊤  $FFCC ⊤∨ $0CF0
 0000FFFC
-      5 ⎕CR (4⍴256)⊤  $FFCC ⍲⍲ $0CF0
+      5 ⎕CR (4⍴256)⊤  $FFCC ⊤⍲ $0CF0
 FFFFF33F
-      5 ⎕CR (4⍴256)⊤  $FFCC ⍱⍱ $0CF0
+      5 ⎕CR (4⍴256)⊤  $FFCC ⊤⍱ $0CF0
 FFFF0003
+      5 ⎕CR (4⍴256)⊤  $FFCC ⊤= $0CF0
+FFFF0CC3
+      5 ⎕CR (4⍴256)⊤  $FFCC ⊤≠ $0CF0
+0000F33C
 
-      5 ⎕CR (4⍴256)⊤  ∨∨ $0CF0
+
+      5 ⎕CR (4⍴256)⊤  ⊤∨ $0CF0
 00000CF0
 

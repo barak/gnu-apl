@@ -705,7 +705,7 @@ between GNU APL and IBM APL2.
 * Section 3.13::  Hex Numbers
 * Section 3.14::  User-defined Commands
 * Section 3.15::  Monadic ⊢ and ⊣, dyadic ⊢ with Axis
-* Section 3.16::  Bit-wise Logical Functions ∧∧, ∨∨, ⍲⍲, and ⍱⍱
+* Section 3.16::  Bit-wise Logical Functions ⊤∧, ⊤∨, ⊤⍲, and ⊤⍱
 * Section 3.17::  Dyadic ⎕CR
 * Section 3.18::  Dyadic ⎕FX (Native Functions)
 * Section 3.19::  ⎕ARG - Interpreter command line arguments
@@ -1614,27 +1614,32 @@ a*c
 
 
 @node    Section 3.16
-@section Bit-wise Logical Functions ∧∧, ∨∨, ⍲⍲, and ⍱⍱
+@section Bit-wise Logical Functions ⊤∧, ⊤∨, ⊤⍲, ⊤⍱, T≠, and T=
 
-The standard APL functions And (∧), Or (∨), Nand (⍲), and Nor (⍱) operate
-primarily on Boolean integers. Primarily means that the the LCM variant for ∧
+The APL functions And (∧), Or (∨), Nand (⍲), and Nor (⍱) operate primarily on
+Boolean integers. Primarily means that the the LCM variant for ∧
 and the GCD variant for ∨ are not considered in this context. (The LCM and
 GCD variants are defined in the ISO standard and supported in GNU APL but
 not in IBM APL2).
 
 However, probably more often than not one needs to compute Boolean functions
-between the bits of (non-Boolean) integers and not between entire Boolean
-integers. Although that is possible to do in standard APL, the procedure is
-fairly awkward and, more importantly, inefficient:
+between the bits of arbitrary (non-Boolean) integers and not between entire
+Boolean integers 0 or 1. Although that is possible to do in standard APL,
+the procedure is fairly awkward and, more importantly, inefficient:
 
 @itemize
 @item
 convert every integer argument X to a 64-item Boolean vector X←(64⍴2)⊤X,
 @item
-call the Boolean function ∧, ∨, ⍲, or ⍱, with the converted arguments, and
+call the Boolean function ∧, ∨, ⍲, ⍱, =, or ≠ with the converted arguments,
+and
 @item
 convert the Boolean result vector R back to the integer result Z←2⊥R
 @end itemize
+
+Note: for boolean arguments the APL functions ≠ resp. = can be used to compute
+the more customary boolean functions XOR and XNOR. In this context = and ≠ are
+treated as boolean functions even though they accept non-boolean arguments,
 
 For example (using  5 ⎕CR (4⍴256)⊤X to display X in hex):
 
@@ -1649,56 +1654,58 @@ ABBADEAD
 
 @end verbatim
 
-With the bit-wise @b{And} (∧∧) the same can be achieved in a simpler fashion
+With the bit-wise @b{And} (∣∧) the same can be achieved in a simpler fashion
 and far more efficiently:
 
 @verbatim
+      ⍝ Traditional AND
       5 ⎕CR (4⍴256)⊤   A←$ABBADEAD
 ABBADEAD
       5 ⎕CR (4⍴256)⊤   B←$00FF00FF
 00FF00FF
 
-      5 ⎕CR (4⍴256)⊤   A ∧∧ B
+      ⍝ bit-wise AND
+      5 ⎕CR (4⍴256)⊤   A ⊤∧ B
 00BA00AD
 @end verbatim
 
-@subsection Dyadic ∧∧, ∨∨, ⍲⍲, ⍱⍱, ==, and ≠≠
+@subsection Dyadic ⊤∧, ⊤∨, ⊤⍲, ⊤⍱, ⊤=, and ⊤≠
 
-The dyadic forms of @b{∧∧}, @b{∨∨}, @b{⍲⍲}, and @b{⍱⍱} are simply the bit-wise
+The dyadic forms of @b{⊤∧}, @b{⊤∨}, @b{⊤⍲}, and @b{⊤⍱} are simply the bit-wise
 variants of their Boolean companions:
 
 @verbatim
-      A ∧∧ B    ←→    2⊥ ((64⍴2)⊤A) ∧ (64⍴2)⊤B      ⍝ aka. AND
-      A ∨∨ B    ←→    2⊥ ((64⍴2)⊤A) ∨ (64⍴2)⊤B      ⍝ aka. OR
-      A ⍲⍲ B    ←→    2⊥ ((64⍴2)⊤A) ⍲ (64⍴2)⊤B      ⍝ aka. NAND
-      A ⍱⍱ B    ←→    2⊥ ((64⍴2)⊤A) ⍱ (64⍴2)⊤B      ⍝ aka. NOR
-      A ≠≠ B    ←→    2⊥ ((64⍴2)⊤A) ≠ (64⍴2)⊤B      ⍝ aka. XOR
-      A == B    ←→    2⊥ ((64⍴2)⊤A) = (64⍴2)⊤B      ⍝ not XOR
+      A ⊤∧ B    ←→    2⊥ ((64⍴2)⊤A) ∧ (64⍴2)⊤B      ⍝ aka. AND
+      A ⊤∨ B    ←→    2⊥ ((64⍴2)⊤A) ∨ (64⍴2)⊤B      ⍝ aka. OR
+      A ⊤⍲ B    ←→    2⊥ ((64⍴2)⊤A) ⍲ (64⍴2)⊤B      ⍝ aka. NAND
+      A ⊤⍱ B    ←→    2⊥ ((64⍴2)⊤A) ⍱ (64⍴2)⊤B      ⍝ aka. NOR
+      A ⊤≠ B    ←→    2⊥ ((64⍴2)⊤A) ≠ (64⍴2)⊤B      ⍝ aka. XOR
+      A ⊤= B    ←→    2⊥ ((64⍴2)⊤A) = (64⍴2)⊤B      ⍝ aka. NXOR or XNOR
 @end verbatim
 
-@subsection Monadic ∨∨ and ⍱⍱
+@subsection Monadic ⊤∨ and ⊤⍱
 
-@b{⍲⍲} does not have a monadic form, but @b{∧∧}, @b{∨∨}, and @b{⍱⍱} do.
-Formally monadic @b{∨∨} resp, @b{⍱⍱} are dyadic @b{∨∨} resp, @b{⍱⍱} with
+@b{⊤∧} and @b{⊤⍲}  have no monadic form, but @b{⊤∧}, @b{⊤∨}, and @b{⊤⍱} do.
+Formally monadic @b{⊤∨} resp, @b{⊤⍱} are dyadic @b{⊤∨} resp, @b{⊤⍱} with
 a left argument of 0:
 
 @verbatim
-      ∨∨ B    ←→    0 ∨∨ B      ⍝ real B to nearby integer
-      ⍱⍱ B    ←→    0 ⍱⍱ B      ⍝ bit-wise Not
+      ⊤∨ B    ←→    0 ⊤∨ B      ⍝ real B to nearby integer
+      ⊤⍱ B    ←→    0 ⊤⍱ B      ⍝ bit-wise Not
 @end verbatim
 
 Even though that Or-ing a boolean vector with 0 itself has no effect, the
-monadic ∨∨ and ⍱⍱ are still useful due to their side effects: conversion
-from near-integer float values to integers (monadic @b{∨∨} and inversion
-of the bits (monadic @b{⍱⍱}, The latter is needed since ∼ has a monadic
-form and as a consequence ∼∼ was not an option for a bit-wise @b{Not}
+monadic ⊤∨ and ⊤⍱ are still useful due to their side effects: conversion
+from near-integer float values to integers (monadic @b{⊤∨} and inversion
+of the bits (monadic @b{⊤⍱}, The latter is needed since ∼ has a monadic
+form and as a consequence ⊤∼ was not an option for a bit-wise @b{Not}
 function.
 
-Monadic @b{⍱⍱ B} is the bit-wise @b{Not} function of its argument:
+Monadic @b{⊤⍱ B} is the bit-wise @b{Not} function of its argument:
 
-      ⍱⍱ B    ←→    2⊥ ~(64⍴2)⊤B
+      ⊤⍱ B    ←→    2⊥ ~(64⍴2)⊤B
 
-Monadic @b{∨∨ B} converts near-integer values B into true integers:
+Monadic @b{⊤∨ B} converts near-integer values B into true integers:
 
 @verbatim
       26 ⎕CR    1            ⍝ integer
@@ -1709,7 +1716,7 @@ Monadic @b{∨∨ B} converts near-integer values B into true integers:
 16
       26 ⎕CR    1.1÷1.1      ⍝ real
 32
-      26 ⎕CR    ∨∨ 1.1÷1.1   ⍝ integer
+      26 ⎕CR    ⊤∨ 1.1÷1.1   ⍝ integer
 16
 @end verbatim
 
@@ -1718,15 +1725,15 @@ That also works for complex numbers with a near-zero imaginary part:
 @verbatim
       26 ⎕CR    1.1J0÷1.1      ⍝ real
 32
-      26 ⎕CR    ∨∨ 1.1J0÷1.1      ⍝ integer
+      26 ⎕CR    ⊤∨ 1.1J0÷1.1      ⍝ integer
 16
 @end verbatim
 
-As a matter of fact, @b{∨∨} works for all near-gaussian complex numbers,
+As a matter of fact, @b{⊤∨} works for all near-gaussian complex numbers,
 but the effect is not visible with 26 ⎕CR since gaussian and non-gaussian
 complex numbers have the same cell type in GNU APL.
 
-@subsection Monadic ∧∧
+@subsection Monadic ⊤∧
 
 The ISO standard defines two different concepts to decide if a real number R
 is close to an integer I,
@@ -1751,16 +1758,16 @@ Now, all bit-wise functions described so far use the first concept, i,e,
 if their their arguments are real or complex, then the smallest distance to
 a (nearby) integer must not exceed the @b{integer tolerance}. In some contexts
 that could be difficult to achieve and for that reason GNU APL provides
-monadic ∧∧ which works like ∨∨ except that the permitted distance from a
+monadic ⊤∧ which works like ⊤∨ except that the permitted distance from a
 nearby integer is now controlled by ⎕CT rather than by the integer tolerance.
 
 All bit-wise logical functions throw a DOMAIN ERROR if an argument is not close
 enough to an integer. integer tolerance is typically sdmaller than ⎕CT and
-in that case is ∧∧ little more tolerant than ∨∨ regarding the distance to
-nearby integers. In addition ∧∧ gives the user (via ⎕CT) more control over
+in that case is ⊤∧ little more tolerant than ⊤∨ regarding the distance to
+nearby integers. In addition ⊤∧ gives the user (via ⎕CT) more control over
 the permitted tolerance for real numbers in the neighborhood of integers.
 
-@subsection Character Arguments for Monadic ⍱⍱ and Dyadic ∧∧, ∨∨, ==, and ≠≠
+@subsection Character Arguments for Monadic ⊤⍱ and Dyadic ⊤∧, ⊤∨, ==, and ≠≠
 
 Some of the bitwise operations are allowed to have characters as their right
 argument. If the right argument is a character then the result is a character
@@ -1772,10 +1779,10 @@ The characters involved are treated as 32 bit quantities:
 @verbatim
       5 ⎕CR 'A'
 41
-      5 ⎕CR ⍱⍱'A'                       ⍝ Note that 5 ⎕CR ANDs with $FF
+      5 ⎕CR ⊤⍱'A'                       ⍝ Note that 5 ⎕CR ANDs with $FF
 BE
 
-      256 256 256 256⊤ ⎕UCS ⍱⍱ 'A'      ⍝ ⍱⍱ 'A' is FFFFFFBE
+      256 256 256 256⊤ ⎕UCS ⊤⍱ 'A'      ⍝ ⊤⍱ 'A' is FFFFFFBE
 255 255 255 190
       256 256 256 256⊤$FFFFFFBE
 255 255 255 190

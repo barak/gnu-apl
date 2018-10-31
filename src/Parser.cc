@@ -490,10 +490,9 @@ Parser::replace_bitwise_functions(Token_string & tos)
 {
    loop(t, int(tos.size()) - 1)
        {
-         const TokenTag tag = tos[t].get_tag();
-         if (tag != tos[t+1].get_tag())   continue;   // different
+         if (tos[t].get_tag() != TOK_F12_ENCODE)   continue;
 
-         switch(tag)
+         switch(tos[t+1].get_tag())
             {
               case TOK_F2_AND:
                    new (&tos[t]) Token(TOK_F2_AND_B, &Bif_F2_AND_B::_fun);
