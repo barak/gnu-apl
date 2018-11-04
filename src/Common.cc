@@ -90,11 +90,12 @@ rlimit rl;
 
    if (log_startup)
       CERR
-           << "sizeof(int) is           " << sizeof(int)           << endl
-           << "sizeof(void *) is        " << sizeof(void *)        << endl
-           << "sizeof(Cell) is          " << sizeof(Cell)          << endl
-           << "sizeof(Svar_record) is   " << sizeof(Svar_record)   << endl
-           << "sizeof(Svar_partner) is   " << sizeof(Svar_partner) << endl;
+           << "sizeof(int) is           " << sizeof(int)              << endl
+           << "sizeof(void *) is        " << sizeof(void *)           << endl
+           << "sizeof(Cell) is          " << sizeof(Cell)             << endl
+           << "sizeof(Svar_record) is   " << sizeof(Svar_record)      << endl
+           << "sizeof(Svar_partner) is  " << sizeof(Svar_partner)     << endl
+           << "process memory limit is  " << total_memory << " bytes" << endl;
 
    // CYGWIN does not have RLIMIT_NPROC
    //

@@ -1142,34 +1142,39 @@ Quad_WA::get_apl_value() const
 {
 Value_P Z(LOC);
 
-uint64_t total = total_memory;   // max memory as reported by RLIM_INFINITY
-uint64_t proc_mem = 0;            // memory as reported proc/mem_info
+   // total_memory is the max. virtual memory of the process running GNU APL,
+   // as reported by getrlimit(RLIMIT_AS) at the start of the interpreter.
+   // It could be RLIM_INFINITY if no limit was set for the process.
+   // 
+   // proc_mem is the amount of free memory as reported as MemFree:
+   // in /proc/meminfo
+   //
+uint64_t total = total_memory;
+uint64_t proc_mem = 0;           // memory as reported proc/mem_info
 
-   {
-     FILE * pm = fopen("/proc/meminfo", "r");
+   // set proc_mem to the value of MemFree: in /proc/meminfo (if present)...
+   //
+   if (FILE * pm = fopen("/proc/meminfo", "r"))
+      {
+        for (;;)
+            {
+              char buffer[2000];
+              if (fgets(buffer, sizeof(buffer) - 1, pm) == 0)   break;
+              buffer[sizeof(buffer) - 1] = 0;
+              if (!strncmp(buffer, "MemFree:", 8))
+                 {
+                   proc_mem = atoi(buffer + 8);
+                   proc_mem *= 1024;
+                   break;
+                 }
+            }
 
-     if (pm)   // /proc/meminfo exists
-        {
-          for (;;)
-              {
-                char buffer[2000];
-                if (fgets(buffer, sizeof(buffer) - 1, pm) == 0)   break;
-                buffer[sizeof(buffer) - 1] = 0;
-                if (!strncmp(buffer, "MemFree:", 8))
-                   {
-                     proc_mem = atoi(buffer + 8);
-                     proc_mem *= 1024;
-                     break;
-                   }
-              }
-
-          fclose(pm);
-        }
-   }
+        fclose(pm);
+      }
 
    if (proc_mem == 0)   // nothing from /proc/meminfo
       {
-        if (total == RLIM_INFINITY)   // no rlimit
+        if (total == RLIM_INFINITY)   // no rlimit for this process
            {
              CERR << "Cannot properly determine ⎕WA (process has no memory"
                      " limit and /proc/meminfo provided no info)" << endl;
@@ -1181,11 +1186,11 @@ uint64_t proc_mem = 0;            // memory as reported proc/mem_info
                     + Value::value_count * sizeof(Value);
            }
       }
-   else
+   else                 // found MemFree: in /proc/meminfo
       {
-        if (total == RLIM_INFINITY)   // no rlimit
+        if (total == RLIM_INFINITY)   // no rlimit for this process
            {
-             total = proc_mem;   // use value from .proc/meminfo
+             total = proc_mem;   // use value from /proc/meminfo
            }
         else                          // process has rlimit
            {

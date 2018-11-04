@@ -41,7 +41,13 @@ void
 PointerCell::init_other(void * other, Value & cell_owner,
                             const char * loc) const
 {
-   new (other) PointerCell(get_pointer_value()->clone(loc), cell_owner);
+   Assert(other);   // the new PointerCell to be created
+
+   try {
+         Value_P sub = get_pointer_value()->clone(loc);
+         Assert(!!sub);
+         new (other) PointerCell(sub, cell_owner);
+       } catch(...) { WS_FULL; }
 }
 //-----------------------------------------------------------------------------
 void

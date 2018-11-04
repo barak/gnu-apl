@@ -283,6 +283,14 @@ char ** strings = backtrace_symbols(buffer, size);
         << "----------------------------------------"  << endl
         << "-- Stack trace at " << file << ":" << line << endl
         << "----------------------------------------"  << endl;
+
+   if (strings == 0)
+      {
+        cerr << "backtrace_symbols() failed: cannot display stack" << endl
+             << "========================================" << endl;
+        return;
+      }
+
    for (int i = 1; i < size - 1; ++i)
        {
          // make a copy of strings[i] that can be
@@ -300,7 +308,6 @@ char ** strings = backtrace_symbols(buffer, size);
    // crashes at times
    free(strings);   // but not strings[x] !
 #endif
-
 
 #endif
 }
