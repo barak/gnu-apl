@@ -445,6 +445,7 @@ PERFORMANCE_END(fs_M_join_AB, start_M_join, 1);
                               }
 
                            Value_P Z1(*sh_Z1, LOC);
+                           if (Z1->is_scalar())   Z1 = B1->clone(LOC);
                            new (&cell_Z) PointerCell(Z1, *job_AB->value_Z);
 
                            PJob_scalar_AB j1(Z1.get(),
@@ -471,6 +472,7 @@ PERFORMANCE_END(fs_M_join_AB, start_M_join, 1);
                            else
                               {
                                  Value_P Z1(A1->get_shape(), LOC);
+                                 if (Z1->is_scalar())   Z1 = A1->clone(LOC);
                                  new (&cell_Z) PointerCell(Z1,*job_AB->value_Z);
 
                                  PJob_scalar_AB j1(Z1.get(),
@@ -499,6 +501,8 @@ PERFORMANCE_END(fs_M_join_AB, start_M_join, 1);
                            else
                               {
                                 Value_P Z1(B1->get_shape(), LOC);
+                                if (Z1->is_scalar())   Z1 = B1->clone(LOC);
+
                                 new (&cell_Z) PointerCell(Z1, *job_AB->value_Z);
 
                                 PJob_scalar_AB j1(Z1.get(), &cell_A, 0,
