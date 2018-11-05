@@ -236,7 +236,7 @@ Executable * statements = 0;
                   << "      " << err.get_error_line_3() << endl;
            }
 
-        err.print(UERR);
+        err.print(UERR, LOC);
         return;
       }
    catch (...)
@@ -449,7 +449,9 @@ check_EOC:
                       }
                  }
 
-              Workspace::get_error()->print(CERR);
+              if (Workspace::get_error()->get_print_loc() == 0)   // not printed
+                 Workspace::get_error()->print(CERR, LOC);
+
               if (Workspace::SI_top()->get_level() == 0)
                  {
                    Value::erase_stale(LOC);

@@ -796,7 +796,7 @@ UserFunction * fun = 0;
       {
         delete fun;
 
-        err.print(CERR);
+        err.print(CERR, LOC);
       }
    catch (...)
       {

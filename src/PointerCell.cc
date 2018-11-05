@@ -37,6 +37,20 @@ PointerCell::PointerCell(Value_P sub_val, Value & cell_owner)
    cell_owner.add_subcount(sub_val->nz_element_count());
 }
 //-----------------------------------------------------------------------------
+PointerCell::PointerCell(Value * sub_val, Value & cell_owner)
+{
+   // DO NOT: Assert(!sub_val->is_simple_scalar()); This is a special
+   // constructor only used in ScalarFunction.cc to create an un-initialized
+   // PointerCell
+
+   new (&value.pval.valp) Value_P(sub_val, LOC);
+   value.pval.owner = &cell_owner;
+
+   Assert(value.pval.owner != sub_val);   // typical cut-and-paste error
+   cell_owner.increment_pointer_cell_count();
+   cell_owner.add_subcount(sub_val->nz_element_count());
+}
+//-----------------------------------------------------------------------------
 void
 PointerCell::init_other(void * other, Value & cell_owner,
                             const char * loc) const

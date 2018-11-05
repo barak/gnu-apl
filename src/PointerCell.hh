@@ -32,8 +32,12 @@
 class PointerCell : public Cell
 {
 public:
-   /// construct a cell containing nested sub-array \b val.
+   /// constructor: a cell containing nested sub-array \b val.
    PointerCell(Value_P val, Value & cell_owner);
+
+   /// constructor: a cell containing nested sub-array \b val where val
+   /// us allowed to be a simpkle scalar (used only in ScalarFunction.cc)
+   PointerCell(Value * val, Value & cell_owner);
 
    /// overloaded Cell::init_other
    virtual void init_other(void * other, Value & cell_owner,

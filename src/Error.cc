@@ -28,8 +28,17 @@
 
 //-----------------------------------------------------------------------------
 void
-Error::print(ostream & out) const
+Error::print(ostream & out, const char * loc) const
 {
+   if (print_loc)
+      {
+        CERR << endl << "*** Error printed twice; first printed at "
+             << print_loc << endl
+             << "now printed at " << loc << endl;
+
+        return;
+      }
+
    Log(LOG_verbose_error)
       {
         out << endl
@@ -56,6 +65,8 @@ Error::print(ostream & out) const
 
         if (parser_loc)   out << "   Parser LOC: " << parser_loc  << endl;
         if (print_loc)    out << "   Print LOC:  " << print_loc   << endl;
+                          out << "   loc:        " << loc         << endl;
+        loc = print_loc;
 
         if (symbol_name.size())
            out                << "   Symbol:     " << symbol_name << endl;
@@ -140,10 +151,11 @@ const int diff = right_caret - left_caret;
 void
 Error::print_em(ostream & out, const char * loc)
 {
-   if (print_loc) 
+   if (print_loc)
       {
         CERR << endl << "*** Error printed twice; first printed at "
-             << print_loc << endl;
+             << print_loc << endl
+             << "now printed from " << loc << endl;
 
         return;
       }

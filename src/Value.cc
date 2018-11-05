@@ -1671,22 +1671,85 @@ Value::clone(const char * loc) const
 const uint64_t start_1 = cycle_counter();
 #endif
 
-Value_P ret(get_shape(), loc);
+Value_P Z(get_shape(), loc);
 
 const Cell * src = &get_ravel(0);
-Cell * dst = &ret->get_ravel(0);
+Cell * dst = &Z->get_ravel(0);
 const ShapeItem count = nz_element_count();
 
-   loop(c, count)   dst++->init(*src++, ret.getref(), LOC);
+   loop(c, count)   dst++->init(*src++, Z.getref(), LOC);
 
-   ret->check_value(LOC);
+   Z->check_value(LOC);
 
 #ifdef PERFORMANCE_COUNTERS_WANTED
 const uint64_t end_1 = cycle_counter();
    Performance::fs_clone_B.add_sample(end_1 - start_1, count);
 #endif
 
-   return ret;
+   return Z;
+}
+//-----------------------------------------------------------------------------
+Value_P
+Value::clone_type(const char * loc) const
+{
+#ifdef PERFORMANCE_COUNTERS_WANTED
+const uint64_t start_1 = cycle_counter();
+#endif
+
+Value_P Z(get_shape(), loc);   // type has (recursively) the same shape as this
+const ShapeItem len_Z = nz_element_count();
+   loop(z, len_Z)
+       {
+         if (get_ravel(z).is_integer_cell())
+            new (Z->next_ravel())   IntCell(0);
+         else if (get_ravel(z).is_character_cell())
+            new (Z->next_ravel())   CharCell(UNI_ASCII_SPACE);
+         else if (get_ravel(z).is_pointer_cell())
+            {
+              Value_P sub = get_ravel(z).get_pointer_value();
+              Value_P sub_type = sub->clone_type(loc);
+              new (Z->next_ravel())   PointerCell(sub_type.get(), Z.getref());
+            }
+   else DOMAIN_ERROR;
+       }
+
+   Z->check_value(LOC);
+
+#ifdef PERFORMANCE_COUNTERS_WANTED
+const uint64_t end_1 = cycle_counter();
+   Performance::fs_clone_B.add_sample(end_1 - start_1, len_Z);
+#endif
+   return Z;
+}
+//-----------------------------------------------------------------------------
+Value_P
+Value::clone_prototype(const char * loc) const
+{
+#ifdef PERFORMANCE_COUNTERS_WANTED
+const uint64_t start_1 = cycle_counter();
+#endif
+
+Value_P Z(loc);   // prototype is always a scalar
+   if (get_ravel(0).is_integer_cell())
+      new (Z->next_ravel())   IntCell(0);
+   else if (get_ravel(0).is_character_cell())
+      new (Z->next_ravel())   CharCell(UNI_ASCII_SPACE);
+   else if (get_ravel(0).is_pointer_cell())
+      {
+        Value_P sub = get_ravel(0).get_pointer_value();
+        Value_P sub_type = sub->clone_type(loc);
+        new (Z->next_ravel())   PointerCell(sub_type.get(), Z.getref());
+      }
+   else DOMAIN_ERROR;
+
+   Z->check_value(LOC);
+
+#ifdef PERFORMANCE_COUNTERS_WANTED
+const uint64_t end_1 = cycle_counter();
+   Performance::fs_clone_B.add_sample(end_1 - start_1, 1);
+#endif
+
+   return Z;
 }
 //-----------------------------------------------------------------------------
 /// lrp p.138: S←⍴⍴A + NOTCHAR (per column)

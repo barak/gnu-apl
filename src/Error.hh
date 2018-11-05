@@ -74,7 +74,7 @@ struct Error
    UCS_string get_error_line_3() const;
 
    /// print the error and its related information
-   void print(ostream & out) const;
+   void print(ostream & out, const char * loc) const;
 
    /// return a string describing the error
    static const UCS_string error_name(ErrorCode err);
