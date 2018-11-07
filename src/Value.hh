@@ -457,12 +457,6 @@ public:
    /// return a deep copy of \b this value
    Value_P clone(const char * loc) const;
 
-   /// return a deep copy of \b the type of this value
-   Value_P clone_type(const char * loc) const;
-
-   /// return a deep copy of \b the prototype of this value
-   Value_P clone_prototype(const char * loc) const;
-
    /// get the min spacing for this column and set/clear if there
    /// is/isn't a numeric item in the column.
    /// are/ain't numeric items in col.

@@ -45,7 +45,7 @@ Cell::init_from_value(Value_P value, Value & cell_owner, const char * loc)
 {
    if (value->is_simple_scalar())
       {
-        init(value->get_ravel(0), cell_owner, loc);
+        value->get_ravel(0).init_other(this, cell_owner, loc);
       }
    else
       {
@@ -64,7 +64,7 @@ Value_P ret;
    else
       {
         ret = Value_P(loc);
-        ret->get_ravel(0).init(*this, ret.getref(), loc);
+        init_other(&ret->get_ravel(0), ret.getref(), loc);
         ret->check_value(LOC);
       }
 
@@ -76,9 +76,10 @@ Cell::init_type(const Cell & other, Value & cell_owner, const char * loc)
 {
    if (other.is_pointer_cell())
       {
-        new (this) PointerCell(other.get_pointer_value()->clone(loc),
-                               cell_owner);
-        get_pointer_value()->to_proto();
+        Value_P sub = other.get_pointer_value()->clone(loc);
+        Assert(!sub->is_simple_scalar());
+        sub->to_proto();
+        new (this) PointerCell(sub, cell_owner);
       }
    else if (other.is_lval_cell())
       {
@@ -101,7 +102,7 @@ Cell::copy(Value & val, const Cell * & src, ShapeItem count)
    loop(c, count)
       {
         Assert1(val.more());
-        val.next_ravel()->init(*src++, val, LOC);
+        src++->init_other(val.next_ravel(), val, LOC);
       }
 }
 //-----------------------------------------------------------------------------

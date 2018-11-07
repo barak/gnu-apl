@@ -65,7 +65,7 @@ Error::print(ostream & out, const char * loc) const
 
         if (parser_loc)   out << "   Parser LOC: " << parser_loc  << endl;
         if (print_loc)    out << "   Print LOC:  " << print_loc   << endl;
-                          out << "   loc:        " << loc         << endl;
+        out                   << "   loc:        " << loc         << endl;
         loc = print_loc;
 
         if (symbol_name.size())

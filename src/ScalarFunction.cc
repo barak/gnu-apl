@@ -464,9 +464,7 @@ PERFORMANCE_END(fs_M_join_AB, start_M_join, 1);
                            const ShapeItem len_Z1 = A1->element_count();
                            if (len_Z1 == 0)
                               {
-                                Value_P Z1 = A1->clone(LOC);
-                                Z1->to_proto();
-                                Z1->check_value(LOC);
+                                Value_P Z1 = A1->prototype(LOC);
                                 new (&cell_Z) PointerCell(Z1, *job_AB->value_Z);
                               }
                            else
@@ -493,9 +491,7 @@ PERFORMANCE_END(fs_M_join_AB, start_M_join, 1);
                            const ShapeItem len_Z1 = B1->element_count();
                            if (len_Z1 == 0)
                               {
-                                Value_P Z1= B1->clone(LOC);
-                                Z1->to_proto();
-                                Z1->check_value(LOC);
+                                Value_P Z1= B1->prototype(LOC);
                                 new (&cell_Z) PointerCell(Z1, *job_AB->value_Z);
                               }
                            else
@@ -601,9 +597,7 @@ ShapeItem end_z = z + slice_len;
                      const ShapeItem len_Z1 = A1->element_count();
                      if (len_Z1 == 0)
                         {
-                          Value_P Z1= A1->clone(LOC);
-                          Z1->to_proto();
-                          Z1->check_value(LOC);
+                          Value_P Z1= A1->prototype(LOC);
                           new (&cell_Z) PointerCell(Z1, *job_AB->value_Z);
                         }
                      else
@@ -628,9 +622,7 @@ ShapeItem end_z = z + slice_len;
                      const ShapeItem len_Z1 = B1->element_count();
                      if (len_Z1 == 0)
                         {
-                          Value_P Z1= B1->clone(LOC);
-                          Z1->to_proto();
-                          Z1->check_value(LOC);
+                          Value_P Z1= B1->prototype(LOC);
                           new (&cell_Z) PointerCell(Z1, *job_AB->value_Z);
                         }
                      else

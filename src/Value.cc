@@ -1628,6 +1628,31 @@ const Cell * c = &get_ravel(0);
 }
 //-----------------------------------------------------------------------------
 Value_P
+Value::clone(const char * loc) const
+{
+#ifdef PERFORMANCE_COUNTERS_WANTED
+const uint64_t start_1 = cycle_counter();
+#endif
+
+Value_P Z(get_shape(), loc);
+
+const Cell * src = &get_ravel(0);
+Cell * dst = &Z->get_ravel(0);
+const ShapeItem count = nz_element_count();
+
+   loop(c, count)   src++->init_other(dst++, Z.getref(), LOC);
+
+   Z->check_value(LOC);
+
+#ifdef PERFORMANCE_COUNTERS_WANTED
+const uint64_t end_1 = cycle_counter();
+   Performance::fs_clone_B.add_sample(end_1 - start_1, count);
+#endif
+
+   return Z;
+}
+//-----------------------------------------------------------------------------
+Value_P
 Value::prototype(const char * loc) const
 {
    // the type of an array is an array with the same structure, but all numbers
@@ -1636,7 +1661,8 @@ Value::prototype(const char * loc) const
    // the prototype of an array is the type of the first element of the array.
 
 const Cell & first = get_ravel(0);
-
+   if (first.is_integer_cell())     return IntScalar(0, LOC);
+   if (first.is_character_cell())   return CharScalar(UNI_ASCII_SPACE, LOC);
    if (first.is_pointer_cell())
       {
         Value_P B0 = first.get_pointer_value();
@@ -1653,103 +1679,8 @@ const Cell & first = get_ravel(0);
         Z->set_complete();
         return Z;
       }
-   else
-      {
-        Value_P Z(loc);
 
-        Z->next_ravel()->init_type(first, Z.getref(), LOC);
-        Z->set_complete();
-        return Z;
-      }
-
-}
-//-----------------------------------------------------------------------------
-Value_P
-Value::clone(const char * loc) const
-{
-#ifdef PERFORMANCE_COUNTERS_WANTED
-const uint64_t start_1 = cycle_counter();
-#endif
-
-Value_P Z(get_shape(), loc);
-
-const Cell * src = &get_ravel(0);
-Cell * dst = &Z->get_ravel(0);
-const ShapeItem count = nz_element_count();
-
-   loop(c, count)   dst++->init(*src++, Z.getref(), LOC);
-
-   Z->check_value(LOC);
-
-#ifdef PERFORMANCE_COUNTERS_WANTED
-const uint64_t end_1 = cycle_counter();
-   Performance::fs_clone_B.add_sample(end_1 - start_1, count);
-#endif
-
-   return Z;
-}
-//-----------------------------------------------------------------------------
-Value_P
-Value::clone_type(const char * loc) const
-{
-#ifdef PERFORMANCE_COUNTERS_WANTED
-const uint64_t start_1 = cycle_counter();
-#endif
-
-Value_P Z(get_shape(), loc);   // type has (recursively) the same shape as this
-const ShapeItem len_Z = nz_element_count();
-   loop(z, len_Z)
-       {
-         if (get_ravel(z).is_integer_cell())
-            new (Z->next_ravel())   IntCell(0);
-         else if (get_ravel(z).is_character_cell())
-            new (Z->next_ravel())   CharCell(UNI_ASCII_SPACE);
-         else if (get_ravel(z).is_pointer_cell())
-            {
-              Value_P sub = get_ravel(z).get_pointer_value();
-              Value_P sub_type = sub->clone_type(loc);
-              new (Z->next_ravel())   PointerCell(sub_type.get(), Z.getref());
-            }
-   else DOMAIN_ERROR;
-       }
-
-   Z->check_value(LOC);
-
-#ifdef PERFORMANCE_COUNTERS_WANTED
-const uint64_t end_1 = cycle_counter();
-   Performance::fs_clone_B.add_sample(end_1 - start_1, len_Z);
-#endif
-   return Z;
-}
-//-----------------------------------------------------------------------------
-Value_P
-Value::clone_prototype(const char * loc) const
-{
-#ifdef PERFORMANCE_COUNTERS_WANTED
-const uint64_t start_1 = cycle_counter();
-#endif
-
-Value_P Z(loc);   // prototype is always a scalar
-   if (get_ravel(0).is_integer_cell())
-      new (Z->next_ravel())   IntCell(0);
-   else if (get_ravel(0).is_character_cell())
-      new (Z->next_ravel())   CharCell(UNI_ASCII_SPACE);
-   else if (get_ravel(0).is_pointer_cell())
-      {
-        Value_P sub = get_ravel(0).get_pointer_value();
-        Value_P sub_type = sub->clone_type(loc);
-        new (Z->next_ravel())   PointerCell(sub_type.get(), Z.getref());
-      }
-   else DOMAIN_ERROR;
-
-   Z->check_value(LOC);
-
-#ifdef PERFORMANCE_COUNTERS_WANTED
-const uint64_t end_1 = cycle_counter();
-   Performance::fs_clone_B.add_sample(end_1 - start_1, 1);
-#endif
-
-   return Z;
+   DOMAIN_ERROR;
 }
 //-----------------------------------------------------------------------------
 /// lrp p.138: S←⍴⍴A + NOTCHAR (per column)

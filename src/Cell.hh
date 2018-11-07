@@ -489,7 +489,7 @@ public:
    /// copy (deep) count cells from src to dest)
    static void copy(Cell * & dst, const Cell * & src, ShapeItem count,
                     Value & cell_owner)
-      { loop(c, count)   dst++->init(*src++, cell_owner, LOC); }
+      { loop(c, count)   src++->init_other(dst++, cell_owner, LOC); }
 
    /// copy (deep) count cells from src to val (which is under construction))
    static void copy(Value & val, const Cell * & src, ShapeItem count);
