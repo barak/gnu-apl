@@ -491,7 +491,7 @@ PERFORMANCE_END(fs_M_join_AB, start_M_join, 1);
                            const ShapeItem len_Z1 = B1->element_count();
                            if (len_Z1 == 0)
                               {
-                                Value_P Z1= B1->prototype(LOC);
+                                Value_P Z1 = B1->prototype(LOC);
                                 new (&cell_Z) PointerCell(Z1, *job_AB->value_Z);
                               }
                            else
@@ -597,7 +597,7 @@ ShapeItem end_z = z + slice_len;
                      const ShapeItem len_Z1 = A1->element_count();
                      if (len_Z1 == 0)
                         {
-                          Value_P Z1= A1->prototype(LOC);
+                          Value_P Z1 = A1->prototype(LOC);
                           new (&cell_Z) PointerCell(Z1, *job_AB->value_Z);
                         }
                      else
@@ -622,7 +622,7 @@ ShapeItem end_z = z + slice_len;
                      const ShapeItem len_Z1 = B1->element_count();
                      if (len_Z1 == 0)
                         {
-                          Value_P Z1= B1->prototype(LOC);
+                          Value_P Z1 = B1->prototype(LOC);
                           new (&cell_Z) PointerCell(Z1, *job_AB->value_Z);
                         }
                      else
@@ -653,18 +653,35 @@ CELL_PERFORMANCE_END(job_AB->fun->get_statistics_AB(), start_2, z)
 Token
 ScalarFunction::eval_fill_AB(Value_P A, Value_P B)
 {
-   // eval_fill_AB() is called when A or B or both are empty
+   // eval_fill_AB() is called when A or B (or both) are empty.
    //
-   if (A->is_scalar_extensible())   // then B is empty
+   if (B->element_count() == 0)   // B is empty
       {
+        if (B->get_ravel(0).is_numeric() ||
+            B->get_ravel(0).is_character_cell())
+           {
+             Value_P Z(B->get_shape(), LOC);
+             new (&Z->get_ravel(0))   IntCell(0);
+             Z->check_value(LOC);
+             return Token(TOK_APL_VALUE1, Z);
+           }
+
         Value_P Z = B->clone(LOC);
         Z->to_proto();
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
 
-   if (B->is_scalar_extensible())   // then A is empty
+   if (A->element_count() == 0)   // A is empty
       {
+        if (A->get_ravel(0).is_numeric() ||
+            A->get_ravel(0).is_character_cell())
+           {
+             Value_P Z(A->get_shape(), LOC);
+             new (&Z->get_ravel(0))   IntCell(0);
+             Z->check_value(LOC);
+             return Token(TOK_APL_VALUE1, Z);
+           }
         Value_P Z = A->clone(LOC);
         Z->to_proto();
         Z->check_value(LOC);
@@ -674,6 +691,9 @@ ScalarFunction::eval_fill_AB(Value_P A, Value_P B)
    // both A and B are empty
    //
    Assert(A->same_shape(*B));   // has been checked already
+
+   // Value::prototype() does not work here, so we clone() and to_proto()
+   //
 Value_P Z = B->clone(LOC);
    Z->to_proto();
    Z->check_value(LOC);
@@ -687,9 +707,24 @@ ScalarFunction::eval_fill_B(Value_P B)
 {
    // eval_fill_B() is called when a scalar function with empty B is called
    //
+   // lrm p. 56: When the prototypes of the empty arguments are simple
+   //            scalars, return a zero prototype
+   //
+   if (B->get_ravel(0).is_numeric() ||
+       B->get_ravel(0).is_character_cell())
+      {
+        Value_P Z(B->get_shape(), LOC);
+        new (&Z->get_ravel(0))   IntCell(0);
+        Z->check_value(LOC);
+        return Token(TOK_APL_VALUE1, Z);
+      }
+
+   // Value::prototype() does not work here, so we clone() and to_proto()
+   //
 Value_P Z = B->clone(LOC);
    Z->to_proto();
    Z->check_value(LOC);
+
    return Token(TOK_APL_VALUE1, Z);
 }
 //-----------------------------------------------------------------------------

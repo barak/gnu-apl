@@ -95,6 +95,10 @@ protected:
 
    /// overloaded Cell::bif_not_equal_bitwise()
    virtual ErrorCode bif_not_equal_bitwise(Cell * Z, const Cell * A) const;
+
+   /// overloaded Cell::to_type()
+   virtual void to_type()
+      { value.aval = UNI_ASCII_SPACE; }
 };
 //-----------------------------------------------------------------------------
 

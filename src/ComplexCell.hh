@@ -22,6 +22,7 @@
 #define __COMPLEXCELL_HH_DEFINED__
 
 #include "NumericCell.hh"
+#include "IntCell.hh"
 
 //-----------------------------------------------------------------------------
 /*!
@@ -237,6 +238,10 @@ protected:
 
    /// overloaded Cell::CDR_size()
    virtual int CDR_size() const { return 16; }
+
+   /// overloaded Cell::to_type()
+   virtual void to_type()
+      { new(this)   IntCell(0); }
 };
 //=============================================================================
 

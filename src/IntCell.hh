@@ -236,6 +236,10 @@ protected:
 
    /// overloaded Cell::CDR_size()
    virtual int CDR_size() const;
+
+   /// overloaded Cell::to_type()
+   virtual void to_type()
+      { value.ival = 0; }
 };
 //-----------------------------------------------------------------------------
 inline void

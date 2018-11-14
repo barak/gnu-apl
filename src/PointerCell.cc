@@ -291,4 +291,14 @@ PrintBuffer ret(*val, pctx, 0);
    return ret;
 }
 //-----------------------------------------------------------------------------
+void
+PointerCell::to_type()
+{
+Value * sub = get_pointer_value().get();
+   Assert(sub);
+const ShapeItem len = sub->nz_element_count();
+Cell * ravel = &sub->get_ravel(0);
+   loop(l, len)   ravel++->to_type();
+}
+//-----------------------------------------------------------------------------
 

@@ -83,7 +83,10 @@ protected:
    virtual const char * get_classname() const   { return "PointerCell"; }
 
    /// overloaded Cell::CDR_size() should not be called for pointer cells
-   virtual int CDR_size() const { NeverReach("CDR_size called on PointerCell base class"); }
+   virtual int CDR_size() const { NeverReach("PointerCell::CDR_size() called");}
+
+   /// overloaded Cell::to_type()
+   virtual void to_type();
 };
 //=============================================================================
 

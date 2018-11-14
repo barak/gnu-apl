@@ -883,8 +883,7 @@ const APL_Integer function_number = B->get_ravel(0).get_int_value();
                //
                struct sigaction action;
                memset(&action, 0, sizeof(struct sigaction));
-               action.sa_handler = reinterpret_cast<typeof(action.sa_handler)>
-                                                    (0);
+               action.sa_handler = 0;
                sigaction(SIGSEGV, &action, 0);
                const APL_Integer result = *reinterpret_cast<char *>(4343);
                CERR << "NOTE: Throwing a segfault failed." << endl;

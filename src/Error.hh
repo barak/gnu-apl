@@ -167,6 +167,7 @@ void throw_define_error(const UCS_string & fun, const UCS_string & cmd,
 #define DEFN_ERROR          throw_apl_error(E_DEFN_ERROR,           LOC)
 #define DOMAIN_ERROR        throw_apl_error(E_DOMAIN_ERROR,         LOC)
 #define INDEX_ERROR         throw_apl_error(E_INDEX_ERROR,          LOC)
+#define INTERNAL_ERROR      throw_apl_error(E_INTERNAL_ERROR,       LOC)
 #define INTERRUPT           { \
                               throw_apl_error(E_INTERRUPT,          LOC); }
 #define LENGTH_ERROR        throw_apl_error(E_LENGTH_ERROR,         LOC)

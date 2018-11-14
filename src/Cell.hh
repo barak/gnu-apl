@@ -63,22 +63,22 @@ public:
    /// is used (and value is erased). Otherwise a PointerCell is created.
    void init_from_value(Value_P value, Value & cell_owner, const char * loc);
 
+   /// Return \b true if \b this cell is greater than \b other, with:
+   /// 1. PointerCell > NumericCell > CharCell
+   /// 2a. NumericCells sorted by get_real_value(). then by get_imag_value()
+   /// 2b. CharCells sorted by get_char_value()
+   /// 2c. PointerCells sorted by rank, then by shape, then by ravel
+   virtual bool greater(const Cell & other) const;
+
+   /// return \b true if \b this cell is equal to \b other
+   virtual bool equal(const Cell & other, double qct) const;
+
    /// return pointer value of a PointerCell or create a scalar with a
    /// copy of this cell.
    Value_P to_value(const char * loc) const;
 
    /// init \b this cell to be the type of \b other
    void init_type(const Cell & other, Value & cell_owner, const char * loc);
-
-   /// Return \b true if \b this cell is greater than \b other, with:
-   /// 1. PointerCell > NumericCell > CharCell
-   /// 2a. NumericCells sorted by get_real_value(). then by get_imag_value()
-   /// 2b. CharCells sorted by get_char_value()
-   /// 2c. PointerCells sorted by rank, then shape, then ravel
-   virtual bool greater(const Cell & other) const;
-
-   /// return \b true if \b this cell is equal to \b other
-   virtual bool equal(const Cell & other, double qct) const;
 
    /// ISO p.15: return \b true if A and B are on the same half-plane
    static bool same_half_plane(APL_Complex A, APL_Complex B);
@@ -198,10 +198,6 @@ public:
    virtual bool is_picked_lval_cell() const
       { return false; }
 
-   /// Return \b true iff \b this cell is an error cell
-   virtual bool is_error_cell() const
-      { return false; }
-
    /// Return \b true iff \b this cell is a complex number cell
    virtual bool is_complex_cell() const
       { return false; }
@@ -221,6 +217,10 @@ public:
    /// Return \b true iff \b this cell is an example field character cell
    virtual bool is_example_field() const
       { return false; }
+
+   /// convert this cell to its type
+   virtual void to_type()
+      { DOMAIN_ERROR; }
 
    /// The possible cell values
    union SomeValue

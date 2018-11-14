@@ -22,6 +22,7 @@
 #define __FLOATCELL_HH_DEFINED__
 
 #include "../config.h"   // for RATIONAL_NUMBERS_WANTED
+#include "IntCell.hh"
 #include "RealCell.hh"
 
 //-----------------------------------------------------------------------------
@@ -326,6 +327,10 @@ protected:
 
    /// Overloaded Cell::CDR_size()
    virtual int CDR_size() const { return 8; }
+
+   /// overloaded Cell::to_type()
+   virtual void to_type()
+      { new(this)   IntCell(0); }
 };
 //=============================================================================
 
