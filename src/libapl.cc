@@ -621,6 +621,10 @@ init_libapl(const char * progname, int log_startup)
    uprefs.requested_id = 2000;
 
    init_1(progname, log_startup);
+
+   uprefs.read_config_file(true,  log_startup);   // in /etc/gnu-apl.d/
+   uprefs.read_config_file(false, log_startup);   // in $HOME/.config/gnu_apl/
+
    init_2(log_startup);
 }
 //-----------------------------------------------------------------------------
