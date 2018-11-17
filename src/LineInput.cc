@@ -237,6 +237,7 @@ LineHistory::print_history(ostream & out)
 void
 LineHistory::add_line(const UCS_string & line)
 {
+   if (max_lines == 0)      return;   // no history
    if (!line.has_black())   return;
 
    if (int(hist_lines.size()) < max_lines)   // append
