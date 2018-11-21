@@ -25,6 +25,7 @@
 #include "DerivedFunction.hh"
 #include "Executable.hh"
 #include "Error.hh"
+#include "Function.hh"
 #include "Parser.hh"
 #include "Prefix.hh"
 #include "PrintOperator.hh"

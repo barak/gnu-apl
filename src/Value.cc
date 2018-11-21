@@ -53,12 +53,14 @@ uint64_t Value::fast_new = 0;
 uint64_t Value::slow_new = 0;
 
 //-----------------------------------------------------------------------------
-inline void
+void
 Value::init_ravel()
 {
    owner_count = 0;
    pointer_cell_count = 0;
    nz_subcell_count = 0;
+   check_ptr = 0;
+   new (short_value)   IntCell(0);
 
    ++value_count;
    if (Quad_SYL::value_count_limit &&
@@ -77,69 +79,78 @@ Value::init_ravel()
 
 const ShapeItem length = shape.get_volume();
 
-   if (length > SHORT_VALUE_LENGTH_WANTED)
-      {
-        // if the compiler uses 4-byte pointers, then do not allow APL
-        // values that are too large. The reason is that new[] may return
-        // a non-0 pointer (thus pretending everything is OK), but a subsequent
-        // attermpt to initialize the value might then throw a segfault.
-        //
-        enum { MAX_LEN = 2000000000 /  sizeof(Cell) };
-        if (length > MAX_LEN && sizeof(void *) < 6)
-           throw_apl_error(E_WS_FULL, alloc_loc);
-
-        total_ravel_count += length;
-        if (Quad_SYL::ravel_count_limit &&
-            Quad_SYL::ravel_count_limit < total_ravel_count)
-           {
-             total_ravel_count -= length;
-
-             // make sure that the value is properly initialized
-             //
-             ravel = short_value;
-             new (&shape) Shape();
-             new (ravel)   IntCell(42);
-
-             MORE_ERROR() <<
-             "the system limit on the total ravel size (as set in ⎕SYL) "
-             "was reached\n(and to avoid lock-up, the limit in ⎕SYL "
-             "was automatically cleared).";
-
-             // reset the limit so that we don't get stuck here.
-             //
-             Quad_SYL::ravel_count_limit = 0;
-             set_attention_raised(LOC);
-             set_interrupt_raised(LOC);
-           }
-
-        try
-           {
-             Cell * long_ravel = reinterpret_cast<Cell *>
-                                 (new char[length * sizeof(Cell)]);
-//           Cell * long_ravel =  new Cell[length];
-             ravel = long_ravel;
-           }
-        catch (...)
-           {
-             // for some unknown reason, this object gets cleared after
-             // throwing the E_WS_FULL below (which destroys the prev and
-             // next pointers. We therefore unlink() the object here (where
-             // prev and next pointers are still intact).
-             //
-             unlink();
-             throw_apl_error(E_WS_FULL, alloc_loc);
-           }
-      }
-   else
+   // small values always succeed...
+   //
+   if (length <= SHORT_VALUE_LENGTH_WANTED)
       {
         ravel = short_value;
+        check_ptr = reinterpret_cast<const char *>(this) + 7;
+        return;
+      }
+
+   // large Value. If the compiler uses 4-byte pointers, then do not allow APL
+   // values that are too large. The reason is that new[] may return
+   // a non-0 pointer (thus pretending everything is OK), but a subsequent
+   // attermpt to initialize the value might then throw a segfault.
+   //
+   enum { MAX_LEN = 2000000000 / sizeof(Cell) };
+   if (length > MAX_LEN && sizeof(void *) < 6)
+      throw_apl_error(E_WS_FULL, alloc_loc);
+
+   total_ravel_count += length;
+   if (Quad_SYL::ravel_count_limit &&
+       Quad_SYL::ravel_count_limit < total_ravel_count)
+      {
+        total_ravel_count -= length;
+
+        // make sure that the value is properly initialized
+        //
+        new (&shape) Shape();
+        ravel = short_value;
+        new (ravel)   IntCell(42);
+
+        MORE_ERROR() <<
+"the system limit on the total ravel size (as set in ⎕SYL) was reached\n"
+"(and to avoid lock-up, the limit in ⎕SYL was automatically cleared).";
+
+        // reset the limit so that we don't get stuck here.
+        //
+        Quad_SYL::ravel_count_limit = 0;
+        set_attention_raised(LOC);
+        set_interrupt_raised(LOC);
+      }
+
+   try
+      {
+        Cell * long_ravel = reinterpret_cast<Cell *>
+                                 (new char[length * sizeof(Cell)]);
+//      Cell * long_ravel =  new Cell[length];
+        ravel = long_ravel;
+      }
+   catch (...)
+      {
+        // for some unknown reason, this object gets cleared after
+        // throwing the E_WS_FULL below (which destroys the prev and
+        // next pointers. We therefore unlink() the object here (where
+        // prev and next pointers are still intact).
+        //
+        unlink();
+
+        Log(LOG_Value_alloc)
+           CERR << "new char[" << (length * sizeof(Cell))
+                << "] (aka. long ravel allocation) failed at " LOC << endl;
+
+        MORE_ERROR() << "The instatiation of a Value object succeeded, "
+                        "but allocation of its (large) ravel failed.";
+        new (&shape) Shape();
+        ravel = short_value;
+        throw_apl_error(E_WS_FULL, alloc_loc);
       }
 
    // init the first ravel element to (prototype) 0 so that we can avoid
    // many empty checks all over the place
    //
    new (ravel)   IntCell(0);
-
    check_ptr = reinterpret_cast<const char *>(this) + 7;
 }
 //-----------------------------------------------------------------------------

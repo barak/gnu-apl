@@ -26,6 +26,7 @@
 #include "Value.icc"
 #include "Common.hh"
 #include "LibPaths.hh"
+#include "UCS_string.hh"
 #include "UTF8_string.hh"
 
 class Workspace;

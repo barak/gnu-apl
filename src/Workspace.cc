@@ -1022,4 +1022,11 @@ Workspace::wsid(ostream & out, UCS_string arg, LibRef lib, bool silent)
    the_workspace.WS_name = arg;
 }
 //-----------------------------------------------------------------------------
+UCS_string &
+MORE_ERROR()
+{
+   Workspace::more_error().shrink(0);
+   return Workspace::more_error();
+}
+//-----------------------------------------------------------------------------
 

@@ -23,6 +23,8 @@
 
 #include "Value.hh"
 
+UCS_string & MORE_ERROR();
+
 //-----------------------------------------------------------------------------
 void
 Value_P_Base::increment_owner_count(Value * v, const char * loc)
@@ -51,63 +53,261 @@ Value_P_Base::decrement_owner_count(Value * & v, const char * loc)
 //-----------------------------------------------------------------------------
 inline Value_P::Value_P(const char * loc)
 {
-   value_p = new Value(loc);
+   try
+      {
+        value_p = new Value(loc);
+      }
+   catch (Error error)
+      {
+        // new() succeeded, but allocation of a (long) ravel failed.
+        //
+        Log(LOG_Value_alloc)   CERR << "Ravel allocation failed" << endl;
+        MORE_ERROR() << "new Value(loc) failed (ravel allocation)";
+        throw error;   // rethrow
+      }
+   catch (...)
+      {
+        // new() failed
+        //
+        Log(LOG_Value_alloc)
+           CERR << "Value_P::Value_P(loc) failed at "  LOC
+                << " (caller: " << loc << ")" << endl;
+        MORE_ERROR() << "new Value(loc) failed";
+        WS_FULL;
+      }
+
    increment_owner_count(value_p, loc);
    ADD_EVENT(value_p, VHE_PtrNew, value_p->owner_count, loc);
 }
 //-----------------------------------------------------------------------------
 inline Value_P::Value_P(const Cell & cell, const char * loc)
 {
-   value_p = new Value(cell, loc);
+   try
+      {
+        value_p = new Value(cell, loc);
+      }
+   catch (Error error)
+      {
+        // new() succeeded, but allocation of a (long) ravel failed.
+        //
+        Log(LOG_Value_alloc)   CERR << "Ravel allocation failed" << endl;
+        MORE_ERROR() << "new Value(cell, loc (ravel allocation)";
+        throw error;   // rethrow
+      }
+   catch (...)
+      {
+        // new() failed
+        //
+        Log(LOG_Value_alloc)
+           CERR << "Value_P::Value_P(const Cell &, loc) failed at "  LOC
+                << " (caller: " << loc << ")" << endl;
+        MORE_ERROR() << "new Value(cell, loc) failed";
+        WS_FULL;
+      }
+
    increment_owner_count(value_p, loc);
    ADD_EVENT(value_p, VHE_PtrNew, value_p->owner_count, loc);
 }
 //-----------------------------------------------------------------------------
 inline Value_P::Value_P(ShapeItem len, const char * loc)
 {
-   value_p = new Value(len, loc);
+   try
+      {
+        value_p = new Value(len, loc);
+      }
+   catch (Error error)
+      {
+        // new() succeeded, but allocation of a (long) ravel failed.
+        //
+        Log(LOG_Value_alloc)   CERR << "Ravel allocation failed" << endl;
+        MORE_ERROR() << "new Value(len, loc) failed (ravel allocation)";
+        throw error;   // rethrow
+      }
+   catch (...)
+      {
+        // new() failed
+        //
+        Log(LOG_Value_alloc)
+           CERR << "Value_P::Value_P(const ShapeItem &, loc) failed at "  LOC
+                << " (caller: " << loc << ")" << endl;
+        MORE_ERROR() << "new Value(len, loc) failed";
+        WS_FULL;
+      }
+
    increment_owner_count(value_p, loc);
    ADD_EVENT(value_p, VHE_PtrNew, value_p->owner_count, loc);
 }
 //-----------------------------------------------------------------------------
 inline Value_P::Value_P(const UCS_string & ucs, const char * loc)
 {
-   value_p = new Value(ucs, loc);
+   try
+      {
+        value_p = new Value(ucs, loc);
+      }
+   catch (Error error)
+      {
+        // new() succeeded, but allocation of a (long) ravel failed.
+        //
+        Log(LOG_Value_alloc)   CERR << "Ravel allocation failed" << endl;
+        MORE_ERROR() << "new Value(ucs, loc) failed (ravel allocation)";
+        throw error;   // rethrow
+      }
+   catch (...)
+      {
+        // new() failed
+        //
+        Log(LOG_Value_alloc)
+           CERR << "Value_P::Value_P(const UCS_string &, loc) failed at "  LOC
+                << " (caller: " << loc << ")" << endl;
+        MORE_ERROR() << "new Value(ucs, loc) failed";
+        WS_FULL;
+      }
+
    increment_owner_count(value_p, loc);
    ADD_EVENT(value_p, VHE_PtrNew, value_p->owner_count, loc);
 }
 //-----------------------------------------------------------------------------
 inline Value_P::Value_P(const CDR_string & cdr, const char * loc)
 {
-   value_p = new Value(cdr, loc);
+   try
+      {
+        value_p = new Value(cdr, loc);
+      }
+   catch (Error error)
+      {
+        // new() succeeded, but allocation of a (long) ravel failed.
+        //
+        Log(LOG_Value_alloc)   CERR << "Ravel allocation failed" << endl;
+        MORE_ERROR() << "new Value(cdr, loc) failed (ravel allocation)";
+        throw error;   // rethrow
+      }
+   catch (...)
+      {
+        // new() failed
+        //
+        Log(LOG_Value_alloc)
+           CERR << "Value_P::Value_P(const CDR_string &, loc) failed at "  LOC
+                << " (caller: " << loc << ")" << endl;
+        MORE_ERROR() << "new Value(cdr, loc) failed";
+        WS_FULL;
+      }
+
    increment_owner_count(value_p, loc);
    ADD_EVENT(value_p, VHE_PtrNew, value_p->owner_count, loc);
 }
 //-----------------------------------------------------------------------------
 inline Value_P::Value_P(const PrintBuffer & pb, const char * loc)
 {
-   value_p = new Value(pb, loc);
-   increment_owner_count(value_p, loc);
-   ADD_EVENT(value_p, VHE_PtrNew, value_p->owner_count, loc);
-}
-//-----------------------------------------------------------------------------
-inline Value_P::Value_P(const char * loc, const Shape * sh)
-{
-   value_p = new Value(loc, sh);
+   try
+      {
+        value_p = new Value(pb, loc);
+      }
+   catch (Error error)
+      {
+        // new() succeeded, but allocation of a (long) ravel failed.
+        //
+        Log(LOG_Value_alloc)   CERR << "Ravel allocation failed" << endl;
+        MORE_ERROR() << "new Value(pb, loc) failed (ravel allocation)";
+        throw error;   // rethrow
+      }
+   catch (...)
+      {
+        // new() failed
+        //
+        Log(LOG_Value_alloc)
+           CERR << "Value_P::Value_P(const PrintBuffer &, loc) failed at "  LOC
+                << " (caller: " << loc << ")" << endl;
+        MORE_ERROR() << "new Value(pb, loc) failed";
+        WS_FULL;
+      }
+
    increment_owner_count(value_p, loc);
    ADD_EVENT(value_p, VHE_PtrNew, value_p->owner_count, loc);
 }
 //-----------------------------------------------------------------------------
 inline Value_P::Value_P(const UTF8_string & utf, const char * loc)
 {
-   value_p = new Value(utf, loc);
+   try
+      {
+        value_p = new Value(utf, loc);
+      }
+   catch (Error error)
+      {
+        // new() succeeded, but allocation of a (long) ravel failed.
+        //
+        Log(LOG_Value_alloc)   CERR << "Ravel allocation failed" << endl;
+        MORE_ERROR() << "new Value(utf, loc) failed (ravel allocation)";
+        throw error;   // rethrow
+      }
+   catch (...)
+      {
+        // new() failed
+        //
+        Log(LOG_Value_alloc)
+           CERR << "Value_P::Value_P(const UTF8_string &, loc) failed at "  LOC
+                << " (caller: " << loc << ")" << endl;
+        MORE_ERROR() << "new Value(utf, loc) failed";
+        WS_FULL;
+      }
+
    increment_owner_count(value_p, loc);
    ADD_EVENT(value_p, VHE_PtrNew, value_p->owner_count, loc);
 }
 //-----------------------------------------------------------------------------
-inline Value_P::Value_P(const Shape & sh, const char * loc)
+inline Value_P::Value_P(const char * loc, const Shape * shape)
 {
-   value_p = new Value(sh, loc);
+   try
+      {
+        value_p = new Value(loc, shape);
+      }
+   catch (Error error)
+      {
+        // new() succeeded, but allocation of a (long) ravel failed.
+        //
+        Log(LOG_Value_alloc)   CERR << "Ravel allocation failed" << endl;
+        MORE_ERROR() << "new Value(loc, shape) failed (ravel allocation)";
+        throw error;   // rethrow
+      }
+   catch (...)
+      {
+        // new() failed
+        //
+        Log(LOG_Value_alloc)
+           CERR << "Value_P::Value_P(Shape " << shape << " failed at " LOC
+                << " (caller: " << loc << ")" << endl;
+        MORE_ERROR() << "new Value(loc, shape) failed";
+        WS_FULL;
+      }
+
+   increment_owner_count(value_p, loc);
+   ADD_EVENT(value_p, VHE_PtrNew, value_p->owner_count, loc);
+}
+//-----------------------------------------------------------------------------
+inline Value_P::Value_P(const Shape & shape, const char * loc)
+{
+   try
+      {
+        value_p = new Value(shape, loc);
+      }
+   catch (Error error)
+      {
+        // new() succeeded, but allocation of a (long) ravel failed.
+        //
+        Log(LOG_Value_alloc)   CERR << "Ravel allocation failed" << endl;
+        MORE_ERROR() << "new Value(shape, loc) failed (ravel allocation)";
+        throw error;   // rethrow
+      }
+   catch (...)
+      {
+        // new() failed
+        //
+        Log(LOG_Value_alloc)
+           CERR << "Value_P::Value_P(Shape " << shape << " failed at " LOC
+                << " (caller: " << loc << ")" << endl;
+        MORE_ERROR() << "new Value(shape, loc) failed";
+        WS_FULL;
+      }
+
    increment_owner_count(value_p, loc);
    ADD_EVENT(value_p, VHE_PtrNew, value_p->owner_count, loc);
 }

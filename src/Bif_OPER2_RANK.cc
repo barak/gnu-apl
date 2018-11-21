@@ -186,8 +186,7 @@ Value_P vsh_B(LOC, &low_B);
 Value_P vsh_Z(LOC, &shape_Z);
 
 Value_P X7(7, LOC);
-Q(LOC)
-   if (!X)   new (X7->next_ravel())   IntCell(-1);                // no X
+   if (!X)   new (X7->next_ravel())   IntCell(-1);              // no X
    else      X7->next_ravel()->init_from_value(X, X7.getref(), LOC);
 
    new (X7->next_ravel())   IntCell(low_A.get_volume());        // LA

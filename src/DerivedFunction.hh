@@ -18,8 +18,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __FUNOPER_HH__DEFINED__
-#define __FUNOPER_HH__DEFINED__
+#ifndef __DERIVED_FUNCTION__DEFINED__
+#define __DERIVED_FUNCTION__DEFINED__
 
 #include "Error.hh"
 #include "Function.hh"
@@ -127,4 +127,4 @@ protected:
    int idx;
 };
 //-----------------------------------------------------------------------------
-#endif // __FUNOPER_HH__DEFINED__
+#endif // __DERIVED_FUNCTION__DEFINED__

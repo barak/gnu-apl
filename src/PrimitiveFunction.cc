@@ -237,7 +237,7 @@ Value_P Z(shape_Z, LOC);
    else
       {
         loop(z, len_Z)
-            Z->next_ravel()->init(B.get_ravel(z % len_B), Z.getref(), LOC);
+            B.get_ravel(z % len_B).init_other(Z->next_ravel(), Z.getref(), LOC);
       }
 
    Z->set_default(B, LOC);

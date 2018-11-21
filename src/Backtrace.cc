@@ -286,8 +286,10 @@ char ** strings = backtrace_symbols(buffer, size);
 
    if (strings == 0)
       {
-        cerr << "backtrace_symbols() failed: cannot display stack" << endl
-             << "========================================" << endl;
+        cerr << "backtrace_symbols() failed. using backtrace_symbols_fd()"
+                " instead" << endl << endl;
+        backtrace_symbols_fd(buffer, size, STDERR_FILENO);
+        cerr << "========================================" << endl;
         return;
       }
 
