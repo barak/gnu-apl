@@ -918,14 +918,14 @@ const APL_Integer qio = Workspace::get_IO();
            }
         else if (x == SYL_VALUE_COUNT_LIMIT)   // value count limit
            {
-             if (b && (b < (Value::value_count + 10)))    // too low
+             if (b && (b < APL_Integer(Value::value_count + 10)))    // too low
                 DOMAIN_ERROR;
              value_count_limit = b;
            }
         else if (x == SYL_RAVEL_BYTES_LIMIT)   // ravel bytes limit
            {
              const int cells = b / sizeof(Cell);
-             if (cells && (cells < (Value::total_ravel_count + 1000)))
+             if (cells && (cells < APL_Integer(Value::total_ravel_count + 1000)))
                 DOMAIN_ERROR;
 
              ravel_count_limit = cells;
@@ -1140,69 +1140,9 @@ Quad_WA::Quad_WA()
 Value_P
 Quad_WA::get_apl_value() const
 {
-Value_P Z(LOC);
-
-   // total_memory is the max. virtual memory of the process running GNU APL,
-   // as reported by getrlimit(RLIMIT_AS) at the start of the interpreter.
-   // It could be RLIM_INFINITY if no limit was set for the process.
-   // 
-   // proc_mem is the amount of free memory as reported as MemFree:
-   // in /proc/meminfo
-   //
-uint64_t total = total_memory;
-uint64_t proc_mem = 0;           // memory as reported proc/mem_info
-
-   // set proc_mem to the value of MemFree: in /proc/meminfo (if present)...
-   //
-   if (FILE * pm = fopen("/proc/meminfo", "r"))
-      {
-        for (;;)
-            {
-              char buffer[2000];
-              if (fgets(buffer, sizeof(buffer) - 1, pm) == 0)   break;
-              buffer[sizeof(buffer) - 1] = 0;
-              if (!strncmp(buffer, "MemFree:", 8))
-                 {
-                   proc_mem = atoi(buffer + 8);
-                   proc_mem *= 1024;
-                   break;
-                 }
-            }
-
-        fclose(pm);
-      }
-
-   if (proc_mem == 0)   // nothing from /proc/meminfo
-      {
-        if (total == RLIM_INFINITY)   // no rlimit for this process
-           {
-             CERR << "Cannot properly determine ⎕WA (process has no memory"
-                     " limit and /proc/meminfo provided no info)" << endl;
-             total = 1000000;
-           }
-        else                          // process has rlimit
-           {
-             total -= Value::total_ravel_count * sizeof(Cell)
-                    + Value::value_count * sizeof(Value);
-           }
-      }
-   else                 // found MemFree: in /proc/meminfo
-      {
-        if (total == RLIM_INFINITY)   // no rlimit for this process
-           {
-             total = proc_mem;   // use value from /proc/meminfo
-           }
-        else                          // process has rlimit
-           {
-             total -= Value::total_ravel_count * sizeof(Cell)
-                    + Value::value_count * sizeof(Value);
-             if (total > proc_mem)   total = proc_mem;   // use minimum
-           }
-      }
-
-   new (Z->next_ravel())   IntCell(total);
-   Z->check_value(LOC);
-   return Z;
+   return IntScalar(total_memory -
+                    ( Value::total_ravel_count * sizeof(Cell)
+                    + Value::value_count * sizeof(Value)), LOC);
 }
 //=============================================================================
 Quad_X::Quad_X()

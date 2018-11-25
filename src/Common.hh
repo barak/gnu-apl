@@ -36,7 +36,12 @@ enum { MAX_RANK = MAX_RANK_WANTED };
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/resource.h>
 #include <sys/time.h>
+
+#ifndef RLIM_INFINITY   // Raspberry
+#define RLIM_INFINITY (~static_cast<rlim_t>(0))
+#endif
 
 // if someone (like curses on Solaris) has #defined erase() then
 // #undef it because vector would not be happy with it
@@ -346,6 +351,9 @@ extern ostream & get_CERR();
 
 /// The total memory that we have.
 extern uint64_t total_memory;
+
+/// the memory limit at startup
+extern rlim_t initial_rlimit;
 
 #ifdef VALUE_HISTORY_WANTED
 

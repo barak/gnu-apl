@@ -42,8 +42,8 @@
 #include "ValueHistory.hh"
 #include "Workspace.hh"
 
-ShapeItem Value::value_count = 0;
-ShapeItem Value::total_ravel_count = 0;
+uint64_t Value::value_count = 0;
+uint64_t Value::total_ravel_count = 0;
 
 // the static Value instances are defined in StaticObjects.cc
 
@@ -61,10 +61,11 @@ Value::init_ravel()
    nz_subcell_count = 0;
    check_ptr = 0;
    new (short_value)   IntCell(0);
+   ravel = short_value;
 
    ++value_count;
    if (Quad_SYL::value_count_limit &&
-       Quad_SYL::value_count_limit < value_count)
+       Quad_SYL::value_count_limit < APL_Integer(value_count))
       {
         MORE_ERROR() <<
 "the system limit on the APL value count (as set in ⎕SYL) was reached\n"
@@ -83,7 +84,6 @@ const ShapeItem length = shape.get_volume();
    //
    if (length <= SHORT_VALUE_LENGTH_WANTED)
       {
-        ravel = short_value;
         check_ptr = reinterpret_cast<const char *>(this) + 7;
         return;
       }
@@ -91,18 +91,15 @@ const ShapeItem length = shape.get_volume();
    // large Value. If the compiler uses 4-byte pointers, then do not allow APL
    // values that are too large. The reason is that new[] may return
    // a non-0 pointer (thus pretending everything is OK), but a subsequent
-   // attermpt to initialize the value might then throw a segfault.
+   // attempt to initialize the value might then throw a segfault.
    //
    enum { MAX_LEN = 2000000000 / sizeof(Cell) };
    if (length > MAX_LEN && sizeof(void *) < 6)
       throw_apl_error(E_WS_FULL, alloc_loc);
 
-   total_ravel_count += length;
    if (Quad_SYL::ravel_count_limit &&
-       Quad_SYL::ravel_count_limit < total_ravel_count)
+       Quad_SYL::ravel_count_limit < APL_Integer(total_ravel_count + length))
       {
-        total_ravel_count -= length;
-
         // make sure that the value is properly initialized
         //
         new (&shape) Shape();
@@ -120,12 +117,26 @@ const ShapeItem length = shape.get_volume();
         set_interrupt_raised(LOC);
       }
 
-   try
-      {
-        Cell * long_ravel = reinterpret_cast<Cell *>
-                                 (new char[length * sizeof(Cell)]);
-//      Cell * long_ravel =  new Cell[length];
-        ravel = long_ravel;
+   ravel = reinterpret_cast<Cell *>(new char[length * sizeof(Cell)]);
+
+/*
+   ravel = 0;   // assume new() fails
+// try
+//    {
+        ravel = reinterpret_cast<Cell *>(new char[length * sizeof(Cell)]);
+        if (ravel == 0)   // new failed (without trowing an exception)
+           {
+              Log(LOG_Value_alloc)
+                 CERR << "new char[" << (length * sizeof(Cell))
+                      << "] (aka. long ravel allocation) returned 0 at " LOC
+                      << endl;
+
+              MORE_ERROR() << "The instatiation of a Value object succeeded, "
+                              "but allocation of its (large) ravel failed.";
+              new (&shape) Shape();
+              ravel = short_value;
+              throw_apl_error(E_WS_FULL, alloc_loc);
+           }
       }
    catch (...)
       {
@@ -137,8 +148,11 @@ const ShapeItem length = shape.get_volume();
         unlink();
 
         Log(LOG_Value_alloc)
-           CERR << "new char[" << (length * sizeof(Cell))
-                << "] (aka. long ravel allocation) failed at " LOC << endl;
+           {
+             CERR << "new char[" << (length * sizeof(Cell))
+                  << "] (aka. long ravel allocation) threw an exception at " LOC
+                  << endl;
+           }
 
         MORE_ERROR() << "The instatiation of a Value object succeeded, "
                         "but allocation of its (large) ravel failed.";
@@ -146,12 +160,64 @@ const ShapeItem length = shape.get_volume();
         ravel = short_value;
         throw_apl_error(E_WS_FULL, alloc_loc);
       }
+*/
 
    // init the first ravel element to (prototype) 0 so that we can avoid
    // many empty checks all over the place
    //
    new (ravel)   IntCell(0);
    check_ptr = reinterpret_cast<const char *>(this) + 7;
+   total_ravel_count += length;
+}
+//-----------------------------------------------------------------------------
+bool
+Value::check_WS_FULL(const char * args, ShapeItem cell_count, const char * loc)
+{
+const uint64_t used_memory = (total_ravel_count + cell_count) * sizeof(Cell)
+                            + value_count * sizeof(Value);
+enum { margin = 100000000 };
+
+   if (total_memory > (used_memory + margin))   return false;   // OK
+
+   Log(LOG_Value_alloc)
+      CERR << "    value_count:       " << value_count             << endl
+           << "    total_ravel_count: " << total_ravel_count       << endl
+           << "    new cell_count:    " << cell_count              << endl
+           << "    total_memory:      " << total_memory            << endl
+           << "    used_memory:       " << used_memory             << endl
+           << "    margin:            " << margin                  << endl
+
+           << " at " << LOC << endl;
+   return true;
+}
+//-----------------------------------------------------------------------------
+void
+Value::catch_Error(const Error & error, const char * args, const char * loc)
+{
+   Log(LOG_Value_alloc)   CERR << "Ravel allocation failed" << endl;
+   MORE_ERROR() << "new Value(" << args << ") failed (ravel allocation)";
+   throw error;   // rethrow
+}
+//-----------------------------------------------------------------------------
+void
+Value::catch_exception(const exception & ex, const char * args,
+                      const char * caller,  const char * loc)
+{
+   CERR << "Value_P::Value_P(" << args << ") failed at " << loc
+        << " (caller: " << caller << ")" << endl
+        << " what: " << ex.what() << endl;
+   MORE_ERROR() << "new Value(" << args << ") failed";
+   WS_FULL;
+}
+//-----------------------------------------------------------------------------
+void
+Value::catch_ANY(const char * args, const char * caller, const char * loc)
+{
+   Log(LOG_Value_alloc)
+      CERR << "Value_P::Value_P(Shape " << args << " failed at " << loc
+           << " (caller: " << caller << ")" << endl;
+   MORE_ERROR() << "new Value(" << args << ") failed";
+   WS_FULL;
 }
 //-----------------------------------------------------------------------------
 Value::Value(const char * loc)
@@ -302,6 +368,7 @@ const ShapeItem length = nz_element_count();
 
    --value_count;
 
+   if (ravel == 0)   return;   // new() failed
    if (ravel != short_value)
       {
         total_ravel_count -= length;

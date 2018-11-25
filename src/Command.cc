@@ -22,6 +22,7 @@
 #include <errno.h>
 #include <limits.h>
 #include <string.h>
+#include <sys/resource.h>
 
 #include "CharCell.hh"
 #include "ComplexCell.hh"
@@ -450,7 +451,13 @@ check_EOC:
                  }
 
               if (Workspace::get_error()->get_print_loc() == 0)   // not printed
-                 Workspace::get_error()->print(CERR, LOC);
+                 {
+                   Workspace::get_error()->print(CERR, LOC);
+                 }
+              else
+                 {
+                    // CERR << "ERROR printed twice" << endl;
+                 }
 
               if (Workspace::SI_top()->get_level() == 0)
                  {
@@ -1633,6 +1640,18 @@ Command::cmd_OFF(int exit_val)
              << " seconds " << endl;
 
       }
+
+   // restore the initial memory rlimit
+   //
+#ifndef RLIMIT_AS // BSD does not define RLIMIT_AS
+# define RLIMIT_AS RLIMIT_DATA
+#endif
+
+rlimit rl;
+   getrlimit(RLIMIT_AS, &rl);
+   rl.rlim_cur = initial_rlimit;
+   setrlimit(RLIMIT_AS, &rl);
+
    exit(exit_val);
 }
 //-----------------------------------------------------------------------------

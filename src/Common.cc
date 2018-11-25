@@ -21,7 +21,6 @@
 #include <fcntl.h>
 #include <stdio.h>
 #include <string.h>
-#include <sys/resource.h>
 #include <sys/stat.h>
 #include <sys/time.h>
 #include <sys/types.h>
@@ -40,7 +39,8 @@
 #include "UserPreferences.hh"
 #include "ValueHistory.hh"
 
-uint64_t total_memory = 0;
+uint64_t total_memory = 0x40000000;   // a little more than 1 Gig
+rlim_t initial_rlimit = RLIM_INFINITY;
 
 bool got_WINCH = false;
 
@@ -77,20 +77,85 @@ bool interrupt_is_raised()
    return interrupt_raised;
 }
 //-----------------------------------------------------------------------------
+uint64_t
+get_free_memory()
+{
+uint64_t proc_mem = 1000000000;   // assume 1 Gig on error
+
+   if (FILE * pm = fopen("/proc/meminfo", "r"))
+      {
+        for (;;)
+            {
+              char buffer[2000];
+              if (fgets(buffer, sizeof(buffer) - 1, pm) == 0)   break;
+              buffer[sizeof(buffer) - 1] = 0;
+              if (!strncmp(buffer, "MemFree:", 8))
+                 {
+                   proc_mem = atoi(buffer + 8);
+                   proc_mem *= 1024;
+                   break;
+                 }
+            }
+
+        fclose(pm);
+      }
+
+   return proc_mem;
+}
+//-----------------------------------------------------------------------------
 void
 init_1(const char * argv0, bool log_startup)
 {
 rlimit rl;
 
-#ifndef RLIMIT_AS // BSD
-#define RLIMIT_AS RLIMIT_DATA
+#ifndef RLIMIT_AS // BSD does not define RLIMIT_AS
+# define RLIMIT_AS RLIMIT_DATA
 #endif
+
+enum { MAX_RLIMIT_AS = 4000000000UL };
+
    getrlimit(RLIMIT_AS, &rl);
+   initial_rlimit = rl.rlim_cur;
+
+   if (log_startup)
+      {
+        if (initial_rlimit == ~static_cast<rlim_t>(0))
+          CERR << "initial RLIMIT_AS (aka. virtual memory) is: 'unlimited'"
+               << endl;
+        else
+          CERR << "initial RLIMIT_AS (aka. virtual memory) is: "
+               <<  initial_rlimit << endl;
+      }
+
+   // if the user has set a memory rlimit (and hopefully knowing what she is
+   // doing) then leave it as is; otherwise set the limit to 80 % of the
+   // avaiable memory
+   //
+   total_memory = (get_free_memory() / 10) * 8;
+   if (log_startup)
+      CERR << "set total memory to " << total_memory
+          << " (= 80% of MemFree: in /proc/meminfo)" << endl;
+
+   if (rl.rlim_cur == RLIM_INFINITY)
+      {
+        rl.rlim_cur = total_memory;
+        if (log_startup)
+           CERR << "decreasing RLIMIT_AS to: " << rl.rlim_cur << endl;
+        setrlimit(rl.rlim_cur, &rl);
+      }
+   else if (rl.rlim_cur > total_memory)
+      {
+        rl.rlim_cur = total_memory;
+           CERR << "decreasing RLIMIT_AS to: " << rl.rlim_cur << endl;
+        setrlimit(total_memory, &rl);
+      }
+
    total_memory = rl.rlim_cur;
 
    if (log_startup)
       CERR
            << "sizeof(int) is           " << sizeof(int)              << endl
+           << "sizeof(long) is          " << sizeof(long)             << endl
            << "sizeof(void *) is        " << sizeof(void *)           << endl
            << "sizeof(Cell) is          " << sizeof(Cell)             << endl
            << "sizeof(Svar_record) is   " << sizeof(Svar_record)      << endl
@@ -100,12 +165,18 @@ rlimit rl;
    // CYGWIN does not have RLIMIT_NPROC
    //
 #ifdef RLIMIT_NPROC
+
+   // unlimit the number of threads and processes...
+   //
    getrlimit(RLIMIT_NPROC, &rl);
    if (log_startup)
       CERR << "increasing rlimit RLIMIT_NPROC from " <<  rl.rlim_cur
            << " to infinity" << endl;
-   rl.rlim_cur =  ~0;   // RLIM_INFINITY fails on Raspberry
+   rl.rlim_cur = RLIM_INFINITY;
    setrlimit(RLIMIT_NPROC, &rl);
+
+   // limit the virtual memory size to avoid new() problem with large values
+   //
 #endif
 
    Avec::init();

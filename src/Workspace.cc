@@ -196,6 +196,12 @@ Workspace::immediate_execution(bool exit_on_error)
                  }
               if (exit_on_error)   return Token(TOK_OFF);
             }
+         catch (const std::bad_alloc & e)
+            {
+              CERR << "*** " << __FUNCTION__
+                   << "() caught bad_alloc: " << e.what() << " ***" << endl;
+              BACKTRACE
+            }
          catch (...)
             {
               CERR << "*** " << __FUNCTION__

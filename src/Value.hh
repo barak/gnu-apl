@@ -521,10 +521,10 @@ public:
    static int print_stale(ostream & out);
 
    /// total nz_element_counts of all non-short values
-   static ShapeItem total_ravel_count;
+   static uint64_t total_ravel_count;
 
    /// the number of values created
-   static ShapeItem value_count;
+   static uint64_t value_count;
 
    /// a "checksum" to detect deleted values
    const void * check_ptr;
@@ -544,6 +544,20 @@ public:
    /// increase \b nz_subcell_count by \b count
    void add_subcount(ShapeItem count)
       { nz_subcell_count += count; }
+
+   /// check if WS is FULL after allocating value with \b cell_count items
+   static bool check_WS_FULL(const char * args, ShapeItem cell_count,
+                             const char * loc);
+
+   /// handler for catch(Error) in init_ravel() (never called)
+   static void catch_Error(const Error & error, const char * args, const char * loc);
+
+   /// handler for catch(exception) in init_ravel() (never called)
+   static void catch_exception(const exception & ex, const char * args,
+                        const char * caller,  const char * loc);
+
+   /// handler for catch(...) in init_ravel() (never called)
+   static void catch_ANY(const char * args, const char * caller, const char * loc);
 
    /// the number of fast (recycled) new() calls
    static uint64_t fast_new;
