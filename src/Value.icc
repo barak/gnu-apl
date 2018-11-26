@@ -56,10 +56,10 @@ inline Value_P::Value_P(const char * loc)
 const char * args = "const char * loc";
    value_p = 0;
 
-   try                   { value_p = new Value(loc); }
-   catch (Error error)   { Value::catch_Error(error, loc, LOC);       }
-   catch (exception e)   { Value::catch_exception(e, args, loc, LOC); }
-   catch (...)           { Value::catch_ANY(args, loc, LOC);          }
+   try                           { value_p = new Value(loc); }
+   catch (const Error & error)   { Value::catch_Error(error, loc, LOC);       }
+   catch (const exception & e)   { Value::catch_exception(e, args, loc, LOC); }
+   catch (...)                   { Value::catch_ANY(args, loc, LOC);          }
 
    increment_owner_count(value_p, loc);
    ADD_EVENT(value_p, VHE_PtrNew, value_p->owner_count, loc);
@@ -70,10 +70,10 @@ inline Value_P::Value_P(const Cell & cell, const char * loc)
 const char * args = "const Cell & cell, const char * loc";
    value_p = 0;
 
-   try                   { value_p = new Value(cell, loc); }
-   catch (Error error)   { Value::catch_Error(error, loc, LOC);       }
-   catch (exception e)   { Value::catch_exception(e, args, loc, LOC); }
-   catch (...)           { Value::catch_ANY(args, loc, LOC);          }
+   try                           { value_p = new Value(cell, loc); }
+   catch (const Error & error)   { Value::catch_Error(error, loc, LOC);       }
+   catch (const exception & e)   { Value::catch_exception(e, args, loc, LOC); }
+   catch (...)                   { Value::catch_ANY(args, loc, LOC);          }
 
    increment_owner_count(value_p, loc);
    ADD_EVENT(value_p, VHE_PtrNew, value_p->owner_count, loc);
@@ -84,10 +84,10 @@ inline Value_P::Value_P(ShapeItem len, const char * loc)
 const char * args = "ShapeItem len, const char * loc";
    value_p = 0;
 
-   try                   { value_p = new Value(len, loc); }
-   catch (Error error)   { Value::catch_Error(error, loc, LOC);       }
-   catch (exception e)   { Value::catch_exception(e, args, loc, LOC); }
-   catch (...)           { Value::catch_ANY(args, loc, LOC);          }
+   try                           { value_p = new Value(len, loc); }
+   catch (const Error & error)   { Value::catch_Error(error, loc, LOC);       }
+   catch (const exception & e)   { Value::catch_exception(e, args, loc, LOC); }
+   catch (...)                   { Value::catch_ANY(args, loc, LOC);          }
 
    increment_owner_count(value_p, loc);
    ADD_EVENT(value_p, VHE_PtrNew, value_p->owner_count, loc);
@@ -98,10 +98,10 @@ inline Value_P::Value_P(const UCS_string & ucs, const char * loc)
 const char * args = "const UCS_string & ucs, const char * loc";
    value_p = 0;
 
-   try                   { value_p = new Value(ucs, loc); }
-   catch (Error error)   { Value::catch_Error(error, loc, LOC);       }
-   catch (exception e)   { Value::catch_exception(e, args, loc, LOC); }
-   catch (...)           { Value::catch_ANY(args, loc, LOC);          }
+   try                           { value_p = new Value(ucs, loc); }
+   catch (const Error & error)   { Value::catch_Error(error, loc, LOC);       }
+   catch (const exception & e)   { Value::catch_exception(e, args, loc, LOC); }
+   catch (...)                   { Value::catch_ANY(args, loc, LOC);          }
 
    increment_owner_count(value_p, loc);
    ADD_EVENT(value_p, VHE_PtrNew, value_p->owner_count, loc);
@@ -112,10 +112,10 @@ inline Value_P::Value_P(const CDR_string & cdr, const char * loc)
 const char * args = "const CDR_string & cdr, const char * loc";
    value_p = 0;
 
-   try                   { value_p = new Value(cdr, loc); }
-   catch (Error error)   { Value::catch_Error(error, loc, LOC);       }
-   catch (exception e)   { Value::catch_exception(e, args, loc, LOC); }
-   catch (...)           { Value::catch_ANY(args, loc, LOC);          }
+   try                           { value_p = new Value(cdr, loc); }
+   catch (const Error & error)   { Value::catch_Error(error, loc, LOC);       }
+   catch (const exception & e)   { Value::catch_exception(e, args, loc, LOC); }
+   catch (...)                   { Value::catch_ANY(args, loc, LOC);          }
 
    increment_owner_count(value_p, loc);
    ADD_EVENT(value_p, VHE_PtrNew, value_p->owner_count, loc);
@@ -127,9 +127,9 @@ const char * args = "const PrintBuffer & ob, const char * loc";
    value_p = 0;
 
    try                   { value_p = new Value(pb, loc); }
-   catch (Error error)   { Value::catch_Error(error, loc, LOC);       }
-   catch (exception e)   { Value::catch_exception(e, args, loc, LOC); }
-   catch (...)           { Value::catch_ANY(args, loc, LOC);          }
+   catch (const Error & error)   { Value::catch_Error(error, loc, LOC);       }
+   catch (const exception & e)   { Value::catch_exception(e, args, loc, LOC); }
+   catch (...)                   { Value::catch_ANY(args, loc, LOC);          }
 
    increment_owner_count(value_p, loc);
    ADD_EVENT(value_p, VHE_PtrNew, value_p->owner_count, loc);
@@ -140,10 +140,10 @@ inline Value_P::Value_P(const UTF8_string & utf, const char * loc)
 const char * args = "const UTF8_string & utf, const char * loc";
    value_p = 0;
 
-   try                   { value_p = new Value(utf, loc); }
-   catch (Error error)   { Value::catch_Error(error, loc, LOC);       }
-   catch (exception e)   { Value::catch_exception(e, args, loc, LOC); }
-   catch (...)           { Value::catch_ANY(args, loc, LOC);          }
+   try                           { value_p = new Value(utf, loc); }
+   catch (const Error & error)   { Value::catch_Error(error, loc, LOC);       }
+   catch (const exception & e)   { Value::catch_exception(e, args, loc, LOC); }
+   catch (...)                   { Value::catch_ANY(args, loc, LOC);          }
 
    increment_owner_count(value_p, loc);
    ADD_EVENT(value_p, VHE_PtrNew, value_p->owner_count, loc);
@@ -154,10 +154,10 @@ inline Value_P::Value_P(const char * loc, const Shape * shape)
 const char * args = "const char * loc, const Shape & shape";
    value_p = 0;
 
-   try                   { value_p = new Value(loc, shape); }
-   catch (Error error)   { Value::catch_Error(error, loc, LOC);       }
-   catch (exception e)   { Value::catch_exception(e, args, loc, LOC); }
-   catch (...)           { Value::catch_ANY(args, loc, LOC);          }
+   try                           { value_p = new Value(loc, shape); }
+   catch (const Error & error)   { Value::catch_Error(error, loc, LOC);       }
+   catch (const exception & e)   { Value::catch_exception(e, args, loc, LOC); }
+   catch (...)                   { Value::catch_ANY(args, loc, LOC);          }
 
    increment_owner_count(value_p, loc);
    ADD_EVENT(value_p, VHE_PtrNew, value_p->owner_count, loc);
@@ -169,10 +169,10 @@ const char * args = "const Shape & shape, const char * loc";
    value_p = 0;
    if (Value::check_WS_FULL(args, shape.get_volume(), loc))   WS_FULL;
 
-   try                   { value_p = new Value(shape, loc); }
-   catch (Error error)   { Value::catch_Error(error, loc, LOC);       }
-   catch (exception e)   { Value::catch_exception(e, args, loc, LOC); }
-   catch (...)           { Value::catch_ANY(args, loc, LOC);          }
+   try                           { value_p = new Value(shape, loc); }
+   catch (const Error & error)   { Value::catch_Error(error, loc, LOC);       }
+   catch (const exception & e)   { Value::catch_exception(e, args, loc, LOC); }
+   catch (...)                   { Value::catch_ANY(args, loc, LOC);          }
 
    increment_owner_count(value_p, loc);
    ADD_EVENT(value_p, VHE_PtrNew, value_p->owner_count, loc);
