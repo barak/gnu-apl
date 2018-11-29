@@ -196,8 +196,9 @@ StateIndicator * si = Workspace::SI_top();
       }
 
 Error error(code, loc);
-   if (si)   si->update_error_info(error);
-   throw error;
+Error & eref = error;
+   if (si)   si->update_error_info(eref);
+   throw eref;
 }
 //-----------------------------------------------------------------------------
 void
@@ -212,11 +213,12 @@ throw_parse_error(ErrorCode code, const char * par_loc, const char *loc)
    MORE_ERROR() << Error::error_name(code);
 
 Error error(code, loc);
+Error & eref = error;
    error.parser_loc = par_loc;
 
 // StateIndicator * si = Workspace::SI_top();
 //   if (si)   si->update_error_info(error);
-   throw error;
+   throw eref;
 }
 //-----------------------------------------------------------------------------
 void
@@ -232,9 +234,10 @@ throw_symbol_error(const UCS_string & sym_name, const char * loc)
    Log(LOG_verbose_error)     Backtrace::show(__FILE__, __LINE__);
 
 Error error(E_VALUE_ERROR, loc);
+Error & eref = error;
    error.symbol_name = sym_name;
-   if (Workspace::SI_top())   Workspace::SI_top()->update_error_info(error);
-   throw error;
+   if (Workspace::SI_top())   Workspace::SI_top()->update_error_info(eref);
+   throw eref;
 }
 //-----------------------------------------------------------------------------
 void
@@ -250,12 +253,13 @@ throw_define_error(const UCS_string & fun_name, const UCS_string & cmd,
    Log(LOG_verbose_error)     Backtrace::show(__FILE__, __LINE__);
 
 Error error(E_DEFN_ERROR, loc);
-   error.symbol_name = fun_name;
-   error.error_message_2 = UCS_string(6, UNI_ASCII_SPACE);
-   error.error_message_2.append(cmd);   // something like ∇FUN[⎕]∇
-   error.left_caret = error.error_message_2.size() - 1;
-   if (Workspace::SI_top())   *Workspace::get_error() = error;
-   throw error;
+Error & eref = error;
+   eref.symbol_name = fun_name;
+   eref.error_message_2 = UCS_string(6, UNI_ASCII_SPACE);
+   eref.error_message_2.append(cmd);   // something like ∇FUN[⎕]∇
+   eref.left_caret = error.error_message_2.size() - 1;
+   if (Workspace::SI_top())   *Workspace::get_error() = eref;
+   throw eref;
 }
 //-----------------------------------------------------------------------------
 

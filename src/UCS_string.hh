@@ -167,6 +167,9 @@ public:
    /// return true if \b this starts with prefix (ASCII, case matters).
    bool starts_with(const char * prefix) const;
 
+   /// return true if \b this ends with suffix (ASCII, case matters).
+   bool ends_with(const char * suffix) const;
+
    /// return true if \b this starts with \b prefix (case sensitive).
    bool starts_with(const UCS_string & prefix) const;
 
@@ -319,6 +322,13 @@ public:
    /// split \b this multi-line string into individual lines,
    /// removing the CR and NL chars in \b this string.
    size_t to_vector(UCS_string_vector & result) const;
+
+   /// return \b this string with "escape sequences" replaced by their real
+   /// characters ('' → ' if single quoted and \r, \n, \xNNN etc. otherwise.
+   UCS_string un_escape(bool double_quoted, bool keep_LF) const;
+
+   /// the inverse of \b un_escape().
+   UCS_string do_escape(bool double_quoted) const;
 
    /// an iterator for UCS_strings
    class iterator

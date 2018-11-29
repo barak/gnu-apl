@@ -241,9 +241,9 @@ const Error * err = 0;
 
    for (StateIndicator * si = Workspace::SI_top(); si; si = si->get_parent())
        {
-         if (si->get_error().error_code != E_NO_ERROR)
+         if (StateIndicator::get_error(si).error_code != E_NO_ERROR)
             {
-              err = &si->get_error();
+              err = &StateIndicator::get_error(si);
               break;
             }
          if (si->get_parse_mode() == PM_FUNCTION)   break;
@@ -278,7 +278,7 @@ ErrorCode ec = E_NO_ERROR;
 
    for (; si; si = si->get_parent())
        {
-         ec = si->get_error().error_code;
+         ec = StateIndicator::get_error(si).error_code;
          if (ec != E_NO_ERROR)
             {
               break;
@@ -442,7 +442,7 @@ StateIndicator * si = Workspace::SI_top_fun();
 
    // ignore assignments if error was SYNTAX ERROR or VALUE ERROR
    //
-   if (si->get_error().is_syntax_or_value_error())   return;
+   if (StateIndicator::get_error(si).is_syntax_or_value_error())   return;
 
    si->set_L(value);
 }
@@ -840,7 +840,7 @@ StateIndicator * si = Workspace::SI_top_fun();
 
    // ignore assignments if error was SYNTAX ERROR or VALUE ERROR
    //
-   if (si->get_error().is_syntax_or_value_error())   return;
+   if (StateIndicator::get_error(si).is_syntax_or_value_error())   return;
 
    si->set_R(value);
 }
@@ -1159,7 +1159,7 @@ StateIndicator * si = Workspace::SI_top_fun();
 
    // ignore assignments if error was SYNTAX ERROR or VALUE ERROR
    //
-   if (si->get_error().is_syntax_or_value_error())   return;
+   if (StateIndicator::get_error(si).is_syntax_or_value_error())   return;
 
    si->set_X(value);
 }

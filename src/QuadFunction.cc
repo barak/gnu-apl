@@ -348,7 +348,7 @@ Value_P Z(3, LOC);
         StateIndicator * si = Workspace::SI_top();
         si->clear_safe_execution();
 
-        const Error & err = si->get_error();
+        const Error & err = StateIndicator::get_error(si);
         const ErrorCode ec = ErrorCode(result.get_int_val());
 
         PrintBuffer pb;
@@ -565,7 +565,7 @@ const ErrorCode ec = get_error_code(B);
              error.left_caret = 6;
              error.right_caret = -1;
              Workspace::pop_SI(LOC);
-             Workspace::SI_top()->get_error() = error;
+             StateIndicator::get_error(Workspace::SI_top()) = error;
              error.print_em(UERR, LOC);
              return Token();
            }
@@ -1195,10 +1195,10 @@ const APL_Integer b = B->get_ravel(0).get_near_int();
                  }
                  break;
 
-        case 4:  if (si->get_error().error_code)
+        case 4:  if (StateIndicator::get_error(si).error_code)
                     {
                       const UCS_string & text =
-                                        si->get_error().get_error_line_2();
+                            StateIndicator::get_error(si).get_error_line_2();
                       Z = Value_P(text, LOC);
                     }
                  else
@@ -1271,11 +1271,11 @@ ShapeItem z = 0;
                       }
                       break;
 
-             case 4:  if (si->get_error().error_code)
+             case 4:  if (StateIndicator::get_error(si).error_code)
                          {
                            const UCS_string & text =
-                                        si->get_error().get_error_line_2();
-                           new (cZ) PointerCell(Value_P(text, LOC), Z.getref()); 
+                               StateIndicator::get_error(si).get_error_line_2();
+                           new (cZ) PointerCell(Value_P(text, LOC), Z.getref());
                          }
                       else
                          {

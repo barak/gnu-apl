@@ -805,17 +805,13 @@ LineInput::get_terminal_line(LineInputMode mode, const UCS_string & prompt,
         case LIM_Quote_Quad:
         case LIM_Quad_Quad:
         case LIM_Quad_INP:
-             {
-               Output::set_color_mode(Output::COLM_INPUT);
-               edit_line(mode, prompt, line, eof, hist);
-               return;
-             }
+             Output::set_color_mode(Output::COLM_INPUT);
+
+             /* fall through */
 
         case LIM_Nabla:
-             {
-               edit_line(LIM_Nabla, prompt, line, eof, hist);
-               return;
-             }
+             edit_line(mode, prompt, line, eof, hist);
+             return;
 
         default: FIXME;
       }
@@ -825,8 +821,7 @@ LineInput::get_terminal_line(LineInputMode mode, const UCS_string & prompt,
 //-----------------------------------------------------------------------------
 void
 LineInput::edit_line(LineInputMode mode, const UCS_string & prompt,
-                       UCS_string & user_line, bool & eof,
-                       LineHistory & hist)
+                     UCS_string & user_line, bool & eof, LineHistory & hist)
 {
    the_line_input->current_termios.c_lflag &= ~ISIG;   // disable ^C
 #ifndef WANT_LIBAPL

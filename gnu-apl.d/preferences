@@ -370,14 +370,21 @@ CONTROL-Ds-TO-EXIT 0
 
 ###############################################################################
 #
-# Setting Multi-Line-Strings to No disables Strings that start with " and
+# Setting Old-Multi-Line-Strings to No disables Strings that start with " and
 # span multiple lines. Such strings are converted to a nested vector where each
 # line is one (nested) vector element (discarding the trailing \n, if any).
+#
+# Setting New-Multi-Line-Strings to No disables new-style multi line strings
+# (similar to old-style but using """ to delimit multiple lines).
 #
 # Multi-Line-Strings  are only allowed inside ∇-defined functions; in immediate
 # execution the effect of multi-line functions can be achieved with ⎕INP.
 #
-# Multi-Line-Strings No
+# By default both old-style and new-style multi line strings are enabled, but
+# old-style multi line strings will disappear in the near future.
+#
+# Old-Multi-Line-Strings No
+# New-Multi-Line-Strings No
 
 ###############################################################################
 #

@@ -144,7 +144,7 @@ Workspace::clear_error(const char * loc)
    //
    for (StateIndicator * si = the_workspace.SI_top(); si; si = si->get_parent())
        {
-         si->get_error().init(E_NO_ERROR, LOC);
+         StateIndicator::get_error(si).init(E_NO_ERROR, LOC);
          if (si->get_parse_mode() == PM_FUNCTION)   break;
        }
 }
@@ -165,7 +165,7 @@ Workspace::SI_top_error()
 {
    for (StateIndicator * si = SI_top(); si; si = si->get_parent())
        {
-         if (si->get_error().error_code != E_NO_ERROR)   return si;
+         if (StateIndicator::get_error(si).error_code != E_NO_ERROR)   return si;
        }
 
    return 0;   // no context with an error
@@ -180,7 +180,7 @@ Workspace::immediate_execution(bool exit_on_error)
            {
               Command::process_line();
            }
-         catch (Error err)
+         catch (Error & err)
             {
               if (!err.get_print_loc())
                  {

@@ -132,7 +132,10 @@ int control_D_count = 0;
        }
 
    Log(LOG_nabla)
-      UERR << "done '" << fun_header << "'" << endl;
+      {
+        UERR << "done: '" << fun_header << "'" << endl;
+        loop(l, lines.size())   UERR << lines[l].text << endl;
+      }
 
 UCS_string fun_text;
    loop(l, lines.size())
@@ -374,7 +377,8 @@ Nabla::parse_oper(UCS_string & oper, bool initial)
 
 UCS_string::iterator c(oper.begin());
 Unicode cc = c.next();
-   while (cc == ' ')   cc = c.next();
+UCS_string text = oper;
+   while (cc == ' ')   cc = c.next();   // skip leading whitespace
 
    // we expect one of the following:
    //
@@ -384,11 +388,12 @@ Unicode cc = c.next();
    // [n]                                           (goto)
    // text                                          (override text)
 
-   if (cc != UNI_ASCII_L_BRACK)
+   if (cc != UNI_ASCII_L_BRACK)   // override text
       {
         ecmd = ECMD_EDIT;
         edit_from = current_line;
-        for (; cc != Invalid_Unicode; cc = c.next())   current_text.append(cc);
+        current_text = text;
+//      for (; cc != Invalid_Unicode; cc = c.next())   current_text.append(cc);
         return 0;
       }
 

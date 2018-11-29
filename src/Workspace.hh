@@ -128,7 +128,7 @@ public:
 
    /// return information in SI_top()
    static Error * get_error()
-      { return SI_top() ? &SI_top()->get_error() : 0; }
+      { return &StateIndicator::get_error(SI_top()); }
 
    /// return reference to more info about last error
    static UCS_string & more_error()

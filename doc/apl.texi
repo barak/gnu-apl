@@ -892,7 +892,7 @@ Using '----' as last argument on the first line of the script file prevents any
 of the options given to the script to be interpreted as APL options; all
 such options are passed to the application via ⎕ARG.
 
-@subsection Helpful features for scripting
+@subsection Helpful Features for Scripting
 
 In order to be really useful for scripting, three more features have been added:
 
@@ -956,7 +956,106 @@ Third line
 ...
 END-OF-⎕INP
 
-These features together allow you to write Web pages in APL!
+@subsection Multi-Line Strings
+
+Another feature of GNU APL to simplify the creation of values that contain
+longer texts are strings that span several lines. A major disadvantage of ⎕INP
+is that it can be used in immediate execution mode (and therefore also in
+scripts), but not in defined functions. In order to fill that gap, multi-line
+strings were introduced. They cme in two flavours: old-style and new-style.
+
+@subsubsection Old-style Multi-Line Strings
+
+Old-style multi-line Strings were the first attempt to provide long strings for defined functions. For that reason they worked only in defined functions, but
+not in immediate execution (and therefore also not in scripts outside defined
+functions). One reason for that was that these strings could easily be entered
+by mistake in immediate execution (by simply forgetting the terminating " or
+' of a string.
+
+An  old-style multi-line String starts at the last " in a (defined function)
+line with an odd number of " characters. It continues over the subsequent
+function lines until the next ". The result is a nested APL value containing
+one nested string per line involved.
+
+For example:
+@verbatim
+
+∇Z←FOO
+ Z←"ABC
+ DEF
+ GHIJK"
+∇
+
+4 ⎕CR FOO
+┏→━━━━━━━━━━━━━━━━━━━━┓
+┃┏→━━┓ ┏→━━━┓ ┏→━━━━━┓┃
+┃┃ABC┃ ┃ DEF┃ ┃ GHIJK┃┃
+┃┗━━━┛ ┗━━━━┛ ┗━━━━━━┛┃
+┗∊━━━━━━━━━━━━━━━━━━━━┛
+@end verbatim
+
+If the first string is empty then the nested value starts with an empty
+string, but completely empty lines in the defined function are being ignored:
+
+@verbatim
+∇Z←FOO
+ Z←"
+ABC
+ DEF
+
+  GHIJK"
+∇
+
+4 ⎕CR FOO
+┏→━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃┏⊖┓ ┏→━━┓ ┏→━━━┓ ┏→━━━━━━┓┃
+┃┃ ┃ ┃ABC┃ ┃ DEF┃ ┃  GHIJK┃┃
+┃┗━┛ ┗━━━┛ ┗━━━━┛ ┗━━━━━━━┛┃
+┗∊━━━━━━━━━━━━━━━━━━━━━━━━━┛
+@end verbatim
+
+@subsubsection New-style Multi-Line Strings
+
+Even though the combination of ⎕INP for immediate execution and multi-line
+strings for defined functions achieved their goals, it was certainly not
+very intuitive to have different approaches for different APL modes. This
+was leading to the new-style multi-line Strings. They adopted the triple
+quote (""") syntax know from e.g. the Python language. All in all is the
+syntax of new-style multi-line Strings cleaner: empty lines are handled more
+consistently and the string lines are separated from the APL code lines.
+More importantly, new-style multi-line Strings work alike in immediate
+execution mode, in scripts, and in defined functions. New-style strings are a
+little different and more restrictive than their old-style companions:
+
+* the starting """ must be placed at the end of an APL code line, i.e. no
+  mixing of APL code and string content on the same line
+
+* the ending """ must be placed at the end of a separate lines with only spaces
+  allowed before the """ (to vertically align it with the leading """ if so
+  desired).
+
+* Neither the starting nor the ending line become nested strings of the result.
+
+Example:
+@verbatim
+ 4 ⎕CR """
+ABC
+ DEF
+
+  GHIJK
+       """
+┏→━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃┏→━━┓ ┏→━━━┓ ┏⊖┓ ┏→━━━━━━┓┃
+┃┃ABC┃ ┃ DEF┃ ┃ ┃ ┃  GHIJK┃┃
+┃┗━━━┛ ┗━━━━┛ ┗━┛ ┗━━━━━━━┛┃
+┗∊━━━━━━━━━━━━━━━━━━━━━━━━━┛
+@end verbatim
+
+When entering a new-style multi-line Strings then the prompt is prepended by
+→ to indicate that a Multi-Line String is being entered.
+
+⎕INP and old-style strings will coexist for s while, but may disappear at some
+point in time.
 
 @subsection Script Example
 

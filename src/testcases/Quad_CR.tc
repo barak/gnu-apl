@@ -379,6 +379,11 @@ DOMAIN ERROR+
 A ⎕CR B with invalid A
       →
 
+      ⍝ control characters
+      4 ⎕CR "--\a--"
+┏→━━━━┓
+┃--␇--┃
+┗━━━━━┛
 
       ⍝ regression
       5 ⎕CR '1'

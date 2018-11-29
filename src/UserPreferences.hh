@@ -62,6 +62,7 @@ struct UserPreferences
 #define sec_def(X) X(false),
 #include "Security.def"
      multi_line_strings(true),
+     multi_line_strings_3(true),
      WINCH_sets_pw(false)
    { gettimeofday(&session_start, 0); }
 
@@ -198,8 +199,11 @@ struct UserPreferences
    bool X;   ///< true if X is disabled dor security reasons
 #include "Security.def"
 
-   /// true if multi-line strings are allowed (in ∇-defined functions)
+   /// true if old-style multi-line strings are allowed (in ∇-defined functions)
    bool multi_line_strings;
+
+   /// true if new-style multi-line strings are allowed
+   bool multi_line_strings_3;
 
    /// true if the WINCH signal shall modify ⎕PW
    bool WINCH_sets_pw;

@@ -435,13 +435,14 @@ Simple_string<const StateIndicator *, false> stack;
              {
                Assert(ufun);
                const Function_PC PC = si->get_prefix().get_error_PC();
-               if (const ErrorCode ec = si->get_error().error_code)
+               if (const ErrorCode ec = StateIndicator::get_error(si).error_code)
                   {
                     // get_error_line_2() is something like fun[line] statement.
                     // find the space after fun[line].
                     //
                     int spc2 = 0;
-                    const UCS_string & el2 = si->get_error().get_error_line_2();
+                    const UCS_string & el2 =
+                          StateIndicator::get_error(si).get_error_line_2();
                     loop(e, el2.size())
                         {
                           if (el2[e] == ']')
@@ -450,12 +451,13 @@ Simple_string<const StateIndicator *, false> stack;
                                break;
                              }
                         }
-                    
+
                     int spe2 = spc2;
                     while (spe2 < el2.size() &&
                            el2[spe2] == UNI_ASCII_SPACE)   ++spe2;
                     const int spl2 = el2.size() - spe2;
-                    const UCS_string & el3 = si->get_error().get_error_line_3();
+                    const UCS_string & el3 =
+                          StateIndicator::get_error(si).get_error_line_3();
 
                     // put fun[line] into one <TD> and the failed statement into
                     // the next <TD>

@@ -58,14 +58,45 @@ ShapeItem Command::APL_expression_count = 0;
 void
 Command::process_line()
 {
-UCS_string line;
-bool eof = false;
-   InputMux::get_line(LIM_ImmediateExecution, Workspace::get_prompt(),
+UCS_string accu;   // for new-style multiline strings
+UCS_string prompt = Workspace::get_prompt();
+   for (;;)
+       {
+         UCS_string line;
+         bool eof = false;
+         InputMux::get_line(LIM_ImmediateExecution, prompt,
                       line, eof, LineInput::get_history());
 
-   if (eof) CERR << "EOF at " << LOC << endl;
+         if (eof) CERR << "EOF at " << LOC << endl;
 
-   process_line(line);
+         if (line.ends_with("\"\"\""))   /// start or end of multi-line
+            {
+               if (accu.size() == 0)    // start of multi-line
+                  {
+                    accu = line;
+                    prompt.prepend(UNI_RIGHT_ARROW);
+                    accu.shrink(line.size() - 3);   // discard """
+                    accu.append(UNI_ASCII_SPACE);
+                  }
+               else                     // end of multi-line
+                  {
+                    accu.pop();   // trailing " "
+                    process_line(accu);
+                    return;
+                  }
+            }
+         else if (accu.size())   // inside multi-line
+            {
+              accu.append_ascii("\"");
+              accu.append(line.do_escape(true));
+              accu.append_ascii("\" ");
+            }
+         else                   // normal input line
+            {
+              process_line(line);
+              return;
+            }
+       }
 }
 //-----------------------------------------------------------------------------
 void
@@ -437,7 +468,7 @@ check_EOC:
               //
               if (Workspace::SI_top()->get_executable()->cannot_suspend())
                  {
-                    Error error = Workspace::SI_top()->get_error();
+                    Error err = StateIndicator::get_error(Workspace::SI_top());
                     while (Workspace::SI_top()->get_executable()
                                               ->cannot_suspend())
                        {
@@ -446,7 +477,7 @@ check_EOC:
 
                    if (Workspace::SI_top())
                       {
-                        Workspace::SI_top()->get_error() = error;
+                        StateIndicator::get_error(Workspace::SI_top()) = err;
                       }
                  }
 

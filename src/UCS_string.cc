@@ -557,9 +557,20 @@ UCS_string::starts_with(const char * prefix) const
         if (uni != Unicode(pc))   return false;
       }
 
-   // strings agree, but prefix is longer
+   // strings match, but prefix is longer
    //
-   return false;   
+   return false;
+}
+//-----------------------------------------------------------------------------
+bool 
+UCS_string::ends_with(const char * suffix) const
+{
+const size_t s_len = strlen(suffix);
+   if (size() < s_len)   return false;
+
+   suffix += s_len;    // goto end of suffix
+   loop(s, s_len)   if (at(size() - s - 1) != *--suffix)   return false;
+   return true;
 }
 //-----------------------------------------------------------------------------
 bool 
@@ -856,6 +867,179 @@ char cc[60];
         else         break;
       }
 }
+//-----------------------------------------------------------------------------
+UCS_string
+UCS_string::un_escape(bool double_quoted, bool keep_LF) const
+{
+const char * hex = "0123456789abcdef";
+UCS_string ret;
+   ret.reserve(size());
+
+   if (double_quoted)
+      {
+        loop(s, size())
+            {
+             const Unicode uni = at(s);
+             if (uni != UNI_ASCII_BACKSLASH)   // normal char
+                {
+                  ret.append(uni);
+                  continue;
+                }
+
+             if (s >= (size() - 1))   // \ at end of string
+                {
+                  ret.append(UNI_ASCII_BACKSLASH);
+                  break;
+                }
+
+             const Unicode uni1 = at(++s);
+             switch(uni1)
+                 {
+                  case UNI_ASCII_a:            ret << UNI_ASCII_BEL;   continue;
+                  case UNI_ASCII_b:            ret << UNI_ASCII_BS;    continue;
+                  case UNI_ASCII_f:            ret << UNI_ASCII_FF;    continue;
+                  case UNI_ASCII_n:            if (keep_LF)   break;
+                                               ret << UNI_ASCII_LF;    continue;
+                  case UNI_ASCII_r:            ret << UNI_ASCII_CR;    continue;
+                  case UNI_ASCII_t:            ret << UNI_ASCII_BS;    continue;
+                  case UNI_ASCII_v:            ret << UNI_ASCII_VT;    continue;
+                  case UNI_ASCII_DOUBLE_QUOTE:
+                  case UNI_ASCII_BACKSLASH:
+                                               ret << uni1;            continue;
+                  default:                     break;
+                 }
+
+             int max_len = 0;
+             if (uni1 == UNI_ASCII_u)
+                {
+                  max_len = 4;
+                }
+             else if (uni1 == UNI_ASCII_x)
+                {
+                  max_len = 2;
+                }
+             else   // \n or \": keep them escaped
+                {
+                  ret.append(uni);
+                  ret.append(uni1);
+                  continue;
+                }
+
+               // \x or \u
+               //
+               int value = 0;
+               loop(m, max_len)
+                   {
+                     if (s >= (size() - 1))   break;
+                     const int dig = at(s+1);
+                     const char * pos = strchr(hex, dig);
+                     if (pos == 0)   break;   // non-hex character
+
+                     value = value << 4 | (pos - hex);
+                     ++s;
+                   }
+               ret.append(Unicode(value));
+            }
+      }
+   else
+      {
+        bool got_quote = false;
+        loop(s, size())
+           {
+             const Unicode uni = at(s);
+             if (uni == UNI_SINGLE_QUOTE)
+                {
+                  if (got_quote)
+                     {
+                        ret.append(UNI_SINGLE_QUOTE);
+                        got_quote = false;
+                     }
+                  else
+                     {
+                        ret.append(UNI_SINGLE_QUOTE);
+                        got_quote = true;
+                     }
+                }
+             else
+                {
+                  if (got_quote)   ret.append(UNI_SINGLE_QUOTE);   // mal-formed
+                  ret.append(uni);
+                  got_quote = false;
+                }
+           }
+      }
+
+   return ret;
+}
+//-----------------------------------------------------------------------------
+UCS_string
+UCS_string::do_escape(bool double_quoted) const
+{
+const char * hex = "0123456789abcdef";
+UCS_string ret;
+   ret.reserve(size());
+
+   if (double_quoted)
+      {
+        loop(s, size())
+           {
+             const Unicode uni = at(s);
+             switch(uni)
+                {
+                  case UNI_ASCII_BEL:            ret << "\\a";    continue;
+                  case UNI_ASCII_BS:             ret << "\\b";    continue;
+                  case UNI_ASCII_HT:             ret << "\\t";    continue;
+                  case UNI_ASCII_LF:             ret << "\\n";    continue;
+                  case UNI_ASCII_VT:             ret << "\\v";    continue;
+                  case UNI_ASCII_FF:             ret << "\\f";    continue;
+                  case UNI_ASCII_CR:             ret << "\\r";    continue;
+                  case UNI_ASCII_DOUBLE_QUOTE:   ret << "\\\"";   continue;
+                  case UNI_ASCII_BACKSLASH:      ret << "\\\\";   continue;
+                  default:                       break;
+                }
+
+             // none of the above
+             //
+             if (uni >= UNI_ASCII_SPACE && uni < UNI_ASCII_DELETE)
+                {
+                  ret.append(uni);
+                  continue;
+                }
+
+             if (uni <= 0x0F)   // small ASCII
+                {
+                  ret << "\\x0";
+                  ret << Unicode(hex[uni]);
+                }
+             else if (uni <= 0xFF)   // other ASCII
+                {
+                  ret << "\\x";
+                  ret << Unicode(hex[uni >> 4 & 0x0F]);
+                  ret << Unicode(hex[uni      & 0x0F]);
+                }
+             else
+                {
+                  ret << "\\u";
+                  ret << Unicode(hex[uni >> 12 & 0x0F]);
+                  ret << Unicode(hex[uni >>  8 & 0x0F]);
+                  ret << Unicode(hex[uni >>  4 & 0x0F]);
+                  ret << Unicode(hex[uni       & 0x0F]);
+                }
+           }
+      }
+   else   // single-quoted
+      {
+        loop(s, size())
+           {
+             const Unicode uni = at(s);
+             ret.append(uni);
+             if (uni == UNI_SINGLE_QUOTE)   ret.append(uni);   // another '
+           }
+      }
+
+   return ret;
+}
+//-----------------------------------------------------------------------------
 //-----------------------------------------------------------------------------
 size_t
 UCS_string::to_vector(UCS_string_vector & result) const

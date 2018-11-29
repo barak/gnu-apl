@@ -110,9 +110,13 @@ UCS_string ucs;
 ColInfo info;
    info.flags |= CT_CHAR;
 
-   if (pctx.get_style() == PR_APL_FUN)
+PrintStyle style = pctx.get_style();
+Unicode uni = get_char_value();
+   if ((style & PST_PRETTY) && uni < UNI_ASCII_SPACE)
+      uni = Unicode(uni + 0x2400);
+
+   if (style == PR_APL_FUN)
       {
-        Unicode uni = get_char_value();
         if (uni == UNI_SINGLE_QUOTE)
            {
              ucs.append(UNI_SINGLE_QUOTE);
@@ -129,17 +133,16 @@ ColInfo info;
       }
    else
       {
-       if (pctx.get_style() & PST_QUOTE_CHARS)
+       if (style & PST_QUOTE_CHARS)
           {
             ucs.append(UNI_SINGLE_QUOTE);
-            ucs.append(get_char_value());
+            ucs.append(uni);
             ucs.append(UNI_SINGLE_QUOTE);
           }
         else
           {
-            ucs.append(get_char_value());
+            ucs.append(uni);
           }
-
       }
 
    info.real_len = info.int_len = ucs.size();

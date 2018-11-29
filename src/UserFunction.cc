@@ -612,11 +612,11 @@ UserFunction::transform_multi_line_strings()
 
 enum Line_status
    {
-    Function_header,
-    APL_text,
-    Start_of_string,
-    Inside_string,
-    End_of_string
+     Function_header = 0,
+     APL_text        = 1,
+     Start_of_string = 2,
+     Inside_string   = 3,
+     End_of_string   = 4
    };
 
 char status[get_text_size()];   status[0] = Function_header;
@@ -646,27 +646,133 @@ Line_status current = APL_text;
             }
        }
 
+   if (current == Start_of_string || current == Inside_string)
+      {
+         // multi-line string started but not ended.
+         //
+         return E_DEFN_ERROR;
+      }
+
    // modify lines...
    //
-int l = 1;
-UCS_string accu;
-   while (l < get_text_size())
+   for (int l = 1; l < get_text_size();)
        {
          if (status[l] == APL_text)   { ++l;   continue; }
          const int start = l;
          Assert1(status[l] == Start_of_string);
-         accu = get_text(l++);
-         accu.append_utf8("\" ");
+         UCS_string accu = get_text(l++);
+         accu << "\" ";
          while (status[l] == Inside_string)
                {
-                 accu.append_utf8(" \"");
-                 accu.append(get_text(l));
-                 accu.append_utf8("\"");
+                 accu << " \"" << get_text(l).do_escape(true) << "\"";
                  clear_text(l++);
                }
          Assert(status[l] == End_of_string);
-         accu.append_utf8("\"");
-         accu.append(get_text(l));
+         accu << "\"" << get_text(l);
+         set_text(start, accu);
+         clear_text(l++);
+       }
+
+   // remove trailing empty lines...
+   //
+   while (get_text_size() && get_text(get_text_size() - 1).size() == 0)
+         text.shrink(get_text_size() - 1);
+
+// CERR << endl;
+// loop(l, get_text_size())   CERR << "[" << l << "]  " << get_text(l) << endl;
+
+   return E_NO_ERROR;
+}
+//-----------------------------------------------------------------------------
+ErrorCode
+UserFunction::transform_multi_line_strings_3()
+{
+  /* convert a set of lines like
+
+     [k+1] PREFIX """
+     [k+2] L2 ...
+     [k+N] """
+
+    into:
+
+    [k+1] PREFIX "L2" ... "LN"
+    [...] (empty)
+    [k+N] (empty)
+
+     In contrast to transform_multi_line_strings(), line k+N may only
+     consist of spaces and the terminating """.
+   */
+
+enum Line_status
+   {
+     Function_header = 0,
+     APL_text        = 1,
+     Start_of_string = 2,
+     Inside_string   = 3,
+     End_of_string   = 4
+   };
+
+char status[get_text_size()];   status[0] = Function_header;
+Line_status current = APL_text;
+
+   // determine line status of each line...
+   //
+   for (ShapeItem l = 1; l < get_text_size(); ++l)
+       {
+         const UCS_string & line = get_text(l);
+         const ShapeItem len = line.size();
+         if (line.ends_with("\"\"\""))
+            {
+              if (current == APL_text)   // start of multi-line string
+                 {
+                    status[l] = Start_of_string;
+                    current = Inside_string;
+                 }
+              else                       // end of multi-line string
+                 {
+                   bool blanks_only = true;
+                   for (ShapeItem c = 0; c < (len - 3); ++c)
+                       {
+                          if (line[c] != UNI_ASCII_SPACE &&
+                              line[c] != UNI_ASCII_HT)   blanks_only = false;
+                       }
+
+                    if (blanks_only)
+                       {
+                         status[l] = End_of_string;
+                         current = APL_text;
+                       }
+                 }
+            }
+         else              // no status change
+            {
+              status[l] = current;
+            }
+       }
+
+   if (current == Start_of_string || current == Inside_string)
+      {
+         // multi-line string started but not ended.
+         //
+         return E_DEFN_ERROR;
+      }
+
+   // modify lines...
+   //
+   for (int l = 1; l < get_text_size(); )
+       {
+         if (status[l] == APL_text)   { ++l;   continue; }
+         const int start = l;
+         Assert1(status[l] == Start_of_string);
+         UCS_string accu = get_text(l++);
+         accu.shrink(accu.size() - 3);   // remove trailing """
+         accu << " ";
+         while (status[l] == Inside_string)
+               {
+                 accu << " \"" << get_text(l).do_escape(true) << "\"";
+                 clear_text(l++);
+               }
+         Assert(status[l] == End_of_string);
          set_text(start, accu);
          clear_text(l++);
        }
@@ -688,10 +794,41 @@ UserFunction::parse_body(const char * loc, bool tolerant, bool macro)
    line_starts.shrink(0);
    line_starts.append(Function_PC_0);   // will be set later.
 
+UCS_string_vector original_text;
+   //
+   // The text is modified for parsing but restored afterwards so that e,g,
+   // ∇FUN[⎕]∇ shows the text enterd by the user.
+   //
+   // original_text is only set if text was modified.
+   //
    clear_body();
 
-UCS_string_vector original_text;    // before possibly transforming multilines
-   if (uprefs.multi_line_strings)   // user allows multi-line strings
+   if (uprefs.multi_line_strings_3)   // new-style multi-line strings allowed
+      {
+        for (int l = 1; l < get_text_size(); ++l)
+            {
+              const UCS_string & line = get_text(l);
+              const ShapeItem len = line.size();
+              if (len >= 3 &&
+                  line[len - 1] == UNI_ASCII_DOUBLE_QUOTE &&
+                  line[len - 2] == UNI_ASCII_DOUBLE_QUOTE &&
+                  line[len - 3] == UNI_ASCII_DOUBLE_QUOTE)
+                 {
+                   original_text = text;
+                   const ErrorCode ec = transform_multi_line_strings_3();
+                   if (ec)
+                      {
+                        text = original_text;   // restore function text
+                        error_line = l;
+                        return;
+                      }
+
+                   break;
+                 }
+            }
+      }
+
+   if (uprefs.multi_line_strings)   // old-style multi-line strings allowed
       {
         for (int l = 1; l < get_text_size(); ++l)
             {
@@ -758,7 +895,7 @@ UCS_string_vector original_text;    // before possibly transforming multilines
                         << header.get_name() << endl;
                  }
             }
-        catch(Error err)
+        catch(const Error & err)
             {
               return;
             }
@@ -792,7 +929,7 @@ UserFunction * fun = 0;
       {
         load(workspace, function, fun);
       }
-   catch (Error err)
+   catch (Error & err)
       {
         delete fun;
 
@@ -905,8 +1042,11 @@ const bool bad_function = info || err_line != -1;
            }
          else if (err_line > 0)
            {
-             MORE_ERROR() << info << " in function line ["
-                          << err_line << "] of:\n" << text;
+             UCS_string & more = MORE_ERROR();
+             more << info << " in function line [" << err_line << "] of:\n";
+             loop(l, ufun->get_text_size())
+                more << "[" << l << "] " << ufun->get_text(l) << "\n";
+
              Log(LOG_UserFunction__fix)
                 CERR << "Bad function line: " << err_line << endl;
            }

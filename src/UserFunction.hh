@@ -237,9 +237,13 @@ public:
    /// set trace or stop vector
    void set_trace_stop(Simple_string<Function_Line, false> & lines, bool stop);
 
-   /// transform a function body containing multi-lines into a standard
-   /// function body
+   /// transform a function body containing (old-style) multi-lines into a
+   /// standard function body
    ErrorCode transform_multi_line_strings();
+
+   /// transform a function body containing (new-style) multi-lines into a
+   /// standard function body
+   ErrorCode transform_multi_line_strings_3();
 
    /// recompile the body
    void parse_body(const char * loc, bool tolerant, bool macro);

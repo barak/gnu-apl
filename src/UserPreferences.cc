@@ -1237,6 +1237,15 @@ int file_profile = 0;   // the current profile in the preferences file
          else if (!strcasecmp(opt, "Multi-Line-Strings"))
             {
               multi_line_strings = yes;
+              multi_line_strings_3 = yes;
+            }
+         else if (!strcasecmp(opt, "New-Multi-Line-Strings"))
+            {
+              multi_line_strings_3 = yes;
+            }
+         else if (!strcasecmp(opt, "Old-Multi-Line-Strings"))
+            {
+              multi_line_strings = yes;
             }
          else if (!strcasecmp(opt, "WINCH-SETS-⎕PW"))
             {

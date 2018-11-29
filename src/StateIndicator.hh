@@ -126,10 +126,12 @@ public:
    void info(ostream & out, const char * loc) const;
 
    /// return the error related info in this context
-   Error & get_error() { return error; }
+   static Error & get_error(StateIndicator * si)
+       { return si ? si->error : top_level_error; }
 
    /// return the error related info in this context
-   const Error & get_error() const { return error; }
+   static const Error & get_error(const StateIndicator * si)
+       { return si ? si->error : top_level_error; }
 
    /// return left arg
    Value_P get_L();
@@ -189,7 +191,10 @@ public:
    SI_level nth_push(const Symbol * sym, int from_tos) const;
 
    /// a small storage for DerivedFunction objects.
-  DerivedFunctionCache fun_oper_cache;
+   DerivedFunctionCache fun_oper_cache;
+
+   /// error when )SI is empty
+   static Error top_level_error;
 
 protected:
    /// the user function that is being executed

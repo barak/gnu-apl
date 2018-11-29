@@ -154,13 +154,15 @@ enum { MAX_RLIMIT_AS = 4000000000UL };
 
    if (log_startup)
       CERR
-           << "sizeof(int) is           " << sizeof(int)              << endl
-           << "sizeof(long) is          " << sizeof(long)             << endl
-           << "sizeof(void *) is        " << sizeof(void *)           << endl
-           << "sizeof(Cell) is          " << sizeof(Cell)             << endl
-           << "sizeof(Svar_record) is   " << sizeof(Svar_record)      << endl
-           << "sizeof(Svar_partner) is  " << sizeof(Svar_partner)     << endl
-           << "process memory limit is  " << total_memory << " bytes" << endl;
+           << "sizeof(int) is           " << sizeof(int)               << endl
+           << "sizeof(long) is          " << sizeof(long)              << endl
+           << "sizeof(void *) is        " << sizeof(void *)            << endl
+           << "sizeof(Cell) is          " << sizeof(Cell)              << endl
+           << "sizeof(Value) is         " << sizeof(Value)
+           << " (including " << SHORT_VALUE_LENGTH_WANTED << " Cells)" << endl
+           << "sizeof(Svar_record) is   " << sizeof(Svar_record)       << endl
+           << "sizeof(Svar_partner) is  " << sizeof(Svar_partner)      << endl
+           << "process memory limit is  " << total_memory << " bytes"  << endl;
 
    // CYGWIN does not have RLIMIT_NPROC
    //

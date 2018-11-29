@@ -253,19 +253,19 @@ enum ParseMode
 /// Different ways of printing APL values.
 enum PrintStyle
 {
-   PST_NONE        = 0,                  ///< nothing
+   PST_NONE          = 0,                ///< nothing
 
    // character sets for inner and outer frames
    //
-   PST_CS_NONE     = 0x00000000,         ///< ASCII chars (- | and +)
-   PST_CS_ASCII    = 0x00000001,         ///< ASCII chars (- | and +)
-   PST_CS_THIN     = 0x00000002,         ///< thin lines
-   PST_CS_THICK    = 0x00000003,         ///< thick lines
-   PST_CS_DOUBLE   = 0x00000004,         ///< double lines
-   PST_CS_MASK     = 0x0000000F,         ///< mask for line style
+   PST_CS_NONE       = 0x00000000,       ///< ASCII chars (- | and +)
+   PST_CS_ASCII      = 0x00000001,       ///< ASCII chars (- | and +)
+   PST_CS_THIN       = 0x00000002,       ///< thin lines
+   PST_CS_THICK      = 0x00000003,       ///< thick lines
+   PST_CS_DOUBLE     = 0x00000004,       ///< double lines
+   PST_CS_MASK       = 0x0000000F,       ///< mask for line style
 
-   PST_CS_INNER    = PST_CS_MASK,        ///< mask for inner line style
-   PST_CS_OUTER    = PST_CS_MASK << 4,   ///< mask for outer line style
+   PST_CS_INNER      = PST_CS_MASK,      ///< mask for inner line style
+   PST_CS_OUTER      = PST_CS_MASK << 4, ///< mask for outer line style
 
    // flags for numeric formatting
    //
@@ -280,6 +280,7 @@ enum PrintStyle
    PST_PACKED        = 0x00040000,       ///< 4 byte/char
    PST_NARS          = 0x00080000,       ///< NARS APL ⎕FMT style
    PST_QUOTE_CHARS   = 0x00100000,       ///< quote chars and strings
+   PST_PRETTY        = 0x00200000,       ///< print control characters nicely
 
    PR_APL            = PST_MATRIX,       ///< normal APL output
    PR_APL_MIN        = PST_MATRIX        ///< normal APL output w/o E0 and ...0
@@ -291,13 +292,17 @@ enum PrintStyle
    PR_BOXED_CHAR     = PST_MATRIX
                      | PST_CS_ASCII,     ///< 2 ⎕CR (ASCII chars)
    PR_BOXED_GRAPHIC  = PST_MATRIX
+                     | PST_PRETTY
                      | PST_CS_THICK,     ///< 3/4 ⎕CR (graphic characters)
    PR_BOXED_GRAPHIC1 = PST_MATRIX
+                     | PST_PRETTY
                      | PST_CS_THIN,      ///< 7/8 ⎕CR (graphic characters)
    PR_BOXED_GRAPHIC2 = PST_MATRIX
+                     | PST_PRETTY
                      | PST_CS_THICK 
                      | PST_CS_DOUBLE << 4, ///< DISPLAY graphic in double box
    PR_BOXED_GRAPHIC3 = PST_MATRIX
+                     | PST_PRETTY
                      | PST_CS_THICK
                      | PST_QUOTE_CHARS,    ///<  29 ⎕CR (quoted chars)
    PR_NARS           = PR_BOXED_GRAPHIC  | PST_NARS,  ///< NARS APL style
