@@ -203,7 +203,7 @@ UCS_string digits;
         if (value >= 10.0)
            {
              // 10.0 or more is a rounding error from 9,999...
-             digits.append(static_cast<Unicode>(10 + '0'));
+             digits.append(Unicode(10 + '0'));
              while (digits.size() < (quad_pp + 2))   digits.append(UNI_ASCII_0);
              break;
            }
@@ -220,7 +220,7 @@ UCS_string digits;
              const int dig = int(value);
              value -= dig;
              value *= 10.0;
-             digits.append(static_cast<Unicode>(dig + '0'));
+             digits.append(Unicode(dig + '0'));
            }
       }
 
@@ -231,7 +231,7 @@ UCS_string digits;
 const Unicode last = digits.last();
    digits.pop();
 
-   if (last >= '5')   digits.last() = static_cast<Unicode>(digits.last() + 1);
+   if (last >= '5')   digits.last() = Unicode(digits.last() + 1);
  
    // adjust carries of 2nd to last digit
    //
@@ -239,8 +239,8 @@ const Unicode last = digits.last();
        {
         if (digits[d] > '9')
            {
-             digits[d] =     static_cast<Unicode>(digits[d]     - 10);
-             digits[d - 1] = static_cast<Unicode>(digits[d - 1] +  1);
+             digits[d] =     Unicode(digits[d]     - 10);
+             digits[d - 1] = Unicode(digits[d - 1] +  1);
            }
        }
 
@@ -248,7 +248,7 @@ const Unicode last = digits.last();
    //
    if (digits[0] > '9')
       {
-        digits[0] = static_cast<Unicode>(digits[0] - 10);
+        digits[0] = Unicode(digits[0] - 10);
         digits.insert_before(0, UNI_ASCII_1);
         ++expo;
         digits.pop();
@@ -565,7 +565,7 @@ UCS_string::starts_with(const char * prefix) const
 bool 
 UCS_string::ends_with(const char * suffix) const
 {
-const size_t s_len = strlen(suffix);
+const ShapeItem s_len = strlen(suffix);
    if (size() < s_len)   return false;
 
    suffix += s_len;    // goto end of suffix
