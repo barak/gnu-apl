@@ -181,9 +181,10 @@ am__libapl_la_SOURCES_DIST = buildtag buildtag.hh ../config.h \
 	QuadFunction.cc QuadFunction.hh ProcessorID.cc ProcessorID.hh \
 	Quad_CR.cc Quad_CR.hh Quad_DLX.cc Quad_DLX.hh Quad_FFT.cc \
 	Quad_FFT.hh Quad_FIO.cc Quad_FIO.hh Quad_FX.cc Quad_FX.hh \
-	Quad_GTK.cc Quad_GTK.hh Quad_RE.cc Quad_RE.hh Quad_RL.cc \
-	Quad_RL.hh Quad_SQL.cc Quad_SQL.hh Quad_SVx.cc Quad_SVx.hh \
-	Quad_TF.cc Quad_TF.hh Parallel.cc Parallel.hh Performance.cc \
+	Quad_GTK.cc Quad_GTK.hh Quad_PLOT.cc Quad_PLOT.def \
+	Quad_PLOT.hh Quad_RE.cc Quad_RE.hh Quad_RL.cc Quad_RL.hh \
+	Quad_SQL.cc Quad_SQL.hh Quad_SVx.cc Quad_SVx.hh Quad_TF.cc \
+	Quad_TF.hh Parallel.cc Parallel.hh Performance.cc \
 	Performance.def Performance.hh RealCell.cc RealCell.hh sbrk.cc \
 	Shape.cc Shape.hh SharedValuePointer.hh Simple_string.hh \
 	ScalarFunction.cc ScalarFunction.hh Security.cc Security.def \
@@ -252,11 +253,11 @@ am__objects_5 = libapl_la-Archive.lo libapl_la-ArrayIterator.lo \
 	libapl_la-Quad_CR.lo libapl_la-Quad_DLX.lo \
 	libapl_la-Quad_FFT.lo libapl_la-Quad_FIO.lo \
 	libapl_la-Quad_FX.lo libapl_la-Quad_GTK.lo \
-	libapl_la-Quad_RE.lo libapl_la-Quad_RL.lo \
-	libapl_la-Quad_SQL.lo libapl_la-Quad_SVx.lo \
-	libapl_la-Quad_TF.lo libapl_la-Parallel.lo \
-	libapl_la-Performance.lo libapl_la-RealCell.lo \
-	libapl_la-sbrk.lo libapl_la-Shape.lo \
+	libapl_la-Quad_PLOT.lo libapl_la-Quad_RE.lo \
+	libapl_la-Quad_RL.lo libapl_la-Quad_SQL.lo \
+	libapl_la-Quad_SVx.lo libapl_la-Quad_TF.lo \
+	libapl_la-Parallel.lo libapl_la-Performance.lo \
+	libapl_la-RealCell.lo libapl_la-sbrk.lo libapl_la-Shape.lo \
 	libapl_la-ScalarFunction.lo libapl_la-Security.lo \
 	libapl_la-StateIndicator.lo libapl_la-Svar_DB.lo \
 	libapl_la-Svar_record.lo libapl_la-Symbol.lo \
@@ -315,9 +316,10 @@ am__apl_SOURCES_DIST = main.cc buildtag buildtag.hh ../config.h \
 	QuadFunction.cc QuadFunction.hh ProcessorID.cc ProcessorID.hh \
 	Quad_CR.cc Quad_CR.hh Quad_DLX.cc Quad_DLX.hh Quad_FFT.cc \
 	Quad_FFT.hh Quad_FIO.cc Quad_FIO.hh Quad_FX.cc Quad_FX.hh \
-	Quad_GTK.cc Quad_GTK.hh Quad_RE.cc Quad_RE.hh Quad_RL.cc \
-	Quad_RL.hh Quad_SQL.cc Quad_SQL.hh Quad_SVx.cc Quad_SVx.hh \
-	Quad_TF.cc Quad_TF.hh Parallel.cc Parallel.hh Performance.cc \
+	Quad_GTK.cc Quad_GTK.hh Quad_PLOT.cc Quad_PLOT.def \
+	Quad_PLOT.hh Quad_RE.cc Quad_RE.hh Quad_RL.cc Quad_RL.hh \
+	Quad_SQL.cc Quad_SQL.hh Quad_SVx.cc Quad_SVx.hh Quad_TF.cc \
+	Quad_TF.hh Parallel.cc Parallel.hh Performance.cc \
 	Performance.def Performance.hh RealCell.cc RealCell.hh sbrk.cc \
 	Shape.cc Shape.hh SharedValuePointer.hh Simple_string.hh \
 	ScalarFunction.cc ScalarFunction.hh Security.cc Security.def \
@@ -385,11 +387,11 @@ am__objects_10 = apl-Archive.$(OBJEXT) apl-ArrayIterator.$(OBJEXT) \
 	apl-Quad_CR.$(OBJEXT) apl-Quad_DLX.$(OBJEXT) \
 	apl-Quad_FFT.$(OBJEXT) apl-Quad_FIO.$(OBJEXT) \
 	apl-Quad_FX.$(OBJEXT) apl-Quad_GTK.$(OBJEXT) \
-	apl-Quad_RE.$(OBJEXT) apl-Quad_RL.$(OBJEXT) \
-	apl-Quad_SQL.$(OBJEXT) apl-Quad_SVx.$(OBJEXT) \
-	apl-Quad_TF.$(OBJEXT) apl-Parallel.$(OBJEXT) \
-	apl-Performance.$(OBJEXT) apl-RealCell.$(OBJEXT) \
-	apl-sbrk.$(OBJEXT) apl-Shape.$(OBJEXT) \
+	apl-Quad_PLOT.$(OBJEXT) apl-Quad_RE.$(OBJEXT) \
+	apl-Quad_RL.$(OBJEXT) apl-Quad_SQL.$(OBJEXT) \
+	apl-Quad_SVx.$(OBJEXT) apl-Quad_TF.$(OBJEXT) \
+	apl-Parallel.$(OBJEXT) apl-Performance.$(OBJEXT) \
+	apl-RealCell.$(OBJEXT) apl-sbrk.$(OBJEXT) apl-Shape.$(OBJEXT) \
 	apl-ScalarFunction.$(OBJEXT) apl-Security.$(OBJEXT) \
 	apl-StateIndicator.$(OBJEXT) apl-Svar_DB.$(OBJEXT) \
 	apl-Svar_record.$(OBJEXT) apl-Symbol.$(OBJEXT) \
@@ -633,6 +635,8 @@ VALUE_HISTORY_WANTED = @VALUE_HISTORY_WANTED@
 VERSION = @VERSION@
 VF_TRACING_WANTED = @VF_TRACING_WANTED@
 VISIBLE_MARKERS_WANTED = @VISIBLE_MARKERS_WANTED@
+XCBLIBS_CFLAGS = @XCBLIBS_CFLAGS@
+XCBLIBS_LIBS = @XCBLIBS_LIBS@
 abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
 abs_top_builddir = @abs_top_builddir@
@@ -729,9 +733,10 @@ common_SOURCES = buildtag buildtag.hh ../config.h \
 	QuadFunction.cc QuadFunction.hh ProcessorID.cc ProcessorID.hh \
 	Quad_CR.cc Quad_CR.hh Quad_DLX.cc Quad_DLX.hh Quad_FFT.cc \
 	Quad_FFT.hh Quad_FIO.cc Quad_FIO.hh Quad_FX.cc Quad_FX.hh \
-	Quad_GTK.cc Quad_GTK.hh Quad_RE.cc Quad_RE.hh Quad_RL.cc \
-	Quad_RL.hh Quad_SQL.cc Quad_SQL.hh Quad_SVx.cc Quad_SVx.hh \
-	Quad_TF.cc Quad_TF.hh Parallel.cc Parallel.hh Performance.cc \
+	Quad_GTK.cc Quad_GTK.hh Quad_PLOT.cc Quad_PLOT.def \
+	Quad_PLOT.hh Quad_RE.cc Quad_RE.hh Quad_RL.cc Quad_RL.hh \
+	Quad_SQL.cc Quad_SQL.hh Quad_SVx.cc Quad_SVx.hh Quad_TF.cc \
+	Quad_TF.hh Parallel.cc Parallel.hh Performance.cc \
 	Performance.def Performance.hh RealCell.cc RealCell.hh sbrk.cc \
 	Shape.cc Shape.hh SharedValuePointer.hh Simple_string.hh \
 	ScalarFunction.cc ScalarFunction.hh Security.cc Security.def \
@@ -764,7 +769,7 @@ pkglib_LTLIBRARIES = $(am__append_11)
 @WANT_LIBAPL_FALSE@apl_CXXFLAGS = $(common_CXXFLAGS) $(GPROF_WANTED) \
 @WANT_LIBAPL_FALSE@	$(CXX_RDYNAMIC)
 @WANT_LIBAPL_FALSE@apl_LDFLAGS = $(common_LDFLAGS)
-apl_LDADD = $(LIBS) $(FFT_LIBS)
+apl_LDADD = $(LIBS)
 all: all-recursive
 
 .SUFFIXES:
@@ -1000,6 +1005,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Quad_FIO.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Quad_FX.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Quad_GTK.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Quad_PLOT.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Quad_RE.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Quad_RL.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Quad_SQL.Po@am__quote@
@@ -1096,6 +1102,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Quad_FIO.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Quad_FX.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Quad_GTK.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Quad_PLOT.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Quad_RE.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Quad_RL.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Quad_SQL.Plo@am__quote@
@@ -1603,6 +1610,13 @@ libapl_la-Quad_GTK.lo: Quad_GTK.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Quad_GTK.cc' object='libapl_la-Quad_GTK.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Quad_GTK.lo `test -f 'Quad_GTK.cc' || echo '$(srcdir)/'`Quad_GTK.cc
+
+libapl_la-Quad_PLOT.lo: Quad_PLOT.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Quad_PLOT.lo -MD -MP -MF $(DEPDIR)/libapl_la-Quad_PLOT.Tpo -c -o libapl_la-Quad_PLOT.lo `test -f 'Quad_PLOT.cc' || echo '$(srcdir)/'`Quad_PLOT.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-Quad_PLOT.Tpo $(DEPDIR)/libapl_la-Quad_PLOT.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Quad_PLOT.cc' object='libapl_la-Quad_PLOT.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Quad_PLOT.lo `test -f 'Quad_PLOT.cc' || echo '$(srcdir)/'`Quad_PLOT.cc
 
 libapl_la-Quad_RE.lo: Quad_RE.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Quad_RE.lo -MD -MP -MF $(DEPDIR)/libapl_la-Quad_RE.Tpo -c -o libapl_la-Quad_RE.lo `test -f 'Quad_RE.cc' || echo '$(srcdir)/'`Quad_RE.cc
@@ -2779,6 +2793,20 @@ apl-Quad_GTK.obj: Quad_GTK.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Quad_GTK.cc' object='apl-Quad_GTK.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Quad_GTK.obj `if test -f 'Quad_GTK.cc'; then $(CYGPATH_W) 'Quad_GTK.cc'; else $(CYGPATH_W) '$(srcdir)/Quad_GTK.cc'; fi`
+
+apl-Quad_PLOT.o: Quad_PLOT.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Quad_PLOT.o -MD -MP -MF $(DEPDIR)/apl-Quad_PLOT.Tpo -c -o apl-Quad_PLOT.o `test -f 'Quad_PLOT.cc' || echo '$(srcdir)/'`Quad_PLOT.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Quad_PLOT.Tpo $(DEPDIR)/apl-Quad_PLOT.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Quad_PLOT.cc' object='apl-Quad_PLOT.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Quad_PLOT.o `test -f 'Quad_PLOT.cc' || echo '$(srcdir)/'`Quad_PLOT.cc
+
+apl-Quad_PLOT.obj: Quad_PLOT.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Quad_PLOT.obj -MD -MP -MF $(DEPDIR)/apl-Quad_PLOT.Tpo -c -o apl-Quad_PLOT.obj `if test -f 'Quad_PLOT.cc'; then $(CYGPATH_W) 'Quad_PLOT.cc'; else $(CYGPATH_W) '$(srcdir)/Quad_PLOT.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Quad_PLOT.Tpo $(DEPDIR)/apl-Quad_PLOT.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Quad_PLOT.cc' object='apl-Quad_PLOT.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Quad_PLOT.obj `if test -f 'Quad_PLOT.cc'; then $(CYGPATH_W) 'Quad_PLOT.cc'; else $(CYGPATH_W) '$(srcdir)/Quad_PLOT.cc'; fi`
 
 apl-Quad_RE.o: Quad_RE.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Quad_RE.o -MD -MP -MF $(DEPDIR)/apl-Quad_RE.Tpo -c -o apl-Quad_RE.o `test -f 'Quad_RE.cc' || echo '$(srcdir)/'`Quad_RE.cc

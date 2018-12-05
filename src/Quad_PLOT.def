@@ -1,0 +1,31 @@
+
+gdef(String,   caption, "GNU APL PLOT", plot window caption)
+gdef(Pixel,    pa_width,           600, plotarea width)
+gdef(Pixel,    pa_height,          400, plotarea height)
+gdef(Pixel,    pa_border_L,         30, pixels left of the plotarea)
+gdef(Pixel,    pa_border_R,         20, pixels right of the plotarea)
+gdef(Pixel,    pa_border_T,         25, pixels above the plotarea)
+gdef(Pixel,    pa_border_B,         25, pixels below the plotarea)
+gdef(uint32_t, gridx_style,          1, X grid style (0-2))
+gdef(Pixel,    gridx_pixels,        44, pixels between X grid lines)
+gdef(uint32_t, gridy_style,          1, Y grid style (0-2))
+gdef(Pixel,    gridy_pixels,        33, pixels between Y grid lines)
+gdef(Pixel,    border_width,        10, width of the window border)
+gdef(Color,    canvas_color,  0xFFFFFF, background color of the plot window)
+gdef(Color,    gridX_color,   0x000000, color of the X-grid lines)
+gdef(Pixel,    gridX_line_width,     1, thickness of the X-grid lines)
+gdef(Color,    gridY_color,   0x000000, color of the Y-grid lines)
+gdef(Pixel,    gridY_line_width,     1, thickness of the Y-grid lines)
+gdef(Pixel,    legend_X,            50, the X position of the legend)
+gdef(Pixel,    legend_Y,            50, the Y position of the legend)
+gdef(Pixel,    legend_dY,           15, the distance between legend lines)
+gdef(Pixel,    legend_lX,           50, the length of the legend lines)
+
+ldef(Color,    line_color,    0x00FF00, the color of plot line N)
+ldef(Pixel,    line_width,           3, the thickness of plot line N)
+ldef(Color,    point_color,   0x00FF00, the color of the plot points)
+ldef(Pixel,    point_size,           8, the diameter of the plot points)
+ldef(String,   legend_name,         "", the name of plot line N in the legend)
+
+#undef gdef
+#undef ldef

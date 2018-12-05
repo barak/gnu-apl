@@ -48,9 +48,8 @@ ProcessorID::init(bool log_startup)
              << "uprefs.requested_par:   " << uprefs.requested_par   << endl;
       }
 
-   id.proc = static_cast<AP_num>(uprefs.requested_id);
-   id.parent = uprefs.requested_par ? static_cast<AP_num>(uprefs.requested_par)
-                                    : AP_NULL;
+   id.proc = AP_num(uprefs.requested_id);
+   id.parent = uprefs.requested_par ? AP_num(uprefs.requested_par) : AP_NULL;
    id.grand = AP_NULL;
 
    if (!uprefs.system_do_svars)

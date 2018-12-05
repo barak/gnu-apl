@@ -253,7 +253,7 @@ const Error * err = 0;
       {
         // return 3 0⍴' '
         //
-        Shape sh(static_cast<ShapeItem>(3), static_cast<ShapeItem>(0));
+        Shape sh(ShapeItem(3), ShapeItem(0));
         Value_P Z(sh, LOC);
         Z->set_proto_Spc();
         Z->check_value(LOC);
@@ -933,7 +933,7 @@ const APL_Integer qio = Workspace::get_IO();
         else if (x == SYL_CURRENT_CORES)   // number of cores
            {
 #if PARALLEL_ENABLED
-             if (Parallel::set_core_count(static_cast<CoreCount>(b), false))
+             if (Parallel::set_core_count(CoreCount(b), false))
                 DOMAIN_ERROR;
 #else
              DOMAIN_ERROR;

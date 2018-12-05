@@ -51,5 +51,7 @@ dist_doc_DATA =			\
 	apl.html		\
 	libapl.texi		\
 	libapl.info		\
+	PLOT_circle.png		\
+	PLOT_zigzag.png		\
 	libapl.html
 

@@ -138,7 +138,7 @@ void
 VH_entry::print(int & flags, ostream & out, const Value * val,
                const VH_entry * previous) const
 {
-const ValueFlags flags_before = static_cast<ValueFlags>(flags);
+const ValueFlags flags_before = ValueFlags(flags);
 
    if (previous == 0                            ||
        previous->testcase_file == 0             ||
@@ -164,25 +164,25 @@ const ValueFlags flags_before = static_cast<ValueFlags>(flags);
         case VHE_Check:
              flags |= VF_complete;
              out << "  VHE_Check   " << flags_before << " ";
-             if (flags_before != flags)   out << static_cast<ValueFlags>(flags)
+             if (flags_before != flags)   out << ValueFlags(flags)
                                               << " ";
              else                         out << "            ";
              break;
 
         case VHE_SetFlag:
              flags |= iarg;
-             out << "  Set " << flags_name(static_cast<ValueFlags>(iarg))
+             out << "  Set " << flags_name(ValueFlags(iarg))
                  << "     " << flags_before << " ";
-             if (flags_before != flags)   out << static_cast<ValueFlags>(flags)
+             if (flags_before != flags)   out << ValueFlags(flags)
                                               << " ";
              else                         out << "            ";
              break;
 
         case VHE_ClearFlag:
              flags &= ~iarg;
-             out << "  Clear " << flags_name(static_cast<ValueFlags>(iarg))
+             out << "  Clear " << flags_name(ValueFlags(iarg))
                  << "   " << flags_before << " ";
-             if (flags_before != flags)   out << static_cast<ValueFlags>(flags)
+             if (flags_before != flags)   out << ValueFlags(flags)
                                               << " ";
              else                         out << "            ";
              break;
@@ -197,7 +197,7 @@ const ValueFlags flags_before = static_cast<ValueFlags>(flags);
 
         case VHE_Error:
              out << "  " << setw(38)
-                 << Error::error_name(static_cast<ErrorCode>(iarg)) << " ";
+                 << Error::error_name(ErrorCode(iarg)) << " ";
              break;
 
         case VHE_PtrNew:

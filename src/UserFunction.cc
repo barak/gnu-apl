@@ -578,7 +578,7 @@ Simple_string<bool, false> ts_lines;
         loop(ts, line_starts.size())
            {
              if (ts_lines[ts])
-                stop_lines.append(static_cast<Function_Line>(ts));
+                stop_lines.append(Function_Line(ts));
            }
       }
    else
@@ -587,7 +587,7 @@ Simple_string<bool, false> ts_lines;
         loop(ts, line_starts.size())
            {
              if (ts_lines[ts])
-                trace_lines.append(static_cast<Function_Line>(ts));
+                trace_lines.append(Function_Line(ts));
            }
       }
 
@@ -1167,7 +1167,7 @@ const ErrorCode ec = parser.parse(body_text, body);
         return 0;
       }
 
-UserFunction * ufun = new UserFunction(static_cast<Fun_signature>(signature), 0,
+UserFunction * ufun = new UserFunction(Fun_signature(signature), 0,
                                        body_text, body);
    return ufun;
 }

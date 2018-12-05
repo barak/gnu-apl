@@ -2899,7 +2899,7 @@ Simple_string<ShapeItem, false> line_starts;
         if (result_utf8[r] == UNI_ASCII_LF)   line_starts.append(r + 1);
       }
 
-Value_P Z(static_cast<ShapeItem>(line_starts.size() - 1), LOC);
+Value_P Z(ShapeItem(line_starts.size() - 1), LOC);
    loop(l, line_starts.size() - 1)
       {
         ShapeItem len;

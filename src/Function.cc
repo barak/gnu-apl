@@ -143,7 +143,7 @@ int sig = SIG_FUN;
    if (get_fun_valence() == 2)    sig |= SIG_A;
    if (get_fun_valence() >= 1)    sig |= SIG_B;
 
-   return static_cast<Fun_signature>(sig);
+   return Fun_signature(sig);
 }
 //-----------------------------------------------------------------------------
 ostream &

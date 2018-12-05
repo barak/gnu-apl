@@ -84,6 +84,9 @@
 /* Define to 1 if you have the `socket' library (-lsocket). */
 #undef HAVE_LIBSOCKET
 
+/* Define to 1 if you have the `xcb' library (-lxcb). */
+#undef HAVE_LIBXCB
+
 /* Define to 1 if you have the <memory.h> header file. */
 #undef HAVE_MEMORY_H
 
@@ -161,6 +164,9 @@
 
 /* Define to 1 if you have the <utmpx.h> header file. */
 #undef HAVE_UTMPX_H
+
+/* Define to 1 if you have the <xcb/xcb.h> header file. */
+#undef HAVE_XCB_XCB_H
 
 /* Define to 1 if the system has the type `_Bool'. */
 #undef HAVE__BOOL

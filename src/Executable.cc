@@ -684,7 +684,7 @@ int level = 0;
         lambda_body.append(ret_void, LOC);
       }
 
-   return static_cast<Fun_signature>(signature);
+   return Fun_signature(signature);
 }
 //-----------------------------------------------------------------------------
 UCS_string

@@ -717,7 +717,7 @@ LibRef libref = LIB0;
 const Unicode l = args[0][0];
       if (Avec::is_digit(l))
       {
-        libref = static_cast<LibRef>(l - '0');
+        libref = LibRef(l - '0');
         args.erase(0);
       }
 
@@ -765,7 +765,7 @@ Command::cmd_DROP(ostream & out, const UCS_string_vector & lib_ws)
    //
 LibRef libref = LIB_NONE;
 UCS_string wname = lib_ws.last();
-   if (lib_ws.size() == 2)   libref = static_cast<LibRef>(lib_ws[0][0] - '0');
+   if (lib_ws.size() == 2)   libref = LibRef(lib_ws[0][0] - '0');
 
 UTF8_string filename = LibPaths::get_lib_filename(libref, wname, true,
                                                   ".xml", ".apl");
@@ -807,7 +807,7 @@ LibRef wsid_lib = LIB0;
 UCS_string wsid_name = Workspace::get_WS_name();
    if (Avec::is_digit(wsid_name[0]))   // wsid contains a libnum
       {
-        wsid_lib = static_cast<LibRef>(wsid_name[0] - '0');
+        wsid_lib = LibRef(wsid_name[0] - '0');
         wsid_name.erase(0);
         wsid_name.remove_leading_whitespaces();
       }
@@ -924,7 +924,7 @@ Command::cmd_PSTAT(ostream & out, const UCS_string & arg)
       }
 
 Pfstat_ID iarg = PFS_ALL;
-   if (arg.size() > 0)   iarg = static_cast<Pfstat_ID>(arg.atoi());
+   if (arg.size() > 0)   iarg = Pfstat_ID(arg.atoi());
 
    Performance::print(iarg, out);
 }
@@ -1294,8 +1294,8 @@ Command::cmd_LIBS(ostream & out, const UCS_string_vector & args)
            }
 
         UTF8_string path(args[1]);
-        LibPaths::set_lib_dir(static_cast<LibRef>(libref), path.c_str(),
-                               LibPaths::LibDir::CSRC_CMD);
+        LibPaths::set_lib_dir(LibRef(libref), path.c_str(),
+                              LibPaths::LibDir::CSRC_CMD);
         out << "LIBRARY REFERENCE " << libref << " SET TO " << path << endl;
         return;
       }
@@ -1320,9 +1320,9 @@ Command::cmd_LIBS(ostream & out, const UCS_string_vector & args)
 
    loop(d, 10)
        {
-          UTF8_string path = LibPaths::get_lib_dir(static_cast<LibRef>(d));
+          UTF8_string path = LibPaths::get_lib_dir(LibRef(d));
           out << " " << d << " ";
-          switch(LibPaths::get_cfg_src(static_cast<LibRef>(d)))
+          switch(LibPaths::get_cfg_src(LibRef(d)))
              {
                 case LibPaths::LibDir::CSRC_NONE:      out << "NONE" << endl;
                                                      continue;
@@ -1362,9 +1362,9 @@ UCS_string arg("0");
         path = LibPaths::get_lib_dir(LIB0);
       }
    else if (arg.size() == 1 &&
-            Avec::is_digit(static_cast<Unicode>(arg[0])))   // case 2.
+            Avec::is_digit(Unicode(arg[0])))   // case 2.
       {
-        path = LibPaths::get_lib_dir(static_cast<LibRef>(arg[0] - '0'));
+        path = LibPaths::get_lib_dir(LibRef(arg[0] - '0'));
       }
    else                                        // case 3.
       {
@@ -1780,7 +1780,7 @@ LibRef wsid_lib = LIB0;
 UCS_string wsid_name = Workspace::get_WS_name();
    if (Avec::is_digit(wsid_name[0]))   // wsid contains a libnum
       {
-        wsid_lib = static_cast<LibRef>(wsid_name[0] - '0');
+        wsid_lib = LibRef(wsid_name[0] - '0');
         wsid_name.erase(0);
         wsid_name.remove_leading_whitespaces();
       }
@@ -1817,7 +1817,7 @@ Command::resolve_lib_wsname(ostream & out, const UCS_string_vector & args,
         return true;   // error
       }
 
-   lib = static_cast<LibRef>(args[0][0] - '0');
+   lib = LibRef(args[0][0] - '0');
    wsname = args[1];
    return false;   // OK
 }
@@ -2440,7 +2440,7 @@ bool got_minus = false;
 
    // "increment" TO so that we can compare ITEM < TO
    //
-   if (to.size())   to.last() = static_cast<Unicode>(to.last() + 1);
+   if (to.size())   to.last() = Unicode(to.last() + 1);
    
    return false;   // OK
 }

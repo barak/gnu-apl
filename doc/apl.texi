@@ -708,17 +708,18 @@ between GNU APL and IBM APL2.
 * Section 3.16::  Bit-wise Logical Functions ⊤∧, ⊤∨, ⊤⍲, and ⊤⍱
 * Section 3.17::  Dyadic ⎕CR
 * Section 3.18::  Dyadic ⎕FX (Native Functions)
-* Section 3.19::  ⎕ARG - Interpreter command line arguments
-* Section 3.20::  ⎕DLX - Knuth's Dancing Links Algorithm
-* Section 3.21::  ⎕ENV - Environment Variable
-* Section 3.22::  ⎕FIO - File I/O Functions
-* Section 3.23::  ⎕FFT - Fast Fourier Transform
-* Section 3.24::  ⎕GTK - GTK Interface
-* Section 3.25::  ⎕RE  - Regular Expressions
-* Section 3.26::  ⎕PS  - Print Style
-* Section 3.27::  ⎕SQL - SQL Database Interface
-* Section 3.28::  ⎕SI  - State Indicator
-* Section 3.29::  ⎕SYL - System limits
+* Section 3.19::  ⎕ARG  - Interpreter command line arguments
+* Section 3.20::  ⎕DLX  - Knuth's Dancing Links Algorithm
+* Section 3.21::  ⎕ENV  - Environment Variable
+* Section 3.22::  ⎕FIO  - File I/O Functions
+* Section 3.23::  ⎕FFT  - Fast Fourier Transform
+* Section 3.24::  ⎕GTK  - GTK Interface
+* Section 3.25::  ⎕PLOT - Plot Data
+* Section 3.26::  ⎕PS   - Print Style
+* Section 3.27::  ⎕RE   - Regular Expressions
+* Section 3.28::  ⎕SQL  - SQL Database Interface
+* Section 3.29::  ⎕SI   - State Indicator
+* Section 3.30::  ⎕SYL  - System limits
 @end menu
 
 There are a few possibly useful features in GNU APL:
@@ -776,7 +777,7 @@ echoing of stdin to stdout, automatic loading of a )CONTINUE workspaces,
 
 If the path to the interpreter is relative (which might be useful if you
 do not know in advance where the APL interpreter will be installed) then
-it must be in $PATH of the shell that runs the script).
+it must be in $PATH of the shell that runs the script.
 
 @subsection How command line arguments are handled
 
@@ -896,6 +897,11 @@ such options are passed to the application via ⎕ARG.
 
 In order to be really useful for scripting, three more features have been added:
 
+* ⎕ARG: access to the command line arguments given to the interpreter
+* ⎕ENV: access to the environment variables of the process running the
+        interpreter, and
+* ⎕INP: Here-Document-alike function for creating large text variables
+
 The system variable ⎕ARG contains all command line arguments passed to the
 interpreter. In the initial example above this would be a nested 3-element
 vector:
@@ -959,23 +965,31 @@ END-OF-⎕INP
 @subsection Multi-Line Strings
 
 Another feature of GNU APL to simplify the creation of values that contain
-longer texts are strings that span several lines. A major disadvantage of ⎕INP
-is that it can be used in immediate execution mode (and therefore also in
-scripts), but not in defined functions. In order to fill that gap, multi-line
-strings were introduced. They cme in two flavours: old-style and new-style.
+longer texts are strings that span several lines. One consequence of how ⎕INP
+works is that the strings read by ⎕INP always originate in stdin of the
+interpreter. In immediate execution mode (and therefore also in APL scripts)
+stdin is the next lines entered by the user (interactive APL sessions) or
+the next lines in the script file (in APL scripts). Often, however, a
+programmer wants to specify long strings inside a defined function and not
+on the top-level of an APL script. That renders ⎕SI almost useless for
+defined functions.
+
+In order to provide a way for defining long strings inside defined functions,
+multi-line strings were introduced. They come in two flavors: old-style
+and new-style.
 
 @subsubsection Old-style Multi-Line Strings
 
-Old-style multi-line Strings were the first attempt to provide long strings for defined functions. For that reason they worked only in defined functions, but
-not in immediate execution (and therefore also not in scripts outside defined
-functions). One reason for that was that these strings could easily be entered
-by mistake in immediate execution (by simply forgetting the terminating " or
-' of a string.
+Old-style multi-line strings were the first attempt to provide long strings for
+defined functions. These strings are not allowed in immediate execution mode
+because could easily be entered by mistake (by simply forgetting the
+terminating " or ' of a string) and that would have obscured the traditional
+behavior of immediate execution mode.
 
-An  old-style multi-line String starts at the last " in a (defined function)
-line with an odd number of " characters. It continues over the subsequent
-function lines until the next ". The result is a nested APL value containing
-one nested string per line involved.
+An  old-style multi-line string starts at the last " in a line of a defined
+function that has line with an odd number of " characters.  It continues over
+the subsequent function lines until the next ". The result is a nested APL
+value containing one nested string per line involved.
 
 For example:
 @verbatim
@@ -1017,24 +1031,31 @@ ABC
 @subsubsection New-style Multi-Line Strings
 
 Even though the combination of ⎕INP for immediate execution and multi-line
-strings for defined functions achieved their goals, it was certainly not
-very intuitive to have different approaches for different APL modes. This
-was leading to the new-style multi-line Strings. They adopted the triple
-quote (""") syntax know from e.g. the Python language. All in all is the
-syntax of new-style multi-line Strings cleaner: empty lines are handled more
-consistently and the string lines are separated from the APL code lines.
-More importantly, new-style multi-line Strings work alike in immediate
+strings for defined functions achieved the goal of specifying large amounts
+of text in a simple manner, its  was certainly not very intuitive or elegant
+to have different approaches for different APL modes.
+
+This was leading to the new-style multi-line strings. They adopted the triple
+quote (""") syntax know from e.g. the Python language. The syntax of new-style
+multi-line strings cleaner: empty lines are handled more consistently and the
+string lines are completely separated from the APL code lines.
+More importantly, new-style multi-line strings work alike in immediate
 execution mode, in scripts, and in defined functions. New-style strings are a
 little different and more restrictive than their old-style companions:
 
 * the starting """ must be placed at the end of an APL code line, i.e. no
-  mixing of APL code and string content on the same line
+  mixing of APL code and string content on the same line. In old-style strings
+   the APL line on which the string started became part of the string while
+   in new-style strings the strings begins at the following line.
 
 * the ending """ must be placed at the end of a separate lines with only spaces
   allowed before the """ (to vertically align it with the leading """ if so
-  desired).
+  desired). In old-style strings the text up to the termination " is part of
+  the string while in new-style strings it is not.
 
-* Neither the starting nor the ending line become nested strings of the result.
+* Neither the starting nor the ending line become nested strings of the result,
+  and every line can be clearly identified as being either APL code or else
+  string text.
 
 Example:
 @verbatim
@@ -1051,7 +1072,7 @@ ABC
 ┗∊━━━━━━━━━━━━━━━━━━━━━━━━━┛
 @end verbatim
 
-When entering a new-style multi-line Strings then the prompt is prepended by
+When entering a new-style multi-line strings then the prompt is prepended by
 → to indicate that a Multi-Line String is being entered.
 
 ⎕INP and old-style strings will coexist for s while, but may disappear at some
@@ -1736,9 +1757,9 @@ and
 convert the Boolean result vector R back to the integer result Z←2⊥R
 @end itemize
 
-Note: for boolean arguments the APL functions ≠ resp. = can be used to compute
-the more customary boolean functions XOR and XNOR. In this context = and ≠ are
-treated as boolean functions even though they accept non-boolean arguments,
+Note: for Boolean arguments the APL functions ≠ resp. = can be used to compute
+the more customary Boolean functions XOR and XNOR. In this context = and ≠ are
+treated as Boolean functions even though they accept non-Boolean arguments,
 
 For example (using  5 ⎕CR (4⍴256)⊤X to display X in hex):
 
@@ -1793,7 +1814,7 @@ a left argument of 0:
       ⊤⍱ B    ←→    0 ⊤⍱ B      ⍝ bit-wise Not
 @end verbatim
 
-Even though that Or-ing a boolean vector with 0 itself has no effect, the
+Even though that Or-ing a Boolean vector with 0 itself has no effect, the
 monadic ⊤∨ and ⊤⍱ are still useful due to their side effects: conversion
 from near-integer float values to integers (monadic @b{⊤∨} and inversion
 of the bits (monadic @b{⊤⍱}, The latter is needed since ∼ has a monadic
@@ -1828,8 +1849,8 @@ That also works for complex numbers with a near-zero imaginary part:
 16
 @end verbatim
 
-As a matter of fact, @b{⊤∨} works for all near-gaussian complex numbers,
-but the effect is not visible with 26 ⎕CR since gaussian and non-gaussian
+As a matter of fact, @b{⊤∨} works for all near-Gaussian complex numbers,
+but the effect is not visible with 26 ⎕CR since Gaussian and non-Gaussian
 complex numbers have the same cell type in GNU APL.
 
 @subsection Monadic ⊤∧
@@ -1861,14 +1882,14 @@ monadic ⊤∧ which works like ⊤∨ except that the permitted distance from a
 nearby integer is now controlled by ⎕CT rather than by the integer tolerance.
 
 All bit-wise logical functions throw a DOMAIN ERROR if an argument is not close
-enough to an integer. integer tolerance is typically sdmaller than ⎕CT and
+enough to an integer. integer tolerance is typically smaller than ⎕CT and
 in that case is ⊤∧ little more tolerant than ⊤∨ regarding the distance to
 nearby integers. In addition ⊤∧ gives the user (via ⎕CT) more control over
 the permitted tolerance for real numbers in the neighborhood of integers.
 
 @subsection Character Arguments for Monadic ⊤⍱ and Dyadic ⊤∧, ⊤∨, ==, and ≠≠
 
-Some of the bitwise operations are allowed to have characters as their right
+Some of the bit-wise operations are allowed to have characters as their right
 argument. If the right argument is a character then the result is a character
 as well. This can be useful for masking purposes such as extracting the lower
 7 bits of 8-bit bytes containing ASCII characters.
@@ -2548,6 +2569,194 @@ and has therefore been put into a separate document.
 See: @b{HOWTOs/Quad-GTK.html}.
 
 @node    Section 3.25
+@section ⎕PLOT - Plot Data
+
+⎕PLOT is a function for visualizing numerical APL values. The values to be
+plotted are provided as the right argument of ⎕PLOT while the optional
+left argument controls details of the output, such as the plot window size,
+colors for lines and grids, etc.
+
+The general syntax of ⎕PLOT is:
+
+@verbatim
+   ⎕PLOT ''      ⍝ show a list of attrinutes and their default values
+   H←⎕PLOT B     ⍝ plot B with all attributes set to their default values
+   H←A ⎕PLOT B   ⍝ plot B with some of the default attributes overridden
+   ⎕PLOT H       ⍝ close the plot window with handle H
+   ⎕PLOT  0      ⍝ verbosity: OFF (do not print attribute values)
+   ⎕PLOT ¯1      ⍝ verbosity: ON (print attribute values before plotting)
+   ⎕PLOT ¯2      ⍝ verbosity: DEBUG (also print debug information)
+@end verbatim
+
+@subsection The Plot Data B
+
+The Plot Data B can be a vector (in that case a single plot line is being
+plotted) or a matrix (in that case one plot line per matrix row is being
+plotted, by default in different colors). Each data item has to be numeric
+and represents one point in the plot. The points that are adjacent in a row
+of the matrix are connected by lines. By default plotted points and the lines
+connecting them have the same color. However, all colors used, all diameters
+of points, and all thicknesses of the lines can be controlled by overriding
+the default values (dyadic A ⎕PLOT B).
+
+@subsubsection Complex Plot Data
+
+If a data item B[N] or B[row;N] is @b{complex}, say B[N] = x + iy. then it is
+placed (after some scaling) at position (x, y) of the plot. The X-range
+[Xmin ... Xmax] of the plot is then determined by the real parts of B,
+and the Y-range [Ymin ... Ymax] of the plot is determined by the imaginary
+parts of B. That is:
+
+@verbatim
+Xmin ← ⌊/,9○B    ⍝ smallest real part of B
+Xmax ← ⌈/,9○B    ⍝ largest real part of B
+Ymin ← ⌊/,11○B   ⍝ smallest imaginary part of B
+Ymax ← ⌈/,11○B   ⍝ largest imaginary part of B
+@end verbatim
+
+Example (plot a circle (actually: a regular 20-gon)):
+
+@verbatim
+      ⎕PLOT +⌿1 0J1×[1]1 2 ∘.○ (0,⍳2×N) × ○÷N←10
+@end verbatim
+
+produces this plot window (only visible in the HTML version of this document;
+in text mode see file @b{doc/PLOT_circle.png}):
+
+@image {PLOT_circle}
+
+@subsubsection Real Plot Data
+
+On the other hand, if a data item B[N] or B[row;N] is @b{real}, then it is
+placed at position (N, x) of the plot. The X-range is then\
+[⎕IO ... ⎕IO + ¯1↑⍴B] and the Y-range [Ymin ... Ymax] of the plot is
+determined by the values parts of B. That is:
+
+@verbatim
+Xmin ← ⎕IO         ⍝ smallest real part of B
+Xmax ← ⎕IO + ⌈/B   ⍝ largest real part of B
+Ymin ← ⌊/,B        ⍝ smallest value in B
+Ymax ← ⌈/,B        ⍝ largest value in B
+@end verbatim
+
+In theory one can also mix real and complex values, even though doing so makes
+little sense.
+
+Example:
+
+@verbatim
+      ⎕PLOT ⎕PLOT 0 1 ¯1 2 ¯2 3 ¯3
+@end verbatim
+
+produces this plot window (only visible in the HTML version of this document;
+in text mode see file @b{doc/PLOT_zigzag.png}):
+
+@image {PLOT_zigzag}
+
+@subsection The Plot Attributes A
+
+As can be displayed by ⎕PLOT "" there is quite a number of attributes that
+control how the resulting plot looks like:
+
+@verbatim
+      ⎕PLOT ''
+   ⎕PLOT Usage:
+
+   ⎕PLOT B     plot B with default attribute values
+   A ⎕PLOT B   plot B with attributes A
+
+   A is a nested vector of strings.
+   Each string has the form "Attribute: Value"
+   Colors are specified either as #RGB or as #RRGGBB or as RR GG BB)
+   The attributes understood and their defaults are:
+
+   1. Global (plot window) Attributes:
+
+caption:            GNU APL PLOT   (plot window caption)
+pa_width:           600 pixel      (plotarea width)
+pa_height:          400 pixel      (plotarea height)
+pa_border_L:        30 pixel       (pixels left of the plotarea)
+pa_border_R:        20 pixel       (pixels right of the plotarea)
+pa_border_T:        25 pixel       (pixels above the plotarea)
+pa_border_B:        25 pixel       (pixels below the plotarea)
+gridx_style:        1              (X grid style (0-2))
+gridx_pixels:       44 pixel       (pixels between X grid lines)
+gridy_style:        1              (Y grid style (0-2))
+gridy_pixels:       33 pixel       (pixels between Y grid lines)
+border_width:       10 pixel       (width of the window border)
+canvas_color:       #FFFFFF        (background color of the plot window)
+gridX_color:        #000000        (color of the X-grid lines)
+gridX_line_width:   1 pixel        (thickness of the X-grid lines)
+gridY_color:        #000000        (color of the Y-grid lines)
+gridY_line_width:   1 pixel        (thickness of the Y-grid lines)
+legend_X:           50 pixel       (the X position of the legend)
+legend_Y:           50 pixel       (the Y position of the legend)
+legend_dY:          15 pixel       (the distance between legend lines)
+legend_lX:          50 pixel       (the length of the legend lines)
+
+   2. Local (plot line N) Attributes:
+
+line_color-N:       #00FF00        (the color of plot line N)
+line_width-N:       3 pixel        (the thickness of plot line N)
+point_color-N:      #00FF00        (the color of the plot points)
+point_size-N:       8 pixel        (the diameter of the plot points)
+legend_name-N:                     (the name of plot line N in the legend)
+@end verbatim
+
+There are 2 kinds of attributes: global attributes that affect the entire plot,
+and local (per-line) attributes that affect one of the plot lines (which
+corresponds to one row of B). The most convenient way to specify multiple
+attributes in one go is to use multi-line strings.
+
+For example (plot 2 lines of 10 random numbers each, named "random row 1" and
+"random row 2"):
+
+@verbatim
+      Data ← ?2 10⍴10   ⍝ two rows of random data
+      Attributes  ← """
+legend_name-0: Random Row 1
+legend_name-1: Random Row 2
+                    """
+      Attributes ⎕PLOT Data
+@end verbatim
+
+@subsection Plot Window Handling
+
+Each call of ⎕PLOT with some plot data B opens a separate window in the X
+server (which implies that ⎕PLOT requires X). That window runs in its own
+thread until it is being closed. A window can be closed in different ways:
+
+* By the user clicking on the close button (at the top-right) of the window, or
+* By the user opening the drop down menu of the window (at the top left of the
+  window) and selecting the option named "Close", or
+* from APL by calling 
+
+@node    Section 3.26
+@section ⎕PS - Print Style
+
+⎕PS is an integer vector that currently (read: SVN 982) contains two integers
+which control some details of how APL values are being printed. The default
+value of ⎕PS is 0 0. ⎕PS is a session variable which survives )LOADing of
+workspaces
+
+⎕PS[1] = 0: print rational quotients a normal floating point numbers
+
+⎕PS[1] = 1: print rational quotients as A÷B
+
+Note: ⎕PS[1] has only an effect if rational numbers were ./configured.
+
+⎕PS[2] = 0: no "boxing" of APL values
+
+⎕PS[2] > 0: "boxing" of APL values according to ⎕PS[2].
+
+Setting ⎕PS[2] has the same effect as the debug command ]BOXING and uses
+the same values.
+
+Note: For compatibility with older workspaces, Assigning a single value to
+⎕PS assigns that value to ⎕PS[2] and sets ⎕PS[1] to 0.
+
+
+@node    Section 3.27
 @section ⎕RE - Regular Expressions
 
 ⎕RE is a function that provides access to a subset of libpcre2, which is a
@@ -2848,32 +3057,8 @@ The same for the pos+len output format:
 @end verbatim
 
 
-@node    Section 3.26
-@section ⎕PS - Print Style
 
-⎕PS is an integer vector that currently (read: SVN 982) contains two integers
-which control some details of how APL values are being printed. The default
-value of ⎕PS is 0 0. ⎕PS is a session variable which survives )LOADing of
-workspaces
-
-⎕PS[1] = 0: print rational quotients a normal floating point numbers
-
-⎕PS[1] = 1: print rational quotients as A÷B
-
-Note: ⎕PS[1] has only an effect if rational numbers were ./configured.
-
-⎕PS[2] = 0: no "boxing" of APL values
-
-⎕PS[2] > 0: "boxing" of APL values according to ⎕PS[2].
-
-Setting ⎕PS[2] has the same effect as the debug command ]BOXING and uses
-the same values.
-
-Note: For compatibility with older workspaces, Assigning a single value to
-⎕PS assigns that value to ⎕PS[2] and sets ⎕PS[1] to 0.
-
-
-@node    Section 3.27
+@node    Section 3.28
 @section ⎕SQL - SQL Database Interface
 
 As of GNU APL 1.6, the native function SQL has been replaced by the
@@ -2993,7 +3178,7 @@ More columns containing extra information may be added in a future
 release.
 
 
-@node    Section 3.28
+@node    Section 3.29
 @section ⎕SI - State Indicator
 
 ⎕SI returns aspects of the current State Indicator, similar to the standard
@@ -3057,7 +3242,7 @@ For example, ¯1 ⎕SI refers to the currently executing context, ¯2 ⎕SI is
 the caller, and so on.
 
 
-@node    Section 3.29
+@node    Section 3.30
 @section ⎕SYL - System limits
 
 System variable ⎕SYL shows a number of system limits when referenced:

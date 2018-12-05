@@ -308,7 +308,7 @@ Token
 Quad_FFT::eval_B(Value_P B)
 {
     MORE_ERROR() <<
-"⎕FFT is not available because either no libpcre2 libfftw3 was found on this\n"
+"⎕FFT is not available because either no libfftw3 library was found on this\n"
 "system when GNU APL was compiled, or because it was disabled in ./configure.";
 
    SYNTAX_ERROR;

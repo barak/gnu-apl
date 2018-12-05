@@ -132,8 +132,7 @@ UTF8_string::UTF8_string(const UCS_string & ucs)
 }
 //-----------------------------------------------------------------------------
 UTF8_string::UTF8_string(const Value & value)
-   : Simple_string<UTF8, false>(int(value.element_count())
-     , static_cast<UTF8>(0))
+   : Simple_string<UTF8, false>(int(value.element_count()), UTF8(0))
 {
    loop(v, value.element_count())
        {
@@ -377,7 +376,7 @@ operator<<(ostream & os, const UTF8_string & utf)
 int
 UTF8_filebuf::overflow(int c)
 {
-   data.append(static_cast<UTF8>(c));
+   data.append(UTF8(c));
    return 0;
 }
 //=============================================================================

@@ -545,7 +545,7 @@ StateIndicator::statement_result(Token & result, bool trace)
         if (ufun && (ufun->get_exec_properties()[0] == 0))
            {
              const Function_Line line =
-                   executable->get_line(static_cast<Function_PC>(get_PC() - 1));
+                   executable->get_line(Function_PC(get_PC() - 1));
              result.show_trace(COUT, ufun->get_name(), line);
            }
       }

@@ -161,6 +161,7 @@ qv( PS            , "⎕PS"     ,          )
   /**  OPER2_PRODUCT removed              **/
 qv( PW            , "⎕PW"     , = 0x5009 )
 sf( OPER2_POWER   , "⍣"       ,          )
+qf( PLOT          , "⎕PLOT"   ,          )
 
 st( Quad_Quad     , "⎕"       , = 0x5101 )
 st( QUOTE1        , "'"       ,          )

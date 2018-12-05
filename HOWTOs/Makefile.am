@@ -1,6 +1,7 @@
 
 dist_doc_DATA =	APL-on-Macintosh.pdf \
 		APL-Communication-Cookbook.html \
+		Adding-System-Functions.html \
 		Quad-GTK.html \
 		glade-0.png \
 		glade-1.png \

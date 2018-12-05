@@ -319,7 +319,7 @@ struct tf3_header
 const uint8_t * data = cdr.get_items();
 
 const uint32_t nelm = get_4_be(data + 8);
-const CDR_type vtype = static_cast<CDR_type>(data[12]);
+const CDR_type vtype = CDR_type(data[12]);
 const Rank rank = data[13];
 Shape shape;
    loop(r, rank)

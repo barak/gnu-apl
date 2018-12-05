@@ -1309,7 +1309,7 @@ const bool ws_to_ws = Svar_DB::is_ws_to_ws(get_SV_key());
                    for (const uint32_t * varname =
                                          Svar_DB::get_svar_name(get_SV_key());
                         varname && *varname; ++varname)
-                       CERR << static_cast<Unicode>(*varname++);
+                       CERR << Unicode(*varname++);
                    CERR << " is blocked on set. Waiting ...";
                  }
             }
@@ -1400,7 +1400,7 @@ const bool ws_to_ws = Svar_DB::is_ws_to_ws(get_SV_key());
                    for (const uint32_t * varname =
                                          Svar_DB::get_svar_name(get_SV_key());
                         varname && *varname; ++varname)
-                       CERR << static_cast<Unicode>(*varname++);
+                       CERR << Unicode(*varname++);
                    CERR << " is blocked on use. Waiting ...";
                  }
             }

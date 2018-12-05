@@ -419,11 +419,11 @@ TabExpansion::expand_filename(UCS_string & user,
              UCS_string libs_present;
              loop(lib, 10)
                  {
-                    if (!LibPaths::is_present(static_cast<LibRef>(lib)))
+                    if (!LibPaths::is_present(LibRef(lib)))
                        continue;
 
                     libs_present.append(UNI_ASCII_SPACE);
-                    libs_present.append(static_cast<Unicode>(UNI_ASCII_0 + lib));
+                    libs_present.append(Unicode(UNI_ASCII_0 + lib));
                  }
              if (libs_present.size() == 0)   goto nothing;
 
@@ -442,13 +442,13 @@ TabExpansion::expand_filename(UCS_string & user,
         //
         if (ehint != EH_oLIB_WSNAME)   goto nothing;
 
-        const LibRef lib = static_cast<LibRef>(arg[0] - '0');
+        const LibRef lib = LibRef(arg[0] - '0');
 
         if (arg.size() == 1 && !have_trailing_blank)   // no space yet
            {
              user = cmd;
              user.append(UNI_ASCII_SPACE);
-             user.append(static_cast<Unicode>(arg[0]));
+             user.append(Unicode(arg[0]));
              user.append(UNI_ASCII_SPACE);
              return ER_REPLACE;
            }

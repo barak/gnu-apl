@@ -344,7 +344,7 @@ char * V = TLV + 8;
         UTF8_string data_utf;   // H:widget:callback
         loop(v, V_len)   data_utf.append(V[v]);
         UCS_string data_ucs(data_utf);
-        data_ucs[0] = (static_cast<Unicode>(fd));
+        data_ucs[0] = (Unicode(fd));
 
         event_queue.append(data_ucs);
 

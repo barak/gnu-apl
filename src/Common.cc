@@ -119,7 +119,7 @@ enum { MAX_RLIMIT_AS = 4000000000UL };
 
    if (log_startup)
       {
-        if (initial_rlimit == ~static_cast<rlim_t>(0))
+        if (initial_rlimit == ~rlim_t(0))
           CERR << "initial RLIMIT_AS (aka. virtual memory) is: 'unlimited'"
                << endl;
         else
@@ -408,7 +408,7 @@ Value_P Z(loc);
 Value_P
 Idx0(const char * loc)
 {
-Value_P Z(static_cast<ShapeItem>(0), loc);
+Value_P Z(ShapeItem(0), loc);
    Z->check_value(LOC);
    return Z;
 }
@@ -416,7 +416,7 @@ Value_P Z(static_cast<ShapeItem>(0), loc);
 Value_P
 Str0(const char * loc)
 {
-Value_P Z(static_cast<ShapeItem>(0), loc);
+Value_P Z(ShapeItem(0), loc);
    Z->set_proto_Spc();
    Z->check_value(LOC);
    return Z;
@@ -425,7 +425,7 @@ Value_P Z(static_cast<ShapeItem>(0), loc);
 Value_P
 Str0_0(const char * loc)
 {
-Shape sh(static_cast<ShapeItem>(0), static_cast<ShapeItem>(0));
+Shape sh(ShapeItem(0), ShapeItem(0));
 Value_P Z(sh, loc);
    Z->set_proto_Spc();
    Z->check_value(LOC);
@@ -435,7 +435,7 @@ Value_P Z(sh, loc);
 Value_P
 Idx0_0(const char * loc)
 {
-Shape sh(static_cast<ShapeItem>(0), static_cast<ShapeItem>(0));
+Shape sh(ShapeItem(0), ShapeItem(0));
 Value_P Z(sh, loc);
    Z->check_value(LOC);
    return Z;

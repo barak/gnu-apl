@@ -163,7 +163,7 @@ char peer[100];
         server_sockname = 0;
         logit && get_CERR() << "Using TCP socket towards APserver..."
                             << endl;
-        sock = static_cast<TCP_socket>(socket(AF_INET, SOCK_STREAM, 0));
+        sock = TCP_socket(socket(AF_INET, SOCK_STREAM, 0));
         if (sock == NO_TCP_SOCKET)
            {
              get_CERR() << "*** socket(AF_INET, SOCK_STREAM, 0) failed at "
@@ -280,7 +280,7 @@ char peer[100];
    usleep(50000);
    logit && get_CERR() << "connected to APserver, socket is " << sock << endl;
 
-   return static_cast<TCP_socket>(sock);
+   return TCP_socket(sock);
 }
 //-----------------------------------------------------------------------------
 void
@@ -401,7 +401,7 @@ Signal_base * response =
 
    if (response)
       {
-        events = static_cast<Svar_event>(response->get__EVENTS_ARE__events());
+        events = Svar_event(response->get__EVENTS_ARE__events());
         const SV_key ret = response->get__EVENTS_ARE__key();
         delete response;
         return ret;
@@ -431,8 +431,7 @@ Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
 
    if (response)
       {
-        const Svar_event ret = static_cast<Svar_event>
-                                          (response->get__EVENTS_ARE__events());
+        const Svar_event ret = Svar_event(response->get__EVENTS_ARE__events());
         delete response;
         return ret;
       }
@@ -540,15 +539,12 @@ Signal_base * response = Signal_base::recv_TCP(tcp, buffer, sizeof(buffer),
 
    if (response)
       {
-         offering_id.proc =
-                  static_cast<AP_num>(response->get__OFFERING_ID_IS__proc());
-         offering_id.parent =
-                  static_cast<AP_num>(response->get__OFFERING_ID_IS__parent());
-         offering_id.grand =
-                  static_cast<AP_num>(response->get__OFFERING_ID_IS__grand());
+         offering_id.proc = AP_num(response->get__OFFERING_ID_IS__proc());
+         offering_id.parent = AP_num(response->get__OFFERING_ID_IS__parent());
+         offering_id.grand = AP_num(response->get__OFFERING_ID_IS__grand());
         delete response;
       }
-       
+
    return offering_id;
 }
 //-----------------------------------------------------------------------------

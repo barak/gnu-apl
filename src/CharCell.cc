@@ -28,40 +28,40 @@ CharCell::get_cell_subtype() const
    if (value.ival < 0)   // negative char (only fits in signed containers)
       {
         if (-value.ival <= 0x80)
-           return static_cast<CellType>(CT_CHAR | CTS_S8 | CTS_S16 | CTS_S32 | CTS_S64);
+           return CellType(CT_CHAR | CTS_S8 | CTS_S16 | CTS_S32 | CTS_S64);
 
         if (-value.ival <= 0x8000)
-           return static_cast<CellType>(CT_CHAR | CTS_S16 | CTS_S32 | CTS_S64);
+           return CellType(CT_CHAR | CTS_S16 | CTS_S32 | CTS_S64);
 
-        return static_cast<CellType>(CT_CHAR | CTS_S32 | CTS_S64);
+        return CellType(CT_CHAR | CTS_S32 | CTS_S64);
       }
 
    // positive char
    //
    if (value.ival <= 0x7F)
-      return static_cast<CellType>(CT_CHAR | CTS_X8  | CTS_S8  | CTS_U8  |
-                                   CTS_X16 | CTS_S16 | CTS_U16 |
-                                   CTS_X32 | CTS_S32 | CTS_U32 |
-                                   CTS_X64 | CTS_S64 | CTS_U64);
+      return CellType(CT_CHAR | CTS_X8  | CTS_S8  | CTS_U8  |
+                      CTS_X16 | CTS_S16 | CTS_U16 |
+                      CTS_X32 | CTS_S32 | CTS_U32 |
+                      CTS_X64 | CTS_S64 | CTS_U64);
 
    if (value.ival <= 0xFF)
-      return static_cast<CellType>(CT_CHAR |                     CTS_U8  |
-                                   CTS_X16 | CTS_S16 | CTS_U16 |
-                                   CTS_X32 | CTS_S32 | CTS_U32 |
-                                   CTS_X64 | CTS_S64 | CTS_U64);
+      return CellType(CT_CHAR |                     CTS_U8  |
+                      CTS_X16 | CTS_S16 | CTS_U16 |
+                      CTS_X32 | CTS_S32 | CTS_U32 |
+                      CTS_X64 | CTS_S64 | CTS_U64);
 
    if (value.ival <= 0x7FFF)
-      return static_cast<CellType>(CT_CHAR | CTS_X16 | CTS_S16 | CTS_U16 |
-                                   CTS_X32 | CTS_S32 | CTS_U32 |
-                                   CTS_X64 | CTS_S64 | CTS_U64);
+      return CellType(CT_CHAR | CTS_X16 | CTS_S16 | CTS_U16 |
+                      CTS_X32 | CTS_S32 | CTS_U32 |
+                      CTS_X64 | CTS_S64 | CTS_U64);
 
    if (value.ival <= 0xFFFF)
-      return static_cast<CellType>(CT_CHAR |                     CTS_U16 |
-                                   CTS_X32 | CTS_S32 | CTS_U32 |
-                                   CTS_X64 | CTS_S64 | CTS_U64);
+      return CellType(CT_CHAR |                     CTS_U16 |
+                      CTS_X32 | CTS_S32 | CTS_U32 |
+                      CTS_X64 | CTS_S64 | CTS_U64);
 
-   return static_cast<CellType>(CT_CHAR | CTS_X32 | CTS_S32 | CTS_U32 |
-                                CTS_X64 | CTS_S64 | CTS_U64);
+   return CellType(CT_CHAR | CTS_X32 | CTS_S32 | CTS_U32 |
+                   CTS_X64 | CTS_S64 | CTS_U64);
 }
 //-----------------------------------------------------------------------------
 bool
@@ -188,16 +188,16 @@ const Unicode uni = get_char_value();
 ErrorCode
 CharCell::bif_not_bitwise(Cell * Z) const
 {
-   return zv(Z, static_cast<Unicode>(get_char_value() ^ 0xFFFFFFFF));
+   return zv(Z, Unicode(get_char_value() ^ 0xFFFFFFFF));
 }
 //-----------------------------------------------------------------------------
 ErrorCode
 CharCell::bif_and_bitwise(Cell * Z, const Cell * A) const
 {
    if (A->is_character_cell())
-     return zv(Z, static_cast<Unicode>(value.aval & A->get_char_value()));
+     return zv(Z, Unicode(value.aval & A->get_char_value()));
    else if (A->is_numeric())
-      return zv(Z, static_cast<Unicode>(value.aval & A->get_int_value()));
+      return zv(Z, Unicode(value.aval & A->get_int_value()));
    else
       return E_DOMAIN_ERROR;
 }
@@ -206,9 +206,9 @@ ErrorCode
 CharCell::bif_or_bitwise(Cell * Z, const Cell * A) const
 {
    if (A->is_character_cell())
-     return zv(Z, static_cast<Unicode>(value.aval | A->get_char_value()));
+     return zv(Z, Unicode(value.aval | A->get_char_value()));
    else if (A->is_numeric())
-      return zv(Z, static_cast<Unicode>(value.aval | A->get_int_value()));
+      return zv(Z, Unicode(value.aval | A->get_int_value()));
    else
       return E_DOMAIN_ERROR;
 }
@@ -217,11 +217,9 @@ ErrorCode
 CharCell::bif_equal_bitwise(Cell * Z, const Cell * A) const
 {
    if (A->is_character_cell())
-     return zv(Z, static_cast<Unicode>
-                             (0xFFFFFFFF & (value.aval ^ A->get_char_value())));
+     return zv(Z, Unicode(0xFFFFFFFF & (value.aval ^ A->get_char_value())));
    else if (A->is_numeric())
-      return zv(Z, static_cast<Unicode>
-                             (0xFFFFFFFF & (value.aval ^ A->get_int_value())));
+      return zv(Z, Unicode(0xFFFFFFFF & (value.aval ^ A->get_int_value())));
    else
       return E_DOMAIN_ERROR;
 }
@@ -230,11 +228,9 @@ ErrorCode
 CharCell::bif_not_equal_bitwise(Cell * Z, const Cell * A) const
 {
    if (A->is_character_cell())
-     return zv(Z, static_cast<Unicode>
-                             (value.aval ^ A->get_char_value()));
+     return zv(Z, Unicode(value.aval ^ A->get_char_value()));
    else if (A->is_numeric())
-      return zv(Z, static_cast<Unicode>
-                             (value.aval ^ A->get_int_value()));
+      return zv(Z, Unicode(value.aval ^ A->get_int_value()));
    else
       return E_DOMAIN_ERROR;
 }

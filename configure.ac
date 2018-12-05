@@ -81,12 +81,16 @@ AC_CHECK_HEADERS([	\
 	inttypes.h	\
 	stdint.h	\
 	stdlib.h	\
-        string.h	\
+	string.h	\
 	strings.h	\
 	unistd.h	\
 	sys/un.h	\
 	ext/atomicity.h	\
+	xcb/xcb.h	\
 	utmpx.h])
+
+# xcb/xproto.h needs xcb/xcb.h
+AC_CHECK_HEADER(xcb/xproto.h, [], [], [#include <xcb/xcb.h>])
 
 # Checks for typedefs, structures, and compiler characteristics.
 #
@@ -125,11 +129,12 @@ AC_CHECK_LIB(
 		LIBS="-lcurses $LIBS"])
 	])
 
-AC_CHECK_LIB([execinfo],  [backtrace])
-AC_CHECK_LIB([m],         [acosh])
-AC_CHECK_LIB([pthread],   [sem_init])
-AC_CHECK_LIB([dl],        [dlopen])
-AC_CHECK_LIB([fftw3],     [fftw_plan_dft])
+AC_CHECK_LIB([execinfo], [backtrace])
+AC_CHECK_LIB([m],        [acosh])
+AC_CHECK_LIB([pthread],  [sem_init])
+AC_CHECK_LIB([dl],       [dlopen])
+AC_CHECK_LIB([fftw3],    [fftw_plan_dft])
+AC_CHECK_LIB([xcb],      [xcb_connect])
 
 # check if SQLite3 is wanted and installed
 m4_include([m4/ax_lib_sqlite3.m4])            AX_LIB_SQLITE3([])
@@ -164,6 +169,15 @@ if test "x$USABLE_PostgreSQL" = "xyes"; then
 fi
 fi
 
+# check if libxcb is installed
+PKG_CHECK_MODULES(XCBLIBS, [xcb >= 1.6], [HAVE_libxcb=yes], [HAVE_libxcb=no])
+AM_CONDITIONAL(HAVE_LIBXCB, test "$HAVE_libxcb" = yes)
+if test "$HAVE_libxcb" = yes; then
+   AC_DEFINE_UNQUOTED(HAVE_GTK3, [1], [libxcb is installed])
+else
+   AC_DEFINE_UNQUOTED(HAVE_GTK3, [0], [libxcb is NOT installed])
+fi
+
 # check if libpcre is installed
 m4_include([m4/ax_path_lib_pcre.m4])
    AX_PATH_LIB_PCRE([])
@@ -173,7 +187,7 @@ AM_CONDITIONAL(HAVE_LIBPCRE2_32,
 # check for GTK+ version 3
 #
 AC_ARG_WITH([gtk3], AS_HELP_STRING([--with-gtk3],
-     [Build with ⎕GTK (interface to GTK+ version 3)]))
+     [enable ⎕GTK (interface to GTK+ version 3; needs libgtk-3 and more)]))
 PKG_CHECK_MODULES([GTK], [gtk+-3.0], [HAVE_gtk3=yes], [HAVE_gtk3=no])
 AM_CONDITIONAL(HAVE_GTK3, test "x$HAVE_gtk3" = xyes)
 if test "x$HAVE_gtk3" = xyes; then

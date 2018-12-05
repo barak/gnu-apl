@@ -349,7 +349,7 @@ const int b0 = fgetc(file);
    if (b0 == EOF)   return UNI_EOF;
 
    ++fget_count;
-   if (!(b0 & 0x80))   return static_cast<Unicode>(b0);   // ASCII
+   if (!(b0 & 0x80))   return Unicode(b0);   // ASCII
 
 int len,bx;
    if      ((b0 & 0xE0) == 0xC0)   { len = 2;   bx = b0 & 0x1F; }
@@ -1070,7 +1070,7 @@ const APL_Integer function_number = X->get_ravel(0).get_near_int();
                 const int len = strlen(text);
                 Value_P Z(len, LOC);
                 loop(t, len)   new (Z->next_ravel())
-                               CharCell(static_cast<Unicode>(text[t]));
+                               CharCell(Unicode(text[t]));
 
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
@@ -1294,7 +1294,7 @@ const APL_Integer function_number = X->get_ravel(0).get_near_int();
                 Value_P Z(len, LOC);
                 Z->set_proto_Spc();
                 loop(z, len) new (Z->next_ravel())
-                             CharCell(static_cast<Unicode>(data[z]));
+                             CharCell(Unicode(data[z]));
                 munmap(data, len);
 
                 Z->set_default_Spc();
@@ -1588,8 +1588,7 @@ const APL_Integer function_number = X->get_ravel(0).get_near_int();
          case 200:   // clear statistics Bi
          case 201:   // get statistics Bi
               {
-                const Pfstat_ID b = static_cast<Pfstat_ID>
-                                    (B->get_ravel(0).get_int_value());
+                const Pfstat_ID b = Pfstat_ID(B->get_ravel(0).get_int_value());
                 Statistics * stat = Performance::get_statistics(b);
                 if (stat == 0)   DOMAIN_ERROR;   // bad statistics ID
 
@@ -1743,7 +1742,7 @@ const APL_Integer function_number = X->get_ravel(0).get_near_int();
                    t.tm_isdst = -1;
 
                const time_t seconds = mktime(&t);
-               if (seconds == static_cast<time_t>(-1))   DOMAIN_ERROR;
+               if (seconds == time_t(-1))   DOMAIN_ERROR;
 
                 Value_P Z(4, LOC);
                 new (Z->next_ravel()) IntCell(seconds);

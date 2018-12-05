@@ -286,7 +286,7 @@ Value::Value(const UTF8_string & utf, const char * loc)
 
    new (&get_ravel(0)) CharCell(UNI_ASCII_SPACE);   // prototype
    loop(l, utf.size())
-       new (next_ravel()) CharCell(static_cast<Unicode>(utf[l] & 0xFF));
+       new (next_ravel()) CharCell(Unicode(utf[l] & 0xFF));
    set_complete();
 }
 //-----------------------------------------------------------------------------
@@ -326,7 +326,7 @@ const ShapeItem width = pb.get_width(0);
 //-----------------------------------------------------------------------------
 Value::Value(const char * loc, const Shape * sh)
    : DynamicObject(loc, &all_values),
-     shape(static_cast<ShapeItem>(sh->get_rank())),
+     shape(ShapeItem(sh->get_rank())),
      flags(VF_NONE),
      valid_ravel_items(0)
 {
@@ -1567,12 +1567,12 @@ PrintContext pctx = Workspace::get_PrintContext(PR_APL);
            {
              return out << endl;
            }
-            
+
         pctx.set_style(PR_APL_MIN);
       }
    else                  // matrix or higher
       {
-        pctx.set_style(static_cast<PrintStyle>(pctx.get_style() | PST_NO_FRACT_0));
+        pctx.set_style(PrintStyle(pctx.get_style() | PST_NO_FRACT_0));
       }
 
 PrintBuffer pb(*this, pctx, &out);   // constructor prints it
@@ -1592,7 +1592,7 @@ int style = pctx.get_style();
         style |= PST_NO_FRACT_0;
       }
 
-   pctx.set_style(static_cast<PrintStyle>(style));
+   pctx.set_style(PrintStyle(style));
 
 PrintBuffer pb(*this, pctx, &out);
    return out;

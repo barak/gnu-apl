@@ -77,7 +77,7 @@ APL_value
 char_scalar(int uni, const char * loc)
 {
 Value_P Z(loc);
-   new (Z->next_ravel()) CharCell(static_cast<Unicode>(uni));
+   new (Z->next_ravel()) CharCell(Unicode(uni));
    Value_P::increment_owner_count(Z.get(), loc);   // keep value
    return Z.get();
 }
@@ -236,14 +236,14 @@ Value_P Z(sh, LOC);
         return Z.get();
       }
 
-   if (!Avec::is_first_symbol_char(static_cast<Unicode>(*var_name_ucs)))
+   if (!Avec::is_first_symbol_char(Unicode(*var_name_ucs)))
       return 0;
 
 UCS_string var_name;
    var_name.reserve(40);
    while (*var_name_ucs)
       {
-        const Unicode uni = static_cast<Unicode>(*var_name_ucs++);
+        const Unicode uni = Unicode(*var_name_ucs++);
         if (!Avec::is_symbol_char(uni))   return 0;
         var_name.append(uni);
       }
@@ -272,7 +272,7 @@ Cell * cell = &val->get_ravel(idx);
         Value_P::decrement_owner_count(v, LOC);
       }
 
-   new (cell)   CharCell(static_cast<Unicode>(new_char));
+   new (cell)   CharCell(Unicode(new_char));
 }
 //-----------------------------------------------------------------------------
 
@@ -369,7 +369,7 @@ apl_exec_ucs(const unsigned int * line_ucs)
 { 
 UCS_string line;
    line.reserve(200);
-   while (*line_ucs)   line.append(static_cast<Unicode>(*line_ucs++));
+   while (*line_ucs)   line.append(Unicode(*line_ucs++));
 
 const StateIndicator * si = Workspace::SI_top();
   Command::process_line(line);
@@ -397,7 +397,7 @@ apl_command_ucs(const unsigned int * command)
 {
 UCS_string command_ucs;
    command_ucs.reserve(200);
-   while (*command)   command_ucs.append(static_cast<Unicode>(*command++));
+   while (*command)   command_ucs.append(Unicode(*command++));
 
 ostringstream out;
   Command::do_APL_command(out, command_ucs);
@@ -425,7 +425,7 @@ get_function_ucs(const unsigned int * name, APL_function * L, APL_function * R)
 {
 UCS_string function_ucs;
    function_ucs.reserve(40);
-   while (*name)   function_ucs.append(static_cast<Unicode>(*name++));
+   while (*name)   function_ucs.append(Unicode(*name++));
 
    if (function_ucs.size() == 0)   return 0;   // empty name
 
@@ -510,7 +510,7 @@ print_ucs(FILE * out, const unsigned int * string_ucs)
 {
 UCS_string ucs;
    ucs.reserve(200);
-   while (*string_ucs)   ucs.append(static_cast<Unicode>(*string_ucs++));
+   while (*string_ucs)   ucs.append(Unicode(*string_ucs++));
 
 UTF8_string utf8(ucs);
    fprintf(out, "%s", utf8.c_str());
@@ -602,7 +602,7 @@ const Unicode uni = UTF8_string::toUni(reinterpret_cast<const UTF8 *>
 void
 Unicode_to_UTF8(int uni, char * dest, int * length)
 {
-UCS_string ucs(static_cast<Unicode>(uni));
+UCS_string ucs(Unicode(uni));
 UTF8_string utf8(ucs);
    for (int d = 0; d < utf8.size(); ++d)   dest[d] = utf8[d];
    dest[utf8.size()] = 0;

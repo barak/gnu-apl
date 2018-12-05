@@ -1293,7 +1293,7 @@ UCS_string ret;
                   while (u < ucs.size() && ucs[u] >= '0' && ucs[u] <= '9')
                      { num *= 10;   num += ucs[u++] - '0'; }
 
-                  ret.append(static_cast<Unicode>(num));
+                  ret.append(Unicode(num));
                  }
            }
         else ret.append(ucs[u]);

@@ -582,7 +582,7 @@ const char * dirs[] = { "", "/APs" };
                 if (slen >= APL_PATH_MAX)   expected[APL_PATH_MAX] = 0;
                 if (strcmp(entry->d_name, expected))   continue;
 
-                processors.append(static_cast<AP_num>(apnum));
+                processors.append(AP_num(apnum));
              }
 
          closedir(dir);

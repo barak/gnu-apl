@@ -243,6 +243,8 @@ VALUE_HISTORY_WANTED = @VALUE_HISTORY_WANTED@
 VERSION = @VERSION@
 VF_TRACING_WANTED = @VF_TRACING_WANTED@
 VISIBLE_MARKERS_WANTED = @VISIBLE_MARKERS_WANTED@
+XCBLIBS_CFLAGS = @XCBLIBS_CFLAGS@
+XCBLIBS_LIBS = @XCBLIBS_LIBS@
 abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
 abs_top_builddir = @abs_top_builddir@
@@ -298,6 +300,7 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 dist_doc_DATA = APL-on-Macintosh.pdf \
 		APL-Communication-Cookbook.html \
+		Adding-System-Functions.html \
 		Quad-GTK.html \
 		glade-0.png \
 		glade-1.png \

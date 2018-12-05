@@ -314,7 +314,7 @@ UserFunction_header::UserFunction_header(Fun_signature sig, int lambda_num)
 
    // make sure that sig is valid
    //
-Fun_signature sig1 = static_cast<Fun_signature>(sig | SIG_FUN);
+Fun_signature sig1 = Fun_signature(sig | SIG_FUN);
 bool valid_signature = false;
    loop(p, PATTERN_COUNT)
       {

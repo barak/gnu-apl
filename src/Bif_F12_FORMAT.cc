@@ -175,7 +175,7 @@ Bif_F12_FORMAT::monadic_format(Value_P B)
 {
    Assert(B->get_rank() <= 2);
 
-const PrintStyle style(static_cast<PrintStyle>(PR_APL | PST_NO_FRACT_0));
+const PrintStyle style(PrintStyle(PR_APL | PST_NO_FRACT_0));
 const PrintContext pctx = Workspace::get_PrintContext(style);
 
 const PrintBuffer pb(*B, pctx, 0);
@@ -232,7 +232,7 @@ UCS_string_vector col_formats;
            }
       }
 
-   if (cols != static_cast<ShapeItem>(col_formats.size()))   LENGTH_ERROR;
+   if (cols != ShapeItem(col_formats.size()))   LENGTH_ERROR;
 
    // convert each column format string into a Format_LIFER
    //

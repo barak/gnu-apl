@@ -907,7 +907,7 @@ LineEditContext lec(mode, 24, Workspace::get_PW(), hist, prompt);
 
               case Invalid_Unicode:
                    continue;
- 
+
               default:  // regular APL character
                    lec.insert_char(uni);
                    continue;
@@ -1012,7 +1012,7 @@ const int b0 = safe_fgetc();
               uni |= subc & 0x3F;
             }
 
-        return static_cast<Unicode>(bx | uni);
+        return Unicode(bx | uni);
       }
 
    if (b0 == UNI_ASCII_ESC)
@@ -1065,6 +1065,6 @@ const int b0 = safe_fgetc();
       }
    else if (b0 == UNI_ASCII_DELETE)   return UNI_ASCII_BS;
 
-   return static_cast<Unicode>(b0);
+   return Unicode(b0);
 }
 //-----------------------------------------------------------------------------

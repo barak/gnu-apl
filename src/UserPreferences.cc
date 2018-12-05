@@ -1193,7 +1193,7 @@ int file_profile = 0;   // the current profile in the preferences file
                    continue;
                  }
 
-              LibPaths::set_lib_dir(static_cast<LibRef>(lib_ref), arg,
+              LibPaths::set_lib_dir(LibRef(lib_ref), arg,
                                     sys ? LibPaths::LibDir::CSRC_PREF_SYS
                                         : LibPaths::LibDir::CSRC_PREF_HOME);
             }

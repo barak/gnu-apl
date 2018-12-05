@@ -198,6 +198,7 @@ TD(TOK_Quad_GTK      , TC_FUN2      , TV_FUN  , ID::Quad_GTK     )
 TD(TOK_Quad_NA       , TC_FUN2      , TV_FUN  , ID::Quad_NA      )
 TD(TOK_Quad_NC       , TC_FUN1      , TV_FUN  , ID::Quad_NC      )
 TD(TOK_Quad_NL       , TC_FUN2      , TV_FUN  , ID::Quad_NL      )
+TD(TOK_Quad_PLOT     , TC_FUN2      , TV_FUN  , ID::Quad_PLOT    )
 TD(TOK_Quad_SVO      , TC_FUN2      , TV_FUN  , ID::Quad_SVO     )
 
 TD(TOK_OPER1_COMMUTE , TC_OPER1     , TV_FUN  , ID::OPER1_COMMUTE)

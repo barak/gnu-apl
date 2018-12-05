@@ -110,7 +110,7 @@ FloatCell::compare(const Cell & other) const
         return (dfval() <= other.get_real_value()) ? COMP_LT : COMP_GT;
       }
 
-   if (other.is_complex_cell())   return static_cast<Comp_result>(-other.compare(*this));
+   if (other.is_complex_cell())   return Comp_result(-other.compare(*this));
 
    DOMAIN_ERROR;
 }
@@ -638,7 +638,7 @@ const APL_Complex z = complex_power(a, dfval());
 }
 //-----------------------------------------------------------------------------
 inline double
-P_modulo_Q(double P, double Q)
+p_modulo_q(double P, double Q)
 {
   // return R ← P - (×P) ⌊ | Q × ⌊ | P ÷ Q as described in ISO p. 89
   //            │   │    │ │ │   │ │ │
@@ -695,14 +695,14 @@ const APL_Float r              = P - prod2;
    return r;
 
 /*
-Q(P)
-Q(Q)
-Q(quotient)
-Q(abs_quotient)
-Q(floor_quotient)
-Q(abs_prod)
-Q(prod2)
-Q(r)
+// Q(P)
+// Q(Q)
+// Q(quotient)
+// Q(abs_quotient)
+// Q(floor_quotient)
+// Q(abs_prod)
+// Q(prod2)
+// Q(r)
 
 Assert(isnormal(abs_quotient)   || abs_quotient   == 0.0);
 Assert(isnormal(floor_quotient) || floor_quotient == 0.0);
@@ -741,7 +741,7 @@ const APL_Float b = dfval();
    // Note: In that case, the integer to which A ÷ B is close is either
    // floor(A ÷ B) or ceil(A ÷ B).
    //
-const APL_Float z = P_modulo_Q(b, a);
+const APL_Float z = p_modulo_q(b, a);
 Assert(isnormal(z) || z == 0.0);
 
 

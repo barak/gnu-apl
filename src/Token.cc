@@ -521,8 +521,7 @@ const Value & val = *get_apl_val();
       }
    else                  // matrix or higher
       {
-        pctx.set_style(static_cast<PrintStyle>
-                                    (pctx.get_style() | PST_NO_FRACT_0));
+        pctx.set_style(PrintStyle(pctx.get_style() | PST_NO_FRACT_0));
       }
 
 PrintBuffer pb(val, pctx, 0);

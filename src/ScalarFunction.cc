@@ -126,15 +126,14 @@ Value_P Z = do_scalar_B(ec, B, fun);
    if (ec != E_NO_ERROR)
       {
         loop(a, Thread_context::get_active_core_count())
-            Thread_context::get_context(static_cast<CoreNumber>(a))
-                                                  ->joblist_B.cancel_jobs();
+            Thread_context::get_context(CoreNumber(a))->joblist_B.cancel_jobs();
         throw_apl_error(ec, LOC);
       }
 
 PERFORMANCE_END(fs_SCALAR_B, start, Z->nz_element_count());
 
    loop(a, Thread_context::get_active_core_count())
-       Assert(Thread_context::get_context(static_cast<CoreNumber>(a))
+       Assert(Thread_context::get_context(CoreNumber(a))
                             ->joblist_B.get_size() == 0);
 
    return Token(TOK_APL_VALUE1, Z);
@@ -162,7 +161,7 @@ const bool maybe_parallel = Parallel::run_parallel &&
        {
          loop(a, Thread_context::get_active_core_count())
              {
-               job_B = Thread_context::get_context(static_cast<CoreNumber>(a))
+               job_B = Thread_context::get_context(CoreNumber(a))
                                        ->joblist_B.next_job();
                if (job_B)   break;
              }
@@ -326,15 +325,14 @@ Value_P Z = do_scalar_AB(ec, A, B, fun);
    if (ec != E_NO_ERROR)
       {
         loop(a, Thread_context::get_active_core_count())
-           Thread_context::get_context(static_cast<CoreNumber>(a))
-                                                ->joblist_AB.cancel_jobs();
+           Thread_context::get_context(CoreNumber(a))->joblist_AB.cancel_jobs();
         throw_apl_error(ec, LOC);
       }
 
 PERFORMANCE_END(fs_SCALAR_AB, start, Z->nz_element_count());
 
    loop(a, Thread_context::get_active_core_count())
-       Assert(Thread_context::get_context(static_cast<CoreNumber>(a))
+       Assert(Thread_context::get_context(CoreNumber(a))
                             ->joblist_AB.get_size() == 0);
 
    return Token(TOK_APL_VALUE1, Z);
@@ -382,7 +380,7 @@ const bool maybe_parallel = Parallel::run_parallel &&
        {
          loop(a, Thread_context::get_active_core_count())
              {
-               job_AB = Thread_context::get_context(static_cast<CoreNumber>(a))
+               job_AB = Thread_context::get_context(CoreNumber(a))
                                    ->joblist_AB.next_job();
                if (job_AB)   break;
              }
@@ -572,8 +570,7 @@ ShapeItem end_z = z + slice_len;
                           Token result =job_AB->fun->eval_fill_AB(A1, B1);
                           if (result.get_tag() == TOK_ERROR)
                              {
-                               job_AB->error = static_cast<ErrorCode>
-                                                      (result.get_int_val());
+                               job_AB->error = ErrorCode(result.get_int_val());
                                return;
                              }
                         }

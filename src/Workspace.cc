@@ -35,6 +35,7 @@ using namespace std;
 #include "Quad_FFT.hh"
 #include "Quad_FX.hh"
 #include "Quad_GTK.hh"
+#include "Quad_PLOT.hh"
 #include "Quad_SQL.hh"
 #include "Quad_TF.hh"
 #include "SystemVariable.hh"
@@ -443,7 +444,8 @@ int count = 0;
    loop(f, the_workspace.expunged_functions.size())
        {
          char cc[100];
-         snprintf(cc, sizeof(cc), "    ⎕EX[%lld] ", static_cast<long long>(f));
+         const long long lf(f);
+         snprintf(cc, sizeof(cc), "    ⎕EX[%lld] ", lf);
          count += the_workspace.expunged_functions[f]
                                ->show_owners(cc, out, value);
        }
@@ -1000,7 +1002,7 @@ Workspace::wsid(ostream & out, UCS_string arg, LibRef lib, bool silent)
       {
         if (arg[0] >= '0' && arg[0] <= '9')   // it does
            {
-             lib = static_cast<LibRef>(arg[0] - '0');
+             lib = LibRef(arg[0] - '0');
              arg.erase(0);                       // skip the library number
              arg.remove_leading_whitespaces();   // and blanks after it
            }
@@ -1023,7 +1025,7 @@ Workspace::wsid(ostream & out, UCS_string arg, LibRef lib, bool silent)
    if (lib != LIB0)
       {
         arg.prepend(UNI_ASCII_SPACE);
-        arg.prepend(static_cast<Unicode>('0' + lib));
+        arg.prepend(Unicode('0' + lib));
       }
    the_workspace.WS_name = arg;
 }

@@ -39,6 +39,7 @@
 #include "Quad_FFT.hh"
 #include "Quad_FX.hh"
 #include "Quad_GTK.hh"
+#include "Quad_PLOT.hh"
 #include "Quad_RE.hh"
 #include "Quad_SQL.hh"
 #include "Quad_SVx.hh"

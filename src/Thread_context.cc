@@ -135,7 +135,7 @@ Thread_context::init_parallel(CoreCount count, bool logit)
    thread_contexts_count = count;
    thread_contexts = new Thread_context[thread_contexts_count];
    loop(c, thread_contexts_count)
-       thread_contexts[c].init_entry(static_cast<CoreNumber>(c));
+       thread_contexts[c].init_entry(CoreNumber(c));
 }
 //-----------------------------------------------------------------------------
 void

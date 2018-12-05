@@ -63,8 +63,7 @@ Parallel::init(bool logit)
    Thread_context::get_context(CNUM_MASTER)->thread = pthread_self();
    for (int w = CNUM_WORKER1; w < get_max_core_count(); ++w)
        {
-         Thread_context * tctx = Thread_context::get_context(
-                                                 static_cast<CoreNumber>(w));
+         Thread_context * tctx = Thread_context::get_context(CoreNumber(w));
          const int result = pthread_create(&(tctx->thread), /* attr */ 0,
                                              worker_main, tctx);
          if (result)
@@ -82,7 +81,7 @@ Parallel::init(bool logit)
    // bind threads to cores
    //
    loop(c, get_max_core_count())
-       Thread_context::get_context(static_cast<CoreNumber>(c))
+       Thread_context::get_context(CoreNumber(c))
                        ->bind_to_cpu(all_CPUs[c], logit);
 
    if (logit)   Thread_context::print_all(CERR);
@@ -141,7 +140,7 @@ Parallel::set_core_count(CoreCount new_count, bool logit)
         lock_pool(logit);
         Thread_context::set_active_core_count(new_count);
         for (int c = 1; c < new_count; ++c)
-            Thread_context::get_context(static_cast<CoreNumber>(c))->job_number =
+            Thread_context::get_context(CoreNumber(c))->job_number =
                             Thread_context::get_master().job_number;
         unlock_pool(logit);
 
@@ -221,7 +220,7 @@ const int err = pthread_getaffinity_np(pthread_self(), sizeof(CPUs), &CPUs);
          {
            if (CPU_ISSET(c, &CPUs))
               {
-                all_CPUs.append(static_cast<CPU_Number>(c));
+                all_CPUs.append(CPU_Number(c));
                 if (int(all_CPUs.size() == CPU_count))   break;   // all CPUs found
               }
          }
@@ -254,7 +253,7 @@ const int err = pthread_getaffinity_np(pthread_self(), sizeof(CPUs), &CPUs);
 
    if (count < 0)   count = 64;
 
-   loop(c, CORE_COUNT_WANTED)   all_CPUs.append(static_cast<CPU_Number>(c));
+   loop(c, CORE_COUNT_WANTED)   all_CPUs.append(CPU_Number(c));
 
    Log(LOG_Parallel || logit)
       {
@@ -293,8 +292,7 @@ Parallel::unlock_pool(bool logit)
         for (int a = 1; a < Thread_context::get_active_core_count(); ++a)
             {
               PRINT_LOCKED(CERR << "Parallel::unlock_pool() : " << endl; )
-              Thread_context * tc = Thread_context::get_context(
-                                                    static_cast<CoreNumber>(a));
+              Thread_context * tc = Thread_context::get_context(CoreNumber(a));
               sem_post(&tc->pool_sema);
               PRINT_LOCKED(
               CERR << "    pool_sema of thread #" << a << " incremented."
@@ -304,8 +302,7 @@ Parallel::unlock_pool(bool logit)
    else
      {
         for (int a = 1; a < Thread_context::get_active_core_count(); ++a)
-            sem_post(&Thread_context::get_context(
-                                      static_cast<CoreNumber>(a))->pool_sema);
+            sem_post(&Thread_context::get_context(CoreNumber(a))->pool_sema);
        }
 }
 //-----------------------------------------------------------------------------
