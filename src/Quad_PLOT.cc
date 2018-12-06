@@ -37,7 +37,6 @@ Simple_string<pthread_t, false> Quad_PLOT::plot_threads;
 #include "FloatCell.hh"
 #include "Workspace.hh"
 
-#include <assert.h>
 #include <stdio.h>
 #include <math.h>
 #include <stdlib.h>
@@ -53,9 +52,10 @@ using namespace std;
 
 typedef uint16_t  Pixel;
 typedef uint32_t Color;
-typedef const char * String;
+typedef std::string String;
 
 //=============================================================================
+/// data for one plot line
 class Plot_data_row
 {
 public:
@@ -63,7 +63,20 @@ public:
    Plot_data_row(const double * pX, const double * pY, uint32_t idx,
                  uint32_t len)
    : X(pX), Y(pY), row_num(idx), N(len)
-   {}
+   {
+     min_X = max_X = get_X(0);
+     min_Y = max_Y = get_Y(0);
+     for (unsigned int n = 1; n < N; ++n)
+         {
+            const double Xn = get_X(n);
+            if (min_X > Xn)   min_X = Xn;
+            if (max_X < Xn)   max_X = Xn;
+
+            const double Yn = get_Y(n);
+            if (min_Y > Yn)   min_Y = Yn;
+            if (max_Y < Yn)   max_Y = Yn;
+         }
+   }
 
    /// destructor
    ~Plot_data_row()
@@ -77,53 +90,54 @@ public:
    uint32_t get_N() const
       { return N; }
 
-   /// return the n-th X coordinates
+   /// return the n-th X coordinate
    double get_X(uint32_t n) const
       { return X ? X[n] : n; }
 
-   /// return the n-th Y coordinates
+   /// return the n-th Y coordinate
    double get_Y(uint32_t n) const
       { return Y[n]; }
 
-   /// return the smallest value in X (if present) otherwise 0
+   /// return the smallest value in X
    double get_min_X() const
-      {
-        if (!X)   return 0;
-        double ret = X[0];
-        for (unsigned int n = 1; n < N; ++n)   if (ret > X[n])   ret = X[n];
-        return ret;
-      }
+      { return min_X; }
 
-   /// return the largest value in X (if present) otherwise N-1
+   /// return the largest value in X
    double get_max_X() const
-      {
-        if (!X)   return N-1;
-        double ret = X[0];
-        for (unsigned int n = 1; n < N; ++n)   if (ret < X[n])   ret = X[n];
-        return ret;
-      }
+      { return max_X; }
 
    /// return the smallest value in Y
    double get_min_Y() const
-      {
-        double ret = Y[0];
-        for (unsigned int n = 1; n < N; ++n)   if (ret > Y[n])   ret = Y[n];
-        return ret;
-      }
+      { return min_Y; }
 
    /// return the largest value in X (if present) otherwise N-1
    double get_max_Y() const
-      {
-        double ret = Y[0];
-        for (unsigned int n = 1; n < N; ++n)   if (ret < Y[n])   ret = Y[n];
-        return ret;
-      }
+      { return max_Y; }
 
 protected:
+   /// the X coordinates
    const double * X;
+
+   /// the Y coordinates
    const double * Y;
+
+   /// the row number
    const uint32_t row_num;
+
+   /// the row length
    const uint32_t N;
+
+   /// the smallest value in X
+   double min_X;
+
+   /// the largest value in X
+   double max_X;
+
+   /// the smallest value in Y
+   double min_Y;
+
+   /// the largest value in Y
+   double max_Y;
 };
 //=============================================================================
 class Plot_data
@@ -156,62 +170,47 @@ public:
    /// return the X and Y values of the data matrix row/col
    void get_XY(double & X, double & Y, uint32_t row, uint32_t col) const
         {
-          assert(row < idx);
+          Assert(row < idx);
           X = data_rows[row]->get_X(col);
           Y = data_rows[row]->get_Y(col);
         }
 
    /// return the smallest X value in the data matrix
    double get_min_X() const
-      {
-        double ret = data_rows[0]->get_min_X();
-        for (unsigned int r = 1; r < idx; ++r)
-            {
-              const double m = data_rows[r]->get_min_X();
-              if (ret > m)   ret = m;
-            }
-        return ret;
-      }
+      { return min_X; }
 
    /// return the largest X value in the data matrix
    double get_max_X() const
-      {
-        double ret = data_rows[0]->get_max_X();
-        for (unsigned int r = 1; r < idx; ++r)
-            {
-              const double m = data_rows[r]->get_max_X();
-              if (ret < m)   ret = m;
-            }
-        return ret;
-      }
+      { return max_X; }
 
    /// return the smallest Y value in the data matrix
    double get_min_Y() const
-      {
-        double ret = data_rows[0]->get_min_Y();
-        for (unsigned int r = 1; r < idx; ++r)
-            {
-              const double m = data_rows[r]->get_min_Y();
-              if (ret > m)   ret = m;
-            }
-        return ret;
-      }
+      { return min_Y; }
 
    /// return the largest Y value in the data matrix
    double get_max_Y() const
-      {
-        double ret = data_rows[0]->get_max_Y();
-        for (unsigned int r = 1; r < idx; ++r)
-            {
-              const double m = data_rows[r]->get_max_Y();
-              if (ret < m)   ret = m;
-            }
-        return ret;
-      }
+      { return max_Y; }
 
    /// add a row to the data matrix
-   void add_row(Plot_data_row * row)
-      { assert(idx < row_count);   data_rows[idx++] = row; }
+   void add_row(const Plot_data_row * row)
+      {
+        Assert(idx < row_count);
+        data_rows[idx++] = row;
+        if (idx == 1)   // first row
+           {
+             min_X = row->get_min_X();
+             max_X = row->get_max_X();
+             min_Y = row->get_min_Y();
+             max_Y = row->get_max_Y();
+           }
+        else
+           {
+             if (min_X > row->get_min_X())   min_X = row->get_min_X();
+             if (max_X < row->get_max_X())   max_X = row->get_max_X();
+             if (min_Y > row->get_min_Y())   min_Y = row->get_min_Y();
+             if (max_Y < row->get_max_Y())   max_Y = row->get_max_Y();
+           }
+      }
 
    /// convert a number to a string
    static const char * uint32_t_to_str(uint32_t val)
@@ -286,6 +285,18 @@ protected:
 
    /// the current number of columns in the data matrix
    uint32_t idx;
+
+   /// the smallest value in X
+   double min_X;
+
+   /// the largest value in X
+   double max_X;
+
+   /// the smallest value in Y
+   double min_Y;
+
+   /// the largest value in Y
+   double max_Y;
 };
 //-----------------------------------------------------------------------------
 Color
@@ -382,8 +393,11 @@ public:
         delete &plot_data;
       }
 
-   // update derived properties after changing primary ones
+   /// update derived properties after changing primary ones
    void update(int verbosity);
+
+   /// handle window resize event
+   void set_window_size(int width, int height);
 
    // get_XXX() and set_XXX functions
 #define ldef(_ty, _na, _val, _descr)
@@ -418,6 +432,8 @@ public:
    double get_tile_Y() const          { return tile_Y; }
    int    get_gridx_last() const      { return gridx_last; }
    int    get_gridy_last() const      { return gridy_last; }
+   int    get_verbosity() const       { return verbosity; }
+   void  set_verbosity(int verb)      { verbosity = verb; }
 
    const Plot_data & get_plot_data() const   { return plot_data; }
 
@@ -441,6 +457,7 @@ protected:
    double tile_Y;
    int gridx_last;
    int gridy_last;
+   int verbosity;
 
    Plot_line_properties ** line_properties;
 
@@ -465,7 +482,8 @@ Plot_window_properties::Plot_window_properties(const Plot_data * data,
    scale_X(0),
    scale_Y(0),
    tile_X(0),
-   tile_Y(0)
+   tile_Y(0),
+   verbosity(0)
 {
    (verbosity > 1) && CERR << setw(20) << "min_X: " << min_X << endl
                            << setw(20) << "max_X: " << max_X << endl
@@ -479,10 +497,27 @@ Plot_window_properties::Plot_window_properties(const Plot_data * data,
 }
 //-----------------------------------------------------------------------------
 void
+Plot_window_properties::set_window_size(int width, int height)
+{
+   // window_width and window_height are, despite of their names, the
+   // size of the plot area (without borders).
+   //
+   pa_width  = width  - pa_border_L - pa_border_R;
+   pa_height = height - pa_border_T - pa_border_B;
+   update(0);
+}
+//-----------------------------------------------------------------------------
+
+void
 Plot_window_properties::update(int verbosity)
 {
    window_width  = pa_border_L + pa_width  + pa_border_R;
    window_height = pa_border_T + pa_height + pa_border_B;
+
+   min_X = plot_data.get_min_X();
+   max_X = plot_data.get_max_X();
+   min_Y = plot_data.get_min_Y();
+   max_Y = plot_data.get_max_Y();
 
 double delta_X = max_X - min_X;
 double delta_Y = max_Y - min_Y;
@@ -750,6 +785,17 @@ do_plot(xcb_connection_t * conn, xcb_screen_t * screen, xcb_drawable_t window,
         xcb_gcontext_t gc, const Plot_window_properties & w_props,
         const Plot_data & data)
 {
+   // draw the background
+   //
+   {
+     enum { mask = XCB_GC_FOREGROUND };
+     const uint32_t value = w_props.get_canvas_color();
+     xcb_change_gc(conn, gc, mask, &value);
+     xcb_rectangle_t rect = { 0, 0, w_props.get_window_width(),
+                                    w_props.get_window_height() };
+     xcb_poly_fill_rectangle(conn, window, gc, 1, &rect);
+   }
+
 Plot_line_properties ** l_props = w_props.get_line_properties();
 
    // get graphics context...
@@ -843,7 +889,7 @@ xcb_gcontext_t text_gc = getFontGC(conn, screen, window, "fixed",
          const Pixel point_size = l_props[l]->point_size;
          draw_line(conn, window, gc, x0, y, x2, y);
          draw_point(conn, window, gc, x1, y, point_size);
-         draw_text(conn, text_gc, window, xt, y + 5, lp.legend_name);
+         draw_text(conn, text_gc, window, xt, y + 5, lp.legend_name.c_str());
        }
 
    // draw the plot line(s)...
@@ -901,8 +947,8 @@ xcb_intern_atom_reply_t & reply = *xcb_intern_atom_reply(conn, cookie, 0);
 void *
 plot_main(void * vp_props)
 {
-const Plot_window_properties & w_props =
-      *reinterpret_cast<const Plot_window_properties *>(vp_props);
+Plot_window_properties & w_props =
+      *reinterpret_cast<Plot_window_properties *>(vp_props);
 
 const Plot_data & data = w_props.get_plot_data();
 
@@ -920,6 +966,7 @@ xcb_screen_t * screen = xcb_setup_roots_iterator(setup).data;
 xcb_gcontext_t gc = xcb_generate_id(conn);
    {
      enum { mask = XCB_GC_GRAPHICS_EXPOSURES };
+//               | XCB_EVENT_MASK_STRUCTURE_NOTIFY };
      const uint32_t value = 0;
 
      xcb_create_gc(conn, gc, screen->root, mask, &value);
@@ -931,7 +978,8 @@ xcb_drawable_t window = xcb_generate_id(conn);
    {
      enum { mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK};
      const uint32_t values[] = { w_props.get_canvas_color(),
-                                 XCB_EVENT_MASK_EXPOSURE };
+                                 XCB_EVENT_MASK_EXPOSURE
+                               | XCB_EVENT_MASK_STRUCTURE_NOTIFY };
      xcb_create_window(conn,                            // connection
                        XCB_COPY_FROM_PARENT,            // depth
                        window,                          // window Id
@@ -946,7 +994,8 @@ xcb_drawable_t window = xcb_generate_id(conn);
 
      xcb_change_property(conn, XCB_PROP_MODE_REPLACE, window,
                        XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8,
-                       strlen(w_props.get_caption()), w_props.get_caption());
+                       w_props.get_caption().size(),
+                       w_props.get_caption().c_str());
    }
 
    // tell the window manager that we will handle WM_DELETE_WINDOW events...
@@ -997,7 +1046,7 @@ const xcb_get_input_focus_reply_t * focusReply =
 
         switch(event->response_type & ~0x80)
            {
-             case XCB_EXPOSE:
+             case XCB_EXPOSE:             // 12
                   do_plot(conn, screen, window, gc, w_props, data);
                   if (focusReply)
                      {
@@ -1015,7 +1064,23 @@ const xcb_get_input_focus_reply_t * focusReply =
                  xcb_flush(conn);
                  break;
 
-             case XCB_CLIENT_MESSAGE:
+             case XCB_UNMAP_NOTIFY:       // 18
+             case XCB_MAP_NOTIFY:         // 19
+             case XCB_REPARENT_NOTIFY:    // 21
+                  break;
+
+             case XCB_CONFIGURE_NOTIFY:   // 22
+                  if (focusReply)   break;   // not yet exposed
+
+                  {
+                    const xcb_configure_notify_event_t * notify =
+                          reinterpret_cast<const xcb_configure_notify_event_t *>
+                             (event);
+                    w_props.set_window_size(notify->width, notify->height);
+                  }
+             break;
+
+             case XCB_CLIENT_MESSAGE:     // 33
                   if (reinterpret_cast<xcb_client_message_event_t *>(event)
                            ->data.data32[0] == window_deleted)
                      {
@@ -1040,10 +1105,10 @@ const xcb_get_input_focus_reply_t * focusReply =
                   break;
 
              default:
-                CERR << "unexpected event type "
-                     << static_cast<unsigned int>(event->response_type)
-                      << " (ignored)" << endl;
-                break;
+                w_props.get_verbosity() > 0 &&
+                   CERR << "unexpected event type "
+                        << static_cast<unsigned int>(event->response_type)
+                         << " (ignored)" << endl;
            }
 
         free(event);
@@ -1057,6 +1122,7 @@ Token
 Quad_PLOT::eval_AB(Value_P A, Value_P B)
 {
    if (B->get_rank() < 1 || B->get_rank() > 2)   RANK_ERROR;
+   if (B->element_count() < 2)                   LENGTH_ERROR;
 
    // plot window with default attrinutes
    //
@@ -1073,6 +1139,8 @@ Plot_window_properties * w_props = new Plot_window_properties(data, verbosity);
    if (A->get_rank() > 1)   RANK_ERROR;
 
 const ShapeItem len_A = A->element_count();
+   if (len_A < 1)   LENGTH_ERROR;
+
 const APL_Integer qio = Workspace::get_IO();
 
    loop(a, len_A)
@@ -1142,6 +1210,7 @@ Quad_PLOT::eval_B(Value_P B)
       }
 
    if (B->get_rank() < 1 || B->get_rank() > 2)   RANK_ERROR;
+   if (B->element_count() < 2)                   LENGTH_ERROR;
 
    // plot window with default attrinutes
    //
@@ -1207,6 +1276,7 @@ Value_P
 Quad_PLOT::plot_data(Plot_window_properties * w_props,
                      const Plot_data * data)
 {
+   w_props->set_verbosity(verbosity);
    verbosity > 0 && w_props->print(CERR);
 
 pthread_t thread;
@@ -1221,6 +1291,7 @@ void
 Quad_PLOT::help() const
 {
    CERR <<
+"\n"
 "   ⎕PLOT Usage:\n"
 "\n"
 "   ⎕PLOT B     plot B with default attribute values\n"

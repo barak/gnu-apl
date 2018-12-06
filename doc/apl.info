@@ -2574,6 +2574,7 @@ As can be displayed by ⎕PLOT "" there is quite a number of attributes
 that control how the resulting plot looks like:
 
       ⎕PLOT ''
+
    ⎕PLOT Usage:
 
    ⎕PLOT B     plot B with default attribute values
@@ -2615,6 +2616,7 @@ line_width-N:       3 pixel        (the thickness of plot line N)
 point_color-N:      #00FF00        (the color of the plot points)
 point_size-N:       8 pixel        (the diameter of the plot points)
 legend_name-N:                     (the name of plot line N in the legend)
+
 
    There are 2 kinds of attributes: global attributes that affect the
 entire plot, and local (per-line) attributes that affect one of the plot
@@ -4591,19 +4593,19 @@ Node: Section 3.2284908
 Node: Section 3.2391486
 Node: Section 3.2493937
 Node: Section 3.2594606
-Node: Section 3.26101240
-Node: Section 3.27102180
-Node: Section 3.28115742
-Node: Section 3.29118846
-Node: Section 3.30120835
-Node: Chapter 4125213
-Node: Chapter 5126961
-Node: Chapter 6128090
-Node: Section 6.1128509
-Node: Section 6.2129196
-Node: Chapter 7130027
-Node: Section 7.1130530
-Node: Section 7.2155840
+Node: Section 3.26101242
+Node: Section 3.27102182
+Node: Section 3.28115744
+Node: Section 3.29118848
+Node: Section 3.30120837
+Node: Chapter 4125215
+Node: Chapter 5126963
+Node: Chapter 6128092
+Node: Section 6.1128511
+Node: Section 6.2129198
+Node: Chapter 7130029
+Node: Section 7.1130532
+Node: Section 7.2155842
 
 End Tag Table
 
