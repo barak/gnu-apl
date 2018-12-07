@@ -1192,7 +1192,7 @@ Quad_PLOT::eval_B(Value_P B)
         sem_wait(&plot_threads_sema);
            loop(pt, Quad_PLOT::plot_threads.size())
                {
-                 if (Quad_PLOT::plot_threads[pt] != B0)   continue;
+                 if (Quad_PLOT::plot_threads[pt] != pthread_t(B0))   continue;
 
                  plot_threads[pt] = plot_threads[plot_threads.size() - 1];
                  plot_threads.pop();
