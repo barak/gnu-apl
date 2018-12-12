@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2017  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2018  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -338,7 +338,8 @@ public:
 #include "Quad_PLOT.def"
    line_number(lnum)
    {
-     snprintf(legend_name_buffer, sizeof(legend_name_buffer), "Line-%u", lnum);
+     snprintf(legend_name_buffer, sizeof(legend_name_buffer),
+              "Line-%d", int(lnum + Workspace::get_IO()));
      legend_name = legend_name_buffer;
      switch(lnum)
         {
@@ -363,7 +364,7 @@ public:
 #define gdef(_ty, _na, _val, _descr)
 #define ldef(ty,  na,  _val, _descr) ty na;
 #include "Quad_PLOT.def"
-  const int line_number;
+  const int line_number;   // starting a 0 regardless of ⎕IO
    char legend_name_buffer[50];
 };
 //-----------------------------------------------------------------------------
@@ -372,8 +373,9 @@ Plot_line_properties::print(ostream & out) const
 {
 char cc[40];
 #define gdef(_ty, _na, _val, _descr)
-#define ldef(ty,  na,  _val, _descr)                      \
-   snprintf(cc, sizeof(cc), #na "-%u:  ", line_number);   \
+#define ldef(ty,  na,  _val, _descr)                   \
+   snprintf(cc, sizeof(cc), #na "-%d:  ",              \
+            int(line_number + Workspace::get_IO()));   \
    CERR << setw(20) << cc << Plot_data::ty ## _to_str(na) << endl;
 #include "Quad_PLOT.def"
 
@@ -610,7 +612,8 @@ const char * value = colon + 1;
 const char * minus = strchr(att_and_val, '-');
    if (minus && minus < colon)   // line attribute
       {
-        const int line = strtol(minus + 1, 0, 10);
+        const int line = strtol(minus + 1, 0, 10) - Workspace::get_IO();
+        if (line < 0)             return "invalid line number";
         if (line >= line_count)   return "invalid line number";
 
 #define gdef(_ty, _na, _val, _descr)
@@ -773,19 +776,140 @@ const xcb_segment_t segment = { x0, y0, x1, y1 };
    xcb_poly_segment(conn, window, gc, 1, &segment);
 }
 //-----------------------------------------------------------------------------
+#define ITEMS(x) sizeof(x)/sizeof(*x), x
 void
 draw_point(xcb_connection_t * conn, xcb_drawable_t window, xcb_gcontext_t gc,
-           int16_t x, int16_t y, uint16_t point_size)
+           int16_t x, int16_t y, Color canvas_color,
+           const Plot_line_properties & l_props)
 {
-   x -= point_size >> 1;
-   y -= point_size >> 1;
+const Pixel point_size  = l_props.point_size;
+const Pixel point_size2  = l_props.point_size2;
+const int   point_style = l_props.get_point_style();
+const int16_t half = point_size >> 1;
 
-const xcb_arc_t arc = { x, y, point_size, point_size, 0, int16_t(360 << 6) };
-   xcb_poly_fill_arc(conn, window, gc, 1, &arc);
+   if (point_style == 1)   // circle
+      {
+        xcb_arc_t arc = { int16_t(x - half), int16_t(y - half),   // positions
+                          point_size, point_size,                 // diameters
+                          0, int16_t(360 << 6) };                 // angles
+        xcb_poly_fill_arc(conn, window, gc, 1, &arc);
+
+        if (point_size2)   // hollow
+           {
+             const int16_t half2 = point_size2 >> 1;
+             xcb_arc_t arc2 = { int16_t(x-half2), int16_t(y-half2),   // pos
+                                point_size2, point_size2,             // dia
+                                0, int16_t(360 << 6) };               // ang
+             enum { mask = XCB_GC_FOREGROUND };
+             xcb_change_gc(conn, gc, mask, &canvas_color);
+             xcb_poly_fill_arc(conn, window, gc, 1, &arc2);
+             xcb_change_gc(conn, gc, mask, &l_props.point_color);
+           }
+      }
+   else if (point_style == 2)   // triangle ∆
+      {
+        const int16_t center_y = y - 2*point_size/3;
+        const int16_t hypo_y = half*1.732;
+        const xcb_point_t points[3]   = {
+              { int16_t(x), center_y  },
+              { int16_t(half), hypo_y },
+              { int16_t(-2*half), 0   } };
+        xcb_fill_poly(conn, window, gc, XCB_POLY_SHAPE_CONVEX,
+                      XCB_COORD_MODE_PREVIOUS, ITEMS(points));
+        if (point_size2)   // hollow
+           {
+             const int16_t half2 = point_size2 >> 1;
+             const int16_t center2_y = y - 2*point_size2/3;
+             const int16_t hypo2_y = half2*1.732;
+             const xcb_point_t points2[3]  = {
+                 { int16_t(x), center2_y   },
+                 { int16_t(half2), hypo2_y },
+                 { int16_t(-2*half2), 0    } };
+             enum { mask = XCB_GC_FOREGROUND };
+             xcb_change_gc(conn, gc, mask, &canvas_color);
+             xcb_fill_poly(conn, window, gc, XCB_POLY_SHAPE_CONVEX,
+                           XCB_COORD_MODE_PREVIOUS, ITEMS(points2));
+             xcb_change_gc(conn, gc, mask, &l_props.point_color);
+           }
+      }
+   else if (point_style == 3)   // triangle ∇
+      {
+        const int16_t center_y = y + 2*point_size/3;
+        const int16_t hypo_y = - half*1.732;
+        const xcb_point_t points[3]   = {
+              { int16_t(x), center_y  },
+              { int16_t(half), hypo_y },
+              { int16_t(-2*half), 0   } };
+        xcb_fill_poly(conn, window, gc, XCB_POLY_SHAPE_CONVEX,
+                      XCB_COORD_MODE_PREVIOUS, ITEMS(points));
+        if (point_size2)   // hollow
+           {
+             const int16_t half2 = point_size2 >> 1;
+             const int16_t center2_y = y + 2*point_size2/3;
+             const int16_t hypo2_y = - half2*1.732;
+             const xcb_point_t points2[3]  = {
+                 { int16_t(x), center2_y   },
+                 { int16_t(half2), hypo2_y },
+                 { int16_t(-2*half2), 0    } };
+             enum { mask = XCB_GC_FOREGROUND };
+             xcb_change_gc(conn, gc, mask, &canvas_color);
+             xcb_fill_poly(conn, window, gc, XCB_POLY_SHAPE_CONVEX,
+                           XCB_COORD_MODE_PREVIOUS, ITEMS(points2));
+             xcb_change_gc(conn, gc, mask, &l_props.point_color);
+           }
+      }
+   else if (point_style == 4)   // caro
+      {
+        const xcb_point_t points[4] =           {
+              { int16_t(x), int16_t(y - half) },
+              { int16_t(half), int16_t(half)  },
+              { int16_t(-half), int16_t(half) },
+              { int16_t(-half), int16_t(-half)} };
+        xcb_fill_poly(conn, window, gc, XCB_POLY_SHAPE_CONVEX,
+                      XCB_COORD_MODE_PREVIOUS, ITEMS(points));
+        if (point_size2)   // hollow
+           {
+             const int16_t half2 = point_size2 >> 1;
+             const xcb_point_t points2[4] =            {
+                   { int16_t(x), int16_t(y - half2)  },
+                   { int16_t(half2), int16_t(half2)  },
+                   { int16_t(-half2), int16_t(half2) },
+                   { int16_t(-half2), int16_t(-half2)} };
+             enum { mask = XCB_GC_FOREGROUND };
+             xcb_change_gc(conn, gc, mask, &canvas_color);
+             xcb_fill_poly(conn, window, gc, XCB_POLY_SHAPE_CONVEX,
+                           XCB_COORD_MODE_PREVIOUS, ITEMS(points2));
+             xcb_change_gc(conn, gc, mask, &l_props.point_color);
+           }
+      }
+   else if (point_style == 5)   // square
+      {
+        const xcb_point_t points[4] =     {
+              { int16_t(x - half), int16_t(y - half) },
+              { int16_t(point_size), 0  },
+              { 0, int16_t(point_size)  },
+              { int16_t(-point_size), 0 } };
+        xcb_fill_poly(conn, window, gc, XCB_POLY_SHAPE_CONVEX,
+                      XCB_COORD_MODE_PREVIOUS, ITEMS(points));
+        if (point_size2)   // hollow
+           {
+             const int16_t half2 = point_size2 >> 1;
+             const xcb_point_t points2[4] =
+                 { { int16_t(x - half2), int16_t(y - half2) },
+                   { int16_t(point_size2), 0  },
+                   { 0, int16_t(point_size2)  },
+                   { int16_t(-point_size2), 0 } };
+             enum { mask = XCB_GC_FOREGROUND };
+             xcb_change_gc(conn, gc, mask, &canvas_color);
+             xcb_fill_poly(conn, window, gc, XCB_POLY_SHAPE_CONVEX,
+                           XCB_COORD_MODE_PREVIOUS, ITEMS(points2));
+             xcb_change_gc(conn, gc, mask, &l_props.point_color);
+           }
+      }
+
+   // otherwise: draw no point
 }
 //-----------------------------------------------------------------------------
-
-#define ITEMS(x) sizeof(x)/sizeof(*x), x
 void
 do_plot(xcb_connection_t * conn, xcb_screen_t * screen, xcb_drawable_t window,
         xcb_gcontext_t gc, const Plot_window_properties & w_props,
@@ -793,10 +917,10 @@ do_plot(xcb_connection_t * conn, xcb_screen_t * screen, xcb_drawable_t window,
 {
    // draw the background
    //
+const Color canvas_color = w_props.get_canvas_color();
    {
      enum { mask = XCB_GC_FOREGROUND };
-     const uint32_t value = w_props.get_canvas_color();
-     xcb_change_gc(conn, gc, mask, &value);
+     xcb_change_gc(conn, gc, mask, &canvas_color);
      xcb_rectangle_t rect = { 0, 0, w_props.get_window_width(),
                                     w_props.get_window_height() };
      xcb_poly_fill_rectangle(conn, window, gc, 1, &rect);
@@ -884,18 +1008,19 @@ xcb_gcontext_t text_gc = getFontGC(conn, screen, window, "fixed",
          const Plot_line_properties & lp = *l_props[l];
 
          enum { mask = XCB_GC_FOREGROUND | XCB_GC_LINE_WIDTH };
-         const uint32_t values[] = { lp.line_color, lp.line_width };
-         xcb_change_gc(conn, gc, mask, values);
+         const uint32_t gc_1[] = { lp.line_color, lp.line_width };
+         const uint32_t gc_2[] = { lp.point_color, lp.point_size };
 
          const int x0 = w_props.get_legend_X();
          const int x1 = x0 + (w_props.get_legend_X() >> 1);
          const int x2 = x1 + (w_props.get_legend_X() >> 1);
          const int xt = x2 + 10;
          const int y  = w_props.get_legend_Y() + l*w_props.get_legend_dY();
-         const Pixel point_size = l_props[l]->point_size;
+         xcb_change_gc(conn, gc, mask, gc_1);
          draw_line(conn, window, gc, x0, y, x2, y);
-         draw_point(conn, window, gc, x1, y, point_size);
          draw_text(conn, text_gc, window, xt, y + 5, lp.legend_name.c_str());
+         xcb_change_gc(conn, gc, mask, gc_2);
+         draw_point(conn, window, gc, x1, y, canvas_color, *l_props[l]);
        }
 
    // draw the plot line(s)...
@@ -905,10 +1030,11 @@ xcb_gcontext_t text_gc = getFontGC(conn, screen, window, "fixed",
          enum { mask = XCB_GC_FOREGROUND
                      | XCB_GC_LINE_WIDTH
               };
-         const uint32_t values[] = { l_props[l]->line_color,
-                                     l_props[l]->line_width
-                                   };
-         xcb_change_gc(conn, gc, mask, values);
+         const uint32_t gc_1[] = { l_props[l]->line_color,
+                                     l_props[l]->line_width };
+         const uint32_t gc_2[] = { l_props[l]->point_color,
+                                   l_props[l]->point_size };
+         xcb_change_gc(conn, gc, mask, gc_1);
 
          int last_x = 0;
          int last_y = 0;
@@ -922,13 +1048,13 @@ xcb_gcontext_t text_gc = getFontGC(conn, screen, window, "fixed",
                last_y = py;
              }
 
-         const Pixel point_size = l_props[l]->point_size;
+         xcb_change_gc(conn, gc, mask, gc_2);
          loop(n, data.get_col_count())
              {
                double vx, vy;   data.get_XY(vx, vy, l, n);
                const Pixel px = w_props.valX2pixel(vx - w_props.get_min_X());
                const Pixel py = w_props.valY2pixel(vy - w_props.get_min_Y());
-               draw_point(conn, window, gc, px, py, point_size);
+               draw_point(conn, window, gc, px, py, canvas_color, *l_props[l]);
              }
        }
 
@@ -1167,7 +1293,10 @@ const APL_Integer qio = Workspace::get_IO();
                DOMAIN_ERROR;
             }
 
-         const UCS_string ucs = attr->get_UCS_ravel();
+         UCS_string ucs = attr->get_UCS_ravel();
+         ucs.remove_leading_and_trailing_whitespaces();
+         if (ucs.size() == 0)         continue;
+         if (ucs[0] == UNI_COMMENT)   continue;
          UTF8_string utf(ucs);
          const char * error = w_props->set_attribute(utf.c_str());
          if (error)

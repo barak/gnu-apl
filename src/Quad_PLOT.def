@@ -24,7 +24,9 @@ gdef(Pixel,    legend_lX,           50, the length of the legend lines)
 ldef(Color,    line_color,    0x00FF00, the color of plot line N)
 ldef(Pixel,    line_width,           3, the thickness of plot line N)
 ldef(Color,    point_color,   0x00FF00, the color of the plot points)
-ldef(Pixel,    point_size,           8, the diameter of the plot points)
+ldef(uint32_t, point_style,          1, the form of the plot points)
+ldef(Pixel,    point_size,           8, the outer diameter of the plot points)
+ldef(Pixel,    point_size2,          0, the inner diameter of the plot points)
 ldef(String,   legend_name,         "", the name of plot line N in the legend)
 
 #undef gdef

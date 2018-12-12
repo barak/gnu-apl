@@ -1019,11 +1019,7 @@ UCS_string ret;
                 }
              else
                 {
-                  ret << "\\u";
-                  ret << Unicode(hex[uni >> 12 & 0x0F]);
-                  ret << Unicode(hex[uni >>  8 & 0x0F]);
-                  ret << Unicode(hex[uni >>  4 & 0x0F]);
-                  ret << Unicode(hex[uni       & 0x0F]);
+                  ret.append(uni);
                 }
            }
       }
