@@ -524,12 +524,12 @@ double delta_Y = max_Y - min_Y;
 
    // first approximation for value → pixel factor
    //
-   scale_X = pa_width  / delta_X;
-   scale_Y = pa_height / delta_Y;
+   scale_X = pa_width  / delta_X;   // pixels per X-value
+   scale_Y = pa_height / delta_Y;   // pixels per Y-value
 
    verbosity > 1 &&
-      CERR << setw(20) << "delta_X (1): " << delta_X << " pixels/X" << endl
-           << setw(20) << "delta_Y (1): " << delta_Y << " pixels/Y" << endl
+      CERR << setw(20) << "delta_X (1): " << delta_X << " (Xmax-Xmin)" << endl
+           << setw(20) << "delta_Y (1): " << delta_Y << " Ymax-Ymin" << endl
            << setw(20) << "scale_X (1): " << scale_X << " pixels/X" << endl
            << setw(20) << "scale_Y (1): " << scale_Y << " pixels/Y" << endl;
 
@@ -537,8 +537,10 @@ const double tile_X_raw = gridx_pixels / scale_X;
 const double tile_Y_raw = gridy_pixels / scale_Y;
 
    verbosity > 1 &&
-      CERR << setw(20) << "tile_X_raw: " << tile_X_raw << endl
-           << setw(20) << "tile_Y_raw: " << tile_Y_raw << endl;
+      CERR << setw(20) << "tile_X_raw: " << tile_X_raw
+                                         << "(∆X between grid lines)" << endl
+           << setw(20) << "tile_Y_raw: " << tile_Y_raw
+                                         << "(∆Y between grid lines)" << endl;
 
    tile_X = round_up_125(tile_X_raw);
    tile_Y = round_up_125(tile_Y_raw);
@@ -556,7 +558,7 @@ const int max_Yi = ceil(max_Y / tile_Y);
    max_Y = tile_Y * ceil(max_Y  / tile_Y);
 
    delta_X = max_X - min_X;
-   delta_X = max_Y - min_Y;
+   delta_Y = max_Y - min_Y;
 
    // final value → pixel factor
    //
@@ -568,10 +570,14 @@ const int max_Yi = ceil(max_Y / tile_Y);
            << setw(20) << "max_X (2): " << max_X << endl
            << setw(20) << "min_Y (2): " << min_Y << endl
            << setw(20) << "max_Y (2): " << max_Y << endl
-           << setw(20) << "delta_X (2): " << delta_X << endl
-           << setw(20) << "delta_Y (2): " << delta_Y << endl
+           << setw(20) << "delta_X (2): " << delta_X << " (Xmax-Xmin)" << endl
+           << setw(20) << "delta_Y (2): " << delta_Y << " (Ymax-Ymin)" << endl
            << setw(20) << "scale_X (2): " << scale_X << " pixels/X" << endl
-           << setw(20) << "scale_Y (2): " << scale_Y << " pixels/Y" << endl;
+           << setw(20) << "scale_Y (2): " << scale_Y << " pixels/Y" << endl
+           << setw(20) << "tile_X  (2): " << tile_X
+                                          << "(∆X between grid lines)" << endl
+           << setw(20) << "tile    (2): " << tile_Y
+                                          << "(∆Y between grid lines)" << endl;
 }
 //-----------------------------------------------------------------------------
 int
