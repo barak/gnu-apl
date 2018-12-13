@@ -620,7 +620,6 @@ const char * minus = strchr(att_and_val, '-');
 #define ldef(ty,  na,  val, _descr)                                       \
          if (!strncmp(#na "-", att_and_val, minus - att_and_val))         \
             { const char * error = 0;                                     \
-Q(line) \
               line_properties[line]->set_ ## na(Plot_data::ty ##          \
                                                 _from_str(value, error)); \
               return error;                                               \

@@ -377,8 +377,12 @@ CONTROL-Ds-TO-EXIT 0
 # Setting New-Multi-Line-Strings to No disables new-style multi line strings
 # (similar to old-style but using """ to delimit multiple lines).
 #
-# Multi-Line-Strings  are only allowed inside ∇-defined functions; in immediate
-# execution the effect of multi-line functions can be achieved with ⎕INP.
+# Old=Multi-Line-Strings are only allowed inside ∇-defined functions; in
+# immediate execution the effect of multi-line functions can be achieved
+#with ⎕INP.
+#
+# New-Multi-Line-Strings can be used inside ∇-defined functions and also in
+# immediate execution mode.
 #
 # By default both old-style and new-style multi line strings are enabled, but
 # old-style multi line strings will disappear in the near future.
