@@ -770,7 +770,8 @@ ofstream outf(filename.c_str(), ofstream::out);
    if (!outf.is_open())   // open failed
       {
         CERR << "Unable to )DUMP workspace '" << wsname
-             << "': " << strerror(errno) << endl;
+             << "': " << strerror(errno) << "." << endl
+             << "    NOTE: filename: " << filename << endl;
         return;
       }
 

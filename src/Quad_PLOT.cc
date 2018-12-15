@@ -1469,7 +1469,7 @@ Token
 Quad_PLOT::eval_B(Value_P B)
 {
     MORE_ERROR() <<
-"⎕PLOT is not available because either no libcxb library was found on this\n"
+"⎕PLOT is not available because either no libxcb library was found on this\n"
 "system when GNU APL was compiled, or because it was disabled in ./configure.";
 
    SYNTAX_ERROR;
@@ -1480,7 +1480,7 @@ Token
 Quad_PLOT::eval_AB(Value_P A, Value_P B)
 {
     MORE_ERROR() <<
-"⎕PLOT is not available because either no libcxb library was found on this\n"
+"⎕PLOT is not available because either no libxcb library was found on this\n"
 "system when GNU APL was compiled, or because it was disabled in ./configure.";
 
    SYNTAX_ERROR;
