@@ -612,9 +612,14 @@ const char * value = colon + 1;
 const char * minus = strchr(att_and_val, '-');
    if (minus && minus < colon)   // line attribute
       {
+        // it is not unlikely that the user wants to use the same attributes
+        // for different plots that may differ in the number of lines. We
+        // therefore silently ignore such over-specified attribute rather
+        // than returning an error string (which then raises a DOMAIN error).
+        // 
         const int line = strtol(minus + 1, 0, 10) - Workspace::get_IO();
-        if (line < 0)             return "invalid line number";
-        if (line >= line_count)   return "invalid line number";
+        if (line < 0)             return 0;
+        if (line >= line_count)   return 0;
 
 #define gdef(_ty, _na, _val, _descr)
 #define ldef(ty,  na,  val, _descr)                                       \

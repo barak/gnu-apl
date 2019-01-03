@@ -18,6 +18,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <errno.h>
 #include <fcntl.h>
 #include <limits.h>
 #include <string.h>
@@ -929,7 +930,7 @@ FILE * f = fopen(filename, "r");
       {
          if (log_startup)
             CERR << "Not reading config file " << filename
-                 << " (not found/readable)" << endl;
+                 << " (" << strerror(errno) << ")" << endl;
          return 0;
       }
 
@@ -1065,7 +1066,10 @@ int file_profile = 0;   // the current profile in the preferences file
             }
          else if (!strcasecmp(opt, "Logging"))
             {
+              d[0] = strtoll(arg, 0, 10);   // decimal!
               Log_control(LogId(d[0]), true);
+              log_startup && CERR << "    logging facility " << d[0]
+                                  << " enabled in " << filename << endl;
             }
          else if (!strcasecmp(opt, "CIN-SEQUENCE"))
             {
