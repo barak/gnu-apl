@@ -1,4 +1,4 @@
-
+#ifdef gtk_fun_def
 /* a mapping from ⎕GTK function names (right string argument Bs in ⎕GTK Bs) to Gtk functions
 
            ╔════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
@@ -28,7 +28,9 @@ gtk_fun_def(drawingarea ,GtkDrawingArea,set_Y_origin ,Origin  ,V,I, set the Y-or
 //         ╚════════════╧══════════════╧═════════════╧════════╧═╧═╧══════════════════════════════════════════════════════╝
 
 #undef gtk_fun_def
+#endif
 
+#ifdef gtk_event_def
 /* a mapping from GTK events (signals) to Gtk_server callbacks...
 
              ╔═══════════════════════════════════════════════════════════════════════════╗
@@ -51,4 +53,5 @@ gtk_event_def( destroy ,  1  ,        ,GiNsEsIsCs, Main-Window,window     ,GtkWi
 //           ╚═════════╧═════╧════════╧══════════╧════════════╧═══════════╧══════════════╝
 
 #undef gtk_event_def
+#endif
 

@@ -109,6 +109,7 @@ public:
    APL_Float dfval() const
       { return value.fval.u1.flt; }
 
+   /// construct a new FloatCell a address Z
    ErrorCode zv(Cell * Z) const
       {
         new (Z) FloatCell(dfval());   return E_NO_ERROR;

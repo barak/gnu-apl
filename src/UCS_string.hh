@@ -324,7 +324,7 @@ public:
    size_t to_vector(UCS_string_vector & result) const;
 
    /// return \b this string with "escape sequences" replaced by their real
-   /// characters ('' → ' if single quoted and \r, \n, \xNNN etc. otherwise.
+   /// characters ('' → ' if single quoted and \\r, \\n, \\xNNN etc. otherwise.
    UCS_string un_escape(bool double_quoted, bool keep_LF) const;
 
    /// the inverse of \b un_escape().

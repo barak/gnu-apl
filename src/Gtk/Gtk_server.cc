@@ -428,7 +428,6 @@ print_fun(Fnum N, const char * gid, const char * gclass, const char * gfun,
 static void
 print_funs()
 {
-#define gtk_event_def(ev_name, ...)
 #define gtk_fun_def(glade_ID, gtk_class, gtk_function, ZAname, Z, A, help) \
    print_fun(FNUM_ ## gtk_class ## _ ## gtk_function, #glade_ID, \
    #gtk_class, #gtk_function, #ZAname, gtype_ ## Z, gtype_ ## A, #help);
@@ -472,14 +471,11 @@ static print_evs(int which)
 {
    if (which == 1)   // names
       {
-#define gtk_fun_def(_glade_ID, _gtk_class, _gtk_function, _ZAname, _Z,_A, _help)
-#define gtk_event_def(ev_name, ...) \
-        cout << "** " << #ev_name << endl;
+#define gtk_event_def(ev_name, ...)   cout << "** " << #ev_name << endl;
 #include "Gtk_map.def"
       }
    else if (which == 2)   // details
       {
-#define gtk_fun_def(_glade_ID, _gtk_class, _gtk_function, _ZAname, _Z,_A, _help)
 #define gtk_event_def(ev_name, argc, _opt, sig, wid_name, wid_id, wid_class) \
         print_ev2(#ev_name, argc, #sig, #wid_name, #wid_id, #wid_class);
 #include "Gtk_map.def"
@@ -704,8 +700,6 @@ char * V = TLV + 8;                  // the V part of the TLV buffer
 
                 // widget functions...
                 //
-#define gtk_event_def(ev_name, ...)
-
 #define gtk_fun_def(glade_ID, gtk_class, gtk_function, _ZAname, Z, A, _help)  \
          case Command_ ## gtk_class ## _ ## gtk_function:                     \
 { gtk_class * widget = reinterpret_cast<gtk_class *>(selected);               \
@@ -1153,7 +1147,6 @@ const int cmd_len = cmd_end - cmd;
 //
 extern "C"
 {
-#define gtk_fun_def(_entry, ...)
 #define gtk_event_def(ev_name, _argc, opt, sig, _wid_name, _wid_id,_wid_class) \
 void ev_name(GtkWidget * widget opt , gpointer user_data = 0) \
 { generic_callback(widget, #ev_name, #sig); }

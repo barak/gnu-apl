@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2018  Dr. Jürgen Sauermann
+    Copyright (C) 2018-2019  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -140,6 +140,7 @@ protected:
    double max_Y;
 };
 //=============================================================================
+/// data for all plot lines
 class Plot_data
 {
 public:
@@ -212,7 +213,7 @@ public:
            }
       }
 
-   /// convert a number to a string
+   /// convert integer to a string
    static const char * uint32_t_to_str(uint32_t val)
       {
         static char ret[40];
@@ -234,7 +235,7 @@ public:
    static const char * double_to_str(double val)
       {
         static char ret[40];
-        snprintf(ret, sizeof(ret), "%lf pixel", val);
+        snprintf(ret, sizeof(ret), "%.1lf", val);
         ret[sizeof(ret) - 1] = 0;
         return ret;
       }
@@ -263,6 +264,7 @@ public:
    static double double_from_str(const char * str, const char * & error)
       { error = 0;   return strtold(str, 0); }
 
+   /// consvert a string like "#RGB" or "#RRGGB" to a color
    static Color Color_from_str(const char * str, const char * & error);
 
    /// convert a string to a uint32_t
@@ -333,7 +335,6 @@ class Plot_line_properties
 public:
    /// constructor
    Plot_line_properties(int lnum) :
-#define gdef(_ty, _na, _val, _descr) 
 #define ldef(_ty,  na,  val, _descr) na(val),
 #include "Quad_PLOT.def"
    line_number(lnum)
@@ -354,25 +355,30 @@ public:
    }
 
    // get_XXX() and set_XXX functions
-#define gdef(_ty, _na, _val, _descr)
-#define ldef(ty,  na,  _val, _descr) ty get_ ## na() const   { return na; } \
-                             void set_ ## na(ty val)   { na = val; }
+#define ldef(ty,  na,  _val, _descr)      \
+   /** return the value of na **/         \
+   ty get_ ## na() const   { return na; } \
+   /** set the  value of na **/           \
+   void set_ ## na(ty val)   { na = val; }
 #include "Quad_PLOT.def"
 
+   /// print the properties
    int print(ostream & out) const;
 
-#define gdef(_ty, _na, _val, _descr)
-#define ldef(ty,  na,  _val, _descr) ty na;
+#define ldef(ty,  na,  _val, descr) /** descr **/ ty na;
 #include "Quad_PLOT.def"
+
+  /// plot line number
   const int line_number;   // starting a 0 regardless of ⎕IO
-   char legend_name_buffer[50];
+
+  /// a buffer for creating a legend name from a macto
+  char legend_name_buffer[50];
 };
 //-----------------------------------------------------------------------------
 int
 Plot_line_properties::print(ostream & out) const
 {
 char cc[40];
-#define gdef(_ty, _na, _val, _descr)
 #define ldef(ty,  na,  _val, _descr)                   \
    snprintf(cc, sizeof(cc), #na "-%d:  ",              \
             int(line_number + Workspace::get_IO()));   \
@@ -386,6 +392,15 @@ char cc[40];
 class Plot_window_properties
 {
 public:
+   /// the kind of range
+   enum Plot_Range_type
+      {
+        NO_RANGE           = 0,   ///< no plot range provided
+        PLOT_RANGE_MIN     = 1,   ///< min value provided
+        PLOT_RANGE_MAX     = 2,   ///< max value provided
+        PLOT_RANGE_MIN_MAX = PLOT_RANGE_MIN | PLOT_RANGE_MAX ///< min. and max.
+      };
+
    /// constructor
    Plot_window_properties(const Plot_data * data, int verbosity);
 
@@ -395,72 +410,167 @@ public:
         delete &plot_data;
       }
 
-   /// update derived properties after changing primary ones
-   void update(int verbosity);
+   /// update derived properties after changing primary ones, return \b true
+   /// on error
+   bool update(int verbosity);
 
    /// handle window resize event
    void set_window_size(int width, int height);
 
    // get_XXX() and set_XXX functions
-#define ldef(_ty, _na, _val, _descr)
-#define gdef(ty,  na,  _val, _descr) ty get_ ## na() const   { return na; } \
-                             void set_ ## na(ty val)   { na = val; }
+#define gdef(ty,  na,  _val, _descr)                                     \
+  /** return the value of na **/                                         \
+  ty get_ ## na() const   { return na; }                                 \
+  /** set the value of na **/                                            \
+  void set_ ## na(ty val)                                                \
+     { na = val;                                                         \
+       if (!strcmp(#na, "rangeX_min"))                                   \
+          rangeX_type = Plot_Range_type(rangeX_type | PLOT_RANGE_MIN);   \
+       else if (!strcmp(#na, "rangeX_max"))                              \
+          rangeX_type = Plot_Range_type(rangeX_type | PLOT_RANGE_MAX);   \
+       if (!strcmp(#na, "rangeY_min"))                                   \
+          rangeX_type = Plot_Range_type(rangeY_type | PLOT_RANGE_MIN);   \
+       else if (!strcmp(#na, "rangeY_max"))                              \
+          rangeX_type = Plot_Range_type(rangeY_type | PLOT_RANGE_MAX);   \
+     }
 #include "Quad_PLOT.def"
 
+   /// return true iff a rangeX_min property was specified
+   bool rangeX_min_valid() const
+      { return !!(rangeX_type & PLOT_RANGE_MIN); }
+
+   /// return true iff a rangeX_max property was specified
+   bool rangeX_max_valid() const
+      { return !!(rangeX_type & PLOT_RANGE_MAX); }
+
+   /// return true iff a rangeY_min property was specified
+   bool rangeY_min_valid() const
+      { return !!(rangeY_type & PLOT_RANGE_MIN); }
+
+   /// return true iff a rangeY_max property was specified
+   bool rangeY_max_valid() const
+      { return !!(rangeY_type & PLOT_RANGE_MAX); }
+
+   /// an array of plot line properties
    Plot_line_properties ** get_line_properties() const
       { return line_properties; }
 
+   /// convert \n val_X to the X coordinate of the pixel in the plot area
    Pixel valX2pixel(double val_X) const
       { return pa_border_L + val_X * scale_X; }
 
+   /// convert \n val_Y to the Y coordinate of the pixel in the plot area
    Pixel valY2pixel(double val_Y) const
       { return pa_border_T + pa_height - val_Y * scale_Y; }
 
+   /// print the properties (for sebugging purposes)
    int print(ostream & out) const;
 
    /// for e.g. att_and_val = "pa_width: 600" set pa_width to 600.
    /// Return error string on error.
    const char * set_attribute(const char * att_and_val);
 
+   /// return the width of the plot window
    Pixel  get_window_width() const    { return window_width; }
+
+   /// return the height of the plot window
    Pixel  get_window_height() const   { return window_height; }
+
+   /// return the smallest X value
    double get_min_X() const           { return min_X; }
+
+   /// return the largest X value
    double get_max_X() const           { return max_X; }
+
+   /// return the smallest Y value
    double get_min_Y() const           { return min_Y; }
+
+   /// return the largest Y value
    double get_max_Y() const           { return max_Y; }
+
+   /// return the X value → X pixels scaling factor
    double get_scale_X() const         { return scale_X; }
+
+   /// return the Y value → Y pixels scaling factor
    double get_scale_Y() const         { return scale_Y; }
+
+   /// return the number of pixels between X grid lines
    double get_tile_X() const          { return tile_X; }
+
+   /// return the number of pixels between Y grid lines
    double get_tile_Y() const          { return tile_Y; }
-   int    get_gridx_last() const      { return gridx_last; }
-   int    get_gridy_last() const      { return gridy_last; }
+
+   /// return the last index of the X grid
+   int    get_gridX_last() const      { return gridX_last; }
+
+   /// return the last index of the Y grid
+   int    get_gridY_last() const      { return gridY_last; }
+
+   /// return the verbosity when plotting
    int    get_verbosity() const       { return verbosity; }
+
+   /// set the verbosity when plotting
    void  set_verbosity(int verb)      { verbosity = verb; }
 
+   /// return the date to be plotted
    const Plot_data & get_plot_data() const   { return plot_data; }
 
 protected:
+   /// the number of plot lines
    const int line_count;
+
+   /// the date to be plotted
    const Plot_data & plot_data;
 
-#define ldef(_ty, _na, _val, _descr)
-#define gdef(ty,  na,  _val, _descr) ty na;
+#define gdef(ty, na, _val, descr) /** descr **/ ty na;
 #include "Quad_PLOT.def"
 
+   /// the width of the plot window
    Pixel window_width;
+
+   /// the height of the plot window
    Pixel window_height;
+
+   /// the smallest X value
    double min_X;
+
+   /// the largest X value
    double max_X;
+
+   /// the smallest Y value
    double min_Y;
+
+   /// the largest Y value
    double max_Y;
+
+   /// the X value → X pixels scaling factor
    double scale_X;
+
+   /// the Y value → Y pixels scaling factor
    double scale_Y;
+
+   /// the number of pixels between X grid lines
    double tile_X;
+
+   /// the number of pixels between Y grid lines
    double tile_Y;
-   int gridx_last;
-   int gridy_last;
+
+   /// the last index of the X grid
+   int gridX_last;
+
+   /// the last index of the Y grid
+   int gridY_last;
+
+   /// the verbosity when plotting
    int verbosity;
 
+   /// the kind of X range
+   Plot_Range_type rangeX_type;
+
+   /// the kind of Y range
+   Plot_Range_type rangeY_type;
+
+   /// array contraining the data for rhe plot lines
    Plot_line_properties ** line_properties;
 
    /// round val up to the next higher 1/2/5×10^N
@@ -472,9 +582,7 @@ Plot_window_properties::Plot_window_properties(const Plot_data * data,
    line_count(data->get_row_count()),
    plot_data(*data),
 #define gdef(_ty,  na,  val, _descr) na(val),
-#define ldef(_ty, _na, _val, _descr) 
 #include "Quad_PLOT.def"
-
    window_width(pa_border_L + pa_width  + pa_border_R),
    window_height(pa_border_T + pa_height + pa_border_B),
    min_X(data->get_min_X()),
@@ -485,7 +593,9 @@ Plot_window_properties::Plot_window_properties(const Plot_data * data,
    scale_Y(0),
    tile_X(0),
    tile_Y(0),
-   verbosity(0)
+   verbosity(0),
+   rangeX_type(NO_RANGE),
+   rangeY_type(NO_RANGE)
 {
    (verbosity > 1) && CERR << setw(20) << "min_X: " << min_X << endl
                            << setw(20) << "max_X: " << max_X << endl
@@ -510,7 +620,7 @@ Plot_window_properties::set_window_size(int width, int height)
 }
 //-----------------------------------------------------------------------------
 
-void
+bool
 Plot_window_properties::update(int verbosity)
 {
    window_width  = pa_border_L + pa_width  + pa_border_R;
@@ -520,6 +630,25 @@ Plot_window_properties::update(int verbosity)
    max_X = plot_data.get_max_X();
    min_Y = plot_data.get_min_Y();
    max_Y = plot_data.get_max_Y();
+
+   // the user may override the range derived from the data
+   //
+   if (rangeX_min_valid())   min_X = rangeX_min;
+   if (rangeX_max_valid())   max_X = rangeX_max;
+   if (rangeY_min_valid())   min_Y = rangeY_min;
+   if (rangeY_max_valid())   max_Y = rangeY_max;
+
+   if (min_X >= max_X)
+      {
+        MORE_ERROR() << "empty X range in A ⎕PLOT B";
+        return true;
+      }
+
+   if (min_Y >= max_Y)
+      {
+        MORE_ERROR() << "empty Y range in A ⎕PLOT B";
+        return true;
+      }
 
 double delta_X = max_X - min_X;
 double delta_Y = max_Y - min_Y;
@@ -535,8 +664,8 @@ double delta_Y = max_Y - min_Y;
            << setw(20) << "scale_X (1): " << scale_X << " pixels/X" << endl
            << setw(20) << "scale_Y (1): " << scale_Y << " pixels/Y" << endl;
 
-const double tile_X_raw = gridx_pixels / scale_X;
-const double tile_Y_raw = gridy_pixels / scale_Y;
+const double tile_X_raw = gridX_pixels / scale_X;
+const double tile_Y_raw = gridY_pixels / scale_Y;
 
    verbosity > 1 &&
       CERR << setw(20) << "tile_X_raw: " << tile_X_raw
@@ -551,8 +680,8 @@ const int min_Xi = floor(min_X / tile_X);
 const int min_Yi = floor(min_Y / tile_Y);
 const int max_Xi = ceil(max_X / tile_X);
 const int max_Yi = ceil(max_Y / tile_Y);
-   gridx_last = 0.5 + max_Xi - min_Xi;
-   gridy_last = 0.5 + max_Yi - min_Yi;
+   gridX_last = 0.5 + max_Xi - min_Xi;
+   gridY_last = 0.5 + max_Yi - min_Yi;
 
    min_X = tile_X * floor(min_X / tile_X);
    min_Y = tile_Y * floor(min_Y / tile_Y);
@@ -580,12 +709,13 @@ const int max_Yi = ceil(max_Y / tile_Y);
                                           << "(∆X between grid lines)" << endl
            << setw(20) << "tile    (2): " << tile_Y
                                           << "(∆Y between grid lines)" << endl;
+
+   return false;   // OK
 }
 //-----------------------------------------------------------------------------
 int
 Plot_window_properties::print(ostream & out) const
 {
-#define ldef(_ty, _na, _val, _descr)
 #define gdef(ty,  na,  _val, _descr) \
    out << setw(20) << #na ":  " << Plot_data::ty ## _to_str(na) << endl;
 #include "Quad_PLOT.def"
@@ -621,7 +751,6 @@ const char * minus = strchr(att_and_val, '-');
         if (line < 0)             return 0;
         if (line >= line_count)   return 0;
 
-#define gdef(_ty, _na, _val, _descr)
 #define ldef(ty,  na,  val, _descr)                                       \
          if (!strncmp(#na "-", att_and_val, minus - att_and_val))         \
             { const char * error = 0;                                     \
@@ -633,7 +762,6 @@ const char * minus = strchr(att_and_val, '-');
       }
    else                          // window attribute
       {
-#define ldef(_ty, _na, _val, _descr)
 #define gdef(ty,  na,  _val, _descr) \
          if (!strncmp(#na, att_and_val, colon - att_and_val))         \
             { const char * error = 0;                                 \
@@ -702,11 +830,17 @@ xcb_char2b_t * ret = new xcb_char2b_t[length];
   return ret;
 }
 //-----------------------------------------------------------------------------
+/// the width and the height of a string (in pixels)
 struct string_width_height
 {
+   /// constructor: ask X-server for the size (in pixels) of \b string
    string_width_height(const char * string, xcb_connection_t * conn,
                        xcb_font_t font);
+
+   /// the width of the string (pixels)
    int width;
+
+   /// the height of the string (pixels)
    int height;
 };
 
@@ -950,16 +1084,16 @@ xcb_gcontext_t text_gc = getFontGC(conn, screen, window, "fixed",
      const int py0 = w_props.valY2pixel(0);
      const double dy = w_props.get_max_Y() - w_props.get_min_Y();
      const int py1 = w_props.valY2pixel(dy);
-     for (int ix = 0; ix <= w_props.get_gridx_last(); ++ix)
+     for (int ix = 0; ix <= w_props.get_gridX_last(); ++ix)
          {
            const double v = w_props.get_min_X() + ix*w_props.get_tile_X();
            const int px = w_props.valX2pixel(v - w_props.get_min_X());
-           if (ix == 0 || ix == w_props.get_gridx_last() ||
-               w_props.get_gridx_style() == 1)
+           if (ix == 0 || ix == w_props.get_gridX_last() ||
+               w_props.get_gridX_style() == 1)
               {
                 draw_line(conn, window, gc, px, py0, px, py1);
               }
-           else if (w_props.get_gridx_style() == 2)
+           else if (w_props.get_gridX_style() == 2)
               {
                 draw_line(conn, window, gc, px, py0 - 5, px, py0 + 5);
               }
@@ -983,16 +1117,16 @@ xcb_gcontext_t text_gc = getFontGC(conn, screen, window, "fixed",
      const int px0 = w_props.valX2pixel(0);
      const double dx = w_props.get_max_X() - w_props.get_min_X();
      const int px1 = w_props.valX2pixel(dx);
-     for (int iy = 0; iy <= w_props.get_gridy_last(); ++iy)
+     for (int iy = 0; iy <= w_props.get_gridY_last(); ++iy)
          {
            const double v = w_props.get_min_Y() + iy*w_props.get_tile_Y();
            const int py = w_props.valY2pixel(v - w_props.get_min_Y());
-           if (iy == 0 || iy == w_props.get_gridy_last() ||
-               w_props.get_gridy_style() == 1)
+           if (iy == 0 || iy == w_props.get_gridY_last() ||
+               w_props.get_gridY_style() == 1)
               {
                 draw_line(conn, window, gc, px0, py, px1, py);
               }
-           else if (w_props.get_gridy_style() == 2)
+           else if (w_props.get_gridY_style() == 2)
               {
                 draw_line(conn, window, gc, px0 - 5, py, px0 + 5, py);
               }
@@ -1310,7 +1444,7 @@ const APL_Integer qio = Workspace::get_IO();
             }
        }
 
-   w_props->update(verbosity);
+   if (w_props->update(verbosity))   DOMAIN_ERROR;
    return Token(TOK_APL_VALUE1, plot_data(w_props, data));
 }
 //-----------------------------------------------------------------------------
@@ -1363,7 +1497,6 @@ Plot_window_properties * w_props = new Plot_window_properties(data, verbosity);
          WS_FULL;
       }
 
-// w_props->update(verbosity);
    return Token(TOK_APL_VALUE1, plot_data(w_props, data));
 }
 //-----------------------------------------------------------------------------
@@ -1446,7 +1579,6 @@ Quad_PLOT::help() const
 
    CERR << left;
 
-#define ldef(_ty, _na, _val, _descr)
 #define gdef(ty,  na,  val, descr)           \
    CERR << setw(20) << #na ":  " << setw(14) \
         << Plot_data::ty ## _to_str(val) << " (" << #descr << ")" << endl;
@@ -1457,7 +1589,6 @@ Quad_PLOT::help() const
 "   2. Local (plot line N) Attributes:\n"
 "\n";
 
-#define gdef(_ty, _na, _val, _descr)
 #define ldef(ty,  na,  val, descr)             \
    CERR << setw(20) << #na "-N:  " << setw(14) \
         << Plot_data::ty ## _to_str(val) << " (" << #descr << ")" << endl;

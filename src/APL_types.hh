@@ -508,6 +508,7 @@ struct AP_num3
      grand(gra)
    {}
 
+   /// copy \b other to \b this
    void operator =(const AP_num3 & other)
       {
         proc   = other.proc;

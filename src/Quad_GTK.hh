@@ -28,6 +28,7 @@
 #include "Simple_string.hh"
 #include "UCS_string_vector.hh"
 
+/// the implementation of ⎕GTK
 class Quad_GTK : public QuadFunction
 {
 public:
@@ -43,19 +44,21 @@ public:
    void clear();
 
 protected:
+   /// the type of a function parameter or return value
    enum Gtype
       {
-        gtype_V = 0,   // void
-        gtype_S = 1,   // string
-        gtype_I = 2,   // integer
-        gtype_F = 3,   // float
+        gtype_V = 0,   ///< void
+        gtype_S = 1,   ///< string
+        gtype_I = 2,   ///< integer
+        gtype_F = 3,   ///< float
       };
 
 #include "Gtk/Gtk_enums.hh"
 
+   /// the context for a GTL window
    struct window_entry
       {
-        int fd;
+        int fd;   ///< pipe to the windw process
       };
 
    /// overloaded Function::eval_AB()
@@ -83,12 +86,14 @@ protected:
    /// write a TLV
    int write_TLV(int fd, int tag, const UTF8_string & value);
 
-
+   /// open the GTH window described by gui_filename and optional css_filename
    int open_window(const UCS_string & gui_filename,
                    const UCS_string * css_filename);
 
+   /// return the handles of currently open windows
    Value_P window_list() const;
 
+   /// close the window with file descriptor fd
    Value_P close_window(int fd);
 
    /// poll all fds and insert events into \b event_queue until no more
@@ -105,8 +110,10 @@ protected:
     **/
    Value_P read_fd(int fd, int tag);
 
+   /// the currently open GTK windows
    Simple_string<window_entry, false> open_windows;
 
+   /// event queue for events from the GTK windows
    UCS_string_vector event_queue;
 };
 

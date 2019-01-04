@@ -118,9 +118,11 @@ public:
    /// Construct a token for an index
    Token(TokenTag tg, IndexExpr & idx);
 
+   /// destructor
    ~Token()
      { extract_apl_val("~Token()");  }
 
+   /// swap this and \b other
    inline void Hswap(Token & other)
       { ::Hswap(tag, other.tag);
         ::Hswap(value.int_vals[0], other.value.int_vals[0]);

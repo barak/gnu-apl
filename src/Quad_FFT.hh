@@ -27,6 +27,7 @@
 #include "Value.hh"
 #include "Simple_string.hh"
 
+/// the implementation of ⎕FFT
 class Quad_FFT : public QuadFunction
 {
 public:
@@ -96,11 +97,12 @@ protected:
              - 0.388*cos(6*n*M_PI / (N-1))
              + 0.028*cos(8*n*M_PI / (N-1)); }
 
-   /// set up a multi-dimensional window for shape sh, using ithe window
-   // function \b win
+   /// set up a multi-dimensional window for shape sh, using the window
+   /// function \b win
    static void fill_window(double * result, const Shape & shape,
                            window_function win);
 
+   /// true if fftw_import_system_wisdom() was called
    bool system_wisdom_loaded;
 };
 

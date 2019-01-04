@@ -59,6 +59,7 @@ public:
                            const Value & value);
 
 protected:
+   /// list all ⎕CR functions
    static Token list_functions(ostream & out);
 
    /// compute \b 5 ⎕CR \b B or \b 6 ⎕CR \b B

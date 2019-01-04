@@ -4,7 +4,6 @@ enum Fnum
 {
    FNUM_INVALID = -1,
    FNUM_0 = 0,
-#define gtk_event_def(ev_name, ...)
 #define gtk_fun_def(_glade_ID, gtk_class, gtk_function, _ZAname,_Z,_A,_help) \
    FNUM_ ## gtk_class ## _ ## gtk_function,
 
@@ -15,7 +14,6 @@ enum Fnum
 enum Gtk_Command_Tag
 {
    Command_0 = 1000,
-#define gtk_event_def(ev_name, ...)
 #define gtk_fun_def(_glade_ID, gtk_class, gtk_function, _ZAname,_Z,_A,_help) \
    Command_ ## gtk_class ## _ ## gtk_function,
 
@@ -26,17 +24,17 @@ enum Gtk_Command_Tag
 enum Gtk_Response_Tag
 {
    Response_0 = 2000,
-#define gtk_event_def(ev_name, ...)
 #define gtk_fun_def(_glade_ID, gtk_class, gtk_function, _ZAname,_Z,_A,_help) \
    Response_ ## gtk_class ## _ ## gtk_function,
 
 #include "Gtk_map.def"
 };
 
+/// tags specifying events
 enum Event_tag
 {
-   Event_widget_fun = 3000,      // H:widget:callback
-   Event_widget_fun_id_class,    // H:widget:callback:glade_id:name
-   Event_toplevel_window_done,   // H:Done
+   Event_widget_fun = 3000,      ///< H:widget:callback
+   Event_widget_fun_id_class,    ///< H:widget:callback:glade_id:name
+   Event_toplevel_window_done,   ///< H:Done
 };
 
