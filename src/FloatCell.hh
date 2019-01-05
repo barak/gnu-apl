@@ -35,6 +35,7 @@
  value.numerator ÷ value.fval.denominator, or not (and then
  value.fval.denominator is 0 and value.fval.u1.flt contains the double value)
  */
+/// A Cell containing a single Floating point (or rational) value
 class FloatCell : public RealCell
 {
 public:

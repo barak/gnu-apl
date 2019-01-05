@@ -31,6 +31,7 @@
 /**
     Base class for all system variables (Quad variables).
  */
+///  Base class for all APL system variables
 class SystemVariable : public Symbol
 {
 public:
@@ -68,6 +69,7 @@ public:
 /**
     A system variable that cannot be localized (push and pop have no effect).
  */
+/// Base class for all APL system variables that cannot be localized
 class NL_SystemVariable : public SystemVariable
 {
 public:
@@ -96,6 +98,7 @@ protected:
 /**
     A read-only system variable (push, pop, and assign are ignored).
  */
+/// Base class for all read-only APL system variables
 class RO_SystemVariable : public NL_SystemVariable
 {
 public:
@@ -123,6 +126,7 @@ protected:
 /**
    System variable Quad-AI (Account Information)
  */
+/// The class implementing ⎕AI
 class Quad_AI : public RO_SystemVariable
 {
 public:
@@ -147,6 +151,7 @@ protected:
 /**
    System variable Quad-ARG (command line arguments of the interpreter)
  */
+/// The class implementing ⎕ARG
 class Quad_ARG : public RO_SystemVariable
 {
 public:
@@ -161,6 +166,7 @@ protected:
 /**
    System variable Quad-AV (Atomic Vector)
  */
+/// The class implementing ⎕AV
 class Quad_AV : public RO_SystemVariable
 {
 public:
@@ -177,6 +183,7 @@ public:
 /**
    System variable Quad-CT (Comparison Tolerance)
  */
+/// The class implementing ⎕CT
 class Quad_CT : public SystemVariable
 {
 public:
@@ -203,6 +210,7 @@ protected:
 /**
    System variable Quad-EM (Event Message)
  */
+/// The class implementing ⎕EM
 class Quad_EM : public RO_SystemVariable
 {
 public:
@@ -219,6 +227,7 @@ protected:
 /**
    System variable Quad-ET (Event Type).
  */
+/// The class implementing ⎕ET
 class Quad_ET : public RO_SystemVariable
 {
 public:
@@ -234,6 +243,7 @@ protected:
 /**
    System variable Quad-FC (Format Control).
  */
+/// The class implementing ⎕FC
 class Quad_FC : public SystemVariable
 {
 public:
@@ -261,6 +271,7 @@ protected:
 /**
    System variable Quad-IO (Index Origin).
  */
+/// The class implementing ⎕IO
 class Quad_IO : public SystemVariable
 {
 public:
@@ -287,6 +298,7 @@ protected:
 /**
    System variable Quad-L (Left Argument).
  */
+/// The class implementing ⎕L
 class Quad_L : public NL_SystemVariable
 {
 public:
@@ -307,6 +319,7 @@ protected:
 /**
    System variable Quad-LC (Line Counter).
  */
+/// The class implementing ⎕LC
 class Quad_LC : public RO_SystemVariable
 {
 public:
@@ -321,6 +334,7 @@ protected:
 /**
    System variable Quad-LX (Latent Expression).
  */
+/// The class implementing ⎕LX
 class Quad_LX : public NL_SystemVariable
 {
 public:
@@ -339,6 +353,7 @@ protected:
 /**
    System variable Quad-PP (Printing Precision).
  */
+/// The class implementing ⎕PP
 class Quad_PP : public SystemVariable
 {
 public:
@@ -365,6 +380,7 @@ protected:
 /**
    System variable Quad-PR (Prompt Replacement).
  */
+/// The class implementing ⎕PR
 class Quad_PR : public SystemVariable
 {
 public:
@@ -391,6 +407,7 @@ protected:
    System variable Quad-PS (Print Style). This variable controls the formatting
    of APL values (classical APL or DISPLAY style).
  */
+/// The class implementing ⎕PS
 class Quad_PS : public SystemVariable
 {
 public:
@@ -438,6 +455,7 @@ protected:
 /**
    System variable Quad-PW (Print Width).
  */
+/// The class implementing ⎕PW
 class Quad_PW : public SystemVariable
 {
 public:
@@ -464,6 +482,7 @@ protected:
 /**
    System variable Quad-Quad (Evaluated Input/Output).
  */
+/// The class implementing ⎕
 class Quad_Quad : public SystemVariable
 {
 public:
@@ -484,6 +503,7 @@ protected:
 /**
    System variable Quote-Quad (Evaluated Input/Output).
  */
+/// The class implementing ⍞
 class Quad_QUOTE : public SystemVariable
 {
 public:
@@ -507,6 +527,7 @@ protected:
 /**
    System variable Quad-R (Right Argment).
  */
+/// The class implementing ⎕R
 class Quad_R : public NL_SystemVariable
 {
 public:
@@ -527,6 +548,7 @@ protected:
 /**
    System variable Quad-SYL (System Limits).
  */
+/// The class implementing ⎕SYL
 class Quad_SYL : public NL_SystemVariable
 {
 public:
@@ -574,6 +596,7 @@ protected:
 /**
    System variable Quad-TC (Terminal Control Characters)
  */
+/// The class implementing ⎕TC
 class Quad_TC : public RO_SystemVariable
 {
 public:
@@ -584,6 +607,7 @@ public:
 /**
    System variable Quad-TS (Time Stamp).
  */
+/// The class implementing ⎕TS
 class Quad_TS : public RO_SystemVariable
 {
 public:
@@ -597,6 +621,7 @@ public:
 /**
    System variable Quad-TZ (Time Zone).
  */
+/// The class implementing ⎕TZ
 class Quad_TZ : public SystemVariable
 {
 public:
@@ -646,6 +671,7 @@ protected:
 /**
    System variable Quad-UL (User Load).
  */
+/// The class implementing ⎕UL
 class Quad_UL : public RO_SystemVariable
 {
 public:
@@ -660,6 +686,7 @@ protected:
 /**
    System variable Quad-WA (Workspace Available).
  */
+/// The class implementing ⎕WA
 class Quad_WA : public RO_SystemVariable
 {
 public:
@@ -674,6 +701,7 @@ protected:
 /**
    System variable Quad-X (Axis Argument).
  */
+/// The class implementing ⎕X
 class Quad_X : public NL_SystemVariable
 {
 public:

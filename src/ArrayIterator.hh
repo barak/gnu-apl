@@ -22,7 +22,7 @@
 #define __ARRAY_ITERATOR_HH_DEFINED__
 
 #include "Common.hh"
-#include "Value.icc"
+#include "Value.hh"
 #include "SystemLimits.hh"
 
 //-----------------------------------------------------------------------------
@@ -100,6 +100,7 @@ public:
     The permutation is given as a \b Shape. If perm = 0, 1, 2, ... then
     PermutedArrayIterator is the same as ArrayIterator.
  **/
+/// an iterator for arrays with permnutet dimensions
 class PermutedArrayIterator : public ArrayIteratorBase
 {
 public:

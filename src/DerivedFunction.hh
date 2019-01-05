@@ -29,6 +29,7 @@
 /** an operator bound to one or more functions. The bound operator is then
     another operator (e.g. (+.) or a function (e.g. (+.×) or (+/).
  **/
+/// An APL operator bounf to its function argument(s)
 class DerivedFunction : public Function
 {
 public:

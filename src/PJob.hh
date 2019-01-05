@@ -195,7 +195,7 @@ protected:
    /// ravel of the result
    Cell * cZ;
 };
-//=============================================================================
+// ============================================================================
 /// a number of jobs, where each job can be executed in parallel
 class Parallel_job_list_base
 {
@@ -203,12 +203,13 @@ public:
    /// from where the joblist was started
    static const char * started_loc;
 };
-
+// ----------------------------------------------------------------------------
 /** a list of parallel jobs. It is used to control the parallel computation
     of nested results. Initially the Parallel_job_list is create with one
     job. If nested values are encountered they are not computed immediately
     but added to the joblist for later execution.
  **/
+/// A linked list of parallel jobs
 template <class T, bool has_destructor>
 class Parallel_job_list : public Parallel_job_list_base
 {

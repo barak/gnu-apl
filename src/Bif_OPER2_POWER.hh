@@ -26,6 +26,7 @@
 //-----------------------------------------------------------------------------
 /** Primitive operator ⍣ (power)
  */
+/// The class implementing ⍣
 class Bif_OPER2_POWER : public PrimitiveOperator
 {
 public:

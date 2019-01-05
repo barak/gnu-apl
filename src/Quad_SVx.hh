@@ -25,7 +25,8 @@
 #include "SystemVariable.hh"
 
 //-----------------------------------------------------------------------------
-/// some helper functions to start auxiliary processors
+/** some helper functions to start auxiliary processors */
+/// Base class for ⎕SVC, ⎕SVE, ⎕SVO, ⎕SVQ, ⎕SVR, and ⎕SVS
 class Quad_SVx
 {
 public:
@@ -43,6 +44,7 @@ protected:
 /**
    The system function ⎕SVC (Shared Variable Control).
  */
+/// The class implementing ⎕SVC
 class Quad_SVC : public QuadFunction, Quad_SVx
 {
 public:
@@ -63,6 +65,7 @@ protected:
 /**
    The system variable ⎕SVE (Shared Variable Event).
  */
+/// The implementation of ⎕SVE
 class Quad_SVE : public NL_SystemVariable, Quad_SVx
 {
 public:
@@ -83,6 +86,7 @@ protected:
 /**
    The system function Quad-SVO (Shared Variable Offer).
  */
+/// The implementation of ⎕SVO
 class Quad_SVO : public QuadFunction, Quad_SVx
 {
 public:
@@ -107,6 +111,7 @@ protected:
 /**
    The system function Quad-SVQ (Shared Variable Query).
  */
+/// The implementation of ⎕SVQ
 class Quad_SVQ : public QuadFunction, Quad_SVx
 {
 public:
@@ -130,6 +135,7 @@ protected:
 /**
    The system function ⎕SVR (shared Variable Retraction).
  */
+/// The implementation of ⎕SVR
 class Quad_SVR : public QuadFunction, Quad_SVx
 {
 public:
@@ -147,6 +153,7 @@ protected:
 /**
    The system function ⎕SVS (Shared Variable State).
  */
+/// The implementation of ⎕SVS
 class Quad_SVS : public QuadFunction, Quad_SVx
 {
 public:

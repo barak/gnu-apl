@@ -42,7 +42,7 @@
 #include "SystemLimits.hh"
 #include "SystemVariable.hh"
 #include "Tokenizer.hh"
-#include "Value.icc"
+#include "Value.hh"
 #include "Workspace.hh"
 
 //-----------------------------------------------------------------------------

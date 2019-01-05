@@ -22,7 +22,7 @@
 #define __NAMED_OBJECT_HH_DEFINED__
 
 #include "Id.hh"
-#include "Value.icc"
+#include "Value.hh"
 
 class Function;
 class Symbol;
@@ -30,9 +30,7 @@ class UCS_string;
 class Value;
 
 //-----------------------------------------------------------------------------
-/**
-     The possible values returned by \b Quad-NC.
- */
+/// The possible values returned by \b ⎕NC.
 enum NameClass
 {
   NC_INVALID          = -1,   ///< invalid name class.
@@ -57,7 +55,7 @@ enum NameClass
    System names are used by system variables and dunctions (⎕xx) and
    by primitive functions and operators.
  **/
-
+/// A user-defined variable or function
 class NamedObject
 {
 public:

@@ -27,6 +27,7 @@
 /**
    A dummy function for the product operator.
  **/
+/// The class implementing ∘
 class Bif_JOT : public PrimitiveFunction
 {
 public:
@@ -48,6 +49,7 @@ protected:
 //-----------------------------------------------------------------------------
 /** Primitive operator outer product.
  */
+/// The class implementing ∘.g
 class Bif_OPER2_OUTER : public PrimitiveOperator
 {
 public:

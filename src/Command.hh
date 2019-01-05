@@ -23,9 +23,9 @@
 
 #include <dirent.h>
 
-#include "Value.icc"
 #include "Common.hh"
 #include "LibPaths.hh"
+#include "Value.hh"
 #include "UCS_string.hh"
 #include "UTF8_string.hh"
 
@@ -36,6 +36,7 @@ class Workspace;
     Some command related functions, including the main input loop
     of the APL interpreter.
  */
+/// The class implementing all APL commands
 class Command
 {
 public:

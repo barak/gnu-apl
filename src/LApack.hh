@@ -163,8 +163,10 @@ protected:
 /// the minimum of \b x and \b y
 #define MIN(x, y) ((x) <= (y) ? (x) : (y))
 
-/// a single double or complex number. This class contains wrappers to
-/// double or complex numbers so that they can be used in templates.
+/** a single double or complex number. This class contains wrappers to
+    double or complex numbers so that they can be used in templates.
+ */
+/// A single double or complex number
 class DZ
 {
 public:
@@ -268,7 +270,7 @@ const T tmp = x;
   y = tmp;
 }
 //-----------------------------------------------------------------------------
-/// a vector of real numbers or a vector of complex numbers
+/// A vector of real numbers or a vector of complex numbers
 template<typename T>
 class Vector
 {
@@ -419,7 +421,7 @@ protected:
    const ShapeItem len;
 };
 //-----------------------------------------------------------------------------
-/// A double or complex  matrix
+/// A double or complex matrix
 template<typename T>
 class Matrix
 {

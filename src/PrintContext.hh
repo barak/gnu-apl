@@ -24,8 +24,7 @@
 #include "Common.hh"
 #include "SystemLimits.hh"
 
-/// PrintContext is a collection of attributes that control how
-/// APL values are being printed.
+/// Attributes that control how APL values are being printed.
 class PrintContext
 {
 public:

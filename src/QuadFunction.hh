@@ -25,8 +25,8 @@
 #include "StateIndicator.hh"
 
 //-----------------------------------------------------------------------------
-/** The various Quad functions.
- */
+/** The various Quad functions.  */
+/// Base class for all system functions
 class QuadFunction : public PrimitiveFunction
 {
 public:
@@ -46,9 +46,8 @@ public:
    virtual bool has_result() const   { return true; }
 };
 //-----------------------------------------------------------------------------
-/**
-   The system function ⎕AF (Atomic Function)
- */
+/** The system function ⎕AF (Atomic Function) */
+/// The class implementing ⎕AF
 class Quad_AF : public QuadFunction
 {
 public:
@@ -64,9 +63,8 @@ public:
 protected:
 };
 //-----------------------------------------------------------------------------
-/**
-   The system function ⎕AT (Attributes)
- */
+/** The system function ⎕AT (Attributes) */
+/// The class implementing ⎕AI
 class Quad_AT : public QuadFunction
 {
 public:
@@ -82,9 +80,8 @@ public:
 protected:
 };
 //-----------------------------------------------------------------------------
-/**
-   The system function ⎕DL (Delay).
- */
+/** The system function ⎕DL (Delay).  */
+/// The class implementing ⎕DL
 class Quad_DL : public QuadFunction
 {
 public:
@@ -102,6 +99,7 @@ protected:
 /**
    The system function ⎕EA (Execute Alternate)
  */
+/// The class implementing ⎕EA
 class Quad_EA : public QuadFunction
 {
 public:
@@ -122,6 +120,7 @@ protected:
 /**
    The system function ⎕EB (Execute Both)
  */
+/// The class implementing ⎕EB
 class Quad_EB : public QuadFunction
 {
 public:
@@ -142,6 +141,7 @@ protected:
 /**
    The system function ⎕EC (Execute Controlled)
  */
+/// The class implementing ⎕EC
 class Quad_EC : public QuadFunction
 {
 public:
@@ -168,6 +168,7 @@ protected:
 /**
    The system function ⎕ENV (ENvironment Variables)
  */
+/// The class implementing ⎕ENV
 class Quad_ENV : public QuadFunction
 {
 public:
@@ -185,6 +186,7 @@ protected:
 /**
    The system function ⎕ES (Event Simulate).
  */
+/// The class implementing ⎕ES
 class Quad_ES : public QuadFunction
 {
 public:
@@ -211,6 +213,7 @@ protected:
 /**
    The system function ⎕EX (Expunge).
  */
+/// The class implementing ⎕EX
 class Quad_EX : public QuadFunction
 {
 public:
@@ -231,6 +234,7 @@ protected:
 /**
    The system function ⎕INP (input from script, aka. HERE document)
  */
+/// The class implementing ⎕INP
 class Quad_INP : public QuadFunction
 {
 public:
@@ -291,6 +295,7 @@ protected:
 /**
    The system function ⎕NA (Name Association).
  */
+/// The class implementing ⎕NA
 class Quad_NA : public QuadFunction
 {
 public:
@@ -311,6 +316,7 @@ protected:
 /**
    The system function ⎕NC (Name class).
  */
+/// The class implementing ⎕NC
 class Quad_NC : public QuadFunction
 {
 public:
@@ -332,6 +338,7 @@ protected:
 /**
    The system function ⎕NL (Name List).
  */
+/// The class implementing ⎕NL
 class Quad_NL : public QuadFunction
 {
 public:
@@ -357,6 +364,7 @@ protected:
 /**
    The system function ⎕SI (State Indicator)
  */
+/// The class implementing ⎕SI
 class Quad_SI : public QuadFunction
 {
 public:
@@ -378,6 +386,7 @@ protected:
 /**
    The system function ⎕UCS (Universal Character Set)
  */
+/// The class implementing ⎕UCS
 class Quad_UCS : public QuadFunction
 {
 public:
@@ -393,7 +402,7 @@ public:
 protected:
 };
 //-----------------------------------------------------------------------------
-/// functions common for ⎕STOP and ⎕TRACE
+/// Base class for ⎕STOP and ⎕TRACE
 class Stop_Trace : public QuadFunction
 {
 protected:
@@ -413,7 +422,7 @@ protected:
    void assign(UserFunction * ufun, const Value & new_value, bool stop);
 };
 //-----------------------------------------------------------------------------
-/// ⎕STOP
+/// The class implementing ⎕STOP
 class Quad_STOP : public Stop_Trace
 {
 public:
@@ -432,7 +441,7 @@ public:
    static Quad_STOP  _fun;          ///< Built-in function.
 };
 //-----------------------------------------------------------------------------
-/// ⎕TRACE
+/// The class implementing ⎕TRACE
 class Quad_TRACE : public Stop_Trace
 {
 public:
@@ -451,8 +460,5 @@ public:
    static Quad_TRACE  _fun;          ///< Built-in function.
 };
 //-----------------------------------------------------------------------------
-
-
-
 
 #endif // __Quad_FUNCTION_HH_DEFINED__

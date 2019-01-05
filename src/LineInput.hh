@@ -26,6 +26,7 @@
 #include "Output.hh"
 #include "PrintOperator.hh"
 #include "UCS_string.hh"
+#include "UCS_string_vector.hh"
 
 class Nabla;
 
@@ -247,6 +248,7 @@ typedef void get_line_cb(LineInputMode mode, const UCS_string & prompt,
 /** InputMux fetches one line from either an input file, or interactively
    from the user if no input file is present
  **/
+/// a multiplexer selecting the input to the APL interpreter
 class InputMux
 {
 public:
@@ -344,8 +346,10 @@ protected:
    static LineInput * the_line_input;
 };
 //-----------------------------------------------------------------------------
-/// A mapping from ESC sequences to (internal) pseudo-Unicodes such as
-/// UNI_CursorUp and friends
+/** A mapping from ESC sequences to (internal) pseudo-Unicodes such as
+    UNI_CursorUp and friends
+ */
+/// A mapping from ANSI ESC sequences to internal Unicodes
 struct ESCmap
 {
    /// return true if seq is a true prefix of \b this ESCmap

@@ -27,6 +27,7 @@
 /*!
     A cell containing a single Unicode (most likely an APL character)
  */
+/// A Cell containing a single Unicode character
 class CharCell : public Cell
 {
 public:

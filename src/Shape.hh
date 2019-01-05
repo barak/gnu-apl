@@ -22,7 +22,9 @@
 #define __SHAPE_HH_DEFINED__
 
 #include "Common.hh"
-#include "Error.hh"
+#include "Error_macros.hh"
+
+#include <string.h>
 
 // ----------------------------------------------------------------------------
 /// the shape of an APL value

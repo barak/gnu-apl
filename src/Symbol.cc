@@ -36,7 +36,7 @@
 #include "Svar_signals.hh"
 #include "SystemVariable.hh"
 #include "UserFunction.hh"
-#include "Value.icc"
+#include "Value.hh"
 #include "Workspace.hh"
 
 //-----------------------------------------------------------------------------

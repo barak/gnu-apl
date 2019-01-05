@@ -30,9 +30,7 @@
 #include "UTF8_string.hh"
 
 //-----------------------------------------------------------------------------
-/**
-    The (symbols in the) header of a user-defined function.
- */
+/// The (symbols in the) header of a defined function
 class UserFunction_header
 {
 public:

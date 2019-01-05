@@ -46,6 +46,7 @@ class StateIndicator;
  The symbol tables of the Workspace. We put them into a base class for
  Workspace, so that they are initialized before all the members of Workspace.
  **/
+/// The symbol tables of an APL workspace
 class Workspace_0
 {
 protected:
@@ -60,6 +61,7 @@ protected:
     An APL workspace. This structure contains everyting (variables, functions,
     SI stack, etc.) belonging to a single APL workspace.
  */
+/// An APL workspace
 class Workspace : public Workspace_0
 {
 public:

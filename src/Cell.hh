@@ -44,6 +44,7 @@ class IntCell;
  **
  **   The kind of item is defined by its class, which is derived from Cell.
  **/
+/// The base class for all Cells
 class Cell
 {
 public:

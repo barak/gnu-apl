@@ -26,9 +26,9 @@
 #include "CharCell.hh"
 #include "PrimitiveFunction.hh"
 #include "PrintOperator.hh"
-#include "Value.icc"
+#include "Value.hh"
 #include "Workspace.hh"
-                                            
+
 Bif_F12_FORMAT   Bif_F12_FORMAT::_fun;       // ⍕
 Bif_F12_FORMAT * Bif_F12_FORMAT::fun = &Bif_F12_FORMAT::_fun;
 

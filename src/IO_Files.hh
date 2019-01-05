@@ -66,6 +66,7 @@ using namespace std;
     are all executed. The output of the APL interpreter is compared against
     the testcase files and mismatches are recorded.
  */
+/// a sequence of files that are still to be executed
 class IO_Files
 {
    friend int main(int argc, const char *argv[]);

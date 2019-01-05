@@ -24,9 +24,11 @@
 #include "UTF8_string.hh"
 #include "UCS_string_vector.hh"
 
-/// an input file and its properties. The file can be an apl script(.apl) file
-/// or a testcase (.tc) file. The file names initially come from the command
-/// line, but can be extended by )COPY commands 
+/** an input file and its properties. The file can be an apl script(.apl) file
+    or a testcase (.tc) file. The file names initially come from the command
+    line, but can be extended by )COPY commands 
+ */
+/// A single input file to be executed by the interpreter
 struct InputFile
 {
    friend class IO_Files;

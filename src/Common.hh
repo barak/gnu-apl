@@ -144,6 +144,7 @@ timeval tv;
   Software probes. A probe is a measurement of CPU cycles executed between two
   points P1 and P2 in the source code.
  */
+/// CPU cycle counter for performance measurements
 class Probe
 {
 public:
@@ -436,32 +437,6 @@ inline const void * CVOIP(const void * addr) { return addr; }
 
 //-----------------------------------------------------------------------------
 
-#include "SharedValuePointer.hh"
-
-// frequently used values
-
-/// integer scalar
-Value_P IntScalar(APL_Integer val, const char * loc);
-
-/// floating-point scalar
-Value_P FloatScalar(APL_Float val, const char * loc);
-
-/// character scalar
-Value_P CharScalar(Unicode uni, const char * loc);
-
-/// complex scalar
-Value_P ComplexScalar(APL_Complex cpx, const char * loc);
-
-/// ⍳0 (aka. ⍬)
-Value_P Idx0(const char * loc);
-
-/// ''
-Value_P Str0(const char * loc);
-
-/// 0 0⍴''
-Value_P Str0_0(const char * loc);
-
-/// 0 0⍴0
-Value_P Idx0_0(const char * loc);
+#include "Value_P.hh"
 
 #endif // __COMMON_HH_DEFINED__

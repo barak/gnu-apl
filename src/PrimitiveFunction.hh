@@ -24,7 +24,7 @@
 #include "Common.hh"
 #include "Function.hh"
 #include "Performance.hh"
-#include "Value.icc"
+#include "Value.hh"
 #include "Id.hh"
 
 class ArrayIterator;
@@ -39,6 +39,7 @@ class CollatingCache;
 
     The individual system functions are derived from this class
  */
+/// Base class for all internal functions of the interpreter
 class PrimitiveFunction : public Function
 {
 public:
@@ -88,8 +89,7 @@ protected:
    static const IntCell n_filler;
 };
 //-----------------------------------------------------------------------------
-/** The various non-scalar functions
- */
+/// Base class for all internal non-scalar functions of the interpreter
 class NonscalarFunction : public PrimitiveFunction
 {
 public:
@@ -99,8 +99,8 @@ public:
    {}
 };
 //-----------------------------------------------------------------------------
-/** System function zilde (⍬)
- */
+/** System function zilde (⍬) */
+/// The class implementing ⍬ (the empty numeric vector)
 class Bif_F0_ZILDE : public NonscalarFunction
 {
 public:
@@ -120,8 +120,8 @@ protected:
    virtual bool may_push_SI() const   { return false; }
 };
 //-----------------------------------------------------------------------------
-/** System function execute
- */
+/** System function execute */
+/// The class implementing ⍎
 class Bif_F1_EXECUTE : public NonscalarFunction
 {
 public:
@@ -150,8 +150,8 @@ protected:
    virtual bool may_push_SI() const   { return true; }
 };
 //-----------------------------------------------------------------------------
-/** System function index (⌷)
- */
+/** System function index (⌷) */
+/// The class implementing ⌷
 class Bif_F2_INDEX : public NonscalarFunction
 {
 public:
@@ -171,8 +171,8 @@ public:
 protected:
 };
 //-----------------------------------------------------------------------------
-/** primitive functions partition and enclose
- */
+/** primitive functions partition and enclose */
+/// The class implementing ⊂
 class Bif_F12_PARTITION : public NonscalarFunction
 {
 public:
@@ -217,8 +217,8 @@ protected:
                             Value_P B);
 };
 //-----------------------------------------------------------------------------
-/** primitive functions pick and disclose
- */
+/** primitive functions pick and disclose */
+/// The class implementing ⊃
 class Bif_F12_PICK : public NonscalarFunction
 {
 public:
@@ -259,8 +259,8 @@ protected:
                        APL_Integer qio, Value * cell_owner);
 };
 //-----------------------------------------------------------------------------
-/** Comma related functions (catenate, laminate, and ravel.)
- */
+/** Comma related functions (catenate, laminate, and ravel.) */
+/// Base class for , and ⍪
 class Bif_COMMA : public NonscalarFunction
 {
 public:
@@ -288,8 +288,8 @@ public:
    static Value_P append_scalar(Value_P A, Axis axis, const Cell & cell_B);
 };
 //-----------------------------------------------------------------------------
-/** primitive functions catenate, laminate, and ravel along last axis
- */
+/** primitive functions catenate, laminate, and ravel along last axis */
+/// The class implementing ,
 class Bif_F12_COMMA : public Bif_COMMA
 {
 public:
@@ -317,8 +317,8 @@ public:
 protected:
 };
 //-----------------------------------------------------------------------------
-/** primitive functions catenate and laminate along first axis, table
- */
+/** primitive functions catenate and laminate along first axis, table */
+/// The class implementing ⍪
 class Bif_F12_COMMA1 : public Bif_COMMA
 {
 public:
@@ -345,8 +345,8 @@ public:
 protected:
 };
 //-----------------------------------------------------------------------------
-/** primitive functions take and first
- */
+/** primitive functions take and first */
+/// The class implementing ↑
 class Bif_F12_TAKE : public NonscalarFunction
 {
 public:
@@ -383,8 +383,8 @@ protected:
    Token take(Value_P A, Value_P B);
 };
 //-----------------------------------------------------------------------------
-/** System function drop
- */
+/** System function drop */
+/// The class implementing ↓
 class Bif_F12_DROP : public NonscalarFunction
 {
 public:
@@ -404,8 +404,8 @@ public:
 protected:
 };
 //-----------------------------------------------------------------------------
-/** primitive functions member and enlist
- */
+/** primitive functions member and enlist */
+/// The class implementing ∈
 class Bif_F12_ELEMENT : public NonscalarFunction
 {
 public:
@@ -425,8 +425,8 @@ public:
 protected:
 };
 //-----------------------------------------------------------------------------
-/** primitive functions match and depth
- */
+/** primitive functions match and depth */
+/// The class implementing ≡
 class Bif_F12_EQUIV : public NonscalarFunction
 {
 public:
@@ -449,8 +449,8 @@ protected:
    Token depth(Value_P B);
 };
 //-----------------------------------------------------------------------------
-/** primitive function natch (≢)
- */
+/** primitive function natch (≢) */
+/// The class implementing ≡
 class Bif_F12_NEQUIV : public NonscalarFunction
 {
 public:
@@ -469,8 +469,8 @@ public:
    static Bif_F12_NEQUIV  _fun;   ///< Built-in function
 };
 //-----------------------------------------------------------------------------
-/** System function encode
- */
+/** System function encode */
+/// The class implementing ⊤
 class Bif_F12_ENCODE : public NonscalarFunction
 {
 public:
@@ -498,8 +498,8 @@ protected:
                const Cell * cA, APL_Complex b, double qct);
 };
 //-----------------------------------------------------------------------------
-/** System function decode
- */
+/** System function decode */
+/// The class implementing ⊥
 class Bif_F12_DECODE : public NonscalarFunction
 {
 public:
@@ -529,8 +529,8 @@ protected:
                        double qct);
 };
 //-----------------------------------------------------------------------------
-/** primitive functions matrix divide and matrix invert
- */
+/** primitive functions matrix divide and matrix invert */
+/// The class implementing ⌹
 class Bif_F12_DOMINO : public NonscalarFunction
 {
 public:
@@ -562,8 +562,8 @@ protected:
    Token matrix_divide(Value_P A, Value_P B);
 };
 //-----------------------------------------------------------------------------
-/** primitive functions rotate and reverse
- */
+/** primitive functions rotate and reverse */
+/// Base class for implementing ⌽ and ⊖
 class Bif_ROTATE : public NonscalarFunction
 {
 public:
@@ -580,8 +580,8 @@ protected:
    static Token reverse(Value_P B, Axis axis);
 };
 //-----------------------------------------------------------------------------
-/** primitive functions rotate and reverse along last axis
- */
+/** primitive functions rotate and reverse along last axis */
+/// The class implementing ⌽
 class Bif_F12_ROTATE : public Bif_ROTATE
 {
 public:
@@ -609,8 +609,8 @@ public:
 protected:
 };
 //-----------------------------------------------------------------------------
-/** primitive functions rotate and reverse along first axis
- */
+/** primitive functions rotate and reverse along first axis */
+/// The class implementing ⊖
 class Bif_F12_ROTATE1 : public Bif_ROTATE
 {
 public:
@@ -638,8 +638,8 @@ public:
 protected:
 };
 //-----------------------------------------------------------------------------
-/** System function transpose
- */
+/** System function transpose */
+/// The class implementing ⍉
 class Bif_F12_TRANSPOSE : public NonscalarFunction
 {
 public:
@@ -675,8 +675,8 @@ protected:
    static bool is_permutation(const Shape & sh);
 };
 //-----------------------------------------------------------------------------
-/** System function index of (⍳)
- */
+/** System function index of (⍳) */
+/// The class implementing ⍳
 class Bif_F12_INDEX_OF : public NonscalarFunction
 {
 public:
@@ -697,8 +697,8 @@ public:
 protected:
 };
 //-----------------------------------------------------------------------------
-/** primitive functions reshape and shape
- */
+/** primitive functions reshape and shape */
+/// The class implementing ⍴
 class Bif_F12_RHO : public NonscalarFunction
 {
 public:
@@ -721,8 +721,8 @@ public:
 protected:
 };
 //-----------------------------------------------------------------------------
-/** System function ∪ (unique/union)
- */
+/** System function ∪ (unique/union) */
+/// The class implementing ∪
 class Bif_F12_UNION : public NonscalarFunction
 {
 public:
@@ -754,8 +754,8 @@ protected:
       }
 };
 //-----------------------------------------------------------------------------
-/** System function ∩ (intersection)
- */
+/** System function ∩ (intersection) */
+/// The class implementing ∩
 class Bif_F2_INTER : public NonscalarFunction
 {
 public:
@@ -773,8 +773,8 @@ public:
 protected:
 };
 //-----------------------------------------------------------------------------
-/** System function left (⊣)
- */
+/** System function left (⊣) */
+/// The class implementing ⊣
 class Bif_F2_LEFT : public NonscalarFunction
 {
 public:
@@ -796,8 +796,8 @@ public:
 protected:
 };
 //-----------------------------------------------------------------------------
-/** System function right (⊢)
- */
+/** System function right (⊢) */
+/// The class implementing ⊢
 class Bif_F2_RIGHT : public NonscalarFunction
 {
 public:

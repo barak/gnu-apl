@@ -26,6 +26,7 @@
 //-----------------------------------------------------------------------------
 /** Primitive operator ⍤ (rank)
  */
+/// The class implementing ⍤
 class Bif_OPER2_RANK : public PrimitiveOperator
 {
 public:

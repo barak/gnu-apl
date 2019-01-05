@@ -49,7 +49,7 @@
 #include "UserPreferences.hh"
 #include "Workspace.hh"
 
-#include "Value.icc"
+#include "Value.hh"
 
 int Command::boxing_format = 0;
 ShapeItem Command::APL_expression_count = 0;

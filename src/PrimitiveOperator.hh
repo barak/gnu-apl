@@ -27,8 +27,7 @@
 class BeamIterator;
 
 //-----------------------------------------------------------------------------
-/** The various built-in operators.
- */
+/// Base class for all primitive APL operators
 class PrimitiveOperator : public PrimitiveFunction
 {
 public:

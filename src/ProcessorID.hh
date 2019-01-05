@@ -102,8 +102,10 @@ struct Network_Profile
       }
 };
 
-/// One processor. APL interpreters have numbers > 1000 while auxiliary
-/// processors have numbers < 1000
+/** One APL processor. APL interpreters have numbers > 1000 while auxiliary
+    processors have numbers < 1000
+ */
+/// One APL processor
 class ProcessorID
 {
 public:

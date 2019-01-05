@@ -30,7 +30,7 @@
 #include "Parallel.hh"
 #include "PointerCell.hh"
 #include "ScalarFunction.hh"
-#include "Value.icc"
+#include "Value.hh"
 #include "Workspace.hh"
 
 // scalar function instances

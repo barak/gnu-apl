@@ -21,7 +21,7 @@
 #include <stdio.h>
 #include <math.h>
 
-#include "Value.icc"
+#include "Value.hh"
 #include "ErrorCode.hh"
 #include "PointerCell.hh"
 #include "ComplexCell.hh"

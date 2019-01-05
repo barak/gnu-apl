@@ -26,6 +26,7 @@
 //-----------------------------------------------------------------------------
 /** Primitive operator ⍨ (commute/duplicate)
  */
+/// The class implementing ⍨
 class Bif_OPER1_COMMUTE : public PrimitiveOperator
 {
 public:

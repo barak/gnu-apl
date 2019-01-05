@@ -33,8 +33,7 @@ class Cell;
 
 //-----------------------------------------------------------------------------
 
-/// some information about a column to be printed. This info
-/// is used to properly align the elements of a column.
+/// some information about a column to be printed.
 class ColInfo
 {
 public:
@@ -81,9 +80,7 @@ public:
    int denom_len;
 };
 //-----------------------------------------------------------------------------
-/** A two-dimensional Unicode character buffer used for converting APL values
-    to their character representations.
- */
+/// A two-dimensional Unicode character buffer
 class PrintBuffer
 {
 public:

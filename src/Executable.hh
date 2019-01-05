@@ -21,10 +21,10 @@
 #ifndef __EXECUTABLE_HH_DEFINED__
 #define __EXECUTABLE_HH_DEFINED__
 
-#include "Output.hh"
-#include "Parser.hh"
+#include "Token.hh"
 #include "UCS_string_vector.hh"
 
+class Error;
 class UCS_string;
 class UserFunction;
 
@@ -35,6 +35,7 @@ class UserFunction;
      - the statements of one line in immediate execution, or
      - all lines of a user defined function.
  **/
+/// Base class for ExecuteList, StatementList, and UserFunction
 class Executable
 {
 public:
@@ -199,8 +200,9 @@ protected:
 };
 //-----------------------------------------------------------------------------
 /**
-   The token of an execute expression (⍎',,,')
+   The token of an execute expression (⍎'...')
  **/
+/// The token of an execute expression ⍎'...'
 class ExecuteList : public Executable
 {
    friend class XML_Loading_Archive;
@@ -223,6 +225,7 @@ protected:
 /**
    The token of an statement list (cmd ◊ cmd ... ◊ cmd)
  **/
+/// The token of an statement list cmd ◊ cmd ... ◊ cmd
 class StatementList : public Executable
 {
    friend class XML_Loading_Archive;

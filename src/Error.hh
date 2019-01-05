@@ -26,6 +26,29 @@
 #include "ErrorCode.hh"
 #include "UCS_string.hh"
 
+/// throw a error with a parser location
+void throw_parse_error(ErrorCode code, const char * par_loc,
+                       const char * loc)
+#ifdef __GNUC__
+    __attribute__ ((noreturn))
+#endif
+;
+
+/// throw an Error related to \b Symbol \b symbol
+void throw_symbol_error(const UCS_string & symb, const char * loc)
+#ifdef __GNUC__
+    __attribute__ ((noreturn))
+#endif
+;
+
+/// throw a define error for function \b fun
+void throw_define_error(const UCS_string & fun, const UCS_string & cmd,
+                        const char * loc)
+#ifdef __GNUC__
+    __attribute__ ((noreturn))
+#endif
+;
+
 class Function;
 class IndexExpr;
 
@@ -34,8 +57,13 @@ class IndexExpr;
  ** The primary item is the error_code; the other items are only valid if
  ** error_code != NO_ERROR
  **/
-struct Error
+/// An APL error and information related to it
+class Error
 {
+   friend class Executable;
+   friend class Quad_ES;
+
+public:
    /// constructor: error with error code ec
    Error(ErrorCode ec, const char * loc) { init(ec, loc); }
 
@@ -68,6 +96,18 @@ struct Error
    const UCS_string & get_error_line_2() const
       { return error_message_2; }
 
+   /// return the major class (⎕ET) of the error
+   static int error_major(ErrorCode err)
+      { return err >> 16; }
+
+   /// return the category (⎕ET) of the error
+   static int error_minor(ErrorCode err)
+      { return err & 0x00FF; }
+
+   /// return source file location where this error was printed (0 if not)
+   const char * get_print_loc() const
+      { return print_loc; }
+
    /// compute the caret line. This is the thirs of 3 error lines.
    /// It contains the failure position the statement and is NOT subject
    /// to translation.
@@ -79,16 +119,12 @@ struct Error
    /// return a string describing the error
    static const UCS_string error_name(ErrorCode err);
 
-   /// return the major class (⎕ET) of the error
-   static int error_major(ErrorCode err)
-      { return err >> 16; }
-
-   /// return the category (⎕ET) of the error
-   static int error_minor(ErrorCode err)
-      { return err & 0x00FF; }
-
    /// print the 3 error message lines as per ⎕EM
    void print_em(ostream & out, const char * loc);
+
+   /// throw a DEFN ERROR
+   static void throw_define_error(const UCS_string & fun,
+                                  const UCS_string & cmd, const char * loc);
 
    /// the error code
    ErrorCode error_code;
@@ -118,10 +154,6 @@ struct Error
    /// the right caret position (-1 if none) for the error display
    int right_caret;
 
-   /// return source file location where this error was printed (0 if not)
-   const char * get_print_loc() const
-      { return print_loc; }
-
 protected:
    /// where this error was printed (0 if not)
    const char * print_loc;
@@ -130,61 +162,4 @@ private:
    /// constructor (not implemented): prevent construction without error code
    Error();
 };
-
-/// throw an Error with \b code only (typically a standard APL error)
-void throw_apl_error(ErrorCode code, const char * loc)
-#ifdef __GNUC__
-    __attribute__ ((noreturn))
-#endif
-;
-
-/// throw a error with a parser location
-void throw_parse_error(ErrorCode code, const char * par_loc,
-                       const char * loc)
-#ifdef __GNUC__
-    __attribute__ ((noreturn))
-#endif
-;
-
-/// throw an Error related to \b Symbol \b symbol
-void throw_symbol_error(const UCS_string & symb, const char * loc)
-#ifdef __GNUC__
-    __attribute__ ((noreturn))
-#endif
-;
-
-/// throw a define error for function \b fun
-void throw_define_error(const UCS_string & fun, const UCS_string & cmd,
-                        const char * loc)
-#ifdef __GNUC__
-    __attribute__ ((noreturn))
-#endif
-;
-
-#define ATTENTION           { \
-                              throw_apl_error(E_ATTENTION,          LOC); }
-#define AXIS_ERROR          throw_apl_error(E_AXIS_ERROR,           LOC)
-#define DEFN_ERROR          throw_apl_error(E_DEFN_ERROR,           LOC)
-#define DOMAIN_ERROR        throw_apl_error(E_DOMAIN_ERROR,         LOC)
-#define INDEX_ERROR         throw_apl_error(E_INDEX_ERROR,          LOC)
-#define INTERNAL_ERROR      throw_apl_error(E_INTERNAL_ERROR,       LOC)
-#define INTERRUPT           { \
-                              throw_apl_error(E_INTERRUPT,          LOC); }
-#define LENGTH_ERROR        throw_apl_error(E_LENGTH_ERROR,         LOC)
-#define LIMIT_ERROR_RANK    throw_apl_error(E_SYS_LIMIT_RANK,       LOC)
-#define LIMIT_ERROR_SVAR    throw_apl_error(E_SYS_LIMIT_SVAR,       LOC)
-#define LIMIT_ERROR_FUNOPER throw_apl_error(E_SYS_LIMIT_FUNOPER,    LOC)
-#define LIMIT_ERROR_PREFIX  throw_apl_error(E_SYS_LIMIT_PREFIX,     LOC)
-#define RANK_ERROR          throw_apl_error(E_RANK_ERROR,           LOC)
-#define SYNTAX_ERROR        throw_apl_error(E_SYNTAX_ERROR,         LOC)
-#define LEFT_SYNTAX_ERROR   throw_apl_error(E_LEFT_SYNTAX_ERROR,    LOC)
-#define SYSTEM_ERROR        throw_apl_error(E_SYSTEM_ERROR,         LOC)
-#define TODO                throw_apl_error(E_NOT_YET_IMPLEMENTED,  LOC)
-#define FIXME               {  Backtrace::show(__FILE__, __LINE__); \
-                               cleanup(false);   exit(0);           \
-                               throw_apl_error(E_THIS_IS_A_BUG,     LOC); }
-#define VALUE_ERROR         throw_apl_error(E_VALUE_ERROR,          LOC)
-#define VALENCE_ERROR       throw_apl_error(E_VALENCE_ERROR,        LOC)
-#define WS_FULL           { throw_apl_error(E_WS_FULL,              LOC); }
-
 #endif // __ERROR_HH_DEFINED__

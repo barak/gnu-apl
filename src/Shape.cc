@@ -19,7 +19,7 @@
 */
 
 #include "Shape.hh"
-#include "Value.icc"
+#include "Value.hh"
 
 //-----------------------------------------------------------------------------
 Shape::Shape(Value_P A, int qio_A)

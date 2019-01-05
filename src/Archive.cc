@@ -48,7 +48,7 @@
 #include "Token.hh"
 #include "UCS_string.hh"
 #include "UserFunction.hh"
-#include "Value.icc"
+#include "Value.hh"
 #include "Workspace.hh"
 
 using namespace std;

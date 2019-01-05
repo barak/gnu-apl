@@ -27,6 +27,7 @@ class Function;
 class Symbol;
 class UCS_string;
 
+//-----------------------------------------------------------------------------
 /**
  An Identifier for each internal object (primitives, Quad-symbols, and more).
  The ID can be derived in different ways:
@@ -38,8 +39,7 @@ class UCS_string;
 
   This is controlled by 5 corresponding macros: pp() qv() qf() resp. st()
  */
-
-//-----------------------------------------------------------------------------
+/// Identifier of an internal object of the APL interpreter
 class ID
 {
 public:

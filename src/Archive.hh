@@ -27,7 +27,7 @@
 #include "UTF8_string.hh"
 #include "Workspace.hh"
 
-#include "Value.icc"
+#include "Value.hh"
 
 class Cell;
 class Function;

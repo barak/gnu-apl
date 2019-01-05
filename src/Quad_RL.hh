@@ -24,9 +24,8 @@
 #include "SystemVariable.hh"
 
 //-----------------------------------------------------------------------------
-/**
-   System variable Quad-RL (Random Link).
- */
+/** System variable Quad-RL (Random Link).  */
+/// Helper for ⎕RE
 class Quad_RL : public SystemVariable
 {
 public:

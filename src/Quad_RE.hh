@@ -27,6 +27,7 @@
 
 class Regexp;
 
+/// The class implementing ⎕RE
 class Quad_RE : public QuadFunction
 {
 public:

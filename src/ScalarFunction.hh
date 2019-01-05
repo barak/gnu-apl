@@ -28,12 +28,13 @@
 #include "PrimitiveFunction.hh"
 #include "Thread_context.hh"
 
-#include "Value.icc"
+#include "Value.hh"
 
 //-----------------------------------------------------------------------------
 /** Base class for scalar functions (functions whose monadic and/or dyadic
     version are scalar.
  */
+/// Base class for all scalar functions
 class ScalarFunction : public PrimitiveFunction
 {
 public:
@@ -111,6 +112,7 @@ protected:
 //-----------------------------------------------------------------------------
 /** Scalar functions binomial and factorial.
  */
+/// The class implementing !
 class Bif_F12_BINOM : public ScalarFunction
 {
 public:
@@ -146,6 +148,7 @@ protected:
 //-----------------------------------------------------------------------------
 /** Scalar function less than.
  */
+/// The class implementing <
 class Bif_F2_LESS : public ScalarFunction
 {
 public:
@@ -177,6 +180,7 @@ protected:
 //-----------------------------------------------------------------------------
 /** Scalar function equal.
  */
+/// The class implementing =
 class Bif_F2_EQUAL : public ScalarFunction
 {
 public:
@@ -208,6 +212,7 @@ protected:
 //-----------------------------------------------------------------------------
 /** Scalar function EQ bitwise (i.e. bitwise not A xor B)
  */
+/// The class implementing ⊤=
 class Bif_F2_EQUAL_B : public ScalarFunction
 {
 public:
@@ -239,6 +244,7 @@ protected:
 //-----------------------------------------------------------------------------
 /** Scalar function NE bitwise (i.e. bitwise A xor B)
  */
+/// The class implementing ⊤≠
 class Bif_F2_UNEQ_B : public ScalarFunction
 {
 public:
@@ -270,6 +276,7 @@ protected:
 //-----------------------------------------------------------------------------
 /** Scalar function greater than.
  */
+/// The class implementing >
 class Bif_F2_GREATER : public ScalarFunction
 {
 public:
@@ -301,6 +308,7 @@ protected:
 //-----------------------------------------------------------------------------
 /** Scalar function AND/LCM
  */
+/// The class implementing ∧
 class Bif_F2_AND : public ScalarFunction
 {
 public:
@@ -335,6 +343,7 @@ protected:
 //-----------------------------------------------------------------------------
 /** Scalar function AND bitwise
  */
+/// The class implementing ⊤∧
 class Bif_F2_AND_B : public ScalarFunction
 {
 public:
@@ -373,6 +382,7 @@ protected:
 //-----------------------------------------------------------------------------
 /** Scalar function OR/GCD
  */
+/// The class implementing ∨
 class Bif_F2_OR : public ScalarFunction
 {
 public:
@@ -407,6 +417,7 @@ protected:
 //-----------------------------------------------------------------------------
 /** Scalar function OR bitwise
  */
+/// The class implementing ⊤∨
 class Bif_F2_OR_B : public ScalarFunction
 {
 public:
@@ -445,6 +456,7 @@ protected:
 //-----------------------------------------------------------------------------
 /** Scalar function less or equal.
  */
+/// The class implementing ≤
 class Bif_F2_LEQ : public ScalarFunction
 {
 public:
@@ -474,8 +486,9 @@ protected:
       { return eval_scalar_AXB(A, X, B, &Cell::bif_less_eq); }
 };
 //-----------------------------------------------------------------------------
-/** Scalar function equal.
+/** Scalar function greater or equal.
  */
+/// The class implementing ≥
 class Bif_F2_MEQ : public ScalarFunction
 {
 public:
@@ -507,6 +520,7 @@ protected:
 //-----------------------------------------------------------------------------
 /** Scalar function not equal
  */
+/// The class implementing ≠
 class Bif_F2_UNEQ : public ScalarFunction
 {
 public:
@@ -538,6 +552,7 @@ protected:
 //-----------------------------------------------------------------------------
 /** Scalar function find.
  */
+/// The class implementing ⋸
 class Bif_F2_FIND : public ScalarFunction
 {
 public:
@@ -564,6 +579,7 @@ protected:
 //-----------------------------------------------------------------------------
 /** Scalar function NOR
  */
+/// The class implementing ⍱
 class Bif_F2_NOR : public ScalarFunction
 {
 public:
@@ -591,6 +607,7 @@ protected:
 //-----------------------------------------------------------------------------
 /** Scalar function NOR bitwise
  */
+/// The class implementing ⊤⍱
 class Bif_F2_NOR_B : public ScalarFunction
 {
 public:
@@ -622,6 +639,7 @@ protected:
 //-----------------------------------------------------------------------------
 /** Scalar function nand.
  */
+/// The class implementing ⍲
 class Bif_F2_NAND : public ScalarFunction
 {
 public:
@@ -649,6 +667,7 @@ protected:
 //-----------------------------------------------------------------------------
 /** Scalar function NAND bitwise
  */
+/// The class implementing ⊤⍲
 class Bif_F2_NAND_B : public ScalarFunction
 {
 public:
@@ -676,6 +695,7 @@ protected:
 //-----------------------------------------------------------------------------
 /** Scalar functions power and exponential.
  */
+/// The class implementing ⋆
 class Bif_F12_POWER : public ScalarFunction
 {
 public:
@@ -717,6 +737,7 @@ protected:
 //-----------------------------------------------------------------------------
 /** Scalar functions add and conjugate.
  */
+/// The class implementing +
 class Bif_F12_PLUS : public ScalarFunction
 {
 public:
@@ -767,6 +788,7 @@ protected:
 //-----------------------------------------------------------------------------
 /** Scalar functions subtract and negative.
  */
+/// The class implementing -
 class Bif_F12_MINUS : public ScalarFunction
 {
 public:
@@ -808,6 +830,7 @@ protected:
 //-----------------------------------------------------------------------------
 /** Scalar function roll and non-scalar function dial.
  */
+/// The class implementing ?
 class Bif_F12_ROLL : public ScalarFunction
 {
 public:
@@ -838,6 +861,7 @@ protected:
 //-----------------------------------------------------------------------------
 /** Scalar function not and non-scalar function without.
  */
+/// The class implementing ∼
 class Bif_F12_WITHOUT : public ScalarFunction
 {
 public:
@@ -868,6 +892,7 @@ protected:
 //-----------------------------------------------------------------------------
 /** Scalar functions times and direction.
  */
+/// The class implementing ×
 class Bif_F12_TIMES : public ScalarFunction
 {
 public:
@@ -918,6 +943,7 @@ protected:
 //-----------------------------------------------------------------------------
 /** Scalar functions divide and reciprocal.
  */
+/// The class implementing ÷
 class Bif_F12_DIVIDE : public ScalarFunction
 {
 public:
@@ -959,6 +985,7 @@ protected:
 //-----------------------------------------------------------------------------
 /** Scalar functions circle functions and pi times.
  */
+/// The class implementing ○
 class Bif_F12_CIRCLE : public ScalarFunction
 {
 public:
@@ -1001,8 +1028,9 @@ protected:
    const bool inverse;
 };
 //-----------------------------------------------------------------------------
-/** Scalar functions minimum and round up.
+/** Scalar functions maximum and round up.
  */
+/// The class implementing ⌈
 class Bif_F12_RND_UP : public ScalarFunction
 {
 public:
@@ -1039,8 +1067,9 @@ protected:
       { return eval_scalar_AXB(A, X, B, &Cell::bif_maximum); }
 };
 //-----------------------------------------------------------------------------
-/** Scalar functions maximum and round down.
+/** Scalar functions minimum and round down.
  */
+/// The class implementing ⌊
 class Bif_F12_RND_DN : public ScalarFunction
 {
 public:
@@ -1079,6 +1108,7 @@ protected:
 //-----------------------------------------------------------------------------
 /** Scalar functions residue and magnitude.
  */
+/// The class implementing ∣
 class Bif_F12_STILE : public ScalarFunction
 {
 public:
@@ -1114,6 +1144,7 @@ protected:
 //-----------------------------------------------------------------------------
 /** Scalar functions logarithms.
  */
+/// The class implementing ⍟
 class Bif_F12_LOGA : public ScalarFunction
 {
 public:

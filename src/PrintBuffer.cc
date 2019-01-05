@@ -27,7 +27,7 @@
 #include "PointerCell.hh"
 #include "PrintBuffer.hh"
 #include "PrintOperator.hh"
-#include "Value.icc"
+#include "Value.hh"
 #include "Workspace.hh"
 
 /// max sizes for arrays on the stack. Larger values are allocated with new()

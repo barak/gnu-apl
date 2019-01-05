@@ -25,7 +25,6 @@
 #include "IndexExpr.hh"
 #include "Output.hh"
 #include "Prefix.hh"
-#include "SharedValuePointer.hh"
 #include "StateIndicator.hh"
 #include "SystemLimits.hh"
 #include "UserFunction.hh"

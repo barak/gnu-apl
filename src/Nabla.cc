@@ -69,7 +69,7 @@ Nabla::throw_edit_error(const char * why)
         MORE_ERROR() << why;
       }
 
-   throw_define_error(fun_header, first_command, why);
+   Error::throw_define_error(fun_header, first_command, why);
 }
 //-----------------------------------------------------------------------------
 void

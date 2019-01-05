@@ -33,7 +33,7 @@
 #include "Workspace.hh"
 
 #include "Cell.icc"
-#include "Value.icc"
+#include "Value.hh"
 
 //-----------------------------------------------------------------------------
 bool

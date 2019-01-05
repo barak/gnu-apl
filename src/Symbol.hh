@@ -33,9 +33,11 @@ class IndexExpr;
 class UserFunction;
 
 //-----------------------------------------------------------------------------
-/// One entry of the value stack for \b this symbol. The value stack
-/// is pushed/poped when the symbol is localized on entry/return of
-/// a user defined function.
+/** One entry in the value stack of a symbol. The value stack
+    is pushed/poped when the symbol is localized on entry/return of
+    a user defined function.
+ */
+/// One entry in the value stack of a Symbol
 class ValueStackItem
 {
 public:
@@ -82,9 +84,7 @@ public:
    NameClass name_class;
 };
 //-----------------------------------------------------------------------------
-/**
-    Base class for variables and user defined functions.
- */
+/// Base class for variables, defined functions, snd distinguished names
 class Symbol : public NamedObject
 {
    friend class SymbolTable;

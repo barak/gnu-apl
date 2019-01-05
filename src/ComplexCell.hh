@@ -25,11 +25,12 @@
 #include "IntCell.hh"
 
 //-----------------------------------------------------------------------------
-/*!
+/**
  A cell containing a single APL complex value. This class essentially
  overloads certain functions in class Cell with complex number specific
  implementations.
  */
+/// A celkl containing one complex numbver
 class ComplexCell : public NumericCell
 {
 public:

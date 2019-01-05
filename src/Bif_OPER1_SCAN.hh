@@ -26,6 +26,7 @@
 //-----------------------------------------------------------------------------
 /** Primitive operator scan.
  */
+/// Base class for \ and ⍀
 class Bif_SCAN : public PrimitiveOperator
 {
 public:
@@ -46,6 +47,7 @@ protected:
 //-----------------------------------------------------------------------------
 /** Primitive operator \ (scan along last axis)
  */
+/// The class implementing \.
 class Bif_OPER1_SCAN : public Bif_SCAN
 {
 public:
@@ -78,6 +80,7 @@ protected:
 //-----------------------------------------------------------------------------
 /** Primitive operator ⍀ (scan along first axis)
  */
+/// The class implementing ⍀
 class Bif_OPER1_SCAN1 : public Bif_SCAN
 {
 public:

@@ -28,8 +28,10 @@
 
 class Function;
 
-/// a structure that contains user preferences from different sources
-/// (command line arguments, config files, environment variables ...)
+/** a structure that contains user preferences from different sources
+    (command line arguments, config files, environment variables ...)
+ */
+/// Various preferences of the user
 struct UserPreferences
 {
    UserPreferences()

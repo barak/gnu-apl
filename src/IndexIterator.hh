@@ -19,16 +19,16 @@
 */
 
 #include "Shape.hh"
-
-#include "Value.icc"
+#include "Value.hh"
 
 //-----------------------------------------------------------------------------
-/*!
+/**
    An iterator for one dimension of indices. When the iterator reached its
    end, it wraps around and increments its upper IndexIterator (if any).
 
    This way, multi-dimensional iterators can be created.
  */
+/// Base class for ElidedIndexIterator and TrueIndexIterator
 class IndexIterator
 {
 public:
@@ -80,7 +80,7 @@ protected:
    ShapeItem pos;
 };
 //-----------------------------------------------------------------------------
-/// an IndexIterator for an elided index
+/// Iterator for an elided index (= ⍳(⍴B)[N] for some N)
 class ElidedIndexIterator : public IndexIterator
 {
 public:
@@ -97,7 +97,7 @@ public:
       { Assert(i < count);   return i; }
 };
 //-----------------------------------------------------------------------------
-/// an IndexIterator for a true (i.e. non-elided) index vector
+/// an IndexIterator for a true (i.e. non-elided) index array
 class TrueIndexIterator : public IndexIterator
 {
 public:
@@ -126,6 +126,7 @@ protected:
     a multi-dimensional index iterator, consisting of several
    one-dimensional iterators.
  **/
+/// A multi-dimensional index iterator
 class MultiIndexIterator
 {
 public:

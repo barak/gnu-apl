@@ -232,109 +232,109 @@ enum Signal_id
 */
 
 
-/// ⎕SVO
+/// APserver request: ⎕SVO
    sid_MAKE_OFFER,
-/// ⎕SVR
+/// APserver request: ⎕SVR
    sid_RETRACT_OFFER,
-/// ⎕SVR
+/// APserver request: ⎕SVR
    sid_RETRACT_VAR,
 
-/// set state of shared var \b key
+/// APserver request: set state of shared var \b key
    sid_SET_STATE,
 
-/// set control of shared var \b key
+/// APserver request: set control of shared var \b key
    sid_SET_CONTROL,
 
-/// X←SVAR
+/// APserver request: X←SVAR
    sid_GET_VALUE,
 
-/// X←SVAR result
+/// APserver result for: X←SVAR
    sid_VALUE_IS,
 
-/// SVAR←X
+/// APserver request: SVAR←X
    sid_ASSIGN_VALUE,
-/// SVAR←X result
+/// APserver result for: SVAR←X
    sid_SVAR_ASSIGNED,
 
-/// Can svar key be referenced ?
+/// APserver request: Can svar key be referenced ?
    sid_MAY_USE,
 
-/// Can svar key be assigned ?
+/// APserver request: Can svar key be assigned ?
    sid_MAY_SET,
 
-/// read SVAR database record from APserver
+/// APserver request: read SVAR database record from APserver
 ///
 ///		apl/APnnn	--> READ_SVAR_RECORD		APserver
 ///				<-- SVAR_RECORD_IS
 ///
    sid_READ_SVAR_RECORD,
-/// result (record) for read SVAR database record from APserver
+/// APserver result (record) for: read SVAR database record from APserver
    sid_SVAR_RECORD_IS,
 
-/// is ID registered ?
+/// APserver request: is ID registered ?
    sid_IS_REGISTERED_ID,
 
-/// yes (1) or no (0)
+/// APserver result: yes (1) or no (0)
    sid_YES_NO,
 
-/// register processor proc in APserver
+/// APserver request: register processor proc in APserver
    sid_REGISTER_PROCESSOR,
 
-/// match offered shared variable or create a new offer
+/// APserver request: match offered shared variable or make a new offer
    sid_MATCH_OR_MAKE,
 
-/// result for match or create
+/// APserver result for: match or make
    sid_MATCH_OR_MAKE_RESULT,
 
 
-/// find processor ID that offers \b key
+/// APserver request: find processor ID that offers \b key
    sid_FIND_OFFERING_ID,
 
-/// result of find processor ID that offers \b key
+/// APserver result for: find processor ID that offers \b key
    sid_OFFERING_ID_IS,
 
-/// get offering processors  (⎕SVQ)
+/// APserver request: get offering processors  (⎕SVQ)
    sid_GET_OFFERING_PROCS,
 
-/// result of get offering processors  (⎕SVQ)
+/// APserver result for: get offering processors  (⎕SVQ)
    sid_OFFERING_PROCS_ARE,
 
-/// get offered variables  (⎕SVQ)
+/// APserver request: get offered variables  (⎕SVQ)
    sid_GET_OFFERED_VARS,
 
-/// result of get offered variables  (⎕SVQ)
+/// APserver result for: get offered variables  (⎕SVQ)
    sid_OFFERED_VARS_ARE,
 
-/// find pairing key (CTL vs. DAT or Cnnn vs. Dnnn) for AP210
+/// APserver request: find pairing key (CTL vs. DAT or Cnnn vs. Dnnn) for AP210
    sid_FIND_PAIRING_KEY,
 
-/// result of find pairing key
+/// APserver result for: find pairing key
    sid_PAIRING_KEY_IS,
 
-/// result of find pairing key (CTL vs. DAT or Cnnn vs. Dnnn) for AP210
+/// APserver result for: find pairing key (CTL vs. DAT or Cnnn vs. Dnnn) for AP210
 /// get events for one processor (first shared var with an event)
    sid_GET_EVENTS,
 
-/// clear all events for one processor
+/// APserver request: clear all events for one processor
    sid_CLEAR_ALL_EVENTS,
 
 
-/// result of clear all events for one processor (first cleared svar
+/// APserver result for: clear all events for one processor (first cleared svar
    sid_EVENTS_ARE,
 
-/// add an event  for \b key
+/// APserver request: add an event for \b key
    sid_ADD_EVENT,
 
-/// ws-ws SVAR←X
+/// APserver request: ws-ws SVAR←X
    sid_ASSIGN_WSWS_VAR,
-/// X←ws-ws SVAR
+/// APserver request: X←ws-ws SVAR
    sid_READ_WSWS_VAR,
-/// result of X←ws-ws SVAR
+/// APserver result for: X←ws-ws SVAR
    sid_WSWS_VALUE_IS,
 
-/// print the entire database (for command ]SVARS)
+/// APserver request: print the entire database (for command ]SVARS)
    sid_PRINT_SVAR_DB,
-/// print the entire database result
+/// APserver result for: print the entire database
    sid_SVAR_DB_PRINTED,
 
    sid_MAX,
@@ -371,23 +371,23 @@ public:
 */
 
 
-/// ⎕SVO
+/// APserver request: ⎕SVO
    /// access functions for signal MAKE_OFFER...
    virtual uint64_t get__MAKE_OFFER__key() const   ///< dito
       { bad_get("MAKE_OFFER", "key"); return 0; }
 
-/// ⎕SVR
+/// APserver request: ⎕SVR
    /// access functions for signal RETRACT_OFFER...
    virtual uint64_t get__RETRACT_OFFER__key() const   ///< dito
       { bad_get("RETRACT_OFFER", "key"); return 0; }
 
-/// ⎕SVR
+/// APserver request: ⎕SVR
    /// access functions for signal RETRACT_VAR...
    virtual uint64_t get__RETRACT_VAR__key() const   ///< dito
       { bad_get("RETRACT_VAR", "key"); return 0; }
 
 
-/// set state of shared var \b key
+/// APserver request: set state of shared var \b key
    /// access functions for signal SET_STATE...
    virtual uint64_t get__SET_STATE__key() const   ///< dito
       { bad_get("SET_STATE", "key"); return 0; }
@@ -397,7 +397,7 @@ public:
       { bad_get("SET_STATE", "sloc"); return 0; }
 
 
-/// set control of shared var \b key
+/// APserver request: set control of shared var \b key
    /// access functions for signal SET_CONTROL...
    virtual uint64_t get__SET_CONTROL__key() const   ///< dito
       { bad_get("SET_CONTROL", "key"); return 0; }
@@ -405,13 +405,13 @@ public:
       { bad_get("SET_CONTROL", "new_control"); return 0; }
 
 
-/// X←SVAR
+/// APserver request: X←SVAR
    /// access functions for signal GET_VALUE...
    virtual uint64_t get__GET_VALUE__key() const   ///< dito
       { bad_get("GET_VALUE", "key"); return 0; }
 
 
-/// X←SVAR result
+/// APserver result for: X←SVAR
    /// access functions for signal VALUE_IS...
    virtual uint64_t get__VALUE_IS__key() const   ///< dito
       { bad_get("VALUE_IS", "key"); return 0; }
@@ -423,14 +423,14 @@ public:
       { bad_get("VALUE_IS", "cdr_value"); return 0; }
 
 
-/// SVAR←X
+/// APserver request: SVAR←X
    /// access functions for signal ASSIGN_VALUE...
    virtual uint64_t get__ASSIGN_VALUE__key() const   ///< dito
       { bad_get("ASSIGN_VALUE", "key"); return 0; }
    virtual string get__ASSIGN_VALUE__cdr_value() const   ///< dito
       { bad_get("ASSIGN_VALUE", "cdr_value"); return 0; }
 
-/// SVAR←X result
+/// APserver result for: SVAR←X
    /// access functions for signal SVAR_ASSIGNED...
    virtual uint64_t get__SVAR_ASSIGNED__key() const   ///< dito
       { bad_get("SVAR_ASSIGNED", "key"); return 0; }
@@ -440,7 +440,7 @@ public:
       { bad_get("SVAR_ASSIGNED", "error_loc"); return 0; }
 
 
-/// Can svar key be referenced ?
+/// APserver request: Can svar key be referenced ?
    /// access functions for signal MAY_USE...
    virtual uint64_t get__MAY_USE__key() const   ///< dito
       { bad_get("MAY_USE", "key"); return 0; }
@@ -448,7 +448,7 @@ public:
       { bad_get("MAY_USE", "attempt"); return 0; }
 
 
-/// Can svar key be assigned ?
+/// APserver request: Can svar key be assigned ?
    /// access functions for signal MAY_SET...
    virtual uint64_t get__MAY_SET__key() const   ///< dito
       { bad_get("MAY_SET", "key"); return 0; }
@@ -456,7 +456,7 @@ public:
       { bad_get("MAY_SET", "attempt"); return 0; }
 
 
-/// read SVAR database record from APserver
+/// APserver request: read SVAR database record from APserver
 ///
 ///		apl/APnnn	--> READ_SVAR_RECORD		APserver
 ///				<-- SVAR_RECORD_IS
@@ -465,13 +465,13 @@ public:
    virtual uint64_t get__READ_SVAR_RECORD__key() const   ///< dito
       { bad_get("READ_SVAR_RECORD", "key"); return 0; }
 
-/// result (record) for read SVAR database record from APserver
+/// APserver result (record) for: read SVAR database record from APserver
    /// access functions for signal SVAR_RECORD_IS...
    virtual string get__SVAR_RECORD_IS__record() const   ///< dito
       { bad_get("SVAR_RECORD_IS", "record"); return 0; }
 
 
-/// is ID registered ?
+/// APserver request: is ID registered ?
    /// access functions for signal IS_REGISTERED_ID...
    virtual uint32_t get__IS_REGISTERED_ID__proc() const   ///< dito
       { bad_get("IS_REGISTERED_ID", "proc"); return 0; }
@@ -481,13 +481,13 @@ public:
       { bad_get("IS_REGISTERED_ID", "grand"); return 0; }
 
 
-/// yes (1) or no (0)
+/// APserver result: yes (1) or no (0)
    /// access functions for signal YES_NO...
    virtual uint8_t get__YES_NO__yes() const   ///< dito
       { bad_get("YES_NO", "yes"); return 0; }
 
 
-/// register processor proc in APserver
+/// APserver request: register processor proc in APserver
    /// access functions for signal REGISTER_PROCESSOR...
    virtual uint32_t get__REGISTER_PROCESSOR__proc() const   ///< dito
       { bad_get("REGISTER_PROCESSOR", "proc"); return 0; }
@@ -501,7 +501,7 @@ public:
       { bad_get("REGISTER_PROCESSOR", "progname"); return 0; }
 
 
-/// match offered shared variable or create a new offer
+/// APserver request: match offered shared variable or make a new offer
    /// access functions for signal MATCH_OR_MAKE...
    virtual string get__MATCH_OR_MAKE__varname() const   ///< dito
       { bad_get("MATCH_OR_MAKE", "varname"); return 0; }
@@ -519,20 +519,20 @@ public:
       { bad_get("MATCH_OR_MAKE", "from_grand"); return 0; }
 
 
-/// result for match or create
+/// APserver result for: match or make
    /// access functions for signal MATCH_OR_MAKE_RESULT...
    virtual uint64_t get__MATCH_OR_MAKE_RESULT__key() const   ///< dito
       { bad_get("MATCH_OR_MAKE_RESULT", "key"); return 0; }
 
 
 
-/// find processor ID that offers \b key
+/// APserver request: find processor ID that offers \b key
    /// access functions for signal FIND_OFFERING_ID...
    virtual uint64_t get__FIND_OFFERING_ID__key() const   ///< dito
       { bad_get("FIND_OFFERING_ID", "key"); return 0; }
 
 
-/// result of find processor ID that offers \b key
+/// APserver result for: find processor ID that offers \b key
    /// access functions for signal OFFERING_ID_IS...
    virtual uint32_t get__OFFERING_ID_IS__proc() const   ///< dito
       { bad_get("OFFERING_ID_IS", "proc"); return 0; }
@@ -542,19 +542,19 @@ public:
       { bad_get("OFFERING_ID_IS", "grand"); return 0; }
 
 
-/// get offering processors  (⎕SVQ)
+/// APserver request: get offering processors  (⎕SVQ)
    /// access functions for signal GET_OFFERING_PROCS...
    virtual uint32_t get__GET_OFFERING_PROCS__offered_to_proc() const   ///< dito
       { bad_get("GET_OFFERING_PROCS", "offered_to_proc"); return 0; }
 
 
-/// result of get offering processors  (⎕SVQ)
+/// APserver result for: get offering processors  (⎕SVQ)
    /// access functions for signal OFFERING_PROCS_ARE...
    virtual string get__OFFERING_PROCS_ARE__offering_procs() const   ///< dito
       { bad_get("OFFERING_PROCS_ARE", "offering_procs"); return 0; }
 
 
-/// get offered variables  (⎕SVQ)
+/// APserver request: get offered variables  (⎕SVQ)
    /// access functions for signal GET_OFFERED_VARS...
    virtual uint32_t get__GET_OFFERED_VARS__offered_to_proc() const   ///< dito
       { bad_get("GET_OFFERED_VARS", "offered_to_proc"); return 0; }
@@ -562,25 +562,25 @@ public:
       { bad_get("GET_OFFERED_VARS", "accepted_by_proc"); return 0; }
 
 
-/// result of get offered variables  (⎕SVQ)
+/// APserver result for: get offered variables  (⎕SVQ)
    /// access functions for signal OFFERED_VARS_ARE...
    virtual string get__OFFERED_VARS_ARE__offered_vars() const   ///< dito
       { bad_get("OFFERED_VARS_ARE", "offered_vars"); return 0; }
 
 
-/// find pairing key (CTL vs. DAT or Cnnn vs. Dnnn) for AP210
+/// APserver request: find pairing key (CTL vs. DAT or Cnnn vs. Dnnn) for AP210
    /// access functions for signal FIND_PAIRING_KEY...
    virtual uint64_t get__FIND_PAIRING_KEY__key() const   ///< dito
       { bad_get("FIND_PAIRING_KEY", "key"); return 0; }
 
 
-/// result of find pairing key
+/// APserver result for: find pairing key
    /// access functions for signal PAIRING_KEY_IS...
    virtual uint64_t get__PAIRING_KEY_IS__pairing_key() const   ///< dito
       { bad_get("PAIRING_KEY_IS", "pairing_key"); return 0; }
 
 
-/// result of find pairing key (CTL vs. DAT or Cnnn vs. Dnnn) for AP210
+/// APserver result for: find pairing key (CTL vs. DAT or Cnnn vs. Dnnn) for AP210
 /// get events for one processor (first shared var with an event)
    /// access functions for signal GET_EVENTS...
    virtual uint32_t get__GET_EVENTS__proc() const   ///< dito
@@ -591,7 +591,7 @@ public:
       { bad_get("GET_EVENTS", "grand"); return 0; }
 
 
-/// clear all events for one processor
+/// APserver request: clear all events for one processor
    /// access functions for signal CLEAR_ALL_EVENTS...
    virtual uint32_t get__CLEAR_ALL_EVENTS__proc() const   ///< dito
       { bad_get("CLEAR_ALL_EVENTS", "proc"); return 0; }
@@ -602,7 +602,7 @@ public:
 
 
 
-/// result of clear all events for one processor (first cleared svar
+/// APserver result for: clear all events for one processor (first cleared svar
    /// access functions for signal EVENTS_ARE...
    virtual uint64_t get__EVENTS_ARE__key() const   ///< dito
       { bad_get("EVENTS_ARE", "key"); return 0; }
@@ -610,7 +610,7 @@ public:
       { bad_get("EVENTS_ARE", "events"); return 0; }
 
 
-/// add an event  for \b key
+/// APserver request: add an event for \b key
    /// access functions for signal ADD_EVENT...
    virtual uint64_t get__ADD_EVENT__key() const   ///< dito
       { bad_get("ADD_EVENT", "key"); return 0; }
@@ -624,28 +624,28 @@ public:
       { bad_get("ADD_EVENT", "event"); return 0; }
 
 
-/// ws-ws SVAR←X
+/// APserver request: ws-ws SVAR←X
    /// access functions for signal ASSIGN_WSWS_VAR...
    virtual uint64_t get__ASSIGN_WSWS_VAR__key() const   ///< dito
       { bad_get("ASSIGN_WSWS_VAR", "key"); return 0; }
    virtual string get__ASSIGN_WSWS_VAR__cdr_value() const   ///< dito
       { bad_get("ASSIGN_WSWS_VAR", "cdr_value"); return 0; }
 
-/// X←ws-ws SVAR
+/// APserver request: X←ws-ws SVAR
    /// access functions for signal READ_WSWS_VAR...
    virtual uint64_t get__READ_WSWS_VAR__key() const   ///< dito
       { bad_get("READ_WSWS_VAR", "key"); return 0; }
 
-/// result of X←ws-ws SVAR
+/// APserver result for: X←ws-ws SVAR
    /// access functions for signal WSWS_VALUE_IS...
    virtual string get__WSWS_VALUE_IS__cdr_value() const   ///< dito
       { bad_get("WSWS_VALUE_IS", "cdr_value"); return 0; }
 
 
-/// print the entire database (for command ]SVARS)
+/// APserver request: print the entire database (for command ]SVARS)
    /// access functions for signal PRINT_SVAR_DB...
 
-/// print the entire database result
+/// APserver result for: print the entire database
    /// access functions for signal SVAR_DB_PRINTED...
    virtual string get__SVAR_DB_PRINTED__printout() const   ///< dito
       { bad_get("SVAR_DB_PRINTED", "printout"); return 0; }
@@ -676,9 +676,9 @@ protected:
 */
 
 
-/// ⎕SVO
+/// APserver request: ⎕SVO
 //----------------------------------------------------------------------------
-/// a class for MAKE_OFFER
+/// The class for signal MAKE_OFFER
 class MAKE_OFFER_c : public Signal_base
 {
 public:
@@ -724,9 +724,9 @@ public:
 protected:
    Sig_item_x64 key;   ///< key
 };
-/// ⎕SVR
+/// APserver request: ⎕SVR
 //----------------------------------------------------------------------------
-/// a class for RETRACT_OFFER
+/// The class for signal RETRACT_OFFER
 class RETRACT_OFFER_c : public Signal_base
 {
 public:
@@ -772,9 +772,9 @@ public:
 protected:
    Sig_item_x64 key;   ///< key
 };
-/// ⎕SVR
+/// APserver request: ⎕SVR
 //----------------------------------------------------------------------------
-/// a class for RETRACT_VAR
+/// The class for signal RETRACT_VAR
 class RETRACT_VAR_c : public Signal_base
 {
 public:
@@ -821,9 +821,9 @@ protected:
    Sig_item_x64 key;   ///< key
 };
 
-/// set state of shared var \b key
+/// APserver request: set state of shared var \b key
 //----------------------------------------------------------------------------
-/// a class for SET_STATE
+/// The class for signal SET_STATE
 class SET_STATE_c : public Signal_base
 {
 public:
@@ -888,9 +888,9 @@ protected:
    Sig_item_string sloc;   ///< sloc
 };
 
-/// set control of shared var \b key
+/// APserver request: set control of shared var \b key
 //----------------------------------------------------------------------------
-/// a class for SET_CONTROL
+/// The class for signal SET_CONTROL
 class SET_CONTROL_c : public Signal_base
 {
 public:
@@ -946,9 +946,9 @@ protected:
    Sig_item_u8 new_control;   ///< new_control
 };
 
-/// X←SVAR
+/// APserver request: X←SVAR
 //----------------------------------------------------------------------------
-/// a class for GET_VALUE
+/// The class for signal GET_VALUE
 class GET_VALUE_c : public Signal_base
 {
 public:
@@ -995,9 +995,9 @@ protected:
    Sig_item_x64 key;   ///< key
 };
 
-/// X←SVAR result
+/// APserver result for: X←SVAR
 //----------------------------------------------------------------------------
-/// a class for VALUE_IS
+/// The class for signal VALUE_IS
 class VALUE_IS_c : public Signal_base
 {
 public:
@@ -1071,9 +1071,9 @@ protected:
    Sig_item_string cdr_value;   ///< cdr_value
 };
 
-/// SVAR←X
+/// APserver request: SVAR←X
 //----------------------------------------------------------------------------
-/// a class for ASSIGN_VALUE
+/// The class for signal ASSIGN_VALUE
 class ASSIGN_VALUE_c : public Signal_base
 {
 public:
@@ -1128,9 +1128,9 @@ protected:
    Sig_item_x64 key;   ///< key
    Sig_item_string cdr_value;   ///< cdr_value
 };
-/// SVAR←X result
+/// APserver result for: SVAR←X
 //----------------------------------------------------------------------------
-/// a class for SVAR_ASSIGNED
+/// The class for signal SVAR_ASSIGNED
 class SVAR_ASSIGNED_c : public Signal_base
 {
 public:
@@ -1195,9 +1195,9 @@ protected:
    Sig_item_string error_loc;   ///< error_loc
 };
 
-/// Can svar key be referenced ?
+/// APserver request: Can svar key be referenced ?
 //----------------------------------------------------------------------------
-/// a class for MAY_USE
+/// The class for signal MAY_USE
 class MAY_USE_c : public Signal_base
 {
 public:
@@ -1253,9 +1253,9 @@ protected:
    Sig_item_i32 attempt;   ///< attempt
 };
 
-/// Can svar key be assigned ?
+/// APserver request: Can svar key be assigned ?
 //----------------------------------------------------------------------------
-/// a class for MAY_SET
+/// The class for signal MAY_SET
 class MAY_SET_c : public Signal_base
 {
 public:
@@ -1311,13 +1311,13 @@ protected:
    Sig_item_i32 attempt;   ///< attempt
 };
 
-/// read SVAR database record from APserver
+/// APserver request: read SVAR database record from APserver
 ///
 ///		apl/APnnn	--> READ_SVAR_RECORD		APserver
 ///				<-- SVAR_RECORD_IS
 ///
 //----------------------------------------------------------------------------
-/// a class for READ_SVAR_RECORD
+/// The class for signal READ_SVAR_RECORD
 class READ_SVAR_RECORD_c : public Signal_base
 {
 public:
@@ -1363,9 +1363,9 @@ public:
 protected:
    Sig_item_x64 key;   ///< key
 };
-/// result (record) for read SVAR database record from APserver
+/// APserver result (record) for: read SVAR database record from APserver
 //----------------------------------------------------------------------------
-/// a class for SVAR_RECORD_IS
+/// The class for signal SVAR_RECORD_IS
 class SVAR_RECORD_IS_c : public Signal_base
 {
 public:
@@ -1412,9 +1412,9 @@ protected:
    Sig_item_string record;   ///< record
 };
 
-/// is ID registered ?
+/// APserver request: is ID registered ?
 //----------------------------------------------------------------------------
-/// a class for IS_REGISTERED_ID
+/// The class for signal IS_REGISTERED_ID
 class IS_REGISTERED_ID_c : public Signal_base
 {
 public:
@@ -1479,9 +1479,9 @@ protected:
    Sig_item_u32 grand;   ///< grand
 };
 
-/// yes (1) or no (0)
+/// APserver result: yes (1) or no (0)
 //----------------------------------------------------------------------------
-/// a class for YES_NO
+/// The class for signal YES_NO
 class YES_NO_c : public Signal_base
 {
 public:
@@ -1528,9 +1528,9 @@ protected:
    Sig_item_u8 yes;   ///< yes
 };
 
-/// register processor proc in APserver
+/// APserver request: register processor proc in APserver
 //----------------------------------------------------------------------------
-/// a class for REGISTER_PROCESSOR
+/// The class for signal REGISTER_PROCESSOR
 class REGISTER_PROCESSOR_c : public Signal_base
 {
 public:
@@ -1613,9 +1613,9 @@ protected:
    Sig_item_string progname;   ///< progname
 };
 
-/// match offered shared variable or create a new offer
+/// APserver request: match offered shared variable or make a new offer
 //----------------------------------------------------------------------------
-/// a class for MATCH_OR_MAKE
+/// The class for signal MATCH_OR_MAKE
 class MATCH_OR_MAKE_c : public Signal_base
 {
 public:
@@ -1716,9 +1716,9 @@ protected:
    Sig_item_u32 from_grand;   ///< from_grand
 };
 
-/// result for match or create
+/// APserver result for: match or make
 //----------------------------------------------------------------------------
-/// a class for MATCH_OR_MAKE_RESULT
+/// The class for signal MATCH_OR_MAKE_RESULT
 class MATCH_OR_MAKE_RESULT_c : public Signal_base
 {
 public:
@@ -1766,9 +1766,9 @@ protected:
 };
 
 
-/// find processor ID that offers \b key
+/// APserver request: find processor ID that offers \b key
 //----------------------------------------------------------------------------
-/// a class for FIND_OFFERING_ID
+/// The class for signal FIND_OFFERING_ID
 class FIND_OFFERING_ID_c : public Signal_base
 {
 public:
@@ -1815,9 +1815,9 @@ protected:
    Sig_item_x64 key;   ///< key
 };
 
-/// result of find processor ID that offers \b key
+/// APserver result for: find processor ID that offers \b key
 //----------------------------------------------------------------------------
-/// a class for OFFERING_ID_IS
+/// The class for signal OFFERING_ID_IS
 class OFFERING_ID_IS_c : public Signal_base
 {
 public:
@@ -1882,9 +1882,9 @@ protected:
    Sig_item_u32 grand;   ///< grand
 };
 
-/// get offering processors  (⎕SVQ)
+/// APserver request: get offering processors  (⎕SVQ)
 //----------------------------------------------------------------------------
-/// a class for GET_OFFERING_PROCS
+/// The class for signal GET_OFFERING_PROCS
 class GET_OFFERING_PROCS_c : public Signal_base
 {
 public:
@@ -1931,9 +1931,9 @@ protected:
    Sig_item_u32 offered_to_proc;   ///< offered_to_proc
 };
 
-/// result of get offering processors  (⎕SVQ)
+/// APserver result for: get offering processors  (⎕SVQ)
 //----------------------------------------------------------------------------
-/// a class for OFFERING_PROCS_ARE
+/// The class for signal OFFERING_PROCS_ARE
 class OFFERING_PROCS_ARE_c : public Signal_base
 {
 public:
@@ -1980,9 +1980,9 @@ protected:
    Sig_item_string offering_procs;   ///< offering_procs
 };
 
-/// get offered variables  (⎕SVQ)
+/// APserver request: get offered variables  (⎕SVQ)
 //----------------------------------------------------------------------------
-/// a class for GET_OFFERED_VARS
+/// The class for signal GET_OFFERED_VARS
 class GET_OFFERED_VARS_c : public Signal_base
 {
 public:
@@ -2038,9 +2038,9 @@ protected:
    Sig_item_u32 accepted_by_proc;   ///< accepted_by_proc
 };
 
-/// result of get offered variables  (⎕SVQ)
+/// APserver result for: get offered variables  (⎕SVQ)
 //----------------------------------------------------------------------------
-/// a class for OFFERED_VARS_ARE
+/// The class for signal OFFERED_VARS_ARE
 class OFFERED_VARS_ARE_c : public Signal_base
 {
 public:
@@ -2087,9 +2087,9 @@ protected:
    Sig_item_string offered_vars;   ///< offered_vars
 };
 
-/// find pairing key (CTL vs. DAT or Cnnn vs. Dnnn) for AP210
+/// APserver request: find pairing key (CTL vs. DAT or Cnnn vs. Dnnn) for AP210
 //----------------------------------------------------------------------------
-/// a class for FIND_PAIRING_KEY
+/// The class for signal FIND_PAIRING_KEY
 class FIND_PAIRING_KEY_c : public Signal_base
 {
 public:
@@ -2136,9 +2136,9 @@ protected:
    Sig_item_x64 key;   ///< key
 };
 
-/// result of find pairing key
+/// APserver result for: find pairing key
 //----------------------------------------------------------------------------
-/// a class for PAIRING_KEY_IS
+/// The class for signal PAIRING_KEY_IS
 class PAIRING_KEY_IS_c : public Signal_base
 {
 public:
@@ -2185,10 +2185,10 @@ protected:
    Sig_item_x64 pairing_key;   ///< pairing_key
 };
 
-/// result of find pairing key (CTL vs. DAT or Cnnn vs. Dnnn) for AP210
+/// APserver result for: find pairing key (CTL vs. DAT or Cnnn vs. Dnnn) for AP210
 /// get events for one processor (first shared var with an event)
 //----------------------------------------------------------------------------
-/// a class for GET_EVENTS
+/// The class for signal GET_EVENTS
 class GET_EVENTS_c : public Signal_base
 {
 public:
@@ -2253,9 +2253,9 @@ protected:
    Sig_item_u32 grand;   ///< grand
 };
 
-/// clear all events for one processor
+/// APserver request: clear all events for one processor
 //----------------------------------------------------------------------------
-/// a class for CLEAR_ALL_EVENTS
+/// The class for signal CLEAR_ALL_EVENTS
 class CLEAR_ALL_EVENTS_c : public Signal_base
 {
 public:
@@ -2321,9 +2321,9 @@ protected:
 };
 
 
-/// result of clear all events for one processor (first cleared svar
+/// APserver result for: clear all events for one processor (first cleared svar
 //----------------------------------------------------------------------------
-/// a class for EVENTS_ARE
+/// The class for signal EVENTS_ARE
 class EVENTS_ARE_c : public Signal_base
 {
 public:
@@ -2379,9 +2379,9 @@ protected:
    Sig_item_u32 events;   ///< events
 };
 
-/// add an event  for \b key
+/// APserver request: add an event for \b key
 //----------------------------------------------------------------------------
-/// a class for ADD_EVENT
+/// The class for signal ADD_EVENT
 class ADD_EVENT_c : public Signal_base
 {
 public:
@@ -2464,9 +2464,9 @@ protected:
    Sig_item_u32 event;   ///< event
 };
 
-/// ws-ws SVAR←X
+/// APserver request: ws-ws SVAR←X
 //----------------------------------------------------------------------------
-/// a class for ASSIGN_WSWS_VAR
+/// The class for signal ASSIGN_WSWS_VAR
 class ASSIGN_WSWS_VAR_c : public Signal_base
 {
 public:
@@ -2521,9 +2521,9 @@ protected:
    Sig_item_x64 key;   ///< key
    Sig_item_string cdr_value;   ///< cdr_value
 };
-/// X←ws-ws SVAR
+/// APserver request: X←ws-ws SVAR
 //----------------------------------------------------------------------------
-/// a class for READ_WSWS_VAR
+/// The class for signal READ_WSWS_VAR
 class READ_WSWS_VAR_c : public Signal_base
 {
 public:
@@ -2569,9 +2569,9 @@ public:
 protected:
    Sig_item_x64 key;   ///< key
 };
-/// result of X←ws-ws SVAR
+/// APserver result for: X←ws-ws SVAR
 //----------------------------------------------------------------------------
-/// a class for WSWS_VALUE_IS
+/// The class for signal WSWS_VALUE_IS
 class WSWS_VALUE_IS_c : public Signal_base
 {
 public:
@@ -2618,9 +2618,9 @@ protected:
    Sig_item_string cdr_value;   ///< cdr_value
 };
 
-/// print the entire database (for command ]SVARS)
+/// APserver request: print the entire database (for command ]SVARS)
 //----------------------------------------------------------------------------
-/// a class for PRINT_SVAR_DB
+/// The class for signal PRINT_SVAR_DB
 class PRINT_SVAR_DB_c : public Signal_base
 {
 public:
@@ -2658,9 +2658,9 @@ public:
 
 protected:
 };
-/// print the entire database result
+/// APserver result for: print the entire database
 //----------------------------------------------------------------------------
-/// a class for SVAR_DB_PRINTED
+/// The class for signal SVAR_DB_PRINTED
 class SVAR_DB_PRINTED_c : public Signal_base
 {
 public:
@@ -2717,109 +2717,109 @@ struct _all_signal_classes_
 */
 
 
-/// ⎕SVO
+/// APserver request: ⎕SVO
         char u_MAKE_OFFER[sizeof(MAKE_OFFER_c)];
-/// ⎕SVR
+/// APserver request: ⎕SVR
         char u_RETRACT_OFFER[sizeof(RETRACT_OFFER_c)];
-/// ⎕SVR
+/// APserver request: ⎕SVR
         char u_RETRACT_VAR[sizeof(RETRACT_VAR_c)];
 
-/// set state of shared var \b key
+/// APserver request: set state of shared var \b key
         char u_SET_STATE[sizeof(SET_STATE_c)];
 
-/// set control of shared var \b key
+/// APserver request: set control of shared var \b key
         char u_SET_CONTROL[sizeof(SET_CONTROL_c)];
 
-/// X←SVAR
+/// APserver request: X←SVAR
         char u_GET_VALUE[sizeof(GET_VALUE_c)];
 
-/// X←SVAR result
+/// APserver result for: X←SVAR
         char u_VALUE_IS[sizeof(VALUE_IS_c)];
 
-/// SVAR←X
+/// APserver request: SVAR←X
         char u_ASSIGN_VALUE[sizeof(ASSIGN_VALUE_c)];
-/// SVAR←X result
+/// APserver result for: SVAR←X
         char u_SVAR_ASSIGNED[sizeof(SVAR_ASSIGNED_c)];
 
-/// Can svar key be referenced ?
+/// APserver request: Can svar key be referenced ?
         char u_MAY_USE[sizeof(MAY_USE_c)];
 
-/// Can svar key be assigned ?
+/// APserver request: Can svar key be assigned ?
         char u_MAY_SET[sizeof(MAY_SET_c)];
 
-/// read SVAR database record from APserver
+/// APserver request: read SVAR database record from APserver
 ///
 ///		apl/APnnn	--> READ_SVAR_RECORD		APserver
 ///				<-- SVAR_RECORD_IS
 ///
         char u_READ_SVAR_RECORD[sizeof(READ_SVAR_RECORD_c)];
-/// result (record) for read SVAR database record from APserver
+/// APserver result (record) for: read SVAR database record from APserver
         char u_SVAR_RECORD_IS[sizeof(SVAR_RECORD_IS_c)];
 
-/// is ID registered ?
+/// APserver request: is ID registered ?
         char u_IS_REGISTERED_ID[sizeof(IS_REGISTERED_ID_c)];
 
-/// yes (1) or no (0)
+/// APserver result: yes (1) or no (0)
         char u_YES_NO[sizeof(YES_NO_c)];
 
-/// register processor proc in APserver
+/// APserver request: register processor proc in APserver
         char u_REGISTER_PROCESSOR[sizeof(REGISTER_PROCESSOR_c)];
 
-/// match offered shared variable or create a new offer
+/// APserver request: match offered shared variable or make a new offer
         char u_MATCH_OR_MAKE[sizeof(MATCH_OR_MAKE_c)];
 
-/// result for match or create
+/// APserver result for: match or make
         char u_MATCH_OR_MAKE_RESULT[sizeof(MATCH_OR_MAKE_RESULT_c)];
 
 
-/// find processor ID that offers \b key
+/// APserver request: find processor ID that offers \b key
         char u_FIND_OFFERING_ID[sizeof(FIND_OFFERING_ID_c)];
 
-/// result of find processor ID that offers \b key
+/// APserver result for: find processor ID that offers \b key
         char u_OFFERING_ID_IS[sizeof(OFFERING_ID_IS_c)];
 
-/// get offering processors  (⎕SVQ)
+/// APserver request: get offering processors  (⎕SVQ)
         char u_GET_OFFERING_PROCS[sizeof(GET_OFFERING_PROCS_c)];
 
-/// result of get offering processors  (⎕SVQ)
+/// APserver result for: get offering processors  (⎕SVQ)
         char u_OFFERING_PROCS_ARE[sizeof(OFFERING_PROCS_ARE_c)];
 
-/// get offered variables  (⎕SVQ)
+/// APserver request: get offered variables  (⎕SVQ)
         char u_GET_OFFERED_VARS[sizeof(GET_OFFERED_VARS_c)];
 
-/// result of get offered variables  (⎕SVQ)
+/// APserver result for: get offered variables  (⎕SVQ)
         char u_OFFERED_VARS_ARE[sizeof(OFFERED_VARS_ARE_c)];
 
-/// find pairing key (CTL vs. DAT or Cnnn vs. Dnnn) for AP210
+/// APserver request: find pairing key (CTL vs. DAT or Cnnn vs. Dnnn) for AP210
         char u_FIND_PAIRING_KEY[sizeof(FIND_PAIRING_KEY_c)];
 
-/// result of find pairing key
+/// APserver result for: find pairing key
         char u_PAIRING_KEY_IS[sizeof(PAIRING_KEY_IS_c)];
 
-/// result of find pairing key (CTL vs. DAT or Cnnn vs. Dnnn) for AP210
+/// APserver result for: find pairing key (CTL vs. DAT or Cnnn vs. Dnnn) for AP210
 /// get events for one processor (first shared var with an event)
         char u_GET_EVENTS[sizeof(GET_EVENTS_c)];
 
-/// clear all events for one processor
+/// APserver request: clear all events for one processor
         char u_CLEAR_ALL_EVENTS[sizeof(CLEAR_ALL_EVENTS_c)];
 
 
-/// result of clear all events for one processor (first cleared svar
+/// APserver result for: clear all events for one processor (first cleared svar
         char u_EVENTS_ARE[sizeof(EVENTS_ARE_c)];
 
-/// add an event  for \b key
+/// APserver request: add an event for \b key
         char u_ADD_EVENT[sizeof(ADD_EVENT_c)];
 
-/// ws-ws SVAR←X
+/// APserver request: ws-ws SVAR←X
         char u_ASSIGN_WSWS_VAR[sizeof(ASSIGN_WSWS_VAR_c)];
-/// X←ws-ws SVAR
+/// APserver request: X←ws-ws SVAR
         char u_READ_WSWS_VAR[sizeof(READ_WSWS_VAR_c)];
-/// result of X←ws-ws SVAR
+/// APserver result for: X←ws-ws SVAR
         char u_WSWS_VALUE_IS[sizeof(WSWS_VALUE_IS_c)];
 
-/// print the entire database (for command ]SVARS)
+/// APserver request: print the entire database (for command ]SVARS)
         char u_PRINT_SVAR_DB[sizeof(PRINT_SVAR_DB_c)];
-/// print the entire database result
+/// APserver result for: print the entire database
         char u_SVAR_DB_PRINTED[sizeof(SVAR_DB_PRINTED_c)];
 
 };
@@ -2916,109 +2916,109 @@ Signal_base * ret = 0;
 */
 
 
-/// ⎕SVO
+/// APserver request: ⎕SVO
         case sid_MAKE_OFFER: ret = new MAKE_OFFER_c(b);   break;
-/// ⎕SVR
+/// APserver request: ⎕SVR
         case sid_RETRACT_OFFER: ret = new RETRACT_OFFER_c(b);   break;
-/// ⎕SVR
+/// APserver request: ⎕SVR
         case sid_RETRACT_VAR: ret = new RETRACT_VAR_c(b);   break;
 
-/// set state of shared var \b key
+/// APserver request: set state of shared var \b key
         case sid_SET_STATE: ret = new SET_STATE_c(b);   break;
 
-/// set control of shared var \b key
+/// APserver request: set control of shared var \b key
         case sid_SET_CONTROL: ret = new SET_CONTROL_c(b);   break;
 
-/// X←SVAR
+/// APserver request: X←SVAR
         case sid_GET_VALUE: ret = new GET_VALUE_c(b);   break;
 
-/// X←SVAR result
+/// APserver result for: X←SVAR
         case sid_VALUE_IS: ret = new VALUE_IS_c(b);   break;
 
-/// SVAR←X
+/// APserver request: SVAR←X
         case sid_ASSIGN_VALUE: ret = new ASSIGN_VALUE_c(b);   break;
-/// SVAR←X result
+/// APserver result for: SVAR←X
         case sid_SVAR_ASSIGNED: ret = new SVAR_ASSIGNED_c(b);   break;
 
-/// Can svar key be referenced ?
+/// APserver request: Can svar key be referenced ?
         case sid_MAY_USE: ret = new MAY_USE_c(b);   break;
 
-/// Can svar key be assigned ?
+/// APserver request: Can svar key be assigned ?
         case sid_MAY_SET: ret = new MAY_SET_c(b);   break;
 
-/// read SVAR database record from APserver
+/// APserver request: read SVAR database record from APserver
 ///
 ///		apl/APnnn	--> READ_SVAR_RECORD		APserver
 ///				<-- SVAR_RECORD_IS
 ///
         case sid_READ_SVAR_RECORD: ret = new READ_SVAR_RECORD_c(b);   break;
-/// result (record) for read SVAR database record from APserver
+/// APserver result (record) for: read SVAR database record from APserver
         case sid_SVAR_RECORD_IS: ret = new SVAR_RECORD_IS_c(b);   break;
 
-/// is ID registered ?
+/// APserver request: is ID registered ?
         case sid_IS_REGISTERED_ID: ret = new IS_REGISTERED_ID_c(b);   break;
 
-/// yes (1) or no (0)
+/// APserver result: yes (1) or no (0)
         case sid_YES_NO: ret = new YES_NO_c(b);   break;
 
-/// register processor proc in APserver
+/// APserver request: register processor proc in APserver
         case sid_REGISTER_PROCESSOR: ret = new REGISTER_PROCESSOR_c(b);   break;
 
-/// match offered shared variable or create a new offer
+/// APserver request: match offered shared variable or make a new offer
         case sid_MATCH_OR_MAKE: ret = new MATCH_OR_MAKE_c(b);   break;
 
-/// result for match or create
+/// APserver result for: match or make
         case sid_MATCH_OR_MAKE_RESULT: ret = new MATCH_OR_MAKE_RESULT_c(b);   break;
 
 
-/// find processor ID that offers \b key
+/// APserver request: find processor ID that offers \b key
         case sid_FIND_OFFERING_ID: ret = new FIND_OFFERING_ID_c(b);   break;
 
-/// result of find processor ID that offers \b key
+/// APserver result for: find processor ID that offers \b key
         case sid_OFFERING_ID_IS: ret = new OFFERING_ID_IS_c(b);   break;
 
-/// get offering processors  (⎕SVQ)
+/// APserver request: get offering processors  (⎕SVQ)
         case sid_GET_OFFERING_PROCS: ret = new GET_OFFERING_PROCS_c(b);   break;
 
-/// result of get offering processors  (⎕SVQ)
+/// APserver result for: get offering processors  (⎕SVQ)
         case sid_OFFERING_PROCS_ARE: ret = new OFFERING_PROCS_ARE_c(b);   break;
 
-/// get offered variables  (⎕SVQ)
+/// APserver request: get offered variables  (⎕SVQ)
         case sid_GET_OFFERED_VARS: ret = new GET_OFFERED_VARS_c(b);   break;
 
-/// result of get offered variables  (⎕SVQ)
+/// APserver result for: get offered variables  (⎕SVQ)
         case sid_OFFERED_VARS_ARE: ret = new OFFERED_VARS_ARE_c(b);   break;
 
-/// find pairing key (CTL vs. DAT or Cnnn vs. Dnnn) for AP210
+/// APserver request: find pairing key (CTL vs. DAT or Cnnn vs. Dnnn) for AP210
         case sid_FIND_PAIRING_KEY: ret = new FIND_PAIRING_KEY_c(b);   break;
 
-/// result of find pairing key
+/// APserver result for: find pairing key
         case sid_PAIRING_KEY_IS: ret = new PAIRING_KEY_IS_c(b);   break;
 
-/// result of find pairing key (CTL vs. DAT or Cnnn vs. Dnnn) for AP210
+/// APserver result for: find pairing key (CTL vs. DAT or Cnnn vs. Dnnn) for AP210
 /// get events for one processor (first shared var with an event)
         case sid_GET_EVENTS: ret = new GET_EVENTS_c(b);   break;
 
-/// clear all events for one processor
+/// APserver request: clear all events for one processor
         case sid_CLEAR_ALL_EVENTS: ret = new CLEAR_ALL_EVENTS_c(b);   break;
 
 
-/// result of clear all events for one processor (first cleared svar
+/// APserver result for: clear all events for one processor (first cleared svar
         case sid_EVENTS_ARE: ret = new EVENTS_ARE_c(b);   break;
 
-/// add an event  for \b key
+/// APserver request: add an event for \b key
         case sid_ADD_EVENT: ret = new ADD_EVENT_c(b);   break;
 
-/// ws-ws SVAR←X
+/// APserver request: ws-ws SVAR←X
         case sid_ASSIGN_WSWS_VAR: ret = new ASSIGN_WSWS_VAR_c(b);   break;
-/// X←ws-ws SVAR
+/// APserver request: X←ws-ws SVAR
         case sid_READ_WSWS_VAR: ret = new READ_WSWS_VAR_c(b);   break;
-/// result of X←ws-ws SVAR
+/// APserver result for: X←ws-ws SVAR
         case sid_WSWS_VALUE_IS: ret = new WSWS_VALUE_IS_c(b);   break;
 
-/// print the entire database (for command ]SVARS)
+/// APserver request: print the entire database (for command ]SVARS)
         case sid_PRINT_SVAR_DB: ret = new PRINT_SVAR_DB_c(b);   break;
-/// print the entire database result
+/// APserver result for: print the entire database
         case sid_SVAR_DB_PRINTED: ret = new SVAR_DB_PRINTED_c(b);   break;
 
         default: cerr << "Signal_base::recv_TCP() failed: unknown signal id "

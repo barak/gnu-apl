@@ -27,7 +27,7 @@
 #include "NamedObject.hh"
 #include "Parser.hh"
 #include "PrintBuffer.hh"
-#include "Value.icc"
+#include "Value.hh"
 
 class Workspace;
 class UserFunction;
@@ -43,9 +43,8 @@ class UserFunction;
    default implementation for axis function: ignore axis
 */
 //-----------------------------------------------------------------------------
-/**
-    The base class for all functions (user defined or system functions).
- */
+/** The base class for all functions (user defined or system functions).  */
+/// Base class for all APL functions and operators (system or defined)
 class Function : public NamedObject
 {
 public:

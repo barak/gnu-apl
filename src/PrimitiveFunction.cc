@@ -42,7 +42,7 @@
 #include "PrintOperator.hh"
 #include "StateIndicator.hh"
 #include "UserFunction.hh"
-#include "Value.icc"
+#include "Value.hh"
 #include "Workspace.hh"
 
 // primitive function instances

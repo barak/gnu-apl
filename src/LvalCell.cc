@@ -21,7 +21,7 @@
 #include "LvalCell.hh"
 #include "PrintOperator.hh"
 #include "UTF8_string.hh"
-#include "Value.icc"
+#include "Value.hh"
 
 //-----------------------------------------------------------------------------
 LvalCell::LvalCell(Cell * cell, Value * cell_owner)

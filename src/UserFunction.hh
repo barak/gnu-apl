@@ -31,9 +31,7 @@
 #include "UTF8_string.hh"
 
 //-----------------------------------------------------------------------------
-/**
-    A user-defined function.
- */
+/// One user-defined function
 class UserFunction : public Function, public Executable
 {
 public:

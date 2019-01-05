@@ -33,7 +33,7 @@
 #include "StateIndicator.hh"
 #include "Symbol.hh"
 #include "UserFunction_header.hh"
-#include "Value.icc"
+#include "Value.hh"
 #include "Workspace.hh"
 
 //=============================================================================

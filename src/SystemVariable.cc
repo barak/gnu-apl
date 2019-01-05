@@ -46,7 +46,7 @@
 #include "SystemVariable.hh"
 #include "UserFunction.hh"
 #include "UserPreferences.hh"
-#include "Value.icc"
+#include "Value.hh"
 #include "Workspace.hh"
 
 UCS_string Quad_QUOTE::prompt;

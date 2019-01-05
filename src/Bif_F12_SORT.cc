@@ -23,7 +23,7 @@
 #include "Cell.hh"
 #include "Heapsort.hh"
 #include "Macro.hh"
-#include "Value.icc"
+#include "Value.hh"
 #include "Workspace.hh"
 
 Bif_F12_SORT_ASC  Bif_F12_SORT_ASC::_fun;     // ⍋

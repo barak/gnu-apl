@@ -27,7 +27,7 @@
 #include "Output.hh"
 #include "PointerCell.hh"
 #include "PrintOperator.hh"
-#include "Value.icc"
+#include "Value.hh"
 #include "SystemLimits.hh"
 #include "Workspace.hh"
 

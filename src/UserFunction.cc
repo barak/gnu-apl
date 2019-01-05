@@ -33,7 +33,7 @@
 #include "Symbol.hh"
 #include "UserFunction.hh"
 #include "UserPreferences.hh"
-#include "Value.icc"
+#include "Value.hh"
 #include "Workspace.hh"
 
 //-----------------------------------------------------------------------------

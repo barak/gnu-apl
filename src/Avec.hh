@@ -53,6 +53,7 @@ enum CharacterFlag
     class Avec is a collection of static functions related to the Atomic
     Vector of the APL interpreter
  */
+/// Static helper  functions related to ⎕AV
 class Avec
 {
 public:

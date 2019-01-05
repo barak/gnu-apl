@@ -31,6 +31,7 @@
 /**
     A user-defined function.
  */
+/// A user-defined function written in C++.
 class NativeFunction : public Function
 {
 public:

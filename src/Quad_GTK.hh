@@ -28,7 +28,7 @@
 #include "Simple_string.hh"
 #include "UCS_string_vector.hh"
 
-/// the implementation of ⎕GTK
+/// The class implementing ⎕GTK
 class Quad_GTK : public QuadFunction
 {
 public:

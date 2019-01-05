@@ -22,7 +22,7 @@
 #include "UCS_string_vector.hh"
 #include "Workspace.hh"
 
-#include "Value.icc"
+#include "Value.hh"
 
 //----------------------------------------------------------------------------
 UCS_string_vector::UCS_string_vector(const Value & val, bool surrogate)

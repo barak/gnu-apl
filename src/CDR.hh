@@ -29,6 +29,7 @@ class Value;
  **/
 
 //-----------------------------------------------------------------------------
+/// The class implementing CDR (IBM's Common Data Representation)
 class CDR
 {
 public:

@@ -26,6 +26,7 @@
 #define PCRE2_CODE_UNIT_WIDTH 32
 #include <pcre2.h>
 
+/// Regular expression match
 class RegexpMatch
 {
 public:
@@ -52,6 +53,7 @@ protected:
    const UCS_string & matched_B;
 };
 
+/// Helper class for ⎕RE
 class Regexp
 {
 public:

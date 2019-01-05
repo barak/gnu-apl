@@ -26,6 +26,7 @@
 //-----------------------------------------------------------------------------
 /** Primitive operator reduce (common part for all reducr variants)
  */
+/// Base class for / and ⌿
 class Bif_REDUCE : public PrimitiveOperator
 {
 public:
@@ -54,6 +55,7 @@ protected:
 //-----------------------------------------------------------------------------
 /** Primitive operator reduce along last axis.
  */
+/// The class implementing /
 class Bif_OPER1_REDUCE : public Bif_REDUCE
 {
 public:
@@ -89,6 +91,7 @@ protected:
 //-----------------------------------------------------------------------------
 /** Primitive operator reduce along first axis.
  */
+/// The class implementing ⌿
 class Bif_OPER1_REDUCE1 : public Bif_REDUCE
 {
 public:

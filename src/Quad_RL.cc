@@ -21,7 +21,7 @@
 #include <stdlib.h>
 
 #include "Quad_RL.hh"
-#include "Value.icc"
+#include "Value.hh"
 #include "IntCell.hh"
 
 uint64_t Quad_RL::state = 0;

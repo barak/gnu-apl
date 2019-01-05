@@ -21,6 +21,7 @@
 #ifndef __QUAD_FIO_HH_DEFINED__
 #define __QUAD_FIO_HH_DEFINED__
 
+#include "Error_macros.hh"
 #include "PrimitiveOperator.hh"
 #include "QuadFunction.hh"
 
@@ -31,6 +32,7 @@ class File_or_String;
 /**
    The system function Quad-FIO (File I/O)
  */
+/// The class implementing ⎕FIO
 class Quad_FIO : public QuadFunction
 {
 public:

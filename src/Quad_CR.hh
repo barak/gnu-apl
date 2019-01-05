@@ -27,6 +27,7 @@
 /**
    The system function ⎕CR (Character Representation).
  */
+/// The class implementing ⎕CR
 class Quad_CR : public QuadFunction
 {
 public:

@@ -23,9 +23,7 @@
 
 #include "Token.hh"
 
-/**
-     Functions related to tokenizing of input lines and user defined functions.
- */
+/// The converter from APL input characters to APL tokens
 class Tokenizer
 {
 public:

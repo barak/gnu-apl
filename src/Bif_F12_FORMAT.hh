@@ -27,6 +27,7 @@
  It represents a sub-field (int part, fract part, or exponent)
  of the format field
  */
+/// A helper for Bif_F12_FORMAT (sizes of the fields in a number)
 struct Format_sub
 {
    Format_sub()
@@ -80,6 +81,7 @@ struct Format_sub
 //-----------------------------------------------------------------------------
 /** System function format
  */
+/// The class implementing ⍕
 class Bif_F12_FORMAT : public NonscalarFunction
 {
 public:

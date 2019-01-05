@@ -25,17 +25,14 @@
 #include <sys/time.h>
 #include <sys/types.h>
 
-#include "CharCell.hh"
 #include "Common.hh"
-#include "ComplexCell.hh"
-#include "FloatCell.hh"
 #include "LineInput.hh"
 #include "LibPaths.hh"
 #include "NativeFunction.hh"
 #include "Output.hh"
 #include "ProcessorID.hh"
 #include "Svar_DB.hh"
-#include "Value.icc"
+#include "Value.hh"
 #include "UserPreferences.hh"
 #include "ValueHistory.hh"
 
@@ -369,81 +366,3 @@ sixbit(Unicode uni)
    return -1;   // uni is not a hex digit
 }
 //-----------------------------------------------------------------------------
-Value_P
-IntScalar(APL_Integer val, const char * loc)
-{
-Value_P Z(loc);
-   new (Z->next_ravel())   IntCell(val);
-   Z->check_value(LOC);
-   return Z;
-}
-//-----------------------------------------------------------------------------
-Value_P
-FloatScalar(APL_Float val, const char * loc)
-{
-Value_P Z(loc);
-   new (Z->next_ravel())   FloatCell(val);
-   Z->check_value(LOC);
-   return Z;
-}
-//-----------------------------------------------------------------------------
-Value_P
-ComplexScalar(APL_Complex val, const char * loc)
-{
-Value_P Z(loc);
-   new (Z->next_ravel()) ComplexCell(val);
-   Z->check_value(LOC);
-   return Z;
-}
-//-----------------------------------------------------------------------------
-Value_P
-CharScalar(Unicode uni, const char * loc)
-{
-Value_P Z(loc);
-   new (Z->next_ravel()) CharCell(uni);
-   Z->check_value(LOC);
-   return Z;
-}
-//-----------------------------------------------------------------------------
-Value_P
-Idx0(const char * loc)
-{
-Value_P Z(ShapeItem(0), loc);
-   Z->check_value(LOC);
-   return Z;
-}
-//-----------------------------------------------------------------------------
-Value_P
-Str0(const char * loc)
-{
-Value_P Z(ShapeItem(0), loc);
-   Z->set_proto_Spc();
-   Z->check_value(LOC);
-   return Z;
-}
-//-----------------------------------------------------------------------------
-Value_P
-Str0_0(const char * loc)
-{
-Shape sh(ShapeItem(0), ShapeItem(0));
-Value_P Z(sh, loc);
-   Z->set_proto_Spc();
-   Z->check_value(LOC);
-   return Z;
-}
-//-----------------------------------------------------------------------------
-Value_P
-Idx0_0(const char * loc)
-{
-Shape sh(ShapeItem(0), ShapeItem(0));
-Value_P Z(sh, loc);
-   Z->check_value(LOC);
-   return Z;
-}
-//-----------------------------------------------------------------------------
-ostream & operator << (ostream & out, const AP_num3 & ap3)
-{
-   return out << ap3.proc << "." << ap3.parent << "." << ap3.grand;
-}
-//-----------------------------------------------------------------------------
-

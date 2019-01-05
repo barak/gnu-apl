@@ -48,6 +48,7 @@ configure_args.cc							\
 DiffOut.cc					DiffOut.hh		\
 DynamicObject.cc				DynamicObject.hh	\
 Error.cc		Error.def		Error.hh		\
+						Error_macros.hh		\
 						ErrorCode.hh		\
 Executable.cc					Executable.hh		\
 FloatCell.cc					FloatCell.hh		\
@@ -103,7 +104,6 @@ Performance.cc		Performance.def		Performance.hh		\
 RealCell.cc					RealCell.hh		\
 sbrk.cc									\
 Shape.cc					Shape.hh		\
-						SharedValuePointer.hh	\
 						Simple_string.hh	\
 ScalarFunction.cc				ScalarFunction.hh	\
 Security.cc		Security.def		Security.hh		\
@@ -128,7 +128,8 @@ UserFunction.cc					UserFunction.hh		\
 UserFunction_header.cc				UserFunction_header.hh	\
 UserPreferences.cc				UserPreferences.hh	\
 UTF8_string.cc					UTF8_string.hh		\
-Value.cc		Value.icc		Value.hh		\
+Value.cc					Value.hh		\
+						Value_P.hh		\
 ValueHistory.cc					ValueHistory.hh		\
 Workspace.cc					Workspace.hh            \
 static_Objects.cc                               static_Objects.hh

@@ -241,8 +241,8 @@ Error & eref = error;
 }
 //-----------------------------------------------------------------------------
 void
-throw_define_error(const UCS_string & fun_name, const UCS_string & cmd,
-                   const char * loc)
+Error::throw_define_error(const UCS_string & fun_name, const UCS_string & cmd,
+                          const char * loc)
 {
    Log(LOG_error_throw)   
       {   

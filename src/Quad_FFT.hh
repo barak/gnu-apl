@@ -27,7 +27,7 @@
 #include "Value.hh"
 #include "Simple_string.hh"
 
-/// the implementation of ⎕FFT
+/// The class implementing ⎕FFT
 class Quad_FFT : public QuadFunction
 {
 public:

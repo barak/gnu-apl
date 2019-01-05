@@ -27,7 +27,7 @@
 #include "InputFile.hh"
 #include "PrintOperator.hh"
 #include "UCS_string.hh"
-#include "Value.icc"
+#include "Value.hh"
 #include "ValueHistory.hh"
 
 VH_entry VH_entry::history[VALUEHISTORY_SIZE + 1];

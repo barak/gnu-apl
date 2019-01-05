@@ -27,6 +27,7 @@
 /**
    The system function Quad-FX (Fix)
  */
+/// The class implementing ⎕FX
 class Quad_FX : public QuadFunction
 {
 public:

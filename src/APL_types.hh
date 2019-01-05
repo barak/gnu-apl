@@ -540,8 +540,10 @@ struct Function_PC2
    Function_PC high;   ///< high PC (including)
 };
 //-----------------------------------------------------------------------------
-/// A single label. A label is a local variable (sym) with an integer function
-/// line (in which sym: was specified as the first 2 tokens in the line)
+/** A single label. A label is a local variable (sym) with an integer function
+    line (in which \b sym: was specified as the first 2 tokens in the line)
+ */
+///  A label in a defined function
 struct labVal
 {
    Symbol      * sym;    ///< The symbol for the label variable.

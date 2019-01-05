@@ -28,6 +28,7 @@
 /**
    The system function ⎕DLX aka. Dancing Links or Algorithm X by D. Knuth 2000
  */
+/// The class implementing ⎕DLX
 class Quad_DLX : public QuadFunction
 {
 public:

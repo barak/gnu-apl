@@ -28,6 +28,7 @@
     A cell pointing to another cell.
     This is used for selective assignments.
  **/
+/// A cell pointing to another cell (which shall be updated)
 class LvalCell : public Cell
 {
 public:

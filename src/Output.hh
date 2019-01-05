@@ -67,6 +67,7 @@ using namespace std;
 
 /** the output of the APL interpreter to cout and maybe to a test result file
  **/
+/// The class handling all output from the APL interpreter
 class Output
 {
 public:

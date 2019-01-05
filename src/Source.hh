@@ -24,19 +24,19 @@
 #include "Simple_string.hh"
 
 //-----------------------------------------------------------------------------
-/// A substring of a string for sequential access
+/// An iterator for Simple_string<>
 template<typename T, bool has_destructor = false>
 class Source
 {
 public:
-   /// constructor: source is entire string.
+   /// constructor: iterate over the entire string.
    Source(const Simple_string<T, has_destructor> & s)
    : str(s),
    idx(0),
    end(s.size())
    {}
 
-   /// constructor: source is string from \b from to the end of the string
+   /// constructor: iterate from \b from to the end of the string
    Source(const Source<T, has_destructor> & src, int32_t from)
    : str(src.str),
      idx(src.idx + from),
@@ -45,7 +45,7 @@ public:
      if (idx > end)   idx = end;
    }
 
-   /// constructor: source is string from \b from to \b to
+   /// constructor: iterate from \b from to \b to
    Source(const Source<T, has_destructor> & src, int32_t from, int32_t to)
    : str(src.str),
      idx(src.idx + from),
@@ -55,7 +55,7 @@ public:
      if (idx > end)   idx = end;
    }
 
-   /// return the number of remaining items.
+   /// return the number of remaining items
    int32_t rest() const
       { return end - idx; }
 

@@ -50,7 +50,7 @@
 #include "Token.hh"
 
    // Values are the APL values (nested or not) manipulated by Functions.
-#include "Value.icc"
+#include "Value.hh"
 
    // access to system variables (⎕IO and friends)
 #include "Workspace.hh"

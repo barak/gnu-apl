@@ -156,7 +156,7 @@ protected:
    double data2;   // can grow quickly!
 };
 //=============================================================================
-/// base class for different kinds of statistics
+/// Base class for different kinds of statistics
 class Statistics
 {
 public:
@@ -197,7 +197,7 @@ protected:
    const Pfstat_ID id;
 };
 //=============================================================================
-/// performance counters for a APL function
+/// Performance counters for an entire APL system function
 class FunctionStatistics : public Statistics
 {
 public:
@@ -242,7 +242,7 @@ protected:
    Statistics_record vec_cycles;
 };
 //-----------------------------------------------------------------------------
-/// performance counters for a cell level function
+/// Performance counters for one cell level function
 class CellFunctionStatistics : public Statistics
 {
 public:
@@ -310,6 +310,7 @@ protected:
 /**
      Performance (cycle-) counters at different levels
  **/
+/// A class containing performance counters for several functions
 class Performance
 {
 public:

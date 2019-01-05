@@ -334,7 +334,7 @@ protected:
 };
 define(`m4_signal',
 `//----------------------------------------------------------------------------
-/// a class for $1
+/// The class for signal $1
 class $1_c : public Signal_base
 {
 public:

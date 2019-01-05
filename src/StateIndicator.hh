@@ -36,6 +36,7 @@
     Compared to e.g.  C++, the state indicator is (one element of) the
     function call stack of the interpreter.
  */
+/// One entry of the state indicator (SI) of the APL interpreter
 class StateIndicator
 {
    friend class XML_Loading_Archive;

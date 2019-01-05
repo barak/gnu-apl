@@ -26,8 +26,9 @@
 
 //-----------------------------------------------------------------------------
 /**
-   The system function ⎕SQL aka. Dancing Links or Algorithm X by D. Knuth 2000
+   The system function ⎕SQL
  */
+/// The class implementing ⎕SQL
 class Quad_SQL : public QuadFunction
 {
 public:

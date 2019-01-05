@@ -27,7 +27,7 @@
     This class contains all cell functions for which the detailed type
     makes no difference.
 */
-
+/// Base class for IntCell and FloatCell
 class RealCell : public NumericCell
 {
 protected:

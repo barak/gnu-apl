@@ -26,6 +26,7 @@
 //-----------------------------------------------------------------------------
 /** Primitive operator ¨ (each).
  */
+/// The class implementing ¨
 class Bif_OPER1_EACH : public PrimitiveOperator
 {
 public:

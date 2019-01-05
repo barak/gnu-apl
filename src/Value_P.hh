@@ -18,8 +18,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#ifndef __SHARED_VALUE_POINTER_HH_DEFINED__
-#define __SHARED_VALUE_POINTER_HH_DEFINED__
+#ifndef __VALUE_P_HH_DEFINED__
+#define __VALUE_P_HH_DEFINED__
 
 #ifndef __COMMON_HH_DEFINED__
 # error This file shall NOT be #included directly, but by #including Comon.hh
@@ -35,13 +35,8 @@ class PrintBuffer;
 
 #define ptr_clear(p, l) p.reset()
 
-/** NOTE: the inline functions below require Value.hh (which in turn
-    requireis the classes nelow). These inline functions are therefore
-    implemented in Value.icc (after both Value.hh AND SharedValuePointer
-    have been included.
-**/
-
 //-----------------------------------------------------------------------------
+/// A Value smart * and access functions (except constructors)
 class Value_P_Base
 {
    friend class PointerCell;
@@ -109,7 +104,7 @@ protected:
    Value * value_p;
 };
 //-----------------------------------------------------------------------------
-/// a smart pointer to a Value
+/// A Value smart * (constructors)
 class Value_P : public Value_P_Base
 {
 public:
@@ -158,9 +153,6 @@ public:
 
    /// Destructor
    inline ~Value_P();
-
-   /// return the number of Value_P that point to \b value_p
-   inline int use_count() const;
 };
 //-----------------------------------------------------------------------------
 

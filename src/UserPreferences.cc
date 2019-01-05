@@ -43,7 +43,7 @@ extern const char * configure_args;
 #include "UserPreferences.hh"
 #include "Workspace.hh"
 
-#include "Value.icc"
+#include "Value.hh"
 
 UserPreferences uprefs;
 

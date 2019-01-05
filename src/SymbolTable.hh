@@ -133,9 +133,7 @@ protected:
 class Symbol;
 
 //-----------------------------------------------------------------------------
-/**
-     A table containing all user defined symbols.
- */
+/// The table containing all user defined symbols.
 class SymbolTable : public SymbolTableBase<Symbol, SYMBOL_HASH_TABLE_SIZE>
 {
 public:
@@ -236,10 +234,7 @@ protected:
    SystemVariable * sysvar;
 };
 //-----------------------------------------------------------------------------
-/**
-     A table containing system defined symbols (aka. distinguished names)
- */
-
+/// The table containing all system defined symbols (aka. distinguished names)
 class SystemSymTab : public SymbolTableBase<SystemName, 256 - 1>
 {
 public:

@@ -25,7 +25,7 @@
 
 #include "Avec.hh"
 #include "Common.hh"
-#include "Error.hh"
+#include "Error_macros.hh"
 #include "Id.hh"
 #include "Simple_string.hh"
 #include "Source.hh"
@@ -41,6 +41,7 @@ class Workspace;
     A Token, consisting of a \b tag and a \b value. The \b tag (actually
     already (tag & TV_MASK) identifies the type of the \b value.
  */
+/// One atom of an APL function or expression
 class Token
 {
 public:
@@ -317,10 +318,8 @@ private:
    // prevent accidental copying
    Token & operator =(const Token & other);
 };
-
-
 //-----------------------------------------------------------------------------
-/// A string of Token
+/// A sequence of Token
 class Token_string : public  Simple_string<Token, true>
 {
 public:
@@ -350,10 +349,13 @@ private:
    Token_string & operator =(const Token_string & other);
 };
 //-----------------------------------------------------------------------------
-/// a token with its location information. For token copied from a function
-/// body: low = high = PC. For token from a reduction low is the low location
-/// of the first token and high is the high of the last token of the token
-/// range that led to e.g a result token.
+/** a token with its location information. For token copied from a function
+    body: low = high = PC. For token from a reduction low is the low location
+    of the first token and high is the high of the last token of the token
+    range that led to e.g a result token.
+    A Token and its position (in a Token_string)
+ */
+/// A Token and its location information (position in a Token_string)
 struct Token_loc
 {
    /// constructor: invalid Token_loc

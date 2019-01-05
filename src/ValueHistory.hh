@@ -28,8 +28,7 @@ using namespace std;
 
 class Value;
 
-/// a ringbuffer containing events that are related to the manipulation
-/// of values
+/// a ringbuffer of events related to the manipulation of values
 class VH_entry
 {
    friend void print_history(ostream & out, const Value * val,

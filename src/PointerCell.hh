@@ -29,6 +29,7 @@
     arrays. This class essentially overloads certain functions in class
     Cell with nested array specific implementations.
  */
+/// A cell pointing to a (nested) APL value
 class PointerCell : public Cell
 {
 public:

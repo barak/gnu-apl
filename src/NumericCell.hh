@@ -28,6 +28,7 @@
     complex number cell. This class contains all cell functions for which
     the detailed type makes no difference.
 */
+/// Base class for RealCell and ComplexCell
 class NumericCell : public Cell
 {
 protected:

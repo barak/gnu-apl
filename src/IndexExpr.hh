@@ -23,12 +23,13 @@
 
 #include "Cell.hh"
 #include "DynamicObject.hh"
-#include "Value.icc"
+#include "Value.hh"
 
 //-----------------------------------------------------------------------------
 /**
      An array of index values.
  */
+/// The interal representation of some APL index [A1;A2;...;An]
 class IndexExpr : public DynamicObject
 {
 public:

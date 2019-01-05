@@ -22,6 +22,7 @@
 
 #include "CDR_string.hh"
 #include "CharCell.hh"
+#include "ComplexCell.hh"
 #include "Common.hh"
 #include "Error.hh"
 #include "FloatCell.hh"
@@ -38,7 +39,7 @@
 #include "SystemVariable.hh"
 #include "UCS_string.hh"
 #include "UserFunction.hh"
-#include "Value.icc"
+#include "Value.hh"
 #include "ValueHistory.hh"
 #include "Workspace.hh"
 
@@ -1945,3 +1946,81 @@ operator<<(ostream & out, const Value & v)
    return out;
 }
 //-----------------------------------------------------------------------------
+Value_P
+IntScalar(APL_Integer val, const char * loc)
+{
+Value_P Z(loc);
+   new (Z->next_ravel())   IntCell(val);
+   Z->check_value(LOC);
+   return Z;
+}
+//-----------------------------------------------------------------------------
+Value_P
+FloatScalar(APL_Float val, const char * loc)
+{
+Value_P Z(loc);
+   new (Z->next_ravel())   FloatCell(val);
+   Z->check_value(LOC);
+   return Z;
+}
+//-----------------------------------------------------------------------------
+Value_P
+ComplexScalar(APL_Complex val, const char * loc)
+{
+Value_P Z(loc);
+   new (Z->next_ravel()) ComplexCell(val);
+   Z->check_value(LOC);
+   return Z;
+}
+//-----------------------------------------------------------------------------
+Value_P
+CharScalar(Unicode uni, const char * loc)
+{
+Value_P Z(loc);
+   new (Z->next_ravel()) CharCell(uni);
+   Z->check_value(LOC);
+   return Z;
+}
+//-----------------------------------------------------------------------------
+Value_P
+Idx0(const char * loc)
+{
+Value_P Z(ShapeItem(0), loc);
+   Z->check_value(LOC);
+   return Z;
+}
+//-----------------------------------------------------------------------------
+Value_P
+Str0(const char * loc)
+{
+Value_P Z(ShapeItem(0), loc);
+   Z->set_proto_Spc();
+   Z->check_value(LOC);
+   return Z;
+}
+//-----------------------------------------------------------------------------
+Value_P
+Str0_0(const char * loc)
+{
+Shape sh(ShapeItem(0), ShapeItem(0));
+Value_P Z(sh, loc);
+   Z->set_proto_Spc();
+   Z->check_value(LOC);
+   return Z;
+}
+//-----------------------------------------------------------------------------
+Value_P
+Idx0_0(const char * loc)
+{
+Shape sh(ShapeItem(0), ShapeItem(0));
+Value_P Z(sh, loc);
+   Z->check_value(LOC);
+   return Z;
+}
+//-----------------------------------------------------------------------------
+ostream & operator << (ostream & out, const AP_num3 & ap3)
+{
+   return out << ap3.proc << "." << ap3.parent << "." << ap3.grand;
+}
+//-----------------------------------------------------------------------------
+

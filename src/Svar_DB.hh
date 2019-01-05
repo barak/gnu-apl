@@ -68,8 +68,7 @@ private:
          { const Svar_record_P svar(key); open_act }	\
     else { closed_act }
 
-/// access to a database in APserver that contains all shared variables on
-/// this machine
+/// Access to the shared variable database in APserver
 class Svar_DB
 {
 public:

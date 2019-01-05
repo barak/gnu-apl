@@ -24,7 +24,7 @@
 #include "FloatCell.hh"
 #include "IntCell.hh"
 #include "PointerCell.hh"
-#include "Value.icc"
+#include "Value.hh"
 #include "Workspace.hh"
 
 //-----------------------------------------------------------------------------

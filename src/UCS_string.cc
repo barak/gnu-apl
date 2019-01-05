@@ -29,7 +29,7 @@
 #include "PrintOperator.hh"
 #include "UCS_string.hh"
 #include "UTF8_string.hh"
-#include "Value.icc"
+#include "Value.hh"
 
 ShapeItem UCS_string::total_count = 0;
 ShapeItem UCS_string::total_id = 0;

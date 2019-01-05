@@ -32,7 +32,7 @@
 class Plot_window_properties;
 class Plot_data;
 
-/// the implementation of ⎕PLOT
+/// The class implementing ⎕PLOT
 class Quad_PLOT : public QuadFunction
 {
 public:

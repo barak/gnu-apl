@@ -26,6 +26,7 @@
 /*!
      Functions related to parsing of input lines and user defined functions.
  */
+/// A parser for APL code
 class Parser
 {
 public:

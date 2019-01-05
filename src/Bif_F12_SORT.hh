@@ -38,6 +38,7 @@ class Cell;
    (which are actually indices into A) of the CollatingCacheEntry for c1 and
    c2 are used for the comparison and the lowest dimansion wins.
 **/
+/// One item in a CollatingCache
 struct CollatingCacheEntry
 {
    /// constructor: an invalid entry (for allocating Simple_string items)
@@ -77,8 +78,10 @@ operator << (ostream & out, const CollatingCacheEntry & entry)
    return out << "CC-entry(" << entry.ce_char << ")";
 }
 //-----------------------------------------------------------------------------
-/// A collating cache which is the internal representation of the left
-/// argument A of dydic A⍋B or A⍒B
+/** A collating cache which is the internal representation of the left
+    argument A of dydic A⍋B or A⍒B
+ */
+/// A cache for speeding up dyadic ⍋ and ⍒
 class CollatingCache : public Simple_string<CollatingCacheEntry, false>
 {
 public:
@@ -118,6 +121,7 @@ protected:
 //=============================================================================
 /** primitive functions grade up and grade down
  */
+/// Base class for ⍋ and ⍒
 class Bif_F12_SORT : public NonscalarFunction
 {
 public:
@@ -147,6 +151,7 @@ protected:
 //-----------------------------------------------------------------------------
 /** System function grade up ⍋
  */
+/// The class implementing ⍋
 class Bif_F12_SORT_ASC : public Bif_F12_SORT
 {
 public:
@@ -173,6 +178,7 @@ protected:
 //-----------------------------------------------------------------------------
 /** System function grade down ⍒
  */
+/// The class implementing ⍒
 class Bif_F12_SORT_DES : public Bif_F12_SORT
 {
 public:

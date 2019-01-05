@@ -162,20 +162,20 @@ am__libapl_la_SOURCES_DIST = buildtag buildtag.hh ../config.h \
 	Doxy.cc Doxy.hh CharCell.cc CharCell.hh Command.cc Command.def \
 	Command.hh Common.cc Common.hh ComplexCell.cc ComplexCell.hh \
 	configure_args.cc DiffOut.cc DiffOut.hh DynamicObject.cc \
-	DynamicObject.hh Error.cc Error.def Error.hh ErrorCode.hh \
-	Executable.cc Executable.hh FloatCell.cc FloatCell.hh \
-	Function.cc Function.hh DerivedFunction.cc DerivedFunction.hh \
-	Help.def Heapsort.hh Id.cc Id.def Id.hh IndexExpr.cc \
-	IndexExpr.hh IndexIterator.cc IndexIterator.hh InputFile.cc \
-	InputFile.hh IntCell.cc IntCell.hh IO_Files.cc IO_Files.hh \
-	LApack.cc LApack.hh LibPaths.cc LibPaths.hh LineInput.cc \
-	LineInput.hh Logging.cc Logging.def Logging.hh LvalCell.cc \
-	LvalCell.hh makefile.h Malloc_hooks.cc Nabla.cc Nabla.hh \
-	Macro.cc Macro.def Macro.hh NamedObject.cc NamedObject.hh \
-	NativeFunction.cc NativeFunction.hh Native_interface.hh \
-	NumericCell.cc NumericCell.hh Output.cc Output.hh PJob.hh \
-	Parser.cc Parser.hh Prefix.cc Prefix.def Prefix.hh \
-	PointerCell.cc PointerCell.hh PrimitiveFunction.cc \
+	DynamicObject.hh Error.cc Error.def Error.hh Error_macros.hh \
+	ErrorCode.hh Executable.cc Executable.hh FloatCell.cc \
+	FloatCell.hh Function.cc Function.hh DerivedFunction.cc \
+	DerivedFunction.hh Help.def Heapsort.hh Id.cc Id.def Id.hh \
+	IndexExpr.cc IndexExpr.hh IndexIterator.cc IndexIterator.hh \
+	InputFile.cc InputFile.hh IntCell.cc IntCell.hh IO_Files.cc \
+	IO_Files.hh LApack.cc LApack.hh LibPaths.cc LibPaths.hh \
+	LineInput.cc LineInput.hh Logging.cc Logging.def Logging.hh \
+	LvalCell.cc LvalCell.hh makefile.h Malloc_hooks.cc Nabla.cc \
+	Nabla.hh Macro.cc Macro.def Macro.hh NamedObject.cc \
+	NamedObject.hh NativeFunction.cc NativeFunction.hh \
+	Native_interface.hh NumericCell.cc NumericCell.hh Output.cc \
+	Output.hh PJob.hh Parser.cc Parser.hh Prefix.cc Prefix.def \
+	Prefix.hh PointerCell.cc PointerCell.hh PrimitiveFunction.cc \
 	PrimitiveFunction.hh PrimitiveOperator.cc PrimitiveOperator.hh \
 	PrintBuffer.cc PrintBuffer.hh PrintContext.hh PrintOperator.hh \
 	QuadFunction.cc QuadFunction.hh ProcessorID.cc ProcessorID.hh \
@@ -186,23 +186,22 @@ am__libapl_la_SOURCES_DIST = buildtag buildtag.hh ../config.h \
 	Quad_SQL.cc Quad_SQL.hh Quad_SVx.cc Quad_SVx.hh Quad_TF.cc \
 	Quad_TF.hh Parallel.cc Parallel.hh Performance.cc \
 	Performance.def Performance.hh RealCell.cc RealCell.hh sbrk.cc \
-	Shape.cc Shape.hh SharedValuePointer.hh Simple_string.hh \
-	ScalarFunction.cc ScalarFunction.hh Security.cc Security.def \
-	Security.hh Source.hh StateIndicator.cc StateIndicator.hh \
-	Svar_DB.cc Svar_DB.hh Svar_record.cc Svar_record.hh \
-	tcp_signal.m4 Svar_signals.def Svar_signals.hh Symbol.cc \
-	Symbol.hh SymbolTable.cc SymbolTable.hh SystemLimits.def \
-	SystemLimits.hh SystemVariable.cc SystemVariable.def \
-	SystemVariable.hh TabExpansion.cc TabExpansion.hh \
-	Thread_context.cc Thread_context.hh Token.cc Token.def \
-	Token.hh TokenEnums.hh Tokenizer.cc Tokenizer.hh UCS_string.cc \
-	UCS_string.hh UCS_string_vector.cc UCS_string_vector.hh \
-	Unicode.hh UserFunction.cc UserFunction.hh \
-	UserFunction_header.cc UserFunction_header.hh \
-	UserPreferences.cc UserPreferences.hh UTF8_string.cc \
-	UTF8_string.hh Value.cc Value.icc Value.hh ValueHistory.cc \
-	ValueHistory.hh Workspace.cc Workspace.hh static_Objects.cc \
-	static_Objects.hh Regexp.cc Regexp.hh \
+	Shape.cc Shape.hh Simple_string.hh ScalarFunction.cc \
+	ScalarFunction.hh Security.cc Security.def Security.hh \
+	Source.hh StateIndicator.cc StateIndicator.hh Svar_DB.cc \
+	Svar_DB.hh Svar_record.cc Svar_record.hh tcp_signal.m4 \
+	Svar_signals.def Svar_signals.hh Symbol.cc Symbol.hh \
+	SymbolTable.cc SymbolTable.hh SystemLimits.def SystemLimits.hh \
+	SystemVariable.cc SystemVariable.def SystemVariable.hh \
+	TabExpansion.cc TabExpansion.hh Thread_context.cc \
+	Thread_context.hh Token.cc Token.def Token.hh TokenEnums.hh \
+	Tokenizer.cc Tokenizer.hh UCS_string.cc UCS_string.hh \
+	UCS_string_vector.cc UCS_string_vector.hh Unicode.hh \
+	UserFunction.cc UserFunction.hh UserFunction_header.cc \
+	UserFunction_header.hh UserPreferences.cc UserPreferences.hh \
+	UTF8_string.cc UTF8_string.hh Value.cc Value.hh Value_P.hh \
+	ValueHistory.cc ValueHistory.hh Workspace.cc Workspace.hh \
+	static_Objects.cc static_Objects.hh Regexp.cc Regexp.hh \
 	sql/SqliteArgListBuilder.cc sql/SqliteArgListBuilder.hh \
 	sql/SqliteConnection.cc sql/SqliteConnection.hh \
 	sql/SqliteResultValue.cc sql/SqliteResultValue.hh \
@@ -297,20 +296,20 @@ am__apl_SOURCES_DIST = main.cc buildtag buildtag.hh ../config.h \
 	Doxy.cc Doxy.hh CharCell.cc CharCell.hh Command.cc Command.def \
 	Command.hh Common.cc Common.hh ComplexCell.cc ComplexCell.hh \
 	configure_args.cc DiffOut.cc DiffOut.hh DynamicObject.cc \
-	DynamicObject.hh Error.cc Error.def Error.hh ErrorCode.hh \
-	Executable.cc Executable.hh FloatCell.cc FloatCell.hh \
-	Function.cc Function.hh DerivedFunction.cc DerivedFunction.hh \
-	Help.def Heapsort.hh Id.cc Id.def Id.hh IndexExpr.cc \
-	IndexExpr.hh IndexIterator.cc IndexIterator.hh InputFile.cc \
-	InputFile.hh IntCell.cc IntCell.hh IO_Files.cc IO_Files.hh \
-	LApack.cc LApack.hh LibPaths.cc LibPaths.hh LineInput.cc \
-	LineInput.hh Logging.cc Logging.def Logging.hh LvalCell.cc \
-	LvalCell.hh makefile.h Malloc_hooks.cc Nabla.cc Nabla.hh \
-	Macro.cc Macro.def Macro.hh NamedObject.cc NamedObject.hh \
-	NativeFunction.cc NativeFunction.hh Native_interface.hh \
-	NumericCell.cc NumericCell.hh Output.cc Output.hh PJob.hh \
-	Parser.cc Parser.hh Prefix.cc Prefix.def Prefix.hh \
-	PointerCell.cc PointerCell.hh PrimitiveFunction.cc \
+	DynamicObject.hh Error.cc Error.def Error.hh Error_macros.hh \
+	ErrorCode.hh Executable.cc Executable.hh FloatCell.cc \
+	FloatCell.hh Function.cc Function.hh DerivedFunction.cc \
+	DerivedFunction.hh Help.def Heapsort.hh Id.cc Id.def Id.hh \
+	IndexExpr.cc IndexExpr.hh IndexIterator.cc IndexIterator.hh \
+	InputFile.cc InputFile.hh IntCell.cc IntCell.hh IO_Files.cc \
+	IO_Files.hh LApack.cc LApack.hh LibPaths.cc LibPaths.hh \
+	LineInput.cc LineInput.hh Logging.cc Logging.def Logging.hh \
+	LvalCell.cc LvalCell.hh makefile.h Malloc_hooks.cc Nabla.cc \
+	Nabla.hh Macro.cc Macro.def Macro.hh NamedObject.cc \
+	NamedObject.hh NativeFunction.cc NativeFunction.hh \
+	Native_interface.hh NumericCell.cc NumericCell.hh Output.cc \
+	Output.hh PJob.hh Parser.cc Parser.hh Prefix.cc Prefix.def \
+	Prefix.hh PointerCell.cc PointerCell.hh PrimitiveFunction.cc \
 	PrimitiveFunction.hh PrimitiveOperator.cc PrimitiveOperator.hh \
 	PrintBuffer.cc PrintBuffer.hh PrintContext.hh PrintOperator.hh \
 	QuadFunction.cc QuadFunction.hh ProcessorID.cc ProcessorID.hh \
@@ -321,23 +320,22 @@ am__apl_SOURCES_DIST = main.cc buildtag buildtag.hh ../config.h \
 	Quad_SQL.cc Quad_SQL.hh Quad_SVx.cc Quad_SVx.hh Quad_TF.cc \
 	Quad_TF.hh Parallel.cc Parallel.hh Performance.cc \
 	Performance.def Performance.hh RealCell.cc RealCell.hh sbrk.cc \
-	Shape.cc Shape.hh SharedValuePointer.hh Simple_string.hh \
-	ScalarFunction.cc ScalarFunction.hh Security.cc Security.def \
-	Security.hh Source.hh StateIndicator.cc StateIndicator.hh \
-	Svar_DB.cc Svar_DB.hh Svar_record.cc Svar_record.hh \
-	tcp_signal.m4 Svar_signals.def Svar_signals.hh Symbol.cc \
-	Symbol.hh SymbolTable.cc SymbolTable.hh SystemLimits.def \
-	SystemLimits.hh SystemVariable.cc SystemVariable.def \
-	SystemVariable.hh TabExpansion.cc TabExpansion.hh \
-	Thread_context.cc Thread_context.hh Token.cc Token.def \
-	Token.hh TokenEnums.hh Tokenizer.cc Tokenizer.hh UCS_string.cc \
-	UCS_string.hh UCS_string_vector.cc UCS_string_vector.hh \
-	Unicode.hh UserFunction.cc UserFunction.hh \
-	UserFunction_header.cc UserFunction_header.hh \
-	UserPreferences.cc UserPreferences.hh UTF8_string.cc \
-	UTF8_string.hh Value.cc Value.icc Value.hh ValueHistory.cc \
-	ValueHistory.hh Workspace.cc Workspace.hh static_Objects.cc \
-	static_Objects.hh Regexp.cc Regexp.hh \
+	Shape.cc Shape.hh Simple_string.hh ScalarFunction.cc \
+	ScalarFunction.hh Security.cc Security.def Security.hh \
+	Source.hh StateIndicator.cc StateIndicator.hh Svar_DB.cc \
+	Svar_DB.hh Svar_record.cc Svar_record.hh tcp_signal.m4 \
+	Svar_signals.def Svar_signals.hh Symbol.cc Symbol.hh \
+	SymbolTable.cc SymbolTable.hh SystemLimits.def SystemLimits.hh \
+	SystemVariable.cc SystemVariable.def SystemVariable.hh \
+	TabExpansion.cc TabExpansion.hh Thread_context.cc \
+	Thread_context.hh Token.cc Token.def Token.hh TokenEnums.hh \
+	Tokenizer.cc Tokenizer.hh UCS_string.cc UCS_string.hh \
+	UCS_string_vector.cc UCS_string_vector.hh Unicode.hh \
+	UserFunction.cc UserFunction.hh UserFunction_header.cc \
+	UserFunction_header.hh UserPreferences.cc UserPreferences.hh \
+	UTF8_string.cc UTF8_string.hh Value.cc Value.hh Value_P.hh \
+	ValueHistory.cc ValueHistory.hh Workspace.cc Workspace.hh \
+	static_Objects.cc static_Objects.hh Regexp.cc Regexp.hh \
 	sql/SqliteArgListBuilder.cc sql/SqliteArgListBuilder.hh \
 	sql/SqliteConnection.cc sql/SqliteConnection.hh \
 	sql/SqliteResultValue.cc sql/SqliteResultValue.hh \
@@ -714,20 +712,20 @@ common_SOURCES = buildtag buildtag.hh ../config.h \
 	Doxy.cc Doxy.hh CharCell.cc CharCell.hh Command.cc Command.def \
 	Command.hh Common.cc Common.hh ComplexCell.cc ComplexCell.hh \
 	configure_args.cc DiffOut.cc DiffOut.hh DynamicObject.cc \
-	DynamicObject.hh Error.cc Error.def Error.hh ErrorCode.hh \
-	Executable.cc Executable.hh FloatCell.cc FloatCell.hh \
-	Function.cc Function.hh DerivedFunction.cc DerivedFunction.hh \
-	Help.def Heapsort.hh Id.cc Id.def Id.hh IndexExpr.cc \
-	IndexExpr.hh IndexIterator.cc IndexIterator.hh InputFile.cc \
-	InputFile.hh IntCell.cc IntCell.hh IO_Files.cc IO_Files.hh \
-	LApack.cc LApack.hh LibPaths.cc LibPaths.hh LineInput.cc \
-	LineInput.hh Logging.cc Logging.def Logging.hh LvalCell.cc \
-	LvalCell.hh makefile.h Malloc_hooks.cc Nabla.cc Nabla.hh \
-	Macro.cc Macro.def Macro.hh NamedObject.cc NamedObject.hh \
-	NativeFunction.cc NativeFunction.hh Native_interface.hh \
-	NumericCell.cc NumericCell.hh Output.cc Output.hh PJob.hh \
-	Parser.cc Parser.hh Prefix.cc Prefix.def Prefix.hh \
-	PointerCell.cc PointerCell.hh PrimitiveFunction.cc \
+	DynamicObject.hh Error.cc Error.def Error.hh Error_macros.hh \
+	ErrorCode.hh Executable.cc Executable.hh FloatCell.cc \
+	FloatCell.hh Function.cc Function.hh DerivedFunction.cc \
+	DerivedFunction.hh Help.def Heapsort.hh Id.cc Id.def Id.hh \
+	IndexExpr.cc IndexExpr.hh IndexIterator.cc IndexIterator.hh \
+	InputFile.cc InputFile.hh IntCell.cc IntCell.hh IO_Files.cc \
+	IO_Files.hh LApack.cc LApack.hh LibPaths.cc LibPaths.hh \
+	LineInput.cc LineInput.hh Logging.cc Logging.def Logging.hh \
+	LvalCell.cc LvalCell.hh makefile.h Malloc_hooks.cc Nabla.cc \
+	Nabla.hh Macro.cc Macro.def Macro.hh NamedObject.cc \
+	NamedObject.hh NativeFunction.cc NativeFunction.hh \
+	Native_interface.hh NumericCell.cc NumericCell.hh Output.cc \
+	Output.hh PJob.hh Parser.cc Parser.hh Prefix.cc Prefix.def \
+	Prefix.hh PointerCell.cc PointerCell.hh PrimitiveFunction.cc \
 	PrimitiveFunction.hh PrimitiveOperator.cc PrimitiveOperator.hh \
 	PrintBuffer.cc PrintBuffer.hh PrintContext.hh PrintOperator.hh \
 	QuadFunction.cc QuadFunction.hh ProcessorID.cc ProcessorID.hh \
@@ -738,24 +736,23 @@ common_SOURCES = buildtag buildtag.hh ../config.h \
 	Quad_SQL.cc Quad_SQL.hh Quad_SVx.cc Quad_SVx.hh Quad_TF.cc \
 	Quad_TF.hh Parallel.cc Parallel.hh Performance.cc \
 	Performance.def Performance.hh RealCell.cc RealCell.hh sbrk.cc \
-	Shape.cc Shape.hh SharedValuePointer.hh Simple_string.hh \
-	ScalarFunction.cc ScalarFunction.hh Security.cc Security.def \
-	Security.hh Source.hh StateIndicator.cc StateIndicator.hh \
-	Svar_DB.cc Svar_DB.hh Svar_record.cc Svar_record.hh \
-	tcp_signal.m4 Svar_signals.def Svar_signals.hh Symbol.cc \
-	Symbol.hh SymbolTable.cc SymbolTable.hh SystemLimits.def \
-	SystemLimits.hh SystemVariable.cc SystemVariable.def \
-	SystemVariable.hh TabExpansion.cc TabExpansion.hh \
-	Thread_context.cc Thread_context.hh Token.cc Token.def \
-	Token.hh TokenEnums.hh Tokenizer.cc Tokenizer.hh UCS_string.cc \
-	UCS_string.hh UCS_string_vector.cc UCS_string_vector.hh \
-	Unicode.hh UserFunction.cc UserFunction.hh \
-	UserFunction_header.cc UserFunction_header.hh \
-	UserPreferences.cc UserPreferences.hh UTF8_string.cc \
-	UTF8_string.hh Value.cc Value.icc Value.hh ValueHistory.cc \
-	ValueHistory.hh Workspace.cc Workspace.hh static_Objects.cc \
-	static_Objects.hh $(am__append_3) $(am__append_6) \
-	$(am__append_7) $(am__append_10)
+	Shape.cc Shape.hh Simple_string.hh ScalarFunction.cc \
+	ScalarFunction.hh Security.cc Security.def Security.hh \
+	Source.hh StateIndicator.cc StateIndicator.hh Svar_DB.cc \
+	Svar_DB.hh Svar_record.cc Svar_record.hh tcp_signal.m4 \
+	Svar_signals.def Svar_signals.hh Symbol.cc Symbol.hh \
+	SymbolTable.cc SymbolTable.hh SystemLimits.def SystemLimits.hh \
+	SystemVariable.cc SystemVariable.def SystemVariable.hh \
+	TabExpansion.cc TabExpansion.hh Thread_context.cc \
+	Thread_context.hh Token.cc Token.def Token.hh TokenEnums.hh \
+	Tokenizer.cc Tokenizer.hh UCS_string.cc UCS_string.hh \
+	UCS_string_vector.cc UCS_string_vector.hh Unicode.hh \
+	UserFunction.cc UserFunction.hh UserFunction_header.cc \
+	UserFunction_header.hh UserPreferences.cc UserPreferences.hh \
+	UTF8_string.cc UTF8_string.hh Value.cc Value.hh Value_P.hh \
+	ValueHistory.cc ValueHistory.hh Workspace.cc Workspace.hh \
+	static_Objects.cc static_Objects.hh $(am__append_3) \
+	$(am__append_6) $(am__append_7) $(am__append_10)
 pkglib_LTLIBRARIES = $(am__append_11)
 @WANT_LIBAPL_TRUE@pkginclude_HEADERS = libapl.h
 @WANT_LIBAPL_TRUE@libapl_la_SOURCES = $(common_SOURCES) libapl.h libapl.cc

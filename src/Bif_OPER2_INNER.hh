@@ -26,6 +26,7 @@
 //-----------------------------------------------------------------------------
 /** Primitive operator inner product.
  */
+/// The class implementing f.g
 class Bif_OPER2_INNER : public PrimitiveOperator
 {
 public:

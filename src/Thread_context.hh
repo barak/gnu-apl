@@ -58,6 +58,7 @@
 
  **/
 //=============================================================================
+/// the context for one parallel execution thread
 class Thread_context
 {
 public:

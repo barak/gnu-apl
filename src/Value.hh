@@ -21,12 +21,6 @@
 #ifndef __VALUE_HH_DEFINED__
 #define __VALUE_HH_DEFINED__
 
-// prevent bypassing of Value.icc
-//
-#ifndef __VALUE_ICC_DEFINED__
-#error "Do not #include Value.hh directly! Please #include Value.icc instead"
-#endif
-
 #include "Cell.hh"
 #include "CharCell.hh"
 #include "Common.hh"
@@ -39,6 +33,7 @@
 using namespace std;
 
 class CDR_string;
+class Error;
 class IndexExpr;
 class PrintBuffer;
 class Value_P;
@@ -49,6 +44,7 @@ class Thread_context;
     An APL value. It consists of a fixed header (rank, shape) and
     and a ravel (a sequence of cells).
  */
+/// An APL Value (a Shape and a ravel)
 class Value : public DynamicObject
 {
    friend class Value_P;
@@ -647,9 +643,289 @@ private:
 };
 // ----------------------------------------------------------------------------
 
-extern void print_history(ostream & out, const Value * val,
-                                const char * loc);
+extern void print_history(ostream & out, const Value * val, const char * loc);
+
+// ============================================================================
+
+// shortcuts for frequently used APL values...
+
+/// integer scalar
+Value_P IntScalar(APL_Integer val, const char * loc);
+
+/// floating-point scalar
+Value_P FloatScalar(APL_Float val, const char * loc);
+
+/// character scalar
+Value_P CharScalar(Unicode uni, const char * loc);
+
+/// complex scalar
+Value_P ComplexScalar(APL_Complex cpx, const char * loc);
+
+/// ⍳0 (aka. ⍬)
+Value_P Idx0(const char * loc);
+
+/// ''
+Value_P Str0(const char * loc);
+
+/// 0 0⍴''
+Value_P Str0_0(const char * loc);
+
+/// 0 0⍴0
+Value_P Idx0_0(const char * loc);
 
 // ----------------------------------------------------------------------------
 
+// inline functions that depend on class Value being declared...
+
+void
+Value_P_Base::increment_owner_count(Value * v, const char * loc)
+{
+  Assert1(v);
+  if (v->check_ptr == reinterpret_cast<const char *>(v) + 7)   ++v->owner_count;
+}
+//-----------------------------------------------------------------------------
+inline void
+Value_P_Base::decrement_owner_count(Value * & v, const char * loc)
+{
+   Assert1(v);
+
+   if (v->check_ptr == reinterpret_cast<const char *>(v) + 7)
+      {
+        Assert1(v->owner_count > 0);
+         --v->owner_count;
+
+        if (v->owner_count == 0)
+           {
+             delete v;
+             v = 0;
+           }
+      }
+}
+//-----------------------------------------------------------------------------
+inline void
+Value_P_Base::reset()
+{
+   if (value_p)
+      {
+        decrement_owner_count(value_p, LOC);
+        value_p = 0;
+      }
+}
+//-----------------------------------------------------------------------------
+inline void
+Value_P_Base::clear(const char * loc)
+{
+  if (value_p)
+     {
+       decrement_owner_count(value_p, loc);
+       ADD_EVENT(value_p, VHE_PtrClr,
+                 value_p ? value_p->owner_count : -99, loc);
+
+       value_p = 0;
+     }
+}
+//-----------------------------------------------------------------------------
+inline void
+Value_P_Base::clear_pointer(const char * loc)
+{
+  if (value_p)
+     {
+       // do NOT decrement_owner_count() !
+       ADD_EVENT(value_p, VHE_PtrClr,
+                 value_p ? value_p->owner_count : -99, loc);
+
+       value_p = 0;
+     }
+}
+// ============================================================================
+
+#include "Error.hh"
+#include "Value_P.hh"
+
+//-----------------------------------------------------------------------------
+inline Value_P::Value_P(const char * loc)
+{
+const char * args = "const char * loc";
+   value_p = 0;
+
+   try                           { value_p = new Value(loc); }
+   catch (const Error & error)   { Value::catch_Error(error, loc, LOC);       }
+   catch (const exception & e)   { Value::catch_exception(e, args, loc, LOC); }
+   catch (...)                   { Value::catch_ANY(args, loc, LOC);          }
+
+   increment_owner_count(value_p, loc);
+   ADD_EVENT(value_p, VHE_PtrNew, value_p->owner_count, loc);
+}
+//-----------------------------------------------------------------------------
+inline Value_P::~Value_P()
+{
+   if (value_p)
+      {
+        decrement_owner_count(value_p, LOC);   // may clear value_p
+        ADD_EVENT(value_p, VHE_PtrDel,
+                  value_p ? value_p->owner_count : -99, LOC);
+      }
+}
+//-----------------------------------------------------------------------------
+inline Value_P::Value_P(const Cell & cell, const char * loc)
+{
+const char * args = "const Cell & cell, const char * loc";
+   value_p = 0;
+
+   try                           { value_p = new Value(cell, loc); }
+   catch (const Error & error)   { Value::catch_Error(error, loc, LOC);       }
+   catch (const exception & e)   { Value::catch_exception(e, args, loc, LOC); }
+   catch (...)                   { Value::catch_ANY(args, loc, LOC);          }
+
+   increment_owner_count(value_p, loc);
+   ADD_EVENT(value_p, VHE_PtrNew, value_p->owner_count, loc);
+}
+//-----------------------------------------------------------------------------
+inline Value_P::Value_P(ShapeItem len, const char * loc)
+{
+const char * args = "ShapeItem len, const char * loc";
+   value_p = 0;
+
+   try                           { value_p = new Value(len, loc); }
+   catch (const Error & error)   { Value::catch_Error(error, loc, LOC);       }
+   catch (const exception & e)   { Value::catch_exception(e, args, loc, LOC); }
+   catch (...)                   { Value::catch_ANY(args, loc, LOC);          }
+
+   increment_owner_count(value_p, loc);
+   ADD_EVENT(value_p, VHE_PtrNew, value_p->owner_count, loc);
+}
+//-----------------------------------------------------------------------------
+inline Value_P::Value_P(const UCS_string & ucs, const char * loc)
+{
+const char * args = "const UCS_string & ucs, const char * loc";
+   value_p = 0;
+
+   try                           { value_p = new Value(ucs, loc); }
+   catch (const Error & error)   { Value::catch_Error(error, loc, LOC);       }
+   catch (const exception & e)   { Value::catch_exception(e, args, loc, LOC); }
+   catch (...)                   { Value::catch_ANY(args, loc, LOC);          }
+
+   increment_owner_count(value_p, loc);
+   ADD_EVENT(value_p, VHE_PtrNew, value_p->owner_count, loc);
+}
+//-----------------------------------------------------------------------------
+inline Value_P::Value_P(const CDR_string & cdr, const char * loc)
+{
+const char * args = "const CDR_string & cdr, const char * loc";
+   value_p = 0;
+
+   try                           { value_p = new Value(cdr, loc); }
+   catch (const Error & error)   { Value::catch_Error(error, loc, LOC);       }
+   catch (const exception & e)   { Value::catch_exception(e, args, loc, LOC); }
+   catch (...)                   { Value::catch_ANY(args, loc, LOC);          }
+
+   increment_owner_count(value_p, loc);
+   ADD_EVENT(value_p, VHE_PtrNew, value_p->owner_count, loc);
+}
+//-----------------------------------------------------------------------------
+inline Value_P::Value_P(const PrintBuffer & pb, const char * loc)
+{
+const char * args = "const PrintBuffer & ob, const char * loc";
+   value_p = 0;
+
+   try                   { value_p = new Value(pb, loc); }
+   catch (const Error & error)   { Value::catch_Error(error, loc, LOC);       }
+   catch (const exception & e)   { Value::catch_exception(e, args, loc, LOC); }
+   catch (...)                   { Value::catch_ANY(args, loc, LOC);          }
+
+   increment_owner_count(value_p, loc);
+   ADD_EVENT(value_p, VHE_PtrNew, value_p->owner_count, loc);
+}
+//-----------------------------------------------------------------------------
+inline Value_P::Value_P(const UTF8_string & utf, const char * loc)
+{
+const char * args = "const UTF8_string & utf, const char * loc";
+   value_p = 0;
+
+   try                           { value_p = new Value(utf, loc); }
+   catch (const Error & error)   { Value::catch_Error(error, loc, LOC);       }
+   catch (const exception & e)   { Value::catch_exception(e, args, loc, LOC); }
+   catch (...)                   { Value::catch_ANY(args, loc, LOC);          }
+
+   increment_owner_count(value_p, loc);
+   ADD_EVENT(value_p, VHE_PtrNew, value_p->owner_count, loc);
+}
+//-----------------------------------------------------------------------------
+inline Value_P::Value_P(const char * loc, const Shape * shape)
+{
+const char * args = "const char * loc, const Shape & shape";
+   value_p = 0;
+
+   try                           { value_p = new Value(loc, shape); }
+   catch (const Error & error)   { Value::catch_Error(error, loc, LOC);       }
+   catch (const exception & e)   { Value::catch_exception(e, args, loc, LOC); }
+   catch (...)                   { Value::catch_ANY(args, loc, LOC);          }
+
+   increment_owner_count(value_p, loc);
+   ADD_EVENT(value_p, VHE_PtrNew, value_p->owner_count, loc);
+}
+//-----------------------------------------------------------------------------
+inline void
+Value_P::operator =(const Value_P & other)
+{
+   if (value_p == other.value_p)   return;   // same pointer
+
+   if (value_p)   // override existing pointer
+      {
+        decrement_owner_count(value_p, LOC);
+        ADD_EVENT(value_p, VHE_PtrClr, other.value_p->owner_count, LOC);
+      }
+
+   value_p = other.value_p;
+   if (value_p)
+      {
+        increment_owner_count(value_p, LOC);
+        ADD_EVENT(value_p, VHE_PtrCopy3, value_p->owner_count, LOC);
+      }
+}
+//-----------------------------------------------------------------------------
+inline Value_P::Value_P(const Value_P & other, const char * loc)
+{
+   value_p = other.value_p;
+   if (value_p)
+      {
+        increment_owner_count(value_p, loc);
+        ADD_EVENT(value_p, VHE_PtrCopy1, value_p->owner_count, loc);
+      }
+}
+//-----------------------------------------------------------------------------
+inline Value_P::Value_P(const Value_P & other)
+{
+   value_p = other.value_p;
+   if (value_p)
+      {
+        increment_owner_count(value_p, LOC);
+        ADD_EVENT(value_p, VHE_PtrCopy1, value_p->owner_count, LOC);
+      }
+}
+//-----------------------------------------------------------------------------
+inline Value_P::Value_P(const Shape & shape, const char * loc)
+{
+const char * args = "const Shape & shape, const char * loc";
+   value_p = 0;
+   if (Value::check_WS_FULL(args, shape.get_volume(), loc))   WS_FULL;
+
+   try                           { value_p = new Value(shape, loc); }
+   catch (const Error & error)   { Value::catch_Error(error, loc, LOC);       }
+   catch (const exception & e)   { Value::catch_exception(e, args, loc, LOC); }
+   catch (...)                   { Value::catch_ANY(args, loc, LOC);          }
+
+   increment_owner_count(value_p, loc);
+   ADD_EVENT(value_p, VHE_PtrNew, value_p->owner_count, loc);
+}
+//-----------------------------------------------------------------------------
+inline Value_P::Value_P(Value * val, const char * loc)
+{
+   value_p = val;
+   increment_owner_count(value_p, loc);
+   ADD_EVENT(value_p, VHE_PtrNew, value_p->owner_count, loc);
+}
+//-----------------------------------------------------------------------------
+
 #endif // __VALUE_HH_DEFINED__
+

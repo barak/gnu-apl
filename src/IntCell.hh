@@ -30,6 +30,7 @@
     overloads certain functions in class Cell with integer specific
     implementations.
  */
+/// A cell containing a single Integer value
 class IntCell : public RealCell
 {
 public:
