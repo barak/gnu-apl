@@ -41,7 +41,7 @@ syl2("print length limit (0 = no limit)"      , PRINT_LIMIT       , print_length
 syl2("max. prefix length"                     , __MAXONT          , Prefix::MAX_CONTENT )
 syl2("log₁₀(integer tolerance (aka. fuzz))"   , __LINTTOLERANCE   , static_cast<int>(log10(INTEGER_TOLERANCE) - 0.2))
 syl2("log₁₀(real tolerance (aka. fuxx))"      , __LREALTOLERANCE  , static_cast< int>(log10(REAL_TOLERANCE) - 0.2))
-syl2("⎕WA margin"                             , __WA_MARGIN       , Quad_WA::WA_margin                 )
+syl2("⎕WA safety margin"                      , WA_MARGIN         , Quad_WA::WA_margin                 )
 
 #undef syl1
 #undef syl2

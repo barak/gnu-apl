@@ -945,6 +945,11 @@ const APL_Integer qio = Workspace::get_IO();
              if (b < 1000)   DOMAIN_ERROR;
              print_length_limit = b;
            }
+        else if (x == SYL_WA_MARGIN)   // ⍎WA safety margin
+           {
+             if (b < 1000000)   DOMAIN_ERROR;
+             Quad_WA::WA_margin = b;
+           }
         else
            {
              INDEX_ERROR;
