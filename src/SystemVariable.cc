@@ -945,7 +945,7 @@ const APL_Integer qio = Workspace::get_IO();
              if (b < 1000)   DOMAIN_ERROR;
              print_length_limit = b;
            }
-        else if (x == SYL_WA_MARGIN)   // ⍎WA safety margin
+        else if (x == SYL_WA_MARGIN)   // ⎕WA safety margin
            {
              if (b < 1000000)   DOMAIN_ERROR;
              Quad_WA::WA_margin = b;
@@ -1148,8 +1148,7 @@ Value_P
 Quad_WA::get_apl_value() const
 {
    return IntScalar(total_memory -
-                    ( WA_margin
-                    + Value::total_ravel_count * sizeof(Cell)
+                    (Value::total_ravel_count * sizeof(Cell)
                     + Value::value_count * sizeof(Value)), LOC);
 }
 //=============================================================================
