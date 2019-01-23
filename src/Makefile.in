@@ -199,13 +199,14 @@ am__libapl_la_SOURCES_DIST = buildtag buildtag.hh ../config.h \
 	UCS_string_vector.cc UCS_string_vector.hh Unicode.hh \
 	UserFunction.cc UserFunction.hh UserFunction_header.cc \
 	UserFunction_header.hh UserPreferences.cc UserPreferences.hh \
-	UTF8_string.cc UTF8_string.hh Value.cc Value.hh Value_P.hh \
-	ValueHistory.cc ValueHistory.hh Workspace.cc Workspace.hh \
-	static_Objects.cc static_Objects.hh Regexp.cc Regexp.hh \
-	sql/SqliteArgListBuilder.cc sql/SqliteArgListBuilder.hh \
-	sql/SqliteConnection.cc sql/SqliteConnection.hh \
-	sql/SqliteResultValue.cc sql/SqliteResultValue.hh \
-	sql/SqliteProvider.cc sql/SqliteProvider.hh sql/Connection.cc \
+	UTF8_string.cc UTF8_string.hh Value.cc Value.icc Value.hh \
+	Value_P.icc Value_P.hh ValueHistory.cc ValueHistory.hh \
+	Workspace.cc Workspace.hh static_Objects.cc static_Objects.hh \
+	Regexp.cc Regexp.hh sql/SqliteArgListBuilder.cc \
+	sql/SqliteArgListBuilder.hh sql/SqliteConnection.cc \
+	sql/SqliteConnection.hh sql/SqliteResultValue.cc \
+	sql/SqliteResultValue.hh sql/SqliteProvider.cc \
+	sql/SqliteProvider.hh sql/Connection.cc \
 	sql/PostgresArgListBuilder.cc sql/PostgresArgListBuilder.hh \
 	sql/PostgresConnection.cc sql/PostgresConnection.hh \
 	sql/PostgresProvider.cc sql/PostgresProvider.hh libapl.h \
@@ -333,13 +334,14 @@ am__apl_SOURCES_DIST = main.cc buildtag buildtag.hh ../config.h \
 	UCS_string_vector.cc UCS_string_vector.hh Unicode.hh \
 	UserFunction.cc UserFunction.hh UserFunction_header.cc \
 	UserFunction_header.hh UserPreferences.cc UserPreferences.hh \
-	UTF8_string.cc UTF8_string.hh Value.cc Value.hh Value_P.hh \
-	ValueHistory.cc ValueHistory.hh Workspace.cc Workspace.hh \
-	static_Objects.cc static_Objects.hh Regexp.cc Regexp.hh \
-	sql/SqliteArgListBuilder.cc sql/SqliteArgListBuilder.hh \
-	sql/SqliteConnection.cc sql/SqliteConnection.hh \
-	sql/SqliteResultValue.cc sql/SqliteResultValue.hh \
-	sql/SqliteProvider.cc sql/SqliteProvider.hh sql/Connection.cc \
+	UTF8_string.cc UTF8_string.hh Value.cc Value.icc Value.hh \
+	Value_P.icc Value_P.hh ValueHistory.cc ValueHistory.hh \
+	Workspace.cc Workspace.hh static_Objects.cc static_Objects.hh \
+	Regexp.cc Regexp.hh sql/SqliteArgListBuilder.cc \
+	sql/SqliteArgListBuilder.hh sql/SqliteConnection.cc \
+	sql/SqliteConnection.hh sql/SqliteResultValue.cc \
+	sql/SqliteResultValue.hh sql/SqliteProvider.cc \
+	sql/SqliteProvider.hh sql/Connection.cc \
 	sql/PostgresArgListBuilder.cc sql/PostgresArgListBuilder.hh \
 	sql/PostgresConnection.cc sql/PostgresConnection.hh \
 	sql/PostgresProvider.cc sql/PostgresProvider.hh
@@ -749,10 +751,11 @@ common_SOURCES = buildtag buildtag.hh ../config.h \
 	UCS_string_vector.cc UCS_string_vector.hh Unicode.hh \
 	UserFunction.cc UserFunction.hh UserFunction_header.cc \
 	UserFunction_header.hh UserPreferences.cc UserPreferences.hh \
-	UTF8_string.cc UTF8_string.hh Value.cc Value.hh Value_P.hh \
-	ValueHistory.cc ValueHistory.hh Workspace.cc Workspace.hh \
-	static_Objects.cc static_Objects.hh $(am__append_3) \
-	$(am__append_6) $(am__append_7) $(am__append_10)
+	UTF8_string.cc UTF8_string.hh Value.cc Value.icc Value.hh \
+	Value_P.icc Value_P.hh ValueHistory.cc ValueHistory.hh \
+	Workspace.cc Workspace.hh static_Objects.cc static_Objects.hh \
+	$(am__append_3) $(am__append_6) $(am__append_7) \
+	$(am__append_10)
 pkglib_LTLIBRARIES = $(am__append_11)
 @WANT_LIBAPL_TRUE@pkginclude_HEADERS = libapl.h
 @WANT_LIBAPL_TRUE@libapl_la_SOURCES = $(common_SOURCES) libapl.h libapl.cc

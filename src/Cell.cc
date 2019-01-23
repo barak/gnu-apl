@@ -41,7 +41,7 @@ Cell::operator new(std::size_t s, void * pos)
 }
 //-----------------------------------------------------------------------------
 void
-Cell::init_from_value(Value_P value, Value & cell_owner, const char * loc)
+Cell::init_from_value(Value * value, Value & cell_owner, const char * loc)
 {
    if (value->is_simple_scalar())
       {
@@ -79,7 +79,7 @@ Cell::init_type(const Cell & other, Value & cell_owner, const char * loc)
         Value_P sub = other.get_pointer_value()->clone(loc);
         Assert(!sub->is_simple_scalar());
         sub->to_proto();
-        new (this) PointerCell(sub, cell_owner);
+        new (this) PointerCell(sub.get(), cell_owner);
       }
    else if (other.is_lval_cell())
       {

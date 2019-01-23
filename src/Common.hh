@@ -437,6 +437,4 @@ inline const void * CVOIP(const void * addr) { return addr; }
 
 //-----------------------------------------------------------------------------
 
-#include "Value_P.hh"
-
 #endif // __COMMON_HH_DEFINED__

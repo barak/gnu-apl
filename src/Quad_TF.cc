@@ -817,7 +817,7 @@ ShapeItem skipped = 0;
 
         Shape sh;
         {
-          Value_P aval = tos[s].get_apl_val();
+          const Value * aval = tos[s].get_apl_val().get();
           sh = Shape(aval, /* ⎕IO */ 0);
           tos[s].extract_apl_val(LOC);
         }
@@ -1066,7 +1066,7 @@ ShapeItem skipped = 0;
         else
            {
              Value_P enc_B(LOC);
-             new (enc_B->next_ravel()) PointerCell(B, enc_B.getref());
+             new (enc_B->next_ravel()) PointerCell(B.get(), enc_B.getref());
              Token tok(TOK_APL_VALUE1, enc_B);
              tos[s - skipped].move_2(tok, LOC);
              tos[s + 2].clear(LOC);   // B
@@ -1111,7 +1111,7 @@ ShapeItem skipped = 0;
         else
            {
              Value_P enc_B(LOC);
-             new (enc_B->next_ravel()) PointerCell(B, enc_B.getref());
+             new (enc_B->next_ravel()) PointerCell(B.get(), enc_B.getref());
              Token tok(TOK_APL_VALUE1, enc_B);
              tos[s - skipped + 1].move_2(tok, LOC);
              tos[s + 2].clear(LOC);   // B

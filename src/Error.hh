@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2019  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -49,9 +49,6 @@ void throw_define_error(const UCS_string & fun, const UCS_string & cmd,
 #endif
 ;
 
-class Function;
-class IndexExpr;
-
 /**
  ** The exception that is thrown when errors occur. 
  ** The primary item is the error_code; the other items are only valid if
@@ -60,15 +57,33 @@ class IndexExpr;
 /// An APL error and information related to it
 class Error
 {
+   // TODO: the friends below exist for historical reasons and should use
+   // access functions instead of accessing data members of class Error.
+   // The throw_xxx() friends could be made static members of class Error.
+   // That will be quite some work, though.
+   //
+   friend class Command;
+   friend class Doxy;
    friend class Executable;
+   friend class ExecuteList;
+   friend class Prefix;
+   friend class Quad_EM;
    friend class Quad_ES;
+   friend class Quad_ET;
+   friend class Quad_SI;
+   friend class StateIndicator;
+   friend class StatementList;
+   friend class Tokenizer;
+   friend class UserFunction;
+   friend class Workspace;
+
+   friend void  throw_apl_error(ErrorCode, const char *);
+   friend void  throw_parse_error(ErrorCode, const char *, const char *);
+   friend void  throw_symbol_error(const UCS_string &, const char *);
 
 public:
    /// constructor: error with error code ec
-   Error(ErrorCode ec, const char * loc) { init(ec, loc); }
-
-   /// initialize this error: set mandatory items and clear optional items
-   void init(ErrorCode ec, const char * loc);
+   Error(ErrorCode ec, const char * loc);
 
    /// return true iff error_code is known (as opposed to an arbitrary
    /// error code constructed by ⎕ES)
@@ -126,6 +141,7 @@ public:
    static void throw_define_error(const UCS_string & fun,
                                   const UCS_string & cmd, const char * loc);
 
+protected:
    /// the error code
    ErrorCode error_code;
 
@@ -154,7 +170,6 @@ public:
    /// the right caret position (-1 if none) for the error display
    int right_caret;
 
-protected:
    /// where this error was printed (0 if not)
    const char * print_loc;
 

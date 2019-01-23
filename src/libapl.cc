@@ -48,7 +48,7 @@ int_scalar(int64_t val, const char * loc)
 {
 Value_P Z(loc);
    new (Z->next_ravel()) IntCell(val);
-   Value_P::increment_owner_count(Z.get(), loc);   // keep value
+   Z.get()->increment_owner_count(loc);   // keep value
    return Z.get();
 }
 //-----------------------------------------------------------------------------
@@ -58,7 +58,7 @@ double_scalar(APL_Float val, const char * loc)
 {
 Value_P Z(loc);
    new (Z->next_ravel()) FloatCell(val);
-   Value_P::increment_owner_count(Z.get(), loc);   // keep value
+   Z.get()->increment_owner_count(loc);   // keep value
    return Z.get();
 }
 //-----------------------------------------------------------------------------
@@ -68,7 +68,7 @@ complex_scalar(APL_Float real, APL_Float imag, const char * loc)
 {
 Value_P Z(loc);
    new (Z->next_ravel()) ComplexCell(real, imag);
-   Value_P::increment_owner_count(Z.get(), loc);   // keep value
+   Z.get()->increment_owner_count(loc);   // keep value
    return Z.get();
 }
 //-----------------------------------------------------------------------------
@@ -78,7 +78,7 @@ char_scalar(int uni, const char * loc)
 {
 Value_P Z(loc);
    new (Z->next_ravel()) CharCell(Unicode(uni));
-   Value_P::increment_owner_count(Z.get(), loc);   // keep value
+   Z.get()->increment_owner_count(loc);   // keep value
    return Z.get();
 }
 //-----------------------------------------------------------------------------
@@ -94,7 +94,7 @@ Value_P Z(sh, loc);
    while (Cell * cell = Z->next_ravel())   new (cell)   IntCell(0);
 
    Z->check_value(LOC);
-   Value_P::increment_owner_count(Z.get(), loc);   // keep value
+   Z.get()->increment_owner_count(loc);   // keep value
    return Z.get();
 }
 //-----------------------------------------------------------------------------
@@ -106,7 +106,7 @@ UTF8_string utf8(str);
 UCS_string ucs(utf8);
 
 Value_P Z(ucs, loc);
-   Value_P::increment_owner_count(Z.get(), loc);   // keep value
+   Z.get()->increment_owner_count(loc);   // keep value
    return Z.get();
 }
 
@@ -119,7 +119,7 @@ void
 release_value(const APL_value val, const char * loc)
 {
 Value * v = const_cast<Value *>(val);
-   if (val)   Value_P::decrement_owner_count(v, loc);
+   if (val)   v->decrement_owner_count(loc);
 }
 
 
@@ -207,7 +207,7 @@ APL_value
 get_value(const APL_value val, uint64_t idx)
 {
 Value_P sub = val->get_ravel(idx).get_pointer_value();
-   Value_P::increment_owner_count(sub.get(), LOC);
+   Z.get()->increment_owner_count(LOC);   // keep value
    return sub.get();
 }
 /******************************************************************************
@@ -232,7 +232,7 @@ Value_P Z(sh, LOC);
         // and the caller is responsiblr fopr decrementing it when the
         // value is no longer needed.
         //
-        Value_P::increment_owner_count(Z.get(), LOC);
+        Z.get()->increment_owner_count(LOC);   // keep value
         return Z.get();
       }
 
@@ -269,7 +269,7 @@ Cell * cell = &val->get_ravel(idx);
    if (cell->is_pointer_cell())
       {
         Value * v = cell->get_pointer_value().get();
-        Value_P::decrement_owner_count(v, LOC);
+        v->decrement_owner_count(LOC);
       }
 
    new (cell)   CharCell(Unicode(new_char));
@@ -284,7 +284,7 @@ Cell * cell = &val->get_ravel(idx);
    if (cell->is_pointer_cell())
       {
         Value * v = cell->get_pointer_value().get();
-        Value_P::decrement_owner_count(v, LOC);
+        v->decrement_owner_count(LOC);
       }
 
    new (cell)   IntCell(new_int);
@@ -299,7 +299,7 @@ Cell * cell = &val->get_ravel(idx);
    if (cell->is_pointer_cell())
       {
         Value * v = cell->get_pointer_value().get();
-        Value_P::decrement_owner_count(v, LOC);
+        v->decrement_owner_count(LOC);
       }
 
    new (cell)   FloatCell(new_double);
@@ -314,7 +314,7 @@ Cell * cell = &val->get_ravel(idx);
    if (cell->is_pointer_cell())
       {
         Value * v = cell->get_pointer_value().get();
-        Value_P::decrement_owner_count(v, LOC);
+        v->decrement_owner_count(LOC);
       }
 
    new (cell)   ComplexCell(new_real, new_imag);
@@ -327,7 +327,7 @@ Cell * cell = &val->get_ravel(idx);
    if (cell->is_pointer_cell())
       {
         Value * v = cell->get_pointer_value().get();
-        Value_P::decrement_owner_count(v, LOC);
+        v->decrement_owner_count(v, LOC);
       }
 
    if (new_value->is_simple_scalar())   // e.g. ⊂5 is 5
@@ -528,7 +528,7 @@ Symbol * symbol = Workspace::lookup_existing_symbol(var_name_ucs);
 Value_P Z = symbol->get_value();
    if (!Z)                              return 0;
 
-   Value_P::increment_owner_count(Z.get(), loc);
+   Z.get()->increment_owner_count(loc);   // keep value
    return Z.get();
 }
 //-----------------------------------------------------------------------------

@@ -191,7 +191,7 @@ Value_P PostgresArgListBuilder::run_query( bool ignore_result )
                 for( int col = 0 ; col < cols ; col++ ) {
                     if( PQgetisnull( result.get_result(), row, col ) ) {
                         new (db_result_value->next_ravel())
-                            PointerCell( Idx0( LOC ), db_result_value.getref());
+                            PointerCell( Idx0(LOC).get(), db_result_value.getref());
                     }
                     else {
                         Oid col_type = PQftype( result.get_result(), col );
@@ -212,12 +212,12 @@ Value_P PostgresArgListBuilder::run_query( bool ignore_result )
                         else {
                             if( *value == 0 ) {
                                 new (db_result_value->next_ravel())
-                                    PointerCell( Str0( LOC ),
+                                    PointerCell( Str0( LOC ).get(),
                                                  db_result_value.getref() );
                             }
                             else {
                                 new (db_result_value->next_ravel())
-                                    PointerCell( make_string_cell( value, LOC ),
+                                    PointerCell( make_string_cell( value, LOC ).get(),
                                                  db_result_value.getref() );
                             }
                         }

@@ -156,7 +156,7 @@ Bif_F12_RHO::eval_AB(Value_P A, Value_P B)
 const uint64_t start_1 = cycle_counter();
 #endif
 
-const Shape shape_Z(A, 0);
+const Shape shape_Z(A.get(), 0);
 
    // check that shape_Z is positive
    //
@@ -273,12 +273,12 @@ const ShapeItem ec = B->element_count();
    if (ec == 0)
       {
         Value_P Z(LOC);
-        new (Z->next_ravel()) PointerCell(Idx0(LOC), Z.getref());
+        new (Z->next_ravel()) PointerCell(Idx0(LOC).get(), Z.getref());
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
 
-Shape sh(B, 0);
+Shape sh(B.get(), 0);
    loop(b, ec)
       {
         if (sh.get_shape_item(b) < 0)   DOMAIN_ERROR;
@@ -298,7 +298,7 @@ Value_P Z(sh, LOC);
               N /= q;
             }
         ZZ->check_value(LOC);
-        new (Z->next_ravel())   PointerCell(ZZ, Z.getref());
+        new (Z->next_ravel())   PointerCell(ZZ.get(), Z.getref());
       }
 
    if (Z->element_count() == 0)   // empty result
@@ -306,7 +306,7 @@ Value_P Z(sh, LOC);
         Value_P ZZ(ec, LOC);
         loop(r, ec)   new (ZZ->next_ravel())   IntCell(0);
         ZZ->check_value(LOC);
-        new (&Z->get_ravel(0))   PointerCell(ZZ, Z.getref());   // prototype
+        new (&Z->get_ravel(0))   PointerCell(ZZ.get(), Z.getref());   // prototype
       }
 
    Z->check_value(LOC);
@@ -732,7 +732,7 @@ const APL_Integer qio = Workspace::get_IO();
 
    // case 3b: ,[n1 ... nk]B : combine axes.
    //
-const Shape axes(X, qio);
+const Shape axes(X.get(), qio);
 
 const ShapeItem from = axes.get_shape_item(0);
    if (from < 0)   AXIS_ERROR;
@@ -1141,7 +1141,7 @@ Bif_F12_TRANSPOSE::eval_AB(Value_P A, Value_P B)
         return Token(TOK_APL_VALUE1, Z);
       }
 
-const Shape shape_A(A, Workspace::get_IO());
+const Shape shape_A(A.get(), Workspace::get_IO());
    if (shape_A.get_rank() != B->get_rank())   LENGTH_ERROR;
 
    // the elements in A shall be valid axes of B->
@@ -1770,7 +1770,7 @@ Bif_F12_PARTITION::eval_B(Value_P B)
    if (B->is_simple_scalar())   return Token(TOK_APL_VALUE1, B);
 
 Value_P Z(LOC);
-   new (Z->next_ravel()) PointerCell(B->clone(LOC), Z.getref());
+   new (Z->next_ravel()) PointerCell(B->clone(LOC).get(), Z.getref());
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
@@ -1847,7 +1847,7 @@ Value_P Z(shape_Z, LOC);
         const ShapeItem off_Z = it_Z.multiply(weight_Z);   // offset in Z
 
         Value_P vZ(item_shape, LOC);
-        new (Z->next_ravel()) PointerCell(vZ, Z.getref());
+        new (Z->next_ravel()) PointerCell(vZ.get(), Z.getref());
 
         if (item_shape.is_empty())
            {
@@ -1991,7 +1991,7 @@ Cell * vv = &V->get_ravel(0);
        }
 
    V->check_value(LOC);
-   new (dest) PointerCell(V, dest_owner);
+   new (dest) PointerCell(V.get(), dest_owner);
 }
 //-----------------------------------------------------------------------------
 Token
@@ -2300,7 +2300,7 @@ ShapeItem c = 0;
         if (B->get_rank() != len_A)   RANK_ERROR;
 
         const Shape weight = B->get_shape().reverse_scan();
-        const Shape A_as_shape(A, qio);
+        const Shape A_as_shape(A.get(), qio);
 
         loop(r, A->element_count())
             {
@@ -2515,7 +2515,7 @@ Value * v1_owner = v1->get_lval_cellowner();
    if (v1_owner)   // B is a left value
       {
         Value_P B1(LOC);
-        new (&B1->get_ravel(0))   PointerCell(v1, B1.getref());
+        new (&B1->get_ravel(0))   PointerCell(v1.get(), B1.getref());
 
         Value_P Z(LOC);
         new (&Z->get_ravel(0))   LvalCell(&B1->get_ravel(0), v1_owner);
@@ -2559,7 +2559,7 @@ Token result = Bif_F12_PICK::fun->eval_XB(X, cT);
 Token
 Bif_F12_TAKE::eval_AB(Value_P A, Value_P B)
 {
-Shape ravel_A1(A, /* ⎕IO */ 0);   // checks that 1 ≤ ⍴⍴A and ⍴A ≤ MAX_RANK
+Shape ravel_A1(A.get(), /* ⎕IO */ 0);   // checks that 1 ≤ ⍴⍴A and ⍴A ≤ MAX_RANK
 
    if (B->is_scalar())
       {
@@ -2658,7 +2658,7 @@ const Shape weight_B = B->get_shape().reverse_scan();
 Token
 Bif_F12_DROP::eval_AB(Value_P A, Value_P B)
 {
-Shape ravel_A(A, /* ⎕IO */ 0);
+Shape ravel_A(A.get(), /* ⎕IO */ 0);
    if (A->get_rank() > 1)   RANK_ERROR;
 
    if (B->is_scalar())
@@ -2911,7 +2911,7 @@ Value_P Z(ShapeItem(line_starts.size() - 1), LOC);
         UTF8_string line_utf8(&result_utf8[line_starts[l]], len);
         UCS_string line_ucs(line_utf8);
         Value_P ZZ(line_ucs, LOC);
-        new (Z->next_ravel())   PointerCell(ZZ, Z.getref());
+        new (Z->next_ravel())   PointerCell(ZZ.get(), Z.getref());
       }
 
    Z->check_value(LOC);

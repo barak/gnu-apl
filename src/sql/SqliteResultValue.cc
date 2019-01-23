@@ -40,16 +40,16 @@ void DoubleResultValue::update( Cell *cell, Value & cell_owner ) const
 void StringResultValue::update( Cell *cell, Value & cell_owner ) const
 {
     if( value.size() == 0 ) {
-        new (cell) PointerCell( Str0( LOC ), cell_owner );
+        new (cell) PointerCell(Str0(LOC).get(), cell_owner );
     }
     else {
-        new (cell) PointerCell( make_string_cell( value, LOC ), cell_owner );
+        new (cell) PointerCell(make_string_cell(value, LOC).get(), cell_owner);
     }
 }
 
 void NullResultValue::update( Cell *cell, Value & cell_owner ) const
 {
-    new (cell) PointerCell( Idx0( LOC ), cell_owner );
+    new (cell) PointerCell( Idx0(LOC).get(), cell_owner );
 }
 
 void ResultRow::add_values( sqlite3_stmt *statement )

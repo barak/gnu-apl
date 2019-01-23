@@ -112,5 +112,5 @@ L6: Z← 0, ⊂2 SINES_N 5×3 4 5 ◊ →0   ⍝ 3 sines then symmetrized, no wi
 )HOST gnuplot /tmp/plot_commands
 
 )VARS
-)OFF
+⍝ )OFF
 

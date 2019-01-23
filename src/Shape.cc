@@ -22,7 +22,7 @@
 #include "Value.hh"
 
 //-----------------------------------------------------------------------------
-Shape::Shape(Value_P A, int qio_A)
+Shape::Shape(const Value * A, int qio_A)
    : rho_rho(0),
      volume(1)
 {

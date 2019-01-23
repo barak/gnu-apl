@@ -167,7 +167,7 @@ const int function = B->get_ravel(0).get_int_value();
                loop(a, args.size())
                    {
                      Value_P Za(args[a], LOC);
-                     new (Z->next_ravel())   PointerCell(Za, Z.getref());
+                     new (Z->next_ravel())   PointerCell(Za.get(), Z.getref());
                    }
                Z->check_value(LOC);
                return Token(TOK_APL_VALUE1, Z);

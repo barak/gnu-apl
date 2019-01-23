@@ -72,7 +72,7 @@ public:
    /// constructor: shape defined by the ravel of an APL value \b val
    /// throw RANK or LENGTH error where needed. Negative values are allowed
    /// in order to support e.g. ¯4 ↑ B
-   Shape(Value_P A, int qio_A);
+   Shape(const Value * val, int qio_A);
 
    /// return a shape like this, but with negative elements made positive
    Shape abs() const;

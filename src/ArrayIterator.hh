@@ -26,7 +26,7 @@
 #include "SystemLimits.hh"
 
 //-----------------------------------------------------------------------------
-/// An iterator for arrays. The iterator produces all index values of a Shape.
+/// Base class for ArrayIteratorBase and PermutedArrayIterator
 class ArrayIteratorBase
 {
 public:
@@ -83,7 +83,7 @@ protected:
    bool is_done;
 };
 //-----------------------------------------------------------------------------
-/// An iterator counting 0, 1, 2, ..., but with permutated dimensions
+/// An iterator counting 0, 1, 2, ... ⍴,shape
 class ArrayIterator : public ArrayIteratorBase
 {
 public:
@@ -96,7 +96,7 @@ public:
    void operator ++();
 };
 //-----------------------------------------------------------------------------
-/** An iterator counting 0, 1, 2, ... but with permuted dimensions
+/** An iterator counting 0, 1, 2, ... ⍴,shap but with permuted dimensions
     The permutation is given as a \b Shape. If perm = 0, 1, 2, ... then
     PermutedArrayIterator is the same as ArrayIterator.
  **/

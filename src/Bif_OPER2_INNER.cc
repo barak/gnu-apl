@@ -158,7 +158,7 @@ const bool B_enclosed = B->get_rank() > 1;
         Value_P A_RO_B = T1.get_apl_val();
 
         Cell * cZ = Z->next_ravel();
-        new (cZ) PointerCell(A_RO_B, Z.getref());
+        new (cZ) PointerCell(A_RO_B.get(), Z.getref());
 
         // at this point Z[z] is the result of a built-in function RO.
         // Compute LO/Z[z].
@@ -169,7 +169,7 @@ const bool B_enclosed = B->get_rank() > 1;
 
         if (T2.get_tag() == TOK_ERROR)   return T2;
 
-        cZ->init_from_value(T2.get_apl_val(), Z.getref(), LOC);
+        cZ->init_from_value(T2.get_apl_val().get(), Z.getref(), LOC);
       }
 
    Z->set_default(*B.get(), LOC);

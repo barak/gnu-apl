@@ -298,8 +298,8 @@ static Token show_tables( Value_P B )
         Shape shape( tables.size () );
         value = Value_P( shape, LOC );
         for( vector<string>::iterator i = tables.begin() ; i != tables.end() ; i++ ) {
-            new (value->next_ravel()) PointerCell( make_string_cell( *i, LOC ),
-               value.getref() );
+            new (value->next_ravel())
+               PointerCell( make_string_cell( *i, LOC ).get(), value.getref() );
         }
     }
 
@@ -328,7 +328,9 @@ static Token show_cols( Value_P A, Value_P B )
         Shape shape( cols.size(), 2 );
         value = Value_P( shape, LOC );
         for( vector<ColumnDescriptor>::iterator i = cols.begin() ; i != cols.end() ; i++ ) {
-            new (value->next_ravel()) PointerCell( make_string_cell( i->get_name(), LOC ) , value.getref());
+            new (value->next_ravel())
+                PointerCell(make_string_cell(i->get_name(), LOC).get(),
+                            value.getref());
 
             Value_P type;
             if( i->get_type().size() == 0 ) {
@@ -337,7 +339,7 @@ static Token show_cols( Value_P A, Value_P B )
             else {
                 type = make_string_cell( i->get_type(), LOC );
             }
-            new (value->next_ravel()) PointerCell( type, value.getref() );
+            new (value->next_ravel()) PointerCell( type.get(), value.getref() );
         }
     }
 

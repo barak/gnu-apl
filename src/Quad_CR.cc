@@ -269,7 +269,7 @@ bool extra_frame = false;
    if (extra_frame && !B->is_simple_scalar())
       {
         Value_P B1(LOC);
-        new (&B1->get_ravel(0)) PointerCell(B->clone(LOC), B1.getref());
+        new (&B1->get_ravel(0)) PointerCell(B->clone(LOC).get(), B1.getref());
         B1->check_value(LOC);
         PrintBuffer pb(*B1, pctx, 0);
         return Value_P(pb, LOC);
@@ -324,7 +324,7 @@ Value_P Z(ucs_vec.size(), LOC);
    loop(line, ucs_vec.size())
       {
          Value_P Z_line(ucs_vec[line], LOC);
-         new (Z->next_ravel())   PointerCell(Z_line, Z.getref());
+         new (Z->next_ravel())   PointerCell(Z_line.get(), Z.getref());
       }
 
    Z->set_default_Spc();
@@ -1067,7 +1067,7 @@ Value_P Z(len, LOC);
            {
              Value_P B_sub = cB.get_pointer_value();
              Value_P Z_sub = do_CR26(B_sub.getref());
-             new (Z->next_ravel()) PointerCell(Z_sub, Z.getref());
+             new (Z->next_ravel()) PointerCell(Z_sub.get(), Z.getref());
            }
         else
            {
@@ -1092,7 +1092,7 @@ Value_P Z(len, LOC);
             {
               Value_P B_sub = cB.get_pointer_value();
               Value_P Z_sub = do_CR27_28(primary, B_sub.getref());
-              new (cZ) PointerCell(Z_sub, Z.getref());
+              new (cZ) PointerCell(Z_sub.get(), Z.getref());
             }
          else
             {
@@ -1214,7 +1214,7 @@ PrintContext pctx = Workspace::get_PrintContext(PR_APL);
         if (row->element_count() == 1)   // single item
            {
              Value_P Zrow = row->get_ravel(0).get_pointer_value()->clone(LOC);
-             new (Z->next_ravel())   PointerCell(Zrow, Z.getref());
+             new (Z->next_ravel())   PointerCell(Zrow.get(), Z.getref());
              continue;
            }
 
@@ -1233,12 +1233,12 @@ PrintContext pctx = Workspace::get_PrintContext(PR_APL);
         if (pb.get_height() == 1)
            {
              Value_P Zrow(pb.l1(), LOC);
-             new (Z->next_ravel())   PointerCell(Zrow, Z.getref());
+             new (Z->next_ravel())   PointerCell(Zrow.get(), Z.getref());
            }
         else
            {
              Value_P Zrow(pb, LOC);
-             new (Z->next_ravel())   PointerCell(Zrow, Z.getref());
+             new (Z->next_ravel())   PointerCell(Zrow.get(), Z.getref());
            }
       }
 
@@ -1377,7 +1377,7 @@ const ShapeItem len_B = B.element_count();
       {
         Value_P Z1 = Str0(LOC);
         Value_P Z(1, LOC);
-        new (&Z->get_ravel(0)) PointerCell(Z1, Z.getref());
+        new (&Z->get_ravel(0)) PointerCell(Z1.get(), Z.getref());
         Z->check_value(LOC);
         return Z;
       }
@@ -1398,7 +1398,7 @@ UCS_string line;
          if (uni == UNI_ASCII_LF)
             {
               Value_P Zb(line, LOC);
-              new (Z->next_ravel()) PointerCell(Zb, Z.getref());
+              new (Z->next_ravel()) PointerCell(Zb.get(), Z.getref());
               line.shrink(0);
             }
          else
@@ -1410,7 +1410,7 @@ UCS_string line;
    if (line.size())   // incomplete last line
       {
         Value_P Zb(line, LOC);
-        new (Z->next_ravel()) PointerCell(Zb, Z.getref());
+        new (Z->next_ravel()) PointerCell(Zb.get(), Z.getref());
         line.shrink(0);
       }
 

@@ -1,0 +1,82 @@
+/*
+    This file is part of GNU APL, a free implementation of the
+    ISO/IEC Standard 13751, "Programming Language APL, Extended"
+
+    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+
+    This program is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    This program is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+*/
+
+#include "CharCell.hh"
+#include "FloatCell.hh"
+#include "IntCell.hh"
+#include "LvalCell.hh"
+#include "PointerCell.hh"
+#include "Value.hh"
+
+//-----------------------------------------------------------------------------
+void
+Value::set_proto_Spc()
+{
+  new (&ravel[0]) CharCell(UNI_ASCII_SPACE);
+}
+//-----------------------------------------------------------------------------
+void
+Value::set_default_Int()
+{
+  if (is_empty())   new (&ravel[0]) IntCell(0);
+}
+//-----------------------------------------------------------------------------
+void
+Value::set_default_Spc()
+{
+  if (is_empty())   new (&ravel[0]) CharCell(UNI_ASCII_SPACE);
+}
+//-----------------------------------------------------------------------------
+void
+Value::set_default(const Value & B, const char * loc)
+{
+  if (is_empty())
+     {
+       Assert1(ravel[0].is_integer_cell());   // by constructor
+       const Cell & cell = B.get_ravel(0);
+       if (cell.is_lval_cell())   new (&ravel[0]) LvalCell(0, 0);
+       else                       ravel[0].init_type(cell, *this, loc);
+     }
+}
+//-----------------------------------------------------------------------------
+void
+Value::next_ravel_Char(Unicode u)
+{
+  new (next_ravel()) CharCell(u);
+}
+//-----------------------------------------------------------------------------
+void
+Value::next_ravel_Float(APL_Float f)
+{
+  new (next_ravel()) FloatCell(f);
+}
+//-----------------------------------------------------------------------------
+void
+Value::next_ravel_Int(APL_Integer i)
+{
+  new (next_ravel()) IntCell(i);
+}
+//-----------------------------------------------------------------------------
+void
+Value::next_ravel_Pointer(Value * val)
+{
+  new (next_ravel()) PointerCell(val, *this);
+}
+//-----------------------------------------------------------------------------

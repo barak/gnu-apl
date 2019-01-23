@@ -30,6 +30,7 @@
 #include "Simple_string.hh"
 #include "Source.hh"
 #include "TokenEnums.hh"
+#include "Value.hh"
 
 class Function;
 class IndexExpr;

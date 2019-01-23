@@ -81,20 +81,27 @@ uint64_t proc_mem = 1000000000;   // assume 1 Gig on error
 
    if (FILE * pm = fopen("/proc/meminfo", "r"))
       {
+        uint64_t mem_free = 0;
+        uint64_t mem_cached = 0;
         for (;;)
             {
               char buffer[2000];
               if (fgets(buffer, sizeof(buffer) - 1, pm) == 0)   break;
               buffer[sizeof(buffer) - 1] = 0;
+
               if (!strncmp(buffer, "MemFree:", 8))
                  {
-                   proc_mem = atoi(buffer + 8);
-                   proc_mem *= 1024;
-                   break;
+                   mem_free = strtoll(buffer + 8, 0, 10);
+                 }
+              else if (!strncmp(buffer, "Cached:", 8))
+                 {
+                   mem_cached = strtoll(buffer + 7, 0, 10);
                  }
             }
 
         fclose(pm);
+        mem_free += mem_cached;
+        if (mem_free)   proc_mem = 1024ULL*mem_free;
       }
 
    return proc_mem;

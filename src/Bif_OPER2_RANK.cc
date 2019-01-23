@@ -92,12 +92,12 @@ Value_P vsh_Z(shape_Z.get_rank(), LOC);
 
 Value_P X5(5, LOC);
    if (!X)   new (X5->next_ravel())   IntCell(-1);                // no X
-   else      new (X5->next_ravel())   PointerCell(X, X5.getref());   // X
+   else      new (X5->next_ravel())   PointerCell(X.get(), X5.getref());   // X
 
    new (X5->next_ravel())   IntCell(shape_B.get_volume());        // LB
-   new (X5->next_ravel())   PointerCell(vsh_B, X5.getref());      // rho_B
+   new (X5->next_ravel())   PointerCell(vsh_B.get(), X5.getref());      // rho_B
    new (X5->next_ravel())   IntCell(shape_Z.get_volume());        // N_max
-   new (X5->next_ravel())   PointerCell(vsh_Z, X5.getref());      // rho_Z
+   new (X5->next_ravel())   PointerCell(vsh_Z.get(), X5.getref());      // rho_Z
    X5->check_value(LOC);
    return Macro::Z__LO_RANK_X5_B->eval_LXB(_LO, X5, B);
 }
@@ -173,7 +173,7 @@ const Shape shape_Z = rk_B_frame ? B->get_shape().high_shape(rk_B_frame)
         Value_P Z1 = LO->eval_fill_AB(Fill_A, Fill_B).get_apl_val();
 
         Value_P Z(shape_Z, LOC);
-        Z->get_ravel(0).init_from_value(Z1, Z.getref(), LOC);
+        Z->get_ravel(0).init_from_value(Z1.get(), Z.getref(), LOC);
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
@@ -187,19 +187,19 @@ Value_P vsh_Z(LOC, &shape_Z);
 
 Value_P X7(7, LOC);
    if (!X)   new (X7->next_ravel())   IntCell(-1);              // no X
-   else      X7->next_ravel()->init_from_value(X, X7.getref(), LOC);
+   else      X7->next_ravel()->init_from_value(X.get(), X7.getref(), LOC);
 
    new (X7->next_ravel())   IntCell(low_A.get_volume());        // LA
 
-   X7->next_ravel()->init_from_value(vsh_A, X7.getref(), LOC);
+   X7->next_ravel()->init_from_value(vsh_A.get(), X7.getref(), LOC);
 
    new (X7->next_ravel())   IntCell(low_B.get_volume());        // LB
 
-   X7->next_ravel()->init_from_value(vsh_B, X7.getref(), LOC);
+   X7->next_ravel()->init_from_value(vsh_B.get(), X7.getref(), LOC);
 
    new (X7->next_ravel())   IntCell(shape_Z.get_volume());        // N_max
 
-   X7->next_ravel()->init_from_value(vsh_Z, X7.getref(), LOC);
+   X7->next_ravel()->init_from_value(vsh_Z.get(), X7.getref(), LOC);
 
    X7->check_value(LOC);
    return Macro::Z__A_LO_RANK_X7_B->eval_ALXB(A, _LO, X7, B);

@@ -145,7 +145,7 @@ Workspace::clear_error(const char * loc)
    //
    for (StateIndicator * si = the_workspace.SI_top(); si; si = si->get_parent())
        {
-         StateIndicator::get_error(si).init(E_NO_ERROR, LOC);
+         new (&StateIndicator::get_error(si)) Error(E_NO_ERROR, LOC);
          if (si->get_parse_mode() == PM_FUNCTION)   break;
        }
 }

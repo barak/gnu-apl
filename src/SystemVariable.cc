@@ -57,6 +57,7 @@ ShapeItem Quad_SYL::ravel_count_limit = 0;
 ShapeItem Quad_SYL::print_length_limit = 0;
 
 Unicode Quad_AV::qav[MAX_AV];
+int64_t Quad_WA::WA_margin = 100000000;
 
 //=============================================================================
 void
@@ -192,7 +193,7 @@ Value_P Z(argc, LOC);
         UTF8_string utf(arg);
         UCS_string ucs(utf);
         Value_P sub(ucs, LOC);
-        new (Z->next_ravel())   PointerCell(sub, Z.getref());
+        new (Z->next_ravel())   PointerCell(sub.get(), Z.getref());
       }
 
    Z->check_value(LOC);
@@ -960,7 +961,8 @@ Value_P Z(sh, LOC);
 #define syl2(n, e, v) syl1(n, e, v)
 #define syl3(n, e, v) syl1(n, e, v)
 #define syl1(n, _e, v) \
-  new (Z->next_ravel()) PointerCell(Value_P(UCS_string(UTF8_string(n)), LOC), Z.getref()); \
+  new (Z->next_ravel()) \
+      PointerCell(Value_P(UCS_string(UTF8_string(n)), LOC).get(), Z.getref()); \
   new (Z->next_ravel()) IntCell(v);
 #include "SystemLimits.def"
 
@@ -1141,7 +1143,8 @@ Value_P
 Quad_WA::get_apl_value() const
 {
    return IntScalar(total_memory -
-                    ( Value::total_ravel_count * sizeof(Cell)
+                    ( WA_margin
+                    + Value::total_ravel_count * sizeof(Cell)
                     + Value::value_count * sizeof(Value)), LOC);
 }
 //=============================================================================

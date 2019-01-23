@@ -22,6 +22,7 @@
 #define __CDR_HH_DEFINED__
 
 #include "CDR_string.hh"
+#include "Value_P.hh"
 
 class Value;
 

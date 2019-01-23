@@ -693,6 +693,9 @@ public:
    /// Constructor.
    Quad_WA();
 
+   /// a safety maring causing WS FULL before complete memory starvation
+   static int64_t WA_margin;
+
 protected:
    /// overloaded Symbol::get_apl_value().
    virtual Value_P get_apl_value() const;

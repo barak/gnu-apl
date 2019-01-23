@@ -948,10 +948,9 @@ Token result = at0().get_function()->eval_B(at1().get_apl_val());
 
                   const APL_Integer major = info[2].get_int_value();
                   const APL_Integer minor = info[3].get_int_value();
-                  const ErrorCode ec =
-                                  ErrorCode(major << 16 | minor);
+                  const ErrorCode ec = ErrorCode(major << 16 | minor);
                   StateIndicator * parent = Workspace::SI_top()->get_parent();
-                  StateIndicator::get_error(parent).init(ec, LOC);
+                  new (&StateIndicator::get_error(parent)) Error(ec, LOC);
                 }
               else              // committed value
                 {

@@ -246,9 +246,9 @@ const Shape3 B3(B->get_shape(), axis);
         Value_P vsh_B3(LOC, &B3);
         Value_P X4(4, LOC);
         new (X4->next_ravel())   IntCell(axis + Workspace::get_IO());   // X
-        new (X4->next_ravel())   PointerCell(vsh_Z,  X4.getref());      // ⍴Z
-        new (X4->next_ravel())   PointerCell(vsh_Z3, X4.getref());      // ⍴Z3
-        new (X4->next_ravel())   PointerCell(vsh_B3, X4.getref());      // ⍴B3
+        new (X4->next_ravel())   PointerCell(vsh_Z.get(),  X4.getref());      // ⍴Z
+        new (X4->next_ravel())   PointerCell(vsh_Z3.get(), X4.getref());      // ⍴Z3
+        new (X4->next_ravel())   PointerCell(vsh_B3.get(), X4.getref());      // ⍴B3
         X4->check_value(LOC);
         if (A0<0)   return Macro::Z__nA_LO_REDUCE_X4_B->eval_ALXB(A1,_LO,X4,B);
         else        return Macro::Z__pA_LO_REDUCE_X4_B->eval_ALXB(A1,_LO,X4,B);
@@ -326,7 +326,7 @@ prim_f2 scalar_LO       = LO->get_scalar_f2();
 
                   Assert(result.get_Class() == TC_VALUE);
                   Value_P ZZ = result.get_apl_val();
-                  cZ->init_from_value(ZZ, Z.getref(), LOC);
+                  cZ->init_from_value(ZZ.get(), Z.getref(), LOC);
                 }
            }
       }

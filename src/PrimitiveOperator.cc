@@ -49,7 +49,7 @@ Token tok = fun->eval_fill_AB(Fill_A, Fill_B);
 
    if (tok.get_Class() != TC_VALUE)   return tok;
 
-Value_P Z = tok.get_apl_val();
+Value * Z = tok.get_apl_val().get();
 Value_P Z1(shape_Z, LOC);   // shape_Z is empty
    Z1->get_ravel(0).  init_from_value(Z, Z1.getref(), loc);
 

@@ -104,15 +104,15 @@ Value_P Z(B->get_shape(), LOC);
             {
               const Unicode uni = cell_B.get_char_value();
               int32_t pos = Avec::find_av_pos(uni);
-              if (pos < 0)   new (Z->next_ravel()) IntCell(MAX_AV);
-              else           new (Z->next_ravel()) IntCell(pos);
+              if (pos < 0)   Z->next_ravel_Int(MAX_AV);
+              else           Z->next_ravel_Int(pos);
               continue;
             }
 
          if (cell_B.is_integer_cell())
             {
               const APL_Integer idx = cell_B.get_near_int();
-              new (Z->next_ravel()) CharCell(Quad_AV::indexed_at(idx));
+              Z->next_ravel_Char(Quad_AV::indexed_at(idx));
               continue;
             }
 
@@ -235,7 +235,7 @@ const APL_time_us end = start + 1000000 * B->get_ravel(0).get_real_value();
    // return time elapsed.
    //
 Value_P Z(LOC);
-   new (Z->next_ravel()) FloatCell(0.000001*(now() - start));
+   Z->next_ravel_Float(0.000001*(now() - start));
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
@@ -290,15 +290,15 @@ ExecuteList * fun = 0;
         // syntax error in B
         //
         Value_P Z2(2, LOC);
-            new (Z2->next_ravel())  IntCell(Error::error_major(E_SYNTAX_ERROR));
-            new (Z2->next_ravel())  IntCell(Error::error_minor(E_SYNTAX_ERROR));
-         Z2->check_value(LOC);
+            Z2->next_ravel_Int(Error::error_major(E_SYNTAX_ERROR));
+            Z2->next_ravel_Int(Error::error_minor(E_SYNTAX_ERROR));
+            Z2->check_value(LOC);
 
         Value_P Z3(Error::error_name(E_SYNTAX_ERROR), LOC);
         Value_P Z(3, LOC);
-        new (Z->next_ravel()) IntCell(0);        // return code = error
-        new (Z->next_ravel()) PointerCell(Z2, Z.getref());   // ⎕ET value
-        new (Z->next_ravel()) PointerCell(Z3, Z.getref());   // ⎕EM
+        Z->next_ravel_Int(0);              // return code = error
+        Z->next_ravel_Pointer(Z2.get());   // ⎕ET value
+        Z->next_ravel_Pointer(Z3.get());   // ⎕EM
 
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
@@ -318,18 +318,18 @@ Token
 Quad_EC::eval_fill_B(Value_P B)
 {
 Value_P Z2(2, LOC);
-   new(Z2->next_ravel())   IntCell(0);
-   new(Z2->next_ravel())   IntCell(0);
+   Z2->next_ravel_Int(0);
+   Z2->next_ravel_Int(0);
    Z2->check_value(LOC);
 
 Value_P Zsub(3, LOC);
-   new (Zsub->next_ravel())   IntCell(3);   // statement without result
-   new (Zsub->next_ravel())   PointerCell(Z2, Zsub.getref());
-   new (Zsub->next_ravel())   PointerCell(Idx0(LOC), Zsub.getref());
+   Zsub->next_ravel_Int(3);   // statement without result
+   Zsub->next_ravel_Pointer(Z2.get());
+   Zsub->next_ravel_Pointer(Idx0(LOC).get());
    Zsub->check_value(LOC);
 
 Value_P Z(ShapeItem(0), LOC);
-  new (&Z->get_ravel(0))   PointerCell(Zsub, Z.getref());
+  new (&Z->get_ravel(0))   PointerCell(Zsub.get(), Z.getref());
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
@@ -358,15 +358,15 @@ Value_P Z(3, LOC);
         pb.append_ucs(err.get_error_line_3());
 
         Value_P Z2(2, LOC);
-            new (Z2->next_ravel()) IntCell(Error::error_major(ec));
-            new (Z2->next_ravel()) IntCell(Error::error_minor(ec));
+            Z2->next_ravel_Int(Error::error_major(ec));
+            Z2->next_ravel_Int(Error::error_minor(ec));
         Z2->check_value(LOC);
 
         Value_P Z3(pb, LOC);   // 3 line message like ⎕EM
 
-        new (Z->next_ravel()) IntCell(0);
-        new (Z->next_ravel()) PointerCell(Z2, Z.getref());
-        new (Z->next_ravel()) PointerCell(Z3, Z.getref());
+        Z->next_ravel_Int(0);
+        Z->next_ravel_Pointer(Z2.get());
+        Z->next_ravel_Pointer(Z3.get());
 
         Z->check_value(LOC);
         result.move_2(Token(TOK_APL_VALUE1, Z), LOC);
@@ -376,44 +376,44 @@ Value_P Z(3, LOC);
    // all other cases have Z2 = 0 0
    //
 Value_P Z2(2, LOC);
-   new (Z2->next_ravel()) IntCell(0);
-   new (Z2->next_ravel()) IntCell(0);
-        Z2->check_value(LOC);
+   Z2->next_ravel_Int(0);
+   Z2->next_ravel_Int(0);
+   Z2->check_value(LOC);
 
    switch(result.get_tag())
       {
         case TOK_APL_VALUE1:
         case TOK_APL_VALUE3:
-             new (Z->next_ravel()) IntCell(1);
-             new (Z->next_ravel()) PointerCell(Z2, Z.getref());
-             Z->next_ravel()->init_from_value(result.get_apl_val(),
+             Z->next_ravel_Int(1);
+             Z->next_ravel_Pointer(Z2.get());
+             Z->next_ravel()->init_from_value(result.get_apl_val().get(),
                                               Z.getref(), LOC);
              break;
 
         case TOK_APL_VALUE2:
-             new (Z->next_ravel()) IntCell(2);
-             new (Z->next_ravel()) PointerCell(Z2, Z.getref());
-             Z->next_ravel()->init_from_value(result.get_apl_val(),
+             Z->next_ravel_Int(2);
+             Z->next_ravel_Pointer(Z2.get());
+             Z->next_ravel()->init_from_value(result.get_apl_val().get(),
                                               Z.getref(), LOC);
              break;
 
         case TOK_NO_VALUE:
         case TOK_VOID:
-             new (Z->next_ravel()) IntCell(3);
-             new (Z->next_ravel()) PointerCell(Z2, Z.getref());
-             new (Z->next_ravel()) PointerCell(Idx0_0(LOC), Z.getref());
+             Z->next_ravel_Int(3);
+             Z->next_ravel_Pointer(Z2.get());
+             Z->next_ravel_Pointer(Idx0_0(LOC).get());
              break;
 
         case TOK_BRANCH:
-             new (Z->next_ravel()) IntCell(4);
-             new (Z->next_ravel()) PointerCell(Z2, Z.getref());
-             new (Z->next_ravel()) IntCell(result.get_int_val());
+             Z->next_ravel_Int(4);
+             Z->next_ravel_Pointer(Z2.get());
+             Z->next_ravel_Int(result.get_int_val());
              break;
 
         case TOK_ESCAPE:
-             new (Z->next_ravel()) IntCell(5);
-             new (Z->next_ravel()) PointerCell(Z2, Z.getref());
-             new (Z->next_ravel()) PointerCell(Idx0_0(LOC), Z.getref());
+             Z->next_ravel_Int(5);
+             Z->next_ravel_Pointer(Z2.get());
+             Z->next_ravel_Pointer(Idx0_0(LOC).get());
              break;
 
         default: CERR << "unexpected result tag " << result.get_tag()
@@ -474,8 +474,8 @@ Value_P Z(sh_Z, LOC);
 
         Value_P varval(ucs, LOC);
 
-        new (Z->next_ravel()) PointerCell(varname, Z.getref());
-        new (Z->next_ravel()) PointerCell(varval, Z.getref());
+        Z->next_ravel_Pointer(varname.get());
+        Z->next_ravel_Pointer(varval.get());
       }
 
    Z->set_default_Spc();
@@ -515,7 +515,7 @@ Quad_ES::event_simulate(const UCS_string * A, Value_P B, Error & error)
 const ErrorCode ec = get_error_code(B);
    if (ec == E_QUAD_EA_EXEC)   return Token(TOK_EA_EXEC, B->clone(LOC));
 
-   error.init(ec, error.throw_loc);
+   new (&error)   Error(ec, error.throw_loc);
 
    if (error.error_code == E_NO_ERROR)   // B = 0 0: reset ⎕ET and ⎕EM.
       {
@@ -614,7 +614,7 @@ Shape sh_Z;
    if (var_count > 1)   sh_Z.add_shape_item(var_count);
 Value_P Z(sh_Z, LOC);
 
-   loop(z, var_count)   new (Z->next_ravel()) IntCell(expunge(vars[z]));
+   loop(z, var_count)   Z->next_ravel_Int(expunge(vars[z]));
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
@@ -667,24 +667,23 @@ const ShapeItem line_count = raw_lines.size();
 Value_P BB(line_count, LOC);
    loop(l, line_count)
        {
-         Cell * cBB = BB->next_ravel();
          if (escapes[l].size() == 0)   // prefix only
             {
               Value_P c1(prefixes[l], LOC);
               Value_P row(1, LOC);
-              new (row->next_ravel())   PointerCell(c1, row.getref());
+              row->next_ravel_Pointer(c1.get());
               row->check_value(LOC);
-              new (cBB)   PointerCell(row, BB.getref());
+              BB->next_ravel_Pointer(row.get());
             }
          else if (suffixes[l].size() == 0)   // prefix and escape
             {
               Value_P c1(prefixes[l], LOC);
               Value_P c2(escapes [l], LOC);
               Value_P row(2, LOC);
-              new (row->next_ravel())   PointerCell(c1, row.getref());
-              new (row->next_ravel())   PointerCell(c2, row.getref());
+              row->next_ravel_Pointer(c1.get());
+              row->next_ravel_Pointer(c2.get());
               row->check_value(LOC);
-              new (cBB)   PointerCell(row, BB.getref());
+              BB->next_ravel_Pointer(row.get());
             }
          else                                // prefix, escape, and suffix
             {
@@ -692,11 +691,11 @@ Value_P BB(line_count, LOC);
               Value_P c2(escapes [l], LOC);
               Value_P c3(suffixes[l], LOC);
               Value_P row(3, LOC);
-              new (row->next_ravel())   PointerCell(c1, row.getref());
-              new (row->next_ravel())   PointerCell(c2, row.getref());
-              new (row->next_ravel())   PointerCell(c3, row.getref());
+              row->next_ravel_Pointer(c1.get());
+              row->next_ravel_Pointer(c2.get());
+              row->next_ravel_Pointer(c3.get());
               row->check_value(LOC);
-              new (cBB)   PointerCell(row, BB.getref());
+              BB->next_ravel_Pointer(row.get());
             }
        }
    BB->check_value(LOC);
@@ -733,7 +732,7 @@ Value_P Z(raw_lines.size(), LOC);
    loop(l, raw_lines.size())
        {
          Value_P ZZ(raw_lines[l], LOC);
-         new (Z->next_ravel())   PointerCell(ZZ, Z.getref());
+         Z->next_ravel_Pointer(ZZ.get());
        }
 
    Quad_INP_running = false;
@@ -816,17 +815,17 @@ Value_P Z(lines.size(), LOC);
          loop(v, val_count)
             {
               Value_P val = tos[2*v].get_apl_val();
-              ZZ->next_ravel()->init_from_value(val, ZZ.getref(), LOC);
+              ZZ->next_ravel()->init_from_value(val.get(), ZZ.getref(), LOC);
             }
 
          ZZ->check_value(LOC);
-         new (Z->next_ravel()) PointerCell(ZZ, Z.getref());
+         Z->next_ravel_Pointer(ZZ.get());
       }
 
    if (lines.size() == 0)   // empty result
       {
         Value_P ZZ(UCS_string(), LOC);
-        new(&Z->get_ravel(0)) PointerCell(ZZ, Z.getref());
+        new(&Z->get_ravel(0)) PointerCell(ZZ.get(), Z.getref());
       }
 
    Z->check_value(LOC);
@@ -964,7 +963,7 @@ Shape sh_Z;
    if (var_count > 1)   sh_Z.add_shape_item(var_count);
 Value_P Z(sh_Z, LOC);
 
-   loop(v, var_count)   new (Z->next_ravel())   IntCell(get_NC(vars[v]));
+   loop(v, var_count)   Z->next_ravel_Int(get_NC(vars[v]));
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
@@ -1127,8 +1126,7 @@ Value_P Z(shZ, LOC);
         loop(l, longest)
            {
              const UCS_string & ucs = names[smallest];
-             new (Z->next_ravel())
-                 CharCell(l < ucs.size() ? ucs[l] : UNI_ASCII_SPACE);
+             Z->next_ravel_Char(l < ucs.size() ? ucs[l] : UNI_ASCII_SPACE);
            }
 
         // remove smalles from table
@@ -1184,7 +1182,7 @@ const APL_Integer b = B->get_ravel(0).get_near_int();
                  break;
 
         case 2:  Z = Value_P(LOC);
-                new (Z->next_ravel()) IntCell(fun_line);
+                Z->next_ravel_Int(fun_line);
                 break;
 
         case 3:  {
@@ -1196,24 +1194,26 @@ const APL_Integer b = B->get_ravel(0).get_near_int();
                  }
                  break;
 
-        case 4:  if (StateIndicator::get_error(si).error_code)
-                    {
-                      const UCS_string & text =
-                            StateIndicator::get_error(si).get_error_line_2();
-                      Z = Value_P(text, LOC);
-                    }
-                 else
+        case 4: if (StateIndicator::get_error(si).error_code)
+                   {
+                     const UCS_string & text =
+                           StateIndicator::get_error(si).get_error_line_2();
+                     Z = Value_P(text, LOC);
+                   }
+                else
                     {
                       const UCS_string text = exec->statement_text(PC);
                       Z = Value_P(text, LOC);
                     }
-                 break;
+                break;
 
         case 5: Z = Value_P(LOC);
-                new (Z->next_ravel()) IntCell(PC);                      break;
+                Z->next_ravel_Int(PC);
+                break;
 
         case 6: Z = Value_P(LOC);
-                new (Z->next_ravel()) IntCell(pm);                      break;
+                Z->next_ravel_Int(pm);
+                break;
 
         default: DOMAIN_ERROR;
       }
@@ -1256,7 +1256,7 @@ ShapeItem z = 0;
          switch (b)
            {
              case 1:  new (cZ) PointerCell(
-                                Value_P(fun_name, LOC), Z.getref());
+                                Value_P(fun_name, LOC).get(), Z.getref());
                       break;
 
              case 2:  new (cZ) IntCell(fun_line);
@@ -1268,7 +1268,7 @@ ShapeItem z = 0;
                         fun_and_line.append_number(fun_line);
                         fun_and_line.append(UNI_ASCII_R_BRACK);
                         new (cZ) PointerCell(Value_P(
-                                    fun_and_line, LOC), Z.getref()); 
+                                    fun_and_line, LOC).get(), Z.getref()); 
                       }
                       break;
 
@@ -1276,12 +1276,13 @@ ShapeItem z = 0;
                          {
                            const UCS_string & text =
                                StateIndicator::get_error(si).get_error_line_2();
-                           new (cZ) PointerCell(Value_P(text, LOC), Z.getref());
+                           new (cZ) PointerCell(Value_P(text, LOC).get(),
+                                                Z.getref());
                          }
                       else
                          {
                            const UCS_string text = exec->statement_text(PC);
-                           new (cZ) PointerCell(Value_P( text, LOC),
+                           new (cZ) PointerCell(Value_P( text, LOC).get(),
                                                 Z.getref()); 
                          }
                       break;
@@ -1316,14 +1317,14 @@ const ShapeItem ec = B->element_count();
          if (cell_B.is_character_cell())   // char to Unicode
             {
               const Unicode uni = cell_B.get_char_value();
-              new (Z->next_ravel()) IntCell(uni);
+              Z->next_ravel_Int(uni);
               continue;
             }
 
          if (cell_B.is_integer_cell())
             {
               const APL_Integer bint = cell_B.get_near_int();
-              new (Z->next_ravel())   CharCell(Unicode(bint));
+              Z->next_ravel_Char(Unicode(bint));
               continue;
             }
 
@@ -1376,7 +1377,7 @@ Stop_Trace::reference(const Simple_string<Function_Line, false> & lines,
 {
 Value_P Z(lines.size(), LOC);
 
-   loop(z, lines.size())   new (Z->next_ravel()) IntCell(lines[z]);
+   loop(z, lines.size())   Z->next_ravel_Int(lines[z]);
 
    if (assigned)   return Token(TOK_APL_VALUE2, Z);
    else            return Token(TOK_APL_VALUE1, Z);

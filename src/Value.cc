@@ -424,7 +424,7 @@ const int src_incr = new_value->is_scalar() ? 0 : 1;
         Cell * dest = C->get_lval_value();   // can be 0!
         if (dest)   dest->release(LOC);   // free sub-values etc (if any)
 
-        new (dest)   PointerCell(new_value, *cellowner);
+        new (dest)   PointerCell(new_value.get(), *cellowner);
         return;
       }
 
@@ -1277,7 +1277,7 @@ Value_P Z(len_A + 1, LOC);
       }
    else
       {
-        new (Z->next_ravel()) PointerCell(B, Z.getref());
+        new (Z->next_ravel()) PointerCell(B.get(), Z.getref());
       }
 
    Z->check_value(LOC);
@@ -1307,7 +1307,7 @@ Value_P Z(len_B + 1, LOC);
       }
    else
       {
-        new (Z->next_ravel()) PointerCell(A, Z.getref());
+        new (Z->next_ravel()) PointerCell(A.get(), Z.getref());
       }
 
    loop(b, len_B)   Z->next_ravel()->init(B->get_ravel(b), Z.getref(), LOC);
@@ -1335,7 +1335,7 @@ Value_P Z(2, LOC);
       }
    else
       {
-        new (Z->next_ravel()) PointerCell(A, Z.getref());
+        new (Z->next_ravel()) PointerCell(A.get(), Z.getref());
       }
 
    if (B->is_simple_scalar())
@@ -1344,7 +1344,7 @@ Value_P Z(2, LOC);
       }
    else
       {
-        new (Z->next_ravel()) PointerCell(B, Z.getref());
+        new (Z->next_ravel()) PointerCell(B.get(), Z.getref());
       }
 
    Z->check_value(LOC);

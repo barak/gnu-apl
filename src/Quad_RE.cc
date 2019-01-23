@@ -116,7 +116,7 @@ Value_P Z(ini + child_count[idx], LOC);
         const UCS_string item(*B, start, end - start);
         Value_P sub_value(item, LOC);
         sub_value->check_value(LOC);
-        new (Z->next_ravel())   PointerCell(sub_value, Z.getref());
+        new (Z->next_ravel())   PointerCell(sub_value.get(), Z.getref());
       }
    else
       {
@@ -128,7 +128,7 @@ Value_P Z(ini + child_count[idx], LOC);
        {
          if (parents[ch] != idx)   continue;   // ch is not a child of idx
          Value_P CH = deep_value(ch, ovector, count, parents, child_count, B);
-         new (Z->next_ravel())   PointerCell(CH, Z.getref());
+         new (Z->next_ravel())   PointerCell(CH.get(), Z.getref());
        }
 
    Z->check_value(LOC);
@@ -183,13 +183,13 @@ Value_P Z(cells_allocated, LOC);
                   {
                     Cell & cell = Z->get_ravel(u);
                     new (Z2->next_ravel())
-                        PointerCell(cell.get_pointer_value(), Z2.getref());
+                        PointerCell(cell.get_pointer_value().get(), Z2.getref());
                     cell.release(LOC);
                   }
               Z = Z2;
             }
 
-         new (Z->next_ravel())   PointerCell(ZZ, Z.getref());
+         new (Z->next_ravel())   PointerCell(ZZ.get(), Z.getref());
          ++cells_used;
        }
 
@@ -384,7 +384,7 @@ Value_P Z(shape, LOC);
 
          Value_P Z_sub = regex_results(regexp, flags, B_sub->get_UCS_ravel());
          Z_sub->check_value(LOC);
-         new (Z->next_ravel()) PointerCell(Z_sub, Z.getref());
+         new (Z->next_ravel()) PointerCell(Z_sub.get(), Z.getref());
        }
 
    Z->check_value(LOC);

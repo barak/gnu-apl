@@ -200,7 +200,7 @@ PERFORMANCE_END(fs_M_join_B, start_M_join, 1);
                       {
                         Value_P B1 = cell_B.get_pointer_value();
                         Value_P Z1(B1->get_shape(), LOC);
-                        new (&cell_Z) PointerCell(Z1, *job_B->value_Z);
+                        new (&cell_Z) PointerCell(Z1.get(), *job_B->value_Z);
 
                         PJob_scalar_B j1(Z1.get(), B1.getref());
                         Thread_context::get_master().joblist_B.add_job(j1);
@@ -249,13 +249,13 @@ ShapeItem end_z = z + slice_len;
                    POOL_LOCK(parallel_jobs_lock,
                              Value_P Z1 = B1->clone(LOC))
                     Z1->to_proto();
-                    new (&cell_Z) PointerCell(Z1, *job_B->value_Z);
+                    new (&cell_Z) PointerCell(Z1.get(), *job_B->value_Z);
                  }
               else
                  {
                    POOL_LOCK(parallel_jobs_lock,
                              Value_P Z1(B1->get_shape(), LOC))
-                   new (&cell_Z) PointerCell(Z1, *job_B->value_Z);
+                   new (&cell_Z) PointerCell(Z1.get(), *job_B->value_Z);
 
                    PJob_scalar_B j1(Z1.get(), B1.getref());
                    tctx.joblist_B.add_job(j1);
@@ -287,7 +287,7 @@ ScalarFunction::expand_pointers(Cell * cell_Z, Value & Z_owner,
              Value_P value_B = cell_B->get_pointer_value();
              POOL_LOCK(parallel_jobs_lock,
                        Token token = eval_scalar_AB(value_A, value_B, fun))
-             new (cell_Z) PointerCell(token.get_apl_val(), Z_owner);
+             new (cell_Z) PointerCell(token.get_apl_val().get(), Z_owner);
            }
         else                             // A is pointer, B is simple
            {
@@ -295,7 +295,7 @@ ScalarFunction::expand_pointers(Cell * cell_Z, Value & Z_owner,
              Value_P scalar_B(*cell_B, LOC);
              POOL_LOCK(parallel_jobs_lock,
                        Token token = eval_scalar_AB(value_A, scalar_B, fun))
-             new (cell_Z) PointerCell(token.get_apl_val(), Z_owner);
+             new (cell_Z) PointerCell(token.get_apl_val().get(), Z_owner);
            }
       }
    else                                  // A is simple
@@ -306,7 +306,7 @@ ScalarFunction::expand_pointers(Cell * cell_Z, Value & Z_owner,
              Value_P value_B = cell_B->get_pointer_value();
              POOL_LOCK(parallel_jobs_lock,
                        Token token = eval_scalar_AB(scalar_A, value_B, fun))
-             new (cell_Z) PointerCell(token.get_apl_val(), Z_owner);
+             new (cell_Z) PointerCell(token.get_apl_val().get(), Z_owner);
            }
    else                                // A and B are both plain
          {
@@ -438,13 +438,14 @@ PERFORMANCE_END(fs_M_join_AB, start_M_join, 1);
                            if (len_Z1 == 0)
                               {
                                 Value_P Z1 = eval_fill_AB(A1, B1).get_apl_val();
-                                new (&cell_Z) PointerCell(Z1, *job_AB->value_Z);
+                                new (&cell_Z) PointerCell(Z1.get(), *job_AB->value_Z);
                                 continue;
                               }
 
                            Value_P Z1(*sh_Z1, LOC);
                            new (&cell_Z)
-                               PointerCell(Z1.get(), *job_AB->value_Z);
+                               PointerCell(Z1.get(), *job_AB->value_Z,
+                                           0x6B616769);
 
                            PJob_scalar_AB j1(Z1.get(),
                                                 &A1->get_ravel(0), inc_A1,
@@ -463,13 +464,14 @@ PERFORMANCE_END(fs_M_join_AB, start_M_join, 1);
                            if (len_Z1 == 0)
                               {
                                 Value_P Z1 = A1->prototype(LOC);
-                                new (&cell_Z) PointerCell(Z1, *job_AB->value_Z);
+                                new (&cell_Z) PointerCell(Z1.get(), *job_AB->value_Z);
                               }
                            else
                               {
                                  Value_P Z1(A1->get_shape(), LOC);
                                  new (&cell_Z)
-                                     PointerCell(Z1.get(),*job_AB->value_Z);
+                                     PointerCell(Z1.get(),*job_AB->value_Z,
+                                                 0x6B616769);
 
                                  PJob_scalar_AB j1(Z1.get(),
                                                   &A1->get_ravel(0), inc_A1,
@@ -490,14 +492,15 @@ PERFORMANCE_END(fs_M_join_AB, start_M_join, 1);
                            if (len_Z1 == 0)
                               {
                                 Value_P Z1 = B1->prototype(LOC);
-                                new (&cell_Z) PointerCell(Z1, *job_AB->value_Z);
+                                new (&cell_Z) PointerCell(Z1.get(), *job_AB->value_Z);
                               }
                            else
                               {
                                 Value_P Z1(B1->get_shape(), LOC);
 
                                 new (&cell_Z)
-                                    PointerCell(Z1.get(), *job_AB->value_Z);
+                                    PointerCell(Z1.get(), *job_AB->value_Z,
+                                                0x6B616769);
 
                                 PJob_scalar_AB j1(Z1.get(), &cell_A, 0,
                                                   &B1->get_ravel(0), inc_B1);
@@ -577,7 +580,7 @@ ShapeItem end_z = z + slice_len;
 
                      POOL_LOCK(parallel_jobs_lock,
                                Value_P Z1(*sh_Z1, LOC))
-                        new (&cell_Z) PointerCell(Z1, *job_AB->value_Z);
+                        new (&cell_Z) PointerCell(Z1.get(), *job_AB->value_Z);
 
                         PJob_scalar_AB j1(Z1.get(),
                                           &A1->get_ravel(0), inc_A1,
@@ -595,12 +598,12 @@ ShapeItem end_z = z + slice_len;
                      if (len_Z1 == 0)
                         {
                           Value_P Z1 = A1->prototype(LOC);
-                          new (&cell_Z) PointerCell(Z1, *job_AB->value_Z);
+                          new (&cell_Z) PointerCell(Z1.get(), *job_AB->value_Z);
                         }
                      else
                         {
                           Value_P Z1(A1->get_shape(), LOC);
-                          new (&cell_Z) PointerCell(Z1, *job_AB->value_Z);
+                          new (&cell_Z) PointerCell(Z1.get(), *job_AB->value_Z);
 
                           PJob_scalar_AB j1(Z1.get(),
                                             &A1->get_ravel(0), inc_A1,
@@ -620,13 +623,13 @@ ShapeItem end_z = z + slice_len;
                      if (len_Z1 == 0)
                         {
                           Value_P Z1 = B1->prototype(LOC);
-                          new (&cell_Z) PointerCell(Z1, *job_AB->value_Z);
+                          new (&cell_Z) PointerCell(Z1.get(), *job_AB->value_Z);
                         }
                      else
                         {
                           POOL_LOCK(parallel_jobs_lock,
                                     Value_P Z1(B1->get_shape(), LOC))
-                          new (&cell_Z) PointerCell(Z1, *job_AB->value_Z);
+                          new (&cell_Z) PointerCell(Z1.get(), *job_AB->value_Z);
 
                           PJob_scalar_AB j1(Z1.get(), &cell_A, 0,
                                            &B1->get_ravel(0), inc_B1);
@@ -760,7 +763,7 @@ const Cell & cell_FI0 = FI0->get_ravel(0);
         sub->check_value(LOC);
 
         while (Z->more())
-           new (Z->next_ravel()) PointerCell(sub->clone(LOC), Z.getref());
+           new (Z->next_ravel()) PointerCell(sub->clone(LOC).get(), Z.getref());
       }
    else
       {

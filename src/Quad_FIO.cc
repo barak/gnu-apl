@@ -667,7 +667,7 @@ Unicode lookahead = input.get_next();
                   if (!suppress)
                      {
                        Value_P ZZ(ucs, LOC);
-                       new (&Z->get_ravel(z++))   PointerCell(ZZ, Z.getref());
+                       new (&Z->get_ravel(z++))   PointerCell(ZZ.get(), Z.getref());
                      }
                 }
            }
@@ -685,7 +685,7 @@ Unicode lookahead = input.get_next();
              if (!suppress)
                 {
                   Value_P ZZ(ucs, LOC);
-                  new (&Z->get_ravel(z++))   PointerCell(ZZ, Z.getref());
+                  new (&Z->get_ravel(z++))   PointerCell(ZZ.get(), Z.getref());
                 }
            }
         else if (conv == UNI_ASCII_n)  // characters consumed thus far
@@ -1371,7 +1371,7 @@ const APL_Integer function_number = X->get_ravel(0).get_near_int();
 
                      UCS_string filename(dent.d_name);
                      Value_P Z_name(filename, LOC);
-                     new (Z->next_ravel())   PointerCell(Z_name, Z.getref());
+                     new (Z->next_ravel())   PointerCell(Z_name.get(), Z.getref());
                    }
 
                 Z->set_default_Spc();
@@ -1521,11 +1521,11 @@ const APL_Integer function_number = X->get_ravel(0).get_near_int();
                 Value_P Z(5, LOC);
                 new (Z->next_ravel())   IntCell(count);
                 new (Z->next_ravel())
-                    PointerCell(fds_to_val(rd, max_fd), Z.getref());
+                    PointerCell(fds_to_val(rd, max_fd).get(), Z.getref());
                 new (Z->next_ravel())
-                    PointerCell(fds_to_val(wr, max_fd), Z.getref());
+                    PointerCell(fds_to_val(wr, max_fd).get(), Z.getref());
                 new (Z->next_ravel())
-                    PointerCell(fds_to_val(ex, max_fd), Z.getref());
+                    PointerCell(fds_to_val(ex, max_fd).get(), Z.getref());
                 new (Z->next_ravel())
                     IntCell(timeout.tv_sec*1000 + timeout.tv_usec/1000);
                 Z->check_value(LOC);
@@ -1609,7 +1609,7 @@ const APL_Integer function_number = X->get_ravel(0).get_near_int();
                        const Statistics_record * rN = stat->get_record();
                        Value_P Z(8, LOC);
                        new (Z->next_ravel())   IntCell(t);
-                       new (Z->next_ravel())   PointerCell(Z1, Z.getref());
+                       new (Z->next_ravel())   PointerCell(Z1.get(), Z.getref());
                        new (Z->next_ravel())   IntCell(r1->get_count());
                        new (Z->next_ravel())   IntCell(r1->get_sum());
                        new (Z->next_ravel())   FloatCell(r1->get_sum2());
@@ -1624,7 +1624,7 @@ const APL_Integer function_number = X->get_ravel(0).get_near_int();
                        const Statistics_record * r = stat->get_record();
                        Value_P Z(5, LOC);
                        new (Z->next_ravel())   IntCell(t);
-                       new (Z->next_ravel())   PointerCell(Z1, Z.getref());
+                       new (Z->next_ravel())   PointerCell(Z1.get(), Z.getref());
                        new (Z->next_ravel())   IntCell(r->get_count());
                        new (Z->next_ravel())   IntCell(r->get_sum());
                        new (Z->next_ravel())   FloatCell(r->get_sum2());
@@ -1682,7 +1682,7 @@ const APL_Integer function_number = X->get_ravel(0).get_near_int();
                       UTF8_string utf(from, end - from);
                       UCS_string ucs(utf);
                       Value_P ZZ(ucs, LOC);
-                      new (Z->next_ravel())  PointerCell(ZZ, Z.getref());
+                      new (Z->next_ravel())  PointerCell(ZZ.get(), Z.getref());
                       from = data + l + 1;
                     }
 
@@ -1693,7 +1693,7 @@ const APL_Integer function_number = X->get_ravel(0).get_near_int();
                       UTF8_string utf(from, end - from);
                       UCS_string ucs(utf);
                       Value_P ZZ(ucs, LOC);
-                      new (Z->next_ravel())  PointerCell(ZZ, Z.getref());
+                      new (Z->next_ravel())  PointerCell(ZZ.get(), Z.getref());
                    }
 
                 munmap(data, len);

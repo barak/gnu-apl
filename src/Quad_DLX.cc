@@ -795,7 +795,7 @@ Value_P Z(root.get_solution_count(), LOC);
    if (root.get_solution_count() == 0)   // empty result
       {
         Value_P Z1 = Idx0(LOC);   // Z1 is ⍬
-        new (&Z->get_ravel(0))   PointerCell(Z1, Z.getref());
+        new (&Z->get_ravel(0))   PointerCell(Z1.get(), Z.getref());
       }
    else
       {
@@ -809,7 +809,7 @@ Value_P Z(root.get_solution_count(), LOC);
                   new (Zs->next_ravel()) IntCell(qio + root.all_solutions[a++]);
                 }
              Zs->check_value(LOC);
-             new (Z->next_ravel())   PointerCell(Zs, Z.getref());
+             new (Z->next_ravel())   PointerCell(Zs.get(), Z.getref());
            }
       }
 

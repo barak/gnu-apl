@@ -28,6 +28,7 @@
 #include "Common.hh"
 #include "ErrorCode.hh"
 #include "PrintBuffer.hh"
+#include "Value_P.hh"
 
 class Value;
 class IntCell;
@@ -62,7 +63,7 @@ public:
 
    /// init this Cell from value. If value is a scalar then its first element
    /// is used (and value is erased). Otherwise a PointerCell is created.
-   void init_from_value(Value_P value, Value & cell_owner, const char * loc);
+   void init_from_value(Value * value, Value & cell_owner, const char * loc);
 
    /// Return \b true if \b this cell is greater than \b other, with:
    /// 1. PointerCell > NumericCell > CharCell
@@ -223,14 +224,14 @@ public:
    virtual void to_type()
       { DOMAIN_ERROR; }
 
-   /// The possible cell values
+   /// A union containing all possible cell values for the different Cell types
    union SomeValue
       {
-        Unicode        aval;        ///< a character
-        APL_Float_Base cval[2];     ///< a complex number
-        ErrorCode      eval;        ///< an error code
-        APL_Integer    ival;        ///< an integer
-        struct _fval                ///< a floating point value
+        Unicode        aval;      ///< for CharCell
+        APL_Float_Base cval[2];   ///< for ComplexCell
+        ErrorCode      eval;      ///< an error code
+        APL_Integer    ival;      ///< for IntCell
+        struct _fval              ///< for FloatCell
            {
              /// either a floating point value, or the denominator of a quotient
              union _flt_num
@@ -239,19 +240,17 @@ public:
                   APL_Integer    num;   ///< the numerator of the quotient
                 } u1;                   ///< primary value, 27 ⎕CR
 
-             /// 0 for floating point value, or the denominator of a quotient
-	     APL_Integer denominator;
+             /// 0 for non-rational valued, or the denominator of a quotient
+             APL_Integer denominator;
            }           fval;        ///< a rational or floating point value
-        void          *vptr;        ///< a void pointer
-        Cell          *next;        ///< pointer to the next (unused) cell
-        Cell          *lval;        ///< left value (for selective assignment)
+        Cell          *lval;        ///< for LvalCell (selective assignment)
 
-        /// pointer to, and owner of, a nested APL (sub-) value
+        /// a pointer to, and the owner of, a nested APL (sub-) value
         struct _pval
            {
-             Value_P_Base valp;     ///< a pointer to a value
-             Value       *owner;    ///< the value containing a PointerCell
-           }           pval;        ///< a nested value, and its owner
+             Value_P_Base valp;     ///< smart pointer to a value
+             Value       *owner;    ///< the value that contains valp
+           } pval;                  ///< for PointerCell
       };
 
    /// return the type of \b this cell

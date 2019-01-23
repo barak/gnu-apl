@@ -27,6 +27,19 @@
 #include "Workspace.hh"
 
 //-----------------------------------------------------------------------------
+Error::Error(ErrorCode ec, const char * loc)
+   : error_code(ec),
+     throw_loc(loc),
+     parser_loc(0),
+     show_locked(false),
+     left_caret(-1),
+     right_caret(-1),
+     print_loc(0)
+{
+   error_message_1 = error_name(error_code);
+   if (Workspace::more_error().size())   error_message_1.append(UNI_ASCII_PLUS);
+}
+//-----------------------------------------------------------------------------
 void
 Error::print(ostream & out, const char * loc) const
 {
@@ -111,22 +124,6 @@ Error::is_syntax_or_value_error() const
    if (error_major(error_code) == 2)   return true;   // some SYNTAX ERROR
    if (error_major(error_code) == 3)   return true;   // VALUE ERROR
    return false;
-}
-//-----------------------------------------------------------------------------
-void
-Error::init(ErrorCode ec, const char * loc)
-{
-   error_code = ec;
-   throw_loc = loc;
-   error_message_1 = error_name(error_code);
-   if (Workspace::more_error().size())   error_message_1.append(UNI_ASCII_PLUS);
-   error_message_2.shrink(0);
-   symbol_name.shrink(0);
-   parser_loc = 0;
-   show_locked = false;
-   left_caret = -1;
-   right_caret = -1;
-   print_loc = 0;
 }
 //-----------------------------------------------------------------------------
 UCS_string

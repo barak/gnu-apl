@@ -123,7 +123,7 @@ Value_P RO_B;
       if (result.get_Class() == TC_VALUE)
          {
            Value_P ZZ = result.get_apl_val();
-           Z->next_ravel()->init_from_value(ZZ, Z.getref(), LOC);
+           Z->next_ravel()->init_from_value(ZZ.get(), Z.getref(), LOC);
            continue;
          }
 

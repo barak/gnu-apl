@@ -767,7 +767,8 @@ Value_P vector(count, LOC);
 
             case TOK_APL_VALUE1:
             case TOK_APL_VALUE3:
-                 new (addr) PointerCell(tok.get_apl_val(), vector.getref());
+                 new (addr) PointerCell(tok.get_apl_val().get(),
+                                        vector.getref());
                  tok.clear(LOC);   // invalidate token
                  break;
 

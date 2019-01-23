@@ -81,8 +81,8 @@ char * loc = new char[loc_len + 1];
    // count errors
    IO_Files::assert_error();
 
-Error * err = Workspace::get_error();
-   if (err)   err->init(E_ASSERTION_FAILED, loc);
+   if (Error * err = Workspace::get_error())
+      new (err) Error(E_ASSERTION_FAILED, loc);
 
    asserting = false;
 

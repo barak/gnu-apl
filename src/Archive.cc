@@ -1553,7 +1553,7 @@ const Unicode type = UTF8_string::toUni(first, len, true);
                                       &end, 10);
                Assert(vid >= 0);
                Assert(vid < int(values.size()));
-               C++->init_from_value(values[vid], C_owner, LOC);
+               C++->init_from_value(values[vid].get(), C_owner, LOC);
                first = reinterpret_cast<const UTF8 *>(end);
              }
              break;

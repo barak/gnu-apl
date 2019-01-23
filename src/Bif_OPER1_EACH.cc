@@ -66,7 +66,7 @@ Function * LO = _LO.get_function();
         if (Z1->is_simple_scalar())   return Token(TOK_APL_VALUE1, Z1);
 
         Value_P Z(shape_Z, LOC);
-        new (&Z->get_ravel(0)) PointerCell(Z1, Z.getref());
+        new (&Z->get_ravel(0)) PointerCell(Z1.get(), Z.getref());
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
@@ -149,7 +149,7 @@ ShapeItem len_Z = 0;
              if (vZ->is_simple_scalar())
                 cZ->init(vZ->get_ravel(0), Z.getref(), LOC);
              else
-                new (cZ)   PointerCell(vZ, Z.getref());
+                new (cZ)   PointerCell(vZ.get(), Z.getref());
 
             continue;   // next z
            }
@@ -215,7 +215,7 @@ Value_P Z;
                   if (vZ->is_simple_scalar())
                      cZ->init(vZ->get_ravel(0), Z.getref(), LOC);
                   else
-                     new (cZ)  PointerCell(vZ, Z.getref());
+                     new (cZ)  PointerCell(vZ.get(), Z.getref());
 
                   continue;   // next z
            }
@@ -246,7 +246,7 @@ Value_P Z;
              Token result = LO->eval_B(LO_B);
              if (result.get_Class() == TC_VALUE)
                 {
-                  Value_P vZ = result.get_apl_val();
+                  Value * vZ = result.get_apl_val().get();
 
                   Cell * cZ = Z->next_ravel();
                   if (0)

@@ -42,18 +42,21 @@ void ArrayIterator::operator ++()
 
    ++total;
 
-   for (Rank p = max_vals.get_rank() - 1; !is_done; --p)
+   // max_vals[0] is the highest dimension in APL which increments ar
+   // the slowest rate. max_vals[ramk-1] is the fastest.
+   //
+   for (Rank r = max_vals.get_rank() - 1; !is_done; --r)
        {
-         if (p < 0)
+         if (r < 0)
             {
               is_done = true;
               return;
             }
 
-         values.increment_shape_item(p);
-         if (values.get_shape_item(p) < max_vals.get_shape_item(p))   return;
+         values.increment_shape_item(r);
+         if (values.get_shape_item(r) < max_vals.get_shape_item(r))   return;
 
-         values.set_shape_item(p, 0);   // wrap around
+         values.set_shape_item(r, 0);   // wrap around
        }
 
    Assert(0 && "Not reached");

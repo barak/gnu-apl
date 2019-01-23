@@ -20,7 +20,7 @@ common_CXXFLAGS = -Wall -I sql -Wold-style-cast $(CXX_WERROR)
 common_LDFLAGS =
 common_SOURCES =        buildtag		buildtag.hh		\
 						../config.h		\
-                                                APL_Float_as_class.hh	\
+						APL_Float_as_class.hh	\
 						APL_types.hh		\
 Archive.cc					Archive.hh		\
 ArrayIterator.cc				ArrayIterator.hh	\
@@ -122,17 +122,17 @@ Token.cc		Token.def		Token.hh		\
 						TokenEnums.hh		\
 Tokenizer.cc					Tokenizer.hh		\
 UCS_string.cc					UCS_string.hh		\
-UCS_string_vector.cc                            UCS_string_vector.hh    \
+UCS_string_vector.cc				UCS_string_vector.hh    \
 						Unicode.hh		\
 UserFunction.cc					UserFunction.hh		\
 UserFunction_header.cc				UserFunction_header.hh	\
 UserPreferences.cc				UserPreferences.hh	\
 UTF8_string.cc					UTF8_string.hh		\
-Value.cc					Value.hh		\
-						Value_P.hh		\
+Value.cc		Value.icc		Value.hh		\
+			Value_P.icc		Value_P.hh		\
 ValueHistory.cc					ValueHistory.hh		\
 Workspace.cc					Workspace.hh            \
-static_Objects.cc                               static_Objects.hh
+static_Objects.cc				static_Objects.hh
 
 if HAVE_LIBPCRE2_32
 common_SOURCES +=                                                       \

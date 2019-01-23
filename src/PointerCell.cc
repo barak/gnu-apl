@@ -25,23 +25,25 @@
 #include "Workspace.hh"
 
 //-----------------------------------------------------------------------------
-PointerCell::PointerCell(Value_P sub_val, Value & cell_owner)
+PointerCell::PointerCell(Value * sub_val, Value & cell_owner)
 {
    Assert(!sub_val->is_simple_scalar());
 
    new (&value.pval.valp) Value_P(sub_val, LOC);
    value.pval.owner = &cell_owner;
 
-   Assert(value.pval.owner != sub_val.get());   // typical cut-and-paste error
+   Assert(value.pval.owner != sub_val);   // typical cut-and-paste error
    cell_owner.increment_pointer_cell_count();
    cell_owner.add_subcount(sub_val->nz_element_count());
 }
 //-----------------------------------------------------------------------------
-PointerCell::PointerCell(Value * sub_val, Value & cell_owner)
+PointerCell::PointerCell(Value * sub_val, Value & cell_owner, uint32_t magic)
 {
    // DO NOT: Assert(!sub_val->is_simple_scalar()); This is a special
    // constructor only used in ScalarFunction.cc to create an un-initialized
    // PointerCell
+
+   Assert(magic == 0x6B616769);
 
    new (&value.pval.valp) Value_P(sub_val, LOC);
    value.pval.owner = &cell_owner;
@@ -61,7 +63,7 @@ Value_P sub;   // instantiate beforehand so that sub is 0 if clone() fails
 
    sub = get_pointer_value()->clone(loc);
    Assert(!!sub);
-   new (other) PointerCell(sub, cell_owner);
+   new (other) PointerCell(sub.get(), cell_owner);
 }
 //-----------------------------------------------------------------------------
 void
@@ -69,10 +71,6 @@ PointerCell::release(const char * loc)
 {
    value.pval.owner->decrement_pointer_cell_count();
    value.pval.owner->add_subcount(-get_pointer_value()->nz_element_count());
-
-// Value * sub = (Value *)value.vptr;
-// const ShapeItem sub_len = sub->nz_element_count();
-//    loop(s, sub_len)   sub->get_ravel(s).release(loc);
 
    value.pval.valp.reset();
    new (this) IntCell(0);
@@ -269,7 +267,7 @@ PrintBuffer ret(*val, pctx, 0);
                          c++->init(proto->get_ravel(0),
                                    proto_reshaped.getref(), LOC);
                       else
-                         new (c++) PointerCell(proto->clone(LOC),
+                         new (c++) PointerCell(proto->clone(LOC).get(),
                                                proto_reshaped.getref());
 
                   proto_reshaped->check_value(LOC);
