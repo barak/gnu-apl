@@ -40,8 +40,9 @@ syl2("cores used"                             , CURRENT_CORES     , Thread_conte
 syl2("print length limit (0 = no limit)"      , PRINT_LIMIT       , print_length_limit  )
 syl2("max. prefix length"                     , __MAXONT          , Prefix::MAX_CONTENT )
 syl2("log₁₀(integer tolerance (aka. fuzz))"   , __LINTTOLERANCE   , static_cast<int>(log10(INTEGER_TOLERANCE) - 0.2))
-syl2("log₁₀(real tolerance (aka. fuxx))"      , __LREALTOLERANCE  , static_cast< int>(log10(REAL_TOLERANCE) - 0.2))
-syl2("⎕WA safety margin"                      , WA_MARGIN         , Quad_WA::WA_margin                 )
+syl2("log₁₀(real tolerance (aka. fuzz))"      , __LREALTOLERANCE  , static_cast< int>(log10(REAL_TOLERANCE) - 0.2))
+syl2("⎕WA safety margin (bytes)"              , WA_MARGIN         , Quad_WA::WA_margin  )
+syl2("⎕WA memory scale (%)"                   , WA_SCALE          , Quad_WA::WA_scale   )
 
 #undef syl1
 #undef syl2

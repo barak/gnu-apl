@@ -1,0 +1,1800 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+    "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
+<meta name="generator" content="AsciiDoc 8.6.9" />
+<title>Memory Management in GNU APL</title>
+<style type="text/css">
+/* Shared CSS for AsciiDoc xhtml11 and html5 backends */
+
+/* Default font. */
+body {
+  font-family: Georgia,serif;
+}
+
+/* Title font. */
+h1, h2, h3, h4, h5, h6,
+div.title, caption.title,
+thead, p.table.header,
+#toctitle,
+#author, #revnumber, #revdate, #revremark,
+#footer {
+  font-family: Arial,Helvetica,sans-serif;
+}
+
+body {
+  margin: 1em 5% 1em 5%;
+}
+
+a {
+  color: blue;
+  text-decoration: underline;
+}
+a:visited {
+  color: fuchsia;
+}
+
+em {
+  font-style: italic;
+  color: navy;
+}
+
+strong {
+  font-weight: bold;
+  color: #083194;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #527bbd;
+  margin-top: 1.2em;
+  margin-bottom: 0.5em;
+  line-height: 1.3;
+}
+
+h1, h2, h3 {
+  border-bottom: 2px solid silver;
+}
+h2 {
+  padding-top: 0.5em;
+}
+h3 {
+  float: left;
+}
+h3 + * {
+  clear: left;
+}
+h5 {
+  font-size: 1.0em;
+}
+
+div.sectionbody {
+  margin-left: 0;
+}
+
+hr {
+  border: 1px solid silver;
+}
+
+p {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+ul, ol, li > p {
+  margin-top: 0;
+}
+ul > li     { color: #aaa; }
+ul > li > * { color: black; }
+
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
+  padding: 0;
+  margin: 0;
+}
+pre {
+  white-space: pre-wrap;
+}
+
+#author {
+  color: #527bbd;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+#email {
+}
+#revnumber, #revdate, #revremark {
+}
+
+#footer {
+  font-size: small;
+  border-top: 2px solid silver;
+  padding-top: 0.5em;
+  margin-top: 4.0em;
+}
+#footer-text {
+  float: left;
+  padding-bottom: 0.5em;
+}
+#footer-badges {
+  float: right;
+  padding-bottom: 0.5em;
+}
+
+#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
+div.imageblock, div.exampleblock, div.verseblock,
+div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
+div.admonitionblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+div.admonitionblock {
+  margin-top: 2.0em;
+  margin-bottom: 2.0em;
+  margin-right: 10%;
+  color: #606060;
+}
+
+div.content { /* Block element content. */
+  padding: 0;
+}
+
+/* Block element titles. */
+div.title, caption.title {
+  color: #527bbd;
+  font-weight: bold;
+  text-align: left;
+  margin-top: 1.0em;
+  margin-bottom: 0.5em;
+}
+div.title + * {
+  margin-top: 0;
+}
+
+td div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content + div.title {
+  margin-top: 0.0em;
+}
+
+div.sidebarblock > div.content {
+  background: #ffffee;
+  border: 1px solid #dddddd;
+  border-left: 4px solid #f0f0f0;
+  padding: 0.5em;
+}
+
+div.listingblock > div.content {
+  border: 1px solid #dddddd;
+  border-left: 5px solid #f0f0f0;
+  background: #f8f8f8;
+  padding: 0.5em;
+}
+
+div.quoteblock, div.verseblock {
+  padding-left: 1.0em;
+  margin-left: 1.0em;
+  margin-right: 10%;
+  border-left: 5px solid #f0f0f0;
+  color: #888;
+}
+
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock > pre.content {
+  font-family: inherit;
+  font-size: inherit;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
+div.verseblock + div.attribution {
+  text-align: left;
+}
+
+div.admonitionblock .icon {
+  vertical-align: top;
+  font-size: 1.1em;
+  font-weight: bold;
+  text-decoration: underline;
+  color: #527bbd;
+  padding-right: 0.5em;
+}
+div.admonitionblock td.content {
+  padding-left: 0.5em;
+  border-left: 3px solid #dddddd;
+}
+
+div.exampleblock > div.content {
+  border-left: 3px solid #dddddd;
+  padding-left: 0.5em;
+}
+
+div.imageblock div.content { padding-left: 0; }
+span.image img { border-style: none; vertical-align: text-bottom; }
+a.image:visited { color: white; }
+
+dl {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+dt {
+  margin-top: 0.5em;
+  margin-bottom: 0;
+  font-style: normal;
+  color: navy;
+}
+dd > *:first-child {
+  margin-top: 0.1em;
+}
+
+ul, ol {
+    list-style-position: outside;
+}
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
+  list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
+}
+
+tfoot {
+  font-weight: bold;
+}
+td > div.verse {
+  white-space: pre;
+}
+
+div.hdlist {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+div.hdlist tr {
+  padding-bottom: 15px;
+}
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
+  vertical-align: top;
+  font-style: normal;
+  padding-right: 0.8em;
+  color: navy;
+}
+td.hdlist2 {
+  vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
+}
+
+.footnote, .footnoteref {
+  font-size: 0.8em;
+}
+
+span.footnote, span.footnoteref {
+  vertical-align: super;
+}
+
+#footnotes {
+  margin: 20px 0 20px 0;
+  padding: 7px 0 0 0;
+}
+
+#footnotes div.footnote {
+  margin: 0 0 5px 0;
+}
+
+#footnotes hr {
+  border: none;
+  border-top: 1px solid silver;
+  height: 1px;
+  text-align: left;
+  margin-left: 0;
+  width: 20%;
+  min-width: 100px;
+}
+
+div.colist td {
+  padding-right: 0.5em;
+  padding-bottom: 0.3em;
+  vertical-align: top;
+}
+div.colist td img {
+  margin-top: 0.3em;
+}
+
+@media print {
+  #footer-badges { display: none; }
+}
+
+#toc {
+  margin-bottom: 2.5em;
+}
+
+#toctitle {
+  color: #527bbd;
+  font-size: 1.1em;
+  font-weight: bold;
+  margin-top: 1.0em;
+  margin-bottom: 0.1em;
+}
+
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+div.toclevel2 {
+  margin-left: 2em;
+  font-size: 0.9em;
+}
+div.toclevel3 {
+  margin-left: 4em;
+  font-size: 0.9em;
+}
+div.toclevel4 {
+  margin-left: 6em;
+  font-size: 0.9em;
+}
+
+span.aqua { color: aqua; }
+span.black { color: black; }
+span.blue { color: blue; }
+span.fuchsia { color: fuchsia; }
+span.gray { color: gray; }
+span.green { color: green; }
+span.lime { color: lime; }
+span.maroon { color: maroon; }
+span.navy { color: navy; }
+span.olive { color: olive; }
+span.purple { color: purple; }
+span.red { color: red; }
+span.silver { color: silver; }
+span.teal { color: teal; }
+span.white { color: white; }
+span.yellow { color: yellow; }
+
+span.aqua-background { background: aqua; }
+span.black-background { background: black; }
+span.blue-background { background: blue; }
+span.fuchsia-background { background: fuchsia; }
+span.gray-background { background: gray; }
+span.green-background { background: green; }
+span.lime-background { background: lime; }
+span.maroon-background { background: maroon; }
+span.navy-background { background: navy; }
+span.olive-background { background: olive; }
+span.purple-background { background: purple; }
+span.red-background { background: red; }
+span.silver-background { background: silver; }
+span.teal-background { background: teal; }
+span.white-background { background: white; }
+span.yellow-background { background: yellow; }
+
+span.big { font-size: 2em; }
+span.small { font-size: 0.6em; }
+
+span.underline { text-decoration: underline; }
+span.overline { text-decoration: overline; }
+span.line-through { text-decoration: line-through; }
+
+div.unbreakable { page-break-inside: avoid; }
+
+
+/*
+ * xhtml11 specific
+ *
+ * */
+
+div.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+div.tableblock > table {
+  border: 3px solid #527bbd;
+}
+thead, p.table.header {
+  font-weight: bold;
+  color: #527bbd;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overriden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
+
+
+/*
+ * html5 specific
+ *
+ * */
+
+table.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+thead, p.tableblock.header {
+  font-weight: bold;
+  color: #527bbd;
+}
+p.tableblock {
+  margin-top: 0;
+}
+table.tableblock {
+  border-width: 3px;
+  border-spacing: 0px;
+  border-style: solid;
+  border-color: #527bbd;
+  border-collapse: collapse;
+}
+th.tableblock, td.tableblock {
+  border-width: 1px;
+  padding: 4px;
+  border-style: solid;
+  border-color: #527bbd;
+}
+
+table.tableblock.frame-topbot {
+  border-left-style: hidden;
+  border-right-style: hidden;
+}
+table.tableblock.frame-sides {
+  border-top-style: hidden;
+  border-bottom-style: hidden;
+}
+table.tableblock.frame-none {
+  border-style: hidden;
+}
+
+th.tableblock.halign-left, td.tableblock.halign-left {
+  text-align: left;
+}
+th.tableblock.halign-center, td.tableblock.halign-center {
+  text-align: center;
+}
+th.tableblock.halign-right, td.tableblock.halign-right {
+  text-align: right;
+}
+
+th.tableblock.valign-top, td.tableblock.valign-top {
+  vertical-align: top;
+}
+th.tableblock.valign-middle, td.tableblock.valign-middle {
+  vertical-align: middle;
+}
+th.tableblock.valign-bottom, td.tableblock.valign-bottom {
+  vertical-align: bottom;
+}
+
+
+/*
+ * manpage specific
+ *
+ * */
+
+body.manpage h1 {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border-top: 2px solid silver;
+  border-bottom: 2px solid silver;
+}
+body.manpage h2 {
+  border-style: none;
+}
+body.manpage div.sectionbody {
+  margin-left: 3em;
+}
+
+@media print {
+  body.manpage div#toc { display: none; }
+}
+
+
+</style>
+<script type="text/javascript">
+/*<![CDATA[*/
+var asciidoc = {  // Namespace.
+
+/////////////////////////////////////////////////////////////////////
+// Table Of Contents generator
+/////////////////////////////////////////////////////////////////////
+
+/* Author: Mihai Bazon, September 2002
+ * http://students.infoiasi.ro/~mishoo
+ *
+ * Table Of Content generator
+ * Version: 0.4
+ *
+ * Feel free to use this script under the terms of the GNU General Public
+ * License, as long as you do not remove or alter this notice.
+ */
+
+ /* modified by Troy D. Hanson, September 2006. License: GPL */
+ /* modified by Stuart Rackham, 2006, 2009. License: GPL */
+
+// toclevels = 1..4.
+toc: function (toclevels) {
+
+  function getText(el) {
+    var text = "";
+    for (var i = el.firstChild; i != null; i = i.nextSibling) {
+      if (i.nodeType == 3 /* Node.TEXT_NODE */) // IE doesn't speak constants.
+        text += i.data;
+      else if (i.firstChild != null)
+        text += getText(i);
+    }
+    return text;
+  }
+
+  function TocEntry(el, text, toclevel) {
+    this.element = el;
+    this.text = text;
+    this.toclevel = toclevel;
+  }
+
+  function tocEntries(el, toclevels) {
+    var result = new Array;
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    // Function that scans the DOM tree for header elements (the DOM2
+    // nodeIterator API would be a better technique but not supported by all
+    // browsers).
+    var iterate = function (el) {
+      for (var i = el.firstChild; i != null; i = i.nextSibling) {
+        if (i.nodeType == 1 /* Node.ELEMENT_NODE */) {
+          var mo = re.exec(i.tagName);
+          if (mo && (i.getAttribute("class") || i.getAttribute("className")) != "float") {
+            result[result.length] = new TocEntry(i, getText(i), mo[1]-1);
+          }
+          iterate(i);
+        }
+      }
+    }
+    iterate(el);
+    return result;
+  }
+
+  var toc = document.getElementById("toc");
+  if (!toc) {
+    return;
+  }
+
+  // Delete existing TOC entries in case we're reloading the TOC.
+  var tocEntriesToRemove = [];
+  var i;
+  for (i = 0; i < toc.childNodes.length; i++) {
+    var entry = toc.childNodes[i];
+    if (entry.nodeName.toLowerCase() == 'div'
+     && entry.getAttribute("class")
+     && entry.getAttribute("class").match(/^toclevel/))
+      tocEntriesToRemove.push(entry);
+  }
+  for (i = 0; i < tocEntriesToRemove.length; i++) {
+    toc.removeChild(tocEntriesToRemove[i]);
+  }
+
+  // Rebuild TOC entries.
+  var entries = tocEntries(document.getElementById("content"), toclevels);
+  for (var i = 0; i < entries.length; ++i) {
+    var entry = entries[i];
+    if (entry.element.id == "")
+      entry.element.id = "_toc_" + i;
+    var a = document.createElement("a");
+    a.href = "#" + entry.element.id;
+    a.appendChild(document.createTextNode(entry.text));
+    var div = document.createElement("div");
+    div.appendChild(a);
+    div.className = "toclevel" + entry.toclevel;
+    toc.appendChild(div);
+  }
+  if (entries.length == 0)
+    toc.parentNode.removeChild(toc);
+},
+
+
+/////////////////////////////////////////////////////////////////////
+// Footnotes generator
+/////////////////////////////////////////////////////////////////////
+
+/* Based on footnote generation code from:
+ * http://www.brandspankingnew.net/archive/2005/07/format_footnote.html
+ */
+
+footnotes: function () {
+  // Delete existing footnote entries in case we're reloading the footnodes.
+  var i;
+  var noteholder = document.getElementById("footnotes");
+  if (!noteholder) {
+    return;
+  }
+  var entriesToRemove = [];
+  for (i = 0; i < noteholder.childNodes.length; i++) {
+    var entry = noteholder.childNodes[i];
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+      entriesToRemove.push(entry);
+  }
+  for (i = 0; i < entriesToRemove.length; i++) {
+    noteholder.removeChild(entriesToRemove[i]);
+  }
+
+  // Rebuild footnote entries.
+  var cont = document.getElementById("content");
+  var spans = cont.getElementsByTagName("span");
+  var refs = {};
+  var n = 0;
+  for (i=0; i<spans.length; i++) {
+    if (spans[i].className == "footnote") {
+      n++;
+      var note = spans[i].getAttribute("data-note");
+      if (!note) {
+        // Use [\s\S] in place of . so multi-line matches work.
+        // Because JavaScript has no s (dotall) regex flag.
+        note = spans[i].innerHTML.match(/\s*\[([\s\S]*)]\s*/)[1];
+        spans[i].innerHTML =
+          "[<a id='_footnoteref_" + n + "' href='#_footnote_" + n +
+          "' title='View footnote' class='footnote'>" + n + "</a>]";
+        spans[i].setAttribute("data-note", note);
+      }
+      noteholder.innerHTML +=
+        "<div class='footnote' id='_footnote_" + n + "'>" +
+        "<a href='#_footnoteref_" + n + "' title='Return to text'>" +
+        n + "</a>. " + note + "</div>";
+      var id =spans[i].getAttribute("id");
+      if (id != null) refs["#"+id] = n;
+    }
+  }
+  if (n == 0)
+    noteholder.parentNode.removeChild(noteholder);
+  else {
+    // Process footnoterefs.
+    for (i=0; i<spans.length; i++) {
+      if (spans[i].className == "footnoteref") {
+        var href = spans[i].getElementsByTagName("a")[0].getAttribute("href");
+        href = href.match(/#.*/)[0];  // Because IE return full URL.
+        n = refs[href];
+        spans[i].innerHTML =
+          "[<a href='#_footnote_" + n +
+          "' title='View footnote' class='footnote'>" + n + "</a>]";
+      }
+    }
+  }
+},
+
+install: function(toclevels) {
+  var timerId;
+
+  function reinstall() {
+    asciidoc.footnotes();
+    if (toclevels) {
+      asciidoc.toc(toclevels);
+    }
+  }
+
+  function reinstallAndRemoveTimer() {
+    clearInterval(timerId);
+    reinstall();
+  }
+
+  timerId = setInterval(reinstall, 500);
+  if (document.addEventListener)
+    document.addEventListener("DOMContentLoaded", reinstallAndRemoveTimer, false);
+  else
+    window.onload = reinstallAndRemoveTimer;
+}
+
+}
+asciidoc.install();
+/*]]>*/
+</script>
+</head>
+<body class="article">
+<div id="header">
+<h1>Memory Management in GNU APL</h1>
+<span id="author">Jürgen Sauermann, GNU APL</span><br />
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="_abstract">Abstract</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>This document describes how memory is being managed in GNU APL and what
+the consequences for an GNU APL programmer are.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_fundamentals">Fundamentals</h2>
+<div class="sectionbody">
+<div class="ulist"><ul>
+<li>
+<p>
+The GNU APL interpreter is an executable that runs in a single process.
+  Inside the interpreter run a handful of threads; the memory overhead of
+  these threads can be neglected.
+</p>
+</li>
+<li>
+<p>
+Depending on configuration details and user preferences, the interpreter may
+  fork additional processes (APserver, GTK_server) whose sizes are so small
+  that they can also be neglected.
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>The sizes of the binaries mentioned (at the time of this writing) are:</p></div>
+<div class="tableblock">
+<table rules="all"
+width="60%"
+frame="border"
+cellspacing="0" cellpadding="4">
+<caption class="title">Table 1. Binary Sizes</caption>
+<col width="50%" />
+<col width="50%" />
+<thead>
+<tr>
+<th align="left" valign="top"> Binary             </th>
+<th align="left" valign="top"> Size (bytes)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left" valign="top"><p class="table">GNU APL Interpreter</p></td>
+<td align="left" valign="top"><p class="table">18,960,921</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">APserver</p></td>
+<td align="left" valign="top"><p class="table">832,886</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">Gtk_server</p></td>
+<td align="left" valign="top"><p class="table">138,502</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="ulist"><ul>
+<li>
+<p>
+After the interpreter has started it requests additional memory from the
+  operating system on behalf of APL commands and APL code executed. That
+  memory is allocated by malloc(), either directly or indirectly (via C++
+  new()). When the memory is no longer needed the it is returned to the
+  malloc() memory management (for later re-use). The memory kept in the
+  malloc() memory management is only returned to the operating system when the
+  GNU APL interpreter exits.
+</p>
+</li>
+<li>
+<p>
+GNU APL tries to allocate memory statically as much as possible. The
+  static allocation has already taken place when the interpreter outputs its
+  first APL prompt. After that dynamic memory allocation via malloc()/new()
+  is performed for objects whose lifetime is potentially infinite (i.e. whose
+  destruction is triggered by APL code. These objects are:
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+APL variables
+</p>
+</li>
+<li>
+<p>
+APL values
+</p>
+</li>
+<li>
+<p>
+defined functions
+</p>
+</li>
+<li>
+<p>
+call stack (aka. )SI stack) entries of defined functions
+</p>
+</li>
+</ul></div>
+</li>
+</ul></div>
+<div class="paragraph"><p>In the following the sizes of these objects are given. The sizes differ
+slightly between 32-bit and 64-bit systems because 32-bit systems use 4-byte
+pointers and 64-bit systems use 8 byte pointers. In addition to the indicated
+sizes there is a (very) small overhead in the malloc() library for every object.
+Each of the objects is far bigger than its malloc overhead and therefore the
+overhead can normally be ignored. A typical APL program is assumed to have
+less than 1000 APL symbols (i.e. variables or defined functions) and an )SI
+stack depth of less than 100. A typical computer on which GNU APL runs is
+assumed to have 4 GB of memory available to the interpreter and it should
+definitely have at least 1 GB.</p></div>
+<div class="tableblock">
+<table rules="all"
+width="60%"
+frame="border"
+cellspacing="0" cellpadding="4">
+<caption class="title">Table 2. Sizes of Dynamic Objects</caption>
+<col width="33%" />
+<col width="33%" />
+<col width="33%" />
+<thead>
+<tr>
+<th align="left" valign="top"> Object              </th>
+<th align="left" valign="top"> 32-bit system </th>
+<th align="left" valign="top"> 64-bit system</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="left" valign="top"><p class="table">ValueStackItem</p></td>
+<td align="left" valign="top"><p class="table">16</p></td>
+<td align="left" valign="top"><p class="table">24</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">Token</p></td>
+<td align="left" valign="top"><p class="table">20</p></td>
+<td align="left" valign="top"><p class="table">24</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">Ravel Cell</p></td>
+<td align="left" valign="top"><p class="table">20</p></td>
+<td align="left" valign="top"><p class="table">24</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">UCS_string</p></td>
+<td align="left" valign="top"><p class="table">20 + X</p></td>
+<td align="left" valign="top"><p class="table">24 + X</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">APL Symbol</p></td>
+<td align="left" valign="top"><p class="table">56 + X</p></td>
+<td align="left" valign="top"><p class="table">80 + X</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">Defined Function</p></td>
+<td align="left" valign="top"><p class="table">292 + X</p></td>
+<td align="left" valign="top"><p class="table">400 + X</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">Call Stack Entry</p></td>
+<td align="left" valign="top"><p class="table">2952</p></td>
+<td align="left" valign="top"><p class="table">3952</p></td>
+</tr>
+<tr>
+<td align="left" valign="top"><p class="table">APL Value</p></td>
+<td align="left" valign="top"><p class="table">372 + X</p></td>
+<td align="left" valign="top"><p class="table">456 + X</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="paragraph"><p>In the table above, the term + X means that the object is a structure that
+contains other objects. For example the size of a defined function depends
+on the number of function lines and their lengths. Likewise, the size of an
+APL value depends primarily on the number of its ravel elements. The term X
+for the different objects is explained in the following.</p></div>
+<div class="sect2">
+<h3 id="_x_for_a_unicode_string_aka_ucs_string">X for a Unicode string (aka. UCS string)</h3>
+<div class="paragraph"><p>X is 4 byte per Unicode character. For performance reasons at least 16
+characters are being allocated so that X ≥ 64.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_x_for_an_apl_symbol">X for an APL Symbol</h3>
+<div class="paragraph"><p>An APL symbol has two variable parts: an UCS string containing the name of the
+symbol (e.g. a variable name or a the name of a defined function) and value
+stack. The value stack of a function is initially empty, but is increased
+when a defined function is called and the symbol is a local variable or a
+label in the defined function and decreased if that function returns. The
+amount of memory by which the stack is increased is the size of a
+<strong>ValueStackItem</strong> in the table above.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_x_for_a_defined_function">X for a Defined Function</h3>
+<div class="paragraph"><p>When a defined functions is created, then its textual representation (i.e.
+the argument for ⎕FX or the result produced by the ∇-editor). This textual
+representation is stored in the function object for the purpose of displaying
+error information in case the execution of the function fails.</p></div>
+<div class="paragraph"><p>The textual representation is then converted into an internal representation
+of fixed-sized Token with one token for each lexical unit. A Lexical unit is:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+one user-defined name, or
+</p>
+</li>
+<li>
+<p>
+one distinguished name, or
+</p>
+</li>
+<li>
+<p>
+one primitive function, or
+</p>
+</li>
+<li>
+<p>
+a special symbol (◊ [ ] etc.)
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>Finally a jump table to the different function lines is added to the
+function. The X for the function is therefore Utx + N×To + L×Jt, where</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Utx is the size of UCS_string containing the function text,
+</p>
+</li>
+<li>
+<p>
+N is the number of Token,
+</p>
+</li>
+<li>
+<p>
+To is the size of a Token as above,
+</p>
+</li>
+<li>
+<p>
+L is the number of function lines
+</p>
+</li>
+<li>
+<p>
+Jt is the size of a jump table entry (4 bytes)
+</p>
+</li>
+</ul></div>
+</div>
+<div class="sect2">
+<h3 id="_x_for_an_apl_value">X for an APL Value</h3>
+<div class="paragraph"><p>GNU APL distinguishes between short values and long values. A short value is a
+value with up to 12 ravel elements while a long value is a value with more
+than 12 ravel elements. The split point between long and short values is 12 by
+default, but can be changed via ./configure.</p></div>
+<div class="paragraph"><p>The rationale for distinguishing short and long values is performance. A short
+value can be allocated in a single new() call while a long value needs two
+new() calls: one for the value header (which contains the shape of the value),
+and one for the ravel cells of the value. Looking at the details of malloc()
+one can see that the allocation or de-allocation of smaller memory areas is more
+efficient than the allocation or de-allocation of larger areas, Finally,
+short APL values occur more frequent in APL programs than long values, and they
+are also more frequently overridden as a whole (which allocates a new value
+and discards the old) as opposed to being updated via indexed assignment
+(which changes an existing value but does does not create a newly allocated
+value (unless nesting is involved)).</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+If a value is short then X = 0
+</p>
+</li>
+<li>
+<p>
+otherwise X = N × Ce, where
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+N is the number of ravel elements (i.e. ⍴,VALUE), and
+</p>
+</li>
+<li>
+<p>
+Ce is the size of a ravel Cell as above.
+</p>
+</li>
+</ul></div>
+</li>
+</ul></div>
+<div class="paragraph"><p><strong>Note:</strong> In the classical APL world of ISO 8485, all ravel elements of an APL
+value had the same type like bit, 8-bit char, 32-bit integer, or float and the
+ravel was densely packet. Accessing a particular element V[n] of a value V was
+a fast constant time operation, which was internally performed very
+frequently. Many APL primitive functions (with the noteworthy exception of
+scalar functions) need to perform multiple computations of V[n] for one
+of their arguments V.</p></div>
+<div class="paragraph"><p>In ISO 13751 the concept of mixed values was introduced, In a mixed value
+different ravel elements can have different types, so that the type becomes a
+property of each ravel element of a value instead of a property of the value
+itself. The implementer of ISO 13751 then had different alternatives (and
+possibly combinations of them) to deal with mixed values:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Leave the existing bit-, byte-, integer- and float-arrays as they
+  are and add a new kind of mixed-arrays. This was a reasonable approach for
+  those who had a code base from ISO 8485 already and who wanted to extend
+  that code base to ISO 13751.
+</p>
+</li>
+<li>
+<p>
+Make the ravel elements pointers to a different location that contains the
+  real ravel elements. Since all pointers have the same size, the constant time
+  access to arbitrary ravel elements would remain. The performance cost
+  would be somewhat higher due to:
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+the additional indirection via the pointers, and
+</p>
+</li>
+<li>
+<p>
+possibly one more memory allocation per ravel element.
+  While the cost for the additional indirection would probably be more than
+  compensated by the reduced access time, the cost for additional memory
+  allocations could have become a major headache.
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+Make the ravel elements virtual objects that all have the same size. That
+  means instead of primitive functions working with pointers to ravel
+  elements, the ravel elements would point to the functions that are
+  appropriate for their type. On one hand this approach wastes quite some
+  memory because the largest possible type (i.e. complex numbers) determines
+  the size of all ravel cells including those that would fit in far fewer
+  bytes. On the other hand there are quite a few advantages:
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+The the same size of all elements causes V[n] to take constant time,
+</p>
+</li>
+<li>
+<p>
+The indexed assignment of e.g. a single element (of a different type) to a
+   non-mixed array would also take (constant time (in option 1 above the entire
+   array would have needed to be converted from non-mixed to mixed)).
+</p>
+</li>
+<li>
+<p>
+The number of different array types would be reduced to 1 instead of being
+   increased from 5 to 6 (bit, byte, integer, float, complex, and mixed). This
+   in turn makes a huge number of type-checks in the dyadic APL primitives
+   obsolete. Since a virtual cell knows its own type, it only needs to check
+   the type of the other cell(s) in a dyadic operation.
+</p>
+</li>
+<li>
+<p>
+The "wasted" space could be used for other features at no extra cost such as:
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+64-bit integers instead of 32-bit Integers,
+</p>
+</li>
+<li>
+<p>
+rational number arithmetic for floating point numbers
+</p>
+</li>
+</ul></div>
+</li>
+</ul></div>
+</li>
+</ul></div>
+<div class="paragraph"><p>Since GNU APL was to be designed from scratch without having a  prior code base,
+the first option was ruled out almost immediately. The second option was
+briefly considered, but then ruled out as well because code size for the
+second option was expected to be significantly larger than for the third
+option.</p></div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_summary">Summary</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>The discussion of sizes so far can be summarized as:</p></div>
+<div class="paragraph"><p><strong>Corollary:</strong> For a typical APL program on a typical computer, the only items
+of concern in the context of memory management are APL values.</p></div>
+<div class="paragraph"><p><strong>Note:</strong> The default values of system variable ⎕SYL (aka. system limits)
+guarantee to some extent that an APL program behaves like a typical APL
+program,</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_how_the_available_memory_is_estimated">How the Available Memory is Estimated</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_history">History</h3>
+<div class="paragraph"><p>In the good old days of CP/M and friends, say 1975, memory management was
+rather simple. The process running an APL interpreter would know how much
+memory was reserved (and therefore available for it) and it could use that
+memory without restrictions. The amount of memory (say <strong>initial-⎕WA</strong>) that
+the process could use was simply:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong>initial-⎕WA = top-of-memory - top-of-used-memory</strong>
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>This value was determined at the start-up of the interpreter (where the mallow()
+pool was essentially empty) and the interpreter would keep track of the memory
+that it allocated after that, say <strong>memory-used</strong>. So printing ⎕WA at any time
+would essentially show <strong>initial-⎕WA - memory-used</strong>. And that was it.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_present_memory_management">Present memory management</h3>
+<div class="paragraph"><p>Since then a number of things have changed. The changes are in general
+advantageous, but also cause trouble in very specific situations. The main
+differences, as seen by an application like GNU APL are:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Change from physical to virtual memory. These days the memory allocated by
+  malloc() is virtual. Under <strong>normal</strong> circumstances the application need not
+  care about this difference, but in some special cases it is negatively
+  affected (and can then do very little about it).
+</p>
+</li>
+<li>
+<p>
+A direct consequence of virtual memory is that the size of it is no longer
+  determined by the physical memory available in a computer, but by other
+  properties like the number of bits in the virtual memory addresses. This
+  makes it impossible to determine initial-⎕WA (more precisely: ⎕WA is no
+  longer a constant but becomes dependent of what happens not only in the APL
+  interpreter itself but also in other processes and/or in the kernel.
+</p>
+</li>
+<li>
+<p>
+Over-commitment: Modern operating systems return far more virtual memory to
+  applications than they really have in terms of physical memory. The idea is
+  that not all applications reach their maximum need for memory a the same
+  time, so that the same piece of physical memory can be used by different
+  applications (or by the kernel for that matter) at different times.
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p><strong>Corollary 1:</strong> In the old days, the memory that an applications has obtained
+from the kernel was a <strong>guarantee</strong>. These day it is merely a <strong>promise</strong> which
+<strong>normally</strong> kept but may fail with a small though non-zero probability.</p></div>
+<div class="paragraph"><p><strong>Corollary 2:</strong> As far as GNU APL is concerned, GNU APL does not (and actually
+cannot) guarantee proper operation if the kernel reaches the limit of its
+physical memory. Some error handling mechanisms, in particular WS full errors,
+may fail in a non-graceful fashion - including immediate termination of the
+GNU APL process without any warnings.</p></div>
+<div class="paragraph"><p>Although a crash of GNU APL cannot be prevented in general. one can decrease
+the probability of such crashes by taking counter-measures beforehand. Most GNU
+APL users will not need this (see <strong>normal</strong> above), but those facing problems
+with improper WS full handling should read on.</p></div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_improving_the_gnu_apl_ws_full_handling">Improving the GNU APL WS full handling</h2>
+<div class="sectionbody">
+<div class="sect2">
+<h3 id="_the_oom_handler">The OOM handler</h3>
+<div class="paragraph"><p>One enemy of GNU APL is the kernel&#8217;s OOM (out-of-memory) handler. The OOM
+handler is invoked when the kernel needs (physical) memory and has none. It
+then kills one or more running processes in order to claim their memory back.
+The processes that are killed (un-gracefully) may or may not be the process(es)
+that have caused the shortage of memory. That is:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+GNU APL may be killed by some other (unrelated) process or interrupt that
+  has requested memory, or
+</p>
+</li>
+<li>
+<p>
+some other (unrelated) process may be killed by a memory request from GNU
+  APL, or
+</p>
+</li>
+<li>
+<p>
+GNU APL is killed by a memory request from itself.
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>It should be clear that the first two cases are very difficult to reproduce.
+The third case is much easier by creating a very large APL value. It is also
+the case that has been observed in reality.</p></div>
+<div class="paragraph"><p>In GNU/Linux one can protect individual processes from being killed by the
+OOM handler with the following command (as root; &lt;PID&gt; is the process ID of
+the process to be protected:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>echo -17 &gt; /proc/&lt;PID&gt;/oom_adj</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>The OOM handler can also be disabled entirely with</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>sysctl vm.overcommit_memory=2</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>or:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>echo "vm.overcommit_memory=2" &gt;&gt; /etc/sysctl.conf</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p><strong>Warning:</strong> These settings can seriously impact the stability of the operating
+system and should not be used on machines whose availability is a concern.
+There is no point in sacrificing the stability of a system for the stability of
+a process running on that system.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_using_system_limits">Using System Limits</h3>
+<div class="paragraph"><p>Instead of disabling the OOM handler, one should use methods that prevent GNU
+APL from requesting too much memory. so that the OOM handler is not invoked
+in the first place (at least not from GNU APL). There are several ⎕SYL (aka.
+system limit) entries that can be set by an APL program in order to prevent
+GNU APL from requesting too much memory. Some of them have to be combined
+with other to achieve full protection.</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+⎕SYL[1;] limits the depth of the )SI stack and therefore the amount of
+  memory spent for function calls. Referring to Table 2 above, <strong>⎕SYL[1;2]←1000</strong>
+  will throw a LIMIT ERROR if the )SI stack grows above 3 Megabytes (32-bit
+  systems) or 4 Megabytes (64-bit systems).
+</p>
+</li>
+<li>
+<p>
+⎕SYL[2;] limits the number of APL values. <strong>⎕SYL[2;2]←1000</strong> will throw a
+  LIMIT ERROR when more than 1000 APL values (variables as well as
+  intermediate results) are created. Referring to Table 2 above, this
+  corresponds to 372 kByte on 32-bit systems, or 456 kByte on 64-bit systems.
+  Note that the space for localized variables of defined functions belongs to
+  ⎕SYL[2;] and not to ⎕SYL[1;].
+</p>
+</li>
+<li>
+<p>
+⎕SYL[3;] limits the number of ravel elements in APL values.
+  <strong>⎕SYL[3;2]←1000000</strong> will throw a LIMIT ERROR before more than 20 MByte on
+  32-bit systems, or more than 24 MByte on 64-bit systems is requested.
+</p>
+</li>
+<li>
+<p>
+Finally, ⎕SYL[31 32;] define a safety margin that is is explained below.
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>In short, ⎕SYL[1;] protects primarily against too deep recursion, which is most
+likely caused by a programming fault. ⎕SYL[2;] protects against too many APL
+values, and ⎕SYL[2;] protects against too large APL values.</p></div>
+<div class="paragraph"><p>Like WS FULL and other APL errors, hitting a system limit brings the
+interpreter back to immediate execution (interactive) mode. If one wants to
+handle the situation programmatically, one can catch the limit error with ⎕EA,
+⎕EB, or ⎕EC.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_analyzing_proc_meminfo">Analyzing /proc/meminfo</h3>
+<div class="paragraph"><p>On a GNU/Linux machine, the file <strong>/proc/meminfo</strong> provides quite useful
+information about the usage of memory at the point in time when /proc/meminfo
+is read. Before setting system limits as described above, one should consult
+/proc/meminfo to see how the memory is distributed and then set the limits
+accordingly.</p></div>
+<div class="paragraph"><p>Ideally <strong>/proc/meminfo</strong> shows something like:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>MemTotal:         185736 kB
+MemFree:           12660 kB
+MemAvailable:     126264 kB
+Buffers:           74704 kB
+Cached:            54732 kB</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>In that case <strong>MemAvailable:</strong> is the value on which the system limits settings
+should be based. On older GNU/Linux machines <strong>MemAvailable:</strong> may not be
+displayed. In that case <strong>MemFree: + Cached:</strong> can be used as a work-around.</p></div>
+<div class="paragraph"><p>The actual implementation of <strong>MemAvailable:</strong> by the kernel is quite complex
+(more than simply adding <strong>MemFree:</strong> and <strong>Cached:</strong>). For that reason, even if
+<strong>MemAvailable:</strong> were available on all GNU/Linux machines it would still
+be impossible to call it before each creation of an APL value.</p></div>
+<div class="paragraph"><p>Instead, GNU APL uses the following simple algorithm:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+After the interpreter has started, compute <strong>total_memory</strong> as follows:
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+If the process that runs the interpreter has a limit set on the amount of
+   its virtual memory, then the interpreter assumes that that amount of memory
+   will be available and sets <strong>total_memory</strong> to that limit. In this case
+   <strong>/proc/meminfo</strong> is not used.
+</p>
+</li>
+<li>
+<p>
+Otherwise (i.e. the virtual memory for the process is unlimited) the
+   interpreter consults <strong>/proc/meminfo</strong> and sets <strong>total_memory</strong> to either
+   <strong>MemAvailable:</strong> (if present) or else to <strong>MemFree: + Cached:</strong>.
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+As new APL values are created and destroyed in the course of running APL
+  programs, the amount of memory allocated for them is tracked in, say,
+  <strong>used_memory</strong>.
+</p>
+</li>
+<li>
+<p>
+Before requesting new memory of, say, size <strong>new</strong>, GNU APL checks that
+</p>
+</li>
+</ul></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>   total_memory_1 ≥ used_memory + new + ⎕WA-margin</code>
+
+</pre>
+</div></div>
+<div class="ulist"><ul>
+<li>
+<p>
+In this check <strong>total_memory_1</strong> is <strong>⎕SYL[32;2]</strong> percent of <strong>total_memory</strong>
+  above, and reduced by <strong>⎕SYL[31;2]</strong>. The reason for the scaling by
+  <strong>⎕SYL[32;2]</strong> is that malloc() usually requests slightly more memory from
+  the kernel than the application had requested from malloc().
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+If that check fails then WS FULL is raised,
+</p>
+</li>
+<li>
+<p>
+otherwise the request is forwarded to malloc() and from there possibly
+   to the kernel.
+</p>
+</li>
+</ul></div>
+</li>
+</ul></div>
+<div class="paragraph"><p>The ⎕WA-margin currently has a default value of 0, but can be changed via</p></div>
+</div>
+<div class="sect2">
+<h3 id="_hints_for_gnu_apl_users">Hints for GNU APL Users</h3>
+<div class="sect3">
+<h4 id="_setting_a_memory_limit">Setting a memory limit</h4>
+<div class="paragraph"><p>If stability of a system is a concern, then setting memory limits for
+processes is normally a good idea. The command for doing that is differs
+between shells; in <strong>bash</strong> you can start GNU APL with a virtual memory limit
+of like this:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>ulimit -v 1000000
+apl</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>The unis is kB, so that the command above will set the limit to 1 GB. The
+limit remains in force for all subsequent commands and can be removed like
+this:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>ulimit -v unlimited
+apl</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p><strong>Note:</strong> setting memory limits via <strong>ulimit</strong> as such does not directly solve the
+problem that a process may have when it reaches the limit. However, it
+helps a procxss in predicting when the limit will be reached.</p></div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_32_bit_gnu_linux">32-bit GNU/Linux</h3>
+<div class="paragraph"><p>On 32-bit machines there is a per process memory limit of about 3 GByte. If
+the memory of a machines is, say, 8 GB or more then one can have several
+processes with each process allocating up to 3 GByte as long as the memory
+shown in <strong>/proc/meminfo</strong> is not exceeded.</p></div>
+<div class="paragraph"><p>If GNU APL sees a <strong>total_memory</strong> of more than 3 GB in the analysis of
+<strong>/proc/meminfo</strong>, then it reduces <strong>total_memory</strong> to about 3 GB. if it is
+running on a 32-bit kernel. 64-bit machines have a similar limit, but the
+limit is so high that is is not relevant in practice.</p></div>
+<div class="paragraph"><p>The safety margin <strong>(total_memory_1</strong> - <strong>total_memory)</strong> that results from
+<strong>⎕SYL[31 32;2]</strong> remains in effect so that the total memory that an APL program
+can obtain is somewhere below 3 GB.</p></div>
+<div class="sect3">
+<h4 id="_troubleshooting_ws_full_problems">Troubleshooting WS FULL problems</h4>
+<div class="paragraph"><p>For debugging purposes the safety margin can be disabled in APL like this:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>      ⎕SYL[31;2] ← 1000000         ⍝ smallest margin (1 MB)
+      ⎕SYL[32;2] ← 200             ⍝ far above available</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>WS FULL can occur in very many places of the interpreter. To find the exact
+position where a WS FULL was generated, some related logging facilities can be
+turned on:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>      ]log 25
+      ]log 26
+      ]log 45</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>On a 32-bit machine A WS FULL can be reliably produced like this (the example
+was kindly provided by Christian Robert):</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>      N←5000000    ⍝ 32-bit; use a larger value for 64-bit
+      A←⊂'0123456789ABCDEF
+      ↑↑ N ⍴ A      ⍝ trigger WS FULL</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>This example is of particular interest because, depending upon variable <strong>N</strong>
+it creates two different challenges for the kernel. One is a big allocation
+when the process is already near starvation and one is a small allocation
+that fails.</p></div>
+<div class="paragraph"><p>in both cases the WS FULL is caused by <strong>N ⍴ A</strong>. Because A is a scalar (due to
+⊂), all ravel elements of the result are nested values. Therefore  the
+computation of <strong>N ⍴ A</strong> creates exactly 1+N values: a big value for the result
+itself and N small nested values the the ravel of the result.</p></div>
+<div class="paragraph"><p>Referring to Table 2, the variable <strong>A</strong> (and therefore each nested value of the
+result needs <strong>372 + 16*20 = 692</strong> bytes. The top-level of the result requires
+<strong>372 + N*20</strong> bytes. Let <strong>F</strong> be the amount of (free) memory that could be
+obtained from malloc(). Then:</p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+if <strong>F &lt; 372 + N*20</strong> then the allocation of the top-level value fails,
+</p>
+</li>
+<li>
+<p>
+else if <strong>F &lt; 372 + N*20 + N*692</strong> then the allocation of the top-level value
+  succeeds, but the allocation of one of the nested sub-values fails,
+</p>
+</li>
+<li>
+<p>
+else all allocations succeed and <strong>N ⍴ A</strong> succeeds as expected.
+</p>
+</li>
+</ol></div>
+<div class="paragraph"><p>The less than obvious difference between the first and the second case is the
+amount of free memory at the point in time where the allocation failed:
+1. if the first (big) allocation fails, then the free memory is still F,
+2. if one of the subsequent (small) allocations fail then (since the previous
+   allocations have succeeded) the free memory is now less that the requested
+   size, regardless how large F was initially. In our example F would be less
+   than 692 bytes (in theory) or less than about 1024 (in practice because
+   malloc allocates the next power of 2).</p></div>
+<div class="paragraph"><p>Exception handling with only 1024 bytes left can fail as can be demonstrate on a
+32-bit machine quite easily. The following examples show both cases (with
+safety margin disabled in order to allow near-memory-starvation.</p></div>
+</div>
+<div class="sect3">
+<h4 id="_example_1_ws_full_with_sufficient_free_memory_left">Example 1: WS FULL with sufficient free memory left</h4>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>      ⍝ enable relevant logging facilities
+      ]log 25
+    Log facility 'more verbose errors                 ' is now ON
+      ]log 26
+    Log facility 'details of error throwing           ' is now ON
+      ]log 45
+    Log facility 'details of Value allocation         ' is now ON
+
+      ⍝ disable safety margin
+      ⎕SYL[31 32;2]←1000000 200
+      ⎕SYL[31 32;]
+ ⎕WA safety margin (bytes) 1000000
+ ⎕WA memory scale (%)          200
+
+      A←⊂'0123456789ABCDEF'   ⍝ 692 bytes
+      N←200000000             ⍝ for 200 Mio ravel Cells
+      ↑↑ N⍴A                  ⍝ 4 GB top-level + 138.4 GB nested sub-values
+
+throwing WS FULL at PrimitiveFunction.cc:230
+
+ ----------------------------------------
+ -- Stack trace at Error.cc:184
+ ----------------------------------------
+0xB7160AF3 __libc_start_main
+0x8092998  main
+0x8247A9D   Workspace::immediate_execution(bool)
+0x80EF330    Command::process_line()
+0x80EFCAB     Command::do_APL_expression(UCS_string&amp;)
+0x80EF459      Command::finish_context()
+0x80FB64D       Executable::execute_body() const
+0x81DBE31        StateIndicator::run()
+0x8149E2C         Prefix::reduce_statements()
+0x8146913          Prefix::reduce_A_F_B_()
+0x815579D           Bif_F12_RHO::eval_AB(Value_P, Value_P)
+0x8155463            Bif_F12_RHO::do_reshape(Shape const&amp;, Value const&amp;)
+0x80B5EE6             Value_P::Value_P(Shape const&amp;, char const*)
+0x8245B9A              Value::init_ravel()
+0x80FA35B               throw_apl_error(ErrorCode, char const*)
+========================================
+WS FULL
+      ↑↑N⍴A
+        ^ ^
+Ravel allocation failed
+
+      )MORE
+new Value(PrimitiveFunction.cc:230) failed (APL error in ravel allocation)
+      throwing WS FULL at Value_P.icc:227</code>
+
+</pre>
+</div></div>
+</div>
+<div class="sect3">
+<h4 id="_example_2_ws_full_with_very_little_free_memory_left">Example 2: WS FULL with very little free memory left</h4>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>      ⍝ enable relevant logging facilities
+      ]log 25
+    Log facility 'more verbose errors                 ' is now ON
+      ]log 26
+    Log facility 'details of error throwing           ' is now ON
+      ]log 45
+    Log facility 'details of Value allocation         ' is now ON
+
+      ⍝ disable safety margin
+      ⎕SYL[31 32;2]←1000000 200
+      ⎕SYL[31 32;]
+ ⎕WA safety margin (bytes) 1000000
+ ⎕WA memory scale (%)          200
+
+      A←⊂'0123456789ABCDEF'   ⍝ 692 bytes
+      N←20000000              ⍝ for 20 Mio ravel Cells
+      ↑↑ N⍴A                  ⍝ 0,4 GB top-level + 13.84 GB nested sub-values
+Value_P::Value_P(const Shape &amp; shape, const char * loc) failed at
+Value_P.icc:235 (caller: PrimitiveFunction.cc:240)
+ what: std::bad_alloc
+ initial sbrk(): 0xa28a000
+ current sbrk(): 0x9eaec000
+ alloc_size:     0x140 (320)
+  used memory:   0xbbb495c0 (3149174208)
+
+throwing WS FULL at Value.cc:233
+
+ ----------------------------------------
+ -- Stack trace at Error.cc:184
+ ----------------------------------------
+backtrace_symbols() failed. Using backtrace_symbols_fd() instead...
+
+./apl[0x809a380]
+ /lib/i386-linux-gnu/libc.so.6(__libc_start_main+0xf3)[0xb70c0af3]
+  ./apl(main+0x48)[0x8092998]
+   ./apl(_ZN9Workspace19immediate_executionEb+0x1d)[0x8247a9d]
+    ./apl(_ZN7Command12process_lineEv+0x460)[0x80ef330]
+     ./apl(_ZN7Command17do_APL_expressionER10UCS_string+0x6b)[0x80efcab]
+      ./apl(_ZN7Command14finish_contextEv+0x29)[0x80ef459]
+       ./apl(_ZNK10Executable12execute_bodyEv+0x1d)[0x80fb64d]
+        ./apl(_ZN14StateIndicator3runEv+0x21)[0x81dbe31]
+         ./apl(_ZN6Prefix17reduce_statementsEv+0x22c)[0x8149e2c]
+          ./apl(_ZN6Prefix13reduce_A_F_B_Ev+0xd3)[0x8146913]
+           ./apl(_ZN11Bif_F12_RHO7eval_ABE7Value_PS0_+0xad)[0x815579d]
+            ./apl(_ZN11Bif_F12_RHO10do_reshapeERK5ShapeRK5Value+0x258)[0x8155678]
+             ./apl(_ZNK11PointerCell10init_otherEPvR5ValuePKc+0x49)[0x814c6e9]
+              ./apl(_ZNK5Value5cloneEPKc+0x30)[0x82438a0]
+               ./apl(_ZN7Value_PC1ERK5ShapePKc+0x13e)[0x80b5fae]
+                ./apl(_ZN5Value15catch_exceptionERKSt9exceptionPKcS4_S4_+0x31e)[0x823c93e]
+                 ./apl(_Z15throw_apl_error9ErrorCodePKc+0x6b)[0x80fa35b]
+========================================
+WS FULL+
+      ↑↑N⍴A
+        ^ ^
+
+      )MORE
+new Value(const Shape &amp; shape, const char * loc) failed (std::bad_alloc)
+      throwing WS FULL at Value_P.icc:227</code>
+
+</pre>
+</div></div>
+</div>
+<div class="sect3">
+<h4 id="_differences_between_example_1_and_example_2">Differences between Example 1 and Example 2</h4>
+<div class="ulist"><ul>
+<li>
+<p>
+Execution time: the second example uses noticeably more time before the WS
+  FULL occurs. In this time the interpreter creates a large number of
+  sub-values until the memory is exhausted.
+</p>
+</li>
+<li>
+<p>
+The stack dumps differ. The pretty-printing of C++ function names requires
+  extra memory, In example 2 that extra memory is not available so that
+  backtrace_symbols() fails (and the interpreter then uses a function that
+needs less memory):
+</p>
+</li>
+</ul></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code> ----------------------------------------
+ -- Stack trace at Error.cc:184
+ ----------------------------------------
+backtrace_symbols() failed. Using backtrace_symbols_fd() instead...</code>
+
+</pre>
+</div></div>
+<div class="ulist"><ul>
+<li>
+<p>
+The WS FULL is thrown from different locations. PrimitiveFunction.cc:230 is
+  in the implementation of dyadic ⍴, while Value.cc:233 is the exception
+  handler for <strong>std::bad_alloc</strong> (see also <strong>what:</strong> in the debug printout),
+</p>
+</li>
+</ul></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>throwing WS FULL at PrimitiveFunction.cc:230</code>
+
+</pre>
+</div></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>throwing WS FULL at Value.cc:233</code>
+
+</pre>
+</div></div>
+<div class="ulist"><ul>
+<li>
+<p>
+The )MORE information&#8217;s in the two examples differ.  The term <strong>Ravel
+  allocation</strong> in the printout of example 1 refers to the allocation of the
+(big) top-level ravel.
+</p>
+</li>
+</ul></div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_final_remarks">Final Remarks</h3>
+<div class="paragraph"><p>The exact behavior of processes with too little memory is generally difficult
+to predict. While the A⍴N example given above is understood to some extent,
+there are other cases such as out-of-memory when the process stack is
+exhausted that were not yet reported.</p></div>
+<div class="paragraph"><p>We are trying our best to fix such cases, but when reporting them as errors
+on bug-apl please consider the following.</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+It helps a lot if you can provide reliable way to reproduce the problem.
+  Most of the time for fixing an error is spent on reproducing it.
+</p>
+</li>
+<li>
+<p>
+Check that the problem cannot be fixed by setting memory limits. As explained
+  above there are some boundary conditions from the operating systems that
+  cannot be fixed (or even properly handled) by a process. Remember the
+  existing tools for that:
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+ulimit to protect processes from each other,
+</p>
+</li>
+<li>
+<p>
+⎕SYL[1 2 3;2] to limit what a process may try allocate, and
+</p>
+</li>
+<li>
+<p>
+⎕SYL[31 32;2] to avoid near-memory-starvation situations in the WS FULL
+   exception handling
+</p>
+</li>
+</ul></div>
+</li>
+</ul></div>
+<div class="paragraph"><p>Thanks for using GNU APL.</p></div>
+</div>
+</div>
+</div>
+</div>
+<div id="footnotes"><hr /></div>
+<div id="footer">
+<div id="footer-text">
+Last updated 2019-01-28 15:21:46 CET
+</div>
+</div>
+</body>
+</html>

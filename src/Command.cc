@@ -1680,7 +1680,7 @@ Command::cmd_OFF(int exit_val)
 
 rlimit rl;
    getrlimit(RLIMIT_AS, &rl);
-   rl.rlim_cur = initial_rlimit;
+   rl.rlim_cur = Quad_WA::initial_rlimit;
    setrlimit(RLIMIT_AS, &rl);
 
    exit(exit_val);

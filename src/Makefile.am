@@ -99,6 +99,7 @@ Quad_RL.cc					Quad_RL.hh		\
 Quad_SQL.cc					Quad_SQL.hh		\
 Quad_SVx.cc					Quad_SVx.hh		\
 Quad_TF.cc					Quad_TF.hh		\
+Quad_WA.cc					Quad_WA.hh		\
 Parallel.cc					Parallel.hh		\
 Performance.cc		Performance.def		Performance.hh		\
 RealCell.cc					RealCell.hh		\

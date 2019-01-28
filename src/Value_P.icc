@@ -224,7 +224,11 @@ inline Value_P::Value_P(const Shape & shape, const char * loc)
 {
 const char * args = "const Shape & shape, const char * loc";
    value_p = 0;
-   if (Value::check_WS_FULL(args, shape.get_volume(), loc))   WS_FULL;
+   if (Value::check_WS_FULL(args, shape.get_volume(), loc))
+      {
+        MORE_ERROR() << "WS FULL detected by Value::check_WS_FULL()";
+        WS_FULL;
+      }
 
    try                           { value_p = new Value(shape, loc); }
    catch (const Error & error)   { Value::catch_Error(error, loc, LOC);       }

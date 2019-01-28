@@ -614,6 +614,9 @@ protected:
    /// number values that have been deleted
    static int deleted_values_count;
 
+   /// the size of the next allocation
+   static uint64_t alloc_size;
+
    /// max. number values that have been deleted
    enum { deleted_values_MAX = 10000 };
 

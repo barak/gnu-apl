@@ -350,12 +350,6 @@ extern ostream & get_CERR();
 
 //-----------------------------------------------------------------------------
 
-/// The total memory that we have.
-extern uint64_t total_memory;
-
-/// the memory limit at startup
-extern rlim_t initial_rlimit;
-
 #ifdef VALUE_HISTORY_WANTED
 
    enum { VALUEHISTORY_SIZE = 100000 };

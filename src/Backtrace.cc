@@ -286,9 +286,14 @@ char ** strings = backtrace_symbols(buffer, size);
 
    if (strings == 0)
       {
-        cerr << "backtrace_symbols() failed. using backtrace_symbols_fd()"
-                " instead" << endl << endl;
-        backtrace_symbols_fd(buffer, size, STDERR_FILENO);
+        cerr << "backtrace_symbols() failed. Using backtrace_symbols_fd()"
+                " instead..." << endl << endl;
+        // backtrace_symbols_fd(buffer, size, STDERR_FILENO);
+        for (int b = size - 1; b > 0; --b)
+            {
+              for (int s = b + 1; s < size; ++s)   cerr << " ";
+                  backtrace_symbols_fd(buffer + b, 1, STDERR_FILENO);
+            }
         cerr << "========================================" << endl;
         return;
       }

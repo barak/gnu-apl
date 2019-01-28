@@ -31,6 +31,7 @@
 #include "Quad_RE.hh"
 #include "Quad_RL.hh"
 #include "Quad_SVx.hh"
+#include "Quad_WA.hh"
 #include "ScalarFunction.hh"
 #include "Simple_string.hh"
 #include "Symbol.hh"

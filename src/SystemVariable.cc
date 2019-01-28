@@ -57,7 +57,6 @@ ShapeItem Quad_SYL::ravel_count_limit = 0;
 ShapeItem Quad_SYL::print_length_limit = 0;
 
 Unicode Quad_AV::qav[MAX_AV];
-int64_t Quad_WA::WA_margin = 100000000;
 
 //=============================================================================
 void
@@ -950,6 +949,12 @@ const APL_Integer qio = Workspace::get_IO();
              if (b < 1000000)   DOMAIN_ERROR;
              Quad_WA::WA_margin = b;
            }
+        else if (x == SYL_WA_SCALE)   // ⎕WA memory scale (45% - 200% %
+           {
+             if (b <  45)   DOMAIN_ERROR;
+             if (b > 200)   DOMAIN_ERROR;
+             Quad_WA::WA_scale = b;
+           }
         else
            {
              INDEX_ERROR;
@@ -1136,20 +1141,6 @@ Value_P Z(LOC);
    new (Z->next_ravel())   IntCell(user_count);
    Z->check_value(LOC);
    return Z;
-}
-//=============================================================================
-Quad_WA::Quad_WA()
-   : RO_SystemVariable(ID::Quad_WA)
-{
-   Symbol::assign(IntScalar(0, LOC), false, LOC);
-}
-//-----------------------------------------------------------------------------
-Value_P
-Quad_WA::get_apl_value() const
-{
-   return IntScalar(total_memory -
-                    (Value::total_ravel_count * sizeof(Cell)
-                    + Value::value_count * sizeof(Value)), LOC);
 }
 //=============================================================================
 Quad_X::Quad_X()

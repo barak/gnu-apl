@@ -43,6 +43,8 @@
 #include "ValueHistory.hh"
 #include "Workspace.hh"
 
+extern uint64_t top_of_memory();
+
 uint64_t Value::value_count = 0;
 uint64_t Value::total_ravel_count = 0;
 
@@ -52,6 +54,8 @@ void * Value::deleted_values = 0;
 int Value::deleted_values_count = 0;
 uint64_t Value::fast_new = 0;
 uint64_t Value::slow_new = 0;
+uint64_t Value::alloc_size = 0;
+
 
 //-----------------------------------------------------------------------------
 void
@@ -118,7 +122,8 @@ const ShapeItem length = shape.get_volume();
         set_interrupt_raised(LOC);
       }
 
-   ravel = reinterpret_cast<Cell *>(new char[length * sizeof(Cell)]);
+   alloc_size = length * sizeof(Cell);
+   ravel = reinterpret_cast<Cell *>(new char[alloc_size]);
 
 /*
    ravel = 0;   // assume new() fails
@@ -172,21 +177,25 @@ const ShapeItem length = shape.get_volume();
 }
 //-----------------------------------------------------------------------------
 bool
-Value::check_WS_FULL(const char * args, ShapeItem cell_count, const char * loc)
+Value::check_WS_FULL(const char * args, ShapeItem requested_cell_count,
+                     const char * loc)
 {
-const uint64_t used_memory = (total_ravel_count + cell_count) * sizeof(Cell)
-                            + value_count * sizeof(Value);
-enum { margin = 100000000 };
+const uint64_t used_memory
+               = (total_ravel_count + requested_cell_count) * sizeof(Cell)
+               + (value_count + 1) * sizeof(Value)
+               + Workspace::SI_entry_count() * sizeof(StateIndicator);
 
-   if (total_memory > (used_memory + margin))   return false;   // OK
+   if ((Quad_WA::total_memory*Quad_WA::WA_scale/100) >
+       (used_memory + Quad_WA::WA_margin))   return false;   // OK
 
-   Log(LOG_Value_alloc)
-      CERR << "    value_count:       " << value_count             << endl
-           << "    total_ravel_count: " << total_ravel_count       << endl
-           << "    new cell_count:    " << cell_count              << endl
-           << "    total_memory:      " << total_memory            << endl
-           << "    used_memory:       " << used_memory             << endl
-           << "    margin:            " << margin                  << endl
+   Log(LOG_Value_alloc) CERR
+   << "    value_count:       " << value_count             << endl
+   << "    total_ravel_count: " << total_ravel_count       << " cells" << endl
+   << "    new cell_count:    " << requested_cell_count    << " cells" << endl
+   << "    total_memory:      " << Quad_WA::total_memory   << " bytes" << endl
+   << "    used_memory:       " << used_memory             << " bytes" << endl
+   << "    ⎕WA margin:        " << Quad_WA::WA_margin      << " bytes" << endl
+   << "    ⎕WA scale:         " << Quad_WA::WA_scale       << "%" << endl
 
            << " at " << LOC << endl;
    return true;
@@ -196,7 +205,8 @@ void
 Value::catch_Error(const Error & error, const char * args, const char * loc)
 {
    Log(LOG_Value_alloc)   CERR << "Ravel allocation failed" << endl;
-   MORE_ERROR() << "new Value(" << args << ") failed (ravel allocation)";
+   MORE_ERROR() << "new Value(" << args
+                << ") failed (APL error in ravel allocation)";
    throw error;   // rethrow
 }
 //-----------------------------------------------------------------------------
@@ -204,10 +214,22 @@ void
 Value::catch_exception(const exception & ex, const char * args,
                       const char * caller,  const char * loc)
 {
+const uint64_t used_memory
+               = total_ravel_count * sizeof(Cell)
+               + value_count * sizeof(Value)
+               + Workspace::SI_entry_count() * sizeof(StateIndicator);
+
    CERR << "Value_P::Value_P(" << args << ") failed at " << loc
-        << " (caller: " << caller << ")" << endl
-        << " what: " << ex.what() << endl;
-   MORE_ERROR() << "new Value(" << args << ") failed";
+        << " (caller: "        << caller << ")" << endl
+        << " what: "           << ex.what() << endl
+        << " initial sbrk(): 0x" << hex << Quad_WA::initial_sbrk << endl
+        << " current sbrk(): 0x" << top_of_memory() << endl
+        << " alloc_size:     0x" << alloc_size << dec << " ("
+                                 << alloc_size << ")" << endl
+        << "  used memory:   0x" << hex  << used_memory << dec
+                                 << " (" << used_memory << ")" << endl;
+
+   MORE_ERROR() << "new Value(" << args << ") failed (" << ex.what() << ")";
    WS_FULL;
 }
 //-----------------------------------------------------------------------------
@@ -217,7 +239,7 @@ Value::catch_ANY(const char * args, const char * caller, const char * loc)
    Log(LOG_Value_alloc)
       CERR << "Value_P::Value_P(Shape " << args << " failed at " << loc
            << " (caller: " << caller << ")" << endl;
-   MORE_ERROR() << "new Value(" << args << ") failed";
+   MORE_ERROR() << "new Value(" << args << ") failed (ANY)";
    WS_FULL;
 }
 //-----------------------------------------------------------------------------
@@ -370,7 +392,8 @@ const ShapeItem length = nz_element_count();
    --value_count;
 
    if (ravel == 0)   return;   // new() failed
-   if (ravel != short_value)
+
+   if (ravel != short_value)   // long value
       {
         total_ravel_count -= length;
         delete [] ravel;

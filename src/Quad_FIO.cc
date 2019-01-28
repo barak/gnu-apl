@@ -45,7 +45,7 @@
 #include "Tokenizer.hh"
 #include "Workspace.hh"
 
-extern long long top_of_memory();
+extern uint64_t top_of_memory();
 
 Quad_FIO  Quad_FIO::_fun;
 Quad_FIO * Quad_FIO::fun = &Quad_FIO::_fun;
