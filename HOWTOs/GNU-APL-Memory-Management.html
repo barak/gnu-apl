@@ -1205,18 +1205,18 @@ from the kernel was a <strong>guarantee</strong>. These day it is merely a <stro
 <strong>normally</strong> kept but may fail with a small though non-zero probability.</p></div>
 <div class="paragraph"><p><strong>Corollary 2:</strong> As far as GNU APL is concerned, GNU APL does not (and actually
 cannot) guarantee proper operation if the kernel reaches the limit of its
-physical memory. Some error handling mechanisms, in particular WS full errors,
+physical memory. Some error handling mechanisms, in particular WS FULL errors,
 may fail in a non-graceful fashion - including immediate termination of the
 GNU APL process without any warnings.</p></div>
 <div class="paragraph"><p>Although a crash of GNU APL cannot be prevented in general. one can decrease
 the probability of such crashes by taking counter-measures beforehand. Most GNU
 APL users will not need this (see <strong>normal</strong> above), but those facing problems
-with improper WS full handling should read on.</p></div>
+with improper WS FULL handling should read on.</p></div>
 </div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_improving_the_gnu_apl_ws_full_handling">Improving the GNU APL WS full handling</h2>
+<h2 id="_improving_the_gnu_apl_ws_full_handling">Improving the GNU APL WS FULL handling</h2>
 <div class="sectionbody">
 <div class="sect2">
 <h3 id="_the_oom_handler">The OOM handler</h3>
@@ -1541,13 +1541,23 @@ else all allocations succeed and <strong>N ⍴ A</strong> succeeds as expected.
 </li>
 </ol></div>
 <div class="paragraph"><p>The less than obvious difference between the first and the second case is the
-amount of free memory at the point in time where the allocation failed:
-1. if the first (big) allocation fails, then the free memory is still F,
-2. if one of the subsequent (small) allocations fail then (since the previous
+amount of free memory at the point in time where the allocation failed:</p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+if the first (big) allocation fails, then the free memory is still F,
+</p>
+</li>
+<li>
+<p>
+if one of the subsequent (small) allocations fail then (since the previous
    allocations have succeeded) the free memory is now less that the requested
    size, regardless how large F was initially. In our example F would be less
    than 692 bytes (in theory) or less than about 1024 (in practice because
-   malloc allocates the next power of 2).</p></div>
+   malloc allocates the next power of 2).
+</p>
+</li>
+</ol></div>
 <div class="paragraph"><p>Exception handling with only 1024 bytes left can fail as can be demonstrate on a
 32-bit machine quite easily. The following examples show both cases (with
 safety margin disabled in order to allow near-memory-starvation.</p></div>
@@ -1773,7 +1783,7 @@ ulimit to protect processes from each other,
 </li>
 <li>
 <p>
-⎕SYL[1 2 3;2] to limit what a process may try allocate, and
+⎕SYL[1 2 3;2] to limit what the GNU APL interpreter may try allocate, and
 </p>
 </li>
 <li>
@@ -1793,7 +1803,7 @@ ulimit to protect processes from each other,
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
-Last updated 2019-01-28 15:21:46 CET
+Last updated 2019-01-28 15:37:24 CET
 </div>
 </div>
 </body>
