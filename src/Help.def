@@ -138,9 +138,15 @@ help_def(2, "⌈", "Maximum",                   "The greater value of A or B",  
 help_def(1, "⌊", "Floor",                     "Greatest integer less than or equal to B",                                                        "")
 help_def(2, "⌊", "Minimum",                   "The smaller value of A or B",                                                                     "")
 help_def(1, "∣", "Absolute value",            "Magnitude of B",                                                                                  "")
+// Note: ASCII | versus APL ∣
+help_def(1, "∣", "Absolute value",            "Magnitude of B",                                                                                  "")
 help_def(2, "∣", "Modulo",                    "R modulo A",                                                                                      "")
+help_def(2, "|", "Modulo",                    "R modulo A",                                                                                      "")
+// Note: ASCII ~ versus APL ∼
 help_def(1, "∼", "Not",                       "Boolean inverse: Z[i] is 1 - B[i], all B[i] must be 0 or 1",                                      "")
+help_def(1, "~", "Not",                       "Boolean inverse: Z[i] is 1 - B[i], all B[i] must be 0 or 1",                                      "")
 help_def(2, "∼", "Without",                   "Z is A with the values from B removed.",                                                          "")
+help_def(2, "~", "Without",                   "Z is A with the values from B removed.",                                                          "")
 help_def(1, "!", "Factorial",                 "Product of integers 1 to B",                                                                      "")
 help_def(2, "!", "Combinations",              "Number of combinations of B items taken A at a time",                                             "")
 help_def(2, "<", "Less than",                 "1 if A is less than B, 0 if not",                                                                 "")
