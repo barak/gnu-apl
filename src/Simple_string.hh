@@ -164,7 +164,11 @@ public:
       {
         Assert(items_valid > 0);
         --items_valid;
-        if (has_destructor)  (items + items_valid)->~T();
+        if (has_destructor)
+           {
+             (items + items_valid)->~T();
+             memset(items + items_valid, 0, sizeof(T));
+           }
       }
 
    /// decrease size to \b new_size
@@ -178,23 +182,15 @@ public:
    /// erase \b one item, at \b pos
    void erase(ShapeItem pos)
       {
-        if (pos >= items_valid)   return;   // nothing to erase
+        Assert(pos < items_valid);
 
          const ShapeItem rest = items_valid - (pos + 1);
+         T * t = items + pos;
 
-         if (rest < 0)   // erase more than we have, i.e. no rest
-           {
-             shrink(pos);
-             return;
-           }
-
-         loop(r, rest)
-            {
-              T * t = items + pos + r;
-              t->~T();
-              new (t) T(items[pos + 1 + r]);
-            }
-         --items_valid;
+         t->~T();                               // destruct erased item
+         memmove(t, t + 1, rest * sizeof(T));   // copy remeining items down
+         memset(items + items_valid - 1, 0, sizeof(T));
+         --items_valid;   // not pop() !!!
       }
 
    /// extend allocated size

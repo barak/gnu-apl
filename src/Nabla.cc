@@ -738,13 +738,13 @@ const int idx_to = find_line(LineLabel(edit_to));
 
    modified = true;
 
-   if (edit_from == -1)   // delete single line
+   if (edit_from == -1)   // [∆N] : delete single line
       {
         lines.erase(idx_to);
         return 0;
       }
 
-   // delete multiple lines
+   // [N∆M] : delete multiple lines
    //
 const int idx_from = find_line(LineLabel(edit_from));
    if (idx_from == -1)       return "Bad line number M in [M∆N] ";
