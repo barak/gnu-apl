@@ -166,8 +166,9 @@ public:
         --items_valid;
         if (has_destructor)
            {
-             (items + items_valid)->~T();
-             memset(items + items_valid, 0, sizeof(T));
+             T * t = items + items_valid;
+             t->~T();
+             new (t) T();
            }
       }
 
@@ -184,13 +185,17 @@ public:
       {
         Assert(pos < items_valid);
 
-         const ShapeItem rest = items_valid - (pos + 1);
-         T * t = items + pos;
+        const ShapeItem rest = items_valid - (pos + 1);
+        T * t = items + pos;
+        t->~T();                               // destruct erased item
 
-         t->~T();                               // destruct erased item
-         memmove(t, t + 1, rest * sizeof(T));   // copy remeining items down
-         memset(items + items_valid - 1, 0, sizeof(T));
-         --items_valid;   // not pop() !!!
+        void * vp0 = t;                        // erased item
+        void * vp1 = t + 1;                    // next higher item
+        memmove(vp0, vp1, rest * sizeof(T));   // copy remaining items down
+
+        vp0 = items + items_valid - 1;
+        new (items + items_valid - 1) T();
+        --items_valid;   // not pop() !!!
       }
 
    /// extend allocated size
