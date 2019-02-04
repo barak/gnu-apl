@@ -739,18 +739,23 @@ Command::cmd_DOXY(ostream & out, UCS_string_vector & args)
 UTF8_string root("/tmp");
    if (args.size())   root = UTF8_string(args[0]);
 
-Doxy doxy(out, root);
-   doxy.gen();
+   try
+     {
+       Doxy doxy(out, root);
+       doxy.gen();
 
-   if (doxy.get_errors())
-      out << "Command ]DOXY failed (" << doxy.get_errors() << " errors)"
-          << endl;
-   else
-      out << "Command ]DOXY finished successfully." << endl
-          << "    The generated documentation was stored in directory "
-          << doxy.get_root_dir() << endl
-          << "    You may want to browse it from file://" << doxy.get_root_dir()
-          << "/index.html" << endl;
+       if (doxy.get_errors())
+          out << "Command ]DOXY failed (" << doxy.get_errors() << " errors)"
+              << endl;
+      else
+         out << "Command ]DOXY finished successfully." << endl
+             << "    The generated documentation was stored in directory "
+             << doxy.get_root_dir() << endl
+             << "    You may want to browse it from file://"
+             << doxy.get_root_dir()
+             << "/index.html" << endl;
+     }
+   catch (...) {}
 }
 //-----------------------------------------------------------------------------
 void 

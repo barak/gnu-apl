@@ -68,7 +68,6 @@ Workspace::push_SI(Executable * fun, const char * loc)
 {
    Assert1(fun);
 
-
    if (Quad_SYL::si_depth_limit && SI_top() &&
        Quad_SYL::si_depth_limit <= SI_top()->get_level())
       {
@@ -81,7 +80,45 @@ Workspace::push_SI(Executable * fun, const char * loc)
         set_interrupt_raised(LOC);
       }
 
-   the_workspace.top_SI = new StateIndicator(fun, SI_top());
+   if (Value::check_WS_FULL(__FUNCTION__, 1000, LOC))
+      {
+        if (SI_top() && SI_top()->get_executable() &&
+             the_workspace.SI_entry_count() > 100)
+            MORE_ERROR() <<
+          "Value::check_WS_FULL() complained when calling a defined function.\n"
+          "This was most likely caused by some infinite recursion involving "
+             << SI_top()->get_executable()->get_name();
+        else
+           MORE_ERROR() <<
+           "Value::check_WS_FULL() complained when calling a defined function";
+        WS_FULL;
+      }
+
+   try
+      {
+         StateIndicator * old_top = SI_top();
+         the_workspace.top_SI = new StateIndicator(fun, old_top);
+         if (the_workspace.top_SI == 0)
+            {
+              MORE_ERROR() <<
+              "malloc() → 0 when calling a defined function";
+              the_workspace.top_SI = old_top;
+              WS_FULL;
+            }
+      }
+   catch (const std::bad_alloc & e)
+      {
+         if (SI_top() && SI_top()->get_executable() &&
+             the_workspace.SI_entry_count() > 100)
+            MORE_ERROR() <<
+            "std::bad_alloc exception when calling a defined function\n"
+            "This was most likely caused by some infinite recursion involving "
+            << SI_top()->get_executable()->get_name();
+         else
+            MORE_ERROR() <<
+            "std::bad_alloc exception when calling a defined function";
+         WS_FULL;
+      }
 
    Log(LOG_StateIndicator__push_pop)
       {
@@ -201,7 +238,12 @@ Workspace::immediate_execution(bool exit_on_error)
             {
               CERR << "*** " << __FUNCTION__
                    << "() caught bad_alloc: " << e.what() << " ***" << endl;
-              BACKTRACE
+              if (the_workspace.SI_entry_count() > 100)
+                 CERR << ")SI depth is " << the_workspace.SI_entry_count()
+                      <<  "; )SIC is strongly recommended !!!"
+                      << endl;
+              try { WS_FULL } catch (...) {}
+              if (exit_on_error)   return Token(TOK_OFF);
             }
          catch (...)
             {
@@ -902,7 +944,7 @@ UTF8_string filename = LibPaths::get_lib_filename(libref, wsname, true,
 int dump_fd = -1;
 XML_Loading_Archive in(filename.c_str(), dump_fd);
 
-   if (dump_fd != -1)
+   if (dump_fd != -1)   // wsname.apl
       {
         the_workspace.clear_WS(out, true);
 
@@ -930,8 +972,9 @@ XML_Loading_Archive in(filename.c_str(), dump_fd);
         // we cant set ⎕LX because it was not executed yet.
         return;
       }
-   else
+   else   // wsname.xml
       {
+Q(filename)
         if (!in.is_open())   // open failed
            {
              out << ")LOAD " << wsname << " (file " << filename
