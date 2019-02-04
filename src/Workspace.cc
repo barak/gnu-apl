@@ -974,7 +974,6 @@ XML_Loading_Archive in(filename.c_str(), dump_fd);
       }
    else   // wsname.xml
       {
-Q(filename)
         if (!in.is_open())   // open failed
            {
              out << ")LOAD " << wsname << " (file " << filename
