@@ -65,7 +65,8 @@ struct UserPreferences
 #include "Security.def"
      multi_line_strings(true),
      multi_line_strings_3(true),
-     WINCH_sets_pw(false)
+     WINCH_sets_pw(false),
+     auto_OFF(false)
    { gettimeofday(&session_start, 0); }
 
    /// read a \b preference file and update parameters set there
@@ -209,6 +210,9 @@ struct UserPreferences
 
    /// true if the WINCH signal shall modify ⎕PW
    bool WINCH_sets_pw;
+
+   /// true if the interpreter shall )OFF onm EOF of the last input file
+   bool auto_OFF;
 
 protected:
    /// open a user-supplied config file (in $HOME or gnu-apl.d)

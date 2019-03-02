@@ -27,6 +27,7 @@
 #include "IO_Files.hh"
 #include "Output.hh"
 #include "UTF8_string.hh"
+#include "UserPreferences.hh"
 #include "Workspace.hh"
 
 int IO_Files::testcase_count = 0;
@@ -277,6 +278,8 @@ IO_Files::end_of_current_file()
 
    InputFile::files_todo.erase(0);
 
+   if (uprefs.auto_OFF && !InputFile::files_todo.size())   Command::cmd_OFF(0);
+
    Output::reset_dout();
    reset_errors();
    return true;   // continue processing
@@ -353,7 +356,7 @@ IO_Files::open_next_file()
               }
 
            Log(LOG_test_execution)
-              CERR << "openened testcase file "
+              CERR << "opened testcase file "
                    << InputFile::current_filename() << endl;
 
            Output::reset_dout();

@@ -401,6 +401,14 @@ CONTROL-Ds-TO-EXIT 0
 
 ###############################################################################
 #
+# with the option below you can perform an automatic )OFF after the last
+# input file (from the -f command line option) was processed.
+#
+# AUTO-OFF  Yes
+
+# With the option below you can cause the WINCH signal to change ⎕PW. The
+###############################################################################
+#
 # The following lines show examples of GNU APL capabilities that can be
 # disabled. The security settings are put into profile [1] which means that
 # they only have an effect if:

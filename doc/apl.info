@@ -199,6 +199,12 @@ GNU APL understands the following command line options:
 
      do not load a SETUP or CONTINUE workspace on start-up.
 
+   • ‘--OFF’
+
+     This option causes GNU APL to perform an automatic )OFF command
+     after the last line of the last input file (as per -f option) was
+     executed.
+
    • ‘--PW COLS’
 
      set the initial value of ⎕PW to COLS (min.  30, max.  10000)
@@ -4566,46 +4572,46 @@ please read <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 Tag Table:
 Node: Top383
 Node: Chapter 11416
-Node: Chapter 217072
-Node: Chapter 321496
-Node: Section 3.123021
-Node: Section 3.239033
-Node: Section 3.339792
-Node: Section 3.441079
-Node: Section 3.543700
-Node: Section 3.643873
-Node: Section 3.744486
-Node: Section 3.848430
-Node: Section 3.949972
-Node: Section 3.1050569
-Node: Section 3.1152353
-Node: Section 3.1254293
-Node: Section 3.1355234
-Node: Section 3.1455486
-Node: Section 3.1556882
-Node: Section 3.1659394
-Node: Section 3.1766098
-Node: Section 3.1871151
-Node: Section 3.1974433
-Node: Section 3.2074724
-Node: Section 3.2184636
-Node: Section 3.2284908
-Node: Section 3.2391486
-Node: Section 3.2493937
-Node: Section 3.2594606
-Node: Section 3.26101242
-Node: Section 3.27102182
-Node: Section 3.28115744
-Node: Section 3.29118848
-Node: Section 3.30120837
-Node: Chapter 4125215
-Node: Chapter 5126963
-Node: Chapter 6128092
-Node: Section 6.1128511
-Node: Section 6.2129198
-Node: Chapter 7130029
-Node: Section 7.1130532
-Node: Section 7.2155842
+Node: Chapter 217248
+Node: Chapter 321672
+Node: Section 3.123197
+Node: Section 3.239209
+Node: Section 3.339968
+Node: Section 3.441255
+Node: Section 3.543876
+Node: Section 3.644049
+Node: Section 3.744662
+Node: Section 3.848606
+Node: Section 3.950148
+Node: Section 3.1050745
+Node: Section 3.1152529
+Node: Section 3.1254469
+Node: Section 3.1355410
+Node: Section 3.1455662
+Node: Section 3.1557058
+Node: Section 3.1659570
+Node: Section 3.1766274
+Node: Section 3.1871327
+Node: Section 3.1974609
+Node: Section 3.2074900
+Node: Section 3.2184812
+Node: Section 3.2285084
+Node: Section 3.2391662
+Node: Section 3.2494113
+Node: Section 3.2594782
+Node: Section 3.26101418
+Node: Section 3.27102358
+Node: Section 3.28115920
+Node: Section 3.29119024
+Node: Section 3.30121013
+Node: Chapter 4125391
+Node: Chapter 5127139
+Node: Chapter 6128268
+Node: Section 6.1128687
+Node: Section 6.2129374
+Node: Chapter 7130205
+Node: Section 7.1130708
+Node: Section 7.2156018
 
 End Tag Table
 

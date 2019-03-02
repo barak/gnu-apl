@@ -432,6 +432,12 @@ UserPreferences::parse_argv_2(bool logit)
               continue;   // -p already handled in parse_argv_1()
             }
 
+         if (!strcmp(opt, "--OFF"))
+            {
+              auto_OFF = true;
+              continue;
+            }
+
          if (!strcmp(opt, "--par"))
             {
               ++a;
@@ -1254,6 +1260,10 @@ int file_profile = 0;   // the current profile in the preferences file
          else if (!strcasecmp(opt, "WINCH-SETS-⎕PW"))
             {
               WINCH_sets_pw = yes;
+            }
+         else if (!strcasecmp(opt, "AUTO-OFF"))
+            {
+              auto_OFF = yes;
             }
 
          // security facilities...

@@ -530,12 +530,12 @@ uninstall-am: uninstall-dist_docDATA
 
 
 .asciidoc.html:
-	if [ -z `which asciidoc` ] ; then touch -c ${HTML} ;    \
+	if [ -z `which asciidoc` ] ; then touch $@ ;       \
 	else asciidoc -a icons -o $@ $< ;                  \
              sed -i 's|<pre><code>|<pre>\n\n<code>|' $@ ;  \
              sed -i 's|</code></pre>|</code>\n\n</pre>|' $@ ; fi
 
-.PRECIOUS: $(HTML) glade-1.png \ glade-2.png glade-3.png glade-4.png
+.PRECIOUS: $(HTML) glade-1.png glade-2.png glade-3.png glade-4.png
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
