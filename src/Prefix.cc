@@ -119,7 +119,7 @@ Prefix::uses_function(const UserFunction * ufun) const
 }
 //-----------------------------------------------------------------------------
 bool
-Prefix::is_value_parent(int pc) const
+Prefix::is_value_parenthesis(int pc) const
 {
    // we have ) XXX with XXX on the stack and need to know if the evaluation
    // of (... ) will be a value as in e.g. (1 + 1) or a function as in (+/).
@@ -144,7 +144,7 @@ TokenClass next = body[pc].get_Class();
       {
         const Symbol * sym = body[pc].get_sym_ptr();
         const NameClass nc = sym->get_nc();
-                      
+
         if (nc == NC_FUNCTION)   return false;
         if (nc == NC_OPERATOR)   return false;
         return true;
@@ -157,7 +157,7 @@ TokenClass next = body[pc].get_Class();
    if (next == TC_L_PARENT)   // )) XXX
       {
         ++pc;
-        if (!is_value_parent(pc))   return false;   // (fun)) XXX
+        if (!is_value_parenthesis(pc))   return false;   // (fun)) XXX
         const int offset = body[pc].get_int_val2();
         pc += offset;
         if (pc >= body.size())   return true;   // syntax error
@@ -211,7 +211,7 @@ TokenTag tag_LO = body[pc].get_tag();
         tag_LO = body[pc].get_tag();
       }
 
-   if (tag_LO == TOK_R_PARENT)   return !is_value_parent(pc);
+   if (tag_LO == TOK_R_PARENT)   return !is_value_parenthesis(pc);
    if (body[pc].get_Class() == TC_OPER2)   return false;   // make / a function
 
    if ((tag_LO & TV_MASK) == TV_FUN)   return true;
@@ -362,12 +362,12 @@ Prefix::value_expected()
                     {
                       const Symbol * sym = tok.get_sym_ptr();
                       const NameClass nc = sym->get_nc();
-                      
+
                       if (nc == NC_FUNCTION)   return false;
                       if (nc == NC_OPERATOR)   return false;
                       return true;   // value
                     }
-             
+
                case TC_RETURN:  return false;   // syntax error
                case TC_VALUE:   return true;
 
@@ -722,7 +722,7 @@ Prefix::dont_reduce(TokenClass next) const
            }
         else if (next == TC_R_PARENT)   // ) B
            {
-             if (is_value_parent(PC))     // e.g. (X+Y) B
+             if (is_value_parenthesis(PC))     // e.g. (X+Y) B
                 {
                   return best->prio < BS_VAL_VAL;
                 }
@@ -862,12 +862,6 @@ Token result = at1();   // B or F
 }
 //-----------------------------------------------------------------------------
 void
-Prefix::reduce_LPAR_F_RPAR_()
-{
-   reduce_LPAR_B_RPAR_();   // same as ( B )
-}
-//-----------------------------------------------------------------------------
-void
 Prefix::reduce_LPAR_F_C_RPAR()
 {
    Assert1(prefix_len == 4);
@@ -877,10 +871,14 @@ Prefix::reduce_LPAR_F_C_RPAR()
    if (at2().get_ValueType() != TV_VAL)   SYNTAX_ERROR;
    if (!at2().get_apl_val())              SYNTAX_ERROR;
 
+   //     at: 0 1 2 3
+   // before: ( F C )
+   // after:  F C
+   //
    at3().move_1(at2(), LOC);
    at2().move_1(at1(), LOC);
-   pop();    // pop C
-   pop();    // pop RPAR
+   pop_and_discard();    // pop old RPAR
+   pop_and_discard();    // pop old C
    action = RA_CONTINUE;
 }
 //-----------------------------------------------------------------------------
@@ -1239,18 +1237,6 @@ const TokenTag tag = at0().get_tag();
 }
 //-----------------------------------------------------------------------------
 void
-Prefix::reduce_B_D_B_()
-{
-   reduce_F_D_G_();   // same as F2
-}
-//-----------------------------------------------------------------------------
-void
-Prefix::reduce_B_D_G_()
-{
-   reduce_F_D_G_();   // same as F2
-}
-//-----------------------------------------------------------------------------
-void
 Prefix::reduce_F_D_B_()
 {
    // same as G2, except for ⍤
@@ -1424,7 +1410,8 @@ Value_P Z;
         try
            {
              Z = A->index(*idx);
-             Log(LOG_delete)   CERR << "delete " << CVOIP(idx) << " at " LOC << endl;
+             Log(LOG_delete)
+                CERR << "delete " << CVOIP(idx) << " at " LOC << endl;
              delete idx;
            }
         catch (Error err)
@@ -1574,30 +1561,6 @@ Token result = Token(TOK_APL_VALUE2, Z);
 
    set_assign_state(ASS_none);
    action = RA_CONTINUE;
-}
-//-----------------------------------------------------------------------------
-void
-Prefix::reduce_V_ASS_N_()
-{
-   // named lambda: V ← { ... } niladic (same as reduce_V_ASS_F_)
-   //
-   reduce_V_ASS_F_();
-}
-//-----------------------------------------------------------------------------
-void
-Prefix::reduce_V_ASS_M_()
-{
-   // named lambda: V ← { ... } monadic operator (same as reduce_V_ASS_F_)
-   //
-   reduce_V_ASS_F_();
-}
-//-----------------------------------------------------------------------------
-void
-Prefix::reduce_V_ASS_D_()
-{
-   // named lambda: V ← { ... } dyadic operator (same as reduce_V_ASS_F_)
-   //
-   reduce_V_ASS_F_();
 }
 //-----------------------------------------------------------------------------
 void
@@ -1946,8 +1909,8 @@ const bool trace = at0().get_Class() == TC_END &&
            {
               // the function ignores attention (aka. weak interrupt)
               //
-              pop_and_discard();   // pop() END
-              pop_and_discard();   // pop() GOTO
+              pop_and_discard();   // pop END
+              pop_and_discard();   // pop GOTO
               action = RA_CONTINUE;
               return;
            }

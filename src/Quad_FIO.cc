@@ -1667,6 +1667,8 @@ const APL_Integer function_number = X->get_ravel(0).get_near_int();
                     {
                       if (data[l] == '\n')   ++line_count;
                     }
+
+                // if the last line does not end with \n then count it as well
                 if (len && data[len - 1] != '\n')   ++line_count;
 
                 Value_P Z(line_count, LOC);
@@ -1678,7 +1680,7 @@ const APL_Integer function_number = X->get_ravel(0).get_near_int();
                       if (data[l] != '\n')   continue;
 
                       uint8_t * end = data + l;
-                      if (end[-1] == '\r')   --end;   // discard trailing CR
+                      if (end > data && end[-1] == '\r')   --end;   // discard trailing CR
                       UTF8_string utf(from, end - from);
                       UCS_string ucs(utf);
                       Value_P ZZ(ucs, LOC);

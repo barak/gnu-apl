@@ -268,7 +268,7 @@ public:
    bool is_value_bracket() const;
 
    /// read and resolve the token class left of )
-   bool is_value_parent(int pc) const;
+   bool is_value_parenthesis(int pc) const;
 
    /// return true if the token at pc is a (possibly bracketed) function or
    /// operator (or a symbol representing one).

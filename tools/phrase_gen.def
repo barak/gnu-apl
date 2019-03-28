@@ -1,7 +1,14 @@
 
 /*
-   phrase(a0, a1, ...) defines a sequence of token classes
+   phrase(prio, a0, a1, a2, a3, inl) defines a sequence of token classes
+   with a priority and a Boolean property inline
 
+   prio is a priority for resolving reduce/reduce conflicts.
+   a0, a1, ... are groups of token classes:
+   inlis true for trivial wrappers
+
+   group     token class(es)
+   -------------------------
    ASS:      ←
    GOTO:     →
    ESC:      →
@@ -21,87 +28,89 @@
    V:        TC_SYMBOL
    I:        TC_PINDEX
    RETC:     TC_RETURN
+   -------------------------
 
    Normally the priority is the priority of the prefix plus the number of items
+   so that the longest match of the same prefix wins
  */
 
 // remove parentheses
-phrase(BS_ANY + 3,       LPAR , B    , RPAR ,      )
-phrase(BS_ANY + 3,       LPAR , F    , RPAR ,      )
-phrase(BS_ANY + 4,       LPAR , F    , C    , RPAR )
+phrase(BS_ANY + 3,       LPAR , B    , RPAR ,      , ""    )
+phrase(BS_ANY + 3,       LPAR , F    , RPAR ,      , "LPAR_B_RPAR_")
+phrase(BS_ANY + 4,       LPAR , F    , C    , RPAR , ""    )
 
 // niladic function call
-phrase(BS_ANY +  1,      N    ,      ,      ,      )
+phrase(BS_ANY +  1,      N    ,      ,      ,      , ""    )
 
 // function called monadically
-phrase_MISC (BS_F_B + 2,        F    , B    ,      )
-phrase_MISC (BS_F_B + 3,        F    , C    , B    )
+phrase_MISC (BS_F_B + 2,        F    , B    ,      , ""    )
+phrase_MISC (BS_F_B + 3,        F    , C    , B    , ""    )
 
 // function called dyadically
-phrase(BS_A_F + 3,       A    , F    , B    ,      )
-phrase(BS_A_F + 3,       A    , M    , B    ,      )   // e.g. A / B
-phrase(BS_A_F + 4,       A    , F    , C    , B    )
-phrase(BS_A_F + 4,       A    , M    , C    , B    )   // e.g. A /[X] B
+phrase(BS_A_F + 3,       A    , F    , B    ,      , ""    )
+phrase(BS_A_F + 3,       A    , M    , B    ,      , ""    )   // e.g. A / B
+phrase(BS_A_F + 4,       A    , F    , C    , B    , ""    )
+phrase(BS_A_F + 4,       A    , M    , C    , B    , ""    )   // e.g. A /[X] B
 
 // monadic operator
-phrase(BS_LO_OP + 2,     F    , M    ,      ,      )   // e.g. +/
-phrase(BS_LO_OP + 3,     F    , M    , C    ,      )   // e.g. +/[2]
-phrase(BS_LO_OP + 3,     F    , C    , M    ,      )   // e.g. ,[2]/
-phrase(BS_LO_OP + 4,     F    , C    , M    , C    )   // e.g. ,[2]/[2]
-phrase(BS_LO_OP + 2,     M    , M    ,      ,      )   // e.g. /¨
-phrase(BS_LO_OP + 3,     M    , M    , C    ,      )   // e.g. /¨[2]
-phrase(BS_LO_OP + 3,     M    , C    , M    ,      )   // e.g. /[2]¨
-phrase(BS_LO_OP + 4,     M    , C    , M    , C    )   // e.g. /[2]¨[2]
+phrase(BS_LO_OP + 2,     F    , M    ,      ,      , ""    )   // e.g. +/
+phrase(BS_LO_OP + 3,     F    , M    , C    ,      , ""    )   // e.g. +/[2]
+phrase(BS_LO_OP + 3,     F    , C    , M    ,      , ""    )   // e.g. ,[2]/
+phrase(BS_LO_OP + 4,     F    , C    , M    , C    , ""    )   // e.g. ,[2]/[2]
+phrase(BS_LO_OP + 2,     M    , M    ,      ,      , ""    )   // e.g. /¨
+phrase(BS_LO_OP + 3,     M    , M    , C    ,      , ""    )   // e.g. /¨[2]
+phrase(BS_LO_OP + 3,     M    , C    , M    ,      , ""    )   // e.g. /[2]¨
+phrase(BS_LO_OP + 4,     M    , C    , M    , C    , ""    )   // e.g. /[2]¨[2]
 
 // dyadic operator
-phrase(BS_OP_RO + 3,     B    , D    , B    ,      )
-phrase(BS_OP_RO + 3,     B    , D    , G    ,      )
-phrase(BS_OP_RO + 3,     F    , D    , B    ,      )
-phrase(BS_OP_RO + 3,     F    , D    , G    ,      )
-phrase(BS_OP_RO + 3,     F    , D    , M    ,      )
-phrase(BS_OP_RO + 3,     M    , D    , G    ,      )
-phrase(BS_OP_RO + 3,     M    , D    , M    ,      )
-phrase(BS_OP_RO + 4,     F    , D    , C    , B    )
+phrase(BS_OP_RO + 3,     A    , D    , B    ,      , "F_D_G_")
+phrase(BS_OP_RO + 3,     A    , D    , G    ,      , "F_D_G_")
+phrase(BS_OP_RO + 3,     F    , D    , B    ,      , ""    )
+phrase(BS_OP_RO + 3,     F    , D    , G    ,      , ""    )
+phrase(BS_OP_RO + 3,     F    , D    , M    ,      , ""    )
+phrase(BS_OP_RO + 3,     M    , D    , G    ,      , ""    )
+phrase(BS_OP_RO + 3,     M    , D    , M    ,      , ""    )
+phrase(BS_OP_RO + 4,     F    , D    , C    , B    , ""    )
 
 // indexed reference and assignment
-phrase(BS_ANY_BRA + 2,   A    , C    ,      ,      )
-phrase(BS_ANY_BRA + 2,   V    , C    ,      ,      )
-phrase(BS_ANY_BRA + 4,   V    , C    , ASS  , B    )
+phrase(BS_ANY_BRA + 2,   A    , C    ,      ,      , ""    )
+phrase(BS_ANY_BRA + 2,   V    , C    ,      ,      , ""    )
+phrase(BS_ANY_BRA + 4,   V    , C    , ASS  , B    , ""    )
 
 // selective specification
-phrase(BS_F_B + 2,       F    , V    ,     ,       )
+phrase(BS_F_B + 2,       F    , V    ,     ,       , ""    )
 
 // (reference) and assignment
-phrase(BS_V_ASS + 3,     A    , ASS  , B    ,      )   // selective spec.
-phrase(BS_V_ASS + 3,     V    , ASS  , B    ,      )   // variable spec.
-phrase(BS_V_ASS + 3,     V    , ASS  , N    ,      )   // λ: V ← { ... }
-phrase(BS_V_ASS + 3,     V    , ASS  , F    ,      )   // λ: V ← { ... } ⍺ ⍵
-phrase(BS_V_ASS + 3,     V    , ASS  , M    ,      )   // λ: V ← { ... } ⍶
-phrase(BS_V_ASS + 3,     V    , ASS  , D    ,      )   // λ: V ← { ... } ⍶ ⍹
+phrase(BS_V_ASS + 3,     A    , ASS  , B    ,      , ""    )   // selective spec.
+phrase(BS_V_ASS + 3,     V    , ASS  , B    ,      , ""    )   // variable spec.
+phrase(BS_V_ASS + 3,     V    , ASS  , F    ,      , ""    )   // λ: V ← { ... } ⍺ ⍵
+phrase(BS_V_ASS + 3,     V    , ASS  , N    ,      , "V_ASS_F_")   // λ: V ← { ... }
+phrase(BS_V_ASS + 3,     V    , ASS  , M    ,      , "V_ASS_F_")   // λ: V ← { ... } ⍶
+phrase(BS_V_ASS + 3,     V    , ASS  , D    ,      , "V_ASS_F_")   // λ: V ← { ... } ⍶ ⍹
 
 // build index list
-phrase(BS_ANY + 1,       RBRA ,      ,      ,      )
-phrase(BS_ANY + 2,       LBRA , I    ,      ,      )
-phrase(BS_ANY + 3,       LBRA , B    , I    ,      )
+phrase(BS_ANY + 1,       RBRA ,      ,      ,      , ""    )
+phrase(BS_ANY + 2,       LBRA , I    ,      ,      , ""    )
+phrase(BS_ANY + 3,       LBRA , B    , I    ,      , ""    )
 
 // vector notation
-phrase(BS_VAL_VAL + 2,   A    , B    ,      ,      )
+phrase(BS_VAL_VAL + 2,   A    , B    ,      ,      , ""    )
 
 // vector assignment (A B ... C) ← B
-phrase(BS_VAL_VAL + 2,   V    , RPAR , ASS  , B    )
+phrase(BS_VAL_VAL + 2,   V    , RPAR , ASS  , B    , ""    )
 
 // end of statement
-phrase(BS_ANY + 2,       END  , VOID ,      ,      )
-phrase(BS_ANY + 2,       END  , B    ,      ,      )
-phrase(BS_ANY + 3,       END  , GOTO , B    ,      )
-phrase(BS_ANY + 2,       END  , GOTO ,      ,      )
+phrase(BS_ANY + 2,       END  , VOID ,      ,      , ""    )
+phrase(BS_ANY + 2,       END  , B    ,      ,      , ""    )
+phrase(BS_ANY + 3,       END  , GOTO , B    ,      , ""    )
+phrase(BS_ANY + 2,       END  , GOTO ,      ,      , ""    )
 
 // end of user defined function, ⍎, or ◊ context
-phrase(BS_ANY + 1,       RETC ,      ,      ,      )
-phrase(BS_ANY + 2,       RETC , VOID ,      ,      )
-phrase(BS_ANY + 2,       RETC , B    ,      ,      )
-phrase(BS_ANY + 2,       RETC , GOTO ,      ,      )
-phrase(BS_ANY + 3,       RETC , GOTO , B    ,      )
+phrase(BS_ANY + 1,       RETC ,      ,      ,      , ""    )
+phrase(BS_ANY + 2,       RETC , VOID ,      ,      , ""    )
+phrase(BS_ANY + 2,       RETC , B    ,      ,      , ""    )
+phrase(BS_ANY + 2,       RETC , GOTO ,      ,      , ""    )
+phrase(BS_ANY + 3,       RETC , GOTO , B    ,      , ""    )
 
 #undef phrase
 

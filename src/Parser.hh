@@ -24,7 +24,7 @@
 #include "Token.hh"
 
 /*!
-     Functions related to parsing of input lines and user defined functions.
+     Functions related to parsing of input lines and defined functions.
  */
 /// A parser for APL code
 class Parser

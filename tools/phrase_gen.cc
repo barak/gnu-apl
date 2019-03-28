@@ -41,30 +41,35 @@ struct _phrase
    int          misc;
    int          len;
    int          hash;
+   const char * alias;
 } phrase_tab[] =
 {
 #define sn(x) SN_ ## x
 #define tn(x) # x
-#define phrase(prio, a, b, c, d)              \
+#define phrase(prio, a, b, c, d, alias)          \
    { { sn(a), sn(b), sn(c), sn(d)  }, tn(a),  \
-     { tn(a), tn(b), tn(c), tn(d), }, prio, 0, 0, 0 },
+     { tn(a), tn(b), tn(c), tn(d), }, prio, 0, 0, 0, alias },
 
-#define phrase1(prio, a, b, c, d)           \
+// phrase1 is a helper for phrase_MISC() to keep it short
+//
+#define phrase1(prio, a, b, c, d, alias)         \
    { { sn(a), sn(b), sn(c), sn(d) }, "MISC",   \
-     { tn(a), tn(b), tn(c), tn(d) }, prio, 1, 0, 0 },
+     { tn(a), tn(b), tn(c), tn(d) }, prio, 1, 0, 0, alias },
 
-#define phrase_MISC(prio, b, c, d)            \
-   phrase1(prio, ASS,   b, c, d)              \
-   phrase1(prio, GOTO,  b, c, d)              \
-   phrase1(prio, F,     b, c, d)               \
-   phrase1(prio, LBRA,  b, c, d)              \
-   phrase1(prio, END,   b, c, d)              \
-   phrase1(prio, LPAR,  b, c, d)              \
-   phrase1(prio, C,     b, c, d)              \
-   phrase1(prio, RETC,  b, c, d)              \
-   phrase1(prio, M,     b, c, d)
+// phrase_MISC is a shortcut for a collection of phrases that cause a
+// nomadic function to be called monadically.
+#define phrase_MISC(prio, b, c, d, alias)   \
+   phrase1(prio, ASS,   b, c, d, alias)     \
+   phrase1(prio, GOTO,  b, c, d, alias)     \
+   phrase1(prio, F,     b, c, d, alias)     \
+   phrase1(prio, LBRA,  b, c, d, alias)     \
+   phrase1(prio, END,   b, c, d, alias)     \
+   phrase1(prio, LPAR,  b, c, d, alias)     \
+   phrase1(prio, C,     b, c, d, alias)     \
+   phrase1(prio, RETC,  b, c, d, alias)     \
+   phrase1(prio, M,     b, c, d, alias)
 
-phrase(0,                     ,      ,      ,    )
+phrase(0,                     ,      ,      ,    , "")
 
 #include "phrase_gen.def"
 };
@@ -72,6 +77,8 @@ phrase(0,                     ,      ,      ,    )
 enum { PHRASE_COUNT = sizeof(phrase_tab) / sizeof(*phrase_tab) };
 
 //-----------------------------------------------------------------------------
+/// a function that prints one phrase in the large comment at the start of
+/// the output file (i.e. Prefix.def)
 void
 print_phrase(FILE * out, int ph)
 {
@@ -112,20 +119,23 @@ int hash_len = 0;
 
    while (len < 40)   len += fprintf(out, " ");
    fprintf(out, "%d", hash_len);
+   if (*e.alias)   fprintf(out, " %s", e.alias);
    fprintf(out, "\n");
 }
 //-----------------------------------------------------------------------------
+/// a function that prints the entire large comment at the start of
+/// the output file (i.e. Prefix.def)
 void
 print_phrases(FILE * out)
 {
    fprintf(out, "\n   /*** phrase table ***\n"
                 "\n"
-                "   phrase ##:  phrase              length\n"
-                "   --------------------------------------\n");
+                "   phrase ##:  phrase              length alias\n"
+                "   ---------------------------------------------\n");
 
    for (int ph = 0; ph < PHRASE_COUNT; ++ph)   print_phrase(out, ph);
 
-   fprintf(out, "   --------------------------------------\n"
+   fprintf(out, "   ---------------------------------------------\n"
                 "\n"
                 "   *** phrase table ***/\n\n");
 }
@@ -156,15 +166,20 @@ int * tab = new int[modu];
    return true;
 }
 //-----------------------------------------------------------------------------
+/// write the declaration of a reduce_ function to out
 void
 print_entry_decl(FILE * out, const _phrase & e)
 {
+   if (*e.alias)   return;
+
    // declare reduce_MISC_xxx only once (for ASS variant)
    //
    if (strcmp(e.rn1, e.names[0]) && e.phrase[0] != SN_ASS)   return;
 
-char nam[100];   snprintf(nam, sizeof(nam), "%s %s %s %s", 
-                 e.names[0], e.names[1], e.names[2], e.names[3]);
+char nam[100];
+int nam_len = snprintf(nam, sizeof(nam), "%s %s %s %s", 
+                       e.names[0], e.names[1], e.names[2], e.names[3]);
+   while (nam_len && nam[nam_len - 1] == ' ')   nam[--nam_len] = 0;
 
 char fun[100];   snprintf(fun, sizeof(fun), "%s_%s_%s_%s();", 
                           e.rn1, e.names[1], e.names[2], e.names[3]);
@@ -180,6 +195,8 @@ char nam[100];   snprintf(nam, sizeof(nam), "%s %s %s %s",
 
 char fun[100];   snprintf(fun, sizeof(fun), "%s_%s_%s_%s", 
                           e.rn1, e.names[1], e.names[2], e.names[3]);
+
+   if (*e.alias)   snprintf(fun, sizeof(fun), "%s", e.alias);
 
    fprintf(out, "  PH( %-14s , 0x%5.5X,   %2d,   %d,  %d, %-12s )\n",
                 nam, e.hash, e.prio, e.misc, e.len, fun);
