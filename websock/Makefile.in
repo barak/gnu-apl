@@ -14,8 +14,6 @@
 
 @SET_MAKE@
 
-# Makefile targets that can be made before running ./configure
-
 VPATH = @srcdir@
 am__is_gnu_make = test -n '$(MAKEFILE_LIST)' && test -n '$(MAKELEVEL)'
 am__make_running_with_option = \
@@ -80,14 +78,9 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-DIST_COMMON = $(srcdir)/Makefile.incl INSTALL NEWS README AUTHORS \
-	ChangeLog $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
-	$(top_srcdir)/configure $(am__configure_deps) \
-	$(srcdir)/config.h.in $(dist_doc_DATA) $(dist_noinst_DATA) \
-	$(nobase_dist_sysconf_DATA) COPYING compile config.guess \
-	config.rpath config.sub depcomp install-sh missing texinfo.tex \
-	ltmain.sh
-subdir = .
+subdir = websock
+DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
+	$(dist_doc_DATA) README
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/depend.m4 \
 	$(top_srcdir)/m4/ax_lib_sqlite3.m4 \
@@ -96,10 +89,8 @@ am__aclocal_m4_deps = $(top_srcdir)/m4/depend.m4 \
 	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
-am__CONFIG_DISTCLEAN_FILES = config.status config.cache config.log \
- configure.lineno config.status.lineno
 mkinstalldirs = $(install_sh) -d
-CONFIG_HEADER = config.h
+CONFIG_HEADER = $(top_builddir)/config.h
 CONFIG_CLEAN_FILES =
 CONFIG_CLEAN_VPATH_FILES =
 AM_V_P = $(am__v_P_@AM_V@)
@@ -156,9 +147,8 @@ am__uninstall_files_from_dir = { \
     || { echo " ( cd '$$dir' && rm -f" $$files ")"; \
          $(am__cd) "$$dir" && rm -f $$files; }; \
   }
-am__installdirs = "$(DESTDIR)$(docdir)" "$(DESTDIR)$(sysconfdir)"
-DATA = $(dist_doc_DATA) $(dist_noinst_DATA) \
-	$(nobase_dist_sysconf_DATA)
+am__installdirs = "$(DESTDIR)$(docdir)"
+DATA = $(dist_doc_DATA)
 RECURSIVE_CLEAN_TARGETS = mostlyclean-recursive clean-recursive	\
   distclean-recursive maintainer-clean-recursive
 am__recursive_targets = \
@@ -166,9 +156,8 @@ am__recursive_targets = \
   $(RECURSIVE_CLEAN_TARGETS) \
   $(am__extra_recursive_targets)
 AM_RECURSIVE_TARGETS = $(am__recursive_targets:-recursive=) TAGS CTAGS \
-	cscope distdir dist dist-all distcheck
-am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) \
-	$(LISP)config.h.in
+	distdir
+am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) $(LISP)
 # Read a list of newline-separated strings from the standard input,
 # and print each of them once, without duplicates.  Input order is
 # *not* preserved.
@@ -187,17 +176,8 @@ am__define_uniq_tagged_files = \
   done | $(am__uniquify_input)`
 ETAGS = etags
 CTAGS = ctags
-CSCOPE = cscope
+DIST_SUBDIRS = $(SUBDIRS)
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
-distdir = $(PACKAGE)-$(VERSION)
-top_distdir = $(distdir)
-am__remove_distdir = \
-  if test -d "$(distdir)"; then \
-    find "$(distdir)" -type d ! -perm -200 -exec chmod u+w {} ';' \
-      && rm -rf "$(distdir)" \
-      || { sleep 5 && rm -rf "$(distdir)"; }; \
-  else :; fi
-am__post_remove_distdir = $(am__remove_distdir)
 am__relativize = \
   dir0=`pwd`; \
   sed_first='s,^\([^/]*\)/.*$$,\1,'; \
@@ -223,13 +203,6 @@ am__relativize = \
     dir1=`echo "$$dir1" | sed -e "$$sed_rest"`; \
   done; \
   reldir="$$dir2"
-DIST_ARCHIVES = $(distdir).tar.gz
-GZIP_ENV = --best
-DIST_TARGETS = dist-gzip
-distuninstallcheck_listfiles = find . -type f -print
-am__distuninstallcheck_listfiles = $(distuninstallcheck_listfiles) \
-  | sed 's|^\./|$(prefix)/|' | grep -v '$(infodir)/dir$$'
-distcleancheck_listfiles = find . -type f -print
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
 AM_DEFAULT_VERBOSITY = @AM_DEFAULT_VERBOSITY@
@@ -385,87 +358,47 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-ACLOCAL_AMFLAGS = -I m4
-DISTCHECK_CONFIGURE_FLAGS = --enable-maintainer-mode=no
-APL_DIRS = workspaces wslib3 wslib4 wslib5
-SUBDIRS = $(APL_DIRS) build doc erlang gnu-apl.d HOWTOs src \
-	support-files tools websock
-DIST_SUBDIRS = $(SUBDIRS) rpm debian
-dist_doc_DATA = README			   \
-		README-1-prerequisites	   \
-		README-2-configure	   \
-		README-3-keyboard	   \
-		README-4-compliance	   \
-		README-5-WINDOWS	   \
-                README-6-porting	   \
-		README-7-more-info	   \
-		README-8-parallel          \
-                README-9-post-installation
-
-nobase_dist_sysconf_DATA = gnu-apl.d/preferences
-dist_noinst_DATA = Doxyfile Makefile.incl
-EXTRA_DIST = config.rpath m4/ChangeLog
-all: config.h
-	$(MAKE) $(AM_MAKEFLAGS) all-recursive
+SUBDIRS = client server
+dist_doc_DATA = README
+all: all-recursive
 
 .SUFFIXES:
-$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am $(srcdir)/Makefile.incl $(am__configure_deps)
+$(srcdir)/Makefile.in: @MAINTAINER_MODE_TRUE@ $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
 	    *$$dep*) \
-	      echo ' cd $(srcdir) && $(AUTOMAKE) --gnu'; \
-	      $(am__cd) $(srcdir) && $(AUTOMAKE) --gnu \
-		&& exit 0; \
+	      ( cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh ) \
+	        && { if test -f $@; then exit 0; else break; fi; }; \
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu websock/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu Makefile
+	  $(AUTOMAKE) --gnu websock/Makefile
 .PRECIOUS: Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
 	  *config.status*) \
-	    echo ' $(SHELL) ./config.status'; \
-	    $(SHELL) ./config.status;; \
+	    cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh;; \
 	  *) \
-	    echo ' cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__depfiles_maybe)'; \
-	    cd $(top_builddir) && $(SHELL) ./config.status $@ $(am__depfiles_maybe);; \
+	    echo ' cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe)'; \
+	    cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@ $(am__depfiles_maybe);; \
 	esac;
-$(srcdir)/Makefile.incl:
 
 $(top_builddir)/config.status: $(top_srcdir)/configure $(CONFIG_STATUS_DEPENDENCIES)
-	$(SHELL) ./config.status --recheck
+	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 
 $(top_srcdir)/configure: @MAINTAINER_MODE_TRUE@ $(am__configure_deps)
-	$(am__cd) $(srcdir) && $(AUTOCONF)
+	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(ACLOCAL_M4): @MAINTAINER_MODE_TRUE@ $(am__aclocal_m4_deps)
-	$(am__cd) $(srcdir) && $(ACLOCAL) $(ACLOCAL_AMFLAGS)
+	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
-
-config.h: stamp-h1
-	@test -f $@ || rm -f stamp-h1
-	@test -f $@ || $(MAKE) $(AM_MAKEFLAGS) stamp-h1
-
-stamp-h1: $(srcdir)/config.h.in $(top_builddir)/config.status
-	@rm -f stamp-h1
-	cd $(top_builddir) && $(SHELL) ./config.status config.h
-$(srcdir)/config.h.in: @MAINTAINER_MODE_TRUE@ $(am__configure_deps) 
-	($(am__cd) $(top_srcdir) && $(AUTOHEADER))
-	rm -f stamp-h1
-	touch $@
-
-distclean-hdr:
-	-rm -f config.h stamp-h1
 
 mostlyclean-libtool:
 	-rm -f *.lo
 
 clean-libtool:
 	-rm -rf .libs _libs
-
-distclean-libtool:
-	-rm -f libtool config.lt
 install-dist_docDATA: $(dist_doc_DATA)
 	@$(NORMAL_INSTALL)
 	@list='$(dist_doc_DATA)'; test -n "$(docdir)" || list=; \
@@ -487,30 +420,6 @@ uninstall-dist_docDATA:
 	@list='$(dist_doc_DATA)'; test -n "$(docdir)" || list=; \
 	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
 	dir='$(DESTDIR)$(docdir)'; $(am__uninstall_files_from_dir)
-install-nobase_dist_sysconfDATA: $(nobase_dist_sysconf_DATA)
-	@$(NORMAL_INSTALL)
-	@list='$(nobase_dist_sysconf_DATA)'; test -n "$(sysconfdir)" || list=; \
-	if test -n "$$list"; then \
-	  echo " $(MKDIR_P) '$(DESTDIR)$(sysconfdir)'"; \
-	  $(MKDIR_P) "$(DESTDIR)$(sysconfdir)" || exit 1; \
-	fi; \
-	$(am__nobase_list) | while read dir files; do \
-	  xfiles=; for file in $$files; do \
-	    if test -f "$$file"; then xfiles="$$xfiles $$file"; \
-	    else xfiles="$$xfiles $(srcdir)/$$file"; fi; done; \
-	  test -z "$$xfiles" || { \
-	    test "x$$dir" = x. || { \
-	      echo " $(MKDIR_P) '$(DESTDIR)$(sysconfdir)/$$dir'"; \
-	      $(MKDIR_P) "$(DESTDIR)$(sysconfdir)/$$dir"; }; \
-	    echo " $(INSTALL_DATA) $$xfiles '$(DESTDIR)$(sysconfdir)/$$dir'"; \
-	    $(INSTALL_DATA) $$xfiles "$(DESTDIR)$(sysconfdir)/$$dir" || exit $$?; }; \
-	done
-
-uninstall-nobase_dist_sysconfDATA:
-	@$(NORMAL_UNINSTALL)
-	@list='$(nobase_dist_sysconf_DATA)'; test -n "$(sysconfdir)" || list=; \
-	$(am__nobase_strip_setup); files=`$(am__nobase_strip)`; \
-	dir='$(DESTDIR)$(sysconfdir)'; $(am__uninstall_files_from_dir)
 
 # This directory's subdirectories are mostly independent; you can cd
 # into them and run 'make' without going through this Makefile.
@@ -592,12 +501,6 @@ GTAGS:
 	here=`$(am__cd) $(top_builddir) && pwd` \
 	  && $(am__cd) $(top_srcdir) \
 	  && gtags -i $(GTAGS_ARGS) "$$here"
-cscope: cscope.files
-	test ! -s cscope.files \
-	  || $(CSCOPE) -b -q $(AM_CSCOPEFLAGS) $(CSCOPEFLAGS) -i cscope.files $(CSCOPE_ARGS)
-clean-cscope:
-	-rm -f cscope.files
-cscope.files: clean-cscope cscopelist
 cscopelist: cscopelist-recursive
 
 cscopelist-am: $(am__tagged_files)
@@ -616,11 +519,8 @@ cscopelist-am: $(am__tagged_files)
 
 distclean-tags:
 	-rm -f TAGS ID GTAGS GRTAGS GSYMS GPATH tags
-	-rm -f cscope.out cscope.in.out cscope.po.out cscope.files
 
 distdir: $(DISTFILES)
-	$(am__remove_distdir)
-	test -d "$(distdir)" || mkdir "$(distdir)"
 	@srcdirstrip=`echo "$(srcdir)" | sed 's/[].[^$$\\*]/\\\\&/g'`; \
 	topsrcdirstrip=`echo "$(top_srcdir)" | sed 's/[].[^$$\\*]/\\\\&/g'`; \
 	list='$(DISTFILES)'; \
@@ -675,143 +575,12 @@ distdir: $(DISTFILES)
 	      || exit 1; \
 	  fi; \
 	done
-	-test -n "$(am__skip_mode_fix)" \
-	|| find "$(distdir)" -type d ! -perm -755 \
-		-exec chmod u+rwx,go+rx {} \; -o \
-	  ! -type d ! -perm -444 -links 1 -exec chmod a+r {} \; -o \
-	  ! -type d ! -perm -400 -exec chmod a+r {} \; -o \
-	  ! -type d ! -perm -444 -exec $(install_sh) -c -m a+r {} {} \; \
-	|| chmod -R a+r "$(distdir)"
-dist-gzip: distdir
-	tardir=$(distdir) && $(am__tar) | GZIP=$(GZIP_ENV) gzip -c >$(distdir).tar.gz
-	$(am__post_remove_distdir)
-
-dist-bzip2: distdir
-	tardir=$(distdir) && $(am__tar) | BZIP2=$${BZIP2--9} bzip2 -c >$(distdir).tar.bz2
-	$(am__post_remove_distdir)
-
-dist-lzip: distdir
-	tardir=$(distdir) && $(am__tar) | lzip -c $${LZIP_OPT--9} >$(distdir).tar.lz
-	$(am__post_remove_distdir)
-
-dist-xz: distdir
-	tardir=$(distdir) && $(am__tar) | XZ_OPT=$${XZ_OPT--e} xz -c >$(distdir).tar.xz
-	$(am__post_remove_distdir)
-
-dist-tarZ: distdir
-	@echo WARNING: "Support for shar distribution archives is" \
-	               "deprecated." >&2
-	@echo WARNING: "It will be removed altogether in Automake 2.0" >&2
-	tardir=$(distdir) && $(am__tar) | compress -c >$(distdir).tar.Z
-	$(am__post_remove_distdir)
-
-dist-shar: distdir
-	@echo WARNING: "Support for distribution archives compressed with" \
-		       "legacy program 'compress' is deprecated." >&2
-	@echo WARNING: "It will be removed altogether in Automake 2.0" >&2
-	shar $(distdir) | GZIP=$(GZIP_ENV) gzip -c >$(distdir).shar.gz
-	$(am__post_remove_distdir)
-
-dist-zip: distdir
-	-rm -f $(distdir).zip
-	zip -rq $(distdir).zip $(distdir)
-	$(am__post_remove_distdir)
-
-dist dist-all:
-	$(MAKE) $(AM_MAKEFLAGS) $(DIST_TARGETS) am__post_remove_distdir='@:'
-	$(am__post_remove_distdir)
-
-# This target untars the dist file and tries a VPATH configuration.  Then
-# it guarantees that the distribution is self-contained by making another
-# tarfile.
-distcheck: dist
-	case '$(DIST_ARCHIVES)' in \
-	*.tar.gz*) \
-	  GZIP=$(GZIP_ENV) gzip -dc $(distdir).tar.gz | $(am__untar) ;;\
-	*.tar.bz2*) \
-	  bzip2 -dc $(distdir).tar.bz2 | $(am__untar) ;;\
-	*.tar.lz*) \
-	  lzip -dc $(distdir).tar.lz | $(am__untar) ;;\
-	*.tar.xz*) \
-	  xz -dc $(distdir).tar.xz | $(am__untar) ;;\
-	*.tar.Z*) \
-	  uncompress -c $(distdir).tar.Z | $(am__untar) ;;\
-	*.shar.gz*) \
-	  GZIP=$(GZIP_ENV) gzip -dc $(distdir).shar.gz | unshar ;;\
-	*.zip*) \
-	  unzip $(distdir).zip ;;\
-	esac
-	chmod -R a-w $(distdir)
-	chmod u+w $(distdir)
-	mkdir $(distdir)/_build $(distdir)/_inst
-	chmod a-w $(distdir)
-	test -d $(distdir)/_build || exit 0; \
-	dc_install_base=`$(am__cd) $(distdir)/_inst && pwd | sed -e 's,^[^:\\/]:[\\/],/,'` \
-	  && dc_destdir="$${TMPDIR-/tmp}/am-dc-$$$$/" \
-	  && am__cwd=`pwd` \
-	  && $(am__cd) $(distdir)/_build \
-	  && ../configure \
-	    $(AM_DISTCHECK_CONFIGURE_FLAGS) \
-	    $(DISTCHECK_CONFIGURE_FLAGS) \
-	    --srcdir=.. --prefix="$$dc_install_base" \
-	  && $(MAKE) $(AM_MAKEFLAGS) \
-	  && $(MAKE) $(AM_MAKEFLAGS) dvi \
-	  && $(MAKE) $(AM_MAKEFLAGS) check \
-	  && $(MAKE) $(AM_MAKEFLAGS) install \
-	  && $(MAKE) $(AM_MAKEFLAGS) installcheck \
-	  && $(MAKE) $(AM_MAKEFLAGS) uninstall \
-	  && $(MAKE) $(AM_MAKEFLAGS) distuninstallcheck_dir="$$dc_install_base" \
-	        distuninstallcheck \
-	  && chmod -R a-w "$$dc_install_base" \
-	  && ({ \
-	       (cd ../.. && umask 077 && mkdir "$$dc_destdir") \
-	       && $(MAKE) $(AM_MAKEFLAGS) DESTDIR="$$dc_destdir" install \
-	       && $(MAKE) $(AM_MAKEFLAGS) DESTDIR="$$dc_destdir" uninstall \
-	       && $(MAKE) $(AM_MAKEFLAGS) DESTDIR="$$dc_destdir" \
-	            distuninstallcheck_dir="$$dc_destdir" distuninstallcheck; \
-	      } || { rm -rf "$$dc_destdir"; exit 1; }) \
-	  && rm -rf "$$dc_destdir" \
-	  && $(MAKE) $(AM_MAKEFLAGS) dist \
-	  && rm -rf $(DIST_ARCHIVES) \
-	  && $(MAKE) $(AM_MAKEFLAGS) distcleancheck \
-	  && cd "$$am__cwd" \
-	  || exit 1
-	$(am__post_remove_distdir)
-	@(echo "$(distdir) archives ready for distribution: "; \
-	  list='$(DIST_ARCHIVES)'; for i in $$list; do echo $$i; done) | \
-	  sed -e 1h -e 1s/./=/g -e 1p -e 1x -e '$$p' -e '$$x'
-distuninstallcheck:
-	@test -n '$(distuninstallcheck_dir)' || { \
-	  echo 'ERROR: trying to run $@ with an empty' \
-	       '$$(distuninstallcheck_dir)' >&2; \
-	  exit 1; \
-	}; \
-	$(am__cd) '$(distuninstallcheck_dir)' || { \
-	  echo 'ERROR: cannot chdir into $(distuninstallcheck_dir)' >&2; \
-	  exit 1; \
-	}; \
-	test `$(am__distuninstallcheck_listfiles) | wc -l` -eq 0 \
-	   || { echo "ERROR: files left after uninstall:" ; \
-	        if test -n "$(DESTDIR)"; then \
-	          echo "  (check DESTDIR support)"; \
-	        fi ; \
-	        $(distuninstallcheck_listfiles) ; \
-	        exit 1; } >&2
-distcleancheck: distclean
-	@if test '$(srcdir)' = . ; then \
-	  echo "ERROR: distcleancheck can only run from a VPATH build" ; \
-	  exit 1 ; \
-	fi
-	@test `$(distcleancheck_listfiles) | wc -l` -eq 0 \
-	  || { echo "ERROR: files left in build directory after distclean:" ; \
-	       $(distcleancheck_listfiles) ; \
-	       exit 1; } >&2
 check-am: all-am
 check: check-recursive
-all-am: Makefile $(DATA) config.h
+all-am: Makefile $(DATA)
 installdirs: installdirs-recursive
 installdirs-am:
-	for dir in "$(DESTDIR)$(docdir)" "$(DESTDIR)$(sysconfdir)"; do \
+	for dir in "$(DESTDIR)$(docdir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
 install: install-recursive
@@ -849,10 +618,8 @@ clean: clean-recursive
 clean-am: clean-generic clean-libtool mostlyclean-am
 
 distclean: distclean-recursive
-	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
 	-rm -f Makefile
-distclean-am: clean-am distclean-generic distclean-hdr \
-	distclean-libtool distclean-tags
+distclean-am: clean-am distclean-generic distclean-tags
 
 dvi: dvi-recursive
 
@@ -872,7 +639,7 @@ install-dvi: install-dvi-recursive
 
 install-dvi-am:
 
-install-exec-am: install-nobase_dist_sysconfDATA
+install-exec-am:
 
 install-html: install-html-recursive
 
@@ -895,8 +662,6 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-recursive
-	-rm -f $(am__CONFIG_DISTCLEAN_FILES)
-	-rm -rf $(top_srcdir)/autom4te.cache
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
@@ -912,222 +677,24 @@ ps: ps-recursive
 
 ps-am:
 
-uninstall-am: uninstall-dist_docDATA uninstall-nobase_dist_sysconfDATA
+uninstall-am: uninstall-dist_docDATA
 
-.MAKE: $(am__recursive_targets) all install-am install-strip
+.MAKE: $(am__recursive_targets) install-am install-strip
 
-.PHONY: $(am__recursive_targets) CTAGS GTAGS TAGS all all-am \
-	am--refresh check check-am clean clean-cscope clean-generic \
-	clean-libtool cscope cscopelist-am ctags ctags-am dist \
-	dist-all dist-bzip2 dist-gzip dist-lzip dist-shar dist-tarZ \
-	dist-xz dist-zip distcheck distclean distclean-generic \
-	distclean-hdr distclean-libtool distclean-tags distcleancheck \
-	distdir distuninstallcheck dvi dvi-am html html-am info \
-	info-am install install-am install-data install-data-am \
+.PHONY: $(am__recursive_targets) CTAGS GTAGS TAGS all all-am check \
+	check-am clean clean-generic clean-libtool cscopelist-am ctags \
+	ctags-am distclean distclean-generic distclean-libtool \
+	distclean-tags distdir dvi dvi-am html html-am info info-am \
+	install install-am install-data install-data-am \
 	install-dist_docDATA install-dvi install-dvi-am install-exec \
 	install-exec-am install-html install-html-am install-info \
-	install-info-am install-man install-nobase_dist_sysconfDATA \
-	install-pdf install-pdf-am install-ps install-ps-am \
-	install-strip installcheck installcheck-am installdirs \
-	installdirs-am maintainer-clean maintainer-clean-generic \
-	mostlyclean mostlyclean-generic mostlyclean-libtool pdf pdf-am \
-	ps ps-am tags tags-am uninstall uninstall-am \
-	uninstall-dist_docDATA uninstall-nobase_dist_sysconfDATA
+	install-info-am install-man install-pdf install-pdf-am \
+	install-ps install-ps-am install-strip installcheck \
+	installcheck-am installdirs installdirs-am maintainer-clean \
+	maintainer-clean-generic mostlyclean mostlyclean-generic \
+	mostlyclean-libtool pdf pdf-am ps ps-am tags tags-am uninstall \
+	uninstall-am uninstall-dist_docDATA
 
-
-###############################################################################
-# show make targets
-#
-.PHONY: help
-help:
-	@echo ""
-	@echo ""
-	@echo "in addition to standard targets (all, install, clean, ...) "
-	@echo "the following make targets may be supported (at this level):"
-	@echo ""
-	@echo "    make help      - print this text"
-	@echo "    make DIST      - dist + a Makefile that calls ./configure"
-	@echo "    make DOXY      - create Doxygen documentation"
-	@echo "    make RPM       - create (source and binary) RPMs"
-	@echo "    make DEB       - create debian packages"
-	@echo ""
-	@echo "    make SVNUP     - update from SVN and ./configure"
-	@echo ""
-	@echo "NOTE: The RPM and DEB targets may fail because they require" 
-	@echo "additional tools that may not be present on your machine."
-	@echo ""
-	@echo "The following targets are shortcuts for lazy developers like the"
-	@echo "GNU APL author and are not very useful for normal users:"
-	@echo ""
-	@echo "    make develop   - enable full dependency tracking"
-	@echo "    make gprof     - make develop + enable gprof profiling"
-	@echo "    make parallel  - enable multi-core APL (buggy and experimental!)"
-	@echo "    make parallel1 - make parallel for benchmarking"
-	@echo ""
-
-###############################################################################
-# a shortcut to ./configure for developing and troubleshooting
-#
-.PHONY: develop
-develop:
-	./configure  --enable-maintainer-mode DEVELOP_WANTED=yes
-	make all
-
-###############################################################################
-# a shortcut to ./configure for profiling using gprof
-#
-# running apl (in e.g. src) will then produce a file gmon.out which can then be
-# analyzed with gprof apl gmon.out
-#
-.PHONY: gprof
-gprof:
-	./configure  --enable-maintainer-mode DEVELOP_WANTED=yes GPROF_WANTED=yes
-	make all
-
-###############################################################################
-# a shortcut to ./configure for devloping and troubleshooting libapl
-#
-.PHONY: develop_lib
-develop_lib:
-	./configure  --enable-maintainer-mode DEVELOP_WANTED=yes --with-libapl
-	make all
-
-# a shortcut to configure for benchmarking parallel execution
-#
-.PHONY: parallel
-parallel:
-	./configure --enable-maintainer-mode            \
-                    VALUE_CHECK_WANTED=no               \
-                    VALUE_HISTORY_WANTED=no             \
-                    PERFORMANCE_COUNTERS_WANTED=no      \
-                    DYNAMIC_LOG_WANTED=yes              \
-                    ASSERT_LEVEL_WANTED=0               \
-                    CORE_COUNT_WANTED=-3
-	make all
-
-# a shortcut to configure for benchmarking parallel execution but with
-# performance counters
-#
-.PHONY: parallel1
-parallel1:
-	./configure --enable-maintainer-mode            \
-                    VALUE_CHECK_WANTED=no               \
-                    VALUE_HISTORY_WANTED=no             \
-                    PERFORMANCE_COUNTERS_WANTED=yes     \
-                    DYNAMIC_LOG_WANTED=yes              \
-                    ASSERT_LEVEL_WANTED=0               \
-                    CORE_COUNT_WANTED=-3
-	make all
-
-# doxygen documentation
-#
-.PHONY:	DOXY
-DOXY:
-	doxygen
-
-# source and binary RPMs
-#
-.PHONY:	RPM
-RPM:	DIST all
-	rm -f rpm/rpm-tmp.*
-	make -C rpm $@
-	mkdir -p ftp-upload
-	cp rpm/SRPMS/$(PACKAGE)-$(PACKAGE_VERSION)-0.src.rpm  ftp-upload/
-	cp rpm/RPMS/*/$(PACKAGE)-$(PACKAGE_VERSION)-0.*.rpm   ftp-upload/
-
-# source and binary Debian packages
-#
-.PHONY:	DEB
-DEB:	DIST
-	rm -Rf debian_tmp
-	mkdir debian_tmp
-	cp $(distdir).tar.gz \
-           debian_tmp/$(PACKAGE)_$(PACKAGE_VERSION).orig.tar.gz
-	cd debian_tmp ; tar xf $(PACKAGE)_$(PACKAGE_VERSION).orig.tar.gz
-	cp doc/apl.1 debian_tmp/$(distdir)/debian/manpage.1
-	cd debian_tmp/$(distdir) ; dpkg-buildpackage -j4
-	mkdir -p ftp-upload
-	cp debian_tmp/$(PACKAGE)_$(PACKAGE_VERSION)-1_*.deb          ftp-upload/
-	cp debian_tmp/$(PACKAGE)_$(PACKAGE_VERSION)-1.debian.tar.gz  ftp-upload/
-
-# update from SVN repository and ./configure
-#
-.PHONY:	SVNUP
-SVNUP:
-	svn update
-	./configure --disable-maintainer-mode
-
-# a shortcut to export changes to ../savannah-repo-apl (which is supposed to be
-# a checkout of the GNU APL repository at Savannah
-#
-.PHONY:	SYNC
-SYNC:	DIST
-	rm -Rf apl-$(VERSION)
-	tar xvzf apl-$(VERSION).tar.gz
-	rm -f apl-$(VERSION)/src/makefile.h
-	rm -f apl-$(VERSION)/src/buildtag.hh
-	rm -f apl-$(VERSION)/src/configure_args.cc
-	cp -a apl-$(VERSION)/* ../savannah-repo-apl/trunk/
-	rm -Rf apl-$(VERSION)
-	cd ../savannah-repo-apl ; svn add . --force -q
-
-# build all packages and SYNC
-#
-.PHONY:	EXPO
-EXPO:
-	tools/check_src
-	svn -m "auto-commit by make EXPO" commit
-	svn update
-	cd src; . buildtag
-	svn -m "auto-commit by make EXPO" commit
-	./configure --disable-maintainer-mode
-	make all
-	make dist
-	make DEB
-#	make RPM
-	make SYNC
-
-# EXPO1 is EXPO without updating/committing from/to SVN
-.PHONY:	EXPO1
-EXPO1:
-	tools/check_src
-	cd src; source buildtag
-	./configure --disable-maintainer-mode
-	make
-	make dist
-	make DEB
-	make RPM
-
-Makefile.dist:
-	echo "%:"		 > $@
-	echo "rm -f Makefile"	>> $@
-	echo "./configure"	>> $@
-	echo "make $@"		>> $@
-	echo 			>> $@
-
-# perform 'make dist' and then add file './Makefile.dist' as 'Makefile' to
-# the GNU APL project tar file created by 'make dist'.
-#
-# This is a trick to enable the building of make targets that do not need
-# ./configure (i.e. help, develop, develop_lib, parallel, and parallel1)
-# before ./configure is run. This avoids running ./configure if not needed
-# or running ./configure twice (e.g. for make develop)
-#
-DIST:	dist Makefile.dist
-	pwd
-	mkdir -p tmp
-	cd tmp; tar xzf ../apl-$(VERSION).tar.gz;		\
-	cp -f ../Makefile.dist apl-$(VERSION)/Makefile;		\
-	tar czf ../apl-$(VERSION).tar.gz apl-$(VERSION)
-	rm -Rf tmp
-
-am--refresh:
-	echo "making am--refresh"
-
-.PHONY: git-pull
-git-pull:
-	make -C src $@
-	make -C wslib5 $@
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

@@ -1,0 +1,6 @@
+
+The files 'apl_js.html' and 'apl_js.css' are the "client-side" HTML and
+CSS files sent from the web-server to the browser that is acceessing a
+GNU APL interpreter on the server side.
+
+

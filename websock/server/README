@@ -1,0 +1,11 @@
+
+The file 'wsock.js' is an example websocket interface to a standard GNU
+APL interpreter written in JavaScript. It requires a server-side node.js
+installation and a node.js application with 'wsock.js' as its main script.
+
+wsock.js depends on 'express'. On the server it is started like this:
+
+    node wsock.js
+
+The file apl_js is a confguration snipplet for an apache web server.
+

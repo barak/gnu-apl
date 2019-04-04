@@ -343,6 +343,9 @@ AC_CONFIG_FILES([Makefile
                  support-files/old-Keyboard/Makefile
                  support-files/Dirk/Makefile
                  tools/Makefile
+                 websock/Makefile
+                 websock/client/Makefile
+                 websock/server/Makefile
                  workspaces/Makefile
                  wslib3/Makefile
                  wslib4/Makefile

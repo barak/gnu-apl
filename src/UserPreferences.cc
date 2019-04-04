@@ -213,6 +213,27 @@ bool log_startup = false;
               user_profile = atoi(val);
               continue;
             }
+
+         if (!strcmp(opt, "-C"))
+            {
+              ++a;
+              if (!val)
+                 {
+                   CERR << "-C without directory" << endl;
+                   exit(a);
+                 }
+
+              if (chroot(val))
+                 {
+                   CERR << "chroot(" << val << ") failed: "
+                        << strerror(errno) << endl;
+                   exit(a);
+                 }
+
+              if (chdir("/"))   ;
+
+              continue;
+            }
        }
 
    return log_startup;
@@ -272,6 +293,12 @@ UserPreferences::parse_argv_2(bool logit)
             {
               show_configure_options();
               exit(0);
+            }
+
+         if (!strcmp(opt, "-C"))
+            {
+              ++a;
+              continue;   // -C already handled in parse_argv_1()
             }
 
          if (!strcmp(opt, "--Color"))

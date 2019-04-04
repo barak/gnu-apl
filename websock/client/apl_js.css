@@ -1,0 +1,17 @@
+
+BODY    { background-color: #EEE;
+          margin: 0; padding: 2em;
+        }
+
+H1      { text-align: center }
+.footer { text-align: center; font-style: italic }
+
+.APL_output
+{
+  display: block;
+  font-family: monospace;
+  white-space: pre;
+  margin: 1em 0;
+  width: 80em;
+}
+

@@ -158,6 +158,47 @@ U+2200 - U+23FF range).
 GNU APL understands the following command line options:
 
 @itemize @bullet
+
+@item
+@option{-C new_root}
+
+perform chroot("new_root") followed by chdir("/"). This restricts the access
+of the the process running GNU APL to files in or below directory new_root, and
+it also changes the current directory (which could have resided above new_root
+before the chroot() was executed).
+
+The -C option is intended to be a security
+feature for GNU APL interpreters that are facing a hostile environment like
+the public internet.
+
+NOTES:
+@itemize @bullet
+
+@item
+For -C to work, new_root needs to contain minimal set of binaries, in
+particular a shell, and possibly libraries needed by the shell. Consult
+'info chroot invocation' for issues to consider and common pitfalls.
+
+@item
+GNU APL processes the -C option (i.e. it calls chroot("new_root")) before
+all other command line options. As a consequence, file names in other command
+line options pf GNU APL are also affected by -C. That means that the file names
+are interpreted relative to new_root and not relative to the root of the
+process that is starting GNU APL.
+
+@item
+GNU APL may automatically start other processes such as APserver and friends
+after processing the -C option. These processes (and the libraries that they
+depend on) should reside in the proper directory below new_root. For example,
+with the default configuration of GNU APL, GNU APL installs itself in
+/usr/local/bin and also expects APserver in the same directory. After -C
+new_root. however, /usr/local/bin is no longer accessible and one would need to copy /usr/local/bin/APserver to new_root/usr/local/bin/APserver
+
+@item
+Depending on your platform, the process using -C may need root privileges.
+
+@end itemize
+
 @item
 @option{--cfg}
 
@@ -1820,7 +1861,7 @@ a left argument of 0:
       ⊤⍱ B    ←→    0 ⊤⍱ B      ⍝ bit-wise Not
 @end verbatim
 
-Even though that Or-ing a Boolean vector with 0 itself has no effect, the
+Even though Or-ing a Boolean vector with 0 itself has no effect, the
 monadic ⊤∨ and ⊤⍱ are still useful due to their side effects: conversion
 from near-integer float values to integers (monadic @b{⊤∨} and inversion
 of the bits (monadic @b{⊤⍱}, The latter is needed since ∼ has a monadic

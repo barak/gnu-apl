@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+ <head>
+ <meta charset="UTF-8">
+ <link rel="stylesheet" type="text/css" href="apl_css">
+  <script type='text/javascript'>
+
+    function init()
+    {
+      var address = "ws://server57:42424";
+      var protocol = "apl-protocol"
+      web_socket = new WebSocket(address, protocol);
+      web_socket.onmessage = function(e)
+         {
+           if (typeof e.data === 'string')
+              {
+                var lines = e.data.split("\n");
+                output_line(output_rest + lines[0] + "\n");
+                output_rest = lines.pop();
+                for (var j = 1; j < lines.length; ++j)
+                    output_line(lines[j] + "\n");
+              }
+         };
+
+      input_form = document.forms["APL_input"]["in_form"];
+      output_div = document.getElementById("APL_output");
+      output_screen = [ ];   // content of output_div
+      output_screen_max = 30;
+      output_line("APL output...");
+      output_line("");
+      output_rest = "";
+    }
+
+    // print line into the output_div element
+    //
+    function output_line(line)
+    {
+       if (output_screen.length > output_screen_max)   output_screen.shift();
+       output_screen.push(line);
+
+      var text = "";
+      for (var j = 0; j < output_screen.length; ++j)
+          text = text + output_screen[j];
+      output_div.innerHTML = text;
+    }
+
+    function process_line()
+    {
+      var user_input = input_form.value + "\n";
+      input_form.value = "";
+      web_socket.send(user_input);
+      output_line("      " + user_input);
+      return false;
+    }
+
+  </script>
+ </head>
+ <body onload="init()">
+
+  <H1>Welcome to TRY-GNU-APL</H1>
+  <HR>
+  <pre><div id="APL_output"></div></pre>
+  <HR>
+  <form name="APL_input" onsubmit="return process_line()" method="post">
+   APL Input: <input type="text" name="in_form" size=60>
+  <input type="submit" value="Enter">
+  </form>
+  <HR>
+  <div class=footer>this page is powered by GNU APL</div>
+ </body>
+</html>
+

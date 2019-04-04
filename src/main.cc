@@ -223,7 +223,7 @@ const char * lines[] =
   ""                                                                      ,
   c1                                                                      ,
   ""                                                                      ,
-  "Copyright (C) 2008-2016  Dr. Jürgen Sauermann"                         ,
+  "Copyright (C) 2008-2019  Dr. Jürgen Sauermann"                         ,
   "Banner by FIGlet: www.figlet.org"                                      ,
   ""                                                                      ,
   "This program comes with ABSOLUTELY NO WARRANTY;"                       ,

@@ -127,6 +127,45 @@ U+2200 - U+23FF range).
 
 GNU APL understands the following command line options:
 
+   • ‘-C new_root’
+
+     perform chroot("new_root") followed by chdir("/").  This restricts
+     the access of the the process running GNU APL to files in or below
+     directory new_root, and it also changes the current directory
+     (which could have resided above new_root before the chroot() was
+     executed).
+
+     The -C option is intended to be a security feature for GNU APL
+     interpreters that are facing a hostile environment like the public
+     internet.
+
+     NOTES:
+
+        • For -C to work, new_root needs to contain minimal set of
+          binaries, in particular a shell, and possibly libraries needed
+          by the shell.  Consult ’info chroot invocation’ for issues to
+          consider and common pitfalls.
+
+        • GNU APL processes the -C option (i.e.  it calls
+          chroot("new_root")) before all other command line options.  As
+          a consequence, file names in other command line options pf GNU
+          APL are also affected by -C. That means that the file names
+          are interpreted relative to new_root and not relative to the
+          root of the process that is starting GNU APL.
+
+        • GNU APL may automatically start other processes such as
+          APserver and friends after processing the -C option.  These
+          processes (and the libraries that they depend on) should
+          reside in the proper directory below new_root.  For example,
+          with the default configuration of GNU APL, GNU APL installs
+          itself in /usr/local/bin and also expects APserver in the same
+          directory.  After -C new_root.  however, /usr/local/bin is no
+          longer accessible and one would need to copy
+          /usr/local/bin/APserver to new_root/usr/local/bin/APserver
+
+        • Depending on your platform, the process using -C may need root
+          privileges.
+
    • ‘--cfg’
 
      show ./configure options that were used to configure GNU APL, and
@@ -1742,12 +1781,11 @@ of their Boolean companions:
       ⊤∨ B    ←→    0 ⊤∨ B      ⍝ real B to nearby integer
       ⊤⍱ B    ←→    0 ⊤⍱ B      ⍝ bit-wise Not
 
-   Even though that Or-ing a Boolean vector with 0 itself has no effect,
-the monadic ⊤∨ and ⊤⍱ are still useful due to their side effects:
-conversion from near-integer float values to integers (monadic ⊤∨ and
-inversion of the bits (monadic ⊤⍱, The latter is needed since ∼ has a
-monadic form and as a consequence ⊤∼ was not an option for a bit-wise
-Not function.
+   Even though Or-ing a Boolean vector with 0 itself has no effect, the
+monadic ⊤∨ and ⊤⍱ are still useful due to their side effects: conversion
+from near-integer float values to integers (monadic ⊤∨ and inversion of
+the bits (monadic ⊤⍱, The latter is needed since ∼ has a monadic form
+and as a consequence ⊤∼ was not an option for a bit-wise Not function.
 
    Monadic ⊤⍱ B is the bit-wise Not function of its argument:
 
@@ -4572,46 +4610,46 @@ please read <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 Tag Table:
 Node: Top383
 Node: Chapter 11416
-Node: Chapter 217248
-Node: Chapter 321672
-Node: Section 3.123197
-Node: Section 3.239209
-Node: Section 3.339968
-Node: Section 3.441255
-Node: Section 3.543876
-Node: Section 3.644049
-Node: Section 3.744662
-Node: Section 3.848606
-Node: Section 3.950148
-Node: Section 3.1050745
-Node: Section 3.1152529
-Node: Section 3.1254469
-Node: Section 3.1355410
-Node: Section 3.1455662
-Node: Section 3.1557058
-Node: Section 3.1659570
-Node: Section 3.1766274
-Node: Section 3.1871327
-Node: Section 3.1974609
-Node: Section 3.2074900
-Node: Section 3.2184812
-Node: Section 3.2285084
-Node: Section 3.2391662
-Node: Section 3.2494113
-Node: Section 3.2594782
-Node: Section 3.26101418
-Node: Section 3.27102358
-Node: Section 3.28115920
-Node: Section 3.29119024
-Node: Section 3.30121013
-Node: Chapter 4125391
-Node: Chapter 5127139
-Node: Chapter 6128268
-Node: Section 6.1128687
-Node: Section 6.2129374
-Node: Chapter 7130205
-Node: Section 7.1130708
-Node: Section 7.2156018
+Node: Chapter 219118
+Node: Chapter 323542
+Node: Section 3.125067
+Node: Section 3.241079
+Node: Section 3.341838
+Node: Section 3.443125
+Node: Section 3.545746
+Node: Section 3.645919
+Node: Section 3.746532
+Node: Section 3.850476
+Node: Section 3.952018
+Node: Section 3.1052615
+Node: Section 3.1154399
+Node: Section 3.1256339
+Node: Section 3.1357280
+Node: Section 3.1457532
+Node: Section 3.1558928
+Node: Section 3.1661440
+Node: Section 3.1768139
+Node: Section 3.1873192
+Node: Section 3.1976474
+Node: Section 3.2076765
+Node: Section 3.2186677
+Node: Section 3.2286949
+Node: Section 3.2393527
+Node: Section 3.2495978
+Node: Section 3.2596647
+Node: Section 3.26103283
+Node: Section 3.27104223
+Node: Section 3.28117785
+Node: Section 3.29120889
+Node: Section 3.30122878
+Node: Chapter 4127256
+Node: Chapter 5129004
+Node: Chapter 6130133
+Node: Section 6.1130552
+Node: Section 6.2131239
+Node: Chapter 7132070
+Node: Section 7.1132573
+Node: Section 7.2157883
 
 End Tag Table
 

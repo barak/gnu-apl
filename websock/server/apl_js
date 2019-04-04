@@ -1,0 +1,15 @@
+Alias   /apl_js   /home/eedjsa/projects/juergen/apl-1.7/websock/client/apl_js.html
+Alias   /apl_css  /home/eedjsa/projects/juergen/apl-1.7/websock/client/apl_js.css
+
+<Location /apl_js>
+    Order           allow,deny
+    Allow from      all
+    Satisfy         Any
+</Location>
+
+<Location /apl_css>
+    Order           allow,deny
+    Allow from      all
+    Satisfy         Any
+</Location>
+

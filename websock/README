@@ -1,0 +1,12 @@
+
+This directory contains the source code for a TRY-GNU-APL web site.
+
+The sub-directory 'client' contains the client (web-browser) part which is
+sent to a remote browser.
+
+The sub-directory 'server' contains the server part which is executed
+in a node.js context around GNU APL.
+
+
+
+

@@ -1178,7 +1178,7 @@ Command::cmd_HOST(ostream & out, const UCS_string & arg)
 
 UTF8_string host_cmd(arg);
 FILE * pipe = popen(host_cmd.c_str(), "r");
-   if (pipe == 0)   // popen failed
+   if (pipe == 0)   // popen() failed
       {
         out << ")HOST command failed: " << strerror(errno) << endl;
         return;
@@ -1192,6 +1192,11 @@ FILE * pipe = popen(host_cmd.c_str(), "r");
        }
 
 int result = pclose(pipe);
+   Log(LOG_verbose_error)
+      {
+        if (result)   CERR << "pclose(" << arg << ") says: "
+                           << strerror(errno) << endl;
+      }
    out << endl << IntCell(result) << endl;
 }
 //-----------------------------------------------------------------------------
