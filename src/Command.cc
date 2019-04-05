@@ -1172,7 +1172,9 @@ Command::cmd_HOST(ostream & out, const UCS_string & arg)
 {
    if (uprefs.safe_mode)
       {
-        out << ")HOST command not allowed in safe mode." << endl;
+        out << 
+"This interpreter was started in \"safe mode\" (command line option --safe,\n"
+"see ⎕ARG). The APL command )HOST is not permitted in safe mode." << endl;
         return;
       }
 

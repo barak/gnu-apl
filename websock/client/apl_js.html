@@ -2,7 +2,7 @@
 <html>
  <head>
  <meta charset="UTF-8">
- <link rel="stylesheet" type="text/css" href="apl_css">
+ <link rel="stylesheet" type="text/css" href="./apl_js.css">
   <script type='text/javascript'>
 
     function init()
@@ -14,42 +14,84 @@
          {
            if (typeof e.data === 'string')
               {
-                var lines = e.data.split("\n");
-                output_line(output_rest + lines[0] + "\n");
-                output_rest = lines.pop();
-                for (var j = 1; j < lines.length; ++j)
-                    output_line(lines[j] + "\n");
+                var lines = e.data.split('\n');
+                var last = lines.pop();
+                for (var j = 0; j < lines.length; ++j)
+                    output_line(lines[j], "o");
               }
          };
 
       input_form = document.forms["APL_input"]["in_form"];
-      output_div = document.getElementById("APL_output");
-      output_screen = [ ];   // content of output_div
-      output_screen_max = 30;
-      output_line("APL output...");
-      output_line("");
-      output_rest = "";
+      channel = "o";
+      prompt = false;
+    }
+
+    function to_HTML(text)
+    {
+      var ret = "";
+      for (var j = 0; j < text.length; ++j)
+          {
+            var cc = text.charAt(j);
+            switch(cc)
+               {
+                 case ' ': ret += "&nbsp;";   break;
+                 case '&': ret += "&amp;";    break;
+                 case '<': ret += "&lt;";     break;
+                 case '>': ret += "&gt;";     break;
+                 case '"': ret += "&quot;";   break;
+                 case "'": ret += "&apos;";   break;
+                 default:  ret += cc;
+               }
+          }
+      return ret;
     }
 
     // print line into the output_div element
     //
-    function output_line(line)
+    function output_line(line, ioe)
     {
-       if (output_screen.length > output_screen_max)   output_screen.shift();
-       output_screen.push(line);
+      if (line === '      ' && !prompt)   // most likely a prompt
+         {
+           prompt = true;
+           return;
+         }
 
-      var text = "";
-      for (var j = 0; j < output_screen.length; ++j)
-          text = text + output_screen[j];
-      output_div.innerHTML = text;
+      if (prompt)   // false prompt
+         {
+           do_output_line('      ', "o");
+           prompt = false;
+         }
+
+      do_output_line(line, ioe);
+    }
+
+    function do_output_line(line, ioe)
+    {
+      if (line.charAt(0) == "①")        // output channel
+         {
+           channel = "o";
+           line = line.slice(1);   // remove ①
+         }
+      else if (line.charAt(0) == "②")   // error channel
+         {
+           channel = "e";
+           line = line.slice(1);   // remove ②
+         }
+      var screen =  document.getElementById("screen");
+      var row = screen.insertRow(-1);   // insert at the end
+      var cell = row.insertCell(0);
+      cell.innerHTML = to_HTML(line);
+      if (ioe === 'i')   cell.className = "i";
+      else               cell.className = channel;
     }
 
     function process_line()
     {
-      var user_input = input_form.value + "\n";
+      var user_input = input_form.value;
       input_form.value = "";
-      web_socket.send(user_input);
-      output_line("      " + user_input);
+      output_line('      ' + user_input, "i");
+      prompt = false;
+      web_socket.send(user_input + "\n");
       return false;
     }
 
@@ -59,7 +101,8 @@
 
   <H1>Welcome to TRY-GNU-APL</H1>
   <HR>
-  <pre><div id="APL_output"></div></pre>
+  <TABLE id=screen>
+  </TABLE>
   <HR>
   <form name="APL_input" onsubmit="return process_line()" method="post">
    APL Input: <input type="text" name="in_form" size=60>

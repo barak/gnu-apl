@@ -30,18 +30,12 @@ server.listen(42424,
 wsServer = new WebSocketServer(
    {
      httpServer: server,
-     // You should not use autoAcceptConnections for production
-     // applications, as it defeats all standard cross-origin protection
-     // facilities built into the protocol and the browser.  You should
-     // *always* verify the connection's origin and decide whether or not
-     // to accept it.
      autoAcceptConnections: false
    }                          );
  
 wsServer.on('request', function(request)
    {
     var connection = request.accept('apl-protocol', request.origin);
-    var tx_line = "";
     console.log(now() + ' Connection from ' +
                 request.origin + ' accepted.');
 
@@ -50,23 +44,12 @@ wsServer.on('request', function(request)
                                          "--noCONT",
                                          "--rawCIN",
                                          "-p", "2",
-                                         "-w", "100",
+                                         "-w", "300",
                                        ]);
      apl.stdout.setEncoding('utf-8');
-
-     apl.stdout.on('data', (data) =>
-        {
-          // some output bytes from GNU APL.
-          // Collect them into full lines.
-          var pos = data.lastIndexOf("\n");
-	  if (pos == -1)   tx_line += data;
-          else
-             {
-               var rest = data.slice(pos + 1)   // bytes after \n
-               connection.sendUTF(tx_line + data.slice(0, pos + 1));
-               tx_line = rest;
-             }
-        }         );
+     apl.stdout.on('data', (data) => { connection.sendUTF(data); } );
+     apl.stderr.setEncoding('utf-8');
+     apl.stderr.on('data', (data) => { connection.sendUTF(data); } );
 
     connection.on('message',
        function(message)
