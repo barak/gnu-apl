@@ -85,6 +85,8 @@ char cc[4000];
 #endif
 
    snprintf(cc, sizeof(cc),
+"    -C new_root          perform chroot(new_root) before starting APL (root only)\n"
+"    -u UID               runas user UID (root only)\n"
 "    --cfg                show ./configure options used and exit\n"
 "    --noCIN              do not echo input (for scripting)\n"
 "    --echoCIN            echo (final) input to COUT\n"
