@@ -1,13 +1,12 @@
 
+H1      { margin: 0; padding: 0;  text-align: center     }
 BODY    { background-color: #9EE; margin: 0; padding: 0; }
-H1      { margin: 0; padding: 1em; text-align: center }
-.footer { text-align: center; font-style: italic }
+.footer { text-align: center;     font-style: italic     }
 
-TABLE {border-collapse: collapse;}
-TD    { padding: 0px;
-        font-family: monospace; width: 80em; }
+TABLE {border-collapse: collapse; }
+TD    { padding: 0; font-family: monospace; width: 80em; }
 
-/// output channel coloring (in/out/error)
+/* output channel coloring (in/out/error) */
 .i   { background-color: #DDD; color: #00F }
 .o   { background-color: #FFF; color: #000 }
 .e   { background-color: #FFF; color: #F00 }

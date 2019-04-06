@@ -234,6 +234,23 @@ bool log_startup = false;
 
               continue;
             }
+
+         if (!strcmp(opt, "-u"))
+            {
+              ++a;
+              if (!val)
+                 {
+                   CERR << "-u without user ID" << endl;
+                   exit(a);
+                 }
+              if (setuid(strtol(val, 0, 10)))
+                 {
+                   CERR << "setuid(" << val << ") failed: "
+                        << strerror(errno) << endl;
+                   exit(a);
+                 }
+              continue;
+            }
        }
 
    return log_startup;
@@ -641,6 +658,12 @@ UserPreferences::parse_argv_2(bool logit)
               show_version(cout);
               exit(0);
             }
+         if (!strcmp(opt, "-u"))
+            {
+              ++a;
+              continue;   // -u already handled in parse_argv_1()
+            }
+
          if (!strcmp(opt, "-w"))
             {
               ++a;

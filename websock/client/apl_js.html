@@ -2,12 +2,14 @@
 <html>
  <head>
  <meta charset="UTF-8">
- <link rel="stylesheet" type="text/css" href="./apl_js.css">
+ <link rel="stylesheet" type="text/css" href="/try-GNU-APL.css">
   <script type='text/javascript'>
 
     function init()
     {
-      var address = "ws://server57:42424";
+      host = 'server57';
+      host = window.location.hostname;
+      var address = "ws://" + host + ":42424";
       var protocol = "apl-protocol"
       web_socket = new WebSocket(address, protocol);
       web_socket.onmessage = function(e)
@@ -15,7 +17,9 @@
            if (typeof e.data === 'string')
               {
                 var lines = e.data.split('\n');
-                var last = lines.pop();
+                lines[0] = carry + lines[0];
+                carry = lines.pop();
+                if (carry.charAt(0) == "⓪")   carry = "";   // discard input prompt
                 for (var j = 0; j < lines.length; ++j)
                     output_line(lines[j], "o");
               }
@@ -24,6 +28,7 @@
       input_form = document.forms["APL_input"]["in_form"];
       channel = "o";
       prompt = false;
+      carry = "";   // carry from one message to the next
     }
 
     function to_HTML(text)
@@ -46,11 +51,11 @@
       return ret;
     }
 
-    // print line into the output_div element
+    // append line to the output table
     //
     function output_line(line, ioe)
     {
-      if (line === '      ' && !prompt)   // most likely a prompt
+      if (line == '      ' && !prompt)   // most likely a prompt
          {
            prompt = true;
            return;
@@ -58,7 +63,7 @@
 
       if (prompt)   // false prompt
          {
-           do_output_line('      ', "o");
+           do_output_line('  ..  ', "o");
            prompt = false;
          }
 
@@ -67,6 +72,9 @@
 
     function do_output_line(line, ioe)
     {
+      if (line.charAt(0) == "⓪")        // input echo: ignore
+         return;
+
       if (line.charAt(0) == "①")        // output channel
          {
            channel = "o";
@@ -79,18 +87,22 @@
          }
       var screen =  document.getElementById("screen");
       var row = screen.insertRow(-1);   // insert at the end
+      if (ioe == 'i')   row.className = "i";
+      else              row.className = channel;
       var cell = row.insertCell(0);
       cell.innerHTML = to_HTML(line);
-      if (ioe === 'i')   cell.className = "i";
-      else               cell.className = channel;
+      if (ioe == 'i')   cell.className = "i";
+      else              cell.className = channel;
     }
 
     function process_line()
     {
+      // the user has entered something in her browser...
+      //
       var user_input = input_form.value;
       input_form.value = "";
-      output_line('      ' + user_input, "i");
       prompt = false;
+      output_line('      ' + user_input, "i");
       web_socket.send(user_input + "\n");
       return false;
     }
@@ -99,9 +111,9 @@
  </head>
  <body onload="init()">
 
-  <H1>Welcome to TRY-GNU-APL</H1>
+  <H1>Welcome to try-GNU-APL</H1>
   <HR>
-  <TABLE id=screen>
+  <TABLE id=screen class=i>
   </TABLE>
   <HR>
   <form name="APL_input" onsubmit="return process_line()" method="post">
@@ -109,7 +121,7 @@
   <input type="submit" value="Enter">
   </form>
   <HR>
-  <div class=footer>this page is powered by GNU APL</div>
+  <div class=footer>this page is fed from GNU APL</div>
  </body>
 </html>
 

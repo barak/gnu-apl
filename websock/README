@@ -1,5 +1,5 @@
 
-This directory contains the source code for a TRY-GNU-APL web site.
+This directory contains the source code for the try-GNU-APL web site.
 
 The sub-directory 'client' contains the client (web-browser) part which is
 sent to a remote browser.
@@ -8,5 +8,39 @@ The sub-directory 'server' contains the server part which is executed
 in a node.js context around GNU APL.
 
 
+A HTTP GET /try-GNU-APL is processed as follows:
 
+                                                 SERVER
+      CLIENT                                   ╔════════╗
+    ╔═════════╗                                ║  HTTP  ║
+    ║ Browser ║                                ║ server ║
+    ║         ╟───→─── GET /try-GNU-APL ───→───╫───┐    ║
+    ║ ╔═════╗ ║                                ║   │    ║
+    ║ ║   ┌─╫─╫───←───   apl_js.html    ───←───╫───┘    ║
+    ║ ║   │ ║ ║                                ╚════════╝
+    ║ ║   │ ║ ║                                ╔═════════╗
+    ║ ║   └─║─╫───→──  GET ws:*:42424   ───→───╫────┐    ║
+    ║ ║     ║ ║                                ║    ↓    ║
+    ║ ║     ║ ║                         stdin  ║ ╔══╧══╗ ║
+    ║ ║    ─╫─╫────────────────────────────→───╫─╢ GNU ║ ║
+    ║ ║    ─╫─╫────────────────────────────←───╫─╢ APL ║ ║
+    ║ ║    ─╫─╫────────────────────────────←───╫─╢     ║ ║
+    ║ ║     ║ ║                         stdout ║ ╚═════╝ ║
+    ║ ╚═════╝ ║                         stderr ║   web   ║
+    ║ apl_js  ║                                ║ socket  ║
+    ╚═════════╝                                ║ server  ║
+                                               ╚═════════╝
+
+
+1. The browser sends a GET request for /try-GNU-APL (port 80)
+
+2. The HTTP server returns file apl_js.html to the browser.
+
+3. apl_js.html contains a piece of javascript that connects to the
+   web socket server (port 42424).
+
+4. The web socket server starts a GNU APL instance and sets up a
+   web socket  connection to the javascript. The javascript side of the
+   connection does a simple terminal emulation that generates the input
+   for GNU APL and formats the output of GNU APL in the browser.
 

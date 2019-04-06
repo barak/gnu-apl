@@ -36,20 +36,42 @@ wsServer = new WebSocketServer(
 wsServer.on('request', function(request)
    {
     var connection = request.accept('apl-protocol', request.origin);
+    var connection_closed = false;
     console.log(now() + ' Connection from ' +
                 request.origin + ' accepted.');
 
-     apl = spawn('/usr/local/bin/apl', [ "--safe",
-                                         "--noSV",
-                                         "--noCONT",
-                                         "--rawCIN",
-                                         "-p", "2",
-                                         "-w", "300",
-                                       ]);
+     apl = spawn('/usr/local/bin/apl',
+                 [ "-C", "/home/www-data/apl-chroot",
+           //      "--safe",
+                   "--noSV",
+                   "--noCONT",
+                   "--rawCIN",
+                   "-p", "2",
+                   "-w", "300",
+                 ]);
      apl.stdout.setEncoding('utf-8');
-     apl.stdout.on('data', (data) => { connection.sendUTF(data); } );
+     apl.stdout.on('data', (data) =>
+        {
+          // console.log("stdout:\n'" + data + "'\n-o-");
+          if (connection_closed)
+             {
+               apl.stdin.write(')OFF');
+               apl.kill('SIGKILL');
+             }
+          else                     connection.sendUTF(data);
+        }         );
+
      apl.stderr.setEncoding('utf-8');
-     apl.stderr.on('data', (data) => { connection.sendUTF(data); } );
+     apl.stderr.on('data', (data) =>
+        {
+          // console.log("stderr:\n'" + data + "'\n-e-");
+          if (connection_closed)
+             {
+               apl.stdin.write(')OFF');
+               apl.kill('SIGHUP');
+             }
+          else                     connection.sendUTF(data);
+        }         );
 
     connection.on('message',
        function(message)
@@ -70,8 +92,9 @@ wsServer.on('request', function(request)
             //
             console.log(now() + ' Peer ' + connection.remoteAddress +
                         ' disconnected.');
+            connection_closed = true;
             apl.stdin.write(')OFF');
-            apl.kill('SIGHUP');
+            apl.kill('SIGKILL');
           }      );
 
     connection.on('error',

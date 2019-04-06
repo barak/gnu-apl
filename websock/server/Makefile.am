@@ -1,3 +1,3 @@
 
-dist_doc_DATA = apl_js wsock.js
+dist_doc_DATA = apl_js.apache2  wsock.js
 

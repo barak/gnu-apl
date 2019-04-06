@@ -425,4 +425,14 @@ Profile 1
   disable_Quad_FIO          no     # do not disable ⎕FIO
   disable_native_functions  yes    # disable A ⎕FX B (native fnctions)
 
+# a profile suitable for the web sockets stuff shipped with GNU APL
+Profile 2
+
+CIN-SEQUENCE           E2 93 AA   // ⓪
+COUT-SEQUENCE          E2 91 A0   // ①
+CERR-SEQUENCE          E2 91 A1   // ②
+UERR-SEQUENCE          E2 91 A1   // ② like CERR
+RESET-SEQUENCE         //
+CLEAR-EOL-SEQUENCE     //
+CLEAR-EOS-SEQUENCE     //
 

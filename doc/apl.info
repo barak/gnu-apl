@@ -366,6 +366,11 @@ GNU APL understands the following command line options:
 
      show version information and exit.
 
+   • ‘-u UID’
+
+     run as user with UID 0.  This option can only be used by the root
+     user (who then wants to run as a different user).
+
    • ‘-w milli’
 
      wait milli milliseconds at start-up.  Useful to give other programs
@@ -4610,46 +4615,46 @@ please read <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 Tag Table:
 Node: Top383
 Node: Chapter 11416
-Node: Chapter 219118
-Node: Chapter 323542
-Node: Section 3.125067
-Node: Section 3.241079
-Node: Section 3.341838
-Node: Section 3.443125
-Node: Section 3.545746
-Node: Section 3.645919
-Node: Section 3.746532
-Node: Section 3.850476
-Node: Section 3.952018
-Node: Section 3.1052615
-Node: Section 3.1154399
-Node: Section 3.1256339
-Node: Section 3.1357280
-Node: Section 3.1457532
-Node: Section 3.1558928
-Node: Section 3.1661440
-Node: Section 3.1768139
-Node: Section 3.1873192
-Node: Section 3.1976474
-Node: Section 3.2076765
-Node: Section 3.2186677
-Node: Section 3.2286949
-Node: Section 3.2393527
-Node: Section 3.2495978
-Node: Section 3.2596647
-Node: Section 3.26103283
-Node: Section 3.27104223
-Node: Section 3.28117785
-Node: Section 3.29120889
-Node: Section 3.30122878
-Node: Chapter 4127256
-Node: Chapter 5129004
-Node: Chapter 6130133
-Node: Section 6.1130552
-Node: Section 6.2131239
-Node: Chapter 7132070
-Node: Section 7.1132573
-Node: Section 7.2157883
+Node: Chapter 219266
+Node: Chapter 323690
+Node: Section 3.125215
+Node: Section 3.241227
+Node: Section 3.341986
+Node: Section 3.443273
+Node: Section 3.545894
+Node: Section 3.646067
+Node: Section 3.746680
+Node: Section 3.850624
+Node: Section 3.952166
+Node: Section 3.1052763
+Node: Section 3.1154547
+Node: Section 3.1256487
+Node: Section 3.1357428
+Node: Section 3.1457680
+Node: Section 3.1559076
+Node: Section 3.1661588
+Node: Section 3.1768287
+Node: Section 3.1873340
+Node: Section 3.1976622
+Node: Section 3.2076913
+Node: Section 3.2186825
+Node: Section 3.2287097
+Node: Section 3.2393675
+Node: Section 3.2496126
+Node: Section 3.2596795
+Node: Section 3.26103431
+Node: Section 3.27104371
+Node: Section 3.28117933
+Node: Section 3.29121037
+Node: Section 3.30123026
+Node: Chapter 4127404
+Node: Chapter 5129152
+Node: Chapter 6130281
+Node: Section 6.1130700
+Node: Section 6.2131387
+Node: Chapter 7132218
+Node: Section 7.1132721
+Node: Section 7.2158031
 
 End Tag Table
 

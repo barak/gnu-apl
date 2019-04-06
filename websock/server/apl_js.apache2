@@ -1,0 +1,24 @@
+
+# this is a configuration snipplet for apache.
+#
+
+# the following 2 aliases map the external URIs (i.e. the names used in the
+# browser) to their places in the file system.
+#
+Alias /try-GNU-APL      /var/www/html/apl_js.html
+Alias /try-GNU-APL.css  /var/www/html/apl_js.css
+
+# the following 2 Location statements set the access rights and other properties
+# 
+<Location /apl_js>
+    Order           allow,deny
+    Allow from      all
+    Satisfy         Any
+</Location>
+
+<Location /apl_css>
+    Order           allow,deny
+    Allow from      all
+    Satisfy         Any
+</Location>
+
