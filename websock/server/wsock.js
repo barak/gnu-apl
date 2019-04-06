@@ -37,11 +37,21 @@ wsServer.on('request', function(request)
    {
     var connection = request.accept('apl-protocol', request.origin);
     var connection_closed = false;
-    console.log(now() + ' Connection from ' +
-                request.origin + ' accepted.');
+
+    console.log(now() + ' Connection from ' + request.origin + ' accepted');
+    if (request.origin != "http://juergen-sauermann.de")
+       {
+         // we expect websocket request to come from our code. If not,
+         // someone else tries to use out web socket directly (which would
+         // be dubious).
+         //
+         console.log(now() + ' Connection from a dubious origin. Abort it.');
+         connection.close();
+         return;
+       }
 
      apl = spawn('/usr/local/bin/apl',
-                 [ "-C", "/home/www-data/apl-chroot",
+                 [ "-C", "/home/www-data/apl-chroot", "-u", "33",
            //      "--safe",
                    "--noSV",
                    "--noCONT",
@@ -55,7 +65,6 @@ wsServer.on('request', function(request)
           // console.log("stdout:\n'" + data + "'\n-o-");
           if (connection_closed)
              {
-               apl.stdin.write(')OFF');
                apl.kill('SIGKILL');
              }
           else                     connection.sendUTF(data);
@@ -67,8 +76,7 @@ wsServer.on('request', function(request)
           // console.log("stderr:\n'" + data + "'\n-e-");
           if (connection_closed)
              {
-               apl.stdin.write(')OFF');
-               apl.kill('SIGHUP');
+               apl.kill('SIGKILL');
              }
           else                     connection.sendUTF(data);
         }         );
@@ -93,7 +101,6 @@ wsServer.on('request', function(request)
             console.log(now() + ' Peer ' + connection.remoteAddress +
                         ' disconnected.');
             connection_closed = true;
-            apl.stdin.write(')OFF');
             apl.kill('SIGKILL');
           }      );
 
