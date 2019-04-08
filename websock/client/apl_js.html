@@ -118,12 +118,16 @@
   </TABLE>
   <HR>
   <form name="APL_input" onsubmit="return process_line()" method="post">
-   <STRONG>APL Input:</STRONG> <input type="text" name="in_form" size=60>
+   <STRONG>APL Input:</STRONG>
+  <input type="text" id="APL_entry" name="in_form" size=60>
   <input type="submit" value="Enter">
   &nbsp; &nbsp; &nbsp; 
   <input type="button" value="Show an APL Keyboard"
          onclick='window.open("APL_keyboard.html", "APL Keyboard",
                               "width=930,height=500"); return false;');>
+  <input type="button" value="Show another APL Keyboard (experimental)"
+         onclick='window.open("APL_keyboard2.html", "APL Keyboard2",
+                      "width=930,height=500"); return false;');>
   </form>
   <HR>
   <div class=footer>
