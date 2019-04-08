@@ -24,6 +24,7 @@
 #include "Error_macros.hh"
 #include "PrimitiveOperator.hh"
 #include "QuadFunction.hh"
+#include "UserPreferences.hh"
 
 class File_or_String;
 
@@ -120,6 +121,17 @@ protected:
          file_entry & fe = get_file_entry(value);   // may throw DOMAIN ERROR
          return fe.fe_fd;
        }
+
+   /// throw a DOMAIN error if the interpreter runs in safe mode.
+   void UNSAFE(const char * funname, int funnum)
+      {
+        if (uprefs.safe_mode)
+           {
+             MORE_ERROR() << "⎕FIO[" << funnum
+                          << " is not permitted in safe mode (see ⎕ARGi)";
+             DOMAIN_ERROR;
+           }
+      }
 
    /// list all ⎕IO functions to \b out
    Token list_functions(ostream & out);

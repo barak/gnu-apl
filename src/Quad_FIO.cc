@@ -1371,7 +1371,8 @@ const APL_Integer function_number = X->get_ravel(0).get_near_int();
 
                      UCS_string filename(dent.d_name);
                      Value_P Z_name(filename, LOC);
-                     new (Z->next_ravel())   PointerCell(Z_name.get(), Z.getref());
+                     new (Z->next_ravel())
+                         PointerCell(Z_name.get(), Z.getref());
                    }
 
                 Z->set_default_Spc();
@@ -1380,6 +1381,7 @@ const APL_Integer function_number = X->get_ravel(0).get_near_int();
               }
 
          case 32:   // socket(Bi=AF_INET, SOCK_STREAM, 0)
+              UNSAFE("socket", function_number);
               {
                 errno = 0;
                 APL_Integer domain = AF_INET;
@@ -1680,7 +1682,8 @@ const APL_Integer function_number = X->get_ravel(0).get_near_int();
                       if (data[l] != '\n')   continue;
 
                       uint8_t * end = data + l;
-                      if (end > data && end[-1] == '\r')   --end;   // discard trailing CR
+                     // discard CR before LF
+                      if (end > data && end[-1] == '\r')   --end;
                       UTF8_string utf(from, end - from);
                       UCS_string ucs(utf);
                       Value_P ZZ(ucs, LOC);

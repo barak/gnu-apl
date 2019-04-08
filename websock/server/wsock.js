@@ -52,7 +52,7 @@ wsServer.on('request', function(request)
 
      apl = spawn('/usr/local/bin/apl',
                  [ "-C", "/home/www-data/apl-chroot", "-u", "33",
-           //      "--safe",
+                   "--safe",
                    "--noSV",
                    "--noCONT",
                    "--rawCIN",
