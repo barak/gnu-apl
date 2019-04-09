@@ -423,9 +423,9 @@ PERFORMANCE_END(fs_M_join_AB, start_M_join, 1);
                            const int inc_A1 = A1->get_increment();
                            const int inc_B1 = B1->get_increment();
                            const Shape * sh_Z1 = &B1->get_shape();
-                           if      (A1->is_scalar())   sh_Z1 = &B1->get_shape();
-                           else if (B1->is_scalar())   sh_Z1 = &A1->get_shape();
-                           else if (inc_B1 == 0)       sh_Z1 = &A1->get_shape();
+                           if      (A1->is_scalar())  sh_Z1 = &B1->get_shape();
+                           else if (B1->is_scalar())  sh_Z1 = &A1->get_shape();
+                           else if (inc_B1 == 0)      sh_Z1 = &A1->get_shape();
 
                            if (inc_A1 && inc_B1 && !A1->same_shape(*B1))
                               {
@@ -437,8 +437,10 @@ PERFORMANCE_END(fs_M_join_AB, start_M_join, 1);
                            const ShapeItem len_Z1 = sh_Z1->get_volume();
                            if (len_Z1 == 0)
                               {
-                                Value_P Z1 = eval_fill_AB(A1, B1).get_apl_val();
-                                new (&cell_Z) PointerCell(Z1.get(), *job_AB->value_Z);
+                                Value_P Z1 =
+                                        eval_fill_AB(A1, B1).get_apl_val();
+                                new (&cell_Z) PointerCell(Z1.get(),
+                                                          *job_AB->value_Z);
                                 continue;
                               }
 
@@ -463,8 +465,9 @@ PERFORMANCE_END(fs_M_join_AB, start_M_join, 1);
                            const ShapeItem len_Z1 = A1->element_count();
                            if (len_Z1 == 0)
                               {
-                                Value_P Z1 = A1->prototype(LOC);
-                                new (&cell_Z) PointerCell(Z1.get(), *job_AB->value_Z);
+                                Value_P Z1 = eval_fill_AB(A1, B).get_apl_val();
+                                new (&cell_Z) PointerCell(Z1.get(),
+                                                          *job_AB->value_Z);
                               }
                            else
                               {
@@ -483,7 +486,7 @@ PERFORMANCE_END(fs_M_join_AB, start_M_join, 1);
                    else
                       if (cell_B.is_pointer_cell())
                          {
-                           // A is not nested, B is nested
+                           // B is nested, A is not
                            //
                            Value_P B1 = cell_B.get_pointer_value();
                            const int inc_B1 = B1->get_increment();
@@ -491,8 +494,9 @@ PERFORMANCE_END(fs_M_join_AB, start_M_join, 1);
                            const ShapeItem len_Z1 = B1->element_count();
                            if (len_Z1 == 0)
                               {
-                                Value_P Z1 = B1->prototype(LOC);
-                                new (&cell_Z) PointerCell(Z1.get(), *job_AB->value_Z);
+                                Value_P Z1 = eval_fill_AB(A, B1).get_apl_val();
+                                new (&cell_Z) PointerCell(Z1.get(),
+                                                          *job_AB->value_Z);
                               }
                            else
                               {
@@ -597,13 +601,18 @@ ShapeItem end_z = z + slice_len;
                      const ShapeItem len_Z1 = A1->element_count();
                      if (len_Z1 == 0)
                         {
-                          Value_P Z1 = A1->prototype(LOC);
-                          new (&cell_Z) PointerCell(Z1.get(), *job_AB->value_Z);
+                          Value_P B(LOC);   // a scalar
+                          B->get_ravel(0).init(cell_B, B.getref(), LOC);
+                          Value_P Z1 = job_AB->fun->eval_fill_AB(A1, B)
+                                                   .get_apl_val();
+                          new (&cell_Z) PointerCell(Z1.get(),
+                                                    *job_AB->value_Z);
                         }
                      else
                         {
                           Value_P Z1(A1->get_shape(), LOC);
-                          new (&cell_Z) PointerCell(Z1.get(), *job_AB->value_Z);
+                          new (&cell_Z) PointerCell(Z1.get(),
+                                                    *job_AB->value_Z);
 
                           PJob_scalar_AB j1(Z1.get(),
                                             &A1->get_ravel(0), inc_A1,
@@ -622,14 +631,19 @@ ShapeItem end_z = z + slice_len;
                      const ShapeItem len_Z1 = B1->element_count();
                      if (len_Z1 == 0)
                         {
-                          Value_P Z1 = B1->prototype(LOC);
-                          new (&cell_Z) PointerCell(Z1.get(), *job_AB->value_Z);
+                          Value_P A(LOC);   // a scalar
+                          A->get_ravel(0).init(cell_A, A.getref(), LOC);
+                          Value_P Z1 = job_AB->fun->eval_fill_AB(A, B1)
+                                                   .get_apl_val();
+                          new (&cell_Z) PointerCell(Z1.get(),
+                                                    *job_AB->value_Z);
                         }
                      else
                         {
                           POOL_LOCK(parallel_jobs_lock,
                                     Value_P Z1(B1->get_shape(), LOC))
-                          new (&cell_Z) PointerCell(Z1.get(), *job_AB->value_Z);
+                          new (&cell_Z) PointerCell(Z1.get(),
+                                                    *job_AB->value_Z);
 
                           PJob_scalar_AB j1(Z1.get(), &cell_A, 0,
                                            &B1->get_ravel(0), inc_B1);

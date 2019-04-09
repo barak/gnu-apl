@@ -182,8 +182,17 @@ Function * LO = _LO.get_function();
 
         Value_P Fill_B = Bif_F12_TAKE::first(B);
         Token tZ = LO->eval_fill_B(Fill_B);
-        Value_P Z = tZ.get_apl_val();
-        Z->set_shape(B->get_shape());
+        Value_P Z1 = tZ.get_apl_val();
+
+        if (Z1->is_simple_scalar())
+           {
+             Z1->set_shape(B->get_shape());
+             return Token(TOK_APL_VALUE1, Z1);
+           }
+
+        Value_P Z(B->get_shape(), LOC);
+        new (&Z->get_ravel(0)) PointerCell(Z1.get(), Z.getref());
+        Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
 

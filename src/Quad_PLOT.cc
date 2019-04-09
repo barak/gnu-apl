@@ -1394,7 +1394,7 @@ Quad_PLOT::eval_AB(Value_P A, Value_P B)
    if (B->get_rank() < 1 || B->get_rank() > 2)   RANK_ERROR;
    if (B->element_count() < 2)                   LENGTH_ERROR;
 
-   // plot window with default attrinutes
+   // plot window with default attributes
    //
 Plot_data * data = setup_data(B.get());
    if (data == 0)   DOMAIN_ERROR;

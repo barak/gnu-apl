@@ -54,6 +54,7 @@ dist_noinst_DATA =				           \
         Factorial.tc                                       \
         File_IO_1.tc                                       \
         File_IO.tc                                         \
+        Fill.tc                                            \
         Find.tc                                            \
         First.tc                                           \
         Floor.tc                                           \
