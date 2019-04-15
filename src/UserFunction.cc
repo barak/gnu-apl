@@ -987,7 +987,7 @@ void * start = mmap(0, len, PROT_READ, MAP_SHARED, in, 0);
         throw_apl_error(E_WS_MMAP, LOC);
       }
 
-UTF8_string utf(reinterpret_cast<const UTF8 *>(start), len);
+UTF8_string utf(utf8P(start), len);
 
    // skip trailing \r and \n.
    //

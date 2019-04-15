@@ -26,6 +26,9 @@
 #include "Output.hh"
 #include "PrintOperator.hh"
 
+class Value;
+class IndexExpr;
+
 /*
  A base class for dynamically allocated objects. It remembers where an object
  was allocated and maintains a doubly linked ring of all allocated objects.
@@ -80,6 +83,17 @@ public:
         prev = this;
         next = this;
       }
+
+   /// cast to const Value *. Caller must check that this cast is valid.
+   const Value * pValue() const
+      { return reinterpret_cast<const Value *>(this); }
+
+   /// cast to Value *. Caller must check that this cast is valid.
+   Value * pValue()
+      { return reinterpret_cast<Value *>(this); }
+
+   /// cast to IndexExpr *. Caller must check that this cast is valid.
+   IndexExpr * pIndexExpr()   { return reinterpret_cast<IndexExpr *>(this); }
 
    /// print this object
    ///

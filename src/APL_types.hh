@@ -39,7 +39,7 @@ using namespace std;
 #define APL_Float_is_class 0
 
 //////////////////////////////////////////////////////////////
-// A. typedefs						    //
+// A. typedefs                                              //
 //////////////////////////////////////////////////////////////
 
 /// The rank of an APL value.
@@ -59,6 +59,12 @@ typedef Unicode APL_Char;
 
 /// One APL integer value.
 typedef int64_t APL_Integer;
+
+/// long long for sprintf() and friends
+typedef long long long_long;
+
+/// unsigned long for sprintf() and friends
+typedef unsigned long unsigned_long;
 
 inline void
 Hswap(APL_Integer & i1, APL_Integer & i2)

@@ -72,8 +72,7 @@ public:
    APL_Float dfval() const
       {
         if (const APL_Integer denom = get_denominator())
-           return static_cast<APL_Float>(get_numerator())
-                / static_cast<APL_Float>(denom);
+           return (1.0 * get_numerator() / denom;
         return value.fval.u1.flt;
       }
 
@@ -333,6 +332,14 @@ protected:
    /// overloaded Cell::to_type()
    virtual void to_type()
       { new(this)   IntCell(0); }
+
+   /// downcast to const FloatCell
+   virtual const FloatCell & cFloatCell() const   { return *this; }
+
+   /// downcast to FloatCell
+   virtual FloatCell & vFloatCell()   { return *this; }
+
+
 };
 //=============================================================================
 

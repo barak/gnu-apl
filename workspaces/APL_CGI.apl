@@ -86,6 +86,7 @@ xMAIL_WEB←'bug-apl@gnu.org'
 xMAIL_APL←'bug-apl@gnu.org'
 xMAIL_APL_ARCHIVE←'http://lists.gnu.org/archive/html/bug-apl/'
 xMAIL_APL_SUBSCRIBE←'https://lists.gnu.org/mailman/listinfo/bug-apl'
+xTRY_GNU_APL←'http://juergen-sauermann.de/try-GNU-APL'
 xSVN_APL←'https://savannah.gnu.org/svn/?group=apl'
 
 ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝
@@ -228,6 +229,13 @@ is not provided in binary form, so you should start the <B>apl</B> binary with
 command line option --noSV. Note as well that the binary <B>apl</B> will not
 be updated with every GNU APL release. Therefore it will contain errors that
 have been corrected already.
+
+<?apl HTML∆H4[''] 'GNU APL Online' ?>
+
+As of recently, there is an (experimental) online version of GNU APL. It is
+intended to give you an idea of how GNU APL will look like if you install it
+on your computer. See
+<?apl HTML∆x2y xTRY_GNU_APL HTML∆A, xTRY_GNU_APL ?>
 </DIV>
 <DIV class="c4">
 <?apl HTML∆H2[''] 'Reporting Bugs' ?>

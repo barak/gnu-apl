@@ -22,6 +22,7 @@
 #define __CDR_STRING_HH_DEFINED__
 
 #include "Simple_string.hh"
+#include "UTF8_string.hh"
 
 /// the header of a CDR record
 struct CDR_header
@@ -40,11 +41,11 @@ struct CDR_header
 
    /// return the number of bytes in host endian
    uint32_t get_nb() const
-      { return get_be32(reinterpret_cast<const uint8_t *>(&be_nb)); }
+      { return get_be32(utf8P(&be_nb)); }
 
    /// return the number of elements in host endian
    uint32_t get_nelm() const
-      { return get_be32(reinterpret_cast<const uint8_t *>(&be_nelm)); }
+      { return get_be32(utf8P(&be_nelm)); }
 
    /// convert big endian 32 bit value to 32 bit host value (== ntohl())
    static uint32_t get_be32(const uint8_t * data)
@@ -52,8 +53,8 @@ struct CDR_header
         uint32_t ret  =  *data++;  ret <<= 8;
                  ret |= *data++;   ret <<= 8;
                  ret |= *data++;   ret <<= 8;
-                 ret |= *data++;   return ret;
-
+                 ret |= *data++;
+        return ret;
       }
 };
 
@@ -63,7 +64,7 @@ class CDR_string : public Simple_string<uint8_t, false>
 public:
    /// Constructor: An uninitialized CDR structure
    CDR_string()
-   : Simple_string<uint8_t, false>(reinterpret_cast<const uint8_t *>(0), 0)
+   : Simple_string<uint8_t, false>(utf8P(0), 0)
    {}
 
    /// Constructor: CDR structure from uint8_t * and length

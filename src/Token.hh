@@ -162,7 +162,7 @@ public:
    ErrorCode get_ErrorCode() const
       { Assert1(get_tag() == TOK_ERROR);
         Assert1(get_ValueType() == TV_INT);
-        return static_cast<ErrorCode>(value.int_vals[0]); }
+        return ErrorCode(value.int_vals[0]); }
 
    /// set the integer value of this token
    void set_int_val(int64_t val)

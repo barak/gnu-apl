@@ -315,7 +315,7 @@ Signal_base * response = Signal_base::recv_TCP(sock, buffer, sizeof(buffer),
                                                del, log);
    if (response)
       {
-        memcpy(static_cast <void *>(&cache),
+        memcpy(static_cast<void *>(&cache),
                response->get__SVAR_RECORD_IS__record().data(),
                sizeof(Svar_record));
 
@@ -360,8 +360,7 @@ uint32_t vname1[MAX_SVAR_NAMELEN];
         else                break;
       }
 
-string vname(reinterpret_cast<const char *>(vname1),
-                     MAX_SVAR_NAMELEN*sizeof(uint32_t));
+string vname(charP(vname1), MAX_SVAR_NAMELEN*sizeof(uint32_t));
 
 MATCH_OR_MAKE_c request(tcp, vname,
                              to.proc,      to.parent,      to.grand,

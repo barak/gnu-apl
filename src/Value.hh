@@ -506,7 +506,7 @@ public:
    ValueFlags get_flags() const   { return ValueFlags(flags); }
 
    /// print info related to a stale value
-   void print_stale_info(ostream & out, const DynamicObject * dob);
+   void print_stale_info(ostream & out, const DynamicObject * dob) const;
 
    /// number of Value_P objects pointing to this value
    int owner_count;
@@ -545,14 +545,14 @@ public:
    void increment_owner_count(const char * loc)
       {
         Assert1(this);
-        if (check_ptr == reinterpret_cast<const char *>(this) + 7)
+        if (check_ptr == charP(this) + 7)
            ++owner_count;
       }
 
       void decrement_owner_count(const char * loc)
          {
            Assert1(this);
-           if (check_ptr == reinterpret_cast<const char *>(this) + 7)
+           if (check_ptr == charP(this) + 7)
               {
                 Assert1(owner_count > 0);
                 --owner_count;
@@ -666,6 +666,9 @@ private:
 
    Value * operator &()   { return this; }
 };
+
+/// a marker for potentially broken (partly un-initialized) Value
+typedef Value BadValue;
 // ----------------------------------------------------------------------------
 
 extern void print_history(ostream & out, const Value * val, const char * loc);

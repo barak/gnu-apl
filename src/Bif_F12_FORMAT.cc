@@ -676,7 +676,7 @@ char * fract_end = 0;
         // create a format like %.5E (if fract_part has 5 digits)
         //
         const int flen = snprintf(format, sizeof(format), "%%.%luE",
-                                static_cast<unsigned long>(fract_part.size()));
+                                unsigned_long(fract_part.size()));
         Assert(flen < int(sizeof(format)));   // format was big enough.
 
         const int dlen = snprintf(&data_buf[0], data_buf_len, format, value);
@@ -699,7 +699,7 @@ char * fract_end = 0;
    else   // no exponent in format string.
       {
         const int flen = snprintf(format, sizeof(format), "%%.%luf",
-                                 static_cast<unsigned long>(fract_part.size()));
+                                  unsigned_long(fract_part.size()));
         Assert(flen < int(sizeof(format)));   // assume no snprintf() overflow
 
         const int dlen = snprintf(&data_buf[0], data_buf_len, format, value);

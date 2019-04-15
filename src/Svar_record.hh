@@ -152,7 +152,7 @@ struct Svar_partner
    /// return the control bits of this partner (as seen by the offering
    // partner)
    Svar_Control get_control() const
-      { return static_cast<Svar_Control>(flags); }
+      { return Svar_Control(flags); }
 
    /// print this partner
    ostream & print(ostream & out) const;
@@ -222,7 +222,7 @@ struct Svar_record
    SV_Coupling get_coupling() const
        { int ret = 0;   if (offering.is_active())    ++ret;
                         if (accepting.is_active())   ++ret;
-         return static_cast<SV_Coupling>(ret); }
+         return SV_Coupling(ret); }
 
 
    /// return the control bits of this variable

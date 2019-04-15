@@ -596,8 +596,7 @@ int
 Command::val_val::compare_val_val1(const void * key, const void * B)
 {
 const void * Bv = reinterpret_cast<const val_val *>(B)->child;
-   return reinterpret_cast<const char *>(key)
-        - reinterpret_cast<const char *>(Bv);
+   return charP(key) - charP(Bv);
 }
 //-----------------------------------------------------------------------------
 void 
@@ -2081,8 +2080,7 @@ const char sub_type = record[1];
                   case '(': {
                               stype = " timestamp";
                               YMDhmsu t(now());   // fallback if sscanf() != 7
-                              if (7 == sscanf(
-                                    reinterpret_cast<const char *>(record + 1),
+                              if (7 == sscanf(charP(record + 1),
                                               "(%d %d %d %d %d %d %d)",
                                               &t.year, &t.month, &t.day,
                                               &t.hour, &t.minute, &t.second,

@@ -466,7 +466,7 @@ void * emacs_start = dlsym(handle, "emacs_start");
 UTF8_string so_path_utf(so_path);
 const int error =
     reinterpret_cast<int (*)(const char *, const char *)>(emacs_start)
-            (emacs_arg, reinterpret_cast<const char *>(so_path_utf.c_str()));
+            (emacs_arg, charP(so_path_utf.c_str()));
    if (error)
       {
         t4.append_utf8(", but emacs_start()  returned error ");

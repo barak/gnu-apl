@@ -249,7 +249,7 @@ public:
 
    /// number of available cores
    static CoreCount get_max_core_count()
-      { return static_cast<CoreCount>(all_CPUs.size()); }
+      { return CoreCount(all_CPUs.size()); }
 
    /// make all pool members lock on their pool_sema
    static void lock_pool(bool logit);

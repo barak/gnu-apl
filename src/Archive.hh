@@ -337,6 +337,12 @@ protected:
    /// return floating point value of attribute \b att_name
    APL_Float find_float_attr(const char * att_name);
 
+   static int64_t stoll(const UTF8 * start, UTF8 ** end, int base)
+      {
+        return ::strtoll(charP(start),
+                         reinterpret_cast<char **>(end), base);
+      }
+
    /// the file descriptor for the mmap()ed workspace.xml file
    int fd;
 
@@ -347,7 +353,7 @@ protected:
    size_t map_length;
 
    /// the start of the file
-   const UTF8 * file_start;
+   const char * file_start;
 
    /// the start of the current line
    const UTF8 * line_start;

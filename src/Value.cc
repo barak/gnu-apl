@@ -89,7 +89,7 @@ const ShapeItem length = shape.get_volume();
    //
    if (length <= SHORT_VALUE_LENGTH_WANTED)
       {
-        check_ptr = reinterpret_cast<const char *>(this) + 7;
+        check_ptr = charP(this) + 7;
         return;
       }
 
@@ -172,7 +172,7 @@ const ShapeItem length = shape.get_volume();
    // many empty checks all over the place
    //
    new (ravel)   IntCell(0);
-   check_ptr = reinterpret_cast<const char *>(this) + 7;
+   check_ptr = charP(this) + 7;
    total_ravel_count += length;
 }
 //-----------------------------------------------------------------------------
@@ -399,7 +399,7 @@ const ShapeItem length = nz_element_count();
         delete [] ravel;
       }
 
-   Assert(check_ptr == reinterpret_cast<const char *>(this) + 7);
+   Assert(check_ptr == charP(this) + 7);
    check_ptr = 0;
 }
 //-----------------------------------------------------------------------------
@@ -479,16 +479,14 @@ const ShapeItem ec = nz_element_count();
 
    // find the first lval cell with a non-0 owner
    //
-const Cell * C = &get_ravel(0);
    loop(e, ec)
       {
-        if (C->is_lval_cell())
-           return reinterpret_cast<const LvalCell *>(C)->get_cell_owner();
+        const Cell & cell = get_ravel(e);
+        if (cell.is_lval_cell())
+           return cell.cLvalCell().get_cell_owner();
 
-        if (C->is_pointer_cell())
-           return  C->get_pointer_value()->get_lval_cellowner();
-
-        ++C;
+        if (cell.is_pointer_cell())
+           return  cell.get_pointer_value()->get_lval_cellowner();
       }
 
    return 0;
@@ -544,8 +542,7 @@ Value::mark_all_dynamic_values()
    for (DynamicObject * dob = DynamicObject::all_values.get_prev();
         dob != &all_values; dob = dob->get_prev())
        {
-         Value * val = static_cast<Value *>(dob);
-         val->set_marked();
+         dob->pValue()->set_marked();
        }
 }
 //-----------------------------------------------------------------------------
@@ -579,10 +576,10 @@ Value::rollback(ShapeItem items, const char * loc)
 void
 Value::erase_all(ostream & out)
 {
-   for (const DynamicObject * vb = DynamicObject::all_values.get_next();
-        vb != &DynamicObject::all_values; vb = vb->get_next())
+   for (const DynamicObject * dob = DynamicObject::all_values.get_next();
+        dob != &DynamicObject::all_values; dob = dob->get_next())
        {
-         const Value * v = static_cast<const Value *>(vb);
+         const Value * v = dob->pValue();
          out << "erase_all sees Value:" << endl
              << "  Allocated by " << v->where_allocated() << endl
              << "  ";
@@ -598,25 +595,24 @@ int count = 0;
    Log(LOG_Value__erase_stale)
       CERR << endl << endl << "erase_stale() called from " << loc << endl;
 
-   for (DynamicObject * obj = all_values.get_next();
-        obj != &all_values; obj = obj->get_next())
+   for (DynamicObject * dob = all_values.get_next();
+        dob != &all_values; dob = dob->get_next())
        {
-         if (obj == obj->get_next())   // a loop
+         Value * v = dob->pValue();
+         if (dob == dob->get_next())   // a loop
             {
               CERR << "A loop in DynamicObject::all_values (detected in "
                       "function erase_stale() at object "
-                   << CVOIP(obj) << "): " << endl;
+                   << CVOIP(dob) << "): " << endl;
               all_values.print_chain(CERR);
               CERR << endl;
 
-              CERR << " DynamicObject: " << obj << endl;
-              CERR << " Value:         " << static_cast<Value *>(obj)
-                   << endl;
-              CERR << *static_cast<Value *>(obj) << endl;
+              CERR << " DynamicObject: " << dob << endl;
+              CERR << " Value:         " << v   << endl;
+              CERR << *v                        << endl;
             }
 
-         Assert(obj != obj->get_next());
-         Value * v = static_cast<Value *>(obj);
+         Assert(dob != dob->get_next());
          if (v->owner_count)   continue;
 
          ADD_EVENT(v, VHE_Stale, v->owner_count, loc);
@@ -624,7 +620,7 @@ int count = 0;
          Log(LOG_Value__erase_stale)
             {
               CERR << "Erasing stale Value "
-                   << CVOIP(obj) << ":" << endl
+                   << CVOIP(dob) << ":" << endl
                    << "  Allocated by " << v->where_allocated() << endl
                    << "  ";
               v->list_one(CERR, false);
@@ -634,12 +630,12 @@ int count = 0;
          //
          ++count;
 
-         obj->unlink();
+         dob->unlink();
 
          // v->erase(loc) could mess up the chain, so we start over
          // rather than continuing
          //
-         obj = &all_values;
+         dob = &all_values;
        }
 
    return count;
@@ -666,25 +662,24 @@ int count = 0;
              << "finish_incomplete() called from " << loc << endl;
       }
 
-   for (DynamicObject * obj = all_values.get_next();
-        obj != &all_values; obj = obj->get_next())
+   for (DynamicObject * dob = all_values.get_next();
+        dob != &all_values; dob = dob->get_next())
        {
-         if (obj == obj->get_next())   // a loop
+         Value * v = dob->pValue();
+         if (dob == dob->get_next())   // a loop
             {
               CERR << "A loop in DynamicObject::all_values (detected in "
                       "function Value::finish_incomplete() at object "
-                   << CVOIP(obj) << "): " << endl;
+                   << CVOIP(dob) << "): " << endl;
               all_values.print_chain(CERR);
               CERR << endl;
 
-              CERR << " DynamicObject: " << obj << endl;
-              CERR << " Value:         " << static_cast<Value *>(obj)
-                   << endl;
-              CERR << static_cast<Value *>(obj) << endl;
+              CERR << " DynamicObject: " << dob << endl;
+              CERR << " Value:         " << v   << endl;
+              CERR << *v                        << endl;
             }
 
-         Assert(obj != obj->get_next());
-         Value * v = static_cast<Value *>(obj);
+         Assert(dob != dob->get_next());
          if (v->flags & VF_complete)   continue;
 
          ADD_EVENT(v, VHE_Completed, v->owner_count, LOC);
@@ -697,7 +692,7 @@ int count = 0;
          Log(LOG_Value__erase_stale)
             {
               CERR << "Fixed incomplete Value "
-                   << CVOIP(obj) << ":" << endl
+                   << CVOIP(dob) << ":" << endl
                    << "  Allocated by " << v->where_allocated() << endl
                    << "  ";
               v->list_one(CERR, false);
@@ -744,11 +739,11 @@ ostream &
 Value::list_all(ostream & out, bool show_owners)
 {
 int num = 0;
-   for (const DynamicObject * vb = all_values.get_prev();
-        vb != &all_values; vb = vb->get_prev())
+   for (const DynamicObject * dob = all_values.get_prev();
+        dob != &all_values; dob = dob->get_prev())
        {
          out << "Value #" << num++ << ":";
-         static_cast<const Value *>(vb)->list_one(out, show_owners);
+         static_cast<const Value *>(dob)->list_one(out, show_owners);
        }
 
    return out << endl;
@@ -1833,13 +1828,21 @@ const ShapeItem rows = ec/cols;
 int
 Value::print_incomplete(ostream & out)
 {
-Simple_string<Value *, false> incomplete;
+Simple_string<const Value *, false> incomplete;
 bool goon = true;
 
    for (DynamicObject * dob = all_values.get_prev();
         goon && (dob != &all_values); dob = dob->get_prev())
        {
-         Value * val = static_cast<Value *>(dob);
+         // this fails:   Value * val = dob->pValue();
+         //
+         // likely reason: construction of dob is incomplete.
+         //
+         // We take a careful approach to print more and more info, since
+         // the interpreter is quite likely to segfault in this function.
+         // Do not use reinterpret_cast() here.
+         //
+         BadValue * val = static_cast<Value *>(dob);
          goon = (dob != dob->get_prev());
 
          if (val->is_complete())   continue;
@@ -1858,9 +1861,8 @@ bool goon = true;
    //
    loop(s, incomplete.size())
       {
-        incomplete[s]->print_stale_info(out,
-               static_cast<const DynamicObject *>(incomplete[s]));
-       }
+        incomplete[s]->print_stale_info(out, incomplete[s]);
+      }
 
    return incomplete.size();
 }
@@ -1878,7 +1880,7 @@ int count = 0;
    for (DynamicObject * dob = all_values.get_prev();
         goon && (dob != &all_values); dob = dob->get_prev())
        {
-         Value * val = static_cast<Value *>(dob);
+         BadValue * val = static_cast<Value *>(dob);
          goon = (dob == dob->get_prev());
 
          if (val->owner_count)   continue;
@@ -1915,7 +1917,7 @@ int count = 0;
    for (DynamicObject * dob = all_values.get_prev();
         dob != &all_values; dob = dob->get_prev())
        {
-         Value * val = static_cast<Value *>(dob);
+         BadValue * val = static_cast<Value *>(dob);
 
          // don't print values found in the previous round.
          //
@@ -1942,12 +1944,12 @@ int count = 0;
 }
 //-----------------------------------------------------------------------------
 void
-Value::print_stale_info(ostream & out, const DynamicObject * dob)
+Value::print_stale_info(ostream & out, const DynamicObject * dob) const
 {
    out << "print_stale_info():   alloc(" << dob->where_allocated()
        << ") flags(" << get_flags() << ")" << endl;
 
-   print_history(out, static_cast<const Value *>(dob), LOC);
+   print_history(out, dob->pValue(), LOC);
 
    try 
       {

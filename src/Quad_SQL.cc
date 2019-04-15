@@ -452,7 +452,7 @@ ucs_string_from_string( const std::string &string )
 {
 const size_t length = string.size();
 const char * buf = string.c_str();
-UTF8_string utf(reinterpret_cast<const UTF8 *>(buf), length);
+UTF8_string utf(utf8P(buf), length);
     return UCS_string(utf);
 }
 //-----------------------------------------------------------------------------

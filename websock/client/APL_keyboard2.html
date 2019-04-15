@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="UTF-8">
+  <title>GNU APL Keyboard</title>
+
+  <style>
+    H1       { text-align: center }
+
+    .keyboard { width:           730px;
+                height:          200px;
+                border-collapse: collapse;
+                table-layout:    fixed
+              }
+    .key     { border:        1px solid black;
+               margin:        0;
+               padding:       0;
+               border-radius: 15px;
+               height:        50px
+             }
+
+    .b5  { width:  50px; font-family: monospace }
+    .b7  { width:  70px }
+    .b8  { width:  80px }
+    .b10 { width: 100px }
+    .b11 { width: 110px }
+    .b13 { width: 130px }
+    .b14 { width: 140px }
+  </style>
+
+  <script>
+      _kK = "kK''";
+      _exe = "'\"⍕≢";
+      _sev = "7&⊖⊖";
+      function locate(obj)
+         {
+           var curleft = 0;
+           var curtop = 0;
+           if (obj.offsetParent)
+              {
+                do {
+                     curleft += obj.offsetLeft;
+                     curtop  += obj.offsetTop;
+                   } while (obj = obj.offsetParent);
+              }
+           return [curleft,curtop];
+         }
+
+      function pushed(event, keys)
+         {
+           if (keys.length != 4)   return;
+           var cX = 0;
+           var cY = 0;
+           [cX, cY] = locate(event.target);
+           var X = event.clientX - cX;
+           var Y = event.clientY - cY;
+           var key;
+           if (X < 25)   // ASCII
+              if (Y < 25)   key = keys[1];   // not shifted
+              else          key = keys[0];   // shifted
+           else          // APL
+              if (Y < 25)   key = keys[3];   // not shifted
+              else          key = keys[2];   // shifted
+
+           if (key == "\n")   // send the line to GNU APL
+              window.opener.process_line();
+           else               // change the input field
+              {
+                 var entry = window.opener.document.getElementById("APL_entry");
+                 if (key == "\b")   // backspace
+                    entry.value = entry.value.slice(0, entry.value.length - 1);
+                 else if (key == "\t")   // (soft) tab
+                    entry.value += "    ".slice(entry.value.length % 4);
+                 else
+                    entry.value += key;
+              }
+         }
+  </script>
+ </head>
+ <body>
+  <H1>GNU APL Keyboard</H1>
+  <CENTER>
+<!--
+ ╔════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦════╦═══════╗
+ ║ ~  ║ !⌶ ║ @⍫ ║ #⍒ ║ $⍋ ║ %⌽ ║ ^⍉ ║ &⊖ ║ *⍟ ║ (⍱ ║ )⍲ ║ _! ║ +⌹ ║       ║
+ ║ `◊ ║ 1¨ ║ 2¯ ║ 3< ║ 4≤ ║ 5= ║ 6≥ ║ 7> ║ 8≠ ║ 9∨ ║ 0∧ ║ -× ║ =÷ ║ BACKS ║
+ ╠════╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦════╣
+ ║       ║ Q  ║ W⍹ ║ E⋸ ║ R  ║ T⍨ ║ Y¥ ║ U  ║ I⍸ ║ O⍥ ║ P⍣ ║ {⍞ ║ }⍬ ║ |⊣ ║
+ ║  TAB  ║ q? ║ w⍵ ║ e∈ ║ r⍴ ║ t∼ ║ y↑ ║ u↓ ║ i⍳ ║ o○ ║ p⋆ ║ [← ║ ]→ ║ \⊢ ║
+ ╠═══════╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩════╣
+ ║ (CAPS   ║ A⍶ ║ S  ║ D  ║ F  ║ G  ║ H  ║ J⍤ ║ K  ║ L⌷ ║ :≡ ║ "≢ ║       ║
+ ║  LOCK)  ║ a⍺ ║ s⌈ ║ d⌊ ║ f_ ║ g∇ ║ h∆ ║ j∘ ║ k' ║ l⎕ ║ ;⍎ ║ '⍕ ║ LFEED ║
+ ╠═════════╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══════╣
+ ║             ║ Z  ║ Xχ ║ C¢ ║ V  ║ B£ ║ N  ║ M  ║ <⍪ ║ >⍙ ║ ?⍠ ║        ║
+ ║    SPACE    ║ z⊂ ║ x⊃ ║ c∩ ║ v∪ ║ b⊥ ║ n⊤ ║ m| ║ ,⍝ ║ .⍀ ║ /⌿ ║ SPACE  ║
+ ╚═════════════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩════════╝
+-->
+
+   <TABLE class=keyboard cellspacing=0>
+    <TR>   <!-- 13*5 + BACKSP(8) = 73 -->
+     <TD colspan=5><BUTTON class="key b5"
+         onclick='pushed(event, "`~◊◊")'    >~ &nbsp;<BR>&#96;&nbsp; ◊</BUTTON>
+     <TD colspan=5> <BUTTON class="key b5"
+         onclick='pushed(event, "1!¨⌶")'    >! ⌶<BR>1 ¨</BUTTON>
+     <TD colspan=5> <BUTTON class="key b5"
+         onclick='pushed(event, "2@¯⍫")'    >@ ⍫<BR>2 ¯</BUTTON>
+     <TD colspan=5> <BUTTON class="key b5"
+         onclick='pushed(event, "3#<⍒")'    ># ⍒<BR>3 &lt;</BUTTON>
+     <TD colspan=5> <BUTTON class="key b5"
+          onclick='pushed(event, "4$≤⍋")'    >$ ⍋<BR>4 ≤</BUTTON>
+     <TD colspan=5> <BUTTON class="key b5"
+         onclick='pushed(event, "5%=⌽")'    >% ⌽<BR>5 =</BUTTON>
+     <TD colspan=5> <BUTTON class="key b5"
+         onclick='pushed(event, "6^≥⍉")'    >^ ⍉<BR>6 ≥</BUTTON>
+     <TD colspan=5> <BUTTON class="key b5"
+         onclick='pushed(event, _sev  )'    >&amp; ⊖<BR>7 &gt;</BUTTON>
+     <TD colspan=5> <BUTTON class="key b5"
+         onclick='pushed(event,"8*≠⍟")'     >* ⍟<BR>8 ≠</BUTTON>
+     <TD colspan=5> <BUTTON class="key b5"
+         onclick='pushed(event, "9(∨⍱")'    >( ⍱<BR>9 ∨</BUTTON>
+     <TD colspan=5> <BUTTON class="key b5"
+         onclick='pushed(event, "0)∧⍲")'    >) ⍲<BR>0 ∧</BUTTON>
+     <TD colspan=5> <BUTTON class="key b5"
+         onclick='pushed(event, "-_×!")'    >_ !<BR>- ×</BUTTON>
+     <TD colspan=5> <BUTTON class="key b5"
+         onclick='pushed(event, "=+÷⌹")'    >+ ⌹<BR>= ÷</BUTTON>
+     <TD colspan=8> <BUTTON class="key b8"
+         onclick='pushed(event, "\b\b\b\b")'>BACK<BR>SPACE</BUTTON>
+
+    <TR>   <!-- TAB(8) + 13*5     = 73  -->
+     <TD colspan=8> <BUTTON class="key b8"
+         onclick='pushed(event, "\t\t\t\t")'>TAB <BR>&nbsp;</BUTTON>
+     <TD colspan=5> <BUTTON class="key b5"
+         onclick='pushed(event, "qQ??")'    >Q &nbsp;<BR>q ?</BUTTON>
+     <TD colspan=5> <BUTTON class="key b5"
+         onclick='pushed(event, "wW⍵⍹")'    >W ⍹<BR/>w &omega;</BUTTON>
+     <TD colspan=5> <BUTTON class="key b5"
+         onclick='pushed(event, "eE∈⋸")'    >E ⋸<BR>e ∈</BUTTON>
+     <TD colspan=5> <BUTTON class="key b5"
+         onclick='pushed(event, "rR⍴⍴")'     >R &nbsp;<BR>r ⍴</BUTTON>
+     <TD colspan=5> <BUTTON class="key b5"
+         onclick='pushed(event, "tT∼⍨")'    >T ⍨<BR>t ∼</BUTTON>
+     <TD colspan=5> <BUTTON class="key b5"
+         onclick='pushed(event, "yY↑¥")'    >Y ¥<BR>y ↑</BUTTON>
+     <TD colspan=5> <BUTTON class="key b5"
+         onclick='pushed(event, "uU↓↓")'    >U &nbsp;<BR>u ↓</BUTTON>
+     <TD colspan=5> <BUTTON class="key b5"
+         onclick='pushed(event, "iI⍳⍸")'    >I ⍸<BR>i ⍳</BUTTON>
+     <TD colspan=5> <BUTTON class="key b5"
+         onclick='pushed(event, "oO○⍥")'    >O ⍥<BR>o ○</BUTTON>
+     <TD colspan=5> <BUTTON class="key b5"
+         onclick='pushed(event, "pP⋆⍣")'    >P ⍣<BR>p ⋆</BUTTON>
+     <TD colspan=5> <BUTTON class="key b5"
+         onclick='pushed(event, "[{←⍞")'    >[ ⍞<BR>{ ←</BUTTON>
+     <TD colspan=5> <BUTTON class="key b5"
+         onclick='pushed(event, "]}→⍬")'    >] ⍬<BR>} →</BUTTON>
+     <TD colspan=5> <BUTTON class="key b5"
+         onclick='pushed(event, "\\|⊢⊣")'   >| ⊣<BR>\ ⊢</BUTTON>
+
+    <TR>   <!-- CAPSLOCK(10) + 11*5 + RETURN(8) = 73 -->
+     <TD colspan=10> <BUTTON class="key b10">&nbsp;
+                                                     <BR>&nbsp;</BUTTON>
+     <TD colspan=5> <BUTTON class="key b5"
+         onclick='pushed(event, "aA⍺⍶")'    >A &nbsp;<BR>a ⍺</BUTTON>
+     <TD colspan=5> <BUTTON class="key b5"
+         onclick='pushed(event, "sS⌈⌈")'    >S &nbsp;<BR>s ⌈</BUTTON>
+     <TD colspan=5> <BUTTON class="key b5"
+         onclick='pushed(event, "dD⌊⌊")'    >D &nbsp;<BR>d ⌊</BUTTON>
+     <TD colspan=5> <BUTTON class="key b5"
+         onclick='pushed(event, "fF__")'    >F &nbsp;<BR>f _</BUTTON>
+     <TD colspan=5> <BUTTON class="key b5"
+         onclick='pushed(event, "gG∇∇")'    >G &nbsp;<BR>g ∇</BUTTON>
+     <TD colspan=5> <BUTTON class="key b5"
+         onclick='pushed(event, "hH∆⍙")'    >H ⍙<BR>h ∆</BUTTON>
+     <TD colspan=5> <BUTTON class="key b5"
+         onclick='pushed(event, "jJ∘⍤")'    >J ⍤<BR>j ∘</BUTTON>
+     <TD colspan=5> <BUTTON class="key b5"
+         onclick='pushed(event, _kK   )'    >K &nbsp;<BR>k '</BUTTON>
+     <TD colspan=5> <BUTTON class="key b5"
+         onclick='pushed(event, "lL⎕⌷")'    > L ⌷<BR>l ⎕</BUTTON>
+     <TD colspan=5> <BUTTON class="key b5"
+         onclick='pushed(event, ";:⍎≡")'    > : ≡<BR>; ⍎</BUTTON>
+     <TD colspan=5> <BUTTON class="key b5"
+         onclick='pushed(event, _exe)'      > " ≢<BR>' ⍕</BUTTON>
+     <TD colspan=8> <BUTTON class="key b8"
+         onclick='pushed(event, "\n\n\n\n")'>ENTER<BR>&nbsp;</BUTTON>
+
+    <TR>   <!-- SPACE(14) + 10*5 + SPACE(9) = 73 -->
+     <TD colspan=14> <BUTTON class="key b14"
+         onclick='pushed(event,"    ")'    >&nbsp;<BR>&blank;</BUTTON>
+     <TD colspan=5> <BUTTON class="key b5"
+         onclick='pushed(event, "zZ⊂⊂")'    >Z &nbsp;<BR>z ⊂</BUTTON>
+     <TD colspan=5> <BUTTON class="key b5"
+         onclick='pushed(event, "xX⊃χ")'    >X χ<BR>x ⊃</BUTTON>
+     <TD colspan=5> <BUTTON class="key b5"
+         onclick='pushed(event, "cC∩¢")'    >C ¢<BR>c ∩</BUTTON>
+     <TD colspan=5> <BUTTON class="key b5"
+         onclick='pushed(event, "vV∪∪")'    >V &nbsp;<BR>v ∪</BUTTON>
+     <TD colspan=5> <BUTTON class="key b5"
+         onclick='pushed(event, "bB⊥£")'    >B £<BR>b ⊥</BUTTON>
+     <TD colspan=5> <BUTTON class="key b5"
+         onclick='pushed(event, "nN⊤⊤")'    >N &nbsp;<BR>n ⊤</BUTTON>
+     <TD colspan=5> <BUTTON class="key b5"
+         onclick='pushed(event, "mM∣∣")'    >M &nbsp;<BR>m ∣</BUTTON>
+     <TD colspan=5> <BUTTON class="key b5"
+         onclick='pushed(event, ",<⍝⍪")'    >&lt;⍪<BR>, ⍝</BUTTON>
+     <TD colspan=5> <BUTTON class="key b5"
+         onclick='pushed(event, ".>⍀⍙")'    >&gt; ⍙<BR>. ⍀</BUTTON>
+     <TD colspan=5> <BUTTON class="key b5"
+         onclick='pushed(event, "/?⌿⌿")'    >? &nbsp;<BR>/ ⌿</BUTTON>
+     <TD colspan=9>  <BUTTON class="key b9"
+         onclick='pushed(event, "    ")'    >&nbsp;<BR>&blank;</BUTTON>
+   </TABLE>
+   <BR>
+
+   <TABLE>
+    <TR><TH>Usage:
+    <TR><TD>Click on the left   half of a key to send the ASCII character shown
+    <TR><TD>Click on the right  half of a key to send the APL   character shown
+    <TR><TD>Click on the top    half of a key to send the upper character shown
+    <TR><TD>Click on the bottom half of a key to send the lower character shown
+   </TABLE>
+  </CENTER>
+ </body>
+</html>
+
+ 

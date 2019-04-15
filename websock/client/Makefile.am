@@ -1,3 +1,3 @@
 
-dist_doc_DATA = apl_js.css  apl_js.html
+dist_doc_DATA = apl_js.html APL_keyboard.html APL_keyboard2.html
 

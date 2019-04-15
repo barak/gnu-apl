@@ -1102,7 +1102,7 @@ Value_P Z(len, LOC);
                    if (cB.get_cell_type() == CT_CHAR)
                       data = cB.get_char_value();
                    else if (cB.get_cell_type() == CT_CELLREF)
-                      data = reinterpret_cast<APL_Integer>(cB.get_lval_value());
+                      data = APL_Integer(cB.get_lval_value());
                    else
                       memcpy(&data, cB.get_u0(), sizeof(data));
                  }
@@ -1111,9 +1111,7 @@ Value_P Z(len, LOC);
                    if (cB.get_cell_type() == CT_COMPLEX)
                       memcpy(&data, cB.get_u1(), sizeof(data));
                    else if (cB.get_cell_type() == CT_CELLREF)
-                      data = reinterpret_cast<APL_Integer>
-                           (reinterpret_cast<const LvalCell *>(&cB)
-                              ->get_cell_owner());
+                      data = APL_Integer(cB.cLvalCell().get_cell_owner());
 #ifdef RATIONAL_NUMBERS_WANTED
                    else if (cB.get_cell_type() == CT_FLOAT)
                       memcpy(&data, cB.get_u1(), sizeof(data));

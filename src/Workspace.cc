@@ -964,8 +964,7 @@ XML_Loading_Archive in(filename.c_str(), dump_fd);
            wsid_end[-3] == 'a' &&
            wsid_end[-2] == 'p' &&
            wsid_end[-1] == 'l')   wsid_end -= 4;   // skip .apl extension
-        const UTF8_string wsid_utf8(reinterpret_cast<const UTF8 *>(wsid_start),
-                                    wsid_end - wsid_start);
+        const UTF8_string wsid_utf8(utf8P(wsid_start), wsid_end - wsid_start);
         const UCS_string wsid_ucs(wsid_utf8);
         wsid(out, wsid_ucs, libref, true);
 

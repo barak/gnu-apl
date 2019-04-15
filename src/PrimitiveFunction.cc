@@ -1683,8 +1683,7 @@ Bif_F12_ELEMENT::eval_B(Value_P B)
                       }
                    else
                       {
-                        Value * owner = reinterpret_cast<const LvalCell *>
-                                                        (C)->get_cell_owner();
+                        Value * owner = C->cLvalCell().get_cell_owner();
                         new (&Z->get_ravel(0))
                             LvalCell(C->get_lval_value(), owner);
                         break;

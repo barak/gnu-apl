@@ -140,8 +140,7 @@ get_rank(const APL_value val)
 int64_t
 get_axis(const APL_value val, unsigned int axis)
 {
-   return axis < static_cast<unsigned int>(val->get_rank())
-          ? val->get_shape_item(axis) : -1;
+   return int(axis) < val->get_rank() ? val->get_shape_item(axis) : -1;
 }
 //-----------------------------------------------------------------------------
 
@@ -593,8 +592,7 @@ int
 UTF8_to_Unicode(const char * utf, int * length)
 {
 int len = 0;
-const Unicode uni = UTF8_string::toUni(reinterpret_cast<const UTF8 *>
-                                       (utf), len, false);
+const Unicode uni = UTF8_string::toUni(utf8P(utf), len, false);
    if (length)   *length = len;
    return uni;
 }

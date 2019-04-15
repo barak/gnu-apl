@@ -235,7 +235,7 @@ public:
 
    /// same as app(const UTF8 * str)
    void append_utf8(const char * str)
-      { append_utf8(reinterpret_cast<const UTF8 *>(str)); }
+      { append_utf8(utf8P(str)); }
 
    /// prepend character \b uni
    void prepend(Unicode uni)

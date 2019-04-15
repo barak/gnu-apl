@@ -413,13 +413,20 @@ operator --(Function_PC & pc)
    return pc;
 }
 //-----------------------------------------------------------------------------
+/// frequently used cast to const char *
+inline const char *
+charP(const void * vp)
+{
+  return reinterpret_cast<const char *>(vp);
+}
+//-----------------------------------------------------------------------------
 
 #define uhex  std::hex << uppercase << setfill('0')
 #define lhex  std::hex << nouppercase << setfill('0')
 #define nohex std::dec << nouppercase << setfill(' ')
 
 /// formatting for hex (and similar) values
-#define HEX(x)     "0x" << uhex <<             static_cast<int64_t>(x) << nohex
+#define HEX(x)     "0x" << uhex <<             int64_t(x) << nohex
 #define HEX2(x)    "0x" << uhex << std::right << \
                            setw(2) << int(x) << std::left << nohex
 #define HEX4(x)    "0x" << uhex << std::right << \

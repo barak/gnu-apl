@@ -65,7 +65,14 @@ protected:
    virtual const char * get_classname() const   { return "LvalCell"; }
 
   /// Overloaded Cell::CDR_size() should not be called for lval cells
-   virtual int CDR_size() const { NeverReach("CDR_size called on LvalCell base class"); }
+   virtual int CDR_size() const
+      { NeverReach("CDR_size called on LvalCell base class"); }
+
+   /// downcast to const LvalCell
+   virtual const LvalCell & cLvalCell() const   { return *this; }
+
+   /// downcast to LvalCell
+   virtual LvalCell & vLvalCell()   { return *this; }
 };
 
 /// a compatibility Cell for fixing a bug in ⊃. Will be removed 

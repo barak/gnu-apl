@@ -305,8 +305,7 @@ bool got_tag = false;
         const int rest = size() - src;
         if (rest > 5 && items[src + 1] == '#' && items[src + 4] == ';')
            {
-             const long val = strtol(
-                        reinterpret_cast<const char *>(items + src + 2), 0, 10);
+             const long val = strtol(charP(items + src + 2), 0, 10);
              items[dest++] = char(val);
              src += 4;
            }

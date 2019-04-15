@@ -3,7 +3,21 @@
  <head>
  <meta charset="UTF-8">
  <title>try-GNU-APL</title>
- <link rel="stylesheet" type="text/css" href="/try-GNU-APL.css">
+ <style>
+  H1      { margin: 0; padding: 0;  text-align: center     }
+  BODY    { background-color: #9EE; margin: 0; padding: 0; }
+  .footer { text-align: center;     font-style: italic     }
+
+  TABLE      { border-collapse: collapse; }
+  TD         { padding: 0; font-family: monospace; width: 80em; #}
+  #APL_entry { font-family: monospace }
+
+  /* output channel coloring (in/out/error) */
+  .i   { background-color: #DDD; color: #00F }
+  .o   { background-color: #FFF; color: #000 }
+  .e   { background-color: #FFF; color: #F00 }
+ </style>
+
   <script type='text/javascript'>
 
     function init()
@@ -20,13 +34,13 @@
                 var lines = e.data.split('\n');
                 lines[0] = carry + lines[0];
                 carry = lines.pop();
-                if (carry.charAt(0) == "⓪")   carry = "";   // discard input prompt
+                if (carry.charAt(0) == "⓪")   carry = "";   // discard prompt
                 for (var j = 0; j < lines.length; ++j)
                     output_line(lines[j], "o");
               }
          };
 
-      input_form = document.forms["APL_input"]["in_form"];
+      input_form = document.forms["APL_form"]["in_form"];
       channel = "o";
       prompt = false;
       carry = "";   // carry from one message to the next
@@ -117,17 +131,17 @@
   <TABLE id=screen class=i>
   </TABLE>
   <HR>
-  <form name="APL_input" onsubmit="return process_line()" method="post">
+  <form name="APL_form" id="APL_form"
+        onsubmit="return process_line()" method="post">
    <STRONG>APL Input:</STRONG>
   <input type="text" id="APL_entry" name="in_form" size=60>
   <input type="submit" value="Enter">
-  &nbsp; &nbsp; &nbsp; 
   <input type="button" value="Show an APL Keyboard"
          onclick='window.open("APL_keyboard.html", "APL Keyboard",
                               "width=930,height=500"); return false;');>
   <input type="button" value="Show another APL Keyboard (experimental)"
          onclick='window.open("APL_keyboard2.html", "APL Keyboard2",
-                      "width=930,height=500"); return false;');>
+                      "width=850,height=500"); return false;');>
   </form>
   <HR>
   <div class=footer>

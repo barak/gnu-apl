@@ -1377,7 +1377,7 @@ const xcb_get_input_focus_reply_t * focusReply =
              default:
                 w_props.get_verbosity() > 0 &&
                    CERR << "unexpected event type "
-                        << static_cast<unsigned int>(event->response_type)
+                        << int(event->response_type)
                          << " (ignored)" << endl;
            }
 

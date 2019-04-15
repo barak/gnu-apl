@@ -36,6 +36,13 @@ class UCS_string;
 typedef uint8_t UTF8;
 
 //-----------------------------------------------------------------------------
+/// frequently used cast to const UTF8 *
+inline const UTF8 *
+utf8P(const void * vp)
+{
+  return reinterpret_cast<const UTF8 *>(vp);
+}
+//-----------------------------------------------------------------------------
 /// an UTF8 encoded Unicode (RFC 3629) string
 class UTF8_string :  public Simple_string<UTF8, false>
 {
@@ -46,7 +53,7 @@ public:
 
    /// constructor: UTF8_string from 0-terminated C string.
    UTF8_string(const char * str)
-   : Simple_string<UTF8, false>(reinterpret_cast<const UTF8 *>(str), str ? strlen(str) : 0)
+   : Simple_string<UTF8, false>(utf8P(str), str ? strlen(str) : 0)
    {}
 
    /// constructor: copy of string, but at most len bytes
@@ -74,7 +81,7 @@ public:
       {
         extend(items_valid + 1);
         items[items_valid] = 0;   // the terminating 0
-        return reinterpret_cast<const char *>(items);
+        return charP(items);
       }
 
    /// append a 0-terminated C string

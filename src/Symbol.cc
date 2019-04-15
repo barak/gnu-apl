@@ -969,8 +969,7 @@ UCS_string data;
 
                for (char * cp = buffer + strlen(buffer);
                     cp < (buffer + 72); )   *cp++ = ' ';
-                sprintf(buffer + 72, "%8.8lld\r\n", 
-                        static_cast<long long>(seq++));
+                sprintf(buffer + 72, "%8.8lld\r\n", long_long(seq++));
                 fwrite(buffer, 1, 82, out);
 
                // write function record(s)
@@ -997,7 +996,7 @@ UCS_string data;
              buffer[1 + uu] = cc;
            }
 
-        sprintf(buffer + 72, "%8.8lld\r\n", static_cast<long long>(seq++));
+        sprintf(buffer + 72, "%8.8lld\r\n", long_long(seq++));
         fwrite(buffer, 1, 82, out);
       }
 }
@@ -1062,7 +1061,7 @@ int count = 0;
                         {
                           char cc[100];
                           snprintf(cc, sizeof(cc), "    VS[%lld] ",
-                                   static_cast<long long>(v));
+                                   long_long(v));
                           count += ufun->show_owners(cc, out, value);
                         }
                    }
@@ -1283,7 +1282,7 @@ CDR_string cdr;
    CDR::to_CDR(cdr, *new_value);
    if (cdr.size() > MAX_SVAR_SIZE)   LIMIT_ERROR_SVAR;
 
-string data(reinterpret_cast<const char *>(cdr.get_items()), cdr.size());
+string data(charP(cdr.get_items()), cdr.size());
 
    // wait for shared variable to be ready
    //
