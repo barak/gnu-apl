@@ -663,7 +663,8 @@ const APL_Float quotient = P / Q;   // quotient←b÷a and check overflows
      if ((qct != 0) && Cell::integral_within(quotient, qct))   return 0.0;
    }
 
-const APL_Float abs_quotient   = quotient < 0 ? -quotient : quotient;
+const APL_Float null(0.0);
+const APL_Float abs_quotient = quotient < null ? -quotient : quotient;
    if (abs_quotient > 4.5E15)
       {
         // if "| P ÷ Q" is too large then 'abs_quotient' is not exact any more.
@@ -683,12 +684,12 @@ const APL_Float abs_quotient   = quotient < 0 ? -quotient : quotient;
         // P is smaller in magnitude than Q. If P and Q have the same sign then
         // P mod Q is P, otherwise Q - P.
         //
-        return (P < 0) == (Q < 0) ? P : Q + P;
+        return (P < null) == (Q < null) ? P : Q + P;
       }
 
 const APL_Float floor_quotient = floor(abs_quotient);
 const APL_Float prod           = Q * floor_quotient;
-const APL_Float abs_prod       = prod < 0 ? -prod : prod;
+const APL_Float abs_prod       = prod < null ? -prod : prod;
 const APL_Float prod2          = P < 0 ? -abs_prod : abs_prod;
 const APL_Float r              = P - prod2;
 
@@ -741,19 +742,19 @@ const APL_Float b = dfval();
    // Note: In that case, the integer to which A ÷ B is close is either
    // floor(A ÷ B) or ceil(A ÷ B).
    //
+const APL_Float null(0.0);
 const APL_Float z = p_modulo_q(b, a);
-Assert(isnormal(z) || z == 0.0);
-
+Assert(isnormal(z) || z == null);
 
 APL_Float r2;
-   if      (z < 0 && a < 0)   r2 = z;           // (×R) = ×Q)
-   else if (z > 0 && a > 0)   r2 = z;           // (×R) = ×Q)
+   if      (z < null && a < null)   r2 = z;     // (×R) = ×Q)
+   else if (z > null && a > null)   r2 = z;     // (×R) = ×Q)
    else                       r2 = z + a;       // (×R) ≠ ×Q)
-Assert(isnormal(r2) || r2 == 0.0);
+Assert(isnormal(r2) || r2 == null);
 
-   if (r2 == 0)   return IntCell::z0(Z);
-   if (r2 == a)   return IntCell::z0(Z);
-   else           return zv(Z, r2);
+   if (r2 == null)   return IntCell::z0(Z);
+   if (r2 == a)      return IntCell::z0(Z);
+   else              return zv(Z, r2);
 }
 //-----------------------------------------------------------------------------
 ErrorCode

@@ -50,7 +50,7 @@ uint64_t Value::total_ravel_count = 0;
 
 // the static Value instances are defined in StaticObjects.cc
 
-void * Value::deleted_values = 0;
+_deleted_value * Value::deleted_values = 0;
 int Value::deleted_values_count = 0;
 uint64_t Value::fast_new = 0;
 uint64_t Value::slow_new = 0;
@@ -743,7 +743,7 @@ int num = 0;
         dob != &all_values; dob = dob->get_prev())
        {
          out << "Value #" << num++ << ":";
-         static_cast<const Value *>(dob)->list_one(out, show_owners);
+         dob->pValue()->list_one(out, show_owners);
        }
 
    return out << endl;
@@ -1831,18 +1831,10 @@ Value::print_incomplete(ostream & out)
 Simple_string<const Value *, false> incomplete;
 bool goon = true;
 
-   for (DynamicObject * dob = all_values.get_prev();
+   for (const DynamicObject * dob = all_values.get_prev();
         goon && (dob != &all_values); dob = dob->get_prev())
        {
-         // this fails:   Value * val = dob->pValue();
-         //
-         // likely reason: construction of dob is incomplete.
-         //
-         // We take a careful approach to print more and more info, since
-         // the interpreter is quite likely to segfault in this function.
-         // Do not use reinterpret_cast() here.
-         //
-         BadValue * val = static_cast<Value *>(dob);
+         const Value * val = dob->pValue();
          goon = (dob != dob->get_prev());
 
          if (val->is_complete())   continue;
@@ -1870,17 +1862,17 @@ bool goon = true;
 int
 Value::print_stale(ostream & out)
 {
-Simple_string<Value *, false> stale_vals;
+Simple_string<const Value *, false> stale_vals;
 Simple_string<const DynamicObject *, false> stale_dobs;
 bool goon = true;
 int count = 0;
 
    // first print addresses and remember stale values
    //
-   for (DynamicObject * dob = all_values.get_prev();
+   for (const DynamicObject * dob = all_values.get_prev();
         goon && (dob != &all_values); dob = dob->get_prev())
        {
-         BadValue * val = static_cast<Value *>(dob);
+         const Value * val = dob->pValue();
          goon = (dob == dob->get_prev());
 
          if (val->owner_count)   continue;
@@ -1901,7 +1893,7 @@ int count = 0;
    loop(s, stale_vals.size())
       {
         const DynamicObject * dob = stale_dobs[s];
-        Value * val = stale_vals[s];
+        const Value * val = stale_vals[s];
         val->print_stale_info(out, dob);
         ++count;
        }
@@ -1914,10 +1906,10 @@ int count = 0;
 
    // print all values that are still marked
    //
-   for (DynamicObject * dob = all_values.get_prev();
+   for (const DynamicObject * dob = all_values.get_prev();
         dob != &all_values; dob = dob->get_prev())
        {
-         BadValue * val = static_cast<Value *>(dob);
+         const Value * val = dob->pValue();
 
          // don't print values found in the previous round.
          //

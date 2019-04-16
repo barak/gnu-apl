@@ -38,6 +38,12 @@ class PrintBuffer;
 class Value_P;
 class Thread_context;
 
+/// a linked list of deleted values
+struct _deleted_value
+{
+  _deleted_value * next;
+};
+
 //=============================================================================
 /**
     An APL value. It consists of a fixed header (rank, shape) and
@@ -608,8 +614,8 @@ protected:
    /// the cells of a short (i.e. ⍴,value ≤ SHORT_VALUE_LENGTH_WANTED) value
    Cell short_value[SHORT_VALUE_LENGTH_WANTED];
 
-   /// values that have been deleted
-   static void * deleted_values;
+   /// a linked list of values that have been deleted
+   static _deleted_value * deleted_values;
 
    /// number values that have been deleted
    static int deleted_values_count;
@@ -631,7 +637,7 @@ protected:
            {
              --deleted_values_count;
              void * ret = deleted_values;
-             deleted_values = *reinterpret_cast<void **>(deleted_values);
+             deleted_values = deleted_values->next;
              ++fast_new;
              return ret;
            }
@@ -646,8 +652,8 @@ protected:
         if (deleted_values_count < deleted_values_MAX)   // we have space
            {
              ++deleted_values_count;
-             *reinterpret_cast<void **>(ptr) = deleted_values;
-             deleted_values = ptr;
+             reinterpret_cast<_deleted_value *>(ptr)->next = deleted_values;
+             deleted_values = reinterpret_cast<_deleted_value *>(ptr);
            }
         else                                             // no more space
            {
@@ -666,9 +672,6 @@ private:
 
    Value * operator &()   { return this; }
 };
-
-/// a marker for potentially broken (partly un-initialized) Value
-typedef Value BadValue;
 // ----------------------------------------------------------------------------
 
 extern void print_history(ostream & out, const Value * val, const char * loc);

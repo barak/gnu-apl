@@ -21,6 +21,7 @@
 
 #include "Common.hh"
 #include "DynamicObject.hh"
+#include "IndexExpr.hh"
 #include "PrintOperator.hh"
 #include "Value.hh"
 
@@ -63,6 +64,38 @@ DynamicObject::print(ostream & out) const
        << "    prev:      " << CVOIP(prev)          << endl
        << "    next:      " << CVOIP(next)          << endl
        << "    allocated: " << where_allocated()    << endl;
+}
+//-----------------------------------------------------------------------------
+/// cast DynamicObject to derived class Value.
+// This only works properly after #include Value.hh !
+Value *
+DynamicObject::pValue()
+{
+   return static_cast<Value *>(this);
+}
+//-----------------------------------------------------------------------------
+/// cast DynamicObject to derived class Value.
+// This only works properly after #include Value.hh !
+const Value *
+DynamicObject::pValue() const
+{
+  return static_cast<const Value *>(this);
+}
+//-----------------------------------------------------------------------------
+/// cast DynamicObject to derived class IndexExpr.
+// This only works properly after #include IndexExpr.hh !
+const IndexExpr *
+DynamicObject::pIndexExpr() const
+{
+  return static_cast<const IndexExpr *>(this);
+}
+//-----------------------------------------------------------------------------
+/// cast DynamicObject to derived class Value.
+// This only works properly after #include IndexExpr.hh !
+IndexExpr *
+DynamicObject::pIndexExpr()
+{
+  return static_cast<IndexExpr *>(this);
 }
 //-----------------------------------------------------------------------------
 

@@ -1510,10 +1510,10 @@ const Unicode type = UTF8_string::toUni(first, len, true);
         case UNI_PAD_U3: // integer
              first += len;
              {
-               UTF8 * end = 0;
-               const APL_Integer val = stoll(first, &end, 10);
+               char * end = 0;
+               const APL_Integer val = strtoll(charP(first), &end, 10);
                new (C++) IntCell(val);
-               first = end;
+               first = utf8P(end);
              }
              break;
 
@@ -1544,12 +1544,12 @@ const Unicode type = UTF8_string::toUni(first, len, true);
         case UNI_PAD_U6: // pointer
              first += len;
              {
-               UTF8 * end = 0;
-               const int vid = stoll(first, &end, 10);
+               char * end = 0;
+               const int vid = strtoll(charP(first), &end, 10);
                Assert(vid >= 0);
                Assert(vid < int(values.size()));
                C++->init_from_value(values[vid].get(), C_owner, LOC);
-               first = end;
+               first = utf8P(end);
              }
              break;
 
@@ -1562,16 +1562,16 @@ const Unicode type = UTF8_string::toUni(first, len, true);
                 }
              else
                 {
-                  UTF8 * end = 0;
-                  const int vid = stoll(first, &end, 16);
+                  char * end = 0;
+                  const int vid = strtoll(charP(first), &end, 16);
                   Assert(vid >= 0);
                   Assert(vid < int(values.size()));
                   Assert(*end == '[');   ++end;
-                  const ShapeItem offset = stoll(end, &end, 16);
+                  const ShapeItem offset = strtoll(end, &end, 16);
                   Assert(*end == ']');   ++end;
                   new (C++) LvalCell(&values[vid]->get_ravel(offset),
                                      values[vid].get());
-                  first = end;
+                  first = utf8P(end);
                 }
              break;
 
@@ -1582,21 +1582,21 @@ const Unicode type = UTF8_string::toUni(first, len, true);
              //
              first += len;
              {
-               UTF8 * end = 0;
-               const uint64_t numer = stoll(first, &end, 10);
-               first = end;
+               char * end = 0;
+               const uint64_t numer = strtoll(charP(first), &end, 10);
+               first = utf8P(end);
 
                // skip ÷ (which is is C3 B7 in UTF8)
                Assert((*end++ & 0xFF) == 0xC3);
                Assert((*end++ & 0xFF) == 0xB7);
-               const uint64_t denom = stoll(end, &end, 10);
+               const uint64_t denom = strtoll(end, &end, 10);
                Assert(denom > 0);
 #ifdef RATIONAL_NUMBERS_WANTED
                new (C++) FloatCell(numer, denom);
 #else
                new (C++) FloatCell((1.0*(numer))/denom);
 #endif
-               first = end;
+               first = utf8P(end);
              }
              break;
 
@@ -1635,8 +1635,8 @@ XML_Loading_Archive::read_chars(UCS_string & ucs, const UTF8 * & utf)
             {
               utf += len;   // skip UNI_PAD_U1
               char_mode = false;
-              UTF8 * end = 0;
-              const int hex = stoll(utf, &end, 16);
+              char * end = 0;
+              const int hex = strtoll(charP(utf), &end, 16);
               ucs.append(Unicode(hex));
               utf = utf8P(end);
               continue;
@@ -2364,7 +2364,7 @@ const TokenTag tag = TokenTag(find_int_attr("tag", false, 16));
 
         case TV_INDEX: 
              {
-               UTF8 * vids = const_cast<UTF8 *>(find_attr("index", false));
+               const UTF8 * vids = find_attr("index", false);
                IndexExpr & idx = *new IndexExpr(ASS_none, LOC);
                while (*vids != '"')
                   {
@@ -2375,13 +2375,15 @@ const TokenTag tag = TokenTag(find_int_attr("tag", false, 16));
                        }
                     else                // value
                        {
+                         char * end = 0;
                          Assert1(*vids == 'v');   ++vids;
                          Assert1(*vids == 'i');   ++vids;
                          Assert1(*vids == 'd');   ++vids;
                          Assert1(*vids == '_');   ++vids;
-                         const int vid = stoll(vids, &vids, 10);
+                         const int vid = strtoll(charP(vids), &end, 10);
                          Assert(vid < int(values.size()));
                          idx.add(values[vid]);
+                         vids = utf8P(end);
                        }
                   }
                new (&tloc.tok) Token(tag, idx);

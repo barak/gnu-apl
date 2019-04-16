@@ -35,8 +35,8 @@ uint64_t
 top_of_memory()
 {
    if (sizeof(const void *) == 4)
-      return 0xFFFFFFFFULL & reinterpret_cast<uint64_t>(sbrk(0));
+      return 0xFFFFFFFFULL & uint64_t(sbrk(0));
    else
-      return reinterpret_cast<uint64_t>(sbrk(0));
+      return uint64_t(sbrk(0));
 }
 

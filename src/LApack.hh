@@ -748,7 +748,7 @@ ShapeItem  lastc = 0;
 
    if (lastv)
       {
-        APL_Float * gemv_data = new APL_Float[2*N];
+        APL_Float * gemv_data = new APL_Float[2*N];   // N double or N complex
         Vector<T> gemv_result(reinterpret_cast<T *>(gemv_data), N);
 
         gemv<T>(lastv, lastc, c, v, gemv_result);

@@ -289,7 +289,7 @@ Output::read_ESC_sequence(char * dest, int destlen, int append,
         return 1;
       }
 
-   if (str == reinterpret_cast<char *>(-1))
+   if (str == reinterpret_cast<const char *>(-1))
       {
         const char * term = getenv("TERM");
         CERR << "capability '" << capname 

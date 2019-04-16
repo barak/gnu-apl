@@ -80,10 +80,6 @@ public:
    const CDR_header & header() const
       { return *reinterpret_cast<const CDR_header *>(items); }
 
-   /// return the header of this CDR
-   CDR_header & header()
-      { return *reinterpret_cast<CDR_header *>(items); }
-
    /// return the tag of this CDR
    int get_ptr() const   { return get_4(0); }
 

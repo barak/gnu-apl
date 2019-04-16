@@ -34,7 +34,8 @@ class IndexExpr;
  was allocated and maintains a doubly linked ring of all allocated objects.
 
  The doubly linked list has a statically allocated anchor that must not
- be removed. I.e. the list is never empty.
+ be removed. The existance of the anchor guarantees that the list is never
+ empty (which simplifies programming).
  */
 /// A Value or an IndexExpr
 class DynamicObject
@@ -53,7 +54,7 @@ public:
      next->prev = this;
    }
 
-   /// a special constructor for statically allocated objects.
+   /// a special constructor for the statically allocated anchors
    DynamicObject(const char * loc)
    : alloc_loc(loc),
      next(this),
@@ -85,15 +86,16 @@ public:
       }
 
    /// cast to const Value *. Caller must check that this cast is valid.
-   const Value * pValue() const
-      { return reinterpret_cast<const Value *>(this); }
+   const Value * pValue() const;
 
    /// cast to Value *. Caller must check that this cast is valid.
-   Value * pValue()
-      { return reinterpret_cast<Value *>(this); }
+   Value * pValue();
 
    /// cast to IndexExpr *. Caller must check that this cast is valid.
-   IndexExpr * pIndexExpr()   { return reinterpret_cast<IndexExpr *>(this); }
+   const IndexExpr * pIndexExpr() const;
+
+   /// cast to IndexExpr *. Caller must check that this cast is valid.
+   IndexExpr * pIndexExpr();
 
    /// print this object
    ///

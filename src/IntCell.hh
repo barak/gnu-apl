@@ -180,6 +180,12 @@ public:
    /// overloaded Cell::get_byte_value()
    virtual int get_byte_value() const;
 
+   /// downcast to const IntCell
+   virtual const IntCell & cIntlCell() const   { return *this; }
+
+   /// downcast to IntCell
+   virtual IntCell & vIntCell()   { return *this; }
+
 protected:
    /// overloaded Cell::get_cell_type()
    virtual CellType get_cell_type() const

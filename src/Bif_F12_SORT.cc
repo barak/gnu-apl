@@ -172,10 +172,10 @@ const Cell * base = &B->get_ravel(0) - qio*comp_len;
 const struct { const Cell * base; ShapeItem comp_len; } ctx = { base, comp_len};
 
    if (order == SORT_ASCENDING)
-      Heapsort<IntCell>::sort(reinterpret_cast<IntCell *>(&Z->get_ravel(0)),
+      Heapsort<IntCell>::sort(&Z->get_ravel(0).vIntCell(),
                               len_BZ, &ctx, &Cell::greater_vec);
    else
-      Heapsort<IntCell>::sort(reinterpret_cast<IntCell *>(&Z->get_ravel(0)),
+      Heapsort<IntCell>::sort(&Z->get_ravel(0).vIntCell(),
                                len_BZ, &ctx, &Cell::smaller_vec);
 
    return Token(TOK_APL_VALUE1, Z);
@@ -221,7 +221,7 @@ CollatingCache cache(A.getref(), base_B1, comp_len);
 
    // then sort Z (actually re-arrange Z so that B[Z] is sorted)
    //
-IntCell * z0 = reinterpret_cast<IntCell *>(&Z->get_ravel(0));
+IntCell * z0 = &Z->get_ravel(0).vIntCell();
    if (order == SORT_ASCENDING)
       Heapsort<IntCell>::sort(z0, len_BZ, &cache, &CollatingCache::greater_vec);
    else

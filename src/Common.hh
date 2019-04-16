@@ -368,7 +368,9 @@ extern ostream & get_CERR();
 /// Function_Line ++ (post increment)
 inline int operator ++(Function_Line & fl, int)
 {
-   return (reinterpret_cast<int &>(fl))++;
+Function_Line ret = fl;
+   fl = Function_Line(fl + 1);
+   return ret;
 }
 //=============================================================================
 inline void skip_spaces(const char * & p)

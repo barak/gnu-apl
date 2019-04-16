@@ -72,6 +72,7 @@
   bool operator>=(x, y)
   bool operator==(x, y)
   bool operator!=(x, y)
+  bool is_normal(x)
 
   APL_Float_Base & operator+=(x)
   APL_Float_Base & operator-=(x)
@@ -110,8 +111,14 @@ public:
    APL_Float_Base & _set(double d)
       { dval = d;    return *this; }
 
-   /// cast to APL_Float
+   /// cast to APL_Float (creates a copy)
    inline operator APL_Float() const;
+
+   /// up-cast const APL_Float_Base * to const APL_Float *
+   inline const APL_Float * pAPL_Float() const;
+
+   /// up-cast APL_Float_Base * to APL_Float *
+   inline APL_Float * pAPL_Float();
 
    /// cast to double
    inline operator double()
@@ -144,13 +151,33 @@ public:
    APL_Float & operator =(const APL_Float & other)
       { dval = other.dval; return *this; }
 };
+/// isnormal() for APL_Float
+inline bool isnormal(const APL_Float & val)
+{
+  return std::isnormal(val._get());
+}
 //------------------------------------------------------------------------------
 /// cast from APL_Float_Base to APL_Float
 APL_Float_Base::operator APL_Float() const
 {
    return APL_Float(dval);
 }
-//=============================================================================
+//------------------------------------------------------------------------------
+/// up-cast from const APL_Float_Base * to const APL_Float *
+const APL_Float *
+APL_Float_Base::pAPL_Float() const
+{
+   return static_cast<const APL_Float *>(this);
+}
+//------------------------------------------------------------------------------
+/// up-cast from APL_Float_Base * to APL_Float *
+APL_Float *
+APL_Float_Base::pAPL_Float()
+{
+   return static_cast<APL_Float *>(this);
+}
+//------------------------------------------------------------------------------
+
 #define wrap1(type, fun)                                                \
 inline type fun(const APL_Float_Base & d)                               \
    { return type(fun(double(d._get()))); }
