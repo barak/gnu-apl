@@ -211,10 +211,10 @@ char cc[80];
                  space -= leave_char_mode();
 #ifdef RATIONAL_NUMBERS_WANTED
                  {
-                 const FloatCell * flt = cell.cFloatCell();
-                 if (const APL_Integer denom = flt->get_denominator())
+                 const FloatCell & flt = cell.cFloatCell();
+                 if (const APL_Integer denom = flt.get_denominator())
                     {
-                      const APL_Integer numer = flt->get_numerator();
+                      const APL_Integer numer = flt.get_numerator();
                       snprintf(cc, sizeof(cc), "%lld÷%lld", long_long(numer),
                                long_long(denom));
                       NEED(1 + strlen(cc)) << UNI_PAD_U8 << decr(--space, cc);
@@ -852,7 +852,7 @@ ShapeItem idx = 0;
                         // case.
                         //
                         CERR << "*** Sub-Value "
-                             << CVOIP(sub) << " has two parents." << endl
+                             << voidP(sub) << " has two parents." << endl
                              << "Child: vid=" << sub_idx << ", _val="
                              << values[sub_idx]._val << "_par="
                              << values[sub_idx]._par << endl

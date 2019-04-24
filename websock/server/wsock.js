@@ -45,7 +45,8 @@ wsServer.on('request', function(request)
          // someone else tries to use out web socket directly (which would
          // be dubious).
          //
-         console.log(now() + ' Connection from a dubious origin. Abort it.');
+         console.log(now() + ' Connection from a dubious origin ('
+                           + request.origin + '). Abort it.');
          connection.close();
          return;
        }

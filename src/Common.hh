@@ -22,6 +22,8 @@
 #define __COMMON_HH_DEFINED__
 
 #include "../config.h"   // for xxx_WANTED and other macros from ./configure
+#include <sys/un.h>
+#include <netinet/in.h>
 
 #ifdef ENABLE_NLS
 #include <libintl.h>
@@ -40,7 +42,7 @@ enum { MAX_RANK = MAX_RANK_WANTED };
 #include <sys/time.h>
 
 #ifndef RLIM_INFINITY   // Raspberry
-#define RLIM_INFINITY (~static_cast<rlim_t>(0))
+#define RLIM_INFINITY (~rlim_t(0))
 #endif
 
 // if someone (like curses on Solaris) has #defined erase() then
@@ -435,9 +437,18 @@ charP(const void * vp)
                            setw(4) << int(x) << std::left << nohex
 #define UNI(x)     "U+" << uhex <<      setw(4) << int(x) << nohex
 
-/// force a cast to a cont void *
-inline const void * CVOIP(const void * addr) { return addr; }
+/// cast to a const void *
+inline const void * voidP(const void * addr) { return addr; }
 
+//-----------------------------------------------------------------------------
+/// A union holding a sockaddr and a sockaddr_in as to avoid casting
+/// between sockaddr and a sockaddr_in
+union SockAddr
+{
+  sockaddr    addr;
+  sockaddr_in inet;
+  sockaddr_un uNix;
+};
 //-----------------------------------------------------------------------------
 
 #endif // __COMMON_HH_DEFINED__

@@ -105,7 +105,7 @@ Executable::~Executable()
 {
    Log(LOG_UserFunction__fix)
       {
-        CERR << "deleting Executable " << CVOIP(this)
+        CERR << "deleting Executable " << voidP(this)
              << " (body size=" << body.size() << ")" << endl;
       }
 
@@ -863,7 +863,7 @@ ExecuteList * fun = new ExecuteList(data, loc);
    Log(LOG_UserFunction__fix)
       {
         CERR << "fix pmode=execute list:" << endl << data
-             << " addr " << CVOIP(fun) << endl
+             << " addr " << voidP(fun) << endl
              << "------------------- ExecuteList::fix() --" << endl;
       }
 
@@ -917,7 +917,7 @@ StatementList * fun = new StatementList(data, loc);
    Log(LOG_UserFunction__fix)
       {
         CERR << "fix pmode=statement list:" << endl << data << endl
-             << " addr " << CVOIP(fun) << endl
+             << " addr " << voidP(fun) << endl
              << "------------------- StatementList::fix() --" << endl;
       }
 

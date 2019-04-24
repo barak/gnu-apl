@@ -1004,7 +1004,7 @@ Prefix::reduce_MISC_F_C_B()
    if (at1().get_ValueType() != TV_VAL)   // [i1;i2...] instead of [axis]
       {
         IndexExpr * idx = &at1().get_index_val();
-        Log(LOG_delete)   CERR << "delete " << CVOIP(idx) << " at " LOC << endl;
+        Log(LOG_delete)   CERR << "delete " << voidP(idx) << " at " LOC << endl;
         delete idx;
          at1().clear(LOC);
          SYNTAX_ERROR;
@@ -1411,13 +1411,13 @@ Value_P Z;
            {
              Z = A->index(*idx);
              Log(LOG_delete)
-                CERR << "delete " << CVOIP(idx) << " at " LOC << endl;
+                CERR << "delete " << voidP(idx) << " at " LOC << endl;
              delete idx;
            }
         catch (Error err)
            {
              Token result = Token(TOK_ERROR, err.error_code);
-             Log(LOG_delete)   CERR << "delete " << CVOIP(idx)
+             Log(LOG_delete)   CERR << "delete " << voidP(idx)
                                     << " at " LOC << endl;
              delete idx;
              pop_args_push_result(result);
@@ -1473,7 +1473,7 @@ Value_P B = at3().get_apl_val();
         try
            {
              V->assign_indexed(*idx, B);
-             Log(LOG_delete)   CERR << "delete " << CVOIP(idx)
+             Log(LOG_delete)   CERR << "delete " << voidP(idx)
                                     << " at " LOC << endl;
              delete idx;
            }
@@ -1482,7 +1482,7 @@ Value_P B = at3().get_apl_val();
              Token result = Token(TOK_ERROR, err.error_code);
              at1().clear(LOC);
              at3().clear(LOC);
-             Log(LOG_delete)   CERR << "delete " << CVOIP(idx)
+             Log(LOG_delete)   CERR << "delete " << voidP(idx)
                                     << " at " LOC << endl;
              delete idx;
              pop_args_push_result(result);
@@ -1574,7 +1574,7 @@ Prefix::reduce_RBRA___()
    //
 IndexExpr * idx = new IndexExpr(get_assign_state(), LOC);
    Log(LOG_delete)
-      CERR << "new    " << CVOIP(idx) << " at " LOC << endl;
+      CERR << "new    " << voidP(idx) << " at " LOC << endl;
 
    new (&at0()) Token(TOK_PINDEX, *idx);
    set_assign_state(ASS_none);
@@ -1597,7 +1597,7 @@ const bool last_index = (at0().get_tag() == TOK_L_BRACK);
         Token result = Token(TOK_INDEX, idx);
         pop_args_push_result(result);
         action = RA_CONTINUE;
-        Log(LOG_delete)   CERR << "delete " << CVOIP(&idx)
+        Log(LOG_delete)   CERR << "delete " << voidP(&idx)
                                << " at " LOC << endl;
         delete &idx;
         return;
@@ -1647,7 +1647,7 @@ const bool last_index = (at0().get_tag() == TOK_L_BRACK);   // ; vs. [
              Assert1(!!X);
              I.move_2(Token(TOK_AXES, X), LOC);
              Log(LOG_delete)
-                CERR << "delete " << CVOIP(&idx) << " at " LOC << endl;
+                CERR << "delete " << voidP(&idx) << " at " LOC << endl;
              delete &idx;
            }
         else

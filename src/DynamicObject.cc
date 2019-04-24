@@ -40,9 +40,9 @@ int pos = 0;
    for (const DynamicObject * p = this; ;)
        {
          out << "    Chain[" << setw(2) << pos++ << "]  " 
-             << CVOIP(p->prev) << " --> "
-             << CVOIP(p)       << " --> "
-             << CVOIP(p->next) << "    "
+             << voidP(p->prev) << " --> "
+             << voidP(p)       << " --> "
+             << voidP(p->next) << "    "
              << p->where_allocated() << endl;
 
           p = p->next;
@@ -53,16 +53,16 @@ int pos = 0;
 void
 DynamicObject::print_new(ostream & out, const char * loc) const
 {
-   out << "new    " << CVOIP(this) << " at " << loc << endl;
+   out << "new    " << voidP(this) << " at " << loc << endl;
 }
 //-----------------------------------------------------------------------------
 void
 DynamicObject::print(ostream & out) const
 {
-   out << "DynamicObject: " << CVOIP(this)
-       << " (Value: " << CVOIP(this) << ") :"       << endl
-       << "    prev:      " << CVOIP(prev)          << endl
-       << "    next:      " << CVOIP(next)          << endl
+   out << "DynamicObject: " << voidP(this)
+       << " (Value: " << voidP(this) << ") :"       << endl
+       << "    prev:      " << voidP(prev)          << endl
+       << "    next:      " << voidP(next)          << endl
        << "    allocated: " << where_allocated()    << endl;
 }
 //-----------------------------------------------------------------------------

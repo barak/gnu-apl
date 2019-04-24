@@ -179,13 +179,12 @@ char peer[100];
 
         // bind local port to 127.0.0.1
         //
-        sockaddr_in local;
-        memset(&local, 0, sizeof(sockaddr_in));
-        local.sin_family = AF_INET;
-        local.sin_addr.s_addr = htonl(0x7F000001);
+        SockAddr local;
+        memset(&local, 0, sizeof(SockAddr));
+        local.inet.sin_family = AF_INET;
+        local.inet.sin_addr.s_addr = htonl(0x7F000001);
 
-        if (::bind(sock, reinterpret_cast<const sockaddr *>(&local),
-                         sizeof(sockaddr_in)))
+        if (::bind(sock, &local.addr, sizeof(sockaddr_in)))
            {
              get_CERR() << "bind(127.0.0.1) failed:" << strerror(errno) << endl;
              ::close(sock);
@@ -209,25 +208,25 @@ char peer[100];
 #if HAVE_SYS_UN_H
         if (server_sockname)
            {
-             sockaddr_un remote;
-             memset(&remote, 0, sizeof(sockaddr_un));
-             remote.sun_family = AF_UNIX;
-             strcpy(remote.sun_path + ABSTRACT_OFFSET, server_sockname);
+             SockAddr remote;
+             memset(&remote, 0, sizeof(SockAddr));
+             remote.uNix.sun_family = AF_UNIX;
+             strcpy(remote.uNix.sun_path + ABSTRACT_OFFSET, server_sockname);
 
-             if (::connect(sock, reinterpret_cast<sockaddr *>(&remote),
-                           sizeof(remote)) == 0)   break;   // success
+             if (::connect(sock, &remote.addr, sizeof(sockaddr_un)) == 0)
+                break;   // success
            }
         else   // TCP
 #endif
            {
-             sockaddr_in remote;
+             SockAddr remote;
              memset(&remote, 0, sizeof(sockaddr_in));
-             remote.sin_family = AF_INET;
-             remote.sin_port = htons(APserver_port);
-             remote.sin_addr.s_addr = htonl(0x7F000001);
+             remote.inet.sin_family = AF_INET;
+             remote.inet.sin_port = htons(APserver_port);
+             remote.inet.sin_addr.s_addr = htonl(0x7F000001);
 
-             if (::connect(sock, reinterpret_cast<sockaddr *>(&remote),
-                           sizeof(remote)) == 0)   break;   // success
+             if (::connect(sock, &remote.addr, sizeof(sockaddr_in)) == 0)
+                break;   // success
            }
 
          // ::connect() to APserver failed. If
@@ -310,7 +309,7 @@ const int sock = Svar_DB::get_DB_tcp();
 
 char * del = 0;
 char buffer[2*MAX_SIGNAL_CLASS_SIZE + sizeof(Svar_record)];
-ostream * log = (LOG_startup || LOG_Svar_DB_signals) ? & cerr : 0;
+ostream * log = (LOG_startup != 0 || LOG_Svar_DB_signals != 0) ? & cerr : 0;
 Signal_base * response = Signal_base::recv_TCP(sock, buffer, sizeof(buffer),
                                                del, log);
    if (response)

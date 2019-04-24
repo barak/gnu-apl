@@ -84,7 +84,7 @@ Cell::init_type(const Cell & other, Value & cell_owner, const char * loc)
    else if (other.is_lval_cell())
       {
         new (this) LvalCell(other.get_lval_value(),
-                 reinterpret_cast<const LvalCell *>(&other)->get_cell_owner());
+                            other.cLvalCell().get_cell_owner());
       }
    else if (other.is_character_cell())
       {

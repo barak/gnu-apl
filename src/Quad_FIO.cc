@@ -1415,10 +1415,9 @@ const APL_Integer function_number = X->get_ravel(0).get_near_int();
               {
                 const int fd = get_fd(*B.get());
                 errno = 0;
-                sockaddr_in addr;
-                socklen_t alen = sizeof(addr);
-                const int sock = accept(fd, reinterpret_cast<sockaddr *>
-                                                               (&addr), &alen);
+                SockAddr addr;
+                socklen_t alen = sizeof(addr.inet);
+                const int sock = accept(fd, &addr.addr, &alen);
                 if (sock == -1)   goto out_errno;
 
                 file_entry nfe (0, sock);
@@ -1426,9 +1425,9 @@ const APL_Integer function_number = X->get_ravel(0).get_near_int();
 
                 Value_P Z(4, LOC);
                 new (Z->next_ravel())   IntCell(nfe.fe_fd);
-                new (Z->next_ravel())   IntCell(addr.sin_family);
-                new (Z->next_ravel())   IntCell(ntohl(addr.sin_addr.s_addr));
-                new (Z->next_ravel())   IntCell(ntohs(addr.sin_port));
+                new (Z->next_ravel())   IntCell(addr.inet.sin_family);
+                new (Z->next_ravel())   IntCell(ntohl(addr.inet.sin_addr.s_addr));
+                new (Z->next_ravel())   IntCell(ntohs(addr.inet.sin_port));
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
               }
@@ -1555,16 +1554,15 @@ const APL_Integer function_number = X->get_ravel(0).get_near_int();
               {
                 const int fd = get_fd(*B.get());
                 errno = 0;
-                sockaddr_in addr;
-                socklen_t alen = sizeof(addr);
-                const int ret = getsockname(fd, reinterpret_cast<sockaddr *>
-                                                               (&addr), &alen);
+                SockAddr addr;
+                socklen_t alen = sizeof(addr.inet);
+                const int ret = getsockname(fd, &addr.addr, &alen);
                 if (ret == -1)   goto out_errno;
 
                 Value_P Z(3, LOC);
-                new (Z->next_ravel())   IntCell(addr.sin_family);
-                new (Z->next_ravel())   IntCell(ntohl(addr.sin_addr.s_addr));
-                new (Z->next_ravel())   IntCell(ntohs(addr.sin_port));
+                new (Z->next_ravel())   IntCell(addr.inet.sin_family);
+                new (Z->next_ravel())   IntCell(ntohl(addr.inet.sin_addr.s_addr));
+                new (Z->next_ravel())   IntCell(ntohs(addr.inet.sin_port));
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
               }
@@ -1573,16 +1571,15 @@ const APL_Integer function_number = X->get_ravel(0).get_near_int();
               {
                 const int fd = get_fd(*B.get());
                 errno = 0;
-                sockaddr_in addr;
-                socklen_t alen = sizeof(addr);
-                const int ret = getpeername(fd, reinterpret_cast<sockaddr *>
-                                                                (&addr), &alen);
+                SockAddr addr;
+                socklen_t alen = sizeof(addr.inet);
+                const int ret = getpeername(fd, &addr.addr, &alen);
                 if (ret == -1)   goto out_errno;
 
                 Value_P Z(3, LOC);
-                new (Z->next_ravel())   IntCell(addr.sin_family);
-                new (Z->next_ravel())   IntCell(ntohl(addr.sin_addr.s_addr));
-                new (Z->next_ravel())   IntCell(ntohs(addr.sin_port));
+                new (Z->next_ravel())   IntCell(addr.inet.sin_family);
+                new (Z->next_ravel())   IntCell(ntohl(addr.inet.sin_addr.s_addr));
+                new (Z->next_ravel())   IntCell(ntohs(addr.inet.sin_port));
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
               }
@@ -2152,14 +2149,13 @@ const int function_number = X->get_ravel(0).get_near_int();
          case 33:   // bind(Bh, Aa)
               {
                 const int fd = get_fd(*B.get());
-                sockaddr_in addr;
-                memset(&addr, 0, sizeof(addr));
-                addr.sin_family      =       A->get_ravel(0).get_int_value();
-                addr.sin_addr.s_addr = htonl(A->get_ravel(1).get_int_value());
-                addr.sin_port        = htons(A->get_ravel(2).get_int_value());
+                SockAddr addr;
+                memset(&addr, 0, sizeof(addr.inet));
+                addr.inet.sin_family      =       A->get_ravel(0).get_int_value();
+                addr.inet.sin_addr.s_addr = htonl(A->get_ravel(1).get_int_value());
+                addr.inet.sin_port        = htons(A->get_ravel(2).get_int_value());
                 errno = 0;
-                bind(fd, reinterpret_cast<const sockaddr *>(&addr),
-                     sizeof(addr));
+                bind(fd, &addr.addr, sizeof(addr.inet));
                 goto out_errno;
               }
 
@@ -2179,14 +2175,13 @@ const int function_number = X->get_ravel(0).get_near_int();
               {
                 const int fd = get_fd(*B.get());
                 errno = 0;
-                sockaddr_in addr;
-                memset(&addr, 0, sizeof(addr));
-                addr.sin_family      =       A->get_ravel(0).get_int_value();
-                addr.sin_addr.s_addr = htonl(A->get_ravel(1).get_int_value());
-                addr.sin_port        = htons(A->get_ravel(2).get_int_value());
+                SockAddr addr;
+                memset(&addr, 0, sizeof(addr.inet));
+                addr.inet.sin_family      =       A->get_ravel(0).get_int_value();
+                addr.inet.sin_addr.s_addr = htonl(A->get_ravel(1).get_int_value());
+                addr.inet.sin_port        = htons(A->get_ravel(2).get_int_value());
                 errno = 0;
-                connect(fd, reinterpret_cast<const sockaddr *>(&addr),
-                        sizeof(addr));
+                connect(fd, &addr.addr, sizeof(addr));
                 goto out_errno;
               }
 

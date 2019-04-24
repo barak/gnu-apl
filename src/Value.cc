@@ -521,7 +521,7 @@ const char * sc = set ? " SET " : " CLEAR ";
 const int new_flags = set ? flags | flag : flags & ~flag;
 const char * chg = flags == new_flags ? " (no change)" : " (changed)";
 
-   CERR << "Value " << CVOIP(this)
+   CERR << "Value " << voidP(this)
         << sc << flag_name << " (" << HEX(flag) << ")"
         << " at " << loc << " now = " << HEX(new_flags)
         << chg << endl;
@@ -603,7 +603,7 @@ int count = 0;
             {
               CERR << "A loop in DynamicObject::all_values (detected in "
                       "function erase_stale() at object "
-                   << CVOIP(dob) << "): " << endl;
+                   << voidP(dob) << "): " << endl;
               all_values.print_chain(CERR);
               CERR << endl;
 
@@ -620,7 +620,7 @@ int count = 0;
          Log(LOG_Value__erase_stale)
             {
               CERR << "Erasing stale Value "
-                   << CVOIP(dob) << ":" << endl
+                   << voidP(dob) << ":" << endl
                    << "  Allocated by " << v->where_allocated() << endl
                    << "  ";
               v->list_one(CERR, false);
@@ -670,7 +670,7 @@ int count = 0;
             {
               CERR << "A loop in DynamicObject::all_values (detected in "
                       "function Value::finish_incomplete() at object "
-                   << CVOIP(dob) << "): " << endl;
+                   << voidP(dob) << "): " << endl;
               all_values.print_chain(CERR);
               CERR << endl;
 
@@ -692,7 +692,7 @@ int count = 0;
          Log(LOG_Value__erase_stale)
             {
               CERR << "Fixed incomplete Value "
-                   << CVOIP(dob) << ":" << endl
+                   << voidP(dob) << ":" << endl
                    << "  Allocated by " << v->where_allocated() << endl
                    << "  ";
               v->list_one(CERR, false);
@@ -727,7 +727,7 @@ Value::list_one(ostream & out, bool show_owners) const
 
    // print owners...
    //
-   out << "Owners of " << CVOIP(this) << ":" << endl;
+   out << "Owners of " << voidP(this) << ":" << endl;
 
    Workspace::show_owners(out, *this);
 
@@ -1640,7 +1640,7 @@ UCS_string ind(indent, UNI_ASCII_SPACE);
       }
    else
       {
-        out << ind << "Addr:    " << CVOIP(this) << endl
+        out << ind << "Addr:    " << voidP(this) << endl
             << ind << "Rank:    " << get_rank()  << endl
             << ind << "Shape:   " << get_shape() << endl
             << ind << "Flags:   " << get_flags();
@@ -1706,7 +1706,7 @@ Value::print_structure(ostream & out, int indent, ShapeItem idx) const
 {
    loop(i, indent)   out << "    ";
    if (indent)   out << "[" << idx << "] ";
-   out << "addr=" << CVOIP(this)
+   out << "addr=" << voidP(this)
        << " ≡" << compute_depth()
        << " ⍴" << get_shape()
        << " flags: " << HEX4(get_flags()) << "   "
@@ -1839,7 +1839,7 @@ bool goon = true;
 
          if (val->is_complete())   continue;
 
-         out << "incomplete value at " << CVOIP(val) << endl;
+         out << "incomplete value at " << voidP(val) << endl;
          incomplete.append(val);
 
          if (!goon)
@@ -1877,7 +1877,7 @@ int count = 0;
 
          if (val->owner_count)   continue;
 
-         out << "stale value at " << CVOIP(val) << endl;
+         out << "stale value at " << voidP(val) << endl;
          stale_vals.append(val);
          stale_dobs.append(dob);
 

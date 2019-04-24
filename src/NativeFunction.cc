@@ -385,13 +385,13 @@ NativeFunction::fix(const UCS_string & so_name,
 
 NativeFunction * new_function = new NativeFunction(so_name, function_name);
    Log(LOG_delete)
-      CERR << "new    " << CVOIP(new_function) << " at " LOC << endl;
+      CERR << "new    " << voidP(new_function) << " at " LOC << endl;
 
 
    if (!new_function->valid)   // something went wrong
       {
         Log(LOG_delete)
-          CERR << "delete " << CVOIP(new_function) << " at " LOC << endl;
+          CERR << "delete " << voidP(new_function) << " at " LOC << endl;
         delete new_function;
         return 0;
       }

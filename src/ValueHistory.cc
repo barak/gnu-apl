@@ -104,7 +104,7 @@ int cidx = VH_entry::idx;
       }
     else
       {
-        out << endl << "value " << CVOIP(val)
+        out << endl << "value " << voidP(val)
             << " has " << var_events.size()
             << " events in its history";
         if (loc)   out << " (at " << loc << ")";

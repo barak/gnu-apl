@@ -9,7 +9,7 @@
   .footer { text-align: center;     font-style: italic     }
 
   TABLE      { border-collapse: collapse; }
-  TD         { padding: 0; font-family: monospace; width: 80em; #}
+  TD         { padding: 0; font-family: monospace; width: 80em; }
   #APL_entry { font-family: monospace }
 
   /* output channel coloring (in/out/error) */
@@ -25,7 +25,7 @@
       host = 'server57';
       host = window.location.hostname;
       var address = "ws://" + host + ":42424";
-      var protocol = "apl-protocol"
+      var protocol = "apl-protocol";
       web_socket = new WebSocket(address, protocol);
       web_socket.onmessage = function(e)
          {
@@ -60,6 +60,9 @@
                  case '>': ret += "&gt;";     break;
                  case '"': ret += "&quot;";   break;
                  case "'": ret += "&apos;";   break;
+                 case '⓪':                    break;
+                 case '①':                    break;
+                 case '②':                    break;
                  default:  ret += cc;
                }
           }
@@ -117,7 +120,7 @@
       var user_input = input_form.value;
       input_form.value = "";
       prompt = false;
-      output_line('      ' + user_input, "i");
+      output_line('      ' + user_input, "i");   // input echo
       web_socket.send(user_input + "\n");
       return false;
     }
@@ -136,12 +139,16 @@
    <STRONG>APL Input:</STRONG>
   <input type="text" id="APL_entry" name="in_form" size=60>
   <input type="submit" value="Enter">
-  <input type="button" value="Show an APL Keyboard"
-         onclick='window.open("APL_keyboard.html", "APL Keyboard",
-                              "width=930,height=500"); return false;');>
-  <input type="button" value="Show another APL Keyboard (experimental)"
-         onclick='window.open("APL_keyboard2.html", "APL Keyboard2",
-                      "width=850,height=500"); return false;');>
+  <input type="button" value="Show an APL Keyboard" onclick='
+                  window.open("APL_keyboard.html",
+                              "APL Keyboard",
+                              "width=930,height=500");
+                  return false;');>
+  <input type="button" value="Show another APL Keyboard (experimental)" onclick='
+                  window.open("APL_keyboard2.html",
+                              "APL Keyboard2",
+                              "width=850,height=500");
+                  return false;');>
   </form>
   <HR>
   <div class=footer>

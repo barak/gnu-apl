@@ -48,8 +48,8 @@ IndexIterator::increment()
 ostream &
 IndexIterator::print(ostream & out) const
 {
-   out << "Iterator "     << CVOIP(this) << ":"  << endl
-       << "   upper:       " << CVOIP(upper)     << endl
+   out << "Iterator "     << voidP(this) << ":"  << endl
+       << "   upper:       " << voidP(upper)     << endl
        << "   value:       " << get_value()      << endl
        << "   indices[" << get_index_count()     << "] :";
 
@@ -128,7 +128,7 @@ ShapeItem weight = 1;
             }
 
          Log(LOG_delete)
-            CERR << "new    " << CVOIP(new_it) << " at " LOC << endl;
+            CERR << "new    " << voidP(new_it) << " at " LOC << endl;
 
          if (last_it)   last_it->set_upper(new_it);
          else           lowest_it = new_it;
@@ -145,7 +145,7 @@ MultiIndexIterator::~MultiIndexIterator()
          IndexIterator * del = it;
          it = it->get_upper();
          Log(LOG_delete)
-            CERR << "delete " HEX(reinterpret_cast<uint64_t>(del))
+            CERR << "delete " HEX(uint64_t(del))
                  << " at " LOC << endl;
          delete del;
        }

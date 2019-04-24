@@ -68,7 +68,7 @@ ostream &
 Symbol::print_verbose(ostream & out) const
 {
    out << "Symbol ";
-   print(out) << " " << CVOIP(this) << endl;
+   print(out) << " " << voidP(this) << endl;
 
    loop(v, value_stack.size())
        {
@@ -91,7 +91,7 @@ Symbol::print_verbose(ostream & out) const
               case NC_VARIABLE:
                    {
                       Value_P val = item.apl_val;
-                      out << "Variable at " << CVOIP(val.get()) << endl;
+                      out << "Variable at " << voidP(val.get()) << endl;
                       val->print_properties(out, 8, false);
                       out << endl;
                    }
@@ -105,7 +105,7 @@ Symbol::print_verbose(ostream & out) const
 
                      fun->print_properties(out, 4);
                      out << "    ⎕NC:            " << item.name_class << endl
-                         << "    addr:           " << CVOIP(fun) << endl;
+                         << "    addr:           " << voidP(fun) << endl;
 
                      out << endl;
                    }
@@ -377,7 +377,7 @@ const ValueStackItem & vs = value_stack.last();
              CERR << "-pop-value " << name
                   << " flags " << ret->get_flags() << " ";
              if (value_stack.size() == 0)   CERR << " (last)";
-             CERR << " addr " << CVOIP(ret.get()) << endl;
+             CERR << " addr " << voidP(ret.get()) << endl;
            }
 
         // unlike vector<ValueStackItem>, Simple_string<ValueStackItem>.pop()
@@ -435,7 +435,7 @@ Symbol::push_function(Function * function)
 {
    Log(LOG_SYMBOL_push_pop)
       {
-        CERR << "+push_function " << name << " " << CVOIP(function);
+        CERR << "+push_function " << name << " " << voidP(function);
         if (value_stack.size() == 0)   CERR << " (initial)";
         CERR << endl;
       }
@@ -461,7 +461,7 @@ ValueStackItem vs;
         CERR << "+push-value " << name << " flags ";
         print_flags(CERR, get_value()->get_flags()) << " ";
         if (value_stack.size() == 0)   CERR << " (initial)";
-        CERR << " addr " << CVOIP(get_value().get()) << endl;
+        CERR << " addr " << voidP(get_value().get()) << endl;
       }
 }
 //-----------------------------------------------------------------------------

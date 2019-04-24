@@ -1704,7 +1704,7 @@ Bif_F12_ELEMENT::eval_B(Value_P B)
 
               if (C->is_lval_cell())
                  {
-                   left = reinterpret_cast<const LvalCell *>(C)->get_cell_owner();
+                   left = C->cLvalCell().get_cell_owner();
                    C = C->get_lval_value();
                    continue;
                  }

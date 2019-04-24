@@ -1087,7 +1087,7 @@ Function * old_function = symbol->get_function();
 
    Log(LOG_UserFunction__fix)
       {
-        CERR << " addr " << CVOIP(ufun) << endl;
+        CERR << " addr " << voidP(ufun) << endl;
         ufun->print(CERR);
       }
 

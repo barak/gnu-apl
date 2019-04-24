@@ -203,7 +203,7 @@ void *
 common_new(size_t size)
 {
 void * ret = malloc(size);
-const uint64_t iret = reinterpret_cast<uint64_t>(ret);
+const uint64_t iret = uint64_t(ret);
    CERR << "NEW " << HEX(iret) << "-" << HEX(iret + size)
         << "  (" << HEX(size) << ")" << endl;
    return ret;
@@ -212,7 +212,7 @@ const uint64_t iret = reinterpret_cast<uint64_t>(ret);
 void
 common_delete(void * p)
 {
-   CERR << "DEL " << HEX(reinterpret_cast<uint64_t>(p)) << endl;
+   CERR << "DEL " << HEX(uint64_t(p)) << endl;
    free(p);
 }
 //-----------------------------------------------------------------------------

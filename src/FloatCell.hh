@@ -72,7 +72,7 @@ public:
    APL_Float dfval() const
       {
         if (const APL_Integer denom = get_denominator())
-           return (1.0 * get_numerator() / denom;
+           return (1.0 * get_numerator() / denom);
         return value.fval.u1.flt;
       }
 

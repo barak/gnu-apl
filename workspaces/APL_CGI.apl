@@ -87,6 +87,7 @@ xMAIL_APL←'bug-apl@gnu.org'
 xMAIL_APL_ARCHIVE←'http://lists.gnu.org/archive/html/bug-apl/'
 xMAIL_APL_SUBSCRIBE←'https://lists.gnu.org/mailman/listinfo/bug-apl'
 xTRY_GNU_APL←'http://juergen-sauermann.de/try-GNU-APL'
+xDocker_GNU_APL←'https://hub.docker.com/r/juergensauermann/gnu-apl'
 xSVN_APL←'https://savannah.gnu.org/svn/?group=apl'
 
 ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝
@@ -235,12 +236,19 @@ have been corrected already.
 As of recently, there is an (experimental) online version of GNU APL. It is
 intended to give you an idea of how GNU APL will look like if you install it
 on your computer. See
-<?apl HTML∆x2y xTRY_GNU_APL HTML∆A, xTRY_GNU_APL ?>
+<?apl HTML∆x2y xTRY_GNU_APL HTML∆A, "<B>", xTRY_GNU_APL, "</B>" ?>.
+
+<?apl HTML∆H4[''] 'GNU APL on Docker' ?>
+
+For those who live in the cloud there is a small Docker container with Alpine
+GNU/Linux, GNU APL, and the optional libraries (SQLite, Postgres, FFT). See
+<?apl HTML∆x2y xDocker_GNU_APL HTML∆A, "<B>", xDocker_GNU_APL, "</B>" ?>.
+
 </DIV>
 <DIV class="c4">
 <?apl HTML∆H2[''] 'Reporting Bugs' ?>
 
-GNU APL is made up of more than 90,000 lines of C++ code. In a code of that
+GNU APL is made up of more than 100,000 lines of C++ code. In a code of that
 size, programming mistakes are inevitable. Even though mistakes are hardly
 avoidable, they can be <B>corrected</B> once they are found. In order to
 improve the quality of GNU APL, we would like to encourage you to report

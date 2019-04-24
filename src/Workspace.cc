@@ -127,7 +127,7 @@ Workspace::push_SI(Executable * fun, const char * loc)
              << " exec=" << fun << " "
              << fun->get_name();
 
-        CERR << " new SI is " << CVOIP(SI_top())
+        CERR << " new SI is " << voidP(SI_top())
              << " at " << loc << endl;
       }
 }
@@ -147,7 +147,7 @@ const Executable * exec = SI_top()->get_executable();
 
         if (exec->get_ufun())   CERR << exec->get_ufun()->get_name();
         else                    CERR << SI_top()->get_parse_mode_name();
-        CERR << " " << CVOIP(SI_top())
+        CERR << " " << voidP(SI_top())
              << " at " << loc << endl;
       }
 

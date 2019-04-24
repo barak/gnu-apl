@@ -676,9 +676,9 @@ ShapeItem duplicate_parents = 0;
               else
                  {
                    ++duplicate_parents;
-                   out << "Value * vvp=" << CVOIP(vvp) << " already has parent "
-                       << CVOIP(vvp->parent) << " when checking Value * val="
-                       << CVOIP(vvp) << endl;
+                   out << "Value * vvp=" << voidP(vvp) << " already has parent "
+                       << voidP(vvp->parent) << " when checking Value * val="
+                       << voidP(vvp) << endl;
 
                    out << "History of the child:" << endl;
                    print_history(out, vvp->child, LOC);
