@@ -2950,7 +2950,7 @@ const ShapeItem len_B = B->element_count();
 
         Value_P Z(len_Z, LOC);
         loop(z, len_Z)   Z->next_ravel()->init(*cells_Z[z], Z.getref(), LOC);
-        delete cells_B;
+        delete[] cells_B;
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
@@ -3029,7 +3029,7 @@ const double qct = Workspace::get_CT();
 
         Z->set_default(*B, LOC);
         Z->check_value(LOC);
-        delete cells_A;
+        delete[] cells_A;
         return Token(TOK_APL_VALUE1, Z);
       }
     else
@@ -3054,7 +3054,7 @@ const double qct = Workspace::get_CT();
 
         Z->set_default(*B, LOC);
         Z->check_value(LOC);
-        delete cells_Z;
+        delete[] cells_Z;
         return Token(TOK_APL_VALUE1, Z);
       }
 }

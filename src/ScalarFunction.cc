@@ -1155,7 +1155,7 @@ Value_P Z(len_Z, LOC);
 
    loop(z, len_Z)   Z->next_ravel()->init(*cells_Z[z], Z.getref(), LOC);
 
-   delete cells_A;   // incl. cells_Z and cells_B
+   delete[] cells_A;   // incl. cells_Z and cells_B
 
    Z->check_value(LOC);
    return Z;

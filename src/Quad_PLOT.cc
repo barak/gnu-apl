@@ -795,7 +795,7 @@ int expo = 0;
       }
    else                           // use float arithmetic for 10^expo
       {
-        const double expo_val = exp10(expo);
+        const double expo_val = pow(10, expo);
         if (val <= 2.0)   return  expo < 0 ? 2.0/expo_val : 2.0*expo_val;
         if (val <= 5.0)   return  expo < 0 ? 5.0/expo_val : 5.0*expo_val;
         return  expo < 0 ? 10.0/expo_val : 10.0*expo_val;
@@ -1556,7 +1556,7 @@ pthread_t thread;
    sem_wait(&Quad_PLOT::plot_threads_sema);
       plot_threads.append(thread);
    sem_post(&Quad_PLOT::plot_threads_sema);
-   return IntScalar(thread, LOC);
+   return IntScalar(static_cast<APL_Integer>(thread), LOC);
 }
 //-----------------------------------------------------------------------------
 void
