@@ -232,7 +232,12 @@ bool log_startup = false;
                    exit(a);
                  }
 
-              if (chdir("/"))   ;
+              if (chdir("/"))
+                 {
+                   CERR << "chdir(\"/\") failed: "
+                        << strerror(errno) << endl;
+                   exit(a);
+                 }
 
               continue;
             }
