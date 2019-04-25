@@ -592,7 +592,7 @@ Workspace::list_SI(ostream & out, SI_mode mode)
    for (const StateIndicator * si = SI_top(); si; si = si->get_parent())
        si->list(out, mode);
 
-   if (mode && SIM_debug)   out << endl;
+   if (mode & SIM_debug)   out << endl;
 }
 //-----------------------------------------------------------------------------
 void
