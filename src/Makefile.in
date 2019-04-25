@@ -701,8 +701,8 @@ distcleancheck_listfile = buildtag
 
 # common means common to the apl and libapl builds
 #
-common_CXXFLAGS = -Wall -I sql -Wold-style-cast $(CXX_WERROR) \
-	$(am__append_4) $(am__append_8)
+common_CXXFLAGS = -Wall -I sql $(CXX_WERROR) $(am__append_4) \
+	$(am__append_8)
 common_LDFLAGS = $(am__append_5) $(am__append_9)
 common_SOURCES = buildtag buildtag.hh ../config.h \
 	APL_Float_as_class.hh APL_types.hh Archive.cc Archive.hh \
