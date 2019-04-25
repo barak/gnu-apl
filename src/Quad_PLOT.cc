@@ -1556,7 +1556,12 @@ pthread_t thread;
    sem_wait(&Quad_PLOT::plot_threads_sema);
       plot_threads.append(thread);
    sem_post(&Quad_PLOT::plot_threads_sema);
-   return IntScalar(static_cast<APL_Integer>(thread), LOC);
+APL_Integer ret = 0;
+   if (sizeof(ret) < sizeof(ret))   // never
+      memcpy(&ret, &thread, sizeof(ret));
+   else
+      memcpy(&ret, &thread, sizeof(thread));
+   return IntScalar(ret, LOC);
 }
 //-----------------------------------------------------------------------------
 void
