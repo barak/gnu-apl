@@ -179,7 +179,7 @@ public:
    bool do_join;
 
    /// a semaphore to block this context
-   sem_t pool_sema;
+   sem_t * pool_sema;
 
    /// true if blocked on pool_sema
    bool blocked;

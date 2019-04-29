@@ -55,17 +55,17 @@ AC_MSG_RESULT([$CAN_rdynamic])
 AC_CHECK_HEADER(
 	[ncurses.h],
 	[AC_DEFINE_UNQUOTED(	[HAVE_NCURSES_H], [1],
-				[Define to 1 if <ncurses.h> is present])],
+				[Define to 1 iff <ncurses.h> is present])],
 	[AC_CHECK_HEADER(
 	[curses.h],
 	[AC_DEFINE_UNQUOTED(	[HAVE_CURSES_H], [1],
-				[Define to 1 if <curses.h> is present])])
+				[Define to 1 iff <curses.h> is present])])
 	])
 
 AC_CHECK_HEADER(
 	[term.h],
 	[AC_DEFINE_UNQUOTED(	[HAVE_TERM_H], [1],
-				[Define to 1 if <term.h> is present])],
+				[Define to 1 iff <term.h> is present])],
 	[],
 	[	[ # if HAVE_NCURSES_H   ]
 		[ # include <ncurses.h> ]
@@ -119,13 +119,13 @@ AC_CHECK_LIB([nsl],       [yp_all])   # for Solaris
 AC_CHECK_LIB(
 	[ncurses], [setupterm],
 	[	AC_DEFINE_UNQUOTED([HAVE_LIBCURSES], [1],
-				   [Define to 1 if lib(n)curses is available])
+				   [Define to 1 iff lib(n)curses is available])
 	 	LIBS="-lncurses $LIBS"],
 	[
     AC_CHECK_LIB(
 	[curses], [setupterm],
 	[	AC_DEFINE_UNQUOTED([HAVE_LIBCURSES], [1],
-				   [Define to 1 if lib(n)curses is available])
+				   [Define to 1 iff lib(n)curses is available])
 		LIBS="-lcurses $LIBS"])
 	])
 
@@ -196,6 +196,7 @@ else
 AC_DEFINE_UNQUOTED(HAVE_GTK3, [0], [GTK+ version 3 NOT installed])
 fi
 
+################################# rdtsc check #################################
 # check if rdtsc (read CPU cycle counter is available.
 # This is expected only on Intel CPUs
 AC_MSG_CHECKING([whether CPU has rdtsc (read CPU cycle counter) opcode])
@@ -205,11 +206,35 @@ AC_COMPILE_IFELSE(
           __asm__ __volatile__ ("rdtsc" : "=a" (lo), "=d" (hi));]]
     )], [HAVE_rdtsc=yes], [HAVE_rdtsc=no])
 if test "x$HAVE_rdtsc" = "xyes"; then
-   AC_DEFINE_UNQUOTED([HAVE_RDTSC], [1], [CPU has rdtsc opcode])
+   AC_DEFINE_UNQUOTED([HAVE_RDTSC], [1],
+                      [Define to 1 iff the CPU has rdtsc opcode])
 fi
 AM_CONDITIONAL(HAVE_RDTSC, test "x$HAVE_rdtsc" = xyes)
 AC_MSG_RESULT([$HAVE_rdtsc])
 
+############################### sem_init() check ##############################
+# check if sem_init() works (it does not on OS-X)
+#
+apl_save_CXXFLAGS=$CXXFLAGS
+CXXFLAGS="-Wall -Werror"
+
+# This is expected only on Intel CPUs
+AC_MSG_CHECKING([whether sem_init() works])
+AC_COMPILE_IFELSE(
+        [AC_LANG_PROGRAM([[#include <semaphore.h>]],
+        [[sem_t sema;
+          sem_init(&sema, 0, 0);
+        ]]
+    )], [HAVE_SEM_INIT=yes], [HAVE_SEM_INIT=no])
+if test "x$HAVE_SEM_INIT" = "xyes"; then
+   AC_DEFINE_UNQUOTED([HAVE_SEM_INIT], [1], [Define to 1 iff sem_init() works])
+fi
+AM_CONDITIONAL(HAVE_SEM_INIT, test "x$HAVE_SEM_INIT" = xyes)
+CXXFLAGS=$apl_save_CXXFLAGS
+AC_MSG_RESULT([$HAVE_SEM_INIT])
+
+
+######################## pthread_getaffinity_np() check #######################
 # see if pthread_getaffinity_np() and pthread_setaffinity_np are available
 #
 AC_MSG_CHECKING([whether pthread_setaffinity_np is available])
@@ -217,7 +242,7 @@ AC_COMPILE_IFELSE(
     [AC_LANG_PROGRAM([ [#include <pthread.h>]
                        [#include <ext/atomicity.h>]
                      ],
- 	             [ [cpu_set_t cpuset;]
+                     [ [cpu_set_t cpuset;]
                        [pthread_setaffinity_np(0, sizeof(cpuset), &cpuset);]
                        [pthread_getaffinity_np(0, sizeof(cpuset), &cpuset);]
                        [_Atomic_word count = 0;]
@@ -226,12 +251,13 @@ AC_COMPILE_IFELSE(
                      ])],
     [HAVE_AFFINITY_NP=yes
      AC_DEFINE_UNQUOTED([HAVE_AFFINITY_NP], [1],
-                        [Define to 1 if pthread_setaffinity_np() is available])
+                        [Define to 1 iff pthread_setaffinity_np() is available])
     ],
     [HAVE_AFFINITY_NP=no])
 AM_CONDITIONAL(HAVE_AFFINITY_NP, test "x$HAVE_AFFINITY_NP" = xyes)
 AC_MSG_RESULT([$HAVE_AFFINITY_NP])
 
+############################### atomicity checks ##############################
 # check for alternatives for ext/atomicity.h on OS/X 
 #
 AC_MSG_CHECKING([whether OSAtomicAdd32Barrier() is available])
@@ -239,10 +265,10 @@ apl_save_CXXFLAGS=$CXXFLAGS
 CXXFLAGS="-Wall -Werror"
 AC_COMPILE_IFELSE(
     [AC_LANG_PROGRAM([ [#include <libkern/OSAtomic.h>] ],
- 	             [ [OSAtomicAdd32Barrier(0, 0);]   ])],
+                     [ [OSAtomicAdd32Barrier(0, 0);]   ])],
     [HAVE_OSX_ATOMIC=yes
      AC_DEFINE_UNQUOTED([HAVE_OSX_ATOMIC], [1],
-                          [Define to 1 if OSAtomicAdd32Barrier() is available])
+                          [Define to 1 iff OSAtomicAdd32Barrier() is available])
     ],
     [HAVE_OSX_ATOMIC=no])
 CXXFLAGS=$apl_save_CXXFLAGS
@@ -254,12 +280,12 @@ AC_MSG_RESULT([$HAVE_OSX_ATOMIC])
 AC_MSG_CHECKING([whether atomic_add_32_nv() is available])
 AC_COMPILE_IFELSE(
     [AC_LANG_PROGRAM([ [#include <atomic.h>] ],
- 	             [ [atomic_add_32_nv(0, 0);]
- 	               [atomic_add_32   (0, 0);]
+                     [ [atomic_add_32_nv(0, 0);]
+                       [atomic_add_32   (0, 0);]
                      ])],
     [HAVE_SOLARIS_ATOMIC=yes
      AC_DEFINE_UNQUOTED([HAVE_SOLARIS_ATOMIC], [1],
-                          [Define to 1 if atomic_add_32_nv() is available])
+                          [Define to 1 iff atomic_add_32_nv() is available])
     ],
     [HAVE_SOLARIS_ATOMIC=no])
 AC_MSG_RESULT([$HAVE_SOLARIS_ATOMIC])

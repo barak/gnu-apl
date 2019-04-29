@@ -25,7 +25,9 @@
 Quad_PLOT  Quad_PLOT::_fun;
 Quad_PLOT * Quad_PLOT::fun = &Quad_PLOT::_fun;
 
-sem_t Quad_PLOT::plot_threads_sema;
+sem_t __plot_threads_sema;
+sem_t * Quad_PLOT::plot_threads_sema = &__plot_threads_sema;
+
 Simple_string<pthread_t, false> Quad_PLOT::plot_threads;
 
 #if defined(HAVE_XCB_XCB_H)
@@ -1293,14 +1295,14 @@ const xcb_get_input_focus_reply_t * focusReply =
            {
              pthread_t thread = pthread_self();
              bool zombie = true;
-             sem_wait(&Quad_PLOT::plot_threads_sema);
+             sem_wait(Quad_PLOT::plot_threads_sema);
                 loop(pt, Quad_PLOT::plot_threads.size())
                     if (Quad_PLOT::plot_threads[pt] == thread)
                        {
                          zombie = false;
                          break;
                        }
-             sem_post(&Quad_PLOT::plot_threads_sema);
+             sem_post(Quad_PLOT::plot_threads_sema);
 
              if (zombie)
                 {
@@ -1358,7 +1360,7 @@ const xcb_get_input_focus_reply_t * focusReply =
                        free(event);
                        xcb_disconnect(conn);
                        delete &w_props;
-                       sem_wait(&Quad_PLOT::plot_threads_sema);
+                       sem_wait(Quad_PLOT::plot_threads_sema);
                           const int count = Quad_PLOT::plot_threads.size();
                           const pthread_t thread = pthread_self();
                           loop(pt, count)
@@ -1369,7 +1371,7 @@ const xcb_get_input_focus_reply_t * focusReply =
                                    Quad_PLOT::plot_threads.pop();
                                    break;
                                  }
-                       sem_post(&Quad_PLOT::plot_threads_sema);
+                       sem_post(Quad_PLOT::plot_threads_sema);
                        return 0;
                      }
                   break;
@@ -1388,6 +1390,18 @@ const xcb_get_input_focus_reply_t * focusReply =
    return 0;
 }
 //=============================================================================
+Quad_PLOT::Quad_PLOT()
+  : QuadFunction(TOK_Quad_PLOT),
+    verbosity(0)
+{
+    __sem_init(plot_threads_sema, 0, 1);
+}
+//-----------------------------------------------------------------------------
+Quad_PLOT::~Quad_PLOT()
+{
+   __sem_destroy(plot_threads_sema);
+}
+//-----------------------------------------------------------------------------
 Token
 Quad_PLOT::eval_AB(Value_P A, Value_P B)
 {
@@ -1453,27 +1467,33 @@ Quad_PLOT::eval_B(Value_P B)
 {
    if (B->get_rank() == 0)   // create a zombie by removing it from plot_threads
       {
-        APL_Integer B0 = B->get_ravel(0).get_int_value();
-        if (B0 <= 0 && B0 >= -2)   // verbose mode
+        union
            {
-             verbosity = -B0;
+             int64_t B0;
+             pthread_t thread;
+           } u;
+
+        u.B0 = B->get_ravel(0).get_int_value();
+        if (u.B0 <= 0 && u.B0 >= -2)   // verbose mode
+           {
+             verbosity = -u.B0;
              CERR << "⎕PLOT verbosity set to " << verbosity << endl;
              return Token(TOK_APL_VALUE1, Idx0(LOC));
            }
 
         bool found = false;
-        sem_wait(&plot_threads_sema);
+        sem_wait(plot_threads_sema);
            loop(pt, Quad_PLOT::plot_threads.size())
                {
-                 if (Quad_PLOT::plot_threads[pt] != pthread_t(B0))   continue;
+                 if (Quad_PLOT::plot_threads[pt] != u.thread)   continue;
 
                  plot_threads[pt] = plot_threads[plot_threads.size() - 1];
                  plot_threads.pop();
                  found = true;
                  break;
                }
-         sem_post(&plot_threads_sema);
-        return Token(TOK_APL_VALUE1, IntScalar(found ? B0 : 0, LOC));
+         sem_post(plot_threads_sema);
+        return Token(TOK_APL_VALUE1, IntScalar(found ? u.B0 : 0, LOC));
       }
 
    if (B->get_rank() == 1 && B->element_count() == 0)
@@ -1485,7 +1505,7 @@ Quad_PLOT::eval_B(Value_P B)
    if (B->get_rank() < 1 || B->get_rank() > 2)   RANK_ERROR;
    if (B->element_count() < 2)                   LENGTH_ERROR;
 
-   // plot window with default attrinutes
+   // plot window with default attributes
    //
 Plot_data * data = setup_data(B.get());
    if (data == 0)   DOMAIN_ERROR;
@@ -1551,17 +1571,17 @@ Quad_PLOT::plot_data(Plot_window_properties * w_props,
    w_props->set_verbosity(verbosity);
    verbosity > 0 && w_props->print(CERR);
 
-pthread_t thread;
-   pthread_create(&thread, 0, plot_main, w_props);
-   sem_wait(&Quad_PLOT::plot_threads_sema);
-      plot_threads.append(thread);
-   sem_post(&Quad_PLOT::plot_threads_sema);
-APL_Integer ret = 0;
-   if (sizeof(ret) < sizeof(ret))   // never
-      memcpy(&ret, &thread, sizeof(ret));
-   else
-      memcpy(&ret, &thread, sizeof(thread));
-   return IntScalar(ret, LOC);
+union
+{
+   pthread_t thread;
+   int64_t   ret;
+} u;
+   u.ret = 0;
+   pthread_create(&u.thread, 0, plot_main, w_props);
+   sem_wait(Quad_PLOT::plot_threads_sema);
+      plot_threads.append(u.thread);
+   sem_post(Quad_PLOT::plot_threads_sema);
+   return IntScalar(u.ret, LOC);
 }
 //-----------------------------------------------------------------------------
 void

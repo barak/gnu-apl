@@ -671,6 +671,8 @@ WANT_ANDROID_FALSE
 WANT_ANDROID_TRUE
 HAVE_AFFINITY_NP_FALSE
 HAVE_AFFINITY_NP_TRUE
+HAVE_SEM_INIT_FALSE
+HAVE_SEM_INIT_TRUE
 HAVE_RDTSC_FALSE
 HAVE_RDTSC_TRUE
 HAVE_GTK3_FALSE
@@ -18821,6 +18823,7 @@ _ACEOF
 
 fi
 
+################################# rdtsc check #################################
 # check if rdtsc (read CPU cycle counter is available.
 # This is expected only on Intel CPUs
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether CPU has rdtsc (read CPU cycle counter) opcode" >&5
@@ -18862,6 +18865,56 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $HAVE_rdtsc" >&5
 $as_echo "$HAVE_rdtsc" >&6; }
 
+############################### sem_init() check ##############################
+# check if sem_init() works (it does not on OS-X)
+#
+apl_save_CXXFLAGS=$CXXFLAGS
+CXXFLAGS="-Wall -Werror"
+
+# This is expected only on Intel CPUs
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether sem_init() works" >&5
+$as_echo_n "checking whether sem_init() works... " >&6; }
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+#include <semaphore.h>
+int
+main ()
+{
+sem_t sema;
+          sem_init(&sema, 0, 0);
+
+
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_compile "$LINENO"; then :
+  HAVE_SEM_INIT=yes
+else
+  HAVE_SEM_INIT=no
+fi
+rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
+if test "x$HAVE_SEM_INIT" = "xyes"; then
+
+cat >>confdefs.h <<_ACEOF
+#define HAVE_SEM_INIT 1
+_ACEOF
+
+fi
+ if test "x$HAVE_SEM_INIT" = xyes; then
+  HAVE_SEM_INIT_TRUE=
+  HAVE_SEM_INIT_FALSE='#'
+else
+  HAVE_SEM_INIT_TRUE='#'
+  HAVE_SEM_INIT_FALSE=
+fi
+
+CXXFLAGS=$apl_save_CXXFLAGS
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $HAVE_SEM_INIT" >&5
+$as_echo "$HAVE_SEM_INIT" >&6; }
+
+
+######################## pthread_getaffinity_np() check #######################
 # see if pthread_getaffinity_np() and pthread_setaffinity_np are available
 #
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether pthread_setaffinity_np is available" >&5
@@ -18908,6 +18961,7 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $HAVE_AFFINITY_NP" >&5
 $as_echo "$HAVE_AFFINITY_NP" >&6; }
 
+############################### atomicity checks ##############################
 # check for alternatives for ext/atomicity.h on OS/X
 #
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether OSAtomicAdd32Barrier() is available" >&5
@@ -18953,7 +19007,7 @@ int
 main ()
 {
  atomic_add_32_nv(0, 0);
- 	               atomic_add_32   (0, 0);
+                       atomic_add_32   (0, 0);
 
   ;
   return 0;
@@ -19531,6 +19585,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_RDTSC_TRUE}" && test -z "${HAVE_RDTSC_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_RDTSC\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${HAVE_SEM_INIT_TRUE}" && test -z "${HAVE_SEM_INIT_FALSE}"; then
+  as_fn_error $? "conditional \"HAVE_SEM_INIT\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_AFFINITY_NP_TRUE}" && test -z "${HAVE_AFFINITY_NP_FALSE}"; then

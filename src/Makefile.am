@@ -11,6 +11,7 @@ DIST_SUBDIRS = $(SUBDIRS) testcases
 
 datadir = @datadir@
 localedir = $(datadir)/locale
+host_os = @host_os@
 
 distcleancheck_listfile = buildtag
 
@@ -227,6 +228,7 @@ makefile.h:
 	@echo "#define Makefile__pkglibdir  \"${pkglibdir}\""   >> $@
 	@echo "#define Makefile__localedir  \"${localedir}\""   >> $@
 	@echo "#define Makefile__srcdir     \"${abs_srcdir}\""  >> $@
+	@echo "#define Makefile__host_os    \"${host_os}\""     >> $@
 	@echo                                                   >> $@
 
 .PHONY:	patch

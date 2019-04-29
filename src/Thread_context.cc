@@ -104,7 +104,7 @@ Thread_context::PF_lock_unlock_pool(Thread_context & tctx)
    tctx.PF_join();
 
    tctx.blocked = true;
-   sem_wait(&tctx.pool_sema);
+   sem_wait(tctx.pool_sema);
    tctx.blocked = false;
 
    Log(LOG_Parallel)
@@ -124,7 +124,7 @@ void
 Thread_context::init_entry(CoreNumber n)
 {
    N = n;
-   sem_init(&pool_sema, 0, 0);
+   __sem_init(pool_sema, 0, 0);
 }
 //-----------------------------------------------------------------------------
 void

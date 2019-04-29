@@ -264,10 +264,10 @@ public:
    static bool set_core_count(CoreCount new_count, bool logit);
 
    /// a semaphore to protect printing from different threads
-   static sem_t print_sema;
+   static sem_t * print_sema;
 
    /// a semaphore to tell when a thread has started
-   static sem_t pthread_create_sema;
+   static sem_t * pthread_create_sema;
 
    /// return the core number for \b idx
    static CPU_Number get_CPU(int idx)

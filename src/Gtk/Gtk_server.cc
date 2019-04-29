@@ -37,6 +37,7 @@
 #include <iostream>
 #include <iomanip>
 
+#include "../Common.hh"
 #include "Gtk_enums.hh"
 
 using namespace std;
@@ -49,7 +50,8 @@ static bool verbose__draw_cmd  = false;
 static bool verbose__reads     = false;
 static bool verbose__writes    = false;
 
-static sem_t drawarea_sema;
+static sem_t __drawarea_sema;
+static sem_t * drawarea_sema = &__drawarea_sema;
 
 static cairo_surface_t * surface = 0;
 
@@ -278,7 +280,7 @@ gtk_drawingarea_draw_commands(GtkDrawingArea * widget, const char * data)
    // this function is called when apl does DrawCmd ⎕GTK[H_ID] "draw_commands"
 
    verbose__calls && cerr << "gtk_drawingarea_draw_commands()..." << endl;
-   sem_wait(&drawarea_sema);
+   sem_wait(drawarea_sema);
 
    while (*data && *data < ' ')   ++data;   // remove leading whitespace
 
@@ -304,7 +306,7 @@ gtk_drawingarea_draw_commands(GtkDrawingArea * widget, const char * data)
         drawarea_dlen += add_len;
       }
 
-   sem_post(&drawarea_sema);
+   sem_post(drawarea_sema);
    verbose__draw_data && cerr << "draw_data[" << drawarea_dlen << "]:\n"
                               << drawarea_data << endl;
 
@@ -569,7 +571,7 @@ unsigned int len = snprintf(buffer, sizeof(buffer) - 1, "%ld",
 int
 main(int argc, char * argv[])
 {
-   sem_init(&drawarea_sema, /* pshared */ 0, 1);
+   __sem_init(drawarea_sema, /* pshared */ 0, 1);
 
 bool do_funs = false;
 bool do_ev1 = false;
@@ -585,13 +587,31 @@ bool do_ev2 = false;
                cerr << argv[0] << ": invalid option '"
                     << argv[a] << "'" << endl
                     << "try: --funs, --ev1, --ev2, or -v" << endl;
+               __sem_destroy(drawarea_sema);
                return a;
              }
        }
 
-   if (do_funs)   { print_funs(); return 0; }
-   if (do_ev1)    { print_evs(1); return 0; }
-   if (do_ev2)    { print_evs(2); return 0; }
+   if (do_funs)
+      {
+         print_funs();
+         __sem_destroy(drawarea_sema);
+         return 0;
+      }
+
+   if (do_ev1)
+      {
+        print_evs(1);
+        __sem_destroy(drawarea_sema);
+        return 0;
+      }
+
+   if (do_ev2)
+      {
+         print_evs(2);
+        __sem_destroy(drawarea_sema);
+         return 0;
+      }
 
 const int flags = fcntl(3, F_GETFD);
    if (flags == -1)
@@ -603,6 +623,7 @@ const int flags = fcntl(3, F_GETFD);
 "    usage is to open this program from GNU APL using ⎕FIO[57] and then to\n"
 "    encode TLV buffers with 33 ⎕CR and send them to this program with ⎕FIO[43]"
    << endl;
+        __sem_destroy(drawarea_sema);
         return 1;
       }
 
@@ -631,6 +652,7 @@ char * V = TLV + 8;                  // the V part of the TLV buffer
                {
                  cerr << "TLV socked closed (1): " << strerror(errno) << endl;
                  close(3);
+                 __sem_destroy(drawarea_sema);
                  return 0;
                }
 
@@ -652,6 +674,7 @@ char * V = TLV + 8;                  // the V part of the TLV buffer
              {
                cerr << "TLV socked closed (2): " << strerror(errno) << endl;
                close(3);
+               __sem_destroy(drawarea_sema);
                return 0;
              }
 
@@ -671,6 +694,7 @@ char * V = TLV + 8;                  // the V part of the TLV buffer
                     << strerror(errno) << ": V_len=" << V_len
                                        << " rx_len=" << rx_len << endl;
                close(3);
+               __sem_destroy(drawarea_sema);
                return 0;
              }
           if (V_len)
@@ -719,6 +743,7 @@ char * V = TLV + 8;                  // the V part of the TLV buffer
 
    cerr << endl << "Gtk_server closed from client" << endl;
    close(3);
+   __sem_destroy(drawarea_sema);
    return 0;
 }
 //-----------------------------------------------------------------------------
@@ -1174,7 +1199,7 @@ do_draw(GtkWidget * drawing_area, cairo_t * cr, gpointer user_data)
         verbose__do_draw && cerr << "   new surface: cr="
                                  << reinterpret_cast<const void *>(cr) << endl;
 
-        sem_wait(&drawarea_sema);
+        sem_wait(drawarea_sema);
         assert(drawarea_data);
 
         // pretend configure event
@@ -1197,7 +1222,7 @@ do_draw(GtkWidget * drawing_area, cairo_t * cr, gpointer user_data)
               cmd = cmd_end + 1;
             }
 
-        sem_post(&drawarea_sema);
+        sem_post(drawarea_sema);
       }
 
    cairo_set_source_surface(cr, surface, 0, 0);

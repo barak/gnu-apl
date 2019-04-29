@@ -22,8 +22,11 @@
 #define __COMMON_HH_DEFINED__
 
 #include "../config.h"   // for xxx_WANTED and other macros from ./configure
-#include <sys/un.h>
+
 #include <netinet/in.h>
+#include <sys/un.h>
+#include <sys/stat.h>
+#include <sys/fcntl.h>
 
 #ifdef ENABLE_NLS
 #include <libintl.h>
@@ -131,7 +134,7 @@ uint32_t lo, hi;
    return uint64_t(hi) << 32 | lo;
 }
 
-#else
+#else // not HAVE_RDTSC
 
 inline uint64_t cycle_counter()
 {
@@ -139,8 +142,30 @@ timeval tv;
    gettimeofday(&tv, 0);
    return tv.tv_sec * 1000000ULL + tv.tv_usec;
 }
-#endif
+#endif // HAVE_RDTSC
 
+//-----------------------------------------------------------------------------
+#if HAVE_SEM_INIT
+
+# define __sem_destroy(sem) sem_destroy(sem)
+# define __sem_init(sem, pshared, value) sem_init(sem, pshared, value)
+
+#else // not HAVE_SEM_INIT
+
+# define __sem_destroy(sem) { if (sem) sem_close(sem); }
+# define __sem_init(sem, _pshared, value)                   \
+{                                                          \
+char sname[100];                                           \
+   { /* create a unique name */                            \
+     timeval tv;   gettimeofday(&tv, 0);                   \
+     unsigned int secs = tv.tv_sec, usecs = tv.tv_usec;    \
+     snprintf(sname, sizeof(sname), "/gnu_apl_%s_%u_%u",   \
+              #sem, secs, usecs);                          \
+   }                                                       \
+   enum { mode = S_IRWXU | S_IRWXG | S_IRWXO };            \
+   sem = sem_open(sname, O_CREAT, mode, value);            \
+}
+#endif // HAVE_SEM_INIT
 //-----------------------------------------------------------------------------
 /**
   Software probes. A probe is a measurement of CPU cycles executed between two

@@ -37,16 +37,16 @@ class Quad_PLOT : public QuadFunction
 {
 public:
    /// Constructor.
-   Quad_PLOT()
-      : QuadFunction(TOK_Quad_PLOT),
-        verbosity(0)
-   { sem_init(&plot_threads_sema, 0, 1); }
+   Quad_PLOT();
+
+   /// Denstructor.
+   ~Quad_PLOT();
 
    static Quad_PLOT * fun;          ///< Built-in function.
    static Quad_PLOT  _fun;          ///< Built-in function.
 
    /// a semaphore protecting plot_threads
-   static sem_t plot_threads_sema;
+   static sem_t * plot_threads_sema;
 
    /// an array of threads (one per plot window) handling X events from the
    /// window

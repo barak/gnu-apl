@@ -21,8 +21,6 @@
 #ifndef __SCALAR_FUNCTION_HH_DEFINED__
 #define __SCALAR_FUNCTION_HH_DEFINED__
 
-#include <semaphore.h>
-
 #include "Id.hh"
 #include "Parallel.hh"
 #include "PrimitiveFunction.hh"

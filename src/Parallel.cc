@@ -28,7 +28,7 @@
 #include "UserPreferences.hh"
 
 #if !PARALLEL_ENABLED
-#define sem_init(x, y, z)
+#define sem_init(x, y, z)   /* NO-OP */
 #endif // PARALLEL_ENABLED
 
 const char * Parallel_job_list_base::started_loc = 0;
@@ -47,8 +47,8 @@ Parallel::init(bool logit)
 
    // init global semaphores
    //
-   sem_init(&print_sema,          /* shared */ 0, /* value */ 1);
-   sem_init(&pthread_create_sema, /* shared */ 0, /* value */ 0);
+   __sem_init(print_sema,          /* shared */ 0, /* value */ 1);
+   __sem_init(pthread_create_sema, /* shared */ 0, /* value */ 0);
 
    // compute number of cores available and set total_CPU_count accordingly
    //
@@ -75,7 +75,7 @@ Parallel::init(bool logit)
             }
 
          // wait until new thread has reached its work loop
-         sem_wait(&pthread_create_sema);
+         sem_wait(pthread_create_sema);
        }
 
    // bind threads to cores
@@ -102,8 +102,10 @@ Parallel::init(bool logit)
 #endif // PARALLEL_ENABLED
 }
 
-sem_t Parallel::print_sema;
-sem_t Parallel::pthread_create_sema;
+sem_t __print_sema;
+sem_t __pthread_create_sema;
+sem_t * Parallel::print_sema          = &__print_sema;
+sem_t * Parallel::pthread_create_sema = &__pthread_create_sema;
 
 //=============================================================================
 bool
@@ -293,7 +295,7 @@ Parallel::unlock_pool(bool logit)
             {
               PRINT_LOCKED(CERR << "Parallel::unlock_pool() : " << endl; )
               Thread_context * tc = Thread_context::get_context(CoreNumber(a));
-              sem_post(&tc->pool_sema);
+              sem_post(tc->pool_sema);
               PRINT_LOCKED(
               CERR << "    pool_sema of thread #" << a << " incremented."
                    << endl;)
@@ -302,7 +304,7 @@ Parallel::unlock_pool(bool logit)
    else
      {
         for (int a = 1; a < Thread_context::get_active_core_count(); ++a)
-            sem_post(&Thread_context::get_context(CoreNumber(a))->pool_sema);
+            sem_post(Thread_context::get_context(CoreNumber(a))->pool_sema);
        }
 }
 //-----------------------------------------------------------------------------
@@ -318,12 +320,12 @@ Thread_context & tctx = *reinterpret_cast<Thread_context *>(arg);
 
    // tell the creator that we have started
    //
-   sem_post(&pthread_create_sema);
+   sem_post(pthread_create_sema);
 
    // start in state locked
    //
    tctx.blocked = true;
-   sem_wait(&tctx.pool_sema);
+   sem_wait(tctx.pool_sema);
    tctx.blocked = false;
 
    Log(LOG_Parallel)

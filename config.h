@@ -25,10 +25,10 @@
 /* define to enable gprof profiling */
 #define GPROF_WANTED -pg
 
-/* Define to 1 if pthread_setaffinity_np() is available */
+/* Define to 1 iff pthread_setaffinity_np() is available */
 #define HAVE_AFFINITY_NP 1
 
-/* Define to 1 if <curses.h> is present */
+/* Define to 1 iff <curses.h> is present */
 /* #undef HAVE_CURSES_H */
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
@@ -58,7 +58,7 @@
 /* Define to 1 if you have the <inttypes.h> header file. */
 #define HAVE_INTTYPES_H 1
 
-/* Define to 1 if lib(n)curses is available */
+/* Define to 1 iff lib(n)curses is available */
 #define HAVE_LIBCURSES 1
 
 /* Define to 1 if you have the `dl' library (-ldl). */
@@ -100,10 +100,10 @@
 /* Define to 1 if you have the `munmap' function. */
 #define HAVE_MUNMAP 1
 
-/* Define to 1 if <ncurses.h> is present */
+/* Define to 1 iff <ncurses.h> is present */
 #define HAVE_NCURSES_H 1
 
-/* Define to 1 if OSAtomicAdd32Barrier() is available */
+/* Define to 1 iff OSAtomicAdd32Barrier() is available */
 /* #undef HAVE_OSX_ATOMIC */
 
 /* Define to 1 if PostgreSQL libraries are available */
@@ -112,10 +112,13 @@
 /* Define to 1 if you have the `pow' function. */
 #define HAVE_POW 1
 
-/* CPU has rdtsc opcode */
+/* Define to 1 iff the CPU has rdtsc opcode */
 #define HAVE_RDTSC 1
 
-/* Define to 1 if atomic_add_32_nv() is available */
+/* Define to 1 iff sem_init() works */
+#define HAVE_SEM_INIT 1
+
+/* Define to 1 iff atomic_add_32_nv() is available */
 /* #undef HAVE_SOLARIS_ATOMIC */
 
 /* Have the SQLITE3 library */
@@ -157,7 +160,7 @@
 /* Define to 1 if you have the <sys/un.h> header file. */
 #define HAVE_SYS_UN_H 1
 
-/* Define to 1 if <term.h> is present */
+/* Define to 1 iff <term.h> is present */
 #define HAVE_TERM_H 1
 
 /* Define to 1 if you have the <unistd.h> header file. */
