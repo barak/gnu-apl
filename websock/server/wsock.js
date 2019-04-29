@@ -59,7 +59,9 @@ wsServer.on('request', function(request)
                    "--safe",
                    "--noSV",
                    "--noCONT",
+                   "--OFF",
                    "--rawCIN",
+                   "--CPU_limit_secs", "5",
                    "-p", "2",
                    "-w", "300",
                  ]);

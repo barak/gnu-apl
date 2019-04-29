@@ -85,8 +85,7 @@ char cc[4000];
 #endif
 
    snprintf(cc, sizeof(cc),
-"    -C new_root          perform chroot(new_root) before starting APL (root only)\n"
-"    -u UID               runas user UID (root only)\n"
+"    -C new_root          do chroot(new_root) before starting APL (root only)\n"
 "    --cfg                show ./configure options used and exit\n"
 "    --noCIN              do not echo input (for scripting)\n"
 "    --CPU_limit_secs sec set CPU time limit to sec seconds\n"
@@ -99,6 +98,7 @@ char cc[4000];
 "    --gpl                show license (GPL) and exit\n"
 "    -L wsname            )LOAD wsname (and not SETUP or CONTINUE) on startup\n"
 "    --LX expr            execute APL expression expr first\n"
+"    --OFF                automatically )OFF after last input file\n"
 "    -p N                 use profile N in preferences files\n"
 "    --par proc           use processor parent ID proc (default: no parent)\n"
 "    --PW value           initial value of ⎕PW\n"
@@ -121,6 +121,7 @@ char cc[4000];
 "                         4:   exit after first error\n"
 "    --TR                 randomize order of testfiles\n"
 "    --TS                 append to (rather than override) summary.log\n"
+"    -u UID               run as user UID (root only)\n"
 "    -v, --version        show version information and exit\n"
 "    -w milli             wait milli milliseconds at startup\n"
 "    --                   end of options for %s\n", prog);
@@ -490,16 +491,16 @@ UserPreferences::parse_argv_2(bool logit)
               continue;
             }
 
-         if (!strcmp(opt, "-p"))
-            {
-              ++a;
-              continue;   // -p already handled in parse_argv_1()
-            }
-
          if (!strcmp(opt, "--OFF"))
             {
               auto_OFF = true;
               continue;
+            }
+
+         if (!strcmp(opt, "-p"))
+            {
+              ++a;
+              continue;   // -p already handled in parse_argv_1()
             }
 
          if (!strcmp(opt, "--par"))
