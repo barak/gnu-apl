@@ -89,6 +89,7 @@ char cc[4000];
 "    -u UID               runas user UID (root only)\n"
 "    --cfg                show ./configure options used and exit\n"
 "    --noCIN              do not echo input (for scripting)\n"
+"    --CPU_limit_secs sec set CPU time limit to sec seconds\n"
 "    --echoCIN            echo (final) input to COUT\n"
 "    --rawCIN             do not emit escape sequences\n"
 "    --[no]Color          start with ]XTERM ON [OFF])\n"
@@ -323,6 +324,18 @@ UserPreferences::parse_argv_2(bool logit)
             {
               ++a;
               continue;   // -C already handled in parse_argv_1()
+            }
+
+         if (!strcmp(opt, "--CPU_limit_secs"))
+            {
+              ++a;
+              if (!val)
+                 {
+                   CERR << "--CPU_limit_secs without seconds" << endl;
+                   exit(a);
+                 }
+              CPU_limit_secs = atoi(val);
+              continue;
             }
 
          if (!strcmp(opt, "--Color"))

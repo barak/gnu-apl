@@ -7,10 +7,13 @@ const { spawn } = require('child_process');
 function now()
    {
      var d = new Date();
-     var hh = `00${d.getHours()}`  .slice(-2)
-     var mm = `00${d.getMinutes()}`.slice(-2)
-     var ss = `00${d.getSeconds()}`.slice(-2)
-     return `${hh}:${mm}:${ss}`
+     var YY = `00${d.getFullYear()}`.slice(-4)
+     var MM = `00${d.getMonth()}`   .slice(-2)
+     var DD = `00${d.getDay()}`     .slice(-2)
+     var hh = `00${d.getHours()}`   .slice(-2)
+     var mm = `00${d.getMinutes()}` .slice(-2)
+     var ss = `00${d.getSeconds()}` .slice(-2)
+     return `${YY}-${MM}-${DD} ${hh}:${mm}:${ss}`
    }
 
 var server = http.createServer(

@@ -327,6 +327,14 @@ const bool log_startup = uprefs.parse_argv_1();
 
    Macro::init_macros();
 
+   if (uprefs.CPU_limit_secs)
+      {
+        rlimit rl;
+        getrlimit(RLIMIT_CPU, &rl);
+        rl.rlim_cur = uprefs.CPU_limit_secs;
+        setrlimit(RLIMIT_CPU, &rl);
+      }
+
    if (uprefs.emacs_mode)
       {
         UCS_string info;
