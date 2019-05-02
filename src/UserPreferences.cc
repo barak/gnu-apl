@@ -1096,7 +1096,32 @@ int file_profile = 0;   // the current profile in the preferences file
               file_profile = atoi(arg);
               continue;
             }
+
          if (file_profile && (file_profile != user_profile))   continue;
+
+         // set up pointers to arguments...
+         //
+         const char * sargs[100];
+         char * p = buffer;
+         int sargs_idx = 0;
+         for (;;)
+            {
+              while (*p && *p <= ' ')   ++p;    // discard leading whitespace
+              if (*p == 0)   break;
+
+              if (p[0] == '/' && p[1] == '/')   break;   // comment
+
+              const char * arg = p;
+              sargs[sargs_idx++] = arg;         // store start of argument
+              while (*p > ' ')   ++p;           // skip non-whitespaces
+              if (*p)   *p++ = 0;
+              else      break;
+            }
+
+         // some args could be non-numeric
+         //
+         Assert(sargs_idx >= count);
+         sargs[sargs_idx] = "NUL";              // terminating 0
 
          if (!strcasecmp(opt, "Color"))
             {
@@ -1150,86 +1175,78 @@ int file_profile = 0;   // the current profile in the preferences file
             }
          else if (!strcasecmp(opt, "CIN-SEQUENCE"))
             {
-              loop(p, count - 1)   Output::color_CIN[p] = char(d[p] & 0xFF);
-              Output::color_CIN[count - 1] = 0;
+              loop(sa, sargs_idx)
+                  Output::color_CIN[sa] = decode_ASCII(sargs[sa + 1]);
             }
          else if (!strcasecmp(opt, "COUT-SEQUENCE"))
             {
-              loop(p, count - 1)   Output::color_COUT[p] = char(d[p] & 0xFF);
-              Output::color_COUT[count - 1] = 0;
+              loop(sa, sargs_idx)
+                  Output::color_COUT[sa] = decode_ASCII(sargs[sa + 1]);
             }
          else if (!strcasecmp(opt, "CERR-SEQUENCE"))
             {
-              loop(p, count - 1)   Output::color_CERR[p] = char(d[p] & 0xFF);
-              Output::color_CERR[count - 1] = 0;
+              loop(sa, sargs_idx)
+                  Output::color_CERR[sa] = decode_ASCII(sargs[sa + 1]);
             }
          else if (!strcasecmp(opt, "UERR-SEQUENCE"))
             {
-              loop(p, count - 1)   Output::color_UERR[p] = char(d[p] & 0xFF);
-              Output::color_UERR[count - 1] = 0;
+              loop(sa, sargs_idx)
+                  Output::color_UERR[sa] = decode_ASCII(sargs[sa + 1]);
             }
          else if (!strcasecmp(opt, "RESET-SEQUENCE"))
             {
-              loop(p, count - 1)   Output::color_RESET[p] = char(d[p] & 0xFF);
-              Output::color_RESET[count - 1] = 0;
+              loop(sa, sargs_idx)
+                 Output::color_RESET[sa] = decode_ASCII(sargs[sa + 1]);
             }
          else if (!strcasecmp(opt, "CLEAR-EOL-SEQUENCE"))
             {
-              loop(p, count - 1)   Output::clear_EOL[p] = char(d[p] & 0xFF);
-              Output::clear_EOL[count - 1] = 0;
+              loop(sa, sargs_idx)
+                 Output::clear_EOL[sa] = decode_ASCII(sargs[sa + 1]);
             }
          else if (!strcasecmp(opt, "CLEAR-EOS-SEQUENCE"))
             {
-              loop(p, count - 1)   Output::clear_EOS[p] = char(d[p] & 0xFF);
-              Output::clear_EOS[count - 1] = 0;
+              loop(sa, sargs_idx)
+                 Output::clear_EOS[sa] = decode_ASCII(sargs[sa + 1]);
             }
          else if (!strcasecmp(opt, "KEY-CURSOR-UP"))
             {
-              loop(p, count - 1)
-                  Output::ESC_CursorUp[p] = char(d[p] & 0xFF);
-              Output::ESC_CursorUp[count - 1] = 0;
+              loop(sa, sargs_idx)
+                 Output::ESC_CursorUp[sa] = decode_ASCII(sargs[sa + 1]);
             }
          else if (!strcasecmp(opt, "KEY-CURSOR-DOWN"))
             {
-              loop(p, count - 1)
-                  Output::ESC_CursorDown[p] = char(d[p] & 0xFF);
-              Output::ESC_CursorDown[count - 1] = 0;
+              loop(sa, sargs_idx)
+                 Output::ESC_CursorDown[sa] = decode_ASCII(sargs[sa + 1]);
             }
          else if (!strcasecmp(opt, "KEY-CURSOR-RIGHT"))
             {
-              loop(p, count - 1)
-                  Output::ESC_CursorRight[p] = char(d[p] & 0xFF);
-              Output::ESC_CursorRight[count - 1] = 0;
+              loop(sa, sargs_idx)
+                 Output::ESC_CursorRight[sa] = decode_ASCII(sargs[sa + 1]);
             }
          else if (!strcasecmp(opt, "KEY-CURSOR-LEFT"))
             {
-              loop(p, count - 1)
-                  Output::ESC_CursorLeft[p] = char(d[p] & 0xFF);
-              Output::ESC_CursorLeft[count - 1] = 0;
+              loop(sa, sargs_idx)
+                 Output::ESC_CursorLeft[sa] = decode_ASCII(sargs[sa + 1]);
             }
          else if (!strcasecmp(opt, "KEY-CURSOR-END"))
             {
-              loop(p, count - 1)
-                  Output::ESC_CursorEnd[p] = char(d[p] & 0xFF);
-              Output::ESC_CursorEnd[count - 1] = 0;
+              loop(sa, sargs_idx)
+                 Output::ESC_CursorEnd[sa] = decode_ASCII(sargs[sa + 1]);
             }
          else if (!strcasecmp(opt, "KEY-CURSOR-HOME"))
             {
-              loop(p, count - 1)
-                  Output::ESC_CursorHome[p] = char(d[p] & 0xFF);
-              Output::ESC_CursorHome[count - 1] = 0;
+              loop(sa, sargs_idx)
+                 Output::ESC_CursorHome[sa] = decode_ASCII(sargs[sa + 1]);
             }
          else if (!strcasecmp(opt, "KEY-INSMODE"))
             {
-              loop(p, count - 1)
-                  Output::ESC_InsertMode[p] = char(d[p] & 0xFF);
-              Output::ESC_InsertMode[count - 1] = 0;
+              loop(sa, sargs_idx)
+                 Output::ESC_InsertMode[sa] = decode_ASCII(sargs[sa + 1]);
             }
          else if (!strcasecmp(opt, "KEY-DELETE"))
             {
-              loop(p, count - 1)
-                  Output::ESC_Delete[p] = char(d[p] & 0xFF);
-              Output::ESC_Delete[count - 1] = 0;
+              loop(sa, sargs_idx)
+                 Output::ESC_Delete[sa] = decode_ASCII(sargs[sa + 1]);
             }
          else if (!strcasecmp(opt, "CIN-FOREGROUND"))
             {
@@ -1350,6 +1367,48 @@ int file_profile = 0;   // the current profile in the preferences file
        }
 
    fclose(f);
+}
+//-----------------------------------------------------------------------------
+int
+UserPreferences::decode_ASCII(const char * strg)
+{
+   if (!strcmp(strg, "NUL"))   return 0x00;
+   if (!strcmp(strg, "SOH"))   return 0x01;
+   if (!strcmp(strg, "STX"))   return 0x02;
+   if (!strcmp(strg, "ETX"))   return 0x03;
+   if (!strcmp(strg, "EOT"))   return 0x04;
+   if (!strcmp(strg, "ENQ"))   return 0x05;
+   if (!strcmp(strg, "ACK"))   return 0x06;
+   if (!strcmp(strg, "BEL"))   return 0x07;
+   if (!strcmp(strg, "BS"))   return 0x08;
+   if (!strcmp(strg, "HT"))    return 0x09;
+   if (!strcmp(strg, "LF"))    return 0x0A;
+   if (!strcmp(strg, "VT"))    return 0x0B;
+   if (!strcmp(strg, "FF"))    return 0x0C;
+   if (!strcmp(strg, "CR"))    return 0x0D;
+   if (!strcmp(strg, "SO"))    return 0x0E;
+   if (!strcmp(strg, "SI"))    return 0x0F;
+   if (!strcmp(strg, "DLE"))   return 0x10;
+   if (!strcmp(strg, "DC1"))   return 0x11;
+   if (!strcmp(strg, "DC2"))   return 0x12;
+   if (!strcmp(strg, "DC3"))   return 0x13;
+   if (!strcmp(strg, "DC4"))   return 0x14;
+   if (!strcmp(strg, "NAK"))   return 0x15;
+   if (!strcmp(strg, "SYN"))   return 0x16;
+   if (!strcmp(strg, "ETB"))   return 0x17;
+   if (!strcmp(strg, "CAN"))   return 0x18;
+   if (!strcmp(strg, "EM"))    return 0x19;
+   if (!strcmp(strg, "SUB"))   return 0x1A;
+   if (!strcmp(strg, "ESC"))   return 0x1B;
+   if (!strcmp(strg, "FS"))    return 0x1C;
+   if (!strcmp(strg, "GS"))    return 0x1D;
+   if (!strcmp(strg, "RS"))    return 0x1E;
+   if (!strcmp(strg, "US"))    return 0x1F;
+
+   if (strlen(strg) == 1)   return *strg;                 // single char
+   if (strlen(strg) == 2)   return strtol(strg, 0, 16);   // hex value, e.g. 4C
+   CERR << "invalid parameter " << strg << " in preferences file" << endl;
+   return -1;
 }
 //-----------------------------------------------------------------------------
 void

@@ -1625,6 +1625,15 @@ Quad_PLOT::help() const
 
 #else // no libxce...
 
+Quad_PLOT::Quad_PLOT()
+  : QuadFunction(TOK_Quad_PLOT),
+    verbosity(0)
+{
+}
+//-----------------------------------------------------------------------------
+Quad_PLOT::~Quad_PLOT()
+{
+}
 //-----------------------------------------------------------------------------
 Token
 Quad_PLOT::eval_B(Value_P B)

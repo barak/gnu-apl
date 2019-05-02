@@ -229,6 +229,12 @@ protected:
    /// return true if file \b filename is an APL script (has execute permission
    /// and starts with #!
    static bool is_APL_script(const char * filename);
+
+   /// decode a byte in a preferences file. The byte can be given as ASCII name
+   /// (currently only ESC is understood), a single char (that stands for
+   /// itself), or 2 2-character hex value
+   /// 
+   static int decode_ASCII(const char * strg);
 };
 
 extern UserPreferences uprefs;

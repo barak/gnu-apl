@@ -13,7 +13,7 @@
 # It can be overridden by  ./configure --sysconfdir=something-else
 #
 # If both files are present then (1) is read before (2) so that for
-# duplicate settings in both files (2) prevails.
+# contradicting settings in both files (2) prevails.
 #
 # Many settings can also be changed by command line options; the command line
 # options take precedence over settings in (1) or (2).
@@ -129,19 +129,20 @@
 # (most likely the columns background and foreground).
 # Each sequence can be up to 20 characters long.
 #
-# The default setting (i.e. for a white background) is this:
+# The default setting in GNU APL assumes a VT100 terminal with a white
+# background, which correspnds to the following setup:
 #
-#               VT100:          foreground        background
-#                               color    |        |    color
-#                                        V        V 
-# //                    ESC  [  0  ;  3 fg  ;  4 bg  m
-# CIN-SEQUENCE           1b 5b 30 3b 33 30 3b 34 37 6d    // ESC [0;30;47m
-# COUT-SEQUENCE          1b 5b 30 3b 33 39 3b 34 39 6d    // ESC [0;39;49m
-# CERR-SEQUENCE          1b 5b 30 3b 33 35 3b 34 39 6d    // ESC [0;35;49m
-# UERR-SEQUENCE          1b 5b 30 3b 33 35 3b 34 39 6d    // ESC [0;35;49m
-# RESET-SEQUENCE         1b 5b 30 3b 33 39 3b 34 39 6d    // ESC [0;39;49m
-# CLEAR-EOL-SEQUENCE     1b 5b 4B                         // ESC [K
-# CLEAR-EOS-SEQUENCE     1b 5b 4A                         // ESC [J
+#               VT100:     foreground       background
+#                          color    |       |    color
+#                                   V       V
+# general color format; ESC [ 0 ; 3 fg ; 4 bg m
+# CIN-SEQUENCE          ESC [ 0 ; 3 0  ; 4 7  m
+# COUT-SEQUENCE         ESC [ 0 ; 3 9  ; 4 9  m
+# CERR-SEQUENCE         ESC [ 0 ; 3 5  ; 4 9  m
+# UERR-SEQUENCE         ESC [ 0 ; 3 5  ; 4 9  m
+# RESET-SEQUENCE        ESC [ 0 ; 3 9  ; 4 9  m
+# CLEAR-EOL-SEQUENCE    ESC [ K
+# CLEAR-EOS-SEQUENCE    ESC [ J
 #
 # On a black background (still assuming VT100 so that the CLEAR-EOL-SEQUENCE
 # does not need to be re-defined), the following may be more suitable:

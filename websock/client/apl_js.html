@@ -8,9 +8,15 @@
   BODY    { background-color: #9EE; margin: 0; padding: 0; }
   .footer { text-align: center;     font-style: italic     }
 
-  TABLE      { border-collapse: collapse; }
-  TD         { padding: 0; font-family: monospace; width: 80em; }
-  #APL_entry { font-family: monospace }
+  TABLE       { border-collapse: collapse; }
+  TD.i        { border:0;  padding: 0; font-family: monospace; width: 60em; }
+  TD.o        { border:0;  padding: 0; font-family: monospace; width: 60em; }
+  TD.e        { border:0;  padding: 0; font-family: monospace; width: 60em; }
+  #APL_entry  { font-family: monospace }
+
+  .w_screen     { font-family: monospace; width: 80em  }
+  .w_space      { font-family: monospace; width:   2em }
+  .w_links      { font-family: monospace; width:  30em }
 
   /* output channel coloring (in/out/error) */
   .i   { background-color: #DDD; color: #00F }
@@ -22,6 +28,16 @@
 
     function init()
     {
+      var min_width = window.width();
+      var min_height = window.height();
+      if (min_width < 1600)   min_width = 1600;
+      if (min_height < 800)   min_height = 800;
+      if (window.width() < min_width or window.height() < min_height)
+         {
+           var w = "width=" + str(min_width);
+           var h = ", height=" + str(min_height);
+           window.open('?', '_self', w + h);
+         }
       host = 'server57';
       host = window.location.hostname;
       var address = "ws://" + host + ":42424";
@@ -124,14 +140,35 @@
       web_socket.send(user_input + "\n");
       return false;
     }
-
   </script>
  </head>
+
  <body onload="init()">
 
   <H1>Welcome to try-GNU-APL</H1>
   <HR>
-  <TABLE id=screen class=i>
+  <TABLE>
+   <TR>
+    <TD class=w_screen><TABLE id=screen class=i></TABLE></TD>
+    <TD class=w_space>&nbsp;</TD>
+    <TD class=w_links><TABLE class=info>
+         <TR><TH><H3>Useful GNU APL Links</H3></TD></TR>
+         <TR><TD><A href=http://www.gnu.org/software/apl>
+                          The GNU APL Homepage</A></TD></TR>
+         <TR><TD><A href=http://lists.gnu.org/archive/html/bug-apl/>
+                          The GNU APL Mailing List</A></TD></TR>
+         <TR><TD><A href=http://www.gnu.org/software/apl/apl.html>
+                          The GNU APL Info Manual</A></TD></TR>
+         <TR><TD><A href=http://svn.savannah.gnu.org/viewvc/apl/>
+                          GNU APL Sources (Subversion)</A></TD></TR>
+         <TR><TD><A href="https://savannah.gnu.org/svn/?group=apl">
+                          Help for GNU APL Subversion</A></TD></TR>
+         <TR><TD><A href=http://www.gnu.org/software/apl/Community.html>
+                          The GNU APL Community</A></TD></TR>
+         <TR><TD><A href=http://www.gnu.org/home.html>
+                          The GNU Project</A></TD></TR>
+        </TABLE>
+   </TR>
   </TABLE>
   <HR>
   <form name="APL_form" id="APL_form"
@@ -139,16 +176,10 @@
    <STRONG>APL Input:</STRONG>
   <input type="text" id="APL_entry" name="in_form" size=60>
   <input type="submit" value="Enter">
-  <input type="button" value="Show an APL Keyboard" onclick='
-                  window.open("APL_keyboard.html",
-                              "APL Keyboard",
-                              "width=930,height=500");
-                  return false;');>
-  <input type="button" value="Show another APL Keyboard (experimental)" onclick='
-                  window.open("APL_keyboard2.html",
-                              "APL Keyboard2",
-                              "width=850,height=500");
-                  return false;');>
+  <input type="button" value="Show an APL Keyboard"
+         onclick='window.open("APL_keyboard2.html", "APL Keyboard2", "width=850,height=500"); return false;'>
+  <input type="button" value="Show a static (for cut-and-paste) APL Keyboard"
+         onclick='window.open("APL_keyboard.html", "APL Keyboard", "width=930,height=500"); return false;'>
   </form>
   <HR>
   <div class=footer>
