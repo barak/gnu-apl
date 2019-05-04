@@ -20,6 +20,7 @@
 
 #include <iomanip>
 
+#include "Bif_F12_TAKE_DROP.hh"
 #include "Command.hh"
 #include "Executable.hh"
 #include "IndexExpr.hh"

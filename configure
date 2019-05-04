@@ -2920,6 +2920,7 @@ ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
+configure_options="$0 $*"
 
 ac_aux_dir=
 for ac_dir in . "$srcdir"/.; do
@@ -22192,4 +22193,7 @@ fi
   echo "      installation appears to be missing or incomplete (see details above)"
   echo " "
 fi
+
+echo "configure: saving configure options in $srcdir/configure_options"
+echo "$configure_options" > $srcdir/configure_options
 

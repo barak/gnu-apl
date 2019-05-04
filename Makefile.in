@@ -942,22 +942,23 @@ uninstall-am: uninstall-dist_docDATA uninstall-nobase_dist_sysconfDATA
 help:
 	@echo ""
 	@echo ""
-	@echo "in addition to standard targets (all, install, clean, ...) "
+	@echo "In addition to the standard make targets (all, install, clean, ...), "
 	@echo "the following make targets may be supported (at this level):"
 	@echo ""
 	@echo "    make help      - print this text"
 	@echo "    make DIST      - dist + a Makefile that calls ./configure"
 	@echo "    make DOXY      - create Doxygen documentation"
 	@echo "    make RPM       - create (source and binary) RPMs"
-	@echo "    make DEB       - create debian packages"
+	@echo "    make DEB       - create Debian packages"
 	@echo ""
 	@echo "    make SVNUP     - update from SVN and ./configure"
 	@echo ""
-	@echo "NOTE: The RPM and DEB targets may fail because they require" 
-	@echo "additional tools that may not be present on your machine."
+	@echo "NOTE: The RPM and DEB targets may fail because they require additional tools" 
+	@echo "that may not be present on your machine. Don't worry if that happens, unless"
+	@echo "you really need the RPM and/or Debian packages."
 	@echo ""
-	@echo "The following targets are shortcuts for lazy developers like the"
-	@echo "GNU APL author and are not very useful for normal users:"
+	@echo "The following targets are shortcuts for lazy developers (like the GNU APL "
+	@echo "author) and are not very useful for normal users:"
 	@echo ""
 	@echo "    make develop   - enable full dependency tracking"
 	@echo "    make gprof     - make develop + enable gprof profiling"
@@ -1055,7 +1056,8 @@ DEB:	DIST
 .PHONY:	SVNUP
 SVNUP:
 	svn update
-	./configure --disable-maintainer-mode
+	@if [ -x ./config.status ]; then ./config.status ; \
+	else ./configure --disable-maintainer-mode ; fi
 
 # a shortcut to export changes to ../savannah-repo-apl (which is supposed to be
 # a checkout of the GNU APL repository at Savannah

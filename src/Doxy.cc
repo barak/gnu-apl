@@ -20,6 +20,7 @@
 #include <errno.h>
 #include <sys/stat.h>
 
+#include "Bif_F12_TAKE_DROP.hh"
 #include "Doxy.hh"
 #include "Heapsort.hh"
 #include "Logging.hh"

@@ -61,7 +61,8 @@ DEB:	DIST
 .PHONY:	SVNUP
 SVNUP:
 	svn update
-	./configure --disable-maintainer-mode
+	@if [ -x ./config.status ]; then ./config.status ; \
+	else ./configure --disable-maintainer-mode ; fi
 
 # a shortcut to export changes to ../savannah-repo-apl (which is supposed to be
 # a checkout of the GNU APL repository at Savannah

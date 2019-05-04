@@ -5,7 +5,8 @@
  <title>try-GNU-APL</title>
  <style>
   H1      { margin: 0; padding: 0;  text-align: center     }
-  BODY    { background-color: #9EE; margin: 0; padding: 0; }
+  BODY    { background-color: #9EE; margin: 0; padding: 0;
+            min-width: 1640px; min-height: 640px; }
   .footer { text-align: center;     font-style: italic     }
 
   TABLE       { border-collapse: collapse; }
@@ -28,16 +29,6 @@
 
     function init()
     {
-      var min_width = window.width();
-      var min_height = window.height();
-      if (min_width < 1600)   min_width = 1600;
-      if (min_height < 800)   min_height = 800;
-      if (window.width() < min_width or window.height() < min_height)
-         {
-           var w = "width=" + str(min_width);
-           var h = ", height=" + str(min_height);
-           window.open('?', '_self', w + h);
-         }
       host = 'server57';
       host = window.location.hostname;
       var address = "ws://" + host + ":42424";

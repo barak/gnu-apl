@@ -783,7 +783,7 @@ There are a few possibly useful features in GNU APL:
 As already mentioned, it is possible to write APL scripts. Similar to other
 script languages, an APL script is a text file whose first line is a
 "shebang line", i.e. a line starting with @option{#!}, followed by the
-absolute path to the interpreter (in out case the GNU APL binary), followed
+absolute path to the interpreter (in our case the GNU APL binary), followed
 by command line arguments that are passed on to the interpreter. In our case
 the shebang line could be, for example:
 

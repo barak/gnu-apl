@@ -30,6 +30,7 @@ Avec.cc			Avec.def		Avec.hh			\
 Backtrace.cc					Backtrace.hh		\
 Bif_F12_FORMAT.cc				Bif_F12_FORMAT.hh	\
 Bif_F12_SORT.cc					Bif_F12_SORT.hh		\
+Bif_F12_TAKE_DROP.cc				Bif_F12_TAKE_DROP.hh	\
 Bif_OPER1_COMMUTE.cc				Bif_OPER1_COMMUTE.hh	\
 Bif_OPER1_EACH.cc				Bif_OPER1_EACH.hh	\
 Bif_OPER2_POWER.cc				Bif_OPER2_POWER.hh	\

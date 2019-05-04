@@ -153,29 +153,30 @@ am__libapl_la_SOURCES_DIST = buildtag buildtag.hh ../config.h \
 	ArrayIterator.cc ArrayIterator.hh Assert.cc Assert.hh Avec.cc \
 	Avec.def Avec.hh Backtrace.cc Backtrace.hh Bif_F12_FORMAT.cc \
 	Bif_F12_FORMAT.hh Bif_F12_SORT.cc Bif_F12_SORT.hh \
-	Bif_OPER1_COMMUTE.cc Bif_OPER1_COMMUTE.hh Bif_OPER1_EACH.cc \
-	Bif_OPER1_EACH.hh Bif_OPER2_POWER.cc Bif_OPER2_POWER.hh \
-	Bif_OPER2_INNER.cc Bif_OPER2_INNER.hh Bif_OPER2_OUTER.cc \
-	Bif_OPER2_OUTER.hh Bif_OPER2_RANK.cc Bif_OPER2_RANK.hh \
-	Bif_OPER1_REDUCE.cc Bif_OPER1_REDUCE.hh Bif_OPER1_SCAN.cc \
-	Bif_OPER1_SCAN.hh CDR.cc CDR.hh Cell.cc Cell.icc Cell.hh \
-	Doxy.cc Doxy.hh CharCell.cc CharCell.hh Command.cc Command.def \
-	Command.hh Common.cc Common.hh ComplexCell.cc ComplexCell.hh \
-	configure_args.cc DiffOut.cc DiffOut.hh DynamicObject.cc \
-	DynamicObject.hh Error.cc Error.def Error.hh Error_macros.hh \
-	ErrorCode.hh Executable.cc Executable.hh FloatCell.cc \
-	FloatCell.hh Function.cc Function.hh DerivedFunction.cc \
-	DerivedFunction.hh Help.def Heapsort.hh Id.cc Id.def Id.hh \
-	IndexExpr.cc IndexExpr.hh IndexIterator.cc IndexIterator.hh \
-	InputFile.cc InputFile.hh IntCell.cc IntCell.hh IO_Files.cc \
-	IO_Files.hh LApack.cc LApack.hh LibPaths.cc LibPaths.hh \
-	LineInput.cc LineInput.hh Logging.cc Logging.def Logging.hh \
-	LvalCell.cc LvalCell.hh makefile.h Malloc_hooks.cc Nabla.cc \
-	Nabla.hh Macro.cc Macro.def Macro.hh NamedObject.cc \
-	NamedObject.hh NativeFunction.cc NativeFunction.hh \
-	Native_interface.hh NumericCell.cc NumericCell.hh Output.cc \
-	Output.hh PJob.hh Parser.cc Parser.hh Prefix.cc Prefix.def \
-	Prefix.hh PointerCell.cc PointerCell.hh PrimitiveFunction.cc \
+	Bif_F12_TAKE_DROP.cc Bif_F12_TAKE_DROP.hh Bif_OPER1_COMMUTE.cc \
+	Bif_OPER1_COMMUTE.hh Bif_OPER1_EACH.cc Bif_OPER1_EACH.hh \
+	Bif_OPER2_POWER.cc Bif_OPER2_POWER.hh Bif_OPER2_INNER.cc \
+	Bif_OPER2_INNER.hh Bif_OPER2_OUTER.cc Bif_OPER2_OUTER.hh \
+	Bif_OPER2_RANK.cc Bif_OPER2_RANK.hh Bif_OPER1_REDUCE.cc \
+	Bif_OPER1_REDUCE.hh Bif_OPER1_SCAN.cc Bif_OPER1_SCAN.hh CDR.cc \
+	CDR.hh Cell.cc Cell.icc Cell.hh Doxy.cc Doxy.hh CharCell.cc \
+	CharCell.hh Command.cc Command.def Command.hh Common.cc \
+	Common.hh ComplexCell.cc ComplexCell.hh configure_args.cc \
+	DiffOut.cc DiffOut.hh DynamicObject.cc DynamicObject.hh \
+	Error.cc Error.def Error.hh Error_macros.hh ErrorCode.hh \
+	Executable.cc Executable.hh FloatCell.cc FloatCell.hh \
+	Function.cc Function.hh DerivedFunction.cc DerivedFunction.hh \
+	Help.def Heapsort.hh Id.cc Id.def Id.hh IndexExpr.cc \
+	IndexExpr.hh IndexIterator.cc IndexIterator.hh InputFile.cc \
+	InputFile.hh IntCell.cc IntCell.hh IO_Files.cc IO_Files.hh \
+	LApack.cc LApack.hh LibPaths.cc LibPaths.hh LineInput.cc \
+	LineInput.hh Logging.cc Logging.def Logging.hh LvalCell.cc \
+	LvalCell.hh makefile.h Malloc_hooks.cc Nabla.cc Nabla.hh \
+	Macro.cc Macro.def Macro.hh NamedObject.cc NamedObject.hh \
+	NativeFunction.cc NativeFunction.hh Native_interface.hh \
+	NumericCell.cc NumericCell.hh Output.cc Output.hh PJob.hh \
+	Parser.cc Parser.hh Prefix.cc Prefix.def Prefix.hh \
+	PointerCell.cc PointerCell.hh PrimitiveFunction.cc \
 	PrimitiveFunction.hh PrimitiveOperator.cc PrimitiveOperator.hh \
 	PrintBuffer.cc PrintBuffer.hh PrintContext.hh PrintOperator.hh \
 	QuadFunction.cc QuadFunction.hh ProcessorID.cc ProcessorID.hh \
@@ -228,20 +229,20 @@ am__dirstamp = $(am__leading_dot)dirstamp
 am__objects_5 = libapl_la-Archive.lo libapl_la-ArrayIterator.lo \
 	libapl_la-Assert.lo libapl_la-Avec.lo libapl_la-Backtrace.lo \
 	libapl_la-Bif_F12_FORMAT.lo libapl_la-Bif_F12_SORT.lo \
-	libapl_la-Bif_OPER1_COMMUTE.lo libapl_la-Bif_OPER1_EACH.lo \
-	libapl_la-Bif_OPER2_POWER.lo libapl_la-Bif_OPER2_INNER.lo \
-	libapl_la-Bif_OPER2_OUTER.lo libapl_la-Bif_OPER2_RANK.lo \
-	libapl_la-Bif_OPER1_REDUCE.lo libapl_la-Bif_OPER1_SCAN.lo \
-	libapl_la-CDR.lo libapl_la-Cell.lo libapl_la-Doxy.lo \
-	libapl_la-CharCell.lo libapl_la-Command.lo libapl_la-Common.lo \
-	libapl_la-ComplexCell.lo libapl_la-configure_args.lo \
-	libapl_la-DiffOut.lo libapl_la-DynamicObject.lo \
-	libapl_la-Error.lo libapl_la-Executable.lo \
-	libapl_la-FloatCell.lo libapl_la-Function.lo \
-	libapl_la-DerivedFunction.lo libapl_la-Id.lo \
-	libapl_la-IndexExpr.lo libapl_la-IndexIterator.lo \
-	libapl_la-InputFile.lo libapl_la-IntCell.lo \
-	libapl_la-IO_Files.lo libapl_la-LApack.lo \
+	libapl_la-Bif_F12_TAKE_DROP.lo libapl_la-Bif_OPER1_COMMUTE.lo \
+	libapl_la-Bif_OPER1_EACH.lo libapl_la-Bif_OPER2_POWER.lo \
+	libapl_la-Bif_OPER2_INNER.lo libapl_la-Bif_OPER2_OUTER.lo \
+	libapl_la-Bif_OPER2_RANK.lo libapl_la-Bif_OPER1_REDUCE.lo \
+	libapl_la-Bif_OPER1_SCAN.lo libapl_la-CDR.lo libapl_la-Cell.lo \
+	libapl_la-Doxy.lo libapl_la-CharCell.lo libapl_la-Command.lo \
+	libapl_la-Common.lo libapl_la-ComplexCell.lo \
+	libapl_la-configure_args.lo libapl_la-DiffOut.lo \
+	libapl_la-DynamicObject.lo libapl_la-Error.lo \
+	libapl_la-Executable.lo libapl_la-FloatCell.lo \
+	libapl_la-Function.lo libapl_la-DerivedFunction.lo \
+	libapl_la-Id.lo libapl_la-IndexExpr.lo \
+	libapl_la-IndexIterator.lo libapl_la-InputFile.lo \
+	libapl_la-IntCell.lo libapl_la-IO_Files.lo libapl_la-LApack.lo \
 	libapl_la-LibPaths.lo libapl_la-LineInput.lo \
 	libapl_la-Logging.lo libapl_la-LvalCell.lo \
 	libapl_la-Malloc_hooks.lo libapl_la-Nabla.lo \
@@ -290,29 +291,30 @@ am__apl_SOURCES_DIST = main.cc buildtag buildtag.hh ../config.h \
 	ArrayIterator.cc ArrayIterator.hh Assert.cc Assert.hh Avec.cc \
 	Avec.def Avec.hh Backtrace.cc Backtrace.hh Bif_F12_FORMAT.cc \
 	Bif_F12_FORMAT.hh Bif_F12_SORT.cc Bif_F12_SORT.hh \
-	Bif_OPER1_COMMUTE.cc Bif_OPER1_COMMUTE.hh Bif_OPER1_EACH.cc \
-	Bif_OPER1_EACH.hh Bif_OPER2_POWER.cc Bif_OPER2_POWER.hh \
-	Bif_OPER2_INNER.cc Bif_OPER2_INNER.hh Bif_OPER2_OUTER.cc \
-	Bif_OPER2_OUTER.hh Bif_OPER2_RANK.cc Bif_OPER2_RANK.hh \
-	Bif_OPER1_REDUCE.cc Bif_OPER1_REDUCE.hh Bif_OPER1_SCAN.cc \
-	Bif_OPER1_SCAN.hh CDR.cc CDR.hh Cell.cc Cell.icc Cell.hh \
-	Doxy.cc Doxy.hh CharCell.cc CharCell.hh Command.cc Command.def \
-	Command.hh Common.cc Common.hh ComplexCell.cc ComplexCell.hh \
-	configure_args.cc DiffOut.cc DiffOut.hh DynamicObject.cc \
-	DynamicObject.hh Error.cc Error.def Error.hh Error_macros.hh \
-	ErrorCode.hh Executable.cc Executable.hh FloatCell.cc \
-	FloatCell.hh Function.cc Function.hh DerivedFunction.cc \
-	DerivedFunction.hh Help.def Heapsort.hh Id.cc Id.def Id.hh \
-	IndexExpr.cc IndexExpr.hh IndexIterator.cc IndexIterator.hh \
-	InputFile.cc InputFile.hh IntCell.cc IntCell.hh IO_Files.cc \
-	IO_Files.hh LApack.cc LApack.hh LibPaths.cc LibPaths.hh \
-	LineInput.cc LineInput.hh Logging.cc Logging.def Logging.hh \
-	LvalCell.cc LvalCell.hh makefile.h Malloc_hooks.cc Nabla.cc \
-	Nabla.hh Macro.cc Macro.def Macro.hh NamedObject.cc \
-	NamedObject.hh NativeFunction.cc NativeFunction.hh \
-	Native_interface.hh NumericCell.cc NumericCell.hh Output.cc \
-	Output.hh PJob.hh Parser.cc Parser.hh Prefix.cc Prefix.def \
-	Prefix.hh PointerCell.cc PointerCell.hh PrimitiveFunction.cc \
+	Bif_F12_TAKE_DROP.cc Bif_F12_TAKE_DROP.hh Bif_OPER1_COMMUTE.cc \
+	Bif_OPER1_COMMUTE.hh Bif_OPER1_EACH.cc Bif_OPER1_EACH.hh \
+	Bif_OPER2_POWER.cc Bif_OPER2_POWER.hh Bif_OPER2_INNER.cc \
+	Bif_OPER2_INNER.hh Bif_OPER2_OUTER.cc Bif_OPER2_OUTER.hh \
+	Bif_OPER2_RANK.cc Bif_OPER2_RANK.hh Bif_OPER1_REDUCE.cc \
+	Bif_OPER1_REDUCE.hh Bif_OPER1_SCAN.cc Bif_OPER1_SCAN.hh CDR.cc \
+	CDR.hh Cell.cc Cell.icc Cell.hh Doxy.cc Doxy.hh CharCell.cc \
+	CharCell.hh Command.cc Command.def Command.hh Common.cc \
+	Common.hh ComplexCell.cc ComplexCell.hh configure_args.cc \
+	DiffOut.cc DiffOut.hh DynamicObject.cc DynamicObject.hh \
+	Error.cc Error.def Error.hh Error_macros.hh ErrorCode.hh \
+	Executable.cc Executable.hh FloatCell.cc FloatCell.hh \
+	Function.cc Function.hh DerivedFunction.cc DerivedFunction.hh \
+	Help.def Heapsort.hh Id.cc Id.def Id.hh IndexExpr.cc \
+	IndexExpr.hh IndexIterator.cc IndexIterator.hh InputFile.cc \
+	InputFile.hh IntCell.cc IntCell.hh IO_Files.cc IO_Files.hh \
+	LApack.cc LApack.hh LibPaths.cc LibPaths.hh LineInput.cc \
+	LineInput.hh Logging.cc Logging.def Logging.hh LvalCell.cc \
+	LvalCell.hh makefile.h Malloc_hooks.cc Nabla.cc Nabla.hh \
+	Macro.cc Macro.def Macro.hh NamedObject.cc NamedObject.hh \
+	NativeFunction.cc NativeFunction.hh Native_interface.hh \
+	NumericCell.cc NumericCell.hh Output.cc Output.hh PJob.hh \
+	Parser.cc Parser.hh Prefix.cc Prefix.def Prefix.hh \
+	PointerCell.cc PointerCell.hh PrimitiveFunction.cc \
 	PrimitiveFunction.hh PrimitiveOperator.cc PrimitiveOperator.hh \
 	PrintBuffer.cc PrintBuffer.hh PrintContext.hh PrintOperator.hh \
 	QuadFunction.cc QuadFunction.hh ProcessorID.cc ProcessorID.hh \
@@ -363,27 +365,28 @@ am__apl_SOURCES_DIST = main.cc buildtag buildtag.hh ../config.h \
 am__objects_10 = apl-Archive.$(OBJEXT) apl-ArrayIterator.$(OBJEXT) \
 	apl-Assert.$(OBJEXT) apl-Avec.$(OBJEXT) \
 	apl-Backtrace.$(OBJEXT) apl-Bif_F12_FORMAT.$(OBJEXT) \
-	apl-Bif_F12_SORT.$(OBJEXT) apl-Bif_OPER1_COMMUTE.$(OBJEXT) \
-	apl-Bif_OPER1_EACH.$(OBJEXT) apl-Bif_OPER2_POWER.$(OBJEXT) \
-	apl-Bif_OPER2_INNER.$(OBJEXT) apl-Bif_OPER2_OUTER.$(OBJEXT) \
-	apl-Bif_OPER2_RANK.$(OBJEXT) apl-Bif_OPER1_REDUCE.$(OBJEXT) \
-	apl-Bif_OPER1_SCAN.$(OBJEXT) apl-CDR.$(OBJEXT) \
-	apl-Cell.$(OBJEXT) apl-Doxy.$(OBJEXT) apl-CharCell.$(OBJEXT) \
-	apl-Command.$(OBJEXT) apl-Common.$(OBJEXT) \
-	apl-ComplexCell.$(OBJEXT) apl-configure_args.$(OBJEXT) \
-	apl-DiffOut.$(OBJEXT) apl-DynamicObject.$(OBJEXT) \
-	apl-Error.$(OBJEXT) apl-Executable.$(OBJEXT) \
-	apl-FloatCell.$(OBJEXT) apl-Function.$(OBJEXT) \
-	apl-DerivedFunction.$(OBJEXT) apl-Id.$(OBJEXT) \
-	apl-IndexExpr.$(OBJEXT) apl-IndexIterator.$(OBJEXT) \
-	apl-InputFile.$(OBJEXT) apl-IntCell.$(OBJEXT) \
-	apl-IO_Files.$(OBJEXT) apl-LApack.$(OBJEXT) \
-	apl-LibPaths.$(OBJEXT) apl-LineInput.$(OBJEXT) \
-	apl-Logging.$(OBJEXT) apl-LvalCell.$(OBJEXT) \
-	apl-Malloc_hooks.$(OBJEXT) apl-Nabla.$(OBJEXT) \
-	apl-Macro.$(OBJEXT) apl-NamedObject.$(OBJEXT) \
-	apl-NativeFunction.$(OBJEXT) apl-NumericCell.$(OBJEXT) \
-	apl-Output.$(OBJEXT) apl-Parser.$(OBJEXT) apl-Prefix.$(OBJEXT) \
+	apl-Bif_F12_SORT.$(OBJEXT) apl-Bif_F12_TAKE_DROP.$(OBJEXT) \
+	apl-Bif_OPER1_COMMUTE.$(OBJEXT) apl-Bif_OPER1_EACH.$(OBJEXT) \
+	apl-Bif_OPER2_POWER.$(OBJEXT) apl-Bif_OPER2_INNER.$(OBJEXT) \
+	apl-Bif_OPER2_OUTER.$(OBJEXT) apl-Bif_OPER2_RANK.$(OBJEXT) \
+	apl-Bif_OPER1_REDUCE.$(OBJEXT) apl-Bif_OPER1_SCAN.$(OBJEXT) \
+	apl-CDR.$(OBJEXT) apl-Cell.$(OBJEXT) apl-Doxy.$(OBJEXT) \
+	apl-CharCell.$(OBJEXT) apl-Command.$(OBJEXT) \
+	apl-Common.$(OBJEXT) apl-ComplexCell.$(OBJEXT) \
+	apl-configure_args.$(OBJEXT) apl-DiffOut.$(OBJEXT) \
+	apl-DynamicObject.$(OBJEXT) apl-Error.$(OBJEXT) \
+	apl-Executable.$(OBJEXT) apl-FloatCell.$(OBJEXT) \
+	apl-Function.$(OBJEXT) apl-DerivedFunction.$(OBJEXT) \
+	apl-Id.$(OBJEXT) apl-IndexExpr.$(OBJEXT) \
+	apl-IndexIterator.$(OBJEXT) apl-InputFile.$(OBJEXT) \
+	apl-IntCell.$(OBJEXT) apl-IO_Files.$(OBJEXT) \
+	apl-LApack.$(OBJEXT) apl-LibPaths.$(OBJEXT) \
+	apl-LineInput.$(OBJEXT) apl-Logging.$(OBJEXT) \
+	apl-LvalCell.$(OBJEXT) apl-Malloc_hooks.$(OBJEXT) \
+	apl-Nabla.$(OBJEXT) apl-Macro.$(OBJEXT) \
+	apl-NamedObject.$(OBJEXT) apl-NativeFunction.$(OBJEXT) \
+	apl-NumericCell.$(OBJEXT) apl-Output.$(OBJEXT) \
+	apl-Parser.$(OBJEXT) apl-Prefix.$(OBJEXT) \
 	apl-PointerCell.$(OBJEXT) apl-PrimitiveFunction.$(OBJEXT) \
 	apl-PrimitiveOperator.$(OBJEXT) apl-PrintBuffer.$(OBJEXT) \
 	apl-QuadFunction.$(OBJEXT) apl-ProcessorID.$(OBJEXT) \
@@ -709,29 +712,30 @@ common_SOURCES = buildtag buildtag.hh ../config.h \
 	ArrayIterator.cc ArrayIterator.hh Assert.cc Assert.hh Avec.cc \
 	Avec.def Avec.hh Backtrace.cc Backtrace.hh Bif_F12_FORMAT.cc \
 	Bif_F12_FORMAT.hh Bif_F12_SORT.cc Bif_F12_SORT.hh \
-	Bif_OPER1_COMMUTE.cc Bif_OPER1_COMMUTE.hh Bif_OPER1_EACH.cc \
-	Bif_OPER1_EACH.hh Bif_OPER2_POWER.cc Bif_OPER2_POWER.hh \
-	Bif_OPER2_INNER.cc Bif_OPER2_INNER.hh Bif_OPER2_OUTER.cc \
-	Bif_OPER2_OUTER.hh Bif_OPER2_RANK.cc Bif_OPER2_RANK.hh \
-	Bif_OPER1_REDUCE.cc Bif_OPER1_REDUCE.hh Bif_OPER1_SCAN.cc \
-	Bif_OPER1_SCAN.hh CDR.cc CDR.hh Cell.cc Cell.icc Cell.hh \
-	Doxy.cc Doxy.hh CharCell.cc CharCell.hh Command.cc Command.def \
-	Command.hh Common.cc Common.hh ComplexCell.cc ComplexCell.hh \
-	configure_args.cc DiffOut.cc DiffOut.hh DynamicObject.cc \
-	DynamicObject.hh Error.cc Error.def Error.hh Error_macros.hh \
-	ErrorCode.hh Executable.cc Executable.hh FloatCell.cc \
-	FloatCell.hh Function.cc Function.hh DerivedFunction.cc \
-	DerivedFunction.hh Help.def Heapsort.hh Id.cc Id.def Id.hh \
-	IndexExpr.cc IndexExpr.hh IndexIterator.cc IndexIterator.hh \
-	InputFile.cc InputFile.hh IntCell.cc IntCell.hh IO_Files.cc \
-	IO_Files.hh LApack.cc LApack.hh LibPaths.cc LibPaths.hh \
-	LineInput.cc LineInput.hh Logging.cc Logging.def Logging.hh \
-	LvalCell.cc LvalCell.hh makefile.h Malloc_hooks.cc Nabla.cc \
-	Nabla.hh Macro.cc Macro.def Macro.hh NamedObject.cc \
-	NamedObject.hh NativeFunction.cc NativeFunction.hh \
-	Native_interface.hh NumericCell.cc NumericCell.hh Output.cc \
-	Output.hh PJob.hh Parser.cc Parser.hh Prefix.cc Prefix.def \
-	Prefix.hh PointerCell.cc PointerCell.hh PrimitiveFunction.cc \
+	Bif_F12_TAKE_DROP.cc Bif_F12_TAKE_DROP.hh Bif_OPER1_COMMUTE.cc \
+	Bif_OPER1_COMMUTE.hh Bif_OPER1_EACH.cc Bif_OPER1_EACH.hh \
+	Bif_OPER2_POWER.cc Bif_OPER2_POWER.hh Bif_OPER2_INNER.cc \
+	Bif_OPER2_INNER.hh Bif_OPER2_OUTER.cc Bif_OPER2_OUTER.hh \
+	Bif_OPER2_RANK.cc Bif_OPER2_RANK.hh Bif_OPER1_REDUCE.cc \
+	Bif_OPER1_REDUCE.hh Bif_OPER1_SCAN.cc Bif_OPER1_SCAN.hh CDR.cc \
+	CDR.hh Cell.cc Cell.icc Cell.hh Doxy.cc Doxy.hh CharCell.cc \
+	CharCell.hh Command.cc Command.def Command.hh Common.cc \
+	Common.hh ComplexCell.cc ComplexCell.hh configure_args.cc \
+	DiffOut.cc DiffOut.hh DynamicObject.cc DynamicObject.hh \
+	Error.cc Error.def Error.hh Error_macros.hh ErrorCode.hh \
+	Executable.cc Executable.hh FloatCell.cc FloatCell.hh \
+	Function.cc Function.hh DerivedFunction.cc DerivedFunction.hh \
+	Help.def Heapsort.hh Id.cc Id.def Id.hh IndexExpr.cc \
+	IndexExpr.hh IndexIterator.cc IndexIterator.hh InputFile.cc \
+	InputFile.hh IntCell.cc IntCell.hh IO_Files.cc IO_Files.hh \
+	LApack.cc LApack.hh LibPaths.cc LibPaths.hh LineInput.cc \
+	LineInput.hh Logging.cc Logging.def Logging.hh LvalCell.cc \
+	LvalCell.hh makefile.h Malloc_hooks.cc Nabla.cc Nabla.hh \
+	Macro.cc Macro.def Macro.hh NamedObject.cc NamedObject.hh \
+	NativeFunction.cc NativeFunction.hh Native_interface.hh \
+	NumericCell.cc NumericCell.hh Output.cc Output.hh PJob.hh \
+	Parser.cc Parser.hh Prefix.cc Prefix.def Prefix.hh \
+	PointerCell.cc PointerCell.hh PrimitiveFunction.cc \
 	PrimitiveFunction.hh PrimitiveOperator.cc PrimitiveOperator.hh \
 	PrintBuffer.cc PrintBuffer.hh PrintContext.hh PrintOperator.hh \
 	QuadFunction.cc QuadFunction.hh ProcessorID.cc ProcessorID.hh \
@@ -954,6 +958,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Backtrace.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Bif_F12_FORMAT.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Bif_F12_SORT.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Bif_F12_TAKE_DROP.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Bif_OPER1_COMMUTE.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Bif_OPER1_EACH.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Bif_OPER1_REDUCE.Po@am__quote@
@@ -1052,6 +1057,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Backtrace.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Bif_F12_FORMAT.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Bif_F12_SORT.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Bif_F12_TAKE_DROP.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Bif_OPER1_COMMUTE.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Bif_OPER1_EACH.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Bif_OPER1_REDUCE.Plo@am__quote@
@@ -1232,6 +1238,13 @@ libapl_la-Bif_F12_SORT.lo: Bif_F12_SORT.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Bif_F12_SORT.cc' object='libapl_la-Bif_F12_SORT.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Bif_F12_SORT.lo `test -f 'Bif_F12_SORT.cc' || echo '$(srcdir)/'`Bif_F12_SORT.cc
+
+libapl_la-Bif_F12_TAKE_DROP.lo: Bif_F12_TAKE_DROP.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Bif_F12_TAKE_DROP.lo -MD -MP -MF $(DEPDIR)/libapl_la-Bif_F12_TAKE_DROP.Tpo -c -o libapl_la-Bif_F12_TAKE_DROP.lo `test -f 'Bif_F12_TAKE_DROP.cc' || echo '$(srcdir)/'`Bif_F12_TAKE_DROP.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-Bif_F12_TAKE_DROP.Tpo $(DEPDIR)/libapl_la-Bif_F12_TAKE_DROP.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Bif_F12_TAKE_DROP.cc' object='libapl_la-Bif_F12_TAKE_DROP.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Bif_F12_TAKE_DROP.lo `test -f 'Bif_F12_TAKE_DROP.cc' || echo '$(srcdir)/'`Bif_F12_TAKE_DROP.cc
 
 libapl_la-Bif_OPER1_COMMUTE.lo: Bif_OPER1_COMMUTE.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Bif_OPER1_COMMUTE.lo -MD -MP -MF $(DEPDIR)/libapl_la-Bif_OPER1_COMMUTE.Tpo -c -o libapl_la-Bif_OPER1_COMMUTE.lo `test -f 'Bif_OPER1_COMMUTE.cc' || echo '$(srcdir)/'`Bif_OPER1_COMMUTE.cc
@@ -2037,6 +2050,20 @@ apl-Bif_F12_SORT.obj: Bif_F12_SORT.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Bif_F12_SORT.cc' object='apl-Bif_F12_SORT.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Bif_F12_SORT.obj `if test -f 'Bif_F12_SORT.cc'; then $(CYGPATH_W) 'Bif_F12_SORT.cc'; else $(CYGPATH_W) '$(srcdir)/Bif_F12_SORT.cc'; fi`
+
+apl-Bif_F12_TAKE_DROP.o: Bif_F12_TAKE_DROP.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Bif_F12_TAKE_DROP.o -MD -MP -MF $(DEPDIR)/apl-Bif_F12_TAKE_DROP.Tpo -c -o apl-Bif_F12_TAKE_DROP.o `test -f 'Bif_F12_TAKE_DROP.cc' || echo '$(srcdir)/'`Bif_F12_TAKE_DROP.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Bif_F12_TAKE_DROP.Tpo $(DEPDIR)/apl-Bif_F12_TAKE_DROP.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Bif_F12_TAKE_DROP.cc' object='apl-Bif_F12_TAKE_DROP.o' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Bif_F12_TAKE_DROP.o `test -f 'Bif_F12_TAKE_DROP.cc' || echo '$(srcdir)/'`Bif_F12_TAKE_DROP.cc
+
+apl-Bif_F12_TAKE_DROP.obj: Bif_F12_TAKE_DROP.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Bif_F12_TAKE_DROP.obj -MD -MP -MF $(DEPDIR)/apl-Bif_F12_TAKE_DROP.Tpo -c -o apl-Bif_F12_TAKE_DROP.obj `if test -f 'Bif_F12_TAKE_DROP.cc'; then $(CYGPATH_W) 'Bif_F12_TAKE_DROP.cc'; else $(CYGPATH_W) '$(srcdir)/Bif_F12_TAKE_DROP.cc'; fi`
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-Bif_F12_TAKE_DROP.Tpo $(DEPDIR)/apl-Bif_F12_TAKE_DROP.Po
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Bif_F12_TAKE_DROP.cc' object='apl-Bif_F12_TAKE_DROP.obj' libtool=no @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Bif_F12_TAKE_DROP.obj `if test -f 'Bif_F12_TAKE_DROP.cc'; then $(CYGPATH_W) 'Bif_F12_TAKE_DROP.cc'; else $(CYGPATH_W) '$(srcdir)/Bif_F12_TAKE_DROP.cc'; fi`
 
 apl-Bif_OPER1_COMMUTE.o: Bif_OPER1_COMMUTE.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Bif_OPER1_COMMUTE.o -MD -MP -MF $(DEPDIR)/apl-Bif_OPER1_COMMUTE.Tpo -c -o apl-Bif_OPER1_COMMUTE.o `test -f 'Bif_OPER1_COMMUTE.cc' || echo '$(srcdir)/'`Bif_OPER1_COMMUTE.cc

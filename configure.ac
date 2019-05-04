@@ -3,6 +3,7 @@
 
 AC_PREREQ([2.65])
 AC_INIT([GNU APL], [1.7], [bug-apl@gnu.org])
+configure_options="$0 $*"
 AC_PREFIX_DEFAULT( /usr/local )
 AC_CONFIG_AUX_DIR([.])
 AC_USE_SYSTEM_EXTENSIONS
@@ -630,4 +631,7 @@ fi
   echo "      installation appears to be missing or incomplete (see details above)"
   echo " "
 fi
+
+echo "configure: saving configure options in $srcdir/configure_options"
+echo "$configure_options" > $srcdir/configure_options
 

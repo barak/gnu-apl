@@ -20,6 +20,7 @@
 
 #include "ArrayIterator.hh"
 #include "Avec.hh"
+#include "Bif_F12_TAKE_DROP.hh"
 #include "IndexIterator.hh"
 #include "CharCell.hh"
 #include "ComplexCell.hh"
