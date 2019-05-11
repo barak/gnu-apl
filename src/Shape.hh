@@ -108,6 +108,10 @@ public:
    ShapeItem get_shape_item(Rank r) const
    { Assert(r < rho_rho);   return rho[r]; }
 
+   /// return the length of dimension \b r
+   ShapeItem get_transposed_shape_item(Rank r) const
+   { Assert(r < rho_rho);   return rho[rho_rho - r - 1]; }
+
    /// return the length of the last dimension
    ShapeItem get_last_shape_item() const
    { Assert(rho_rho > 0);   return rho[rho_rho - 1]; }

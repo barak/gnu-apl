@@ -1179,8 +1179,7 @@ Value_P Z(shape_Z, LOC);
              sh_sub.expand_rank(conformed.get_rank());
              B_sub->set_shape(sh_sub);
 
-             Token T = Bif_F12_TAKE::do_take(conformed, B_sub);
-             Value_P ZZ = T.get_apl_val();
+             Value_P ZZ = Bif_F12_TAKE::do_take(conformed, B_sub);
              loop(zz, conformed_len)
                  Z->next_ravel()->init(ZZ->get_ravel(zz), Z.getref(), LOC);
            }

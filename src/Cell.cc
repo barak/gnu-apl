@@ -76,6 +76,7 @@ Cell::init_type(const Cell & other, Value & cell_owner, const char * loc)
 {
    if (other.is_pointer_cell())
       {
+Q(LOC)
         Value_P sub = other.get_pointer_value()->clone(loc);
         Assert(!sub->is_simple_scalar());
         sub->to_proto();

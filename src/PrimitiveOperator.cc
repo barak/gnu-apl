@@ -18,19 +18,10 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "ArrayIterator.hh"
 #include "Avec.hh"
 #include "Bif_F12_TAKE_DROP.hh"
-#include "IndexIterator.hh"
-#include "CharCell.hh"
-#include "ComplexCell.hh"
-#include "FloatCell.hh"
-#include "IntCell.hh"
-#include "LvalCell.hh"
-#include "PointerCell.hh"
 #include "PrimitiveOperator.hh"
 #include "Value.hh"
-#include "Workspace.hh"
 
 //-----------------------------------------------------------------------------
 Token

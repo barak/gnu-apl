@@ -20,7 +20,6 @@
 
 #include <unistd.h>
 
-#include "ArrayIterator.hh"
 #include "Avec.hh"
 #include "Bif_F12_FORMAT.hh"
 #include "CDR.hh"

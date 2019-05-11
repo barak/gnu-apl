@@ -26,7 +26,7 @@
 ArrayIteratorBase::ArrayIteratorBase(const Shape & shape)
    : max_vals(shape),
      total(0),
-     is_done(false)
+     done(false)
 {
    Assert(!shape.is_empty());
 
@@ -38,18 +38,18 @@ ArrayIteratorBase::ArrayIteratorBase(const Shape & shape)
 //-----------------------------------------------------------------------------
 void ArrayIterator::operator ++()
 {
-   if (is_done)   return;
+   if (done)   return;
 
    ++total;
 
    // max_vals[0] is the highest dimension in APL which increments ar
    // the slowest rate. max_vals[ramk-1] is the fastest.
    //
-   for (Rank r = max_vals.get_rank() - 1; !is_done; --r)
+   for (Rank r = max_vals.get_rank() - 1; !done; --r)
        {
          if (r < 0)
             {
-              is_done = true;
+              done = true;
               return;
             }
 
@@ -64,13 +64,13 @@ void ArrayIterator::operator ++()
 //-----------------------------------------------------------------------------
 void PermutedArrayIterator::operator ++()
 {
-   if(is_done)   return;
+   if(done)   return;
 
-   for (Rank up = max_vals.get_rank() - 1; !is_done; --up)
+   for (Rank up = max_vals.get_rank() - 1; !done; --up)
        {
          if (up < 0)
             {
-              is_done = true;
+              done = true;
               return;
             }
 

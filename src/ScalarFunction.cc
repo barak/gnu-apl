@@ -873,7 +873,7 @@ Value_P Z(B->get_shape(), LOC);
 
 const Cell * cB = &B->get_ravel(0);
 
-   for (ArrayIterator it(B->get_shape()); !it.done(); ++it)
+   for (ArrayIterator it(B->get_shape()); it.more(); ++it)
        {
          ShapeItem a = 0;
          Rank rA = 0;
@@ -906,9 +906,9 @@ PERFORMANCE_START(start_1)
 
 const double qct = Workspace::get_CT();
 Value_P Z(B->get_shape(), LOC);
+Shape shape_A;
 
 const ShapeItem len_Z = Z->element_count();
-Shape shape_A;
 
    if (A->get_rank() > B->get_rank())   // then Z is all zeros.
       {
@@ -935,7 +935,7 @@ Shape shape_A;
             }
        }
 
-   for (ArrayIterator zi(B->get_shape()); !zi.done(); ++zi)
+   for (ArrayIterator zi(B->get_shape()); zi.more(); ++zi)
        {
 PERFORMANCE_START(start_2)
          if (contained(shape_A, &A->get_ravel(0), B, zi.get_values(), qct))
@@ -965,7 +965,7 @@ Bif_F2_FIND::contained(const Shape & shape_A, const Cell * cA,
 
 const Shape weight = B->get_shape().reverse_scan();
 
-   for (ArrayIterator ai(shape_A); !ai.done(); ++ai)
+   for (ArrayIterator ai(shape_A); ai.more(); ++ai)
        {
          const Shape & pos_A = ai.get_values();
          ShapeItem pos_B = 0;

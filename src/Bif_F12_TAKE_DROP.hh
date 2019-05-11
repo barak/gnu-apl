@@ -23,8 +23,7 @@
 
 #include "PrimitiveFunction.hh"
 
-//-----------------------------------------------------------------------------
-
+//=============================================================================
 /** primitive functions Take and First */
 /// The class implementing ↑
 class Bif_F12_TAKE : public NonscalarFunction
@@ -46,7 +45,7 @@ public:
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B);
 
    /// Take from B according to ravel_A
-   static Token do_take(const Shape shape_Zi, Value_P B);
+   static Value_P do_take(const Shape & shape_Zi, Value_P B);
 
    /// Fill Z with B, pad as necessary
    static void fill(const Shape & shape_Zi, Cell * cZ, Value & Z_owner,
@@ -62,8 +61,8 @@ protected:
    /// Take A from B
    Token take(Value_P A, Value_P B);
 };
-//-----------------------------------------------------------------------------
-/** System function drop */
+//=============================================================================
+/** primitive function drop */
 /// The class implementing ↓
 class Bif_F12_DROP : public NonscalarFunction
 {
@@ -85,5 +84,155 @@ public:
 protected:
 
 };
-//-----------------------------------------------------------------------------
+//=============================================================================
+/** A helper class for Bif_F12_TAKE and Bif_F12_DROP. It implements an iterator
+    that iterates over the indices (as dictated by ileft argument A) of the
+    right argument B of A↑B or A↓B,
+ **/
+class TakeDropIterator
+{
+public:
+   TakeDropIterator(bool take, const Shape & sh_A, const Shape & sh_B)
+   : ref_B(sh_B),
+     current_offset(0),
+     outside_B(0),
+     has_overtake(false),
+     done(false)
+      {
+        ShapeItem _weight = 1;
+        loop(r, sh_A.get_rank())
+            {
+              const ShapeItem sA = sh_A.get_transposed_shape_item(r);
+              const ShapeItem sB = sh_B.get_transposed_shape_item(r);
+              ShapeItem _from, _to;
+              if (take)   // sh_A ↑ B
+                 {
+                   if (sA < 0)   // take from end
+                      {
+                        _to   = sB;
+                        _from = sB + sA;   // + since sA < 0
+                      }
+                   else          // take from start
+                      {
+                        _from = 0;
+                        _to   = sA;
+                      }
+
+                   if (_from < 0 || _from >= sB)   outside_B |= 1ULL << r;
+                   if (_from < 0 || _to >= sB)     has_overtake = true;
+                 }
+              else        // sh_A ↓ B
+                 {
+                   if (sA < 0)   // drop from end
+                      {
+                        _from = 0;
+                        _to   = sB + sA;   // + since sA < 0
+                      }
+                   else          // drop from start
+                      {
+                        _from = sA;
+                        _to   = sB;
+                      }
+
+                   if (_from >= _to)   // over-drop
+                      {
+                        _from = 0;
+                        _to   = 0;
+                      }
+                 }
+
+              Assert(_from <= _to);
+
+              _ftwc & ftwc_r = ftwc[r];
+              ftwc_r.from    = _from;
+              ftwc_r.to      = _to;
+              ftwc_r.weight  = _weight;
+              ftwc_r.current = _from;
+              current_offset += _from * _weight;
+
+              if (_from == _to)   done = true;   // empty array
+
+              _weight *= sB;
+            }
+      }
+
+   /// the work-horse of the iterator
+   void operator++()
+      {
+        loop(r, ref_B.get_rank())
+           {
+             _ftwc & ftwc_r = ftwc[r];
+             ++ftwc_r.current;
+              current_offset += ftwc_r.weight;
+              if (has_overtake)
+                 {
+                   if (ftwc_r.current < 0 ||
+                       ftwc_r.current >= ref_B.get_transposed_shape_item(r))
+                      outside_B |= 1ULL << r;
+                   else
+                      outside_B &= ~(1ULL << r);
+                 }
+
+              if (ftwc_r.current < ftwc_r.to)   return;
+
+              // end of dimension reached: reset this dimension
+              // and increment next dimension
+              //
+              current_offset -= ftwc_r.weight * (ftwc_r.current - ftwc_r.from);
+              ftwc_r.current = ftwc_r.from;
+              if (has_overtake)
+                 {
+                   if (ftwc_r.current < 0 ||
+                       ftwc_r.current >= ref_B.get_transposed_shape_item(r))
+                      outside_B |= 1ULL << r;
+                   else
+                      outside_B &= ~(1ULL << r);
+                 }
+           }
+        done = true;
+      }
+
+   /// return true iff this inerator has more items to come.
+   bool more() const   { return !done; }
+
+   /// return the current offset (if inside B) or else -1.
+   ShapeItem operator()() const
+      { return outside_B ? -1 : current_offset; }
+
+protected:
+   /// shape of the source array
+   const Shape & ref_B;
+
+   /// from / to / weight / current
+   struct _ftwc
+      {
+        // the start index (inclusive) for each axis. It can be < 0 for
+         // over-Take from the end.
+         ShapeItem from;
+
+         // the end index (exclusive) for each axis. It can be > dimension
+         // length for over-Take from the start.
+         ShapeItem to;
+
+         /// weight of the dimension
+         ShapeItem weight;
+
+         /// the current index
+         ShapeItem current;
+      } ftwc[MAX_RANK];
+
+
+   /// the current offset from ↑B
+   ShapeItem current_offset;
+
+   /// a bitmask of dimensions with overtake
+   ShapeItem outside_B;
+
+   /// true iff over-Take of at least one dimension
+   bool has_overtake;
+
+   /// true iff this interator has reached its final item
+   bool done;
+};
+//=============================================================================
 #endif // __BIF_F12_TAKE_DROP_HH_DEFINED__

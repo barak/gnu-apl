@@ -182,14 +182,22 @@ public:
    {}
 
    /// overloaded Function::eval_B()
-   virtual Token eval_B(Value_P B);
+   virtual Token eval_B(Value_P B)
+      { return Token(TOK_APL_VALUE1, do_eval_B(B)); }
+
+   /// implementation of eval_B()
+   Value_P do_eval_B(Value_P B);
 
    /// overloaded Function::eval_AB()
    virtual Token eval_AB(Value_P A, Value_P B)
       { return partition(A, B, B->get_rank() - 1); }
 
    /// overloaded Function::eval_XB()
-   virtual Token eval_XB(Value_P X, Value_P B);
+   virtual Token eval_XB(Value_P X, Value_P B)
+      { return Token(TOK_APL_VALUE1, do_eval_XB(X, B)); }
+
+   /// implementation of eval_XB()
+   Value_P do_eval_XB(Value_P X, Value_P B);
 
    /// overloaded Function::eval_AXB()
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B);

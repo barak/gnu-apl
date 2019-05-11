@@ -1171,7 +1171,7 @@ Value_P Z(shape_Z, LOC);
 
 const Cell * cB = &B->get_ravel(0);
 
-   for (ArrayIterator it_Z(shape_Z); !it_Z.done(); ++it_Z)
+   for (ArrayIterator it_Z(shape_Z); it_Z.more(); ++it_Z)
        {
          const Shape idx_B = permute(it_Z.get_values(), A);
          const ShapeItem b = B->get_shape().ravel_pos(idx_B);
@@ -1231,7 +1231,7 @@ Value_P Z(shape_Z, LOC);
 
 const Cell * cB = &B->get_ravel(0);
 
-   for (ArrayIterator it_Z(shape_Z); !it_Z.done(); ++it_Z)
+   for (ArrayIterator it_Z(shape_Z); it_Z.more(); ++it_Z)
        {
          const Shape idx_B = permute(it_Z.get_values(), A);
          const ShapeItem b = B->get_shape().ravel_pos(idx_B);
@@ -1760,24 +1760,23 @@ const Rank axis = Value::get_single_axis(X.get(), B->get_rank());
    return partition(A, B, axis);
 }
 //-----------------------------------------------------------------------------
-Token
-Bif_F12_PARTITION::eval_B(Value_P B)
+Value_P
+Bif_F12_PARTITION::do_eval_B(Value_P B)
 {
-   if (B->is_simple_scalar())   return Token(TOK_APL_VALUE1, B);
+   if (B->is_simple_scalar())   return B;
 
 Value_P Z(LOC);
    new (Z->next_ravel()) PointerCell(B->clone(LOC).get(), Z.getref());
    Z->check_value(LOC);
-   return Token(TOK_APL_VALUE1, Z);
+   return Z;
 }
 //-----------------------------------------------------------------------------
-Token
-Bif_F12_PARTITION::eval_XB(Value_P X, Value_P B)
+Value_P
+Bif_F12_PARTITION::do_eval_XB(Value_P X, Value_P B)
 {
 const Shape shape_X = Value::to_shape(X.get());
 
-Value_P Z = enclose_with_axes(shape_X, B);
-   return Token(TOK_APL_VALUE1, Z);
+   return enclose_with_axes(shape_X, B);
 }
 //-----------------------------------------------------------------------------
 Value_P
@@ -1838,7 +1837,7 @@ Value_P Z(shape_Z, LOC);
          return Z;
       }
 
-   for (ArrayIterator it_Z(shape_Z); !it_Z.done(); ++it_Z)
+   for (ArrayIterator it_Z(shape_Z); it_Z.more(); ++it_Z)
       {
         const ShapeItem off_Z = it_Z.multiply(weight_Z);   // offset in Z
 
@@ -1851,7 +1850,7 @@ Value_P Z(shape_Z, LOC);
            }
         else
            {
-             for (ArrayIterator it_it(item_shape); !it_it.done(); ++it_it)
+             for (ArrayIterator it_it(item_shape); it_it.more(); ++it_it)
                  {
                    const ShapeItem off_B =  // offset in B
                          it_it.multiply(it_weight);
@@ -2145,7 +2144,7 @@ Value_P Z(shape_Z, LOC);
    //
 PermutedArrayIterator it_Z(shape_Z, perm);
 
-   for (ArrayIterator it_B(B->get_shape()); !it_B.done(); ++it_B)
+   for (ArrayIterator it_B(B->get_shape()); it_B.more(); ++it_B)
       {
         const Cell & B_item = B->get_ravel(it_B.get_total());
         const Cell * src = 0;
@@ -2153,7 +2152,7 @@ PermutedArrayIterator it_Z(shape_Z, perm);
            {
              Value_P vB = B_item.get_pointer_value();
              ArrayIterator vB_it(vB->get_shape());
-             for (ArrayIterator it_it(item_shape); !it_it.done(); ++it_it)
+             for (ArrayIterator it_it(item_shape); it_it.more(); ++it_it)
                  {
                    if (vB->get_shape().contains(it_it.get_values()))
                       {
@@ -2171,7 +2170,7 @@ PermutedArrayIterator it_Z(shape_Z, perm);
            }
         else
            {
-             for (ArrayIterator it_it(item_shape); !it_it.done(); ++it_it)
+             for (ArrayIterator it_it(item_shape); it_it.more(); ++it_it)
                  {
                    if (it_it.get_total() == 0)   // first element: use B_item
                       {

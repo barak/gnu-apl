@@ -33,21 +33,9 @@ public:
    /// Contruct an iterator for an array with rank rk and shape sh.
    ArrayIteratorBase(const Shape & sh);
 
-   /// Return true iff the iterator has reached the end of the array.
-   bool done() const
-      { return is_done; }
-
    /// Return true unless the iterator has reached the end of the array.
-   bool not_done() const
-      { return !is_done; }
-
-   /// Get the max index for dimension r.
-   ShapeItem get_max_value(Rank r) const
-      { return max_vals.get_shape_item(r); }
-
-   /// Get the max index for all dimensions.
-   const Shape & get_max_values() const
-      { return max_vals; }
+   bool more() const
+      { return !done; }
 
    /// Get the current index for all dimensions.
    const Shape & get_values() const
@@ -80,7 +68,7 @@ protected:
    ShapeItem total;
 
    /// true, iff the iterator has reached the end of the array.
-   bool is_done;
+   bool done;
 };
 //-----------------------------------------------------------------------------
 /// An iterator counting 0, 1, 2, ... ⍴,shape
@@ -96,11 +84,11 @@ public:
    void operator ++();
 };
 //-----------------------------------------------------------------------------
-/** An iterator counting 0, 1, 2, ... ⍴,shap but with permuted dimensions
+/** An iterator counting 0, 1, 2, ... ⍴,shape but with permuted dimensions
     The permutation is given as a \b Shape. If perm = 0, 1, 2, ... then
     PermutedArrayIterator is the same as ArrayIterator.
  **/
-/// an iterator for arrays with permnutet dimensions
+/// an iterator for arrays with permnuted dimensions
 class PermutedArrayIterator : public ArrayIteratorBase
 {
 public:
