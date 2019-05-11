@@ -26,7 +26,7 @@
 
 //-----------------------------------------------------------------------------
 void
-IndexIterator::increment()
+IndexIterator::operator ++()
 {
    ++pos;
    if (pos >= get_index_count())
@@ -34,11 +34,11 @@ IndexIterator::increment()
          if (upper)
             {
               pos = 0;
-              upper->increment();
+              ++*upper;
             }
          else
             {
-              pos = get_index_count();   // so that done() works
+              pos = get_index_count();   // so that more() works
             }
       }
 
@@ -80,7 +80,7 @@ TrueIndexIterator::TrueIndexIterator(ShapeItem w, Value_P value,
 //=============================================================================
 MultiIndexIterator::MultiIndexIterator(const Shape & shape,
                                        const IndexExpr & IDX)
-   : last_it(0),
+   : highest_it(0),
      lowest_it(0),
      empty(false)
 {
@@ -130,11 +130,11 @@ ShapeItem weight = 1;
          Log(LOG_delete)
             CERR << "new    " << voidP(new_it) << " at " LOC << endl;
 
-         if (last_it)   last_it->set_upper(new_it);
-         else           lowest_it = new_it;
+         if (highest_it)   highest_it->set_upper(new_it);
+         else              lowest_it = new_it;
 
          weight *= sh_r;
-         last_it = new_it;
+         highest_it = new_it;
        }
 }
 //-----------------------------------------------------------------------------
@@ -152,24 +152,16 @@ MultiIndexIterator::~MultiIndexIterator()
 }
 //-----------------------------------------------------------------------------
 ShapeItem
-MultiIndexIterator::next()
+MultiIndexIterator::operator ++(int)
 {
-   Assert(!lowest_it || !done());
+   Assert(!lowest_it || more());
 
 ShapeItem ret = 0;
    for (IndexIterator * it = lowest_it; it; it = it->get_upper())
             ret += it->get_value();
 
-   if (lowest_it)   lowest_it->increment();
+   if (lowest_it)   ++*lowest_it;
    return ret;
-}
-//-----------------------------------------------------------------------------
-bool
-MultiIndexIterator::done() const
-{
-   if (last_it == 0)   return true;
-   if (empty)          return true;
-   return last_it->done();
 }
 //=============================================================================
 

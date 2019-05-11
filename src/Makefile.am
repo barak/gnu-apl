@@ -24,7 +24,7 @@ common_SOURCES =        buildtag		buildtag.hh		\
 						APL_Float_as_class.hh	\
 						APL_types.hh		\
 Archive.cc					Archive.hh		\
-ArrayIterator.cc				ArrayIterator.hh	\
+						ArrayIterator.hh	\
 Assert.cc					Assert.hh		\
 Avec.cc			Avec.def		Avec.hh			\
 Backtrace.cc					Backtrace.hh		\

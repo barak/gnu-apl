@@ -1128,11 +1128,11 @@ const ShapeItem ec_z = Z->element_count();
    // construct iterators.
    // We go from lower indices to higher indices in IX, which
    // means from higher indices to lower indices in this and Z
-   
+   //
    loop(z, ec_z)
-       Z->next_ravel()->init(get_ravel(mult.next()), Z.getref(), LOC);
+       Z->next_ravel()->init(get_ravel(mult++), Z.getref(), LOC);
 
-   Assert(mult.done());
+   Assert(!mult.more());
    Z->check_value(LOC);
    return Z;
 }

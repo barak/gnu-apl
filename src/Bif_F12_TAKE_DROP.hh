@@ -21,6 +21,7 @@
 #ifndef __BIF_F12_TAKE_DROP_HH_DEFINED__
 #define __BIF_F12_TAKE_DROP_HH_DEFINED__
 
+#include "Common.hh"
 #include "PrimitiveFunction.hh"
 
 //=============================================================================
@@ -204,23 +205,7 @@ protected:
    const Shape & ref_B;
 
    /// from / to / weight / current
-   struct _ftwc
-      {
-        // the start index (inclusive) for each axis. It can be < 0 for
-         // over-Take from the end.
-         ShapeItem from;
-
-         // the end index (exclusive) for each axis. It can be > dimension
-         // length for over-Take from the start.
-         ShapeItem to;
-
-         /// weight of the dimension
-         ShapeItem weight;
-
-         /// the current index
-         ShapeItem current;
-      } ftwc[MAX_RANK];
-
+   struct _ftwc ftwc[MAX_RANK];
 
    /// the current offset from ↑B
    ShapeItem current_offset;

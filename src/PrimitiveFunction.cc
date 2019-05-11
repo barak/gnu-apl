@@ -1163,7 +1163,7 @@ Bif_F12_TRANSPOSE::transpose(const Shape & A, Value_P B)
 const Shape shape_Z = permute(B->get_shape(), inverse_permutation(A));
 Value_P Z(shape_Z, LOC);
 
-   if (Z->is_empty())
+   if (shape_Z.is_empty())
       {
          Z->set_default(*B.get(), LOC);
          return Z;
@@ -1173,7 +1173,7 @@ const Cell * cB = &B->get_ravel(0);
 
    for (ArrayIterator it_Z(shape_Z); it_Z.more(); ++it_Z)
        {
-         const Shape idx_B = permute(it_Z.get_values(), A);
+         const Shape idx_B = permute(it_Z.get_offsets(), A);
          const ShapeItem b = B->get_shape().ravel_pos(idx_B);
          Z->next_ravel()->init(cB[b], Z.getref(), LOC);
        }
@@ -1233,7 +1233,7 @@ const Cell * cB = &B->get_ravel(0);
 
    for (ArrayIterator it_Z(shape_Z); it_Z.more(); ++it_Z)
        {
-         const Shape idx_B = permute(it_Z.get_values(), A);
+         const Shape idx_B = permute(it_Z.get_offsets(), A);
          const ShapeItem b = B->get_shape().ravel_pos(idx_B);
          Z->next_ravel()->init(cB[b], Z.getref(), LOC);
        }
@@ -2146,7 +2146,7 @@ PermutedArrayIterator it_Z(shape_Z, perm);
 
    for (ArrayIterator it_B(B->get_shape()); it_B.more(); ++it_B)
       {
-        const Cell & B_item = B->get_ravel(it_B.get_total());
+        const Cell & B_item = B->get_ravel(it_B());
         const Cell * src = 0;
         if (B_item.is_pointer_cell())
            {
@@ -2154,9 +2154,9 @@ PermutedArrayIterator it_Z(shape_Z, perm);
              ArrayIterator vB_it(vB->get_shape());
              for (ArrayIterator it_it(item_shape); it_it.more(); ++it_it)
                  {
-                   if (vB->get_shape().contains(it_it.get_values()))
+                   if (vB->get_shape().contains(it_it.get_offsets()))
                       {
-                        src = &vB->get_ravel(vB_it.get_total());
+                        src = &vB->get_ravel(vB_it());
                         ++vB_it;
                       }
                    else if (vB->get_ravel(0).is_character_cell())  // char
@@ -2164,7 +2164,7 @@ PermutedArrayIterator it_Z(shape_Z, perm);
                    else                                   // simple numeric
                         src = &n_filler;
 
-                   Z->get_ravel(it_Z.get_total()).init(*src, Z.getref(), LOC);
+                   Z->get_ravel(it_Z()).init(*src, Z.getref(), LOC);
                    ++it_Z;
                  }
            }
@@ -2172,7 +2172,7 @@ PermutedArrayIterator it_Z(shape_Z, perm);
            {
              for (ArrayIterator it_it(item_shape); it_it.more(); ++it_it)
                  {
-                   if (it_it.get_total() == 0)   // first element: use B_item
+                   if (it_it() == 0)   // first element: use B_item
                       {
                         src = &B_item;
                       }
@@ -2185,7 +2185,7 @@ PermutedArrayIterator it_Z(shape_Z, perm);
                         src = &n_filler;
                       }
 
-                   Z->get_ravel(it_Z.get_total()).init(*src, Z.getref(), LOC);
+                   Z->get_ravel(it_Z()).init(*src, Z.getref(), LOC);
                    ++it_Z;
                  }
             }

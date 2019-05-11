@@ -150,29 +150,29 @@ LTLIBRARIES = $(pkglib_LTLIBRARIES)
 libapl_la_LIBADD =
 am__libapl_la_SOURCES_DIST = buildtag buildtag.hh ../config.h \
 	APL_Float_as_class.hh APL_types.hh Archive.cc Archive.hh \
-	ArrayIterator.cc ArrayIterator.hh Assert.cc Assert.hh Avec.cc \
-	Avec.def Avec.hh Backtrace.cc Backtrace.hh Bif_F12_FORMAT.cc \
-	Bif_F12_FORMAT.hh Bif_F12_SORT.cc Bif_F12_SORT.hh \
-	Bif_F12_TAKE_DROP.cc Bif_F12_TAKE_DROP.hh Bif_OPER1_COMMUTE.cc \
-	Bif_OPER1_COMMUTE.hh Bif_OPER1_EACH.cc Bif_OPER1_EACH.hh \
-	Bif_OPER2_POWER.cc Bif_OPER2_POWER.hh Bif_OPER2_INNER.cc \
-	Bif_OPER2_INNER.hh Bif_OPER2_OUTER.cc Bif_OPER2_OUTER.hh \
-	Bif_OPER2_RANK.cc Bif_OPER2_RANK.hh Bif_OPER1_REDUCE.cc \
-	Bif_OPER1_REDUCE.hh Bif_OPER1_SCAN.cc Bif_OPER1_SCAN.hh CDR.cc \
-	CDR.hh Cell.cc Cell.icc Cell.hh Doxy.cc Doxy.hh CharCell.cc \
-	CharCell.hh Command.cc Command.def Command.hh Common.cc \
-	Common.hh ComplexCell.cc ComplexCell.hh configure_args.cc \
-	DiffOut.cc DiffOut.hh DynamicObject.cc DynamicObject.hh \
-	Error.cc Error.def Error.hh Error_macros.hh ErrorCode.hh \
-	Executable.cc Executable.hh FloatCell.cc FloatCell.hh \
-	Function.cc Function.hh DerivedFunction.cc DerivedFunction.hh \
-	Help.def Heapsort.hh Id.cc Id.def Id.hh IndexExpr.cc \
-	IndexExpr.hh IndexIterator.cc IndexIterator.hh InputFile.cc \
-	InputFile.hh IntCell.cc IntCell.hh IO_Files.cc IO_Files.hh \
-	LApack.cc LApack.hh LibPaths.cc LibPaths.hh LineInput.cc \
-	LineInput.hh Logging.cc Logging.def Logging.hh LvalCell.cc \
-	LvalCell.hh makefile.h Malloc_hooks.cc Nabla.cc Nabla.hh \
-	Macro.cc Macro.def Macro.hh NamedObject.cc NamedObject.hh \
+	ArrayIterator.hh Assert.cc Assert.hh Avec.cc Avec.def Avec.hh \
+	Backtrace.cc Backtrace.hh Bif_F12_FORMAT.cc Bif_F12_FORMAT.hh \
+	Bif_F12_SORT.cc Bif_F12_SORT.hh Bif_F12_TAKE_DROP.cc \
+	Bif_F12_TAKE_DROP.hh Bif_OPER1_COMMUTE.cc Bif_OPER1_COMMUTE.hh \
+	Bif_OPER1_EACH.cc Bif_OPER1_EACH.hh Bif_OPER2_POWER.cc \
+	Bif_OPER2_POWER.hh Bif_OPER2_INNER.cc Bif_OPER2_INNER.hh \
+	Bif_OPER2_OUTER.cc Bif_OPER2_OUTER.hh Bif_OPER2_RANK.cc \
+	Bif_OPER2_RANK.hh Bif_OPER1_REDUCE.cc Bif_OPER1_REDUCE.hh \
+	Bif_OPER1_SCAN.cc Bif_OPER1_SCAN.hh CDR.cc CDR.hh Cell.cc \
+	Cell.icc Cell.hh Doxy.cc Doxy.hh CharCell.cc CharCell.hh \
+	Command.cc Command.def Command.hh Common.cc Common.hh \
+	ComplexCell.cc ComplexCell.hh configure_args.cc DiffOut.cc \
+	DiffOut.hh DynamicObject.cc DynamicObject.hh Error.cc \
+	Error.def Error.hh Error_macros.hh ErrorCode.hh Executable.cc \
+	Executable.hh FloatCell.cc FloatCell.hh Function.cc \
+	Function.hh DerivedFunction.cc DerivedFunction.hh Help.def \
+	Heapsort.hh Id.cc Id.def Id.hh IndexExpr.cc IndexExpr.hh \
+	IndexIterator.cc IndexIterator.hh InputFile.cc InputFile.hh \
+	IntCell.cc IntCell.hh IO_Files.cc IO_Files.hh LApack.cc \
+	LApack.hh LibPaths.cc LibPaths.hh LineInput.cc LineInput.hh \
+	Logging.cc Logging.def Logging.hh LvalCell.cc LvalCell.hh \
+	makefile.h Malloc_hooks.cc Nabla.cc Nabla.hh Macro.cc \
+	Macro.def Macro.hh NamedObject.cc NamedObject.hh \
 	NativeFunction.cc NativeFunction.hh Native_interface.hh \
 	NumericCell.cc NumericCell.hh Output.cc Output.hh PJob.hh \
 	Parser.cc Parser.hh Prefix.cc Prefix.def Prefix.hh \
@@ -226,8 +226,8 @@ am__dirstamp = $(am__leading_dot)dirstamp
 @POSTGRES_TRUE@	sql/libapl_la-PostgresArgListBuilder.lo \
 @POSTGRES_TRUE@	sql/libapl_la-PostgresConnection.lo \
 @POSTGRES_TRUE@	sql/libapl_la-PostgresProvider.lo
-am__objects_5 = libapl_la-Archive.lo libapl_la-ArrayIterator.lo \
-	libapl_la-Assert.lo libapl_la-Avec.lo libapl_la-Backtrace.lo \
+am__objects_5 = libapl_la-Archive.lo libapl_la-Assert.lo \
+	libapl_la-Avec.lo libapl_la-Backtrace.lo \
 	libapl_la-Bif_F12_FORMAT.lo libapl_la-Bif_F12_SORT.lo \
 	libapl_la-Bif_F12_TAKE_DROP.lo libapl_la-Bif_OPER1_COMMUTE.lo \
 	libapl_la-Bif_OPER1_EACH.lo libapl_la-Bif_OPER2_POWER.lo \
@@ -288,29 +288,29 @@ libapl_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 PROGRAMS = $(bin_PROGRAMS)
 am__apl_SOURCES_DIST = main.cc buildtag buildtag.hh ../config.h \
 	APL_Float_as_class.hh APL_types.hh Archive.cc Archive.hh \
-	ArrayIterator.cc ArrayIterator.hh Assert.cc Assert.hh Avec.cc \
-	Avec.def Avec.hh Backtrace.cc Backtrace.hh Bif_F12_FORMAT.cc \
-	Bif_F12_FORMAT.hh Bif_F12_SORT.cc Bif_F12_SORT.hh \
-	Bif_F12_TAKE_DROP.cc Bif_F12_TAKE_DROP.hh Bif_OPER1_COMMUTE.cc \
-	Bif_OPER1_COMMUTE.hh Bif_OPER1_EACH.cc Bif_OPER1_EACH.hh \
-	Bif_OPER2_POWER.cc Bif_OPER2_POWER.hh Bif_OPER2_INNER.cc \
-	Bif_OPER2_INNER.hh Bif_OPER2_OUTER.cc Bif_OPER2_OUTER.hh \
-	Bif_OPER2_RANK.cc Bif_OPER2_RANK.hh Bif_OPER1_REDUCE.cc \
-	Bif_OPER1_REDUCE.hh Bif_OPER1_SCAN.cc Bif_OPER1_SCAN.hh CDR.cc \
-	CDR.hh Cell.cc Cell.icc Cell.hh Doxy.cc Doxy.hh CharCell.cc \
-	CharCell.hh Command.cc Command.def Command.hh Common.cc \
-	Common.hh ComplexCell.cc ComplexCell.hh configure_args.cc \
-	DiffOut.cc DiffOut.hh DynamicObject.cc DynamicObject.hh \
-	Error.cc Error.def Error.hh Error_macros.hh ErrorCode.hh \
-	Executable.cc Executable.hh FloatCell.cc FloatCell.hh \
-	Function.cc Function.hh DerivedFunction.cc DerivedFunction.hh \
-	Help.def Heapsort.hh Id.cc Id.def Id.hh IndexExpr.cc \
-	IndexExpr.hh IndexIterator.cc IndexIterator.hh InputFile.cc \
-	InputFile.hh IntCell.cc IntCell.hh IO_Files.cc IO_Files.hh \
-	LApack.cc LApack.hh LibPaths.cc LibPaths.hh LineInput.cc \
-	LineInput.hh Logging.cc Logging.def Logging.hh LvalCell.cc \
-	LvalCell.hh makefile.h Malloc_hooks.cc Nabla.cc Nabla.hh \
-	Macro.cc Macro.def Macro.hh NamedObject.cc NamedObject.hh \
+	ArrayIterator.hh Assert.cc Assert.hh Avec.cc Avec.def Avec.hh \
+	Backtrace.cc Backtrace.hh Bif_F12_FORMAT.cc Bif_F12_FORMAT.hh \
+	Bif_F12_SORT.cc Bif_F12_SORT.hh Bif_F12_TAKE_DROP.cc \
+	Bif_F12_TAKE_DROP.hh Bif_OPER1_COMMUTE.cc Bif_OPER1_COMMUTE.hh \
+	Bif_OPER1_EACH.cc Bif_OPER1_EACH.hh Bif_OPER2_POWER.cc \
+	Bif_OPER2_POWER.hh Bif_OPER2_INNER.cc Bif_OPER2_INNER.hh \
+	Bif_OPER2_OUTER.cc Bif_OPER2_OUTER.hh Bif_OPER2_RANK.cc \
+	Bif_OPER2_RANK.hh Bif_OPER1_REDUCE.cc Bif_OPER1_REDUCE.hh \
+	Bif_OPER1_SCAN.cc Bif_OPER1_SCAN.hh CDR.cc CDR.hh Cell.cc \
+	Cell.icc Cell.hh Doxy.cc Doxy.hh CharCell.cc CharCell.hh \
+	Command.cc Command.def Command.hh Common.cc Common.hh \
+	ComplexCell.cc ComplexCell.hh configure_args.cc DiffOut.cc \
+	DiffOut.hh DynamicObject.cc DynamicObject.hh Error.cc \
+	Error.def Error.hh Error_macros.hh ErrorCode.hh Executable.cc \
+	Executable.hh FloatCell.cc FloatCell.hh Function.cc \
+	Function.hh DerivedFunction.cc DerivedFunction.hh Help.def \
+	Heapsort.hh Id.cc Id.def Id.hh IndexExpr.cc IndexExpr.hh \
+	IndexIterator.cc IndexIterator.hh InputFile.cc InputFile.hh \
+	IntCell.cc IntCell.hh IO_Files.cc IO_Files.hh LApack.cc \
+	LApack.hh LibPaths.cc LibPaths.hh LineInput.cc LineInput.hh \
+	Logging.cc Logging.def Logging.hh LvalCell.cc LvalCell.hh \
+	makefile.h Malloc_hooks.cc Nabla.cc Nabla.hh Macro.cc \
+	Macro.def Macro.hh NamedObject.cc NamedObject.hh \
 	NativeFunction.cc NativeFunction.hh Native_interface.hh \
 	NumericCell.cc NumericCell.hh Output.cc Output.hh PJob.hh \
 	Parser.cc Parser.hh Prefix.cc Prefix.def Prefix.hh \
@@ -362,10 +362,10 @@ am__apl_SOURCES_DIST = main.cc buildtag buildtag.hh ../config.h \
 @POSTGRES_TRUE@	sql/apl-PostgresArgListBuilder.$(OBJEXT) \
 @POSTGRES_TRUE@	sql/apl-PostgresConnection.$(OBJEXT) \
 @POSTGRES_TRUE@	sql/apl-PostgresProvider.$(OBJEXT)
-am__objects_10 = apl-Archive.$(OBJEXT) apl-ArrayIterator.$(OBJEXT) \
-	apl-Assert.$(OBJEXT) apl-Avec.$(OBJEXT) \
-	apl-Backtrace.$(OBJEXT) apl-Bif_F12_FORMAT.$(OBJEXT) \
-	apl-Bif_F12_SORT.$(OBJEXT) apl-Bif_F12_TAKE_DROP.$(OBJEXT) \
+am__objects_10 = apl-Archive.$(OBJEXT) apl-Assert.$(OBJEXT) \
+	apl-Avec.$(OBJEXT) apl-Backtrace.$(OBJEXT) \
+	apl-Bif_F12_FORMAT.$(OBJEXT) apl-Bif_F12_SORT.$(OBJEXT) \
+	apl-Bif_F12_TAKE_DROP.$(OBJEXT) \
 	apl-Bif_OPER1_COMMUTE.$(OBJEXT) apl-Bif_OPER1_EACH.$(OBJEXT) \
 	apl-Bif_OPER2_POWER.$(OBJEXT) apl-Bif_OPER2_INNER.$(OBJEXT) \
 	apl-Bif_OPER2_OUTER.$(OBJEXT) apl-Bif_OPER2_RANK.$(OBJEXT) \
@@ -709,29 +709,29 @@ common_CXXFLAGS = -Wall -I sql $(CXX_WERROR) $(am__append_4) \
 common_LDFLAGS = $(am__append_5) $(am__append_9)
 common_SOURCES = buildtag buildtag.hh ../config.h \
 	APL_Float_as_class.hh APL_types.hh Archive.cc Archive.hh \
-	ArrayIterator.cc ArrayIterator.hh Assert.cc Assert.hh Avec.cc \
-	Avec.def Avec.hh Backtrace.cc Backtrace.hh Bif_F12_FORMAT.cc \
-	Bif_F12_FORMAT.hh Bif_F12_SORT.cc Bif_F12_SORT.hh \
-	Bif_F12_TAKE_DROP.cc Bif_F12_TAKE_DROP.hh Bif_OPER1_COMMUTE.cc \
-	Bif_OPER1_COMMUTE.hh Bif_OPER1_EACH.cc Bif_OPER1_EACH.hh \
-	Bif_OPER2_POWER.cc Bif_OPER2_POWER.hh Bif_OPER2_INNER.cc \
-	Bif_OPER2_INNER.hh Bif_OPER2_OUTER.cc Bif_OPER2_OUTER.hh \
-	Bif_OPER2_RANK.cc Bif_OPER2_RANK.hh Bif_OPER1_REDUCE.cc \
-	Bif_OPER1_REDUCE.hh Bif_OPER1_SCAN.cc Bif_OPER1_SCAN.hh CDR.cc \
-	CDR.hh Cell.cc Cell.icc Cell.hh Doxy.cc Doxy.hh CharCell.cc \
-	CharCell.hh Command.cc Command.def Command.hh Common.cc \
-	Common.hh ComplexCell.cc ComplexCell.hh configure_args.cc \
-	DiffOut.cc DiffOut.hh DynamicObject.cc DynamicObject.hh \
-	Error.cc Error.def Error.hh Error_macros.hh ErrorCode.hh \
-	Executable.cc Executable.hh FloatCell.cc FloatCell.hh \
-	Function.cc Function.hh DerivedFunction.cc DerivedFunction.hh \
-	Help.def Heapsort.hh Id.cc Id.def Id.hh IndexExpr.cc \
-	IndexExpr.hh IndexIterator.cc IndexIterator.hh InputFile.cc \
-	InputFile.hh IntCell.cc IntCell.hh IO_Files.cc IO_Files.hh \
-	LApack.cc LApack.hh LibPaths.cc LibPaths.hh LineInput.cc \
-	LineInput.hh Logging.cc Logging.def Logging.hh LvalCell.cc \
-	LvalCell.hh makefile.h Malloc_hooks.cc Nabla.cc Nabla.hh \
-	Macro.cc Macro.def Macro.hh NamedObject.cc NamedObject.hh \
+	ArrayIterator.hh Assert.cc Assert.hh Avec.cc Avec.def Avec.hh \
+	Backtrace.cc Backtrace.hh Bif_F12_FORMAT.cc Bif_F12_FORMAT.hh \
+	Bif_F12_SORT.cc Bif_F12_SORT.hh Bif_F12_TAKE_DROP.cc \
+	Bif_F12_TAKE_DROP.hh Bif_OPER1_COMMUTE.cc Bif_OPER1_COMMUTE.hh \
+	Bif_OPER1_EACH.cc Bif_OPER1_EACH.hh Bif_OPER2_POWER.cc \
+	Bif_OPER2_POWER.hh Bif_OPER2_INNER.cc Bif_OPER2_INNER.hh \
+	Bif_OPER2_OUTER.cc Bif_OPER2_OUTER.hh Bif_OPER2_RANK.cc \
+	Bif_OPER2_RANK.hh Bif_OPER1_REDUCE.cc Bif_OPER1_REDUCE.hh \
+	Bif_OPER1_SCAN.cc Bif_OPER1_SCAN.hh CDR.cc CDR.hh Cell.cc \
+	Cell.icc Cell.hh Doxy.cc Doxy.hh CharCell.cc CharCell.hh \
+	Command.cc Command.def Command.hh Common.cc Common.hh \
+	ComplexCell.cc ComplexCell.hh configure_args.cc DiffOut.cc \
+	DiffOut.hh DynamicObject.cc DynamicObject.hh Error.cc \
+	Error.def Error.hh Error_macros.hh ErrorCode.hh Executable.cc \
+	Executable.hh FloatCell.cc FloatCell.hh Function.cc \
+	Function.hh DerivedFunction.cc DerivedFunction.hh Help.def \
+	Heapsort.hh Id.cc Id.def Id.hh IndexExpr.cc IndexExpr.hh \
+	IndexIterator.cc IndexIterator.hh InputFile.cc InputFile.hh \
+	IntCell.cc IntCell.hh IO_Files.cc IO_Files.hh LApack.cc \
+	LApack.hh LibPaths.cc LibPaths.hh LineInput.cc LineInput.hh \
+	Logging.cc Logging.def Logging.hh LvalCell.cc LvalCell.hh \
+	makefile.h Malloc_hooks.cc Nabla.cc Nabla.hh Macro.cc \
+	Macro.def Macro.hh NamedObject.cc NamedObject.hh \
 	NativeFunction.cc NativeFunction.hh Native_interface.hh \
 	NumericCell.cc NumericCell.hh Output.cc Output.hh PJob.hh \
 	Parser.cc Parser.hh Prefix.cc Prefix.def Prefix.hh \
@@ -952,7 +952,6 @@ distclean-compile:
 	-rm -f *.tab.c
 
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Archive.Po@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-ArrayIterator.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Assert.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Avec.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-Backtrace.Po@am__quote@
@@ -1051,7 +1050,6 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-sbrk.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-static_Objects.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Archive.Plo@am__quote@
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-ArrayIterator.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Assert.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Avec.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Backtrace.Plo@am__quote@
@@ -1196,13 +1194,6 @@ libapl_la-Archive.lo: Archive.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Archive.cc' object='libapl_la-Archive.lo' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-Archive.lo `test -f 'Archive.cc' || echo '$(srcdir)/'`Archive.cc
-
-libapl_la-ArrayIterator.lo: ArrayIterator.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-ArrayIterator.lo -MD -MP -MF $(DEPDIR)/libapl_la-ArrayIterator.Tpo -c -o libapl_la-ArrayIterator.lo `test -f 'ArrayIterator.cc' || echo '$(srcdir)/'`ArrayIterator.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/libapl_la-ArrayIterator.Tpo $(DEPDIR)/libapl_la-ArrayIterator.Plo
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='ArrayIterator.cc' object='libapl_la-ArrayIterator.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -c -o libapl_la-ArrayIterator.lo `test -f 'ArrayIterator.cc' || echo '$(srcdir)/'`ArrayIterator.cc
 
 libapl_la-Assert.lo: Assert.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Assert.lo -MD -MP -MF $(DEPDIR)/libapl_la-Assert.Tpo -c -o libapl_la-Assert.lo `test -f 'Assert.cc' || echo '$(srcdir)/'`Assert.cc
@@ -1966,20 +1957,6 @@ apl-Archive.obj: Archive.cc
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Archive.cc' object='apl-Archive.obj' libtool=no @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-Archive.obj `if test -f 'Archive.cc'; then $(CYGPATH_W) 'Archive.cc'; else $(CYGPATH_W) '$(srcdir)/Archive.cc'; fi`
-
-apl-ArrayIterator.o: ArrayIterator.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-ArrayIterator.o -MD -MP -MF $(DEPDIR)/apl-ArrayIterator.Tpo -c -o apl-ArrayIterator.o `test -f 'ArrayIterator.cc' || echo '$(srcdir)/'`ArrayIterator.cc
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-ArrayIterator.Tpo $(DEPDIR)/apl-ArrayIterator.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='ArrayIterator.cc' object='apl-ArrayIterator.o' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-ArrayIterator.o `test -f 'ArrayIterator.cc' || echo '$(srcdir)/'`ArrayIterator.cc
-
-apl-ArrayIterator.obj: ArrayIterator.cc
-@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-ArrayIterator.obj -MD -MP -MF $(DEPDIR)/apl-ArrayIterator.Tpo -c -o apl-ArrayIterator.obj `if test -f 'ArrayIterator.cc'; then $(CYGPATH_W) 'ArrayIterator.cc'; else $(CYGPATH_W) '$(srcdir)/ArrayIterator.cc'; fi`
-@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/apl-ArrayIterator.Tpo $(DEPDIR)/apl-ArrayIterator.Po
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='ArrayIterator.cc' object='apl-ArrayIterator.obj' libtool=no @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -c -o apl-ArrayIterator.obj `if test -f 'ArrayIterator.cc'; then $(CYGPATH_W) 'ArrayIterator.cc'; else $(CYGPATH_W) '$(srcdir)/ArrayIterator.cc'; fi`
 
 apl-Assert.o: Assert.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(apl_CXXFLAGS) $(CXXFLAGS) -MT apl-Assert.o -MD -MP -MF $(DEPDIR)/apl-Assert.Tpo -c -o apl-Assert.o `test -f 'Assert.cc' || echo '$(srcdir)/'`Assert.cc

@@ -501,7 +501,7 @@ enum AP_num
 /// longest filename
 enum {  APL_PATH_MAX = 4096 };
 //////////////////////////////////////////////////////////////
-// C. structs          i                                    //
+// C. structs                                               //
 //////////////////////////////////////////////////////////////
 
 /// three AP numbers that uniquely identify a processor
@@ -554,6 +554,30 @@ struct labVal
 {
    Symbol      * sym;    ///< The symbol for the label variable.
    Function_Line line;   ///< The line number of the label.
+};
+//-----------------------------------------------------------------------------
+/// The end and the state of an abstract iterator along one axis
+/// (to / weight / current)
+struct _twc
+{
+   // the end index (exclusive) for each axis. It can be > dimension
+   // length for over-Take from the start.
+   ShapeItem to;
+
+   /// weight of the dimension
+   ShapeItem weight;
+
+   /// the current index
+   ShapeItem current;
+};
+//-----------------------------------------------------------------------------
+/// The range and the state of an abstract iterator along one axis
+/// (from / to / weight / current)
+struct _ftwc : public _twc
+{
+   // the start index (inclusive) for each axis. It can be < 0 for
+   // over-Take from the end.
+   ShapeItem from;
 };
 //-----------------------------------------------------------------------------
 

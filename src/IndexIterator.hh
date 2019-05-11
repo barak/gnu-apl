@@ -43,10 +43,10 @@ public:
     virtual ~IndexIterator() {}
 
    /// go the the next index
-   void increment();
+   void operator ++();
 
-   /// true iff this operator has reached the end of the Array cross section.
-   bool done() const   { return pos == count; }
+   /// return true if more indices are coming
+   bool more() const   { return count && pos < count; }
 
    /// return the current index
    virtual ShapeItem get_value() const = 0;
@@ -136,15 +136,16 @@ public:
    /// destructor
    ~MultiIndexIterator();
 
-   /// get the next index (offset into a ravel) and increment iterators
-   ShapeItem next();
+   /// get the current index (offset into a ravel) and increment iterators
+   ShapeItem operator ++(int);
 
-   /// return true if the end of indices was reached.
-   bool done() const;
+   /// return true if more indices are coming
+   bool more() const
+      { return highest_it && highest_it->more(); }
 
 protected:
    /// the iterator for the highest dimension
-   IndexIterator * last_it;
+   IndexIterator * highest_it;
 
    /// the iterator for the lowest dimension
    IndexIterator * lowest_it;

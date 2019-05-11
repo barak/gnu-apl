@@ -307,9 +307,6 @@ protected:
    /// return true iff there is more data in the file
    bool more() const   { return data < file_end; }
 
-   /// return true iff there is no more data in the file
-   bool done() const   { return data >= file_end; }
-
    /// show some characters starting at the current position
    void where(ostream & out);
 

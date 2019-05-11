@@ -26,84 +26,134 @@
 #include "SystemLimits.hh"
 
 //-----------------------------------------------------------------------------
-/// Base class for ArrayIteratorBase and PermutedArrayIterator
-class ArrayIteratorBase
-{
-public:
-   /// Contruct an iterator for an array with rank rk and shape sh.
-   ArrayIteratorBase(const Shape & sh);
-
-   /// Return true unless the iterator has reached the end of the array.
-   bool more() const
-      { return !done; }
-
-   /// Get the current index for all dimensions.
-   const Shape & get_values() const
-      { return values; }
-
-   /// Get the current index for dimension r.
-   ShapeItem get_value(Rank r) const
-      { return values.get_shape_item(r); }
-
-   /// Get the total (the current offset into the ravel).
-   ShapeItem get_total() const
-      { return total; }
-
-   /// multiply values with weight
-   ShapeItem multiply(const Shape & weight)
-      { Assert(values.get_rank() == weight.get_rank());
-        ShapeItem ret = 0;
-        loop(r, weight.get_rank())
-            ret += values.get_shape_item(r) * weight.get_shape_item(r);
-        return ret; }
-
-protected:
-   /// The current indices.
-   Shape values;
-
-   /// The shape of the array.
-   const Shape max_vals;
-
-   /// The current total value
-   ShapeItem total;
-
-   /// true, iff the iterator has reached the end of the array.
-   bool done;
-};
-//-----------------------------------------------------------------------------
 /// An iterator counting 0, 1, 2, ... ⍴,shape
-class ArrayIterator : public ArrayIteratorBase
+class ArrayIterator
 {
 public:
    /// constructor
    ArrayIterator(const Shape & shape)
-   : ArrayIteratorBase(shape)
-   {}
+   : ref_B(shape),
+     current_offset(0),
+     rank(shape.get_rank()),
+     done(false)
+      {
+        ShapeItem _weight = 1;
+        loop(r, rank)
+            {
+              const ShapeItem sB = shape.get_transposed_shape_item(r);
+              _twc & twc_r = twc[r];
 
-   /// increment the iterator
-   void operator ++();
+              twc_r.current = 0;
+              twc_r.to      = sB;
+              twc_r.weight  = _weight;
+
+              if (0 == sB)   done = true;   // empty array
+              _weight *= sB;
+            }
+      }
+
+   /// the work-horse of the iterator
+   void operator++()
+      {
+        ++current_offset;
+        loop(r, rank)
+            {
+             _twc & twc_r = twc[r];
+             ++twc_r.current;
+
+              if (twc_r.current < twc_r.to)   return;
+
+              // end of the axis reached: reset this axis
+              // and increment next axis via loop()
+              //
+              twc_r.current = 0;
+           }
+        done = true;
+      }
+
+   /// return true iff this iterator has more items to come.
+   bool more() const   { return !done; }
+
+   /// Get the current offset for axis r (! mirrored !) .
+   ShapeItem get_offset(Rank r) const
+      { return twc[rank - r - 1].current; }
+
+   /// return the current offset
+   ShapeItem operator()() const
+      { return current_offset; }
+
+   Shape get_offsets() const
+      {
+        Shape ret;
+        loop(r, rank)   ret.add_shape_item(twc[rank - r - 1].current);
+        return ret;
+      }
+
+   /// multiply the current offsets with w and return their sum
+   ShapeItem multiply(const Shape & w) const
+      { Assert1(rank == w.get_rank());
+        ShapeItem ret = 0;
+        loop(r, rank)   ret += twc[rank - r - 1].current * w.get_shape_item(r);
+        return ret; }
+
+protected:
+   /// shape of the array over which we iterate
+   const Shape & ref_B;
+
+   /// _twc means to / weight / current
+   struct _twc twc[MAX_RANK];
+
+   /// the current offset from ↑B
+   ShapeItem current_offset;
+
+   /// the number of axes
+   const Rank rank;
+
+   /// true iff this interator has reached its final item
+   bool done;
 };
 //-----------------------------------------------------------------------------
-/** An iterator counting 0, 1, 2, ... ⍴,shape but with permuted dimensions
+/** An iterator counting 0, 1, 2, ... ⍴,shape but with permuted axes
     The permutation is given as a \b Shape. If perm = 0, 1, 2, ... then
     PermutedArrayIterator is the same as ArrayIterator.
  **/
-/// an iterator for arrays with permnuted dimensions
-class PermutedArrayIterator : public ArrayIteratorBase
+/// an iterator for arrays with permnuted axes
+class PermutedArrayIterator : public ArrayIterator
 {
 public:
    /// constructor
    PermutedArrayIterator(const Shape & shape, const Shape & perm)
-   : ArrayIteratorBase(shape),
+   : ArrayIterator(shape),
      permutation(perm),
      weight(shape.reverse_scan())
-   { Assert(shape.get_rank() == perm.get_rank()); }
+   { Assert(rank == perm.get_rank()); }
 
-   /// Increment the iterator.
-   void operator ++();
+   /// the work-horse of the iterator
+   void operator ++()
+      {
+         if (done)   return;
+
+         loop(upr, rank)   // upr: un-permuted rank
+             {
+               const Axis r = permutation.get_shape_item(rank - upr - 1);
+               _twc & twc_r = twc[rank - r - 1];
+               ++twc_r.current;
+               current_offset += twc_r.weight;
+
+               if (twc_r.current < twc_r.to)   return;
+
+               // end of the axis reached: reset this axis
+               // and increment the next axis via loop()
+               //
+               current_offset -= twc_r.weight * twc_r.current;
+               twc_r.current = 0;
+             }
+
+         done = true;
+      }
 
 protected:
-   /// The current indices.
+   /// The permutation of the indices.
    const Shape permutation;
 
    /// the weights of the indices

@@ -882,7 +882,7 @@ const Cell * cB = &B->get_ravel(0);
                if (axis_in_X[rB])
                   {
                     a += weight_A.get_shape_item(rA++)
-                       * it.get_value(rB);
+                       * it.get_offset(rB);
                   }
              }
 
@@ -938,10 +938,10 @@ const ShapeItem len_Z = Z->element_count();
    for (ArrayIterator zi(B->get_shape()); zi.more(); ++zi)
        {
 PERFORMANCE_START(start_2)
-         if (contained(shape_A, &A->get_ravel(0), B, zi.get_values(), qct))
-            new (&Z->get_ravel(zi.get_total()))   IntCell(1);
+         if (contained(shape_A, &A->get_ravel(0), B, zi.get_offsets(), qct))
+            new (&Z->get_ravel(zi()))   IntCell(1);
          else
-            new (&Z->get_ravel(zi.get_total()))   IntCell(0);
+            new (&Z->get_ravel(zi()))   IntCell(0);
 
 CELL_PERFORMANCE_END(get_statistics_AB(), start_2, zi.get_total())
        }
@@ -967,13 +967,13 @@ const Shape weight = B->get_shape().reverse_scan();
 
    for (ArrayIterator ai(shape_A); ai.more(); ++ai)
        {
-         const Shape & pos_A = ai.get_values();
+         const Shape & pos_A = ai.get_offsets();
          ShapeItem pos_B = 0;
          loop(r, B->get_rank())   pos_B += weight.get_shape_item(r)
                                          * (idx_B.get_shape_item(r)
                                          + pos_A.get_shape_item(r));
 
-         if (!cA[ai.get_total()].equal(B->get_ravel(pos_B), qct))
+         if (!cA[ai()].equal(B->get_ravel(pos_B), qct))
             return false;
        }
 
