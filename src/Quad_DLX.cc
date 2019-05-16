@@ -508,7 +508,7 @@ void
 DLX_Root_Node::solve()
 {
 new_level:
-   Assert(level < cols);
+   Assert(level <= cols);
 
    deep_check();
 
