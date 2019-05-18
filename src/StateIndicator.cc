@@ -287,23 +287,27 @@ const UserFunction * ufun = executable->get_ufun();
         if (err.show_locked || ufun->get_exec_properties()[1])
            {
              locked = true;
-             err.error_message_2 = UCS_string(6, UNI_ASCII_SPACE);
+             snprintf(err.error_message_2, sizeof(err.error_message_2),
+                      "      ");
+             err.left_caret = 6;
            }
         else
            {
-             err.error_message_2 = ufun->get_name_and_line(get_PC());
-             err.error_message_2.append(UNI_ASCII_SPACE);
-             err.error_message_2.append(UNI_ASCII_SPACE);
+             UCS_string ucs(ufun->get_name_and_line(get_PC()));
+             UTF8_string utf(ucs);
+             snprintf(err.error_message_2, sizeof(err.error_message_2),
+                      "%s  ", utf.c_str());
+             err.left_caret = ucs.size() + 2;
            }
       }
    else
       {
-        err.error_message_2 = UCS_string(6, UNI_ASCII_SPACE);
+        snprintf(err.error_message_2, sizeof(err.error_message_2), "      ");
+        err.left_caret = 6;
       }
 
    // prepare third line (carets)
    //
-   err.left_caret = err.error_message_2.size();
    err.right_caret = -1;
 
    if (locked)

@@ -175,14 +175,14 @@ libapl_la_LDFLAGS += -avoid-version
 # libapl_la_LDFLAGS += -shared
 # libapl_la_LDFLAGS += -export-dynamic
 libapl_la_CXXFLAGS = $(common_CXXFLAGS)
-libapl_la_CXXFLAGS += $(GPROF_WANTED) $(CXX_RDYNAMIC)
+libapl_la_CXXFLAGS += $(GCOV_WANTED) $(GPROF_WANTED) $(CXX_RDYNAMIC)
 
 else
 
 bin_PROGRAMS = apl
 apl_SOURCES = main.cc $(common_SOURCES)
 apl_CXXFLAGS = $(common_CXXFLAGS)
-apl_CXXFLAGS += $(GPROF_WANTED) $(CXX_RDYNAMIC)
+apl_CXXFLAGS += $(GCOV_WANTED) $(GPROF_WANTED) $(CXX_RDYNAMIC)
 apl_LDFLAGS = $(common_LDFLAGS)
 
 endif

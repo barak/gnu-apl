@@ -656,6 +656,7 @@ SECURITY_LEVEL_WANTED
 ASSERT_LEVEL_WANTED
 VF_TRACING_WANTED
 DYNAMIC_LOG_WANTED
+GCOV_WANTED
 GPROF_WANTED
 VALUE_HISTORY_WANTED
 PERFORMANCE_COUNTERS_WANTED
@@ -869,6 +870,7 @@ VALUE_CHECK_WANTED
 PERFORMANCE_COUNTERS_WANTED
 VALUE_HISTORY_WANTED
 GPROF_WANTED
+GCOV_WANTED
 DYNAMIC_LOG_WANTED
 VF_TRACING_WANTED
 ASSERT_LEVEL_WANTED
@@ -1569,6 +1571,8 @@ Some influential environment variables:
               default: no
   GPROF_WANTED
               enable gprof (-pg) (see README-2-configure) default: no
+  GCOV_WANTED enable gcov (-fprofile-arcs and -ftest-coverage) (see
+              README-2-configure) default: no
   DYNAMIC_LOG_WANTED
               enable dynamic logging (see README-2-configure) default: no
   VF_TRACING_WANTED
@@ -19202,11 +19206,25 @@ $as_echo "$VALUE_HISTORY_WANTED" >&6; }
 $as_echo_n "checking whether gprof profiling shall be enabled... " >&6; }
 
 if test "x$GPROF_WANTED" = "xyes"; then
-   GPROF_WANTED=-pg
+   GPROF_WANTED="-pg"
    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 else
    GPROF_WANTED=
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+# APL: gcov coverage testing ?
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether gcov coverage testing shall be enabled" >&5
+$as_echo_n "checking whether gcov coverage testing shall be enabled... " >&6; }
+
+if test "x$GCOV_WANTED" = "xyes"; then
+   GCOV_WANTED="--coverage"
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+else
+   GCOV_WANTED=
    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
 fi

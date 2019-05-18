@@ -449,10 +449,22 @@ AC_MSG_CHECKING([whether gprof profiling shall be enabled])
 AC_ARG_VAR(GPROF_WANTED,
    [ enable gprof (-pg) (see README-2-configure) default: no ])
 if test "x$GPROF_WANTED" = "xyes"; then
-   GPROF_WANTED=-pg
+   GPROF_WANTED="-pg"
    AC_MSG_RESULT([yes])
 else
    GPROF_WANTED=
+   AC_MSG_RESULT([no])
+fi
+
+# APL: gcov coverage testing ?
+AC_MSG_CHECKING([whether gcov coverage testing shall be enabled])
+AC_ARG_VAR(GCOV_WANTED,
+   [ enable gcov (-fprofile-arcs and -ftest-coverage) (see README-2-configure) default: no ])
+if test "x$GCOV_WANTED" = "xyes"; then
+   GCOV_WANTED="--coverage"
+   AC_MSG_RESULT([yes])
+else
+   GCOV_WANTED=
    AC_MSG_RESULT([no])
 fi
 

@@ -230,7 +230,13 @@ public:
    Function_PC get_error_PC() const
       { return content[put - 1].pc; } 
 
-   /// set action according to (result-) Token type
+   /// set the prefix parser action
+   void set_action(R_action ra)
+      {
+        action = ra;
+      }
+
+   /// set the prefix parser action according to (result-) Token type
    void set_action(const Token & result)
       {
         switch(result.get_Class())

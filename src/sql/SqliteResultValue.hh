@@ -31,7 +31,8 @@ class ResultValue
 {
 public:
     virtual ~ResultValue() {}
-    virtual void update( Cell *cell, Value & cell_owner ) const = 0;
+    virtual void update(Cell * cell, Value & cell_owner) const = 0;
+   virtual ResultValue * clone() const                         = 0;
 };
 
 class IntResultValue : public ResultValue {
@@ -39,6 +40,7 @@ public:
     IntResultValue( APL_Integer value_in ) : value( value_in ) {}
     virtual ~IntResultValue() {}
     virtual void update( Cell *cell, Value & cell_owner ) const;
+   virtual ResultValue * clone() const { return new IntResultValue(value); }
 
 private:
     APL_Integer value;
@@ -49,6 +51,7 @@ public:
     DoubleResultValue( double value_in ) : value( value_in ) {}
     virtual ~DoubleResultValue() {}
     virtual void update( Cell *cell, Value & cell_owner ) const;
+   virtual ResultValue * clone() const { return new DoubleResultValue(value); }
 
 private:
     double value;
@@ -59,6 +62,7 @@ public:
     NullResultValue() {};
     virtual ~NullResultValue() {}
     virtual void update( Cell *cell, Value & cell_owner ) const;
+   virtual ResultValue * clone() const { return new NullResultValue(); }
 };
 
 class StringResultValue : public ResultValue {
@@ -66,7 +70,8 @@ public:
     StringResultValue( string value_in ) : value( value_in ) {}
     virtual ~StringResultValue() {}
     virtual void update( Cell *cell, Value & cell_owner ) const;
-  
+   virtual ResultValue * clone() const { return new StringResultValue(value); }
+
 private:
     string value;
 };
@@ -74,11 +79,20 @@ private:
 class ResultRow
 {
 public:
-    ResultRow( void ) {}
-    ResultRow( const ResultRow &orig ) : values( orig.values ) {}
-    ~ResultRow() {}
-    void add_values( sqlite3_stmt *statement );
-    const vector<const ResultValue *> &get_values() { return values; }
+    ResultRow() {}
+    ResultRow(const ResultRow & orig)
+       {
+         loop(o, orig.get_values().size())
+             values.push_back(orig.get_values()[o]->clone());
+       }
+
+    ~ResultRow()
+       {
+         loop(v, values.size())   delete values[v];
+       }
+
+    void add_values(sqlite3_stmt * statement);
+    const vector<const ResultValue *> & get_values() const { return values; }
 
 private:
     vector<const ResultValue *> values;

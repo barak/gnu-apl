@@ -262,7 +262,7 @@ const Error * err = 0;
 
 PrintBuffer pb;
    pb.append_ucs(err->get_error_line_1());
-   pb.append_ucs(err->get_error_line_2());
+   pb.append_ucs(UCS_string(UTF8_string(err->get_error_line_2())));
    pb.append_ucs(err->get_error_line_3());
    pb.pad_to_spaces();   // replace pad char by spaces
 Value_P Z(pb, LOC);

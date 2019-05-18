@@ -57,7 +57,7 @@ public:
    {}
 
    /// destructor
-   ~XML_Saving_Archive()   { out.close();  delete values; }
+   ~XML_Saving_Archive()   { out.close();  delete [] values; }
 
    /// an index for \b values
    enum Vid { INVALID_VID = -1 };

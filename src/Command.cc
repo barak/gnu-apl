@@ -262,19 +262,21 @@ Executable * statements = 0;
         UERR << Error::error_name(err.error_code);
         if (Workspace::more_error().size())   UERR << UNI_ASCII_PLUS;
         UERR << endl;
-        if (err.get_error_line_2().size())
+        if (*err.get_error_line_2())
            {
              COUT << "      " << err.get_error_line_2() << endl
                   << "      " << err.get_error_line_3() << endl;
            }
 
         err.print(UERR, LOC);
+        delete statements;
         return;
       }
    catch (...)
       {
         CERR << "*** Command::process_line() caught other exception ***"
              << endl;
+        delete statements;
         cmd_OFF(0);
       }
 
@@ -294,8 +296,6 @@ Executable * statements = 0;
          body[1].get_Class() == TC_END   &&
          body[2].get_tag() == TOK_RETURN_STATS)
         {
-          delete statements;
-
           // remove all SI entries up to (including) the next immediate
           // execution context
           //
@@ -308,6 +308,8 @@ Executable * statements = 0;
                 si->escape();   // pop local vars of user defined functions
                 Workspace::pop_SI(LOC);
               }
+
+          delete statements;
           return;
         }
    }

@@ -1,5 +1,5 @@
 The GNU APL interpreter can be configured by means of ./configure options.
-The standard ./configure options are desctbed in file INSTALL in this directory.
+The standard ./configure options are described in file INSTALL in this directory.
 In addition to the standard options provided by ./configure the following GNU
 APL specific ./configure options are recognized. If an option is NOT given
 on the ./configure command line, then either the default value for the option
@@ -14,7 +14,7 @@ the option will not occur.
 --with-libapl
    This option builds GNU APL as a shared library (libapl.so) rather than an
    integrated executable. This option is often combined with option
-   --with-android, and is automatically set by option --with-erlang. The
+   --with-android, and is automatically set by option --with-Eng. The
    --with-libapl option not only builds approproate Makefiles, but it also
    changes the GNU APL code in some places.
    
@@ -216,10 +216,17 @@ SHORT_VALUE_LENGTH_WANTED=12
 
 
 GPROF_WANTED=yes
-   Setting GPROF_WANTED adds -pg flags to CXXFLAGS and LDFLAGS and that
+   Setting GPROF_WANTED adds the flag -pg to CXXFLAGS and LDFLAGS and that
    enables support for gprof profiling of the apl interpreter. Example:
 
     ./configure GPROF_WANTED=yes
+
+GCOV_WANTED=yes
+   Setting GCOV_WANTED adds the flags -fprofile-arcs and -ftest-coverage flags
+   to CXXFLAGS and that enables support for gcov coverage testing of the apl
+   interpreter. Example:
+
+    ./configure GCOV_WANTED=yes
 
 VISIBLE_MARKERS_WANTED=yes
    GNU APL uses a handful of Unicode characters as internal pad characters

@@ -93,22 +93,21 @@ public:
    bool is_syntax_or_value_error() const;
 
    /// set error line 2 to ucs
-   void set_error_line_2(const UCS_string & ucs, int lcaret, int rcaret)
-      { error_message_2 = ucs; left_caret = lcaret; right_caret = rcaret; }
+   void set_error_line_2(const UCS_string & ucs, int lcaret, int rcaret);
 
    /// return ⎕EM[1;]. This is the first of 3 error lines. It contains the
    /// error name (like SYNTAX ERROR, DOMAIN ERROR, etc) and is subject
    /// to translation
-   const UCS_string & get_error_line_1() const
+   const char * get_error_line_1() const
       { return error_message_1; }
 
    /// clear error line 1
    void clear_error_line_1()
-      { error_message_1.shrink(0); }
+      { *error_message_1 = 0; }
 
    /// return error_message_2. This is the second of 3 error lines.
    /// It contains the failed statement and is NOT subject to translation.
-   const UCS_string & get_error_line_2() const
+   const char * get_error_line_2() const
       { return error_message_2; }
 
    /// return the major class (⎕ET) of the error
@@ -123,7 +122,7 @@ public:
    const char * get_print_loc() const
       { return print_loc; }
 
-   /// compute the caret line. This is the thirs of 3 error lines.
+   /// compute the caret line. This is the third of the 3 error lines.
    /// It contains the failure position the statement and is NOT subject
    /// to translation.
    UCS_string get_error_line_3() const;
@@ -132,7 +131,7 @@ public:
    void print(ostream & out, const char * loc) const;
 
    /// return a string describing the error
-   static const UCS_string error_name(ErrorCode err);
+   static const char * error_name(ErrorCode err);
 
    /// print the 3 error message lines as per ⎕EM
    void print_em(ostream & out, const char * loc);
@@ -149,17 +148,17 @@ protected:
    const char * throw_loc;
 
    /// an optional symbol related to (i.e. triggering) the error
-   UCS_string symbol_name;
+   char symbol_name[60];
 
    /// an optional source file location (for parse errors)
    const char * parser_loc;
 
    /// an optional error text. this text is provided for non-APL errors,
    // for example in ⎕ES
-   UCS_string error_message_1;
+   char error_message_1[40];
 
    /// second line of error message (only valid if error_code != _NO_ERROR)
-   UCS_string error_message_2;
+   char error_message_2[60];
 
    /// display user function and line rather than ⎕ES instruction
    bool show_locked;

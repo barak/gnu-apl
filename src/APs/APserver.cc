@@ -978,7 +978,6 @@ const char * listen_name = APSERVER_PATH;
 bool got_path = false;
 bool got_port = false;
 bool auto_start = false;
-size_t janitor = 0;
 
    for (int a = 1; a < argc; )
        {
@@ -1096,8 +1095,6 @@ const int listen_sock = got_path ? open_UNIX_socket(listen_name)
 
    memset(&db, 0, sizeof(db));
 
-int max_fd = listen_sock;
-
    (verbosity > 0) && cerr << prog << ": entering main loop..." << endl;
    for (;;)
       {
@@ -1107,7 +1104,7 @@ int max_fd = listen_sock;
 
 #ifdef USE_POLL // use poll()
 
-        DynArray(struct pollfd, fds, 2*connected_procs.size() + 1);
+        pollfd fds[2*connected_procs.size() + 1];
         fds[0].fd = listen_sock;
         fds[0].events = POLLIN | POLLPRI;
         int fd_idx = 1;
@@ -1149,6 +1146,9 @@ int max_fd = listen_sock;
              }
 
 #else // use select()
+
+size_t janitor = 0;
+int max_fd = listen_sock;
 
         FD_SET(listen_sock, &read_fds);
         for (size_t j = 0; j < connected_procs.size(); ++j)

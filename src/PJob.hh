@@ -205,7 +205,7 @@ public:
 };
 // ----------------------------------------------------------------------------
 /** a list of parallel jobs. It is used to control the parallel computation
-    of nested results. Initially the Parallel_job_list is create with one
+    of nested results. Initially the Parallel_job_list is created with one
     job. If nested values are encountered they are not computed immediately
     but added to the joblist for later execution.
  **/

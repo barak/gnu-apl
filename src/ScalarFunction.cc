@@ -110,7 +110,7 @@ static volatile _Atomic_word parallel_jobs_lock = 0;
 #endif
 
 PJob_scalar_AB * job_AB = 0;
-PJob_scalar_B  * job_B = 0;
+PJob_scalar_B  * job_B  = 0;
 
 //-----------------------------------------------------------------------------
 Token
@@ -145,7 +145,7 @@ ScalarFunction::do_scalar_B(ErrorCode & ec, Value_P B, prim_f1 fun)
 Value_P Z(B->get_shape(), LOC);
 
    // create a worklist with one item that computes Z. If nested values are
-   // detected when computing Z then jobs for them are added to the worklist.
+   // detected while computing Z then jobs for them are added to the worklist.
    //
    {
      PJob_scalar_B job_B(Z.get(), B.getref());
@@ -363,7 +363,7 @@ const ShapeItem len_Z = shape_Z->get_volume();
 Value_P Z(*shape_Z, LOC);
 
    // create a worklist with one item that computes Z. If nested values are
-   // detected when computing Z then jobs for them are added to the worklist.
+   // detected while computing Z then jobs for them are added to the worklist.
    //
    {
      PJob_scalar_AB job_AB(Z.get(), &A->get_ravel(0), inc_A,
@@ -450,8 +450,8 @@ PERFORMANCE_END(fs_M_join_AB, start_M_join, 1);
                                            0x6B616769);
 
                            PJob_scalar_AB j1(Z1.get(),
-                                                &A1->get_ravel(0), inc_A1,
-                                                &B1->get_ravel(0), inc_B1);
+                                             &A1->get_ravel(0), inc_A1,
+                                             &B1->get_ravel(0), inc_B1);
                            Thread_context::get_master()
                                           .joblist_AB.add_job(j1);
                          }
@@ -477,8 +477,8 @@ PERFORMANCE_END(fs_M_join_AB, start_M_join, 1);
                                                  0x6B616769);
 
                                  PJob_scalar_AB j1(Z1.get(),
-                                                  &A1->get_ravel(0), inc_A1,
-                                                  &cell_B, 0);
+                                                   &A1->get_ravel(0), inc_A1,
+                                                   &cell_B, 0);
                                  Thread_context::get_master().joblist_AB
                                                              .add_job(j1);
                               }
@@ -943,7 +943,7 @@ PERFORMANCE_START(start_2)
          else
             new (&Z->get_ravel(zi()))   IntCell(0);
 
-CELL_PERFORMANCE_END(get_statistics_AB(), start_2, zi.get_total())
+CELL_PERFORMANCE_END(get_statistics_AB(), start_2, B->get_shape().get_volume())
        }
 
 done:

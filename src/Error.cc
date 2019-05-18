@@ -36,8 +36,12 @@ Error::Error(ErrorCode ec, const char * loc)
      right_caret(-1),
      print_loc(0)
 {
-   error_message_1 = error_name(error_code);
-   if (Workspace::more_error().size())   error_message_1.append(UNI_ASCII_PLUS);
+const char more = Workspace::more_error().size() ? '+' : 0;
+   snprintf(error_message_1, sizeof(error_message_1), "%s%c",
+            error_name(error_code), more);
+
+   *symbol_name = 0;
+   *error_message_2 = 0;
 }
 //-----------------------------------------------------------------------------
 void
@@ -65,7 +69,7 @@ Error::print(ostream & out, const char * loc) const
              return;
            }
 
-        if (error_message_1.size())
+        if (*error_message_1)
            {
              out << error_message_1 << endl;
            }
@@ -81,7 +85,7 @@ Error::print(ostream & out, const char * loc) const
         out                   << "   loc:        " << loc         << endl;
         loc = print_loc;
 
-        if (symbol_name.size())
+        if (*symbol_name)
            out                << "   Symbol:     " << symbol_name << endl;
 
         out <<                   "   Thrown at:  " << throw_loc   << endl
@@ -90,19 +94,19 @@ Error::print(ostream & out, const char * loc) const
       }
 }
 //-----------------------------------------------------------------------------
-const UCS_string
+const char *
 Error::error_name(ErrorCode err)
 {
    switch(err)
       {
    /// the cases
 #define err_def(c, txt, _maj, _min) \
-   case E_ ## c:   return UCS_string(UTF8_string(txt));
+   case E_ ## c:   return txt;
 
 #include "Error.def"
       }
 
-   return UCS_string("Unknown Error");
+   return "Unknown Error";
 }
 //-----------------------------------------------------------------------------
 bool
@@ -116,6 +120,16 @@ Error::is_known() const
       }
 
    return false;
+}
+//-----------------------------------------------------------------------------
+void
+Error::set_error_line_2(const UCS_string & ucs, int lcaret, int rcaret)
+{
+UTF8_string utf(ucs);
+   strncpy(error_message_2, utf.c_str(), sizeof(error_message_2));
+   error_message_2[sizeof(error_message_2) - 1] = 0;
+   left_caret = lcaret;
+   right_caret = rcaret;
 }
 //-----------------------------------------------------------------------------
 bool
@@ -158,7 +172,7 @@ Error::print_em(ostream & out, const char * loc)
       }
 
    print_loc = loc;
-   if (get_error_line_1().size())   out << get_error_line_1() << endl;
+   if (*get_error_line_1())   out << get_error_line_1() << endl;
 
    out << get_error_line_2() << endl
        << get_error_line_3() << endl;
@@ -232,7 +246,9 @@ throw_symbol_error(const UCS_string & sym_name, const char * loc)
 
 Error error(E_VALUE_ERROR, loc);
 Error & eref = error;
-   error.symbol_name = sym_name;
+UTF8_string sym_name_utf(sym_name);
+   snprintf(error.symbol_name, sizeof(error.symbol_name), "%s",
+            sym_name_utf.c_str());
    if (Workspace::SI_top())   Workspace::SI_top()->update_error_info(eref);
    throw eref;
 }
@@ -251,10 +267,14 @@ Error::throw_define_error(const UCS_string & fun_name, const UCS_string & cmd,
 
 Error error(E_DEFN_ERROR, loc);
 Error & eref = error;
-   eref.symbol_name = fun_name;
-   eref.error_message_2 = UCS_string(6, UNI_ASCII_SPACE);
-   eref.error_message_2.append(cmd);   // something like ∇FUN[⎕]∇
-   eref.left_caret = error.error_message_2.size() - 1;
+UTF8_string fun_name_utf(fun_name);
+   snprintf(error.symbol_name, sizeof(error.symbol_name), "%s",
+            fun_name_utf.c_str());
+
+UTF8_string cmd_utf(cmd);   // cmd is something like ∇FUN[⎕]∇
+   snprintf(error.error_message_2, sizeof(error.error_message_2),
+            " aaa  %s", cmd_utf.c_str());
+   eref.left_caret = 5 + cmd.size();
    if (Workspace::SI_top())   *Workspace::get_error() = eref;
    throw eref;
 }

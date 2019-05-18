@@ -273,6 +273,11 @@ public:
    static CPU_Number get_CPU(int idx)
       { return all_CPUs[idx]; }
 
+   static void cleanup()
+      {
+        all_CPUs.deallocate();
+      }
+
 protected:
    /// the main() function of the worker threads
    static void * worker_main(void *);

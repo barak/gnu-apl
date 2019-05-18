@@ -184,7 +184,7 @@ Token_string out;
       {
         // find next diamond. If there is one, copy statement in reverse order,
         // append TOK_ENDL, and continue.
-        
+
         // 1. determine statement length
         //
         ShapeItem stat_len = 0;   // statement length, not counting ◊
@@ -335,7 +335,7 @@ void
 Executable::set_error_info(Error & error, Function_PC2 pc_from_to) const
 {
 const ErrorCode ec = error.error_code;
-UCS_string & message_2 = error.error_message_2;
+UCS_string message_2(UTF8_string(error.error_message_2));
 
    // for value errors we point to the failed symbol itself.
    //
@@ -419,6 +419,12 @@ int len_between = 0;   // distance between the carets
          if (q > pc_from_to.high)         len_left += len;
          else if (q > pc_from_to.low)   len_between += len;
        }
+
+   {
+     UTF8_string utf(message_2);
+     strncpy(error.error_message_2, utf.c_str(), sizeof(error.error_message_2));
+     error.error_message_2[sizeof(error.error_message_2) - 1] = 0;
+   }
 
    // Line 3: carets
    //
@@ -889,8 +895,8 @@ ExecuteList * fun = new ExecuteList(data, loc);
       }
    catch (Error err)
       {
-        Error * werr = Workspace::get_error();
-        if (werr)   *werr = err;
+        if (Error * werr = Workspace::get_error())   *werr = err;
+
         delete fun;
         return 0;
       }
@@ -902,7 +908,7 @@ ExecuteList * fun = new ExecuteList(data, loc);
         CERR << "fun->body.size() is " << fun->body.size() << endl;
       }
 
-   // for ⍎ we don't append TOK_END, but only TOK_RETURN_EXEC.
+   // for ⍎ we do not append TOK_END, but only TOK_RETURN_EXEC.
    fun->body.append(Token(TOK_RETURN_EXEC), LOC);
 
    Log(LOG_UserFunction__fix)   fun->print(CERR);
@@ -921,13 +927,20 @@ StatementList * fun = new StatementList(data, loc);
              << "------------------- StatementList::fix() --" << endl;
       }
 
-   {
-     Error * err = Workspace::get_error();
-     if (err)   err->parser_loc = 0;
-   }
+   if (Error * err = Workspace::get_error())   err->parser_loc = 0;
 
-   fun->parse_body_line(Function_Line_0, data, false, false, loc, false);
-   fun->setup_lambdas();
+   try
+      {
+        fun->parse_body_line(Function_Line_0, data, false, false, loc, false);
+        fun->setup_lambdas();
+      }
+   catch (Error & e)
+      {
+        Log(LOG_UserFunction__fix)
+           CERR << "parse_body_line(line 0) failed" << endl;
+        delete fun;
+        throw e;
+      }
 
    Log(LOG_UserFunction__fix)
       {

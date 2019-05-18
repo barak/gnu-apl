@@ -52,32 +52,42 @@ void NullResultValue::update( Cell *cell, Value & cell_owner ) const
     new (cell) PointerCell( Idx0(LOC).get(), cell_owner );
 }
 
-void ResultRow::add_values( sqlite3_stmt *statement )
+void
+ResultRow::add_values( sqlite3_stmt *statement )
 {
-    int n = sqlite3_column_count( statement );
-    for( int i = 0 ; i < n ; i++ ) {
-        ResultValue *value;
-        int type = sqlite3_column_type( statement, i );
-        switch( type ) {
+const int n = sqlite3_column_count( statement );
+    loop(i, n)
+       {
+          ResultValue * value;
+          int type = sqlite3_column_type( statement, i );
+          switch( type ) {
         case SQLITE_INTEGER:
-            value = new IntResultValue( sqlite3_column_int64( statement, i ) );
-            break;
+             value = new IntResultValue(sqlite3_column_int64(statement, i));
+             break;
+
         case SQLITE_FLOAT:
-            value = new DoubleResultValue( sqlite3_column_double( statement, i ) );
-            break;
+             value = new DoubleResultValue(sqlite3_column_double(statement, i));
+             break;
+
         case SQLITE_TEXT:
-            value = new StringResultValue( reinterpret_cast<const char *>( sqlite3_column_text( statement, i ) ) );
-            break;
+             value = new StringResultValue(reinterpret_cast<const char *>
+                      (sqlite3_column_text(statement, i)));
+             break;
+
         case SQLITE_BLOB:
-            value = new NullResultValue();
-            break;
+             value = new NullResultValue();
+             break;
+
         case SQLITE_NULL:
-            value = new NullResultValue();
-            break;
+             value = new NullResultValue();
+             break;
+
         default:
-            CERR << "Unsupported column type, column=" << i << ", type+" << type << endl;
+            CERR << "Unsupported column type, column="
+                 << i << ", type+" << type << endl;
             value = new NullResultValue();
         }
-        values.push_back( value );
+
+        values.push_back(value);
     }
 }

@@ -40,7 +40,8 @@ Prefix::Prefix(StateIndicator & _si, const Token_string & _body)
      body(_body),
      PC(Function_PC_0),
      assign_state(ASS_none),
-     lookahead_high(Function_PC_invalid)
+     lookahead_high(Function_PC_invalid),
+     action(RA_FIXME)
 {
 }
 //-----------------------------------------------------------------------------
@@ -669,6 +670,29 @@ found_prefix:
 
    (this->*best->reduce_fun)();
 
+   if (this != &Workspace::SI_top()->get_prefix())
+      {
+        // the )SI stack was changed by reduce_fun() above.
+        //
+        const StateIndicator * si  = Workspace::SI_top();
+        Assert(si);
+
+        if (const StateIndicator * sip = si->get_parent())
+           {
+             // CERR << "ACTION 1: " << si ->get_prefix().action << endl;
+             // CERR << "PARENT 1: " << sip->get_prefix().action << endl;
+             Assert(si->get_prefix().action == RA_SI_PUSHED
+                || sip->get_prefix().action == RA_SI_PUSHED);
+           }
+        else
+           {
+             // CERR << "ACTION 2: " << si ->get_prefix().action << endl;
+             Assert(si->get_prefix().action == RA_SI_PUSHED);
+           }
+
+        return Token(TOK_SI_PUSHED);
+      }
+
    Log(LOG_prefix_parser)
       CERR << "   reduce_" << best->reduce_name << "() returned: ";
 
@@ -923,21 +947,23 @@ Token result = at0().get_function()->eval_B(at1().get_apl_val());
       {
         if (result.get_tag() == TOK_EA_EXEC)
            {
+             action = RA_SI_PUSHED;
+
              // the macro Quad_EA was called and has returned an action
              // to be performed in the caller. We pop the )SI entry for
-             // Quad_EA continue in the calling prefix parser
+             // Quad_EA and continue in the calling prefix parser
              //
-             action = RA_SI_PUSHED;
              const Cell * info = &result.get_apl_val()->get_ravel(0);
              Workspace::pop_SI(LOC);
              UCS_string stat(*info[1].get_pointer_value());
              if (stat.size())
                 {
-                  // the B side of A ⎕EA B has failed or returned → or →N
+                  // the B side of A ⎕EA B has failed or has returned → or →N
                   // so that stat (which is A or → or →N) shall be executed
                   //
 //                CERR << "⎕ES: ⍎" << stat << endl;
                   Token exec = Bif_F1_EXECUTE::execute_statement(stat);
+
                   if (exec.get_Class() == TC_VALUE)   // ⍎ literal
                      {
                        Workspace::SI_top()->get_prefix().at0().move_1(exec,LOC);
@@ -967,6 +993,7 @@ Token result = at0().get_function()->eval_B(at1().get_apl_val());
                        new (&si_pushed)  Token(TOK_APL_VALUE2, scalar);
                      }
                 }
+             Workspace::SI_top()->get_prefix().set_action(RA_SI_PUSHED);
              return;
            }
 

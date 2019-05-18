@@ -80,6 +80,11 @@ Quad_SQL::Quad_SQL()
    init_provider_map();
 }
 //-----------------------------------------------------------------------------
+Quad_SQL::~Quad_SQL()
+{
+   loop(p, providers.size())   delete providers[p];
+}
+//-----------------------------------------------------------------------------
 static Token list_functions( ostream &out )
 {
     out << "Available function numbers:" << endl

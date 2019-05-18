@@ -443,14 +443,15 @@ Simple_string<const StateIndicator *, false> stack;
              {
                Assert(ufun);
                const Function_PC PC = si->get_prefix().get_error_PC();
-               if (const ErrorCode ec = StateIndicator::get_error(si).error_code)
+               if (const ErrorCode ec =
+                         StateIndicator::get_error(si).error_code)
                   {
                     // get_error_line_2() is something like fun[line] statement.
                     // find the space after fun[line].
                     //
                     int spc2 = 0;
-                    const UCS_string & el2 =
-                          StateIndicator::get_error(si).get_error_line_2();
+                    const UCS_string el2(UTF8_string(
+                          StateIndicator::get_error(si).get_error_line_2()));
                     loop(e, el2.size())
                         {
                           if (el2[e] == ']')

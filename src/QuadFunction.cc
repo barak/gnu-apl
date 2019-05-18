@@ -282,7 +282,10 @@ Quad_EC::eval_B(Value_P B)
 const UCS_string statement_B(*B.get());
 
 ExecuteList * fun = 0;
-   try { fun = ExecuteList::fix(statement_B, LOC); }    catch (...) {}
+   try {
+         fun = ExecuteList::fix(statement_B, LOC);
+       }
+     catch (...) {}
 
    if (fun == 0)
       {
@@ -293,7 +296,9 @@ ExecuteList * fun = 0;
             Z2->next_ravel_Int(Error::error_minor(E_SYNTAX_ERROR));
             Z2->check_value(LOC);
 
-        Value_P Z3(Error::error_name(E_SYNTAX_ERROR), LOC);
+        UTF8_string Z3_utf(Error::error_name(E_SYNTAX_ERROR));
+        UCS_string Z3_ucs(Z3_utf);
+        Value_P Z3(Z3_ucs, LOC);
         Value_P Z(3, LOC);
         Z->next_ravel_Int(0);              // return code = error
         Z->next_ravel_Pointer(Z2.get());   // ⎕ET value
@@ -353,7 +358,7 @@ Value_P Z(3, LOC);
 
         PrintBuffer pb;
         pb.append_ucs(Error::error_name(ec));
-        pb.append_ucs(err.get_error_line_2());
+        pb.append_ucs(UCS_string(UTF8_string(err.get_error_line_2())));
         pb.append_ucs(err.get_error_line_3());
 
         Value_P Z2(2, LOC);
@@ -498,7 +503,7 @@ Quad_ES::eval_B(Value_P B)
 {
 Error error(E_NO_ERROR, LOC);
 const Token ret = event_simulate(0, B, error);
-   if (error.error_code == E_NO_ERROR)   return ret;
+   if (error.error_code == E_NO_ERROR)              return ret;
    if (Workspace::SI_top()->get_safe_execution())   return ret;
 
    throw error;
@@ -533,11 +538,17 @@ const ErrorCode ec = get_error_code(B);
    //
    if (A)                                 // A ⎕ES B
       {
-        error.error_message_1 = *A;
+        UCS_string msg1_ucs(*A);
+        UTF8_string msg1_utf(msg1_ucs);
+        snprintf(error.error_message_1, sizeof(error.error_message_1),
+                 "%s", msg1_utf.c_str());
       }
    else if (error.error_code == E_USER_DEFINED_ERROR)   // ⎕ES with character B
       {
-        error.error_message_1 = UCS_string(*B.get());
+        UCS_string msg1_ucs(*B.get());
+        UTF8_string msg1_utf(msg1_ucs);
+        snprintf(error.error_message_1, sizeof(error.error_message_1),
+                 "%s", msg1_utf.c_str());
       }
    else if (error.is_known())             //  ⎕ES B with known major/minor B
       {
@@ -545,7 +556,7 @@ const ErrorCode ec = get_error_code(B);
       }
    else                                   //  ⎕ES B with unknown major/minor B
       {
-        error.error_message_1.shrink(0);
+        *error.error_message_1 = 0;
       }
 
    error.show_locked = true;
@@ -560,8 +571,9 @@ const ErrorCode ec = get_error_code(B);
              // and B is not empty, the event action is generated as though
              // the function were primitive.
              //
-             error.error_message_2 = UCS_string(6, UNI_ASCII_SPACE);
-             error.error_message_2.append(ufun->get_name());
+             UTF8_string ufun_name(ufun->get_name());
+             snprintf(error.error_message_2, sizeof(error.error_message_2),
+                      "      %s", ufun_name.c_str());
              error.left_caret = 6;
              error.right_caret = -1;
              Workspace::pop_SI(LOC);
@@ -1195,8 +1207,8 @@ const APL_Integer b = B->get_ravel(0).get_near_int();
 
         case 4: if (StateIndicator::get_error(si).error_code)
                    {
-                     const UCS_string & text =
-                           StateIndicator::get_error(si).get_error_line_2();
+                     const UCS_string text(UTF8_string(
+                           StateIndicator::get_error(si).get_error_line_2()));
                      Z = Value_P(text, LOC);
                    }
                 else
@@ -1273,8 +1285,8 @@ ShapeItem z = 0;
 
              case 4:  if (StateIndicator::get_error(si).error_code)
                          {
-                           const UCS_string & text =
-                               StateIndicator::get_error(si).get_error_line_2();
+                           const UCS_string text(UTF8_string(
+                             StateIndicator::get_error(si).get_error_line_2()));
                            new (cZ) PointerCell(Value_P(text, LOC).get(),
                                                 Z.getref());
                          }

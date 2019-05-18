@@ -190,6 +190,9 @@ public:
    /// a list of dyadic PJobs created by this core
    Parallel_job_list<PJob_scalar_AB, false> joblist_AB;
 
+   static void cleanup()
+      { delete [] thread_contexts;   thread_contexts = 0; }
+
 protected:
    /// all thread contexts
    static Thread_context * thread_contexts;

@@ -30,11 +30,13 @@
 #include "LibPaths.hh"
 #include "NativeFunction.hh"
 #include "Output.hh"
+#include "Parallel.hh"
 #include "ProcessorID.hh"
 #include "Quad_WA.hh"
 #include "Svar_DB.hh"
 #include "Symbol.hh"
 #include "StateIndicator.hh"
+#include "Thread_context.hh"
 #include "Token.hh"
 #include "Value.hh"
 #include "UserFunction.hh"
@@ -159,6 +161,10 @@ cleanup(bool soft)
         LineInput::close(false);
 
         Output::reset_colors();
+
+        Thread_context::cleanup();
+
+        Parallel::cleanup();
       }
    else        // minimal clean-up
       {

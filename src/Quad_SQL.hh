@@ -35,6 +35,9 @@ public:
    /// Constructor.
    Quad_SQL();
 
+   /// Destructor
+   ~Quad_SQL();
+
    static Quad_SQL * fun;          ///< Built-in function.
    static Quad_SQL  _fun;          ///< Built-in function.
 

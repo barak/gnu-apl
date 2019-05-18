@@ -152,14 +152,12 @@ public:
 
         extend(items_valid + 1);
 
-        (items + items_valid)->~T();
-        for (ShapeItem s = items_valid; s > pos; --s)   items[s] = items[s - 1];
-        (items + pos)->~T();
+        memmove(items + pos + 1, items + pos , (items_valid - pos) * sizeof(T));
         new (items + pos)   T(t);
         ++items_valid;
       }
 
-   /// forget (snf maybe desctruct) the last item
+   /// forget (and maybe destruct) the last item
     void pop()
       {
         Assert(items_valid > 0);
@@ -220,6 +218,15 @@ public:
         other.items = it;
       }
 
+   /// deallocate memory
+   void deallocate()
+      { 
+        delete [] items;
+        items = 0;
+        items_valid = 0;
+        items_allocated = 0;
+      }
+
 protected:
    /// allocation tuning
    enum
@@ -245,22 +252,11 @@ protected:
 
         T * old_items = items;
         items_allocated = new_size + ADD_ALLOC;
-        items = new T[items_allocated];
-        loop(c, items_valid)
-           {
-              if (has_destructor)   (items + c)->~T();
-              new (items + c) T(old_items[c]);
-           }
+        T * new_items = new T[items_allocated];
+        memcpy(new_items, old_items, items_valid * sizeof(T));
+        memset(old_items, 0, items_valid * sizeof(T));
         delete [] old_items;
-      }
-
-   /// deallocate memory
-   void deallocate()
-      { 
-        delete [] items;
-        items = 0;
-        items_valid = 0;
-        items_allocated = 0;
+        items = new_items;
       }
 
    /// the number of characters allocated
