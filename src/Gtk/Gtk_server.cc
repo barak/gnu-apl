@@ -656,8 +656,10 @@ char * V = TLV + 8;                  // the V part of the TLV buffer
                  return 0;
                }
 
-            const int V_len = (TLV[4] & 0xFF) << 24 | (TLV[5] & 0xFF) << 16
-                            | (TLV[6] & 0xFF) << 8 | (TLV[7] & 0xFF);
+            const unsigned int V_len = (TLV[4] & 0xFF) << 24
+                                     | (TLV[5] & 0xFF) << 16
+                                     | (TLV[6] & 0xFF) << 8
+                                     | (TLV[7] & 0xFF);
 
             if ((V_len + 8) > TLV_buflen)   // re-allocate a larger buffer
                {
@@ -1240,7 +1242,7 @@ top_level_done(GtkWidget * window, gpointer user_data)
    //
 char data[50];
 
-const int slen = snprintf(data, sizeof(data),
+const unsigned int slen = snprintf(data, sizeof(data),
                           "H%s:%s", "top-level", __FUNCTION__);
    if (slen >= sizeof(data))   data[sizeof(data) - 1] = 0;
 

@@ -229,7 +229,10 @@ TD(TOK_INTEGER       , TC_VALUE     , TV_INT  , ID::INTEGER      )
 TD(TOK_REAL          , TC_VALUE     , TV_FLT  , ID::REAL         )
 TD(TOK_COMPLEX       , TC_VALUE     , TV_CPX  , ID::COMPLEX      )
 TD(TOK_ERROR         , TC_SI_LEAVE  , TV_INT  , ID::ERROR        )
-TD(TOK_EA_EXEC       , TC_SI_LEAVE  , TV_VAL  , ID::EA_EXEC      ) // ⎕EA helper
+TD(TOK_QUAD_ES_BRA   , TC_SI_LEAVE  , TV_VAL  , ID::ES_BRA       ) // ⎕ES helper
+TD(TOK_QUAD_ES_COM   , TC_SI_LEAVE  , TV_VAL  , ID::ES_COM       ) // ⎕ES helper
+TD(TOK_QUAD_ES_ERR   , TC_SI_LEAVE  , TV_VAL  , ID::ES_ERR       ) // ⎕ES helper
+TD(TOK_QUAD_ES_ESC   , TC_SI_LEAVE  , TV_VAL  , ID::ES_ESC       ) // ⎕ES helper
 
 #undef TD
 

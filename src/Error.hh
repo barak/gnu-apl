@@ -155,7 +155,7 @@ protected:
 
    /// an optional error text. this text is provided for non-APL errors,
    // for example in ⎕ES
-   char error_message_1[40];
+   char error_message_1[60];
 
    /// second line of error message (only valid if error_code != _NO_ERROR)
    char error_message_2[60];

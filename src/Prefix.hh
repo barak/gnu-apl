@@ -293,6 +293,9 @@ public:
        { Assert1(idx < put);   return content[put - idx - 1]; }
 
 protected:
+   /// a unique identifier
+   const uint64_t instance;
+
    /// the StateIndicator that contains this parser
    StateIndicator & si;
 
@@ -327,6 +330,9 @@ protected:
 
    /// the phrase being reduced (only valid if a phrase was matched)
    const Phrase * best;
+
+   /// a generator for unique identifiers
+   static uint64_t instance_counter;
 };
 //-----------------------------------------------------------------------------
 

@@ -32,9 +32,12 @@
 #include "ValueHistory.hh"
 #include "Workspace.hh"
 
+uint64_t Prefix::instance_counter = 0;
+
 //-----------------------------------------------------------------------------
 Prefix::Prefix(StateIndicator & _si, const Token_string & _body)
-   : si(_si),
+   : instance(++instance_counter),
+     si(_si),
      put(0),
      saved_lookahead(Token(TOK_VOID), Function_PC_invalid),
      body(_body),
@@ -668,28 +671,15 @@ found_prefix:
         --prefix_len;
       }
 
+const uint64_t inst = instance;
    (this->*best->reduce_fun)();
 
-   if (this != &Workspace::SI_top()->get_prefix())
+   if (inst != Workspace::SI_top()->get_prefix().instance)
       {
-        // the )SI stack was changed by reduce_fun() above.
+        // the reduce_fun() above has changed the )SI stack. As a consequence
+        // the 'this' pointer is no longer valid and we must not access members
+        // of this Prefix instance.
         //
-        const StateIndicator * si  = Workspace::SI_top();
-        Assert(si);
-
-        if (const StateIndicator * sip = si->get_parent())
-           {
-             // CERR << "ACTION 1: " << si ->get_prefix().action << endl;
-             // CERR << "PARENT 1: " << sip->get_prefix().action << endl;
-             Assert(si->get_prefix().action == RA_SI_PUSHED
-                || sip->get_prefix().action == RA_SI_PUSHED);
-           }
-        else
-           {
-             // CERR << "ACTION 2: " << si ->get_prefix().action << endl;
-             Assert(si->get_prefix().action == RA_SI_PUSHED);
-           }
-
         return Token(TOK_SI_PUSHED);
       }
 
@@ -945,55 +935,68 @@ Prefix::reduce_MISC_F_B_()
 Token result = at0().get_function()->eval_B(at1().get_apl_val());
    if (result.get_Class() == TC_SI_LEAVE)
       {
-        if (result.get_tag() == TOK_EA_EXEC)
+        if (result.get_tag() == TOK_QUAD_ES_COM)
            {
-             action = RA_SI_PUSHED;
+             StateIndicator * parent = Workspace::SI_top()->get_parent();
+             if (parent)   Workspace::pop_SI(LOC);   // discard caller of ⎕ES
+             const Cell & info = result.get_apl_val()->get_ravel(2);
 
-             // the macro Quad_EA was called and has returned an action
-             // to be performed in the caller. We pop the )SI entry for
-             // Quad_EA and continue in the calling prefix parser
-             //
+             Token & si_pushed = Workspace::SI_top()->get_prefix().at0();
+             Assert(si_pushed.get_tag() == TOK_SI_PUSHED);
+             if (info.is_pointer_cell())
+                {
+                  Value_P val = info.get_pointer_value();
+                  new (&si_pushed)  Token(TOK_APL_VALUE2, val);
+                }
+             else
+                {
+                  Value_P scalar(LOC);
+                  scalar->next_ravel()->init(info, scalar.getref(),LOC);
+                  scalar->check_value(LOC);
+                  new (&si_pushed)  Token(TOK_APL_VALUE2, scalar);
+                }
+             return;
+           }
+
+        if (result.get_tag() == TOK_QUAD_ES_ESC)
+           {
+             StateIndicator * parent = Workspace::SI_top()->get_parent();
+             if (parent)   Workspace::pop_SI(LOC);   // discard caller of ⎕ES
+             UCS_string stat(UTF8_string("→"));
+             Bif_F1_EXECUTE::execute_statement(stat);
+             return;
+           }
+
+        if (result.get_tag() == TOK_QUAD_ES_BRA)
+           {
+             StateIndicator * parent = Workspace::SI_top()->get_parent();
+             if (parent)   Workspace::pop_SI(LOC);   // discard caller of ⎕ES
+             const Cell & info = result.get_apl_val()->get_ravel(2);
+             const APL_Integer line = info.get_int_value();
+             UCS_string stat(UTF8_string("→"));
+             stat.append_number(line);
+             Bif_F1_EXECUTE::execute_statement(stat);
+             return;
+           }
+
+        if (result.get_tag() == TOK_QUAD_ES_ERR)
+           {
+             StateIndicator * parent = Workspace::SI_top()->get_parent();
+             if (parent)   Workspace::pop_SI(LOC);   // discard caller of ⎕ES
              const Cell * info = &result.get_apl_val()->get_ravel(0);
-             Workspace::pop_SI(LOC);
-             UCS_string stat(*info[1].get_pointer_value());
-             if (stat.size())
-                {
-                  // the B side of A ⎕EA B has failed or has returned → or →N
-                  // so that stat (which is A or → or →N) shall be executed
-                  //
-//                CERR << "⎕ES: ⍎" << stat << endl;
-                  Token exec = Bif_F1_EXECUTE::execute_statement(stat);
+             UCS_string stat(         *info[2].get_pointer_value());
+             const APL_Integer major = info[3].get_int_value();
+             const APL_Integer minor = info[4].get_int_value();
+             const ErrorCode ec = ErrorCode(major << 16 | minor);
 
-                  if (exec.get_Class() == TC_VALUE)   // ⍎ literal
-                     {
-                       Workspace::SI_top()->get_prefix().at0().move_1(exec,LOC);
-                       return;
-                     }
-
-                  const APL_Integer major = info[2].get_int_value();
-                  const APL_Integer minor = info[3].get_int_value();
-                  const ErrorCode ec = ErrorCode(major << 16 | minor);
-                  StateIndicator * parent = Workspace::SI_top()->get_parent();
-                  new (&StateIndicator::get_error(parent)) Error(ec, LOC);
-                }
-              else              // committed value
+             Token exec = Bif_F1_EXECUTE::execute_statement(stat);
+             if (exec.get_Class() == TC_VALUE)   // ⍎ literal
                 {
-                  Token & si_pushed = Workspace::SI_top()->get_prefix().at0();
-                  Assert(si_pushed.get_tag() == TOK_SI_PUSHED);
-                  if (info[3].is_pointer_cell())
-                     {
-                       Value_P val = info[3].get_pointer_value();
-                       new (&si_pushed)  Token(TOK_APL_VALUE2, val);
-                     }
-                  else
-                     {
-                       Value_P scalar(LOC);
-                       scalar->next_ravel()->init(info[3], scalar.getref(),LOC);
-                       scalar->check_value(LOC);
-                       new (&si_pushed)  Token(TOK_APL_VALUE2, scalar);
-                     }
+                  Workspace::SI_top()->get_prefix().at0().move_1(exec, LOC);
+                  return;
                 }
-             Workspace::SI_top()->get_prefix().set_action(RA_SI_PUSHED);
+
+             new (&StateIndicator::get_error(parent)) Error(ec, LOC);
              return;
            }
 
@@ -1004,6 +1007,8 @@ Token result = at0().get_function()->eval_B(at1().get_apl_val());
              action = RA_RETURN;
              return;
            }
+
+        // possibly reached (!)
       }
 
    pop_args_push_result(result);

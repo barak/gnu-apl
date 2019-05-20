@@ -517,7 +517,10 @@ Quad_ES::event_simulate(const UCS_string * A, Value_P B, Error & error)
    if (B->element_count() == 0)   return Token();
 
 const ErrorCode ec = get_error_code(B);
-   if (ec == E_QUAD_EA_EXEC)   return Token(TOK_EA_EXEC, B->clone(LOC));
+   if (ec == E_QUAD_ES_BRA)   return Token(TOK_QUAD_ES_BRA, B->clone(LOC));
+   if (ec == E_QUAD_ES_COM)   return Token(TOK_QUAD_ES_COM, B->clone(LOC));
+   if (ec == E_QUAD_ES_ERR)   return Token(TOK_QUAD_ES_ERR, B->clone(LOC));
+   if (ec == E_QUAD_ES_ESC)   return Token(TOK_QUAD_ES_ESC, B->clone(LOC));
 
    new (&error)   Error(ec, error.throw_loc);
 
@@ -556,7 +559,9 @@ const ErrorCode ec = get_error_code(B);
       }
    else                                   //  ⎕ES B with unknown major/minor B
       {
-        *error.error_message_1 = 0;
+        snprintf(error.error_message_1, sizeof(error.error_message_1),
+                 "Unkown error (major %d, minor %d) in ⎕ES B",
+                 error.error_code >> 16, error.error_code & 0xFFFF);
       }
 
    error.show_locked = true;
@@ -598,19 +603,31 @@ Quad_ES::get_error_code(Value_P B)
    //
    // Otherwise, throw an error
 
+   // We extend the standard error codes by a markers E_QUAD_ES_* (10-13) which
+   // are only used by the Macros Z__A_Quad_EA_B and Z__A_Quad_EB_B in order to
+   // return branches and the like as a result.
+
    if (B->get_rank() > 1)   RANK_ERROR;
 
    if (B->element_count() == 0)   return E_NO_ERROR;
    if (B->is_char_string())       return E_USER_DEFINED_ERROR;
 
-const APL_Integer major = B->get_ravel(0).get_near_int();
-   if (major == (E_QUAD_EA_EXEC >> 16) && B->element_count() == 4)
-      return E_QUAD_EA_EXEC;
+const APL_Integer err = (B->get_ravel(0).get_near_int() << 16)
+                      | (B->get_ravel(1).get_near_int() & 0xFFFF);
+
+   if ((err >> 16) == (E_QUAD_ES_BRA >> 16))   // one of the ⎕EA or ⎕EB events
+      {
+        const ShapeItem len_B = B->element_count();
+        if (err == E_QUAD_ES_COM && len_B == 3)   return E_QUAD_ES_COM;
+        if (err == E_QUAD_ES_ERR && len_B == 5)   return E_QUAD_ES_ERR;
+        if (err == E_QUAD_ES_BRA && len_B == 3)   return E_QUAD_ES_BRA;
+        if (err == E_QUAD_ES_ESC && len_B == 2)   return E_QUAD_ES_ESC;
+        DOMAIN_ERROR;
+      }
 
    if (B->element_count() != 2)   LENGTH_ERROR;
-const APL_Integer minor = B->get_ravel(1).get_near_int();
 
-   return ErrorCode(major << 16 | (minor & 0xFFFF));
+   return ErrorCode(err);
 }
 //=============================================================================
 Token
