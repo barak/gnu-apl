@@ -7,12 +7,12 @@ CLEAR WS
 ]log 42
 
 ∇TEST
- '⎕ES''HELLO'''⎕EA'3÷0'
+ '⎕ES "HELLO"' ⎕EA '3÷0'
 ∇
 
 ⎕CR 'TEST'
-TEST                   
- '⎕ES''HELLO'''⎕EA'3÷0'
+TEST                    
+ '⎕ES "HELLO"' ⎕EA '3÷0'
 
 
       TEST

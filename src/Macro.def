@@ -215,11 +215,11 @@ mac_def(Z__Quad_INP_B,
 mac_def(Z__A_Quad_EA_B,
   " Z←A Z__A_Quad_EA_B B;RC;ET;RES\n"
 "     (RC ET RES)←⎕EC B ◊ →(RC=0 1 2 3 4 5)/ERR VAL COM 0 BRA ESC\n"
+"ERR: ⎕ES 100 $FFFF,  (⊂,A),  ET     ⍝ error\n"
 "VAL: Z←RES      ◊ →0                ⍝ non-committed value\n"
-"BRA: ⎕ES 100 ¯1   RES                 ⍝ →N\n"
-"COM: ⎕ES 100 ¯2   RES                 ⍝ committed value\n"
-"ERR: ⎕ES 100 ¯3,  (⊂,A),  ET          ⍝ error\n"
-"ESC: ⎕ES 100 ¯4                       ⍝ →\n")
+"COM: ⎕ES 100 $FFFE   RES            ⍝ committed value\n"
+"BRA: ⎕ES 100 $FFFD   RES            ⍝ →N\n"
+"ESC: ⎕ES 100 $FFFC                  ⍝ →\n")
 
 /// ⎕EB (execute both) helper
 //
@@ -227,11 +227,11 @@ mac_def(Z__A_Quad_EB_B,
   " Z←A Z__A_Quad_EB_B B;RC;ET;RES\n"
 "     (RC ET RES)←⎕EC B ◊ ⍎A\n"
 "     →(RC=0 1 2 3 4 5)/ERR VAL COM 0 BRA ESC\n"
-"VAL: Z←RES      ◊ →0                ⍝ non-committed value\n"
-"BRA: ⎕ES 100 ¯1   RES                 ⍝ →N\n"
-"COM: ⎕ES 100 ¯2   RES                 ⍝ committed value\n"
 "ERR: ⎕ES ET     ◊ →0                ⍝ error\n"
-"ESC: ⎕ES 100 ¯4                       ⍝ →\n")
+"VAL: Z←RES      ◊ →0                ⍝ non-committed value\n"
+"COM: ⎕ES 100 $FFFE   RES            ⍝ committed value\n"
+"BRA: ⎕ES 100 $FFFD   RES            ⍝ →N\n"
+"ESC: ⎕ES 100 $FFFC                  ⍝ →\n")
 
 /// inner product with A and B of rank ≤ 1
 //

@@ -613,7 +613,7 @@ Quad_ES::get_error_code(Value_P B)
    if (B->is_char_string())       return E_USER_DEFINED_ERROR;
 
 const APL_Integer err = (B->get_ravel(0).get_near_int() << 16)
-                      | (B->get_ravel(1).get_near_int() & 0xFFFF);
+                      | (B->get_ravel(1).get_near_int());
 
    if ((err >> 16) == (E_QUAD_ES_BRA >> 16))   // one of the ⎕EA or ⎕EB events
       {

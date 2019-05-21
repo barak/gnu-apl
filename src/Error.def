@@ -90,9 +90,9 @@ err_def(COMMAND_PUSHED,      "Command Pushed"                  ,   9,      1 )
 err_def(COPY_PENDING,        "*** )COPY Pending"               ,   9,      2 )
 
 // error codes used internally by macros Z__A_Quad_EA_B and Z__A_Quad_EB_B
-err_def(QUAD_ES_BRA,         "⎕ES (→N)"                        , 100, 0xFFFF )
+err_def(QUAD_ES_ERR,         "⎕ES (Error)"                     , 100, 0xFFFF )
 err_def(QUAD_ES_COM,         "⎕ES (Committed Value)"           , 100, 0xFFFE )
-err_def(QUAD_ES_ERR,         "⎕ES (Error)"                     , 100, 0xFFFD )
+err_def(QUAD_ES_BRA,         "⎕ES (→N)"                        , 100, 0xFFFD )
 err_def(QUAD_ES_ESC,         "⎕ES (→)"                         , 100, 0xFFFC )
 
 #undef err_def

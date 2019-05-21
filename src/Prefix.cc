@@ -935,23 +935,41 @@ Prefix::reduce_MISC_F_B_()
 Token result = at0().get_function()->eval_B(at1().get_apl_val());
    if (result.get_Class() == TC_SI_LEAVE)
       {
+        if (result.get_tag() == TOK_SI_PUSHED)   goto done;
+
+        /* NOTE: the tags TOK_QUAD_ES_COM, TOK_QUAD_ES_ESC, TOK_QUAD_ES_BRA,
+                 and TOK_QUAD_ES_ERR below can only occur if:
+
+            1. ⎕EA resp. ⎕EB is called, which are implemented as macros
+               Z__A_Quad_EA_B resp. Z__A_Quad_EB_B.
+
+            2. The macro calls ⎕ES 100 ¯1...¯4, which brings us here.
+
+            We must check that ⎕ES 100 was not called directly, but only via
+            ⎕EA or ⎕EB.
+         */
+
         if (result.get_tag() == TOK_QUAD_ES_COM)
            {
-             StateIndicator * parent = Workspace::SI_top()->get_parent();
-             if (parent)   Workspace::pop_SI(LOC);   // discard caller of ⎕ES
-             const Cell & info = result.get_apl_val()->get_ravel(2);
+             // make sure that ⎕ES was called from a macro (implies parent)
+             //
+             if (Workspace::SI_top()->function_name()[0] != UNI_MUE)
+                DOMAIN_ERROR;
 
+             Workspace::pop_SI(LOC);   // discard ⎕EA/⎕EB context
+
+             const Cell & QES_arg2 = result.get_apl_val()->get_ravel(2);
              Token & si_pushed = Workspace::SI_top()->get_prefix().at0();
              Assert(si_pushed.get_tag() == TOK_SI_PUSHED);
-             if (info.is_pointer_cell())
+             if (QES_arg2.is_pointer_cell())
                 {
-                  Value_P val = info.get_pointer_value();
+                  Value_P val = QES_arg2.get_pointer_value();
                   new (&si_pushed)  Token(TOK_APL_VALUE2, val);
                 }
              else
                 {
                   Value_P scalar(LOC);
-                  scalar->next_ravel()->init(info, scalar.getref(),LOC);
+                  scalar->next_ravel()->init(QES_arg2, scalar.getref(),LOC);
                   scalar->check_value(LOC);
                   new (&si_pushed)  Token(TOK_APL_VALUE2, scalar);
                 }
@@ -960,46 +978,69 @@ Token result = at0().get_function()->eval_B(at1().get_apl_val());
 
         if (result.get_tag() == TOK_QUAD_ES_ESC)
            {
-             StateIndicator * parent = Workspace::SI_top()->get_parent();
-             if (parent)   Workspace::pop_SI(LOC);   // discard caller of ⎕ES
-             UCS_string stat(UTF8_string("→"));
-             Bif_F1_EXECUTE::execute_statement(stat);
+             // make sure that ⎕ES was called from a macro (implies parent)
+             //
+             if (Workspace::SI_top()->function_name()[0] != UNI_MUE)
+                DOMAIN_ERROR;
+
+             Workspace::pop_SI(LOC);   // discard the ⎕EA/⎕EB context
+
+             Token & si_pushed = Workspace::SI_top()->get_prefix().at0();
+             Assert(si_pushed.get_tag() == TOK_SI_PUSHED);
+             new (&si_pushed)  Token(TOK_ESCAPE);
              return;
            }
 
         if (result.get_tag() == TOK_QUAD_ES_BRA)
            {
-             StateIndicator * parent = Workspace::SI_top()->get_parent();
-             if (parent)   Workspace::pop_SI(LOC);   // discard caller of ⎕ES
-             const Cell & info = result.get_apl_val()->get_ravel(2);
-             const APL_Integer line = info.get_int_value();
-             UCS_string stat(UTF8_string("→"));
-             stat.append_number(line);
-             Bif_F1_EXECUTE::execute_statement(stat);
+             // make sure that ⎕ES was called from a macro (implies parent)
+             //
+             if (Workspace::SI_top()->function_name()[0] != UNI_MUE)
+                DOMAIN_ERROR;
+
+             Workspace::pop_SI(LOC);   // discard the ⎕EA/⎕EB context
+
+             const Cell & QES_arg2 = result.get_apl_val()->get_ravel(2);
+             const APL_Integer line = QES_arg2.get_int_value();
+
+             Token & si_pushed = Workspace::SI_top()->get_prefix().at0();
+             Assert(si_pushed.get_tag() == TOK_SI_PUSHED);
+
+             Workspace::SI_top()->jump(IntScalar(line, LOC));
              return;
            }
 
         if (result.get_tag() == TOK_QUAD_ES_ERR)
            {
-             StateIndicator * parent = Workspace::SI_top()->get_parent();
-             if (parent)   Workspace::pop_SI(LOC);   // discard caller of ⎕ES
-             const Cell * info = &result.get_apl_val()->get_ravel(0);
-             UCS_string stat(         *info[2].get_pointer_value());
-             const APL_Integer major = info[3].get_int_value();
-             const APL_Integer minor = info[4].get_int_value();
+             // this case can only occur with ⎕EA, but not with ⎕EB.
+
+             // make sure that ⎕ES was called from a macro (implies parent)
+             //
+             if (Workspace::SI_top()->function_name()[0] != UNI_MUE)
+                DOMAIN_ERROR;
+
+             Workspace::pop_SI(LOC);   // discard the ⎕EA/⎕EB context
+             StateIndicator * top = Workspace::SI_top();
+
+             const Cell * QES_arg = &result.get_apl_val()->get_ravel(0);
+             UCS_string statement_A(   QES_arg[2].get_pointer_value().getref());
+             const APL_Integer major = QES_arg[3].get_int_value();
+             const APL_Integer minor = QES_arg[4].get_int_value();
              const ErrorCode ec = ErrorCode(major << 16 | minor);
 
-             Token exec = Bif_F1_EXECUTE::execute_statement(stat);
-             if (exec.get_Class() == TC_VALUE)   // ⍎ literal
+             Token result_A = Bif_F1_EXECUTE::execute_statement(statement_A);
+             if (result_A.get_Class() == TC_VALUE)   // ⍎ literal
                 {
-                  Workspace::SI_top()->get_prefix().at0().move_1(exec, LOC);
+                  Workspace::SI_top()->get_prefix().at0().move_1(result_A, LOC);
                   return;
                 }
-
-             new (&StateIndicator::get_error(parent)) Error(ec, LOC);
+             new (&StateIndicator::get_error(top)) Error(ec, LOC);
              return;
            }
 
+        // at this point a normal monadic function (i.e. other than ⎕EA/⎕EB)
+        // has returned an error
+        //
         if (result.get_tag() == TOK_ERROR)
            {
              Token_loc tl(result, get_range_low());
@@ -1008,9 +1049,12 @@ Token result = at0().get_function()->eval_B(at1().get_apl_val());
              return;
            }
 
-        // possibly reached (!)
+        // not reached
+        Q1(result.get_tag())
+        FIXME;
       }
 
+done:
    pop_args_push_result(result);
    set_action(result);
 }

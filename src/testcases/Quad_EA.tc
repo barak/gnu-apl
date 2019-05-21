@@ -52,29 +52,29 @@ foo_fails[1]  ÷0
 0 2 2 1 0
       )SIC
 
-   ⍝ ⎕EA with branch
+   ⍝ ⎕EA with branch ----------------------------------
    ⍝
-∇foo_branch
- 1
+∇FOO_branch
+ 'line-1'
  '→ERR' ⎕EA '++'
- 3 ◊ →0
-ERR: 'B1 failed'
- 5
+ 'line-3 reached (error)' ◊ →0
+ERR: "⎕EA succeeded with its left (branch-) argument '→ERR'"
+ 'line-5'
  'OK' ⎕EA '→OK'
- 7 ◊ →0
-OK: 'B2 succeeded'
+ 'line-7 reached (error)' ◊ →0
+OK: "⎕EA succeeded with its right (branch-) argument '→OK'"
 ∇
 
-      foo_branch
-1
-B1 failed
-5
-B2 succeeded
+      FOO_branch
+line-1
+⎕EA succeeded with its left (branch-) argument '→ERR'
+line-5
+⎕EA succeeded with its right (branch-) argument '→OK'
 
       )SI
 
       )SIC
-      )ERASE foo_fails foo_branch
+      )ERASE foo_fails FOO_branch
 
       )CHECK
 OK      - no stale functions
@@ -82,6 +82,41 @@ OK      - no stale values
 OK      - no stale indices
 OK      - no duplicate parents
 
+⍝ Escape ----------------------------------
+
+      )SIC
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+      )ERASE FOO
+
+∇A FOO B
+ →(B=0)⍴GOON ◊ A FOO B-1 ◊ →0
+ GOON: ⎕SI 3 ◊ →(A=1 2 3)/ 0 ESC BRA
+ ESC: '→'   ⎕EA '⍳2.5' ◊ 'NOT-REACHED: FOO(ESC)'
+ BRA: '→LP' ⎕EA '⍳2.5' ◊ 'NOT-REACHED: FOO(BRA)'
+      'NOT-REACHED: FOO(BRA+1)'
+ LP: 'REACHED: FOO(LP)'
+∇
+
+      ⍝ build an )SI stack
+      1 FOO 3
+ ◊[0] FOO[1] FOO[1] FOO[1] FOO[2] 
+
+      2 FOO 3
+ ◊[0] FOO[1] FOO[1] FOO[1] FOO[2] 
+
+      ⎕SI 3    ⍝ expect )SI cleared
+ ◊[0] 
+
+      3 FOO 3    ⍝ expect branch taken
+ ◊[0] FOO[1] FOO[1] FOO[1] FOO[2] 
+REACHED: FOO(LP)
+
+      →
 
 ⍝ ==================================
 
