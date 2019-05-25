@@ -107,9 +107,6 @@ public:
    /// Maybe print B (according to tag) and erase B
    void statement_result(Token & result, bool trace);
 
-   /// update error information in \b error and copy it to SI
-   void update_error_info(Error & err);
-
    /// Escape from \b user function (exit from each invocation until
    /// immediate execution is reached)
    void escape();

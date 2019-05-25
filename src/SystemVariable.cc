@@ -241,7 +241,7 @@ const Error * err = 0;
 
    for (StateIndicator * si = Workspace::SI_top(); si; si = si->get_parent())
        {
-         if (StateIndicator::get_error(si).error_code != E_NO_ERROR)
+         if (StateIndicator::get_error(si).get_error_code() != E_NO_ERROR)
             {
               err = &StateIndicator::get_error(si);
               break;
@@ -273,25 +273,26 @@ Value_P Z(pb, LOC);
 Value_P
 Quad_ET::get_apl_value() const
 {
-StateIndicator * si = Workspace::SI_top();
+Value_P Z(2, LOC);
 ErrorCode ec = E_NO_ERROR;
 
-   for (; si; si = si->get_parent())
+   for (StateIndicator * si = Workspace::SI_top(); si; si = si->get_parent())
        {
-         ec = StateIndicator::get_error(si).error_code;
+         ec = StateIndicator::get_error(si).get_error_code();
          if (ec != E_NO_ERROR)
             {
-              break;
+              new (Z->next_ravel()) IntCell(Error::error_major(ec));
+              new (Z->next_ravel()) IntCell(Error::error_minor(ec));
+              goto done;
             }
 
          if (si->get_parse_mode() == PM_FUNCTION)   break;
        }
 
-Value_P Z(2, LOC);
+   new (Z->next_ravel()) IntCell(Error::error_major(E_NO_ERROR));
+   new (Z->next_ravel()) IntCell(Error::error_minor(E_NO_ERROR));
 
-   new (Z->next_ravel()) IntCell(Error::error_major(ec));
-   new (Z->next_ravel()) IntCell(Error::error_minor(ec));
-
+done:
    Z->check_value(LOC);
    return Z;
 }

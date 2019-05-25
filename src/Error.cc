@@ -23,6 +23,7 @@
 #include "Output.hh"
 #include "PrintOperator.hh"
 #include "Symbol.hh"
+#include "StateIndicator.hh"
 #include "UserFunction.hh"
 #include "Workspace.hh"
 
@@ -207,13 +208,14 @@ StateIndicator * si = Workspace::SI_top();
       }
 
 Error error(code, loc);
+   if (si)   error.update_error_info(si);
+
 Error & eref = error;
-   if (si)   si->update_error_info(eref);
    throw eref;
 }
 //-----------------------------------------------------------------------------
 void
-throw_parse_error(ErrorCode code, const char * par_loc, const char *loc)
+Error::throw_parse_error(ErrorCode code, const char * par_loc, const char *loc)
 {
    Log(LOG_error_throw)
       CERR << endl
@@ -224,16 +226,17 @@ throw_parse_error(ErrorCode code, const char * par_loc, const char *loc)
    MORE_ERROR() << Error::error_name(code);
 
 Error error(code, loc);
-Error & eref = error;
    error.parser_loc = par_loc;
 
 // StateIndicator * si = Workspace::SI_top();
-//   if (si)   si->update_error_info(error);
+// if (si)   error.update_error_info(si);
+
+Error & eref = error;
    throw eref;
 }
 //-----------------------------------------------------------------------------
 void
-throw_symbol_error(const UCS_string & sym_name, const char * loc)
+Error::throw_symbol_error(const UCS_string & sym_name, const char * loc)
 {
    Log(LOG_error_throw)   
       {   
@@ -245,11 +248,12 @@ throw_symbol_error(const UCS_string & sym_name, const char * loc)
    Log(LOG_verbose_error)     Backtrace::show(__FILE__, __LINE__);
 
 Error error(E_VALUE_ERROR, loc);
-Error & eref = error;
 UTF8_string sym_name_utf(sym_name);
    snprintf(error.symbol_name, sizeof(error.symbol_name), "%s",
             sym_name_utf.c_str());
-   if (Workspace::SI_top())   Workspace::SI_top()->update_error_info(eref);
+   if (StateIndicator * si = Workspace::SI_top())   error.update_error_info(si);
+
+Error & eref = error;
    throw eref;
 }
 //-----------------------------------------------------------------------------
@@ -277,6 +281,72 @@ UTF8_string cmd_utf(cmd);   // cmd is something like ∇FUN[⎕]∇
    eref.left_caret = 5 + cmd.size();
    if (Workspace::SI_top())   *Workspace::get_error() = eref;
    throw eref;
+}
+//-----------------------------------------------------------------------------
+void
+Error::update_error_info(StateIndicator * si)
+{
+bool locked = false;
+const UserFunction * ufun = si->get_executable()->get_ufun();
+
+   // prepare second error line (failed statement)
+   //
+   if (ufun)
+      {
+        if (get_show_locked() || ufun->get_exec_properties()[1])
+           {
+             locked = true;
+             set_error_line_2("      ");
+             set_left_caret(6);
+           }
+        else
+           {
+             UCS_string ucs(ufun->get_name_and_line(si->get_PC()));
+             ucs.append(UNI_ASCII_SPACE);
+             ucs.append(UNI_ASCII_SPACE);
+             UTF8_string utf(ucs);
+             set_error_line_2(utf.c_str());
+             set_left_caret(ucs.size());
+           }
+      }
+   else
+      {
+        set_error_line_2("      ");
+        set_left_caret(6);
+      }
+
+   // prepare third line (carets)
+   //
+   set_right_caret(-1);
+
+   if (locked)
+      {
+        si->get_executable()->get_ufun()->set_locked_error_info(*this);
+      }
+   else
+      {
+        const Function_PC from = si->get_prefix().get_range_low();
+        Function_PC to   = si->get_prefix().get_range_high();
+        const Function_PC2 error_range(from, to);
+        si->get_executable()->set_error_info(*this, error_range);
+      }
+
+   // print error, unless we are in safe execution mode.
+   //
+   {
+     bool print_error = true;
+     for (const StateIndicator * si1 = si; si1; si1 = si1->get_parent())
+         {
+           if (si1->get_safe_execution())
+              {
+                print_error = false;
+                break;
+              }
+         }
+     if (print_error)   print_em(UERR, LOC);
+   }
+
+   StateIndicator::get_error(si) = *this;
 }
 //-----------------------------------------------------------------------------
 

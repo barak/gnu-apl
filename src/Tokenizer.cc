@@ -61,7 +61,7 @@ Tokenizer::tokenize(const UCS_string & input, Token_string & tos)
         const int caret_1 = input.size() - rest_1;
         const int caret_2 = input.size() - rest_2;
         err.set_error_line_2(input, caret_1, caret_2);
-        return err.error_code;
+        return err.get_error_code();
       }
 
    return E_NO_ERROR;
@@ -122,7 +122,7 @@ Source<Unicode> src(input);
                    if (tok.get_tag() == TOK_CHARACTER)
                       CERR << "Unicode: " << UNI(tok.get_char_val()) << endl;
                    rest_2 = src.rest();
-                   throw_parse_error(E_NON_APL_CHAR, LOC, loc);
+                   Error::throw_parse_error(E_NON_APL_CHAR, LOC, loc);
                    break;
 
               case TC_VOID:
@@ -131,7 +131,7 @@ Source<Unicode> src(input);
                    rest_2 = src.rest();
                    UERR << "Unknown APL character: " << uni
                         << " (" << UNI(uni) << ")" << endl;
-                   throw_parse_error(E_NON_APL_CHAR, LOC, loc);
+                   Error::throw_parse_error(E_NON_APL_CHAR, LOC, loc);
                    break;
 
               case TC_SYMBOL:
@@ -213,7 +213,7 @@ Source<Unicode> src(input);
                         // or a syntax error:         e.g. Done.
                         //
                         if (src.rest() == 1)   // syntax error
-                           throw_parse_error(E_SYNTAX_ERROR, LOC, loc);
+                           Error::throw_parse_error(E_SYNTAX_ERROR, LOC, loc);
 
                         Unicode uni_1 = src[1];
                         const Token tok_1 = Avec::uni_to_token(uni_1, LOC);
@@ -285,9 +285,11 @@ Source<Unicode> src(input);
                       {
                         rest_2 = src.rest();
                         if (pmode == PM_EXECUTE)
-                           throw_parse_error(E_ILLEGAL_COLON_EXEC, LOC, loc);
+                           Error::throw_parse_error(E_ILLEGAL_COLON_EXEC,
+                                                    LOC, loc);
                         else
-                           throw_parse_error(E_ILLEGAL_COLON_STAT, LOC, loc);
+                           Error::throw_parse_error(E_ILLEGAL_COLON_STAT,
+                                                    LOC, loc);
                       }
 
                    ++src;
@@ -490,7 +492,7 @@ bool got_end = false;
          else if (uni == UNI_ASCII_LF)
             {
               rest_2 = src.rest();
-              throw_parse_error(E_NO_STRING_END, LOC, loc);
+              Error::throw_parse_error(E_NO_STRING_END, LOC, loc);
             }
          else
             {
@@ -498,7 +500,7 @@ bool got_end = false;
             }
        }
 
-   if (!got_end)   throw_parse_error(E_NO_STRING_END, LOC, loc);
+   if (!got_end)   Error::throw_parse_error(E_NO_STRING_END, LOC, loc);
 
    if (string_value.size() == 1)   // scalar
       {
@@ -546,7 +548,7 @@ bool got_end = false;
          else if (uni == UNI_ASCII_LF)          // end of line before "
             {
               rest_2 = src.rest();
-              throw_parse_error(E_NO_STRING_END, LOC, loc);
+              Error::throw_parse_error(E_NO_STRING_END, LOC, loc);
             }
          else if (uni == UNI_ASCII_BACKSLASH)   // backslash
             {
@@ -574,7 +576,7 @@ bool got_end = false;
             }
        }
 
-   if (!got_end)   throw_parse_error(E_NO_STRING_END, LOC, loc);
+   if (!got_end)   Error::throw_parse_error(E_NO_STRING_END, LOC, loc);
 
    else
       {
@@ -601,7 +603,7 @@ const bool real_valid = tokenize_real(src, real_need_float, real_flt, real_int);
    if (!real_valid)
       {
         rest_2 = src.rest();
-        throw_parse_error(E_BAD_NUMBER, LOC, loc);
+        Error::throw_parse_error(E_BAD_NUMBER, LOC, loc);
       }
 
    if (src.rest() && (*src == UNI_ASCII_J || *src == UNI_ASCII_j))
@@ -742,7 +744,7 @@ done:
    if (src.rest())
       {
         if (*src == UNI_OVERBAR || *src == '.')
-                   throw_parse_error(E_BAD_NUMBER, LOC, loc);
+           Error::throw_parse_error(E_BAD_NUMBER, LOC, loc);
       }
 }
 //-----------------------------------------------------------------------------

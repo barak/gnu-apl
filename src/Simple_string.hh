@@ -253,8 +253,9 @@ protected:
         T * old_items = items;
         items_allocated = new_size + ADD_ALLOC;
         T * new_items = new T[items_allocated];
-        memcpy(new_items, old_items, items_valid * sizeof(T));
-        memset(old_items, 0, items_valid * sizeof(T));
+        memcpy(static_cast<void *>(new_items), old_items,
+               items_valid * sizeof(T));
+        memset(static_cast<void *>(old_items), 0, items_valid * sizeof(T));
         delete [] old_items;
         items = new_items;
       }

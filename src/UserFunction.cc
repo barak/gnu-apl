@@ -514,7 +514,7 @@ Value_P Z = B->clone(LOC);
 void
 UserFunction::set_locked_error_info(Error & error) const
 {
-UCS_string message_2(UTF8_string(error.error_message_2));
+UCS_string message_2(UTF8_string(error.get_error_line_2()));
 
 #define SHORT 0
    if (header.A())
@@ -555,11 +555,10 @@ UCS_string message_2(UTF8_string(error.error_message_2));
 
    {
      UTF8_string utf(message_2);
-     strncpy(error.error_message_2, utf.c_str(), sizeof(error.error_message_2));
-     error.error_message_2[sizeof(error.error_message_2) - 1] = 0;
+     error.set_error_line_2(utf.c_str());
    }
 
-   error.right_caret = error.left_caret + message_2.size() - 7;
+   error.set_right_caret(error.get_left_caret() + message_2.size() - 7);
 }
 //-----------------------------------------------------------------------------
 void

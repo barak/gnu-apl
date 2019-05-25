@@ -152,7 +152,7 @@ ErrorCode ec = parser.parse(ucs_line, in);
              throw error;
            }
 
-        if (ec != E_NO_ERROR)   throw_parse_error(ec, LOC, LOC);
+        if (ec != E_NO_ERROR)   Error::throw_parse_error(ec, LOC, LOC);
       }
 
    return parse_body_line(line, in, trace, tolerant, loc);
@@ -253,10 +253,10 @@ Executable::execute_body() const
 {
 StateIndicator & si = *Workspace::SI_top();
 
-   try                 { return si.run();                         }
-   catch (Error err)   { return Token(TOK_ERROR, err.error_code); }
-   catch (Token tok)   { return tok;                              }
-   catch (...)         { return Token(TOK_ERROR, E_SYSTEM_ERROR); }
+   try                 { return si.run();                               }
+   catch (Error err)   { return Token(TOK_ERROR, err.get_error_code()); }
+   catch (Token tok)   { return tok;                                    }
+   catch (...)         { return Token(TOK_ERROR, E_SYSTEM_ERROR);       }
 
    // not reached
    FIXME;
@@ -334,8 +334,8 @@ UCS_string ret;
 void
 Executable::set_error_info(Error & error, Function_PC2 pc_from_to) const
 {
-const ErrorCode ec = error.error_code;
-UCS_string message_2(UTF8_string(error.error_message_2));
+const ErrorCode ec = error.get_error_code();
+UCS_string message_2(UTF8_string(error.get_error_line_2()));
 
    // for value errors we point to the failed symbol itself.
    //
@@ -422,17 +422,16 @@ int len_between = 0;   // distance between the carets
 
    {
      UTF8_string utf(message_2);
-     strncpy(error.error_message_2, utf.c_str(), sizeof(error.error_message_2));
-     error.error_message_2[sizeof(error.error_message_2) - 1] = 0;
+     error.set_error_line_2(utf.c_str());
    }
 
    // Line 3: carets
    //
-   error.left_caret += len_left;
+   error.set_left_caret(error.get_left_caret() + len_left);
 
    if (pc_from_to.high != pc_from_to.low)   // two carets
       {
-        error.right_caret = error.left_caret + len_between;
+        error.set_right_caret(error.get_left_caret() + len_between);
       }
 }
 //-----------------------------------------------------------------------------
@@ -859,10 +858,7 @@ ExecuteList *
 ExecuteList::fix(const UCS_string & data, const char * loc)
 {
    // clear errors that may have occured before
-   {
-     Error * err = Workspace::get_error();
-     if (err) err->error_code = E_NO_ERROR;
-   }
+   if (Error * err = Workspace::get_error())   err->clear_error_code();
 
 ExecuteList * fun = new ExecuteList(data, loc);
 
@@ -875,15 +871,15 @@ ExecuteList * fun = new ExecuteList(data, loc);
 
    {
      Error * err = Workspace::get_error();
-     if (err && err->error_code)
+     if (err && err->get_error_code())
         {
           Log(LOG_UserFunction__fix)
              {
                 CERR << "fix pmode=execute list failed with error "
-                     << Error::error_name(err->error_code) << endl;
+                     << Error::error_name(err->get_error_code()) << endl;
              }
 
-          err->parser_loc = 0;
+          err->set_parser_loc(0);
           delete fun;
           return 0;
         }
@@ -927,7 +923,7 @@ StatementList * fun = new StatementList(data, loc);
              << "------------------- StatementList::fix() --" << endl;
       }
 
-   if (Error * err = Workspace::get_error())   err->parser_loc = 0;
+   if (Error * err = Workspace::get_error())   err->set_parser_loc(0);
 
    try
       {

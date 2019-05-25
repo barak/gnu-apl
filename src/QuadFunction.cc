@@ -157,7 +157,7 @@ Value_P Z(shape_Z, LOC);
            }
 
         NamedObject * obj = Workspace::lookup_existing_name(symbol_name);
-        if (obj == 0)   throw_symbol_error(symbol_name, LOC);
+        if (obj == 0)   Error::throw_symbol_error(symbol_name, LOC);
 
         const Function * function = obj->get_function();
         if (function)             // user defined or system function.
@@ -341,12 +341,27 @@ Value_P Z(ShapeItem(0), LOC);
 void
 Quad_EC::eoc(Token & result)
 {
-   // set result to an APL value Z = (Z1 Z2 Z3) where:
+   // set Token result to an APL value Z = (Z1 Z2 Z3) where:
    //
-   // Z1 is an integer scalar 0-5 (return code),
+   // Z1 is an integer scalar 0-5 (return code):
+   //
+   //    0: Error
+   //    1: Value
+   //    2: Committed Value
+   //    3: Void
+   //    4: Branch
+   //    5: Escape
+   //
    // Z2 is a two-element integer vector with the value that ⎕ET would have,
-   // Z3 is some value
+   // ⎕ET is not set while in ⎕EC.
    //
+   // Z3 is a value that depends on Z1:
+   //
+   // 0:      ⎕EM
+   // 1 or 2: the value
+   // 3 or 5: 0⍴0
+   // 4:      the branch line
+
 Value_P Z(3, LOC);
    if (result.get_tag() == TOK_ERROR)
       {
@@ -493,7 +508,7 @@ Quad_ES::eval_AB(Value_P A, Value_P B)
 const UCS_string ucs(*A.get());
 Error error(E_NO_ERROR, LOC);
 const Token ret = event_simulate(&ucs, B, error);
-   if (error.error_code == E_NO_ERROR)   return ret;
+   if (error.get_error_code() == E_NO_ERROR)   return ret;
 
    throw error;
 }
@@ -503,7 +518,7 @@ Quad_ES::eval_B(Value_P B)
 {
 Error error(E_NO_ERROR, LOC);
 const Token ret = event_simulate(0, B, error);
-   if (error.error_code == E_NO_ERROR)              return ret;
+   if (error.get_error_code() == E_NO_ERROR)              return ret;
    if (Workspace::SI_top()->get_safe_execution())   return ret;
 
    throw error;
@@ -522,15 +537,15 @@ const ErrorCode ec = get_error_code(B);
    if (ec == E_QUAD_ES_ERR)   return Token(TOK_QUAD_ES_ERR, B->clone(LOC));
    if (ec == E_QUAD_ES_ESC)   return Token(TOK_QUAD_ES_ESC, B->clone(LOC));
 
-   new (&error)   Error(ec, error.throw_loc);
+   new (&error)   Error(ec, error.get_throw_loc());
 
-   if (error.error_code == E_NO_ERROR)   // B = 0 0: reset ⎕ET and ⎕EM.
+   if (error.get_error_code() == E_NO_ERROR)   // B = 0 0: reset ⎕ET and ⎕EM.
       {
         Workspace::clear_error(LOC);
         return Token();
       }
 
-   if (error.error_code == E_ASSERTION_FAILED)   // B = 0 ASSERTION_FAILED
+   if (error.get_error_code() == E_ASSERTION_FAILED)   // B = 0 ASSERTION_FAILED
       {
         Assert(0 && "simulated ASSERTION_FAILED in ⎕ES");
       }
@@ -543,15 +558,13 @@ const ErrorCode ec = get_error_code(B);
       {
         UCS_string msg1_ucs(*A);
         UTF8_string msg1_utf(msg1_ucs);
-        snprintf(error.error_message_1, sizeof(error.error_message_1),
-                 "%s", msg1_utf.c_str());
+        error.set_error_line_1(msg1_utf.c_str());
       }
-   else if (error.error_code == E_USER_DEFINED_ERROR)   // ⎕ES with character B
+   else if (error.get_error_code() == E_USER_DEFINED_ERROR)   // ⎕ES with character B
       {
         UCS_string msg1_ucs(*B.get());
         UTF8_string msg1_utf(msg1_ucs);
-        snprintf(error.error_message_1, sizeof(error.error_message_1),
-                 "%s", msg1_utf.c_str());
+        error.set_error_line_1(msg1_utf.c_str());
       }
    else if (error.is_known())             //  ⎕ES B with known major/minor B
       {
@@ -559,12 +572,13 @@ const ErrorCode ec = get_error_code(B);
       }
    else                                   //  ⎕ES B with unknown major/minor B
       {
-        snprintf(error.error_message_1, sizeof(error.error_message_1),
-                 "Unkown error (major %d, minor %d) in ⎕ES B",
-                 error.error_code >> 16, error.error_code & 0xFFFF);
+        char cc[80];
+        snprintf(cc, sizeof(cc), "Unkown error (major %d, minor %d) in ⎕ES B",
+                 error.get_error_code() >> 16, error.get_error_code() & 0xFFFF);
+        error.set_error_line_1(cc);
       }
 
-   error.show_locked = true;
+   error.set_show_locked(true);
 
    Assert(Workspace::SI_top());
    if (StateIndicator * si = Workspace::SI_top()->get_parent())
@@ -576,11 +590,9 @@ const ErrorCode ec = get_error_code(B);
              // and B is not empty, the event action is generated as though
              // the function were primitive.
              //
-             UTF8_string ufun_name(ufun->get_name());
-             snprintf(error.error_message_2, sizeof(error.error_message_2),
-                      "      %s", ufun_name.c_str());
-             error.left_caret = 6;
-             error.right_caret = -1;
+             UCS_string ufun_name("      ");
+             ufun_name.append(ufun->get_name());
+             error.set_error_line_2(ufun_name, 6, -1);
              Workspace::pop_SI(LOC);
              StateIndicator::get_error(Workspace::SI_top()) = error;
              error.print_em(UERR, LOC);
@@ -588,7 +600,7 @@ const ErrorCode ec = get_error_code(B);
            }
       }
 
-   Workspace::SI_top()->update_error_info(error);
+   error.update_error_info(Workspace::SI_top());
    return Token();
 }
 //-----------------------------------------------------------------------------
@@ -1222,7 +1234,7 @@ const APL_Integer b = B->get_ravel(0).get_near_int();
                  }
                  break;
 
-        case 4: if (StateIndicator::get_error(si).error_code)
+        case 4: if (StateIndicator::get_error(si).get_error_code())
                    {
                      const UCS_string text(UTF8_string(
                            StateIndicator::get_error(si).get_error_line_2()));
@@ -1300,7 +1312,7 @@ ShapeItem z = 0;
                       }
                       break;
 
-             case 4:  if (StateIndicator::get_error(si).error_code)
+             case 4:  if (StateIndicator::get_error(si).get_error_code())
                          {
                            const UCS_string text(UTF8_string(
                              StateIndicator::get_error(si).get_error_line_2()));

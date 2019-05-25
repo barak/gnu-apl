@@ -180,9 +180,9 @@ StateIndicator::print(ostream & out) const
    out << "Stat:       " << executable->statement_text(get_PC());
    out << endl;
 
-   out << "err_code:   " << HEX(error.error_code) << endl;
-   if (error.error_code)
-      out << "thrown at:  " << error.throw_loc << endl
+   out << "err_code:   " << HEX(error.get_error_code()) << endl;
+   if (error.get_error_code())
+      out << "thrown at:  " << error.get_throw_loc() << endl
        << "e_msg_1:    '" << error.get_error_line_1() << "'" << endl
        << "e_msg_2:    '" << error.get_error_line_2() << "'" << endl
        << "e_msg_3:    '" << error.get_error_line_3() << "'" << endl;
@@ -213,7 +213,7 @@ StateIndicator::list(ostream & out, SI_mode mode) const
 
              if (mode & SIM_statements)   // )SIS
                 {
-                  if (error.error_code)
+                  if (error.get_error_code())
                      {
                        out << error.get_error_line_2() << endl
                            << error.get_error_line_3();
@@ -261,7 +261,7 @@ StateIndicator::list(ostream & out, SI_mode mode) const
 
                   // )SIS and we have a statement
                   //
-                  if (error.error_code)
+                  if (error.get_error_code())
                      out << error.get_error_line_2() << endl
                          << error.get_error_line_3();
                   else
@@ -272,72 +272,6 @@ StateIndicator::list(ostream & out, SI_mode mode) const
       }
 
    out << endl;
-}
-//-----------------------------------------------------------------------------
-void
-StateIndicator::update_error_info(Error & err)
-{
-bool locked = false;
-const UserFunction * ufun = executable->get_ufun();
-
-   // prepare second error line (failed statement)
-   //
-   if (ufun)
-      {
-        if (err.show_locked || ufun->get_exec_properties()[1])
-           {
-             locked = true;
-             snprintf(err.error_message_2, sizeof(err.error_message_2),
-                      "      ");
-             err.left_caret = 6;
-           }
-        else
-           {
-             UCS_string ucs(ufun->get_name_and_line(get_PC()));
-             UTF8_string utf(ucs);
-             snprintf(err.error_message_2, sizeof(err.error_message_2),
-                      "%s  ", utf.c_str());
-             err.left_caret = ucs.size() + 2;
-           }
-      }
-   else
-      {
-        snprintf(err.error_message_2, sizeof(err.error_message_2), "      ");
-        err.left_caret = 6;
-      }
-
-   // prepare third line (carets)
-   //
-   err.right_caret = -1;
-
-   if (locked)
-      {
-        executable->get_ufun()->set_locked_error_info(err);
-      }
-   else
-      {
-        const Function_PC from = current_stack.get_range_low();
-        Function_PC to   = current_stack.get_range_high();
-        const Function_PC2 error_range(from, to);
-        executable->set_error_info(err, error_range);
-      }
-
-   // print error, unless we are in safe execution mode.
-   //
-   {
-     bool print_error = true;
-     for (const StateIndicator * si = this; si; si = si->get_parent())
-         {
-           if (si->get_safe_execution())
-              {
-                print_error = false;
-                break;
-              }
-         }
-     if (print_error)   err.print_em(UERR, LOC);
-   }
-
-   error = err;
 }
 //-----------------------------------------------------------------------------
 ostream &

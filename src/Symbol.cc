@@ -513,7 +513,7 @@ Symbol::get_apl_value() const
 {
    Assert(value_stack.size() > 0);
    if (value_stack.last().name_class != NC_VARIABLE)
-      throw_symbol_error(get_name(), LOC);
+      Error::throw_symbol_error(get_name(), LOC);
 
    return value_stack.last().apl_val;
 }
@@ -682,7 +682,7 @@ const ValueStackItem & vs = value_stack.last();
    switch(vs.name_class)
       {
         case NC_UNUSED_USER_NAME:
-             if (!left_sym)   throw_symbol_error(get_name(), LOC);
+             if (!left_sym)   Error::throw_symbol_error(get_name(), LOC);
              return;   // leave symbol as is
 
         case NC_LABEL:

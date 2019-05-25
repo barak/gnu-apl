@@ -259,7 +259,7 @@ Executable * statements = 0;
       }
    catch (Error err)
       {
-        UERR << Error::error_name(err.error_code);
+        UERR << Error::error_name(err.get_error_code());
         if (Workspace::more_error().size())   UERR << UNI_ASCII_PLUS;
         UERR << endl;
         if (*err.get_error_line_2())

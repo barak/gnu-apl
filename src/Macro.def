@@ -210,7 +210,7 @@ mac_def(Z__Quad_INP_B,
 "LOOPC: ROW[C]←⊂⍕⍎⊃ROW[C]\n"
 "CX:    →(C_max>C←C+2)⍴LOOPC ◊ B[N]←31 ⎕CR ⊂ROW ◊ →(N_max>N←N+1)⍴LOOPN\n")
 
-/// ⎕EA helper
+/// ⎕EA (Execute Alternate) helper
 //
 mac_def(Z__A_Quad_EA_B,
   " Z←A Z__A_Quad_EA_B B;RC;ET;RES\n"
@@ -221,7 +221,7 @@ mac_def(Z__A_Quad_EA_B,
 "BRA: ⎕ES 100 $FFFD   RES            ⍝ →N\n"
 "ESC: ⎕ES 100 $FFFC                  ⍝ →\n")
 
-/// ⎕EB (execute both) helper
+/// ⎕EB (Execute Both) helper
 //
 mac_def(Z__A_Quad_EB_B,
   " Z←A Z__A_Quad_EB_B B;RC;ET;RES\n"

@@ -26,28 +26,13 @@
 #include "ErrorCode.hh"
 #include "UCS_string.hh"
 
-/// throw a error with a parser location
-void throw_parse_error(ErrorCode code, const char * par_loc,
-                       const char * loc)
 #ifdef __GNUC__
-    __attribute__ ((noreturn))
+    #define GNUC__noreturn __attribute__ ((noreturn))
+#else
+    #define GNUC__noreturn
 #endif
-;
 
-/// throw an Error related to \b Symbol \b symbol
-void throw_symbol_error(const UCS_string & symb, const char * loc)
-#ifdef __GNUC__
-    __attribute__ ((noreturn))
-#endif
-;
-
-/// throw a define error for function \b fun
-void throw_define_error(const UCS_string & fun, const UCS_string & cmd,
-                        const char * loc)
-#ifdef __GNUC__
-    __attribute__ ((noreturn))
-#endif
-;
+class StateIndicator;
 
 /**
  ** The exception that is thrown when errors occur. 
@@ -57,30 +42,6 @@ void throw_define_error(const UCS_string & fun, const UCS_string & cmd,
 /// An APL error and information related to it
 class Error
 {
-   // TODO: the friends below exist for historical reasons and should use
-   // access functions instead of accessing data members of class Error.
-   // The throw_xxx() friends could be made static members of class Error.
-   // That will be quite some work, though.
-   //
-   friend class Command;
-   friend class Doxy;
-   friend class Executable;
-   friend class ExecuteList;
-   friend class Prefix;
-   friend class Quad_EM;
-   friend class Quad_ES;
-   friend class Quad_ET;
-   friend class Quad_SI;
-   friend class StateIndicator;
-   friend class StatementList;
-   friend class Tokenizer;
-   friend class UserFunction;
-   friend class Workspace;
-
-   friend void  throw_apl_error(ErrorCode, const char *);
-   friend void  throw_parse_error(ErrorCode, const char *, const char *);
-   friend void  throw_symbol_error(const UCS_string &, const char *);
-
 public:
    /// constructor: error with error code ec
    Error(ErrorCode ec, const char * loc);
@@ -92,8 +53,8 @@ public:
    /// return true iff error_code is some SYNTAX ERROR or VALUE ERROR
    bool is_syntax_or_value_error() const;
 
-   /// set error line 2 to ucs
-   void set_error_line_2(const UCS_string & ucs, int lcaret, int rcaret);
+   const ErrorCode get_error_code() const
+      { return error_code; }
 
    /// return ⎕EM[1;]. This is the first of 3 error lines. It contains the
    /// error name (like SYNTAX ERROR, DOMAIN ERROR, etc) and is subject
@@ -116,7 +77,7 @@ public:
 
    /// return the category (⎕ET) of the error
    static int error_minor(ErrorCode err)
-      { return err & 0x00FF; }
+      { return err & 0xFFFF; }
 
    /// return source file location where this error was printed (0 if not)
    const char * get_print_loc() const
@@ -127,18 +88,79 @@ public:
    /// to translation.
    UCS_string get_error_line_3() const;
 
+   /// return the source code location where the error was thrown
+   const char * get_throw_loc() const
+      { return throw_loc; }
+
+   /// return the left caret (^) position in the third error line
+   int get_left_caret() const
+      { return left_caret; }
+
+   /// return the right caret (^) position in the third error line
+   int get_right_caret() const
+      { return right_caret; }
+
+   /// return the show_locked flag
+   bool get_show_locked() const
+      { return show_locked; }
+
    /// print the error and its related information
    void print(ostream & out, const char * loc) const;
 
-   /// return a string describing the error
-   static const char * error_name(ErrorCode err);
+   /// set the first error line
+   void set_error_line_1(const char * msg_1)
+      { strncpy(error_message_1, msg_1, sizeof(error_message_1));
+        error_message_1[sizeof(error_message_1) - 1] = 0; }
+
+   /// set the second error line
+   void set_error_line_2(const char * msg_2)
+      { strncpy(error_message_2, msg_2, sizeof(error_message_2));
+        error_message_2[sizeof(error_message_2) - 1] = 0; }
+
+   /// set error line 2, left caret, and right caret
+   void set_error_line_2(const UCS_string & ucs, int lcaret, int rcaret);
 
    /// print the 3 error message lines as per ⎕EM
    void print_em(ostream & out, const char * loc);
 
-   /// throw a DEFN ERROR
+   /// set the error code
+   void clear_error_code()
+      { error_code = E_NO_ERROR; }
+
+   /// set the show_locked flag
+   void set_show_locked(bool on)
+      { show_locked = on; }
+
+   /// set the left caret (^) position in the third error line
+   void set_left_caret(int col)
+      { left_caret = col; }
+
+   /// set the right caret (^) position in the third error line
+   void set_right_caret(int col)
+      { right_caret = col; }
+
+   /// set the source code line where a parse error was thrown
+   void set_parser_loc(const char * loc)
+      { parser_loc = loc; }
+
+   /// update error information in \b this and copy it to si
+   void update_error_info(StateIndicator * si);
+
+   /// throw an Error related to \b Symbol \b symbol
+   static void throw_symbol_error(const UCS_string & symbol,
+                                  const char * loc) GNUC__noreturn;
+
+   /// throw a error with a parser location
+   static void throw_parse_error(ErrorCode code, const char * par_loc,
+                                 const char * loc) GNUC__noreturn;
+
+   /// throw a DEFN ERROR for function \b fun
    static void throw_define_error(const UCS_string & fun,
-                                  const UCS_string & cmd, const char * loc);
+                                  const UCS_string & cmd,
+                                  const char * loc) GNUC__noreturn;
+
+   /// return a string describing the error
+   static const char * error_name(ErrorCode err);
 
 protected:
    /// the error code

@@ -444,7 +444,7 @@ Simple_string<const StateIndicator *, false> stack;
                Assert(ufun);
                const Function_PC PC = si->get_prefix().get_error_PC();
                if (const ErrorCode ec =
-                         StateIndicator::get_error(si).error_code)
+                         StateIndicator::get_error(si).get_error_code())
                   {
                     // get_error_line_2() is something like fun[line] statement.
                     // find the space after fun[line].

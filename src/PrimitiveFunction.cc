@@ -462,6 +462,15 @@ Bif_COMMA::catenate(Value_P A, Axis axis, Value_P B)
 {
    if (A->is_scalar())
       {
+        if (B->is_scalar())
+           {
+             Value_P Z(2, LOC);
+             Z->next_ravel()->init(A->get_ravel(0), Z.getref(), LOC);
+             Z->next_ravel()->init(B->get_ravel(0), Z.getref(), LOC);
+             Z->check_value(LOC);
+             return Token(TOK_APL_VALUE1, Z);
+           }
+
         const Cell & cell_A = A->get_ravel(0);
         Value_P Z = prepend_scalar(cell_A, axis, B);
         Z->check_value(LOC);

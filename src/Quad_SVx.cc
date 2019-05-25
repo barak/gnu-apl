@@ -200,7 +200,7 @@ Value_P Z(sh_Z, LOC);
         // set control.
         //
         Symbol * sym = Workspace::lookup_existing_symbol(vars[z]);
-        if (sym == 0)   throw_symbol_error(vars[z], LOC);
+        if (sym == 0)   Error::throw_symbol_error(vars[z], LOC);
 
         const SV_key key = sym->get_SV_key();
         Svar_DB::set_control(key, Svar_Control(ctl));
@@ -232,7 +232,7 @@ Value_P Z(sh_Z, LOC);
    loop(z, var_count)
       {
         Symbol * sym = Workspace::lookup_existing_symbol(vars[z]);
-        if (sym == 0)   throw_symbol_error(vars[z], LOC);
+        if (sym == 0)   Error::throw_symbol_error(vars[z], LOC);
 
         const SV_key key = sym->get_SV_key();
         const Svar_Control control = Svar_DB::get_control(key);
@@ -721,7 +721,7 @@ Value_P Z(sh_Z, LOC);
    loop(z, var_count)
       {
         Symbol * sym = Workspace::lookup_existing_symbol(vars[z]);
-        if (sym == 0)   throw_symbol_error(vars[z], LOC);
+        if (sym == 0)   Error::throw_symbol_error(vars[z], LOC);
 
         const SV_key key = sym->get_SV_key();
         const Svar_state state = Svar_DB::get_state(key);

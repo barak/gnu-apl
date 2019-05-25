@@ -203,7 +203,8 @@ Workspace::SI_top_error()
 {
    for (StateIndicator * si = SI_top(); si; si = si->get_parent())
        {
-         if (StateIndicator::get_error(si).error_code != E_NO_ERROR)   return si;
+         if (StateIndicator::get_error(si).get_error_code() != E_NO_ERROR)
+            return si;
        }
 
    return 0;   // no context with an error
@@ -222,12 +223,13 @@ Workspace::immediate_execution(bool exit_on_error)
             {
               if (!err.get_print_loc())
                  {
-                   if (err.error_code != E_DEFN_ERROR)
+                   if (err.get_error_code() != E_DEFN_ERROR)
                       {
                         err.print_em(UERR, LOC);
                         CERR << __FUNCTION__ << "() caught APL error "
-                             << HEX(err.error_code) << " ("
-                             << err.error_name(err.error_code) << ")" << endl;
+                             << HEX(err.get_error_code()) << " ("
+                             << err.error_name(err.get_error_code()) << ")"
+                             << endl;
 
                         IO_Files::apl_error(LOC);
                       }

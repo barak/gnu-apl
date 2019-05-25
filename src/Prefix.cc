@@ -940,10 +940,14 @@ Token result = at0().get_function()->eval_B(at1().get_apl_val());
         /* NOTE: the tags TOK_QUAD_ES_COM, TOK_QUAD_ES_ESC, TOK_QUAD_ES_BRA,
                  and TOK_QUAD_ES_ERR below can only occur if:
 
-            1. ⎕EA resp. ⎕EB is called, which are implemented as macros
+            1. ⎕EA resp. ⎕EB is called; each is implemented as macro
                Z__A_Quad_EA_B resp. Z__A_Quad_EB_B.
 
             2. The macro calls ⎕ES 100 ¯1...¯4, which brings us here.
+
+            Token result is the return token of Quad_ES::eval_AB() or
+            Quad_ES::eval_B() and contains the right argument B (as set in
+            the macro).
 
             We must check that ⎕ES 100 was not called directly, but only via
             ⎕EA or ⎕EB.
@@ -1021,6 +1025,9 @@ Token result = at0().get_function()->eval_B(at1().get_apl_val());
 
              Workspace::pop_SI(LOC);   // discard the ⎕EA/⎕EB context
              StateIndicator * top = Workspace::SI_top();
+
+             Token & si_pushed = top->get_prefix().at0();
+             Assert(si_pushed.get_tag() == TOK_SI_PUSHED);
 
              const Cell * QES_arg = &result.get_apl_val()->get_ravel(0);
              UCS_string statement_A(   QES_arg[2].get_pointer_value().getref());
@@ -1492,7 +1499,7 @@ Value_P Z;
            }
         catch (Error err)
            {
-             Token result = Token(TOK_ERROR, err.error_code);
+             Token result = Token(TOK_ERROR, err.get_error_code());
              Log(LOG_delete)   CERR << "delete " << voidP(idx)
                                     << " at " LOC << endl;
              delete idx;
@@ -1534,7 +1541,7 @@ Value_P B = at3().get_apl_val();
            }
         catch (Error err)
            {
-             Token result = Token(TOK_ERROR, err.error_code);
+             Token result = Token(TOK_ERROR, err.get_error_code());
              at1().clear(LOC);
              at3().clear(LOC);
              pop_args_push_result(result);
@@ -1555,7 +1562,7 @@ Value_P B = at3().get_apl_val();
            }
         catch (Error err)
            {
-             Token result = Token(TOK_ERROR, err.error_code);
+             Token result = Token(TOK_ERROR, err.get_error_code());
              at1().clear(LOC);
              at3().clear(LOC);
              Log(LOG_delete)   CERR << "delete " << voidP(idx)
