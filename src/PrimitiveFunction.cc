@@ -460,17 +460,11 @@ const Cell * cA = &A->get_ravel(0);
 Token
 Bif_COMMA::catenate(Value_P A, Axis axis, Value_P B)
 {
+   // NOTE: the case A->is_scalar() && B->is_scalar() was supposedly ruled out
+   //       before calling catenate()
+
    if (A->is_scalar())
       {
-        if (B->is_scalar())
-           {
-             Value_P Z(2, LOC);
-             Z->next_ravel()->init(A->get_ravel(0), Z.getref(), LOC);
-             Z->next_ravel()->init(B->get_ravel(0), Z.getref(), LOC);
-             Z->check_value(LOC);
-             return Token(TOK_APL_VALUE1, Z);
-           }
-
         const Cell & cell_A = A->get_ravel(0);
         Value_P Z = prepend_scalar(cell_A, axis, B);
         Z->check_value(LOC);
@@ -796,6 +790,15 @@ const Shape shape_Z(B->element_count());
 Token
 Bif_F12_COMMA::eval_AB(Value_P A, Value_P B)
 {
+  if (A->is_scalar() && B->is_scalar())
+     {
+       Value_P Z(2, LOC);
+       Z->next_ravel()->init(A->get_ravel(0), Z.getref(), LOC);
+       Z->next_ravel()->init(B->get_ravel(0), Z.getref(), LOC);
+       Z->check_value(LOC);
+       return Token(TOK_APL_VALUE1, Z);
+     }
+
 Rank max_rank = A->get_rank();
    if (max_rank < B->get_rank())  max_rank = B->get_rank(); 
    return catenate(A, max_rank - 1, B);
@@ -804,6 +807,8 @@ Rank max_rank = A->get_rank();
 Token
 Bif_F12_COMMA::eval_AXB(Value_P A, Value_P X, Value_P B)
 {
+  if (A->is_scalar() && B->is_scalar())   RANK_ERROR;
+
    // catenate or laminate
    //
    if (!X->is_scalar_or_len1_vector())   AXIS_ERROR;
@@ -855,6 +860,15 @@ Shape shape_Z(c1, c2);
 Token
 Bif_F12_COMMA1::eval_AB(Value_P A, Value_P B)
 {
+  if (A->is_scalar() && B->is_scalar())
+     {
+       Value_P Z(2, LOC);
+       Z->next_ravel()->init(A->get_ravel(0), Z.getref(), LOC);
+       Z->next_ravel()->init(B->get_ravel(0), Z.getref(), LOC);
+       Z->check_value(LOC);
+       return Token(TOK_APL_VALUE1, Z);
+     }
+
    return catenate(A, 0, B);
 }
 //-----------------------------------------------------------------------------

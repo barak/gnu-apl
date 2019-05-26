@@ -152,22 +152,19 @@ public:
 
         extend(items_valid + 1);
 
-        memmove(items + pos + 1, items + pos , (items_valid - pos) * sizeof(T));
+        (items + items_valid)->~T();
+        for (ShapeItem s = items_valid; s > pos; --s)   items[s] = items[s - 1];
+        (items + pos)->~T();
         new (items + pos)   T(t);
         ++items_valid;
       }
 
-   /// forget (and maybe destruct) the last item
+   /// forget (and maybe desctruct) the last item
     void pop()
       {
         Assert(items_valid > 0);
         --items_valid;
-        if (has_destructor)
-           {
-             T * t = items + items_valid;
-             t->~T();
-             new (t) T();
-           }
+        if (has_destructor)  items[items_valid].~T();
       }
 
    /// decrease size to \b new_size
@@ -183,17 +180,15 @@ public:
       {
         Assert(pos < items_valid);
 
-        const ShapeItem rest = items_valid - (pos + 1);
-        T * t = items + pos;
-        t->~T();                               // destruct erased item
+         const ShapeItem rest = items_valid - (pos + 1);
 
-        void * vp0 = t;                        // erased item
-        void * vp1 = t + 1;                    // next higher item
-        memmove(vp0, vp1, rest * sizeof(T));   // copy remaining items down
-
-        vp0 = items + items_valid - 1;
-        new (items + items_valid - 1) T();
-        --items_valid;   // not pop() !!!
+         (items + pos)->~T();                 // destruct erased item
+         loop(r, rest)
+            {
+              T * t = items + pos + r;
+              new (t) T(items[pos + 1 + r]);  // copy the item above
+            }
+         --items_valid;
       }
 
    /// extend allocated size
@@ -220,7 +215,7 @@ public:
 
    /// deallocate memory
    void deallocate()
-      { 
+      {
         delete [] items;
         items = 0;
         items_valid = 0;
@@ -252,12 +247,12 @@ protected:
 
         T * old_items = items;
         items_allocated = new_size + ADD_ALLOC;
-        T * new_items = new T[items_allocated];
-        memcpy(static_cast<void *>(new_items), old_items,
-               items_valid * sizeof(T));
-        memset(static_cast<void *>(old_items), 0, items_valid * sizeof(T));
-        delete [] old_items;
-        items = new_items;
+        items = new T[items_allocated];
+        loop(c, items_valid)
+           {
+              new (items + c) T(old_items[c]);
+           }
+        delete []  old_items;
       }
 
    /// the number of characters allocated
