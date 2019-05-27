@@ -109,12 +109,12 @@ public:
 
    /// set the first error line
    void set_error_line_1(const char * msg_1)
-      { strncpy(error_message_1, msg_1, sizeof(error_message_1));
+      { strncpy(error_message_1, msg_1, sizeof(error_message_1) - 1);
         error_message_1[sizeof(error_message_1) - 1] = 0; }
 
    /// set the second error line
    void set_error_line_2(const char * msg_2)
-      { strncpy(error_message_2, msg_2, sizeof(error_message_2));
+      { strncpy(error_message_2, msg_2, sizeof(error_message_2) - 1);
         error_message_2[sizeof(error_message_2) - 1] = 0; }
 
    /// set error line 2, left caret, and right caret

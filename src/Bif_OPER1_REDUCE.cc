@@ -31,7 +31,7 @@ Bif_OPER1_REDUCE1 * Bif_OPER1_REDUCE1::fun = &Bif_OPER1_REDUCE1::_fun;
 
 //-----------------------------------------------------------------------------
 Token
-Bif_REDUCE::replicate(Value_P A, Value_P B, Axis axis)
+Bif_REDUCE::replicate(Value_P A, Value_P B, uAxis axis)
 {
    // turn scalar B into ,B
    //
@@ -118,7 +118,7 @@ const Shape3 shape_B3(shape_B, axis);
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_REDUCE::reduce(Token & _LO, Value_P B, Axis axis)
+Bif_REDUCE::reduce(Token & _LO, Value_P B, uAxis axis)
 {
 Function * LO = _LO.get_function();
    Assert1(LO);
@@ -163,7 +163,7 @@ const Shape3 Z3(B3.h(), 1, B3.l());
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_REDUCE::reduce_n_wise(Value_P A, Token & _LO, Value_P B, Axis axis)
+Bif_REDUCE::reduce_n_wise(Value_P A, Token & _LO, Value_P B, uAxis axis)
 {
 Function * LO = _LO.get_function();
    Assert(LO);

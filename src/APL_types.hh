@@ -46,6 +46,9 @@ using namespace std;
 typedef int32_t Rank;
 typedef Rank Axis;
 
+typedef uint32_t uRank;
+typedef uRank uAxis;
+
 typedef int32_t Depth;
 
 /// The dimensions of an APL value.

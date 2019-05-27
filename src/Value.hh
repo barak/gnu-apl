@@ -167,7 +167,7 @@ public:
       { return shape.get_volume() ? shape.get_volume() : 1; }
 
    /// return the rank of \b this value
-   Rank get_rank() const
+   uRank get_rank() const
      { return shape.get_rank(); }
 
    /// return the shape of \b this value

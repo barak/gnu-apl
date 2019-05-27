@@ -39,13 +39,13 @@ public:
 
 protected:
    /// Replicate B according to A along axis.
-   Token replicate(Value_P A, Value_P B, Axis axis);
+   Token replicate(Value_P A, Value_P B, uAxis axis);
 
    /// LO-reduce B along axis.
-   Token reduce(Token & _LO, Value_P B, Axis axis);
+   Token reduce(Token & _LO, Value_P B, uAxis axis);
 
    /// LO-reduce B n-wise along axis.
-   Token reduce_n_wise(Value_P A, Token & _LO, Value_P B, Axis axis);
+   Token reduce_n_wise(Value_P A, Token & _LO, Value_P B, uAxis axis);
 
 protected:
    /// overloaded Function::may_push_SI()

@@ -278,7 +278,7 @@ public:
    {}
 
    /// ravel along axis, with axis being the first (⍪( or last (,) axis of B
-   Token ravel_axis(Value_P X, Value_P B, Axis axis);
+   Token ravel_axis(Value_P X, Value_P B, uAxis axis);
 
    /// Return the ravel of B as APL value
    static Token ravel(const Shape & new_shape, Value_P B);
@@ -290,10 +290,10 @@ public:
    static Token laminate(Value_P A, Axis axis, Value_P B);
 
    /// Prepend scalar cell_A to B along axis
-   static Value_P prepend_scalar(const Cell & cell_A, Axis axis, Value_P B);
+   static Value_P prepend_scalar(const Cell & cell_A, uAxis axis, Value_P B);
 
    /// Prepend scalar cell_B to A along axis
-   static Value_P append_scalar(Value_P A, Axis axis, const Cell & cell_B);
+   static Value_P append_scalar(Value_P A, uAxis axis, const Cell & cell_B);
 };
 //-----------------------------------------------------------------------------
 /** primitive functions catenate, laminate, and ravel along last axis */

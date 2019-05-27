@@ -107,7 +107,7 @@ protected:
    ShapeItem current_offset;
 
    /// the number of axes
-   const Rank rank;
+   const uRank rank;
 
    /// true iff this interator has reached its final item
    bool done;

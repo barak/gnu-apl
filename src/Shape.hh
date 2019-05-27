@@ -56,7 +56,7 @@ public:
    { rho[0] = height;   rho[1] = rows;   rho[2] = cols; }
 
    /// constructor: arbitrary shape
-   Shape(Rank rk, const ShapeItem * sh)
+   Shape(uRank rk, const ShapeItem * sh)
    : rho_rho(0),
      volume(1)
    { loop(r, rk)   add_shape_item(sh[r]); }
@@ -78,11 +78,11 @@ public:
    Shape abs() const;
 
    /// return a shape with the upper \b cnt dimensions of this shape
-   Shape high_shape(Rank cnt) const
+   Shape high_shape(uRank cnt) const
       { Assert(cnt <= get_rank());   return Shape(cnt, rho); }
 
    /// return a shape with the lower \b cnt dimensions of this shape
-   Shape low_shape(Rank cnt) const
+   Shape low_shape(uRank cnt) const
       { Assert(cnt <= get_rank());
         return Shape(cnt, rho + (get_rank() - cnt)); }
 
@@ -101,15 +101,15 @@ public:
       { return ! (*this == other); }
 
    /// return the rank
-   Rank get_rank() const
+   uRank get_rank() const
    { return rho_rho; }
 
    /// return the length of dimension \b r
-   ShapeItem get_shape_item(Rank r) const
+   ShapeItem get_shape_item(uAxis r) const
    { Assert(r < rho_rho);   return rho[r]; }
 
    /// return the length of dimension \b r
-   ShapeItem get_transposed_shape_item(Rank r) const
+   ShapeItem get_transposed_shape_item(uAxis r) const
    { Assert(r < rho_rho);   return rho[rho_rho - r - 1]; }
 
    /// return the length of the last dimension
@@ -128,7 +128,7 @@ public:
         return count; }
 
    /// modify dimension \b r
-   void set_shape_item(Rank r, ShapeItem sh)
+   void set_shape_item(uAxis r, ShapeItem sh)
       { Assert(r < rho_rho);
         if (rho[r])   { volume /= rho[r];  rho[r] = sh;  volume *= rho[r]; }
         else          { rho[r] = sh;   recompute_volume();                 } }
@@ -151,7 +151,7 @@ public:
         rho[rho_rho++] = len;   volume *= len; }
 
    /// possibly increase rank by prepending axes of length 1
-   void expand_rank(Rank new_rk)
+   void expand_rank(uRank new_rk)
       { if (rho_rho < new_rk)
             {
               const int diff = new_rk - rho_rho;
@@ -214,7 +214,7 @@ public:
 
 protected:
    /// the rank (number of valid shape items)
-   Rank rho_rho;
+   uRank rho_rho;
 
    /// the shape
    ShapeItem rho[MAX_RANK];

@@ -360,7 +360,7 @@ const ShapeItem count = B->element_count();
 }
 //-----------------------------------------------------------------------------
 Value_P
-Bif_COMMA::prepend_scalar(const Cell & cell_A, Axis axis, Value_P B)
+Bif_COMMA::prepend_scalar(const Cell & cell_A, uAxis axis, Value_P B)
 {
    if (B->is_empty())
       {
@@ -413,7 +413,7 @@ const Cell * cB = &B->get_ravel(0);
 }
 //-----------------------------------------------------------------------------
 Value_P
-Bif_COMMA::append_scalar(Value_P A, Axis axis, const Cell & cell_B)
+Bif_COMMA::append_scalar(Value_P A, uAxis axis, const Cell & cell_B)
 {
    if (A->is_empty())
       {
@@ -683,7 +683,7 @@ const Cell * cB = &B->get_ravel(0);
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_COMMA::ravel_axis(Value_P X, Value_P B, Axis axis)
+Bif_COMMA::ravel_axis(Value_P X, Value_P B, uAxis axis)
 {
 const APL_Integer qio = Workspace::get_IO();
 
@@ -753,7 +753,7 @@ ShapeItem count = 1;
 Shape shape_Z;
    loop (r, from)   shape_Z.add_shape_item(B->get_shape_item(r));
    shape_Z.add_shape_item(count);
-   for (Rank r = to + 1; r < B->get_rank(); ++r)
+   for (uRank r = to + 1; r < B->get_rank(); ++r)
        shape_Z.add_shape_item(B->get_shape_item(r));
 
    return ravel(shape_Z, B);
@@ -799,7 +799,7 @@ Bif_F12_COMMA::eval_AB(Value_P A, Value_P B)
        return Token(TOK_APL_VALUE1, Z);
      }
 
-Rank max_rank = A->get_rank();
+uRank max_rank = A->get_rank();
    if (max_rank < B->get_rank())  max_rank = B->get_rank(); 
    return catenate(A, max_rank - 1, B);
 }
@@ -820,7 +820,8 @@ const APL_Integer qio = Workspace::get_IO();
       {
         const Axis axis = cX.get_checked_near_int() - qio;
         if (axis < 0)                                         AXIS_ERROR;
-        if (axis >= A->get_rank() && axis >= B->get_rank())   AXIS_ERROR;
+        if (uAxis(axis) >= A->get_rank() && uAxis(axis) >= B->get_rank())
+           AXIS_ERROR;
         return catenate(A, axis, B);
       }
 
@@ -842,7 +843,7 @@ ShapeItem c2 = 1;   // assume B is scalar;
    if (B->get_rank() >= 1)
       {
         c1 = B->get_shape_item(0);
-        for (Rank r = 1; r < B->get_rank(); ++r)   c2 *= B->get_shape_item(r);
+        for (uRank r = 1; r < B->get_rank(); ++r)   c2 *= B->get_shape_item(r);
       }
 
 Shape shape_Z(c1, c2);

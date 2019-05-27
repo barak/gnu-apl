@@ -35,10 +35,10 @@ public:
  
 protected:
    /// Expand B according to A.
-   Token expand(Value_P A, Value_P B, Axis axis);
+   Token expand(Value_P A, Value_P B, uAxis axis);
 
    /// Compute the LO-scan of B.
-   Token scan(Token & _LO, Value_P B, Axis axis);
+   Token scan(Token & _LO, Value_P B, uAxis axis);
 
    /// Compute one scan item and store result in Z.
    static void scan_item(Cell * Z, Function * LO, const Cell * B,

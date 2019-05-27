@@ -32,7 +32,7 @@ Bif_OPER1_SCAN1 * Bif_OPER1_SCAN1::fun = &Bif_OPER1_SCAN1::_fun;
 
 //-----------------------------------------------------------------------------
 Token
-Bif_SCAN::expand(Value_P A, Value_P B, Axis axis)
+Bif_SCAN::expand(Value_P A, Value_P B, uAxis axis)
 {
    // turn scalar B into ,B
    //
@@ -125,7 +125,7 @@ ShapeItem inc_2 = 0;              // increment after result m*l items
 }
 //-----------------------------------------------------------------------------
 Token
-Bif_SCAN::scan(Token & _LO, Value_P B, Axis axis)
+Bif_SCAN::scan(Token & _LO, Value_P B, uAxis axis)
 {
 Function * LO = _LO.get_function();
    Assert(LO);

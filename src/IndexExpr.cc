@@ -40,7 +40,7 @@ IndexExpr::~IndexExpr()
 }
 //-----------------------------------------------------------------------------
 Value_P
-IndexExpr::extract_value(Rank rk)
+IndexExpr::extract_value(uAxis rk)
 {
    Assert1(rk < rank);
 
@@ -101,7 +101,7 @@ Rank axis = I->get_ravel(0).get_near_int() - qio;
 }
 //-----------------------------------------------------------------------------
 void
-IndexExpr::set_value(Axis axis, Value_P val)
+IndexExpr::set_value(uAxis axis, Value_P val)
 {
    // Note: we expect that all axes have been allocated with add(0)
    // Note also that IndexExpr is in parsing order, ie. 0 is the lowest axis.

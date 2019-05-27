@@ -89,7 +89,7 @@ Shape::insert_axis(Axis axis, ShapeItem len) const
         return ret + *this;
       }
 
-   if (axis >= get_rank())   // insert after last axis
+   if (uAxis(axis) >= get_rank())   // insert after last axis
       {
         const Shape ret(len);
         return *this + ret;

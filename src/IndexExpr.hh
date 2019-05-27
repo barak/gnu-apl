@@ -51,7 +51,7 @@ public:
         values[rank++] = val; }
 
    /// return the number of values (= number of semicolons + 1)
-   Rank value_count() const   { return rank; }
+   uRank value_count() const   { return rank; }
 
    /// return true iff the number of dimensions is 1 (i.e. no ; and non-empty)
    bool is_axis() const   { return rank == 1; }
@@ -60,7 +60,7 @@ public:
    Rank get_axis(Rank max_axis) const;
 
    /// set axis \b axis to \b val
-   void set_value(Axis axis, Value_P val);
+   void set_value(uAxis axis, Value_P val);
 
    /// return true iff this index is part of indexed assignment ( A[]← )
    Assign_state get_assign_state() const
@@ -71,7 +71,7 @@ public:
    Shape to_shape() const;
 
    /// return one axis value and clear it in \b this IndexExpr
-   Value_P extract_value(Rank rk);
+   Value_P extract_value(uAxis rk);
 
    /// clear all axis values
    void extract_all();
@@ -87,7 +87,7 @@ public:
 
 protected:
    /// the number of dimensions
-   Rank rank;
+   uRank rank;
 
    /// true iff this index is part of indexed assignment ( A[]← )
    const Assign_state assign_state;
