@@ -59,7 +59,7 @@ const uint32_t hash = compute_hash(sym_name);
              CERR << "Symbol " << sym_name << " has hash " << HEX(hash) << endl;
            }
 
-        Symbol * new_symbol = new Symbol(sym_name, ID::USER_SYMBOL);
+        Symbol * new_symbol = new Symbol(sym_name, ID_USER_SYMBOL);
         symbol_table[hash] =  new_symbol;
         return new_symbol;
       }
@@ -79,7 +79,7 @@ const uint32_t hash = compute_hash(sym_name);
 
    // no symbol with name sym_name exists. The second walk:
    //
-Symbol * sym = new Symbol(sym_name, ID::USER_SYMBOL);
+Symbol * sym = new Symbol(sym_name, ID_USER_SYMBOL);
    add_symbol(sym);
    return sym;
 }
@@ -528,7 +528,7 @@ SystemName * sym = symbol_table[hash];
 }
 //-----------------------------------------------------------------------------
 void
-SystemSymTab::add_fun_or_var(const UCS_string & name, ID::Id id,
+SystemSymTab::add_fun_or_var(const UCS_string & name, Id id,
                        QuadFunction * function, SystemVariable * variable)
 {
    // name should not yet exist

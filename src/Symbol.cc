@@ -40,16 +40,16 @@
 #include "Workspace.hh"
 
 //-----------------------------------------------------------------------------
-Symbol::Symbol(ID::Id id)
+Symbol::Symbol(Id id)
    : NamedObject(id),
      next(0),
-     name(ID::get_name(id)),
+     name(ID::get_name_UCS(id)),
      monitor_callback(0)
 {
    push();
 }
 //-----------------------------------------------------------------------------
-Symbol::Symbol(const UCS_string & ucs, ID::Id id)
+Symbol::Symbol(const UCS_string & ucs, Id id)
    : NamedObject(id),
      next(0),
      name(ucs),

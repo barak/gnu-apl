@@ -91,10 +91,10 @@ class Symbol : public NamedObject
 
 public:
    /// create a system symbol with Id \b id
-   Symbol(ID::Id id);
+   Symbol(Id id);
 
    /// create a symbol with name \b ucs
-   Symbol(const UCS_string & ucs, ID::Id id);
+   Symbol(const UCS_string & ucs, Id id);
 
    /// destructor
    virtual ~Symbol()
@@ -128,7 +128,7 @@ public:
    /// share variable with \b proc
    void share_var(SV_key key);
 
-   /// unshare variable
+   /// unshare a shared variable
    SV_Coupling unshare_var();
 
    /// clear the value stack of \b this symbol
@@ -209,7 +209,7 @@ public:
    virtual const Function * get_function() const;
 
    /// The name of \b this \b Symbol
-   virtual const UCS_string & get_name() const   { return name; }
+   virtual UCS_string get_name() const   { return name; }
 
    /// overloaded NamedObject::get_function()
    virtual Function * get_function();
@@ -308,7 +308,7 @@ class LAMBDA : public Symbol
 public:
    /// constructor
    LAMBDA()
-   : Symbol(ID::LAMBDA)
+   : Symbol(ID_LAMBDA)
    {}
 
    /// destroy variable
@@ -321,7 +321,7 @@ class ALPHA : public Symbol
 public:
    /// constructor
    ALPHA()
-   : Symbol(ID::ALPHA)
+   : Symbol(ID_ALPHA)
    {}
 
    /// destroy variable
@@ -334,7 +334,7 @@ class ALPHA_U : public Symbol
 public:
    /// constructor
    ALPHA_U()
-   : Symbol(ID::ALPHA_U)
+   : Symbol(ID_ALPHA_U)
    {}
 
    /// destroy variable
@@ -347,7 +347,7 @@ class CHI : public Symbol
 public:
    /// constructor
    CHI()
-   : Symbol(ID::CHI)
+   : Symbol(ID_CHI)
    {}
 
    /// destroy variable
@@ -360,7 +360,7 @@ class OMEGA : public Symbol
 public:
    /// constructor
    OMEGA()
-   : Symbol(ID::OMEGA)
+   : Symbol(ID_OMEGA)
    {}
 
    /// destroy variable
@@ -373,7 +373,7 @@ class OMEGA_U : public Symbol
 public:
    /// constructor
    OMEGA_U()
-   : Symbol(ID::OMEGA_U)
+   : Symbol(ID_OMEGA_U)
    {}
 
    /// destroy variable

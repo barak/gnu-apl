@@ -130,8 +130,7 @@ Quad_FIO::close_handle(int fd)
         if (fe.fe_FILE)   fclose(fe.fe_FILE);   // also closes fe.fe_fd
         else              close(fe.fe_fd);
 
-        fe = open_files.last();       // move last file to fe
-        open_files.pop();        // erase last file
+        open_files.erase(h);
         return 0;   // OK
       }
 

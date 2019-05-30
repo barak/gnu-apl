@@ -28,13 +28,13 @@
 NameClass
 NamedObject::get_nc() const
 {
-   if (id == ID::USER_SYMBOL ||   // this named object is a user defined object
-       id == ID::ALPHA       ||   // ⍺
-       id == ID::ALPHA_U     ||   // ⍶
-       id == ID::LAMBDA      ||   // λ
-       id == ID::OMEGA       ||   // ⍵
-       id == ID::OMEGA_U     ||   // ⍹
-       id == ID::CHI)             // χ
+   if (id == ID_USER_SYMBOL ||   // this named object is a user defined object
+       id == ID_ALPHA       ||   // ⍺
+       id == ID_ALPHA_U     ||   // ⍶
+       id == ID_LAMBDA      ||   // λ
+       id == ID_OMEGA       ||   // ⍵
+       id == ID_OMEGA_U     ||   // ⍹
+       id == ID_CHI)             // χ
       {
         const Symbol * sym = get_symbol();
         if (sym)

@@ -21,6 +21,7 @@
 #include <math.h>
 #include <string.h>
 
+#include "Backtrace.hh"
 #include "Common.hh"
 #include "FloatCell.hh"
 #include "Heapsort.hh"
@@ -1460,4 +1461,24 @@ UCS_string ret;
    
    return ret;
 }
+//----------------------------------------------------------------------------
+#if UCS_tracking
+UCS_string::~UCS_string()
+{
+   --total_count;
+   cerr << setfill('0') << endl << "@@ " << setw(5) << instance_id
+        << " DEL ##" << total_count
+        << " c= " << Backtrace::caller(3) << setfill(' ') << endl;
+}
+//----------------------------------------------------------------------------
+void UCS_string::create(const char * loc)
+{
+   ++total_count;
+   instance_id = ++total_id;
+   cerr << setfill('0') << endl << "@@ " << setw(5) << instance_id
+        << " NEW ##" << total_count << " " << loc
+        << " c= " << Backtrace::caller(3) << setfill(' ') << endl;
+}
+
+#endif
 //----------------------------------------------------------------------------

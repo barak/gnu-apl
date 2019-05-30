@@ -23,6 +23,9 @@
 
 #include <iostream>
 
+#include "UTF8_string.hh"
+#include "UCS_string.hh"
+
 class Function;
 class Symbol;
 class UCS_string;
@@ -43,20 +46,11 @@ class UCS_string;
 class ID
 {
 public:
-   /// an ID. Every object known to APL (primitive, ⎕xx, ...) has one
-   enum Id
-   {
-#define pp(i, _u, v)          i v,
-#define qf(i, _u, v) Quad_ ## i v,
-#define qv(i, _u, v) Quad_ ## i v,
-#define sf(i, _u, v)          i v,
-#define st(i, _u, v)          i v,
-
-#include "Id.def"
-   };
+   /// return the printable name for id as UTF8 *
+   static const UTF8 * get_name(Id id);
 
    /// return the printable name for id as UCS_string
-   static const UCS_string & get_name(Id id);
+   static UCS_string get_name_UCS(Id id);
 
    /// If \b id is the ID of primitive function, primitive operator, or
    /// quad function, then return a pointer to it. Otherwise return 0.
@@ -68,6 +62,9 @@ public:
 
    /// return the TokenTag for \b id
    static int get_token_tag(Id id);
+
+   /// release UCS_strings with ID names
+   static void cleanup();
 };
 //-----------------------------------------------------------------------------
 

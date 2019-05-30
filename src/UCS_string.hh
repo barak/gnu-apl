@@ -25,7 +25,6 @@
 #include <stdio.h>
 
 #include "Assert.hh"
-#include "Backtrace.hh"
 #include "Common.hh"
 #include "Heapsort.hh"
 #include "Simple_string.hh"
@@ -85,26 +84,19 @@ public:
    /// constructor: UCS_string from simple character vector value.
    UCS_string(const Value & value);
 
-   ~UCS_string()
-      {
-        --total_count;
 #if UCS_tracking
-        cerr << setfill('0') << "@@ " << setw(5) << instance_id
-             << " DEL ##" << total_count << setfill(' ') << endl;
-#endif
-      }
-
    /// common part of all constructors
-   void create(const char * loc)
-      { 
-        ++total_count;
-#if UCS_tracking
-        instance_id = ++total_id;
-        cerr << setfill('0') << "@@ " << setw(5) << instance_id
-             << " NEW ##" << total_count << " " << loc
-             << " c= " << Backtrace::caller(2) << setfill(' ') << endl;
+   void create(const char * loc);
+
+   /// destructor
+   ~UCS_string();
+#else
+   /// common part of all constructors
+   void create(const char * loc)   { ++total_count; }
+
+   /// destructor
+   ~UCS_string()                   { --total_count; }
 #endif
-      }
 
    /// cast to an array of items with the same size as Unicode. This is for
    /// interfacing to libraries that have typedef'ed Unicodes differently.

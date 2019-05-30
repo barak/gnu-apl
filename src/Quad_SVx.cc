@@ -248,7 +248,7 @@ Value_P Z(sh_Z, LOC);
 }
 //=============================================================================
 Quad_SVE::Quad_SVE()
-   : NL_SystemVariable(ID::Quad_SVE)
+   : NL_SystemVariable(ID_Quad_SVE)
 {
    Symbol::assign(IntScalar(0, LOC), false, LOC);
 }

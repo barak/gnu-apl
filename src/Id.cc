@@ -56,29 +56,42 @@ struct Id_name
   /// compare \b key with \b item (for bsearch())
   static int compare(const void * key, const void * item)
      {
-       return *reinterpret_cast<const ID::Id *>(key)
+       return *reinterpret_cast<const Id *>(key)
             - reinterpret_cast<const Id_name *>(item)->id;
      }
 
   /// the ID
-  ID::Id id;
+  Id id;
 
    /// how \b id is being printed
-  const UCS_string * ucs_name;
+  const UTF8 * utf_name;
 };
 
 static Id_name id2ucs[] =
 {
-#define pp(i, _u, _v) { ID::i, 0}, 
-#define qf(i,  _u, _v) {ID::Quad_ ## i, 0}, 
-#define qv(i,  _u, _v) {ID::Quad_ ## i, 0}, 
-#define sf(i,  _u, _v) {ID::i, 0}, 
-#define st(i,  _u, _v) {ID::i, 0},
+#define pp(i, _u, _v) { ID_      ## i, 0}, 
+#define qf(i,  _u, _v) {ID_Quad_ ## i, 0}, 
+#define qv(i,  _u, _v) {ID_Quad_ ## i, 0}, 
+#define sf(i,  _u, _v) {ID_      ## i, 0}, 
+#define st(i,  _u, _v) {ID_      ## i, 0},
 
 #include "Id.def"
 };
 
-const UCS_string &
+//-----------------------------------------------------------------------------
+UCS_string
+ID::get_name_UCS(Id id)
+{
+UTF8_string utf(reinterpret_cast<const char *>(get_name(id)));
+   return UCS_string(utf);
+}
+//-----------------------------------------------------------------------------
+void
+ID::cleanup()
+{
+}
+//-----------------------------------------------------------------------------
+const UTF8 *
 ID::get_name(Id id)
 {
 void * result =
@@ -86,44 +99,41 @@ void * result =
             sizeof(Id_name), Id_name::compare);
 
    Assert(result);
-Id_name * idn = reinterpret_cast<Id_name *>(result);
-   if (const UCS_string * ucs = idn->ucs_name)   return *ucs; 
+Id_name * idn = static_cast<Id_name *>(result);
+   if (const UTF8 * utf = idn->utf_name)   return utf; 
 
    // the name was not yet constructed. Do it now
    //
 const char * name = "unknown ID";
    switch(id)
        {
-#define pp(i, _u, _v) case ID::i:          name = #i;   break;
-#define qf(i,  u, _v) case ID::Quad_ ## i: name = u;   break;
-#define qv(i,  u, _v) case ID::Quad_ ## i: name = u;   break;
-#define sf(i,  u, _v) case ID::i:          name = u;   break;
-#define st(i,  u, _v) case ID::i:          name = u;   break;
+#define pp(i, _u, _v) case ID_      ## i:   name = #i;   break;
+#define qf(i,  u, _v) case ID_Quad_ ## i:   name = u;   break;
+#define qv(i,  u, _v) case ID_Quad_ ## i:   name = u;   break;
+#define sf(i,  u, _v) case ID_      ## i:   name = u;   break;
+#define st(i,  u, _v) case ID_      ## i:   name = u;   break;
 
 #include "Id.def"
        }
 
-UTF8_string utf(name);
-UCS_string * ucs = new UCS_string(utf);
-   idn->ucs_name = ucs;
-   return *ucs;
+   return reinterpret_cast<const UTF8 *>(name);
 }
 //-----------------------------------------------------------------------------
 ostream &
-operator << (ostream & out, ID::Id id)
+operator << (ostream & out, Id id)
 {
    return out << ID::get_name(id);
 }
 //-----------------------------------------------------------------------------
 Function *
-ID::get_system_function(ID::Id id)
+ID::get_system_function(Id id)
 {
    switch(id)
       {
 #define pp(i, _u, _v)
-#define qf(i, _u, _v) case ID::Quad_ ## i: return Quad_ ## i::fun;
+#define qf(i, _u, _v) case ID_Quad_ ## i:   return Quad_ ## i::fun;
 #define qv(i, _u, _v)
-#define sf(i, _u, _v) case ID:: i:        return Bif_ ## i::fun;
+#define sf(i, _u, _v) case ID_ ## i:        return Bif_ ## i::fun;
 #define st(i, _u, _v)
 
 #include "Id.def"
@@ -135,13 +145,13 @@ ID::get_system_function(ID::Id id)
 }
 //-----------------------------------------------------------------------------
 Symbol *
-ID::get_system_variable(ID::Id id)
+ID::get_system_variable(Id id)
 {
    switch(id)
       {
 #define pp(_i, _u, _v)
 #define qf(_i, _u, _v)
-#define qv( i, _u, _v)   case ID::Quad_ ## i: \
+#define qv( i, _u, _v)   case ID_Quad_ ## i: \
                               return &Workspace::get_v_Quad_ ## i();
 #define sf(_i, _u, _v) 
 #define st(_i, _u, _v) 
@@ -161,7 +171,7 @@ ID::get_token_tag(Id id)
       {
 #define pp(_i, _u, _v)
 #define qf(_i, _u, _v)
-#define qv( i, _u, _v)   case ID::Quad_ ## i: return TOK_Quad_## i;
+#define qv( i, _u, _v)   case ID_Quad_ ## i: return TOK_Quad_## i;
 #define sf(_i, _u, _v) 
 #define st(_i, _u, _v) 
 

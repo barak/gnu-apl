@@ -52,21 +52,21 @@ enum NameClass
   User define names are used for (user-defined) variables, functions,
   or operators.
 
-   System names are used by system variables and dunctions (⎕xx) and
-   by primitive functions and operators.
+   System names are used by system variables and functions (⎕xx) and
+   for primitive functions and operators.
  **/
 /// A user-defined variable or function
 class NamedObject
 {
 public:
    /// constructor from Id
-   NamedObject(ID::Id i)
+   NamedObject(Id i)
    : id(i)
    {}
 
    /// return the name of the named object
-   virtual const UCS_string & get_name() const
-      { return ID::get_name(id); }
+   virtual UCS_string get_name() const
+      { return ID::get_name_UCS(id); }
 
    /// return the function for this Id (if any) or 0 if this Id does
    /// (currently) represent a function.
@@ -85,18 +85,18 @@ public:
    virtual const Symbol * get_symbol() const  { return 0; }
 
    /// return the Id of this object (ID_USER_SYMBOL for user defined objects)
-   ID::Id get_Id() const
+   Id get_Id() const
       { return id; }
 
    /// return true, iff this object is user-defined
    bool is_user_defined() const
-      { return id == ID::USER_SYMBOL; }
+      { return id == ID_USER_SYMBOL; }
 
    /// Get current \b NameClass of \b this name.
    NameClass get_nc() const;
 
    /// the object's id
-   const ID::Id id;
+   const Id id;
 };
 
 #endif // __NAMED_OBJECT_HH_DEFINED__

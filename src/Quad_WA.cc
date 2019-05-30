@@ -31,7 +31,7 @@ unsigned long long Quad_WA::initial_sbrk = 0;
 
 //=============================================================================
 Quad_WA::Quad_WA()
-   : RO_SystemVariable(ID::Quad_WA)
+   : RO_SystemVariable(ID_Quad_WA)
 {
    Symbol::assign(IntScalar(0, LOC), false, LOC);
 }

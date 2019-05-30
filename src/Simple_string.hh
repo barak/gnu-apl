@@ -53,33 +53,21 @@ public:
    Simple_string(const T * data, ShapeItem len)
       {
         allocate(len);
-        loop(l, items_valid)
-           {
-             (items + l)->~T();
-             new (items + l) T(data[l]);
-           }
+        loop(l, items_valid)   new (items + l) T(data[l]);
       }
 
    /// constructor: \b len times \b data
    Simple_string(ShapeItem len, const T & data)
       {
         allocate(len);
-        loop(l, items_valid)
-           {
-             (items + l)->~T();
-             new (items + l) T(data);
-           }
+        loop(l, items_valid)   new (items + l) T(data);
       }
 
    /// constructor: copy other string
    Simple_string(const Simple_string & other)
       {
         allocate(other.items_valid);
-        loop(l, items_valid)
-           {
-             (items + l)->~T();
-             new (items + l) T(other.items[l]);
-           }
+        loop(l, items_valid)   new (items + l) T(other.items[l]);
       }
 
    /// constructor: copy other string, starting at pos, max. len items
@@ -87,11 +75,7 @@ public:
       {
         Assert((pos + len) <= other.items_valid);
         allocate(len);
-        loop(l, items_valid)
-           {
-             (items + l)->~T();
-             new (items + l) T(other.items[l + pos]);
-           }
+        loop(l, items_valid)   new (items + l) T(other.items[l + pos]);
       }
 
    /// destructor
@@ -129,7 +113,6 @@ public:
    void append(const T & t, const char * loc = 0)
       {
         extend(items_valid + 1);
-        (items + items_valid)->~T();
         new (items + items_valid++) T(t);
       }
 
@@ -140,7 +123,8 @@ public:
         loop(o, other.items_valid)   append(other[o]);
       }
 
-   /// insert character \b t before position \b pos
+   /// insert character \b t before position \b pos. After that items[]pos]
+   /// is the new item and the old items[pos]... are moved up.
    void insert_before(ShapeItem pos, const T & t)
       {
         Assert(pos <= items_valid);
@@ -152,10 +136,8 @@ public:
 
         extend(items_valid + 1);
 
-        (items + items_valid)->~T();
         for (ShapeItem s = items_valid; s > pos; --s)   items[s] = items[s - 1];
-        (items + pos)->~T();
-        new (items + pos)   T(t);
+        items[pos] = t;
         ++items_valid;
       }
 
@@ -180,15 +162,16 @@ public:
       {
         Assert(pos < items_valid);
 
-         const ShapeItem rest = items_valid - (pos + 1);
+        const ShapeItem rest = items_valid - (pos + 1);
 
-         (items + pos)->~T();                 // destruct erased item
-         loop(r, rest)
+        loop(r, rest)
             {
               T * t = items + pos + r;
+              t->~T();
               new (t) T(items[pos + 1 + r]);  // copy the item above
             }
          --items_valid;
+         items[items_valid].~T();             // destruct final item
       }
 
    /// extend allocated size

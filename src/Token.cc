@@ -176,7 +176,7 @@ operator << (ostream & out, const Token & token)
         return out << token.get_Id() << token.get_int_val();
       }
 
-   if (token.get_Id() > ID::No_ID2)   return out << token.get_Id();
+   if (token.get_Id() > ID_No_ID2)   return out << token.get_Id();
 
    switch(token.get_Class())
       {
@@ -378,7 +378,7 @@ Token::print_function(ostream & out) const
 
    out << "{ unknown function Token " << tag;
 
-   if (get_Id() != ID::No_ID)   // tag has an Id
+   if (get_Id() != ID_No_ID)   // tag has an Id
       {
         out << ", Id = " << get_Id();
       }
@@ -453,7 +453,7 @@ Token::print_value(ostream & out) const
 
    out << "{ unknown value Token " << tag;
 
-   if (get_Id() != ID::No_ID)   // tag has an Id
+   if (get_Id() != ID_No_ID)   // tag has an Id
       {
         out << ", Id = " << get_Id();
       }
@@ -595,14 +595,14 @@ UCS_string ucs;
         case TC_L_PARENT:
         case TC_R_CURLY:
         case TC_L_CURLY:
-             return ID::get_name(get_Id());
+             return ID::get_name_UCS(get_Id());
 
         case TC_FUN0:
         case TC_FUN12:
         case TC_OPER1:
         case TC_OPER2:
-             if (get_Id() == ID::No_ID)   return get_function()->get_name();
-             return ID::get_name(get_Id());
+             if (get_Id() == ID_No_ID)   return get_function()->get_name();
+             return ID::get_name_UCS(get_Id());
 
         default:
              CERR << "Token: " << HEX4(tag) << " " << *this

@@ -21,6 +21,7 @@
 #ifndef __EXECUTABLE_HH_DEFINED__
 #define __EXECUTABLE_HH_DEFINED__
 
+#include "Avec.hh"
 #include "Token.hh"
 #include "UCS_string_vector.hh"
 
@@ -58,7 +59,7 @@ public:
    void clear_body();
 
    /// return the name of this function, or ◊ or ⍎
-   virtual const UCS_string & get_name() const = 0;
+   virtual UCS_string get_name() const = 0;
 
    /// return true iff this Executable cannot be suspended
    virtual bool cannot_suspend() const
@@ -218,8 +219,8 @@ public:
 
 protected:
    /// overloaded Executable::get_name()
-   virtual const UCS_string & get_name() const
-      { return ID::get_name(ID::F1_EXECUTE); }
+   virtual UCS_string get_name() const
+      { return UCS_string(UNI_EXECUTE); }
 };
 //-----------------------------------------------------------------------------
 /**
@@ -241,8 +242,8 @@ protected:
    {}
 
    /// overloaded Executable::get_name()
-   virtual const UCS_string & get_name() const
-      { return ID::get_name(ID::DIAMOND); }
+   virtual UCS_string get_name() const
+      { return UCS_string(UNI_DIAMOND); }
 };
 //-----------------------------------------------------------------------------
 

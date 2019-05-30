@@ -36,7 +36,7 @@ class SystemVariable : public Symbol
 {
 public:
    /// Construct a \b SystemVariable with \b Id \b id
-   SystemVariable(ID::Id id)
+   SystemVariable(Id id)
    : Symbol(id)
    {}
 
@@ -73,7 +73,7 @@ class NL_SystemVariable : public SystemVariable
 public:
 public:
    /// Constructor.
-   NL_SystemVariable(ID::Id id)
+   NL_SystemVariable(Id id)
    : SystemVariable(id)
    {}
 protected:
@@ -101,7 +101,7 @@ class RO_SystemVariable : public NL_SystemVariable
 {
 public:
    /// Constructor.
-   RO_SystemVariable(ID::Id id)
+   RO_SystemVariable(Id id)
    : NL_SystemVariable(id)
    {}
 
@@ -214,7 +214,7 @@ class Quad_EM : public RO_SystemVariable
 public:
    /// Constructor.
    Quad_EM()
-   : RO_SystemVariable(ID::Quad_EM)
+   : RO_SystemVariable(ID_Quad_EM)
    {}
 
 protected:
@@ -230,7 +230,7 @@ class Quad_ET : public RO_SystemVariable
 {
 public:
    /// Constructor.
-   Quad_ET() : RO_SystemVariable(ID::Quad_ET)
+   Quad_ET() : RO_SystemVariable(ID_Quad_ET)
    {}
 
 protected:
@@ -551,7 +551,7 @@ class Quad_SYL : public NL_SystemVariable
 {
 public:
    /// Constructor.
-   Quad_SYL() : NL_SystemVariable(ID::Quad_SYL)
+   Quad_SYL() : NL_SystemVariable(ID_Quad_SYL)
       { assign(Value_P(), false, LOC); }
 
    /// overloaded Symbol::assign()

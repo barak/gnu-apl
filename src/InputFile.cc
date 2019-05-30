@@ -48,6 +48,7 @@ InputFile::operator =(const InputFile & other)
    // Otherwise the strings would be deleted twice.
    //
    file        = other.file;
+   filename.~UTF8_string();
    new (&filename)   UTF8_string(&other.filename[0], other.filename.size());
    test        = other.test;
    echo        = other.echo;

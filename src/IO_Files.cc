@@ -231,7 +231,7 @@ IO_Files::end_of_current_file()
                 }
            }
       }
-             
+
    InputFile::close_current_file();
    ++testcases_done;
 
@@ -270,7 +270,7 @@ IO_Files::end_of_current_file()
                   << "Failed testcase is " << InputFile::current_filename()
                   << endl 
                   << endl;
-                  
+
              InputFile::files_todo.shrink(0);
              return false;
            }

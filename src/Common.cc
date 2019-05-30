@@ -165,6 +165,8 @@ cleanup(bool soft)
         Thread_context::cleanup();
 
         Parallel::cleanup();
+
+        ID::cleanup();
       }
    else        // minimal clean-up
       {

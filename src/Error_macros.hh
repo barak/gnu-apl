@@ -21,6 +21,7 @@
 #ifndef __ERROR_MACROS_HH_DEFINED__
 #define __ERROR_MACROS_HH_DEFINED__
 
+#include "Backtrace.hh"
 #include "ErrorCode.hh"
 
 /// throw an Error with \b code only (typically a standard APL error)

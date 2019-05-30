@@ -1734,9 +1734,9 @@ const int vid = find_int_attr("vid", false, 10);
    //
    if (symbol.is_readonly())                     return;
    if (symbol.get_name().starts_iwith("⎕NLT"))   return;   // extinct
-   if (symbol.get_Id() == ID::Quad_SVE)           return;
-   if (symbol.get_Id() == ID::Quad_SYL)           return;
-   if (symbol.get_Id() == ID::Quad_PS)            return;
+   if (symbol.get_Id() == ID_Quad_SVE)           return;
+   if (symbol.get_Id() == ID_Quad_SYL)           return;
+   if (symbol.get_Id() == ID_Quad_PS)            return;
 
    if (vid == -1)   // stale variable
       {
@@ -1914,17 +1914,17 @@ const int depth = find_int_attr("stack-size", false, 10);
    // lookup symbol, trying ⎕xx first
    //
 Symbol * symbol;
-   if (name_UCS == ID::get_name(ID::LAMBDA))
+   if (name_UCS == ID::get_name_UCS(ID_LAMBDA))
       symbol = &Workspace::get_v_LAMBDA();
-   else if (name_UCS == ID::get_name(ID::ALPHA))
+   else if (name_UCS == ID::get_name_UCS(ID_ALPHA))
       symbol = &Workspace::get_v_ALPHA();
-   else if (name_UCS == ID::get_name(ID::ALPHA_U))
+   else if (name_UCS == ID::get_name_UCS(ID_ALPHA_U))
       symbol = &Workspace::get_v_ALPHA_U();
-   else if (name_UCS == ID::get_name(ID::CHI))
+   else if (name_UCS == ID::get_name_UCS(ID_CHI))
       symbol = &Workspace::get_v_CHI();
-   else if (name_UCS == ID::get_name(ID::OMEGA))
+   else if (name_UCS == ID::get_name_UCS(ID_OMEGA))
       symbol = &Workspace::get_v_OMEGA();
-   else if (name_UCS == ID::get_name(ID::OMEGA_U))
+   else if (name_UCS == ID::get_name_UCS(ID_OMEGA_U))
       symbol = &Workspace::get_v_OMEGA_U();
    else
       symbol = Workspace::lookup_existing_symbol(name_UCS);
@@ -1967,13 +1967,13 @@ bool no_copy = is_protected || (have_allowed_objects && !is_selected);
    //
    if (!have_allowed_objects       &&   // no dedicated object list
         copying                    &&   // )COPY
-        (name_UCS == ID::get_name(ID::Quad_CT) ||
-         name_UCS == ID::get_name(ID::Quad_FC) ||
-         name_UCS == ID::get_name(ID::Quad_IO) ||
-         name_UCS == ID::get_name(ID::Quad_LX) ||
-         name_UCS == ID::get_name(ID::Quad_PP) ||
-         name_UCS == ID::get_name(ID::Quad_PR) ||
-         name_UCS == ID::get_name(ID::Quad_RL)
+        (name_UCS == ID::get_name_UCS(ID_Quad_CT) ||
+         name_UCS == ID::get_name_UCS(ID_Quad_FC) ||
+         name_UCS == ID::get_name_UCS(ID_Quad_IO) ||
+         name_UCS == ID::get_name_UCS(ID_Quad_LX) ||
+         name_UCS == ID::get_name_UCS(ID_Quad_PP) ||
+         name_UCS == ID::get_name_UCS(ID_Quad_PR) ||
+         name_UCS == ID::get_name_UCS(ID_Quad_RL)
         ))
       {
         Log(LOG_archive)   CERR << name_UCS << " not copied at " << LOC << endl;
@@ -1983,8 +1983,8 @@ bool no_copy = is_protected || (have_allowed_objects && !is_selected);
    // in a )LOAD silently ignore session variables (⎕PW and ⎕TZ)
    //
    if (!copying &&   // )LOAD
-        (name_UCS == ID::get_name(ID::Quad_PW) ||
-         name_UCS == ID::get_name(ID::Quad_TZ)))
+        (name_UCS == ID::get_name_UCS(ID_Quad_PW) ||
+         name_UCS == ID::get_name_UCS(ID_Quad_TZ)))
       {
         skip_to_tag("/Symbol");
         return;
@@ -2228,7 +2228,7 @@ XML_Loading_Archive::read_lambda(const UTF8 * lambda_name)
 {
 UCS_string lambda = read_UCS();
 
-Symbol dummy(ID::No_ID);
+Symbol dummy(ID_No_ID);
 UserFunction * ufun = UserFunction::fix_lambda(dummy, lambda);
    Assert(ufun);
    ufun->increment_refcount(LOC);   // since we push it below
@@ -2415,12 +2415,12 @@ const UTF8 * fun_name = find_attr(name_attr, true);
 
    if (fun_name)   // user defined function
       {
-        int level = find_int_attr(level_attr, false, 10);
+        const int level = find_int_attr(level_attr, false, 10);
         const UTF8 * end = fun_name;
         while (*end != '"')   ++end;
         UTF8_string name_UTF(fun_name, end - fun_name);
         UCS_string name_UCS(name_UTF);
-        if (name_UCS == ID::get_name(ID::LAMBDA))
+        if (name_UCS == ID::get_name_UCS(ID_LAMBDA))
            {
              Assert(level == -1);
              return find_lambda(name_UCS);
@@ -2440,7 +2440,7 @@ const UTF8 * fun_name = find_attr(name_attr, true);
 const int fun_id = find_int_attr(id_attr, true, 16);
    if (fun_id != -1)
       {
-        Function * sysfun = ID::get_system_function(ID::Id(fun_id));
+        Function * sysfun = ID::get_system_function(Id(fun_id));
         Assert(sysfun);
         return sysfun;
       }

@@ -161,7 +161,7 @@ UCS_string fun_text;
           LineInput::replace_history_line(line_0);
         }
 
-        for (int l = 1; l < lines.size(); ++l)
+        for (size_t l = 1; l < lines.size(); ++l)
             {
               UCS_string line_l("[");
               line_l.append_number(l);
@@ -271,7 +271,7 @@ UserFunction_header hdr(fun_header, false);
       {
         UCS_string oper;
         Unicode cc;
-        do 
+        do
           {
             if (!c.more())   return "no ] in ∇-command";
             oper.append(cc = c.next());
@@ -573,7 +573,7 @@ Nabla::open_new_function()
       UERR << "creating new function '" << fun_symbol->get_name() 
            << "' with header '" << fun_header << "'" << endl;
 
-   lines.append(FunLine(0, fun_header));
+   lines.push_back(FunLine(0, fun_header));
    return 0;
 }
 //-----------------------------------------------------------------------------
@@ -640,7 +640,7 @@ UCS_string_vector tlines;
                   }
              }
 
-         lines.append(fl);
+         lines.push_back(fl);
        }
 
    current_line = LineLabel(tlines.size());
@@ -700,7 +700,7 @@ const LineLabel user_edit_to = edit_to;
 
    if (idx_from == 0)   COUT << "    ∇" << endl;               // if header line
    for (int e = idx_from; e <= idx_to; ++e)   lines[e].print(COUT);
-   if (idx_to == lines.size() - 1)   COUT << "    ∇" << endl;  // if last line
+   if (idx_to == int(lines.size() - 1))   COUT << "    ∇" << endl;  // if last line
 
    if (user_edit_to.valid())   // eg. [⎕42] or [2⎕42]
       {
@@ -717,7 +717,7 @@ const LineLabel user_edit_to = edit_to;
       }
    else                      // eg. [42⎕] or [⎕]
       {
-        current_line = lines.last().label;
+        current_line = lines.back().label;
         current_line.next();
       }
 
@@ -740,7 +740,7 @@ const int idx_to = find_line(LineLabel(edit_to));
 
    if (edit_from == -1)   // [∆N] : delete single line
       {
-        lines.erase(idx_to);
+        lines.erase(lines.begin() + idx_to);
         return 0;
       }
 
@@ -750,8 +750,8 @@ const int idx_from = find_line(LineLabel(edit_from));
    if (idx_from == -1)       return "Bad line number M in [M∆N] ";
    if (idx_from >= idx_to)   return "M ≥ N in [M∆N] ";
 
-   loop(j, idx_to - idx_from)   lines.erase(idx_from);
-   current_line = lines.last().label;
+   loop(j, idx_to - idx_from)   lines.erase(lines.begin() + idx_from);
+   current_line = lines.back().label;
    return 0;
 }
 //-----------------------------------------------------------------------------
@@ -851,14 +851,14 @@ const int idx_from = find_line(edit_from);
         // find the largest label before edit_from (if any)
         //
         int before_idx = -1;
-        for (int i = 0; i < lines.size(); ++i)
+        for (size_t i = 0; i < lines.size(); ++i)
             {
               if (lines[i].label < edit_from)   before_idx = i;
-              else                                 break;
+              else                              break;
             }
 
         FunLine fl(edit_from, current_text);
-        lines.insert_before(before_idx + 1, fl);
+        lines.insert(lines.begin() + before_idx + 1, fl);
       }
    else
       {
@@ -875,8 +875,8 @@ const int idx_from = find_line(edit_from);
 const char *
 Nabla::execute_escape()
 {
-   lines.shrink(0);
-   lines.append(FunLine(0, fun_header));
+   lines.clear();
+   lines.push_back(FunLine(0, fun_header));
    return 0;
 }
 //-----------------------------------------------------------------------------

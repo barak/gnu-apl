@@ -124,7 +124,7 @@ public:
    virtual ostream & print(ostream & out) const;
 
    /// return the name of this function
-   virtual const UCS_string & get_name() const
+   virtual UCS_string get_name() const
       { return header.get_name(); }
 
    /// return e.g. 'FOO[10]' 

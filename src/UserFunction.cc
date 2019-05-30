@@ -41,7 +41,7 @@
 UserFunction::UserFunction(const UCS_string txt, const char * loc,
                            const UTF8_string & _creator, bool tolerant,
                            bool macro)
-  : Function(ID::USER_SYMBOL, TOK_FUN2),
+  : Function(ID_USER_SYMBOL, TOK_FUN2),
     Executable(txt, true, PM_FUNCTION, loc),
     header(txt, macro),
     creator(_creator),
@@ -90,7 +90,7 @@ UserFunction::UserFunction(const UCS_string txt, const char * loc,
 //-----------------------------------------------------------------------------
 UserFunction::UserFunction(Fun_signature sig, int lambda_num,
                            const UCS_string & text, Token_string & lambda_body)
-  : Function(ID::USER_SYMBOL, TOK_FUN0),
+  : Function(ID_USER_SYMBOL, TOK_FUN0),
     Executable(sig, lambda_num, text, LOC),
     header(sig, lambda_num),
     creator(UNI_LAMBDA),

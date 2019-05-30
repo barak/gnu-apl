@@ -96,6 +96,16 @@ protected:
           fe_may_write(false)
         {}
 
+        void operator =(const file_entry & other)
+           {
+             path = other.path;
+             fe_FILE = other.fe_FILE;
+             fe_fd = other.fe_fd;
+             fe_errno = other.fe_errno;
+             fe_may_read = other.fe_may_read;
+             fe_may_write = other.fe_may_write;
+           }
+
         UTF8_string path;      ///< filename
         FILE * fe_FILE;        ///< FILE * returned by fopen()
         int    fe_fd;          ///< file desriptor == fileno(file)
@@ -150,7 +160,7 @@ protected:
    Token do_scanf(File_or_String & input, const UCS_string & format);
 
    /// the open files
-   Simple_string<file_entry, false> open_files;
+   Simple_string<file_entry, true> open_files;
 };
 //-----------------------------------------------------------------------------
 #endif //  __QUAD_FIO_HH_DEFINED__

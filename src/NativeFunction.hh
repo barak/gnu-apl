@@ -146,7 +146,7 @@ protected:
    /// Overloaded Function::destroy()
    virtual void destroy();
 
-   const UCS_string & get_name() const
+   UCS_string get_name() const
       { return name; }
 
    /// dl_open() handle of shared library

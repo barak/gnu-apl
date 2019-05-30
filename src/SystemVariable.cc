@@ -126,7 +126,7 @@ SystemVariable::get_attributes(int mode, Cell * dest) const
 }
 //=============================================================================
 Quad_AV::Quad_AV()
-   : RO_SystemVariable(ID::Quad_AV)
+   : RO_SystemVariable(ID_Quad_AV)
 {
    Assert1(MAX_AV == 256);
 Value_P AV(MAX_AV, LOC);
@@ -151,7 +151,7 @@ Quad_AV::indexed_at(uint32_t pos)
 }
 //=============================================================================
 Quad_AI::Quad_AI()
-   : RO_SystemVariable(ID::Quad_AI),
+   : RO_SystemVariable(ID_Quad_AI),
      session_start(now()),
      user_wait(0)
 {
@@ -176,7 +176,7 @@ Value_P ret(5, LOC);
 }
 //=============================================================================
 Quad_ARG::Quad_ARG()
-   : RO_SystemVariable(ID::Quad_ARG)
+   : RO_SystemVariable(ID_Quad_ARG)
 {
 }
 //-----------------------------------------------------------------------------
@@ -200,7 +200,7 @@ Value_P Z(argc, LOC);
 }
 //=============================================================================
 Quad_CT::Quad_CT()
-   : SystemVariable(ID::Quad_CT)
+   : SystemVariable(ID_Quad_CT)
 {
    Symbol::assign(FloatScalar(DEFAULT_Quad_CT, LOC), false, LOC);
 }
@@ -297,7 +297,7 @@ done:
    return Z;
 }
 //=============================================================================
-Quad_FC::Quad_FC() : SystemVariable(ID::Quad_FC)
+Quad_FC::Quad_FC() : SystemVariable(ID_Quad_FC)
 {
 Value_P QFC(6, LOC);
    new (QFC->next_ravel()) CharCell(UNI_ASCII_FULLSTOP);
@@ -409,7 +409,7 @@ Value_P new_val(ucs, LOC);
 }
 //=============================================================================
 Quad_IO::Quad_IO()
-   : SystemVariable(ID::Quad_IO)
+   : SystemVariable(ID_Quad_IO)
 {
    Symbol::assign(IntScalar(1, LOC), false, LOC);
 }
@@ -430,7 +430,7 @@ Quad_IO::assign(Value_P value, bool clone, const char * loc)
 }
 //=============================================================================
 Quad_L::Quad_L()
- : NL_SystemVariable(ID::Quad_L)
+ : NL_SystemVariable(ID_Quad_L)
 {
    Symbol::assign(IntScalar(0, LOC), false, LOC);
 }
@@ -462,7 +462,7 @@ StateIndicator * si = Workspace::SI_top_error();
 }
 //=============================================================================
 Quad_LC::Quad_LC()
-   : RO_SystemVariable(ID::Quad_LC)
+   : RO_SystemVariable(ID_Quad_LC)
 {
    Symbol::assign(IntScalar(0, LOC), false, LOC);
 }
@@ -494,7 +494,7 @@ Value_P Z(len, LOC);
 }
 //=============================================================================
 Quad_LX::Quad_LX()
-   : NL_SystemVariable(ID::Quad_LX)
+   : NL_SystemVariable(ID_Quad_LX)
 {
    Symbol::assign(Str0(LOC), false, LOC);
 }
@@ -509,7 +509,7 @@ Quad_LX::assign(Value_P value, bool clone, const char * loc)
 }
 //=============================================================================
 Quad_PP::Quad_PP()
-   : SystemVariable(ID::Quad_PP)
+   : SystemVariable(ID_Quad_PP)
 {
 Value_P value(LOC);
 
@@ -530,7 +530,7 @@ APL_Integer pp = value->get_sole_integer();
 }
 //=============================================================================
 Quad_PR::Quad_PR()
-   : SystemVariable(ID::Quad_PR)
+   : SystemVariable(ID_Quad_PR)
 {
    Symbol::assign(CharScalar(UNI_ASCII_SPACE, LOC), false, LOC);
 }
@@ -546,7 +546,7 @@ UCS_string ucs = value->get_UCS_ravel();
 }
 //=============================================================================
 Quad_PS::Quad_PS()
-   : SystemVariable(ID::Quad_PS),
+   : SystemVariable(ID_Quad_PS),
      print_quotients(false),
      style(Command::boxing_format)
 {
@@ -679,7 +679,7 @@ Value_P Z(2, LOC);
 }
 //=============================================================================
 Quad_PW::Quad_PW()
-   : SystemVariable(ID::Quad_PW)
+   : SystemVariable(ID_Quad_PW)
 {
    Symbol::assign(IntScalar(uprefs.initial_pw, LOC), false, LOC);
 }
@@ -699,7 +699,7 @@ const APL_Integer pw = value->get_sole_integer();
 }
 //=============================================================================
 Quad_Quad::Quad_Quad()
- : SystemVariable(ID::Quad_Quad)
+ : SystemVariable(ID_Quad_Quad)
 {
 }
 //-----------------------------------------------------------------------------
@@ -733,7 +733,7 @@ UCS_string line;
 }
 //=============================================================================
 Quad_QUOTE::Quad_QUOTE()
- : SystemVariable(ID::QUOTE_Quad)
+ : SystemVariable(ID_QUOTE_Quad)
 {
    // we assign a dummy value so that ⍞ is not undefined.
    //
@@ -828,7 +828,7 @@ Value_P Z(line, LOC);
 }
 //=============================================================================
 Quad_R::Quad_R()
- : NL_SystemVariable(ID::Quad_R)
+ : NL_SystemVariable(ID_Quad_R)
 {
    Symbol::assign(IntScalar(0, LOC), false, LOC);
 }
@@ -982,7 +982,7 @@ Value_P Z(sh, LOC);
 }
 //=============================================================================
 Quad_TC::Quad_TC()
-   : RO_SystemVariable(ID::Quad_TC)
+   : RO_SystemVariable(ID_Quad_TC)
 {
 Value_P QCT(3, LOC);
    new (QCT->next_ravel()) CharCell(UNI_ASCII_BS);
@@ -994,7 +994,7 @@ Value_P QCT(3, LOC);
 }
 //=============================================================================
 Quad_TS::Quad_TS()
-   : RO_SystemVariable(ID::Quad_TS)
+   : RO_SystemVariable(ID_Quad_TS)
 {
    Symbol::assign(IntScalar(0, LOC), false, LOC);
 }
@@ -1019,7 +1019,7 @@ Value_P Z(7, LOC);
 }
 //=============================================================================
 Quad_TZ::Quad_TZ()
-   : SystemVariable(ID::Quad_TZ)
+   : SystemVariable(ID_Quad_TZ)
 {
    offset_seconds = compute_offset();
 
@@ -1112,7 +1112,7 @@ Cell & cell = value->get_ravel(0);
 }
 //=============================================================================
 Quad_UL::Quad_UL()
-   : RO_SystemVariable(ID::Quad_UL)
+   : RO_SystemVariable(ID_Quad_UL)
 {
    Symbol::assign(get_apl_value(), false, LOC);
 }
@@ -1145,7 +1145,7 @@ Value_P Z(LOC);
 }
 //=============================================================================
 Quad_X::Quad_X()
- : NL_SystemVariable(ID::Quad_X)
+ : NL_SystemVariable(ID_Quad_X)
 {
    Symbol::assign(IntScalar(0, LOC), false, LOC);
 }

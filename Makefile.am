@@ -75,6 +75,8 @@ SYNC:	DIST
 	rm -f apl-$(VERSION)/src/buildtag.hh
 	rm -f apl-$(VERSION)/src/configure_args.cc
 	cp -a apl-$(VERSION)/* ../savannah-repo-apl/trunk/
+	echo "exported from SVN version " `svnversion` > \
+    ../savannah-repo-apl/trunk/exported_from
 	rm -Rf apl-$(VERSION)
 	cd ../savannah-repo-apl ; svn add . --force -q
 
@@ -83,9 +85,9 @@ SYNC:	DIST
 .PHONY:	EXPO
 EXPO:
 	tools/check_src
-	svn -m "auto-commit by make EXPO" commit
+	svn -m "auto-commit by make EXPO, local SVN: `svnversion`" commit
 	svn update
-	cd src; . buildtag
+	cd src; source buildtag
 	svn -m "auto-commit by make EXPO" commit
 	./configure --disable-maintainer-mode
 	make all

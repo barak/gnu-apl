@@ -503,6 +503,19 @@ enum AP_num
 //-----------------------------------------------------------------------------
 /// longest filename
 enum {  APL_PATH_MAX = 4096 };
+//-----------------------------------------------------------------------------
+/// an ID. Every internal object known to APL (primitive, ⎕xx, ...) has one
+enum Id
+{
+#define pp(i, _u, v) ID_ ##   i v,
+#define qf(i, _u, v) ID_Quad_ ## i v,
+#define qv(i, _u, v) ID_Quad_ ## i v,
+#define sf(i, _u, v) ID_ ##   i v,
+#define st(i, _u, v) ID_ ##   i v,
+
+#include "Id.def"
+};
+
 //////////////////////////////////////////////////////////////
 // C. structs                                               //
 //////////////////////////////////////////////////////////////

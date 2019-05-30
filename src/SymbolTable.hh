@@ -186,7 +186,7 @@ class SystemName
 {
 public:
    /// constructor: system variable or function
-   SystemName(const UCS_string & var_name, ID::Id var_id,
+   SystemName(const UCS_string & var_name, Id var_id,
               QuadFunction * fun,  SystemVariable * var)
    : name(var_name),
      id(var_id),
@@ -195,7 +195,7 @@ public:
    {}
 
    /// return the distinguished name
-   const UCS_string & get_name() const
+   UCS_string get_name() const
       { return name; }
 
    /// system variables are never erased
@@ -214,7 +214,7 @@ public:
       { return function; }
 
    /// return the ID of this name
-   ID::Id get_id() const
+   Id get_id() const
       { return id; }
 
    /// The next name with the same hash value as \b this \b SystemName
@@ -225,7 +225,7 @@ protected:
    const UCS_string name;
 
    /// the Id of the variable or function
-   const ID::Id id;
+   const Id id;
 
    /// the function if the name refers to a system function, or 0 if not
    QuadFunction * function;
@@ -250,22 +250,21 @@ public:
    void clear_slot(ostream & out, int hash);
 
    /// add \b function to the symbol table
-   void add_function(const UCS_string & name, ID::Id id,
-                     QuadFunction * function)
+   void add_function(const UCS_string & name, Id id, QuadFunction * function)
       { add_fun_or_var(name, id, function, 0); }
 
    /// add \b variable to the symbol table
-   void add_variable(const UCS_string & name, ID::Id id,
+   void add_variable(const UCS_string & name, Id id,
                      SystemVariable * variable)
       { add_fun_or_var(name, id, 0, variable); }
 
    /// don't add ⍺ and friends
-   void add_variable(const UCS_string & name, ID::Id id, Symbol * variable)
+   void add_variable(const UCS_string & name, Id id, Symbol * variable)
       { }
 
 protected:
    /// add a function or variable
-   void add_fun_or_var(const UCS_string & name, ID::Id id,
+   void add_fun_or_var(const UCS_string & name, Id id,
                        QuadFunction * function, SystemVariable * variable);
 
    /// the length of the longest name

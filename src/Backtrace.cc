@@ -357,9 +357,14 @@ void * buffer[200];
 const int size = backtrace(buffer, sizeof(buffer)/sizeof(*buffer));
 char ** strings = backtrace_symbols(buffer, size);
 
-static char demangled[200] = { 0 };
-   demangle_line(demangled, sizeof(demangled), strings[offset]);
-   return demangled;
+char * demangled = static_cast<char *>(malloc(200));
+   if (demangled)
+       {
+         *demangled = 0;
+         demangle_line(demangled, 200, strings[offset]);
+         return demangled;
+       }
+   return strings[offset];
 }
 //-----------------------------------------------------------------------------
 #endif // HAVE_EXECINFO_H

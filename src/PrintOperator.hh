@@ -26,6 +26,7 @@
 #include "Common.hh"
 #include "Id.hh"
 #include "Source.hh"
+#include "TokenEnums.hh"
 #include "Unicode.hh"
 
 struct AP_num3;
@@ -52,7 +53,7 @@ ostream & operator << (ostream &, const Function &);
 ostream & operator << (ostream &, const Function_PC2 &);
 ostream & operator << (ostream &, const Cell &);
 ostream & operator << (ostream &, const DynamicObject &);
-ostream & operator << (ostream &,       ID::Id id);
+ostream & operator << (ostream &,       Id id);
 ostream & operator << (ostream &, const IndexExpr &);
 ostream & operator << (ostream &, const LineLabel &);
 ostream & operator << (ostream &, const PrintBuffer &);

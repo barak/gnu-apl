@@ -317,9 +317,9 @@ Source<Unicode> src(input);
                         << "uni:   " << uni << endl
                         << "Token = " << tok.get_tag() << endl;
 
-                   if (tok.get_Id() != ID::No_ID)
+                   if (tok.get_Id() != ID_No_ID)
                       {
-                        CERR << ", Id = " << ID::Id(tok.get_tag() >> 16);
+                        CERR << ", Id = " << Id(tok.get_tag() >> 16);
                       }
                    CERR << endl;
                    Assert(0 && "Should not happen");

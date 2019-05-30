@@ -706,8 +706,10 @@ const Token_string & body = ufun->get_body();
 
                     if (!have_call)
                        {
-                         const fcall_edge edge(ufun,   &caller_sym->get_name(),
-                                               callee, &callee_sym.get_name());
+                         UCS_string caller_name = caller_sym->get_name();
+                         UCS_string callee_name = callee_sym.get_name();
+                         const fcall_edge edge(ufun,   &caller_name,
+                                               callee, &callee_name);
 
                          call_graph.append(edge);
                          Log(LOG_command_DOXY)

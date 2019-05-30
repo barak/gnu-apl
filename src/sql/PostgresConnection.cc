@@ -102,34 +102,40 @@ void PostgresConnection::fill_tables( vector<string> &tables )
     }
 }
 
-void PostgresConnection::fill_cols( const string &table, vector<ColumnDescriptor> &cols )
+void
+PostgresConnection::fill_cols(const string &table,
+                              vector<ColumnDescriptor> &cols)
 {
-    const char *s = table.c_str();
-    PostgresAllocMemoryWrapper escaped_table_name( PQescapeLiteral( db, s, strlen( s ) ) );
+const char * s = table.c_str();
+PostgresAllocMemoryWrapper
+             escaped_table_name(PQescapeLiteral(db, s, strlen(s)));
 
-    stringstream sql;
-    sql << "select column_name,data_type from information_schema.columns where table_name = "
-        << escaped_table_name.value();
+stringstream sql;
+    sql << "select column_name,data_type from information_schema.columns"
+          " where table_name = " << escaped_table_name.value();
 
-    PostgresResultWrapper result( PQexec( db, sql.str().c_str() ) );
-    ExecStatusType status = PQresultStatus( result.get_result() );
-    if( status != PGRES_TUPLES_OK ) {
-        stringstream out;
-        out << "Error getting list of columns: " << PQresultErrorMessage( result.get_result() );
-        Workspace::more_error() = out.str().c_str();
-        DOMAIN_ERROR;            
-    }
+PostgresResultWrapper result( PQexec( db, sql.str().c_str() ) );
+ExecStatusType status = PQresultStatus( result.get_result() );
+    if (status != PGRES_TUPLES_OK )
+       {
+         stringstream out;
+         out << "Error getting list of columns: "
+             << PQresultErrorMessage(result.get_result());
+         Workspace::more_error() = out.str().c_str();
+         DOMAIN_ERROR;
+       }
 
-    int rows = PQntuples( result.get_result() );
-    for( int row = 0 ; row < rows ; row++ ) {
-        char *colname = PQgetvalue( result.get_result(), row, 0 );
-        char *coltype = PQgetvalue( result.get_result(), row, 1 );
-        cols.push_back( ColumnDescriptor( const_cast<const char *>( colname ),
-                                          const_cast<const char *>( coltype ) ) );
-    }
+int rows = PQntuples( result.get_result() );
+    for (int row = 0 ; row < rows ; row++ )
+        {
+          const char * colname = PQgetvalue( result.get_result(), row, 0 );
+          const char * coltype = PQgetvalue( result.get_result(), row, 1 );
+          cols.push_back( ColumnDescriptor(colname, coltype));
+        }
 }
-
-const string PostgresConnection::make_positional_param( int pos )
+//-----------------------------------------------------------------------------
+const string
+PostgresConnection::make_positional_param(int pos)
 {
     stringstream out;
     out << "$" << (pos + 1);

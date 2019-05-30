@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2019  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,6 +21,7 @@
 #ifndef __NABLA_HH_DEFINED__
 #define __NABLA_HH_DEFINED__
 
+#include <vector>
 #include "UCS_string.hh"
 
 class Symbol;
@@ -189,7 +190,7 @@ protected:
    Symbol * fun_symbol;
 
    /// the lines of the function.
-   Simple_string<FunLine, true> lines;
+   vector<FunLine> lines;
 
    /// editor commands
    enum Ecmd

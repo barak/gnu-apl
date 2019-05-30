@@ -34,6 +34,8 @@ pp( No_ID         , ---       , = 0      )
 pp( No_ID1        , ---       , = 1      )
 pp( No_ID2        , ---       , = 2      )
 pp( No_ID3        , ---       , = 3      )
+pp( FUN           , ---       , = 4      )
+pp( VAR           , ---       , = 5      )
 
 qf( AF            , "⎕AF"     , = 0x4101 )
 qv( AI            , "⎕AI"     ,          )

@@ -76,7 +76,8 @@ void SqliteConnection::transaction_rollback()
     run_simple( "rollback" );
 }
 
-void SqliteConnection::fill_tables( vector<string> &tables )
+void
+SqliteConnection::fill_tables(vector<string> & tables)
 {
     sqlite3_stmt *statement;
     if( sqlite3_prepare_v2( get_db(), "select name from sqlite_master where type = 'table'", -1,
@@ -96,27 +97,38 @@ void SqliteConnection::fill_tables( vector<string> &tables )
             raise_sqlite_error( "Table name is not a text column" );
         }
 
-        tables.push_back( reinterpret_cast<const char *>( sqlite3_column_text( statement, 0 ) ) );
+        tables.push_back(reinterpret_cast<const char *>
+                                          (sqlite3_column_text(statement, 0)));
     }
 }
 
-void SqliteConnection::fill_cols( const string &table, vector<ColumnDescriptor> &cols )
+void
+SqliteConnection::fill_cols(const string &table,
+                            vector<ColumnDescriptor> & cols)
 {
-    sqlite3_stmt *statement;
-    char *statement_content = sqlite3_mprintf( "pragma table_info('%q')", table.c_str() );
-    if( sqlite3_prepare_v2( get_db(), statement_content, -1, &statement, NULL ) != SQLITE_OK ) {
-        raise_sqlite_error( "Error getting table names" );
-    }
+sqlite3_stmt * statement;
+char * statement_content = sqlite3_mprintf("pragma table_info('%q')",
+                                           table.c_str() );
+int result = sqlite3_prepare_v2(get_db(), statement_content,
+        -1, &statement, NULL);
 
-    SqliteStmtWrapper statement_wrapper( statement );
-    int result;
-    while( (result = sqlite3_step( statement_wrapper.get_statement() )) != SQLITE_DONE ) {
-        cols.push_back( ColumnDescriptor( reinterpret_cast<const char *>( sqlite3_column_text( statement, 1 ) ),
-                                          reinterpret_cast<const char *>( sqlite3_column_text( statement, 2 ) ) ) );
-    }
+    sqlite3_free(statement_content);
+
+   if (result != SQLITE_OK )   raise_sqlite_error("Error getting table names");
+
+SqliteStmtWrapper statement_wrapper(statement);
+    while ((result = sqlite3_step(statement_wrapper.get_statement()))
+            != SQLITE_DONE)
+        {
+          cols.push_back(ColumnDescriptor(reinterpret_cast<const char *>
+                                          (sqlite3_column_text(statement, 1)),
+                                          reinterpret_cast<const char *>
+                                          (sqlite3_column_text(statement, 2))));
+        }
 }
 
-const string SqliteConnection::make_positional_param( int )
+const string
+SqliteConnection::make_positional_param(int)
 {
     return "?";
 }

@@ -75,7 +75,7 @@ public:
    bool is_operator() const   { return sym_LO != 0; }
 
    /// return the name of the function
-   const UCS_string & get_name() const   { return function_name; }
+   UCS_string get_name() const   { return function_name; }
 
    /// return the Symbol for the function result
    Symbol * Z()   const   { return sym_Z; }

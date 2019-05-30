@@ -104,7 +104,7 @@ public:
          strings.pop();
        }
 
-   /// reduct number of strings to \b new_size
+   /// reduce number of strings to \b new_size
    void shrink(ShapeItem new_size)
       { while (size() > new_size)   pop(); }
 

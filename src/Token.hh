@@ -140,8 +140,8 @@ public:
       { return TokenClass(tag & TC_MASK); }
 
    /// return the Id of this token.
-   ID::Id get_Id() const
-      { return ID::Id(tag >> 16); }
+   Id get_Id() const
+      { return Id(tag >> 16); }
 
    /// return the tag of this token
    const TokenTag get_tag() const   { return tag; }
