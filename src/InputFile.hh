@@ -21,6 +21,8 @@
 #ifndef __INPUT_FILE_HH_DEFINED__
 #define __INPUT_FILE_HH_DEFINED__
 
+#include <vector>
+
 #include "UTF8_string.hh"
 #include "UCS_string_vector.hh"
 
@@ -133,10 +135,10 @@ struct InputFile
    static void randomize_files();
 
    /// files that need to be processed
-   static Simple_string<InputFile, true> files_todo;
+   static std::vector<InputFile> files_todo;
 
    /// the initial set of files provided on the command line
-   static Simple_string<InputFile, true> files_orig;
+   static std::vector<InputFile> files_orig;
 
    /// FILE * from fopen (or 0 if file is closed)
    FILE       * file;

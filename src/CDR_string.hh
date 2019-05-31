@@ -59,17 +59,17 @@ struct CDR_header
 };
 
 /// a string containing a CDR record
-class CDR_string : public Simple_string<uint8_t, false>
+class CDR_string : public Simple_string<uint8_t>
 {
 public:
    /// Constructor: An uninitialized CDR structure
    CDR_string()
-   : Simple_string<uint8_t, false>(utf8P(0), 0)
+   : Simple_string<uint8_t>(utf8P(0), 0)
    {}
 
    /// Constructor: CDR structure from uint8_t * and length
    CDR_string(const uint8_t * data, int len)
-   : Simple_string<uint8_t, false>(data, len)
+   : Simple_string<uint8_t>(data, len)
    {}
 
    /// return the bytes of this CDR

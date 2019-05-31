@@ -1828,7 +1828,7 @@ const ShapeItem rows = ec/cols;
 int
 Value::print_incomplete(ostream & out)
 {
-Simple_string<const Value *, false> incomplete;
+Simple_string<const Value *> incomplete;
 bool goon = true;
 
    for (const DynamicObject * dob = all_values.get_prev();
@@ -1862,8 +1862,8 @@ bool goon = true;
 int
 Value::print_stale(ostream & out)
 {
-Simple_string<const Value *, false> stale_vals;
-Simple_string<const DynamicObject *, false> stale_dobs;
+Simple_string<const Value *> stale_vals;
+Simple_string<const DynamicObject *> stale_dobs;
 bool goon = true;
 int count = 0;
 

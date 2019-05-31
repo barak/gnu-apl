@@ -219,7 +219,7 @@ const ShapeItem rows = B->get_rows();
    // split format into format fields, one per column.
    // If there is only one format field, then repeat it cols times.
    //
-UCS_string_vector col_formats;
+vector<UCS_string> col_formats;
    split_example_into_columns(format, col_formats);
    if (col_formats. size() == 1)
       {
@@ -228,7 +228,7 @@ UCS_string_vector col_formats;
         loop(c, cols - 1)
            {
              format.append(f);
-             col_formats.append(col0);
+             col_formats.push_back(col0);
            }
       }
 
@@ -236,9 +236,9 @@ UCS_string_vector col_formats;
 
    // convert each column format string into a Format_LIFER
    //
-Simple_string<Format_LIFER, false> col_items;
+vector<Format_LIFER> col_items;
    loop(c, col_formats.size())
-       col_items.append(Format_LIFER(col_formats[c]));
+       col_items.push_back(Format_LIFER(col_formats[c]));
 
    Log(LOG_Bif_F12_FORMAT)
       {
@@ -303,7 +303,7 @@ Value_P Z(shape_Z, LOC);
 //-----------------------------------------------------------------------------
 void
 Bif_F12_FORMAT::split_example_into_columns(const UCS_string & format,
-                                   UCS_string_vector & col_formats)
+                                   vector<UCS_string> & col_formats)
 {
 bool fmt_seen = false;
 UCS_string fmt;
@@ -317,7 +317,7 @@ UCS_string fmt;
 
          if ((cc == UNI_ASCII_SPACE) && fmt_seen)   // end of field
             {
-              col_formats.append(fmt);
+              col_formats.push_back(fmt);
               fmt.shrink(0);    // start a new field;
               fmt_seen = false;
               continue;   // next char
@@ -328,7 +328,7 @@ UCS_string fmt;
               ++f;   // next char is right decorator (and end of field)
               if (f < format.size())   fmt.append(format[f]);
 
-              col_formats.append(fmt);
+              col_formats.push_back(fmt);
               fmt.shrink(0);    // start a new field;
               fmt_seen = false;
               continue;   // next char
@@ -337,11 +337,11 @@ UCS_string fmt;
 
    if ((!fmt_seen) && (col_formats.size() > 0))
       {
-        col_formats.last().append(fmt);
+        col_formats.back().append(fmt);
       }
    else
       {
-        col_formats.append(fmt);
+        col_formats.push_back(fmt);
       }
 }
 //-----------------------------------------------------------------------------

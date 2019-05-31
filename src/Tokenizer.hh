@@ -21,8 +21,77 @@
 #ifndef __TOKENIZER_HH_DEFINED__
 #define __TOKENIZER_HH_DEFINED__
 
+#include "Simple_string.hh"
 #include "Token.hh"
+#include "UCS_string.hh"
 
+class Token;
+
+//-----------------------------------------------------------------------------
+/// An iterator for UCS_string
+class Unicode_source
+{
+public:
+   /// constructor: iterate over the entire string.
+   Unicode_source(const UCS_string & s)
+   : str(s),
+   idx(0),
+   end(s.size())
+   {}
+
+   /// constructor: iterate from \b from to \b to
+   Unicode_source(const Unicode_source & src, int32_t from, int32_t to)
+   : str(src.str),
+     idx(src.idx + from),
+     end(src.idx + from + to)
+   {
+     if (end > src.str.size())   end = src.str.size();
+     if (idx > end)   idx = end;
+   }
+
+   /// return the number of remaining items
+   int32_t rest() const
+      { return end - idx; }
+
+   /// lookup next item
+   const Unicode & operator[](int32_t i) const
+      { i += idx;   Assert(uint32_t(i) < uint32_t(end));   return str[i]; }
+
+   /// get next item
+   const Unicode & get()
+      { Assert(idx < end);   return str[idx++]; }
+
+   /// lookup next item without removing it
+   const Unicode & operator *() const
+      { Assert(idx < end);   return str[idx]; }
+
+   /// skip the first element
+   void operator ++()
+      { Assert(idx < end);   ++idx; }
+
+   /// undo skip of the current element
+   void operator --()
+      { Assert(idx > 0);   --idx; }
+
+   /// shrink the source to rest \b new_rest
+   void set_rest(int32_t new_rest)
+      { Assert(new_rest <= rest());   end = idx + new_rest; }
+
+   /// skip \b count elements
+   void skip(int32_t count)
+      { idx += count;   if (idx > end)   idx = end; }
+
+protected:
+   /// the source string
+   const UCS_string & str;
+
+   /// the current position
+   int32_t idx;
+
+   /// the end position (excluding)
+   int32_t end;
+};
+//-----------------------------------------------------------------------------
 /// The converter from APL input characters to APL tokens
 class Tokenizer
 {
@@ -47,22 +116,22 @@ protected:
    void do_tokenize(const UCS_string & input, Token_string & tos);
 
    /// tokenize a function
-   void tokenize_function(Source<Unicode> & src, Token_string & tos);
+   void tokenize_function(Unicode_source & src, Token_string & tos);
 
    /// tokenize a Quad function or variable
-   void tokenize_quad(Source<Unicode> & src, Token_string & tos);
+   void tokenize_quad(Unicode_source & src, Token_string & tos);
 
    /// tokenize a single quoted string
-   void tokenize_string1(Source<Unicode> & src, Token_string & tos);
+   void tokenize_string1(Unicode_source & src, Token_string & tos);
 
    /// tokenize a double quoted string
-   void tokenize_string2(Source<Unicode> & src, Token_string & tos);
+   void tokenize_string2(Unicode_source & src, Token_string & tos);
 
    /// tokenize a number (integer, floating point, or complex).
-   void tokenize_number(Source<Unicode> & src, Token_string & tos);
+   void tokenize_number(Unicode_source & src, Token_string & tos);
 
    /// tokenize a real number (integer or floating point).
-   bool tokenize_real(Source<Unicode> &src, bool & need_float,
+   bool tokenize_real(Unicode_source &src, bool & need_float,
                       APL_Float & flt_val, APL_Integer & int_val);
 
    /// a locale-independent sscanf()
@@ -70,7 +139,7 @@ protected:
                         int E_pos, int minus_pos);
 
    /// tokenize a symbol
-   void tokenize_symbol(Source<Unicode> & src, Token_string & tos);
+   void tokenize_symbol(Unicode_source & src, Token_string & tos);
 
    /// the parsing mode of this parser
    const ParseMode pmode;

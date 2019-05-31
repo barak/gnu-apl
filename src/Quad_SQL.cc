@@ -33,8 +33,8 @@
 #include "Simple_string.hh"
 
 // !!! declare providers before Quad_SQL::_fun !!!
-static Simple_string<Provider *, false> providers;
-static Simple_string<Connection *, false> connections;
+static Simple_string<Provider *> providers;
+static Simple_string<Connection *> connections;
 
 Quad_SQL  Quad_SQL::_fun;
 Quad_SQL * Quad_SQL::fun = &Quad_SQL::_fun;

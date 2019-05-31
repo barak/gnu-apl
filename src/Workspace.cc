@@ -528,7 +528,7 @@ Workspace::clear_WS(ostream & out, bool silent)
 {
    // remove user-defined commands
    //
-   get_user_commands().shrink(0);
+   get_user_commands().clear();
 
    // clear the SI (pops all localized symbols)
    //
@@ -740,7 +740,7 @@ InputFile fam(filename, file, false, false, true, with_LX);
         fam.set_COPY();
         ++Bif_F1_EXECUTE::copy_pending;
       }
-   InputFile::files_todo.insert_before(0, fam);
+   InputFile::files_todo.insert(InputFile::files_todo.begin(), fam);
 }
 //-----------------------------------------------------------------------------
 /// a streambuf that escapes certain HTML characters
@@ -914,7 +914,7 @@ int variable_count = 0;
 void
 Workspace::dump_commands(ostream & out)
 {
-Simple_string<Command::user_command, false> & cmds = get_user_commands();
+vector<Command::user_command> & cmds = get_user_commands();
 
    loop(c, cmds.size())
       out << "]USERCMD " << cmds[c].prefix

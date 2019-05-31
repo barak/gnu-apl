@@ -254,16 +254,14 @@ SCORES
 
 ⍝ Inverse 2 ⎕TF, Chars  ----------------------------------
 
-      X←2 2 3⍴'ABC123abc#$%'
-      X
+      ⎕←X←2 2 3⍴'ABC123abc#$%'
 ABC
 123
 
 abc
 #$%
 
-      R←2 ⎕TF 'X'
-      R
+      ⎕←R←2 ⎕TF 'X'
 X←(2 2 3⍴'ABC123abc#$%')
 
       ⎕NC 'X'

@@ -50,7 +50,7 @@ public:
 
    /// an array of threads (one per plot window) handling X events from the
    /// window
-   static Simple_string<pthread_t, false> plot_threads;
+   static Simple_string<pthread_t> plot_threads;
 
 protected:
    /// overloaded Function::eval_AB()

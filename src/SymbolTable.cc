@@ -144,7 +144,7 @@ UCS_string to;
 
    // put those symbols into 'list' that satisfy 'which'
    //
-Simple_string<Symbol *, false> list;
+Simple_string<Symbol *> list;
 int symbol_count = 0;
    loop(s, SYMBOL_HASH_TABLE_SIZE)
        {
@@ -223,7 +223,7 @@ UCS_string_vector names;
    // figure column widths
    //
    enum { tabsize = 4 };
-Simple_string<int, false> col_width = names.compute_column_width(tabsize);
+Simple_string<int> col_width = names.compute_column_width(tabsize);
 
    loop(c, count)
       {
@@ -434,10 +434,10 @@ ValueStackItem & tos = symbol->value_stack[0];
    return true;
 }
 //-----------------------------------------------------------------------------
-Simple_string<const Symbol *, false>
+Simple_string<const Symbol *>
 SymbolTable::get_all_symbols() const
 {
-Simple_string<const Symbol *, false> ret;
+Simple_string<const Symbol *> ret;
    ret.reserve(1000);
 
    loop(hash, SYMBOL_HASH_TABLE_SIZE)
@@ -454,7 +454,7 @@ Simple_string<const Symbol *, false> ret;
 void
 SymbolTable::dump(ostream & out, int & fcount, int & vcount) const
 {
-Simple_string<const Symbol *, false> symbols;
+Simple_string<const Symbol *> symbols;
    loop(hash, SYMBOL_HASH_TABLE_SIZE)
       {
         for (const Symbol * sym = symbol_table[hash]; sym; sym = sym->next)

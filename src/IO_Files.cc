@@ -271,12 +271,12 @@ IO_Files::end_of_current_file()
                   << endl 
                   << endl;
 
-             InputFile::files_todo.shrink(0);
+             InputFile::files_todo.clear();
              return false;
            }
       }
 
-   InputFile::files_todo.erase(0);
+   InputFile::files_todo.erase(InputFile::files_todo.begin());
 
    if (uprefs.auto_OFF && !InputFile::files_todo.size())   Command::cmd_OFF(0);
 
@@ -351,7 +351,7 @@ IO_Files::open_next_file()
               {
                 CERR << "could not open "
                      << InputFile::current_filename() << endl;
-                InputFile::files_todo.erase(0);
+                InputFile::files_todo.erase(InputFile::files_todo.begin());
                 continue;
               }
 

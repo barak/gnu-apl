@@ -159,28 +159,29 @@ ErrorCode ec = parser.parse(ucs_line, in);
 } 
 //-----------------------------------------------------------------------------
 ErrorCode
-Executable::parse_body_line(Function_Line line, const Token_string & in,
+Executable::parse_body_line(Function_Line line, const Token_string & input,
                             bool trace,  bool tolerant, const char * loc)
 {
-Source<Token, true> src(in);
+ShapeItem idx = 0;
+const ShapeItem end = input.size();
 
    // handle labels (if any)
    //
-   if (get_parse_mode() == PM_FUNCTION &&
-       src.rest() >= 2                 &&
-       src[0].get_tag() == TOK_SYMBOL  &&
-       src[1].get_tag() == TOK_COLON)
+   if (get_parse_mode() == PM_FUNCTION  &&
+       end > 1                          &&
+       input[0].get_tag() == TOK_SYMBOL &&
+       input[1].get_tag() == TOK_COLON)
       {
-        Token tok = src.get();   // get the label symbol
-        ++src;                   // skip the :
+        Token tok_sym = input[0];   // get the label symbol
+        idx = 2;                   // skip the :
 
         UserFunction * ufun = get_ufun();
         Assert(ufun);
-        ufun->add_label(tok.get_sym_ptr(), line);
+        ufun->add_label(tok_sym.get_sym_ptr(), line);
       }
 
 Token_string out;
-   while (src.rest())
+   while ((end - idx))
       {
         // find next diamond. If there is one, copy statement in reverse order,
         // append TOK_ENDL, and continue.
@@ -189,9 +190,9 @@ Token_string out;
         //
         ShapeItem stat_len = 0;   // statement length, not counting ◊
         int diamond = 0;
-        loop(t, src.rest())
+        loop(t, (end - idx))
             {
-              if (src[t].get_tag() == TOK_DIAMOND)
+              if (input[idx + t].get_tag() == TOK_DIAMOND)
                  {
                    diamond = 1;
                    break;
@@ -206,7 +207,7 @@ Token_string out;
         //
         loop(s, stat_len)
             {
-              const Token & tok = src[stat_len - s - 1];
+              const Token & tok = input[idx + stat_len - s - 1];
               if (tok.get_Class() >= TC_MAX_PERM &&
                   tok.get_tag() != TOK_L_CURLY &&
                   tok.get_tag() != TOK_R_CURLY)
@@ -217,12 +218,13 @@ Token_string out;
                         << "Offending token: (tag > TC_MAX_PERM) "
                         << tok.get_tag() << " " << tok << endl
                         << "Statement: ";
-                   Token::print_token_list(CERR, in);
+                   loop(t, input.size())   CERR << "`" << input[t] << "  ";
+                   CERR << endl;
                    SYNTAX_ERROR;
                  }
               out.append(tok);
             }
-        src.skip(stat_len + diamond);   // skip statement and maybe ◊
+        idx += stat_len + diamond;   // skip statement and maybe ◊
 
         // 3. maybe add a TOK_END or TOK_ENDL
         //
@@ -246,6 +248,8 @@ Token_string out;
 
    loop(t, out.size())   body.append(out[t], LOC);
    return E_NO_ERROR;
+
+#undef get
 }
 //-----------------------------------------------------------------------------
 Token

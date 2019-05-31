@@ -42,31 +42,31 @@ UCS_string::UCS_string()
 }
 //-----------------------------------------------------------------------------
 UCS_string::UCS_string(Unicode uni)
-   : Simple_string<Unicode, false>(1, uni)
+   : Simple_string<Unicode>(1, uni)
 {
   create(LOC);
 }
 //-----------------------------------------------------------------------------
 UCS_string::UCS_string(const Unicode * data, size_t len)
-   : Simple_string<Unicode, false>(data, len)
+   : Simple_string<Unicode>(data, len)
 {
    create(LOC);
 }
 //-----------------------------------------------------------------------------
 UCS_string::UCS_string(size_t len, Unicode uni)
-   : Simple_string<Unicode, false>(len, uni)
+   : Simple_string<Unicode>(len, uni)
 {
    create(LOC);
 }
 //-----------------------------------------------------------------------------
 UCS_string::UCS_string(const UCS_string & ucs)
-   : Simple_string<Unicode, false>(ucs)
+   : Simple_string<Unicode>(ucs)
 {
    create(LOC);
 }
 //-----------------------------------------------------------------------------
 UCS_string::UCS_string(const UCS_string & ucs, size_t pos, size_t len)
-   : Simple_string<Unicode, false>(ucs, pos, len)
+   : Simple_string<Unicode>(ucs, pos, len)
 {
    create(LOC);
 }
@@ -333,7 +333,7 @@ UCS_string::UCS_string(const PrintBuffer & pb, Rank rank, int quad_PW)
 
 const int total_width = pb.get_width(0);
 
-Simple_string<int, false> breakpoints;
+Simple_string<int> breakpoints;
    breakpoints.reserve(2*total_width/quad_PW);
 
    // print rows, breaking at breakpoints
@@ -475,7 +475,7 @@ UCS_string::split_ws(UCS_string & rest)
 //-----------------------------------------------------------------------------
 /// constructor
 UCS_string::UCS_string(const Value & value)
-   : Simple_string<Unicode, false>(0, 0)
+   : Simple_string<Unicode>(0, 0)
 {
    create(LOC);
 
@@ -488,7 +488,7 @@ const ShapeItem ec = value.element_count();
 }
 //-----------------------------------------------------------------------------
 UCS_string::UCS_string(istream & in)
-   : Simple_string<Unicode, false>(0, 0)
+   : Simple_string<Unicode>(0, 0)
 {
    create(LOC);
 

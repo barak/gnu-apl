@@ -200,8 +200,8 @@ Token_string tos;
 
    // count symbols before first semicolon, allow one symbol too much.
    //
-int sym_count = 0;
-int tos_idx = 0;
+size_t sym_count = 0;
+size_t tos_idx = 0;
 Symbol * symbols[12];
    for (; tos_idx < 12; ++tos_idx)
       {
@@ -245,7 +245,7 @@ const int sc100_tc = sym_count * 100 + tos_idx;
    // note: constructor has set all symbol pointers to 0!
    // store symbol pointers according to signature.
    {
-     int sidx = 0;
+     size_t sidx = 0;
      if (signature & SIG_Z)    sym_Z   = symbols[sidx++];
      if (signature & SIG_A)    sym_A   = symbols[sidx++];
      if (signature & SIG_LO)   sym_LO  = symbols[sidx++];

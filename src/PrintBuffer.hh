@@ -21,6 +21,8 @@
 #ifndef __PRINT_BUFFER_HH__DEFINED__
 #define __PRINT_BUFFER_HH__DEFINED__
 
+#include <vector>
+
 #include "Avec.hh"
 #include "Common.hh"
 #include "PrintContext.hh"
@@ -96,7 +98,8 @@ public:
    /// helper for non-trivial PrintBuffer(const Value & ...) constructor
    void do_PrintBuffer(const Value & value,const PrintContext & pctx,
                          ostream * out, PrintStyle outer_style,
-                         bool * scaling, PrintBuffer * pcols,
+                         std::vector<bool> & scaling,
+                         std::vector<PrintBuffer> & pcols,
                          PrintBuffer * item_matrix);
 
    /// PrintBuffer from an APL value in function-style

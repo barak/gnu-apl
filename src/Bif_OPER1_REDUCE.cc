@@ -48,7 +48,7 @@ Shape shape_B = B->get_shape();
 const ShapeItem len_B = shape_B.get_shape_item(axis);
 ShapeItem len_A = A->element_count();
 ShapeItem len_Z = 0;
-Simple_string<ShapeItem, false> rep_counts;
+Simple_string<ShapeItem> rep_counts;
    rep_counts.reserve(len_B);
    if (len_A == 1)   // single a -> a a ... a (len_B times)
       {

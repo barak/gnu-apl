@@ -65,5 +65,5 @@ INFO(Workspace::the_workspace, __LINE__)
 Workspace Workspace::the_workspace;
 
 INFO(Parallel::all_CPUs, __LINE__)
-Simple_string<CPU_Number, false>Parallel::all_CPUs;
+Simple_string<CPU_Number>Parallel::all_CPUs;
 

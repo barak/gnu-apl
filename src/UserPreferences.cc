@@ -382,8 +382,8 @@ UserPreferences::parse_argv_2(bool logit)
 
               const UTF8_string & filename(val);
               InputFile fam(filename, 0, false, !do_not_echo, true, no_LX);
-              InputFile::files_todo.append(fam);
-              InputFile::files_orig.append(fam);
+              InputFile::files_todo.push_back(fam);
+              InputFile::files_orig.push_back(fam);
               continue;
             }
 
@@ -634,8 +634,8 @@ UserPreferences::parse_argv_2(bool logit)
                        }
                     const UTF8_string & filename = expanded_argv[a];
                     InputFile fam(filename, 0, true, true, false, no_LX);
-                    InputFile::files_todo.append(fam);
-                    InputFile::files_orig.append(fam);
+                    InputFile::files_todo.push_back(fam);
+                    InputFile::files_orig.push_back(fam);
                   }
 
               // 
@@ -716,7 +716,7 @@ UserPreferences::parse_argv_2(bool logit)
       {
         const UTF8_string & filename = expanded_argv[script_argc];
         InputFile fam(filename, 0, false, !do_not_echo, true, no_LX);
-        InputFile::files_todo.insert_before(0, fam);
+        InputFile::files_todo.insert(InputFile::files_todo.begin(), fam);
       }
 
    // count number of testfiles

@@ -562,12 +562,11 @@ UCS_string message_2(UTF8_string(error.get_error_line_2()));
 }
 //-----------------------------------------------------------------------------
 void
-UserFunction::set_trace_stop(Simple_string<Function_Line, false> & lines,
-                             bool stop)
+UserFunction::set_trace_stop(Simple_string<Function_Line> & lines, bool stop)
 {
    // Sort lines
    //
-Simple_string<bool, false> ts_lines;
+Simple_string<bool> ts_lines;
    ts_lines.reserve(line_starts.size());
 
    loop(ts, line_starts.size())   ts_lines.append(false);
@@ -919,8 +918,8 @@ UCS_string_vector original_text;
    // let [0] be the end of the function.
    line_starts[0] = Function_PC(body.size());
 
-   if (header.Z())   body.append(Token(TOK_RETURN_SYMBOL, header.Z()), LOC);
-   else              body.append(Token(TOK_RETURN_VOID), LOC);
+   if (header.Z())   body.append(Token(TOK_RETURN_SYMBOL, header.Z()));
+   else              body.append(Token(TOK_RETURN_VOID));
 
    // restore the original text (before multi-line expansion)
    if (original_text.size())   text = original_text;
@@ -1340,7 +1339,7 @@ UserFunction::adjust_line_starts()
    // this function is called from Executable::setup_lambdas() just before
    // Parser::remove_void_token(body) in order to adjust line_starts
    //
-Simple_string<ShapeItem, false> gaps;
+Simple_string<ShapeItem> gaps;
    gaps.reserve(line_starts.size());   // count TOK_VOID in every line
    loop(ls, line_starts.size())
       {

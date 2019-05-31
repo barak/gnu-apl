@@ -415,7 +415,7 @@ protected:
    UserFunction * locate_fun(const Value & fun_name);
 
    /// return integers in lines
-   Token reference(const Simple_string<Function_Line, false> & lines,
+   Token reference(const Simple_string<Function_Line> & lines,
                    bool assigned);
 
    /// return assign lines in new_value to stop or trace vector in ufun

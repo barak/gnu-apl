@@ -353,7 +353,7 @@ XML_Saving_Archive::save_Parser(const Prefix & prefix)
 void
 XML_Saving_Archive::save_symtab(const SymbolTable & symtab)
 {
-Simple_string<const Symbol *, false> symbols = symtab.get_all_symbols();
+Simple_string<const Symbol *> symbols = symtab.get_all_symbols();
 
    // remove erased symbols
    //
@@ -488,7 +488,7 @@ XML_Saving_Archive::save_Symbol(const Symbol & sym)
 //-----------------------------------------------------------------------------
 void
 XML_Saving_Archive::save_user_commands(
-               const Simple_string<Command::user_command, false> & cmds)
+               const std::vector<Command::user_command> & cmds)
 {
    if (cmds.size() == 0)   return;
 
@@ -1471,14 +1471,14 @@ bool no_copy = false;   // assume the value is needed
 
    if (no_copy)
       {
-        values.append(Value_P());
+        values.push_back(Value_P());
       }
    else
       {
         Assert(vid == int(values.size()));
 
         Value_P val(sh_value, LOC);
-        values.append(val);
+        values.push_back(val);
       }
 }
 //-----------------------------------------------------------------------------
@@ -2078,7 +2078,7 @@ UCS_string  fun_UCS(fun_UTF);
 const int mode = find_int_attr("mode", false, 10);
 
 Command::user_command ucmd = { name_UCS, fun_UCS, mode };
-   Workspace::get_user_commands().append(ucmd);
+   Workspace::get_user_commands().push_back(ucmd);
 }
 //-----------------------------------------------------------------------------
 void

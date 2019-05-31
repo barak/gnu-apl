@@ -44,7 +44,7 @@ utf8P(const void * vp)
 }
 //-----------------------------------------------------------------------------
 /// an UTF8 encoded Unicode (RFC 3629) string
-class UTF8_string :  public Simple_string<UTF8, false>
+class UTF8_string :  public Simple_string<UTF8>
 {
 public:
    /// constructor: empty UTF8_string
@@ -53,12 +53,12 @@ public:
 
    /// constructor: UTF8_string from 0-terminated C string.
    UTF8_string(const char * str)
-   : Simple_string<UTF8, false>(utf8P(str), str ? strlen(str) : 0)
+   : Simple_string<UTF8>(utf8P(str), str ? strlen(str) : 0)
    {}
 
    /// constructor: copy of string, but at most len bytes
    UTF8_string(const UTF8 * string, size_t len)
-   : Simple_string<UTF8, false>(string, len)
+   : Simple_string<UTF8>(string, len)
    {}
 
    /// constructor: copy of UCS string. The UCS characters will be UTF8-encoded

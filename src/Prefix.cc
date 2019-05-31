@@ -131,7 +131,7 @@ Prefix::is_value_parenthesis(int pc) const
    Assert1(body[pc].get_Class() == TC_R_PARENT);
 
    ++pc;
-   if (pc >= body.size())   return true;   // syntax error
+   if (pc >= int(body.size()))   return true;   // syntax error
 
 TokenClass next = body[pc].get_Class();
 
@@ -140,7 +140,7 @@ TokenClass next = body[pc].get_Class();
         const int offset = body[pc].get_int_val2();
         pc += offset;
         Assert1(body[pc].get_Class() == TC_L_BRACK);   // opening [
-        if (pc >= body.size())   return true;   // syntax error
+        if (pc >= Function_PC(body.size()))   return true;   // syntax error
         next = body[pc].get_Class();
       }
 
@@ -164,11 +164,11 @@ TokenClass next = body[pc].get_Class();
         if (!is_value_parenthesis(pc))   return false;   // (fun)) XXX
         const int offset = body[pc].get_int_val2();
         pc += offset;
-        if (pc >= body.size())   return true;   // syntax error
+        if (pc >= Function_PC(body.size()))   return true;   // syntax error
         next = body[pc].get_Class();
         Assert1(next == TC_L_PARENT);   // opening (
         ++pc;
-        if (pc >= body.size())   return true;   // syntax error
+        if (pc >= Function_PC(body.size()))   return true;   // syntax error
 
         //   (val)) XXX
         //  ^
@@ -191,8 +191,8 @@ TokenClass next = body[pc].get_Class();
 
    // dyadic operator with numeric function argument, for example:  ⍤ 0 
    //
-   if (next == TC_VALUE       &&
-       pc < (body.size() - 1) &&
+   if (next == TC_VALUE                  &&
+       pc < Function_PC(body.size() - 1) &&
        body[pc+1].get_Class() == TC_OPER2)   return false;
 
    return true;
@@ -251,7 +251,7 @@ Prefix::vector_ass_count() const
 {
 int count = 0;
 
-   for (int pc = PC; pc < body.size(); ++pc)
+   for (Function_PC pc = PC; pc < Function_PC(body.size()); ++pc)
        {
          if (body[pc].get_tag() != TOK_LSYMB2)   break;
          ++count;
@@ -347,7 +347,7 @@ Prefix::value_expected()
    //
    if (saved_lookahead.tok.get_ValueType() == TV_INDEX)   return true;
 
-   for (int pc = PC; pc < body.size();)
+   for (int pc = PC; pc < int(body.size());)
       {
         const Token & tok = body[pc++];
         switch(tok.get_Class())
@@ -597,7 +597,7 @@ found_prefix:
    //
    {
      TokenClass next = TC_INVALID;
-     if (PC < body.size())
+     if (PC < Function_PC(body.size()))
         {
           const Token & tok = body[PC];
 
@@ -1420,7 +1420,7 @@ Prefix::reduce_F_D_C_B()
    // reduce, except if another dyadic operator is coming. In that case
    // F belongs to the other operator and we simply continue.
    //
-   if (PC < body.size())
+   if (PC < Function_PC(body.size()))
         {
           const Token & tok = body[PC];
           TokenClass next =  tok.get_Class();
@@ -1787,7 +1787,7 @@ const int count = vector_ass_count();
 
    // vector assignment.
    //
-Simple_string<Symbol *, false> symbols;
+Simple_string<Symbol *> symbols;
    symbols.append(at0().get_sym_ptr());
    loop(c, count)
       {

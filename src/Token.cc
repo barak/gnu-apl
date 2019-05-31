@@ -691,19 +691,12 @@ Token::short_class_name(TokenClass cls)
    return "???";
 }
 //-----------------------------------------------------------------------------
-void
-Token::print_token_list(ostream & out, const Source<Token, true> & src)
-{
-const int len = src.rest();
-   loop(t, len)   out << "`" << src[t] << "  ";
-   out << endl;
-}
-//-----------------------------------------------------------------------------
 ostream &
 operator << (ostream & out, const Token_string & tos)
 {
    out << "[" << tos.size() << " token]: ";
-   Token::print_token_list(out, tos);
+   loop(t, tos.size())   CERR << "`" << tos[t] << "  ";
+   out << endl;
    out << endl;
    return out;
 }

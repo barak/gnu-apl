@@ -263,7 +263,7 @@ public:
 
    /// perform a vector assignment (like (A B C)←1 2 3) for variables in
    /// \b symbols with values \b values
-   static void vector_assignment(Simple_string<Symbol *, false> & symbols,
+   static void vector_assignment(Simple_string<Symbol *> & symbols,
                                  Value_P values);
 
    /// dump this symbol to out
@@ -294,7 +294,7 @@ protected:
    void (*monitor_callback)(const Symbol &, Symbol_Event sev);
 
    /// the value stack of \b this \b Symbol
-   Simple_string<ValueStackItem, false> value_stack;
+   Simple_string<ValueStackItem> value_stack;
 };
 
 inline void

@@ -38,7 +38,6 @@
 #include "IntCell.hh"
 #include "Output.hh"
 #include "PointerCell.hh"
-#include "PrintOperator.hh"
 #include "Symbol.hh"
 #include "SystemLimits.hh"
 #include "SystemVariable.hh"
@@ -46,6 +45,9 @@
 #include "Value.hh"
 #include "Workspace.hh"
 
+//-----------------------------------------------------------------------------
+inline ostream & operator << (ostream & out, const Unicode_source & src)
+   { loop(s, src.rest())   out << src[s];   return out; }
 //-----------------------------------------------------------------------------
 /** convert \b UCS_string input into a Token_string tos.
 */
@@ -76,7 +78,7 @@ Tokenizer::do_tokenize(const UCS_string & input, Token_string & tos)
       CERR << "tokenize: input[" << input.size() << "] is: «"
            << input << "»" << endl;
 
-Source<Unicode> src(input);
+Unicode_source src(input);
    while ((rest_1 = rest_2 = src.rest()) != 0)
       {
         Unicode uni = *src;
@@ -87,7 +89,7 @@ Source<Unicode> src(input);
 
         Log(LOG_tokenize)
            {
-             Source<Unicode> s1(src, 0, 24);
+             Unicode_source s1(src, 0, 24);
              CERR << "  tokenize(" <<  src.rest() << " chars) sees [tag "
                   << tok.tag_name() << " «" << uni << "»] " << s1;
              if (src.rest() != s1.rest())   CERR << " ...";
@@ -143,25 +145,25 @@ Source<Unicode> src(input);
                       {
                         ++src;
                         tos.append(Token(TOK_Quad_QUOTE,
-                                   &Workspace::get_v_Quad_QUOTE()), LOC);
+                                         &Workspace::get_v_Quad_QUOTE()));
                       }
                    else if (uni == UNI_ALPHA)
                       {
                         ++src;
                         tos.append(Token(TOK_ALPHA,
-                                   &Workspace::get_v_ALPHA()), LOC);
+                                         &Workspace::get_v_ALPHA()));
                       }
                    else if (uni == UNI_ALPHA_UNDERBAR)
                       {
                         ++src;
                         tos.append(Token(TOK_ALPHA_U,
-                                   &Workspace::get_v_ALPHA_U()), LOC);
+                                            &Workspace::get_v_ALPHA_U()));
                       }
                    else if (uni == UNI_CHI)
                       {
                         ++src;
                         tos.append(Token(TOK_CHI,
-                                   &Workspace::get_v_CHI()), LOC);
+                                            &Workspace::get_v_CHI()));
                       }
                    else if (uni == UNI_LAMBDA)
                       {
@@ -176,20 +178,20 @@ Source<Unicode> src(input);
                            {
                              ++src;
                              tos.append(Token(TOK_LAMBDA,
-                                        &Workspace::get_v_LAMBDA()), LOC);
+                                           &Workspace::get_v_LAMBDA()));
                            }
                       }
                    else if (uni == UNI_OMEGA)
                       {
                         ++src;
                         tos.append(Token(TOK_OMEGA,
-                                   &Workspace::get_v_OMEGA()), LOC);
+                                            &Workspace::get_v_OMEGA()));
                       }
                    else if (uni == UNI_OMEGA_UNDERBAR)
                       {
                         ++src;
                         tos.append(Token(TOK_OMEGA_U,
-                                   &Workspace::get_v_OMEGA_U()), LOC);
+                                            &Workspace::get_v_OMEGA_U()));
                       }
                    else
                       {
@@ -239,7 +241,7 @@ Source<Unicode> src(input);
               case TC_R_ARROW:
                    ++src;
                    if (src.rest())   tos.append(tok);
-                   else              tos.append(Token(TOK_ESCAPE), LOC);
+                   else              tos.append(Token(TOK_ESCAPE));
                    break;
 
               case TC_ASSIGN:
@@ -252,7 +254,7 @@ Source<Unicode> src(input);
                      const bool col = tos.size() > 1 &&
                                 tos[tos.size() - 2].get_tag() == TOK_COLON;
 
-                   tos.append(tok, LOC);
+                   tos.append(tok);
 
                    // change token tag of ← if:
                    //
@@ -272,12 +274,12 @@ Source<Unicode> src(input);
               case TC_L_CURLY:
               case TC_R_CURLY:
                    ++src;
-                   tos.append(tok, LOC);
+                   tos.append(tok);
                    break;
 
               case TC_DIAMOND:
                    ++src;
-                   tos.append(tok, LOC);
+                   tos.append(tok);
                    break;
 
               case TC_COLON:
@@ -293,7 +295,7 @@ Source<Unicode> src(input);
                       }
 
                    ++src;
-                   tos.append(tok, LOC);
+                   tos.append(tok);
                    break;
 
               case TC_NUMERIC:
@@ -331,13 +333,13 @@ Source<Unicode> src(input);
 }
 //-----------------------------------------------------------------------------
 void
-Tokenizer::tokenize_function(Source<Unicode> & src, Token_string & tos)
+Tokenizer::tokenize_function(Unicode_source & src, Token_string & tos)
 {
    Log(LOG_tokenize)   CERR << "tokenize_function(" << src << ")" << endl;
 
 const Unicode uni = src.get();
 const Token tok = tokenize_function(uni);
-   tos.append(tok, LOC);
+   tos.append(tok);
 }
 //-----------------------------------------------------------------------------
 Token
@@ -431,7 +433,7 @@ const Token tok = Avec::uni_to_token(uni, LOC);
 }
 //-----------------------------------------------------------------------------
 void
-Tokenizer::tokenize_quad(Source<Unicode> & src, Token_string & tos)
+Tokenizer::tokenize_quad(Unicode_source & src, Token_string & tos)
 {
    Log(LOG_tokenize)
       CERR << "tokenize_quad(" << src.rest() << " chars)"<< endl;
@@ -449,7 +451,7 @@ UCS_string ucs(UNI_Quad_Quad);
 int len = 0;
 const Token t = Workspace::get_quad(ucs, len);
    src.skip(len - 1);
-   tos.append(t, LOC);
+   tos.append(t);
 }
 //-----------------------------------------------------------------------------
 /** tokenize a single quoted string.
@@ -457,7 +459,7 @@ const Token t = Workspace::get_quad(ucs, len);
  **  return a TOK_CHARACTER. Otherwise we return TOK_APL_VALUE1.
  **/
 void
-Tokenizer::tokenize_string1(Source<Unicode> & src, Token_string & tos)
+Tokenizer::tokenize_string1(Unicode_source & src, Token_string & tos)
 {
    Log(LOG_tokenize)   CERR << "tokenize_string1(" << src << ")" << endl;
 
@@ -508,7 +510,7 @@ bool got_end = false;
       }
    else
       {
-        tos.append(Token(TOK_APL_VALUE1, Value_P(string_value, LOC)), LOC);
+        tos.append(Token(TOK_APL_VALUE1, Value_P(string_value, LOC)));
       }
 }
 //-----------------------------------------------------------------------------
@@ -517,7 +519,7 @@ bool got_end = false;
  **  return a TOK_CHARACTER. Otherwise we return TOK_APL_VALUE1.
  **/
 void
-Tokenizer::tokenize_string2(Source<Unicode> & src, Token_string & tos)
+Tokenizer::tokenize_string2(Unicode_source & src, Token_string & tos)
 {
    Log(LOG_tokenize)   CERR << "tokenize_string2(" << src << ")" << endl;
 
@@ -580,12 +582,12 @@ bool got_end = false;
 
    else
       {
-        tos.append(Token(TOK_APL_VALUE1, Value_P(string_value, LOC)), LOC);
+        tos.append(Token(TOK_APL_VALUE1, Value_P(string_value, LOC)));
       }
 }
 //-----------------------------------------------------------------------------
 void
-Tokenizer::tokenize_number(Source<Unicode> & src, Token_string & tos)
+Tokenizer::tokenize_number(Unicode_source & src, Token_string & tos)
 {
    Log(LOG_tokenize)   CERR << "tokenize_number(" << src << ")" << endl;
 
@@ -779,7 +781,7 @@ static const long double nexpo_tab[310] =
 };
 
 bool
-Tokenizer::tokenize_real(Source<Unicode> & src, bool & need_float,
+Tokenizer::tokenize_real(Unicode_source & src, bool & need_float,
                          APL_Float & flt_val, APL_Integer & int_val)
 {
    int_val = 0;
@@ -984,7 +986,7 @@ UTF8_string digits = int_digits;
 }
 //-----------------------------------------------------------------------------
 void
-Tokenizer::tokenize_symbol(Source<Unicode> & src, Token_string & tos)
+Tokenizer::tokenize_symbol(Unicode_source & src, Token_string & tos)
 {
    Log(LOG_tokenize)   CERR << "tokenize_symbol() : " << src.rest() << endl;
 

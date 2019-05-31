@@ -286,7 +286,7 @@ protected:
    static void init_all_CPUs(bool logit);
 
    /// the CPU numbers that can be used
-   static Simple_string<CPU_Number, false>all_CPUs;
+   static Simple_string<CPU_Number> all_CPUs;
 };
 //=============================================================================
 

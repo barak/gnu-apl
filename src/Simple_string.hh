@@ -38,7 +38,7 @@ using namespace std;
 
 //-----------------------------------------------------------------------------
 /// a simple string
-template <typename T, bool has_destructor>
+template <typename T>
 class Simple_string
 {
 public:
@@ -141,20 +141,24 @@ public:
         ++items_valid;
       }
 
-   /// forget (and maybe desctruct) the last item
+   /// discard the last item
     void pop()
       {
         Assert(items_valid > 0);
         --items_valid;
-        if (has_destructor)  items[items_valid].~T();
       }
 
    /// decrease size to \b new_size
    void shrink(ShapeItem new_size)
       {
         Assert((items_valid - new_size) >= 0);
-        if (has_destructor)   while ((items_valid - new_size) > 0)   pop();
-        else                  items_valid = new_size;
+        items_valid = new_size;
+      }
+
+   /// shrink to size 0
+   void clear()
+      {
+        items_valid = 0;
       }
 
    /// erase \b one item, at \b pos

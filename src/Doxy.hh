@@ -69,7 +69,8 @@ struct fcall_edge
    int      value;
 };
 
-typedef Simple_string<fcall_edge, false> CallGraph;
+typedef Simple_string<fcall_edge> CallGraph;
+
 //-----------------------------------------------------------------------------
 /// implementation of the ]Doxy command.
 class Doxy
@@ -82,12 +83,12 @@ public:
    void gen();
 
    /// HTML-print a table with all functions to 'page'
-   void functions_table(const Simple_string<const Symbol *, false> & functions,
+   void functions_table(const Simple_string<const Symbol *> & functions,
                        ofstream & page);
 
    /// HTML-print a table with all variables to 'page'
-   void variables_table(const Simple_string<const Symbol *, false> & variables,
-                       ofstream & page);
+   void variables_table(const Simple_string<const Symbol *> & variables,
+                        ofstream & page);
 
    /// HTML-print a table with the SI stack to 'page'
    void SI_table(ofstream & page);
@@ -113,7 +114,7 @@ protected:
    void function_page(const UserFunction * ufun, const UCS_string & alias);
 
    /// create the call graph
-   void make_call_graph(const Simple_string<const Symbol *, false> & all_funs);
+   void make_call_graph(const Simple_string<const Symbol *> & all_funs);
 
    /// add one symbol to the call graph. Note that one symbol can have different
    /// UserFunctions at different SI levels.
@@ -150,7 +151,7 @@ protected:
    UTF8_string root_dir;
 
    /// the nodes for the current root.
-   Simple_string<const UserFunction *, false> nodes;
+   Simple_string<const UserFunction *> nodes;
 
    /// the real names for the current root.
    UCS_string_vector aliases;

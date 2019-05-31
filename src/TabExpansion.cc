@@ -53,7 +53,7 @@ TabExpansion::expand_tab(UCS_string & user)
 ExpandResult
 TabExpansion::expand_user_name(UCS_string & user)
 {
-Simple_string<const Symbol *, false> symbols = Workspace::get_all_symbols();
+Simple_string<const Symbol *> symbols = Workspace::get_all_symbols();
 
 UCS_string_vector matches;
    loop(s, symbols.size())
@@ -207,7 +207,7 @@ const UCS_string help(user, 0, 6);
 UCS_string prefix(user, 5, user.size() - 5);   // the name prefix
    prefix.remove_leading_whitespaces();
 
-Simple_string<const Symbol *, false> symbols = Workspace::get_all_symbols();
+Simple_string<const Symbol *> symbols = Workspace::get_all_symbols();
 
 UCS_string_vector matches;
    loop(s, symbols.size())
@@ -265,7 +265,7 @@ const int max_col = Workspace::get_PW() - 4;
       }
 #include "Help.def"
 
-Simple_string<const Symbol *, false> symbols = Workspace::get_all_symbols();
+Simple_string<const Symbol *> symbols = Workspace::get_all_symbols();
 
 UCS_string_vector names;
    loop(s, symbols.size())

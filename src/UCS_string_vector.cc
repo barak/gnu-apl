@@ -109,12 +109,12 @@ const ShapeItem name_len = val.get_cols();
       }
 }
 //----------------------------------------------------------------------------
-Simple_string<int, false>
+Simple_string<int>
 UCS_string_vector::compute_column_width(int tab_size)
 {
 const int quad_PW = Workspace::get_PW();
 
-Simple_string<int, false> result;
+Simple_string<int> result;
 
    if (size() < 2)
       {
@@ -126,7 +126,7 @@ Simple_string<int, false> result;
    // compute block counts (one block having tab_size characters)
    //
 const int max_blocks = (quad_PW + 1) / tab_size;
-Simple_string<int, false> name_blocks;
+Simple_string<int> name_blocks;
    loop(n, size())
        {
          name_blocks.append(1 + (1 + strings[n]->size()) / tab_size);

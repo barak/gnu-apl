@@ -111,7 +111,7 @@ protected:
    Value_P read_fd(int fd, int tag);
 
    /// the currently open GTK windows
-   Simple_string<window_entry, false> open_windows;
+   Simple_string<window_entry> open_windows;
 
    /// event queue for events from the GTK windows
    UCS_string_vector event_queue;

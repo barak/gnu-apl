@@ -110,7 +110,6 @@ Shape.cc					Shape.hh		\
 						Simple_string.hh	\
 ScalarFunction.cc				ScalarFunction.hh	\
 Security.cc		Security.def		Security.hh		\
-						Source.hh		\
 StateIndicator.cc				StateIndicator.hh	\
 Svar_DB.cc					Svar_DB.hh		\
 Svar_record.cc					Svar_record.hh		\

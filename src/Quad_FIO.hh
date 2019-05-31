@@ -21,6 +21,8 @@
 #ifndef __QUAD_FIO_HH_DEFINED__
 #define __QUAD_FIO_HH_DEFINED__
 
+#include <vector>
+
 #include "Error_macros.hh"
 #include "PrimitiveOperator.hh"
 #include "QuadFunction.hh"
@@ -160,7 +162,7 @@ protected:
    Token do_scanf(File_or_String & input, const UCS_string & format);
 
    /// the open files
-   Simple_string<file_entry, true> open_files;
+   std::vector<file_entry> open_files;
 };
 //-----------------------------------------------------------------------------
 #endif //  __QUAD_FIO_HH_DEFINED__

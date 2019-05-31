@@ -261,7 +261,7 @@ public:
    ShapeItem get_cover_count() const      { return cover_count; }
 
    /// all solutions as len rows... len rows ...
-   Simple_string<ShapeItem, false> all_solutions;
+   Simple_string<ShapeItem> all_solutions;
 
 protected:
    /// the max. number of solutions to produce, 0 = all
@@ -274,10 +274,10 @@ protected:
    const ShapeItem cols;
 
    /// the column headers
-   Simple_string<DLX_Header_Node, false> headers;
+   Simple_string<DLX_Header_Node> headers;
 
    /// the '1's and '2's in the (sparse) matrix
-   Simple_string<DLX_Node, false> nodes;
+   Simple_string<DLX_Node> nodes;
 
    /// the number of primary columns
    ShapeItem primary_count;

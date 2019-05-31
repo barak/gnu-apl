@@ -197,8 +197,8 @@ UserFunction * ufun = UserFunction::fix(fun_text, error_line, false,
 
    // set stop and trace vectors
    //
-Simple_string<Function_Line, false> stop_vec;
-Simple_string<Function_Line, false> trace_vec;
+Simple_string<Function_Line> stop_vec;
+Simple_string<Function_Line> trace_vec;
    loop(l, lines.size())
        {
          if (lines[l].stop_flag)    stop_vec.append(Function_Line(l));

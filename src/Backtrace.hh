@@ -69,7 +69,7 @@ protected:
       };
 
    /// a mapping from PCs to source lines.
-   static Simple_string<PC_src, false> pc_2_src;
+   static Simple_string<PC_src> pc_2_src;
 };
 
 #define BACKTRACE Backtrace::show(__FILE__, __LINE__);

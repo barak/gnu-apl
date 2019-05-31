@@ -18,7 +18,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-// #define USE_POLL   /* use poll() instead of select() */
+#define USE_POLL   /* use poll() instead of select() */
 
 #include <errno.h>
 #include <limits.h>
@@ -268,7 +268,7 @@ char * bslash = strrchr(AP_progname, '/');
       {
         snprintf(AP_progname, APL_PATH_MAX, "AP%u", id.proc);
       }
-   
+
    AP_progname[APL_PATH_MAX] = 0;
 
    debug && *debug << "*** starting " << AP_progname << endl;
@@ -1108,7 +1108,7 @@ const int listen_sock = got_path ? open_UNIX_socket(listen_name)
         fds[0].fd = listen_sock;
         fds[0].events = POLLIN | POLLPRI;
         int fd_idx = 1;
-        for (int j = 0; j < connected_procs.size(); ++j)
+        for (size_t j = 0; j < connected_procs.size(); ++j)
             {
               TCP_socket fd = connected_procs[j].fd;
               if (fd != NO_TCP_SOCKET)
@@ -1147,25 +1147,51 @@ const int listen_sock = got_path ? open_UNIX_socket(listen_name)
 
 #else // use select()
 
-size_t janitor = 0;
-int max_fd = listen_sock;
+        size_t janitor = 0;
+        int max_fd = listen_sock;
+        char dummy;
+
+        if (0 != read(listen_sock, &dummy, 0))
+           cerr << prog << ": listen socket has died unexpectedly" << endl;
 
         FD_SET(listen_sock, &read_fds);
         for (size_t j = 0; j < connected_procs.size(); ++j)
             {
-              TCP_socket fd = connected_procs[j].fd;
+              {
+              const TCP_socket fd = connected_procs[j].fd;
               if (fd != NO_TCP_SOCKET)
                  {
-                   if (max_fd < fd)   max_fd = fd;
-                   FD_SET(fd, &read_fds);
+                   if (0 != read(fd, &dummy, 0))
+                      {
+                        cerr << prog << ": socket fd[" << j
+                             << "] has died unexpectedly" << endl;
+                        close_fd(fd);
+                      }
+                   else
+                      {
+                        if (max_fd < fd)   max_fd = fd;
+                        FD_SET(fd, &read_fds);
+                      }
                  }
+              }
 
-              fd = connected_procs[j].fd2;
-              if (fd != NO_TCP_SOCKET)
-                 {
-                   if (max_fd < fd)   max_fd = fd;
-                   FD_SET(fd, &read_fds);
-                 }
+              {
+                const TCP_socket fd2 = connected_procs[j].fd2;
+                if (fd2 != NO_TCP_SOCKET)
+                   {
+                     if (0 != read(fd2, &dummy, 0))
+                        {
+                          cerr << prog << ": socket fd2[" << j
+                               << "] has died unexpectedly" << endl;
+                          close_fd(fd2);
+                        }
+                     else
+                        {
+                          if (max_fd < fd2)   max_fd = fd2;
+                          FD_SET(fd2, &read_fds);
+                        }
+                   }
+              }
             }
 
         timeval timeout = { 1, 0 };   // one second

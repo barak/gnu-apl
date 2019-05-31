@@ -451,7 +451,7 @@ Quad_ENV::eval_B(Value_P B)
 
 const ShapeItem ec_B = B->element_count();
 
-Simple_string<const char *, false> evars;
+Simple_string<const char *> evars;
 
    for (char **e = environ; *e; ++e)
        {
@@ -1094,7 +1094,7 @@ int requested_NCs = 0;
    //
 UCS_string_vector names;
    {
-     Simple_string<const Symbol *, false> symbols = Workspace::get_all_symbols();
+     Simple_string<const Symbol *> symbols = Workspace::get_all_symbols();
 
      loop(s, symbols.size())
         {
@@ -1412,8 +1412,7 @@ UserFunction * ufun = fun->get_ufun1();
 }
 //-----------------------------------------------------------------------------
 Token
-Stop_Trace::reference(const Simple_string<Function_Line, false> & lines,
-                      bool assigned)
+Stop_Trace::reference(const Simple_string<Function_Line> & lines, bool assigned)
 {
 Value_P Z(lines.size(), LOC);
 
@@ -1426,7 +1425,7 @@ Value_P Z(lines.size(), LOC);
 void
 Stop_Trace::assign(UserFunction * ufun, const Value & new_value, bool stop)
 {
-Simple_string<Function_Line, false> lines;
+Simple_string<Function_Line> lines;
    lines.reserve(new_value.element_count());
 
    loop(l, new_value.element_count())

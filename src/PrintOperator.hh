@@ -25,7 +25,6 @@
 
 #include "Common.hh"
 #include "Id.hh"
-#include "Source.hh"
 #include "TokenEnums.hh"
 #include "Unicode.hh"
 
@@ -39,7 +38,6 @@ class  IndexExpr;
 struct LineLabel;
 class  PrintBuffer;
 class  Shape;
-template <class T, bool> class Source;
 class  Symbol;
 class  Token;
 class  Token_string;
@@ -70,10 +68,6 @@ ostream & operator << (ostream &, const Value &);
 
 inline ostream & operator << (ostream & out,       ValueFlags flags)
    { return print_flags(out, flags); }
-
-template<typename T>
-ostream & operator << (ostream & out, const Source<T> & src)
-   { loop(s, src.rest())   out << src[s];   return out; }
 
 inline ostream & operator << (ostream & out, const labVal & lv)
    { return out << "Line-" << lv.line << ":"; }

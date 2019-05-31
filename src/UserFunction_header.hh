@@ -175,10 +175,10 @@ protected:
    Symbol * sym_B;
 
    /// The local variables of \b this function.
-   Simple_string<Symbol *, false> local_vars;
+   Simple_string<Symbol *> local_vars;
 
    /// The labels of \b this function.
-   Simple_string<labVal, false> label_values;
+   Simple_string<labVal> label_values;
 };
 //-----------------------------------------------------------------------------
 

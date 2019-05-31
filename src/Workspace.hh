@@ -21,6 +21,8 @@
 #ifndef __WORKSPACE_HH_DEFINED__
 #define __WORKSPACE_HH_DEFINED__
 
+#include <vector>
+
 #include "Command.hh"
 #include "PrimitiveOperator.hh"
 #include "PrintContext.hh"
@@ -117,7 +119,7 @@ public:
       { return the_workspace.top_SI; }
 
    /// copy all allocated symbols into \b table of size \b table_size
-   static Simple_string<const Symbol *, false> get_all_symbols()
+   static Simple_string<const Symbol *> get_all_symbols()
       { return the_workspace.symbol_table.get_all_symbols(); }
 
    /// lookup an existing user defined symbol. If not found, create one
@@ -170,7 +172,7 @@ public:
       { the_workspace.WS_name = new_name; }
 
    /// Return all user-defined commands
-   static Simple_string<Command::user_command, false> & get_user_commands()
+   static vector<Command::user_command> & get_user_commands()
       {  return the_workspace.user_commands; }
 
    /// Create a new SI-entry on the SI stack.
@@ -303,7 +305,7 @@ protected:
    UCS_string prompt;
 
    /// user defined functions that were ⎕EX'ed while on the SI stack
-   Simple_string<const UserFunction *, false> expunged_functions;
+   Simple_string<const UserFunction *> expunged_functions;
 
    /// more info about last error
    UCS_string more_error_info;
@@ -315,7 +317,7 @@ protected:
    UCS_string pushed_command;
 
    /// user defined commands
-   Simple_string<Command::user_command, false> user_commands;
+   std::vector<Command::user_command> user_commands;
 
    /// the current workspace (for objects that need one but don't have one).
    static Workspace the_workspace;

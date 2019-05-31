@@ -44,7 +44,7 @@ class UCS_string_vector;
 
 //=============================================================================
 /// A string of Unicode characters (32-bit)
-class UCS_string : public  Simple_string<Unicode, false>
+class UCS_string : public  Simple_string<Unicode>
 {
 public:
    /// default constructor: empty string

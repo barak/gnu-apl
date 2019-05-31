@@ -281,7 +281,7 @@ public:
 
 protected:
    /// jobs to be performed
-   Simple_string<T, has_destructor> jobs;
+   Simple_string<T> jobs;
 
    /// the currently executed worklist item
    T current_job;

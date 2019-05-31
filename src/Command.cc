@@ -638,7 +638,7 @@ Command::cmd_CHECK(ostream & out)
 
    // discover duplicate parents
    //
-Simple_string<val_val, false> values;
+Simple_string<val_val> values;
 ShapeItem duplicate_parents = 0;
    for (const DynamicObject * obj = DynamicObject::get_all_values()->get_next();
         obj != DynamicObject::get_all_values(); obj = obj->get_next())
@@ -1578,7 +1578,7 @@ UCS_string_vector directories;
    //
    enum { tabsize = 4 };
 
-Simple_string<int, false> col_width =
+Simple_string<int> col_width =
    directories.compute_column_width(tabsize);
 
    loop(c, directories.size())
@@ -1864,7 +1864,7 @@ Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
 
   if (args.size() == 1 && args[0].starts_iwith("REMOVE-ALL"))
      {
-       Workspace::get_user_commands().shrink(0);
+       Workspace::get_user_commands().clear();
        out << "    All user-defined commands removed." << endl;
        return;
      }
@@ -1883,7 +1883,8 @@ Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
                   out << "    User-defined command "
                       << Workspace::get_user_commands()[u].prefix
                       << " removed." << endl;
-                  Workspace::get_user_commands().erase(u);
+                  Workspace::get_user_commands().
+                     erase(Workspace::get_user_commands().begin() + u);
                   return;
                 }
            }
@@ -1996,7 +1997,7 @@ Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
       }
 
 user_command new_user_command = { command_name, apl_fun, mode };
-   Workspace::get_user_commands().append(new_user_command);
+   Workspace::get_user_commands().push_back(new_user_command);
 
    out << "    User-defined command "
        << new_user_command.prefix << " installed." << endl;

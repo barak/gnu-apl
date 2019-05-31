@@ -21,6 +21,8 @@
 #ifndef __BIF_F12_FORMAT_HH_DEFINED__
 #define __BIF_F12_FORMAT_HH_DEFINED__
 
+#include <vector>
+
 #include "PrimitiveFunction.hh"
 
 /** A helper struct for Bif_F12_FORMAT
@@ -162,7 +164,7 @@ protected:
 
    /// split entire format string string into \b column format strings
    void split_example_into_columns(const UCS_string & format,
-                                   UCS_string_vector & col_formats);
+                                   std::vector<UCS_string> & col_formats);
 
    /// A character array with  a columns of B formatted by specification
    PrintBuffer format_col_spec(int width, int precision, const Cell * cB,

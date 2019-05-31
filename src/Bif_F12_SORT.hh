@@ -82,7 +82,7 @@ operator << (ostream & out, const CollatingCacheEntry & entry)
     argument A of dydic A⍋B or A⍒B
  */
 /// A cache for speeding up dyadic ⍋ and ⍒
-class CollatingCache : public Simple_string<CollatingCacheEntry, false>
+class CollatingCache : public Simple_string<CollatingCacheEntry>
 {
 public:
    /// constructor: cache of rank r and comparison length clen

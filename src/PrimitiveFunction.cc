@@ -2652,7 +2652,7 @@ UTF8_string result_utf8 = out.get_data();
        result_utf8.last() != UNI_ASCII_LF)
       result_utf8.append(UNI_ASCII_LF);
 
-Simple_string<ShapeItem, false> line_starts;
+Simple_string<ShapeItem> line_starts;
    line_starts.append(0);
    loop(r, result_utf8.size())
       {
@@ -2718,7 +2718,7 @@ const ShapeItem len_B = B->element_count();
 
    // B is small, so an iterative search of unique elements is faster
    //
-Simple_string<const Cell *, false> items_Z;
+Simple_string<const Cell *> items_Z;
    items_Z.reserve(len_B);
 
    loop(b, len_B)

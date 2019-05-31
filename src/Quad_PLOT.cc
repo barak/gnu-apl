@@ -28,7 +28,7 @@ Quad_PLOT * Quad_PLOT::fun = &Quad_PLOT::_fun;
 sem_t __plot_threads_sema;
 sem_t * Quad_PLOT::plot_threads_sema = &__plot_threads_sema;
 
-Simple_string<pthread_t, false> Quad_PLOT::plot_threads;
+Simple_string<pthread_t> Quad_PLOT::plot_threads;
 
 #if defined(HAVE_XCB_XCB_H)
 

@@ -149,13 +149,13 @@ const ShapeItem ec = value.element_count();
    //
 const ShapeItem cols = value.get_last_shape_item();
 
-Simple_string<bool, false> scaling;
+vector<bool> scaling;
    scaling.reserve(cols);
-   loop(c, cols)   scaling.append(false);
+   loop(c, cols)   scaling.push_back(false);
 
-Simple_string<PrintBuffer, true> pcols;
+vector<PrintBuffer> pcols;
    pcols.reserve(cols);
-   loop(c, cols)   pcols.append(PrintBuffer());
+   loop(c, cols)   pcols.push_back(PrintBuffer());
 
 PrintBuffer * item_matrix = 0;
    try { item_matrix = new PrintBuffer[ec]; }
@@ -166,9 +166,8 @@ PrintBuffer * item_matrix = 0;
         WS_FULL;
       }
 
-   do_PrintBuffer(value, pctx, out, outer_style,
-                            &scaling[0], &pcols[0],
-                            item_matrix);
+   do_PrintBuffer(value, pctx, out, outer_style, scaling, pcols, item_matrix);
+
    delete [] item_matrix;
 
    PERFORMANCE_END(fs_PrintBuffer_B, start_0, ec)
@@ -177,7 +176,7 @@ PrintBuffer * item_matrix = 0;
 void
 PrintBuffer::do_PrintBuffer(const Value & value, const PrintContext & pctx,
                          ostream * out, PrintStyle outer_style,
-                         bool * scaling, PrintBuffer * pcols,
+                         vector<bool> & scaling, vector<PrintBuffer> & pcols,
                          PrintBuffer * item_matrix)
 {
 const bool framed = outer_style & (PST_CS_MASK | PST_CS_OUTER);
@@ -213,12 +212,12 @@ const bool nested = !value.is_simple();
      //    therefore we have (⍴,value) items. Items are rectangular.
      //
      PERFORMANCE_START(start_2)
-     Simple_string<Rank, false> max_row_ranks;
+     vector<Rank> max_row_ranks;
      max_row_ranks.reserve(rows);
      loop(y, rows)
         {
           ShapeItem max_row_height = 0;
-          max_row_ranks.append(0);
+          max_row_ranks.push_back(0);
 
           loop(x, cols)
               {
@@ -234,8 +233,8 @@ const bool nested = !value.is_simple();
                    {
                      Value_P sub_val = cell.get_pointer_value();
                      const Rank sub_rank = sub_val->get_rank();
-                     if (max_row_ranks.last() < sub_rank)
-                        max_row_ranks.last() = sub_rank;
+                     if (max_row_ranks.back() < sub_rank)
+                        max_row_ranks.back() = sub_rank;
                    }
 
                 if (max_row_height < item.get_height())
@@ -294,7 +293,7 @@ const bool nested = !value.is_simple();
           // PrintBuffer pcol. Insert separator rows as needed.
           //
           PrintBuffer & dest = pcols[x];
-          new (pcols + x) PrintBuffer;
+          pcols[x] = PrintBuffer();
 
           // compute the final height of dest and reserve enough rows as to
           // avoid unnecessary copies

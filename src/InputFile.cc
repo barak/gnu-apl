@@ -33,8 +33,8 @@
 #include "UserFunction.hh"
 #include "UserPreferences.hh"
 
-Simple_string<InputFile, true> InputFile::files_todo;
-Simple_string<InputFile, true> InputFile::files_orig;
+vector<InputFile> InputFile::files_todo;
+vector<InputFile> InputFile::files_orig;
 int InputFile::stdin_line_no = 1;
 
 //-----------------------------------------------------------------------------
@@ -125,7 +125,7 @@ InputFile::randomize_files()
            }
       }
 
-   for (int done = 0; done < 4*files_todo.size();)
+   for (size_t done = 0; done < 4*files_todo.size();)
        {
          const int n1 = random() % files_todo.size();
          const int n2 = random() % files_todo.size();

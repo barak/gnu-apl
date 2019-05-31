@@ -159,10 +159,10 @@ Value_P PostgresArgListBuilder::run_query( bool ignore_result )
 {
     int n = args.size();
     int array_len = n == 0 ? 1 : n;
-    Simple_string<Oid, false>          types  (array_len, 0);
-    Simple_string<const char *, false> values (array_len, 0);
-    Simple_string<int, false>          lengths(array_len, 0);
-    Simple_string<int, false>          formats(array_len, 0);
+    Simple_string<Oid>          types  (array_len, 0);
+    Simple_string<const char *> values (array_len, 0);
+    Simple_string<int>          lengths(array_len, 0);
+    Simple_string<int>          formats(array_len, 0);
 
     for( int i = 0 ; i < n ; i++ ) {
         PostgresArg *arg = args[i];

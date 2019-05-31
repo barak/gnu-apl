@@ -127,11 +127,11 @@ public:
       }
 
    /// compute columns widths so that items align nicely
-   Simple_string<int, false> compute_column_width(int tab_size);
+   Simple_string<int> compute_column_width(int tab_size);
 
 protected:
    /// the strings in this string vector
-   Simple_string<UCS_string *, false> strings;
+   Simple_string<UCS_string *> strings;
 
 private:
    void * operator new(size_t size);

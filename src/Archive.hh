@@ -21,6 +21,9 @@
 #include <stdint.h>
 #include <fstream>
 #include <string.h>
+#include <vector>
+
+#include <vector>
 
 #include "SystemLimits.hh"
 #include "UCS_string.hh"
@@ -77,7 +80,7 @@ public:
    void save_Symbol(const Symbol & sym);
 
    /// write all user defined commands
-   void save_user_commands(const Simple_string<Command::user_command, false> & cmds);
+   void save_user_commands(const std::vector<Command::user_command> & cmds);
 
    /// write SymbolTable \b symtab
    void save_symtab(const SymbolTable & symtab);
@@ -371,7 +374,7 @@ protected:
    const UTF8 * file_end;
 
    /// all values in the workspace
-   Simple_string<Value_P, true> values;
+   std::vector<Value_P> values;
 
    /// true for )COPY and )PCOPY, false for )LOAD
    bool copying;
@@ -383,7 +386,7 @@ protected:
    bool reading_vids;
 
    /// the vids to be copied (empty if all)
-   Simple_string<int, false> vids_COPY;
+   Simple_string<int> vids_COPY;
 
    /// the names of objects (empty if all)
    UCS_string_vector allowed_objects;
@@ -399,7 +402,7 @@ protected:
      };
 
    /// parents[vid] os the parent of vid, or -1 if vid is a top-level value
-   Simple_string<int, false> parents;
+   Simple_string<int> parents;
 
    /// the file name from which this archive was read
    const char * filename;

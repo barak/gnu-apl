@@ -82,7 +82,7 @@ LibPaths::compute_bin_path(const char * argv0, bool logit)
               // string.
               //
               const size_t plen = strlen(path);
-              Simple_string<char, false>   path1;
+              Simple_string<char>   path1;
               path1.reserve(plen + 1);
               loop(p, (plen + 1))   path1.append(path[p]);
               char * next = &path1[0];

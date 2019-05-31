@@ -82,17 +82,17 @@ struct ProcAuth
    AP_num3 id;
 
    /// the allowed remote processors
-   Simple_string<int, false> rsvopid;    ///< left argument(s) of remote ⎕SVO and ⎕SVQ
+   Simple_string<int> rsvopid;   ///< left argument(s) of remote ⎕SVO and ⎕SVQ
 };
 
 /// A network profile
 struct Network_Profile
 {
    /// left argument of ⎕SVO and ⎕SVQ
-   Simple_string<SvoPid, false> svo_pids;
+   Simple_string<SvoPid> svo_pids;
 
    /// processor authentications
-   Simple_string<ProcAuth, false> proc_auths;
+   Simple_string<ProcAuth> proc_auths;
 
    /// clear everything
    void clear()

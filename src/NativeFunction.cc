@@ -30,7 +30,7 @@
 #include "Symbol.hh"
 #include "Workspace.hh"
 
-Simple_string<NativeFunction *, false> NativeFunction::valid_functions;
+Simple_string<NativeFunction *> NativeFunction::valid_functions;
 
 //-----------------------------------------------------------------------------
 NativeFunction::NativeFunction(const UCS_string & so_name,

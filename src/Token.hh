@@ -28,7 +28,6 @@
 #include "Error_macros.hh"
 #include "Id.hh"
 #include "Simple_string.hh"
-#include "Source.hh"
 #include "TokenEnums.hh"
 #include "Value.hh"
 
@@ -281,9 +280,6 @@ public:
    /// return a brief token class name for debugging purposes
    static const char * short_class_name(TokenClass cls);
 
-   /// print a list of token
-   static void print_token_list(ostream & out, const Source<Token, true> &list);
-
    /// the optional value of the token.
    union sval
       {
@@ -321,22 +317,22 @@ private:
 };
 //-----------------------------------------------------------------------------
 /// A sequence of Token
-class Token_string : public  Simple_string<Token, true>
+class Token_string : public  Simple_string<Token>
 {
 public:
    /// construct an empty string
    Token_string() 
-   : Simple_string<Token, true>()
+   : Simple_string<Token>()
    {}
 
    /// construct a string of \b len Token, starting at \b data.
    Token_string(const Token * data, uint32_t len)
-   : Simple_string<Token, true>(data, len)
+   : Simple_string<Token>(data, len)
    {}
 
    /// construct a string of \b len Token from another token string
    Token_string(const Token_string & other, uint32_t pos, uint32_t len)
-   : Simple_string<Token, true>(other, pos, len)
+   : Simple_string<Token>(other, pos, len)
    {}
 
    /// reversde the token order from \b from to \b to (including)
