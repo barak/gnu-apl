@@ -22,10 +22,10 @@
 #define __BACKTRACE_HH_DEFINED__
 
 #include <stdint.h>
+#include <vector>
 
 #include "Common.hh"
 #include "PrintOperator.hh"
-#include "Simple_string.hh"
 
 /// show the current function call stack.
 class Backtrace
@@ -69,7 +69,7 @@ protected:
       };
 
    /// a mapping from PCs to source lines.
-   static Simple_string<PC_src> pc_2_src;
+   static std::vector<PC_src> pc_2_src;
 };
 
 #define BACKTRACE Backtrace::show(__FILE__, __LINE__);

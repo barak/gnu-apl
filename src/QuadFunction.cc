@@ -19,6 +19,7 @@
 */
 
 #include <unistd.h>
+#include <vector>
 
 #include "Avec.hh"
 #include "Bif_F12_FORMAT.hh"
@@ -451,7 +452,7 @@ Quad_ENV::eval_B(Value_P B)
 
 const ShapeItem ec_B = B->element_count();
 
-Simple_string<const char *> evars;
+std::vector<const char *> evars;
 
    for (char **e = environ; *e; ++e)
        {
@@ -469,7 +470,7 @@ Simple_string<const char *> evars;
                  }
             }
 
-         if (match)   evars.append(env);
+         if (match)   evars.push_back(env);
        }
 
 const Shape sh_Z(evars.size(), 2);
@@ -696,9 +697,9 @@ UCS_string e2;
    esc1 = e1;
    esc2 = e2;
 
-   prefixes.shrink(0);
-   escapes.shrink(0);
-   suffixes.shrink(0);
+   prefixes.clear();
+   escapes.clear();
+   suffixes.clear();
 
    read_strings();    // read lines from file or stdin
    split_strings();   // split lines into prefixes, escapes, and suffixes
@@ -842,7 +843,7 @@ Parser parser(PM_EXECUTE, LOC, false);
                  }
 
             }
-         lines.append(line);
+         lines.push_back(line);
       }
 
 Value_P Z(lines.size(), LOC);
@@ -914,7 +915,7 @@ Quad_INP::read_strings()
 {
    // read lines until an end-maker is detected
    //
-   raw_lines.shrink(0);
+   raw_lines.clear();
    for (;;)
       {
         bool eof = false;
@@ -927,12 +928,12 @@ Quad_INP::read_strings()
         if (end != -1)   // end marker found
            {
              line.shrink(end);
-             if (line.size())   raw_lines.append(line);
+             if (line.size())   raw_lines.push_back(line);
              break;
            }
 
         if (eof && !line.size())   break;
-        raw_lines.append(line);
+        raw_lines.push_back(line);
         if (eof)   break;
       }
 }
@@ -947,9 +948,9 @@ UCS_string empty;
         const ShapeItem epos = line.substr_pos(esc1);
         if (esc1.size() == 0 || epos == -1)   // no escape in this line
            {
-             prefixes.append(line);
-             escapes.append(empty);
-             suffixes.append(empty);
+             prefixes.push_back(line);
+             escapes.push_back(empty);
+             suffixes.push_back(empty);
              continue;
            }
 
@@ -957,7 +958,7 @@ UCS_string empty;
         //
         UCS_string pref = line;
         pref.shrink(epos);
-        prefixes.append(pref);
+        prefixes.push_back(pref);
 
         line = line.drop(epos + esc1.size());   // skip prefix and esc1
         if (esc2.size())   // end defined
@@ -965,24 +966,24 @@ UCS_string empty;
              const ShapeItem eend = line.substr_pos(esc2);
              if (eend == -1)   // no exec end in this line
                 {
-                  escapes.append(line);
-                  suffixes.append(empty);
+                  escapes.push_back(line);
+                  suffixes.push_back(empty);
                   continue;
                 }
              else              // found an exec end in this line
                 {
                   UCS_string exec = line;
                   exec.shrink(eend);
-                  escapes.append(exec);
+                  escapes.push_back(exec);
                   line = line.drop(eend + esc2.size());   // skip exec and esc2
-                  suffixes.append(line);
+                  suffixes.push_back(line);
                   continue;
                 }
            }
         else               // no end defined
            {
-             escapes.append(line);
-             suffixes.append(empty);
+             escapes.push_back(line);
+             suffixes.push_back(empty);
            }
       }
 
@@ -1094,7 +1095,7 @@ int requested_NCs = 0;
    //
 UCS_string_vector names;
    {
-     Simple_string<const Symbol *> symbols = Workspace::get_all_symbols();
+     std::vector<const Symbol *> symbols = Workspace::get_all_symbols();
 
      loop(s, symbols.size())
         {
@@ -1112,7 +1113,7 @@ UCS_string_vector names;
                if (!first_chars.contains(first_char))   continue;
              }
 
-          names.append(symbol->get_name());
+          names.push_back(symbol->get_name());
         }
    }
 
@@ -1123,15 +1124,15 @@ UCS_string_vector names;
 #define ro_sv_def(x, _str, _txt)                                   \
    { Symbol * symbol = &Workspace::get_v_ ## x();           \
      if ((requested_NCs & 1 << 5) && symbol->get_nc() != 0) \
-        names.append(symbol->get_name()); }
+        names.push_back(symbol->get_name()); }
 
 #define rw_sv_def(x, _str, _txt)                                   \
    { Symbol * symbol = &Workspace::get_v_ ## x();           \
      if ((requested_NCs & 1 << 5) && symbol->get_nc() != 0) \
-        names.append(symbol->get_name()); }
+        names.push_back(symbol->get_name()); }
 
 #define sf_def(x, _str, _txt)                                      \
-   { if (requested_NCs & 1 << 6)   names.append((x::fun->get_name())); }
+   { if (requested_NCs & 1 << 6)   names.push_back((x::fun->get_name())); }
 #include "SystemVariable.def"
       }
 
@@ -1412,7 +1413,7 @@ UserFunction * ufun = fun->get_ufun1();
 }
 //-----------------------------------------------------------------------------
 Token
-Stop_Trace::reference(const Simple_string<Function_Line> & lines, bool assigned)
+Stop_Trace::reference(const std::vector<Function_Line> & lines, bool assigned)
 {
 Value_P Z(lines.size(), LOC);
 
@@ -1425,14 +1426,14 @@ Value_P Z(lines.size(), LOC);
 void
 Stop_Trace::assign(UserFunction * ufun, const Value & new_value, bool stop)
 {
-Simple_string<Function_Line> lines;
+std::vector<Function_Line> lines;
    lines.reserve(new_value.element_count());
 
    loop(l, new_value.element_count())
       {
          APL_Integer line = new_value.get_ravel(l).get_near_int();
          if (line < 1)   continue;
-         lines.append(Function_Line(line));
+         lines.push_back(Function_Line(line));
       }
 
    ufun->set_trace_stop(lines, stop);

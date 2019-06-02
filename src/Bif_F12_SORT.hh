@@ -21,6 +21,8 @@
 #ifndef __COLLATING_CACHE_HH_DEFINED__
 #define __COLLATING_CACHE_HH_DEFINED__
 
+#include <vector>
+
 #include "Common.hh"
 #include "PrimitiveFunction.hh"
 #include "Token.hh"
@@ -41,7 +43,8 @@ class Cell;
 /// One item in a CollatingCache
 struct CollatingCacheEntry
 {
-   /// constructor: an invalid entry (for allocating Simple_string items)
+   /// constructor: an invalid entry (for allocatingi
+   /// vector<CollatingCacheEntry> items)
    CollatingCacheEntry()
    : ce_char(Invalid_Unicode),
      ce_shape()
@@ -58,6 +61,9 @@ struct CollatingCacheEntry
 
    /// the shape
    Shape ce_shape;
+
+   void operator =(const CollatingCacheEntry & other)
+      { new (this)   CollatingCacheEntry(other); }
 
    /// compare this entry with \b other at \b axis
    int compare_axis(const CollatingCacheEntry & other, Rank axis) const
@@ -82,7 +88,7 @@ operator << (ostream & out, const CollatingCacheEntry & entry)
     argument A of dydic A⍋B or A⍒B
  */
 /// A cache for speeding up dyadic ⍋ and ⍒
-class CollatingCache : public Simple_string<CollatingCacheEntry>
+class CollatingCache : public std::vector<CollatingCacheEntry>
 {
 public:
    /// constructor: cache of rank r and comparison length clen

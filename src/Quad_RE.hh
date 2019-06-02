@@ -23,7 +23,6 @@
 
 #include "QuadFunction.hh"
 #include "Value.hh"
-#include "Simple_string.hh"
 
 class Regexp;
 

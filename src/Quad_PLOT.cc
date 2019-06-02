@@ -28,7 +28,7 @@ Quad_PLOT * Quad_PLOT::fun = &Quad_PLOT::_fun;
 sem_t __plot_threads_sema;
 sem_t * Quad_PLOT::plot_threads_sema = &__plot_threads_sema;
 
-Simple_string<pthread_t> Quad_PLOT::plot_threads;
+std::vector<pthread_t> Quad_PLOT::plot_threads;
 
 #if defined(HAVE_XCB_XCB_H)
 
@@ -1368,7 +1368,7 @@ const xcb_get_input_focus_reply_t * focusReply =
                                  {
                                    Quad_PLOT::plot_threads[pt] =
                                       Quad_PLOT::plot_threads[count - 1];
-                                   Quad_PLOT::plot_threads.pop();
+                                   Quad_PLOT::plot_threads.pop_back();
                                    break;
                                  }
                        sem_post(Quad_PLOT::plot_threads_sema);
@@ -1488,7 +1488,7 @@ Quad_PLOT::eval_B(Value_P B)
                  if (Quad_PLOT::plot_threads[pt] != u.thread)   continue;
 
                  plot_threads[pt] = plot_threads[plot_threads.size() - 1];
-                 plot_threads.pop();
+                 plot_threads.pop_back();
                  found = true;
                  break;
                }
@@ -1579,7 +1579,7 @@ union
    u.ret = 0;
    pthread_create(&u.thread, 0, plot_main, w_props);
    sem_wait(Quad_PLOT::plot_threads_sema);
-      plot_threads.append(u.thread);
+      plot_threads.push_back(u.thread);
    sem_post(Quad_PLOT::plot_threads_sema);
    return IntScalar(u.ret, LOC);
 }

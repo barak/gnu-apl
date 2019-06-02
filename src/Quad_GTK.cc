@@ -141,7 +141,7 @@ const int function = B->get_ravel(0).get_int_value();
 
              {
                UCS_string HWF = event_queue[0];   // fd, widget : fun
-               event_queue.erase(0);
+               event_queue.erase(event_queue.begin());
 
                // split (Unicode)Handle,"widget:function"
                // into a 3-element APL vector Handle (⊂"widget") (⊂"function")
@@ -152,7 +152,7 @@ const int function = B->get_ravel(0).get_int_value();
                    {
                      if (HWF[j] == UNI_ASCII_COLON)
                         {
-                          args.append(arg);
+                          args.push_back(arg);
                           arg.shrink(0);
                         }
                      else
@@ -160,7 +160,7 @@ const int function = B->get_ravel(0).get_int_value();
                           arg.append(HWF[j]);
                         }
                    }
-               args.append(arg);
+               args.push_back(arg);
 
                Value_P Z(1 + args.size(), LOC);
                new (Z->next_ravel()) IntCell(HWF[0]);
@@ -346,7 +346,7 @@ char * V = TLV + 8;
         UCS_string data_ucs(data_utf);
         data_ucs[0] = (Unicode(fd));
 
-        event_queue.append(data_ucs);
+        event_queue.push_back(data_ucs);
 
         return Value_P();   // i.e. NULL
       }
@@ -526,8 +526,8 @@ Quad_GTK::close_window(int fd)
         window_entry & we = open_windows[w];
         if (fd == we.fd)
            {
-             we = open_windows.last();
-             open_windows.pop();
+             we = open_windows.back();
+             open_windows.pop_back();
              if (write_TL0(fd, 5))
                 {
                   CERR << "write(close Tag) failed in ⎕GTK::close_window()";
@@ -655,7 +655,7 @@ UTF8_string gui_utf8(gui_filename);
       }
 
 window_entry we = { fd };
-   open_windows.append(we);
+   open_windows.push_back(we);
    return fd;
 }
 //-----------------------------------------------------------------------------

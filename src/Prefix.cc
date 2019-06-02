@@ -1787,15 +1787,15 @@ const int count = vector_ass_count();
 
    // vector assignment.
    //
-Simple_string<Symbol *> symbols;
-   symbols.append(at0().get_sym_ptr());
+std::vector<Symbol *> symbols;
+   symbols.push_back(at0().get_sym_ptr());
    loop(c, count)
       {
         Token_loc tl = lookahead();
         Assert1(tl.tok.get_tag() == TOK_LSYMB2);   // by vector_ass_count()
         Symbol * V = tl.tok.get_sym_ptr();
         Assert(V);
-        symbols.append(V);
+        symbols.push_back(V);
       }
 
 Value_P B = at3().get_apl_val();

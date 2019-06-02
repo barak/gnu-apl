@@ -26,7 +26,6 @@
 
 #include "Assert.hh"
 #include "PrintOperator.hh"
-#include "Simple_string.hh"
 #include "UTF8_string.hh"
 
 using namespace std;
@@ -41,11 +40,11 @@ public:
    : aplout(""),
      errout(_errout),
      expand_LF(false)
-   { aplout.shrink(0); }
+   { aplout.clear(); }
 
    /// discard all characters
    void reset()
-   { aplout.shrink(0); }
+   { aplout.clear(); }
 
    /// set LF → CRLF expansion mode
    int LF_to_CRLF(int on)

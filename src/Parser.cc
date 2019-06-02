@@ -19,6 +19,7 @@
 */
 
 #include <string.h>
+#include <vector>
 
 #include "CharCell.hh"
 #include "ComplexCell.hh"
@@ -74,7 +75,7 @@ Parser::parse(const Token_string & input, Token_string & tos) const
 
    // split input line into statements (separated by ◊)
    //
-Simple_string<Token_string *> statements;
+std::vector<Token_string *> statements;
    {
      Token_string * stat = new Token_string();
      loop(idx, input.size())
@@ -82,7 +83,7 @@ Simple_string<Token_string *> statements;
           const Token & tok = input[idx];
           if (tok.get_tag() == TOK_DIAMOND)
              {
-               statements.append(stat);
+               statements.push_back(stat);
                stat = new Token_string();
              }
           else
@@ -90,7 +91,7 @@ Simple_string<Token_string *> statements;
                stat->append(tok);
              }
         }
-     statements.append(stat);
+     statements.push_back(stat);
    }
 
    loop(s, statements.size())
@@ -98,7 +99,7 @@ Simple_string<Token_string *> statements;
         Token_string * stat = statements[s];
         if (const ErrorCode err = parse_statement(*stat))
            {
-             while (s < statements.size())
+             while (s < int(statements.size()))
                {
                  stat = statements[s++];
                  delete stat;
@@ -230,7 +231,7 @@ Parser::collect_constants(Token_string & tos)
 
         // at this point, t is the first item. Collect subsequenct items.
         //
-        for (to = t + 1; to < tos.size(); ++to)
+        for (to = t + 1; to < size_t(tos.size()); ++to)
             {
 #if 1
               // Note: ISO 13751 gives an example with 1 2 3[2] ↔ 2
@@ -244,7 +245,7 @@ Parser::collect_constants(Token_string & tos)
               // if tos[to + 1] is [ then [ binds stronger than
               // vector notation and we stop collecting.
               //
-              if (size_t(to + 1) < tos.size() &&
+              if ((to + 1) < size_t(tos.size()) &&
                   tos[to + 1].get_tag() == TOK_L_BRACK)   break;
 #endif
               const TokenTag tag = tos[to].get_tag();
@@ -337,7 +338,7 @@ Parser::find_closing_bracket(const Token_string & tos, int pos)
 
 int others = 0;
 
-   for (size_t p = pos + 1; p < tos.size(); ++p)
+   for (size_t p = pos + 1; p < size_t(tos.size()); ++p)
        {
          Log(LOG_find_closing)
             CERR << "find_closing_bracket() sees " << tos[p] << endl;
@@ -383,7 +384,7 @@ Parser::find_closing_parent(const Token_string & tos, int pos)
 
 int others = 0;
 
-   for (size_t p = pos + 1; p < tos.size(); ++p)
+   for (size_t p = pos + 1; p < size_t(tos.size()); ++p)
        {
          Log(LOG_find_closing)
             CERR << "find_closing_bracket() sees " << tos[p] << endl;
@@ -581,7 +582,7 @@ size_t dst = 0;
    loop(src, tos.size())
        {
          if (tos[src].get_tag() == TOK_VOID)   continue;
-         if (src != dst)   tos[dst].move_1(tos[src], LOC);
+         if (size_t(src) != dst)   tos[dst].move_1(tos[src], LOC);
          ++dst;
        }
 
@@ -591,7 +592,7 @@ size_t dst = 0;
 ErrorCode
 Parser::match_par_bra(Token_string & tos, bool backwards)
 {
-Simple_string<ShapeItem> stack;
+std::vector<ShapeItem> stack;
    loop(s, tos.size())
        {
          const ShapeItem t = backwards ? (tos.size() - 1) - s : s;
@@ -602,7 +603,7 @@ Simple_string<ShapeItem> stack;
              // for [ ( or { push the position onto stack
              case TC_L_BRACK:  if (tos[t].get_tag() != TOK_L_BRACK)   continue;
              case TC_L_PARENT:
-             case TC_L_CURLY:  stack.append(t);
+             case TC_L_CURLY:  stack.push_back(t);
                                continue;
 
              case TC_R_BRACK:  ec = E_UNBALANCED_BRACKET;
@@ -624,8 +625,8 @@ Simple_string<ShapeItem> stack;
           //
           if (stack.size() == 0)   return ec;
 
-           const ShapeItem t1 = stack.last();
-           stack.pop();
+           const ShapeItem t1 = stack.back();
+           stack.pop_back();
 
           if (tos[t1].get_Class() != tc_peer)   return ec;
 

@@ -375,7 +375,7 @@ const Symbol * symbol = Workspace::lookup_existing_symbol(symbol_name);
                         }
                     res.append(UNI_ASCII_R_CURLY);
 
-                    result.append(res);
+                    result.push_back(res);
                   }
                else
                   {
@@ -385,7 +385,7 @@ const Symbol * symbol = Workspace::lookup_existing_symbol(symbol_name);
                        {
                          if (text[u] == '\n')
                              {
-                               result.append(res);
+                               result.push_back(res);
                                res.shrink(0);
                                UCS_string next(text, u+1, text.size()-(u+1));
                                if (!next.is_comment_or_label() &&
@@ -399,7 +399,7 @@ const Symbol * symbol = Workspace::lookup_existing_symbol(symbol_name);
                        }
                     res.append(ufun.get_exec_properties()[0]
                                ? UNI_DEL_TILDE : UNI_NABLA);
-                    result.append(res);
+                    result.push_back(res);
                   }
                return;
              }
@@ -469,7 +469,7 @@ UCS_string shape_rho;
         picker.get(proto_name);
         picker.pop();
         do_CR10_rec(result, *proto, picker, pidx);
-        result.last().append_utf8(" ⍝ proto 1");
+        result.back().append_utf8(" ⍝ proto 1");
 
         // and then another line to reshape the prototype
         //
@@ -477,8 +477,8 @@ UCS_string shape_rho;
         reshape.append_utf8("←");
         reshape.append(shape_rho);
         reshape.append(proto_name);
-        result.append(reshape);
-        result.last().append_utf8(" ⍝ proto 2");
+        result.push_back(reshape);
+        result.back().append_utf8(" ⍝ proto 2");
         return;
       }
 
@@ -489,7 +489,7 @@ bool nested = false;
    //
    if (short_ravel(result, nested, value, picker, left, shape_rho))
       {
-        result.append(compute_prolog(picker.get_level(), left, value));
+        result.push_back(compute_prolog(picker.get_level(), left, value));
 
         ShapeItem pos = 0;
         V_mode mode = Vm_NONE;
@@ -524,7 +524,7 @@ bool nested = false;
                    pos += count;
                    count = 0;
 
-                   result.append(line);
+                   result.push_back(line);
                    rhs.shrink(0);
                    mode = Vm_NONE;
                  }
@@ -545,7 +545,7 @@ bool nested = false;
      line.append_utf8("←");
      line.append(rhs);
 
-     result.append(line);
+     result.push_back(line);
    }
 
    // step 2: nested items
@@ -620,7 +620,7 @@ V_mode mode = Vm_NONE;
    //
    close_mode(line, mode);
 
-   result.append(line);
+   result.push_back(line);
    return false;
 }
 //-----------------------------------------------------------------------------
@@ -713,7 +713,7 @@ const bool need_disclose = get_level() > 1;
 
    // , is only needed if the picked item is not a true vector
    //
-const bool need_comma = shapes.last().get_rank() != 1;
+const bool need_comma = shapes.back().get_rank() != 1;
 
    result.append_utf8("(");
    if (need_comma)      result.append_utf8(",");
@@ -819,7 +819,7 @@ Quad_CR::do_CR12(const Value & B)
    if (B.get_rank() > 1)   RANK_ERROR;
 
 CDR_string cdr;
-   loop(b, B.element_count())   cdr.append(B.get_ravel(b).get_byte_value());
+   loop(b, B.element_count())   cdr.push_back(B.get_ravel(b).get_byte_value());
 Value_P Z = CDR::from_CDR(cdr, LOC);
    return Z;
 }
@@ -883,7 +883,7 @@ const Cell * cB = &B.get_ravel(0);
          const int n1 = nibble(cB++->get_char_value());
          const int n2 = nibble(cB++->get_char_value());
          if (n1 < 0 || n2 < 0)   DOMAIN_ERROR;
-         cdr.append(16*n1 + n2);
+         cdr.push_back(16*n1 + n2);
        }
 
    Value_P Z = CDR::from_CDR(cdr, LOC);
@@ -1042,7 +1042,7 @@ Value_P
 Quad_CR::do_CR19(const Value & B)
 {
 UTF8_string utf(B);
-   for (ShapeItem l = 0; l < utf.size();)
+   for (ShapeItem l = 0; l < ShapeItem(utf.size());)
        {
          int len = 0;
          const Unicode uni = UTF8_string::toUni(&utf[l], len, false);

@@ -55,7 +55,7 @@ UCS_string UA1 = UA.unique();
        {
          const Unicode uni = UA1[a];
          const CollatingCacheEntry entry(uni, A.get_shape());
-         append(entry);
+         push_back(entry);
        }
 
    // move entries back
@@ -80,7 +80,7 @@ UCS_string UA1 = UA.unique();
    // add one entry for all characters in B that are not in A
    //
 CollatingCacheEntry others(Invalid_Unicode, A.get_shape());
-   append(others);
+   push_back(others);
 }
 //-----------------------------------------------------------------------------
 bool

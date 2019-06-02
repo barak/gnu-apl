@@ -237,11 +237,11 @@ public:
 
    /// return the top-most item on the value stack
    const ValueStackItem * top_of_stack() const
-      { return value_stack.size() ? &value_stack.last() : 0; }
+      { return value_stack.size() ? &value_stack.back() : 0; }
 
    /// return the top-most item on the value stack
    ValueStackItem * top_of_stack()
-      { return value_stack.size() ? &value_stack.last() : 0; }
+      { return value_stack.size() ? &value_stack.back() : 0; }
 
    /// return the idx'th item on stack (higher index = newer item)
    const ValueStackItem & operator [](int idx) const
@@ -263,7 +263,7 @@ public:
 
    /// perform a vector assignment (like (A B C)←1 2 3) for variables in
    /// \b symbols with values \b values
-   static void vector_assignment(Simple_string<Symbol *> & symbols,
+   static void vector_assignment(std::vector<Symbol *> & symbols,
                                  Value_P values);
 
    /// dump this symbol to out
@@ -294,7 +294,7 @@ protected:
    void (*monitor_callback)(const Symbol &, Symbol_Event sev);
 
    /// the value stack of \b this \b Symbol
-   Simple_string<ValueStackItem> value_stack;
+   std::vector<ValueStackItem> value_stack;
 };
 
 inline void

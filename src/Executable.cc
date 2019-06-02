@@ -48,17 +48,17 @@ Executable::Executable(const UCS_string & ucs,  bool multi_line,
              switch (uni)
                 {
                   case UNI_ASCII_CR:                         break;
-                  case UNI_ASCII_LF: text.append(line);
+                  case UNI_ASCII_LF: text.push_back(line);
                                      line.shrink(0);         break;
                   default:           line.append(uni);
                }
            }
 
-        if (line.size())   text.append(line);
+        if (line.size())   text.push_back(line);
       }
    else
       {
-        text.append(ucs);
+        text.push_back(ucs);
       }
 }
 //-----------------------------------------------------------------------------
@@ -87,17 +87,17 @@ ShapeItem last_semi = -1;
       {
         for (ShapeItem t = last_semi; t < lambda_text.size(); ++t)
             header.append(lambda_text[t]);
-        text.append(header);
+        text.push_back(header);
 
         UCS_string new_body(lambda_text);
         new_body.shrink(last_semi);
         new_body.remove_trailing_whitespaces();
-        text.append(new_body);
+        text.push_back(new_body);
       }
    else
       {
-        text.append(header);
-        text.append(lambda_text);
+        text.push_back(header);
+        text.push_back(lambda_text);
      }
 }
 //-----------------------------------------------------------------------------
@@ -704,8 +704,8 @@ UCS_string lambda_text;
 
 int level = 0;   // {/} nesting level
 bool copying = false;
-int tidx = 0;    // the current line in text[]
-int tcol = 0;    // the current column in text[tidx];
+size_t tidx = 0;    // the current line in text[]
+size_t tcol = 0;    // the current column in text[tidx];
 bool in_single_quotes = false;
 bool in_double_quotes = false;
 
@@ -720,7 +720,7 @@ bool in_double_quotes = false;
 
          const UCS_string & line = text[tidx];
 
-         if (tcol >= line.size())   // end of line: wrap to next line
+         if (tcol >= size_t(line.size()))   // end of line: wrap to next line
             {
               ++tidx;     // next line
               tcol = 0;   // first column

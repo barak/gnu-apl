@@ -177,7 +177,7 @@ public:
 
    /// add empty rows to \b this PrintBuffer
    void add_empty_rows(ShapeItem count)
-      { loop(c, count)   buffer.append(UCS_string()); }
+      { loop(c, count)   buffer.push_back(UCS_string()); }
 
    /// return the ColInfo of \b this PrintBuffer
    const ColInfo & get_info() const   { return col_info; }

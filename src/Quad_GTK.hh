@@ -22,10 +22,10 @@
 #define __Quad_GTK_DEFINED__
 
 #include <math.h>
+#include <vector>
 
 #include "QuadFunction.hh"
 #include "Value.hh"
-#include "Simple_string.hh"
 #include "UCS_string_vector.hh"
 
 /// The class implementing ⎕GTK
@@ -111,7 +111,7 @@ protected:
    Value_P read_fd(int fd, int tag);
 
    /// the currently open GTK windows
-   Simple_string<window_entry> open_windows;
+   std::vector<window_entry> open_windows;
 
    /// event queue for events from the GTK windows
    UCS_string_vector event_queue;

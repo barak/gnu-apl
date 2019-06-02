@@ -25,7 +25,6 @@
 
 #include "QuadFunction.hh"
 #include "Value.hh"
-#include "Simple_string.hh"
 
 /// The class implementing ⎕FFT
 class Quad_FFT : public QuadFunction

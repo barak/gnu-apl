@@ -21,6 +21,8 @@
 #ifndef __PROCESSOR_ID_HH_DEFINED__
 #define __PROCESSOR_ID_HH_DEFINED__
 
+#include <vector>
+
 using namespace std;
 
 #ifdef AP_NUM
@@ -82,23 +84,23 @@ struct ProcAuth
    AP_num3 id;
 
    /// the allowed remote processors
-   Simple_string<int> rsvopid;   ///< left argument(s) of remote ⎕SVO and ⎕SVQ
+   std::vector<int> rsvopid;   ///< left argument(s) of remote ⎕SVO and ⎕SVQ
 };
 
 /// A network profile
 struct Network_Profile
 {
    /// left argument of ⎕SVO and ⎕SVQ
-   Simple_string<SvoPid> svo_pids;
+   std::vector<SvoPid> svo_pids;
 
    /// processor authentications
-   Simple_string<ProcAuth> proc_auths;
+   std::vector<ProcAuth> proc_auths;
 
    /// clear everything
    void clear()
       {
-        svo_pids.shrink(0);
-        proc_auths.shrink(0);
+        svo_pids.clear();
+        proc_auths.clear();
       }
 };
 

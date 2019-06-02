@@ -187,7 +187,7 @@ bool
 UserPreferences::parse_argv_1()
 {
 bool log_startup = false;
-   for (int a = 1; a < expanded_argv.size(); )
+   for (size_t a = 1; a < expanded_argv.size(); )
        {
          const char * opt = expanded_argv[a++];
          const char * val = (a < expanded_argv.size()) ? expanded_argv[a] : 0;
@@ -287,7 +287,7 @@ UserPreferences::parse_argv_2(bool logit)
          }
    }
 
-   for (int a = 1; a < expanded_argv.size(); )
+   for (size_t a = 1; a < expanded_argv.size(); )
        {
          if (a == script_argc)   { ++a;   continue; }   // skip scriptname
 
@@ -759,8 +759,8 @@ UserPreferences::expand_argv(int argc, const char ** argv)
 {
    loop(a, argc)
        {
-         original_argv.append(argv[a]);
-         expanded_argv.append(argv[a]);
+         original_argv.push_back(argv[a]);
+         expanded_argv.push_back(argv[a]);
        }
 
    if (argc <= 1)   // no args at all
@@ -790,7 +790,7 @@ const char * apl_args = argv[1];   // the args after e.g. /usr/bin/apl
         return;
       }
 
-   expanded_argv.erase(1);
+   expanded_argv.erase(expanded_argv.begin() + 1);
    --script_argc;
    for (int index = 1;;)
        {
@@ -802,7 +802,7 @@ const char * apl_args = argv[1];   // the args after e.g. /usr/bin/apl
 
          if (!strcmp(apl_args, "--"))        // "--" at end of apl_args
             {
-              expanded_argv.insert_before(index++, "--");
+              expanded_argv.insert(expanded_argv.begin() + index++, "--");
               ++script_argc;
               break;   // done
             }
@@ -810,7 +810,7 @@ const char * apl_args = argv[1];   // the args after e.g. /usr/bin/apl
          if (!strncmp(apl_args, "-- ", 2) &&
                apl_args[2] <= ' ')   // "--" somewhere in apl_args
             {
-              expanded_argv.insert_before(index++, "--");
+              expanded_argv.insert(expanded_argv.begin() + index++, "--");
               ++script_argc;
               apl_args += 2;   // skip "--"
               continue;
@@ -821,20 +821,18 @@ const char * apl_args = argv[1];   // the args after e.g. /usr/bin/apl
             {
               const int arg_len = arg_end - apl_args;
               const char * arg = strndup(apl_args, arg_len);
-              expanded_argv.insert_before(index++, arg);
+              expanded_argv.insert(expanded_argv.begin() + index++, arg);
               ++script_argc;
               apl_args += arg_len;
             }
          else           // last argument
             {
               const char * arg = strdup(apl_args);
-              expanded_argv.insert_before(index++, arg);
+              expanded_argv.insert(expanded_argv.begin() + index++, arg);
               ++script_argc;
               break;
             }
        }
-
-   return;
 }
 //-----------------------------------------------------------------------------
 void

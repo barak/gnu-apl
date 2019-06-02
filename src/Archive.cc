@@ -353,17 +353,17 @@ XML_Saving_Archive::save_Parser(const Prefix & prefix)
 void
 XML_Saving_Archive::save_symtab(const SymbolTable & symtab)
 {
-Simple_string<const Symbol *> symbols = symtab.get_all_symbols();
+std::vector<const Symbol *> symbols = symtab.get_all_symbols();
 
    // remove erased symbols
    //
-   for (int s = 0; s < symbols.size();)
+   for (size_t s = 0; s < symbols.size();)
       {
         const Symbol * sym = symbols[s];
         if (sym->is_erased())
             {
-              symbols[s] = symbols.last();
-              symbols.pop();
+              symbols[s] = symbols.back();
+              symbols.pop_back();
               continue;
             }
 
@@ -380,7 +380,7 @@ Simple_string<const Symbol *> symbols = symtab.get_all_symbols();
         // set idx to the alphabetically smallest name
         //
         int idx = 0;
-        for (int i = 1; i < symbols.size(); ++i)
+        for (size_t i = 1; i < symbols.size(); ++i)
             {
               if (symbols[idx]->compare(*symbols[i]) > 0)   idx = i;
             }
@@ -388,8 +388,8 @@ Simple_string<const Symbol *> symbols = symtab.get_all_symbols();
         const Symbol * sym = symbols[idx];
         save_Symbol(*sym);
 
-        symbols[idx] = symbols.last();
-        symbols.pop();
+        symbols[idx] = symbols.back();
+        symbols.pop_back();
       }
 
    --indent;
@@ -1428,7 +1428,7 @@ const int  rk  = find_int_attr("rk",  false, 10);
 
    if (reading_vids)
       {
-         parents.append(parent);
+         parents.push_back(parent);
          return;
       }
 
@@ -1956,7 +1956,7 @@ bool no_copy = is_protected || (have_allowed_objects && !is_selected);
         if (is_tag("Variable"))
            {
              const int vid = find_int_attr("vid", false, 10);
-             vids_COPY.append(vid);
+             vids_COPY.push_back(vid);
            }
         skip_to_tag("/Symbol");
         return;
@@ -2006,8 +2006,8 @@ bool no_copy = is_protected || (have_allowed_objects && !is_selected);
       {
         if (allowed_objects[a] == name_UCS)
              {
-               allowed_objects[a] = allowed_objects.last();
-               allowed_objects.pop();
+               allowed_objects[a] = allowed_objects.back();
+               allowed_objects.pop_back();
                break;
            }
       }

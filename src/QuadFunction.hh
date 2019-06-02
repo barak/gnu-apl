@@ -21,6 +21,8 @@
 #ifndef __Quad_FUNCTION_HH_DEFINED__
 #define __Quad_FUNCTION_HH_DEFINED__
 
+#include <vector>
+
 #include "PrimitiveFunction.hh"
 #include "StateIndicator.hh"
 
@@ -415,8 +417,7 @@ protected:
    UserFunction * locate_fun(const Value & fun_name);
 
    /// return integers in lines
-   Token reference(const Simple_string<Function_Line> & lines,
-                   bool assigned);
+   Token reference(const std::vector<Function_Line> & lines, bool assigned);
 
    /// return assign lines in new_value to stop or trace vector in ufun
    void assign(UserFunction * ufun, const Value & new_value, bool stop);

@@ -141,7 +141,7 @@ InputFile * input = InputFile::current_file();
                     const bool allowed = input->check_filter(file_line);
                     if (!allowed)
                        {
-                         file_line.shrink(0);
+                         file_line.clear();
                          continue;
                        }
                  }

@@ -21,7 +21,6 @@
 #ifndef __TOKENIZER_HH_DEFINED__
 #define __TOKENIZER_HH_DEFINED__
 
-#include "Simple_string.hh"
 #include "Token.hh"
 #include "UCS_string.hh"
 

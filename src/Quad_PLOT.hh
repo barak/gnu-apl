@@ -24,10 +24,10 @@
 #include <math.h>
 #include <pthread.h>
 #include <semaphore.h>
+#include <vector>
 
 #include "QuadFunction.hh"
 #include "Value.hh"
-#include "Simple_string.hh"
 
 class Plot_window_properties;
 class Plot_data;
@@ -50,7 +50,7 @@ public:
 
    /// an array of threads (one per plot window) handling X events from the
    /// window
-   static Simple_string<pthread_t> plot_threads;
+   static std::vector<pthread_t> plot_threads;
 
 protected:
    /// overloaded Function::eval_AB()

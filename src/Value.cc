@@ -19,6 +19,7 @@
 */
 
 #include <sys/types.h>
+#include <vector>
 
 #include "CDR_string.hh"
 #include "CharCell.hh"
@@ -1828,7 +1829,7 @@ const ShapeItem rows = ec/cols;
 int
 Value::print_incomplete(ostream & out)
 {
-Simple_string<const Value *> incomplete;
+std::vector<const Value *> incomplete;
 bool goon = true;
 
    for (const DynamicObject * dob = all_values.get_prev();
@@ -1840,7 +1841,7 @@ bool goon = true;
          if (val->is_complete())   continue;
 
          out << "incomplete value at " << voidP(val) << endl;
-         incomplete.append(val);
+         incomplete.push_back(val);
 
          if (!goon)
             {
@@ -1862,8 +1863,8 @@ bool goon = true;
 int
 Value::print_stale(ostream & out)
 {
-Simple_string<const Value *> stale_vals;
-Simple_string<const DynamicObject *> stale_dobs;
+std::vector<const Value *> stale_vals;
+std::vector<const DynamicObject *> stale_dobs;
 bool goon = true;
 int count = 0;
 
@@ -1878,8 +1879,8 @@ int count = 0;
          if (val->owner_count)   continue;
 
          out << "stale value at " << voidP(val) << endl;
-         stale_vals.append(val);
-         stale_dobs.append(dob);
+         stale_vals.push_back(val);
+         stale_dobs.push_back(dob);
 
          if (!goon)
             {

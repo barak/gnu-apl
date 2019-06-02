@@ -545,7 +545,7 @@ UCS_string_vector result;
         arg.copy_black(next, idx);
         if (next.size() == 0)   return result;
 
-        result.append(next);
+        result.push_back(next);
       }
 }
 //-----------------------------------------------------------------------------
@@ -638,7 +638,7 @@ Command::cmd_CHECK(ostream & out)
 
    // discover duplicate parents
    //
-Simple_string<val_val> values;
+std::vector<val_val> values;
 ShapeItem duplicate_parents = 0;
    for (const DynamicObject * obj = DynamicObject::get_all_values()->get_next();
         obj != DynamicObject::get_all_values(); obj = obj->get_next())
@@ -646,7 +646,7 @@ ShapeItem duplicate_parents = 0;
          const Value * val = static_cast<const Value *>(obj);
 
          val_val vv = { 0, val };   // no parent
-         values.append(vv, LOC);
+         values.push_back(vv);
        }
 
    Heapsort<val_val>::sort(&values[0], values.size(), 0,
@@ -719,7 +719,7 @@ const Unicode l = args[0][0];
       if (Avec::is_digit(l))
       {
         libref = LibRef(l - '0');
-        args.erase(0);
+        args.erase(args.begin());
       }
 
    if (args.size() == 0)   // at least workspace name is required
@@ -730,7 +730,7 @@ const Unicode l = args[0][0];
       }
 
 UCS_string wsname = args[0];
-   args.erase(0);
+   args.erase(args.begin());
    Workspace::copy_WS(out, libref, wsname, args, protection);
 }
 //-----------------------------------------------------------------------------
@@ -770,7 +770,7 @@ Command::cmd_DROP(ostream & out, const UCS_string_vector & lib_ws)
    // lib_ws.size() is 1 or 2. If 2 then the first is the lib number
    //
 LibRef libref = LIB_NONE;
-UCS_string wname = lib_ws.last();
+UCS_string wname = lib_ws.back();
    if (lib_ws.size() == 2)   libref = LibRef(lib_ws[0][0] - '0');
 
 UTF8_string filename = LibPaths::get_lib_filename(libref, wname, true,
@@ -1101,7 +1101,7 @@ UCS_string_vector commands;
 
    out << left << "APL Commands:" << endl;
 #define cmd_def(cmd_str, _cod, arg, _hint) \
-   { UCS_string c(cmd_str " " arg);   commands.append(c); }
+   { UCS_string c(cmd_str " " arg);   commands.push_back(c); }
 #include "Command.def"
 
 bool left_col = true;
@@ -1211,8 +1211,8 @@ Command::cmd_IN(ostream & out, UCS_string_vector & args, bool protection)
    // IN filename [objects...]
 
 UCS_string fname = args[0];
-   args[0] = args.last();
-   args.pop();
+   args[0] = args.back();
+   args.pop_back();
 
 UTF8_string filename = LibPaths::get_lib_filename(LIB_NONE, fname, true,
                                                   ".atf", 0);
@@ -1400,8 +1400,8 @@ UCS_string arg("0");
             }
           else                   // relative path
             {
-              path.append(UNI_ASCII_SLASH);
-              path.append(UTF8_string(buffer));
+              path.append('/');
+              path.append_utf8(UTF8_string(buffer));
             }
        }
 
@@ -1430,7 +1430,7 @@ Command::is_directory(dirent * entry, const UTF8_string & path)
 UTF8_string filename = path;
 UTF8_string entry_name(entry->d_name);
    filename.append('/');
-   filename.append(entry_name);
+   filename.append_utf8(entry_name);
 
 DIR * dir = opendir(filename.c_str());
    if (dir) closedir(dir);
@@ -1468,11 +1468,11 @@ const UCS_string * range = 0;
 
          if (is_path)   // normal (non-range) arg
             {
-              args.append(arg);
+              args.push_back(arg);
             }
          else if (!is_range)   // normal (non-range) arg
             {
-              args.append(arg);
+              args.push_back(arg);
             }
          else if (range)   // second non-range arg
             {
@@ -1528,7 +1528,7 @@ UCS_string_vector directories;
             {
               if (filename_utf8[0] == '.')   continue;
               filename.append(UNI_ASCII_SLASH);
-              directories.append(filename);
+              directories.push_back(filename);
               continue;
             }
 
@@ -1538,19 +1538,19 @@ UCS_string_vector directories;
               if (filename_utf8.ends_with(".apl"))
                  {
                    filename.shrink(filename.size() - 4);   // skip extension
-                   files.append(filename);
+                   files.push_back(filename);
                  }
               else if (filename_utf8.ends_with(".xml"))
                  {
                    filename.shrink(filename.size() - 4);   // skip extension
-                   files.append(filename);
+                   files.push_back(filename);
                  }
             }
          else
             {
               if (filename[0] == '.')          continue;  // skip dot files
               if (filename[dlen - 1] == '~')   continue;  // and editor backups
-              files.append(filename);
+              files.push_back(filename);
             }
        }
    closedir(dir);
@@ -1562,13 +1562,13 @@ UCS_string_vector directories;
    files.sort();
    loop(f, files.size())
       {
-        if (directories.size()  && directories.last() == files[f])
+        if (directories.size()  && directories.back() == files[f])
            {
              // there were some file.apl and file.xml. Skip the second
              //
              continue;
            }
-        directories.append(files[f]);
+        directories.push_back(files[f]);
       }
 
    // 5. list directories first, then files
@@ -1578,14 +1578,15 @@ UCS_string_vector directories;
    //
    enum { tabsize = 4 };
 
-Simple_string<int> col_width =
-   directories.compute_column_width(tabsize);
+std::vector<int> col_widths;
+   directories.compute_column_width(tabsize, col_widths);
 
    loop(c, directories.size())
       {
-        const int col = c % col_width.size();
+        const int col = c % col_widths.size();
         out << directories[c];
-        if (col == (col_width.size() - 1) || c == (directories.size() - 1))
+        if (col == int(col_widths.size() - 1) ||
+              c == int(directories.size() - 1))
            {
              // last column or last item: print newline
              //
@@ -1595,7 +1596,7 @@ Simple_string<int> col_width =
            {
              // intermediate column: print spaces
              //
-             const int len = tabsize*col_width[col] - directories[c].size();
+             const int len = tabsize*col_widths[col] - directories[c].size();
              Assert(len > 0);
              loop(l, len)   out << " ";
            }
@@ -1703,11 +1704,11 @@ void
 Command::cmd_OUT(ostream & out, UCS_string_vector & args)
 {
 UCS_string fname = args[0];
-   args.erase(0);
+   args.erase(args.begin());
 
 UTF8_string filename = LibPaths::get_lib_filename(LIB_NONE, fname, false,
                                                   ".atf", 0);
-   
+
 FILE * atf = fopen(filename.c_str(), "w");
    if (atf == 0)
       {
@@ -1914,7 +1915,7 @@ Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
          // looks like the user command is a lambda function.
          UCS_string result;
          // lambdas could contain spaces, collect all arguments in one string
-         for (int i = 1; i < args.size(); ++ i)
+         for (size_t i = 1; i < args.size(); ++i)
             {
                result << args[i];
             }

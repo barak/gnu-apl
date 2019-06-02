@@ -53,7 +53,7 @@ TabExpansion::expand_tab(UCS_string & user)
 ExpandResult
 TabExpansion::expand_user_name(UCS_string & user)
 {
-Simple_string<const Symbol *> symbols = Workspace::get_all_symbols();
+std::vector<const Symbol *> symbols = Workspace::get_all_symbols();
 
 UCS_string_vector matches;
    loop(s, symbols.size())
@@ -63,7 +63,7 @@ UCS_string_vector matches;
 
         const UCS_string & sym_name = sym->get_name();
         if (!sym_name.starts_with(user))   continue;
-        matches.append(sym_name);
+        matches.push_back(sym_name);
       }
 
    if (matches.size() == 0)   return ER_IGNORE;   // no match
@@ -101,7 +101,7 @@ UCS_string arg;
 #define cmd_def(cmd_str, code, arg, hint)                \
    { UCS_string ustr(cmd_str);                           \
      if (ustr.starts_iwith(cmd))                         \
-        { matches.append(ustr); ehint = hint; shint = arg; } }
+        { matches.push_back(ustr); ehint = hint; shint = arg; } }
 #include "Command.def"
 
    // no match was found: ignore the TAB
@@ -124,8 +124,8 @@ UCS_string arg;
                 {
                   if (matches[m].size() != cmd.size())   // wrong match
                      {
-                       matches[m].swap(matches.last());
-                       matches.pop();
+                       matches[m].swap(matches.back());
+                       matches.pop_back();
                        goto again;
                      }
                 }
@@ -207,7 +207,7 @@ const UCS_string help(user, 0, 6);
 UCS_string prefix(user, 5, user.size() - 5);   // the name prefix
    prefix.remove_leading_whitespaces();
 
-Simple_string<const Symbol *> symbols = Workspace::get_all_symbols();
+std::vector<const Symbol *> symbols = Workspace::get_all_symbols();
 
 UCS_string_vector matches;
    loop(s, symbols.size())
@@ -217,7 +217,7 @@ UCS_string_vector matches;
 
         const UCS_string & sym_name = sym->get_name();
         if (!sym_name.starts_with(prefix))   continue;
-        matches.append(sym_name);
+        matches.push_back(sym_name);
       }
 
    if (matches.size() == 0)   return ER_IGNORE;   // no match
@@ -265,7 +265,7 @@ const int max_col = Workspace::get_PW() - 4;
       }
 #include "Help.def"
 
-Simple_string<const Symbol *> symbols = Workspace::get_all_symbols();
+std::vector<const Symbol *> symbols = Workspace::get_all_symbols();
 
 UCS_string_vector names;
    loop(s, symbols.size())
@@ -274,7 +274,7 @@ UCS_string_vector names;
         if (sym->is_erased())    continue;
 
         const UCS_string & sym_name = sym->get_name();
-        names.append(sym_name);
+        names.push_back(sym_name);
       }
 
    names.sort();
@@ -306,7 +306,7 @@ int c1 = col;
       {
         Unicode uni = names[0][0];
         CERR << " " << uni;
-        for (ShapeItem n = 1; n < names.size(); ++n)
+        for (ShapeItem n = 1; n < ShapeItem(names.size()); ++n)
             {
               if (names[n][0] == uni)   continue;   // same first character
               uni = names[n][0];
@@ -351,13 +351,13 @@ int qpos = -1;
         UCS_string_vector matches;
 
 #define ro_sv_def(_q, str, _txt) { UCS_string ustr(str);   \
-   if (ustr.size() && ustr.starts_iwith(qxx)) matches.append(ustr); }
+   if (ustr.size() && ustr.starts_iwith(qxx)) matches.push_back(ustr); }
 
 #define rw_sv_def(_q, str, _txt) { UCS_string ustr(str);   \
-   if (ustr.size() && ustr.starts_iwith(qxx)) matches.append(ustr); }
+   if (ustr.size() && ustr.starts_iwith(qxx)) matches.push_back(ustr); }
 
 #define sf_def(_q, str, _txt) { UCS_string ustr(str);   \
-   if (ustr.size() && ustr.starts_iwith(qxx)) matches.append(ustr); }
+   if (ustr.size() && ustr.starts_iwith(qxx)) matches.push_back(ustr); }
 
 #include "SystemVariable.def"
 
@@ -499,7 +499,7 @@ TabExpansion::expand_filename(UCS_string & user,
      if (dir_basename == 0)   goto nothing;
 
      UTF8_string base_utf = UTF8_string(++dir_basename);
-     dir_utf.shrink(dir_basename - dir_dirname);
+     dir_utf.resize(dir_basename - dir_dirname);
      dir_ucs = UCS_string(dir_utf);
 
      DIR * dir = opendir(dir_utf.c_str());
@@ -650,7 +650,7 @@ const bool only_workspaces = (ehint == EH_oLIB_WSNAME) ||
                if (!is_wsname)   continue;
              }
 
-          matches.append(name);
+          matches.push_back(name);
        }
 }
 //-----------------------------------------------------------------------------

@@ -18,6 +18,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <vector>
+
 #include "Bif_OPER1_REDUCE.hh"
 #include "Bif_OPER1_SCAN.hh"
 #include "LvalCell.hh"
@@ -49,12 +51,12 @@ Shape shape_B = B->get_shape();
 
 const ShapeItem ec_A = A->element_count();
 ShapeItem ones_A = 0;
-Simple_string<ShapeItem> rep_counts;
+std::vector<ShapeItem> rep_counts;
    rep_counts.reserve(ec_A);
    loop(a, ec_A)
       {
         APL_Integer rep_A = A->get_ravel(a).get_near_int();
-        rep_counts.append(rep_A);
+        rep_counts.push_back(rep_A);
         if      (rep_A == 0)        ;
         else if (rep_A == 1)        ++ones_A;
         else                        DOMAIN_ERROR;

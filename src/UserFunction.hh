@@ -22,6 +22,7 @@
 #define __USERFUNCTION_HH_DEFINED__
 
 #include <sys/types.h>
+#include <vector>
 
 #include "Error.hh"
 #include "Executable.hh"
@@ -233,7 +234,7 @@ public:
       { return creator; }
 
    /// set trace or stop vector
-   void set_trace_stop(Simple_string<Function_Line> & lines, bool stop);
+   void set_trace_stop(std::vector<Function_Line> & lines, bool stop);
 
    /// transform a function body containing (old-style) multi-lines into a
    /// standard function body
@@ -247,11 +248,11 @@ public:
    void parse_body(const char * loc, bool tolerant, bool macro);
 
    /// return stop lines (from S∆fun ← lines)
-   const Simple_string<Function_Line> & get_stop_lines() const
+   const std::vector<Function_Line> & get_stop_lines() const
       { return stop_lines; }
 
    /// return trace lines (from S∆fun ← lines)
-   const Simple_string<Function_Line> & get_trace_lines() const
+   const std::vector<Function_Line> & get_trace_lines() const
       { return trace_lines; }
 
    /// return the header object (return value name, argument names, local vars,
@@ -311,13 +312,13 @@ protected:
       [N] TOK_RETURN_SYMBOL or TOK_RETURN_VOID   <--+
 
    **/
-   Simple_string<Function_PC> line_starts;
+   std::vector<Function_PC> line_starts;
 
    /// stop lines (from S∆fun ← lines)
-   Simple_string<Function_Line> stop_lines;
+   std::vector<Function_Line> stop_lines;
 
    /// trace lines (from S∆fun ← lines)
-   Simple_string<Function_Line> trace_lines;
+   std::vector<Function_Line> trace_lines;
 
    /// execution properties as per 3⎕AT
    int exec_properties[4];

@@ -850,8 +850,8 @@ bool dot_seen = false;
              fract_digits.append(src.get());
            }
 
-        while (fract_digits.size() && fract_digits.last() == '0')   // 1d.
-           fract_digits.pop();
+        while (fract_digits.size() && fract_digits.back() == '0')   // 1d.
+           fract_digits.pop_back();
       }
 
    // require at least one integer or fractional digit
@@ -895,7 +895,7 @@ int expo = 0;
    expo += int_digits.size();
 
 UTF8_string digits = int_digits;
-   digits.append(fract_digits);
+   digits.append_utf8(fract_digits);
 
    // at this point, digits is the fractional part ff... of 0.ff... ×10⋆expo
    // discard leading fractional 0s and adjust expo accordingly
@@ -914,7 +914,7 @@ UTF8_string digits = int_digits;
    // round according to the last digit.
    //
    if (digits.size() > MAX_TOKENIZE_DIGITS_1)
-      digits.shrink(MAX_TOKENIZE_DIGITS_1);
+      digits.resize(MAX_TOKENIZE_DIGITS_1);
 
    if (digits.size() == MAX_TOKENIZE_DIGITS_1)
       {
@@ -945,11 +945,11 @@ UTF8_string digits = int_digits;
             }
       }
 
-   if (digits.size() > expo)   need_float = true;
+   if (int(digits.size()) > expo)   need_float = true;
 
    if (need_float)
       {
-        if (digits.size() > 17)   digits.shrink(17);
+        if (digits.size() > 17)   digits.resize(17);
 
        int64_t v = 0;
         loop(j, digits.size())

@@ -144,7 +144,7 @@ UCS_string to;
 
    // put those symbols into 'list' that satisfy 'which'
    //
-Simple_string<Symbol *> list;
+std::vector<Symbol *> list;
 int symbol_count = 0;
    loop(s, SYMBOL_HASH_TABLE_SIZE)
        {
@@ -170,16 +170,13 @@ int symbol_count = 0;
 
                if (sym->value_stack.size() == 0)
                   {
-                    if (which == LIST_ALL)
-                       {
-                         list.append(sym);
-                       }
+                    if (which == LIST_ALL)   list.push_back(sym);
                     continue;
                   }
 
                if (sym->is_erased() && !(which & LIST_ERASED))   continue;
 
-               const NameClass nc = sym->value_stack.last().name_class;
+               const NameClass nc = sym->value_stack.back().name_class;
                if (((nc == NC_VARIABLE)         && (which & LIST_VARS))    ||
                    ((nc == NC_FUNCTION)         && (which & LIST_FUNS))    ||
                    ((nc == NC_OPERATOR)         && (which & LIST_OPERS))   ||
@@ -188,7 +185,7 @@ int symbol_count = 0;
                    ((nc == NC_INVALID)          && (which & LIST_INVALID)) ||
                    ((nc == NC_UNUSED_USER_NAME) && (which & LIST_UNUSED)))
                    {
-                     list.append(sym);
+                     list.push_back(sym);
                    }
              }
        }
@@ -213,9 +210,9 @@ UCS_string_vector names;
         if (which == LIST_NAMES)   // append .NC
            {
              name.append(UNI_ASCII_FULLSTOP);
-             name.append_number(list[l]->value_stack.last().name_class);
+             name.append_number(list[l]->value_stack.back().name_class);
            }
-        names.append(name);
+        names.push_back(name);
       }
 
    names.sort();
@@ -223,13 +220,14 @@ UCS_string_vector names;
    // figure column widths
    //
    enum { tabsize = 4 };
-Simple_string<int> col_width = names.compute_column_width(tabsize);
+std::vector<int> col_widths;
+   names.compute_column_width(tabsize, col_widths);
 
    loop(c, count)
       {
-        const int col = c % col_width.size();
+        const size_t col = c % col_widths.size();
         out << names[c];
-        if (col == (col_width.size() - 1) || c == (count - 1))
+        if (col == (col_widths.size() - 1) || c == (count - 1))
            {
              // last column or last item: print newline
              //
@@ -239,7 +237,7 @@ Simple_string<int> col_width = names.compute_column_width(tabsize);
            {
              // intermediate column: print spaces
              //
-             const int len = tabsize*col_width[col] - names[c].size();
+             const int len = tabsize*col_widths[col] - names[c].size();
              Assert(len > 0);
              loop(l, len)   out << " ";
            }
@@ -434,17 +432,17 @@ ValueStackItem & tos = symbol->value_stack[0];
    return true;
 }
 //-----------------------------------------------------------------------------
-Simple_string<const Symbol *>
+std::vector<const Symbol *>
 SymbolTable::get_all_symbols() const
 {
-Simple_string<const Symbol *> ret;
+std::vector<const Symbol *> ret;
    ret.reserve(1000);
 
    loop(hash, SYMBOL_HASH_TABLE_SIZE)
       {
         for (const Symbol * sym = symbol_table[hash]; sym; sym = sym->next)
             {
-              ret.append(sym);
+              ret.push_back(sym);
             }
       }
 
@@ -454,14 +452,14 @@ Simple_string<const Symbol *> ret;
 void
 SymbolTable::dump(ostream & out, int & fcount, int & vcount) const
 {
-Simple_string<const Symbol *> symbols;
+std::vector<const Symbol *> symbols;
    loop(hash, SYMBOL_HASH_TABLE_SIZE)
       {
         for (const Symbol * sym = symbol_table[hash]; sym; sym = sym->next)
             {
               if (sym->is_erased())              continue;
               if (sym->value_stack_size() < 1)   continue;
-              symbols.append(sym);
+              symbols.push_back(sym);
             }
       }
 
@@ -469,7 +467,7 @@ Simple_string<const Symbol *> symbols;
    //
    loop(d, symbols.size())
       {
-        for (ShapeItem j = d + 1; j < symbols.size(); ++j)
+        for (ShapeItem j = d + 1; j < ShapeItem(symbols.size()); ++j)
             {
               if (symbols[d]->get_name().compare(symbols[j]->get_name()) > 0)
                  {

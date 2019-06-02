@@ -21,7 +21,8 @@
 #ifndef __CDR_STRING_HH_DEFINED__
 #define __CDR_STRING_HH_DEFINED__
 
-#include "Simple_string.hh"
+#include <vector>
+
 #include "UTF8_string.hh"
 
 /// the header of a CDR record
@@ -59,26 +60,24 @@ struct CDR_header
 };
 
 /// a string containing a CDR record
-class CDR_string : public Simple_string<uint8_t>
+class CDR_string : public std::vector<uint8_t>
 {
 public:
    /// Constructor: An uninitialized CDR structure
    CDR_string()
-   : Simple_string<uint8_t>(utf8P(0), 0)
    {}
 
    /// Constructor: CDR structure from uint8_t * and length
    CDR_string(const uint8_t * data, int len)
-   : Simple_string<uint8_t>(data, len)
-   {}
+      { loop(l, len)   push_back(*data++); }
 
    /// return the bytes of this CDR
    const uint8_t * get_items() const
-      { return items; }
+      { return &front(); }
 
    /// return the header of this CDR
    const CDR_header & header() const
-      { return *reinterpret_cast<const CDR_header *>(items); }
+      { return reinterpret_cast<const CDR_header &>(front()); }
 
    /// return the tag of this CDR
    int get_ptr() const   { return get_4(0); }
@@ -108,10 +107,9 @@ public:
       {
         uint32_t cnt = 1;
         for (int r = 0; r < get_rank(); ++r)   cnt *= get_4(16 + 4*r);
-        if (items == 0)                           return 1;
         if (size() < 32)                          return 2;
         if (get_ptr() != 0x00002020)              return 3;
-        if (int(header().get_nb()) != size())     return 4;
+        if (header().get_nb() != size())          return 4;
         if (header().get_nelm() != cnt)           return 5;
         if (uint32_t(get_type()) > CDR_NEST32)    return 6;
         return 0;

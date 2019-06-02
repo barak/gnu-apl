@@ -44,7 +44,7 @@ using namespace std;
 Backtrace::_lines_status 
        Backtrace::lines_status = Backtrace::LINES_not_checked;
 
-Simple_string<Backtrace::PC_src> Backtrace::pc_2_src;
+std::vector<Backtrace::PC_src> Backtrace::pc_2_src;
 
 //-----------------------------------------------------------------------------
 const char *
@@ -149,7 +149,7 @@ int64_t prev_pc = -1LL;
                       }
 
                    PC_src pcs = { pc, src_line };
-                   pc_2_src.append(pcs);
+                   pc_2_src.push_back(pcs);
                    prev_pc = pc;
                    new_line = false;
                  }
@@ -323,10 +323,10 @@ char ** strings = backtrace_symbols(buffer, size);
 int
 Backtrace::demangle_line(char * result, size_t result_max, const char * buf)
 {
-Simple_string<char> tmp;
+std::string tmp;
    tmp.reserve(result_max + 1);
    for (const char * b = buf; *b &&  b < (buf + result_max); ++b)
-       tmp.append(*b);
+       tmp += *b;
    tmp.append(0);
 
 char * e = 0;

@@ -22,6 +22,7 @@
 #define __USERFUNCTION__HEADER_HH_DEFINED__
 
 #include <sys/types.h>
+#include <vector>
 
 #include "Error.hh"
 #include "Executable.hh"
@@ -120,7 +121,7 @@ public:
    void add_label(Symbol * sym, Function_Line line)
       {
         labVal label = { sym, line };
-        label_values.append(label);
+        label_values.push_back(label);
       }
 
    /// Check that all function params, local vars. and labels are unique.
@@ -142,7 +143,7 @@ public:
 
 protected:
    /// remove \b sym from local_vars if it occurs at pos or above
-   void remove_duplicate_local_var(const Symbol * sym, int pos);
+   void remove_duplicate_local_var(const Symbol * sym, size_t pos);
 
    /// error if header was not parsed successfully
    ErrorCode error;
@@ -175,10 +176,10 @@ protected:
    Symbol * sym_B;
 
    /// The local variables of \b this function.
-   Simple_string<Symbol *> local_vars;
+   std::vector<Symbol *> local_vars;
 
    /// The labels of \b this function.
-   Simple_string<labVal> label_values;
+   std::vector<labVal> label_values;
 };
 //-----------------------------------------------------------------------------
 

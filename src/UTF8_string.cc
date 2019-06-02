@@ -60,7 +60,7 @@ UTF8_string::UTF8_string(const UCS_string & ucs)
 
    loop(i, ucs.size())
       {
-        uint32_t uni = ucs[i];
+        int uni = ucs[i];
         if (uni < 0x80)            // 1-byte unicode (ASCII)
            {
              append(uni);
@@ -101,7 +101,7 @@ UTF8_string::UTF8_string(const UCS_string & ucs)
              append(b3  | 0x80);
              append(b4  | 0x80);
            }
-        else if (uni < 0x80000000)   // 6-byte unicode
+        else if (size_t(uni) < 0x80000000)   // 6-byte unicode
            {
              const uint8_t b5 = uni & 0x3F;   uni >>= 6; 
              const uint8_t b4 = uni & 0x3F;   uni >>= 6; 
@@ -132,11 +132,10 @@ UTF8_string::UTF8_string(const UCS_string & ucs)
 }
 //-----------------------------------------------------------------------------
 UTF8_string::UTF8_string(const Value & value)
-   : Simple_string<UTF8>(value.element_count(), UTF8(0))
 {
    loop(v, value.element_count())
        {
-       at(v) = value.get_ravel(v).get_char_value() & 0xFF;
+         *this += value.get_ravel(v).get_char_value() & 0xFF;
        }
 }
 //-----------------------------------------------------------------------------
@@ -252,12 +251,12 @@ UTF8_string::starts_with(const char * path) const
 {
    if (path == 0)   return false;   // no path provided
 
-const int path_len = strlen(path);
+const size_t path_len = strlen(path);
    if (path_len > size())   return false;   // path_len longer than this string
 
    // can't use strncmp() because this string may not be 0-terminated
    //
-   loop(p, path_len)   if (items[p] != path[p])   return false;
+   loop(p, path_len)   if (at(p) != path[p])   return false;
    return true;
 }
 //-----------------------------------------------------------------------------
@@ -266,12 +265,12 @@ UTF8_string::ends_with(const char * ext) const
 {
    if (ext == 0)   return false;   // no ext provided
 
-const int ext_len = strlen(ext);
+const size_t ext_len = strlen(ext);
    if (ext_len > size())   return false;   // ext longer than this string
 
    // can't use strncmp() because this string may not be 0-terminated
    //
-   loop(e, ext_len)   if (items[size() - ext_len + e] != ext[e])   return false;
+   loop(e, ext_len)   if (at(size() - ext_len + e) != ext[e])   return false;
    return true;
 }
 //-----------------------------------------------------------------------------
@@ -282,7 +281,7 @@ int dest = 0;
 bool got_tag = false;
    loop(src, size())
       {
-        const char cc = char(items[src]);
+        const char cc = at(src);
         if (in_HTML == 2)   // in HTML header, i.e. < seen
            {
              if (cc == '>')   in_HTML = 1;   // in HTML but not in HTML tag
@@ -298,46 +297,46 @@ bool got_tag = false;
 
         if (cc != '&')   // unless HTML-escaped char
            {
-             items[dest++] = cc;
+             at(dest++) = cc;
              continue;
            }
 
         const int rest = size() - src;
-        if (rest > 5 && items[src + 1] == '#' && items[src + 4] == ';')
+        if (rest > 5 && at(src + 1) == '#' && at(src + 4) == ';')
            {
-             const long val = strtol(charP(items + src + 2), 0, 10);
-             items[dest++] = char(val);
+             const long val = strtol(charP(&at(src + 2)), 0, 10);
+             at(dest++) = val;
              src += 4;
            }
-        else if (rest > 4 && items[src + 1] == 'g' &&
-                             items[src + 2] == 't' &&
-                             items[src + 3] == ';')
+        else if (rest > 4 && at(src + 1) == 'g' &&
+                             at(src + 2) == 't' &&
+                             at(src + 3) == ';')
            {
-             items[dest++] = '>';
+             at(dest++) = '>';
              src += 3;   // skip gt;
            }
-        else if (rest > 4 && items[src + 1] == 'l' &&
-                             items[src + 2] == 't' &&
-                             items[src + 3] == ';')
+        else if (rest > 4 && at(src + 1) == 'l' &&
+                             at(src + 2) == 't' &&
+                             at(src + 3) == ';')
            {
-             items[dest++] = '<';
+             at(dest++) = '<';
              src += 3;   // skip gt;
            }
         else
            {
-             items[dest++] = cc;
+             at(dest++) = cc;
            }
       }
 
    if (got_tag)   dest = 0;
-   shrink(dest);
+   resize(dest);
    return in_HTML;
 }
 //-----------------------------------------------------------------------------
 bool
 UTF8_string::round_0_1()
 {
-   if (last() >= '5')   // round up
+   if (back() >= '5')   // round up
       {
         // rounding up of the last digit creates a carry
         //
@@ -352,7 +351,7 @@ UTF8_string::round_0_1()
               // eat carry
               //
               ++at(j);
-              pop();   // discard last digit.
+              pop_back();   // discard last digit.
               return false;   // no carry
             }
       }
@@ -361,7 +360,7 @@ UTF8_string::round_0_1()
    // up to 1.000...
    //
    at(0) = '1';
-   pop();
+   pop_back();
    return true;   // 1.0 → 0.1
 }
 //-----------------------------------------------------------------------------

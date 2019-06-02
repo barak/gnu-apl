@@ -63,9 +63,9 @@ Quad_RL::get_random()
    state += Knuth_c;
 
    Assert(value_stack.size());
-   if (value_stack.last().name_class != NC_VARIABLE)   VALUE_ERROR;
+   if (value_stack.back().name_class != NC_VARIABLE)   VALUE_ERROR;
 
-   new (&value_stack.last().apl_val->get_ravel(0))   IntCell(state);
+   new (&value_stack.back().apl_val->get_ravel(0))   IntCell(state);
    return state;
 }
 //-----------------------------------------------------------------------------
@@ -81,6 +81,6 @@ void
 Quad_RL::pop()
 {
    Symbol::pop();
-   state = value_stack.last().apl_val->get_ravel(0).get_near_int();
+   state = value_stack.back().apl_val->get_ravel(0).get_near_int();
 }
 //=============================================================================

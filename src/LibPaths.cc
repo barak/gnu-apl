@@ -24,6 +24,8 @@
 #include <string.h>
 #include <unistd.h>
 
+#include <string>
+
 #include "Error.hh"
 #include "LibPaths.hh"
 #include "PrintOperator.hh"
@@ -82,9 +84,9 @@ LibPaths::compute_bin_path(const char * argv0, bool logit)
               // string.
               //
               const size_t plen = strlen(path);
-              Simple_string<char>   path1;
+              std::string   path1;
               path1.reserve(plen + 1);
-              loop(p, (plen + 1))   path1.append(path[p]);
+              loop(p, (plen + 1))   path1 += path[p];
               char * next = &path1[0];
               for (;;)
                   {
@@ -231,12 +233,12 @@ UTF8_string ret(APL_lib_root);
    if (libref == LIB0)   // workspaces
       {
         const UTF8_string subdir("/workspaces");
-        ret.append(subdir);
+        ret.append_utf8(subdir);
       }
    else                  // wslibN
       {
         const UTF8_string subdir("/wslib");
-        ret.append(subdir);
+        ret.append_utf8(subdir);
         ret.append(Unicode(libref + '0'));
       }
 
@@ -313,7 +315,7 @@ int name_has_extension = 0;   // assume name has neither extension ext1 nor ext2
 
 UTF8_string filename = get_lib_dir(lib);
    filename.append(UNI_ASCII_SLASH);
-   filename.append(name);
+   filename.append_utf8(name);
 
    if (name_has_extension)   return filename;
 

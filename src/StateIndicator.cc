@@ -437,12 +437,12 @@ StateIndicator::nth_push(const Symbol * sym, int from_tos) const
 
   // collect SI entries in reverse order...
    //
-Simple_string<const StateIndicator *> stack;
+std::vector<const StateIndicator *> stack;
 
    for (const StateIndicator * si = Workspace::SI_top();
         si; si = si->get_parent())
       {
-        stack.append(si);
+        stack.push_back(si);
       }
 
    loop(d, stack.size())

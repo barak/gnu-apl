@@ -110,7 +110,7 @@ struct InputFile
    /// add object to object_filter
    void add_filter_object(UCS_string & object)
       {
-        object_filter.append(object);
+        object_filter.push_back(object);
       }
 
    /// return true if this file as an oject filter (from )COPY file names...)
@@ -145,9 +145,6 @@ struct InputFile
 
    /// the file name
    UTF8_string  filename;
-
-   /// copy operator
-   InputFile & operator =(const InputFile &);
 
 protected:
 

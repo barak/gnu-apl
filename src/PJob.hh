@@ -23,6 +23,8 @@
 
 class PrimitiveFunction;
 
+#include <vector>
+
 #include "PrimitiveFunction.hh"
 
 /**
@@ -233,14 +235,14 @@ public:
 #endif
 
          started_loc = loc;
-         jobs.shrink(0);
-         jobs.append(first_job);
+         jobs.clear();
+         jobs.push_back(first_job);
       }
 
    /// cancel the entire job list
    void cancel_jobs()
       {
-        jobs.shrink(0);
+        jobs.clear();
         started_loc = 0;
       }
 
@@ -254,8 +256,8 @@ public:
              return 0;
            }
 
-        current_job = jobs.last();
-        jobs.pop();
+        current_job = jobs.back();
+        jobs.pop_back();
         return &current_job;
       }
 
@@ -264,12 +266,12 @@ public:
       { return current_job; }
 
    /// return the current size
-   int get_size()
+   size_t get_size()
       { return jobs.size(); }
 
    /// add \b job to \b jobs
    void add_job(T & job)
-      { jobs.append(job); }
+      { jobs.push_back(job); }
 
    /// return true if not all jobs are done yet
    bool busy()
@@ -281,7 +283,7 @@ public:
 
 protected:
    /// jobs to be performed
-   Simple_string<T> jobs;
+   std::vector<T> jobs;
 
    /// the currently executed worklist item
    T current_job;

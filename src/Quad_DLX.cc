@@ -18,6 +18,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <vector>
+
 #include "Logging.hh"
 #include "PointerCell.hh"
 #include "Quad_DLX.hh"
@@ -53,6 +55,9 @@ public:
      left(l),
       right(r)
    { insert_lr();   insert_ud(); }
+
+   void operator = (const DLX_Node & other)
+      { new (this) DLX_Node(other); }
 
    /// (re-)insert \b this node horizontally (between left and right)
    void insert_lr()   { left->right = this;  right->left = this; }
@@ -261,7 +266,7 @@ public:
    ShapeItem get_cover_count() const      { return cover_count; }
 
    /// all solutions as len rows... len rows ...
-   Simple_string<ShapeItem> all_solutions;
+   std::vector<ShapeItem> all_solutions;
 
 protected:
    /// the max. number of solutions to produce, 0 = all
@@ -274,10 +279,10 @@ protected:
    const ShapeItem cols;
 
    /// the column headers
-   Simple_string<DLX_Header_Node> headers;
+   std::vector<DLX_Header_Node> headers;
 
    /// the '1's and '2's in the (sparse) matrix
-   Simple_string<DLX_Node> nodes;
+   std::vector<DLX_Node> nodes;
 
    /// the number of primary columns
    ShapeItem primary_count;
@@ -346,23 +351,23 @@ const Cell * b = &B.get_ravel(0);
 
    Log(LOG_Quad_DLX)   CERR << "Matrix has " << ones << " ones" << endl;
 
-   // set up column headers. Simple_string::append may move the headers so
+   // set up column headers. std::vector.push_back() may move the headers so
    // we first append all headers and initialize then
    //
    headers.reserve(cols);
-   loop (c, cols)   headers.append(DLX_Header_Node());
+   loop (c, cols)   headers.push_back(DLX_Header_Node());
    loop (c, cols)
       {
         if (c) new (&headers[c]) DLX_Header_Node(c, &headers[c - 1], this);
         else   new (&headers[c]) DLX_Header_Node(c, this,            this);
       }
 
-   // set up non-header nodes. Simple_string::append may move the headers so
+   // set up non-header nodes. std::vector.push_back() may move the headers so
    // we first append all nodes and initialize then.
    //
    b = &B.get_ravel(0);
    nodes.reserve(ones);
-   loop(o, ones)   nodes.append(DLX_Node());
+   loop(o, ones)   nodes.push_back(DLX_Node());
 
    DLX_Node * n = &nodes[0];
    loop (r, rows)
@@ -535,9 +540,9 @@ DLX_Node * item = right;
 
    if (primary_count == 0)
       {
-        all_solutions.append(level);
+        all_solutions.push_back(level);
         loop(s, level)
-            all_solutions.append(headers[s].item_r->row);
+            all_solutions.push_back(headers[s].item_r->row);
 
         Log(LOG_Quad_DLX)
            {

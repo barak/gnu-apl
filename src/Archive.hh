@@ -19,8 +19,10 @@
 */
 
 #include <stdint.h>
+
 #include <fstream>
 #include <string.h>
+#include <vector>
 #include <vector>
 
 #include <vector>
@@ -386,7 +388,7 @@ protected:
    bool reading_vids;
 
    /// the vids to be copied (empty if all)
-   Simple_string<int> vids_COPY;
+   std::vector<int> vids_COPY;
 
    /// the names of objects (empty if all)
    UCS_string_vector allowed_objects;
@@ -402,7 +404,7 @@ protected:
      };
 
    /// parents[vid] os the parent of vid, or -1 if vid is a top-level value
-   Simple_string<int> parents;
+   std::vector<int> parents;
 
    /// the file name from which this archive was read
    const char * filename;

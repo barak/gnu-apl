@@ -53,7 +53,7 @@ Doxy::Doxy(ostream & cout, const UCS_string & dest_dir)
       ws_name = UCS_string("CLEAR-WS");
 
    root_dir.append_str("/");
-   root_dir.append(UTF8_string(ws_name));
+   root_dir.append_utf8(UTF8_string(ws_name));
 
    Log(LOG_command_DOXY)
       out << "Creating output directory " << root_dir << endl;
@@ -110,9 +110,9 @@ Doxy::gen()
 {
 const SymbolTable & symtab = Workspace::get_symbol_table();
 
-Simple_string<const Symbol *> all_symbols = symtab.get_all_symbols();
-Simple_string<const Symbol *> functions;
-Simple_string<const Symbol *> variables;
+std::vector<const Symbol *> all_symbols = symtab.get_all_symbols();
+std::vector<const Symbol *> functions;
+std::vector<const Symbol *> variables;
 
    loop(a, all_symbols.size())
       {
@@ -132,8 +132,8 @@ Simple_string<const Symbol *> variables;
                    default: ;
                  }
             }
-        if (is_function)   functions.append(sym);
-        if (is_variable)   variables.append(sym);
+        if (is_function)   functions.push_back(sym);
+        if (is_variable)   variables.push_back(sym);
       }
 
    if (functions.size() > 1)
@@ -181,7 +181,7 @@ const UCS_string alias = "all-functions";
          {
            UTF8_string cmapx_filename(root_dir);
            cmapx_filename.append_str("/cg_");
-           cmapx_filename.append(UTF8_string(alias));
+           cmapx_filename.append_utf8(UTF8_string(alias));
            cmapx_filename.append_str(".cmapx");
            FILE * cmap = fopen(cmapx_filename.c_str(), "r");
            Assert(cmap);
@@ -205,7 +205,7 @@ const UCS_string alias = "all-functions";
 }
 //-----------------------------------------------------------------------------
 void
-Doxy::functions_table(const Simple_string<const Symbol *> & functions,
+Doxy::functions_table(const std::vector<const Symbol *> & functions,
                       ofstream & page)
 {
    if (functions.size() == 0)   return;
@@ -332,7 +332,7 @@ int total_lines = 0;
 }
 //-----------------------------------------------------------------------------
 void
-Doxy::variables_table(const Simple_string<const Symbol *> & variables,
+Doxy::variables_table(const std::vector<const Symbol *> & variables,
                        ofstream & page)
 {
    if (variables.size() == 0)   return;
@@ -407,12 +407,12 @@ Doxy::SI_table(ofstream & page)
 {
    // collect SI entries in reverse order...
    //
-Simple_string<const StateIndicator *> stack;
+std::vector<const StateIndicator *> stack;
 
    for (const StateIndicator * si = Workspace::SI_top();
         si; si = si->get_parent())
       {
-        stack.append(si);
+        stack.push_back(si);
       }
 
    if (stack.size() == 0)   return;
@@ -510,7 +510,7 @@ Doxy::function_page(const UserFunction * ufun, const UCS_string & alias)
 {
 UTF8_string fun_filename(root_dir);
    fun_filename.append_str("/f_");
-   fun_filename.append(UTF8_string(alias));
+   fun_filename.append_utf8(UTF8_string(alias));
    fun_filename.append_str(".html");
 
    Log(LOG_command_DOXY)
@@ -562,7 +562,7 @@ ofstream page(fun_filename.c_str());
         {
           UTF8_string cmapx_filename(root_dir);
           cmapx_filename.append_str("/cg_");
-          cmapx_filename.append(UTF8_string(alias));
+          cmapx_filename.append_utf8(UTF8_string(alias));
           cmapx_filename.append_str(".cmapx");
           FILE * cmap = fopen(cmapx_filename.c_str(), "r");
           if (cmap == 0)
@@ -597,7 +597,7 @@ ofstream page(fun_filename.c_str());
          {
            UTF8_string cmapx_filename(root_dir);
            cmapx_filename.append_str("/gc_");
-           cmapx_filename.append(UTF8_string(alias));
+           cmapx_filename.append_utf8(UTF8_string(alias));
            cmapx_filename.append_str(".cmapx");
            FILE * cmap = fopen(cmapx_filename.c_str(), "r");
            Assert(cmap);
@@ -646,7 +646,7 @@ const char * bold = "<span style='font-weight: bold'>";
 }
 //-----------------------------------------------------------------------------
 void
-Doxy::make_call_graph(const Simple_string<const Symbol *> & all_fns)
+Doxy::make_call_graph(const std::vector<const Symbol *> & all_fns)
 {
    loop(f, all_fns.size())
       {
@@ -711,7 +711,7 @@ const Token_string & body = ufun->get_body();
                          const fcall_edge edge(ufun,   &caller_name,
                                                callee, &callee_name);
 
-                         call_graph.append(edge);
+                         call_graph.push_back(edge);
                          Log(LOG_command_DOXY)
                             out << "    " << caller_sym->get_name()
                                 << " calls " << callee->get_name() << endl;
@@ -776,8 +776,8 @@ bool progress = true;
 
    // create a list of nodes that are reachable
    //
-   nodes.shrink(0);
-   aliases.shrink(0);
+   nodes.clear();
+   aliases.clear();
    loop(e, call_graph.size())
        {
          const fcall_edge & edge = call_graph[e];
@@ -792,13 +792,13 @@ bool progress = true;
 
           if (caller_is_new)
              {
-               nodes.append(edge.caller);
-               aliases.append(*edge.caller_name);
+               nodes.push_back(edge.caller);
+               aliases.push_back(*edge.caller_name);
              }
           if (callee_is_new)
              {
-               nodes.append(edge.callee);
-               aliases.append(*edge.callee_name);
+               nodes.push_back(edge.callee);
+               aliases.push_back(*edge.callee_name);
              }
        }
 
@@ -817,7 +817,7 @@ Doxy::write_call_graph(const UserFunction * ufun, const UCS_string & alias,
 UTF8_string cg_filename(root_dir);
    if (caller)   cg_filename.append_str("/gc_");
    else          cg_filename.append_str("/cg_");
-   cg_filename.append(UTF8_string(alias));
+   cg_filename.append_utf8(UTF8_string(alias));
 UTF8_string png_filename(cg_filename);
 UTF8_string cmapx_filename(cg_filename);
    cg_filename.append_str(".gv");
@@ -867,7 +867,8 @@ const char * node0_attributes = " shape=rect"
         loop(e, call_graph.size())
            {
              const fcall_edge & edge = call_graph[e];
-             if (edge.value >= call_graph.size())   continue;   // not reachable
+             if (edge.value >= int(call_graph.size()))   // not reachable
+                continue;
              const int n0 = node_ID(edge.caller);
              const int n1 = node_ID(edge.callee);
              Assert(n0 != -1);

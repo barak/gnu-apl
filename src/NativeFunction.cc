@@ -30,7 +30,7 @@
 #include "Symbol.hh"
 #include "Workspace.hh"
 
-Simple_string<NativeFunction *> NativeFunction::valid_functions;
+std::vector<NativeFunction *> NativeFunction::valid_functions;
 
 //-----------------------------------------------------------------------------
 NativeFunction::NativeFunction(const UCS_string & so_name,
@@ -149,7 +149,7 @@ const char * why = sym->cant_be_defined();
 
    Workspace::more_error().shrink(0);
    valid = true;
-   valid_functions.append(this);
+   valid_functions.push_back(this);
 }
 //-----------------------------------------------------------------------------
 NativeFunction::~NativeFunction()
@@ -161,7 +161,7 @@ NativeFunction::~NativeFunction()
       {
         if (valid_functions[v] == this)
            {
-             valid_functions.erase(v);
+             valid_functions.erase(valid_functions.begin() + v);
            }
       }
 }
@@ -253,8 +253,8 @@ const char * dirs[] =
          if (dirs[d] == 0)   continue;
 
          UTF8_string dir_so_path(dirs[d]);
-         dir_so_path.append(UTF8_string("/"));
-         dir_so_path.append(utf_so_path);
+         dir_so_path.append('/');
+         dir_so_path.append_utf8(utf_so_path);
 
          UTF8_string dir_only(dir_so_path);
          dir_only[strrchr(dir_only.c_str(), '/') - dir_only.c_str()] = 0;
@@ -292,7 +292,7 @@ const char * dirs[] =
                if (has_extension && *exts[e])   continue;
 
                UTF8_string filename(dir_so_path);
-               if (exts[e])   filename.append(UTF8_string(exts[e]));
+               if (exts[e])   filename.append_utf8(UTF8_string(exts[e]));
 
                void * handle = try_one_file(filename.c_str(), t4);
                if (handle)   // found library
@@ -313,9 +313,9 @@ NativeFunction::cleanup()
    //
    while(valid_functions.size())
       {
-        NativeFunction * fun = valid_functions.last();
-        valid_functions.pop();
-        
+        NativeFunction * fun = valid_functions.back();
+        valid_functions.pop_back();
+
         if (fun->close_fun && fun->handle)
            {
              const bool do_dlclose = (*fun->close_fun)(CAUSE_SHUTDOWN, fun);

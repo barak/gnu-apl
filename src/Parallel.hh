@@ -273,11 +273,6 @@ public:
    static CPU_Number get_CPU(int idx)
       { return all_CPUs[idx]; }
 
-   static void cleanup()
-      {
-        all_CPUs.deallocate();
-      }
-
 protected:
    /// the main() function of the worker threads
    static void * worker_main(void *);
@@ -286,7 +281,7 @@ protected:
    static void init_all_CPUs(bool logit);
 
    /// the CPU numbers that can be used
-   static Simple_string<CPU_Number> all_CPUs;
+   static std::vector<CPU_Number> all_CPUs;
 };
 //=============================================================================
 

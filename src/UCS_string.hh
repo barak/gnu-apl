@@ -412,9 +412,9 @@ public:
       { return total_count; }
 
    /// return true if n1 < n2
-   static bool compare_names(const UCS_string * const & n1,
-                             const UCS_string * const & n2, const void *)
-      { return n2->compare(*n1) == COMP_LT; }
+   static bool compare_names(const UCS_string & n1,
+                             const UCS_string & n2, const void *)
+      { return n2.compare(n1) == COMP_LT; }
 
 protected:
    /// the total number of UCS_strings
@@ -439,5 +439,22 @@ Hswap(const UCS_string * & u1, const UCS_string * & u2)
 const UCS_string * tmp = u1;   u1 = u2;   u2 = tmp;
 }
 //-----------------------------------------------------------------------------
+inline void
+Hswap(UCS_string & u1, UCS_string & u2)
+{
+Unicode * items = u1.items;
+   u1.items = u2.items;
+   u2.items = items;
+
+const ShapeItem items_allocated = u1.items_allocated;
+   u1.items_allocated = u2.items_allocated;
+   u2.items_allocated = items_allocated;
+
+const ShapeItem items_valid = u1.items_valid;
+   u1.items_valid = u2.items_valid;
+   u2.items_valid = items_valid;
+}
+//-----------------------------------------------------------------------------
+
 #endif // __UCS_STRING_HH_DEFINED__
 

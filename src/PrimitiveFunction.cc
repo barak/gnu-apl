@@ -2649,21 +2649,21 @@ const bool user_cmd = Command::do_APL_command(out, command);
 
 UTF8_string result_utf8 = out.get_data();
    if (result_utf8.size() == 0 ||
-       result_utf8.last() != UNI_ASCII_LF)
+       result_utf8.back() != UNI_ASCII_LF)
       result_utf8.append(UNI_ASCII_LF);
 
-Simple_string<ShapeItem> line_starts;
-   line_starts.append(0);
+std::vector<ShapeItem> line_starts;
+   line_starts.push_back(0);
    loop(r, result_utf8.size())
       {
-        if (result_utf8[r] == UNI_ASCII_LF)   line_starts.append(r + 1);
+        if (result_utf8[r] == UNI_ASCII_LF)   line_starts.push_back(r + 1);
       }
 
 Value_P Z(ShapeItem(line_starts.size() - 1), LOC);
    loop(l, line_starts.size() - 1)
       {
         ShapeItem len;
-        if (l < line_starts.size() - 1)
+        if (l < ShapeItem(line_starts.size() - 1))
            len = line_starts[l + 1] - line_starts[l] - 1;
         else
            len = result_utf8.size() - line_starts[l];
@@ -2718,13 +2718,13 @@ const ShapeItem len_B = B->element_count();
 
    // B is small, so an iterative search of unique elements is faster
    //
-Simple_string<const Cell *> items_Z;
+std::vector<const Cell *> items_Z;
    items_Z.reserve(len_B);
 
    loop(b, len_B)
       {
         const Cell & cell = B->get_ravel(b);
-        if (is_unique(cell, items_Z, qct))   items_Z.append(&cell);
+        if (is_unique(cell, items_Z, qct))   items_Z.push_back(&cell);
       }
 
    // build result value Z

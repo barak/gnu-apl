@@ -49,7 +49,7 @@ PrintBuffer::PrintBuffer(const UCS_string & ucs, const ColInfo & ci)
    : col_info(ci),
      complete(true)
 {
-   buffer.append(ucs);
+   buffer.push_back(ucs);
 }
 //-----------------------------------------------------------------------------
 PrintBuffer::PrintBuffer(const Value & value, const PrintContext & _pctx,
@@ -644,7 +644,7 @@ PrintBuffer::pad_height(Unicode pad, ShapeItem height)
    if (height > get_height())
       {
         UCS_string ucs(get_width(0), pad);
-        while (height > get_height())   buffer.append(ucs);
+        while (height > get_height())   buffer.push_back(ucs);
       }
 }
 //-----------------------------------------------------------------------------
@@ -662,7 +662,7 @@ PrintBuffer::pad_height_above(Unicode pad, ShapeItem height)
    if (height > get_height())
       {
         UCS_string ucs(get_width(0), pad);
-        while (height > get_height())   buffer.insert_before(0, ucs);
+        while (height > get_height())   buffer.insert(buffer.begin(), ucs);
       }
 }
 //-----------------------------------------------------------------------------
@@ -734,12 +734,12 @@ Unicode HORI, VERT, NW, NE, SE, SW;
         UCS_string upper;
         upper.append(NE);
         upper.append(NW);
-        buffer.append(upper);
+        buffer.push_back(upper);
 
         UCS_string lower;
         lower.append(SE);
         lower.append(SW);
-        buffer.append(lower);
+        buffer.push_back(lower);
 
         Assert(is_rectangular());
         return;
@@ -763,8 +763,8 @@ Unicode HORI, VERT, NW, NE, SE, SW;
    //
 UCS_string hori(get_width(0), HORI);
 
-   buffer.insert_before(0, hori);
-   buffer.append(hori);
+   buffer.insert(buffer.begin(), hori);
+   buffer.push_back(hori);
 
    // draw the corners
    //
@@ -841,12 +841,12 @@ Unicode HORI, VERT, NW, NE, SE, SW;
         UCS_string upper;
         upper.append(NE);
         upper.append(NW);
-        buffer.append(upper);
+        buffer.push_back(upper);
 
         UCS_string lower;
         lower.append(SE);
         lower.append(SW);
-        buffer.append(lower);
+        buffer.push_back(lower);
 
         Assert(is_rectangular());
         return;
@@ -869,8 +869,8 @@ Unicode HORI, VERT, NW, NE, SE, SW;
    //
 UCS_string hori(get_width(0), HORI);
 
-   buffer.insert_before(0, hori);
-   buffer.append(hori);
+   buffer.insert(buffer.begin(), hori);
+   buffer.push_back(hori);
 
    // draw the corners
    //
@@ -931,24 +931,24 @@ PrintBuffer::append_ucs(const UCS_string & ucs)
 {
    if (buffer.size() == 0)   // empty
       {
-        buffer.append(ucs);
+        buffer.push_back(ucs);
       }
    else if (ucs.size() < get_width(0))
       {
         UCS_string ucs1(ucs);
         UCS_string pad(get_width(0) - ucs.size(), UNI_iPAD_L1);
         ucs1.append(pad);
-        buffer.append(ucs1);
+        buffer.push_back(ucs1);
       }
    else if (ucs.size() > get_width(0))
       {
         UCS_string pad(ucs.size() - get_width(0), UNI_iPAD_L2);
         loop(h, get_height())   buffer[h].append(pad);
-        buffer.append(ucs);
+        buffer.push_back(ucs);
       }
    else
       {
-        buffer.append(ucs);
+        buffer.push_back(ucs);
       }
 }
 //-----------------------------------------------------------------------------
@@ -1050,7 +1050,7 @@ UCS_string ucs1;
    if (this_l > 0)   pad_l(UNI_ASCII_SPACE, this_l);
    if (this_r > 0)   pad_r(UNI_ASCII_SPACE, this_r);
 
-   buffer.append(ucs1);
+   buffer.push_back(ucs1);
 
    Assert(is_rectangular());
 }
@@ -1078,7 +1078,7 @@ PrintBuffer::add_column(Unicode pad, int32_t pad_count, const PrintBuffer & pb)
 void PrintBuffer::add_row(const PrintBuffer & pb)
 {
    buffer.reserve(buffer.size() + pb.get_height());
-   loop(h, pb.get_height())   buffer.append(pb.buffer[h]);
+   loop(h, pb.get_height())   buffer.push_back(pb.buffer[h]);
 }
 //-----------------------------------------------------------------------------
 void
@@ -1334,7 +1334,7 @@ PrintBuffer::align_left(ColInfo & COL_INFO)
 const size_t diff = COL_INFO.int_len - col_info.int_len;
 
    if (buffer.size())   pad_r(UNI_iPAD_L3, diff);
-   else                 buffer.append(UCS_string(diff, UNI_iPAD_L3));
+   else                 buffer.push_back(UCS_string(diff, UNI_iPAD_L3));
 
    col_info.int_len = COL_INFO.int_len;
 

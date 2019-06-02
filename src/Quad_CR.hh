@@ -22,6 +22,7 @@
 #ifndef __Quad_CR_HH_DEFINED__
 #define __Quad_CR_HH_DEFINED__
 
+#include <vector>
 #include "QuadFunction.hh"
 
 /**
@@ -132,11 +133,17 @@ protected:
 
           /// push \b sh on \b shapes stack and \b pidx on \b indices stack
           void push(const Shape & sh, ShapeItem pidx)
-             { shapes.append(sh);   indices.append(pidx); }
+             {
+               shapes.push_back(sh);
+               indices.push_back(pidx);
+             }
 
           /// pop \b shapes and \b indices
           void pop()
-             { shapes.pop();   indices.pop(); }
+             {
+               shapes.pop_back();
+               indices.pop_back();
+             }
 
            /// varname or pick of varname
            void get(UCS_string & result);
@@ -153,10 +160,10 @@ protected:
            const UCS_string & var_name;
 
            /// the shapes along the pick
-           Simple_string<Shape> shapes;
+           std::vector<Shape> shapes;
 
            /// the indices along the pick
-           Simple_string<ShapeItem> indices;
+           std::vector<ShapeItem> indices;
       };
 
    /// compute 10 ⎕CR recursively

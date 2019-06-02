@@ -22,6 +22,7 @@
 #define __SYMBOLTABLE_HH_DEFINED__
 
 #include <stdint.h>
+#include <vector>
 
 #include "UCS_string.hh"
 
@@ -168,7 +169,7 @@ public:
    void write_all_symbols(FILE * out, uint64_t & seq) const;
 
    /// return all symbols  (including erased symbols)
-   Simple_string<const Symbol *> get_all_symbols() const;
+   std::vector<const Symbol *> get_all_symbols() const;
 
    /// dump symbols to out
    void dump(ostream & out, int & fcount, int & vcount) const;

@@ -26,6 +26,8 @@
 #include <sys/mman.h>
 #include <errno.h>
 
+#include <vector>
+
 #include "Bif_F12_TAKE_DROP.hh"
 #include "Error.hh"
 #include "Output.hh"
@@ -61,7 +63,7 @@ UserFunction::UserFunction(const UCS_string txt, const char * loc,
    exec_properties[2] = 0;
    exec_properties[3] = 0;
 
-   line_starts.append(Function_PC_0);   // will be set later.
+   line_starts.push_back(Function_PC_0);   // will be set later.
 
    if (header.get_error() != E_NO_ERROR)   // bad header
       {
@@ -131,8 +133,8 @@ UserFunction::UserFunction(Fun_signature sig, int lambda_num,
 
    parse_body_line(Function_Line_0, lambda_body, false, false, LOC);
    setup_lambdas();
-   line_starts.append(Function_PC(lambda_body.size() - 1));
-   line_starts.append(Function_PC_0);
+   line_starts.push_back(Function_PC(lambda_body.size() - 1));
+   line_starts.push_back(Function_PC_0);
    error_line = -1;   // no error
    error_info = 0;
 }
@@ -562,14 +564,13 @@ UCS_string message_2(UTF8_string(error.get_error_line_2()));
 }
 //-----------------------------------------------------------------------------
 void
-UserFunction::set_trace_stop(Simple_string<Function_Line> & lines, bool stop)
+UserFunction::set_trace_stop(std::vector<Function_Line> & lines, bool stop)
 {
    // Sort lines
    //
-Simple_string<bool> ts_lines;
-   ts_lines.reserve(line_starts.size());
+std::vector<bool> ts_lines;
 
-   loop(ts, line_starts.size())   ts_lines.append(false);
+   loop(ts, line_starts.size())   ts_lines.push_back(false);
    loop(ll, lines.size())
       {
         Function_Line line = lines[ll];
@@ -579,20 +580,20 @@ Simple_string<bool> ts_lines;
 
    if (stop)
       {
-        stop_lines.shrink(0);
+        stop_lines.clear();
         loop(ts, line_starts.size())
            {
              if (ts_lines[ts])
-                stop_lines.append(Function_Line(ts));
+                stop_lines.push_back(Function_Line(ts));
            }
       }
    else
       {
-        trace_lines.shrink(0);
+        trace_lines.clear();
         loop(ts, line_starts.size())
            {
              if (ts_lines[ts])
-                trace_lines.append(Function_Line(ts));
+                trace_lines.push_back(Function_Line(ts));
            }
       }
 
@@ -681,7 +682,7 @@ Line_status current = APL_text;
    // remove trailing empty lines...
    //
    while (get_text_size() && get_text(get_text_size() - 1).size() == 0)
-         text.shrink(get_text_size() - 1);
+         text.pop_back();
 
 // CERR << endl;
 // loop(l, get_text_size())   CERR << "[" << l << "]  " << get_text(l) << endl;
@@ -785,7 +786,7 @@ Line_status current = APL_text;
    // remove trailing empty lines...
    //
    while (get_text_size() && get_text(get_text_size() - 1).size() == 0)
-         text.shrink(get_text_size() - 1);
+         text.pop_back();
 
 // CERR << endl;
 // loop(l, get_text_size())   CERR << "[" << l << "]  " << get_text(l) << endl;
@@ -796,8 +797,8 @@ Line_status current = APL_text;
 void
 UserFunction::parse_body(const char * loc, bool tolerant, bool macro)
 {
-   line_starts.shrink(0);
-   line_starts.append(Function_PC_0);   // will be set later.
+   line_starts.clear();
+   line_starts.push_back(Function_PC_0);   // will be set later.
 
 UCS_string_vector original_text;
    //
@@ -876,7 +877,7 @@ UCS_string_vector original_text;
            }
 
         error_line = l;   // assume error
-        line_starts.append(Function_PC(body.size()));
+        line_starts.push_back(Function_PC(body.size()));
 
         if (stop_line)
            {
@@ -996,7 +997,8 @@ UTF8_string utf(utf8P(start), len);
 
    // skip trailing \r and \n.
    //
-   while (utf.size() && (utf.last() == '\r' || utf.last() == '\n'))   utf.pop();
+   while (utf.size() &&
+          (utf.back() == '\r' || utf.back() == '\n'))   utf.pop_back();
 
    munmap(start, st.st_size);
    close(in);
@@ -1339,20 +1341,20 @@ UserFunction::adjust_line_starts()
    // this function is called from Executable::setup_lambdas() just before
    // Parser::remove_void_token(body) in order to adjust line_starts
    //
-Simple_string<ShapeItem> gaps;
+std::vector<ShapeItem> gaps;
    gaps.reserve(line_starts.size());   // count TOK_VOID in every line
    loop(ls, line_starts.size())
       {
-         gaps.append(0);
+         gaps.push_back(0);
          if (ls == 0)   continue;   // function header (has no TOK_VOID)
 
          const ShapeItem from = line_starts[ls];
          ShapeItem to = body.size();    // end of function (for last line)
-         if (ls < (line_starts.size() - 1))   to = line_starts[ls + 1];
+         if (ls < ShapeItem(line_starts.size() - 1))   to = line_starts[ls + 1];
 
         for (ShapeItem b = from; b < to; ++b)
             {
-             if (body[b].get_tag() == TOK_VOID)   ++gaps.last();
+             if (body[b].get_tag() == TOK_VOID)   ++gaps.back();
             }
       }
 
@@ -1367,13 +1369,13 @@ int total_gaps = 0;
 Function_PC
 UserFunction::line_start(Function_Line line) const
 {
-   if (line < 0 || line >= line_starts.size())
+   if (line < 0 || size_t(line) >= line_starts.size())
       {
         Q1(line)
         Q1(line_starts.size())
         Assert(0);
       }
-      
+
    return line_starts[line];
 }
 //-----------------------------------------------------------------------------

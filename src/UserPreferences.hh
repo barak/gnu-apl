@@ -22,6 +22,7 @@
 #define __USER_PREFERENCES_HH_DEFINED__
 
 #include <sys/time.h>
+#include <string>
 
 #include "Parallel.hh"
 #include "UTF8_string.hh"
@@ -102,10 +103,10 @@ struct UserPreferences
    void expand_argv(int argc, const char ** argv);
 
    /// argv/argc at startup
-   Simple_string<const char *> original_argv;
+   std::vector<const char *> original_argv;
 
    /// argv/argc after expand_argv
-   Simple_string<const char *> expanded_argv;
+   std::vector<const char *> expanded_argv;
 
    /// when apl was started
    timeval session_start;
@@ -176,7 +177,7 @@ struct UserPreferences
 
    /// the argument number of the APL script name (if run from a script)
    /// in expanded_argv, or 0 if apl is started directly.
-   int script_argc;
+   size_t script_argc;
 
    /// location of the input line history
    UTF8_string line_history_path;

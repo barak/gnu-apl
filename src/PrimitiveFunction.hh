@@ -21,6 +21,8 @@
 #ifndef __PRIMITIVE_FUNCTION_HH_DEFINED__
 #define __PRIMITIVE_FUNCTION_HH_DEFINED__
 
+#include <vector>
+
 #include "Common.hh"
 #include "Function.hh"
 #include "Performance.hh"
@@ -695,7 +697,7 @@ public:
 protected:
    /// return \b true iff \b cell is different from all \b others within \b qct
    static bool is_unique(const Cell & cell,
-                         Simple_string<const Cell *> & others, double qct)
+                         std::vector<const Cell *> & others, double qct)
       { loop(z, others.size())
             { if (others[z]->equal(cell, qct))  return false; }
         return true;

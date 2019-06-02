@@ -205,7 +205,7 @@ size_t tos_idx = 0;
 Symbol * symbols[12];
    for (; tos_idx < 12; ++tos_idx)
       {
-         if (tos_idx >= tos.size())                   break;
+         if (tos_idx >= size_t(tos.size()))           break;
          if (tos[tos_idx].get_tag() == TOK_SEMICOL)   break;
          if (tos[tos_idx].get_Class() == TC_SYMBOL)
             symbols[sym_count++] = tos[tos_idx].get_sym_ptr();
@@ -260,7 +260,7 @@ const int sc100_tc = sym_count * 100 + tos_idx;
      function_name = sym_FUN->get_name();
    }
 
-   while (tos_idx < (tos.size() - 1))
+   while (tos_idx < size_t(tos.size() - 1))
       {
         if (tos[tos_idx++].get_tag() != TOK_SEMICOL)
            {
@@ -269,7 +269,7 @@ const int sc100_tc = sym_count * 100 + tos_idx;
            }
 
 
-        if (tos_idx == tos.size())
+        if (tos_idx == size_t(tos.size()))
            {
              error_info = "Trailing semicolon in function header";
              return;
@@ -289,7 +289,7 @@ const int sc100_tc = sym_count * 100 + tos_idx;
              return;
            }
 
-        local_vars.append(tos[tos_idx++].get_sym_ptr());
+        local_vars.push_back(tos[tos_idx++].get_sym_ptr());
       }
 
    remove_duplicate_local_variables();
@@ -345,7 +345,7 @@ bool valid_signature = false;
 void
 UserFunction_header::add_local_var(Symbol * sym)
 {
-   local_vars.append(sym);
+   local_vars.push_back(sym);
 }
 //-----------------------------------------------------------------------------
 void
@@ -409,7 +409,7 @@ UserFunction_header::remove_duplicate_local_variables()
 }
 //-----------------------------------------------------------------------------
 void
-UserFunction_header::remove_duplicate_local_var(const Symbol * sym, int pos)
+UserFunction_header::remove_duplicate_local_var(const Symbol * sym, size_t pos)
 {
    // remove sym from the vector of local variables. Only the local vars
    // at pos or higher are being removed
@@ -420,8 +420,8 @@ UserFunction_header::remove_duplicate_local_var(const Symbol * sym, int pos)
        {
          if (sym == local_vars[pos])
             {
-              local_vars[pos] = local_vars.last();
-              local_vars.pop();
+              local_vars[pos] = local_vars.back();
+              local_vars.pop_back();
               continue;
             }
          ++pos;

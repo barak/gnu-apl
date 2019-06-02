@@ -18,9 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include <vector>
-#include <typeinfo>
 #include <string.h>
+#include <typeinfo>
+#include <vector>
 
 #include "config.h"   // for HAVE_xxx macros
 
@@ -30,11 +30,10 @@
 
 #include "Quad_SQL.hh"
 #include "Security.hh"
-#include "Simple_string.hh"
 
 // !!! declare providers before Quad_SQL::_fun !!!
-static Simple_string<Provider *> providers;
-static Simple_string<Connection *> connections;
+static std::vector<Provider *> providers;
+static std::vector<Connection *> connections;
 
 Quad_SQL  Quad_SQL::_fun;
 Quad_SQL * Quad_SQL::fun = &Quad_SQL::_fun;
@@ -57,7 +56,7 @@ init_provider_map()
 #ifdef HAVE_SQLITE3
    Provider *sqliteProvider = new SqliteProvider();
    Assert(sqliteProvider);
-   providers.append(sqliteProvider);
+   providers.push_back(sqliteProvider);
 #elif REALLY_WANT_SQLITE3
 # warning "SQLite3 unavailable since ./configure could not detect it"
 #endif
@@ -65,7 +64,7 @@ init_provider_map()
 #ifdef USABLE_PostgreSQL
    Provider *postgresProvider = new PostgresProvider();
    Assert(postgresProvider);
-   providers.append(postgresProvider);
+   providers.push_back(postgresProvider);
 #elif REALLY_WANT_PostgreSQL
 #  warning "PostgreSQL unavailable since ./configure could not detect it."
 # if HAVE_POSTGRESQL
@@ -108,7 +107,7 @@ static int find_free_connection( void )
           if (connections[i] == 0)   return i;
         }
 
-    connections.append(0);
+    connections.push_back(0);
     return connections.size() - 1;
 }
 //-----------------------------------------------------------------------------

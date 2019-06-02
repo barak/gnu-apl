@@ -512,8 +512,8 @@ const int ret = the_workspace.expunged_functions.size();
 
    while(the_workspace.expunged_functions.size())
        {
-         const UserFunction * ufun = the_workspace.expunged_functions.last();
-         the_workspace.expunged_functions.pop();
+         const UserFunction * ufun = the_workspace.expunged_functions.back();
+         the_workspace.expunged_functions.pop_back();
          out << "finally deleting " << ufun->get_name() << "...";
          delete ufun;
          out << " OK" << endl;

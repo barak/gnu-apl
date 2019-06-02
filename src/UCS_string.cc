@@ -89,7 +89,7 @@ UCS_string::UCS_string(const UTF8_string & utf)
    Log(LOG_char_conversion)
       CERR << "UCS_string::UCS_string(): utf = " << utf << endl;
 
-   for (int i = 0; i < utf.size();)
+   for (size_t i = 0; i < utf.size();)
       {
         const uint32_t b0 = utf[i++];
         uint32_t bx = b0;
@@ -1037,36 +1037,35 @@ UCS_string ret;
    return ret;
 }
 //-----------------------------------------------------------------------------
-//-----------------------------------------------------------------------------
 size_t
 UCS_string::to_vector(UCS_string_vector & result) const
 {
 size_t max_len = 0;
 
-   result.shrink(0);
+   result.clear();
    if (size() == 0)   return max_len;
 
-   result.append(UCS_string());
+   result.push_back(UCS_string());
    loop(s, size())
       {
         const Unicode uni = at(s);
         if (uni == UNI_ASCII_LF)    // line done
            {
-             const size_t len = result.last().size();
+             const size_t len = result.back().size();
              if (max_len < len)   max_len = len;
 
              if (s < size() - 1)   // more coming
-                result.append(UCS_string());
+                result.push_back(UCS_string());
            }
         else
            {
              if (uni != UNI_ASCII_CR)         // ignore \r.
-                result[result.size() - 1].append(uni);
+                result.back().append(uni);
            }
       }
 
    // if the last line lacked a \n we check max_len here again.
-const size_t len = result.last().size();
+const size_t len = result.back().size();
    if (max_len < len)   max_len = len;
 
    return max_len;

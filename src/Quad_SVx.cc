@@ -527,7 +527,7 @@ Quad_SVQ::get_processors()
    //
    // 2. running processors that have offered variables in Svar_DB.
    //
-Simple_string<AP_num> processors;
+std::vector<AP_num> processors;
 
    // case 1...
    //
@@ -582,7 +582,7 @@ const char * dirs[] = { "", "/APs" };
                 if (slen >= APL_PATH_MAX)   expected[APL_PATH_MAX] = 0;
                 if (strcmp(entry->d_name, expected))   continue;
 
-                processors.append(AP_num(apnum));
+                processors.push_back(AP_num(apnum));
              }
 
          closedir(dir);
@@ -594,22 +594,22 @@ const char * dirs[] = { "", "/APs" };
 
    // sort and remove duplicates
    //
-Simple_string<int32_t> sorted;
+std::vector<int32_t> sorted;
    while (processors.size())
       {
         // find smallest
         //
         int smallest = processors[0];
-        for (int s = 1; s < processors.size(); ++s)
+        for (size_t s = 1; s < processors.size(); ++s)
             if (smallest > processors[s])   smallest = processors[s];
 
        // add smallest to sorted
        //
-       sorted.append(smallest);
+       sorted.push_back(smallest);
 
        // remove smallest from processors
        //
-        for (int s = 0; s < processors.size();)
+        for (size_t s = 0; s < processors.size();)
             {
               if (processors[s] != smallest)
                  {
@@ -617,8 +617,8 @@ Simple_string<int32_t> sorted;
                  }
               else
                  {
-                   processors[s] = processors.last();
-                   processors.pop();
+                   processors[s] = processors.back();
+                   processors.pop_back();
                  }
             }
       }
@@ -631,21 +631,20 @@ Value_P Z(sorted.size(), LOC);
 Value_P
 Quad_SVQ::get_variables(AP_num proc)
 {
-Simple_string<uint32_t> varnames;
+std::vector<uint32_t> varnames;
    Svar_DB::get_offered_variables(ProcessorID::get_own_ID(), proc, varnames);
 
    // varnames is a sequence of 0-terminated Unicodes
    //
-Simple_string<int> var_lengths;   // including terminating 0
+std::vector<int> var_lengths;   // including terminating 0
 int last_zero = -1;
    loop(v, varnames.size())
       {
         if (varnames[v] == 0)
            {
-             var_lengths.append(v + 1 - last_zero);
+             var_lengths.push_back(v + 1 - last_zero);
              last_zero = v;
            }
-        
       }
 
 const int count = var_lengths.size();

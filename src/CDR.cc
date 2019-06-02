@@ -34,7 +34,7 @@ CDR::to_CDR(CDR_string & result, const Value & value)
 const CDR_type type = value.get_CDR_type();
 const int len = value.total_size_brutto(type);
    result.reserve(len + 1);
-   result.shrink(0);
+   result.clear();
 
    fill(result, type, len, value);
 }
@@ -60,42 +60,42 @@ CDR::fill(CDR_string & result, int type, int len, const Value & val)
    // ptr
    //
 const uint32_t ptr = 0x00002020;
-   result.append(Unicode(ptr >> 24 & 0xFF));
-   result.append(Unicode(ptr >> 16 & 0xFF));
-   result.append(Unicode(ptr >>  8 & 0xFF));
-   result.append(Unicode(ptr       & 0xFF));
+   result.push_back(Unicode(ptr >> 24 & 0xFF));
+   result.push_back(Unicode(ptr >> 16 & 0xFF));
+   result.push_back(Unicode(ptr >>  8 & 0xFF));
+   result.push_back(Unicode(ptr       & 0xFF));
 
    // nb (header + data + sub-values + padding)
    //
-   result.append(Unicode(len >> 24 & 0xFF));
-   result.append(Unicode(len >> 16 & 0xFF));
-   result.append(Unicode(len >>  8 & 0xFF));
-   result.append(Unicode(len       & 0xFF));
+   result.push_back(Unicode(len >> 24 & 0xFF));
+   result.push_back(Unicode(len >> 16 & 0xFF));
+   result.push_back(Unicode(len >>  8 & 0xFF));
+   result.push_back(Unicode(len       & 0xFF));
 
    // nelm
    //
 const uint32_t nelm = val.element_count();
-   result.append(Unicode(nelm >> 24 & 0xFF));
-   result.append(Unicode(nelm >> 16 & 0xFF));
-   result.append(Unicode(nelm >>  8 & 0xFF));
-   result.append(Unicode(nelm       & 0xFF));
+   result.push_back(Unicode(nelm >> 24 & 0xFF));
+   result.push_back(Unicode(nelm >> 16 & 0xFF));
+   result.push_back(Unicode(nelm >>  8 & 0xFF));
+   result.push_back(Unicode(nelm       & 0xFF));
 
    // type, rank, 0, 0
    //
-   result.append(Unicode(type));
-   result.append(Unicode(val.get_rank()));
-   result.append(Unicode_0);
-   result.append(Unicode_0);
+   result.push_back(Unicode(type));
+   result.push_back(Unicode(val.get_rank()));
+   result.push_back(Unicode_0);
+   result.push_back(Unicode_0);
 
    // shape
    //
    loop(r, val.get_rank())
       {
         const uint32_t sh = val.get_shape_item(r);
-        result.append(Unicode(sh >> 24 & 0xFF));
-        result.append(Unicode(sh >> 16 & 0xFF));
-        result.append(Unicode(sh >>  8 & 0xFF));
-        result.append(Unicode(sh       & 0xFF));
+        result.push_back(Unicode(sh >> 24 & 0xFF));
+        result.push_back(Unicode(sh >> 16 & 0xFF));
+        result.push_back(Unicode(sh >>  8 & 0xFF));
+        result.push_back(Unicode(sh       & 0xFF));
       }
 
    // body
@@ -112,14 +112,14 @@ const uint32_t nelm = val.element_count();
              if (i)   accu |= 0x80 >> bit;
              if (bit == 7)
                 {
-                  result.append(Unicode(accu));
+                  result.push_back(Unicode(accu));
                   accu = 0;
                 }
            }
 
         if (nelm % 8)   // partly filled
            {
-             result.append(Unicode(accu));
+             result.push_back(Unicode(accu));
            }
 
       }
@@ -128,10 +128,10 @@ const uint32_t nelm = val.element_count();
         loop(e, nelm)
            {
              uint64_t i = val.get_ravel(e).get_int_value();
-             result.append(Unicode(i & 0xFF));   i >>= 8;
-             result.append(Unicode(i & 0xFF));   i >>= 8;
-             result.append(Unicode(i & 0xFF));   i >>= 8;
-             result.append(Unicode(i & 0xFF));   i >>= 8;
+             result.push_back(Unicode(i & 0xFF));   i >>= 8;
+             result.push_back(Unicode(i & 0xFF));   i >>= 8;
+             result.push_back(Unicode(i & 0xFF));   i >>= 8;
+             result.push_back(Unicode(i & 0xFF));   i >>= 8;
              Assert(i == 0 || i == 0xFFFFFFFF);
            }
       }
@@ -142,14 +142,14 @@ const uint32_t nelm = val.element_count();
              const APL_Float v = val.get_ravel(e).get_real_value();
              const APL_Float * dv = &v;
              uint64_t i = *reinterpret_cast<const uint64_t *>(dv);
-             result.append(Unicode(i & 0xFF));   i >>= 8;
-             result.append(Unicode(i & 0xFF));   i >>= 8;
-             result.append(Unicode(i & 0xFF));   i >>= 8;
-             result.append(Unicode(i & 0xFF));   i >>= 8;
-             result.append(Unicode(i & 0xFF));   i >>= 8;
-             result.append(Unicode(i & 0xFF));   i >>= 8;
-             result.append(Unicode(i & 0xFF));   i >>= 8;
-             result.append(Unicode(i & 0xFF));   i >>= 8;
+             result.push_back(Unicode(i & 0xFF));   i >>= 8;
+             result.push_back(Unicode(i & 0xFF));   i >>= 8;
+             result.push_back(Unicode(i & 0xFF));   i >>= 8;
+             result.push_back(Unicode(i & 0xFF));   i >>= 8;
+             result.push_back(Unicode(i & 0xFF));   i >>= 8;
+             result.push_back(Unicode(i & 0xFF));   i >>= 8;
+             result.push_back(Unicode(i & 0xFF));   i >>= 8;
+             result.push_back(Unicode(i & 0xFF));   i >>= 8;
            }
       }
    else if (type == 3)   // 16 byte complex vector
@@ -159,26 +159,26 @@ const uint32_t nelm = val.element_count();
              APL_Float v = val.get_ravel(e).get_real_value();
              const APL_Float * dv = &v;
              uint64_t i = *reinterpret_cast<const uint64_t *>(dv);
-             result.append(Unicode(i & 0xFF));   i >>= 8;
-             result.append(Unicode(i & 0xFF));   i >>= 8;
-             result.append(Unicode(i & 0xFF));   i >>= 8;
-             result.append(Unicode(i & 0xFF));   i >>= 8;
-             result.append(Unicode(i & 0xFF));   i >>= 8;
-             result.append(Unicode(i & 0xFF));   i >>= 8;
-             result.append(Unicode(i & 0xFF));   i >>= 8;
-             result.append(Unicode(i & 0xFF));   i >>= 8;
+             result.push_back(Unicode(i & 0xFF));   i >>= 8;
+             result.push_back(Unicode(i & 0xFF));   i >>= 8;
+             result.push_back(Unicode(i & 0xFF));   i >>= 8;
+             result.push_back(Unicode(i & 0xFF));   i >>= 8;
+             result.push_back(Unicode(i & 0xFF));   i >>= 8;
+             result.push_back(Unicode(i & 0xFF));   i >>= 8;
+             result.push_back(Unicode(i & 0xFF));   i >>= 8;
+             result.push_back(Unicode(i & 0xFF));   i >>= 8;
 
              v = val.get_ravel(e).get_imag_value();
              dv = &v;
              i = *reinterpret_cast<const uint64_t *>(dv);
-             result.append(Unicode(i & 0xFF));   i >>= 8;
-             result.append(Unicode(i & 0xFF));   i >>= 8;
-             result.append(Unicode(i & 0xFF));   i >>= 8;
-             result.append(Unicode(i & 0xFF));   i >>= 8;
-             result.append(Unicode(i & 0xFF));   i >>= 8;
-             result.append(Unicode(i & 0xFF));   i >>= 8;
-             result.append(Unicode(i & 0xFF));   i >>= 8;
-             result.append(Unicode(i & 0xFF));   i >>= 8;
+             result.push_back(Unicode(i & 0xFF));   i >>= 8;
+             result.push_back(Unicode(i & 0xFF));   i >>= 8;
+             result.push_back(Unicode(i & 0xFF));   i >>= 8;
+             result.push_back(Unicode(i & 0xFF));   i >>= 8;
+             result.push_back(Unicode(i & 0xFF));   i >>= 8;
+             result.push_back(Unicode(i & 0xFF));   i >>= 8;
+             result.push_back(Unicode(i & 0xFF));   i >>= 8;
+             result.push_back(Unicode(i & 0xFF));   i >>= 8;
            }
       }
    else if (type == 4)   // 1 byte char vector
@@ -188,7 +188,7 @@ const uint32_t nelm = val.element_count();
              const Unicode uni = val.get_ravel(e).get_char_value();
              Assert(uni >= 0);
              Assert(uni < 256);
-             result.append(uni);
+             result.push_back(uni);
            }
       }
    else if (type == 5)   // 4 byte UNICODE vector
@@ -196,10 +196,10 @@ const uint32_t nelm = val.element_count();
         loop(e, nelm)
            {
              uint32_t i = val.get_ravel(e).get_char_value();
-             result.append(Unicode(i & 0xFF));   i >>= 8;
-             result.append(Unicode(i & 0xFF));   i >>= 8;
-             result.append(Unicode(i & 0xFF));   i >>= 8;
-             result.append(Unicode(i & 0xFF));   i >>= 8;
+             result.push_back(Unicode(i & 0xFF));   i >>= 8;
+             result.push_back(Unicode(i & 0xFF));   i >>= 8;
+             result.push_back(Unicode(i & 0xFF));   i >>= 8;
+             result.push_back(Unicode(i & 0xFF));   i >>= 8;
            }
       }
    else if (type == 7)   // packed vector with 4 bytes offsets.
@@ -235,10 +235,10 @@ const uint32_t nelm = val.element_count();
         while (offset & 0x0F)   ++offset;
         loop(e, nelm)
            {
-             result.append(Unicode(offset       & 0xFF));
-             result.append(Unicode(offset >>  8 & 0xFF));
-             result.append(Unicode(offset >> 16 & 0xFF));
-             result.append(Unicode(offset >> 24 & 0xFF));
+             result.push_back(Unicode(offset       & 0xFF));
+             result.push_back(Unicode(offset >>  8 & 0xFF));
+             result.push_back(Unicode(offset >> 16 & 0xFF));
+             result.push_back(Unicode(offset >> 24 & 0xFF));
 
              const Cell & cell = val.get_ravel(e);
              if (cell.is_simple_cell())
@@ -261,7 +261,7 @@ const uint32_t nelm = val.element_count();
         // pad top level to 16 bytes. end is aligned to 16 byte so we
         // case use it as reference.
         //
-        while (result.size() & 0x0F)   result.append(Unicode_0);
+        while (result.size() & 0x0F)   result.push_back(Unicode_0);
 
         // append sub-values.
         //
@@ -295,7 +295,7 @@ const uint32_t nelm = val.element_count();
 
    // final padding
    //
-   while (result.size() & 15)   result.append(Unicode_0);
+   while (result.size() & 15)   result.push_back(Unicode_0);
 }
 //-----------------------------------------------------------------------------
 Value_P

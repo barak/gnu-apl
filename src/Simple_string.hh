@@ -36,6 +36,8 @@
 
 using namespace std;
 
+class UCS_string;
+
 //-----------------------------------------------------------------------------
 /// a simple string
 template <typename T>
@@ -250,6 +252,7 @@ protected:
 
    /// the items
    T * items;
+   friend void Hswap(UCS_string &, UCS_string &);
 
    /// return the idx'th character
    const T & at(ShapeItem idx) const

@@ -25,11 +25,12 @@
 #include <stdint.h>
 #include <string.h>
 
-#include "Simple_string.hh"
+#include "Common.hh"
 
 using namespace std;
 
 class UCS_string;
+class Value;
 
 //-----------------------------------------------------------------------------
 /// one byte of a UTF8 encoded Unicode (RFC 3629) string
@@ -44,7 +45,7 @@ utf8P(const void * vp)
 }
 //-----------------------------------------------------------------------------
 /// an UTF8 encoded Unicode (RFC 3629) string
-class UTF8_string :  public Simple_string<UTF8>
+class UTF8_string : public std::basic_string<UTF8>
 {
 public:
    /// constructor: empty UTF8_string
@@ -53,13 +54,15 @@ public:
 
    /// constructor: UTF8_string from 0-terminated C string.
    UTF8_string(const char * str)
-   : Simple_string<UTF8>(utf8P(str), str ? strlen(str) : 0)
-   {}
+      { while (*str)   *this += *str++; }
 
-   /// constructor: copy of string, but at most len bytes
-   UTF8_string(const UTF8 * string, size_t len)
-   : Simple_string<UTF8>(string, len)
-   {}
+   /// constructor: copy of C string, but at most len bytes
+   UTF8_string(const UTF8 * str, size_t len)
+      {
+        loop(l, len)
+            if (*str)   *this += *str++;
+            else        break;
+      }
 
    /// constructor: copy of UCS string. The UCS characters will be UTF8-encoded
    UTF8_string(const UCS_string & ucs);
@@ -76,17 +79,32 @@ public:
         return true;
       }
 
-   /// return this string as a C-string (appending a 0-byte)
    const char * c_str()
-      {
-        extend(items_valid + 1);
-        items[items_valid] = 0;   // the terminating 0
-        return charP(items);
-      }
+      { return reinterpret_cast<const char *>
+                               (std::basic_string<UTF8>::c_str()); }
+
+   /// prevent basic_string::erase() with its dangerous default value for
+   /// the number of erased character.
+   void erase(size_t pos)
+      { basic_string::erase(pos, 1); }
+
+   const UTF8 & back() const
+      { Assert(size());   return at(size() - 1); }
+
+   UTF8 & back()
+      { Assert(size());   return at(size() - 1); }
+
+   void pop_back()
+      { Assert(size());   resize(size() - 1); }
 
    /// append a 0-terminated C string
    void append_str(const char * str)
-      { const UTF8_string str_utf(str);  append(str_utf); }
+      { while (*str)   *this += *str++; }
+
+
+   /// append the UTF8_string \b suffix
+   void append_utf8(const UTF8_string & suffix)
+      { loop(s, suffix.size())   *this += suffix[s]; }
 
    /// display bytes in this UTF string
    ostream & dump_hex(ostream & out, int max_bytes) const;
@@ -111,6 +129,8 @@ public:
 
    /// return the next UTF8 encoded char from an input file
    static Unicode getc(istream & in);
+
+void append(UTF8 cc)   { *this += cc; }
 };
 //=============================================================================
 /// A UTF8 string to be used as filebuf in UTF8_ostream

@@ -97,7 +97,7 @@ Parallel::init(bool logit)
 #else // not PARALLEL_ENABLED
 
    Thread_context::init_sequential(logit);
-   all_CPUs.append(CPU_0);
+   all_CPUs.push_back(CPU_0);
 
 #endif // PARALLEL_ENABLED
 }
@@ -175,13 +175,13 @@ int count = CORE_COUNT_WANTED;
 #if CORE_COUNT_WANTED == 0
 
    run_parallel = false;
-   all_CPUs.append(CPU_0);
+   all_CPUs.push_back(CPU_0);
    return;
 
 #elif CORE_COUNT_WANTED == 1
 
    run_parallel = true;
-   all_CPUs.append(CPU_0);
+   all_CPUs.push_back(CPU_0);
    return;
 
 #elif CORE_COUNT_WANTED == -2   // --cc N
@@ -191,7 +191,7 @@ int count = CORE_COUNT_WANTED;
    if (uprefs.requested_cc < 1)   // serial or 1 core
       {
         run_parallel = uprefs.requested_cc > 0;
-        all_CPUs.append(CPU_0);
+        all_CPUs.push_back(CPU_0);
         return;
       }
    else
@@ -212,18 +212,18 @@ const int err = pthread_getaffinity_np(pthread_self(), sizeof(CPUs), &CPUs);
       {
         CERR << "pthread_getaffinity_np() failed with error "
              << err << endl;
-        all_CPUs.append(CPU_0);
+        all_CPUs.push_back(CPU_0);
         return;
       }
 
    {
-     const int CPU_count = CPU_COUNT(&CPUs);
+     const size_t CPU_count = CPU_COUNT(&CPUs);
      loop(c, 8*sizeof(cpu_set_t))
          {
            if (CPU_ISSET(c, &CPUs))
               {
-                all_CPUs.append(CPU_Number(c));
-                if (int(all_CPUs.size() == CPU_count))   break;   // all CPUs found
+                all_CPUs.push_back(CPU_Number(c));
+                if (all_CPUs.size() == CPU_count)   break;   // all CPUs found
               }
          }
    }
@@ -232,7 +232,7 @@ const int err = pthread_getaffinity_np(pthread_self(), sizeof(CPUs), &CPUs);
       {
         CERR << "*** no cores detected, assuming at least one! "
              << err << endl;
-        all_CPUs.append(CPU_0);
+        all_CPUs.push_back(CPU_0);
         return;
       }
 
@@ -242,7 +242,7 @@ const int err = pthread_getaffinity_np(pthread_self(), sizeof(CPUs), &CPUs);
    if (count < 0)   count = all_CPUs.size();
 
    // if there are more CPUs than requested then limit all_CPUs accordingly
-   if (int(all_CPUs.size()) > count)   all_CPUs.shrink(count);
+   if (all_CPUs.size() > size_t(count))   all_CPUs.resize(count);
 
    Log(LOG_Parallel || logit)
       {
@@ -255,7 +255,7 @@ const int err = pthread_getaffinity_np(pthread_self(), sizeof(CPUs), &CPUs);
 
    if (count < 0)   count = 64;
 
-   loop(c, CORE_COUNT_WANTED)   all_CPUs.append(CPU_Number(c));
+   loop(c, CORE_COUNT_WANTED)   all_CPUs.push_back(CPU_Number(c));
 
    Log(LOG_Parallel || logit)
       {

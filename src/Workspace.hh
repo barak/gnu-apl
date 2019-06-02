@@ -35,7 +35,6 @@
 #include "Quad_SVx.hh"
 #include "Quad_WA.hh"
 #include "ScalarFunction.hh"
-#include "Simple_string.hh"
 #include "Symbol.hh"
 #include "SymbolTable.hh"
 #include "SystemVariable.hh"
@@ -119,7 +118,7 @@ public:
       { return the_workspace.top_SI; }
 
    /// copy all allocated symbols into \b table of size \b table_size
-   static Simple_string<const Symbol *> get_all_symbols()
+   static std::vector<const Symbol *> get_all_symbols()
       { return the_workspace.symbol_table.get_all_symbols(); }
 
    /// lookup an existing user defined symbol. If not found, create one
@@ -153,7 +152,7 @@ public:
 
    /// add \b ufun to list of that were ⎕EX'ed while on the SI stack
    static void add_expunged_function(const UserFunction * ufun)
-      { the_workspace.expunged_functions.append(ufun); }
+      { the_workspace.expunged_functions.push_back(ufun); }
 
    /// return the symbol table of the current workspace.
    static const SymbolTable & get_symbol_table()
@@ -305,7 +304,7 @@ protected:
    UCS_string prompt;
 
    /// user defined functions that were ⎕EX'ed while on the SI stack
-   Simple_string<const UserFunction *> expunged_functions;
+   std::vector<const UserFunction *> expunged_functions;
 
    /// more info about last error
    UCS_string more_error_info;

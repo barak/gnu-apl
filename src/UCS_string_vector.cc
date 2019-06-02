@@ -105,32 +105,29 @@ const ShapeItem name_len = val.get_cols();
                 }
              break;
            }
-        append(name);
+        push_back(name);
       }
 }
 //----------------------------------------------------------------------------
-Simple_string<int>
-UCS_string_vector::compute_column_width(int tab_size)
+void
+UCS_string_vector::compute_column_width(int tab_size, std::vector<int> & result)
 {
 const int quad_PW = Workspace::get_PW();
 
-Simple_string<int> result;
+   result.clear();
 
    if (size() < 2)
       {
-        if (size())   result.append(strings[0]->size());
-        else          result.append(quad_PW);
-        return result;
+        if (size())   result.push_back(front().size());
+        else          result.push_back(quad_PW);
+        return;
       }
 
    // compute block counts (one block having tab_size characters)
    //
 const int max_blocks = (quad_PW + 1) / tab_size;
 Simple_string<int> name_blocks;
-   loop(n, size())
-       {
-         name_blocks.append(1 + (1 + strings[n]->size()) / tab_size);
-       }
+   loop(n, size())   name_blocks.append(1 + (1 + at(n).size()) / tab_size);
 
    // compute max number of column blocks based on first line blocks
    //
@@ -150,12 +147,9 @@ int max_col = -1;
 
      if (max_col == -1)   // all blocks fit
         {
-          result.shrink(0);
-          loop(n, size())
-              {
-                result.append(name_blocks[n]);
-              }
-          return result;
+          result.clear();
+          loop(n, size())   result.push_back(name_blocks[n]);
+          return;
         }
    }
 
@@ -163,7 +157,7 @@ int max_col = -1;
    //
    for (;max_col > 1; --max_col)
       {
-        result.shrink(0);
+        result.clear();
         int free_blocks = max_blocks;
         loop(n, size())   // try to fit blocks into result
             {
@@ -173,7 +167,7 @@ int max_col = -1;
                  {
                    free_blocks -= bn;
                    if (free_blocks < 0)   break;
-                   result.append(bn);
+                   result.push_back(bn);
                  }
               else if (bn > result[col_n])
                  {
@@ -183,18 +177,14 @@ int max_col = -1;
                  }
             }
 
-        if (free_blocks >= 0)   return result;   // success
+        if (free_blocks >= 0)   return;   // success
       }
 
    // single colums
    //
-   result.shrink(0);
+   result.clear();
 int max_nb = 0;
-   loop(n, size())
-      {
-        if (max_nb < name_blocks[n])   max_nb = name_blocks[n];
-      }
-   result.append(max_nb);
-   return result;
+   loop(n, size())   if (max_nb < name_blocks[n])   max_nb = name_blocks[n];
+   result.push_back(max_nb);
 }
 //----------------------------------------------------------------------------

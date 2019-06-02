@@ -231,8 +231,8 @@ const char * loc = 0;
                   {
                     ++s;   // skip comma
                     if (1 != sscanf(s, "%u", &id))   break;
-                    
-                    procauth.rsvopid.append(id);
+
+                    procauth.rsvopid.push_back(id);
                     s = strchr(s, ',');
                   }
               continue;
@@ -305,7 +305,7 @@ const char * loc = 0;
              loc = read_svopid(file, svopid, line);
              if (loc)   break;
 
-             network_profile.svo_pids.append(svopid);
+             network_profile.svo_pids.push_back(svopid);
              continue;
            }
 
@@ -324,7 +324,7 @@ const char * loc = 0;
              loc = read_procauth(file, procauth, line);
              if (loc)   break;
 
-             network_profile.proc_auths.append(procauth);
+             network_profile.proc_auths.push_back(procauth);
              continue;
            }
 
