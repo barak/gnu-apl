@@ -206,7 +206,7 @@ APL_value
 get_value(const APL_value val, uint64_t idx)
 {
 Value_P sub = val->get_ravel(idx).get_pointer_value();
-   Z.get()->increment_owner_count(LOC);   // keep value
+   sub.get()->increment_owner_count(LOC);   // keep value
    return sub.get();
 }
 /******************************************************************************
