@@ -253,7 +253,7 @@ const char * dirs[] =
          if (dirs[d] == 0)   continue;
 
          UTF8_string dir_so_path(dirs[d]);
-         dir_so_path.append('/');
+         dir_so_path += '/';
          dir_so_path.append_utf8(utf_so_path);
 
          UTF8_string dir_only(dir_so_path);

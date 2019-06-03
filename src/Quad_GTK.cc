@@ -342,7 +342,7 @@ char * V = TLV + 8;
         // replace H by the actual fd and store the result in event_queue.
         //
         UTF8_string data_utf;   // H:widget:callback
-        loop(v, V_len)   data_utf.append(V[v]);
+        loop(v, V_len)   data_utf += V[v];
         UCS_string data_ucs(data_utf);
         data_ucs[0] = (Unicode(fd));
 
@@ -369,7 +369,7 @@ char * V = TLV + 8;
    // and return APL vector function,"result-value"
    //
 UTF8_string utf;
-   loop(u, V_len)   utf.append(V[u]);
+   loop(u, V_len)   utf += V[u];
    UCS_string ucs(utf);
 
 Value_P Z(1 + ucs.size(), LOC);
@@ -477,7 +477,7 @@ bool window_valid = false;
 
    loop(i, X->element_count())
        {
-         if (i)   window_id.append(X->get_ravel(i).get_char_value());
+         if (i)   window_id += X->get_ravel(i).get_char_value();
        }
 
    return fd;

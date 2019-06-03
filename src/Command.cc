@@ -1400,7 +1400,7 @@ UCS_string arg("0");
             }
           else                   // relative path
             {
-              path.append('/');
+              path += '/';
               path.append_utf8(UTF8_string(buffer));
             }
        }
@@ -1429,7 +1429,7 @@ Command::is_directory(dirent * entry, const UTF8_string & path)
 
 UTF8_string filename = path;
 UTF8_string entry_name(entry->d_name);
-   filename.append('/');
+   filename += '/';
    filename.append_utf8(entry_name);
 
 DIR * dir = opendir(filename.c_str());
@@ -1583,10 +1583,10 @@ std::vector<int> col_widths;
 
    loop(c, directories.size())
       {
-        const int col = c % col_widths.size();
+        const size_t col = c % col_widths.size();
         out << directories[c];
-        if (col == int(col_widths.size() - 1) ||
-              c == int(directories.size() - 1))
+        if (col == size_t(col_widths.size() - 1) ||
+              c == ShapeItem(directories.size() - 1))
            {
              // last column or last item: print newline
              //
@@ -2220,7 +2220,7 @@ Token_string tos;
      if (tokenizer.tokenize(data1, tos) != E_NO_ERROR)   return;
    }
  
-   if (tos.size() != shape.get_volume())   return;
+   if (tos.size() != size_t(shape.get_volume()))   return;
 
 Value_P val(shape, LOC);
    new (&val->get_ravel(0)) IntCell(0);   // prototype

@@ -56,7 +56,7 @@ Token_string tos1;
    if (tos1.size() == 1)
       {
         const ErrorCode err = parse_statement(tos1);
-        if (err == E_NO_ERROR)   tos.append(tos1[0]);
+        if (err == E_NO_ERROR)   tos.push_back(tos1[0]);
         return err;
       }
 
@@ -88,7 +88,7 @@ std::vector<Token_string *> statements;
              }
           else
              {
-               stat->append(tok);
+               stat->push_back(tok);
              }
         }
      statements.push_back(stat);
@@ -99,7 +99,7 @@ std::vector<Token_string *> statements;
         Token_string * stat = statements[s];
         if (const ErrorCode err = parse_statement(*stat))
            {
-             while (s < int(statements.size()))
+             while (size_t(s) < statements.size())
                {
                  stat = statements[s++];
                  delete stat;
@@ -107,11 +107,11 @@ std::vector<Token_string *> statements;
              return err;
            }
 
-        if (s)   tos.append(Token(TOK_DIAMOND));
+        if (s)   tos.push_back(Token(TOK_DIAMOND));
 
         loop(t, stat->size())
            {
-             tos.append(Token());
+             tos.push_back(Token());
              tos[tos.size() - 1].move_1((*stat)[t], LOC);
            }
         delete stat;
@@ -231,7 +231,7 @@ Parser::collect_constants(Token_string & tos)
 
         // at this point, t is the first item. Collect subsequenct items.
         //
-        for (to = t + 1; to < size_t(tos.size()); ++to)
+        for (to = t + 1; to < tos.size(); ++to)
             {
 #if 1
               // Note: ISO 13751 gives an example with 1 2 3[2] ↔ 2
@@ -245,7 +245,7 @@ Parser::collect_constants(Token_string & tos)
               // if tos[to + 1] is [ then [ binds stronger than
               // vector notation and we stop collecting.
               //
-              if ((to + 1) < size_t(tos.size()) &&
+              if (size_t(to + 1) < tos.size() &&
                   tos[to + 1].get_tag() == TOK_L_BRACK)   break;
 #endif
               const TokenTag tag = tos[to].get_tag();
@@ -338,7 +338,7 @@ Parser::find_closing_bracket(const Token_string & tos, int pos)
 
 int others = 0;
 
-   for (size_t p = pos + 1; p < size_t(tos.size()); ++p)
+   for (size_t p = pos + 1; p < tos.size(); ++p)
        {
          Log(LOG_find_closing)
             CERR << "find_closing_bracket() sees " << tos[p] << endl;
@@ -384,7 +384,7 @@ Parser::find_closing_parent(const Token_string & tos, int pos)
 
 int others = 0;
 
-   for (size_t p = pos + 1; p < size_t(tos.size()); ++p)
+   for (size_t p = pos + 1; p < tos.size(); ++p)
        {
          Log(LOG_find_closing)
             CERR << "find_closing_bracket() sees " << tos[p] << endl;
@@ -582,11 +582,11 @@ size_t dst = 0;
    loop(src, tos.size())
        {
          if (tos[src].get_tag() == TOK_VOID)   continue;
-         if (size_t(src) != dst)   tos[dst].move_1(tos[src], LOC);
+         if (src != ShapeItem(dst))   tos[dst].move_1(tos[src], LOC);
          ++dst;
        }
 
-   tos.shrink(dst);
+   tos.resize(dst);
 }
 //-----------------------------------------------------------------------------
 ErrorCode

@@ -128,7 +128,7 @@ Executable::clear_body()
            }
       }
 
-   body.shrink(0);
+   body.clear();
 }
 //-----------------------------------------------------------------------------
 ErrorCode
@@ -222,7 +222,7 @@ Token_string out;
                    CERR << endl;
                    SYNTAX_ERROR;
                  }
-              out.append(tok);
+              out.push_back(tok);
             }
         idx += stat_len + diamond;   // skip statement and maybe ◊
 
@@ -231,14 +231,14 @@ Token_string out;
         if (stat_len && (diamond || get_parse_mode() != PM_EXECUTE))
            {
              const int64_t tr = trace ? 1 : 0;
-             out.append(Token(TOK_END, tr), LOC);
+             out.push_back(Token(TOK_END, tr));
            }
       }
 
    // replace the trailing TOK_END (if any) into TOK_ENDL
    //
-   if (out.size() && out.last().get_tag() == TOK_END)
-      out.last().ChangeTag(TOK_ENDL);
+   if (out.size() && out.back().get_tag() == TOK_END)
+      out.back().ChangeTag(TOK_ENDL);
 
    Log(LOG_UserFunction__set_line)
       {
@@ -246,7 +246,7 @@ Token_string out;
         out.print(CERR, false);
       } 
 
-   loop(t, out.size())   body.append(out[t], LOC);
+   loop(t, out.size())   body.push_back(out[t]);
    return E_NO_ERROR;
 
 #undef get
@@ -284,9 +284,9 @@ Executable::print_text(ostream & out) const
 UCS_string
 Executable::statement_text(Function_PC pc) const
 {
-   if (pc >= body.size())
+   if (pc >= Function_PC(body.size()))
       {
-        Assert(pc == body.size());
+        Assert(pc == Function_PC(body.size()));
         pc = Function_PC(body.size() - 1);
       }
 
@@ -445,7 +445,7 @@ Executable::get_statement_start(int pc) const
    // this function is used in error reporting so it should
    // not Assert() and the like to avoid infinite recursion.
 
-   if (pc >= body.size())   pc = body.size() - 1;
+   if (pc >= int(body.size()))   pc = body.size() - 1;
 
    // if we are at the end of the statement, move back.
    //
@@ -537,7 +537,7 @@ int lambda_num = 0;
 
          ShapeItem end = -1;
          int level = 1;   // since body[b] is {
-         for (ShapeItem b1 = b + 1; b1 < body.size(); ++b1)
+         for (ShapeItem b1 = b + 1; b1 < ShapeItem(body.size()); ++b1)
              {
                switch(body[b1].get_tag())
                   {
@@ -659,13 +659,13 @@ int level = 0;
               // first token: prepend λ ← tokens
               //
               Symbol * sym_Z = &Workspace::get_v_LAMBDA();
-              lambda_body.append(Token(TOK_LAMBDA, sym_Z), LOC);
-              lambda_body.append(Token(TOK_ASSIGN1), LOC);
+              lambda_body.push_back(Token(TOK_LAMBDA, sym_Z));
+              lambda_body.push_back(Token(TOK_ASSIGN1));
 
               signature |= SIG_Z;
             }
 
-         lambda_body.append(t, LOC);
+         lambda_body.push_back(t);
        }
 
    if ((signature & SIG_B) == 0 &&   // niladic
@@ -682,15 +682,15 @@ int level = 0;
    if (signature & SIG_Z)
       {
         const int64_t trace = 0;
-        lambda_body.append(Token(TOK_ENDL, trace));
+        lambda_body.push_back(Token(TOK_ENDL, trace));
 
         Token ret_lambda(TOK_RETURN_SYMBOL, &Workspace::get_v_LAMBDA());
-        lambda_body.append(ret_lambda, LOC);
+        lambda_body.push_back(ret_lambda);
       }
    else
       {
         Token ret_void(TOK_RETURN_VOID);
-        lambda_body.append(ret_void, LOC);
+        lambda_body.push_back(ret_void);
       }
 
    return Fun_signature(signature);
@@ -795,14 +795,14 @@ Executable::reverse_statement_token(Token_string & tos)
 {
 ShapeItem from = 0;
 
-   for (ShapeItem to = from + 1; to < tos.size(); ++to)
+   for (ShapeItem to = from + 1; to < ShapeItem(tos.size()); ++to)
        {
          if (tos[to].get_Class() == TC_END)
             {
               tos.reverse_from_to(from, to - 1);   // except TC_END
               from = to + 1;
             }
-         else if (to == (tos.size() - 1))
+         else if (to == ShapeItem(tos.size() - 1))
             {
               tos.reverse_from_to(from, to);
               from = to + 1;
@@ -909,7 +909,7 @@ ExecuteList * fun = new ExecuteList(data, loc);
       }
 
    // for ⍎ we do not append TOK_END, but only TOK_RETURN_EXEC.
-   fun->body.append(Token(TOK_RETURN_EXEC), LOC);
+   fun->body.push_back(Token(TOK_RETURN_EXEC));
 
    Log(LOG_UserFunction__fix)   fun->print(CERR);
    return fun;
@@ -947,7 +947,7 @@ StatementList * fun = new StatementList(data, loc);
         CERR << "fun->body.size() is " << fun->body.size() << endl;
       }
 
-   fun->body.append(Token(TOK_RETURN_STATS), LOC);
+   fun->body.push_back(Token(TOK_RETURN_STATS));
 
    Log(LOG_UserFunction__fix)   fun->print(CERR);
    return fun;

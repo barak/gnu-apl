@@ -144,25 +144,25 @@ Unicode_source src(input);
                    else if (uni == UNI_QUOTE_Quad)
                       {
                         ++src;
-                        tos.append(Token(TOK_Quad_QUOTE,
+                        tos.push_back(Token(TOK_Quad_QUOTE,
                                          &Workspace::get_v_Quad_QUOTE()));
                       }
                    else if (uni == UNI_ALPHA)
                       {
                         ++src;
-                        tos.append(Token(TOK_ALPHA,
+                        tos.push_back(Token(TOK_ALPHA,
                                          &Workspace::get_v_ALPHA()));
                       }
                    else if (uni == UNI_ALPHA_UNDERBAR)
                       {
                         ++src;
-                        tos.append(Token(TOK_ALPHA_U,
+                        tos.push_back(Token(TOK_ALPHA_U,
                                             &Workspace::get_v_ALPHA_U()));
                       }
                    else if (uni == UNI_CHI)
                       {
                         ++src;
-                        tos.append(Token(TOK_CHI,
+                        tos.push_back(Token(TOK_CHI,
                                             &Workspace::get_v_CHI()));
                       }
                    else if (uni == UNI_LAMBDA)
@@ -177,20 +177,20 @@ Unicode_source src(input);
                         else   // λ
                            {
                              ++src;
-                             tos.append(Token(TOK_LAMBDA,
+                             tos.push_back(Token(TOK_LAMBDA,
                                            &Workspace::get_v_LAMBDA()));
                            }
                       }
                    else if (uni == UNI_OMEGA)
                       {
                         ++src;
-                        tos.append(Token(TOK_OMEGA,
+                        tos.push_back(Token(TOK_OMEGA,
                                             &Workspace::get_v_OMEGA()));
                       }
                    else if (uni == UNI_OMEGA_UNDERBAR)
                       {
                         ++src;
-                        tos.append(Token(TOK_OMEGA_U,
+                        tos.push_back(Token(TOK_OMEGA_U,
                                             &Workspace::get_v_OMEGA_U()));
                       }
                    else
@@ -229,10 +229,10 @@ Unicode_source src(input);
                         tokenize_function(src, tos);
                       }
                    if (tos.size() >= 2 &&
-                       tos.last().get_tag() == TOK_OPER2_INNER &&
+                       tos.back().get_tag() == TOK_OPER2_INNER &&
                        tos[tos.size() - 2].get_tag() == TOK_JOT)
                       {
-                        new (&tos.last()) Token(TOK_OPER2_OUTER,
+                        new (&tos.back()) Token(TOK_OPER2_OUTER,
                                                 Bif_OPER2_OUTER::fun);
                       }
 
@@ -240,8 +240,8 @@ Unicode_source src(input);
 
               case TC_R_ARROW:
                    ++src;
-                   if (src.rest())   tos.append(tok);
-                   else              tos.append(Token(TOK_ESCAPE));
+                   if (src.rest())   tos.push_back(tok);
+                   else              tos.push_back(Token(TOK_ESCAPE));
                    break;
 
               case TC_ASSIGN:
@@ -254,7 +254,7 @@ Unicode_source src(input);
                      const bool col = tos.size() > 1 &&
                                 tos[tos.size() - 2].get_tag() == TOK_COLON;
 
-                   tos.append(tok);
+                   tos.push_back(tok);
 
                    // change token tag of ← if:
                    //
@@ -263,7 +263,7 @@ Unicode_source src(input);
                    // : SYM ←   (at the start of statement after label)
                    //
                    if (sym && ((tos.size() == 2) || dia || col))
-                      tos.last().ChangeTag(TOK_ASSIGN1);
+                      tos.back().ChangeTag(TOK_ASSIGN1);
                    }
                    break;
 
@@ -274,12 +274,12 @@ Unicode_source src(input);
               case TC_L_CURLY:
               case TC_R_CURLY:
                    ++src;
-                   tos.append(tok);
+                   tos.push_back(tok);
                    break;
 
               case TC_DIAMOND:
                    ++src;
-                   tos.append(tok);
+                   tos.push_back(tok);
                    break;
 
               case TC_COLON:
@@ -295,7 +295,7 @@ Unicode_source src(input);
                       }
 
                    ++src;
-                   tos.append(tok);
+                   tos.push_back(tok);
                    break;
 
               case TC_NUMERIC:
@@ -339,7 +339,7 @@ Tokenizer::tokenize_function(Unicode_source & src, Token_string & tos)
 
 const Unicode uni = src.get();
 const Token tok = tokenize_function(uni);
-   tos.append(tok);
+   tos.push_back(tok);
 }
 //-----------------------------------------------------------------------------
 Token
@@ -451,7 +451,7 @@ UCS_string ucs(UNI_Quad_Quad);
 int len = 0;
 const Token t = Workspace::get_quad(ucs, len);
    src.skip(len - 1);
-   tos.append(t);
+   tos.push_back(t);
 }
 //-----------------------------------------------------------------------------
 /** tokenize a single quoted string.
@@ -506,11 +506,11 @@ bool got_end = false;
 
    if (string_value.size() == 1)   // scalar
       {
-        tos.append(Token(TOK_CHARACTER, string_value[0]));
+        tos.push_back(Token(TOK_CHARACTER, string_value[0]));
       }
    else
       {
-        tos.append(Token(TOK_APL_VALUE1, Value_P(string_value, LOC)));
+        tos.push_back(Token(TOK_APL_VALUE1, Value_P(string_value, LOC)));
       }
 }
 //-----------------------------------------------------------------------------
@@ -582,7 +582,7 @@ bool got_end = false;
 
    else
       {
-        tos.append(Token(TOK_APL_VALUE1, Value_P(string_value, LOC)));
+        tos.push_back(Token(TOK_APL_VALUE1, Value_P(string_value, LOC)));
       }
 }
 //-----------------------------------------------------------------------------
@@ -624,20 +624,20 @@ const bool real_valid = tokenize_real(src, real_need_float, real_flt, real_int);
              --src;   // undo skip 'J'
              if (real_need_float)
                 {
-                  tos.append(Token(TOK_REAL,    real_flt));
+                  tos.push_back(Token(TOK_REAL,    real_flt));
                   Log(LOG_tokenize)
                      CERR << "  tokenize_number: real " << real_flt << endl;
                 }
              else
                 {
-                  tos.append(Token(TOK_INTEGER, real_int));
+                  tos.push_back(Token(TOK_INTEGER, real_int));
                   Log(LOG_tokenize)
                      CERR << "  tokenize_number: integer " << real_int << endl;
                 }
              goto done;;
            }
 
-        tos.append(Token(TOK_COMPLEX, real_flt, imag_flt));
+        tos.push_back(Token(TOK_COMPLEX, real_flt, imag_flt));
         Log(LOG_tokenize)   CERR << "  tokenize_number: complex "
                                  << real_flt << "J" << imag_flt << endl;
       }
@@ -657,13 +657,13 @@ const bool real_valid = tokenize_real(src, real_need_float, real_flt, real_int);
              --src;   // undo skip 'D'
              if (real_need_float)
                 {
-                  tos.append(Token(TOK_REAL,    real_flt));
+                  tos.push_back(Token(TOK_REAL,    real_flt));
                   Log(LOG_tokenize)
                      CERR << "  tokenize_number: real " << real_flt << endl;
                 }
              else
                 {
-                  tos.append(Token(TOK_INTEGER, real_int));
+                  tos.push_back(Token(TOK_INTEGER, real_int));
                   Log(LOG_tokenize)
                      CERR << "  tokenize_number: integer " << real_int << endl;
                 }
@@ -674,7 +674,7 @@ const bool real_valid = tokenize_real(src, real_need_float, real_flt, real_int);
         //
         APL_Float real = real_flt * cos(M_PI*degrees_flt / 180.0);
         APL_Float imag = real_flt * sin(M_PI*degrees_flt / 180.0);
-        tos.append(Token(TOK_COMPLEX, real, imag));
+        tos.push_back(Token(TOK_COMPLEX, real, imag));
         Log(LOG_tokenize)   CERR << "  tokenize_number: complex " << real
                                  << "J" << imag << endl;
       }
@@ -694,13 +694,13 @@ const bool real_valid = tokenize_real(src, real_need_float, real_flt, real_int);
              --src;   // undo skip 'R'
              if (real_need_float)
                 {
-                  tos.append(Token(TOK_REAL,    real_flt));
+                  tos.push_back(Token(TOK_REAL,    real_flt));
                   Log(LOG_tokenize)
                      CERR << "  tokenize_number: real " << real_flt << endl;
                 }
              else
                 {
-                  tos.append(Token(TOK_INTEGER, real_int));
+                  tos.push_back(Token(TOK_INTEGER, real_int));
                   Log(LOG_tokenize)
                      CERR << "  tokenize_number: integer " << real_int << endl;
                 }
@@ -711,7 +711,7 @@ const bool real_valid = tokenize_real(src, real_need_float, real_flt, real_int);
         //
         APL_Float real = real_flt * cos(radian_flt);
         APL_Float imag = real_flt * sin(radian_flt);
-        tos.append(Token(TOK_COMPLEX, real, imag));
+        tos.push_back(Token(TOK_COMPLEX, real, imag));
         Log(LOG_tokenize)   CERR << "  tokenize_number: complex " << real
                                  << "J" << imag << endl;
       }
@@ -719,13 +719,13 @@ const bool real_valid = tokenize_real(src, real_need_float, real_flt, real_int);
       {
         if (real_need_float)
            {
-             tos.append(Token(TOK_REAL,    real_flt));
+             tos.push_back(Token(TOK_REAL,    real_flt));
              Log(LOG_tokenize)
                 CERR << "  tokenize_number: real " << real_flt << endl;
            }
         else
            {
-             tos.append(Token(TOK_INTEGER, real_int));
+             tos.push_back(Token(TOK_INTEGER, real_int));
              Log(LOG_tokenize)
                 CERR << "  tokenize_number: integer " << real_int << endl;
            }
@@ -837,7 +837,7 @@ bool dot_seen = false;
 
    // integer part
    //
-   while (src.rest() && Avec::is_digit(*src))   int_digits.append(src.get());
+   while (src.rest() && Avec::is_digit(*src))   int_digits += src.get();
 
    // fractional part
    //
@@ -847,7 +847,7 @@ bool dot_seen = false;
         dot_seen = true;
         while (src.rest() && Avec::is_digit(*src))
            {
-             fract_digits.append(src.get());
+             fract_digits += src.get();
            }
 
         while (fract_digits.size() && fract_digits.back() == '0')   // 1d.
@@ -874,14 +874,14 @@ bool dot_seen = false;
              ++src;                        // skip e/E
              ++src;                        // skip ¯
              while (src.rest() && Avec::is_digit(*src))
-                  expo_digits.append(src.get());
+                  expo_digits += src.get();
            }
         else if (Avec::is_digit(src[1]))               // Ennn
            {
              need_float = true;
              ++src;                        // skip e/E
              while (src.rest() && Avec::is_digit(*src))
-                  expo_digits.append(src.get());
+                  expo_digits += src.get();
            }
       }
 
@@ -1024,15 +1024,15 @@ UCS_string symbol;
              src.get();                                // skip ←
              Log(LOG_tokenize)
                 CERR << "Stop/Trace assigned: " << symbol1 << endl;
-             tos.append(Token(TOK_APL_VALUE1, AB));   // left argument of ST
-             tos.append(Token(TOK_FUN2, ST));
+             tos.push_back(Token(TOK_APL_VALUE1, AB));   // left argument of ST
+             tos.push_back(Token(TOK_FUN2, ST));
            }
         else
            {
              Log(LOG_tokenize)
                 CERR << "Stop/Trace referenved: " << symbol1 << endl;
-             tos.append(Token(TOK_FUN2, ST));
-             tos.append(Token(TOK_APL_VALUE1, AB));   // right argument of ST
+             tos.push_back(Token(TOK_FUN2, ST));
+             tos.push_back(Token(TOK_APL_VALUE1, AB));   // right argument of ST
            }
 
         return;
@@ -1040,7 +1040,7 @@ UCS_string symbol;
 
 Symbol * sym = Workspace::lookup_symbol(symbol);
    Assert(sym);
-   tos.append(Token(TOK_SYMBOL, sym));
+   tos.push_back(Token(TOK_SYMBOL, sym));
 }
 //-----------------------------------------------------------------------------
 

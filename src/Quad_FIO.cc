@@ -2368,7 +2368,7 @@ const int function_number = X->get_ravel(0).get_near_int();
                     {
                       Value_P Ai = A->get_ravel(a).get_pointer_value();
                       UTF8_string line(Ai.getref());
-                      line.append(UNI_ASCII_LF);
+                      line += '\n';
                       const size_t len = line.size();
                       size_t written = fwrite(line.c_str(), 1, len, f);
                       if (len != written)   goto out_errno;

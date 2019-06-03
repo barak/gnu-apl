@@ -119,12 +119,12 @@ UserFunction::UserFunction(Fun_signature sig, int lambda_num,
    else                    tag = TOK_FUN0;
 
    while (lambda_body.size() > 2 &&
-          lambda_body.last().get_tag() == TOK_SYMBOL &&
+          lambda_body.back().get_tag() == TOK_SYMBOL &&
           lambda_body[lambda_body.size() - 2].get_tag() == TOK_SEMICOL)
       {
-        header.add_local_var(lambda_body.last().get_sym_ptr());
-        lambda_body.pop();   // varname
-        lambda_body.pop();   // semicolon
+        header.add_local_var(lambda_body.back().get_sym_ptr());
+        lambda_body.pop_back();   // varname
+        lambda_body.pop_back();   // semicolon
       }
 
    // order of local vars is reversed. Fix that.
@@ -881,9 +881,9 @@ UCS_string_vector original_text;
 
         if (stop_line)
            {
-             body.append(Token(TOK_STOP_LINE));
+             body.push_back(Token(TOK_STOP_LINE));
              const int64_t tr = 0;
-             body.append(Token(TOK_END, tr));
+             body.push_back(Token(TOK_END, tr));
            }
 
         const UCS_string & line = get_text(l);
@@ -919,8 +919,8 @@ UCS_string_vector original_text;
    // let [0] be the end of the function.
    line_starts[0] = Function_PC(body.size());
 
-   if (header.Z())   body.append(Token(TOK_RETURN_SYMBOL, header.Z()));
-   else              body.append(Token(TOK_RETURN_VOID));
+   if (header.Z())   body.push_back(Token(TOK_RETURN_SYMBOL, header.Z()));
+   else              body.push_back(Token(TOK_RETURN_VOID));
 
    // restore the original text (before multi-line expansion)
    if (original_text.size())   text = original_text;
@@ -1152,10 +1152,10 @@ UCS_string body_text;
 Token_string body;
    {
      Token ret_lambda(TOK_RETURN_SYMBOL, &Workspace::get_v_LAMBDA());
-     body.append(ret_lambda);
+     body.push_back(ret_lambda);
      const int64_t trace = 0;
      Token tok_endl(TOK_ENDL, trace);
-     body.append(tok_endl);
+     body.push_back(tok_endl);
    }
 
    if (semi != -1)
@@ -1350,7 +1350,8 @@ std::vector<ShapeItem> gaps;
 
          const ShapeItem from = line_starts[ls];
          ShapeItem to = body.size();    // end of function (for last line)
-         if (ls < ShapeItem(line_starts.size() - 1))   to = line_starts[ls + 1];
+         if (ls < (ShapeItem(line_starts.size()) - 1))
+            to = line_starts[ls + 1];
 
         for (ShapeItem b = from; b < to; ++b)
             {

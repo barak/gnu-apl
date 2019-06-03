@@ -20,6 +20,7 @@
 
 #include <math.h>
 #include <string.h>
+#include <vector>
 
 #include "Backtrace.hh"
 #include "Common.hh"
@@ -333,7 +334,7 @@ UCS_string::UCS_string(const PrintBuffer & pb, Rank rank, int quad_PW)
 
 const int total_width = pb.get_width(0);
 
-Simple_string<int> breakpoints;
+std::vector<int> breakpoints;
    breakpoints.reserve(2*total_width/quad_PW);
 
    // print rows, breaking at breakpoints
@@ -350,7 +351,7 @@ Simple_string<int> breakpoints;
               if (row == 0)   // first row: set up breakpoints
                  {
                    chunk_len = pb.get_line(0).compute_chunk_length(quad_PW,col);
-                   breakpoints.append(chunk_len);
+                   breakpoints.push_back(chunk_len);
                  }
               else
                  {

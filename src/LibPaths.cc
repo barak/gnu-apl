@@ -93,9 +93,9 @@ LibPaths::compute_bin_path(const char * argv0, bool logit)
                     char * semi = strchr(next, ':');
                     if (semi)   *semi = 0;
                     UTF8_string filename;
-                    for (const char * n = next; *n; ++n)   filename.append(*n);
-                    filename.append('/');
-                    for (const char * a = argv0; *a; ++a)   filename.append(*a);
+                    for (const char * n = next; *n; ++n)   filename += *n;
+                    filename += '/';
+                    for (const char * a = argv0; *a; ++a)   filename += *a;
 
                     if (access(filename.c_str(), X_OK) == 0)
                        {
@@ -239,7 +239,7 @@ UTF8_string ret(APL_lib_root);
       {
         const UTF8_string subdir("/wslib");
         ret.append_utf8(subdir);
-        ret.append(Unicode(libref + '0'));
+        ret += libref + '0';
       }
 
    return ret;
@@ -314,7 +314,7 @@ int name_has_extension = 0;   // assume name has neither extension ext1 nor ext2
       }
 
 UTF8_string filename = get_lib_dir(lib);
-   filename.append(UNI_ASCII_SLASH);
+   filename += '/';
    filename.append_utf8(name);
 
    if (name_has_extension)   return filename;

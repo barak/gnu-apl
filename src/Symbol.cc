@@ -1074,7 +1074,7 @@ Symbol::vector_assignment(std::vector<Symbol *> & symbols, Value_P values)
 {
    if (values->get_rank() > 1)   RANK_ERROR;
    if (!values->is_scalar() &&
-       values->element_count() != ShapeItem(symbols.size()))   LENGTH_ERROR;
+       size_t(values->element_count()) != symbols.size())   LENGTH_ERROR;
 
 const int incr = values->is_scalar() ? 0 : 1;
 const Cell * cV = &values->get_ravel(0);

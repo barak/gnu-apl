@@ -22,12 +22,12 @@
 #define __TOKEN_HH_DEFINED__
 
 #include <ostream>
+#include <vector>
 
 #include "Avec.hh"
 #include "Common.hh"
 #include "Error_macros.hh"
 #include "Id.hh"
-#include "Simple_string.hh"
 #include "TokenEnums.hh"
 #include "Value.hh"
 
@@ -310,30 +310,22 @@ protected:
 
    /// helper function to print Quad-function (system function or variable).
    ostream & print_quad(ostream & out) const;
-
-private:
-   // prevent accidental copying
-   Token & operator =(const Token & other);
 };
 //-----------------------------------------------------------------------------
 /// A sequence of Token
-class Token_string : public  Simple_string<Token>
+class Token_string : public  std::vector<Token>
 {
 public:
    /// construct an empty string
-   Token_string() 
-   : Simple_string<Token>()
-   {}
+   Token_string()   {}
 
    /// construct a string of \b len Token, starting at \b data.
-   Token_string(const Token * data, uint32_t len)
-   : Simple_string<Token>(data, len)
-   {}
+   Token_string(const Token * data, ShapeItem len)
+      { loop(l, len)   push_back(data[l]); }
 
    /// construct a string of \b len Token from another token string
    Token_string(const Token_string & other, uint32_t pos, uint32_t len)
-   : Simple_string<Token>(other, pos, len)
-   {}
+      { loop(l, len)   push_back(other[pos++]); }
 
    /// reversde the token order from \b from to \b to (including)
    void reverse_from_to(ShapeItem from, ShapeItem to);

@@ -1042,7 +1042,7 @@ Value_P
 Quad_CR::do_CR19(const Value & B)
 {
 UTF8_string utf(B);
-   for (ShapeItem l = 0; l < ShapeItem(utf.size());)
+   for (size_t l = 0; l < utf.size();)
        {
          int len = 0;
          const Unicode uni = UTF8_string::toUni(&utf[l], len, false);

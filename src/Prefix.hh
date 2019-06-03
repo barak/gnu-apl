@@ -177,7 +177,7 @@ public:
    Token_loc lookahead()
       {
         const Function_PC old_pc = PC++;
-        if (old_pc < Function_PC(body.size()))
+        if (size_t(old_pc) < body.size())
            return Token_loc(body[old_pc], old_pc);
         return Token_loc(Token(), --PC);   // end of function
       }

@@ -393,7 +393,7 @@ const int data_chars = len - idx;
              MORE_ERROR() << "tokenization failed in 1 ⎕TF N record";
              return Value_P();
            }
-        if (tos.size() != shape.get_volume())
+        if (size_t(tos.size()) != size_t(shape.get_volume()))
            {
              MORE_ERROR() << "item count mismatch in 1 ⎕TF N record";
              return Value_P();
@@ -778,10 +778,11 @@ ShapeItem skipped = 0;
 
    loop(s, tos.size())
       {
-        if (s < (tos.size() - 1) && tos[s].get_tag() == TOK_Quad_UCS)
+        if (s < ShapeItem(tos.size() - 1) && tos[s].get_tag() == TOK_Quad_UCS)
            {
              s += 1;     skipped += 1;    // skip ⎕UCS
-             for (; s < tos.size() && tos[s].get_Class() == TC_VALUE; ++s)
+             for (; s < ShapeItem(tos.size()) &&
+                    tos[s].get_Class() == TC_VALUE; ++s)
                 {
                   tos[s].get_apl_val()->toggle_UCS();
                   tos[s - skipped].move_1(tos[s], LOC);
@@ -792,7 +793,7 @@ ShapeItem skipped = 0;
 
       }
 
-   if (skipped)   tos.shrink(tos.size() - skipped);
+   if (skipped)   tos.resize(tos.size() - skipped);
 }
 //-----------------------------------------------------------------------------
 void
@@ -805,10 +806,10 @@ ShapeItem skipped = 0;
         // we replace A⍴B by B reshaped to A. But only if the element count in
         // B agrees with A (otherwise we need to glue first).
         //
-        if (s >= (tos.size() - 2)                 ||
-            tos[s    ].get_Class() != TC_VALUE    ||                // A
-            tos[s + 1].get_tag()   != TOK_F12_RHO ||                // ⍴
-            tos[s + 2].get_Class() != TC_VALUE)                     // B 
+        if ((s + 2) >= ShapeItem(tos.size())      ||   // too short
+            tos[s    ].get_Class() != TC_VALUE    ||   // not A
+            tos[s + 1].get_tag()   != TOK_F12_RHO ||   // not ⍴
+            tos[s + 2].get_Class() != TC_VALUE)        // not B 
            {
              if (skipped)   // dont copy to itself
                 tos[s - skipped].move_1(tos[s], LOC);
@@ -839,7 +840,7 @@ ShapeItem skipped = 0;
 
    if (skipped)
       {
-        tos.shrink(tos.size() - skipped);
+        tos.resize(tos.size() - skipped);
         ++progress;
       }
 }
@@ -853,9 +854,9 @@ ShapeItem skipped = 0;
       {
         // we replace , B by B reshaped or A , B by AB
         //
-        if (s < (tos.size() - 1)                    &&
-            tos[s    ].get_tag()   == TOK_F12_COMMA &&   // ,
-            tos[s + 1].get_Class() == TC_VALUE)          // B 
+        if (s < ShapeItem(tos.size() - 1)     &&
+            tos[s].get_tag() == TOK_F12_COMMA &&   // ,
+            tos[s + 1].get_Class() == TC_VALUE)    // B 
            {
              const ShapeItem d_1 = s - skipped - 1;
              if (s > 0 && tos[d_1].get_tag() == TOK_R_PARENT)   // value to be
@@ -902,7 +903,7 @@ ShapeItem skipped = 0;
 
    if (skipped)
       {
-        tos.shrink(tos.size() - skipped);
+        tos.resize(tos.size() - skipped);
         ++progress;
       }
 }
@@ -914,7 +915,7 @@ ShapeItem skipped = 0;
 
    loop(s, tos.size())
       {
-        if (s >= (tos.size() - 2)                       ||
+        if ((s + 2) >= ShapeItem(tos.size())            ||
             (s && tos[s - 1].get_Class() == TC_VALUE)   ||   // dyadic ⊂
             tos[s    ].get_tag()   != TOK_F12_PARTITION ||   // not ⊂
             tos[s + 1].get_tag()   != TOK_F12_PARTITION ||   // not ⊂
@@ -930,7 +931,7 @@ ShapeItem skipped = 0;
 
    if (skipped)
       {
-        tos.shrink(tos.size() - skipped);
+        tos.resize(tos.size() - skipped);
         ++progress;
       }
 }
@@ -947,7 +948,7 @@ ShapeItem skipped = 0;
    //
    loop(s, tos.size())
       {
-        if ((s >= (tos.size() - 5))                    ||   // too short
+        if ((s + 5) >= ShapeItem(tos.size())           ||   // too short
             tos[s    ].get_Class() != TC_VALUE         ||   // not N
             tos[s + 1].get_tag()   != TOK_F12_MINUS    ||   // not -
             tos[s + 2].get_tag()   != TOK_Quad_IO      ||   // not ⎕IO
@@ -979,7 +980,7 @@ ShapeItem skipped = 0;
 
    if (skipped)
       {
-        tos.shrink(tos.size() - skipped);
+        tos.resize(tos.size() - skipped);
         ++progress;
       }
 }
@@ -996,7 +997,7 @@ ShapeItem skipped = 0;
    //
    loop(s, tos.size())
       {
-        if ((s >= (tos.size() - 7))                    ||   // too short
+        if ((s + 7) >= ShapeItem(tos.size())           ||   // too short
             tos[s    ].get_Class() != TC_VALUE         ||   // not N
             tos[s + 1].get_tag()   != TOK_F12_MINUS    ||   // not -
             tos[s + 2].get_Class() != TC_VALUE         ||   // not K
@@ -1033,7 +1034,7 @@ ShapeItem skipped = 0;
 
    if (skipped)
       {
-        tos.shrink(tos.size() - skipped);
+        tos.resize(tos.size() - skipped);
         ++progress;
       }
 }
@@ -1047,7 +1048,7 @@ ShapeItem skipped = 0;
    //
    loop(s, tos.size())
       {
-        if (s >= (tos.size() - 3)                       ||
+        if ((s + 3) >= ShapeItem(tos.size())            ||
             tos[s    ].get_tag()   != TOK_L_PARENT      ||   // not (
             tos[s + 1].get_tag()   != TOK_F12_PARTITION ||   // not ⊂
             tos[s + 2].get_Class() != TC_VALUE          ||   // not B 
@@ -1076,7 +1077,7 @@ ShapeItem skipped = 0;
 
    if (skipped)
       {
-        tos.shrink(tos.size() - skipped);
+        tos.resize(tos.size() - skipped);
         ++progress;
       }
 }
@@ -1090,7 +1091,7 @@ ShapeItem skipped = 0;
    //
    loop(s, tos.size())
       {
-        if (s >= (tos.size() - 2)                       ||
+        if ((s + 2) >= ShapeItem(tos.size())            ||
             tos[s    ].get_tag()   != TOK_F12_RHO       ||   // not ⍴
             tos[s + 1].get_tag()   != TOK_F12_PARTITION ||   // not ⊂
             tos[s + 2].get_Class() != TC_VALUE)              // not B 
@@ -1121,7 +1122,7 @@ ShapeItem skipped = 0;
 
    if (skipped)
       {
-        tos.shrink(tos.size() - skipped);
+        tos.resize(tos.size() - skipped);
         ++progress;
       }
 }
@@ -1135,7 +1136,7 @@ ShapeItem skipped = 0;
       {
         // we replace ( B ) by B 
         //
-        if (s < (tos.size() - 2)                   &&
+        if ((s + 2) < ShapeItem(tos.size())        &&
             tos[s].get_tag()       == TOK_L_PARENT &&
             tos[s + 1].get_Class() == TC_VALUE     &&
             tos[s + 2].get_tag()   == TOK_R_PARENT)   // ( B )
@@ -1151,7 +1152,7 @@ ShapeItem skipped = 0;
 
    if (skipped)
       {
-        tos.shrink(tos.size() - skipped);
+        tos.resize(tos.size() - skipped);
         ++progress;
       }
 }
@@ -1173,7 +1174,8 @@ ShapeItem skipped = 0;
          // subsequent values (if any) are glued to the first value which
          // is now tos[s - skipped]
          //
-         while ((s + 1) < tos.size() && tos[s + 1].get_Class() == TC_VALUE)
+         while ((s + 1) < ShapeItem(tos.size()) &&
+                tos[s + 1].get_Class() == TC_VALUE)
             {
                Token t;
                t.move_1(tos[s - skipped], LOC);
@@ -1184,7 +1186,7 @@ ShapeItem skipped = 0;
 
    if (skipped)
       {
-        tos.shrink(tos.size() - skipped);
+        tos.resize(tos.size() - skipped);
         ++progress;
       }
 }

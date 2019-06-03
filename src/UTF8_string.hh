@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2015  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2019  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 
 #include <iostream>
 #include <stdint.h>
-#include <string.h>
+#include <string>
 
 #include "Common.hh"
 
@@ -129,8 +129,6 @@ public:
 
    /// return the next UTF8 encoded char from an input file
    static Unicode getc(istream & in);
-
-void append(UTF8 cc)   { *this += cc; }
 };
 //=============================================================================
 /// A UTF8 string to be used as filebuf in UTF8_ostream

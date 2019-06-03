@@ -18,11 +18,13 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <vector>
+
 #include "Avec.hh"
 #include "UCS_string_vector.hh"
+#include "Value.hh"
 #include "Workspace.hh"
 
-#include "Value.hh"
 
 //----------------------------------------------------------------------------
 UCS_string_vector::UCS_string_vector(const Value & val, bool surrogate)
@@ -126,8 +128,8 @@ const int quad_PW = Workspace::get_PW();
    // compute block counts (one block having tab_size characters)
    //
 const int max_blocks = (quad_PW + 1) / tab_size;
-Simple_string<int> name_blocks;
-   loop(n, size())   name_blocks.append(1 + (1 + at(n).size()) / tab_size);
+std::vector<int> name_blocks;
+   loop(n, size())   name_blocks.push_back(1 + (1 + at(n).size()) / tab_size);
 
    // compute max number of column blocks based on first line blocks
    //

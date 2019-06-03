@@ -831,7 +831,7 @@ Token * t1 = &at(from);
 Token * t2 = &at(to);
    Assert(0 <= from);
    Assert(from <= to);
-   Assert(to <= size());
+   Assert(to <= ShapeItem(size()));
 
    while (t1 < t2)   t1++->Hswap(*t2--);
 }

@@ -23,6 +23,7 @@
 
 #include <stdint.h>
 #include <stdio.h>
+#include <string>
 
 #include "Assert.hh"
 #include "Common.hh"

@@ -150,7 +150,7 @@ InputFile * input = InputFile::current_file();
 
          if (cc == '\r')   continue;   // ignore carriage returns
 
-          file_line.append(UTF8(cc));
+          file_line += cc;
        }
 
    Log(LOG_test_execution)

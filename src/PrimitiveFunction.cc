@@ -2650,7 +2650,7 @@ const bool user_cmd = Command::do_APL_command(out, command);
 UTF8_string result_utf8 = out.get_data();
    if (result_utf8.size() == 0 ||
        result_utf8.back() != UNI_ASCII_LF)
-      result_utf8.append(UNI_ASCII_LF);
+      result_utf8 += '\n';
 
 std::vector<ShapeItem> line_starts;
    line_starts.push_back(0);

@@ -140,7 +140,7 @@ get_rank(const APL_value val)
 int64_t
 get_axis(const APL_value val, unsigned int axis)
 {
-   return int(axis) < val->get_rank() ? val->get_shape_item(axis) : -1;
+   return uRank(axis) < val->get_rank() ? val->get_shape_item(axis) : -1;
 }
 //-----------------------------------------------------------------------------
 
@@ -326,7 +326,7 @@ Cell * cell = &val->get_ravel(idx);
    if (cell->is_pointer_cell())
       {
         Value * v = cell->get_pointer_value().get();
-        v->decrement_owner_count(v, LOC);
+        v->decrement_owner_count(LOC);
       }
 
    if (new_value->is_simple_scalar())   // e.g. ⊂5 is 5
@@ -337,11 +337,13 @@ Cell * cell = &val->get_ravel(idx);
       {
         const Cell & src = new_value->get_ravel(0);
         if (!src.is_pointer_cell())   DOMAIN_ERROR;
-        new (cell)   PointerCell(src.get_pointer_value()->clone(LOC), *val);
+        Value_P sub = src.get_pointer_value()->clone(LOC);
+        new (cell)   PointerCell(sub.get(), *val);
       }
    else
       {
-        new (cell)   PointerCell(new_value->clone(LOC), *val);
+        Value_P sub = new_value->clone(LOC);
+        new (cell)   PointerCell(sub.get(), *val);
       }
 }
 
@@ -359,7 +361,7 @@ const StateIndicator * si = Workspace::SI_top();
    if (si == Workspace::SI_top())   return E_NO_ERROR;
 
    si = Workspace::SI_top_error();
-   if (si)   return si->get_error().error_code;
+   if (si)   return StateIndicator::get_error(si).get_error_code();
    return E_UNKNOWN_ERROR;
 } 
 //-----------------------------------------------------------------------------
@@ -375,7 +377,7 @@ const StateIndicator * si = Workspace::SI_top();
    if (si == Workspace::SI_top())   return E_NO_ERROR;
 
    si = Workspace::SI_top_error();
-   if (si)   return si->get_error().error_code;
+   if (si)   return StateIndicator::get_error(si).get_error_code();
    return E_UNKNOWN_ERROR;
 } 
 //-----------------------------------------------------------------------------
@@ -434,7 +436,7 @@ Token_string tos;
 
    // resolve user defined names to user defined functions
    //
-   for (int j = 0; j < tos.size(); ++j)
+   for (int j = 0; j < int(tos.size()); ++j)
        {
         if (tos[j].get_ValueType() == TV_SYM)   // user defined function
            {
@@ -600,9 +602,9 @@ const Unicode uni = UTF8_string::toUni(utf8P(utf), len, false);
 void
 Unicode_to_UTF8(int uni, char * dest, int * length)
 {
-UCS_string ucs(Unicode(uni));
+UCS_string ucs(1, Unicode(uni));
 UTF8_string utf8(ucs);
-   for (int d = 0; d < utf8.size(); ++d)   dest[d] = utf8[d];
+   for (int d = 0; d < int(utf8.size()); ++d)   dest[d] = utf8[d];
    dest[utf8.size()] = 0;
    if (length)   *length = utf8.size();
 }

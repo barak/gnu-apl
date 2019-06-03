@@ -205,7 +205,7 @@ size_t tos_idx = 0;
 Symbol * symbols[12];
    for (; tos_idx < 12; ++tos_idx)
       {
-         if (tos_idx >= size_t(tos.size()))           break;
+         if (tos_idx >= tos.size())                   break;
          if (tos[tos_idx].get_tag() == TOK_SEMICOL)   break;
          if (tos[tos_idx].get_Class() == TC_SYMBOL)
             symbols[sym_count++] = tos[tos_idx].get_sym_ptr();
@@ -260,7 +260,7 @@ const int sc100_tc = sym_count * 100 + tos_idx;
      function_name = sym_FUN->get_name();
    }
 
-   while (tos_idx < size_t(tos.size() - 1))
+   while (tos_idx < (tos.size() - 1))
       {
         if (tos[tos_idx++].get_tag() != TOK_SEMICOL)
            {
@@ -269,7 +269,7 @@ const int sc100_tc = sym_count * 100 + tos_idx;
            }
 
 
-        if (tos_idx == size_t(tos.size()))
+        if (tos_idx == tos.size())
            {
              error_info = "Trailing semicolon in function header";
              return;

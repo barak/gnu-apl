@@ -48,7 +48,7 @@ PERFORMANCE_START(cout_perf)
 
    if (c != '\n')   // not end of line
       {
-        aplout.append(c);
+        aplout += c;
         PERFORMANCE_END(fs_COUT_B, cout_perf, 1)
         return 0;
       }
