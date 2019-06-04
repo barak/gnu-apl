@@ -1213,18 +1213,18 @@ const UCS_string text = fun.canonical(false);
              << "   .atf output file incompatible with other APL interpreters."
              << endl;
 
-        ucs.append_utf8("'");
+        ucs.append_UTF8("'");
         ucs.append(fun_name);
-        ucs.append_utf8("' ⎕FX '");
+        ucs.append_UTF8("' ⎕FX '");
         ucs.append(text);
-        ucs.append_utf8("'");
+        ucs.append_UTF8("'");
         return;
       }
 
 UCS_string_vector lines;
    text.to_vector(lines);
 
-   ucs.append_utf8("⎕FX");
+   ucs.append_UTF8("⎕FX");
 
    loop(l, lines.size())
       {
@@ -1239,7 +1239,7 @@ Quad_TF::tf2_char_vec(UCS_string & ucs, const UCS_string & vec)
    if (vec.size() == 0)   return;
 
 bool in_UCS = false;
-   ucs.append_utf8("'");
+   ucs.append_UTF8("'");
 
    loop(v, vec.size())
        {
@@ -1247,14 +1247,14 @@ bool in_UCS = false;
          const bool need_UCS = Avec::need_UCS(uni);
          if (in_UCS != need_UCS)   // mode changed
             {
-              if (in_UCS)   ucs.append_utf8("),'");      // UCS() → 'xxx'
-              else          ucs.append_utf8("',(⎕UCS");   // 'xxx' → UCS()
+              if (in_UCS)   ucs.append_UTF8("),'");      // UCS() → 'xxx'
+              else          ucs.append_UTF8("',(⎕UCS");   // 'xxx' → UCS()
               in_UCS = need_UCS;
             }
 
          if (in_UCS)
             {
-              ucs.append_utf8(" ");
+              ucs.append_UTF8(" ");
               ucs.append_number(uni);
             }
          else
@@ -1264,8 +1264,8 @@ bool in_UCS = false;
             }
        }
 
-   if (in_UCS)   ucs.append_utf8("),''");
-   else          ucs.append_utf8("'");
+   if (in_UCS)   ucs.append_UTF8("),''");
+   else          ucs.append_UTF8("'");
 }
 //-----------------------------------------------------------------------------
 UCS_string

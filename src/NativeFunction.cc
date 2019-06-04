@@ -147,7 +147,7 @@ const char * why = sym->cant_be_defined();
    if (is_operator())   sym->set_nc(NC_OPERATOR, this);
    else                 sym->set_nc(NC_FUNCTION, this);
 
-   Workspace::more_error().shrink(0);
+   Workspace::more_error().clear();
    valid = true;
    valid_functions.push_back(this);
 }
@@ -170,15 +170,15 @@ void *
 NativeFunction::try_one_file(const char * filename, UCS_string & t4)
 {
 const int t4_len = t4.size();
-   t4.append_utf8("    file ");
-   t4.append_utf8(filename);
+   t4.append_UTF8("    file ");
+   t4.append_UTF8(filename);
 
    if (access(filename, R_OK) != 0)
       {
-        while (t4.size() < t4_len + 44)     t4.append_utf8(" ");
-        t4.append_utf8(" (");
-        t4.append_utf8(strerror(errno));
-        t4.append_utf8(")\n");
+        while (t4.size() < t4_len + 44)     t4.append_UTF8(" ");
+        t4.append_UTF8(" (");
+        t4.append_UTF8(strerror(errno));
+        t4.append_UTF8(")\n");
         return 0;
       }
 
@@ -188,10 +188,10 @@ void * handle = dlopen(filename, RTLD_NOW);
         const char * err = dlerror();
         if (strrchr(err, ':'))   err = 1 + strrchr(err, ':');
 
-        while (t4.size() < t4_len + 44)     t4.append_utf8(" ");
-        t4.append_utf8(" (");
-        t4.append_utf8(err);
-        t4.append_utf8(" )\n");
+        while (t4.size() < t4_len + 44)     t4.append_UTF8(" ");
+        t4.append_UTF8(" (");
+        t4.append_UTF8(err);
+        t4.append_UTF8(" )\n");
       }
 
    return handle;
@@ -202,10 +202,10 @@ NativeFunction::open_so_file(UCS_string & t4, UCS_string & so_path)
 {
    // prepare a )MORE error message containing the file names tried.
    //
-   t4.shrink(0);
-   t4.append_utf8("Could not find shared library '");
+   t4.clear();
+   t4.append_UTF8("Could not find shared library '");
    t4.append(so_path);
-   t4.append_utf8("'\n"
+   t4.append_UTF8("'\n"
                   "The following directories and file names were tried:\n");
 
    // if the name starts with / (or \ on Windows) or .
@@ -220,7 +220,7 @@ NativeFunction::open_so_file(UCS_string & t4, UCS_string & so_path)
 
         if (handle == 0)
            {
-             t4.append_utf8(
+             t4.append_UTF8(
             "NOTE: Filename extensions are NOT automatically added "
             "when a full path\n"
             "      (i.e. a path starting with / or .) is used.");
@@ -254,15 +254,15 @@ const char * dirs[] =
 
          UTF8_string dir_so_path(dirs[d]);
          dir_so_path += '/';
-         dir_so_path.append_utf8(utf_so_path);
+         dir_so_path.append_UTF8(utf_so_path);
 
          UTF8_string dir_only(dir_so_path);
          dir_only[strrchr(dir_only.c_str(), '/') - dir_only.c_str()] = 0;
          if (access(dir_only.c_str(), R_OK | X_OK))
             {
-              t4.append_utf8("    directory ");
-              t4.append_utf8(dir_only.c_str());
-              t4.append_utf8("\n");
+              t4.append_UTF8("    directory ");
+              t4.append_UTF8(dir_only.c_str());
+              t4.append_UTF8("\n");
               continue;   // new directory
             }
 
@@ -292,7 +292,7 @@ const char * dirs[] =
                if (has_extension && *exts[e])   continue;
 
                UTF8_string filename(dir_so_path);
-               if (exts[e])   filename.append_utf8(UTF8_string(exts[e]));
+               if (exts[e])   filename.append_UTF8(UTF8_string(exts[e]));
 
                void * handle = try_one_file(filename.c_str(), t4);
                if (handle)   // found library
@@ -458,7 +458,7 @@ void * handle = open_so_file(t4, so_path);
 void * emacs_start = dlsym(handle, "emacs_start");
    if (emacs_start == 0)
       {
-        t4.append_utf8(", but it\n   it is lacking the mandatory "
+        t4.append_UTF8(", but it\n   it is lacking the mandatory "
                        "function emacs_start()\n");
         return t4;
       }
@@ -469,13 +469,13 @@ const int error =
             (emacs_arg, charP(so_path_utf.c_str()));
    if (error)
       {
-        t4.append_utf8(", but emacs_start()  returned error ");
+        t4.append_UTF8(", but emacs_start()  returned error ");
         t4.append_number(error);
-        t4.append_utf8("\n");
+        t4.append_UTF8("\n");
         return t4;
       }
 
-   t4.shrink(0);   // success
+   t4.clear();   // success
    return t4;
 }
 //-----------------------------------------------------------------------------

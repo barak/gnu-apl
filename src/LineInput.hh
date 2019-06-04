@@ -119,7 +119,7 @@ public:
 
    /// clear (after ^C)
    void clear()
-      { user_line.shrink(0); }
+      { user_line.clear(); }
 
    /// return the number of screen rows
    int get_screen_rows() const

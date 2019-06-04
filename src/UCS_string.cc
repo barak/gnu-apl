@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2016  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2019  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -43,44 +43,53 @@ UCS_string::UCS_string()
 }
 //-----------------------------------------------------------------------------
 UCS_string::UCS_string(Unicode uni)
-   : Simple_string<Unicode>(1, uni)
+   : basic_string<Unicode>(1, uni)
 {
   create(LOC);
 }
 //-----------------------------------------------------------------------------
 UCS_string::UCS_string(const Unicode * data, size_t len)
-   : Simple_string<Unicode>(data, len)
+   : basic_string<Unicode>(data, len)
 {
    create(LOC);
 }
 //-----------------------------------------------------------------------------
 UCS_string::UCS_string(size_t len, Unicode uni)
-   : Simple_string<Unicode>(len, uni)
+   : basic_string<Unicode>(len, uni)
 {
    create(LOC);
 }
 //-----------------------------------------------------------------------------
 UCS_string::UCS_string(const UCS_string & ucs)
-   : Simple_string<Unicode>(ucs)
+   : basic_string<Unicode>(ucs)
 {
    create(LOC);
 }
 //-----------------------------------------------------------------------------
 UCS_string::UCS_string(const UCS_string & ucs, size_t pos, size_t len)
-   : Simple_string<Unicode>(ucs, pos, len)
+   : basic_string<Unicode>(ucs, pos, len)
 {
    create(LOC);
 }
 //-----------------------------------------------------------------------------
 UCS_string::UCS_string(const char * cstring)
 {
+   // calling this constructor with and utf8-encoded C string is usually wrong.
+   //
+   // Instead of:   UCS_string(const char * utf8_string)
+   // one should:   UCS_string(UTF8_string(utf8_string))
+   //
+   // so that the constructor below takes care of the utf8-decoding.
+   //
+   // For ASCII C strings this constuctor is fine.
+   //
    create(LOC);
 
-const int len = strlen(cstring);
-   extend(len + 1);
-
-   while (items_valid < len)   items[items_valid++] = Unicode(*cstring++);
-   items[items_valid] = UNI_ASCII_NUL;
+   while (*cstring)
+      {
+        Assert((0x80 & *cstring) == 0);   // ASCII
+        *this += Unicode(*cstring++);
+      }
 }
 //-----------------------------------------------------------------------------
 UCS_string::UCS_string(const UTF8_string & utf)
@@ -170,8 +179,8 @@ int expo = 0;
       {
         if (value > 1e307)
            {
-             if (negative)   append_utf8("¯∞");
-             else            append_utf8("∞");
+             if (negative)   append_UTF8("¯∞");
+             else            append_UTF8("∞");
              FloatCell::map_FC(*this);
              return;
            }
@@ -226,14 +235,14 @@ UCS_string digits;
            }
       }
 
-   if (digits[0] != '0')   digits.pop();
+   if (digits[0] != '0')   digits.pop_back();
 
    // round last digit
    //
-const Unicode last = digits.last();
-   digits.pop();
+const Unicode last = digits.back();
+   digits.pop_back();
 
-   if (last >= '5')   digits.last() = Unicode(digits.last() + 1);
+   if (last >= '5')   digits.back() = Unicode(digits.back() + 1);
  
    // adjust carries of 2nd to last digit
    //
@@ -251,14 +260,14 @@ const Unicode last = digits.last();
    if (digits[0] > '9')
       {
         digits[0] = Unicode(digits[0] - 10);
-        digits.insert_before(0, UNI_ASCII_1);
+        digits.insert(0, UNI_ASCII_1);
         ++expo;
-        digits.pop();
+        digits.pop_back();
       }
 
    // remove trailing zeros
    //
-   while (digits.size() > 1 && digits.last() == UNI_ASCII_0)   digits.pop();
+   while (digits.size() > 1 && digits.back() == UNI_ASCII_0)  digits.pop_back();
 
    // force scaled format if:
    //
@@ -358,7 +367,7 @@ std::vector<int> breakpoints;
                    chunk_len = breakpoints[b++];
                  }
 
-              if (col)   append_utf8("\n      ");
+              if (col)   append_UTF8("\n      ");
               UCS_string trow(pb.get_line(row), col, chunk_len);
               trow.remove_trailing_padchars();
               append(trow);
@@ -373,6 +382,32 @@ std::vector<int> breakpoints;
        {
          if (is_iPAD_char(at(u)))   at(u) = UNI_ASCII_SPACE;
        }
+}
+//-----------------------------------------------------------------------------
+/// constructor
+UCS_string::UCS_string(const Value & value)
+{
+   create(LOC);
+
+   if (value.get_rank() > 1) RANK_ERROR;
+
+const ShapeItem ec = value.element_count();
+   reserve(ec);
+
+   loop(e, ec)   append(value.get_ravel(e).get_char_value());
+}
+//-----------------------------------------------------------------------------
+UCS_string::UCS_string(istream & in)
+{
+   create(LOC);
+
+   for (;;)
+      {
+        const Unicode uni = UTF8_string::getc(in);
+        if (uni == Invalid_Unicode)   return;
+        if (uni == UNI_ASCII_LF)      return;
+        append(uni);
+      }
 }
 //-----------------------------------------------------------------------------
 int
@@ -415,7 +450,7 @@ UCS_string::remove_trailing_padchars()
          if (at(u) == UNI_LINE_VERT2)   break;
          if (at(u) == UNI_iPAD_L0)
             {
-              shrink(0);
+              clear();
               return;
             }
        }
@@ -438,7 +473,7 @@ UCS_string::remove_trailing_padchars()
 void
 UCS_string::remove_trailing_whitespaces()
 {
-   while (size() && last() <= UNI_ASCII_SPACE)   pop();
+   while (size() && back() <= UNI_ASCII_SPACE)   pop_back();
 }
 //-----------------------------------------------------------------------------
 void
@@ -452,8 +487,8 @@ int count = 0;
       }
 
    if (count == 0)        return;      // no leading whitspaces
-   if (count == size())   shrink(0);   // only whitespaces
-   else                   *this = UCS_string(*this, count, size() - count);
+   if (count == size())   clear();     // only whitespaces
+   else                   basic_string::erase(0, count);
 }
 //-----------------------------------------------------------------------------
 void
@@ -468,38 +503,10 @@ UCS_string::split_ws(UCS_string & rest)
               ShapeItem arg = clen;
               while (arg < size() && Avec::is_white(at(arg)))   ++arg;
               while (arg < size())   rest.append(at(arg++));
-              shrink(clen);
+              resize(clen);
               return;
             }
        }
-}
-//-----------------------------------------------------------------------------
-/// constructor
-UCS_string::UCS_string(const Value & value)
-   : Simple_string<Unicode>(0, 0)
-{
-   create(LOC);
-
-   if (value.get_rank() > 1) RANK_ERROR;
-
-const ShapeItem ec = value.element_count();
-   reserve(ec);
-
-   loop(e, ec)   append(value.get_ravel(e).get_char_value());
-}
-//-----------------------------------------------------------------------------
-UCS_string::UCS_string(istream & in)
-   : Simple_string<Unicode>(0, 0)
-{
-   create(LOC);
-
-   for (;;)
-      {
-        const Unicode uni = UTF8_string::getc(in);
-        if (uni == Invalid_Unicode)   return;
-        if (uni == UNI_ASCII_LF)      return;
-        append(uni);
-      }
 }
 //-----------------------------------------------------------------------------
 void
@@ -789,7 +796,7 @@ bool in_quote2 = false;
 }
 //-----------------------------------------------------------------------------
 void
-UCS_string::append_utf8(const UTF8 * str)
+UCS_string::append_UTF8(const UTF8 * str)
 {
 const size_t len = strlen(charP(str));
 const UTF8_string utf(str, len);
@@ -809,12 +816,6 @@ UCS_string::append_quoted(const UCS_string & other)
           append(uni);
        }
    append(UNI_ASCII_DOUBLE_QUOTE);
-}
-//-----------------------------------------------------------------------------
-void
-UCS_string::append_ascii(const char * str)
-{
-   while (*str)   append(Unicode(*str++));
 }
 //-----------------------------------------------------------------------------
 void
@@ -1400,8 +1401,8 @@ UCS_string::round_last_digit()
             }
       }
 
-   shrink(size() - 1);
-   if (items[size() - 1] == UNI_ASCII_FULLSTOP)   shrink(size() - 1);
+   pop_back();
+   if (back() == UNI_ASCII_FULLSTOP)   pop_back();
 }
 //----------------------------------------------------------------------------
 bool
@@ -1447,18 +1448,18 @@ UCS_string ret;
         const Unicode uni = at(offset);
         switch(uni)
            {
-             case ' ':  if (preserve_ws)   ret.append_ascii("&nbsp;");
+             case ' ':  if (preserve_ws)   ret.append_ASCII("&nbsp;");
                         else               ret.append(uni);
                         break;
-             case '#':  ret.append_ascii("&#35;");   break;
-             case '%':  ret.append_ascii("&#37;");   break;
-             case '&':  ret.append_ascii("&#38;");   break;
-             case '<':  ret.append_ascii("&lt;");    break;
-             case '>':  ret.append_ascii("&gt;");    break;
+             case '#':  ret.append_ASCII("&#35;");   break;
+             case '%':  ret.append_ASCII("&#37;");   break;
+             case '&':  ret.append_ASCII("&#38;");   break;
+             case '<':  ret.append_ASCII("&lt;");    break;
+             case '>':  ret.append_ASCII("&gt;");    break;
              default:   ret.append(uni);
            }
       }
-   
+
    return ret;
 }
 //----------------------------------------------------------------------------

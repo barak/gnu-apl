@@ -153,7 +153,7 @@ const int function = B->get_ravel(0).get_int_value();
                      if (HWF[j] == UNI_ASCII_COLON)
                         {
                           args.push_back(arg);
-                          arg.shrink(0);
+                          arg.clear();
                         }
                      else
                         {

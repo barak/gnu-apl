@@ -771,7 +771,7 @@ Line_status current = APL_text;
          const int start = l;
          Assert1(status[l] == Start_of_string);
          UCS_string accu = get_text(l++);
-         accu.shrink(accu.size() - 3);   // remove trailing """
+         accu.resize(accu.size() - 3);   // remove trailing """
          accu << " ";
          while (status[l] == Inside_string)
                {
@@ -1147,7 +1147,7 @@ ShapeItem semi = -1;
 UCS_string body_text;
    for (; t < text.size(); ++t)   body_text.append(text[t]);
 
-   while (body_text.last() == UNI_ASCII_LF)  body_text.pop();
+   while (body_text.back() == UNI_ASCII_LF)  body_text.pop_back();
 
 Token_string body;
    {

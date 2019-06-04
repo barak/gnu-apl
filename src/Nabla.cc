@@ -53,7 +53,7 @@ Nabla::Nabla(const UCS_string & cmd)
      current_line(1),
      first_command(cmd)
 {
-   Workspace::more_error().shrink(0);
+   Workspace::more_error().clear();
 }
 //-----------------------------------------------------------------------------
 void
@@ -165,7 +165,7 @@ UCS_string fun_text;
             {
               UCS_string line_l("[");
               line_l.append_number(l);
-              line_l.append_utf8("]  ");
+              line_l.append_UTF8("]  ");
               while (line_l.size() < 6)   line_l.append(UNI_ASCII_SPACE);
               line_l.append(lines[l].text);
               line_l.remove_trailing_whitespaces();
@@ -355,22 +355,22 @@ Nabla::parse_oper(UCS_string & oper, bool initial)
 
    // skip trailing spaces
    //
-   while (oper.size() > 0 && oper.last() <= ' ')   oper.pop();
-   if (oper.size() > 0 && oper.last() == UNI_NABLA)
+   while (oper.size() > 0 && oper.back() <= ' ')   oper.pop_back();
+   if (oper.size() > 0 && oper.back() == UNI_NABLA)
       {
         do_close = true;
-        oper.pop();
-        while (oper.size() > 0 && oper.last() <= ' ')   oper.pop();
+        oper.pop_back();
+        while (oper.size() > 0 && oper.back() <= ' ')   oper.pop_back();
       }
-   else if (oper.size() > 0 && oper.last() == UNI_DEL_TILDE)
+   else if (oper.size() > 0 && oper.back() == UNI_DEL_TILDE)
       {
         do_close = true;
         locked = true;
-        oper.pop();
-        while (oper.size() > 0 && oper.last() <= ' ')   oper.pop();
+        oper.pop_back();
+        while (oper.size() > 0 && oper.back() <= ' ')   oper.pop_back();
       }
 
-   current_text.shrink(0);
+   current_text.clear();
    ecmd = ECMD_NOP;
 
    if (oper.size() == 0 && do_close)   return 0;
@@ -827,7 +827,7 @@ ErrorCode ec = parser.parse(current_text, in);
    if (ec == E_NO_STRING_END && uprefs.multi_line_strings)
       {
         ec = E_NO_ERROR;
-        Workspace::more_error().shrink(0);
+        Workspace::more_error().clear();
       }
 
    if (ec)
@@ -908,12 +908,12 @@ UCS_string ucs("[");
    ucs.append_number(ln_major);
    if (ln_minor.size())
       {
-        ucs.append_utf8(".");
+        ucs.append_UTF8(".");
         ucs.append(ln_minor);
       }
-   ucs.append_utf8("]");
+   ucs.append_UTF8("]");
 
-   while (ucs.size() < 5)   ucs.append_utf8(" ");
+   while (ucs.size() < 5)   ucs.append_UTF8(" ");
    out << ucs;
 }
 //-----------------------------------------------------------------------------
@@ -929,7 +929,7 @@ UCS_string ret("[");
         loop(s, ln_minor.size())   ret.append(Unicode(char(ln_minor[s])));
       }
 
-   ret.append_utf8("] ");
+   ret.append_UTF8("] ");
    while (ret.size() < min_size)   ret.append(UNI_ASCII_SPACE);
    return ret;
 }

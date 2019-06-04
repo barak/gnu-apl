@@ -27,7 +27,7 @@
 
 //-----------------------------------------------------------------------------
 TabExpansion::TabExpansion(UCS_string & line)
-   : have_trailing_blank(line.size() && line.last() == ' ')
+   : have_trailing_blank(line.size() && line.back() == ' ')
 {
 }
 //-----------------------------------------------------------------------------
@@ -71,7 +71,7 @@ UCS_string_vector matches;
    if (matches.size() > 1)    // multiple names match user input
       {
         const int user_len = user.size();
-        user.shrink(0);
+        user.clear();
         return show_alternatives(user, user_len, matches);
       }
 
@@ -137,7 +137,7 @@ UCS_string arg;
    //
    if (matches.size() > 1)   // multiple commands match cmd
       {
-        user.shrink(0);
+        user.clear();
         return show_alternatives(user, cmd.size(), matches);
       }
 
@@ -230,7 +230,7 @@ UCS_string_vector matches;
            {
              // all matches can be extended in a unique way
              //
-             matches[0].shrink(common_len);
+             matches[0].resize(common_len);
              user = help + matches[0];
              return ER_REPLACE;
            }
@@ -386,7 +386,7 @@ int qpos = -1;
                  // expand to common part.
                  //
                  user = matches[0];
-                 user.shrink(common_len);
+                 user.resize(common_len);
                  return ER_REPLACE;
                }
            }
@@ -590,7 +590,7 @@ UTF8_string arg_utf(filename);
    //
    user = cmd;
    user.append(UNI_ASCII_SPACE);
-   user.append_utf8(path.c_str());
+   user.append_UTF8(path.c_str());
    user.append(UNI_ASCII_SLASH);
    user.append(matches[0]);
    return ER_REPLACE;
@@ -680,7 +680,7 @@ const int common_len = compute_common_length(prefix_len, matches);
         //
         const int usize = user.size();
         user.append(matches[0]);
-        user.shrink(usize + common_len);
+        user.resize(usize + common_len);
         return ER_REPLACE;
       }
 }

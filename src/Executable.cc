@@ -49,7 +49,7 @@ Executable::Executable(const UCS_string & ucs,  bool multi_line,
                 {
                   case UNI_ASCII_CR:                         break;
                   case UNI_ASCII_LF: text.push_back(line);
-                                     line.shrink(0);         break;
+                                     line.clear();           break;
                   default:           line.append(uni);
                }
            }
@@ -90,7 +90,7 @@ ShapeItem last_semi = -1;
         text.push_back(header);
 
         UCS_string new_body(lambda_text);
-        new_body.shrink(last_semi);
+        new_body.resize(last_semi);
         new_body.remove_trailing_whitespaces();
         text.push_back(new_body);
       }
@@ -325,7 +325,7 @@ UCS_string ret;
    while (tidx < line_txt.size())
       {
         if (Avec::is_diamond(line_txt[tidx]))    break;
-        ret.append(line_txt[tidx++], LOC);
+        ret.append(line_txt[tidx++]);
       }
 
    // skip trailing spaces
@@ -700,7 +700,7 @@ UCS_string
 Executable::extract_lambda_text(Fun_signature signature, int skip) const
 {
 UCS_string lambda_text;
-   if (signature & SIG_Z)   lambda_text.append_utf8("λ←");
+   if (signature & SIG_Z)   lambda_text.append_UTF8("λ←");
 
 int level = 0;   // {/} nesting level
 bool copying = false;
@@ -778,7 +778,7 @@ bool in_double_quotes = false;
                    --skip;                       // next {...} at top-level
                    if (!copying)  continue;
 
-                   lambda_text.pop();            // the last }
+                   lambda_text.pop_back();       // the last }
                    return lambda_text;
 
               default: continue;

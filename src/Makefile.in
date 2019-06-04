@@ -187,12 +187,12 @@ am__libapl_la_SOURCES_DIST = buildtag buildtag.hh ../config.h \
 	Quad_SQL.cc Quad_SQL.hh Quad_SVx.cc Quad_SVx.hh Quad_TF.cc \
 	Quad_TF.hh Quad_WA.cc Quad_WA.hh Parallel.cc Parallel.hh \
 	Performance.cc Performance.def Performance.hh RealCell.cc \
-	RealCell.hh sbrk.cc Shape.cc Shape.hh Simple_string.hh \
-	ScalarFunction.cc ScalarFunction.hh Security.cc Security.def \
-	Security.hh StateIndicator.cc StateIndicator.hh Svar_DB.cc \
-	Svar_DB.hh Svar_record.cc Svar_record.hh tcp_signal.m4 \
-	Svar_signals.def Svar_signals.hh Symbol.cc Symbol.hh \
-	SymbolTable.cc SymbolTable.hh SystemLimits.def SystemLimits.hh \
+	RealCell.hh sbrk.cc Shape.cc Shape.hh ScalarFunction.cc \
+	ScalarFunction.hh Security.cc Security.def Security.hh \
+	StateIndicator.cc StateIndicator.hh Svar_DB.cc Svar_DB.hh \
+	Svar_record.cc Svar_record.hh tcp_signal.m4 Svar_signals.def \
+	Svar_signals.hh Symbol.cc Symbol.hh SymbolTable.cc \
+	SymbolTable.hh SystemLimits.def SystemLimits.hh \
 	SystemVariable.cc SystemVariable.def SystemVariable.hh \
 	TabExpansion.cc TabExpansion.hh Thread_context.cc \
 	Thread_context.hh Token.cc Token.def Token.hh TokenEnums.hh \
@@ -324,12 +324,12 @@ am__apl_SOURCES_DIST = main.cc buildtag buildtag.hh ../config.h \
 	Quad_SQL.cc Quad_SQL.hh Quad_SVx.cc Quad_SVx.hh Quad_TF.cc \
 	Quad_TF.hh Quad_WA.cc Quad_WA.hh Parallel.cc Parallel.hh \
 	Performance.cc Performance.def Performance.hh RealCell.cc \
-	RealCell.hh sbrk.cc Shape.cc Shape.hh Simple_string.hh \
-	ScalarFunction.cc ScalarFunction.hh Security.cc Security.def \
-	Security.hh StateIndicator.cc StateIndicator.hh Svar_DB.cc \
-	Svar_DB.hh Svar_record.cc Svar_record.hh tcp_signal.m4 \
-	Svar_signals.def Svar_signals.hh Symbol.cc Symbol.hh \
-	SymbolTable.cc SymbolTable.hh SystemLimits.def SystemLimits.hh \
+	RealCell.hh sbrk.cc Shape.cc Shape.hh ScalarFunction.cc \
+	ScalarFunction.hh Security.cc Security.def Security.hh \
+	StateIndicator.cc StateIndicator.hh Svar_DB.cc Svar_DB.hh \
+	Svar_record.cc Svar_record.hh tcp_signal.m4 Svar_signals.def \
+	Svar_signals.hh Symbol.cc Symbol.hh SymbolTable.cc \
+	SymbolTable.hh SystemLimits.def SystemLimits.hh \
 	SystemVariable.cc SystemVariable.def SystemVariable.hh \
 	TabExpansion.cc TabExpansion.hh Thread_context.cc \
 	Thread_context.hh Token.cc Token.def Token.hh TokenEnums.hh \
@@ -745,12 +745,12 @@ common_SOURCES = buildtag buildtag.hh ../config.h \
 	Quad_SQL.cc Quad_SQL.hh Quad_SVx.cc Quad_SVx.hh Quad_TF.cc \
 	Quad_TF.hh Quad_WA.cc Quad_WA.hh Parallel.cc Parallel.hh \
 	Performance.cc Performance.def Performance.hh RealCell.cc \
-	RealCell.hh sbrk.cc Shape.cc Shape.hh Simple_string.hh \
-	ScalarFunction.cc ScalarFunction.hh Security.cc Security.def \
-	Security.hh StateIndicator.cc StateIndicator.hh Svar_DB.cc \
-	Svar_DB.hh Svar_record.cc Svar_record.hh tcp_signal.m4 \
-	Svar_signals.def Svar_signals.hh Symbol.cc Symbol.hh \
-	SymbolTable.cc SymbolTable.hh SystemLimits.def SystemLimits.hh \
+	RealCell.hh sbrk.cc Shape.cc Shape.hh ScalarFunction.cc \
+	ScalarFunction.hh Security.cc Security.def Security.hh \
+	StateIndicator.cc StateIndicator.hh Svar_DB.cc Svar_DB.hh \
+	Svar_record.cc Svar_record.hh tcp_signal.m4 Svar_signals.def \
+	Svar_signals.hh Symbol.cc Symbol.hh SymbolTable.cc \
+	SymbolTable.hh SystemLimits.def SystemLimits.hh \
 	SystemVariable.cc SystemVariable.def SystemVariable.hh \
 	TabExpansion.cc TabExpansion.hh Thread_context.cc \
 	Thread_context.hh Token.cc Token.def Token.hh TokenEnums.hh \

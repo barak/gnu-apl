@@ -107,7 +107,6 @@ Performance.cc		Performance.def		Performance.hh		\
 RealCell.cc					RealCell.hh		\
 sbrk.cc									\
 Shape.cc					Shape.hh		\
-						Simple_string.hh	\
 ScalarFunction.cc				ScalarFunction.hh	\
 Security.cc		Security.def		Security.hh		\
 StateIndicator.cc				StateIndicator.hh	\

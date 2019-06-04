@@ -152,7 +152,7 @@ operator << (ostream & out, const Token & token)
              UCS_string ucs = pb.get_line(0).no_pad();
              if (ucs.size() > 20)
                 {
-                  ucs.shrink(20);
+                  ucs.resize(20);
                   more = true;
                 }
              out << ucs;
@@ -466,9 +466,9 @@ Token::show_trace(ostream & out, const UCS_string & fun_name,
                   Function_Line line) const
 {
 UCS_string fn = fun_name;
-   fn.append_utf8("[");
+   fn.append_UTF8("[");
    fn.append_number(line);
-   fn.append_utf8("] ");
+   fn.append_UTF8("] ");
 
    out << fn;
 

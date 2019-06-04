@@ -386,7 +386,7 @@ const Symbol * symbol = Workspace::lookup_existing_symbol(symbol_name);
                          if (text[u] == '\n')
                              {
                                result.push_back(res);
-                               res.shrink(0);
+                               res.clear();
                                UCS_string next(text, u+1, text.size()-(u+1));
                                if (!next.is_comment_or_label() &&
                                    u < (text.size() - 1))
@@ -449,13 +449,13 @@ UCS_string shape_rho;
    {
      if (value.get_rank() == 1)   // true vector
         {
-          if      (value.element_count() == 0)   shape_rho.append_utf8("0⍴");
-          else if (value.element_count() == 1)   shape_rho.append_utf8(",");
+          if      (value.element_count() == 0)   shape_rho.append_UTF8("0⍴");
+          else if (value.element_count() == 1)   shape_rho.append_UTF8(",");
         }
      else if (value.get_rank() > 1)   // matrix or higher
         {
            shape_rho.append_shape(value.get_shape());
-           shape_rho.append_utf8("⍴");
+           shape_rho.append_UTF8("⍴");
          }
    }
 
@@ -469,16 +469,16 @@ UCS_string shape_rho;
         picker.get(proto_name);
         picker.pop();
         do_CR10_rec(result, *proto, picker, pidx);
-        result.back().append_utf8(" ⍝ proto 1");
+        result.back().append_UTF8(" ⍝ proto 1");
 
         // and then another line to reshape the prototype
         //
         reshape.append(proto_name);
-        reshape.append_utf8("←");
+        reshape.append_UTF8("←");
         reshape.append(shape_rho);
         reshape.append(proto_name);
         result.push_back(reshape);
-        result.back().append_utf8(" ⍝ proto 2");
+        result.back().append_UTF8(" ⍝ proto 2");
         return;
       }
 
@@ -503,7 +503,7 @@ bool nested = false;
              //
              UCS_string line(2*(picker.get_level() - 1), UNI_ASCII_SPACE);
              picker.get_indexed(line, pos, count);
-             line.append_utf8("←");
+             line.append_UTF8("←");
 
              // compute next item
              //
@@ -525,7 +525,7 @@ bool nested = false;
                    count = 0;
 
                    result.push_back(line);
-                   rhs.shrink(0);
+                   rhs.clear();
                    mode = Vm_NONE;
                  }
 
@@ -542,7 +542,7 @@ bool nested = false;
 
      UCS_string line(2*(picker.get_level() - 1), UNI_ASCII_SPACE);
      picker.get_indexed(line, pos, count);
-     line.append_utf8("←");
+     line.append_UTF8("←");
      line.append(rhs);
 
      result.push_back(line);
@@ -595,7 +595,7 @@ int len = 0;
 UCS_string line(2*(picker.get_level() - 1), UNI_ASCII_SPACE);  // indent
 
    line.append(left);
-   line.append_utf8("←");
+   line.append_UTF8("←");
    line.append(shape_rho);
 
 V_mode mode = Vm_NONE;
@@ -636,11 +636,11 @@ APL_Integer default_int  = 0;
 const bool default_is_int = figure_default(value, default_char, default_int);
 
    prolog.append(left);
-   prolog.append_utf8("←");
-   if (pick_level > 1)   prolog.append_utf8("⊂");
+   prolog.append_UTF8("←");
+   if (pick_level > 1)   prolog.append_UTF8("⊂");
    prolog.append_shape(value.get_shape());
-   if (default_is_int)   prolog.append_utf8("⍴0 ⍝ prolog ≡");
-   else                  prolog.append_utf8("⍴' ' ⍝ prolog ≡");
+   if (default_is_int)   prolog.append_UTF8("⍴0 ⍝ prolog ≡");
+   else                  prolog.append_UTF8("⍴' ' ⍝ prolog ≡");
    prolog.append_number(pick_level);
 
    return prolog;
@@ -679,29 +679,29 @@ const int level = shapes.size();
         return;
       }
 
-   result.append_utf8("((⎕IO+");
+   result.append_UTF8("((⎕IO+");
    if (level == 2 && shapes[0].get_rank() > 1)   // need ⊂ for left ⊃ arg
       {
          Shape sh = shapes[0].offset_to_index(indices[1]);
-         result.append_utf8("(⊂");
+         result.append_UTF8("(⊂");
          result.append_shape(sh);
-         result.append_utf8(")");
+         result.append_UTF8(")");
       }
    else
       {
         loop(s, shapes.size() - 1)
            {
-             if (s)   result.append_utf8(" ");
+             if (s)   result.append_UTF8(" ");
              Shape sh = shapes[s].offset_to_index(indices[s + 1]);
-             if (sh.get_rank() > 1)   result.append_utf8("(");
+             if (sh.get_rank() > 1)   result.append_UTF8("(");
              result.append_shape(sh);
-             if (sh.get_rank() > 1)   result.append_utf8(")");
+             if (sh.get_rank() > 1)   result.append_UTF8(")");
            }
       }
 
-   result.append_utf8(")⊃");
+   result.append_UTF8(")⊃");
    result.append(var_name);
-   result.append_utf8(")");
+   result.append_UTF8(")");
 }
 //-----------------------------------------------------------------------------
 void
@@ -715,20 +715,20 @@ const bool need_disclose = get_level() > 1;
    //
 const bool need_comma = shapes.back().get_rank() != 1;
 
-   result.append_utf8("(");
-   if (need_comma)      result.append_utf8(",");
-   if (need_disclose)   result.append_utf8("⊃");
+   result.append_UTF8("(");
+   if (need_comma)      result.append_UTF8(",");
+   if (need_disclose)   result.append_UTF8("⊃");
    get(result);
-   result.append_utf8(")");
-   result.append_utf8("[");
+   result.append_UTF8(")");
+   result.append_UTF8("[");
    if (pos)
       {
         result.append_number(pos);
-        result.append_utf8("+");
+        result.append_UTF8("+");
       }
-   result.append_utf8("⍳");
+   result.append_UTF8("⍳");
    result.append_number(len);
-   result.append_utf8("]");
+   result.append_UTF8("]");
 }
 //-----------------------------------------------------------------------------
 Quad_CR::V_mode
@@ -776,7 +776,7 @@ Quad_CR::do_CR10_item(UCS_string & item, const Cell & cell, V_mode mode,
         bool scaled = false;
         PrintContext pctx(PR_APL_MIN, MAX_Quad_PP, MAX_Quad_PW);
         item = UCS_string(cell.get_real_value(), scaled, pctx);
-        item.append_utf8("J");
+        item.append_UTF8("J");
         scaled = false;
         item.append(UCS_string(cell.get_imag_value(), scaled, pctx));
         return Vm_NUM;
@@ -787,9 +787,9 @@ Quad_CR::do_CR10_item(UCS_string & item, const Cell & cell, V_mode mode,
         // cell is a pointer cell which will be replaced later.
         // For now we add an item in the current mode as placeholder
         //
-        if (mode == Vm_QUOT)   { item.append_utf8("∘");     return Vm_QUOT; }
-        if (mode == Vm_UCS)    { item.append_utf8("33");    return Vm_UCS;  }
-        item.append_utf8("00");
+        if (mode == Vm_QUOT)   { item.append_UTF8("∘");     return Vm_QUOT; }
+        if (mode == Vm_UCS)    { item.append_UTF8("33");    return Vm_UCS;  }
+        item.append_UTF8("00");
         return Vm_NUM;
       }
 
@@ -1277,8 +1277,8 @@ int ascii_len = 0;
 void
 Quad_CR::close_mode(UCS_string & rhs, V_mode mode)
 {
-   if      (mode == Vm_QUOT)   rhs.append_utf8("'");
-   else if (mode == Vm_UCS)    rhs.append_utf8(")");
+   if      (mode == Vm_QUOT)   rhs.append_UTF8("'");
+   else if (mode == Vm_UCS)    rhs.append_UTF8(")");
 }
 //-----------------------------------------------------------------------------
 void
@@ -1286,16 +1286,16 @@ Quad_CR::item_separator(UCS_string & line, V_mode from_mode, V_mode to_mode)
 {
    if (from_mode == to_mode)   // separator in same mode (if any)
       {
-        if      (to_mode == Vm_UCS)    line.append_utf8(" ");
-        else if (to_mode == Vm_NUM)    line.append_utf8(" ");
+        if      (to_mode == Vm_UCS)    line.append_UTF8(" ");
+        else if (to_mode == Vm_NUM)    line.append_UTF8(" ");
       }
    else                // close old mode and open new one
       {
         close_mode(line, from_mode);
-        if (from_mode != Vm_NONE)   line.append_utf8(",");
+        if (from_mode != Vm_NONE)   line.append_UTF8(",");
 
-        if      (to_mode == Vm_UCS)    line.append_utf8("(,⎕UCS ");
-        else if (to_mode == Vm_QUOT)   line.append_utf8("'");
+        if      (to_mode == Vm_UCS)    line.append_UTF8("(,⎕UCS ");
+        else if (to_mode == Vm_QUOT)   line.append_UTF8("'");
       }
 }
 //-----------------------------------------------------------------------------
@@ -1397,7 +1397,7 @@ UCS_string line;
             {
               Value_P Zb(line, LOC);
               new (Z->next_ravel()) PointerCell(Zb.get(), Z.getref());
-              line.shrink(0);
+              line.clear();
             }
          else
             {
@@ -1409,7 +1409,7 @@ UCS_string line;
       {
         Value_P Zb(line, LOC);
         new (Z->next_ravel()) PointerCell(Zb.get(), Z.getref());
-        line.shrink(0);
+        line.clear();
       }
 
    return Z;

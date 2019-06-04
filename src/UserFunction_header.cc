@@ -433,16 +433,16 @@ UserFunction_header::lambda_header(Fun_signature sig, int lambda_num)
 {
 UCS_string u;
 
-   if (sig & SIG_Z)      u.append_utf8("λ←");
-   if (sig & SIG_A)      u.append_utf8("⍺ ");
-   if (sig & SIG_LORO)   u.append_utf8("(");
-   if (sig & SIG_LO)     u.append_utf8("⍶ ");
-   u.append_utf8("λ"); 
+   if (sig & SIG_Z)      u.append_UTF8("λ←");
+   if (sig & SIG_A)      u.append_UTF8("⍺ ");
+   if (sig & SIG_LORO)   u.append_UTF8("(");
+   if (sig & SIG_LO)     u.append_UTF8("⍶ ");
+   u.append_UTF8("λ"); 
    u.append_number(lambda_num); 
-   if (sig & SIG_RO)     u.append_utf8(" ⍹ ");
-   if (sig & SIG_LORO)   u.append_utf8(")");
-   if (sig & SIG_X)      u.append_utf8("[χ]");
-   if (sig & SIG_B)      u.append_utf8(" ⍵");
+   if (sig & SIG_RO)     u.append_UTF8(" ⍹ ");
+   if (sig & SIG_LORO)   u.append_UTF8(")");
+   if (sig & SIG_X)      u.append_UTF8("[χ]");
+   if (sig & SIG_B)      u.append_UTF8(" ⍵");
 
    return u;
 }

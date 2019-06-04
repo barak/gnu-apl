@@ -31,9 +31,6 @@
 #include "UserFunction.hh"
 #include "Workspace.hh"
 
-// error when )SI is empty
-Error StateIndicator::top_level_error(E_NO_ERROR, LOC);
-
 //-----------------------------------------------------------------------------
 StateIndicator::StateIndicator(Executable * exec, StateIndicator * _par)
    : executable(exec),

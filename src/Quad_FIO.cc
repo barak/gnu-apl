@@ -65,19 +65,19 @@ Quad_FIO::Quad_FIO()
    // init stdin, stdout, stderr, and maybe fd 3 
    //
 file_entry f0(stdin, STDIN_FILENO);
-   f0.path.append_str("stdin");
+   f0.path.append_ASCII("stdin");
    open_files.push_back(f0);
 file_entry f1(stdout, STDOUT_FILENO);
-   f1.path.append_str("stdout");
+   f1.path.append_ASCII("stdout");
    open_files.push_back(f1);
 file_entry f2(stderr, STDERR_FILENO);
-   f1.path.append_str("stderr");
+   f1.path.append_ASCII("stderr");
    open_files.push_back(f2);
 
    if (-1 != fcntl(3, F_GETFD))   // this process was forked from another APL
       {
         file_entry f3(0, 3);
-        f3.path.append_str("pipe-to_client");
+        f3.path.append_ASCII("pipe-to_client");
         open_files.push_back(f3);
       }
 }
@@ -287,7 +287,7 @@ char numbuf[50];
                                }
                             fmt[fm++] = un1;   fmt[fm] = 0;
                             sprintf(numbuf, fmt, iv);
-                            UZ.append_utf8(numbuf);
+                            UZ.append_UTF8(numbuf);
                           }
                           goto field_done;
 
@@ -298,7 +298,7 @@ char numbuf[50];
                                             B->get_ravel(b++).get_real_value();
                             fmt[fm++] = un1;   fmt[fm] = 0;
                             sprintf(numbuf, fmt, fv);
-                            UZ.append_utf8(numbuf);
+                            UZ.append_UTF8(numbuf);
                           }
                           goto field_done;
 
@@ -319,7 +319,7 @@ char numbuf[50];
 
                      case 'm':
                           sprintf(numbuf, "%s", strerror(errno));
-                          UZ.append_utf8(numbuf);
+                          UZ.append_UTF8(numbuf);
                           goto field_done;
 
                      case '%':

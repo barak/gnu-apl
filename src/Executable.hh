@@ -113,7 +113,7 @@ public:
 
    /// clear the text of line n (0 = header line)
    void clear_text(int l)
-      { text[l].shrink(0); }
+      { text[l].clear(); }
 
    /// set the text of line n (0 = header line)
    void set_text(int l, const UCS_string & new_line)

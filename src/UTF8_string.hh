@@ -98,12 +98,12 @@ public:
       { Assert(size());   resize(size() - 1); }
 
    /// append a 0-terminated C string
-   void append_str(const char * str)
-      { while (*str)   *this += *str++; }
+   void append_ASCII(const char * ascii)
+      { while (*ascii)   *this += *ascii++; }
 
 
    /// append the UTF8_string \b suffix
-   void append_utf8(const UTF8_string & suffix)
+   void append_UTF8(const UTF8_string & suffix)
       { loop(s, suffix.size())   *this += suffix[s]; }
 
    /// display bytes in this UTF string

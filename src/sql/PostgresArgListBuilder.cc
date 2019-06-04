@@ -21,7 +21,7 @@
 #include "PostgresArgListBuilder.hh"
 
 #include <string.h>
-#include "../Simple_string.hh"
+#include <vector>
 
 template<class T>
 PostgresBindArg<T>::~PostgresBindArg()
@@ -157,12 +157,13 @@ static void update_double_cell( Cell *cell, char *content )
 
 Value_P PostgresArgListBuilder::run_query( bool ignore_result )
 {
-    int n = args.size();
-    int array_len = n == 0 ? 1 : n;
-    Simple_string<Oid>          types  (array_len, 0);
-    Simple_string<const char *> values (array_len, 0);
-    Simple_string<int>          lengths(array_len, 0);
-    Simple_string<int>          formats(array_len, 0);
+    const int n = args.size();
+    const int array_len = n == 0 ? 1 : n;
+    const char * cp_null = 0;
+    vector<Oid>          types  (array_len, 0);
+    vector<const char *> values (array_len, cp_null);
+    vector<int>          lengths(array_len, 0);
+    vector<int>          formats(array_len, 0);
 
     for( int i = 0 ; i < n ; i++ ) {
         PostgresArg *arg = args[i];

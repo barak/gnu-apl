@@ -895,7 +895,7 @@ int expo = 0;
    expo += int_digits.size();
 
 UTF8_string digits = int_digits;
-   digits.append_utf8(fract_digits);
+   digits.append_UTF8(fract_digits);
 
    // at this point, digits is the fractional part ff... of 0.ff... ×10⋆expo
    // discard leading fractional 0s and adjust expo accordingly

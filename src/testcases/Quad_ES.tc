@@ -99,11 +99,11 @@ Unkown error (major 13, minor 17) in ⎕ES B
 
       ⎕EM
 Unkown error (major 13, minor 17) in ⎕ES B
-      RECIP 0                               
-      ^     ^                               
+      RECIP 0                             
+      ^     ^                             
 
       ⍴⎕EM
-3 44
+3 42
 
       ⎕ET
 13 17

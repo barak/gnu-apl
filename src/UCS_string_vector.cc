@@ -57,7 +57,7 @@ const ShapeItem name_len = val.get_cols();
              //
              if (uni != UNI_ASCII_SPACE)
                 {
-                  name.shrink(0);
+                  name.clear();
                   break;
                 }
 
@@ -80,7 +80,7 @@ const ShapeItem name_len = val.get_cols();
              // is an error (if last is false) or not. In both cases the first
              // name can be ignored.
              //
-             name.shrink(0);
+             name.clear();
              if (!surrogate)   break;   // error
 
              // 'last' is true thus to_varnames() was called from ⎕SVO and
@@ -101,7 +101,7 @@ const ShapeItem name_len = val.get_cols();
                      }
                   else
                      {
-                       name.shrink(0);   // error
+                       name.clear();   // error
                        break;
                      }
                 }

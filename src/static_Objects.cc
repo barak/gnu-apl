@@ -64,6 +64,9 @@ DynamicObject DynamicObject::all_index_exprs(LOC);
 INFO(Workspace::the_workspace, __LINE__)
 Workspace Workspace::the_workspace;
 
+INFO(StateIndicator::top_level_error, __LINE__)
+Error StateIndicator::top_level_error(E_NO_ERROR, LOC);
+
 INFO(Parallel::all_CPUs, __LINE__)
 std::vector<CPU_Number>Parallel::all_CPUs;
 

@@ -57,7 +57,7 @@ struct LineLabel
 
    /// invalidate the line number
    void clear()
-      { ln_major = -1;   ln_minor.shrink(0); }
+      { ln_major = -1;   ln_minor.clear(); }
 
    /// return true iff this line number is the header line [0]
    bool is_header_line_number() const

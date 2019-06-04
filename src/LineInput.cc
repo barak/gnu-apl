@@ -410,7 +410,7 @@ LineEditContext::delete_char()
    if (uidx == (user_line.size() - 1))   // cursor on last char
       {
         CIN << ' ' << UNI_ASCII_BS;
-        user_line.pop();
+        user_line.pop_back();
       }
    else
       {
@@ -433,7 +433,7 @@ LineEditContext::insert_char(Unicode uni)
       }
    else if (ins_mode)              // insert char
       {
-        user_line.insert_before(uidx, uni);
+        user_line.insert(uidx, uni);
         adjust_allocated_height();
         refresh_wrapped_cursor();
         refresh_from_cursor();
@@ -455,7 +455,7 @@ LineEditContext::cut_to_EOL()
    if (uidx >= user_line.size())   return;   // nothing to cut
 
    cut_buffer = UCS_string(user_line, uidx, user_line.size() - uidx);
-   user_line.shrink(uidx);
+   user_line.resize(uidx);
    refresh_from_cursor();
 }
 //-----------------------------------------------------------------------------
@@ -471,7 +471,7 @@ LineEditContext::paste()
    else                            // insert cut buffer
       {
         const UCS_string rest(user_line, uidx, user_line.size() - uidx);
-        user_line.shrink(uidx);
+        user_line.resize(uidx);
         user_line.append(cut_buffer);
         user_line.append(rest);
       }
@@ -522,7 +522,7 @@ const ExpandResult expand_result = tab_exp.expand_tab(line);
              return;
 
         case ER_REPLACE:
-             user_line.shrink(0);
+             user_line.clear();
              user_line.append(line);
              uidx = 0;
              refresh_from_cursor();
@@ -682,9 +682,9 @@ InputMux::get_line(LineInputMode mode, const UCS_string & prompt,
                               file_line[0] == UNI_ASCII_BS)
                              {
                                file_line.erase(0);
-                               line.pop();
+                               line.pop_back();
                              }
-                       line.append_utf8(file_line.c_str());
+                       line.append_UTF8(file_line.c_str());
                        break;
 
                   case LIM_Nabla:
@@ -828,7 +828,7 @@ LineInput::edit_line(LineInputMode mode, const UCS_string & prompt,
    tcsetattr(STDIN_FILENO, TCSANOW, &the_line_input->current_termios);
 #endif // WANT_LIBAPL
 
-   user_line.shrink(0);
+   user_line.clear();
 
 LineEditContext lec(mode, 24, Workspace::get_PW(), hist, prompt);
 

@@ -75,21 +75,21 @@ UCS_string prompt = Workspace::get_prompt();
                   {
                     accu = line;
                     prompt.prepend(UNI_RIGHT_ARROW);
-                    accu.shrink(line.size() - 3);   // discard """
+                    accu.resize(line.size() - 3);   // discard """
                     accu.append(UNI_ASCII_SPACE);
                   }
                else                     // end of multi-line
                   {
-                    accu.pop();   // trailing " "
+                    accu.pop_back();   // trailing " "
                     process_line(accu);
                     return;
                   }
             }
          else if (accu.size())   // inside multi-line
             {
-              accu.append_ascii("\"");
+              accu.append_ASCII("\"");
               accu.append(line.do_escape(true));
-              accu.append_ascii("\" ");
+              accu.append_ASCII("\" ");
             }
          else                   // normal input line
             {
@@ -145,12 +145,12 @@ int len = 0;
 
 UCS_string arg(line, len, line.size() - len);
 UCS_string_vector args = split_arg(arg);
-   line.shrink(0);
+   line.clear();
    if (!cmd.starts_iwith(")MORE")) 
       {
         // clear )MORE info unless command is )MORE
         //
-        Workspace::more_error().shrink(0);
+        Workspace::more_error().clear();
       }
 
 #define cmd_def(cmd_str, code, garg, _hint)                          \
@@ -250,7 +250,7 @@ UCS_string args_ucs(args);
 void
 Command::do_APL_expression(UCS_string & line)
 {
-   Workspace::more_error().shrink(0);
+   Workspace::more_error().clear();
 
 Executable * statements = 0;
    try
@@ -438,7 +438,7 @@ check_EOC:
                    Workspace::pop_SI(LOC);
                    UCS_string pushed_command = Workspace::get_pushed_Command();
                    process_line(pushed_command);
-                   pushed_command.shrink(0);
+                   pushed_command.clear();
                    Workspace::push_Command(pushed_command);   // clear in
                    return;
                  }
@@ -1401,7 +1401,7 @@ UCS_string arg("0");
           else                   // relative path
             {
               path += '/';
-              path.append_utf8(UTF8_string(buffer));
+              path.append_UTF8(UTF8_string(buffer));
             }
        }
 
@@ -1430,7 +1430,7 @@ Command::is_directory(dirent * entry, const UTF8_string & path)
 UTF8_string filename = path;
 UTF8_string entry_name(entry->d_name);
    filename += '/';
-   filename.append_utf8(entry_name);
+   filename.append_UTF8(entry_name);
 
 DIR * dir = opendir(filename.c_str());
    if (dir) closedir(dir);
@@ -1537,12 +1537,12 @@ UCS_string_vector directories;
             {
               if (filename_utf8.ends_with(".apl"))
                  {
-                   filename.shrink(filename.size() - 4);   // skip extension
+                   filename.resize(filename.size() - 4);   // skip extension
                    files.push_back(filename);
                  }
               else if (filename_utf8.ends_with(".xml"))
                  {
-                   filename.shrink(filename.size() - 4);   // skip extension
+                   filename.resize(filename.size() - 4);   // skip extension
                    files.push_back(filename);
                  }
             }
@@ -1920,7 +1920,7 @@ Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
                result << args[i];
             }
          // check if lamda-function closed properly
-         if (result.last() == '}')
+         if (result.back() == '}')
             {
                is_lambda = true;
                apl_fun = result;
@@ -2135,7 +2135,7 @@ const char sub_type = record[1];
              else if (item_type == 'N')   numeric_1TF(objects);
              else if (item_type == 'F')   function_2TF(objects);
              else                         CERR << "????: " << data << endl;
-             data.shrink(0);
+             data.clear();
            }
       }
    else
@@ -2410,8 +2410,8 @@ Command::parse_from_to(UCS_string & from, UCS_string & to,
    // 3b.       - TO
    // 3c.  FROM - TO
    //
-   from.shrink(0);
-   to.shrink(0);
+   from.clear();
+   to.clear();
 
 int s = 0;
 bool got_minus = false;
@@ -2454,8 +2454,8 @@ bool got_minus = false;
 
    // "increment" TO so that we can compare ITEM < TO
    //
-   if (to.size())   to.last() = Unicode(to.last() + 1);
-   
+   if (to.size())   to.back() = Unicode(to.back() + 1);
+
    return false;   // OK
 }
 //-----------------------------------------------------------------------------

@@ -51,13 +51,13 @@ Workspace::Workspace()
      top_SI(0)
 {
 #define ro_sv_def(x, str, _txt)                                   \
-   if (*str) { UCS_string q(UNI_Quad_Quad);   q.append_utf8(str); \
+   if (*str) { UCS_string q(UNI_Quad_Quad);   q.append_UTF8(str); \
    distinguished_names.add_variable(q, ID_ ## x, &v_ ## x); }
 
 #define rw_sv_def ro_sv_def
 
 #define sf_def(x, str, _txt)                                      \
-   if (*str) { UCS_string q(UNI_Quad_Quad);   q.append_utf8(str); \
+   if (*str) { UCS_string q(UNI_Quad_Quad);   q.append_UTF8(str); \
    distinguished_names.add_function(q, ID_ ## x, x::fun); }
 
 #include "SystemVariable.def"
@@ -540,7 +540,7 @@ Workspace::clear_WS(ostream & out, bool silent)
 
    // clear the )MORE error info
    //
-   more_error().shrink(0);
+   more_error().clear();
 
    // ⎕PW and ⎕TZ shall survive )CLEAR (lrm p. 260);
    //
@@ -660,7 +660,7 @@ Workspace::backup_existing_file(const char * filename)
    if (access(filename, F_OK) != 0)   return false;   // OK
 
 UTF8_string backup_filename = filename;
-   backup_filename.append_str(".bak");
+   backup_filename.append_ASCII(".bak");
 
    // 2. if backup file exists then remove it...
    //
@@ -1077,7 +1077,7 @@ Workspace::wsid(ostream & out, UCS_string arg, LibRef lib, bool silent)
 UCS_string &
 MORE_ERROR()
 {
-   Workspace::more_error().shrink(0);
+   Workspace::more_error().clear();
    return Workspace::more_error();
 }
 //-----------------------------------------------------------------------------

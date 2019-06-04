@@ -28,7 +28,6 @@
 #include "Assert.hh"
 #include "Common.hh"
 #include "Heapsort.hh"
-#include "Simple_string.hh"
 #include "Unicode.hh"
 #include "UTF8_string.hh"
 
@@ -45,7 +44,7 @@ class UCS_string_vector;
 
 //=============================================================================
 /// A string of Unicode characters (32-bit)
-class UCS_string : public  Simple_string<Unicode>
+class UCS_string : public  basic_string<Unicode>
 {
 public:
    /// default constructor: empty string
@@ -154,6 +153,10 @@ public:
    Unicode back() const
     { return size() ? (*this)[size() - 1] : Invalid_Unicode; }
 
+   /// return the last character in \b this string
+   Unicode & back()
+    { Assert(size());   return at(size() - 1); }
+
    /// return true if this string contains non-whitespace characters
    bool has_black() const;
 
@@ -183,7 +186,7 @@ public:
 
    /// remove the last character in \b this string
    void pop_back()
-   { Assert(size() > 0);   shrink(size() - 1); }
+   { Assert(size() > 0);   resize(size() - 1); }
 
    /// return this string reversed (i.e. characters from back to front).
    UCS_string reverse() const;
@@ -212,62 +215,45 @@ public:
    /// followed by digits.
    int atoi() const;
 
+   /// append UCS_string other to this string
+   void append(const UCS_string & other)
+      { basic_string::append(other); }
+
    /// append 0-terminated ASCII string \b str to this string. str is NOT
-   /// interpreted as UTF8 string (use append_utf8() if such interpretation        /// is desired)
-   void append_ascii(const char * str);
+   /// interpreted as UTF8 string (use append_UTF8() if such interpretation        /// is desired)
+   void append_ASCII(const char * ascii)
+      { while (*ascii)   *this += Unicode(*ascii++); }
+
 
    /// append 0-terminated UTF8 string str to \b this UCS_string.
-   // This is different from append_ascii((const char *)str):
+   // This is different from append_ASCII((const char * str):
    ///
    /// append_ascii() appends one Unicode per byte (i.e. strlen(str) in total),
    /// without checking for UTF8 sequences.
    ///
-   /// append_utf8() appends one Unicode per UTF8 sequence (which is the same
+   /// append_UTF8() appends one Unicode per UTF8 sequence (which is the same
    /// if all characteras are ASCII, but less if not.
-   void append_utf8(const UTF8 * str);
+   void append_UTF8(const UTF8 * str);
 
    /// same as app(const UTF8 * str)
-   void append_utf8(const char * str)
-      { append_utf8(utf8P(str)); }
+   void append_UTF8(const char * str)
+      { append_UTF8(utf8P(str)); }
+
+   /// more intuitive insert() function
+   void insert(ShapeItem pos, Unicode uni)
+      { basic_string::insert(pos, 1, uni); }
 
    /// prepend character \b uni
    void prepend(Unicode uni)
-      {
-        if (size() == 0)   { append(uni);   return; }
-
-        extend(size() + 1);
-        ++items_valid;
-        memmove(&at(1), &at(0), size() * sizeof(Unicode));
-        at(0) = uni;
-      }
+      { insert(0, uni); }
 
    /// return \b this string and \b other concatenated
    UCS_string operator +(const UCS_string & other) const
-      { UCS_string ret(*this);   ret.append(other);   return ret; }
-
-   /// assign UCS_string \b other
-   const UCS_string & operator =(const UCS_string & other)
-      {
-        shrink(0);
-        append(other);
-        return *this;
-      }
-
-   /// return true iff \b this is equal to \b other
-   bool operator ==(const UCS_string & other) const
-      {
-        if (size() != other.size())   return false;
-        loop(c, size())   if (at(c) != other.at(c))   return false;
-        return true;
-      }
-
-   /// return true iff \b this is different from \b other
-   bool operator !=(const UCS_string & other) const
-      { return !(*this == other); }
+      { UCS_string ret(*this);   ret += other;   return ret; }
 
    /// append C-string \b str
    UCS_string & operator <<(const char * str)
-      { append_utf8(str);   return *this; }
+      { append_UTF8(str);   return *this; }
 
    /// append number \b num
    UCS_string & operator <<(ShapeItem num)
@@ -275,25 +261,17 @@ public:
 
    /// append character \b uni
    UCS_string & operator <<(Unicode uni)
-      { append(uni);   return *this; }
+      { *this += uni;   return *this; }
 
    /// append UCS_string \b other
    UCS_string & operator <<(const UCS_string & other)
-      { append(other);   return *this; }
+      { basic_string::append(other);   return *this; }
 
    /// compare \b this with UCS_string \b other
    Comp_result compare(const UCS_string & other) const
       {
-        const ShapeItem common_len = items_valid < other.items_valid
-                             ? items_valid : other.items_valid;
-        loop(c, common_len)
-            {
-              if (at(c) < other.at(c))   return COMP_LT;
-              if (at(c) > other.at(c))   return COMP_GT;
-            }
-
-        if (items_valid < other.items_valid)   return COMP_LT;
-        if (items_valid > other.items_valid)   return COMP_GT;
+        if (*this < other)   return COMP_LT;
+        if (*this > other)   return COMP_GT;
         return COMP_EQ;
       }
 
@@ -322,6 +300,10 @@ public:
 
    /// the inverse of \b un_escape().
    UCS_string do_escape(bool double_quoted) const;
+
+   /// overload basic_string::size() so that it returns a signed length
+   ShapeItem size() const
+      { return basic_string::size(); }
 
    /// an iterator for UCS_strings
    class iterator
@@ -378,6 +360,10 @@ public:
    /// return this string HTML-escaped, starting at offset, maybe using &nbsp;
    UCS_string to_HTML(int offset, bool preserve_ws) const;
 
+   /// erase 1 (!) character at pos
+   void erase(ShapeItem pos)
+      { basic_string::erase(pos, 1); }
+
    /// helper function for Heapsort<Unicode>::sort()
    static bool greater_uni(const Unicode & u1, const Unicode & u2, const void *)
       { return u1 > u2; }
@@ -432,6 +418,11 @@ protected:
 private:
    void * operator new[](size_t size);
    void operator delete[](void *);
+
+private:
+   /// prevent accidental usage of the rather dangerous default len parameter
+   /// in basic_strng::erase(pos, len = npos)
+   basic_string & erase(size_type pos, size_type len);
 };
 //-----------------------------------------------------------------------------
 inline void
@@ -443,17 +434,9 @@ const UCS_string * tmp = u1;   u1 = u2;   u2 = tmp;
 inline void
 Hswap(UCS_string & u1, UCS_string & u2)
 {
-Unicode * items = u1.items;
-   u1.items = u2.items;
-   u2.items = items;
-
-const ShapeItem items_allocated = u1.items_allocated;
-   u1.items_allocated = u2.items_allocated;
-   u2.items_allocated = items_allocated;
-
-const ShapeItem items_valid = u1.items_valid;
-   u1.items_valid = u2.items_valid;
-   u2.items_valid = items_valid;
+UCS_string  u = u1;
+           u1 = u2;
+           u2 = u;
 }
 //-----------------------------------------------------------------------------
 

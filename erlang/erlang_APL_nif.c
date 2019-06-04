@@ -33,7 +33,7 @@
 # define HAVE_DIRTY   /* we hope so */
 #endif
 
-#if HAVE_DIRTY
+#ifdef HAVE_DIRTY
 # define DIRTY_FLAG , ERL_NIF_DIRTY_JOB_CPU_BOUND
 #else
 # define DIRTY_FLAG

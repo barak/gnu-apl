@@ -489,7 +489,7 @@ Value_P Z(sh_Z, LOC);
 
         Value_P varname(ucs, LOC);
 
-        ucs.shrink(0);
+        ucs.clear();
         while (*env)   ucs.append(Unicode(*env++));
 
         Value_P varval(ucs, LOC);
@@ -927,7 +927,7 @@ Quad_INP::read_strings()
         const int end = line.substr_pos(end_marker);
         if (end != -1)   // end marker found
            {
-             line.shrink(end);
+             line.resize(end);
              if (line.size())   raw_lines.push_back(line);
              break;
            }
@@ -957,7 +957,7 @@ UCS_string empty;
         // at this point line did contain an exec string
         //
         UCS_string pref = line;
-        pref.shrink(epos);
+        pref.resize(epos);
         prefixes.push_back(pref);
 
         line = line.drop(epos + esc1.size());   // skip prefix and esc1
@@ -973,7 +973,7 @@ UCS_string empty;
              else              // found an exec end in this line
                 {
                   UCS_string exec = line;
-                  exec.shrink(eend);
+                  exec.resize(eend);
                   escapes.push_back(exec);
                   line = line.drop(eend + esc2.size());   // skip exec and esc2
                   suffixes.push_back(line);
