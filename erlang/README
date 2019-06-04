@@ -443,4 +443,28 @@ I. Unicode versus UTF8.
 32.41592654                          ← APL printout out the result
 [{value,[],[32.41592653589793]}]     ← Erlang printout of the result
 
+I. Issues
+---------
+
+Depending on your platform and the location where GNU APL is installed, a
+few things may be needed.
+
+I1. make sure that erlang_APL_nif.so will be found - either by setting
+the environment variable LD_LIBRARY_PATH properly, or by adding an entry
+to /etc/ld.so.conf. See man ldconfig for details.
+
+2. make sure that APserver is found or not used. You can start APserver
+   manually beforehand like this:
+
+APserver -H &
+
+   or you can start apl like this:
+
+apl   --noSV
+
+Shared variables are a compatibility left-over from the 1970 while Erlang was
+created in the 1990s. It is therefore quite unlikely that APL Shared variables
+and Erlang are being used toghether and if so, the extra effort of starting
+APserver manually beforehand seems good enough.
+
 
