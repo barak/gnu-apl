@@ -22,16 +22,17 @@
 #include <sstream>
 #include <ostream>
 
-#include <Workspace.hh>
 #include <Command.hh>
 #include <ComplexCell.hh>
 #include <DiffOut.hh>
 #include <Error.hh>
-#include <LineInput.hh>
 #include <FloatCell.hh>
+#include <LineInput.hh>
+#include <Macro.hh>
 #include <PointerCell.hh>
 #include <Tokenizer.hh>
 #include <UserPreferences.hh>
+#include <Workspace.hh>
 
 #include "libapl.h"
 
@@ -626,6 +627,8 @@ init_libapl(const char * progname, int log_startup)
    uprefs.read_config_file(false, log_startup);   // in $HOME/.config/gnu_apl/
 
    init_2(log_startup);
+
+   Macro::init_macros();
 }
 //-----------------------------------------------------------------------------
 extern DiffOut DOUT_filebuf;
