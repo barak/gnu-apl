@@ -155,7 +155,8 @@ const Shape3 B3(B->get_shape(), axis);
         new (X4->next_ravel())   IntCell(B3.m());
         new (X4->next_ravel())   IntCell(B3.l());
         X4->check_value(LOC);
-        return Macro::Z__LO_REDUCE_X4_B->eval_LXB(_LO, X4, B);
+        return Macro::get_macro(Macro::MAC_Z__LO_REDUCE_X4_B)
+                    ->eval_LXB(_LO, X4, B);
       }
 
    if (shape_Z.is_empty())   return LO->eval_identity_fun(B, axis);
@@ -252,8 +253,10 @@ const Shape3 B3(B->get_shape(), axis);
         new (X4->next_ravel())   PointerCell(vsh_Z3.get(), X4.getref());      // ⍴Z3
         new (X4->next_ravel())   PointerCell(vsh_B3.get(), X4.getref());      // ⍴B3
         X4->check_value(LOC);
-        if (A0<0)   return Macro::Z__nA_LO_REDUCE_X4_B->eval_ALXB(A1,_LO,X4,B);
-        else        return Macro::Z__pA_LO_REDUCE_X4_B->eval_ALXB(A1,_LO,X4,B);
+        if (A0 < 0)   return Macro::get_macro(Macro::MAC_Z__nA_LO_REDUCE_X4_B)
+                                  ->eval_ALXB(A1,_LO,X4,B);
+        else        return Macro::get_macro(Macro::MAC_Z__pA_LO_REDUCE_X4_B)
+                                ->eval_ALXB(A1,_LO,X4,B);
       }
 
    return do_reduce(shape_Z, Z3, A0, LO, B, B->get_shape_item(axis));

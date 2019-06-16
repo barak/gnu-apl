@@ -101,7 +101,8 @@ host_triplet = @host@
 @POSTGRES_TRUE@                  sql/PostgresProvider.cc       sql/PostgresProvider.hh
 
 @WANT_LIBAPL_TRUE@am__append_11 = libapl.la
-@WANT_LIBAPL_FALSE@bin_PROGRAMS = apl$(EXEEXT)
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@am__append_12 = lib_gnu_apl.la
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@bin_PROGRAMS = apl$(EXEEXT)
 subdir = src
 DIST_COMMON = $(srcdir)/Makefile.in $(srcdir)/Makefile.am \
 	$(top_srcdir)/depcomp $(am__pkginclude_HEADERS_DIST)
@@ -147,6 +148,156 @@ am__uninstall_files_from_dir = { \
 am__installdirs = "$(DESTDIR)$(pkglibdir)" "$(DESTDIR)$(bindir)" \
 	"$(DESTDIR)$(pkgincludedir)"
 LTLIBRARIES = $(pkglib_LTLIBRARIES)
+lib_gnu_apl_la_LIBADD =
+am__lib_gnu_apl_la_SOURCES_DIST = buildtag buildtag.hh ../config.h \
+	APL_Float_as_class.hh APL_types.hh Archive.cc Archive.hh \
+	ArrayIterator.hh Assert.cc Assert.hh Avec.cc Avec.def Avec.hh \
+	Backtrace.cc Backtrace.hh Bif_F12_FORMAT.cc Bif_F12_FORMAT.hh \
+	Bif_F12_SORT.cc Bif_F12_SORT.hh Bif_F12_TAKE_DROP.cc \
+	Bif_F12_TAKE_DROP.hh Bif_OPER1_COMMUTE.cc Bif_OPER1_COMMUTE.hh \
+	Bif_OPER1_EACH.cc Bif_OPER1_EACH.hh Bif_OPER2_POWER.cc \
+	Bif_OPER2_POWER.hh Bif_OPER2_INNER.cc Bif_OPER2_INNER.hh \
+	Bif_OPER2_OUTER.cc Bif_OPER2_OUTER.hh Bif_OPER2_RANK.cc \
+	Bif_OPER2_RANK.hh Bif_OPER1_REDUCE.cc Bif_OPER1_REDUCE.hh \
+	Bif_OPER1_SCAN.cc Bif_OPER1_SCAN.hh CDR.cc CDR.hh Cell.cc \
+	Cell.icc Cell.hh Doxy.cc Doxy.hh CharCell.cc CharCell.hh \
+	Command.cc Command.def Command.hh Common.cc Common.hh \
+	ComplexCell.cc ComplexCell.hh configure_args.cc DiffOut.cc \
+	DiffOut.hh DynamicObject.cc DynamicObject.hh Error.cc \
+	Error.def Error.hh Error_macros.hh ErrorCode.hh Executable.cc \
+	Executable.hh FloatCell.cc FloatCell.hh Function.cc \
+	Function.hh DerivedFunction.cc DerivedFunction.hh Help.def \
+	Heapsort.hh Id.cc Id.def Id.hh IndexExpr.cc IndexExpr.hh \
+	IndexIterator.cc IndexIterator.hh InputFile.cc InputFile.hh \
+	IntCell.cc IntCell.hh IO_Files.cc IO_Files.hh LApack.cc \
+	LApack.hh LibPaths.cc LibPaths.hh LineInput.cc LineInput.hh \
+	Logging.cc Logging.def Logging.hh LvalCell.cc LvalCell.hh \
+	makefile.h Malloc_hooks.cc Nabla.cc Nabla.hh Macro.cc \
+	Macro.def Macro.hh NamedObject.cc NamedObject.hh \
+	NativeFunction.cc NativeFunction.hh Native_interface.hh \
+	NumericCell.cc NumericCell.hh Output.cc Output.hh PJob.hh \
+	Parser.cc Parser.hh Prefix.cc Prefix.def Prefix.hh \
+	PointerCell.cc PointerCell.hh PrimitiveFunction.cc \
+	PrimitiveFunction.hh PrimitiveOperator.cc PrimitiveOperator.hh \
+	PrintBuffer.cc PrintBuffer.hh PrintContext.hh PrintOperator.hh \
+	QuadFunction.cc QuadFunction.hh ProcessorID.cc ProcessorID.hh \
+	Quad_CR.cc Quad_CR.hh Quad_DLX.cc Quad_DLX.hh Quad_FFT.cc \
+	Quad_FFT.hh Quad_FIO.cc Quad_FIO.hh Quad_FX.cc Quad_FX.hh \
+	Quad_GTK.cc Quad_GTK.hh Quad_PLOT.cc Quad_PLOT.def \
+	Quad_PLOT.hh Quad_RE.cc Quad_RE.hh Quad_RL.cc Quad_RL.hh \
+	Quad_SQL.cc Quad_SQL.hh Quad_SVx.cc Quad_SVx.hh Quad_TF.cc \
+	Quad_TF.hh Quad_WA.cc Quad_WA.hh Parallel.cc Parallel.hh \
+	Performance.cc Performance.def Performance.hh RealCell.cc \
+	RealCell.hh sbrk.cc Shape.cc Shape.hh ScalarFunction.cc \
+	ScalarFunction.hh Security.cc Security.def Security.hh \
+	StateIndicator.cc StateIndicator.hh Svar_DB.cc Svar_DB.hh \
+	Svar_record.cc Svar_record.hh tcp_signal.m4 Svar_signals.def \
+	Svar_signals.hh Symbol.cc Symbol.hh SymbolTable.cc \
+	SymbolTable.hh SystemLimits.def SystemLimits.hh \
+	SystemVariable.cc SystemVariable.def SystemVariable.hh \
+	TabExpansion.cc TabExpansion.hh Thread_context.cc \
+	Thread_context.hh Token.cc Token.def Token.hh TokenEnums.hh \
+	Tokenizer.cc Tokenizer.hh UCS_string.cc UCS_string.hh \
+	UCS_string_vector.cc UCS_string_vector.hh Unicode.hh \
+	UserFunction.cc UserFunction.hh UserFunction_header.cc \
+	UserFunction_header.hh UserPreferences.cc UserPreferences.hh \
+	UTF8_string.cc UTF8_string.hh Value.cc Value.icc Value.hh \
+	Value_P.icc Value_P.hh ValueHistory.cc ValueHistory.hh \
+	Workspace.cc Workspace.hh static_Objects.cc static_Objects.hh \
+	Regexp.cc Regexp.hh sql/SqliteArgListBuilder.cc \
+	sql/SqliteArgListBuilder.hh sql/SqliteConnection.cc \
+	sql/SqliteConnection.hh sql/SqliteResultValue.cc \
+	sql/SqliteResultValue.hh sql/SqliteProvider.cc \
+	sql/SqliteProvider.hh sql/Connection.cc \
+	sql/PostgresArgListBuilder.cc sql/PostgresArgListBuilder.hh \
+	sql/PostgresConnection.cc sql/PostgresConnection.hh \
+	sql/PostgresProvider.cc sql/PostgresProvider.hh python_apl.cc
+@HAVE_LIBPCRE2_32_TRUE@am__objects_1 = lib_gnu_apl_la-Regexp.lo
+am__dirstamp = $(am__leading_dot)dirstamp
+@SQLITE3_TRUE@am__objects_2 =  \
+@SQLITE3_TRUE@	sql/lib_gnu_apl_la-SqliteArgListBuilder.lo \
+@SQLITE3_TRUE@	sql/lib_gnu_apl_la-SqliteConnection.lo \
+@SQLITE3_TRUE@	sql/lib_gnu_apl_la-SqliteResultValue.lo \
+@SQLITE3_TRUE@	sql/lib_gnu_apl_la-SqliteProvider.lo \
+@SQLITE3_TRUE@	sql/lib_gnu_apl_la-Connection.lo
+@POSTGRES_TRUE@@SQLITE3_FALSE@am__objects_3 = sql/lib_gnu_apl_la-Connection.lo
+@POSTGRES_TRUE@am__objects_4 =  \
+@POSTGRES_TRUE@	sql/lib_gnu_apl_la-PostgresArgListBuilder.lo \
+@POSTGRES_TRUE@	sql/lib_gnu_apl_la-PostgresConnection.lo \
+@POSTGRES_TRUE@	sql/lib_gnu_apl_la-PostgresProvider.lo
+am__objects_5 = lib_gnu_apl_la-Archive.lo lib_gnu_apl_la-Assert.lo \
+	lib_gnu_apl_la-Avec.lo lib_gnu_apl_la-Backtrace.lo \
+	lib_gnu_apl_la-Bif_F12_FORMAT.lo \
+	lib_gnu_apl_la-Bif_F12_SORT.lo \
+	lib_gnu_apl_la-Bif_F12_TAKE_DROP.lo \
+	lib_gnu_apl_la-Bif_OPER1_COMMUTE.lo \
+	lib_gnu_apl_la-Bif_OPER1_EACH.lo \
+	lib_gnu_apl_la-Bif_OPER2_POWER.lo \
+	lib_gnu_apl_la-Bif_OPER2_INNER.lo \
+	lib_gnu_apl_la-Bif_OPER2_OUTER.lo \
+	lib_gnu_apl_la-Bif_OPER2_RANK.lo \
+	lib_gnu_apl_la-Bif_OPER1_REDUCE.lo \
+	lib_gnu_apl_la-Bif_OPER1_SCAN.lo lib_gnu_apl_la-CDR.lo \
+	lib_gnu_apl_la-Cell.lo lib_gnu_apl_la-Doxy.lo \
+	lib_gnu_apl_la-CharCell.lo lib_gnu_apl_la-Command.lo \
+	lib_gnu_apl_la-Common.lo lib_gnu_apl_la-ComplexCell.lo \
+	lib_gnu_apl_la-configure_args.lo lib_gnu_apl_la-DiffOut.lo \
+	lib_gnu_apl_la-DynamicObject.lo lib_gnu_apl_la-Error.lo \
+	lib_gnu_apl_la-Executable.lo lib_gnu_apl_la-FloatCell.lo \
+	lib_gnu_apl_la-Function.lo lib_gnu_apl_la-DerivedFunction.lo \
+	lib_gnu_apl_la-Id.lo lib_gnu_apl_la-IndexExpr.lo \
+	lib_gnu_apl_la-IndexIterator.lo lib_gnu_apl_la-InputFile.lo \
+	lib_gnu_apl_la-IntCell.lo lib_gnu_apl_la-IO_Files.lo \
+	lib_gnu_apl_la-LApack.lo lib_gnu_apl_la-LibPaths.lo \
+	lib_gnu_apl_la-LineInput.lo lib_gnu_apl_la-Logging.lo \
+	lib_gnu_apl_la-LvalCell.lo lib_gnu_apl_la-Malloc_hooks.lo \
+	lib_gnu_apl_la-Nabla.lo lib_gnu_apl_la-Macro.lo \
+	lib_gnu_apl_la-NamedObject.lo lib_gnu_apl_la-NativeFunction.lo \
+	lib_gnu_apl_la-NumericCell.lo lib_gnu_apl_la-Output.lo \
+	lib_gnu_apl_la-Parser.lo lib_gnu_apl_la-Prefix.lo \
+	lib_gnu_apl_la-PointerCell.lo \
+	lib_gnu_apl_la-PrimitiveFunction.lo \
+	lib_gnu_apl_la-PrimitiveOperator.lo \
+	lib_gnu_apl_la-PrintBuffer.lo lib_gnu_apl_la-QuadFunction.lo \
+	lib_gnu_apl_la-ProcessorID.lo lib_gnu_apl_la-Quad_CR.lo \
+	lib_gnu_apl_la-Quad_DLX.lo lib_gnu_apl_la-Quad_FFT.lo \
+	lib_gnu_apl_la-Quad_FIO.lo lib_gnu_apl_la-Quad_FX.lo \
+	lib_gnu_apl_la-Quad_GTK.lo lib_gnu_apl_la-Quad_PLOT.lo \
+	lib_gnu_apl_la-Quad_RE.lo lib_gnu_apl_la-Quad_RL.lo \
+	lib_gnu_apl_la-Quad_SQL.lo lib_gnu_apl_la-Quad_SVx.lo \
+	lib_gnu_apl_la-Quad_TF.lo lib_gnu_apl_la-Quad_WA.lo \
+	lib_gnu_apl_la-Parallel.lo lib_gnu_apl_la-Performance.lo \
+	lib_gnu_apl_la-RealCell.lo lib_gnu_apl_la-sbrk.lo \
+	lib_gnu_apl_la-Shape.lo lib_gnu_apl_la-ScalarFunction.lo \
+	lib_gnu_apl_la-Security.lo lib_gnu_apl_la-StateIndicator.lo \
+	lib_gnu_apl_la-Svar_DB.lo lib_gnu_apl_la-Svar_record.lo \
+	lib_gnu_apl_la-Symbol.lo lib_gnu_apl_la-SymbolTable.lo \
+	lib_gnu_apl_la-SystemVariable.lo \
+	lib_gnu_apl_la-TabExpansion.lo \
+	lib_gnu_apl_la-Thread_context.lo lib_gnu_apl_la-Token.lo \
+	lib_gnu_apl_la-Tokenizer.lo lib_gnu_apl_la-UCS_string.lo \
+	lib_gnu_apl_la-UCS_string_vector.lo \
+	lib_gnu_apl_la-UserFunction.lo \
+	lib_gnu_apl_la-UserFunction_header.lo \
+	lib_gnu_apl_la-UserPreferences.lo \
+	lib_gnu_apl_la-UTF8_string.lo lib_gnu_apl_la-Value.lo \
+	lib_gnu_apl_la-ValueHistory.lo lib_gnu_apl_la-Workspace.lo \
+	lib_gnu_apl_la-static_Objects.lo $(am__objects_1) \
+	$(am__objects_2) $(am__objects_3) $(am__objects_4)
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@am_lib_gnu_apl_la_OBJECTS =  \
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	$(am__objects_5) \
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	lib_gnu_apl_la-python_apl.lo
+lib_gnu_apl_la_OBJECTS = $(am_lib_gnu_apl_la_OBJECTS)
+AM_V_lt = $(am__v_lt_@AM_V@)
+am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
+am__v_lt_0 = --silent
+am__v_lt_1 = 
+lib_gnu_apl_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
+	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
+	$(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) \
+	$(lib_gnu_apl_la_LDFLAGS) $(LDFLAGS) -o $@
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@am_lib_gnu_apl_la_rpath = -rpath \
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	$(pkglibdir)
 libapl_la_LIBADD =
 am__libapl_la_SOURCES_DIST = buildtag buildtag.hh ../config.h \
 	APL_Float_as_class.hh APL_types.hh Archive.cc Archive.hh \
@@ -212,20 +363,19 @@ am__libapl_la_SOURCES_DIST = buildtag buildtag.hh ../config.h \
 	sql/PostgresConnection.cc sql/PostgresConnection.hh \
 	sql/PostgresProvider.cc sql/PostgresProvider.hh libapl.h \
 	libapl.cc
-@HAVE_LIBPCRE2_32_TRUE@am__objects_1 = libapl_la-Regexp.lo
-am__dirstamp = $(am__leading_dot)dirstamp
-@SQLITE3_TRUE@am__objects_2 = sql/libapl_la-SqliteArgListBuilder.lo \
+@HAVE_LIBPCRE2_32_TRUE@am__objects_6 = libapl_la-Regexp.lo
+@SQLITE3_TRUE@am__objects_7 = sql/libapl_la-SqliteArgListBuilder.lo \
 @SQLITE3_TRUE@	sql/libapl_la-SqliteConnection.lo \
 @SQLITE3_TRUE@	sql/libapl_la-SqliteResultValue.lo \
 @SQLITE3_TRUE@	sql/libapl_la-SqliteProvider.lo \
 @SQLITE3_TRUE@	sql/libapl_la-Connection.lo
-@POSTGRES_TRUE@@SQLITE3_FALSE@am__objects_3 =  \
+@POSTGRES_TRUE@@SQLITE3_FALSE@am__objects_8 =  \
 @POSTGRES_TRUE@@SQLITE3_FALSE@	sql/libapl_la-Connection.lo
-@POSTGRES_TRUE@am__objects_4 =  \
+@POSTGRES_TRUE@am__objects_9 =  \
 @POSTGRES_TRUE@	sql/libapl_la-PostgresArgListBuilder.lo \
 @POSTGRES_TRUE@	sql/libapl_la-PostgresConnection.lo \
 @POSTGRES_TRUE@	sql/libapl_la-PostgresProvider.lo
-am__objects_5 = libapl_la-Archive.lo libapl_la-Assert.lo \
+am__objects_10 = libapl_la-Archive.lo libapl_la-Assert.lo \
 	libapl_la-Avec.lo libapl_la-Backtrace.lo \
 	libapl_la-Bif_F12_FORMAT.lo libapl_la-Bif_F12_SORT.lo \
 	libapl_la-Bif_F12_TAKE_DROP.lo libapl_la-Bif_OPER1_COMMUTE.lo \
@@ -271,15 +421,11 @@ am__objects_5 = libapl_la-Archive.lo libapl_la-Assert.lo \
 	libapl_la-UserPreferences.lo libapl_la-UTF8_string.lo \
 	libapl_la-Value.lo libapl_la-ValueHistory.lo \
 	libapl_la-Workspace.lo libapl_la-static_Objects.lo \
-	$(am__objects_1) $(am__objects_2) $(am__objects_3) \
-	$(am__objects_4)
-@WANT_LIBAPL_TRUE@am_libapl_la_OBJECTS = $(am__objects_5) \
+	$(am__objects_6) $(am__objects_7) $(am__objects_8) \
+	$(am__objects_9)
+@WANT_LIBAPL_TRUE@am_libapl_la_OBJECTS = $(am__objects_10) \
 @WANT_LIBAPL_TRUE@	libapl_la-libapl.lo
 libapl_la_OBJECTS = $(am_libapl_la_OBJECTS)
-AM_V_lt = $(am__v_lt_@AM_V@)
-am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
-am__v_lt_0 = --silent
-am__v_lt_1 = 
 libapl_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(libapl_la_CXXFLAGS) \
 	$(CXXFLAGS) $(libapl_la_LDFLAGS) $(LDFLAGS) -o $@
@@ -348,19 +494,19 @@ am__apl_SOURCES_DIST = main.cc buildtag buildtag.hh ../config.h \
 	sql/PostgresArgListBuilder.cc sql/PostgresArgListBuilder.hh \
 	sql/PostgresConnection.cc sql/PostgresConnection.hh \
 	sql/PostgresProvider.cc sql/PostgresProvider.hh
-@HAVE_LIBPCRE2_32_TRUE@am__objects_6 = apl-Regexp.$(OBJEXT)
-@SQLITE3_TRUE@am__objects_7 = sql/apl-SqliteArgListBuilder.$(OBJEXT) \
+@HAVE_LIBPCRE2_32_TRUE@am__objects_11 = apl-Regexp.$(OBJEXT)
+@SQLITE3_TRUE@am__objects_12 = sql/apl-SqliteArgListBuilder.$(OBJEXT) \
 @SQLITE3_TRUE@	sql/apl-SqliteConnection.$(OBJEXT) \
 @SQLITE3_TRUE@	sql/apl-SqliteResultValue.$(OBJEXT) \
 @SQLITE3_TRUE@	sql/apl-SqliteProvider.$(OBJEXT) \
 @SQLITE3_TRUE@	sql/apl-Connection.$(OBJEXT)
-@POSTGRES_TRUE@@SQLITE3_FALSE@am__objects_8 =  \
+@POSTGRES_TRUE@@SQLITE3_FALSE@am__objects_13 =  \
 @POSTGRES_TRUE@@SQLITE3_FALSE@	sql/apl-Connection.$(OBJEXT)
-@POSTGRES_TRUE@am__objects_9 =  \
+@POSTGRES_TRUE@am__objects_14 =  \
 @POSTGRES_TRUE@	sql/apl-PostgresArgListBuilder.$(OBJEXT) \
 @POSTGRES_TRUE@	sql/apl-PostgresConnection.$(OBJEXT) \
 @POSTGRES_TRUE@	sql/apl-PostgresProvider.$(OBJEXT)
-am__objects_10 = apl-Archive.$(OBJEXT) apl-Assert.$(OBJEXT) \
+am__objects_15 = apl-Archive.$(OBJEXT) apl-Assert.$(OBJEXT) \
 	apl-Avec.$(OBJEXT) apl-Backtrace.$(OBJEXT) \
 	apl-Bif_F12_FORMAT.$(OBJEXT) apl-Bif_F12_SORT.$(OBJEXT) \
 	apl-Bif_F12_TAKE_DROP.$(OBJEXT) \
@@ -408,10 +554,11 @@ am__objects_10 = apl-Archive.$(OBJEXT) apl-Assert.$(OBJEXT) \
 	apl-UserPreferences.$(OBJEXT) apl-UTF8_string.$(OBJEXT) \
 	apl-Value.$(OBJEXT) apl-ValueHistory.$(OBJEXT) \
 	apl-Workspace.$(OBJEXT) apl-static_Objects.$(OBJEXT) \
-	$(am__objects_6) $(am__objects_7) $(am__objects_8) \
-	$(am__objects_9)
-@WANT_LIBAPL_FALSE@am_apl_OBJECTS = apl-main.$(OBJEXT) \
-@WANT_LIBAPL_FALSE@	$(am__objects_10)
+	$(am__objects_11) $(am__objects_12) $(am__objects_13) \
+	$(am__objects_14)
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@am_apl_OBJECTS =  \
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@	apl-main.$(OBJEXT) \
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@	$(am__objects_15)
 apl_OBJECTS = $(am_apl_OBJECTS)
 am__DEPENDENCIES_1 =
 apl_DEPENDENCIES = $(am__DEPENDENCIES_1)
@@ -470,8 +617,10 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(libapl_la_SOURCES) $(apl_SOURCES)
-DIST_SOURCES = $(am__libapl_la_SOURCES_DIST) $(am__apl_SOURCES_DIST)
+SOURCES = $(lib_gnu_apl_la_SOURCES) $(libapl_la_SOURCES) \
+	$(apl_SOURCES)
+DIST_SOURCES = $(am__lib_gnu_apl_la_SOURCES_DIST) \
+	$(am__libapl_la_SOURCES_DIST) $(am__apl_SOURCES_DIST)
 RECURSIVE_TARGETS = all-recursive check-recursive cscopelist-recursive \
 	ctags-recursive dvi-recursive html-recursive info-recursive \
 	install-data-recursive install-dvi-recursive \
@@ -763,7 +912,7 @@ common_SOURCES = buildtag buildtag.hh ../config.h \
 	Workspace.cc Workspace.hh static_Objects.cc static_Objects.hh \
 	$(am__append_3) $(am__append_6) $(am__append_7) \
 	$(am__append_10)
-pkglib_LTLIBRARIES = $(am__append_11)
+pkglib_LTLIBRARIES = $(am__append_11) $(am__append_12)
 @WANT_LIBAPL_TRUE@pkginclude_HEADERS = libapl.h
 @WANT_LIBAPL_TRUE@libapl_la_SOURCES = $(common_SOURCES) libapl.h libapl.cc
 @WANT_LIBAPL_TRUE@libapl_la_LDFLAGS = $(common_LDFLAGS) -avoid-version
@@ -773,10 +922,27 @@ pkglib_LTLIBRARIES = $(am__append_11)
 @WANT_LIBAPL_TRUE@libapl_la_CXXFLAGS = $(common_CXXFLAGS) \
 @WANT_LIBAPL_TRUE@	$(GCOV_WANTED) $(GPROF_WANTED) \
 @WANT_LIBAPL_TRUE@	$(CXX_RDYNAMIC)
-@WANT_LIBAPL_FALSE@apl_SOURCES = main.cc $(common_SOURCES)
-@WANT_LIBAPL_FALSE@apl_CXXFLAGS = $(common_CXXFLAGS) $(GCOV_WANTED) \
-@WANT_LIBAPL_FALSE@	$(GPROF_WANTED) $(CXX_RDYNAMIC)
-@WANT_LIBAPL_FALSE@apl_LDFLAGS = $(common_LDFLAGS)
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@lib_gnu_apl_la_SOURCES = $(common_SOURCES) python_apl.cc
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@lib_gnu_apl_la_LDFLAGS =  \
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	$(common_LDFLAGS) \
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	-avoid-version
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@lib_gnu_apl_la_CXXFLAGS =  \
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	$(common_CXXFLAGS) \
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	$(GCOV_WANTED) \
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	$(GPROF_WANTED) \
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	$(CXX_RDYNAMIC) -DNDEBUG \
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	-D_FORTIFY_SOURCE=2 \
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	-fwrapv -fPIC \
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	-fstack-protector \
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	--param=ssp-buffer-size=4 \
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	-I/usr/include/python3.4m
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@apl_SOURCES = main.cc $(common_SOURCES)
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@apl_CXXFLAGS =  \
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@	$(common_CXXFLAGS) \
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@	$(GCOV_WANTED) \
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@	$(GPROF_WANTED) \
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@	$(CXX_RDYNAMIC)
+@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@apl_LDFLAGS = $(common_LDFLAGS)
 apl_LDADD = $(LIBS)
 all: all-recursive
 
@@ -853,6 +1019,25 @@ sql/$(am__dirstamp):
 sql/$(DEPDIR)/$(am__dirstamp):
 	@$(MKDIR_P) sql/$(DEPDIR)
 	@: > sql/$(DEPDIR)/$(am__dirstamp)
+sql/lib_gnu_apl_la-SqliteArgListBuilder.lo: sql/$(am__dirstamp) \
+	sql/$(DEPDIR)/$(am__dirstamp)
+sql/lib_gnu_apl_la-SqliteConnection.lo: sql/$(am__dirstamp) \
+	sql/$(DEPDIR)/$(am__dirstamp)
+sql/lib_gnu_apl_la-SqliteResultValue.lo: sql/$(am__dirstamp) \
+	sql/$(DEPDIR)/$(am__dirstamp)
+sql/lib_gnu_apl_la-SqliteProvider.lo: sql/$(am__dirstamp) \
+	sql/$(DEPDIR)/$(am__dirstamp)
+sql/lib_gnu_apl_la-Connection.lo: sql/$(am__dirstamp) \
+	sql/$(DEPDIR)/$(am__dirstamp)
+sql/lib_gnu_apl_la-PostgresArgListBuilder.lo: sql/$(am__dirstamp) \
+	sql/$(DEPDIR)/$(am__dirstamp)
+sql/lib_gnu_apl_la-PostgresConnection.lo: sql/$(am__dirstamp) \
+	sql/$(DEPDIR)/$(am__dirstamp)
+sql/lib_gnu_apl_la-PostgresProvider.lo: sql/$(am__dirstamp) \
+	sql/$(DEPDIR)/$(am__dirstamp)
+
+lib_gnu_apl.la: $(lib_gnu_apl_la_OBJECTS) $(lib_gnu_apl_la_DEPENDENCIES) $(EXTRA_lib_gnu_apl_la_DEPENDENCIES) 
+	$(AM_V_CXXLD)$(lib_gnu_apl_la_LINK) $(am_lib_gnu_apl_la_rpath) $(lib_gnu_apl_la_OBJECTS) $(lib_gnu_apl_la_LIBADD) $(LIBS)
 sql/libapl_la-SqliteArgListBuilder.lo: sql/$(am__dirstamp) \
 	sql/$(DEPDIR)/$(am__dirstamp)
 sql/libapl_la-SqliteConnection.lo: sql/$(am__dirstamp) \
@@ -1048,6 +1233,104 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-main.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-sbrk.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl-static_Objects.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Archive.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Assert.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Avec.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Backtrace.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Bif_F12_FORMAT.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Bif_F12_SORT.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Bif_F12_TAKE_DROP.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Bif_OPER1_COMMUTE.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Bif_OPER1_EACH.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Bif_OPER1_REDUCE.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Bif_OPER1_SCAN.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Bif_OPER2_INNER.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Bif_OPER2_OUTER.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Bif_OPER2_POWER.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Bif_OPER2_RANK.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-CDR.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Cell.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-CharCell.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Command.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Common.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-ComplexCell.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-DerivedFunction.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-DiffOut.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Doxy.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-DynamicObject.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Error.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Executable.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-FloatCell.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Function.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-IO_Files.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Id.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-IndexExpr.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-IndexIterator.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-InputFile.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-IntCell.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-LApack.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-LibPaths.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-LineInput.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Logging.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-LvalCell.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Macro.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Malloc_hooks.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Nabla.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-NamedObject.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-NativeFunction.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-NumericCell.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Output.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Parallel.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Parser.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Performance.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-PointerCell.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Prefix.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-PrimitiveFunction.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-PrimitiveOperator.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-PrintBuffer.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-ProcessorID.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-QuadFunction.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Quad_CR.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Quad_DLX.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Quad_FFT.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Quad_FIO.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Quad_FX.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Quad_GTK.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Quad_PLOT.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Quad_RE.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Quad_RL.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Quad_SQL.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Quad_SVx.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Quad_TF.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Quad_WA.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-RealCell.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Regexp.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-ScalarFunction.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Security.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Shape.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-StateIndicator.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Svar_DB.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Svar_record.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Symbol.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-SymbolTable.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-SystemVariable.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-TabExpansion.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Thread_context.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Token.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Tokenizer.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-UCS_string.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-UCS_string_vector.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-UTF8_string.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-UserFunction.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-UserFunction_header.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-UserPreferences.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Value.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-ValueHistory.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-Workspace.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-configure_args.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-python_apl.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-sbrk.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lib_gnu_apl_la-static_Objects.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Archive.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Assert.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/libapl_la-Avec.Plo@am__quote@
@@ -1154,6 +1437,14 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@sql/$(DEPDIR)/apl-SqliteConnection.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sql/$(DEPDIR)/apl-SqliteProvider.Po@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sql/$(DEPDIR)/apl-SqliteResultValue.Po@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sql/$(DEPDIR)/lib_gnu_apl_la-Connection.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sql/$(DEPDIR)/lib_gnu_apl_la-PostgresArgListBuilder.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sql/$(DEPDIR)/lib_gnu_apl_la-PostgresConnection.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sql/$(DEPDIR)/lib_gnu_apl_la-PostgresProvider.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sql/$(DEPDIR)/lib_gnu_apl_la-SqliteArgListBuilder.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sql/$(DEPDIR)/lib_gnu_apl_la-SqliteConnection.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sql/$(DEPDIR)/lib_gnu_apl_la-SqliteProvider.Plo@am__quote@
+@AMDEP_TRUE@@am__include@ @am__quote@sql/$(DEPDIR)/lib_gnu_apl_la-SqliteResultValue.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sql/$(DEPDIR)/libapl_la-Connection.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sql/$(DEPDIR)/libapl_la-PostgresArgListBuilder.Plo@am__quote@
 @AMDEP_TRUE@@am__include@ @am__quote@sql/$(DEPDIR)/libapl_la-PostgresConnection.Plo@am__quote@
@@ -1186,6 +1477,748 @@ distclean-compile:
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='$<' object='$@' libtool=yes @AMDEPBACKSLASH@
 @AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LTCXXCOMPILE) -c -o $@ $<
+
+lib_gnu_apl_la-Archive.lo: Archive.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Archive.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Archive.Tpo -c -o lib_gnu_apl_la-Archive.lo `test -f 'Archive.cc' || echo '$(srcdir)/'`Archive.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Archive.Tpo $(DEPDIR)/lib_gnu_apl_la-Archive.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Archive.cc' object='lib_gnu_apl_la-Archive.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Archive.lo `test -f 'Archive.cc' || echo '$(srcdir)/'`Archive.cc
+
+lib_gnu_apl_la-Assert.lo: Assert.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Assert.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Assert.Tpo -c -o lib_gnu_apl_la-Assert.lo `test -f 'Assert.cc' || echo '$(srcdir)/'`Assert.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Assert.Tpo $(DEPDIR)/lib_gnu_apl_la-Assert.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Assert.cc' object='lib_gnu_apl_la-Assert.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Assert.lo `test -f 'Assert.cc' || echo '$(srcdir)/'`Assert.cc
+
+lib_gnu_apl_la-Avec.lo: Avec.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Avec.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Avec.Tpo -c -o lib_gnu_apl_la-Avec.lo `test -f 'Avec.cc' || echo '$(srcdir)/'`Avec.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Avec.Tpo $(DEPDIR)/lib_gnu_apl_la-Avec.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Avec.cc' object='lib_gnu_apl_la-Avec.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Avec.lo `test -f 'Avec.cc' || echo '$(srcdir)/'`Avec.cc
+
+lib_gnu_apl_la-Backtrace.lo: Backtrace.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Backtrace.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Backtrace.Tpo -c -o lib_gnu_apl_la-Backtrace.lo `test -f 'Backtrace.cc' || echo '$(srcdir)/'`Backtrace.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Backtrace.Tpo $(DEPDIR)/lib_gnu_apl_la-Backtrace.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Backtrace.cc' object='lib_gnu_apl_la-Backtrace.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Backtrace.lo `test -f 'Backtrace.cc' || echo '$(srcdir)/'`Backtrace.cc
+
+lib_gnu_apl_la-Bif_F12_FORMAT.lo: Bif_F12_FORMAT.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Bif_F12_FORMAT.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Bif_F12_FORMAT.Tpo -c -o lib_gnu_apl_la-Bif_F12_FORMAT.lo `test -f 'Bif_F12_FORMAT.cc' || echo '$(srcdir)/'`Bif_F12_FORMAT.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Bif_F12_FORMAT.Tpo $(DEPDIR)/lib_gnu_apl_la-Bif_F12_FORMAT.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Bif_F12_FORMAT.cc' object='lib_gnu_apl_la-Bif_F12_FORMAT.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Bif_F12_FORMAT.lo `test -f 'Bif_F12_FORMAT.cc' || echo '$(srcdir)/'`Bif_F12_FORMAT.cc
+
+lib_gnu_apl_la-Bif_F12_SORT.lo: Bif_F12_SORT.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Bif_F12_SORT.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Bif_F12_SORT.Tpo -c -o lib_gnu_apl_la-Bif_F12_SORT.lo `test -f 'Bif_F12_SORT.cc' || echo '$(srcdir)/'`Bif_F12_SORT.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Bif_F12_SORT.Tpo $(DEPDIR)/lib_gnu_apl_la-Bif_F12_SORT.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Bif_F12_SORT.cc' object='lib_gnu_apl_la-Bif_F12_SORT.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Bif_F12_SORT.lo `test -f 'Bif_F12_SORT.cc' || echo '$(srcdir)/'`Bif_F12_SORT.cc
+
+lib_gnu_apl_la-Bif_F12_TAKE_DROP.lo: Bif_F12_TAKE_DROP.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Bif_F12_TAKE_DROP.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Bif_F12_TAKE_DROP.Tpo -c -o lib_gnu_apl_la-Bif_F12_TAKE_DROP.lo `test -f 'Bif_F12_TAKE_DROP.cc' || echo '$(srcdir)/'`Bif_F12_TAKE_DROP.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Bif_F12_TAKE_DROP.Tpo $(DEPDIR)/lib_gnu_apl_la-Bif_F12_TAKE_DROP.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Bif_F12_TAKE_DROP.cc' object='lib_gnu_apl_la-Bif_F12_TAKE_DROP.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Bif_F12_TAKE_DROP.lo `test -f 'Bif_F12_TAKE_DROP.cc' || echo '$(srcdir)/'`Bif_F12_TAKE_DROP.cc
+
+lib_gnu_apl_la-Bif_OPER1_COMMUTE.lo: Bif_OPER1_COMMUTE.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Bif_OPER1_COMMUTE.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Bif_OPER1_COMMUTE.Tpo -c -o lib_gnu_apl_la-Bif_OPER1_COMMUTE.lo `test -f 'Bif_OPER1_COMMUTE.cc' || echo '$(srcdir)/'`Bif_OPER1_COMMUTE.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Bif_OPER1_COMMUTE.Tpo $(DEPDIR)/lib_gnu_apl_la-Bif_OPER1_COMMUTE.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Bif_OPER1_COMMUTE.cc' object='lib_gnu_apl_la-Bif_OPER1_COMMUTE.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Bif_OPER1_COMMUTE.lo `test -f 'Bif_OPER1_COMMUTE.cc' || echo '$(srcdir)/'`Bif_OPER1_COMMUTE.cc
+
+lib_gnu_apl_la-Bif_OPER1_EACH.lo: Bif_OPER1_EACH.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Bif_OPER1_EACH.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Bif_OPER1_EACH.Tpo -c -o lib_gnu_apl_la-Bif_OPER1_EACH.lo `test -f 'Bif_OPER1_EACH.cc' || echo '$(srcdir)/'`Bif_OPER1_EACH.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Bif_OPER1_EACH.Tpo $(DEPDIR)/lib_gnu_apl_la-Bif_OPER1_EACH.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Bif_OPER1_EACH.cc' object='lib_gnu_apl_la-Bif_OPER1_EACH.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Bif_OPER1_EACH.lo `test -f 'Bif_OPER1_EACH.cc' || echo '$(srcdir)/'`Bif_OPER1_EACH.cc
+
+lib_gnu_apl_la-Bif_OPER2_POWER.lo: Bif_OPER2_POWER.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Bif_OPER2_POWER.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Bif_OPER2_POWER.Tpo -c -o lib_gnu_apl_la-Bif_OPER2_POWER.lo `test -f 'Bif_OPER2_POWER.cc' || echo '$(srcdir)/'`Bif_OPER2_POWER.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Bif_OPER2_POWER.Tpo $(DEPDIR)/lib_gnu_apl_la-Bif_OPER2_POWER.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Bif_OPER2_POWER.cc' object='lib_gnu_apl_la-Bif_OPER2_POWER.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Bif_OPER2_POWER.lo `test -f 'Bif_OPER2_POWER.cc' || echo '$(srcdir)/'`Bif_OPER2_POWER.cc
+
+lib_gnu_apl_la-Bif_OPER2_INNER.lo: Bif_OPER2_INNER.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Bif_OPER2_INNER.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Bif_OPER2_INNER.Tpo -c -o lib_gnu_apl_la-Bif_OPER2_INNER.lo `test -f 'Bif_OPER2_INNER.cc' || echo '$(srcdir)/'`Bif_OPER2_INNER.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Bif_OPER2_INNER.Tpo $(DEPDIR)/lib_gnu_apl_la-Bif_OPER2_INNER.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Bif_OPER2_INNER.cc' object='lib_gnu_apl_la-Bif_OPER2_INNER.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Bif_OPER2_INNER.lo `test -f 'Bif_OPER2_INNER.cc' || echo '$(srcdir)/'`Bif_OPER2_INNER.cc
+
+lib_gnu_apl_la-Bif_OPER2_OUTER.lo: Bif_OPER2_OUTER.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Bif_OPER2_OUTER.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Bif_OPER2_OUTER.Tpo -c -o lib_gnu_apl_la-Bif_OPER2_OUTER.lo `test -f 'Bif_OPER2_OUTER.cc' || echo '$(srcdir)/'`Bif_OPER2_OUTER.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Bif_OPER2_OUTER.Tpo $(DEPDIR)/lib_gnu_apl_la-Bif_OPER2_OUTER.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Bif_OPER2_OUTER.cc' object='lib_gnu_apl_la-Bif_OPER2_OUTER.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Bif_OPER2_OUTER.lo `test -f 'Bif_OPER2_OUTER.cc' || echo '$(srcdir)/'`Bif_OPER2_OUTER.cc
+
+lib_gnu_apl_la-Bif_OPER2_RANK.lo: Bif_OPER2_RANK.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Bif_OPER2_RANK.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Bif_OPER2_RANK.Tpo -c -o lib_gnu_apl_la-Bif_OPER2_RANK.lo `test -f 'Bif_OPER2_RANK.cc' || echo '$(srcdir)/'`Bif_OPER2_RANK.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Bif_OPER2_RANK.Tpo $(DEPDIR)/lib_gnu_apl_la-Bif_OPER2_RANK.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Bif_OPER2_RANK.cc' object='lib_gnu_apl_la-Bif_OPER2_RANK.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Bif_OPER2_RANK.lo `test -f 'Bif_OPER2_RANK.cc' || echo '$(srcdir)/'`Bif_OPER2_RANK.cc
+
+lib_gnu_apl_la-Bif_OPER1_REDUCE.lo: Bif_OPER1_REDUCE.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Bif_OPER1_REDUCE.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Bif_OPER1_REDUCE.Tpo -c -o lib_gnu_apl_la-Bif_OPER1_REDUCE.lo `test -f 'Bif_OPER1_REDUCE.cc' || echo '$(srcdir)/'`Bif_OPER1_REDUCE.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Bif_OPER1_REDUCE.Tpo $(DEPDIR)/lib_gnu_apl_la-Bif_OPER1_REDUCE.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Bif_OPER1_REDUCE.cc' object='lib_gnu_apl_la-Bif_OPER1_REDUCE.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Bif_OPER1_REDUCE.lo `test -f 'Bif_OPER1_REDUCE.cc' || echo '$(srcdir)/'`Bif_OPER1_REDUCE.cc
+
+lib_gnu_apl_la-Bif_OPER1_SCAN.lo: Bif_OPER1_SCAN.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Bif_OPER1_SCAN.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Bif_OPER1_SCAN.Tpo -c -o lib_gnu_apl_la-Bif_OPER1_SCAN.lo `test -f 'Bif_OPER1_SCAN.cc' || echo '$(srcdir)/'`Bif_OPER1_SCAN.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Bif_OPER1_SCAN.Tpo $(DEPDIR)/lib_gnu_apl_la-Bif_OPER1_SCAN.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Bif_OPER1_SCAN.cc' object='lib_gnu_apl_la-Bif_OPER1_SCAN.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Bif_OPER1_SCAN.lo `test -f 'Bif_OPER1_SCAN.cc' || echo '$(srcdir)/'`Bif_OPER1_SCAN.cc
+
+lib_gnu_apl_la-CDR.lo: CDR.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-CDR.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-CDR.Tpo -c -o lib_gnu_apl_la-CDR.lo `test -f 'CDR.cc' || echo '$(srcdir)/'`CDR.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-CDR.Tpo $(DEPDIR)/lib_gnu_apl_la-CDR.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='CDR.cc' object='lib_gnu_apl_la-CDR.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-CDR.lo `test -f 'CDR.cc' || echo '$(srcdir)/'`CDR.cc
+
+lib_gnu_apl_la-Cell.lo: Cell.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Cell.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Cell.Tpo -c -o lib_gnu_apl_la-Cell.lo `test -f 'Cell.cc' || echo '$(srcdir)/'`Cell.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Cell.Tpo $(DEPDIR)/lib_gnu_apl_la-Cell.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Cell.cc' object='lib_gnu_apl_la-Cell.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Cell.lo `test -f 'Cell.cc' || echo '$(srcdir)/'`Cell.cc
+
+lib_gnu_apl_la-Doxy.lo: Doxy.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Doxy.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Doxy.Tpo -c -o lib_gnu_apl_la-Doxy.lo `test -f 'Doxy.cc' || echo '$(srcdir)/'`Doxy.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Doxy.Tpo $(DEPDIR)/lib_gnu_apl_la-Doxy.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Doxy.cc' object='lib_gnu_apl_la-Doxy.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Doxy.lo `test -f 'Doxy.cc' || echo '$(srcdir)/'`Doxy.cc
+
+lib_gnu_apl_la-CharCell.lo: CharCell.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-CharCell.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-CharCell.Tpo -c -o lib_gnu_apl_la-CharCell.lo `test -f 'CharCell.cc' || echo '$(srcdir)/'`CharCell.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-CharCell.Tpo $(DEPDIR)/lib_gnu_apl_la-CharCell.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='CharCell.cc' object='lib_gnu_apl_la-CharCell.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-CharCell.lo `test -f 'CharCell.cc' || echo '$(srcdir)/'`CharCell.cc
+
+lib_gnu_apl_la-Command.lo: Command.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Command.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Command.Tpo -c -o lib_gnu_apl_la-Command.lo `test -f 'Command.cc' || echo '$(srcdir)/'`Command.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Command.Tpo $(DEPDIR)/lib_gnu_apl_la-Command.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Command.cc' object='lib_gnu_apl_la-Command.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Command.lo `test -f 'Command.cc' || echo '$(srcdir)/'`Command.cc
+
+lib_gnu_apl_la-Common.lo: Common.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Common.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Common.Tpo -c -o lib_gnu_apl_la-Common.lo `test -f 'Common.cc' || echo '$(srcdir)/'`Common.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Common.Tpo $(DEPDIR)/lib_gnu_apl_la-Common.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Common.cc' object='lib_gnu_apl_la-Common.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Common.lo `test -f 'Common.cc' || echo '$(srcdir)/'`Common.cc
+
+lib_gnu_apl_la-ComplexCell.lo: ComplexCell.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-ComplexCell.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-ComplexCell.Tpo -c -o lib_gnu_apl_la-ComplexCell.lo `test -f 'ComplexCell.cc' || echo '$(srcdir)/'`ComplexCell.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-ComplexCell.Tpo $(DEPDIR)/lib_gnu_apl_la-ComplexCell.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='ComplexCell.cc' object='lib_gnu_apl_la-ComplexCell.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-ComplexCell.lo `test -f 'ComplexCell.cc' || echo '$(srcdir)/'`ComplexCell.cc
+
+lib_gnu_apl_la-configure_args.lo: configure_args.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-configure_args.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-configure_args.Tpo -c -o lib_gnu_apl_la-configure_args.lo `test -f 'configure_args.cc' || echo '$(srcdir)/'`configure_args.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-configure_args.Tpo $(DEPDIR)/lib_gnu_apl_la-configure_args.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='configure_args.cc' object='lib_gnu_apl_la-configure_args.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-configure_args.lo `test -f 'configure_args.cc' || echo '$(srcdir)/'`configure_args.cc
+
+lib_gnu_apl_la-DiffOut.lo: DiffOut.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-DiffOut.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-DiffOut.Tpo -c -o lib_gnu_apl_la-DiffOut.lo `test -f 'DiffOut.cc' || echo '$(srcdir)/'`DiffOut.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-DiffOut.Tpo $(DEPDIR)/lib_gnu_apl_la-DiffOut.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='DiffOut.cc' object='lib_gnu_apl_la-DiffOut.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-DiffOut.lo `test -f 'DiffOut.cc' || echo '$(srcdir)/'`DiffOut.cc
+
+lib_gnu_apl_la-DynamicObject.lo: DynamicObject.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-DynamicObject.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-DynamicObject.Tpo -c -o lib_gnu_apl_la-DynamicObject.lo `test -f 'DynamicObject.cc' || echo '$(srcdir)/'`DynamicObject.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-DynamicObject.Tpo $(DEPDIR)/lib_gnu_apl_la-DynamicObject.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='DynamicObject.cc' object='lib_gnu_apl_la-DynamicObject.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-DynamicObject.lo `test -f 'DynamicObject.cc' || echo '$(srcdir)/'`DynamicObject.cc
+
+lib_gnu_apl_la-Error.lo: Error.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Error.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Error.Tpo -c -o lib_gnu_apl_la-Error.lo `test -f 'Error.cc' || echo '$(srcdir)/'`Error.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Error.Tpo $(DEPDIR)/lib_gnu_apl_la-Error.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Error.cc' object='lib_gnu_apl_la-Error.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Error.lo `test -f 'Error.cc' || echo '$(srcdir)/'`Error.cc
+
+lib_gnu_apl_la-Executable.lo: Executable.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Executable.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Executable.Tpo -c -o lib_gnu_apl_la-Executable.lo `test -f 'Executable.cc' || echo '$(srcdir)/'`Executable.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Executable.Tpo $(DEPDIR)/lib_gnu_apl_la-Executable.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Executable.cc' object='lib_gnu_apl_la-Executable.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Executable.lo `test -f 'Executable.cc' || echo '$(srcdir)/'`Executable.cc
+
+lib_gnu_apl_la-FloatCell.lo: FloatCell.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-FloatCell.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-FloatCell.Tpo -c -o lib_gnu_apl_la-FloatCell.lo `test -f 'FloatCell.cc' || echo '$(srcdir)/'`FloatCell.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-FloatCell.Tpo $(DEPDIR)/lib_gnu_apl_la-FloatCell.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='FloatCell.cc' object='lib_gnu_apl_la-FloatCell.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-FloatCell.lo `test -f 'FloatCell.cc' || echo '$(srcdir)/'`FloatCell.cc
+
+lib_gnu_apl_la-Function.lo: Function.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Function.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Function.Tpo -c -o lib_gnu_apl_la-Function.lo `test -f 'Function.cc' || echo '$(srcdir)/'`Function.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Function.Tpo $(DEPDIR)/lib_gnu_apl_la-Function.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Function.cc' object='lib_gnu_apl_la-Function.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Function.lo `test -f 'Function.cc' || echo '$(srcdir)/'`Function.cc
+
+lib_gnu_apl_la-DerivedFunction.lo: DerivedFunction.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-DerivedFunction.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-DerivedFunction.Tpo -c -o lib_gnu_apl_la-DerivedFunction.lo `test -f 'DerivedFunction.cc' || echo '$(srcdir)/'`DerivedFunction.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-DerivedFunction.Tpo $(DEPDIR)/lib_gnu_apl_la-DerivedFunction.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='DerivedFunction.cc' object='lib_gnu_apl_la-DerivedFunction.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-DerivedFunction.lo `test -f 'DerivedFunction.cc' || echo '$(srcdir)/'`DerivedFunction.cc
+
+lib_gnu_apl_la-Id.lo: Id.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Id.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Id.Tpo -c -o lib_gnu_apl_la-Id.lo `test -f 'Id.cc' || echo '$(srcdir)/'`Id.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Id.Tpo $(DEPDIR)/lib_gnu_apl_la-Id.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Id.cc' object='lib_gnu_apl_la-Id.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Id.lo `test -f 'Id.cc' || echo '$(srcdir)/'`Id.cc
+
+lib_gnu_apl_la-IndexExpr.lo: IndexExpr.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-IndexExpr.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-IndexExpr.Tpo -c -o lib_gnu_apl_la-IndexExpr.lo `test -f 'IndexExpr.cc' || echo '$(srcdir)/'`IndexExpr.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-IndexExpr.Tpo $(DEPDIR)/lib_gnu_apl_la-IndexExpr.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='IndexExpr.cc' object='lib_gnu_apl_la-IndexExpr.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-IndexExpr.lo `test -f 'IndexExpr.cc' || echo '$(srcdir)/'`IndexExpr.cc
+
+lib_gnu_apl_la-IndexIterator.lo: IndexIterator.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-IndexIterator.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-IndexIterator.Tpo -c -o lib_gnu_apl_la-IndexIterator.lo `test -f 'IndexIterator.cc' || echo '$(srcdir)/'`IndexIterator.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-IndexIterator.Tpo $(DEPDIR)/lib_gnu_apl_la-IndexIterator.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='IndexIterator.cc' object='lib_gnu_apl_la-IndexIterator.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-IndexIterator.lo `test -f 'IndexIterator.cc' || echo '$(srcdir)/'`IndexIterator.cc
+
+lib_gnu_apl_la-InputFile.lo: InputFile.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-InputFile.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-InputFile.Tpo -c -o lib_gnu_apl_la-InputFile.lo `test -f 'InputFile.cc' || echo '$(srcdir)/'`InputFile.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-InputFile.Tpo $(DEPDIR)/lib_gnu_apl_la-InputFile.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='InputFile.cc' object='lib_gnu_apl_la-InputFile.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-InputFile.lo `test -f 'InputFile.cc' || echo '$(srcdir)/'`InputFile.cc
+
+lib_gnu_apl_la-IntCell.lo: IntCell.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-IntCell.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-IntCell.Tpo -c -o lib_gnu_apl_la-IntCell.lo `test -f 'IntCell.cc' || echo '$(srcdir)/'`IntCell.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-IntCell.Tpo $(DEPDIR)/lib_gnu_apl_la-IntCell.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='IntCell.cc' object='lib_gnu_apl_la-IntCell.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-IntCell.lo `test -f 'IntCell.cc' || echo '$(srcdir)/'`IntCell.cc
+
+lib_gnu_apl_la-IO_Files.lo: IO_Files.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-IO_Files.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-IO_Files.Tpo -c -o lib_gnu_apl_la-IO_Files.lo `test -f 'IO_Files.cc' || echo '$(srcdir)/'`IO_Files.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-IO_Files.Tpo $(DEPDIR)/lib_gnu_apl_la-IO_Files.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='IO_Files.cc' object='lib_gnu_apl_la-IO_Files.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-IO_Files.lo `test -f 'IO_Files.cc' || echo '$(srcdir)/'`IO_Files.cc
+
+lib_gnu_apl_la-LApack.lo: LApack.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-LApack.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-LApack.Tpo -c -o lib_gnu_apl_la-LApack.lo `test -f 'LApack.cc' || echo '$(srcdir)/'`LApack.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-LApack.Tpo $(DEPDIR)/lib_gnu_apl_la-LApack.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='LApack.cc' object='lib_gnu_apl_la-LApack.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-LApack.lo `test -f 'LApack.cc' || echo '$(srcdir)/'`LApack.cc
+
+lib_gnu_apl_la-LibPaths.lo: LibPaths.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-LibPaths.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-LibPaths.Tpo -c -o lib_gnu_apl_la-LibPaths.lo `test -f 'LibPaths.cc' || echo '$(srcdir)/'`LibPaths.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-LibPaths.Tpo $(DEPDIR)/lib_gnu_apl_la-LibPaths.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='LibPaths.cc' object='lib_gnu_apl_la-LibPaths.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-LibPaths.lo `test -f 'LibPaths.cc' || echo '$(srcdir)/'`LibPaths.cc
+
+lib_gnu_apl_la-LineInput.lo: LineInput.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-LineInput.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-LineInput.Tpo -c -o lib_gnu_apl_la-LineInput.lo `test -f 'LineInput.cc' || echo '$(srcdir)/'`LineInput.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-LineInput.Tpo $(DEPDIR)/lib_gnu_apl_la-LineInput.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='LineInput.cc' object='lib_gnu_apl_la-LineInput.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-LineInput.lo `test -f 'LineInput.cc' || echo '$(srcdir)/'`LineInput.cc
+
+lib_gnu_apl_la-Logging.lo: Logging.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Logging.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Logging.Tpo -c -o lib_gnu_apl_la-Logging.lo `test -f 'Logging.cc' || echo '$(srcdir)/'`Logging.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Logging.Tpo $(DEPDIR)/lib_gnu_apl_la-Logging.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Logging.cc' object='lib_gnu_apl_la-Logging.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Logging.lo `test -f 'Logging.cc' || echo '$(srcdir)/'`Logging.cc
+
+lib_gnu_apl_la-LvalCell.lo: LvalCell.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-LvalCell.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-LvalCell.Tpo -c -o lib_gnu_apl_la-LvalCell.lo `test -f 'LvalCell.cc' || echo '$(srcdir)/'`LvalCell.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-LvalCell.Tpo $(DEPDIR)/lib_gnu_apl_la-LvalCell.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='LvalCell.cc' object='lib_gnu_apl_la-LvalCell.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-LvalCell.lo `test -f 'LvalCell.cc' || echo '$(srcdir)/'`LvalCell.cc
+
+lib_gnu_apl_la-Malloc_hooks.lo: Malloc_hooks.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Malloc_hooks.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Malloc_hooks.Tpo -c -o lib_gnu_apl_la-Malloc_hooks.lo `test -f 'Malloc_hooks.cc' || echo '$(srcdir)/'`Malloc_hooks.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Malloc_hooks.Tpo $(DEPDIR)/lib_gnu_apl_la-Malloc_hooks.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Malloc_hooks.cc' object='lib_gnu_apl_la-Malloc_hooks.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Malloc_hooks.lo `test -f 'Malloc_hooks.cc' || echo '$(srcdir)/'`Malloc_hooks.cc
+
+lib_gnu_apl_la-Nabla.lo: Nabla.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Nabla.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Nabla.Tpo -c -o lib_gnu_apl_la-Nabla.lo `test -f 'Nabla.cc' || echo '$(srcdir)/'`Nabla.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Nabla.Tpo $(DEPDIR)/lib_gnu_apl_la-Nabla.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Nabla.cc' object='lib_gnu_apl_la-Nabla.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Nabla.lo `test -f 'Nabla.cc' || echo '$(srcdir)/'`Nabla.cc
+
+lib_gnu_apl_la-Macro.lo: Macro.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Macro.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Macro.Tpo -c -o lib_gnu_apl_la-Macro.lo `test -f 'Macro.cc' || echo '$(srcdir)/'`Macro.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Macro.Tpo $(DEPDIR)/lib_gnu_apl_la-Macro.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Macro.cc' object='lib_gnu_apl_la-Macro.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Macro.lo `test -f 'Macro.cc' || echo '$(srcdir)/'`Macro.cc
+
+lib_gnu_apl_la-NamedObject.lo: NamedObject.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-NamedObject.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-NamedObject.Tpo -c -o lib_gnu_apl_la-NamedObject.lo `test -f 'NamedObject.cc' || echo '$(srcdir)/'`NamedObject.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-NamedObject.Tpo $(DEPDIR)/lib_gnu_apl_la-NamedObject.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='NamedObject.cc' object='lib_gnu_apl_la-NamedObject.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-NamedObject.lo `test -f 'NamedObject.cc' || echo '$(srcdir)/'`NamedObject.cc
+
+lib_gnu_apl_la-NativeFunction.lo: NativeFunction.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-NativeFunction.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-NativeFunction.Tpo -c -o lib_gnu_apl_la-NativeFunction.lo `test -f 'NativeFunction.cc' || echo '$(srcdir)/'`NativeFunction.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-NativeFunction.Tpo $(DEPDIR)/lib_gnu_apl_la-NativeFunction.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='NativeFunction.cc' object='lib_gnu_apl_la-NativeFunction.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-NativeFunction.lo `test -f 'NativeFunction.cc' || echo '$(srcdir)/'`NativeFunction.cc
+
+lib_gnu_apl_la-NumericCell.lo: NumericCell.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-NumericCell.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-NumericCell.Tpo -c -o lib_gnu_apl_la-NumericCell.lo `test -f 'NumericCell.cc' || echo '$(srcdir)/'`NumericCell.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-NumericCell.Tpo $(DEPDIR)/lib_gnu_apl_la-NumericCell.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='NumericCell.cc' object='lib_gnu_apl_la-NumericCell.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-NumericCell.lo `test -f 'NumericCell.cc' || echo '$(srcdir)/'`NumericCell.cc
+
+lib_gnu_apl_la-Output.lo: Output.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Output.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Output.Tpo -c -o lib_gnu_apl_la-Output.lo `test -f 'Output.cc' || echo '$(srcdir)/'`Output.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Output.Tpo $(DEPDIR)/lib_gnu_apl_la-Output.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Output.cc' object='lib_gnu_apl_la-Output.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Output.lo `test -f 'Output.cc' || echo '$(srcdir)/'`Output.cc
+
+lib_gnu_apl_la-Parser.lo: Parser.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Parser.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Parser.Tpo -c -o lib_gnu_apl_la-Parser.lo `test -f 'Parser.cc' || echo '$(srcdir)/'`Parser.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Parser.Tpo $(DEPDIR)/lib_gnu_apl_la-Parser.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Parser.cc' object='lib_gnu_apl_la-Parser.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Parser.lo `test -f 'Parser.cc' || echo '$(srcdir)/'`Parser.cc
+
+lib_gnu_apl_la-Prefix.lo: Prefix.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Prefix.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Prefix.Tpo -c -o lib_gnu_apl_la-Prefix.lo `test -f 'Prefix.cc' || echo '$(srcdir)/'`Prefix.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Prefix.Tpo $(DEPDIR)/lib_gnu_apl_la-Prefix.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Prefix.cc' object='lib_gnu_apl_la-Prefix.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Prefix.lo `test -f 'Prefix.cc' || echo '$(srcdir)/'`Prefix.cc
+
+lib_gnu_apl_la-PointerCell.lo: PointerCell.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-PointerCell.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-PointerCell.Tpo -c -o lib_gnu_apl_la-PointerCell.lo `test -f 'PointerCell.cc' || echo '$(srcdir)/'`PointerCell.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-PointerCell.Tpo $(DEPDIR)/lib_gnu_apl_la-PointerCell.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='PointerCell.cc' object='lib_gnu_apl_la-PointerCell.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-PointerCell.lo `test -f 'PointerCell.cc' || echo '$(srcdir)/'`PointerCell.cc
+
+lib_gnu_apl_la-PrimitiveFunction.lo: PrimitiveFunction.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-PrimitiveFunction.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-PrimitiveFunction.Tpo -c -o lib_gnu_apl_la-PrimitiveFunction.lo `test -f 'PrimitiveFunction.cc' || echo '$(srcdir)/'`PrimitiveFunction.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-PrimitiveFunction.Tpo $(DEPDIR)/lib_gnu_apl_la-PrimitiveFunction.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='PrimitiveFunction.cc' object='lib_gnu_apl_la-PrimitiveFunction.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-PrimitiveFunction.lo `test -f 'PrimitiveFunction.cc' || echo '$(srcdir)/'`PrimitiveFunction.cc
+
+lib_gnu_apl_la-PrimitiveOperator.lo: PrimitiveOperator.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-PrimitiveOperator.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-PrimitiveOperator.Tpo -c -o lib_gnu_apl_la-PrimitiveOperator.lo `test -f 'PrimitiveOperator.cc' || echo '$(srcdir)/'`PrimitiveOperator.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-PrimitiveOperator.Tpo $(DEPDIR)/lib_gnu_apl_la-PrimitiveOperator.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='PrimitiveOperator.cc' object='lib_gnu_apl_la-PrimitiveOperator.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-PrimitiveOperator.lo `test -f 'PrimitiveOperator.cc' || echo '$(srcdir)/'`PrimitiveOperator.cc
+
+lib_gnu_apl_la-PrintBuffer.lo: PrintBuffer.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-PrintBuffer.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-PrintBuffer.Tpo -c -o lib_gnu_apl_la-PrintBuffer.lo `test -f 'PrintBuffer.cc' || echo '$(srcdir)/'`PrintBuffer.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-PrintBuffer.Tpo $(DEPDIR)/lib_gnu_apl_la-PrintBuffer.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='PrintBuffer.cc' object='lib_gnu_apl_la-PrintBuffer.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-PrintBuffer.lo `test -f 'PrintBuffer.cc' || echo '$(srcdir)/'`PrintBuffer.cc
+
+lib_gnu_apl_la-QuadFunction.lo: QuadFunction.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-QuadFunction.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-QuadFunction.Tpo -c -o lib_gnu_apl_la-QuadFunction.lo `test -f 'QuadFunction.cc' || echo '$(srcdir)/'`QuadFunction.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-QuadFunction.Tpo $(DEPDIR)/lib_gnu_apl_la-QuadFunction.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='QuadFunction.cc' object='lib_gnu_apl_la-QuadFunction.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-QuadFunction.lo `test -f 'QuadFunction.cc' || echo '$(srcdir)/'`QuadFunction.cc
+
+lib_gnu_apl_la-ProcessorID.lo: ProcessorID.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-ProcessorID.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-ProcessorID.Tpo -c -o lib_gnu_apl_la-ProcessorID.lo `test -f 'ProcessorID.cc' || echo '$(srcdir)/'`ProcessorID.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-ProcessorID.Tpo $(DEPDIR)/lib_gnu_apl_la-ProcessorID.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='ProcessorID.cc' object='lib_gnu_apl_la-ProcessorID.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-ProcessorID.lo `test -f 'ProcessorID.cc' || echo '$(srcdir)/'`ProcessorID.cc
+
+lib_gnu_apl_la-Quad_CR.lo: Quad_CR.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Quad_CR.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Quad_CR.Tpo -c -o lib_gnu_apl_la-Quad_CR.lo `test -f 'Quad_CR.cc' || echo '$(srcdir)/'`Quad_CR.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Quad_CR.Tpo $(DEPDIR)/lib_gnu_apl_la-Quad_CR.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Quad_CR.cc' object='lib_gnu_apl_la-Quad_CR.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Quad_CR.lo `test -f 'Quad_CR.cc' || echo '$(srcdir)/'`Quad_CR.cc
+
+lib_gnu_apl_la-Quad_DLX.lo: Quad_DLX.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Quad_DLX.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Quad_DLX.Tpo -c -o lib_gnu_apl_la-Quad_DLX.lo `test -f 'Quad_DLX.cc' || echo '$(srcdir)/'`Quad_DLX.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Quad_DLX.Tpo $(DEPDIR)/lib_gnu_apl_la-Quad_DLX.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Quad_DLX.cc' object='lib_gnu_apl_la-Quad_DLX.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Quad_DLX.lo `test -f 'Quad_DLX.cc' || echo '$(srcdir)/'`Quad_DLX.cc
+
+lib_gnu_apl_la-Quad_FFT.lo: Quad_FFT.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Quad_FFT.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Quad_FFT.Tpo -c -o lib_gnu_apl_la-Quad_FFT.lo `test -f 'Quad_FFT.cc' || echo '$(srcdir)/'`Quad_FFT.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Quad_FFT.Tpo $(DEPDIR)/lib_gnu_apl_la-Quad_FFT.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Quad_FFT.cc' object='lib_gnu_apl_la-Quad_FFT.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Quad_FFT.lo `test -f 'Quad_FFT.cc' || echo '$(srcdir)/'`Quad_FFT.cc
+
+lib_gnu_apl_la-Quad_FIO.lo: Quad_FIO.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Quad_FIO.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Quad_FIO.Tpo -c -o lib_gnu_apl_la-Quad_FIO.lo `test -f 'Quad_FIO.cc' || echo '$(srcdir)/'`Quad_FIO.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Quad_FIO.Tpo $(DEPDIR)/lib_gnu_apl_la-Quad_FIO.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Quad_FIO.cc' object='lib_gnu_apl_la-Quad_FIO.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Quad_FIO.lo `test -f 'Quad_FIO.cc' || echo '$(srcdir)/'`Quad_FIO.cc
+
+lib_gnu_apl_la-Quad_FX.lo: Quad_FX.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Quad_FX.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Quad_FX.Tpo -c -o lib_gnu_apl_la-Quad_FX.lo `test -f 'Quad_FX.cc' || echo '$(srcdir)/'`Quad_FX.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Quad_FX.Tpo $(DEPDIR)/lib_gnu_apl_la-Quad_FX.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Quad_FX.cc' object='lib_gnu_apl_la-Quad_FX.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Quad_FX.lo `test -f 'Quad_FX.cc' || echo '$(srcdir)/'`Quad_FX.cc
+
+lib_gnu_apl_la-Quad_GTK.lo: Quad_GTK.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Quad_GTK.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Quad_GTK.Tpo -c -o lib_gnu_apl_la-Quad_GTK.lo `test -f 'Quad_GTK.cc' || echo '$(srcdir)/'`Quad_GTK.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Quad_GTK.Tpo $(DEPDIR)/lib_gnu_apl_la-Quad_GTK.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Quad_GTK.cc' object='lib_gnu_apl_la-Quad_GTK.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Quad_GTK.lo `test -f 'Quad_GTK.cc' || echo '$(srcdir)/'`Quad_GTK.cc
+
+lib_gnu_apl_la-Quad_PLOT.lo: Quad_PLOT.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Quad_PLOT.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Quad_PLOT.Tpo -c -o lib_gnu_apl_la-Quad_PLOT.lo `test -f 'Quad_PLOT.cc' || echo '$(srcdir)/'`Quad_PLOT.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Quad_PLOT.Tpo $(DEPDIR)/lib_gnu_apl_la-Quad_PLOT.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Quad_PLOT.cc' object='lib_gnu_apl_la-Quad_PLOT.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Quad_PLOT.lo `test -f 'Quad_PLOT.cc' || echo '$(srcdir)/'`Quad_PLOT.cc
+
+lib_gnu_apl_la-Quad_RE.lo: Quad_RE.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Quad_RE.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Quad_RE.Tpo -c -o lib_gnu_apl_la-Quad_RE.lo `test -f 'Quad_RE.cc' || echo '$(srcdir)/'`Quad_RE.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Quad_RE.Tpo $(DEPDIR)/lib_gnu_apl_la-Quad_RE.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Quad_RE.cc' object='lib_gnu_apl_la-Quad_RE.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Quad_RE.lo `test -f 'Quad_RE.cc' || echo '$(srcdir)/'`Quad_RE.cc
+
+lib_gnu_apl_la-Quad_RL.lo: Quad_RL.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Quad_RL.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Quad_RL.Tpo -c -o lib_gnu_apl_la-Quad_RL.lo `test -f 'Quad_RL.cc' || echo '$(srcdir)/'`Quad_RL.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Quad_RL.Tpo $(DEPDIR)/lib_gnu_apl_la-Quad_RL.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Quad_RL.cc' object='lib_gnu_apl_la-Quad_RL.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Quad_RL.lo `test -f 'Quad_RL.cc' || echo '$(srcdir)/'`Quad_RL.cc
+
+lib_gnu_apl_la-Quad_SQL.lo: Quad_SQL.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Quad_SQL.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Quad_SQL.Tpo -c -o lib_gnu_apl_la-Quad_SQL.lo `test -f 'Quad_SQL.cc' || echo '$(srcdir)/'`Quad_SQL.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Quad_SQL.Tpo $(DEPDIR)/lib_gnu_apl_la-Quad_SQL.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Quad_SQL.cc' object='lib_gnu_apl_la-Quad_SQL.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Quad_SQL.lo `test -f 'Quad_SQL.cc' || echo '$(srcdir)/'`Quad_SQL.cc
+
+lib_gnu_apl_la-Quad_SVx.lo: Quad_SVx.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Quad_SVx.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Quad_SVx.Tpo -c -o lib_gnu_apl_la-Quad_SVx.lo `test -f 'Quad_SVx.cc' || echo '$(srcdir)/'`Quad_SVx.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Quad_SVx.Tpo $(DEPDIR)/lib_gnu_apl_la-Quad_SVx.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Quad_SVx.cc' object='lib_gnu_apl_la-Quad_SVx.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Quad_SVx.lo `test -f 'Quad_SVx.cc' || echo '$(srcdir)/'`Quad_SVx.cc
+
+lib_gnu_apl_la-Quad_TF.lo: Quad_TF.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Quad_TF.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Quad_TF.Tpo -c -o lib_gnu_apl_la-Quad_TF.lo `test -f 'Quad_TF.cc' || echo '$(srcdir)/'`Quad_TF.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Quad_TF.Tpo $(DEPDIR)/lib_gnu_apl_la-Quad_TF.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Quad_TF.cc' object='lib_gnu_apl_la-Quad_TF.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Quad_TF.lo `test -f 'Quad_TF.cc' || echo '$(srcdir)/'`Quad_TF.cc
+
+lib_gnu_apl_la-Quad_WA.lo: Quad_WA.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Quad_WA.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Quad_WA.Tpo -c -o lib_gnu_apl_la-Quad_WA.lo `test -f 'Quad_WA.cc' || echo '$(srcdir)/'`Quad_WA.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Quad_WA.Tpo $(DEPDIR)/lib_gnu_apl_la-Quad_WA.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Quad_WA.cc' object='lib_gnu_apl_la-Quad_WA.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Quad_WA.lo `test -f 'Quad_WA.cc' || echo '$(srcdir)/'`Quad_WA.cc
+
+lib_gnu_apl_la-Parallel.lo: Parallel.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Parallel.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Parallel.Tpo -c -o lib_gnu_apl_la-Parallel.lo `test -f 'Parallel.cc' || echo '$(srcdir)/'`Parallel.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Parallel.Tpo $(DEPDIR)/lib_gnu_apl_la-Parallel.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Parallel.cc' object='lib_gnu_apl_la-Parallel.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Parallel.lo `test -f 'Parallel.cc' || echo '$(srcdir)/'`Parallel.cc
+
+lib_gnu_apl_la-Performance.lo: Performance.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Performance.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Performance.Tpo -c -o lib_gnu_apl_la-Performance.lo `test -f 'Performance.cc' || echo '$(srcdir)/'`Performance.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Performance.Tpo $(DEPDIR)/lib_gnu_apl_la-Performance.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Performance.cc' object='lib_gnu_apl_la-Performance.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Performance.lo `test -f 'Performance.cc' || echo '$(srcdir)/'`Performance.cc
+
+lib_gnu_apl_la-RealCell.lo: RealCell.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-RealCell.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-RealCell.Tpo -c -o lib_gnu_apl_la-RealCell.lo `test -f 'RealCell.cc' || echo '$(srcdir)/'`RealCell.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-RealCell.Tpo $(DEPDIR)/lib_gnu_apl_la-RealCell.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='RealCell.cc' object='lib_gnu_apl_la-RealCell.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-RealCell.lo `test -f 'RealCell.cc' || echo '$(srcdir)/'`RealCell.cc
+
+lib_gnu_apl_la-sbrk.lo: sbrk.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-sbrk.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-sbrk.Tpo -c -o lib_gnu_apl_la-sbrk.lo `test -f 'sbrk.cc' || echo '$(srcdir)/'`sbrk.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-sbrk.Tpo $(DEPDIR)/lib_gnu_apl_la-sbrk.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sbrk.cc' object='lib_gnu_apl_la-sbrk.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-sbrk.lo `test -f 'sbrk.cc' || echo '$(srcdir)/'`sbrk.cc
+
+lib_gnu_apl_la-Shape.lo: Shape.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Shape.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Shape.Tpo -c -o lib_gnu_apl_la-Shape.lo `test -f 'Shape.cc' || echo '$(srcdir)/'`Shape.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Shape.Tpo $(DEPDIR)/lib_gnu_apl_la-Shape.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Shape.cc' object='lib_gnu_apl_la-Shape.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Shape.lo `test -f 'Shape.cc' || echo '$(srcdir)/'`Shape.cc
+
+lib_gnu_apl_la-ScalarFunction.lo: ScalarFunction.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-ScalarFunction.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-ScalarFunction.Tpo -c -o lib_gnu_apl_la-ScalarFunction.lo `test -f 'ScalarFunction.cc' || echo '$(srcdir)/'`ScalarFunction.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-ScalarFunction.Tpo $(DEPDIR)/lib_gnu_apl_la-ScalarFunction.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='ScalarFunction.cc' object='lib_gnu_apl_la-ScalarFunction.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-ScalarFunction.lo `test -f 'ScalarFunction.cc' || echo '$(srcdir)/'`ScalarFunction.cc
+
+lib_gnu_apl_la-Security.lo: Security.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Security.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Security.Tpo -c -o lib_gnu_apl_la-Security.lo `test -f 'Security.cc' || echo '$(srcdir)/'`Security.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Security.Tpo $(DEPDIR)/lib_gnu_apl_la-Security.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Security.cc' object='lib_gnu_apl_la-Security.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Security.lo `test -f 'Security.cc' || echo '$(srcdir)/'`Security.cc
+
+lib_gnu_apl_la-StateIndicator.lo: StateIndicator.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-StateIndicator.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-StateIndicator.Tpo -c -o lib_gnu_apl_la-StateIndicator.lo `test -f 'StateIndicator.cc' || echo '$(srcdir)/'`StateIndicator.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-StateIndicator.Tpo $(DEPDIR)/lib_gnu_apl_la-StateIndicator.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='StateIndicator.cc' object='lib_gnu_apl_la-StateIndicator.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-StateIndicator.lo `test -f 'StateIndicator.cc' || echo '$(srcdir)/'`StateIndicator.cc
+
+lib_gnu_apl_la-Svar_DB.lo: Svar_DB.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Svar_DB.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Svar_DB.Tpo -c -o lib_gnu_apl_la-Svar_DB.lo `test -f 'Svar_DB.cc' || echo '$(srcdir)/'`Svar_DB.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Svar_DB.Tpo $(DEPDIR)/lib_gnu_apl_la-Svar_DB.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Svar_DB.cc' object='lib_gnu_apl_la-Svar_DB.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Svar_DB.lo `test -f 'Svar_DB.cc' || echo '$(srcdir)/'`Svar_DB.cc
+
+lib_gnu_apl_la-Svar_record.lo: Svar_record.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Svar_record.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Svar_record.Tpo -c -o lib_gnu_apl_la-Svar_record.lo `test -f 'Svar_record.cc' || echo '$(srcdir)/'`Svar_record.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Svar_record.Tpo $(DEPDIR)/lib_gnu_apl_la-Svar_record.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Svar_record.cc' object='lib_gnu_apl_la-Svar_record.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Svar_record.lo `test -f 'Svar_record.cc' || echo '$(srcdir)/'`Svar_record.cc
+
+lib_gnu_apl_la-Symbol.lo: Symbol.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Symbol.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Symbol.Tpo -c -o lib_gnu_apl_la-Symbol.lo `test -f 'Symbol.cc' || echo '$(srcdir)/'`Symbol.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Symbol.Tpo $(DEPDIR)/lib_gnu_apl_la-Symbol.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Symbol.cc' object='lib_gnu_apl_la-Symbol.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Symbol.lo `test -f 'Symbol.cc' || echo '$(srcdir)/'`Symbol.cc
+
+lib_gnu_apl_la-SymbolTable.lo: SymbolTable.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-SymbolTable.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-SymbolTable.Tpo -c -o lib_gnu_apl_la-SymbolTable.lo `test -f 'SymbolTable.cc' || echo '$(srcdir)/'`SymbolTable.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-SymbolTable.Tpo $(DEPDIR)/lib_gnu_apl_la-SymbolTable.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='SymbolTable.cc' object='lib_gnu_apl_la-SymbolTable.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-SymbolTable.lo `test -f 'SymbolTable.cc' || echo '$(srcdir)/'`SymbolTable.cc
+
+lib_gnu_apl_la-SystemVariable.lo: SystemVariable.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-SystemVariable.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-SystemVariable.Tpo -c -o lib_gnu_apl_la-SystemVariable.lo `test -f 'SystemVariable.cc' || echo '$(srcdir)/'`SystemVariable.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-SystemVariable.Tpo $(DEPDIR)/lib_gnu_apl_la-SystemVariable.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='SystemVariable.cc' object='lib_gnu_apl_la-SystemVariable.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-SystemVariable.lo `test -f 'SystemVariable.cc' || echo '$(srcdir)/'`SystemVariable.cc
+
+lib_gnu_apl_la-TabExpansion.lo: TabExpansion.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-TabExpansion.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-TabExpansion.Tpo -c -o lib_gnu_apl_la-TabExpansion.lo `test -f 'TabExpansion.cc' || echo '$(srcdir)/'`TabExpansion.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-TabExpansion.Tpo $(DEPDIR)/lib_gnu_apl_la-TabExpansion.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='TabExpansion.cc' object='lib_gnu_apl_la-TabExpansion.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-TabExpansion.lo `test -f 'TabExpansion.cc' || echo '$(srcdir)/'`TabExpansion.cc
+
+lib_gnu_apl_la-Thread_context.lo: Thread_context.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Thread_context.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Thread_context.Tpo -c -o lib_gnu_apl_la-Thread_context.lo `test -f 'Thread_context.cc' || echo '$(srcdir)/'`Thread_context.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Thread_context.Tpo $(DEPDIR)/lib_gnu_apl_la-Thread_context.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Thread_context.cc' object='lib_gnu_apl_la-Thread_context.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Thread_context.lo `test -f 'Thread_context.cc' || echo '$(srcdir)/'`Thread_context.cc
+
+lib_gnu_apl_la-Token.lo: Token.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Token.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Token.Tpo -c -o lib_gnu_apl_la-Token.lo `test -f 'Token.cc' || echo '$(srcdir)/'`Token.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Token.Tpo $(DEPDIR)/lib_gnu_apl_la-Token.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Token.cc' object='lib_gnu_apl_la-Token.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Token.lo `test -f 'Token.cc' || echo '$(srcdir)/'`Token.cc
+
+lib_gnu_apl_la-Tokenizer.lo: Tokenizer.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Tokenizer.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Tokenizer.Tpo -c -o lib_gnu_apl_la-Tokenizer.lo `test -f 'Tokenizer.cc' || echo '$(srcdir)/'`Tokenizer.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Tokenizer.Tpo $(DEPDIR)/lib_gnu_apl_la-Tokenizer.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Tokenizer.cc' object='lib_gnu_apl_la-Tokenizer.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Tokenizer.lo `test -f 'Tokenizer.cc' || echo '$(srcdir)/'`Tokenizer.cc
+
+lib_gnu_apl_la-UCS_string.lo: UCS_string.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-UCS_string.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-UCS_string.Tpo -c -o lib_gnu_apl_la-UCS_string.lo `test -f 'UCS_string.cc' || echo '$(srcdir)/'`UCS_string.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-UCS_string.Tpo $(DEPDIR)/lib_gnu_apl_la-UCS_string.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='UCS_string.cc' object='lib_gnu_apl_la-UCS_string.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-UCS_string.lo `test -f 'UCS_string.cc' || echo '$(srcdir)/'`UCS_string.cc
+
+lib_gnu_apl_la-UCS_string_vector.lo: UCS_string_vector.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-UCS_string_vector.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-UCS_string_vector.Tpo -c -o lib_gnu_apl_la-UCS_string_vector.lo `test -f 'UCS_string_vector.cc' || echo '$(srcdir)/'`UCS_string_vector.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-UCS_string_vector.Tpo $(DEPDIR)/lib_gnu_apl_la-UCS_string_vector.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='UCS_string_vector.cc' object='lib_gnu_apl_la-UCS_string_vector.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-UCS_string_vector.lo `test -f 'UCS_string_vector.cc' || echo '$(srcdir)/'`UCS_string_vector.cc
+
+lib_gnu_apl_la-UserFunction.lo: UserFunction.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-UserFunction.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-UserFunction.Tpo -c -o lib_gnu_apl_la-UserFunction.lo `test -f 'UserFunction.cc' || echo '$(srcdir)/'`UserFunction.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-UserFunction.Tpo $(DEPDIR)/lib_gnu_apl_la-UserFunction.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='UserFunction.cc' object='lib_gnu_apl_la-UserFunction.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-UserFunction.lo `test -f 'UserFunction.cc' || echo '$(srcdir)/'`UserFunction.cc
+
+lib_gnu_apl_la-UserFunction_header.lo: UserFunction_header.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-UserFunction_header.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-UserFunction_header.Tpo -c -o lib_gnu_apl_la-UserFunction_header.lo `test -f 'UserFunction_header.cc' || echo '$(srcdir)/'`UserFunction_header.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-UserFunction_header.Tpo $(DEPDIR)/lib_gnu_apl_la-UserFunction_header.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='UserFunction_header.cc' object='lib_gnu_apl_la-UserFunction_header.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-UserFunction_header.lo `test -f 'UserFunction_header.cc' || echo '$(srcdir)/'`UserFunction_header.cc
+
+lib_gnu_apl_la-UserPreferences.lo: UserPreferences.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-UserPreferences.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-UserPreferences.Tpo -c -o lib_gnu_apl_la-UserPreferences.lo `test -f 'UserPreferences.cc' || echo '$(srcdir)/'`UserPreferences.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-UserPreferences.Tpo $(DEPDIR)/lib_gnu_apl_la-UserPreferences.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='UserPreferences.cc' object='lib_gnu_apl_la-UserPreferences.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-UserPreferences.lo `test -f 'UserPreferences.cc' || echo '$(srcdir)/'`UserPreferences.cc
+
+lib_gnu_apl_la-UTF8_string.lo: UTF8_string.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-UTF8_string.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-UTF8_string.Tpo -c -o lib_gnu_apl_la-UTF8_string.lo `test -f 'UTF8_string.cc' || echo '$(srcdir)/'`UTF8_string.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-UTF8_string.Tpo $(DEPDIR)/lib_gnu_apl_la-UTF8_string.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='UTF8_string.cc' object='lib_gnu_apl_la-UTF8_string.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-UTF8_string.lo `test -f 'UTF8_string.cc' || echo '$(srcdir)/'`UTF8_string.cc
+
+lib_gnu_apl_la-Value.lo: Value.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Value.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Value.Tpo -c -o lib_gnu_apl_la-Value.lo `test -f 'Value.cc' || echo '$(srcdir)/'`Value.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Value.Tpo $(DEPDIR)/lib_gnu_apl_la-Value.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Value.cc' object='lib_gnu_apl_la-Value.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Value.lo `test -f 'Value.cc' || echo '$(srcdir)/'`Value.cc
+
+lib_gnu_apl_la-ValueHistory.lo: ValueHistory.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-ValueHistory.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-ValueHistory.Tpo -c -o lib_gnu_apl_la-ValueHistory.lo `test -f 'ValueHistory.cc' || echo '$(srcdir)/'`ValueHistory.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-ValueHistory.Tpo $(DEPDIR)/lib_gnu_apl_la-ValueHistory.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='ValueHistory.cc' object='lib_gnu_apl_la-ValueHistory.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-ValueHistory.lo `test -f 'ValueHistory.cc' || echo '$(srcdir)/'`ValueHistory.cc
+
+lib_gnu_apl_la-Workspace.lo: Workspace.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Workspace.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Workspace.Tpo -c -o lib_gnu_apl_la-Workspace.lo `test -f 'Workspace.cc' || echo '$(srcdir)/'`Workspace.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Workspace.Tpo $(DEPDIR)/lib_gnu_apl_la-Workspace.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Workspace.cc' object='lib_gnu_apl_la-Workspace.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Workspace.lo `test -f 'Workspace.cc' || echo '$(srcdir)/'`Workspace.cc
+
+lib_gnu_apl_la-static_Objects.lo: static_Objects.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-static_Objects.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-static_Objects.Tpo -c -o lib_gnu_apl_la-static_Objects.lo `test -f 'static_Objects.cc' || echo '$(srcdir)/'`static_Objects.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-static_Objects.Tpo $(DEPDIR)/lib_gnu_apl_la-static_Objects.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='static_Objects.cc' object='lib_gnu_apl_la-static_Objects.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-static_Objects.lo `test -f 'static_Objects.cc' || echo '$(srcdir)/'`static_Objects.cc
+
+lib_gnu_apl_la-Regexp.lo: Regexp.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-Regexp.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-Regexp.Tpo -c -o lib_gnu_apl_la-Regexp.lo `test -f 'Regexp.cc' || echo '$(srcdir)/'`Regexp.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-Regexp.Tpo $(DEPDIR)/lib_gnu_apl_la-Regexp.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='Regexp.cc' object='lib_gnu_apl_la-Regexp.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-Regexp.lo `test -f 'Regexp.cc' || echo '$(srcdir)/'`Regexp.cc
+
+sql/lib_gnu_apl_la-SqliteArgListBuilder.lo: sql/SqliteArgListBuilder.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT sql/lib_gnu_apl_la-SqliteArgListBuilder.lo -MD -MP -MF sql/$(DEPDIR)/lib_gnu_apl_la-SqliteArgListBuilder.Tpo -c -o sql/lib_gnu_apl_la-SqliteArgListBuilder.lo `test -f 'sql/SqliteArgListBuilder.cc' || echo '$(srcdir)/'`sql/SqliteArgListBuilder.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) sql/$(DEPDIR)/lib_gnu_apl_la-SqliteArgListBuilder.Tpo sql/$(DEPDIR)/lib_gnu_apl_la-SqliteArgListBuilder.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sql/SqliteArgListBuilder.cc' object='sql/lib_gnu_apl_la-SqliteArgListBuilder.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o sql/lib_gnu_apl_la-SqliteArgListBuilder.lo `test -f 'sql/SqliteArgListBuilder.cc' || echo '$(srcdir)/'`sql/SqliteArgListBuilder.cc
+
+sql/lib_gnu_apl_la-SqliteConnection.lo: sql/SqliteConnection.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT sql/lib_gnu_apl_la-SqliteConnection.lo -MD -MP -MF sql/$(DEPDIR)/lib_gnu_apl_la-SqliteConnection.Tpo -c -o sql/lib_gnu_apl_la-SqliteConnection.lo `test -f 'sql/SqliteConnection.cc' || echo '$(srcdir)/'`sql/SqliteConnection.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) sql/$(DEPDIR)/lib_gnu_apl_la-SqliteConnection.Tpo sql/$(DEPDIR)/lib_gnu_apl_la-SqliteConnection.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sql/SqliteConnection.cc' object='sql/lib_gnu_apl_la-SqliteConnection.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o sql/lib_gnu_apl_la-SqliteConnection.lo `test -f 'sql/SqliteConnection.cc' || echo '$(srcdir)/'`sql/SqliteConnection.cc
+
+sql/lib_gnu_apl_la-SqliteResultValue.lo: sql/SqliteResultValue.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT sql/lib_gnu_apl_la-SqliteResultValue.lo -MD -MP -MF sql/$(DEPDIR)/lib_gnu_apl_la-SqliteResultValue.Tpo -c -o sql/lib_gnu_apl_la-SqliteResultValue.lo `test -f 'sql/SqliteResultValue.cc' || echo '$(srcdir)/'`sql/SqliteResultValue.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) sql/$(DEPDIR)/lib_gnu_apl_la-SqliteResultValue.Tpo sql/$(DEPDIR)/lib_gnu_apl_la-SqliteResultValue.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sql/SqliteResultValue.cc' object='sql/lib_gnu_apl_la-SqliteResultValue.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o sql/lib_gnu_apl_la-SqliteResultValue.lo `test -f 'sql/SqliteResultValue.cc' || echo '$(srcdir)/'`sql/SqliteResultValue.cc
+
+sql/lib_gnu_apl_la-SqliteProvider.lo: sql/SqliteProvider.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT sql/lib_gnu_apl_la-SqliteProvider.lo -MD -MP -MF sql/$(DEPDIR)/lib_gnu_apl_la-SqliteProvider.Tpo -c -o sql/lib_gnu_apl_la-SqliteProvider.lo `test -f 'sql/SqliteProvider.cc' || echo '$(srcdir)/'`sql/SqliteProvider.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) sql/$(DEPDIR)/lib_gnu_apl_la-SqliteProvider.Tpo sql/$(DEPDIR)/lib_gnu_apl_la-SqliteProvider.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sql/SqliteProvider.cc' object='sql/lib_gnu_apl_la-SqliteProvider.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o sql/lib_gnu_apl_la-SqliteProvider.lo `test -f 'sql/SqliteProvider.cc' || echo '$(srcdir)/'`sql/SqliteProvider.cc
+
+sql/lib_gnu_apl_la-Connection.lo: sql/Connection.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT sql/lib_gnu_apl_la-Connection.lo -MD -MP -MF sql/$(DEPDIR)/lib_gnu_apl_la-Connection.Tpo -c -o sql/lib_gnu_apl_la-Connection.lo `test -f 'sql/Connection.cc' || echo '$(srcdir)/'`sql/Connection.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) sql/$(DEPDIR)/lib_gnu_apl_la-Connection.Tpo sql/$(DEPDIR)/lib_gnu_apl_la-Connection.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sql/Connection.cc' object='sql/lib_gnu_apl_la-Connection.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o sql/lib_gnu_apl_la-Connection.lo `test -f 'sql/Connection.cc' || echo '$(srcdir)/'`sql/Connection.cc
+
+sql/lib_gnu_apl_la-PostgresArgListBuilder.lo: sql/PostgresArgListBuilder.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT sql/lib_gnu_apl_la-PostgresArgListBuilder.lo -MD -MP -MF sql/$(DEPDIR)/lib_gnu_apl_la-PostgresArgListBuilder.Tpo -c -o sql/lib_gnu_apl_la-PostgresArgListBuilder.lo `test -f 'sql/PostgresArgListBuilder.cc' || echo '$(srcdir)/'`sql/PostgresArgListBuilder.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) sql/$(DEPDIR)/lib_gnu_apl_la-PostgresArgListBuilder.Tpo sql/$(DEPDIR)/lib_gnu_apl_la-PostgresArgListBuilder.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sql/PostgresArgListBuilder.cc' object='sql/lib_gnu_apl_la-PostgresArgListBuilder.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o sql/lib_gnu_apl_la-PostgresArgListBuilder.lo `test -f 'sql/PostgresArgListBuilder.cc' || echo '$(srcdir)/'`sql/PostgresArgListBuilder.cc
+
+sql/lib_gnu_apl_la-PostgresConnection.lo: sql/PostgresConnection.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT sql/lib_gnu_apl_la-PostgresConnection.lo -MD -MP -MF sql/$(DEPDIR)/lib_gnu_apl_la-PostgresConnection.Tpo -c -o sql/lib_gnu_apl_la-PostgresConnection.lo `test -f 'sql/PostgresConnection.cc' || echo '$(srcdir)/'`sql/PostgresConnection.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) sql/$(DEPDIR)/lib_gnu_apl_la-PostgresConnection.Tpo sql/$(DEPDIR)/lib_gnu_apl_la-PostgresConnection.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sql/PostgresConnection.cc' object='sql/lib_gnu_apl_la-PostgresConnection.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o sql/lib_gnu_apl_la-PostgresConnection.lo `test -f 'sql/PostgresConnection.cc' || echo '$(srcdir)/'`sql/PostgresConnection.cc
+
+sql/lib_gnu_apl_la-PostgresProvider.lo: sql/PostgresProvider.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT sql/lib_gnu_apl_la-PostgresProvider.lo -MD -MP -MF sql/$(DEPDIR)/lib_gnu_apl_la-PostgresProvider.Tpo -c -o sql/lib_gnu_apl_la-PostgresProvider.lo `test -f 'sql/PostgresProvider.cc' || echo '$(srcdir)/'`sql/PostgresProvider.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) sql/$(DEPDIR)/lib_gnu_apl_la-PostgresProvider.Tpo sql/$(DEPDIR)/lib_gnu_apl_la-PostgresProvider.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='sql/PostgresProvider.cc' object='sql/lib_gnu_apl_la-PostgresProvider.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o sql/lib_gnu_apl_la-PostgresProvider.lo `test -f 'sql/PostgresProvider.cc' || echo '$(srcdir)/'`sql/PostgresProvider.cc
+
+lib_gnu_apl_la-python_apl.lo: python_apl.cc
+@am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -MT lib_gnu_apl_la-python_apl.lo -MD -MP -MF $(DEPDIR)/lib_gnu_apl_la-python_apl.Tpo -c -o lib_gnu_apl_la-python_apl.lo `test -f 'python_apl.cc' || echo '$(srcdir)/'`python_apl.cc
+@am__fastdepCXX_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/lib_gnu_apl_la-python_apl.Tpo $(DEPDIR)/lib_gnu_apl_la-python_apl.Plo
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	$(AM_V_CXX)source='python_apl.cc' object='lib_gnu_apl_la-python_apl.lo' libtool=yes @AMDEPBACKSLASH@
+@AMDEP_TRUE@@am__fastdepCXX_FALSE@	DEPDIR=$(DEPDIR) $(CXXDEPMODE) $(depcomp) @AMDEPBACKSLASH@
+@am__fastdepCXX_FALSE@	$(AM_V_CXX@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) -c -o lib_gnu_apl_la-python_apl.lo `test -f 'python_apl.cc' || echo '$(srcdir)/'`python_apl.cc
 
 libapl_la-Archive.lo: Archive.cc
 @am__fastdepCXX_TRUE@	$(AM_V_CXX)$(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CXX) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(libapl_la_CXXFLAGS) $(CXXFLAGS) -MT libapl_la-Archive.lo -MD -MP -MF $(DEPDIR)/libapl_la-Archive.Tpo -c -o libapl_la-Archive.lo `test -f 'Archive.cc' || echo '$(srcdir)/'`Archive.cc

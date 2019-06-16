@@ -664,6 +664,8 @@ VALUE_CHECK_WANTED
 MAX_RANK_WANTED
 DEVELOP_WANTED
 CXX_WERROR
+WANT_PYTHON_FALSE
+WANT_PYTHON_TRUE
 WANT_LIBAPL_FALSE
 WANT_LIBAPL_TRUE
 WANT_ERLANG_FALSE
@@ -842,6 +844,7 @@ with_gtk3
 with_android
 with_erlang
 with_libapl
+with_python
 '
       ac_precious_vars='build_alias
 host_alias
@@ -1533,6 +1536,7 @@ Optional Packages:
   --with-android          enable when compiling for Android
   --with-erlang           enable to build the Erlang interface
   --with-libapl           enable to build libapl.so
+  --with-python           enable to build python extension lib_gnu_apl.so
 
 Some influential environment variables:
   CC          C compiler command
@@ -19092,7 +19096,7 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $user_wants_erlang" >&5
 $as_echo "$user_wants_erlang" >&6; }
 
-# check if the user wants libapl.so
+# check if the user wants to build libapl.so
 #
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking if we want to build libapl.so" >&5
 $as_echo_n "checking if we want to build libapl.so... " >&6; }
@@ -19120,6 +19124,31 @@ fi
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $user_wants_libapl" >&5
 $as_echo "$user_wants_libapl" >&6; }
+
+# check if the user wants to build the python extension gnu_apl.so
+#
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if we want to build libpython_apl.so" >&5
+$as_echo_n "checking if we want to build libpython_apl.so... " >&6; }
+user_wants_python=no
+
+# Check whether --with-python was given.
+if test "${with_python+set}" = set; then :
+  withval=$with_python; user_wants_python=yes
+fi
+
+
+if test "x$user_wants_python" = xyes ; then
+
+$as_echo "#define WANT_PYTHON 1" >>confdefs.h
+
+fi
+ if test "x$user_wants_python" = xyes; then
+  WANT_PYTHON_TRUE=
+  WANT_PYTHON_FALSE='#'
+else
+  WANT_PYTHON_TRUE='#'
+  WANT_PYTHON_FALSE=
+fi
 
 
 ac_config_files="$ac_config_files Makefile build/Makefile debian/Makefile debian/source/Makefile doc/Makefile erlang/Makefile erlang/apl.erl gnu-apl.d/Makefile gnu-apl.d/preferences HOWTOs/Makefile rpm/Makefile rpm/apl.spec src/Makefile src/APs/Makefile src/Gtk/Makefile src/emacs_mode/Makefile src/native/Makefile src/sql/Makefile src/testcases/Makefile src/workspaces/Makefile support-files/Makefile support-files/105-key-International-Keyboard/Makefile support-files/Dyalog-Keyboard/Makefile support-files/OS-X-Keyboard/Makefile support-files/Unicomp-Keyboard/Makefile support-files/WASD-Keyboard/Makefile support-files/old-Keyboard/Makefile support-files/Dirk/Makefile tools/Makefile websock/Makefile websock/client/Makefile websock/server/Makefile workspaces/Makefile wslib3/Makefile wslib4/Makefile wslib5/Makefile wslib5/APLComponentFiles/Makefile wslib5/iso-apl-cf/Makefile"
@@ -19624,6 +19653,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${WANT_LIBAPL_TRUE}" && test -z "${WANT_LIBAPL_FALSE}"; then
   as_fn_error $? "conditional \"WANT_LIBAPL\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${WANT_PYTHON_TRUE}" && test -z "${WANT_PYTHON_FALSE}"; then
+  as_fn_error $? "conditional \"WANT_PYTHON\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${ON_i686_TRUE}" && test -z "${ON_i686_FALSE}"; then

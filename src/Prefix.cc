@@ -1910,11 +1910,8 @@ const Token result = si.jump(line);
 
    if (result.get_tag() == TOK_NOBRANCH)   // branch not taken, e.g. →⍬
       {
-        if (trace)
-           {
-             Token bra(TOK_NOBRANCH);
-             si.statement_result(bra, true);
-           }
+        Token bra(TOK_NOBRANCH);
+        si.statement_result(bra, trace);
 
         action = RA_PUSH_NEXT;
         if (attention_is_raised() && end_of_line)
@@ -1978,8 +1975,8 @@ const bool trace = at0().get_Class() == TC_END &&
                   (at0().get_int_val() & 1) != 0;
    if (trace)
       {
-        Token bra(TOK_ESCAPE);
-        si.statement_result(bra, true);
+        Token esc(TOK_ESCAPE);
+        si.statement_result(esc, true);
       }
 
    // the statement is → which could mean TOK_ESCAPE (normal →) or

@@ -1,6 +1,6 @@
 #!/bin/bash
 
-# this script builds different GNU APL variants and test some of them
+# this script builds different GNU APL variants and tests some of them
 
 # figure and normalize some directory names
 #

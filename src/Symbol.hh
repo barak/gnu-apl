@@ -62,7 +62,9 @@ public:
    /// reset \b this ValueStackItem to being unused
    void clear()
       {
+        // sym_val contains only POD variables, so it can be memset()
         memset(&sym_val, 0, sizeof(sym_val));
+        if (!!apl_val)   apl_val.reset();
         name_class = NC_UNUSED_USER_NAME;
       }
 

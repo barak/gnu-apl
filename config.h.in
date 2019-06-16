@@ -272,6 +272,9 @@
 /* Define if building libapl.so */
 #undef WANT_LIBAPL
 
+/* Define if building lib_gnu_apl.so */
+#undef WANT_PYTHON
+
 /* Define to 1 if on MINIX. */
 #undef _MINIX
 

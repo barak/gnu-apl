@@ -380,7 +380,7 @@ const StateIndicator * si = Workspace::SI_top();
    si = Workspace::SI_top_error();
    if (si)   return StateIndicator::get_error(si).get_error_code();
    return E_UNKNOWN_ERROR;
-} 
+}
 //-----------------------------------------------------------------------------
 const char *
 apl_command(const char * command)
@@ -627,8 +627,6 @@ init_libapl(const char * progname, int log_startup)
    uprefs.read_config_file(false, log_startup);   // in $HOME/.config/gnu_apl/
 
    init_2(log_startup);
-
-   Macro::init_macros();
 }
 //-----------------------------------------------------------------------------
 extern DiffOut DOUT_filebuf;

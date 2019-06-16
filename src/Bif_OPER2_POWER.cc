@@ -58,8 +58,10 @@ Function * RO = _RO.get_function();   Assert(RO);
 
    if (LO->may_push_SI() || RO->may_push_SI())   // user-defined or macro
       {
-        if (!A)   return Macro::Z__LO_POWER_RO_B  ->eval_LRB (   _LO, _RO, B);
-        else      return Macro::Z__A_LO_POWER_RO_B->eval_ALRB(A, _LO, _RO, B);
+        if (!A)   return Macro::get_macro(Macro::MAC_Z__LO_POWER_RO_B)
+                              ->eval_LRB (_LO, _RO, B);
+        else      return Macro::get_macro(Macro::MAC_Z__A_LO_POWER_RO_B)
+                              ->eval_ALRB(A, _LO, _RO, B);
       }
 
    // primitive LO and RO
@@ -141,11 +143,15 @@ ShapeItem repeat_cnt = N->get_ravel(0).get_checked_near_int();
       {
         Token N(TOK_APL_VALUE1, IntScalar(repeat_cnt, LOC));
         if (LO->has_result())
-           if (!A)   return Macro::Z__LO_POWER_N_B  ->eval_LRB (   _LO, N, B);
-           else      return Macro::Z__A_LO_POWER_N_B->eval_ALRB(A, _LO, N, B);
+           if (!A)   return Macro::get_macro(Macro::MAC_Z__LO_POWER_N_B)
+                                 ->eval_LRB (   _LO, N, B);
+           else      return Macro::get_macro(Macro::MAC_Z__A_LO_POWER_N_B)
+                                 ->eval_ALRB(A, _LO, N, B);
         else
-           if (!A)   return Macro::LO_POWER_N_B  ->eval_LRB (   _LO, N, B);
-           else      return Macro::A_LO_POWER_N_B->eval_ALRB(A, _LO, N, B);
+           if (!A)   return Macro::get_macro(Macro::MAC_LO_POWER_N_B)
+                                 ->eval_LRB (   _LO, N, B);
+           else      return Macro::get_macro(Macro::MAC_A_LO_POWER_N_B)
+                                 ->eval_ALRB(A, _LO, N, B);
       }
 
    for (;;)

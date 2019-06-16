@@ -81,7 +81,8 @@ Value_P Z(A->get_shape() + B->get_shape(), LOC);
 
    if (RO->may_push_SI())   // user defined LO
       {
-        return Macro::Z__A_LO_OUTER_B->eval_ALB(A, _RO, B);
+        return Macro::get_macro(Macro::MAC_Z__A_LO_OUTER_B)
+                    ->eval_ALB(A, _RO, B);
       }
 
 const ShapeItem len_B = B->element_count();

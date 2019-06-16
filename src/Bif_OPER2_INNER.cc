@@ -84,9 +84,11 @@ const ShapeItem items_B = shape_B1.get_volume();
         // iso: if A1 and B1 are both vectors, return f/A1 g B1.
         //
         if (A->get_rank() <= 1 && B->get_rank() <= 1)
-           return Macro::Z__vA_LO_INNER_RO_vB->eval_ALRB(A, _LO, _RO, B);
+           return Macro::get_macro(Macro::MAC_Z__vA_LO_INNER_RO_vB)
+                       ->eval_ALRB(A, _LO, _RO, B);
         else
-           return Macro::Z__A_LO_INNER_RO_B->eval_ALRB(A, _LO, _RO, B);
+           return Macro::get_macro(Macro::MAC_Z__A_LO_INNER_RO_B)
+                       ->eval_ALRB(A, _LO, _RO, B);
       }
 
 Value_P Z(shape_A1 + shape_B1, LOC);

@@ -494,32 +494,32 @@ Parser::replace_bitwise_functions(Token_string & tos)
          switch(tos[t+1].get_tag())
             {
               case TOK_F2_AND:
-                   new (&tos[t]) Token(TOK_F2_AND_B, &Bif_F2_AND_B::_fun);
+                   tos[t] = Token(TOK_F2_AND_B, &Bif_F2_AND_B::_fun);
                    tos[++t].clear(LOC);
                    continue;
 
               case TOK_F2_OR:
-                   new (&tos[t]) Token(TOK_F2_OR_B, &Bif_F2_OR_B::_fun);
+                   tos[t] = Token(TOK_F2_OR_B, &Bif_F2_OR_B::_fun);
                    tos[++t].clear(LOC);
                    continue;
 
               case TOK_F2_NAND:
-                   new (&tos[t]) Token(TOK_F2_NAND_B,&Bif_F2_NAND_B::_fun);
+                   tos[t] = Token(TOK_F2_NAND_B,&Bif_F2_NAND_B::_fun);
                    tos[++t].clear(LOC);
                    continue;
 
               case TOK_F2_NOR:
-                   new (&tos[t]) Token(TOK_F2_NOR_B, &Bif_F2_NOR_B::_fun);
+                   tos[t] = Token(TOK_F2_NOR_B, &Bif_F2_NOR_B::_fun);
                    tos[++t].clear(LOC);
                    continue;
 
               case TOK_F2_EQUAL:
-                   new (&tos[t]) Token(TOK_F2_EQUAL_B, &Bif_F2_EQUAL_B::_fun);
+                   tos[t] = Token(TOK_F2_EQUAL_B, &Bif_F2_EQUAL_B::_fun);
                    tos[++t].clear(LOC);
                    continue;
 
               case TOK_F2_UNEQ:
-                   new (&tos[t]) Token(TOK_F2_UNEQ_B, &Bif_F2_UNEQ_B::_fun);
+                   tos[t] = Token(TOK_F2_UNEQ_B, &Bif_F2_UNEQ_B::_fun);
                    tos[++t].clear(LOC);
                    continue;
 
@@ -678,7 +678,7 @@ Parser::create_scalar_value(Token & output)
              {
                Value_P scalar(LOC);
 
-               new (&scalar->get_ravel(0))  CharCell(output.get_char_val());
+               new (scalar->next_ravel())  CharCell(output.get_char_val());
                scalar->check_value(LOC);
                Token tok(TOK_APL_VALUE3, scalar);
                output.move_1(tok, LOC);
@@ -689,7 +689,7 @@ Parser::create_scalar_value(Token & output)
              {
                Value_P scalar(LOC);
 
-               new (&scalar->get_ravel(0))   IntCell(output.get_int_val());
+               new (scalar->next_ravel())   IntCell(output.get_int_val());
                scalar->check_value(LOC);
                Token tok(TOK_APL_VALUE3, scalar);
                output.move_1(tok, LOC);
@@ -700,7 +700,7 @@ Parser::create_scalar_value(Token & output)
              {
                Value_P scalar(LOC);
 
-               new (&scalar->get_ravel(0))  FloatCell(output.get_flt_val());
+               new (scalar->next_ravel())  FloatCell(output.get_flt_val());
                scalar->check_value(LOC);
                Token tok(TOK_APL_VALUE3, scalar);
                output.move_1(tok, LOC);
@@ -711,8 +711,8 @@ Parser::create_scalar_value(Token & output)
              {
                Value_P scalar(LOC);
 
-               new (&scalar->get_ravel(0))   ComplexCell(output.get_cpx_real(),
-                                                         output.get_cpx_imag());
+               new (scalar->next_ravel())   ComplexCell(output.get_cpx_real(),
+                                                        output.get_cpx_imag());
                scalar->check_value(LOC);
                Token tok(TOK_APL_VALUE3, scalar);
                output.move_1(tok, LOC);

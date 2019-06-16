@@ -17,7 +17,8 @@ dist_doc_DATA = README			   \
                 README-6-porting	   \
 		README-7-more-info	   \
 		README-8-parallel          \
-                README-9-post-installation
+                README-9-post-installation \
+                README-10-python
 
 nobase_dist_sysconf_DATA = gnu-apl.d/preferences
 

@@ -16,7 +16,7 @@
 @node Top
 @top libAPL
 
-libapl is a C library, kindly contrinuted to the GNU APL project by Dr. Dirk
+libapl is a C library, kindly contributed to the GNU APL project by Dr. Dirk
 Laurie, that gives C programs access to GNU APL.
 
 Almost everything that a user can do interactively with GNU APL can also be

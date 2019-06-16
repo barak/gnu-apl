@@ -201,7 +201,8 @@ const Shape3 Z3(B->get_shape(), axis);
         new (X4->next_ravel())   IntCell(Z3.m());
         new (X4->next_ravel())   IntCell(Z3.l());
         X4->check_value(LOC);
-        return Macro::Z__LO_SCAN_X4_B->eval_LXB(_LO, X4, B);
+        return Macro::get_macro(Macro::MAC_Z__LO_SCAN_X4_B)
+                    ->eval_LXB(_LO, X4, B);
       }
 
    if (B->get_shape().is_empty())   return LO->eval_identity_fun(B, axis);

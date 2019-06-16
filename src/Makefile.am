@@ -176,6 +176,23 @@ libapl_la_CXXFLAGS = $(common_CXXFLAGS)
 libapl_la_CXXFLAGS += $(GCOV_WANTED) $(GPROF_WANTED) $(CXX_RDYNAMIC)
 
 else
+if WANT_PYTHON
+
+pkglib_LTLIBRARIES += lib_gnu_apl.la
+lib_gnu_apl_la_SOURCES   = $(common_SOURCES) python_apl.cc
+lib_gnu_apl_la_LDFLAGS   = $(common_LDFLAGS)
+lib_gnu_apl_la_LDFLAGS  += -avoid-version
+lib_gnu_apl_la_CXXFLAGS  = $(common_CXXFLAGS)
+lib_gnu_apl_la_CXXFLAGS += $(GCOV_WANTED) $(GPROF_WANTED) $(CXX_RDYNAMIC)
+lib_gnu_apl_la_CXXFLAGS += -DNDEBUG
+lib_gnu_apl_la_CXXFLAGS += -D_FORTIFY_SOURCE=2
+lib_gnu_apl_la_CXXFLAGS += -fwrapv
+lib_gnu_apl_la_CXXFLAGS += -fPIC
+lib_gnu_apl_la_CXXFLAGS += -fstack-protector
+lib_gnu_apl_la_CXXFLAGS += --param=ssp-buffer-size=4 
+lib_gnu_apl_la_CXXFLAGS += -I/usr/include/python3.4m
+
+else
 
 bin_PROGRAMS = apl
 apl_SOURCES = main.cc $(common_SOURCES)
@@ -183,6 +200,7 @@ apl_CXXFLAGS = $(common_CXXFLAGS)
 apl_CXXFLAGS += $(GCOV_WANTED) $(GPROF_WANTED) $(CXX_RDYNAMIC)
 apl_LDFLAGS = $(common_LDFLAGS)
 
+endif
 endif
 
 # normally we would say:

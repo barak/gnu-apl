@@ -550,14 +550,14 @@ public:
 
    void increment_owner_count(const char * loc)
       {
-        Assert1(this);
+        Assert1(reinterpret_cast<void *>(this) != 0);
         if (check_ptr == charP(this) + 7)
            ++owner_count;
       }
 
       void decrement_owner_count(const char * loc)
          {
-           Assert1(this);
+           Assert1(reinterpret_cast<void *>(this) != 0);
            if (check_ptr == charP(this) + 7)
               {
                 Assert1(owner_count > 0);

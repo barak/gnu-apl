@@ -256,7 +256,7 @@ Quad_EA::eval_AB(Value_P A, Value_P B)
         else                     DOMAIN_ERROR;
       }
 
-   return Macro::Z__A_Quad_EA_B->eval_AB(A, B);
+   return Macro::get_macro(Macro::MAC_Z__A_Quad_EA_B)->eval_AB(A, B);
 }
 //=============================================================================
 Token
@@ -274,7 +274,7 @@ Quad_EB::eval_AB(Value_P A, Value_P B)
         else                     DOMAIN_ERROR;
       }
 
-   return Macro::Z__A_Quad_EB_B->eval_AB(A, B);
+   return Macro::get_macro(Macro::MAC_Z__A_Quad_EB_B)->eval_AB(A, B);
 }
 //=============================================================================
 Token
@@ -741,7 +741,7 @@ Value_P BB(line_count, LOC);
        }
    BB->check_value(LOC);
 
-Token ret = Macro::Z__Quad_INP_B->eval_B(BB);
+Token ret = Macro::get_macro(Macro::MAC_Z__Quad_INP_B)->eval_B(BB);
    Assert1(ret.get_tag() == TOK_SI_PUSHED);
 
    loop(l, line_count)   BB->get_ravel(l).release(LOC);

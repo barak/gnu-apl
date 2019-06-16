@@ -28,6 +28,7 @@ help:
 	@echo ""
 	@echo "    make develop   - enable full dependency tracking"
 	@echo "    make gprof     - make develop + enable gprof profiling"
+	@echo "    make python    - make develop + build python module"
 	@echo "    make parallel  - enable multi-core APL (buggy and experimental!)"
 	@echo "    make parallel1 - make parallel for benchmarking"
 	@echo ""
@@ -38,6 +39,15 @@ help:
 .PHONY: develop
 develop:
 	./configure  --enable-maintainer-mode DEVELOP_WANTED=yes
+	make all
+
+
+###############################################################################
+# a shortcut to ./configure for compiling the python library
+#
+.PHONY: python
+python:
+	./configure  --enable-maintainer-mode DEVELOP_WANTED=yes --with-python
 	make all
 
 

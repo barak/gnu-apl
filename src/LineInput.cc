@@ -23,6 +23,7 @@
 
 #include "Assert.hh"
 #include "Command.hh"
+#include "Common.hh"
 #include "Error.hh"
 #include "InputFile.hh"
 #include "IO_Files.hh"
@@ -614,7 +615,9 @@ LineInput::LineInput(bool do_read_history)
    current_termios.c_lflag |= ISIG;
 
 #ifndef WANT_LIBAPL
+# ifndef WANT_PYTHON
    tcsetattr(STDIN_FILENO, TCSANOW, &current_termios);
+# endif // WANT_PYTHON
 #endif // WANT_LIBAPL
 }
 //-----------------------------------------------------------------------------
@@ -625,11 +628,14 @@ LineInput::~LineInput()
    if (write_history)   history.save_history(uprefs.line_history_path.c_str());
 
 #ifndef WANT_LIBAPL
+# ifndef WANT_PYTHON
    tcsetattr(STDIN_FILENO, TCSANOW, &initial_termios);
+# endif // WANT_PYTHON
 #endif // WANT_LIBAPL
 }
 //-----------------------------------------------------------------------------
-void LineInput::init(bool do_read_history)
+void
+LineInput::init(bool do_read_history)
 {
    the_line_input = new LineInput(do_read_history);
 }

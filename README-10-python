@@ -1,0 +1,46 @@
+
+GNU APL can be compiled as a Python module.
+The basic build procedure is this:
+
+    configure --with-libpython_apl [ other ./configure optionsi ...]
+    make
+    sudo make install
+
+This installs a shared object file named 'libgnu_apl.so' in the place where
+GNU APL installs its libraries (typically /usr/local/lib/apl or
+/usr/lib/apl)
+
+The shared object file must then be copied to the directory where Python
+keeps its libraries (e.g. /usr/lib/python3.4/lib-dynload/). For example (if
+your Python version is 3.4, and NOTICE THE DIFFERENT NAME OF THE .so FILE):
+
+    sudo cp /usr/local/lib/apl/lib_gnu_apl.so \
+            /usr/lib/python3.4/lib-dynload/gnu_apl.cpython-34m.so
+
+After that, one can import GNU APL in Python and call Python functions
+provided by gnu_apl:
+
+>>> import gnu_apl
+>>> gnu_apl.exec("4 4⍴1+2")
+3 3 3 3
+3 3 3 3
+3 3 3 3
+3 3 3 3
+0
+>>> gnu_apl.command(")WSID")
+'IS CLEAR WS\n'
+
+
+The output above is a mix of APL output and Python output, which is more often
+than not a bad idea. A better approach is to generate no APL output (i,e, the
+results of APL computations should be assigned to variables and variables ⎕
+and ⍞ should not be used). Alternatively, you can change the default print
+behaviour in Python with gnu_apl.set_display(mode). See, for example,
+gnu_apl.help('set_display').
+
+After a sucessful installation you can display the documentation of all Python
+functions in an interactive Python session like this:
+
+>>> import gnu_apl
+>>> gnu_apl.help('all')
+

@@ -31,7 +31,7 @@ public:
    /// the unique number of a macros
    enum Macro_num
       {
-#define mac_def(n, _txt) MAC_ ## n,
+#define mac_def(name, _txt) MAC_ ## name,
 #include "Macro.def"
         MAC_COUNT
       };
@@ -46,31 +46,17 @@ public:
    virtual int get_macnum() const
       { return macro_number; }
 
-   /// initialize all macros (called once at program start up)
-   static void init_macros();
-
    /// unmark all values used in the bodies of all macros
    static void unmark_all_macros();
 
    /// return the macro with \b macro_number num
    static Macro * get_macro(Macro_num num);
 
-#define mac_def(n, _txt) static Macro * n;   ///< a macro
+#define mac_def(name, _txt) static Macro name;   ///< a macro
 #include "Macro.def"
 
    /// a vector of all macros
    static Macro * all_macros[MAC_COUNT];
-
-   /// a helper to destroy macros on exit()
-   class Cleaner
-      {
-        public:
-           Cleaner() {}
-           ~Cleaner();
-      };
-
-   /// static Cleaner instance whose destructor will be called when APL exits
-   static Cleaner cleaner;
 
 protected:
    /// A (compile-time) unique number for this macro

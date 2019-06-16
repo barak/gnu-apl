@@ -324,7 +324,7 @@ fi
 AM_CONDITIONAL(WANT_ERLANG, test "x$user_wants_erlang" = xyes)
 AC_MSG_RESULT([$user_wants_erlang])
 
-# check if the user wants libapl.so
+# check if the user wants to build libapl.so
 #
 AC_MSG_CHECKING([if we want to build libapl.so])
 user_wants_libapl=$user_wants_erlang   # Erlang needs libapl
@@ -340,6 +340,19 @@ fi
 AM_CONDITIONAL(WANT_LIBAPL, test "x$user_wants_libapl" = xyes)
 AC_MSG_RESULT([$user_wants_libapl])
 
+# check if the user wants to build the python extension gnu_apl.so
+#
+AC_MSG_CHECKING([if we want to build libpython_apl.so])
+user_wants_python=no
+AC_ARG_WITH( [python],
+             [AS_HELP_STRING([--with-python],
+             [enable to build python extension lib_gnu_apl.so])],
+             [user_wants_python=yes])
+
+if test "x$user_wants_python" = xyes ; then
+   AC_DEFINE([WANT_PYTHON], [1], [Define if building lib_gnu_apl.so])
+fi
+AM_CONDITIONAL(WANT_PYTHON, test "x$user_wants_python" = xyes)
 
 AC_CONFIG_FILES([Makefile
                  build/Makefile

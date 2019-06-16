@@ -24,6 +24,7 @@
 #include "Common.hh"
 #include "DynamicObject.hh"
 #include "Logging.hh"
+#include "Macro.hh"
 #include "static_Objects.hh"
 #include "Workspace.hh"
 
@@ -69,4 +70,9 @@ Error StateIndicator::top_level_error(E_NO_ERROR, LOC);
 
 INFO(Parallel::all_CPUs, __LINE__)
 std::vector<CPU_Number>Parallel::all_CPUs;
+
+
+INFO(Macro::all_macros, __LINE__)
+#define mac_def(name, txt) Macro Macro::name(MAC_ ## name, txt);
+#include "Macro.def"
 

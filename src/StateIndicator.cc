@@ -298,7 +298,7 @@ StateIndicator::jump(Value_P value)
    // function (and then return TOK_BRANCH.). The jump itself (if any)
    // is executed in Prefix.cc.
    //
-   if (value->get_rank() > 1)   DOMAIN_ERROR;
+   if (value->get_rank() > 1)   RANK_ERROR;
 
    if (value->element_count() == 0)     // →''
       {
@@ -327,7 +327,7 @@ const UserFunction * ufun = get_executable()->get_ufun();
 }
 //-----------------------------------------------------------------------------
 void
-StateIndicator::escape()  
+StateIndicator::escape()
 {
 }
 //-----------------------------------------------------------------------------
@@ -467,6 +467,11 @@ typedef int (*result_callback)(const Value * result, int committed);
 extern "C" result_callback res_callback;
 result_callback res_callback = 0;
 #endif
+
+#ifdef WANT_PYTHON
+extern bool python_result_callback(Token & result);
+#endif
+
 void
 StateIndicator::statement_result(Token & result, bool trace)
 {
@@ -492,7 +497,14 @@ StateIndicator::statement_result(Token & result, bool trace)
    // if result is a value then print it, unless it is a committed value
    // (i.e. TOK_APL_VALUE2)
    //
-   if (result.get_ValueType() != TV_VAL)   return;
+   if (result.get_ValueType() != TV_VAL)
+      {
+#ifdef WANT_PYTHON
+         python_result_callback(result);
+#endif
+
+         return;
+      }
 
 const TokenTag tag = result.get_tag();
 Value_P B(result.get_apl_val());
@@ -510,6 +522,10 @@ bool print_value = tag == TOK_APL_VALUE1 || tag == TOK_APL_VALUE3;
         //
         print_value = res_callback(B.get(), !print_value);
       }
+#endif
+
+#ifdef WANT_PYTHON
+   print_value = python_result_callback(result);
 #endif
 
    if (!print_value)   return;

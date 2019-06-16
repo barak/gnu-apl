@@ -23,12 +23,7 @@
 #include "Assert.hh"
 #include "Macro.hh"
 
-#define mac_def(n, _txt) Macro * Macro::n = 0;
-#include "Macro.def"
-
 Macro * Macro::all_macros[MAC_COUNT];
-
-Macro::Cleaner Macro::cleaner;
 
 //-----------------------------------------------------------------------------
 Macro::Macro(Macro_num num, const char * text)
@@ -53,19 +48,6 @@ Macro::~Macro()
 {
 }
 //-----------------------------------------------------------------------------
-void
-Macro::init_macros()
-{
-#define mac_def(n, txt) n = new Macro(Macro::MAC_ ## n, txt);
-#include "Macro.def"
-}
-//-----------------------------------------------------------------------------
-Macro::Cleaner::~Cleaner()
-{
-#define mac_def(n, txt) delete n;
-#include "Macro.def"
-}
-//-----------------------------------------------------------------------------
 Macro *
 Macro::get_macro(Macro_num num)
 {
@@ -77,7 +59,7 @@ Macro::get_macro(Macro_num num)
 void
 Macro::unmark_all_macros()
 {
-#define mac_def(n, _txt) n->unmark_all_values();
+#define mac_def(name, _txt) get_macro(MAC_ ## name)->unmark_all_values();
 #include "Macro.def"
 }
 //-----------------------------------------------------------------------------

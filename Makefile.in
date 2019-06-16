@@ -401,7 +401,8 @@ dist_doc_DATA = README			   \
                 README-6-porting	   \
 		README-7-more-info	   \
 		README-8-parallel          \
-                README-9-post-installation
+                README-9-post-installation \
+                README-10-python
 
 nobase_dist_sysconf_DATA = gnu-apl.d/preferences
 dist_noinst_DATA = Doxyfile Makefile.incl
@@ -963,6 +964,7 @@ help:
 	@echo ""
 	@echo "    make develop   - enable full dependency tracking"
 	@echo "    make gprof     - make develop + enable gprof profiling"
+	@echo "    make python    - make develop + build python module"
 	@echo "    make parallel  - enable multi-core APL (buggy and experimental!)"
 	@echo "    make parallel1 - make parallel for benchmarking"
 	@echo ""
@@ -973,6 +975,14 @@ help:
 .PHONY: develop
 develop:
 	./configure  --enable-maintainer-mode DEVELOP_WANTED=yes
+	make all
+
+###############################################################################
+# a shortcut to ./configure for compiling the python library
+#
+.PHONY: python
+python:
+	./configure  --enable-maintainer-mode DEVELOP_WANTED=yes --with-python
 	make all
 
 ###############################################################################

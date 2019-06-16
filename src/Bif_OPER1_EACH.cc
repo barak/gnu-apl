@@ -87,21 +87,28 @@ Function * LO = _LO.get_function();
         if (scalar_B && B->get_ravel(0).is_pointer_cell())
            B = B->get_ravel(0).get_pointer_value();
 
-        Macro * macro = 0; 
+        Macro * macro = 0;
         if (LO->has_result())
            if (scalar_A)
-              if (scalar_B)   macro = Macro::Z__sA_LO_EACH_sB;
-              else            macro = Macro::Z__sA_LO_EACH_vB;
+              if (scalar_B)   macro = Macro::get_macro(
+                                      Macro::MAC_Z__sA_LO_EACH_sB);
+              else            macro = Macro::get_macro(
+                                      Macro::MAC_Z__sA_LO_EACH_vB);
            else
-              if (scalar_B)   macro = Macro::Z__vA_LO_EACH_sB;
-              else            macro = Macro::Z__vA_LO_EACH_vB;
+              if (scalar_B)   macro = Macro::get_macro(
+                                      Macro::MAC_Z__vA_LO_EACH_sB);
+              else            macro = Macro::get_macro(
+                                      Macro::MAC_Z__vA_LO_EACH_vB);
         else
            if (scalar_A)
               if (scalar_B)   LO->eval_ALB(A, _LO, B);
-              else                  macro = Macro::sA_LO_EACH_vB;
+              else                  macro = Macro::get_macro(
+                                            Macro::MAC_sA_LO_EACH_vB);
            else
-              if (scalar_B)   macro = Macro::vA_LO_EACH_sB;
-              else            macro = Macro::vA_LO_EACH_vB;
+              if (scalar_B)   macro = Macro::get_macro(
+                                      Macro::MAC_vA_LO_EACH_sB);
+              else            macro = Macro::get_macro(
+                                      Macro::MAC_vA_LO_EACH_vB);
 
         return macro->eval_ALB(A, _LO, B);
       }
@@ -199,9 +206,13 @@ Function * LO = _LO.get_function();
 
    if (LO->may_push_SI())   // user defined LO
       {
-        if (!LO->has_result())         return Macro::LO_EACH_B->eval_LB(_LO, B);
-        if (LO == Bif_F1_EXECUTE::fun)  return Macro::Z__EXEC_EACH_B->eval_B(B);
-        return Macro::Z__LO_EACH_B->eval_LB(_LO, B);
+        if (!LO->has_result())
+           return Macro::get_macro(Macro::MAC_LO_EACH_B)->eval_LB(_LO, B);
+
+        if (LO == Bif_F1_EXECUTE::fun)
+           return Macro::get_macro(Macro::MAC_Z__EXEC_EACH_B)->eval_B(B);
+
+        return Macro::get_macro(Macro::MAC_Z__LO_EACH_B)->eval_LB(_LO, B);
       }
 
 const ShapeItem len_Z = B->element_count();

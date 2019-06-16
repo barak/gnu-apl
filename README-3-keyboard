@@ -214,6 +214,16 @@ See also Blake's notes in support-files/Unicomp-Keyboard/apl.unicomp.xkb.txt
 Another description (also using setxkbmap) and files supporting it was kindly
 provided by Dirk Laurie and is contained in directory support-files//Dirk.
 
+UPDATE: it seems like xmodmap no longer works in Linux Mint 19 (and probably
+also not on the Ubuntu version on which Mint 19 is based). A replacement for
+xmodmap on Mint 19 that roughly behaves like the xmodmap file for the Dyalog
+keyboard could be:
+
+   $ setxkbmap us,apl dyalog  -option grp:switch,grp:lswitch
+
+The -option arguments tell which keys will switch to apl when held down, see
+man xkeyboard-config).
+
 5. loadkeys
 ===========
 

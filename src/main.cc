@@ -325,8 +325,6 @@ const bool log_startup = uprefs.parse_argv_1();
 
    uprefs.parse_argv_2(log_startup);
 
-   Macro::init_macros();
-
    if (uprefs.CPU_limit_secs)
       {
         rlimit rl;
