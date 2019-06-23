@@ -470,8 +470,13 @@ inline const void * voidP(const void * addr) { return addr; }
 /// between sockaddr and a sockaddr_in
 union SockAddr
 {
+  /// an arbitrary socket address
   sockaddr    addr;
+
+  /// an AF_INET socket address
   sockaddr_in inet;
+
+  ///  an AF_UNIX socket address
   sockaddr_un uNix;
 };
 //-----------------------------------------------------------------------------

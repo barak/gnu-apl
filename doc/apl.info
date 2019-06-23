@@ -1885,16 +1885,19 @@ several formatting styles and conversion functions in addition to the
 well-known monadic form.
 
    Calling ⎕CR monadically without an axis and with an empty right
-argument shows a list of all functions provided by ⎕FIO:
+argument shows a list of all functions provided by ⎕CR:
 
       ⎕CR ''
 
    Say a byte vector is an integer vector with numbers having a (signed
 or unsigned) 8-bit value (i.e.  a value from -128 to 255 inclusive).
-Such byte vectors are returned by several ⎕FIO functions and expected as
-arguments by several other ⎕FIO function.  Let Z←A ⎕CR B.
+Such byte vectors are frequenctly used arguments and results of ⎕FIO
+functions.
 
-   Then the left argument A of ⎕CR selects one of the following:
+   Let Z←A ⎕CR B.
+
+   Then the left argument A of ⎕CR selects one of several sub-functions
+of ⎕CR:
 
    A=0-4 or 7-9, or 29: various formatting styles (boxed, APL
 input/output, etc.).  Just try them out.
@@ -2044,7 +2047,7 @@ FILE_IO
    Zh ←    FUN[ 3] Bs    fopen(Bs, "r") filename Bs
       ...
 
-   Current versions of GNU APL have replaced the native FILE_IO function
+   Recent versions of GNU APL have replaced the native FILE_IO function
 above by the system function ⎕FIO. ⎕FIO need not be ⎕FX’ed and is
 otherwise backward compatible to the native function.  New function
 numbers are, however, only added to ⎕FIO and not to the old native
@@ -4634,27 +4637,27 @@ Node: Section 3.1457680
 Node: Section 3.1559076
 Node: Section 3.1661588
 Node: Section 3.1768287
-Node: Section 3.1873340
-Node: Section 3.1976622
-Node: Section 3.2076913
-Node: Section 3.2186825
-Node: Section 3.2287097
-Node: Section 3.2393675
-Node: Section 3.2496126
-Node: Section 3.2596795
-Node: Section 3.26103431
-Node: Section 3.27104371
-Node: Section 3.28117933
-Node: Section 3.29121037
-Node: Section 3.30123026
-Node: Chapter 4127404
-Node: Chapter 5129152
-Node: Chapter 6130281
-Node: Section 6.1130700
-Node: Section 6.2131387
-Node: Chapter 7132218
-Node: Section 7.1132721
-Node: Section 7.2158031
+Node: Section 3.1873322
+Node: Section 3.1976603
+Node: Section 3.2076894
+Node: Section 3.2186806
+Node: Section 3.2287078
+Node: Section 3.2393656
+Node: Section 3.2496107
+Node: Section 3.2596776
+Node: Section 3.26103412
+Node: Section 3.27104352
+Node: Section 3.28117914
+Node: Section 3.29121018
+Node: Section 3.30123007
+Node: Chapter 4127385
+Node: Chapter 5129133
+Node: Chapter 6130262
+Node: Section 6.1130681
+Node: Section 6.2131368
+Node: Chapter 7132199
+Node: Section 7.1132702
+Node: Section 7.2158012
 
 End Tag Table
 

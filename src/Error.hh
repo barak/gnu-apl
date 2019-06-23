@@ -53,6 +53,7 @@ public:
    /// return true iff error_code is some SYNTAX ERROR or VALUE ERROR
    bool is_syntax_or_value_error() const;
 
+   /// return the error code of \b this error
    const ErrorCode get_error_code() const
       { return error_code; }
 

@@ -87,12 +87,13 @@ protected:
 };
 //=============================================================================
 /** A helper class for Bif_F12_TAKE and Bif_F12_DROP. It implements an iterator
-    that iterates over the indices (as dictated by ileft argument A) of the
+    that iterates over the indices (as dictated by left argument A) of the
     right argument B of A↑B or A↓B,
  **/
 class TakeDropIterator
 {
 public:
+   /// constructor
    TakeDropIterator(bool take, const Shape & sh_A, const Shape & sh_B)
    : ref_B(sh_B),
      current_offset(0),

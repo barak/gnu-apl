@@ -31,9 +31,6 @@ class Value;
 /// a ringbuffer of events related to the manipulation of values
 class VH_entry
 {
-   friend void print_history(ostream & out, const Value * val,
-                             const char * loc);
-
 public:
    /// Constructor: empty (invalid) event
    VH_entry() {}
@@ -43,6 +40,10 @@ public:
 
    /// init the event history
    static void init();
+
+   /// print the history of \b value
+   static void print_history(ostream & out, const Value * value,
+                             const char * loc);
 
    /// ring buffer of events
    static VH_entry history[VALUEHISTORY_SIZE + 1];   // +1 for Solaris
@@ -74,6 +75,4 @@ protected:
    int           testcase_line;
 };
 
-extern void print_history(ostream & out, const Value * val,
-                                const char * loc);
 #endif // __VALUEHISTORY_HH_DEFINED__

@@ -82,6 +82,7 @@ public:
    ShapeItem operator()() const
       { return current_offset; }
 
+   /// return the offsets as a Shape
    Shape get_offsets() const
       {
         Shape ret;

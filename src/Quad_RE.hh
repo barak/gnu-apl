@@ -38,13 +38,14 @@ public:
    static Quad_RE  _fun;          ///< Built-in function.
 
 protected:
+   /// the type of result
    enum Result_type
       {
-        RT_string    = 0,
-        RT_partition = 1,
-        RT_pos_len   = 2,
-        RT_reduce    = 3,
-      } result_type;
+        RT_string    = 0,   ///< matched string
+        RT_partition = 1,   ///< dito.
+        RT_pos_len   = 2,   ///< position and length
+        RT_reduce    = 3,   ///< dito.
+      } result_type;    ///< the type of result
 
    /// overloaded Function::eval_AB().
    Token eval_AB(Value_P A, Value_P B)
@@ -63,19 +64,40 @@ protected:
 
 #ifdef HAVE_LIBPCRE2_32
 
+   /// libpcre flags
    class Flags
       {
         public:
-           Flags(const UCS_string &flags_in);
-           int get_compflags() const { return flags; }
-           bool get_error_on_no_match() const { return error_on_no_match; }
-           bool get_global() const { return global; }
-           Result_type get_result_type() const { return result_type; }
+           /// constructor
+           Flags(const UCS_string & flags_in);
+
+           /// return the flags
+           int get_compflags() const
+              { return flags; }
+
+           /// return true if no match shall give an error
+           bool get_error_on_no_match() const
+              { return error_on_no_match; }
+
+           /// return global
+           bool get_global() const
+              { return global; }
+
+           /// return the result type
+           Result_type get_result_type() const
+              { return result_type; }
 
         protected:
+           /// the flags (see pcre.h)
            int flags;
+
+           /// make no match an error
            bool error_on_no_match;
+
+           /// dito.
            bool global;
+
+           /// dito.
            Result_type result_type;
       };
 

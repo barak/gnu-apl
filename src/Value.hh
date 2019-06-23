@@ -41,6 +41,7 @@ class Thread_context;
 /// a linked list of deleted values
 struct _deleted_value
 {
+   /// the next deleted value
   _deleted_value * next;
 };
 
@@ -548,6 +549,7 @@ public:
    void add_subcount(ShapeItem count)
       { nz_subcell_count += count; }
 
+      /// increment the number of (smart-) pointers to this value
    void increment_owner_count(const char * loc)
       {
         Assert1(reinterpret_cast<void *>(this) != 0);
@@ -555,6 +557,8 @@ public:
            ++owner_count;
       }
 
+      /// decrement the number of (smart-) pointers to this value and delete
+      /// this value if no more pointers exist
       void decrement_owner_count(const char * loc)
          {
            Assert1(reinterpret_cast<void *>(this) != 0);
@@ -670,6 +674,7 @@ private:
    /// prevent delete[] of Value
    static void operator delete[](void* ptr);
 
+   /// restrict use of & (which is frequently a mistake)
    Value * operator &()   { return this; }
 };
 // ----------------------------------------------------------------------------

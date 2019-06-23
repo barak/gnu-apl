@@ -79,7 +79,8 @@ public:
         return true;
       }
 
-   const char * c_str()
+   /// return \b this string as a 0-termionated C string
+   const char * c_str() const
       { return reinterpret_cast<const char *>
                                (std::basic_string<UTF8>::c_str()); }
 
@@ -88,19 +89,17 @@ public:
    void erase(size_t pos)
       { basic_string::erase(pos, 1); }
 
-   const UTF8 & back() const
+   /// return the last byte in this string
+   UTF8 back() const
       { Assert(size());   return at(size() - 1); }
 
-   UTF8 & back()
-      { Assert(size());   return at(size() - 1); }
-
+   /// discard the last byte in this string
    void pop_back()
       { Assert(size());   resize(size() - 1); }
 
    /// append a 0-terminated C string
    void append_ASCII(const char * ascii)
       { while (*ascii)   *this += *ascii++; }
-
 
    /// append the UTF8_string \b suffix
    void append_UTF8(const UTF8_string & suffix)

@@ -1942,7 +1942,7 @@ Value::print_stale_info(ostream & out, const DynamicObject * dob) const
    out << "print_stale_info():   alloc(" << dob->where_allocated()
        << ") flags(" << get_flags() << ")" << endl;
 
-   print_history(out, dob->pValue(), LOC);
+   VH_entry::print_history(out, dob->pValue(), LOC);
 
    try 
       {

@@ -25,7 +25,6 @@
 
 //-----------------------------------------------------------------------------
 /** System variable Quad-RL (Random Link).  */
-/// Helper for ⎕RE
 class Quad_RL : public SystemVariable
 {
 public:

@@ -2148,16 +2148,17 @@ formatting styles and conversion functions in addition to the well-known
 monadic form.
 </p>
 <p>Calling ⎕CR monadically without an axis and with an empty right argument
-shows a list of all functions provided by ⎕FIO:
+shows a list of all functions provided by ⎕CR:
 </p>
 <pre class="verbatim">      ⎕CR ''
 </pre>
 <p>Say a <b>byte vector</b> is an integer vector with numbers having a (signed or
 unsigned) 8-bit value (i.e. a value from -128 to 255 inclusive). Such byte
-vectors are returned by several ⎕FIO functions and expected as arguments by 
-several other ⎕FIO function. Let Z←A ⎕CR B.
+vectors are frequenctly used arguments and results of ⎕FIO functions.
 </p>
-<p>Then the left argument A of ⎕CR selects one of the following:
+<p>Let Z←A ⎕CR B.
+</p>
+<p>Then the left argument A of ⎕CR selects one of several sub-functions of ⎕CR:
 </p>
 <p>A=0-4 or 7-9, or 29: various formatting styles (boxed, APL input/output, etc.).
 Just try them out.
@@ -2304,7 +2305,7 @@ FILE_IO
    Zh ←    FUN[ 3] Bs    fopen(Bs, &quot;r&quot;) filename Bs
       ...
 </pre>
-<p>Current versions of GNU APL have replaced the native FILE_IO function above by
+<p>Recent versions of GNU APL have replaced the native FILE_IO function above by
 the system function ⎕FIO. ⎕FIO need not be ⎕FX&rsquo;ed and is otherwise backward
 compatible to the native function. New function numbers are, however, only
 added to ⎕FIO and not to the old native function FILE_IO. The parameters of

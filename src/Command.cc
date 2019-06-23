@@ -47,6 +47,7 @@
 #include "Tokenizer.hh"
 #include "UserFunction.hh"
 #include "UserPreferences.hh"
+#include "ValueHistory.hh"
 #include "Workspace.hh"
 
 #include "Value.hh"
@@ -683,11 +684,11 @@ ShapeItem duplicate_parents = 0;
                        << voidP(vvp) << endl;
 
                    out << "History of the child:" << endl;
-                   print_history(out, vvp->child, LOC);
+                   VH_entry::print_history(out, vvp->child, LOC);
                    out << "History of the first parent:" << endl;
-                   print_history(out, vvp->parent, LOC);
+                   VH_entry::print_history(out, vvp->parent, LOC);
                    out << "History of the second parent:" << endl;
-                   print_history(out, val, LOC);
+                   VH_entry::print_history(out, val, LOC);
                    out << endl;
                  }
            }

@@ -1222,9 +1222,17 @@ Prefix::reduce_F_M_C_()
 {
    Assert1(prefix_len == 3);
 
+   if (at2().get_tag() != TOK_AXES)   // e.g. F[;2] instead of F[2]
+      {
+        // the user has provided a TOK_INDEX where TOK_AXES was expected
+        MORE_ERROR() << "illegal ; in axis";
+        AXIS_ERROR;
+      }
+
 DerivedFunction * derived =
    Workspace::SI_top()->fun_oper_cache.get(LOC);
-   new (derived) DerivedFunction(at0(), at1().get_function(),
+   new (derived) DerivedFunction(at0(),
+                                 at1().get_function(),
                                  at2().get_axes(), LOC);
 
    pop_args_push_result(Token(TOK_FUN2, derived));
@@ -1253,9 +1261,17 @@ Prefix::reduce_F_C_M_()
 {
    Assert1(prefix_len == 3);
 
+   if (at1().get_tag() != TOK_AXES)   // e.g. F[;2] instead of F[2]
+      {
+        // the user has provided a TOK_INDEX where TOK_AXES was expected
+        MORE_ERROR() << "illegal ; in axis";
+        AXIS_ERROR;
+      }
+
 DerivedFunction * F_C =
    Workspace::SI_top()->fun_oper_cache.get(LOC);
-   new (F_C) DerivedFunction(at0().get_function(), at1().get_axes(), LOC);
+   new (F_C) DerivedFunction(at0().get_function(),
+                             at1().get_axes(), LOC);
 
 Token tok_F_C(TOK_FUN2, F_C);
 DerivedFunction * derived =
@@ -1288,9 +1304,24 @@ Prefix::reduce_F_C_M_C()
 {
    Assert1(prefix_len == 4);
 
+   if (at1().get_tag() != TOK_AXES)   // e.g. F[;2] instead of F[2]
+      {
+        // the user has provided a TOK_INDEX where TOK_AXES was expected
+        MORE_ERROR() << "illegal ; in axis";
+        AXIS_ERROR;
+      }
+
+   if (at3().get_tag() != TOK_AXES)   // e.g. M[;2] instead of M[2]
+      {
+        // the user has provided a TOK_INDEX where TOK_AXES was expected
+        MORE_ERROR() << "illegal ; in axis";
+        AXIS_ERROR;
+      }
+
 DerivedFunction * F_C =
    Workspace::SI_top()->fun_oper_cache.get(LOC);
-   new (F_C) DerivedFunction(at0().get_function(), at1().get_axes(), LOC);
+   new (F_C) DerivedFunction(at0().get_function(),
+                             at1().get_axes(), LOC);
 
 Token tok_F_C(TOK_FUN2, F_C);
 DerivedFunction * derived =
@@ -1443,6 +1474,13 @@ Value_P y123;
 Value_P B;
    Bif_OPER2_RANK::split_y123_B(at3().get_apl_val(), y123, B);
 Token new_y123(TOK_APL_VALUE1, y123);
+
+   if (at2().get_tag() != TOK_AXES)   // e.g. D[;2] instead of D[;2]
+      {
+        // the user has provided a TOK_INDEX where TOK_AXES was expected
+        MORE_ERROR() << "illegal ; in axis";
+        AXIS_ERROR;
+      }
 
 Value_P v_idx = at2().get_axes();
 DerivedFunction * derived = Workspace::SI_top()->fun_oper_cache.get(LOC);

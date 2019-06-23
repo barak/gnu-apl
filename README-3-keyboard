@@ -69,9 +69,16 @@ located in the included support-files directory.
 
 Then a number of different keyboard layouts were contributed by GNU APL users.
 
-As of GNU APL 1.4 there is now one directory for every keyboard interface option,
-currently Dirk, Dyalog-Keyboard, old-Keyboard, OS-X-Keyboard, Unicomp-Keyboard, 
-and WASD-Keyboard options are listed.
+As of GNU APL 1.4 there is now one directory for every keyboard interface
+option, currently:
+
+    support-files/Dirk,
+    support-files/Dyalog-Keyboard,
+    support-files/Jürgen-Mint-19,
+    support-files/old-Keyboard,
+    support-files/OS-X-Keyboard,
+    support-files/Unicomp-Keyboard, and
+    support-files/WASD-Keyboard
 
 The file names mentioned in the following are generic (independent of a
 particular keyboard layout) whereas the support files provided, live in
@@ -163,7 +170,7 @@ PC105 USA and International Keyboards
 ║  SHIFT ║ > °║ z⊂ ║ x⊃ ║ c∩ ║ v∪ ║ b⊥ ║ n⊤ ║ m| ║ ,⍝ ║ .⍀ ║ /⌿ ║  SHIFT      ║
 ╚════════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩═════════════╝
 
-Three files within "support-files/Dialog-Keyboard/", keyboard.txt, keyboard1.txt
+Three files within "support-files/Dyalog-Keyboard/", keyboard.txt, keyboard1.txt
 and pc105.txt contain the above images. If you want to print it 
 (keyboard1 is < 80 characters wide).
 
@@ -174,6 +181,11 @@ If you are Finnish then you may want to have a look here:
 
   http://www.oksman.eu/apl/gnu_apl_installation_with_finnish_keyboard_layout.txt
 
+LATEST NEWS: as of Mint-19 xmodmap is no longer working (at least with the
+GNOME desktop). For those who used xmodmap with a Dyalog keyboard layout,
+a 1:1 replacement based on setxkbmap exists, see file README in directory
+support-files/Jürgen-Mint-19. This file is a hack that is somewhat easier
+to use than "proper" setxkbmap/xkbcomp setup explained in the next section.
 
 4. setxkbmap/xkbcomp
 ====================
@@ -212,17 +224,18 @@ can generate your own apl.xkm file (see man pages for setxkbmap and xkbcomp).
 See also Blake's notes in support-files/Unicomp-Keyboard/apl.unicomp.xkb.txt
 
 Another description (also using setxkbmap) and files supporting it was kindly
-provided by Dirk Laurie and is contained in directory support-files//Dirk.
+provided by Dirk Laurie and is contained in directory support-files/Dirk.
 
-UPDATE: it seems like xmodmap no longer works in Linux Mint 19 (and probably
-also not on the Ubuntu version on which Mint 19 is based). A replacement for
-xmodmap on Mint 19 that roughly behaves like the xmodmap file for the Dyalog
-keyboard could be:
-
-   $ setxkbmap us,apl dyalog  -option grp:switch,grp:lswitch
-
-The -option arguments tell which keys will switch to apl when held down, see
-man xkeyboard-config).
+WARNING: the description above is merely the "Theory of Operation" for
+setxkbmap and friends (according to their man pages). Over the years, window
+managers have become increasingly intrusive (some call it "convenient")
+into the keyboard setup. There exist a number of description below the
+directory support-files/ that may look contradictory and/or may not work on
+a given platform. These descriptions were, to the best of our knowledge,
+valid and working at the time when they were contributed, but may have stopped
+working on some platforms in the meantime. Therefore please consider them as
+mere ideas how keyboard layouts could be adapted to APL rather than fool-proof
+recipies.
 
 5. loadkeys
 ===========
@@ -268,7 +281,7 @@ refer you to the web page of Elias Mårtenson who has put a lot of effort
 into developing an emacs mode for GNU APL. This is a must for every
 emacs user:
 
-    https://github.com/lokedhs/gnu-apl-mode 
+    https://github.com/lokedhs/gnu-apl-mode
 
 
 8. Vim Plugins

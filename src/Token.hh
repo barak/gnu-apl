@@ -334,7 +334,7 @@ public:
    void print(ostream & out, bool details) const;
 
 private:
-   // prevent accidental copying
+   /// prevent accidental copying
    Token_string & operator =(const Token_string & other);
 };
 //-----------------------------------------------------------------------------

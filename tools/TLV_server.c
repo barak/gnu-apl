@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2018  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2019  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -45,19 +45,19 @@
 
       ⍝ one time
       Path ← '/usr/lib/apl/TLV_server'    ⍝ whereever TLV_server was installed
-      Handle ← ⎕FIO[57] Path              ⍝ start & connect TLV_server
+      Handle ← ⎕FIO[57] Path              ⍝ start & connect to the TLV_server
 
       ⍝ typically in a loop,,,
-      TLV ← 33 ⎕CR 42,'Forty-Two'         ⍝ encode a TLV buffer
+      TLV ← 33 ⎕CR 42,'Forty-Two'         ⍝ encode a TLV buffer, Tag 42
       ⊣TLV ⎕FIO[43] Handle                ⍝ send TLV buffer to TLV_server
       TL ← 8 ⎕FIO[6] Handle               ⍝ read tag/length from TLV_server
       Value ← (256⊥4↓TL) ⎕FIO[6] Handle   ⍝ read value  from TLV_server
       34 ⎕CR TL,Value                     ⍝ display response tag and value
 
       ⍝ cleanup (one time)
+      TLV ← 33 ⎕CR 99,'quit'              ⍝ encode stop command, Tag 99
+      ⊣TLV ⎕FIO[43] Handle                ⍝ send TLV buffer to TLV_server
       ⊣(⎕FIO[4] Handle)                   ⍝ close connection (stops TLV_server)
-
-
 
  */
 
@@ -95,15 +95,17 @@ FILE * f = fdopen(TLV_socket, "r");
        {
           // read the fixed size TL
           //
-          rx_len = fread(TLV, 1, 8, f);
-          if (rx_len != 8)
+          rx_len = fread(TLV, 1, 4 + 4, f);
+          if (rx_len != 4 + 4)
              {
                fprintf(stderr, "TLV socked closed (1): %s\n", strerror(errno));
-               fclose(f);
-               return 0;
+               break;
              }
 
-          TLV_tag = TLV[0] << 24 | TLV[1] << 16 | TLV[2] << 8 | TLV[3];
+          TLV_tag = (TLV[0] & 0xFF) << 24
+                  | (TLV[1] & 0xFF) << 16
+                  | (TLV[2] & 0xFF) << 8
+                  | (TLV[3] & 0xFF);
           TLV_len = TLV[4] << 24 | TLV[5] << 16 | TLV[6] << 8 | TLV[7];
 
           // read the variable-sized V
@@ -115,37 +117,55 @@ FILE * f = fdopen(TLV_socket, "r");
                   {
                     fprintf(stderr, "TLV socked closed (2): %s\n",
                             strerror(errno));
-                    fclose(f);
-                    return 0;
+                    break;
                   }
                V[TLV_len] = 0;
              }
 
-          // negate the tag
+          // check for 'quit' Tag from the TLV client
           //
-          TLV_tag = -TLV_tag;
-          TLV[0] = TLV_tag >>  24;
-          TLV[1] = TLV_tag >>  16;
-          TLV[2] = TLV_tag >>   8;
-          TLV[3] = TLV_tag;
+          const int done = (TLV_tag == 99);
+          if (done)
+             {
+               TLV_len = 4;
+               V[0] = 'd';
+               V[1] = 'o';
+               V[2] = 'n';
+               V[3] = 'e';
+             }
+          else
+             {
+               // negate the tag
+               //
+               TLV_tag = -TLV_tag;
+               TLV[0] = TLV_tag >>  24;
+               TLV[1] = TLV_tag >>  16;
+               TLV[2] = TLV_tag >>   8;
+               TLV[3] = TLV_tag;
 
-          // mirror the value
-          //
-          for (j = 0; j < TLV_len/2; ++j)
-              {
-                const char tmp = V[j];
-                V[j] = V[TLV_len - j - 1];
-                V[TLV_len - j - 1] = tmp;
-              }
+               // mirror the value
+               //
+               for (j = 0; j < TLV_len/2; ++j)
+                   {
+                     const char tmp = V[j];
+                     V[j] = V[TLV_len - j - 1];
+                     V[TLV_len - j - 1] = tmp;
+                   }
+             }
 
           // send the response
           //
-          tx_len = write(TLV_socket, TLV, 8 + TLV_len);
-          if (tx_len != (8 + TLV_len))
+          tx_len = write(TLV_socket, TLV, 4 + 4 + TLV_len);
+          if (tx_len != (4 + 4 + TLV_len))
              {
                fprintf(stderr, "TLV socked closed (3): %s\n", strerror(errno));
-               fclose(f);
-               return 0;
+               break;
              }
+
+          if (done)   break;
        }
+
+   fclose(f);
+   return 0;
 }
+

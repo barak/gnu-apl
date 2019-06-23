@@ -75,6 +75,9 @@ public:
    /// get one Unicode from file
    static Unicode fget_utf8(FILE * file, ShapeItem & fget_count);
 
+   /// return one mor more random values
+   static Value_P get_random(APL_Integer mode, APL_Integer len);
+
    /// return the open FILE * for (APL integer) \b handle
    FILE * get_FILE(int handle);
 
@@ -98,6 +101,7 @@ protected:
           fe_may_write(false)
         {}
 
+        /// assignment
         void operator =(const file_entry & other)
            {
              path = other.path;

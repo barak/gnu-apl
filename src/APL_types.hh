@@ -576,8 +576,8 @@ struct labVal
 /// (to / weight / current)
 struct _twc
 {
-   // the end index (exclusive) for each axis. It can be > dimension
-   // length for over-Take from the start.
+   /// the end index (exclusive) for each axis. It can be > dimension
+   /// length for over-Take from the start.
    ShapeItem to;
 
    /// weight of the dimension
@@ -591,8 +591,8 @@ struct _twc
 /// (from / to / weight / current)
 struct _ftwc : public _twc
 {
-   // the start index (inclusive) for each axis. It can be < 0 for
-   // over-Take from the end.
+   /// the start index (inclusive) for each axis. It can be < 0 for
+   /// over-Take from the end.
    ShapeItem from;
 };
 //-----------------------------------------------------------------------------

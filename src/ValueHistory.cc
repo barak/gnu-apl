@@ -67,7 +67,7 @@ VH_entry * entry = VH_entry::history + VH_entry::idx++;
 }
 //----------------------------------------------------------------------------
 void
-print_history(ostream & out, const Value * val, const char * loc)
+VH_entry::print_history(ostream & out, const Value * val, const char * loc)
 {
    // search backwards for events of val.
    //

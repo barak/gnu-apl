@@ -341,6 +341,45 @@ char numbuf[50];
        }
 }
 //-----------------------------------------------------------------------------
+Value_P
+Quad_FIO::get_random(APL_Integer mode, APL_Integer len)
+{
+const int device = open("/dev/urandom", O_RDONLY);
+   if (device == -1)
+      {
+        MORE_ERROR() << "⎕FIO[60] failed when trying to open /dev/urandom: "
+                     << strerror(errno);
+        DOMAIN_ERROR;
+      }
+
+unsigned char buffer[32];   // caller has checked that len <= 32
+const ssize_t bytes = read(device, buffer, len);
+   close(device);
+
+   if (bytes == -1)
+      {
+        MORE_ERROR() << "⎕FIO[60] failed when trying to read /dev/urandom: "
+                     << strerror(errno);
+        DOMAIN_ERROR;
+      }
+
+   if (mode == 0)        // single integer result (len ≤ 8)
+      {
+         APL_Integer result = 0;
+         loop(l, len)   result = result << 8 | (buffer[l] & 0xFF);
+         return IntScalar(result, LOC);
+      }
+   else if (mode == 1)   // byte vector result
+      {
+        Value_P Z(len, LOC);
+        loop(l, len)   new (Z->next_ravel())   IntCell(buffer[l] & 0xFF);
+         return Z;
+      }
+
+   MORE_ERROR() << "Invalid mode A in A ⎕FIO[60] B";
+   DOMAIN_ERROR;
+}
+//-----------------------------------------------------------------------------
 Unicode
 Quad_FIO::fget_utf8(FILE * file, ShapeItem & fget_count)
 {
@@ -666,7 +705,8 @@ Unicode lookahead = input.get_next();
                   if (!suppress)
                      {
                        Value_P ZZ(ucs, LOC);
-                       new (&Z->get_ravel(z++))   PointerCell(ZZ.get(), Z.getref());
+                       new (&Z->get_ravel(z++))
+                           PointerCell(ZZ.get(), Z.getref());
                      }
                 }
            }
@@ -711,10 +751,11 @@ Quad_FIO::list_functions(ostream & out)
 "   Functions provided by ⎕FIO...\n"
 "\n"
 "   Legend: a - address family, IPv4 address, port (or errno)\n"
+"           b - byte(s) (Integer(s) in the range [0-255])\n"
 "           d - table of dirent structs\n"
 "           e - error code (integer as per errno.h)\n"
 "           f - format string (printf(), scanf())\n"
-"           h - file handle (integer)\n"
+"           h - file handle (small integer)\n"
 "           i - integer\n"
 "           n - names (nested vector of strings)\n"
 "           s - string\n"
@@ -740,15 +781,15 @@ Quad_FIO::list_functions(ostream & out)
 "File I/O functions:\n"
 "\n"
 "   Ze ←    ⎕FIO[ 4] Bh    fclose(Bh)\n"
-"   Ze ←    ⎕FIO[ 5] Bh    errno (of last call on Bh)\n"
-"   Zi ←    ⎕FIO[ 6] Bh    fread(Zi, 1, " << SMALL_BUF << ", Bh) 1 byte per Zi\n"
-"   Zi ← Ai ⎕FIO[ 6] Bh    fread(Zi, 1, Ai, Bh) 1 byte per Zi\n"
-"   Zi ← Ai ⎕FIO[ 7] Bh    fwrite(Ai, 1, ⍴Ai, Bh) 1 byte per Ai\n"
-"   Zi ←    ⎕FIO[ 8] Bh    fgets(Zi, " << SMALL_BUF << ", Bh) 1 byte per Zi\n"
-"   Zi ← Ai ⎕FIO[ 8] Bh    fgets(Zi, Ai, Bh) 1 byte per Zi\n"
-"   Zi ←    ⎕FIO[ 9] Bh    fgetc(Zi, Bh) 1 byte\n"
+"   Ze ←    ⎕FIO[ 5] Bh    errno (of the last call using Bh)\n"
+"   Zb ←    ⎕FIO[ 6] Bh    fread(Zi, 1, " << SMALL_BUF << ", Bh) 1 byte per Zb\n"
+"   Zb ← Ai ⎕FIO[ 6] Bh    fread(Zi, 1, Ai, Bh) 1 byte per Zb\n"
+"   Zi ← Ab ⎕FIO[ 7] Bh    fwrite(Ab, 1, ⍴Ai, Bh) 1 byte per Ai\n"
+"   Zb ←    ⎕FIO[ 8] Bh    fgets(Zb, " << SMALL_BUF << ", Bh) 1 byte per Zb\n"
+"   Zb ← Ai ⎕FIO[ 8] Bh    fgets(Zb, Ai, Bh) 1 byte per Zb\n"
+"   Zb ←    ⎕FIO[ 9] Bh    fgetc(Zb, Bh) 1 byte\n"
 "   Zi ←    ⎕FIO[10] Bh    feof(Bh)\n"
-"   Zi ←    ⎕FIO[11] Bh    ferror(Bh)\n"
+"   Ze ←    ⎕FIO[11] Bh    ferror(Bh)\n"
 "   Zi ←    ⎕FIO[12] Bh    ftell(Bh)\n"
 "   Zi ← Ai ⎕FIO[13] Bh    fseek(Bh, Ai, SEEK_SET)\n"
 "   Zi ← Ai ⎕FIO[14] Bh    fseek(Bh, Ai, SEEK_CUR)\n"
@@ -767,7 +808,7 @@ Quad_FIO::list_functions(ostream & out)
 "   Zh ← As ⎕FIO[24] Bs    popen(Bs, As) command Bs mode As\n"
 "   Zh ←    ⎕FIO[24] Bs    popen(Bs, \"r\") command Bs\n"
 "   Ze ←    ⎕FIO[25] Bh    pclose(Bh)\n"
-"   Zs ←    ⎕FIO[26] Bs    return entire file Bs as byte vector\n"
+"   Zb ←    ⎕FIO[26] Bs    return entire file Bs as byte vector\n"
 "   Zs ← As ⎕FIO[27] Bs    rename file As to Bs\n"
 "   Zd ←    ⎕FIO[28] Bs    return content of directory Bs\n"
 "   Zn ←    ⎕FIO[29] Bs    return file names in directory Bs\n"
@@ -779,14 +820,14 @@ Quad_FIO::list_functions(ostream & out)
 "   Ze ← Ai ⎕FIO[34] Bh    listen(Bh, Ai)\n"
 "   Za ←    ⎕FIO[35] Bh    accept(Bh)\n"
 "   Ze ← Aa ⎕FIO[36] Bh    connect(Bh, Aa)\n"
-"   Zi ←    ⎕FIO[37] Bh    recv(Bh, Zi, " << SMALL_BUF << ", 0) 1 byte per Zi\n"
-"   Zi ← Ai ⎕FIO[37] Bh    recv(Bh, Zi, Ai, 0) 1 byte per Zi\n"
-"   Zi ← Ai ⎕FIO[38] Bh    send(Bh, Ai, ⍴Ai, 0) 1 byte per Ai\n"
+"   Zb ←    ⎕FIO[37] Bh    recv(Bh, Zb, " << SMALL_BUF << ", 0) 1 byte per Zb\n"
+"   Zb ← Ai ⎕FIO[37] Bh    recv(Bb, Zi, Ai, 0) 1 byte per Zb\n"
+"   Zi ← Ab ⎕FIO[38] Bh    send(Bh, Ab, ⍴Ab, 0) 1 byte per Ab\n"
 "   Zi ← Ac ⎕FIO[39] Bh    send(Bh, Ac, ⍴Ac, 0) 1 Unicode per Ac, Output UTF8\n"
 "   Zi ←    ⎕FIO[40] B     select(B_read, B_write, B_exception, B_timeout)\n"
 "   Zi ←    ⎕FIO[41] Bh    read(Bh, Zi, " << SMALL_BUF << ") 1 byte per Zi\n"
-"   Zi ← Ai ⎕FIO[41] Bh    read(Bh, Zi, Ai) 1 byte per Zi\n"
-"   Zi ← Ai ⎕FIO[42] Bh    write(Bh, Ai, ⍴Ai) 1 byte per Ai\n"
+"   Zb ← Ai ⎕FIO[41] Bh    read(Bh, Zb, Ai) 1 byte per Zb\n"
+"   Zi ← Ab ⎕FIO[42] Bh    write(Bh, Ab, ⍴Ab) 1 byte per Ab\n"
 "   Zi ← Ac ⎕FIO[43] Bh    write(Bh, Ac, ⍴Ac) 1 Unicode per Ac, Output UTF8\n"
 "   Za ←    ⎕FIO[44] Bh    getsockname(Bh)\n"
 "   Za ←    ⎕FIO[45] Bh    getpeername(Bh)\n"
@@ -800,11 +841,14 @@ Quad_FIO::list_functions(ostream & out)
 "   Zy9←    ⎕FIO[52] Bi    localtime(Bi) Note: Jan 2, 2017 is: 2017 1 2 ...\n"
 "   Zy9←    ⎕FIO[53] Bi    gmtime(Bi)    Note: Jan 2, 2017 is: 2017 1 2 ...\n"
 "   Zi ←    ⎕FIO[54] Bs    chdir(Bs)\n"
-"   Ze ← Af ⎕FIO[55] Bh    sscanf(Bs, As) Af is the format string\n"
+"   Ze ← Af ⎕FIO[55] Bs    sscanf(Bs, As) Af is the format string\n"
 "   Zs ← As ⎕FIO[56] Bs    write nested lines As to file named Bs\n"
 "   Zh ←    ⎕FIO[57] Bs    fork() and execve(Bs, { Bs, 0}, {0})\n"
 "   Zs ← Af ⎕FIO[58] B     sprintf(Af, B...) As is the format string\n"
 "   Zi ← Ai ⎕FIO[59] Bh    fcntl(Bh, Ai...) file control\n"
+"   Zi ←    ⎕FIO[60] Bi    return a Bi-byte random integer (for setting ⎕RL)\n"
+"   Zi ← 0  ⎕FIO[60] Bi    same as monadic ⎕FIO[60] Bi (random scalar, Bi≤8)\n"
+"   Zb ← 1  ⎕FIO[60] Bi    return a vector of random bytes, (Bi ≥ ⍴Zi)\n"
 "\n"
 "Benchmarking functions:\n"
 "\n"
@@ -1791,6 +1835,16 @@ const APL_Integer function_number = X->get_ravel(0).get_near_int();
                   return Token(TOK_APL_VALUE1, IntScalar(fd, LOC));
               }
 
+         case 60:   // random value
+              {
+                 if (!B->is_scalar())   RANK_ERROR;
+                 const APL_Integer len = B->get_ravel(0).get_int_value();
+                 if (len < 1)   LENGTH_ERROR;
+                 if (len > 8)   LENGTH_ERROR;
+                 Value_P Z = get_random(0, len);
+                 return Token(TOK_APL_VALUE1, Z);
+              }
+
          case 202:   // get monadic parallel threshold
          case 203:   // get dyadic  parallel threshold
               {
@@ -2407,6 +2461,18 @@ const int function_number = X->get_ravel(0).get_near_int();
 
                 if (result == -1 && errno)   goto out_errno;
                 return Token(TOK_APL_VALUE1, IntScalar(result, LOC));
+              }
+
+         case 60:   // random value(s)
+              {
+                 if (!A->is_scalar())   RANK_ERROR;
+                 if (!B->is_scalar())   RANK_ERROR;
+                 const APL_Integer mode = A->get_ravel(0).get_int_value();
+                 const APL_Integer len  = B->get_ravel(0).get_int_value();
+                 if (len < 1)    LENGTH_ERROR;
+                 if (len > 32)   LENGTH_ERROR;
+                 Value_P Z = get_random(mode, len);
+                 return Token(TOK_APL_VALUE1, Z);
               }
 
          case 202:   // set monadic parallel threshold

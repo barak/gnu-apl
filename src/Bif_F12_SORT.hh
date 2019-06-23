@@ -62,6 +62,7 @@ struct CollatingCacheEntry
    /// the shape
    Shape ce_shape;
 
+   /// assignment (to allow const ce_char)
    void operator =(const CollatingCacheEntry & other)
       { new (this)   CollatingCacheEntry(other); }
 

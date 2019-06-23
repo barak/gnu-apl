@@ -416,7 +416,10 @@ protected:
 #endif
 
 private:
+   /// prevent accidental allocation
    void * operator new[](size_t size);
+
+   /// prevent accidental de-allocation
    void operator delete[](void *);
 
 private:

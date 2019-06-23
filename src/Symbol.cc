@@ -37,6 +37,7 @@
 #include "SystemVariable.hh"
 #include "UserFunction.hh"
 #include "Value.hh"
+#include "ValueHistory.hh"
 #include "Workspace.hh"
 
 //-----------------------------------------------------------------------------
@@ -127,7 +128,7 @@ Symbol::assign(Value_P new_value, bool clone, const char * loc)
       {
         CERR << "Incomplete value at " LOC << endl;
         new_value->print_properties(CERR, 0, false);
-        print_history(CERR, new_value.get(), LOC);
+        VH_entry::print_history(CERR, new_value.get(), LOC);
         Assert(0);
       }
 

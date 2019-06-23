@@ -1,0 +1,31 @@
+
+As of Mint-19 (Gnome) xmodmap has stopped working. The file 'us' in this
+directory is a 1:1 replacement for the .xmodmap file that I used in the
+last 10 years.
+
+The file 'us' provides the following keyboard layout:
+
+  the standard US layout
++ additional APL symbols as found on a Dyalog US keyboard
++ German "Umlaute and a few extra keys on the numeric keypad
+
+I have tried to use the "proper way" with setxkbmap (as described, for
+example, in the directory 'Dirk', but could not get it working. My very
+personal solution was then to "hack" all additional keys (APL, Umlaute)
+directly into the US base keyboard.
+
+In my old .xmodmap file, the keys that switch to APL were hardwired to
+be both ALT keys. With the 'us' file in this directory it seems as if
+one can choose different keys to switch to APL characters. That is, of
+course, an advantage. I cannot predict, though, for how long it will
+be working.
+
+
+Installation (from this directory):
+
+1. sudo mv /usr/share/X11/xkb/symbols/us   /usr/share/X11/xkb/symbols/us.orig
+2. sudo cp ./us   /usr/share/X11/xkb/symbols/us
+3. select switch key(s) in: Control Center → Hardware → Keyboard → Layouts
+                                           → Options → Key to choose 3rd Level.
+4. reboot
+

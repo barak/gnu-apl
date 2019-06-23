@@ -190,6 +190,7 @@ public:
    /// a list of dyadic PJobs created by this core
    Parallel_job_list<PJob_scalar_AB, false> joblist_AB;
 
+   /// remove all thread contexts (when the APL interpreter exits)
    static void cleanup()
       { delete [] thread_contexts;   thread_contexts = 0; }
 

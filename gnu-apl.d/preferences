@@ -283,9 +283,9 @@
 # LIBREF-0 /home/xyz/my-own-libs
 # LIBREF-1 /home/xyz/my-group-libs
 # LIBREF-2 /group/abc/other-libs
-  LIBREF-3 /usr/local/lib/apl/wslib3
-  LIBREF-4 /usr/local/lib/apl/wslib4
-  LIBREF-5 /usr/local/lib/apl/wslib5
+  LIBREF-3 /usr/lib/apl/wslib3
+  LIBREF-4 /usr/lib/apl/wslib4
+  LIBREF-5 /usr/lib/apl/wslib5
 # LIBREF-6 /usr/lib/gnu-apl/lib-6
 # LIBREF-7 /usr/lib/gnu-apl/lib-7
 # LIBREF-8 /usr/lib/gnu-apl/lib-8
@@ -343,8 +343,8 @@ BACKUP_BEFORE_SAVE  yes
 # directory named 'support-files' as a starting point for your own layout
 # and uncomment the following setting:
 #
-# KEYBOARD_LAYOUT_FILE  /usr/local/etc/gnu-apl.d/keyboard1.txt
-# KEYBOARD_LAYOUT_FILE  /usr/local/etc/gnu-apl.d/keyboard2.txt
+# KEYBOARD_LAYOUT_FILE  /usr/etc/gnu-apl.d/keyboard1.txt
+# KEYBOARD_LAYOUT_FILE  /usr/etc/gnu-apl.d/keyboard2.txt
 #
 
 ###############################################################################

@@ -117,8 +117,6 @@ static PyObject * exec_result = 0;
 bool
 python_result_callback(Token & result)
 {
-   CERR << endl << "### PYTHON RESULT CALLBACK ###" << endl;
-
 const TokenTag tag = result.get_tag();
 bool do_display = false;
 

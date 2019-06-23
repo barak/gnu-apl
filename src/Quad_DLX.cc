@@ -56,6 +56,7 @@ public:
       right(r)
    { insert_lr();   insert_ud(); }
 
+   /// assignment
    void operator = (const DLX_Node & other)
       { new (this) DLX_Node(other); }
 

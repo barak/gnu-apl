@@ -78,7 +78,7 @@ RegexpMatch::num_matches() const
    if (match_result < 0)
       {
         MORE_ERROR() << "Attempt to call num_matches without matches";
-        FIXME;        
+        FIXME;
       }
 
     return match_result;
@@ -122,8 +122,7 @@ Regexp::~Regexp()
    pcre2_code_free(code);
 }
 //-----------------------------------------------------------------------------
-
-RegexpMatch *
+const RegexpMatch *
 Regexp::match(const UCS_string &match, PCRE2_SIZE size) const
 {
    return new RegexpMatch(code, match, size);
