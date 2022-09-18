@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-August 4, 2022
+September 18, 2022
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
@@ -703,13 +703,14 @@ File: apl.info,  Node: Chapter 2,  Next: Chapter 3,  Prev: Chapter 1,  Up: Top
 * Section 2.29::  ⎕JSON - JSON Parsing
 * Section 2.30::  ⎕MAP  - Map Value
 * Section 2.31::  ⎕PLOT - Plot Data
-* Section 2.32::  ⎕PS   - Print Style
-* Section 2.33::  ⎕RE   - Regular Expressions
-* Section 2.34::  ⎕RVAL - Random APL value
-* Section 2.35::  ⎕SQL  - SQL Database Interface
-* Section 2.36::  ⎕SI   - State Indicator
-* Section 2.37::  ⎕SYL  - System limits
-* Section 2.38::  ⎕XML - XML Parsing
+* Section 2.32::  ⎕PNG  - Portable Network Graphics
+* Section 2.33::  ⎕PS   - Print Style
+* Section 2.34::  ⎕RE   - Regular Expressions
+* Section 2.35::  ⎕RVAL - Random APL value
+* Section 2.36::  ⎕SQL  - SQL Database Interface
+* Section 2.37::  ⎕SI   - State Indicator
+* Section 2.38::  ⎕SYL  - System limits
+* Section 2.39::  ⎕XML - XML Parsing
 
 There are a few hopefully useful features in GNU APL:
 
@@ -3651,19 +3652,200 @@ for the libgtk-3 option.
 
 File: apl.info,  Node: Section 2.32,  Next: Section 2.33,  Prev: Section 2.31,  Up: Chapter 2
 
-2.32 ⎕PS - Print Style
+2.32 ⎕PNG - Portable Network Graphics
+=====================================
+
+Portable Network Graphics is a file format for images, defined in *RFC
+2083*.  To quote the RFC:
+
+   ‘The PNG format provides a portable, legally unencumbered,
+well-compressed, well-specified standard for lossless bitmapped image
+files.’
+
+2.32.1 The GNU APL Color Model
+------------------------------
+
+An image is a rectangular matrix of *Pixels* which makes APL the perfect
+language for manipulating images.  In GNU APL (and also in the PNG
+standard) a single pixel may have one, two, three, or four color
+components, or short colors, as follows:
+
+   • A pixel with *one* color defines an uncolored (grayscale) pixel
+     between black and white,
+   • A pixel with *two* colors defines a grayscale pixels between black
+     and white, and its opacity (see below),
+   • a pixel with *three* colors defines a colored pixel whose colors
+     are red, green and blue (or RGB for short), and
+   • a pixel with *four* colors defines an RGB pixel and its opacity
+     (RGBA for short).
+
+   The opacity (sometimes called the "alpha channel" and abbreviated A
+in the RGBA foremat) defines how transparent a pixel is; lower values
+cause the background of a pixel to shine through while larger values
+make the pixel more opaque.  One important use of the alpha channel is
+images that shall not appear rectangular (even though theirunderlying
+colour matrix is).  For example, to display a red circle on top of
+somerhing else, one can set the opacity of the pixels inside the circle
+to their maximum (as to making them fully opaque and competely hiding
+the background or some other image below) and the pixels outside the
+circle to 0 (making them fully transparent).
+
+   Since every pixel of an image may have 1, 2, 3, or 4 color
+components, the representation of an image in APL is a three
+dimenstional Array *Image* where:
+
+   • *(COLORS HEIGHT WIDTH) ← ⍴ IMAGE*,
+   • *COLORS* is a number that determines *_general format_* of the
+     image (and, by chance, the number of its color components):
+        • *COLORS = 1*: a grayscale image,
+        • *COLORS = 2*: a grayscale image with an alpha channel,
+        • *COLORS = 3*: a colored RGB (red/green/blue) image, or
+        • *COLORS = 4*: a colored RGB image with an alpha channel, aka.
+          RGBA)
+   • *Height* is the number of pixels of the image in the vertical
+     direction, and
+   • *Width* is the number of pixels of the image in the horizontal
+     direction.
+
+   Above is: *Width* is the number of pixels in the horizontal
+direction, *Height* the number of the pixels in the vertical direction,
+and *Colors* the number of color components as above.  For simplicity we
+can treat the opacity as yet another color although, strictly speaking,
+it is not.
+
+   For an image I, the horizontal pixel position I[;;x] increases from
+left to right and the vertical pixel position I[;y;] increases from top
+to bottom.
+
+   In addition to the 4 general image formats above, the PNG standard
+allows each format to have different resolutions (of 1-bit, 2-bit,
+4-bit, 8-bit, and 16-bit, even though not all combinations of image
+format and resolution are permitted.  For example, the lower resolutions
+(of 1-bit, 2-bit, or 4-bit) are only permitted for grayscale images
+without alpha channel, 16-bit is allowed for all images except those
+with a color table, and so on.
+
+   In theory there are 20 different combinations of 4 general image
+formats and 5 resolutions of the color components.  However, the PNG
+standard allows only 15 of them, in particular by permitting 1-bit,
+2-bit, 4-bit resolutions only for grayscale images without alpha
+channel.  The GNU APL color model reduces these 15 combinations further
+to the 4 general types types with the following rules:
+
+   • On input, i.e.  when reading a PNG image file and producting the
+     APL array described above, the different resolutions allowed by the
+     PNG standard are normalized to a single range of real numbers
+     between 0.0 and 1.0 (this is by chance also the range used in the
+     GTK standard used in ⎕PNG and ⎕PLOT).
+   • Also on input, images that use color tables (for compressing the
+     image as to reduce the file size) are automatically expanded.  The
+     resulting APL value is therefore independent of the use of color
+     tables.
+   • On output, i.e.  when storing the APL array in a PNG file, the
+     resolution is 8-bit by default.  8-bit is the only resolution which
+     is valid for all image formats in the PNG standard.
+   • Also on output, one may optionally specify a different resolution.
+
+   In GNU APL, integers and floating point numbers take the same space
+in memory.  The advantage of smaller PNG files with lower resolutions
+would therefore disappear as soon as converted to APL. On the other
+hand, the disadvantage (primarily different max.  values for different
+resolutions) would remain.  In the GNU APL color model a purely red RGB
+pixel has the same value *I[;y[x] ← 1.0 0.0 0.0* regardless of
+resolution, which simplifies matters considerably.  In a PNG file that
+same red RGB pixel would instead have either:
+
+   • the value $01 0 0 in a 1-bit RGB image, or
+   • the value $03 0 0 in a 2-bit RGB image, or
+   • the value $07 0 0 in a 4-bit RGB image, or
+   • the value $FF 0 0 in a 8-bit RGB image, or
+   • the value $FFFF 0 0 in a 16-bit RGB image.
+
+   It may be useful to note that the human eye can only distinguish
+around 120 different colors, i.e.  around 7-bit (for all color planes
+together).  For this reason 16-bit color components are quite an
+overkill and the 8-bit default therefore should be more than sufficient
+for most purposes.
+
+2.32.2 Monadic ⎕PNG
+-------------------
+
+Monadic ⎕PNG, i.e.  ⎕PNG B is used for 3 purposes:
+
+   • Conversion of PNG files into the GNU APL color model,
+   • Display of an APL array (in the GNU APL color model) in a window on
+     the screen (interactive used of PNG), and
+   • Controlling of ⎕PNG itself.
+
+   The desired purpose is dictated by the properties of *B*:
+
+   • If *B* is an APL text vector (i.e.  a string) then ⎕PNG will read
+     the file with that name and return an numeric APL array with rank 3
+     containing the color components of the image in the file as
+     described above.
+   • If the rank of *B* is 3 then *B* must be numeric (with values
+     between 0.0 and 1.0) and is then is assumed to be an array in the
+     GNU APL color model (such as the result of the case above).  This
+     image is is being displayed in a window on the screen (which
+     survives even after ⎕PNG has returned.  The result returned by ⎕PNG
+     is a window handle (a number identifying this window) which may
+     later be used (in the case described below) to close the window
+     programmatically from APL. Alternatively the window can also be
+     closed interactively by the user via its close button.
+   • Finally, if *B* is a numeric scalar then it fine-tunes the ⎕PNG
+     behaviour.  Positive numbers are taken as window handles returned
+     in the case above and will close the window with that handle.  ⎕PNG
+     ¯3 closes all open ⎕PNG windows, other numbers control debug
+     facilities inside ⎕PNG and are not of general interest here.
+
+2.32.3 Dyadic ⎕PNG
+------------------
+
+Dyadic *A ⎕PNG B* has only one purposes: to store an APL array in the
+GNU APL color model into a PNG file.
+
+   • If *A* is a text vector then it is taken as the name of a PNG file
+     into which the image *B* shall be written.  In this case the
+     resolution is 8 bits for each color component.
+   • If *A* is a 2-element vector, say *(A1 A2) ← A*, then the nested
+     *A1* is the name of a PNG file as before and *A2* is the reolution
+     (1, 2, 4, 8, or 16) to be used for the output file.  In this case
+     the combination of the general image format (as implied by *↑⍴B*)
+     and resolution *A2* must be a valid one in the PNG standard.
+
+2.32.4 APL Examples
+-------------------
+
+      ⍝ load PNG file image.png
+      Image ← ⎕PNG 'image.png'
+
+      ⍝ display the image
+      Handle ← ⎕PNG Image
+
+      ⍝ close the window that displays the image
+      ⎕PNG Handle
+
+      ⍝ display PNG file image.png without storing it in a variable
+      ⎕PNG ⎕PNG 'image.png'
+
+
+
+File: apl.info,  Node: Section 2.33,  Next: Section 2.34,  Prev: Section 2.32,  Up: Chapter 2
+
+2.33 ⎕PS - Print Style
 ======================
 
 ⎕PS is an integer vector that currently (read: as of SVN 982) contains
 two integers which control some details of how APL values are being
 printed.  The default value of ⎕PS is 0 0.  ⎕PS is a session variable
-which survives )LOADing of workspaces
+which survives the *)LOAD*ing of workspaces.
 
-   ⎕PS[1] = 0: print rational quotients a normal floating point numbers
+   ⎕PS[1] = 0: print rational quotients as normal floating point numbers
+(digits, fractional point, possibly an exponent).
 
-   ⎕PS[1] = 1: print rational quotients as A÷B
+   ⎕PS[1] = 1: print rational quotients as Numerator÷Denominator÷
 
-   Note: ⎕PS[1] has only an effect if rational numbers were
+   Note: ⎕PS[1] has no effect if rational numbers were not
 ./configure’d.
 
    ⎕PS[2] = 0: no "boxing" of APL values
@@ -3677,9 +3859,9 @@ uses the same values.
 value to ⎕PS assigns that value to ⎕PS[2] and sets ⎕PS[1] to 0.
 
 
-File: apl.info,  Node: Section 2.33,  Next: Section 2.34,  Prev: Section 2.32,  Up: Chapter 2
+File: apl.info,  Node: Section 2.34,  Next: Section 2.35,  Prev: Section 2.33,  Up: Chapter 2
 
-2.33 ⎕RE - Regular Expressions
+2.34 ⎕RE - Regular Expressions
 ==============================
 
 ⎕RE is a function that provides access to a subset of libpcre2, which is
@@ -3687,7 +3869,7 @@ a powerful regular expression matching library.  "pcre" is an acronym
 for "Perl compatible regular expressions".  libpcre2 is Copyright (c)
 1997-2017 University of Cambridge, England.
 
-2.33.1 Preconditions
+2.34.1 Preconditions
 --------------------
 
 libpcre2 is NOT shipped with GNU APL but must be installed before the
@@ -3698,7 +3880,7 @@ are found.
    If ./configure does not find libpcre2, then ⎕RE will raise a SYNTAX
 ERROR when ⎕RE is used in an APL program.
 
-2.33.2 Syntax
+2.34.2 Syntax
 -------------
 
 ⎕RE has two forms.  The short form (without an axis argument) is
@@ -3715,7 +3897,7 @@ Z ← A ⎕RE[X] B   (long form, with axis X)
    It therefore suffices to explain the long form.  The long form has 3
 different arguments A, B, and X.
 
-2.33.3 The Regular Expression A
+2.34.3 The Regular Expression A
 -------------------------------
 
 A is a simple character vector which is expected to be a regular
@@ -3727,7 +3909,7 @@ user of ⎕RE is referred to the description that comes with libpcre2.
 
    See in particular: man pcre2pattern
 
-2.33.4 The String(s) B Being Matched
+2.34.4 The String(s) B Being Matched
 ------------------------------------
 
 B is either:
@@ -3759,7 +3941,7 @@ character vector.
    Any string B that is passed to libpcre2 is called "Subject" in the
 libpcre2 documentation.
 
-2.33.5 The Flags X
+2.34.5 The Flags X
 ------------------
 
 By default, i.e.  without an axis argument X or - equivalently - with an
@@ -3776,7 +3958,7 @@ character is a flag.  Each flag is either understood by (and then passed
 unmodified to) libpcre2 or else understood by ⎕RE itself (and then not
 passed to libpcre2).
 
-2.33.5.1 The libpcre2 flags: i, m, s, and x
+2.34.5.1 The libpcre2 flags: i, m, s, and x
 ...........................................
 
 The libpcre2 flags accepted by ⎕RE are: i, m, s, and x.  They correspond
@@ -3790,7 +3972,7 @@ to the following libpcre2 flags:
    Please consult the libpcre2 documentation for a more detailed
 description of these flags.
 
-2.33.5.2 The ⎕RE (APL output format) flags ↓, ⊂, and /
+2.34.5.2 The ⎕RE (APL output format) flags ↓, ⊂, and /
 ......................................................
 
 ⎕RE provides different output formats, some of which are tailored to
@@ -3843,7 +4025,7 @@ flags:
 formats ⊂ and / are identical; if ’g’ is present, however, then they may
 differ.
 
-2.33.5.3 the ⎕RE global flag g
+2.34.5.3 the ⎕RE global flag g
 ..............................
 
 The default behavior of ⎕RE is to return only the first match of A in B.
@@ -3909,7 +4091,7 @@ of output formats ’partition’ and ’compress’.
 
       A ⌷RE['/'] B   ←→   0 ≠ A  A ⌷RE['⊂'] B
 
-2.33.5.4 the ⎕RE error flag E
+2.34.5.4 the ⎕RE error flag E
 .............................
 
 The default behavior of ⎕RE is to return an empty result if no match of
@@ -3937,7 +4119,7 @@ that case it is natural to check the length of the result:
 ┗━┛
 
 
-2.33.6 Complex Matches
+2.34.6 Complex Matches
 ----------------------
 
 The regular expressions considered so far were simple, which means that
@@ -4005,9 +4187,9 @@ two 1-character sub-matches:
 ┗∊∊━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
 
-File: apl.info,  Node: Section 2.34,  Next: Section 2.35,  Prev: Section 2.33,  Up: Chapter 2
+File: apl.info,  Node: Section 2.35,  Next: Section 2.36,  Prev: Section 2.34,  Up: Chapter 2
 
-2.34 ⎕RVAL - Random APL value
+2.35 ⎕RVAL - Random APL value
 =============================
 
 The standard way to produce random numbers is the primitive function ?
@@ -4026,7 +4208,7 @@ other aspects like:
 case for ⎕RVAL is the production of test data for the interpreter, but
 ⎕RVAL might be useful for other purposes as well.
 
-2.34.1 General
+2.35.1 General
 --------------
 
 In general, monadic ⎕RVAL B, returns a single random APL value Z, while
@@ -4048,7 +4230,7 @@ Max. Depth: 4
    The default properties therefore return an integer scalar for every
 call of ⎕RVAL B.
 
-2.34.2 Dyadic ⎕RVAL
+2.35.2 Dyadic ⎕RVAL
 -------------------
 
 The left argument A of A ⎕RVAL B determines which aspect of the
@@ -4066,7 +4248,7 @@ scalar:
 
    • A=4 controls a maximum depth of the subsequent random APL values.
 
-2.34.2.1 0 ⎕RVAL B: Control of the underlying random number generator
+2.35.2.1 0 ⎕RVAL B: Control of the underlying random number generator
 .....................................................................
 
 ⎕RVAL uses the standard C function random_r().  For this reason ⎕RVAL is
@@ -4097,7 +4279,7 @@ shall be generated again.  The random number generators of ?  and ⎕RVAL
 are indepentent; generating a random number or random value with one
 does not change the state of the other.
 
-2.34.2.2 1 ⎕RVAL B: Control of the ranks
+2.35.2.2 1 ⎕RVAL B: Control of the ranks
 ........................................
 
 The rank of subsequently generated random values can be controlled with
@@ -4132,7 +4314,7 @@ to query the current setting for 1 ⎕RVAL.
      vectors with probability 30%, and a matrices with probability 20%.
      The numbers need not add up to 100, but will be scaled accordingly.
 
-2.34.2.3 2 ⎕RVAL B: Control of the shapes
+2.35.2.3 2 ⎕RVAL B: Control of the shapes
 .........................................
 
 The shapes of subsequently generated random values can be controlled
@@ -4163,7 +4345,7 @@ used to query the current setting for 2 ⎕RVAL.
    This will produce scalars, vectors with a fixed length of 3 and
 matrices with 3 rows and between 0 and 10 columns.
 
-2.34.2.4 3 ⎕RVAL B: Control of the data types
+2.35.2.4 3 ⎕RVAL B: Control of the data types
 .............................................
 
 The types (i.e.  CHARACTER, INTEGER, REAL, COMPLEX, or NESTED) of
@@ -4206,7 +4388,7 @@ to query the current setting for 3 ⎕RVAL.
 ¯975954163190248487                   0.5892132425
 7677327503669503253 2152001972871424768
 
-2.34.2.5 4 ⎕RVAL B: Control of a maximum depth
+2.35.2.5 4 ⎕RVAL B: Control of a maximum depth
 ..............................................
 
 If the probability of generating a nested value is > 0 then the depth of
@@ -4221,7 +4403,7 @@ depth;
    An empty B, e.g.  4 ⎕RVAL ⍬, will not change anything and can be used
 to query the current setting for 4 ⎕RVAL.
 
-2.34.2.6 monadic ⎕RVAL B: Return a new random value
+2.35.2.6 monadic ⎕RVAL B: Return a new random value
 ...................................................
 
 Calling ⎕RVAL monadically produces one new random APL value.
@@ -4274,16 +4456,16 @@ non-empty B.
 
 
 
-File: apl.info,  Node: Section 2.35,  Next: Section 2.36,  Prev: Section 2.34,  Up: Chapter 2
+File: apl.info,  Node: Section 2.36,  Next: Section 2.37,  Prev: Section 2.35,  Up: Chapter 2
 
-2.35 ⎕SQL - SQL Database Interface
+2.36 ⎕SQL - SQL Database Interface
 ==================================
 
 As of GNU APL 1.6, the native function SQL has been replaced by the
 system function ⎕SQL, described below.  ⎕SQL has an axis argument that
 selects a sub-function of ⎕SQL.
 
-2.35.1 ⎕SQL[0] : display subfunctions
+2.36.1 ⎕SQL[0] : display subfunctions
 -------------------------------------
 
       ⎕SQL[0]''
@@ -4298,7 +4480,7 @@ query ⎕SQL[4,db] params - send SQL update
       ⎕SQL[8] ref       - list tables
 ref   ⎕SQL[9] table     - list columns for table
 
-2.35.2 ref ← A ⎕SQL[1] B : open database
+2.36.2 ref ← A ⎕SQL[1] B : open database
 ----------------------------------------
 
       type  ⎕SQL[1] file
@@ -4321,7 +4503,7 @@ described in the PostgreSQL documentation.
 using other SQL functions.  This value should be seen as an opaque
 handle.  It is, however, guaranteed that the handle is a scalar value.
 
-2.35.3 ⎕SQL[2] B : close database
+2.36.3 ⎕SQL[2] B : close database
 ---------------------------------
 
       ⎕SQL[2] ref
@@ -4333,7 +4515,7 @@ function has been called, no further operations are to be performed on
 this handle.  Future calls to ⎕SQL[1] may reuse previously disconnected
 handles.
 
-2.35.4 Z ← A ⎕SQL[3, ref] B : database query (with result)
+2.36.4 Z ← A ⎕SQL[3, ref] B : database query (with result)
 ----------------------------------------------------------
 
       query ⎕SQL[3, ref] params
@@ -4353,7 +4535,7 @@ with each row being the values for each call.
 select statement.  Null values are returned as ⍬ and empty strings are
 returned as ”.
 
-2.35.5 Z ← A ⎕SQL[4, ref] B : database query (w/o result)
+2.36.5 Z ← A ⎕SQL[4, ref] B : database query (w/o result)
 ---------------------------------------------------------
 
       query ⎕SQL[4, ref] params
@@ -4363,35 +4545,35 @@ returned as ”.
    This function is identical to SQL∆Select with the exception that it
 is used on statements which do not return a result table.
 
-2.35.6 ⎕SQL[5] B : start transaction
+2.36.6 ⎕SQL[5] B : start transaction
 ------------------------------------
 
       ⎕SQL[5] ref
 
    Begin a transaction.
 
-2.35.7 ⎕SQL[6] B : commit transaction
+2.36.7 ⎕SQL[6] B : commit transaction
 -------------------------------------
 
       ⎕SQL[6] ref
 
    Commit a transaction.
 
-2.35.8 ⎕SQL[7] B : rollback transaction
+2.36.8 ⎕SQL[7] B : rollback transaction
 ---------------------------------------
 
       ⎕SQL[7] ref
 
    Rolls back the current transaction.
 
-2.35.9 Z←⎕SQL[8] B : table names
+2.36.9 Z←⎕SQL[8] B : table names
 --------------------------------
 
       ⎕SQL[8] ref
 
    Return an array containing the name of all tables.
 
-2.35.10 Z←⎕SQL[9] B : column names
+2.36.10 Z←⎕SQL[9] B : column names
 ----------------------------------
 
       ref  ⎕SQL[9] table
@@ -4405,9 +4587,9 @@ table.  Currently, the column layout is as follows:
 release.
 
 
-File: apl.info,  Node: Section 2.36,  Next: Section 2.37,  Prev: Section 2.35,  Up: Chapter 2
+File: apl.info,  Node: Section 2.37,  Next: Section 2.38,  Prev: Section 2.36,  Up: Chapter 2
 
-2.36 ⎕SI - State Indicator
+2.37 ⎕SI - State Indicator
 ==========================
 
 ⎕SI returns aspects of the current State Indicator, similar to the
@@ -4473,9 +4655,9 @@ the oldest level.
 is the caller, and so on.
 
 
-File: apl.info,  Node: Section 2.37,  Next: Section 2.38,  Prev: Section 2.36,  Up: Chapter 2
+File: apl.info,  Node: Section 2.38,  Next: Section 2.39,  Prev: Section 2.37,  Up: Chapter 2
 
-2.37 ⎕SYL - System limits
+2.38 ⎕SYL - System limits
 =========================
 
 System variable ⎕SYL shows a number of system limits when referenced:
@@ -4513,7 +4695,7 @@ result in a SYNTAX ERROR. Indexed assignment to ⎕SYL will result in an
 INDEX ERROR unless the limit is writable.  Some read-only limits can be
 changed at compile-time via ./configure
 
-2.37.1 ⎕SYL[1 2 3 4 5 6;]
+2.38.1 ⎕SYL[1 2 3 4 5 6;]
 -------------------------
 
 The first three limits are writable; their purpose is to stop execution
@@ -4545,20 +4727,20 @@ bytes limits together.
    An attempt to set a too small limit, for example one that is close to
 the current value, is rejected with a DOMAIN ERROR.
 
-2.37.2 ⎕SYL[7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23;]
+2.38.2 ⎕SYL[7 8 9 10 11 12 13 14 15 16 17 18 19 20 21 22 23;]
 -------------------------------------------------------------
 
 These system limits are read-only.  Some of them can be changed at
 compile time via ./configure.  Most others can be changed in the source
 code of GNU APL, but doing so is not recommended.
 
-2.37.3 ⎕SYL[24 25 26;]
+2.38.3 ⎕SYL[24 25 26;]
 ----------------------
 
 These system limits have been added in preparation of multi-core GNU
 APL. They are currently not used.
 
-2.37.4 ⎕SYL[27;]
+2.38.4 ⎕SYL[27;]
 ----------------
 
 This is not a limit that raises a limit error.  Instead it limits the
@@ -4575,12 +4757,12 @@ this:
 
 
 
-File: apl.info,  Node: Section 2.38,  Prev: Section 2.37,  Up: Chapter 2
+File: apl.info,  Node: Section 2.39,  Prev: Section 2.38,  Up: Chapter 2
 
-2.38 ⎕XML - XML Parsing
+2.39 ⎕XML - XML Parsing
 =======================
 
-2.38.1 Purpose
+2.39.1 Purpose
 --------------
 
 GNU APL provides ⎕XML as a means of performing elementary manipulations
@@ -4612,7 +4794,7 @@ Hello
      document type declarations (DTDs), document validation, etc.)
      herself in APL and without much ovehead.
 
-2.38.2 Some XML Terminology
+2.39.2 Some XML Terminology
 ---------------------------
 
 An XML document is a character string with a standardized format.  The
@@ -4687,7 +4869,7 @@ ignored by ⎕XML. As a consequence, entity declarations have no effect
 and only the predefined XML entities (i.e.  &, <, >, ’, and ") are
 recognized (and translated) by ⎕XML.
 
-2.38.3 How ⎕XML maps XML documents to APL Values
+2.39.3 How ⎕XML maps XML documents to APL Values
 ------------------------------------------------
 
 The principal mapping between XML strings and APL values is:
@@ -4812,7 +4994,7 @@ declarations, etc.  will be contained in a single associative array.
       ⍙1wsid          ⍝ first attribute wsid from e.g. <Workspace wsid=...
       ⍙2year          ⍝ second attribute year
 
-2.38.4 Monadic ⎕XML
+2.39.4 Monadic ⎕XML
 -------------------
 
 Z ← ⎕XML B converts APL string B that contains a valid XML document to
@@ -4829,7 +5011,7 @@ suppressed in 2 ways:
   1. set ⎕PW large enough, or
   2. prefix the string with ⊃35⎕CR as in the examples below.
 
-2.38.5 Dyadic ⎕XML
+2.39.5 Dyadic ⎕XML
 ------------------
 
 Z ← A ⎕XML B provides a number of convenience functions.  Its left
@@ -5044,7 +5226,7 @@ APL←⎕XML XML
      
      4786
 
-2.38.6 XML Queries
+2.39.6 XML Queries
 ------------------
 
 The different functions in dyadic ⎕XML are intended to construct XML
@@ -6566,64 +6748,65 @@ please read <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 
 Tag Table:
 Node: Top383
-Node: Chapter 11573
-Node: Chapter 223283
-Node: Section 2.125178
-Node: Section 2.245743
-Node: Section 2.346502
-Node: Section 2.447777
-Node: Section 2.552222
-Node: Section 2.652395
-Node: Section 2.753025
-Node: Section 2.856978
-Node: Section 2.958513
-Node: Section 2.1060605
-Node: Section 2.1162159
-Node: Section 2.1263944
-Node: Section 2.1365884
-Node: Section 2.1466825
-Node: Section 2.1567077
-Node: Section 2.1668473
-Node: Section 2.1778586
-Node: Section 2.1881108
-Node: Section 2.1987815
-Node: Section 2.2089260
-Node: Section 2.2194921
-Node: Section 2.2299955
-Node: Section 2.23103236
-Node: Section 2.24103527
-Node: Section 2.25114352
-Node: Section 2.26114624
-Node: Section 2.27121202
-Node: Section 2.28123662
-Node: Section 2.29124331
-Node: Section 2.30125982
-Node: Section 2.31129771
-Node: Output File Format141771
-Node: Section 2.32142946
-Node: Section 2.33143896
-Node: Section 2.34158612
-Node: Section 2.35168679
-Node: Section 2.36172798
-Node: Section 2.37174893
-Node: Section 2.38179318
-Node: Chapter 3200668
-Node: Chapter 4203169
-Node: Chapter 5204295
-Node: Section 5.1205832
-Node: Section 5.2207112
-Node: Section 5.3207472
-Node: Section 5.4207714
-Node: Section 5.5208376
-Node: Section 5.6208854
-Node: Section 5.7209626
-Node: Section 5.8210083
-Node: Chapter 6210485
-Node: Section 6.1210904
-Node: Section 6.2211591
-Node: Chapter 7212422
-Node: Section 7.1212925
-Node: Section 7.2238239
+Node: Chapter 11577
+Node: Chapter 223287
+Node: Section 2.125236
+Node: Section 2.245801
+Node: Section 2.346560
+Node: Section 2.447835
+Node: Section 2.552280
+Node: Section 2.652453
+Node: Section 2.753083
+Node: Section 2.857036
+Node: Section 2.958571
+Node: Section 2.1060663
+Node: Section 2.1162217
+Node: Section 2.1264002
+Node: Section 2.1365942
+Node: Section 2.1466883
+Node: Section 2.1567135
+Node: Section 2.1668531
+Node: Section 2.1778644
+Node: Section 2.1881166
+Node: Section 2.1987873
+Node: Section 2.2089318
+Node: Section 2.2194979
+Node: Section 2.22100013
+Node: Section 2.23103294
+Node: Section 2.24103585
+Node: Section 2.25114410
+Node: Section 2.26114682
+Node: Section 2.27121260
+Node: Section 2.28123720
+Node: Section 2.29124389
+Node: Section 2.30126040
+Node: Section 2.31129829
+Node: Output File Format141829
+Node: Section 2.32143004
+Node: Section 2.33151480
+Node: Section 2.34152507
+Node: Section 2.35167223
+Node: Section 2.36177290
+Node: Section 2.37181409
+Node: Section 2.38183504
+Node: Section 2.39187929
+Node: Chapter 3209279
+Node: Chapter 4211780
+Node: Chapter 5212906
+Node: Section 5.1214443
+Node: Section 5.2215723
+Node: Section 5.3216083
+Node: Section 5.4216325
+Node: Section 5.5216987
+Node: Section 5.6217465
+Node: Section 5.7218237
+Node: Section 5.8218694
+Node: Chapter 6219096
+Node: Section 6.1219515
+Node: Section 6.2220202
+Node: Chapter 7221033
+Node: Section 7.1221536
+Node: Section 7.2246850
 
 End Tag Table
 

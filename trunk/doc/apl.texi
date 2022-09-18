@@ -769,13 +769,14 @@ in a 'preferences' file still follow the library root scheme.
 * Section 2.29::  ⎕JSON - JSON Parsing
 * Section 2.30::  ⎕MAP  - Map Value
 * Section 2.31::  ⎕PLOT - Plot Data
-* Section 2.32::  ⎕PS   - Print Style
-* Section 2.33::  ⎕RE   - Regular Expressions
-* Section 2.34::  ⎕RVAL - Random APL value
-* Section 2.35::  ⎕SQL  - SQL Database Interface
-* Section 2.36::  ⎕SI   - State Indicator
-* Section 2.37::  ⎕SYL  - System limits
-* Section 2.38::  ⎕XML - XML Parsing
+* Section 2.32::  ⎕PNG  - Portable Network Graphics
+* Section 2.33::  ⎕PS   - Print Style
+* Section 2.34::  ⎕RE   - Regular Expressions
+* Section 2.35::  ⎕RVAL - Random APL value
+* Section 2.36::  ⎕SQL  - SQL Database Interface
+* Section 2.37::  ⎕SI   - State Indicator
+* Section 2.38::  ⎕SYL  - System limits
+* Section 2.39::  ⎕XML - XML Parsing
 @end menu
 
 There are a few hopefully useful features in GNU APL:
@@ -3773,20 +3774,204 @@ For backward compatibility, the @b{libxcb} option for ⎕PLOT will continue
 to exist for some time, but bug fixes and new features will only be made for the
 @b{libgtk-3} option.
 
-
 @node    Section 2.32
+@section ⎕PNG - Portable Network Graphics
+
+Portable Network Graphics is a file format for images, defined in
+@strong{RFC 2083}. To quote the RFC:
+
+@cite{The PNG format provides a portable, legally unencumbered,
+well-compressed, well-specified standard for lossless bitmapped image files.}
+
+@subsection The GNU APL Color Model
+
+An image is a rectangular matrix of @strong{Pixels} which makes APL the
+perfect language for manipulating images. In GNU APL (and also in the PNG
+standard) a single pixel may have one, two, three, or four color components,
+or short colors, as follows:
+
+@itemize
+@item A pixel with @strong{one} color defines an uncolored (grayscale)
+pixel between black and white,
+@item A pixel with @strong{two} colors defines a grayscale pixels between
+black and white, and its opacity (see below),
+@item a pixel with @strong{three} colors defines a colored pixel whose colors
+are red, green and blue (or RGB for short), and
+@item a pixel with @strong{four} colors defines an RGB pixel and its opacity
+(RGBA for short).
+@end itemize
+
+The opacity (sometimes called the "alpha channel" and abbreviated A in the
+RGBA foremat) defines how transparent a pixel is; lower values cause the
+background of a pixel to shine through while larger values make the pixel
+more opaque. One important use of the alpha channel is images that shall
+not appear rectangular (even though theirunderlying colour matrix is).
+For example, to display a red circle on top of somerhing else, one can set
+the opacity of the pixels inside the circle to their maximum (as to making
+them fully opaque and competely hiding the background or some other image
+below) and the pixels outside the circle to 0 (making them fully transparent).
+
+Since every pixel of an image may have 1, 2, 3, or 4 color components, the
+representation of an image in APL is a three dimenstional Array
+@strong{Image} where:
+
+@itemize
+@item @strong{(COLORS HEIGHT WIDTH) ← ⍴ IMAGE},
+@item @strong{COLORS} is a number that determines @strong{@emph{general
+format}} of the image (and, by chance, the number of its color components):
+  @itemize
+  @item @strong{COLORS = 1}: a grayscale image,
+  @item @strong{COLORS = 2}: a grayscale image with an alpha channel,
+  @item @strong{COLORS = 3}: a colored RGB (red/green/blue) image, or
+  @item @strong{COLORS = 4}: a colored RGB image with an alpha channel,
+   aka. RGBA)
+  @end itemize
+@item @strong{Height} is the number of pixels of the image in the vertical
+direction, and
+@item @strong{Width} is the number of pixels of the image in the horizontal
+direction.
+@end itemize
+
+Above is: @strong{Width} is the number of pixels in the horizontal direction,
+@strong{Height} the number of the pixels in the vertical direction, and
+@strong{Colors} the number of color components as above. For simplicity we
+can treat the opacity as yet another color although, strictly speaking, it
+is not.
+
+For an image I, the horizontal pixel position I[;;x] increases from left to
+right and the vertical pixel position I[;y;] increases from top to bottom.
+
+In addition to the 4 general image formats above, the PNG standard allows
+each format to have different resolutions (of 1-bit, 2-bit, 4-bit, 8-bit,
+and 16-bit, even though not all combinations of image format and resolution
+are permitted. For example, the lower resolutions (of 1-bit, 2-bit, or 4-bit)
+are only permitted for grayscale images without alpha channel, 16-bit is
+allowed for all images except those with a color table, and so on.
+
+In theory there are 20 different combinations of 4 general image formats and
+5 resolutions of the color components. However, the PNG standard allows only
+15 of them, in particular by permitting 1-bit, 2-bit, 4-bit resolutions only
+for grayscale images without alpha channel. The GNU APL color model reduces
+these 15 combinations further to the 4 general types types with the following
+rules:
+
+@itemize
+@item On input, i.e. when reading a PNG image file and producting the APL
+array described above, the different resolutions allowed by the PNG standard
+are normalized to a single range of real numbers between 0.0 and 1.0 (this
+is by chance also the range used in the GTK standard used in ⎕PNG and ⎕PLOT).
+@item Also on input, images that use color tables (for compressing the
+image as to reduce the file size) are automatically expanded. The resulting
+APL value is therefore independent of the use of color tables.
+@item On output, i.e. when storing the APL array in a PNG file, the
+resolution is 8-bit by default. 8-bit is the only resolution which is valid
+for all image formats in the PNG standard.
+@item Also on output, one may optionally specify a different resolution.
+@end itemize
+
+In GNU APL, integers and floating point numbers take the same space in
+memory. The advantage of smaller PNG files with lower resolutions would
+therefore disappear as soon as converted to APL. On the other hand, the
+disadvantage (primarily different max. values for different resolutions)
+would remain. In the GNU APL color model a purely red RGB pixel has the same
+value @strong{I[;y[x] ← 1.0 0.0 0.0} regardless of resolution, which
+simplifies matters considerably. In a PNG file that same red RGB pixel
+would instead have either:
+
+@itemize
+@item the value $01 0 0 in a 1-bit RGB image, or
+@item the value $03 0 0 in a 2-bit RGB image, or
+@item the value $07 0 0 in a 4-bit RGB image, or
+@item the value $FF 0 0 in a 8-bit RGB image, or
+@item the value $FFFF 0 0 in a 16-bit RGB image.
+@end itemize
+
+It may be useful to note that the human eye can only distinguish around 120
+different colors, i.e. around 7-bit (for all color planes together). For this
+reason 16-bit color components are quite an overkill and the 8-bit default
+therefore should be more than sufficient for most purposes.
+
+@subsection Monadic ⎕PNG
+
+Monadic ⎕PNG, i.e. ⎕PNG B is used for 3 purposes:
+
+@itemize
+@item Conversion of PNG files into the GNU APL color model,
+@item Display of an APL array (in the GNU APL color model) in a window on
+the screen (interactive used of PNG), and
+@item Controlling of ⎕PNG itself.
+@end itemize
+
+The desired purpose is dictated by the properties of @strong{B}:
+
+@itemize
+@item If @strong{B} is an APL text vector (i.e. a string) then ⎕PNG will
+  read the file with that name and return an numeric APL array with rank 3
+  containing the color components of the image in the file as described above.
+@item If the rank of @strong{B} is 3 then @strong{B} must be numeric (with
+  values between 0.0 and 1.0) and is then is assumed to be an array in the
+  GNU APL color model (such as the result of the case above). This image is
+  is being displayed in a window on the screen (which survives even after
+  ⎕PNG has returned.  The result returned by ⎕PNG is a window handle
+  (a number identifying this window) which may later be used (in the case
+  described below) to close the window programmatically from APL.
+  Alternatively the window can also be closed interactively by the user
+  via its close button.
+@item Finally, if @strong{B} is a numeric scalar then it fine-tunes the
+  ⎕PNG behaviour. Positive numbers are taken as window handles returned in
+  the case above and will close the window with that handle. ⎕PNG ¯3 closes
+  all open ⎕PNG windows, other numbers control debug facilities inside ⎕PNG
+  and are not of general interest here.
+@end itemize
+
+@subsection Dyadic ⎕PNG
+
+Dyadic @strong{A ⎕PNG B} has only one purposes: to store an APL array in
+the GNU APL color model into a PNG file.
+
+@itemize
+@item If @strong{A} is a text vector then it is taken as the name of a PNG
+  file into which the image @strong{B} shall be written. In this case the
+  resolution is 8 bits for each color component.
+@item If @strong{A} is a 2-element vector, say @strong{(A1 A2) ← A},
+  then the nested @strong{A1} is the name of a PNG file as before and 
+  @strong{A2} is the reolution (1, 2, 4, 8, or 16) to be used for the
+  output file. In this case the combination of the general image format
+  (as implied by @strong{↑⍴B}) and resolution @strong{A2} must be a valid
+  one in the PNG standard.
+@end itemize
+
+@subsection APL Examples
+
+@verbatim
+      ⍝ load PNG file image.png
+      Image ← ⎕PNG 'image.png'
+
+      ⍝ display the image
+      Handle ← ⎕PNG Image
+
+      ⍝ close the window that displays the image
+      ⎕PNG Handle
+
+      ⍝ display PNG file image.png without storing it in a variable
+      ⎕PNG ⎕PNG 'image.png'
+
+@end verbatim
+
+@node    Section 2.33
 @section ⎕PS - Print Style
 
 ⎕PS is an integer vector that currently (read: as of SVN 982) contains
 two integers which control some details of how APL values are being printed.
 The default value of ⎕PS is 0 0. ⎕PS is a session variable which survives
-)LOADing of workspaces
+the @strong{)LOAD}ing of workspaces.
 
-⎕PS[1] = 0: print rational quotients a normal floating point numbers
+⎕PS[1] = 0: print rational quotients as normal floating point numbers
+(digits, fractional point, possibly an exponent).
 
-⎕PS[1] = 1: print rational quotients as A÷B
+⎕PS[1] = 1: print rational quotients as Numerator÷Denominator÷
 
-Note: ⎕PS[1] has only an effect if rational numbers were ./configure'd.
+Note: ⎕PS[1] has no effect if rational numbers were not ./configure'd.
 
 ⎕PS[2] = 0: no "boxing" of APL values
 
@@ -3799,7 +3984,7 @@ Note: For compatibility with older workspaces, assigning a single value to
 ⎕PS assigns that value to ⎕PS[2] and sets ⎕PS[1] to 0.
 
 
-@node    Section 2.33
+@node    Section 2.34
 @section ⎕RE - Regular Expressions
 
 ⎕RE is a function that provides access to a subset of libpcre2, which is a
@@ -4131,7 +4316,7 @@ The same for the pos+len output format:
 ┗∊∊━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 @end verbatim
 
-@node    Section 2.34
+@node    Section 2.35
 @section ⎕RVAL - Random APL value
 
 The standard way to produce random numbers is the primitive function ?
@@ -4424,7 +4609,7 @@ Examples:
 @end verbatim
 
 
-@node    Section 2.35
+@node    Section 2.36
 @section ⎕SQL - SQL Database Interface
 
 As of GNU APL 1.6, the native function SQL has been replaced by the
@@ -4566,7 +4751,7 @@ More columns containing extra information may be added in a future
 release.
 
 
-@node    Section 2.36
+@node    Section 2.37
 @section ⎕SI - State Indicator
 
 ⎕SI returns aspects of the current State Indicator, similar to the standard
@@ -4645,7 +4830,7 @@ For example, ¯1 ⎕SI refers to the currently executing context, ¯2 ⎕SI is
 the caller, and so on.
 
 
-@node    Section 2.37
+@node    Section 2.38
 @section ⎕SYL - System limits
 
 System variable ⎕SYL shows a number of system limits when referenced:
@@ -4747,8 +4932,8 @@ is printed instead of VALUE. The shape SH is computed like this:
 @end verbatim
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.38
-@section ⎕XML - XML Parsing
+@node    Section 2.39
+@section ⎕XML  - XML Parsing
 
 @subsection Purpose
 
