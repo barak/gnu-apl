@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@ Bif_F12_INDEX_OF Bif_F12_INDEX_OF ::_fun;    // ⍳
 
 Bif_F12_INDEX_OF * Bif_F12_INDEX_OF ::fun = &Bif_F12_INDEX_OF ::_fun;
 
-//=============================================================================
+//============================================================================
 Token
 Bif_F12_INDEX_OF::eval_B(Value_P B) const
 {
@@ -36,14 +36,14 @@ const ShapeItem ec = B->element_count();
 
    if (ec == 1)
       {
-        // interval (standard ⍳N)
+        // interval (standard ⍳B with scalar or 1-element B)
         //
-        const APL_Integer len = B->get_ravel(0).get_near_int();
+        const APL_Integer len = B->get_cfirst().get_near_int();
         if (len < 0)   DOMAIN_ERROR;
 
         Value_P Z(len, LOC);
 
-        loop(z, len)   new (Z->next_ravel()) IntCell(qio + z);
+        loop(z, len)   Z->next_ravel_Int(qio + z);
 
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
@@ -51,49 +51,53 @@ const ShapeItem ec = B->element_count();
 
    // generalized ⍳B a la Dyalog APL...
    //
+   // ⍴B  ←→  ⍴⍴Z, B = ⍴Z
    if (ec == 0)
       {
         Value_P Z(LOC);
-        new (Z->next_ravel()) PointerCell(Idx0(LOC).get(), Z.getref());
+        Z->next_ravel_Pointer(Idx0(LOC).get());
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
 
-Shape sh(B.get(), 0);
-   loop(b, ec)
-      {
-        if (sh.get_shape_item(b) < 0)   DOMAIN_ERROR;
-      }
+Shape sh_Z(*B, 0);
+   loop(b, ec)   if (sh_Z.get_shape_item(b) < 0)   DOMAIN_ERROR;
 
    // at this point sh is correct and ⍳ cannot fail.
    //
-Value_P Z(sh, LOC);
+Value_P Z(sh_Z, LOC);
+const sRank rk_Z = Z->get_rank();
    loop(z, Z->element_count())
       {
-        Value_P ZZ(sh.get_rank(), LOC);
+        Value_P ZZ(rk_Z, LOC);
         ShapeItem N = z;
-        loop(r, sh.get_rank())
+        ShapeItem zz[rk_Z];
+        loop(r, rk_Z)
             {
-              const ShapeItem q = sh.get_shape_item(ec - r - 1);
-              new (&ZZ->get_ravel(ec - r - 1))   IntCell(N%q + qio);
+              const ShapeItem q = sh_Z.get_shape_item(ec - r - 1);
+              zz[ec - r - 1] = N % q + qio;
               N /= q;
             }
+
+        loop(r, rk_Z)   ZZ->next_ravel_Int(zz[r]);
+
         ZZ->check_value(LOC);
-        new (Z->next_ravel())   PointerCell(ZZ.get(), Z.getref());
+        Z->next_ravel_Pointer(ZZ.get());
       }
 
    if (Z->element_count() == 0)   // empty result
       {
-        Value_P ZZ(ec, LOC);
-        loop(r, ec)   new (ZZ->next_ravel())   IntCell(0);
+        Value_P ZZ(rk_Z, LOC);   // ZZ←(⍴⍴Z)⍴0...
+        while (ZZ->more())   ZZ->next_ravel_0();
         ZZ->check_value(LOC);
-        new (&Z->get_ravel(0))   PointerCell(ZZ.get(), Z.getref()); // prototype
+
+        new (&Z->get_wproto())   PointerCell(ZZ.get(), *Z); // ⊂(⍴⍴Z)⍴0
       }
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// search elements of B in A. ⍴Z is ⍴B, and elements of Z are indices of A.
 Token
 Bif_F12_INDEX_OF::eval_AB(Value_P A, Value_P B) const
@@ -122,25 +126,25 @@ Value_P Z(B->get_shape(), LOC);
         // We don't do that for too small A though, as to compensate for the
         // start-up cost of the sorting.
         //
-        const ShapeItem * Idx_A = Cell::sorted_indices(&A->get_ravel(0), len_A,
+        const ShapeItem * Idx_A = Cell::sorted_indices(&A->get_cfirst(), len_A,
                                                        SORT_ASCENDING, 1);
         loop(bz, len_BZ)
             {
-              const APL_Integer z = find_B_in_sorted_A(&A->get_ravel(0),
+              const APL_Integer z = find_B_in_sorted_A(&A->get_cfirst(),
                                                        len_A, Idx_A,
-                                                       B->get_ravel(bz), qct);
+                                                       B->get_cravel(bz), qct);
 
-              if (simple_result)   new (Z->next_ravel()) IntCell(qio + z);
+              if (simple_result)   Z->next_ravel_Int(qio + z);
               else if (z == len_A)   // not found: set result item to ⍬
                  {
                    Value_P zilde(ShapeItem(0), LOC);
-                   new (Z->next_ravel()) PointerCell(zilde.get(), Z.getref());
+                   Z->next_ravel_Pointer(zilde.get());
                  }
               else                   // element found (first at z (+⎕IO)
                  {
                    const Shape Sz = A->get_shape().offset_to_index(z, qio);
                    Value_P Vz(LOC, &Sz);
-                   new (Z->next_ravel()) PointerCell(Vz.get(), Z.getref());
+                   Z->next_ravel_Pointer(Vz.get());
                  }
             }
         delete[] Idx_A;
@@ -150,20 +154,20 @@ Value_P Z(B->get_shape(), LOC);
       {
         loop(bz, len_BZ)
             {
-              const APL_Integer z = find_B_in_A(&A->get_ravel(0), len_A,
-                                                B->get_ravel(bz), qct);
+              const APL_Integer z = find_B_in_A(&A->get_cfirst(), len_A,
+                                                B->get_cravel(bz), qct);
 
-              if (simple_result)   new (Z->next_ravel()) IntCell(qio + z);
+              if (simple_result)   Z->next_ravel_Int(qio + z);
               else if (z == len_A)   // not found: set result item to ⍬
                  {
                    Value_P zilde(ShapeItem(0), LOC);
-                   new (Z->next_ravel()) PointerCell(zilde.get(), Z.getref());
+                   Z->next_ravel_Pointer(zilde.get());
                  }
               else                   // element found (first at z (+⎕IO)
                  {
                    const Shape Sz = A->get_shape().offset_to_index(z, qio);
                    Value_P Vz(LOC, &Sz);
-                   new (Z->next_ravel()) PointerCell(Vz.get(), Z.getref());
+                   Z->next_ravel_Pointer(Vz.get());
                  }
             }
       }
@@ -171,7 +175,7 @@ Value_P Z(B->get_shape(), LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Bif_F12_INDEX_OF::bs_cmp(const Cell & cell, const ShapeItem & A,
                          const void * ctx)
@@ -184,7 +188,7 @@ const Cell & cell_A = cells_A[A];
 const int ret = cell.compare(cell_A);
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ShapeItem
 Bif_F12_INDEX_OF::find_B_in_sorted_A(const Cell * ravel_A, ShapeItem len_A,
                                      const ShapeItem * Idx_A,
@@ -219,5 +223,5 @@ ShapeItem ret = pos;
 
    return ret;
 }
-//=============================================================================
+//============================================================================
 

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 
 #include "Cell.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /*! A cell that is either an integer cell, a floating point cell, or a
     complex number cell. This class contains all cell functions for which
     the detailed type makes no difference.
@@ -31,6 +31,19 @@
 /// Base class for RealCell and ComplexCell
 class NumericCell : public Cell
 {
+public:
+   /// initialize the (un-initialized) Cell *Z to (if possible) an IntCell
+   /// or else to a FloatCell with value flt.
+   static ErrorCode zV(Cell * Z, APL_Float flt);
+
+   /// initialize the (un-initialized) Cell *Z to (if possible) an IntCell,
+   /// a FloatCell, or a ComplexCell with value cpx.
+   static ErrorCode zV(Cell * Z, APL_Complex cpx);
+
+   /// initialize the (un-initialized) Cell *Z to (if possible) an IntCell,
+   /// a FloatCell, or a ComplexCell with value cpx.
+   static ErrorCode zV(Cell * Z, APL_Float real, APL_Float imag);
+
 protected:
    /// overloaded Cell::is_numeric()
    virtual bool is_numeric() const
@@ -106,6 +119,6 @@ protected:
    /// multiply \b a by 1, -1, i, or -i so that a.real is maximal
    static APL_Complex cpx_max_real(APL_Complex a);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __NUMERICCELL_HH_DEFINED__

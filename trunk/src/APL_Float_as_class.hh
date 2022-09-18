@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -136,7 +136,7 @@ protected:
    /// the value
    double dval;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// a non-rational APL floating point value
 class APL_Float : public APL_Float_Base
 {
@@ -156,27 +156,27 @@ inline bool isnormal(const APL_Float & val)
 {
   return std::isnormal(val._get());
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// cast from APL_Float_Base to APL_Float
 APL_Float_Base::operator APL_Float() const
 {
    return APL_Float(dval);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// up-cast from const APL_Float_Base * to const APL_Float *
 const APL_Float *
 APL_Float_Base::pAPL_Float() const
 {
    return static_cast<const APL_Float *>(this);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// up-cast from APL_Float_Base * to APL_Float *
 APL_Float *
 APL_Float_Base::pAPL_Float()
 {
    return static_cast<APL_Float *>(this);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #define wrap1(type, fun)                                                \
 inline type fun(const APL_Float_Base & d)                               \
@@ -273,7 +273,7 @@ assop_wrap1(-)
 assop_wrap1(*)
 assop_wrap1(/)
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 inline complex<APL_Float>
 complex_sqrt(complex<APL_Float> x)
 {
@@ -281,7 +281,7 @@ const complex<double> cx(x.real()._get(), x.imag()._get());
 const complex<double> cz = sqrt(cx);
    return complex<APL_Float>(cz.real(), cz.imag());
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 inline complex<APL_Float>
 complex_exponent(complex<APL_Float> x)
 {
@@ -289,7 +289,7 @@ const complex<double> cx(x.real()._get(), x.imag()._get());
 const complex<double> cz = exp(cx);
    return complex<APL_Float>(cz.real(), cz.imag());
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 inline complex<APL_Float>
 complex_power(complex<APL_Float> x, complex<APL_Float> y)
 {
@@ -298,6 +298,6 @@ const complex<double> cy(y.real()._get(), y.imag()._get());
 const complex<double> cz = pow(cx, cy);
    return complex<APL_Float>(cz.real(), cz.imag());
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 #endif // __APL_FLOAT_AS_CLASS_HH_DEFINED__
 

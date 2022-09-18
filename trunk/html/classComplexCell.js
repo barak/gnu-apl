@@ -61,8 +61,11 @@ var classComplexCell =
     [ "need_scaling", "classComplexCell.html#a8882c2a4701f26a80e9bc1aa2dd450be", null ],
     [ "ONE", "classComplexCell.html#ae41a9c3b768daa6c34b1a36a7827da34", null ],
     [ "PLUS_i", "classComplexCell.html#aad6c296915a85820d2e39ee01f64c74b", null ],
-    [ "to_type", "classComplexCell.html#a98da563abd084cf0c9e77ab9d0465bb3", null ],
-    [ "zv", "classComplexCell.html#abe932bb7b95925a58c06342bb2be643f", null ],
-    [ "zv", "classComplexCell.html#ae94e1e4daaba62ad8aa17851c94c6813", null ],
-    [ "zv", "classComplexCell.html#ad1be7492effa84d3893d4ac6c960d0bb", null ]
+    [ "zC", "classComplexCell.html#a9ccb64da2c504a517c725dc2c41940da", null ],
+    [ "zC", "classComplexCell.html#a76bdd67691bee87877efcc5cccd8199f", null ],
+    [ "FloatCell", "classComplexCell.html#a4616ec755694d9c27a390c15e91d5a24", null ],
+    [ "IntCell", "classComplexCell.html#afd3c49de8dc518c6464f91986959e0af", null ],
+    [ "NumericCell", "classComplexCell.html#a3f00a33db902b73442acfc08d7f19716", null ],
+    [ "RealCell", "classComplexCell.html#affcb4d972251e07660a6122bbdd90d89", null ],
+    [ "Value", "classComplexCell.html#aeceedf6e1a7d48a588516ce2b1983d6f", null ]
 ];

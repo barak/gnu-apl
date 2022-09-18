@@ -26,7 +26,7 @@ Bif_F12_INTERVAL_INDEX Bif_F12_INTERVAL_INDEX::_fun;    // ⍳
 Bif_F12_INTERVAL_INDEX *
 Bif_F12_INTERVAL_INDEX::fun = &Bif_F12_INTERVAL_INDEX::_fun;
 
-//=============================================================================
+//============================================================================
 /** return { (,⍵) / ,⍳⍴⍵ }. ⍸B is similar to ⍳B except that:
     * ⍸Z is a vector ⍴,B instead of an array with shape ⍴B, and'
     * the n_th index ist repeated (,B)[n] times instead of once (and
@@ -45,14 +45,14 @@ const ShapeItem ec_B = B->element_count();
 ShapeItem count = 0;
    loop(b, ec_B)
        {
-         const Cell & cell = B->get_ravel(b);
+         const Cell & cell = B->get_cravel(b);
          if (!cell.is_near_int())
             {
               MORE_ERROR() << "non-integer item in the argument of monadic ⍸";
               DOMAIN_ERROR;
             }
 
-          const APL_Integer Bi = B->get_ravel(b).get_near_int();
+          const APL_Integer Bi = B->get_cravel(b).get_near_int();
           if (Bi < 0)
             {
               MORE_ERROR() << "negative item in the argument of monadic ⍸";
@@ -67,7 +67,7 @@ Value_P Z(count, LOC);
 const uRank rank = B->get_rank();
    loop(b, ec_B)
        {
-         const Cell & cell = B->get_ravel(b);
+         const Cell & cell = B->get_cravel(b);
          const APL_Integer Bi = cell.get_near_int();   // number of repetitions
          if (!Bi)   continue;   // nothing to do
 
@@ -77,7 +77,7 @@ const uRank rank = B->get_rank();
              {
                if (rank <= 1)   // simple shape
                   {
-                    new (Z->next_ravel())   IntCell(b + qio);
+                    Z->next_ravel_Int(b + qio);
                   }
                else             // nested shape
                   {
@@ -85,20 +85,20 @@ const uRank rank = B->get_rank();
                      loop(r, rank)
                          {
                            const ShapeItem sh_r = sh_b.get_shape_item(r);
-                           new (ZZ->next_ravel())   IntCell(sh_r);
+                           ZZ->next_ravel_Int(sh_r);
                          }
-                     ZZ->set_default_Int();
+                     ZZ->set_proto_Int();
                      ZZ->check_value(LOC);
-                     new (Z->next_ravel())   PointerCell(ZZ.get(), Z.getref());
+                     Z->next_ravel_Pointer(ZZ.get());
                   }
              }
        }
 
-   Z->set_default_Int();
+   Z->set_proto_Int();
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// search elements of B in ntervals defined by A. ⍴Z is ⍴B, and elements of Z
 /// are indices of A so that A[Z[N]] ≤ B[N] < A[Z[N] + 1]
 Token
@@ -116,8 +116,8 @@ const ShapeItem ec_A = A->element_count();
 
    for(ShapeItem a = 1; a < ec_A; ++a)
        {
-         const Cell & c1 = A->get_ravel(a-1);
-         const Cell & c2 = A->get_ravel(a);
+         const Cell & c1 = A->get_cravel(a-1);
+         const Cell & c2 = A->get_cravel(a);
          const Comp_result c1_c2 = c1.compare(c2);
          if (c1_c2 != COMP_LT)
             {
@@ -131,20 +131,20 @@ const ShapeItem ec_A = A->element_count();
    //
 Value_P Z(B->get_shape(), LOC);
 const ShapeItem ec_B = B->element_count();
-const Cell * cells_A = &A->get_ravel(0);
+const Cell * cells_A = &A->get_cfirst();
 const APL_Integer qio = Workspace::get_IO();
 
    loop(b, ec_B)
       {
-        const ShapeItem z = find_range(B->get_ravel(b), cells_A, ec_A);
-        new (Z->next_ravel())   IntCell(z + qio);
+        const ShapeItem z = find_range(B->get_cravel(b), cells_A, ec_A);
+        Z->next_ravel_Int(z + qio);
       }
 
-   Z->set_default_Int();
+   Z->set_proto_Int();
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ShapeItem
 Bif_F12_INTERVAL_INDEX::find_range(const Cell & cell, const Cell * ranges,
                                    ShapeItem range_count)
@@ -180,5 +180,5 @@ ShapeItem ret = 0;
 
    return ret;
 }
-//=============================================================================
+//============================================================================
 

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,6 +19,7 @@
 */
 
 #include "Bif_F12_PARTITION_PICK.hh"
+#include "Bif_F12_TAKE_DROP.hh"
 #include "Bif_OPER2_INNER.hh"
 #include "Bif_OPER1_REDUCE.hh"
 #include "Macro.hh"
@@ -30,7 +31,37 @@ Bif_OPER2_INNER * Bif_OPER2_INNER::fun = &Bif_OPER2_INNER::_fun;
 
 Bif_OPER2_INNER::PJob_product Bif_OPER2_INNER::job;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+Token
+Bif_OPER2_INNER::fill(const Shape shape_Z, Value_P A, Function_P fun,
+                      Value_P B, const char * loc)
+{
+   // this function is called from A f.g B when A fun B is called with an
+   // empty A or B. In this case shape_Z is empty since A->get_shape() or
+   // B->get_shape() (or both) contain axes of length 0.
+
+Value_P Fill_A;   // argument A of the fill function
+Value_P Fill_B;   // argument B of the fill function
+
+   if (A->is_empty())   Fill_A = A->prototype(LOC);
+   else                 Fill_A = Bif_F12_TAKE::first(*A);
+
+   if (B->is_empty())   Fill_B = B->prototype(LOC);
+   else                 Fill_B = Bif_F12_TAKE::first(*B);
+
+Token tok = fun->eval_fill_AB(Fill_A, Fill_B);
+
+   if (tok.get_Class() != TC_VALUE)   return tok;
+
+Value * Z = tok.get_apl_val().get();
+
+Value_P Z1(shape_Z, LOC);   // shape_Z is empty
+   Z1->get_wproto().init_from_value(Z, *Z1, loc);
+
+   Z1->check_value(LOC);
+   return Token(TOK_APL_VALUE1, Z1);
+}
+//----------------------------------------------------------------------------
 Token
 Bif_OPER2_INNER::eval_ALRB(Value_P A, Token & _LO, Token & _RO, Value_P B) const
 {
@@ -49,29 +80,19 @@ Function_P RO = _RO.get_function();
        A->get_shape().get_last_shape_item() !=
        B->get_shape().get_shape_item(0))   LENGTH_ERROR;
 
-Shape shape_A1;
-ShapeItem len_A = 1;
-   if (!A->is_scalar())
-      {
-        len_A = A->get_last_shape_item();
-        shape_A1 = A->get_shape().without_axis(A->get_rank() - 1);
-      }
+const Shape shape_A1 =A->get_shape().without_last_axis();
+const ShapeItem len_A = A->get_last_shape_item();
 
-Shape shape_B1;
-ShapeItem len_B = 1;
-   if (!B->is_scalar())
-      {
-        len_B = B->get_shape_item(0);
-        shape_B1 = B->get_shape().without_axis(0);
-      }
+const Shape shape_B1 = B->get_shape().without_first_axis();
+const ShapeItem len_B = B->get_first_shape_item();
 
    // we do not check len_A == len_B here, since a non-scalar LO may
    // accept different lengths of its left and right arguments
 
-const ShapeItem items_A = shape_A1.get_volume();
-const ShapeItem items_B = shape_B1.get_volume();
+const ShapeItem items_A1 = shape_A1.get_volume();
+const ShapeItem items_B1 = shape_B1.get_volume();
 
-   if (items_A == 0 || items_B == 0)   // empty result
+   if (items_A1 == 0 || items_B1 == 0)   // empty result
       {
         // the outer product portion of LO.RO is empty.
         // Apply the fill function of RO
@@ -82,7 +103,7 @@ const ShapeItem items_B = shape_B1.get_volume();
 
    if (LO->may_push_SI() || RO->may_push_SI())   // user defined LO or RO
       {
-        // iso: if A1 and B1 are both vectors, return f/A1 g B1.
+        // ISO: if A1 and B1 are both vectors, return f/A1 g B1.
         //
         if (A->get_rank() <= 1 && B->get_rank() <= 1)
            return Macro::get_macro(Macro::MAC_Z__vA_LO_INNER_RO_vB)
@@ -109,12 +130,12 @@ Value_P Z(shape_A1 + shape_B1, LOC);
    //
         if (len_A != len_B && job.incA && job.incB)   LENGTH_ERROR;
 
-        job.cZ     = &Z->get_ravel(0);
-        job.cA     = &A->get_ravel(0);
-        job.ZAh    = items_A;
+        job.cZ     = &Z->get_wfirst();
+        job.cA     = &A->get_cfirst();
+        job.ZAh    = items_A1;
         job.LO_len = A->is_scalar() ? len_B : len_A;
-        job.cB     = &B->get_ravel(0);
-        job.ZBl    = items_B;
+        job.cB     = &B->get_cfirst();
+        job.ZBl    = items_B1;
         job.ec     = E_NO_ERROR;
 
         scalar_inner_product();
@@ -145,14 +166,14 @@ const bool B_enclosed = B->get_rank() > 1;
         B = Bif_F12_PARTITION::enclose_with_axes(first_axis, B);
       }
 
-   loop (a, items_A)
-   loop (b, items_B)
+   loop (a, items_A1)
+   loop (b, items_B1)
       {
         Value_P RO_A(A, LOC);
-        if (A_enclosed)   RO_A = A->get_ravel(a).get_pointer_value();
+        if (A_enclosed)   RO_A = A->get_cravel(a).get_pointer_value();
 
         Value_P RO_B(B, LOC);
-        if (B_enclosed)   RO_B = B->get_ravel(b).get_pointer_value();
+        if (B_enclosed)   RO_B = B->get_cravel(b).get_pointer_value();
 
         const Token T1 = RO->eval_AB(RO_A, RO_B);
 
@@ -160,22 +181,23 @@ const bool B_enclosed = B->get_rank() > 1;
 
         Value_P A_RO_B = T1.get_apl_val();
 
-        Cell * cZ = Z->next_ravel();
         if (A_RO_B->is_simple_scalar())   // A_RO_B is A RO B
            {
              // A RO B has returned a scalar, so LO/A_RO_B is A_RO_B
              //
-             cZ->init(A_RO_B->get_ravel(0), Z.getref(), LOC);
+             Z->next_ravel_Cell(A_RO_B->get_cfirst());
            }
         else
            {
-             // A RO B has returned a vector, so compute LO/A_RO_B
+             // A RO B has returned vector A_RO_B, compute LO/A_RO_B
              //
-          //    new (cZ) PointerCell(A_RO_B.get(), Z.getref());
-
-            const Token T2 = Bif_OPER1_REDUCE::fun->eval_LB(_LO, A_RO_B);
+             const Token T2 = Bif_OPER1_REDUCE::reduce(_LO, A_RO_B,
+                                                       A_RO_B->get_rank() - 1);
              if (T2.get_tag() == TOK_ERROR)   return T2;
-             cZ->init_from_value(T2.get_apl_val().get(), Z.getref(), LOC);
+
+             Value_P V2 = T2.get_apl_val();
+             if (V2->is_simple_scalar())   Z->next_ravel_Cell(V2->get_cfirst());
+             else                          Z->next_ravel_Pointer(V2.get());
            }
       }
 
@@ -183,7 +205,7 @@ const bool B_enclosed = B->get_rank() > 1;
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Bif_OPER2_INNER::scalar_inner_product() const
 {
@@ -218,7 +240,7 @@ const uint64_t end_1 = cycle_counter();
    Performance::fs_OPER2_INNER_AB.add_sample(end_1-start_1, job.ZAh * job.ZBl);
 #endif
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Bif_OPER2_INNER::PF_scalar_inner_product(Thread_context & tctx)
 {
@@ -240,6 +262,8 @@ ShapeItem end_z = z + slice_len;
         //   e.g.  Z[z] ← +/ (row_A × colB)
         //
         // we use Z[z] as accumulator for LO /
+        //
+        // we use the terms sum and product as if Z←A LO.RO B were A +.* B
         //
         Cell * sum = job.cZ + z;
         loop(l, job.LO_len)
@@ -264,4 +288,4 @@ ShapeItem end_z = z + slice_len;
            }
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------

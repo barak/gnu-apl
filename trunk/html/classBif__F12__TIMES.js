@@ -1,12 +1,12 @@
 var classBif__F12__TIMES =
 [
     [ "Bif_F12_TIMES", "classBif__F12__TIMES.html#acd250ea0be7cb8eb941650e8faf02c96", null ],
-    [ "eval_AB", "classBif__F12__TIMES.html#aaaf6a69d494617d215f5b4c956e59939", null ],
-    [ "eval_AXB", "classBif__F12__TIMES.html#a0304a256c74148dc30f4cabe717b49c9", null ],
-    [ "eval_B", "classBif__F12__TIMES.html#a0ef1f2227651d151c317304b3527b95f", null ],
-    [ "eval_identity_fun", "classBif__F12__TIMES.html#a0c1ba7d8e47b9c16555ea9fa9a94be68", null ],
+    [ "eval_AB", "classBif__F12__TIMES.html#a51d1b6e40c634539276c72aaf871cd56", null ],
+    [ "eval_AXB", "classBif__F12__TIMES.html#af4a357aaeb4d8b06ce3addea8e00c72d", null ],
+    [ "eval_B", "classBif__F12__TIMES.html#a14cbf46ddc0446de17af6a1030e6fc3e", null ],
+    [ "eval_identity_fun", "classBif__F12__TIMES.html#a480df75a71fe27ca2bf9837e7449c866", null ],
     [ "get_assoc", "classBif__F12__TIMES.html#ac16178a2e958ab945ccc918eb0b13fa3", null ],
-    [ "get_dyadic_inverse", "classBif__F12__TIMES.html#a993a6ce9666b2c008b429265306a6d67", null ],
+    [ "get_dyadic_inverse", "classBif__F12__TIMES.html#aa5020db7cb386f5f689b1b48da0682a6", null ],
     [ "get_scalar_f2", "classBif__F12__TIMES.html#a2476d6a19759d5679ebdde1a0b88ecdc", null ],
     [ "_fun", "classBif__F12__TIMES.html#a3853c4d64dec9bae72fa891c87ff6514", null ],
     [ "_fun_inverse", "classBif__F12__TIMES.html#af91f5d229aa7054c0c4102d330b7c678", null ],

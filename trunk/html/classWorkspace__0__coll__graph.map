@@ -1,17 +1,17 @@
 <map id="Workspace_0" name="Workspace_0">
-<area shape="rect" id="node2" href="$classSymbolTable.html" title="The table containing all user defined symbols. " alt="" coords="1332,217,1431,244"/>
-<area shape="rect" id="node3" href="$classSymbolTableBase.html" title="SymbolTableBase\&lt; Symbol,\l SYMBOL_HASH_TABLE_SIZE \&gt;" alt="" coords="957,214,1181,255"/>
-<area shape="rect" id="node4" href="$classSymbol.html" title="Base class for variables, defined functions, and distinguished names. " alt="" coords="595,213,661,240"/>
-<area shape="rect" id="node17" href="$classSystemVariable.html" title="Base class for all APL system variables. " alt="" coords="819,175,933,201"/>
-<area shape="rect" id="node5" href="$classNamedObject.html" title="A user&#45;defined variable or function. " alt="" coords="36,201,139,228"/>
-<area shape="rect" id="node13" href="$classFunction.html" title="Base class for all APL functions and operators (system or defined) " alt="" coords="329,97,401,124"/>
-<area shape="rect" id="node6" href="$classUCS__string.html" title="A string of Unicode characters (32&#45;bit) " alt="" coords="319,149,410,176"/>
-<area shape="rect" id="node10" href="$classSystemName.html" title="a distinguished name (i.e. ⎕xx) " alt="" coords="1205,152,1308,179"/>
-<area shape="rect" id="node8" href="$classSystemSymTab.html" title="The table containing all system defined symbols (aka. distinguished names) " alt="" coords="1808,161,1924,188"/>
-<area shape="rect" id="node9" href="$classSymbolTableBase.html" title="SymbolTableBase\&lt; SystemName,\l 256 &#45; 1 \&gt;" alt="" coords="1455,149,1679,190"/>
-<area shape="rect" id="node11" href="$classQuadFunction.html" title="Base class for all system functions. " alt="" coords="825,73,927,100"/>
-<area shape="rect" id="node12" href="$classPrimitiveFunction.html" title="Base class for all internal functions of the interpreter. " alt="" coords="567,73,689,100"/>
-<area shape="rect" id="node14" href="$classCellFunctionStatistics.html" title="Performance counters for one cell level function. " alt="" coords="289,47,440,73"/>
-<area shape="rect" id="node15" href="$classStatistics.html" title="Base class for different kinds of statistics. " alt="" coords="49,5,126,32"/>
-<area shape="rect" id="node16" href="$classStatistics__record.html" title="one statistics for computing the mean and the variance of samples " alt="" coords="27,56,147,83"/>
+<area shape="rect" id="node2" href="$classSymbolTable.html" title="The table containing all user defined symbols. " alt="" coords="1295,217,1393,244"/>
+<area shape="rect" id="node3" href="$classSymbolTableBase.html" title="SymbolTableBase\&lt; Symbol,\l SYMBOL_HASH_TABLE_SIZE \&gt;" alt="" coords="920,214,1144,255"/>
+<area shape="rect" id="node4" href="$classSymbol.html" title="Base class for variables, defined functions, and distinguished names. " alt="" coords="557,213,624,240"/>
+<area shape="rect" id="node17" href="$classSystemVariable.html" title="Base class for all APL system variables. " alt="" coords="781,175,896,201"/>
+<area shape="rect" id="node5" href="$classNamedObject.html" title="A user&#45;defined variable or function. " alt="" coords="17,209,120,236"/>
+<area shape="rect" id="node13" href="$classFunction.html" title="Base class for all APL functions and operators (system or defined) " alt="" coords="291,97,363,124"/>
+<area shape="rect" id="node6" href="$classUCS__string.html" title="A string of Unicode characters (32&#45;bit) " alt="" coords="282,149,373,176"/>
+<area shape="rect" id="node10" href="$classSystemName.html" title="a distinguished name (i.e. ⎕xx) " alt="" coords="1168,152,1271,179"/>
+<area shape="rect" id="node8" href="$classSystemSymTab.html" title="The table containing all system defined symbols (aka. distinguished names) " alt="" coords="1771,161,1887,188"/>
+<area shape="rect" id="node9" href="$classSymbolTableBase.html" title="SymbolTableBase\&lt; SystemName,\l 256 &#45; 1 \&gt;" alt="" coords="1417,149,1641,190"/>
+<area shape="rect" id="node11" href="$classQuadFunction.html" title="Base class for all system functions. " alt="" coords="787,73,890,100"/>
+<area shape="rect" id="node12" href="$classPrimitiveFunction.html" title="Base class for all internal functions of the interpreter. " alt="" coords="529,73,652,100"/>
+<area shape="rect" id="node14" href="$classCellFunctionStatistics.html" title="Performance counters for one cell level function. " alt="" coords="252,47,403,73"/>
+<area shape="rect" id="node15" href="$classStatistics.html" title="Base class for different kinds of statistics. " alt="" coords="30,5,107,32"/>
+<area shape="rect" id="node16" href="$classStatistics__record.html" title="one statistics for computing the mean and the variance of samples " alt="" coords="9,56,129,83"/>
 </map>

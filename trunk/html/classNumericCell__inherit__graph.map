@@ -1,5 +1,5 @@
 <map id="NumericCell" name="NumericCell">
-<area shape="rect" id="node3" href="$classComplexCell.html" title="A celkl containing one complex numbver. " alt="" coords="5,155,103,181"/>
+<area shape="rect" id="node3" href="$classComplexCell.html" title="A cell containing one complex number. " alt="" coords="5,155,103,181"/>
 <area shape="rect" id="node4" href="$classRealCell.html" title="Base class for IntCell and FloatCell. " alt="" coords="127,155,199,181"/>
 <area shape="rect" id="node2" href="$classCell.html" title="The base class for all Cells. " alt="" coords="86,5,131,32"/>
 <area shape="rect" id="node5" href="$classFloatCell.html" title="A Cell containing a single floating point (or rational) value. " alt="" coords="81,229,155,256"/>

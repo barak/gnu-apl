@@ -1,5 +1,5 @@
 <map id="LineEditContext" name="LineEditContext">
-<area shape="rect" id="node2" href="$classLineHistory.html" title="the lines that the user has previously entered " alt="" coords="49,179,137,206"/>
-<area shape="rect" id="node3" href="$classUCS__string__vector.html" title="a vector of UCS_strings. " alt="" coords="27,81,160,108"/>
-<area shape="rect" id="node5" href="$classUCS__string.html" title="A string of Unicode characters (32&#45;bit) " alt="" coords="303,179,393,206"/>
+<area shape="rect" id="node2" href="$classLineHistory.html" title="the lines that the user has previously entered " alt="" coords="183,209,271,235"/>
+<area shape="rect" id="node3" href="$classUCS__string.html" title="A string of Unicode characters (32&#45;bit) " alt="" coords="23,96,114,123"/>
+<area shape="rect" id="node5" href="$classUCS__string__vector.html" title="a vector of UCS_strings. " alt="" coords="183,96,317,123"/>
 </map>

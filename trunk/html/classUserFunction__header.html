@@ -62,6 +62,7 @@ $(document).ready(function(){initNavTree('classUserFunction__header.html','');})
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
+<a href="#pro-static-methods">Static Protected Member Functions</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="classUserFunction__header-members.html">List of all members</a>  </div>
   <div class="headertitle">
@@ -78,9 +79,9 @@ Collaboration diagram for UserFunction_header:</div>
 <div class="dyncontent">
 <div class="center"><img src="classUserFunction__header__coll__graph.png" border="0" usemap="#UserFunction__header_coll__map" alt="Collaboration graph"/></div>
 <map name="UserFunction__header_coll__map" id="UserFunction__header_coll__map">
-<area shape="rect" id="node2" href="classSymbol.html" title="Base class for variables, defined functions, and distinguished names. " alt="" coords="23,171,90,197"/>
-<area shape="rect" id="node3" href="classNamedObject.html" title="A user&#45;defined variable or function. " alt="" coords="5,81,108,108"/>
-<area shape="rect" id="node4" href="classUCS__string.html" title="A string of Unicode characters (32&#45;bit) " alt="" coords="139,81,230,108"/>
+<area shape="rect" id="node2" href="classSymbol.html" title="Base class for variables, defined functions, and distinguished names. " alt="" coords="23,185,90,212"/>
+<area shape="rect" id="node3" href="classNamedObject.html" title="A user&#45;defined variable or function. " alt="" coords="5,96,108,123"/>
+<area shape="rect" id="node4" href="classUCS__string.html" title="A string of Unicode characters (32&#45;bit) " alt="" coords="139,96,230,123"/>
 </map>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
@@ -88,7 +89,7 @@ Collaboration diagram for UserFunction_header:</div>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a003ac8f5ff1ec67f3fe5e6ad0ef850de"><td class="memItemLeft" align="right" valign="top"><a id="a003ac8f5ff1ec67f3fe5e6ad0ef850de"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classUserFunction__header.html#a003ac8f5ff1ec67f3fe5e6ad0ef850de">UserFunction_header</a> (const <a class="el" href="classUCS__string.html">UCS_string</a> &amp;txt, bool macro)</td></tr>
-<tr class="memdesc:a003ac8f5ff1ec67f3fe5e6ad0ef850de"><td class="mdescLeft">&#160;</td><td class="mdescRight">constructor from first line in <b>txt</b> (for normal defined functions) <br /></td></tr>
+<tr class="memdesc:a003ac8f5ff1ec67f3fe5e6ad0ef850de"><td class="mdescLeft">&#160;</td><td class="mdescRight">constructor from first line in <b>txt</b> (for proper defined functions) <br /></td></tr>
 <tr class="separator:a003ac8f5ff1ec67f3fe5e6ad0ef850de"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab1dffd12344c108071b5f03276c6b9fe"><td class="memItemLeft" align="right" valign="top"><a id="ab1dffd12344c108071b5f03276c6b9fe"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classUserFunction__header.html#ab1dffd12344c108071b5f03276c6b9fe">UserFunction_header</a> (Fun_signature sig, int lambda_num)</td></tr>
@@ -190,10 +191,10 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classUserFunction__header.html#a332a135b6d9ec286e6deb84298c10a43">remove_duplicate_local_variables</a> ()</td></tr>
 <tr class="memdesc:a332a135b6d9ec286e6deb84298c10a43"><td class="mdescLeft">&#160;</td><td class="mdescRight">Check that all function params, local vars. and labels are unique. <br /></td></tr>
 <tr class="separator:a332a135b6d9ec286e6deb84298c10a43"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a455a3af03f9beb7a08f48ac08001765a"><td class="memItemLeft" align="right" valign="top"><a id="a455a3af03f9beb7a08f48ac08001765a"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classUserFunction__header.html#a455a3af03f9beb7a08f48ac08001765a">eval_common</a> ()</td></tr>
-<tr class="memdesc:a455a3af03f9beb7a08f48ac08001765a"><td class="mdescLeft">&#160;</td><td class="mdescRight">push Z (if defined), local variables, and labels. <br /></td></tr>
-<tr class="separator:a455a3af03f9beb7a08f48ac08001765a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1d9d5b7bca1eecd659580126b6e4813a"><td class="memItemLeft" align="right" valign="top"><a id="a1d9d5b7bca1eecd659580126b6e4813a"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classUserFunction__header.html#a1d9d5b7bca1eecd659580126b6e4813a">eval_common</a> () const</td></tr>
+<tr class="memdesc:a1d9d5b7bca1eecd659580126b6e4813a"><td class="mdescLeft">&#160;</td><td class="mdescRight">push Z (if defined), local variables, and labels. <br /></td></tr>
+<tr class="separator:a1d9d5b7bca1eecd659580126b6e4813a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ade0a7cad8305b7f3149ab4e25566aca2"><td class="memItemLeft" align="right" valign="top"><a id="ade0a7cad8305b7f3149ab4e25566aca2"></a>
 ShapeItem&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classUserFunction__header.html#ade0a7cad8305b7f3149ab4e25566aca2">local_var_count</a> () const</td></tr>
 <tr class="memdesc:ade0a7cad8305b7f3149ab4e25566aca2"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the number of local variables <br /></td></tr>
@@ -212,10 +213,25 @@ static <a class="el" href="classUCS__string.html">UCS_string</a>&#160;</td><td c
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
+<tr class="memitem:af72aea0d6de982a6ed4002dc61c173ab"><td class="memItemLeft" align="right" valign="top"><a id="af72aea0d6de982a6ed4002dc61c173ab"></a>
+const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classUserFunction__header.html#af72aea0d6de982a6ed4002dc61c173ab">init_signature</a> (const <a class="el" href="classUCS__string.html">UCS_string</a> &amp;text, bool macro)</td></tr>
+<tr class="memdesc:af72aea0d6de982a6ed4002dc61c173ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">init the signature from text <br /></td></tr>
+<tr class="separator:af72aea0d6de982a6ed4002dc61c173ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7ce5d64cb355876f5a5a5606476d1696"><td class="memItemLeft" align="right" valign="top"><a id="a7ce5d64cb355876f5a5a5606476d1696"></a>
+const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classUserFunction__header.html#a7ce5d64cb355876f5a5a5606476d1696">init_local_vars</a> (const <a class="el" href="classUCS__string.html">UCS_string</a> &amp;text, bool macro)</td></tr>
+<tr class="memdesc:a7ce5d64cb355876f5a5a5606476d1696"><td class="mdescLeft">&#160;</td><td class="mdescRight">init the local variables from text <br /></td></tr>
+<tr class="separator:a7ce5d64cb355876f5a5a5606476d1696"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af00a60b75d11d89318c278f153b9c3a8"><td class="memItemLeft" align="right" valign="top"><a id="af00a60b75d11d89318c278f153b9c3a8"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classUserFunction__header.html#af00a60b75d11d89318c278f153b9c3a8">remove_duplicate_local_var</a> (const <a class="el" href="classSymbol.html">Symbol</a> *sym, size_t pos)</td></tr>
 <tr class="memdesc:af00a60b75d11d89318c278f153b9c3a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">remove <b>sym</b> from local_vars if it occurs at pos or above <br /></td></tr>
 <tr class="separator:af00a60b75d11d89318c278f153b9c3a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-static-methods"></a>
+Static Protected Member Functions</h2></td></tr>
+<tr class="memitem:a963329caf6fac2cd769b2229fc3d483f"><td class="memItemLeft" align="right" valign="top"><a id="a963329caf6fac2cd769b2229fc3d483f"></a>
+static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classUserFunction__header.html#a963329caf6fac2cd769b2229fc3d483f">signature_is_valid</a> (Fun_signature sig)</td></tr>
+<tr class="memdesc:a963329caf6fac2cd769b2229fc3d483f"><td class="mdescLeft">&#160;</td><td class="mdescRight">return true iff bitmap <b>sig</b> is a valid funvtion signature <br /></td></tr>
+<tr class="separator:a963329caf6fac2cd769b2229fc3d483f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
@@ -229,7 +245,7 @@ const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 <tr class="separator:a8816b7e797c9e291ded6bc00a51adede"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab7e0af151f54a53b3e87e43cc250564e"><td class="memItemLeft" align="right" valign="top"><a id="ab7e0af151f54a53b3e87e43cc250564e"></a>
 <a class="el" href="classUCS__string.html">UCS_string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classUserFunction__header.html#ab7e0af151f54a53b3e87e43cc250564e">function_name</a></td></tr>
-<tr class="memdesc:ab7e0af151f54a53b3e87e43cc250564e"><td class="mdescLeft">&#160;</td><td class="mdescRight">the name of this function <br /></td></tr>
+<tr class="memdesc:ab7e0af151f54a53b3e87e43cc250564e"><td class="mdescLeft">&#160;</td><td class="mdescRight">the name of this function. In most cases function_name is sym_FUN-&gt;<a class="el" href="classUserFunction__header.html#abcc2f6d70da90e3123e630a226b9e931" title="return the name of the function ">get_name()</a>, but for lambdas it is not. <br /></td></tr>
 <tr class="separator:ab7e0af151f54a53b3e87e43cc250564e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae152c1f1b74703ad584fbb43b7aad3f3"><td class="memItemLeft" align="right" valign="top"><a id="ae152c1f1b74703ad584fbb43b7aad3f3"></a>
 <a class="el" href="classSymbol.html">Symbol</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classUserFunction__header.html#ae152c1f1b74703ad584fbb43b7aad3f3">sym_Z</a></td></tr>
@@ -282,7 +298,7 @@ std::vector&lt; <a class="el" href="structlabVal.html">labVal</a> &gt;&#160;</td
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="classUserFunction__header.html">UserFunction_header</a></li>
-    <li class="footer">Generated on Sun Aug 9 2020 16:43:42 for GNUAPL by
+    <li class="footer">Generated on Sun Jan 30 2022 20:14:27 for GNUAPL by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>

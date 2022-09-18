@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@
 #include "Tokenizer.hh"
 #include "Workspace.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 Parser::parse(const UCS_string & input, Token_string & tos) const
 {
@@ -47,8 +47,7 @@ Token_string tos1;
 
    {
      Tokenizer tokenizer(pmode, LOC, macro);
-     ErrorCode ec = tokenizer.tokenize(input, tos1);
-     if (ec != E_NO_ERROR)   return ec;
+     if (const ErrorCode ec = tokenizer.tokenize(input, tos1))   return ec;
    }
 
    // special case: single token (to speed up ⍎)
@@ -62,7 +61,7 @@ Token_string tos1;
 
    return parse(tos1, tos);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 Parser::parse(const Token_string & input, Token_string & tos) const
 {
@@ -119,7 +118,7 @@ std::vector<Token_string *> statements;
 
    return E_NO_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 Parser::parse_statement(Token_string & tos)
 {
@@ -201,7 +200,7 @@ Parser::parse_statement(Token_string & tos)
 
    return E_NO_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Parser::collect_constants(Token_string & tos)
 {
@@ -239,7 +238,7 @@ Parser::collect_constants(Token_string & tos)
               // In contrast, the binding rules stated in IBM's apl2lrm.pdf
               // would give 3[2] ↔ RANK ERROR.
               // 
-              // We follow apl2lrm; to enable IBM behavior write #if 0 above.
+              // We follow apl2lrm; to enable ISO behavior write #if 0 above.
               // 
 
               // if tos[to + 1] is [ then [ binds stronger than
@@ -271,7 +270,7 @@ Parser::collect_constants(Token_string & tos)
         tos.print(CERR, true);
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Parser::collect_groups(Token_string & tos)
 {
@@ -330,7 +329,7 @@ int opening = -1;
 
    return false;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Parser::find_closing_bracket(const Token_string & tos, int pos)
 {
@@ -353,7 +352,7 @@ int others = 0;
 
    SYNTAX_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Parser::find_opening_bracket(const Token_string & tos, int pos)
 {
@@ -376,7 +375,7 @@ int others = 0;
 
    SYNTAX_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Parser::find_closing_parent(const Token_string & tos, int pos)
 {
@@ -399,7 +398,7 @@ int others = 0;
 
    SYNTAX_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Parser::find_opening_parent(const Token_string & tos, int pos)
 {
@@ -422,7 +421,7 @@ int others = 0;
 
    SYNTAX_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Parser::remove_nongrouping_parantheses(Token_string & tos)
 {
@@ -483,7 +482,7 @@ Parser::remove_nongrouping_parantheses(Token_string & tos)
              }
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Parser::replace_bitwise_functions(Token_string & tos)
 {
@@ -530,7 +529,7 @@ Parser::replace_bitwise_functions(Token_string & tos)
             }
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Parser::check_if_value(const Token_string & tos, int pos)
 {
@@ -576,7 +575,7 @@ Parser::check_if_value(const Token_string & tos, int pos)
 
    return false;   // tos[pos] is at the end of a function
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Parser::remove_void_token(Token_string & tos)
 {
@@ -591,7 +590,7 @@ size_t dst = 0;
 
    tos.resize(dst);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 Parser::match_par_bra(Token_string & tos, bool backwards)
 {
@@ -650,7 +649,7 @@ std::vector<ShapeItem> stack;
 
    return E_NO_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Parser::create_value(Token_string & tos, int pos, int count)
 {
@@ -671,7 +670,7 @@ Parser::create_value(Token_string & tos, int pos, int count)
         tos.print(CERR, true);
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Parser::create_scalar_value(Token & output)
 {
@@ -681,7 +680,7 @@ Parser::create_scalar_value(Token & output)
              {
                Value_P scalar(LOC);
 
-               new (scalar->next_ravel())  CharCell(output.get_char_val());
+               scalar->next_ravel_Char(output.get_char_val());
                scalar->check_value(LOC);
                Token tok(TOK_APL_VALUE3, scalar);
                output.move_1(tok, LOC);
@@ -690,34 +689,24 @@ Parser::create_scalar_value(Token & output)
 
         case TOK_INTEGER:
              {
-               Value_P scalar(LOC);
-
-               new (scalar->next_ravel())   IntCell(output.get_int_val());
-               scalar->check_value(LOC);
-               Token tok(TOK_APL_VALUE3, scalar);
+               Token tok(TOK_APL_VALUE3, IntScalar(output.get_int_val(), LOC));
                output.move_1(tok, LOC);
              }
              return;
 
         case TOK_REAL:
              {
-               Value_P scalar(LOC);
-
-               new (scalar->next_ravel())  FloatCell(output.get_flt_val());
-               scalar->check_value(LOC);
-               Token tok(TOK_APL_VALUE3, scalar);
+               Token tok(TOK_APL_VALUE3,
+                         FloatScalar(output.get_flt_val(), LOC));
                output.move_1(tok, LOC);
              }
              return;
 
         case TOK_COMPLEX:
              {
-               Value_P scalar(LOC);
-
-               new (scalar->next_ravel())   ComplexCell(output.get_cpx_real(),
-                                                        output.get_cpx_imag());
-               scalar->check_value(LOC);
-               Token tok(TOK_APL_VALUE3, scalar);
+               Token tok(TOK_APL_VALUE3,
+                         ComplexScalar(output.get_cpx_real(),
+                                       output.get_cpx_imag(), LOC));
                output.move_1(tok, LOC);
              }
              return;
@@ -732,54 +721,51 @@ Parser::create_scalar_value(Token & output)
    CERR << "Unexpected token " << output.get_tag() << ": " << output << endl;
    Assert(0 && "Unexpected token");
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
-Parser::create_vector_value(Token_string & tos,
-                            int pos, int count)
+Parser::create_vector_value(Token_string & tos, int pos, int count)
 {
-Value_P vector(count, LOC);
+Value_P Z(count, LOC);
 
    loop(l, count)
        {
-         Cell * addr = &vector->get_ravel(l);
          Token & tok = tos[pos + l];
 
          switch(tok.get_tag())
             {
               case TOK_CHARACTER:
-                   new (addr) CharCell(tok.get_char_val());
+                   Z->next_ravel_Char(tok.get_char_val());
                    tok.clear(LOC);   // invalidate token
                    break;
 
               case TOK_INTEGER:
-                   new (addr) IntCell(tok.get_int_val());
+                   Z->next_ravel_Int(tok.get_int_val());
                    tok.clear(LOC);   // invalidate token
                    break;
 
               case TOK_REAL:
-                   new (addr) FloatCell(tok.get_flt_val());
+                   Z->next_ravel_Float(tok.get_flt_val());
                    tok.clear(LOC);   // invalidate token
                    break;
 
               case TOK_COMPLEX:
-                   new (addr) ComplexCell(tok.get_cpx_real(),
-                                          tok.get_cpx_imag());
+                   Z->next_ravel_Complex(tok.get_cpx_real(),
+                                         tok.get_cpx_imag());
                    tok.clear(LOC);   // invalidate token
                    break;
 
             case TOK_APL_VALUE1:
             case TOK_APL_VALUE3:
-                 new (addr) PointerCell(tok.get_apl_val().get(),
-                                        vector.getref());
+                 Z->next_ravel_Value(tok.get_apl_val().get());
                  tok.clear(LOC);   // invalidate token
                  break;
 
-              default: Assert(0);
+              default: FIXME;
             }
        }
 
-   vector->check_value(LOC);
-Token tok(TOK_APL_VALUE3, vector);
+   Z->check_value(LOC);
+Token tok(TOK_APL_VALUE3, Z);
 
    tos[pos].move_1(tok, LOC);
 
@@ -789,7 +775,8 @@ Token tok(TOK_APL_VALUE3, vector);
         tos.print(CERR, true);
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+/// in tos, (re-) mark the symbols left of ← as left symbols
 void
 Parser::mark_lsymb(Token_string & tos)
 {
@@ -797,11 +784,11 @@ Parser::mark_lsymb(Token_string & tos)
       {
         if (tos[ass].get_Class() != TC_ASSIGN)   continue;
 
-        // found ←. move backwards. Before that we handle the special case of
-        // vector specification, i.e. (SYM SYM ... SYM) ← value
+        // found ← in VAR VAR)← move backwards. Before that we handle the special
+        // case of vector specification, i.e. (SYM SYM ... SYM) ← value
         //
         if (ass >= 3 && tos[ass - 1].get_Class() == TC_R_PARENT &&
-                        tos[ass - 2].get_Class() == TC_SYMBOL &&
+                        tos[ass - 2].get_Class() == TC_SYMBOL   &&
                         tos[ass - 3].get_Class() == TC_SYMBOL)
            {
              // first make sure that this is really a vector specification.
@@ -809,17 +796,36 @@ Parser::mark_lsymb(Token_string & tos)
              const int syms_to = ass - 2;
              int syms_from = ass - 3;
              bool is_vector_spec = true;
+             bool is_selective_spec = false;
              for (int a1 = ass - 4; a1 >= 0; --a1)
                  {
-                   if (tos[a1].get_Class() == TC_L_PARENT)
+                   const TokenClass tc = tos[a1].get_Class();
+                   if (tc == TC_L_PARENT)   // end of (...)←
                       {
                         syms_from = a1 + 1;
                         break;
                       }
-                   if (tos[a1].get_Class() == TC_SYMBOL)     continue; 
+                   if (tc == TC_SYMBOL)     continue; 
+                   if (tc == TC_FUN12 || tc == TC_OPER1 || tc == TC_OPER2)
+                      {
+                        is_selective_spec = true;
+                        is_vector_spec = false;
+                        break;
+                      }
+
+                   // something else
+                   //
                    is_vector_spec = false;
                    break;
                  }
+
+             if (is_selective_spec == is_vector_spec)   // none or both
+                {
+                  MORE_ERROR() <<
+                      "Left of )← seems to be neither a vector "
+                      "specification nor a selective specvification";
+                  LEFT_SYNTAX_ERROR;
+                }
 
              // if this is a vector specification, then mark all symbols
              // inside ( ... ) as TOK_LSYMB2.
@@ -860,4 +866,4 @@ Parser::mark_lsymb(Token_string & tos)
             }
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------

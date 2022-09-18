@@ -77,22 +77,23 @@ Collaboration diagram for PJob_scalar_B:</div>
 <div class="dyncontent">
 <div class="center"><img src="classPJob__scalar__B__coll__graph.png" border="0" usemap="#PJob__scalar__B_coll__map" alt="Collaboration graph"/></div>
 <map name="PJob__scalar__B_coll__map" id="PJob__scalar__B_coll__map">
-<area shape="rect" id="node2" href="classCell.html" title="The base class for all Cells. " alt="" coords="298,69,343,96"/>
-<area shape="rect" id="node3" href="unionCell_1_1SomeValue.html" title="A union containing all possible cell values for the different Cell types. " alt="" coords="1227,87,1347,113"/>
-<area shape="rect" id="node5" href="classValue.html" title="An APL Value (essentially a Shape and a ravel) " alt="" coords="570,251,625,277"/>
-<area shape="rect" id="node4" href="structCell_1_1SomeValue_1_1__pval.html" title="a pointer to, and the owner of, a nested APL (sub&#45;) value " alt="" coords="991,131,1149,157"/>
-<area shape="rect" id="node9" href="classValue__P__Base.html" title="A Value smart * and access functions (except constructors) " alt="" coords="781,131,889,157"/>
-<area shape="rect" id="node6" href="classDynamicObject.html" title="A Value or an IndexExpr. " alt="" coords="265,203,377,229"/>
-<area shape="rect" id="node7" href="struct__deleted__value.html" title="a linked list of deleted values " alt="" coords="266,292,375,319"/>
-<area shape="rect" id="node8" href="classShape.html" title="the shape of an APL value " alt="" coords="291,343,350,369"/>
-<area shape="rect" id="node10" href="structCell_1_1SomeValue_1_1__fval.html" title="&lt; for FloatCell " alt="" coords="992,243,1148,269"/>
-<area shape="rect" id="node11" href="unionCell_1_1SomeValue_1_1__fval_1_1__flt__num.html" title="either a floating point value, or the denominator of a quotient " alt="" coords="757,298,913,339"/>
-<area shape="rect" id="node12" href="classPrimitiveFunction.html" title="Base class for all internal functions of the interpreter. " alt="" coords="536,399,659,425"/>
-<area shape="rect" id="node13" href="classFunction.html" title="Base class for all APL functions and operators (system or defined) " alt="" coords="285,445,357,472"/>
-<area shape="rect" id="node14" href="classNamedObject.html" title="A user&#45;defined variable or function. " alt="" coords="14,445,117,472"/>
-<area shape="rect" id="node15" href="classCellFunctionStatistics.html" title="Performance counters for one cell level function. " alt="" coords="245,395,396,421"/>
-<area shape="rect" id="node16" href="classStatistics.html" title="Base class for different kinds of statistics. " alt="" coords="27,344,104,371"/>
-<area shape="rect" id="node17" href="classStatistics__record.html" title="one statistics for computing the mean and the variance of samples " alt="" coords="5,395,125,421"/>
+<area shape="rect" id="node2" href="classConstCell__P.html" title="a &quot;smart&quot; Cell *, allowing only a subset of what a normal Cell * is capable of. MUST NOT BE USED FOR ..." alt="" coords="193,247,289,273"/>
+<area shape="rect" id="node3" href="classCell.html" title="The base class for all Cells. " alt="" coords="101,125,147,152"/>
+<area shape="rect" id="node4" href="unionCell_1_1SomeValue.html" title="A union containing all possible cell values for the different Cell types. " alt="" coords="108,531,228,557"/>
+<area shape="rect" id="node6" href="classValue.html" title="An APL Value (essentially a Shape and a ravel) " alt="" coords="470,247,525,273"/>
+<area shape="rect" id="node5" href="structCell_1_1SomeValue_1_1__pval.html" title="a pointer to, and the owner of, a nested APL (sub&#45;) value " alt="" coords="315,441,474,468"/>
+<area shape="rect" id="node10" href="classValue__P__Base.html" title="A Value smart * and access functions (except constructors) " alt="" coords="341,345,449,371"/>
+<area shape="rect" id="node7" href="classDynamicObject.html" title="A Value or an IndexExpr. " alt="" coords="712,125,824,152"/>
+<area shape="rect" id="node8" href="struct__deleted__value.html" title="a linked list of deleted values " alt="" coords="443,125,552,152"/>
+<area shape="rect" id="node9" href="classShape.html" title="the shape of an APL value " alt="" coords="629,125,688,152"/>
+<area shape="rect" id="node11" href="structCell_1_1SomeValue_1_1__fval.html" title="&lt; for FloatCell " alt="" coords="530,441,686,468"/>
+<area shape="rect" id="node12" href="unionCell_1_1SomeValue_1_1__fval_1_1__flt__num.html" title="either a floating point value, or the denominator of a quotient " alt="" coords="562,337,718,379"/>
+<area shape="rect" id="node13" href="classPrimitiveFunction.html" title="Base class for all internal functions of the interpreter. " alt="" coords="313,247,436,273"/>
+<area shape="rect" id="node14" href="classFunction.html" title="Base class for all APL functions and operators (system or defined) " alt="" coords="347,125,419,152"/>
+<area shape="rect" id="node15" href="classNamedObject.html" title="A user&#45;defined variable or function. " alt="" coords="331,5,434,32"/>
+<area shape="rect" id="node16" href="classCellFunctionStatistics.html" title="Performance counters for one cell level function. " alt="" coords="171,125,322,152"/>
+<area shape="rect" id="node17" href="classStatistics.html" title="Base class for different kinds of statistics. " alt="" coords="85,5,163,32"/>
+<area shape="rect" id="node18" href="classStatistics__record.html" title="one statistics for computing the mean and the variance of samples " alt="" coords="187,5,307,32"/>
 </map>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
@@ -133,10 +134,10 @@ ShapeItem&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 ErrorCode&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPJob__scalar__B.html#a3655dccef765db2a2dd894077720039d">error</a></td></tr>
 <tr class="memdesc:a3655dccef765db2a2dd894077720039d"><td class="mdescLeft">&#160;</td><td class="mdescRight">an error detected during computation of, eg. fun1 or fun2 <br /></td></tr>
 <tr class="separator:a3655dccef765db2a2dd894077720039d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae33a959d4ce25a0aee0693384d46fbaf"><td class="memItemLeft" align="right" valign="top"><a id="ae33a959d4ce25a0aee0693384d46fbaf"></a>
-<a class="el" href="classPrimitiveFunction.html">PrimitiveFunction</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPJob__scalar__B.html#ae33a959d4ce25a0aee0693384d46fbaf">fun</a></td></tr>
-<tr class="memdesc:ae33a959d4ce25a0aee0693384d46fbaf"><td class="mdescLeft">&#160;</td><td class="mdescRight">the APL function being computed <br /></td></tr>
-<tr class="separator:ae33a959d4ce25a0aee0693384d46fbaf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a93d4e748fece95e48e0b9fce3faa4856"><td class="memItemLeft" align="right" valign="top"><a id="a93d4e748fece95e48e0b9fce3faa4856"></a>
+const <a class="el" href="classPrimitiveFunction.html">PrimitiveFunction</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPJob__scalar__B.html#a93d4e748fece95e48e0b9fce3faa4856">fun</a></td></tr>
+<tr class="memdesc:a93d4e748fece95e48e0b9fce3faa4856"><td class="mdescLeft">&#160;</td><td class="mdescRight">the APL function being computed <br /></td></tr>
+<tr class="separator:a93d4e748fece95e48e0b9fce3faa4856"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aed5388e7dcbd9a58a7728ea386078512"><td class="memItemLeft" align="right" valign="top"><a id="aed5388e7dcbd9a58a7728ea386078512"></a>
 prim_f1&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPJob__scalar__B.html#aed5388e7dcbd9a58a7728ea386078512">fun1</a></td></tr>
 <tr class="memdesc:aed5388e7dcbd9a58a7728ea386078512"><td class="mdescLeft">&#160;</td><td class="mdescRight">the monadic cell function to be computed <br /></td></tr>
@@ -144,10 +145,10 @@ prim_f1&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="c
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
-<tr class="memitem:a22fc3321aad6dc240e2c6ebdc7394e2f"><td class="memItemLeft" align="right" valign="top"><a id="a22fc3321aad6dc240e2c6ebdc7394e2f"></a>
-const <a class="el" href="classCell.html">Cell</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPJob__scalar__B.html#a22fc3321aad6dc240e2c6ebdc7394e2f">cB</a></td></tr>
-<tr class="memdesc:a22fc3321aad6dc240e2c6ebdc7394e2f"><td class="mdescLeft">&#160;</td><td class="mdescRight">ravel of the right argument <br /></td></tr>
-<tr class="separator:a22fc3321aad6dc240e2c6ebdc7394e2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a10670a9767e63a2858e16165815d3d07"><td class="memItemLeft" align="right" valign="top"><a id="a10670a9767e63a2858e16165815d3d07"></a>
+<a class="el" href="classConstCell__P.html">ConstCell_P</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPJob__scalar__B.html#a10670a9767e63a2858e16165815d3d07">cB</a></td></tr>
+<tr class="memdesc:a10670a9767e63a2858e16165815d3d07"><td class="mdescLeft">&#160;</td><td class="mdescRight">ravel of the right argument <br /></td></tr>
+<tr class="separator:a10670a9767e63a2858e16165815d3d07"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5625cc23df7ac41b15f094b9c381e1d0"><td class="memItemLeft" align="right" valign="top"><a id="a5625cc23df7ac41b15f094b9c381e1d0"></a>
 <a class="el" href="classCell.html">Cell</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPJob__scalar__B.html#a5625cc23df7ac41b15f094b9c381e1d0">cZ</a></td></tr>
 <tr class="memdesc:a5625cc23df7ac41b15f094b9c381e1d0"><td class="mdescLeft">&#160;</td><td class="mdescRight">ravel of the result <br /></td></tr>
@@ -158,7 +159,7 @@ const <a class="el" href="classCell.html">Cell</a> *&#160;</td><td class="memIte
 <p>A PJob is a computation that can be carried out in parallel on different cores. The PJob_XXX structs defined in this file contain the essential information needed to do the job.</p>
 <p>A Job is typically implemented by iterating some <a class="el" href="classCell.html" title="The base class for all Cells. ">Cell</a> function along the ravels of the result Z, the right argument B, and possibly (for dyadic <a class="el" href="classCell.html" title="The base class for all Cells. ">Cell</a> functions) the left argument A. </p>
 
-<p class="definition">Definition at line <a class="el" href="PJob_8hh_source.html#l00041">41</a> of file <a class="el" href="PJob_8hh_source.html">PJob.hh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="PJob_8hh_source.html#l00042">42</a> of file <a class="el" href="PJob_8hh_source.html">PJob.hh</a>.</p>
 </div><hr/>The documentation for this class was generated from the following file:<ul>
 <li>src/<a class="el" href="PJob_8hh_source.html">PJob.hh</a></li>
 </ul>
@@ -168,7 +169,7 @@ const <a class="el" href="classCell.html">Cell</a> *&#160;</td><td class="memIte
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="classPJob__scalar__B.html">PJob_scalar_B</a></li>
-    <li class="footer">Generated on Sun Aug 9 2020 16:43:42 for GNUAPL by
+    <li class="footer">Generated on Sun Jan 30 2022 20:14:26 for GNUAPL by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>

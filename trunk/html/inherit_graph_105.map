@@ -1,38 +1,3 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classSignal__base.html" title="the base class for all signal classes " alt="" coords="5,867,99,893"/>
-<area shape="rect" id="node2" href="$classADD__EVENT__c.html" title="APserver request: add an event for key. " alt="" coords="196,5,313,32"/>
-<area shape="rect" id="node3" href="$classASSIGN__VALUE__c.html" title="APserver request: SVAR←X. " alt="" coords="185,56,324,83"/>
-<area shape="rect" id="node4" href="$classASSIGN__WSWS__VAR__c.html" title="APserver request: ws&#45;ws SVAR←X. " alt="" coords="168,107,341,133"/>
-<area shape="rect" id="node5" href="$classCLEAR__ALL__EVENTS__c.html" title="APserver request: clear all events for one processor. " alt="" coords="169,157,341,184"/>
-<area shape="rect" id="node6" href="$classEVENTS__ARE__c.html" title="APserver result for: clear all events for one processor (first cleared svar. " alt="" coords="192,208,317,235"/>
-<area shape="rect" id="node7" href="$classFIND__OFFERING__ID__c.html" title="APserver request: find processor ID that offers key. " alt="" coords="172,259,337,285"/>
-<area shape="rect" id="node8" href="$classFIND__PAIRING__KEY__c.html" title="APserver request: find pairing key (CTL vs. DAT or Cnnn vs. Dnnn) for AP210. " alt="" coords="172,309,337,336"/>
-<area shape="rect" id="node9" href="$classGET__EVENTS__c.html" title="APserver result for: find pairing key (CTL vs. DAT or Cnnn vs. Dnnn) for AP210 get events for one pro..." alt="" coords="193,360,317,387"/>
-<area shape="rect" id="node10" href="$classGET__OFFERED__VARS__c.html" title="APserver request: get offered variables (⎕SVQ) " alt="" coords="165,411,344,437"/>
-<area shape="rect" id="node11" href="$classGET__OFFERING__PROCS__c.html" title="APserver request: get offering processors (⎕SVQ) " alt="" coords="157,461,352,488"/>
-<area shape="rect" id="node12" href="$classGET__VALUE__c.html" title="APserver request: X←SVAR. " alt="" coords="197,512,312,539"/>
-<area shape="rect" id="node13" href="$classIS__REGISTERED__ID__c.html" title="APserver request: is ID registered ? " alt="" coords="172,563,337,589"/>
-<area shape="rect" id="node14" href="$classMAKE__OFFER__c.html" title="APserver request: ⎕SVO. " alt="" coords="191,613,318,640"/>
-<area shape="rect" id="node15" href="$classMATCH__OR__MAKE__c.html" title="APserver request: match offered shared variable or make a new offer. " alt="" coords="177,664,333,691"/>
-<area shape="rect" id="node16" href="$classMATCH__OR__MAKE__RESULT__c.html" title="APserver result for: match or make. " alt="" coords="147,715,363,741"/>
-<area shape="rect" id="node17" href="$classMAY__SET__c.html" title="APserver request: Can svar key be assigned ? " alt="" coords="205,765,304,792"/>
-<area shape="rect" id="node18" href="$classMAY__USE__c.html" title="APserver request: Can svar key be referenced ? " alt="" coords="205,816,305,843"/>
-<area shape="rect" id="node19" href="$classOFFERED__VARS__ARE__c.html" title="APserver result for: get offered variables (⎕SVQ) " alt="" coords="165,867,344,893"/>
-<area shape="rect" id="node20" href="$classOFFERING__ID__IS__c.html" title="APserver result for: find processor ID that offers key. " alt="" coords="181,917,328,944"/>
-<area shape="rect" id="node21" href="$classOFFERING__PROCS__ARE__c.html" title="APserver result for: get offering processors (⎕SVQ) " alt="" coords="157,968,352,995"/>
-<area shape="rect" id="node22" href="$classPAIRING__KEY__IS__c.html" title="APserver result for: find pairing key. " alt="" coords="181,1019,328,1045"/>
-<area shape="rect" id="node23" href="$classPRINT__SVAR__DB__c.html" title="APserver request: print the entire database (for command ]SVARS) " alt="" coords="181,1069,328,1096"/>
-<area shape="rect" id="node24" href="$classREAD__SVAR__RECORD__c.html" title="APserver request: read SVAR database record from APserver. " alt="" coords="163,1120,347,1147"/>
-<area shape="rect" id="node25" href="$classREAD__WSWS__VAR__c.html" title="APserver request: X←ws&#45;ws SVAR. " alt="" coords="175,1171,335,1197"/>
-<area shape="rect" id="node26" href="$classREGISTER__PROCESSOR__c.html" title="APserver request: register processor proc in APserver. " alt="" coords="155,1221,354,1248"/>
-<area shape="rect" id="node27" href="$classRETRACT__OFFER__c.html" title="APserver request: ⎕SVR. " alt="" coords="179,1272,331,1299"/>
-<area shape="rect" id="node28" href="$classRETRACT__VAR__c.html" title="APserver request: ⎕SVR. " alt="" coords="187,1323,322,1349"/>
-<area shape="rect" id="node29" href="$classSET__CONTROL__c.html" title="APserver request: set control of shared var key. " alt="" coords="187,1373,322,1400"/>
-<area shape="rect" id="node30" href="$classSET__STATE__c.html" title="APserver request: set state of shared var key. " alt="" coords="199,1424,311,1451"/>
-<area shape="rect" id="node31" href="$classSVAR__ASSIGNED__c.html" title="APserver result for: SVAR←X. " alt="" coords="179,1475,330,1501"/>
-<area shape="rect" id="node32" href="$classSVAR__DB__PRINTED__c.html" title="APserver result for: print the entire database. " alt="" coords="171,1525,338,1552"/>
-<area shape="rect" id="node33" href="$classSVAR__RECORD__IS__c.html" title="APserver result (record) for: read SVAR database record from APserver. " alt="" coords="175,1576,334,1603"/>
-<area shape="rect" id="node34" href="$classVALUE__IS__c.html" title="APserver result for: X←SVAR. " alt="" coords="205,1627,305,1653"/>
-<area shape="rect" id="node35" href="$classWSWS__VALUE__IS__c.html" title="APserver result for: X←ws&#45;ws SVAR. " alt="" coords="179,1677,330,1704"/>
-<area shape="rect" id="node36" href="$classYES__NO__c.html" title="APserver result: yes (1) or no (0) " alt="" coords="209,1728,300,1755"/>
+<area shape="rect" id="node1" href="$classSig__item__int.html" title="Sig_item_int\&lt; uint32\l_t, 4 \&gt;" alt="" coords="5,5,147,47"/>
 </map>

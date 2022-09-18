@@ -113,17 +113,17 @@ vector<pthread_t> Quad_PLOT::plot_threads;
 int Quad_PLOT::verbosity = 0;
 
 #if defined(MISSING_LIBS)
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Quad_PLOT::Quad_PLOT()
   : QuadFunction(TOK_Quad_PLOT)
 {
    verbosity = 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Quad_PLOT::~Quad_PLOT()
 {
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_PLOT::eval_B(Value_P B) const
 {
@@ -135,13 +135,13 @@ MISSING1 MISSING2 MISSING3 MISSING4 ") were either missing,\n"
    SYNTAX_ERROR;
    return Token();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_PLOT::eval_AB(Value_P A, Value_P B) const
 {
    return eval_B(B);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #else   // not defined(WHY_NOT)
 
@@ -193,7 +193,7 @@ extern const Plot_window_properties *
              plot_stop(const Plot_window_properties * vp_props);
 #endif
 
-//=============================================================================
+//============================================================================
 
 Quad_PLOT::Quad_PLOT()
   : QuadFunction(TOK_Quad_PLOT)
@@ -202,12 +202,12 @@ Quad_PLOT::Quad_PLOT()
    __sem_init(plot_window_sema, 1, 0);
    verbosity = 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Quad_PLOT::~Quad_PLOT()
 {
    __sem_destroy(plot_threads_sema);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_PLOT::eval_AB(Value_P A, Value_P B) const
 {
@@ -218,14 +218,14 @@ Quad_PLOT::eval_AB(Value_P A, Value_P B) const
 
    // plot window with default attributes
    //
-Plot_data * data = setup_data(B.get());
+Plot_data * data = setup_data(*B);
    if (data == 0)   DOMAIN_ERROR;
 
 Plot_window_properties * w_props = new Plot_window_properties(data, verbosity);
    if (w_props == 0)
       {
         delete data;
-         WS_FULL;
+        WS_FULL;
       }
 
    Log(LOG_Quad_PLOT)
@@ -234,22 +234,58 @@ Plot_window_properties * w_props = new Plot_window_properties(data, verbosity);
    // from here on 'data' is owned by 'w_props' (whose destructor
    // will delete it).
    //
-   if (A->get_rank() > 1)   { delete w_props;   RANK_ERROR; }
+   if (const ErrorCode ec = parse_attributes(*A, w_props))
+      {
+        delete w_props;
+        throw_apl_error(ec, LOC);
+      }
+   if (w_props->update(verbosity))   { delete w_props;   DOMAIN_ERROR; }
 
-const ShapeItem len_A = A->element_count();
-   if (len_A < 1)   { delete w_props;   LENGTH_ERROR; }
+   // do_plot_data takes ownership of w_props and will delete w_props
+   //
+   return Token(TOK_APL_VALUE1, do_plot_data(w_props, data));
+}
+//----------------------------------------------------------------------------
+ErrorCode
+Quad_PLOT::parse_attributes(const Value & A, Plot_window_properties * w_props)
+{
+   if (A.is_member())   // new-style attributes
+      {
+        loop(row, A.get_rows())
+            {
+              const Cell & att_name = A.get_cravel(2*row);
+              if (att_name.is_pointer_cell())   // used entry in A
+                 {
+                   const UCS_string ucs = att_name.get_pointer_value()
+                                                 ->get_UCS_ravel();
+                   if (const char * error = w_props->set_attribute(ucs,
+                                                  A.get_cravel(2*row + 1)))
+                      {
+                        MORE_ERROR() << error << " in ⎕PLOT attribute ." << ucs;
+                        return E_DOMAIN_ERROR;
+                      }
+                 }
+            }
+        return E_NO_ERROR;
+      }
+
+   // old-style attributes
+   //
+   if (A.get_rank() > 1)   { delete w_props;   RANK_ERROR; }
+
+const ShapeItem len_A = A.element_count();
+   if (len_A < 1)   return E_LENGTH_ERROR;
 
 const APL_Integer qio = Workspace::get_IO();
 
    loop(a, len_A)
        {
-         const Cell & cell_A = A->get_ravel(a);
+         const Cell & cell_A = A.get_cravel(a);
          if (!cell_A.is_pointer_cell())
             {
                MORE_ERROR() << "A[" << (a + qio)
                             << "] is not a string in A ⎕PLOT B";
-               delete w_props;
-               DOMAIN_ERROR;
+               return E_DOMAIN_ERROR;
             }
 
          const Value * attr = cell_A.get_pointer_value().get();
@@ -257,39 +293,32 @@ const APL_Integer qio = Workspace::get_IO();
             {
                MORE_ERROR() << "A[" << (a + qio)
                             << "] is not a string in A ⎕PLOT B";
-               delete w_props;
-               DOMAIN_ERROR;
+               return E_DOMAIN_ERROR;
             }
 
          UCS_string ucs = attr->get_UCS_ravel();
          ucs.remove_leading_and_trailing_whitespaces();
-         if (ucs.size() == 0)         continue;
+         if (ucs.size() == 0)               continue;
          if (Avec::is_comment(ucs[0]))      continue;
          UTF8_string utf(ucs);
-         const char * error = w_props->set_attribute(utf.c_str());
-         if (error)
+         if (const char * error = w_props->set_attribute(utf.c_str()))
             {
               MORE_ERROR() << error << " in ⎕PLOT attribute '" << ucs << "'";
-              delete w_props;
-              DOMAIN_ERROR;
+              return E_DOMAIN_ERROR;
             }
        }
 
-   if (w_props->update(verbosity))   { delete w_props;   DOMAIN_ERROR; }
-
-   // do_plot_data takes ownership of w_props and will delete w_props
-   //
-   return Token(TOK_APL_VALUE1, do_plot_data(w_props, data));
+   return E_NO_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_PLOT::eval_B(Value_P B) const
 {
    CHECK_SECURITY(disable_Quad_PLOT);
 
-   if (B->get_rank() == 0 && !B->get_ravel(0).is_pointer_cell())
+   if (B->get_rank() == 0 && !B->get_cfirst().is_pointer_cell())
       {
-        // scalar argument: plot window control
+        // scalar (integer) argument: plot window control
         union
            {
              APL_Integer B0;                           // APL
@@ -298,7 +327,7 @@ Quad_PLOT::eval_B(Value_P B) const
              pthread_t thread;                         // xcb
            } u;
 
-        u.B0 = B->get_ravel(0).get_int_value();
+        u.B0 = B->get_cfirst().get_int_value();
         if (u.B0 == 0)                 // reset plot verbosity
            {
              verbosity = 0;
@@ -322,10 +351,26 @@ Quad_PLOT::eval_B(Value_P B) const
 
         if (u.B0 == -3)   // close all windows
            {
+#if HAVE_GTK3
+             Value_P Z(plot_threads.size(), LOC);
+             loop(p, plot_threads.size())
+                {
+                  u.B0 = plot_threads[p];
+                  Z->next_ravel_Int(u.B0);
+
+                  plot_stop(u.w_props);
+                }
+             plot_threads.clear();
+             Z->check_value(LOC);
+             return Token(TOK_APL_VALUE1, Z);
+#else   // XCB
              while (plot_threads.size())
                 {
                   plot_threads.pop_back();
                 }
+
+              // continue below...
+#endif
            }
 
         if (u.B0 == -4)                // enable SHOW_DRAW
@@ -369,7 +414,7 @@ Quad_PLOT::eval_B(Value_P B) const
 
    // plot window with default attributes
    //
-Plot_data * data = setup_data(B.get());
+Plot_data * data = setup_data(*B);
    if (data == 0)   DOMAIN_ERROR;
 
 Plot_window_properties * w_props = new Plot_window_properties(data, verbosity);
@@ -381,236 +426,341 @@ Plot_window_properties * w_props = new Plot_window_properties(data, verbosity);
 
    return Token(TOK_APL_VALUE1, do_plot_data(w_props, data));
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Plot_data *
-Quad_PLOT::setup_data(const Value * B)
+Quad_PLOT::setup_data(const Value & B)
 {
-   // check data. We expect B to be either:
-   //  1a. a numeric vector (for a single plot line), or
-   //  1b. a numeric matrix (for one plot line for each row of the matrix), or
-   //  2a. a scalar of a nested numeric vector (for a single plot line), or
-   //  2b. a vector of nested numeric vectors (for one plot line per item)
-   //  3.  a 3-dimensional real vector for surface plots
-   //
-   if (B->is_scalar())   // 2a. → 1a.
+   /** check data. We expect B to be either:
+
+       1a. a numeric vector (for a single plot line), or
+       1b. a numeric matrix (for one plot line for each row of the matrix), or
+       2a. a scalar of a nested numeric vector (for a single plot line), or
+       2b. a vector of nested numeric vectors (for one plot line per item)
+       3.  a 3-dimensional real vector for surface plots
+    **/
+
+const Value * pB = &B;
+   if (B.is_scalar())   // case 2a. → 1a. by disclosing scalar B
       {
-         if (!B->get_ravel(0).is_pointer_cell())   DOMAIN_ERROR;
-         B = B->get_ravel(0).get_pointer_value().get();
+        if (!B.get_cfirst().is_pointer_cell())   DOMAIN_ERROR;
+        pB = B.get_cfirst().get_pointer_value().get();   // B ← ⊃ B
       }
 
+   if (pB->get_rank() == 3)                   return setup_data_3D(*pB);
+   if (!pB->get_cfirst().is_pointer_cell())   return setup_data_2D(*pB);
+   return setup_data_2D_2b(*pB);
+}
+//----------------------------------------------------------------------------
+Plot_data *
+Quad_PLOT::setup_data_2D(const Value & B)
+{
+   /** initialize the data for a 2D plot. B is the right argument
+       of ⎕PLOT B or A ⎕PLOT B and contains the plot coordinates of
+       the plot points as simple numeric values. Every B[line;] is one
+       plot line.
+
+       A complex number xJy means 2D plot coordinates (x, y) while a
+       real number x means 2D plot coordinates (N, y) where N is the
+       position of x in B[d;];
+
+       The third dimension Z is set to Y although not used.
+    **/
+
+const ShapeItem cols_B = B.get_cols();
+const ShapeItem rows_B = B.get_rows();
+const ShapeItem len_B = rows_B * cols_B;
+
+   // all items of B shall be simple numbers (integer, real, or complex).
+   loop(b, len_B)
+       {
+         if (!B.get_cravel(b).is_numeric())   return 0;
+       }
+
+   // split B into X=real B, Y=imag Y
+
+double * X = new double[3*len_B];
+double * Y = X + len_B;
+double * Z = Y + len_B;
+   if (!X)   WS_FULL;
+
 const APL_Integer qio = Workspace::get_IO();
+   loop(b, len_B)
+       {
+         const Cell & cB = B.get_cravel(b);
+         if (cB.is_complex_cell())   // (x, y)
+            {
+              X[b] = cB.get_real_value();
+              Z[b] = Y[b] = cB.get_imag_value();
+            }
+         else                        // (N, y)
+            {
+              X[b] = qio + b % cols_B;
+              Z[b] = Y[b] = cB.get_real_value();
+            }
+       }
+
+Plot_data * data = new Plot_data(rows_B);
+   loop(r, rows_B)
+       {
+         const double * pX = X + r*cols_B;
+         const double * pY = Y + r*cols_B;
+         const double * pZ = Z + r*cols_B;
+         const Plot_data_row * pdr = new Plot_data_row(pX, pY, pZ, r, cols_B);
+         data->add_row(pdr);
+       }
+
+   return data;
+}
+//----------------------------------------------------------------------------
+Plot_data *
+Quad_PLOT::setup_data_2D_2b(const Value & B)
+{
+   /** initialize the data for a 2D plot. B is the right argument
+       of ⎕PLOT B or A ⎕PLOT B and contains the plot lines as nested
+       values. Every ⊃B[line] is one plot line.
+
+       The third dimension Z is set to Y although not used.
+    **/
+
+ShapeItem data_points = 0;
+   if (B.get_rank() > 1)   RANK_ERROR;
+const ShapeItem rows = B.element_count();   // number of plot rows
+   loop(r, rows)
+       {
+         const Value * vrow = B.get_cravel(r).get_pointer_value().get();
+         if (vrow->get_rank() > 1)   RANK_ERROR;
+         const ShapeItem row_len = vrow->element_count();
+         data_points += row_len;
+         loop(rb, row_len)
+             {
+               if (!vrow->get_cravel(rb).is_numeric())   DOMAIN_ERROR;
+             }
+       }
+
+double * X = new double[3*data_points];
+double * Y = X + data_points;
+double * Z = Y + data_points;
+   if (!X)   WS_FULL;
+
+ShapeItem idx = 0;
+const APL_Integer qio = Workspace::get_IO();
+
+   loop(r, rows)
+       {
+         const Value * vrow = B.get_cravel(r).get_pointer_value().get();
+         loop(v, vrow->element_count())
+             {
+               const Cell & cB = vrow->get_cravel(v);
+               if (cB.is_complex_cell())
+                  {
+                    X[idx] = cB.get_real_value();
+                    Z[idx] = Y[idx] = cB.get_imag_value();
+                  }
+               else
+                  {
+                    X[idx] = qio + v;
+                    Z[idx] = Y[idx] = cB.get_real_value();
+                  }
+               ++idx;
+             }
+       }
+
+Plot_data * data = new Plot_data(rows);
+   idx = 0;
+   loop(r, rows)
+       {
+         const double * pX = X + idx;
+         const double * pY = Y + idx;
+         const double * pZ = Z + idx;
+         const Value * vrow = B.get_cravel(r).get_pointer_value().get();
+         const ShapeItem row_len = vrow->element_count();
+         const Plot_data_row * pdr = new Plot_data_row(pX, pY, pZ, r,
+                                                            row_len);
+         data->add_row(pdr);
+         idx += row_len;
+       }
+
+   return data;
+}
+//----------------------------------------------------------------------------
+Plot_data *
+Quad_PLOT::setup_data_3D(const Value & B)
+{
+   /** initialize the data for a 3D (surface-) plot. B is the right argument
+       of ⎕PLOT B or A ⎕PLOT B and can be:
+
+       1. A single nested array Y. In this case the X and Z coordintes
+          are derived from ⍴Y and run from X=0...cols and from Z=0 to rows.
+          The double * data contains only the values from Y (height).
+
+          The double * Y contains the values from for Y (height):
+
+           Y
+           ↓
+          ┌───────────────┐
+          │ Y-coordinates │
+          └───────────────┘
+          │← data_points →│
+
+
+       2. Two nested arrays X and Y. In this case the Z coordinate is derived
+          from ⍴Y and run from Z=0 to rows.
+
+          The double * X contains the values from X, followed by the values
+          for Y (height):
+
+           X               Y               Z
+           ↓               ↓              
+          ┌───────────────┬───────────────┐
+          │ X-coordinates │ Y-coordinates │
+          └───────────────┴───────────────┘
+          │← data_points →│← data_points →│
+
+
+       3. B← (⊂X) (⊂Y) (⊂Z). This indicates a 3D aka, surface plot.
+          All coordinates come from B and the double * X contains
+          Y and Z like this:
+
+           X               Y               Z
+           ↓               ↓               ↓
+          ┌───────────────┬───────────────┬───────────────┐
+          │ X-coordinates │ Y-coordinates │ Z-coordinates │
+          └───────────────┴───────────────┴───────────────┘
+          │← data_points →│← data_points →│← data_points →│
+
+    **/
+
+const ShapeItem planes = B.get_shape_item(0);   // (X), Y, and (Z)
+const ShapeItem rows   = B.get_shape_item(1);
+const ShapeItem cols   = B.get_shape_item(2);
+
+   if (planes < 1 || planes > 3)    LENGTH_ERROR;
+   if (rows < 1)                    LENGTH_ERROR;
+   if (cols < 1)                    LENGTH_ERROR;
+
 Plot_data * data = 0;
-   if (B->get_rank() == 3)   // case 3.
+
+const ShapeItem data_points = rows * cols;
+
+   if (planes == 3)   // X, Y, and Z
       {
-        const ShapeItem planes = B->get_shape_item(0);   // (X), Y, and (Z)
-        const ShapeItem rows = B->get_shape_item(1);
-        const ShapeItem cols = B->get_shape_item(2);
-        if (planes < 1 || planes > 3)    LENGTH_ERROR;
-        if (rows < 1)                    LENGTH_ERROR;
-        if (cols < 1)                    LENGTH_ERROR;
-        const ShapeItem data_points = rows * cols;
+        double * X = new double[3*data_points];
+        double * Y = X + data_points;
+        double * Z = Y + data_points;
+        if (!X)   WS_FULL;
 
-        if (planes == 3)   // X, Y, and Z
-           {
-             double * X = new double[3*data_points];
-             double * Y = X + data_points;
-             double * Z = Y + data_points;
-             if (!X)   WS_FULL;
+        data = new Plot_data(rows);
+        loop(r, rows)
+            {
+              loop(c, cols)
+                  {
+                    const ShapeItem p = c + r*cols;
+                    const Cell & cX = B.get_cravel(p);
+                    const Cell & cY = B.get_cravel(p +   data_points);
+                    const Cell & cZ = B.get_cravel(p + 2*data_points);
 
-             data = new Plot_data(rows);
-             loop(r, rows)
-                 {
-                   loop(c, cols)
-                       {
-                         const ShapeItem p = c + r*cols;
-                         const Cell & cX = B->get_ravel(p);
-                         const Cell & cY = B->get_ravel(p + data_points);
-                         const Cell & cZ = B->get_ravel(p + 2*data_points);
+                    if (!(cX.is_integer_cell() ||
+                          cX.is_real_cell()))   DOMAIN_ERROR;
+                    if (!(cY.is_integer_cell() ||
+                          cY.is_real_cell()))   DOMAIN_ERROR;
+                    if (!(cZ.is_integer_cell() ||
+                          cZ.is_real_cell()))   DOMAIN_ERROR;
 
-                         if (!(cX.is_integer_cell() ||
-                               cX.is_real_cell()))   DOMAIN_ERROR;
-                         if (!(cY.is_integer_cell() ||
-                               cY.is_real_cell()))   DOMAIN_ERROR;
-                         if (!(cZ.is_integer_cell() ||
-                               cZ.is_real_cell()))   DOMAIN_ERROR;
-
-                         X[p] = cX.get_real_value();
-                         Y[p] = cY.get_real_value();
-                         Z[p] = cZ.get_real_value();
-                       }
+                    X[p] = cX.get_real_value();
+                    Y[p] = cY.get_real_value();
+                    Z[p] = cZ.get_real_value();
+                  }
                    const double * pX = X + r*cols;
                    const double * pY = Y + r*cols;
                    const double * pZ = Z + r*cols;
                    const Plot_data_row * pdr = new Plot_data_row(pX, pY, pZ,
                                                                  r, cols);
                    data->add_row(pdr);
-                 }
-           }
-        else if (planes == 2)   // X and Y, but no Z
-           {
-             double * X = new double[2*data_points];
-             double * Y = X + data_points;
-             if (!X)   WS_FULL;
-
-             data = new Plot_data(rows);
-             loop(r, rows)
-                 {
-                   loop(c, cols)
-                       {
-                         const ShapeItem p = c + r*cols;
-                         const Cell & cX = B->get_ravel(p);
-                         const Cell & cY = B->get_ravel(p + data_points);
-
-                         if (!(cX.is_integer_cell() ||
-                               cX.is_real_cell()))   DOMAIN_ERROR;
-                         if (!(cY.is_integer_cell() ||
-                               cY.is_real_cell()))   DOMAIN_ERROR;
-
-                         X[p] = cX.get_real_value();
-                         Y[p] = cY.get_real_value();
-                       }
-                   const double * pX = X + r*cols;
-                   const double * pY = Y + r*cols;
-                   const Plot_data_row * pdr = new Plot_data_row(pX, pY, 0,
-                                                                 r, cols);
-                   data->add_row(pdr);
-                 }
-           }
-        else                    // Y, but no X or Z
-           {
-             double * Y = new double[data_points];
-             if (!Y)   WS_FULL;
-
-             data = new Plot_data(rows);
-             loop(r, rows)
-                 {
-                   loop(c, cols)
-                       {
-                         const ShapeItem p = c + r*cols;
-                         const Cell & cY = B->get_ravel(p);
-
-                         if (!(cY.is_integer_cell() ||
-                               cY.is_real_cell()))   DOMAIN_ERROR;
-
-                         Y[p] = cY.get_real_value();
-                       }
-                   const double * pY = Y + r*cols;
-                   const Plot_data_row * pdr = new Plot_data_row(0, pY, 0,
-                                                                 r, cols);
-                   data->add_row(pdr);
-                 }
-           }
-        data->surface = true;
-      }
-   else if (B->get_ravel(0).is_pointer_cell())   // 2b.
-      {
-        ShapeItem data_points = 0;
-        if (B->get_rank() > 1)   RANK_ERROR;
-        const ShapeItem rows = B->get_cols();
-        loop(r, rows)
-            {
-              const Value * vrow = B->get_ravel(r).get_pointer_value().get();
-              if (vrow->get_rank() > 1)   RANK_ERROR;
-              const ShapeItem row_len = vrow->element_count();
-              data_points += row_len;
-              loop(rb, row_len)
-                  {
-                    if (!vrow->get_ravel(rb).is_numeric())   DOMAIN_ERROR;
-                  }
             }
-        double * X = new double[3*data_points];
+      }
+   else if (planes == 2)   // X and Y, but no Z
+      {
+        double * X = new double[2*data_points];
         double * Y = X + data_points;
-        double * Z = Y + data_points;
         if (!X)   WS_FULL;
 
-        ShapeItem idx = 0;
-        loop(r, rows)
-            {
-              const Value * vrow = B->get_ravel(r).get_pointer_value().get();
-              loop(v, vrow->element_count())
-                  {
-                    const Cell & cB = vrow->get_ravel(v);
-                    if (cB.is_complex_cell())
-                       {
-                         X[idx] = cB.get_real_value();
-                         Z[idx] = Y[idx] = cB.get_imag_value();
-                       }
-                    else
-                       {
-                         X[idx] = qio + v;
-                         Z[idx] = Y[idx] = cB.get_real_value();
-                       }
-                    ++idx;
-                  }
-            }
         data = new Plot_data(rows);
-        idx = 0;
         loop(r, rows)
             {
-              const double * pX = X + idx;
-              const double * pY = Y + idx;
-              const double * pZ = Z + idx;
-              const Value * vrow = B->get_ravel(r).get_pointer_value().get();
-              const ShapeItem row_len = vrow->element_count();
-              const Plot_data_row * pdr = new Plot_data_row(pX, pY, pZ, r,
-                                                            row_len);
+              loop(c, cols)
+                  {
+                    const ShapeItem p = c + r*cols;
+                    const Cell & cX = B.get_cravel(p);
+                    const Cell & cY = B.get_cravel(p + data_points);
+
+                    if (!(cX.is_integer_cell() ||
+                    cX.is_real_cell()))   DOMAIN_ERROR;
+                    if (!(cY.is_integer_cell() ||
+                               cY.is_real_cell()))   DOMAIN_ERROR;
+
+                    X[p] = cX.get_real_value();
+                    Y[p] = cY.get_real_value();
+                  }
+              const double * pX = X + r*cols;
+              const double * pY = Y + r*cols;
+              const Plot_data_row * pdr = new Plot_data_row(pX, pY, 0, r, cols);
               data->add_row(pdr);
-              idx += row_len;
             }
       }
-   else
+   else                    // Y, but no X and no Z
       {
-        const ShapeItem cols_B = B->get_cols();
-        const ShapeItem rows_B = B->get_rows();
-        const ShapeItem len_B = rows_B * cols_B;
+        double * Y = new double[data_points];
+        if (!Y)   WS_FULL;
 
-        loop(b, len_B)
+        data = new Plot_data(rows);
+        loop(r, rows)
             {
-              if (!B->get_ravel(b).is_numeric())   return 0;
-            }
+              loop(c, cols)
+                  {
+                    const ShapeItem p = c + r*cols;
+                    const Cell & cY = B.get_cravel(p);
 
-        // split B into X=real B, Y=imag Y
+                    if (!(cY.is_integer_cell() ||
+                          cY.is_real_cell()))   DOMAIN_ERROR;
 
-        double * X = new double[3*len_B];
-        double * Y = X + len_B;
-        double * Z = Y + len_B;
-        if (!X)   WS_FULL;
-
-        loop(b, len_B)
-            {
-              const Cell & cB = B->get_ravel(b);
-              if (cB.is_complex_cell())
-                 {
-                   X[b] = cB.get_real_value();
-                   Z[b] = Y[b] = cB.get_imag_value();
-                 }
-              else
-                 {
-                   X[b] = qio + b % cols_B;
-                   Z[b] = Y[b] = cB.get_real_value();
-                 }
-            }
-
-        data = new Plot_data(rows_B);
-        loop(r, rows_B)
-            {
-              const double * pX = X + r*cols_B;
-              const double * pY = Y + r*cols_B;
-              const double * pZ = Z + r*cols_B;
-              const Plot_data_row * pdr = new Plot_data_row(pX, pY, pZ, r, cols_B);
+                    Y[p] = cY.get_real_value();
+                  }
+              const double * pY = Y + r*cols;
+              const Plot_data_row * pdr = new Plot_data_row(0, pY, 0, r, cols);
               data->add_row(pdr);
             }
-
       }
+
+   data->surface = true;
    return data;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_PLOT::do_plot_data(Plot_window_properties * w_props,
                         const Plot_data * data)
 {
    w_props->set_verbosity(verbosity);
    verbosity > 0 && w_props->print(CERR);
+
+   // check (possibly again) for empty plot ranges which could be caused
+   // by bad plot data but also by bad properties.
+   //
+   if (w_props->get_min_X() >= w_props->get_max_X())
+      {
+        MORE_ERROR() << "empty X range in A ⎕PLOT B";
+        DOMAIN_ERROR;
+      }
+   if (w_props->get_min_Y() >= w_props->get_max_Y())
+      {
+        MORE_ERROR() << "empty Y range in A ⎕PLOT B";
+        DOMAIN_ERROR;
+      }
+
+   if (w_props->get_min_Z() >= w_props->get_max_Z())
+      {
+        MORE_ERROR() << "empty Z range in A ⎕PLOT B";
+        DOMAIN_ERROR;
+      }
 
 union
 {
@@ -634,7 +784,7 @@ union
    sem_wait(plot_window_sema);   // blocks until window shown
    return IntScalar(u.ret, LOC);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static UCS_string
 fill_14(const std::string & name)
 {
@@ -655,7 +805,7 @@ Quad_PLOT::help()
 "   A ⎕PLOT B   plot B with attributes specified by A\n"
 "\n"
 "   A is a nested vector of strings.\n"
-"   Each string in A has the form \"Attribute: Value\"\n"
+"   Each string A[i] has the form \"Attribute: Value\"\n"
 "   Colors are specified either as #RGB or as #RRGGBB or as RR GG BB)\n"
 "\n"
 "   The attributes understood by ⎕PLOT and their default values are:\n"
@@ -685,6 +835,6 @@ Quad_PLOT::help()
 
    CERR << right;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 #endif // defined(WHY_NOT)
 

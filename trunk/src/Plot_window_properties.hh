@@ -24,8 +24,8 @@
 
 class Plot_line_properties;
 
-//=============================================================================
-/// properties of the entire plot window
+//============================================================================
+/// properties of the entire plot window (from A in A ⎕PLOT B)
 class Plot_window_properties
 {
 public:
@@ -51,7 +51,7 @@ public:
    /// handle window resize event
    void set_window_size(Pixel_X width, Pixel_Y height);
 
-   // get_XXX() and set_XXX functions
+   // get_XXX() and set_XXX() functions for weindow properties
 # define gdef(ty,  na,  _val, _descr)                                     \
   /** return the value of na **/                                         \
   ty get_ ## na() const   { return na; }                                 \
@@ -71,6 +71,12 @@ public:
        else if (!strcmp(#na, "rangeY_max"))                              \
           rangeZ_type = Plot_Range_type(rangeZ_type | PLOT_RANGE_MAX);   \
      }
+
+# define ldef(ty,  na, _val, _descr)                              \
+   /** set the  value of na in all lines**/                        \
+   void set_all_ ## na(ty v, int propnum) { loop(ln, line_count)   \
+       if (can_be_set(ln, propnum))   line_properties[ln]->set_ ## na(v); }
+
 # include "Quad_PLOT.def"
 
    /// return true iff a rangeX_min property was specified
@@ -133,6 +139,10 @@ public:
    /// for e.g. att_and_val = "pa_width: 600" set pa_width to 600.
    /// Return error string on error.
    const char * set_attribute(const char * att_and_val);
+
+   /// for e.g. A.pa_width ←  600" set pa_width to 600.
+   /// Return error string on error.
+   const char * set_attribute(const UCS_string & att, const Cell & val);
 
    /// return the width of the plot window
    Pixel_X  get_window_width() const    { return window_width; }
@@ -286,8 +296,16 @@ protected:
 
    /// round val up to the next higher 1/2/5×10^N
    static double round_up_125(double val);
+
+   /// return true unless property \b propnum was already set in plot
+   /// line \b line
+   bool can_be_set(uint16_t line, uint16_t propnum);
+
+   /// a list of properties that have been set alreay (to protect items
+   /// from being overridden in set_all_XXX() functions
+   vector<uint16_t> properties_set;
 };
-//=============================================================================
+//============================================================================
 
 #endif // __PLOT_WINDOW_PROPERTIES_HH_DEFINED__
 

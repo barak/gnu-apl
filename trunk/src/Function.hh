@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -31,6 +31,7 @@
 
 class Workspace;
 class UserFunction;
+class RavelIterator;
 
 /* Naming conventions:
 
@@ -42,7 +43,7 @@ class UserFunction;
 
    default implementation for axis function: ignore axis
 */
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** The base class for all functions (user defined or system functions).  */
 /// Base class for all APL functions and operators (system or defined)
 class Function : public NamedObject
@@ -84,6 +85,40 @@ public:
    /// return \b true iff \b this function is a derived function
    virtual bool is_derived() const
       { return false; }
+
+   /// a monadic Cell function that returns bool
+   typedef bool (*bool_f1)(const Cell & B);
+
+   /// a dyadic Cell function that returns bool
+   typedef bool (*bool_f2)(const Cell & A, const Cell & B);
+
+   /// a monadic function that returns packed bool for packed A
+   typedef uint64_t (*bool_f1_bool)(uint64_t A);
+
+   /// a dyadic function that returns packed bool for packed A and packed B
+   typedef uint64_t (*bool_f2_bool)(uint64_t A, uint64_t B);
+
+   /// return \b a bool_f1() (if any), otherwise 0.
+   virtual bool_f1 get_bool_f1() const
+      { return 0; }
+
+   /// return \b a bool_f2() (if any), otherwise 0.
+   virtual bool_f2 get_bool_f2() const
+      { return 0; }
+
+   /// return \b a bool_f1() (if any), otherwise 0.
+   virtual bool_f1_bool get_bool_f1_bool() const
+      { return 0; }
+
+   /// return \b a bool_f2() (if any), otherwise 0.
+   virtual bool_f2_bool get_bool_f2_bool() const
+      { return 0; }
+
+   /// return \b true iff \b this function returns a (possibly nested)
+   /// boolean result and takes (only) boolean arguments.
+   /// For example: ∧, ∨, ∼, ...
+   virtual bool is_bool_bool() const
+      { return 0; }
 
    /// return \b true if \b eval_XXX may push the SI. True for ⍎, user defined
    /// functions, and operators derived from user defined functions
@@ -135,14 +170,11 @@ public:
    /// print the properties of this function
    virtual void print_properties(ostream & out, int indent) const = 0;
 
-   /// store the attributes (as per ⎕AT) of symbol at dest, ...
-   virtual void get_attributes(int mode, Cell * dest) const;
+   /// store the attributes (as per ⎕AT) of symbol in Z, ...
+   virtual void get_attributes(int mode, Value & Z) const;
 
    /// return a pointer to \b this UserFunction (if it is one)
-   virtual UserFunction * get_ufun1()   { return 0; }
-
-   /// return a pointer to \b this UserFunction (if it is one)
-   virtual const UserFunction * get_ufun1() const   { return 0; }
+   virtual const UserFunction * get_func_ufun() const   { return 0; }
 
    /// return true if this function has a name with alphabetic chars,
    /// i.e. the function is user defined or a quad function
@@ -219,12 +251,15 @@ public:
       { DOMAIN_ERROR; }
 
    /// Evaluate \b the fill function.
-   virtual Token eval_fill_AB(Value_P A, Value_P B) const
-      { DOMAIN_ERROR; }
+   virtual Token eval_fill_AB(Value_P A, Value_P B) const;
 
-   /// Evaluate \b the identity function.
-   virtual Token eval_identity_fun(Value_P B, Axis axis) const
-      {  DOMAIN_ERROR; }
+   /** Evaluate \b the identity function. B is empty and the result is a
+   /// value f/B0 with (B0 f ↑B) ≡ B for all B (and f is \b this function).
+   /// If such a B0 does not exist then raise a DOMAIN ERROR.
+
+       NOTE that eval_identity_fun() returns f/B0 and not B0 !!!
+    **/
+   virtual Token eval_identity_fun(Value_P B, sAxis axis) const;
 
    /// Delete this function (do nothing, overloaded by UserFunction).
    virtual void destroy() {}
@@ -234,11 +269,16 @@ public:
       { NeverReach("Function::canonical() called"); }
 
    /// return axis (non-0 only for derived functions)
-   virtual const Value_P * locate_X() const
+   virtual Value_P * locate_X() const
       { return 0; }
 
-   /// return a (pseudo-) axis for \b name
-   virtual ShapeItem string_to_int(const UCS_string & name) const
+   /// return true if this function has (named) sub-functions, i.e.
+   /// this function is either ⎕FIO or ⎕CR.
+   virtual bool has_subfuns() const
+      { return false; }
+
+   /// return a (pseudo-) axis number for subfunction \b name
+   virtual sAxis subfun_to_axis(const UCS_string & name) const
       { return -1; }
 
    /// return the signature of this function (currently only valid
@@ -271,6 +311,6 @@ protected:
    /// the thresholds for parallel execution
    ShapeItem parallel_thresholds[2];
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __FUNCTION_HH_DEFINED__

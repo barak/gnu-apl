@@ -33,7 +33,7 @@ TD(TOK_LSYMB2        , TC_SYMBOL    , TV_SYM  , ID_No_ID2       )
 TD(TOK_P_SYMB        , TC_SYMBOL    , TV_SYM  , ID_No_ID3       ) // (SYMBOL)
 TD(TOK_NUMERIC       , TC_NUMERIC   , TV_CHAR , ID_No_ID        )
 TD(TOK_INDEX         , TC_INDEX     , TV_INDEX, ID_No_ID        )
-TD(TOK_PINDEX        , TC_PINDEX    , TV_INDEX, ID_No_ID        )
+TD(TOK_PINDEX        , TC_PINDEX    , TV_INDEX, ID_No_ID        ) // partial [;]
 TD(TOK_AXIS          , TC_INDEX     , TV_VAL  , ID_No_ID        )
 TD(TOK_FUN0          , TC_FUN0      , TV_FUN  , ID_No_ID        ) // user def'd
 TD(TOK_FUN2          , TC_FUN2      , TV_FUN  , ID_No_ID        ) // user def'd

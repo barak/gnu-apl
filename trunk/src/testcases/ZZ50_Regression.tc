@@ -40,12 +40,12 @@ X←X[NN?NN]             ⍝ in random order
 U←∪X                   ⍝ U is unique X (the function under test)
 
 
-0∈+⌿U∘.=X              ⍝ check that every item in X is also in U
+0ϵ+⌿U∘.=X              ⍝ check that every item in X is also in U
 0
 
 UU←U∘.=U               ⍝ check that all items in U are different
 (1 1⍉UU)←0             ⍝ outside the diagonal
-1∈,UU
+1ϵ,UU
 0
 
 )SI

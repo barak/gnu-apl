@@ -31,43 +31,44 @@
    phrase 25:  VAL  F   [X]  VAL        4
    phrase 26:  VAL  OP1  [X]  VAL       4
    phrase 27:  F   OP1                  2
-   phrase 28:  F   OP1  [X]             3
-   phrase 29:  F   [X]  OP1             3
-   phrase 30:  F   [X]  OP1  [X]        4
-   phrase 31:  VAL  OP1                 2
-   phrase 32:  OP2  SYM                 2
-   phrase 33:  VAL  OP2  VAL            3 F_D_G_
-   phrase 34:  VAL  OP2  F              3 F_D_G_
-   phrase 35:  F   OP2  VAL             3
-   phrase 36:  F   OP2  F               3
-   phrase 37:  F   OP2  [X]  VAL        4
-   phrase 38:  VAL  [X]                 2
-   phrase 39:  SYM  [X]                 2
-   phrase 40:  SYM  [X]  ←    VAL       4
-   phrase 41:  F   SYM                  2
-   phrase 42:  VAL  ←    VAL            3
-   phrase 43:  SYM  ←    VAL            3
-   phrase 44:  OP2  SYM  ←    VAL       4
-   phrase 45:  SYM  ←    F              3
-   phrase 46:  SYM  ←    F0             3 V_ASS_F_
-   phrase 47:  SYM  ←    OP1            3 V_ASS_F_
-   phrase 48:  SYM  ←    OP2            3 V_ASS_F_
-   phrase 49:  ]                        1
-   phrase 50:  [ ;  PIDX                2
-   phrase 51:  [ ;  VAL  PIDX           3
-   phrase 52:  VAL  VAL                 2
-   phrase 53:  SYM  )    ←    VAL       4
-   phrase 54:  END  VOID                2
-   phrase 55:  END  VAL                 2
-   phrase 56:  END  →                   2
-   phrase 57:  END  →    VAL            3
-   phrase 58:  END  VAL  →    VAL       4
-   phrase 59:  RET                      1
-   phrase 60:  RET  VOID                2
-   phrase 61:  RET  VAL                 2
-   phrase 62:  RET  →                   2
-   phrase 63:  RET  →    VAL            3
-   phrase 64:  RET  VAL  →    VAL       4
+   phrase 28:  OP1  OP1                 2
+   phrase 29:  F   OP1  [X]             3
+   phrase 30:  F   [X]  OP1             3
+   phrase 31:  F   [X]  OP1  [X]        4
+   phrase 32:  VAL  OP1                 2
+   phrase 33:  OP2  SYM                 2
+   phrase 34:  VAL  OP2  VAL            3 F_D_G_
+   phrase 35:  VAL  OP2  F              3 F_D_G_
+   phrase 36:  F   OP2  VAL             3
+   phrase 37:  F   OP2  F               3
+   phrase 38:  F   OP2  [X]  VAL        4
+   phrase 39:  VAL  [X]                 2
+   phrase 40:  SYM  [X]                 2
+   phrase 41:  SYM  [X]  ←    VAL       4
+   phrase 42:  F   SYM                  2
+   phrase 43:  VAL  ←    VAL            3
+   phrase 44:  SYM  ←    VAL            3
+   phrase 45:  OP2  SYM  ←    VAL       4
+   phrase 46:  SYM  ←    F              3
+   phrase 47:  SYM  ←    F0             3 V_ASS_F_
+   phrase 48:  SYM  ←    OP1            3 V_ASS_F_
+   phrase 49:  SYM  ←    OP2            3 V_ASS_F_
+   phrase 50:  ]                        1
+   phrase 51:  [ ;  PIDX                2
+   phrase 52:  [ ;  VAL  PIDX           3
+   phrase 53:  VAL  VAL                 2
+   phrase 54:  SYM  )    ←    VAL       4
+   phrase 55:  END  VOID                2
+   phrase 56:  END  VAL                 2
+   phrase 57:  END  →                   2
+   phrase 58:  END  →    VAL            3
+   phrase 59:  END  VAL  →    VAL       4
+   phrase 60:  RET                      1
+   phrase 61:  RET  VOID                2
+   phrase 62:  RET  VAL                 2
+   phrase 63:  RET  →                   2
+   phrase 64:  RET  →    VAL            3
+   phrase 65:  RET  VAL  →    VAL       4
    ---------------------------------------------
 
    *** phrase table ***/
@@ -86,6 +87,7 @@
    void reduce_A_F_C_B();            ///< reduce phrase A F C B
    void reduce_A_M_C_B();            ///< reduce phrase A M C B
    void reduce_F_M__();              ///< reduce phrase F M
+   void reduce_M_M__();              ///< reduce phrase M M
    void reduce_F_M_C_();             ///< reduce phrase F M C
    void reduce_F_C_M_();             ///< reduce phrase F C M
    void reduce_F_C_M_C();            ///< reduce phrase F C M C
@@ -119,7 +121,7 @@
    void reduce_RETC_GOTO_B_();       ///< reduce phrase RETC GOTO B
    void reduce_RETC_A_GOTO_B();      ///< reduce phrase RETC A GOTO B
 
-   enum { PHRASE_COUNT   = 65,      ///< number of phrases
+   enum { PHRASE_COUNT   = 66,      ///< number of phrases
           PHRASE_MODU    = 415,     ///< hash table size
           MAX_PHRASE_LEN = 4 };     ///< max. number of token in a phrase
 
@@ -441,7 +443,7 @@ const Prefix::Phrase Prefix::hash_table[PHRASE_MODU] =
   PH(                , 0x00000,    0,   0,  0, ___          )
   PH( F M            , 0x00127,   42,   0,  2, F_M__        )
   PH(                , 0x00000,    0,   0,  0, ___          )
-  PH(                , 0x00000,    0,   0,  0, ___          )
+  PH( M M            , 0x00129,   42,   0,  2, M_M__        )
   PH(                , 0x00000,    0,   0,  0, ___          )
   PH(                , 0x00000,    0,   0,  0, ___          )
   PH(                , 0x00000,    0,   0,  0, ___          )

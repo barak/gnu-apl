@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ class Function;
 class Symbol;
 class UCS_string;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
  An Identifier for each internal object (primitives, Quad-symbols, and more).
  The ID can be derived in different ways:
@@ -73,7 +73,7 @@ public:
    /// release UCS_strings with ID names
    static void cleanup();
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #include "TokenEnums.hh"
 

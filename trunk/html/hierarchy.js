@@ -2,10 +2,12 @@ var hierarchy =
 [
     [ "_all_signal_classes_", "struct__all__signal__classes__.html", null ],
     [ "_deleted_value", "struct__deleted__value.html", null ],
+    [ "XML_Loading_Archive::_derived_todo", "structXML__Loading__Archive_1_1__derived__todo.html", null ],
     [ "Cell::SomeValue::_fval::_flt_num", "unionCell_1_1SomeValue_1_1__fval_1_1__flt__num.html", null ],
     [ "Cell::SomeValue::_fval", "structCell_1_1SomeValue_1_1__fval.html", null ],
-    [ "_header_pattern", "struct__header__pattern.html", null ],
+    [ "Quad_WA::_mem_info", "structQuad__WA_1_1__mem__info.html", null ],
     [ "Cell::SomeValue::_pval", "structCell_1_1SomeValue_1_1__pval.html", null ],
+    [ "Quad_CR::_sub_fun", "structQuad__CR_1_1__sub__fun.html", null ],
     [ "Quad_FIO::_sub_fun", "structQuad__FIO_1_1__sub__fun.html", null ],
     [ "ValueStackItem::_sym_val", "unionValueStackItem_1_1__sym__val.html", null ],
     [ "_twc", "struct__twc.html", [
@@ -17,24 +19,19 @@ var hierarchy =
     [ "APL_Float_Base", "classAPL__Float__Base.html", [
       [ "APL_Float", "classAPL__Float.html", null ]
     ] ],
-    [ "ArrayIterator", "classArrayIterator.html", [
-      [ "PermutedArrayIterator", "classPermutedArrayIterator.html", null ]
-    ] ],
+    [ "ArrayIterator", "classArrayIterator.html", null ],
     [ "Avec", "classAvec.html", null ],
+    [ "AxisIterator", "classAxisIterator.html", null ],
     [ "Backtrace", "classBacktrace.html", null ],
     [ "basic_string", null, [
-      [ "UCS_string", "classUCS__string.html", null ]
-    ] ],
-    [ "basic_string", null, [
+      [ "UCS_string", "classUCS__string.html", null ],
       [ "UTF8_string", "classUTF8__string.html", null ]
     ] ],
     [ "CDR", "classCDR.html", null ],
     [ "CDR_header", "structCDR__header.html", null ],
     [ "Cell", "classCell.html", [
       [ "CharCell", "classCharCell.html", null ],
-      [ "LvalCell", "classLvalCell.html", [
-        [ "LvalCell_picked", "classLvalCell__picked.html", null ]
-      ] ],
+      [ "LvalCell", "classLvalCell.html", null ],
       [ "NumericCell", "classNumericCell.html", [
         [ "ComplexCell", "classComplexCell.html", null ],
         [ "RealCell", "classRealCell.html", [
@@ -49,6 +46,8 @@ var hierarchy =
     [ "ColInfo", "classColInfo.html", null ],
     [ "CollatingCacheEntry", "structCollatingCacheEntry.html", null ],
     [ "Command", "classCommand.html", null ],
+    [ "ConstCell_P", "classConstCell__P.html", null ],
+    [ "ConstRavel_P", "classConstRavel__P.html", null ],
     [ "CPU_pool", "classCPU__pool.html", null ],
     [ "DerivedFunctionCache", "classDerivedFunctionCache.html", null ],
     [ "DLX_Node", "classDLX__Node.html", [
@@ -79,9 +78,9 @@ var hierarchy =
       [ "ErrOut", "classErrOut.html", null ],
       [ "UTF8_filebuf", "classUTF8__filebuf.html", null ]
     ] ],
-    [ "Quad_RE::Flags", "classQuad__RE_1_1Flags.html", null ],
     [ "Bif_F12_FORMAT::Format_LIFER", "structBif__F12__FORMAT_1_1Format__LIFER.html", null ],
     [ "Format_sub", "structFormat__sub.html", null ],
+    [ "XML_Loading_Archive::fun_map", "structXML__Loading__Archive_1_1fun__map.html", null ],
     [ "Function_PC2", "structFunction__PC2.html", null ],
     [ "Nabla::FunLine", "structNabla_1_1FunLine.html", null ],
     [ "Heapsort< T >", "classHeapsort.html", null ],
@@ -128,6 +127,7 @@ var hierarchy =
             [ "Bif_F12_EQUIV", "classBif__F12__EQUIV.html", null ],
             [ "Bif_F12_FORMAT", "classBif__F12__FORMAT.html", null ],
             [ "Bif_F12_INDEX_OF", "classBif__F12__INDEX__OF.html", null ],
+            [ "Bif_F12_INTERVAL_INDEX", "classBif__F12__INTERVAL__INDEX.html", null ],
             [ "Bif_F12_NEQUIV", "classBif__F12__NEQUIV.html", null ],
             [ "Bif_F12_PARTITION", "classBif__F12__PARTITION.html", null ],
             [ "Bif_F12_PICK", "classBif__F12__PICK.html", null ],
@@ -182,6 +182,7 @@ var hierarchy =
             [ "Quad_FX", "classQuad__FX.html", null ],
             [ "Quad_GTK", "classQuad__GTK.html", null ],
             [ "Quad_INP", "classQuad__INP.html", null ],
+            [ "Quad_JSON", "classQuad__JSON.html", null ],
             [ "Quad_MAP", "classQuad__MAP.html", null ],
             [ "Quad_NA", "classQuad__NA.html", null ],
             [ "Quad_NC", "classQuad__NC.html", null ],
@@ -198,6 +199,7 @@ var hierarchy =
             [ "Quad_SVS", "classQuad__SVS.html", null ],
             [ "Quad_TF", "classQuad__TF.html", null ],
             [ "Quad_UCS", "classQuad__UCS.html", null ],
+            [ "Quad_XML", "classQuad__XML.html", null ],
             [ "Stop_Trace", "classStop__Trace.html", [
               [ "Quad_STOP", "classQuad__STOP.html", null ],
               [ "Quad_TRACE", "classQuad__TRACE.html", null ]
@@ -223,17 +225,17 @@ var hierarchy =
             [ "Bif_F2_EQUAL_B", "classBif__F2__EQUAL__B.html", null ],
             [ "Bif_F2_FIND", "classBif__F2__FIND.html", null ],
             [ "Bif_F2_GREATER", "classBif__F2__GREATER.html", null ],
-            [ "Bif_F2_LEQ", "classBif__F2__LEQ.html", null ],
+            [ "Bif_F2_LEQU", "classBif__F2__LEQU.html", null ],
             [ "Bif_F2_LESS", "classBif__F2__LESS.html", null ],
-            [ "Bif_F2_MEQ", "classBif__F2__MEQ.html", null ],
+            [ "Bif_F2_MEQU", "classBif__F2__MEQU.html", null ],
             [ "Bif_F2_NAND", "classBif__F2__NAND.html", null ],
             [ "Bif_F2_NAND_B", "classBif__F2__NAND__B.html", null ],
             [ "Bif_F2_NOR", "classBif__F2__NOR.html", null ],
             [ "Bif_F2_NOR_B", "classBif__F2__NOR__B.html", null ],
             [ "Bif_F2_OR", "classBif__F2__OR.html", null ],
             [ "Bif_F2_OR_B", "classBif__F2__OR__B.html", null ],
-            [ "Bif_F2_UNEQ", "classBif__F2__UNEQ.html", null ],
-            [ "Bif_F2_UNEQ_B", "classBif__F2__UNEQ__B.html", null ]
+            [ "Bif_F2_UNEQ_B", "classBif__F2__UNEQ__B.html", null ],
+            [ "Bif_F2_UNEQU", "classBif__F2__UNEQU.html", null ]
           ] ]
         ] ],
         [ "UserFunction", "classUserFunction.html", null ]
@@ -298,13 +300,13 @@ var hierarchy =
     [ "Backtrace::PC_src", "structBacktrace_1_1PC__src.html", null ],
     [ "Performance", "classPerformance.html", null ],
     [ "Prefix::Phrase", "structPrefix_1_1Phrase.html", null ],
+    [ "Phrase", "structPhrase.html", null ],
     [ "Quad_CR::Picker", "classQuad__CR_1_1Picker.html", null ],
     [ "Pixel_XY", "structPixel__XY.html", null ],
     [ "Bif_OPER2_INNER::PJob_product", "structBif__OPER2__INNER_1_1PJob__product.html", null ],
     [ "Bif_OPER2_OUTER::PJob_product", "structBif__OPER2__OUTER_1_1PJob__product.html", null ],
     [ "PJob_scalar_AB", "classPJob__scalar__AB.html", null ],
     [ "PJob_scalar_B", "classPJob__scalar__B.html", null ],
-    [ "Plot_context", "structPlot__context.html", null ],
     [ "Plot_data", "classPlot__data.html", null ],
     [ "Plot_data_row", "classPlot__data__row.html", null ],
     [ "Plot_line_properties", "classPlot__line__properties.html", null ],
@@ -388,7 +390,6 @@ var hierarchy =
     [ "streambuf", null, [
       [ "HTML_streambuf", "classHTML__streambuf.html", null ]
     ] ],
-    [ "string_width_height", "structstring__width__height.html", null ],
     [ "Token::sval", "unionToken_1_1sval.html", null ],
     [ "Svar_DB", "classSvar__DB.html", null ],
     [ "Svar_partner", "structSvar__partner.html", null ],
@@ -420,20 +421,23 @@ var hierarchy =
       [ "Value_P", "classValue__P.html", null ]
     ] ],
     [ "ValueStackItem", "classValueStackItem.html", null ],
+    [ "Vector< T >", "classVector.html", null ],
     [ "vector", null, [
       [ "CDR_string", "classCDR__string.html", null ],
       [ "CollatingCache", "classCollatingCache.html", null ],
       [ "Token_string", "classToken__string.html", null ],
       [ "UCS_string_vector", "classUCS__string__vector.html", null ]
     ] ],
-    [ "Vector< T >", "classVector.html", null ],
     [ "VH_entry", "classVH__entry.html", null ],
     [ "Quad_GTK::window_entry", "structQuad__GTK_1_1window__entry.html", null ],
     [ "Workspace_0", "classWorkspace__0.html", [
       [ "Workspace", "classWorkspace.html", null ]
     ] ],
-    [ "XML_Loading_Archive", "classXML__Loading__Archive.html", null ],
-    [ "XML_Saving_Archive", "classXML__Saving__Archive.html", null ],
+    [ "XML_Archive", "classXML__Archive.html", [
+      [ "XML_Loading_Archive", "classXML__Loading__Archive.html", null ],
+      [ "XML_Saving_Archive", "classXML__Saving__Archive.html", null ]
+    ] ],
+    [ "XML_node", "classXML__node.html", null ],
     [ "YMDhmsu", "structYMDhmsu.html", null ],
     [ "Bif_F12_UNION::Zone", "structBif__F12__UNION_1_1Zone.html", null ],
     [ "ZZ", "classZZ.html", null ]

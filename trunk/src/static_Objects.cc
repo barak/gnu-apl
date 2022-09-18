@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,19 +36,19 @@
 bool static_Objects::show_constructors = false;
 bool static_Objects::show_destructors  = false;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static_Objects::static_Objects(const char * l, const char * w)
    : what(w),
      loc(l)
 {
    if (show_constructors)   cerr << "++ constructing " << what << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static_Objects::~static_Objects()
 {
    if (show_destructors)   cerr << "-- destructing " << what << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #define INFO(m, l) DO_INFO(#m, l)
 #define DO_INFO(m, l)   extern static_Objects info_ ## l; \

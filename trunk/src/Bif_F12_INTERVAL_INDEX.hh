@@ -23,7 +23,7 @@
 
 #include "PrimitiveFunction.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** System function interval index (⍸) */
 /// The class implementing ⍸
 class Bif_F12_INTERVAL_INDEX: public NonscalarFunction
@@ -44,11 +44,11 @@ public:
    static Bif_F12_INTERVAL_INDEX  _fun;   ///< Built-in function
 
 protected:
-   // find cell in ranges defined by ranges and range_count
+   /// find cell in ranges defined by ranges and range_count
    static ShapeItem find_range(const Cell & cell, const Cell * ranges,
                                ShapeItem range_count);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __Bif_F12_INTERVAL_INDEX_HH_DEFINED__
 

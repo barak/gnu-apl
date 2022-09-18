@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,11 +18,36 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/*
+   #define macros Assert(cond) and Assert1(cond)
+
+   All macros may (depending on ASSERT_LEVEL_WANTED) evaluate the
+   condition-expression cond. If cond is true (the expected case),
+   then no more actions are performed.
+
+   If cond is false (the unexpected case) then the macro will print a complaint
+   show a stack-trace (both visible in APL). Interpretation of APL code will
+   continue for the moment, but sooner or later the interpreter will crash.
+
+   ASSERT_LEVEL_WANTED = 0: neither Assert() nor Assert1() will complain
+   ASSERT_LEVEL_WANTED = 1: Assert() will complain. Assert1() will not
+   ASSERT_LEVEL_WANTED = 2: both Assert() and Assert1() will complain
+
+   That is, higher ASSERT_LEVEL_WANTED will raise more complaints.
+
+   The default ./configure (intended for normal users) will have
+   ASSERT_LEVEL_WANTED = 0.
+
+   The ./configure DEVELOP_WANTED=yes (aka. make develop) will have
+   ASSERT_LEVEL_WANTED = 2.
+ */
+
 #ifndef __ASSERT_HH_DEFINED__
 #define __ASSERT_HH_DEFINED__
 
 #include "Common.hh"
 
+/// the complaint function
 extern void do_Assert(const char * cond, const char * fun,
                       const char * file, int line)
 #ifdef __GNUC__
@@ -36,12 +61,14 @@ extern void do_Assert(const char * cond, const char * fun,
 
 #elif ASSERT_LEVEL_WANTED == 0
 
-#define Assert1(x)   if ((x)) {}
-#define Assert(x)    if ((x)) {}
+// use 'if (x) {}' below to suppress 'uninitialized' compiler warnings
+
+#define Assert1(x) if (x) {}
+#define Assert(x)  if (x) {}
 
 #elif ASSERT_LEVEL_WANTED == 1
 
-#define Assert1(x)  if ((x)) {}
+#define Assert1(x) if (x) {}
 #define Assert(x)  if (!(x))   do_Assert(#x, __FUNCTION__, __FILE__, __LINE__)
 
 #elif ASSERT_LEVEL_WANTED == 2
@@ -49,15 +76,13 @@ extern void do_Assert(const char * cond, const char * fun,
 #define Assert1(x) if (!(x))   do_Assert(#x, __FUNCTION__, __FILE__, __LINE__)
 #define Assert(x)  if (!(x))   do_Assert(#x, __FUNCTION__, __FILE__, __LINE__)
 
-#else 
+#else
 
-#error "Bad ASSERT_LEVEL_WANTED"
+#error "Bad or #undef'ed ASSERT_LEVEL_WANTED"
 
 #endif
 
 #define NeverReach(X) do_Assert(X, __FUNCTION__, __FILE__, __LINE__)
-
-/// trivial assertion
 
 /// normal assertion
 

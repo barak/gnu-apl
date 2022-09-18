@@ -1,7 +1,7 @@
 var classQuad__TF =
 [
     [ "Quad_TF", "classQuad__TF.html#ae9b15fd0ae227d3a550f01a164f76af8", null ],
-    [ "eval_AB", "classQuad__TF.html#a0b9baf30e622ebe20e0afc21f32ec644", null ],
+    [ "eval_AB", "classQuad__TF.html#a27ed4b02d5f1a1c8a8b0a1fcbe2756f8", null ],
     [ "is_inverse", "classQuad__TF.html#ac13dba3ac6ba51cf563b1ee7932d9d83", null ],
     [ "no_UCS", "classQuad__TF.html#a4ad62507efae73aa10d72b8989c05f50", null ],
     [ "tf1", "classQuad__TF.html#a8b22aa8a0a7a674bb9a6040b60288072", null ],
@@ -27,6 +27,7 @@ var classQuad__TF =
     [ "tf2_reduce_sequence1", "classQuad__TF.html#a7629d3eb075d96522390147828b822d6", null ],
     [ "tf2_reduce_UCS", "classQuad__TF.html#a499c2aa8ed4589243493cf4d93db0bbf", null ],
     [ "tf2_shape", "classQuad__TF.html#a160b51803b3fc7f0378701651a25c717", null ],
+    [ "tf2_toggle_UCS", "classQuad__TF.html#ac63b0e65bfd18c05cdff0da9e32ac043", null ],
     [ "tf2_value", "classQuad__TF.html#a4aa501720adbb19aed9599912a8a8b07", null ],
     [ "tf2_var", "classQuad__TF.html#a2aa5ee00d25d18308ef22d666b3bbf40", null ],
     [ "tf3", "classQuad__TF.html#a690180778642f09f9471a909fd6dd633", null ],

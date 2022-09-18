@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -27,13 +27,15 @@
 #include "Function.hh"
 #include "Error.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
     A defined function written in C++.
  */
 /// A defined function written in C++.
 class NativeFunction : public Function
 {
+   friend class Doxy;
+
 public:
    /// return the name of the .so library that implements this function
    const UCS_string & get_so_path() const
@@ -143,7 +145,7 @@ protected:
    virtual Token eval_fill_AB(Value_P A, Value_P B) const;
 
    /// Overloaded Function::eval_identity_fun()
-   virtual Token eval_identity_fun(Value_P B, Axis axis) const;
+   virtual Token eval_identity_fun(Value_P B, sAxis axis) const;
 
    /// Overloaded Function::destroy()
    virtual void destroy();
@@ -225,12 +227,12 @@ protected:
    Token (*f_eval_fill_AB) (Vr A,                     Vr B, Th);
 
    /// pointer to function eval_identity_fun() in shared library
-   Token (*f_eval_ident_Bx)(Vr B,                   Axis x, Th);
+   Token (*f_eval_ident_Bx)(Vr B,                  sAxis x, Th);
 #undef Th
 
    /// callback before library is closed
    bool (*close_fun)(Cause cause, const NativeFunction * caller);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __NATIVE_FUNCTION_HH_DEFINED__

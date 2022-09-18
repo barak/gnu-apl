@@ -54,8 +54,11 @@ var classFloatCell =
     [ "map_FC", "classFloatCell.html#a2c4411b8d81f22aaf0b02fa5caac3e45", null ],
     [ "need_scaling", "classFloatCell.html#ad2bf434993646c6d2434942bdf1086e2", null ],
     [ "need_scaling", "classFloatCell.html#af74c3b872fffd4c8ff3f95106793bbe8", null ],
-    [ "to_type", "classFloatCell.html#a199b5cad4417cb77f85777f41f4c5462", null ],
     [ "vFloatCell", "classFloatCell.html#a9fbc8149dc2f0b59c2170ef22f0ef080", null ],
-    [ "zv", "classFloatCell.html#a315a36734a31673bb0c0f76f229a8cd3", null ],
-    [ "zv", "classFloatCell.html#ac4d9feaeccee7a5440f40ebd3cd0186e", null ]
+    [ "zF", "classFloatCell.html#a88217aaf5cd286cc89a85d2885876dda", null ],
+    [ "ComplexCell", "classFloatCell.html#a804b58ff7c70407dbc3edb9d74690f65", null ],
+    [ "IntCell", "classFloatCell.html#afd3c49de8dc518c6464f91986959e0af", null ],
+    [ "NumericCell", "classFloatCell.html#a3f00a33db902b73442acfc08d7f19716", null ],
+    [ "RealCell", "classFloatCell.html#affcb4d972251e07660a6122bbdd90d89", null ],
+    [ "Value", "classFloatCell.html#aeceedf6e1a7d48a588516ce2b1983d6f", null ]
 ];

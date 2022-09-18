@@ -59,6 +59,7 @@ $(document).ready(function(){initNavTree('classValue.html','');});
 <div id="doc-content">
 <div class="header">
   <div class="summary">
+<a href="#pub-types">Public Types</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="#pub-attribs">Public Attributes</a> &#124;
@@ -106,6 +107,13 @@ Collaboration diagram for Value:</div>
 </map>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-types"></a>
+Public Types</h2></td></tr>
+<tr class="memitem:a67c304be7bc2d0cee027a1e4c7ebfc9d"><td class="memItemLeft" align="right" valign="top"><a id="a67c304be7bc2d0cee027a1e4c7ebfc9d"></a>enum &#160;</td><td class="memItemRight" valign="bottom">{ <b>PACKED_MINIMUM_LENGHT</b> = SHORT_VALUE_LENGTH_WANTED
+ }<tr class="memdesc:a67c304be7bc2d0cee027a1e4c7ebfc9d"><td class="mdescLeft">&#160;</td><td class="mdescRight">packing makes no sense for short booleans <br /></td></tr>
+</td></tr>
+<tr class="separator:a67c304be7bc2d0cee027a1e4c7ebfc9d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:a3a578f458da8a4ab67052dba0f7bffdd"><td class="memItemLeft" align="right" valign="top"><a id="a3a578f458da8a4ab67052dba0f7bffdd"></a>
@@ -212,10 +220,8 @@ ShapeItem&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a2a4091e71aa181bd9d05dd5822198306">set_shape_item</a> (Rank r, ShapeItem sh)</td></tr>
 <tr class="memdesc:a2a4091e71aa181bd9d05dd5822198306"><td class="mdescLeft">&#160;</td><td class="mdescRight">set the length of dimension <b>r</b> to <b>sh</b>. <br /></td></tr>
 <tr class="separator:a2a4091e71aa181bd9d05dd5822198306"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3e3e796bbb4a64c80fc1c60a67eea6c0"><td class="memItemLeft" align="right" valign="top"><a id="a3e3e796bbb4a64c80fc1c60a67eea6c0"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a3e3e796bbb4a64c80fc1c60a67eea6c0">set_shape</a> (const <a class="el" href="classShape.html">Shape</a> &amp;sh)</td></tr>
-<tr class="memdesc:a3e3e796bbb4a64c80fc1c60a67eea6c0"><td class="mdescLeft">&#160;</td><td class="mdescRight">reshape this value in place. The element count must not increase <br /></td></tr>
-<tr class="separator:a3e3e796bbb4a64c80fc1c60a67eea6c0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aafe2d51551a1108a8d8e431fc1b019a0"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#aafe2d51551a1108a8d8e431fc1b019a0">set_shape</a> (const <a class="el" href="classShape.html">Shape</a> &amp;new_shape)</td></tr>
+<tr class="separator:aafe2d51551a1108a8d8e431fc1b019a0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0cc27364712e6ae2195b15ec54f516a2"><td class="memItemLeft" align="right" valign="top"><a id="a0cc27364712e6ae2195b15ec54f516a2"></a>
 ShapeItem&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a0cc27364712e6ae2195b15ec54f516a2">get_offset</a> (const <a class="el" href="classCell.html">Cell</a> *cell) const</td></tr>
 <tr class="memdesc:a0cc27364712e6ae2195b15ec54f516a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the position of cell in the ravel of <b>this</b> value. <br /></td></tr>
@@ -256,6 +262,10 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#abca25cc2fb27492148e152a2228b18ed">can_be_compared</a> () const</td></tr>
 <tr class="memdesc:abca25cc2fb27492148e152a2228b18ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">return true if this value can be compared. This is the case when all cells (including nested ones) are not complex <br /></td></tr>
 <tr class="separator:abca25cc2fb27492148e152a2228b18ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a73cceacc63b081d8002600b32ed78c9c"><td class="memItemLeft" align="right" valign="top"><a id="a73cceacc63b081d8002600b32ed78c9c"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a73cceacc63b081d8002600b32ed78c9c">equal_string</a> (const <a class="el" href="classUCS__string.html">UCS_string</a> &amp;ucs) const</td></tr>
+<tr class="memdesc:a73cceacc63b081d8002600b32ed78c9c"><td class="mdescLeft">&#160;</td><td class="mdescRight">optimized comparison function for strings <br /></td></tr>
+<tr class="separator:a73cceacc63b081d8002600b32ed78c9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5fe3659073f7ba9ad8dca424ed45c657"><td class="memItemLeft" align="right" valign="top"><a id="a5fe3659073f7ba9ad8dca424ed45c657"></a>
 <a class="el" href="classValue__P.html">Value_P</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a5fe3659073f7ba9ad8dca424ed45c657">get_cellrefs</a> (const char *loc)</td></tr>
 <tr class="memdesc:a5fe3659073f7ba9ad8dca424ed45c657"><td class="mdescLeft">&#160;</td><td class="mdescRight">return a value containing pointers to all ravel cells of this value. the result is non-nested and has the same shape as <b>this</b> <br /></td></tr>
@@ -264,30 +274,86 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a5be5b6031f53082438fa9de824732fbe">assign_cellrefs</a> (<a class="el" href="classValue__P.html">Value_P</a> val)</td></tr>
 <tr class="memdesc:a5be5b6031f53082438fa9de824732fbe"><td class="mdescLeft">&#160;</td><td class="mdescRight">assign <b>val</b> to the cell references in this value. <br /></td></tr>
 <tr class="separator:a5be5b6031f53082438fa9de824732fbe"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a89120a742c078918d1a5d84ec742e69c"><td class="memItemLeft" align="right" valign="top"><a id="a89120a742c078918d1a5d84ec742e69c"></a>
-<a class="el" href="classCell.html">Cell</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a89120a742c078918d1a5d84ec742e69c">get_ravel</a> (ShapeItem idx)</td></tr>
-<tr class="memdesc:a89120a742c078918d1a5d84ec742e69c"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the idx'th element of the ravel. <br /></td></tr>
-<tr class="separator:a89120a742c078918d1a5d84ec742e69c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa4bab83a558a755bfe5e1c625bb427b1"><td class="memItemLeft" align="right" valign="top"><a id="aa4bab83a558a755bfe5e1c625bb427b1"></a>
-const <a class="el" href="classCell.html">Cell</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#aa4bab83a558a755bfe5e1c625bb427b1">get_ravel</a> (ShapeItem idx) const</td></tr>
-<tr class="memdesc:aa4bab83a558a755bfe5e1c625bb427b1"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the idx'th element of the ravel. <br /></td></tr>
-<tr class="separator:aa4bab83a558a755bfe5e1c625bb427b1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5dbf7a1bbd982188052432b2f3ccd26c"><td class="memItemLeft" align="right" valign="top"><a id="a5dbf7a1bbd982188052432b2f3ccd26c"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a5dbf7a1bbd982188052432b2f3ccd26c">check_lval_consistency</a> () const</td></tr>
+<tr class="memdesc:a5dbf7a1bbd982188052432b2f3ccd26c"><td class="mdescLeft">&#160;</td><td class="mdescRight">check that this left-value is consistent and return its cell owner. If <b>quick</b> then the first owner is returned, otherwise the entire value is checked. <br /></td></tr>
+<tr class="separator:a5dbf7a1bbd982188052432b2f3ccd26c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab24a3c8c0cee32cd909dcb978be5b8ff"><td class="memItemLeft" align="right" valign="top"><a id="ab24a3c8c0cee32cd909dcb978be5b8ff"></a>
+<a class="el" href="classCell.html">Cell</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#ab24a3c8c0cee32cd909dcb978be5b8ff">get_member</a> (const vector&lt; const <a class="el" href="classUCS__string.html">UCS_string</a> *&gt; &amp;members, <a class="el" href="classValue.html">Value</a> *&amp;owner, bool create_if_needed, bool throw_error)</td></tr>
+<tr class="memdesc:ab24a3c8c0cee32cd909dcb978be5b8ff"><td class="mdescLeft">&#160;</td><td class="mdescRight">return member of this value, defined by <b>members</b>. The first name in members ist the deepest, while the last name is the name of the variable containing the members (and is only used in error printouts). <br /></td></tr>
+<tr class="separator:ab24a3c8c0cee32cd909dcb978be5b8ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad44d777caa4b4add818d784b2fcf1ccd"><td class="memItemLeft" align="right" valign="top"><a id="ad44d777caa4b4add818d784b2fcf1ccd"></a>
+const <a class="el" href="classCell.html">Cell</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#ad44d777caa4b4add818d784b2fcf1ccd">get_member_data</a> (const <a class="el" href="classUCS__string.html">UCS_string</a> &amp;member) const</td></tr>
+<tr class="memdesc:ad44d777caa4b4add818d784b2fcf1ccd"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the <a class="el" href="classCell.html" title="The base class for all Cells. ">Cell</a> (if any) containing the data of structured value member <b>member</b>, or 0 if member not found. <br /></td></tr>
+<tr class="separator:ad44d777caa4b4add818d784b2fcf1ccd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7c6b3e9d0c395e71cce8c394eb8bb84e"><td class="memItemLeft" align="right" valign="top"><a id="a7c6b3e9d0c395e71cce8c394eb8bb84e"></a>
+<a class="el" href="classCell.html">Cell</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a7c6b3e9d0c395e71cce8c394eb8bb84e">get_member_data</a> (const <a class="el" href="classUCS__string.html">UCS_string</a> &amp;member)</td></tr>
+<tr class="memdesc:a7c6b3e9d0c395e71cce8c394eb8bb84e"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the <a class="el" href="classCell.html" title="The base class for all Cells. ">Cell</a> (if any) containing the data of structured value member <b>member</b>, or 0 if member not found. <br /></td></tr>
+<tr class="separator:a7c6b3e9d0c395e71cce8c394eb8bb84e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abe3195d6faf086d15f3af75f247f15f0"><td class="memItemLeft" align="right" valign="top"><a id="abe3195d6faf086d15f3af75f247f15f0"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#abe3195d6faf086d15f3af75f247f15f0">sorted_members</a> (std::vector&lt; ShapeItem &gt; &amp;result, const Unicode *filter) const</td></tr>
+<tr class="memdesc:abe3195d6faf086d15f3af75f247f15f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">store the row numbers (starting at 0) so that this[rows] is sorted in result. Only used rows are returned. <br /></td></tr>
+<tr class="separator:abe3195d6faf086d15f3af75f247f15f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aafa578eaa72b9db66546ac31b7c8ab93"><td class="memItemLeft" align="right" valign="top"><a id="aafa578eaa72b9db66546ac31b7c8ab93"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#aafa578eaa72b9db66546ac31b7c8ab93">used_members</a> (std::vector&lt; ShapeItem &gt; &amp;result, bool sorted) const</td></tr>
+<tr class="memdesc:aafa578eaa72b9db66546ac31b7c8ab93"><td class="mdescLeft">&#160;</td><td class="mdescRight">store the row numbers (starting at 0) in result so that this[rows] is a (used) row, maybe sorted. in result. Only used rows are returned. <br /></td></tr>
+<tr class="separator:aafa578eaa72b9db66546ac31b7c8ab93"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac2d425c2f76775ca99709a9430dd2f87"><td class="memItemLeft" align="right" valign="top"><a id="ac2d425c2f76775ca99709a9430dd2f87"></a>
+ShapeItem&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#ac2d425c2f76775ca99709a9430dd2f87">get_member_count</a> () const</td></tr>
+<tr class="memdesc:ac2d425c2f76775ca99709a9430dd2f87"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the number of (valid) members, as per this[1;] <br /></td></tr>
+<tr class="separator:ac2d425c2f76775ca99709a9430dd2f87"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acd6b3044148fdc7c650af80d2401bbe9"><td class="memItemLeft" align="right" valign="top"><a id="acd6b3044148fdc7c650af80d2401bbe9"></a>
+<a class="el" href="classCell.html">Cell</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#acd6b3044148fdc7c650af80d2401bbe9">get_new_member</a> (const <a class="el" href="classUCS__string.html">UCS_string</a> &amp;new_member)</td></tr>
+<tr class="memdesc:acd6b3044148fdc7c650af80d2401bbe9"><td class="mdescLeft">&#160;</td><td class="mdescRight">create a new member and return the <a class="el" href="classCell.html" title="The base class for all Cells. ">Cell</a> containing the data for it <br /></td></tr>
+<tr class="separator:acd6b3044148fdc7c650af80d2401bbe9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a411b407ccbe6440be35bd0bae2b72f8c"><td class="memItemLeft" align="right" valign="top"><a id="a411b407ccbe6440be35bd0bae2b72f8c"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a411b407ccbe6440be35bd0bae2b72f8c">double_ravel</a> (const char *loc)</td></tr>
+<tr class="memdesc:a411b407ccbe6440be35bd0bae2b72f8c"><td class="mdescLeft">&#160;</td><td class="mdescRight">double the ravel length of <b>this</b> value (by appending integer 0s). <br /></td></tr>
+<tr class="separator:a411b407ccbe6440be35bd0bae2b72f8c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a113fa41969aed3b011b477ea199c6157"><td class="memItemLeft" align="right" valign="top"><a id="a113fa41969aed3b011b477ea199c6157"></a>
+const <a class="el" href="classCell.html">Cell</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a113fa41969aed3b011b477ea199c6157">get_cravel</a> (ShapeItem idx) const</td></tr>
+<tr class="memdesc:a113fa41969aed3b011b477ea199c6157"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the (constant) idx'th element of the ravel. <br /></td></tr>
+<tr class="separator:a113fa41969aed3b011b477ea199c6157"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0d7debc5273aad742471b2d7990a6c8a"><td class="memItemLeft" align="right" valign="top"><a id="a0d7debc5273aad742471b2d7990a6c8a"></a>
+const <a class="el" href="classCell.html">Cell</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a0d7debc5273aad742471b2d7990a6c8a">get_cfirst</a> () const</td></tr>
+<tr class="memdesc:a0d7debc5273aad742471b2d7990a6c8a"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the first element of the ravel (which is always present). same as <a class="el" href="classValue.html#af0b07dd0be944ea021c18d1128f04f99" title="return the first element of the ravel (which is always present) same as get_first(), but named differently to indicate its context. ">get_cproto()</a>, but named differently to indicate its context. <br /></td></tr>
+<tr class="separator:a0d7debc5273aad742471b2d7990a6c8a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af0b07dd0be944ea021c18d1128f04f99"><td class="memItemLeft" align="right" valign="top"><a id="af0b07dd0be944ea021c18d1128f04f99"></a>
+const <a class="el" href="classCell.html">Cell</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#af0b07dd0be944ea021c18d1128f04f99">get_cproto</a> () const</td></tr>
+<tr class="memdesc:af0b07dd0be944ea021c18d1128f04f99"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the first element of the ravel (which is always present) same as get_first(), but named differently to indicate its context. <br /></td></tr>
+<tr class="separator:af0b07dd0be944ea021c18d1128f04f99"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2e9d4f020d691a1bb6d111dcb45e51cd"><td class="memItemLeft" align="right" valign="top"><a id="a2e9d4f020d691a1bb6d111dcb45e51cd"></a>
+const <a class="el" href="classCell.html">Cell</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a2e9d4f020d691a1bb6d111dcb45e51cd">get_cscalar</a> () const</td></tr>
+<tr class="memdesc:a2e9d4f020d691a1bb6d111dcb45e51cd"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the first element of the ravel of a scalar same as <a class="el" href="classValue.html#a0d7debc5273aad742471b2d7990a6c8a" title="return the first element of the ravel (which is always present). same as get_cproto(), but named differently to indicate its context. ">get_cfirst()</a>, but named differently to indicate its context. <br /></td></tr>
+<tr class="separator:a2e9d4f020d691a1bb6d111dcb45e51cd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5060aba17dac4ad78c0d76efecf2a88e"><td class="memItemLeft" align="right" valign="top"><a id="a5060aba17dac4ad78c0d76efecf2a88e"></a>
+<a class="el" href="classCell.html">Cell</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a5060aba17dac4ad78c0d76efecf2a88e">get_wravel</a> (ShapeItem idx)</td></tr>
+<tr class="memdesc:a5060aba17dac4ad78c0d76efecf2a88e"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the (writable) idx'th element of the ravel. <br /></td></tr>
+<tr class="separator:a5060aba17dac4ad78c0d76efecf2a88e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae3005aca1140a99141d00d2b0ba1e2e2"><td class="memItemLeft" align="right" valign="top"><a id="ae3005aca1140a99141d00d2b0ba1e2e2"></a>
+<a class="el" href="classCell.html">Cell</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#ae3005aca1140a99141d00d2b0ba1e2e2">get_wfirst</a> ()</td></tr>
+<tr class="memdesc:ae3005aca1140a99141d00d2b0ba1e2e2"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the first element of the ravel (which is always present) Same as <a class="el" href="classValue.html#a9da0c0eaf6cbe4ff7333aa2d8a414e2c" title="return the first element of the ravel (which is always present) same as wfirst(), but named different...">get_wproto()</a> and <a class="el" href="classValue.html#ad5c33eef7b806d256a916e4648c3d40e" title="return the first element of the ravel of a scalar value. Same as get_wfirst(), but named differently ...">get_wscalar()</a>, but named differently to indicate its context. <br /></td></tr>
+<tr class="separator:ae3005aca1140a99141d00d2b0ba1e2e2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad5c33eef7b806d256a916e4648c3d40e"><td class="memItemLeft" align="right" valign="top"><a id="ad5c33eef7b806d256a916e4648c3d40e"></a>
+<a class="el" href="classCell.html">Cell</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#ad5c33eef7b806d256a916e4648c3d40e">get_wscalar</a> ()</td></tr>
+<tr class="memdesc:ad5c33eef7b806d256a916e4648c3d40e"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the first element of the ravel of a scalar value. Same as <a class="el" href="classValue.html#ae3005aca1140a99141d00d2b0ba1e2e2" title="return the first element of the ravel (which is always present) Same as get_wproto() and get_wscalar(...">get_wfirst()</a>, but named differently to indicate its context. <br /></td></tr>
+<tr class="separator:ad5c33eef7b806d256a916e4648c3d40e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9da0c0eaf6cbe4ff7333aa2d8a414e2c"><td class="memItemLeft" align="right" valign="top"><a id="a9da0c0eaf6cbe4ff7333aa2d8a414e2c"></a>
+<a class="el" href="classCell.html">Cell</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a9da0c0eaf6cbe4ff7333aa2d8a414e2c">get_wproto</a> ()</td></tr>
+<tr class="memdesc:a9da0c0eaf6cbe4ff7333aa2d8a414e2c"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the first element of the ravel (which is always present) same as wfirst(), but named differently to indicate its context. <br /></td></tr>
+<tr class="separator:a9da0c0eaf6cbe4ff7333aa2d8a414e2c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0bf4036b722711452b097ad6919fb0f8"><td class="memItemLeft" align="right" valign="top"><a id="a0bf4036b722711452b097ad6919fb0f8"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a0bf4036b722711452b097ad6919fb0f8">set_default</a> (const <a class="el" href="classValue.html">Value</a> &amp;B, const char *loc)</td></tr>
 <tr class="memdesc:a0bf4036b722711452b097ad6919fb0f8"><td class="mdescLeft">&#160;</td><td class="mdescRight">set the prototype (according to B) if this value is empty. <br /></td></tr>
 <tr class="separator:a0bf4036b722711452b097ad6919fb0f8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5f515f27a70f5b3c4b84457214df97a7"><td class="memItemLeft" align="right" valign="top"><a id="a5f515f27a70f5b3c4b84457214df97a7"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a5f515f27a70f5b3c4b84457214df97a7">set_proto_Spc</a> ()</td></tr>
-<tr class="memdesc:a5f515f27a70f5b3c4b84457214df97a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">set the prototype to ' ' <br /></td></tr>
+<tr class="memdesc:a5f515f27a70f5b3c4b84457214df97a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">set the prototype to ' ' if this value is empty. <br /></td></tr>
 <tr class="separator:a5f515f27a70f5b3c4b84457214df97a7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adbc800e6bbe26fe35e6d44cc7b967a96"><td class="memItemLeft" align="right" valign="top"><a id="adbc800e6bbe26fe35e6d44cc7b967a96"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#adbc800e6bbe26fe35e6d44cc7b967a96">set_default_Spc</a> ()</td></tr>
-<tr class="memdesc:adbc800e6bbe26fe35e6d44cc7b967a96"><td class="mdescLeft">&#160;</td><td class="mdescRight">set the prototype to ' ' if this value is empty. <br /></td></tr>
-<tr class="separator:adbc800e6bbe26fe35e6d44cc7b967a96"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac3d694454b3b63baea92fbe7e7542535"><td class="memItemLeft" align="right" valign="top"><a id="ac3d694454b3b63baea92fbe7e7542535"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#ac3d694454b3b63baea92fbe7e7542535">set_default_Int</a> ()</td></tr>
-<tr class="memdesc:ac3d694454b3b63baea92fbe7e7542535"><td class="mdescLeft">&#160;</td><td class="mdescRight">set the prototype to 0 if this value is empty. <br /></td></tr>
-<tr class="separator:ac3d694454b3b63baea92fbe7e7542535"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5b598e63a13d4a62463fc133438214fc"><td class="memItemLeft" align="right" valign="top"><a id="a5b598e63a13d4a62463fc133438214fc"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a5b598e63a13d4a62463fc133438214fc">set_proto_Int</a> ()</td></tr>
+<tr class="memdesc:a5b598e63a13d4a62463fc133438214fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">set the prototype to 0 if this value is empty. <br /></td></tr>
+<tr class="separator:a5b598e63a13d4a62463fc133438214fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2285690ca29b78ee86465fee277929d9"><td class="memItemLeft" align="right" valign="top"><a id="a2285690ca29b78ee86465fee277929d9"></a>
 ShapeItem&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a2285690ca29b78ee86465fee277929d9">get_enlist_count</a> () const</td></tr>
 <tr class="memdesc:a2285690ca29b78ee86465fee277929d9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the number of scalars in this value (enlist). <br /></td></tr>
@@ -296,10 +362,14 @@ ShapeItem&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 APL_types::Depth&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a06683bcfcb7626f2b824dae1824903bc">compute_depth</a> () const</td></tr>
 <tr class="memdesc:a06683bcfcb7626f2b824dae1824903bc"><td class="mdescLeft">&#160;</td><td class="mdescRight">compute the depth of this value. <br /></td></tr>
 <tr class="separator:a06683bcfcb7626f2b824dae1824903bc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7b3ae554237886fd96a5d7fa19f99e91"><td class="memItemLeft" align="right" valign="top"><a id="a7b3ae554237886fd96a5d7fa19f99e91"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a7b3ae554237886fd96a5d7fa19f99e91">enlist</a> (<a class="el" href="classCell.html">Cell</a> *&amp;dest, <a class="el" href="classValue.html">Value</a> &amp;dest_owner, bool left) const</td></tr>
-<tr class="memdesc:a7b3ae554237886fd96a5d7fa19f99e91"><td class="mdescLeft">&#160;</td><td class="mdescRight">store the scalars in this value into dest... <br /></td></tr>
-<tr class="separator:a7b3ae554237886fd96a5d7fa19f99e91"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a15eb0ae8e55612d5b0996d776dde56d1"><td class="memItemLeft" align="right" valign="top"><a id="a15eb0ae8e55612d5b0996d776dde56d1"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a15eb0ae8e55612d5b0996d776dde56d1">enlist_left</a> (<a class="el" href="classValue.html">Value</a> &amp;Z) const</td></tr>
+<tr class="memdesc:a15eb0ae8e55612d5b0996d776dde56d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">store the scalars in this (left-)value into dest... <br /></td></tr>
+<tr class="separator:a15eb0ae8e55612d5b0996d776dde56d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad1c3f8939a302c7fb357e24527f28edb"><td class="memItemLeft" align="right" valign="top"><a id="ad1c3f8939a302c7fb357e24527f28edb"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#ad1c3f8939a302c7fb357e24527f28edb">enlist_right</a> (<a class="el" href="classValue.html">Value</a> &amp;Z) const</td></tr>
+<tr class="memdesc:ad1c3f8939a302c7fb357e24527f28edb"><td class="mdescLeft">&#160;</td><td class="mdescRight">store the scalars in this value into dest... <br /></td></tr>
+<tr class="separator:ad1c3f8939a302c7fb357e24527f28edb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a40566d5ef1f14404304e2af47a48f50c"><td class="memItemLeft" align="right" valign="top"><a id="a40566d5ef1f14404304e2af47a48f50c"></a>
 CellType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a40566d5ef1f14404304e2af47a48f50c">flat_cell_types</a> () const</td></tr>
 <tr class="memdesc:a40566d5ef1f14404304e2af47a48f50c"><td class="mdescLeft">&#160;</td><td class="mdescRight">compute the cell types contained in the top level of <b>this</b> value <br /></td></tr>
@@ -320,6 +390,10 @@ CellType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a21369bf72b3fb40d1e9558cb1497a6b0">print</a> (ostream &amp;out) const</td></tr>
 <tr class="memdesc:a21369bf72b3fb40d1e9558cb1497a6b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">print <b>this</b> value (line break at <a class="el" href="classWorkspace.html#a3eaa0cc324b4e8e0f3fb0039efcd1b0c" title="return the current ⎕PW ">Workspace::get_PW()</a>) <br /></td></tr>
 <tr class="separator:a21369bf72b3fb40d1e9558cb1497a6b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adcada8db3d31b0fc0791755ed40dc1d0"><td class="memItemLeft" align="right" valign="top"><a id="adcada8db3d31b0fc0791755ed40dc1d0"></a>
+ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#adcada8db3d31b0fc0791755ed40dc1d0">print_member</a> (ostream &amp;out, <a class="el" href="classUCS__string.html">UCS_string</a> member) const</td></tr>
+<tr class="memdesc:adcada8db3d31b0fc0791755ed40dc1d0"><td class="mdescLeft">&#160;</td><td class="mdescRight">print <b>this</b> member value <br /></td></tr>
+<tr class="separator:adcada8db3d31b0fc0791755ed40dc1d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a08e065983cfb43e7ade0c29a1023ed0c"><td class="memItemLeft" align="right" valign="top"><a id="a08e065983cfb43e7ade0c29a1023ed0c"></a>
 ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a08e065983cfb43e7ade0c29a1023ed0c">print1</a> (ostream &amp;out, <a class="el" href="classPrintContext.html">PrintContext</a> pctx) const</td></tr>
 <tr class="memdesc:a08e065983cfb43e7ade0c29a1023ed0c"><td class="mdescLeft">&#160;</td><td class="mdescRight">print <b>this</b> value (line break at print_width) <br /></td></tr>
@@ -332,18 +406,18 @@ ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" h
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a200bd63e173573ab65e6d71e4f8be109">debug</a> (const char *info) const</td></tr>
 <tr class="memdesc:a200bd63e173573ab65e6d71e4f8be109"><td class="mdescLeft">&#160;</td><td class="mdescRight">debug-print <b>this</b> value <br /></td></tr>
 <tr class="separator:a200bd63e173573ab65e6d71e4f8be109"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afd4baae2e44f4810cb99345d52705a58"><td class="memItemLeft" align="right" valign="top"><a id="afd4baae2e44f4810cb99345d52705a58"></a>
-ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#afd4baae2e44f4810cb99345d52705a58">print_boxed</a> (ostream &amp;out, const char *info=0) const</td></tr>
-<tr class="memdesc:afd4baae2e44f4810cb99345d52705a58"><td class="mdescLeft">&#160;</td><td class="mdescRight">print this value in 4 ⎕CR style <br /></td></tr>
-<tr class="separator:afd4baae2e44f4810cb99345d52705a58"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6f574c5690fbcf4024a78ed14a8375db"><td class="memItemLeft" align="right" valign="top"><a id="a6f574c5690fbcf4024a78ed14a8375db"></a>
+ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a6f574c5690fbcf4024a78ed14a8375db">print_boxed</a> (ostream &amp;out, int indent) const</td></tr>
+<tr class="memdesc:a6f574c5690fbcf4024a78ed14a8375db"><td class="mdescLeft">&#160;</td><td class="mdescRight">print this value in 4 ⎕CR style <br /></td></tr>
+<tr class="separator:a6f574c5690fbcf4024a78ed14a8375db"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad8cf427edc910f94e31db0d2c1c456fc"><td class="memItemLeft" align="right" valign="top"><a id="ad8cf427edc910f94e31db0d2c1c456fc"></a>
 <a class="el" href="classValue__P.html">Value_P</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#ad8cf427edc910f94e31db0d2c1c456fc">index</a> (const <a class="el" href="classIndexExpr.html">IndexExpr</a> &amp;IDX) const</td></tr>
 <tr class="memdesc:ad8cf427edc910f94e31db0d2c1c456fc"><td class="mdescLeft">&#160;</td><td class="mdescRight">return <b>this</b> indexed by (multi-dimensional) <b>IDX</b>. <br /></td></tr>
 <tr class="separator:ad8cf427edc910f94e31db0d2c1c456fc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6a2bad8eb6d09cd57f235709fe58a9f9"><td class="memItemLeft" align="right" valign="top"><a id="a6a2bad8eb6d09cd57f235709fe58a9f9"></a>
-<a class="el" href="classValue__P.html">Value_P</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a6a2bad8eb6d09cd57f235709fe58a9f9">index</a> (<a class="el" href="classValue__P.html">Value_P</a> IDX) const</td></tr>
-<tr class="memdesc:a6a2bad8eb6d09cd57f235709fe58a9f9"><td class="mdescLeft">&#160;</td><td class="mdescRight">return <b>this</b> indexed by (one-dimensional) <b>IDX</b>. <br /></td></tr>
-<tr class="separator:a6a2bad8eb6d09cd57f235709fe58a9f9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aad04e796b926355040d462e81b9d7f11"><td class="memItemLeft" align="right" valign="top"><a id="aad04e796b926355040d462e81b9d7f11"></a>
+<a class="el" href="classValue__P.html">Value_P</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#aad04e796b926355040d462e81b9d7f11">index</a> (const <a class="el" href="classValue.html">Value</a> *X) const</td></tr>
+<tr class="memdesc:aad04e796b926355040d462e81b9d7f11"><td class="mdescLeft">&#160;</td><td class="mdescRight">return <b>this</b> indexed by (one-dimensional) <b>IDX</b>. <br /></td></tr>
+<tr class="separator:aad04e796b926355040d462e81b9d7f11"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8103d85e8d44c2e4fc99ecd31c163e6f"><td class="memItemLeft" align="right" valign="top"><a id="a8103d85e8d44c2e4fc99ecd31c163e6f"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a8103d85e8d44c2e4fc99ecd31c163e6f">get_owner_count</a> () const</td></tr>
 <tr class="memdesc:a8103d85e8d44c2e4fc99ecd31c163e6f"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the number of <a class="el" href="classValue__P.html" title="A Value smart * (constructors) ">Value_P</a> pointing to <b>this</b> value <br /></td></tr>
@@ -352,38 +426,106 @@ int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class
 <a class="el" href="classValue.html">Value</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a568f71b7c67f0fea6bf44b475638dced">get_lval_cellowner</a> () const</td></tr>
 <tr class="memdesc:a568f71b7c67f0fea6bf44b475638dced"><td class="mdescLeft">&#160;</td><td class="mdescRight">return <b>true</b> iff this value is an lval (selective assignment) i.e. return true if at least one leaf value is an lval. <br /></td></tr>
 <tr class="separator:a568f71b7c67f0fea6bf44b475638dced"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0e51c8e38dbd9e8f799f5375f84cbca3"><td class="memItemLeft" align="right" valign="top"><a id="a0e51c8e38dbd9e8f799f5375f84cbca3"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a0e51c8e38dbd9e8f799f5375f84cbca3">more</a> ()</td></tr>
-<tr class="memdesc:a0e51c8e38dbd9e8f799f5375f84cbca3"><td class="mdescLeft">&#160;</td><td class="mdescRight">return true iff more ravel items (as per shape) need to be initialized. (the prototype of empty values may still be missing) <br /></td></tr>
-<tr class="separator:a0e51c8e38dbd9e8f799f5375f84cbca3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab013faebe60543f8ed4060afbfc73941"><td class="memItemLeft" align="right" valign="top"><a id="ab013faebe60543f8ed4060afbfc73941"></a>
-<a class="el" href="classCell.html">Cell</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#ab013faebe60543f8ed4060afbfc73941">next_ravel</a> ()</td></tr>
-<tr class="memdesc:ab013faebe60543f8ed4060afbfc73941"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the next ravel cell to be initialized (excluding prototype) <br /></td></tr>
-<tr class="separator:ab013faebe60543f8ed4060afbfc73941"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab8c3bc165a2d9635f9f2b0713e9a3e08"><td class="memItemLeft" align="right" valign="top"><a id="ab8c3bc165a2d9635f9f2b0713e9a3e08"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#ab8c3bc165a2d9635f9f2b0713e9a3e08">more</a> () const</td></tr>
+<tr class="memdesc:ab8c3bc165a2d9635f9f2b0713e9a3e08"><td class="mdescLeft">&#160;</td><td class="mdescRight">return true iff more ravel items (as per shape) need to be initialized. (the prototype of empty values may still be missing) <br /></td></tr>
+<tr class="separator:ab8c3bc165a2d9635f9f2b0713e9a3e08"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5723f5f86b97a1870f7e784ad6a3bfba"><td class="memItemLeft" align="right" valign="top"><a id="a5723f5f86b97a1870f7e784ad6a3bfba"></a>
+ShapeItem&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a5723f5f86b97a1870f7e784ad6a3bfba">get_valid_item_count</a> ()</td></tr>
+<tr class="memdesc:a5723f5f86b97a1870f7e784ad6a3bfba"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the number of (so far) initialized items <br /></td></tr>
+<tr class="separator:a5723f5f86b97a1870f7e784ad6a3bfba"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a28b03067aa98ed267a7556de9e839609"><td class="memItemLeft" align="right" valign="top"><a id="a28b03067aa98ed267a7556de9e839609"></a>
+<a class="el" href="classCell.html">Cell</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a28b03067aa98ed267a7556de9e839609">current_ravel</a> ()</td></tr>
+<tr class="memdesc:a28b03067aa98ed267a7556de9e839609"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the current ravel cell to be initialized (excluding prototype) <br /></td></tr>
+<tr class="separator:a28b03067aa98ed267a7556de9e839609"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a131a7844810059a3ab8eb411fd713e3b"><td class="memItemLeft" align="right" valign="top"><a id="a131a7844810059a3ab8eb411fd713e3b"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a131a7844810059a3ab8eb411fd713e3b">next_ravel_Char</a> (Unicode u)</td></tr>
 <tr class="memdesc:a131a7844810059a3ab8eb411fd713e3b"><td class="mdescLeft">&#160;</td><td class="mdescRight">initialize the next ravel cell with a character value <br /></td></tr>
 <tr class="separator:a131a7844810059a3ab8eb411fd713e3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1101e1fbe4fae7862fec5100c209917f"><td class="memItemLeft" align="right" valign="top"><a id="a1101e1fbe4fae7862fec5100c209917f"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a1101e1fbe4fae7862fec5100c209917f">next_ravel_Float</a> (<a class="el" href="classAPL__Float.html">APL_Float</a> f)</td></tr>
+<tr class="memdesc:a1101e1fbe4fae7862fec5100c209917f"><td class="mdescLeft">&#160;</td><td class="mdescRight">initialize the next ravel cell with a floating point value <br /></td></tr>
+<tr class="separator:a1101e1fbe4fae7862fec5100c209917f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9c87e64547021af7287ba6f2a6a17b57"><td class="memItemLeft" align="right" valign="top"><a id="a9c87e64547021af7287ba6f2a6a17b57"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a9c87e64547021af7287ba6f2a6a17b57">next_ravel_Number</a> (<a class="el" href="classAPL__Float.html">APL_Float</a> f)</td></tr>
+<tr class="memdesc:a9c87e64547021af7287ba6f2a6a17b57"><td class="mdescLeft">&#160;</td><td class="mdescRight">initialize the next ravel cell with a floating point value, converting it to integer if possible <br /></td></tr>
+<tr class="separator:a9c87e64547021af7287ba6f2a6a17b57"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a53c6b84c6d56e91898c457f1a9a39001"><td class="memItemLeft" align="right" valign="top"><a id="a53c6b84c6d56e91898c457f1a9a39001"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a53c6b84c6d56e91898c457f1a9a39001">next_ravel_Number</a> (<a class="el" href="classAPL__Float.html">APL_Float</a> real, <a class="el" href="classAPL__Float.html">APL_Float</a> imag)</td></tr>
+<tr class="memdesc:a53c6b84c6d56e91898c457f1a9a39001"><td class="mdescLeft">&#160;</td><td class="mdescRight">initialize the next ravel cell with a complex value if needed, or with (near-real) floating point value if possible. <br /></td></tr>
+<tr class="separator:a53c6b84c6d56e91898c457f1a9a39001"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa7fc263ea218a2dfbc3d3b15b815e845"><td class="memItemLeft" align="right" valign="top"><a id="aa7fc263ea218a2dfbc3d3b15b815e845"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#aa7fc263ea218a2dfbc3d3b15b815e845">next_ravel_Number</a> (APL_Complex cpx)</td></tr>
+<tr class="memdesc:aa7fc263ea218a2dfbc3d3b15b815e845"><td class="mdescLeft">&#160;</td><td class="mdescRight">initialize the next ravel cell with a complex value if needed, or with (near-real) floating point value if possible. <br /></td></tr>
+<tr class="separator:aa7fc263ea218a2dfbc3d3b15b815e845"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a35a1c313fbca5c1bef209f8d978ef9b6"><td class="memItemLeft" align="right" valign="top"><a id="a35a1c313fbca5c1bef209f8d978ef9b6"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a35a1c313fbca5c1bef209f8d978ef9b6">next_ravel_Cell</a> (const <a class="el" href="classCell.html">Cell</a> &amp;other)</td></tr>
+<tr class="memdesc:a35a1c313fbca5c1bef209f8d978ef9b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">initialize the next ravel cell from another <a class="el" href="classCell.html" title="The base class for all Cells. ">Cell</a> <br /></td></tr>
+<tr class="separator:a35a1c313fbca5c1bef209f8d978ef9b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a825bb984c11a131c55729a3af8eeeec5"><td class="memItemLeft" align="right" valign="top"><a id="a825bb984c11a131c55729a3af8eeeec5"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a825bb984c11a131c55729a3af8eeeec5">next_ravel_Proto</a> (const <a class="el" href="classCell.html">Cell</a> &amp;other)</td></tr>
+<tr class="memdesc:a825bb984c11a131c55729a3af8eeeec5"><td class="mdescLeft">&#160;</td><td class="mdescRight">initialize the next ravel cell from the type of another <a class="el" href="classCell.html" title="The base class for all Cells. ">Cell</a> <br /></td></tr>
+<tr class="separator:a825bb984c11a131c55729a3af8eeeec5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af7298ff0ff361b48ddf36f2ca3c8d599"><td class="memItemLeft" align="right" valign="top"><a id="af7298ff0ff361b48ddf36f2ca3c8d599"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#af7298ff0ff361b48ddf36f2ca3c8d599">next_ravel_Complex</a> (APL_Complex cpx)</td></tr>
+<tr class="memdesc:af7298ff0ff361b48ddf36f2ca3c8d599"><td class="mdescLeft">&#160;</td><td class="mdescRight">initialize the next ravel cell with a floating point value <br /></td></tr>
+<tr class="separator:af7298ff0ff361b48ddf36f2ca3c8d599"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1b2b72849868777fcc1d505f1aebb8d3"><td class="memItemLeft" align="right" valign="top"><a id="a1b2b72849868777fcc1d505f1aebb8d3"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a1b2b72849868777fcc1d505f1aebb8d3">next_ravel_Complex</a> (<a class="el" href="classAPL__Float.html">APL_Float</a> real, <a class="el" href="classAPL__Float.html">APL_Float</a> imag)</td></tr>
+<tr class="memdesc:a1b2b72849868777fcc1d505f1aebb8d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">initialize the next ravel cell with a floating point value <br /></td></tr>
+<tr class="separator:a1b2b72849868777fcc1d505f1aebb8d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab3a0d3914977f611bfddf54178edd477"><td class="memItemLeft" align="right" valign="top"><a id="ab3a0d3914977f611bfddf54178edd477"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#ab3a0d3914977f611bfddf54178edd477">next_ravel_Int</a> (APL_Integer i)</td></tr>
 <tr class="memdesc:ab3a0d3914977f611bfddf54178edd477"><td class="mdescLeft">&#160;</td><td class="mdescRight">initialize the next ravel cell with an integer value <br /></td></tr>
 <tr class="separator:ab3a0d3914977f611bfddf54178edd477"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1101e1fbe4fae7862fec5100c209917f"><td class="memItemLeft" align="right" valign="top"><a id="a1101e1fbe4fae7862fec5100c209917f"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a1101e1fbe4fae7862fec5100c209917f">next_ravel_Float</a> (<a class="el" href="classAPL__Float.html">APL_Float</a> f)</td></tr>
-<tr class="memdesc:a1101e1fbe4fae7862fec5100c209917f"><td class="mdescLeft">&#160;</td><td class="mdescRight">initialize the next ravel cell with an floating-point value <br /></td></tr>
-<tr class="separator:a1101e1fbe4fae7862fec5100c209917f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aedaeba59657616d3db9240ae9a0e50b2"><td class="memItemLeft" align="right" valign="top"><a id="aedaeba59657616d3db9240ae9a0e50b2"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#aedaeba59657616d3db9240ae9a0e50b2">next_ravel_Byte</a> (uint8_t byte)</td></tr>
+<tr class="memdesc:aedaeba59657616d3db9240ae9a0e50b2"><td class="mdescLeft">&#160;</td><td class="mdescRight">initialize the next ravel position with <b>byte</b>. NOTE that in this case ravel is a uint8_t * and not a <a class="el" href="classCell.html" title="The base class for all Cells. ">Cell</a> * !!! <br /></td></tr>
+<tr class="separator:aedaeba59657616d3db9240ae9a0e50b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a23f74a9841ee7c005ee16e673f72f84b"><td class="memItemLeft" align="right" valign="top"><a id="a23f74a9841ee7c005ee16e673f72f84b"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a23f74a9841ee7c005ee16e673f72f84b">next_ravel_Lval</a> (<a class="el" href="classCell.html">Cell</a> *target, <a class="el" href="classValue.html">Value</a> *target_owner)</td></tr>
+<tr class="memdesc:a23f74a9841ee7c005ee16e673f72f84b"><td class="mdescLeft">&#160;</td><td class="mdescRight">initialize the next ravel cell with a pointer to another <a class="el" href="classCell.html" title="The base class for all Cells. ">Cell</a> <br /></td></tr>
+<tr class="separator:a23f74a9841ee7c005ee16e673f72f84b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3a424b54ee7bfa4fcd69ff972e1c7add"><td class="memItemLeft" align="right" valign="top"><a id="a3a424b54ee7bfa4fcd69ff972e1c7add"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a3a424b54ee7bfa4fcd69ff972e1c7add">next_ravel_Pointer</a> (<a class="el" href="classValue.html">Value</a> *val)</td></tr>
 <tr class="memdesc:a3a424b54ee7bfa4fcd69ff972e1c7add"><td class="mdescLeft">&#160;</td><td class="mdescRight">initialize the next ravel cell with an APL sub-value <br /></td></tr>
 <tr class="separator:a3a424b54ee7bfa4fcd69ff972e1c7add"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4c48047baec74b3017d684803cab3f8e"><td class="memItemLeft" align="right" valign="top"><a id="a4c48047baec74b3017d684803cab3f8e"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a4c48047baec74b3017d684803cab3f8e">next_ravel_Value</a> (<a class="el" href="classValue.html">Value</a> *val)</td></tr>
+<tr class="memdesc:a4c48047baec74b3017d684803cab3f8e"><td class="mdescLeft">&#160;</td><td class="mdescRight">initialize the next ravel cell from either a APL scalar (if val is one) or from a non-scalar (producing as <a class="el" href="classPointerCell.html" title="A cell pointing to a (nested) APL value. ">PointerCell</a> <br /></td></tr>
+<tr class="separator:a4c48047baec74b3017d684803cab3f8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a72edd0065e9f22b270ddeda972ed9534"><td class="memItemLeft" align="right" valign="top"><a id="a72edd0065e9f22b270ddeda972ed9534"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a72edd0065e9f22b270ddeda972ed9534">set_ravel_Char</a> (ShapeItem offset, Unicode uni)</td></tr>
+<tr class="memdesc:a72edd0065e9f22b270ddeda972ed9534"><td class="mdescLeft">&#160;</td><td class="mdescRight">set ravel[offset] to <b>uni</b> <br /></td></tr>
+<tr class="separator:a72edd0065e9f22b270ddeda972ed9534"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa76de15be071eea1c129aae6045ffa93"><td class="memItemLeft" align="right" valign="top"><a id="aa76de15be071eea1c129aae6045ffa93"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#aa76de15be071eea1c129aae6045ffa93">set_ravel_Int</a> (ShapeItem offset, APL_Integer aint)</td></tr>
+<tr class="memdesc:aa76de15be071eea1c129aae6045ffa93"><td class="mdescLeft">&#160;</td><td class="mdescRight">set ravel[offset] to <b>aint</b> <br /></td></tr>
+<tr class="separator:aa76de15be071eea1c129aae6045ffa93"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a543709a9fcb4273395465ad8ff21ae5b"><td class="memItemLeft" align="right" valign="top"><a id="a543709a9fcb4273395465ad8ff21ae5b"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a543709a9fcb4273395465ad8ff21ae5b">set_ravel_Float</a> (ShapeItem offset, <a class="el" href="classAPL__Float.html">APL_Float</a> flt)</td></tr>
+<tr class="memdesc:a543709a9fcb4273395465ad8ff21ae5b"><td class="mdescLeft">&#160;</td><td class="mdescRight">set ravel[offset] to <b>flt</b> <br /></td></tr>
+<tr class="separator:a543709a9fcb4273395465ad8ff21ae5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afd08a9cd66afb49ff0e654b56d718616"><td class="memItemLeft" align="right" valign="top"><a id="afd08a9cd66afb49ff0e654b56d718616"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#afd08a9cd66afb49ff0e654b56d718616">set_ravel_Complex</a> (ShapeItem offset, <a class="el" href="classAPL__Float.html">APL_Float</a> real, <a class="el" href="classAPL__Float.html">APL_Float</a> imag)</td></tr>
+<tr class="memdesc:afd08a9cd66afb49ff0e654b56d718616"><td class="mdescLeft">&#160;</td><td class="mdescRight">set ravel[offset] to <b>Complex(real, imag)</b> <br /></td></tr>
+<tr class="separator:afd08a9cd66afb49ff0e654b56d718616"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab3c0dbf393c94f1aa17f7e31c8e45116"><td class="memItemLeft" align="right" valign="top"><a id="ab3c0dbf393c94f1aa17f7e31c8e45116"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#ab3c0dbf393c94f1aa17f7e31c8e45116">set_ravel_Cell</a> (ShapeItem offset, const <a class="el" href="classCell.html">Cell</a> &amp;cell)</td></tr>
+<tr class="memdesc:ab3c0dbf393c94f1aa17f7e31c8e45116"><td class="mdescLeft">&#160;</td><td class="mdescRight">set ravel[offset] to <b>cell</b>. <br /></td></tr>
+<tr class="separator:ab3c0dbf393c94f1aa17f7e31c8e45116"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af9b318f6629a410f8336945def0261ca"><td class="memItemLeft" align="right" valign="top"><a id="af9b318f6629a410f8336945def0261ca"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#af9b318f6629a410f8336945def0261ca">set_ravel_Pointer</a> (ShapeItem offset, <a class="el" href="classValue.html">Value</a> *val)</td></tr>
+<tr class="memdesc:af9b318f6629a410f8336945def0261ca"><td class="mdescLeft">&#160;</td><td class="mdescRight">set ravel[offset] to b <b><a class="el" href="classPointerCell.html" title="A cell pointing to a (nested) APL value. ">PointerCell(val)</a></b>, where val ≠ simple scalar. <br /></td></tr>
+<tr class="separator:af9b318f6629a410f8336945def0261ca"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a30de0ab46eb111aa75fe870b1610ef3d"><td class="memItemLeft" align="right" valign="top"><a id="a30de0ab46eb111aa75fe870b1610ef3d"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a30de0ab46eb111aa75fe870b1610ef3d">set_ravel_Value</a> (ShapeItem offset, <a class="el" href="classValue.html">Value</a> *value)</td></tr>
+<tr class="memdesc:a30de0ab46eb111aa75fe870b1610ef3d"><td class="mdescLeft">&#160;</td><td class="mdescRight">set ravel[offset] to <b>value</b> <br /></td></tr>
+<tr class="separator:a30de0ab46eb111aa75fe870b1610ef3d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a109476ed4f75f448226543cc34eba42c"><td class="memItemLeft" align="right" valign="top"><a id="a109476ed4f75f448226543cc34eba42c"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a109476ed4f75f448226543cc34eba42c">NOTCHAR</a> () const</td></tr>
 <tr class="memdesc:a109476ed4f75f448226543cc34eba42c"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the NOTCHAR property of the value. NOTCHAR is false for simple char arrays and true if any element is numeric or nested. The NOTCHAR property of empty arrays is the NOTCHAR property of its prototype. see also lrm p. 138. <br /></td></tr>
 <tr class="separator:a109476ed4f75f448226543cc34eba42c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aac01e84c15e73e216a710535e6eacc42"><td class="memItemLeft" align="right" valign="top"><a id="aac01e84c15e73e216a710535e6eacc42"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#aac01e84c15e73e216a710535e6eacc42">toggle_UCS</a> ()</td></tr>
-<tr class="memdesc:aac01e84c15e73e216a710535e6eacc42"><td class="mdescLeft">&#160;</td><td class="mdescRight">convert chars to ints and ints to chars (recursively). return the number of cells that are neither char nor int. <br /></td></tr>
-<tr class="separator:aac01e84c15e73e216a710535e6eacc42"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa22368fada64d25dd7e02b56be1423fe"><td class="memItemLeft" align="right" valign="top"><a id="aa22368fada64d25dd7e02b56be1423fe"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#aa22368fada64d25dd7e02b56be1423fe">same_rank</a> (const <a class="el" href="classValue.html">Value</a> &amp;other) const</td></tr>
 <tr class="memdesc:aa22368fada64d25dd7e02b56be1423fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">return <b>true</b> iff <b>this</b> value has the same rank as <b>other</b>. <br /></td></tr>
@@ -400,6 +542,26 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#af839013ca1d84e78c52a83e1b564e090">flag_info</a> (const char *loc, ValueFlags flag, const char *flag_name, bool set) const</td></tr>
 <tr class="memdesc:af839013ca1d84e78c52a83e1b564e090"><td class="mdescLeft">&#160;</td><td class="mdescRight">print debug info about setting or clearing of flags to CERR <br /></td></tr>
 <tr class="separator:af839013ca1d84e78c52a83e1b564e090"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1c385f28e2fcfd81146e6cd7317ac013"><td class="memItemLeft" align="right" valign="top"><a id="a1c385f28e2fcfd81146e6cd7317ac013"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a1c385f28e2fcfd81146e6cd7317ac013">SET_member</a> () const</td></tr>
+<tr class="memdesc:a1c385f28e2fcfd81146e6cd7317ac013"><td class="mdescLeft">&#160;</td><td class="mdescRight">set the <a class="el" href="classValue.html" title="An APL Value (essentially a Shape and a ravel) ">Value</a> flag <b>member</b> <br /></td></tr>
+<tr class="separator:a1c385f28e2fcfd81146e6cd7317ac013"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa8295760964d5f1d9dea8912c2c630dd"><td class="memItemLeft" align="right" valign="top"><a id="aa8295760964d5f1d9dea8912c2c630dd"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#aa8295760964d5f1d9dea8912c2c630dd">is_member</a> () const</td></tr>
+<tr class="memdesc:aa8295760964d5f1d9dea8912c2c630dd"><td class="mdescLeft">&#160;</td><td class="mdescRight">true if <a class="el" href="classValue.html" title="An APL Value (essentially a Shape and a ravel) ">Value</a> flag <b>member</b> is set <br /></td></tr>
+<tr class="separator:aa8295760964d5f1d9dea8912c2c630dd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a70e78e185bf871d72f603fb0a7bb6f48"><td class="memItemLeft" align="right" valign="top"><a id="a70e78e185bf871d72f603fb0a7bb6f48"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a70e78e185bf871d72f603fb0a7bb6f48">SET_packed</a> () const</td></tr>
+<tr class="memdesc:a70e78e185bf871d72f603fb0a7bb6f48"><td class="mdescLeft">&#160;</td><td class="mdescRight">set the <a class="el" href="classValue.html" title="An APL Value (essentially a Shape and a ravel) ">Value</a> flag <b>packed</b> <br /></td></tr>
+<tr class="separator:a70e78e185bf871d72f603fb0a7bb6f48"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac5ddd76146b85cc3ee586d5d294ec5b5"><td class="memItemLeft" align="right" valign="top"><a id="ac5ddd76146b85cc3ee586d5d294ec5b5"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#ac5ddd76146b85cc3ee586d5d294ec5b5">CLEAR_packed</a> () const</td></tr>
+<tr class="memdesc:ac5ddd76146b85cc3ee586d5d294ec5b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">clear the <a class="el" href="classValue.html" title="An APL Value (essentially a Shape and a ravel) ">Value</a> flag <b>packed</b> <br /></td></tr>
+<tr class="separator:ac5ddd76146b85cc3ee586d5d294ec5b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6c84896ec53d4baae44a1a9c2a4134f6"><td class="memItemLeft" align="right" valign="top"><a id="a6c84896ec53d4baae44a1a9c2a4134f6"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a6c84896ec53d4baae44a1a9c2a4134f6">is_packed</a> () const</td></tr>
+<tr class="memdesc:a6c84896ec53d4baae44a1a9c2a4134f6"><td class="mdescLeft">&#160;</td><td class="mdescRight">true if <a class="el" href="classValue.html" title="An APL Value (essentially a Shape and a ravel) ">Value</a> flag <b>packed</b> is set <br /></td></tr>
+<tr class="separator:a6c84896ec53d4baae44a1a9c2a4134f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adcb473c06a80341922ca9e76c1581958"><td class="memItemLeft" align="right" valign="top"><a id="adcb473c06a80341922ca9e76c1581958"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#adcb473c06a80341922ca9e76c1581958">SET_complete</a> () const</td></tr>
 <tr class="memdesc:adcb473c06a80341922ca9e76c1581958"><td class="mdescLeft">&#160;</td><td class="mdescRight">set the <a class="el" href="classValue.html" title="An APL Value (essentially a Shape and a ravel) ">Value</a> flag <b>complete</b> <br /></td></tr>
@@ -420,6 +582,18 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a84cb4f9a86540d04c52bfae177a97bc8">is_marked</a> () const</td></tr>
 <tr class="memdesc:a84cb4f9a86540d04c52bfae177a97bc8"><td class="mdescLeft">&#160;</td><td class="mdescRight">true if <a class="el" href="classValue.html" title="An APL Value (essentially a Shape and a ravel) ">Value</a> flag <b>marked</b> is set <br /></td></tr>
 <tr class="separator:a84cb4f9a86540d04c52bfae177a97bc8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1e5dccb394253ea13877c788980325d3"><td class="memItemLeft" align="right" valign="top"><a id="a1e5dccb394253ea13877c788980325d3"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a1e5dccb394253ea13877c788980325d3">is_structured</a> () const</td></tr>
+<tr class="memdesc:a1e5dccb394253ea13877c788980325d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">return true if this variable is <a class="el" href="classValue.html#aa8295760964d5f1d9dea8912c2c630dd" title="true if Value flag member is set ">is_member()</a> and a N×2 matrix with proper keys <br /></td></tr>
+<tr class="separator:a1e5dccb394253ea13877c788980325d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3117ef45bf1740b787751f5186220828"><td class="memItemLeft" align="right" valign="top"><a id="a3117ef45bf1740b787751f5186220828"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a3117ef45bf1740b787751f5186220828">add_member</a> (const <a class="el" href="classUCS__string.html">UCS_string</a> &amp;member_name, <a class="el" href="classValue.html">Value</a> *member_value)</td></tr>
+<tr class="memdesc:a3117ef45bf1740b787751f5186220828"><td class="mdescLeft">&#160;</td><td class="mdescRight">add a member to a structured variable <br /></td></tr>
+<tr class="separator:a3117ef45bf1740b787751f5186220828"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9c5da73b65e557cb2446dca7fc9fee3a"><td class="memItemLeft" align="right" valign="top"><a id="a9c5da73b65e557cb2446dca7fc9fee3a"></a>
+ShapeItem&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a9c5da73b65e557cb2446dca7fc9fee3a">get_all_members_count</a> () const</td></tr>
+<tr class="memdesc:a9c5da73b65e557cb2446dca7fc9fee3a"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the (recursive) number of members in this value <br /></td></tr>
+<tr class="separator:a9c5da73b65e557cb2446dca7fc9fee3a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a69a8e1aa89135b7ae26d26516524bfe1"><td class="memItemLeft" align="right" valign="top"><a id="a69a8e1aa89135b7ae26d26516524bfe1"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a69a8e1aa89135b7ae26d26516524bfe1">unmark</a> () const</td></tr>
 <tr class="memdesc:a69a8e1aa89135b7ae26d26516524bfe1"><td class="mdescLeft">&#160;</td><td class="mdescRight">clear marked flag on this value and its nested sub-values <br /></td></tr>
@@ -483,6 +657,10 @@ ValueFlags&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a82fd0d84f4c7f0b22a6b035e0201506a">print_stale_info</a> (ostream &amp;out, const <a class="el" href="classDynamicObject.html">DynamicObject</a> *dob) const</td></tr>
 <tr class="memdesc:a82fd0d84f4c7f0b22a6b035e0201506a"><td class="mdescLeft">&#160;</td><td class="mdescRight">print info related to a stale value <br /></td></tr>
 <tr class="separator:a82fd0d84f4c7f0b22a6b035e0201506a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa914c68d753cc27daddc7fec5af8e81a"><td class="memItemLeft" align="right" valign="top"><a id="aa914c68d753cc27daddc7fec5af8e81a"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#aa914c68d753cc27daddc7fec5af8e81a">explode</a> ()</td></tr>
+<tr class="memdesc:aa914c68d753cc27daddc7fec5af8e81a"><td class="mdescLeft">&#160;</td><td class="mdescRight">expand packed Booleans (in place) <br /></td></tr>
+<tr class="separator:aa914c68d753cc27daddc7fec5af8e81a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a553c4b723218b35f615f9dda928d7e72"><td class="memItemLeft" align="right" valign="top"><a id="a553c4b723218b35f615f9dda928d7e72"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a553c4b723218b35f615f9dda928d7e72">increment_pointer_cell_count</a> ()</td></tr>
 <tr class="memdesc:a553c4b723218b35f615f9dda928d7e72"><td class="mdescLeft">&#160;</td><td class="mdescRight">increment the <a class="el" href="classPointerCell.html" title="A cell pointing to a (nested) APL value. ">PointerCell</a> count <br /></td></tr>
@@ -573,7 +751,7 @@ static Rank&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 <tr class="separator:a045aa0c22b3eb2f0a93682c82829ea3c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad33f56da0eeb1b787fb1da18318dca36"><td class="memItemLeft" align="right" valign="top"><a id="ad33f56da0eeb1b787fb1da18318dca36"></a>
 static <a class="el" href="classShape.html">Shape</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#ad33f56da0eeb1b787fb1da18318dca36">to_shape</a> (const <a class="el" href="classValue.html">Value</a> *val)</td></tr>
-<tr class="memdesc:ad33f56da0eeb1b787fb1da18318dca36"><td class="mdescLeft">&#160;</td><td class="mdescRight">convert the ravel of <b>val</b> to a shape <br /></td></tr>
+<tr class="memdesc:ad33f56da0eeb1b787fb1da18318dca36"><td class="mdescLeft">&#160;</td><td class="mdescRight">convert the ravel of <a class="el" href="classValue.html" title="An APL Value (essentially a Shape and a ravel) ">Value</a> <b>val</b> to a shape (normalized to ⎕IO←0) <br /></td></tr>
 <tr class="separator:ad33f56da0eeb1b787fb1da18318dca36"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a137fcfe588e0315bf5c9293c741b3b25"><td class="memItemLeft" align="right" valign="top"><a id="a137fcfe588e0315bf5c9293c741b3b25"></a>
 static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a137fcfe588e0315bf5c9293c741b3b25">glue</a> (<a class="el" href="classToken.html">Token</a> &amp;token, <a class="el" href="classToken.html">Token</a> &amp;token_A, <a class="el" href="classToken.html">Token</a> &amp;token_B, const char *loc)</td></tr>
@@ -611,10 +789,6 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a38979fd196c826557e1614fa0514bbaa">erase_stale</a> (const char *loc)</td></tr>
 <tr class="memdesc:a38979fd196c826557e1614fa0514bbaa"><td class="mdescLeft">&#160;</td><td class="mdescRight">erase stale values <br /></td></tr>
 <tr class="separator:a38979fd196c826557e1614fa0514bbaa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0d704e6edac46a415855b05a55804731"><td class="memItemLeft" align="right" valign="top"><a id="a0d704e6edac46a415855b05a55804731"></a>
-static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a0d704e6edac46a415855b05a55804731">finish_incomplete</a> (const char *loc)</td></tr>
-<tr class="memdesc:a0d704e6edac46a415855b05a55804731"><td class="mdescLeft">&#160;</td><td class="mdescRight">re-initialize incomplete values <br /></td></tr>
-<tr class="separator:a0d704e6edac46a415855b05a55804731"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af36fd7af530f8dd299623de18b37f34b"><td class="memItemLeft" align="right" valign="top"><a id="af36fd7af530f8dd299623de18b37f34b"></a>
 static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#af36fd7af530f8dd299623de18b37f34b">erase_all</a> (ostream &amp;out)</td></tr>
 <tr class="memdesc:af36fd7af530f8dd299623de18b37f34b"><td class="mdescLeft">&#160;</td><td class="mdescRight">erase all values (clean-up after )CLEAR) <br /></td></tr>
@@ -655,10 +829,6 @@ static const <a class="el" href="classDynamicObject.html">DynamicObject</a> *&#1
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
-<tr class="memitem:aa451abca383727e28175240133b428f2"><td class="memItemLeft" align="right" valign="top"><a id="aa451abca383727e28175240133b428f2"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#aa451abca383727e28175240133b428f2">owner_count</a></td></tr>
-<tr class="memdesc:aa451abca383727e28175240133b428f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">number of <a class="el" href="classValue__P.html" title="A Value smart * (constructors) ">Value_P</a> objects pointing to this value <br /></td></tr>
-<tr class="separator:aa451abca383727e28175240133b428f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a79bc694e1049f76d4cb78ba917836633"><td class="memItemLeft" align="right" valign="top"><a id="a79bc694e1049f76d4cb78ba917836633"></a>
 const void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a79bc694e1049f76d4cb78ba917836633">check_ptr</a></td></tr>
 <tr class="memdesc:a79bc694e1049f76d4cb78ba917836633"><td class="mdescLeft">&#160;</td><td class="mdescRight">a "checksum" to detect deleted values <br /></td></tr>
@@ -674,14 +844,14 @@ static uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el"
 static uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#af235bef37769ed13b809abe5c3ef2e27">value_count</a> = 0</td></tr>
 <tr class="memdesc:af235bef37769ed13b809abe5c3ef2e27"><td class="mdescLeft">&#160;</td><td class="mdescRight">the number of values created <br /></td></tr>
 <tr class="separator:af235bef37769ed13b809abe5c3ef2e27"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac4f7670215f05afe353ff082a29c218e"><td class="memItemLeft" align="right" valign="top"><a id="ac4f7670215f05afe353ff082a29c218e"></a>
-static uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#ac4f7670215f05afe353ff082a29c218e">fast_new</a> = 0</td></tr>
-<tr class="memdesc:ac4f7670215f05afe353ff082a29c218e"><td class="mdescLeft">&#160;</td><td class="mdescRight">the number of fast (recycled) new() calls <br /></td></tr>
-<tr class="separator:ac4f7670215f05afe353ff082a29c218e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6ef76aceafb31692d0d98fb39a97b78b"><td class="memItemLeft" align="right" valign="top"><a id="a6ef76aceafb31692d0d98fb39a97b78b"></a>
-static uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a6ef76aceafb31692d0d98fb39a97b78b">slow_new</a> = 0</td></tr>
-<tr class="memdesc:a6ef76aceafb31692d0d98fb39a97b78b"><td class="mdescLeft">&#160;</td><td class="mdescRight">the number of slow (malloc() based) new() calls <br /></td></tr>
-<tr class="separator:a6ef76aceafb31692d0d98fb39a97b78b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5b020cb0c071d000c3366f63b8fe3746"><td class="memItemLeft" align="right" valign="top"><a id="a5b020cb0c071d000c3366f63b8fe3746"></a>
+static uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a5b020cb0c071d000c3366f63b8fe3746">fast_new_count</a> = 0</td></tr>
+<tr class="memdesc:a5b020cb0c071d000c3366f63b8fe3746"><td class="mdescLeft">&#160;</td><td class="mdescRight">the number of fast (recycled) new() calls <br /></td></tr>
+<tr class="separator:a5b020cb0c071d000c3366f63b8fe3746"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a45f1909f80d50509a2358cb43ba04b77"><td class="memItemLeft" align="right" valign="top"><a id="a45f1909f80d50509a2358cb43ba04b77"></a>
+static uint64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a45f1909f80d50509a2358cb43ba04b77">slow_new_count</a> = 0</td></tr>
+<tr class="memdesc:a45f1909f80d50509a2358cb43ba04b77"><td class="mdescLeft">&#160;</td><td class="mdescRight">the number of slow (malloc() based) new() calls <br /></td></tr>
+<tr class="separator:a45f1909f80d50509a2358cb43ba04b77"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-types"></a>
 Protected Types</h2></td></tr>
@@ -708,9 +878,13 @@ Protected Member Functions</h2></td></tr>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a8c736f9a11a11c7c2c6299ae5c902897">Value</a> (const <a class="el" href="classShape.html">Shape</a> &amp;sh, const char *loc)</td></tr>
 <tr class="memdesc:a8c736f9a11a11c7c2c6299ae5c902897"><td class="mdescLeft">&#160;</td><td class="mdescRight">constructor: a general array with shape <b>sh</b> <br /></td></tr>
 <tr class="separator:a8c736f9a11a11c7c2c6299ae5c902897"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2f91106976acfaf1dcbf437c0e864c91"><td class="memItemLeft" align="right" valign="top"><a id="a2f91106976acfaf1dcbf437c0e864c91"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a2f91106976acfaf1dcbf437c0e864c91">Value</a> (const <a class="el" href="classShape.html">Shape</a> &amp;sh, uint8_t *bits, const char *loc)</td></tr>
+<tr class="memdesc:a2f91106976acfaf1dcbf437c0e864c91"><td class="mdescLeft">&#160;</td><td class="mdescRight">constructor: a packed array with shape <b>sh</b> <br /></td></tr>
+<tr class="separator:a2f91106976acfaf1dcbf437c0e864c91"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a32a3b743de46da9b791cc794fb5349ec"><td class="memItemLeft" align="right" valign="top"><a id="a32a3b743de46da9b791cc794fb5349ec"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a32a3b743de46da9b791cc794fb5349ec">Value</a> (const <a class="el" href="classUCS__string.html">UCS_string</a> &amp;ucs, const char *loc)</td></tr>
-<tr class="memdesc:a32a3b743de46da9b791cc794fb5349ec"><td class="mdescLeft">&#160;</td><td class="mdescRight">constructor: a simple character vector from a UCS string <br /></td></tr>
+<tr class="memdesc:a32a3b743de46da9b791cc794fb5349ec"><td class="mdescLeft">&#160;</td><td class="mdescRight">constructor: a simple character vector from a UCS string. Rank is always 1, so that <a class="el" href="classValue.html#af888cebca232681238b61fa15be641f1" title="return true iff this value is a simple character vector. ">is_char_vector()</a> will be true. <br /></td></tr>
 <tr class="separator:a32a3b743de46da9b791cc794fb5349ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a03f8ce1ef48f7111d87c5fc27042b31a"><td class="memItemLeft" align="right" valign="top"><a id="a03f8ce1ef48f7111d87c5fc27042b31a"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a03f8ce1ef48f7111d87c5fc27042b31a">Value</a> (const <a class="el" href="classUTF8__string.html">UTF8_string</a> &amp;utf, const char *loc)</td></tr>
@@ -728,6 +902,14 @@ Protected Member Functions</h2></td></tr>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a157c9151b80095223c17288d16f7da9f">Value</a> (const char *loc, const <a class="el" href="classShape.html">Shape</a> *sh)</td></tr>
 <tr class="memdesc:a157c9151b80095223c17288d16f7da9f"><td class="mdescLeft">&#160;</td><td class="mdescRight">constructor: a integer vector containing the items of a shape <br /></td></tr>
 <tr class="separator:a157c9151b80095223c17288d16f7da9f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab013faebe60543f8ed4060afbfc73941"><td class="memItemLeft" align="right" valign="top"><a id="ab013faebe60543f8ed4060afbfc73941"></a>
+<a class="el" href="classCell.html">Cell</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#ab013faebe60543f8ed4060afbfc73941">next_ravel</a> ()</td></tr>
+<tr class="memdesc:ab013faebe60543f8ed4060afbfc73941"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the next ravel cell to be initialized (excluding prototype) <br /></td></tr>
+<tr class="separator:ab013faebe60543f8ed4060afbfc73941"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a45e872fa66647ffb6be85c6d5526f933"><td class="memItemLeft" align="right" valign="top"><a id="a45e872fa66647ffb6be85c6d5526f933"></a>
+uint8_t *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a45e872fa66647ffb6be85c6d5526f933">next_ravel_byte</a> ()</td></tr>
+<tr class="memdesc:a45e872fa66647ffb6be85c6d5526f933"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the next (packed) byte position <br /></td></tr>
+<tr class="separator:a45e872fa66647ffb6be85c6d5526f933"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1120641bea23235f2525146e6f5f48df"><td class="memItemLeft" align="right" valign="top"><a id="a1120641bea23235f2525146e6f5f48df"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a1120641bea23235f2525146e6f5f48df">init_ravel</a> ()</td></tr>
 <tr class="memdesc:a1120641bea23235f2525146e6f5f48df"><td class="mdescLeft">&#160;</td><td class="mdescRight">init the ravel of an APL value, return the ravel length <br /></td></tr>
@@ -750,6 +932,10 @@ Protected Attributes</h2></td></tr>
 <a class="el" href="classShape.html">Shape</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#ac763cf82905bdc58a8fbc811380f24c5">shape</a></td></tr>
 <tr class="memdesc:ac763cf82905bdc58a8fbc811380f24c5"><td class="mdescLeft">&#160;</td><td class="mdescRight">the shape of <b>this</b> value (only the first <b>rank</b> values are valid. <br /></td></tr>
 <tr class="separator:ac763cf82905bdc58a8fbc811380f24c5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa451abca383727e28175240133b428f2"><td class="memItemLeft" align="right" valign="top"><a id="aa451abca383727e28175240133b428f2"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#aa451abca383727e28175240133b428f2">owner_count</a></td></tr>
+<tr class="memdesc:aa451abca383727e28175240133b428f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">number of <a class="el" href="classValue__P.html" title="A Value smart * (constructors) ">Value_P</a> objects pointing to this value <br /></td></tr>
+<tr class="separator:aa451abca383727e28175240133b428f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac3d3709ddecaa0adb017b50431b70752"><td class="memItemLeft" align="right" valign="top"><a id="ac3d3709ddecaa0adb017b50431b70752"></a>
 ShapeItem&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#ac3d3709ddecaa0adb017b50431b70752">pointer_cell_count</a></td></tr>
 <tr class="memdesc:ac3d3709ddecaa0adb017b50431b70752"><td class="mdescLeft">&#160;</td><td class="mdescRight">the value that has a <a class="el" href="classPointerCell.html" title="A cell pointing to a (nested) APL value. ">PointerCell</a> pointing to <b>this</b> value (if any) <br /></td></tr>
@@ -770,10 +956,10 @@ ShapeItem&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 <a class="el" href="classCell.html">Cell</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#ad7eee95264ddfd83cec7ca23bac8029c">ravel</a></td></tr>
 <tr class="memdesc:ad7eee95264ddfd83cec7ca23bac8029c"><td class="mdescLeft">&#160;</td><td class="mdescRight">The ravel of <b>this</b> value. <br /></td></tr>
 <tr class="separator:ad7eee95264ddfd83cec7ca23bac8029c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3a579f80a7c5530f70e714087620bb5b"><td class="memItemLeft" align="right" valign="top"><a id="a3a579f80a7c5530f70e714087620bb5b"></a>
-<a class="el" href="classCell.html">Cell</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a3a579f80a7c5530f70e714087620bb5b">short_value</a> [12]</td></tr>
-<tr class="memdesc:a3a579f80a7c5530f70e714087620bb5b"><td class="mdescLeft">&#160;</td><td class="mdescRight">the cells of a short (i.e. ⍴,value ≤ SHORT_VALUE_LENGTH_WANTED) value <br /></td></tr>
-<tr class="separator:a3a579f80a7c5530f70e714087620bb5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a927a63742fa6f9da678ab899882dc346"><td class="memItemLeft" align="right" valign="top"><a id="a927a63742fa6f9da678ab899882dc346"></a>
+<a class="el" href="classCell.html">Cell</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue.html#a927a63742fa6f9da678ab899882dc346">short_value</a> [SHORT_VALUE_LENGTH_WANTED]</td></tr>
+<tr class="memdesc:a927a63742fa6f9da678ab899882dc346"><td class="mdescLeft">&#160;</td><td class="mdescRight">the cells of a short (i.e. ⍴,value ≤ SHORT_VALUE_LENGTH_WANTED) value <br /></td></tr>
+<tr class="separator:a927a63742fa6f9da678ab899882dc346"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_attribs_classDynamicObject"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_classDynamicObject')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="classDynamicObject.html">DynamicObject</a></td></tr>
 <tr class="memitem:a69801c8b2dcb911f0e60d0682a65017c inherit pro_attribs_classDynamicObject"><td class="memItemLeft" align="right" valign="top"><a id="a69801c8b2dcb911f0e60d0682a65017c"></a>
 const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDynamicObject.html#a69801c8b2dcb911f0e60d0682a65017c">alloc_loc</a></td></tr>
@@ -846,7 +1032,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>PointerCell</b></td>
 <div class="textblock"><p>An APL <a class="el" href="classValue.html" title="An APL Value (essentially a Shape and a ravel) ">Value</a> (essentially a <a class="el" href="classShape.html" title="the shape of an APL value ">Shape</a> and a ravel) </p>
 <p>An APL value. It consists of a fixed header (rank, shape) and and a ravel (a sequence of cells). If the ravel is short, then it is contained in the value itself; otherwise the value uses a pointer to a loner ravel. </p>
 
-<p class="definition">Definition at line <a class="el" href="Value_8hh_source.html#l00056">56</a> of file <a class="el" href="Value_8hh_source.html">Value.hh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Value_8hh_source.html#l00058">58</a> of file <a class="el" href="Value_8hh_source.html">Value.hh</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="a21237b2c7e26efd23b9a86780dfad6d5"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a21237b2c7e26efd23b9a86780dfad6d5">&#9670;&nbsp;</a></span>get_col_spacing()</h2>
@@ -883,9 +1069,9 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>PointerCell</b></td>
 <p>get the min spacing for this column and set/clear if there is/isn't a numeric item in the column. are/ain't numeric items in col. </p>
 <p>lrp p.138: S←⍴⍴A + NOTCHAR (per column) </p>
 
-<p class="definition">Definition at line <a class="el" href="Value_8cc_source.html#l01800">1800</a> of file <a class="el" href="Value_8cc_source.html">Value.cc</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Value_8cc_source.html#l02492">2492</a> of file <a class="el" href="Value_8cc_source.html">Value.cc</a>.</p>
 
-<p class="reference">References <a class="el" href="Value_8hh_source.html#l00163">element_count()</a>, <a class="el" href="Value_8hh_source.html#l00183">get_last_shape_item()</a>, <a class="el" href="Cell_8hh_source.html#l00126">Cell::get_pointer_value()</a>, <a class="el" href="Value_8hh_source.html#l00254">get_ravel()</a>, <a class="el" href="Cell_8hh_source.html#l00197">Cell::is_character_cell()</a>, and <a class="el" href="Cell_8hh_source.html#l00201">Cell::is_pointer_cell()</a>.</p>
+<p class="reference">References <a class="el" href="Value_8hh_source.html#l00172">element_count()</a>, <a class="el" href="Value_8hh_source.html#l00313">get_cravel()</a>, <a class="el" href="Value_8hh_source.html#l00192">get_last_shape_item()</a>, <a class="el" href="Cell_8cc_source.html#l00148">Cell::get_pointer_value()</a>, <a class="el" href="Cell_8hh_source.html#l00194">Cell::is_character_cell()</a>, and <a class="el" href="Cell_8hh_source.html#l00198">Cell::is_pointer_cell()</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="PrintBuffer_8cc_source.html#l00177">PrintBuffer::do_PrintBuffer()</a>.</p>
 <div class="dynheader">
@@ -894,11 +1080,13 @@ Here is the call graph for this function:</div>
 <div class="center"><img src="classValue_a21237b2c7e26efd23b9a86780dfad6d5_cgraph.png" border="0" usemap="#classValue_a21237b2c7e26efd23b9a86780dfad6d5_cgraph" alt=""/></div>
 <map name="classValue_a21237b2c7e26efd23b9a86780dfad6d5_cgraph" id="classValue_a21237b2c7e26efd23b9a86780dfad6d5_cgraph">
 <area shape="rect" id="node2" href="classValue.html#a9fc8bbaf9fefe6835dea7db0f71b8b6c" title="return the number of elements (the product of the shapes). " alt="" coords="228,5,376,32"/>
-<area shape="rect" id="node3" href="classValue.html#ad93c531583abca50f61db8f9f9ef81ed" title="return the length of the last dimension of this value " alt="" coords="211,56,393,83"/>
-<area shape="rect" id="node4" href="classCell.html#a3af019707c56a0fb40fce2d370af8307" title="Return the APL value of a cell (Asserts for non&#45;pointer cells) " alt="" coords="225,107,379,133"/>
-<area shape="rect" id="node5" href="classValue.html#a89120a742c078918d1a5d84ec742e69c" title="return the idx&#39;th element of the ravel. " alt="" coords="244,157,360,184"/>
-<area shape="rect" id="node6" href="classCell.html#ab3d14978f78ba264d40e9ed1a4823be2" title="Return true iff this cell is a character cell. " alt="" coords="227,208,377,235"/>
-<area shape="rect" id="node7" href="classCell.html#ae98b3988a7fa52c6c157b4911b043dde" title="Return true iff this cell is a pointer (to a sub&#45;array) cell. " alt="" coords="234,259,370,285"/>
+<area shape="rect" id="node3" href="classValue.html#a113fa41969aed3b011b477ea199c6157" title="return the (constant) idx&#39;th element of the ravel. " alt="" coords="241,56,363,83"/>
+<area shape="rect" id="node4" href="classValue.html#ad93c531583abca50f61db8f9f9ef81ed" title="return the length of the last dimension of this value " alt="" coords="211,107,393,133"/>
+<area shape="rect" id="node5" href="classCell.html#a367b9df7e0d4b805e5f31641658113f6" title="Return the APL value of a cell (Asserts for non&#45;pointer cells) " alt="" coords="225,157,379,184"/>
+<area shape="rect" id="node8" href="classCell.html#ab3d14978f78ba264d40e9ed1a4823be2" title="Return true iff this cell is a character cell. " alt="" coords="227,208,377,235"/>
+<area shape="rect" id="node9" href="classCell.html#ae98b3988a7fa52c6c157b4911b043dde" title="Return true iff this cell is a pointer (to a sub&#45;array) cell. " alt="" coords="234,259,370,285"/>
+<area shape="rect" id="node6" href="classCell.html#a38a6a25f0ad091f35e3d9abfe5608a50" title="return the type of this cell " alt="" coords="461,132,591,159"/>
+<area shape="rect" id="node7" href="classCell.html#a6c3fdef3d82f53649d1c3f16d37eedd7" title="the name of ct " alt="" coords="441,183,611,209"/>
 </map>
 </div>
 <div class="dynheader">
@@ -913,8 +1101,53 @@ Here is the caller graph for this function:</div>
 
 </div>
 </div>
+<a id="aafe2d51551a1108a8d8e431fc1b019a0"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aafe2d51551a1108a8d8e431fc1b019a0">&#9670;&nbsp;</a></span>set_shape()</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname">void Value::set_shape </td>
+          <td>(</td>
+          <td class="paramtype">const <a class="el" href="classShape.html">Shape</a> &amp;&#160;</td>
+          <td class="paramname"><em>new_shape</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">inline</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>reshape this value in place. This is generally dangerous and only permitted if:</p>
+<ol type="1">
+<li>this value has been initialized completely, and</li>
+<li>the new shape has not more items than this value.</li>
+</ol>
+<p>If this value is empty, then (due to its prototype) reshaping it to volume 1 is permitted. </p>
+
+<p class="definition">Definition at line <a class="el" href="Value_8hh_source.html#l00216">216</a> of file <a class="el" href="Value_8hh_source.html">Value.hh</a>.</p>
+
+<p class="reference">References <a class="el" href="Shape_8hh_source.html#l00187">Shape::get_volume()</a>.</p>
+<div class="dynheader">
+Here is the call graph for this function:</div>
+<div class="dyncontent">
+<div class="center"><img src="classValue_aafe2d51551a1108a8d8e431fc1b019a0_cgraph.png" border="0" usemap="#classValue_aafe2d51551a1108a8d8e431fc1b019a0_cgraph" alt=""/></div>
+<map name="classValue_aafe2d51551a1108a8d8e431fc1b019a0_cgraph" id="classValue_aafe2d51551a1108a8d8e431fc1b019a0_cgraph">
+<area shape="rect" id="node2" href="classShape.html#af39e05bad7be900fa1437a6eb6035e97" title="return the number of ravel elements (1 for scalars,i else product of shapes) " alt="" coords="176,5,311,32"/>
+</map>
+</div>
+
+</div>
+</div>
 <hr/>The documentation for this class was generated from the following files:<ul>
 <li>src/<a class="el" href="Value_8hh_source.html">Value.hh</a></li>
+<li>src/<a class="el" href="Command_8def_source.html">Command.def</a></li>
 <li>src/<a class="el" href="Value_8cc_source.html">Value.cc</a></li>
 </ul>
 </div><!-- contents -->
@@ -923,7 +1156,7 @@ Here is the caller graph for this function:</div>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="classValue.html">Value</a></li>
-    <li class="footer">Generated on Sun Aug 9 2020 16:43:42 for GNUAPL by
+    <li class="footer">Generated on Sun Jan 30 2022 20:14:27 for GNUAPL by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>

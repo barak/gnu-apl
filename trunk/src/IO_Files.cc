@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -39,11 +39,11 @@ int IO_Files::last_apl_error_line = -1;
 int IO_Files::assert_errors = 0;
 int IO_Files::diff_errors = 0;
 int IO_Files::parse_errors = 0;
-IO_Files::TestMode IO_Files::test_mode = TM_EXIT_AFTER_LAST;
+IO_Files::TestMode IO_Files::test_mode = TM_EXIT_AFTER_LAST_FILE;
 bool IO_Files::need_total = false;
 ofstream IO_Files::current_testreport;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 IO_Files::get_file_line(UTF8_string & line, bool & eof)
 {
@@ -91,8 +91,8 @@ IO_Files::get_file_line(UTF8_string & line, bool & eof)
         print_summary();
         need_total = false;   // forget the -T option
 
-        if ((test_mode == TM_EXIT_AFTER_LAST) ||
-            (test_mode == TM_EXIT_AFTER_LAST_IF_OK && !error_count()))
+        if ((test_mode == TM_EXIT_AFTER_LAST_FILE) ||
+            (test_mode == TM_EXIT_AFTER_LAST_FILE_IF_OK && !error_count()))
           {
             CERR << "Exiting (test_mode " << test_mode << ")" << endl;
             cleanup(true);
@@ -103,7 +103,7 @@ IO_Files::get_file_line(UTF8_string & line, bool & eof)
 
    eof = true;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 IO_Files::read_file_line(UTF8_string & file_line, bool & eof)
 {
@@ -156,7 +156,7 @@ InputFile * input = InputFile::current_file();
    Log(LOG_test_execution)
       CERR << "read_file_line() -> " << file_line << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 IO_Files::next_file()
 {
@@ -171,7 +171,7 @@ IO_Files::next_file()
       }
    open_next_file();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 IO_Files::end_of_current_file()
 {
@@ -260,8 +260,8 @@ IO_Files::end_of_current_file()
 
         summary << InputFile::current_filename() << endl;
 
-        if ((test_mode == TM_STOP_AFTER_ERROR ||
-             test_mode == TM_EXIT_AFTER_ERROR) && error_count())
+        if ((test_mode == TM_STOP_AFTER_FILE_ERROR ||
+             test_mode == TM_EXIT_AFTER_FILE_ERROR) && error_count())
            {
              CERR << endl
                   << "Stopping test execution since an error has occurred"
@@ -284,7 +284,7 @@ IO_Files::end_of_current_file()
    reset_errors();
    return true;   // continue processing
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 IO_Files::print_summary()
 {
@@ -306,7 +306,7 @@ int done = testcases_done;
            << "(" << testcase_count << ")"
            << " testcase files" << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 IO_Files::open_next_file()
 {
@@ -318,7 +318,15 @@ IO_Files::open_next_file()
 
    if (InputFile::current_file()->file)
       {
-        CERR << "IO_Files::open_next_file(): already open" << endl;
+        if (InputFile::current_file()->is_pushed_pending())
+           {
+             InputFile::current_file()->set_pushed_pending(false);
+             CERR << "*** Leaving the pushed immediate execution context" << endl;
+           }
+        else
+           {
+             CERR << "IO_Files::open_next_file(): already open" << endl;
+           }
         return;
       }
 
@@ -327,7 +335,7 @@ IO_Files::open_next_file()
            if (!InputFile::current_file())   break;   // no more files
 
            char log_name[FILENAME_MAX];
-           snprintf(log_name, sizeof(log_name) - 1,  "%s.log",
+           snprintf(log_name, FILENAME_MAX - 1,  "%s.log",
                     InputFile::current_filename());
 
            if (InputFile::current_file()->test)
@@ -378,7 +386,7 @@ IO_Files::open_next_file()
            return;
          }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 IO_Files::expect_apl_errors(const UCS_string & arg)
 {
@@ -399,7 +407,7 @@ const int cnt = arg.atoi();
                 << " expecing " << cnt << endl;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 IO_Files::syntax_error()
 {
@@ -413,7 +421,7 @@ IO_Files::syntax_error()
 
    current_testreport << "**\n** Parse Error ********\n**" << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 IO_Files::apl_error(const char * loc)
 {
@@ -427,7 +435,7 @@ IO_Files::apl_error(const char * loc)
    Log(LOG_test_execution)
       CERR << "APL errors incremented to " << apl_errors << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 IO_Files::assert_error()
 {
@@ -438,7 +446,7 @@ IO_Files::assert_error()
    Log(LOG_test_execution)
       CERR << "Assert errors incremented to " << assert_errors << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 IO_Files::diff_error()
 {
@@ -448,5 +456,14 @@ IO_Files::diff_error()
    ++diff_errors;
    Log(LOG_test_execution)
       CERR << "Diff errors incremented to " << diff_errors << endl;
+
+   if (test_mode & TM_DONE_AFTER_LINE_ERROR)
+      {
+        ++total_errors;
+        ++testcases_done;
+        InputFile::close_current_file();
+        InputFile::files_todo.clear();
+        if (test_mode == TM_EXIT_AFTER_LINE_ERROR)   Command::cmd_OFF(1);
+      }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------

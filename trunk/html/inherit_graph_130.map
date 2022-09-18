@@ -1,3 +1,4 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classUnicode__source.html" title="An iterator for UCS_string. " alt="" coords="5,5,121,32"/>
+<area shape="rect" id="node2" href="$classUCS__string.html" title="A string of Unicode characters (32&#45;bit) " alt="" coords="147,5,238,32"/>
+<area shape="rect" id="node3" href="$classUTF8__string.html" title="an UTF8 encoded Unicode (RFC 3629) string " alt="" coords="145,56,240,83"/>
 </map>

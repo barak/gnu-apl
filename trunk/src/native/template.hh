@@ -78,7 +78,7 @@ static Fun_signature get_signature();
 static bool close_fun(Cause cause, const NativeFunction * caller);
 static Token eval_fill_B(Value_P B, const NativeFunction * caller);
 static Token eval_fill_AB(Value_P A, Value_P B, const NativeFunction * caller);
-static Token eval_ident_Bx(Value_P B, Axis x, const NativeFunction * caller);
+static Token eval_ident_Bx(Value_P B, sAxis x, const NativeFunction * caller);
 
 #if defined TEMPLATE_F0
 
@@ -364,7 +364,7 @@ Value_P Z(ucs, LOC);
 }
 //-----------------------------------------------------------------------------
 Token
-eval_ident_Bx(Value_P B, Axis x, const NativeFunction * caller)
+eval_ident_Bx(Value_P B, sAxis x, const NativeFunction * caller)
 {
 UCS_string ucs("eval_ident_Bx() called");
 Value_P Z(ucs, LOC);

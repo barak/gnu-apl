@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@
 class Workspace;
 struct dirent;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /*!
     Some command related functions, including the main input loop
     of the APL interpreter.
@@ -68,6 +68,9 @@ public:
    /// clean-up and exit from APL interpreter
    static void cmd_OFF(int exit_val);
 
+   /// clean-up and exit from APL interpreter
+   static void cmd_PUSHFILE();
+
    /// return the current boxing format
    static int get_boxing_format()
       { return boxing_format; }
@@ -90,7 +93,7 @@ public:
    /// a helper for finding sub-values with two parents
    struct val_val
       {
-        /// the parent (0 unless child is a sub-value
+        /// the parent (0 unless \b this is a sub-value
         const Value * parent;
 
         /// the value (always valid)
@@ -98,7 +101,7 @@ public:
 
         /// compare function for Heapsort::sort()
         static bool compare_val_val(const val_val & A, const val_val & B,
-                                     const void *);
+                                    const void * /* not used */);
 
         /// compare function for bsearch()
         static int compare_val_val1(const void * key, const void * B);
@@ -106,6 +109,9 @@ public:
 
    /// return true if entry is a directory
    static bool is_directory(dirent * entry, const UTF8_string & path);
+
+   /// clear the copy_once_table.
+   static void clear_copy_once_table();
 
    /// format for ]BOXING
    static int boxing_format;
@@ -221,7 +227,8 @@ protected:
                             const char * args);
 
    /// resolve an optional lib followed by a WS name
-   static bool resolve_lib_wsname(ostream & out, const UCS_string_vector & args,
+   static bool resolve_lib_wsname(ostream & out,
+                                  const UCS_string_vector & args,
                                   LibRef &lib, UCS_string & wsname);
 
    /// a helper struct for the )IN command
@@ -288,10 +295,10 @@ protected:
    /// workspaces that shall not be copied twice
    static UCS_string_vector copy_once_table;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 inline void Hswap(Command::val_val & vp1, Command::val_val & vp2)
 {
 const Command::val_val tmp = vp1;   vp1 = vp2;   vp2 = tmp;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 #endif // __COMMAND_HH_DEFINED__

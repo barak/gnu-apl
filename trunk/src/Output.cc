@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -62,7 +62,8 @@ ostream UERR(&UERR_filebuf);
 extern ostream & get_CERR();
 ostream & get_CERR()
 {
-   return ErrOut::used ? CERR : cerr;
+   if (uprefs.output_to_cout)       return ErrOut::used ? CERR : cout;
+   else                             return ErrOut::used ? CERR : cerr;
 };
 
 Output::ColorMode Output::color_mode = COLM_UNDEF;
@@ -112,7 +113,7 @@ char Output::ESC_CursorHome_1 [MAX_ESC_LEN] = CSI "1;" "\0" "H";   ///< Key Home
 char Output::ESC_InsertMode_1 [MAX_ESC_LEN] = CSI "2;" "\0" "~";   ///< Key Ins
 char Output::ESC_Delete_1     [MAX_ESC_LEN] = CSI "3;" "\0" "~";   ///< Key Del
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 CinOut::overflow(int c)
 {
@@ -125,19 +126,20 @@ PERFORMANCE_END(fs_CERR_B, cerr_perf, 1)
 
    return 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 ErrOut::overflow(int c)
 {
 PERFORMANCE_START(cerr_perf)
 
    Output::set_color_mode(Output::COLM_ERROR);
-   cerr << char(c);
+   if (uprefs.output_to_cout)   cout << char(c);
+   else                         cerr << char(c);
 PERFORMANCE_END(fs_CERR_B, cerr_perf, 1)
 
    return 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Output::init(bool logit)
 {
@@ -157,13 +159,13 @@ Output::init(bool logit)
                 "configured in your preferences file(s))" << endl;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Output::reset_dout()
 {
    DOUT_filebuf.reset();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Output::reset_colors()
 {
@@ -172,7 +174,7 @@ Output::reset_colors()
    cout << color_RESET << clear_EOL;
    cerr << color_RESET << clear_EOL;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Output::set_color_mode(Output::ColorMode mode)
 {
@@ -197,7 +199,7 @@ Output::set_color_mode(Output::ColorMode mode)
         default: break;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void 
 Output::toggle_color(const UCS_string & arg)
 {
@@ -205,13 +207,13 @@ Output::toggle_color(const UCS_string & arg)
    else if (arg.starts_iwith("OFF"))   colors_enabled = false;
    else                                colors_enabled = !colors_enabled;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Output::color_enabled()
 {
    return Output::colors_enabled;
 }
-//=============================================================================
+//============================================================================
 void
 CIN_ostream::set_cursor(int y, int x)
 {
@@ -232,4 +234,4 @@ CIN_ostream::set_cursor(int y, int x)
         *this << CSI << (1 + y) << ";" << (1 + x) << 'H' << std::flush;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------

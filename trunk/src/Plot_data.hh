@@ -60,11 +60,17 @@ struct Pixel_XY
    Pixel_Y y;   ///< vertical pixels
 };
 //============================================================================
-/// data for one plot line
+/** data for one plot line, aka. data row. The [plot line consists of N
+    data points with coordinate vectors X, Y, and Z.
+ **/
 class Plot_data_row
 {
 public:
-   /// constructor
+   /** constructor. Always called from Quad_PLOT::setup_data() which allocates
+       it with std::new(void *, size_t). For efficiency, all data points in all
+       rows are put into the same double * and our ~Plot_data_row() destructor
+       is responsible for deleting it (when row 0 is destructed).
+    **/
    Plot_data_row(const double * pX, const double * pY, const double * pZ,
                  uint32_t idx, uint32_t len)
    : X(pX), Y(pY), Z(pZ), row_num(idx), N(len)

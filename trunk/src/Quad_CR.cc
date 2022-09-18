@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,20 +26,20 @@
 #include "Symbol.hh"
 #include "Workspace.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Quad_CR::_sub_fun Quad_CR::sub_functions[] =
 {
 #define crdef(N, name)   { N, #name },
 #include "Quad_CR.def"
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Quad_CR::fun_compare(const void * key, const void * sf)
 {
    return strcasecmp(reinterpret_cast<const char *>(key),
                      reinterpret_cast<const _sub_fun *>(sf)->key);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_CR::list_functions(ostream & out, bool mapping)
 {
@@ -115,31 +115,34 @@ Quad_CR::list_functions(ostream & out, bool mapping)
 "   Zn ← 35 ⎕CR Bl    string of lines Bl → nested vector of lines Zn\n"
 "   Zl ← 36 ⎕CR Bn    nested vector of lines Bn → string of lines Bl\n"
 "   Zl ← 37 ⎕CR Bn    ⎕CR B without removing indentation\n"
-"   Zl ← 38 ⎕CR Bi    empty structure with capacity Bi\n"
+"   Z  ← 38 ⎕CR Bi    empty structured variable with capacity Bi\n"
+"   Z  ← 39 ⎕CR Bi    structured variable capacity Bi\n"
+"   Zi ← 40 ⎕CR Bi    pack boolean Bi (experimental, don't use!)\n"
+"   Zi ← 41 ⎕CR Bi    unpack boolean Bi (experimental, don't use!)\n"
 "\n"
 "   if N ⎕CR has an inverse M ⎕CR then -N can be used instead of M\n";
       }
   return Token(TOK_APL_VALUE1, Str0(LOC));
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_CR::eval_B(Value_P B) const
 {
    if (B->element_count() == 0)   // ⎕CR '' : print help
       {
-        if (B->get_ravel(0).is_character_cell())
+        if (B->get_cfirst().is_character_cell())
            return list_functions(CERR, true);
-        if (B->get_ravel(0).is_integer_cell())
+        if (B->get_cfirst().is_integer_cell())
            return list_functions(CERR, false);
       }
 
-   return do_eval_B(B.getref(), true);
+   return do_eval_B(B.get(), true);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
-Quad_CR::do_eval_B(const Value & B, bool remove_extra_spaces)
+Quad_CR::do_eval_B(const Value * B, bool remove_extra_spaces)
 {
-UCS_string symbol_name(B);
+UCS_string symbol_name(*B);
 
    // remove trailing whitespaces in B
    //
@@ -203,49 +206,18 @@ Value_P Z(shape_Z, LOC);
       {
         const UCS_string & line = tlines[row];
         loop(col, line.size())
-            new (Z->next_ravel()) CharCell(line[col]);
+            Z->next_ravel_Char(line[col]);
 
         loop(col, max_len - line.size())
-            new (Z->next_ravel()) CharCell(UNI_SPACE);
+            Z->next_ravel_Char(UNI_SPACE);
       }
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
-Token
-Quad_CR::eval_AB(Value_P A, Value_P B) const
-{
-int function_number = -1;
-
-   if (A->get_rank() > 1)                    RANK_ERROR;
-   if (A->is_char_array())   // function name, e.g. "APL_expression"
-      {
-        UCS_string ucs_A(A.getref());
-        UTF8_string utf_A(ucs_A);
-        function_number = string_to_int(utf_A.c_str());
-        if (function_number == -1)
-           {
-             MORE_ERROR() << "Bad function name X in ⎕FIO[X]B (X is '"
-                          << ucs_A << "')";
-             DOMAIN_ERROR;
-           }
-      }
-   else
-      {
-        if (!A->is_scalar_or_len1_vector())       LENGTH_ERROR;
-        function_number = A->get_ravel(0).get_int_value();
-      }
-
-PrintContext pctx = Workspace::get_PrintContext(PST_NONE);
-
-Value_P Z = do_CR(function_number, B.get(), pctx);
-   Z->check_value(LOC);
-   return Token(TOK_APL_VALUE1, Z);
-}
-//-----------------------------------------------------------------------------
-ShapeItem
-Quad_CR::string_to_int(const UCS_string & name) const
+//----------------------------------------------------------------------------
+sAxis
+Quad_CR::subfun_to_axis(const UCS_string & name) const
 {
 UTF8_string name_utf(name);
 const char * function_name = name_utf.c_str();
@@ -260,7 +232,38 @@ const char * function_name = name_utf.c_str();
   return -1;    // not found
 
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+Token
+Quad_CR::eval_AB(Value_P A, Value_P B) const
+{
+int function_number = -1;
+
+   if (A->get_rank() > 1)                    RANK_ERROR;
+   if (A->is_char_array())   // function name, e.g. "APL_expression"
+      {
+        UCS_string ucs_A(*A);
+        UTF8_string utf_A(ucs_A);
+        function_number = subfun_to_axis(utf_A.c_str());
+        if (function_number == -1)
+           {
+             MORE_ERROR() << "Bad function name X in ⎕FIO[X]B (X is '"
+                          << ucs_A << "')";
+             DOMAIN_ERROR;
+           }
+      }
+   else
+      {
+        if (!A->is_scalar_or_len1_vector())       LENGTH_ERROR;
+        function_number = A->get_cfirst().get_int_value();
+      }
+
+PrintContext pctx = Workspace::get_PrintContext(PST_NONE);
+
+Value_P Z = do_CR(function_number, B.get(), pctx);
+   Z->check_value(LOC);
+   return Token(TOK_APL_VALUE1, Z);
+}
+//----------------------------------------------------------------------------
 Value_P
 Quad_CR::do_CR(APL_Integer a, const Value * B, PrintContext pctx)
 {
@@ -286,10 +289,12 @@ Quad_CR::do_CR(APL_Integer a, const Value * B, PrintContext pctx)
         case -36: a = 35;   break;
         case -38: a = 39;   break;
         case -39: a = 38;   break;
+        case -40: a = 41;   break;
+        case -41: a = 40;   break;
         default: MORE_ERROR() << "A ⎕CR B with invalid A < 0";
                  DOMAIN_ERROR;
       }
-  
+
 bool extra_frame = false;
    switch(a)
       {
@@ -304,59 +309,67 @@ bool extra_frame = false;
 
    switch(a)
       {
-        case  0: pctx.set_style(PR_APL);               break;
-        case  1: pctx.set_style(PR_APL_FUN);           break;
-        case  2: pctx.set_style(PR_BOXED_CHAR);        break;
-        case  3: pctx.set_style(PR_BOXED_GRAPHIC);     break;
-        case  4: pctx.set_style(PR_BOXED_GRAPHIC);     break;
-        case  5: return do_CR5_6("0123456789ABCDEF", *B);   // byte-vector → HEX
-        case  6: return do_CR5_6("0123456789abcdef", *B);   // byte-vector → hex
-        case  7: pctx.set_style(PR_BOXED_GRAPHIC1);    break;
-        case  8: pctx.set_style(PR_BOXED_GRAPHIC1);    break;
-        case  9: pctx.set_style(PR_BOXED_GRAPHIC2);    break;
-        case 10: return do_CR10(*B);
-        case 11: return do_CR11(*B);    // Value → CDR conversion
-        case 12: return do_CR12(*B);    // CDR → Value conversion
-        case 13: return do_CR13(*B);    // hex → byte-vector
-        case 14: return do_CR14(*B);    // Value → CDR → hex conversion
-        case 15: return do_CR15(*B);    // hex → CDR → Value conversion
-        case 16: return do_CR16(*B);    // byte vector → base64 (RFC 4648)
-        case 17: return do_CR17(*B);    // base64 → byte vector (RFC 4648)
-        case 18: return do_CR18(*B);    // UCS → UTF8 byte vector
-        case 19: return do_CR19(*B);    // UTF8 byte vector → UCS string
-        case 20: pctx.set_style(PR_NARS);              break;
-        case 21: pctx.set_style(PR_NARS1);             break;
-        case 22: pctx.set_style(PR_NARS2);             break;
-        case 23: pctx.set_style(PR_NARS);              break;
-        case 24: pctx.set_style(PR_NARS1);             break;
-        case 25: pctx.set_style(PR_NARS2);             break;
-        case 26: return do_CR26(*B);             // Cell types
-        case 27: return do_CR27_28(true,  *B);   // value as int
-        case 28: return do_CR27_28(false, *B);   // value2 as int
-        case 29: pctx.set_style(PR_BOXED_GRAPHIC3);    break;
-        case 30: return do_CR30(*B);             // conform B (for ⍤ macro)
-        case 31: return do_CR31_32(true, *B);    // ⎕INP helper
-        case 32: return do_CR31_32(false, *B);   // ⎕INP helper
-        case 33: return do_CR33(*B);             // TV to TLV byte vector
-        case 34: return do_CR34(*B);             // TLV byte vector to TV
-        case 35: return do_CR35(*B);             // lines to nested strings
-        case 36: return do_CR36(*B);             // nested strings to lines
-        case 37: return do_CR37(*B);             // ⎕CR B with extra spaces kept
-        case 38: return do_CR38(*B);             // plain →  structure
-        case 39: return do_CR39(*B);             // structure → plain
 
-        default: MORE_ERROR() << "A ⎕CR B with invalid A";
+/// a local shortcut for the various frame variants of ⎕CR
+#define FRAME(x)   pctx.set_style(x);   break;
+
+        case  0: FRAME(PR_APL)
+        case  1: FRAME(PR_APL_FUN)
+        case  2: FRAME(PR_BOXED_CHAR)
+        case  3: FRAME(PR_BOXED_GRAPHIC)
+        case  4: FRAME(PR_BOXED_GRAPHIC)
+        case  5:                               // byte-vector → HEX
+        case  6: return do_CR5_6(a, B);        // byte-vector → hex
+        case  7: FRAME(PR_BOXED_GRAPHIC1)
+        case  8: FRAME(PR_BOXED_GRAPHIC1)
+        case  9: FRAME(PR_BOXED_GRAPHIC2)
+        case 10: return do_CR10(B);
+        case 11: return do_CR11(B);            // Value → CDR conversion
+        case 12: return do_CR12(B);            // CDR → Value conversion
+        case 13: return do_CR13(B);            // hex → byte-vector
+        case 14: return do_CR14(B);            // Value → CDR → hex conversion
+        case 15: return do_CR15(B);            // hex → CDR → Value conversion
+        case 16: return do_CR16(B);            // byte vector → base64, RFC 4648
+        case 17: return do_CR17(B);            // base64 → byte vector, RFC 4648
+        case 18: return do_CR18(B);            // UCS → UTF8 byte vector
+        case 19: return do_CR19(B);            // UTF8 byte vector → UCS string
+        case 20: FRAME(PR_NARS)
+        case 21: FRAME(PR_NARS1)
+        case 22: FRAME(PR_NARS2)
+        case 23: FRAME(PR_NARS)
+        case 24: FRAME(PR_NARS1)
+        case 25: FRAME(PR_NARS2)
+        case 26: return do_CR26(B);            // Cell types
+        case 27:                               // value as int
+        case 28: return do_CR27_28(a, B);      // value2 as int
+        case 29: FRAME(PR_BOXED_GRAPHIC3)
+        case 30: return do_CR30(B);            // conform B (for ⍤ macro)
+        case 31:                               // ⎕INP helper
+        case 32: return do_CR31_32(a, B);      // ⎕INP helper
+        case 33: return do_CR33(B);            // TV to TLV byte vector
+        case 34: return do_CR34(B);            // TLV byte vector to TV
+        case 35: return do_CR35(B);            // lines to nested strings
+        case 36: return do_CR36(B);            // nested strings to lines
+        case 37: return do_CR37(B);            // ⎕CR B but extra spaces kept
+        case 38: return do_CR38(B);            // plain →  structure
+        case 39: return do_CR39(B);            // structure → plain
+        case 40: return do_CR40(B);            // boolean → packed
+        case 41: return do_CR41(B);            // packed → boolean
+
+        default: MORE_ERROR() << "A ⎕CR B with invalid A (=" << a << ")";
                  DOMAIN_ERROR;
+#undef FRAME
       }
 
    // common code for ⎕CR variants that only differ by print style...
    //
    if (extra_frame && !B->is_simple_scalar())
       {
-        Value_P B1(LOC);
-        new (&B1->get_ravel(0)) PointerCell(B->clone(LOC).get(), B1.getref());
-        B1->check_value(LOC);
-        PrintBuffer pb(*B1, pctx, 0);
+        Value_P Z(LOC);                          // a nested scalar
+        Value * Zsub = const_cast<Value *>(B);   // will die at } below
+        Z->next_ravel_Pointer(Zsub);             // Z ← ⊂ B
+        Z->check_value(LOC);
+        PrintBuffer pb(*Z, pctx, 0);
         return Value_P(pb, LOC);
       }
    else   // no frame
@@ -365,39 +378,40 @@ bool extra_frame = false;
          return Value_P(pb, LOC);
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
-Quad_CR::do_CR5_6(const char * alpha, const Value & B)
+Quad_CR::do_CR5_6(int A_5_6, const Value * B)
 {
-Shape shape_Z(B.get_shape());
+const char * alpha = (A_5_6 == 5) ? "0123456789ABCDEF" : "0123456789abcdef";
+Shape shape_Z(B->get_shape());
    if (shape_Z.get_rank() == 0)   // scalar B
       {
         shape_Z.add_shape_item(2);
       }
    else
       {
-        shape_Z.set_shape_item(B.get_rank() - 1, B.get_cols()*2);
+        shape_Z.set_shape_item(B->get_rank() - 1, B->get_cols()*2);
       }
 
 Value_P Z(shape_Z, LOC);
 
-const Cell * cB = &B.get_ravel(0);
-   loop(b, B.element_count())
+const Cell * cB = &B->get_cfirst();
+   loop(b, B->element_count())
        {
          const int val = cB++->get_byte_value() & 0x00FF;
          const int h = alpha[val >> 4];
          const int l = alpha[val & 0x0F];
-         new (Z->next_ravel())   CharCell(Unicode(h));
-         new (Z->next_ravel())   CharCell(Unicode(l));
+         Z->next_ravel_Char(Unicode(h));
+         Z->next_ravel_Char(Unicode(l));
        }
 
-   Z->set_default_Spc();
+   Z->set_proto_Spc();
    Z->check_value(LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
-Quad_CR::do_CR10(const Value & B)
+Quad_CR::do_CR10(const Value * B)
 {
    // cannot use PrintBuffer because the lines in ucs_vec
    // have different lengths
@@ -409,26 +423,26 @@ Value_P Z(ucs_vec.size(), LOC);
    loop(line, ucs_vec.size())
       {
          Value_P Z_line(ucs_vec[line], LOC);
-         new (Z->next_ravel())   PointerCell(Z_line.get(), Z.getref());
+         Z->next_ravel_Pointer(Z_line.get());
       }
 
-   Z->set_default_Spc();
+   Z->set_proto_Spc();
    Z->check_value(LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
-Quad_CR::do_CR10(UCS_string_vector & result, const Value & B)
+Quad_CR::do_CR10(UCS_string_vector & result, const Value * B)
 {
-const UCS_string symbol_name(B);
+const UCS_string symbol_name(*B);
 const Symbol * symbol = Workspace::lookup_existing_symbol(symbol_name);
    if (symbol == 0)   DOMAIN_ERROR;
 
-   switch(symbol->get_nc())
+   switch(symbol->get_NC())
       {
         case NC_VARIABLE:
              {
-               const Value & value = *symbol->get_apl_value().get();
+               const Value * value = symbol->get_apl_value().get();
                do_CR10_variable(result, symbol_name, value);
                return;
              }
@@ -491,12 +505,13 @@ const Symbol * symbol = Workspace::lookup_existing_symbol(symbol_name);
         default: DOMAIN_ERROR;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
-Quad_CR::do_CR10_variable(UCS_string_vector & result, const UCS_string & var_name,
-                     const Value & value)
+Quad_CR::do_CR10_variable(UCS_string_vector & result,
+                          const UCS_string & var_name,
+                          const Value * value)
 {
-   if (value.is_member())   // normal variable
+   if (value->is_member())   // normal variable
       {
         if (const char * error = do_CR10_structured(result, var_name, value))
            {
@@ -514,9 +529,9 @@ not_structured:
 Picker picker(var_name);
    do_CR10_value(result, value, picker, -99);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
-Quad_CR::do_CR10_value(UCS_string_vector & result, const Value & value, 
+Quad_CR::do_CR10_value(UCS_string_vector & result, const Value * value, 
                      Picker & picker, ShapeItem pidx)
 {
    /*
@@ -535,7 +550,7 @@ Quad_CR::do_CR10_value(UCS_string_vector & result, const Value & value,
       by recursive do_CR10_value() calls for the sub-values.
    */
 
-   picker.push(value.get_shape(), pidx);
+   picker.push(value->get_shape(), pidx);
 
 UCS_string left;
    picker.get(left);
@@ -546,28 +561,28 @@ UCS_string left;
    //
 UCS_string shape_rho;
    {
-     if (value.get_rank() == 1)   // true vector
+     if (value->get_rank() == 1)   // true vector
         {
-          if      (value.element_count() == 0)   shape_rho.append_UTF8("0⍴");
-          else if (value.element_count() == 1)   shape_rho.append_UTF8(",");
+          if      (value->element_count() == 0)   shape_rho.append_UTF8("0⍴");
+          else if (value->element_count() == 1)   shape_rho.append_UTF8(",");
         }
-     else if (value.get_rank() > 1)   // matrix or higher
+     else if (value->get_rank() > 1)   // matrix or higher
         {
-           shape_rho.append_shape(value.get_shape());
+           shape_rho.append_shape(value->get_shape());
            shape_rho.append_UTF8("⍴");
          }
    }
 
-   if (value.element_count() == 0)   // empty value
+   if (value->element_count() == 0)   // empty value
       {
         UCS_string reshape(2*(picker.get_level() - 1), UNI_SPACE);
-        Value_P proto = value.prototype(LOC);
+        Value_P proto = value->prototype(LOC);
 
         // emit one line for the prototype
         UCS_string proto_name;
         picker.get(proto_name);
         picker.pop();
-        do_CR10_value(result, *proto, picker, pidx);
+        do_CR10_value(result, proto.get(), picker, pidx);
         result.back().append_UTF8(" ⍝ proto 1");
 
         // and then another line to reshape the prototype
@@ -594,7 +609,7 @@ bool nested = false;
         V_mode mode = Vm_NONE;
         UCS_string rhs;
         ShapeItem count = 0;                // the number of items on this line
-        ShapeItem todo = value.nz_element_count();  // the number of items to do
+        ShapeItem todo = value->nz_element_count();  // the number of items to do
 
         loop(p, todo)
            {
@@ -607,7 +622,7 @@ bool nested = false;
              // compute next item
              //
              UCS_string item;
-             const Cell & cell = value.get_ravel(p);
+             const Cell & cell = value->get_cravel(p);
              if (cell.is_pointer_cell())   nested = true;
              const bool may_quote = use_quote(mode, value, p);
              const V_mode next_mode = do_CR10_item(item, cell, mode, may_quote);
@@ -651,29 +666,30 @@ UCS_string line(2*(picker.get_level() - 1), UNI_SPACE);
    //
    if (nested)
       {
-        loop(p, value.element_count())
+        loop(p, value->element_count())
            {
-             const Cell & cell = value.get_ravel(p);
+             const Cell & cell = value->get_cravel(p);
              if (!cell.is_pointer_cell())   continue;
 
-             const Value & sub_value = *cell.get_pointer_value().get();
+             const Value * sub_value = cell.get_pointer_value().get();
              do_CR10_value(result, sub_value, picker, p);
            }
       }
 
    picker.pop();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 const char *
-Quad_CR::do_CR10_structured(UCS_string_vector & result, const UCS_string & var_name,
-                            const Value & value)
+Quad_CR::do_CR10_structured(UCS_string_vector & result,
+                            const UCS_string & var_name,
+                            const Value * value)
 {
-   if (value.get_rank() != 2)   return "bad rank";
-   if (value.get_cols() != 2)   return "bad shape";
+   if (value->get_rank() != 2)   return "bad rank";
+   if (value->get_cols() != 2)   return "bad shape";
 
-   loop(r, value.get_rows())
+   loop(r, value->get_rows())
        {
-         const Cell & member_cell = value.get_ravel(2*r);
+         const Cell & member_cell = value->get_cravel(2*r);
          if (!member_cell.is_pointer_cell())   continue;
          const Value * member_name = member_cell.get_pointer_value().get();
          if (!member_name->is_char_string())   continue;
@@ -683,10 +699,10 @@ Quad_CR::do_CR10_structured(UCS_string_vector & result, const UCS_string & var_n
          path += UNI_FULLSTOP;
          path.append(member_ucs);
 
-         const Cell & data_cell = value.get_ravel(2*r + 1);
+         const Cell & data_cell = value->get_cravel(2*r + 1);
          if (data_cell.is_member_anchor())   // non-leaf
             {
-              const Value & sub_value = data_cell.get_pointer_value().getref();
+              const Value * sub_value = data_cell.get_pointer_value().get();
               do_CR10_structured(result, path, sub_value);
             }
          else                                // leaf
@@ -694,24 +710,25 @@ Quad_CR::do_CR10_structured(UCS_string_vector & result, const UCS_string & var_n
               Picker picker(path);
               if (data_cell.is_pointer_cell())   // nested data_cell
                  {
-                   const Value & sub_value = data_cell.get_pointer_value().getref();
+                   const Value * sub_value =
+                                 data_cell.get_pointer_value().get();
                    do_CR10_value(result, sub_value, picker, -99);
                  }
               else                               // simple data_cell
                  {
                    Value_P sub_value(LOC);
-                   sub_value->next_ravel()->init(data_cell, sub_value.getref(), LOC);
-                   do_CR10_value(result, sub_value.getref(), picker, -99);
+                   sub_value->next_ravel_Cell(data_cell);
+                   do_CR10_value(result, sub_value.get(), picker, -99);
                  }
             }
        }
 
    return 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Quad_CR::short_ravel(UCS_string_vector & result, bool & nested,
-                     const Value & value, const Picker & picker,
+                     const Value * value, const Picker & picker,
                      const UCS_string & left, const UCS_string & shape_rho)
 {
    // some quick checks beforehand to avoid wasting time attempting to
@@ -719,12 +736,12 @@ Quad_CR::short_ravel(UCS_string_vector & result, bool & nested,
    //
    enum { MAX_SHORT_RAVEL_LEN = 70 };
 
-const ShapeItem value_len = value.nz_element_count();
+const ShapeItem value_len = value->nz_element_count();
    if (value_len >= MAX_SHORT_RAVEL_LEN)   return true;  // too long
 int len = 0;
    loop(v, value_len)
       {
-        const Cell & cell = value.get_ravel(v);
+        const Cell & cell = value->get_cravel(v);
         if (cell.is_integer_cell())   len += 2;   // min. integer (+ separator)
         else if (cell.is_character_cell())   len += 1;
         else if (cell.is_pointer_cell())     len += 1;
@@ -748,7 +765,7 @@ V_mode mode = Vm_NONE;
          // compute next item
          //
           UCS_string item;
-          const Cell & cell = value.get_ravel(v);
+          const Cell & cell = value->get_cravel(v);
           if (cell.is_pointer_cell())   nested = true;
           const bool may_quote = use_quote(mode, value, v);
           const V_mode next_mode = do_CR10_item(item, cell, mode, may_quote);
@@ -767,10 +784,10 @@ V_mode mode = Vm_NONE;
    result.push_back(line);
    return false;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string
 Quad_CR::compute_prolog(int pick_level, const UCS_string & left,
-                        const Value & value)
+                        const Value * value)
 {
    // compute the prolog
    //
@@ -782,23 +799,23 @@ const bool default_is_int = figure_default(value, default_char, default_int);
    prolog.append(left);
    prolog.append_UTF8("←");
    if (pick_level > 1)   prolog.append_UTF8("⊂");
-   prolog.append_shape(value.get_shape());
+   prolog.append_shape(value->get_shape());
    if (default_is_int)   prolog.append_UTF8("⍴0 ⍝ prolog ≡");
    else                  prolog.append_UTF8("⍴' ' ⍝ prolog ≡");
    prolog.append_number(pick_level);
 
    return prolog;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
-Quad_CR::figure_default(const Value & value, Unicode & default_char,
+Quad_CR::figure_default(const Value * value, Unicode & default_char,
                         APL_Integer & default_int)
 {
 ShapeItem zeroes = 0;
 ShapeItem blanks = 0;
-   loop(v, value.nz_element_count())
+   loop(v, value->nz_element_count())
       {
-        const Cell & cell = value.get_ravel(0);
+        const Cell & cell = value->get_cfirst();
         if (cell.is_integer_cell())
            {
              if (cell.get_int_value() == 0)   ++zeroes;
@@ -811,7 +828,7 @@ ShapeItem blanks = 0;
 
    return zeroes >= blanks;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_CR::Picker::get(UCS_string & result)
 {
@@ -847,7 +864,7 @@ const int level = shapes.size();
    result.append(var_name);
    result.append_UTF8(")");
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_CR::Picker::get_indexed(UCS_string & result, ShapeItem pos, ShapeItem len)
 {
@@ -874,7 +891,7 @@ const bool need_comma = shapes.back().get_rank() != 1;
    result.append_number(len);
    result.append_UTF8("]");
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Quad_CR::V_mode
 Quad_CR::do_CR10_item(UCS_string & item, const Cell & cell, V_mode mode,
                       bool may_quote)
@@ -940,9 +957,9 @@ Quad_CR::do_CR10_item(UCS_string & item, const Cell & cell, V_mode mode,
    DOMAIN_ERROR;
    return mode;   // not reached
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
-Quad_CR::do_CR11(const Value & B)
+Quad_CR::do_CR11(const Value * B)
 {
 CDR_string cdr;
    CDR::to_CDR(cdr, B);
@@ -950,51 +967,53 @@ CDR_string cdr;
 const ShapeItem len = cdr.size();
 Value_P Z(len, LOC);
    loop(l, len)
-       new (Z->next_ravel()) CharCell(Unicode(0xFF & cdr[l]));
+       Z->next_ravel_Char(Unicode(0xFF & cdr[l]));
 
-   Z->set_default_Spc();
+   Z->set_proto_Spc();
    Z->check_value(LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
-Quad_CR::do_CR12(const Value & B)
+Quad_CR::do_CR12(const Value * B)
 {
-   if (B.get_rank() > 1)   RANK_ERROR;
+   if (B->get_rank() > 1)   RANK_ERROR;
 
 CDR_string cdr;
-   loop(b, B.element_count())   cdr.push_back(B.get_ravel(b).get_byte_value());
+   loop(b, B->element_count())
+       cdr.push_back(B->get_cravel(b).get_byte_value());
+
 Value_P Z = CDR::from_CDR(cdr, LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
-Quad_CR::do_CR13(const Value & B)
+Quad_CR::do_CR13(const Value * B)
 {
    // hex → Value conversion. 2 characters per byte in B, therefore
    // last axis of B must have even length.
    //
-   if (B.get_cols() & 1)   LENGTH_ERROR;
+   if (B->get_cols() & 1)   LENGTH_ERROR;
 
-Shape shape_Z(B.get_shape());
-   shape_Z.set_shape_item(B.get_rank() - 1, (B.get_cols() + 1)/ 2);
+Shape shape_Z(B->get_shape());
+   shape_Z.set_shape_item(B->get_rank() - 1, (B->get_cols() + 1)/ 2);
 
 Value_P Z(shape_Z, LOC);
-const Cell * cB = &B.get_ravel(0);
+const Cell * cB = &B->get_cfirst();
    loop(z, Z->element_count())
        {
          const int n1 = nibble(cB++->get_char_value());
          const int n2 = nibble(cB++->get_char_value());
          if (n1 < 0 || n2 < 0)   DOMAIN_ERROR;
-         new (Z->next_ravel()) CharCell(Unicode(16*n1 + n2));
+         Z->next_ravel_Char(Unicode(16*n1 + n2));
        }
 
    Z->check_value(LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
-Quad_CR::do_CR14(const Value & B)
+Quad_CR::do_CR14(const Value * B)
 {
 const char * hex = "0123456789abcdef";
 CDR_string cdr;
@@ -1006,22 +1025,22 @@ Value_P Z(2*len, LOC);
        {
          const Unicode uh = Unicode(hex[0x0F & cdr[l] >> 4]);
          const Unicode ul = Unicode(hex[0x0F & cdr[l]]);
-         new (Z->next_ravel()) CharCell(uh);
-         new (Z->next_ravel()) CharCell(ul);
+         Z->next_ravel_Char(uh);
+         Z->next_ravel_Char(ul);
        }
-   Z->set_default_Spc();
+   Z->set_proto_Spc();
    Z->check_value(LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
-Quad_CR::do_CR15(const Value & B)
+Quad_CR::do_CR15(const Value * B)
 {
-   if (B.get_rank() > 1)   RANK_ERROR;
+   if (B->get_rank() > 1)   RANK_ERROR;
 
 CDR_string cdr;
-const ShapeItem len = B.element_count()/2;
-const Cell * cB = &B.get_ravel(0);
+const ShapeItem len = B->element_count()/2;
+const Cell * cB = &B->get_cfirst();
    loop(b, len)
        {
          const int n1 = nibble(cB++->get_char_value());
@@ -1033,21 +1052,21 @@ const Cell * cB = &B.get_ravel(0);
    Value_P Z = CDR::from_CDR(cdr, LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
-Quad_CR::do_CR16(const Value & B)
+Quad_CR::do_CR16(const Value * B)
 {
-   if (B.get_rank() > 1)   RANK_ERROR;
+   if (B->get_rank() > 1)   RANK_ERROR;
 
-const ShapeItem full_quantums = B.element_count() / 3;
-const ShapeItem len_Z = 4 * ((B.element_count() + 2) / 3);
+const ShapeItem full_quantums = B->element_count() / 3;
+const ShapeItem len_Z = 4 * ((B->element_count() + 2) / 3);
 Value_P Z(len_Z, LOC);
 
 const char *alpha = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                     "abcdefghijklmnopqrstuvwxyz"
                     "0123456789+/";
 
-const Cell * cB = &B.get_ravel(0);
+const Cell * cB = &B->get_cfirst();
    loop(b, full_quantums)   // encode full quantums
       {
         /*      -- b1 -- -- b2 -- -- b3 --
@@ -1062,15 +1081,15 @@ const Cell * cB = &B.get_ravel(0);
         const int z3 = (b2 & 0x0F) << 2 | (b3 & 0xC0) >> 6;
         const int z4 =  b3 & 0x3F;
 
-        new (Z->next_ravel()) CharCell(Unicode(alpha[z1]));
-        new (Z->next_ravel()) CharCell(Unicode(alpha[z2]));
-        new (Z->next_ravel()) CharCell(Unicode(alpha[z3]));
-        new (Z->next_ravel()) CharCell(Unicode(alpha[z4]));
+        Z->next_ravel_Char(Unicode(alpha[z1]));
+        Z->next_ravel_Char(Unicode(alpha[z2]));
+        Z->next_ravel_Char(Unicode(alpha[z3]));
+        Z->next_ravel_Char(Unicode(alpha[z4]));
       }
 
    // process final bytes
    //
-   switch(B.element_count() - 3*full_quantums)
+   switch(B->element_count() - 3*full_quantums)
       {
         case 0: break;   // length of B is 3 * N
 
@@ -1082,10 +1101,10 @@ const Cell * cB = &B.get_ravel(0);
                   const int z1 = b1 >> 2;
                   const int z2 = (b1 & 0x03) << 4 | (b2 & 0xF0) >> 4;
 
-                  new(Z->next_ravel())CharCell(Unicode(alpha[z1]));
-                  new(Z->next_ravel())CharCell(Unicode(alpha[z2]));
-                  new (Z->next_ravel()) CharCell(Unicode('='));
-                  new (Z->next_ravel()) CharCell(Unicode('='));
+                  Z->next_ravel_Char(Unicode(alpha[z1]));
+                  Z->next_ravel_Char(Unicode(alpha[z2]));
+                  Z->next_ravel_Char(Unicode('='));
+                  Z->next_ravel_Char(Unicode('='));
                 }
                 break;
 
@@ -1099,39 +1118,39 @@ const Cell * cB = &B.get_ravel(0);
                   const int z2 = (b1 & 0x03) << 4 | (b2 & 0xF0) >> 4;
                   const int z3 = (b2 & 0x0F) << 2 | (b3 & 0xC0) >> 6;
 
-                  new(Z->next_ravel())CharCell(Unicode(alpha[z1]));
-                  new(Z->next_ravel())CharCell(Unicode(alpha[z2]));
-                  new(Z->next_ravel())CharCell(Unicode(alpha[z3]));
-                  new(Z->next_ravel())CharCell(Unicode('='));
+                  Z->next_ravel_Char(Unicode(alpha[z1]));
+                  Z->next_ravel_Char(Unicode(alpha[z2]));
+                  Z->next_ravel_Char(Unicode(alpha[z3]));
+                  Z->next_ravel_Char(Unicode('='));
                 }
                 break;
       }
 
-   Z->set_default_Spc();
+   Z->set_proto_Spc();
    Z->check_value(LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
-Quad_CR::do_CR17(const Value & B)
+Quad_CR::do_CR17(const Value * B)
 {
-   if (B.get_rank() != 1)   RANK_ERROR;
+   if (B->get_rank() != 1)   RANK_ERROR;
 
-const int cols = B.get_cols();
+const int cols = B->get_cols();
    if (cols == 0)   return Str0(LOC);  // empty value
    if (cols & 3)    LENGTH_ERROR;      // length not 4*n
 
    // figure number of missing chars in final quantum
    //
 int missing = 0;
-   if      (B.get_ravel(cols - 2).get_char_value() == '=')   missing = 2;
-   else if (B.get_ravel(cols - 1).get_char_value() == '=')   missing = 1;
+   if      (B->get_cravel(cols - 2).get_char_value() == '=')   missing = 2;
+   else if (B->get_cravel(cols - 1).get_char_value() == '=')   missing = 1;
 
-const ShapeItem len_Z = 3 * (B.element_count() / 4) - missing;
-const ShapeItem quantums = B.element_count() / 4;
+const ShapeItem len_Z = 3 * (B->element_count() / 4) - missing;
+const ShapeItem quantums = B->element_count() / 4;
 
 Value_P Z(len_Z, LOC);
-const Cell * cB = &B.get_ravel(0);
+const Cell * cB = &B->get_cfirst();
    loop(q, quantums)
        {
          const int b1 = sixbit(cB++->get_char_value());
@@ -1153,96 +1172,93 @@ const Cell * cB = &B.get_ravel(0);
 
          if (q < (quantums - 1) || missing == 0)
             {
-              new (Z->next_ravel())   CharCell(Unicode(z1));
-              new (Z->next_ravel())   CharCell(Unicode(z2));
-              new (Z->next_ravel())   CharCell(Unicode(z3));
+              Z->next_ravel_Char(Unicode(z1));
+              Z->next_ravel_Char(Unicode(z2));
+              Z->next_ravel_Char(Unicode(z3));
             }
          else if (missing == 1)   // k6 k2l4 l20000 =
             {
-              new (Z->next_ravel())   CharCell(Unicode(z1));
-              new (Z->next_ravel())   CharCell(Unicode(z2));
+              Z->next_ravel_Char(Unicode(z1));
+              Z->next_ravel_Char(Unicode(z2));
             }
          else                     // k6 k20000 = =
             {
-              new (Z->next_ravel())   CharCell(Unicode(z1));
+              Z->next_ravel_Char(Unicode(z1));
             }
        }
 
-   Z->set_default_Spc();
+   Z->set_proto_Spc();
    Z->check_value(LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
-Quad_CR::do_CR18(const Value & B)
+Quad_CR::do_CR18(const Value * B)
 {
-UCS_string ucs(B);
+UCS_string ucs(*B);
 UTF8_string utf(ucs);
 Value_P Z(utf, LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
-Quad_CR::do_CR19(const Value & B)
+Quad_CR::do_CR19(const Value * B)
 {
-UTF8_string utf(B);
-   for (size_t l = 0; l < utf.size();)
-       {
-         int len = 0;
-         const Unicode uni = UTF8_string::toUni(&utf[l], len, false);
-         if (uni == Invalid_Unicode)   DOMAIN_ERROR;
+   if (B->get_rank() > 1)   RANK_ERROR;
+const ShapeItem len_B = B->element_count();
 
-         l += len;
-       }
+UTF8 bytes_utf[len_B + 10];
+   loop(b, len_B)   bytes_utf[b] = B->get_cravel(b).get_byte_value();
+   bytes_utf[len_B] = 0;
 
-UCS_string ucs(utf);
+const UTF8_string utf(bytes_utf, len_B);
+const UCS_string ucs(utf);
 Value_P Z(ucs, LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
-Quad_CR::do_CR26(const Value & B)
+Quad_CR::do_CR26(const Value * B)
 {
-const ShapeItem len = B.element_count();
+const ShapeItem len = B->element_count();
 Value_P Z(len, LOC);
    loop(l, len)
       {
-        const Cell & cB = B.get_ravel(l);
+        const Cell & cB = B->get_cravel(l);
         if (cB.is_pointer_cell())
            {
              Value_P B_sub = cB.get_pointer_value();
-             Value_P Z_sub = do_CR26(B_sub.getref());
-             new (Z->next_ravel()) PointerCell(Z_sub.get(), Z.getref());
+             Value_P Z_sub = do_CR26(B_sub.get());
+             Z->next_ravel_Pointer(Z_sub.get());
            }
         else
            {
-             new (Z->next_ravel())   IntCell(cB.get_cell_type());
+             Z->next_ravel_Int(cB.get_cell_type());
            }
       }
 
    Z->check_value(LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
-Quad_CR::do_CR27_28(bool primary, const Value & B)
+Quad_CR::do_CR27_28(int A_27_28, const Value * B)
 {
-const ShapeItem len = B.element_count();
+const ShapeItem len = B->element_count();
 Value_P Z(len, LOC);
    loop(l, len)
        {
-         const Cell & cB = B.get_ravel(l);
-         Cell * cZ = Z->next_ravel();
+         const Cell & cB = B->get_cravel(l);
          if (cB.is_pointer_cell())
             {
               Value_P B_sub = cB.get_pointer_value();
-              Value_P Z_sub = do_CR27_28(primary, B_sub.getref());
-              new (cZ) PointerCell(Z_sub.get(), Z.getref());
+              Value_P Z_sub = do_CR27_28(A_27_28, B_sub.get());
+              Z->next_ravel_Pointer(Z_sub.get());
             }
          else
             {
               APL_Integer data = 0;
-              if (primary)   // primary value
+              if (A_27_28 == 27)   // 27 ⎕CR B: primary value
                  {
                    if (cB.get_cell_type() == CT_CHAR)
                       data = cB.get_char_value();
@@ -1251,100 +1267,107 @@ Value_P Z(len, LOC);
                    else
                       memcpy(&data, cB.get_u0(), sizeof(data));
                  }
-              else   // additional value
+              else               // 28 ⎕CR B: additional value
                  {
                    if (cB.get_cell_type() == CT_COMPLEX)
-                      memcpy(&data, cB.get_u1(), sizeof(data));
+                      {
+                        memcpy(&data, cB.get_u1(), sizeof(data));
+                      }
                    else if (cB.get_cell_type() == CT_CELLREF)
-                      data = APL_Integer(cB.cLvalCell().get_cell_owner());
+                      {
+                        const LvalCell & cB_lval =
+                                       reinterpret_cast<const LvalCell &>(cB);
+                        data = APL_Integer(cB_lval.get_cell_owner());
+                      }
 #ifdef RATIONAL_NUMBERS_WANTED
                    else if (cB.get_cell_type() == CT_FLOAT)
-                      memcpy(&data, cB.get_u1(), sizeof(data));
+                      {
+                        memcpy(&data, cB.get_u1(), sizeof(data));
+                      }
                    else if (cB.get_cell_type() == CT_INT)
-                      data = 1;
+                      {
+                        data = 1;
+                      }
 #endif
                  }
 
-              new (cZ)   IntCell(data);
+              Z->next_ravel_Int(data);
             }
        }
 
    Z->check_value(LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
-Quad_CR::do_CR30(const Value & B)
+Quad_CR::do_CR30(const Value * B)
 {
-   // Z is B with all items conformed to the same rank and shape
+   // Z is B with all items conformed to the same rank and shape. Primarily
+   // an internal function used in macros Z__LO_RANK_X5_B and Z__A_LO_RANK_X7_B
+   // but possibly useful elsewhere.
+
+const ShapeItem len_B = B->element_count();
+   if (len_B == 0)   return CLONE(B, LOC);
+
+   // we use 'ShapeItem max_shape[MAX_RANK] max_shape' instead of
+   // 'Shape max_shape' to avoid multiple recompute_volume() in class Shape
+   // while looping along the B ravel.
    //
-const ShapeItem len = B.element_count();
-   if (len == 0)   return B.clone(LOC);
-/*
-   if (len == 1)
-      {
-        return B.clone(LOC);
-        if (!B.get_ravel(0).is_pointer_cell())   return B.clone(LOC);
-        return B.get_ravel(0).get_pointer_value()->clone(LOC);
-      }
-*/
-
-ShapeItem max_shape[MAX_RANK];   // in reverse order
+ShapeItem max_shape[MAX_RANK];
    loop(r, MAX_RANK)   max_shape[r] = 0;
-Rank max_rank = 0;
+sRank max_rank = 0;
 
-   loop(b, len)
+   loop(b, len_B)
       {
-        const Cell & cB = B.get_ravel(b);
+        const Cell & cB = B->get_cravel(b);
         if (cB.is_lval_cell())   DOMAIN_ERROR;
         if (!cB.is_pointer_cell())   continue;   // simple scalar
 
         const Shape sh = cB.get_pointer_value()->get_shape();
-        const Rank rk = sh.get_rank();
+        const sRank rk = sh.get_rank();
         if (max_rank < rk)   max_rank = rk;
         loop(s, rk)
            {
-             const ShapeItem sh_s = sh.get_shape_item(rk - s - 1);
+             const ShapeItem sh_s = sh.get_shape_item(s);
              if (max_shape[s] < sh_s) max_shape[s] = sh_s;
            }
       }
 
 Shape conformed;
-   loop(r, max_rank)   conformed.add_shape_item(max_shape[max_rank - r - 1]);
+   loop(r, max_rank)   conformed.add_shape_item(max_shape[r]);
 const ShapeItem conformed_len = conformed.get_volume();
 
-Shape shape_Z(B.get_shape() + conformed);
+Shape shape_Z(B->get_shape() + conformed);
 Value_P Z(shape_Z, LOC);
 
-   loop(b, len)
+   loop(b, len_B)
       {
-        const Cell & cB = B.get_ravel(b);
+        const Cell & cB = B->get_cravel(b);
         if (cB.is_pointer_cell())
            {
-             Value_P B_sub = cB.get_pointer_value()->clone(LOC);
+             Value_P B_sub = CLONE_P(cB.get_pointer_value(), LOC);
              Shape sh_sub = B_sub->get_shape();
              sh_sub.expand_rank(conformed.get_rank());
              B_sub->set_shape(sh_sub);
 
-             Value_P ZZ = Bif_F12_TAKE::do_take(conformed, B_sub);
-             loop(zz, conformed_len)
-                 Z->next_ravel()->init(ZZ->get_ravel(zz), Z.getref(), LOC);
+             Value_P ZZ = Bif_F12_TAKE::do_take(conformed, *B_sub, false);
+             loop(zz, conformed_len)   Z->next_ravel_Cell(ZZ->get_cravel(zz));
            }
         else   // simple scalar
            {
-             Z->next_ravel()->init(cB, Z.getref(), LOC);
-             loop(zz, (conformed_len - 1))   new (Z->next_ravel()) IntCell(0);
+             Z->next_ravel_Cell(cB);
+             loop(zz, (conformed_len - 1))   Z->next_ravel_0();
            }
       }
 
    Z->check_value(LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
-Quad_CR::do_CR31_32(bool align_bottom, const Value & B)
+Quad_CR::do_CR31_32(int A_31_32, const Value * B)
 {
-const ShapeItem len = B.element_count();
+const ShapeItem len = B->element_count();
    if (len == 0)   LENGTH_ERROR;
 
 Value_P Z(len, LOC);
@@ -1354,50 +1377,50 @@ PrintContext pctx = Workspace::get_PrintContext(PR_APL);
 
    loop(b, len)
       {
-        Value_P row = B.get_ravel(b).get_pointer_value();
+        Value_P row = B->get_cravel(b).get_pointer_value();
 
         if (row->element_count() == 1)   // single item
            {
-             Value_P Zrow = row->get_ravel(0).get_pointer_value()->clone(LOC);
-             new (Z->next_ravel())   PointerCell(Zrow.get(), Z.getref());
+             Value_P Zrow = CLONE_P(row->get_cfirst().get_pointer_value(), LOC);
+             Z->next_ravel_Pointer(Zrow.get());
              continue;
            }
 
         PrintBuffer pb;
         loop(col, row->element_count())
             {
-              Value_P item = row->get_ravel(col).get_pointer_value();
+              Value_P item = row->get_cravel(col).get_pointer_value();
               PrintBuffer pb_item(*item, pctx, 0);
-              pb.pad_height(UNI_SPACE, pb_item.get_height());
-              if (align_bottom)
-                 pb_item.pad_height_above(UNI_SPACE, pb.get_height());
+              pb.pad_height(UNI_SPACE, pb_item.get_row_count());
+              if (A_31_32 == 31)   // align bottoms
+                 pb_item.pad_height_above(UNI_SPACE, pb.get_row_count());
               else
-                 pb_item.pad_height(UNI_SPACE, pb.get_height());
+                 pb_item.pad_height(UNI_SPACE, pb.get_row_count());
               pb.add_column(UNI_SPACE, 0, pb_item);
             }
-        if (pb.get_height() == 1)
+        if (pb.get_row_count() == 1)
            {
              Value_P Zrow(pb.l1(), LOC);
-             new (Z->next_ravel())   PointerCell(Zrow.get(), Z.getref());
+             Z->next_ravel_Pointer(Zrow.get());
            }
         else
            {
              Value_P Zrow(pb, LOC);
-             new (Z->next_ravel())   PointerCell(Zrow.get(), Z.getref());
+             Z->next_ravel_Pointer(Zrow.get());
            }
       }
 
    Z->check_value(LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
-Quad_CR::use_quote(V_mode mode, const Value & value, ShapeItem pos)
+Quad_CR::use_quote(V_mode mode, const Value * value, ShapeItem pos)
 {
 int char_len = 0;
 int ascii_len = 0;
 
-   for (; pos < value.element_count(); ++pos)
+   for (; pos < value->element_count(); ++pos)
        {
          // if we are in '' mode then a single ASCII char
          // suffices to remain in that mode
@@ -1409,9 +1432,9 @@ int ascii_len = 0;
          //
          if (ascii_len >= 3)   return true;
 
-         if (!value.get_ravel(pos).is_character_cell())   break;
+         if (!value->get_cravel(pos).is_character_cell())   break;
          ++char_len;
-         const Unicode uni = value.get_ravel(pos).get_char_value();
+         const Unicode uni = value->get_cravel(pos).get_char_value();
          if (uni >= ' ' && uni <= 0x7E)   ++ascii_len;
          else                             break;
        }
@@ -1420,14 +1443,14 @@ int ascii_len = 0;
    //
    return (char_len == ascii_len);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_CR::close_mode(UCS_string & rhs, V_mode mode)
 {
    if      (mode == Vm_QUOT)   rhs.append_UTF8("'");
    else if (mode == Vm_UCS)    rhs.append_UTF8(")");
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_CR::item_separator(UCS_string & line, V_mode from_mode, V_mode to_mode)
 {
@@ -1445,49 +1468,48 @@ Quad_CR::item_separator(UCS_string & line, V_mode from_mode, V_mode to_mode)
         else if (to_mode == Vm_QUOT)   line.append_UTF8("'");
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
-Quad_CR::do_CR33(const Value & B)
+Quad_CR::do_CR33(const Value * B)
 {
    // convert B = Integer Tag, len bytes Data
    // to      Z = 4-byte Tag, 4-byte Len, len bytes Data
    //
-   if (B.get_rank() > 1)   RANK_ERROR;
-const ShapeItem len_B = B.element_count();
+   if (B->get_rank() > 1)   RANK_ERROR;
+const ShapeItem len_B = B->element_count();
    if (len_B < 1)   LENGTH_ERROR;
 const ShapeItem len_B1 = len_B - 1;
-const Cell * cB = &B.get_ravel(0);
+const Cell * cB = &B->get_cfirst();
    if (!cB++->is_integer_cell())   DOMAIN_ERROR;
    loop (b,  len_B1)   cB++->get_byte_value();   // DOMAIN ERROR if not byte
 
 Value_P Z(len_B + 7, LOC);
-const APL_Integer tag = B.get_ravel(0).get_int_value();
-    new (Z->next_ravel()) CharCell(Unicode(tag >> 24 & 0xFF));
-    new (Z->next_ravel()) CharCell(Unicode(tag >> 16 & 0xFF));
-    new (Z->next_ravel()) CharCell(Unicode(tag >>  8 & 0xFF));
-    new (Z->next_ravel()) CharCell(Unicode(tag       & 0xFF));
-    new (Z->next_ravel()) CharCell(Unicode(len_B1 >> 24 & 0xFF));
-    new (Z->next_ravel()) CharCell(Unicode(len_B1 >> 16 & 0xFF));
-    new (Z->next_ravel()) CharCell(Unicode(len_B1 >>  8 & 0xFF));
-    new (Z->next_ravel()) CharCell(Unicode(len_B1       & 0xFF));
+const APL_Integer tag = B->get_cfirst().get_int_value();
+    Z->next_ravel_Char(Unicode(tag >> 24 & 0xFF));
+    Z->next_ravel_Char(Unicode(tag >> 16 & 0xFF));
+    Z->next_ravel_Char(Unicode(tag >>  8 & 0xFF));
+    Z->next_ravel_Char(Unicode(tag       & 0xFF));
+    Z->next_ravel_Char(Unicode(len_B1 >> 24 & 0xFF));
+    Z->next_ravel_Char(Unicode(len_B1 >> 16 & 0xFF));
+    Z->next_ravel_Char(Unicode(len_B1 >>  8 & 0xFF));
+    Z->next_ravel_Char(Unicode(len_B1       & 0xFF));
     loop(z, len_B1)
-       new (Z->next_ravel())
-           CharCell(Unicode(B.get_ravel(z + 1).get_byte_value()));
+        Z->next_ravel_Char(Unicode(B->get_cravel(z+1).get_byte_value()));
 
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
-Quad_CR::do_CR34(const Value & B)
+Quad_CR::do_CR34(const Value * B)
 {
    // convert B = 4-byte Tag, 4-byte Len, len bytes Data
    // to      Z = Integer Tag, len bytes Data
    //
    //
-   if (B.get_rank() != 1)   RANK_ERROR;
-const ShapeItem len_B = B.element_count();
+   if (B->get_rank() != 1)   RANK_ERROR;
+const ShapeItem len_B = B->element_count();
    if (len_B < 8)   LENGTH_ERROR;
-const Cell * cB = &B.get_ravel(0);
+const Cell * cB = &B->get_cfirst();
 
    // throwe DOMAIN ERROR if one of the vector items is not a byte
    loop(b, len_B)
@@ -1495,7 +1517,7 @@ const Cell * cB = &B.get_ravel(0);
          cB++->get_byte_value();
        }
 
-   cB = &B.get_ravel(0);
+   cB = &B->get_cfirst();
 
 int32_t tag = 0;
    loop(bb, 4)   tag = tag << 8 | cB++->get_byte_value();
@@ -1505,28 +1527,27 @@ uint32_t len = 0;
    if (len != (len_B - 8))   LENGTH_ERROR;
 
 Value_P Z(len_B - 7, LOC);
-   new (Z->next_ravel())   IntCell(tag);
-   loop(z, len_B - 8)
-      new (Z->next_ravel())  CharCell(Unicode(cB++->get_byte_value()));
+   Z->next_ravel_Int(tag);
+   loop(z, len_B - 8)   Z->next_ravel_Char(Unicode(cB++->get_byte_value()));
 
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
-Quad_CR::do_CR35(const Value & B)
+Quad_CR::do_CR35(const Value * B)
 {
    // B must be a true string (is_char_vector() == 1) that MAY contain
    // \n which then separates different lines. The \n are removed and
    // the result is a (nested) vector containing all lines.
 
-   if (B.get_rank() != 1)   RANK_ERROR;
+   if (B->get_rank() != 1)   RANK_ERROR;
 
-const ShapeItem len_B = B.element_count();
+const ShapeItem len_B = B->element_count();
    if (len_B == 0)
       {
-        Value_P Z1 = Str0(LOC);
+        Value_P Z1 = Str0(LOC);   // Z1←''
         Value_P Z(1, LOC);
-        new (&Z->get_ravel(0)) PointerCell(Z1.get(), Z.getref());
+        Z->next_ravel_Pointer(Z1.get());
         Z->check_value(LOC);
         return Z;
       }
@@ -1534,21 +1555,21 @@ const ShapeItem len_B = B.element_count();
 ShapeItem lf_count = 0;
    loop(b, len_B)
        {
-         if (B.get_ravel(b).get_char_value() == UNI_LF)   ++lf_count;
+         if (B->get_cravel(b).get_char_value() == UNI_LF)   ++lf_count;
        }
 
-   if (B.get_ravel(len_B - 1).get_char_value() != UNI_LF)   ++lf_count;
+   if (B->get_cravel(len_B - 1).get_char_value() != UNI_LF)   ++lf_count;
 
 Value_P Z(lf_count, LOC);
 UCS_string line;
 
    loop(b, len_B)
        {
-         const Unicode uni = B.get_ravel(b).get_char_value();
+         const Unicode uni = B->get_cravel(b).get_char_value();
          if (uni == UNI_LF)
             {
               Value_P Zb(line, LOC);
-              new (Z->next_ravel()) PointerCell(Zb.get(), Z.getref());
+              Z->next_ravel_Pointer(Zb.get());
               line.clear();
             }
          else
@@ -1560,23 +1581,23 @@ UCS_string line;
    if (line.size())   // incomplete last line
       {
         Value_P Zb(line, LOC);
-        new (Z->next_ravel()) PointerCell(Zb.get(), Z.getref());
+        Z->next_ravel_Pointer(Zb.get());
         line.clear();
       }
 
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
-Quad_CR::do_CR36(const Value & B)
+Quad_CR::do_CR36(const Value * B)
 {
-   if (B.get_rank() != 1)   RANK_ERROR;
+   if (B->get_rank() != 1)   RANK_ERROR;
 
-const ShapeItem len_B = B.element_count();
-ShapeItem len_Z = B.element_count();
+const ShapeItem len_B = B->element_count();
+ShapeItem len_Z = B->element_count();
    loop(b, len_B)
        {
-         const Value & Bb = *B.get_ravel(b).get_pointer_value().get();
+         const Value & Bb = *B->get_cravel(b).get_pointer_value().get();
          if (Bb.get_rank() > 1)   RANK_ERROR;
          len_Z += 1 + Bb.element_count();
        }
@@ -1585,7 +1606,7 @@ UCS_string UZ;
    UZ.reserve(len_Z);
    loop(b, len_B)
        {
-         const Value & Bb = *B.get_ravel(b).get_pointer_value().get();
+         const Value & Bb = *B->get_cravel(b).get_pointer_value().get();
          UCS_string Ub(Bb);
          UZ.append(Ub);
          UZ.append(UNI_LF);
@@ -1594,9 +1615,9 @@ UCS_string UZ;
 Value_P Z(UZ, LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
-Quad_CR::do_CR38(const Value & B)
+Quad_CR::do_CR38(const Value * B)
 {
    /*
       return a structured value with:
@@ -1605,9 +1626,9 @@ Quad_CR::do_CR38(const Value & B)
       ii. 2×N matrix B:       members B[;1] and values B[;2]
    */
 
-   if (B.is_scalar())   // return a structured value with B unused rows
+   if (B->is_scalar())   // return a structured value with B unused rows
       {
-        APL_Integer capacity = B.get_ravel(0).get_near_int();
+        APL_Integer capacity = B->get_cfirst().get_near_int();
         if (capacity < 0)   DOMAIN_ERROR;
         if (capacity < 8)   return EmptyStruct(LOC);
 
@@ -1621,8 +1642,8 @@ Quad_CR::do_CR38(const Value & B)
         Value_P Z(shape_Z, LOC);
         loop(c, capacity)
             {
-              new (Z->next_ravel())   IntCell(0);
-              new (Z->next_ravel())   IntCell(0);
+              Z->next_ravel_0();
+              Z->next_ravel_0();
             }
 
         Z->check_value(LOC);
@@ -1632,11 +1653,11 @@ Quad_CR::do_CR38(const Value & B)
 
    // array to structured value...
    //
-   if (B.get_rank() != 2)   RANK_ERROR;
-   if (B.get_cols() != 2)    LENGTH_ERROR;
+   if (B->get_rank() != 2)   RANK_ERROR;
+   if (B->get_cols() != 2)    LENGTH_ERROR;
 
-const ShapeItem rows_B = B.get_rows();
-ShapeItem valid_rows = B.get_member_count();
+const ShapeItem rows_B = B->get_rows();
+ShapeItem valid_rows = B->get_member_count();
 
 ShapeItem capacity;
    for (capacity = 8; capacity < valid_rows ;)   capacity += capacity;
@@ -1648,24 +1669,24 @@ Value_P Z(shape_Z, LOC);
    // fill with unused
    loop(c, capacity)
        {
-         new (Z->next_ravel())   IntCell(0);
-         new (Z->next_ravel())   IntCell(0);
+         Z->next_ravel_0();
+         Z->next_ravel_0();
        }
 
    loop(r, rows_B)
       {
-        const Cell & member_name = B.get_ravel(2*r);
+        const Cell & member_name = B->get_cravel(2*r);
         if (member_name.is_character_cell())             // valid row
            {
              UCS_string name(member_name.get_char_value());
              Cell * data = Z->get_new_member(name);
-             data->init(B.get_ravel(2*r + 1), Z.getref(), LOC);
+             data->init(B->get_cravel(2*r + 1), *Z, LOC);
            }
         else if (member_name.is_pointer_cell())               // valid row
            {
-             UCS_string name(member_name.get_pointer_value().getref());
+             UCS_string name(*member_name.get_pointer_value());
              Cell * data = Z->get_new_member(name);
-             data->init(B.get_ravel(2*r + 1), Z.getref(), LOC);
+             data->init(B->get_cravel(2*r + 1), *Z, LOC);
            }
       }
 
@@ -1673,50 +1694,114 @@ Value_P Z(shape_Z, LOC);
    Z->check_value(LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
-Quad_CR::do_CR39(const Value & B)
+Quad_CR::do_CR39(const Value * B)
 {
    // structured value to array
    //
-   if (B.get_rank()  != 2)   RANK_ERROR;
-   if (B.get_cols() != 2)   LENGTH_ERROR;
+   if (B->get_rank()  != 2)   RANK_ERROR;
+   if (B->get_cols() != 2)   LENGTH_ERROR;
 
-const ShapeItem rows_B = B.get_rows();
-const ShapeItem valid_rows = B.get_member_count();
+const ShapeItem rows_B = B->get_rows();
+const ShapeItem valid_rows = B->get_member_count();
 
 const Shape shape_Z(valid_rows, 2);
 Value_P Z(shape_Z, LOC);
 
    loop(r, rows_B)
        {
-         const Cell & name_cell = B.get_ravel(2*r);
+         const Cell & name_cell = B->get_cravel(2*r);
          if (name_cell.is_integer_cell())   continue;   // unused row
 
-         Z->next_ravel()->init(name_cell, Z.getref(), LOC);
+         Z->next_ravel_Cell(name_cell);
 
-         const Cell & data_cell = B.get_ravel(2*r + 1);
+         const Cell & data_cell = B->get_cravel(2*r + 1);
          if (data_cell.is_pointer_cell())   // non-leaf or nested leaf
             {
               Value_P B_sub = data_cell.get_pointer_value();
               if (B_sub->is_member())   // non-leaf
                  {
-                   Value_P B_struct = do_CR39(*B_sub);
-                   new (Z->next_ravel()) PointerCell(B_struct.get(), Z.getref());
+                   Value_P B_struct = do_CR39(B_sub.get());
+                   Z->next_ravel_Pointer(B_struct.get());
                  }
               else                      // leaf
                  {
-                   new (Z->next_ravel()) PointerCell(B_sub.get(), Z.getref());
+                   Z->next_ravel_Pointer(B_sub.get());
                  }
             }
          else                                               // leaf
             {
-              Z->next_ravel()->init(data_cell, Z.getref(), LOC);
+              Z->next_ravel_Cell(data_cell);
             }
        }
 
    Z->check_value(LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+Value_P
+Quad_CR::do_CR40(const Value * B)
+{
+   // return boolean B as packed boolean Z
+   //
+const ShapeItem B_len = B->element_count() ;
+   if (B_len <= Value::PACKED_MINIMUM_LENGHT)
+      {
+        MORE_ERROR() << "Only Boolean Arrays with more than "
+                     << Value::PACKED_MINIMUM_LENGHT << " items can be packed";
+        LENGTH_ERROR;
+      }
+
+   // round B_len up to the next multiple of 64
+   //
+const ShapeItem Z_len = (B_len + 63) >> 6;   // length in units of uint64_t
+uint64_t * bits = new uint64_t[Z_len];
+   if (bits == 0)   WS_FULL;
+
+   // set all bits to 0, then some to 1...
+   //
+   loop(z, Z_len)   bits[z] = 0;
+
+uint64_t chunk = 0;
+uint64_t bit  = 1;
+   loop(b, B_len)
+       {
+         const Cell & cell_B = B->get_cravel(b);
+         if (!cell_B.is_near_bool())   DOMAIN_ERROR;
+         if (const APL_Integer bi = cell_B.get_near_int())   chunk |= bit;
+         bit += bit;
+         if (bit == 0)   // uint64_t bit complete
+            {
+              bits[b >> 6] = chunk;
+              chunk = 0;
+              bit = 1;
+            }
+       }
+
+    if (chunk)   bits[Z_len - 1] = chunk;   // rest bits
+
+Value_P Z(B->get_shape(), bits, LOC);
+   return Z;
+}
+//----------------------------------------------------------------------------
+Value_P
+Quad_CR::do_CR41(const Value * B)
+{
+   if (!(B->get_flags() & VF_packed))
+      {
+        MORE_ERROR() << "B is not packed in 41 ⎕CR B";
+        DOMAIN_ERROR;
+      }
+
+Value_P Z(B->get_shape(), LOC);
+
+const ShapeItem B_len = B->element_count();
+const uint8_t * bits = reinterpret_cast<const uint8_t *>(&B->get_cfirst());
+
+   loop(b, B_len)   Z->next_ravel_Int((bits[b >> 3] & 1ULL << (b & 7)) ? 1 : 0);
+
+   return Idx0(LOC);
+}
+//----------------------------------------------------------------------------
 

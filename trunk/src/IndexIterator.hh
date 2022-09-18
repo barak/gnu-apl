@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,7 +21,7 @@
 #include "Shape.hh"
 #include "Value.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
    An iterator for one dimension of indices. When the iterator reached its
    end, it wraps around and increments its upper IndexIterator (if any).
@@ -49,7 +49,7 @@ public:
    bool more() const   { return count && pos < count; }
 
    /// return the current index
-   virtual ShapeItem get_value() const = 0;
+   virtual ShapeItem get_ivalue() const = 0;
 
    /// return the current index
    virtual ShapeItem get_pos(ShapeItem p) const = 0;
@@ -79,7 +79,7 @@ protected:
    /// The current value.
    ShapeItem pos;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// Iterator for an elided index (= ⍳(⍴B)[N] for some N)
 class ElidedIndexIterator : public IndexIterator
 {
@@ -90,13 +90,13 @@ public:
    {}
 
    /// get the current index.
-   virtual ShapeItem get_value() const { return pos * weight; }
+   virtual ShapeItem get_ivalue() const { return pos * weight; }
 
    /// get the index i.
    virtual ShapeItem get_pos(ShapeItem i) const
       { Assert(i < count);   return i; }
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// an IndexIterator for a true (i.e. non-elided) index array
 class TrueIndexIterator : public IndexIterator
 {
@@ -110,7 +110,7 @@ public:
       { delete [] indices; }
 
    /// return the current index
-   virtual ShapeItem get_value() const
+   virtual ShapeItem get_ivalue() const
       { Assert(pos < count);   return indices[pos]; }
 
    /// return the i'th index
@@ -121,7 +121,7 @@ protected:
    /// the indices
    ShapeItem * indices;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
     a multi-dimensional index iterator, consisting of several
    one-dimensional iterators.
@@ -153,5 +153,5 @@ protected:
    /// true if one of the iterators has length 0
    bool empty;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 

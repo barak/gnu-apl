@@ -1,8 +1,10 @@
 <map id="Value::get_col_spacing" name="Value::get_col_spacing">
 <area shape="rect" id="node2" href="$classValue.html#a9fc8bbaf9fefe6835dea7db0f71b8b6c" title="return the number of elements (the product of the shapes). " alt="" coords="228,5,376,32"/>
-<area shape="rect" id="node3" href="$classValue.html#ad93c531583abca50f61db8f9f9ef81ed" title="return the length of the last dimension of this value " alt="" coords="211,56,393,83"/>
-<area shape="rect" id="node4" href="$classCell.html#a3af019707c56a0fb40fce2d370af8307" title="Return the APL value of a cell (Asserts for non&#45;pointer cells) " alt="" coords="225,107,379,133"/>
-<area shape="rect" id="node5" href="$classValue.html#a89120a742c078918d1a5d84ec742e69c" title="return the idx&#39;th element of the ravel. " alt="" coords="244,157,360,184"/>
-<area shape="rect" id="node6" href="$classCell.html#ab3d14978f78ba264d40e9ed1a4823be2" title="Return true iff this cell is a character cell. " alt="" coords="227,208,377,235"/>
-<area shape="rect" id="node7" href="$classCell.html#ae98b3988a7fa52c6c157b4911b043dde" title="Return true iff this cell is a pointer (to a sub&#45;array) cell. " alt="" coords="234,259,370,285"/>
+<area shape="rect" id="node3" href="$classValue.html#a113fa41969aed3b011b477ea199c6157" title="return the (constant) idx&#39;th element of the ravel. " alt="" coords="241,56,363,83"/>
+<area shape="rect" id="node4" href="$classValue.html#ad93c531583abca50f61db8f9f9ef81ed" title="return the length of the last dimension of this value " alt="" coords="211,107,393,133"/>
+<area shape="rect" id="node5" href="$classCell.html#a367b9df7e0d4b805e5f31641658113f6" title="Return the APL value of a cell (Asserts for non&#45;pointer cells) " alt="" coords="225,157,379,184"/>
+<area shape="rect" id="node8" href="$classCell.html#ab3d14978f78ba264d40e9ed1a4823be2" title="Return true iff this cell is a character cell. " alt="" coords="227,208,377,235"/>
+<area shape="rect" id="node9" href="$classCell.html#ae98b3988a7fa52c6c157b4911b043dde" title="Return true iff this cell is a pointer (to a sub&#45;array) cell. " alt="" coords="234,259,370,285"/>
+<area shape="rect" id="node6" href="$classCell.html#a38a6a25f0ad091f35e3d9abfe5608a50" title="return the type of this cell " alt="" coords="461,132,591,159"/>
+<area shape="rect" id="node7" href="$classCell.html#a6c3fdef3d82f53649d1c3f16d37eedd7" title="the name of ct " alt="" coords="441,183,611,209"/>
 </map>

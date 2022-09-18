@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 
 class Token;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// An iterator for UCS_string
 class Unicode_source
 {
@@ -90,7 +90,7 @@ protected:
    /// the end position (excluding)
    int32_t end;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// The converter from APL input characters to APL tokens
 class Tokenizer
 {
@@ -99,46 +99,48 @@ public:
    Tokenizer(ParseMode pm, const char * _loc, bool mac)
    : pmode(pm),
      macro(mac),
-     loc(_loc),
-     rest_1(0),
-     rest_2(0)
+     loc(_loc)
    {}
 
    /// tokenize UTF-8 string \b input into token string \b tos.
-   ErrorCode tokenize(const UCS_string & input, Token_string & tos);
+   ErrorCode tokenize(const UCS_string & input, Token_string & tos) const;
 
    /// tokenize a primitive (1-character) function
    static Token tokenize_function(Unicode uni);
 
 protected:
    /// tokenize UCS string \b input into token string \b tos.
-   void do_tokenize(const UCS_string & input, Token_string & tos);
+   void do_tokenize(const UCS_string & input, Token_string & tos,
+                    size_t & rest_2) const;
 
    /// tokenize a function
-   void tokenize_function(Unicode_source & src, Token_string & tos);
+   void tokenize_function(Unicode_source & src, Token_string & tos) const;
 
    /// tokenize a Quad function or variable
-   void tokenize_quad(Unicode_source & src, Token_string & tos);
+   void tokenize_quad(Unicode_source & src, Token_string & tos) const;
 
    /// tokenize a single quoted string
-   void tokenize_string1(Unicode_source & src, Token_string & tos);
+   void tokenize_string1(Unicode_source & src, Token_string & tos,
+                         size_t & rest_2) const;
 
    /// tokenize a double quoted string
-   void tokenize_string2(Unicode_source & src, Token_string & tos);
+   void tokenize_string2(Unicode_source & src, Token_string & tos,
+                         size_t & rest_2) const;
 
    /// tokenize a number (integer, floating point, or complex).
-   void tokenize_number(Unicode_source & src, Token_string & tos);
+   void tokenize_number(Unicode_source & src, Token_string & tos,
+                        size_t & rest_2) const;
 
    /// tokenize a real number (integer or floating point).
    bool tokenize_real(Unicode_source &src, bool & need_float,
-                      APL_Float & flt_val, APL_Integer & int_val);
+                      APL_Float & flt_val, APL_Integer & int_val) const;
 
    /// a locale-independent sscanf()
    static int scan_real(const char * strg, APL_Float & result, 
                         int E_pos, int minus_pos);
 
    /// tokenize a symbol
-   void tokenize_symbol(Unicode_source & src, Token_string & tos);
+   void tokenize_symbol(Unicode_source & src, Token_string & tos) const;
 
    /// the parsing mode of this parser
    const ParseMode pmode;
@@ -148,12 +150,6 @@ protected:
 
    /// caller of this Tokenizer
    const char * loc;
-
-   /// the characters afer caret 1
-   int rest_1;
-
-   /// the characters afer caret 2
-   int rest_2;
 };
 
 #endif // __TOKENIZER_HH_DEFINED__

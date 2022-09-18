@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ class VH_entry
 {
 public:
    /// Constructor: empty (invalid) event
-   VH_entry() {}
+   VH_entry()   {}
 
    /// Constructor: event for \b val
    VH_entry(const Value * val, VH_event ev, int ia, const char * loc);
@@ -42,7 +42,7 @@ public:
    static void init();
 
    /// print the history of \b value
-   static void print_history(ostream & out, const Value * value,
+   static void print_history(ostream & out, const Value & value,
                              const char * loc);
 
    /// ring buffer of events
@@ -53,10 +53,11 @@ public:
 
 protected:
    /// print the event
-   void print(int & flags, ostream & out, const Value * val,
+   void print(int & flags, ostream & out, const Value & val,
                const VH_entry * previous) const;
 
-   /// the Value to which this event belongs
+   /// the Value (if any) to which this event belongs. APL errors thrown do
+   /// not have one.
    const Value * val;
 
    /// the event number

@@ -32,13 +32,12 @@ ENDCAT
    cat << ENDCAT
     </TABLE>
     <HR>
-
 ENDCAT
 
    cat $1.cont
 
    echo "  </BODY>"
    echo "</HTML>"
-
 } > apl-intro.html
 
+exit 0

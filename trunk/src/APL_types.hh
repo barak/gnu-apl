@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -42,14 +42,18 @@ using namespace std;
 // A. typedefs                                              //
 //////////////////////////////////////////////////////////////
 
-/// The rank of an APL value.
-typedef int32_t Rank;
-typedef Rank Axis;
+/// The (signed) rank of an APL value.
+typedef int16_t sRank;
+typedef sRank sAxis;
 
+/// The (unsigned) rank of an APL value.
 typedef uint32_t uRank;
 typedef uRank uAxis;
 
-/// The dimensions of an APL value.
+/// A bitmap for axes (in fun[X] arguments) normalized to ⎕IO←0.
+typedef uint16_t AxesBitmap;
+
+/// One dimension length (axis length) of an APL shape.
 typedef int64_t ShapeItem;
 
 /// The SI level, 0 = global (oldest), caller at level N called function at N+1
@@ -93,10 +97,10 @@ typedef APL_Float_Base APL_Float;
 
 #endif // APL_Float is class vs. POD
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// One APL complex value.
 typedef complex<APL_Float> APL_Complex;
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// APL time = microseconds since Jan. 1. 1970 00:00:00 UTC
 typedef int64_t APL_time_us;
 
@@ -165,7 +169,7 @@ enum ListCategory
                | LIST_OPERS,
   LIST_ALL     = 0xFFFFFFFF   ///< list everything
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// possible properties of a Value.
 enum ValueFlags
 {
@@ -174,11 +178,12 @@ enum ValueFlags
   VF_marked   = 0x0800,   ///< marked to detect stale
   VF_temp     = 0x1000,   ///< computed value
   VF_member   = 0x2000,   ///< used for member access
+  VF_packed   = 0x4000,   ///< packed homogenious ravel
 };
 
 extern ostream & print_flags(ostream & out, ValueFlags flags);
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// events for APL values
 enum VH_event
 {
@@ -206,7 +211,7 @@ enum VH_event
   VHE_Stale,       ///< stale value erased
   VHE_Visit,       ///< test point
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// The bits in an int
 enum Bitmask
 {
@@ -243,7 +248,7 @@ enum Bitmask
    BIT_30 = 1 << 30,   ///<< dito.
    BIT_31 = 1 << 31    ///<< dito.
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// the line number of an APL function line (0 being the line to
 /// return from the function).
 enum Function_Line
@@ -253,7 +258,7 @@ enum Function_Line
    Function_Line_1  =  1,
    Function_Line_10 = 10,
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ///  What is being parsed (function, immediate execution statements, or ⍎expr)
 enum ParseMode
 {
@@ -261,7 +266,7 @@ enum ParseMode
    PM_STATEMENT_LIST = 1,   ///< immediate execution
    PM_EXECUTE        = 2,   ///< execute (⍎)
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// Different ways of printing APL values.
 enum PrintStyle
 {
@@ -321,7 +326,7 @@ enum PrintStyle
    PR_NARS1          = PR_BOXED_GRAPHIC1 | PST_NARS,  ///< NARS APL style,
    PR_NARS2          = PR_BOXED_GRAPHIC2 | PST_NARS,  ///< NARS APL style,
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// an offset into the body of a user-defined function. If we consider the APL
 /// interpreter as a high-level machine that executes token in user defined
 /// functions then this offset is the "program counter" of the high-level
@@ -332,7 +337,7 @@ enum Function_PC
    Function_PC_done    = -1,   ///< goto 0
    Function_PC_invalid = -1    ///< dito
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// signature of a user defined function
 enum Fun_signature
 {
@@ -397,7 +402,7 @@ enum Fun_signature
    SIG_Z_A_LO_OP1_X_B  = SIG_Z   | SIG_A_LO_OP1_X_B,    ///< dito
    SIG_Z_A_LO_OP2_RO_B = SIG_Z   | SIG_A_LO_OP2_RO_B,   ///< dito
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// the mode that distinguishes different SI commands (SI, SIS, SINL, ]SI, ]SIS)
 enum SI_mode
 {
@@ -411,7 +416,7 @@ enum SI_mode
    SIM_SI_dbg     = SIM_debug,
    SIM_SIS_dbg    = SIM_debug | SIM_statements,
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// the number of cores/tasks to be used
 enum CoreCount
 {
@@ -419,7 +424,7 @@ enum CoreCount
   CCNT_0       = 0,    ///<< no core
   CCNT_1       = 1,    ///< one core ...
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// the cores/tasks to be used
 enum CoreNumber
 {
@@ -427,19 +432,19 @@ enum CoreNumber
   CNUM_MASTER  = 0,   ///< the interpreter core
   CNUM_WORKER1 = 1,   ///< the first worker core ...
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// the CPUs reported by the OS
 enum CPU_Number
 {
    CPU_0 = 0   ///< the first (only) CPU
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// the number of CPUs available
 enum CPU_count
 {
    CPU_CNT_1 = 1   ///< one CPU
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// the state of an assignment
 enum Assign_state
 {
@@ -447,7 +452,7 @@ enum Assign_state
    ASS_arrow_seen = 1,   ///< ← seen but no variable yet
    ASS_var_seen   = 2,   ///< var and ← seen
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// the cause for something
 enum Cause
 {
@@ -455,7 +460,7 @@ enum Cause
    CAUSE_SHUTDOWN = 1,
    CAUSE_ERASED   = 2,
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// the CDR data types
 enum CDR_type
 {
@@ -468,7 +473,7 @@ enum CDR_type
    CDR_PROG64  = 6,   ///< 2*32 bit progression vector
    CDR_NEST32  = 7,   ///< 32 bit pointer to nested value
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// the result of a comparison cell_1.compare(cell_2)
 enum Comp_result
 {
@@ -476,14 +481,14 @@ enum Comp_result
   COMP_EQ =  0,   ///< equal:         cell_1 = cell_2
   COMP_GT =  1,   ///< greater than:  cell_1 > cell_2
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// the order of a comparison
 enum Sort_order
 {
    SORT_DESCENDING = 0,   ///< sort descending
    SORT_ASCENDING  = 1,   ///< sort asscending
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// events for a symbol
 enum Symbol_Event
 {
@@ -493,7 +498,7 @@ enum Symbol_Event
    SEV_ASSIGNED = 4,
    SEV_ERASED   = 5,
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// Auxiliary processor numbers
 enum AP_num
 {
@@ -503,10 +508,10 @@ enum AP_num
   AP_INTERPRETER = 1000,   ///< the AP for the APL interpreters
   AP_FIRST_USER  = 1001,   ///< the first AP for APL users
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// longest filename
 enum {  APL_PATH_MAX = 4096 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 //////////////////////////////////////////////////////////////
 // C. structs                                               //
@@ -540,7 +545,7 @@ struct AP_num3
    AP_num parent;   ///< the parent of the processor
    AP_num grand;    ///< the parent of the parent
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// two Function_PCs indication a token range in a user defined function body
 struct Function_PC2
 {
@@ -553,7 +558,7 @@ struct Function_PC2
    Function_PC low;    ///< low PC  (including)
    Function_PC high;   ///< high PC (including)
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** A single label. A label is a local variable (sym) with an integer function
     line (in which \b sym: was specified as the first 2 tokens in the line)
  */
@@ -563,7 +568,7 @@ struct labVal
    Symbol      * sym;    ///< The symbol for the label variable.
    Function_Line line;   ///< The line number of the label.
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// The end and the state of an abstract iterator along one axis
 /// (to / weight / current)
 struct _twc
@@ -578,7 +583,7 @@ struct _twc
    /// the current index
    ShapeItem current;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// The range and the state of an abstract iterator along one axis
 /// (from / to / weight / current)
 struct _ftwc : public _twc
@@ -587,7 +592,7 @@ struct _ftwc : public _twc
    /// over-Take from the end.
    ShapeItem from;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// the ravel (of an APL value) and a comparison lenght (= number of
 /// consecutive cells to be compared)
 struct ravel_comp_len
@@ -598,7 +603,7 @@ struct ravel_comp_len
    /// the number of consecutive Cells to be compared
    ShapeItem comp_len;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 //////////////////////////////////////////////////////////////
 // D. Namespace APL_types

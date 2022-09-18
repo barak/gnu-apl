@@ -15,6 +15,8 @@ using namespace std;
 
 #include <apl/libapl.h>
 
+int error_count = 0;
+
 //               H0 H1  H2  H3  H4  H5
 int Hx_num[] = { 0, 0,  0,  0,  0,  0 };
 enum { Hx_max = sizeof(Hx_num) / sizeof(int) };
@@ -23,7 +25,7 @@ int Hx_len = 0;
 int in_table = 0;
 
 FILE * fout = 0;   // body text
-FILE * ftoc = 0;   // table off content
+FILE * ftoc = 0;   // table of content
 FILE * ftc = 0;    // testcase file
 
 string stdOut_chars;
@@ -33,14 +35,14 @@ vector<string> quad_responses;
 class StdOut : public streambuf
 {
    virtual int overflow(int c)
-      { stdOut_chars += (char)c; }
+      { stdOut_chars += (char)c;   return 0; }
 
 } stdOut;
 
 class StdErr : public streambuf
 {
    virtual int overflow(int c)
-      { stdErr_chars += (char)c; }
+      { stdErr_chars += (char)c;   return 0; }
 
 } stdErr;
 
@@ -129,9 +131,10 @@ public:
         return true;
       }
 
+   /// recursively emit this range
    int emit(const char * tag);
    int copy();
-   int fcopy(FILE * out);
+   void fcopy(FILE * out);
 
    /// true if cp is «
    static bool is_start(const char * cp)
@@ -170,14 +173,16 @@ Range::Range(const char * cp, int len)
    //
 int level = 0;
 int lnum = 1;
+const char * last_start = from;
    for (const char * p = from; p < to; ++p)
        {
           if (*p == '\n')   ++lnum;
-          if (is_start(p))
+          if (is_start(p))   // see «
              {
+               last_start = p;
                ++level;
              }
-          else if (is_end(p))
+          else if (is_end(p))   // see »
              {
                if (level > 0)
                   {
@@ -185,12 +190,17 @@ int lnum = 1;
                   }
                else
                   {
-                    fprintf(stderr, "No mathing » for « line %d\n", lnum);
-                    _exit(1);
+                    fprintf(stderr, "No matching » for « line %d\n", lnum);
+                    fprintf(stderr, "Start is around: ");
+                    for (const char * p = last_start;
+                         p < to && p < (last_start + 40); ++p)
+                        fprintf(stderr, "%c", *p);
+                    fprintf(stderr, "\n");
+                    ++error_count;
+//                  _exit(1);
                   }
              }
        }
-   
 }
 //-----------------------------------------------------------------------------
 
@@ -222,7 +232,8 @@ int depth = 1;   // the skipped «
        }
 
    fprintf(stderr, "No mathing » for « at line %d col %d\n", line, col);
-   _exit(1);
+   ++error_count;
+// _exit(1);
 }
 //-----------------------------------------------------------------------------
 int
@@ -258,7 +269,7 @@ Range::copy()
        }
 }
 //-----------------------------------------------------------------------------
-int
+void
 Range::fcopy(FILE * out)
 {
    fwrite(from, 1, to - from, out);
@@ -282,11 +293,14 @@ Null_handler(const tag_table & tab, Range & r)
         case 1:  out.print("&nbsp;");   break;
         default: r.copy();
       }
+
+   return 0;
 }
 //-----------------------------------------------------------------------------
 int
 T_TE_handler(const tag_table & tab, Range & r)
 {
+   // handler for text attributed like «su», «SU», «BO» etc.
    assert(tab.cinfo);
    out.print("<");
    out.print(tab.cinfo);
@@ -352,7 +366,7 @@ const int Hx = tab.iinfo;
 
         // BODY...
         {
-          char cc[100];
+          char cc[200];
           sprintf(cc, "<a name=\"CH_%s\"></a>\n", chapter);
           for (const char * s = cc; *s; )   out.Putc(*s++ & 0xFF);
           for (const char * s = chapter; *s; )   out.Putc(*s++ & 0xFF);
@@ -502,7 +516,6 @@ const bool have_err = stdErr_chars.size() > 0;
       }
 
    fprintf(ftc, "\n");
-
 }
 //-----------------------------------------------------------------------------
 int
@@ -568,7 +581,7 @@ int nabla_to = -1;
         out.print("</PRE></b>");
         out.pre(false);
       }
-   
+
    return 0;
 }
 //-----------------------------------------------------------------------------
@@ -777,35 +790,36 @@ UL_handler(const tag_table & tab, Range & r)
 //-----------------------------------------------------------------------------
 tag_table open_tags[] =
 {
- // tag     handler        cinfo       iinfo indent
- { "#",     Comment      , ""        , 0   , 0  },
- { "BO"   , T_TE_handler , "B"       , 0   , 0  },
- { "H1"   , Hx_handler   , 0         , 1   , 0  },
- { "H2"   , Hx_handler   , 0         , 2   , 0  },
- { "H3"   , Hx_handler   , 0         , 3   , 0  },
- { "H4"   , Hx_handler   , 0         , 4   , 0  },
- { "H5"   , Hx_handler   , 0         , 5   , 0  },    
- { "H6"   , Hx_handler   , 0         , 6   , 0  },
+ // tag     handler        cinfo        iinfo indent
+ //                        │            │     │
+ { "#",     Comment      , ""         , 0   , 0  },
+ { "BO"   , T_TE_handler , "B"        , 0   , 0  },
+ { "H1"   , Hx_handler   , 0          , 1   , 0  },
+ { "H2"   , Hx_handler   , 0          , 2   , 0  },
+ { "H3"   , Hx_handler   , 0          , 3   , 0  },
+ { "H4"   , Hx_handler   , 0          , 4   , 0  },
+ { "H5"   , Hx_handler   , 0          , 5   , 0  },    
+ { "H6"   , Hx_handler   , 0          , 6   , 0  },
 
-                           // in table       ? ------------------------+ 
-                           // in .tc output  ? -------------------+    |
-                           // in HTML output ? --------------+    |    |
-                           // continuation   ? ---------+    |    |    |
-/*                                                      |    |    |    |
-   APL: APL normal APL input and output (executed)      |    |    |    |
-                                                        |    |    |    | */
- { "APL"  , APL_handler  , 0         , 0   , 0  },
- { "QUAD" , QUAD_handler , 0         , 0   , 0  },
-/* IN: normal APL input at the beginning of example     |    |    |    |
-                                                        |    |    |    | */
+                           // in table       ? ────────────────────────┐
+                           // in .tc output  ? ───────────────────┐    │
+                           // in HTML output ? ──────────────┐    │    │
+                           // continuation   ? ─────────┐    │    │    │
+/*                                                      │    │    │    │
+   APL: APL normal APL input and output (executed)      │    │    │    │
+                                                        │    │    │    │ */
+ { "APL"  , APL_handler  , 0          , 0   , 0  },
+ { "QUAD" , QUAD_handler , 0          , 0   , 0  },
+/* IN: normal APL input at the beginning of example     │    │    │    │
+                                                        │    │    │    │ */
  { "IN"   , IN_handler   , "input_T"  , 0   , 0  }, // no   yes  yes  no
  { "IN1"  , IN_handler   , "input_"   , 1   , 0  }, // yes  yes  yes  no
  { "IN2"  , IN_handler   , "input_"   , 2   , 0  }, // yes  yes  no   no
  { "IN3"  , IN_handler   , "input"    , 3   , 0  }, // inl  yes  no   no
  { "IN7"  , IN_handler   , "input_T"  , 7   , 0  }, // no   yes  no   no
  { "IN8"  , IN_handler   , "input_T"  , 8   , 0  }, // no   no   yes  no
-/* OU: normal APL output with end of example            |    |    |    |
-                                                        |    |    |    | */
+/* OU: normal APL output with end of example            │    │    │    │
+                                                        │    │    │    │ */
  { "OU"   , OU_handler   , "output"   , 0   , 0  }, // no   yes  yes  no
  { "OU1"  , OU_handler   , "output1"  , 1   , 0  }, // yes  yes  yes  no
  { "OU2"  , OU_handler   , "output1"  , 2   , 0  }, // yes  yes  no   no
@@ -814,30 +828,32 @@ tag_table open_tags[] =
 
  { "LI"   , LI_handler   , 0          , 0   , 0  },
  { "OL"   , OL_handler   , 0          , 0   , 0  },
- { "-"    , Null_handler , 0         , 0   , 1  },
- { "EMPTY", Null_handler , 0         , 1   , 1  },
- { "SU"   , T_TE_handler , "SUP"     , 0   , 0  },
- { "su"   , T_TE_handler , "SUB"     , 0   , 0  },
- { "TAB"  , TAB_handler  , 0         , 0   , 0  },
- { "TAB1" , TAB_handler  , "table1"  , 0   , 0  },
- { "TD"   , TD_handler   , "tab"     , 1   , 0  }, // 1 column
- { "TD1"  , TD_handler   , "tab1"    , 1   , 0  }, // format: tab1
- { "TD2"  , TD_handler   , "tab2"    , 1   , 0  }, // format: tab2
- { "TD3"  , TD_handler   , "tab3"    , 1   , 0  }, // format: tab3
- { "TD4"  , TD_handler   , "tab4"    , 1   , 0  }, // format: tab4
- { "TD5"  , TD_handler   , "tab5"    , 1   , 0  }, // format: tab5
- { "TH"   , TH_handler   , 0         , 1   , 0  },
- { "TH1"  , TH_handler   , "tab1"    , 1   , 0  }, // format: tab1
- { "TH12" , TH_handler   , "tab12"   , 2   , 0  }, // format: tab12, 2 columns
- { "TH2"  , TH_handler   , "tab2"    , 1   , 0  }, // format: tab2
- { "TH3"  , TH_handler   , "tab3"    , 1   , 0  }, // format: tab3
- { "TH4"  , TH_handler   , "tab4"    , 1   , 0  }, // format: tab4
- { "TH45" , TH_handler   , "tab45"   , 2   , 0  }, // format: tab45, 2 columns
- { "TH5"  , TH_handler   , "tab5"    , 5   , 0  }, // format: tab5
- { "TO"   , TO_handler   , 0         , 0   , 0  },
- { "TR"   , TR_handler   , 0         , 0   , 2  },
- { "UL"   , UL_handler   , 0         , 0   , 0  },
- { ""     , BR_handler   , 0         , 0   , 0  },
+ { "-"    , Null_handler , 0          , 0   , 1  },
+ { "EMPTY", Null_handler , 0          , 1   , 1  },
+ { "SU"   , T_TE_handler , "SUP"      , 0   , 0  },
+ { "su"   , T_TE_handler , "SUB"      , 0   , 0  },
+ { "TAB"  , TAB_handler  , 0          , 0   , 0  },
+ { "TAB1" , TAB_handler  , "table1"   , 0   , 0  },
+ { "TD"   , TD_handler   , "tab"      , 1   , 0  }, // 1 column
+ { "TD1"  , TD_handler   , "tab1"     , 1   , 0  }, // format: tab1
+ { "TD2"  , TD_handler   , "tab2"     , 1   , 0  }, // format: tab2
+ { "TD3"  , TD_handler   , "tab3"     , 1   , 0  }, // format: tab3
+ { "TD4"  , TD_handler   , "tab4"     , 1   , 0  }, // format: tab4
+ { "TD5"  , TD_handler   , "tab5"     , 1   , 0  }, // format: tab5
+ { "TD12" , TD_handler   , "tab1"     , 2   , 0  }, // format: tab1
+ { "TD45" , TD_handler   , "tab4"     , 2   , 0  }, // format: tab4
+ { "TH"   , TH_handler   , 0          , 1   , 0  },
+ { "TH1"  , TH_handler   , "tab1"     , 1   , 0  }, // format: tab1
+ { "TH12" , TH_handler   , "tab12"    , 2   , 0  }, // format: tab12, 2 columns
+ { "TH2"  , TH_handler   , "tab2"     , 1   , 0  }, // format: tab2
+ { "TH3"  , TH_handler   , "tab3"     , 1   , 0  }, // format: tab3
+ { "TH4"  , TH_handler   , "tab4"     , 1   , 0  }, // format: tab4
+ { "TH45" , TH_handler   , "tab45"    , 2   , 0  }, // format: tab45, 2 columns
+ { "TH5"  , TH_handler   , "tab5"     , 5   , 0  }, // format: tab5
+ { "TO"   , TO_handler   , 0          , 0   , 0  },
+ { "TR"   , TR_handler   , 0          , 0   , 2  },
+ { "UL"   , UL_handler   , 0          , 0   , 0  },
+ { ""     , BR_handler   , 0          , 0   , 0  },
 };
 
 enum { open_tags_count  = sizeof(open_tags)  / sizeof(tag_table) };
@@ -847,7 +863,7 @@ int
 Range::emit(const char * tag)
 {
    // find handler for tag. Search backwards so that we can store shorter
-   // tags befor longer ones (like OU before OU1) and still get the longer
+   // tags before longer ones (like OU before OU1) and still get the longer
    // match.
    //
    for (int h = 0; h < open_tags_count; ++h)
@@ -863,6 +879,7 @@ Range::emit(const char * tag)
        }
 
    fprintf(stderr, "NO handler for '«%s' at line %d col %d\n", tag, line, col);
+   ++error_count;
    return 1;
 }
 //-----------------------------------------------------------------------------
@@ -884,7 +901,7 @@ main(int argc, char * argv[])
 
    assert(argc == 5 && "missing filename(s). Stop.");
 
-const int fd = open(argv[1], O_RDONLY);
+const int fd = open(argv[1], O_RDONLY);   // the input file
    assert(fd != -1 && "bad input filename");
 
    fout = fopen(argv[2], "w");
@@ -903,8 +920,8 @@ void * vp = mmap(0, st.st_size, PROT_READ, MAP_SHARED, fd, 0);
    assert(vp != MAP_FAILED);
    close(fd);
 
-   COUT.rdbuf(&stdOut);
-   UERR.rdbuf(&stdErr);
+   COUT.rdbuf(&stdOut);   // install COUT buffer
+   UERR.rdbuf(&stdErr);   // install CERR buffer
 
 
 Range r((const char *)vp, st.st_size);
@@ -915,7 +932,30 @@ const int error = r.emit("-");
    fclose(ftoc);
    fclose(fout);
 
+   if (error_count)
+      {
+        fprintf(stderr, "\n\n\n\n\n\n\n"
+"     EEEEE  RRRR  RRRR   OOO  RRRR  \n"
+"     E      R   R R   R O   O R   R \n"
+"     EEEEE  RRRR  RRRR  O   O RRRR  \n"
+"     E      R R   R R   O   O R R   \n"
+"     EEEEE  R  R  R  R   OOO  R  R  \n"
+"                                    \n\n\n\n\n\n\n");
+      }
+   else
+      {
+        fprintf(stderr, "\n\n\n\n\n\n\n"
+"      OOO    K  K  \n"
+"     O   O   K K   \n"
+"     O   O   KK    \n"
+"     O   O   K K   \n"
+"      OOO    K  K  \n"
+"                 \n\n\n\n\n\n\n");
+      }
+
    munmap(vp, st.st_size);
+const char * kill[] = { "/usr/bin/killall", "tee", 0 };
+   execve(kill[0], (char **)kill, 0);
    return 0;
 }
 //-----------------------------------------------------------------------------

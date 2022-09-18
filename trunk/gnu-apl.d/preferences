@@ -9,10 +9,10 @@
 #
 # In both cases the file name must be 'preferences'.
 #
-# The system configuration directory is usually /etc or /etc/local
+# The system configuration directory is usually /etc or /usr/local/etc
 # It can be overridden by  ./configure --sysconfdir=something-else
 #
-# If both files are present then (1) is read before (2) so that for
+# If both files are present then (1) is read before (2) so that in case of
 # contradicting settings in both files (2) prevails.
 #
 # Many settings can also be changed by command line options; the command line
@@ -23,7 +23,7 @@
 # uncomment them.
 #
 # The meaning of most settings should be obvious; if not, then please refer to
-# the more detailed desctption in the file README-9-Post-Installation, located
+# the more detailed description in the file README-9-Post-Installation, located
 # in the top-level directory of the GNU APL package.
 
 ###############################################################################
@@ -299,15 +299,26 @@
 READLINE_HISTORY_LEN  500
 READLINE_HISTORY_PATH .apl.history
 
-# The history can serve two purposes: to recall lines that were previously
-# and to list what was done (with command )HISTORY). For the latter purpose
-# it is normally convenient to show the new ⎕CR of a function that was edited
-# instead of the command that started the editor. The following parameter
-# controls whether the editor command (like ∇foo ) or the new ⎕CR of the
-# function shall be inserted into the history.
-# 
-# The default (modified) shows the editor command if the function was opened
-# but not changed and the new ⎕CR if the function was changed.
+# The history can serve two purposes:
+#
+# 1. to recall lines that were previously entered, or
+# 2. to list what was done (with command )HISTORY).
+#
+# For purpose 2. it is normally more convenient to show the entire ⎕CR
+# of a function that was edited instead of only the command that started
+# the ∇-editor. For purpose 1, however, recalling the lines of entire
+# functions can become annoying if the functions are long.
+#
+# The following parameter controls whether the history shall contain:
+#
+# A. only the editor command (like ∇foo) that has started the ∇-editor, but
+#    not the entire ⎕CR of the function that was edited, or else
+#
+# B. the entire new ⎕CR of the function that was edited.
+#
+# The default (modified) is a compromise that inserts only the editor
+# command if the function was opened but not changed (e.g. ∇FOO[⎕]∇ )
+# and the entire new ⎕CR if the function was changed or (newly created).
 #
 # NABLA-TO-HISTORY  Never
   NABLA-TO-HISTORY  Modified (default)
@@ -410,6 +421,12 @@ CONTROL-Ds-TO-EXIT 0
 
 ###############################################################################
 #
+# with the option below GNU APL writes to file descriptor 1 (aka. stdout)
+# instead of file descriptor 2 (aka. stderr)
+# OUTPUT-TO-COUT  Yes
+
+###############################################################################
+#
 # The following lines show examples of GNU APL capabilities that can be
 # disabled. The security settings are put into profile [1] which means that
 # they only have an effect if:
@@ -427,6 +444,7 @@ Profile 1
   disable_native_functions  yes    # disable A ⎕FX B (native fnctions)
   disable_Quad_PLOT         yes    # disable ⎕PLOT
   disable_Quad_SQL          yes    # disable ⎕SQL
+  disable_SAVE_command      yes    # disable )SAVE and )DUMP ws
 
 # a profile suitable for the web sockets stuff shipped with GNU APL
 Profile 2
@@ -438,4 +456,11 @@ UERR-SEQUENCE          E2 91 A1   // ② like CERR
 RESET-SEQUENCE         //
 CLEAR-EOL-SEQUENCE     //
 CLEAR-EOS-SEQUENCE     //
+
+  disable_Quad_GTK          yes    # disable ⎕cwGTK
+  disable_Quad_FIO          no     # do not disable ⎕FIO
+  disable_native_functions  yes    # disable A ⎕FX B (native fnctions)
+  disable_Quad_PLOT         yes    # disable ⎕PLOT
+  disable_Quad_SQL          yes    # disable ⎕SQL
+  disable_SAVE_command      yes    # disable )SAVE and )DUMP ws
 

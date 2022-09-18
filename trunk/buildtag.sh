@@ -50,13 +50,14 @@ else
     BUILD_OS=`uname -s -r -m`
 fi
 
-BUILD_TAG="\" / $SVNINFO\", \"$BUILD_DATE\", \"$BUILD_OS\", \"$CONFIGURE_OPTS\""
+BUILD_TAG="\" / SVN: $SVNINFO\", \"$BUILD_DATE\", \"$BUILD_OS\", \"$CONFIGURE_OPTS\""
 
 # write buildtag.hh
 #
-echo "#include \"Common.hh\""                                     > buildtag.hh
-echo "#define BUILDTAG PACKAGE_NAME, PACKAGE_VERSION $BUILD_TAG" >> buildtag.hh
-echo "#define ARCHIVE_SVN \"$ARCHIVE_SVNINFO\""                  >> buildtag.hh
+echo "
+#define BUILDTAG PACKAGE_NAME, PACKAGE_VERSION $BUILD_TAG
+#define ARCHIVE_SVN \"$ARCHIVE_SVNINFO\"
+" > buildtag.hh
 
 # write makefile.h
 #

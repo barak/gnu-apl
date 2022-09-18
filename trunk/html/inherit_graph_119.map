@@ -1,3 +1,4 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classSymbolTableBase.html" title="common part of user&#45;defined names and distinguished names " alt="" coords="5,5,157,47"/>
+<area shape="rect" id="node1" href="$classSymbolTableBase.html" title="SymbolTableBase\&lt; Symbol,\l SYMBOL_HASH_TABLE_SIZE \&gt;" alt="" coords="5,5,229,47"/>
+<area shape="rect" id="node2" href="$classSymbolTable.html" title="The table containing all user defined symbols. " alt="" coords="277,13,376,39"/>
 </map>

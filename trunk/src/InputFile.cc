@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ vector<InputFile> InputFile::files_todo;
 vector<InputFile> InputFile::files_orig;
 int InputFile::stdin_line_no = 1;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 InputFile::open_current_file()
 {
@@ -50,7 +50,7 @@ InputFile::open_current_file()
         files_todo[0].line_no = 0;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 InputFile::close_current_file()
 {
@@ -73,7 +73,7 @@ InputFile::close_current_file()
            }
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 InputFile::randomize_files()
 {
@@ -123,14 +123,14 @@ InputFile::randomize_files()
          ++done;
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 InputFile::echo_current_file()
 {
    if (files_todo.size()) return files_todo[0].echo;
    return uprefs.echo_CIN || !uprefs.do_not_echo;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 InputFile::check_filter(const UTF8_string & line)
 {
@@ -204,5 +204,5 @@ UCS_string ucs_line(line);
 
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 

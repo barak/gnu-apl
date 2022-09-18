@@ -3,19 +3,66 @@
 # this script checks for bad settings when exporting a package
 # this script shall be run in the top-level directory
 
+################################################################################
+logging_facilities_check()
+{
+echo -n "checking that all logging facilities are turned off ... "
 
-echo -n "checking that logging facilities are turned off ... "
-cnt1=`grep -c "log_def("   src/Logging.def`
-cnt2=`grep -c "log_def(0" src/Logging.def`
+local cnt1=$(grep -c "log_def("   src/Logging.def)
+local cnt2=$(grep -c "log_def(0" src/Logging.def)
 
 if [ $cnt1 != $cnt2 ]
 then
-   echo
-   echo "*** Cannot build packages because some logging facility is ON in src/Logging.def"
+   echo "
+***
+*** Cannot build packages because some logging facility is ON in src/Logging.def
+***
+"
    exit 1
-exit 0
+fi
+echo "OK."
+}
+
+################################################################################
+Q_check()
+{
+echo -n "checking that all Q() macros were removed ... "
+
+local files_cc=$(find src -name '*.cc'   -exec echo -n " {}" \;)
+local files_hh=$(find src -name '*.hh'   -exec echo -n " {}" \;)
+local files_icc=$(find src -name '*.icc' -exec echo -n " {}" \;)
+local files="$files_cc $files_hh $files_icc"
+local q=$(grep 'Q(' $files | grep -v '#define Q(x)')
+
+if [ -n "$q" ]
+then
+echo "
+***
+*** Cannot build packages because some Q() macros were not removed:
+***
+$q
+"
+  exit 1
+fi
+echo "OK."
+}
+
+################################################################################
+# main()...
+
+if [  -d tools -a -d src  ]
+then true
+else
+   echo "
+***
+*** error: run this script from the GNU APL toplevel directory !
+***
+"
+   exit 1
 fi
 
-echo "OK."
+logging_facilities_check
+Q_check
+
 exit 0
 

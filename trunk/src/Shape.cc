@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -21,23 +21,23 @@
 #include "Shape.hh"
 #include "Value.hh"
 
-//-----------------------------------------------------------------------------
-Shape::Shape(const Value * A, int qio_A)
+//----------------------------------------------------------------------------
+Shape::Shape(const Value & A, int qio_A)
    : rho_rho(0),
      volume(1)
 {
    // check that A is a shape value, like the left argument of A⍴B
    //
-   if (A->get_rank() > 1)               RANK_ERROR;
-const ShapeItem Alen = A->element_count();
-   if (Alen > MAX_RANK)   LIMIT_ERROR_RANK;   // of A
+   if (A.get_rank() > 1)   RANK_ERROR;
+const ShapeItem len_A = A.element_count();
+   if (len_A > MAX_RANK)   LIMIT_ERROR_RANK;   // of A
 
-   loop(r, A->element_count())
+   loop(a, len_A)
       {
-        add_shape_item(A->get_ravel(r).get_near_int() - qio_A);
+        add_shape_item(A.get_cravel(a).get_near_int() - qio_A);
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Shape Shape::abs() const
 {
 Shape ret;
@@ -50,7 +50,7 @@ Shape ret;
 
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Shape::operator ==(const Shape & other) const
 {
@@ -61,7 +61,7 @@ Shape::operator ==(const Shape & other) const
 
    return true;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Shape::expand(const Shape & B)
 {
@@ -78,9 +78,9 @@ Shape::expand(const Shape & B)
         volume *= rho[r];
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Shape
-Shape::insert_axis(Axis axis, ShapeItem len) const
+Shape::insert_axis(sAxis axis, ShapeItem len) const
 {
    if (get_rank() >= MAX_RANK)   LIMIT_ERROR_RANK;
 
@@ -105,14 +105,14 @@ Shape ret;
 
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ShapeItem
 Shape::ravel_pos(const Shape & idx) const
 {
 ShapeItem p = 0;
 ShapeItem w = 1;
 
-   for (Rank r = get_rank(); r-- > 0;)
+   for (sRank r = get_rank(); r-- > 0;)
       {
         p += w*idx.get_shape_item(r);
         w *= get_shape_item(r);
@@ -120,7 +120,7 @@ ShapeItem w = 1;
 
    return p;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Shape
 Shape::offset_to_index(ShapeItem offset, int quad_io) const
 {
@@ -142,21 +142,37 @@ Shape ret;
 
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Shape::check_same(const Shape & B, ErrorCode rank_err, ErrorCode len_err,
                   const char * loc) const
 {
-   if (get_rank() != B.get_rank())
-      throw_apl_error(rank_err, loc);
+   if (get_rank() != B.get_rank())   throw_apl_error(rank_err, loc);
 
    loop(r, get_rank())
       {
-        if (get_shape_item(r) != B.get_shape_item(r))
-           throw_apl_error(len_err, loc);
+        if (get_shape_item(r) == B.get_shape_item(r))   continue;
+        throw_apl_error(len_err, loc);
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+bool
+Shape::is_permutation() const
+{
+ShapeItem axes = 0;   // a bitmap of axes
+
+   loop(r, get_rank())
+       {
+         const ShapeItem ax = get_shape_item(r);
+         if (ax < 0)                return false;
+         if (ax >= get_rank())      return false;
+         if (axes & 1 << ax)        return false;
+          axes |= 1 << ax;
+       }
+
+   return true;
+}
+//----------------------------------------------------------------------------
 ostream &
 operator <<(ostream & out, const Shape & shape)
 {
@@ -169,4 +185,4 @@ operator <<(ostream & out, const Shape & shape)
    out << "⊐";
    return out;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------

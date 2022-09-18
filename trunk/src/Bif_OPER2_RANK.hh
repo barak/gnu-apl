@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 
 #include "PrimitiveOperator.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** Primitive operator ⍤ (rank)
  */
 /// The class implementing ⍤
@@ -40,8 +40,8 @@ public:
    virtual Token eval_ALRXB(Value_P A, Token & LO, Token & RO, Value_P X, Value_P B) const;
 
    /// the 'normalized' implementation of all eval_ALxxx*( functions
-   static Token do_ALyXB(Value_P A, Rank rk_chunk_A, Token & LO,
-                         Value_P X, Value_P B, Rank rk_chunk_B);
+   static Token do_ALyXB(Value_P A, sRank rk_chunk_A, Token & LO,
+                         Value_P X, Value_P B, sRank rk_chunk_B);
 
    /// overloaded Function::eval_LRB()
    virtual Token eval_LRB(Token & LO, Token & RO, Value_P B) const;
@@ -54,7 +54,7 @@ public:
       { return false; }
 
    /// the 'normalized' implementation of all eval_Lxxx*( functions
-   static Token do_LyXB(Token & LO, Value_P X, Value_P B, Rank rk_chunkB);
+   static Token do_LyXB(Token & LO, Value_P X, Value_P B, sRank rk_chunkB);
 
    /// split j B into j and B
    static void split_y123_B(Value_P y123_B, Value_P & y123, Value_P & B);
@@ -64,11 +64,11 @@ public:
 
 protected:
    /// convert 1- 2- or 3-element vector y123 to chunk-rank of B
-   static void y123_to_B(Value_P y123, Rank & rk_B);
+   static void y123_to_B(Value_P y123, sRank & rk_B);
 
    /// convert 1- 2- or 3-element vector y123 to chunk-ranks of A and B
-   static void y123_to_AB(Value_P y123, Rank & rk_A, Rank & rk_B);
+   static void y123_to_AB(Value_P y123, sRank & rk_A, sRank & rk_B);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __BIF_OPER2_RANK_HH_DEFINED__

@@ -1,5 +1,5 @@
 <map id="UserFunction_header" name="UserFunction_header">
-<area shape="rect" id="node2" href="$classSymbol.html" title="Base class for variables, defined functions, and distinguished names. " alt="" coords="23,171,90,197"/>
-<area shape="rect" id="node3" href="$classNamedObject.html" title="A user&#45;defined variable or function. " alt="" coords="5,81,108,108"/>
-<area shape="rect" id="node4" href="$classUCS__string.html" title="A string of Unicode characters (32&#45;bit) " alt="" coords="139,81,230,108"/>
+<area shape="rect" id="node2" href="$classSymbol.html" title="Base class for variables, defined functions, and distinguished names. " alt="" coords="23,185,90,212"/>
+<area shape="rect" id="node3" href="$classNamedObject.html" title="A user&#45;defined variable or function. " alt="" coords="5,96,108,123"/>
+<area shape="rect" id="node4" href="$classUCS__string.html" title="A string of Unicode characters (32&#45;bit) " alt="" coords="139,96,230,123"/>
 </map>

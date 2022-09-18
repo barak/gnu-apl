@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ class Error;
 class UCS_string;
 class UserFunction;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
      A sequence of APL token. An executable is created for one of 3 purposes:
      - an APL expression for execute (⍎), or
@@ -71,7 +71,7 @@ public:
       { return 0; }
 
    /// return a UserFunction * (if \b this is one) or else 0.
-   virtual const UserFunction * get_ufun() const
+   virtual const UserFunction * get_exec_ufun() const
       { return 0; }
 
    /// return true if this Executable localizes Symbol \b sym
@@ -79,7 +79,7 @@ public:
       { return false; }
 
    /// return a UserFunction * (if \b this is one) or else 0.
-   virtual UserFunction * get_ufun()
+   virtual UserFunction * get_exec_ufun()
    { return 0; }
 
    /// get the line number for pc
@@ -199,7 +199,7 @@ protected:
    /// reference counter (for lambdas)
    int refcount;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
    The token of an execute expression (⍎'...')
  **/
@@ -222,7 +222,7 @@ protected:
    virtual UCS_string get_name() const
       { return UCS_string(UNI_EXECUTE); }
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
    The token of an statement list (cmd ◊ cmd ... ◊ cmd)
  **/
@@ -245,6 +245,6 @@ protected:
    virtual UCS_string get_name() const
       { return UCS_string(UNI_DIAMOND); }
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __EXECUTABLE_HH_DEFINED__

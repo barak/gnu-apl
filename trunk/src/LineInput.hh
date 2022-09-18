@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -30,17 +30,17 @@
 
 class Nabla;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// kind of input
 enum LineInputMode
 {
-   LIM_ImmediateExecution,
-   LIM_Quote_Quad,
-   LIM_Quad_Quad,
-   LIM_Quad_INP,
-   LIM_Nabla,
+   LIM_ImmediateExecution = 0,
+   LIM_Quote_Quad         = 1,
+   LIM_Quad_Quad          = 2,
+   LIM_Quad_INP           = 3,
+   LIM_Nabla              = 4,
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// the lines that the user has previously entered
 class LineHistory
 {
@@ -61,12 +61,12 @@ public:
    void clear_history(ostream & out);
 
    /// print history to \b out
-   void print_history(ostream & out);
+   void print_history(ostream & out) const;
 
    /// start a new up/down sequence
    void next()
       { current_line = put;
-        if (current_line < 0)   current_line += hist_lines.size();       // wrap
+        if (current_line < 0)   current_line += hist_lines.size();   // wrap
         if (current_line >= int(hist_lines.size()))
            current_line = 0;  // wrap
       }
@@ -76,6 +76,15 @@ public:
 
    /// move to next newer entry
    const UCS_string * down();
+
+   /// update history search substring
+   const void clear_search(void);
+
+   /// update search substring (called when current line is edited)
+   const void update_search(UCS_string &cur_line);
+
+   /// find entries like current line in history
+   const UCS_string * search(UCS_string &cur_line);
 
    /// print relevant indices
    ostream &  info(ostream & out) const
@@ -108,10 +117,16 @@ protected:
    /// the max. history size
    const int max_lines;
 
+   /// the current searched-for substring
+   UCS_string cur_search_substr;
+
+   /// the last searched-for line match
+   int last_search_line;
+
    /// the history
    UCS_string_vector hist_lines;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// a context for one user-input line
 class LineEditContext
 {
@@ -152,6 +167,10 @@ public:
    /// move the cursor
    void move_idx(int new_idx)
       { uidx = new_idx;   set_cursor(); }
+
+   /// get current cursor column
+   int get_idx(void)
+      { return uidx; }
 
    /// set the cursor (writing the appropriate ESC sequence to CIN)
    void set_cursor()
@@ -202,11 +221,21 @@ public:
    /// tab expansion
    void tab_expansion(LineInputMode mode);
 
+   /// reset search substring
+   void cursor_CLEAR_SEARCH();
+
    /// move backwards in history
    void cursor_UP();
 
    /// move forward in history
    void cursor_DOWN();
+
+   /// shortcut calling update_search() of member \b history with argument
+   /// \b user_line
+   void update_SEARCH();
+
+   /// search line history
+   void cursor_SEARCH();
 
    /// return current user input
    const UCS_string & get_user_line() const
@@ -240,13 +269,13 @@ protected:
    /// true if history was entered
    bool history_entered;
 
-   /// dito
+   /// ditto
    UCS_string user_line_before_history;
 
    /// a buffer for ^K/^Y
    static UCS_string cut_buffer;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// a callback function to be called instead of get_line()
 typedef void get_line_cb(LineInputMode mode, const UCS_string & prompt,
                          UCS_string & line, bool & eof, LineHistory & hist);
@@ -275,7 +304,7 @@ protected:
    /// It will be called instead of \b get_line() if non-0
    static get_line_cb * get_line_callback;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// a class for obtaining one line of input from the user (editable)
 class LineInput
 {
@@ -351,7 +380,7 @@ protected:
    /// single LineInput instance that restores stdin termios on destruction
    static LineInput * the_line_input;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** A mapping from ESC sequences to (internal) pseudo-Unicodes such as
     UNI_CursorUp and friends
  */
@@ -382,6 +411,6 @@ struct ESCmap
    /// a mapping from keyboard escape sequences to Unicodes
    static ESCmap the_ESCmap[];
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __LINEINPUT_HH_DEFINED__

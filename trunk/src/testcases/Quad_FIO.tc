@@ -277,6 +277,13 @@ World!
       FMT ⎕FIO['sscanf'] DATA   ⍝ dyadic with axis string
  22 3.14 C DEFGH st⍴ing 57 
 
+      FMT←"Hello %[Hal]" ◊ DATA←"Hello Halloween"
+      FMT ⎕FIO['sscanf'] DATA
+ Hall 
+      FMT←"Hello %[^wen]" ◊ DATA←"Hello Halloween"
+      FMT ⎕FIO['sscanf'] DATA
+ Hallo 
+
       ⍝ execve
       ⍝
       ⍝Filename←'/usr/local/lib/apl/TLV_server'  ⍝ whereever TLV_server lives
@@ -311,6 +318,57 @@ wc.txt
       )ERASE FORMAT Handle Handle1 Handle2 Command AF_INET SOCK_STREAM
       )ERASE Error FSTAT Filename LOCALHOST Port Z Server IPPROTO_IP
       )ERASE FMT DATA TL TLV Value
+
+      ⍝ regression
+
+      ⍝ ' flag
+      ⍝
+      "Hello %'d world" ⎕FIO.sprintf 123456
+Hello 123,456 world
+      "Hello %'d world" ⎕FIO.sprintf 12345
+Hello 12,345 world
+      "Hello %'d world" ⎕FIO.sprintf 1234
+Hello 1,234 world
+      "Hello %'d world" ⎕FIO.sprintf 123
+Hello 123 world
+      "Hello %'d world" ⎕FIO.sprintf 12
+Hello 12 world
+      "Hello %'d world" ⎕FIO.sprintf 1
+Hello 1 world
+
+      "Hello %'d world" ⎕FIO.sprintf 0
+Hello 0 world
+
+      "Hello %'d world" ⎕FIO.sprintf ¯1
+Hello -1 world
+      "Hello %'d world" ⎕FIO.sprintf ¯12
+Hello -12 world
+      "Hello %'d world" ⎕FIO.sprintf ¯123
+Hello -123 world
+      "Hello %'d world" ⎕FIO.sprintf ¯1234
+Hello -1,234 world
+      "Hello %'d world" ⎕FIO.sprintf ¯12345
+Hello -12,345 world
+      "Hello %'d world" ⎕FIO.sprintf ¯123456
+Hello -123,456 world
+
+      "Hello %'.2f world" ⎕FIO.sprintf 123456.77
+Hello 123,456.77 world
+      "Hello %'.2f world" ⎕FIO.sprintf 12345.77
+Hello 12,345.77 world
+      "Hello %'.2f world" ⎕FIO.sprintf 1234.77
+Hello 1,234.77 world
+      "Hello %'.2f world" ⎕FIO.sprintf 123.77
+Hello 123.77 world
+
+      "Hello %'.2f world" ⎕FIO.sprintf ¯123456.77
+Hello -123,456.77 world
+      "Hello %'.2f world" ⎕FIO.sprintf ¯12345.77
+Hello -12,345.77 world
+      "Hello %'.2f world" ⎕FIO.sprintf ¯1234.77
+Hello -1,234.77 world
+      "Hello %'.2f world" ⎕FIO.sprintf ¯123.77
+Hello -123.77 world
 
 ⍝     )VARS
 

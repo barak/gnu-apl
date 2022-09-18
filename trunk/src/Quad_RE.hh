@@ -79,7 +79,7 @@ protected:
            bool get_error_on_no_match() const
               { return error_on_no_match; }
 
-           /// return global
+           /// return global (return all matches and not only first match)
            bool get_global() const
               { return global; }
 

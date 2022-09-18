@@ -1,13 +1,14 @@
 <map id="XML_Saving_Archive" name="XML_Saving_Archive">
-<area shape="rect" id="node2" href="$structXML__Saving__Archive_1_1__val__par.html" title="a value and its parent (if the parent is nested) " alt="" coords="186,216,333,257"/>
-<area shape="rect" id="node3" href="$classValue.html" title="An APL Value (essentially a Shape and a ravel) " alt="" coords="393,127,448,153"/>
-<area shape="rect" id="node7" href="$structCell_1_1SomeValue_1_1__pval.html" title="a pointer to, and the owner of, a nested APL (sub&#45;) value " alt="" coords="371,321,529,348"/>
-<area shape="rect" id="node8" href="$classValue__P__Base.html" title="A Value smart * and access functions (except constructors) " alt="" coords="445,223,553,250"/>
-<area shape="rect" id="node4" href="$classDynamicObject.html" title="A Value or an IndexExpr. " alt="" coords="115,21,227,48"/>
-<area shape="rect" id="node5" href="$classCell.html" title="The base class for all Cells. " alt="" coords="494,501,539,528"/>
-<area shape="rect" id="node6" href="$unionCell_1_1SomeValue.html" title="A union containing all possible cell values for the different Cell types. " alt="" coords="390,412,510,439"/>
-<area shape="rect" id="node9" href="$structCell_1_1SomeValue_1_1__fval.html" title="&lt; for FloatCell " alt="" coords="5,321,161,348"/>
-<area shape="rect" id="node10" href="$unionCell_1_1SomeValue_1_1__fval_1_1__flt__num.html" title="either a floating point value, or the denominator of a quotient " alt="" coords="5,216,161,257"/>
-<area shape="rect" id="node11" href="$struct__deleted__value.html" title="a linked list of deleted values " alt="" coords="366,21,475,48"/>
-<area shape="rect" id="node12" href="$classShape.html" title="the shape of an APL value " alt="" coords="553,21,611,48"/>
+<area shape="rect" id="node2" href="$classXML__Archive.html" title="class for )SAVEing and )LOADing APL Workspaces in an XML file format " alt="" coords="177,223,277,250"/>
+<area shape="rect" id="node3" href="$structXML__Saving__Archive_1_1__val__par.html" title="a value and its parent (if the parent is nested) " alt="" coords="5,216,152,257"/>
+<area shape="rect" id="node4" href="$classValue.html" title="An APL Value (essentially a Shape and a ravel) " alt="" coords="394,127,449,153"/>
+<area shape="rect" id="node8" href="$structCell_1_1SomeValue_1_1__pval.html" title="a pointer to, and the owner of, a nested APL (sub&#45;) value " alt="" coords="334,321,493,348"/>
+<area shape="rect" id="node9" href="$classValue__P__Base.html" title="A Value smart * and access functions (except constructors) " alt="" coords="301,223,409,250"/>
+<area shape="rect" id="node5" href="$classDynamicObject.html" title="A Value or an IndexExpr. " alt="" coords="116,21,228,48"/>
+<area shape="rect" id="node6" href="$classCell.html" title="The base class for all Cells. " alt="" coords="628,501,673,528"/>
+<area shape="rect" id="node7" href="$unionCell_1_1SomeValue.html" title="A union containing all possible cell values for the different Cell types. " alt="" coords="535,412,655,439"/>
+<area shape="rect" id="node10" href="$structCell_1_1SomeValue_1_1__fval.html" title="&lt; for FloatCell " alt="" coords="517,321,673,348"/>
+<area shape="rect" id="node11" href="$unionCell_1_1SomeValue_1_1__fval_1_1__flt__num.html" title="either a floating point value, or the denominator of a quotient " alt="" coords="522,216,678,257"/>
+<area shape="rect" id="node12" href="$struct__deleted__value.html" title="a linked list of deleted values " alt="" coords="367,21,476,48"/>
+<area shape="rect" id="node13" href="$classShape.html" title="the shape of an APL value " alt="" coords="553,21,612,48"/>
 </map>

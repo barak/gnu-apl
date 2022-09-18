@@ -1,4 +1,7 @@
 
+# Bill Daly's APL library
+SUBDIRS = DALY
+
 # NOTE: listing a file in info_TEXINFOS causes the corresponding .html file
 # to be deleted on 'make clean' That is bad for people not having a
 # $MAKEINFOHTML installed. We therefore leve info_TEXINFOS empty and instead
@@ -8,7 +11,7 @@ info_TEXINFOS =
 
 man1_MANS = apl.1
 
-# info_TEXINFOS = fails for more than one .texi file. We therefore install
+# info_TEXINFOS = fails for more than one .info file. We therefore install
 # libapl.info explicitly
 #
 install-info-am:

@@ -2,7 +2,9 @@
 <area shape="rect" id="node2" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string " alt="" coords="224,5,364,32"/>
 <area shape="rect" id="node3" href="$classUCS__string.html#a40523238d26f5405f5392df03d242627" title="common part of all constructors " alt="" coords="227,56,361,83"/>
 <area shape="rect" id="node4" href="$classValue.html#a9fc8bbaf9fefe6835dea7db0f71b8b6c" title="return the number of elements (the product of the shapes). " alt="" coords="220,107,368,133"/>
-<area shape="rect" id="node5" href="$classCell.html#ab940e21b6212fbd1bfa8de9f99d090ea" title="Return the character value of a cell. " alt="" coords="223,157,365,184"/>
-<area shape="rect" id="node6" href="$classValue.html#a5ac7131d2f89d0bc8b8907d960cbd125" title="return the rank of this value " alt="" coords="237,208,351,235"/>
-<area shape="rect" id="node7" href="$classValue.html#a89120a742c078918d1a5d84ec742e69c" title="return the idx&#39;th element of the ravel. " alt="" coords="236,259,352,285"/>
+<area shape="rect" id="node5" href="$classCell.html#a2999919fc2782b3cebfd925c63cc1fac" title="Return the character value of a cell. " alt="" coords="223,157,365,184"/>
+<area shape="rect" id="node8" href="$classValue.html#a113fa41969aed3b011b477ea199c6157" title="return the (constant) idx&#39;th element of the ravel. " alt="" coords="233,208,355,235"/>
+<area shape="rect" id="node9" href="$classValue.html#a5ac7131d2f89d0bc8b8907d960cbd125" title="return the rank of this value " alt="" coords="237,259,351,285"/>
+<area shape="rect" id="node6" href="$classCell.html#a38a6a25f0ad091f35e3d9abfe5608a50" title="return the type of this cell " alt="" coords="435,132,566,159"/>
+<area shape="rect" id="node7" href="$classCell.html#a6c3fdef3d82f53649d1c3f16d37eedd7" title="the name of ct " alt="" coords="416,183,585,209"/>
 </map>

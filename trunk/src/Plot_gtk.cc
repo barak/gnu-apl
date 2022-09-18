@@ -3,7 +3,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2018-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2018-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -19,6 +19,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file **/
+
+/// debug verbosity
 static int verbosity;
 
 #include "Common.hh"
@@ -32,7 +35,10 @@ static int verbosity;
 # include "Plot_line_properties.hh"
 # include "Plot_window_properties.hh"
 
+/// the main() program of the thread that handles one plot window.
 extern void * plot_main(void * vp_props);
+
+/// the window properties of one plot window.
 extern const Plot_window_properties *
              plot_stop(const Plot_window_properties * vp_props);
 
@@ -41,7 +47,10 @@ extern const Plot_window_properties *
 # include "Quad_PLOT.hh"
 # include "Workspace.hh"
 
+/// the font to be used for texts
 const char * FONT_NAME = "sans-serif";
+
+/// the size of the font to be used for texts
 enum {  FONT_SIZE = 10 };
 
 // ===========================================================================
@@ -88,7 +97,9 @@ struct Plot_context
 };
 
 /// all Plot_contexts (= all open windows)
-static vector<const Plot_context *> all_plot_contexts;
+static vector<Plot_context *> all_plot_contexts;
+
+/// the number of open plot windows (to see when the last one was closed).
 static int plot_window_count = 0;
 
 //----------------------------------------------------------------------------
@@ -104,6 +115,7 @@ cairo_set_RGB_source(cairo_t * cr, Color color)
                              (color       & 0xFF) / 255.0, 1.0);   // opaque
 }
 //----------------------------------------------------------------------------
+/// draw a line from P0 to P1
 static void
 draw_line(cairo_t * cr, Color line_color, int line_style, int line_width,
           const Pixel_XY & P0, const Pixel_XY & P1)
@@ -132,6 +144,7 @@ double dashes_3[] = { 10.0, 5.0 };     // ─╴─╴─╴─╴
    if (line_style != 1)   cairo_set_dash(cr, dashes_1, num_dashes_1, 0);
 }
 //----------------------------------------------------------------------------
+/// draw a circle with diameter \b size around P0
 static void
 draw_circle(cairo_t * cr, Pixel_XY P0, Color color, int size)
 {
@@ -140,6 +153,7 @@ draw_circle(cairo_t * cr, Pixel_XY P0, Color color, int size)
    cairo_fill(cr);
 }
 //----------------------------------------------------------------------------
+/// draw a ▲ or ▼ with given \b size around P0
 static void
 draw_delta(cairo_t * cr, Pixel_XY P0, bool up, Color color, int size)
 {
@@ -167,6 +181,7 @@ const double s = 0.5*l;           // ∆ base middle to left/right vertex
    cairo_fill(cr);
 }
 //----------------------------------------------------------------------------
+/// draw a ■ or ◆ with given \b size around P0
 static void
 draw_quad(cairo_t * cr, Pixel_XY P0, bool caro, Color color, int size)
 {
@@ -190,6 +205,7 @@ draw_quad(cairo_t * cr, Pixel_XY P0, bool caro, Color color, int size)
    cairo_fill(cr);
 }
 //----------------------------------------------------------------------------
+/// draw a 🞤 or 🞫 with given \b size around P0
 static void
 draw_cross(cairo_t * cr, Pixel_XY P0, bool plus, Color color,
            double size, int size2)
@@ -219,45 +235,49 @@ const double half = 0.5*size;
    cairo_stroke(cr);
 }
 //----------------------------------------------------------------------------
+/// draw a point with given \b point_style and \b size around P
 static void
-draw_point(cairo_t * cr, Pixel_XY P, int point_style,
+draw_point(cairo_t * cr, Pixel_XY P0, int point_style,
            const Color outer_color, int outer_dia,
            const Color inner_color, int inner_dia)
 {
 const bool es = ! (point_style & 1);   // even style
    switch(point_style)
       {
-        case 0:                                                   return;
-        case 1: draw_circle(cr, P,     outer_color, outer_dia);   break;  // ●
-        case 2:                                                           // ▲
-        case 3: draw_delta( cr, P, es, outer_color, outer_dia);   break;  // ▼
-        case 4:                                                           // ◆
-        case 5: draw_quad(  cr, P, es, outer_color, outer_dia);   break;  // ■
-        case 6:                                                           // 🞤
-        case 7: draw_cross( cr, P, es, outer_color, outer_dia,
-                                                    inner_dia);   return; // 🞫
+        case 0:                                                    return;
+        case 1: draw_circle(cr, P0,     outer_color, outer_dia);   break;    // ●
+        case 2:                                                              // ▲
+        case 3: draw_delta( cr, P0, es, outer_color, outer_dia);   break;    // ▼
+        case 4:                                                              // ◆
+        case 5: draw_quad(  cr, P0, es, outer_color, outer_dia);   break;    // ■
+        case 6:                                                              // 🞤
+        case 7: draw_cross( cr, P0, es, outer_color, outer_dia,
+                                                    inner_dia);    return;   // 🞫
         default: MORE_ERROR() << "Invalid point style: "
-                              << point_style;                     return;
+                              << point_style;                      return;
       }
 
-   // at this point, point_style understands (though may not have) inner_dia.
+   // at this point, point_style is one of those that requires (though may not
+   // yet honor) the inner_dia.
    //
    if (inner_dia)   switch(point_style)
       {
-        case 1: draw_circle(cr, P,     inner_color, inner_dia);   return; // ●
-        case 2:                                                           // ▲
-        case 3: draw_delta( cr, P, es, inner_color, inner_dia);   return; // ▼
-        case 4:                                                           // ◆
-        case 5: draw_quad(  cr, P, es, inner_color, inner_dia);   return; // ■
+        case 1: draw_circle(cr, P0,     inner_color, inner_dia);   return;   // ●
+        case 2:                                                              // ▲
+        case 3: draw_delta( cr, P0, es, inner_color, inner_dia);   return;   // ▼
+        case 4:                                                              // ◆
+        case 5: draw_quad(  cr, P0, es, inner_color, inner_dia);   return;   // ■
       }
 }
 //----------------------------------------------------------------------------
+/// draw a red marker for debugging purposes (to show where pixel P0 is)
 inline void
-draw_marker(cairo_t * cr, Pixel_XY P)
+draw_marker(cairo_t * cr, Pixel_XY P0)
 {
-   draw_point(cr, P, 1, 0xFF0000, 10, 0, 0);
+   draw_point(cr, P0, 1, 0xFF0000, 10, 0, 0);
 }
 //----------------------------------------------------------------------------
+/// draw an arrow from O to A
 static void
 draw_arrow(cairo_t * cr, Pixel_XY O, Pixel_XY A, const Color color)
 {
@@ -295,100 +315,230 @@ const Pixel_XY T(S.x + TIP*Ux, S.y + TIP*Uy);
    cairo_fill(cr);
 }
 //----------------------------------------------------------------------------
+/// format \b val according to \b format (with \b percent pointing to % in
+/// format, e.g. %d or %f like in printf()).
 const char *
-format_tick(double val)
+format_user_tick(double val, int tidx, const char * format, const char * percent)
 {
-static char cc[40];
-char * cp = cc;
-   if (val == 0)
+static char cc[60] = "";   // should suffice
+
+   if (percent[1] == 's')   // %s: inline tick texts separated by %
       {
-        *cp++ = '0';
-        *cp++ = 0;
+        // e.g. '%sTick0%Tick1%...TickN"
+        const char * tick_text = percent + 2;   // e.g. Tick0
+        for (int idx = tidx; idx > 0; --idx)   // skip texts < idx
+            {
+              const char * tick_end = strchr(tick_text + 1, '%');
+              if (tick_end == 0)   // no more '%'
+                 {
+                   CERR << "⎕PLOT: too few tick texts in " << percent
+                                << " (at tick " << tidx << ")";
+                   sprintf(cc, "Tick-%d", tidx);
+                   return cc;
+                 }
+              tick_text = tick_end + 1;
+            }
+
+        size_t tick_len = 0;
+        if (const char * tick_end = strchr(tick_text, '%'))
+           tick_len = tick_end - tick_text;
+        else
+           tick_len = strlen(tick_text);
+
+        if (tick_len >= (sizeof(cc) - 1))
+           {
+             CERR << "⎕PLOT: tick text too long";
+             sprintf(cc, "Tick-%d", tidx);
+             return cc;
+           }
+
+        strncpy(cc, tick_text, tick_len);
         return cc;
       }
 
-   if (val < 0)
+bool round = false;
+   while (*percent)
       {
-        *cp++ = '-';
-        val = -val;
+        const char cc = *percent++;
+        if (cc == 'd')  { round = true;   break; }   // %d
+        if (cc == 'i')  { round = true;   break; }   // %i
+        if (cc == 'u')  { round = true;   break; }   // %u
       }
 
-   // at this point,. val > 0
-   //
-   if (val < 1 && val >= 0.1)  // 100-999 milli
-      {
-        snprintf(cc, sizeof(cc), "0.%03d", int(val*1000));
-        size_t cc_len = strlen(cc);
-        if (cc[--cc_len] == '0')   cc[cc_len] = 0;   // skip trailing 0
-        return cc;
-      }
+   if (!round)         snprintf(cc, sizeof(cc), format, val);
+   else if (val > 0)   snprintf(cc, sizeof(cc), format, int(rint(val) + 0.5));
+   else                snprintf(cc, sizeof(cc), format, int(rint(val) - 0.5));
 
-const char * unit = 0;
-   if (val >= 1e3)
-      {
-        if      (val >= 1e15)   ;
-        else if (val >= 1e12)   { unit = "T";   val *= 1e-12; }
-        else if (val >= 1e9)    { unit = "G";   val *= 1e-9;  }
-        else if (val >= 1e6)    { unit = "M";   val *= 1e-6;  }
-        else                    { unit = "k";   val *= 1e-3;  }
-      }
-   else
-      {
-
-        if (val >= 1e0)    { unit = "";                  }
-        else if (val >= 1e-3)   { unit = "m";   val *= 1e3;   }
-        else if (val >= 1e-6)   { unit = "μ";   val *= 1e6;   }
-        else if (val >= 1e-9)   { unit = "n";   val *= 1e9;   }
-        else if (val >= 1e-12)  { unit = "p";   val *= 1e12;  }
-      }
-
-   if (unit == 0)   // very large or very small
-      {
-        snprintf(cp, sizeof(cc) - 1, "%.2E", val);
-        return cc;
-      }
-
-   // at this point: 1 ≤ val < 1000
-   //
-   if      (val < 10)    snprintf(cp, sizeof(cc) - 1, "%.2f%s", val, unit);
-   else if (val < 100)   snprintf(cp, sizeof(cc) - 1, "%.1f%s", val, unit);
-   else                  snprintf(cp, sizeof(cc) - 1, "%.0f%s", val, unit);
    return cc;
 }
 //----------------------------------------------------------------------------
+/// format the text of tick \b idx (with value \b val) according to \b format.
+const char *
+format_tick(double val, double dV, int idx, const char * format)
+{
+   if (*format)   // user-defined format string
+      {
+        if (const char * percent = strchr(format, '%'))
+           return format_user_tick(val, idx, format, percent);
+
+        MORE_ERROR() << "⎕PLOT: no % in user-defined format string";
+        DOMAIN_ERROR;
+      }
+
+   if (val == 0)   return "0";
+
+static char cc[40];   // should suffice
+
+   /* Avoid duplicate axis strings when dV is small. For that we need so many
+      fractional digits that dV makes a difference.
+
+      if dV ≥ 1    then adding dV will increment the integer part of val and
+                        no  fractional digits are needed.
+      if dV ≥ 0.1  then one fractional digit is needed to make a difference
+      if dV ≥ 0.01 then two fractional digit is needed
+      ...
+
+      dV is { 1, 2, 5 }×10ⁿ and threrfore it is better to compare with 0.9
+      instead of 1.0 as to avoid rounding problems with 1.0 < 1.0.
+    */
+char fmt[10];
+short digits = 0;
+   while (dV < 0.9)   { ++digits;   dV *= 10.0; }
+   snprintf(fmt, sizeof(fmt), "%%.%uf", digits);   // e.g. %.2f
+   snprintf(cc,  sizeof(cc) - 1, fmt, val);
+
+   // some locales produce , instead of . in snprintf(). We fix that here...
+   //
+   for (char * cp = cc; *cp; ++cp)   if (*cp == ',')   *cp = '.';
+
+   // skip leading 0 in 0.xxx
+   if (cc[1] == '.' && cc[0] == '0')   return cc + 1;
+
+   // skip leading 0 in -0.xxx
+   if (cc[2] == '.' && cc[1] == '0' && cc[0] == '-')
+      {
+      cc[1] = '-';
+       return cc + 1;
+      }
+
+   // skip leading 0 in -0.xxx
+   return cc;
+}
+//----------------------------------------------------------------------------
+/// return the size of single_line string \b text when printed with font \b
+/// font_name of /// size \b font_size
 void
-cairo_string_size(double & lx, double & ly, cairo_t * cr, const char * label,
+cairo_string_size(double & lx, double & ly, cairo_t * cr, const char * text,
                   const char * font_name, double font_size)
 {
-  cairo_new_path(cr);
   cairo_select_font_face(cr, font_name, CAIRO_FONT_SLANT_NORMAL,
                                         CAIRO_FONT_WEIGHT_NORMAL);
 
   cairo_set_font_size(cr, font_size);
 
-  cairo_move_to(cr, 0.0, 0.0);
-  cairo_text_path(cr, label);
-
-  cairo_get_current_point(cr, &lx, &ly);
-  if (ly == 0.0)   ly = font_size;   // cairo bug
-  cairo_new_path(cr);
+cairo_text_extents_t extends;
+  cairo_text_extents(cr, text, &extends);
+  lx = extends.width;
+  ly = extends.height;
 }
 //----------------------------------------------------------------------------
+/// return the size len_x:len_y of the multi_line string \b lines when
+/// printed with font \b font_name of size \b font_size
 void
-draw_text(cairo_t * cr, const char * label, const Pixel_XY & xy)
+cairo_multiline_size(double & len_x, double & len_y, cairo_t * cr,
+                     const char * lines, const char * font_name, double font_size)
 {
-  cairo_move_to(cr, xy.x, xy.y);
+  len_x = 0;
+  len_y = 0;
+char line[strlen(lines) + 10];
+
+   // split lines into single strings line and cumulate the sizes
+   for (;;)
+       {
+         double lx = 0;
+         double ly = 0;
+         if (const char * nl = strchr(lines, '\n'))   // more lines coming
+            {
+              const size_t len = nl - lines;
+              memcpy(line, lines, len);
+              line[len] = 0;
+              lines = nl + 1;
+
+              cairo_string_size(lx, ly, cr, line, font_name, font_size);
+              if (len_x < lx)   len_x = lx;   // horizontal: take maximum
+              if (len_y)   len_y += 2;        // space between lines
+              len_y += ly;                    // vertical: add height
+            }
+         else                      // final line
+            {
+              cairo_string_size(lx, ly, cr, lines, font_name, font_size);
+              if (len_x < lx)   len_x = lx;   // horizontal: take maximum
+              if (len_y)   len_y += 2;        // space between lines
+              len_y += ly;                    // vertical: add height
+              break;   // for (;;)
+            }
+       }
+}
+//----------------------------------------------------------------------------
+/// draw single-line string \b text at position xy
+void
+draw_text(cairo_t * cr, const char * text, const Pixel_XY & xy)
+{
   cairo_select_font_face(cr, FONT_NAME,
                              CAIRO_FONT_SLANT_NORMAL,
                              CAIRO_FONT_WEIGHT_NORMAL);
-
   cairo_set_font_size(cr, FONT_SIZE);
 
-  ///  cairo_show_text(cr, label);
-  cairo_text_path(cr, label);
+  cairo_move_to(cr, xy.x, xy.y);
+
+  ///  cairo_show_text(cr, text);
+  cairo_text_path(cr, text);
   cairo_fill(cr);
 }
 //----------------------------------------------------------------------------
+/// draw multi-line string \b lines at position xy
+void
+draw_multiline(cairo_t * cr, const char * lines, Pixel_XY xy, double width)
+{
+const char * font_name = FONT_NAME;
+const int font_size = FONT_SIZE;
+  cairo_select_font_face(cr, font_name,
+                             CAIRO_FONT_SLANT_NORMAL,
+                             CAIRO_FONT_WEIGHT_NORMAL);
+
+  cairo_set_font_size(cr, font_size);
+
+char line[strlen(lines) + 10];
+
+   for (;;)
+       {
+         if (const char * nl = strchr(lines, '\n'))   // more lines coming
+            {
+              const size_t len = nl - lines;
+              memcpy(line, lines, len);
+              line[len] = 0;
+              lines = nl + 1;
+
+              double line_w = 0, line_h = 0;   // size of line
+              cairo_string_size(line_w, line_h, cr, line, font_name, font_size);
+              const double indent = 0.5*(width - line_w);
+
+              cairo_move_to(cr, xy.x + indent, xy.y);
+              cairo_text_path(cr, line);
+              xy.y += 2 + FONT_SIZE;
+              cairo_fill(cr);
+            }
+         else   // final line
+            {
+              cairo_move_to(cr, xy.x, xy.y);
+              cairo_text_path(cr, lines);
+              cairo_fill(cr);
+              break;
+            }
+       }
+}
+//----------------------------------------------------------------------------
+/// draw a legend for the different plot lines
 void
 draw_legend(cairo_t * cr, const Plot_context & pctx, bool surface_plot)
 {
@@ -418,13 +568,19 @@ double longest_len = 0.0;
        }
 
 const Color canvas_color = w_props.get_canvas_color();
+const Color legend_color = w_props.get_legend_color();
 
   /*
                              ┌────────────────────────┐
-   every legend looks like:  │  ---o---  legend_name  │  -- y0
+   every legend looks like:  │  ───o───  legend_name  │──── y0
                              └────────────────────────┘
-                                |  |  |  |
+                                │  │  │  │
                                x0 x1 x2 xt
+                                │  │  │  │
+                                │  │  │  └──── start of legend text
+                                │  │  └─────── end of legend line
+                                │  └────────── point of legend line
+                                └───────────── start of legend line
   */
 
 const Pixel_XY origin = w_props.get_origin(surface_plot);
@@ -450,7 +606,7 @@ const int dy = w_props.get_legend_dY();
      const double Y0 = y0 - ly2                       - BORDER;
      const double Y1 = y0 + ly2 + dy*(line_count - 1) + BORDER;
 
-     cairo_set_RGB_source(cr, canvas_color);
+     cairo_set_RGB_source(cr, legend_color);
      cairo_rectangle(cr, X0, Y0, X1 - X0, Y1 - Y0);
      cairo_fill_preserve(cr);
      cairo_set_RGB_source(cr, 0x000000);
@@ -478,6 +634,7 @@ const int dy = w_props.get_legend_dY();
        }
 }
 //----------------------------------------------------------------------------
+/// swap pixels P0 with value Y0, and P1 with value Y1
 static inline void
 pv_swap(Pixel_XY & P0, double & Y0, Pixel_XY & P1, double & Y1)
 {
@@ -485,8 +642,8 @@ const double   Y = Y0;   Y0 = Y1;   Y1 = Y;
 const Pixel_XY P = P0;   P0 = P1;   P1 = P;
 }
 //----------------------------------------------------------------------------
-// draw a 3D triangle where one point P0 is at visual height H0 and the
-// other two points P1 and P2 are the same at visual height H12.
+/// draw a 3D triangle where one point P0 is at visual height H0 and the
+/// other two points P1 and P2 are the same at visual height H12.
 void
 draw_triangle(cairo_t * cr, const Plot_context & pctx, int verbosity,
               Pixel_XY P0, double H0, Pixel_XY P1, Pixel_XY P2, double H12)
@@ -521,9 +678,9 @@ const double dH = (H12 - H0) / steps;
        }
 }
 //----------------------------------------------------------------------------
-// draw a 3D triangle where the points P0, P1, and P2 are at visual
-// heights H0, H1, and H2 respectively. This is done by splitting the
-// triangle into two triangles that each have 2 points at the same height.
+/// draw a 3D triangle where the points P0, P1, and P2 are at visual
+/// heights H0, H1, and H2 respectively. This is done by splitting the
+/// triangle into two triangles that each have 2 points at the same height.
 void
 draw_triangle(cairo_t * cr, const Plot_context & pctx, int verbosity,
               Pixel_XY P0, double H0, Pixel_XY P1, double H1,
@@ -579,6 +736,7 @@ const vector<level_color> & color_steps = w_props.get_gradient();
       }
 }
 //----------------------------------------------------------------------------
+/// draw the (vertical) X grid-lines of the plot (starting from the X axis)
 void
 draw_X_grid(cairo_t * cr, const Plot_context & pctx, bool surface_plot)
 {
@@ -590,34 +748,40 @@ const Pixel_Y py0 = w_props.valY2pixel(0);
 const double dv = w_props.get_max_Y() - w_props.get_min_Y();
 const Pixel_Y py1 = w_props.valY2pixel(dv);
 const int grid_style = w_props.get_gridX_style();
+
    for (int ix = 0; ix <= w_props.get_gridX_last(); ++ix)
        {
-         const double v = w_props.get_min_X() + ix*w_props.get_value_per_tile_X();
+         const double dV = w_props.get_value_per_tile_X();
+         const double v = w_props.get_min_X() + ix*dV;
          const int px0 = w_props.valX2pixel(v - w_props.get_min_X())
                        + w_props.get_origin_X();
 
+         // draw the first and last grid line solid, the others with
+         // the desired line style.
+         //
          if (ix == 0 || ix == w_props.get_gridX_last())
             {
-              draw_line(cr, grid_color, 1, line_width,
-                        Pixel_XY(px0, py0), Pixel_XY(px0, py1));
+              draw_line(cr, grid_color, /* solid */ 1, line_width,
+                        Pixel_XY(px0, py0 + 5), Pixel_XY(px0, py1));
             }
          else
             {
               draw_line(cr, grid_color, grid_style, line_width,
-                        Pixel_XY(px0, py0 + 5), Pixel_XY(px0, py1 - 5));
+                        Pixel_XY(px0, py0 + 5), Pixel_XY(px0, py1));
             }
 
-         const char * cc = format_tick(v);
+         string format = w_props.get_format_X();
+         const char * cc = format_tick(v, dV, ix, format.c_str());
          double cc_width, cc_height;
-         cairo_string_size(cc_width, cc_height, cr, cc, FONT_NAME, FONT_SIZE);
+         cairo_multiline_size(cc_width, cc_height, cr, cc, FONT_NAME, FONT_SIZE);
 
-         Pixel_XY cc_pos(px0 - 0.5*cc_width, py0 + cc_height + 3);
+         Pixel_XY cc_pos(px0 - 0.5*cc_width, py0 + cc_height + 8);
          if (surface_plot)
             {
               cc_pos.x -= w_props.get_origin_X();
               cc_pos.y += w_props.get_origin_Y();
             }
-         draw_text(cr, cc, cc_pos);
+         draw_multiline(cr, cc, cc_pos, cc_width);
        }
 
    if (w_props.get_axisX_arrow())
@@ -636,6 +800,7 @@ const int grid_style = w_props.get_gridX_style();
       }
 }
 //----------------------------------------------------------------------------
+/// draw the (horizontal) Y grid-lines of the plot (starting at the Y axis)
 void
 draw_Y_grid(cairo_t * cr, const Plot_context & pctx, bool surface_plot)
 {
@@ -647,32 +812,49 @@ const Pixel_X px0 = w_props.valX2pixel(0) + w_props.get_origin_X();
 const double dv = w_props.get_max_X() - w_props.get_min_X();
 const Pixel_X px1 = w_props.valX2pixel(dv) + w_props.get_origin_X();
 const int grid_style = w_props.get_gridY_style();
+
    for (int iy = 0; iy <= w_props.get_gridY_last(); ++iy)
        {
-         const double v = w_props.get_min_Y() + iy*w_props.get_value_per_tile_Y();
+         const double dV = w_props.get_value_per_tile_Y();
+         const double v = w_props.get_min_Y() + iy*dV;
          const Pixel_Y py0 = w_props.valY2pixel(v - w_props.get_min_Y());
-         if (iy == 0 || iy == w_props.get_gridY_last())
+
+         // draw the first and last grid line solid, the others with
+         // the desired line style.
+         //
+         if (iy == 0 || iy == w_props.get_gridY_last())   // first or last line
             {
-              draw_line(cr, grid_color, 1, line_width,
-                        Pixel_XY(px0, py0), Pixel_XY(px1, py0));
+              draw_line(cr, grid_color, /* solid */ 1, line_width,
+                        Pixel_XY(px0 - 5, py0), Pixel_XY(px1 + 1, py0));
             }
          else
             {
 
               draw_line(cr, grid_color, grid_style, line_width,
-                        Pixel_XY(px0 - 5, py0), Pixel_XY(px1 + 5, py0));
+                        Pixel_XY(px0 - 5, py0), Pixel_XY(px1 + 1, py0));
             }
-         const char * cc = format_tick(v);
+         string format = w_props.get_format_Y();
+         const char * cc = format_tick(v, dV, iy, format.c_str());
          double cc_width, cc_height;
-         cairo_string_size(cc_width, cc_height, cr, cc, FONT_NAME, FONT_SIZE);
+         cairo_multiline_size(cc_width, cc_height, cr, cc, FONT_NAME, FONT_SIZE);
 
-         Pixel_XY cc_pos(px0 - cc_width - 4, py0 + 0.5 * cc_height - 1);
+         Pixel_XY cc_pos(px0 - cc_width - 8, py0 + 0.5 * cc_height - 1);
          if (surface_plot)
             {
               cc_pos.x -= w_props.get_origin_X();
               cc_pos.y += w_props.get_origin_Y();
             }
-           draw_text(cr, cc, cc_pos);
+
+           if (int16_t(cc_pos.x) < 0)
+              {
+                CERR << "⎕PLOT warning: pa_border_L="
+                     << int(w_props.get_pa_border_L())
+                     << " is too small to print all Y-axis ticks (add "
+                     << -int16_t(cc_pos.x) << ").";
+                COUT << endl;
+              }
+
+           draw_multiline(cr, cc, cc_pos, cc_width);
        }
 
    if (w_props.get_axisY_arrow())
@@ -705,6 +887,7 @@ const int grid_style = w_props.get_gridY_style();
       }
 }
 //----------------------------------------------------------------------------
+/// draw the (slanted) Z grid-lines of the plot
 void
 draw_Z_grid(cairo_t * cr, const Plot_context & pctx)
 {
@@ -723,11 +906,12 @@ const Pixel_XY orig = w_props.valXYZ2pixelXY(w_props.get_min_X(),
 const Pixel_X len_X = w_props.valX2pixel(w_props.get_max_X())
                     - w_props.valX2pixel(w_props.get_min_X());
 
-   // NOTE: in cairo (other than in xcb) the Y-coordinates increase when moving
-   // down the screen. Therefore larger Y values correspond to smsller Y
-   // coordinates and we must subtract w_props.valY2pixel(w_props.get_max_Y())
-   // from w_props.valY2pixel(w_props.get_min_Y()) and not the other way around.
-   //
+   /* NOTE: in cairo (other than in xcb) the Y-coordinates increase when moving
+      down the screen. Therefore larger Y values correspond to smsller Y
+      coordinates and we must subtract w_props.valY2pixel(w_props.get_max_Y())
+      from w_props.valY2pixel(w_props.get_min_Y()) and not the other way
+      around.
+    */
 const Pixel_Y len_Y = w_props.valY2pixel(w_props.get_min_Y())
                     - w_props.valY2pixel(w_props.get_max_Y());
 
@@ -744,10 +928,13 @@ int grid_style = w_props.get_gridZ_style();
          const  Pixel_XY PX(px1, py0);   // along the X axis
          const  Pixel_XY PY(px0, py1);   // along the Y axis
 
+         // draw the first and last grid line solid, the others with
+         // the desired line style.
+         //
          if (iz == iz_max)   // full line
             {
-              draw_line(cr, grid_color, 1, line_width, PZ, PX);
-              draw_line(cr, grid_color, 1, line_width, PZ, PY);
+              draw_line(cr, grid_color, /* solid */ 1, line_width, PZ, PX);
+              draw_line(cr, grid_color, /* solid */ 1, line_width, PZ, PY);
             }
          else
             {
@@ -755,12 +942,14 @@ int grid_style = w_props.get_gridZ_style();
               draw_line(cr, grid_color, grid_style, line_width, PZ, PY);
             }
 
-         const double v = w_props.get_min_Z() + iz*w_props.get_value_per_tile_Z();
-         const char * cc = format_tick(v);
+         const double dV = w_props.get_value_per_tile_Z();
+         const double v = w_props.get_min_Z() + iz*dV;
+         string format = w_props.get_format_Z();
+         const char * cc = format_tick(v, dV, iz, format.c_str());
          double cc_width, cc_height;
-         cairo_string_size(cc_width, cc_height, cr, cc, FONT_NAME, FONT_SIZE);
+         cairo_multiline_size(cc_width, cc_height, cr, cc, FONT_NAME, FONT_SIZE);
          const Pixel_XY cc_pos(px1 + 10, py0 + 0.5*cc_height - 1);
-         draw_text(cr, cc, cc_pos);
+         draw_multiline(cr, cc, cc_pos, cc_width);
        }
 
    // lines starting on the X-axis...
@@ -1032,6 +1221,7 @@ const int point_style  = lp0.get_point_style();
       }
 }
 //----------------------------------------------------------------------------
+/// plot the data
 static void
 do_plot(GtkWidget * drawing_area, const Plot_context & pctx, cairo_t * cr)
 {
@@ -1063,13 +1253,39 @@ const bool surface_plot = w_props.get_plot_data().is_surface_plot();
   draw_legend(cr, pctx, surface_plot);
 }
 //----------------------------------------------------------------------------
+/// callback when the plot window is destroyed
 extern "C" gboolean
 plot_destroyed(GtkWidget * top_level);
 
 gboolean
 plot_destroyed(GtkWidget * top_level)
 {
+   /* top_level is the window that was destroyed. Remove it from 
+      all_all_plot_contexts to avoid
+      'invalid unclassed pointer in cast to 'GtkWindow' assertions.
+
+      Case 1: the window was closed from APL. Then plot_stop() has already
+              removed the window from all_plot_contexts and we will not find it
+              below.
+
+      Case 2: the user has closed the window via the GUI. Then plot_stop() was
+              not yet called. We will then find top_level in all_plot_contexts
+              and remove it.
+    */
+
    if (verbosity & SHOW_EVENTS)   CERR << "PLOT DESTROYED" << endl;
+
+   for (size_t th = 0; th < all_plot_contexts.size(); ++th)
+       {
+         const Plot_context * pctx = all_plot_contexts[th];
+         if (top_level == pctx->window)                       // mark it closed
+            {
+              all_plot_contexts[th] = all_plot_contexts.back();
+              all_plot_contexts.pop_back();
+              break;
+            }
+       }
+
   // gtk_main_quit();
   return TRUE;   // event handled by this handler
 }
@@ -1078,66 +1294,119 @@ plot_destroyed(GtkWidget * top_level)
 cairo_surface_t *
 add_border(const Plot_context & pctx, cairo_surface_t * old_surface)
 {
-   // gtk_win is the window including borders
+   // gtk_win is the smaller window (excluding the borders created by the
+   // window manager).
    //
 GtkWindow * gtk_win = GTK_WINDOW(pctx.window);   // the plot window (GTK)
    Assert(gtk_win);
-int gtk_x, gtk_y, gtk_w, gtk_h;
-   gtk_window_get_position(gtk_win, &gtk_x, &gtk_y);
-   gtk_window_get_size(gtk_win, &gtk_w, &gtk_h);
 
-   // gtd is the window excluding borders (with slightly larger x, y and the
-   // same size
+int gtk_x, gtk_y;   gtk_window_get_position(gtk_win, &gtk_x, &gtk_y);
+int gtk_w, gtk_h;   gtk_window_get_size(gtk_win, &gtk_w, &gtk_h);
+
+   // gdk_win is the larger window (i.e. including borders created by the window
+   //  manager.
    //
 GdkWindow * gdk_win = gtk_widget_get_window(GTK_WIDGET(gtk_win));   // dito (GDK)
    Assert(gdk_win);
+int gdk_x, gdk_y;   gdk_window_get_position(gdk_win, &gdk_x, &gdk_y);
 
-int gdk_x, gdk_y;
-   gdk_window_get_position(gdk_win, &gdk_x, &gdk_y);
+   /* compute the border widths. We can assume that the thin east, south, and
+   // west borders are the same while the north boarder is thicker due to the
+   // window caption. We subtract the N/W corner of the (smaller) gtk_win from
+   // the N/W corner of the gdk_win. The x-difference is then the thinkness
+   // of the East- (and hence South and West-) border while the x-difference
+   // is the thinkness of the North- border.
+
+          ╔═════════════ Gdk window ═══ ...
+          ║    dy
+          ║    ┌──────── Gtk window ─── ...
+          ║ dx │
+          ║    │
+           ...
+    */
 
 const int N_border   = gdk_y - gtk_y;   // north border (window caption)
-const int ESW_border = gdk_x - gtk_x;   // east, south, or west border
+const int ESW_border = gdk_x - gtk_x;   // east, south, or west borders
 
-GdkWindow * root = gdk_get_default_root_window();
-GdkPixbuf * pixbuf = gdk_pixbuf_get_from_window(root, gtk_x, gtk_y,
-                                                gtk_w + 2*ESW_border,
-                                                gtk_h + N_border + ESW_border);
-
-cairo_surface_t * ret = gdk_cairo_surface_create_from_pixbuf(pixbuf, 1, gdk_win);
-
-   // at this point the window manager has already displayed the window borders,
-   // but not yet the content (since we haven't returned yet). We fix that by
-   // copyingg the new content (which is contained in old_surface) into ret.
+   // create a GdkPixbuf. The gdk_get_default_root_window() contains the
+   // (north) window caption and east, south, aand weset borders, so they
+   // need to be added to that the GdkPixbuf does not get truncated.
    //
-cairo_t * cr2 = cairo_create(ret);
-   cairo_new_path(cr2);
-   cairo_set_source_surface(cr2, old_surface, ESW_border, N_border);
-   cairo_rectangle(cr2, ESW_border, N_border, gtk_w, gtk_h);
-   cairo_fill(cr2);
-   cairo_destroy(cr2);
+GdkWindow * root = gdk_get_default_root_window();
+   if (pctx.w_props.get_with_border())   // with window borders
+      {
+        GdkPixbuf * pixbuf = gdk_pixbuf_get_from_window(root, gtk_x, gtk_y,
+                                                        gtk_w + 2*ESW_border,
+                                                        gtk_h + N_border
+                                                              + ESW_border);
 
-   return ret;
+        cairo_surface_t * ret = gdk_cairo_surface_create_from_pixbuf(pixbuf,
+                                                                     1, gdk_win);
+
+        // at this point the window manager has already displayed the window
+        // borders, but not the window content (since we have not yet returned
+        // from draw_callback()).  We fix that by copying the new content
+        //  (which is contained in old_surface) into ret.
+        //
+        cairo_t * cr2 = cairo_create(ret);
+        cairo_new_path(cr2);
+        cairo_set_source_surface(cr2, old_surface, ESW_border, N_border);
+        cairo_rectangle(cr2, ESW_border, N_border, gtk_w, gtk_h);
+        cairo_fill(cr2);
+        cairo_destroy(cr2);
+
+        return ret;
+      }
+   else                                     // without window borders
+      {
+        // the pix buf starts a little later and is a little smaller
+        //
+        GdkPixbuf * pixbuf = gdk_pixbuf_get_from_window(root,
+                                                        gtk_x + ESW_border,
+                                                        gtk_y + N_border,
+                                                        gtk_w, gtk_h);
+
+        cairo_surface_t * ret = gdk_cairo_surface_create_from_pixbuf(pixbuf,
+                                                                     1, gdk_win);
+
+        // at this point the window manager has already displayed the window
+        // borders, but not the window content (since we have not yet returned
+        // from draw_callback()).  We fix that by copying the new content
+        //  (which is contained in old_surface) into ret.
+        //
+        cairo_t * cr2 = cairo_create(ret);
+        cairo_new_path(cr2);
+        cairo_set_source_surface(cr2, old_surface, 0, 0);
+        cairo_rectangle(cr2, 0, 0, gtk_w, gtk_h);
+        cairo_fill(cr2);
+        cairo_destroy(cr2);
+
+        return ret;
+      }
 }
 //----------------------------------------------------------------------------
+/// save the pixels of the plot to a file
 static void
-save_file(const Plot_context & pctx, cairo_surface_t * surface)
+save_file(Plot_context & pctx, cairo_surface_t * surface)
 {
-const Plot_window_properties & w_props = pctx.w_props;
+Plot_window_properties & w_props = pctx.w_props;
 
 string fname = w_props.get_output_filename();
-   if (fname.size() == 0)   return;
+   if (fname.size() == 0)   return;   // no output_filename or already written
 
+   // append .png unless already there
    if (fname.size() < 4 || strcmp(".png", fname.c_str() + fname.size() - 4))
       fname += ".png";
 
-cairo_status_t stat;
+cairo_status_t stat = CAIRO_STATUS_SUCCESS;
 
+   errno = 0;
    if (cairo_surface_t * file_surface = add_border(pctx, surface))
       {
         stat = cairo_surface_write_to_png(file_surface, fname.c_str());
         cairo_surface_destroy(file_surface);
       }
-   else   // adding window boarder failed (or not desired)
+   else   // adding window border failed (or not desired)
       {
         stat = cairo_surface_write_to_png(surface, fname.c_str());
       }
@@ -1145,16 +1414,23 @@ cairo_status_t stat;
    if (stat == CAIRO_STATUS_SUCCESS)
       {
         CERR << "wrote output file: " << fname << endl;
+
+        // clear filename so it won;t be written again.
+        //
+        string empty;
+        w_props.set_output_filename(empty);
   //    if (w_props.get_auto_close() == 1)   gtk_main_quit();
       }
 
    else
       {
-        CERR << "*** writing output fil: " << fname << " failed." << endl;
+        CERR << "*** writing output file: '" << fname << "' failed: "
+             << strerror(errno) << endl;
   //    if (w_props.get_auto_close() == 2)   gtk_main_quit();
       }
 }
 //----------------------------------------------------------------------------
+/// callback when the plot window shall be redrawn
 extern "C" gboolean
 draw_callback(GtkWidget * drawing_area, cairo_t * cr, gpointer user_data);
 
@@ -1172,7 +1448,7 @@ const int new_height = gtk_widget_get_allocated_height(drawing_area);
 
    // find the Plot_context for this event...
    //
-const Plot_context * pctx = 0;
+Plot_context * pctx = 0;
    for (size_t th = 0; th < all_plot_contexts.size(); ++th)
        {
            if (all_plot_contexts[th]->drawing_area == drawing_area)
@@ -1213,6 +1489,8 @@ cairo_surface_t * surface = gdk_window_create_similar_surface(
    return TRUE;   // event handled by this handler
 }
 //----------------------------------------------------------------------------
+/// make gtk_main() suitable for pthread_create() and maybe tell when it is
+/// finished
 static void *
 gtk_main_wrapper(void * w_props)
 {
@@ -1249,9 +1527,15 @@ plot_stop(const Plot_window_properties * props)
          const Plot_window_properties * w_props = &pctx->w_props;
          if (w_props == props)
             {
-              gtk_window_close(GTK_WINDOW(pctx->window));
+              const GtkWidget * top_level = pctx->window;
+
+               // gtk_window_close() calls plot_destroyed() so we should
+               // remove it from all_plot_contexts beforehand.
+               //
               all_plot_contexts[th] = all_plot_contexts.back();
               all_plot_contexts.pop_back();
+
+              gtk_window_close(GTK_WINDOW(top_level));
               return props;
             }
        }

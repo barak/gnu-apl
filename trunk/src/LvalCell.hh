@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 
 #include "Cell.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
     A cell pointing to another cell.
     This is used for selective assignments.
@@ -51,7 +51,7 @@ public:
    Value * get_cell_owner() const
       { return value.pval.owner; }
 
-   // make sure that owner (if any) owns this Cell
+   /// make sure that owner (if any) owns this Cell
    void check_consistency() const;
 
 protected:
@@ -76,6 +76,6 @@ protected:
    /// downcast to LvalCell
    virtual LvalCell & vLvalCell()   { return *this; }
 };
-//=============================================================================
+//============================================================================
 
 #endif // __LVALCELL_HH_DEFINED__

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 
 #include "PrimitiveFunction.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** System function index of (⍳) */
 /// The class implementing ⍳
 class Bif_F12_INDEX_OF : public NonscalarFunction
@@ -62,7 +62,7 @@ protected:
    /// compare function for Heapsort<ShapeItem>::search<const Cell &>
    static int bs_cmp(const Cell & cell, const ShapeItem & A, const void * ctx);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __Bif_F12_INDEX_OF_HH_DEFINED__
 

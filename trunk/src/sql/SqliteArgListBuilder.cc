@@ -94,24 +94,31 @@ Value_P SqliteArgListBuilder::run_query( bool ignore_result )
         results.push_back( row );
     }
 
-    Value_P db_result_value;
-    int row_count = results.size();
-    if( row_count > 0 ) {
-        int col_count = results[0].get_values().size();
-        Shape result_shape( row_count, col_count );
-        db_result_value = Value_P( result_shape, LOC );
-        for( vector<ResultRow>::iterator row_iterator = results.begin() ; row_iterator != results.end() ; row_iterator++ ) {
-            const vector<const ResultValue *> &row = row_iterator->get_values();
-            for( vector<const ResultValue *>::const_iterator col_iterator = row.begin() ; col_iterator != row.end() ; col_iterator++ ) {
-                (*col_iterator)->update( db_result_value->next_ravel(),
-                                         db_result_value.getref() );
-            }
-        }
-    }
-    else {
-        db_result_value = Idx0( LOC );
-    }
+Value_P db_result_value;
+int row_count = results.size();
+    if (row_count > 0 )
+       {
+         int col_count = results[0].get_values().size();
+         Shape result_shape( row_count, col_count );
+         db_result_value = Value_P(result_shape, LOC);
+         for (vector<ResultRow>::iterator row_iterator = results.begin();
+              row_iterator != results.end(); row_iterator++ )
+             {
+               const vector<const ResultValue *> & row =
+                            row_iterator->get_values();
+               for (vector<const ResultValue *>::const_iterator col_iterator
+                                                                = row.begin();
+                    col_iterator != row.end() ; col_iterator++)
+                   {
+                     (*col_iterator)->update(*db_result_value);
+                   }
+             }
+       }
+    else
+       {
+         db_result_value = Idx0(LOC);
+       }
 
-    db_result_value->check_value( LOC );
+    db_result_value->check_value(LOC);
     return db_result_value;
 }

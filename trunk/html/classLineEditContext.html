@@ -77,9 +77,9 @@ Collaboration diagram for LineEditContext:</div>
 <div class="dyncontent">
 <div class="center"><img src="classLineEditContext__coll__graph.png" border="0" usemap="#LineEditContext_coll__map" alt="Collaboration graph"/></div>
 <map name="LineEditContext_coll__map" id="LineEditContext_coll__map">
-<area shape="rect" id="node2" href="classLineHistory.html" title="the lines that the user has previously entered " alt="" coords="49,179,137,206"/>
-<area shape="rect" id="node3" href="classUCS__string__vector.html" title="a vector of UCS_strings. " alt="" coords="27,81,160,108"/>
-<area shape="rect" id="node5" href="classUCS__string.html" title="A string of Unicode characters (32&#45;bit) " alt="" coords="303,179,393,206"/>
+<area shape="rect" id="node2" href="classLineHistory.html" title="the lines that the user has previously entered " alt="" coords="183,209,271,235"/>
+<area shape="rect" id="node3" href="classUCS__string.html" title="A string of Unicode characters (32&#45;bit) " alt="" coords="23,96,114,123"/>
+<area shape="rect" id="node5" href="classUCS__string__vector.html" title="a vector of UCS_strings. " alt="" coords="183,96,317,123"/>
 </map>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
@@ -121,6 +121,10 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLineEditContext.html#a347304e997f587298b31ca56b87b2826">move_idx</a> (int new_idx)</td></tr>
 <tr class="memdesc:a347304e997f587298b31ca56b87b2826"><td class="mdescLeft">&#160;</td><td class="mdescRight">move the cursor <br /></td></tr>
 <tr class="separator:a347304e997f587298b31ca56b87b2826"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a716df1d91d6c505fee75b4dd4df33601"><td class="memItemLeft" align="right" valign="top"><a id="a716df1d91d6c505fee75b4dd4df33601"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLineEditContext.html#a716df1d91d6c505fee75b4dd4df33601">get_idx</a> (void)</td></tr>
+<tr class="memdesc:a716df1d91d6c505fee75b4dd4df33601"><td class="mdescLeft">&#160;</td><td class="mdescRight">get current cursor column <br /></td></tr>
+<tr class="separator:a716df1d91d6c505fee75b4dd4df33601"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a42e54e34054a3d943bedba1021973f0a"><td class="memItemLeft" align="right" valign="top"><a id="a42e54e34054a3d943bedba1021973f0a"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLineEditContext.html#a42e54e34054a3d943bedba1021973f0a">set_cursor</a> ()</td></tr>
 <tr class="memdesc:a42e54e34054a3d943bedba1021973f0a"><td class="mdescLeft">&#160;</td><td class="mdescRight">set the cursor (writing the appropriate ESC sequence to CIN) <br /></td></tr>
@@ -181,6 +185,10 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLineEditContext.html#a8908cfbf56371294323892784508eca7">tab_expansion</a> (LineInputMode mode)</td></tr>
 <tr class="memdesc:a8908cfbf56371294323892784508eca7"><td class="mdescLeft">&#160;</td><td class="mdescRight">tab expansion <br /></td></tr>
 <tr class="separator:a8908cfbf56371294323892784508eca7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2508faadc966340cdf4a5f2b1f5d11db"><td class="memItemLeft" align="right" valign="top"><a id="a2508faadc966340cdf4a5f2b1f5d11db"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLineEditContext.html#a2508faadc966340cdf4a5f2b1f5d11db">cursor_CLEAR_SEARCH</a> ()</td></tr>
+<tr class="memdesc:a2508faadc966340cdf4a5f2b1f5d11db"><td class="mdescLeft">&#160;</td><td class="mdescRight">reset search substring <br /></td></tr>
+<tr class="separator:a2508faadc966340cdf4a5f2b1f5d11db"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afb1bb78e3774564eb2fc1c58a672365c"><td class="memItemLeft" align="right" valign="top"><a id="afb1bb78e3774564eb2fc1c58a672365c"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLineEditContext.html#afb1bb78e3774564eb2fc1c58a672365c">cursor_UP</a> ()</td></tr>
 <tr class="memdesc:afb1bb78e3774564eb2fc1c58a672365c"><td class="mdescLeft">&#160;</td><td class="mdescRight">move backwards in history <br /></td></tr>
@@ -189,6 +197,14 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLineEditContext.html#a8e52f296fc6f747ddfce8d6550f2db45">cursor_DOWN</a> ()</td></tr>
 <tr class="memdesc:a8e52f296fc6f747ddfce8d6550f2db45"><td class="mdescLeft">&#160;</td><td class="mdescRight">move forward in history <br /></td></tr>
 <tr class="separator:a8e52f296fc6f747ddfce8d6550f2db45"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a43cc3cfb93095a5d3e0121aec6ab1071"><td class="memItemLeft" align="right" valign="top"><a id="a43cc3cfb93095a5d3e0121aec6ab1071"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLineEditContext.html#a43cc3cfb93095a5d3e0121aec6ab1071">update_SEARCH</a> ()</td></tr>
+<tr class="memdesc:a43cc3cfb93095a5d3e0121aec6ab1071"><td class="mdescLeft">&#160;</td><td class="mdescRight">shortcut calling update_search() of member <b>history</b> with argument <b>user_line</b> <br /></td></tr>
+<tr class="separator:a43cc3cfb93095a5d3e0121aec6ab1071"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adc5ab21d52a2ea0c7219357dcd0c067f"><td class="memItemLeft" align="right" valign="top"><a id="adc5ab21d52a2ea0c7219357dcd0c067f"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLineEditContext.html#adc5ab21d52a2ea0c7219357dcd0c067f">cursor_SEARCH</a> ()</td></tr>
+<tr class="memdesc:adc5ab21d52a2ea0c7219357dcd0c067f"><td class="mdescLeft">&#160;</td><td class="mdescRight">search line history <br /></td></tr>
+<tr class="separator:adc5ab21d52a2ea0c7219357dcd0c067f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae1d81648a808d88cd0cd0a2a35df1863"><td class="memItemLeft" align="right" valign="top"><a id="ae1d81648a808d88cd0cd0a2a35df1863"></a>
 const <a class="el" href="classUCS__string.html">UCS_string</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLineEditContext.html#ae1d81648a808d88cd0cd0a2a35df1863">get_user_line</a> () const</td></tr>
 <tr class="memdesc:ae1d81648a808d88cd0cd0a2a35df1863"><td class="mdescLeft">&#160;</td><td class="mdescRight">return current user input <br /></td></tr>
@@ -234,7 +250,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="separator:aeff76efaf88899cfbb1dbf8b5a16b0db"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac447cbb419ee368483b12fcd31a6278a"><td class="memItemLeft" align="right" valign="top"><a id="ac447cbb419ee368483b12fcd31a6278a"></a>
 <a class="el" href="classUCS__string.html">UCS_string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLineEditContext.html#ac447cbb419ee368483b12fcd31a6278a">user_line_before_history</a></td></tr>
-<tr class="memdesc:ac447cbb419ee368483b12fcd31a6278a"><td class="mdescLeft">&#160;</td><td class="mdescRight">dito <br /></td></tr>
+<tr class="memdesc:ac447cbb419ee368483b12fcd31a6278a"><td class="mdescLeft">&#160;</td><td class="mdescRight">ditto <br /></td></tr>
 <tr class="separator:ac447cbb419ee368483b12fcd31a6278a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-static-attribs"></a>
@@ -247,7 +263,7 @@ static <a class="el" href="classUCS__string.html">UCS_string</a>&#160;</td><td c
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>a context for one user-input line </p>
 
-<p class="definition">Definition at line <a class="el" href="LineInput_8hh_source.html#l00116">116</a> of file <a class="el" href="LineInput_8hh_source.html">LineInput.hh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LineInput_8hh_source.html#l00131">131</a> of file <a class="el" href="LineInput_8hh_source.html">LineInput.hh</a>.</p>
 </div><hr/>The documentation for this class was generated from the following files:<ul>
 <li>src/<a class="el" href="LineInput_8hh_source.html">LineInput.hh</a></li>
 <li>src/<a class="el" href="LineInput_8cc_source.html">LineInput.cc</a></li>
@@ -258,7 +274,7 @@ static <a class="el" href="classUCS__string.html">UCS_string</a>&#160;</td><td c
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="classLineEditContext.html">LineEditContext</a></li>
-    <li class="footer">Generated on Sun Aug 9 2020 16:43:42 for GNUAPL by
+    <li class="footer">Generated on Sun Jan 30 2022 20:14:26 for GNUAPL by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>

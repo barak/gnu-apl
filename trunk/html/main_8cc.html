@@ -59,21 +59,25 @@ $(document).ready(function(){initNavTree('main_8cc.html','');});
 <div id="doc-content">
 <div class="header">
   <div class="summary">
+<a href="#define-members">Macros</a> &#124;
 <a href="#func-members">Functions</a> &#124;
 <a href="#var-members">Variables</a>  </div>
   <div class="headertitle">
 <div class="title">main.cc File Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><code>#include &lt;errno.h&gt;</code><br />
+<div class="textblock"><code>#include &lt;pthread.h&gt;</code><br />
+<code>#include &lt;errno.h&gt;</code><br />
 <code>#include &lt;fcntl.h&gt;</code><br />
 <code>#include &lt;limits.h&gt;</code><br />
 <code>#include &lt;signal.h&gt;</code><br />
 <code>#include &lt;string.h&gt;</code><br />
 <code>#include &lt;termios.h&gt;</code><br />
+<code>#include &lt;netinet/in.h&gt;</code><br />
 <code>#include &lt;sys/ioctl.h&gt;</code><br />
 <code>#include &lt;sys/resource.h&gt;</code><br />
 <code>#include &lt;sys/stat.h&gt;</code><br />
+<code>#include &lt;sys/socket.h&gt;</code><br />
 <code>#include &lt;sys/types.h&gt;</code><br />
 <code>#include &quot;buildtag.hh&quot;</code><br />
 <code>#include &quot;Command.hh&quot;</code><br />
@@ -81,7 +85,6 @@ $(document).ready(function(){initNavTree('main_8cc.html','');});
 <code>#include &quot;IO_Files.hh&quot;</code><br />
 <code>#include &quot;LibPaths.hh&quot;</code><br />
 <code>#include &quot;Macro.hh&quot;</code><br />
-<code>#include &quot;makefile.h&quot;</code><br />
 <code>#include &quot;Output.hh&quot;</code><br />
 <code>#include &quot;NativeFunction.hh&quot;</code><br />
 <code>#include &quot;Workspace.hh&quot;</code><br />
@@ -91,89 +94,91 @@ Include dependency graph for main.cc:</div>
 <div class="dyncontent">
 <div class="center"><img src="main_8cc__incl.png" border="0" usemap="#src_2main_8cc" alt=""/></div>
 <map name="src_2main_8cc" id="src_2main_8cc">
-<area shape="rect" id="node12" href="buildtag_8hh_source.html" title="buildtag.hh" alt="" coords="1757,1051,1842,1077"/>
-<area shape="rect" id="node13" href="Common_8hh_source.html" title="Common.hh" alt="" coords="2225,1723,2318,1749"/>
-<area shape="rect" id="node38" href="Command_8hh_source.html" title="Command.hh" alt="" coords="1557,603,1657,629"/>
-<area shape="rect" id="node40" href="LibPaths_8hh_source.html" title="LibPaths.hh" alt="" coords="1287,677,1378,704"/>
-<area shape="rect" id="node64" href="Output_8hh_source.html" title="Output.hh" alt="" coords="1085,1499,1164,1525"/>
-<area shape="rect" id="node74" href="IO__Files_8hh_source.html" title="IO_Files.hh" alt="" coords="801,1573,891,1600"/>
-<area shape="rect" id="node75" href="Macro_8hh_source.html" title="Macro.hh" alt="" coords="1139,229,1215,256"/>
-<area shape="rect" id="node92" href="NativeFunction_8hh_source.html" title="NativeFunction.hh" alt="" coords="1609,379,1737,405"/>
-<area shape="rect" id="node93" href="Workspace_8hh_source.html" title="Workspace.hh" alt="" coords="3714,80,3821,107"/>
-<area shape="rect" id="node106" href="UserPreferences_8hh_source.html" title="UserPreferences.hh" alt="" coords="4066,901,4205,928"/>
-<area shape="rect" id="node27" href="APL__types_8hh_source.html" title="APL_types.hh" alt="" coords="3779,1797,3883,1824"/>
-<area shape="rect" id="node33" href="Assert_8hh_source.html" title="Assert.hh" alt="" coords="1171,1797,1249,1824"/>
-<area shape="rect" id="node34" href="Logging_8hh_source.html" title="Logging.hh" alt="" coords="2034,1797,2119,1824"/>
-<area shape="rect" id="node36" href="SystemLimits_8hh_source.html" title="SystemLimits.hh" alt="" coords="4490,1797,4610,1824"/>
-<area shape="rect" id="node30" href="Unicode_8hh_source.html" title="Unicode.hh" alt="" coords="862,1872,950,1899"/>
-<area shape="rect" id="node32" href="Id_8def_source.html" title="Id.def" alt="" coords="3828,1872,3883,1899"/>
-<area shape="rect" id="node31" href="Avec_8def_source.html" title="Avec.def" alt="" coords="574,1947,649,1973"/>
-<area shape="rect" id="node35" href="Logging_8def_source.html" title="Logging.def" alt="" coords="2029,1872,2119,1899"/>
-<area shape="rect" id="node37" href="SystemLimits_8def_source.html" title="SystemLimits.def" alt="" coords="4589,1872,4713,1899"/>
-<area shape="rect" id="node41" href="UTF8__string_8hh_source.html" title="UTF8_string.hh" alt="" coords="1715,1648,1827,1675"/>
-<area shape="rect" id="node43" href="Value_8hh_source.html" title="Value.hh" alt="" coords="2496,677,2569,704"/>
-<area shape="rect" id="node54" href="UCS__string_8hh_source.html" title="UCS_string.hh" alt="" coords="1064,1573,1172,1600"/>
-<area shape="rect" id="node44" href="CharCell_8hh_source.html" title="CharCell.hh" alt="" coords="2529,827,2619,853"/>
-<area shape="rect" id="node58" href="Shape_8hh_source.html" title="Shape.hh" alt="" coords="2486,1200,2563,1227"/>
-<area shape="rect" id="node62" href="Value__P_8hh_source.html" title="Value_P.hh" alt="" coords="2229,1125,2319,1152"/>
-<area shape="rect" id="node63" href="DynamicObject_8hh_source.html" title="DynamicObject.hh" alt="" coords="1295,1349,1426,1376"/>
-<area shape="rect" id="node66" href="FloatCell_8hh_source.html" title="FloatCell.hh" alt="" coords="2876,752,2968,779"/>
-<area shape="rect" id="node67" href="IntCell_8hh_source.html" title="IntCell.hh" alt="" coords="2839,827,2917,853"/>
-<area shape="rect" id="node70" href="LvalCell_8hh_source.html" title="LvalCell.hh" alt="" coords="2355,827,2441,853"/>
-<area shape="rect" id="node71" href="PointerCell_8hh_source.html" title="PointerCell.hh" alt="" coords="2425,901,2529,928"/>
-<area shape="rect" id="node45" href="Cell_8hh_source.html" title="Cell.hh" alt="" coords="2504,1051,2567,1077"/>
-<area shape="rect" id="node46" href="ErrorCode_8hh_source.html" title="ErrorCode.hh" alt="" coords="2739,1349,2838,1376"/>
-<area shape="rect" id="node48" href="PrintBuffer_8hh_source.html" title="PrintBuffer.hh" alt="" coords="2395,1125,2497,1152"/>
-<area shape="rect" id="node47" href="Error_8def_source.html" title="Error.def" alt="" coords="2753,1424,2825,1451"/>
-<area shape="rect" id="node50" href="Avec_8hh_source.html" title="Avec.hh" alt="" coords="1759,1200,1829,1227"/>
-<area shape="rect" id="node51" href="PrintContext_8hh_source.html" title="PrintContext.hh" alt="" coords="3897,1275,4011,1301"/>
-<area shape="rect" id="node52" href="PrintOperator_8hh_source.html" title="PrintOperator.hh" alt="" coords="1449,1424,1566,1451"/>
-<area shape="rect" id="node61" href="UCS__string__vector_8hh_source.html" title="UCS_string_vector.hh" alt="" coords="2159,1275,2309,1301"/>
-<area shape="rect" id="node53" href="Id_8hh_source.html" title="Id.hh" alt="" coords="1566,1499,1617,1525"/>
-<area shape="rect" id="node56" href="TokenEnums_8hh_source.html" title="TokenEnums.hh" alt="" coords="1957,1573,2074,1600"/>
-<area shape="rect" id="node55" href="Heapsort_8hh_source.html" title="Heapsort.hh" alt="" coords="3174,1648,3267,1675"/>
-<area shape="rect" id="node57" href="Token_8def_source.html" title="Token.def" alt="" coords="1975,1648,2055,1675"/>
-<area shape="rect" id="node59" href="Error__macros_8hh_source.html" title="Error_macros.hh" alt="" coords="2892,1275,3011,1301"/>
-<area shape="rect" id="node60" href="Backtrace_8hh_source.html" title="Backtrace.hh" alt="" coords="2974,1349,3073,1376"/>
-<area shape="rect" id="node68" href="RealCell_8hh_source.html" title="RealCell.hh" alt="" coords="2777,901,2867,928"/>
-<area shape="rect" id="node69" href="NumericCell_8hh_source.html" title="NumericCell.hh" alt="" coords="2654,976,2766,1003"/>
-<area shape="rect" id="node76" href="UserFunction_8hh_source.html" title="UserFunction.hh" alt="" coords="1765,304,1884,331"/>
-<area shape="rect" id="node90" href="Macro_8def_source.html" title="Macro.def" alt="" coords="1135,304,1215,331"/>
-<area shape="rect" id="node77" href="Error_8hh_source.html" title="Error.hh" alt="" coords="1697,528,1765,555"/>
-<area shape="rect" id="node79" href="Executable_8hh_source.html" title="Executable.hh" alt="" coords="1820,453,1925,480"/>
-<area shape="rect" id="node81" href="Function_8hh_source.html" title="Function.hh" alt="" coords="2041,453,2131,480"/>
-<area shape="rect" id="node84" href="Symbol_8hh_source.html" title="Symbol.hh" alt="" coords="3704,453,3788,480"/>
-<area shape="rect" id="node89" href="UserFunction__header_8hh_source.html" title="UserFunction_header.hh" alt="" coords="1913,379,2077,405"/>
-<area shape="rect" id="node80" href="Token_8hh_source.html" title="Token.hh" alt="" coords="2965,603,3041,629"/>
-<area shape="rect" id="node82" href="NamedObject_8hh_source.html" title="NamedObject.hh" alt="" coords="2101,603,2221,629"/>
-<area shape="rect" id="node83" href="Parser_8hh_source.html" title="Parser.hh" alt="" coords="2963,528,3041,555"/>
-<area shape="rect" id="node85" href="Svar__DB_8hh_source.html" title="Svar_DB.hh" alt="" coords="3845,1573,3938,1600"/>
-<area shape="rect" id="node87" href="ProcessorID_8hh_source.html" title="ProcessorID.hh" alt="" coords="3751,1648,3864,1675"/>
-<area shape="rect" id="node88" href="Svar__record_8hh_source.html" title="Svar_record.hh" alt="" coords="3843,1723,3953,1749"/>
-<area shape="rect" id="node94" href="PrimitiveOperator_8hh_source.html" title="PrimitiveOperator.hh" alt="" coords="2609,229,2750,256"/>
-<area shape="rect" id="node102" href="QuadFunction_8hh_source.html" title="QuadFunction.hh" alt="" coords="3351,229,3472,256"/>
-<area shape="rect" id="node103" href="Quad__CR_8hh_source.html" title="Quad_CR.hh" alt="" coords="3718,155,3817,181"/>
-<area shape="rect" id="node104" href="Quad__DLX_8hh_source.html" title="Quad_DLX.hh" alt="" coords="3177,155,3281,181"/>
-<area shape="rect" id="node105" href="Quad__FIO_8hh_source.html" title="Quad_FIO.hh" alt="" coords="3841,155,3941,181"/>
-<area shape="rect" id="node110" href="Quad__RE_8hh_source.html" title="Quad_RE.hh" alt="" coords="3055,155,3152,181"/>
-<area shape="rect" id="node111" href="Quad__RL_8hh_source.html" title="Quad_RL.hh" alt="" coords="4273,229,4368,256"/>
-<area shape="rect" id="node112" href="SystemVariable_8hh_source.html" title="SystemVariable.hh" alt="" coords="4203,379,4335,405"/>
-<area shape="rect" id="node113" href="Quad__SVx_8hh_source.html" title="Quad_SVx.hh" alt="" coords="4017,155,4120,181"/>
-<area shape="rect" id="node114" href="Quad__WA_8hh_source.html" title="Quad_WA.hh" alt="" coords="4219,304,4319,331"/>
-<area shape="rect" id="node115" href="ScalarFunction_8hh_source.html" title="ScalarFunction.hh" alt="" coords="3567,155,3693,181"/>
-<area shape="rect" id="node118" href="SymbolTable_8hh_source.html" title="SymbolTable.hh" alt="" coords="4347,1499,4463,1525"/>
-<area shape="rect" id="node119" href="SystemVariable_8def_source.html" title="SystemVariable.def" alt="" coords="3406,155,3542,181"/>
-<area shape="rect" id="node95" href="PrimitiveFunction_8hh_source.html" title="PrimitiveFunction.hh" alt="" coords="3341,379,3482,405"/>
-<area shape="rect" id="node98" href="StateIndicator_8hh_source.html" title="StateIndicator.hh" alt="" coords="2105,304,2227,331"/>
-<area shape="rect" id="node96" href="Performance_8hh_source.html" title="Performance.hh" alt="" coords="3301,1723,3415,1749"/>
-<area shape="rect" id="node97" href="Performance_8def_source.html" title="Performance.def" alt="" coords="3289,1797,3408,1824"/>
-<area shape="rect" id="node99" href="DerivedFunction_8hh_source.html" title="DerivedFunction.hh" alt="" coords="1449,379,1584,405"/>
-<area shape="rect" id="node100" href="Prefix_8hh_source.html" title="Prefix.hh" alt="" coords="2813,528,2887,555"/>
-<area shape="rect" id="node101" href="Prefix_8def_source.html" title="Prefix.def" alt="" coords="2811,603,2889,629"/>
-<area shape="rect" id="node107" href="Parallel_8hh_source.html" title="Parallel.hh" alt="" coords="3625,976,3707,1003"/>
-<area shape="rect" id="node109" href="Security_8def_source.html" title="Security.def" alt="" coords="4168,976,4260,1003"/>
-<area shape="rect" id="node116" href="Thread__context_8hh_source.html" title="Thread_context.hh" alt="" coords="3670,229,3801,256"/>
-<area shape="rect" id="node117" href="PJob_8hh_source.html" title="PJob.hh" alt="" coords="3704,304,3775,331"/>
+<area shape="rect" id="node16" href="Command_8hh_source.html" title="Command.hh" alt="" coords="2333,603,2433,629"/>
+<area shape="rect" id="node17" href="Common_8hh_source.html" title="Common.hh" alt="" coords="3143,1723,3236,1749"/>
+<area shape="rect" id="node40" href="LibPaths_8hh_source.html" title="LibPaths.hh" alt="" coords="1534,677,1624,704"/>
+<area shape="rect" id="node70" href="Output_8hh_source.html" title="Output.hh" alt="" coords="3993,1499,4072,1525"/>
+<area shape="rect" id="node77" href="IO__Files_8hh_source.html" title="IO_Files.hh" alt="" coords="4156,1573,4245,1600"/>
+<area shape="rect" id="node78" href="Macro_8hh_source.html" title="Macro.hh" alt="" coords="660,229,736,256"/>
+<area shape="rect" id="node93" href="NativeFunction_8hh_source.html" title="NativeFunction.hh" alt="" coords="2032,379,2160,405"/>
+<area shape="rect" id="node94" href="Workspace_8hh_source.html" title="Workspace.hh" alt="" coords="1450,80,1556,107"/>
+<area shape="rect" id="node107" href="UserPreferences_8hh_source.html" title="UserPreferences.hh" alt="" coords="1718,901,1856,928"/>
+<area shape="rect" id="node41" href="UTF8__string_8hh_source.html" title="UTF8_string.hh" alt="" coords="1876,1648,1988,1675"/>
+<area shape="rect" id="node43" href="Value_8hh_source.html" title="Value.hh" alt="" coords="3541,677,3614,704"/>
+<area shape="rect" id="node58" href="UCS__string_8hh_source.html" title="UCS_string.hh" alt="" coords="2198,1573,2306,1600"/>
+<area shape="rect" id="node30" href="APL__types_8hh_source.html" title="APL_types.hh" alt="" coords="2547,1797,2651,1824"/>
+<area shape="rect" id="node35" href="Assert_8hh_source.html" title="Assert.hh" alt="" coords="4122,1797,4201,1824"/>
+<area shape="rect" id="node36" href="Logging_8hh_source.html" title="Logging.hh" alt="" coords="3299,1797,3384,1824"/>
+<area shape="rect" id="node38" href="SystemLimits_8hh_source.html" title="SystemLimits.hh" alt="" coords="306,1797,426,1824"/>
+<area shape="rect" id="node33" href="Unicode_8hh_source.html" title="Unicode.hh" alt="" coords="2658,1872,2746,1899"/>
+<area shape="rect" id="node34" href="Avec_8def_source.html" title="Avec.def" alt="" coords="2156,1947,2231,1973"/>
+<area shape="rect" id="node37" href="Logging_8def_source.html" title="Logging.def" alt="" coords="3290,1872,3380,1899"/>
+<area shape="rect" id="node39" href="SystemLimits_8def_source.html" title="SystemLimits.def" alt="" coords="209,1872,333,1899"/>
+<area shape="rect" id="node44" href="CharCell_8hh_source.html" title="CharCell.hh" alt="" coords="3568,827,3659,853"/>
+<area shape="rect" id="node60" href="Shape_8hh_source.html" title="Shape.hh" alt="" coords="2331,1200,2408,1227"/>
+<area shape="rect" id="node64" href="Value__P_8hh_source.html" title="Value_P.hh" alt="" coords="3869,1125,3958,1152"/>
+<area shape="rect" id="node65" href="ComplexCell_8hh_source.html" title="ComplexCell.hh" alt="" coords="3866,752,3980,779"/>
+<area shape="rect" id="node66" href="NumericCell_8hh_source.html" title="NumericCell.hh" alt="" coords="3850,976,3962,1003"/>
+<area shape="rect" id="node67" href="IntCell_8hh_source.html" title="IntCell.hh" alt="" coords="3958,827,4037,853"/>
+<area shape="rect" id="node69" href="DynamicObject_8hh_source.html" title="DynamicObject.hh" alt="" coords="3467,1349,3598,1376"/>
+<area shape="rect" id="node72" href="FloatCell_8hh_source.html" title="FloatCell.hh" alt="" coords="4056,752,4148,779"/>
+<area shape="rect" id="node73" href="LvalCell_8hh_source.html" title="LvalCell.hh" alt="" coords="3684,827,3770,853"/>
+<area shape="rect" id="node74" href="PointerCell_8hh_source.html" title="PointerCell.hh" alt="" coords="3531,901,3635,928"/>
+<area shape="rect" id="node45" href="Cell_8hh_source.html" title="Cell.hh" alt="" coords="3649,1051,3712,1077"/>
+<area shape="rect" id="node46" href="ErrorCode_8hh_source.html" title="ErrorCode.hh" alt="" coords="1708,1349,1807,1376"/>
+<area shape="rect" id="node48" href="PrintBuffer_8hh_source.html" title="PrintBuffer.hh" alt="" coords="2204,1125,2306,1152"/>
+<area shape="rect" id="node47" href="Error_8def_source.html" title="Error.def" alt="" coords="1684,1424,1756,1451"/>
+<area shape="rect" id="node50" href="Avec_8hh_source.html" title="Avec.hh" alt="" coords="2157,1200,2228,1227"/>
+<area shape="rect" id="node51" href="PrintContext_8hh_source.html" title="PrintContext.hh" alt="" coords="1418,1275,1532,1301"/>
+<area shape="rect" id="node52" href="PrintOperator_8hh_source.html" title="PrintOperator.hh" alt="" coords="2788,1424,2906,1451"/>
+<area shape="rect" id="node63" href="UCS__string__vector_8hh_source.html" title="UCS_string_vector.hh" alt="" coords="1861,1275,2012,1301"/>
+<area shape="rect" id="node53" href="Id_8hh_source.html" title="Id.hh" alt="" coords="2534,1499,2584,1525"/>
+<area shape="rect" id="node56" href="TokenEnums_8hh_source.html" title="TokenEnums.hh" alt="" coords="2534,1573,2651,1600"/>
+<area shape="rect" id="node54" href="IdEnums_8hh_source.html" title="IdEnums.hh" alt="" coords="2418,1648,2510,1675"/>
+<area shape="rect" id="node55" href="Id_8def_source.html" title="Id.def" alt="" coords="2437,1723,2492,1749"/>
+<area shape="rect" id="node57" href="Token_8def_source.html" title="Token.def" alt="" coords="2535,1648,2615,1675"/>
+<area shape="rect" id="node59" href="Heapsort_8hh_source.html" title="Heapsort.hh" alt="" coords="1404,1648,1498,1675"/>
+<area shape="rect" id="node61" href="Error__macros_8hh_source.html" title="Error_macros.hh" alt="" coords="2036,1275,2154,1301"/>
+<area shape="rect" id="node62" href="Backtrace_8hh_source.html" title="Backtrace.hh" alt="" coords="2192,1349,2291,1376"/>
+<area shape="rect" id="node68" href="RealCell_8hh_source.html" title="RealCell.hh" alt="" coords="3947,901,4038,928"/>
+<area shape="rect" id="node79" href="UserFunction_8hh_source.html" title="UserFunction.hh" alt="" coords="1334,304,1453,331"/>
+<area shape="rect" id="node92" href="Macro_8def_source.html" title="Macro.def" alt="" coords="659,304,739,331"/>
+<area shape="rect" id="node80" href="Error_8hh_source.html" title="Error.hh" alt="" coords="2158,528,2226,555"/>
+<area shape="rect" id="node82" href="Executable_8hh_source.html" title="Executable.hh" alt="" coords="1953,453,2058,480"/>
+<area shape="rect" id="node84" href="Function_8hh_source.html" title="Function.hh" alt="" coords="2235,453,2326,480"/>
+<area shape="rect" id="node87" href="Symbol_8hh_source.html" title="Symbol.hh" alt="" coords="1217,453,1301,480"/>
+<area shape="rect" id="node91" href="UserFunction__header_8hh_source.html" title="UserFunction_header.hh" alt="" coords="1294,379,1458,405"/>
+<area shape="rect" id="node83" href="Token_8hh_source.html" title="Token.hh" alt="" coords="2509,603,2585,629"/>
+<area shape="rect" id="node85" href="NamedObject_8hh_source.html" title="NamedObject.hh" alt="" coords="2967,603,3087,629"/>
+<area shape="rect" id="node86" href="Parser_8hh_source.html" title="Parser.hh" alt="" coords="2340,528,2418,555"/>
+<area shape="rect" id="node88" href="Svar__DB_8hh_source.html" title="Svar_DB.hh" alt="" coords="1263,1573,1356,1600"/>
+<area shape="rect" id="node89" href="ProcessorID_8hh_source.html" title="ProcessorID.hh" alt="" coords="1266,1648,1380,1675"/>
+<area shape="rect" id="node90" href="Svar__record_8hh_source.html" title="Svar_record.hh" alt="" coords="1513,1723,1624,1749"/>
+<area shape="rect" id="node95" href="PrimitiveOperator_8hh_source.html" title="PrimitiveOperator.hh" alt="" coords="2067,229,2208,256"/>
+<area shape="rect" id="node103" href="QuadFunction_8hh_source.html" title="QuadFunction.hh" alt="" coords="1902,229,2024,256"/>
+<area shape="rect" id="node104" href="Quad__CR_8hh_source.html" title="Quad_CR.hh" alt="" coords="1283,155,1382,181"/>
+<area shape="rect" id="node105" href="Quad__DLX_8hh_source.html" title="Quad_DLX.hh" alt="" coords="2094,155,2198,181"/>
+<area shape="rect" id="node106" href="Quad__FIO_8hh_source.html" title="Quad_FIO.hh" alt="" coords="1796,155,1896,181"/>
+<area shape="rect" id="node111" href="Quad__RE_8hh_source.html" title="Quad_RE.hh" alt="" coords="1972,155,2069,181"/>
+<area shape="rect" id="node112" href="Quad__RL_8hh_source.html" title="Quad_RL.hh" alt="" coords="1097,304,1192,331"/>
+<area shape="rect" id="node113" href="SystemVariable_8hh_source.html" title="SystemVariable.hh" alt="" coords="913,379,1045,405"/>
+<area shape="rect" id="node114" href="Quad__SVx_8hh_source.html" title="Quad_SVx.hh" alt="" coords="1406,155,1509,181"/>
+<area shape="rect" id="node115" href="Quad__WA_8hh_source.html" title="Quad_WA.hh" alt="" coords="854,155,954,181"/>
+<area shape="rect" id="node116" href="ScalarFunction_8hh_source.html" title="ScalarFunction.hh" alt="" coords="3264,155,3390,181"/>
+<area shape="rect" id="node121" href="SymbolTable_8hh_source.html" title="SymbolTable.hh" alt="" coords="416,1499,532,1525"/>
+<area shape="rect" id="node122" href="SystemVariable_8def_source.html" title="SystemVariable.def" alt="" coords="1584,155,1720,181"/>
+<area shape="rect" id="node96" href="PrimitiveFunction_8hh_source.html" title="PrimitiveFunction.hh" alt="" coords="2984,379,3126,405"/>
+<area shape="rect" id="node99" href="StateIndicator_8hh_source.html" title="StateIndicator.hh" alt="" coords="2474,304,2596,331"/>
+<area shape="rect" id="node97" href="Performance_8hh_source.html" title="Performance.hh" alt="" coords="2791,1648,2906,1675"/>
+<area shape="rect" id="node98" href="Performance_8def_source.html" title="Performance.def" alt="" coords="2789,1723,2908,1749"/>
+<area shape="rect" id="node100" href="DerivedFunction_8hh_source.html" title="DerivedFunction.hh" alt="" coords="2388,379,2522,405"/>
+<area shape="rect" id="node101" href="Prefix_8hh_source.html" title="Prefix.hh" alt="" coords="2764,528,2839,555"/>
+<area shape="rect" id="node102" href="Prefix_8def_source.html" title="Prefix.def" alt="" coords="2762,603,2841,629"/>
+<area shape="rect" id="node108" href="Parallel_8hh_source.html" title="Parallel.hh" alt="" coords="3266,976,3348,1003"/>
+<area shape="rect" id="node110" href="Security_8def_source.html" title="Security.def" alt="" coords="1825,976,1917,1003"/>
+<area shape="rect" id="node117" href="Thread__context_8hh_source.html" title="Thread_context.hh" alt="" coords="3023,229,3154,256"/>
+<area shape="rect" id="node118" href="PJob_8hh_source.html" title="PJob.hh" alt="" coords="3053,304,3124,331"/>
+<area shape="rect" id="node119" href="ConstCell__P_8hh_source.html" title="ConstCell_P.hh" alt="" coords="4186,1051,4300,1077"/>
 </map>
 </div>
 </div>
@@ -209,6 +214,10 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="main_8cc.html#ab6efa4d4786e6fbbb2f08da1fc147559">show_welcome</a> (ostream &amp;out, const char *argv0)</td></tr>
 <tr class="memdesc:ab6efa4d4786e6fbbb2f08da1fc147559"><td class="mdescLeft">&#160;</td><td class="mdescRight">print a welcome message (copyright notice) <br /></td></tr>
 <tr class="separator:ab6efa4d4786e6fbbb2f08da1fc147559"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a11c6f136e89451d829406b9004857ee2"><td class="memItemLeft" align="right" valign="top"><a id="a11c6f136e89451d829406b9004857ee2"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="main_8cc.html#a11c6f136e89451d829406b9004857ee2">remap_stdio</a> ()</td></tr>
+<tr class="memdesc:a11c6f136e89451d829406b9004857ee2"><td class="mdescLeft">&#160;</td><td class="mdescRight">maybe remap stdin, stdout, and stderr to an incoming TCP connection to port uprefs.tcp_port on localhost <br /></td></tr>
+<tr class="separator:a11c6f136e89451d829406b9004857ee2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa0321421b17def7b58fc0cabc8890260"><td class="memItemLeft" align="right" valign="top"><a id="aa0321421b17def7b58fc0cabc8890260"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="main_8cc.html#aa0321421b17def7b58fc0cabc8890260">init_apl</a> (int argc, const char *argv[])</td></tr>
 <tr class="memdesc:aa0321421b17def7b58fc0cabc8890260"><td class="mdescLeft">&#160;</td><td class="mdescRight">initialize the interpreter <br /></td></tr>
@@ -221,7 +230,7 @@ int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="main_
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
 <tr class="memitem:ae391057907402dc331a0bd362158a1fe"><td class="memItemLeft" align="right" valign="top"><a id="ae391057907402dc331a0bd362158a1fe"></a>
-static const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="main_8cc.html#ae391057907402dc331a0bd362158a1fe">build_tag</a> [] = { &quot;GNU APL&quot; , &quot;1.8&quot; &quot; / 17066:17067M&quot;, &quot;2020-08-09 11:20:36 UTC&quot;, &quot;Linux 4.15.0-108-generic x86_64&quot;, &quot;default ./configure options&quot; , 0 }</td></tr>
+static const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="main_8cc.html#ae391057907402dc331a0bd362158a1fe">build_tag</a> [] = { BUILDTAG, 0 }</td></tr>
 <tr class="memdesc:ae391057907402dc331a0bd362158a1fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">when this file was built <br /></td></tr>
 <tr class="separator:ae391057907402dc331a0bd362158a1fe"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae57189216c94343512a5f35ac4885f54"><td class="memItemLeft" align="right" valign="top"><a id="ae57189216c94343512a5f35ac4885f54"></a>
@@ -279,7 +288,7 @@ static struct sigaction&#160;</td><td class="memItemRight" valign="bottom"><a cl
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dir_68267d1309a1af8e8297ef4c3efbcdba.html">src</a></li><li class="navelem"><a class="el" href="main_8cc.html">main.cc</a></li>
-    <li class="footer">Generated on Sun Aug 9 2020 16:43:42 for GNUAPL by
+    <li class="footer">Generated on Sun Jan 30 2022 20:14:26 for GNUAPL by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -29,7 +29,7 @@ Bif_OPER1_EACH Bif_OPER1_EACH::_fun;
 
 Bif_OPER1_EACH * Bif_OPER1_EACH::fun = &Bif_OPER1_EACH::_fun;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_OPER1_EACH::eval_ALB(Value_P A, Token & _LO, Value_P B) const
 {
@@ -61,9 +61,9 @@ Function_P LO = _LO.get_function();
       {
         if (!LO->has_result())   return Token(TOK_VOID);
 
-        Value_P First_A = Bif_F12_TAKE::first(A);
-        Value_P First_B = Bif_F12_TAKE::first(B);
-        Shape shape_Z;
+        Value_P First_A = Bif_F12_TAKE::first(*A);
+        Value_P First_B = Bif_F12_TAKE::first(*B);
+        Shape shape_Z;   // will be ⍴A or ⍴B and therefore empty
 
         if (A->is_empty())          shape_Z = A->get_shape();
         else if (!A->is_scalar())   DOMAIN_ERROR;
@@ -74,9 +74,9 @@ Function_P LO = _LO.get_function();
         Value_P Z1 = LO->eval_fill_AB(First_A, First_B).get_apl_val();
         Value_P Z(shape_Z, LOC);
         if (Z1->is_simple_scalar())
-           Z->get_ravel(0).init(Z1->get_ravel(0), Z.getref(), LOC);
-        else
-           new (&Z->get_ravel(0))   PointerCell(Z1.get(), Z.getref());
+           Z->set_ravel_Cell(0, Z1->get_cscalar());
+        else   // need to encose Z1
+           Z->set_ravel_Pointer(0, Z1.get());
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
@@ -127,12 +127,12 @@ Function_P LO = _LO.get_function();
            {
              if (extend_B && !B->is_scalar())   // 1-element non-scalar B
                 {
-                  Value_P A1(LOC);
-                  A1->get_ravel(0).init(A->get_ravel(0), A1.getref(), LOC);
+                  Value_P A1(LOC);   // A1 ← , A
+                  A1->get_wscalar().init(A->get_cscalar(), *A1, LOC);
                   A1->check_value(LOC);
 
-                  Value_P B1(LOC);
-                  B1->get_ravel(0).init(B->get_ravel(0), B1.getref(), LOC);
+                  Value_P B1(LOC);   // B1 ← , B
+                  B1->get_wscalar().init(B->get_cscalar(), *B1, LOC);
                   B1->check_value(LOC);
 
                   return macro->eval_ALB(A1, _LO, B1);
@@ -140,7 +140,7 @@ Function_P LO = _LO.get_function();
              else
                 {
                   Value_P A1(LOC);
-                  A1->get_ravel(0).init(A->get_ravel(0), A1.getref(), LOC);
+                  A1->get_wscalar().init(A->get_cfirst(), *A1, LOC);
                   A1->check_value(LOC);
 
                   return macro->eval_ALB(A1, _LO, B);
@@ -149,7 +149,7 @@ Function_P LO = _LO.get_function();
         else if (extend_B && !B->is_scalar())   // 1-element non-scalar B
            {
              Value_P B1(LOC);
-             B1->get_ravel(0).init(B->get_ravel(0), B1.getref(), LOC);
+             B1->get_wscalar().init(B->get_cfirst(), *B1, LOC);
              B1->check_value(LOC);
 
              return macro->eval_ALB(A, _LO, B1);
@@ -186,8 +186,8 @@ Value_P Z;
 
    loop(z, len_Z)
       {
-        const Cell * cA = &A->get_ravel(inc_A * z);
-        const Cell * cB = &B->get_ravel(inc_B * z);
+        const Cell * cA = &A->get_cravel(inc_A * z);
+        const Cell * cB = &B->get_cravel(inc_B * z);
         const bool left_val = cB->is_lval_cell();
         Value_P LO_A = cA->to_value(LOC);     // left argument of LO
         Value_P LO_B = cB->to_value(LOC);     // right argument of LO;
@@ -211,11 +211,10 @@ Value_P Z;
            {
              Value_P vZ = result.get_apl_val();
 
-             Cell * cZ = Z->next_ravel();
              if (vZ->is_simple_scalar() || (left_val && vZ->is_scalar()))
-                cZ->init(vZ->get_ravel(0), Z.getref(), LOC);
+                Z->next_ravel_Cell(vZ->get_cfirst());
              else
-                new (cZ)   PointerCell(vZ.get(), Z.getref());
+                Z->next_ravel_Pointer(vZ.get());
 
              continue;   // next z
            }
@@ -231,22 +230,23 @@ Value_P Z;
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
-Bif_OPER1_EACH::eval_LB(Token & _LO, Value_P B) const
+Bif_OPER1_EACH::do_eval_LB(Token & _LO, Value_P B)
 {
    // monadic EACH: call _LO for every item of B
 
 Function_P LO = _LO.get_function();
    Assert1(LO);
-   if (LO->is_operator())                SYNTAX_ERROR;
+
+   if (LO->is_operator() && !is_SLASH_or_BACKSLASH(_LO.get_tag()))  SYNTAX_ERROR;
    if (!(LO->get_signature() & SIG_B))   VALENCE_ERROR;
 
    if (B->is_empty())
       {
         if (!LO->has_result())   return Token(TOK_VOID);
 
-        Value_P First_B = Bif_F12_TAKE::first(B);
+        Value_P First_B = Bif_F12_TAKE::first(*B);
         Token tZ = LO->eval_fill_B(First_B);
         Value_P Z1 = tZ.get_apl_val();
 
@@ -257,7 +257,7 @@ Function_P LO = _LO.get_function();
            }
 
         Value_P Z(B->get_shape(), LOC);
-        new (&Z->get_ravel(0)) PointerCell(Z1.get(), Z.getref());
+        Z->set_ravel_Pointer(0, Z1.get());
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
@@ -289,12 +289,10 @@ Value_P Z;
              if (result.get_Class() == TC_VALUE)
                 {
                   Value_P vZ = result.get_apl_val();
-
-                  Cell * cZ = Z->next_ravel();
                   if (vZ->is_simple_scalar())
-                     cZ->init(vZ->get_ravel(0), Z.getref(), LOC);
+                     Z->next_ravel_Cell(vZ->get_cfirst());
                   else
-                     new (cZ)  PointerCell(vZ.get(), Z.getref());
+                     Z->next_ravel_Pointer(vZ.get());
 
                   continue;   // next z
            }
@@ -307,7 +305,7 @@ Value_P Z;
            }
         else
            {
-             const Cell * cB = &B->get_ravel(z);
+             const Cell * cB = &B->get_cravel(z);
              const bool left_val = cB->is_lval_cell();
              Value_P LO_B = cB->to_value(LOC);      // right argument of LO
 
@@ -326,14 +324,10 @@ Value_P Z;
                 {
                   Value * vZ = result.get_apl_val().get();
 
-                  Cell * cZ = Z->next_ravel();
-                  if (0)
-                     cZ->init_from_value(vZ, Z.getref(), LOC);
-                  else if (vZ->is_simple_scalar() ||
-                           (left_val && vZ->is_scalar()))
-                     cZ->init(vZ->get_ravel(0), Z.getref(), LOC);
+                  if (vZ->is_simple_scalar() || (left_val && vZ->is_scalar()))
+                     Z->next_ravel_Cell(vZ->get_cfirst());
                   else
-                     new (cZ)   PointerCell(vZ, Z.getref());
+                     Z->next_ravel_Pointer(vZ);
 
                   continue;   // next z
                 }
@@ -352,5 +346,5 @@ Value_P Z;
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 

@@ -1,6 +1,0 @@
-<map id="Bif_F2_MEQ" name="Bif_F2_MEQ">
-<area shape="rect" id="node2" href="$classScalarFunction.html" title="Base class for all scalar functions. " alt="" coords="12,229,121,256"/>
-<area shape="rect" id="node3" href="$classPrimitiveFunction.html" title="Base class for all internal functions of the interpreter. " alt="" coords="5,155,128,181"/>
-<area shape="rect" id="node4" href="$classFunction.html" title="Base class for all APL functions and operators (system or defined) " alt="" coords="31,80,103,107"/>
-<area shape="rect" id="node5" href="$classNamedObject.html" title="A user&#45;defined variable or function. " alt="" coords="15,5,118,32"/>
-</map>

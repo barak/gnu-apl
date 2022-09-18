@@ -60,6 +60,8 @@ $(document).ready(function(){initNavTree('classUCS__string__vector.html','');});
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pro-methods">Protected Member Functions</a> &#124;
+<a href="#pri-methods">Private Member Functions</a> &#124;
 <a href="classUCS__string__vector-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">UCS_string_vector Class Reference</div>  </div>
@@ -74,11 +76,15 @@ $(document).ready(function(){initNavTree('classUCS__string__vector.html','');});
 Inheritance diagram for UCS_string_vector:</div>
 <div class="dyncontent">
 <div class="center"><img src="classUCS__string__vector__inherit__graph.png" border="0" usemap="#UCS__string__vector_inherit__map" alt="Inheritance graph"/></div>
+<map name="UCS__string__vector_inherit__map" id="UCS__string__vector_inherit__map">
+</map>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <div class="dynheader">
 Collaboration diagram for UCS_string_vector:</div>
 <div class="dyncontent">
 <div class="center"><img src="classUCS__string__vector__coll__graph.png" border="0" usemap="#UCS__string__vector_coll__map" alt="Collaboration graph"/></div>
+<map name="UCS__string__vector_coll__map" id="UCS__string__vector_coll__map">
+</map>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
@@ -97,12 +103,42 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="separator:a65567680f61c6cf35a211fc7e8ae21ae"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4c548acafd0c03ebbe43ad8643dc07d0"><td class="memItemLeft" align="right" valign="top"><a id="a4c548acafd0c03ebbe43ad8643dc07d0"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classUCS__string__vector.html#a4c548acafd0c03ebbe43ad8643dc07d0">sort</a> ()</td></tr>
-<tr class="memdesc:a4c548acafd0c03ebbe43ad8643dc07d0"><td class="mdescLeft">&#160;</td><td class="mdescRight">sort strings <br /></td></tr>
+<tr class="memdesc:a4c548acafd0c03ebbe43ad8643dc07d0"><td class="mdescLeft">&#160;</td><td class="mdescRight">sort the strings in this vector alphabetically <br /></td></tr>
 <tr class="separator:a4c548acafd0c03ebbe43ad8643dc07d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:affd2be085b10c39ad48659a884cf2ab1"><td class="memItemLeft" align="right" valign="top"><a id="affd2be085b10c39ad48659a884cf2ab1"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classUCS__string__vector.html#affd2be085b10c39ad48659a884cf2ab1">compute_column_width</a> (int tab_size, std::vector&lt; int &gt; &amp;result)</td></tr>
-<tr class="memdesc:affd2be085b10c39ad48659a884cf2ab1"><td class="mdescLeft">&#160;</td><td class="mdescRight">compute columns widths so that items align nicely <br /></td></tr>
+<tr class="memdesc:affd2be085b10c39ad48659a884cf2ab1"><td class="mdescLeft">&#160;</td><td class="mdescRight">compute columns width so that items align nicely (for )VARS, )FNS, etc.) <br /></td></tr>
 <tr class="separator:affd2be085b10c39ad48659a884cf2ab1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a410ffa588704260e23f324e87cfb751e"><td class="memItemLeft" align="right" valign="top"><a id="a410ffa588704260e23f324e87cfb751e"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classUCS__string__vector.html#a410ffa588704260e23f324e87cfb751e">erase</a> (size_t pos)</td></tr>
+<tr class="memdesc:a410ffa588704260e23f324e87cfb751e"><td class="mdescLeft">&#160;</td><td class="mdescRight">replacement for erase(std::vector::iterator position) <br /></td></tr>
+<tr class="separator:a410ffa588704260e23f324e87cfb751e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a16fca0c736760dae8fbf220634fc500d"><td class="memItemLeft" align="right" valign="top"><a id="a16fca0c736760dae8fbf220634fc500d"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classUCS__string__vector.html#a16fca0c736760dae8fbf220634fc500d">insert</a> (size_t pos, const <a class="el" href="classUCS__string.html">UCS_string</a> &amp;value)</td></tr>
+<tr class="memdesc:a16fca0c736760dae8fbf220634fc500d"><td class="mdescLeft">&#160;</td><td class="mdescRight">replacement for insert(std::vector::iterator position, value) <br /></td></tr>
+<tr class="separator:a16fca0c736760dae8fbf220634fc500d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afa3b6be58263a29c6feac04fad12e814"><td class="memItemLeft" align="right" valign="top"><a id="afa3b6be58263a29c6feac04fad12e814"></a>
+std::ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classUCS__string__vector.html#afa3b6be58263a29c6feac04fad12e814">print_table</a> (std::ostream &amp;out, size_t column_count) const</td></tr>
+<tr class="memdesc:afa3b6be58263a29c6feac04fad12e814"><td class="mdescLeft">&#160;</td><td class="mdescRight">print items of <b>this</b> vector in a table with <b>column_count</b> columns <br /></td></tr>
+<tr class="separator:afa3b6be58263a29c6feac04fad12e814"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
+Protected Member Functions</h2></td></tr>
+<tr class="memitem:a0ee9c9648dfd9fdb2e3d09c46952a908"><td class="memItemLeft" align="right" valign="top"><a id="a0ee9c9648dfd9fdb2e3d09c46952a908"></a>
+ShapeItem&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classUCS__string__vector.html#a0ee9c9648dfd9fdb2e3d09c46952a908">max_width</a> (size_t col, size_t column_count) const</td></tr>
+<tr class="memdesc:a0ee9c9648dfd9fdb2e3d09c46952a908"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the size of the longest <a class="el" href="classUCS__string.html" title="A string of Unicode characters (32-bit) ">UCS_string</a> in <b>this</b> vector. <br /></td></tr>
+<tr class="separator:a0ee9c9648dfd9fdb2e3d09c46952a908"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
+Private Member Functions</h2></td></tr>
+<tr class="memitem:a7be4d2429fe221935702dbab4fe30941"><td class="memItemLeft" align="right" valign="top"><a id="a7be4d2429fe221935702dbab4fe30941"></a>
+std::vector&lt; <a class="el" href="classUCS__string.html">UCS_string</a> &gt;::iterator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classUCS__string__vector.html#a7be4d2429fe221935702dbab4fe30941">erase</a> (std::vector&lt; <a class="el" href="classUCS__string.html">UCS_string</a> &gt;::iterator position)</td></tr>
+<tr class="memdesc:a7be4d2429fe221935702dbab4fe30941"><td class="mdescLeft">&#160;</td><td class="mdescRight">prevent the inadvertent use of iterator nonsense <br /></td></tr>
+<tr class="separator:a7be4d2429fe221935702dbab4fe30941"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab01617f747b3292f5f1b2251e507633b"><td class="memItemLeft" align="right" valign="top"><a id="ab01617f747b3292f5f1b2251e507633b"></a>
+std::vector&lt; <a class="el" href="classUCS__string.html">UCS_string</a> &gt;::iterator&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classUCS__string__vector.html#ab01617f747b3292f5f1b2251e507633b">insert</a> (std::vector&lt; <a class="el" href="classUCS__string.html">UCS_string</a> &gt;::iterator position, const <a class="el" href="classUCS__string.html">UCS_string</a> &amp;value)</td></tr>
+<tr class="memdesc:ab01617f747b3292f5f1b2251e507633b"><td class="mdescLeft">&#160;</td><td class="mdescRight">prevent the inadvertent use of iterator nonsense <br /></td></tr>
+<tr class="separator:ab01617f747b3292f5f1b2251e507633b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>a vector of UCS_strings. </p>
@@ -118,7 +154,7 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="classUCS__string__vector.html">UCS_string_vector</a></li>
-    <li class="footer">Generated on Sun Aug 9 2020 16:43:42 for GNUAPL by
+    <li class="footer">Generated on Sun Jan 30 2022 20:14:27 for GNUAPL by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>

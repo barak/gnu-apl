@@ -16,72 +16,75 @@
  ⍝
 ∇Z←MON_EXPR
   Z←⍬
-  ⍝     A          OP    B           N CN             STAT
-  ⍝-------------------------------------------------------
-  Z←Z,⊂ ""         "+"   "⍙Mix_IRC"  1 "F12_PLUS"       0
-  Z←Z,⊂ ""         "-"   "⍙Mix_IRC"  1 "F12_MINUS"      1
-  Z←Z,⊂ ""         "×"   "⍙Mix_IRC"  1 "F12_TIMES"      2
-  Z←Z,⊂ ""         "÷"   "⍙Mix1_IRC" 1 "F12_DIVIDE"     3
-  Z←Z,⊂ ""         "∼"   "⍙Bool"     1 "F12_WITHOUT"    4
-  Z←Z,⊂ ""         "⌈"   "⍙Mix_IR"   1 "F12_RND_UP"     5
-  Z←Z,⊂ ""         "⌊"   "⍙Mix_IR"   1 "F12_RND_DN"     6
-  Z←Z,⊂ ""         "!"   "⍙Int2"     1 "F12_BINOM"      7
-  Z←Z,⊂ ""         "⋆"   "⍙Mix_IRC"  1 "F12_POWER"      8
-  Z←Z,⊂ ""         "⍟"   "⍙Mix1_IRC" 1 "F12_LOGA"       9
-  Z←Z,⊂ ""         "○"   "⍙Mix_IRC"  1 "F12_CIRCLE"    10
-  Z←Z,⊂ ""         "∣"   "⍙Mix_IR"   1 "F12_STILE"     11
-  Z←Z,⊂ ""         "?"   "⍙Int2"     1 "F12_ROLL"      12
+  ⍝     A            OP     B            N   CN          STAT
+  ⍝----------------------------------------------------------
+  Z←Z,⊂ ""           "+"    "⍙Mix_IRC"   1   "F12_PLUS"     0
+  Z←Z,⊂ ""           "-"    "⍙Mix_IRC"   1   "F12_MINUS"    1
+  Z←Z,⊂ ""           "×"    "⍙Mix_IRC"   1   "F12_TIMES"    2
+  Z←Z,⊂ ""           "÷"    "⍙Mix1_IRC"  1   "F12_DIVIDE"   3
+  Z←Z,⊂ ""           "∼"    "⍙Bool"      1   "F12_WITHOUT"  4
+  Z←Z,⊂ ""           "⌈"    "⍙Mix_IR"    1   "F12_RND_UP"   5
+  Z←Z,⊂ ""           "⌊"    "⍙Mix_IR"    1   "F12_RND_DN"   6
+  Z←Z,⊂ ""           "!"    "⍙Int2"      1   "F12_BINOM"    7
+  Z←Z,⊂ ""           "⋆"    "⍙Mix_IRC"   1   "F12_POWER"    8
+  Z←Z,⊂ ""           "⍟"    "⍙Mix1_IRC"  1   "F12_LOGA"     9
+  Z←Z,⊂ ""           "○"    "⍙Mix_IRC"   1   "F12_CIRCLE"  10
+  Z←Z,⊂ ""           "∣"    "⍙Mix_IR"    1   "F12_STILE"   11
+  Z←Z,⊂ ""           "?"    "⍙Int2"      1   "F12_ROLL"    12
 ∇
 
 ∇Z←DYA_EXPR
   Z←⍬
-  ⍝     A           OP    B           N CN            STAT
-  ⍝-------------------------------------------------------
-  Z←Z,⊂ "⍙Mix_IRC"  "+"   "⍙Mix_IRC"  2 "F12_PLUS"      13
-  Z←Z,⊂ "⍙Mix_IRC"  "-"   "⍙Mix_IRC"  2 "F12_MINUS"     14
-  Z←Z,⊂ "⍙Mix_IRC"  "×"   "⍙Mix1_IRC" 2 "F12_TIMES"     15
-  Z←Z,⊂ "⍙Mix1_IRC" "÷"   "⍙Mix1_IRC" 2 "F12_DIVIDE"    16
-  Z←Z,⊂ "⍙Bool"     "∧"   "⍙Bool1"    2 "F2_AND"        17
-  Z←Z,⊂ "⍙Int"      "⊤∧"  "⍙Int"      2 "F2_AND_B"      18
-  Z←Z,⊂ "⍙Bool"     "∨"   "⍙Bool1"    2 "F2_OR"         19
-  Z←Z,⊂ "⍙Int"      "⊤∨"  "⍙Int"      2 "F2_OR_B"       20
-  Z←Z,⊂ "⍙Bool"     "⍲"   "⍙Bool1"    2 "F2_NAND"       21
-  Z←Z,⊂ "⍙Int"      "⊤⍲"  "⍙Int"      2 "F2_NAND_B"     22
-  Z←Z,⊂ "⍙Bool"     "⍱"   "⍙Bool1"    2 "F2_NOR"        23
-  Z←Z,⊂ "⍙Int"      "⊤⍱"  "⍙Int"      2 "F2_NOR_B"      24
-  Z←Z,⊂ "⍙Mix_IR"   "⌈"   "⍙Mix_IR"   2 "F12_RND_UP"    25
-  Z←Z,⊂ "⍙Mix_IR"   "⌊"   "⍙Mix_IR"   2 "F12_RND_DN"    26
-  Z←Z,⊂ "⍙Mix_IRC"  "!"   "⍙Mix_IRC"  2 "F12_BINOM"     27
-  Z←Z,⊂ "⍙Mix_IRC"  "⋆"   "⍙Mix_IRC"  2 "F12_POWER"     28
-  Z←Z,⊂ "⍙Mix1_IRC" "⍟"   "⍙Mix1_IRC" 2 "F12_LOGA"      29
-  Z←Z,⊂ "⍙Mix_IR "  "<"   "⍙Mix_IR"   2 "F2_LESS"       30
-  Z←Z,⊂ "⍙Mix_IR "  "≤"   "⍙Mix_IR"   2 "F2_LEQ"        31
-  Z←Z,⊂ "⍙MMix_IRC"  "="   "⍙Mix_IRC"  2 "F2_EQUAL"     32
-  Z←Z,⊂ "⍙MInt"      "⊤="  "⍙Int"      2 "F2_EQUAL_B"   33
-  Z←Z,⊂ "⍙MInt2"     "≠"   "⍙Mix_IRC"  2 "F2_UNEQ"      34
-  Z←Z,⊂ "⍙MInt"      "⊤≠"  "⍙Int"      2 "F2_UNEQ_B"    35
-  Z←Z,⊂ "⍙Mix_IR"   ">"   "⍙Mix_IR"   2 "F2_GREATER"    36
-  Z←Z,⊂ "⍙Mix_IR"   "≥"   "⍙Mix_IR"   2 "F2_MEQ"        37
-  Z←Z,⊂ "¯6"         "○"   "⍙Mix_IRC"  2 "F12_CIRCLE"   38
-  Z←Z,⊂ "⍙Mix_IRC"  "∣"   "⍙Mix_IRC"  2 "F12_STILE"     39
-  Z←Z,⊂ "1 2 3"      "⋸"   "⍙Int"      2 "F12_FIND"     40
-  Z←Z,⊂ "⍙Mat1_IRC" "+.×" "⍙Mat1_IRC" 3 "OPER2_INNER"   41
-  Z←Z,⊂ "⍙Vec1_IRC" "∘.×" "⍙Vec1_IRC" 3 "OPER2_OUTER"   42
+  ⍝     A            OP     B            N  CN           STAT
+  ⍝----------------------------------------------------------
+  Z←Z,⊂ "⍙Mix_IRC"   "+"    "⍙Mix_IRC"   2  "F12_PLUS"     13
+  Z←Z,⊂ "⍙Mix_IRC"   "-"    "⍙Mix_IRC"   2  "F12_MINUS"    14
+  Z←Z,⊂ "⍙Mix_IRC"   "×"    "⍙Mix1_IRC"  2  "F12_TIMES"    15
+  Z←Z,⊂ "⍙Mix1_IRC"  "÷"    "⍙Mix1_IRC"  2  "F12_DIVIDE"   16
+  Z←Z,⊂ "⍙Bool"      "∧"    "⍙Bool1"     2  "F2_AND"       17
+  Z←Z,⊂ "⍙Int"       "⊤∧"   "⍙Int"       2  "F2_AND_B"     18
+  Z←Z,⊂ "⍙Bool"      "∨"    "⍙Bool1"     2  "F2_OR"        19
+  Z←Z,⊂ "⍙Int"       "⊤∨"   "⍙Int"       2  "F2_OR_B"      20
+  Z←Z,⊂ "⍙Bool"      "⍲"    "⍙Bool1"     2  "F2_NAND"      21
+  Z←Z,⊂ "⍙Int"       "⊤⍲"   "⍙Int"       2  "F2_NAND_B"    22
+  Z←Z,⊂ "⍙Bool"      "⍱"    "⍙Bool1"     2  "F2_NOR"       23
+  Z←Z,⊂ "⍙Int"       "⊤⍱"   "⍙Int"       2  "F2_NOR_B"     24
+  Z←Z,⊂ "⍙Mix_IR"    "⌈"    "⍙Mix_IR"    2  "F12_RND_UP"   25
+  Z←Z,⊂ "⍙Mix_IR"    "⌊"    "⍙Mix_IR"    2  "F12_RND_DN"   26
+  Z←Z,⊂ "⍙Mix_IRC"   "!"    "⍙Mix_IRC"   2  "F12_BINOM"    27
+  Z←Z,⊂ "⍙Mix_IRC"   "⋆"    "⍙Mix_IRC"   2  "F12_POWER"    28
+  Z←Z,⊂ "⍙Mix1_IRC"  "⍟"    "⍙Mix1_IRC"  2  "F12_LOGA"     29
+  Z←Z,⊂ "⍙Mix_IR "   "<"    "⍙Mix_IR"    2  "F2_LESS"      30
+  Z←Z,⊂ "⍙Mix_IR "   "≤"    "⍙Mix_IR"    2  "F2_LEQ"       31
+  Z←Z,⊂ "⍙MMix_IRC"  "="    "⍙Mix_IRC"   2  "F2_EQUAL"     32
+  Z←Z,⊂ "⍙MInt"      "⊤="   "⍙Int"       2  "F2_EQUAL_B"   33
+  Z←Z,⊂ "⍙MInt2"     "≠"    "⍙Mix_IRC"   2  "F2_UNEQ"      34
+  Z←Z,⊂ "⍙MInt"      "⊤≠"   "⍙Int"       2  "F2_UNEQ_B"    35
+  Z←Z,⊂ "⍙Mix_IR"    ">"    "⍙Mix_IR"    2  "F2_GREATER"   36
+  Z←Z,⊂ "⍙Mix_IR"    "≥"    "⍙Mix_IR"    2  "F2_MEQ"       37
+  Z←Z,⊂ "¯6"         "○"    "⍙Mix_IRC"   2  "F12_CIRCLE"   38
+  Z←Z,⊂ "⍙Mix_IRC"   "∣"    "⍙Mix_IRC"   2  "F12_STILE"    39
+  Z←Z,⊂ "1 2 3"      "⋸"    "⍙Int"       2  "F12_FIND"     40
+  Z←Z,⊂ "⍙Mat1_IRC"  "+.×"  "⍙Mat1_IRC"  3  "OPER2_INNER"  41
+  Z←Z,⊂ "⍙Vec1_IRC"  "∘.×"  "⍙Vec1_IRC"  3  "OPER2_OUTER"  42
 ∇
-
 ⍝ ====================================================================
 ∇Z←A contains B
  Z←(A⍳⊂B)≤⍴A
 ∇
 
 ∇decode_ARGS;ARGS;OPT_C;OPT_D;OPT_H
-  ARGS←⎕ARG↓⍨⎕ARG⍳⊂'--'
+ ⍝
+ ⍝⍝ decode the command line arguments (if any) with which the script was called.
+ ⍝
+ ARGS←⎕ARG↓⍨⎕ARG⍳⊂'--'
  OPT_C←ARGS↓⍨ARGS⍳⊂'-c'
  OPT_D←ARGS↓⍨ARGS⍳⊂'-d'
  OPT_F←ARGS↓⍨ARGS⍳⊂'-f'
  OPT_H←(ARGS contains '-h') ∨ (ARGS contains '--help')
 
- ⍝ pick option arg, or default if not found
+ ⍝ pick option arg, or its default if not provided
+ ⍝
  OPT_C←⊃↑OPT_C, ⊂"2,4,8,12"
  OPT_D←⊃↑OPT_D, ⊂"⍳20"
  OPT_F←⊃↑OPT_F, ⊂" 1"
@@ -91,16 +94,17 @@
   ∆FUNC ←⍎OPT_F ◊ '∆FUNC: ' ∆FUNC
   ∆FUNC ←1⌈(⍬⍴⍴MON_EXPR,DYA_EXPR)⌊∆FUNC
   EXPR: (MON_EXPR,DYA_EXPR)[∆FUNC]
+  SPEEDUPS←0 2⍴0
 
  →0↓⍨(⎕ARG contains '-h') ∨ ⎕ARG contains '--help'
 
  ⊃¨"""
 Usage: apl -f <path-to-workspace/> -- options
 options:
-    -h, --help:      print this info
-    -c corecounts        e.g. -c 3,4,7  for core counts 3, 4, and 7
-    -d datalengths       e.g. -d 2+⍳20  for data lengths 2, 3, ... 22
-    -f function number   e.g. -f 39 for Z ← ¯6○ ⍙Mix_IRC
+    -h, --help       print this text
+    -c corecounts               e.g. -c 3,4,7  for core counts 3, 4, and 7
+    -d datalengths              e.g. -d 2+⍳20  for data lengths 2, 3, ... 22
+    -f function (STAT) number   e.g. -f 39 for Z ← ¯6○ ⍙Mix_IRC
    """
 ∇
 
@@ -172,40 +176,55 @@ options:
 ∇
 
 ⍝ ====================================================================
-∇Z←PLOT_WIN_ATTS;CAPTION;Wpos_X;Wpos_Y
- ⍝⍝ return useful window attributes for ⎕PLOT
+∇ATTS←PLOT_WIN_ATTS;A;OP;B
+ ⍝
+ ⍝⍝ return attributes for ⎕PLOT (one core count, variable length)
+ ⍝
+ (A OP B)←3↑EXPR
 
-  CAPTION←⊂'caption: Z←', (⊃,/EXPR[1 2 3]), ' on ', (⍕CORES), ' cores'
-  Wpos_X←⊂'pw_pos_X: ', ⍕200+30×CORES
-  Wpos_Y←⊂'pw_pos_Y: ', ⍕200+30×CORES
-  Z←"""
-pa_border_L: 60
-legend_X:    80
-legend_Y:    45
-legend_name-1: measured cycles sequential
-legend_name-2: linearized cycles sequential
-legend_name-3: measured cycles parallel
-legend_name-4: linearized cycles parallel
-point_color-1: #00C000
- line_color-1: #00C000
-point_color-2: #00C000
- line_color-2: #00C000
-point_color-3: #C00000
- line_color-3: #C00000
-point_color-4: #C00000
-line_color-4:  #C00000
+ ATTS.caption      ← A, ' ', OP, ' ', B, ' on ', (⍕CORES), ' cores'
+ ATTS.pw_pos_X     ← 200+30×CORES
+ ATTS.pw_pos_Y     ← 200+30×CORES
 
-line_width-1:  0
-line_width-2:  2
-line_width-3:  0
-line_width-4:  2
+ ATTS.pa_border_L   ← 60
+ ATTS.legend_X      ← 80
+ ATTS.legend_Y      ← 45
+ ATTS.legend_name_1 ← "measured cycles sequential"
+ ATTS.legend_name_2 ← "linearized cycles sequential"
+ ATTS.legend_name_3 ← "measured cycles parallel"
+ ATTS.legend_name_4 ← "linearized cycles parallel"
+ ATTS.point_color_1 ← "#00C000"
+ ATTS. line_color_1 ← "#00C000"
+ ATTS.point_color_2 ← "#00C000"
+ ATTS. line_color_2 ← "#00C000"
+ ATTS.point_color_3 ← "#C00000"
+ ATTS. line_color_3 ← "#C00000"
+ ATTS.point_color_4 ← "#C00000"
+ ATTS.line_color_4  ← "#C00000"
 
-point_size-2:  0
-point_size-4:  0
-      """
-  Z←CAPTION,Wpos_X,Wpos_Y,Z
+ ATTS.line_width_1  ← 0
+ ATTS.line_width_2  ← 2
+ ATTS.line_width_3  ← 0
+ ATTS.line_width_4  ← 2
+
+ ATTS.point_size_2  ← 0
+ ATTS.point_size_4  ← 0
 ∇
-
+⍝ ====================================================================
+∇ATTS←SPEEDUP_ATTS
+ ⍝
+ ⍝⍝ return attributes for ⎕PLOT (core count vs. speedup)
+ ⍝
+ ATTS.caption       ← 'Parallel Speedup vs. Core Count'
+ ATTS.pw_pos_X      ← 200
+ ATTS.pw_pos_Y      ← 200
+ ATTS. format_X ← "%d\nCores"
+ ATTS.legend_X      ← 50
+ ATTS.legend_Y      ← 200
+ ATTS.legend_name_1 ← "parallel speedup"
+ ATTS.point_color_1 ← "#0000FF"
+ ATTS.pa_border_B   ← 50
+∇
 ⍝ ====================================================================
 ∇ONE_CORE_COUNT CORES;EXPR;DLEN;DATA;P_pit;P_sup;S_pit;S_sup;I;LEN;SUM;SUM2;Q;PZ;SZ
 4 ⎕CR ∆FUNC
@@ -244,6 +263,7 @@ SAME_DATA:
 P_sup
   'Parallel:   Startup'(0 0⍕P_sup) 'Per-Item:' (0 0⍕P_pit)
   'Speedup:    ' (0 2⍕S_pit÷P_pit) ' for' CORES 'cores'
+  SPEEDUPS←SPEEDUPS⍪ CORES, S_pit÷P_pit
 
   →(P_sup < S_sup)⍴GOON   ⍝ parallel setup is faster:    nonsense
   →(P_pit ≥ S_pit)⍴GOON   ⍝ parallel per item is slower: nonsense
@@ -280,8 +300,14 @@ L: ONE_CORE_COUNT ↑CORE_COUNTS
 ⍝ ====================================================================
 decode_ARGS
 GO ∆CORES
+
+ 'Speedups: ' SPEEDUPS
+ ⊣ SPEEDUP_ATTS ⎕PLOT SPEEDUPS[;1] + 0J1×SPEEDUPS[;2]
+
 )MORE
+'Hit RETURN to close windows and exit'
 ⎕
+⎕PLOT ¯3   ⍝ close plot windows
 )FNS
 )VARS
 )OFF

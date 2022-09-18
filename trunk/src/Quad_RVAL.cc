@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -44,7 +44,7 @@ Quad_RVAL * Quad_RVAL::fun = &Quad_RVAL::_fun;
 
 #if HAVE_LIBC
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Quad_RVAL::Quad_RVAL()
    : QuadFunction(TOK_Quad_RVAL)
 {
@@ -64,7 +64,7 @@ Quad_RVAL::Quad_RVAL()
    desired_types.push_back(0);   // no complex
    desired_types.push_back(0);   // no nested
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_RVAL::do_eval_B(const Value & B, int depth)
 {
@@ -95,46 +95,46 @@ bool need_restore = false;
 
          if (ec_B >= 1)   // rank: scalar or enclosed vector (distribution)
             {
-              const Cell & cell = B.get_ravel(0);
+              const Cell & cell = B.get_cfirst();
               if (cell.is_pointer_cell())
                  {
-                   do_eval_AB(1, cell.get_pointer_value().getref());
+                   do_eval_AB(1, *cell.get_pointer_value());
                  }
               else   // rank as scalar
                  {
                    Value_P rank = IntScalar(cell.get_int_value(), LOC);
-                   do_eval_AB(1, rank.getref());
+                   do_eval_AB(1, *rank);
                  }
             }
 
          if (ec_B >= 2)   // shape: scalar or enclosed vector
             {
-              const Cell & cell = B.get_ravel(1);
+              const Cell & cell = B.get_cravel(1);
               if (cell.is_pointer_cell())
                  {
-                   do_eval_AB(2, cell.get_pointer_value().getref());
+                   do_eval_AB(2, *cell.get_pointer_value());
                  }
               else   // shape as scalar: Z← (rank⍴ec_B)⍴random_data
                  {
                    Value_P rank = IntScalar(cell.get_int_value(), LOC);
-                   do_eval_AB(2, rank.getref());
+                   do_eval_AB(2, *rank);
                  }
             }
 
          if (ec_B >= 3)   // type: always enclosed vector (distribution)
-            do_eval_AB(3, B.get_ravel(2).get_pointer_value().getref());
+            do_eval_AB(3, *B.get_cravel(2).get_pointer_value());
 
          if (ec_B >= 4)   // maxdepth: scalar or 1-element vector
             {
-              const Cell & cell = B.get_ravel(3);
+              const Cell & cell = B.get_cravel(3);
               if (cell.is_pointer_cell())   // maxdepth as 1-element vector
                  {
-                   do_eval_AB(4, cell.get_pointer_value().getref());
+                   do_eval_AB(4, *cell.get_pointer_value());
                  }
               else   // maxdepth as scalar
                  {
                    Value_P rank = IntScalar(cell.get_int_value(), LOC);
-                   do_eval_AB(4, rank.getref());
+                   do_eval_AB(4, *rank);
                  }
             }
        }
@@ -147,11 +147,11 @@ bool need_restore = false;
         throw;
       }
 
-const Rank rank = choose_integer(desired_ranks);
+const sRank rank = choose_integer(desired_ranks);
 Shape shape;
 
 
-   for (Rank r = MAX_RANK - rank; r < MAX_RANK; ++r)
+   for (sRank r = MAX_RANK - rank; r < MAX_RANK; ++r)
        {
          vector<int> vsh_r;   vsh_r.push_back(desired_shape.get_shape_item(r));
          const int sh_r = choose_integer(vsh_r);
@@ -166,14 +166,13 @@ const ShapeItem ec = Z->element_count();
       {
          int type_z;  do    { type_z = choose_integer(desired_types); }
                       while (depth == desired_maxdepth && type_z == 4);
-         Cell * cZ = Z->next_ravel();
          switch(type_z)
             {
-               case 0:   random_character(cZ);                     continue;
-               case 1:   random_integer(cZ);                       continue;
-               case 2:   random_float(cZ);                         continue;
-               case 3:   random_complex(cZ);                        continue;
-               case 4:   random_nested(cZ, Z.getref(), B, depth);   continue;
+               case 0:   random_character(*Z);          continue;
+               case 1:   random_integer(*Z);            continue;
+               case 2:   random_float(*Z);              continue;
+               case 3:   random_complex(*Z);            continue;
+               case 4:   random_nested(*Z, B, depth);   continue;
                default:  FIXME;
             }
       }
@@ -186,12 +185,12 @@ const ShapeItem ec = Z->element_count();
         desired_maxdepth = old_desired_maxdepth;
       }
 
-   if (ec == 0)   new (&Z->get_ravel(0))   IntCell(0);
+   if (ec == 0)   Z->set_proto_Int();
 
    Z->check_value(LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_RVAL::eval_AB(Value_P A, Value_P B) const
 {
@@ -208,10 +207,10 @@ Quad_RVAL::eval_AB(Value_P A, Value_P B) const
         DOMAIN_ERROR;
       }
 
-Value_P Z = do_eval_AB(A->get_ravel(0).get_int_value(), B.getref());
+Value_P Z = do_eval_AB(A->get_cfirst().get_int_value(), *B);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_RVAL::do_eval_AB(int A, const Value & B)
 {
@@ -229,7 +228,7 @@ const int function = A;
    MORE_ERROR() << "Bad function number A in A ⎕RVAL B";
    DOMAIN_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_RVAL::generator_state(const Value & B)
 {
@@ -247,7 +246,7 @@ const ShapeItem new_N = B.element_count();
    // always return the previous state
    //
 Value_P Z(N, LOC);
-   loop(n, N)   new (Z->next_ravel())   IntCell(state[n] & 0xFF);
+   loop(n, N)   Z->next_ravel_Int(state[n] & 0xFF);
    Z->check_value(LOC);
 
    if (new_N)   // set generator state
@@ -256,7 +255,7 @@ Value_P Z(N, LOC);
         //
         loop(b, N)
             {
-              const APL_Integer byte = B.get_ravel(b).get_int_value();
+              const APL_Integer byte = B.get_cravel(b).get_int_value();
               if ((byte < -256) || (byte >  255))
                  {
                    MORE_ERROR() << "Bad right argument B in 0 ⎕RVAL B,"
@@ -267,14 +266,14 @@ Value_P Z(N, LOC);
         N = new_N;
         loop(b, N)
             {
-               state[b] = B.get_ravel(b).get_int_value();
+               state[b] = B.get_cravel(b).get_int_value();
             }
          setstate_r(state, &rdata);
       }
 
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_RVAL::result_rank(const Value & B)
 {
@@ -284,13 +283,12 @@ Quad_RVAL::result_rank(const Value & B)
    // always return the previous rank
    //
 Value_P Z(desired_ranks.size(), LOC);
-   loop(z, desired_ranks.size())
-       new (Z->next_ravel())   IntCell(desired_ranks[z]);
+   loop(z, desired_ranks.size())   Z->next_ravel_Int(desired_ranks[z]);
    Z->check_value(LOC);
 
    if (B.is_scalar())   // single rank (fixed or equal distribution)
       {
-        ShapeItem rk = B.get_ravel(0).get_int_value();
+        ShapeItem rk = B.get_cfirst().get_int_value();
 
         if ((rk < -MAX_RANK) || (rk > MAX_RANK))
            {
@@ -308,7 +306,7 @@ Value_P Z(desired_ranks.size(), LOC);
         vector<int>new_ranks;
         loop(b, B.element_count())
             {
-              const int rank_b = B.get_ravel(b).get_int_value();
+              const int rank_b = B.get_cravel(b).get_int_value();
               if (rank_b < 0)
                  {
                    MORE_ERROR() << "a vector right argument B of 1 ⎕RVAL B "
@@ -323,7 +321,7 @@ Value_P Z(desired_ranks.size(), LOC);
 
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_RVAL::result_shape(const Value & B)
 {
@@ -336,7 +334,7 @@ const ShapeItem len_B = B.element_count();
    //
 Value_P Z(MAX_RANK, LOC);
    loop(r, MAX_RANK)
-      new (Z->next_ravel())   IntCell(desired_shape.get_shape_item(r));
+       Z->next_ravel_Int(desired_shape.get_shape_item(r));
    Z->check_value(LOC);
 
    if (len_B)   // set the current shape
@@ -345,7 +343,7 @@ Value_P Z(MAX_RANK, LOC);
 
         if (B.is_scalar())   // scalar-extend B
            {
-              const APL_Integer len = B.get_ravel(0).get_int_value();
+              const APL_Integer len = B.get_cfirst().get_int_value();
               loop(b, MAX_RANK)   new_shape.add_shape_item(len);
            }
         else                 // vector B: prepend 1s as needed
@@ -356,7 +354,7 @@ Value_P Z(MAX_RANK, LOC);
 
              // fill lower dimensions with B
               loop(b, len_B)
-                  new_shape.add_shape_item(B.get_ravel(b).get_int_value());
+                  new_shape.add_shape_item(B.get_cravel(b).get_int_value());
            }
 
         desired_shape = new_shape;
@@ -364,7 +362,7 @@ Value_P Z(MAX_RANK, LOC);
 
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_RVAL::result_type(const Value & B)
 {
@@ -389,8 +387,7 @@ Quad_RVAL::result_type(const Value & B)
    // always return the previous types
    //
 Value_P Z(desired_types.size(), LOC);
-   loop(z, desired_types.size())
-       new (Z->next_ravel())   IntCell(desired_types[z]);
+   loop(z, desired_types.size())   Z->next_ravel_Int(desired_types[z]);
    Z->check_value(LOC);
 
    if (B.element_count())   // distribution of depths
@@ -399,7 +396,7 @@ Value_P Z(desired_types.size(), LOC);
         bool B_has_simple = false;
         loop(b, B.element_count())
             {
-              const int type_b = B.get_ravel(b).get_int_value();
+              const int type_b = B.get_cravel(b).get_int_value();
               if (type_b < 0)
                  {
                    MORE_ERROR() << "the right argument B of 3 ⎕RVAL B "
@@ -426,7 +423,7 @@ Value_P Z(desired_types.size(), LOC);
 
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_RVAL::result_maxdepth(const Value & B)
 {
@@ -437,7 +434,7 @@ Value_P Z = IntScalar(desired_maxdepth, LOC);
 
    if (B.element_count())   // set the desired maxdepth
       {
-        const APL_Integer mxd = B.get_ravel(0).get_int_value();
+        const APL_Integer mxd = B.get_cfirst().get_int_value();
         if (mxd < 0)
            {
              MORE_ERROR() << "bad max.depth";
@@ -448,7 +445,7 @@ Value_P Z = IntScalar(desired_maxdepth, LOC);
 
    return Z;   // previous desired_maxdepth
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Quad_RVAL::choose_integer(const vector<int> & dist)
 {
@@ -477,26 +474,26 @@ int sum = 0;
 
    FIXME;   // not reached
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
-Quad_RVAL::random_character(Cell * cell)
+Quad_RVAL::random_character(Value & Z)
 {
 const int32_t rnd = rand17();
-   new (cell) CharCell(Unicode((rnd & 0x1FFF) + ((rnd & 0x2000) >> 1)));
+   Z.next_ravel_Char(Unicode((rnd & 0x1FFF) + ((rnd & 0x2000) >> 1)));
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
-Quad_RVAL::random_integer(Cell * cell)
+Quad_RVAL::random_integer(Value & Z)
 {
 const int64_t rnd = rand17()
                   ^ (rand17() << 16)
                   ^ (rand17() << 32)
                   ^ (rand17() << 48);
-   new (cell) IntCell(rnd);
+   Z.next_ravel_Int(rnd);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
-Quad_RVAL::random_float(Cell * cell)
+Quad_RVAL::random_float(Value & Z)
 {
 union { uint64_t i; double f; } u;
    do {
@@ -505,11 +502,11 @@ union { uint64_t i; double f; } u;
         u.i |= 0x3FE0000000000000ULL;
       } while (!isnormal(u.f));
 
-   new (cell) FloatCell(u.f);
+   Z.next_ravel_Float(u.f);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
-Quad_RVAL::random_complex(Cell * cell)
+Quad_RVAL::random_complex(Value & Z)
 {
 union { int64_t i; double f; } u1, u2;
    do {
@@ -523,21 +520,21 @@ union { int64_t i; double f; } u1, u2;
         u2.i &= 0x000FFFFFFFFFFFFFULL;
         u2.i |= 0x3FE0000000000000ULL;
       } while (!isnormal(u2.f));
-   new (cell) ComplexCell(u1.f - 1.0, u2.f - 1.0);
+
+   Z.next_ravel_Complex(u1.f - 1.0, u2.f - 1.0);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
-Quad_RVAL::random_nested(Cell * cell, Value & cell_owner,
-                         const Value & B, int depth)
+Quad_RVAL::random_nested(Value & Z, const Value & B, int depth)
 {
 Value_P Zsub;
 
    do Zsub = do_eval_B(B, depth + 1);
    while (Zsub->is_simple_scalar());
 
-   new (cell) PointerCell(Zsub.get(), cell_owner);
+   Z.next_ravel_Pointer(Zsub.get());
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 uint64_t
 Quad_RVAL::rand17()
 {
@@ -548,17 +545,17 @@ int32_t rnd;
    // the lower 16 bits and return them.
    return (rnd ^ (rnd >> 16)) & 0x1FFFF;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #else    // not HAVE_LIBC
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Quad_RVAL::Quad_RVAL()
    : QuadFunction(TOK_Quad_RVAL)
 {
    N = 8;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_RVAL::do_eval_B(const Value & B, int depth)
 {
@@ -569,7 +566,7 @@ Quad_RVAL::do_eval_B(const Value & B, int depth)
    SYNTAX_ERROR;
    return Value_P();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_RVAL::eval_AB(Value_P A, Value_P B) const
 {
@@ -580,5 +577,5 @@ Quad_RVAL::eval_AB(Value_P A, Value_P B) const
    SYNTAX_ERROR;
    return Token();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 #endif   // HAVE_LIBC

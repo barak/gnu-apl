@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 
 #include "PrimitiveOperator.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** Primitive operator inner product.
  */
 /// The class implementing f.g
@@ -69,7 +69,11 @@ protected:
 
    /// the main loop for an inner product with scalar functions
    static void PF_scalar_inner_product(Thread_context & tctx);
+
+   /// evaluate the fill function with arguments A and B
+   static Token fill(const Shape shape_Z, Value_P A, Function_P fun,
+                     Value_P B, const char * loc);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __BIF_OPER2_INNER_HH_DEFINED__

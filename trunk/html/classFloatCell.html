@@ -62,6 +62,8 @@ $(document).ready(function(){initNavTree('classFloatCell.html','');});
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pub-static-methods">Static Public Member Functions</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
+<a href="#pro-static-methods">Static Protected Member Functions</a> &#124;
+<a href="#friends">Friends</a> &#124;
 <a href="classFloatCell-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">FloatCell Class Reference</div>  </div>
@@ -110,23 +112,19 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a48d2e4f2d44cccc87f56c6edb4899e1b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaa2b1d2de8b20d58dcfcd6ccb2443dad"><td class="memItemLeft" align="right" valign="top"><a id="aaa2b1d2de8b20d58dcfcd6ccb2443dad"></a>
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFloatCell.html#aaa2b1d2de8b20d58dcfcd6ccb2443dad">init_other</a> (void *other, <a class="el" href="classValue.html">Value</a> &amp;cell_owner, const char *loc) const</td></tr>
-<tr class="memdesc:aaa2b1d2de8b20d58dcfcd6ccb2443dad"><td class="mdescLeft">&#160;</td><td class="mdescRight">overloaded <a class="el" href="classCell.html#ae996571823c6935d2bcafd11509ab222" title="init other from this cell ">Cell::init_other</a> <br /></td></tr>
+<tr class="memdesc:aaa2b1d2de8b20d58dcfcd6ccb2443dad"><td class="mdescLeft">&#160;</td><td class="mdescRight">overloaded <a class="el" href="classCell.html#aab9681b3e735d10ef92978c5c17bf95d" title="init (uninitialized) Cell other from this initialized cell ">Cell::init_other</a> <br /></td></tr>
 <tr class="separator:aaa2b1d2de8b20d58dcfcd6ccb2443dad"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afa1a46cfd36a3c2166559f7d425f094d"><td class="memItemLeft" align="right" valign="top"><a id="afa1a46cfd36a3c2166559f7d425f094d"></a>
 <a class="el" href="classAPL__Float.html">APL_Float</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFloatCell.html#afa1a46cfd36a3c2166559f7d425f094d">dfval</a> () const</td></tr>
 <tr class="memdesc:afa1a46cfd36a3c2166559f7d425f094d"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the value of <b>this</b> cell as a double (even if the value is rational) <br /></td></tr>
 <tr class="separator:afa1a46cfd36a3c2166559f7d425f094d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a315a36734a31673bb0c0f76f229a8cd3"><td class="memItemLeft" align="right" valign="top"><a id="a315a36734a31673bb0c0f76f229a8cd3"></a>
-ErrorCode&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFloatCell.html#a315a36734a31673bb0c0f76f229a8cd3">zv</a> (<a class="el" href="classCell.html">Cell</a> *Z) const</td></tr>
-<tr class="memdesc:a315a36734a31673bb0c0f76f229a8cd3"><td class="mdescLeft">&#160;</td><td class="mdescRight">construct a new <a class="el" href="classFloatCell.html" title="A Cell containing a single floating point (or rational) value. ">FloatCell</a> a address Z <br /></td></tr>
-<tr class="separator:a315a36734a31673bb0c0f76f229a8cd3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a081920644071fb8252c46f4490ed2d96"><td class="memItemLeft" align="right" valign="top"><a id="a081920644071fb8252c46f4490ed2d96"></a>
 virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFloatCell.html#a081920644071fb8252c46f4490ed2d96">is_float_cell</a> () const</td></tr>
 <tr class="memdesc:a081920644071fb8252c46f4490ed2d96"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloaded <a class="el" href="classCell.html#a122ed26d321f4d27ca63c8cea0134595" title="Return true iff this cell is a floating point cell. ">Cell::is_float_cell()</a>. <br /></td></tr>
 <tr class="separator:a081920644071fb8252c46f4490ed2d96"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab33d5fb8782321e100cec38cbed5ea18"><td class="memItemLeft" align="right" valign="top"><a id="ab33d5fb8782321e100cec38cbed5ea18"></a>
 virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFloatCell.html#ab33d5fb8782321e100cec38cbed5ea18">is_finite</a> () const</td></tr>
-<tr class="memdesc:ab33d5fb8782321e100cec38cbed5ea18"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloaded <a class="el" href="classCell.html#a4a4fff9745f6938e16764875eba04c2d" title="return true unless this cell contains infinity or NaN ">Cell::is_finite()</a>. <br /></td></tr>
+<tr class="memdesc:ab33d5fb8782321e100cec38cbed5ea18"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloaded <a class="el" href="classCell.html#a4a4fff9745f6938e16764875eba04c2d" title="Return true unless this cell contains infinity or NaN. ">Cell::is_finite()</a>. <br /></td></tr>
 <tr class="separator:ab33d5fb8782321e100cec38cbed5ea18"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aae75ec1cf35bf5f9a97b86046573255c"><td class="memItemLeft" align="right" valign="top"><a id="aae75ec1cf35bf5f9a97b86046573255c"></a>
 virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFloatCell.html#aae75ec1cf35bf5f9a97b86046573255c">greater</a> (const <a class="el" href="classCell.html">Cell</a> &amp;other) const</td></tr>
@@ -245,10 +243,10 @@ virtual ErrorCode&#160;</td><td class="memItemRight" valign="bottom"><a class="e
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#a394510643e8664cf12b5efaf5cb99f71">Cell</a> ()</td></tr>
 <tr class="memdesc:a394510643e8664cf12b5efaf5cb99f71 inherit pub_methods_classCell"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct an un-initialized <a class="el" href="classCell.html" title="The base class for all Cells. ">Cell</a>. <br /></td></tr>
 <tr class="separator:a394510643e8664cf12b5efaf5cb99f71 inherit pub_methods_classCell"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa5e87e053f81f4e39dd13f1d3282b871 inherit pub_methods_classCell"><td class="memItemLeft" align="right" valign="top"><a id="aa5e87e053f81f4e39dd13f1d3282b871"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#aa5e87e053f81f4e39dd13f1d3282b871">init</a> (const <a class="el" href="classCell.html">Cell</a> &amp;other, <a class="el" href="classValue.html">Value</a> &amp;cell_owner, const char *loc)</td></tr>
-<tr class="memdesc:aa5e87e053f81f4e39dd13f1d3282b871 inherit pub_methods_classCell"><td class="mdescLeft">&#160;</td><td class="mdescRight">deep copy of cell <b>other</b> into <b>this</b> cell <br /></td></tr>
-<tr class="separator:aa5e87e053f81f4e39dd13f1d3282b871 inherit pub_methods_classCell"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ace1480b3a8beacc93cac91ebce845905 inherit pub_methods_classCell"><td class="memItemLeft" align="right" valign="top"><a id="ace1480b3a8beacc93cac91ebce845905"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#ace1480b3a8beacc93cac91ebce845905">init</a> (const <a class="el" href="classCell.html">Cell</a> &amp;other, <a class="el" href="classValue.html">Value</a> &amp;this_owner, const char *loc)</td></tr>
+<tr class="memdesc:ace1480b3a8beacc93cac91ebce845905 inherit pub_methods_classCell"><td class="mdescLeft">&#160;</td><td class="mdescRight">init <b>this</b> <a class="el" href="classCell.html" title="The base class for all Cells. ">Cell</a> from a (possibly deep) copy of <b>other</b> <br /></td></tr>
+<tr class="separator:ace1480b3a8beacc93cac91ebce845905 inherit pub_methods_classCell"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6ff584df467249c47c95570553d1f05e inherit pub_methods_classCell"><td class="memItemLeft" align="right" valign="top"><a id="a6ff584df467249c47c95570553d1f05e"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#a6ff584df467249c47c95570553d1f05e">init_from_value</a> (<a class="el" href="classValue.html">Value</a> *<a class="el" href="classCell.html#aec38650253342ecb4fc6498c546a61c8">value</a>, <a class="el" href="classValue.html">Value</a> &amp;cell_owner, const char *loc)</td></tr>
 <tr class="memdesc:a6ff584df467249c47c95570553d1f05e inherit pub_methods_classCell"><td class="mdescLeft">&#160;</td><td class="mdescRight">init this <a class="el" href="classCell.html" title="The base class for all Cells. ">Cell</a> from value. If value is a scalar then its first element is used (and value is erased). Otherwise a <a class="el" href="classPointerCell.html" title="A cell pointing to a (nested) APL value. ">PointerCell</a> is created. <br /></td></tr>
@@ -261,10 +259,10 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#aec1ee0ad9011702c8518aa1eabda32bd">init_type</a> (const <a class="el" href="classCell.html">Cell</a> &amp;other, <a class="el" href="classValue.html">Value</a> &amp;cell_owner, const char *loc)</td></tr>
 <tr class="memdesc:aec1ee0ad9011702c8518aa1eabda32bd inherit pub_methods_classCell"><td class="mdescLeft">&#160;</td><td class="mdescRight">init <b>this</b> cell to be the type of <b>other</b> <br /></td></tr>
 <tr class="separator:aec1ee0ad9011702c8518aa1eabda32bd inherit pub_methods_classCell"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab940e21b6212fbd1bfa8de9f99d090ea inherit pub_methods_classCell"><td class="memItemLeft" align="right" valign="top"><a id="ab940e21b6212fbd1bfa8de9f99d090ea"></a>
-virtual Unicode&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#ab940e21b6212fbd1bfa8de9f99d090ea">get_char_value</a> () const</td></tr>
-<tr class="memdesc:ab940e21b6212fbd1bfa8de9f99d090ea inherit pub_methods_classCell"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the character value of a cell. <br /></td></tr>
-<tr class="separator:ab940e21b6212fbd1bfa8de9f99d090ea inherit pub_methods_classCell"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2999919fc2782b3cebfd925c63cc1fac inherit pub_methods_classCell"><td class="memItemLeft" align="right" valign="top"><a id="a2999919fc2782b3cebfd925c63cc1fac"></a>
+virtual Unicode&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#a2999919fc2782b3cebfd925c63cc1fac">get_char_value</a> () const</td></tr>
+<tr class="memdesc:a2999919fc2782b3cebfd925c63cc1fac inherit pub_methods_classCell"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the character value of a cell. <br /></td></tr>
+<tr class="separator:a2999919fc2782b3cebfd925c63cc1fac inherit pub_methods_classCell"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5ba7cf69ad5fce61cf3ce8c2acb26c72 inherit pub_methods_classCell"><td class="memItemLeft" align="right" valign="top"><a id="a5ba7cf69ad5fce61cf3ce8c2acb26c72"></a>
 virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#a5ba7cf69ad5fce61cf3ce8c2acb26c72">get_byte_value</a> () const</td></tr>
 <tr class="memdesc:a5ba7cf69ad5fce61cf3ce8c2acb26c72 inherit pub_methods_classCell"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the byte value (-128..255 incl) of a cell. <br /></td></tr>
@@ -273,10 +271,10 @@ virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 virtual APL_Integer&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#ad165f9ab69abf46b2cf44d301a700a1c">get_int_value</a> () const</td></tr>
 <tr class="memdesc:ad165f9ab69abf46b2cf44d301a700a1c inherit pub_methods_classCell"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the integer value of a cell. <br /></td></tr>
 <tr class="separator:ad165f9ab69abf46b2cf44d301a700a1c inherit pub_methods_classCell"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3af019707c56a0fb40fce2d370af8307 inherit pub_methods_classCell"><td class="memItemLeft" align="right" valign="top"><a id="a3af019707c56a0fb40fce2d370af8307"></a>
-virtual <a class="el" href="classValue__P.html">Value_P</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#a3af019707c56a0fb40fce2d370af8307">get_pointer_value</a> () const</td></tr>
-<tr class="memdesc:a3af019707c56a0fb40fce2d370af8307 inherit pub_methods_classCell"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the APL value of a cell (Asserts for non-pointer cells) <br /></td></tr>
-<tr class="separator:a3af019707c56a0fb40fce2d370af8307 inherit pub_methods_classCell"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a367b9df7e0d4b805e5f31641658113f6 inherit pub_methods_classCell"><td class="memItemLeft" align="right" valign="top"><a id="a367b9df7e0d4b805e5f31641658113f6"></a>
+virtual <a class="el" href="classValue__P.html">Value_P</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#a367b9df7e0d4b805e5f31641658113f6">get_pointer_value</a> () const</td></tr>
+<tr class="memdesc:a367b9df7e0d4b805e5f31641658113f6 inherit pub_methods_classCell"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the APL value of a cell (Asserts for non-pointer cells) <br /></td></tr>
+<tr class="separator:a367b9df7e0d4b805e5f31641658113f6 inherit pub_methods_classCell"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a87287b9b88b2ee6b92c11aadabe6d557 inherit pub_methods_classCell"><td class="memItemLeft" align="right" valign="top"><a id="a87287b9b88b2ee6b92c11aadabe6d557"></a>
 virtual <a class="el" href="classCell.html">Cell</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#a87287b9b88b2ee6b92c11aadabe6d557">get_lval_value</a> () const</td></tr>
 <tr class="memdesc:a87287b9b88b2ee6b92c11aadabe6d557 inherit pub_methods_classCell"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the APL value of a cell (Asserts for non-lval cells) <br /></td></tr>
@@ -321,6 +319,10 @@ virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#a55a811ad4fe198eaa8677ad4b54e52c7">is_example_field</a> () const</td></tr>
 <tr class="memdesc:a55a811ad4fe198eaa8677ad4b54e52c7 inherit pub_methods_classCell"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return <b>true</b> iff <b>this</b> cell is an example field character cell. <br /></td></tr>
 <tr class="separator:a55a811ad4fe198eaa8677ad4b54e52c7 inherit pub_methods_classCell"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6a5fae12a13f5f0314b10d5324e90564 inherit pub_methods_classCell"><td class="memItemLeft" align="right" valign="top"><a id="a6a5fae12a13f5f0314b10d5324e90564"></a>
+virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#a6a5fae12a13f5f0314b10d5324e90564">is_member_anchor</a> () const</td></tr>
+<tr class="memdesc:a6a5fae12a13f5f0314b10d5324e90564 inherit pub_methods_classCell"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true iff this is a <a class="el" href="classPointerCell.html" title="A cell pointing to a (nested) APL value. ">PointerCell</a> which pouints to a member value. <br /></td></tr>
+<tr class="separator:a6a5fae12a13f5f0314b10d5324e90564 inherit pub_methods_classCell"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8e0a82a41108e66c7de077efeddaca0b inherit pub_methods_classCell"><td class="memItemLeft" align="right" valign="top"><a id="a8e0a82a41108e66c7de077efeddaca0b"></a>
 virtual CellType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#a8e0a82a41108e66c7de077efeddaca0b">get_cell_subtype</a> () const</td></tr>
 <tr class="memdesc:a8e0a82a41108e66c7de077efeddaca0b inherit pub_methods_classCell"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the subtype of <b>this</b> cell. The subtype is the set of containers that can store the cell (only for Int and Char cells). <br /></td></tr>
@@ -349,46 +351,6 @@ ErrorCode&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 ErrorCode&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#a0e7bec79d1ffe526a25c210c141949f5">bif_greater_eq</a> (<a class="el" href="classCell.html">Cell</a> *Z, const <a class="el" href="classCell.html">Cell</a> *A) const</td></tr>
 <tr class="memdesc:a0e7bec79d1ffe526a25c210c141949f5 inherit pub_methods_classCell"><td class="mdescLeft">&#160;</td><td class="mdescRight">store 1 in Z if A is &gt;= the value of <b>this</b> cell in Z, else 0 <br /></td></tr>
 <tr class="separator:a0e7bec79d1ffe526a25c210c141949f5 inherit pub_methods_classCell"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8b2c7380480f92cf1a108a7bdd7a77be inherit pub_methods_classCell"><td class="memItemLeft" align="right" valign="top"><a id="a8b2c7380480f92cf1a108a7bdd7a77be"></a>
-virtual const <a class="el" href="classCharCell.html">CharCell</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#a8b2c7380480f92cf1a108a7bdd7a77be">cCharCell</a> () const</td></tr>
-<tr class="memdesc:a8b2c7380480f92cf1a108a7bdd7a77be inherit pub_methods_classCell"><td class="mdescLeft">&#160;</td><td class="mdescRight">downcast to const <a class="el" href="classCharCell.html" title="A Cell containing a single Unicode character. ">CharCell</a> <br /></td></tr>
-<tr class="separator:a8b2c7380480f92cf1a108a7bdd7a77be inherit pub_methods_classCell"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7a82e068e3469a268b906e714907bfaa inherit pub_methods_classCell"><td class="memItemLeft" align="right" valign="top"><a id="a7a82e068e3469a268b906e714907bfaa"></a>
-virtual <a class="el" href="classCharCell.html">CharCell</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#a7a82e068e3469a268b906e714907bfaa">vCharCell</a> ()</td></tr>
-<tr class="memdesc:a7a82e068e3469a268b906e714907bfaa inherit pub_methods_classCell"><td class="mdescLeft">&#160;</td><td class="mdescRight">downcast to <a class="el" href="classCharCell.html" title="A Cell containing a single Unicode character. ">CharCell</a> <br /></td></tr>
-<tr class="separator:a7a82e068e3469a268b906e714907bfaa inherit pub_methods_classCell"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a71db01fd086cda44388312b57702cb1f inherit pub_methods_classCell"><td class="memItemLeft" align="right" valign="top"><a id="a71db01fd086cda44388312b57702cb1f"></a>
-virtual const <a class="el" href="classComplexCell.html">ComplexCell</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#a71db01fd086cda44388312b57702cb1f">cComplexCell</a> ()</td></tr>
-<tr class="memdesc:a71db01fd086cda44388312b57702cb1f inherit pub_methods_classCell"><td class="mdescLeft">&#160;</td><td class="mdescRight">downcast to const <a class="el" href="classComplexCell.html" title="A celkl containing one complex numbver. ">ComplexCell</a> <br /></td></tr>
-<tr class="separator:a71db01fd086cda44388312b57702cb1f inherit pub_methods_classCell"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae35679b8c061868ffd4487039b267349 inherit pub_methods_classCell"><td class="memItemLeft" align="right" valign="top"><a id="ae35679b8c061868ffd4487039b267349"></a>
-virtual <a class="el" href="classComplexCell.html">ComplexCell</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#ae35679b8c061868ffd4487039b267349">vComplexCell</a> () const</td></tr>
-<tr class="memdesc:ae35679b8c061868ffd4487039b267349 inherit pub_methods_classCell"><td class="mdescLeft">&#160;</td><td class="mdescRight">downcast to <a class="el" href="classComplexCell.html" title="A celkl containing one complex numbver. ">ComplexCell</a> <br /></td></tr>
-<tr class="separator:ae35679b8c061868ffd4487039b267349 inherit pub_methods_classCell"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2fe58ed1c3e83a4abe0b5010b4bae2c3 inherit pub_methods_classCell"><td class="memItemLeft" align="right" valign="top"><a id="a2fe58ed1c3e83a4abe0b5010b4bae2c3"></a>
-virtual const <a class="el" href="classIntCell.html">IntCell</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#a2fe58ed1c3e83a4abe0b5010b4bae2c3">cIntCell</a> () const</td></tr>
-<tr class="memdesc:a2fe58ed1c3e83a4abe0b5010b4bae2c3 inherit pub_methods_classCell"><td class="mdescLeft">&#160;</td><td class="mdescRight">downcast to const <a class="el" href="classIntCell.html" title="A cell containing a single Integer value. ">IntCell</a> <br /></td></tr>
-<tr class="separator:a2fe58ed1c3e83a4abe0b5010b4bae2c3 inherit pub_methods_classCell"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a04de1f852c63d903622aa81b9dc6db4f inherit pub_methods_classCell"><td class="memItemLeft" align="right" valign="top"><a id="a04de1f852c63d903622aa81b9dc6db4f"></a>
-virtual <a class="el" href="classIntCell.html">IntCell</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#a04de1f852c63d903622aa81b9dc6db4f">vIntCell</a> ()</td></tr>
-<tr class="memdesc:a04de1f852c63d903622aa81b9dc6db4f inherit pub_methods_classCell"><td class="mdescLeft">&#160;</td><td class="mdescRight">downcast to <a class="el" href="classIntCell.html" title="A cell containing a single Integer value. ">IntCell</a> <br /></td></tr>
-<tr class="separator:a04de1f852c63d903622aa81b9dc6db4f inherit pub_methods_classCell"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a06ef9c7f3c6bda37c480412a2bca2e9b inherit pub_methods_classCell"><td class="memItemLeft" align="right" valign="top"><a id="a06ef9c7f3c6bda37c480412a2bca2e9b"></a>
-virtual const <a class="el" href="classLvalCell.html">LvalCell</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#a06ef9c7f3c6bda37c480412a2bca2e9b">cLvalCell</a> () const</td></tr>
-<tr class="memdesc:a06ef9c7f3c6bda37c480412a2bca2e9b inherit pub_methods_classCell"><td class="mdescLeft">&#160;</td><td class="mdescRight">downcast to const <a class="el" href="classLvalCell.html" title="A cell pointing to another cell (which shall be updated) ">LvalCell</a> <br /></td></tr>
-<tr class="separator:a06ef9c7f3c6bda37c480412a2bca2e9b inherit pub_methods_classCell"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad80f965066b2fa0e9a40aea2fad0a58b inherit pub_methods_classCell"><td class="memItemLeft" align="right" valign="top"><a id="ad80f965066b2fa0e9a40aea2fad0a58b"></a>
-virtual <a class="el" href="classLvalCell.html">LvalCell</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#ad80f965066b2fa0e9a40aea2fad0a58b">vLvalCell</a> ()</td></tr>
-<tr class="memdesc:ad80f965066b2fa0e9a40aea2fad0a58b inherit pub_methods_classCell"><td class="mdescLeft">&#160;</td><td class="mdescRight">downcast to <a class="el" href="classLvalCell.html" title="A cell pointing to another cell (which shall be updated) ">LvalCell</a> <br /></td></tr>
-<tr class="separator:ad80f965066b2fa0e9a40aea2fad0a58b inherit pub_methods_classCell"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a70e24a88795f797fc66f30879d740ef6 inherit pub_methods_classCell"><td class="memItemLeft" align="right" valign="top"><a id="a70e24a88795f797fc66f30879d740ef6"></a>
-virtual const <a class="el" href="classPointerCell.html">PointerCell</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#a70e24a88795f797fc66f30879d740ef6">cPointerCell</a> () const</td></tr>
-<tr class="memdesc:a70e24a88795f797fc66f30879d740ef6 inherit pub_methods_classCell"><td class="mdescLeft">&#160;</td><td class="mdescRight">downcast to const <a class="el" href="classPointerCell.html" title="A cell pointing to a (nested) APL value. ">PointerCell</a> <br /></td></tr>
-<tr class="separator:a70e24a88795f797fc66f30879d740ef6 inherit pub_methods_classCell"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2614478efb21219bcd3435028f697a67 inherit pub_methods_classCell"><td class="memItemLeft" align="right" valign="top"><a id="a2614478efb21219bcd3435028f697a67"></a>
-virtual <a class="el" href="classPointerCell.html">PointerCell</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#a2614478efb21219bcd3435028f697a67">vPointerCell</a> ()</td></tr>
-<tr class="memdesc:a2614478efb21219bcd3435028f697a67 inherit pub_methods_classCell"><td class="mdescLeft">&#160;</td><td class="mdescRight">downcast to <a class="el" href="classPointerCell.html" title="A cell pointing to a (nested) APL value. ">PointerCell</a> <br /></td></tr>
-<tr class="separator:a2614478efb21219bcd3435028f697a67 inherit pub_methods_classCell"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a335a987c2f993cfc3ef3c09d8297dd33 inherit pub_methods_classCell"><td class="memItemLeft" align="right" valign="top"><a id="a335a987c2f993cfc3ef3c09d8297dd33"></a>
 void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#a335a987c2f993cfc3ef3c09d8297dd33">operator new</a> (std::size_t, void *)</td></tr>
 <tr class="memdesc:a335a987c2f993cfc3ef3c09d8297dd33 inherit pub_methods_classCell"><td class="mdescLeft">&#160;</td><td class="mdescRight">placement new <br /></td></tr>
@@ -416,14 +378,23 @@ static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFloatCell.html#a2c4411b8d81f22aaf0b02fa5caac3e45">map_FC</a> (<a class="el" href="classUCS__string.html">UCS_string</a> &amp;ucs)</td></tr>
 <tr class="memdesc:a2c4411b8d81f22aaf0b02fa5caac3e45"><td class="mdescLeft">&#160;</td><td class="mdescRight">replace normal chars by special chars specified in ⎕FC <br /></td></tr>
 <tr class="separator:a2c4411b8d81f22aaf0b02fa5caac3e45"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac4d9feaeccee7a5440f40ebd3cd0186e"><td class="memItemLeft" align="right" valign="top"><a id="ac4d9feaeccee7a5440f40ebd3cd0186e"></a>
-static ErrorCode&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFloatCell.html#ac4d9feaeccee7a5440f40ebd3cd0186e">zv</a> (<a class="el" href="classCell.html">Cell</a> *Z, <a class="el" href="classAPL__Float.html">APL_Float</a> v)</td></tr>
-<tr class="memdesc:ac4d9feaeccee7a5440f40ebd3cd0186e"><td class="mdescLeft">&#160;</td><td class="mdescRight">initialize Z to <a class="el" href="classAPL__Float.html" title="a non-rational APL floating point value ">APL_Float</a> v <br /></td></tr>
-<tr class="separator:ac4d9feaeccee7a5440f40ebd3cd0186e"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1c809407ae6c0e97a1e2994b8a6b67b5"><td class="memItemLeft" align="right" valign="top"><a id="a1c809407ae6c0e97a1e2994b8a6b67b5"></a>
 static APL_Integer&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFloatCell.html#a1c809407ae6c0e97a1e2994b8a6b67b5">gcd</a> (APL_Integer m, APL_Integer n)</td></tr>
 <tr class="memdesc:a1c809407ae6c0e97a1e2994b8a6b67b5"><td class="mdescLeft">&#160;</td><td class="mdescRight">greatest common divisor, Knuth Vol. 1 p. 14 <br /></td></tr>
 <tr class="separator:a1c809407ae6c0e97a1e2994b8a6b67b5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pub_static_methods_classNumericCell"><td colspan="2" onclick="javascript:toggleInherit('pub_static_methods_classNumericCell')"><img src="closed.png" alt="-"/>&#160;Static Public Member Functions inherited from <a class="el" href="classNumericCell.html">NumericCell</a></td></tr>
+<tr class="memitem:ad3e0fc6450b7cdf6f5a0fa53c2a54817 inherit pub_static_methods_classNumericCell"><td class="memItemLeft" align="right" valign="top"><a id="ad3e0fc6450b7cdf6f5a0fa53c2a54817"></a>
+static ErrorCode&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classNumericCell.html#ad3e0fc6450b7cdf6f5a0fa53c2a54817">zV</a> (<a class="el" href="classCell.html">Cell</a> *Z, <a class="el" href="classAPL__Float.html">APL_Float</a> flt)</td></tr>
+<tr class="memdesc:ad3e0fc6450b7cdf6f5a0fa53c2a54817 inherit pub_static_methods_classNumericCell"><td class="mdescLeft">&#160;</td><td class="mdescRight">initialize the (un-initialized) <a class="el" href="classCell.html" title="The base class for all Cells. ">Cell</a> *Z to (if possible) an <a class="el" href="classIntCell.html" title="A cell containing a single Integer value. ">IntCell</a> or else to a <a class="el" href="classFloatCell.html" title="A Cell containing a single floating point (or rational) value. ">FloatCell</a> with value flt. <br /></td></tr>
+<tr class="separator:ad3e0fc6450b7cdf6f5a0fa53c2a54817 inherit pub_static_methods_classNumericCell"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a28f9418e7fa8d2d475582a11d89f9245 inherit pub_static_methods_classNumericCell"><td class="memItemLeft" align="right" valign="top"><a id="a28f9418e7fa8d2d475582a11d89f9245"></a>
+static ErrorCode&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classNumericCell.html#a28f9418e7fa8d2d475582a11d89f9245">zV</a> (<a class="el" href="classCell.html">Cell</a> *Z, APL_Complex cpx)</td></tr>
+<tr class="memdesc:a28f9418e7fa8d2d475582a11d89f9245 inherit pub_static_methods_classNumericCell"><td class="mdescLeft">&#160;</td><td class="mdescRight">initialize the (un-initialized) <a class="el" href="classCell.html" title="The base class for all Cells. ">Cell</a> *Z to (if possible) an <a class="el" href="classIntCell.html" title="A cell containing a single Integer value. ">IntCell</a>, a <a class="el" href="classFloatCell.html" title="A Cell containing a single floating point (or rational) value. ">FloatCell</a>, or a <a class="el" href="classComplexCell.html" title="A cell containing one complex number. ">ComplexCell</a> with value cpx. <br /></td></tr>
+<tr class="separator:a28f9418e7fa8d2d475582a11d89f9245 inherit pub_static_methods_classNumericCell"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a018355fe7524a9472adcb4d3684c8fe6 inherit pub_static_methods_classNumericCell"><td class="memItemLeft" align="right" valign="top"><a id="a018355fe7524a9472adcb4d3684c8fe6"></a>
+static ErrorCode&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classNumericCell.html#a018355fe7524a9472adcb4d3684c8fe6">zV</a> (<a class="el" href="classCell.html">Cell</a> *Z, <a class="el" href="classAPL__Float.html">APL_Float</a> real, <a class="el" href="classAPL__Float.html">APL_Float</a> imag)</td></tr>
+<tr class="memdesc:a018355fe7524a9472adcb4d3684c8fe6 inherit pub_static_methods_classNumericCell"><td class="mdescLeft">&#160;</td><td class="mdescRight">initialize the (un-initialized) <a class="el" href="classCell.html" title="The base class for all Cells. ">Cell</a> *Z to (if possible) an <a class="el" href="classIntCell.html" title="A cell containing a single Integer value. ">IntCell</a>, a <a class="el" href="classFloatCell.html" title="A Cell containing a single floating point (or rational) value. ">FloatCell</a>, or a <a class="el" href="classComplexCell.html" title="A cell containing one complex number. ">ComplexCell</a> with value cpx. <br /></td></tr>
+<tr class="separator:a018355fe7524a9472adcb4d3684c8fe6 inherit pub_static_methods_classNumericCell"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_static_methods_classCell"><td colspan="2" onclick="javascript:toggleInherit('pub_static_methods_classCell')"><img src="closed.png" alt="-"/>&#160;Static Public Member Functions inherited from <a class="el" href="classCell.html">Cell</a></td></tr>
 <tr class="memitem:a7edb90c346315383846ae9fdb4db8793 inherit pub_static_methods_classCell"><td class="memItemLeft" align="right" valign="top"><a id="a7edb90c346315383846ae9fdb4db8793"></a>
 static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#a7edb90c346315383846ae9fdb4db8793">A_greater_B</a> (const <a class="el" href="classCell.html">Cell</a> *const &amp;A, const <a class="el" href="classCell.html">Cell</a> *const &amp;B, const void *unused_comp_arg)</td></tr>
@@ -501,6 +472,10 @@ static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 static ShapeItem *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#aea7b72b319c82a644d893455516dd8a1">sorted_indices</a> (const <a class="el" href="classCell.html">Cell</a> *ravel, ShapeItem length, Sort_order order, ShapeItem comp_len)</td></tr>
 <tr class="memdesc:aea7b72b319c82a644d893455516dd8a1 inherit pub_static_methods_classCell"><td class="mdescLeft">&#160;</td><td class="mdescRight">return <b>length</b> indices i1, i2, ... iN so that ravel[i1] &lt; ravel[i2] &lt; ... &lt; ravel[iN]. The indices are 0-based and the caller must delete[] the result. Returns 0 on error (= WS FULL). <br /></td></tr>
 <tr class="separator:aea7b72b319c82a644d893455516dd8a1 inherit pub_static_methods_classCell"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6c3fdef3d82f53649d1c3f16d37eedd7 inherit pub_static_methods_classCell"><td class="memItemLeft" align="right" valign="top"><a id="a6c3fdef3d82f53649d1c3f16d37eedd7"></a>
+static const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#a6c3fdef3d82f53649d1c3f16d37eedd7">get_cell_type_name</a> (CellType ct)</td></tr>
+<tr class="memdesc:a6c3fdef3d82f53649d1c3f16d37eedd7 inherit pub_static_methods_classCell"><td class="mdescLeft">&#160;</td><td class="mdescRight">the name of <b>ct</b> <br /></td></tr>
+<tr class="separator:a6c3fdef3d82f53649d1c3f16d37eedd7 inherit pub_static_methods_classCell"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
@@ -568,10 +543,6 @@ virtual const char *&#160;</td><td class="memItemRight" valign="bottom"><a class
 virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFloatCell.html#aa4bb8bd87f1aa08ea3e48dd471049d00">CDR_size</a> () const</td></tr>
 <tr class="memdesc:aa4bb8bd87f1aa08ea3e48dd471049d00"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloaded <a class="el" href="classCell.html#a664a77c44dc2991d35e1fff84533d5dd" title="return the minimum number of data bytes to store this cell in CDR format. The actual number of data b...">Cell::CDR_size()</a> <br /></td></tr>
 <tr class="separator:aa4bb8bd87f1aa08ea3e48dd471049d00"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a199b5cad4417cb77f85777f41f4c5462"><td class="memItemLeft" align="right" valign="top"><a id="a199b5cad4417cb77f85777f41f4c5462"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFloatCell.html#a199b5cad4417cb77f85777f41f4c5462">to_type</a> ()</td></tr>
-<tr class="memdesc:a199b5cad4417cb77f85777f41f4c5462"><td class="mdescLeft">&#160;</td><td class="mdescRight">overloaded <a class="el" href="classCell.html#a31c908c0e75c22b2f6d4f0a53c8dd61d" title="convert this cell to its type ">Cell::to_type()</a> <br /></td></tr>
-<tr class="separator:a199b5cad4417cb77f85777f41f4c5462"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a63650a58f1fd1426f43d940b04a5fd07"><td class="memItemLeft" align="right" valign="top"><a id="a63650a58f1fd1426f43d940b04a5fd07"></a>
 virtual const <a class="el" href="classFloatCell.html">FloatCell</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFloatCell.html#a63650a58f1fd1426f43d940b04a5fd07">cFloatCell</a> () const</td></tr>
 <tr class="memdesc:a63650a58f1fd1426f43d940b04a5fd07"><td class="mdescLeft">&#160;</td><td class="mdescRight">downcast to const <a class="el" href="classFloatCell.html" title="A Cell containing a single floating point (or rational) value. ">FloatCell</a> <br /></td></tr>
@@ -667,8 +638,12 @@ ErrorCode&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 <tr class="memdesc:a0e22dad3d1acbf0b2103508aaa60d621 inherit pro_methods_classNumericCell"><td class="mdescLeft">&#160;</td><td class="mdescRight">N over K for non-integer A and/or B. <br /></td></tr>
 <tr class="separator:a0e22dad3d1acbf0b2103508aaa60d621 inherit pro_methods_classNumericCell"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
-Additional Inherited Members</h2></td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-static-methods"></a>
+Static Protected Member Functions</h2></td></tr>
+<tr class="memitem:a88217aaf5cd286cc89a85d2885876dda"><td class="memItemLeft" align="right" valign="top"><a id="a88217aaf5cd286cc89a85d2885876dda"></a>
+static ErrorCode&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFloatCell.html#a88217aaf5cd286cc89a85d2885876dda">zF</a> (<a class="el" href="classCell.html">Cell</a> *Z, <a class="el" href="classAPL__Float.html">APL_Float</a> flt)</td></tr>
+<tr class="memdesc:a88217aaf5cd286cc89a85d2885876dda"><td class="mdescLeft">&#160;</td><td class="mdescRight">initialize the (un-initialized) <a class="el" href="classCell.html" title="The base class for all Cells. ">Cell</a> *Z to <a class="el" href="classAPL__Float.html" title="a non-rational APL floating point value ">APL_Float</a> flt <br /></td></tr>
+<tr class="separator:a88217aaf5cd286cc89a85d2885876dda"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_static_methods_classNumericCell"><td colspan="2" onclick="javascript:toggleInherit('pro_static_methods_classNumericCell')"><img src="closed.png" alt="-"/>&#160;Static Protected Member Functions inherited from <a class="el" href="classNumericCell.html">NumericCell</a></td></tr>
 <tr class="memitem:a4f123c9528fe4e9a1fc9c75585aa2de3 inherit pro_static_methods_classNumericCell"><td class="memItemLeft" align="right" valign="top"><a id="a4f123c9528fe4e9a1fc9c75585aa2de3"></a>
 static ErrorCode&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classNumericCell.html#a4f123c9528fe4e9a1fc9c75585aa2de3">K33_binomial</a> (<a class="el" href="classCell.html">Cell</a> *Z, APL_Integer N, APL_Integer K, bool negate)</td></tr>
@@ -694,6 +669,27 @@ static ErrorCode&#160;</td><td class="memItemRight" valign="bottom"><a class="el
 static APL_Complex&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classNumericCell.html#a597c08fedf6ed884631b2f790ba1654c">cpx_max_real</a> (APL_Complex a)</td></tr>
 <tr class="memdesc:a597c08fedf6ed884631b2f790ba1654c inherit pro_static_methods_classNumericCell"><td class="mdescLeft">&#160;</td><td class="mdescRight">multiply <b>a</b> by 1, -1, i, or -i so that a.real is maximal <br /></td></tr>
 <tr class="separator:a597c08fedf6ed884631b2f790ba1654c inherit pro_static_methods_classNumericCell"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
+Friends</h2></td></tr>
+<tr class="memitem:a804b58ff7c70407dbc3edb9d74690f65"><td class="memItemLeft" align="right" valign="top"><a id="a804b58ff7c70407dbc3edb9d74690f65"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>ComplexCell</b></td></tr>
+<tr class="separator:a804b58ff7c70407dbc3edb9d74690f65"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afd3c49de8dc518c6464f91986959e0af"><td class="memItemLeft" align="right" valign="top"><a id="afd3c49de8dc518c6464f91986959e0af"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>IntCell</b></td></tr>
+<tr class="separator:afd3c49de8dc518c6464f91986959e0af"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3f00a33db902b73442acfc08d7f19716"><td class="memItemLeft" align="right" valign="top"><a id="a3f00a33db902b73442acfc08d7f19716"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>NumericCell</b></td></tr>
+<tr class="separator:a3f00a33db902b73442acfc08d7f19716"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:affcb4d972251e07660a6122bbdd90d89"><td class="memItemLeft" align="right" valign="top"><a id="affcb4d972251e07660a6122bbdd90d89"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>RealCell</b></td></tr>
+<tr class="separator:affcb4d972251e07660a6122bbdd90d89"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeceedf6e1a7d48a588516ce2b1983d6f"><td class="memItemLeft" align="right" valign="top"><a id="aeceedf6e1a7d48a588516ce2b1983d6f"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>Value</b></td></tr>
+<tr class="separator:aeceedf6e1a7d48a588516ce2b1983d6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
+Additional Inherited Members</h2></td></tr>
 <tr class="inherit_header pro_attribs_classCell"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_classCell')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="classCell.html">Cell</a></td></tr>
 <tr class="memitem:aec38650253342ecb4fc6498c546a61c8 inherit pro_attribs_classCell"><td class="memItemLeft" align="right" valign="top"><a id="aec38650253342ecb4fc6498c546a61c8"></a>
 <a class="el" href="unionCell_1_1SomeValue.html">SomeValue</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#aec38650253342ecb4fc6498c546a61c8">value</a></td></tr>
@@ -716,7 +712,7 @@ static APL_Complex&#160;</td><td class="memItemRight" valign="bottom"><a class="
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="classFloatCell.html">FloatCell</a></li>
-    <li class="footer">Generated on Sun Aug 9 2020 16:43:42 for GNUAPL by
+    <li class="footer">Generated on Sun Jan 30 2022 20:14:26 for GNUAPL by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>

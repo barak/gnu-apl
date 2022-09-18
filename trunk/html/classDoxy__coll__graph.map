@@ -1,5 +1,5 @@
 <map id="Doxy" name="Doxy">
-<area shape="rect" id="node2" href="$classUCS__string.html" title="A string of Unicode characters (32&#45;bit) " alt="" coords="69,96,159,123"/>
-<area shape="rect" id="node4" href="$classUTF8__string.html" title="an UTF8 encoded Unicode (RFC 3629) string " alt="" coords="209,96,304,123"/>
-<area shape="rect" id="node6" href="$classUCS__string__vector.html" title="a vector of UCS_strings. " alt="" coords="347,96,481,123"/>
+<area shape="rect" id="node2" href="$classUCS__string.html" title="A string of Unicode characters (32&#45;bit) " alt="" coords="41,96,131,123"/>
+<area shape="rect" id="node4" href="$classUTF8__string.html" title="an UTF8 encoded Unicode (RFC 3629) string " alt="" coords="172,96,267,123"/>
+<area shape="rect" id="node6" href="$classUCS__string__vector.html" title="a vector of UCS_strings. " alt="" coords="310,96,443,123"/>
 </map>

@@ -31,7 +31,7 @@ class ResultValue
 {
 public:
     virtual ~ResultValue() {}
-    virtual void update(Cell * cell, Value & cell_owner) const = 0;
+    virtual void update(Value & val) const = 0;
    virtual ResultValue * clone() const                         = 0;
 };
 
@@ -39,7 +39,7 @@ class IntResultValue : public ResultValue {
 public:
     IntResultValue( APL_Integer value_in ) : value( value_in ) {}
     virtual ~IntResultValue() {}
-    virtual void update( Cell *cell, Value & cell_owner ) const;
+    virtual void update(Value & val) const;
    virtual ResultValue * clone() const { return new IntResultValue(value); }
 
 private:
@@ -50,7 +50,7 @@ class DoubleResultValue : public ResultValue {
 public:
     DoubleResultValue( double value_in ) : value( value_in ) {}
     virtual ~DoubleResultValue() {}
-    virtual void update( Cell *cell, Value & cell_owner ) const;
+    virtual void update(Value & val ) const;
    virtual ResultValue * clone() const { return new DoubleResultValue(value); }
 
 private:
@@ -61,7 +61,7 @@ class NullResultValue : public ResultValue {
 public:
     NullResultValue() {};
     virtual ~NullResultValue() {}
-    virtual void update( Cell *cell, Value & cell_owner ) const;
+    virtual void update(Value & val) const;
    virtual ResultValue * clone() const { return new NullResultValue(); }
 };
 
@@ -69,7 +69,7 @@ class StringResultValue : public ResultValue {
 public:
     StringResultValue( string value_in ) : value( value_in ) {}
     virtual ~StringResultValue() {}
-    virtual void update( Cell *cell, Value & cell_owner ) const;
+    virtual void update(Value & val) const;
    virtual ResultValue * clone() const { return new StringResultValue(value); }
 
 private:

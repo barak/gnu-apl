@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -29,13 +29,13 @@ class Value;
 /** a class for creating the Common Data Representation of an APL value.
  **/
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// The class implementing CDR (IBM's Common Data Representation)
 class CDR
 {
 public:
    /// convert \b value into a CDR_string
-   static void to_CDR(CDR_string & result, const Value & value);
+   static void to_CDR(CDR_string & result, const Value * value);
 
    /// create a value from a CDR_string, throwing
    /// DOMAIN ERROR if cdr is ill-formed
@@ -63,6 +63,6 @@ protected:
    /// fill result with the bytes of the CDR of \b value
    static void fill(CDR_string & result, int type, int len, const Value & val);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __CDR_HH_DEFINED__

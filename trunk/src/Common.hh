@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,7 +23,10 @@
 
 // NOTE: the path to config.h and makefile.h is set as -I $(pwd) in ./configure
 //
-#include "config.h"     // for xxx_WANTED and other macros from ./configure
+#include "config.h"   // for xxx_WANTED and other macros from ./configure
+
+// makefile.h uses STR(), so define it before
+#define STR(x) #x
 #include "makefile.h"   // various paths
 
 // #include some notoriously needed include files, but only if they
@@ -44,6 +47,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <sys/time.h>   // for gettimeofday()
 
 #ifndef RLIM_INFINITY   // Raspberry
 #define RLIM_INFINITY (~rlim_t(0))
@@ -122,7 +126,7 @@ extern ostream UERR;
 class UCS_string;
 extern UCS_string & MORE_ERROR();   // in Workspace.cc
 
-#define loop(v, e) for (ShapeItem v = 0; v < ShapeItem(e); ++v)
+#define loop(v, e) for (ShapeItem v = 0, __end__ = e; v < __end__; ++v)
 
 // #define TROUBLESHOOT_NEW_DELETE
 
@@ -153,7 +157,7 @@ timeval tv;
 #define cycle_counter() 0
 #endif // HAVE_RDTSC
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 #if HAVE_SEM_INIT
 
 # define __sem_destroy(sem) sem_destroy(sem)
@@ -175,7 +179,7 @@ char sname[100];                                           \
    sem = sem_open(sname, O_CREAT, mode, value);            \
 }
 #endif // HAVE_SEM_INIT
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
   Software probes. A probe is a measurement of CPU cycles executed between two
   points P1 and P2 in the source code.
@@ -325,7 +329,7 @@ protected:
    /// all probes
    static Probe probes[];
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// Year, Month, Day, hour, minute, second, millisecond
 struct YMDhmsu
 {
@@ -343,14 +347,14 @@ struct YMDhmsu
    int second;   ///< second 0-59
    int micro;    ///< microseconds 0-999999
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// whether ⎕LX shall be executed at the end of the file
 enum LX_mode
 {
    no_LX = 0,     ///< no
    do_LX = 1      ///< yes
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #ifdef TROUBLESHOOT_NEW_DELETE
 inline void * operator new(size_t size)   { return common_new(size); }
@@ -359,32 +363,32 @@ inline void   operator delete(void * p)   { common_delete(p); }
 
 using namespace std;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 /// return true iff \b uni is a padding character (used internally).
 inline bool is_iPAD_char(Unicode uni)
-   { return ((uni >= UNI_iPAD_U2) && (uni <= UNI_iPAD_U1)) ||
-            ((uni >= UNI_iPAD_U0) && (uni <= UNI_iPAD_L9)); }
+{
+   return ((uni >= UNI_iPAD_U2) && (uni <= UNI_iPAD_U1))    // ² ³ ¹
+       || ((uni >= UNI_iPAD_U0) && (uni <= UNI_iPAD_L9));   // ⁰ ⁴..⁹ ₀..₉
+}
+//----------------------------------------------------------------------------
 
-//-----------------------------------------------------------------------------
+extern std::ostream & get_CERR();
 
 /// Stringify x.
-#define STR(x) #x
 /// The current location in the source file.
 #define LOC Loc(__FILE__, __LINE__)
 /// The location line l in file f.
 #define Loc(f, l) f ":" STR(l)
 
-extern std::ostream & get_CERR();
-
 /// print x and its source code location
 #define Q(x) get_CERR() << std::left << setw(20) << #x ":" << " '" << x << "' at " LOC << endl;
 
-/// same as Q1 (for printouts guarded by Log macros). Unlike Q() which MUST
-/// NOT REMAIN IN THE CODE, Q1 should remain in the code.
+/// same as Q1 (for printouts guarded by Log macros). Unlike Q () which MUST
+/// NOT REMAIN IN THE CODE, Q1() SHOULD remain in the code.
 #define Q1(x) get_CERR() << std::left << setw(20) << #x ":" << " '" << x << "' at " LOC << endl;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #ifdef VALUE_HISTORY_WANTED
 
@@ -400,7 +404,7 @@ extern std::ostream & get_CERR();
 
 #endif
 
-//=============================================================================
+//============================================================================
 /// Function_Line ++ (post increment)
 inline int operator ++(Function_Line & fl, int)
 {
@@ -408,24 +412,24 @@ Function_Line ret = fl;
    fl = Function_Line(fl + 1);
    return ret;
 }
-//=============================================================================
+//============================================================================
 inline void skip_spaces(const char * & p)
 {
    while (*p && *p <= ' ')   ++p;
 }
-//=============================================================================
+//============================================================================
 inline Function_PC
 operator +(Function_PC pc, int offset)
 {
    return Function_PC(int(pc) + offset);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 inline Function_PC
 operator -(Function_PC pc, int offset)
 {
    return Function_PC(int(pc) - offset);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// Function_PC ++ (post increment)
 inline Function_PC
 operator ++(Function_PC & pc, int)
@@ -434,7 +438,7 @@ const Function_PC before = pc;
    pc = pc + 1;
    return before;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// Function_PC ++ (pre increment)
 inline Function_PC &
 operator ++(Function_PC & pc)
@@ -442,7 +446,7 @@ operator ++(Function_PC & pc)
    pc = pc + 1;
    return pc;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// Function_PC -- (pre decrement)
 inline Function_PC &
 operator --(Function_PC & pc)
@@ -450,14 +454,14 @@ operator --(Function_PC & pc)
    pc = pc - 1;
    return pc;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// frequently used cast to const char *
 inline const char *
 charP(const void * vp)
 {
   return reinterpret_cast<const char *>(vp);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #define uhex  std::hex << uppercase << setfill('0')
 #define lhex  std::hex << nouppercase << setfill('0')
@@ -469,6 +473,10 @@ charP(const void * vp)
                            setw(2) << int(x) << std::left << nohex
 #define HEX4(x)    "0x" << uhex << std::right << \
                            setw(4) << int(x) << std::left << nohex
+#define HEX8(x)    "0x" << uhex << std::right << \
+                           setw(8) << int32_t(x) << std::left << nohex
+#define HEX16(x)   "0x" << uhex << std::right << \
+                           setw(16) << int64_t(x) << std::left << nohex
 #define UNI(x)     "U+" << uhex <<      setw(4) << int(x) << nohex
 
 /// cast to a const void *

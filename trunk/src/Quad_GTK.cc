@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,7 +37,7 @@ std::vector<Quad_GTK::window_entry> Quad_GTK::open_windows;
 UCS_string_vector Quad_GTK::event_queue;
 
 #if HAVE_GTK3
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_GTK::eval_AB(Value_P A, Value_P B) const
 {
@@ -60,18 +60,18 @@ Quad_GTK::eval_AB(Value_P A, Value_P B) const
         DOMAIN_ERROR;
       }
 
-const int function = B->get_ravel(0).get_int_value();
+const int function = B->get_cfirst().get_int_value();
 int fd = -1;
    switch(function)
       {
         case 0: // close window/GUI
              if (!A->is_int_scalar())   goto bad_fd;
-             fd = A->get_ravel(0).get_int_value();
+             fd = A->get_cfirst().get_int_value();
              return Token(TOK_APL_VALUE1, close_window(fd));
 
         case 3: // increase verbosity
              if (!A->is_int_scalar())   goto bad_fd;
-             fd = A->get_ravel(0).get_int_value();
+             fd = A->get_cfirst().get_int_value();
              if (write_TL0(fd, 7))
                 {
                   CERR << "write(Tag 7) failed in Ah ⎕GTK 3" << endl;
@@ -81,7 +81,7 @@ int fd = -1;
 
         case 4: // decrease verbosity
              if (!A->is_int_scalar())   goto bad_fd;
-             fd = A->get_ravel(0).get_int_value();
+             fd = A->get_cfirst().get_int_value();
              if (write_TL0(fd, 8))
                 {
                   CERR << "write(Tag 8) failed in Ah ⎕GTK 4" << endl;
@@ -102,7 +102,7 @@ bad_fd:
                 << " expects a handle (i.e. an integer scalar) Ah";
    DOMAIN_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_GTK::eval_B(Value_P B) const
 {
@@ -123,7 +123,7 @@ Quad_GTK::eval_B(Value_P B) const
         DOMAIN_ERROR;
       }
 
-const int function = B->get_ravel(0).get_int_value();
+const int function = B->get_cfirst().get_int_value();
    switch(function)
       {
         case 0:   // list of open fds
@@ -173,11 +173,11 @@ const int function = B->get_ravel(0).get_int_value();
                args.push_back(arg);
 
                Value_P Z(1 + args.size(), LOC);
-               new (Z->next_ravel()) IntCell(HWF[0]);
+               Z->next_ravel_Char(HWF[0]);
                loop(a, args.size())
                    {
                      Value_P Za(args[a], LOC);
-                     new (Z->next_ravel())   PointerCell(Za.get(), Z.getref());
+                     Z->next_ravel_Pointer(Za.get());
                    }
                Z->check_value(LOC);
                return Token(TOK_APL_VALUE1, Z);
@@ -191,7 +191,7 @@ const int function = B->get_ravel(0).get_int_value();
    MORE_ERROR() << "Unexpected B in ⎕GTK B";
    DOMAIN_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_GTK::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
@@ -204,7 +204,7 @@ const int fd = resolve_window(X.get(), window_id);
    write_TLV(fd, 6, window_id);   // select wodget
 
 int fun = FNUM_INVALID;
-   if (B->is_int_scalar())         fun = B->get_ravel(0).get_int_value();
+   if (B->is_int_scalar())         fun = B->get_cfirst().get_int_value();
    else if (B->is_char_string())   fun = resolve_fun_name(window_id, B.get());
    else
       {
@@ -245,7 +245,7 @@ UCS_string ucs_A;
       {
         loop(a, A->element_count())
             {
-              const Cell & cell = A->get_ravel(a);
+              const Cell & cell = A->get_cravel(a);
               if (!cell.is_pointer_cell())
                  {
                     MORE_ERROR() << "A ⎕GTK " << fun
@@ -272,7 +272,7 @@ UTF8_string utf_A(ucs_A);
    write_TLV(fd, command_tag, utf_A);
    return Token(TOK_APL_VALUE1, poll_response(fd, response_tag));
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_GTK::eval_XB(Value_P X, Value_P B) const
 {
@@ -285,7 +285,7 @@ const int fd = resolve_window(X.get(), window_id);
    write_TLV(fd, 6, window_id);   // select wodget
 
 int fun = FNUM_INVALID;
-   if (B->is_int_scalar())         fun = B->get_ravel(0).get_int_value();
+   if (B->is_int_scalar())         fun = B->get_cfirst().get_int_value();
    else if (B->is_char_string())   fun = resolve_fun_name(window_id, B.get());
    else                            DOMAIN_ERROR;
 
@@ -314,7 +314,7 @@ Gtype Atype = gtype_V;
    write_TL0(fd, command_tag);   // command
    return Token(TOK_APL_VALUE1, poll_response(fd, response_tag));
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_GTK::read_fd(int fd, int tag)
 {
@@ -388,12 +388,12 @@ UTF8_string utf;
    UCS_string ucs(utf);
 
 Value_P Z(1 + ucs.size(), LOC);
-   new (Z->next_ravel())   IntCell(TLV_tag - Response_0);
-   loop(u, ucs.size())   new (Z->next_ravel())   CharCell(ucs[u]);
+   Z->next_ravel_Int(TLV_tag - Response_0);
+   loop(u, ucs.size())   Z->next_ravel_Char(ucs[u]);
    Z->check_value(LOC);
    return  Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_GTK::poll_all()
 {
@@ -426,7 +426,7 @@ const int ready = poll(fds, count, 0);
         CERR << "*** poll() failed: " << strerror(errno) << endl;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_GTK::poll_response(int fd, int tag)
 {
@@ -458,7 +458,7 @@ const int ready = poll(&pfd, 1, 0);
    CERR << "*** poll() failed" << endl;
    DOMAIN_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_GTK::window_list()
 {
@@ -466,19 +466,19 @@ Value_P Z(open_windows.size(), LOC);
    loop(w, open_windows.size())
       {
         const APL_Integer fd = open_windows[w].fd;
-        new (Z->next_ravel()) IntCell(fd);
+        Z->next_ravel_Int(fd);
       }
 
-   Z->set_default_Int();
+   Z->set_proto_Int();
    Z->check_value(LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Quad_GTK::resolve_window(const Value * X, UTF8_string & window_id)
 {
    if (X->get_rank() > 1)   RANK_ERROR;
-const int fd = X->get_ravel(0).get_int_value();
+const int fd = X->get_cfirst().get_int_value();
 
    // verify that ↑X is an open window...
    //
@@ -501,12 +501,12 @@ bool window_valid = false;
 
    loop(i, X->element_count())
        {
-         if (i)   window_id += X->get_ravel(i).get_char_value();
+         if (i)   window_id += X->get_cravel(i).get_char_value();
        }
 
    return fd;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Quad_GTK::Fnum
 Quad_GTK::resolve_fun_name(UTF8_string & window_id, const Value * B)
 {
@@ -535,13 +535,13 @@ const char * fun_name = utf_B.c_str();
         << ", function=" << fun_name << " could not be resolved";
    return FNUM_INVALID;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_GTK::clear()
 {
    loop(w, open_windows.size())   close_window(open_windows[w].fd);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_GTK::close_window(int fd)
 {
@@ -556,7 +556,7 @@ Quad_GTK::close_window(int fd)
                 {
                   CERR << "write(close Tag) failed in ⎕GTK::close_window()";
                 }
-             const int err = Quad_FIO::fun->close_handle(fd);
+             const int err = Quad_FIO::close_handle(fd);
              return IntScalar(err, LOC);
            }
       }
@@ -564,7 +564,7 @@ Quad_GTK::close_window(int fd)
    MORE_ERROR() << "Invalid ⎕GTK handle " << fd;
    DOMAIN_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Quad_GTK::write_TL0(int fd, int tag)
 {
@@ -587,7 +587,7 @@ const size_t tx_len = write(fd, TLV, 8);
 
    return 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Quad_GTK::write_TLV(int fd, int tag, const UTF8_string & value)
 {
@@ -611,7 +611,7 @@ unsigned char TLV[TLV_len];
 
    return 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Quad_GTK::open_window(const UCS_string & gui_filename,
                    const UCS_string * css_filename)
@@ -655,7 +655,7 @@ int envp_idx = 0;
               envp[envp_idx] = 0;
             }
        }
-const int fd = Quad_FIO::fun->do_FIO_57(path, envp);
+const int fd = Quad_FIO::do_FIO_57(path, envp);
 
    // write TLVs 1 and 3 or 1, 2, and 3 to Gtk_server...
    //
@@ -669,7 +669,7 @@ UTF8_string gui_utf8(gui_filename);
    slen = write(fd, path1, 8 + gui_utf8.size());
    if (slen == -1)
       {
-         Quad_FIO::fun->close_handle(fd);
+         Quad_FIO::close_handle(fd);
          MORE_ERROR() << "write(Tag 1) failed in ⎕GTK";
          DOMAIN_ERROR;
       }
@@ -685,7 +685,7 @@ UTF8_string gui_utf8(gui_filename);
         slen = write(fd, path2, 8 + css_utf8.size());
         if (slen == -1)
            {
-              Quad_FIO::fun->close_handle(fd);
+              Quad_FIO::close_handle(fd);
               MORE_ERROR() << "write(Tag 2) failed in ⎕GTK";
               DOMAIN_ERROR;
            }
@@ -693,7 +693,7 @@ UTF8_string gui_utf8(gui_filename);
 
    if (write_TL0(fd, 3))
       {
-         Quad_FIO::fun->close_handle(fd);
+         Quad_FIO::close_handle(fd);
          MORE_ERROR() << "write(Tag 3) failed in ⎕GTK";
          DOMAIN_ERROR;
       }
@@ -702,6 +702,6 @@ window_entry we = { fd };
    open_windows.push_back(we);
    return fd;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 #endif   // HAVE_GTK3
 

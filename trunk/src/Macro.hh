@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 
 #include "UserFunction.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// a system function or operator implemented as an internal defined function
 class Macro : public UserFunction
 {
@@ -67,7 +67,7 @@ private:
    /// destructor (not supposed to be called)
    ~Macro();
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __MACRO_HH_DEFINED__
 

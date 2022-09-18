@@ -1,7 +1,5 @@
 <map id="Plot_window_properties::get_origin_Y" name="Plot_window_properties::get_origin_Y">
-<area shape="rect" id="node2" href="$structPlot__context.html#ae4285a04e68fbf6bd0b472bd66bcb55c" title="return the required height of the entire plot area " alt="" coords="217,5,370,47"/>
-<area shape="rect" id="node3" href="$structstring__width__height.html#a07e79d6687845bfaf3266af0f13fdea2" title="constructor: ask X&#45;server for the size (in pixels) of string " alt="" coords="430,60,573,101"/>
-<area shape="rect" id="node4" href="$classPlot__window__properties.html#acd007c1ca30e86d8e12e125a39d7d9a5" title="convert values val_X, val_Y, and val_Z, to the X and Y coordinate of the pixel below the Z=0 plane of..." alt="" coords="213,125,373,167"/>
-<area shape="rect" id="node5" href="$classPlot__window__properties.html#af978c228065cbaba8381af79bc1fce95" title="convert &#160;&#160;val_Z to the relative Z vector (q. quadrant) " alt="" coords="421,125,581,167"/>
-<area shape="rect" id="node6" href="$classPlot__window__properties.html#aa4db62e171eab805cd9e1a3cbc253c3c" title="return the pixel position of the point where the X, Y, and possibly Z&#45;axis cross. ..." alt="" coords="421,191,581,232"/>
+<area shape="rect" id="node2" href="$classPlot__window__properties.html#acd007c1ca30e86d8e12e125a39d7d9a5" title="convert values val_X, val_Y, and val_Z, to the X and Y coordinate of the pixel below the Z=0 plane of..." alt="" coords="213,5,373,47"/>
+<area shape="rect" id="node3" href="$classPlot__window__properties.html#af978c228065cbaba8381af79bc1fce95" title="convert &#160;&#160;val_Z to the relative Z vector (q. quadrant) " alt="" coords="421,5,581,47"/>
+<area shape="rect" id="node4" href="$classPlot__window__properties.html#aa4db62e171eab805cd9e1a3cbc253c3c" title="return the pixel position of the point where the X, Y, and possibly Z&#45;axis cross. ..." alt="" coords="421,71,581,112"/>
 </map>

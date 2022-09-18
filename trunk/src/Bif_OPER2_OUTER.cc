@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ Bif_OPER2_OUTER * Bif_OPER2_OUTER::fun = &Bif_OPER2_OUTER::_fun;
 
 Bif_OPER2_OUTER::PJob_product Bif_OPER2_OUTER::job;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_OPER2_OUTER::eval_ALRB(Value_P A, Token & LO, Token & _RO, Value_P B) const
 {
@@ -51,11 +51,11 @@ Value_P Z(A->get_shape() + B->get_shape(), LOC);
    //
    if (RO->get_scalar_f2() && A->is_simple() && B->is_simple())
       {
-        job.cZ     = &Z->get_ravel(0);
-        job.cA     = &A->get_ravel(0);
+        job.cZ     = &Z->get_wfirst();
+        job.cA     = &A->get_cfirst();
         job.ZAh    = A->element_count();
         job.RO     = RO->get_scalar_f2();
-        job.cB     = &B->get_ravel(0);
+        job.cB     = &B->get_cfirst();
         job.ZBl    = B->element_count();
         job.ec     = E_NO_ERROR;
 
@@ -70,11 +70,11 @@ Value_P Z(A->get_shape() + B->get_shape(), LOC);
 
    if (Z->is_empty())
       {
-        Value_P Fill_A = Bif_F12_TAKE::first(A);
-        Value_P Fill_B = Bif_F12_TAKE::first(B);
+        Value_P Fill_A = Bif_F12_TAKE::first(*A);
+        Value_P Fill_B = Bif_F12_TAKE::first(*B);
 
         Value_P Z1 = RO->eval_fill_AB(Fill_A, Fill_B).get_apl_val();
-        Z->get_ravel(0).init(Z1->get_ravel(0), Z.getref(), LOC);
+        Z->set_ravel_Cell(0, Z1->get_cfirst());
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
@@ -93,8 +93,8 @@ Value_P RO_B;
 
    loop(z, len_Z)
       {
-        const Cell * cA = &A->get_ravel(z / len_B);
-        const Cell * cB = &B->get_ravel(z % len_B);
+        const Cell * cA = &A->get_cravel(z / len_B);
+        const Cell * cB = &B->get_cravel(z % len_B);
 
         if (cA->is_pointer_cell())
            {
@@ -102,8 +102,8 @@ Value_P RO_B;
            }
         else
            {
-             RO_A = Value_P(LOC);
-             RO_A->get_ravel(0).init(*cA, RO_A.getref(), LOC);
+             RO_A = Value_P(LOC);   // scalar RO_A
+             RO_A->set_ravel_Cell(0, *cA);
            }
 
         if (cB->is_pointer_cell())
@@ -112,8 +112,8 @@ Value_P RO_B;
            }
         else
            {
-             RO_B = Value_P(LOC);
-             RO_B->get_ravel(0).init(*cB, RO_B.getref(), LOC);
+             RO_B = Value_P(LOC);   // scalar RO_B
+             RO_B->set_ravel_Cell(0, *cB);
            }
 
         Token result = RO->eval_AB(RO_A, RO_B);
@@ -125,7 +125,7 @@ Value_P RO_B;
       if (result.get_Class() == TC_VALUE)
          {
            Value_P ZZ = result.get_apl_val();
-           Z->next_ravel()->init_from_value(ZZ.get(), Z.getref(), LOC);
+           Z->next_ravel_Value(ZZ.get());
            continue;
          }
 
@@ -139,7 +139,7 @@ Value_P RO_B;
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Bif_OPER2_OUTER::scalar_outer_product() const
 {
@@ -175,7 +175,7 @@ const uint64_t end_1 = cycle_counter();
                                              job.ZAh * job.ZBl);
 #endif
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Bif_OPER2_OUTER::PF_scalar_outer_product(Thread_context & tctx)
 {
@@ -194,4 +194,4 @@ ShapeItem end_z = z + slice_len;
         if (job.ec != E_NO_ERROR)   return;
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------

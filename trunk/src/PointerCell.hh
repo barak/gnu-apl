@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 
 #include "Cell.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /*!
     A cell pointing to another APL value. This is used to create nested
     arrays. This class essentially overloads certain functions in class
@@ -72,6 +72,10 @@ public:
    Value * get_cell_owner() const
       { return value.pval.owner; }
 
+   /// isolate value.pval.valp (make \b value.pval the sole owner)
+   void isolate(const char * loc)
+      { if (+value.pval.valp)   value.pval.valp.isolate(LOC); }
+
 protected:
    ///  overloaded Cell::get_cell_type()
    virtual CellType get_cell_type() const
@@ -88,10 +92,7 @@ protected:
 
    /// overloaded Cell::CDR_size() should not be called for pointer cells
    virtual int CDR_size() const { NeverReach("PointerCell::CDR_size() called");}
-
-   /// overloaded Cell::to_type()
-   virtual void to_type();
 };
-//=============================================================================
+//============================================================================
 
 #endif // __POINTERCELL_HH_DEFINED__

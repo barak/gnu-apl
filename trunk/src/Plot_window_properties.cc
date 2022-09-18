@@ -23,7 +23,7 @@
 #include "Plot_line_properties.hh"
 #include "Plot_window_properties.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Plot_window_properties::Plot_window_properties(const Plot_data * data,
                                                int verbosity)
    : line_count(data->get_row_count()),
@@ -71,7 +71,7 @@ Plot_window_properties::Plot_window_properties(const Plot_data * data,
 
    update(verbosity);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Plot_window_properties::~Plot_window_properties()
 
 {
@@ -80,7 +80,7 @@ Plot_window_properties::~Plot_window_properties()
 
    delete &plot_data;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Plot_window_properties::set_window_size(Pixel_X width, Pixel_Y height)
 {
@@ -90,7 +90,7 @@ Plot_window_properties::set_window_size(Pixel_X width, Pixel_Y height)
    pa_height = height - pa_border_T - origin_Y - pa_border_B;
    update(0);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 bool
 Plot_window_properties::update(int verbosity)
@@ -103,10 +103,9 @@ Plot_window_properties::update(int verbosity)
    //
    // 2. when the user resizes the plot window.
    //
-   // In both cases the caller has changed (at least) pa_width and pa_height,
+   // In both cases the caller has most likely changed pa_width or pa_height,
    // and this function recomputes all variables that depend on them.
    //
-
    window_width  = pa_border_L + origin_X + pa_width  + pa_border_R;
    window_height = pa_border_T + origin_Y + pa_height + pa_border_B;
 
@@ -117,7 +116,10 @@ Plot_window_properties::update(int verbosity)
    min_Z = plot_data.get_min_Z();
    max_Z = plot_data.get_max_Z();
 
-   // the user may override the range derived from the data
+   // at this point the plot variables were computed from ionly the plot data
+   // (aka. auto-scaled). Now override them with user preferences from the plot
+   // attributes A (of A ⎕PLOT B). The XXX_valid() functions tell us whether
+   // or not an attribute was provided in A.
    //
    if (rangeX_min_valid())   min_X = rangeX_min;
    if (rangeX_max_valid())   max_X = rangeX_max;
@@ -228,7 +230,7 @@ const int max_Zi = ceil(max_Z / tile_Z);
 
    return false;   // OK
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Plot_window_properties::print(ostream & out) const
 {
@@ -252,7 +254,7 @@ Plot_window_properties::print(ostream & out) const
 
    return 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 const char *
 Plot_window_properties::set_attribute(const char * att_and_val)
 {
@@ -261,9 +263,9 @@ Plot_window_properties::set_attribute(const char * att_and_val)
 
        att_and_val is a string specifying one of:
 
-       a window attribute, like:   origin_X: 100                 , or
-       a line attribute, like:     point_color-1:  #000000       , or
-       a color gradient, like:     color_level-50: #00FF00
+       1. a window attribute, e.g.:   origin_X: 100                 , or
+       2. a line attribute,   e.g.:   point_color-1:  #000000       , or
+       3. a color gradient,   e.g.:   color_level-50: #00FF00
 
        The value (right of ':') can be
 
@@ -274,8 +276,8 @@ Plot_window_properties::set_attribute(const char * att_and_val)
       return 0 on success or else an appropriate error string.
     */
 
-   // find demarcation between attribute name and attribute value
-   ///
+   // find ':' which separates the attribute name and the attribute value.
+   //
 const char * colon = strchr(att_and_val, ':');
    if (colon == 0)   return "Expecting 'attribute: value' but no : found";
 
@@ -284,28 +286,32 @@ const char * colon = strchr(att_and_val, ':');
 const char * value = colon + 1;
    while (*value && (*value <= ' '))   ++value;
 
-   // check for line number resp. level
-   //·
+   // check for optional line number resp. color level
+   //
+int propnum = 0;
 const char * minus = strchr(att_and_val, '-');
+int line_number = -1;
+
    if (minus && minus < colon)   // line attribute or color gradient
       {
         // it is not unlikely that the user wants to use the same attributes
         // for different plots that may differ in the number of lines. We
         // therefore silently ignore such over-specified attribute rather
         // than returning an error string (which then raises a DOMAIN error).
-        //·
+        //
         if (!strncmp(att_and_val, "color_level-", 12))
            {
              const int level = strtoll(minus + 1, 0, 10);
-             if (level < 0)     return "negative color level";
-             if (level > 100)   return "color level > 100%";
+             if (level < 0)     return "color gradient level < 0%";
+             if (level > 100)   return "color gradient level > 100%";
              const char * error = 0;
               const Color color = Plot_data::Color_from_str(value, error);
               if (error)   return error;
 
               level_color grad = { level, color };
 
-              // insert grad into gradient, but keeping it sorted by level
+              // insert grad into gradient, but keeping gradient sorted
+              // by increasing level
               //
               loop(g, gradient.size())
                   {
@@ -322,25 +328,29 @@ const char * minus = strchr(att_and_val, '-');
               return 0;   // OK
            }
 
+        // figure the line number in the attribute name, for example in
+        // line_color-2. No line number means all lines.
+        //
         const int line = strtoll(minus + 1, 0, 10) - Workspace::get_IO();
         if (line < 0)             return "line number ≤ ⎕IO";
-        if (line >= line_count)   return "line number too large";
+        if (line >= line_count)   return 0;   // silently ignore
+        line_number = line;
+      }
 
 # define ldef(ty,  na,  val, _descr)                                       \
-         if (!strncmp(#na "-", att_and_val, minus - att_and_val))         \
-            { const char * error = 0;                                     \
-              line_properties[line]->set_ ## na(Plot_data::ty ##          \
-                                                _from_str(value, error)); \
-              return error;                                               \
+         ++propnum;                                                        \
+         if (Plot_line_properties::is_line_property(att_and_val, #na))     \
+            { const char * error = 0;                                      \
+              if (line_number == -1)                                       \
+                 set_all_ ## na(Plot_data::ty ## _from_str(value, error),  \
+                                propnum); \
+              else                                                         \
+                {  line_properties[line_number]->set_ ## na(Plot_data::ty  \
+                                             ## _from_str(value, error));  \
+                   properties_set.push_back(line_number << 8 | propnum); } \
+              return error;                                                \
             }
-# include "Quad_PLOT.def"
 
-        // nothing found
-        //
-        return "Bad or unknown line attribute";
-      }
-   else                          // window attribute
-      {
 # define gdef(ty,  na,  _val, _descr) \
          if (!strncmp(#na, att_and_val, colon - att_and_val))         \
             { const char * error = 0;                                 \
@@ -348,11 +358,70 @@ const char * minus = strchr(att_and_val, '-');
               return error;                                           \
             }
 # include "Quad_PLOT.def"
+
+   return "Bad or unknown window attribute.";
+}
+//----------------------------------------------------------------------------
+bool
+Plot_window_properties::can_be_set(uint16_t line, uint16_t propnum)
+{
+   loop(ps, properties_set.size())
+       {
+         if (properties_set[ps] == (line << 8 | propnum))   return false;
+       }
+
+   return true;
+}
+//----------------------------------------------------------------------------
+const char *
+Plot_window_properties::set_attribute(const UCS_string & att, const Cell & val)
+{
+   // replace trailing _NNN in att with -NNN.
+   //
+UCS_string att1 = att;
+bool trailing_NNN = false;
+   for (int a = att1.size() - 1; a >= 0; --a)
+       {
+         const Unicode cc = att1[a];
+         if (!Avec::is_digit(cc))
+            {
+               trailing_NNN = cc == UNI_UNDERSCORE;
+               if (trailing_NNN)   att1[a] = UNI_MINUS;
+               break;
+            }
+       }
+
+   if (att1.size() > 40)   // most are < 20
+      {
+        return "attribute too long";
       }
 
-   return "Bad or unknown window attribute";
+char att_and_value[100];
+UTF8_string attname_utf(att1);
+const char * attname_cp = attname_utf.c_str();
+   if (val.is_integer_cell())   // integer attribute value
+      {
+        const int ival = val.get_int_value();
+        snprintf(att_and_value, sizeof(att_and_value),
+                 "%s: %d", attname_cp, ival);
+        return set_attribute(att_and_value);
+      }
+   else if (val.is_pointer_cell())   // string value
+      {
+        UCS_string val_ucs = val.get_pointer_value()->get_UCS_ravel();
+        UTF8_string attval_utf(val_ucs);
+        const char * attval_cp = attval_utf.c_str();
+        snprintf(att_and_value, sizeof(att_and_value),
+                 "%s: %s", attname_cp, attval_cp);
+        return set_attribute(att_and_value);
+      }
+   else
+      {
+        return "Bad attribute value type";
+      }
+
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 double
 Plot_window_properties::round_up_125(double val)
 {
@@ -380,7 +449,7 @@ int expo = 0;
         return  expo < 0 ? 10.0/expo_val : 10.0*expo_val;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 uint32_t
 Plot_window_properties::get_color(double alpha) const
 {
@@ -426,7 +495,7 @@ Plot_window_properties::get_color(double alpha) const
    //
    return gradient.back().rgb;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Pixel_XY
 Plot_window_properties::valXYZ2pixelXY(double X, double Y, double Z) const
 {
@@ -437,7 +506,7 @@ const Pixel_X py = valY2pixel(Y - get_min_Y())                  + pz*sin(phi);
 
    return Pixel_XY(px, py);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 
 

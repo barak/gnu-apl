@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -24,26 +24,26 @@
 #include "UTF8_string.hh"
 #include "Value.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 LvalCell::LvalCell(Cell * cell, Value * cell_owner)
 {
    value.lval = cell;
    value.pval.owner = cell_owner;
    check_consistency();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 LvalCell::init_other(void * other, Value &, const char * loc) const
 {
    new (other)  LvalCell(get_lval_value(), get_cell_owner());
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Cell *
 LvalCell::get_lval_value()  const
 {
   return value.lval;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 PrintBuffer
 LvalCell::character_representation(const PrintContext & pctx) const
 {
@@ -61,13 +61,13 @@ PrintBuffer pb = value.lval->character_representation(pctx);
    pb.pad_r(Unicode('='), 1);
    return pb;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 LvalCell::check_consistency() const
 {
   if (value.lval)                      // valid owner
      {
-        const Cell * C0 = &value.pval.owner->get_ravel(0);
+        const Cell * C0 = &value.pval.owner->get_cfirst();
         const Cell * CN = C0 + value.pval.owner->nz_element_count();
        if (value.lval < C0 || value.lval >= CN)   // wrong owner
           {
@@ -81,5 +81,5 @@ LvalCell::check_consistency() const
   else Assert(value.pval.owner == 0);   // no owner
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 

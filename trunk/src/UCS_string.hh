@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@ class UCS_string_vector;
 /// track construction and destruction of UCS_strings
 #define UCS_tracking 0
 
-//=============================================================================
+//============================================================================
 /// A string of Unicode characters (32-bit)
 class UCS_string : public std::basic_string<Unicode>
 {
@@ -62,7 +62,8 @@ public:
    /// constructor: copy of another UCS_string
    UCS_string(const UCS_string & ucs);
 
-   /// constructor: copy of another UCS_string
+   /// constructor: copy of another UCS_string \b ucs, starting at \b pos
+   /// in \b ucs and length \b len
    UCS_string(const UCS_string & ucs, size_t pos, size_t len);
 
    /// constructor: UCS_string from UTF8_string
@@ -73,7 +74,7 @@ public:
    UCS_string(const char * cstring);
 
    /// constructor: UCS_string from print buffer
-   UCS_string(const PrintBuffer & pb, Rank rank, int quad_PW);
+   UCS_string(const PrintBuffer & pb, sRank rank, int quad_PW);
 
    /// constructor: UCS_string from a double with quad_pp valid digits.
    /// (eg. 3.33 has 3 digits), In standard APL format.
@@ -259,11 +260,11 @@ public:
    void append(const UCS_string & other)
       {  basic_string<Unicode>::append(other); }
 
-   /// append 0-terminated ASCII string \b str to this string. str is NOT
-   /// interpreted as UTF8 string (use append_UTF8() if such interpretation        /// is desired)
+   /// append 0-terminated ASCII string \b str to this string.
+   /// \b str is NOT interpreted as UTF8 string (use append_UTF8() instead of
+   /// append_ASCII() if such interpretation is desired)
    void append_ASCII(const char * ascii)
-      { while (*ascii)   *this += Unicode(*ascii++); }
-
+      { while (const char cc = *ascii++)   *this += Unicode(cc); }
 
    /// append 0-terminated UTF8 string str to \b this UCS_string.
    // This is different from append_ASCII((const char * str):
@@ -383,7 +384,8 @@ public:
       {  basic_string<Unicode>::erase(pos, 1); }
 
    /// helper function for Heapsort<Unicode>::sort()
-   static bool greater_uni(const Unicode & u1, const Unicode & u2, const void *)
+   static bool greater_uni(const Unicode & u1, const Unicode & u2,
+                            const void *)
       { return u1 > u2; }
 
    /// convert a signed integer value to an UCS_string (like sprintf())
@@ -445,13 +447,13 @@ private:
    /// in basic_strng::erase(pos, len = npos)
     basic_string<Unicode> & erase(size_type pos, size_type len);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 inline void
 Hswap(const UCS_string * & u1, const UCS_string * & u2)
 {
 const UCS_string * tmp = u1;   u1 = u2;   u2 = tmp;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 inline void
 Hswap(UCS_string & u1, UCS_string & u2)
 {
@@ -459,7 +461,7 @@ UCS_string  u = u1;
            u1 = u2;
            u2 = u;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __UCS_STRING_HH_DEFINED__
 

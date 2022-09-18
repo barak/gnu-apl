@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 
 #include "PrimitiveOperator.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** Primitive operator ¨ (each).
  */
 /// The class implementing ¨
@@ -34,7 +34,8 @@ public:
    Bif_OPER1_EACH() : PrimitiveOperator(TOK_OPER1_EACH) {}
 
    /// Overloaded Function::eval_LB().
-   virtual Token eval_LB(Token & LO, Value_P B) const;
+   virtual Token eval_LB(Token & LO, Value_P B) const
+      { return do_eval_LB(LO, B); }
 
    /// Overloaded Function::eval_ALB().
    virtual Token eval_ALB(Value_P A, Token & LO, Value_P B) const;
@@ -42,10 +43,13 @@ public:
    static Bif_OPER1_EACH * fun;      ///< Built-in function.
    static Bif_OPER1_EACH  _fun;      ///< Built-in function.
 
+   /// implementation of eval_LB()
+   static Token do_eval_LB(Token & LO, Value_P B);
+
 protected:
    /// overloaded Function::may_push_SI()
    virtual bool may_push_SI() const
       { return false; }
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 #endif // __BIF_OPER1_EACH_HH_DEFINED__

@@ -1,8 +1,14 @@
+
+# NOTE: without 'no-dependencies' make target distclean won't work.
+# AUTOMAKE_OPTIONS = no-dependencies
+
 EXTRA_DIRS =
 if ! WANT_ANDROID
 EXTRA_DIRS += APs emacs_mode sql workspaces
 endif
 SUBDIRS = native $(EXTRA_DIRS)
+
+all: ../makefile.h
 
 # depending on HAVE_GTK3 we want either Plot_gtk.cc or Plot_xcb.cc compiled,
 # but keep both source files in the tar file (hence EXTRA_apl_SOURCES).
@@ -10,6 +16,7 @@ SUBDIRS = native $(EXTRA_DIRS)
 if HAVE_GTK3
 SUBDIRS += Gtk
    plot_SOURCES      = Plot_gtk.cc
+   plot_CXXFLAGS     = -Wno-parentheses
    EXTRA_apl_SOURCES = Plot_xcb.cc
 else
    plot_SOURCES      = Plot_xcb.cc
@@ -25,7 +32,7 @@ host_os = @host_os@
 
 # common means common to the apl and libapl builds
 #
-common_CXXFLAGS = -Wall -I sql -I $(abs_top_srcdir) $(CXX_WERROR)
+common_CXXFLAGS = -Wall $(plot_CXXFLAGS) -I sql -I $(abs_top_srcdir) $(CXX_WERROR)
 common_CXXFLAGS += $(GTK_CFLAGS) $(GTK_LIBS)
 common_CXXFLAGS += $(PYTHON_CFLAGS)
 common_LDFLAGS  = -export-dynamic $(GTK_LDFLAGS)
@@ -63,6 +70,7 @@ common_SOURCES += CharCell.cc					CharCell.hh
 common_SOURCES += Command.cc		Command.def		Command.hh
 common_SOURCES += Common.cc					Common.hh
 common_SOURCES += ComplexCell.cc				ComplexCell.hh
+common_SOURCES += 						ConstCell_P.hh
 common_SOURCES += DerivedFunction.cc				DerivedFunction.hh
 common_SOURCES += DiffOut.cc					DiffOut.hh
 common_SOURCES += DynamicObject.cc				DynamicObject.hh
@@ -93,7 +101,7 @@ common_SOURCES += Missing_Libraries.cc
 common_SOURCES += NamedObject.cc				NamedObject.hh
 common_SOURCES += NativeFunction.cc				NativeFunction.hh
 common_SOURCES += 						Native_interface.hh
-common_SOURCES += NumericCell.cc				NumericCell.hh
+common_SOURCES += NumericCell.cc	NumericCell.icc		NumericCell.hh
 common_SOURCES += Output.cc					Output.hh
 common_SOURCES += 						PJob.hh
 common_SOURCES += Parallel.cc					Parallel.hh
@@ -105,7 +113,7 @@ common_SOURCES += Plot_line_properties.cc			Plot_line_properties.hh
 common_SOURCES += Plot_data.cc					Plot_data.hh
 common_SOURCES += Plot_window_properties.cc			Plot_window_properties.hh
 common_SOURCES += PrimitiveFunction.cc				PrimitiveFunction.hh
-common_SOURCES += PrimitiveOperator.cc				PrimitiveOperator.hh
+common_SOURCES += 						PrimitiveOperator.hh
 common_SOURCES += PrintBuffer.cc				PrintBuffer.hh
 common_SOURCES += 						PrintContext.hh
 common_SOURCES += 						PrintOperator.hh
@@ -212,8 +220,9 @@ lib_gnu_apl_la_CXXFLAGS += -D_FORTIFY_SOURCE=2
 lib_gnu_apl_la_CXXFLAGS += -fwrapv
 lib_gnu_apl_la_CXXFLAGS += -fPIC
 lib_gnu_apl_la_CXXFLAGS += -fstack-protector
-lib_gnu_apl_la_CXXFLAGS += --param=ssp-buffer-size=4 
-lib_gnu_apl_la_CXXFLAGS += -I/usr/include/python3.4m
+lib_gnu_apl_la_CXXFLAGS += --param=ssp-buffer-size=4
+lib_gnu_apl_la_CXXFLAGS += -I/usr/include/python3.6m   # server68
+lib_gnu_apl_la_CXXFLAGS += -I/usr/include/python3.8    # server58
 
 else
 
@@ -240,7 +249,7 @@ update-svar_signals:
 apl_LDADD = $(LIBS)
 
 apl.lines: apl
-	objdump -j .text -l -d $< > $@
+	objdump --section=.text --line-numbers --disassemble $< > $@
 
 test: all
 	./apl --id 1010 -T testcases/*tc

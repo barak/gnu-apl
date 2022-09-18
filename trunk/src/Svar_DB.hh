@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ using namespace std;
 # define ABSTRACT_OFFSET 0
 #endif
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// a pointer to one record (one shared variable) of the shared Svar_DB_memory
 class Svar_record_P
 {
@@ -59,7 +59,7 @@ private:
    /// don't copy...
    Svar_record_P & operator =(const Svar_record_P & other);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 # define READ_RECORD(key, open_act, closed_act)		\
     if (Svar_DB::APserver_available())			\
          { const Svar_record_P svar(key); open_act }	\

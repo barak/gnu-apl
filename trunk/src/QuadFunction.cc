@@ -88,7 +88,7 @@ Quad_UCS   * Quad_UCS  ::fun = &Quad_UCS  ::_fun;
 Quad_STOP  * Quad_STOP ::fun = &Quad_STOP ::_fun;
 Quad_TRACE * Quad_TRACE::fun = &Quad_TRACE::_fun;
 
-//=============================================================================
+//============================================================================
 Token
 Quad_AF::eval_B(Value_P B) const
 {
@@ -97,13 +97,13 @@ Value_P Z(B->get_shape(), LOC);
 
    loop(v, ec)
        {
-         const Cell & cell_B = B->get_ravel(v);
+         const Cell & cell_B = B->get_cravel(v);
 
          if (cell_B.is_character_cell())   // Unicode to AV index
             {
               const Unicode uni = cell_B.get_char_value();
               int32_t pos = Avec::find_av_pos(uni);
-              if (pos < 0)   Z->next_ravel_Int(MAX_AV);
+              if (pos < 0)   Z->next_ravel_Int(Avec::MAX_AV);
               else           Z->next_ravel_Int(pos);
               continue;
             }
@@ -121,14 +121,16 @@ Value_P Z(B->get_shape(), LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//=============================================================================
+//============================================================================
 Token
 Quad_AT::eval_AB(Value_P A, Value_P B) const
 {
-   // A should be an integer scalar 1, 2, 3, or 4
-   //
+   // A is an integer scalar 1, 2, 3, or 4 (the mode)
+   // B is a matrix of symbol names
+
    if (A->get_rank() > 0)   RANK_ERROR;
-const APL_Integer mode = A->get_ravel(0).get_near_int();
+
+const APL_Integer mode = A->get_cfirst().get_near_int();
    if (mode < 1)   DOMAIN_ERROR;
    if (mode > 4)   DOMAIN_ERROR;
 
@@ -136,6 +138,7 @@ const ShapeItem cols = B->get_cols();
 const ShapeItem rows = B->get_rows();
    if (rows == 0)   LENGTH_ERROR;
 
+               // mode:  1  2  3  4
 const int mode_vec[] = { 3, 7, 4, 2 };
 const int mode_len = mode_vec[mode - 1];
 Shape shape_Z(rows);
@@ -151,7 +154,7 @@ Value_P Z(shape_Z, LOC);
         UCS_string symbol_name;
         loop(c, cols)
            {
-            const Unicode uni = B->get_ravel(b + c).get_char_value();
+            const Unicode uni = B->get_cravel(b + c).get_char_value();
             if (uni == UNI_SPACE)   break;
             symbol_name.append(uni);
            }
@@ -159,22 +162,24 @@ Value_P Z(shape_Z, LOC);
         const NamedObject * obj = Workspace::lookup_existing_name(symbol_name);
         if (obj == 0)   Error::throw_symbol_error(symbol_name, LOC);
 
-        const Function * function = obj->get_function();
-        if (function)             // user defined or system function.
+        if (const Function * function = obj->get_function())
            {
-             function->get_attributes(mode, &Z->get_ravel(r*mode_len));
+             // defined or system function.
+             function->get_attributes(mode, *Z);
              continue;
            }
 
-        if (const Symbol * symbol = obj->get_symbol())   // defined or sys var
+        if (const Symbol * symbol = obj->get_symbol())
            {
-             symbol->get_attributes(mode, &Z->get_ravel(r*mode_len));
+             // defined or sys var
+             symbol->get_attributes(mode, *Z);
              continue;
            }
 
         // neither function nor variable (e.g. unused name)
         VALUE_ERROR;
 
+#if 0 // not reached ??
         if (Avec::is_quad(symbol_name[0]))   // system function or variable
            {
              int l;
@@ -195,14 +200,15 @@ Value_P Z(shape_Z, LOC);
              Symbol * symbol = Workspace::lookup_existing_symbol(symbol_name);
              if (symbol == 0)   VALUE_ERROR;
 
-             symbol->get_attributes(mode, &Z->get_ravel(r*mode_len));
+             symbol->get_attributes(mode, &Z->get_cravel(r*mode_len));
            }
+#endif
       }
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//=============================================================================
+//============================================================================
 Token
 Quad_DL::eval_B(Value_P B) const
 {
@@ -211,30 +217,35 @@ const APL_time_us start = now();
    // B should be an integer or real scalar
    //
    if (B->get_rank() > 0)                 RANK_ERROR;
-   if (!B->get_ravel(0).is_real_cell())   DOMAIN_ERROR;
+   if (!B->get_cfirst().is_real_cell())   DOMAIN_ERROR;
 
-const APL_time_us end = start + 1000000 * B->get_ravel(0).get_real_value();
-   if (end < start)                            DOMAIN_ERROR;
+const APL_time_us end = start + 1000000 * B->get_cfirst().get_real_value();
+   if (end < start)                           DOMAIN_ERROR;
    if (end > start + 31*24*60*60*1000000LL)   DOMAIN_ERROR;   // > 1 month
 
-   for (;;)
+bool need_CR = false;
+   while (now() < end)
        {
-         // compute time remaining.
-         //
-         const APL_time_us remaining_us =  end - now();
-         if (remaining_us <= 0)   break;
-
-         const int wait_sec  = remaining_us/1000000;
-         const int wait_usec = remaining_us%1000000;
-         timeval tv = { wait_sec, wait_usec };
-         if (select(0, 0, 0, 0, &tv) == 0)   break;
+         usleep(20000);
+         if (attention_is_raised())   need_CR = true;
+         if (interrupt_is_raised())
+            {
+              need_CR = true;
+              break;
+            }
        }
 
-   // return time elapsed.
+   // interrupt or attention may have displayed ^C, start a new line if so.
+   if (need_CR)   CERR << endl;
+
+   // we do not clear_attention_raised(LOC) or clear_interrupt_raised(LOC);
+   // so that the user can continue with →''
+
+   // return the time elapsed.
    //
    return Token(TOK_APL_VALUE1, FloatScalar(0.000001*(now() - start), LOC));
 }
-//=============================================================================
+//============================================================================
 Token
 Quad_EA::eval_AB(Value_P A, Value_P B) const
 {
@@ -252,7 +263,7 @@ Quad_EA::eval_AB(Value_P A, Value_P B) const
 
    return Macro::get_macro(Macro::MAC_Z__A_Quad_EA_B)->eval_AB(A, B);
 }
-//=============================================================================
+//============================================================================
 Token
 Quad_EB::eval_AB(Value_P A, Value_P B) const
 {
@@ -270,7 +281,7 @@ Quad_EB::eval_AB(Value_P A, Value_P B) const
 
    return Macro::get_macro(Macro::MAC_Z__A_Quad_EB_B)->eval_AB(A, B);
 }
-//=============================================================================
+//============================================================================
 Token
 Quad_EC::eval_B(Value_P B) const
 {
@@ -295,7 +306,7 @@ ExecuteList * fun = 0;
         UCS_string Z3_ucs(Z3_utf);
         Value_P Z3(Z3_ucs, LOC);
         Value_P Z(3, LOC);
-        Z->next_ravel_Int(0);              // return code = error
+        Z->next_ravel_0();              // return code = error
         Z->next_ravel_Pointer(Z2.get());   // ⎕ET value
         Z->next_ravel_Pointer(Z3.get());   // ⎕EM
 
@@ -312,27 +323,27 @@ ExecuteList * fun = 0;
 
    return Token(TOK_SI_PUSHED);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_EC::eval_fill_B(Value_P B) const
 {
-Value_P Z2(2, LOC);
-   Z2->next_ravel_Int(0);
-   Z2->next_ravel_Int(0);
+Value_P Z2(2, LOC);                             // Z2←0 0 0
+   Z2->next_ravel_0();
+   Z2->next_ravel_0();
    Z2->check_value(LOC);
 
-Value_P Zsub(3, LOC);
-   Zsub->next_ravel_Int(3);   // statement without result
-   Zsub->next_ravel_Pointer(Z2.get());
-   Zsub->next_ravel_Pointer(Idx0(LOC).get());
+Value_P Zsub(3, LOC);                           // Zsub ← 3 (⊂Z2) (⊂⍬)...
+   Zsub->next_ravel_Int(3);                     // Zsub[1] ← 3
+   Zsub->next_ravel_Pointer(Z2.get());          // Zsub[2] ← ⊂ 0 0 0
+   Zsub->next_ravel_Pointer(Idx0(LOC).get());   // Zsub[3] ← ⊂⍬
    Zsub->check_value(LOC);
 
-Value_P Z(ShapeItem(0), LOC);
-  new (&Z->get_ravel(0))   PointerCell(Zsub.get(), Z.getref());
+Value_P Z(ShapeItem(0), LOC);                   // Z ← 0 ⍴ ⊂Zsub
+  new (&Z->get_wproto())   PointerCell(Zsub.get(), *Z);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_EC::eoc(Token & result)
 {
@@ -378,7 +389,7 @@ Value_P Z(3, LOC);
 
         Value_P Z3(pb, LOC);   // 3 line message like ⎕EM
 
-        Z->next_ravel_Int(0);
+        Z->next_ravel_0();
         Z->next_ravel_Pointer(Z2.get());
         Z->next_ravel_Pointer(Z3.get());
 
@@ -390,25 +401,23 @@ Value_P Z(3, LOC);
    // all other cases have Z2 = 0 0
    //
 Value_P Z2(2, LOC);
-   Z2->next_ravel_Int(0);
-   Z2->next_ravel_Int(0);
+   Z2->next_ravel_0();
+   Z2->next_ravel_0();
    Z2->check_value(LOC);
 
    switch(result.get_tag())
       {
         case TOK_APL_VALUE1:
         case TOK_APL_VALUE3:
-             Z->next_ravel_Int(1);
+             Z->next_ravel_1();
              Z->next_ravel_Pointer(Z2.get());
-             Z->next_ravel()->init_from_value(result.get_apl_val().get(),
-                                              Z.getref(), LOC);
+             Z->next_ravel_Value(result.get_apl_val().get());
              break;
 
         case TOK_APL_VALUE2:
              Z->next_ravel_Int(2);
              Z->next_ravel_Pointer(Z2.get());
-             Z->next_ravel()->init_from_value(result.get_apl_val().get(),
-                                              Z.getref(), LOC);
+             Z->next_ravel_Value(result.get_apl_val().get());
              break;
 
         case TOK_NO_VALUE:
@@ -438,7 +447,7 @@ Value_P Z2(2, LOC);
    Z->check_value(LOC);
    result.move_2(Token(TOK_APL_VALUE1, Z), LOC);
 }
-//=============================================================================
+//============================================================================
 Token
 Quad_ENV::eval_B(Value_P B) const
 {
@@ -457,7 +466,7 @@ std::vector<const char *> evars;
          bool match = true;
          loop(b, ec_B)
             {
-              if (B->get_ravel(b).get_char_value() != Unicode(env[b]))
+              if (B->get_cravel(b).get_char_value() != Unicode(env[b]))
                  {
                    match = false;
                    break;
@@ -492,11 +501,11 @@ Value_P Z(sh_Z, LOC);
         Z->next_ravel_Pointer(varval.get());
       }
 
-   Z->set_default_Spc();
+   Z->set_proto_Spc();
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//=============================================================================
+//============================================================================
 Token
 Quad_ES::eval_AB(Value_P A, Value_P B) const
 {
@@ -507,7 +516,7 @@ const Token ret = event_simulate(&ucs, B, error);
 
    throw error;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_ES::eval_B(Value_P B) const
 {
@@ -518,7 +527,7 @@ const Token ret = event_simulate(0, B, error);
 
    throw error;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_ES::event_simulate(const UCS_string * A, Value_P B, Error & error)
 {
@@ -527,10 +536,10 @@ Quad_ES::event_simulate(const UCS_string * A, Value_P B, Error & error)
    if (B->element_count() == 0)   return Token();
 
 const ErrorCode ec = get_error_code(B);
-   if (ec == E_QUAD_ES_BRA)   return Token(TOK_QUAD_ES_BRA, B->clone(LOC));
-   if (ec == E_QUAD_ES_COM)   return Token(TOK_QUAD_ES_COM, B->clone(LOC));
-   if (ec == E_QUAD_ES_ERR)   return Token(TOK_QUAD_ES_ERR, B->clone(LOC));
-   if (ec == E_QUAD_ES_ESC)   return Token(TOK_QUAD_ES_ESC, B->clone(LOC));
+   if (ec == E_QUAD_ES_BRA)   return Token(TOK_QUAD_ES_BRA, CLONE_P(B, LOC));
+   if (ec == E_QUAD_ES_COM)   return Token(TOK_QUAD_ES_COM, CLONE_P(B, LOC));
+   if (ec == E_QUAD_ES_ERR)   return Token(TOK_QUAD_ES_ERR, CLONE_P(B, LOC));
+   if (ec == E_QUAD_ES_ESC)   return Token(TOK_QUAD_ES_ESC, CLONE_P(B, LOC));
 
    new (&error)   Error(ec, error.get_throw_loc());
 
@@ -569,7 +578,8 @@ const ErrorCode ec = get_error_code(B);
       {
         char cc[58];
         snprintf(cc, sizeof(cc), "Unkown error (major %d, minor %d) in ⎕ES B",
-                 error.get_error_code() >> 16, error.get_error_code() & 0xFFFF);
+                 error.get_error_code() >> 16,
+                 error.get_error_code() & 0xFFFF);
         error.set_error_line_1(cc);
       }
 
@@ -578,7 +588,7 @@ const ErrorCode ec = get_error_code(B);
    Assert(Workspace::SI_top());
    if (StateIndicator * si = Workspace::SI_top()->get_parent())
       {
-        const UserFunction * ufun = si->get_executable()->get_ufun();
+        const UserFunction * ufun = si->get_executable()->get_exec_ufun();
         if (ufun)
            {
              // lrm p 282: When ⎕ES is executed from within a defined function
@@ -598,7 +608,7 @@ const ErrorCode ec = get_error_code(B);
    error.update_error_info(Workspace::SI_top());
    return Token();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 Quad_ES::get_error_code(Value_P B)
 {
@@ -619,8 +629,8 @@ Quad_ES::get_error_code(Value_P B)
    if (B->element_count() == 0)   return E_NO_ERROR;
    if (B->is_char_string())       return E_USER_DEFINED_ERROR;
 
-const APL_Integer err = (B->get_ravel(0).get_near_int() << 16)
-                      | (B->get_ravel(1).get_near_int());
+const APL_Integer err = (B->get_cfirst().get_near_int() << 16)
+                      | (B->get_cravel(1).get_near_int());
 
    if ((err >> 16) == (E_QUAD_ES_BRA >> 16))   // one of the ⎕EA or ⎕EB events
       {
@@ -636,25 +646,53 @@ const APL_Integer err = (B->get_ravel(0).get_near_int() << 16)
 
    return ErrorCode(err);
 }
-//=============================================================================
+//============================================================================
 Token
 Quad_EX::eval_B(Value_P B) const
 {
    if (B->get_rank() > 2)   RANK_ERROR;
 
+   // we don't throw a DOMAIN ERROR if B is bad, but provide info for
+   // the user if she asks for it with )MORE.
+   loop(b, B->element_count())
+       {
+         const Cell & cell = B->get_cravel(b);
+         if (!cell.is_character_cell())
+            {
+              MORE_ERROR() << "⎕EX B: non-character in list B (of symbol names)";
+              break;
+            }
+
+        const Unicode uni = cell.get_char_value();
+        if (!( Avec::is_symbol_char(uni) ||
+               Avec::is_white(uni)       ||
+               (uni == UNI_FULLSTOP)))
+           {
+              MORE_ERROR() << "⎕EX B: invalid character "
+                           << uni << " in list B (of symbol names)";
+              break;
+           }
+       }
+
 const ShapeItem var_count = B->get_rows();
-const UCS_string_vector vars(B.getref(), false);
+const UCS_string_vector vars(*B, false);
 
 Shape sh_Z;
    if (var_count > 1)   sh_Z.add_shape_item(var_count);
 Value_P Z(sh_Z, LOC);
 
-   loop(z, var_count)   Z->next_ravel_Int(expunge(vars[z]));
+   loop(z, var_count)
+      {
+        const UCS_string & var = vars[z];
+        const int erased = expunge(var);
+
+        Z->next_ravel_Int(erased);
+      }
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Quad_EX::expunge(const UCS_string & name)
 {
@@ -698,17 +736,17 @@ Symbol * symbol = Workspace::lookup_existing_symbol(*members.back());
      Value * owner = 0;   // not used
      if (Cell * cell = toplevel_val->get_member(members, owner, false, false))
         {
-          cell->release(LOC);   new (cell--)   IntCell(0);   // member value
-          cell->release(LOC);   new (cell)     IntCell(0);   // 'member'
+          cell->release(LOC);   IntCell::z0(cell--);   // member value
+          cell->release(LOC);   IntCell::z0(cell);     // member name
           ret = 1;   // ⎕EX success
         }
    }
 
 cleanup:
-        loop(m, members.size())   delete members[m];
-        return ret;
+   loop(m, members.size())   delete members[m];
+   return ret;
 }
-//=============================================================================
+//============================================================================
 UCS_string Quad_INP::esc1;
 UCS_string Quad_INP::esc2;
 UCS_string Quad_INP::end_marker;
@@ -791,12 +829,12 @@ Value_P BB(line_count, LOC);
 Token ret = Macro::get_macro(Macro::MAC_Z__Quad_INP_B)->eval_B(BB);
    Assert1(ret.get_tag() == TOK_SI_PUSHED);
 
-   loop(l, line_count)   BB->get_ravel(l).release(LOC);
+// loop(l, line_count)   BB->release(l, LOC);
 
    Quad_INP_running = false;
    return Token(TOK_SI_PUSHED);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_INP::eval_B(Value_P B) const
 {
@@ -827,7 +865,7 @@ Value_P Z(raw_lines.size(), LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_INP::eval_XB(Value_P X, Value_P B) const
 {
@@ -837,7 +875,7 @@ Quad_INP::eval_XB(Value_P X, Value_P B) const
         else                     LENGTH_ERROR;
       }
 
-APL_Integer x = X->get_ravel(0).get_near_int();
+APL_Integer x = X->get_cfirst().get_near_int();
    if (x == 0)   return eval_B(B);
    if (x > 1)    DOMAIN_ERROR;
 
@@ -903,7 +941,7 @@ Value_P Z(lines.size(), LOC);
          loop(v, val_count)
             {
               Value_P val = tos[2*v].get_apl_val();
-              ZZ->next_ravel()->init_from_value(val.get(), ZZ.getref(), LOC);
+              ZZ->next_ravel_Value(val.get());
             }
 
          ZZ->check_value(LOC);
@@ -913,13 +951,13 @@ Value_P Z(lines.size(), LOC);
    if (lines.size() == 0)   // empty result
       {
         Value_P ZZ(UCS_string(), LOC);
-        new(&Z->get_ravel(0)) PointerCell(ZZ.get(), Z.getref());
+        Z->set_ravel_Pointer(0, ZZ.get());
       }
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_INP::get_esc(Value_P A, UCS_string & esc1, UCS_string & esc2)
 {
@@ -934,7 +972,7 @@ Quad_INP::get_esc(Value_P A, UCS_string & esc1, UCS_string & esc2)
 
         loop(e, 2)
            {
-             const Cell & cell = A->get_ravel(e);
+             const Cell & cell = A->get_cravel(e);
              if (cell.is_pointer_cell())   // char vector
                 {
                   if (e)   esc2 = cell.get_pointer_value()->get_UCS_ravel();
@@ -956,7 +994,7 @@ Quad_INP::get_esc(Value_P A, UCS_string & esc1, UCS_string & esc2)
         esc2 = esc1;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_INP::read_strings()
 {
@@ -984,7 +1022,7 @@ Quad_INP::read_strings()
         if (eof)   break;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_INP::split_strings()
 {
@@ -1038,14 +1076,14 @@ UCS_string empty;
    Assert(prefixes.size() == escapes.size());
    Assert(prefixes.size() == suffixes.size());
 }
-//=============================================================================
+//============================================================================
 Token
 Quad_NC::eval_B(Value_P B) const
 {
    if (B->get_rank() > 2)   RANK_ERROR;
 
 const ShapeItem var_count = B->get_rows();
-const UCS_string_vector vars(B.getref(), false);
+const UCS_string_vector vars(*B, false);
 
 Shape sh_Z;
    if (var_count > 1)   sh_Z.add_shape_item(var_count);
@@ -1055,74 +1093,86 @@ Value_P Z(sh_Z, LOC);
        {
          const int nc = get_NC(vars[v]);
          if (nc == NC_INVALID)   Z->next_ravel_Int(-1);
-         else                    Z->next_ravel_Int(nc);
+         else                    Z->next_ravel_Int(nc & NC_case_mask);
        }
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 APL_Integer
 Quad_NC::get_NC(const UCS_string ucs)
 {
-   if (ucs.size() == 0)   return -1;   // invalid name
+   if (ucs.size() == 0)   return NC_INVALID;   // invalid name
 
 const Unicode uni = ucs[0];
-Symbol * symbol = 0;
-   if      (uni == UNI_ALPHA)            symbol = &Workspace::get_v_ALPHA();
-   else if (uni == UNI_LAMBDA)           symbol = &Workspace::get_v_LAMBDA();
-   else if (uni == UNI_CHI)              symbol = &Workspace::get_v_CHI();
-   else if (uni == UNI_OMEGA)            symbol = &Workspace::get_v_OMEGA();
-   else if (uni == UNI_ALPHA_UNDERBAR)   symbol = &Workspace::get_v_OMEGA_U();
-   else if (uni == UNI_OMEGA_UNDERBAR)   symbol = &Workspace::get_v_OMEGA_U();
-   if (ucs.size() != 1)   symbol = 0;    // unless more than one char
 
-   if (Avec::is_quad(uni))   // distinguished name
-      {
-        int len = 0;
-        const Token t = Workspace::get_quad(ucs, len);
-        if (len < 2)                      return 5;    // ⎕ : quad variable
-        if (t.get_Class() == TC_VOID)     return -1;   // invalid
-        if (t.get_Class() == TC_SYMBOL)   symbol = t.get_sym_ptr();
-        else                              return  6;   // quad function
-      }
+   // system name ?
+   {
+     const Symbol * sys = 0;
 
-   if (symbol)   // system variable (⎕xx, ⍺, ⍶, ⍵, ⍹, λ, or χ
-      {
-        const NameClass nc = symbol->get_nc();
-        if (nc == NC_UNUSED_USER_NAME)   return 0;
-        return nc + 3;
-      }
+     // ⍺, ⍶, ⍵, and ⍹ are local variables of lambdas and may change their
+     // NC at runtime. We will therefore consult their symbol later on.
+     //
+     if      (uni == UNI_ALPHA)           sys = &Workspace::get_v_ALPHA();
+     else if (uni == UNI_LAMBDA)          sys = &Workspace::get_v_LAMBDA();
+     else if (uni == UNI_CHI)             sys = &Workspace::get_v_CHI();
+     else if (uni == UNI_OMEGA)           sys = &Workspace::get_v_OMEGA();
+     else if (uni == UNI_ALPHA_UNDERBAR)  sys = &Workspace::get_v_OMEGA_U();
+     else if (uni == UNI_OMEGA_UNDERBAR)  sys = &Workspace::get_v_OMEGA_U();
+
+     // the caller may ask for e.g. ⍺123 but we accept ⍺ and friends only if
+     // their lengths is 1.
+     //
+     if (ucs.size() != 1)   sys = 0;    // more than one char
+
+     if (Avec::is_quad(uni))   // distinguished name
+        {
+          int len = 0;
+          const Token t = Workspace::get_quad(ucs, len);
+          if (len < 2)                      return NC_SYSTEM_VAR;   // ⎕ or ⍞
+          if (t.get_Class() == TC_VOID)     return NC_INVALID;
+          if (t.get_Class() == TC_SYMBOL)   sys = t.get_sym_ptr();
+          else                              return  NC_SYSTEM_FUN;
+        }
+    
+     if (sys)   // system variable (⎕xx, ⍺, ⍶, ⍵, ⍹, λ, or χ
+        {
+          const NameClass nc = sys->get_NC();
+          if (nc == NC_UNUSED_USER_NAME)   return NC_SYSTEM_FUN;
+          return nc + 3;
+        }
+     }
 
    // user-defined name
    //
-   symbol = Workspace::lookup_existing_symbol(ucs);
+const Symbol * user_sym = Workspace::lookup_existing_symbol(ucs);
 
-   if (!symbol)
+   if (!user_sym)
       {
-        // symbol not found. Distinguish between invalid and unused names
+        // user_sym not found. Distinguish between invalid and unused names
         //
-        if (!Avec::is_first_symbol_char(ucs[0]))   return -1;   // invalid
+        if (!Avec::is_first_symbol_char(ucs[0]))   return NC_INVALID;
         loop (u, ucs.size())
            {
-             if (!Avec::is_symbol_char(ucs[u]))   return -1;   // invalid
+             if (!Avec::is_symbol_char(ucs[u]))   return NC_INVALID;
            }
         return 0;   // unused
       }
 
-   switch(const NameClass nc = symbol->get_nc())
+   switch(const NameClass nc = user_sym->get_NC())
       {
-        case NC_INVALID:      return -1;
-        case NC_SHARED_VAR:   return NC_VARIABLE;
+        case NC_INVALID:      return NC_INVALID;
+        case NC_SYSTEM_VAR:   return NC_VARIABLE;
         default:              return nc & NC_case_mask;
       }
 }
-//=============================================================================
+//============================================================================
 Token
 Quad_NL::do_quad_NL(Value_P A, Value_P B)
 {
    if (+A && !A->is_char_string())   DOMAIN_ERROR;
-   if (B->get_rank() > 1)             RANK_ERROR;
+   if (B->get_rank() > 1)            RANK_ERROR;
    if (B->element_count() == 0)   // nothing requested
       {
         return Token(TOK_APL_VALUE1, Str0_0(LOC));
@@ -1137,7 +1187,7 @@ int requested_NCs = 0;
    {
      loop(b, B->element_count())
         {
-          const APL_Integer bb = B->get_ravel(b).get_near_int();
+          const APL_Integer bb = B->get_cravel(b).get_near_int();
           if (bb < 1)   DOMAIN_ERROR;
           if (bb > 6)   DOMAIN_ERROR;
           requested_NCs |= 1 << bb;
@@ -1155,8 +1205,8 @@ UCS_string_vector names;
           const Symbol * symbol = symbols[s];
           if (symbol->is_erased())   continue;
 
-          NameClass nc = symbol->get_nc();
-          if (nc == NC_SHARED_VAR)   nc = NC_VARIABLE;
+          NameClass nc = symbol->get_NC();
+          if (nc == NC_SYSTEM_VAR)   nc = NC_VARIABLE;
 
           if (!(requested_NCs & 1 << nc))   continue;   // name class not in B
 
@@ -1172,20 +1222,24 @@ UCS_string_vector names;
 
    // 3, append ⎕-vars and ⎕-functions to name table (unless prevented by A)
    //
-   if (first_chars.size() == 0 || first_chars.contains(UNI_Quad_Quad))
+const bool vars = requested_NCs & 1 << 5;
+const bool funs = requested_NCs & 1 << 6;
+
+   if (first_chars.size() == 0 ||                  // all
+       first_chars.contains(UNI_Quad_Quad))   // ⎕-variables and -functions
       {
-#define ro_sv_def(x, _str, _txt)                                   \
-   { Symbol * symbol = &Workspace::get_v_ ## x();           \
-     if ((requested_NCs & 1 << 5) && symbol->get_nc() != 0) \
+#define ro_sv_def(x, _str, _txt)                            \
+   { const Symbol * symbol = &Workspace::get_v_ ## x();     \
+     if (vars && symbol->get_NC() != 0)                     \
         names.push_back(symbol->get_name()); }
 
-#define rw_sv_def(x, _str, _txt)                                   \
-   { Symbol * symbol = &Workspace::get_v_ ## x();           \
-     if ((requested_NCs & 1 << 5) && symbol->get_nc() != 0) \
+#define rw_sv_def(x, _str, _txt)                            \
+   { const Symbol * symbol = &Workspace::get_v_ ## x();     \
+     if (vars && symbol->get_NC() != 0)                     \
         names.push_back(symbol->get_name()); }
 
-#define sf_def(x, _str, _txt)                                      \
-   { if (requested_NCs & 1 << 6)   names.push_back((x::fun->get_name())); }
+#define sf_def(_x, str, _txt)                               \
+   { if (funs)   names.push_back(UCS_string(UTF8_string("⎕" str))); }
 #include "SystemVariable.def"
       }
 
@@ -1228,11 +1282,11 @@ Value_P Z(shZ, LOC);
         names[smallest] = names[count - 1];
       }
 
-   Z->set_default_Spc();
+   Z->set_proto_Spc();
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//=============================================================================
+//============================================================================
 Token
 Quad_SI::eval_AB(Value_P A, Value_P B) const
 {
@@ -1241,7 +1295,7 @@ Quad_SI::eval_AB(Value_P A, Value_P B) const
         if (A->get_rank() > 1)   RANK_ERROR;
         else                     LENGTH_ERROR;
       }
-APL_Integer a = A->get_ravel(0).get_near_int();
+APL_Integer a = A->get_cfirst().get_near_int();
 const ShapeItem len = Workspace::SI_entry_count();
    if (a >= len)   DOMAIN_ERROR;
    if (a < -len)   DOMAIN_ERROR;
@@ -1269,7 +1323,7 @@ const Function_Line fun_line = exec->get_line(PC);
 
 Value_P Z;
 
-const APL_Integer b = B->get_ravel(0).get_near_int();
+const APL_Integer b = B->get_cfirst().get_near_int();
    switch(b)
       {
         case 1:  Z = Value_P(fun_name, LOC);
@@ -1315,7 +1369,7 @@ const APL_Integer b = B->get_ravel(0).get_near_int();
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_SI::eval_B(Value_P B) const
 {
@@ -1325,7 +1379,7 @@ Quad_SI::eval_B(Value_P B) const
         else                     LENGTH_ERROR;
       }
 
-const APL_Integer b = B->get_ravel(0).get_near_int();
+const APL_Integer b = B->get_cfirst().get_near_int();
 const ShapeItem len = Workspace::SI_entry_count();
 
    if (b < 1)   DOMAIN_ERROR;
@@ -1335,11 +1389,12 @@ const ShapeItem len = Workspace::SI_entry_count();
    //
 Value_P Z(len, LOC);
 
-ShapeItem z = 0;
-   for (const StateIndicator * si = Workspace::SI_top();
-        si; si = si->get_parent())
+   // move from oldest SI entry towards SI_top()...
+   //
+   for (const StateIndicator * parent = 0; parent != Workspace::SI_top();)
        {
-         Cell * cZ = &Z->get_ravel(len - ++z);
+         const StateIndicator * si = StateIndicator::find_child(parent);
+         parent = si;   // for the next iteration
 
          const Function_PC PC = Function_PC(si->get_PC() - 1);
          const Executable * exec = si->get_executable();
@@ -1349,11 +1404,13 @@ ShapeItem z = 0;
 
          switch (b)
            {
-             case 1:  new (cZ) PointerCell(
-                                Value_P(fun_name, LOC).get(), Z.getref());
+             case 1:  {
+                        Value_P name(fun_name, LOC);
+                        Z->next_ravel_Pointer(name.get());
+                      }
                       break;
 
-             case 2:  new (cZ) IntCell(fun_line);
+             case 2:  Z->next_ravel_Int(fun_line);
                       break;
 
              case 3:  {
@@ -1361,36 +1418,37 @@ ShapeItem z = 0;
                         fun_and_line.append(UNI_L_BRACK);
                         fun_and_line.append_number(fun_line);
                         fun_and_line.append(UNI_R_BRACK);
-                        new (cZ) PointerCell(Value_P(
-                                    fun_and_line, LOC).get(), Z.getref()); 
+                        Value_P name_and_line(fun_and_line, LOC);
+                        Z->next_ravel_Pointer(name_and_line.get());
                       }
                       break;
 
              case 4:  if (StateIndicator::get_error(si).get_error_code())
                          {
-                           const UCS_string text(UTF8_string(
-                             StateIndicator::get_error(si).get_error_line_2()));
-                           new (cZ) PointerCell(Value_P(text, LOC).get(),
-                                                Z.getref());
+                           const Error & error = StateIndicator::get_error(si);
+                           const char * error_cp = error.get_error_line_2();
+                           const UTF8_string error_utf(error_cp);
+                           const UCS_string error_ucs(error_utf);
+                           Value_P error_val(error_ucs, LOC);
+                           Z->next_ravel_Pointer(error_val.get());
                          }
-                      else
+                      else   // no error in context si
                          {
                            const UCS_string text = exec->statement_text(PC);
-                           new (cZ) PointerCell(Value_P( text, LOC).get(),
-                                                Z.getref()); 
+                           Value_P text_val(text, LOC);
+                           Z->next_ravel_Pointer(text_val.get());
                          }
                       break;
 
-             case 5:  new (cZ) IntCell(PC);                             break;
-             case 6:  new (cZ) IntCell(pm);                             break;
+             case 5:  Z->next_ravel_Int(PC);   break;
+             case 6:  Z->next_ravel_Int(pm);   break;
            }
-
        }
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//=============================================================================
+//============================================================================
 Token
 Quad_UCS::eval_B(Value_P B) const
 {
@@ -1399,15 +1457,15 @@ const ShapeItem ec = B->element_count();
 
    if (ec == 0)   // prototype
       {
-        if (B->get_ravel(0).is_character_cell())   // char to Unicode
-           new (&Z->get_ravel(0))   IntCell(0);
+        if (B->get_cfirst().is_character_cell())   // char to integer Unicode
+           Z->set_proto_Int();
         else
-           new (&Z->get_ravel(0))   CharCell(UNI_SPACE);
+           Z->set_proto_Spc();
       }
 
    loop(v, ec)
        {
-         const Cell & cell_B = B->get_ravel(v);
+         const Cell & cell_B = B->get_cravel(v);
 
          if (cell_B.is_character_cell())   // char to Unicode
             {
@@ -1456,7 +1514,7 @@ const ShapeItem ec = B->element_count();
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//=============================================================================
+//============================================================================
 const UserFunction *
 Stop_Trace::locate_fun(const Value & fun_name)
 {
@@ -1479,7 +1537,7 @@ Function_P fun = fun_symbol->get_function();
         return 0;
       }
 
-const UserFunction * ufun = fun->get_ufun1();
+const UserFunction * ufun = fun->get_func_ufun();
    if (ufun == 0)
       {
         CERR << "symbol " << fun_name_ucs
@@ -1489,7 +1547,7 @@ const UserFunction * ufun = fun->get_ufun1();
 
    return ufun;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Stop_Trace::reference(const std::vector<Function_Line> & lines, bool assigned)
 {
@@ -1500,7 +1558,7 @@ Value_P Z(lines.size(), LOC);
    if (assigned)   return Token(TOK_APL_VALUE2, Z);
    else            return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Stop_Trace::assign(UserFunction * ufun, const Value & new_value, bool stop)
 {
@@ -1509,14 +1567,14 @@ std::vector<Function_Line> lines;
 
    loop(l, new_value.element_count())
       {
-         APL_Integer line = new_value.get_ravel(l).get_near_int();
+         APL_Integer line = new_value.get_cravel(l).get_near_int();
          if (line < 1)   continue;
          lines.push_back(Function_Line(line));
       }
 
    ufun->set_trace_stop(lines, stop);
 }
-//=============================================================================
+//============================================================================
 Token
 Quad_STOP::eval_AB(Value_P A, Value_P B) const
 {
@@ -1540,7 +1598,7 @@ const UserFunction * ufun = locate_fun(*A);
    assign(const_cast<UserFunction *>(ufun), *A, true);
    return reference(ufun->get_stop_lines(), true);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_STOP::eval_B(Value_P B) const
 {
@@ -1549,7 +1607,7 @@ const UserFunction * ufun = locate_fun(*B);
 
    return reference(ufun->get_stop_lines(), false);
 }
-//=============================================================================
+//============================================================================
 Token
 Quad_TRACE::eval_AB(Value_P A, Value_P B) const
 {
@@ -1573,7 +1631,7 @@ const UserFunction * ufun = locate_fun(*A);
    assign(const_cast<UserFunction *>(ufun), *A, false);
    return reference(ufun->get_trace_lines(), true);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_TRACE::eval_B(Value_P B) const
 {
@@ -1582,5 +1640,5 @@ const UserFunction * ufun = locate_fun(*B);
 
    return reference(ufun->get_trace_lines(), false);
 }
-//=============================================================================
+//============================================================================
 

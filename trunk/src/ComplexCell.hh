@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -24,25 +24,31 @@
 #include "NumericCell.hh"
 #include "IntCell.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
  A cell containing a single APL complex value. This class essentially
  overloads certain functions in class Cell with complex number specific
  implementations.
  */
-/// A celkl containing one complex numbver
+/// A cell containing one complex number
 class ComplexCell : public NumericCell
 {
+   friend class IntCell;       // for zC()
+   friend class FloatCell;     // for zC()
+   friend class NumericCell;   // for zC()
+   friend class RealCell;      // for zC()
+   friend class Value;         // for zC()
+
 public:
    /// Construct an complex number cell from a complex number
    ComplexCell(APL_Complex c);
 
+   /// Construct an complex number cell from real part \b r and imag part \b i.
+   ComplexCell(APL_Float r, APL_Float i);
+
    /// overloaded Cell::init_other
    virtual void init_other(void * other, Value & cell_owner, const char * loc)
       const { new (other)   ComplexCell(value.cval[0], value.cval[1]); }
-
-   /// Construct an complex number cell from real part \b r and imag part \b i.
-   ComplexCell(APL_Float r, APL_Float i);
 
    /// overloaded Cell::is_complex_cell().
    virtual bool is_complex_cell() const   { return true; }
@@ -155,25 +161,25 @@ public:
    static APL_Float mag2(APL_Complex A)
       { return A.real() * A.real() + A.imag() * A.imag(); }
 
-   /// initialize Z to real r
-   static ErrorCode zv(Cell * Z, APL_Float r)
-      { new (Z) ComplexCell(r, 0.0);   return E_NO_ERROR; }
-
-   /// initialize Z to complex r + ij
-   static ErrorCode zv(Cell * Z, APL_Float r, APL_Float j)
-      { new (Z) ComplexCell(r, j);   return E_NO_ERROR; }
-
-   /// initialize Z to APL_Complex v
-   static ErrorCode zv(Cell * Z, APL_Complex v)
-      { new (Z) ComplexCell(v.real(), v.imag());   return E_NO_ERROR; }
-
    /// the lanczos approximation for gamma(x + iy)
    static APL_Complex gamma(APL_Float x, const APL_Float & y);
 
    /// compute circle function \b fun
    static ErrorCode do_bif_circle_fun(Cell * Z, int fun, APL_Complex b);
 
+#ifndef __LIBAPL__
+ protected:   // public: in libapl.cc
+#endif // __LIBAPL__
+
+   /// initialize the (un-initialized) Cell *Z to complex r + ij
+   static ErrorCode zC(Cell * Z, APL_Float r, APL_Float j)
+      { new (Z) ComplexCell(r, j);   return E_NO_ERROR; }
+
 protected:
+   /// initialize the (un-initialized) Cell *Z to complex cpx
+   static ErrorCode zC(Cell * Z, APL_Complex cpx)
+      { new (Z) ComplexCell(cpx);   return E_NO_ERROR; }
+
    /// return the complex value of \b this cell
    APL_Complex cval() const
       { return APL_Complex(value.cval[0], value.cval[1]); }
@@ -238,12 +244,9 @@ protected:
    virtual const char * get_classname() const   { return "ComplexCell"; }
 
    /// overloaded Cell::CDR_size()
-   virtual int CDR_size() const { return 16; }
-
-   /// overloaded Cell::to_type()
-   virtual void to_type()
-      { new(this)   IntCell(0); }
+   virtual int CDR_size() const
+      { return 16; }
 };
-//=============================================================================
+//============================================================================
 
 #endif // __COMPLEXCELL_HH_DEFINED__

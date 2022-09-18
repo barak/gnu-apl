@@ -1,4 +1,5 @@
 <map id="LineInput" name="LineInput">
-<area shape="rect" id="node2" href="$classLineHistory.html" title="the lines that the user has previously entered " alt="" coords="49,179,137,206"/>
-<area shape="rect" id="node3" href="$classUCS__string__vector.html" title="a vector of UCS_strings. " alt="" coords="27,81,160,108"/>
+<area shape="rect" id="node2" href="$classLineHistory.html" title="the lines that the user has previously entered " alt="" coords="114,194,202,221"/>
+<area shape="rect" id="node3" href="$classUCS__string.html" title="A string of Unicode characters (32&#45;bit) " alt="" coords="39,96,130,123"/>
+<area shape="rect" id="node5" href="$classUCS__string__vector.html" title="a vector of UCS_strings. " alt="" coords="174,96,307,123"/>
 </map>

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -24,63 +24,70 @@
 #include "Value.hh"
 #include "Workspace.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 IndexExpr::IndexExpr(Assign_state astate, const char * loc)
    : DynamicObject(loc),
      quad_io(Workspace::get_IO()),
      rank(0),
+     value_count(0),
      assign_state(astate)
 {
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 IndexExpr::~IndexExpr()
 {
-// Q1(this)
-// BACKTRACE
+   if (value_count)
+      {
+        loop(r, rank)   if (+values[r])   values[r].reset();
+      }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
-IndexExpr::extract_value(uAxis rk)
+IndexExpr::extract_axis()
 {
-   Assert1(rk < rank);
+   if (rank == 0 || !values[0])    return Value_P();   // no index or [ ]
 
-Value_P ret = values[rk];
-   ptr_clear(values[rk], LOC);
-
+   Assert1(rank == 1);   // must only be called for [ axis ]
+   --value_count;
+Value_P ret = values[0];
+   values[0].reset();   // decrement owner count
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
-IndexExpr::extract_all()
+IndexExpr::check_index_range(const Shape & shape) const
 {
    loop(r, rank)
       {
-        Value_P val = extract_value(r);
-      }
-}
-//-----------------------------------------------------------------------------
-bool
-IndexExpr::check_range(const Shape & shape) const
-{
-   loop(r, rank)
-      {
-        Value_P ival = values[rank - r - 1];
-        if (!ival)   continue;   // elided index
-
-        const ShapeItem max_idx = shape.get_shape_item(r) + quad_io;
-        loop(i, ival->element_count())
+        if (const Value * ival = get_axis_value(r))   // unless elided index
            {
-             const APL_Integer idx = ival->get_ravel(i).get_near_int();
-             if (idx < quad_io)    return true;
-             if (idx >= max_idx)   return true;
+             const ShapeItem max_idx = shape.get_shape_item(r) + quad_io;
+             loop(i, ival->element_count())
+                {
+                  const APL_Integer idx = ival->get_cravel(i).get_near_int();
+                  if (idx < quad_io || idx >= max_idx)   // invalid index
+                     {
+                       UCS_string & ucs = MORE_ERROR();
+                       ucs << "Offending index: " << idx
+                           << " (with ⎕IO: " << quad_io << ")\n"
+                           << "offending axis:  " << (r + quad_io)
+                           << " of some";
+                       loop(s, shape.get_rank())
+                           ucs << " " << shape.get_shape_item(s);
+                       ucs << "⍴...";
+                       if (idx >= max_idx)
+                          ucs << "\nthe max index for axis "
+                              << (r + quad_io)<< " is: "
+                              << (max_idx - quad_io);
+                       INDEX_ERROR;
+                     }
+                }
            }
       }
-
-   return false;   // OK
 }
-//-----------------------------------------------------------------------------
-Rank
-IndexExpr::get_axis(Rank max_axis) const
+//----------------------------------------------------------------------------
+sRank
+IndexExpr::get_axis(sRank max_axis) const
 {
    if (rank != 1)   INDEX_ERROR;
 
@@ -89,46 +96,17 @@ const APL_Integer qio = Workspace::get_IO();
 Value_P I = values[0];
    if (!I->is_scalar_or_len1_vector())     INDEX_ERROR;
 
-   if (!I->get_ravel(0).is_near_int())   INDEX_ERROR;
+   if (!I->get_cfirst().is_near_int())   INDEX_ERROR;
 
    // if axis becomes (signed) negative then it will be (unsigned) too big.
    // Therefore we need not test for < 0.
    //
-Rank axis = I->get_ravel(0).get_near_int() - qio;
+sRank axis = I->get_cfirst().get_near_int() - qio;
    if (axis >= max_axis)   INDEX_ERROR;
 
    return axis;
 }
-//-----------------------------------------------------------------------------
-void
-IndexExpr::set_value(uAxis axis, Value_P val)
-{
-   // Note: we expect that all axes have been allocated with add(0)
-   // Note also that IndexExpr is in parsing order, ie. 0 is the lowest axis.
-   //
-   Assert(axis < rank);
-   Assert(!values[rank - axis - 1]);
-   values[rank - axis - 1] = val;
-}
-//-----------------------------------------------------------------------------
-Shape
-IndexExpr::to_shape() const
-{
-   if (value_count() != 1)   INDEX_ERROR;
-
-Value_P vx = values[0];
-   if (!vx)                  INDEX_ERROR;
-
-const ShapeItem xlen = vx->element_count();
-const APL_Integer qio = Workspace::get_IO();
- 
-Shape shape;
-     loop(x, xlen)
-        shape.add_shape_item(vx->get_ravel(x).get_near_int() - qio);
-
-   return shape;
-}
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 IndexExpr::print_stale(ostream & out)
 {
@@ -151,7 +129,7 @@ int count = 0;
 
    return count;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 IndexExpr::erase_stale(const char * loc)
 {
@@ -174,25 +152,25 @@ IndexExpr::erase_stale(const char * loc)
          delete idx;
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ostream &
 operator <<(ostream & out, const IndexExpr & idx)
 {
    out << "[";
-   loop(i, idx.value_count())
+   loop(i, idx.get_rank())
       {
         if (i)   out << ";";
-        if (+idx.values[i])
+        if (const Value * ival = idx.get_axis_value(i))
            {
-             // value::print() may print a trailing LF that we dont want here.
-             //
+             // value::print() may print a trailing LF that we don't want here.
+             // We therefore print the index values ourselves.
              const PrintContext pctx = Workspace::get_PrintContext(PR_APL_MIN);
-             PrintBuffer pb(*idx.values[i], pctx, 0);
+             PrintBuffer pb(*ival, pctx, 0);
 
-             UCS_string ucs(pb, idx.values[i]->get_rank(), Workspace::get_PW());
+             UCS_string ucs(pb, ival->get_rank(), Workspace::get_PW());
              out << ucs;
            }
       }
    return out << "]";
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------

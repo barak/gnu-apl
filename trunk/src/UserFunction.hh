@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@
 #include "UserFunction_header.hh"
 #include "UTF8_string.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// One user-defined function
 class UserFunction : public Function, public Executable
 {
@@ -55,20 +55,16 @@ public:
    virtual int get_macnum() const
       { return -1; }
 
-   /// overloaded Executable::get_ufun()
-   virtual const UserFunction * get_ufun() const
+   /// overloaded Executable::get_exec_ufun()
+   virtual const UserFunction * get_exec_ufun() const
       { return this; }
 
-   /// overloaded Function::get_ufun1()
-   virtual UserFunction * get_ufun1()
+   /// overloaded Function::get_func_ufun()
+   virtual const UserFunction * get_func_ufun() const
    { return this; }
 
-   /// overloaded Function::get_ufun1()
-   virtual const UserFunction * get_ufun1() const
-   { return this; }
-
-   /// overloaded Executable::get_ufun()
-   virtual UserFunction * get_ufun()
+   /// overloaded Executable::get_exec_ufun()
+   virtual UserFunction * get_exec_ufun()
    { return this; }
 
    /// overloaded Function::get_fun_valence()
@@ -220,7 +216,8 @@ public:
    virtual Token eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const;
 
    /// Overloaded Function::eval_ALRXB()
-   virtual Token eval_ALRXB(Value_P A, Token & LO, Token & RO, Value_P X, Value_P B) const;
+   virtual Token eval_ALRXB(Value_P A, Token & LO, Token & RO, Value_P X,
+                            Value_P B) const;
 
    /// Quad_CR of this function
    virtual UCS_string canonical(bool with_lines) const;
@@ -337,6 +334,6 @@ protected:
    /// information about an error (if any)
    const char * error_info;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __USERFUNCTION_HH_DEFINED__

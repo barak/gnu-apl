@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 
 #include "PrimitiveOperator.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** Primitive operator reduce (common part for all reducr variants)
  */
 /// Base class for / and ⌿
@@ -34,11 +34,14 @@ public:
    Bif_REDUCE(TokenTag tag) : PrimitiveOperator(tag) {}
 
    /// common implementation of reduce() and reduce_n_wise.
-   static Token do_reduce(const Shape & shape_Z, const Shape3 & Z3, ShapeItem a,
-                          Function_P LO, Value_P B, ShapeItem bm);
+   static Token do_reduce(const Shape & shape_Z, const Shape3 & Z3,
+                          ShapeItem a, Function_P LO, Value_P B, ShapeItem bm);
 
    bool has_result() const
       { return true; }
+
+   /// LO-reduce B along axis.
+   static Token reduce(Token & LO, Value_P B, uAxis axis);
 
 protected:
    /// overloaded Function::may_push_SI()
@@ -48,14 +51,11 @@ protected:
    /// Replicate B according to A along axis.
    static Token replicate(Value_P A, Value_P B, uAxis axis);
 
-   /// LO-reduce B along axis.
-   Token reduce(Token & LO, Value_P B, uAxis axis) const;
-
    /// LO-reduce B n-wise along axis.
    Token reduce_n_wise(Value_P A, Token & LO, Value_P B, uAxis axis) const;
 
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** Primitive operator reduce along last axis.
  */
 /// The class implementing /
@@ -91,7 +91,7 @@ public:
 
 protected:
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** Primitive operator reduce along first axis.
  */
 /// The class implementing ⌿
@@ -127,6 +127,6 @@ public:
 
 protected:
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __BIF_OPER1_REDUCE_HH_DEFINED__

@@ -18,17 +18,17 @@
 <area shape="rect" id="node21" href="$classBif__F2__EQUAL__B.html" title="The class implementing ⊤=. " alt="" coords="609,816,737,843"/>
 <area shape="rect" id="node22" href="$classBif__F2__FIND.html" title="The class implementing ⋸ " alt="" coords="623,867,722,893"/>
 <area shape="rect" id="node23" href="$classBif__F2__GREATER.html" title="The class implementing &gt; " alt="" coords="607,917,739,944"/>
-<area shape="rect" id="node24" href="$classBif__F2__LEQ.html" title="The class implementing ≤ " alt="" coords="626,968,719,995"/>
+<area shape="rect" id="node24" href="$classBif__F2__LEQU.html" title="The class implementing ≤ " alt="" coords="621,968,724,995"/>
 <area shape="rect" id="node25" href="$classBif__F2__LESS.html" title="The class implementing &lt;. " alt="" coords="622,1019,723,1045"/>
-<area shape="rect" id="node26" href="$classBif__F2__MEQ.html" title="The class implementing ≥ " alt="" coords="624,1069,721,1096"/>
+<area shape="rect" id="node26" href="$classBif__F2__MEQU.html" title="The class implementing ≥ " alt="" coords="619,1069,726,1096"/>
 <area shape="rect" id="node27" href="$classBif__F2__NAND.html" title="The class implementing ⍲ " alt="" coords="619,1120,726,1147"/>
 <area shape="rect" id="node28" href="$classBif__F2__NAND__B.html" title="The class implementing ⊤⍲ " alt="" coords="611,1171,734,1197"/>
 <area shape="rect" id="node29" href="$classBif__F2__NOR.html" title="The class implementing ⍱ " alt="" coords="624,1221,721,1248"/>
 <area shape="rect" id="node30" href="$classBif__F2__NOR__B.html" title="The class implementing ⊤⍱ " alt="" coords="616,1272,729,1299"/>
 <area shape="rect" id="node31" href="$classBif__F2__OR.html" title="The class implementing ∨ " alt="" coords="629,1323,716,1349"/>
 <area shape="rect" id="node32" href="$classBif__F2__OR__B.html" title="The class implementing ⊤∨ " alt="" coords="621,1373,724,1400"/>
-<area shape="rect" id="node33" href="$classBif__F2__UNEQ.html" title="The class implementing ≠ " alt="" coords="619,1424,726,1451"/>
-<area shape="rect" id="node34" href="$classBif__F2__UNEQ__B.html" title="The class implementing ⊤≠ " alt="" coords="611,1475,734,1501"/>
+<area shape="rect" id="node33" href="$classBif__F2__UNEQ__B.html" title="The class implementing ⊤≠ " alt="" coords="611,1424,734,1451"/>
+<area shape="rect" id="node34" href="$classBif__F2__UNEQU.html" title="The class implementing ≠ " alt="" coords="615,1475,731,1501"/>
 <area shape="rect" id="node2" href="$classPrimitiveFunction.html" title="Base class for all internal functions of the interpreter. " alt="" coords="276,740,399,767"/>
 <area shape="rect" id="node3" href="$classFunction.html" title="Base class for all APL functions and operators (system or defined) " alt="" coords="156,740,228,767"/>
 <area shape="rect" id="node4" href="$classNamedObject.html" title="A user&#45;defined variable or function. " alt="" coords="5,740,108,767"/>

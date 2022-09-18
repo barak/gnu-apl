@@ -1,7 +1,8 @@
 var classMacro =
 [
     [ "Macro_num", "classMacro.html#afaaea363cb2b900ee4bb374994285141", [
-      [ "MAC_COUNT", "classMacro.html#afaaea363cb2b900ee4bb374994285141aa6ad077dccf84c92d7d265b54eaf8eed", null ]
+      [ "MAC_COUNT", "classMacro.html#afaaea363cb2b900ee4bb374994285141aa6ad077dccf84c92d7d265b54eaf8eed", null ],
+      [ "MAC_NONE", "classMacro.html#afaaea363cb2b900ee4bb374994285141aae38939243715b2fb2bd15e9a120308c", null ]
     ] ],
     [ "Macro", "classMacro.html#a843d0c6a6ec805ac60ff776b61a14c57", null ],
     [ "~Macro", "classMacro.html#a6eddef59854716ba31bc261f40fdf492", null ],

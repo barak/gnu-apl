@@ -70,7 +70,7 @@ $(document).ready(function(){initNavTree('structUserPreferences.html','');});
 </div><!--header-->
 <div class="contents">
 
-<p>Various preferences of the user.  
+<p>Various preferences of the user (sorted alphabetically)  
  <a href="structUserPreferences.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="UserPreferences_8hh_source.html">UserPreferences.hh</a>&gt;</code></p>
@@ -138,10 +138,6 @@ std::vector&lt; const char * &gt;&#160;</td><td class="memItemRight" valign="bot
 std::vector&lt; const char * &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structUserPreferences.html#a6b68c6f4c6b987dc3c901afca0da5be7">expanded_argv</a></td></tr>
 <tr class="memdesc:a6b68c6f4c6b987dc3c901afca0da5be7"><td class="mdescLeft">&#160;</td><td class="mdescRight">argv/argc after expand_argv <br /></td></tr>
 <tr class="separator:a6b68c6f4c6b987dc3c901afca0da5be7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac86f3d6c74cc87a5f06c41f01b3dba6d"><td class="memItemLeft" align="right" valign="top"><a id="ac86f3d6c74cc87a5f06c41f01b3dba6d"></a>
-timeval&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structUserPreferences.html#ac86f3d6c74cc87a5f06c41f01b3dba6d">session_start</a></td></tr>
-<tr class="memdesc:ac86f3d6c74cc87a5f06c41f01b3dba6d"><td class="mdescLeft">&#160;</td><td class="mdescRight">when apl was started <br /></td></tr>
-<tr class="separator:ac86f3d6c74cc87a5f06c41f01b3dba6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a05fa2d046fbc312bbd67dc61f9a9fa30"><td class="memItemLeft" align="right" valign="top"><a id="a05fa2d046fbc312bbd67dc61f9a9fa30"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structUserPreferences.html#a05fa2d046fbc312bbd67dc61f9a9fa30">append_summary</a></td></tr>
 <tr class="memdesc:a05fa2d046fbc312bbd67dc61f9a9fa30"><td class="mdescLeft">&#160;</td><td class="mdescRight">append test results to summary.log rather than overriding it <br /></td></tr>
@@ -166,17 +162,33 @@ int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struc
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structUserPreferences.html#a9480894c3719ae23ac76ff3ae7b65271">daemon</a></td></tr>
 <tr class="memdesc:a9480894c3719ae23ac76ff3ae7b65271"><td class="mdescLeft">&#160;</td><td class="mdescRight">run as deamon <br /></td></tr>
 <tr class="separator:a9480894c3719ae23ac76ff3ae7b65271"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af31ba5b2e0c4316bcf1795a66a47b6a5"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structUserPreferences.html#af31ba5b2e0c4316bcf1795a66a47b6a5">disable_Quad_SQL</a></td></tr>
-<tr class="memdesc:af31ba5b2e0c4316bcf1795a66a47b6a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">disable ⎕SQL  <a href="#af31ba5b2e0c4316bcf1795a66a47b6a5">More...</a><br /></td></tr>
-<tr class="separator:af31ba5b2e0c4316bcf1795a66a47b6a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afbe387160a9212cbb20a981e89714c3b"><td class="memItemLeft" align="right" valign="top"><a id="afbe387160a9212cbb20a981e89714c3b"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structUserPreferences.html#afbe387160a9212cbb20a981e89714c3b">discard_indentation</a></td></tr>
+<tr class="memdesc:afbe387160a9212cbb20a981e89714c3b"><td class="mdescLeft">&#160;</td><td class="mdescRight">true if leading spaces in the ∇-editor shall be dropped <br /></td></tr>
+<tr class="separator:afbe387160a9212cbb20a981e89714c3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2a03c00669b5df3b9bc1fe00a02c5065"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structUserPreferences.html#a2a03c00669b5df3b9bc1fe00a02c5065">disable_native_functions</a></td></tr>
+<tr class="memdesc:a2a03c00669b5df3b9bc1fe00a02c5065"><td class="mdescLeft">&#160;</td><td class="mdescRight">disable dyadic ⎕FX  <a href="#a2a03c00669b5df3b9bc1fe00a02c5065">More...</a><br /></td></tr>
+<tr class="separator:a2a03c00669b5df3b9bc1fe00a02c5065"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a85057e9a0940944b3e4cff6d3ed6a175"><td class="memItemLeft" align="right" valign="top"><a id="a85057e9a0940944b3e4cff6d3ed6a175"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structUserPreferences.html#a85057e9a0940944b3e4cff6d3ed6a175">disable_Quad_FIO</a></td></tr>
 <tr class="memdesc:a85057e9a0940944b3e4cff6d3ed6a175"><td class="mdescLeft">&#160;</td><td class="mdescRight">disable ⎕FIO <br /></td></tr>
 <tr class="separator:a85057e9a0940944b3e4cff6d3ed6a175"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2a03c00669b5df3b9bc1fe00a02c5065"><td class="memItemLeft" align="right" valign="top"><a id="a2a03c00669b5df3b9bc1fe00a02c5065"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structUserPreferences.html#a2a03c00669b5df3b9bc1fe00a02c5065">disable_native_functions</a></td></tr>
-<tr class="memdesc:a2a03c00669b5df3b9bc1fe00a02c5065"><td class="mdescLeft">&#160;</td><td class="mdescRight">disable dyadic ⎕FX <br /></td></tr>
-<tr class="separator:a2a03c00669b5df3b9bc1fe00a02c5065"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab9fad09b9fa3b1d1635be6e28f121cbe"><td class="memItemLeft" align="right" valign="top"><a id="ab9fad09b9fa3b1d1635be6e28f121cbe"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structUserPreferences.html#ab9fad09b9fa3b1d1635be6e28f121cbe">disable_Quad_GTK</a></td></tr>
+<tr class="memdesc:ab9fad09b9fa3b1d1635be6e28f121cbe"><td class="mdescLeft">&#160;</td><td class="mdescRight">disable ⎕GTK <br /></td></tr>
+<tr class="separator:ab9fad09b9fa3b1d1635be6e28f121cbe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acb278c010211ba27270043fa53a75a12"><td class="memItemLeft" align="right" valign="top"><a id="acb278c010211ba27270043fa53a75a12"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structUserPreferences.html#acb278c010211ba27270043fa53a75a12">disable_Quad_PLOT</a></td></tr>
+<tr class="memdesc:acb278c010211ba27270043fa53a75a12"><td class="mdescLeft">&#160;</td><td class="mdescRight">disable ⎕PLOT <br /></td></tr>
+<tr class="separator:acb278c010211ba27270043fa53a75a12"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af31ba5b2e0c4316bcf1795a66a47b6a5"><td class="memItemLeft" align="right" valign="top"><a id="af31ba5b2e0c4316bcf1795a66a47b6a5"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structUserPreferences.html#af31ba5b2e0c4316bcf1795a66a47b6a5">disable_Quad_SQL</a></td></tr>
+<tr class="memdesc:af31ba5b2e0c4316bcf1795a66a47b6a5"><td class="mdescLeft">&#160;</td><td class="mdescRight">disable ⎕SQL <br /></td></tr>
+<tr class="separator:af31ba5b2e0c4316bcf1795a66a47b6a5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a12375929629d0e11e8c5f65f9616bfde"><td class="memItemLeft" align="right" valign="top"><a id="a12375929629d0e11e8c5f65f9616bfde"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structUserPreferences.html#a12375929629d0e11e8c5f65f9616bfde">disable_SAVE_command</a></td></tr>
+<tr class="memdesc:a12375929629d0e11e8c5f65f9616bfde"><td class="mdescLeft">&#160;</td><td class="mdescRight">disable )SAVE and )DUMP cimmands <br /></td></tr>
+<tr class="separator:a12375929629d0e11e8c5f65f9616bfde"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a07985392a5effd2e4817c78805da3829"><td class="memItemLeft" align="right" valign="top"><a id="a07985392a5effd2e4817c78805da3829"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structUserPreferences.html#a07985392a5effd2e4817c78805da3829">do_CONT</a></td></tr>
 <tr class="memdesc:a07985392a5effd2e4817c78805da3829"><td class="mdescLeft">&#160;</td><td class="mdescRight">load workspace CONTINUE on start-up <br /></td></tr>
@@ -213,18 +225,26 @@ int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struc
 <a class="el" href="classUTF8__string.html">UTF8_string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structUserPreferences.html#a301864dff4fe6e18b6faa3ab8064ff9c">initial_workspace</a></td></tr>
 <tr class="memdesc:a301864dff4fe6e18b6faa3ab8064ff9c"><td class="mdescLeft">&#160;</td><td class="mdescRight">a workspace to be loaded at startup <br /></td></tr>
 <tr class="separator:a301864dff4fe6e18b6faa3ab8064ff9c"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a15f7ff7ac8f7750c3f45438fd4924d25"><td class="memItemLeft" align="right" valign="top"><a id="a15f7ff7ac8f7750c3f45438fd4924d25"></a>
-int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structUserPreferences.html#a15f7ff7ac8f7750c3f45438fd4924d25">line_history_len</a></td></tr>
-<tr class="memdesc:a15f7ff7ac8f7750c3f45438fd4924d25"><td class="mdescLeft">&#160;</td><td class="mdescRight">number of lines in the input line history <br /></td></tr>
-<tr class="separator:a15f7ff7ac8f7750c3f45438fd4924d25"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8e62b1ab27db8d7090224d729ede5252"><td class="memItemLeft" align="right" valign="top"><a id="a8e62b1ab27db8d7090224d729ede5252"></a>
 <a class="el" href="classUTF8__string.html">UTF8_string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structUserPreferences.html#a8e62b1ab27db8d7090224d729ede5252">latent_expression</a></td></tr>
 <tr class="memdesc:a8e62b1ab27db8d7090224d729ede5252"><td class="mdescLeft">&#160;</td><td class="mdescRight">something to be executed at startup (&ndash;LX) <br /></td></tr>
 <tr class="separator:a8e62b1ab27db8d7090224d729ede5252"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a15f7ff7ac8f7750c3f45438fd4924d25"><td class="memItemLeft" align="right" valign="top"><a id="a15f7ff7ac8f7750c3f45438fd4924d25"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structUserPreferences.html#a15f7ff7ac8f7750c3f45438fd4924d25">line_history_len</a></td></tr>
+<tr class="memdesc:a15f7ff7ac8f7750c3f45438fd4924d25"><td class="mdescLeft">&#160;</td><td class="mdescRight">number of lines in the input line history <br /></td></tr>
+<tr class="separator:a15f7ff7ac8f7750c3f45438fd4924d25"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a058b17d5427be7ae69a8ae91b7ee597a"><td class="memItemLeft" align="right" valign="top"><a id="a058b17d5427be7ae69a8ae91b7ee597a"></a>
+<a class="el" href="classUTF8__string.html">UTF8_string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structUserPreferences.html#a058b17d5427be7ae69a8ae91b7ee597a">keyboard_layout_file</a></td></tr>
+<tr class="memdesc:a058b17d5427be7ae69a8ae91b7ee597a"><td class="mdescLeft">&#160;</td><td class="mdescRight">name of a user-provided keyboard layout file <br /></td></tr>
+<tr class="separator:a058b17d5427be7ae69a8ae91b7ee597a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa9fafc78cb41a4980b8975fae537ef38"><td class="memItemLeft" align="right" valign="top"><a id="aa9fafc78cb41a4980b8975fae537ef38"></a>
 <a class="el" href="classUTF8__string.html">UTF8_string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structUserPreferences.html#aa9fafc78cb41a4980b8975fae537ef38">line_history_path</a></td></tr>
 <tr class="memdesc:aa9fafc78cb41a4980b8975fae537ef38"><td class="mdescLeft">&#160;</td><td class="mdescRight">location of the input line history <br /></td></tr>
 <tr class="separator:aa9fafc78cb41a4980b8975fae537ef38"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a050b520f2b80a84ac769c6de0da48e06"><td class="memItemLeft" align="right" valign="top"><a id="a050b520f2b80a84ac769c6de0da48e06"></a>
+const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structUserPreferences.html#a050b520f2b80a84ac769c6de0da48e06">mem_arg</a></td></tr>
+<tr class="memdesc:a050b520f2b80a84ac769c6de0da48e06"><td class="mdescLeft">&#160;</td><td class="mdescRight">argument of &ndash;mem (if any: 0 if not given, "" if given but empty) <br /></td></tr>
+<tr class="separator:a050b520f2b80a84ac769c6de0da48e06"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a3a9aa07ee8670752d1143065385f33f4"><td class="memItemLeft" align="right" valign="top"><a id="a3a9aa07ee8670752d1143065385f33f4"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structUserPreferences.html#a3a9aa07ee8670752d1143065385f33f4">multi_line_strings</a></td></tr>
 <tr class="memdesc:a3a9aa07ee8670752d1143065385f33f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">true if old-style multi-line strings are allowed (in ∇-defined functions) <br /></td></tr>
@@ -237,6 +257,10 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stru
 int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structUserPreferences.html#addcf34a0844c72074a1ca8959272df04">nabla_to_history</a></td></tr>
 <tr class="memdesc:addcf34a0844c72074a1ca8959272df04"><td class="mdescLeft">&#160;</td><td class="mdescRight">when function body shall go into the history <br /></td></tr>
 <tr class="separator:addcf34a0844c72074a1ca8959272df04"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a87752649d33d8606c938541c8a86afd9"><td class="memItemLeft" align="right" valign="top"><a id="a87752649d33d8606c938541c8a86afd9"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structUserPreferences.html#a87752649d33d8606c938541c8a86afd9">output_to_cout</a></td></tr>
+<tr class="memdesc:a87752649d33d8606c938541c8a86afd9"><td class="mdescLeft">&#160;</td><td class="mdescRight">true if output shall go to cout, otherwise to cerr <br /></td></tr>
+<tr class="separator:a87752649d33d8606c938541c8a86afd9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0bdf523a6b1d5be5cc8395e5e604029d"><td class="memItemLeft" align="right" valign="top"><a id="a0bdf523a6b1d5be5cc8395e5e604029d"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structUserPreferences.html#a0bdf523a6b1d5be5cc8395e5e604029d">randomize_testfiles</a></td></tr>
 <tr class="memdesc:a0bdf523a6b1d5be5cc8395e5e604029d"><td class="mdescLeft">&#160;</td><td class="mdescRight">randomize the order of testfiles <br /></td></tr>
@@ -265,6 +289,10 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stru
 size_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structUserPreferences.html#a40299ebab228da7d31878bcb2743ce35">script_argc</a></td></tr>
 <tr class="memdesc:a40299ebab228da7d31878bcb2743ce35"><td class="mdescLeft">&#160;</td><td class="mdescRight">the argument number of the APL script name (if run from a script) in expanded_argv, or 0 if apl is started directly. <br /></td></tr>
 <tr class="separator:a40299ebab228da7d31878bcb2743ce35"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac86f3d6c74cc87a5f06c41f01b3dba6d"><td class="memItemLeft" align="right" valign="top"><a id="ac86f3d6c74cc87a5f06c41f01b3dba6d"></a>
+timeval&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structUserPreferences.html#ac86f3d6c74cc87a5f06c41f01b3dba6d">session_start</a></td></tr>
+<tr class="memdesc:ac86f3d6c74cc87a5f06c41f01b3dba6d"><td class="mdescLeft">&#160;</td><td class="mdescRight">when apl was started <br /></td></tr>
+<tr class="separator:ac86f3d6c74cc87a5f06c41f01b3dba6d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab953f017038113a7b004f2487f2852f2"><td class="memItemLeft" align="right" valign="top"><a id="ab953f017038113a7b004f2487f2852f2"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structUserPreferences.html#ab953f017038113a7b004f2487f2852f2">silent</a></td></tr>
 <tr class="memdesc:ab953f017038113a7b004f2487f2852f2"><td class="mdescLeft">&#160;</td><td class="mdescRight">true if no banner/Goodbye is wanted. <br /></td></tr>
@@ -273,6 +301,14 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="stru
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structUserPreferences.html#a0a3d82ac824463e8fb89e814638bbb26">system_do_svars</a></td></tr>
 <tr class="memdesc:a0a3d82ac824463e8fb89e814638bbb26"><td class="mdescLeft">&#160;</td><td class="mdescRight">true if shared variables are enabled by the system. This is initially the same as user_do_svars, but can become false if something goes wrong <br /></td></tr>
 <tr class="separator:a0a3d82ac824463e8fb89e814638bbb26"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7e8bcbf535b7cd8b623c6479b791cdb5"><td class="memItemLeft" align="right" valign="top"><a id="a7e8bcbf535b7cd8b623c6479b791cdb5"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structUserPreferences.html#a7e8bcbf535b7cd8b623c6479b791cdb5">tcp_port</a></td></tr>
+<tr class="memdesc:a7e8bcbf535b7cd8b623c6479b791cdb5"><td class="mdescLeft">&#160;</td><td class="mdescRight">TCP port to be used (instead of stdin/stderr) <br /></td></tr>
+<tr class="separator:a7e8bcbf535b7cd8b623c6479b791cdb5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adefbc35a77dfdda8edaf2360f0b11ef2"><td class="memItemLeft" align="right" valign="top"><a id="adefbc35a77dfdda8edaf2360f0b11ef2"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structUserPreferences.html#adefbc35a77dfdda8edaf2360f0b11ef2">tcp_websocket</a></td></tr>
+<tr class="memdesc:adefbc35a77dfdda8edaf2360f0b11ef2"><td class="mdescLeft">&#160;</td><td class="mdescRight">enable websocket protocol on the TCP port <br /></td></tr>
+<tr class="separator:adefbc35a77dfdda8edaf2360f0b11ef2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad6eb07fbdceecd363b830df6033fffc7"><td class="memItemLeft" align="right" valign="top"><a id="ad6eb07fbdceecd363b830df6033fffc7"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structUserPreferences.html#ad6eb07fbdceecd363b830df6033fffc7">user_do_svars</a></td></tr>
 <tr class="memdesc:ad6eb07fbdceecd363b830df6033fffc7"><td class="mdescLeft">&#160;</td><td class="mdescRight">true if shared variables are wanted by the user <br /></td></tr>
@@ -285,18 +321,10 @@ int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="struc
 int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structUserPreferences.html#accf077e3455428f633de752cb402f784">wait_ms</a></td></tr>
 <tr class="memdesc:accf077e3455428f633de752cb402f784"><td class="mdescLeft">&#160;</td><td class="mdescRight">wait at start-up <br /></td></tr>
 <tr class="separator:accf077e3455428f633de752cb402f784"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a058b17d5427be7ae69a8ae91b7ee597a"><td class="memItemLeft" align="right" valign="top"><a id="a058b17d5427be7ae69a8ae91b7ee597a"></a>
-<a class="el" href="classUTF8__string.html">UTF8_string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structUserPreferences.html#a058b17d5427be7ae69a8ae91b7ee597a">keyboard_layout_file</a></td></tr>
-<tr class="memdesc:a058b17d5427be7ae69a8ae91b7ee597a"><td class="mdescLeft">&#160;</td><td class="mdescRight">name of a user-provided keyboard layout file <br /></td></tr>
-<tr class="separator:a058b17d5427be7ae69a8ae91b7ee597a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afa30df42dba2de370822d65f51ffbb93"><td class="memItemLeft" align="right" valign="top"><a id="afa30df42dba2de370822d65f51ffbb93"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structUserPreferences.html#afa30df42dba2de370822d65f51ffbb93">WINCH_sets_pw</a></td></tr>
 <tr class="memdesc:afa30df42dba2de370822d65f51ffbb93"><td class="mdescLeft">&#160;</td><td class="mdescRight">true if the WINCH signal shall modify ⎕PW <br /></td></tr>
 <tr class="separator:afa30df42dba2de370822d65f51ffbb93"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:afbe387160a9212cbb20a981e89714c3b"><td class="memItemLeft" align="right" valign="top"><a id="afbe387160a9212cbb20a981e89714c3b"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structUserPreferences.html#afbe387160a9212cbb20a981e89714c3b">discard_indentation</a></td></tr>
-<tr class="memdesc:afbe387160a9212cbb20a981e89714c3b"><td class="mdescLeft">&#160;</td><td class="mdescRight">true if leading spaces in the ∇-editor shall be dropped <br /></td></tr>
-<tr class="separator:afbe387160a9212cbb20a981e89714c3b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
@@ -315,13 +343,13 @@ static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href
 static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structUserPreferences.html#ae0c29978a4d38c350777c4568a1b4dbe">is_APL_script</a> (const char *filename)</td></tr>
 <tr class="memdesc:ae0c29978a4d38c350777c4568a1b4dbe"><td class="mdescLeft">&#160;</td><td class="mdescRight">return true if file <b>filename</b> is an APL script (has execute permission and starts with #! <br /></td></tr>
 <tr class="separator:ae0c29978a4d38c350777c4568a1b4dbe"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acf0d68d78846f4a5482642646fd5fbb6"><td class="memItemLeft" align="right" valign="top"><a id="acf0d68d78846f4a5482642646fd5fbb6"></a>
-static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structUserPreferences.html#acf0d68d78846f4a5482642646fd5fbb6">set_threshold</a> (<a class="el" href="classFunction.html">Function</a> *fun, int padic, int macn, ShapeItem threshold)</td></tr>
-<tr class="memdesc:acf0d68d78846f4a5482642646fd5fbb6"><td class="mdescLeft">&#160;</td><td class="mdescRight">set the parallel threshold of function <b>fun</b> to <b>threshold</b> <br /></td></tr>
-<tr class="separator:acf0d68d78846f4a5482642646fd5fbb6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a54dae7558c6e045804479a0876f1d7a6"><td class="memItemLeft" align="right" valign="top"><a id="a54dae7558c6e045804479a0876f1d7a6"></a>
+static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structUserPreferences.html#a54dae7558c6e045804479a0876f1d7a6">set_threshold</a> (<a class="el" href="classFunction.html">Function_P</a> fun, int padic, int macn, ShapeItem threshold)</td></tr>
+<tr class="memdesc:a54dae7558c6e045804479a0876f1d7a6"><td class="mdescLeft">&#160;</td><td class="mdescRight">set the parallel threshold of function <b>fun</b> to <b>threshold</b> <br /></td></tr>
+<tr class="separator:a54dae7558c6e045804479a0876f1d7a6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>Various preferences of the user. </p>
+<div class="textblock"><p>Various preferences of the user (sorted alphabetically) </p>
 <p>a structure that contains user preferences from different sources (command line arguments, config files, environment variables ...) </p>
 
 <p class="definition">Definition at line <a class="el" href="UserPreferences_8hh_source.html#l00037">37</a> of file <a class="el" href="UserPreferences_8hh_source.html">UserPreferences.hh</a>.</p>
@@ -352,32 +380,33 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 
 <p class="definition">Definition at line <a class="el" href="UserPreferences_8hh_source.html#l00039">39</a> of file <a class="el" href="UserPreferences_8hh_source.html">UserPreferences.hh</a>.</p>
 
-<p class="reference">References <a class="el" href="UserPreferences_8hh_source.html#l00150">append_summary</a>, <a class="el" href="UserPreferences_8cc_source.html#l00767">expand_argv()</a>, <a class="el" href="UserPreferences_8hh_source.html#l00144">expanded_argv</a>, <a class="el" href="UserPreferences_8hh_source.html#l00119">is_default()</a>, <a class="el" href="UserPreferences_8hh_source.html#l00141">original_argv</a>, <a class="el" href="UserPreferences_8cc_source.html#l00188">parse_argv_1()</a>, <a class="el" href="UserPreferences_8cc_source.html#l00270">parse_argv_2()</a>, <a class="el" href="UserPreferences_8cc_source.html#l01028">read_config_file()</a>, <a class="el" href="UserPreferences_8cc_source.html#l01454">read_threshold_file()</a>, <a class="el" href="UserPreferences_8hh_source.html#l00147">session_start</a>, <a class="el" href="UserPreferences_8cc_source.html#l00872">show_configure_options()</a>, <a class="el" href="UserPreferences_8cc_source.html#l00133">show_GPL()</a>, <a class="el" href="UserPreferences_8cc_source.html#l00848">show_version()</a>, and <a class="el" href="UserPreferences_8cc_source.html#l00058">usage()</a>.</p>
+<p class="reference">References <a class="el" href="UserPreferences_8hh_source.html#l00151">append_summary</a>, <a class="el" href="UserPreferences_8hh_source.html#l00154">auto_OFF</a>, <a class="el" href="UserPreferences_8hh_source.html#l00157">backup_before_save</a>, <a class="el" href="UserPreferences_8hh_source.html#l00160">control_Ds_to_exit</a>, <a class="el" href="UserPreferences_8hh_source.html#l00148">expanded_argv</a>, <a class="el" href="UserPreferences_8hh_source.html#l00126">is_default()</a>, <a class="el" href="UserPreferences_8hh_source.html#l00145">original_argv</a>, <a class="el" href="UserPreferences_8cc_source.html#l00190">parse_argv_1()</a>, <a class="el" href="UserPreferences_8cc_source.html#l00276">parse_argv_2()</a>, <a class="el" href="UserPreferences_8cc_source.html#l01077">read_config_file()</a>, <a class="el" href="UserPreferences_8cc_source.html#l01502">read_threshold_file()</a>, <a class="el" href="UserPreferences_8hh_source.html#l00220">session_start</a>, <a class="el" href="UserPreferences_8cc_source.html#l00921">show_configure_options()</a>, <a class="el" href="UserPreferences_8cc_source.html#l00135">show_GPL()</a>, <a class="el" href="UserPreferences_8cc_source.html#l00897">show_version()</a>, and <a class="el" href="UserPreferences_8cc_source.html#l00053">usage()</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="structUserPreferences_aaf377cc53e470138ca91e289dd3f93a6_cgraph.png" border="0" usemap="#structUserPreferences_aaf377cc53e470138ca91e289dd3f93a6_cgraph" alt=""/></div>
 <map name="structUserPreferences_aaf377cc53e470138ca91e289dd3f93a6_cgraph" id="structUserPreferences_aaf377cc53e470138ca91e289dd3f93a6_cgraph">
-<area shape="rect" id="node2" href="structUserPreferences.html#a39abf091d48a0ddafa59606a28eec8a6" title="expand lumped arguments " alt="" coords="280,17,483,43"/>
-<area shape="rect" id="node4" href="structUserPreferences.html#ac5f1f1243bc9fc6f54d4b443f068cd12" title="return &quot; (default)&quot; if yes is true " alt="" coords="781,91,919,132"/>
-<area shape="rect" id="node5" href="structUserPreferences.html#a8402f25282c1dff4032a8c908e8e79dc" title="parse command line parameters (before reading preference files) " alt="" coords="301,509,461,551"/>
-<area shape="rect" id="node6" href="structUserPreferences.html#afbb29191d4c126b0f767f92eb427d568" title="parse command line parameters (after reading preference files) " alt="" coords="301,341,461,383"/>
-<area shape="rect" id="node7" href="structUserPreferences.html#a0705c74f0fd6b021d96c4806e32d7c4f" title="print how the interpreter was configured (via ./configure) and exit " alt="" coords="547,123,706,164"/>
-<area shape="rect" id="node8" href="structUserPreferences.html#ab6368a769817bd502b6392b4c8d4c0c3" title="show version information " alt="" coords="771,181,929,223"/>
-<area shape="rect" id="node10" href="structUserPreferences.html#a370b725a095b064384442a494370e3b7" title="print the GPL " alt="" coords="531,473,723,499"/>
-<area shape="rect" id="node11" href="structUserPreferences.html#ad180749ff1ec27951e2cfcf650f86ed6" title="print possible command line options and exit " alt="" coords="545,523,708,550"/>
-<area shape="rect" id="node16" href="structUserPreferences.html#a1831227aad6eb6d2fcd28e4d5d0067c3" title="read a preference file and update parameters set there " alt="" coords="305,640,458,681"/>
-<area shape="rect" id="node21" href="structUserPreferences.html#a4f9722b00cc04617ec48eedbedbc8610" title="read a parallel_thresholds file and update parameters set there " alt="" coords="305,575,458,616"/>
-<area shape="rect" id="node3" href="structUserPreferences.html#ae0c29978a4d38c350777c4568a1b4dbe" title="return true if file filename is an APL script (has execute permission and starts with #! ..." alt="" coords="557,5,696,47"/>
-<area shape="rect" id="node12" href="classWorkspace.html#ab055a0407dd155b6e3e3ec76118698e0" title="set the current ⎕PW " alt="" coords="555,422,698,449"/>
-<area shape="rect" id="node13" href="structInputFile.html#a68e5c221c42fd0ec4a924d297332fa4e" title="randomize the order of test_file_names " alt="" coords="557,356,697,397"/>
-<area shape="rect" id="node15" href="structInputFile.html#aa0fa0f6614abab32420064c7c3fcf4e7" title="the number of testcase (.tc) files " alt="" coords="561,291,692,332"/>
-<area shape="rect" id="node9" href="classOutput.html#a7f5a3baf917253208de9aae748cb121d" title="set the color mode (if colors_enabled). Outputs the escape sequence for mode when the color mode chan..." alt="" coords="977,189,1139,215"/>
-<area shape="rect" id="node14" href="classUTF8__string.html#af0f7724e5743d48d9e29776de5d53c71" title="return this string as a 0&#45;termionated C string " alt="" coords="785,363,915,390"/>
-<area shape="rect" id="node17" href="structUserPreferences.html#a07c2933cafe4e981cd07f03232a6b7b5" title="open a user&#45;supplied config file (in $HOME or gnu&#45;apl.d) " alt="" coords="549,575,705,616"/>
-<area shape="rect" id="node18" href="structUserPreferences.html#afd15a9f4cbd24930f47fe6a44eba0290" title="decode a byte in a preferences file. The byte can be given as ASCII name (currently only ESC is under..." alt="" coords="541,640,712,681"/>
-<area shape="rect" id="node19" href="classLibPaths.html#a6c671db38ef40ad989618b9138689573" title="set library path (from config file) " alt="" coords="557,706,697,733"/>
-<area shape="rect" id="node20" href="classUTF8__string.html#aabaebbdfbe8fad48e44655144f5fbd5e" title="append a 0&#45;terminated C string " alt="" coords="555,757,699,799"/>
+<area shape="rect" id="node2" href="structUserPreferences.html#ac5f1f1243bc9fc6f54d4b443f068cd12" title="return &quot; (default)&quot; if yes is true " alt="" coords="745,16,883,57"/>
+<area shape="rect" id="node3" href="structUserPreferences.html#a8402f25282c1dff4032a8c908e8e79dc" title="parse command line parameters (before reading preference files) " alt="" coords="280,376,440,417"/>
+<area shape="rect" id="node4" href="structUserPreferences.html#afbb29191d4c126b0f767f92eb427d568" title="parse command line parameters (after reading preference files) " alt="" coords="280,259,440,300"/>
+<area shape="rect" id="node5" href="structUserPreferences.html#a0705c74f0fd6b021d96c4806e32d7c4f" title="print how the interpreter was configured (via ./configure) and exit " alt="" coords="505,48,663,89"/>
+<area shape="rect" id="node6" href="structUserPreferences.html#ab6368a769817bd502b6392b4c8d4c0c3" title="show version information " alt="" coords="735,107,893,148"/>
+<area shape="rect" id="node8" href="structUserPreferences.html#a370b725a095b064384442a494370e3b7" title="print the GPL " alt="" coords="488,165,680,191"/>
+<area shape="rect" id="node9" href="structUserPreferences.html#ad180749ff1ec27951e2cfcf650f86ed6" title="print possible command line options and exit " alt="" coords="503,499,665,526"/>
+<area shape="rect" id="node17" href="structUserPreferences.html#a1831227aad6eb6d2fcd28e4d5d0067c3" title="read a preference file and update parameters set there " alt="" coords="283,609,437,651"/>
+<area shape="rect" id="node22" href="structUserPreferences.html#a4f9722b00cc04617ec48eedbedbc8610" title="read a parallel_thresholds file and update parameters set there " alt="" coords="283,492,437,533"/>
+<area shape="rect" id="node10" href="classQuad__WA.html#a87b2f0019d118f3e0c1e1bbfd9cb169b" title="parse a &#45;mem command line option " alt="" coords="505,317,663,343"/>
+<area shape="rect" id="node13" href="classWorkspace.html#ab055a0407dd155b6e3e3ec76118698e0" title="set the current ⎕PW " alt="" coords="513,266,655,293"/>
+<area shape="rect" id="node14" href="structInputFile.html#a68e5c221c42fd0ec4a924d297332fa4e" title="randomize the order of test_file_names " alt="" coords="514,433,654,475"/>
+<area shape="rect" id="node16" href="structInputFile.html#aa0fa0f6614abab32420064c7c3fcf4e7" title="the number of testcase (.tc) files " alt="" coords="519,368,649,409"/>
+<area shape="rect" id="node7" href="classOutput.html#a7f5a3baf917253208de9aae748cb121d" title="set the color mode (if colors_enabled). Outputs the escape sequence for mode when the color mode chan..." alt="" coords="948,114,1109,141"/>
+<area shape="rect" id="node11" href="classQuad__WA.html#a5e6486128134180c354cf092476397d1" title="read /proc/meminfo, return the number of items found " alt="" coords="728,342,900,369"/>
+<area shape="rect" id="node12" href="classQuad__WA.html#a17d405124006925906922422170d8354" title="read a (supposedly short) file in /proc " alt="" coords="732,291,896,318"/>
+<area shape="rect" id="node15" href="classUTF8__string.html#af0f7724e5743d48d9e29776de5d53c71" title="return this string as a 0&#45;terminated C string " alt="" coords="749,441,879,467"/>
+<area shape="rect" id="node18" href="structUserPreferences.html#a07c2933cafe4e981cd07f03232a6b7b5" title="open a user&#45;supplied config file (in $HOME or gnu&#45;apl.d) " alt="" coords="506,551,662,592"/>
+<area shape="rect" id="node19" href="structUserPreferences.html#afd15a9f4cbd24930f47fe6a44eba0290" title="decode a byte in a preferences file. The byte can be given as ASCII name (currently only ESC is under..." alt="" coords="499,733,669,775"/>
+<area shape="rect" id="node20" href="classLibPaths.html#a6c671db38ef40ad989618b9138689573" title="set library path (from config file) " alt="" coords="514,617,654,643"/>
+<area shape="rect" id="node21" href="classUTF8__string.html#aabaebbdfbe8fad48e44655144f5fbd5e" title="append a 0&#45;terminated C string " alt="" coords="512,668,656,709"/>
 </map>
 </div>
 
@@ -426,11 +455,11 @@ Here is the call graph for this function:</div>
 <li>maybe set script_argc </li>
 </ol>
 
-<p class="definition">Definition at line <a class="el" href="UserPreferences_8cc_source.html#l00767">767</a> of file <a class="el" href="UserPreferences_8cc_source.html">UserPreferences.cc</a>.</p>
+<p class="definition">Definition at line <a class="el" href="UserPreferences_8cc_source.html#l00816">816</a> of file <a class="el" href="UserPreferences_8cc_source.html">UserPreferences.cc</a>.</p>
 
-<p class="reference">References <a class="el" href="UserPreferences_8hh_source.html#l00144">expanded_argv</a>, <a class="el" href="UserPreferences_8cc_source.html#l00162">is_APL_script()</a>, <a class="el" href="UserPreferences_8hh_source.html#l00141">original_argv</a>, and <a class="el" href="UserPreferences_8hh_source.html#l00204">script_argc</a>.</p>
+<p class="reference">References <a class="el" href="UserPreferences_8hh_source.html#l00148">expanded_argv</a>, <a class="el" href="UserPreferences_8cc_source.html#l00164">is_APL_script()</a>, <a class="el" href="UserPreferences_8hh_source.html#l00145">original_argv</a>, and <a class="el" href="UserPreferences_8hh_source.html#l00217">script_argc</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="main_8cc_source.html#l00265">init_apl()</a>, and <a class="el" href="UserPreferences_8hh_source.html#l00039">UserPreferences()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="main_8cc_source.html#l00368">init_apl()</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -444,9 +473,8 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="structUserPreferences_a39abf091d48a0ddafa59606a28eec8a6_icgraph.png" border="0" usemap="#structUserPreferences_a39abf091d48a0ddafa59606a28eec8a6_icgraph" alt=""/></div>
 <map name="structUserPreferences_a39abf091d48a0ddafa59606a28eec8a6_icgraph" id="structUserPreferences_a39abf091d48a0ddafa59606a28eec8a6_icgraph">
-<area shape="rect" id="node2" href="main_8cc.html#aa0321421b17def7b58fc0cabc8890260" title="initialize the interpreter " alt="" coords="338,5,401,32"/>
-<area shape="rect" id="node4" href="structUserPreferences.html#aaf377cc53e470138ca91e289dd3f93a6" title="UserPreferences::UserPreferences" alt="" coords="256,56,483,83"/>
-<area shape="rect" id="node3" href="main_8cc.html#ac0f2228420376f4db7e1274f2b41667c" title="dito. " alt="" coords="531,5,581,32"/>
+<area shape="rect" id="node2" href="main_8cc.html#aa0321421b17def7b58fc0cabc8890260" title="initialize the interpreter " alt="" coords="256,5,319,32"/>
+<area shape="rect" id="node3" href="main_8cc.html#ac0f2228420376f4db7e1274f2b41667c" title="dito. " alt="" coords="367,5,417,32"/>
 </map>
 </div>
 
@@ -480,15 +508,18 @@ Here is the caller graph for this function:</div>
 
 <p>read a <b>preference</b> file and update parameters set there </p>
 <p>definitions of facilities inside the GNU APL interpreter that can be disabled (by means of preference file entries) for security reasons</p>
-<p>&lt; disable ⎕SQL</p>
+<p>&lt; disable dyadic ⎕FX</p>
 <p>&lt; disable ⎕FIO</p>
-<p>&lt; disable dyadic ⎕FX </p>
+<p>&lt; disable ⎕GTK</p>
+<p>&lt; disable ⎕PLOT</p>
+<p>&lt; disable ⎕SQL</p>
+<p>&lt; disable )SAVE and )DUMP cimmands </p>
 
-<p class="definition">Definition at line <a class="el" href="UserPreferences_8cc_source.html#l01028">1028</a> of file <a class="el" href="UserPreferences_8cc_source.html">UserPreferences.cc</a>.</p>
+<p class="definition">Definition at line <a class="el" href="UserPreferences_8cc_source.html#l01077">1077</a> of file <a class="el" href="UserPreferences_8cc_source.html">UserPreferences.cc</a>.</p>
 
-<p class="reference">References <a class="el" href="UTF8__string_8hh_source.html#l00101">UTF8_string::append_ASCII()</a>, <a class="el" href="UserPreferences_8hh_source.html#l00153">auto_OFF</a>, <a class="el" href="UserPreferences_8hh_source.html#l00156">backup_before_save</a>, <a class="el" href="Output_8hh_source.html#l00142">Output::clear_EOL</a>, <a class="el" href="Output_8hh_source.html#l00145">Output::clear_EOS</a>, <a class="el" href="Output_8hh_source.html#l00109">Output::color_CERR</a>, <a class="el" href="Output_8hh_source.html#l00133">Output::color_CERR_background</a>, <a class="el" href="Output_8hh_source.html#l00130">Output::color_CERR_foreground</a>, <a class="el" href="Output_8hh_source.html#l00103">Output::color_CIN</a>, <a class="el" href="Output_8hh_source.html#l00121">Output::color_CIN_background</a>, <a class="el" href="Output_8hh_source.html#l00118">Output::color_CIN_foreground</a>, <a class="el" href="Output_8hh_source.html#l00106">Output::color_COUT</a>, <a class="el" href="Output_8hh_source.html#l00127">Output::color_COUT_background</a>, <a class="el" href="Output_8hh_source.html#l00124">Output::color_COUT_foreground</a>, <a class="el" href="Output_8hh_source.html#l00115">Output::color_RESET</a>, <a class="el" href="Output_8hh_source.html#l00112">Output::color_UERR</a>, <a class="el" href="Output_8hh_source.html#l00139">Output::color_UERR_background</a>, <a class="el" href="Output_8hh_source.html#l00136">Output::color_UERR_foreground</a>, <a class="el" href="UserPreferences_8hh_source.html#l00159">control_Ds_to_exit</a>, <a class="el" href="LibPaths_8hh_source.html#l00069">LibPaths::LibDir::CSRC_PREF_HOME</a>, <a class="el" href="LibPaths_8hh_source.html#l00068">LibPaths::LibDir::CSRC_PREF_SYS</a>, <a class="el" href="UserPreferences_8cc_source.html#l01412">decode_ASCII()</a>, <a class="el" href="UserPreferences_8hh_source.html#l00229">discard_indentation</a>, <a class="el" href="UserPreferences_8hh_source.html#l00143">do_Color</a>, <a class="el" href="Output_8hh_source.html#l00151">Output::ESC_CursorDown</a>, <a class="el" href="Output_8hh_source.html#l00160">Output::ESC_CursorEnd</a>, <a class="el" href="Output_8hh_source.html#l00163">Output::ESC_CursorHome</a>, <a class="el" href="Output_8hh_source.html#l00157">Output::ESC_CursorLeft</a>, <a class="el" href="Output_8hh_source.html#l00154">Output::ESC_CursorRight</a>, <a class="el" href="Output_8hh_source.html#l00148">Output::ESC_CursorUp</a>, <a class="el" href="Output_8hh_source.html#l00169">Output::ESC_Delete</a>, <a class="el" href="Output_8hh_source.html#l00166">Output::ESC_InsertMode</a>, <a class="el" href="UserPreferences_8hh_source.html#l00161">initial_pw</a>, <a class="el" href="UserPreferences_8hh_source.html#l00223">keyboard_layout_file</a>, <a class="el" href="Output_8hh_source.html#l00202">Output::keys_curses</a>, <a class="el" href="UserPreferences_8hh_source.html#l00167">line_history_len</a>, <a class="el" href="UserPreferences_8hh_source.html#l00173">line_history_path</a>, <a class="el" href="UserPreferences_8hh_source.html#l00176">multi_line_strings</a>, <a class="el" href="UserPreferences_8hh_source.html#l00179">multi_line_strings_3</a>, <a class="el" href="UserPreferences_8hh_source.html#l00182">nabla_to_history</a>, <a class="el" href="UserPreferences_8cc_source.html#l00979">open_user_file()</a>, <a class="el" href="LibPaths_8cc_source.html#l00211">LibPaths::set_lib_dir()</a>, <a class="el" href="UserPreferences_8hh_source.html#l00207">silent</a>, <a class="el" href="UserPreferences_8hh_source.html#l00211">system_do_svars</a>, <a class="el" href="Output_8hh_source.html#l00199">Output::use_curses</a>, <a class="el" href="UserPreferences_8hh_source.html#l00214">user_do_svars</a>, <a class="el" href="UserPreferences_8hh_source.html#l00217">user_profile</a>, and <a class="el" href="UserPreferences_8hh_source.html#l00226">WINCH_sets_pw</a>.</p>
+<p class="reference">References <a class="el" href="UTF8__string_8hh_source.html#l00108">UTF8_string::append_ASCII()</a>, <a class="el" href="UserPreferences_8hh_source.html#l00154">auto_OFF</a>, <a class="el" href="UserPreferences_8hh_source.html#l00157">backup_before_save</a>, <a class="el" href="Output_8hh_source.html#l00142">Output::clear_EOL</a>, <a class="el" href="Output_8hh_source.html#l00145">Output::clear_EOS</a>, <a class="el" href="Output_8hh_source.html#l00109">Output::color_CERR</a>, <a class="el" href="Output_8hh_source.html#l00133">Output::color_CERR_background</a>, <a class="el" href="Output_8hh_source.html#l00130">Output::color_CERR_foreground</a>, <a class="el" href="Output_8hh_source.html#l00103">Output::color_CIN</a>, <a class="el" href="Output_8hh_source.html#l00121">Output::color_CIN_background</a>, <a class="el" href="Output_8hh_source.html#l00118">Output::color_CIN_foreground</a>, <a class="el" href="Output_8hh_source.html#l00106">Output::color_COUT</a>, <a class="el" href="Output_8hh_source.html#l00127">Output::color_COUT_background</a>, <a class="el" href="Output_8hh_source.html#l00124">Output::color_COUT_foreground</a>, <a class="el" href="Output_8hh_source.html#l00115">Output::color_RESET</a>, <a class="el" href="Output_8hh_source.html#l00112">Output::color_UERR</a>, <a class="el" href="Output_8hh_source.html#l00139">Output::color_UERR_background</a>, <a class="el" href="Output_8hh_source.html#l00136">Output::color_UERR_foreground</a>, <a class="el" href="UserPreferences_8hh_source.html#l00160">control_Ds_to_exit</a>, <a class="el" href="LibPaths_8hh_source.html#l00069">LibPaths::LibDir::CSRC_PREF_HOME</a>, <a class="el" href="LibPaths_8hh_source.html#l00068">LibPaths::LibDir::CSRC_PREF_SYS</a>, <a class="el" href="UserPreferences_8cc_source.html#l01460">decode_ASCII()</a>, <a class="el" href="UserPreferences_8hh_source.html#l00169">discard_indentation</a>, <a class="el" href="UserPreferences_8hh_source.html#l00144">do_Color</a>, <a class="el" href="Output_8hh_source.html#l00151">Output::ESC_CursorDown</a>, <a class="el" href="Output_8hh_source.html#l00160">Output::ESC_CursorEnd</a>, <a class="el" href="Output_8hh_source.html#l00163">Output::ESC_CursorHome</a>, <a class="el" href="Output_8hh_source.html#l00157">Output::ESC_CursorLeft</a>, <a class="el" href="Output_8hh_source.html#l00154">Output::ESC_CursorRight</a>, <a class="el" href="Output_8hh_source.html#l00148">Output::ESC_CursorUp</a>, <a class="el" href="Output_8hh_source.html#l00169">Output::ESC_Delete</a>, <a class="el" href="Output_8hh_source.html#l00166">Output::ESC_InsertMode</a>, <a class="el" href="UserPreferences_8hh_source.html#l00165">initial_pw</a>, <a class="el" href="UserPreferences_8hh_source.html#l00177">keyboard_layout_file</a>, <a class="el" href="UserPreferences_8hh_source.html#l00174">line_history_len</a>, <a class="el" href="UserPreferences_8hh_source.html#l00180">line_history_path</a>, <a class="el" href="UserPreferences_8hh_source.html#l00183">mem_arg</a>, <a class="el" href="UserPreferences_8hh_source.html#l00186">multi_line_strings</a>, <a class="el" href="UserPreferences_8hh_source.html#l00189">multi_line_strings_3</a>, <a class="el" href="UserPreferences_8hh_source.html#l00192">nabla_to_history</a>, <a class="el" href="UserPreferences_8cc_source.html#l01028">open_user_file()</a>, <a class="el" href="UserPreferences_8hh_source.html#l00195">output_to_cout</a>, <a class="el" href="LibPaths_8cc_source.html#l00209">LibPaths::set_lib_dir()</a>, <a class="el" href="UserPreferences_8hh_source.html#l00223">silent</a>, <a class="el" href="UserPreferences_8hh_source.html#l00227">system_do_svars</a>, <a class="el" href="UserPreferences_8hh_source.html#l00236">user_do_svars</a>, <a class="el" href="UserPreferences_8hh_source.html#l00239">user_profile</a>, and <a class="el" href="UserPreferences_8hh_source.html#l00245">WINCH_sets_pw</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="main_8cc_source.html#l00265">init_apl()</a>, and <a class="el" href="UserPreferences_8hh_source.html#l00039">UserPreferences()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="main_8cc_source.html#l00368">init_apl()</a>, and <a class="el" href="UserPreferences_8hh_source.html#l00039">UserPreferences()</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -540,9 +571,9 @@ Here is the caller graph for this function:</div>
 <p>print possible command line options and exit </p>
 <p>CYGWIN defines _B. </p>
 
-<p class="definition">Definition at line <a class="el" href="UserPreferences_8cc_source.html#l00058">58</a> of file <a class="el" href="UserPreferences_8cc_source.html">UserPreferences.cc</a>.</p>
+<p class="definition">Definition at line <a class="el" href="UserPreferences_8cc_source.html#l00053">53</a> of file <a class="el" href="UserPreferences_8cc_source.html">UserPreferences.cc</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="UserPreferences_8cc_source.html#l00270">parse_argv_2()</a>, and <a class="el" href="UserPreferences_8hh_source.html#l00039">UserPreferences()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="UserPreferences_8cc_source.html#l00276">parse_argv_2()</a>, and <a class="el" href="UserPreferences_8hh_source.html#l00039">UserPreferences()</a>.</p>
 <div class="dynheader">
 Here is the caller graph for this function:</div>
 <div class="dyncontent">
@@ -558,19 +589,19 @@ Here is the caller graph for this function:</div>
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>
-<a id="af31ba5b2e0c4316bcf1795a66a47b6a5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#af31ba5b2e0c4316bcf1795a66a47b6a5">&#9670;&nbsp;</a></span>disable_Quad_SQL</h2>
+<a id="a2a03c00669b5df3b9bc1fe00a02c5065"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2a03c00669b5df3b9bc1fe00a02c5065">&#9670;&nbsp;</a></span>disable_native_functions</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">bool UserPreferences::disable_Quad_SQL</td>
+          <td class="memname">bool UserPreferences::disable_native_functions</td>
         </tr>
       </table>
 </div><div class="memdoc">
 
-<p>disable ⎕SQL </p>
+<p>disable dyadic ⎕FX </p>
 <p>definitions of facilities inside the GNU APL interpreter that can be disabled (by means of preference file entries) for security reasons </p>
 
 <p class="definition">Definition at line <a class="el" href="UserPreferences_8hh_source.html#l00027">27</a> of file <a class="el" href="UserPreferences_8hh_source.html">UserPreferences.hh</a>.</p>
@@ -587,7 +618,7 @@ Here is the caller graph for this function:</div>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="structUserPreferences.html">UserPreferences</a></li>
-    <li class="footer">Generated on Sun Aug 9 2020 16:43:42 for GNUAPL by
+    <li class="footer">Generated on Sun Jan 30 2022 20:14:27 for GNUAPL by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>

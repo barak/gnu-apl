@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 
 #include "UCS_string.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// common part of user-defined names and distinguished names
 template <typename T, size_t SYMBOL_COUNT>
 class SymbolTableBase
@@ -124,7 +124,7 @@ protected:
 
 class Symbol;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// The table containing all user defined symbols.
 class SymbolTable : public SymbolTableBase<Symbol, SYMBOL_HASH_TABLE_SIZE>
 {
@@ -169,7 +169,7 @@ protected:
    /// erase one symbol, return \b true on error, \b false on success
    bool erase_one_symbol(const UCS_string & sym);
 };
-//=============================================================================
+//============================================================================
 class QuadFunction;
 class SystemVariable;
 
@@ -225,7 +225,7 @@ protected:
    /// the variable if the name refers to a system variable, or 0 if not
    SystemVariable * sysvar;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// The table containing all system defined symbols (aka. distinguished names)
 class SystemSymTab : public SymbolTableBase<SystemName, 256 - 1>
 {
@@ -262,6 +262,6 @@ protected:
    /// the length of the longest name
    int max_name_len;
 };
-//=============================================================================
+//============================================================================
 
 #endif // __SYMBOLTABLE_HH_DEFINED__

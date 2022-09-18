@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -37,42 +37,42 @@
 ShapeItem UCS_string::total_count = 0;
 ShapeItem UCS_string::total_id = 0;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string::UCS_string()
 {
    create(LOC);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string::UCS_string(Unicode uni)
    : basic_string<Unicode>(1, uni)
 {
   create(LOC);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string::UCS_string(const Unicode * data, size_t len)
    : basic_string<Unicode>(data, len)
 {
    create(LOC);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string::UCS_string(size_t len, Unicode uni)
    : basic_string<Unicode>(len, uni)
 {
    create(LOC);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string::UCS_string(const UCS_string & ucs)
    : basic_string<Unicode>(ucs)
 {
    create(LOC);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string::UCS_string(const UCS_string & ucs, size_t pos, size_t len)
    : basic_string<Unicode>(ucs, pos, len)
 {
    create(LOC);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string::UCS_string(const char * cstring)
 {
    // calling this constructor with and utf8-encoded C string is usually wrong.
@@ -96,7 +96,7 @@ UCS_string::UCS_string(const char * cstring)
         *this += Unicode(*str);
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string::UCS_string(const UTF8_string & utf)
 {
    create(LOC);
@@ -193,7 +193,7 @@ start_of_sequence:
    Log(LOG_char_conversion)
       CERR << "UCS_string::UCS_string(): ucs = " << *this << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string::UCS_string(APL_Float value, bool & scaled,
                        const PrintContext & pctx)
 {
@@ -374,14 +374,14 @@ const Unicode last = digits.back();
 
    FloatCell::map_FC(*this);
 }
-//-----------------------------------------------------------------------------
-UCS_string::UCS_string(const PrintBuffer & pb, Rank rank, int quad_PW)
+//----------------------------------------------------------------------------
+UCS_string::UCS_string(const PrintBuffer & pb, sRank rank, int quad_PW)
 {
    create(LOC);
 
-   if (pb.get_height() == 0)   return;      // empty PrintBuffer
+   if (pb.get_row_count() == 0)   return;      // empty PrintBuffer
 
-const int total_width = pb.get_width(0);
+const int total_width = pb.get_column_count();
 
    // initialize chunk_lengths, based on the first row of the PrintBuffer.
    // All subsequent rows are aligned to the first row, therefore the first
@@ -397,7 +397,7 @@ std::vector<int> chunk_lengths;
 
    // print rows, breaking at chunk_lengths
    //
-   loop(row, pb.get_height())
+   loop(row, pb.get_row_count())
        {
          if (row)   append(UNI_LF);   // end previous row
          int brk_idx = 0;
@@ -420,7 +420,7 @@ std::vector<int> chunk_lengths;
          if (is_iPAD_char(at(u)))   at(u) = UNI_SPACE;
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// constructor
 UCS_string::UCS_string(const Value & value)
 {
@@ -431,9 +431,9 @@ UCS_string::UCS_string(const Value & value)
 const ShapeItem ec = value.element_count();
    reserve(ec);
 
-   loop(e, ec)   append(value.get_ravel(e).get_char_value());
+   loop(e, ec)   append(value.get_cravel(e).get_char_value());
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// constructor
 UCS_string::UCS_string(const Cell & cell)
 {
@@ -458,9 +458,9 @@ const Value & value = *cell.get_pointer_value().get();
 const ShapeItem ec = value.element_count();
    reserve(ec);
 
-   loop(e, ec)   append(value.get_ravel(e).get_char_value());
+   loop(e, ec)   append(value.get_cravel(e).get_char_value());
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string::UCS_string(istream & in)
 {
    create(LOC);
@@ -473,7 +473,7 @@ UCS_string::UCS_string(istream & in)
         append(uni);
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 UCS_string::compute_chunk_length(int quad_PW, int col) const
 {
@@ -505,7 +505,7 @@ int pos = col + chunk_len;
    //
    return chunk_len;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 UCS_string::remove_trailing_padchars()
 {
@@ -513,29 +513,43 @@ UCS_string::remove_trailing_padchars()
    // but leave other pad chars intact.
    // But only if the line has no frame (vert).
    //
+again:
+   if (size() > 2 && contains(UNI_iPAD_L0))
+      {
+        Unicode first = Unicode_0;
+        if (back() == UNI_iPAD_U9)        first = UNI_iPAD_U8;
+        else if (back() == UNI_iPAD_U5)   first = UNI_iPAD_U4;
+
+        if (first && at(size() - 2) == UNI_iPAD_L0)
+           {
+        // last column is a nested dimension separator row
+        //
+        ShapeItem len = size() - 2;
+        while (len && (at(len - 1) == UNI_iPAD_L0 ||
+                       at(len - 1) == UNI_iPAD_U0 ||
+                       at(len - 1) == UNI_iPAD_U2 ||
+                       at(len - 1) == UNI_iPAD_U6 ||
+                       at(len - 1) == UNI_iPAD_U7))   --len;
+             if (len && at(len - 1) == first)
+                {
+                  resize(len - 1);
+                  goto again;
+                }
+           }
+      }
 
    // If the line contains UNI_iPAD_L0 (higher dimension separator)
    // then discard all chars (unless the line is framed)..
    //
-   loop(u, size())
-       {
-         if (at(u) == UNI_LINE_VERT)    break;   // │   (framed)
-         if (at(u) == UNI_LINE_VERT2)   break;   // ║   (framed)
-         if (at(u) == UNI_iPAD_L0)
-            {
-              clear();
-              return;
-            }
-       }
-
    while (size())
       {
         const Unicode last = back();
-        if (last == UNI_iPAD_L0 ||   // ₀: Block separator
+        if (last == UNI_iPAD_L0 ||   // ₀: higher dimension separator
             last == UNI_iPAD_L1 ||   // ₁: pad line to PrintBuffer width
             last == UNI_iPAD_L2 ||   // ₂: pad PrintBuffer width to line
             last == UNI_iPAD_L3 ||   // ₃: pad integer part to the left
             last == UNI_iPAD_L4 ||   // ₄: pad fractional part to the right
+            last == UNI_iPAD_U2 ||   // ²  column separator (after notchar)
             last == UNI_iPAD_U2 ||   // ²  column separator (after notchar)
             last == UNI_iPAD_U7)     // ⁷  pad final to the right
             pop_back();
@@ -543,13 +557,13 @@ UCS_string::remove_trailing_padchars()
             break;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 UCS_string::remove_trailing_whitespaces()
 {
    while (size() && back() <= UNI_SPACE)   pop_back();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 UCS_string::remove_leading_whitespaces()
 {
@@ -564,7 +578,7 @@ int count = 0;
    if (count == size())   clear();     // only whitespaces
    else                   basic_string::erase(0, count);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 UCS_string::split_ws(UCS_string & rest)
 {
@@ -582,7 +596,7 @@ UCS_string::split_ws(UCS_string & rest)
             }
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 UCS_string::copy_black(UCS_string & dest, int & idx) const
 {
@@ -590,7 +604,7 @@ UCS_string::copy_black(UCS_string & dest, int & idx) const
    while (idx < size() && at(idx) >  ' ')   dest.append(at(idx++));
    while (idx < size() && at(idx) <= ' ')   ++idx;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ShapeItem
 UCS_string::LF_count() const
 {
@@ -598,7 +612,7 @@ ShapeItem count = 0;
    loop(u, size())   if (at(u) == UNI_LF)   ++count;
    return count;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ShapeItem
 UCS_string::substr_pos(const UCS_string & sub) const
 {
@@ -620,14 +634,14 @@ const ShapeItem start_positions = 1 + size() - sub.size();
 
    return -1;   // not found
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool 
 UCS_string::has_black() const
 {
    loop(s, size())   if (!Avec::is_white(at(s)))   return true;
    return false;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool 
 UCS_string::starts_with(const char * prefix) const
 {
@@ -644,7 +658,7 @@ UCS_string::starts_with(const char * prefix) const
    //
    return false;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool 
 UCS_string::ends_with(const char * suffix) const
 {
@@ -655,7 +669,7 @@ const ShapeItem s_len = strlen(suffix);
    loop(s, s_len)   if (at(size() - s - 1) != *--suffix)   return false;
    return true;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool 
 UCS_string::starts_with(const UCS_string & prefix) const
 {
@@ -665,7 +679,7 @@ UCS_string::starts_with(const UCS_string & prefix) const
 
    return true;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool 
 UCS_string::starts_iwith(const char * prefix) const
 {
@@ -683,7 +697,7 @@ UCS_string::starts_iwith(const char * prefix) const
 
    return *prefix == 0;   
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool 
 UCS_string::starts_iwith(const UCS_string & prefix) const
 {
@@ -700,7 +714,7 @@ UCS_string::starts_iwith(const UCS_string & prefix) const
 
    return true;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string
 UCS_string::no_pad() const
 {
@@ -714,7 +728,7 @@ UCS_string ret;
 
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 UCS_string::map_pad()
 {
@@ -723,7 +737,7 @@ UCS_string::map_pad()
         if (is_iPAD_char(at(s)))   at(s) = UNI_SPACE;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string
 UCS_string::remove_pad() const
 {
@@ -736,7 +750,7 @@ UCS_string ret;
 
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string
 UCS_string::reverse() const
 {
@@ -744,7 +758,7 @@ UCS_string ret;
    for (int s = size(); s > 0;)   ret.append(at(--s));
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 UCS_string::is_comment_or_label() const
 {
@@ -759,7 +773,7 @@ UCS_string::is_comment_or_label() const
 
    return false;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ShapeItem
 UCS_string::double_quote_count(bool in_quote2) const
 {
@@ -796,7 +810,7 @@ bool in_quote1 = false;
 
    return count;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ShapeItem
 UCS_string::double_quote_first() const
 {
@@ -832,7 +846,7 @@ bool in_quote2 = true;
 
    return -1;   // no un-commented and un-escaped " found
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ShapeItem
 UCS_string::double_quote_last() const
 {
@@ -868,7 +882,7 @@ bool in_quote2 = false;
 
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 UCS_string::append_UTF8(const UTF8 * str)
 {
@@ -878,7 +892,7 @@ const UCS_string ucs(utf);
 
    append(ucs);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 UCS_string::append_quoted(const UCS_string & other)
 {
@@ -891,7 +905,7 @@ UCS_string::append_quoted(const UCS_string & other)
        }
    append(UNI_DOUBLE_QUOTE);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 UCS_string::append_number(ShapeItem num)
 {
@@ -903,7 +917,7 @@ char cc[40];
         else         break;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 UCS_string::append_hex(ShapeItem num, bool uppercase)
 {
@@ -916,7 +930,7 @@ char cc[40];
         else         break;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 UCS_string::append_shape(const Shape & shape)
 {
@@ -938,7 +952,7 @@ UCS_string::append_shape(const Shape & shape)
          append_number(s);
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 UCS_string::append_members(const vector<const UCS_string *> & members, int m)
 {
@@ -948,7 +962,7 @@ UCS_string::append_members(const vector<const UCS_string *> & members, int m)
          append(*members[mm]);
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 UCS_string::append_float(APL_Float num)
 {
@@ -960,7 +974,7 @@ char cc[60];
         else         break;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string
 UCS_string::un_escape(bool double_quoted, bool keep_LF) const
 {
@@ -1064,7 +1078,7 @@ UCS_string ret;
 
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string
 UCS_string::do_escape(bool double_quoted) const
 {
@@ -1122,7 +1136,7 @@ UCS_string ret;
 
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 size_t
 UCS_string::to_vector(UCS_string_vector & result) const
 {
@@ -1156,7 +1170,7 @@ const size_t len = result.back().size();
 
    return max_len;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 UCS_string::atoi() const
 {
@@ -1184,15 +1198,15 @@ bool negative = false;
 
    return negative ? -ret : ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ostream &
 operator << (ostream & os, Unicode uni)
-{       
+{
    if (uni < 0x80)      return os << char(uni);
         
    if (uni < 0x800)     return os << char(0xC0 | (uni >> 6))
                                   << char(0x80 | (uni & 0x3F));
-        
+
    if (uni < 0x10000)    return os << char(0xE0 | (uni >> 12))
                                    << char(0x80 | (uni >>  6 & 0x3F))
                                    << char(0x80 | (uni       & 0x3F));
@@ -1215,7 +1229,7 @@ operator << (ostream & os, Unicode uni)
              << char(0x80 | (uni >>  6 & 0x3F))
              << char(0x80 | (uni       & 0x3F));
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ostream &
 operator << (ostream & os, const UCS_string & ucs)
 {
@@ -1234,7 +1248,7 @@ const int fill_len = os.width() - ucs.size();
 
    return os;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 UCS_string::lexical_before(const UCS_string other) const
 {
@@ -1249,7 +1263,7 @@ UCS_string::lexical_before(const UCS_string other) const
    // is longer then this is a prefix of other (and this comes before other)
    return other.size() > size();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ostream &
 UCS_string::dump(ostream & out) const
 {
@@ -1261,7 +1275,7 @@ UCS_string::dump(ostream & out) const
 
    return out << left << dec << nouppercase << setfill(' ');
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string
 UCS_string::from_int(int64_t value)
 {
@@ -1270,7 +1284,7 @@ UCS_string::from_int(int64_t value)
 UCS_string ret(UNI_OVERBAR);
    return ret + from_uint(- value);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string
 UCS_string::from_uint(uint64_t value)
 {
@@ -1290,7 +1304,7 @@ UCS_string ret;
    while (d > digits)   ret.append(Unicode(UNI_0 + *--d));
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string
 UCS_string::from_big(APL_Float & val)
 {
@@ -1317,7 +1331,7 @@ UCS_string ret;
    while (d > digits)   ret.append(Unicode(UNI_0 + *--d));
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string
 UCS_string::from_double_expo_prec(APL_Float v, int fract_digits)
 {
@@ -1429,7 +1443,7 @@ UCS_string mantissa = from_double_fixed_prec(v, fract_digits);
 
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string
 UCS_string::from_double_fixed_prec(APL_Float v, int fract_digits)
 {
@@ -1458,7 +1472,7 @@ UCS_string ret;
    ret.round_last_digit();
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 UCS_string::round_last_digit()
 {

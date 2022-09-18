@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -31,10 +31,11 @@
 
 class ArrayIterator;
 class CharCell;
-class IntCell;
 class CollatingCache;
+class ConstRavel_P;
+class IntCell;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
     Base class for the APL system functions (Quad functions and primitives
     like +, -, ...) and operators
@@ -84,7 +85,7 @@ protected:
    /// performance statistics for dyadic calls
    CellFunctionStatistics * statistics_B;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// Base class for all internal non-scalar functions of the interpreter
 class NonscalarFunction : public PrimitiveFunction
 {
@@ -94,7 +95,25 @@ public:
    : PrimitiveFunction(tag)
    {}
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+/// Base class for all internal non-scalar functions of the interpreter
+// that have the default identity function
+class NonscalarFunction_default_identity : public NonscalarFunction
+{
+public:
+   /// Constructor
+   NonscalarFunction_default_identity(TokenTag tag)
+   : NonscalarFunction(tag)
+   {}
+
+   /// Overloaded Function::eval_identity_fun()
+   virtual Token eval_identity_fun(Value_P B, sAxis axis) const;
+
+   /// implementation of eval_identity_fun(), so that non-derived functions
+   /// may use it as well.
+   static Token do_eval_identity_fun(Value_P B, sAxis axis);
+};
+//----------------------------------------------------------------------------
 /** System function zilde (⍬) */
 /// The class implementing ⍬ (the empty numeric vector)
 class Bif_F0_ZILDE : public NonscalarFunction
@@ -115,7 +134,7 @@ protected:
    /// overladed Function::may_push_SI()
    virtual bool may_push_SI() const   { return false; }
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** System function execute */
 /// The class implementing ⍎
 class Bif_F1_EXECUTE : public NonscalarFunction
@@ -145,7 +164,7 @@ protected:
    /// overladed Function::may_push_SI()
    virtual bool may_push_SI() const   { return true; }
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** System function index (⌷) */
 /// The class implementing ⌷
 class Bif_F2_INDEX : public NonscalarFunction
@@ -166,9 +185,9 @@ public:
    static Bif_F2_INDEX  _fun;   ///< Built-in function
 protected:
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** primitive functions member and enlist */
-/// The class implementing ∈
+/// The class implementing ϵ
 class Bif_F12_ELEMENT : public NonscalarFunction
 {
 public:
@@ -178,16 +197,21 @@ public:
    {}
 
    /// overloaded Function::eval_B()
-   virtual Token eval_B(Value_P B) const;
+   virtual Token eval_B(Value_P B) const
+      { return Token(TOK_APL_VALUE1, do_eval_B(B.get())); }
 
    /// overloaded Function::eval_AB()
    virtual Token eval_AB(Value_P A, Value_P B) const;
 
    static Bif_F12_ELEMENT * fun;   ///< Built-in function
    static Bif_F12_ELEMENT  _fun;   ///< Built-in function
+
+   /// implementation of eval_B()
+   static Value_P do_eval_B(const Value * B);
+
 protected:
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** primitive functions match and depth */
 /// The class implementing ≡
 class Bif_F12_EQUIV : public NonscalarFunction
@@ -211,7 +235,7 @@ protected:
    /// return the depth of B
    Token depth(Value_P B);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** primitive function natch (≢) */
 /// The class implementing ≡
 class Bif_F12_NEQUIV : public NonscalarFunction
@@ -231,7 +255,7 @@ public:
    static Bif_F12_NEQUIV * fun;   ///< Built-in function
    static Bif_F12_NEQUIV  _fun;   ///< Built-in function
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** System function encode */
 /// The class implementing ⊤
 class Bif_F12_ENCODE : public NonscalarFunction
@@ -247,20 +271,24 @@ public:
 
    static Bif_F12_ENCODE * fun;   ///< Built-in function
    static Bif_F12_ENCODE  _fun;   ///< Built-in function
+
 protected:
-   /// encode b according to A (integer A and b)
-   static void encode(ShapeItem dZ, Cell * cZ, ShapeItem ah, ShapeItem al,
-                      const Cell * cA, APL_Integer b);
+   /// encode *ib() according to A (integer A and b)
+   static void encode_Int(Value & Z, ShapeItem aH, ShapeItem aL,
+                          const ConstRavel_P & iA,
+                          const ConstRavel_P & iB);
 
-   /// encode b according to A
-   static void encode(ShapeItem dZ, Cell * cZ, ShapeItem ah, ShapeItem al,
-                      const Cell * cA, APL_Float b, double qct);
+   /// encode *ib() according to A
+   static void encode_Flt(Value & Z, ShapeItem ah, ShapeItem al,
+                          const ConstRavel_P & iA, const ConstRavel_P & iB,
+                         double qct);
 
-   /// encode B according to A
-   static void encode(ShapeItem dZ, Cell * cZ, ShapeItem ah, ShapeItem al,
-                      const Cell * cA, APL_Complex b, double qct);
+   /// encode *ib() according to A
+   static void encode_Cpx(Value & Z, ShapeItem aH, ShapeItem aL,
+                          const ConstRavel_P & iA, const ConstRavel_P & iB,
+                          double qct);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** System function decode */
 /// The class implementing ⊥
 class Bif_F12_DECODE : public NonscalarFunction
@@ -276,40 +304,39 @@ public:
 
    static Bif_F12_DECODE * fun;   ///< Built-in function
    static Bif_F12_DECODE  _fun;   ///< Built-in function
+
 protected:
    /// decode B according to len_A and cA (integer A, B and Z)
-   static bool decode_int(Cell * cZ, ShapeItem len_A, const Cell * cA,
+   static bool decode_int(Value & Z, ShapeItem len_A, const Cell * cA,
                           ShapeItem len_B, const Cell * cB, ShapeItem dB);
 
    /// decode B according to len_A and cA (real A and B)
-   static void decode_real(Cell * cZ, ShapeItem len_A, const Cell * cA,
-                           ShapeItem len_B, const Cell * cB, ShapeItem dB,
-                           double qct);
+   static void decode_real(Value & Z, ShapeItem len_A, const Cell * cA,
+                           ShapeItem len_B, const Cell * cB, ShapeItem dB);
 
    /// decode B according to len_A and cA (complex A or B)
-   static void decode_complex(Cell * cZ, ShapeItem len_A, const Cell * cA,
-                              ShapeItem len_B, const Cell * cB, ShapeItem dB,
-                              double qct);
+   static void decode_complex(Value & Z, ShapeItem len_A, const Cell * cA,
+                              ShapeItem len_B, const Cell * cB, ShapeItem dB);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** primitive functions rotate and reverse */
 /// Base class for implementing ⌽ and ⊖
-class Bif_ROTATE : public NonscalarFunction
+class Bif_ROTATE : public NonscalarFunction_default_identity
 {
 public:
    /// Constructor.
    Bif_ROTATE(TokenTag tag)
-   : NonscalarFunction(tag)
+   : NonscalarFunction_default_identity(tag)
    {}
 
 protected:
    /// Rotate B according to A along axis
-   static Token rotate(Value_P A, Value_P B, Axis axis);
+   static Token rotate(Value_P A, Value_P B, sAxis axis);
 
    /// Reverse B along axis
-   static Token reverse(Value_P B, Axis axis);
+   static Token reverse(Value_P B, sAxis axis);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** primitive functions rotate and reverse along last axis */
 /// The class implementing ⌽
 class Bif_F12_ROTATE : public Bif_ROTATE
@@ -338,7 +365,7 @@ public:
    static Bif_F12_ROTATE  _fun;   ///< Built-in function
 protected:
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** primitive functions rotate and reverse along first axis */
 /// The class implementing ⊖
 class Bif_F12_ROTATE1 : public Bif_ROTATE
@@ -367,19 +394,20 @@ public:
    static Bif_F12_ROTATE1  _fun;   ///< Built-in function
 protected:
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** System function transpose */
 /// The class implementing ⍉
-class Bif_F12_TRANSPOSE : public NonscalarFunction
+class Bif_F12_TRANSPOSE : public NonscalarFunction_default_identity
 {
 public:
    /// Constructor
    Bif_F12_TRANSPOSE()
-   : NonscalarFunction(TOK_F12_TRANSPOSE)
+   : NonscalarFunction_default_identity(TOK_F12_TRANSPOSE)
    {}
 
    /// overloaded Function::eval_B()
-   virtual Token eval_B(Value_P B) const;
+   virtual Token eval_B(Value_P B) const
+      { return do_eval_B(B.get()); }
 
    /// overloaded Function::eval_AB()
    virtual Token eval_AB(Value_P A, Value_P B) const;
@@ -387,12 +415,15 @@ public:
    static Bif_F12_TRANSPOSE * fun;   ///< Built-in function
    static Bif_F12_TRANSPOSE  _fun;   ///< Built-in function
 
-protected:
-   /// Transpose B according to A (without diagonals)
-   static Value_P transpose(const Shape & A, Value_P B);
+   /// Transpose B according to axes A (without diagonals)
+   static Value_P transpose(const Shape & A, const Value * B);
 
-   /// Transpose B according to A (with diagonals)
-   static Value_P transpose_diag(const Shape & A, Value_P B);
+   /// implementation of eval_B()
+   static Token do_eval_B(const Value * B);
+
+protected:
+   /// Transpose B according to axes A (with diagonals)
+   static Value_P transpose_diag(const Shape & A, const Value * B);
 
    /// for \b sh being a permutation of 0, 1, ... rank - 1,
    /// return the inverse permutation sh⁻¹
@@ -400,19 +431,16 @@ protected:
 
    /// return sh permuted according to permutation perm
    static Shape permute(const Shape & sh, const Shape & perm);
-
-   /// return true iff sh is a permutation
-   static bool is_permutation(const Shape & sh);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** primitive functions reshape and shape */
 /// The class implementing ⍴
-class Bif_F12_RHO : public NonscalarFunction
+class Bif_F12_RHO : public NonscalarFunction_default_identity
 {
 public:
    /// Constructor
    Bif_F12_RHO()
-   : NonscalarFunction(TOK_F12_RHO)
+   : NonscalarFunction_default_identity(TOK_F12_RHO)
    {}
 
    /// overloaded Function::eval_B()
@@ -428,7 +456,7 @@ public:
    static Bif_F12_RHO  _fun;   ///< Built-in function
 protected:
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** System function ∪ (unique/union) */
 /// The class implementing ∪
 class Bif_F12_UNION : public NonscalarFunction
@@ -481,7 +509,7 @@ protected:
    static ShapeItem append_zone(const Cell ** cells_Z, const Cell ** cells_B,
                                 Zone_list & B_from_to, double qct);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** System function ∩ (intersection) */
 /// The class implementing ∩
 class Bif_F2_INTER : public NonscalarFunction
@@ -500,7 +528,7 @@ public:
 
 protected:
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** System function left (⊣) */
 /// The class implementing ⊣
 class Bif_F2_LEFT : public NonscalarFunction
@@ -523,7 +551,7 @@ public:
    static Bif_F2_LEFT  _fun;   ///< Built-in function
 protected:
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** System function right (⊢) */
 /// The class implementing ⊢
 class Bif_F2_RIGHT : public NonscalarFunction
@@ -549,6 +577,6 @@ public:
    static Bif_F2_RIGHT  _fun;   ///< Built-in function
 protected:
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __PRIMITIVE_FUNCTION_HH_DEFINED__

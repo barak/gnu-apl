@@ -26,8 +26,10 @@
 #include <string>
 #include <Workspace.hh>
 
-//================================================================================
-/// properties of a single plot line 
+//=============================================================================
+/// properties of a single plot line. The properties, their type, and their
+/// default values are defined in file Quad_PLOT.def.
+
 class Plot_line_properties
 {
 public:
@@ -53,7 +55,7 @@ public:
    ty get_ ## na() const   { return na; }
 # include "Quad_PLOT.def"
 
-   // define the set_XXX functions for every attribute XXX that is
+   // define the set_XXX() function for every attribute XXX that is
    // defined in Quad_PLOT.def...
    //
 # define ldef(ty,  na,  _val, _descr)     \
@@ -63,6 +65,10 @@ public:
 
    /// print the line properties
    int print(std::ostream & out) const;
+
+   /// return true if \b  matches \b attribute. For a match attribute is
+   /// prefix, followed by optional whitespace, terminated by :, -, or space.
+   static bool is_line_property(const char * prefix, const char * attribute);
 
 protected:
 # define ldef(ty,  na,  _val, descr) /** descr **/ ty na;

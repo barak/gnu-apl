@@ -47,7 +47,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -269,7 +269,7 @@ const T tmp = x;
   x = y;
   y = tmp;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// A vector of real numbers or a vector of complex numbers
 template<typename T>
 class Vector
@@ -420,7 +420,7 @@ protected:
    ///  the length of this vector
    const ShapeItem len;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// A double or complex matrix
 template<typename T>
 class Matrix
@@ -561,13 +561,13 @@ protected:
    /// return the distance between two adjacent columns in \b data
    const ShapeItem dx;
 };
-//=============================================================================
+//============================================================================
 
 #include <math.h>
 #include <stdio.h>
 #include <string.h>
 
-//=============================================================================
+//============================================================================
 
    // numerical limits
    //
@@ -580,7 +580,7 @@ static const APL_Float safe_min     =  dlamch_S / dlamch_E;
 static const APL_Float inv_safe_min = 1.0 / safe_min;
 static const APL_Float tol3z        = sqrt(dlamch_E);
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// return the offset of the largest element in vec
 inline ShapeItem
 max_pos(const APL_Float * vec, ShapeItem len)
@@ -595,7 +595,7 @@ APL_Float dmax = ABS(vec[0]);
 
    return imax;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// LApack function larfg
 template<typename T> T larfg(ShapeItem N, T & ALPHA, Vector<T> &x)
 {
@@ -641,7 +641,7 @@ const T factor = DZ::inv(ALPHA - beta);
 
    return tau;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// LApack function trsm
 template<typename T>
 void trsm(int M, int N, const Matrix<T> & A, Matrix<T> & B)
@@ -666,7 +666,7 @@ void trsm(int M, int N, const Matrix<T> & A, Matrix<T> & B)
              }
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// LApack function ila_lc
 template<typename T>
 int ila_lc(ShapeItem M, ShapeItem N, const Matrix<T> & A)
@@ -689,7 +689,7 @@ int ila_lc(ShapeItem M, ShapeItem N, const Matrix<T> & A)
 
    return 1;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// LApack function gemv
 template<typename T>
 inline void gemv(int M, int N, const Matrix<T> & A, const Vector<T> &x,
@@ -702,7 +702,7 @@ inline void gemv(int M, int N, const Matrix<T> & A, const Vector<T> &x,
          y.at(j) = temp;
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// LApack function gerc
 template<typename T>
 void gerc(int M, int N, T ALPHA, const Vector<T> &x, const Vector<T> &y,
@@ -721,7 +721,7 @@ void gerc(int M, int N, T ALPHA, const Vector<T> &x, const Vector<T> &y,
            }
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// LApack function larf
 template<typename T>
 void larf(Vector<T> & v, T tau, Matrix<T> & c)
@@ -756,7 +756,7 @@ ShapeItem  lastc = 0;
         delete[] gemv_data;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// LApack function laqp2
 template<typename T>
 void laqp2(Matrix<T> & A, ShapeItem * pivot, T * tau, APL_Float * vn1)
@@ -845,7 +845,7 @@ APL_Float * vn2 = vn1 + N;
             }
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// LApack function laic1 (maximum case)
 template<typename T>
 void laic1_max(APL_Float SEST, T alpha, T GAMMA, APL_Float &SESTPR, T &S, T &C)
@@ -953,7 +953,7 @@ const APL_Float tmp = sqrt(ABS_2(sine) + ABS_2(cosine));
    C = cosine / tmp;
    SESTPR = sqrt(t + 1.0) * abs_estimate;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// LApack function laic1 (minimum case)
 template<typename T>
 void laic1_min(APL_Float SEST, T alpha, T GAMMA, APL_Float &SESTPR, T &S, T &C)
@@ -1091,7 +1091,7 @@ const APL_Float tmp = sqrt(ABS_2(sine) + ABS_2(cosine));
    S = sine / tmp;
    C = cosine / tmp;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// LApack function unm2r
 template<typename T>
 void unm2r(ShapeItem K, Matrix<T> & A, const T * tau, Matrix<T> & c)
@@ -1120,7 +1120,7 @@ const ShapeItem M = c.get_row_count();
          A.diag(i_0) = Aii;
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// LApack function geqp3
 template<typename T>
 void geqp3(Matrix<T> & A, ShapeItem * pivot, T * tau)
@@ -1155,7 +1155,7 @@ const ShapeItem N = A.get_column_count();
      delete[] vn12;
    }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// LApack function estimating the rank of \b A
 template<typename T>
 int estimate_rank(const Matrix<T> & A, APL_Float rcond)
@@ -1219,7 +1219,7 @@ T * work_max = work_min + N;
    delete[] work_1;
    return N;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 template<typename T>
 int scaled_gelsy(Matrix<T> & A, Matrix<T> & B, double rcond)
 {
@@ -1291,7 +1291,7 @@ T * tmp = tau + N;                                // N complex tmp1 items
    delete[] pivot_tau_tmp;
    return N;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 template<typename T>
 int gelsy(Matrix<T> & A, Matrix<T> &B, APL_Float rcond)
 {
@@ -1348,6 +1348,6 @@ APL_Float scale_B = 1.0;
 
    return N;   // success
 }
-//=============================================================================
+//============================================================================
 
 #endif // __GELSY_HH_DEFINED__

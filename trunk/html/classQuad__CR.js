@@ -1,5 +1,6 @@
 var classQuad__CR =
 [
+    [ "_sub_fun", "structQuad__CR_1_1__sub__fun.html", "structQuad__CR_1_1__sub__fun" ],
     [ "Picker", "classQuad__CR_1_1Picker.html", "classQuad__CR_1_1Picker" ],
     [ "V_mode", "classQuad__CR.html#a44d6bd3a638af316f8a0f37f19b97209", [
       [ "Vm_NONE", "classQuad__CR.html#a44d6bd3a638af316f8a0f37f19b97209a057ca113f2dc35415f2b670b3ccc325c", null ],
@@ -14,8 +15,9 @@ var classQuad__CR =
     [ "do_CR10", "classQuad__CR.html#aa527f599e0a335bea8fba29a03a66f49", null ],
     [ "do_CR10", "classQuad__CR.html#ae54cce9d37dda4e3316858ee1393a2c5", null ],
     [ "do_CR10_item", "classQuad__CR.html#a59678f59cbdc13f8c82978a21128c41f", null ],
-    [ "do_CR10_rec", "classQuad__CR.html#a6dfd729ec0ad8234520fcde4e9e47ee9", null ],
-    [ "do_CR10_var", "classQuad__CR.html#ae2cc6981b257ed6ed1560e925c0f1a21", null ],
+    [ "do_CR10_structured", "classQuad__CR.html#adb7a7687894a0c659fbc03ca2519af47", null ],
+    [ "do_CR10_value", "classQuad__CR.html#a6ebbe028bf784269939fc2777dc48e83", null ],
+    [ "do_CR10_variable", "classQuad__CR.html#ad5dd6d0c74d8c4d954eb9e34df43542b", null ],
     [ "do_CR11", "classQuad__CR.html#a3354155958711356b7e5c62c977b40f0", null ],
     [ "do_CR12", "classQuad__CR.html#ad2703aa51ad4924a7b5bc147de7451ce", null ],
     [ "do_CR13", "classQuad__CR.html#acc72f7116159eb1b8bb3a27202d4e0d1", null ],
@@ -34,15 +36,23 @@ var classQuad__CR =
     [ "do_CR35", "classQuad__CR.html#ab9cef8298c90bb5ffe0832dffe032c4b", null ],
     [ "do_CR36", "classQuad__CR.html#a2554c724d2f22533c31238e35816d51e", null ],
     [ "do_CR37", "classQuad__CR.html#ad8a0a96b4c4a7494f7cb6a51fbedf302", null ],
+    [ "do_CR38", "classQuad__CR.html#a6b741e0c20e25f5bf70ae392763b1062", null ],
+    [ "do_CR39", "classQuad__CR.html#a7e2e60c234adcd6ba3282a583910d97a", null ],
+    [ "do_CR40", "classQuad__CR.html#a91b2f3423954cb09b1d7c0d6099fa622", null ],
+    [ "do_CR41", "classQuad__CR.html#ac1b92588537119d19d30fa568c37db87", null ],
     [ "do_CR5_6", "classQuad__CR.html#a3391279d18ae51b8d27a4fef8a387e33", null ],
     [ "do_eval_B", "classQuad__CR.html#ab525947f5517e80479f46768cc5114d5", null ],
-    [ "eval_AB", "classQuad__CR.html#a8cdaa024940ca59985456109652501e6", null ],
-    [ "eval_B", "classQuad__CR.html#a4776c818324521bf624d456e0341cec0", null ],
+    [ "eval_AB", "classQuad__CR.html#ac60b988ceaf002189a8c60337752048f", null ],
+    [ "eval_B", "classQuad__CR.html#afc5249bc7225f04ab504b96b0212167c", null ],
+    [ "eval_XB", "classQuad__CR.html#a4a7057e997df3f1607b2e003ef7279f6", null ],
     [ "figure_default", "classQuad__CR.html#adb953830f27ea596558a87a42a9077f0", null ],
+    [ "fun_compare", "classQuad__CR.html#ac37401842d20d00a2df654fc8ed3669d", null ],
     [ "item_separator", "classQuad__CR.html#aabf394be562c03b413b6f4beb4a70907", null ],
-    [ "list_functions", "classQuad__CR.html#a1fca3e4f99b676caf092401fe014b1fc", null ],
+    [ "list_functions", "classQuad__CR.html#a7c95591801d3eca7d1a3f4b2de703381", null ],
     [ "short_ravel", "classQuad__CR.html#a42bcaddd80f629456ecd51f857a6c38c", null ],
+    [ "string_to_int", "classQuad__CR.html#ae61555c661c468ddf269cb29bec6720d", null ],
     [ "use_quote", "classQuad__CR.html#af540a560ecc6edeb5dbff2f43faf1bb4", null ],
     [ "_fun", "classQuad__CR.html#a8183dc9f2fbbd717069cdacda6a256cc", null ],
-    [ "fun", "classQuad__CR.html#a8ad9f89908b535caf31b9700bcabb0c7", null ]
+    [ "fun", "classQuad__CR.html#a8ad9f89908b535caf31b9700bcabb0c7", null ],
+    [ "sub_functions", "classQuad__CR.html#adb3582e33480b4895e2f6c9029279f1c", null ]
 ];

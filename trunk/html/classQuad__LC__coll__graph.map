@@ -1,8 +1,8 @@
 <map id="Quad_LC" name="Quad_LC">
-<area shape="rect" id="node2" href="$classRO__SystemVariable.html" title="Base class for all read&#45;only APL system variables. " alt="" coords="7,399,149,425"/>
-<area shape="rect" id="node3" href="$classNL__SystemVariable.html" title="Base class for all APL system variables that cannot be localized. " alt="" coords="9,323,147,349"/>
-<area shape="rect" id="node4" href="$classSystemVariable.html" title="Base class for all APL system variables. " alt="" coords="21,247,135,273"/>
-<area shape="rect" id="node5" href="$classSymbol.html" title="Base class for variables, defined functions, and distinguished names. " alt="" coords="45,171,111,197"/>
-<area shape="rect" id="node6" href="$classNamedObject.html" title="A user&#45;defined variable or function. " alt="" coords="5,81,108,108"/>
-<area shape="rect" id="node7" href="$classUCS__string.html" title="A string of Unicode characters (32&#45;bit) " alt="" coords="133,81,223,108"/>
+<area shape="rect" id="node2" href="$classRO__SystemVariable.html" title="Base class for all read&#45;only APL system variables. " alt="" coords="7,413,149,440"/>
+<area shape="rect" id="node3" href="$classNL__SystemVariable.html" title="Base class for all APL system variables that cannot be localized. " alt="" coords="9,337,147,364"/>
+<area shape="rect" id="node4" href="$classSystemVariable.html" title="Base class for all APL system variables. " alt="" coords="21,261,135,288"/>
+<area shape="rect" id="node5" href="$classSymbol.html" title="Base class for variables, defined functions, and distinguished names. " alt="" coords="45,185,111,212"/>
+<area shape="rect" id="node6" href="$classNamedObject.html" title="A user&#45;defined variable or function. " alt="" coords="5,96,108,123"/>
+<area shape="rect" id="node7" href="$classUCS__string.html" title="A string of Unicode characters (32&#45;bit) " alt="" coords="133,96,223,123"/>
 </map>

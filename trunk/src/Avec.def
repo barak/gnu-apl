@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -18,15 +18,21 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-/** The Unicode characters used in the interpreter.
-    Characters defined with char_def( , xxx) are contained in ⎕AV
-    Characters defined with char_def( , 0xx) are in ⎕AV without APL relevance
-    Characters defined with char_df1() are known in the source code but are 
-    not contained in ⎕AV.
+/** The characters used in the interpreter.
+
+    Macro char_def( ,  xx) defines characters in ⎕AV which have APL relevance.
+
+    Macro char_def( , 0xx) defines characters in ⎕AV without APL relevance.
+    These characters come from the IBM APL2 Workstation ⎕AV and are subject
+    to being removed in favour of new APL characters with APL relevance.
+
+    Macro char_uni() defines characters not in ⎕AV, have no APL relevance,
+    but were declared as members UNI_xxx in \b enum \b Unicode so that they
+    can be referenced with name in the C++ source files.
 **/
 
-//       Name                Unicode  Token          Flags     Pos
-//-------------------------------------------------------------------
+//      (Name                Unicode  Token          Flags      Pos)
+//------------------------------------------------------------------
 char_def(NUL               , 0x00   , END          , NONE     ,  00)
 char_def(SOH               , 0x01   , END          , NONE     ,  01)
 char_def(STX               , 0x02   , END          , NONE     ,  02)
@@ -161,49 +167,51 @@ char_def(POUND             , 0x00A3 , END          , NO_SPACE ,  9C) /* £ */
 char_def(YEN               , 0x00A5 , END          , NO_SPACE , 080) /* ¥ */
 char_def(DIAERESIS         , 0x00A8 , OPER1_EACH   , NO_SPACE ,  FE) /* ¨ */
 char_def(OVERBAR           , 0x00AF , NUMERIC      , SYMBOL   ,  FD) /* ¯ */
-char_df1(PAD_U2            , 0x00B2 , END          , NO_SPACE ,  --) /* ² */
-char_df1(PAD_U3            , 0x00B3 , END          , NO_SPACE ,  --) /* ³ */
-char_df1(PAD_U1            , 0x00B9 , END          , NO_SPACE ,  --) /* ¹ */
-char_df1(INVERTED_QUESTION , 0x00BF , END          , NO_SPACE ,  A8) /* ¿ */
+char_uni(PAD_U2            , 0x00B2 , END          , NO_SPACE      ) /* ² */
+char_uni(PAD_U3            , 0x00B3 , END          , NO_SPACE      ) /* ³ */
+char_uni(PAD_U1            , 0x00B9 , END          , NO_SPACE      ) /* ¹ */
 char_def(MULTIPLY          , 0x00D7 , F12_TIMES    , NO_SPACE ,  F5) /* × */
 char_def(DIVIDE            , 0x00F7 , F12_DIVIDE   , NO_SPACE ,  F6) /* ÷ */
 char_def(LAMBDA            , 0x03BB , SYMBOL       , SYMBOL   ,  99) /* λ */
 char_def(MUE               , 0x03BC , END          , SYMBOL   ,  8B) /* μ */
 char_def(CHI               , 0x03C7 , SYMBOL       , SYMBOL   ,  A2) /* χ */
-char_df1(AV_MAX            , 0x0461 , END          , NO_SPACE ,  --) /* ѡ */
-char_df1(SINGLE_QUOTE1     , 0x2018 , QUOTE1       , NONE     ,  --) /* ⁰ */
-char_df1(SINGLE_QUOTE2     , 0x2019 , QUOTE1       , NONE     ,  --) /* ‘ */
-char_df1(PAD_U0            , 0x2070 , END          , NO_SPACE ,  --) /* ’ */
-char_df1(PAD_U4            , 0x2074 , END          , NO_SPACE ,  --) /* ⁴ */
-char_df1(PAD_U5            , 0x2075 , END          , NO_SPACE ,  --) /* ⁵ */
-char_df1(PAD_U6            , 0x2076 , END          , NO_SPACE ,  --) /* ⁶ */
-char_df1(PAD_U7            , 0x2077 , END          , NO_SPACE ,  --) /* ⁷ */
-char_df1(PAD_U8            , 0x2078 , END          , NO_SPACE ,  --) /* ⁸ */
-char_df1(PAD_U9            , 0x2079 , END          , NO_SPACE ,  --) /* ⁹ */
-char_df1(PAD_Un            , 0x207F , END          , NO_SPACE ,  --) /* ⁿ */
-char_df1(PAD_L0            , 0x2080 , END          , NO_SPACE ,  --) /* ₀ */
-char_df1(PAD_L1            , 0x2081 , END          , NO_SPACE ,  --) /* ₁ */
-char_df1(PAD_L2            , 0x2082 , END          , NO_SPACE ,  --) /* ₂ */
-char_df1(PAD_L3            , 0x2083 , END          , NO_SPACE ,  --) /* ₃ */
-char_df1(PAD_L4            , 0x2084 , END          , NO_SPACE ,  --) /* ₄ */
-char_df1(PAD_L5            , 0x2085 , END          , NO_SPACE ,  --) /* ₅ */
-char_df1(PAD_L6            , 0x2086 , END          , NO_SPACE ,  --) /* ₆ */
-char_df1(PAD_L7            , 0x2087 , END          , NO_SPACE ,  --) /* ₇ */
-char_df1(PAD_L8            , 0x2088 , END          , NO_SPACE ,  --) /* ₈ */
-char_df1(PAD_L9            , 0x2089 , END          , NO_SPACE ,  --) /* ₉ */
+char_def(ELEMENT           , 0x03F5 , F12_ELEMENT  , NO_SPACE ,  EE) /* ϵ */
+char_uni(AV_MAX            , 0x0461 , END          , NO_SPACE      ) /* ѡ */
+char_uni(SINGLE_QUOTE1     , 0x2018 , QUOTE1       , NONE          ) /* ⁰ */
+char_uni(SINGLE_QUOTE2     , 0x2019 , QUOTE1       , NONE          ) /* ‘ */
+char_uni(PAD_U0            , 0x2070 , END          , NO_SPACE      ) /* ⁰ */
+char_uni(PAD_U4            , 0x2074 , END          , NO_SPACE      ) /* ⁴ */
+char_uni(PAD_U5            , 0x2075 , END          , NO_SPACE      ) /* ⁵ */
+char_uni(PAD_U6            , 0x2076 , END          , NO_SPACE      ) /* ⁶ */
+char_uni(PAD_U7            , 0x2077 , END          , NO_SPACE      ) /* ⁷ */
+char_uni(PAD_U8            , 0x2078 , END          , NO_SPACE      ) /* ⁸ */
+char_uni(PAD_U9            , 0x2079 , END          , NO_SPACE      ) /* ⁹ */
+char_uni(PAD_Un            , 0x207F , END          , NO_SPACE      ) /* ⁿ */
+char_uni(PAD_L0            , 0x2080 , END          , NO_SPACE      ) /* ₀ */
+char_uni(PAD_L1            , 0x2081 , END          , NO_SPACE      ) /* ₁ */
+char_uni(PAD_L2            , 0x2082 , END          , NO_SPACE      ) /* ₂ */
+char_uni(PAD_L3            , 0x2083 , END          , NO_SPACE      ) /* ₃ */
+char_uni(PAD_L4            , 0x2084 , END          , NO_SPACE      ) /* ₄ */
+char_uni(PAD_L5            , 0x2085 , END          , NO_SPACE      ) /* ₅ */
+char_uni(PAD_L6            , 0x2086 , END          , NO_SPACE      ) /* ₆ */
+char_uni(PAD_L7            , 0x2087 , END          , NO_SPACE      ) /* ₇ */
+char_uni(PAD_L8            , 0x2088 , END          , NO_SPACE      ) /* ₈ */
+char_uni(PAD_L9            , 0x2089 , END          , NO_SPACE      ) /* ₉ */
+char_uni(PAD_Lk            , 0x2096 , END          , NO_SPACE      ) /* ₖ */
+char_uni(PAD_Ln            , 0x2099 , END          , NO_SPACE      ) /* ₙ */
 char_def(EURO              , 0x20AC , END          , NO_SPACE , 081) /* € */
 char_def(LEFT_ARROW        , 0x2190 , ASSIGN       , NO_SPACE ,  BD) /* ← */
 char_def(UP_ARROW          , 0x2191 , F12_TAKE     , NO_SPACE ,  C6) /* ↑ */
 char_def(RIGHT_ARROW       , 0x2192 , R_ARROW      , NO_SPACE ,  B8) /* → */
 char_def(DOWN_ARROW        , 0x2193 , F12_DROP     , NO_SPACE ,  C7) /* ↓ */
 char_def(RIGHT_LEFT_ARROW  , 0x21C4 , END          , NO_SPACE , 082) /* ⇄ */
-char_df1(DOUBLE_ARROW_L    , 0x21E8 , END          , NO_SPACE ,  --) /* ⇨ */
+char_uni(DOUBLE_ARROW_L    , 0x21E8 , END          , NO_SPACE      ) /* ⇨ */
 char_def(DELTA             , 0x2206 , SYMBOL       , SYMBOL   ,  B6) /* ∆ */
 char_def(NABLA             , 0x2207 , END          , NO_SPACE ,  B7) /* ∇ */
-char_def(ELEMENT           , 0x2208 , F12_ELEMENT  , NO_SPACE ,  EE) /* ∈ */
-char_df1(ELEMENT1          , 0x220A , END          , NO_SPACE ,  --) /* ∊ */
+char_uni(ELEMENT1          , 0x2208 , F12_ELEMENT  , NO_SPACE      ) /* ∈ */
+char_uni(ELEMENT2          , 0x220A , F12_ELEMENT  , NO_SPACE      ) /* ∊ */
 char_def(RING_OPERATOR     , 0x2218 , JOT          , NO_SPACE ,  F8) /* ∘ */
-char_df1(INFINITY          , 0x221E , END          , NO_SPACE ,  --) /* ∞ */
+char_uni(INFINITY          , 0x221E , END          , NO_SPACE      ) /* ∞ */
 char_def(DIVIDES           , 0x2223 , F12_STILE    , NO_SPACE ,  B2) /* ∣ */
 char_def(AND               , 0x2227 , F2_AND       , NO_SPACE ,  83) /* ∧ */
 char_def(OR                , 0x2228 , F2_OR        , NO_SPACE ,  EB) /* ∨ */
@@ -236,13 +244,13 @@ char_def(Quad_DIAMOND      , 0x233A , END          , NO_SPACE , 089) /* ⌺ */
 char_def(Quad_JOT          , 0x233B , END          , NO_SPACE ,  D5) /* ⌻ */
 char_def(Quad_CIRCLE       , 0x233C , END          , NO_SPACE , 08A) /* ⌼ */
 char_def(CIRCLE_STILE      , 0x233D , F12_ROTATE   , NO_SPACE ,  E8) /* ⌽ */
-char_df1(CIRCLE_JOT        , 0x233E , END          , NO_SPACE ,  --) /* ⌾ */
+char_uni(CIRCLE_JOT        , 0x233E , END          , NO_SPACE      ) /* ⌾ */
 char_def(SLASH_BAR         , 0x233F , OPER1_REDUCE1, NO_SPACE ,  F0) /* ⌿ */
 char_def(BACKSLASH_BAR     , 0x2340 , OPER1_SCAN1  , NO_SPACE ,  F1) /* ⍀ */
 char_def(Quad_SLASH        , 0x2341 , END          , NO_SPACE , 08C) /* ⍁ */
 char_def(Quad_BACKSLASH    , 0x2342 , END          , NO_SPACE ,  D4) /* ⍂ */
-char_df1(Quad_LESS_THAN    , 0x2343 , END          , NO_SPACE ,  --) /* ⍃ */
-char_df1(Quad_GREATER_THAN , 0x2344 , END          , NO_SPACE ,  --) /* ⍄ */
+char_uni(Quad_LESS_THAN    , 0x2343 , END          , NO_SPACE      ) /* ⍃ */
+char_uni(Quad_GREATER_THAN , 0x2344 , END          , NO_SPACE      ) /* ⍄ */
 char_def(LEFT_VANE         , 0x2345 , END          , NO_SPACE , 08F) /* ⍅ */
 char_def(RIGHT_VANE        , 0x2346 , END          , NO_SPACE , 093) /* ⍆ */
 char_def(Quad_LEFT_ARROW   , 0x2347 , END          , NO_SPACE , 095) /* ⍇ */
@@ -267,23 +275,23 @@ char_def(CIRCLE_UNDERBAR   , 0x235C , END          , NO_SPACE , 0AA) /* ⍜ */
 char_def(COMMENT           , 0x235D , END          , NO_SPACE ,  E4) /* ⍝ */
 char_def(QUOTE_Quad        , 0x235E , Quad_QUOTE   , NO_SPACE ,  91) /* ⍞ */
 char_def(LOGARITHM         , 0x235F , F12_LOGA     , NO_SPACE ,  B5) /* ⍟ */
-char_df1(Quad_COLON        , 0x2360 , END          , NO_SPACE ,  --) /* ⍠ */
-char_df1(UTACK_DIAERESIS   , 0x2361 , END          , NO_SPACE ,  --) /* ⍡ */
+char_uni(Quad_COLON        , 0x2360 , END          , NO_SPACE      ) /* ⍠ */
+char_uni(UTACK_DIAERESIS   , 0x2361 , END          , NO_SPACE      ) /* ⍡ */
 char_def(DEL_DIAERESIS     , 0x2362 , END          , NO_SPACE , 0AB) /* ⍢ */
 char_def(STAR_DIAERESIS    , 0x2363 , OPER2_POWER  , NO_SPACE ,  8E) /* ⍣ */
 char_def(JOT_DIARESIS      , 0x2364 , OPER2_RANK   , NO_SPACE ,  94) /* ⍤ */
-char_df1(CIRCLE_DIARESIS   , 0x2365 , END          , NO_SPACE ,  --) /* ⍥ */
-char_df1(DOWN_SHOE_STILE   , 0x2366 , END          , NO_SPACE ,  --) /* ⍦ */
-char_df1(LEFT_SHOE_STILE   , 0x2367 , END          , NO_SPACE ,  --) /* ⍧ */
+char_uni(CIRCLE_DIARESIS   , 0x2365 , END          , NO_SPACE      ) /* ⍥ */
+char_uni(DOWN_SHOE_STILE   , 0x2366 , END          , NO_SPACE      ) /* ⍦ */
+char_uni(LEFT_SHOE_STILE   , 0x2367 , END          , NO_SPACE      ) /* ⍧ */
 char_def(TILDE_DIAERESIS   , 0x2368 , OPER1_COMMUTE, NO_SPACE ,  AD) /* ⍨ */
-char_df1(GT_THAN_DIAERESIS , 0x2369 , END          , NO_SPACE ,  --) /* ⍩ */
+char_uni(GT_THAN_DIAERESIS , 0x2369 , END          , NO_SPACE      ) /* ⍩ */
 char_def(COMMA_BAR         , 0x236A , F12_COMMA1   , NO_SPACE ,  B1) /* ⍪ */
 char_def(DEL_TILDE         , 0x236B , END          , NO_SPACE ,  FA) /* ⍫ */
 char_def(ZILDE             , 0x236C , F0_ZILDE     , NO_SPACE ,  B0) /* ⍬ */
-char_df1(STILE_TILDE       , 0x236D , END          , NO_SPACE ,  --) /* ⍭ */
-char_df1(SEMICOL_UNDERBAR  , 0x236E , END          , NO_SPACE ,  --) /* ⍮ */
-char_df1(Quad_NOT_EQUAL    , 0x236F , END          , NO_SPACE ,  --) /* ⍯ */
-char_df1(Quad_QUEST_MARK   , 0x2370 , END          , NO_SPACE ,  --) /* ⍰ */
+char_uni(STILE_TILDE       , 0x236D , END          , NO_SPACE      ) /* ⍭ */
+char_uni(SEMICOL_UNDERBAR  , 0x236E , END          , NO_SPACE      ) /* ⍮ */
+char_uni(Quad_NOT_EQUAL    , 0x236F , END          , NO_SPACE      ) /* ⍯ */
+char_uni(Quad_QUEST_MARK   , 0x2370 , END          , NO_SPACE      ) /* ⍰ */
 char_def(NOR               , 0x2371 , F2_NOR       , NO_SPACE ,  E7) /* ⍱ */
 char_def(NAND              , 0x2372 , F2_NAND      , NO_SPACE ,  E5) /* ⍲ */
 char_def(IOTA              , 0x2373 , F12_INDEX_OF , NO_SPACE ,  EC) /* ⍳ */
@@ -291,22 +299,23 @@ char_def(RHO               , 0x2374 , F12_RHO      , NO_SPACE ,  E6) /* ⍴ */
 char_def(OMEGA             , 0x2375 , SYMBOL       , SYMBOL   ,  F9) /* ⍵ */
 char_def(ALPHA_UNDERBAR    , 0x2376 , SYMBOL       , SYMBOL   ,  9E) /* ⍶ */
 char_def(EPSILON_UNDERBAR  , 0x2377 , F2_FIND      , NO_SPACE ,  D1) /* ⍷ */
-char_def(INDEX_UNDERBAR    , 0x2378 , F12_INTERVAL_INDEX, NO_SPACE,D0) /* ⍸ */
+char_def(INDEX_UNDERBAR    , 0x2378 , F12_INTERVAL_INDEX
+                                                   , NO_SPACE,   D0) /* ⍸ */
 char_def(OMEGA_UNDERBAR    , 0x2379 , SYMBOL       , SYMBOL   ,  E1) /* ⍹ */
 char_def(ALPHA             , 0x237A , SYMBOL       , SYMBOL   ,  E0) /* ⍺ */
 char_def(Quad_Quad         , 0x2395 , Quad_Quad    , NONE     ,  90) /* ⎕ */
 char_def(LINE_HORI         , 0x2500 , END          , NO_SPACE ,  C4) /* ─ */
-char_df1(LINE_HORI2        , 0x2501 , END          , NO_SPACE ,  --) /* ━ */
+char_uni(LINE_HORI2        , 0x2501 , END          , NO_SPACE      ) /* ━ */
 char_def(LINE_VERT         , 0x2502 , END          , NO_SPACE ,  B3) /* │ */
-char_df1(LINE_VERT2        , 0x2503 , END          , NO_SPACE ,  --) /* ┃ */
+char_uni(LINE_VERT2        , 0x2503 , END          , NO_SPACE      ) /* ┃ */
 char_def(LINE_DOWN_RIGHT   , 0x250C , END          , NO_SPACE ,  DA) /* ┌ */
-char_df1(LINE_DOWN2_RIGHT2 , 0x250F , END          , NO_SPACE ,  --) /* ┏ */
+char_uni(LINE_DOWN2_RIGHT2 , 0x250F , END          , NO_SPACE      ) /* ┏ */
 char_def(LINE_DOWN_LEFT    , 0x2510 , END          , NO_SPACE ,  BF) /* ┐ */
-char_df1(LINE_DOWN2_LEFT2  , 0x2513 , END          , NO_SPACE ,  --) /* ┓ */
+char_uni(LINE_DOWN2_LEFT2  , 0x2513 , END          , NO_SPACE      ) /* ┓ */
 char_def(LINE_UP_RIGHT     , 0x2514 , END          , NO_SPACE ,  C0) /* └ */
-char_df1(LINE_UP2_RIGHT2   , 0x2517 , END          , NO_SPACE ,  --) /* ┗ */
+char_uni(LINE_UP2_RIGHT2   , 0x2517 , END          , NO_SPACE      ) /* ┗ */
 char_def(LINE_UP_LEFT      , 0x2518 , END          , NO_SPACE ,  D9) /* ┘ */
-char_df1(LINE_UP2_LEFT2    , 0x251B , END          , NO_SPACE ,  --) /* ┛ */
+char_uni(LINE_UP2_LEFT2    , 0x251B , END          , NO_SPACE      ) /* ┛ */
 char_def(LINE_VERT_RIGHT   , 0x251C , END          , NO_SPACE ,  C3) /* ├ */
 char_def(LINE_VERT_LEFT    , 0x2524 , END          , NO_SPACE ,  B4) /* ┤ */
 char_def(LINE_DOWN_HORI    , 0x252C , END          , NO_SPACE ,  C2) /* ┬ */
@@ -327,11 +336,12 @@ char_def(UPPER_HALF_BLOCK  , 0x2580 , END          , NO_SPACE ,  DF) /* ▀ */
 char_def(LOWER_HALF_BLOCK  , 0x2584 , END          , NO_SPACE ,  DC) /* ▄ */
 char_def(FULL_BLOCK        , 0x2588 , END          , NO_SPACE ,  DB) /* █ */
 char_def(LEFT_HALF_BLOCK   , 0x258C , END          , NO_SPACE ,  DD) /* ▌ */
-char_df1(Quad_Quad1        , 0x25AF , END          , NO_SPACE ,  --) /* ▯ */
+char_uni(Quad_Quad1        , 0x25AF , END          , NO_SPACE      ) /* ▯ */
 char_def(RIGHT_HALF_BLOCK  , 0x2590 , END          , NO_SPACE ,  DE) /* ▐ */
 char_def(DIAMOND           , 0x25CA , DIAMOND      , NO_SPACE ,  D8) /* ◊ */
 char_def(CIRCLE            , 0x25CB , F12_CIRCLE   , NO_SPACE ,  EA) /* ○ */
+//------------------------------------------------------------------
 
 #undef char_def
-#undef char_df1
+#undef char_uni
 

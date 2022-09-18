@@ -1,11 +1,10 @@
 <map id="Cell" name="Cell">
 <area shape="rect" id="node2" href="$classCharCell.html" title="A Cell containing a single Unicode character. " alt="" coords="5,80,79,107"/>
 <area shape="rect" id="node3" href="$classLvalCell.html" title="A cell pointing to another cell (which shall be updated) " alt="" coords="103,80,173,107"/>
-<area shape="rect" id="node5" href="$classNumericCell.html" title="Base class for RealCell and ComplexCell. " alt="" coords="197,80,292,107"/>
-<area shape="rect" id="node10" href="$classPointerCell.html" title="A cell pointing to a (nested) APL value. " alt="" coords="316,80,403,107"/>
-<area shape="rect" id="node4" href="$classLvalCell__picked.html" title="a compatibility Cell for fixing a bug in ⊃. Will be removed " alt="" coords="57,155,171,181"/>
-<area shape="rect" id="node6" href="$classComplexCell.html" title="A celkl containing one complex numbver. " alt="" coords="196,155,293,181"/>
-<area shape="rect" id="node7" href="$classRealCell.html" title="Base class for IntCell and FloatCell. " alt="" coords="318,155,390,181"/>
-<area shape="rect" id="node8" href="$classFloatCell.html" title="A Cell containing a single floating point (or rational) value. " alt="" coords="270,229,345,256"/>
-<area shape="rect" id="node9" href="$classIntCell.html" title="A cell containing a single Integer value. " alt="" coords="369,229,429,256"/>
+<area shape="rect" id="node4" href="$classNumericCell.html" title="Base class for RealCell and ComplexCell. " alt="" coords="197,80,292,107"/>
+<area shape="rect" id="node9" href="$classPointerCell.html" title="A cell pointing to a (nested) APL value. " alt="" coords="316,80,403,107"/>
+<area shape="rect" id="node5" href="$classComplexCell.html" title="A cell containing one complex number. " alt="" coords="141,155,239,181"/>
+<area shape="rect" id="node6" href="$classRealCell.html" title="Base class for IntCell and FloatCell. " alt="" coords="263,155,335,181"/>
+<area shape="rect" id="node7" href="$classFloatCell.html" title="A Cell containing a single floating point (or rational) value. " alt="" coords="215,229,290,256"/>
+<area shape="rect" id="node8" href="$classIntCell.html" title="A cell containing a single Integer value. " alt="" coords="315,229,375,256"/>
 </map>

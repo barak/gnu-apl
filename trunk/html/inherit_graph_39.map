@@ -1,5 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classDynamicObject.html" title="A Value or an IndexExpr. " alt="" coords="5,31,117,57"/>
-<area shape="rect" id="node2" href="$classIndexExpr.html" title="The interal representation of some APL index [A1;A2;...;An]. " alt="" coords="165,5,247,32"/>
-<area shape="rect" id="node3" href="$classValue.html" title="An APL Value (essentially a Shape and a ravel) " alt="" coords="179,56,233,83"/>
+<area shape="rect" id="node1" href="$classDLX__Node.html" title="one &#39;1&#39; in a sparse constraint matrix " alt="" coords="5,31,92,57"/>
+<area shape="rect" id="node2" href="$classDLX__Header__Node.html" title="A (column&#45;) header node. " alt="" coords="140,5,275,32"/>
+<area shape="rect" id="node3" href="$classDLX__Root__Node.html" title="The root node of the constraints matrix. " alt="" coords="147,56,268,83"/>
 </map>

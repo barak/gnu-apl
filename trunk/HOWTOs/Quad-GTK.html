@@ -1812,33 +1812,6 @@ approach is used:</p></div>
 <p>
 Gtk_server currently provides a rather small set of callback functions:
 </p>
-<div class="ulist"><ul>
-<li>
-<p>
-clicked
-</p>
-</li>
-<li>
-<p>
-activate
-</p>
-</li>
-<li>
-<p>
-changed
-</p>
-</li>
-<li>
-<p>
-draw
-</p>
-</li>
-<li>
-<p>
-destroy
-</p>
-</li>
-</ul></div>
 </li>
 <li>
 <p>
@@ -2552,96 +2525,6 @@ cellspacing="0" cellpadding="4">
 <td align="center" valign="top"><p class="table">4</p></td>
 <td align="left" valign="top"><p class="table">decrement the (debug-) verbosity of Gtk_server (subject to be changed)</p></td>
 </tr>
-<tr>
-<td align="left" valign="top"><p class="table">Text ⎕GTK[H_ID] 1     <strong>--or--</strong><br />
- Text ⎕GTK[H_ID] "set_text"</p></td>
-<td align="center" valign="top"><p class="table">1</p></td>
-<td align="left" valign="top"><p class="table">set the text in e.g. a text entry</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table">Text ← ⎕GTK[H_ID] 2     <strong>--or--</strong><br />
- Text ← ⎕GTK[H_ID] "get_text"</p></td>
-<td align="center" valign="top"><p class="table">2</p></td>
-<td align="left" valign="top"><p class="table">return the text in e.g. a text entry</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table">Text ⎕GTK[H_ID] 3     <strong>--or--</strong><br />
- Text ⎕GTK[H_ID] "set_label"</p></td>
-<td align="center" valign="top"><p class="table">3</p></td>
-<td align="left" valign="top"><p class="table">set the text of e.g. a label</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table">Fraction ⎕GTK[H_ID] 4     <strong>--or--</strong><br />
- Fraction ⎕GTK[H_ID] "set_fraction"</p></td>
-<td align="center" valign="top"><p class="table">4</p></td>
-<td align="left" valign="top"><p class="table">set the progress shown by a progress bar</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table">Fraction ← ⎕GTK[H_ID] 5     <strong>--or--</strong><br />
- Fraction ← ⎕GTK[H_ID] "get_fraction"</p></td>
-<td align="center" valign="top"><p class="table">5</p></td>
-<td align="left" valign="top"><p class="table">return the progress shown by a progress bar</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table">Level ⎕GTK[H_ID] 6     <strong>--or--</strong><br />
- Level ⎕GTK[H_ID] "set_value"</p></td>
-<td align="center" valign="top"><p class="table">6</p></td>
-<td align="left" valign="top"><p class="table">set the level shown by a level bar</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table">Level ← ⎕GTK[H_ID] 7     <strong>--or--</strong><br />
- Level ← ⎕GTK[H_ID] "get_value"</p></td>
-<td align="center" valign="top"><p class="table">7</p></td>
-<td align="left" valign="top"><p class="table">return the level shown by level bar</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table">Selected ⎕GTK[H_ID] 8     <strong>--or--</strong><br />
- Selected ⎕GTK[H_ID] "set_active"</p></td>
-<td align="center" valign="top"><p class="table">8</p></td>
-<td align="left" valign="top"><p class="table">set the selected item of a combo box (-1 for none)</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table">Selected ← ⎕GTK[H_ID] 9     <strong>--or--</strong><br />
- Selected ← ⎕GTK[H_ID] "get_active"</p></td>
-<td align="center" valign="top"><p class="table">9</p></td>
-<td align="left" valign="top"><p class="table">return the selected item of a combo box (-1 = none)</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table">DrawCmd ⎕GTK[H_ID] 10     <strong>--or--</strong><br />
- DrawCmd ⎕GTK[H_ID] "draw_commands"</p></td>
-<td align="center" valign="top"><p class="table">10</p></td>
-<td align="left" valign="top"><p class="table">set the commands needed to draw a drawing area</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table">SX_SY ⎕GTK[H_ID] 11     <strong>--or--</strong><br />
- SX_SY ⎕GTK[H_ID] "set_area_size"</p></td>
-<td align="center" valign="top"><p class="table">11</p></td>
-<td align="left" valign="top"><p class="table">set the area size to SX_SY &gt;&gt; 16 : SX_SY &amp; 0xFFFF</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table">Origin ⎕GTK[H_ID] 12     <strong>--or--</strong><br />
- Origin ⎕GTK[H_ID] "set_Y_origin"</p></td>
-<td align="center" valign="top"><p class="table">12</p></td>
-<td align="left" valign="top"><p class="table">set the Y-origin to the top (1) or the bottom (0)</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table">Selected ← ⎕GTK[H_ID] 13     <strong>--or--</strong><br />
- Selected ← ⎕GTK[H_ID] "get_active_text"</p></td>
-<td align="center" valign="top"><p class="table">13</p></td>
-<td align="left" valign="top"><p class="table">return the selected text in a combo box text</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table">Selected ← ⎕GTK[H_ID] 14     <strong>--or--</strong><br />
- Selected ← ⎕GTK[H_ID] "get_value"</p></td>
-<td align="center" valign="top"><p class="table">14</p></td>
-<td align="left" valign="top"><p class="table">return the current value</p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table">Selected ← ⎕GTK[H_ID] 15     <strong>--or--</strong><br />
- Selected ← ⎕GTK[H_ID] "get_value_as_int"</p></td>
-<td align="center" valign="top"><p class="table">15</p></td>
-<td align="left" valign="top"><p class="table">return the current value</p></td>
-</tr>
 </tbody>
 </table>
 </div>
@@ -2696,36 +2579,6 @@ cellspacing="0" cellpadding="4">
 </tr>
 </thead>
 <tbody>
-<tr>
-<td align="left" valign="top"><p class="table"><code><strong>clicked</strong></code></p></td>
-<td align="center" valign="top"><p class="table">1</p></td>
-<td align="left" valign="top"><p class="table">Gi, Ns, Es, Is, Cs</p></td>
-<td align="left" valign="top"><p class="table"><code>6</code>  <code>'OK-button'</code>  <code>'clicked'</code>  <code>'button1'</code>  <code>'GtkButton'</code></p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><code><strong>activate</strong></code></p></td>
-<td align="center" valign="top"><p class="table">1</p></td>
-<td align="left" valign="top"><p class="table">Gi, Ns, Es, Is, Cs</p></td>
-<td align="left" valign="top"><p class="table"><code>6</code>  <code>'Text-entry'</code>  <code>'activate'</code>  <code>'entry1'</code>  <code>'GtkEntry'</code></p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><code><strong>changed</strong></code></p></td>
-<td align="center" valign="top"><p class="table">1</p></td>
-<td align="left" valign="top"><p class="table">Gi, Ns, Es, Is, Cs</p></td>
-<td align="left" valign="top"><p class="table"><code>6</code>  <code>'Select-box'</code>  <code>'changed'</code>  <code>'combobox1'</code>  <code>'GtkComboBox'</code></p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><code><strong>draw</strong></code></p></td>
-<td align="center" valign="top"><p class="table">1</p></td>
-<td align="left" valign="top"><p class="table">Gi, Ns, Es, Is, Cs</p></td>
-<td align="left" valign="top"><p class="table"><code>6</code>  <code>'Canvas'</code>  <code>'draw'</code>  <code>'drawingarea1'</code>  <code>'GtkDrawingArea'</code></p></td>
-</tr>
-<tr>
-<td align="left" valign="top"><p class="table"><code><strong>destroy</strong></code></p></td>
-<td align="center" valign="top"><p class="table">1</p></td>
-<td align="left" valign="top"><p class="table">Gi, Ns, Es, Is, Cs</p></td>
-<td align="left" valign="top"><p class="table"><code>6</code>  <code>'Main-Window'</code>  <code>'destroy'</code>  <code>'window1'</code>  <code>'GtkWindow'</code></p></td>
-</tr>
 </tbody>
 </table>
 </div>
@@ -2840,7 +2693,7 @@ top-level group).</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2021-03-26 20:15:21 CET
+ 2022-03-23 13:47:49 CET
 </div>
 </div>
 </body>

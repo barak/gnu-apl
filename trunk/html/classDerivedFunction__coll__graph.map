@@ -12,7 +12,7 @@
 <area shape="rect" id="node11" href="$classDynamicObject.html" title="A Value or an IndexExpr. " alt="" coords="415,125,527,152"/>
 <area shape="rect" id="node19" href="$classIndexExpr.html" title="The interal representation of some APL index [A1;A2;...;An]. " alt="" coords="312,231,393,257"/>
 <area shape="rect" id="node12" href="$classCell.html" title="The base class for all Cells. " alt="" coords="550,320,595,347"/>
-<area shape="rect" id="node13" href="$unionCell_1_1SomeValue.html" title="A union containing all possible cell values for the different Cell types. " alt="" coords="659,231,779,257"/>
+<area shape="rect" id="node13" href="$unionCell_1_1SomeValue.html" title="A union containing all possible cell values for the different Cell types. " alt="" coords="638,231,758,257"/>
 <area shape="rect" id="node15" href="$structCell_1_1SomeValue_1_1__fval.html" title="&lt; for FloatCell " alt="" coords="667,125,823,152"/>
 <area shape="rect" id="node16" href="$unionCell_1_1SomeValue_1_1__fval_1_1__flt__num.html" title="either a floating point value, or the denominator of a quotient " alt="" coords="827,5,983,47"/>
 <area shape="rect" id="node17" href="$struct__deleted__value.html" title="a linked list of deleted values " alt="" coords="619,320,729,347"/>

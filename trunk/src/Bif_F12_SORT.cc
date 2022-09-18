@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ Bif_F12_SORT_DES  Bif_F12_SORT_DES::_fun;     // ⍒
 Bif_F12_SORT_ASC * Bif_F12_SORT_ASC::fun = &Bif_F12_SORT_ASC::_fun;
 Bif_F12_SORT_DES * Bif_F12_SORT_DES::fun = &Bif_F12_SORT_DES::_fun;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 CollatingCache::CollatingCache(const Value & A, const Cell * base,
                                ShapeItem clen)
    : rank(A.get_rank()),
@@ -42,7 +42,7 @@ CollatingCache::CollatingCache(const Value & A, const Cell * base,
 const ShapeItem ec_A = A.element_count();
 UCS_string UA;
    UA.reserve(ec_A);
-   loop(a, ec_A)   UA.append(A.get_ravel(a).get_char_value());
+   loop(a, ec_A)   UA.append(A.get_cravel(a).get_char_value());
 
 UCS_string UA1 = UA.unique();
 
@@ -62,13 +62,13 @@ UCS_string UA1 = UA.unique();
    //
    loop(a, ec_A)
       {
-        const Unicode uni = A.get_ravel(a).get_char_value();
+        const Unicode uni = A.get_cravel(a).get_char_value();
         CollatingCacheEntry & entry = at(find_entry(uni));
 
         ShapeItem aq = a;
         loop(r, A.get_rank())
            {
-             const Rank axis = entry.ce_shape.get_rank() - r - 1;
+             const sAxis axis = entry.ce_shape.get_rank() - r - 1;
              const ShapeItem ar = aq % A.get_shape_item(axis);
              Assert(ar <= A.get_shape_item(axis));
              if (entry.ce_shape.get_shape_item(axis) > ar)
@@ -82,7 +82,7 @@ UCS_string UA1 = UA.unique();
 CollatingCacheEntry others(Invalid_Unicode, A.get_shape());
    push_back(others);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 CollatingCache::greater_vec(const IntCell & Za, const IntCell & Zb,
                             const void * comp_arg)
@@ -92,7 +92,7 @@ const CollatingCache & cache =
 const Cell * ca = cache.base_B1 + cache.comp_len * Za.get_int_value();
 const Cell * cb = cache.base_B1 + cache.comp_len * Zb.get_int_value();
 
-const Rank rank = cache.get_rank();
+const sRank rank = cache.get_rank();
 
    loop(r, rank)
       {
@@ -108,7 +108,7 @@ const Rank rank = cache.get_rank();
 
    return ca > cb;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 CollatingCache::smaller_vec(const IntCell & Za, const IntCell & Zb,
                             const void * comp_arg)
@@ -117,7 +117,7 @@ const CollatingCache & cache =
                       *reinterpret_cast<const CollatingCache *>(comp_arg);
 const Cell * ca = cache.base_B1 + cache.comp_len * Za.get_int_value();
 const Cell * cb = cache.base_B1 + cache.comp_len * Zb.get_int_value();
-const Rank rank = cache.get_rank();
+const sRank rank = cache.get_rank();
 
    loop(r, rank)
       {
@@ -133,7 +133,7 @@ const Rank rank = cache.get_rank();
 
    return ca > cb;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ShapeItem
 CollatingCache::find_entry(Unicode uni) const
 {
@@ -146,7 +146,7 @@ const CollatingCacheEntry * entry =
    if (entry)   return entry - entries;
    return size() - 1;   // the entry for characters not in A
 }
-//=============================================================================
+//============================================================================
 Token
 Bif_F12_SORT::sort(Value_P B, Sort_order order)
 {
@@ -157,20 +157,20 @@ const ShapeItem len_BZ = B->get_shape_item(0);
    if (len_BZ == 0)   return Token(TOK_APL_VALUE1, Idx0(LOC));
 const ShapeItem comp_len = B->element_count()/len_BZ;
 
-const ShapeItem * indices = Cell::sorted_indices(&B->get_ravel(0),
+const ShapeItem * indices = Cell::sorted_indices(&B->get_cfirst(),
                                                  len_BZ, order, comp_len);
    if (indices == 0)   WS_FULL;
 
 Value_P Z(len_BZ, LOC);
 const int qio = Workspace::get_IO();
 
-   loop(a, len_BZ)   new (Z->next_ravel())   IntCell(indices[a] + qio);
+   loop(a, len_BZ)   Z->next_ravel_Int(indices[a] + qio);
    delete[] indices;
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_F12_SORT::sort_collating(Value_P A, Value_P B, Sort_order order)
 {
@@ -187,7 +187,7 @@ const ShapeItem len_BZ = B->get_shape_item(0);
    // first set Z←⍳len_BZ
    //
 Value_P Z(len_BZ, LOC);
-   loop(l, len_BZ)   new (Z->next_ravel())   IntCell(l + qio);
+   loop(l, len_BZ)   Z->next_ravel_Int(l + qio);
    Z->check_value(LOC);
    if (len_BZ == 1)   return Token(TOK_APL_VALUE1, Z);
 
@@ -199,26 +199,26 @@ const ShapeItem comp_len = ec_B/len_BZ;
    // index for each character in B.
    //
 Value_P B1(B->get_shape(), LOC);
-const Cell * base_B1 = &B1->get_ravel(0) - qio*comp_len;
-CollatingCache cache(A.getref(), base_B1, comp_len);
+const Cell * base_B1 = &B1->get_cfirst() - qio*comp_len;
+CollatingCache cache(*A, base_B1, comp_len);
    loop(b, ec_B)
       {
-        const Unicode uni = B->get_ravel(b).get_char_value();
+        const Unicode uni = B->get_cravel(b).get_char_value();
         const APL_Integer b1 = cache.find_entry(uni);
-        new (B1->next_ravel()) IntCell(b1);
+        B1->next_ravel_Int(b1);
       }
    B1->check_value(LOC);
 
    // then sort Z (actually re-arrange Z so that B[Z] is sorted)
    //
-IntCell * z0 = &Z->get_ravel(0).vIntCell();
+IntCell * Z0 = reinterpret_cast<IntCell *>(&Z->get_wfirst());
    if (order == SORT_ASCENDING)
-      Heapsort<IntCell>::sort(z0, len_BZ, &cache, &CollatingCache::greater_vec);
+      Heapsort<IntCell>::sort(Z0, len_BZ, &cache, &CollatingCache::greater_vec);
    else
-      Heapsort<IntCell>::sort(z0, len_BZ, &cache, &CollatingCache::smaller_vec);
+      Heapsort<IntCell>::sort(Z0, len_BZ, &cache, &CollatingCache::smaller_vec);
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 

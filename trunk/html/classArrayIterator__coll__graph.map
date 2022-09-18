@@ -1,4 +1,3 @@
 <map id="ArrayIterator" name="ArrayIterator">
-<area shape="rect" id="node2" href="$struct__twc.html" title="The end and the state of an abstract iterator along one axis (to / weight / current) ..." alt="" coords="5,5,56,32"/>
-<area shape="rect" id="node3" href="$classShape.html" title="the shape of an APL value " alt="" coords="80,5,139,32"/>
+<area shape="rect" id="node2" href="$classAxisIterator.html" title="An iterator counting 0, 1, 2, ... ⍴[N&#45;1] along one axis of length N. " alt="" coords="8,5,97,32"/>
 </map>

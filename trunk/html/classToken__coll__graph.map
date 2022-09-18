@@ -4,7 +4,7 @@
 <area shape="rect" id="node4" href="$classNamedObject.html" title="A user&#45;defined variable or function. " alt="" coords="5,125,108,152"/>
 <area shape="rect" id="node7" href="$classFunction.html" title="Base class for all APL functions and operators (system or defined) " alt="" coords="21,231,93,257"/>
 <area shape="rect" id="node5" href="$classUCS__string.html" title="A string of Unicode characters (32&#45;bit) " alt="" coords="133,125,223,152"/>
-<area shape="rect" id="node8" href="$classValue__P__Base.html" title="A Value smart * and access functions (except constructors) " alt="" coords="528,13,636,39"/>
+<area shape="rect" id="node8" href="$classValue__P__Base.html" title="A Value smart * and access functions (except constructors) " alt="" coords="455,13,563,39"/>
 <area shape="rect" id="node13" href="$structCell_1_1SomeValue_1_1__pval.html" title="a pointer to, and the owner of, a nested APL (sub&#45;) value " alt="" coords="869,125,1028,152"/>
 <area shape="rect" id="node19" href="$classValue__P.html" title="A Value smart * (constructors) " alt="" coords="312,125,383,152"/>
 <area shape="rect" id="node9" href="$classValue.html" title="An APL Value (essentially a Shape and a ravel) " alt="" coords="813,424,868,451"/>

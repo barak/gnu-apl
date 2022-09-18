@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@
 #include "Prefix.hh"
 #include "PrintOperator.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
     One entry of the state indicator (SI) of the APL interpreter.
     Compared to e.g.  C++, the state indicator is (one element of) the
@@ -128,20 +128,20 @@ public:
    static const Error & get_error(const StateIndicator * si)
        { return si ? si->error : top_level_error; }
 
-   /// return left arg
-   Value_P get_L();
+   /// return left arg (and set \b function)
+   Value_P get_L(UCS_string & function);
 
    /// change left arg
    void set_L(Value_P value);
 
-   /// return right arg
-   Value_P get_R();
+   /// return right arg (and set \b function)
+   Value_P get_R(UCS_string & function);
 
    /// change right arg
    void set_R(Value_P value);
 
-   /// return axis arg
-   Value_P get_X();
+   /// return axis arg (and set \b function)
+   Value_P get_X(UCS_string & function);
 
    /// change axis arg
    void set_X(Value_P value);
@@ -178,9 +178,12 @@ public:
    const Prefix & get_prefix() const
       { return current_stack; }
 
-   /// return the SI that has called this one
+   /// return the SI that has called \b this one
    StateIndicator * get_parent() const
       { return parent; }
+
+   /// return the child SI (if any) that \b parent has called
+   static const StateIndicator * find_child(const StateIndicator * parent);
 
    /// return the level at which sym is pushed for the nth. time
    SI_level nth_push(const Symbol * sym, int from_tos) const;
@@ -210,6 +213,6 @@ protected:
    /// the StateIndicator that has called this one
    StateIndicator * parent;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __STATE_INDICATOR_HH_DEFINED__

@@ -10,7 +10,6 @@ var classOutput =
     ] ],
     [ "color_enabled", "classOutput.html#a5fbec469bdc1d4ed4cd951ba98784118", null ],
     [ "init", "classOutput.html#a65364a05686d3f27ee78ea5747b4cbdd", null ],
-    [ "read_ESC_sequence", "classOutput.html#a3130edc86258293d6873686680ab2293", null ],
     [ "reset_colors", "classOutput.html#a2692045d0f0457f8ce9b476e8ba4dad3", null ],
     [ "reset_dout", "classOutput.html#aef5f941952e0a8ee19481212c472e587", null ],
     [ "set_color_mode", "classOutput.html#a7f5a3baf917253208de9aae748cb121d", null ],
@@ -48,8 +47,5 @@ var classOutput =
     [ "ESC_Delete", "classOutput.html#a10023dbfede11027fd443b7b0636e486", null ],
     [ "ESC_Delete_1", "classOutput.html#a6208ab84a0483cc161645bee5886e067", null ],
     [ "ESC_InsertMode", "classOutput.html#ad3bd229281324b3054b10d40000de172", null ],
-    [ "ESC_InsertMode_1", "classOutput.html#aaec91d184bdb8ec51e3e90a04b17f4c3", null ],
-    [ "exit_attr_mode", "classOutput.html#a4344c9c31394b45c3c951677439aa1ce", null ],
-    [ "keys_curses", "classOutput.html#a508421f14306e792ea6b4b3ee5d47aa0", null ],
-    [ "use_curses", "classOutput.html#a7ef14b95ddc90058d1aac325ac251f77", null ]
+    [ "ESC_InsertMode_1", "classOutput.html#aaec91d184bdb8ec51e3e90a04b17f4c3", null ]
 ];

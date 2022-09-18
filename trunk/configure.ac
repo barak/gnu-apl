@@ -105,7 +105,11 @@ AC_TYPE_UINT32_T
 AC_TYPE_UINT64_T
 AC_TYPE_UINT8_T
 
-#################################################################################
+AC_DEFINE_UNQUOTED([CONFIGURE_ARGS],
+                   "$0 $ac_configure_args",
+                   [how ./configure was called])
+
+##############################################################################
 #
 # Various checks for library functions. We use inverse alphabetic order although
 # the order should be least-dependent to most-dependent (or vice versa?). The
@@ -115,7 +119,7 @@ AC_TYPE_UINT8_T
 # ... lib_A ... lib_B   and the test for lib_B should come before the test for
 # lib_A in this file.
 #
-#################################################################################
+##############################################################################
 
 AC_FUNC_ERROR_AT_LINE
 AC_FUNC_MMAP
@@ -196,16 +200,16 @@ then
 else
     # user wants ⎕GTK)
     AC_MSG_RESULT([yes])
-    AC_MSG_CHECKING([if pkg-config is executable])
-    if test -x /usr/bin/pkg-config
+
+    AC_PATH_PROG(PKG_CONFIG, pkg-config, no)  # locate pkg-config
+    if test x$PKG_CONFIG != xno
     then
-        AC_MSG_RESULT([yes])
         AC_MSG_CHECKING([if package gtk+-3.0 is installed])
-        if pkg-config --exists gtk+-3.0
+        if $PKG_CONFIG --exists gtk+-3.0
         then
             AC_MSG_RESULT([yes])
-            GTK_CFLAGS=`pkg-config --cflags gtk+-3.0`
-            GTK_LDFLAGS=`pkg-config --libs gtk+-3.0`
+            GTK_CFLAGS=`$PKG_CONFIG --cflags gtk+-3.0`
+            GTK_LDFLAGS=`$PKG_CONFIG --libs gtk+-3.0`
             HAVE_gtk3=yes
         else
             AC_MSG_RESULT([no])
@@ -359,6 +363,21 @@ echo
 echo "   *** decisions made by the user ... ***"
 echo
 
+AC_MSG_CHECKING([if user wants ctrl-d to be del-char (moving EOT to ctrl-z)])
+user_wants_ctrld_del=no
+AC_ARG_WITH( [ctrld_del],
+             [AS_HELP_STRING([--with-ctrld_del],
+                             [enable to use ^D as del-char, ^Z as EOT])],
+             [user_wants_ctrld_del=$withval])
+
+if test "x$user_wants_ctrld_del" = xyes ; then
+    AC_DEFINE([WANT_CTRLD_DEL], [1],
+              [Define to make ^D a del-char and ^Z be EOT])
+fi
+
+AM_CONDITIONAL(WANT_CTRLD_DEL, test "x$user_wants_ctrld_del" = xyes)
+AC_MSG_RESULT([$user_wants_ctrld_del])
+
 # check if the user compiles for ANDROID
 #
 AC_MSG_CHECKING([if we are compiling for Android])
@@ -366,7 +385,7 @@ user_wants_android=no
 AC_ARG_WITH( [android],
              [AS_HELP_STRING([--with-android],
                              [enable when compiling for Android])],
-             [user_wants_android=yes])
+             [user_wants_android=$withval])
 
 if test "x$user_wants_android" = xyes ; then
    AC_DEFINE([WANT_ANDROID], [1], [Define if compiling for Android])
@@ -382,7 +401,7 @@ user_wants_erlang=no
 AC_ARG_WITH( [erlang],
              [AS_HELP_STRING([--with-erlang],
                              [enable to build the Erlang interface])],
-             [user_wants_erlang=yes])
+             [user_wants_erlang=$withval])
 
 if test "x$user_wants_libapl" = xyes ; then
    AC_DEFINE([WANT_ERLANG], [1], [Define if building the Erlang interface])
@@ -398,7 +417,7 @@ user_wants_libapl=$user_wants_erlang   # Erlang needs libapl
 AC_ARG_WITH( [libapl],
              [AS_HELP_STRING([--with-libapl],
                              [enable to build libapl.so])],
-             [user_wants_libapl=yes])
+             [user_wants_libapl=$withval])
 
 if test "x$user_wants_libapl" = xyes ; then
    AC_DEFINE([WANT_LIBAPL], [1], [Define if building libapl.so])
@@ -416,14 +435,15 @@ PYTHON_CFLAGS=
 AC_ARG_WITH( [python],
              [AS_HELP_STRING([--with-python],
              [enable to build python extension lib_gnu_apl.so])],
-             [user_wants_python=yes])
+             [user_wants_python=$withval])
 
 if test "$user_wants_python" = yes ; then
    AC_DEFINE([WANT_PYTHON], [1], [Define if building lib_gnu_apl.so])
-   if test -x /usr/bin/pkg-config ; then        # we have pkg-config 
-        if pkg-config --exists python ; then    # and pkg-config knows python
-            PYTHON_CFLAGS=$( pkg-config --cflags python3 )
-        fi
+    AC_PATH_PROG(PKG_CONFIG, pkg-config, no)  # locate pkg-config
+    if test x$PKG_CONFIG != xno ; then        # we have pkg-config
+       if $PKG_CONFIG --exists python ; then  # and pkg-config knows python
+            PYTHON_CFLAGS=$( $PKG_CONFIG --cflags python3 )
+       fi
    fi
 fi
 AM_CONDITIONAL(WANT_PYTHON, test "x$user_wants_python" = xyes)
@@ -434,6 +454,7 @@ AC_CONFIG_FILES([Makefile
                  debian/Makefile
                  debian/source/Makefile
                  doc/Makefile
+                 doc/DALY/Makefile
                  erlang/Makefile
                  erlang/apl.erl
                  gnu-apl.d/Makefile
@@ -465,9 +486,11 @@ AC_CONFIG_FILES([Makefile
                  websock/server/Makefile
                  workspaces/Makefile
                  wslib3/Makefile
+                 wslib3/DALY/Makefile
                  wslib4/Makefile
                  wslib5/Makefile
                  wslib5/APLComponentFiles/Makefile
+                 wslib5/DALY/Makefile
                  wslib5/iso-apl-cf/Makefile
                 ])
 
@@ -709,7 +732,7 @@ do
    if test -f "$f/buildtag.sh"
    then
       apl_top="$f"
-      source "$f/buildtag.sh"
+      . "$f/buildtag.sh"
       abs_apl_top=$(readlink -f "$apl_top")
    fi
 done
@@ -722,21 +745,12 @@ else
    echo "configure: top-level apl directory is: $abs_apl_top"
 fi
 
-# create src/makefile.h
+# remove makefile.h
 #
-echo "configure: creating $abs_apl_top/makefile.h ..."
 if test -f "$apl_top/makefile.h"
 then
    echo "configure: removing old $apl_top/makefile.h"
    rm -f "$apl_top/makefile.h"
-fi
-make makefile.h >/dev/null
-echo "#define CONFIGURE_ARGS         xSTR($0 $ac_configure_args)
-" >> makefile.h
-
-if test "$apl_top" != "."   # vpath build
-then
-   cp makefile.h "$apl_top"/makefile.h
 fi
 
 # summary

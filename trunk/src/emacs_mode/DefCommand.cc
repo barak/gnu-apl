@@ -43,65 +43,72 @@ void DefCommand::run_command( NetworkConnection &conn, const std::vector<std::st
 
         Shape shape( content.size() );
         Value_P function_list_value(shape, LOC);
-        for( vector<string>::const_iterator i = content.begin() ; i != content.end() ; i++ ) {
-            Value_P v;
-            if( i->size() == 0 ) {
-                v = Str0( LOC );
+        for (vector<string>::const_iterator i = content.begin();
+             i != content.end() ; i++)
+            {
+              Value_P v = i->size() ?  make_string_cell(*i, LOC)
+                                    :  Str0( LOC );
+
+              function_list_value->next_ravel_Pointer(v.get());
             }
-            else {
-                v = make_string_cell( *i, LOC );
-            }
-            new (function_list_value->next_ravel())
-                PointerCell(v.get(), function_list_value.getref() );
-        }
+
         function_list_value->check_value( LOC );
 
-        if( args.size() > 1 ) {
+        if (args.size() > 1)
+           {
             Shape tag_shape( 2 );
             Value_P tag(tag_shape, LOC);
-            new (tag->next_ravel()) IntCell( 0 );
-            new (tag->next_ravel())
-                PointerCell( make_string_cell( args[1], LOC ).get(), tag.getref());
-            function_list_value->check_value( LOC );
-            Token result = Quad_FX::fun->eval_AB( tag, function_list_value );
-            out << "function defined\n" << to_string( result.canonical( PST_CS_NONE ) );
-        }
-        else {
-            Token result = Quad_FX::fun->eval_B( function_list_value );
-            if( result.is_apl_val() ) {
-                Value_P value = result.get_apl_val();
-                if( value->is_int_scalar() ) {
-                    out << "error\n"
-                        << "parse error\n"
-                        << "Error parsing expression\n"
-                        << value->get_ravel( 0 ).get_int_value() - Workspace::get_IO() + 1;
+            tag->next_ravel_Int(0);
+            tag->next_ravel_Pointer(make_string_cell(args[1], LOC ).get());
+            function_list_value->check_value(LOC);
+            Token result = Quad_FX::fun->eval_AB( tag, function_list_value);
+            out << "function defined\n"
+                << to_string(result.canonical(PST_CS_NONE));
+           }
+        else
+           {
+             Token result = Quad_FX::fun->eval_B( function_list_value );
+             if (result.is_apl_val())
+                {
+                  Value_P value = result.get_apl_val();
+                  if (value->is_int_scalar())
+                     {
+                       out << "error\n"
+                              "parse error\n"
+                              "Error parsing expression\n"
+                           << value->get_cravel( 0 ).get_int_value() - Workspace::get_IO() + 1;
                 }
-                else if( value->is_char_string() ) {
-                    out << "function defined\n"
-                        << value->get_UCS_ravel();
+                else if (value->is_char_string())
+                   {
+                     out << "function defined\n"
+                         << value->get_UCS_ravel();
+                   }
+                else
+                   {
+                     out << "error\n"
+                         << "illegal result type";
+                   }
                 }
-                else {
-                    out << "error\n"
-                        << "illegal result type";
+             else
+                {
+                  out << "error\n"
+                         "unknown error";
                 }
-            }
-            else {
-                out << "error\n"
-                    << "unknown error";
-            }
-        }
-        out << "\n"
-            << END_TAG << "\n";
-        conn.write_string_to_fd( out.str() );
-    }
-    catch( Error &error ) {
-        stringstream out;
-        out << "error\n";
-
-        log_error( error, out );
+           }
 
         out << "\n"
             << END_TAG << "\n";
         conn.write_string_to_fd( out.str() );
     }
+    catch(Error &error)
+       {
+         stringstream out;
+         out << "error\n";
+
+         log_error( error, out );
+
+         out << "\n"
+             << END_TAG << "\n";
+         conn.write_string_to_fd( out.str() );
+       }
 }

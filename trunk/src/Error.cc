@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@
 #include "UserFunction.hh"
 #include "Workspace.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Error::Error(ErrorCode ec, const char * loc)
    : error_code(ec),
      throw_loc(loc),
@@ -44,7 +44,7 @@ const char more = Workspace::more_error().size() ? '+' : 0;
    *symbol_name = 0;
    *error_message_2 = 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Error::print(ostream & out, const char * loc) const
 {
@@ -94,7 +94,7 @@ Error::print(ostream & out, const char * loc) const
                                                                   << endl;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 const char *
 Error::error_name(ErrorCode err)
 {
@@ -109,7 +109,7 @@ Error::error_name(ErrorCode err)
 
    return "Unknown Error";
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Error::is_known() const
 {
@@ -122,7 +122,7 @@ Error::is_known() const
 
    return false;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Error::set_error_line_2(const UCS_string & ucs, int lcaret, int rcaret)
 {
@@ -132,7 +132,7 @@ UTF8_string utf(ucs);
    left_caret = lcaret;
    right_caret = rcaret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Error::is_syntax_or_value_error() const
 {
@@ -140,7 +140,7 @@ Error::is_syntax_or_value_error() const
    if (error_major(error_code) == 3)   return true;   // VALUE ERROR
    return false;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string
 Error::get_error_line_3() const
 {
@@ -159,7 +159,7 @@ const int diff = right_caret - left_caret;
 
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Error::print_em(ostream & out, const char * loc)
 {
@@ -178,7 +178,7 @@ Error::print_em(ostream & out, const char * loc)
    out << get_error_line_2() << endl
        << get_error_line_3() << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 throw_apl_error(ErrorCode code, const char * loc)
 {
@@ -202,7 +202,7 @@ StateIndicator * si = Workspace::SI_top();
    //
    if (si)
       {
-        const UserFunction * ufun = si->get_executable()->get_ufun();
+        const UserFunction * ufun = si->get_executable()->get_exec_ufun();
         if (ufun && ufun->get_exec_properties()[3])   code = E_DOMAIN_ERROR;
       }
 
@@ -212,7 +212,7 @@ Error error(code, loc);
 Error & eref = error;
    throw eref;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Error::throw_parse_error(ErrorCode code, const char * par_loc, const char *loc)
 {
@@ -233,7 +233,7 @@ Error error(code, loc);
 Error & eref = error;
    throw eref;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Error::throw_symbol_error(const UCS_string & sym_name, const char * loc)
 {
@@ -255,7 +255,7 @@ UTF8_string sym_name_utf(sym_name);
 Error & eref = err;
    throw eref;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Error::throw_define_error(const UCS_string & fun_name, const UCS_string & cmd,
                           const char * loc)
@@ -281,12 +281,12 @@ UTF8_string cmd_utf(cmd);   // cmd is something like ∇FUN[⎕]∇
    if (Workspace::SI_top())   *Workspace::get_error() = eref;
    throw eref;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Error::update_error_info(StateIndicator * si)
 {
 bool locked = false;
-const UserFunction * ufun = si->get_executable()->get_ufun();
+const UserFunction * ufun = si->get_executable()->get_exec_ufun();
 
    // prepare second error line (failed statement)
    //
@@ -320,7 +320,7 @@ const UserFunction * ufun = si->get_executable()->get_ufun();
 
    if (locked)
       {
-        si->get_executable()->get_ufun()->set_locked_error_info(*this);
+        si->get_executable()->get_exec_ufun()->set_locked_error_info(*this);
       }
    else
       {
@@ -347,5 +347,5 @@ const UserFunction * ufun = si->get_executable()->get_ufun();
 
    StateIndicator::get_error(si) = *this;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 

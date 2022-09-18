@@ -1,3 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classSvar__DB.html" title="Access to the shared variable database in APserver. " alt="" coords="5,5,80,32"/>
+<area shape="rect" id="node1" href="$classStatistics.html" title="Base class for different kinds of statistics. " alt="" coords="5,31,83,57"/>
+<area shape="rect" id="node2" href="$classCellFunctionStatistics.html" title="Performance counters for one cell level function. " alt="" coords="131,5,281,32"/>
+<area shape="rect" id="node3" href="$classFunctionStatistics.html" title="Performance counters for an entire APL system function. " alt="" coords="143,56,269,83"/>
 </map>

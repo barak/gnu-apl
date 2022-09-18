@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@
 Bif_F12_FORMAT   Bif_F12_FORMAT::_fun;       // ⍕
 Bif_F12_FORMAT * Bif_F12_FORMAT::fun = &Bif_F12_FORMAT::_fun;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_F12_FORMAT::eval_B(Value_P B) const
 {
@@ -52,41 +52,57 @@ Bif_F12_FORMAT::eval_B(Value_P B) const
       {
         PrintBuffer pb(*B, Workspace::get_PrintContext(PR_APL), 0);
         Assert(pb.is_rectangular());
-        const ShapeItem cols = pb.get_width(0);
-        const ShapeItem rows = pb.get_height();
+        const ShapeItem cols = pb.get_column_count();
+        const ShapeItem rows = pb.get_row_count();
         Shape shape_Z(rows, cols);
         Value_P Z(shape_Z, LOC);
         loop(y, rows)
             {
               UCS_string row = pb.get_line(y);
               row.map_pad();
-              loop(x, cols)   new (Z->next_ravel()) CharCell(row[x]);
+              loop(x, cols)   Z->next_ravel_Char(row[x]);
             }
 
+        Z->check_value(LOC);
+
+        // turn 1-line matrices into vectors
+        //
         if (Z->get_rank() == 2 && Z->get_shape().get_shape_item(0) == 1)
            {
              Shape sh(Z->get_shape().get_shape_item(1));
              Z->set_shape(sh);
            }
 
-        Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
 
 Value_P Z;
    if (B->get_rank() > 2)
       {
-        // reduce N>2 dimensions to 2 dimensions
+        // temporarily reduce the N > 2 dimensions of B
+        // to N = 2 dimensions of B1 (with the same ravel).
         //
+        const Shape shape_B = B->get_shape();
         const Shape shape_B1(B->get_rows(), B->get_cols());
-        Value_P B1 = B->clone(LOC);
-        B1->set_shape(shape_B1);
 
-        Z = monadic_format(B1);
+        try
+           {
+             B->set_shape(shape_B1);
+             Z = monadic_format(B);
+             B->set_shape(shape_B);
+           }
+        catch (...)
+           {
+             B->set_shape(shape_B);
+             throw;   // rethrow error
+           }
 
-        Shape shape_Z(B->get_shape());
-        shape_Z.set_last_shape_item(Z->get_last_shape_item());
-        Assert(shape_Z.get_volume() == Z->element_count());
+        // ¯1↓⍴B ←→ ¯1↓⍴Z i.e. the leading axes of B have the same lengths as
+        // the leading axes of Z. monadic ⍕ changes (increases) only the length
+        // of the last axis. We reshape Z to ¯1↓⍴B , ¯1⍴⍴Z.
+        //
+        Shape shape_Z = B->get_shape().without_last_axis();   // ¯1↓⍴B
+        shape_Z.add_shape_item(Z->get_last_shape_item());     // ¯1↓⍴B , ¯1↑⍴Z
         Z->set_shape(shape_Z);
       }
    else   // B->get_rank() is 0, 1, or 2
@@ -100,13 +116,13 @@ Value_P Z;
    //
 const APL_types::Depth depth = B->compute_depth();
 Shape sZ;
-   if (depth > 1)   // B is nested ⊢ ⍴⍴R is 1 or 2
+   if (depth > 1)   // B is nested, therefore ⍴⍴R is 1 or 2
       {
         // the  examples in lrm contradict the text in lrm.
         //
         // Page 136 shows: R←2 3ρ'ONE' 1 1 'TWO' 2 22 which contains only
         // scalar and vector items (R itself being a matrix) and therefore
-        // ⍕R shoule be a vector according to page 137:
+        // ⍕R should be a vector according to page 137:
         //
         // "Nested Arrays: When R is a nested array, Z is a vector if all"
         // items of R at any depth are scalars or vectors."
@@ -146,7 +162,7 @@ Shape sZ;
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_F12_FORMAT::eval_AB(Value_P A, Value_P B) const
 {
@@ -164,11 +180,11 @@ Value_P Z;
         DOMAIN_ERROR;
       }
 
-   Z->set_default_Spc();
+   Z->set_proto_Spc();
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Bif_F12_FORMAT::monadic_format(Value_P B)
 {
@@ -179,8 +195,8 @@ const PrintContext pctx = Workspace::get_PrintContext(style);
 
 const PrintBuffer pb(*B, pctx, 0);
 
-const ShapeItem width  = pb.get_width(0);
-const ShapeItem height = pb.get_height();
+const ShapeItem width  = pb.get_column_count();
+const ShapeItem height = pb.get_row_count();
 
    // monadic_format() returns the Value with rank 1 or 2 which may be changed
    // in Bif_F12_FORMAT::eval_B() later on to match the rather arbitrary rules
@@ -194,14 +210,14 @@ Value_P Z;
    loop(w, width)
       {
         const Unicode uni = pb.get_char(w, h);
-        if (is_iPAD_char(uni))  new (Z->next_ravel()) CharCell(UNI_SPACE);
-        else                    new (Z->next_ravel()) CharCell(uni);
+        if (is_iPAD_char(uni))  Z->next_ravel_Char(UNI_SPACE);
+        else                    Z->next_ravel_Char(uni);
       }
 
    Z->check_value(LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Bif_F12_FORMAT::format_by_example(Value_P A, Value_P B)
 {
@@ -274,7 +290,7 @@ Value_P Z(shape_Z, LOC);
              UCS_string row;
              loop(c, cols)
                 {
-                  const Cell & cB = B->get_ravel(c + r*cols);
+                  const Cell & cB = B->get_cravel(c + r*cols);
                   if (!cB.is_real_cell())   DOMAIN_ERROR;
 
                   const APL_Float value = cB.get_real_value();
@@ -288,7 +304,7 @@ Value_P Z(shape_Z, LOC);
 
              Assert(row.size() == all_formats.size());
              loop(c, row.size())
-                new (&Z->get_ravel(r*all_formats.size() + c)) CharCell(row[c]);
+                Z->set_ravel_Char(r*all_formats.size() + c, row[c]);
            }
       }
    catch (Error err)
@@ -301,7 +317,7 @@ Value_P Z(shape_Z, LOC);
 
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Bif_F12_FORMAT::split_example_into_columns(const UCS_string & all_formats,
                                    vector<UCS_string> & col_formats)
@@ -349,7 +365,7 @@ UCS_string current_format;
         col_formats.push_back(current_format);
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string
 Bif_F12_FORMAT::Format_LIFER::format_example(APL_Float value)
 {
@@ -379,7 +395,7 @@ const UCS_string right = format_right_side(data_fract, value < 0.0, data_expo);
 
    return left + right;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string
 Bif_F12_FORMAT::Format_LIFER::format_left_side(const UCS_string data_int,
                                                bool negative, bool & overflow)
@@ -412,7 +428,7 @@ UCS_string ucs;
    ucs.append(data);
    return ucs;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string
 Bif_F12_FORMAT::Format_LIFER::format_right_side(const UCS_string data_fract,
                                                 bool negative,
@@ -482,7 +498,7 @@ UCS_string ucs;
 
    return ucs;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Bif_F12_FORMAT::Format_LIFER::Format_LIFER(const UCS_string format)
    : exponent_char(UNI_E),
      expo_negative(false)
@@ -598,18 +614,17 @@ right_decorator:   /// the right decorator
       right_deco.format.append(format[f++]);
 
 fields_done:
-int sum = 0;
-   sum += left_deco.out_len = left_deco .format.size();
+   left_deco.out_len = left_deco .format.size();
 
-   sum += int_part  .out_len = int_part  .format.size();
+   int_part  .out_len = int_part  .format.size();
 
    if (fract_part.format.size())
-      sum += fract_part.out_len = fract_part.format.size() + 1;
+      fract_part.out_len = fract_part.format.size() + 1;
 
    if (exponent.size())
       {
-        sum += expo_deco.out_len = expo_deco.size();
-        sum += exponent.out_len = exponent.format.size() + 1;
+        expo_deco.out_len = expo_deco.size();
+        exponent.out_len = exponent.format.size() + 1;
       }
 
    right_deco.out_len = right_deco.format.size();
@@ -629,7 +644,7 @@ int sum = 0;
      exponent.map_field(2);
    }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Format_sub::map_field(int type)
 {
@@ -668,7 +683,7 @@ int flt_cnt = 0;
 
    return flt_cnt;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ostream &
 Format_sub::print(ostream & out) const
 {
@@ -677,7 +692,7 @@ Format_sub::print(ostream & out) const
    loop(d, 32)   if (flt_mask & (1 << d))   out << char('0' + d);
    return out;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Bif_F12_FORMAT::Format_LIFER::fill_data_fields(APL_Float value,
                 UCS_string & data_int, UCS_string & data_fract,
@@ -794,7 +809,7 @@ const int ilen = int_end - &data_buf[0];
              << "    data_expo:  '" << data_expo << "'"  << endl;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string
 Format_sub::insert_int_commas(const UCS_string & data, bool & overflow) const
 {
@@ -871,7 +886,7 @@ size_t d = data.size();
 
    return ucs.reverse();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string
 Format_sub::insert_fract_commas(const UCS_string & data) const
 {
@@ -901,7 +916,7 @@ int d = 0;
 
    return ucs;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Bif_F12_FORMAT::is_control_char(Unicode uni)
 {
@@ -909,7 +924,7 @@ Bif_F12_FORMAT::is_control_char(Unicode uni)
           (uni == UNI_COMMA) ||
           (uni == UNI_FULLSTOP);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Bif_F12_FORMAT::format_by_specification(Value_P A, Value_P B)
 {
@@ -930,18 +945,18 @@ const ShapeItem len_A = A->element_count();
         ShapeItem W = 0;
         loop(c, cols_B)
            {
-             if (len_A <= 2)   W += A->get_ravel(0).get_near_int();
-             else              W += A->get_ravel(2*c).get_near_int();
+             if (len_A <= 2)   W += A->get_cfirst().get_near_int();
+             else              W += A->get_cravel(2*c).get_near_int();
            }
 
-        Shape shape_Z = shape_B.without_axis(shape_B.get_rank() - 1);
+        Shape shape_Z = shape_B.without_last_axis();
         shape_Z.add_shape_item(W);
         const ShapeItem ec_Z = shape_Z.get_volume();
 
         Value_P Z(shape_Z, LOC);
-        loop(z, ec_Z)   new (Z->next_ravel()) CharCell(UNI_SPACE);
+        loop(z, ec_Z)   Z->next_ravel_Char(UNI_SPACE);
 
-        Z->set_default_Spc();
+        Z->set_proto_Spc();
         return Z;
       }
 
@@ -955,21 +970,21 @@ PrintBuffer pb;
          if (len_A == 1)
             {
               col_width = 0;
-              precision = A->get_ravel(0).get_near_int();
+              precision = A->get_cfirst().get_near_int();
             }
          else if (len_A == 2)
             {
-              col_width = A->get_ravel(0).get_near_int();
-              precision = A->get_ravel(1).get_near_int();
+              col_width = A->get_cfirst().get_near_int();
+              precision = A->get_cravel(1).get_near_int();
             }
          else
             {
-              col_width = A->get_ravel(2*col)    .get_near_int();
-              precision = A->get_ravel(2*col + 1).get_near_int();
+              col_width = A->get_cravel(2*col)    .get_near_int();
+              precision = A->get_cravel(2*col + 1).get_near_int();
             }
 
          PrintBuffer pb_col(format_one_col_by_spec(col_width, precision,
-                                         &B->get_ravel(col), cols_B, rows_B));
+                                         &B->get_cravel(col), cols_B, rows_B));
 
          if (col_width == 0)   pb_col.pad_l(UNI_SPACE, 1);
 
@@ -977,19 +992,19 @@ PrintBuffer pb;
          else       pb = pb_col;
        }
 
-const ShapeItem pb_w = pb.get_width(0);
-const ShapeItem pb_h = pb.get_height();
+const ShapeItem pb_w = pb.get_column_count();
+const ShapeItem pb_h = pb.get_row_count();
 Shape shape_Z(shape_B);
    shape_Z.set_last_shape_item(pb_w);
 
 Value_P Z(shape_Z, LOC);
 
    loop(h, pb_h)
-   loop(w, pb_w)   new (Z->next_ravel()) CharCell(pb.get_char(w, h));
+   loop(w, pb_w)   Z->next_ravel_Char(pb.get_char(w, h));
 
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 PrintBuffer
 Bif_F12_FORMAT::format_one_col_by_spec(int width, int precision,
                                        const Cell * cB, ShapeItem cols,
@@ -1015,7 +1030,7 @@ bool has_complex = false;
 
    if (has_complex)
       {
-         // split cB into real and imag parts...
+         // split cB into vectors real and imag...
          Value_P real(rows, LOC);
          Value_P imag(rows, LOC);
          loop(r, rows)
@@ -1023,21 +1038,21 @@ bool has_complex = false;
               const Cell & cell = cB[r*cols];
               if (cell.is_complex_cell())
                  {
-                   new (real->next_ravel()) FloatCell(cell.get_real_value());
-                   new (imag->next_ravel()) FloatCell(cell.get_imag_value());
+                   real->next_ravel_Float(cell.get_real_value());
+                   imag->next_ravel_Float(cell.get_imag_value());
                  }
               else
                  {
-                   real->next_ravel()->init(cell, real.getref(), LOC);
-                   new (imag->next_ravel()) CharCell(UNI_SPACE);
+                   real->next_ravel_Cell(cell);
+                   imag->next_ravel_Char(UNI_SPACE);
                  }
             }
 
          PrintBuffer pb_real = format_one_col_by_spec(width, precision,
-                                                      &real->get_ravel(0), 1,
+                                                      &real->get_cfirst(), 1,
                                                       rows);
          PrintBuffer pb_imag = format_one_col_by_spec(width, precision,
-                                                      &imag->get_ravel(0), 1,
+                                                      &imag->get_cfirst(), 1,
                                                       rows);
 
          PrintBuffer pb_real_imag;
@@ -1116,12 +1131,12 @@ bool has_complex = false;
           }
       }
 
-   if (width && ret.get_width(0) < width)
-      ret.pad_l(UNI_SPACE, width - ret.get_width(0));
+   if (width && ret.get_column_count() < width)
+      ret.pad_l(UNI_SPACE, width - ret.get_column_count());
 
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Bif_F12_FORMAT::add_row(PrintBuffer & ret, int row, bool has_char,
                         bool has_num, Unicode align_char, UCS_string & data)
@@ -1136,20 +1151,20 @@ Bif_F12_FORMAT::add_row(PrintBuffer & ret, int row, bool has_char,
       }
    else if (!has_num)    // only chars: align left
       {
-        const int d = ret.get_width(0) - data.size();
+        const int d = ret.get_column_count() - data.size();
         if      (d < 0)   ret.pad_r(UNI_SPACE, -d);
         else if (d > 0)   data.append(UCS_string(d, UNI_SPACE));
         ret.append_ucs(data);
       }
    else                 // chars and numbers: align right
       {
-        const int d = ret.get_width(0) - data.size();
+        const int d = ret.get_column_count() - data.size();
         if      (d < 0)   ret.pad_l(UNI_SPACE, -d);
         else if (d > 0)   data = UCS_string(d, UNI_SPACE) + data;
         ret.append_ucs(data);
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string
 Bif_F12_FORMAT::format_spec_float(APL_Float value, int precision)
 {
@@ -1184,10 +1199,10 @@ UCS_string ret = UCS_string::from_double_fixed_prec(value, precision);
 
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ostream &
 operator <<(ostream & out, const Format_sub & fmt)
 {
    return fmt.print(out);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------

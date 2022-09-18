@@ -29,7 +29,7 @@ Quad_RE * Quad_RE::fun = &Quad_RE::_fun;
 
 # include "Regexp.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Quad_RE::Flags::Flags(const UCS_string & flags_string)
    : flags(0),
      error_on_no_match(false),
@@ -65,7 +65,7 @@ int ofcnt = 0;
         DOMAIN_ERROR;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static Value_P
 deep_value(int idx, const PCRE2_SIZE * ovector, int count, const int * parents,
            const int * child_count, const UCS_string * B)
@@ -84,8 +84,8 @@ deep_value(int idx, const PCRE2_SIZE * ovector, int count, const int * parents,
         else     // pos+len
            {
              Value_P Z(2, LOC);
-             new (Z->next_ravel())   IntCell(start);
-             new (Z->next_ravel())   IntCell(end - start);
+             Z->next_ravel_Int(start);
+             Z->next_ravel_Int(end - start);
              Z->check_value(LOC);
              return Z;
            }
@@ -100,48 +100,60 @@ Value_P Z(ini + child_count[idx], LOC);
         const UCS_string item(*B, start, end - start);
         Value_P sub_value(item, LOC);
         sub_value->check_value(LOC);
-        new (Z->next_ravel())   PointerCell(sub_value.get(), Z.getref());
+        Z->next_ravel_Pointer(sub_value.get());
       }
    else
       {
-        new (Z->next_ravel())   IntCell(ovector[2*idx]);
-        new (Z->next_ravel())   IntCell(ovector[2*idx + 1] - ovector[2*idx]);
+        Z->next_ravel_Int(ovector[2*idx]);
+        Z->next_ravel_Int(ovector[2*idx + 1] - ovector[2*idx]);
       }
 
    loop(ch, count)
        {
          if (parents[ch] != idx)   continue;   // ch is not a child of idx
          Value_P CH = deep_value(ch, ovector, count, parents, child_count, B);
-         new (Z->next_ravel())   PointerCell(CH.get(), Z.getref());
+         Z->next_ravel_Pointer(CH.get());
        }
 
    Z->check_value(LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_RE::regex_results(const Regexp & A, const Flags & X, const UCS_string & B)
 {
-ShapeItem B_offset = 0;
-   if (X.get_result_type() == RT_partition || X.get_result_type() == RT_reduce)
-      return partition_result(A, X, B);
+ShapeItem B_offset = 0;   // updated by XXX_result() functions
 
-   if (!X.get_global())   // first match only
+   switch(X.get_result_type())
       {
-        switch(X.get_result_type())
-           {
-             case RT_string:    return string_result   (A, X, B, B_offset);
-             case RT_pos_len:   return index_result    (A, X, B, B_offset);
-             default:           FIXME;
-           }
+        case RT_reduce:
+        case RT_partition: return partition_result(A, X, B);
 
-        // not reached
-        FIXME;
+        case RT_string:    if (X.get_global())   break;   // continue below
+                                return string_result(A, X, B, B_offset);
+
+        case RT_pos_len:   if (X.get_global())   break;   // continue below
+                                return index_result (A, X, B, B_offset);
+
+        default:           FIXME;
       }
 
-ShapeItem cells_used = 0;
-ShapeItem cells_allocated = SHORT_VALUE_LENGTH_WANTED;
-Value_P Z(cells_allocated, LOC);
+   /* At this point the result type is RT_string or RT_pos_len, and the global
+      flag is set (which means that all matches shall be returned).
+
+      We have not yet called the corresponding string_result() or index_result()
+      function (which creates the result), and therefore do not know how long
+      Z will become.
+
+      We handle this by:
+
+      1. starting with a ⍴Z of of SHORT_VALUE_LENGTH_WANTED, and
+      2. doubling ⍴Z whenever needed, and finally
+      3. shrinking ⍴Z to the true number of matches.
+    */
+
+Value_P Z(SHORT_VALUE_LENGTH_WANTED, LOC);
+
    for (;;)
        {
          Value_P ZZ;
@@ -159,40 +171,57 @@ Value_P Z(cells_allocated, LOC);
             }
 
          if (B_offset == -1)   break;   // no more matches
-         if (cells_used >= cells_allocated)   // Z full
+
+         if (!Z->more())   // Z is full
             {
-              cells_allocated += cells_allocated;
-              Value_P Z2(cells_allocated, LOC);
-              loop(u, cells_used)
+              const ShapeItem ec_Z = Z->element_count();
+              Value_P Z2(2*ec_Z, LOC);
+              loop(z, ec_Z)
                   {
-                    Cell & cell = Z->get_ravel(u);
-                    new (Z2->next_ravel())
-                        PointerCell(cell.get_pointer_value().get(), Z2.getref());
-                    cell.release(LOC);
+                    const Cell & cell = Z->get_cravel(z);
+                    Z2->next_ravel_Pointer(cell.get_pointer_value().get());
+                    Z->release(z, LOC);
                   }
               Z = Z2;
             }
 
-         new (Z->next_ravel())   PointerCell(ZZ.get(), Z.getref());
-         ++cells_used;
+         Z->next_ravel_Pointer(ZZ.get());
        }
 
-   Z->set_shape(Shape(cells_used));
+   // most likely, Z is over-allocated at this point and we should init
+   // the not-yet-used Cells before shrinking Z.
+   //
+const Shape sh_Z(Z->get_valid_item_count());
+   while (Z->more())   Z->next_ravel_0();  // init the remaining cells
    Z->check_value(LOC);
+
+   Z->set_shape(sh_Z);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_RE::partition_result(const Regexp & A, const Flags & X,
                           const UCS_string & B)
 {
 const PCRE2_SIZE len = B.size();
 Value_P Z(len, LOC);
-   loop(z, len)   new (Z->next_ravel())   IntCell(0);
 
 PCRE2_SIZE B_offset = 0;
-const int match_id_inc = X.get_result_type() == RT_partition ? 1 : 0;
-   for (ShapeItem match_id = 1; B_offset < len; match_id += match_id_inc)
+ShapeItem match_id_partition = 1;
+ShapeItem match_id_compress  = 1;
+
+ShapeItem & match_id = X.get_result_type() == RT_partition
+                     ? match_id_partition : match_id_compress;
+
+   // compress needs a numeric vector like  1 1 1 0 0 0 0 0 1 1 1...
+   // partition needs a numeric vector like 1 1 1 2 2 2 2 2 3 3 3...
+   // where the ranges of equal numbers belong to the same partition.
+   //
+   // We call RegexpMatch() multiple times and create a partition (-range)
+   // for every match.
+   //
+PCRE2_SIZE last_end = 0;
+   for (; B_offset < len; ++match_id_partition)
        {
          RegexpMatch rem(A.get_code(), B, B_offset);
          if (!rem.is_match())   break;
@@ -200,17 +229,22 @@ const int match_id_inc = X.get_result_type() == RT_partition ? 1 : 0;
          const PCRE2_SIZE * ovector = rem.get_ovector();
          const PCRE2_SIZE start = ovector[0];
          const PCRE2_SIZE end   = ovector[1];
-         for (PCRE2_SIZE b = start; b < end; ++b)
-             new (&Z->get_ravel(b))   IntCell(match_id);
+
+         // zeros (if any) between the previous and the current partition
+         loop(z, start - last_end)   Z->next_ravel_0();
+         last_end = end;
+
+         loop (b, end - start)  Z->next_ravel_Int(match_id);
 
          if (!X.get_global())   break;
          B_offset = end;
        }
 
+   while (Z->more())   Z->next_ravel_0();
    Z->check_value(LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_RE::string_result(const Regexp & A, const Flags & X,
                        const UCS_string & B, ShapeItem & B_offset)
@@ -218,7 +252,7 @@ Quad_RE::string_result(const Regexp & A, const Flags & X,
 RegexpMatch rem(A.get_code(), B, B_offset);
    if (!rem.is_match())
       {
-        B_offset = -1;
+        B_offset = -1;   // indicates an error
         if (X.get_global())               return Value_P();
         if (!X.get_error_on_no_match())   return Idx0(LOC);
         MORE_ERROR() << "No match";
@@ -236,8 +270,8 @@ const PCRE2_SIZE * ovector = rem.get_ovector();
         Value_P Z(2, LOC);
         const PCRE2_SIZE start = ovector[0];
         const PCRE2_SIZE end   = ovector[1];
-        new (Z->next_ravel())   IntCell(start);
-        new (Z->next_ravel())   IntCell(end - start);
+        Z->next_ravel_Int(start);
+        Z->next_ravel_Int(end - start);
         Z->check_value(LOC);
         return Z;
       }
@@ -269,7 +303,7 @@ int ccount[ovector_count];
 
    return deep_value(0, ovector, ovector_count, parents, ccount, &B);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_RE::index_result(const Regexp & A, const Flags & X,
                       const UCS_string & B, ShapeItem & B_offset)
@@ -295,8 +329,8 @@ const PCRE2_SIZE * ovector = rem.get_ovector();
         Value_P Z(2, LOC);
         const PCRE2_SIZE start = ovector[0];
         const PCRE2_SIZE end   = ovector[1];
-        new (Z->next_ravel())   IntCell(start);
-        new (Z->next_ravel())   IntCell(end - start);
+        Z->next_ravel_Int(start);
+        Z->next_ravel_Int(end - start);
         Z->check_value(LOC);
         return Z;
       }
@@ -328,7 +362,7 @@ int ccount[ovector_count];
 
    return deep_value(0, ovector, ovector_count, parents, ccount, 0);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_RE::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
@@ -358,7 +392,7 @@ const Shape & shape = B->get_shape();
 Value_P Z(shape, LOC);
    for (ShapeItem i = 0 ; i < shape.get_volume() ; i++)
        {
-         const Cell & cell = B->get_ravel(i);
+         const Cell & cell = B->get_cravel(i);
          Value_P B_sub = cell.to_value(LOC);
          if (!B_sub->is_char_string())
             {
@@ -368,12 +402,12 @@ Value_P Z(shape, LOC);
 
          Value_P Z_sub = regex_results(regexp, flags, B_sub->get_UCS_ravel());
          Z_sub->check_value(LOC);
-         new (Z->next_ravel()) PointerCell(Z_sub.get(), Z.getref());
+         Z->next_ravel_Pointer(Z_sub.get());
        }
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif

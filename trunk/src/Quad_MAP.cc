@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -24,7 +24,7 @@
 Quad_MAP  Quad_MAP::_fun;
 Quad_MAP * Quad_MAP::fun = &Quad_MAP::_fun;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /*
     8 ⎕CR A←5 2⍴'eEwWaAzZ92' ◊ 8 ⎕CR B←'Halloween' ◊ A ⎕MAP B
  */
@@ -33,25 +33,49 @@ Quad_MAP::eval_AB(Value_P A, Value_P B) const
 {
 bool recursive = false;
 
-   // a nested scalar A indicates recursive ⎕MAP
-   //
-   if (A->get_rank() == 0 && A->get_ravel(0).is_pointer_cell())
+   /* a nested scalar A indicates recursive ⎕MAP. For example
+
+      Map←6 2⍴'aAbBcCdDeEfF'   ⍝ lowercase to uppercase for a-f
+      Map ⎕MAP B      ⍝ flat (top-level only) mapping of B
+      (⊂Map) ⎕Map B   ⍝ recursive mapping of B
+
+      if A is a nested  scalar, then setrecursive and proceed with ⊃A.
+    */
+   if (A->get_rank() == 0 && A->get_cfirst().is_pointer_cell())
       {
          recursive = true;
-         A = A->get_ravel(0).get_pointer_value();
+         A = A->get_cfirst().get_pointer_value();
       }
 
-   if (A->get_rank() != 2)   RANK_ERROR;
-   if (A->get_cols() != 2)   LENGTH_ERROR;
-const ShapeItem map_len = A->get_rows();
-   if (map_len == 0)   LENGTH_ERROR;
+ShapeItem map_len = A->get_rows();               // the number of mappings
+   if      (A->get_rank() == 0)   RANK_ERROR;
+   else if (A->get_rank() == 1)
+      {
+        // A is a vector, accepted to avoid the need for (N 2⍴A)
+        // A[1 3 5...] are the keys while A[2 4 6...] are the mapped values
+        //
+        map_len = A->element_count();
+        if (map_len & 1)
+           {
+             MORE_ERROR() << "Odd length of A in A ⎕MAP B";
+             LENGTH_ERROR;
+           }
+        map_len = map_len >> 1;
+      }
+   else if (A->get_rank() > 2)   RANK_ERROR;
+
+   if (map_len == 0)
+           {
+             MORE_ERROR() << "A with length 0 in A ⎕MAP B";
+             LENGTH_ERROR;
+           }
 
 ShapeItem * indices = new ShapeItem[map_len];
    if (indices == 0)   WS_FULL;
 
    loop(m, map_len)   indices[m] = m;
 
-const ravel_comp_len ctx = { &A->get_ravel(0), 1};
+const ravel_comp_len ctx = { &A->get_cfirst(), 1};
    Heapsort<ShapeItem>::sort(indices, map_len, &ctx, &Quad_MAP::greater_map);
 
    // complain about duplicated keys
@@ -59,8 +83,8 @@ const ravel_comp_len ctx = { &A->get_ravel(0), 1};
 const double qct = Workspace::get_CT();
    for (ShapeItem m = 1; m < map_len; ++m)
        {
-          const Cell & cm1 = A->get_ravel(2*indices[m - 1]);
-          const Cell & cm  = A->get_ravel(2*indices[m    ]);
+          const Cell & cm1 = A->get_cravel(2*indices[m - 1]);
+          const Cell & cm  = A->get_cravel(2*indices[m    ]);
           if (cm1.equal(cm, qct))
              {
                const int qio = Workspace::get_IO();
@@ -72,11 +96,11 @@ const double qct = Workspace::get_CT();
              }
        }
 
-Value_P Z = do_map(&A->get_ravel(0), map_len, indices, B.get(), recursive);
+Value_P Z = do_map(*A, indices, B.get(), recursive);
    delete[] indices;
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Quad_MAP::greater_map(const ShapeItem & a, const ShapeItem & b,
                       const void * ctx)
@@ -89,7 +113,7 @@ const Cell * cells = rcl->ravel;
 
    return a > b;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 compare_MAP(const Cell & key, const ShapeItem & item, const void * ctx)
 {
@@ -98,68 +122,72 @@ const Cell * cells_A = rcl->ravel;
 
    return key.compare(cells_A[2*item]);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 Value_P
-Quad_MAP::do_map(const Cell * ravel_A, ShapeItem len_A,
-                 const ShapeItem * sorted_indices_A, const Value * B,
-                 bool recursive)
+Quad_MAP::do_map(const Value & A, const ShapeItem * sorted_indices_A,
+                 const Value * B, bool recursive)
 {
-Value_P Z(B->get_shape(), LOC);
-const ravel_comp_len ctx = { ravel_A, 1};
+Value_P Z(B->get_shape(), LOC);         // the result, ⍴Z ←→ ⍴B
+
+const ravel_comp_len ctx = { &A.get_cfirst(),   // start of the ravel
+                             1                  // number of chars to compare
+                           };
 
 const ShapeItem len_B = B->element_count();
+const ShapeItem map_len = (A.get_rank() == 1) ? A.element_count() >> 1
+                                              : A.get_rows();
    if (len_B == 0)   // empty value
       {
-         const Cell & cell_B = B->get_ravel(0);
+         const Cell & cell_B = B->get_cfirst();
          if (const ShapeItem * map =
                    Heapsort<ShapeItem>::search<const Cell &>
                                               (cell_B,
                                                sorted_indices_A,
-                                               len_A,
+                                               map_len,
                                                compare_MAP,
                                                &ctx))
             {
-              Cell & cell_Z0 = Z->get_ravel(0);
-              cell_Z0.init(ravel_A[*map*2 + 1], Z.getref(), LOC);
-              if (cell_Z0.is_pointer_cell())
-                 cell_Z0.get_pointer_value()->to_proto();
-        else if (cell_Z0.is_character_cell())
-                 new (&cell_Z0) CharCell(UNI_SPACE);
-        else
-                 new (&cell_Z0) IntCell(0);
+              const Cell & cell_A = A.get_cravel(*map*2 + 1);
+              if (cell_A.is_pointer_cell())
+                 {
+                   Cell & cell_Z0 = Z->get_wproto();
+                   cell_Z0.init(cell_A, *Z, LOC);
+                   cell_Z0.get_pointer_value()->to_type(false);
+                 }
+              else if (cell_A.is_character_cell())
+                 Z->set_proto_Spc();
+              else if (cell_A.is_numeric())
+                 Z->set_proto_Int();
+              else
+                 DOMAIN_ERROR;
             }
          else   // not mapped, simple
             {
-              Z->get_ravel(0).init(cell_B, Z.getref(), LOC);
+              Z->set_default(cell_B, LOC);
             }
       }
 
    loop(b, len_B)
        {
-         const Cell & cell_B = B->get_ravel(b);
-         if (const ShapeItem * map =
-                   Heapsort<ShapeItem>::search<const Cell &>
-                                              (cell_B,
-                                               sorted_indices_A,
-                                               len_A,
-                                               compare_MAP,
-                                               &ctx))
+         const Cell & cell_B = B->get_cravel(b);
+         if (const ShapeItem * map = Heapsort<ShapeItem>::search<const Cell &>
+                   (cell_B, sorted_indices_A, map_len, compare_MAP, &ctx))
             {
-             Z->next_ravel()->init(ravel_A[*map*2 + 1], Z.getref(), LOC);
+             Z->next_ravel_Cell(A.get_cravel(*map*2 + 1));
             }
          else   // cell_B shall not be mapped
             {
               if (recursive && cell_B.is_pointer_cell())   // nested: recursive
                  {
                    Value_P sub_B = cell_B.get_pointer_value();
-                   Value_P sub_Z = do_map(ravel_A, len_A, sorted_indices_A,
+                   Value_P sub_Z = do_map(A, sorted_indices_A,
                                           sub_B.get(), true);
-                   new (Z->next_ravel())  PointerCell(sub_Z.get(), Z.getref());
+                   Z->next_ravel_Pointer(sub_Z.get());
                  }
               else   // not mapped, simple
                  {
-                  Z->next_ravel()->init(cell_B, Z.getref(), LOC);
+                  Z->next_ravel_Cell(cell_B);
                  }
             }
        }
@@ -167,4 +195,4 @@ const ShapeItem len_B = B->element_count();
    Z->check_value(LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------

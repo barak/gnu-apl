@@ -392,13 +392,15 @@ computation of a scalar function, and the difference can be read in APL via
 precise than old-fashioned measurements using ⎕TS at APL level.
 
 Scalar2.apl is most conveniently called from the command line, and what is
-being measured can be controlled via command line arguments. For example:
+being measured can be controlled via command line arguments. For example
+(from the top-level directory of GNU APL):
 
 ----
-apl -f workspaces/Scalar2.apl -- -c 3,6 -d 200×⍳20
+make parallel1      # runs ./configure with suitable options
+src/apl -f workspaces/Scalar2.apl -- -c 3,6 -d 200×⍳20
 ----
 
-The following command line options are supported by *Scalar2.apl*:
+The *Scalar2.apl* workspace understands the following command line options:
 
 .Table Scalar2.apl command line options (after --)
 [width="75%", cols="18,30,^12,^12", options="header"]
@@ -492,4 +494,55 @@ arrays in parallel.
 
 In general, the fewer cycles a function needs, the higher should the threshold
 be set.
+
+== The Optimal vs. the Maximal Core Count
+
+The last plot window shown by the *Scalar2* workspace summarizes the speedups
+that were achieved for the different core counts that were selected with the
+-c option.
+
+image::./APL5.png[APL5,300,150,role="text-center"]
+
+NOTE: leave at least one of the available cores unused because otherwise the
+operating system could grab one of the cores for its own purposes and that
+core would then become much slower than the others. The operating system is
+usually smart enough to locate an unused core for its own purposes, but that
+must fail if all cores are fully loaded with APL work.
+
+The speedups plotted in the last window are usually reasonable if:
+
+* the APL function that is being bench-marked (as selected by the -f option)
+  is not too lightweight, and
+* the vector lengths (-d option) is not too short.
+
+The measurement show above was executed on a 6-core i7-8700 CPU. The CPU has
+6 (physical) cores with 12 (logical) core threads where the 12 core threads
+are mapped to 12 "CPUs" in the operating system as (per */proc/cpuinfo*).
+
+The benchmark command used was:
+
+----
+src/apl -f workspaces/Scalar2.apl -- -c ⍳11 -d 5000×⍳20 -f 39
+----
+
+which means that:
+
+* *-f 39* : selects *Z←¯6○B* aka. *arccosh(B)* as benchmarking function with
+  a mix of Integer, Real, and Complex numbers,
+* *-d 5000×⍳20* : use vector lengths ⍴B = 5,000, 10,000, 15,000 ... 100,000, and
+* *-c ⍳11* : use core counts of 1, 2, 3, ... and 11.
+
+The 11 different core counts and 20 different vector lengths above
+amounted to a total of 220 (= 11×20) individual measurements in the benchmark
+plotted above.
+
+Had we run the benchmark with *-c ⍳12* instead of *-c ⍳11* then the
+measurement with 12 cores would have shown a rather bad speedup (try it
+yourself with *-c* set to the number of cores on your computer).
+
+*Corollary:* the optimal performance is achieved when the number of cores used
+for parallel APL is slightly smaller than the number of cores available. The
+number of cores available is also influenced by other (even idle) processes on
+the machine because they also influence the scheduling of the threads that
+perform the APL work.
 

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -79,14 +79,14 @@ Quad_FIO::_sub_fun Quad_FIO::sub_functions[] =
 #define fiodef(N, name)   { N, #name },
 #include "Quad_FIO.def"
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Quad_FIO::axis_compare(const void * key, const void * sf)
 {
    return strcasecmp(reinterpret_cast<const char *>(key),
                      reinterpret_cast<const _sub_fun *>(sf)->key);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Quad_FIO::function_name_to_int(const char * function_name)
 {
@@ -111,14 +111,14 @@ Quad_FIO::function_name_to_int(const char * function_name)
 
   return -1;    // not found
 }
-//-----------------------------------------------------------------------------
-ShapeItem
-Quad_FIO::string_to_int(const UCS_string & name) const
+//----------------------------------------------------------------------------
+sAxis
+Quad_FIO::subfun_to_axis(const UCS_string & name) const
 {
 UTF8_string name_utf(name);
    return function_name_to_int(name_utf.c_str());
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Quad_FIO::Quad_FIO()
    : QuadFunction(TOK_Quad_FIO)
 {
@@ -141,7 +141,7 @@ file_entry f2(stderr, STDERR_FILENO);
         open_files.push_back(f3);
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_FIO::clear()
 {
@@ -157,7 +157,7 @@ Quad_FIO::clear()
         open_files.pop_back();
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Quad_FIO::file_entry &
 Quad_FIO::get_file_entry(int handle)
 {
@@ -170,7 +170,7 @@ Quad_FIO::get_file_entry(int handle)
                 << " is not an open file handle managed by ⎕FIO, see ⎕FIO 0.";
    DOMAIN_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Quad_FIO::close_handle(int fd)
 {
@@ -197,7 +197,7 @@ Quad_FIO::close_handle(int fd)
    MORE_ERROR() << "Invalid ⎕FIO handle " << fd;
    return -EBADF;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 FILE *
 Quad_FIO::get_FILE(int handle)
 {
@@ -219,7 +219,7 @@ file_entry & fe = get_file_entry(handle);
 
    return fe.fe_FILE;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_FIO::fds_to_val(fd_set * fds, int max_fd)
 {
@@ -233,12 +233,12 @@ Value_P Z(ShapeItem(fd_count), LOC);
    if (fds)
       {
         for (int m = 0; m < max_fd; ++m)
-            if (FD_ISSET(m, fds))   new (Z->next_ravel())   IntCell(m);
+            if (FD_ISSET(m, fds))   Z->next_ravel_Int(m);
       }
 
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_FIO::do_printf(FILE * outf, Value_P A)
 {
@@ -247,14 +247,14 @@ Quad_FIO::do_printf(FILE * outf, Value_P A)
    // number of characters (not bytes!) printed.
    //
 UCS_string UZ;
-const Value & A1 = *A->get_ravel(0).get_pointer_value();
+const Value & A1 = *A->get_cfirst().get_pointer_value();
 UCS_string A_format(A1);
    do_sprintf(UZ, A_format, A.get(), 1);
 UTF8_string utf(UZ);
    fwrite(utf.c_str(), 1, utf.size(), outf);
    return Token(TOK_APL_VALUE1, IntScalar(UZ.size(), LOC));
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_FIO::do_sprintf(UCS_string & UZ, const UCS_string & A_format,
                     const Value * B, int b)
@@ -273,20 +273,22 @@ char numbuf[50];
               continue;
             }
 
-         // % seen. copy the field in format to fmt and fprintf it with
-         // the next argument. That is for format = eg. "...%42.42llf..."
-         // we want fmt to be "%42.42llf"
+         // uni is % which is the start of a format field. Copy the format field
+         // into to string fmt and printf() it with the next argument.
+         // That is, for e.g. format = "...%42.42llf..." we want fmt to be
+         // "%42.42llf"
          //
-         char fmt[40];
+         char fmt[40];               // the naked format for one printf() argument
          unsigned int fm = 0;        // an index into fmt;
-         fmt[fm++] = '%';   // copy the '%'
+         fmt[fm++] = '%';            // copy the % into fmt
+         bool thousands = false;     // print thousands separator (',')
          for (;;)
              {
                if (f >= A_format.size())
                   {
-                    // end of format string reached without seeing the
-                    // format char. We print the string and are done.
-                    // (This was a mal-formed format string from the user)
+                    // end of format string reached without seeing the conversion
+                    // specifier. We print the string and are done. This happens
+                    // only if A_format was somewhat mal-formed.
                     //
                     UCS_string ufmt(fmt);
                     UZ.append(ufmt);
@@ -295,7 +297,7 @@ char numbuf[50];
 
                if (fm >= sizeof(fmt))
                   {
-                    // end of fmt reached without seeing the format char.
+                    // end of fmt reached without seeing the conversion specifier.
                     // We print the string and are done.
                     // (This may or may not be a mal-formed format string
                     // from the user; we assume it is)
@@ -306,17 +308,19 @@ char numbuf[50];
                     goto field_done;
                   }
 
-               const Unicode un1 = A_format[f++];
-               switch(un1)
+               const Unicode uni_1 = A_format[f++];
+               switch(uni_1)
                   {
                      // flag chars and field width/precision
                      //
+                     case '\'': thousands = true;
+                                continue;
+
                      case '#':
                      case '0' ... '9':
                      case '-':
                      case ' ':
                      case '+':
-                     case '\'':   // SUSE
                      case 'I':    // glibc
                      case '.':
 
@@ -328,7 +332,7 @@ char numbuf[50];
                      case 'q':
                      case 'j':
                      case 'z':
-                     case 't': fmt[fm++] = un1;   fmt[fm] = 0;
+                     case 't': fmt[fm++] = uni_1;   fmt[fm] = 0;
                                continue;
 
                          // conversion specifiers
@@ -336,48 +340,66 @@ char numbuf[50];
                      case 'd':   case 'i':   case 'o':
                      case 'u':   case 'x':   case 'X':   case 'p':
                           {
-                            const Cell & cell = B->get_ravel(b++);
-                            APL_Integer iv;
+                            const Cell & cell = B->get_cravel(b++);
+                            APL_Integer int_val;
                             if (cell.is_integer_cell())
                                {
-                                 iv = cell.get_int_value();
+                                 int_val = cell.get_int_value();
                                }
                             else
                                {
                                  const double fv = cell.get_real_value();
-                                 if (fv < 0.0)   iv = -int(-fv);
-                                 else            iv = int(fv);
+                                 if (fv < 0.0)   int_val = -int(-fv);
+                                 else            int_val = int(fv);
                                }
-                            fmt[fm++] = un1;   fmt[fm] = 0;
-                            sprintf(numbuf, fmt, iv);
-                            UZ.append_UTF8(numbuf);
+                            fmt[fm++] = uni_1;   fmt[fm] = 0;
+                            sprintf(numbuf, fmt, int_val);
+                            if (thousands)   group_thousands(UZ, numbuf, false);
+                            else             UZ.append_UTF8(numbuf);
                           }
                           goto field_done;
 
                      case 'e':   case 'E':   case 'f':   case 'F':
                      case 'g':   case 'G':   case 'a':   case 'A':
                           {
-                            const APL_Float fv =
-                                            B->get_ravel(b++).get_real_value();
-                            fmt[fm++] = un1;   fmt[fm] = 0;
-                            sprintf(numbuf, fmt, fv);
-                            UZ.append_UTF8(numbuf);
+                            const APL_Float float_val =
+                                  B->get_cravel(b++).get_real_value();
+                            fmt[fm++] = uni_1;   fmt[fm] = 0;
+                            sprintf(numbuf, fmt, float_val);
+                            if (thousands)
+                               {
+                                 group_thousands(UZ, numbuf, true);
+                               }
+                            else if (char * const dot = strchr(numbuf, '.'))
+                               {
+                                 *dot = 0;
+                                 UZ.append_ASCII(numbuf);
+                                 UZ.append(Workspace::get_FC(0));
+                                 UZ.append_ASCII(dot + 1);
+                               }
+                            else
+                               {
+                                 UZ.append_UTF8(numbuf);
+                               }
                           }
                           goto field_done;
 
                      case 's':   // string or char
-                          if (B->get_ravel(b).is_character_cell())   goto cval;
-                              {
-                                Value_P str =
-                                        B->get_ravel(b++).get_pointer_value();
-                                UCS_string ucs(*str.get());
-                                UZ.append(ucs);
-                              }
+                          if (B->get_cravel(b).is_character_cell())
+                             {
+                               UZ.append(B->get_cravel(b++).get_char_value());
+                               goto field_done;
+                             }
+                          {
+                            Value_P str =
+                                        B->get_cravel(b++).get_pointer_value();
+                            UCS_string ucs(*str.get());
+                            UZ.append(ucs);
+                          }
                           goto field_done;
 
                      case 'c':   // single char
-                     cval:
-                          UZ.append(B->get_ravel(b++).get_char_value());
+                          UZ.append(B->get_cravel(b++).get_char_value());
                           goto field_done;
 
                      case 'm':
@@ -394,7 +416,7 @@ char numbuf[50];
                           /* no break */
 
                      default:
-                          MORE_ERROR() << "invalid format character " << un1
+                          MORE_ERROR() << "invalid format character " << uni_1
                                        << " in function 22 (aka. printf())"
                                          " in module file_io:: ";
                           DOMAIN_ERROR;   // bad format char
@@ -403,7 +425,44 @@ char numbuf[50];
          field_done: ;
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+void
+Quad_FIO::group_thousands(UCS_string & dest, char * buffer, bool flt)
+{
+   // buffer is the 0-terminated and ASCII-only output of some sprintf("%..."),
+   // and the user has requested thousands' separators in the integer part of
+   // buffer.
+
+   if (flt)   // buffer may or may not have a fractional part
+      {
+        if (char * dot = strchr(buffer, '.'))   // buffer has a  fractional part
+           {
+             *dot = 0;
+             group_thousands(dest, buffer, false);
+             dest.append(Workspace::get_FC(0));
+             dest.append_ASCII(dot + 1);
+             return;
+           }
+      }
+
+   // at this point, buffer is integer only.
+   //
+int digit_count = 0;
+   for (const char * b = buffer; *b; ++b)
+       if (*b >= '0' && *b <= '9')   ++digit_count;
+
+   for (const char * b = buffer; *b;)
+       {
+         const char cc = *b++;
+         dest.append(Unicode(cc));
+         if (cc >= '0' && cc <= '9')   // digit
+            {
+              if (--digit_count && !(digit_count % 3))
+                 dest.append(Workspace::get_FC(1));
+            }
+         }
+}
+//----------------------------------------------------------------------------
 Value_P
 Quad_FIO::get_random(APL_Integer mode, APL_Integer len)
 {
@@ -435,14 +494,14 @@ const ssize_t bytes = read(device, buffer, len);
    else if (mode == 1)   // byte vector result
       {
         Value_P Z(len, LOC);
-        loop(l, len)   new (Z->next_ravel())   IntCell(buffer[l] & 0xFF);
+        loop(l, len)   Z->next_ravel_Int(buffer[l] & 0xFF);
          return Z;
       }
 
    MORE_ERROR() << "Invalid mode A in A ⎕FIO[60] B";
    DOMAIN_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Unicode
 Quad_FIO::fget_utf8(FILE * file, ShapeItem & fget_count)
 {
@@ -473,7 +532,7 @@ uint32_t uni = 0;
 
    return Unicode(bx | uni);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// a Unicode source from either a file or a UCS_string
 class File_or_String
 {
@@ -505,7 +564,7 @@ public:
    /// get the next character
    Unicode get_next()
       {
-        if (next != Invalid_Unicode)   // there is a unget'ed char
+        if (next != Invalid_Unicode)   // there is an ungotten char
            {
              const Unicode ret = next;
              next = Invalid_Unicode;
@@ -528,18 +587,21 @@ public:
             }
       }
 
-   /// unget uni
+   /// unget uni. At most one Unicode (= lookahead char) can be ungotten.
    void unget(Unicode uni)
       {
         Assert(next == Invalid_Unicode);
         next = uni;
       }
 
-   /// scan a long long in string or file
+   /// scan a long long in a string or in a file
    int scanf_long_long(const char * fmt, long long * val)
       {
          if (file)
             {
+              // if we have read the next character from a file, then we
+              // need to push it back so that fscanf() will get it.
+              //
               if (next != Invalid_Unicode)
                  {
                    ungetc(next, file);
@@ -617,7 +679,7 @@ public:
       }
 
 protected:
-   /// UTF8-ecnoded source
+   /// UTF8-encoded source
    FILE * file;
 
    /// UCS_string source
@@ -632,23 +694,24 @@ protected:
    /// number of chars consumed thus far
    ShapeItem out_len;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
-Quad_FIO::do_scanf(File_or_String & input, const UCS_string & format)
+Quad_FIO::do_scanf(File_or_String & input, const UCS_string & format,
+                   int function_number)
 {
-ShapeItem count = 0;
    if (format.size() == 0)   LENGTH_ERROR;
 
-   // we take the total number of % as an upper bound fir the number of items
+   // we take the total number of % as an upper bound for the number of items.
+   // the real count may be lower due to %% and assugnment suppression. We fix
+   // that after label out: below
    //
+ShapeItem count = 0;
    loop(f, format.size() - 1)
       {
         if (format[f] == UNI_PERCENT)   ++count;
       }
 
 Value_P Z(count, LOC);
-   loop(z, count)   new (Z->next_ravel())   IntCell(0);
-ShapeItem z = 0;
 
 Unicode lookahead = input.get_next();
    if (lookahead == UNI_EOF)   goto out;
@@ -683,13 +746,14 @@ Unicode lookahead = input.get_next();
         const Unicode fmt_ch1 = format[f];
         if (fmt_ch1 == UNI_PERCENT)   goto match;   // double % is %
 
-        Unicode conv = Unicode_0;
+        Unicode conv = Unicode_0;   // no conversion specifier
         int conv_len = 0;
         bool suppress = false;
         for (;f < format.size(); ++f)
            {
              const Unicode cc = format[f];
-             if (cc == UNI_ASTERISK)   // assignment suppression
+             if (cc == UNI_ASTERISK ||      // *: assignment character
+                 cc == UNI_STAR_OPERATOR)   // ⋆: assignment character
                 {
                   suppress = true;
                   continue;
@@ -698,8 +762,8 @@ Unicode lookahead = input.get_next();
              if (strchr("hjlLmqtz", cc))   // type modifier
                 {
                   // we provide our own conversion modifiers and ignore
-                  // conversion modifiers given by the user
-                  //
+                  // the conversion modifiers given by the user (that only
+                  // make sense in the C/C++ context).
                   continue;
                 }
 
@@ -709,14 +773,14 @@ Unicode lookahead = input.get_next();
                   continue;
                 }
 
-             if (strchr("cdDfFeginousxX", cc))
+             if (strchr("cdDfFeginousxX[", cc))
                 {
                   conv = cc;
-                   break; // conversion
+                  break; // conversion
                 }
            }
 
-        if (conv == Unicode_0)
+        if (conv == Unicode_0)   // no conversion specifier
            {
              MORE_ERROR() << "expecting conversion character "
                              "%, c, d, f, i, n, o, u, s, or x after %";
@@ -733,7 +797,7 @@ Unicode lookahead = input.get_next();
              if (lookahead == UNI_EOF)   goto out;
              if (count != 1)   goto out;
 
-             if (!suppress)   new (&Z->get_ravel(z++))   IntCell(val);
+             if (!suppress)   Z->next_ravel_Int(val);
            }
         else if (strchr("fFeg", conv))  // float conversion
            {
@@ -745,13 +809,13 @@ Unicode lookahead = input.get_next();
              if (lookahead == UNI_EOF)   goto out;
              if (count != 1)   goto out;
 
-             if (!suppress)   new (&Z->get_ravel(z++))   FloatCell(val);
+             if (!suppress)   Z->next_ravel_Float(val);
            }
         else if (conv == UNI_c)  // char(s)
            {
              if (conv_len == 0)   // default: single char
                 {
-                  if (!suppress)   new (&Z->get_ravel(z++)) CharCell(lookahead);
+                  if (!suppress)   Z->next_ravel_Char(lookahead);
                   lookahead = input.get_next();
                   if (lookahead == UNI_EOF)   goto out;
                 }
@@ -768,8 +832,7 @@ Unicode lookahead = input.get_next();
                   if (!suppress)
                      {
                        Value_P ZZ(ucs, LOC);
-                       new (&Z->get_ravel(z++))
-                           PointerCell(ZZ.get(), Z.getref());
+                       Z->next_ravel_Pointer(ZZ.get());
                      }
                 }
            }
@@ -787,26 +850,126 @@ Unicode lookahead = input.get_next();
              if (!suppress)
                 {
                   Value_P ZZ(ucs, LOC);
-                  new (&Z->get_ravel(z++))   PointerCell(ZZ.get(), Z.getref());
+                  Z->next_ravel_Pointer(ZZ.get());
                 }
            }
         else if (conv == UNI_n)  // characters consumed thus far
            {
-             if (!suppress)   new (&Z->get_ravel(z++))
-                                  IntCell(input.get_count());
+             if (!suppress)   Z->next_ravel_Int(input.get_count());
+           }
+        else if (conv == UNI_L_BRACK)   // character range
+           {
+             ++f;   // skip [
+
+             // 1. read the pattern range [...]
+             //
+
+             // if the first char is ^ or ∧ then the characters in the range
+             // shall be excluded rather than included. The range itself is
+             // not affected, though.
+             //
+             if (f == format.size())   LENGTH_ERROR;
+             const bool excluding = format[f] == UNI_CIRCUMFLEX   // ^
+                                 || format[f] == UNI_AND;
+            if (excluding)   ++f;   // skip ^ or ∧
+
+             UCS_string range;   // the character range to be in- or excluded
+             range.reserve(format.size());
+
+             // if the next char is ] then it shall belong to the range,
+             // otherwise it terminates the range than ending it.
+             if (f == format.size())   LENGTH_ERROR;
+             if (format[f] == UNI_R_BRACK)   range += format[f++];
+
+            // the characters of the range, terminated by ]
+            //
+            for (;;)
+                {
+                 if (f == format.size())   // end of format string
+                    {
+                      MORE_ERROR() << "No ] in character range A of A ⎕FIO["
+                                   << function_number << "] B";
+                      DOMAIN_ERROR;
+                    }
+
+                  Unicode funi = format[f];
+                  if ( funi == UNI_MINUS            // maybe a character range
+                    && format[f+1] != UNI_R_BRACK   // otherwise its not
+                    && range.size())                // otherwise its not
+                     {
+                           // the minus belongs to a range A-B. With Unicode
+                           // the range could become ridiculously large and
+                           // we throw a length error if that happens.
+                           //
+                           const Unicode from = range.back();
+                           const Unicode to   = format[++f];
+                           if (from == to)   {}   // 1-character range
+                           else if (from > to)
+                              {
+                                MORE_ERROR() << "Invalid character range '"
+                                             << from << "'-'" << to << "'\n";
+                                DOMAIN_ERROR;
+                              }
+
+                           if ((to - from) >= 96)   // more than visible ASCII
+                              {
+                                MORE_ERROR() << "character range '" << from
+                                             << "'-'" << to << "' too large.\n";
+                                LENGTH_ERROR;
+                              }
+
+                       // at this point the A-B construct is valid. Insert
+                       // the characters into range...
+                       //
+                       for (int u = from + 1; u <= to;)   range += Unicode(u++);
+                     }
+                  if (funi == UNI_R_BRACK)   break;   // end of range
+                  ++f;
+                  range += funi;
+                }
+
+             // 2. create the APL result
+             //
+             UCS_string ucs;
+             ucs.reserve(format.size());
+             for (;;)
+                 {
+                   if (lookahead == UNI_EOF)                 break;
+                   if (conv_len && ucs.size() >= conv_len)   break;
+
+                   if (range.contains(lookahead) == excluding)
+                      {
+                        // lookahead is the first character after the range
+                        break;
+                      }
+                   ucs.append(lookahead);
+
+                   lookahead = input.get_next();
+                 }
+
+             // ] shall only match a nonempty sequence of characters
+             //
+             if (ucs.size() == 0)   goto out;   // empty sequence
+
+             if (!suppress)
+                {
+                  Value_P ZZ(ucs, LOC);
+                  Z->next_ravel_Pointer(ZZ.get());
+                }
            }
       }
 
 out:
-   // shorten Z to the actual number of converted items
+   // shrink Z to the actual number of converted items
    //
-Shape sh_Z(z);
-   Z->set_shape(sh_Z);
+const Shape sh_Z(Z->get_valid_item_count());
+   while (Z->more())   Z->next_ravel_0();
    Z->check_value(LOC);
+   Z->set_shape(sh_Z);
 
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_FIO::list_functions(ostream & out, bool mapping)
 {
@@ -869,7 +1032,8 @@ Quad_FIO::list_functions(ostream & out, bool mapping)
 "\n"
 "   Ze ←    ⎕FIO[ 4] Bh    fclose(Bh)\n"
 "   Ze ←    ⎕FIO[ 5] Bh    errno (of the last call using Bh)\n"
-"   Zb ←    ⎕FIO[ 6] Bh    fread(Zi, 1, " << SMALL_BUF << ", Bh) 1 byte per Zb\n"
+"   Zb ←    ⎕FIO[ 6] Bh    fread(Zi, 1, " << SMALL_BUF
+                                          << ", Bh) 1 byte per Zb\n"
 "   Zb ← Ai ⎕FIO[ 6] Bh    fread(Zi, 1, Ai, Bh) 1 byte per Zb\n"
 "   Zi ← Ab ⎕FIO[ 7] Bh    fwrite(Ab, 1, ⍴Ai, Bh) 1 byte per Ai\n"
 "   Zb ←    ⎕FIO[ 8] Bh    fgets(Zb, " << SMALL_BUF << ", Bh) 1 byte per Zb\n"
@@ -900,7 +1064,7 @@ Quad_FIO::list_functions(ostream & out, bool mapping)
 "   Zd ←    ⎕FIO[28] Bs    return content of directory Bs\n"
 "   Zn ←    ⎕FIO[29] Bs    return file names in directory Bs\n"
 "   Zs ←    ⎕FIO 30        getcwd()\n"
-"   Zn ← As ⎕FIO[31] Bs    access(As, Bs) As ∈ 'RWXF'\n"
+"   Zn ← As ⎕FIO[31] Bs    access(As, Bs) As ϵ 'RWXF'\n"
 "   Zh ←    ⎕FIO[32] Bi    socket(Bi=AF_INET, SOCK_STREAM, 0)\n"
 "   Ze ← Aa ⎕FIO[33] Bh    bind(Bh, Aa)\n"
 "   Ze ←    ⎕FIO[34] Bh    listen(Bh, 10)\n"
@@ -949,7 +1113,7 @@ Quad_FIO::list_functions(ostream & out, bool mapping)
 
    return Token(TOK_APL_VALUE1, Str0(LOC));
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_FIO::eval_B(Value_P B) const
 {
@@ -960,18 +1124,26 @@ Quad_FIO::eval_B(Value_P B) const
 
    if (B->element_count() == 0)   // '' or ⍬
       {
-        if (B->get_ravel(0).is_character_cell())
+        if (B->get_cfirst().is_character_cell())
            return list_functions(CERR, true);
-        if (B->get_ravel(0).is_integer_cell())
+        if (B->get_cfirst().is_integer_cell())
            return list_functions(CERR, false);
       }
 
-const APL_Integer function_number = B->get_ravel(0).get_int_value();
+const APL_Integer function_number = B->get_cfirst().get_int_value();
    switch(function_number)
       {
         // function_numbers < 0 refer to "hacker functions" that should not be
         // used by normal mortals.
         //
+        case -17: // emulate Assert1()
+                  Assert1(0 && "Simulated Assert1() (aka. ⎕FIO ¯17)");
+                  return Token(TOK_APL_VALUE1, IntScalar(0, LOC));
+
+        case -16: // emulate Assert()
+                  Assert(0 && "Simulated Assert() (aka. ⎕FIO ¯16)");
+                  return Token(TOK_APL_VALUE1, IntScalar(0, LOC));
+
         case -15: // print performance IDs and names...
              {
                const ShapeItem count = PFS_MAX3;
@@ -980,11 +1152,11 @@ const APL_Integer function_number = B->get_ravel(0).get_int_value();
 #define perfo_4(id, b, name, thr) perfo_1(id, b, name, thr)
 #define perfo_3(id, b, name, thr) perfo_1(id, b, name, thr)
 #define perfo_2(id, b, name, thr) perfo_1(id, b, name, thr)
-#define perfo_1(id, ab, name, _thr)                     \
-   { new (Z->next_ravel())   IntCell(PFS_ ## id ## ab); \
-     UCS_string ucs(#id #ab);                           \
-     Value_P uZ(ucs, LOC);                              \
-     new (Z->next_ravel())   PointerCell(uZ.get(), Z.getref()); }
+#define perfo_1(id, ab, name, _thr)         \
+   { Z->next_ravel_Int(PFS_ ## id ## ab);   \
+     UCS_string ucs(#id #ab);               \
+     Value_P uZ(ucs, LOC);                  \
+     Z->next_ravel_Pointer(uZ.get());       }
 #include "Performance.def"
                Z->check_value(LOC);
                return Token(TOK_APL_VALUE1, Z);
@@ -1004,10 +1176,10 @@ const APL_Integer function_number = B->get_ravel(0).get_int_value();
                           IntScalar(UCS_string::get_total_count(), LOC));
         case -12: // sbrk()
              return Token(TOK_APL_VALUE1, IntScalar(top_of_memory(), LOC));
-        case -11: // fast new
-             return Token(TOK_APL_VALUE1, IntScalar(Value::fast_new, LOC));
+        case -11: // fnew
+             return Token(TOK_APL_VALUE1, IntScalar(Value::fast_new_count, LOC));
         case -10: // slow new
-             return Token(TOK_APL_VALUE1, IntScalar(Value::slow_new, LOC));
+             return Token(TOK_APL_VALUE1, IntScalar(Value::slow_new_count, LOC));
         case -9: // screen height
              {
                struct winsize ws;
@@ -1050,7 +1222,7 @@ const APL_Integer function_number = B->get_ravel(0).get_int_value();
              {
                Value_P Z(256, LOC);
                const Unicode * ibm = Avec::IBM_quad_AV();
-               loop(c, 256)   new (Z->next_ravel()) CharCell(ibm[c]);
+               loop(c, 256)   Z->next_ravel_Char(ibm[c]);
                Z->check_value(LOC);
                return Token(TOK_APL_VALUE1, Z);
              }
@@ -1087,9 +1259,9 @@ const APL_Integer function_number = B->get_ravel(0).get_int_value();
                Value_P Z(open_files.size(), LOC);
                loop(z, open_files.size())
                    {
-                     new (Z->next_ravel())   IntCell(open_files[z].fe_fd);
+                     Z->next_ravel_Int(open_files[z].fe_fd);
                    }
-               Z->set_default_Int();
+               Z->set_proto_Int();
                Z->check_value(LOC);
                return Token(TOK_APL_VALUE1, Z);
              }
@@ -1105,7 +1277,7 @@ const APL_Integer function_number = B->get_ravel(0).get_int_value();
                UCS_string cwd(buffer);
 
                Value_P Z(cwd, LOC);
-               Z->set_default_Spc();
+               Z->set_proto_Spc();
                Z->check_value(LOC);
                return Token(TOK_APL_VALUE1, Z);
              }
@@ -1120,7 +1292,7 @@ out_errno:
               << "] B failed: " << strerror(errno);
    return Token(TOK_APL_VALUE1, IntScalar(-errno, LOC));
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_FIO::eval_AB(Value_P A, Value_P B) const
 {
@@ -1131,18 +1303,18 @@ Quad_FIO::eval_AB(Value_P A, Value_P B) const
 
    if (B->element_count() == 0)   // '' or ⍬
       {
-        if (B->get_ravel(0).is_character_cell())
+        if (B->get_cfirst().is_character_cell())
            return list_functions(CERR, true);
-        if (B->get_ravel(0).is_integer_cell())
+        if (B->get_cfirst().is_integer_cell())
            return list_functions(CERR, false);
       }
 
-const APL_Integer function_number = B->get_ravel(0).get_int_value();
+const APL_Integer function_number = B->get_cfirst().get_int_value();
    switch(function_number)
       {
         case -3: // read probe A and clear it
              {
-               APL_Integer probe = A->get_ravel(0).get_int_value();
+               APL_Integer probe = A->get_cfirst().get_int_value();
 
                // negative numbers mean take from end (like ↑ and ↓)
                // convention ins that 0, 1, 2, ... are a probe vector (such as
@@ -1158,7 +1330,7 @@ const APL_Integer function_number = B->get_ravel(0).get_int_value();
 
                 Value_P Z(len, LOC);
                 loop(m, len)
-                    new (Z->next_ravel())   IntCell(Probe::get_time(probe, m));
+                    Z->next_ravel_Int(Probe::get_time(probe, m));
 
                 Probe::init(probe);
                 Z->check_value(LOC);
@@ -1170,11 +1342,11 @@ const APL_Integer function_number = B->get_ravel(0).get_int_value();
 
    return list_functions(COUT, false);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_FIO::eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B) const
 {
-const ShapeItem function_number = X->get_ravel(0).get_int_value();
+const ShapeItem function_number = X->get_cfirst().get_int_value();
    switch (function_number)
       {
         case -1:   // benchmark monadic LO with argument B
@@ -1207,7 +1379,7 @@ const ShapeItem function_number = X->get_ravel(0).get_int_value();
    MORE_ERROR() << "Bad function number (axis X) in operator A LO ⎕FIO[X] B";
    DOMAIN_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_FIO::eval_LXB(Token & LO, Value_P X, Value_P B) const
 {
@@ -1227,7 +1399,7 @@ Quad_FIO::eval_LXB(Token & LO, Value_P X, Value_P B) const
          return result;
       }
 
-const ShapeItem function_number = X->get_ravel(0).get_int_value();
+const ShapeItem function_number = X->get_cfirst().get_int_value();
    switch (function_number)
       {
         case -1:   // benchmark monadic LO with argument B
@@ -1256,7 +1428,7 @@ const ShapeItem function_number = X->get_ravel(0).get_int_value();
         case 49:
            {
              Token lines_B = eval_XB(X, B);
-             return Bif_OPER1_EACH::fun->eval_LB(LO, lines_B.get_apl_val());
+             return Bif_OPER1_EACH::do_eval_LB(LO, lines_B.get_apl_val());
            }
       }
 
@@ -1266,7 +1438,7 @@ const ShapeItem function_number = X->get_ravel(0).get_int_value();
 "case use (⎕FIO[X]) or H←⎕FIO[X]\n";
    DOMAIN_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_FIO::eval_XB(Value_P X, Value_P B) const
 {
@@ -1278,7 +1450,7 @@ Quad_FIO::eval_XB(Value_P X, Value_P B) const
 int function_number = -1;
    if (X->is_char_array())   // function name, e.g. "open"
       {
-        UCS_string ucs_X(X.getref());
+        UCS_string ucs_X(*X);
         UTF8_string utf_X(ucs_X);
         function_number = function_name_to_int(utf_X.c_str());
         if (function_number == -1)
@@ -1290,7 +1462,7 @@ int function_number = -1;
       }
    else
       {
-        function_number = X->get_ravel(0).get_near_int();
+        function_number = X->get_cfirst().get_near_int();
       }
 
    switch(function_number)
@@ -1303,13 +1475,12 @@ int function_number = -1;
 
          case 2:   // return strerror(B)
               {
-                int b = B->get_ravel(0).get_near_int();
+                int b = B->get_cfirst().get_near_int();
                 if (b < 0)   b = -b;
                 const char * text = strerror(b);
                 const int len = strlen(text);
                 Value_P Z(len, LOC);
-                loop(t, len)   new (Z->next_ravel())
-                               CharCell(Unicode(text[t]));
+                loop(t, len)   Z->next_ravel_Char(Unicode(text[t]));
 
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
@@ -1317,7 +1488,8 @@ int function_number = -1;
 
          case 3:   // fopen(Bs, "r") filename Bs
               {
-                const UTF8_string path(*B.get());
+                const UCS_string path_ucs(*B.get());
+                const UTF8_string path(path_ucs);
                 errno = 0;
                 FILE * f = fopen(path.c_str(), "r");
                 if (f == 0)   return Token(TOK_APL_VALUE1, IntScalar(-1, LOC));
@@ -1364,7 +1536,7 @@ int function_number = -1;
                 if (len == 0)   goto out_errno;
 
                 Value_P Z(len, LOC);
-                loop(z, len)   new (Z->next_ravel()) IntCell(buffer[z] & 0xFF);
+                loop(z, len)   Z->next_ravel_Int(buffer[z] & 0xFF);
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
               }
@@ -1380,7 +1552,7 @@ int function_number = -1;
                 const char * s = fgets(buffer, SMALL_BUF, file);
                 const int len = s ? strlen(s) : 0;
                 Value_P Z(len, LOC);
-                loop(z, len)   new (Z->next_ravel()) IntCell(buffer[z] & 0xFF);
+                loop(z, len)   Z->next_ravel_Int(buffer[z] & 0xFF);
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
               }
@@ -1434,19 +1606,19 @@ int function_number = -1;
                 if (result)   goto out_errno;   // fstat failed
 
                 Value_P Z(Value_P(13, LOC));
-                new (Z->next_ravel())   IntCell(s.st_dev);
-                new (Z->next_ravel())   IntCell(s.st_ino);
-                new (Z->next_ravel())   IntCell(s.st_mode);
-                new (Z->next_ravel())   IntCell(s.st_nlink);
-                new (Z->next_ravel())   IntCell(s.st_uid);
-                new (Z->next_ravel())   IntCell(s.st_gid);
-                new (Z->next_ravel())   IntCell(s.st_rdev);
-                new (Z->next_ravel())   IntCell(s.st_size);
-                new (Z->next_ravel())   IntCell(s.st_blksize);
-                new (Z->next_ravel())   IntCell(s.st_blocks);
-                new (Z->next_ravel())   IntCell(s.st_atime);
-                new (Z->next_ravel())   IntCell(s.st_mtime);
-                new (Z->next_ravel())   IntCell(s.st_ctime);
+                Z->next_ravel_Int(s.st_dev);
+                Z->next_ravel_Int(s.st_ino);
+                Z->next_ravel_Int(s.st_mode);
+                Z->next_ravel_Int(s.st_nlink);
+                Z->next_ravel_Int(s.st_uid);
+                Z->next_ravel_Int(s.st_gid);
+                Z->next_ravel_Int(s.st_rdev);
+                Z->next_ravel_Int(s.st_size);
+                Z->next_ravel_Int(s.st_blksize);
+                Z->next_ravel_Int(s.st_blocks);
+                Z->next_ravel_Int(s.st_atime);
+                Z->next_ravel_Int(s.st_mtime);
+                Z->next_ravel_Int(s.st_ctime);
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
               }
@@ -1454,7 +1626,8 @@ int function_number = -1;
          case 19:   // unlink(Bc)
               {
                 errno = 0;
-                UTF8_string path(*B.get());
+                const UCS_string path_ucs(*B.get());
+                const UTF8_string path(path_ucs);
                 unlink(path.c_str());
               }
               goto out_errno;
@@ -1462,7 +1635,8 @@ int function_number = -1;
          case 20:   // mkdir(Bc)
               {
                 errno = 0;
-                UTF8_string path(*B.get());
+                const UCS_string path_ucs(*B.get());
+                const UTF8_string path(path_ucs);
                 mkdir(path.c_str(), 0777);
               }
               goto out_errno;
@@ -1470,14 +1644,16 @@ int function_number = -1;
          case 21:   // rmdir(Bc)
               {
                 errno = 0;
-                UTF8_string path(*B.get());
+                const UCS_string path_ucs(*B.get());
+                const UTF8_string path(path_ucs);
                 rmdir(path.c_str());
               }
               goto out_errno;
 
          case 24:   // popen(Bs, "r") command Bs
               {
-                UTF8_string path(*B.get());
+                const UCS_string path_ucs(*B.get());
+                const UTF8_string path(path_ucs);
                 errno = 0;
                 FILE * f = popen(path.c_str(), "r");
                 if (f == 0)
@@ -1489,6 +1665,7 @@ int function_number = -1;
                 file_entry fe(f, fileno(f));
                 fe.fe_may_read = true;
                 open_files.push_back(fe);
+                signal(SIGCHLD, SIG_DFL);
                 return Token(TOK_APL_VALUE1, IntScalar(fe.fe_fd,LOC));
               }
 
@@ -1497,7 +1674,11 @@ int function_number = -1;
                 errno = 0;
                 file_entry & fe = get_file_entry(*B.get());
                 int err = EBADF;   /* Bad file number */
-                if (fe.fe_FILE)   err = pclose(fe.fe_FILE);
+                if (fe.fe_FILE)
+                   {
+                     err = pclose(fe.fe_FILE);
+                     signal(SIGCHLD, SIG_IGN);
+                   }
 
                 fe = open_files.back();       // move last file to fe
                 open_files.pop_back();        // erase last file
@@ -1509,7 +1690,8 @@ int function_number = -1;
          case 26:   // read entire file
               {
                 errno = 0;
-                UTF8_string path(*B.get());
+                const UCS_string path_ucs(*B.get());
+                const UTF8_string path(path_ucs);
                 int fd = open(path.c_str(), O_RDONLY);
                 if (fd == -1)   goto out_errno;
 
@@ -1535,11 +1717,10 @@ int function_number = -1;
 
                 Value_P Z(len, LOC);
                 Z->set_proto_Spc();
-                loop(z, len) new (Z->next_ravel())
-                             CharCell(Unicode(data[z]));
+                loop(z, len)   Z->next_ravel_Char(Unicode(data[z]));
                 munmap(data, len);
 
-                Z->set_default_Spc();
+                Z->set_proto_Spc();
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
               }
@@ -1548,7 +1729,8 @@ int function_number = -1;
          case 29:   // read file names in directory Bs
               {
                 errno = 0;
-                UTF8_string path(*B.get());
+                const UCS_string path_ucs(*B.get());
+                const UTF8_string path(path_ucs);
                 DIR * dir = opendir(path.c_str());
                 if (dir == 0)   goto out_errno;
 
@@ -1587,37 +1769,36 @@ int function_number = -1;
                         {
                           // all platforms support inode number
                           //
-                          new (Z->next_ravel())   IntCell(dent.d_ino);
+                          Z->next_ravel_Int(dent.d_ino);
 
 
 #ifdef _DIRENT_HAVE_D_OFF
-                          new (Z->next_ravel())   IntCell(dent.d_off);
+                          Z->next_ravel_Int(dent.d_off);
 #else
-                          new (Z->next_ravel())   IntCell(-1);
+                          Z->next_ravel_1();
 #endif
 
 
 #ifdef _DIRENT_HAVE_D_RECLEN
-                          new (Z->next_ravel())   IntCell(dent.d_reclen);
+                          Z->next_ravel_Int(dent.d_reclen);
 #else
-                          new (Z->next_ravel())   IntCell(-1);
+                          Z->next_ravel_1();
 #endif
 
 
 #ifdef _DIRENT_HAVE_D_TYPE
-                         new (Z->next_ravel())   IntCell(dent.d_type);
+                         Z->next_ravel_Int(dent.d_type);
 #else
-                          new (Z->next_ravel())   IntCell(-1);
+                          Z->next_ravel_1();
 #endif
                         }   // function_number == 28
 
                      UCS_string filename(dent.d_name);
                      Value_P Z_name(filename, LOC);
-                     new (Z->next_ravel())
-                         PointerCell(Z_name.get(), Z.getref());
+                     Z->next_ravel_Pointer(Z_name.get());
                    }
 
-                Z->set_default_Spc();
+                Z->set_proto_Spc();
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
               }
@@ -1630,11 +1811,11 @@ int function_number = -1;
                 APL_Integer type = SOCK_STREAM;
                 APL_Integer protocol = 0;
                 if (B->element_count() > 0)
-                   domain = B->get_ravel(0).get_int_value();
+                   domain = B->get_cfirst().get_int_value();
                 if (B->element_count() > 1)
-                   type = B->get_ravel(1).get_int_value();
+                   type = B->get_cravel(1).get_int_value();
                 if (B->element_count() > 2)
-                   protocol = B->get_ravel(2).get_int_value();
+                   protocol = B->get_cravel(2).get_int_value();
                 const int sock = socket(domain, type, protocol);
                 if (sock == -1)   goto out_errno;
 
@@ -1666,10 +1847,10 @@ int function_number = -1;
                 open_files.push_back(nfe);
 
                 Value_P Z(4, LOC);
-                new (Z->next_ravel()) IntCell(nfe.fe_fd);
-                new (Z->next_ravel()) IntCell(addr.inet.sin_family);
-                new (Z->next_ravel()) IntCell(ntohl(addr.inet.sin_addr.s_addr));
-                new (Z->next_ravel())   IntCell(ntohs(addr.inet.sin_port));
+                Z->next_ravel_Int(nfe.fe_fd);
+                Z->next_ravel_Int(addr.inet.sin_family);
+                Z->next_ravel_Int(ntohl(addr.inet.sin_addr.s_addr));
+                Z->next_ravel_Int(ntohs(addr.inet.sin_port));
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
               }
@@ -1685,7 +1866,7 @@ int function_number = -1;
                 if (len < 0)   goto out_errno;
 
                 Value_P Z(len, LOC);
-                loop(z, len)   new (Z->next_ravel()) IntCell(buffer[z] & 0xFF);
+                loop(z, len)   Z->next_ravel_Int(buffer[z] & 0xFF);
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
               }
@@ -1707,7 +1888,7 @@ int function_number = -1;
 
                 if (B->element_count() >= 4)
                    {
-                     const APL_Integer milli = B->get_ravel(3).get_int_value();
+                     const APL_Integer milli = B->get_cravel(3).get_int_value();
                      if (milli < 0)   DOMAIN_ERROR;
 
                      timeout.tv_sec = milli / 1000;
@@ -1716,10 +1897,10 @@ int function_number = -1;
 
                 if (B->element_count() >= 3)
                    {
-                      Value_P vex = B->get_ravel(2).get_pointer_value();
+                      Value_P vex = B->get_cravel(2).get_pointer_value();
                       loop(l, vex->element_count())
                           {
-                            const int fd(vex->get_ravel(l).get_int_value());
+                            const int fd(vex->get_cravel(l).get_int_value());
                             if (fd < 0)                       DOMAIN_ERROR;
                             if (fd > 8*int(sizeof(fd_set)))   DOMAIN_ERROR;
                             FD_SET(fd, &exceptfds);
@@ -1730,11 +1911,11 @@ int function_number = -1;
 
                 if (B->element_count() >= 2)
                    {
-                      Value_P vwr = B->get_ravel(1).get_pointer_value();
+                      Value_P vwr = B->get_cravel(1).get_pointer_value();
                       loop(l, vwr->element_count())
                           {
                             const APL_Integer fd =
-                                  vwr->get_ravel(l).get_int_value();
+                                  vwr->get_cravel(l).get_int_value();
                             if (fd < 0)                       DOMAIN_ERROR;
                             if (fd > 8*int(sizeof(fd_set)))   DOMAIN_ERROR;
                             FD_SET(fd, &writefds);
@@ -1745,11 +1926,11 @@ int function_number = -1;
 
                 if (B->element_count() >= 1)
                    {
-                      Value_P vrd = B->get_ravel(0).get_pointer_value();
+                      Value_P vrd = B->get_cfirst().get_pointer_value();
                       loop(l, vrd->element_count())
                           {
                             const APL_Integer fd =
-                                  vrd->get_ravel(l).get_int_value();
+                                  vrd->get_cravel(l).get_int_value();
                             if (fd < 0)                         DOMAIN_ERROR;
                             if (fd > (8*int(sizeof(fd_set))))   DOMAIN_ERROR;
                             FD_SET(fd, &readfds);
@@ -1762,15 +1943,13 @@ int function_number = -1;
                 if (count < 0)   goto out_errno;
 
                 Value_P Z(5, LOC);
-                new (Z->next_ravel())   IntCell(count);
-                new (Z->next_ravel())
-                    PointerCell(fds_to_val(rd, max_fd).get(), Z.getref());
-                new (Z->next_ravel())
-                    PointerCell(fds_to_val(wr, max_fd).get(), Z.getref());
-                new (Z->next_ravel())
-                    PointerCell(fds_to_val(ex, max_fd).get(), Z.getref());
-                new (Z->next_ravel())
-                    IntCell(timeout.tv_sec*1000 + timeout.tv_usec/1000);
+                const APL_Integer milli_seconds = timeout.tv_sec*1000
+                                                + timeout.tv_usec/1000;
+                Z->next_ravel_Int(count);
+                Z->next_ravel_Pointer(fds_to_val(rd, max_fd).get());
+                Z->next_ravel_Pointer(fds_to_val(wr, max_fd).get());
+                Z->next_ravel_Pointer(fds_to_val(ex, max_fd).get());
+                Z->next_ravel_Int(milli_seconds);
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
               }
@@ -1786,8 +1965,8 @@ int function_number = -1;
                 if (len < 0)   goto out_errno;
 
                 Value_P Z(len, LOC);
-                loop(z, len)   new (Z->next_ravel()) IntCell(buffer[z] & 0xFF);
-                Z->set_default_Int();
+                loop(z, len)   Z->next_ravel_Int(buffer[z] & 0xFF);
+                Z->set_proto_Int();
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
               }
@@ -1802,9 +1981,9 @@ int function_number = -1;
                 if (ret == -1)   goto out_errno;
 
                 Value_P Z(3, LOC);
-                new (Z->next_ravel())   IntCell(addr.inet.sin_family);
-                new (Z->next_ravel())   IntCell(ntohl(addr.inet.sin_addr.s_addr));
-                new (Z->next_ravel())   IntCell(ntohs(addr.inet.sin_port));
+                Z->next_ravel_Int(addr.inet.sin_family);
+                Z->next_ravel_Int(ntohl(addr.inet.sin_addr.s_addr));
+                Z->next_ravel_Int(ntohs(addr.inet.sin_port));
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
               }
@@ -1819,9 +1998,9 @@ int function_number = -1;
                 if (ret == -1)   goto out_errno;
 
                 Value_P Z(3, LOC);
-                new (Z->next_ravel()) IntCell(addr.inet.sin_family);
-                new (Z->next_ravel()) IntCell(ntohl(addr.inet.sin_addr.s_addr));
-                new (Z->next_ravel()) IntCell(ntohs(addr.inet.sin_port));
+                Z->next_ravel_Int(addr.inet.sin_family);
+                Z->next_ravel_Int(ntohl(addr.inet.sin_addr.s_addr));
+                Z->next_ravel_Int(ntohs(addr.inet.sin_port));
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
               }
@@ -1829,7 +2008,8 @@ int function_number = -1;
          case 49:   // read entire file as nested lines
               {
                 errno = 0;
-                UTF8_string path(*B.get());
+                const UCS_string path_ucs(*B.get());
+                const UTF8_string path(path_ucs);
                 const int fd = open(path.c_str(), O_RDONLY);
                 if (fd == -1)   goto out_errno;
 
@@ -1878,7 +2058,7 @@ int function_number = -1;
                       UTF8_string utf(from, end - from);
                       UCS_string ucs(utf);
                       Value_P ZZ(ucs, LOC);
-                      new (Z->next_ravel())  PointerCell(ZZ.get(), Z.getref());
+                      Z->next_ravel_Pointer(ZZ.get());
                       from = data + l + 1;
                     }
 
@@ -1889,19 +2069,19 @@ int function_number = -1;
                       UTF8_string utf(from, end - from);
                       UCS_string ucs(utf);
                       Value_P ZZ(ucs, LOC);
-                      new (Z->next_ravel())  PointerCell(ZZ.get(), Z.getref());
+                      Z->next_ravel_Pointer(ZZ.get());
                    }
 
                 munmap(data, len);
 
-                Z->set_default_Spc();
+                Z->set_proto_Spc();
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
               }
 
          case 50:   // gettimeofday
               {
-                const APL_Integer unit = B->get_ravel(0).get_near_int();
+                const APL_Integer unit = B->get_cfirst().get_near_int();
                 timeval tv;
                 gettimeofday(&tv, 0);
                 int64_t usec = tv.tv_sec;
@@ -1926,14 +2106,14 @@ int function_number = -1;
                    LENGTH_ERROR;
 
                 tm t;
-                t.tm_year = B->get_ravel(0).get_int_value() - 1900;
-                t.tm_mon  = B->get_ravel(1).get_int_value() - 1;
-                t.tm_mday = B->get_ravel(2).get_int_value();
-                t.tm_hour = B->get_ravel(3).get_int_value();
-                t.tm_min  = B->get_ravel(4).get_int_value();
-                t.tm_sec  = B->get_ravel(5).get_int_value();
+                t.tm_year = B->get_cfirst().get_int_value() - 1900;
+                t.tm_mon  = B->get_cravel(1).get_int_value() - 1;
+                t.tm_mday = B->get_cravel(2).get_int_value();
+                t.tm_hour = B->get_cravel(3).get_int_value();
+                t.tm_min  = B->get_cravel(4).get_int_value();
+                t.tm_sec  = B->get_cravel(5).get_int_value();
                 if (B->element_count() > 6)   // dst provided
-                   t.tm_isdst = B->get_ravel(6).get_int_value();
+                   t.tm_isdst = B->get_cravel(6).get_int_value();
                 else
                    t.tm_isdst = -1;
 
@@ -1941,10 +2121,10 @@ int function_number = -1;
                if (seconds == time_t(-1))   DOMAIN_ERROR;
 
                 Value_P Z(4, LOC);
-                new (Z->next_ravel()) IntCell(seconds);
-                new (Z->next_ravel()) IntCell(t.tm_wday);
-                new (Z->next_ravel()) IntCell(t.tm_yday);
-                new (Z->next_ravel()) IntCell(t.tm_isdst);
+                Z->next_ravel_Int(seconds);
+                Z->next_ravel_Int(t.tm_wday);
+                Z->next_ravel_Int(t.tm_yday);
+                Z->next_ravel_Int(t.tm_isdst);
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
               }
@@ -1953,28 +2133,29 @@ int function_number = -1;
          case 53:   // gmtime
               {
                 if (B->element_count() != 1)   LENGTH_ERROR;
-                const time_t t = B->get_ravel(0).get_int_value();
+                const time_t t = B->get_cfirst().get_int_value();
                 const tm * tmp = (function_number == 52) ? localtime(&t)
                                                          : gmtime(&t);
                 if (tmp == 0)   DOMAIN_ERROR;
 
                 Value_P Z(9, LOC);
-                new (Z->next_ravel()) IntCell(tmp->tm_year + 1900);
-                new (Z->next_ravel()) IntCell(tmp->tm_mon + 1);
-                new (Z->next_ravel()) IntCell(tmp->tm_mday);
-                new (Z->next_ravel()) IntCell(tmp->tm_hour);
-                new (Z->next_ravel()) IntCell(tmp->tm_min);
-                new (Z->next_ravel()) IntCell(tmp->tm_sec);
-                new (Z->next_ravel()) IntCell(tmp->tm_wday);
-                new (Z->next_ravel()) IntCell(tmp->tm_yday);
-                new (Z->next_ravel()) IntCell(tmp->tm_isdst);
+                Z->next_ravel_Int(tmp->tm_year + 1900);
+                Z->next_ravel_Int(tmp->tm_mon + 1);
+                Z->next_ravel_Int(tmp->tm_mday);
+                Z->next_ravel_Int(tmp->tm_hour);
+                Z->next_ravel_Int(tmp->tm_min);
+                Z->next_ravel_Int(tmp->tm_sec);
+                Z->next_ravel_Int(tmp->tm_wday);
+                Z->next_ravel_Int(tmp->tm_yday);
+                Z->next_ravel_Int(tmp->tm_isdst);
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
               }
 
          case 54:    // chdir
               {
-                UTF8_string path(*B.get());
+                const UCS_string path_ucs(*B.get());
+                const UTF8_string path(path_ucs);
                 errno = chdir(path.c_str());
                 goto out_errno;
               }
@@ -1990,7 +2171,7 @@ int function_number = -1;
          case 60:   // random value
               {
                  if (!B->is_scalar())   RANK_ERROR;
-                 const APL_Integer len = B->get_ravel(0).get_int_value();
+                 const APL_Integer len = B->get_cfirst().get_int_value();
                  if (len < 1)   LENGTH_ERROR;
                  if (len > 8)   LENGTH_ERROR;
                  Value_P Z = get_random(0, len);
@@ -2000,7 +2181,7 @@ int function_number = -1;
          case 200:   // clear statistics Bi
          case 201:   // get statistics Bi
               {
-                const Pfstat_ID b = Pfstat_ID(B->get_ravel(0).get_int_value());
+                const Pfstat_ID b = Pfstat_ID(B->get_cfirst().get_int_value());
                 Statistics * stat = Performance::get_statistics(b);
                 if (stat == 0)   DOMAIN_ERROR;   // bad statistics ID
 
@@ -2014,20 +2195,20 @@ int function_number = -1;
                 //
                  const int t = Performance::get_statistics_type(b);
                  UCS_string stat_name(stat->get_name());
-                 Value_P Z1(stat_name, LOC);
+                 Value_P Zsub(stat_name, LOC);
                  if (t <= 2)   // cell function statistics
                     {
                       const Statistics_record * r1 = stat->get_first_record();
                       const Statistics_record * rN = stat->get_record();
                       Value_P Z(8, LOC);
-                      new (Z->next_ravel())   IntCell(t);
-                      new (Z->next_ravel())   PointerCell(Z1.get(), Z.getref());
-                      new (Z->next_ravel())   IntCell(r1->get_count());
-                      new (Z->next_ravel())   IntCell(r1->get_sum());
-                      new (Z->next_ravel())   FloatCell(r1->get_sum2());
-                      new (Z->next_ravel())   IntCell(rN->get_count());
-                      new (Z->next_ravel())   IntCell(rN->get_sum());
-                      new (Z->next_ravel())   FloatCell(rN->get_sum2());
+                      Z->next_ravel_Int(t);
+                      Z->next_ravel_Pointer(Zsub.get());
+                      Z->next_ravel_Int(r1->get_count());
+                      Z->next_ravel_Int(r1->get_sum());
+                      Z->next_ravel_Float(r1->get_sum2());
+                      Z->next_ravel_Int(rN->get_count());
+                      Z->next_ravel_Int(rN->get_sum());
+                      Z->next_ravel_Float(rN->get_sum2());
                       Z->check_value(LOC);
                       return Token(TOK_APL_VALUE1, Z);
                     }
@@ -2035,11 +2216,11 @@ int function_number = -1;
                     {
                       const Statistics_record * r = stat->get_record();
                       Value_P Z(5, LOC);
-                      new (Z->next_ravel())   IntCell(t);
-                      new (Z->next_ravel())   PointerCell(Z1.get(), Z.getref());
-                      new (Z->next_ravel())   IntCell(r->get_count());
-                      new (Z->next_ravel())   IntCell(r->get_sum());
-                      new (Z->next_ravel())   FloatCell(r->get_sum2());
+                      Z->next_ravel_Int(t);
+                      Z->next_ravel_Pointer(Zsub.get());
+                      Z->next_ravel_Int(r->get_count());
+                      Z->next_ravel_Int(r->get_sum());
+                      Z->next_ravel_Float(r->get_sum2());
                       Z->check_value(LOC);
                       return Token(TOK_APL_VALUE1, Z);
                     }
@@ -2051,8 +2232,8 @@ int function_number = -1;
                 const Function * fun = 0;
                 if (B->element_count() == 3)   // dyadic operator
                    {
-                     const Unicode lfun = B->get_ravel(0).get_char_value();
-                     const Unicode oper = B->get_ravel(1).get_char_value();
+                     const Unicode lfun = B->get_cfirst().get_char_value();
+                     const Unicode oper = B->get_cravel(1).get_char_value();
                      if (oper == UNI_FULLSTOP)
                         {
                           if (lfun == UNI_RING_OPERATOR)   // ∘.g
@@ -2063,7 +2244,7 @@ int function_number = -1;
                    }
                 else
                    {
-                     const Unicode prim = B->get_ravel(0).get_char_value();
+                     const Unicode prim = B->get_cfirst().get_char_value();
                      const Token tok = Tokenizer::tokenize_function(prim);
                      if (!tok.is_function())   DOMAIN_ERROR;
                      fun = tok.get_function();
@@ -2094,7 +2275,7 @@ int function_number = -1;
 out_errno:
    return Token(TOK_APL_VALUE1, IntScalar(-errno, LOC));
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Quad_FIO::do_FIO_57(const UCS_string & B, char * const * envp)
 {
@@ -2137,7 +2318,8 @@ const int sock = spair[1];
    //
    dup2(sock, 3);
 
-UTF8_string path(B);
+const UCS_string path_ucs(B);
+const UTF8_string path(path_ucs);
 char * filename = strdup(path.c_str());
 int argc = 1;
    for (const char * f = filename; *f; ++f)
@@ -2171,7 +2353,7 @@ char * from = filename;
    CERR << "*** execve() failed in 57 ⎕CR: " << strerror(errno);
    exit(-1);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_FIO::eval_AXB(const Value_P A, const Value_P X, const Value_P B) const
 {
@@ -2184,7 +2366,7 @@ Quad_FIO::eval_AXB(const Value_P A, const Value_P X, const Value_P B) const
 int function_number = -1;
    if (X->is_char_array())   // function name, e.g. "open"
       {
-        UCS_string ucs_X(X.getref());
+        UCS_string ucs_X(*X);
         UTF8_string utf_X(ucs_X);
         function_number = function_name_to_int(utf_X.c_str());
         if (function_number == -1)
@@ -2196,7 +2378,7 @@ int function_number = -1;
       }
    else
       {
-        function_number = X->get_ravel(0).get_near_int();
+        function_number = X->get_cfirst().get_near_int();
       }
 
    switch(function_number)
@@ -2206,8 +2388,10 @@ int function_number = -1;
 
          case 3:   // fopen(Bs, As) filename Bs mode As
               {
-                UTF8_string path(*B.get());
-                UTF8_string mode(*A.get());
+                const UCS_string mode_ucs(*A.get());
+                const UCS_string path_ucs(*B.get());
+                UTF8_string mode(mode_ucs);
+                const UTF8_string path(path_ucs);
 
                 const char * m = mode.c_str();
                 bool read = false;
@@ -2235,7 +2419,7 @@ int function_number = -1;
          case 6:   // fread(Zi, 1, Ai, Bh) 1 byte per Zi
               {
                 errno = 0;
-                const size_t bytes = A->get_ravel(0).get_near_int();
+                const size_t bytes = A->get_cfirst().get_near_int();
                 FILE * file = get_FILE(*B.get());
                 clearerr(file);
 
@@ -2249,7 +2433,7 @@ int function_number = -1;
                 if (len == 0)   goto out_errno;
 
                 Value_P Z(len, LOC);
-                loop(z, len)   new (Z->next_ravel()) IntCell(buffer[z] & 0xFF);
+                loop(z, len)   Z->next_ravel_Int(buffer[z] & 0xFF);
                 delete [] del;
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
@@ -2267,7 +2451,7 @@ int function_number = -1;
                 if (bytes > sizeof(small_buffer))
                    buffer = del = new char[bytes];
 
-                loop(z, bytes)   buffer[z] = A->get_ravel(z).get_near_int();
+                loop(z, bytes)   buffer[z] = A->get_cravel(z).get_near_int();
 
                 const size_t len = fwrite(buffer, 1, bytes, file);
                 delete [] del;
@@ -2278,7 +2462,7 @@ int function_number = -1;
          case 8:   // fgets(Zi, Ai, Bh) 1 byte per Zi
               {
                 errno = 0;
-                const size_t bytes = A->get_ravel(0).get_near_int();
+                const size_t bytes = A->get_cfirst().get_near_int();
                 FILE * file = get_FILE(*B.get());
                 clearerr(file);
 
@@ -2291,7 +2475,7 @@ int function_number = -1;
                 const char * s = fgets(buffer, bytes, file);
                 const int len = s ? strlen(s) : 0;
                 Value_P Z(len, LOC);
-                loop(z, len)   new (Z->next_ravel()) IntCell(buffer[z] & 0xFF);
+                loop(z, len)   Z->next_ravel_Int(buffer[z] & 0xFF);
                 delete [] del;
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
@@ -2301,7 +2485,7 @@ int function_number = -1;
               {
                 errno = 0;
                 FILE * file = get_FILE(*B.get());
-                const APL_Integer pos = A->get_ravel(0).get_near_int();
+                const APL_Integer pos = A->get_cfirst().get_near_int();
                 fseek(file, pos, SEEK_SET);
               }
               goto out_errno;
@@ -2310,7 +2494,7 @@ int function_number = -1;
               {
                 errno = 0;
                 FILE * file = get_FILE(*B.get());
-                const APL_Integer pos = A->get_ravel(0).get_near_int();
+                const APL_Integer pos = A->get_cfirst().get_near_int();
                 fseek(file, pos, SEEK_CUR);
               }
               goto out_errno;
@@ -2319,7 +2503,7 @@ int function_number = -1;
               {
                 errno = 0;
                 FILE * file = get_FILE(*B.get());
-                const APL_Integer pos = A->get_ravel(0).get_near_int();
+                const APL_Integer pos = A->get_cfirst().get_near_int();
                 fseek(file, pos, SEEK_END);
               }
               goto out_errno;
@@ -2327,8 +2511,9 @@ int function_number = -1;
          case 20:   // mkdir(Bc, Ai)
               {
                 errno = 0;
-                const int mask = A->get_ravel(0).get_near_int();
-                UTF8_string path(*B.get());
+                const int mask = A->get_cfirst().get_near_int();
+                const UCS_string path_ucs(*B.get());
+                const UTF8_string path(path_ucs);
                 mkdir(path.c_str(), mask);
               }
               goto out_errno;
@@ -2353,8 +2538,10 @@ int function_number = -1;
 
          case 24:   // popen(Bs, As) command Bs mode As
               {
-                UTF8_string path(*B.get());
-                UTF8_string mode(*A.get());
+                const UCS_string mode_ucs(*A.get());
+                const UCS_string path_ucs(*B.get());
+                const UTF8_string mode(mode_ucs);
+                const UTF8_string path(path_ucs);
                 const char * m = mode.c_str();
                 bool read = false;
                 bool write = false;
@@ -2372,6 +2559,7 @@ int function_number = -1;
                      return Token(TOK_APL_VALUE1, IntScalar(-1, LOC));
                    }
 
+                signal(SIGCHLD, SIG_DFL);
                 file_entry fe(f, fileno(f));
                 fe.fe_may_read = read;
                 fe.fe_may_write = write;
@@ -2381,8 +2569,10 @@ int function_number = -1;
 
          case 27:   // rename(As, Bs)
               {
-                UTF8_string old_name(*A.get());
-                UTF8_string new_name(*B.get());
+                const UCS_string old_name_ucs(*A.get());
+                const UCS_string new_name_ucs(*B.get());
+                UTF8_string old_name(old_name_ucs);
+                UTF8_string new_name(new_name_ucs);
                 errno = 0;
                 const int result = rename(old_name.c_str(), new_name.c_str());
                 if (result && errno)   goto out_errno;   // errno should be set
@@ -2392,8 +2582,10 @@ int function_number = -1;
 
          case 31:   // access
               {
-                UTF8_string permissions(*A.get());
-                UTF8_string path(*B.get());
+                const UCS_string mode_ucs(*A.get());
+                const UCS_string path_ucs(*B.get());
+                UTF8_string permissions(mode_ucs);
+                const UTF8_string path(path_ucs);
                 int perms = 0;
                 loop(a, permissions.size())
                     {
@@ -2420,10 +2612,10 @@ int function_number = -1;
                 const int fd = get_fd(*B.get());
                 SockAddr addr;
                 memset(&addr, 0, sizeof(addr.inet));
-                addr.inet.sin_family = A->get_ravel(0).get_int_value();
-                addr.inet.sin_addr.s_addr = htonl(A->get_ravel(1)
+                addr.inet.sin_family = A->get_cfirst().get_int_value();
+                addr.inet.sin_addr.s_addr = htonl(A->get_cravel(1)
                                                     .get_int_value());
-                addr.inet.sin_port = htons(A->get_ravel(2).get_int_value());
+                addr.inet.sin_port = htons(A->get_cravel(2).get_int_value());
                 errno = 0;
                 bind(fd, &addr.addr, sizeof(addr.inet));
                 goto out_errno;
@@ -2434,7 +2626,7 @@ int function_number = -1;
                 const int fd = get_fd(*B.get());
                 APL_Integer backlog = 10;
                 if (A->element_count() > 0)
-                   backlog = A->get_ravel(0).get_int_value();
+                   backlog = A->get_cfirst().get_int_value();
 
                 errno = 0;
                 listen(fd, backlog);
@@ -2447,10 +2639,10 @@ int function_number = -1;
                 errno = 0;
                 SockAddr addr;
                 memset(&addr, 0, sizeof(addr.inet));
-                addr.inet.sin_family = A->get_ravel(0).get_int_value();
-                addr.inet.sin_addr.s_addr = htonl(A->get_ravel(1)
+                addr.inet.sin_family = A->get_cfirst().get_int_value();
+                addr.inet.sin_addr.s_addr = htonl(A->get_cravel(1)
                                                     .get_int_value());
-                addr.inet.sin_port = htons(A->get_ravel(2).get_int_value());
+                addr.inet.sin_port = htons(A->get_cravel(2).get_int_value());
                 errno = 0;
                 connect(fd, &addr.addr, sizeof(addr));
                 goto out_errno;
@@ -2458,7 +2650,7 @@ int function_number = -1;
 
          case 37:   // recv(Bh, Zi, Ai, 0) 1 byte per Zi
               {
-                const size_t bytes = A->get_ravel(0).get_near_int();
+                const size_t bytes = A->get_cfirst().get_near_int();
                 const int fd = get_fd(*B.get());
 
                 char small_buffer[SMALL_BUF];
@@ -2472,7 +2664,7 @@ int function_number = -1;
                 if (len < 0)   goto out_errno;
 
                 Value_P Z(len, LOC);
-                loop(z, len)   new (Z->next_ravel()) IntCell(buffer[z] & 0xFF);
+                loop(z, len)   Z->next_ravel_Int(buffer[z] & 0xFF);
                 delete [] del;
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
@@ -2490,7 +2682,7 @@ int function_number = -1;
                 if (bytes > sizeof(small_buffer))
                    buffer = del = new char[bytes];
 
-                loop(z, bytes)   buffer[z] = A->get_ravel(z).get_near_int();
+                loop(z, bytes)   buffer[z] = A->get_cravel(z).get_near_int();
 
                 const ssize_t len = send(fd, buffer, bytes, 0);
                 if (len < 0)   goto out_errno;
@@ -2513,7 +2705,7 @@ int function_number = -1;
 
          case 41:   // read(Bh, Zi, Ai) 1 byte per Zi
               {
-                const size_t bytes = A->get_ravel(0).get_near_int();
+                const size_t bytes = A->get_cfirst().get_near_int();
                 const int fd = get_fd(*B.get());
 
                 char small_buffer[SMALL_BUF];
@@ -2527,7 +2719,7 @@ int function_number = -1;
                 if (len < 0)   goto out_errno;
 
                 Value_P Z(len, LOC);
-                loop(z, len)   new (Z->next_ravel()) IntCell(buffer[z] & 0xFF);
+                loop(z, len)   Z->next_ravel_Int(buffer[z] & 0xFF);
                 delete [] del;
                 Z->check_value(LOC);
                 return Token(TOK_APL_VALUE1, Z);
@@ -2544,7 +2736,7 @@ int function_number = -1;
                 if (bytes > sizeof(small_buffer))
                    buffer = del = new char[bytes];
 
-                loop(z, bytes)   buffer[z] = A->get_ravel(z).get_byte_value();
+                loop(z, bytes)   buffer[z] = A->get_cravel(z).get_byte_value();
 
                 errno = 0;
                 const ssize_t len = write(fd, buffer, bytes);
@@ -2567,8 +2759,8 @@ int function_number = -1;
 
          case 46:   // getsockopt(Bh, A_level, A_optname, Zi)
               {
-                const APL_Integer level = A->get_ravel(0).get_int_value();
-                const APL_Integer optname = A->get_ravel(1).get_int_value();
+                const APL_Integer level = A->get_cfirst().get_int_value();
+                const APL_Integer optname = A->get_cravel(1).get_int_value();
                 const int fd = get_fd(*B.get());
                 int optval = 0;
                 socklen_t olen = sizeof(optval);
@@ -2580,9 +2772,9 @@ int function_number = -1;
 
          case 47:   // setsockopt(Bh, A_level, A_optname, A_optval)
               {
-                const APL_Integer level = A->get_ravel(0).get_int_value();
-                const APL_Integer optname = A->get_ravel(1).get_int_value();
-                const int optval =  A->get_ravel(2).get_int_value();
+                const APL_Integer level = A->get_cfirst().get_int_value();
+                const APL_Integer optname = A->get_cravel(1).get_int_value();
+                const int optval =  A->get_cravel(2).get_int_value();
                 const int fd = get_fd(*B.get());
                 errno = 0;
                 setsockopt(fd, level, optname, &optval, sizeof(optval));
@@ -2595,7 +2787,7 @@ int function_number = -1;
                 const UCS_string format(*A.get());
                 File_or_String fos(file);
                 errno = 0;
-                return do_scanf(fos, format);
+                return do_scanf(fos, format, function_number);
               }
 
          case 55:   // sscanf(Bh, A_format)
@@ -2604,7 +2796,7 @@ int function_number = -1;
                 const UCS_string data(*B.get());
                 File_or_String fos(&data);
                 errno = 0;
-                return do_scanf(fos, format);
+                return do_scanf(fos, format, function_number);
               }
 
          case 56:   // write nested lines As to file Bs
@@ -2613,12 +2805,13 @@ int function_number = -1;
                 //
                 errno = 0;
                 size_t items_written = 0;
-                UTF8_string path(*B.get());
+                const UCS_string path_ucs(*B.get());
+                const UTF8_string path(path_ucs);
                 if (A->get_rank() > 1)   RANK_ERROR;
                 const ShapeItem line_count = A->element_count();
                 loop(a, line_count)
                     {
-                      const Cell & cA = A->get_ravel(a);
+                      const Cell & cA = A->get_cravel(a);
                       if (!cA.is_pointer_cell())
                          {
                             MORE_ERROR() <<
@@ -2643,8 +2836,8 @@ int function_number = -1;
 
                 loop(a, line_count)
                     {
-                      const Cell & cA = A->get_ravel(a);
-                      const Value & Ai = cA.get_pointer_value().getref();
+                      const Cell & cA = A->get_cravel(a);
+                      const Value & Ai = *cA.get_pointer_value();
                       UCS_string line_ucs(Ai);
                       UTF8_string line_utf(line_ucs);
                       line_utf += '\n';
@@ -2659,7 +2852,7 @@ int function_number = -1;
 
          case 58:   // sprintf(Af, B...)
               {
-                const UCS_string A_format(A.getref());
+                const UCS_string A_format(*A);
                 UCS_string UZ;
                 do_sprintf(UZ, A_format, B.get(), 0);
                 Value_P Z(UZ, LOC);
@@ -2671,7 +2864,7 @@ int function_number = -1;
                 const int fd = get_fd(*B.get());
                 errno = 0;
                 int result = -1;
-                const Cell * cA = &A->get_ravel(0);
+                const Cell * cA = &A->get_cfirst();
                 switch(A->element_count())
                    {
                       case 1: result = fcntl(fd, cA[0].get_int_value());
@@ -2693,8 +2886,8 @@ int function_number = -1;
                 errno = 0;
                 if (!A->is_scalar())   RANK_ERROR;
                 if (!B->is_scalar())   RANK_ERROR;
-                const APL_Integer mode = A->get_ravel(0).get_int_value();
-                const APL_Integer len  = B->get_ravel(0).get_int_value();
+                const APL_Integer mode = A->get_cfirst().get_int_value();
+                const APL_Integer len  = B->get_cfirst().get_int_value();
                 if (len < 1)    LENGTH_ERROR;
                 if (len > 32)   LENGTH_ERROR;
                 Value_P Z = get_random(mode, len);
@@ -2704,17 +2897,17 @@ int function_number = -1;
          case 202:   // set monadic parallel threshold
          case 203:   // set dyadicadic parallel threshold
               {
-                const APL_Integer threshold = A->get_ravel(0).get_int_value();
+                const APL_Integer threshold = A->get_cfirst().get_int_value();
                 Function_P fun = 0;
                 if (B->element_count() == 3)   // dyadic operator
                    {
-                     const Unicode oper = B->get_ravel(1).get_char_value();
+                     const Unicode oper = B->get_cravel(1).get_char_value();
                      if (oper != UNI_FULLSTOP)   DOMAIN_ERROR;
                      fun = Bif_OPER2_INNER::fun;
                    }
                 else
                    {
-                     const Unicode prim = B->get_ravel(0).get_char_value();
+                     const Unicode prim = B->get_cfirst().get_char_value();
                      const Token tok = Tokenizer::tokenize_function(prim);
                      if (!tok.is_function())   DOMAIN_ERROR;
                      fun = tok.get_function();
@@ -2751,5 +2944,5 @@ out_errno:
               << "] B failed: " << strerror(errno);
    return Token(TOK_APL_VALUE1, IntScalar(-errno, LOC));
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 

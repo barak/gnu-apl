@@ -23,7 +23,7 @@
 
 #include "UTF8_string.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 /// a library reference number for commands )LOAD, )SAVE, and )COPY.
 /// No library reference number is the same as LIB0.
@@ -43,7 +43,7 @@ enum LibRef
    LIB_WSNAME,       ///< WS name may start with a library reference
    LIB_NONE = LIB0   ///< no library reference specified.
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// a class mapping library reference numbers to directories
 class LibPaths
 {
@@ -140,5 +140,5 @@ protected:
    /// true if APL_lib_root was not found ("." taken)
    static bool root_from_pwd;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 #endif // __LIBPATHS_HH_DEFINED__

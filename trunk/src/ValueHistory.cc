@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -55,20 +55,16 @@ void * h = history;
 void
 add_event(const Value * val, VH_event ev, int ia, const char * loc)
 {
-   if (loc == 0)
-      {
-        if (val)   loc = val->where_allocated();
-        else       loc = LOC;
-      }
+   Assert(loc);
 
 VH_entry * entry = VH_entry::history + VH_entry::idx++;
    if (VH_entry::idx >= VALUEHISTORY_SIZE)   VH_entry::idx = 0;
 
-   new(entry) VH_entry(val, ev, ia, loc);
+   new (entry) VH_entry(val, ev, ia, loc);
 }
 //----------------------------------------------------------------------------
 void
-VH_entry::print_history(ostream & out, const Value * val, const char * loc)
+VH_entry::print_history(ostream & out, const Value & val, const char * loc)
 {
    // search backwards for events of val.
    //
@@ -92,7 +88,7 @@ int cidx = VH_entry::idx;
               continue;
             }
 
-          if (entry->val != val)            continue;   // some other var
+          if (entry->val != &val)           continue;   // some other var
 
           var_events.push_back(entry);
 
@@ -105,7 +101,7 @@ int cidx = VH_entry::idx;
       }
     else
       {
-        out << endl << "value " << voidP(val)
+        out << endl << "value " << voidP(&val)
             << " has " << var_events.size()
             << " events in its history";
         if (loc)   out << " (at " << loc << ")";
@@ -136,7 +132,7 @@ UCS_string ret;
 }
 //----------------------------------------------------------------------------
 void
-VH_entry::print(int & flags, ostream & out, const Value * val,
+VH_entry::print(int & flags, ostream & out, const Value & val,
                const VH_entry * previous) const
 {
 const ValueFlags flags_before = ValueFlags(flags);

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -34,9 +34,9 @@ using namespace std;
 // the implementation of gelsy<T>
 #include "LApack.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
-divide_matrix(Cell * cZ, bool need_complex,
+divide_matrix(Value & Z, bool need_complex,
               ShapeItem rows, ShapeItem cols_A, const Cell * cA,
               ShapeItem cols_B, const Cell * cB)
 {
@@ -90,7 +90,7 @@ divide_matrix(Cell * cZ, bool need_complex,
               // which is row c of Z.
               //
               loop(r, cols_B)
-                  new (cZ + r*cols_A + c) ComplexCell(a[r].real(), a[r].imag());
+                  Z.set_ravel_Complex(r*cols_A + c, a[r].real(), a[r].imag());
               free(ad);
             }
          else   // real
@@ -132,10 +132,9 @@ divide_matrix(Cell * cZ, bool need_complex,
               // which is row c of Z.
               //
 
-              loop(r, cols_B)
-                  new (cZ + r*cols_A + c)   FloatCell(a[r]);
+              loop(r, cols_B)   Z.set_ravel_Float(r*cols_A + c, a[r]);
               free(a);
             }
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------

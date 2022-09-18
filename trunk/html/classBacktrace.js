@@ -6,8 +6,8 @@ var classBacktrace =
       [ "LINES_outdated", "classBacktrace.html#a22828ea10e4f8ebcc31f3611cec33d5bafdd2cc29a5a4ba1736a6301beea2ab33", null ],
       [ "LINES_valid", "classBacktrace.html#a22828ea10e4f8ebcc31f3611cec33d5ba6efdbdf087d7be1757b8963c8e84f8ce", null ]
     ] ],
-    [ "caller", "classBacktrace.html#add6f58c6442cf88f20958817d8fa720b", null ],
-    [ "demangle_line", "classBacktrace.html#a60b9a2f5cd0bd6f76c07875b5a9562e8", null ],
+    [ "caller", "classBacktrace.html#a1028aa02eb7186e487b7324602f9f972", null ],
+    [ "demangle_line", "classBacktrace.html#a3b3ebb4ef0d850a93d10dcf349cde1c4", null ],
     [ "find_src", "classBacktrace.html#a07bdcf0cb769b764a3c6fc9b0ab74894", null ],
     [ "open_lines_file", "classBacktrace.html#aec4c7866f70a4cd3c4c0883b6729c507", null ],
     [ "pc_cmp", "classBacktrace.html#a76c5fe0d5b88ac892b378660f6ff4feb", null ],

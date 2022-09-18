@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -32,13 +32,13 @@ bool Quad_FFT::system_wisdom_loaded = false;
 #include <fftw3.h>
 #include "ComplexCell.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_FFT::eval_B(Value_P B) const
 {
    return do_fft(FFTW_FORWARD, B, 0);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_FFT::init_in(void * _in, Value_P B, window_function win)
 {
@@ -47,16 +47,16 @@ const APL_Integer N = B->element_count();
 
    if (N < 2)
       {
-        in[0][0] = B->get_ravel(0).get_real_value();
-        in[0][1] = B->get_ravel(0).get_imag_value();
+        in[0][0] = B->get_cfirst().get_real_value();
+        in[0][1] = B->get_cfirst().get_imag_value();
       }
 
    if (win == 0)
       {
         loop(n, N)
            {
-             in[n][0] = B->get_ravel(n).get_real_value();
-             in[n][1] = B->get_ravel(n).get_imag_value();
+             in[n][0] = B->get_cravel(n).get_real_value();
+             in[n][1] = B->get_cravel(n).get_imag_value();
            }
       }
    else if (B->get_rank() == 1)
@@ -64,8 +64,8 @@ const APL_Integer N = B->element_count();
         loop(n, N)
            {
              const double w = win(n, N);
-             in[n][0] = w * B->get_ravel(n).get_real_value();
-             in[n][1] = w * B->get_ravel(n).get_imag_value();
+             in[n][0] = w * B->get_cravel(n).get_real_value();
+             in[n][1] = w * B->get_cravel(n).get_imag_value();
            }
       }
    else
@@ -76,13 +76,13 @@ const APL_Integer N = B->element_count();
         loop(n, N)
            {
              const double w = wp[n];
-             in[n][0] = w * B->get_ravel(n).get_real_value();
-             in[n][1] = w * B->get_ravel(n).get_imag_value();
+             in[n][0] = w * B->get_cravel(n).get_real_value();
+             in[n][1] = w * B->get_cravel(n).get_imag_value();
            }
         delete [] wp;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_FFT::do_fft(int dir, Value_P B, window_function win)
 {
@@ -173,8 +173,7 @@ fftw_complex * out =  reinterpret_cast<fftw_complex *>(fftw_malloc(io_size));
 
 Value_P Z(B->get_shape(), LOC);
 const double norm = sqrt(N);
-   loop(n, N)   new (Z->next_ravel())
-                    ComplexCell(out[n][0]/norm, out[n][1]/norm);
+   loop(n, N)   Z->next_ravel_Complex(out[n][0]/norm, out[n][1]/norm);
 
    fftw_free(in);
    fftw_free(out);
@@ -182,7 +181,7 @@ const double norm = sqrt(N);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_FFT::do_window(Value_P B, window_function win)
 {
@@ -199,12 +198,12 @@ Value_P Z(B->get_shape(), LOC);
         loop(n, N)
            {
              const double w = win(n, N);
-             const Cell & cell_B = B->get_ravel(n);
+             const Cell & cell_B = B->get_cravel(n);
              if (cell_B.is_complex_cell())
-                new (Z->next_ravel())   ComplexCell(w*cell_B.get_real_value(),
-                                                    w*cell_B.get_imag_value());
+                Z->next_ravel_Complex(w*cell_B.get_real_value(),
+                                      w*cell_B.get_imag_value());
              else
-                new (Z->next_ravel())   FloatCell(w * cell_B.get_real_value());
+                Z->next_ravel_Float(w * cell_B.get_real_value());
            }
       }
    else
@@ -216,12 +215,12 @@ Value_P Z(B->get_shape(), LOC);
         loop(n, N)
            {
              const double w = wp[n];
-             const Cell & cell_B = B->get_ravel(n);
+             const Cell & cell_B = B->get_cravel(n);
              if (cell_B.is_complex_cell())
-                new (Z->next_ravel())   ComplexCell(w*cell_B.get_real_value(),
-                                                    w*cell_B.get_imag_value());
+                Z->next_ravel_Complex(w*cell_B.get_real_value(),
+                                      w*cell_B.get_imag_value());
              else
-                new (Z->next_ravel())   FloatCell(w*cell_B.get_real_value());
+                Z->next_ravel_Float(w*cell_B.get_real_value());
            }
         delete [] wp;
       }
@@ -229,14 +228,14 @@ Value_P Z(B->get_shape(), LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_FFT::eval_AB(Value_P A, Value_P B) const
 {
    if (A->get_rank() > 1)         RANK_ERROR;
    if (A->element_count() != 1)   LENGTH_ERROR;
 
-const APL_Integer what = A->get_ravel(0).get_int_value();
+const APL_Integer what = A->get_cfirst().get_int_value();
    switch(what)
       {
         case  15: return do_fft(FFTW_FORWARD, B, &flat_top);
@@ -278,14 +277,14 @@ const APL_Integer what = A->get_ravel(0).get_int_value();
 
    DOMAIN_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_FFT::fill_window(double * result, const Shape & shape, window_function win)
 {
 ShapeItem rlen = 1;
    result[0] = 1.0;
 
-   for (Rank r = shape.get_rank() - 1; r >= 0; --r)
+   for (sRank r = shape.get_rank() - 1; r >= 0; --r)
        {
          const ShapeItem axis_len = shape.get_shape_item(r);
          double * e = result + rlen * axis_len;
@@ -302,7 +301,7 @@ ShapeItem rlen = 1;
        }
 
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // defined(HAVE_LIBFFTW3) && defined(HAVE_FFTW3_H)
 

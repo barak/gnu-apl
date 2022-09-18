@@ -19,6 +19,7 @@ var classCharCell =
     [ "init_other", "classCharCell.html#ae7ee2f171632720601e8225fdb6b236d", null ],
     [ "is_character_cell", "classCharCell.html#ae6016cc26974042776c4e7ecccbb2836", null ],
     [ "is_example_field", "classCharCell.html#aceb8a112fe1d544b9a5e3b3d033875c5", null ],
-    [ "to_type", "classCharCell.html#a3dcc9aa583a8f13cedceb6917f038fae", null ],
-    [ "zv", "classCharCell.html#a105a510fa44441b99cabdd524bcf745c", null ]
+    [ "zU", "classCharCell.html#ad3823b522d81960850e438ac95c5aeba", null ],
+    [ "set_char", "classCharCell.html#aa9dc4e8dc6fcfd69940102caaec93fc3", null ],
+    [ "Value", "classCharCell.html#aeceedf6e1a7d48a588516ce2b1983d6f", null ]
 ];

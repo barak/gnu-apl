@@ -1,11 +1,11 @@
 <map id="Quad_INP" name="Quad_INP">
-<area shape="rect" id="node2" href="$classQuadFunction.html" title="Base class for all system functions. " alt="" coords="107,289,209,316"/>
-<area shape="rect" id="node3" href="$classPrimitiveFunction.html" title="Base class for all internal functions of the interpreter. " alt="" coords="62,213,185,240"/>
+<area shape="rect" id="node2" href="$classQuadFunction.html" title="Base class for all system functions. " alt="" coords="93,304,196,331"/>
+<area shape="rect" id="node3" href="$classPrimitiveFunction.html" title="Base class for all internal functions of the interpreter. " alt="" coords="62,221,185,247"/>
 <area shape="rect" id="node4" href="$classFunction.html" title="Base class for all APL functions and operators (system or defined) " alt="" coords="21,109,93,136"/>
 <area shape="rect" id="node5" href="$classNamedObject.html" title="A user&#45;defined variable or function. " alt="" coords="5,5,108,32"/>
 <area shape="rect" id="node6" href="$classCellFunctionStatistics.html" title="Performance counters for one cell level function. " alt="" coords="117,109,268,136"/>
 <area shape="rect" id="node7" href="$classStatistics.html" title="Base class for different kinds of statistics. " alt="" coords="143,5,221,32"/>
 <area shape="rect" id="node8" href="$classStatistics__record.html" title="one statistics for computing the mean and the variance of samples " alt="" coords="245,5,365,32"/>
-<area shape="rect" id="node9" href="$classUCS__string.html" title="A string of Unicode characters (32&#45;bit) " alt="" coords="246,289,337,316"/>
-<area shape="rect" id="node11" href="$classUCS__string__vector.html" title="a vector of UCS_strings. " alt="" coords="397,289,530,316"/>
+<area shape="rect" id="node9" href="$classUCS__string.html" title="A string of Unicode characters (32&#45;bit) " alt="" coords="227,304,318,331"/>
+<area shape="rect" id="node11" href="$classUCS__string__vector.html" title="a vector of UCS_strings. " alt="" coords="365,304,498,331"/>
 </map>

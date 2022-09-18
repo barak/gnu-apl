@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 
 #include "PJob.hh"
 
-//=============================================================================
+//============================================================================
 /**
   Multi-core GNU APL uses a pool of threads numbered 0, 1, ... core_count()-1
 
@@ -59,7 +59,7 @@
   sufficiently long).
 
  **/
-//=============================================================================
+//============================================================================
 /// the context for one parallel execution thread
 class Thread_context
 {
@@ -197,6 +197,20 @@ public:
    /// remove all thread contexts (when the APL interpreter exits)
    static void cleanup();
 
+   /// cancel all monadic jobs in all thread contexts
+   static void cancel_all_monadic_jobs()
+      {
+        loop(a, get_active_core_count())
+             get_context(CoreNumber(a))->joblist_B.cancel_jobs();
+      }
+
+   /// cancel all dyadic jobs in all thread contexts
+   static void cancel_all_dyadic_jobs()
+      {
+        loop(a, get_active_core_count())
+             get_context(CoreNumber(a))->joblist_AB.cancel_jobs();
+      }
+
 protected:
    /// all thread contexts
    static Thread_context * thread_contexts;
@@ -210,6 +224,6 @@ protected:
    /// the number of cores currently used
    static CoreCount active_core_count;
 };
-//=============================================================================
+//============================================================================
 
 #endif // __THREAD_CONTEXT_HH_DEFINED__

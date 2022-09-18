@@ -22,5 +22,8 @@ var classNumericCell =
     [ "integer_binomial", "classNumericCell.html#a59c9e232b6a1cb365a3252196b41604a", null ],
     [ "is_numeric", "classNumericCell.html#ac197ab40484c2be78b2291fb1ee2a84d", null ],
     [ "K33_binomial", "classNumericCell.html#a4f123c9528fe4e9a1fc9c75585aa2de3", null ],
-    [ "real_binomial", "classNumericCell.html#a0e22dad3d1acbf0b2103508aaa60d621", null ]
+    [ "real_binomial", "classNumericCell.html#a0e22dad3d1acbf0b2103508aaa60d621", null ],
+    [ "zV", "classNumericCell.html#ad3e0fc6450b7cdf6f5a0fa53c2a54817", null ],
+    [ "zV", "classNumericCell.html#a28f9418e7fa8d2d475582a11d89f9245", null ],
+    [ "zV", "classNumericCell.html#a018355fe7524a9472adcb4d3684c8fe6", null ]
 ];

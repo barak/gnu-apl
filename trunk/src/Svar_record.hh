@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -100,12 +100,12 @@ extern const char * event_name(Svar_event ev);
 /// of the partner.
 typedef uint64_t SV_key;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 enum TCP_socket
 {
    NO_TCP_SOCKET = -1
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// one of the two partners of a shared vaiable
 struct Svar_partner
 {
@@ -174,11 +174,11 @@ protected:
    /// true if this is a valid (connected) partner
    bool active;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 extern TCP_socket get_TCP_for_key(SV_key key);
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 /// one  shared variable.
 struct Svar_record
@@ -270,7 +270,7 @@ struct Svar_record
    /// state of this variable
    Svar_state state;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #if APSERVER_TRANSPORT == 1
    enum {  ABSTRACT_OFFSET = 1 };

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ class Function;
 /** a structure that contains user preferences from different sources
     (command line arguments, config files, environment variables ...)
  */
-/// Various preferences of the user
+/// Various preferences of the user (sorted alphabetically)
 struct UserPreferences
 {
    UserPreferences()
@@ -44,8 +44,9 @@ struct UserPreferences
      control_Ds_to_exit(0),
      CPU_limit_secs(0),
      daemon(false),
+     discard_indentation(false),
 #define sec_def(X) X(false),
-#include "Security.def"
+#include "Security.def"   // all start with disable_
      do_CONT(true),
      do_Color(true),
      do_not_echo(false),
@@ -55,9 +56,11 @@ struct UserPreferences
      initial_pw(DEFAULT_Quad_PW),
      line_history_len(500),
      line_history_path(".apl.history"),
+     mem_arg(0),
      multi_line_strings(true),
      multi_line_strings_3(true),
      nabla_to_history(1),   // if function was modified
+     output_to_cout(false),
      randomize_testfiles(false),
      raw_cin(false),
      requested_cc(CCNT_UNKNOWN),
@@ -67,11 +70,12 @@ struct UserPreferences
      script_argc(0),
      silent(false),
      system_do_svars(true),
+     tcp_port(0),
+     tcp_websocket(false),
      user_do_svars(true),
      user_profile(0),
      wait_ms(0),
-     WINCH_sets_pw(false),
-     discard_indentation(false)
+     WINCH_sets_pw(false)
    { gettimeofday(&session_start, 0); }
 
    /// read a \b preference file and update parameters set there
@@ -96,23 +100,25 @@ struct UserPreferences
    /// show version information
    static void show_version(ostream & out);
 
-   /// parse command line parameters (before reading preference files)
+   /// parse the original command line parameters to figure start-up Logging
+   /// (BEFORe any expansions). Parses (only) the -l option. Return true
+   /// iff startup-logging is requested.
+   bool parse_argv_0(int argc, const char * argv[]);
+
+   /// parse command line parameters (BEFORE reading preference files).
+   /// Parses the -l, -p, -C, and -u options. Return true iff startup-logging
+   /// is requested.
    bool parse_argv_1();
 
-   /// parse command line parameters (after reading preference files)
+   /// parse command line parameters (AFTER reading preference files)
+   /// Parses all valid options.
    void parse_argv_2(bool logit);
 
-   /// expand lumped arguments
-   void expand_argv(int argc, const char ** argv);
-
-   /// argv/argc at startup
+   /// argv/argc at startup before expand_argv()
    std::vector<const char *> original_argv;
 
-   /// argv/argc after expand_argv
+   /// argv/argc after expand_argv()
    std::vector<const char *> expanded_argv;
-
-   /// when apl was started
-   timeval session_start;
 
    /// append test results to summary.log rather than overriding it
    bool append_summary;
@@ -132,8 +138,11 @@ struct UserPreferences
    /// run as deamon
    bool daemon;
 
+   /// true if leading spaces in the ∇-editor shall be dropped
+   bool discard_indentation;
+
 #define sec_def(X) \
-   bool X;   ///< true if X is disabled dor security reasons
+   bool X;   ///< true if X is disabled for security reasons
 #include "Security.def"
 
    /// load workspace CONTINUE on start-up
@@ -154,6 +163,9 @@ struct UserPreferences
    /// true if emacs mode is wanted
    bool emacs_mode;
 
+   /// expand lumped arguments
+   void expand_argv(int argc, const char ** argv);
+
    /// --eval expressions
    std::vector<const char *> eval_exprs;
 
@@ -163,16 +175,23 @@ struct UserPreferences
    /// a workspace to be loaded at startup
    UTF8_string initial_workspace;
 
+   /// something to be executed at startup (--LX)
+   UTF8_string latent_expression;
+
    /// number of lines in the input line history
    int line_history_len;
 
-   /// something to be executed at startup (--LX)
-   UTF8_string latent_expression;
+   /// name of a user-provided keyboard layout file
+   UTF8_string keyboard_layout_file;
 
    /// location of the input line history
    UTF8_string line_history_path;
 
-   /// true if old-style multi-line strings are allowed (in ∇-defined functions)
+   /// argument of --mem (if any: 0 if not given, "" if given but empty)
+   const char * mem_arg;
+
+   /// true if old-style multi-line strings are allowed (in ∇-defined
+   /// functions)
    bool multi_line_strings;
 
    /// true if new-style multi-line strings are allowed
@@ -180,6 +199,9 @@ struct UserPreferences
 
    /// when function body shall go into the history
    int nabla_to_history;
+
+   /// true if output shall go to cout, otherwise to cerr
+   bool output_to_cout;
 
    /// randomize the order of testfiles
    bool randomize_testfiles;
@@ -203,12 +225,21 @@ struct UserPreferences
    /// in expanded_argv, or 0 if apl is started directly.
    size_t script_argc;
 
+   /// when apl was started
+   timeval session_start;
+
    /// true if no banner/Goodbye is wanted.
    bool silent;
 
    /// true if shared variables are enabled by the system. This is initially
    /// the same as user_do_svars, but can become false if something goes wrong
    bool system_do_svars;
+
+   /// TCP port to be used (instead of stdin/stderr)
+   int tcp_port;
+
+   /// enable websocket protocol on the TCP port
+   bool tcp_websocket;
 
    /// true if shared variables are wanted by the user
    bool user_do_svars;
@@ -219,14 +250,8 @@ struct UserPreferences
    /// wait at start-up
    int wait_ms;
 
-   /// name of a user-provided keyboard layout file
-   UTF8_string keyboard_layout_file;
-
    /// true if the WINCH signal shall modify ⎕PW
    bool WINCH_sets_pw;
-
-   /// true if leading spaces in the ∇-editor shall be dropped
-   bool discard_indentation;
 
 protected:
    /// decode a byte in a preferences file. The byte can be given as ASCII name

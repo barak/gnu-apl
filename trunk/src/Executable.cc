@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -27,7 +27,7 @@
 #include "Value.hh"
 #include "Workspace.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Executable::Executable(const UCS_string & ucs,  bool multi_line,
                        ParseMode pm, const char * loc)
    : alloc_loc(loc),
@@ -61,7 +61,7 @@ Executable::Executable(const UCS_string & ucs,  bool multi_line,
         text.push_back(ucs);
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Executable::Executable(Fun_signature sig, int lambda_num,
                        const UCS_string & lambda_text, const char * loc)
    : alloc_loc(loc),
@@ -100,7 +100,7 @@ ShapeItem last_semi = -1;
         text.push_back(lambda_text);
      }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Executable::~Executable()
 {
    Log(LOG_UserFunction__fix)
@@ -111,7 +111,7 @@ Executable::~Executable()
 
    clear_body();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Executable::clear_body()
 {
@@ -122,7 +122,7 @@ Executable::clear_body()
         if (body[b].is_function())
            {
              Function_P fun = body[b].get_function();
-             const UserFunction * ufun = fun->get_ufun1();
+             const UserFunction * ufun = fun->get_func_ufun();
              if (ufun && ufun->is_lambda())
                 const_cast<UserFunction *>(ufun)->decrement_refcount(LOC);
              new (&body[b]) Token();
@@ -131,7 +131,7 @@ Executable::clear_body()
 
    body.clear();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 Executable::parse_body_line(Function_Line line, const UCS_string & ucs_line,
                             bool trace, bool tolerant, const char * loc,
@@ -158,7 +158,7 @@ ErrorCode ec = parser.parse(ucs_line, in);
 
    return parse_body_line(line, in, trace, tolerant, loc);
 } 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ErrorCode
 Executable::parse_body_line(Function_Line line, const Token_string & input,
                             bool trace,  bool tolerant, const char * loc)
@@ -176,7 +176,7 @@ const ShapeItem end = input.size();
         Token tok_sym = input[0];   // get the label symbol
         idx = 2;                   // skip the :
 
-        UserFunction * ufun = get_ufun();
+        UserFunction * ufun = get_exec_ufun();
         Assert(ufun);
         ufun->add_label(tok_sym.get_sym_ptr(), line);
       }
@@ -252,7 +252,7 @@ Token_string out;
 
 #undef get
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Executable::execute_body() const
 {
@@ -266,7 +266,7 @@ StateIndicator & si = *Workspace::SI_top();
    // not reached
    FIXME;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Executable::print_token(ostream & out) const
 {
@@ -275,13 +275,13 @@ Executable::print_token(ostream & out) const
 
    body.print(out, false);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Executable::print_text(ostream & out) const
 {
    loop(l, text.size())   out << text[l] << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string
 Executable::statement_text(Function_PC pc) const
 {
@@ -335,7 +335,7 @@ UCS_string ret;
 
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Executable::set_error_info(Error & error, Function_PC2 pc_from_to) const
 {
@@ -440,7 +440,7 @@ int len_between = 0;   // distance between the carets
         error.set_right_caret(error.get_left_caret() + len_between);
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Function_PC
 Executable::get_statement_start(int pc) const
 {
@@ -463,7 +463,7 @@ Executable::get_statement_start(int pc) const
 
    return Function_PC_0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Executable::unmark_all_values() const
 {
@@ -479,7 +479,7 @@ Executable::unmark_all_values() const
         if (tok.get_ValueType() == TV_FUN)
            {
              Function_P fun = tok.get_function();
-             const UserFunction * ufun = fun->get_ufun1();
+             const UserFunction * ufun = fun->get_func_ufun();
              if (ufun && ufun->is_lambda())
                 {
                   ufun->unmark_all_values();
@@ -487,7 +487,7 @@ Executable::unmark_all_values() const
            }
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Executable::show_owners(const char * prefix, ostream & out, const Value & value) const
 {
@@ -498,7 +498,7 @@ int count = 0;
         const Token & tok = body[b];
         if (tok.get_ValueType() != TV_VAL)      continue;
 
-        if (Value::is_or_contains(tok.get_apl_val().get(), value))
+        if (Value::is_or_contains(tok.get_apl_val().get(), &value))
            {
              out << prefix << get_name() << "[" << b << "]" << endl;
              ++count;
@@ -507,7 +507,7 @@ int count = 0;
 
    return count;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Executable::setup_lambdas()
 {
@@ -567,7 +567,7 @@ int lambda_num = 0;
    adjust_line_starts();
    Parser::remove_void_token(body);   // do this AFTER adjust_line_starts() !!!
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ShapeItem
 Executable::setup_one_lambda(ShapeItem b, ShapeItem bend, int lambda_num)
 {
@@ -623,7 +623,7 @@ UserFunction * ufun = new UserFunction(signature, lambda_num,
 
    return bend + 1;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Fun_signature
 Executable::compute_lambda_body(Token_string & lambda_body,
                                 ShapeItem b, ShapeItem bend)
@@ -703,7 +703,7 @@ int level = 0;
 
    return Fun_signature(signature);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string
 Executable::extract_lambda_text(Fun_signature signature, int skip) const
 {
@@ -797,7 +797,7 @@ bool in_double_quotes = false;
    //
    FIXME;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Executable::reverse_statement_token(Token_string & tos)
 {
@@ -817,30 +817,30 @@ ShapeItem from = 0;
             }
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Executable::reverse_all_token(Token_string & tos)
 {
    for (Token * t1 = &tos[0], * t2 = &tos[tos.size() - 1]; t1 < t2;)
        t1++->Hswap(*t2--);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Executable::increment_refcount(const char * loc)
 {
-   Assert1(get_ufun());
-   Assert(get_ufun()->is_lambda());
+   Assert1(get_exec_ufun());
+   Assert(get_exec_ufun()->is_lambda());
 
    ++refcount;
 
 // CERR << "*** increment_refcount() of " << get_name()
 //      << " to " << refcount << " at " << loc << endl;A
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Executable::decrement_refcount(const char * loc)
 {
-UserFunction * ufun = get_ufun();
+UserFunction * ufun = get_exec_ufun();
    Assert1(ufun);
    Assert(ufun->is_lambda());
 
@@ -865,7 +865,7 @@ UserFunction * ufun = get_ufun();
         delete ufun;
       }
 }
-//=============================================================================
+//============================================================================
 ExecuteList *
 ExecuteList::fix(const UCS_string & data, const char * loc)
 {
@@ -922,7 +922,7 @@ ExecuteList * fun = new ExecuteList(data, loc);
    Log(LOG_UserFunction__fix)   fun->print(CERR);
    return fun;
 }
-//=============================================================================
+//============================================================================
 StatementList *
 StatementList::fix(const UCS_string & data, const char * loc)
 {
@@ -960,4 +960,4 @@ StatementList * fun = new StatementList(data, loc);
    Log(LOG_UserFunction__fix)   fun->print(CERR);
    return fun;
 }
-//=============================================================================
+//============================================================================

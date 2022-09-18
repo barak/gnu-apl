@@ -1,3 +1,4 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classXML__Loading__Archive.html" title="a helper class for loading an APL workspace " alt="" coords="5,5,157,32"/>
+<area shape="rect" id="node1" href="$classWorkspace__0.html" title="The symbol tables of an APL workspace. " alt="" coords="5,5,108,32"/>
+<area shape="rect" id="node2" href="$classWorkspace.html" title="An APL workspace. " alt="" coords="156,5,244,32"/>
 </map>

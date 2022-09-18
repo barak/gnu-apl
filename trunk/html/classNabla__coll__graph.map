@@ -1,6 +1,6 @@
 <map id="Nabla" name="Nabla">
-<area shape="rect" id="node2" href="$structLineLabel.html" title="a line number like 1.2 while editing " alt="" coords="302,179,379,206"/>
-<area shape="rect" id="node3" href="$classUCS__string.html" title="A string of Unicode characters (32&#45;bit) " alt="" coords="146,81,237,108"/>
-<area shape="rect" id="node5" href="$classSymbol.html" title="Base class for variables, defined functions, and distinguished names. " alt="" coords="23,179,90,206"/>
-<area shape="rect" id="node6" href="$classNamedObject.html" title="A user&#45;defined variable or function. " alt="" coords="5,81,108,108"/>
+<area shape="rect" id="node2" href="$structLineLabel.html" title="a line number like 1.2 while editing " alt="" coords="302,194,379,221"/>
+<area shape="rect" id="node3" href="$classUCS__string.html" title="A string of Unicode characters (32&#45;bit) " alt="" coords="146,96,237,123"/>
+<area shape="rect" id="node5" href="$classSymbol.html" title="Base class for variables, defined functions, and distinguished names. " alt="" coords="23,194,90,221"/>
+<area shape="rect" id="node6" href="$classNamedObject.html" title="A user&#45;defined variable or function. " alt="" coords="5,96,108,123"/>
 </map>

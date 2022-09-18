@@ -61,7 +61,9 @@ $(document).ready(function(){initNavTree('classValueStackItem.html','');});
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="#pub-attribs">Public Attributes</a> &#124;
+<a href="#pro-methods">Protected Member Functions</a> &#124;
+<a href="#pro-attribs">Protected Attributes</a> &#124;
+<a href="#friends">Friends</a> &#124;
 <a href="classValueStackItem-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">ValueStackItem Class Reference</div>  </div>
@@ -102,6 +104,17 @@ Classes</h2></td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
+<tr class="memitem:a8cb705915fb9e4fa259e48499871ed18"><td class="memItemLeft" align="right" valign="top"><a id="a8cb705915fb9e4fa259e48499871ed18"></a>
+NameClass&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValueStackItem.html#a8cb705915fb9e4fa259e48499871ed18">get_nc</a> () const</td></tr>
+<tr class="memdesc:a8cb705915fb9e4fa259e48499871ed18"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the name class for <b>this</b> <a class="el" href="classValueStackItem.html" title="One entry in the value stack of a Symbol. ">ValueStackItem</a> <br /></td></tr>
+<tr class="separator:a8cb705915fb9e4fa259e48499871ed18"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae270bcde90ba4f5fdf8e96331df551cf"><td class="memItemLeft" align="right" valign="top"><a id="ae270bcde90ba4f5fdf8e96331df551cf"></a>
+const <a class="el" href="classValue.html">Value</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValueStackItem.html#ae270bcde90ba4f5fdf8e96331df551cf">get_apl_value_ptr</a> () const</td></tr>
+<tr class="memdesc:ae270bcde90ba4f5fdf8e96331df551cf"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the name class for <b>this</b> <a class="el" href="classValueStackItem.html" title="One entry in the value stack of a Symbol. ">ValueStackItem</a>, or 0 if it has none <br /></td></tr>
+<tr class="separator:ae270bcde90ba4f5fdf8e96331df551cf"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
+Protected Member Functions</h2></td></tr>
 <tr class="memitem:aae55e61ed01b733b13b0c7b54045a6a7"><td class="memItemLeft" align="right" valign="top"><a id="aae55e61ed01b733b13b0c7b54045a6a7"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValueStackItem.html#aae55e61ed01b733b13b0c7b54045a6a7">ValueStackItem</a> ()</td></tr>
 <tr class="memdesc:aae55e61ed01b733b13b0c7b54045a6a7"><td class="mdescLeft">&#160;</td><td class="mdescRight">constructor: <a class="el" href="classValueStackItem.html" title="One entry in the value stack of a Symbol. ">ValueStackItem</a> for an unused symbol <br /></td></tr>
@@ -123,8 +136,8 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="memdesc:a719a94c5d8c1196c0f5f045b979dcf81"><td class="mdescLeft">&#160;</td><td class="mdescRight">reset <b>this</b> <a class="el" href="classValueStackItem.html" title="One entry in the value stack of a Symbol. ">ValueStackItem</a> to being unused <br /></td></tr>
 <tr class="separator:a719a94c5d8c1196c0f5f045b979dcf81"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
-Public Attributes</h2></td></tr>
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
+Protected Attributes</h2></td></tr>
 <tr class="memitem:a739208eba9367a492a89ff2a2e5b1796"><td class="memItemLeft" align="right" valign="top"><a id="a739208eba9367a492a89ff2a2e5b1796"></a>
 <a class="el" href="unionValueStackItem_1_1__sym__val.html">_sym_val</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValueStackItem.html#a739208eba9367a492a89ff2a2e5b1796">sym_val</a></td></tr>
 <tr class="memdesc:a739208eba9367a492a89ff2a2e5b1796"><td class="mdescLeft">&#160;</td><td class="mdescRight">the (current) value of this symbol (unless variable) <br /></td></tr>
@@ -137,12 +150,39 @@ Public Attributes</h2></td></tr>
 NameClass&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValueStackItem.html#aa7df380849cb4bb49c76a5c79acd0b01">name_class</a></td></tr>
 <tr class="memdesc:aa7df380849cb4bb49c76a5c79acd0b01"><td class="mdescLeft">&#160;</td><td class="mdescRight">the (current) name class (like ⎕NC, unless shared variable) <br /></td></tr>
 <tr class="separator:aa7df380849cb4bb49c76a5c79acd0b01"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="friends"></a>
+Friends</h2></td></tr>
+<tr class="memitem:a62a7fc89f0ee4604e3ccab9b6b6a343f"><td class="memItemLeft" align="right" valign="top"><a id="a62a7fc89f0ee4604e3ccab9b6b6a343f"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>Command</b></td></tr>
+<tr class="separator:a62a7fc89f0ee4604e3ccab9b6b6a343f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a331ee4783e991dde7f81f4cbcfe4255d"><td class="memItemLeft" align="right" valign="top"><a id="a331ee4783e991dde7f81f4cbcfe4255d"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>Doxy</b></td></tr>
+<tr class="separator:a331ee4783e991dde7f81f4cbcfe4255d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa54a5edc675e58c5f578eb2df04198d7"><td class="memItemLeft" align="right" valign="top"><a id="aa54a5edc675e58c5f578eb2df04198d7"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>Quad_RL</b></td></tr>
+<tr class="separator:aa54a5edc675e58c5f578eb2df04198d7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af7a97c38971298d83708ab27e74bf607"><td class="memItemLeft" align="right" valign="top"><a id="af7a97c38971298d83708ab27e74bf607"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>Symbol</b></td></tr>
+<tr class="separator:af7a97c38971298d83708ab27e74bf607"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac1b80bc52166901e909169b2657de45f"><td class="memItemLeft" align="right" valign="top"><a id="ac1b80bc52166901e909169b2657de45f"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>SymbolTable</b></td></tr>
+<tr class="separator:ac1b80bc52166901e909169b2657de45f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a97bcc5da9b5e308637f70865925452ec"><td class="memItemLeft" align="right" valign="top"><a id="a97bcc5da9b5e308637f70865925452ec"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>Workspace</b></td></tr>
+<tr class="separator:a97bcc5da9b5e308637f70865925452ec"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a226ff88cc70ec8663fb41232f151efa3"><td class="memItemLeft" align="right" valign="top"><a id="a226ff88cc70ec8663fb41232f151efa3"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>XML_Loading_Archive</b></td></tr>
+<tr class="separator:a226ff88cc70ec8663fb41232f151efa3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae5d45dbfaeae90eb8cbc66efb2307237"><td class="memItemLeft" align="right" valign="top"><a id="ae5d45dbfaeae90eb8cbc66efb2307237"></a>
+class&#160;</td><td class="memItemRight" valign="bottom"><b>XML_Saving_Archive</b></td></tr>
+<tr class="separator:ae5d45dbfaeae90eb8cbc66efb2307237"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>One entry in the value stack of a <a class="el" href="classSymbol.html" title="Base class for variables, defined functions, and distinguished names. ">Symbol</a>. </p>
 <p>One entry in the value stack of a symbol. The value stack is pushed/poped when the symbol is localized on entry/return of a user defined function. </p>
 
-<p class="definition">Definition at line <a class="el" href="Symbol_8hh_source.html#l00041">41</a> of file <a class="el" href="Symbol_8hh_source.html">Symbol.hh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Symbol_8hh_source.html#l00042">42</a> of file <a class="el" href="Symbol_8hh_source.html">Symbol.hh</a>.</p>
 </div><hr/>The documentation for this class was generated from the following file:<ul>
 <li>src/<a class="el" href="Symbol_8hh_source.html">Symbol.hh</a></li>
 </ul>
@@ -152,7 +192,7 @@ NameClass&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="classValueStackItem.html">ValueStackItem</a></li>
-    <li class="footer">Generated on Sun Aug 9 2020 16:43:42 for GNUAPL by
+    <li class="footer">Generated on Sun Jan 30 2022 20:14:27 for GNUAPL by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>

@@ -58,22 +58,15 @@ static void escape_char( ostream &out, Unicode unicode )
 
 void scalar_value_to_el( ostream &out, Value_P value )
 {
-    Cell &cell = value->get_ravel( 0 );
-    if( cell.is_integer_cell() ) {
-        out << cell.get_int_value();
-    }
-    else if( cell.is_real_cell() ) {
-        out << cell.get_real_value();
-    }
-    else if( cell.is_complex_cell() ) {
-        out << "(:complex " << cell.get_real_value() << " " << cell.get_imag_value() << ")";
-    }
-    else if( cell.is_character_cell() ) {
-        out << "(:unicode " << (int)cell.get_char_value() << ")";
-    }
-    else {
-        out << "(:unknown)";
-    }
+    const Cell & cell = value->get_cravel( 0 );
+    if (cell.is_integer_cell())       out << cell.get_int_value();
+    else if(cell.is_real_cell())      out << cell.get_real_value();
+    else if(cell.is_complex_cell())   out << "(:complex "
+                                          << cell.get_real_value() << " "
+                                          << cell.get_imag_value() << ")";
+    else if(cell.is_character_cell()) out << "(:unicode "
+                                          << (int)cell.get_char_value() << ")";
+    else out << "(:unknown)";
 }
 
 static void apl_value_to_el( ostream &out, Value_P value );
@@ -93,7 +86,7 @@ static void output_onelevel( ostream &out, Value_P value, int level, int start, 
     else {
         for( int i = start ; i < end ; i++ ) {
             if( i > start ) out << " ";
-            apl_value_to_el( out, value->get_ravel( i ).to_value( LOC ) );
+            apl_value_to_el( out, value->get_cravel( i ).to_value( LOC ) );
         }
     }
     out << ")\n";
@@ -117,7 +110,7 @@ static void apl_value_to_el( ostream &out, Value_P value )
         out << "\"";
         int size = shape.get_cols();
         for( int i = 0 ; i < size ; i++ ) {
-            escape_char( out, value->get_ravel( i ).get_char_value() );
+            escape_char( out, value->get_cravel( i ).get_char_value() );
         }
         out << "\"";
     }
@@ -126,7 +119,7 @@ static void apl_value_to_el( ostream &out, Value_P value )
         int size = shape.get_cols();
         for( int i = 0 ; i < size ; i++ ) {
             if( i > 0 ) out << " ";
-            apl_value_to_el( out, value->get_ravel( i ).to_value( LOC ) );
+            apl_value_to_el( out, value->get_cravel( i ).to_value( LOC ) );
         }
         out << ")\n";
     }
@@ -158,12 +151,13 @@ void GetVarCommand::run_command( NetworkConnection &conn, const std::vector<std:
         send_reply( conn, "undefined" );
         return;
     }
-    if( symbol->get_nc() != NC_VARIABLE ) {
-        send_reply( conn, "wrong type" );
-        return;
-    }
+    if (symbol->get_NC() != NC_VARIABLE)
+       {
+         send_reply( conn, "wrong type" );
+         return;
+       }
 
-    Value_P value = symbol->get_value();
+    Value_P value = symbol->get_apl_value();
     try {
         stringstream out;
         out.precision( 20 );

@@ -2,13 +2,13 @@ This directory produces a document apl-intro.html (describing GNU APL)
 and a testcase file (Book.tc) that checks that the examples in apl-intro.html
 are correct:
 
-		               apl-intro
+                               apl-intro
                                   / \
-                                 /   \		<-------- make
+                                 /   \         <-------- make
                                 /     \
   apl-home.css     apl-intro.html     Book.tc)
              \     /                     |
-              \   /                      |	<-------- apl -T Book.tc
+              \   /                      |     <-------- apl -T Book.tc
                \ /                       |
              Browser                Book.tc.log
 

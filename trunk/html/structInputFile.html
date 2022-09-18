@@ -100,6 +100,14 @@ Public Member Functions</h2></td></tr>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structInputFile.html#adbba18806cd166da001a34b438cc5d4a">set_COPY</a> ()</td></tr>
 <tr class="memdesc:adbba18806cd166da001a34b438cc5d4a"><td class="mdescLeft">&#160;</td><td class="mdescRight">set the from_COPY flag <br /></td></tr>
 <tr class="separator:adbba18806cd166da001a34b438cc5d4a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa995e6c076143f39dc59a74af05445d3"><td class="memItemLeft" align="right" valign="top"><a id="aa995e6c076143f39dc59a74af05445d3"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structInputFile.html#aa995e6c076143f39dc59a74af05445d3">set_pushed_IE</a> ()</td></tr>
+<tr class="memdesc:aa995e6c076143f39dc59a74af05445d3"><td class="mdescLeft">&#160;</td><td class="mdescRight">set the pushed_IE flag <br /></td></tr>
+<tr class="separator:aa995e6c076143f39dc59a74af05445d3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a307af49dcf496c919a73d361cb8941db"><td class="memItemLeft" align="right" valign="top"><a id="a307af49dcf496c919a73d361cb8941db"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structInputFile.html#a307af49dcf496c919a73d361cb8941db">set_pushed_pending</a> (bool on_off)</td></tr>
+<tr class="memdesc:a307af49dcf496c919a73d361cb8941db"><td class="mdescLeft">&#160;</td><td class="mdescRight">set the pushed_pending flag <br /></td></tr>
+<tr class="separator:a307af49dcf496c919a73d361cb8941db"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae396278f61a49cc9f7c0128e85865314"><td class="memItemLeft" align="right" valign="top"><a id="ae396278f61a49cc9f7c0128e85865314"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structInputFile.html#ae396278f61a49cc9f7c0128e85865314">set_line_no</a> (int num)</td></tr>
 <tr class="memdesc:ae396278f61a49cc9f7c0128e85865314"><td class="mdescLeft">&#160;</td><td class="mdescRight">set the current line number <br /></td></tr>
@@ -151,6 +159,14 @@ static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structInputFile.html#afbca3c136d4281d5309bca6e79d50226">is_validating</a> ()</td></tr>
 <tr class="memdesc:afbca3c136d4281d5309bca6e79d50226"><td class="mdescLeft">&#160;</td><td class="mdescRight">return true iff the current input file exists and is a test file <br /></td></tr>
 <tr class="separator:afbca3c136d4281d5309bca6e79d50226"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a880e1d4560f201586d43c5ed578b2383"><td class="memItemLeft" align="right" valign="top"><a id="a880e1d4560f201586d43c5ed578b2383"></a>
+static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structInputFile.html#a880e1d4560f201586d43c5ed578b2383">pushed_file</a> ()</td></tr>
+<tr class="memdesc:a880e1d4560f201586d43c5ed578b2383"><td class="mdescLeft">&#160;</td><td class="mdescRight">return true iff the current input file exists and is a pushed immediate execution <br /></td></tr>
+<tr class="separator:a880e1d4560f201586d43c5ed578b2383"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2448e5ac3491695514fbc876ab9436a8"><td class="memItemLeft" align="right" valign="top"><a id="a2448e5ac3491695514fbc876ab9436a8"></a>
+static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structInputFile.html#a2448e5ac3491695514fbc876ab9436a8">is_pushed_pending</a> ()</td></tr>
+<tr class="memdesc:a2448e5ac3491695514fbc876ab9436a8"><td class="mdescLeft">&#160;</td><td class="mdescRight">return true iff the current input file exists and is a pushed immediate execution <br /></td></tr>
+<tr class="separator:a2448e5ac3491695514fbc876ab9436a8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa0fa0f6614abab32420064c7c3fcf4e7"><td class="memItemLeft" align="right" valign="top"><a id="aa0fa0f6614abab32420064c7c3fcf4e7"></a>
 static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structInputFile.html#aa0fa0f6614abab32420064c7c3fcf4e7">testcase_file_count</a> ()</td></tr>
 <tr class="memdesc:aa0fa0f6614abab32420064c7c3fcf4e7"><td class="mdescLeft">&#160;</td><td class="mdescRight">the number of testcase (.tc) files <br /></td></tr>
@@ -200,6 +216,14 @@ Protected Attributes</h2></td></tr>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structInputFile.html#a2daa341c5fa9e91ed0910ac0010c9674">test</a></td></tr>
 <tr class="memdesc:a2daa341c5fa9e91ed0910ac0010c9674"><td class="mdescLeft">&#160;</td><td class="mdescRight">true for -T testfile, false for -f APL file <br /></td></tr>
 <tr class="separator:a2daa341c5fa9e91ed0910ac0010c9674"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a207dde9d8a0d967091d4c0fc5593195e"><td class="memItemLeft" align="right" valign="top"><a id="a207dde9d8a0d967091d4c0fc5593195e"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structInputFile.html#a207dde9d8a0d967091d4c0fc5593195e">pushed_IE</a></td></tr>
+<tr class="memdesc:a207dde9d8a0d967091d4c0fc5593195e"><td class="mdescLeft">&#160;</td><td class="mdescRight">true for ]PUSHFILE child <br /></td></tr>
+<tr class="separator:a207dde9d8a0d967091d4c0fc5593195e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad94b0e05a1ffbafab0c7fdeaf62e3c7d"><td class="memItemLeft" align="right" valign="top"><a id="ad94b0e05a1ffbafab0c7fdeaf62e3c7d"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structInputFile.html#ad94b0e05a1ffbafab0c7fdeaf62e3c7d">pushed_pending</a></td></tr>
+<tr class="memdesc:ad94b0e05a1ffbafab0c7fdeaf62e3c7d"><td class="mdescLeft">&#160;</td><td class="mdescRight">true for ]PUSHFILE parent <br /></td></tr>
+<tr class="separator:ad94b0e05a1ffbafab0c7fdeaf62e3c7d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad576e31702244d0a0ccddc325af708e7"><td class="memItemLeft" align="right" valign="top"><a id="ad576e31702244d0a0ccddc325af708e7"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structInputFile.html#ad576e31702244d0a0ccddc325af708e7">echo</a></td></tr>
 <tr class="memdesc:ad576e31702244d0a0ccddc325af708e7"><td class="mdescLeft">&#160;</td><td class="mdescRight">echo stdin <br /></td></tr>
@@ -269,7 +293,7 @@ class&#160;</td><td class="memItemRight" valign="bottom"><b>IO_Files</b></td></t
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="structInputFile.html">InputFile</a></li>
-    <li class="footer">Generated on Sun Aug 9 2020 16:43:42 for GNUAPL by
+    <li class="footer">Generated on Sun Jan 30 2022 20:14:26 for GNUAPL by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>

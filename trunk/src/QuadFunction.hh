@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 #include "PrimitiveFunction.hh"
 #include "StateIndicator.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** The various Quad functions.  */
 /// Base class for all system functions
 class QuadFunction : public PrimitiveFunction
@@ -49,7 +49,7 @@ public:
    /// overloaded Function::has_result()
    virtual bool has_result() const   { return true; }
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** The system function ⎕AF (Atomic Function) */
 /// The class implementing ⎕AF
 class Quad_AF : public QuadFunction
@@ -66,7 +66,7 @@ public:
 
 protected:
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** The system function ⎕AT (Attributes) */
 /// The class implementing ⎕AI
 class Quad_AT : public QuadFunction
@@ -83,7 +83,7 @@ public:
 
 protected:
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** The system function ⎕DL (Delay).  */
 /// The class implementing ⎕DL
 class Quad_DL : public QuadFunction
@@ -99,7 +99,7 @@ protected:
    /// overloaded Function::eval_B().
    virtual Token eval_B(Value_P B) const;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
    The system function ⎕EA (Execute Alternate)
  */
@@ -120,7 +120,7 @@ protected:
    /// overloaded Function::eval_AB().
    virtual Token eval_AB(Value_P A, Value_P B) const;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
    The system function ⎕EB (Execute Both)
  */
@@ -141,7 +141,7 @@ protected:
    /// overloaded Function::eval_AB().
    virtual Token eval_AB(Value_P A, Value_P B) const;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
    The system function ⎕EC (Execute Controlled)
  */
@@ -168,7 +168,7 @@ protected:
    /// overloaded Function::eval_fill_B().
    virtual Token eval_fill_B(Value_P B) const;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
    The system function ⎕ENV (ENvironment Variables)
  */
@@ -186,7 +186,7 @@ protected:
    /// overloaded Function::eval_B().
    virtual Token eval_B(Value_P B) const;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
    The system function ⎕ES (Event Simulate).
  */
@@ -213,7 +213,7 @@ protected:
    /// compute error code for B
    static ErrorCode get_error_code(Value_P B);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
    The system function ⎕EX (Expunge).
  */
@@ -234,7 +234,7 @@ protected:
    /// overloaded Function::eval_B().
    virtual Token eval_B(Value_P B) const;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
    The system function ⎕INP (input from script, aka. HERE document)
  */
@@ -296,7 +296,7 @@ protected:
    /// bool to prevent recursive ⎕INP calls
    static bool Quad_INP_running;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
    The system function ⎕NA (Name Association).
  */
@@ -319,7 +319,7 @@ protected:
    virtual Token eval_B(Value_P B) const
       { TODO; }
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
    The system function ⎕NC (Name class).
  */
@@ -341,7 +341,7 @@ public:
 
 protected:
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
    The system function ⎕NL (Name List).
  */
@@ -367,7 +367,7 @@ protected:
    /// return A ⎕NL B
    static Token do_quad_NL(Value_P A, Value_P B);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
    The system function ⎕SI (State Indicator)
  */
@@ -389,7 +389,7 @@ public:
 
 protected:
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
    The system function ⎕UCS (Universal Character Set)
  */
@@ -408,7 +408,7 @@ public:
 
 protected:
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// Base class for ⎕STOP and ⎕TRACE
 class Stop_Trace : public QuadFunction
 {
@@ -427,7 +427,7 @@ protected:
    /// return assign lines in new_value to stop or trace vector in ufun
    static void assign(UserFunction * ufun, const Value & new_value, bool stop);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// The class implementing ⎕STOP
 class Quad_STOP : public Stop_Trace
 {
@@ -446,7 +446,7 @@ public:
    static Quad_STOP * fun;          ///< Built-in function.
    static Quad_STOP  _fun;          ///< Built-in function.
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// The class implementing ⎕TRACE
 class Quad_TRACE : public Stop_Trace
 {
@@ -465,6 +465,6 @@ public:
    static Quad_TRACE * fun;          ///< Built-in function.
    static Quad_TRACE  _fun;          ///< Built-in function.
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __Quad_FUNCTION_HH_DEFINED__

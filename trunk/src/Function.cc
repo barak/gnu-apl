@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -32,47 +32,47 @@
 #include "Symbol.hh"
 #include "Value.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
-Function::get_attributes(int mode, Cell * dest) const
+Function::get_attributes(int mode, Value & Z) const
 {
    switch(mode)
       {
         case 1: // valences
-                new (dest + 0) IntCell(has_result() ? 1 : 0);
-                new (dest + 1) IntCell(get_fun_valence());
-                new (dest + 2) IntCell(get_oper_valence());
+                Z.next_ravel_Int(has_result() ? 1 : 0);
+                Z.next_ravel_Int(get_fun_valence());
+                Z.next_ravel_Int(get_oper_valence());
                 return;
 
         case 2: // creation time (7⍴0 for system functions)
                 {
                   const YMDhmsu created(get_creation_time());
-                  new (dest + 0) IntCell(created.year);
-                  new (dest + 1) IntCell(created.month);
-                  new (dest + 2) IntCell(created.day);
-                  new (dest + 3) IntCell(created.hour);
-                  new (dest + 4) IntCell(created.minute);
-                  new (dest + 5) IntCell(created.second);
-                  new (dest + 6) IntCell(created.micro/1000);
+                  Z.next_ravel_Int(created.year);
+                  Z.next_ravel_Int(created.month);
+                  Z.next_ravel_Int(created.day);
+                  Z.next_ravel_Int(created.hour);
+                  Z.next_ravel_Int(created.minute);
+                  Z.next_ravel_Int(created.second);
+                  Z.next_ravel_Int(created.micro/1000);
                 }
                 return;
 
         case 3: // execution properties
-                new (dest + 0) IntCell(get_exec_properties()[0]);
-                new (dest + 1) IntCell(get_exec_properties()[1]);
-                new (dest + 2) IntCell(get_exec_properties()[2]);
-                new (dest + 3) IntCell(get_exec_properties()[3]);
+                Z.next_ravel_Int(get_exec_properties()[0]);
+                Z.next_ravel_Int(get_exec_properties()[1]);
+                Z.next_ravel_Int(get_exec_properties()[2]);
+                Z.next_ravel_Int(get_exec_properties()[3]);
                 return;
 
-        case 4: // 4 ⎕DR functions is always 0 0
-                new (dest + 0) IntCell(0);
-                new (dest + 1) IntCell(0);
+        case 4: // 4 ⎕DR for functions is always 0 0
+                Z.next_ravel_0();
+                Z.next_ravel_0();
                 return;
       }
 
    Assert(0 && "Not reached");
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Function::eval_() const
 {
@@ -80,7 +80,7 @@ Function::eval_() const
         << "() called (overloaded variant not yet implemented?)" << endl;
    FIXME;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Function::eval_B(Value_P B) const
 {
@@ -88,7 +88,7 @@ Function::eval_B(Value_P B) const
         << "() called (overloaded variant not yet implemented?)" << endl;
    VALENCE_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Function::eval_AB(Value_P A, Value_P B) const
 {
@@ -96,7 +96,7 @@ Function::eval_AB(Value_P A, Value_P B) const
         << "() called (overloaded variant not yet implemented?)" << endl;
    VALENCE_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Function::eval_LB(Token & LO, Value_P B) const
 {
@@ -104,7 +104,7 @@ Function::eval_LB(Token & LO, Value_P B) const
         << "() called (overloaded variant not yet implemented?)" << endl;
    VALENCE_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Function::eval_ALB(Value_P A, Token & LO, Value_P B) const
 {
@@ -112,7 +112,7 @@ Function::eval_ALB(Value_P A, Token & LO, Value_P B) const
         << "() called (overloaded variant not yet implemented?)" << endl;
    VALENCE_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Function::eval_LRB(Token & LO, Token & RO, Value_P B) const
 {
@@ -120,7 +120,7 @@ Function::eval_LRB(Token & LO, Token & RO, Value_P B) const
         << "() called (overloaded variant not yet implemented?)" << endl;
    VALENCE_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Function::eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const
 {
@@ -128,7 +128,7 @@ Function::eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const
         << "() called (overloaded variant not yet implemented?)" << endl;
    VALENCE_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Fun_signature
 Function::get_signature() const
 {
@@ -144,12 +144,26 @@ int sig = SIG_FUN;
 
    return Fun_signature(sig);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+Token Function::eval_fill_AB(Value_P A, Value_P B) const
+{
+  MORE_ERROR() << "The fill function of " << get_name()
+               << " is not defined (or not yet implemented)";
+  DOMAIN_ERROR;
+}
+//----------------------------------------------------------------------------
+Token Function::eval_identity_fun(Value_P B, sAxis axis) const
+{
+  MORE_ERROR() << "The identity function of " << get_name()
+               << " is not defined (or not yet implemented)";
+  DOMAIN_ERROR;
+}
+//----------------------------------------------------------------------------
 ostream &
 operator << (ostream & out, const Function & fun)
 {
    fun.print(out);
    return out;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 

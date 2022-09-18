@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -25,15 +25,15 @@
 #include "Common.hh"
 #include "PrimitiveFunction.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** primitive functions matrix divide and matrix invert */
 /// The class implementing ⌹
-class Bif_F12_DOMINO : public NonscalarFunction
+class Bif_F12_DOMINO : public NonscalarFunction_default_identity
 {
 public:
    /// Constructor
    Bif_F12_DOMINO()
-   : NonscalarFunction(TOK_F12_DOMINO)
+   : NonscalarFunction_default_identity(TOK_F12_DOMINO)
    {}
 
    /// overloaded Function::eval_B()
@@ -280,7 +280,7 @@ protected:
      };
 };
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// compute norm variants of column 1 of \b this real marix
 template<>
 inline void
@@ -301,7 +301,7 @@ double sum = 0;
    result.norm__2_real = 2.0 / result.norm2_real;
    result.norm__2_imag = 0.0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// compute norm variants of column 1 of \b this complex marix
 template<>
 inline void
@@ -329,7 +329,7 @@ const complex<double> _2__sum = 2.0 / sum;
    result.norm__2_real = _2__sum.real();
    result.norm__2_imag = _2__sum.imag();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// compute the square of the real item at row y, columns x
 template<>
 inline double
@@ -338,7 +338,7 @@ Bif_F12_DOMINO::Matrix<false>::abs2(ShapeItem y, ShapeItem x) const
 const ShapeItem b = x*dpi + y*dY;
    return data[b]*data[b];
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// compute the square of the complex item at row y, columns x
 template<>
 inline double
@@ -347,7 +347,7 @@ Bif_F12_DOMINO::Matrix<true>::abs2(ShapeItem y, ShapeItem x) const
 const ShapeItem b = x*dpi + y*dY;
    return data[b]*data[b] + data[b+1]*data[b+1];
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// increase real *W11 by +/- real *V11
 template<>
 inline void
@@ -358,7 +358,7 @@ double w11 = *W11;
    if (*V11 < 0)      *V11 -= w11;
    else               *V11 += w11;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// increase complex *W11 by +/- complex *V11
 template<>
 inline void
@@ -371,7 +371,7 @@ bool add = false;
    if (add)   { V11[0] += W11[0];   V11[1] += W11[1]; }
    else       { V11[0] -= W11[0];   V11[1] -= W11[1]; }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// increase complex *W11 by +/- *V11
 template<>
 inline void Bif_F12_DOMINO::Matrix<false>::init_identity(ShapeItem rows)
@@ -387,7 +387,7 @@ inline void Bif_F12_DOMINO::Matrix<false>::init_identity(ShapeItem rows)
    //
    loop(y, rows)              real(y, y) = 1.0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// initialize \b this complex matrix to the unit matrix
 template<>
 inline void Bif_F12_DOMINO::Matrix<true>::init_identity(ShapeItem rows)
@@ -404,7 +404,7 @@ inline void Bif_F12_DOMINO::Matrix<true>::init_identity(ShapeItem rows)
    //
    loop(y, rows)   { real(y, y) = 1.0;   imag(y, y) = 0.0; }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// insert S into \b this real matrix
 template<>
 inline void Bif_F12_DOMINO::Matrix<false>::imbed(const Matrix<false>& S)
@@ -428,7 +428,7 @@ const ShapeItem iN = M - S.M;   // the number of rows and columns from ID N
    //
    loop(y, iN)   real(y,y) = 1.0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// insert S into \b this complex matrix
 template<>
 inline void Bif_F12_DOMINO::Matrix<true>::imbed(const Matrix<true>& S)
@@ -461,7 +461,7 @@ const ShapeItem iN = M - S.M;   // the number of rows and columns from ID N
             }
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// initialize this real matrix to be the outer product of the first
 /// column of the real matrix \b src with itself
 template<>
@@ -487,7 +487,7 @@ Bif_F12_DOMINO::Matrix<false>::init_outer_product(const norm_result & scale,
        real(y, y) = scale.norm__2_real * src.real(y, 0) * src.real(y, 0);
 
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// initialize this complex matrix to be the outer product of the first
 /// column of the complex matrix \b src with itself
 template<>
@@ -524,7 +524,7 @@ const complex<double> sc(scale.norm__2_real, scale.norm__2_imag);
          imag(y, y) = prod.imag();
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// assign real matrix src to this real matrix
 template<>
 inline void
@@ -537,7 +537,7 @@ Bif_F12_DOMINO::Matrix<false>::operator =(const Matrix<false> & src)
          real(y, x) = src.real(y, x);
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// assign complex matrix src to this complex matrix
 template<>
 inline void
@@ -552,7 +552,7 @@ Bif_F12_DOMINO::Matrix<true>::operator =(const Matrix<true> & src)
          imag(y, x) = src.imag(y, x);
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// set this matrix to A +.× B
 template<>
 inline void
@@ -573,7 +573,7 @@ const ShapeItem Z = src_A.N;
          real(y, x) = sum;
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// set this matrix to A +.× B
 template<>
 inline void
@@ -601,7 +601,7 @@ const ShapeItem Z = src_A.N;
          imag(y, x) = sum.imag();
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// transpose the upper left M×M submatrix of this real matrix
 template<>
 inline void
@@ -613,7 +613,7 @@ Bif_F12_DOMINO::Matrix<false>::transpose(ShapeItem M)
         double r = real(y, x); real(y, x) = real(x, y); real(x, y) = r;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// transpose the upper left M×M submatrix of this complex matrix
 template<>
 inline void
@@ -626,7 +626,7 @@ Bif_F12_DOMINO::Matrix<true>::transpose(ShapeItem M)
                t = imag(y, x);   imag(y, x) = imag(x, y);   imag(x, y) = t;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __BIF_F12_DOMINO_HH_DEFINED__
 

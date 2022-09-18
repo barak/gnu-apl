@@ -67,25 +67,16 @@ $(document).ready(function(){initNavTree('classArrayIterator.html','');});
 </div><!--header-->
 <div class="contents">
 
-<p>An iterator counting 0, 1, 2, ... ⍴,shape.  
+<p>An iterator counting along all axes of <b>shape</b>.  
  <a href="classArrayIterator.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="ArrayIterator_8hh_source.html">ArrayIterator.hh</a>&gt;</code></p>
-<div class="dynheader">
-Inheritance diagram for ArrayIterator:</div>
-<div class="dyncontent">
-<div class="center"><img src="classArrayIterator__inherit__graph.png" border="0" usemap="#ArrayIterator_inherit__map" alt="Inheritance graph"/></div>
-<map name="ArrayIterator_inherit__map" id="ArrayIterator_inherit__map">
-<area shape="rect" id="node2" href="classPermutedArrayIterator.html" title="an iterator for arrays with permnuted axes " alt="" coords="5,80,156,107"/>
-</map>
-<center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <div class="dynheader">
 Collaboration diagram for ArrayIterator:</div>
 <div class="dyncontent">
 <div class="center"><img src="classArrayIterator__coll__graph.png" border="0" usemap="#ArrayIterator_coll__map" alt="Collaboration graph"/></div>
 <map name="ArrayIterator_coll__map" id="ArrayIterator_coll__map">
-<area shape="rect" id="node2" href="struct__twc.html" title="The end and the state of an abstract iterator along one axis (to / weight / current) ..." alt="" coords="5,5,56,32"/>
-<area shape="rect" id="node3" href="classShape.html" title="the shape of an APL value " alt="" coords="80,5,139,32"/>
+<area shape="rect" id="node2" href="classAxisIterator.html" title="An iterator counting 0, 1, 2, ... ⍴[N&#45;1] along one axis of length N. " alt="" coords="8,5,97,32"/>
 </map>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
@@ -95,59 +86,71 @@ Public Member Functions</h2></td></tr>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classArrayIterator.html#ae5d9663a09fb3eb89e99413577e225b3">ArrayIterator</a> (const <a class="el" href="classShape.html">Shape</a> &amp;shape)</td></tr>
 <tr class="memdesc:ae5d9663a09fb3eb89e99413577e225b3"><td class="mdescLeft">&#160;</td><td class="mdescRight">constructor <br /></td></tr>
 <tr class="separator:ae5d9663a09fb3eb89e99413577e225b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a360d678e5a2d15cb46378692da1a9d87"><td class="memItemLeft" align="right" valign="top"><a id="a360d678e5a2d15cb46378692da1a9d87"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classArrayIterator.html#a360d678e5a2d15cb46378692da1a9d87">operator++</a> ()</td></tr>
-<tr class="memdesc:a360d678e5a2d15cb46378692da1a9d87"><td class="mdescLeft">&#160;</td><td class="mdescRight">the work-horse of the iterator <br /></td></tr>
-<tr class="separator:a360d678e5a2d15cb46378692da1a9d87"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0b012539c84a4e8bef763c1907c48c8f"><td class="memItemLeft" align="right" valign="top"><a id="a0b012539c84a4e8bef763c1907c48c8f"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classArrayIterator.html#a0b012539c84a4e8bef763c1907c48c8f">more</a> () const</td></tr>
 <tr class="memdesc:a0b012539c84a4e8bef763c1907c48c8f"><td class="mdescLeft">&#160;</td><td class="mdescRight">return true iff this iterator has more items to come. <br /></td></tr>
 <tr class="separator:a0b012539c84a4e8bef763c1907c48c8f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad3b852eab08d844da9f5f2cc5f002285"><td class="memItemLeft" align="right" valign="top"><a id="ad3b852eab08d844da9f5f2cc5f002285"></a>
-ShapeItem&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classArrayIterator.html#ad3b852eab08d844da9f5f2cc5f002285">get_offset</a> (Rank r) const</td></tr>
-<tr class="memdesc:ad3b852eab08d844da9f5f2cc5f002285"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current offset for axis r (! mirrored !) . <br /></td></tr>
-<tr class="separator:ad3b852eab08d844da9f5f2cc5f002285"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a58a9e97e8ccd6ff5f3be912cbcebd1c8"><td class="memItemLeft" align="right" valign="top"><a id="a58a9e97e8ccd6ff5f3be912cbcebd1c8"></a>
-ShapeItem&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classArrayIterator.html#a58a9e97e8ccd6ff5f3be912cbcebd1c8">operator()</a> () const</td></tr>
-<tr class="memdesc:a58a9e97e8ccd6ff5f3be912cbcebd1c8"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the current offset <br /></td></tr>
-<tr class="separator:a58a9e97e8ccd6ff5f3be912cbcebd1c8"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab9cc2105e17def2b0f3b31545620ef28"><td class="memItemLeft" align="right" valign="top"><a id="ab9cc2105e17def2b0f3b31545620ef28"></a>
-<a class="el" href="classShape.html">Shape</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classArrayIterator.html#ab9cc2105e17def2b0f3b31545620ef28">get_offsets</a> () const</td></tr>
-<tr class="memdesc:ab9cc2105e17def2b0f3b31545620ef28"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the offsets as a <a class="el" href="classShape.html" title="the shape of an APL value ">Shape</a> <br /></td></tr>
-<tr class="separator:ab9cc2105e17def2b0f3b31545620ef28"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a167f9b46abe7a5a8bc013d4572cf95a2"><td class="memItemLeft" align="right" valign="top"><a id="a167f9b46abe7a5a8bc013d4572cf95a2"></a>
-ShapeItem&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classArrayIterator.html#a167f9b46abe7a5a8bc013d4572cf95a2">multiply</a> (const <a class="el" href="classShape.html">Shape</a> &amp;w) const</td></tr>
-<tr class="memdesc:a167f9b46abe7a5a8bc013d4572cf95a2"><td class="mdescLeft">&#160;</td><td class="mdescRight">multiply the current offsets with w and return their sum <br /></td></tr>
-<tr class="separator:a167f9b46abe7a5a8bc013d4572cf95a2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a360d678e5a2d15cb46378692da1a9d87"><td class="memItemLeft" align="right" valign="top"><a id="a360d678e5a2d15cb46378692da1a9d87"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classArrayIterator.html#a360d678e5a2d15cb46378692da1a9d87">operator++</a> ()</td></tr>
+<tr class="memdesc:a360d678e5a2d15cb46378692da1a9d87"><td class="mdescLeft">&#160;</td><td class="mdescRight">the work-horse of this iterator. <br /></td></tr>
+<tr class="separator:a360d678e5a2d15cb46378692da1a9d87"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a796a669805c42ace5f2656b8b7769490"><td class="memItemLeft" align="right" valign="top"><a id="a796a669805c42ace5f2656b8b7769490"></a>
+ShapeItem&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classArrayIterator.html#a796a669805c42ace5f2656b8b7769490">get_shape_offset</a> (Axis a) const</td></tr>
+<tr class="memdesc:a796a669805c42ace5f2656b8b7769490"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current offset for axis r. <br /></td></tr>
+<tr class="separator:a796a669805c42ace5f2656b8b7769490"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae0ff90d37383e06ef55e1ba177d370c9"><td class="memItemLeft" align="right" valign="top"><a id="ae0ff90d37383e06ef55e1ba177d370c9"></a>
+ShapeItem&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classArrayIterator.html#ae0ff90d37383e06ef55e1ba177d370c9">get_ravel_offset</a> () const</td></tr>
+<tr class="memdesc:ae0ff90d37383e06ef55e1ba177d370c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the current total offset. <br /></td></tr>
+<tr class="separator:ae0ff90d37383e06ef55e1ba177d370c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4d1bb97a549707ef61c072fe068afdd4"><td class="memItemLeft" align="right" valign="top"><a id="a4d1bb97a549707ef61c072fe068afdd4"></a>
+<a class="el" href="classShape.html">Shape</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classArrayIterator.html#a4d1bb97a549707ef61c072fe068afdd4">get_shape_offsets</a> ()</td></tr>
+<tr class="memdesc:a4d1bb97a549707ef61c072fe068afdd4"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the offsets of the axis_iterators as a shape <br /></td></tr>
+<tr class="separator:a4d1bb97a549707ef61c072fe068afdd4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a26727d60c916b80168821e0065c052fd"><td class="memItemLeft" align="right" valign="top"><a id="a26727d60c916b80168821e0065c052fd"></a>
+ShapeItem&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classArrayIterator.html#a26727d60c916b80168821e0065c052fd">multiply</a> (const <a class="el" href="classShape.html">Shape</a> &amp;weights) const</td></tr>
+<tr class="memdesc:a26727d60c916b80168821e0065c052fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">multiply and cumulate the current ravel offsets <br /></td></tr>
+<tr class="separator:a26727d60c916b80168821e0065c052fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
-<tr class="memitem:a3c7bd69a9bcf20d40be87f48c6fb8272"><td class="memItemLeft" align="right" valign="top"><a id="a3c7bd69a9bcf20d40be87f48c6fb8272"></a>
-const <a class="el" href="classShape.html">Shape</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classArrayIterator.html#a3c7bd69a9bcf20d40be87f48c6fb8272">ref_B</a></td></tr>
-<tr class="memdesc:a3c7bd69a9bcf20d40be87f48c6fb8272"><td class="mdescLeft">&#160;</td><td class="mdescRight">shape of the array over which we iterate <br /></td></tr>
-<tr class="separator:a3c7bd69a9bcf20d40be87f48c6fb8272"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a092cb38fbec4369a810cca33d7c63382"><td class="memItemLeft" align="right" valign="top"><a id="a092cb38fbec4369a810cca33d7c63382"></a>
-struct <a class="el" href="struct__twc.html">_twc</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classArrayIterator.html#a092cb38fbec4369a810cca33d7c63382">twc</a> [MAX_RANK]</td></tr>
-<tr class="memdesc:a092cb38fbec4369a810cca33d7c63382"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="struct__twc.html" title="The end and the state of an abstract iterator along one axis (to / weight / current) ...">_twc</a> means to / weight / current <br /></td></tr>
-<tr class="separator:a092cb38fbec4369a810cca33d7c63382"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acd34108838158a552d40829f04a5cf25"><td class="memItemLeft" align="right" valign="top"><a id="acd34108838158a552d40829f04a5cf25"></a>
-ShapeItem&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classArrayIterator.html#acd34108838158a552d40829f04a5cf25">current_offset</a></td></tr>
-<tr class="memdesc:acd34108838158a552d40829f04a5cf25"><td class="mdescLeft">&#160;</td><td class="mdescRight">the current offset from ↑B <br /></td></tr>
-<tr class="separator:acd34108838158a552d40829f04a5cf25"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a442556d721a61af1c30a3811594ba747"><td class="memItemLeft" align="right" valign="top"><a id="a442556d721a61af1c30a3811594ba747"></a>
-const uRank&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classArrayIterator.html#a442556d721a61af1c30a3811594ba747">rank</a></td></tr>
-<tr class="memdesc:a442556d721a61af1c30a3811594ba747"><td class="mdescLeft">&#160;</td><td class="mdescRight">the number of axes <br /></td></tr>
-<tr class="separator:a442556d721a61af1c30a3811594ba747"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af5657bbff878ea0d1a21e5e3312f7c1f"><td class="memItemLeft" align="right" valign="top"><a id="af5657bbff878ea0d1a21e5e3312f7c1f"></a>
-bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classArrayIterator.html#af5657bbff878ea0d1a21e5e3312f7c1f">done</a></td></tr>
-<tr class="memdesc:af5657bbff878ea0d1a21e5e3312f7c1f"><td class="mdescLeft">&#160;</td><td class="mdescRight">true iff this interator has reached its final item <br /></td></tr>
-<tr class="separator:af5657bbff878ea0d1a21e5e3312f7c1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0dc30a07d78727d9a23da5b55850da66"><td class="memItemLeft" align="right" valign="top"><a id="a0dc30a07d78727d9a23da5b55850da66"></a>
+uRank&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classArrayIterator.html#a0dc30a07d78727d9a23da5b55850da66">rank</a></td></tr>
+<tr class="memdesc:a0dc30a07d78727d9a23da5b55850da66"><td class="mdescLeft">&#160;</td><td class="mdescRight">the number of valid axes (= iterators). <br /></td></tr>
+<tr class="separator:a0dc30a07d78727d9a23da5b55850da66"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9007e82e5b06bd63bbeb1dd3fd237b26"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classAxisIterator.html">AxisIterator</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classArrayIterator.html#a9007e82e5b06bd63bbeb1dd3fd237b26">axis_iterators</a> [MAX_RANK]</td></tr>
+<tr class="separator:a9007e82e5b06bd63bbeb1dd3fd237b26"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>An iterator counting 0, 1, 2, ... ⍴,shape. </p>
+<div class="textblock"><p>An iterator counting along all axes of <b>shape</b>. </p>
 
-<p class="definition">Definition at line <a class="el" href="ArrayIterator_8hh_source.html#l00030">30</a> of file <a class="el" href="ArrayIterator_8hh_source.html">ArrayIterator.hh</a>.</p>
-</div><hr/>The documentation for this class was generated from the following file:<ul>
+<p class="definition">Definition at line <a class="el" href="ArrayIterator_8hh_source.html#l00103">103</a> of file <a class="el" href="ArrayIterator_8hh_source.html">ArrayIterator.hh</a>.</p>
+</div><h2 class="groupheader">Member Data Documentation</h2>
+<a id="a9007e82e5b06bd63bbeb1dd3fd237b26"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a9007e82e5b06bd63bbeb1dd3fd237b26">&#9670;&nbsp;</a></span>axis_iterators</h2>
+
+<div class="memitem">
+<div class="memproto">
+<table class="mlabels">
+  <tr>
+  <td class="mlabels-left">
+      <table class="memname">
+        <tr>
+          <td class="memname"><a class="el" href="classAxisIterator.html">AxisIterator</a> ArrayIterator::axis_iterators[MAX_RANK]</td>
+        </tr>
+      </table>
+  </td>
+  <td class="mlabels-right">
+<span class="mlabels"><span class="mlabel">protected</span></span>  </td>
+  </tr>
+</table>
+</div><div class="memdoc">
+<p>axis iterators. <a class="el" href="classShape.html" title="the shape of an APL value ">Shape</a>: ⊏sh0:sh1:...⊐ │ │ axis_iterators[0] ←→ get_shape_item(0), ─────┘ │ largest weight axis_iterators[1] ←→ get_shape_item(1), ─────────┘ ... </p>
+
+<p class="definition">Definition at line <a class="el" href="ArrayIterator_8hh_source.html#l00194">194</a> of file <a class="el" href="ArrayIterator_8hh_source.html">ArrayIterator.hh</a>.</p>
+
+</div>
+</div>
+<hr/>The documentation for this class was generated from the following file:<ul>
 <li>src/<a class="el" href="ArrayIterator_8hh_source.html">ArrayIterator.hh</a></li>
 </ul>
 </div><!-- contents -->
@@ -156,7 +159,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="classArrayIterator.html">ArrayIterator</a></li>
-    <li class="footer">Generated on Sun Aug 9 2020 16:43:42 for GNUAPL by
+    <li class="footer">Generated on Sun Jan 30 2022 20:14:26 for GNUAPL by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>

@@ -2,7 +2,7 @@
 GNU APL can be compiled as a Python module.
 The basic build procedure is this:
 
-    configure --with-python [ other ./configure options ...]
+    ./configure --with-python [ other ./configure options ...]
     make
     sudo make install
 

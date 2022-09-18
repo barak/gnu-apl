@@ -1,78 +1,78 @@
 <map id="Workspace" name="Workspace">
-<area shape="rect" id="node2" href="$classWorkspace__0.html" title="The symbol tables of an APL workspace. " alt="" coords="2655,243,2757,269"/>
-<area shape="rect" id="node3" href="$classSymbolTable.html" title="The table containing all user defined symbols. " alt="" coords="1821,243,1920,269"/>
-<area shape="rect" id="node4" href="$classSymbolTableBase.html" title="SymbolTableBase\&lt; Symbol,\l SYMBOL_HASH_TABLE_SIZE \&gt;" alt="" coords="1369,254,1593,295"/>
-<area shape="rect" id="node5" href="$classSymbol.html" title="Base class for variables, defined functions, and distinguished names. " alt="" coords="1007,1479,1073,1505"/>
-<area shape="rect" id="node18" href="$classSystemVariable.html" title="Base class for all APL system variables. " alt="" coords="1231,1479,1345,1505"/>
-<area shape="rect" id="node19" href="$classCHI.html" title="lambda variable χ " alt="" coords="1458,1812,1505,1839"/>
-<area shape="rect" id="node49" href="$unionToken_1_1sval.html" title="the optional value of the token. " alt="" coords="1243,2260,1333,2287"/>
-<area shape="rect" id="node65" href="$classALPHA__U.html" title="lambda variable ⍶ " alt="" coords="1440,1845,1523,1872"/>
-<area shape="rect" id="node66" href="$classLAMBDA.html" title="lambda result λ " alt="" coords="1443,1976,1520,2003"/>
-<area shape="rect" id="node70" href="$classALPHA.html" title="lambda variable ⍺ " alt="" coords="1448,220,1515,247"/>
-<area shape="rect" id="node71" href="$classOMEGA__U.html" title="lambda variable ⍹ " alt="" coords="1437,303,1525,329"/>
-<area shape="rect" id="node76" href="$classOMEGA.html" title="lambda variable ⍵ " alt="" coords="1253,887,1323,913"/>
-<area shape="rect" id="node6" href="$classNamedObject.html" title="A user&#45;defined variable or function. " alt="" coords="440,1825,543,1852"/>
-<area shape="rect" id="node14" href="$classFunction.html" title="Base class for all APL functions and operators (system or defined) " alt="" coords="737,2005,809,2032"/>
-<area shape="rect" id="node7" href="$classUCS__string.html" title="A string of Unicode characters (32&#45;bit) " alt="" coords="727,180,818,207"/>
-<area shape="rect" id="node11" href="$classSystemName.html" title="a distinguished name (i.e. ⎕xx) " alt="" coords="1654,141,1757,168"/>
-<area shape="rect" id="node72" href="$classQuad__QUOTE.html" title="The class implementing ⍞ " alt="" coords="1652,1820,1759,1847"/>
-<area shape="rect" id="node9" href="$classSystemSymTab.html" title="The table containing all system defined symbols (aka. distinguished names) " alt="" coords="2345,137,2461,164"/>
-<area shape="rect" id="node10" href="$classSymbolTableBase.html" title="SymbolTableBase\&lt; SystemName,\l 256 &#45; 1 \&gt;" alt="" coords="1948,126,2172,167"/>
-<area shape="rect" id="node12" href="$classQuadFunction.html" title="Base class for all system functions. " alt="" coords="1237,192,1339,219"/>
-<area shape="rect" id="node13" href="$classPrimitiveFunction.html" title="Base class for all internal functions of the interpreter. " alt="" coords="979,192,1101,219"/>
-<area shape="rect" id="node64" href="$classDerivedFunction.html" title="An APL operator bounf to its function argument(s) " alt="" coords="2001,2095,2119,2121"/>
-<area shape="rect" id="node15" href="$classCellFunctionStatistics.html" title="Performance counters for one cell level function. " alt="" coords="697,100,848,127"/>
-<area shape="rect" id="node16" href="$classStatistics.html" title="Base class for different kinds of statistics. " alt="" coords="453,60,530,87"/>
-<area shape="rect" id="node17" href="$classStatistics__record.html" title="one statistics for computing the mean and the variance of samples " alt="" coords="431,111,551,137"/>
-<area shape="rect" id="node20" href="$classQuad__PR.html" title="The class implementing ⎕PR. " alt="" coords="2209,397,2288,424"/>
-<area shape="rect" id="node23" href="$classNL__SystemVariable.html" title="Base class for all APL system variables that cannot be localized. " alt="" coords="1991,1105,2129,1132"/>
-<area shape="rect" id="node24" href="$classQuad__Quad.html" title="The class implementing ⎕ " alt="" coords="1825,1309,1916,1336"/>
-<area shape="rect" id="node25" href="$classQuad__PS.html" title="The class implementing ⎕PS. " alt="" coords="2209,1367,2288,1393"/>
-<area shape="rect" id="node28" href="$classQuad__FC.html" title="The class implementing ⎕FC. " alt="" coords="1831,1417,1910,1444"/>
-<area shape="rect" id="node31" href="$classQuad__IO.html" title="The class implementing ⎕IO. " alt="" coords="2211,1479,2286,1505"/>
-<area shape="rect" id="node33" href="$classQuad__PW.html" title="The class implementing ⎕PW. " alt="" coords="1829,1531,1912,1557"/>
-<area shape="rect" id="node34" href="$classQuad__CT.html" title="The class implementing ⎕CT. " alt="" coords="2209,1589,2288,1616"/>
-<area shape="rect" id="node37" href="$classQuad__RL.html" title="Quad_RL" alt="" coords="1832,1641,1909,1668"/>
-<area shape="rect" id="node73" href="$classQuad__TZ.html" title="The class implementing ⎕TZ. " alt="" coords="2211,1700,2287,1727"/>
-<area shape="rect" id="node79" href="$classQuad__PP.html" title="The class implementing ⎕PP. " alt="" coords="1831,1751,1910,1777"/>
-<area shape="rect" id="node21" href="$classQuad__AV.html" title="The class implementing ⎕AV. " alt="" coords="2667,711,2745,737"/>
-<area shape="rect" id="node22" href="$classRO__SystemVariable.html" title="Base class for all read&#45;only APL system variables. " alt="" coords="2332,761,2473,788"/>
-<area shape="rect" id="node26" href="$classQuad__WA.html" title="The class implementing ⎕WA. " alt="" coords="2665,761,2747,788"/>
-<area shape="rect" id="node30" href="$classQuad__ET.html" title="The class implementing ⎕ET. " alt="" coords="2667,812,2745,839"/>
-<area shape="rect" id="node32" href="$classQuad__TC.html" title="The class implementing ⎕TC. " alt="" coords="2667,863,2745,889"/>
-<area shape="rect" id="node35" href="$classQuad__TS.html" title="The class implementing ⎕TS. " alt="" coords="2667,913,2745,940"/>
-<area shape="rect" id="node36" href="$classQuad__AI.html" title="The class implementing ⎕AI. " alt="" coords="2669,964,2743,991"/>
-<area shape="rect" id="node38" href="$classQuad__ARG.html" title="The class implementing ⎕ARG. " alt="" coords="2661,508,2751,535"/>
-<area shape="rect" id="node75" href="$classQuad__LC.html" title="The class implementing ⎕LC. " alt="" coords="2667,559,2745,585"/>
-<area shape="rect" id="node78" href="$classQuad__UL.html" title="The class implementing ⎕UL. " alt="" coords="2667,609,2745,636"/>
-<area shape="rect" id="node80" href="$classQuad__EM.html" title="The class implementing ⎕EM. " alt="" coords="2666,660,2746,687"/>
-<area shape="rect" id="node27" href="$classQuad__LX.html" title="The class implementing ⎕LX. " alt="" coords="2529,1023,2605,1049"/>
-<area shape="rect" id="node29" href="$classQuad__L.html" title="The class implementing ⎕L. " alt="" coords="2534,1079,2601,1105"/>
-<area shape="rect" id="node67" href="$classQuad__SVE.html" title="The implementation of ⎕SVE. " alt="" coords="2359,1252,2446,1279"/>
-<area shape="rect" id="node69" href="$classQuad__R.html" title="The class implementing ⎕R. " alt="" coords="2532,1136,2603,1163"/>
-<area shape="rect" id="node74" href="$classQuad__SYL.html" title="The class implementing ⎕SYL. " alt="" coords="2525,1193,2610,1220"/>
-<area shape="rect" id="node77" href="$classQuad__X.html" title="The class implementing ⎕X. " alt="" coords="2533,473,2602,500"/>
-<area shape="rect" id="node39" href="$classStateIndicator.html" title="One entry of the state indicator (SI) of the APL interpreter. " alt="" coords="2655,2177,2757,2204"/>
-<area shape="rect" id="node46" href="$classPrefix.html" title="a class for reducing all statements of an Executable " alt="" coords="2375,2291,2431,2317"/>
-<area shape="rect" id="node40" href="$classExecutable.html" title="Base class for ExecuteList, StatementList, and UserFunction. " alt="" coords="2359,2205,2446,2232"/>
-<area shape="rect" id="node41" href="$classToken__string.html" title="A sequence of Token. " alt="" coords="2011,2321,2109,2348"/>
-<area shape="rect" id="node43" href="$classUCS__string__vector.html" title="a vector of UCS_strings. " alt="" coords="1993,2195,2127,2221"/>
-<area shape="rect" id="node45" href="$classError.html" title="An APL error and information related to it. " alt="" coords="2377,2155,2428,2181"/>
-<area shape="rect" id="node47" href="$structToken__loc.html" title="A Token and its location information (position in a Token_string) " alt="" coords="2019,2271,2101,2297"/>
-<area shape="rect" id="node48" href="$classToken.html" title="One atom of an APL function or expression. " alt="" coords="1676,2271,1735,2297"/>
-<area shape="rect" id="node50" href="$classValue__P__Base.html" title="A Value smart * and access functions (except constructors) " alt="" coords="437,2319,545,2345"/>
-<area shape="rect" id="node55" href="$structCell_1_1SomeValue_1_1__pval.html" title="a pointer to, and the owner of, a nested APL (sub&#45;) value " alt="" coords="693,2389,852,2416"/>
-<area shape="rect" id="node61" href="$classValue__P.html" title="A Value smart * (constructors) " alt="" coords="737,2260,808,2287"/>
-<area shape="rect" id="node51" href="$classValue.html" title="An APL Value (essentially a Shape and a ravel) " alt="" coords="257,2368,312,2395"/>
-<area shape="rect" id="node52" href="$classDynamicObject.html" title="A Value or an IndexExpr. " alt="" coords="5,2232,117,2259"/>
-<area shape="rect" id="node60" href="$classIndexExpr.html" title="The interal representation of some APL index [A1;A2;...;An]. " alt="" coords="999,2260,1081,2287"/>
-<area shape="rect" id="node53" href="$classCell.html" title="The base class for all Cells. " alt="" coords="1265,2473,1311,2500"/>
-<area shape="rect" id="node54" href="$unionCell_1_1SomeValue.html" title="A union containing all possible cell values for the different Cell types. " alt="" coords="980,2433,1100,2460"/>
-<area shape="rect" id="node56" href="$structCell_1_1SomeValue_1_1__fval.html" title="&lt; for FloatCell " alt="" coords="695,2445,851,2472"/>
-<area shape="rect" id="node57" href="$unionCell_1_1SomeValue_1_1__fval_1_1__flt__num.html" title="either a floating point value, or the denominator of a quotient " alt="" coords="413,2451,569,2493"/>
-<area shape="rect" id="node58" href="$struct__deleted__value.html" title="a linked list of deleted values " alt="" coords="7,2343,116,2369"/>
-<area shape="rect" id="node59" href="$classShape.html" title="the shape of an APL value " alt="" coords="32,2393,91,2420"/>
-<area shape="rect" id="node62" href="$structPrefix_1_1Phrase.html" title="one phrase in the phrase table " alt="" coords="2007,2381,2113,2408"/>
-<area shape="rect" id="node63" href="$classDerivedFunctionCache.html" title="a small cache for storing a few DerivedFunction objects " alt="" coords="2325,2095,2480,2121"/>
-<area shape="rect" id="node68" href="$classQuad__SVx.html" title="Base class for ⎕SVC, ⎕SVE, ⎕SVO, ⎕SVQ, ⎕SVR, and ⎕SVS. " alt="" coords="2017,1252,2103,1279"/>
+<area shape="rect" id="node2" href="$classWorkspace__0.html" title="The symbol tables of an APL workspace. " alt="" coords="2243,288,2345,315"/>
+<area shape="rect" id="node3" href="$classSymbolTable.html" title="The table containing all user defined symbols. " alt="" coords="1409,292,1508,319"/>
+<area shape="rect" id="node4" href="$classSymbolTableBase.html" title="SymbolTableBase\&lt; Symbol,\l SYMBOL_HASH_TABLE_SIZE \&gt;" alt="" coords="957,302,1181,343"/>
+<area shape="rect" id="node5" href="$classSymbol.html" title="Base class for variables, defined functions, and distinguished names. " alt="" coords="595,1680,661,1707"/>
+<area shape="rect" id="node18" href="$classSystemVariable.html" title="Base class for all APL system variables. " alt="" coords="819,1376,933,1403"/>
+<area shape="rect" id="node19" href="$classCHI.html" title="lambda variable χ " alt="" coords="1046,351,1093,377"/>
+<area shape="rect" id="node50" href="$unionToken_1_1sval.html" title="the optional value of the token. " alt="" coords="831,2195,921,2221"/>
+<area shape="rect" id="node65" href="$classALPHA__U.html" title="lambda variable ⍶ " alt="" coords="1028,2039,1111,2065"/>
+<area shape="rect" id="node66" href="$classLAMBDA.html" title="lambda result λ " alt="" coords="1031,2088,1108,2115"/>
+<area shape="rect" id="node70" href="$classALPHA.html" title="lambda variable ⍺ " alt="" coords="1036,2136,1103,2163"/>
+<area shape="rect" id="node71" href="$classOMEGA__U.html" title="lambda variable ⍹ " alt="" coords="1025,235,1113,261"/>
+<area shape="rect" id="node76" href="$classOMEGA.html" title="lambda variable ⍵ " alt="" coords="1801,2003,1872,2029"/>
+<area shape="rect" id="node6" href="$classNamedObject.html" title="A user&#45;defined variable or function. " alt="" coords="32,1649,135,1676"/>
+<area shape="rect" id="node14" href="$classFunction.html" title="Base class for all APL functions and operators (system or defined) " alt="" coords="325,1629,397,1656"/>
+<area shape="rect" id="node7" href="$classUCS__string.html" title="A string of Unicode characters (32&#45;bit) " alt="" coords="315,129,406,156"/>
+<area shape="rect" id="node11" href="$classSystemName.html" title="a distinguished name (i.e. ⎕xx) " alt="" coords="1242,191,1345,217"/>
+<area shape="rect" id="node72" href="$classQuad__QUOTE.html" title="The class implementing ⍞ " alt="" coords="1240,101,1347,128"/>
+<area shape="rect" id="node9" href="$classSystemSymTab.html" title="The table containing all system defined symbols (aka. distinguished names) " alt="" coords="1933,236,2049,263"/>
+<area shape="rect" id="node10" href="$classSymbolTableBase.html" title="SymbolTableBase\&lt; SystemName,\l 256 &#45; 1 \&gt;" alt="" coords="1536,226,1760,267"/>
+<area shape="rect" id="node12" href="$classQuadFunction.html" title="Base class for all system functions. " alt="" coords="825,205,927,232"/>
+<area shape="rect" id="node13" href="$classPrimitiveFunction.html" title="Base class for all internal functions of the interpreter. " alt="" coords="567,1544,689,1571"/>
+<area shape="rect" id="node15" href="$classCellFunctionStatistics.html" title="Performance counters for one cell level function. " alt="" coords="285,1544,436,1571"/>
+<area shape="rect" id="node16" href="$classStatistics.html" title="Base class for different kinds of statistics. " alt="" coords="45,1535,122,1561"/>
+<area shape="rect" id="node17" href="$classStatistics__record.html" title="one statistics for computing the mean and the variance of samples " alt="" coords="23,1585,143,1612"/>
+<area shape="rect" id="node20" href="$classQuad__PR.html" title="The class implementing ⎕PR. " alt="" coords="1797,523,1876,549"/>
+<area shape="rect" id="node23" href="$classNL__SystemVariable.html" title="Base class for all APL system variables that cannot be localized. " alt="" coords="1579,1061,1717,1088"/>
+<area shape="rect" id="node24" href="$classQuad__Quad.html" title="The class implementing ⎕ " alt="" coords="1413,1351,1504,1377"/>
+<area shape="rect" id="node25" href="$classQuad__PS.html" title="The class implementing ⎕PS. " alt="" coords="1797,1397,1876,1424"/>
+<area shape="rect" id="node27" href="$classQuad__FC.html" title="The class implementing ⎕FC. " alt="" coords="1419,1515,1498,1541"/>
+<area shape="rect" id="node32" href="$classQuad__IO.html" title="The class implementing ⎕IO. " alt="" coords="1799,1572,1874,1599"/>
+<area shape="rect" id="node33" href="$classQuad__PW.html" title="The class implementing ⎕PW. " alt="" coords="1417,1623,1500,1649"/>
+<area shape="rect" id="node34" href="$classQuad__CT.html" title="The class implementing ⎕CT. " alt="" coords="1797,1913,1876,1940"/>
+<area shape="rect" id="node38" href="$classQuad__RL.html" title="Quad_RL" alt="" coords="1420,1947,1497,1973"/>
+<area shape="rect" id="node73" href="$classQuad__TZ.html" title="The class implementing ⎕TZ. " alt="" coords="1799,399,1875,425"/>
+<area shape="rect" id="node78" href="$classQuad__PP.html" title="The class implementing ⎕PP. " alt="" coords="1419,528,1498,555"/>
+<area shape="rect" id="node21" href="$classQuad__AV.html" title="The class implementing ⎕AV. " alt="" coords="2255,983,2333,1009"/>
+<area shape="rect" id="node22" href="$classRO__SystemVariable.html" title="Base class for all read&#45;only APL system variables. " alt="" coords="1920,983,2061,1009"/>
+<area shape="rect" id="node28" href="$classQuad__WA.html" title="The class implementing ⎕WA. " alt="" coords="2253,729,2335,756"/>
+<area shape="rect" id="node31" href="$classQuad__ET.html" title="The class implementing ⎕ET. " alt="" coords="2255,1185,2333,1212"/>
+<area shape="rect" id="node35" href="$classQuad__TC.html" title="The class implementing ⎕TC. " alt="" coords="2255,780,2333,807"/>
+<area shape="rect" id="node36" href="$classQuad__TS.html" title="The class implementing ⎕TS. " alt="" coords="2255,831,2333,857"/>
+<area shape="rect" id="node37" href="$classQuad__AI.html" title="The class implementing ⎕AI. " alt="" coords="2257,881,2331,908"/>
+<area shape="rect" id="node39" href="$classQuad__ARG.html" title="The class implementing ⎕ARG. " alt="" coords="2249,932,2339,959"/>
+<area shape="rect" id="node75" href="$classQuad__LC.html" title="The class implementing ⎕LC. " alt="" coords="2255,1084,2333,1111"/>
+<area shape="rect" id="node79" href="$classQuad__UL.html" title="The class implementing ⎕UL. " alt="" coords="2255,1033,2333,1060"/>
+<area shape="rect" id="node80" href="$classQuad__EM.html" title="The class implementing ⎕EM. " alt="" coords="2254,1135,2334,1161"/>
+<area shape="rect" id="node26" href="$classQuad__LX.html" title="The class implementing ⎕LX. " alt="" coords="2117,609,2193,636"/>
+<area shape="rect" id="node30" href="$classQuad__L.html" title="The class implementing ⎕L. " alt="" coords="2122,671,2189,697"/>
+<area shape="rect" id="node67" href="$classQuad__R.html" title="The class implementing ⎕R. " alt="" coords="2120,1216,2191,1243"/>
+<area shape="rect" id="node68" href="$classQuad__SVE.html" title="The implementation of ⎕SVE. " alt="" coords="1947,1463,2034,1489"/>
+<area shape="rect" id="node74" href="$classQuad__SYL.html" title="The class implementing ⎕SYL. " alt="" coords="2113,551,2198,577"/>
+<area shape="rect" id="node77" href="$classQuad__X.html" title="The class implementing ⎕X. " alt="" coords="2121,1285,2190,1312"/>
+<area shape="rect" id="node29" href="$structQuad__WA_1_1__mem__info.html" title="some relevant values in /proc/meminfo " alt="" coords="1913,729,2068,756"/>
+<area shape="rect" id="node40" href="$classStateIndicator.html" title="One entry of the state indicator (SI) of the APL interpreter. " alt="" coords="2243,1731,2345,1757"/>
+<area shape="rect" id="node47" href="$classPrefix.html" title="a class for reducing all statements of an Executable " alt="" coords="1963,1740,2019,1767"/>
+<area shape="rect" id="node41" href="$classExecutable.html" title="Base class for ExecuteList, StatementList, and UserFunction. " alt="" coords="1947,1844,2034,1871"/>
+<area shape="rect" id="node42" href="$classToken__string.html" title="A sequence of Token. " alt="" coords="1599,1727,1697,1753"/>
+<area shape="rect" id="node44" href="$classUCS__string__vector.html" title="a vector of UCS_strings. " alt="" coords="1581,1845,1715,1872"/>
+<area shape="rect" id="node46" href="$classError.html" title="An APL error and information related to it. " alt="" coords="1965,1793,2016,1820"/>
+<area shape="rect" id="node48" href="$structToken__loc.html" title="A Token and its location information (position in a Token_string) " alt="" coords="1607,1780,1689,1807"/>
+<area shape="rect" id="node49" href="$classToken.html" title="One atom of an APL function or expression. " alt="" coords="1264,1787,1323,1813"/>
+<area shape="rect" id="node51" href="$classValue__P__Base.html" title="A Value smart * and access functions (except constructors) " alt="" coords="29,2436,137,2463"/>
+<area shape="rect" id="node56" href="$structCell_1_1SomeValue_1_1__pval.html" title="a pointer to, and the owner of, a nested APL (sub&#45;) value " alt="" coords="281,2552,440,2579"/>
+<area shape="rect" id="node62" href="$classValue__P.html" title="A Value smart * (constructors) " alt="" coords="325,2307,396,2333"/>
+<area shape="rect" id="node52" href="$classValue.html" title="An APL Value (essentially a Shape and a ravel) " alt="" coords="1266,2521,1321,2548"/>
+<area shape="rect" id="node53" href="$classDynamicObject.html" title="A Value or an IndexExpr. " alt="" coords="305,2440,417,2467"/>
+<area shape="rect" id="node61" href="$classIndexExpr.html" title="The interal representation of some APL index [A1;A2;...;An]. " alt="" coords="587,2307,669,2333"/>
+<area shape="rect" id="node54" href="$classCell.html" title="The base class for all Cells. " alt="" coords="853,2603,899,2629"/>
+<area shape="rect" id="node55" href="$unionCell_1_1SomeValue.html" title="A union containing all possible cell values for the different Cell types. " alt="" coords="568,2615,688,2641"/>
+<area shape="rect" id="node57" href="$structCell_1_1SomeValue_1_1__fval.html" title="&lt; for FloatCell " alt="" coords="283,2632,439,2659"/>
+<area shape="rect" id="node58" href="$unionCell_1_1SomeValue_1_1__fval_1_1__flt__num.html" title="either a floating point value, or the denominator of a quotient " alt="" coords="5,2625,161,2666"/>
+<area shape="rect" id="node59" href="$struct__deleted__value.html" title="a linked list of deleted values " alt="" coords="821,2692,931,2719"/>
+<area shape="rect" id="node60" href="$classShape.html" title="the shape of an APL value " alt="" coords="847,2388,905,2415"/>
+<area shape="rect" id="node63" href="$structPrefix_1_1Phrase.html" title="one phrase in the phrase table " alt="" coords="1595,1675,1701,1701"/>
+<area shape="rect" id="node64" href="$classDerivedFunctionCache.html" title="a small cache for storing a few DerivedFunction objects " alt="" coords="1913,1689,2068,1716"/>
+<area shape="rect" id="node69" href="$classQuad__SVx.html" title="Base class for ⎕SVC, ⎕SVE, ⎕SVO, ⎕SVQ, ⎕SVR, and ⎕SVS. " alt="" coords="1605,1464,1691,1491"/>
 </map>

@@ -23,7 +23,7 @@
 
 #include "QuadFunction.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// a helper class (doubly linked list) for parsing XML
 class XML_node
 {
@@ -84,8 +84,9 @@ public:
    /// leading <, /m or _.
    UCS_string get_tagname() const;
 
+   /// return true iff this XML_node was parsed (and has produced an APL value)
    bool is_parsed() const
-      { return (+APL_value); }
+      { return +APL_value; }
 
    /// unlink \b this node from the doubly-linked list that contains it
    XML_node * unlink()
@@ -192,7 +193,7 @@ protected:
    /// the position of this node (at its level)
    int position;
 };
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
    The system function ⎕XML
  */
@@ -208,6 +209,7 @@ public:
    static Quad_XML * fun;          ///< Built-in function.
    static Quad_XML  _fun;          ///< Built-in function.
 
+   /// return \b ucs with leading _NNN (position) skipped.
    static UCS_string skip_pos_prefix(const UCS_string & ucs);
 
    /// split src, e.g. "_2_name" into integer 2, Unicode '_', and
@@ -246,7 +248,9 @@ protected:
    /// return all XML nodes as member names
    static Token all_members(const Value & B, int flags);
 
+   /// iterator: return the next member after A in structured value B
    static Token next_member(const Value & A, const Value & B);
+
    /// display details for tree() functions
    enum tree_flags
       {

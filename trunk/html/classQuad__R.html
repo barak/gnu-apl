@@ -87,11 +87,11 @@ Collaboration diagram for Quad_R:</div>
 <div class="dyncontent">
 <div class="center"><img src="classQuad__R__coll__graph.png" border="0" usemap="#Quad__R_coll__map" alt="Collaboration graph"/></div>
 <map name="Quad__R_coll__map" id="Quad__R_coll__map">
-<area shape="rect" id="node2" href="classNL__SystemVariable.html" title="Base class for all APL system variables that cannot be localized. " alt="" coords="9,323,147,349"/>
-<area shape="rect" id="node3" href="classSystemVariable.html" title="Base class for all APL system variables. " alt="" coords="21,247,135,273"/>
-<area shape="rect" id="node4" href="classSymbol.html" title="Base class for variables, defined functions, and distinguished names. " alt="" coords="45,171,111,197"/>
-<area shape="rect" id="node5" href="classNamedObject.html" title="A user&#45;defined variable or function. " alt="" coords="5,81,108,108"/>
-<area shape="rect" id="node6" href="classUCS__string.html" title="A string of Unicode characters (32&#45;bit) " alt="" coords="133,81,223,108"/>
+<area shape="rect" id="node2" href="classNL__SystemVariable.html" title="Base class for all APL system variables that cannot be localized. " alt="" coords="9,337,147,364"/>
+<area shape="rect" id="node3" href="classSystemVariable.html" title="Base class for all APL system variables. " alt="" coords="21,261,135,288"/>
+<area shape="rect" id="node4" href="classSymbol.html" title="Base class for variables, defined functions, and distinguished names. " alt="" coords="45,185,111,212"/>
+<area shape="rect" id="node5" href="classNamedObject.html" title="A user&#45;defined variable or function. " alt="" coords="5,96,108,123"/>
+<area shape="rect" id="node6" href="classUCS__string.html" title="A string of Unicode characters (32&#45;bit) " alt="" coords="133,96,223,123"/>
 </map>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
@@ -127,10 +127,10 @@ virtual ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a clas
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSystemVariable.html#a641b6af97217d6864f8ceb7f68d6ab91">assign_indexed</a> (<a class="el" href="classValue__P.html">Value_P</a> X, <a class="el" href="classValue__P.html">Value_P</a> value)</td></tr>
 <tr class="memdesc:a641b6af97217d6864f8ceb7f68d6ab91 inherit pub_methods_classSystemVariable"><td class="mdescLeft">&#160;</td><td class="mdescRight">overloaded <a class="el" href="classSymbol.html#a22e14805fc8449f0d4af99de04ee617e" title="Indexed (multi-dimensional) assign value to this Symbol. ">Symbol::assign_indexed()</a>. <br /></td></tr>
 <tr class="separator:a641b6af97217d6864f8ceb7f68d6ab91 inherit pub_methods_classSystemVariable"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a23a7c4e83b8c97ab36b345343d53887d inherit pub_methods_classSystemVariable"><td class="memItemLeft" align="right" valign="top"><a id="a23a7c4e83b8c97ab36b345343d53887d"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSystemVariable.html#a23a7c4e83b8c97ab36b345343d53887d">get_attributes</a> (int mode, <a class="el" href="classCell.html">Cell</a> *dest) const</td></tr>
-<tr class="memdesc:a23a7c4e83b8c97ab36b345343d53887d inherit pub_methods_classSystemVariable"><td class="mdescLeft">&#160;</td><td class="mdescRight">overloaded <a class="el" href="classSymbol.html#ac0820178f9a0eaaf664599c22e7d5b15" title="store the attributes (as per ⎕AT) of symbol at dest... ">Symbol::get_attributes()</a>. <br /></td></tr>
-<tr class="separator:a23a7c4e83b8c97ab36b345343d53887d inherit pub_methods_classSystemVariable"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aab4fab0cb66063a3f649c73962d72144 inherit pub_methods_classSystemVariable"><td class="memItemLeft" align="right" valign="top"><a id="aab4fab0cb66063a3f649c73962d72144"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSystemVariable.html#aab4fab0cb66063a3f649c73962d72144">get_attributes</a> (int mode, <a class="el" href="classValue.html">Value</a> &amp;Z) const</td></tr>
+<tr class="memdesc:aab4fab0cb66063a3f649c73962d72144 inherit pub_methods_classSystemVariable"><td class="mdescLeft">&#160;</td><td class="mdescRight">overloaded <a class="el" href="classSymbol.html#ab25b15a68f43d4a770d783e09b8ba30b" title="store the attributes (as per ⎕AT) of symbol in Z... ">Symbol::get_attributes()</a>. <br /></td></tr>
+<tr class="separator:aab4fab0cb66063a3f649c73962d72144 inherit pub_methods_classSystemVariable"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af8caf0a07ba86b6b31fa6fbd2065f166 inherit pub_methods_classSystemVariable"><td class="memItemLeft" align="right" valign="top"><a id="af8caf0a07ba86b6b31fa6fbd2065f166"></a>
 virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSystemVariable.html#af8caf0a07ba86b6b31fa6fbd2065f166">expunge</a> ()</td></tr>
 <tr class="memdesc:af8caf0a07ba86b6b31fa6fbd2065f166 inherit pub_methods_classSystemVariable"><td class="mdescLeft">&#160;</td><td class="mdescRight">system vars cannot be expunged. <br /></td></tr>
@@ -176,6 +176,10 @@ TokenClass&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSymbol.html#acf6746d030a587da23fb32e898f23d36">set_nc</a> (NameClass nc)</td></tr>
 <tr class="memdesc:acf6746d030a587da23fb32e898f23d36 inherit pub_methods_classSymbol"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set current NameClass of this <a class="el" href="classSymbol.html" title="Base class for variables, defined functions, and distinguished names. ">Symbol</a> to <b>nc</b>. <br /></td></tr>
 <tr class="separator:acf6746d030a587da23fb32e898f23d36 inherit pub_methods_classSymbol"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2d92f6ac593044a37c0434d712085bef inherit pub_methods_classSymbol"><td class="memItemLeft" align="right" valign="top"><a id="a2d92f6ac593044a37c0434d712085bef"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSymbol.html#a2d92f6ac593044a37c0434d712085bef">set_nc</a> (NameClass nc, <a class="el" href="classFunction.html">Function_P</a> fun)</td></tr>
+<tr class="memdesc:a2d92f6ac593044a37c0434d712085bef inherit pub_methods_classSymbol"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set current NameClass of this <a class="el" href="classSymbol.html" title="Base class for variables, defined functions, and distinguished names. ">Symbol</a> to <b>nc</b> and function fun. <br /></td></tr>
+<tr class="separator:a2d92f6ac593044a37c0434d712085bef inherit pub_methods_classSymbol"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8eb0881471fcf614e9b4d9bd0a4a721b inherit pub_methods_classSymbol"><td class="memItemLeft" align="right" valign="top"><a id="a8eb0881471fcf614e9b4d9bd0a4a721b"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSymbol.html#a8eb0881471fcf614e9b4d9bd0a4a721b">share_var</a> (SV_key key)</td></tr>
 <tr class="memdesc:a8eb0881471fcf614e9b4d9bd0a4a721b inherit pub_methods_classSymbol"><td class="mdescLeft">&#160;</td><td class="mdescRight">share variable with <b>proc</b> <br /></td></tr>
@@ -188,10 +192,6 @@ SV_Coupling&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSymbol.html#ac59d1dd17096f3e89caa257ddeccd970">clear_vs</a> ()</td></tr>
 <tr class="memdesc:ac59d1dd17096f3e89caa257ddeccd970 inherit pub_methods_classSymbol"><td class="mdescLeft">&#160;</td><td class="mdescRight">clear the value stack of <b>this</b> symbol <br /></td></tr>
 <tr class="separator:ac59d1dd17096f3e89caa257ddeccd970 inherit pub_methods_classSymbol"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7ea06f1347d255750bd0719b711b269d inherit pub_methods_classSymbol"><td class="memItemLeft" align="right" valign="top"><a id="a7ea06f1347d255750bd0719b711b269d"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSymbol.html#a7ea06f1347d255750bd0719b711b269d">set_nc</a> (NameClass nc, <a class="el" href="classFunction.html">Function</a> *fun)</td></tr>
-<tr class="memdesc:a7ea06f1347d255750bd0719b711b269d inherit pub_methods_classSymbol"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set current NameClass of this <a class="el" href="classSymbol.html" title="Base class for variables, defined functions, and distinguished names. ">Symbol</a> to <b>nc</b> and function fun. <br /></td></tr>
-<tr class="separator:a7ea06f1347d255750bd0719b711b269d inherit pub_methods_classSymbol"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab73eb07606c68a74d7626c52cda7cb7a inherit pub_methods_classSymbol"><td class="memItemLeft" align="right" valign="top"><a id="ab73eb07606c68a74d7626c52cda7cb7a"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSymbol.html#ab73eb07606c68a74d7626c52cda7cb7a">compare</a> (const <a class="el" href="classSymbol.html">Symbol</a> &amp;other) const</td></tr>
 <tr class="memdesc:ab73eb07606c68a74d7626c52cda7cb7a inherit pub_methods_classSymbol"><td class="mdescLeft">&#160;</td><td class="mdescRight">Compare name of <b>this</b> value with <b>other</b>. <br /></td></tr>
@@ -208,10 +208,10 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSymbol.html#a22e14805fc8449f0d4af99de04ee617e">assign_indexed</a> (<a class="el" href="classIndexExpr.html">IndexExpr</a> &amp;index, <a class="el" href="classValue__P.html">Value_P</a> value)</td></tr>
 <tr class="memdesc:a22e14805fc8449f0d4af99de04ee617e inherit pub_methods_classSymbol"><td class="mdescLeft">&#160;</td><td class="mdescRight">Indexed (multi-dimensional) assign <b>value</b> to <b>this</b> <b><a class="el" href="classSymbol.html" title="Base class for variables, defined functions, and distinguished names. ">Symbol</a></b>. <br /></td></tr>
 <tr class="separator:a22e14805fc8449f0d4af99de04ee617e inherit pub_methods_classSymbol"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a83ab861edab8a200a43e34b8180ba545 inherit pub_methods_classSymbol"><td class="memItemLeft" align="right" valign="top"><a id="a83ab861edab8a200a43e34b8180ba545"></a>
-virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSymbol.html#a83ab861edab8a200a43e34b8180ba545">assign_named_lambda</a> (<a class="el" href="classFunction.html">Function</a> *lambda, const char *loc)</td></tr>
-<tr class="memdesc:a83ab861edab8a200a43e34b8180ba545 inherit pub_methods_classSymbol"><td class="mdescLeft">&#160;</td><td class="mdescRight">assign lambda, eg. V←{ ... } <br /></td></tr>
-<tr class="separator:a83ab861edab8a200a43e34b8180ba545 inherit pub_methods_classSymbol"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa27e1507dff68954239013cffc3599e3 inherit pub_methods_classSymbol"><td class="memItemLeft" align="right" valign="top"><a id="aa27e1507dff68954239013cffc3599e3"></a>
+virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSymbol.html#aa27e1507dff68954239013cffc3599e3">assign_named_lambda</a> (<a class="el" href="classFunction.html">Function_P</a> lambda, const char *loc)</td></tr>
+<tr class="memdesc:aa27e1507dff68954239013cffc3599e3 inherit pub_methods_classSymbol"><td class="mdescLeft">&#160;</td><td class="mdescRight">assign lambda, eg. V←{ ... } <br /></td></tr>
+<tr class="separator:aa27e1507dff68954239013cffc3599e3 inherit pub_methods_classSymbol"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a88ce92302e3a54792fa677cbc3d96fb9 inherit pub_methods_classSymbol"><td class="memItemLeft" align="right" valign="top"><a id="a88ce92302e3a54792fa677cbc3d96fb9"></a>
 ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSymbol.html#a88ce92302e3a54792fa677cbc3d96fb9">print_verbose</a> (ostream &amp;out) const</td></tr>
 <tr class="memdesc:a88ce92302e3a54792fa677cbc3d96fb9 inherit pub_methods_classSymbol"><td class="mdescLeft">&#160;</td><td class="mdescRight">Print <b>this</b> <b><a class="el" href="classSymbol.html" title="Base class for variables, defined functions, and distinguished names. ">Symbol</a></b> and its stack to <b>out</b>. <br /></td></tr>
@@ -248,10 +248,14 @@ virtual const <a class="el" href="classFunction.html">Function</a> *&#160;</td><
 virtual <a class="el" href="classUCS__string.html">UCS_string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSymbol.html#a126fc214ca7a2e2d364e0982a36b2ace">get_name</a> () const</td></tr>
 <tr class="memdesc:a126fc214ca7a2e2d364e0982a36b2ace inherit pub_methods_classSymbol"><td class="mdescLeft">&#160;</td><td class="mdescRight">The name of <b>this</b> <b><a class="el" href="classSymbol.html" title="Base class for variables, defined functions, and distinguished names. ">Symbol</a></b>. <br /></td></tr>
 <tr class="separator:a126fc214ca7a2e2d364e0982a36b2ace inherit pub_methods_classSymbol"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a532ac06e63849f85f7fc52904894fbc4 inherit pub_methods_classSymbol"><td class="memItemLeft" align="right" valign="top"><a id="a532ac06e63849f85f7fc52904894fbc4"></a>
-virtual <a class="el" href="classFunction.html">Function</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSymbol.html#a532ac06e63849f85f7fc52904894fbc4">get_function</a> ()</td></tr>
-<tr class="memdesc:a532ac06e63849f85f7fc52904894fbc4 inherit pub_methods_classSymbol"><td class="mdescLeft">&#160;</td><td class="mdescRight">overloaded <a class="el" href="classNamedObject.html#ac7787482f65cf0641c4027b7ab6ada1f" title="return the function for this Id (if any) or 0 if this Id does (currently) represent a function...">NamedObject::get_function()</a> <br /></td></tr>
-<tr class="separator:a532ac06e63849f85f7fc52904894fbc4 inherit pub_methods_classSymbol"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac37cbe5a8219108176ae5f0b20c1f8f9 inherit pub_methods_classSymbol"><td class="memItemLeft" align="right" valign="top"><a id="ac37cbe5a8219108176ae5f0b20c1f8f9"></a>
+const <a class="el" href="classUCS__string.html">UCS_string</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSymbol.html#ac37cbe5a8219108176ae5f0b20c1f8f9">get_name_ptr</a> () const</td></tr>
+<tr class="memdesc:ac37cbe5a8219108176ae5f0b20c1f8f9 inherit pub_methods_classSymbol"><td class="mdescLeft">&#160;</td><td class="mdescRight">overloaded NamedObject::get_name_ptr() <br /></td></tr>
+<tr class="separator:ac37cbe5a8219108176ae5f0b20c1f8f9 inherit pub_methods_classSymbol"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae4acd785c86eda58d7ff03ac52cc4ef4 inherit pub_methods_classSymbol"><td class="memItemLeft" align="right" valign="top"><a id="ae4acd785c86eda58d7ff03ac52cc4ef4"></a>
+virtual <a class="el" href="classFunction.html">Function_P</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSymbol.html#ae4acd785c86eda58d7ff03ac52cc4ef4">get_function</a> ()</td></tr>
+<tr class="memdesc:ae4acd785c86eda58d7ff03ac52cc4ef4 inherit pub_methods_classSymbol"><td class="mdescLeft">&#160;</td><td class="mdescRight">overloaded <a class="el" href="classNamedObject.html#ac7787482f65cf0641c4027b7ab6ada1f" title="return the function for this Id (if any) or 0 if this Id does (currently) represent a function...">NamedObject::get_function()</a> <br /></td></tr>
+<tr class="separator:ae4acd785c86eda58d7ff03ac52cc4ef4 inherit pub_methods_classSymbol"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a696eb14234b5cc83a5eab198a867a594 inherit pub_methods_classSymbol"><td class="memItemLeft" align="right" valign="top"><a id="a696eb14234b5cc83a5eab198a867a594"></a>
 virtual <a class="el" href="classValue__P.html">Value_P</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSymbol.html#a696eb14234b5cc83a5eab198a867a594">get_value</a> ()</td></tr>
 <tr class="memdesc:a696eb14234b5cc83a5eab198a867a594 inherit pub_methods_classSymbol"><td class="mdescLeft">&#160;</td><td class="mdescRight">overloaded <a class="el" href="classNamedObject.html#a2b9197186d96f9c2e8dd37adf63b4f7a" title="return the variable value for this Id (if any) or 0 if this Id does not (currently) represent a varia...">NamedObject::get_value()</a> <br /></td></tr>
@@ -357,10 +361,10 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classNL__SystemVariable.html#ac2f5d4261936f4151bec88a7a67e3041">push_label</a> (Function_Line label)</td></tr>
 <tr class="memdesc:ac2f5d4261936f4151bec88a7a67e3041 inherit pro_methods_classNL__SystemVariable"><td class="mdescLeft">&#160;</td><td class="mdescRight">overloaded <a class="el" href="classSymbol.html#a8bb62c2d692cba8527325bdd723695fb" title="push a label onto the stack of this Symbol ">Symbol::push_label()</a> <br /></td></tr>
 <tr class="separator:ac2f5d4261936f4151bec88a7a67e3041 inherit pro_methods_classNL__SystemVariable"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa773d2da392a5479bdc32ff0c40e6d4d inherit pro_methods_classNL__SystemVariable"><td class="memItemLeft" align="right" valign="top"><a id="aa773d2da392a5479bdc32ff0c40e6d4d"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classNL__SystemVariable.html#aa773d2da392a5479bdc32ff0c40e6d4d">push_function</a> (<a class="el" href="classFunction.html">Function</a> *function)</td></tr>
-<tr class="memdesc:aa773d2da392a5479bdc32ff0c40e6d4d inherit pro_methods_classNL__SystemVariable"><td class="mdescLeft">&#160;</td><td class="mdescRight">overloaded <a class="el" href="classSymbol.html#a0b44c13f715cdbc9f13d33a6b4e41317" title="push a function onto the stack of this Symbol ">Symbol::push_function()</a> <br /></td></tr>
-<tr class="separator:aa773d2da392a5479bdc32ff0c40e6d4d inherit pro_methods_classNL__SystemVariable"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab9cb909115ed7112fd47fb4938ab5092 inherit pro_methods_classNL__SystemVariable"><td class="memItemLeft" align="right" valign="top"><a id="ab9cb909115ed7112fd47fb4938ab5092"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classNL__SystemVariable.html#ab9cb909115ed7112fd47fb4938ab5092">push_function</a> (<a class="el" href="classFunction.html">Function_P</a> function)</td></tr>
+<tr class="memdesc:ab9cb909115ed7112fd47fb4938ab5092 inherit pro_methods_classNL__SystemVariable"><td class="mdescLeft">&#160;</td><td class="mdescRight">overloaded <a class="el" href="classSymbol.html#aeb0df517c8fa40b7aa1ee11a8142367e" title="push a function onto the stack of this Symbol ">Symbol::push_function()</a> <br /></td></tr>
+<tr class="separator:ab9cb909115ed7112fd47fb4938ab5092 inherit pro_methods_classNL__SystemVariable"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7293cdf0be01f0caa9df51d2b36f7b6b inherit pro_methods_classNL__SystemVariable"><td class="memItemLeft" align="right" valign="top"><a id="a7293cdf0be01f0caa9df51d2b36f7b6b"></a>
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classNL__SystemVariable.html#a7293cdf0be01f0caa9df51d2b36f7b6b">push_value</a> (<a class="el" href="classValue__P.html">Value_P</a> value)</td></tr>
 <tr class="memdesc:a7293cdf0be01f0caa9df51d2b36f7b6b inherit pro_methods_classNL__SystemVariable"><td class="mdescLeft">&#160;</td><td class="mdescRight">overloaded <a class="el" href="classSymbol.html#a86e5ce17e25d84f7491642bc0764712a" title="Push an APL value onto the stack of this Symbol. ">Symbol::push_value()</a> <br /></td></tr>
@@ -405,7 +409,7 @@ std::vector&lt; <a class="el" href="classValueStackItem.html">ValueStackItem</a>
 <div class="textblock"><p>The class implementing ⎕R. </p>
 <p>System variable Quad-R (Right Argment). </p>
 
-<p class="definition">Definition at line <a class="el" href="SystemVariable_8hh_source.html#l00529">529</a> of file <a class="el" href="SystemVariable_8hh_source.html">SystemVariable.hh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="SystemVariable_8hh_source.html#l00530">530</a> of file <a class="el" href="SystemVariable_8hh_source.html">SystemVariable.hh</a>.</p>
 </div><hr/>The documentation for this class was generated from the following files:<ul>
 <li>src/<a class="el" href="SystemVariable_8hh_source.html">SystemVariable.hh</a></li>
 <li>src/<a class="el" href="SystemVariable_8cc_source.html">SystemVariable.cc</a></li>
@@ -416,7 +420,7 @@ std::vector&lt; <a class="el" href="classValueStackItem.html">ValueStackItem</a>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="classQuad__R.html">Quad_R</a></li>
-    <li class="footer">Generated on Sun Aug 9 2020 16:43:42 for GNUAPL by
+    <li class="footer">Generated on Sun Jan 30 2022 20:14:27 for GNUAPL by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>

@@ -1,6 +1,4 @@
 <map id="Plot_window_properties::print" name="Plot_window_properties::print">
-<area shape="rect" id="node2" href="$classQuad__PLOT.html#a0161f15bc1b55d2d79b634ce35c15ec0" title="plot the data (creating a new plot window in X) " alt="" coords="213,31,389,57"/>
-<area shape="rect" id="node5" href="$classPlot__window__properties.html#aa4db62e171eab805cd9e1a3cbc253c3c" title="return the pixel position of the point where the X, Y, and possibly Z&#45;axis cross. ..." alt="" coords="221,82,381,123"/>
-<area shape="rect" id="node3" href="$classQuad__PLOT.html#ad9df6fb27fb9157c5892b86f6d95baf8" title="overloaded Function::eval_AB() " alt="" coords="437,5,588,32"/>
-<area shape="rect" id="node4" href="$classQuad__PLOT.html#ad9dc8b334b11e52e0218f2c3e80e2199" title="overloaded Function::eval_B() " alt="" coords="441,56,584,83"/>
+<area shape="rect" id="node2" href="$classQuad__PLOT.html#acc4187c32c3bad52f276a724b226b429" title="overloaded Function::eval_AB() " alt="" coords="218,5,369,32"/>
+<area shape="rect" id="node3" href="$classPlot__window__properties.html#aa4db62e171eab805cd9e1a3cbc253c3c" title="return the pixel position of the point where the X, Y, and possibly Z&#45;axis cross. ..." alt="" coords="213,57,373,98"/>
 </map>

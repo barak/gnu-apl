@@ -90,7 +90,7 @@ Token eval_AB(Value_P A, Value_P B)
 
 Token eval_XB(Value_P X, Value_P B)
 {
-    const int function_number = X->get_ravel(0).get_near_int();
+    const int function_number = X->get_cravel(0).get_near_int();
 
     switch( function_number ) {
     case 0:
@@ -103,7 +103,7 @@ Token eval_XB(Value_P X, Value_P B)
             port = 0;
         }
         else {
-            port = B->get_ravel( 0 ).get_near_int();
+            port = B->get_cravel( 0 ).get_near_int();
         }
 
         try {
@@ -167,14 +167,14 @@ const UCS_string ucs_string_from_string( const std::string &string )
     return UCS_string( utf );
 }
 
-Value_P make_string_cell( const std::string &string, const char *loc )
+Value_P
+make_string_cell( const std::string &string, const char *loc )
 {
-    UCS_string s = ucs_string_from_string( string );
-    Shape shape( s.size() );
-    Value_P cell(shape, loc );
-    for( int i = 0 ; i < s.size() ; i++ ) {
-        new (cell->next_ravel()) CharCell( s[i] );
-    }
+UCS_string s = ucs_string_from_string( string );
+Shape shape(s.size());
+Value_P cell(shape, loc );
+
+    loop (i, s.size())   cell->next_ravel_Char(s[i]);
     cell->check_value( loc );
     return cell;
 }

@@ -1,4 +1,7 @@
 
+# noinst_PROGRAMS will be compiled (in this subdirectory 'tools')
+# but not installed (in e.g. /usr/bind or /usr/local/bin).
+#
 noinst_PROGRAMS =	APL_keyboard		\
 			APL_keyboard_learn	\
 			APL_keyboard_show	\
@@ -8,16 +11,19 @@ noinst_PROGRAMS =	APL_keyboard		\
 			TLV_server		\
 			ncurses_emul
 
-if HAVE_RDTSC
-if HAVE_AFFINITY_NP
-noinst_PROGRAMS += memory_benchmark
-memory_benchmark_SOURCES = memory_benchmark.cc
-memory_benchmark_LDADD = -lpthread
-memory_benchmark_CXXFLAGS = -Wall
-endif
-endif
 
-dist_noinst_SCRIPTS = check_src
+# fails on cygwin, therefore moved to dist_noinst_SCRIPTS
+#
+# if HAVE_RDTSC
+# if HAVE_AFFINITY_NP
+# noinst_PROGRAMS += memory_benchmark
+# memory_benchmark_SOURCES = memory_benchmark.cc
+# memory_benchmark_LDADD = -lpthread
+# memory_benchmark_CXXFLAGS = -Wall
+# endif
+# endif
+
+dist_noinst_SCRIPTS = check_src memory_benchmark.cc
 
 APL_keyboard_SOURCES       = APL_keyboard.cc        APL_keyboard.def
 APL_keyboard_learn_SOURCES = APL_keyboard_learn.cc  APL_keyboard.orig.def

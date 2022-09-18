@@ -1,11 +1,17 @@
 ⍝ Find.tc
 ⍝ ----------------------------------
 
+   ⍝ character compatibility
 
-      'AB'⋸'ABABABABA'
+      1 ⋸ 1 2 3
+1 0 0
+      1 ⍷1 2 3
+1 0 0
+
+      'AB'⍷'ABABABABA'
 1 0 1 0 1 0 1 0 0
 
-      1 2 3⋸1 2 3 4 1 2 3
+      1 2 3⍷1 2 3 4 1 2 3
 1 0 0 0 1 0 0
 
       H←4 5ρ'ABCABA'
@@ -20,7 +26,7 @@ ABAAB
 BCA
 ABC
 
-      K⋸H
+      K⍷H
 0 1 0 0 0
 0 0 1 0 0
 0 0 0 0 0
@@ -28,7 +34,7 @@ ABC
 
       ⍝ rank of A smaller than rank of B ----------------------------------
 
-      'BA'⋸H
+      'BA'⍷H
 0 0 0 0 0
 0 0 0 0 0
 1 0 0 0 0
@@ -41,7 +47,7 @@ ABC
 ABC
 ABB
 
-      Q⋸'ABCABB'
+      Q⍷'ABCABB'
 0 0 0 0 0 0
 
       ⍝ nested arrays ----------------------------------
@@ -53,18 +59,18 @@ ABB
 4
       ≡S
 2
-      'GO' 'TO'⋸S
+      'GO' 'TO'⍷S
 0 0 1 0
-      'GOTO'⋸S
+      'GOTO'⍷S
 0 0 0 0
 
-      ⍝ ⍷ instead of ⋸ ----------------------------------
+      ⍝ ⍷ instead of ⍷ ----------------------------------
       'GO' 'TO'⍷S
 0 0 1 0
 
       ⍝ deleting multiple blanks ----------------------------------
 
       S←'AB    DEF'
-      (∼'  '⋸S)/S
+      (∼'  '⍷S)/S
 AB DEF
 

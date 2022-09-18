@@ -27,29 +27,34 @@
 #include "CharCell.hh"
 #include "PointerCell.hh"
 
-void IntResultValue::update( Cell *cell, Value & cell_owner ) const
+void
+IntResultValue::update(Value & Z) const
 {
-    new (cell) IntCell( value );
+    Z.next_ravel_Int(value);
 }
 
-void DoubleResultValue::update( Cell *cell, Value & cell_owner ) const
+void
+DoubleResultValue::update(Value & Z) const
 {
-    new (cell) FloatCell( value );
+    Z.next_ravel_Float(value);
 }
 
-void StringResultValue::update( Cell *cell, Value & cell_owner ) const
+void StringResultValue::update(Value & Z) const
 {
-    if( value.size() == 0 ) {
-        new (cell) PointerCell(Str0(LOC).get(), cell_owner );
-    }
-    else {
-        new (cell) PointerCell(make_string_cell(value, LOC).get(), cell_owner);
-    }
+    if (value.size() == 0)
+       {
+         Z.next_ravel_Pointer(Str0(LOC).get());
+       }
+    else
+       {
+         Z.next_ravel_Pointer(make_string_cell(value, LOC).get());
+       }
 }
 
-void NullResultValue::update( Cell *cell, Value & cell_owner ) const
+void
+NullResultValue::update(Value & Z) const
 {
-    new (cell) PointerCell( Idx0(LOC).get(), cell_owner );
+    Z.next_ravel_Pointer(Idx0(LOC).get());
 }
 
 void

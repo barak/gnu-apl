@@ -12,8 +12,8 @@ CLEAR WS
 ┃┃┏→━━┓┃┃
 ┃┃┃0 0┃┃┃
 ┃┃┗━━━┛┃┃
-┃┗∊━━━━┛┃
-┗∊∊━━━━━┛
+┃┗ϵ━━━━┛┃
+┗ϵϵ━━━━━┛
 
 
 ⍝ sometimes WS FULL comes twice. Fix it!

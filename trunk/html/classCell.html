@@ -81,13 +81,12 @@ Inheritance diagram for Cell:</div>
 <map name="Cell_inherit__map" id="Cell_inherit__map">
 <area shape="rect" id="node2" href="classCharCell.html" title="A Cell containing a single Unicode character. " alt="" coords="5,80,79,107"/>
 <area shape="rect" id="node3" href="classLvalCell.html" title="A cell pointing to another cell (which shall be updated) " alt="" coords="103,80,173,107"/>
-<area shape="rect" id="node5" href="classNumericCell.html" title="Base class for RealCell and ComplexCell. " alt="" coords="197,80,292,107"/>
-<area shape="rect" id="node10" href="classPointerCell.html" title="A cell pointing to a (nested) APL value. " alt="" coords="316,80,403,107"/>
-<area shape="rect" id="node4" href="classLvalCell__picked.html" title="a compatibility Cell for fixing a bug in ⊃. Will be removed " alt="" coords="57,155,171,181"/>
-<area shape="rect" id="node6" href="classComplexCell.html" title="A celkl containing one complex numbver. " alt="" coords="196,155,293,181"/>
-<area shape="rect" id="node7" href="classRealCell.html" title="Base class for IntCell and FloatCell. " alt="" coords="318,155,390,181"/>
-<area shape="rect" id="node8" href="classFloatCell.html" title="A Cell containing a single floating point (or rational) value. " alt="" coords="270,229,345,256"/>
-<area shape="rect" id="node9" href="classIntCell.html" title="A cell containing a single Integer value. " alt="" coords="369,229,429,256"/>
+<area shape="rect" id="node4" href="classNumericCell.html" title="Base class for RealCell and ComplexCell. " alt="" coords="197,80,292,107"/>
+<area shape="rect" id="node9" href="classPointerCell.html" title="A cell pointing to a (nested) APL value. " alt="" coords="316,80,403,107"/>
+<area shape="rect" id="node5" href="classComplexCell.html" title="A cell containing one complex number. " alt="" coords="141,155,239,181"/>
+<area shape="rect" id="node6" href="classRealCell.html" title="Base class for IntCell and FloatCell. " alt="" coords="263,155,335,181"/>
+<area shape="rect" id="node7" href="classFloatCell.html" title="A Cell containing a single floating point (or rational) value. " alt="" coords="215,229,290,256"/>
+<area shape="rect" id="node8" href="classIntCell.html" title="A cell containing a single Integer value. " alt="" coords="315,229,375,256"/>
 </map>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <div class="dynheader">
@@ -119,14 +118,14 @@ Public Member Functions</h2></td></tr>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#a394510643e8664cf12b5efaf5cb99f71">Cell</a> ()</td></tr>
 <tr class="memdesc:a394510643e8664cf12b5efaf5cb99f71"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct an un-initialized <a class="el" href="classCell.html" title="The base class for all Cells. ">Cell</a>. <br /></td></tr>
 <tr class="separator:a394510643e8664cf12b5efaf5cb99f71"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa5e87e053f81f4e39dd13f1d3282b871"><td class="memItemLeft" align="right" valign="top"><a id="aa5e87e053f81f4e39dd13f1d3282b871"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#aa5e87e053f81f4e39dd13f1d3282b871">init</a> (const <a class="el" href="classCell.html">Cell</a> &amp;other, <a class="el" href="classValue.html">Value</a> &amp;cell_owner, const char *loc)</td></tr>
-<tr class="memdesc:aa5e87e053f81f4e39dd13f1d3282b871"><td class="mdescLeft">&#160;</td><td class="mdescRight">deep copy of cell <b>other</b> into <b>this</b> cell <br /></td></tr>
-<tr class="separator:aa5e87e053f81f4e39dd13f1d3282b871"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae996571823c6935d2bcafd11509ab222"><td class="memItemLeft" align="right" valign="top"><a id="ae996571823c6935d2bcafd11509ab222"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#ae996571823c6935d2bcafd11509ab222">init_other</a> (void *other, <a class="el" href="classValue.html">Value</a> &amp;cell_owner, const char *loc) const</td></tr>
-<tr class="memdesc:ae996571823c6935d2bcafd11509ab222"><td class="mdescLeft">&#160;</td><td class="mdescRight">init <b>other</b> from <b>this</b> cell <br /></td></tr>
-<tr class="separator:ae996571823c6935d2bcafd11509ab222"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ace1480b3a8beacc93cac91ebce845905"><td class="memItemLeft" align="right" valign="top"><a id="ace1480b3a8beacc93cac91ebce845905"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#ace1480b3a8beacc93cac91ebce845905">init</a> (const <a class="el" href="classCell.html">Cell</a> &amp;other, <a class="el" href="classValue.html">Value</a> &amp;this_owner, const char *loc)</td></tr>
+<tr class="memdesc:ace1480b3a8beacc93cac91ebce845905"><td class="mdescLeft">&#160;</td><td class="mdescRight">init <b>this</b> <a class="el" href="classCell.html" title="The base class for all Cells. ">Cell</a> from a (possibly deep) copy of <b>other</b> <br /></td></tr>
+<tr class="separator:ace1480b3a8beacc93cac91ebce845905"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aab9681b3e735d10ef92978c5c17bf95d"><td class="memItemLeft" align="right" valign="top"><a id="aab9681b3e735d10ef92978c5c17bf95d"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#aab9681b3e735d10ef92978c5c17bf95d">init_other</a> (void *other, <a class="el" href="classValue.html">Value</a> &amp;other_owner, const char *loc) const</td></tr>
+<tr class="memdesc:aab9681b3e735d10ef92978c5c17bf95d"><td class="mdescLeft">&#160;</td><td class="mdescRight">init (uninitialized) <a class="el" href="classCell.html" title="The base class for all Cells. ">Cell</a> <b>other</b> from <b>this</b> initialized cell <br /></td></tr>
+<tr class="separator:aab9681b3e735d10ef92978c5c17bf95d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6ff584df467249c47c95570553d1f05e"><td class="memItemLeft" align="right" valign="top"><a id="a6ff584df467249c47c95570553d1f05e"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#a6ff584df467249c47c95570553d1f05e">init_from_value</a> (<a class="el" href="classValue.html">Value</a> *<a class="el" href="classCell.html#aec38650253342ecb4fc6498c546a61c8">value</a>, <a class="el" href="classValue.html">Value</a> &amp;cell_owner, const char *loc)</td></tr>
 <tr class="memdesc:a6ff584df467249c47c95570553d1f05e"><td class="mdescLeft">&#160;</td><td class="mdescRight">init this <a class="el" href="classCell.html" title="The base class for all Cells. ">Cell</a> from value. If value is a scalar then its first element is used (and value is erased). Otherwise a <a class="el" href="classPointerCell.html" title="A cell pointing to a (nested) APL value. ">PointerCell</a> is created. <br /></td></tr>
@@ -146,10 +145,10 @@ virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#aec1ee0ad9011702c8518aa1eabda32bd">init_type</a> (const <a class="el" href="classCell.html">Cell</a> &amp;other, <a class="el" href="classValue.html">Value</a> &amp;cell_owner, const char *loc)</td></tr>
 <tr class="memdesc:aec1ee0ad9011702c8518aa1eabda32bd"><td class="mdescLeft">&#160;</td><td class="mdescRight">init <b>this</b> cell to be the type of <b>other</b> <br /></td></tr>
 <tr class="separator:aec1ee0ad9011702c8518aa1eabda32bd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab940e21b6212fbd1bfa8de9f99d090ea"><td class="memItemLeft" align="right" valign="top"><a id="ab940e21b6212fbd1bfa8de9f99d090ea"></a>
-virtual Unicode&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#ab940e21b6212fbd1bfa8de9f99d090ea">get_char_value</a> () const</td></tr>
-<tr class="memdesc:ab940e21b6212fbd1bfa8de9f99d090ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the character value of a cell. <br /></td></tr>
-<tr class="separator:ab940e21b6212fbd1bfa8de9f99d090ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2999919fc2782b3cebfd925c63cc1fac"><td class="memItemLeft" align="right" valign="top"><a id="a2999919fc2782b3cebfd925c63cc1fac"></a>
+virtual Unicode&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#a2999919fc2782b3cebfd925c63cc1fac">get_char_value</a> () const</td></tr>
+<tr class="memdesc:a2999919fc2782b3cebfd925c63cc1fac"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the character value of a cell. <br /></td></tr>
+<tr class="separator:a2999919fc2782b3cebfd925c63cc1fac"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5ba7cf69ad5fce61cf3ce8c2acb26c72"><td class="memItemLeft" align="right" valign="top"><a id="a5ba7cf69ad5fce61cf3ce8c2acb26c72"></a>
 virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#a5ba7cf69ad5fce61cf3ce8c2acb26c72">get_byte_value</a> () const</td></tr>
 <tr class="memdesc:a5ba7cf69ad5fce61cf3ce8c2acb26c72"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the byte value (-128..255 incl) of a cell. <br /></td></tr>
@@ -170,10 +169,10 @@ virtual <a class="el" href="classAPL__Float.html">APL_Float</a>&#160;</td><td cl
 virtual APL_Complex&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#a92ec561cfe084fd35cdc2bd529ce5ea1">get_complex_value</a> () const</td></tr>
 <tr class="memdesc:a92ec561cfe084fd35cdc2bd529ce5ea1"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the complex value of a cell. <br /></td></tr>
 <tr class="separator:a92ec561cfe084fd35cdc2bd529ce5ea1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3af019707c56a0fb40fce2d370af8307"><td class="memItemLeft" align="right" valign="top"><a id="a3af019707c56a0fb40fce2d370af8307"></a>
-virtual <a class="el" href="classValue__P.html">Value_P</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#a3af019707c56a0fb40fce2d370af8307">get_pointer_value</a> () const</td></tr>
-<tr class="memdesc:a3af019707c56a0fb40fce2d370af8307"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the APL value of a cell (Asserts for non-pointer cells) <br /></td></tr>
-<tr class="separator:a3af019707c56a0fb40fce2d370af8307"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a367b9df7e0d4b805e5f31641658113f6"><td class="memItemLeft" align="right" valign="top"><a id="a367b9df7e0d4b805e5f31641658113f6"></a>
+virtual <a class="el" href="classValue__P.html">Value_P</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#a367b9df7e0d4b805e5f31641658113f6">get_pointer_value</a> () const</td></tr>
+<tr class="memdesc:a367b9df7e0d4b805e5f31641658113f6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the APL value of a cell (Asserts for non-pointer cells) <br /></td></tr>
+<tr class="separator:a367b9df7e0d4b805e5f31641658113f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a87287b9b88b2ee6b92c11aadabe6d557"><td class="memItemLeft" align="right" valign="top"><a id="a87287b9b88b2ee6b92c11aadabe6d557"></a>
 virtual <a class="el" href="classCell.html">Cell</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#a87287b9b88b2ee6b92c11aadabe6d557">get_lval_value</a> () const</td></tr>
 <tr class="memdesc:a87287b9b88b2ee6b92c11aadabe6d557"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the APL value of a cell (Asserts for non-lval cells) <br /></td></tr>
@@ -272,16 +271,16 @@ virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 <tr class="separator:a79b6c0333d176833fb4fbc10fab94f7b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4a4fff9745f6938e16764875eba04c2d"><td class="memItemLeft" align="right" valign="top"><a id="a4a4fff9745f6938e16764875eba04c2d"></a>
 virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#a4a4fff9745f6938e16764875eba04c2d">is_finite</a> () const</td></tr>
-<tr class="memdesc:a4a4fff9745f6938e16764875eba04c2d"><td class="mdescLeft">&#160;</td><td class="mdescRight">return <b>true</b> unless <b>this</b> cell contains infinity or NaN <br /></td></tr>
+<tr class="memdesc:a4a4fff9745f6938e16764875eba04c2d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return <b>true</b> unless <b>this</b> cell contains infinity or NaN. <br /></td></tr>
 <tr class="separator:a4a4fff9745f6938e16764875eba04c2d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a55a811ad4fe198eaa8677ad4b54e52c7"><td class="memItemLeft" align="right" valign="top"><a id="a55a811ad4fe198eaa8677ad4b54e52c7"></a>
 virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#a55a811ad4fe198eaa8677ad4b54e52c7">is_example_field</a> () const</td></tr>
 <tr class="memdesc:a55a811ad4fe198eaa8677ad4b54e52c7"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return <b>true</b> iff <b>this</b> cell is an example field character cell. <br /></td></tr>
 <tr class="separator:a55a811ad4fe198eaa8677ad4b54e52c7"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a31c908c0e75c22b2f6d4f0a53c8dd61d"><td class="memItemLeft" align="right" valign="top"><a id="a31c908c0e75c22b2f6d4f0a53c8dd61d"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#a31c908c0e75c22b2f6d4f0a53c8dd61d">to_type</a> ()</td></tr>
-<tr class="memdesc:a31c908c0e75c22b2f6d4f0a53c8dd61d"><td class="mdescLeft">&#160;</td><td class="mdescRight">convert this cell to its type <br /></td></tr>
-<tr class="separator:a31c908c0e75c22b2f6d4f0a53c8dd61d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6a5fae12a13f5f0314b10d5324e90564"><td class="memItemLeft" align="right" valign="top"><a id="a6a5fae12a13f5f0314b10d5324e90564"></a>
+virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#a6a5fae12a13f5f0314b10d5324e90564">is_member_anchor</a> () const</td></tr>
+<tr class="memdesc:a6a5fae12a13f5f0314b10d5324e90564"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true iff this is a <a class="el" href="classPointerCell.html" title="A cell pointing to a (nested) APL value. ">PointerCell</a> which pouints to a member value. <br /></td></tr>
+<tr class="separator:a6a5fae12a13f5f0314b10d5324e90564"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a38a6a25f0ad091f35e3d9abfe5608a50"><td class="memItemLeft" align="right" valign="top"><a id="a38a6a25f0ad091f35e3d9abfe5608a50"></a>
 virtual CellType&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#a38a6a25f0ad091f35e3d9abfe5608a50">get_cell_type</a> () const</td></tr>
 <tr class="memdesc:a38a6a25f0ad091f35e3d9abfe5608a50"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the type of <b>this</b> cell <br /></td></tr>
@@ -486,54 +485,6 @@ virtual ErrorCode&#160;</td><td class="memItemRight" valign="bottom"><a class="e
 virtual ErrorCode&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#ad47eaeacb68da350b5f64f5bd3978cfb">bif_multiply_inverse</a> (<a class="el" href="classCell.html">Cell</a> *Z, const <a class="el" href="classCell.html">Cell</a> *A) const</td></tr>
 <tr class="memdesc:ad47eaeacb68da350b5f64f5bd3978cfb"><td class="mdescLeft">&#160;</td><td class="mdescRight">the inverse of bif_bif_multiply <br /></td></tr>
 <tr class="separator:ad47eaeacb68da350b5f64f5bd3978cfb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8b2c7380480f92cf1a108a7bdd7a77be"><td class="memItemLeft" align="right" valign="top"><a id="a8b2c7380480f92cf1a108a7bdd7a77be"></a>
-virtual const <a class="el" href="classCharCell.html">CharCell</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#a8b2c7380480f92cf1a108a7bdd7a77be">cCharCell</a> () const</td></tr>
-<tr class="memdesc:a8b2c7380480f92cf1a108a7bdd7a77be"><td class="mdescLeft">&#160;</td><td class="mdescRight">downcast to const <a class="el" href="classCharCell.html" title="A Cell containing a single Unicode character. ">CharCell</a> <br /></td></tr>
-<tr class="separator:a8b2c7380480f92cf1a108a7bdd7a77be"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7a82e068e3469a268b906e714907bfaa"><td class="memItemLeft" align="right" valign="top"><a id="a7a82e068e3469a268b906e714907bfaa"></a>
-virtual <a class="el" href="classCharCell.html">CharCell</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#a7a82e068e3469a268b906e714907bfaa">vCharCell</a> ()</td></tr>
-<tr class="memdesc:a7a82e068e3469a268b906e714907bfaa"><td class="mdescLeft">&#160;</td><td class="mdescRight">downcast to <a class="el" href="classCharCell.html" title="A Cell containing a single Unicode character. ">CharCell</a> <br /></td></tr>
-<tr class="separator:a7a82e068e3469a268b906e714907bfaa"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a71db01fd086cda44388312b57702cb1f"><td class="memItemLeft" align="right" valign="top"><a id="a71db01fd086cda44388312b57702cb1f"></a>
-virtual const <a class="el" href="classComplexCell.html">ComplexCell</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#a71db01fd086cda44388312b57702cb1f">cComplexCell</a> ()</td></tr>
-<tr class="memdesc:a71db01fd086cda44388312b57702cb1f"><td class="mdescLeft">&#160;</td><td class="mdescRight">downcast to const <a class="el" href="classComplexCell.html" title="A celkl containing one complex numbver. ">ComplexCell</a> <br /></td></tr>
-<tr class="separator:a71db01fd086cda44388312b57702cb1f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae35679b8c061868ffd4487039b267349"><td class="memItemLeft" align="right" valign="top"><a id="ae35679b8c061868ffd4487039b267349"></a>
-virtual <a class="el" href="classComplexCell.html">ComplexCell</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#ae35679b8c061868ffd4487039b267349">vComplexCell</a> () const</td></tr>
-<tr class="memdesc:ae35679b8c061868ffd4487039b267349"><td class="mdescLeft">&#160;</td><td class="mdescRight">downcast to <a class="el" href="classComplexCell.html" title="A celkl containing one complex numbver. ">ComplexCell</a> <br /></td></tr>
-<tr class="separator:ae35679b8c061868ffd4487039b267349"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a63b030d0f3c3d2c8c1d742b5a0ba2212"><td class="memItemLeft" align="right" valign="top"><a id="a63b030d0f3c3d2c8c1d742b5a0ba2212"></a>
-virtual const <a class="el" href="classFloatCell.html">FloatCell</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#a63b030d0f3c3d2c8c1d742b5a0ba2212">cFloatCell</a> () const</td></tr>
-<tr class="memdesc:a63b030d0f3c3d2c8c1d742b5a0ba2212"><td class="mdescLeft">&#160;</td><td class="mdescRight">downcast to const <a class="el" href="classFloatCell.html" title="A Cell containing a single floating point (or rational) value. ">FloatCell</a> <br /></td></tr>
-<tr class="separator:a63b030d0f3c3d2c8c1d742b5a0ba2212"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4c8ad1223139fe56e194cf29024a4e90"><td class="memItemLeft" align="right" valign="top"><a id="a4c8ad1223139fe56e194cf29024a4e90"></a>
-virtual <a class="el" href="classFloatCell.html">FloatCell</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#a4c8ad1223139fe56e194cf29024a4e90">vFloatCell</a> ()</td></tr>
-<tr class="memdesc:a4c8ad1223139fe56e194cf29024a4e90"><td class="mdescLeft">&#160;</td><td class="mdescRight">downcast to <a class="el" href="classFloatCell.html" title="A Cell containing a single floating point (or rational) value. ">FloatCell</a> <br /></td></tr>
-<tr class="separator:a4c8ad1223139fe56e194cf29024a4e90"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2fe58ed1c3e83a4abe0b5010b4bae2c3"><td class="memItemLeft" align="right" valign="top"><a id="a2fe58ed1c3e83a4abe0b5010b4bae2c3"></a>
-virtual const <a class="el" href="classIntCell.html">IntCell</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#a2fe58ed1c3e83a4abe0b5010b4bae2c3">cIntCell</a> () const</td></tr>
-<tr class="memdesc:a2fe58ed1c3e83a4abe0b5010b4bae2c3"><td class="mdescLeft">&#160;</td><td class="mdescRight">downcast to const <a class="el" href="classIntCell.html" title="A cell containing a single Integer value. ">IntCell</a> <br /></td></tr>
-<tr class="separator:a2fe58ed1c3e83a4abe0b5010b4bae2c3"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a04de1f852c63d903622aa81b9dc6db4f"><td class="memItemLeft" align="right" valign="top"><a id="a04de1f852c63d903622aa81b9dc6db4f"></a>
-virtual <a class="el" href="classIntCell.html">IntCell</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#a04de1f852c63d903622aa81b9dc6db4f">vIntCell</a> ()</td></tr>
-<tr class="memdesc:a04de1f852c63d903622aa81b9dc6db4f"><td class="mdescLeft">&#160;</td><td class="mdescRight">downcast to <a class="el" href="classIntCell.html" title="A cell containing a single Integer value. ">IntCell</a> <br /></td></tr>
-<tr class="separator:a04de1f852c63d903622aa81b9dc6db4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a06ef9c7f3c6bda37c480412a2bca2e9b"><td class="memItemLeft" align="right" valign="top"><a id="a06ef9c7f3c6bda37c480412a2bca2e9b"></a>
-virtual const <a class="el" href="classLvalCell.html">LvalCell</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#a06ef9c7f3c6bda37c480412a2bca2e9b">cLvalCell</a> () const</td></tr>
-<tr class="memdesc:a06ef9c7f3c6bda37c480412a2bca2e9b"><td class="mdescLeft">&#160;</td><td class="mdescRight">downcast to const <a class="el" href="classLvalCell.html" title="A cell pointing to another cell (which shall be updated) ">LvalCell</a> <br /></td></tr>
-<tr class="separator:a06ef9c7f3c6bda37c480412a2bca2e9b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad80f965066b2fa0e9a40aea2fad0a58b"><td class="memItemLeft" align="right" valign="top"><a id="ad80f965066b2fa0e9a40aea2fad0a58b"></a>
-virtual <a class="el" href="classLvalCell.html">LvalCell</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#ad80f965066b2fa0e9a40aea2fad0a58b">vLvalCell</a> ()</td></tr>
-<tr class="memdesc:ad80f965066b2fa0e9a40aea2fad0a58b"><td class="mdescLeft">&#160;</td><td class="mdescRight">downcast to <a class="el" href="classLvalCell.html" title="A cell pointing to another cell (which shall be updated) ">LvalCell</a> <br /></td></tr>
-<tr class="separator:ad80f965066b2fa0e9a40aea2fad0a58b"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a70e24a88795f797fc66f30879d740ef6"><td class="memItemLeft" align="right" valign="top"><a id="a70e24a88795f797fc66f30879d740ef6"></a>
-virtual const <a class="el" href="classPointerCell.html">PointerCell</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#a70e24a88795f797fc66f30879d740ef6">cPointerCell</a> () const</td></tr>
-<tr class="memdesc:a70e24a88795f797fc66f30879d740ef6"><td class="mdescLeft">&#160;</td><td class="mdescRight">downcast to const <a class="el" href="classPointerCell.html" title="A cell pointing to a (nested) APL value. ">PointerCell</a> <br /></td></tr>
-<tr class="separator:a70e24a88795f797fc66f30879d740ef6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2614478efb21219bcd3435028f697a67"><td class="memItemLeft" align="right" valign="top"><a id="a2614478efb21219bcd3435028f697a67"></a>
-virtual <a class="el" href="classPointerCell.html">PointerCell</a> &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#a2614478efb21219bcd3435028f697a67">vPointerCell</a> ()</td></tr>
-<tr class="memdesc:a2614478efb21219bcd3435028f697a67"><td class="mdescLeft">&#160;</td><td class="mdescRight">downcast to <a class="el" href="classPointerCell.html" title="A cell pointing to a (nested) APL value. ">PointerCell</a> <br /></td></tr>
-<tr class="separator:a2614478efb21219bcd3435028f697a67"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a335a987c2f993cfc3ef3c09d8297dd33"><td class="memItemLeft" align="right" valign="top"><a id="a335a987c2f993cfc3ef3c09d8297dd33"></a>
 void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#a335a987c2f993cfc3ef3c09d8297dd33">operator new</a> (std::size_t, void *)</td></tr>
 <tr class="memdesc:a335a987c2f993cfc3ef3c09d8297dd33"><td class="mdescLeft">&#160;</td><td class="mdescRight">placement new <br /></td></tr>
@@ -625,6 +576,10 @@ static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 static ShapeItem *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#aea7b72b319c82a644d893455516dd8a1">sorted_indices</a> (const <a class="el" href="classCell.html">Cell</a> *ravel, ShapeItem length, Sort_order order, ShapeItem comp_len)</td></tr>
 <tr class="memdesc:aea7b72b319c82a644d893455516dd8a1"><td class="mdescLeft">&#160;</td><td class="mdescRight">return <b>length</b> indices i1, i2, ... iN so that ravel[i1] &lt; ravel[i2] &lt; ... &lt; ravel[iN]. The indices are 0-based and the caller must delete[] the result. Returns 0 on error (= WS FULL). <br /></td></tr>
 <tr class="separator:aea7b72b319c82a644d893455516dd8a1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6c3fdef3d82f53649d1c3f16d37eedd7"><td class="memItemLeft" align="right" valign="top"><a id="a6c3fdef3d82f53649d1c3f16d37eedd7"></a>
+static const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classCell.html#a6c3fdef3d82f53649d1c3f16d37eedd7">get_cell_type_name</a> (CellType ct)</td></tr>
+<tr class="memdesc:a6c3fdef3d82f53649d1c3f16d37eedd7"><td class="mdescLeft">&#160;</td><td class="mdescRight">the name of <b>ct</b> <br /></td></tr>
+<tr class="separator:a6c3fdef3d82f53649d1c3f16d37eedd7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
@@ -646,7 +601,7 @@ void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cl
 <p>A character scalar An integer scalar A floating point scalar A complex number scalar An APL array</p>
 <p>The kind of item is defined by its class, which is derived from <a class="el" href="classCell.html" title="The base class for all Cells. ">Cell</a>. </p>
 
-<p class="definition">Definition at line <a class="el" href="Cell_8hh_source.html#l00054">54</a> of file <a class="el" href="Cell_8hh_source.html">Cell.hh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Cell_8hh_source.html#l00051">51</a> of file <a class="el" href="Cell_8hh_source.html">Cell.hh</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="a957ed66e4cb8e019ed6e80713dd79fc6"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a957ed66e4cb8e019ed6e80713dd79fc6">&#9670;&nbsp;</a></span>greater()</h2>
@@ -674,16 +629,16 @@ void *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="cl
 
 <p>Return <b>true</b> if <b>this</b> cell is greater than <b>other</b>, with: </p>
 <ol type="1">
-<li><a class="el" href="classPointerCell.html" title="A cell pointing to a (nested) APL value. ">PointerCell</a> &gt; <a class="el" href="classNumericCell.html" title="Base class for RealCell and ComplexCell. ">NumericCell</a> &gt; <a class="el" href="classCharCell.html" title="A Cell containing a single Unicode character. ">CharCell</a> 2a. NumericCells sorted by <a class="el" href="classCell.html#a9a0028fd74f00deb001a8062a55916c6" title="Return the real part of a cell. ">get_real_value()</a>. then by <a class="el" href="classCell.html#a0e6b9239fa77e3222f32400d51c8f114" title="Return the imaginary part of a cell. ">get_imag_value()</a> 2b. CharCells sorted by <a class="el" href="classCell.html#ab940e21b6212fbd1bfa8de9f99d090ea" title="Return the character value of a cell. ">get_char_value()</a> 2c. PointerCells sorted by rank, then by shape, then by ravel </li>
+<li><a class="el" href="classPointerCell.html" title="A cell pointing to a (nested) APL value. ">PointerCell</a> &gt; <a class="el" href="classNumericCell.html" title="Base class for RealCell and ComplexCell. ">NumericCell</a> &gt; <a class="el" href="classCharCell.html" title="A Cell containing a single Unicode character. ">CharCell</a> 2a. NumericCells sorted by <a class="el" href="classCell.html#a9a0028fd74f00deb001a8062a55916c6" title="Return the real part of a cell. ">get_real_value()</a>. then by <a class="el" href="classCell.html#a0e6b9239fa77e3222f32400d51c8f114" title="Return the imaginary part of a cell. ">get_imag_value()</a> 2b. CharCells sorted by <a class="el" href="classCell.html#a2999919fc2782b3cebfd925c63cc1fac" title="Return the character value of a cell. ">get_char_value()</a> 2c. PointerCells sorted by rank, then by shape, then by ravel </li>
 </ol>
 
-<p>Reimplemented in <a class="el" href="classFloatCell.html#aae75ec1cf35bf5f9a97b86046573255c">FloatCell</a>, <a class="el" href="classLvalCell.html#a5f68626ab10353bf6874db8daf1126f3">LvalCell</a>, <a class="el" href="classIntCell.html#aab19e1674cbf6f5e3cef614eb3061fc3">IntCell</a>, <a class="el" href="classComplexCell.html#afea8bc960e26dfcc6dd7c8866b9489d7">ComplexCell</a>, <a class="el" href="classPointerCell.html#a62bd5b43e13b7abfdeb9d4fade773ee2">PointerCell</a>, and <a class="el" href="classCharCell.html#aa22b55f220318f86dabbcadb3bc60a7b">CharCell</a>.</p>
+<p>Reimplemented in <a class="el" href="classFloatCell.html#aae75ec1cf35bf5f9a97b86046573255c">FloatCell</a>, <a class="el" href="classIntCell.html#aab19e1674cbf6f5e3cef614eb3061fc3">IntCell</a>, <a class="el" href="classLvalCell.html#a5f68626ab10353bf6874db8daf1126f3">LvalCell</a>, <a class="el" href="classComplexCell.html#afea8bc960e26dfcc6dd7c8866b9489d7">ComplexCell</a>, <a class="el" href="classPointerCell.html#a62bd5b43e13b7abfdeb9d4fade773ee2">PointerCell</a>, and <a class="el" href="classCharCell.html#aa22b55f220318f86dabbcadb3bc60a7b">CharCell</a>.</p>
 
-<p class="definition">Definition at line <a class="el" href="Cell_8cc_source.html#l00109">109</a> of file <a class="el" href="Cell_8cc_source.html">Cell.cc</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Cell_8cc_source.html#l00099">99</a> of file <a class="el" href="Cell_8cc_source.html">Cell.cc</a>.</p>
 
-<p class="reference">References <a class="el" href="Cell_8hh_source.html#l00275">get_classname()</a>.</p>
+<p class="reference">References <a class="el" href="Cell_8hh_source.html#l00273">get_classname()</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="Cell_8cc_source.html#l00127">A_greater_B()</a>, <a class="el" href="PrimitiveFunction_8cc_source.html#l01442">Bif_F2_INTER::eval_AB()</a>, <a class="el" href="Cell_8hh_source.html#l00065">init_other()</a>, and <a class="el" href="ScalarFunction_8cc_source.html#l01125">Bif_F12_WITHOUT::large_eval_AB()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="Cell_8cc_source.html#l00117">A_greater_B()</a>, <a class="el" href="PrimitiveFunction_8cc_source.html#l01569">Bif_F2_INTER::eval_AB()</a>, <a class="el" href="Cell_8hh_source.html#l00062">init_other()</a>, <a class="el" href="ScalarFunction_8cc_source.html#l01141">Bif_F12_WITHOUT::large_eval_AB()</a>, and <a class="el" href="Value_8cc_source.html#l00724">Value::used_members()</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
@@ -697,205 +652,205 @@ Here is the caller graph for this function:</div>
 <div class="dyncontent">
 <div class="center"><img src="classCell_a957ed66e4cb8e019ed6e80713dd79fc6_icgraph.png" border="0" usemap="#classCell_a957ed66e4cb8e019ed6e80713dd79fc6_icgraph" alt=""/></div>
 <map name="classCell_a957ed66e4cb8e019ed6e80713dd79fc6_icgraph" id="classCell_a957ed66e4cb8e019ed6e80713dd79fc6_icgraph">
-<area shape="rect" id="node2" href="classCell.html#a7edb90c346315383846ae9fdb4db8793" title="like greater() but static " alt="" coords="171,1420,296,1447"/>
-<area shape="rect" id="node3" href="classCell.html#ae996571823c6935d2bcafd11509ab222" title="init other from this cell " alt="" coords="398,1369,505,1396"/>
-<area shape="rect" id="node199" href="classBif__F2__INTER.html#a1b8227996771bfea3bab91a9dd5b9496" title="overloaded Function::eval_AB() " alt="" coords="151,1471,316,1497"/>
-<area shape="rect" id="node200" href="classBif__F12__WITHOUT.html#a2c021b4d40a1f616852c1b68f053e86f" title="eval_AB for large A and/or B " alt="" coords="147,1522,320,1563"/>
-<area shape="rect" id="node198" href="classBif__F12__UNION.html#a34eb75bcc9a6d93b92c3535a1848a8c8" title="overloaded Function::eval_B() " alt="" coords="368,1420,535,1447"/>
-<area shape="rect" id="node4" href="classCell.html#a6ff584df467249c47c95570553d1f05e" title="init this Cell from value. If value is a scalar then its first element is used (and value is erased)..." alt="" coords="2079,3633,2221,3660"/>
-<area shape="rect" id="node47" href="classCell.html#aee2392b15c4b30d9e0cd6ba657bcd218" title="return pointer value of a PointerCell or create a scalar with a copy of this cell. " alt="" coords="2099,527,2201,553"/>
-<area shape="rect" id="node52" href="classCell.html#a5af92ab2381e97fbbf120e5bdf4a4e0c" title="copy (deep) count cells from src to val (which is under construction)) " alt="" coords="583,3700,664,3727"/>
-<area shape="rect" id="node53" href="classCell.html#aa5e87e053f81f4e39dd13f1d3282b871" title="deep copy of cell other into this cell " alt="" coords="588,1137,659,1164"/>
-<area shape="rect" id="node190" href="classBif__F12__RHO.html#a8868eb7f9282f40358aed3d05dce7622" title="Reshape B according to rank and shape. " alt="" coords="2280,464,2459,491"/>
-<area shape="rect" id="node196" href="classValue.html#ae9ed3cf5066ae8ab15514c1470c8de4c" title="return a deep copy of this value " alt="" coords="976,2604,1071,2631"/>
-<area shape="rect" id="node5" href="classXML__Loading__Archive.html#aa94a5825fbb0c3c7d5d894a3d8430221" title="read cell(s) starting at cell from string starting at first to number of cells read ..." alt="" coords="2293,3614,2445,3655"/>
-<area shape="rect" id="node9" href="classBif__OPER1__EACH.html#af80ad56d35f5e745298ca77b4dcc9000" title="Overloaded Function::eval_LB(). " alt="" coords="2521,1619,2711,1645"/>
-<area shape="rect" id="node22" href="classBif__OPER2__INNER.html#a007ff8d24a1cb5ce3c94aeb374bfbb8a" title="Overloaded Function::eval_ALRB(). " alt="" coords="4039,1237,4253,1264"/>
-<area shape="rect" id="node29" href="classBif__REDUCE.html#ac35ea88391287d6ed191a0f9c4829df7" title="common implementation of reduce() and reduce_n_wise. " alt="" coords="2284,571,2455,597"/>
-<area shape="rect" id="node6" href="classXML__Loading__Archive.html#ad200f5b98b9cf3e903ccf714a56a1d0f" title="read next Ravel element " alt="" coords="3068,3331,3220,3373"/>
-<area shape="rect" id="node7" href="classXML__Loading__Archive.html#ad0c398f273df586ef1a2cb9b87b9cb41" title="find attribute att_name and return a pointer to its value if found) " alt="" coords="3303,3331,3455,3373"/>
-<area shape="rect" id="node8" href="classXML__Loading__Archive.html#a475b4572fea93849b155009d78afbd66" title="read next Value element, return true on success " alt="" coords="3550,3331,3702,3373"/>
-<area shape="rect" id="node10" href="classBif__F12__PARTITION.html#af115071efaa0c6562d4fc738e3da3e4b" title="enclose_with_axes " alt="" coords="2810,1543,2965,1585"/>
-<area shape="rect" id="node26" href="classBif__OPER1__EACH.html#a6369aa06b1cc76291102b3a9eaa51f4e" title="Constructor. " alt="" coords="2808,1475,2967,1517"/>
-<area shape="rect" id="node27" href="classQuad__FIO.html#a5712aa59abe6b076b7dec60002a9c65b" title="overloaded Function::eval_LXB(). " alt="" coords="2814,1619,2961,1645"/>
-<area shape="rect" id="node11" href="classBif__F12__PARTITION.html#a35604066609e24447533ce63e55589ad" title="implementation of eval_XB() " alt="" coords="3067,1543,3221,1585"/>
-<area shape="rect" id="node12" href="classBif__F12__PARTITION.html#a84a9587d1015edbbf6743230ffe197d2" title="overloaded Function::eval_XB() " alt="" coords="3302,1805,3457,1846"/>
-<area shape="rect" id="node13" href="classBif__F12__TAKE.html#a12a4dce7a5bcae4626edca0e06f97e17" title="overloaded Function::eval_AXB() " alt="" coords="3292,1096,3467,1123"/>
-<area shape="rect" id="node14" href="classBif__F12__TAKE.html#a7f814116b5f692b9bb4252cd77947031" title="overloaded Function::eval_B() " alt="" coords="3547,796,3705,823"/>
-<area shape="rect" id="node25" href="classBif__F12__DROP.html#a62e9378de6e082b0aaa14b952e7bba0b" title="Constructor. " alt="" coords="3520,923,3732,949"/>
-<area shape="rect" id="node15" href="classPrimitiveOperator.html#a70eb65b0ef7b3d942856dd2e9c1f89b3" title="evaluate the fill function with arguments A and B " alt="" coords="3813,799,3957,825"/>
-<area shape="rect" id="node16" href="classBif__SCAN.html#aa358f899fe16ac87ca4908b0ae8f30f9" title="Expand B according to A. " alt="" coords="4079,741,4213,768"/>
-<area shape="rect" id="node24" href="classPrimitiveOperator.html#a031456b39762cba40d32e4b545178241" title="overloaded Function::get_oper_valence(). Most primitive operators are monadic, so we return 1 and ove..." alt="" coords="4081,793,4211,834"/>
-<area shape="rect" id="node17" href="classBif__OPER1__SCAN.html#aef451a2fe30fc1f4fd655bafdab7ce1d" title="Overloaded Function::eval_AXB(). " alt="" coords="4305,691,4506,717"/>
-<area shape="rect" id="node18" href="classBif__OPER1__SCAN1.html#aa936e8de32b934a5e204d542f5f22f12" title="Overloaded Function::eval_AXB(). " alt="" coords="4301,741,4509,768"/>
-<area shape="rect" id="node19" href="classBif__SCAN.html#a4465ed3ac86af96e5b44610bde2d7a81" title="Constructor. " alt="" coords="4329,640,4481,667"/>
-<area shape="rect" id="node20" href="classBif__OPER1__SCAN.html#a6ef71985d8f724cb7a00c068f25ead93" title="Overloaded Function::eval_AB(). " alt="" coords="4309,792,4501,819"/>
-<area shape="rect" id="node21" href="classBif__OPER1__SCAN1.html#af407f26c04df96831e2c51ae949a013f" title="Overloaded Function::eval_AB(). " alt="" coords="4306,843,4505,869"/>
-<area shape="rect" id="node23" href="classBif__OPER2__INNER.html#af0437dd86d98ef9412317252127cb86f" title="Constructor. " alt="" coords="4323,1230,4487,1271"/>
-<area shape="rect" id="node28" href="classQuad__FIO.html#a8b7be28798cb9bfe3e59de4e5f692167" title="overloaded Function::get_oper_valence(). Most primitive operators are monadic, so we return 1 and ove..." alt="" coords="3074,1611,3214,1653"/>
-<area shape="rect" id="node30" href="classBif__REDUCE.html#ad5a27b05591502ed32178f54c77681ff" title="LO&#45;reduce B along axis. " alt="" coords="2541,329,2691,356"/>
-<area shape="rect" id="node33" href="classBif__REDUCE.html#abc7103a727c123bdde6a44344e6bf68e" title="Constructor. " alt="" coords="2791,355,2983,381"/>
-<area shape="rect" id="node37" href="classBif__REDUCE.html#a77f01003003b9e368640b247052c4e65" title="LO&#45;reduce B n&#45;wise along axis. " alt="" coords="2541,486,2691,527"/>
-<area shape="rect" id="node42" href="classBif__SCAN.html#aeaf4a47b2055d9718e0783206a388b46" title="Compute the LO&#45;scan of B. " alt="" coords="2557,843,2675,869"/>
-<area shape="rect" id="node31" href="classBif__OPER1__REDUCE.html#a3954fb59fc430847412139dc0517d67b" title="Overloaded Function::eval_LXB(). " alt="" coords="2778,56,2997,83"/>
-<area shape="rect" id="node32" href="classBif__OPER1__REDUCE1.html#a9e9d37d463d7ee8108947ad110c3f5bc" title="Overloaded Function::eval_LXB(). " alt="" coords="2802,107,2973,149"/>
-<area shape="rect" id="node34" href="classBif__OPER1__REDUCE.html#a8dbc5630a13a7b2e76851bb8c87496b0" title="Overloaded Function::eval_LB(). " alt="" coords="3780,921,3991,948"/>
-<area shape="rect" id="node35" href="classBif__OPER1__REDUCE1.html#addcdf192988251295f4a93e569f41fa6" title="Overloaded Function::eval_LB(). " alt="" coords="2802,238,2973,279"/>
-<area shape="rect" id="node36" href="classBif__OPER1__REDUCE1.html#a6423215a1b70237fe6b8772205883943" title="Overloaded Function::eval_ALB(). " alt="" coords="2802,173,2973,214"/>
-<area shape="rect" id="node38" href="classBif__OPER1__REDUCE.html#a687d594bcccfa11e99624b4c1b88ca22" title="Overloaded Function::eval_ALXB(). " alt="" coords="2773,523,3001,549"/>
-<area shape="rect" id="node39" href="classBif__OPER1__REDUCE1.html#af212083966eaf922d2fc3180d9ac6c5a" title="Overloaded Function::eval_ALXB(). " alt="" coords="2802,574,2973,615"/>
-<area shape="rect" id="node40" href="classBif__OPER1__REDUCE.html#a018fcffc733c92a4f0c5b32eec3e77ad" title="Overloaded Function::eval_ALB(). " alt="" coords="2778,405,2997,432"/>
-<area shape="rect" id="node41" href="classBif__OPER1__REDUCE1.html#a415346d1c96e786a59f2920a916ffd00" title="Overloaded Function::eval_ALB(). " alt="" coords="2802,457,2973,498"/>
-<area shape="rect" id="node43" href="classBif__OPER1__SCAN.html#a9545fab06eaa3846810acb993eb1d15e" title="Overloaded Function::eval_LXB(). " alt="" coords="2788,843,2987,869"/>
-<area shape="rect" id="node44" href="classBif__OPER1__SCAN1.html#a8eecf451e753716742ea329dc79216ba" title="Overloaded Function::eval_ALXB(). " alt="" coords="2784,893,2991,920"/>
-<area shape="rect" id="node45" href="classBif__OPER1__SCAN.html#a45354d796be16443727c978e818be71e" title="Overloaded Function::eval_LB(). " alt="" coords="2792,944,2983,971"/>
-<area shape="rect" id="node46" href="classBif__OPER1__SCAN1.html#a73fe6d8c636a5f3e92ba124d91cc1fa9" title="Overloaded Function::eval_ALB(). " alt="" coords="2789,995,2986,1021"/>
-<area shape="rect" id="node48" href="classBif__OPER1__EACH.html#a90b7f8e9445c34e434d8da64882d23cc" title="Overloaded Function::eval_ALB(). " alt="" coords="2517,995,2715,1021"/>
-<area shape="rect" id="node49" href="classQuad__RE.html#a663fe9ea03c2e5484c305b44c311272f" title="overloaded Function::eval_AXB(). " alt="" coords="2297,333,2442,360"/>
-<area shape="rect" id="node51" href="classQuad__SQL.html#a606d99570957d2b280d5c6cb037c129c" title="Destructor. " alt="" coords="2286,520,2453,547"/>
-<area shape="rect" id="node50" href="classQuad__RE.html#a101ad5a92231d53e9033d44e6e3ee66c" title="overloaded Function::eval_AB(). " alt="" coords="2548,228,2684,255"/>
-<area shape="rect" id="node54" href="classBif__F12__PARTITION.html#ae1c6eee2d1484f849db4a09933c869d7" title="Copy one partition to dest. " alt="" coords="722,2589,877,2630"/>
-<area shape="rect" id="node59" href="classBif__F12__PICK.html#af7f5990ead370d6bd25feec7f152a3f7" title="⊃B " alt="" coords="942,861,1105,888"/>
-<area shape="rect" id="node60" href="classBif__F12__PICK.html#aa197bf415871735cb30c6c83e0c7428c" title="⊃[X]B " alt="" coords="718,823,881,865"/>
-<area shape="rect" id="node61" href="classBif__F12__TAKE.html#ad490548a02adfb14233a8ae9d1870c67" title="Fill Z with B, pad as necessary. " alt="" coords="734,772,865,799"/>
-<area shape="rect" id="node180" href="classPointerCell.html#acccd604366a71acc67657ce5e4f034e0" title="the Quad_CR representation of this cell " alt="" coords="725,1046,873,1087"/>
-<area shape="rect" id="node182" href="classBif__ROTATE.html#adf5bee0a169a9e1caf5c257b75bcc119" title="Reverse B along axis. " alt="" coords="724,1112,875,1139"/>
-<area shape="rect" id="node183" href="classBif__F2__RIGHT.html#ad3887498169171c1b6fea6f90c70a166" title="overloaded Function::eval_AXB() " alt="" coords="712,1163,887,1189"/>
-<area shape="rect" id="node184" href="classQuad__MAP.html#ada2d50f0373eb3cf47c45c4a69554620" title="compute ⎕MAP with (indices of) sorted A " alt="" coords="728,1213,871,1240"/>
-<area shape="rect" id="node186" href="classSymbol.html#ae6f913c7b0cef06f6bd8b6005c207e64" title="Indexed (one&#45;dimensional) assign value to this Symbol. " alt="" coords="717,1264,881,1291"/>
-<area shape="rect" id="node187" href="classValue.html#a700520f88c4f5facadbbf1ca8e21c7ec" title="constructor: a scalar value (i.e. a value with rank 0) from a cell " alt="" coords="751,1315,847,1341"/>
-<area shape="rect" id="node188" href="classValue.html#a7b3ae554237886fd96a5d7fa19f99e91" title="store the scalars in this value into dest... " alt="" coords="752,1365,847,1392"/>
-<area shape="rect" id="node189" href="classValue.html#a1b3d9774062587550a227517c2fe87a4" title="return true iff this value has the same shape as other or one of the values is a scalar ..." alt="" coords="720,1771,879,1813"/>
-<area shape="rect" id="node55" href="classBif__F12__PARTITION.html#a6d086711dcda3fd3af9c99a57c849fcc" title="Partition B according to A. " alt="" coords="946,3357,1101,3398"/>
-<area shape="rect" id="node56" href="classBif__F12__PARTITION.html#a89b8238c7ee631ef1ffe4d842e3b5445" title="overloaded Function::eval_AXB() " alt="" coords="1409,3518,1563,3559"/>
-<area shape="rect" id="node57" href="classBif__F12__PARTITION.html#a984d802a51126de01c11db576010ff0c" title="overloaded Function::eval_AB() " alt="" coords="1172,3357,1327,3398"/>
-<area shape="rect" id="node58" href="classBif__F12__PICK.html#a2e1a301688d30bf5d28af7fdef03d5e9" title="Constructor. " alt="" coords="1387,3364,1585,3391"/>
-<area shape="rect" id="node62" href="classBif__F12__TAKE.html#a8bb05a8aa39a96d9eed83808ff4f0eb0" title="Take from B according to ravel_A. " alt="" coords="942,799,1105,825"/>
-<area shape="rect" id="node63" href="classBif__F12__TAKE.html#a00dd070ce1e49c93b7214ce5dddd5eb3" title="overloaded Function::eval_AB() " alt="" coords="3296,796,3463,823"/>
-<area shape="rect" id="node64" href="classBif__F12__DROP.html#a4732b40e214ff55e87bfb8fd3e3c27f4" title="overloaded Function::eval_AXB() " alt="" coords="1160,843,1339,869"/>
-<area shape="rect" id="node65" href="classQuad__CR.html#a8a53db3f1436cc6bd2d8d4dd230478c2" title="compute 30 ⎕CR B " alt="" coords="1178,2579,1321,2605"/>
-<area shape="rect" id="node69" href="classStateIndicator.html#abf0d83f5f9a8fec57751bf5636933687" title="Maybe print B (according to tag) and erase B. " alt="" coords="1633,1654,1803,1695"/>
-<area shape="rect" id="node66" href="classQuad__CR.html#ac6f426118cad09841c8545efd5ba8a8f" title="compute a ⎕CR B " alt="" coords="1421,3119,1551,3145"/>
-<area shape="rect" id="node67" href="classQuad__CR.html#a8cdaa024940ca59985456109652501e6" title="overloaded Function::eval_AB() " alt="" coords="1649,3169,1787,3196"/>
-<area shape="rect" id="node68" href="classQuad__CR.html#a636bff25ad9c9bf3148b3c9a700b905f" title="Constructor. " alt="" coords="1862,3220,2009,3247"/>
-<area shape="rect" id="node170" href="classValue.html#afd4baae2e44f4810cb99345d52705a58" title="print this value in 4 ⎕CR style " alt="" coords="1653,3119,1783,3145"/>
-<area shape="rect" id="node179" href="classValue.html#a82fd0d84f4c7f0b22a6b035e0201506a" title="print info related to a stale value " alt="" coords="1643,3397,1793,3424"/>
-<area shape="rect" id="node70" href="classPrefix.html#aef5b0bdecb1238c614297de0f0fcedc2" title="reduce phrase END VOID " alt="" coords="1866,1654,2005,1695"/>
-<area shape="rect" id="node71" href="classPrefix.html#a9e7015acf5d54348a8c23a963b14102c" title="reduce phrase END B " alt="" coords="1851,1537,2020,1564"/>
-<area shape="rect" id="node72" href="classPrefix.html#a0a8766d9a7a7dbdca3d4db11970d4872" title="reduce phrase END GOTO B " alt="" coords="2547,3390,2685,3431"/>
-<area shape="rect" id="node75" href="classPrefix.html#a6c12930eb09786dfca6a92f5f9f759b8" title="reduce phrase END GOTO " alt="" coords="1866,1589,2005,1630"/>
-<area shape="rect" id="node77" href="classStateIndicator.html#aa60ca9df0350c7b2e4c0825f061f300e" title="return the nesting level (oldest SI has level 0, next has level 1, ...) " alt="" coords="1871,2471,2000,2513"/>
-<area shape="rect" id="node73" href="classPrefix.html#a5f475ac8e20cc874483a40c975bbf3c1" title="reduce phrase END A GOTO B " alt="" coords="2818,3273,2957,3314"/>
-<area shape="rect" id="node74" href="classPrefix.html#a9a90db040fcaeb604aef06f11e91343f" title="reduce phrase RETC GOTO B " alt="" coords="2814,3390,2961,3431"/>
-<area shape="rect" id="node76" href="classPrefix.html#af3636e8c1fbf2d9278cca5fd055a5444" title="reduce phrase RETC GOTO " alt="" coords="2077,1401,2223,1442"/>
-<area shape="rect" id="node78" href="classXML__Saving__Archive.html#a3bc62d82baa6be004398f70faa1b3e8b" title="write StateIndicator entry si " alt="" coords="2077,2581,2223,2622"/>
-<area shape="rect" id="node79" href="classDoxy.html#adb0f60780eef8f3246d952596a3a19a6" title="HTML&#45;print a table with the SI stack to &#39;page&#39;. " alt="" coords="2561,1973,2671,2000"/>
-<area shape="rect" id="node82" href="classPrefix.html#a810037eaa8e8141565a0aa3e8b5b3d53" title="print the current stack " alt="" coords="2086,3271,2214,3297"/>
-<area shape="rect" id="node83" href="classPrefix.html#a5478ff7d771d95a161c8ee393d50d7b1" title="execute one context (user defined function or operator, execute, or immediate execution) ..." alt="" coords="2282,3220,2457,3247"/>
-<area shape="rect" id="node100" href="classQuad__SI.html#a04a2ce2cb46f970d3670d5fb7a19f0fe" title="overloaded Function::eval_AB(). " alt="" coords="2551,3136,2681,3163"/>
-<area shape="rect" id="node101" href="classStateIndicator.html#ae0a10cdfaa6db7599a737c5974b3c869" title="return the level at which sym is pushed for the nth. time " alt="" coords="2068,2479,2232,2505"/>
-<area shape="rect" id="node118" href="classWorkspace.html#a4c393e0cc87db7d5148100e25d525729" title="Remove the current SI&#45;entry from the SI stack. " alt="" coords="2819,1931,2956,1957"/>
-<area shape="rect" id="node146" href="classWorkspace.html#a1d227be0952fda0d4c1e9f45e60e83e0" title="Create a new SI&#45;entry on the SI stack. " alt="" coords="2078,1467,2222,1493"/>
-<area shape="rect" id="node80" href="classDoxy.html#ad8abe2e8a1b686a7b35e582c369d41ae" title="generate the entire documentation " alt="" coords="2846,1825,2929,1852"/>
-<area shape="rect" id="node81" href="classCommand.html#a834eac0e797a5d1c992018b7d0c049a4" title="]DOXY: create doxygen&#45;like documentation of the current workspace " alt="" coords="3064,1821,3224,1848"/>
-<area shape="rect" id="node96" href="classPrefix.html#aceebcb5133f4ac2659d49acdfb12a56c" title="reset statement to empty state (e.g. after →N) " alt="" coords="2323,3271,2416,3297"/>
-<area shape="rect" id="node84" href="classPrefix.html#a860fb17d998b1a997e410bff87a2d433" title="return the current dyadic function (if any) " alt="" coords="2535,3557,2697,3584"/>
-<area shape="rect" id="node87" href="classStateIndicator.html#aa99bc8ce846dfd1f09c0ca2f250d940e" title="execute token in body... " alt="" coords="2551,2277,2681,2304"/>
-<area shape="rect" id="node85" href="classBif__F12__COMMA.html#a77f007df41df22e1c2cadcdca2702166" title="overloaded Function::eval_B() " alt="" coords="2801,3557,2974,3584"/>
-<area shape="rect" id="node86" href="classBif__F12__COMMA1.html#adb26f76a3786e600dabfcf5d77050a26" title="overloaded Function::eval_B() " alt="" coords="2797,3608,2977,3635"/>
-<area shape="rect" id="node88" href="classExecutable.html#a56bddb63158eedc401fe8ec3ce04f787" title="execute the body of this executable " alt="" coords="2799,2403,2975,2429"/>
-<area shape="rect" id="node89" href="classCommand.html#a879617e7645bea2e4052154f16999634" title="finish the current SI&#45;&gt;top() and pop it when done " alt="" coords="3294,2808,3465,2835"/>
-<area shape="rect" id="node92" href="classExecutable.html#a351c916116ec94d18156d44781bd37de" title="print this user defined executable to out " alt="" coords="3084,2337,3204,2364"/>
-<area shape="rect" id="node90" href="classCommand.html#af36741357bfd4e183b34ee8b747bc7c5" title="process line which contains APL statements " alt="" coords="3523,2037,3729,2064"/>
-<area shape="rect" id="node91" href="classCommand.html#ae26693534d4df16372f51e55e505b8d7" title="process line which contains a command or statements " alt="" coords="3804,2037,3967,2064"/>
-<area shape="rect" id="node93" href="classBif__F1__EXECUTE.html#aefdd09df4262f08f508f9be8543896b7" title="execute string containing an APL expression or an APL command " alt="" coords="3287,1870,3472,1911"/>
-<area shape="rect" id="node94" href="classPrefix.html#a5945631f508108c499b56d7e8de2e88b" title="reduce phrase ASS F B " alt="" coords="3535,1837,3717,1864"/>
-<area shape="rect" id="node95" href="classQuad__Quad.html#a253824f3a533bef36063138ea6ce0673" title="overloaded Symbol::resolve(). " alt="" coords="3815,1932,3956,1959"/>
-<area shape="rect" id="node97" href="classPrefix.html#a00d0f5152e3c1c6bb3eec7d3aa1cdae5" title="set a new PC " alt="" coords="2562,3288,2670,3315"/>
-<area shape="rect" id="node99" href="classStateIndicator.html#abe48451c67c413334c2f9b1bb43014aa" title="continue this StateIndicator (to line N after →N back into it) " alt="" coords="3075,3019,3213,3045"/>
-<area shape="rect" id="node98" href="classStateIndicator.html#abab6fb3f97723c662eaadf1f28b0f718" title="set the current PC " alt="" coords="2810,3221,2965,3248"/>
-<area shape="rect" id="node102" href="classStateIndicator.html#a2d4915de712ba06900582f0918f053a8" title="return the SI that has called this one " alt="" coords="2305,2523,2434,2565"/>
-<area shape="rect" id="node143" href="classSymbol.html#a1c96df106fe08edf98dc596fe2ce5c8c" title="return the level of fun on the stack of this Symbol) on the SI stack " alt="" coords="2296,1923,2443,1949"/>
-<area shape="rect" id="node103" href="classXML__Saving__Archive.html#acc327395cab545ea7797d92f5c931cab" title="write entire workspace " alt="" coords="3306,3062,3453,3103"/>
-<area shape="rect" id="node105" href="classError.html#adf8e47c02b1ae0be1368a0587f7daed4" title="update error information in this and copy it to si " alt="" coords="2537,2227,2695,2253"/>
-<area shape="rect" id="node110" href="classQuad__FIO.html#a8eec79136034bec6a392ada96bba05ba" title="overloaded Function::eval_B(). " alt="" coords="2551,2480,2681,2507"/>
-<area shape="rect" id="node111" href="classQuad__SI.html#a047776250844272eeeaf208b14a64fcf" title="overloaded Function::eval_AB(). " alt="" coords="2555,2531,2677,2557"/>
-<area shape="rect" id="node112" href="classStateIndicator.html#a96351e4245078ee6b48226003d8f38a4" title="return true iff (1) this SI entry is executing funname, or (2) has resolved funname on its prefix par..." alt="" coords="2547,2582,2685,2623"/>
-<area shape="rect" id="node113" href="classSymbol.html#a83ab861edab8a200a43e34b8180ba545" title="assign lambda, eg. V←{ ... } " alt="" coords="2537,2851,2695,2893"/>
-<area shape="rect" id="node115" href="classQuad__EM.html#af44f390bce05f712cdff0ad13f834a12" title="overloaded Symbol::get_apl_value() " alt="" coords="2532,2648,2700,2675"/>
-<area shape="rect" id="node116" href="classQuad__ET.html#a7cfb4dc2ee0ca9bedff94fdaca4e1cc5" title="overloaded Symbol::get_apl_value(). " alt="" coords="2533,2699,2699,2725"/>
-<area shape="rect" id="node117" href="classQuad__LC.html#ab895433f0a602abef92109e81fee1098" title="overloaded Symbol::get_apl_value(). " alt="" coords="2533,2749,2699,2776"/>
-<area shape="rect" id="node121" href="classWorkspace.html#aa83cc5b899c1d994c4f26baf50a79886" title="clear ⎕EM and ⎕ET related errors (error entries on SI up to (including) the next user&#45;defined funct..." alt="" coords="2809,1981,2966,2008"/>
-<area shape="rect" id="node122" href="classWorkspace.html#a4f16b318ce57e107a03017eb87c80983" title="the topmost SI with parse mode PM_FUNCTION " alt="" coords="2537,2379,2695,2405"/>
-<area shape="rect" id="node126" href="classWorkspace.html#a1afdfb370ef91d4c9d67c698165ab3f6" title="the topmost SI with an error " alt="" coords="2533,2176,2699,2203"/>
-<area shape="rect" id="node130" href="classWorkspace.html#ad7b96da66783767d15336f40250fa7cd" title="return oldest SI entry that is running exex, or 0 if none " alt="" coords="2533,2328,2699,2355"/>
-<area shape="rect" id="node133" href="classWorkspace.html#a3b24e2d83089576235f2c43283259709" title="return true iff function funname is on the current call stack " alt="" coords="2543,2429,2689,2456"/>
-<area shape="rect" id="node134" href="classWorkspace.html#a85160b618521a453657a892f454323d4" title="clear the marked flag in all values known in this workspace " alt="" coords="2537,3070,2695,3111"/>
-<area shape="rect" id="node141" href="classWorkspace.html#a5d85f6457bf1dda2d17162c5dbcda14a" title="print all owners of value " alt="" coords="2528,2917,2704,2944"/>
-<area shape="rect" id="node142" href="classWorkspace.html#a30f12a0dafdc723ce2c67dae3d4b0fd3" title="print the SI on out " alt="" coords="2821,3760,2954,3787"/>
-<area shape="rect" id="node104" href="classWorkspace.html#a8a4f1d898d523818dbd9d7efa6f2cf92" title="save this workspace " alt="" coords="3549,3069,3703,3096"/>
-<area shape="rect" id="node106" href="classError.html#a1c91620311957635852e42ba8cd695c4" title="print the 3 error message lines as per ⎕EM " alt="" coords="2833,2184,2941,2211"/>
-<area shape="rect" id="node107" href="classQuad__ES.html#a4c53438162ec63acf71b2a766c533fae" title="common inplementation for eval_AB() and eval_B() " alt="" coords="3057,2183,3231,2209"/>
-<area shape="rect" id="node108" href="classError.html#af47d2ce6f771f8d502d4d1cd05d6f81d" title="throw an Error related to Symbol symbol " alt="" coords="2818,2337,2957,2378"/>
-<area shape="rect" id="node109" href="classError.html#abe0b8d1e092e62ed9f68f3b38a93694d" title="set the source code line where a parse error was thrown " alt="" coords="3073,2285,3215,2312"/>
-<area shape="rect" id="node114" href="classPrefix.html#a60fc54b072efa544535176ff29469a0b" title="reduce phrase V ASS F " alt="" coords="2800,2909,2975,2936"/>
-<area shape="rect" id="node119" href="classWorkspace.html#a87ccdd5258241c8e7d30cd38d8f609bf" title="clear the SI " alt="" coords="3072,1984,3216,2011"/>
-<area shape="rect" id="node120" href="classWorkspace.html#ade3a373ad48eb7a8fbad97a28472db7f" title="clear the workspace " alt="" coords="3303,1987,3456,2013"/>
-<area shape="rect" id="node123" href="classQuad__L.html#a3a592e9359ea191f10a25fd7a2870380" title="overloaded Symbol::assign() " alt="" coords="2831,2656,2944,2683"/>
-<area shape="rect" id="node124" href="classQuad__R.html#a6414e451e73580b51664ec3f6fe844f9" title="overloaded Symbol::assign() " alt="" coords="2829,2555,2945,2581"/>
-<area shape="rect" id="node125" href="classQuad__X.html#a238be31414ccf35b15feba72e542e341" title="overloaded Symbol::assign() " alt="" coords="2830,2605,2945,2632"/>
-<area shape="rect" id="node127" href="classQuad__L.html#a642efbd79919b2375bfe6e310d968d02" title="overloaded Symbol::get_apl_value(). " alt="" coords="2810,2133,2965,2160"/>
-<area shape="rect" id="node128" href="classQuad__R.html#a54f424aeb814ac8721ee762e62522090" title="overloaded Symbol::get_apl_value(). " alt="" coords="2808,2032,2967,2059"/>
-<area shape="rect" id="node129" href="classQuad__X.html#a8ab477f40371bc4745e0015bfa9718d7" title="overloaded Symbol::get_apl_value(). " alt="" coords="2809,2083,2966,2109"/>
-<area shape="rect" id="node131" href="classSymbol.html#a35d1a9b891e5e78ad10eb372fe185b2b" title="set current NameClass of this Symbol to NC_UNUSED_USER_NAME and remove any values associated with thi..." alt="" coords="2826,2504,2949,2531"/>
-<area shape="rect" id="node132" href="classSymbolTable.html#a63125005c7124354304526f8d63d188f" title="erase one symbol, return true on error, false on success " alt="" coords="3075,2497,3213,2538"/>
-<area shape="rect" id="node135" href="classValue.html#a80c3e1a7208f4f97985e5c742ec93b2d" title="print stale Values, and return the number of stale Values. " alt="" coords="2826,3507,2949,3533"/>
-<area shape="rect" id="node136" href="classCommand.html#af5d73db57801b2363c954b402f19186d" title="check workspace integrity (stale Value and IndexExpr objects, etc) " alt="" coords="3059,3452,3229,3479"/>
-<area shape="rect" id="node137" href="classIO__Files.html#aa05a2917c11a88b9abfc4afa6ca04a3e" title="dito (close files, print errors, summary etc). " alt="" coords="3049,3760,3239,3787"/>
-<area shape="rect" id="node138" href="classIO__Files.html#acc91875b8e0c7a5ad44e3ead0e3dda7b" title="get one line from the current file, open the next file if necceessary " alt="" coords="3305,3553,3453,3580"/>
-<area shape="rect" id="node140" href="classIO__Files.html#a5ac43f7fe811ca95a419f8ba7a11682e" title="close current testcase file (prematurely) and opem mext one " alt="" coords="3315,3760,3443,3787"/>
-<area shape="rect" id="node139" href="classInputMux.html#a8a79cbe5207cde162fb36133ad9defdd" title="get one line " alt="" coords="3561,3476,3691,3503"/>
-<area shape="rect" id="node144" href="classDoxy.html#af9ca0f4064c30a802fa110c53d42c37b" title="HTML&#45;print a table containing all defined functions to page. " alt="" coords="2541,1872,2691,1899"/>
-<area shape="rect" id="node145" href="classDoxy.html#ad310686a39a631dd99823ec9c2e5ace0" title="HTML&#45;print a table with all variables to &#39;page&#39;. " alt="" coords="2542,1821,2690,1848"/>
-<area shape="rect" id="node147" href="classQuad__EC.html#ad178c1afa2211a7b0a020e1e5c40750d" title="overloaded Function::eval_B(). " alt="" coords="2306,1197,2433,1224"/>
-<area shape="rect" id="node148" href="classUserFunction.html#a2a614ee0fd44fa175227a2f22c75a5e1" title="Overloaded Function::eval_() " alt="" coords="2300,1365,2439,1392"/>
-<area shape="rect" id="node150" href="classUserFunction.html#a5b070e31b5b122efd1e6620d5138c128" title="Overloaded Function::eval_B() " alt="" coords="2295,1147,2443,1173"/>
-<area shape="rect" id="node152" href="classUserFunction.html#a267fc88730e3f79990fb636cc68d7118" title="Overloaded Function::eval_XB() " alt="" coords="2291,1416,2448,1443"/>
-<area shape="rect" id="node153" href="classUserFunction.html#aa2ce883e6371a27830c4436405a52aa9" title="Overloaded Function::eval_AB() " alt="" coords="2291,1771,2448,1797"/>
-<area shape="rect" id="node156" href="classUserFunction.html#a596bcedce6af657f36e89c95320a64b8" title="Overloaded Function::eval_AXB() " alt="" coords="2286,1248,2453,1275"/>
-<area shape="rect" id="node157" href="classUserFunction.html#aa463215c06f1a3f0402c08fff45266f7" title="Overloaded Function::eval_LB. " alt="" coords="2292,1669,2447,1696"/>
-<area shape="rect" id="node158" href="classUserFunction.html#ac564f63a1685fe0cc3da40a91c816c37" title="Overloaded Function::eval_LXB() " alt="" coords="2287,893,2451,920"/>
-<area shape="rect" id="node160" href="classUserFunction.html#af4887d6046d182b483ccd9ca8f617677" title="Overloaded Function::eval_ALB. " alt="" coords="2287,1096,2451,1123"/>
-<area shape="rect" id="node162" href="classUserFunction.html#a426cc3daca4a9aacec3ffd9e295ca190" title="Overloaded Function::eval_ALXB() " alt="" coords="2283,1045,2456,1072"/>
-<area shape="rect" id="node164" href="classUserFunction.html#a73ee4e7ba92f80f3b062238510edaca9" title="Overloaded Function::eval_LRB() " alt="" coords="2287,1568,2452,1595"/>
-<area shape="rect" id="node167" href="classUserFunction.html#ae937a218fc6107e6206f7e367f5a8bfe" title="Overloaded Function::eval_LRXB() " alt="" coords="2282,1467,2457,1493"/>
-<area shape="rect" id="node168" href="classUserFunction.html#ac26913570373e080392fd49c30082756" title="Overloaded Function::eval_ALRB() " alt="" coords="2282,1517,2457,1544"/>
-<area shape="rect" id="node169" href="classUserFunction.html#a31fcf39e484947e0c4c15df782538635" title="Overloaded Function::eval_ALRXB() " alt="" coords="2303,1299,2435,1341"/>
-<area shape="rect" id="node149" href="classUserFunction.html#afcfbceabaaaa2977561464a72a56f505" title="overloaded Executable::get_sym_Z() " alt="" coords="2529,1365,2703,1392"/>
-<area shape="rect" id="node151" href="classQuad__INP.html#af688ee6030e38fa5c15538a5ba7cdc10" title="overloaded Function::eval_AB(). " alt="" coords="2546,1163,2686,1189"/>
-<area shape="rect" id="node154" href="classQuad__EA.html#a9b9c3aa5188444ab5867a5251e86f325" title="overloaded Function::eval_AB(). " alt="" coords="2549,1720,2683,1747"/>
-<area shape="rect" id="node155" href="classQuad__EB.html#a7bb48c846be76b65a048e288df8ef229" title="overloaded Function::eval_AB(). " alt="" coords="2549,1669,2683,1696"/>
-<area shape="rect" id="node159" href="classBif__OPER2__RANK.html#a128af301c416807ea81a31f023af2a23" title="the &#39;normalized&#39; implementation of all eval_Lxxx*( functions " alt="" coords="2518,944,2714,971"/>
-<area shape="rect" id="node161" href="classBif__OPER2__OUTER.html#a748e51df2e06f1e1b588231c5da12729" title="Overloaded Function::eval_ALRB(). " alt="" coords="2507,1112,2725,1139"/>
-<area shape="rect" id="node163" href="classBif__OPER2__RANK.html#a589092ac19e8ddb10dfa766304521b5b" title="the &#39;normalized&#39; implementation of all eval_ALxxx*( functions " alt="" coords="2537,1046,2695,1087"/>
-<area shape="rect" id="node165" href="classBif__OPER2__POWER.html#a8b9df7074bc55dfb2c2bc21937b83ca6" title="eval_ALRB() or eval_LRB() for numeric RO (aka. Form 1) " alt="" coords="2526,1487,2706,1529"/>
-<area shape="rect" id="node166" href="classBif__OPER2__POWER.html#a708b42a09509be8c639d330d8e06cf62" title="eval_ALRB() or eval_LRB() for numeric RO (aka. Form 1) " alt="" coords="2526,1553,2706,1594"/>
-<area shape="rect" id="node171" href="classQuad__TF.html#a4aa501720adbb19aed9599912a8a8b07" title="append ravel of value in tf2_format to ucs. Return true iff the value should be enclosed in parenthes..." alt="" coords="2547,3187,2685,3213"/>
-<area shape="rect" id="node172" href="classQuad__TF.html#a2aa5ee00d25d18308ef22d666b3bbf40" title="return B in transfer format 2 (new APL format) for a variable " alt="" coords="2825,2757,2949,2784"/>
-<area shape="rect" id="node178" href="classQuad__TF.html#a7cecac14ed05f07d7b44a5c90d820f03" title="append ravel cells in tf2_format to ucs. " alt="" coords="2820,3120,2955,3147"/>
-<area shape="rect" id="node173" href="classQuad__TF.html#aad2b15f3268d7098d75babcd03e5c762" title="return B in transfer format 2 (new APL2 format) " alt="" coords="3095,2389,3193,2416"/>
-<area shape="rect" id="node176" href="classSymbol.html#a6b9b4537d95855e6490a8ec1b64b6cce" title="write this symbol in )OUT format to file out " alt="" coords="3075,2757,3213,2784"/>
-<area shape="rect" id="node174" href="classQuad__TF.html#a0b9baf30e622ebe20e0afc21f32ec644" title="Overloaded Function::eval_AB(). " alt="" coords="3313,1619,3446,1645"/>
-<area shape="rect" id="node175" href="classQuad__TF.html#ae9b15fd0ae227d3a550f01a164f76af8" title="Constructor. " alt="" coords="3557,1619,3695,1645"/>
-<area shape="rect" id="node177" href="classWorkspace.html#a7ffca45a4446b644e7caf093a1699ba2" title="write symbols for )OUT command " alt="" coords="3300,2757,3459,2784"/>
-<area shape="rect" id="node181" href="classPointerCell.html#ada09bbf55cb9d549f4ad75d67b5c41a5" title="overloaded Cell::is_pointer_cell() " alt="" coords="935,1053,1112,1080"/>
-<area shape="rect" id="node185" href="classQuad__MAP.html#a3c1fc83083fa5396b0efedc959654dc4" title="overloaded Function::eval_AB() " alt="" coords="950,1213,1097,1240"/>
-<area shape="rect" id="node191" href="classQuad__TF.html#aa43ae2aeec77ca2a18070bfa19003e89" title="replace pattern A ⍴ B in tos with the single token (A⍴B); return true iff done so. " alt="" coords="2525,279,2707,305"/>
-<area shape="rect" id="node192" href="classQuad__TF.html#a0d12bc9c1c1710992edb76fca1b7c6af" title="simplify tos by removing UCS nnn etc. " alt="" coords="2815,5,2960,32"/>
-<area shape="rect" id="node193" href="classQuad__TF.html#a293263bd9b2bf923dc9e4113dded832f" title="try inverse ⎕TF2 of ucs, set new_var_or_fun if successful " alt="" coords="3070,93,3218,120"/>
-<area shape="rect" id="node194" href="structCommand_1_1transfer__context.html#a4e80a2899a02285ba89e58792e6150ea" title="process a &#39;A&#39; (array in 2 ⎕TF format) item. " alt="" coords="3287,118,3471,159"/>
-<area shape="rect" id="node195" href="structCommand_1_1transfer__context.html#afee6856208966168d158de45145dd4ca" title="process an &#39;F&#39; (function in 2 ⎕TF format) item. " alt="" coords="3287,53,3471,94"/>
-<area shape="rect" id="node197" href="classValue.html#a6a2bad8eb6d09cd57f235709fe58a9f9" title="return this indexed by (one&#45;dimensional) IDX. " alt="" coords="1202,2680,1297,2707"/>
+<area shape="rect" id="node2" href="classCell.html#a7edb90c346315383846ae9fdb4db8793" title="like greater() but static " alt="" coords="171,2937,296,2964"/>
+<area shape="rect" id="node3" href="classCell.html#aab9681b3e735d10ef92978c5c17bf95d" title="init (uninitialized) Cell other from this initialized cell " alt="" coords="410,2887,517,2913"/>
+<area shape="rect" id="node195" href="classBif__F2__INTER.html#aea1da324cf89caf1f4ab2c31201ebcb8" title="overloaded Function::eval_AB() " alt="" coords="151,2988,316,3015"/>
+<area shape="rect" id="node196" href="classBif__F12__WITHOUT.html#a2c021b4d40a1f616852c1b68f053e86f" title="eval_AB for large A and/or B " alt="" coords="147,3039,320,3081"/>
+<area shape="rect" id="node197" href="classValue.html#aafa578eaa72b9db66546ac31b7c8ab93" title="store the row numbers (starting at 0) in result so that this[rows] is a (used) row, maybe sorted. in result. Only used rows are returned. " alt="" coords="157,3291,309,3317"/>
+<area shape="rect" id="node194" href="classBif__F12__UNION.html#aa78bb6fe147dcc3a3343c3c1f7ad6c66" title="overloaded Function::eval_B() " alt="" coords="380,2937,547,2964"/>
+<area shape="rect" id="node4" href="classCell.html#a6ff584df467249c47c95570553d1f05e" title="init this Cell from value. If value is a scalar then its first element is used (and value is erased)..." alt="" coords="631,2861,773,2888"/>
+<area shape="rect" id="node26" href="classCell.html#ace1480b3a8beacc93cac91ebce845905" title="init this Cell from a (possibly deep) copy of other " alt="" coords="667,3148,737,3175"/>
+<area shape="rect" id="node41" href="classCell.html#a62e4fd0b2c216efc0e23904e53ca7ecc" title="copy (deep) count cells from src to dest) " alt="" coords="661,165,743,192"/>
+<area shape="rect" id="node52" href="classValue.html#ae9ed3cf5066ae8ab15514c1470c8de4c" title="return a deep copy of this value " alt="" coords="655,2912,749,2939"/>
+<area shape="rect" id="node5" href="classBif__REDUCE.html#a74ec7563f72cc91111801a73284c6373" title="common implementation of reduce() and reduce_n_wise. " alt="" coords="2007,3039,2178,3065"/>
+<area shape="rect" id="node6" href="classBif__REDUCE.html#a4d5bcbf32a90de083aef34f0e3a0a212" title="LO&#45;reduce B along axis. " alt="" coords="2262,3039,2413,3065"/>
+<area shape="rect" id="node14" href="classBif__REDUCE.html#a450260486cb0a169a1f13602cae9ab97" title="LO&#45;reduce B n&#45;wise along axis. " alt="" coords="2262,2846,2413,2887"/>
+<area shape="rect" id="node19" href="classBif__REDUCE.html#abc7103a727c123bdde6a44344e6bf68e" title="Constructor. " alt="" coords="2241,3192,2433,3219"/>
+<area shape="rect" id="node20" href="classBif__SCAN.html#a796038c05f7946ae72143ef64c773a1f" title="Compute the LO&#45;scan of B. " alt="" coords="2278,3141,2397,3168"/>
+<area shape="rect" id="node7" href="classBif__OPER1__REDUCE.html#aed5704b99e4ff296d84b329cfcc9048c" title="Overloaded Function::eval_LXB(). " alt="" coords="2499,3064,2718,3091"/>
+<area shape="rect" id="node8" href="classBif__OPER1__REDUCE1.html#a9bb990c9c5944c780452941e13d39c0d" title="Overloaded Function::eval_LXB(). " alt="" coords="2523,3115,2694,3157"/>
+<area shape="rect" id="node9" href="classBif__REDUCE.html#ab33877fbb6938417e4053761eab5e0d5" title="overloaded Function::may_push_SI() " alt="" coords="2513,2963,2704,2989"/>
+<area shape="rect" id="node10" href="classBif__OPER1__REDUCE.html#a1f613b8ac81791d7c61b3e0a9f6e70ba" title="Overloaded Function::eval_LB(). " alt="" coords="2503,3013,2714,3040"/>
+<area shape="rect" id="node13" href="classBif__OPER1__REDUCE1.html#a6bd690931eba7929294983c39655ffa1" title="Overloaded Function::eval_LB(). " alt="" coords="2523,3181,2694,3222"/>
+<area shape="rect" id="node11" href="classBif__OPER2__INNER.html#adbaaf10669f72e39cc58d5dcdab6c5fe" title="Overloaded Function::eval_ALRB(). " alt="" coords="2771,2553,2985,2580"/>
+<area shape="rect" id="node12" href="classBif__OPER2__INNER.html#af0437dd86d98ef9412317252127cb86f" title="Constructor. " alt="" coords="3044,2546,3208,2587"/>
+<area shape="rect" id="node15" href="classBif__OPER1__REDUCE.html#a06f59f7c71977fda6d2ca0e99389b659" title="Overloaded Function::eval_ALXB(). " alt="" coords="2495,2795,2723,2821"/>
+<area shape="rect" id="node16" href="classBif__OPER1__REDUCE1.html#ad48531d0b47915421f4aca74bab3b31d" title="Overloaded Function::eval_ALXB(). " alt="" coords="2523,2846,2694,2887"/>
+<area shape="rect" id="node17" href="classBif__OPER1__REDUCE.html#a584c1a00ef6b21b457c869a862fe4775" title="Overloaded Function::eval_ALB(). " alt="" coords="2499,2912,2718,2939"/>
+<area shape="rect" id="node18" href="classBif__OPER1__REDUCE1.html#a1c98ca9e70231d9a1fe491c64e46f8a8" title="Overloaded Function::eval_ALB(). " alt="" coords="2523,2729,2694,2770"/>
+<area shape="rect" id="node21" href="classBif__OPER1__SCAN.html#ace7710f31a43abd663e582cf96cb9169" title="Overloaded Function::eval_LXB(). " alt="" coords="2509,3247,2708,3273"/>
+<area shape="rect" id="node22" href="classBif__OPER1__SCAN1.html#adb20c6d87fb95f93fc8230f4984c4041" title="Overloaded Function::eval_ALXB(). " alt="" coords="2505,3297,2712,3324"/>
+<area shape="rect" id="node23" href="classBif__SCAN.html#a4465ed3ac86af96e5b44610bde2d7a81" title="Constructor. " alt="" coords="2533,3348,2685,3375"/>
+<area shape="rect" id="node24" href="classBif__OPER1__SCAN.html#afaa44934b4c7bc25b517e3acfe41507b" title="Overloaded Function::eval_LB(). " alt="" coords="2513,3399,2704,3425"/>
+<area shape="rect" id="node25" href="classBif__OPER1__SCAN1.html#a191214991f49b5ce2649400f76f25893" title="Overloaded Function::eval_ALB(). " alt="" coords="2510,3449,2707,3476"/>
+<area shape="rect" id="node27" href="classPrefix.html#acd28cf08ded62eca44eda712aae2bd8d" title="reduce phrase D V " alt="" coords="864,3207,1015,3233"/>
+<area shape="rect" id="node29" href="classQuad__JSON.html#af9e8ac641cd521e54d250971dd66e0b4" title="parse a JSON object member: &quot;name&quot; : value , ; and increment token0 along the way. " alt="" coords="850,3258,1029,3299"/>
+<area shape="rect" id="node37" href="classQuad__MAP.html#ada2d50f0373eb3cf47c45c4a69554620" title="compute ⎕MAP with (indices of) sorted A " alt="" coords="868,3345,1011,3372"/>
+<area shape="rect" id="node39" href="classSymbol.html#ae6f913c7b0cef06f6bd8b6005c207e64" title="Indexed (one&#45;dimensional) assign value to this Symbol. " alt="" coords="857,3089,1021,3116"/>
+<area shape="rect" id="node40" href="classValue.html#a1b3d9774062587550a227517c2fe87a4" title="return true iff this value has the same shape as other or one of the values is a scalar ..." alt="" coords="860,3141,1019,3182"/>
+<area shape="rect" id="node28" href="classPrefix.html#a8d61c8a29f9c33343577b681a6b38ef6" title="reduce phrase D V ASS B " alt="" coords="1103,3189,1239,3230"/>
+<area shape="rect" id="node30" href="classQuad__JSON.html#a089835d5e18fc87f25971bb49046ae88" title="parse a JSON object: { member ( , member)* } and increment token0 " alt="" coords="1081,3305,1260,3332"/>
+<area shape="rect" id="node31" href="classQuad__JSON.html#a1e973192b2dccc89283c8ba4697923fc" title="parse a JSON value (false, null, true, object, array, number, or string) and increment along the way..." alt="" coords="1316,3280,1491,3307"/>
+<area shape="rect" id="node32" href="classQuad__JSON.html#ae101226211d05605bee074e4d3a66f8e" title="convert JSON string to APL associative array " alt="" coords="1551,3331,1741,3357"/>
+<area shape="rect" id="node36" href="classQuad__JSON.html#ad6c1178f70936d2d153b1581e28e8d52" title="parse a JSON array: [ value (, value)* ] and increment token0 along the way. " alt="" coords="1560,3280,1732,3307"/>
+<area shape="rect" id="node33" href="classQuad__JSON.html#a7488f4e12a005de36c3fa9887e4909e5" title="overloaded Function::eval_B() " alt="" coords="1803,3331,1947,3357"/>
+<area shape="rect" id="node34" href="classQuad__JSON.html#a3adb4fba903343bf38b0c3a1dd10feb8" title="overloaded Function::eval_B() " alt="" coords="2261,3369,2414,3396"/>
+<area shape="rect" id="node35" href="classQuad__JSON.html#a2ed44b39f5d092ab5f7e1768c6b8615a" title="return JSON file (&#45;name in B) converted to APL structured value " alt="" coords="2007,3369,2178,3396"/>
+<area shape="rect" id="node38" href="classQuad__MAP.html#af2931692d6fcc941e0ae64b9c4404c38" title="overloaded Function::eval_AB() " alt="" coords="1097,3356,1244,3383"/>
+<area shape="rect" id="node42" href="classBif__COMMA.html#a981489e2a8a459e0b6964ba3028c61de" title="Prepend scalar cell_A to B along axis. " alt="" coords="864,99,1015,141"/>
+<area shape="rect" id="node43" href="classBif__COMMA.html#a4786cd6dc378a9ff7eb6fb56889885f3" title="Catenate A and B. " alt="" coords="1093,56,1248,83"/>
+<area shape="rect" id="node50" href="classBif__COMMA.html#a1f980b9ff0869c8d3bb1ddd27d61a415" title="Prepend scalar cell_B to A along axis. " alt="" coords="845,165,1033,192"/>
+<area shape="rect" id="node51" href="classBif__COMMA.html#a5fb83eaf9d7e3a43f7b80ef2dadd06c5" title="Laminate A and B. " alt="" coords="1094,157,1247,184"/>
+<area shape="rect" id="node49" href="classBif__COMMA.html#aca0328e5d2b45430ab047851dc4d12fc" title="Constructor. " alt="" coords="1314,157,1493,184"/>
+<area shape="rect" id="node44" href="classBif__F12__COMMA.html#a87fad1aaa970af9f453d357390ef4299" title="overloaded Function::eval_AB() " alt="" coords="1312,56,1495,83"/>
+<area shape="rect" id="node46" href="classBif__F12__COMMA.html#aace5736c91d14f2eeb35cc03b0133d8b" title="overloaded Function::eval_AXB() " alt="" coords="1308,107,1499,133"/>
+<area shape="rect" id="node48" href="classBif__F12__COMMA1.html#adb234524e9ba2ad95fba11a405c070a4" title="overloaded Function::eval_AB() " alt="" coords="1309,5,1498,32"/>
+<area shape="rect" id="node45" href="classBif__F12__UNION.html#a0929eb6bc282f9c312db42fdfa78686d" title="overloaded Function::eval_AB() " alt="" coords="1559,56,1733,83"/>
+<area shape="rect" id="node47" href="classBif__F12__COMMA1.html#a1589f5cd171a057b7c45ccdbee3d826a" title="overloaded Function::eval_AXB() " alt="" coords="1547,107,1745,133"/>
+<area shape="rect" id="node53" href="classQuad__CR.html#ac6f426118cad09841c8545efd5ba8a8f" title="compute a ⎕CR B " alt="" coords="1106,2887,1235,2913"/>
+<area shape="rect" id="node191" href="classQuad__CR.html#a8a53db3f1436cc6bd2d8d4dd230478c2" title="compute 30 ⎕CR B " alt="" coords="868,2988,1011,3015"/>
+<area shape="rect" id="node192" href="classQuad__XML.html#a2c3c8a5e317d6e322a52426b36d1e233" title="iterator: return the next member after A in structured value B " alt="" coords="852,2887,1027,2913"/>
+<area shape="rect" id="node193" href="classValue.html#aad04e796b926355040d462e81b9d7f11" title="return this indexed by (one&#45;dimensional) IDX. " alt="" coords="892,2937,987,2964"/>
+<area shape="rect" id="node54" href="classQuad__CR.html#ac60b988ceaf002189a8c60337752048f" title="overloaded Function::eval_AB() " alt="" coords="1335,2887,1472,2913"/>
+<area shape="rect" id="node56" href="classQuad__CR.html#a4a7057e997df3f1607b2e003ef7279f6" title="overloaded Function::eval_XB() " alt="" coords="1577,2937,1715,2964"/>
+<area shape="rect" id="node57" href="classStateIndicator.html#abf0d83f5f9a8fec57751bf5636933687" title="Maybe print B (according to tag) and erase B. " alt="" coords="1319,1417,1488,1458"/>
+<area shape="rect" id="node182" href="classValue.html#a6f574c5690fbcf4024a78ed14a8375db" title="print this value in 4 ⎕CR style " alt="" coords="1338,2988,1469,3015"/>
+<area shape="rect" id="node190" href="classValue.html#a82fd0d84f4c7f0b22a6b035e0201506a" title="print info related to a stale value " alt="" coords="1328,2836,1479,2863"/>
+<area shape="rect" id="node55" href="classQuad__CR.html#a636bff25ad9c9bf3148b3c9a700b905f" title="Constructor. " alt="" coords="1573,2887,1719,2913"/>
+<area shape="rect" id="node58" href="classPrefix.html#aef5b0bdecb1238c614297de0f0fcedc2" title="reduce phrase END VOID " alt="" coords="1577,1329,1715,1370"/>
+<area shape="rect" id="node59" href="classPrefix.html#a9e7015acf5d54348a8c23a963b14102c" title="reduce phrase END B " alt="" coords="1561,1395,1731,1421"/>
+<area shape="rect" id="node60" href="classPrefix.html#a0a8766d9a7a7dbdca3d4db11970d4872" title="reduce phrase END GOTO B " alt="" coords="2268,171,2407,213"/>
+<area shape="rect" id="node63" href="classPrefix.html#a6c12930eb09786dfca6a92f5f9f759b8" title="reduce phrase END GOTO " alt="" coords="1577,1609,1715,1650"/>
+<area shape="rect" id="node65" href="classStateIndicator.html#aa60ca9df0350c7b2e4c0825f061f300e" title="return the nesting level (oldest SI has level 0, next has level 1, ...) " alt="" coords="1581,1446,1711,1487"/>
+<area shape="rect" id="node61" href="classPrefix.html#a5f475ac8e20cc874483a40c975bbf3c1" title="reduce phrase END A GOTO B " alt="" coords="2539,171,2678,213"/>
+<area shape="rect" id="node62" href="classPrefix.html#a9a90db040fcaeb604aef06f11e91343f" title="reduce phrase RETC GOTO B " alt="" coords="2535,106,2682,147"/>
+<area shape="rect" id="node64" href="classPrefix.html#af3636e8c1fbf2d9278cca5fd055a5444" title="reduce phrase RETC GOTO " alt="" coords="1802,2167,1949,2209"/>
+<area shape="rect" id="node66" href="classXML__Saving__Archive.html#a3bc62d82baa6be004398f70faa1b3e8b" title="write StateIndicator entry si " alt="" coords="1802,1707,1949,1749"/>
+<area shape="rect" id="node67" href="classXML__Loading__Archive.html#a486705e0f7d900feed8c8fce0bbb9f46" title="find a lambda in the current SI entry " alt="" coords="1799,66,1951,107"/>
+<area shape="rect" id="node74" href="classDoxy.html#adb0f60780eef8f3246d952596a3a19a6" title="HTML&#45;print a table with the SI stack to &#39;page&#39;. " alt="" coords="2283,1453,2392,1480"/>
+<area shape="rect" id="node77" href="classPrefix.html#a810037eaa8e8141565a0aa3e8b5b3d53" title="print the current stack " alt="" coords="1811,259,1939,285"/>
+<area shape="rect" id="node78" href="classPrefix.html#a5478ff7d771d95a161c8ee393d50d7b1" title="execute one context (user defined function or operator, execute, or immediate execution) ..." alt="" coords="2005,1605,2180,1632"/>
+<area shape="rect" id="node92" href="classQuad__SI.html#a703fb389406e0f834f26f993e0997384" title="overloaded Function::eval_AB(). " alt="" coords="2272,344,2403,371"/>
+<area shape="rect" id="node93" href="classStateIndicator.html#ae0a10cdfaa6db7599a737c5974b3c869" title="return the level at which sym is pushed for the nth. time " alt="" coords="1793,1175,1957,1201"/>
+<area shape="rect" id="node110" href="classWorkspace.html#a4c393e0cc87db7d5148100e25d525729" title="Remove the current SI&#45;entry from the SI stack. " alt="" coords="2540,1403,2677,1429"/>
+<area shape="rect" id="node142" href="classWorkspace.html#a16b43d277c7495423f3a1db945d1ca62" title="Create a new SI&#45;entry on the SI stack. " alt="" coords="1803,2116,1947,2143"/>
+<area shape="rect" id="node68" href="classXML__Loading__Archive.html#ac281f8500311f7c498243ec23ee1d143" title="read a system function with attribute id_prefix&#45;id or a user defined functions with attributes &#39;ufun_..." alt="" coords="2017,41,2169,82"/>
+<area shape="rect" id="node69" href="classXML__Loading__Archive.html#a619b73db295d1c88790d671a9ce7fef4" title="read a token " alt="" coords="2261,41,2413,82"/>
+<area shape="rect" id="node70" href="classXML__Loading__Archive.html#a7381cad28d73cdca8a76bf741921c63d" title="read parsers in SI entry " alt="" coords="2533,41,2685,82"/>
+<area shape="rect" id="node71" href="classXML__Loading__Archive.html#adfa844fcc401d3c335cafa5abda2f35d" title="read next StateIndicator entry " alt="" coords="2802,230,2954,271"/>
+<area shape="rect" id="node72" href="classXML__Loading__Archive.html#ad2f1d88070976eab8a41f0fdcd1e0ec1" title="read next StateIndicator element " alt="" coords="3050,230,3202,271"/>
+<area shape="rect" id="node73" href="classXML__Loading__Archive.html#ad0c398f273df586ef1a2cb9b87b9cb41" title="find attribute att_name and return: a pointer to its value if found, 0 if optional is true..." alt="" coords="3294,230,3446,271"/>
+<area shape="rect" id="node75" href="classDoxy.html#ad8abe2e8a1b686a7b35e582c369d41ae" title="generate the entire documentation " alt="" coords="2567,1555,2650,1581"/>
+<area shape="rect" id="node76" href="classCommand.html#a834eac0e797a5d1c992018b7d0c049a4" title="]DOXY: create doxygen&#45;like documentation of the current workspace " alt="" coords="2798,1555,2958,1581"/>
+<area shape="rect" id="node88" href="classPrefix.html#aceebcb5133f4ac2659d49acdfb12a56c" title="reset statement to empty state (e.g. after →N) " alt="" coords="2046,259,2139,285"/>
+<area shape="rect" id="node79" href="classStateIndicator.html#aa99bc8ce846dfd1f09c0ca2f250d940e" title="execute token in body... " alt="" coords="2273,1723,2402,1749"/>
+<area shape="rect" id="node80" href="classExecutable.html#a56bddb63158eedc401fe8ec3ce04f787" title="execute the body of this executable " alt="" coords="2521,1687,2697,1713"/>
+<area shape="rect" id="node81" href="classCommand.html#a879617e7645bea2e4052154f16999634" title="finish the current SI&#45;&gt;top() and pop it when done " alt="" coords="3041,1200,3211,1227"/>
+<area shape="rect" id="node84" href="classExecutable.html#a351c916116ec94d18156d44781bd37de" title="print this user defined executable to out " alt="" coords="2818,1757,2938,1784"/>
+<area shape="rect" id="node82" href="classCommand.html#af36741357bfd4e183b34ee8b747bc7c5" title="process line which contains APL statements " alt="" coords="3267,1352,3473,1379"/>
+<area shape="rect" id="node83" href="classCommand.html#ae26693534d4df16372f51e55e505b8d7" title="process line which contains a command or statements " alt="" coords="3521,1352,3684,1379"/>
+<area shape="rect" id="node85" href="classBif__F1__EXECUTE.html#aefdd09df4262f08f508f9be8543896b7" title="execute string containing an APL expression or an APL command " alt="" coords="3033,1750,3219,1791"/>
+<area shape="rect" id="node86" href="classPrefix.html#a5945631f508108c499b56d7e8de2e88b" title="reduce phrase ASS F B " alt="" coords="3279,1713,3461,1740"/>
+<area shape="rect" id="node87" href="classQuad__Quad.html#a253824f3a533bef36063138ea6ce0673" title="overloaded Symbol::resolve(). " alt="" coords="3532,1804,3673,1831"/>
+<area shape="rect" id="node89" href="classPrefix.html#a00d0f5152e3c1c6bb3eec7d3aa1cdae5" title="set a new PC " alt="" coords="2283,237,2391,264"/>
+<area shape="rect" id="node91" href="classStateIndicator.html#abe48451c67c413334c2f9b1bb43014aa" title="continue this StateIndicator (to line N after →N back into it) " alt="" coords="2809,453,2947,480"/>
+<area shape="rect" id="node90" href="classStateIndicator.html#abab6fb3f97723c662eaadf1f28b0f718" title="set the current PC " alt="" coords="2531,237,2686,264"/>
+<area shape="rect" id="node94" href="classStateIndicator.html#a2d4915de712ba06900582f0918f053a8" title="return the SI that has called this one " alt="" coords="2028,1015,2157,1057"/>
+<area shape="rect" id="node139" href="classSymbol.html#a1c96df106fe08edf98dc596fe2ce5c8c" title="return the level of fun on the stack of this Symbol) on the SI stack " alt="" coords="2019,1555,2166,1581"/>
+<area shape="rect" id="node95" href="classXML__Saving__Archive.html#acc327395cab545ea7797d92f5c931cab" title="write entire workspace " alt="" coords="3053,1649,3199,1690"/>
+<area shape="rect" id="node97" href="classError.html#adf8e47c02b1ae0be1368a0587f7daed4" title="update error information in this and copy it to si " alt="" coords="2258,1149,2417,1176"/>
+<area shape="rect" id="node101" href="classQuad__FIO.html#a60874d4f95aaaa8df54150af1731af97" title="overloaded Function::eval_B(). " alt="" coords="2272,1301,2403,1328"/>
+<area shape="rect" id="node102" href="classStateIndicator.html#a96351e4245078ee6b48226003d8f38a4" title="return true iff (1) this SI entry is executing funname, or (2) has resolved funname on its prefix par..." alt="" coords="2268,511,2407,553"/>
+<area shape="rect" id="node103" href="classStateIndicator.html#ada4ebcec84c67d51bb6f406d68eabfe7" title="return the child SI (if any) that parent has called " alt="" coords="2271,446,2403,487"/>
+<area shape="rect" id="node105" href="classSymbol.html#aa27e1507dff68954239013cffc3599e3" title="assign lambda, eg. V←{ ... } " alt="" coords="2258,577,2417,618"/>
+<area shape="rect" id="node107" href="classQuad__EM.html#af44f390bce05f712cdff0ad13f834a12" title="overloaded Symbol::get_apl_value() " alt="" coords="2253,643,2421,669"/>
+<area shape="rect" id="node108" href="classQuad__ET.html#a7cfb4dc2ee0ca9bedff94fdaca4e1cc5" title="overloaded Symbol::get_apl_value(). " alt="" coords="2255,693,2420,720"/>
+<area shape="rect" id="node109" href="classQuad__LC.html#ab895433f0a602abef92109e81fee1098" title="overloaded Symbol::get_apl_value(). " alt="" coords="2255,744,2420,771"/>
+<area shape="rect" id="node114" href="classWorkspace.html#aa83cc5b899c1d994c4f26baf50a79886" title="clear ⎕EM and ⎕ET related errors (error entries on SI up to (including) the next user&#45;defined funct..." alt="" coords="2259,1200,2416,1227"/>
+<area shape="rect" id="node115" href="classWorkspace.html#a4f16b318ce57e107a03017eb87c80983" title="the topmost SI with parse mode PM_FUNCTION " alt="" coords="2258,795,2417,821"/>
+<area shape="rect" id="node119" href="classWorkspace.html#a1afdfb370ef91d4c9d67c698165ab3f6" title="the topmost SI with an error " alt="" coords="2254,845,2421,872"/>
+<area shape="rect" id="node123" href="classWorkspace.html#ad7b96da66783767d15336f40250fa7cd" title="return oldest SI entry that is running exex, or 0 if none " alt="" coords="2254,395,2421,421"/>
+<area shape="rect" id="node126" href="classWorkspace.html#a3b24e2d83089576235f2c43283259709" title="return true iff function funname is on the current call stack " alt="" coords="2264,997,2411,1024"/>
+<area shape="rect" id="node129" href="classWorkspace.html#a85160b618521a453657a892f454323d4" title="clear the marked flag in all values known in this workspace " alt="" coords="2258,1657,2417,1698"/>
+<area shape="rect" id="node136" href="classWorkspace.html#a5d85f6457bf1dda2d17162c5dbcda14a" title="print all owners of value " alt="" coords="2249,1048,2425,1075"/>
+<area shape="rect" id="node138" href="classWorkspace.html#a30f12a0dafdc723ce2c67dae3d4b0fd3" title="print the SI on out " alt="" coords="2271,1956,2404,1983"/>
+<area shape="rect" id="node96" href="classWorkspace.html#a8a4f1d898d523818dbd9d7efa6f2cf92" title="save this workspace " alt="" coords="3293,1656,3447,1683"/>
+<area shape="rect" id="node98" href="classError.html#a1c91620311957635852e42ba8cd695c4" title="print the 3 error message lines as per ⎕EM " alt="" coords="2555,1251,2663,1277"/>
+<area shape="rect" id="node99" href="classQuad__ES.html#a4c53438162ec63acf71b2a766c533fae" title="common inplementation for eval_AB() and eval_B() " alt="" coords="2791,1200,2965,1227"/>
+<area shape="rect" id="node100" href="classError.html#abe0b8d1e092e62ed9f68f3b38a93694d" title="set the source code line where a parse error was thrown " alt="" coords="2537,1301,2680,1328"/>
+<area shape="rect" id="node104" href="classQuad__SI.html#adf45c0e846d98374b2ce1e2633de3101" title="overloaded Function::eval_AB(). " alt="" coords="2548,440,2669,467"/>
+<area shape="rect" id="node106" href="classPrefix.html#a60fc54b072efa544535176ff29469a0b" title="reduce phrase V ASS F " alt="" coords="2521,491,2696,517"/>
+<area shape="rect" id="node111" href="classWorkspace.html#a87ccdd5258241c8e7d30cd38d8f609bf" title="clear the SI " alt="" coords="2806,1301,2950,1328"/>
+<area shape="rect" id="node112" href="classWorkspace.html#ade3a373ad48eb7a8fbad97a28472db7f" title="clear the workspace " alt="" coords="3049,1301,3203,1328"/>
+<area shape="rect" id="node113" href="classWorkspace.html#a77c7b25908cf2479dc087cc3bcf44dcb" title="load lib_ws into the_workspace, maybe set ⎕LX of the new WS. " alt="" coords="3295,1301,3445,1328"/>
+<area shape="rect" id="node116" href="classQuad__L.html#a3a592e9359ea191f10a25fd7a2870380" title="overloaded Symbol::assign() " alt="" coords="2552,541,2665,568"/>
+<area shape="rect" id="node117" href="classQuad__R.html#a6414e451e73580b51664ec3f6fe844f9" title="overloaded Symbol::assign() " alt="" coords="2551,592,2667,619"/>
+<area shape="rect" id="node118" href="classQuad__X.html#a238be31414ccf35b15feba72e542e341" title="overloaded Symbol::assign() " alt="" coords="2551,643,2666,669"/>
+<area shape="rect" id="node120" href="classQuad__L.html#a642efbd79919b2375bfe6e310d968d02" title="overloaded Symbol::get_apl_value(). " alt="" coords="2531,795,2686,821"/>
+<area shape="rect" id="node121" href="classQuad__R.html#a54f424aeb814ac8721ee762e62522090" title="overloaded Symbol::get_apl_value(). " alt="" coords="2529,845,2688,872"/>
+<area shape="rect" id="node122" href="classQuad__X.html#a8ab477f40371bc4745e0015bfa9718d7" title="overloaded Symbol::get_apl_value(). " alt="" coords="2530,744,2687,771"/>
+<area shape="rect" id="node124" href="classSymbol.html#a35d1a9b891e5e78ad10eb372fe185b2b" title="set current NameClass of this Symbol to NC_UNUSED_USER_NAME and remove any values associated with thi..." alt="" coords="2547,339,2670,365"/>
+<area shape="rect" id="node125" href="classSymbolTable.html#a63125005c7124354304526f8d63d188f" title="erase one symbol, return true on error, false on success " alt="" coords="2809,505,2947,546"/>
+<area shape="rect" id="node127" href="classNabla.html#a19c7ba833ddf21a1ac5c4309fd44921c" title="open an existing function, or create a new one. " alt="" coords="2806,1015,2950,1057"/>
+<area shape="rect" id="node128" href="classSymbol.html#a684f0db90dea6ac5f38aeb1a64bbe7ed" title="return a reason why this symbol cant become a defined function " alt="" coords="2524,1048,2693,1075"/>
+<area shape="rect" id="node130" href="classValue.html#a80c3e1a7208f4f97985e5c742ec93b2d" title="print stale Values, and return the number of stale Values. " alt="" coords="2547,1737,2670,1764"/>
+<area shape="rect" id="node131" href="classCommand.html#af5d73db57801b2363c954b402f19186d" title="check workspace integrity (stale Value and IndexExpr objects, etc) " alt="" coords="2793,1707,2963,1733"/>
+<area shape="rect" id="node132" href="classIO__Files.html#aa05a2917c11a88b9abfc4afa6ca04a3e" title="dito (close files, print errors, summary etc). " alt="" coords="2783,1841,2973,1868"/>
+<area shape="rect" id="node133" href="classIO__Files.html#acc91875b8e0c7a5ad44e3ead0e3dda7b" title="get one line from the current file, open the next file if necceessary " alt="" coords="3052,1867,3200,1893"/>
+<area shape="rect" id="node135" href="classIO__Files.html#a5ac43f7fe811ca95a419f8ba7a11682e" title="close current testcase file (prematurely) and opem mext one " alt="" coords="3062,1816,3190,1843"/>
+<area shape="rect" id="node134" href="classInputMux.html#a8a79cbe5207cde162fb36133ad9defdd" title="get one line " alt="" coords="3305,1859,3435,1885"/>
+<area shape="rect" id="node137" href="classValue.html#a926a6bd11f4d27c077c19bbb03c333cf" title="list a value " alt="" coords="2555,1099,2663,1125"/>
+<area shape="rect" id="node140" href="classDoxy.html#af9ca0f4064c30a802fa110c53d42c37b" title="HTML&#45;print a table containing all defined functions to page. " alt="" coords="2263,1605,2412,1632"/>
+<area shape="rect" id="node141" href="classDoxy.html#ad310686a39a631dd99823ec9c2e5ace0" title="HTML&#45;print a table with all variables to &#39;page&#39;. " alt="" coords="2263,1555,2411,1581"/>
+<area shape="rect" id="node143" href="classQuad__EC.html#a856174e390a934b63bc19affe232937e" title="overloaded Function::eval_B(). " alt="" coords="2029,1863,2156,1889"/>
+<area shape="rect" id="node144" href="classUserFunction.html#a6b97e1d688a7d49d0740bc2beb45bbd5" title="Overloaded Function::eval_() " alt="" coords="2023,2335,2162,2361"/>
+<area shape="rect" id="node147" href="classUserFunction.html#ac5a1bc9fbc8a69cc5d2084e8c6988227" title="Overloaded Function::eval_B() " alt="" coords="2019,2487,2167,2513"/>
+<area shape="rect" id="node154" href="classUserFunction.html#af1bd185a565ac29ab5aefc716cbe7426" title="Overloaded Function::eval_XB() " alt="" coords="2014,2065,2171,2092"/>
+<area shape="rect" id="node155" href="classUserFunction.html#a65257f7d5b89edcc965fd92fbae48f46" title="Overloaded Function::eval_AB() " alt="" coords="2014,2385,2171,2412"/>
+<area shape="rect" id="node158" href="classUserFunction.html#a53d4c8701829336de21980237a0abfb9" title="Overloaded Function::eval_AXB() " alt="" coords="2009,2116,2176,2143"/>
+<area shape="rect" id="node159" href="classUserFunction.html#a42aac3e7913bc310a67346a39efdb9cb" title="Overloaded Function::eval_LB. " alt="" coords="2015,2436,2170,2463"/>
+<area shape="rect" id="node160" href="classUserFunction.html#a22d837a3b90a55015c65b4e9c9b3e01d" title="Overloaded Function::eval_LXB() " alt="" coords="2011,2588,2175,2615"/>
+<area shape="rect" id="node166" href="classUserFunction.html#ab936593d2fe00b7d564b56ea8c2b1960" title="Overloaded Function::eval_ALB. " alt="" coords="2011,2537,2175,2564"/>
+<area shape="rect" id="node169" href="classUserFunction.html#a6f3ffdf03f5a0d2ace6d53db6cc6b205" title="Overloaded Function::eval_ALXB() " alt="" coords="2006,2167,2179,2193"/>
+<area shape="rect" id="node173" href="classUserFunction.html#ac5c12a65ee7e51bd26827703d9923cb6" title="Overloaded Function::eval_LRB() " alt="" coords="2010,1913,2175,1940"/>
+<area shape="rect" id="node179" href="classUserFunction.html#aba7e511f0a354b5189f2f5725d69fc54" title="Overloaded Function::eval_LRXB() " alt="" coords="2005,2217,2180,2244"/>
+<area shape="rect" id="node180" href="classUserFunction.html#ac557d25c3d12886b50782d710eb9adaf" title="Overloaded Function::eval_ALRB() " alt="" coords="2005,2015,2180,2041"/>
+<area shape="rect" id="node181" href="classUserFunction.html#adc359655922e961d13364f3bf740a8a4" title="Overloaded Function::eval_ALRXB() " alt="" coords="2027,2269,2159,2310"/>
+<area shape="rect" id="node145" href="classUserFunction.html#afcfbceabaaaa2977561464a72a56f505" title="overloaded Executable::get_sym_Z() " alt="" coords="2251,2276,2424,2303"/>
+<area shape="rect" id="node146" href="classPrefix.html#a7d2419d61a50e62c132a60306c28b829" title="reduce phrase RETC " alt="" coords="2525,2276,2693,2303"/>
+<area shape="rect" id="node148" href="classBif__OPER1__EACH.html#a18d74dc6eacdbe19b9fd24e8bb0cf2e2" title="Overloaded Function::eval_LB(). " alt="" coords="2242,2487,2433,2513"/>
+<area shape="rect" id="node153" href="classQuad__INP.html#acbb48b1a9762cc3e23008018a8c1f836" title="overloaded Function::eval_AB(). " alt="" coords="2267,2537,2407,2564"/>
+<area shape="rect" id="node149" href="classBif__F12__PARTITION.html#af115071efaa0c6562d4fc738e3da3e4b" title="enclose_with_axes " alt="" coords="2531,2546,2686,2587"/>
+<area shape="rect" id="node151" href="classBif__OPER1__EACH.html#a6369aa06b1cc76291102b3a9eaa51f4e" title="Constructor. " alt="" coords="2529,2611,2688,2653"/>
+<area shape="rect" id="node152" href="classQuad__FIO.html#a24ac2813d6425ad61471166fe019ba33" title="overloaded Function::eval_LXB(). " alt="" coords="2535,2495,2682,2521"/>
+<area shape="rect" id="node150" href="classBif__F12__TAKE.html#ac89340f87b53b9cd121e8dbc32b36ea6" title="overloaded Function::eval_AXB() " alt="" coords="2791,2640,2965,2667"/>
+<area shape="rect" id="node156" href="classQuad__EA.html#a3791e3ee3083a057e05e49ae8c6e19d4" title="overloaded Function::eval_AB(). " alt="" coords="2270,2385,2405,2412"/>
+<area shape="rect" id="node157" href="classQuad__EB.html#af9245a9add8bd214616bda4dd0e0ccda" title="overloaded Function::eval_AB(). " alt="" coords="2270,2335,2405,2361"/>
+<area shape="rect" id="node161" href="classBif__OPER2__RANK.html#a128af301c416807ea81a31f023af2a23" title="the &#39;normalized&#39; implementation of all eval_Lxxx*( functions " alt="" coords="2239,2436,2435,2463"/>
+<area shape="rect" id="node162" href="classBif__OPER2__RANK.html#a5a578fc5a08d42a3e2ce8500f9a4467f" title="overloaded Function::eval_LRB() " alt="" coords="2509,2327,2709,2353"/>
+<area shape="rect" id="node164" href="classBif__OPER2__RANK.html#accbd6d641ff942e856fc1c2cf845ac08" title="overloaded Function::eval_LRXB() " alt="" coords="2504,2377,2713,2404"/>
+<area shape="rect" id="node165" href="classBif__OPER2__RANK.html#a98c72d8960286a781c71bca57e843593" title="overloaded Function::may_push_SI() " alt="" coords="2525,2429,2693,2470"/>
+<area shape="rect" id="node163" href="classBif__OPER2__RANK.html#a0f4cd1ddae7cc5db317338de123a652f" title="constructor " alt="" coords="2799,2159,2957,2201"/>
+<area shape="rect" id="node167" href="classBif__OPER1__EACH.html#ae7a90f347aff589d61b1b5bc1892aab9" title="Overloaded Function::eval_ALB(). " alt="" coords="2238,2639,2437,2665"/>
+<area shape="rect" id="node168" href="classBif__OPER2__OUTER.html#a2e9a34f12130439dd28c6d528ffadbc3" title="Overloaded Function::eval_ALRB(). " alt="" coords="2228,2588,2447,2615"/>
+<area shape="rect" id="node170" href="classBif__OPER2__RANK.html#a589092ac19e8ddb10dfa766304521b5b" title="the &#39;normalized&#39; implementation of all eval_ALxxx*( functions " alt="" coords="2259,2130,2416,2171"/>
+<area shape="rect" id="node171" href="classBif__OPER2__RANK.html#af386afe437eb506495d05219013e07c7" title="overloaded Function::eval_ALRB() " alt="" coords="2504,2108,2713,2135"/>
+<area shape="rect" id="node172" href="classBif__OPER2__RANK.html#a34d34df4c656d09dd8e216ee44513a68" title="overloaded Function::eval_ALRXB() " alt="" coords="2525,2159,2692,2201"/>
+<area shape="rect" id="node174" href="classBif__OPER2__POWER.html#a8b9df7074bc55dfb2c2bc21937b83ca6" title="eval_ALRB() or eval_LRB() for numeric RO (aka. Form 1) " alt="" coords="2247,1825,2427,1866"/>
+<area shape="rect" id="node178" href="classBif__OPER2__POWER.html#a708b42a09509be8c639d330d8e06cf62" title="eval_ALRB() or eval_LRB() for numeric RO (aka. Form 1) " alt="" coords="2247,1890,2427,1931"/>
+<area shape="rect" id="node175" href="classBif__OPER2__POWER.html#afdfa97e5be93ef265df90ae09b7cfd81" title="overloaded Function::eval_ALRB() " alt="" coords="2497,1788,2720,1815"/>
+<area shape="rect" id="node176" href="classBif__OPER2__POWER.html#a31db2049a45999f2d068d6569ac9b6e4" title="overloaded Function::eval_LRB() " alt="" coords="2502,1839,2715,1865"/>
+<area shape="rect" id="node177" href="classBif__OPER2__POWER.html#abc21752f3d99634597f256ddfca35434" title="overloaded Function::may_push_SI() " alt="" coords="2518,1890,2699,1931"/>
+<area shape="rect" id="node183" href="classQuad__TF.html#a4aa501720adbb19aed9599912a8a8b07" title="append ravel of value in tf2_format to ucs. Return true iff the value should be enclosed in parenthes..." alt="" coords="1577,2988,1715,3015"/>
+<area shape="rect" id="node184" href="classQuad__TF.html#a2aa5ee00d25d18308ef22d666b3bbf40" title="return B in transfer format 2 (new APL format) for a variable " alt="" coords="1813,3217,1937,3244"/>
+<area shape="rect" id="node189" href="classQuad__TF.html#a7cecac14ed05f07d7b44a5c90d820f03" title="append ravel cells in tf2_format to ucs. " alt="" coords="1808,2988,1943,3015"/>
+<area shape="rect" id="node185" href="classQuad__TF.html#aad2b15f3268d7098d75babcd03e5c762" title="return B in transfer format 2 (new APL2 format) " alt="" coords="2043,3217,2142,3244"/>
+<area shape="rect" id="node187" href="classSymbol.html#a6b9b4537d95855e6490a8ec1b64b6cce" title="write this symbol in )OUT format to file out " alt="" coords="2024,3268,2161,3295"/>
+<area shape="rect" id="node186" href="classQuad__TF.html#a27ed4b02d5f1a1c8a8b0a1fcbe2756f8" title="Overloaded Function::eval_AB(). " alt="" coords="2271,3243,2404,3269"/>
+<area shape="rect" id="node188" href="classWorkspace.html#a7ffca45a4446b644e7caf093a1699ba2" title="write symbols for )OUT command " alt="" coords="2258,3293,2417,3320"/>
+<area shape="rect" id="node198" href="classQuad__JSON.html#a5fa39236f3369b35d05af7b326cf0ffc" title="append APL value to JSON string result " alt="" coords="368,3305,559,3346"/>
+<area shape="rect" id="node199" href="classQuad__JSON.html#a87624a1b477fd625968d0686c51534e2" title="convert APL value to JSON string " alt="" coords="607,3312,797,3339"/>
+<area shape="rect" id="node200" href="classQuad__JSON.html#a1fa347b95372cd4c4ab4b7fd6d4b5358" title="append Cell value to JSON string result " alt="" coords="607,3363,797,3405"/>
 </map>
 </div>
 
@@ -911,7 +866,7 @@ Here is the caller graph for this function:</div>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="classCell.html">Cell</a></li>
-    <li class="footer">Generated on Sun Aug 9 2020 16:43:42 for GNUAPL by
+    <li class="footer">Generated on Sun Jan 30 2022 20:14:26 for GNUAPL by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>

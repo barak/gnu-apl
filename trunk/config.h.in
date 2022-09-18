@@ -12,6 +12,9 @@
 /* assert level */
 #undef ASSERT_LEVEL_WANTED
 
+/* how ./configure was called */
+#undef CONFIGURE_ARGS
+
 /* core count */
 #undef CORE_COUNT_WANTED
 
@@ -309,6 +312,9 @@
 
 /* Define if compiling for Android */
 #undef WANT_ANDROID
+
+/* Define to make ^D a del-char and ^Z be EOT */
+#undef WANT_CTRLD_DEL
 
 /* Define if building the Erlang interface */
 #undef WANT_ERLANG

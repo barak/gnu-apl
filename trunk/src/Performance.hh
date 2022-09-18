@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -47,7 +47,7 @@
 
 using namespace std;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// performance statistics IDs
 enum Pfstat_ID
 {
@@ -85,7 +85,7 @@ enum Pfstat_ID
         PFS_SCALAR_AB_overhead,
         PFS_ALL
 };
-//=============================================================================
+//============================================================================
 /// one statistics for computing the mean and the variance of samples
 class Statistics_record
 {
@@ -155,7 +155,7 @@ protected:
    /// sum of squares of sample values
    double data2;   // can grow quickly!
 };
-//=============================================================================
+//============================================================================
 /// Base class for different kinds of statistics
 class Statistics
 {
@@ -196,7 +196,7 @@ protected:
    /// the ID of \b this statistics
    const Pfstat_ID id;
 };
-//=============================================================================
+//============================================================================
 /// Performance counters for an entire APL system function
 class FunctionStatistics : public Statistics
 {
@@ -241,7 +241,7 @@ protected:
    /// the cycles executed
    Statistics_record vec_cycles;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// Performance counters for one cell level function
 class CellFunctionStatistics : public Statistics
 {
@@ -306,7 +306,7 @@ protected:
    /// statistics for subsequent executions
    Statistics_record subsequent;
 };
-//=============================================================================
+//============================================================================
 /**
      Performance (cycle-) counters at different levels
  **/

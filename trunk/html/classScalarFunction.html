@@ -61,6 +61,7 @@ $(document).ready(function(){initNavTree('classScalarFunction.html','');});
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
+<a href="#pro-static-methods">Static Protected Member Functions</a> &#124;
 <a href="#pro-static-attribs">Static Protected Attributes</a> &#124;
 <a href="classScalarFunction-members.html">List of all members</a>  </div>
   <div class="headertitle">
@@ -96,17 +97,17 @@ Inheritance diagram for ScalarFunction:</div>
 <area shape="rect" id="node21" href="classBif__F2__EQUAL__B.html" title="The class implementing ⊤=. " alt="" coords="609,816,737,843"/>
 <area shape="rect" id="node22" href="classBif__F2__FIND.html" title="The class implementing ⋸ " alt="" coords="623,867,722,893"/>
 <area shape="rect" id="node23" href="classBif__F2__GREATER.html" title="The class implementing &gt; " alt="" coords="607,917,739,944"/>
-<area shape="rect" id="node24" href="classBif__F2__LEQ.html" title="The class implementing ≤ " alt="" coords="626,968,719,995"/>
+<area shape="rect" id="node24" href="classBif__F2__LEQU.html" title="The class implementing ≤ " alt="" coords="621,968,724,995"/>
 <area shape="rect" id="node25" href="classBif__F2__LESS.html" title="The class implementing &lt;. " alt="" coords="622,1019,723,1045"/>
-<area shape="rect" id="node26" href="classBif__F2__MEQ.html" title="The class implementing ≥ " alt="" coords="624,1069,721,1096"/>
+<area shape="rect" id="node26" href="classBif__F2__MEQU.html" title="The class implementing ≥ " alt="" coords="619,1069,726,1096"/>
 <area shape="rect" id="node27" href="classBif__F2__NAND.html" title="The class implementing ⍲ " alt="" coords="619,1120,726,1147"/>
 <area shape="rect" id="node28" href="classBif__F2__NAND__B.html" title="The class implementing ⊤⍲ " alt="" coords="611,1171,734,1197"/>
 <area shape="rect" id="node29" href="classBif__F2__NOR.html" title="The class implementing ⍱ " alt="" coords="624,1221,721,1248"/>
 <area shape="rect" id="node30" href="classBif__F2__NOR__B.html" title="The class implementing ⊤⍱ " alt="" coords="616,1272,729,1299"/>
 <area shape="rect" id="node31" href="classBif__F2__OR.html" title="The class implementing ∨ " alt="" coords="629,1323,716,1349"/>
 <area shape="rect" id="node32" href="classBif__F2__OR__B.html" title="The class implementing ⊤∨ " alt="" coords="621,1373,724,1400"/>
-<area shape="rect" id="node33" href="classBif__F2__UNEQ.html" title="The class implementing ≠ " alt="" coords="619,1424,726,1451"/>
-<area shape="rect" id="node34" href="classBif__F2__UNEQ__B.html" title="The class implementing ⊤≠ " alt="" coords="611,1475,734,1501"/>
+<area shape="rect" id="node33" href="classBif__F2__UNEQ__B.html" title="The class implementing ⊤≠ " alt="" coords="611,1424,734,1451"/>
+<area shape="rect" id="node34" href="classBif__F2__UNEQU.html" title="The class implementing ≠ " alt="" coords="615,1475,731,1501"/>
 <area shape="rect" id="node2" href="classPrimitiveFunction.html" title="Base class for all internal functions of the interpreter. " alt="" coords="276,740,399,767"/>
 <area shape="rect" id="node3" href="classFunction.html" title="Base class for all APL functions and operators (system or defined) " alt="" coords="156,740,228,767"/>
 <area shape="rect" id="node4" href="classNamedObject.html" title="A user&#45;defined variable or function. " alt="" coords="5,740,108,767"/>
@@ -132,30 +133,30 @@ Public Member Functions</h2></td></tr>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classScalarFunction.html#a1c3af7c78bbc4be29d3e993ec1619a55">ScalarFunction</a> (TokenTag <a class="el" href="classFunction.html#a4728eed26a2bc0bd86d2668141831760">tag</a>, <a class="el" href="classCellFunctionStatistics.html">CellFunctionStatistics</a> *stat_AB, <a class="el" href="classCellFunctionStatistics.html">CellFunctionStatistics</a> *stat_B, ShapeItem thresh_AB, ShapeItem thresh_B)</td></tr>
 <tr class="memdesc:a1c3af7c78bbc4be29d3e993ec1619a55"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a <a class="el" href="classScalarFunction.html" title="Base class for all scalar functions. ">ScalarFunction</a> with <b>Id</b> <b>id</b>. <br /></td></tr>
 <tr class="separator:a1c3af7c78bbc4be29d3e993ec1619a55"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab843c90e04914c49092fa795237cd23e"><td class="memItemLeft" align="right" valign="top"><a id="ab843c90e04914c49092fa795237cd23e"></a>
-<a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classScalarFunction.html#ab843c90e04914c49092fa795237cd23e">eval_scalar_B</a> (<a class="el" href="classValue__P.html">Value_P</a> B, prim_f1 fun)</td></tr>
-<tr class="memdesc:ab843c90e04914c49092fa795237cd23e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate a scalar function monadically. <br /></td></tr>
-<tr class="separator:ab843c90e04914c49092fa795237cd23e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae6627cba4a9f43f0c15339ccbb67afd8"><td class="memItemLeft" align="right" valign="top"><a id="ae6627cba4a9f43f0c15339ccbb67afd8"></a>
-<a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classScalarFunction.html#ae6627cba4a9f43f0c15339ccbb67afd8">eval_scalar_AB</a> (<a class="el" href="classValue__P.html">Value_P</a> A, <a class="el" href="classValue__P.html">Value_P</a> B, prim_f2 fun)</td></tr>
-<tr class="memdesc:ae6627cba4a9f43f0c15339ccbb67afd8"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate a scalar function dyadically. <br /></td></tr>
-<tr class="separator:ae6627cba4a9f43f0c15339ccbb67afd8"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6f542f78d8c0f36e2c6f6e6f28fec2af"><td class="memItemLeft" align="right" valign="top"><a id="a6f542f78d8c0f36e2c6f6e6f28fec2af"></a>
+<a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classScalarFunction.html#a6f542f78d8c0f36e2c6f6e6f28fec2af">eval_scalar_B</a> (<a class="el" href="classValue__P.html">Value_P</a> B, prim_f1 fun) const</td></tr>
+<tr class="memdesc:a6f542f78d8c0f36e2c6f6e6f28fec2af"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate a scalar function monadically. <br /></td></tr>
+<tr class="separator:a6f542f78d8c0f36e2c6f6e6f28fec2af"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa8c567527713578fb2c1eac26d00843f"><td class="memItemLeft" align="right" valign="top"><a id="aa8c567527713578fb2c1eac26d00843f"></a>
+<a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classScalarFunction.html#aa8c567527713578fb2c1eac26d00843f">eval_scalar_AB</a> (<a class="el" href="classValue__P.html">Value_P</a> A, <a class="el" href="classValue__P.html">Value_P</a> B, prim_f2 fun) const</td></tr>
+<tr class="memdesc:aa8c567527713578fb2c1eac26d00843f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate a scalar function dyadically. <br /></td></tr>
+<tr class="separator:aa8c567527713578fb2c1eac26d00843f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a64754e3340246d2eb4e0757fab13b0df"><td class="memItemLeft" align="right" valign="top"><a id="a64754e3340246d2eb4e0757fab13b0df"></a>
 virtual prim_f2&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classScalarFunction.html#a64754e3340246d2eb4e0757fab13b0df">get_scalar_f2</a> () const =0</td></tr>
 <tr class="memdesc:a64754e3340246d2eb4e0757fab13b0df"><td class="mdescLeft">&#160;</td><td class="mdescRight">overloaded <a class="el" href="classFunction.html#afe9d865da6435934624c614a3a81aecd" title="return the dyadic scalar primitive if this function ">Function::get_scalar_f2</a> <br /></td></tr>
 <tr class="separator:a64754e3340246d2eb4e0757fab13b0df"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0f8464b55ddd4dfc4731efb390076762"><td class="memItemLeft" align="right" valign="top"><a id="a0f8464b55ddd4dfc4731efb390076762"></a>
-<a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classScalarFunction.html#a0f8464b55ddd4dfc4731efb390076762">eval_scalar_AXB</a> (<a class="el" href="classValue__P.html">Value_P</a> A, <a class="el" href="classValue__P.html">Value_P</a> X, <a class="el" href="classValue__P.html">Value_P</a> B, prim_f2 fun)</td></tr>
-<tr class="memdesc:a0f8464b55ddd4dfc4731efb390076762"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate a scalar function dyadically with axis. <br /></td></tr>
-<tr class="separator:a0f8464b55ddd4dfc4731efb390076762"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a40b8deb23b23a860c1b9c9ce20a7824e"><td class="memItemLeft" align="right" valign="top"><a id="a40b8deb23b23a860c1b9c9ce20a7824e"></a>
-virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classScalarFunction.html#a40b8deb23b23a860c1b9c9ce20a7824e">eval_fill_AB</a> (<a class="el" href="classValue__P.html">Value_P</a> A, <a class="el" href="classValue__P.html">Value_P</a> B)</td></tr>
-<tr class="memdesc:a40b8deb23b23a860c1b9c9ce20a7824e"><td class="mdescLeft">&#160;</td><td class="mdescRight">overloaded <a class="el" href="classFunction.html#aa41ed7223cf7a97e8bb09c86d9a84cc6" title="Evaluate the fill function. ">Function::eval_fill_AB()</a> <br /></td></tr>
-<tr class="separator:a40b8deb23b23a860c1b9c9ce20a7824e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac97d7e33335bca1f29b358782f3beb41"><td class="memItemLeft" align="right" valign="top"><a id="ac97d7e33335bca1f29b358782f3beb41"></a>
-virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classScalarFunction.html#ac97d7e33335bca1f29b358782f3beb41">eval_fill_B</a> (<a class="el" href="classValue__P.html">Value_P</a> B)</td></tr>
-<tr class="memdesc:ac97d7e33335bca1f29b358782f3beb41"><td class="mdescLeft">&#160;</td><td class="mdescRight">overloaded <a class="el" href="classFunction.html#a0759cc8a205653eaac99d12449b5f906" title="Evaluate the fill function. ">Function::eval_fill_B()</a> <br /></td></tr>
-<tr class="separator:ac97d7e33335bca1f29b358782f3beb41"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7e4a8a06834fb15f2d22636a7bbf3cae"><td class="memItemLeft" align="right" valign="top"><a id="a7e4a8a06834fb15f2d22636a7bbf3cae"></a>
+<a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classScalarFunction.html#a7e4a8a06834fb15f2d22636a7bbf3cae">eval_scalar_AXB</a> (<a class="el" href="classValue__P.html">Value_P</a> A, <a class="el" href="classValue__P.html">Value_P</a> X, <a class="el" href="classValue__P.html">Value_P</a> B, prim_f2 fun) const</td></tr>
+<tr class="memdesc:a7e4a8a06834fb15f2d22636a7bbf3cae"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate a scalar function dyadically with axis. <br /></td></tr>
+<tr class="separator:a7e4a8a06834fb15f2d22636a7bbf3cae"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aea735279579a709187fcb0100cd84995"><td class="memItemLeft" align="right" valign="top"><a id="aea735279579a709187fcb0100cd84995"></a>
+virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classScalarFunction.html#aea735279579a709187fcb0100cd84995">eval_fill_AB</a> (<a class="el" href="classValue__P.html">Value_P</a> A, <a class="el" href="classValue__P.html">Value_P</a> B) const</td></tr>
+<tr class="memdesc:aea735279579a709187fcb0100cd84995"><td class="mdescLeft">&#160;</td><td class="mdescRight">overloaded <a class="el" href="classFunction.html#ad5b78ee8001b4733e3525408bed88970" title="Evaluate the fill function. ">Function::eval_fill_AB()</a> <br /></td></tr>
+<tr class="separator:aea735279579a709187fcb0100cd84995"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af982a856fcdff7840b5962d13d12ccc0"><td class="memItemLeft" align="right" valign="top"><a id="af982a856fcdff7840b5962d13d12ccc0"></a>
+virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classScalarFunction.html#af982a856fcdff7840b5962d13d12ccc0">eval_fill_B</a> (<a class="el" href="classValue__P.html">Value_P</a> B) const</td></tr>
+<tr class="memdesc:af982a856fcdff7840b5962d13d12ccc0"><td class="mdescLeft">&#160;</td><td class="mdescRight">overloaded <a class="el" href="classFunction.html#ad6f2ff385ca5806385a43500cf9b609b" title="Evaluate the fill function. ">Function::eval_fill_B()</a> <br /></td></tr>
+<tr class="separator:af982a856fcdff7840b5962d13d12ccc0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2c2d61847435fbf524c6ef06e5309270"><td class="memItemLeft" align="right" valign="top"><a id="a2c2d61847435fbf524c6ef06e5309270"></a>
 virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classScalarFunction.html#a2c2d61847435fbf524c6ef06e5309270">has_result</a> () const</td></tr>
 <tr class="memdesc:a2c2d61847435fbf524c6ef06e5309270"><td class="mdescLeft">&#160;</td><td class="mdescRight">overloaded <a class="el" href="classFunction.html#ab42920100ef5ae42e00bc02b915526d1" title="return 1 if the function returns a result, otherwise 0. For non-user defined functions, throw DOMAIN_ERROR. ">Function::has_result()</a> <br /></td></tr>
@@ -202,6 +203,10 @@ virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a735c9e2d01eda71ddece9dc3c527b7b2">is_macro</a> () const</td></tr>
 <tr class="memdesc:a735c9e2d01eda71ddece9dc3c527b7b2 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">return <b>true</b> iff <b>this</b> function is a macro <br /></td></tr>
 <tr class="separator:a735c9e2d01eda71ddece9dc3c527b7b2 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a02f71337eaa985efd2ce198c9c21b313 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a02f71337eaa985efd2ce198c9c21b313"></a>
+virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a02f71337eaa985efd2ce198c9c21b313">is_defined</a> () const</td></tr>
+<tr class="memdesc:a02f71337eaa985efd2ce198c9c21b313 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">return <b>true</b> iff <b>this</b> function is defined (= has an APL body) <br /></td></tr>
+<tr class="separator:a02f71337eaa985efd2ce198c9c21b313 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af2588ccbf97a2a9ad1a2169c04b63bf4 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="af2588ccbf97a2a9ad1a2169c04b63bf4"></a>
 virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#af2588ccbf97a2a9ad1a2169c04b63bf4">is_derived</a> () const</td></tr>
 <tr class="memdesc:af2588ccbf97a2a9ad1a2169c04b63bf4 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">return <b>true</b> iff <b>this</b> function is a derived function <br /></td></tr>
@@ -216,7 +221,7 @@ virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 <tr class="separator:a1e98de20de09c81c7b5e257880eb2c89 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac69b8cfa3ac1577ef8cf98500002e6ef inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="ac69b8cfa3ac1577ef8cf98500002e6ef"></a>
 virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#ac69b8cfa3ac1577ef8cf98500002e6ef">get_oper_valence</a> () const</td></tr>
-<tr class="memdesc:ac69b8cfa3ac1577ef8cf98500002e6ef inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the number of function arguments (1 or 2) of an operator. <br /></td></tr>
+<tr class="memdesc:ac69b8cfa3ac1577ef8cf98500002e6ef inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the number of function arguments (1 or 2) of an operator, or 0 for a "normal" function that isn't an operator. <br /></td></tr>
 <tr class="separator:ac69b8cfa3ac1577ef8cf98500002e6ef inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a54a1f42ec67c604380f61b48b69d25f9 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a54a1f42ec67c604380f61b48b69d25f9"></a>
 virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a54a1f42ec67c604380f61b48b69d25f9">has_axis</a> () const</td></tr>
@@ -226,14 +231,14 @@ virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 virtual const <a class="el" href="classFunction.html">Function</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a0bb0246b1ad11b9c0c6e561a60350457">get_function</a> () const</td></tr>
 <tr class="memdesc:a0bb0246b1ad11b9c0c6e561a60350457 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">overloaded <a class="el" href="classNamedObject.html#ac7787482f65cf0641c4027b7ab6ada1f" title="return the function for this Id (if any) or 0 if this Id does (currently) represent a function...">NamedObject::get_function()</a> <br /></td></tr>
 <tr class="separator:a0bb0246b1ad11b9c0c6e561a60350457 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7989631960b693a29696da19141a2391 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a7989631960b693a29696da19141a2391"></a>
-virtual <a class="el" href="classFunction.html">Function</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a7989631960b693a29696da19141a2391">get_monadic_inverse</a> () const</td></tr>
-<tr class="memdesc:a7989631960b693a29696da19141a2391 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">the monadic inverse function of <b>this</b> function (if any) <br /></td></tr>
-<tr class="separator:a7989631960b693a29696da19141a2391 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5efdf292a6ac47afcd50505cc0ba9e0d inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a5efdf292a6ac47afcd50505cc0ba9e0d"></a>
-virtual <a class="el" href="classFunction.html">Function</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a5efdf292a6ac47afcd50505cc0ba9e0d">get_dyadic_inverse</a> () const</td></tr>
-<tr class="memdesc:a5efdf292a6ac47afcd50505cc0ba9e0d inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">the dyadic inverse function of <b>this</b> function (if any) <br /></td></tr>
-<tr class="separator:a5efdf292a6ac47afcd50505cc0ba9e0d inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4ea53675833b68d1776f297f10e0549d inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a4ea53675833b68d1776f297f10e0549d"></a>
+virtual <a class="el" href="classFunction.html">Function_P</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a4ea53675833b68d1776f297f10e0549d">get_monadic_inverse</a> () const</td></tr>
+<tr class="memdesc:a4ea53675833b68d1776f297f10e0549d inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">the monadic inverse function of <b>this</b> function (if any) <br /></td></tr>
+<tr class="separator:a4ea53675833b68d1776f297f10e0549d inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3d44e6a47d37c404bec6a8e9a9249c68 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a3d44e6a47d37c404bec6a8e9a9249c68"></a>
+virtual <a class="el" href="classFunction.html">Function_P</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a3d44e6a47d37c404bec6a8e9a9249c68">get_dyadic_inverse</a> () const</td></tr>
+<tr class="memdesc:a3d44e6a47d37c404bec6a8e9a9249c68 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">the dyadic inverse function of <b>this</b> function (if any) <br /></td></tr>
+<tr class="separator:a3d44e6a47d37c404bec6a8e9a9249c68 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2ea41f5c122b8b9ad7a32b742b3ce4a0 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a2ea41f5c122b8b9ad7a32b742b3ce4a0"></a>
 APL_time_us&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a2ea41f5c122b8b9ad7a32b742b3ce4a0">get_creation_time</a> () const</td></tr>
 <tr class="memdesc:a2ea41f5c122b8b9ad7a32b742b3ce4a0 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">GMT when this function was created; 0 for system functions. <br /></td></tr>
@@ -246,10 +251,10 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 virtual const int *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a1e71e36e1f81d6963d1ebba0b67495b3">get_exec_properties</a> () const</td></tr>
 <tr class="memdesc:a1e71e36e1f81d6963d1ebba0b67495b3 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the execution properties (3 ⎕AT) for this function <br /></td></tr>
 <tr class="separator:a1e71e36e1f81d6963d1ebba0b67495b3 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad164dda2ffe635ac4eb66dc90e6aba06 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="ad164dda2ffe635ac4eb66dc90e6aba06"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#ad164dda2ffe635ac4eb66dc90e6aba06">get_attributes</a> (int mode, <a class="el" href="classCell.html">Cell</a> *dest) const</td></tr>
-<tr class="memdesc:ad164dda2ffe635ac4eb66dc90e6aba06 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">store the attributes (as per ⎕AT) of symbol at dest, ... <br /></td></tr>
-<tr class="separator:ad164dda2ffe635ac4eb66dc90e6aba06 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac48150e2a6e8797e78d74ba9e9967de2 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="ac48150e2a6e8797e78d74ba9e9967de2"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#ac48150e2a6e8797e78d74ba9e9967de2">get_attributes</a> (int mode, <a class="el" href="classValue.html">Value</a> &amp;Z) const</td></tr>
+<tr class="memdesc:ac48150e2a6e8797e78d74ba9e9967de2 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">store the attributes (as per ⎕AT) of symbol in Z, ... <br /></td></tr>
+<tr class="separator:ac48150e2a6e8797e78d74ba9e9967de2 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adbd055c988c2284dc98bdfacea3268aa inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="adbd055c988c2284dc98bdfacea3268aa"></a>
 virtual <a class="el" href="classUserFunction.html">UserFunction</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#adbd055c988c2284dc98bdfacea3268aa">get_ufun1</a> ()</td></tr>
 <tr class="memdesc:adbd055c988c2284dc98bdfacea3268aa inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">return a pointer to <b>this</b> <a class="el" href="classUserFunction.html" title="One user-defined function. ">UserFunction</a> (if it is one) <br /></td></tr>
@@ -266,66 +271,70 @@ virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 virtual <a class="el" href="classFunction.html#aa9eb1a12a24aa17004ebdfd2d9dfef56">assoc_f2</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#ad30c5f83a063d7951a4cef9bf4f60528">get_assoc</a> () const</td></tr>
 <tr class="memdesc:ad30c5f83a063d7951a4cef9bf4f60528 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">if this function is an associative scalar function then return its associative cell function, otherwise 0. <br /></td></tr>
 <tr class="separator:ad30c5f83a063d7951a4cef9bf4f60528 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a90afe275cefc1230fb019a4bf788a9c2 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a90afe275cefc1230fb019a4bf788a9c2"></a>
-<a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a90afe275cefc1230fb019a4bf788a9c2">get_token</a> ()</td></tr>
-<tr class="memdesc:a90afe275cefc1230fb019a4bf788a9c2 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">set <b>tok</b> to a <b><a class="el" href="classToken.html" title="One atom of an APL function or expression. ">Token</a></b> for <b>this</b> function. <br /></td></tr>
-<tr class="separator:a90afe275cefc1230fb019a4bf788a9c2 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1a9b0b11e2a27b48dc021711d7a7185e inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a1a9b0b11e2a27b48dc021711d7a7185e"></a>
-virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a1a9b0b11e2a27b48dc021711d7a7185e">eval_</a> ()</td></tr>
-<tr class="memdesc:a1a9b0b11e2a27b48dc021711d7a7185e inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">plain function, 0 arguments <br /></td></tr>
-<tr class="separator:a1a9b0b11e2a27b48dc021711d7a7185e inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6a1446fc93c3e4ee7253c22bcc91bf72 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a6a1446fc93c3e4ee7253c22bcc91bf72"></a>
-virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a6a1446fc93c3e4ee7253c22bcc91bf72">eval_AB</a> (<a class="el" href="classValue__P.html">Value_P</a> A, <a class="el" href="classValue__P.html">Value_P</a> B)</td></tr>
-<tr class="memdesc:a6a1446fc93c3e4ee7253c22bcc91bf72 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">plain function, 2 arguments <br /></td></tr>
-<tr class="separator:a6a1446fc93c3e4ee7253c22bcc91bf72 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adddaa59d714dd5aec0d9b0c958c6ac47 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="adddaa59d714dd5aec0d9b0c958c6ac47"></a>
-virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#adddaa59d714dd5aec0d9b0c958c6ac47">eval_ALB</a> (<a class="el" href="classValue__P.html">Value_P</a> A, <a class="el" href="classToken.html">Token</a> &amp;LO, <a class="el" href="classValue__P.html">Value_P</a> B)</td></tr>
-<tr class="memdesc:adddaa59d714dd5aec0d9b0c958c6ac47 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">monadic operator, 2 arguments <br /></td></tr>
-<tr class="separator:adddaa59d714dd5aec0d9b0c958c6ac47 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa682f53485367d23815a1e84dee25d5e inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="aa682f53485367d23815a1e84dee25d5e"></a>
-virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#aa682f53485367d23815a1e84dee25d5e">eval_AXB</a> (<a class="el" href="classValue__P.html">Value_P</a> A, <a class="el" href="classValue__P.html">Value_P</a> X, <a class="el" href="classValue__P.html">Value_P</a> B)</td></tr>
-<tr class="memdesc:aa682f53485367d23815a1e84dee25d5e inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">plain function, 2 arguments, with axis <br /></td></tr>
-<tr class="separator:aa682f53485367d23815a1e84dee25d5e inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8a11576ed58d179a7a25df84e87d3204 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a8a11576ed58d179a7a25df84e87d3204"></a>
-virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a8a11576ed58d179a7a25df84e87d3204">eval_ALRB</a> (<a class="el" href="classValue__P.html">Value_P</a> A, <a class="el" href="classToken.html">Token</a> &amp;LO, <a class="el" href="classToken.html">Token</a> &amp;RO, <a class="el" href="classValue__P.html">Value_P</a> B)</td></tr>
-<tr class="memdesc:a8a11576ed58d179a7a25df84e87d3204 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">dyadic operator, 2 arguments <br /></td></tr>
-<tr class="separator:a8a11576ed58d179a7a25df84e87d3204 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac797264dc258f8cef80c8bab4c698f6f inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="ac797264dc258f8cef80c8bab4c698f6f"></a>
-virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#ac797264dc258f8cef80c8bab4c698f6f">eval_ALXB</a> (<a class="el" href="classValue__P.html">Value_P</a> A, <a class="el" href="classToken.html">Token</a> &amp;LO, <a class="el" href="classValue__P.html">Value_P</a> X, <a class="el" href="classValue__P.html">Value_P</a> B)</td></tr>
-<tr class="memdesc:ac797264dc258f8cef80c8bab4c698f6f inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">monadic operator, 2 arguments, with axis <br /></td></tr>
-<tr class="separator:ac797264dc258f8cef80c8bab4c698f6f inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8be6e118677d6709bb215fb4b13ea7d4 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a8be6e118677d6709bb215fb4b13ea7d4"></a>
-virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a8be6e118677d6709bb215fb4b13ea7d4">eval_ALRXB</a> (<a class="el" href="classValue__P.html">Value_P</a> A, <a class="el" href="classToken.html">Token</a> &amp;LO, <a class="el" href="classToken.html">Token</a> &amp;RO, <a class="el" href="classValue__P.html">Value_P</a> X, <a class="el" href="classValue__P.html">Value_P</a> B)</td></tr>
-<tr class="memdesc:a8be6e118677d6709bb215fb4b13ea7d4 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">dyadic operator, 2 arguments, with axis <br /></td></tr>
-<tr class="separator:a8be6e118677d6709bb215fb4b13ea7d4 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a05392c6830cbcb5947af1d085a87acae inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a05392c6830cbcb5947af1d085a87acae"></a>
-virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a05392c6830cbcb5947af1d085a87acae">eval_B</a> (<a class="el" href="classValue__P.html">Value_P</a> B)</td></tr>
-<tr class="memdesc:a05392c6830cbcb5947af1d085a87acae inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">plain function, 1 argument <br /></td></tr>
-<tr class="separator:a05392c6830cbcb5947af1d085a87acae inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8a27b990784bb708731d82a828ee3efe inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a8a27b990784bb708731d82a828ee3efe"></a>
-virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a8a27b990784bb708731d82a828ee3efe">eval_LB</a> (<a class="el" href="classToken.html">Token</a> &amp;LO, <a class="el" href="classValue__P.html">Value_P</a> B)</td></tr>
-<tr class="memdesc:a8a27b990784bb708731d82a828ee3efe inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">monadic operator, 1 argument <br /></td></tr>
-<tr class="separator:a8a27b990784bb708731d82a828ee3efe inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa563fa68e0c78ffa660fee7395a25997 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="aa563fa68e0c78ffa660fee7395a25997"></a>
-virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#aa563fa68e0c78ffa660fee7395a25997">eval_XB</a> (<a class="el" href="classValue__P.html">Value_P</a> X, <a class="el" href="classValue__P.html">Value_P</a> B)</td></tr>
-<tr class="memdesc:aa563fa68e0c78ffa660fee7395a25997 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">plain function, 1 arguments, with axis <br /></td></tr>
-<tr class="separator:aa563fa68e0c78ffa660fee7395a25997 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a91d8488dd755554b90fd7a2576b6127a inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a91d8488dd755554b90fd7a2576b6127a"></a>
-virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a91d8488dd755554b90fd7a2576b6127a">eval_LXB</a> (<a class="el" href="classToken.html">Token</a> &amp;LO, <a class="el" href="classValue__P.html">Value_P</a> X, <a class="el" href="classValue__P.html">Value_P</a> B)</td></tr>
-<tr class="memdesc:a91d8488dd755554b90fd7a2576b6127a inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">monadic operator, 1 arguments, with axis <br /></td></tr>
-<tr class="separator:a91d8488dd755554b90fd7a2576b6127a inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0c5c1f004a70817b5c9e2ddb34b07513 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a0c5c1f004a70817b5c9e2ddb34b07513"></a>
-virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a0c5c1f004a70817b5c9e2ddb34b07513">eval_LRB</a> (<a class="el" href="classToken.html">Token</a> &amp;LO, <a class="el" href="classToken.html">Token</a> &amp;RO, <a class="el" href="classValue__P.html">Value_P</a> B)</td></tr>
-<tr class="memdesc:a0c5c1f004a70817b5c9e2ddb34b07513 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">dyadic operator, 1 arguments <br /></td></tr>
-<tr class="separator:a0c5c1f004a70817b5c9e2ddb34b07513 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac38e746e7e30d28807b451c134026473 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="ac38e746e7e30d28807b451c134026473"></a>
-virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#ac38e746e7e30d28807b451c134026473">eval_LRXB</a> (<a class="el" href="classToken.html">Token</a> &amp;LO, <a class="el" href="classToken.html">Token</a> &amp;RO, <a class="el" href="classValue__P.html">Value_P</a> X, <a class="el" href="classValue__P.html">Value_P</a> B)</td></tr>
-<tr class="memdesc:ac38e746e7e30d28807b451c134026473 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">dyadic operator, 1 arguments, with axis <br /></td></tr>
-<tr class="separator:ac38e746e7e30d28807b451c134026473 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a205a0f5275a713c1f7642e12c25a7fe7 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a205a0f5275a713c1f7642e12c25a7fe7"></a>
-virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a205a0f5275a713c1f7642e12c25a7fe7">eval_identity_fun</a> (<a class="el" href="classValue__P.html">Value_P</a> B, Axis axis)</td></tr>
-<tr class="memdesc:a205a0f5275a713c1f7642e12c25a7fe7 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate <b>the</b> identity function. <br /></td></tr>
-<tr class="separator:a205a0f5275a713c1f7642e12c25a7fe7 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a74163ba976576a5bb03a060d42fd96e5 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a74163ba976576a5bb03a060d42fd96e5"></a>
+<a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a74163ba976576a5bb03a060d42fd96e5">get_token</a> () const</td></tr>
+<tr class="memdesc:a74163ba976576a5bb03a060d42fd96e5 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">return a <b><a class="el" href="classToken.html" title="One atom of an APL function or expression. ">Token</a></b> for <b>this</b> function. <br /></td></tr>
+<tr class="separator:a74163ba976576a5bb03a060d42fd96e5 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af2539d67c687a61587781ec78c9e060a inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="af2539d67c687a61587781ec78c9e060a"></a>
+TokenTag&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#af2539d67c687a61587781ec78c9e060a">get_tag</a> () const</td></tr>
+<tr class="memdesc:af2539d67c687a61587781ec78c9e060a inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the <b><a class="el" href="classToken.html" title="One atom of an APL function or expression. ">Token</a></b> Tag for <b>this</b> function. <br /></td></tr>
+<tr class="separator:af2539d67c687a61587781ec78c9e060a inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a590e23020b0a7098725988201a213954 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a590e23020b0a7098725988201a213954"></a>
+virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a590e23020b0a7098725988201a213954">eval_</a> () const</td></tr>
+<tr class="memdesc:a590e23020b0a7098725988201a213954 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">plain function, 0 arguments <br /></td></tr>
+<tr class="separator:a590e23020b0a7098725988201a213954 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1d8e47de79dffa81c189730a1a19f80d inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a1d8e47de79dffa81c189730a1a19f80d"></a>
+virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a1d8e47de79dffa81c189730a1a19f80d">eval_AB</a> (<a class="el" href="classValue__P.html">Value_P</a> A, <a class="el" href="classValue__P.html">Value_P</a> B) const</td></tr>
+<tr class="memdesc:a1d8e47de79dffa81c189730a1a19f80d inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">plain function, 2 arguments <br /></td></tr>
+<tr class="separator:a1d8e47de79dffa81c189730a1a19f80d inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5b55cbacebf9d08b224319bfbb835647 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a5b55cbacebf9d08b224319bfbb835647"></a>
+virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a5b55cbacebf9d08b224319bfbb835647">eval_ALB</a> (<a class="el" href="classValue__P.html">Value_P</a> A, <a class="el" href="classToken.html">Token</a> &amp;LO, <a class="el" href="classValue__P.html">Value_P</a> B) const</td></tr>
+<tr class="memdesc:a5b55cbacebf9d08b224319bfbb835647 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">monadic operator, 2 arguments <br /></td></tr>
+<tr class="separator:a5b55cbacebf9d08b224319bfbb835647 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac0152c32dcec821e0ea500f3a34bb20e inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="ac0152c32dcec821e0ea500f3a34bb20e"></a>
+virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#ac0152c32dcec821e0ea500f3a34bb20e">eval_AXB</a> (<a class="el" href="classValue__P.html">Value_P</a> A, <a class="el" href="classValue__P.html">Value_P</a> X, <a class="el" href="classValue__P.html">Value_P</a> B) const</td></tr>
+<tr class="memdesc:ac0152c32dcec821e0ea500f3a34bb20e inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">plain function, 2 arguments, with axis <br /></td></tr>
+<tr class="separator:ac0152c32dcec821e0ea500f3a34bb20e inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a63a00f3563902b8d7312964f0678858c inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a63a00f3563902b8d7312964f0678858c"></a>
+virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a63a00f3563902b8d7312964f0678858c">eval_ALRB</a> (<a class="el" href="classValue__P.html">Value_P</a> A, <a class="el" href="classToken.html">Token</a> &amp;LO, <a class="el" href="classToken.html">Token</a> &amp;RO, <a class="el" href="classValue__P.html">Value_P</a> B) const</td></tr>
+<tr class="memdesc:a63a00f3563902b8d7312964f0678858c inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">dyadic operator, 2 arguments <br /></td></tr>
+<tr class="separator:a63a00f3563902b8d7312964f0678858c inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae284af98a212a517303efb63a4b6b0cb inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="ae284af98a212a517303efb63a4b6b0cb"></a>
+virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#ae284af98a212a517303efb63a4b6b0cb">eval_ALXB</a> (<a class="el" href="classValue__P.html">Value_P</a> A, <a class="el" href="classToken.html">Token</a> &amp;LO, <a class="el" href="classValue__P.html">Value_P</a> X, <a class="el" href="classValue__P.html">Value_P</a> B) const</td></tr>
+<tr class="memdesc:ae284af98a212a517303efb63a4b6b0cb inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">monadic operator, 2 arguments, with axis <br /></td></tr>
+<tr class="separator:ae284af98a212a517303efb63a4b6b0cb inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ade3d2f3b0bbad4dc077c780b025b97a3 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="ade3d2f3b0bbad4dc077c780b025b97a3"></a>
+virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#ade3d2f3b0bbad4dc077c780b025b97a3">eval_ALRXB</a> (<a class="el" href="classValue__P.html">Value_P</a> A, <a class="el" href="classToken.html">Token</a> &amp;LO, <a class="el" href="classToken.html">Token</a> &amp;RO, <a class="el" href="classValue__P.html">Value_P</a> X, <a class="el" href="classValue__P.html">Value_P</a> B) const</td></tr>
+<tr class="memdesc:ade3d2f3b0bbad4dc077c780b025b97a3 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">dyadic operator, 2 arguments, with axis <br /></td></tr>
+<tr class="separator:ade3d2f3b0bbad4dc077c780b025b97a3 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1baa953a35d9dea5fd20bfa095daf360 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a1baa953a35d9dea5fd20bfa095daf360"></a>
+virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a1baa953a35d9dea5fd20bfa095daf360">eval_B</a> (<a class="el" href="classValue__P.html">Value_P</a> B) const</td></tr>
+<tr class="memdesc:a1baa953a35d9dea5fd20bfa095daf360 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">plain function, 1 argument <br /></td></tr>
+<tr class="separator:a1baa953a35d9dea5fd20bfa095daf360 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8d5fd6988d3b4bccecd653f894938d12 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a8d5fd6988d3b4bccecd653f894938d12"></a>
+virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a8d5fd6988d3b4bccecd653f894938d12">eval_LB</a> (<a class="el" href="classToken.html">Token</a> &amp;LO, <a class="el" href="classValue__P.html">Value_P</a> B) const</td></tr>
+<tr class="memdesc:a8d5fd6988d3b4bccecd653f894938d12 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">monadic operator, 1 argument <br /></td></tr>
+<tr class="separator:a8d5fd6988d3b4bccecd653f894938d12 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3952082e43c93f98fbeb9b2981666e91 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a3952082e43c93f98fbeb9b2981666e91"></a>
+virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a3952082e43c93f98fbeb9b2981666e91">eval_XB</a> (<a class="el" href="classValue__P.html">Value_P</a> X, <a class="el" href="classValue__P.html">Value_P</a> B) const</td></tr>
+<tr class="memdesc:a3952082e43c93f98fbeb9b2981666e91 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">plain function, 1 arguments, with axis <br /></td></tr>
+<tr class="separator:a3952082e43c93f98fbeb9b2981666e91 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a132c17d68b03f8e4d016f83eb766f1bd inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a132c17d68b03f8e4d016f83eb766f1bd"></a>
+virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a132c17d68b03f8e4d016f83eb766f1bd">eval_LXB</a> (<a class="el" href="classToken.html">Token</a> &amp;LO, <a class="el" href="classValue__P.html">Value_P</a> X, <a class="el" href="classValue__P.html">Value_P</a> B) const</td></tr>
+<tr class="memdesc:a132c17d68b03f8e4d016f83eb766f1bd inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">monadic operator, 1 arguments, with axis <br /></td></tr>
+<tr class="separator:a132c17d68b03f8e4d016f83eb766f1bd inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a97aa070fdf3c11a56b593fa0992dfcaf inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a97aa070fdf3c11a56b593fa0992dfcaf"></a>
+virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a97aa070fdf3c11a56b593fa0992dfcaf">eval_LRB</a> (<a class="el" href="classToken.html">Token</a> &amp;LO, <a class="el" href="classToken.html">Token</a> &amp;RO, <a class="el" href="classValue__P.html">Value_P</a> B) const</td></tr>
+<tr class="memdesc:a97aa070fdf3c11a56b593fa0992dfcaf inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">dyadic operator, 1 arguments <br /></td></tr>
+<tr class="separator:a97aa070fdf3c11a56b593fa0992dfcaf inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afacffc07ad46ee7b2b828d422d6872c7 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="afacffc07ad46ee7b2b828d422d6872c7"></a>
+virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#afacffc07ad46ee7b2b828d422d6872c7">eval_LRXB</a> (<a class="el" href="classToken.html">Token</a> &amp;LO, <a class="el" href="classToken.html">Token</a> &amp;RO, <a class="el" href="classValue__P.html">Value_P</a> X, <a class="el" href="classValue__P.html">Value_P</a> B) const</td></tr>
+<tr class="memdesc:afacffc07ad46ee7b2b828d422d6872c7 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">dyadic operator, 1 arguments, with axis <br /></td></tr>
+<tr class="separator:afacffc07ad46ee7b2b828d422d6872c7 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aba071b9c8c35cb0c466a20d674a5d8ad inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="aba071b9c8c35cb0c466a20d674a5d8ad"></a>
+virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#aba071b9c8c35cb0c466a20d674a5d8ad">eval_identity_fun</a> (<a class="el" href="classValue__P.html">Value_P</a> B, Axis axis) const</td></tr>
+<tr class="memdesc:aba071b9c8c35cb0c466a20d674a5d8ad inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate <b>the</b> identity function. <br /></td></tr>
+<tr class="separator:aba071b9c8c35cb0c466a20d674a5d8ad inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a09e640b5cb6a7acdf243a31e9c93afaa inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a09e640b5cb6a7acdf243a31e9c93afaa"></a>
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a09e640b5cb6a7acdf243a31e9c93afaa">destroy</a> ()</td></tr>
 <tr class="memdesc:a09e640b5cb6a7acdf243a31e9c93afaa inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">Delete this function (do nothing, overloaded by <a class="el" href="classUserFunction.html" title="One user-defined function. ">UserFunction</a>). <br /></td></tr>
@@ -334,10 +343,14 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 virtual <a class="el" href="classUCS__string.html">UCS_string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a5d1ea5b6f6267431f7ca2773fa0955b9">canonical</a> (bool with_lines) const</td></tr>
 <tr class="memdesc:a5d1ea5b6f6267431f7ca2773fa0955b9 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classQuad__CR.html" title="The class implementing ⎕CR. ">Quad_CR</a> of this function. <br /></td></tr>
 <tr class="separator:a5d1ea5b6f6267431f7ca2773fa0955b9 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aefffcc63fb1972f2e276e8355868c21a inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="aefffcc63fb1972f2e276e8355868c21a"></a>
-virtual <a class="el" href="classValue__P.html">Value_P</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#aefffcc63fb1972f2e276e8355868c21a">locate_X</a> ()</td></tr>
-<tr class="memdesc:aefffcc63fb1972f2e276e8355868c21a inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">return axis (non-0 only for derived functions) <br /></td></tr>
-<tr class="separator:aefffcc63fb1972f2e276e8355868c21a inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6ed58d7507c55f89c44b4d3a71e06b27 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a6ed58d7507c55f89c44b4d3a71e06b27"></a>
+virtual const <a class="el" href="classValue__P.html">Value_P</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a6ed58d7507c55f89c44b4d3a71e06b27">locate_X</a> () const</td></tr>
+<tr class="memdesc:a6ed58d7507c55f89c44b4d3a71e06b27 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">return axis (non-0 only for derived functions) <br /></td></tr>
+<tr class="separator:a6ed58d7507c55f89c44b4d3a71e06b27 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a257d0b6a80edf8b535b07ec9e44a10a9 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a257d0b6a80edf8b535b07ec9e44a10a9"></a>
+virtual ShapeItem&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a257d0b6a80edf8b535b07ec9e44a10a9">string_to_int</a> (const <a class="el" href="classUCS__string.html">UCS_string</a> &amp;name) const</td></tr>
+<tr class="memdesc:a257d0b6a80edf8b535b07ec9e44a10a9 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">return a (pseudo-) axis for <b>name</b> <br /></td></tr>
+<tr class="separator:a257d0b6a80edf8b535b07ec9e44a10a9 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5a8e930a7ee14744736f5d01d6e69aa9 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a5a8e930a7ee14744736f5d01d6e69aa9"></a>
 Fun_signature&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a5a8e930a7ee14744736f5d01d6e69aa9">get_signature</a> () const</td></tr>
 <tr class="memdesc:a5a8e930a7ee14744736f5d01d6e69aa9 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the signature of this function (currently only valid for user-defined functions) <br /></td></tr>
@@ -394,25 +407,21 @@ NameClass&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
 Protected Member Functions</h2></td></tr>
-<tr class="memitem:a220a7fb88435588ed546a522cab1e4c6"><td class="memItemLeft" align="right" valign="top"><a id="a220a7fb88435588ed546a522cab1e4c6"></a>
-<a class="el" href="classValue__P.html">Value_P</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classScalarFunction.html#a220a7fb88435588ed546a522cab1e4c6">do_scalar_B</a> (ErrorCode &amp;ec, <a class="el" href="classValue__P.html">Value_P</a> B, prim_f1 fun)</td></tr>
-<tr class="memdesc:a220a7fb88435588ed546a522cab1e4c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">compute the monadic scalar function <b>fun</b> along one ravel <br /></td></tr>
-<tr class="separator:a220a7fb88435588ed546a522cab1e4c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1c8c78e2b77eee862643249714409aca"><td class="memItemLeft" align="right" valign="top"><a id="a1c8c78e2b77eee862643249714409aca"></a>
-<a class="el" href="classValue__P.html">Value_P</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classScalarFunction.html#a1c8c78e2b77eee862643249714409aca">do_scalar_AB</a> (ErrorCode &amp;ec, <a class="el" href="classValue__P.html">Value_P</a> A, <a class="el" href="classValue__P.html">Value_P</a> B, prim_f2 fun)</td></tr>
-<tr class="memdesc:a1c8c78e2b77eee862643249714409aca"><td class="mdescLeft">&#160;</td><td class="mdescRight">compute the dyadic scalar function <b>fun</b> along one ravel <br /></td></tr>
-<tr class="separator:a1c8c78e2b77eee862643249714409aca"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6708ab16b41f917f0f821ed7b8e3b0c9"><td class="memItemLeft" align="right" valign="top"><a id="a6708ab16b41f917f0f821ed7b8e3b0c9"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classScalarFunction.html#a6708ab16b41f917f0f821ed7b8e3b0c9">expand_pointers</a> (<a class="el" href="classCell.html">Cell</a> *cell_Z, <a class="el" href="classValue.html">Value</a> &amp;Z_owner, const <a class="el" href="classCell.html">Cell</a> *cell_A, const <a class="el" href="classCell.html">Cell</a> *cell_B, prim_f2 fun)</td></tr>
-<tr class="memdesc:a6708ab16b41f917f0f821ed7b8e3b0c9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Apply a function to a nested sub array. <br /></td></tr>
-<tr class="separator:a6708ab16b41f917f0f821ed7b8e3b0c9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a12914c81347ad9297dbbd6a73f2a5357"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classValue__P.html">Value_P</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classScalarFunction.html#a12914c81347ad9297dbbd6a73f2a5357">eval_scalar_AXB</a> (<a class="el" href="classValue__P.html">Value_P</a> A, bool *axis_present, <a class="el" href="classValue__P.html">Value_P</a> B, prim_f2 fun, bool reversed)</td></tr>
-<tr class="memdesc:a12914c81347ad9297dbbd6a73f2a5357"><td class="mdescLeft">&#160;</td><td class="mdescRight">A helper function for <a class="el" href="classScalarFunction.html#a0f8464b55ddd4dfc4731efb390076762" title="Evaluate a scalar function dyadically with axis. ">eval_scalar_AXB()</a>.  <a href="#a12914c81347ad9297dbbd6a73f2a5357">More...</a><br /></td></tr>
-<tr class="separator:a12914c81347ad9297dbbd6a73f2a5357"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a99c717844b6c855c221ba5ae8ada62fd"><td class="memItemLeft" align="right" valign="top"><a id="a99c717844b6c855c221ba5ae8ada62fd"></a>
-<a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classScalarFunction.html#a99c717844b6c855c221ba5ae8ada62fd">eval_scalar_identity_fun</a> (<a class="el" href="classValue__P.html">Value_P</a> B, Axis axis, <a class="el" href="classValue__P.html">Value_P</a> FI0)</td></tr>
-<tr class="memdesc:a99c717844b6c855c221ba5ae8ada62fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate <b>the</b> identity function. <br /></td></tr>
-<tr class="separator:a99c717844b6c855c221ba5ae8ada62fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a254898c12f19ee61f71837247d2efaa9"><td class="memItemLeft" align="right" valign="top"><a id="a254898c12f19ee61f71837247d2efaa9"></a>
+<a class="el" href="classValue__P.html">Value_P</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classScalarFunction.html#a254898c12f19ee61f71837247d2efaa9">do_scalar_B</a> (ErrorCode &amp;ec, <a class="el" href="classValue__P.html">Value_P</a> B, prim_f1 fun) const</td></tr>
+<tr class="memdesc:a254898c12f19ee61f71837247d2efaa9"><td class="mdescLeft">&#160;</td><td class="mdescRight">compute the monadic scalar function <b>fun</b> along one ravel <br /></td></tr>
+<tr class="separator:a254898c12f19ee61f71837247d2efaa9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acf5075b41e5a000feb694cf66638524f"><td class="memItemLeft" align="right" valign="top"><a id="acf5075b41e5a000feb694cf66638524f"></a>
+<a class="el" href="classValue__P.html">Value_P</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classScalarFunction.html#acf5075b41e5a000feb694cf66638524f">do_scalar_AB</a> (ErrorCode &amp;ec, <a class="el" href="classValue__P.html">Value_P</a> A, <a class="el" href="classValue__P.html">Value_P</a> B, prim_f2 fun) const</td></tr>
+<tr class="memdesc:acf5075b41e5a000feb694cf66638524f"><td class="mdescLeft">&#160;</td><td class="mdescRight">compute the dyadic scalar function <b>fun</b> along one ravel <br /></td></tr>
+<tr class="separator:acf5075b41e5a000feb694cf66638524f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:abbe1a96be7aa40e72be44403fa106e3d"><td class="memItemLeft" align="right" valign="top"><a id="abbe1a96be7aa40e72be44403fa106e3d"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classScalarFunction.html#abbe1a96be7aa40e72be44403fa106e3d">expand_pointers</a> (<a class="el" href="classValue__P.html">Value_P</a> Z, <a class="el" href="classValue.html">Value</a> &amp;Z_owner, const <a class="el" href="classCell.html">Cell</a> *cell_A, const <a class="el" href="classCell.html">Cell</a> *cell_B, prim_f2 fun) const</td></tr>
+<tr class="memdesc:abbe1a96be7aa40e72be44403fa106e3d"><td class="mdescLeft">&#160;</td><td class="mdescRight">Apply a function to a nested sub array. <br /></td></tr>
+<tr class="separator:abbe1a96be7aa40e72be44403fa106e3d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac4335931887b47ea78884f875965099a"><td class="memItemLeft" align="right" valign="top"><a class="el" href="classValue__P.html">Value_P</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classScalarFunction.html#ac4335931887b47ea78884f875965099a">eval_scalar_AXB</a> (<a class="el" href="classValue__P.html">Value_P</a> A, bool *axis_present, <a class="el" href="classValue__P.html">Value_P</a> B, prim_f2 fun, bool reversed) const</td></tr>
+<tr class="memdesc:ac4335931887b47ea78884f875965099a"><td class="mdescLeft">&#160;</td><td class="mdescRight">A helper function for <a class="el" href="classScalarFunction.html#a7e4a8a06834fb15f2d22636a7bbf3cae" title="Evaluate a scalar function dyadically with axis. ">eval_scalar_AXB()</a>.  <a href="#ac4335931887b47ea78884f875965099a">More...</a><br /></td></tr>
+<tr class="separator:ac4335931887b47ea78884f875965099a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pro_methods_classPrimitiveFunction"><td colspan="2" onclick="javascript:toggleInherit('pro_methods_classPrimitiveFunction')"><img src="closed.png" alt="-"/>&#160;Protected Member Functions inherited from <a class="el" href="classPrimitiveFunction.html">PrimitiveFunction</a></td></tr>
 <tr class="memitem:abbfceea746a97391601469d6b787bef8 inherit pro_methods_classPrimitiveFunction"><td class="memItemLeft" align="right" valign="top"><a id="abbfceea746a97391601469d6b787bef8"></a>
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPrimitiveFunction.html#abbfceea746a97391601469d6b787bef8">print_properties</a> (ostream &amp;out, int indent) const</td></tr>
@@ -422,6 +431,13 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 virtual ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPrimitiveFunction.html#a872389b6d0bbadd7a0a8c17b1a03d25c">print</a> (ostream &amp;out) const</td></tr>
 <tr class="memdesc:a872389b6d0bbadd7a0a8c17b1a03d25c inherit pro_methods_classPrimitiveFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">Print the name of <b>this</b> <a class="el" href="classPrimitiveFunction.html" title="Base class for all internal functions of the interpreter. ">PrimitiveFunction</a> to <b>out</b>. <br /></td></tr>
 <tr class="separator:a872389b6d0bbadd7a0a8c17b1a03d25c inherit pro_methods_classPrimitiveFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-static-methods"></a>
+Static Protected Member Functions</h2></td></tr>
+<tr class="memitem:a99c717844b6c855c221ba5ae8ada62fd"><td class="memItemLeft" align="right" valign="top"><a id="a99c717844b6c855c221ba5ae8ada62fd"></a>
+static <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classScalarFunction.html#a99c717844b6c855c221ba5ae8ada62fd">eval_scalar_identity_fun</a> (<a class="el" href="classValue__P.html">Value_P</a> B, Axis axis, <a class="el" href="classValue__P.html">Value_P</a> FI0)</td></tr>
+<tr class="memdesc:a99c717844b6c855c221ba5ae8ada62fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate <b>the</b> identity function. <br /></td></tr>
+<tr class="separator:a99c717844b6c855c221ba5ae8ada62fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-static-attribs"></a>
 Static Protected Attributes</h2></td></tr>
@@ -454,7 +470,7 @@ const Id&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 <tr class="inherit_header pro_attribs_classPrimitiveFunction"><td colspan="2" onclick="javascript:toggleInherit('pro_attribs_classPrimitiveFunction')"><img src="closed.png" alt="-"/>&#160;Protected Attributes inherited from <a class="el" href="classPrimitiveFunction.html">PrimitiveFunction</a></td></tr>
 <tr class="memitem:adf3d624aeb14fd7314c3bb6d73c6855a inherit pro_attribs_classPrimitiveFunction"><td class="memItemLeft" align="right" valign="top"><a id="adf3d624aeb14fd7314c3bb6d73c6855a"></a>
 <a class="el" href="classCellFunctionStatistics.html">CellFunctionStatistics</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPrimitiveFunction.html#adf3d624aeb14fd7314c3bb6d73c6855a">statistics_AB</a></td></tr>
-<tr class="memdesc:adf3d624aeb14fd7314c3bb6d73c6855a inherit pro_attribs_classPrimitiveFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">performance statistics for <a class="el" href="classFunction.html#a05392c6830cbcb5947af1d085a87acae" title="plain function, 1 argument ">eval_B()</a> <br /></td></tr>
+<tr class="memdesc:adf3d624aeb14fd7314c3bb6d73c6855a inherit pro_attribs_classPrimitiveFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">performance statistics for <a class="el" href="classFunction.html#a1baa953a35d9dea5fd20bfa095daf360" title="plain function, 1 argument ">eval_B()</a> <br /></td></tr>
 <tr class="separator:adf3d624aeb14fd7314c3bb6d73c6855a inherit pro_attribs_classPrimitiveFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:afe263e8a315681d7c4a0378439d1c968 inherit pro_attribs_classPrimitiveFunction"><td class="memItemLeft" align="right" valign="top"><a id="afe263e8a315681d7c4a0378439d1c968"></a>
 <a class="el" href="classCellFunctionStatistics.html">CellFunctionStatistics</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classPrimitiveFunction.html#afe263e8a315681d7c4a0378439d1c968">statistics_B</a></td></tr>
@@ -476,8 +492,8 @@ ShapeItem&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 
 <p class="definition">Definition at line <a class="el" href="ScalarFunction_8hh_source.html#l00036">36</a> of file <a class="el" href="ScalarFunction_8hh_source.html">ScalarFunction.hh</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
-<a id="a12914c81347ad9297dbbd6a73f2a5357"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a12914c81347ad9297dbbd6a73f2a5357">&#9670;&nbsp;</a></span>eval_scalar_AXB()</h2>
+<a id="ac4335931887b47ea78884f875965099a"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac4335931887b47ea78884f875965099a">&#9670;&nbsp;</a></span>eval_scalar_AXB()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -518,7 +534,7 @@ ShapeItem&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
         <tr>
           <td></td>
           <td>)</td>
-          <td></td><td></td>
+          <td></td><td> const</td>
         </tr>
       </table>
   </td>
@@ -528,78 +544,93 @@ ShapeItem&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 </table>
 </div><div class="memdoc">
 
-<p>A helper function for <a class="el" href="classScalarFunction.html#a0f8464b55ddd4dfc4731efb390076762" title="Evaluate a scalar function dyadically with axis. ">eval_scalar_AXB()</a>. </p>
+<p>A helper function for <a class="el" href="classScalarFunction.html#a7e4a8a06834fb15f2d22636a7bbf3cae" title="Evaluate a scalar function dyadically with axis. ">eval_scalar_AXB()</a>. </p>
 <p>make A the value with the smaller rank). </p>
 
-<p class="definition">Definition at line <a class="el" href="ScalarFunction_8cc_source.html#l00860">860</a> of file <a class="el" href="ScalarFunction_8cc_source.html">ScalarFunction.cc</a>.</p>
+<p class="definition">Definition at line <a class="el" href="ScalarFunction_8cc_source.html#l00871">871</a> of file <a class="el" href="ScalarFunction_8cc_source.html">ScalarFunction.cc</a>.</p>
 
-<p class="reference">References <a class="el" href="ScalarFunction_8cc_source.html#l00278">expand_pointers()</a>, <a class="el" href="Value__P_8hh_source.html#l00076">Value_P_Base::get()</a>, <a class="el" href="Shape_8hh_source.html#l00116">Shape::get_shape_item()</a>, and <a class="el" href="ArrayIterator_8hh_source.html#l00075">ArrayIterator::more()</a>.</p>
+<p class="reference">References <a class="el" href="ScalarFunction_8cc_source.html#l00280">expand_pointers()</a>, <a class="el" href="Value__P_8hh_source.html#l00080">Value_P_Base::get()</a>, <a class="el" href="Shape_8hh_source.html#l00116">Shape::get_shape_item()</a>, <a class="el" href="Value__P_8hh_source.html#l00088">Value_P_Base::getref()</a>, and <a class="el" href="ArrayIterator_8hh_source.html#l00132">ArrayIterator::more()</a>.</p>
 <div class="dynheader">
 Here is the call graph for this function:</div>
 <div class="dyncontent">
-<div class="center"><img src="classScalarFunction_a12914c81347ad9297dbbd6a73f2a5357_cgraph.png" border="0" usemap="#classScalarFunction_a12914c81347ad9297dbbd6a73f2a5357_cgraph" alt=""/></div>
-<map name="classScalarFunction_a12914c81347ad9297dbbd6a73f2a5357_cgraph" id="classScalarFunction_a12914c81347ad9297dbbd6a73f2a5357_cgraph">
-<area shape="rect" id="node2" href="classScalarFunction.html#a6708ab16b41f917f0f821ed7b8e3b0c9" title="Apply a function to a nested sub array. " alt="" coords="195,1249,353,1290"/>
-<area shape="rect" id="node14" href="classValue__P__Base.html#a64e77a99509cdb6ecbe4cf273a2e7694" title="return a const pointer to the Value " alt="" coords="781,1375,916,1401"/>
-<area shape="rect" id="node61" href="classShape.html#a29c90caa0e259dd56559964a158df7c2" title="return the length of dimension r " alt="" coords="195,1420,353,1447"/>
-<area shape="rect" id="node62" href="classArrayIterator.html#a0b012539c84a4e8bef763c1907c48c8f" title="return true iff this iterator has more items to come. " alt="" coords="209,1471,339,1497"/>
-<area shape="rect" id="node3" href="classCell.html#ae98b3988a7fa52c6c157b4911b043dde" title="Return true iff this cell is a pointer (to a sub&#45;array) cell. " alt="" coords="781,1324,917,1351"/>
-<area shape="rect" id="node4" href="classCell.html#a3af019707c56a0fb40fce2d370af8307" title="Return the APL value of a cell (Asserts for non&#45;pointer cells) " alt="" coords="771,5,926,32"/>
-<area shape="rect" id="node5" href="classScalarFunction.html#ae6627cba4a9f43f0c15339ccbb67afd8" title="Evaluate a scalar function dyadically. " alt="" coords="401,1193,543,1234"/>
-<area shape="rect" id="node6" href="classScalarFunction.html#a1c8c78e2b77eee862643249714409aca" title="compute the dyadic scalar function fun along one ravel " alt="" coords="591,727,721,769"/>
-<area shape="rect" id="node28" href="classThread__context.html#a8ef1d4db160a21f5616530cf737e4b18" title="number of currently used cores " alt="" coords="779,1193,918,1234"/>
-<area shape="rect" id="node33" href="classThread__context.html#abe4280ff16a15a70e0c903bb2db70c87" title="return the context for core n " alt="" coords="779,1258,918,1299"/>
-<area shape="rect" id="node60" href="classParallel__job__list.html#ad0759619b570cb362d79edf3d673ae17" title="cancel the entire job list " alt="" coords="595,662,717,703"/>
-<area shape="rect" id="node7" href="classShape.html#af39e05bad7be900fa1437a6eb6035e97" title="return the number of elements (1 for scalars, else product of shapes) " alt="" coords="781,457,916,484"/>
-<area shape="rect" id="node8" href="classScalarFunction.html#a40b8deb23b23a860c1b9c9ce20a7824e" title="overloaded Function::eval_fill_AB() " alt="" coords="778,509,919,550"/>
-<area shape="rect" id="node9" href="classToken.html#a205e0b499e06999ff91c272ff28c9013" title="return the Value_P value of this token. The token could be TOK_NO_VALUE; in that case VALUE_ERROR is ..." alt="" coords="783,625,915,652"/>
-<area shape="rect" id="node15" href="classThread__context.html#aadea40f94c3086eb73d86ce866b6e71d" title="return the context of the master " alt="" coords="779,727,918,769"/>
-<area shape="rect" id="node17" href="classThread__context.html#ad6131c6d7c657ae4fbf75a71db9c574a" title="start parallel execution of work at the master " alt="" coords="1235,676,1395,703"/>
-<area shape="rect" id="node18" href="classThread__context.html#aba6ab97ae2a6542738f93831bd73fa14" title="return the number of the core executing this context " alt="" coords="1867,861,2021,888"/>
-<area shape="rect" id="node27" href="classParallel__job__list.html#a3600568259de8e941c747a255ebb94e1" title="start execution of jobs " alt="" coords="788,793,909,834"/>
-<area shape="rect" id="node34" href="classParallel__job__list.html#a02f0d953e2836a0220dcfdfd492f6a3f" title="set current job. CAUTION: jobs may be modified by the execution of current_job. Therefore we copy cur..." alt="" coords="788,858,909,899"/>
-<area shape="rect" id="node35" href="classFunction.html#a411981c924e92927db6d53ed61f82dc8" title="return break&#45;even point for dyadic parallel execution " alt="" coords="777,923,920,965"/>
-<area shape="rect" id="node36" href="classThread__context.html#aee8c70aa8c5f5e771db87b9d90617bfb" title="end parallel execution of work at the master " alt="" coords="769,989,928,1016"/>
-<area shape="rect" id="node37" href="classPJob__scalar__AB.html#aada9e56ccb96c0ac201744a655b872d2" title="return A[z] " alt="" coords="771,1040,926,1067"/>
-<area shape="rect" id="node38" href="classPJob__scalar__AB.html#a89f888eef09f0fa2bc11b35ee04d3970" title="return B[z] " alt="" coords="771,1091,926,1117"/>
-<area shape="rect" id="node39" href="classPJob__scalar__AB.html#aaed3a03f0d46de9807d4bdec4125d4f1" title="return Z[z] " alt="" coords="772,56,925,83"/>
-<area shape="rect" id="node40" href="classParallel__job__list.html#a197833fe5722fbc8436a59d928c3a426" title="add job to jobs " alt="" coords="788,107,909,149"/>
-<area shape="rect" id="node41" href="classPrimitiveFunction.html#a671dd4fc921e2253cada08d0a385d2f5" title="return the dyadic cell statistics of this (scalar) function " alt="" coords="783,173,914,214"/>
-<area shape="rect" id="node42" href="classValue.html#a8f4efc08e1cf758c79dec03f9a42f9a6" title="check that this value is completely initialized, and set complete flag " alt="" coords="781,356,917,383"/>
-<area shape="rect" id="node53" href="classPrimitiveFunction.html#a15d4ce3247314052986c3fe63fe65734" title="overloaded Function::eval_fill_AB() " alt="" coords="783,290,914,331"/>
-<area shape="rect" id="node57" href="classToken.html#a13e8b65088f8a7d103772acc6cfb5140" title="return the tag of this token " alt="" coords="794,407,903,433"/>
-<area shape="rect" id="node58" href="classToken.html#a9721c23968d7272edd1abae91ba77193" title="return the integer value of this token " alt="" coords="1008,524,1137,551"/>
-<area shape="rect" id="node59" href="classValue__P__Base.html#a704ff85f35cdb60648f59a48f0a15bdb" title="return a const reference of the Value " alt="" coords="774,239,923,265"/>
-<area shape="rect" id="node10" href="classToken.html#a11e37aa69b8eb64f293702293b00f50c" title="return true iff this token is an apl value " alt="" coords="1011,575,1135,601"/>
-<area shape="rect" id="node12" href="unionToken_1_1sval.html#a6718675efc326cfa39f09a7f503cdd50" title="a shortcut for accessing apl_val " alt="" coords="999,625,1146,652"/>
-<area shape="rect" id="node11" href="classToken.html#a1a31afbb07e3f1dbb86d5f872ce5c297" title="return the TokenValueType of this token. " alt="" coords="1238,563,1391,589"/>
-<area shape="rect" id="node13" href="classToken.html#a7955f89bcbc2ab3f5c736218c0a745e8" title="the name of tc " alt="" coords="1247,625,1383,652"/>
-<area shape="rect" id="node16" href="classThread__context.html#a994dd1fef316d70072e8757310671aed" title="make all workers lock on pool_sema " alt="" coords="976,777,1169,804"/>
-<area shape="rect" id="node26" href="classThread__context.html#a4360395b00f2c003ab2a09fbe7635b7b" title="terminate all worker threads " alt="" coords="1231,879,1398,905"/>
-<area shape="rect" id="node19" href="classThread__context.html#a51a35755b357c769f56bcad57a408734" title="end parallel execution of work in a worker " alt="" coords="1233,828,1397,855"/>
-<area shape="rect" id="node20" href="classThread__context.html#ab5c1f95ee686270b4ac6e1806a5bd23f" title="bind thread to core " alt="" coords="1471,1003,1615,1045"/>
-<area shape="rect" id="node21" href="classThread__context.html#a770b7101581894235605003726ebdc62" title="print all TaskTree nodes " alt="" coords="1460,769,1625,796"/>
-<area shape="rect" id="node22" href="classThread__context.html#adc73bb9ae1ecb7b10830bd073201f7ea" title="print this TaskTree node " alt="" coords="1673,861,1819,888"/>
-<area shape="rect" id="node23" href="classThread__context.html#a980dc6d5a2cef07422e21447c5925899" title="print all mileages nodes " alt="" coords="1470,821,1615,862"/>
-<area shape="rect" id="node24" href="classThread__context.html#afd854477bd87d3e80b3786ac2a7d5d9f" title="initialize all thread contexts (set all but N and thread) " alt="" coords="1474,1069,1611,1110"/>
-<area shape="rect" id="node25" href="classThread__context.html#a1965a1f7a7d1e9da522a55148c09bcaa" title="initialize all thread contexts (set all but N and thread) " alt="" coords="1474,886,1611,927"/>
-<area shape="rect" id="node29" href="classThread__context.html#a9da7115c28c4372c40d393c8046bda22" title="set the number of currently used cores " alt="" coords="1003,1031,1142,1073"/>
-<area shape="rect" id="node30" href="classThread__context.html#a06a054fa3fadfda7020d64748371799e" title="initialize thread_contexts[n] " alt="" coords="1246,1031,1383,1073"/>
-<area shape="rect" id="node31" href="classCPU__pool.html#a745603fb69c0ee5d4f4d728028fabff6" title="get the number of (active) CPUs " alt="" coords="1241,1097,1388,1124"/>
-<area shape="rect" id="node32" href="classCPU__pool.html#a9a0ceffddddc5e7b239c2f443fa6a559" title="get the idx;th CPU " alt="" coords="1243,1148,1387,1175"/>
-<area shape="rect" id="node43" href="classValue.html#a9fc8bbaf9fefe6835dea7db0f71b8b6c" title="return the number of elements (the product of the shapes). " alt="" coords="1241,499,1389,525"/>
-<area shape="rect" id="node44" href="classValue.html#a89120a742c078918d1a5d84ec742e69c" title="return the idx&#39;th element of the ravel. " alt="" coords="1257,245,1373,272"/>
-<area shape="rect" id="node45" href="classValue.html#ac5b54e3a13cab0837442f1575b3299a5" title="return the number of elements, but at least 1 (for the prototype). " alt="" coords="988,473,1157,500"/>
-<area shape="rect" id="node46" href="classCell.html#a38a6a25f0ad091f35e3d9abfe5608a50" title="return the type of this cell " alt="" coords="1007,220,1138,247"/>
-<area shape="rect" id="node47" href="classValue.html#a4429dcb041368962591397a45cb23d9b" title="return the shape of this value " alt="" coords="1011,271,1134,297"/>
-<area shape="rect" id="node48" href="classValue.html#a21369bf72b3fb40d1e9558cb1497a6b0" title="print this value (line break at Workspace::get_PW()) " alt="" coords="1029,372,1117,399"/>
-<area shape="rect" id="node49" href="classWorkspace.html#a002e2f097bece67c9d082b7c89db11ae" title="return style and the current ⎕PP, and ⎕PW " alt="" coords="1217,397,1412,424"/>
-<area shape="rect" id="node50" href="classValue.html#a5ac7131d2f89d0bc8b8907d960cbd125" title="return the rank of this value " alt="" coords="1258,448,1371,475"/>
-<area shape="rect" id="node51" href="classPrintContext.html#a787257953d929f80db2ba1698d59b905" title="set the print style to be used " alt="" coords="1237,296,1393,323"/>
-<area shape="rect" id="node52" href="classPrintContext.html#a5ef45c5babbe3ebf9988a9b659a2e407" title="return the print style to be used " alt="" coords="1237,347,1393,373"/>
-<area shape="rect" id="node54" href="classFunction.html#a6a1446fc93c3e4ee7253c22bcc91bf72" title="plain function, 2 arguments " alt="" coords="1008,169,1137,196"/>
-<area shape="rect" id="node55" href="classNamedObject.html#adf8b778a154d1d6e35c7d8a169aaaeb5" title="return the name of the named object " alt="" coords="1231,169,1398,196"/>
-<area shape="rect" id="node56" href="classID.html#af1bb0741450971c1882af59af87eef29" title="return the printable name for id as UCS_string " alt="" coords="1474,169,1611,196"/>
+<div class="center"><img src="classScalarFunction_ac4335931887b47ea78884f875965099a_cgraph.png" border="0" usemap="#classScalarFunction_ac4335931887b47ea78884f875965099a_cgraph" alt=""/></div>
+<map name="classScalarFunction_ac4335931887b47ea78884f875965099a_cgraph" id="classScalarFunction_ac4335931887b47ea78884f875965099a_cgraph">
+<area shape="rect" id="node2" href="classScalarFunction.html#abbe1a96be7aa40e72be44403fa106e3d" title="Apply a function to a nested sub array. " alt="" coords="195,707,353,749"/>
+<area shape="rect" id="node16" href="classValue__P__Base.html#a64e77a99509cdb6ecbe4cf273a2e7694" title="return a const pointer to the Value " alt="" coords="1879,1005,2014,1032"/>
+<area shape="rect" id="node17" href="classValue__P__Base.html#a704ff85f35cdb60648f59a48f0a15bdb" title="return a const reference of the Value " alt="" coords="1872,955,2021,981"/>
+<area shape="rect" id="node76" href="classShape.html#a29c90caa0e259dd56559964a158df7c2" title="return the length of dimension r " alt="" coords="195,2152,353,2179"/>
+<area shape="rect" id="node77" href="classArrayIterator.html#a0b012539c84a4e8bef763c1907c48c8f" title="return true iff this iterator has more items to come. " alt="" coords="209,2203,339,2229"/>
+<area shape="rect" id="node3" href="classCell.html#ae98b3988a7fa52c6c157b4911b043dde" title="Return true iff this cell is a pointer (to a sub&#45;array) cell. " alt="" coords="1879,347,2015,373"/>
+<area shape="rect" id="node4" href="classCell.html#a367b9df7e0d4b805e5f31641658113f6" title="Return the APL value of a cell (Asserts for non&#45;pointer cells) " alt="" coords="1869,701,2024,728"/>
+<area shape="rect" id="node7" href="classScalarFunction.html#aa8c567527713578fb2c1eac26d00843f" title="Evaluate a scalar function dyadically. " alt="" coords="401,1379,543,1421"/>
+<area shape="rect" id="node5" href="classCell.html#a38a6a25f0ad091f35e3d9abfe5608a50" title="return the type of this cell " alt="" coords="2091,575,2222,601"/>
+<area shape="rect" id="node6" href="classCell.html#a6c3fdef3d82f53649d1c3f16d37eedd7" title="the name of ct " alt="" coords="2072,663,2241,689"/>
+<area shape="rect" id="node8" href="classScalarFunction.html#acf5075b41e5a000feb694cf66638524f" title="compute the dyadic scalar function fun along one ravel " alt="" coords="591,1175,721,1217"/>
+<area shape="rect" id="node31" href="classThread__context.html#a8ef1d4db160a21f5616530cf737e4b18" title="number of currently used cores " alt="" coords="779,1842,918,1883"/>
+<area shape="rect" id="node36" href="classThread__context.html#abe4280ff16a15a70e0c903bb2db70c87" title="return the context for core n " alt="" coords="779,1777,918,1818"/>
+<area shape="rect" id="node75" href="classParallel__job__list.html#ad0759619b570cb362d79edf3d673ae17" title="cancel the entire job list " alt="" coords="595,1379,717,1421"/>
+<area shape="rect" id="node9" href="classShape.html#af39e05bad7be900fa1437a6eb6035e97" title="return the number of ravel elements (1 for scalars,i else product of shapes) " alt="" coords="1680,1056,1815,1083"/>
+<area shape="rect" id="node10" href="classScalarFunction.html#aea735279579a709187fcb0100cd84995" title="overloaded Function::eval_fill_AB() " alt="" coords="778,1091,919,1133"/>
+<area shape="rect" id="node11" href="classToken.html#a205e0b499e06999ff91c272ff28c9013" title="return the Value_P value of this token. The token could be TOK_NO_VALUE; in that case VALUE_ERROR is ..." alt="" coords="783,1157,915,1184"/>
+<area shape="rect" id="node18" href="classThread__context.html#aadea40f94c3086eb73d86ce866b6e71d" title="return the context of the master " alt="" coords="779,1659,918,1701"/>
+<area shape="rect" id="node20" href="classThread__context.html#ad6131c6d7c657ae4fbf75a71db9c574a" title="start parallel execution of work at the master " alt="" coords="1235,1489,1395,1516"/>
+<area shape="rect" id="node21" href="classThread__context.html#aba6ab97ae2a6542738f93831bd73fa14" title="return the number of the core executing this context " alt="" coords="1869,1748,2024,1775"/>
+<area shape="rect" id="node30" href="classParallel__job__list.html#a3600568259de8e941c747a255ebb94e1" title="start execution of jobs " alt="" coords="788,1361,909,1402"/>
+<area shape="rect" id="node37" href="classParallel__job__list.html#a02f0d953e2836a0220dcfdfd492f6a3f" title="set current job. CAUTION: jobs may be modified by the execution of current_job. Therefore we copy cur..." alt="" coords="788,1426,909,1467"/>
+<area shape="rect" id="node38" href="classFunction.html#a411981c924e92927db6d53ed61f82dc8" title="return break&#45;even point for dyadic parallel execution " alt="" coords="777,1491,920,1533"/>
+<area shape="rect" id="node39" href="classThread__context.html#aee8c70aa8c5f5e771db87b9d90617bfb" title="end parallel execution of work at the master " alt="" coords="769,1557,928,1584"/>
+<area shape="rect" id="node40" href="classPJob__scalar__AB.html#aada9e56ccb96c0ac201744a655b872d2" title="return A[z] " alt="" coords="771,1608,926,1635"/>
+<area shape="rect" id="node41" href="classPJob__scalar__AB.html#a89f888eef09f0fa2bc11b35ee04d3970" title="return B[z] " alt="" coords="771,191,926,217"/>
+<area shape="rect" id="node42" href="classPJob__scalar__AB.html#aaed3a03f0d46de9807d4bdec4125d4f1" title="return Z[z] " alt="" coords="772,241,925,268"/>
+<area shape="rect" id="node43" href="classParallel__job__list.html#a197833fe5722fbc8436a59d928c3a426" title="add job to jobs " alt="" coords="788,293,909,334"/>
+<area shape="rect" id="node44" href="classPrimitiveFunction.html#a671dd4fc921e2253cada08d0a385d2f5" title="return the dyadic cell statistics of this (scalar) function " alt="" coords="783,358,914,399"/>
+<area shape="rect" id="node45" href="classValue.html#a8f4efc08e1cf758c79dec03f9a42f9a6" title="check that this value is completely initialized, and set complete flag " alt="" coords="781,525,917,552"/>
+<area shape="rect" id="node69" href="classPrimitiveFunction.html#a0a9ea9498169b49951d197bd30ac0eef" title="overloaded Function::eval_fill_AB() " alt="" coords="783,115,914,157"/>
+<area shape="rect" id="node73" href="classToken.html#a13e8b65088f8a7d103772acc6cfb5140" title="return the tag of this token " alt="" coords="794,475,903,501"/>
+<area shape="rect" id="node74" href="classToken.html#a9721c23968d7272edd1abae91ba77193" title="return the integer value of this token " alt="" coords="1008,1208,1137,1235"/>
+<area shape="rect" id="node12" href="classToken.html#a11e37aa69b8eb64f293702293b00f50c" title="return true iff this token is an apl value " alt="" coords="1011,1157,1135,1184"/>
+<area shape="rect" id="node14" href="unionToken_1_1sval.html#a6718675efc326cfa39f09a7f503cdd50" title="a shortcut for accessing apl_val " alt="" coords="999,1107,1146,1133"/>
+<area shape="rect" id="node13" href="classToken.html#a1a31afbb07e3f1dbb86d5f872ce5c297" title="return the TokenValueType of this token. " alt="" coords="1238,1183,1391,1209"/>
+<area shape="rect" id="node15" href="classToken.html#a7955f89bcbc2ab3f5c736218c0a745e8" title="the name of tc " alt="" coords="1247,1107,1383,1133"/>
+<area shape="rect" id="node19" href="classThread__context.html#a994dd1fef316d70072e8757310671aed" title="make all workers lock on pool_sema " alt="" coords="976,1564,1169,1591"/>
+<area shape="rect" id="node29" href="classThread__context.html#a4360395b00f2c003ab2a09fbe7635b7b" title="terminate all worker threads " alt="" coords="1231,1731,1398,1757"/>
+<area shape="rect" id="node22" href="classThread__context.html#a51a35755b357c769f56bcad57a408734" title="end parallel execution of work in a worker " alt="" coords="1233,1629,1397,1656"/>
+<area shape="rect" id="node23" href="classThread__context.html#ab5c1f95ee686270b4ac6e1806a5bd23f" title="bind thread to core " alt="" coords="1471,1825,1615,1866"/>
+<area shape="rect" id="node24" href="classThread__context.html#a770b7101581894235605003726ebdc62" title="print all TaskTree nodes " alt="" coords="1460,1773,1625,1800"/>
+<area shape="rect" id="node25" href="classThread__context.html#adc73bb9ae1ecb7b10830bd073201f7ea" title="print this TaskTree node " alt="" coords="1675,1748,1820,1775"/>
+<area shape="rect" id="node26" href="classThread__context.html#a980dc6d5a2cef07422e21447c5925899" title="print all mileages nodes " alt="" coords="1470,1591,1615,1633"/>
+<area shape="rect" id="node27" href="classThread__context.html#afd854477bd87d3e80b3786ac2a7d5d9f" title="initialize all thread contexts (set all but N and thread) " alt="" coords="1474,1937,1611,1978"/>
+<area shape="rect" id="node28" href="classThread__context.html#a1965a1f7a7d1e9da522a55148c09bcaa" title="initialize all thread contexts (set all but N and thread) " alt="" coords="1474,1657,1611,1698"/>
+<area shape="rect" id="node32" href="classThread__context.html#a9da7115c28c4372c40d393c8046bda22" title="set the number of currently used cores " alt="" coords="1003,1842,1142,1883"/>
+<area shape="rect" id="node33" href="classThread__context.html#a06a054fa3fadfda7020d64748371799e" title="initialize thread_contexts[n] " alt="" coords="1246,1883,1383,1925"/>
+<area shape="rect" id="node34" href="classCPU__pool.html#a745603fb69c0ee5d4f4d728028fabff6" title="get the number of (active) CPUs " alt="" coords="1241,1949,1388,1976"/>
+<area shape="rect" id="node35" href="classCPU__pool.html#a9a0ceffddddc5e7b239c2f443fa6a559" title="get the idx;th CPU " alt="" coords="1243,1781,1387,1808"/>
+<area shape="rect" id="node46" href="classValue.html#a9fc8bbaf9fefe6835dea7db0f71b8b6c" title="return the number of elements (the product of the shapes). " alt="" coords="1673,245,1821,272"/>
+<area shape="rect" id="node47" href="classValue.html#a0d7debc5273aad742471b2d7990a6c8a" title="return the first element of the ravel (which is always present). same as get_cproto(), but named differently to indicate its context. " alt="" coords="1256,296,1373,323"/>
+<area shape="rect" id="node48" href="classValue.html#ac5b54e3a13cab0837442f1575b3299a5" title="return the number of elements, but at least 1 (for the prototype). " alt="" coords="988,576,1157,603"/>
+<area shape="rect" id="node49" href="classValue.html#a4429dcb041368962591397a45cb23d9b" title="return the shape of this value " alt="" coords="1011,424,1134,451"/>
+<area shape="rect" id="node50" href="classValue.html#a21369bf72b3fb40d1e9558cb1497a6b0" title="print this value (line break at Workspace::get_PW()) " alt="" coords="1029,525,1117,552"/>
+<area shape="rect" id="node51" href="classValue.html#aa8295760964d5f1d9dea8912c2c630dd" title="true if Value flag member is set " alt="" coords="1251,643,1378,669"/>
+<area shape="rect" id="node52" href="classValue.html#adcada8db3d31b0fc0791755ed40dc1d0" title="print this member value " alt="" coords="1243,592,1386,619"/>
+<area shape="rect" id="node58" href="classValue.html#a5ac7131d2f89d0bc8b8907d960cbd125" title="return the rank of this value " alt="" coords="1691,752,1804,779"/>
+<area shape="rect" id="node66" href="classWorkspace.html#a002e2f097bece67c9d082b7c89db11ae" title="return style and the current ⎕PP, and ⎕PW " alt="" coords="1217,440,1412,467"/>
+<area shape="rect" id="node67" href="classPrintContext.html#a787257953d929f80db2ba1698d59b905" title="set the print style to be used " alt="" coords="1237,491,1393,517"/>
+<area shape="rect" id="node68" href="classPrintContext.html#a5ef45c5babbe3ebf9988a9b659a2e407" title="return the print style to be used " alt="" coords="1237,541,1393,568"/>
+<area shape="rect" id="node53" href="classValue.html#a65d183d6ebf87a5727143b2b46759168" title="return the product of all but the the last dimension, or 1 for scalars " alt="" coords="1485,752,1601,779"/>
+<area shape="rect" id="node54" href="classValue.html#a113fa41969aed3b011b477ea199c6157" title="return the (constant) idx&#39;th element of the ravel. " alt="" coords="1686,397,1809,424"/>
+<area shape="rect" id="node55" href="classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length " alt="" coords="1686,448,1809,475"/>
+<area shape="rect" id="node56" href="classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string " alt="" coords="1677,651,1817,677"/>
+<area shape="rect" id="node57" href="classQuad__CR.html#ab9cef8298c90bb5ffe0832dffe032c4b" title="compute 35 ⎕CR B " alt="" coords="1471,600,1614,627"/>
+<area shape="rect" id="node60" href="classBif__F12__PICK.html#a49b2c6d2d06a094709eb02c32b936587" title="⊃B " alt="" coords="1461,888,1624,915"/>
+<area shape="rect" id="node63" href="classCell.html#ac4bb8b0cf0718bf4ec7a17f1a0271df0" title="Release content pointed to (complex, APL value) " alt="" coords="1495,397,1590,424"/>
+<area shape="rect" id="node64" href="classIntCell.html#afd60fd9e3a5581ac99c1e053d9218fe7" title="initialize the (un&#45;initialized) Cell *Z to integer 0 " alt="" coords="1501,347,1584,373"/>
+<area shape="rect" id="node59" href="classCell.html#a2999919fc2782b3cebfd925c63cc1fac" title="Return the character value of a cell. " alt="" coords="1876,575,2017,601"/>
+<area shape="rect" id="node61" href="classBif__F12__TAKE.html#aeae92664ab91bb0824af7c37b83cea0d" title="↑B " alt="" coords="1678,904,1817,931"/>
+<area shape="rect" id="node62" href="classCell.html#af8746e4049278c9a46f25e6ee0d71fcc" title="Return true iff this cell is a pointer to a cell. " alt="" coords="1888,904,2005,931"/>
+<area shape="rect" id="node65" href="classIntCell.html#a88c653b2f968c451ee1c1c53a983fa13" title="Construct an integer cell with value 0. " alt="" coords="1694,296,1801,323"/>
+<area shape="rect" id="node70" href="classFunction.html#a1d8e47de79dffa81c189730a1a19f80d" title="plain function, 2 arguments " alt="" coords="1008,108,1137,135"/>
+<area shape="rect" id="node71" href="classNamedObject.html#adf8b778a154d1d6e35c7d8a169aaaeb5" title="return the name of the named object " alt="" coords="1231,93,1398,120"/>
+<area shape="rect" id="node72" href="classID.html#af1bb0741450971c1882af59af87eef29" title="return the printable name for id as UCS_string " alt="" coords="1474,93,1611,120"/>
 </map>
 </div>
 
@@ -615,7 +646,7 @@ Here is the call graph for this function:</div>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="classScalarFunction.html">ScalarFunction</a></li>
-    <li class="footer">Generated on Sun Aug 9 2020 16:43:42 for GNUAPL by
+    <li class="footer">Generated on Sun Jan 30 2022 20:14:27 for GNUAPL by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -58,7 +58,7 @@
 #include "UCS_string.hh"
 #include "Workspace.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// an Id and how it looks like in APL
 struct Id_name
 {
@@ -87,19 +87,19 @@ static Id_name id2ucs[] =
 #include "Id.def"
 };
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string
 ID::get_name_UCS(Id id)
 {
 UTF8_string utf(reinterpret_cast<const char *>(get_name(id)));
    return UCS_string(utf);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 ID::cleanup()
 {
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 const UTF8 *
 ID::get_name(Id id)
 {
@@ -127,13 +127,13 @@ const char * name = "unknown ID";
 
    return reinterpret_cast<const UTF8 *>(name);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ostream &
 operator << (ostream & out, Id id)
 {
    return out << ID::get_name(id);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Function_P
 ID::get_system_function(Id id)
 {
@@ -152,7 +152,7 @@ ID::get_system_function(Id id)
 
    return 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Symbol *
 ID::get_system_variable(Id id)
 {
@@ -172,7 +172,7 @@ ID::get_system_variable(Id id)
 
    return 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 TokenTag
 ID::get_token_tag(Id id)
 {
@@ -191,4 +191,4 @@ ID::get_token_tag(Id id)
 
    return TOK_INVALID;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------

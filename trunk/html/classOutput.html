@@ -116,10 +116,6 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOutput.html#a65364a05686d3f27ee78ea5747b4cbdd">init</a> (bool logit)</td></tr>
 <tr class="memdesc:a65364a05686d3f27ee78ea5747b4cbdd"><td class="mdescLeft">&#160;</td><td class="mdescRight">initialize curses library <br /></td></tr>
 <tr class="separator:a65364a05686d3f27ee78ea5747b4cbdd"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3130edc86258293d6873686680ab2293"><td class="memItemLeft" align="right" valign="top"><a id="a3130edc86258293d6873686680ab2293"></a>
-static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOutput.html#a3130edc86258293d6873686680ab2293">read_ESC_sequence</a> (char *dest, int destlen, int append, const char *capname, char *str, int p1)</td></tr>
-<tr class="memdesc:a3130edc86258293d6873686680ab2293"><td class="mdescLeft">&#160;</td><td class="mdescRight">read/append an ESC sequence in str and store it in <b>dest</b> <br /></td></tr>
-<tr class="separator:a3130edc86258293d6873686680ab2293"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5fbec469bdc1d4ed4cd951ba98784118"><td class="memItemLeft" align="right" valign="top"><a id="a5fbec469bdc1d4ed4cd951ba98784118"></a>
 static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOutput.html#a5fbec469bdc1d4ed4cd951ba98784118">color_enabled</a> ()</td></tr>
 <tr class="memdesc:a5fbec469bdc1d4ed4cd951ba98784118"><td class="mdescLeft">&#160;</td><td class="mdescRight">true if xterm/color is on <br /></td></tr>
@@ -228,17 +224,6 @@ static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href
 <tr class="memitem:a6208ab84a0483cc161645bee5886e067"><td class="memItemLeft" align="right" valign="top">static char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOutput.html#a6208ab84a0483cc161645bee5886e067">ESC_Delete_1</a> [MAX_ESC_LEN] = &quot;\x1B[&quot; &quot;3;&quot; &quot;\0&quot; &quot;~&quot;</td></tr>
 <tr class="memdesc:a6208ab84a0483cc161645bee5886e067"><td class="mdescLeft">&#160;</td><td class="mdescRight">default ESC sequence for Delete key with SHIFT and/or CTRL  <a href="#a6208ab84a0483cc161645bee5886e067">More...</a><br /></td></tr>
 <tr class="separator:a6208ab84a0483cc161645bee5886e067"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4344c9c31394b45c3c951677439aa1ce"><td class="memItemLeft" align="right" valign="top">static char&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOutput.html#a4344c9c31394b45c3c951677439aa1ce">exit_attr_mode</a> [MAX_ESC_LEN] = &quot;\x1B[&quot; &quot;m&quot; &quot;\x1B&quot; &quot;(B&quot;</td></tr>
-<tr class="memdesc:a4344c9c31394b45c3c951677439aa1ce"><td class="mdescLeft">&#160;</td><td class="mdescRight">escape sequence for exiting attribute mode  <a href="#a4344c9c31394b45c3c951677439aa1ce">More...</a><br /></td></tr>
-<tr class="separator:a4344c9c31394b45c3c951677439aa1ce"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7ef14b95ddc90058d1aac325ac251f77"><td class="memItemLeft" align="right" valign="top"><a id="a7ef14b95ddc90058d1aac325ac251f77"></a>
-static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOutput.html#a7ef14b95ddc90058d1aac325ac251f77">use_curses</a> = false</td></tr>
-<tr class="memdesc:a7ef14b95ddc90058d1aac325ac251f77"><td class="mdescLeft">&#160;</td><td class="mdescRight">true if curses shall be used for output ESC sequences <br /></td></tr>
-<tr class="separator:a7ef14b95ddc90058d1aac325ac251f77"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a508421f14306e792ea6b4b3ee5d47aa0"><td class="memItemLeft" align="right" valign="top"><a id="a508421f14306e792ea6b4b3ee5d47aa0"></a>
-static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classOutput.html#a508421f14306e792ea6b4b3ee5d47aa0">keys_curses</a> = false</td></tr>
-<tr class="memdesc:a508421f14306e792ea6b4b3ee5d47aa0"><td class="mdescLeft">&#160;</td><td class="mdescRight">true if curses shall be used for input ESC sequences <br /></td></tr>
-<tr class="separator:a508421f14306e792ea6b4b3ee5d47aa0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-static-attribs"></a>
 Static Protected Attributes</h2></td></tr>
@@ -317,7 +302,7 @@ static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 
 <p class="definition">Definition at line <a class="el" href="Output_8hh_source.html#l00142">142</a> of file <a class="el" href="Output_8hh_source.html">Output.hh</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="Output_8hh_source.html#l00243">CIN_ostream::clear_EOL()</a>, <a class="el" href="main_8cc_source.html#l00265">init_apl()</a>, and <a class="el" href="UserPreferences_8cc_source.html#l01028">UserPreferences::read_config_file()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="Output_8hh_source.html#l00230">CIN_ostream::clear_EOL()</a>, <a class="el" href="main_8cc_source.html#l00368">init_apl()</a>, and <a class="el" href="UserPreferences_8cc_source.html#l01077">UserPreferences::read_config_file()</a>.</p>
 
 </div>
 </div>
@@ -346,7 +331,7 @@ static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 
 <p class="definition">Definition at line <a class="el" href="Output_8hh_source.html#l00145">145</a> of file <a class="el" href="Output_8hh_source.html">Output.hh</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="Output_8hh_source.html#l00247">CIN_ostream::can_clear_EOS()</a>, <a class="el" href="Output_8hh_source.html#l00251">CIN_ostream::clear_EOS()</a>, and <a class="el" href="UserPreferences_8cc_source.html#l01028">UserPreferences::read_config_file()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="Output_8hh_source.html#l00234">CIN_ostream::can_clear_EOS()</a>, <a class="el" href="Output_8hh_source.html#l00238">CIN_ostream::clear_EOS()</a>, and <a class="el" href="UserPreferences_8cc_source.html#l01077">UserPreferences::read_config_file()</a>.</p>
 
 </div>
 </div>
@@ -375,7 +360,7 @@ static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 
 <p class="definition">Definition at line <a class="el" href="Output_8hh_source.html#l00109">109</a> of file <a class="el" href="Output_8hh_source.html">Output.hh</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="main_8cc_source.html#l00265">init_apl()</a>, and <a class="el" href="UserPreferences_8cc_source.html#l01028">UserPreferences::read_config_file()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="main_8cc_source.html#l00368">init_apl()</a>, and <a class="el" href="UserPreferences_8cc_source.html#l01077">UserPreferences::read_config_file()</a>.</p>
 
 </div>
 </div>
@@ -404,7 +389,7 @@ static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 
 <p class="definition">Definition at line <a class="el" href="Output_8hh_source.html#l00103">103</a> of file <a class="el" href="Output_8hh_source.html">Output.hh</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="main_8cc_source.html#l00265">init_apl()</a>, and <a class="el" href="UserPreferences_8cc_source.html#l01028">UserPreferences::read_config_file()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="main_8cc_source.html#l00368">init_apl()</a>, and <a class="el" href="UserPreferences_8cc_source.html#l01077">UserPreferences::read_config_file()</a>.</p>
 
 </div>
 </div>
@@ -433,7 +418,7 @@ static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 
 <p class="definition">Definition at line <a class="el" href="Output_8hh_source.html#l00106">106</a> of file <a class="el" href="Output_8hh_source.html">Output.hh</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="main_8cc_source.html#l00265">init_apl()</a>, and <a class="el" href="UserPreferences_8cc_source.html#l01028">UserPreferences::read_config_file()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="main_8cc_source.html#l00368">init_apl()</a>, and <a class="el" href="UserPreferences_8cc_source.html#l01077">UserPreferences::read_config_file()</a>.</p>
 
 </div>
 </div>
@@ -462,7 +447,7 @@ static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 
 <p class="definition">Definition at line <a class="el" href="Output_8hh_source.html#l00115">115</a> of file <a class="el" href="Output_8hh_source.html">Output.hh</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="UserPreferences_8cc_source.html#l01028">UserPreferences::read_config_file()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="UserPreferences_8cc_source.html#l01077">UserPreferences::read_config_file()</a>.</p>
 
 </div>
 </div>
@@ -491,7 +476,7 @@ static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 
 <p class="definition">Definition at line <a class="el" href="Output_8hh_source.html#l00112">112</a> of file <a class="el" href="Output_8hh_source.html">Output.hh</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="main_8cc_source.html#l00265">init_apl()</a>, and <a class="el" href="UserPreferences_8cc_source.html#l01028">UserPreferences::read_config_file()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="main_8cc_source.html#l00368">init_apl()</a>, and <a class="el" href="UserPreferences_8cc_source.html#l01077">UserPreferences::read_config_file()</a>.</p>
 
 </div>
 </div>
@@ -520,7 +505,7 @@ static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 
 <p class="definition">Definition at line <a class="el" href="Output_8hh_source.html#l00151">151</a> of file <a class="el" href="Output_8hh_source.html">Output.hh</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="UserPreferences_8cc_source.html#l01028">UserPreferences::read_config_file()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="UserPreferences_8cc_source.html#l01077">UserPreferences::read_config_file()</a>.</p>
 
 </div>
 </div>
@@ -576,7 +561,7 @@ static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 
 <p class="definition">Definition at line <a class="el" href="Output_8hh_source.html#l00160">160</a> of file <a class="el" href="Output_8hh_source.html">Output.hh</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="UserPreferences_8cc_source.html#l01028">UserPreferences::read_config_file()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="UserPreferences_8cc_source.html#l01077">UserPreferences::read_config_file()</a>.</p>
 
 </div>
 </div>
@@ -632,7 +617,7 @@ static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 
 <p class="definition">Definition at line <a class="el" href="Output_8hh_source.html#l00163">163</a> of file <a class="el" href="Output_8hh_source.html">Output.hh</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="UserPreferences_8cc_source.html#l01028">UserPreferences::read_config_file()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="UserPreferences_8cc_source.html#l01077">UserPreferences::read_config_file()</a>.</p>
 
 </div>
 </div>
@@ -688,7 +673,7 @@ static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 
 <p class="definition">Definition at line <a class="el" href="Output_8hh_source.html#l00157">157</a> of file <a class="el" href="Output_8hh_source.html">Output.hh</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="UserPreferences_8cc_source.html#l01028">UserPreferences::read_config_file()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="UserPreferences_8cc_source.html#l01077">UserPreferences::read_config_file()</a>.</p>
 
 </div>
 </div>
@@ -744,7 +729,7 @@ static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 
 <p class="definition">Definition at line <a class="el" href="Output_8hh_source.html#l00154">154</a> of file <a class="el" href="Output_8hh_source.html">Output.hh</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="UserPreferences_8cc_source.html#l01028">UserPreferences::read_config_file()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="UserPreferences_8cc_source.html#l01077">UserPreferences::read_config_file()</a>.</p>
 
 </div>
 </div>
@@ -801,7 +786,7 @@ static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 
 <p class="definition">Definition at line <a class="el" href="Output_8hh_source.html#l00148">148</a> of file <a class="el" href="Output_8hh_source.html">Output.hh</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="UserPreferences_8cc_source.html#l01028">UserPreferences::read_config_file()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="UserPreferences_8cc_source.html#l01077">UserPreferences::read_config_file()</a>.</p>
 
 </div>
 </div>
@@ -858,7 +843,7 @@ static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 
 <p class="definition">Definition at line <a class="el" href="Output_8hh_source.html#l00169">169</a> of file <a class="el" href="Output_8hh_source.html">Output.hh</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="UserPreferences_8cc_source.html#l01028">UserPreferences::read_config_file()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="UserPreferences_8cc_source.html#l01077">UserPreferences::read_config_file()</a>.</p>
 
 </div>
 </div>
@@ -914,7 +899,7 @@ static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 
 <p class="definition">Definition at line <a class="el" href="Output_8hh_source.html#l00166">166</a> of file <a class="el" href="Output_8hh_source.html">Output.hh</a>.</p>
 
-<p class="reference">Referenced by <a class="el" href="UserPreferences_8cc_source.html#l01028">UserPreferences::read_config_file()</a>.</p>
+<p class="reference">Referenced by <a class="el" href="UserPreferences_8cc_source.html#l01077">UserPreferences::read_config_file()</a>.</p>
 
 </div>
 </div>
@@ -945,33 +930,6 @@ static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 
 </div>
 </div>
-<a id="a4344c9c31394b45c3c951677439aa1ce"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4344c9c31394b45c3c951677439aa1ce">&#9670;&nbsp;</a></span>exit_attr_mode</h2>
-
-<div class="memitem">
-<div class="memproto">
-<table class="mlabels">
-  <tr>
-  <td class="mlabels-left">
-      <table class="memname">
-        <tr>
-          <td class="memname">char Output::exit_attr_mode = &quot;\x1B[&quot; &quot;m&quot; &quot;\x1B&quot; &quot;(B&quot;</td>
-        </tr>
-      </table>
-  </td>
-  <td class="mlabels-right">
-<span class="mlabels"><span class="mlabel">static</span></span>  </td>
-  </tr>
-</table>
-</div><div class="memdoc">
-
-<p>escape sequence for exiting attribute mode </p>
-<p>VT100 escape sequence to exit attribute mode. </p>
-
-<p class="definition">Definition at line <a class="el" href="Output_8hh_source.html#l00196">196</a> of file <a class="el" href="Output_8hh_source.html">Output.hh</a>.</p>
-
-</div>
-</div>
 <hr/>The documentation for this class was generated from the following files:<ul>
 <li>src/<a class="el" href="Output_8hh_source.html">Output.hh</a></li>
 <li>src/<a class="el" href="Output_8cc_source.html">Output.cc</a></li>
@@ -982,7 +940,7 @@ static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="classOutput.html">Output</a></li>
-    <li class="footer">Generated on Sun Aug 9 2020 16:43:42 for GNUAPL by
+    <li class="footer">Generated on Sun Jan 30 2022 20:14:26 for GNUAPL by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>

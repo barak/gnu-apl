@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -48,7 +48,7 @@ UserPreferences uprefs;
 #undef _B
 #endif
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 UserPreferences::usage(const char * prog)
 {
@@ -66,8 +66,8 @@ UserPreferences::usage(const char * prog)
 
 #ifdef DYNAMIC_LOG_WANTED
    CERR <<
-"    -l num               turn logging facility num ON;\n"
-"                         num is 1-" << (LID_MAX - 1) << "\n";
+"    -l num               turn logging facility num ON (1 ≤ num ≤ "
+                             << (LID_MAX - 1) << ")\n";
 #else
    CERR <<
 "    -l 37                turn logging facility 37 (startup) ON\n";
@@ -84,15 +84,18 @@ UserPreferences::usage(const char * prog)
 #endif // WINDOWS
 "    --cfg                show ./configure options used and exit\n"
 "    --noCIN              do not echo input (for scripting)\n"
-"    --CPU_limit_secs sec set CPU time limit to sec seconds\n"
+"    --CPU_limit_secs sec set CPU time limit to 'sec' seconds\n"
 "    --echoCIN            echo (final) input to COUT\n"
 "    --rawCIN             do not emit escape sequences\n"
+"    --to_COUT            redirect CERR to COUT (like 2>&1 in bash)\n"
+"    --tcp_port port      redirect CIN/COUT/CERR to/from TCP port 'port')\n"
 "    --[no]Color          start with ]XTERM ON [OFF])\n"
 "    --noCONT             do not )LOAD CONTINUE or SETUP workspace on startup\n"
 "    --emacs              run in (classical) emacs mode\n"
-"    --emacs_arg arg      run in emacs mode with argument arg\n"
+"    --emacs_arg arg      run in emacs mode with argument 'arg'\n"
 "    --eval expr          evaluate APL line expr and exit\n"
 "    --gpl                show license (GPL) and exit\n"
+"    --huge [arg]         memory management\n"
 "    -L wsname            )LOAD wsname (and not SETUP or CONTINUE) on startup\n"
 "    --LX expr            execute APL expression expr first\n"
 "    --OFF                automatically )OFF after last input file\n"
@@ -111,7 +114,7 @@ UserPreferences::usage(const char * prog)
 "    --[no]SV             [do not] start APnnn (a shared variable server)\n"
 "    -T testcases ...     run testcases\n"
 "    --TM mode            test mode (for -T files):\n"
-"                         0:   (default) exit after last testcase\n"
+"                         0:   exit after last testcase (default)\n"
 "                         1:   exit after last testcase if no error\n"
 "                         2:   continue (don't exit) after last testcase\n"
 "                         3:   stop testcases after first error (don't exit)\n"
@@ -123,11 +126,15 @@ UserPreferences::usage(const char * prog)
 #endif // WINDOWS
 "    -v, --version        show version information and exit\n"
 "    -w milli             wait milli milliseconds at startup\n"
-"    --                   end of options for " << prog << "\n"
+"    --                   end of options for the " << prog << " binary\n"
+"    +APPOPT              ignored (APL application option)\n"
+"    ++APPOPT ARG1        ignored (APL application option with 1 argument)\n"
+"    +++APPOPT ARG1 ARG2  ignored (APL application option with 2 arguments)\n"
+"       ...\n"
 "\n"
 "Please report problems to: bug-apl@gnu.org\n" << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 UserPreferences::show_GPL(ostream & out)
 {
@@ -138,7 +145,7 @@ UserPreferences::show_GPL(ostream & out)
 "    This program is GNU APL, a free implementation of the\n"
 "    ISO/IEC Standard 13751, \"Programming Language APL, Extended\"\n"
 "\n"
-"    Copyright (C) 2008-2020  Dr. Jürgen Sauermann\n"
+"    Copyright (C) 2008-2022  Dr. Jürgen Sauermann\n"
 "\n"
 "    This program is free software: you can redistribute it and/or modify\n"
 "    it under the terms of the GNU General Public License as published by\n"
@@ -156,7 +163,7 @@ UserPreferences::show_GPL(ostream & out)
 "---------------------------------------------------------------------------\n"
 "\n";
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 UserPreferences::is_APL_script(const char * filename)
 {
@@ -182,7 +189,19 @@ const size_t len = read(fd, buf, sizeof(buf));
    if (buf[1] != '!')   return false;
    return true;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+bool
+UserPreferences::parse_argv_0(int argc, const char * argv[])
+{
+   for (int a = 1; a < (argc - 1); ++a)
+       {
+         if (!strcmp(argv[a], "-l") && atoi(argv[a+1]) == LID_startup)
+            return true;
+       }
+
+   return false;
+}
+//----------------------------------------------------------------------------
 bool
 UserPreferences::parse_argv_1()
 {
@@ -255,7 +274,7 @@ bool log_startup = false;
                    CERR << "-u without user ID" << endl;
                    exit(a);
                  }
-              if (setuid(strtol(val, 0, 10)))
+              if (setuid(strtoll(val, 0, 10)))
                  {
                    CERR << "setuid(" << val << ") failed: "
                         << strerror(errno) << endl;
@@ -268,15 +287,19 @@ bool log_startup = false;
 
    return log_startup;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 UserPreferences::parse_argv_2(bool logit)
 {
-   // execve() puts the script name (and optional args at the end of argv.
+   // execve() puts the script name (and optional script arguments at the
+   // end of argv.
    // For example, argv might look like this:
    //
-   // /usr/bin/apl -apl-options... -- -script-options ./scriptname
+   // /usr/bin/apl -apl-options... -- -application-options
    //
+   // In general the options are the shebang of the script followed by the
+   // command line options (each starting with the interpreter or script name,
+   // followed by their optional arguments).
 
    // if GNU APL is started as aplscript, then --script is implied
    //
@@ -301,9 +324,20 @@ UserPreferences::parse_argv_2(bool logit)
          // at this point, argv[a] is the string after opt, i.e. either the
          // next option or an argument of the current option
          //
-         if (!strcmp(opt, "--"))
+         if (!strcmp(opt, "--"))   // end of options marker
             {
-              break;
+              break;   // for (size_t a = 1; ...
+            }
+
+         if (*opt == '+')   // APL application option
+            {
+              ++opt;   // skip first +
+              while (*opt == '+')
+                    {
+                      ++opt;   // skip +
+                      ++a;     // skip arg
+                    }
+              continue;
             }
 
          if (!strcmp(opt, "-C"))
@@ -425,6 +459,19 @@ UserPreferences::parse_argv_2(bool logit)
               exit(0);
             }
 
+         if (!strcmp(opt, "--mem"))
+            {
+              mem_arg = "";   // assume no value
+              if (val)   // --huge with user-supplied value
+                 {
+                   ++a;   // skip val
+                   mem_arg = val;
+                 }
+
+              Quad_WA::parse_mem(logit);
+              continue;
+            }
+
          if (!strcmp(opt, "--id"))
             {
               ++a;
@@ -487,6 +534,12 @@ UserPreferences::parse_argv_2(bool logit)
          if (!strcmp(opt, "--noCIN"))
             {
               do_not_echo = true;
+              continue;
+            }
+
+         if (!strcmp(opt, "--to_COUT"))
+            {
+              output_to_cout = false;
               continue;
             }
 
@@ -638,7 +691,7 @@ UserPreferences::parse_argv_2(bool logit)
               IO_Files::need_total = true;
               for (; a < expanded_argv.size(); ++a)   // inner for
                   {
-                    if (!strcmp(expanded_argv[a], "--"))  // end of -T arguments
+                    if (!strcmp(expanded_argv[a], "--"))  // end of -T args
                        {
                          ++a;   // skip --
                          break;           // inner for
@@ -672,20 +725,44 @@ UserPreferences::parse_argv_2(bool logit)
                    CERR << "--TM without test mode" << endl;
                    exit(a);
                  }
-              const int mode = atoi(val);
+              const int mode = 1 << atoi(val);
               IO_Files::test_mode = IO_Files::TestMode(mode);
               continue;
             }
+
          if (!strcmp(opt, "--TR"))
             {
               randomize_testfiles = true;
               continue;
             }
+
          if (!strcmp(opt, "--TS"))
             {
               append_summary = true;
               continue;
             }
+
+         if (!strcmp(opt, "--tcp_port"))
+            {
+              ++a;
+              if (!val)
+                 {
+                   CERR << "--tcp_port without port number (>0)" << endl;
+                   exit(a);
+                 }
+              tcp_port = atoi(val);
+              user_do_svars = system_do_svars = false;   // aka. --noSV
+              raw_cin = true;                            // aka. --rawCIN
+         //   do_not_echo = true;                        // aka. --noCIN
+              continue;
+            }
+
+         if (!strcmp(opt, "--tcp_websocket"))
+            {
+              tcp_websocket = true;
+              continue;
+            }
+
          if (!strcmp(opt, "-v") || !strcmp(opt, "--version"))
             {
               show_version(cout);
@@ -723,8 +800,40 @@ UserPreferences::parse_argv_2(bool logit)
 
    if (randomize_testfiles)   InputFile::randomize_files();
 
-   // if running from a script then make the script the first input file
-   if (script_argc != 0)
+   /* Note. Let the first line of script.apl be:
+
+      #!/home/eedjsa/apl-1.8/src/apl -l 37 --script
+
+     apl may have been started in one off these ways:
+
+      A.  ./apl -f script1.apl   # with script1.apl NOT executable. Then:
+               expanded_argv[script_argc] is:  ./apl
+              InputFile::files_todo.size():    1   (from -f)
+               script_argc is:                 0
+
+      B.  ./apl -f script2.apl   # with script2.apl executable. Then:
+              expanded_argv[script_argc] is:   script2.apl
+              InputFile::files_todo.size():    1    (from -f)
+               script_argc is:                 2
+
+      C.   ./apl
+               expanded_argv[script_argc] is:  ./apl
+              InputFile::files_todo.size():    0    (since no -f)
+               script_argc is:                 0
+
+      D.  ./script.apl   # with script2.apl executable. Then:
+              expanded_argv[script_argc] is:   script2.apl
+              InputFile::files_todo.size():    0    (since no -f)
+              script_argc is:                  1    #!./apl
+              script_argc is:                  2    #!./apl --script
+              script_argc is:                  4    #!./apl -l 37 --script
+
+      In case D. the interpreter has lost script_argc and the script file
+      needs to be appended to files_todo.
+    */
+
+   if (InputFile::files_todo.size() == 0)   // no -f (cases C. and D.)
+   if (script_argc > 0)                     // (case D.)
       {
         const UTF8_string & filename = expanded_argv[script_argc];
         InputFile fam(filename, 0, false, !do_not_echo, true, no_LX);
@@ -735,7 +844,7 @@ UserPreferences::parse_argv_2(bool logit)
    //
    IO_Files::testcase_count = InputFile::testcase_file_count();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
     GNU APL can be started in a number of ways:
 
@@ -769,13 +878,15 @@ UserPreferences::parse_argv_2(bool logit)
 void
 UserPreferences::expand_argv(int argc, const char ** argv)
 {
+   // 1. copy the command line arguments into original_argv and expanded_argv.
+   //
    loop(a, argc)
        {
          original_argv.push_back(argv[a]);
          expanded_argv.push_back(argv[a]);
        }
 
-   if (argc <= 1)   // no args at all
+   if (argc <= 1)   // program name argv[0] only, hence no arguments to expand
       {
         return;
       }
@@ -788,13 +899,14 @@ UserPreferences::expand_argv(int argc, const char ** argv)
 
    if (!is_APL_script(argv[2]))   return;   // not run from a script
 
-   // at this point, argv[1] is the optional argument of the interpreter
-   // from the first line of the script, argv[2] is the name of the script,
-   // and argv[3] ... are the arguments given by the user when starting the
-   // script.
-   //
-   // expand argv[1], stopping at --
-   //
+   /* at this point:
+
+      argv[1] is the optional argument of the interpreter on the shebang line,
+      argv[2] is the name of the script, and
+      argv[3] ... are the command line arguments given by the user
+                  when starting the script.
+      expand argv[1], stopping at --
+    */
 const char * apl_args = argv[1];   // the args after e.g. /usr/bin/apl
    script_argc = 2;
    if (!strchr(apl_args, ' '))   // single option
@@ -802,6 +914,7 @@ const char * apl_args = argv[1];   // the args after e.g. /usr/bin/apl
         return;
       }
 
+   // remove expanded_argv[1] and insert the expanded expanded_argv[1] instead
    expanded_argv.erase(expanded_argv.begin() + 1);
    --script_argc;
    for (int index = 1;;)
@@ -846,7 +959,7 @@ const char * apl_args = argv[1];   // the args after e.g. /usr/bin/apl
             }
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 UserPreferences::show_version(ostream & out)
 {
@@ -870,7 +983,7 @@ UserPreferences::show_version(ostream & out)
 
    Output::set_color_mode(Output::COLM_OUTPUT);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 UserPreferences::show_configure_options()
 {
@@ -972,12 +1085,12 @@ UserPreferences::show_configure_options()
    << endl
    << "how ./configure was (probably) called:" << endl
    << "--------------------------------------" << endl
-   << "    " << CONFIGURE_ARGS << endl
+   << "    " CONFIGURE_ARGS << endl
    << endl;
 
    show_version(CERR);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 FILE *
 UserPreferences::open_user_file(const char * fname, char * filename,
                                 bool sys, bool log_startup)
@@ -1003,7 +1116,7 @@ UserPreferences::open_user_file(const char * fname, char * filename,
         // check that $HOME/.gnu-apl/preferences exist and fall back to
         // $HOME/.config gnu-apl/preferences if not
         //
-        if (access(filename, F_OK) != 0)   // file does not exit
+        if (access(filename, F_OK) != 0)   // file does not exist
            {
              snprintf(filename, APL_PATH_MAX,
                       "%s/.config/gnu-apl/%s", HOME, fname);
@@ -1026,7 +1139,7 @@ FILE * f = fopen(filename, "r");
 
    return f;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 UserPreferences::read_config_file(bool sys, bool log_startup)
 {
@@ -1101,7 +1214,7 @@ int file_profile = 0;   // the current profile in the preferences file
          // the user while Profile N > 0 in the file requires the same
          // profile requested by the user.
          //
-         if (!strcasecmp(opt, "Profile"))   // Never ignore Profile entries
+         if (!strcasecmp(opt, "PROFILE"))   // Never ignore Profile entries
             {
               file_profile = atoi(arg);
               continue;
@@ -1143,9 +1256,9 @@ int file_profile = 0;   // the current profile in the preferences file
             }
          sargs[sargs_idx] = "NUL";              // terminating 0
 
-         if (!strcasecmp(opt, "Color"))
+         if (!strcasecmp(opt, "COLOR"))
             {
-              if (yes_no)   // user said "Yes" or "No"
+              if (yes_no)   // user said "YES" or "NO"
                  {
                    // if the user said "Yes" (which is an obsolete setting)
                    // then use_curses is cleared because at the time when
@@ -1163,20 +1276,20 @@ int file_profile = 0;   // the current profile in the preferences file
                    do_Color = true;
                  }
             }
-         else if (!strcasecmp(opt, "Keyboard"))
+         else if (!strcasecmp(opt, "KEYBOARD"))
             {
               // obsolete
             }
-         else if (yes_no && !strcasecmp(opt, "Welcome"))
+         else if (yes_no && !strcasecmp(opt, "WELCOME"))
             {
               silent = no;
             }
-         else if (yes_no && !strcasecmp(opt, "SharedVars"))
+         else if (yes_no && !strcasecmp(opt, "SHAREDVARS"))
             {
               user_do_svars = yes;
               system_do_svars = yes;
             }
-         else if (!strcasecmp(opt, "Logging"))
+         else if (!strcasecmp(opt, "LOGGING"))
             {
               d[0] = strtoll(arg, 0, 10);   // decimal!
               Log_control(LogId(d[0]), true);
@@ -1331,11 +1444,15 @@ int file_profile = 0;   // the current profile in the preferences file
                  }
               else line_history_path = UTF8_string(arg);
             }
+         else if (!strcasecmp(opt, "MEMORY"))
+            {
+              mem_arg = strdup(arg);
+            }
          else if (!strcasecmp(opt, "NABLA-TO-HISTORY"))
             {
-              if      (!strcasecmp(arg, "Never"))      nabla_to_history = 0;
-              else if (!strcasecmp(arg, "Modified"))   nabla_to_history = 1;
-              else if (!strcasecmp(arg, "Always"))     nabla_to_history = 2;
+              if      (!strcasecmp(arg, "NEVER"))      nabla_to_history = 0;
+              else if (!strcasecmp(arg, "MODIFIED"))   nabla_to_history = 1;
+              else if (!strcasecmp(arg, "ALWAYS"))     nabla_to_history = 2;
               else   CERR << "bad value " << arg << " for NABLA-TO-HISTORY"
                         << " at line " << line << " of config file "
                         << filename << " (ignored)" << endl;
@@ -1360,16 +1477,16 @@ int file_profile = 0;   // the current profile in the preferences file
                  CERR << "bad value " << arg << " for INITIAL-⎕PW (ignored)"
                       << endl;
             }
-         else if (!strcasecmp(opt, "Multi-Line-Strings"))
+         else if (!strcasecmp(opt, "MULTI-LINE-STRINGS"))
             {
               multi_line_strings = yes;
               multi_line_strings_3 = yes;
             }
-         else if (!strcasecmp(opt, "New-Multi-Line-Strings"))
+         else if (!strcasecmp(opt, "NEW-MULTI-LINE-STRINGS"))
             {
               multi_line_strings_3 = yes;
             }
-         else if (!strcasecmp(opt, "Old-Multi-Line-Strings"))
+         else if (!strcasecmp(opt, "OLD-MULTI-LINE-STRINGS"))
             {
               multi_line_strings = yes;
             }
@@ -1386,6 +1503,11 @@ int file_profile = 0;   // the current profile in the preferences file
               discard_indentation = yes;
             }
 
+         else if (!strcasecmp(opt, "OUTPUT-TO-COUT"))
+            {
+              output_to_cout = yes;
+            }
+
          // security facilities...
          //
 #define sec_def(X) else if (!strcasecmp(opt, #X)) X = yes;
@@ -1400,7 +1522,7 @@ int file_profile = 0;   // the current profile in the preferences file
 
    fclose(f);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 UserPreferences::decode_ASCII(const char * strg)
 {
@@ -1437,12 +1559,12 @@ UserPreferences::decode_ASCII(const char * strg)
    if (!strcmp(strg, "RS"))    return 0x1E;
    if (!strcmp(strg, "US"))    return 0x1F;
 
-   if (strlen(strg) == 1)   return *strg;                 // single char
-   if (strlen(strg) == 2)   return strtol(strg, 0, 16);   // hex value, e.g. 4C
+   if (strlen(strg) == 1)   return *strg;                  // single char
+   if (strlen(strg) == 2)   return strtoll(strg, 0, 16);   // hex value, e.g. 4C
    CERR << "invalid parameter " << strg << " in preferences file" << endl;
    return -1;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 UserPreferences::read_threshold_file(bool sys, bool log_startup)
 {
@@ -1522,7 +1644,7 @@ int line = 0;
                  << " line " << line << endl;
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 UserPreferences::set_threshold(Function_P fun, int ab, int i_ab,
                                ShapeItem threshold)
@@ -1533,5 +1655,5 @@ UserPreferences::set_threshold(Function_P fun, int ab, int i_ab,
    if (ab == 1)   const_cast<Function *>(fun)->set_monadic_threshold(threshold);
    else           const_cast<Function *>(fun)->set_dyadic_threshold(threshold);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 

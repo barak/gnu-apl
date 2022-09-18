@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -44,6 +44,8 @@ struct InputFile
    : file     (_file),
      filename (&_filename[0], _filename.size()),
      test     (_test),
+     pushed_IE(false),
+     pushed_pending(false),
      echo     (_echo),
      is_script(_is_script),
      with_LX  (LX),
@@ -58,6 +60,14 @@ struct InputFile
    /// set the from_COPY flag
    void set_COPY()
       { from_COPY = true; }
+
+   /// set the pushed_IE flag
+   void set_pushed_IE()
+      { pushed_IE = true; }
+
+   /// set the pushed_pending flag
+   void set_pushed_pending(bool on_off)
+      { pushed_pending = on_off; }
 
    /// set the current line number
    void set_line_no(int num)
@@ -90,11 +100,21 @@ struct InputFile
    /// return true iff input comes from a script (as opposed to running
    /// interactively)
    static bool running_script()
-      { return files_todo.size() > 0 && files_todo[0].is_script; }
+      { return files_todo.size() && files_todo[0].is_script; }
 
    /// return true iff the current input file exists and is a test file
    static bool is_validating()
-      { return files_todo.size() > 0 && files_todo[0].test; }
+      { return files_todo.size() && files_todo[0].test; }
+
+   /// return true iff the current input file exists and is a pushed
+   /// immediate execution
+   static bool pushed_file()
+      { return files_todo.size() && files_todo[0].pushed_IE; }
+
+   /// return true iff the current input file exists and is a pushed
+   /// immediate execution
+   static bool is_pushed_pending()
+      { return files_todo.size() && files_todo[0].pushed_pending; }
 
    /// the number of testcase (.tc) files
    static int testcase_file_count()
@@ -147,13 +167,14 @@ struct InputFile
    UTF8_string  filename;
 
 protected:
-
-   bool test;         ///< true for -T testfile, false for -f APL file
-   bool echo;         ///< echo stdin
-   bool is_script;    ///< script (override existing functions)
-   LX_mode with_LX;   ///< execute ⎕LX at the end
-   int  line_no;      ///< line number in file
-   int  in_html;      ///< 0: no HTML, 1: in HTML file 2: in HTML header
+   bool test;            ///< true for -T testfile, false for -f APL file
+   bool pushed_IE;       ///< true for ]PUSHFILE child
+   bool pushed_pending;  ///< true for ]PUSHFILE parent
+   bool echo;            ///< echo stdin
+   bool is_script;       ///< script (override existing functions)
+   LX_mode with_LX;      ///< execute ⎕LX at the end
+   int  line_no;         ///< line number in file
+   int  in_html;         ///< 0: no HTML, 1: in HTML file 2: in HTML header
 
    /// functions and vars that shoule be )COPIED
    UCS_string_vector object_filter;

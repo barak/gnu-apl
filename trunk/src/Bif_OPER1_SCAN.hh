@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 
 #include "PrimitiveOperator.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** Primitive operator scan.
  */
 /// Base class for \ and ⍀
@@ -44,7 +44,7 @@ protected:
    static void scan_item(Cell * Z, Function_P LO, const Cell * B,
                          uint32_t m_len, uint32_t l_len);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** Primitive operator \ (scan along last axis)
  */
 /// The class implementing \.
@@ -77,7 +77,7 @@ protected:
       { return false; }
 
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** Primitive operator ⍀ (scan along first axis)
  */
 /// The class implementing ⍀
@@ -106,7 +106,7 @@ public:
 
 protected:
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 
 #endif // __Bif_OPER1_SCAN_HH_DEFINED__

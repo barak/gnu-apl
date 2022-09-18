@@ -1,16 +1,14 @@
 <map id="NativeFunction::NativeFunction" name="NativeFunction::NativeFunction">
 <area shape="rect" id="node2" href="$classNativeFunction.html#a07ab61a74e4a64f38424a2bbd0c6b38b" title="⎕FX a native funtion from a shared library (dlopen) handle " alt="" coords="260,78,392,105"/>
-<area shape="rect" id="node3" href="$classXML__Loading__Archive.html#ad200f5b98b9cf3e903ccf714a56a1d0f" title="read next Ravel element " alt="" coords="447,5,599,47"/>
-<area shape="rect" id="node6" href="$classNativeFunction.html#aa3c7c980f71b2b498067dd31b969b4f0" title="return true if the .so library was successfully loaded " alt="" coords="459,71,587,112"/>
-<area shape="rect" id="node8" href="$classQuad__FX.html#a550a9ac4f2bd7ed3d945994f31847012" title="⎕FX with native function and optional library reference " alt="" coords="440,137,605,163"/>
-<area shape="rect" id="node4" href="$classXML__Loading__Archive.html#ad0c398f273df586ef1a2cb9b87b9cb41" title="find attribute att_name and return a pointer to its value if found) " alt="" coords="656,5,808,47"/>
-<area shape="rect" id="node5" href="$classXML__Loading__Archive.html#a475b4572fea93849b155009d78afbd66" title="read next Value element, return true on success " alt="" coords="859,5,1011,47"/>
-<area shape="rect" id="node7" href="$classCommand.html#a925cc5f77af57e1705b8c96a522e6a55" title="show list of commands " alt="" coords="653,78,811,105"/>
-<area shape="rect" id="node9" href="$classQuad__FX.html#a8cd0f99594d0c2559309d1b4f77605cd" title="overloaded Function::eval_AB(). " alt="" coords="665,133,799,159"/>
-<area shape="rect" id="node15" href="$classQuad__FX.html#a1441a80b40e7d08f8f5978f6b0a52040" title="overloaded Function::eval_AXB(). " alt="" coords="661,183,803,210"/>
-<area shape="rect" id="node10" href="$classQuad__TF.html#a293263bd9b2bf923dc9e4113dded832f" title="try inverse ⎕TF2 of ucs, set new_var_or_fun if successful " alt="" coords="861,133,1009,159"/>
-<area shape="rect" id="node11" href="$structCommand_1_1transfer__context.html#a4e80a2899a02285ba89e58792e6150ea" title="process a &#39;A&#39; (array in 2 ⎕TF format) item. " alt="" coords="1059,60,1243,101"/>
-<area shape="rect" id="node12" href="$structCommand_1_1transfer__context.html#afee6856208966168d158de45145dd4ca" title="process an &#39;F&#39; (function in 2 ⎕TF format) item. " alt="" coords="1059,125,1243,167"/>
-<area shape="rect" id="node13" href="$classQuad__TF.html#a0b9baf30e622ebe20e0afc21f32ec644" title="Overloaded Function::eval_AB(). " alt="" coords="1084,191,1217,218"/>
-<area shape="rect" id="node14" href="$classQuad__TF.html#ae9b15fd0ae227d3a550f01a164f76af8" title="Constructor. " alt="" coords="1291,191,1429,218"/>
+<area shape="rect" id="node3" href="$classXML__Loading__Archive.html#a2e7aed9883aa106937d3d9313163e10b" title="read next Function element " alt="" coords="447,5,599,47"/>
+<area shape="rect" id="node4" href="$classNativeFunction.html#aa3c7c980f71b2b498067dd31b969b4f0" title="return true if the .so library was successfully loaded " alt="" coords="459,71,587,112"/>
+<area shape="rect" id="node6" href="$classQuad__FX.html#a550a9ac4f2bd7ed3d945994f31847012" title="⎕FX with native function and optional library reference " alt="" coords="440,137,605,163"/>
+<area shape="rect" id="node5" href="$classCommand.html#a925cc5f77af57e1705b8c96a522e6a55" title="show list of commands " alt="" coords="653,78,811,105"/>
+<area shape="rect" id="node7" href="$classQuad__FX.html#a4e16cbd12b82eb185437fdda9673ec35" title="overloaded Function::eval_AB(). " alt="" coords="665,133,799,159"/>
+<area shape="rect" id="node13" href="$classQuad__FX.html#a5f8e649505baa6e008f2aa11706b2b06" title="overloaded Function::eval_AXB(). " alt="" coords="661,183,803,210"/>
+<area shape="rect" id="node8" href="$classQuad__TF.html#a293263bd9b2bf923dc9e4113dded832f" title="try inverse ⎕TF2 of ucs, set new_var_or_fun if successful " alt="" coords="859,133,1007,159"/>
+<area shape="rect" id="node9" href="$structCommand_1_1transfer__context.html#a4e80a2899a02285ba89e58792e6150ea" title="process a &#39;A&#39; (array in 2 ⎕TF format) item. " alt="" coords="1055,60,1239,101"/>
+<area shape="rect" id="node10" href="$structCommand_1_1transfer__context.html#afee6856208966168d158de45145dd4ca" title="process an &#39;F&#39; (function in 2 ⎕TF format) item. " alt="" coords="1055,125,1239,167"/>
+<area shape="rect" id="node11" href="$classQuad__TF.html#a27ed4b02d5f1a1c8a8b0a1fcbe2756f8" title="Overloaded Function::eval_AB(). " alt="" coords="1080,191,1213,218"/>
+<area shape="rect" id="node12" href="$classQuad__TF.html#ae9b15fd0ae227d3a550f01a164f76af8" title="Constructor. " alt="" coords="1287,191,1425,218"/>
 </map>

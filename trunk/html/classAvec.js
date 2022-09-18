@@ -4,6 +4,7 @@ var classAvec =
     [ "check_av_table", "classAvec.html#a35ee7f96b3fd5f09915684ec542f60cd", null ],
     [ "check_file", "classAvec.html#aa853fc89b23e2ef5d02a56a2339357bd", null ],
     [ "compare_uni", "classAvec.html#a584e4653f79d47cd53be20f9830cbc74", null ],
+    [ "digit_value", "classAvec.html#af9d230b25c7dab2ce52b4f12e7ceb886", null ],
     [ "find_av_pos", "classAvec.html#af37308ba6e99635253c4d487d4bf87fb", null ],
     [ "find_char", "classAvec.html#a844e2fc3a73ef90f42e63a9c268f36b8", null ],
     [ "get_av_pos", "classAvec.html#a01fc79211fc2962b985fbde59438a08a", null ],

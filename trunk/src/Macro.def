@@ -86,9 +86,10 @@ mac_def(  Z__vA_LO_EACH_sB,
 
 /// dyadic EACH with result, vector A, vector B
 //
-mac_def(  Z__vA_LO_EACH_vB, 
+mac_def(  Z__vA_LO_EACH_vB,
  "Z←A (LO Z__vA_LO_EACH_vB) B;rho_Z;N;N_max\n"
- "rho_Z←⍴B ◊ N←⎕IO ◊ A←,A ◊ N_max←N+⍴B←,B ◊ Z←N_max⍴0\n"
+ "→((⍴A)≡⍴B)⍴SHAPES_MATCH ◊ ⎕ES 5,2+(⍴⍴A)=⍴⍴B\n"
+ "SHAPES_MATCH: rho_Z←⍴B ◊ N←⎕IO ◊ A←,A ◊ N_max←N+⍴B←,B ◊ Z←N_max⍴0\n"
  "(N⊃Z)←(N⊃A) LO N⊃B ◊ 0 → N_max>N←N+1\n"
  "Z←rho_Z⍴Z\n")
 
@@ -103,15 +104,13 @@ mac_def(  Z__A_LO_OUTER_B,
 /// inner product. caller has checked that the shapes of A and B fit
 //
 mac_def(  Z__A_LO_INNER_RO_B,
- "Z←A (LO Z__A_LO_INNER_RO_B RO) B;rho_Z;r_Ah;r_Bl;z;M;M_max;N;N_max;I;IA;IB\n"
- "r_Ah←¯1↓⍴A ◊ A←((×/r_Ah),  ¯1↑1,⍴A)⍴A   ⍝ hence 2 = ⍴⍴A\n"
- "r_Bl← 1↓⍴B ◊ B←((1↑(⍴B),1), ×/r_Bl)⍴B   ⍝ hence 2 = ⍴⍴B\n"
- "I←,⍳rho_Z←r_Ah, r_Bl ◊ N←⎕IO ◊ N_max←N+⍴I ◊ Z←N_max⍴0\n"
- "z←(↑⍴B)⍴0 ◊ M_max←⎕IO+⍴z\n"
- "(IA IB)←⊃I[N] ◊ M←⎕IO\n"
- "z[M]←⊂(⊃A[IA;M]) RO ⊃B[M;IB] ◊ 0  → M_max>M←M+1\n"
- "       Z[N]←LO/z             ◊ ¯2 → N_max>N←N+1\n"
- "Z←rho_Z⍴Z\n")
+ "Z←A (LO INNER RO) B;⎕IO\n"
+ "    ⎕IO←1 ◊ → (⍴⍴A) ↓ sA ◊ → (⍴⍴B) ↓ vA_sB\n"
+ "vA_vB: Z←LO/¨ (⊂[ρρA]A) ∘.RO ⊂[1]B ◊ →0\n"
+ "vA_sB: Z←LO/¨ (⊂[ρρA]A) ∘.RO ⊂B    ◊ →0\n"
+ "sA: → (⍴⍴B) ↓ sA_sB\n"
+ "sA_vB: Z←LO/¨ (⊂A)      ∘.RO ⊂[1]B ◊ →0\n"
+ "sA_sB: Z←LO/¨ (⊂A)      ∘.RO ⊂B    ◊ →0\n")
 
 /// monadic power with repeat count and no result
 //

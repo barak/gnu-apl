@@ -174,7 +174,7 @@ eval_B(Value_P B, const NativeFunction * caller)
 {
    if (B->get_rank() > 1)   RANK_ERROR;
 
-   if (!B->get_ravel(0).is_integer_cell())     return list_functions(COUT);
+   if (!B->get_cravel(0).is_integer_cell())     return list_functions(COUT);
 
    return Quad_FIO::fun->eval_B(B);
 }

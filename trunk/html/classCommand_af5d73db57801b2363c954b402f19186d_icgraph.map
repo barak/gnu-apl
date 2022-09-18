@@ -1,6 +1,0 @@
-<map id="Command::cmd_CHECK" name="Command::cmd_CHECK">
-<area shape="rect" id="node2" href="$classXML__Saving__Archive.html#acc327395cab545ea7797d92f5c931cab" title="write entire workspace " alt="" coords="224,23,371,65"/>
-<area shape="rect" id="node3" href="$classWorkspace.html#a8a4f1d898d523818dbd9d7efa6f2cf92" title="save this workspace " alt="" coords="419,31,572,57"/>
-<area shape="rect" id="node4" href="$classCommand.html#ad61e749290966d00856ce1dd4f6abe42" title=")SAVE active WS as CONTINUE and )OFF " alt="" coords="620,5,813,32"/>
-<area shape="rect" id="node5" href="$classCommand.html#aec0c4c6efbb9df9a34220b510f58905a" title=")SAVE: save a workspace file (.xml) " alt="" coords="637,56,796,83"/>
-</map>

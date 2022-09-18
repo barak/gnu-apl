@@ -673,6 +673,8 @@ WANT_ERLANG_FALSE
 WANT_ERLANG_TRUE
 WANT_ANDROID_FALSE
 WANT_ANDROID_TRUE
+WANT_CTRLD_DEL_FALSE
+WANT_CTRLD_DEL_TRUE
 HAVE_AFFINITY_NP_FALSE
 HAVE_AFFINITY_NP_TRUE
 HAVE_SEM_INIT_FALSE
@@ -681,6 +683,7 @@ HAVE_RDTSC_FALSE
 HAVE_RDTSC_TRUE
 HAVE_GTK3_FALSE
 HAVE_GTK3_TRUE
+PKG_CONFIG
 GTK_CFLAGS
 GTK_LDFLAGS
 HAVE_LIBPCRE2_32_FALSE
@@ -837,6 +840,7 @@ with_sqlite3
 with_postgresql
 with_pcre
 with_gtk3
+with_ctrld_del
 with_android
 with_erlang
 with_libapl
@@ -1537,6 +1541,7 @@ Optional Packages:
   --with-pcre[=prefix]    enable ⎕RE (needs libpcre2)
   --with-gtk3             enable ⎕GTK (interface to GTK+ version 3; needs
                           libgtk-3 and more)
+  --with-ctrld_del        enable to use ^D as del-char, ^Z as EOT
   --with-android          enable when compiling for Android
   --with-erlang           enable to build the Erlang interface
   --with-libapl           enable to build libapl.so
@@ -9350,10 +9355,6 @@ _lt_linker_boilerplate=`cat conftest.err`
 $RM -r conftest*
 
 
-## CAVEAT EMPTOR:
-## There is no encapsulation within the following macros, do not change
-## the running order or otherwise move them around unless you know exactly
-## what you are doing...
 if test -n "$compiler"; then
 
 lt_prog_compiler_no_builtin_flag=
@@ -17785,7 +17786,13 @@ _ACEOF
   esac
 
 
-#################################################################################
+
+cat >>confdefs.h <<_ACEOF
+#define CONFIGURE_ARGS "$0 $ac_configure_args"
+_ACEOF
+
+
+##############################################################################
 #
 # Various checks for library functions. We use inverse alphabetic order although
 # the order should be least-dependent to most-dependent (or vice versa?). The
@@ -17795,7 +17802,7 @@ _ACEOF
 # ... lib_A ... lib_B   and the test for lib_B should come before the test for
 # lib_A in this file.
 #
-#################################################################################
+##############################################################################
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for error_at_line" >&5
 $as_echo_n "checking for error_at_line... " >&6; }
@@ -19504,20 +19511,58 @@ else
     # user wants ⎕GTK)
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
-    { $as_echo "$as_me:${as_lineno-$LINENO}: checking if pkg-config is executable" >&5
-$as_echo_n "checking if pkg-config is executable... " >&6; }
-    if test -x /usr/bin/pkg-config
+
+    # Extract the first word of "pkg-config", so it can be a program name with args.
+set dummy pkg-config; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_path_PKG_CONFIG+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  case $PKG_CONFIG in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_PKG_CONFIG="$PKG_CONFIG" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_PKG_CONFIG="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  test -z "$ac_cv_path_PKG_CONFIG" && ac_cv_path_PKG_CONFIG="no"
+  ;;
+esac
+fi
+PKG_CONFIG=$ac_cv_path_PKG_CONFIG
+if test -n "$PKG_CONFIG"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $PKG_CONFIG" >&5
+$as_echo "$PKG_CONFIG" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+  # locate pkg-config
+    if test x$PKG_CONFIG != xno
     then
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
         { $as_echo "$as_me:${as_lineno-$LINENO}: checking if package gtk+-3.0 is installed" >&5
 $as_echo_n "checking if package gtk+-3.0 is installed... " >&6; }
-        if pkg-config --exists gtk+-3.0
+        if $PKG_CONFIG --exists gtk+-3.0
         then
             { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
-            GTK_CFLAGS=`pkg-config --cflags gtk+-3.0`
-            GTK_LDFLAGS=`pkg-config --libs gtk+-3.0`
+            GTK_CFLAGS=`$PKG_CONFIG --cflags gtk+-3.0`
+            GTK_LDFLAGS=`$PKG_CONFIG --libs gtk+-3.0`
             HAVE_gtk3=yes
         else
             { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
@@ -19842,6 +19887,33 @@ echo
 echo "   *** decisions made by the user ... ***"
 echo
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if user wants ctrl-d to be del-char (moving EOT to ctrl-z)" >&5
+$as_echo_n "checking if user wants ctrl-d to be del-char (moving EOT to ctrl-z)... " >&6; }
+user_wants_ctrld_del=no
+
+# Check whether --with-ctrld_del was given.
+if test "${with_ctrld_del+set}" = set; then :
+  withval=$with_ctrld_del; user_wants_ctrld_del=$withval
+fi
+
+
+if test "x$user_wants_ctrld_del" = xyes ; then
+
+$as_echo "#define WANT_CTRLD_DEL 1" >>confdefs.h
+
+fi
+
+ if test "x$user_wants_ctrld_del" = xyes; then
+  WANT_CTRLD_DEL_TRUE=
+  WANT_CTRLD_DEL_FALSE='#'
+else
+  WANT_CTRLD_DEL_TRUE='#'
+  WANT_CTRLD_DEL_FALSE=
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $user_wants_ctrld_del" >&5
+$as_echo "$user_wants_ctrld_del" >&6; }
+
 # check if the user compiles for ANDROID
 #
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking if we are compiling for Android" >&5
@@ -19850,7 +19922,7 @@ user_wants_android=no
 
 # Check whether --with-android was given.
 if test "${with_android+set}" = set; then :
-  withval=$with_android; user_wants_android=yes
+  withval=$with_android; user_wants_android=$withval
 fi
 
 
@@ -19879,7 +19951,7 @@ user_wants_erlang=no
 
 # Check whether --with-erlang was given.
 if test "${with_erlang+set}" = set; then :
-  withval=$with_erlang; user_wants_erlang=yes
+  withval=$with_erlang; user_wants_erlang=$withval
 fi
 
 
@@ -19908,7 +19980,7 @@ user_wants_libapl=$user_wants_erlang   # Erlang needs libapl
 
 # Check whether --with-libapl was given.
 if test "${with_libapl+set}" = set; then :
-  withval=$with_libapl; user_wants_libapl=yes
+  withval=$with_libapl; user_wants_libapl=$withval
 fi
 
 
@@ -19939,7 +20011,7 @@ PYTHON_CFLAGS=
 
 # Check whether --with-python was given.
 if test "${with_python+set}" = set; then :
-  withval=$with_python; user_wants_python=yes
+  withval=$with_python; user_wants_python=$withval
 fi
 
 
@@ -19947,10 +20019,51 @@ if test "$user_wants_python" = yes ; then
 
 $as_echo "#define WANT_PYTHON 1" >>confdefs.h
 
-   if test -x /usr/bin/pkg-config ; then        # we have pkg-config
-        if pkg-config --exists python ; then    # and pkg-config knows python
-            PYTHON_CFLAGS=$( pkg-config --cflags python3 )
-        fi
+    # Extract the first word of "pkg-config", so it can be a program name with args.
+set dummy pkg-config; ac_word=$2
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+$as_echo_n "checking for $ac_word... " >&6; }
+if ${ac_cv_path_PKG_CONFIG+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  case $PKG_CONFIG in
+  [\\/]* | ?:[\\/]*)
+  ac_cv_path_PKG_CONFIG="$PKG_CONFIG" # Let the user override the test with a path.
+  ;;
+  *)
+  as_save_IFS=$IFS; IFS=$PATH_SEPARATOR
+for as_dir in $PATH
+do
+  IFS=$as_save_IFS
+  test -z "$as_dir" && as_dir=.
+    for ac_exec_ext in '' $ac_executable_extensions; do
+  if as_fn_executable_p "$as_dir/$ac_word$ac_exec_ext"; then
+    ac_cv_path_PKG_CONFIG="$as_dir/$ac_word$ac_exec_ext"
+    $as_echo "$as_me:${as_lineno-$LINENO}: found $as_dir/$ac_word$ac_exec_ext" >&5
+    break 2
+  fi
+done
+  done
+IFS=$as_save_IFS
+
+  test -z "$ac_cv_path_PKG_CONFIG" && ac_cv_path_PKG_CONFIG="no"
+  ;;
+esac
+fi
+PKG_CONFIG=$ac_cv_path_PKG_CONFIG
+if test -n "$PKG_CONFIG"; then
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: $PKG_CONFIG" >&5
+$as_echo "$PKG_CONFIG" >&6; }
+else
+  { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+  # locate pkg-config
+    if test x$PKG_CONFIG != xno ; then        # we have pkg-config
+       if $PKG_CONFIG --exists python ; then  # and pkg-config knows python
+            PYTHON_CFLAGS=$( $PKG_CONFIG --cflags python3 )
+       fi
    fi
 fi
  if test "x$user_wants_python" = xyes; then
@@ -19964,7 +20077,7 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $user_wants_python" >&5
 $as_echo "$user_wants_python" >&6; }
 
-ac_config_files="$ac_config_files Makefile build/Makefile debian/Makefile debian/source/Makefile doc/Makefile erlang/Makefile erlang/apl.erl gnu-apl.d/Makefile gnu-apl.d/preferences HOWTOs/Makefile rpm/Makefile rpm/apl.spec src/Makefile src/APs/Makefile src/Gtk/Makefile src/emacs_mode/Makefile src/native/Makefile src/sql/Makefile src/testcases/Makefile src/workspaces/Makefile support-files/Makefile support-files/105-key-International-Keyboard/Makefile support-files/Bill_Daly_Ubuntu/Makefile support-files/Dirk/Makefile support-files/Dyalog-Keyboard/Makefile support-files/Juergen-Mint-19/Makefile support-files/old-Keyboard/Makefile support-files/OS-X-Keyboard/Makefile support-files/Unicomp-Keyboard/Makefile support-files/WASD-Keyboard/Makefile tools/Makefile websock/Makefile websock/client/Makefile websock/server/Makefile workspaces/Makefile wslib3/Makefile wslib4/Makefile wslib5/Makefile wslib5/APLComponentFiles/Makefile wslib5/iso-apl-cf/Makefile"
+ac_config_files="$ac_config_files Makefile build/Makefile debian/Makefile debian/source/Makefile doc/Makefile doc/DALY/Makefile erlang/Makefile erlang/apl.erl gnu-apl.d/Makefile gnu-apl.d/preferences HOWTOs/Makefile rpm/Makefile rpm/apl.spec src/Makefile src/APs/Makefile src/Gtk/Makefile src/emacs_mode/Makefile src/native/Makefile src/sql/Makefile src/testcases/Makefile src/workspaces/Makefile support-files/Makefile support-files/105-key-International-Keyboard/Makefile support-files/Bill_Daly_Ubuntu/Makefile support-files/Dirk/Makefile support-files/Dyalog-Keyboard/Makefile support-files/Juergen-Mint-19/Makefile support-files/old-Keyboard/Makefile support-files/OS-X-Keyboard/Makefile support-files/Unicomp-Keyboard/Makefile support-files/WASD-Keyboard/Makefile tools/Makefile websock/Makefile websock/client/Makefile websock/server/Makefile workspaces/Makefile wslib3/Makefile wslib3/DALY/Makefile wslib4/Makefile wslib5/Makefile wslib5/APLComponentFiles/Makefile wslib5/DALY/Makefile wslib5/iso-apl-cf/Makefile"
 
 
 # AM_CXXFLAGS: do/dont -Werror ?
@@ -20454,6 +20567,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_AFFINITY_NP_TRUE}" && test -z "${HAVE_AFFINITY_NP_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_AFFINITY_NP\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${WANT_CTRLD_DEL_TRUE}" && test -z "${WANT_CTRLD_DEL_FALSE}"; then
+  as_fn_error $? "conditional \"WANT_CTRLD_DEL\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${WANT_ANDROID_TRUE}" && test -z "${WANT_ANDROID_FALSE}"; then
@@ -21471,6 +21588,7 @@ do
     "debian/Makefile") CONFIG_FILES="$CONFIG_FILES debian/Makefile" ;;
     "debian/source/Makefile") CONFIG_FILES="$CONFIG_FILES debian/source/Makefile" ;;
     "doc/Makefile") CONFIG_FILES="$CONFIG_FILES doc/Makefile" ;;
+    "doc/DALY/Makefile") CONFIG_FILES="$CONFIG_FILES doc/DALY/Makefile" ;;
     "erlang/Makefile") CONFIG_FILES="$CONFIG_FILES erlang/Makefile" ;;
     "erlang/apl.erl") CONFIG_FILES="$CONFIG_FILES erlang/apl.erl" ;;
     "gnu-apl.d/Makefile") CONFIG_FILES="$CONFIG_FILES gnu-apl.d/Makefile" ;;
@@ -21502,9 +21620,11 @@ do
     "websock/server/Makefile") CONFIG_FILES="$CONFIG_FILES websock/server/Makefile" ;;
     "workspaces/Makefile") CONFIG_FILES="$CONFIG_FILES workspaces/Makefile" ;;
     "wslib3/Makefile") CONFIG_FILES="$CONFIG_FILES wslib3/Makefile" ;;
+    "wslib3/DALY/Makefile") CONFIG_FILES="$CONFIG_FILES wslib3/DALY/Makefile" ;;
     "wslib4/Makefile") CONFIG_FILES="$CONFIG_FILES wslib4/Makefile" ;;
     "wslib5/Makefile") CONFIG_FILES="$CONFIG_FILES wslib5/Makefile" ;;
     "wslib5/APLComponentFiles/Makefile") CONFIG_FILES="$CONFIG_FILES wslib5/APLComponentFiles/Makefile" ;;
+    "wslib5/DALY/Makefile") CONFIG_FILES="$CONFIG_FILES wslib5/DALY/Makefile" ;;
     "wslib5/iso-apl-cf/Makefile") CONFIG_FILES="$CONFIG_FILES wslib5/iso-apl-cf/Makefile" ;;
 
   *) as_fn_error $? "invalid argument: \`$ac_config_target'" "$LINENO" 5;;
@@ -22953,7 +23073,7 @@ do
    if test -f "$f/buildtag.sh"
    then
       apl_top="$f"
-      source "$f/buildtag.sh"
+      . "$f/buildtag.sh"
       abs_apl_top=$(readlink -f "$apl_top")
    fi
 done
@@ -22966,21 +23086,12 @@ else
    echo "configure: top-level apl directory is: $abs_apl_top"
 fi
 
-# create src/makefile.h
+# remove makefile.h
 #
-echo "configure: creating $abs_apl_top/makefile.h ..."
 if test -f "$apl_top/makefile.h"
 then
    echo "configure: removing old $apl_top/makefile.h"
    rm -f "$apl_top/makefile.h"
-fi
-make makefile.h >/dev/null
-echo "#define CONFIGURE_ARGS         xSTR($0 $ac_configure_args)
-" >> makefile.h
-
-if test "$apl_top" != "."   # vpath build
-then
-   cp makefile.h "$apl_top"/makefile.h
 fi
 
 # summary

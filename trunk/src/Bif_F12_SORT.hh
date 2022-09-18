@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@
 
 class Cell;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** one item of a CollatingCache. Every character in A (of A⍋B or A⍒B gets
    one CollatingCacheEntry; if the same character occurs multiple times in A,
    then the first one (in row-major order) creates the entry and the remaining
@@ -67,7 +67,7 @@ struct CollatingCacheEntry
       { new (this)   CollatingCacheEntry(other); }
 
    /// compare this entry with \b other at \b axis
-   int compare_axis(const CollatingCacheEntry & other, Rank axis) const
+   int compare_axis(const CollatingCacheEntry & other, sAxis axis) const
       {
         return ce_shape.get_shape_item(axis)
              - other.ce_shape.get_shape_item(axis);
@@ -79,13 +79,13 @@ struct CollatingCacheEntry
                             const void * unused_ctx)
       { return key - entry.ce_char; }
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 inline ostream &
 operator << (ostream & out, const CollatingCacheEntry & entry)
 {
    return out << "CC-entry(" << entry.ce_char << ")";
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** A collating cache which is the internal representation of the left
     argument A of dydic A⍋B or A⍒B
  */
@@ -97,7 +97,7 @@ public:
    CollatingCache(const Value & A, const Cell * base, ShapeItem clen);
 
    /// return the number of dimensions of the collating sequence
-   Rank get_rank() const { return rank; }
+   sRank get_rank() const { return rank; }
 
    /// return the number of items to compare
    ShapeItem get_comp_len() const { return comp_len; }
@@ -117,7 +117,7 @@ public:
 
 protected:
    /// the rank of the collating sequence
-   const Rank rank;
+   const sRank rank;
 
    
    /// start of B.s ravel, ⎕IO adjusted
@@ -126,7 +126,7 @@ protected:
    /// the number of items to compare
    const ShapeItem comp_len;
 };
-//=============================================================================
+//============================================================================
 /** primitive functions grade up and grade down
  */
 /// Base class for ⍋ and ⍒
@@ -156,7 +156,7 @@ protected:
    static ShapeItem find_collating_cache_entry(Unicode uni,
                                                CollatingCache & cache);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** System function grade up ⍋
  */
 /// The class implementing ⍋
@@ -183,7 +183,7 @@ public:
    static Bif_F12_SORT_ASC  _fun;   ///< Built-in function
 protected:
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** System function grade down ⍒
  */
 /// The class implementing ⍒
@@ -210,7 +210,7 @@ public:
    static Bif_F12_SORT_DES  _fun;   ///< Built-in function
 protected:
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 
 #endif // __COLLATING_CACHE_HH_DEFINED__

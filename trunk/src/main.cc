@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -31,12 +31,14 @@
 #include <string.h>
 #include <termios.h>
 
+#include <netinet/in.h>
 #include <sys/ioctl.h>
 #include <sys/resource.h>
 #include <sys/stat.h>
+#include <sys/socket.h>
 #include <sys/types.h>
 
-#include "../buildtag.hh"
+#include "buildtag.hh"
 #include "Command.hh"
 #include "Common.hh"
 #include "IO_Files.hh"
@@ -56,14 +58,15 @@
    GNU APL tries to be compatible with both the \b ISO \b standard \b 13751
    (aka. Programming Language APL, Extended) and to \b IBM \b APL2.
 
-   It is \b NOT meant to be a vehicle for implementing new features to the
-   APL language.
+   It is \b NOT meant to be a vehicle for adding new features to the
+   APL language. Its promary focus is on compatibility with APL2 and the
+   ISO standard and portability to different platforms.
  **/
 
 /// when this file  was built
 static const char * build_tag[] = { BUILDTAG, 0 };
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 /// old sigaction argument for ^C
 static struct sigaction old_control_C_action;
@@ -71,7 +74,7 @@ static struct sigaction old_control_C_action;
 /// new sigaction argument for ^C
 static struct sigaction new_control_C_action;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// old sigaction argument for segfaults
 static struct sigaction old_SEGV_action;
 
@@ -99,7 +102,7 @@ signal_SEGV_handler(int)
 
    Command::cmd_OFF(3);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// old sigaction argument for SIGWINCH
 static struct sigaction old_WINCH_action;
 
@@ -126,7 +129,7 @@ struct winsize wsize;
    Workspace::set_PW(wsize.ws_col, LOC);
 }
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// old sigaction argument for SIGUSR1
 static struct sigaction old_USR1_action;
 
@@ -139,7 +142,7 @@ signal_USR1_handler(int)
 {
    CERR << "Got signal USR1" << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// old sigaction argument for SIGTERM
 static struct sigaction old_TERM_action;
 
@@ -154,7 +157,7 @@ signal_TERM_handler(int)
    sigaction(SIGTERM, &old_TERM_action, 0);
    raise(SIGTERM);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 #if PARALLEL_ENABLED
 /// old sigaction argument for ^\,
 static struct sigaction old_control_BSL_action;
@@ -170,7 +173,7 @@ control_BSL(int sig)
    Thread_context::print_all(CERR);
 }
 #endif // PARALLEL_ENABLED
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// old sigaction argument for SIGHUP
 static struct sigaction old_HUP_action;
 
@@ -185,7 +188,7 @@ signal_HUP_handler(int)
    sigaction(SIGHUP, &old_HUP_action, 0);
    raise(SIGHUP);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// print argc and argv[]
 static void
 show_argv(int argc, const char ** argv)
@@ -207,7 +210,7 @@ show_argv(int argc, const char ** argv)
    else
       CERR << "fd 3 is:  OPEN" << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// print a welcome message (copyright notice)
 static void
 show_welcome(ostream & out, const char * argv0)
@@ -228,7 +231,7 @@ const char * lines[] =
   ""                                                                      ,
   c1                                                                      ,
   ""                                                                      ,
-  "Copyright (C) 2008-2020  Dr. Jürgen Sauermann"                         ,
+  "Copyright (C) 2008-2021  Dr. Jürgen Sauermann"                         ,
   "Banner by FIGlet: www.figlet.org"                                      ,
   ""                                                                      ,
   "This program comes with ABSOLUTELY NO WARRANTY;"                       ,
@@ -264,7 +267,103 @@ const int left_pad = (80 - len)/2;
          out<< endl;
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+/// maybe remap stdin, stdout, and stderr to an incoming TCP connection to
+/// port uprefs.tcp_port on localhost
+void
+remap_stdio()
+{
+   if (uprefs.tcp_port <= 0)   return;
+
+const int listen_socket = socket(AF_INET, SOCK_STREAM, 0);
+   if (listen_socket == -1)
+      {
+        perror("socket() failed");
+        exit(1);
+      }
+
+sockaddr_in local;
+   memset(&local, 0, sizeof(local));
+   local.sin_family = AF_INET;
+   local.sin_addr.s_addr = htonl(0x7F000001);   // localhost (127.0.0.1)
+   local.sin_port = htons(uprefs.tcp_port);
+
+   // fix bind() error when listening socket is openend too quickly
+   {
+     const int yes = 1;
+     if (setsockopt(listen_socket, SOL_SOCKET, SO_REUSEADDR,
+                     &yes, sizeof(yes)) < 0)
+        {
+          perror("setsockopt(SO_REUSEADDR) failed");
+        }
+
+      // continue, since a failed setsockopt() is sort of OK here.
+   }
+
+   if (::bind(listen_socket, (const sockaddr *)&local, sizeof(local)))
+      {
+        perror("bind() failed");
+        exit(1);
+      }
+
+   if (listen(listen_socket, 10))
+      {
+        perror("listen() failed");
+        exit(1);
+      }
+
+   0 && CERR << "The GNU APL server is listening on TCP port "
+             << uprefs.tcp_port << endl;
+
+   for (;;)   // connection server loop
+       {
+         sockaddr_in remote;
+         socklen_t remote_len = sizeof(remote);
+         const int connection = ::accept(listen_socket,
+                                       reinterpret_cast<sockaddr *>(&remote),
+                                       &remote_len);
+         if (connection == -1)
+            {
+              perror("accept() failed");
+              exit(1);
+            }
+
+         0 && CERR << "GNU APL server got TCP connction from "
+                   << (ntohl(remote.sin_addr.s_addr) >> 24 & 0xFF) << "."
+                   << (ntohl(remote.sin_addr.s_addr) >> 16 & 0xFF) << "."
+                   << (ntohl(remote.sin_addr.s_addr) >>  8 & 0xFF) << "."
+                   << (ntohl(remote.sin_addr.s_addr) >>  0 & 0xFF) << " port "
+                   << ntohs(remote.sin_port)                       << endl;
+
+         // fork() and let the client return while the server remains in this
+         // server loop for the next connection.
+         //
+         const pid_t fork_result = fork();
+         if (fork_result == -1)   // fork() failed
+            {
+              close(connection);
+              perror("fork() failed");
+              exit(1);
+            }
+
+         if (fork_result)   // parent (server)
+            {
+              close(connection);
+              continue;
+            }
+
+         // child (client)
+         //
+         close(listen_socket);
+         dup2(connection, STDIN_FILENO);
+         dup2(connection, STDOUT_FILENO);
+         dup2(connection, STDERR_FILENO);
+         close(connection);
+         return;
+       }
+
+}
+//----------------------------------------------------------------------------
 /// initialize the interpreter
 int
 init_apl(int argc, const char * argv[])
@@ -276,8 +375,22 @@ init_apl(int argc, const char * argv[])
      if (term == 0 || *term == 0)   setenv("TERM", "dumb", 1);
    }
 
+const bool log_startup0 = uprefs.parse_argv_0(argc, argv);
+   if (LOG_argc_argv || log_startup0)
+      {
+         CERR << "argc/argv before expansion:\n";
+         show_argv(argc, argv);
+      }
+
    uprefs.expand_argv(argc, argv);
-const bool log_startup = uprefs.parse_argv_1();
+
+const bool log_startup = uprefs.parse_argv_1() || log_startup0;
+   if (LOG_argc_argv || log_startup)
+      {
+         CERR << "argc/argv after expansion:\n";
+         show_argv(uprefs.expanded_argv.size(), &uprefs.expanded_argv[0]);
+      }
+
 
 #ifdef DYNAMIC_LOG_WANTED
    if (log_startup)   Log_control(LID_startup, true);
@@ -290,8 +403,9 @@ const bool log_startup = uprefs.parse_argv_1();
    uprefs.read_threshold_file(true,  log_startup);  // dito parallel_thresholds
    uprefs.read_threshold_file(false, log_startup);  // dito parallel_thresholds
 
-   // struct sigaction differs between GNU/Linux and other systems, which causes
-   // compile errors for direct curly bracket assignment on some systems
+   // NOTE: struct sigaction differs between GNU/Linux and other systems,
+   // which causes compile errors for direct curly bracket assignment on
+   // some systems.
    //
    // We therefore memset everything to 0 and then set the handler (which
    // should compile on GNU/Linux and also on other systems.
@@ -315,6 +429,7 @@ const bool log_startup = uprefs.parse_argv_1();
    sigaction(SIGSEGV,  &new_SEGV_action,      &old_SEGV_action);
    sigaction(SIGTERM,  &new_TERM_action,      &old_TERM_action);
    sigaction(SIGHUP,   &new_HUP_action,       &old_HUP_action);
+   signal(SIGCHLD, SIG_IGN);   // do not create zombies
    if (uprefs.WINCH_sets_pw)
       {
         sigaction(SIGWINCH, &new_WINCH_action, &old_WINCH_action);
@@ -332,6 +447,11 @@ const bool log_startup = uprefs.parse_argv_1();
 #endif
 
    uprefs.parse_argv_2(log_startup);
+
+   // maybe use TCP connection instead of stdin/stderr. This function blocks
+   // until a TCP connections was received.
+   //
+   remap_stdio();
 
    if (uprefs.CPU_limit_secs)
       {
@@ -485,7 +605,7 @@ const bool log_startup = uprefs.parse_argv_1();
    Quad_TZ::compute_offset();
    return 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// dito.
 int
 main(int argc, const char *argv[])
@@ -512,10 +632,10 @@ main(int argc, const char *argv[])
    for (;;)
        {
          Token t = Workspace::immediate_execution(
-                       IO_Files::test_mode == IO_Files::TM_EXIT_AFTER_ERROR);
+                   IO_Files::test_mode == IO_Files::TM_EXIT_AFTER_FILE_ERROR);
          if (t.get_tag() == TOK_OFF)   Command::cmd_OFF(0);
        }
 
    return 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------

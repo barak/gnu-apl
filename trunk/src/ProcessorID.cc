@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ AP_num3 ProcessorID::id(NO_AP, AP_NULL, AP_NULL);
 
 Network_Profile ProcessorID::network_profile;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 ProcessorID::init(bool log_startup)
 {
@@ -109,7 +109,7 @@ const TCP_socket sock = Svar_DB::get_DB_tcp();
 
    return false;   // no error
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 const char *
 ProcessorID::read_svopid(FILE * file, SvoPid & svopid, int & line)
 {
@@ -197,7 +197,7 @@ const char * loc = 0;
 
    return loc;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 const char *
 ProcessorID::read_procauth(FILE * file, ProcAuth & procauth, int & line)
 {
@@ -246,7 +246,7 @@ const char * loc = 0;
 
    return loc;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 ProcessorID::read_network_profile()
 {
@@ -263,7 +263,7 @@ const char * filename = getenv("APL2SVPPRF");
         return read_network_profile(fname.c_str());
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 ProcessorID::read_network_profile(const char * filename)
 {
@@ -342,10 +342,10 @@ const char * loc = 0;
 
    return line;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 ProcessorID::disconnect()
 {
    Svar_DB::DB_tcp_error(0, 0, 0);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------

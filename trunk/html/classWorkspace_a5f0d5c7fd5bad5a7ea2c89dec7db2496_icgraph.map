@@ -4,5 +4,5 @@
 <area shape="rect" id="node5" href="$classFloatCell.html#ab33d5fb8782321e100cec38cbed5ea18" title="Overloaded Cell::is_finite(). " alt="" coords="444,71,571,98"/>
 <area shape="rect" id="node6" href="$classIntCell.html#a6bbc6fd82045e146ef6174a11c4c712f" title="the Quad_CR representation of this cell " alt="" coords="446,123,569,164"/>
 <area shape="rect" id="node4" href="$classComplexCell.html#a978a6ef7d34a3446b796a0597c05d074" title="Overloaded Cell::is_finite(). " alt="" coords="635,13,785,39"/>
-<area shape="rect" id="node7" href="$classIntCell.html#ae4f630cfaa0bf996746664933b528216" title="overloaded Cell::bif_within_quad_CT() " alt="" coords="649,123,771,164"/>
+<area shape="rect" id="node7" href="$classIntCell.html#a57acd6c6da8ad45753bb27b304ca597b" title="overloaded Cell::is_integer_cell() " alt="" coords="635,130,785,157"/>
 </map>

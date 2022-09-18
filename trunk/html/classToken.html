@@ -84,7 +84,7 @@ Collaboration diagram for Token:</div>
 <area shape="rect" id="node4" href="classNamedObject.html" title="A user&#45;defined variable or function. " alt="" coords="5,125,108,152"/>
 <area shape="rect" id="node7" href="classFunction.html" title="Base class for all APL functions and operators (system or defined) " alt="" coords="21,231,93,257"/>
 <area shape="rect" id="node5" href="classUCS__string.html" title="A string of Unicode characters (32&#45;bit) " alt="" coords="133,125,223,152"/>
-<area shape="rect" id="node8" href="classValue__P__Base.html" title="A Value smart * and access functions (except constructors) " alt="" coords="528,13,636,39"/>
+<area shape="rect" id="node8" href="classValue__P__Base.html" title="A Value smart * and access functions (except constructors) " alt="" coords="455,13,563,39"/>
 <area shape="rect" id="node13" href="structCell_1_1SomeValue_1_1__pval.html" title="a pointer to, and the owner of, a nested APL (sub&#45;) value " alt="" coords="869,125,1028,152"/>
 <area shape="rect" id="node19" href="classValue__P.html" title="A Value smart * (constructors) " alt="" coords="312,125,383,152"/>
 <area shape="rect" id="node9" href="classValue.html" title="An APL Value (essentially a Shape and a ravel) " alt="" coords="813,424,868,451"/>
@@ -115,6 +115,10 @@ Public Member Functions</h2></td></tr>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classToken.html#a28857fe5c15e75db89ef881dd5a90bea">Token</a> (const <a class="el" href="classToken.html">Token</a> &amp;other)</td></tr>
 <tr class="memdesc:a28857fe5c15e75db89ef881dd5a90bea"><td class="mdescLeft">&#160;</td><td class="mdescRight">copy constructor <br /></td></tr>
 <tr class="separator:a28857fe5c15e75db89ef881dd5a90bea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6c79a9c688ad1f5f69e517437cdb90b6"><td class="memItemLeft" align="right" valign="top"><a id="a6c79a9c688ad1f5f69e517437cdb90b6"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classToken.html#a6c79a9c688ad1f5f69e517437cdb90b6">Token</a> (const <a class="el" href="classToken.html">Token</a> &amp;other, const char *loc)</td></tr>
+<tr class="memdesc:a6c79a9c688ad1f5f69e517437cdb90b6"><td class="mdescLeft">&#160;</td><td class="mdescRight">copy constructor with location <br /></td></tr>
+<tr class="separator:a6c79a9c688ad1f5f69e517437cdb90b6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1da2698e32e4c4ce5bed70964edd2f05"><td class="memItemLeft" align="right" valign="top"><a id="a1da2698e32e4c4ce5bed70964edd2f05"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classToken.html#a1da2698e32e4c4ce5bed70964edd2f05">copy_1</a> (const <a class="el" href="classToken.html">Token</a> &amp;src, const char *loc)</td></tr>
 <tr class="memdesc:a1da2698e32e4c4ce5bed70964edd2f05"><td class="mdescLeft">&#160;</td><td class="mdescRight">copy <b>src</b> into <b>this</b> token. leaving APL value pointer in src (if any) and add events as needed <br /></td></tr>
@@ -131,10 +135,10 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classToken.html#a14b1ba5dbf2f1a644b43bbb53fa7273e">Token</a> (TokenTag tg)</td></tr>
 <tr class="memdesc:a14b1ba5dbf2f1a644b43bbb53fa7273e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a token without a value. <br /></td></tr>
 <tr class="separator:a14b1ba5dbf2f1a644b43bbb53fa7273e"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acbf0b6ca17b5a6a9ce1d6732628b680f"><td class="memItemLeft" align="right" valign="top"><a id="acbf0b6ca17b5a6a9ce1d6732628b680f"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classToken.html#acbf0b6ca17b5a6a9ce1d6732628b680f">Token</a> (TokenTag tg, <a class="el" href="classFunction.html">Function</a> *fun)</td></tr>
-<tr class="memdesc:acbf0b6ca17b5a6a9ce1d6732628b680f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a token for a <b><a class="el" href="classFunction.html" title="Base class for all APL functions and operators (system or defined) ">Function</a></b>. <br /></td></tr>
-<tr class="separator:acbf0b6ca17b5a6a9ce1d6732628b680f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a866dce652cf1d19bf41fc6c4268fcefa"><td class="memItemLeft" align="right" valign="top"><a id="a866dce652cf1d19bf41fc6c4268fcefa"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classToken.html#a866dce652cf1d19bf41fc6c4268fcefa">Token</a> (TokenTag tg, <a class="el" href="classFunction.html">Function_P</a> fun)</td></tr>
+<tr class="memdesc:a866dce652cf1d19bf41fc6c4268fcefa"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a token for a <b><a class="el" href="classFunction.html" title="Base class for all APL functions and operators (system or defined) ">Function</a></b>. <br /></td></tr>
+<tr class="separator:a866dce652cf1d19bf41fc6c4268fcefa"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7cfdfe6d8a2c02d9aff8c6617710413e"><td class="memItemLeft" align="right" valign="top"><a id="a7cfdfe6d8a2c02d9aff8c6617710413e"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classToken.html#a7cfdfe6d8a2c02d9aff8c6617710413e">Token</a> (TokenTag tg, Function_Line line)</td></tr>
 <tr class="memdesc:a7cfdfe6d8a2c02d9aff8c6617710413e"><td class="mdescLeft">&#160;</td><td class="mdescRight">Construct a token for a <b>line</b> number. <br /></td></tr>
@@ -279,10 +283,10 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classToken.html#abe9f60f29fc7644214b48cc2715a21ad">is_function</a> () const</td></tr>
 <tr class="memdesc:abe9f60f29fc7644214b48cc2715a21ad"><td class="mdescLeft">&#160;</td><td class="mdescRight">return true if <b>this</b> token is a function (or operator) <br /></td></tr>
 <tr class="separator:abe9f60f29fc7644214b48cc2715a21ad"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af613f4df5fa00a0c8fa4de162284171c"><td class="memItemLeft" align="right" valign="top"><a id="af613f4df5fa00a0c8fa4de162284171c"></a>
-<a class="el" href="classFunction.html">Function</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classToken.html#af613f4df5fa00a0c8fa4de162284171c">get_function</a> () const</td></tr>
-<tr class="memdesc:af613f4df5fa00a0c8fa4de162284171c"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the <a class="el" href="classFunction.html" title="Base class for all APL functions and operators (system or defined) ">Function</a> * value of this token <br /></td></tr>
-<tr class="separator:af613f4df5fa00a0c8fa4de162284171c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4d19f279ca06bc64e549c9d63ca677b0"><td class="memItemLeft" align="right" valign="top"><a id="a4d19f279ca06bc64e549c9d63ca677b0"></a>
+<a class="el" href="classFunction.html">Function_P</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classToken.html#a4d19f279ca06bc64e549c9d63ca677b0">get_function</a> () const</td></tr>
+<tr class="memdesc:a4d19f279ca06bc64e549c9d63ca677b0"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the Function_P value of this token <br /></td></tr>
+<tr class="separator:a4d19f279ca06bc64e549c9d63ca677b0"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a59c13ceda2896520c6a41cacf67a20ea"><td class="memItemLeft" align="right" valign="top"><a id="a59c13ceda2896520c6a41cacf67a20ea"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classToken.html#a59c13ceda2896520c6a41cacf67a20ea">value_use_count</a> () const</td></tr>
 <tr class="memdesc:a59c13ceda2896520c6a41cacf67a20ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">return value usage counter <br /></td></tr>
@@ -372,7 +376,7 @@ TokenTag&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="classToken.html">Token</a></li>
-    <li class="footer">Generated on Sun Aug 9 2020 16:43:42 for GNUAPL by
+    <li class="footer">Generated on Sun Jan 30 2022 20:14:27 for GNUAPL by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>

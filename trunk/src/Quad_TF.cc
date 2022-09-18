@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -36,7 +36,7 @@ Quad_TF * Quad_TF::fun = &Quad_TF::_fun;
 
 enum { Quad_PP_TF = 17 };
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_TF::eval_AB(Value_P A, Value_P B) const
 {
@@ -45,7 +45,7 @@ Quad_TF::eval_AB(Value_P A, Value_P B) const
    if (A->get_rank() > 0)         RANK_ERROR;
    if (A->element_count() != 1)   LENGTH_ERROR;
 
-const APL_Integer mode = A->get_ravel(0).get_int_value();
+const APL_Integer mode = A->get_cfirst().get_int_value();
 const UCS_string symbol_name(*B.get());
 
 Value_P Z;
@@ -76,7 +76,7 @@ Value_P Z;
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Quad_TF::is_inverse(const UCS_string & maybe_name)
 {
@@ -94,7 +94,7 @@ Quad_TF::is_inverse(const UCS_string & maybe_name)
    // all chars in val were symbol characters. Therefore it is a forward ⎕TF
    return false;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_TF::tf1(const UCS_string & name)
 {
@@ -122,11 +122,11 @@ const Function * function = obj->get_function();
 
    return Str0(LOC);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_TF::tf1(const UCS_string & var_name, Value_P val)
 {
-const bool is_char_array = val->get_ravel(0).is_character_cell();
+const bool is_char_array = val->get_cfirst().is_character_cell();
 UCS_string ucs(is_char_array ? UNI_C : UNI_N);
 
    ucs.append(var_name);
@@ -147,7 +147,7 @@ const ShapeItem ec = val->element_count();
 
         loop(e, ec)
            {
-             const Cell & cell = val->get_ravel(e);
+             const Cell & cell = val->get_cravel(e);
              if (!cell.is_character_cell())
                 {
                   return  Str0(LOC);
@@ -162,7 +162,7 @@ const ShapeItem ec = val->element_count();
            {
              ucs.append(UNI_SPACE);
 
-             const Cell & cell = val->get_ravel(e);
+             const Cell & cell = val->get_cravel(e);
              if (cell.is_integer_cell())
                 {
                   const int sign = ucs.size();
@@ -198,7 +198,7 @@ const ShapeItem ec = val->element_count();
 
    return Value_P(ucs, LOC);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_TF::tf1(const UCS_string & fun_name, const Function & fun)
 {
@@ -225,7 +225,7 @@ UCS_string ucs;
 
    return Value_P(ucs, LOC);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_TF::tf1_inv(const UCS_string & ravel)
 {
@@ -269,7 +269,7 @@ ShapeItem idx = 2;
       }
 
 ShapeItem idx0 = idx;
-Rank rank = 0;
+sRank rank = 0;
    while (idx < len && Avec::is_digit(ravel[idx]))
       rank = 10 * rank + ravel[idx++] - UNI_0;
 
@@ -318,7 +318,7 @@ const NamedObject * sym_or_fun = Workspace::lookup_existing_name(name);
    if (sym_or_fun)   // existing name
       {
         symbol = sym_or_fun->get_symbol();
-        nc = sym_or_fun->get_nc();
+        nc = sym_or_fun->get_NC();
         if (symbol && symbol->is_readonly())
            {
              MORE_ERROR() << "symbol cannot be modified in 1 ⎕TF record";
@@ -328,7 +328,7 @@ const NamedObject * sym_or_fun = Workspace::lookup_existing_name(name);
 
 const int data_chars = len - idx;
 
-   if (mode == UNI_F)   // function
+   if (mode == UNI_F)   // function record
       {
         if (rank != 2)
            {
@@ -336,7 +336,9 @@ const int data_chars = len - idx;
              return Value_P();
            }
 
-        if (nc != NC_UNUSED_USER_NAME && nc != NC_FUNCTION && nc != NC_OPERATOR)
+        if (nc != NC_UNUSED_USER_NAME &&
+            nc != NC_FUNCTION         &&
+            nc != NC_OPERATOR)
            {
              MORE_ERROR() << "symbol is an existing variable in 1 ⎕TF F record";
              return Value_P();
@@ -349,11 +351,10 @@ const int data_chars = len - idx;
            }
 
         Value_P new_val(shape, LOC);
-        loop(d, data_chars)
-           new (&new_val->get_ravel(d)) CharCell(ravel[idx + d]);
+        loop(d, data_chars)   new_val->next_ravel_Char(ravel[idx + d]);
         new_val->check_value(LOC);
 
-         Token t = Quad_FX::fun->eval_B(new_val);
+         Token t = Quad_FX::do_eval_B(new_val.get());
       }
    else if (mode == UNI_C)   // char array
       {
@@ -370,8 +371,7 @@ const int data_chars = len - idx;
            }
 
         Value_P new_val(shape, LOC);
-        loop(d, data_chars)
-           new (&new_val->get_ravel(d)) CharCell(ravel[idx + d]);
+        loop(d, data_chars)   new_val->next_ravel_Char(ravel[idx + d]);
 
         new_val->check_value(LOC);
 
@@ -414,32 +414,33 @@ const int data_chars = len - idx;
 
         // at this point, we have a valid inverse 1 ⎕TF.
         //
-        Value_P new_val(shape, LOC);
+        Value_P ZZ(shape, LOC);
 
         loop(t, tos.size())
            {
-             const TokenTag tag = tos[t].get_tag();
+             const Token & tok = tos[t];
+             const TokenTag tag = tok.get_tag();
              if (tag == TOK_INTEGER)
-                new (&new_val->get_ravel(t)) IntCell(tos[t].get_int_val());
+                ZZ->next_ravel_Int(tok.get_int_val());
              else if (tag == TOK_REAL)
-                new (&new_val->get_ravel(t)) FloatCell(tos[t].get_flt_val());
+                ZZ->next_ravel_Float(tok.get_flt_val());
              else if (tag == TOK_COMPLEX)
-                new (&new_val->get_ravel(t)) ComplexCell(tos[t].get_cpx_real(),
-                                                        tos[t].get_cpx_imag());
+                ZZ->next_ravel_Complex(tok.get_cpx_real(),
+                                            tok.get_cpx_imag());
              else Assert(0);   // since checked above
            }
 
-        new_val->check_value(LOC);
+        ZZ->check_value(LOC);
 
         if (!symbol)   symbol = Workspace::lookup_symbol(name);
 
-        const_cast<Symbol *>(symbol)->assign(new_val, false, LOC);
+        const_cast<Symbol *>(symbol)->assign(ZZ, false, LOC);
       }
    else Assert(0);   // since checked above
 
    return Value_P(name, LOC);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_TF::tf2(const UCS_string & name)
 {
@@ -470,7 +471,7 @@ const Symbol * symbol = obj->get_symbol();
    if (symbol)
       {
         Value_P value = symbol->get_apl_value();
-        if (+value)   return tf2_var(name, value);
+        if (+value)   return tf2_var(name, *value);
 
         /* not a variable: fall through */
       }
@@ -478,22 +479,22 @@ const Symbol * symbol = obj->get_symbol();
    Log(LOG_Quad_TF)   CERR << "error in tf2(" << name << ")" << endl;
    return Token(TOK_APL_VALUE1, Str0(LOC));
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
-Quad_TF::tf2_var(const UCS_string & var_name, Value_P value)
+Quad_TF::tf2_var(const UCS_string & var_name, const Value & B)
 {
    Log(LOG_Quad_TF)   CERR << "tf2_var(" << var_name << ")" << endl;
 
 UCS_string ucs_value; /// the right hand side of VAR←VALUE
-   if (value->is_scalar() && !value->is_simple_scalar())
+   if (B.is_scalar() && !B.is_simple_scalar())
       {
-        const Cell & cell = value->get_ravel(0);
+        const Cell & cell = B.get_cfirst();
         Assert(cell.is_pointer_cell());
-        tf2_value(0, ucs_value, cell.get_pointer_value().getref(), 1);
+        tf2_value(0, ucs_value, *cell.get_pointer_value(), 1);
       }
    else
       {
-        tf2_value(0, ucs_value, value.getref(), 0);
+        tf2_value(0, ucs_value, B, 0);
       }
 
    Assert(ucs_value[0] == UNI_L_PARENT);
@@ -511,7 +512,7 @@ Value_P Z(ucs, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string
 Quad_TF::tf2_inverse(const UCS_string & ravel)
 {
@@ -603,10 +604,10 @@ Token_string tos;
        tos[2].get_tag()   == TOK_Quad_FX &&
        tos[3].get_Class() == TC_VALUE)
       {
-        Value_P fname   =  tos[1].get_apl_val();
-        Value_P so_path =  tos[3].get_apl_val();
+        const Value * fname   =  tos[1].get_apl_val().get();
+        const Value * so_path =  tos[3].get_apl_val().get();
 
-        const Token tok = Quad_FX::fun->eval_AB(so_path, fname);
+        const Token tok = Quad_FX::do_eval_AB(so_path, fname);
         if (tok.get_Class() == TC_VALUE)   // ⎕FX successful
            {
              Value_P val = tok.get_apl_val();
@@ -632,7 +633,7 @@ Token_string tos;
    if (tos[2].get_Class() != TC_VALUE)    return UCS_string();
 
 static const int eprops[] = { 0, 0, 0, 0 };
-const Token tok = Quad_FX::do_quad_FX(eprops, tos[2].get_apl_val(),
+const Token tok = Quad_FX::do_quad_FX(eprops, tos[2].get_apl_val().get(),
                                       UTF8_string("2 ⎕TF"), true);
 
    if (tok.get_Class() != TC_VALUE)
@@ -646,7 +647,7 @@ const Token tok = Quad_FX::do_quad_FX(eprops, tos[2].get_apl_val(),
    //
    return UCS_string(*tok.get_apl_val().get());
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_TF::tf2_shape(UCS_string & ucs, const Shape & shape, ShapeItem nesting)
 {
@@ -666,7 +667,7 @@ Quad_TF::tf2_shape(UCS_string & ucs, const Shape & shape, ShapeItem nesting)
         ucs.append(UNI_RHO);
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_TF::tf2_value(int level, UCS_string & ucs, const Value & value,
                    ShapeItem nesting)
@@ -684,7 +685,7 @@ Quad_TF::tf2_value(int level, UCS_string & ucs, const Value & value,
    // some (but not all) empty vectors
    if (value.is_empty())
       {
-        const Cell & cell = value.get_ravel(0);
+        const Cell & cell = value.get_cfirst();
         if (cell.is_character_cell())
            {
              ucs.append(UNI_L_PARENT);
@@ -700,7 +701,7 @@ const ShapeItem ec = value.nz_element_count();
    // emit e.g. ( shape ⍴
    //
    tf2_shape(ucs, value.get_shape(), nesting);
-   if (value.NOTCHAR())   tf2_ravel(level, ucs, ec, &value.get_ravel(0));
+   if (value.NOTCHAR())   tf2_ravel(level, ucs, ec, &value.get_cfirst());
    else                   tf2_all_char_ravel(level, ucs, value);
    ucs.append(UNI_R_PARENT);   // close corresponding '(' from tf2_shape()
 
@@ -711,7 +712,7 @@ const ShapeItem ec = value.nz_element_count();
       }
    return;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_TF::tf2_ravel(int level, UCS_string & ucs, const ShapeItem len,
                    const Cell * cells)
@@ -729,12 +730,12 @@ Quad_TF::tf2_ravel(int level, UCS_string & ucs, const ShapeItem len,
               ShapeItem nesting = 0;
               while (sub_val->is_scalar())
                     {
-                      Assert(sub_val->get_ravel(0).is_pointer_cell());
+                      Assert(sub_val->get_cfirst().is_pointer_cell());
                       ++nesting;
-                      sub_val = sub_val->get_ravel(0).get_pointer_value();
+                      sub_val = sub_val->get_cfirst().get_pointer_value();
                     }
 
-              tf2_value(level + 1, ucs, sub_val.getref(), nesting);
+              tf2_value(level + 1, ucs, *sub_val, nesting);
            }
         else if (cell.is_lval_cell())
            {
@@ -766,7 +767,7 @@ Quad_TF::tf2_ravel(int level, UCS_string & ucs, const ShapeItem len,
            }
         }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_TF::tf2_all_char_ravel(int level, UCS_string & ucs, const Value & value)
 {
@@ -782,20 +783,17 @@ const ShapeItem ec = value.nz_element_count();
    bool use_UCS = false;
    loop(e, ec)
        {
-         const Unicode uni = value.get_ravel(e).get_char_value();
+         const Unicode uni = value.get_cravel(e).get_char_value();
          if (Avec::need_UCS(uni))   { use_UCS = true;   break; }
        }
 
    if (use_UCS)
       {
-        ucs.append(UNI_Quad_Quad);
-        ucs.append(UNI_U);
-        ucs.append(UNI_C);
-        ucs.append(UNI_S);
+        ucs.append_UTF8("⎕UCS");
         loop(e, ec)
             {
               ucs.append(UNI_SPACE);
-              const Unicode uni = value.get_ravel(e).get_char_value();
+              const Unicode uni = value.get_cravel(e).get_char_value();
               ucs.append_number(uni);
             }
       }
@@ -804,14 +802,14 @@ const ShapeItem ec = value.nz_element_count();
         ucs.append(UNI_SINGLE_QUOTE);
         loop(e, ec)
             {
-              const Unicode uni = value.get_ravel(e).get_char_value();
+              const Unicode uni = value.get_cravel(e).get_char_value();
               ucs.append(uni);
               if (uni == UNI_SINGLE_QUOTE)   ucs.append(UNI_SINGLE_QUOTE);
             }
         ucs.append(UNI_SINGLE_QUOTE);
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_TF::tf2_reduce(Token_string & tos)
 {
@@ -833,7 +831,7 @@ Quad_TF::tf2_reduce(Token_string & tos)
          if ((progress = tf2_glue(tos)))                     continue;
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_TF::tf2_reduce_UCS(Token_string & tos)
 {
@@ -847,7 +845,7 @@ ShapeItem skipped = 0;
              for (; s < ShapeItem(tos.size()) &&
                     tos[s].get_Class() == TC_VALUE; ++s)
                 {
-                  tos[s].get_apl_val()->toggle_UCS();
+                  tf2_toggle_UCS(*tos[s].get_apl_val().get());
                   tos[s - skipped].move_1(tos[s], LOC);
                 }
            }
@@ -866,7 +864,38 @@ ShapeItem skipped = 0;
       }
 
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+ShapeItem
+Quad_TF::tf2_toggle_UCS(Value & val)
+{
+ShapeItem error_count = 0;
+
+   loop(e, val.nz_element_count())
+       {
+        const Cell & cell = val.get_cravel(e);
+        if (cell.is_character_cell())       // char → integer
+           {
+             val.set_ravel_Int(e, cell.get_char_value());
+           }
+        else if (cell.is_integer_cell())   // integer → char
+           {
+             val.set_ravel_Char(e, Unicode(cell.get_int_value()));
+           }
+        else if (cell.is_pointer_cell())   // nested
+           {
+             error_count += tf2_toggle_UCS(*cell.get_pointer_value());
+           }
+        else
+           {
+             ++error_count;
+           }
+      }
+
+   if (val.is_empty())   val.to_type(false);   // unlikely
+
+   return error_count;
+}
+//----------------------------------------------------------------------------
 bool
 Quad_TF::tf2_reduce_RHO(Token_string & tos)
 {
@@ -890,7 +919,7 @@ ShapeItem skipped = 0;
 
         Shape sh;
         {
-          const Value * aval = tos[s].get_apl_val().get();
+          const Value & aval = *tos[s].get_apl_val();
           sh = Shape(aval, /* ⎕IO */ 0);
           tos[s].extract_apl_val(LOC);
         }
@@ -921,7 +950,7 @@ ShapeItem skipped = 0;
 
    return skipped > 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Quad_TF::tf2_reduce_sequence(Token_string & tos)
 {
@@ -949,15 +978,15 @@ ShapeItem skipped = 0;
              continue;
            }
 
-        const APL_Integer N = tos[s].get_apl_val()->get_ravel(0)
+        const APL_Integer N = tos[s].get_apl_val()->get_cfirst()
                                     .get_int_value();
-        const APL_Integer K = tos[s + 5].get_apl_val()->get_ravel(0)
+        const APL_Integer K = tos[s + 5].get_apl_val()->get_cfirst()
                                         .get_int_value();
 
         loop(j, 6)   tos[s + j].clear(LOC);
 
         Value_P sequence(K, LOC);
-        loop(k, K)   new (sequence->next_ravel())   IntCell(N + k);
+        loop(k, K)   sequence->next_ravel_Int(N + k);
         sequence->check_value(LOC);
         Token tok(TOK_APL_VALUE1, sequence);
         tos[s - skipped].move_2(tok, LOC);
@@ -975,7 +1004,7 @@ ShapeItem skipped = 0;
 
    return skipped > 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Quad_TF::tf2_reduce_sequence1(Token_string & tos)
 {
@@ -1006,17 +1035,17 @@ ShapeItem skipped = 0;
              continue;
            }
 
-        const APL_Integer N = tos[s].get_apl_val()->get_ravel(0)
+        const APL_Integer N = tos[s].get_apl_val()->get_cfirst()
                                     .get_int_value();
-        const APL_Integer M = tos[s + 2].get_apl_val()->get_ravel(0)
+        const APL_Integer M = tos[s + 2].get_apl_val()->get_cfirst()
                                         .get_int_value();
-        const APL_Integer K = tos[s + 7].get_apl_val()->get_ravel(0)
+        const APL_Integer K = tos[s + 7].get_apl_val()->get_cfirst()
                                         .get_int_value();
 
         loop(j, 6)   tos[s + j].clear(LOC);
 
         Value_P sequence(K, LOC);
-        loop(k, K)   new (sequence->next_ravel())   IntCell(M * (N + k));
+        loop(k, K)   sequence->next_ravel_Int(M * (N + k));
         sequence->check_value(LOC);
         Token tok(TOK_APL_VALUE1, sequence);
         tos[s - skipped].move_2(tok, LOC);
@@ -1033,7 +1062,7 @@ ShapeItem skipped = 0;
       }
    return skipped > 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Quad_TF::tf2_reduce_ENCLOSE(Token_string & tos)
 {
@@ -1061,7 +1090,7 @@ ShapeItem skipped = 0;
         else
            {
              Value_P enc_B(LOC);
-             new (enc_B->next_ravel()) PointerCell(B.get(), enc_B.getref());
+             enc_B->next_ravel_Pointer(B.get());
              enc_B->check_value(LOC);
              Token tok(TOK_APL_VALUE1, enc_B);
              tos[s - skipped].move_2(tok, LOC);
@@ -1081,7 +1110,7 @@ ShapeItem skipped = 0;
 
    return skipped > 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Quad_TF::tf2_reduce_COMMA(Token_string & tos)
 {
@@ -1112,9 +1141,9 @@ ShapeItem skipped = 0;
                   Assert(B->get_rank() <= 1);
                   Value_P Z(A->element_count() + B->element_count(), LOC);
                   loop(a, A->element_count())
-                     Z->next_ravel()->init(A->get_ravel(a), Z.getref(), LOC);
+                     Z->next_ravel_Cell(A->get_cravel(a));
                   loop(b, B->element_count())
-                     Z->next_ravel()->init(B->get_ravel(b), Z.getref(), LOC);
+                     Z->next_ravel_Cell(B->get_cravel(b));
 
                   tos[s + 1].clear(LOC);
                   Token tok_AB(TOK_APL_VALUE1, Z);
@@ -1149,7 +1178,7 @@ ShapeItem skipped = 0;
 
    return skipped > 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Quad_TF::tf2_reduce_ENCLOSE_ENCLOSE(Token_string & tos)
 {
@@ -1182,7 +1211,7 @@ ShapeItem skipped = 0;
       }
    return skipped > 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Quad_TF::tf2_reduce_ENCLOSE1(Token_string & tos)
 {
@@ -1213,7 +1242,7 @@ ShapeItem skipped = 0;
         else
            {
              Value_P enc_B(LOC);
-             new (enc_B->next_ravel()) PointerCell(B.get(), enc_B.getref());
+             enc_B->next_ravel_Pointer(B.get());
              Token tok(TOK_APL_VALUE1, enc_B);
              tos[s - skipped + 1].move_2(tok, LOC);
              tos[s + 2].clear(LOC);   // B
@@ -1232,7 +1261,7 @@ ShapeItem skipped = 0;
 
    return skipped > 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Quad_TF::tf2_reduce_parentheses(Token_string & tos)
 {
@@ -1258,7 +1287,7 @@ ShapeItem skipped = 0;
                      {
                        dest.extract_apl_val(LOC);    // we will override it
                        Value_P Z(LOC);
-                       new (Z->next_ravel())   PointerCell(B.get(), Z.getref());
+                       Z->next_ravel_Pointer(B.get());
                        Z->check_value(LOC);
                        new (&dest) Token(TOK_APL_VALUE3, Z);
                      }
@@ -1281,7 +1310,7 @@ ShapeItem skipped = 0;
 
    return skipped > 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Quad_TF::tf2_glue(Token_string & tos)
 {
@@ -1319,7 +1348,7 @@ ShapeItem skipped = 0;
 
    return skipped > 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string
 Quad_TF::tf2_fun(const UCS_string & fun_name, const Function & fun)
 {
@@ -1328,7 +1357,7 @@ UCS_string ucs;
 
    return ucs;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_TF::tf2_fun_ucs(UCS_string & ucs, const UCS_string & fun_name,
                     const Function & fun)
@@ -1361,7 +1390,7 @@ UCS_string_vector lines;
         tf2_char_vec(ucs, lines[l]);
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_TF::tf2_char_vec(UCS_string & ucs, const UCS_string & vec)
 {
@@ -1396,7 +1425,7 @@ bool in_UCS = false;
    if (in_UCS)   ucs.append_UTF8("),''");
    else          ucs.append_UTF8("'");
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string
 Quad_TF::no_UCS(const UCS_string & ucs)
 {
@@ -1432,7 +1461,7 @@ UCS_string ret;
 
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_TF::tf3(const UCS_string & name)
 {
@@ -1449,11 +1478,10 @@ const NamedObject * obj = Workspace::lookup_existing_name(name);
 const Symbol * symbol = obj->get_symbol();
    if (symbol)
       {
-        const Value * value = &*symbol->get_apl_value();
-        if (value)
+        if (const Value * value = symbol->get_apl_value().get())
            {
              CDR_string cdr;
-             CDR::to_CDR(cdr, *value);
+             CDR::to_CDR(cdr, value);
 
              return Value_P(cdr, LOC);
            }
@@ -1463,4 +1491,4 @@ const Symbol * symbol = obj->get_symbol();
 
    return Str0(LOC);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------

@@ -77,11 +77,15 @@ $(document).ready(function(){initNavTree('classErrOut.html','');});
 Inheritance diagram for ErrOut:</div>
 <div class="dyncontent">
 <div class="center"><img src="classErrOut__inherit__graph.png" border="0" usemap="#ErrOut_inherit__map" alt="Inheritance graph"/></div>
+<map name="ErrOut_inherit__map" id="ErrOut_inherit__map">
+</map>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <div class="dynheader">
 Collaboration diagram for ErrOut:</div>
 <div class="dyncontent">
 <div class="center"><img src="classErrOut__coll__graph.png" border="0" usemap="#ErrOut_coll__map" alt="Collaboration graph"/></div>
+<map name="ErrOut_coll__map" id="ErrOut_coll__map">
+</map>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
@@ -125,7 +129,7 @@ virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>a filebuf for stderr output </p>
 
-<p class="definition">Definition at line <a class="el" href="DiffOut_8hh_source.html#l00071">71</a> of file <a class="el" href="DiffOut_8hh_source.html">DiffOut.hh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="DiffOut_8hh_source.html#l00072">72</a> of file <a class="el" href="DiffOut_8hh_source.html">DiffOut.hh</a>.</p>
 </div><h2 class="groupheader">Member Function Documentation</h2>
 <a id="aae787c8afe34cff86d3672840fa04102"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#aae787c8afe34cff86d3672840fa04102">&#9670;&nbsp;</a></span>use()</h2>
@@ -152,7 +156,7 @@ virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 <p>a helper function telling whether the constructor for CERR was called if CERR is used before its constructor was called (which can happen in when constructors of static objects are called and use CERR) then a segmentation fault would occur.</p>
 <p>We avoid that by using get_CERR() instead of CERR in such constructors. get_CERR() checks <b>used</b> and returns cerr instead of CERR if it is false. </p>
 
-<p class="definition">Definition at line <a class="el" href="DiffOut_8hh_source.html#l00099">99</a> of file <a class="el" href="DiffOut_8hh_source.html">DiffOut.hh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="DiffOut_8hh_source.html#l00100">100</a> of file <a class="el" href="DiffOut_8hh_source.html">DiffOut.hh</a>.</p>
 
 </div>
 </div>
@@ -167,7 +171,7 @@ virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="classErrOut.html">ErrOut</a></li>
-    <li class="footer">Generated on Sun Aug 9 2020 16:43:42 for GNUAPL by
+    <li class="footer">Generated on Sun Jan 30 2022 20:14:26 for GNUAPL by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>

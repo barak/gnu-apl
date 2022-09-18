@@ -146,7 +146,7 @@ static Connection *value_to_db_id( Value_P value )
         throw_illegal_db_id();
     }
 
-    int db_id = value->get_ravel( 0 ).get_int_value();
+    int db_id = value->get_cravel( 0 ).get_int_value();
     return db_id_to_connection( db_id );
  }
 
@@ -157,7 +157,7 @@ static Token close_database( Value_P B )
         DOMAIN_ERROR;
     }
 
-    int db_id = B->get_ravel( 0 ).get_int_value();
+    int db_id = B->get_cravel( 0 ).get_int_value();
     if( db_id < 0 || db_id >= (int)connections.size() ) {
         throw_illegal_db_id();
     }
@@ -177,7 +177,7 @@ static Value_P run_generic_one_query( ArgListBuilder *arg_list,
                                       bool ignore_result )
 {
     for( int i = 0 ; i < num_args ; i++ ) {
-        const Cell &cell = B->get_ravel( start + i );
+        const Cell &cell = B->get_cravel( start + i );
         if( cell.is_integer_cell() ) {
             arg_list->append_long( cell.get_int_value(), i );
         }
@@ -296,8 +296,7 @@ static Token show_tables( Value_P B )
         Shape shape( tables.size () );
         value = Value_P( shape, LOC );
         for( vector<string>::iterator i = tables.begin() ; i != tables.end() ; i++ ) {
-            new (value->next_ravel())
-               PointerCell( make_string_cell( *i, LOC ).get(), value.getref() );
+            value->next_ravel_Pointer(make_string_cell(*i, LOC).get());
         }
     }
 
@@ -326,9 +325,7 @@ static Token show_cols( Value_P A, Value_P B )
         Shape shape( cols.size(), 2 );
         value = Value_P( shape, LOC );
         for( vector<ColumnDescriptor>::iterator i = cols.begin() ; i != cols.end() ; i++ ) {
-            new (value->next_ravel())
-                PointerCell(make_string_cell(i->get_name(), LOC).get(),
-                            value.getref());
+            value->next_ravel_Pointer(make_string_cell(i->get_name(), LOC).get());
 
             Value_P type;
             if( i->get_type().size() == 0 ) {
@@ -337,7 +334,7 @@ static Token show_cols( Value_P A, Value_P B )
             else {
                 type = make_string_cell( i->get_type(), LOC );
             }
-            new (value->next_ravel()) PointerCell( type.get(), value.getref() );
+            value->next_ravel_Pointer(type.get());
         }
     }
 
@@ -374,7 +371,7 @@ Token eval_AB( Value_P A, Value_P B )
 
 Token eval_XB(Value_P X, Value_P B)
 {
-    const int function_number = X->get_ravel( 0 ).get_near_int( );
+    const int function_number = X->get_cravel( 0 ).get_near_int( );
 
     switch( function_number ) {
     case 0:
@@ -408,12 +405,12 @@ static Connection *param_to_db( Value_P X )
         Workspace::more_error() = "Database id missing from axis parameter";
         RANK_ERROR;
     }
-    return db_id_to_connection( X->get_ravel( 1 ).get_near_int( ) );
+    return db_id_to_connection( X->get_cravel( 1 ).get_near_int( ) );
 }
 
 Token eval_AXB(const Value_P A, const Value_P X, const Value_P B)
 {
-    const int function_number = X->get_ravel( 0 ).get_near_int( );
+    const int function_number = X->get_cravel( 0 ).get_near_int( );
 
     switch( function_number ) {
     case 0:
@@ -458,12 +455,7 @@ static const UCS_string ucs_string_from_string( const std::string &string )
 
 Value_P make_string_cell( const std::string &string, const char *loc )
 {
-    UCS_string s = ucs_string_from_string( string );
-    Shape shape( s.size() );
-    Value_P cell( shape, loc );
-    for( int i = 0 ; i < s.size() ; i++ ) {
-        new (cell->next_ravel()) CharCell( s[i] );
-    }
-    cell->check_value( loc );
-    return cell;
+    UCS_string s = ucs_string_from_string(string);
+    Value_P Z(s, loc);
+    return Z;
 }

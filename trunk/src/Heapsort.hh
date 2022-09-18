@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -40,16 +40,58 @@ public:
    static void sort(T * a, int64_t heapsize, const void * comp_arg,
                     greater_fun gf)
       {
-        // turn a[] into a heap, i.e. a[i] > a[2i] and a[i] > a[2i+1]
-        // for all i. At heapsize/2 + 1 ... the heap property is already
-        // fulfilled, because these items have no children. So we move
-        // downwards from heapsize/2 to 0.
-        //
-        for (int64_t p = heapsize/2 - 1; p >= 0; --p)
-            make_heap(a, heapsize, p, comp_arg, gf);
+        /* Turn a[] into a heap. This means that for every odd element
+           a[i+i+1] in a[] the heap property "Hodd" and for every even element
+           a[i+i+2] in a[] the heap property "Heven" holds, where:
 
-        // here a[] is a heap (and therefore a[0] is the largest element)
+           (Hodd)   a[i] > a[i+i+1]
+           (Heven)  a[i] > a[i+i+2]
 
+           The elements a[i] in the right half of a[] have no "children"
+           a[i+i+1] or a[i+i+2] in a[] and therefore the respective heap
+           property "Hodd" or "Heven" trivially holds.
+
+           To turn a[] into a head it therefore suffices to start at the
+           middle of a[] and move left towards the root p=0, establishing
+           the heap property for each element visited.
+
+                p=0    p=1                  p=heapsize/2             p=heapsize
+                ├──────┼────────────────────┼────────────────────────┤
+           a[]: │ root │  inner tree nodes  │      tree leaves       │
+                └──────┴────────────────────┴────────────────────────┘
+                │  └ largest element        │  the  heap property is │
+                │    on return              │  trivially satisfied   │
+                │                                                    │
+                │← ← ← ← ← ← ← ← ← ← ← ← HEAP → → → → → → → → → → → →│
+        */
+
+        for (int64_t parent = heapsize/2 - 1; parent >= 0; --parent)
+            make_heap(a, heapsize, parent, comp_arg, gf);
+
+        /* At this point a[] is a heap (and therefore a[0] is the largest
+           element). In the following loop:
+
+           The left heapsize elements of a[] are a heap and the remaining
+           right arguments of a[] are sorted. Every iteration of the loop
+           exchanges the root of the heap (which is the largest element of
+           the heap) and makes it the smallest element of the sorted part,
+
+           That is, the size of the heap is decremented while the size of
+           the sorted part is incremented.
+
+                │← ← ← ← ← ← ← HEAP  → → → → → → →│                  │
+                ╔══════╤═══════════════════╤══════╦══════════════════╗
+           a[]: ║ root │ > ... >     ... > │ last ║      sorted      ║
+                ╚══════╧═══════════════════╧══════╩══════════════════╝
+                  ↓↓↓↓                       ↓↓↓↓
+                ╔══════╤═══════════════════╦══════╤══════════════════╗
+           a[]: ║ last │ ...           ... ║ root │ <    sorted      ║
+                ╚══════╧═══════════════════╩══════╧══════════════════╝
+                │← ← ← ← ←  HEAP  → → → → →│                         │
+
+           Every such swap destroyes the heap property of the root and must
+           be re-established with make_heap() aka. "siftDown".
+        */
         for (--heapsize; heapsize > 0; heapsize--)
             {
               // The root a[0] is the largest element in a[0] ... a[k].
@@ -58,53 +100,51 @@ public:
               //
               Hswap(a[heapsize], a[0]);
 
-              // re-establish the heap property of the new a[0]
+              // re-establish the heap property of the new root a[0]
               //
-              make_heap(a, heapsize, 0, comp_arg, gf);
+              make_heap(a, heapsize, /* root */ 0, comp_arg, gf);
             }
       }
 
-   /** binary search for \b key (of type K) in \b array of type T). The
+   /** binary search for \b key (of type KEY) in \b array of type T). The
        key is typically a member of T. If K is, say, integer and T is
        sorted ascendingly then compare() might be:
 
       int compare(const int & key, const T & t, const void *)
          { return key - t.key; }   // return > 0 if key is above t.
     **/
-
-   template<typename K>
-   static const T * search(const K & key,
+   template<typename KEY>
+   static const T * search(const KEY & key,
                            const T * array,
                            int64_t /* array size */ u,
-                           int (*compare)(const K & key, const T & item,
-                                                         const void * comp_ctx),
+                           int (*compare)(const KEY & key, const T & item,
+                                          const void * comp_ctx),
                            const void * ctx)
       {
         for (int64_t l = 0; l < u;)
-           {
-             const int64_t half = (l + u) / 2;
-             const T * middle = &array[half];
-             const int comp = (*compare)(key, *middle, ctx);
-             if      (comp > 0)   l = half + 1;    // search in key upper half
-             else if (comp < 0)   u = half;        // search in key lower half
-             else                 return middle;   // key found
-          }
+            {
+              const int64_t half = (l + u) / 2;
+              const int comp = (*compare)(key, array[half], ctx);
+              if      (comp > 0)   l = half + 1;   // search in the upper half
+              else if (comp < 0)   u = half;       // search in the lower half
+              else return array + half;            // key found
+            }
 
         return 0;
       }
 
-   /// binary search for \b key (of type K) in vector \b vec of type T). The
-   /// key is typically a member of T.
-   template<typename K>
-   static const T * search(const K & key, std::vector<T> & vec,
-                           int (*compare)(const K & key, const T & item,
+   /// binary search for \b key (of type KEY) in vector \b vec of type T).
+   /// The key is typically a member of T. If not then 0 is returned.
+   template<typename KEY>
+   static const T * search(const KEY & key, std::vector<T> & vec,
+                           int (*compare)(const KEY & key, const T & item,
                                 const void * comp_ctx), const void * ctx)
       {
-        return search<K>(key, &vec[0], vec.size(), compare, ctx);
+        return search<KEY>(key, &vec[0], vec.size(), compare, ctx);
       }
 
 protected:
-   /// establish the heap property of the subtree with root a[i]
+   /// establish the heap property of the subtree with root a[parent]
    static void make_heap(T * a, int64_t heapsize, int64_t parent,
                          const void * comp_arg, greater_fun gf)
       {
@@ -114,14 +154,22 @@ protected:
              const int64_t right = left + 1;      // right child of parent.
              int64_t max = parent;                // assume parent is the max.
 
-             // set max to the position of the largest of a[i], a[l], and a[r]
+             // set max to either left, or to right, or leave it as is so that
+             // a[max] is largest of a[i], a[left], and a[right]
              //
-             if ((left < heapsize) && (*gf)(a[left], a[max], comp_arg))
-                max = left;   // left child is larger
+             if (left < heapsize)                         // a[left] exists
+                {
+                  if ((*gf)(a[left], a[max], comp_arg))   // and is > a[max]
+                     max = left;                          // then: max ← left
 
-             if ((right < heapsize) && (*gf)(a[right], a[max], comp_arg))
-                max = right;   // right child is larger
+                  if ( (right < heapsize) &&                // a[right] exists,
+                       (*gf)(a[right], a[max], comp_arg))   // and is > a[max]
+                     max = right;                           // then max ← right
+                }
 
+             // if max is still the parent, then neither left nor right
+             // were larger and we are done.
+             //
              if (max == parent)   return; // parent was the max: done
 
              // left or right was the max. exchange and continue

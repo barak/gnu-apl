@@ -549,7 +549,13 @@ t←t⍪'INADDR_ANY' 0
    →0
 
  ReturnAsis: z←what  ⍝ return original parameter unchanged
-∇ 
+∇
+
+∇ seed←FIO∆random
+  ⍝ Function returns an 8-byte random number from /dev/random, the GNU/Linux
+  ⍝ kernel entropy pool. To be used as random seed for ⎕RL
+  seed←⎕FIO[60] 8
+∇
 
 ⍝ meta data for this library...
 ⍝

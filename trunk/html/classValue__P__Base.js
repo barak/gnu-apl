@@ -11,6 +11,7 @@ var classValue__P__Base =
     [ "operator!", "classValue__P__Base.html#aee6bd462a6536906d93335ba0743bf9f", null ],
     [ "operator!=", "classValue__P__Base.html#a84233e0bdc8da767e47fbfa3169e8dfa", null ],
     [ "operator*", "classValue__P__Base.html#a82382ae55e30ee7285e6f374e43bcead", null ],
+    [ "operator+", "classValue__P__Base.html#ab52639de0f96a2b6e45f8c689f3a09b7", null ],
     [ "operator->", "classValue__P__Base.html#a75c48a6d90fc0a1cc9d76eb26b25f63e", null ],
     [ "operator->", "classValue__P__Base.html#aa88dd0a8655d11d3b4e1d37be4bb4cea", null ],
     [ "operator==", "classValue__P__Base.html#add2d9a2d274babe3bff031424518cf33", null ],

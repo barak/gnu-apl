@@ -1,3 +1,4 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classSystemName.html" title="a distinguished name (i.e. ⎕xx) " alt="" coords="5,5,108,32"/>
+<area shape="rect" id="node1" href="$classSymbolTableBase.html" title="SymbolTableBase\&lt; SystemName,\l 256 &#45; 1 \&gt;" alt="" coords="5,5,229,47"/>
+<area shape="rect" id="node2" href="$classSystemSymTab.html" title="The table containing all system defined symbols (aka. distinguished names) " alt="" coords="277,13,393,39"/>
 </map>

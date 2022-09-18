@@ -62,7 +62,7 @@ void VariablesCommand::run_command( NetworkConnection &conn, const std::vector<s
 
           if (const ValueStackItem * tos = symbol->top_of_stack())
              {
-               const NameClass symbol_nc = tos->get_nc();
+               const NameClass symbol_nc = tos->get_NC();
                const bool symbol_is_var = symbol_nc == NC_VARIABLE;
                const bool symbol_is_fun = symbol_nc == NC_FUNCTION ||
                                           symbol_nc == NC_OPERATOR;

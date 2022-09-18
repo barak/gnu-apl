@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -26,7 +26,7 @@
 #include "StateIndicator.hh"
 #include "Workspace.hh"
 
-//=============================================================================
+//============================================================================
 DerivedFunction::DerivedFunction(Token & larg, Function_P dyop, Token & rfun,
                                  const char * loc)
    : Function(ID_USER_SYMBOL, TOK_FUN2),
@@ -43,7 +43,7 @@ DerivedFunction::DerivedFunction(Token & larg, Function_P dyop, Token & rfun,
         CERR << " at " << loc << endl;
      }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 DerivedFunction::DerivedFunction(Token & lfun, Function_P dyop, Value_P X,
                                  Token & rfun, const char * loc)
    : Function(ID_USER_SYMBOL, TOK_FUN2),
@@ -53,7 +53,7 @@ DerivedFunction::DerivedFunction(Token & lfun, Function_P dyop, Value_P X,
      axis(X, loc)
 {
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 DerivedFunction::DerivedFunction(Token & LO, Function_P monop, const char * loc)
    : Function(ID_USER_SYMBOL, TOK_FUN2),
      left_arg(LO, loc),
@@ -69,7 +69,7 @@ DerivedFunction::DerivedFunction(Token & LO, Function_P monop, const char * loc)
         CERR << " at " << loc << endl;
      }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 DerivedFunction::DerivedFunction(Token & lfun, Function_P monop,
                                  Value_P X, const char * loc)
    : Function(ID_USER_SYMBOL, TOK_FUN2),
@@ -86,7 +86,7 @@ DerivedFunction::DerivedFunction(Token & lfun, Function_P monop,
         CERR << " at " << loc << endl;
      }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 DerivedFunction::DerivedFunction(Function_P fun, Value_P X, const char * loc)
    : Function(ID_USER_SYMBOL, TOK_FUN2),
      left_arg(TOK_VOID),
@@ -102,7 +102,7 @@ DerivedFunction::DerivedFunction(Function_P fun, Value_P X, const char * loc)
         CERR << " at " << loc << endl;
      }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 DerivedFunction::~DerivedFunction()
 {
    Log(LOG_FunOperX)
@@ -110,7 +110,7 @@ DerivedFunction::~DerivedFunction()
         CERR << "~DerivedFunction()" << endl;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 DerivedFunction::destroy_derived(const char * loc)
 {
@@ -123,7 +123,7 @@ DerivedFunction::destroy_derived(const char * loc)
    right_fun.clear(loc);
    axis.clear(loc);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 DerivedFunction::eval_B(Value_P B) const
 {
@@ -161,7 +161,7 @@ DerivedFunction::eval_B(Value_P B) const
            }
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 DerivedFunction::eval_XB(Value_P X, Value_P B) const
 {
@@ -194,7 +194,7 @@ DerivedFunction::eval_XB(Value_P X, Value_P B) const
            }
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 DerivedFunction::eval_AB(Value_P A, Value_P B) const
 {
@@ -232,7 +232,7 @@ DerivedFunction::eval_AB(Value_P A, Value_P B) const
            }
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 DerivedFunction::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
@@ -254,7 +254,7 @@ DerivedFunction::eval_AXB(Value_P A, Value_P X, Value_P B) const
         return oper->eval_ALXB(A, left, X, B);
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ostream &
 DerivedFunction::print(ostream & out) const
 {
@@ -275,7 +275,7 @@ DerivedFunction::print(ostream & out) const
 
    return out << ")";
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 DerivedFunction::has_result() const
 {
@@ -283,14 +283,14 @@ DerivedFunction::has_result() const
    if (left_arg.is_function())   return left_arg.get_function()->has_result();
    return true;   // operator bound to left value
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 DerivedFunction::unmark_all_values() const
 {
    if (+axis)   axis->unmark();
    if (left_arg.is_apl_val())   left_arg.get_apl_val()->unmark();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 DerivedFunction::print_properties(ostream & out, int indent) const
 {
@@ -312,7 +312,7 @@ UCS_string ind(indent, UNI_SPACE);
 
    out << endl;
 }
-//=============================================================================
+//============================================================================
 DerivedFunctionCache::DerivedFunctionCache()
    : idx(0)
 {
@@ -324,7 +324,7 @@ DerivedFunctionCache::DerivedFunctionCache()
               << endl;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 DerivedFunctionCache::~DerivedFunctionCache()
 {
    reset();
@@ -336,7 +336,7 @@ DerivedFunctionCache::~DerivedFunctionCache()
               << endl;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 DerivedFunctionCache::reset()
 {
@@ -355,7 +355,7 @@ DerivedFunctionCache::reset()
               << endl;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 DerivedFunction *
 DerivedFunctionCache::get(const char * loc)
 {
@@ -372,5 +372,5 @@ DerivedFunctionCache::get(const char * loc)
    return reinterpret_cast<DerivedFunction *>
                           (cache + idx++*sizeof(DerivedFunction));
 }
-//=============================================================================
+//============================================================================
 

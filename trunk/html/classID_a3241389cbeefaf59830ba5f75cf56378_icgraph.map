@@ -1,5 +1,0 @@
-<map id="ID::get_system_function" name="ID::get_system_function">
-<area shape="rect" id="node2" href="$classXML__Loading__Archive.html#ad200f5b98b9cf3e903ccf714a56a1d0f" title="read next Ravel element " alt="" coords="219,5,371,47"/>
-<area shape="rect" id="node3" href="$classXML__Loading__Archive.html#ad0c398f273df586ef1a2cb9b87b9cb41" title="find attribute att_name and return a pointer to its value if found) " alt="" coords="419,5,571,47"/>
-<area shape="rect" id="node4" href="$classXML__Loading__Archive.html#a475b4572fea93849b155009d78afbd66" title="read next Value element, return true on success " alt="" coords="619,5,771,47"/>
-</map>

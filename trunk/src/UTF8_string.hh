@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -32,18 +32,25 @@ using namespace std;
 class UCS_string;
 class Value;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// one byte of a UTF8 encoded Unicode (RFC 3629) string
 typedef uint8_t UTF8;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// frequently used cast to const UTF8 *
 inline const UTF8 *
 utf8P(const void * vp)
 {
   return reinterpret_cast<const UTF8 *>(vp);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+/// frequently used cast to UTF8 *
+inline UTF8 *
+utf8P(char * cp)
+{
+  return reinterpret_cast<UTF8 *>(cp);
+}
+//----------------------------------------------------------------------------
 /// an UTF8 encoded Unicode (RFC 3629) string
 class UTF8_string : public std::basic_string<UTF8>
 {
@@ -64,12 +71,9 @@ public:
             else        break;
       }
 
-   /// constructor: copy of UCS string. The UCS characters will be UTF8-encoded
+   /// constructor: copy of UCS string. The Unicodes in ucs
+   /// will be UTF8-encoded
    UTF8_string(const UCS_string & ucs);
-
-   /// constructor: UCS_string from (simple character vector) APL value.
-   /// Non-ASCII characters will be UTF8 encoded.
-   UTF8_string(const Value & value);
 
    /// return true iff \b this is equal to \b other
    bool operator ==(const UTF8_string & other) const
@@ -79,7 +83,7 @@ public:
         return true;
       }
 
-   /// return \b this string as a 0-termionated C string
+   /// return \b this string as a 0-terminated C string
    const char * c_str() const
       { return reinterpret_cast<const char *>
                                (std::basic_string<UTF8>::c_str()); }
@@ -108,7 +112,7 @@ public:
    /// display bytes in this UTF string
    ostream & dump_hex(ostream & out, int max_bytes) const;
 
-   /// return true iff string ends with ext (usually a file name extennsion)
+   /// return true iff string ends with ext (usually a file name extension)
    bool ends_with(const char * ext) const;
 
    /// return true iff string starts with path (usually a file path)
@@ -129,7 +133,7 @@ public:
    /// return the next UTF8 encoded char from an input file
    static Unicode getc(istream & in);
 };
-//=============================================================================
+//============================================================================
 /// A UTF8 string to be used as filebuf in UTF8_ostream
 class UTF8_filebuf : public filebuf
 {
@@ -145,7 +149,7 @@ protected:
    /// the data in this filebuf
    UTF8_string data;
 };
-//=============================================================================
+//============================================================================
 /// a UTF8 string that can be used as ostream
 class UTF8_ostream : public ostream
 {
@@ -163,6 +167,6 @@ protected:
    /// the filebuf of this ostream
    UTF8_filebuf utf8_filebuf;
 };
-//=============================================================================
+//============================================================================
 
 #endif // __UTF8_STRING_HH_DEFINED__

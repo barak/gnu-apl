@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -25,7 +25,7 @@
 #include "Function.hh"
 #include "Output.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** an operator bound to its left and (in the case of a dyadic operator) to
    its right operand.
  **/
@@ -62,23 +62,27 @@ public:
    virtual bool is_derived() const
       { return true; }
 
-  Function_P get_LO() const
+   /// return the left operand of this derived function
+   Function_P get_LO() const
       { return left_arg.get_function(); }
 
-   // return the value (if any) bound to an operator (that allows it)
+   /// return the value (if any) bound to an operator (that allows it)
    Value_P get_bound_LO_value() const
       {
         return left_arg.is_apl_val() ? left_arg.get_apl_val() : Value_P();
       }
 
+   /// return the operator of this derived function
    Function_P get_OPER() const
       { return oper; }
 
+   /// return the right operand (or 0) of this derived function
    Function_P get_RO() const
       {
         return right_fun.get_tag() == TOK_VOID ? 0 : right_fun.get_function();
       }
 
+   /// return the axis argument (or 0 if none) of this derived function
    const Value * get_AXIS() const
       { return axis.get(); }
 
@@ -112,8 +116,8 @@ protected:
       }
 
    /// overloaded Function::locate_X()
-   virtual const Value_P * locate_X() const
-      { return (!axis) ? 0 : &axis; }
+   virtual Value_P * locate_X() const
+      { return !axis ? 0 : const_cast<Value_P *>(&axis); }
 
    /// the function (to the left of the operator)
    Token left_arg;
@@ -134,7 +138,7 @@ private:
    ~DerivedFunction();
 
 };
-//=============================================================================
+//============================================================================
 /// a small cache for storing a few DerivedFunction objects
 class DerivedFunctionCache
 {
@@ -145,12 +149,14 @@ public:
    /// destructor
    ~DerivedFunctionCache();
 
+   /// return the i'th derived function
    const DerivedFunction * at(size_t i) const
       {
         return reinterpret_cast<const DerivedFunction *>
                                (cache + i*sizeof(DerivedFunction));
       }
 
+   /// return the i'th derived function
    const DerivedFunction & operator [](size_t i) const
       {
         Assert(i < idx);
@@ -179,5 +185,5 @@ protected:
    /// the number of elements in \b cache
    size_t idx;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 #endif // __DERIVED_FUNCTION__DEFINED__

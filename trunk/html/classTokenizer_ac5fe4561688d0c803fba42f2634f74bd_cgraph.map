@@ -1,8 +1,0 @@
-<map id="Tokenizer::tokenize_string2" name="Tokenizer::tokenize_string2">
-<area shape="rect" id="node2" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string " alt="" coords="193,5,333,32"/>
-<area shape="rect" id="node3" href="$classUnicode__source.html#aa1e6d0503065a5cd4c12908b02e2bfb8" title="get next item " alt="" coords="191,56,334,83"/>
-<area shape="rect" id="node4" href="$classUnicode__source.html#a0ab44079b7c3f68a88993cb917479f22" title="return the number of remaining items " alt="" coords="189,107,336,133"/>
-<area shape="rect" id="node5" href="$classError.html#a9b063bbb799ab949fd0f6ed2b6ad2709" title="throw a error with a parser location " alt="" coords="198,158,327,199"/>
-<area shape="rect" id="node6" href="$classError.html#a9dbfb665cecfad231189862c5f414c48" title="return a string describing the error " alt="" coords="384,140,507,167"/>
-<area shape="rect" id="node7" href="$classBacktrace.html#aeacff0c96a9f9cb8f92088e549e44bb5" title="show the current function call stack. " alt="" coords="385,191,505,217"/>
-</map>

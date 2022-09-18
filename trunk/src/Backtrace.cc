@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -39,6 +39,8 @@
 #include "Common.hh"
 #include "Backtrace.hh"
 
+#define NO_PC (-1LL)
+
 using namespace std;
 
 Backtrace::_lines_status 
@@ -46,17 +48,19 @@ Backtrace::_lines_status
 
 std::vector<Backtrace::PC_src> Backtrace::pc_2_src;
 
-//-----------------------------------------------------------------------------
+static int64_t main_offset = 0;
+
+//----------------------------------------------------------------------------
 int
 Backtrace::pc_cmp(const int64_t & key, const PC_src & pc_src, const void *)
 {
    return key - pc_src.pc;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 const char *
 Backtrace::find_src(int64_t pc)
 {
-   if (pc == -1LL)   return 0;   // no pc
+   if (pc == NO_PC)   return 0;   // no pc
 
    if (pc_2_src.size())   // database was properly set up.
       {
@@ -65,12 +69,15 @@ Backtrace::find_src(int64_t pc)
         return posp->src_loc;   // found
       }
 
+   0 && cerr << "PC=" << hex << pc << dec << " not found in apl.lines" << endl;
    return 0;   // not found
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Backtrace::open_lines_file()
 {
+extern int main(int argc, const char *argv[]);
+
    if (lines_status != LINES_not_checked)   return;
 
    // we are here for the first time.
@@ -111,25 +118,61 @@ const time_t apl_lines_time = st.st_mtime;
    pc_2_src.reserve(100000);
 char buffer[1000];
 FILE * file = fdopen(fd, "r");
+size_t file_lines = 0;
+size_t asm_lines = 0;
+
    assert(file);
 
 const char * src_line = 0;
 bool new_line = false;
-int64_t prev_pc = -1LL;
+int64_t prev_pc = NO_PC;
 
    for (;;)
        {
          const char * s = fgets(buffer, sizeof(buffer) - 1, file);
          if (s == 0)   break;   // end of file.
+         ++file_lines;
 
          buffer[sizeof(buffer) - 1] = 0;
          int slen = strlen(buffer);
          if (slen && buffer[slen - 1] == '\n')   buffer[--slen] = 0;
          if (slen && buffer[slen - 1] == '\r')   buffer[--slen] = 0;
 
-         // we look for 2 types of line: abolute source file paths
-         // and code lines.
-         //
+         /* we look for 3 types of lines:
+
+            the (single) <main> line,
+            absolute source file path lines, and
+            code lines.
+
+            For example:
+
+000000000014c7a9 <main>:                                   [<main> line]
+main():
+/home/eedjsa/apl-1.8/src/main.cc:611                       [source file path]
+  14c7a9:»······55                   »··push   %rbp        [code line]
+  14c7aa:»······48 89 e5             »··mov    %rsp,%rbp   [code line]
+  ...
+
+            NOTE: this only works with:
+
+            CXXFLAGS='-rdynamic -gdwarf-2' ./configure ...
+
+            since newer compilers strip location information by default.
+          */
+
+         if (strstr(s, "<main>:"))   // <main line>
+            {
+              const int64_t main_funct = reinterpret_cast<long long>(main);
+              const int64_t main_loc = strtoll(s, 0, 16);
+              main_offset = main_funct - main_loc;
+
+              0 && cerr << hex << setfill(' ')
+                   << "main() in apl.lines  " << setw(16) << main_loc    << endl
+                   << "main() offset:      +" << setw(16) << main_offset << endl
+                   << "main() start:       =" << setw(16) << main_funct  << endl
+                   << dec;
+            }
+
          if (s[0] == '/')   // source file path
             {
               src_line = strdup(strrchr(s, '/') + 1);
@@ -141,19 +184,23 @@ int64_t prev_pc = -1LL;
 
          if (s[8] == ':')   // opcode address
             {
-              long long pc = -1LL;
+              ++asm_lines;
+              long long pc = NO_PC;
               if (1 == sscanf(s, " %llx:", &pc))
                  {
                    if (pc < prev_pc)
                       {
-                         assert(0 && "apl.lines not ordered by PC");
+                         assert(0 && "file apl.lines is not ordered by PC");
                          break;
                       }
 
                    PC_src pcs = { pc, src_line };
+                   0 && cerr << "adding " << uhex << pcs.pc << dec
+                             << " aka. " << pcs.src_loc << endl;
                    pc_2_src.push_back(pcs);
                    prev_pc = pc;
-                   new_line = false;
+
+                   // new_line = false;   causes some lines to not be found
                  }
               continue;
             }
@@ -161,10 +208,12 @@ int64_t prev_pc = -1LL;
 
    fclose(file);   // also closes fd
 
-   cerr << "read " << pc_2_src.size() << " line numbers" << endl;
+   cerr << "total_lines in apl.lines:     " << file_lines      << endl
+        << "assembler lines in apl.lines: " << asm_lines       << endl
+        << "source line numbers found:    " << pc_2_src.size() << endl;
    lines_status = LINES_valid;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Backtrace::show_item(int idx, char * s)
 {
@@ -178,7 +227,7 @@ Backtrace::show_item(int idx, char * s)
    // split off address from s.
    //
 const char * addr = "????????";
-int64_t pc = -1LL;
+int64_t pc = NO_PC;
    {
      char * space = strchr(s, ' ');
      if (space)
@@ -188,6 +237,7 @@ int64_t pc = -1LL;
           char * e = strchr(space + 2, ']');
           if (e)   *e = 0;
           pc = strtoll(addr, 0, 16);
+          pc -= main_offset;
         }
    }
 
@@ -261,7 +311,7 @@ char obuf[200] = "@@@@";
    cerr << endl;
 #endif
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Backtrace::show(const char * file, int line)
 {
@@ -320,7 +370,7 @@ char ** strings = backtrace_symbols(buffer, size);
 
 #endif
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 #ifdef HAVE_EXECINFO_H
 int
 Backtrace::demangle_line(char * result, size_t result_max, const char * buf)
@@ -351,7 +401,7 @@ error:
    result[result_max - 1] = 0;
    return status;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 const char *
 Backtrace::caller(int offset)
 {
@@ -368,5 +418,5 @@ char * demangled = static_cast<char *>(malloc(200));
        }
    return strings[offset];
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 #endif // HAVE_EXECINFO_H

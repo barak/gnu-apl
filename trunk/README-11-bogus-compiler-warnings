@@ -28,15 +28,15 @@ In general a bogus compiler warning (we assume the compiler is GNU g++) is
 disabled with a specific compile flag, for example -Werror=maybe-uninitialized.
 The warning emitted by the compiler shows the flag for disabling it.
 
-To causes that flag to be used in the build of GNU APL (i.e. to suppress
+To cause that flag to be used in the build of GNU APL (i.e. to suppress
 the warning) you need to run ./configure again with the flag appended to
 the CXXFLAGS. For example:
 
 CXXFLAGS=-Werror=maybe-uninitialized ./configure
 
-Note that the CXXFLAGS are not .configure arguments (which appear on the right
-of ./configure) but set a shell variable CXXFLAGS which is considered by
-.configure (see INSTALL).
+Note that the CXXFLAGS= above is not .configure arguments (which appear on
+the right of ./configure) but sets a shell variable inamed CXXFLAGS which
+is considered by .configure (see INSTALL).
 
 The bogus warnings reported so far follow...
 
@@ -47,7 +47,7 @@ Shape.hh:133:18: error: ‘shape_Z.Shape::rho[<unknown>]’ may be used uninitia
   133 |         if (rho[r])   { volume /= rho[r];  rho[r] = sh;  volume *= rho[r]; }
       |             ~~~~~^
 
-Suppress this (and other warnings) with:
+Suppress this (and likewise other warnings) with:
 
 CXXFLAGS="-Wno-maybe-uninitialized -Wno-class-memaccess" ./configure
 -----------------------------------------------------------------------------

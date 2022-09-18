@@ -1,5 +1,5 @@
 
-SUBDIRS = APLComponentFiles iso-apl-cf
+SUBDIRS = APLComponentFiles DALY iso-apl-cf
 
 dist_apl5_DATA =	HTML.apl	\
 			FILE_IO.apl	\

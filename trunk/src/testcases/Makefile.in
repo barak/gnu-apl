@@ -93,9 +93,6 @@ host_triplet = @host@
 subdir = src/testcases
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/depend.m4 \
-	$(top_srcdir)/m4/libtool.m4 $(top_srcdir)/m4/ltoptions.m4 \
-	$(top_srcdir)/m4/ltsugar.m4 $(top_srcdir)/m4/ltversion.m4 \
-	$(top_srcdir)/m4/lt~obsolete.m4 \
 	$(top_srcdir)/m4/ax_lib_sqlite3.m4 \
 	$(top_srcdir)/m4/ax_lib_postgresql.m4 \
 	$(top_srcdir)/m4/ax_path_lib_pcre.m4 \
@@ -210,6 +207,7 @@ PCRE_CFLAGS = @PCRE_CFLAGS@
 PCRE_LIBS = @PCRE_LIBS@
 PERFORMANCE_COUNTERS_WANTED = @PERFORMANCE_COUNTERS_WANTED@
 PG_CONFIG = @PG_CONFIG@
+PKG_CONFIG = @PKG_CONFIG@
 POSTGRESQL_CFLAGS = @POSTGRESQL_CFLAGS@
 POSTGRESQL_LDFLAGS = @POSTGRESQL_LDFLAGS@
 POSTGRESQL_VERSION = @POSTGRESQL_VERSION@
@@ -307,6 +305,7 @@ dist_noinst_DATA = \
         Catenate_with_Axis.tc                   \
         Ceiling.tc                              \
         Circle_Functions.tc                     \
+        Clone.tc                                \
         Cloning.tc                              \
         Commute.tc                              \
         Compress.tc                             \
@@ -379,6 +378,7 @@ dist_noinst_DATA = \
         Oper_userfun.tc                         \
         Or.tc                                   \
         OuterProduct.tc                         \
+        Parallel.tc                             \
         Partition.tc                            \
         Partition_with_axis.tc                  \
         Pick.tc                                 \
@@ -500,7 +500,6 @@ dist_noinst_DATA = \
         ZZ33_Regression.tc                      \
         ZZ34_Regression.tc                      \
         ZZ35_Regression.tc                      \
-        ZZ36_Regression.tc                      \
         ZZ37_Regression.tc                      \
         ZZ38_Regression.tc                      \
         ZZ39_Regression.tc                      \
@@ -516,6 +515,10 @@ dist_noinst_DATA = \
         ZZ49_Regression.tc                      \
         ZZ50_Regression.tc                      \
         ZZ51_Regression.tc                      \
+        ZZ52_Regression.tc                      \
+        ZZ53_Regression.tc                      \
+        ZZ54_Regression.tc                      \
+        ZZ55_Regression.tc                      \
         ZZZ0_Standard_08x,tc                    \
         ZZZ0_Standard_09x.tc                    \
         ZZZ0_Standard_10x.tc                    \

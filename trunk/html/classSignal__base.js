@@ -75,7 +75,7 @@ var classSignal__base =
     [ "get_sigID", "classSignal__base.html#a6f28cd17975bd12c01ce3789a4cf022e", null ],
     [ "get_sigName", "classSignal__base.html#a6626c5d03fc977a6eb798dac17e1ae36", null ],
     [ "print", "classSignal__base.html#a4ddd25f4628ffc80a1d7063d5c68a2da", null ],
-    [ "recv_TCP", "classSignal__base.html#a9ea00a9c77a0728accf77e0a82044728", null ],
-    [ "send_TCP", "classSignal__base.html#a189dc16eceb78d24a16e53c125cbf0c3", null ],
+    [ "recv_TCP", "classSignal__base.html#ae6862da3b4684bf41e1a427ebece92e9", null ],
+    [ "send_TCP", "classSignal__base.html#a2ff638373162ccc4a8b1b268b260923e", null ],
     [ "store", "classSignal__base.html#a68f2f5d807d706a6e46709abef26cfb1", null ]
 ];

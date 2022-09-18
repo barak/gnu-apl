@@ -1,9 +1,0 @@
-<map id="Quad_GTK::read_fd" name="Quad_GTK::read_fd">
-<area shape="rect" id="node2" href="$classQuad__GTK.html#adc06cea50b6243aad62bf6f00fddacc6" title="poll all fds and insert events into event_queue until no more events are pending " alt="" coords="212,5,347,32"/>
-<area shape="rect" id="node6" href="$classQuad__GTK.html#abbbfd7aabc354a28380caed4dbd5a9a4" title="poll for a TLV on fd with a specific (reponse&#45;) tag " alt="" coords="192,56,367,83"/>
-<area shape="rect" id="node3" href="$classQuad__GTK.html#a8e220fbcf59197529023736c3721700e" title="overloaded Function::eval_B() " alt="" coords="424,5,559,32"/>
-<area shape="rect" id="node4" href="$classQuad__GTK.html#a508616b9b4b573b2728db9d84b2abf52" title="open the GTH window described by gui_filename and optional css_filename " alt="" coords="616,31,791,57"/>
-<area shape="rect" id="node5" href="$classQuad__GTK.html#aebe76f80340ceb26b2b3dadb348ab30e" title="overloaded Function::eval_AB() " alt="" coords="839,31,983,57"/>
-<area shape="rect" id="node7" href="$classQuad__GTK.html#a4c9c5fbe2460cc39737e3860ad78f458" title="overloaded Function::eval_AXB() " alt="" coords="415,56,568,83"/>
-<area shape="rect" id="node8" href="$classQuad__GTK.html#af1cf653ffeaf8d840e0b359ecd8f28bd" title="overloaded Function::eval_XB() " alt="" coords="419,107,563,133"/>
-</map>

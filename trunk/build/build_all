@@ -2,26 +2,75 @@
 
 # this script builds different GNU APL variants and tests some of them
 
-# figure and normalize some directory names
+# First of all, figure and normalize some directory names:
 #
-START_dir=`pwd`
-cd `dirname $0` 
-BUILD_dir=`pwd`
-# LOG_dir="/tmp"       # where to store longer build logs
-LOG_dir="$BUILD_dir"   # where to store longer build logs
-ROOT_dir=`dirname $BUILD_dir`
-# SRC_dir="$ROOT_dir/src"   for non-VPATH builds
+# START_dir:
+#    the current directory from which this script was called.
+#    Used to cd back when all is done. In a nightly build, START_dir is
+#    probably /etc/cron.daily.
+#
+# TOP_BUILD_dir:
+#    the top-level directory that contains this script. The different
+#    configurations produced by this script are stored in corresponding
+#    subdirectories, e.n. in builddir_standard for configuration "standard"
+#
+# TOP_LOG_dir:
+#    the directory where logfiles produced during the builds are stored.
+#    Normally TOP_LOG_dir is the same as TOP_BUILD_dir
+#
+# ROOT_dir:
+#    the GNU APL top-level directory. This is the one and only
+#    directory than contains the ./configure script for GNU APL. Normally
+#    TOP_BUILD_dir is $ROOT_dir/build.
+#
+# VSRC_dir:
+#    this is (despite of its name 'src' the destination directory for a single
+#    configuration. For example: the VSRC_dir for configuration "standard" is:
+#    $TOP_BUILD_dir/build/builddir_standard/src
+#
+START_dir=$(pwd)      # e.g. /etc/cron.daily
 
+cd $(dirname $0)      # e.g. /root/apl-1.8
+TOP_BUILD_dir=$(pwd)
+SVN_VERSION=$(svnversion)
+
+# NOTE: -j8 fails with out of memory on small hosts (as used for nightly builds)
+J8="-j8"
+J8=""
+
+# TOP_LOG_dir="/tmp"       # where to store longer build logs
+TOP_LOG_dir="$TOP_BUILD_dir"   # where to store longer build logs
+
+ROOT_dir=$(dirname $TOP_BUILD_dir)
+
+# some counters for what happens
 declare -i build_errors=0
 declare -i missing_files=0
 declare -i configs_bad=0
 declare -i configs_good=0
+declare -i test_errors=0
+bad_configs=""
 
 # remove old build results and start a fresh summary file
 #
-rm -f "$BUILD_dir"/apl-*
-rm -f "$LOG_dir"/*.log
-echo "Build Summary:" > "$LOG_dir/summary.log"
+rm -f "$TOP_BUILD_dir"/apl-*
+rm -f "$TOP_BUILD_dir"/*.so
+rm -f "$TOP_LOG_dir"/*.log
+rm -Rf builddir_*
+
+# the user can clean this directory up by calling this script with
+# argument 'clean'
+#
+[ "x$1" = "xclean" ] && exit 0
+
+# check that the ROOT_dir is not ./configure'd. Otherwise ./configure would
+# complain.
+#
+if [ -f "$ROOT_dir/config.status" ]
+then
+   echo "*** $ROOT_dir is not clean. Please run 'make VPATH_clean' there."
+   exit 1
+fi
 
 ###################################################################
 # build one configuration
@@ -33,49 +82,57 @@ build_one()
    # $3: expected result file (apl binary. libapl.so etc.)
    #
 
-   cd "$BUILD_dir"
+   cd "$TOP_BUILD_dir"
    rm -f "$3"   # remove stale build results (should not exist)
    rm -Rf "builddir_$1"
    mkdir "builddir_$1"
    cd "builddir_$1"   # like  the top-level directory in a non-VPATH build
-   VSRC_dir="$BUILD_dir/builddir_$1/src"
+   VSRC_dir="$TOP_BUILD_dir/builddir_$1/src"
 
-   local time_FROM=`date +%s`
+   local time_FROM=$(date +%s)
+   local Logfile=$TOP_LOG_dir/configure-$1.log
    echo
    echo "running ../../configure for configuration: \"$1\"..."
+   echo "  └─── see result in: $Logfile"
    {
      set -o xtrace
      ../../configure $2
      set +o xtrace
-   } > "$LOG_dir/configure-$1.log" 2>&1
+   } > "$Logfile" 2>&1
 
-   echo "building configuration \"$1\"..."
+   cp ../../buildtag.hh .
+
+   Logfile="$TOP_LOG_dir/build-$1.log"
+   echo "running make $J8 all for configuration \"$1\"..."
+   echo "  └─── see result in: $Logfile"
 
    {
      echo "building \"$1\"..."
 
-     make -j8 all
-   } > "$LOG_dir/build-$1.log"
+     make $J8 all
+   } > "$Logfile" 2>&1
+
    local make_result=$?
-   local time_TO=`date +%s`
+   local time_TO=$(date +%s)
    local secs=$(( $time_TO - $time_FROM ))
-   local summ="$LOG_dir/summary.log"
+   local summ="$TOP_LOG_dir/summary.log"
    local OK_failed="OK"
    if [ $make_result -eq 0 ] ; then   # make succeeded
       echo "    make OK for configuration: $1" >> $summ
       if [ -f "$VSRC_dir/apl" ] ; then
-         mv -f "$VSRC_dir/apl" "$BUILD_dir/apl--$1"
+         mv -f "$VSRC_dir/apl" "$TOP_BUILD_dir/apl--$1"
          configs_good=$((configs_good+1))
       elif [ -f "$VSRC_dir/.libs/libapl.so" ] ; then
-         mv -f "$VSRC_dir/.libs/libapl.so" "$BUILD_dir/"
+         mv -f "$VSRC_dir/.libs/libapl.so" "$TOP_BUILD_dir/"
          configs_good=$((configs_good+1))
       elif [ -f "$VSRC_dir/.libs/lib_gnu_apl.so" ] ; then
-         mv -f "$VSRC_dir/.libs/lib_gnu_apl.so" "$BUILD_dir/"
+         mv -f "$VSRC_dir/.libs/lib_gnu_apl.so" "$TOP_BUILD_dir/"
          configs_good=$((configs_good+1))
       elif [ ! -f $3 ] ; then
          echo "**** no file $3 after building $1" >> $summ
          missing_files=$((missing_files+1))
          configs_bad=$((configs_bad+1))
+         bad_configs="$bad_configs $1"
          OK_failed="FAILED (make target missing)"
       fi
       echo "    build $1: OK ($secs seconds)" >> $summ
@@ -85,10 +142,11 @@ build_one()
        echo "!!! configure options were: $2"
        build_errors=$((build_errors+1))
        configs_bad=$((configs_bad+1))
+       bad_configs="$bad_configs $1"
        OK_failed="FAILED (make failed)"
    fi
    echo "    configuration: \"$1\" done." >> $summ
-   echo "  └─── configuration: \"$1\" done ($OK_failed)"
+   echo "  configuration: \"$1\" done ($OK_failed)"
 }
 
 ###################################################################
@@ -97,17 +155,21 @@ build_one()
 test_one()
 {
    echo "testing configuration \"$1\"..."
-   local time_FROM=`date +%s`
-   local summ="$LOG_dir/summary.log"
+   echo "  └─── see test results in: $VSRC_dir/testcases/summary.log"
+
+   local time_FROM=$(date +%s)
+   local summ="$TOP_LOG_dir/summary.log"
    cd $VSRC_dir
+   cp $ROOT_dir/src/testcases/* testcases/
    make test > /dev/null 2>&1
    local make_result=$?
-   local time_TO=`date +%s`
+   local time_TO=$(date +%s)
    local secs=$(( $time_TO - $time_FROM ))
    if [ $make_result -eq 0 ] ; then
       echo "    test $1: OK ($secs seconds)"     >> $summ
    else
       echo "*** test $1: FAILED ($secs seconds)" >> $summ
+      test_errors=$((1+$test_errors))
    fi
 }
 
@@ -118,9 +180,10 @@ if [ "$?" != 0 ]; then
     echo "*** cannot build all since autoreconf failed ***"
     exit 42
 fi
-echo "  └─── autoreconf done."
+echo "  └─── autoreconf done (OK)."
 
-# shortcuts for various configure options
+# some shortcuts for various configure options
+#
 STD="--enable-maintainer-mode"
 LIBAPL="--with-libapl"
 PYTHON="--with-python"
@@ -137,59 +200,106 @@ noVH="VALUE_HISTORY_WANTED=no"
 AL0="ASSERT_LEVEL_WANTED=0"             # no ASSERTions
 FAST="$noVC $noVH $AL0"
 
-# the standard configuration
+################################################################################
+# build the standard configuration
 #
-build_one "standard" "$STD" "$VSRC_dir/apl"
-test_one  "standard"
-
-####################################################################################
-# the standard configuration with libxcb (even if GTK3 is present)
-#
-build_one "libxcb" "$STD $XCB" "$VSRC_dir/apl"
-test_one  "standard"
-
-# the developer configuration with rational number support
-#
-build_one "rational" "$STD $DEV $RAT" "$VSRC_dir/apl"
-
-####################################################################################
-# apl as a library
-#
-build_one "libapl" "$STD $LIBAPL" "$VSRC_dir/.libs/libapl.so"
-
-####################################################################################
-# python interface to APL
-#
-build_one "python" "$STD $PYTHON" "$VSRC_dir/.libs/lib_gnu_apl.so"
-
-
-####################################################################################
-# parallel benchmarking
-#
-build_one "parallel_bench" "$STD $FAST $PERF $DYLO $CC_3" "$VSRC_dir/apl"
-
-####################################################################################
-# erlang interface to APL
-#
-build_one "erlang" "$STD $ERLANG" "$VSRC_dir/.libs/erlang_APL_nif.so"
-
-
-####################################################################################
-# the developer configuration.
-#
-build_one "develop" "$STD $DEV" "$VSRC_dir/apl"
-test_one "develop"
-
+build_standard()
 {
-  echo
-  echo "$build_errors build errors"
-  echo "$missing_files missing files"
-  echo "$configs_bad configurations failed"
-  echo "$configs_good configurations succeeded"
-} >> "$LOG_dir/summary.log"
+  build_one "standard" "$STD" "$VSRC_dir/apl"
+  test_one  "standard"
+}
 
-cat "$LOG_dir/summary.log"
+################################################################################
+# build the standard configuration with libxcb (even if GTK3 is present)
+#
+build_libxcb()
+{
+  build_one "libxcb" "$STD $XCB" "$VSRC_dir/apl"
+  test_one  "standard"
+}
+
+# build the developer configuration with rational number support
+#
+build_rational()
+{
+  build_one "rational" "$STD $DEV $RAT" "$VSRC_dir/apl"
+}
+################################################################################
+# build apl as a library
+#
+build_libapl()
+{
+  build_one "libapl" "$STD $LIBAPL" "$VSRC_dir/.libs/libapl.so"
+}
+################################################################################
+# build the python interface to APL
+#
+build_python()
+{
+  build_one "python" "$STD $PYTHON" "$VSRC_dir/.libs/lib_gnu_apl.so"
+}
+################################################################################
+# build apl for parallel benchmarking
+#
+build_parallel_bench()
+{
+ build_one "parallel_bench" "$STD $FAST $PERF $DYLO $CC_3" "$VSRC_dir/apl"
+}
+################################################################################
+# build the erlang interface to APL
+#
+build_erlang()
+{
+  build_one "erlang" "$STD $ERLANG" "$VSRC_dir/.libs/erlang_APL_nif.so"
+}
+################################################################################
+# build the developer configuration.
+#
+build_develop()
+{
+  build_one "develop" "$STD $DEV" "$VSRC_dir/apl"
+  test_one "develop"
+}
+
+# build all relevant configurations
+{
+  echo "Build Summary:" > "$TOP_LOG_dir/summary.log"
+
+  for config in \
+      standard develop libxcb rational libapl parallel_bench erlang python
+      do build_$config
+  done
+
+  echo
+  echo  "$build_errors build errors"
+  echo "$missing_files missing files (build results)"
+  [ ! -z "$bad_configs" ] && echo "$configs_bad configurations failed: $bad_configs"
+  echo  "$configs_good configurations succeeded"
+  echo   "$test_errors testcases failed"
+} >> "$TOP_LOG_dir/summary.log"
+
+cat "$TOP_LOG_dir/summary.log"
+
+   if [ -d /var/www/html ]
+   then echo "<!DOCTYPE html>
+<html>
+<head>
+  <title>Nightly Build Results for GNU APL</title>
+  <meta charset="UTF-8"/>
+</head>
+<body>
+  <H1><center>Nightly Build Results for GNU APL</center></H1>
+  <HR>
+  Build date:  $(date)<br><br>
+  SVN version: $SVN_VERSION<br><br>
+  $build_errors build errors<br>
+  $missing_files missing files (build results)<br>
+  $configs_bad configurations failed: $bad_configs<br>
+  $configs_good configurations succeeded<br>
+  $test_errors testcases failed<br>
+" > /var/www/html/nightly_build_results.html
+   fi
 
 cd $START_dir     # undo all cds in this script
-stty sane         # in case some test failed badly
+stty sane         # in case some testcase failed badly
 

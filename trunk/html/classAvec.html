@@ -157,6 +157,10 @@ static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAvec.html#a88cc8af75e4a2c4d8a1d382637ca07b4">is_quad</a> (Unicode uni)</td></tr>
 <tr class="memdesc:a88cc8af75e4a2c4d8a1d382637ca07b4"><td class="mdescLeft">&#160;</td><td class="mdescRight">return true if unicode <b>uni</b> is a quad (⎕ or ▯) <br /></td></tr>
 <tr class="separator:a88cc8af75e4a2c4d8a1d382637ca07b4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af9d230b25c7dab2ce52b4f12e7ceb886"><td class="memItemLeft" align="right" valign="top"><a id="af9d230b25c7dab2ce52b4f12e7ceb886"></a>
+static int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAvec.html#af9d230b25c7dab2ce52b4f12e7ceb886">digit_value</a> (Unicode uni, bool hex)</td></tr>
+<tr class="memdesc:af9d230b25c7dab2ce52b4f12e7ceb886"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the value (0..9 if decimal, or 0..15 if hex) for uni, or -1 if uni is not a decimal or hex digit. <br /></td></tr>
+<tr class="separator:af9d230b25c7dab2ce52b4f12e7ceb886"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aec63ac86774c2cd648cd2d7df094eba2"><td class="memItemLeft" align="right" valign="top"><a id="aec63ac86774c2cd648cd2d7df094eba2"></a>
 static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAvec.html#aec63ac86774c2cd648cd2d7df094eba2">need_UCS</a> (Unicode uni)</td></tr>
 <tr class="memdesc:aec63ac86774c2cd648cd2d7df094eba2"><td class="mdescLeft">&#160;</td><td class="mdescRight">return true if unicode <b>uni</b> needs ⎕UCS in 2 ⎕TF or )OUT <br /></td></tr>
@@ -171,11 +175,11 @@ static bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 <tr class="separator:af087e9a2ea710680225e809ac2f8e654"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a853a006d231bce379ea5cb88eec5a216"><td class="memItemLeft" align="right" valign="top"><a id="a853a006d231bce379ea5cb88eec5a216"></a>
 static Unicode&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAvec.html#a853a006d231bce379ea5cb88eec5a216">subscript</a> (uint32_t i)</td></tr>
-<tr class="memdesc:a853a006d231bce379ea5cb88eec5a216"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the subscript char for digit i <br /></td></tr>
+<tr class="memdesc:a853a006d231bce379ea5cb88eec5a216"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the subscript char for digit i (i = 0..9) <br /></td></tr>
 <tr class="separator:a853a006d231bce379ea5cb88eec5a216"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa1d4c24515f876ab1eb51158349e0a71"><td class="memItemLeft" align="right" valign="top"><a id="aa1d4c24515f876ab1eb51158349e0a71"></a>
 static Unicode&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAvec.html#aa1d4c24515f876ab1eb51158349e0a71">superscript</a> (uint32_t i)</td></tr>
-<tr class="memdesc:aa1d4c24515f876ab1eb51158349e0a71"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the superscript char for digit i <br /></td></tr>
+<tr class="memdesc:aa1d4c24515f876ab1eb51158349e0a71"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the superscript char for digit i (i = 0..9) <br /></td></tr>
 <tr class="separator:aa1d4c24515f876ab1eb51158349e0a71"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af37308ba6e99635253c4d487d4bf87fb"><td class="memItemLeft" align="right" valign="top"><a id="af37308ba6e99635253c4d487d4bf87fb"></a>
 static uint32_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classAvec.html#af37308ba6e99635253c4d487d4bf87fb">find_av_pos</a> (Unicode av)</td></tr>
@@ -270,7 +274,7 @@ static <a class="el" href="structAvec_1_1Unicode__to__IBM__codepoint.html">Unico
 <p>compare the unicodes of two entries ua and u2 in <b>inverse_IBM_quad_AV</b> </p>
 <p>compare the unicodes of two chars in the IBM ⎕AV </p>
 
-<p class="definition">Definition at line <a class="el" href="Avec_8cc_source.html#l00548">548</a> of file <a class="el" href="Avec_8cc_source.html">Avec.cc</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Avec_8cc_source.html#l00562">562</a> of file <a class="el" href="Avec_8cc_source.html">Avec.cc</a>.</p>
 
 </div>
 </div>
@@ -301,7 +305,7 @@ static <a class="el" href="structAvec_1_1Unicode__to__IBM__codepoint.html">Unico
 <p>return true if unicode <b>is</b> defined by a char_def() or char_df1() macro </p>
 <p>The Unicode characters used in the interpreter. Characters defined with char_def( , xxx) are contained in ⎕AV Characters defined with char_def( , 0xx) are in ⎕AV without APL relevance Characters defined with char_df1() are known in the source code but are not contained in ⎕AV.</p>
 
-<p class="definition">Definition at line <a class="el" href="Avec_8cc_source.html#l00285">285</a> of file <a class="el" href="Avec_8cc_source.html">Avec.cc</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Avec_8cc_source.html#l00284">284</a> of file <a class="el" href="Avec_8cc_source.html">Avec.cc</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="Avec_8hh_source.html#l00116">is_number()</a>.</p>
 <div class="dynheader">
@@ -325,7 +329,7 @@ Here is the caller graph for this function:</div>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="classAvec.html">Avec</a></li>
-    <li class="footer">Generated on Sun Aug 9 2020 16:43:42 for GNUAPL by
+    <li class="footer">Generated on Sun Jan 30 2022 20:14:26 for GNUAPL by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>

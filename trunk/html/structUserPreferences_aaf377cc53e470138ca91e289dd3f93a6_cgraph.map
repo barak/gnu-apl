@@ -1,22 +1,23 @@
 <map id="UserPreferences::UserPreferences" name="UserPreferences::UserPreferences">
-<area shape="rect" id="node2" href="$structUserPreferences.html#a39abf091d48a0ddafa59606a28eec8a6" title="expand lumped arguments " alt="" coords="280,17,483,43"/>
-<area shape="rect" id="node4" href="$structUserPreferences.html#ac5f1f1243bc9fc6f54d4b443f068cd12" title="return &quot; (default)&quot; if yes is true " alt="" coords="781,91,919,132"/>
-<area shape="rect" id="node5" href="$structUserPreferences.html#a8402f25282c1dff4032a8c908e8e79dc" title="parse command line parameters (before reading preference files) " alt="" coords="301,509,461,551"/>
-<area shape="rect" id="node6" href="$structUserPreferences.html#afbb29191d4c126b0f767f92eb427d568" title="parse command line parameters (after reading preference files) " alt="" coords="301,341,461,383"/>
-<area shape="rect" id="node7" href="$structUserPreferences.html#a0705c74f0fd6b021d96c4806e32d7c4f" title="print how the interpreter was configured (via ./configure) and exit " alt="" coords="547,123,706,164"/>
-<area shape="rect" id="node8" href="$structUserPreferences.html#ab6368a769817bd502b6392b4c8d4c0c3" title="show version information " alt="" coords="771,181,929,223"/>
-<area shape="rect" id="node10" href="$structUserPreferences.html#a370b725a095b064384442a494370e3b7" title="print the GPL " alt="" coords="531,473,723,499"/>
-<area shape="rect" id="node11" href="$structUserPreferences.html#ad180749ff1ec27951e2cfcf650f86ed6" title="print possible command line options and exit " alt="" coords="545,523,708,550"/>
-<area shape="rect" id="node16" href="$structUserPreferences.html#a1831227aad6eb6d2fcd28e4d5d0067c3" title="read a preference file and update parameters set there " alt="" coords="305,640,458,681"/>
-<area shape="rect" id="node21" href="$structUserPreferences.html#a4f9722b00cc04617ec48eedbedbc8610" title="read a parallel_thresholds file and update parameters set there " alt="" coords="305,575,458,616"/>
-<area shape="rect" id="node3" href="$structUserPreferences.html#ae0c29978a4d38c350777c4568a1b4dbe" title="return true if file filename is an APL script (has execute permission and starts with #! ..." alt="" coords="557,5,696,47"/>
-<area shape="rect" id="node12" href="$classWorkspace.html#ab055a0407dd155b6e3e3ec76118698e0" title="set the current ⎕PW " alt="" coords="555,422,698,449"/>
-<area shape="rect" id="node13" href="$structInputFile.html#a68e5c221c42fd0ec4a924d297332fa4e" title="randomize the order of test_file_names " alt="" coords="557,356,697,397"/>
-<area shape="rect" id="node15" href="$structInputFile.html#aa0fa0f6614abab32420064c7c3fcf4e7" title="the number of testcase (.tc) files " alt="" coords="561,291,692,332"/>
-<area shape="rect" id="node9" href="$classOutput.html#a7f5a3baf917253208de9aae748cb121d" title="set the color mode (if colors_enabled). Outputs the escape sequence for mode when the color mode chan..." alt="" coords="977,189,1139,215"/>
-<area shape="rect" id="node14" href="$classUTF8__string.html#af0f7724e5743d48d9e29776de5d53c71" title="return this string as a 0&#45;termionated C string " alt="" coords="785,363,915,390"/>
-<area shape="rect" id="node17" href="$structUserPreferences.html#a07c2933cafe4e981cd07f03232a6b7b5" title="open a user&#45;supplied config file (in $HOME or gnu&#45;apl.d) " alt="" coords="549,575,705,616"/>
-<area shape="rect" id="node18" href="$structUserPreferences.html#afd15a9f4cbd24930f47fe6a44eba0290" title="decode a byte in a preferences file. The byte can be given as ASCII name (currently only ESC is under..." alt="" coords="541,640,712,681"/>
-<area shape="rect" id="node19" href="$classLibPaths.html#a6c671db38ef40ad989618b9138689573" title="set library path (from config file) " alt="" coords="557,706,697,733"/>
-<area shape="rect" id="node20" href="$classUTF8__string.html#aabaebbdfbe8fad48e44655144f5fbd5e" title="append a 0&#45;terminated C string " alt="" coords="555,757,699,799"/>
+<area shape="rect" id="node2" href="$structUserPreferences.html#ac5f1f1243bc9fc6f54d4b443f068cd12" title="return &quot; (default)&quot; if yes is true " alt="" coords="745,16,883,57"/>
+<area shape="rect" id="node3" href="$structUserPreferences.html#a8402f25282c1dff4032a8c908e8e79dc" title="parse command line parameters (before reading preference files) " alt="" coords="280,376,440,417"/>
+<area shape="rect" id="node4" href="$structUserPreferences.html#afbb29191d4c126b0f767f92eb427d568" title="parse command line parameters (after reading preference files) " alt="" coords="280,259,440,300"/>
+<area shape="rect" id="node5" href="$structUserPreferences.html#a0705c74f0fd6b021d96c4806e32d7c4f" title="print how the interpreter was configured (via ./configure) and exit " alt="" coords="505,48,663,89"/>
+<area shape="rect" id="node6" href="$structUserPreferences.html#ab6368a769817bd502b6392b4c8d4c0c3" title="show version information " alt="" coords="735,107,893,148"/>
+<area shape="rect" id="node8" href="$structUserPreferences.html#a370b725a095b064384442a494370e3b7" title="print the GPL " alt="" coords="488,165,680,191"/>
+<area shape="rect" id="node9" href="$structUserPreferences.html#ad180749ff1ec27951e2cfcf650f86ed6" title="print possible command line options and exit " alt="" coords="503,499,665,526"/>
+<area shape="rect" id="node17" href="$structUserPreferences.html#a1831227aad6eb6d2fcd28e4d5d0067c3" title="read a preference file and update parameters set there " alt="" coords="283,609,437,651"/>
+<area shape="rect" id="node22" href="$structUserPreferences.html#a4f9722b00cc04617ec48eedbedbc8610" title="read a parallel_thresholds file and update parameters set there " alt="" coords="283,492,437,533"/>
+<area shape="rect" id="node10" href="$classQuad__WA.html#a87b2f0019d118f3e0c1e1bbfd9cb169b" title="parse a &#45;mem command line option " alt="" coords="505,317,663,343"/>
+<area shape="rect" id="node13" href="$classWorkspace.html#ab055a0407dd155b6e3e3ec76118698e0" title="set the current ⎕PW " alt="" coords="513,266,655,293"/>
+<area shape="rect" id="node14" href="$structInputFile.html#a68e5c221c42fd0ec4a924d297332fa4e" title="randomize the order of test_file_names " alt="" coords="514,433,654,475"/>
+<area shape="rect" id="node16" href="$structInputFile.html#aa0fa0f6614abab32420064c7c3fcf4e7" title="the number of testcase (.tc) files " alt="" coords="519,368,649,409"/>
+<area shape="rect" id="node7" href="$classOutput.html#a7f5a3baf917253208de9aae748cb121d" title="set the color mode (if colors_enabled). Outputs the escape sequence for mode when the color mode chan..." alt="" coords="948,114,1109,141"/>
+<area shape="rect" id="node11" href="$classQuad__WA.html#a5e6486128134180c354cf092476397d1" title="read /proc/meminfo, return the number of items found " alt="" coords="728,342,900,369"/>
+<area shape="rect" id="node12" href="$classQuad__WA.html#a17d405124006925906922422170d8354" title="read a (supposedly short) file in /proc " alt="" coords="732,291,896,318"/>
+<area shape="rect" id="node15" href="$classUTF8__string.html#af0f7724e5743d48d9e29776de5d53c71" title="return this string as a 0&#45;terminated C string " alt="" coords="749,441,879,467"/>
+<area shape="rect" id="node18" href="$structUserPreferences.html#a07c2933cafe4e981cd07f03232a6b7b5" title="open a user&#45;supplied config file (in $HOME or gnu&#45;apl.d) " alt="" coords="506,551,662,592"/>
+<area shape="rect" id="node19" href="$structUserPreferences.html#afd15a9f4cbd24930f47fe6a44eba0290" title="decode a byte in a preferences file. The byte can be given as ASCII name (currently only ESC is under..." alt="" coords="499,733,669,775"/>
+<area shape="rect" id="node20" href="$classLibPaths.html#a6c671db38ef40ad989618b9138689573" title="set library path (from config file) " alt="" coords="514,617,654,643"/>
+<area shape="rect" id="node21" href="$classUTF8__string.html#aabaebbdfbe8fad48e44655144f5fbd5e" title="append a 0&#45;terminated C string " alt="" coords="512,668,656,709"/>
 </map>

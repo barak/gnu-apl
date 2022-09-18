@@ -1097,7 +1097,22 @@ const int listen_sock = got_path ? open_UNIX_socket(listen_name)
 
    fclose(stdout);                 // cause getc() of caller to return EOF !
 
-   if (auto_start && fork())   return 0;         // parent returns (daemonize)
+   if (auto_start && fork())
+      {
+        // if we return too quickly (a race condition) then the pclose() of
+        // our parent process will fail with ECHILD. We therefore wait a
+        // second before returning.
+        //
+        // Our fclose(stdout) above will break the getc(fp) loop in Svar_DB.cc
+        // around line 132, and while we are waiting, the pclose(fp) in
+        // Svar_DB.cc line 137 should succeed without ECHILD.
+        //
+        // At leat that is the plan.
+        //
+        usleep(200000);
+
+        return 0;         // parent returns (daemonize)
+      }
 
    memset(reinterpret_cast<void *>(&db), 0, sizeof(db));
 

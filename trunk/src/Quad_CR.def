@@ -12,6 +12,7 @@
   crdef(13, hex_to_bytes           )
   crdef(37, monadic_keeping_indent )
   crdef(36, nested_lines_to_string )
+  crdef(40, pack                   )
   crdef(27, primary_cellto_int     )
   crdef(31, Quad_INP_macro_helper1 )
   crdef(32, Quad_INP_macro_helper2 )
@@ -42,6 +43,7 @@
   crdef( 5, to_HEX                 )
   crdef(38, to_structure           )
   crdef(33, TV_to_TLV_bytes        )
+  crdef(41, unpack                 )
   crdef(19, UTF8_to_string         )
 #undef crdef
 #endif // crdef

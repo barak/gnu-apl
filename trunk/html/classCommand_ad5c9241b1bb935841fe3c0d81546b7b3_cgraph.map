@@ -1,201 +1,201 @@
 <map id="Command::process_line" name="Command::process_line">
-<area shape="rect" id="node2" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string " alt="" coords="1880,3390,2020,3417"/>
-<area shape="rect" id="node3" href="$classUCS__string.html#ad14d08312e34ad5d733360eccf9a745a" title="append 0&#45;terminated ASCII string str to this string. str is NOT interpreted as UTF8 string (use appen..." alt="" coords="227,4211,367,4252"/>
-<area shape="rect" id="node4" href="$classUCS__string.html#afd4c5d6cd5482ce0979527de1f3699b5" title="the inverse of un_escape(). " alt="" coords="1632,3623,1793,3650"/>
-<area shape="rect" id="node5" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length " alt="" coords="1889,3994,2011,4021"/>
-<area shape="rect" id="node6" href="$classUCS__string.html#a03aed5b59ab15793af300f63abf20de6" title="return true if this ends with suffix (ASCII, case matters). " alt="" coords="218,4159,375,4186"/>
-<area shape="rect" id="node7" href="$classLineInput.html#a7ce871a5af18773d431be4e0746a18eb" title="return the history " alt="" coords="223,4277,370,4303"/>
-<area shape="rect" id="node8" href="$classInputMux.html#a8a79cbe5207cde162fb36133ad9defdd" title="get one line " alt="" coords="232,2974,361,3001"/>
-<area shape="rect" id="node128" href="$classUCS__string.html#a67ea87cb92e687105b21917ffb4a2a6f" title="remove the last character in this string " alt="" coords="1404,3339,1559,3366"/>
-<area shape="rect" id="node199" href="$classWorkspace.html#ae7c0cc7419eedbf2c519dc1c202b901b" title="return the APL prompt " alt="" coords="216,4327,377,4354"/>
-<area shape="rect" id="node200" href="$classUCS__string.html#a5ee12a6873e023f9ad76ffafd7aa9c20" title="prepend character uni " alt="" coords="225,4378,369,4405"/>
-<area shape="rect" id="node9" href="$structInputFile.html#afbca3c136d4281d5309bca6e79d50226" title="return true iff the current input file exists and is a test file " alt="" coords="921,3085,1073,3111"/>
-<area shape="rect" id="node10" href="$classQuad__QUOTE.html#a5cd6bf7b6aa6c66c6d8b285623f948fc" title="end of ⍞ (output, but no input: clear prompt) " alt="" coords="445,3975,587,4002"/>
-<area shape="rect" id="node11" href="$structInputFile.html#a762adde559f6f9cb2defe81c29cf86a5" title="increment the line number of the current file " alt="" coords="447,2832,585,2873"/>
-<area shape="rect" id="node12" href="$classIO__Files.html#acc91875b8e0c7a5ad44e3ead0e3dda7b" title="get one line from the current file, open the next file if necceessary " alt="" coords="442,1047,590,1074"/>
-<area shape="rect" id="node26" href="$classUTF8__string.html#af0f7724e5743d48d9e29776de5d53c71" title="return this string as a 0&#45;termionated C string " alt="" coords="1416,69,1547,95"/>
-<area shape="rect" id="node125" href="$classCommand.html#aafd8a7df22d24109a5ea7de47267f241" title="clean&#45;up and exit from APL interpreter " alt="" coords="923,1478,1071,1505"/>
-<area shape="rect" id="node127" href="$classUTF8__string.html#a7b07ddeb39d90c41cf03575d8d23dc37" title="prevent basic_string::erase() with its dangerous default value for the number of erased character..." alt="" coords="449,2898,583,2925"/>
-<area shape="rect" id="node129" href="$classUCS__string.html#ace70327ef899c525ad9c3f2bffd43697" title="append 0&#45;terminated UTF8 string str to this UCS_string. " alt="" coords="426,2949,606,2975"/>
-<area shape="rect" id="node130" href="$classWorkspace.html#abb16bf711a1e681119ab5a4f78cc4bc5" title="increase the wait time for user input as reported in ⎕AI " alt="" coords="442,2999,590,3026"/>
-<area shape="rect" id="node131" href="$classCPU__pool.html#a78aa1ff8ffbef7ea5e46adc7ffdfa3af" title="make all pool members lock on their pool_sema " alt="" coords="443,2781,589,2807"/>
-<area shape="rect" id="node139" href="$classThread__context.html#a4360395b00f2c003ab2a09fbe7635b7b" title="terminate all worker threads " alt="" coords="1161,3034,1328,3061"/>
-<area shape="rect" id="node150" href="$classLineInput.html#a96f6a9062450af940d63ecff847646e4" title="get a line from the user " alt="" coords="425,3733,607,3759"/>
-<area shape="rect" id="node197" href="$classCPU__pool.html#a317b0a234d6dc8cbb6bab12088ec1aad" title="unlock all pool members from their pool_sema " alt="" coords="437,2671,595,2698"/>
-<area shape="rect" id="node13" href="$structInputFile.html#aecc9494cdddf176dac35cdf8f48dd897" title="the current file " alt="" coords="1173,550,1317,577"/>
-<area shape="rect" id="node14" href="$classIO__Files.html#aa29d2b92365b65b91d6db6288d55ae5d" title="open the next test file " alt="" coords="668,743,831,770"/>
-<area shape="rect" id="node20" href="$classIO__Files.html#a9cd4e5d7e3467ff6ad303dc1063e5004" title="read one line from the current input file with CR and LF removed " alt="" coords="672,313,827,339"/>
-<area shape="rect" id="node48" href="$classWorkspace.html#af444fb0d5974a5b22751c72f19e5beae" title="return the current ⎕LX " alt="" coords="681,1022,818,1049"/>
-<area shape="rect" id="node49" href="$classIO__Files.html#aa05a2917c11a88b9abfc4afa6ca04a3e" title="dito (close files, print errors, summary etc). " alt="" coords="655,1073,844,1099"/>
-<area shape="rect" id="node124" href="$classIO__Files.html#aa2c6031cd53afc14eb880778ec929238" title="return the total number of errors " alt="" coords="925,1427,1069,1454"/>
-<area shape="rect" id="node126" href="$classIO__Files.html#a168f41b75e3b6ea0a6e5aa41f50c1872" title="write testcases summary file " alt="" coords="667,515,832,542"/>
-<area shape="rect" id="node15" href="$structInputFile.html#ad254fe07bec5402c0ea674c483bbf65b" title="the name of the currrent file " alt="" coords="1421,636,1541,677"/>
-<area shape="rect" id="node16" href="$structInputFile.html#ade3c052ce91c9b15b90566e5dc028141" title="open current file unless already open " alt="" coords="1155,465,1334,491"/>
-<area shape="rect" id="node17" href="$classOutput.html#aef5f941952e0a8ee19481212c472e587" title="reset() dout_filebuf " alt="" coords="931,819,1062,846"/>
-<area shape="rect" id="node19" href="$classIO__Files.html#ac9e3a19700b3d04e053494784e71e40d" title="count an error " alt="" coords="923,769,1071,795"/>
-<area shape="rect" id="node18" href="$classDiffOut.html#a2953159be1130890fcb3ad9d363e2c81" title="discard all characters " alt="" coords="1194,769,1295,795"/>
-<area shape="rect" id="node21" href="$structInputFile.html#aeccf06ed0bace1099f6d190c46543e2a" title="the line number of the currrent file " alt="" coords="1185,601,1305,643"/>
-<area shape="rect" id="node22" href="$classUTF8__string.html#ae72a6d597692993ab2760837dda316d3" title="return true iff string starts with path (usually a file path) " alt="" coords="913,313,1080,339"/>
-<area shape="rect" id="node23" href="$structInputFile.html#a5b408d866236d1071ee4717e4a97aec3" title="set the current HTML mode " alt="" coords="931,363,1062,390"/>
-<area shape="rect" id="node24" href="$structInputFile.html#a0a42938e22f9d89d1a24eef4ae241d2d" title="return the current HTML mode " alt="" coords="931,145,1062,171"/>
-<area shape="rect" id="node25" href="$classUTF8__string.html#a507460fd4d97100d36765fb89ebdfbc5" title="skip over &lt; ... &gt; and expand &lt; and friends " alt="" coords="1165,94,1324,121"/>
-<area shape="rect" id="node27" href="$structInputFile.html#a0f449701206a5127e239886ea3591f57" title="return true if this file as an oject filter (from )COPY file names...) " alt="" coords="925,196,1068,237"/>
-<area shape="rect" id="node28" href="$structInputFile.html#a162970480cc07daba1ba85a3ae2580e8" title="check the current line and return true if the line is permitted by the object_filter. This function also updates in_function and in_variable " alt="" coords="1408,571,1555,598"/>
-<area shape="rect" id="node45" href="$structInputFile.html#ac872e443cab2dc1325defd93aaa35063" title="true if echo (of the input) is on for the current file " alt="" coords="1155,145,1334,171"/>
-<area shape="rect" id="node46" href="$structInputFile.html#a1e6384a302fddad91c1b245610cc12ce" title="close the current file and perform some cleanup " alt="" coords="1153,667,1336,694"/>
-<area shape="rect" id="node47" href="$structInputFile.html#a68e5c221c42fd0ec4a924d297332fa4e" title="randomize the order of test_file_names " alt="" coords="1175,196,1315,237"/>
-<area shape="rect" id="node29" href="$classUCS__string.html#a91556379049e71071410cec015b960db" title="remove leading and trailing whitespaces " alt="" coords="1641,1537,1784,1593"/>
-<area shape="rect" id="node30" href="$classUCS__string.html#ad8e1ed8807d094b4b0b596db077af391" title="return this string with the first drop_count characters removed " alt="" coords="1651,542,1774,569"/>
-<area shape="rect" id="node31" href="$classUserFunction__header.html#abcc2f6d70da90e3123e630a226b9e931" title="return the name of the function " alt="" coords="1639,593,1786,635"/>
-<area shape="rect" id="node32" href="$classAvec.html#a88cc8af75e4a2c4d8a1d382637ca07b4" title="return true if unicode uni is a quad (⎕ or ▯) " alt="" coords="1660,467,1765,494"/>
-<area shape="rect" id="node44" href="$classAvec.html#af31e35e3049f3bc48cb1ff8d70262dd7" title="Return true iff av is a valid char in a user defined symbol. " alt="" coords="1623,1667,1803,1694"/>
-<area shape="rect" id="node33" href="$classAvec.html#aec63ac86774c2cd648cd2d7df094eba2" title="return true if unicode uni needs ⎕UCS in 2 ⎕TF or )OUT " alt="" coords="1888,354,2012,381"/>
-<area shape="rect" id="node34" href="$classAvec.html#a07575efd64c4dda554ccde848d2debd3" title="return true iff a token printed after av never needs a space " alt="" coords="1875,405,2025,431"/>
-<area shape="rect" id="node35" href="$classAvec.html#af087e9a2ea710680225e809ac2f8e654" title="return true iff a token printed before av never needs a space " alt="" coords="1871,455,2029,482"/>
-<area shape="rect" id="node36" href="$classAvec.html#a853a006d231bce379ea5cb88eec5a216" title="return the subscript char for digit i " alt="" coords="1893,506,2007,533"/>
-<area shape="rect" id="node37" href="$classAvec.html#aa1d4c24515f876ab1eb51158349e0a71" title="return the superscript char for digit i " alt="" coords="1888,557,2012,583"/>
-<area shape="rect" id="node38" href="$classAvec.html#af37308ba6e99635253c4d487d4bf87fb" title="Find av in character_table. Return AV position if found or MAX_AV. " alt="" coords="1885,607,2015,634"/>
-<area shape="rect" id="node39" href="$classAvec.html#a844e2fc3a73ef90f42e63a9c268f36b8" title="Find av in character_table. Return position or Invalid_CHT. " alt="" coords="1893,658,2007,685"/>
-<area shape="rect" id="node40" href="$classAvec.html#a0641640e6b1cc18a1e4c525dcf5e83a4" title="Find return position of alt_av, or Invalid_AV if not found. " alt="" coords="1858,709,2042,735"/>
-<area shape="rect" id="node41" href="$classAvec.html#a15bfa417923b425ec3c2baf973d2a5f9" title="a pointer to 256 Unicode characters that are exactly the APL2 character set (⎕AV) shown in lrm Appen..." alt="" coords="1878,186,2022,213"/>
-<area shape="rect" id="node42" href="$classAvec.html#a24bf275107eb974d9a47ba0732153edc" title="search uni in inverse_ibm_av and return its position in the IBM ⎕AV (= its code in ..." alt="" coords="1878,237,2022,263"/>
-<area shape="rect" id="node43" href="$classAvec.html#ae3911626674255ce3f75abd5cd4ca3be" title="recompute inverse_ibm_av from ibm_av and print it " alt="" coords="1883,288,2017,329"/>
-<area shape="rect" id="node50" href="$classWorkspace.html#a64cef901fd41c19f4521bdd1175d0be7" title="the number of SI entries " alt="" coords="924,1225,1069,1267"/>
-<area shape="rect" id="node51" href="$classWorkspace.html#a30f12a0dafdc723ce2c67dae3d4b0fd3" title="print the SI on out " alt="" coords="1646,767,1779,794"/>
-<area shape="rect" id="node58" href="$classIO__Files.html#ac7a14dfc38263d79ac39142ac269dfe0" title="count an APL error " alt="" coords="932,667,1061,694"/>
-<area shape="rect" id="node59" href="$classValue.html#a1b6bbee82c30a98ca37cffbc5fb6bd0a" title="print incomplete Values, and return the number of incomplete Values. " alt="" coords="1165,1377,1324,1403"/>
-<area shape="rect" id="node63" href="$classValue.html#a80c3e1a7208f4f97985e5c742ec93b2d" title="print stale Values, and return the number of stale Values. " alt="" coords="935,1377,1058,1403"/>
-<area shape="rect" id="node111" href="$classValue.html#a38979fd196c826557e1614fa0514bbaa" title="erase stale values " alt="" coords="1179,1225,1310,1251"/>
-<area shape="rect" id="node116" href="$classIndexExpr.html#aa16a458ef14025e0bd3af2c7d8513fcb" title="print stale IndexExprs, and return the number of stale IndexExprs. " alt="" coords="1170,921,1319,947"/>
-<area shape="rect" id="node118" href="$classIndexExpr.html#af6ce132f19fe86699668a8cd523ffd01" title="erase stale IndexExprs " alt="" coords="919,1073,1075,1099"/>
-<area shape="rect" id="node52" href="$classWorkspace.html#a057e0d77702810d071560c7b72c2f8d6" title="the top of the SI stack (the SI pushed last) " alt="" coords="2332,877,2467,903"/>
-<area shape="rect" id="node53" href="$classStateIndicator.html#a2d4915de712ba06900582f0918f053a8" title="return the SI that has called this one " alt="" coords="1885,760,2015,801"/>
-<area shape="rect" id="node54" href="$classStateIndicator.html#ae0a10cdfaa6db7599a737c5974b3c869" title="return the level at which sym is pushed for the nth. time " alt="" coords="2100,767,2264,794"/>
-<area shape="rect" id="node55" href="$classStateIndicator.html#a8923e217fa9bf331dd84cc15487dd177" title="return pointer to the current user function, statements, or execute " alt="" coords="2335,760,2464,801"/>
-<area shape="rect" id="node56" href="$classExecutable.html#af5c77881cb3e8da636a0eeb73950c39c" title="return true if this Executable localizes Symbol sym " alt="" coords="2315,826,2484,853"/>
-<area shape="rect" id="node57" href="$classStateIndicator.html#aa60ca9df0350c7b2e4c0825f061f300e" title="return the nesting level (oldest SI has level 0, next has level 1, ...) " alt="" coords="2335,695,2464,736"/>
-<area shape="rect" id="node60" href="$classDynamicObject.html#aa6f0b4349f295e162cd881377bb193fc" title="return the previous DynamicObject in its list " alt="" coords="1396,2427,1567,2454"/>
-<area shape="rect" id="node61" href="$classDynamicObject.html#a5f0541dc59c1cf509d38af50a41325bc" title="cast to const Value *. Caller must check that this cast is valid. " alt="" coords="1401,1225,1561,1251"/>
-<area shape="rect" id="node62" href="$classValue.html#a6c2eb3ec5ec6136eae948bc936c3ae35" title="true if Value flag complete is set " alt="" coords="1646,1081,1779,1107"/>
-<area shape="rect" id="node64" href="$classValue.html#a82fd0d84f4c7f0b22a6b035e0201506a" title="print info related to a stale value " alt="" coords="1169,1503,1320,1530"/>
-<area shape="rect" id="node104" href="$classValue.html#ae90fe6c7d36e56f4768abbc0628c7b06" title="mark all values, except static values " alt="" coords="1161,2089,1329,2131"/>
-<area shape="rect" id="node105" href="$classWorkspace.html#a85160b618521a453657a892f454323d4" title="clear the marked flag in all values known in this workspace " alt="" coords="1633,964,1792,1005"/>
-<area shape="rect" id="node108" href="$classMacro.html#a767e050c31df6b991809b2c72d597f50" title="unmark all values used in the bodies of all macros " alt="" coords="1155,1681,1334,1707"/>
-<area shape="rect" id="node109" href="$classValue.html#a84cb4f9a86540d04c52bfae177a97bc8" title="true if Value flag marked is set " alt="" coords="1651,1182,1774,1209"/>
-<area shape="rect" id="node110" href="$classValue.html#a69a8e1aa89135b7ae26d26516524bfe1" title="clear marked flag on this value and its nested sub&#45;values " alt="" coords="1659,1921,1766,1947"/>
-<area shape="rect" id="node65" href="$classDynamicObject.html#a5919356f13bb4cf24de09ca83c9b30d8" title="where this value was allocated. " alt="" coords="1635,847,1790,888"/>
-<area shape="rect" id="node66" href="$classValue.html#aa7a89fbbca076c1c0c1a579702bf5ff1" title="return the current flags " alt="" coords="1655,1617,1771,1643"/>
-<area shape="rect" id="node67" href="$classVH__entry.html#ae422e396e1a7268221697abfd927ead0" title="print the history of value " alt="" coords="1635,3187,1791,3214"/>
-<area shape="rect" id="node69" href="$classValue.html#a913cbd7a14e7333d56818d1272f717e3" title="print address, shape, and flags of this value " alt="" coords="1408,1529,1555,1555"/>
-<area shape="rect" id="node76" href="$classQuad__CR.html#ac6f426118cad09841c8545efd5ba8a8f" title="compute a ⎕CR B " alt="" coords="1417,2326,1546,2353"/>
-<area shape="rect" id="node103" href="$classValue.html#a21369bf72b3fb40d1e9558cb1497a6b0" title="print this value (line break at Workspace::get_PW()) " alt="" coords="1669,1283,1757,1310"/>
-<area shape="rect" id="node68" href="$classVH__entry.html#a8ea2cd7b38e8e88b545eba58f6a2ffff" title="print the event " alt="" coords="1895,3187,2005,3214"/>
-<area shape="rect" id="node70" href="$classValue.html#a06683bcfcb7626f2b824dae1824903bc" title="compute the depth of this value. " alt="" coords="1637,1385,1789,1411"/>
-<area shape="rect" id="node71" href="$classValue.html#a89120a742c078918d1a5d84ec742e69c" title="return the idx&#39;th element of the ravel. " alt="" coords="2124,2073,2240,2099"/>
-<area shape="rect" id="node72" href="$classCell.html#a3af019707c56a0fb40fce2d370af8307" title="Return the APL value of a cell (Asserts for non&#45;pointer cells) " alt="" coords="1873,2174,2027,2201"/>
-<area shape="rect" id="node73" href="$classValue.html#ac5b54e3a13cab0837442f1575b3299a5" title="return the number of elements, but at least 1 (for the prototype). " alt="" coords="2097,1287,2267,1314"/>
-<area shape="rect" id="node74" href="$classValue.html#a4429dcb041368962591397a45cb23d9b" title="return the shape of this value " alt="" coords="2121,1515,2243,1542"/>
-<area shape="rect" id="node75" href="$classCell.html#ae98b3988a7fa52c6c157b4911b043dde" title="Return true iff this cell is a pointer (to a sub&#45;array) cell. " alt="" coords="1882,2022,2018,2049"/>
-<area shape="rect" id="node77" href="$classPrintContext.html#a787257953d929f80db2ba1698d59b905" title="set the print style to be used " alt="" coords="1872,1667,2028,1694"/>
-<area shape="rect" id="node78" href="$classQuad__CR.html#a3391279d18ae51b8d27a4fef8a387e33" title="compute 5 ⎕CR B or 6 ⎕CR B " alt="" coords="1875,1566,2025,1593"/>
-<area shape="rect" id="node79" href="$classQuad__CR.html#aa527f599e0a335bea8fba29a03a66f49" title="compute 10 ⎕CR B " alt="" coords="1641,2478,1784,2505"/>
-<area shape="rect" id="node80" href="$classValue__P__Base.html#a64e77a99509cdb6ecbe4cf273a2e7694" title="return a const pointer to the Value " alt="" coords="1883,2529,2017,2555"/>
-<area shape="rect" id="node81" href="$classQuad__CR.html#a3354155958711356b7e5c62c977b40f0" title="compute 11 ⎕CR B " alt="" coords="1641,2275,1784,2302"/>
-<area shape="rect" id="node82" href="$classQuad__CR.html#ad2703aa51ad4924a7b5bc147de7451ce" title="compute 12 ⎕CR B " alt="" coords="1879,1870,2021,1897"/>
-<area shape="rect" id="node83" href="$classQuad__CR.html#acc72f7116159eb1b8bb3a27202d4e0d1" title="compute 13 ⎕CR B " alt="" coords="1879,1465,2021,1491"/>
-<area shape="rect" id="node84" href="$classQuad__CR.html#a8a501dc7662e5f525c5e6162d84a6f94" title="compute 14 ⎕CR B " alt="" coords="1641,2326,1784,2353"/>
-<area shape="rect" id="node85" href="$classQuad__CR.html#a4e09292fd07306db8b2fe5749c05c2dc" title="compute 15 ⎕CR B " alt="" coords="1879,2225,2021,2251"/>
-<area shape="rect" id="node86" href="$classQuad__CR.html#abf0cf8ede4fbe148b84686db2536b1d3" title="compute 16 ⎕CR B " alt="" coords="1879,2478,2021,2505"/>
-<area shape="rect" id="node87" href="$classQuad__CR.html#af3d458b36e4e7ac23d5924a689fc8d85" title="compute 17 ⎕CR B " alt="" coords="1879,2630,2021,2657"/>
-<area shape="rect" id="node88" href="$classQuad__CR.html#a3a9dffbc22507dbd4b3d40fc8c599bff" title="compute 18 ⎕CR B " alt="" coords="1641,2883,1784,2910"/>
-<area shape="rect" id="node89" href="$classQuad__CR.html#a63f8105118882eb132c8c13d0b03b6fd" title="compute 19 ⎕CR B " alt="" coords="1641,2934,1784,2961"/>
-<area shape="rect" id="node90" href="$classQuad__CR.html#abffea66282554cab3aa2f8aaaaae500d" title="compute 26 ⎕CR B " alt="" coords="1641,2377,1784,2403"/>
-<area shape="rect" id="node91" href="$classValue__P__Base.html#a704ff85f35cdb60648f59a48f0a15bdb" title="return a const reference of the Value " alt="" coords="2107,2377,2257,2403"/>
-<area shape="rect" id="node92" href="$classQuad__CR.html#ad1aa7ed84143e58e1fa2fa2ee4191b77" title="compute 27 ⎕CR B or 28 ⎕CR B " alt="" coords="1631,2225,1795,2251"/>
-<area shape="rect" id="node93" href="$classQuad__CR.html#a8a53db3f1436cc6bd2d8d4dd230478c2" title="compute 30 ⎕CR B " alt="" coords="1641,2022,1784,2049"/>
-<area shape="rect" id="node94" href="$classValue.html#ae9ed3cf5066ae8ab15514c1470c8de4c" title="return a deep copy of this value " alt="" coords="1903,1769,1997,1795"/>
-<area shape="rect" id="node95" href="$classQuad__CR.html#ae76732697bfb340d060537ee6abff425" title="compute 31 ⎕CR B or 32 ⎕CR B " alt="" coords="1631,2073,1795,2099"/>
-<area shape="rect" id="node97" href="$classQuad__CR.html#a632afa9d3841b8dffea632d9c24babf7" title="compute 33 ⎕CR B " alt="" coords="1641,2681,1784,2707"/>
-<area shape="rect" id="node98" href="$classQuad__CR.html#afa9ef21841300b6aea5b51e24f21d9b5" title="compute 34 ⎕CR B " alt="" coords="1641,2731,1784,2758"/>
-<area shape="rect" id="node99" href="$classQuad__CR.html#ab9cef8298c90bb5ffe0832dffe032c4b" title="compute 35 ⎕CR B " alt="" coords="1641,2833,1784,2859"/>
-<area shape="rect" id="node100" href="$classQuad__CR.html#a2554c724d2f22533c31238e35816d51e" title="compute 36 ⎕CR B " alt="" coords="1641,2579,1784,2606"/>
-<area shape="rect" id="node101" href="$classQuad__CR.html#ad8a0a96b4c4a7494f7cb6a51fbedf302" title="compute 37 ⎕CR B " alt="" coords="1641,2985,1784,3011"/>
-<area shape="rect" id="node102" href="$classValue.html#afe347be3317e5838c2a2f1efce084a47" title="return true iff this value is a simple (i.e. depth 0) scalar. " alt="" coords="1633,3035,1793,3062"/>
-<area shape="rect" id="node96" href="$classWorkspace.html#a002e2f097bece67c9d082b7c89db11ae" title="return style and the current ⎕PP, and ⎕PW " alt="" coords="1853,1211,2047,1238"/>
-<area shape="rect" id="node106" href="$classSymbolTable.html#aff60aea6044524b4466cf73d69b5997f" title="clear the marked flag of all symbols " alt="" coords="1875,979,2025,1020"/>
-<area shape="rect" id="node107" href="$classSymbol.html#ae1b457133fd35d84c76f96160ad0ddfe" title="clear the marked flag of all entries " alt="" coords="1881,1044,2019,1085"/>
-<area shape="rect" id="node112" href="$classDynamicObject.html#ace2cb31c2bcf6043c3a16311f7f1f6bf" title="return the next DynamicObject in its list " alt="" coords="1396,955,1567,982"/>
-<area shape="rect" id="node113" href="$classDynamicObject.html#ac46ced35e2661f48b0514b0b1f0b80c8" title="print the list of objects starting at this object " alt="" coords="1409,1007,1554,1048"/>
-<area shape="rect" id="node114" href="$classValue.html#a926a6bd11f4d27c077c19bbb03c333cf" title="list a value " alt="" coords="1427,1377,1535,1403"/>
-<area shape="rect" id="node115" href="$classWorkspace.html#a5d85f6457bf1dda2d17162c5dbcda14a" title="print all owners of value " alt="" coords="1625,913,1801,939"/>
-<area shape="rect" id="node117" href="$classDynamicObject.html#a17ab8b65022f5a21359f80eeeeccb2d1" title="cast to IndexExpr *. Caller must check that this cast is valid. " alt="" coords="1388,803,1575,830"/>
-<area shape="rect" id="node119" href="$classDynamicObject.html#adb527eca75c7201c033f8c1937e08a78" title="unlink this DynamicObject from its list " alt="" coords="1167,1022,1322,1049"/>
-<area shape="rect" id="node122" href="$classIndexExpr.html#a7cb8dc69ee2b77d786296d674f459f46" title="return the number of values (= number of semicolons + 1) " alt="" coords="1165,1123,1324,1150"/>
-<area shape="rect" id="node123" href="$classWorkspace.html#a3eaa0cc324b4e8e0f3fb0039efcd1b0c" title="return the current ⎕PW " alt="" coords="1173,2562,1316,2589"/>
-<area shape="rect" id="node120" href="$classDynamicObject.html#ada55c9a5ae831ea5d332b3c1ee5b67e9" title="print this object " alt="" coords="1409,854,1554,881"/>
-<area shape="rect" id="node121" href="$classDynamicObject.html#a1555a4463cbd47150f1f4f3fce1025e3" title="print new object message " alt="" coords="1393,905,1569,931"/>
-<area shape="rect" id="node132" href="$classThread__context.html#a8ef1d4db160a21f5616530cf737e4b18" title="number of currently used cores " alt="" coords="680,2664,819,2705"/>
-<area shape="rect" id="node140" href="$classThread__context.html#aadea40f94c3086eb73d86ce866b6e71d" title="return the context of the master " alt="" coords="680,2832,819,2873"/>
-<area shape="rect" id="node141" href="$classThread__context.html#a994dd1fef316d70072e8757310671aed" title="make all workers lock on pool_sema " alt="" coords="900,2781,1093,2807"/>
-<area shape="rect" id="node145" href="$classThread__context.html#a770b7101581894235605003726ebdc62" title="print all TaskTree nodes " alt="" coords="1399,2822,1564,2849"/>
-<area shape="rect" id="node149" href="$classThread__context.html#aee8c70aa8c5f5e771db87b9d90617bfb" title="end parallel execution of work at the master " alt="" coords="670,2898,829,2925"/>
-<area shape="rect" id="node133" href="$classThread__context.html#a9da7115c28c4372c40d393c8046bda22" title="set the number of currently used cores " alt="" coords="927,2664,1066,2705"/>
-<area shape="rect" id="node134" href="$classThread__context.html#a06a054fa3fadfda7020d64748371799e" title="initialize thread_contexts[n] " alt="" coords="1176,2715,1313,2756"/>
-<area shape="rect" id="node135" href="$classThread__context.html#afd854477bd87d3e80b3786ac2a7d5d9f" title="initialize all thread contexts (set all but N and thread) " alt="" coords="1413,2873,1550,2915"/>
-<area shape="rect" id="node136" href="$classThread__context.html#ab5c1f95ee686270b4ac6e1806a5bd23f" title="bind thread to core " alt="" coords="1409,3121,1553,3163"/>
-<area shape="rect" id="node137" href="$classCPU__pool.html#a745603fb69c0ee5d4f4d728028fabff6" title="get the number of (active) CPUs " alt="" coords="1171,2613,1318,2639"/>
-<area shape="rect" id="node138" href="$classCPU__pool.html#a9a0ceffddddc5e7b239c2f443fa6a559" title="get the idx;th CPU " alt="" coords="1173,2663,1317,2690"/>
-<area shape="rect" id="node142" href="$classThread__context.html#ad6131c6d7c657ae4fbf75a71db9c574a" title="start parallel execution of work at the master " alt="" coords="1165,2983,1325,3010"/>
-<area shape="rect" id="node143" href="$classThread__context.html#aba6ab97ae2a6542738f93831bd73fa14" title="return the number of the core executing this context " alt="" coords="1873,3111,2027,3138"/>
-<area shape="rect" id="node144" href="$classThread__context.html#a51a35755b357c769f56bcad57a408734" title="end parallel execution of work in a worker " alt="" coords="1163,2831,1327,2858"/>
-<area shape="rect" id="node146" href="$classThread__context.html#adc73bb9ae1ecb7b10830bd073201f7ea" title="print this TaskTree node " alt="" coords="1640,3137,1785,3163"/>
-<area shape="rect" id="node147" href="$classThread__context.html#a980dc6d5a2cef07422e21447c5925899" title="print all mileages nodes " alt="" coords="1409,2991,1554,3032"/>
-<area shape="rect" id="node148" href="$classThread__context.html#a1965a1f7a7d1e9da522a55148c09bcaa" title="initialize all thread contexts (set all but N and thread) " alt="" coords="1413,3056,1550,3097"/>
-<area shape="rect" id="node151" href="$classOutput.html#a7f5a3baf917253208de9aae748cb121d" title="set the color mode (if colors_enabled). Outputs the escape sequence for mode when the color mode chan..." alt="" coords="669,3943,830,3970"/>
-<area shape="rect" id="node152" href="$classLineInput.html#a81610349f86404c67f583eb296666bb1" title="get a line from from user " alt="" coords="684,3733,815,3759"/>
-<area shape="rect" id="node153" href="$classLineInput.html#ab188d7e07879a811c96002b02908b9a0" title="get one character from user " alt="" coords="934,3186,1059,3213"/>
-<area shape="rect" id="node157" href="$classLineEditContext.html#a3ce189997980bb505f3d776cf388b4ce" title="toggle the insert mode " alt="" coords="917,3507,1076,3548"/>
-<area shape="rect" id="node158" href="$classLineEditContext.html#a909c03d41ba5b42d8fae1e8804bd7789" title="move cursor home " alt="" coords="893,3573,1100,3599"/>
-<area shape="rect" id="node159" href="$classLineEditContext.html#a8810889507384d9a98db8a8d60344a1b" title="move cursor to end " alt="" coords="899,3623,1094,3650"/>
-<area shape="rect" id="node160" href="$classLineEditContext.html#a227f4e1074583815d54370e2a9f07a5c" title="move cursor left " alt="" coords="897,3674,1096,3701"/>
-<area shape="rect" id="node161" href="$classLineEditContext.html#a4d98991491704bcdd530d8850b0779e8" title="move cursor right " alt="" coords="917,3725,1076,3767"/>
-<area shape="rect" id="node162" href="$classLineEditContext.html#a8e52f296fc6f747ddfce8d6550f2db45" title="move forward in history " alt="" coords="892,4887,1101,4914"/>
-<area shape="rect" id="node164" href="$classLineHistory.html#a870ae7c7f0a0abcc27623195bca68b20" title="add one line to this history " alt="" coords="1409,4786,1553,4813"/>
-<area shape="rect" id="node165" href="$classUCS__string.html#ac43d98d8d13b5a91d670fe9af9250861" title="return true if this string contains non&#45;whitespace characters " alt="" coords="1634,4685,1791,4711"/>
-<area shape="rect" id="node182" href="$classLineEditContext.html#afb1bb78e3774564eb2fc1c58a672365c" title="move backwards in history " alt="" coords="904,4938,1089,4965"/>
-<area shape="rect" id="node183" href="$classLineEditContext.html#a47d5284983336a22fdcdbcdddc736826" title="clear (after ^C) " alt="" coords="921,3791,1072,3818"/>
-<area shape="rect" id="node184" href="$classLineEditContext.html#a2e597d200d17b9434fe83d58df393769" title="move cursor left and delete char " alt="" coords="911,3338,1083,3365"/>
-<area shape="rect" id="node185" href="$classLineEditContext.html#a8908cfbf56371294323892784508eca7" title="tab expansion " alt="" coords="926,4421,1067,4463"/>
-<area shape="rect" id="node190" href="$classLineEditContext.html#a7717b306eedb8f3a3949d420f0687172" title="cut from cursor to end of line " alt="" coords="1411,4501,1552,4543"/>
-<area shape="rect" id="node191" href="$classLineEditContext.html#a2af6d28c635eacfafd95d6d8a03b1197" title="delete char at cursor position " alt="" coords="1149,3741,1340,3767"/>
-<area shape="rect" id="node193" href="$classLineEditContext.html#af149649722a0ac4532f47fe729f44f2f" title="paste to cursor position " alt="" coords="1404,4349,1559,4375"/>
-<area shape="rect" id="node194" href="$classLineEditContext.html#a671132bb9b96df8ace2ec1146bc486d6" title="insert uni at cursor position " alt="" coords="903,5330,1090,5357"/>
-<area shape="rect" id="node196" href="$classLineEditContext.html#ae1d81648a808d88cd0cd0a2a35df1863" title="return current user input " alt="" coords="926,3389,1067,3431"/>
-<area shape="rect" id="node154" href="$classLineInput.html#ae2d642d7025f5930c32a6154caf3bc9f" title="interrupt&#45;safe fgetc() " alt="" coords="1173,3186,1317,3213"/>
-<area shape="rect" id="node155" href="$structESCmap.html#a5b67213606c610861670a344d469cc3c" title="return true if an entry has prefix seq of length len " alt="" coords="1171,3135,1318,3162"/>
-<area shape="rect" id="node156" href="$structESCmap.html#af6cbce2074f2cc32f20d8d7fb48db905" title="return true if seq is a true prefix of this ESCmap " alt="" coords="1410,3289,1553,3315"/>
-<area shape="rect" id="node163" href="$classLineHistory.html#af918cad5b18471c0e34453a55e796d41" title="print relevant indices " alt="" coords="1186,4887,1303,4914"/>
-<area shape="rect" id="node169" href="$classLineHistory.html#a4c22c3a61eaa31f95b5c9a1db12cf23d" title="move to next newer entry " alt="" coords="1887,4761,2013,4787"/>
-<area shape="rect" id="node171" href="$classLineEditContext.html#ada01ee6a413a0a4bd4bf3c6065bd650c" title="adjust (increment) the allocated height (long lines) " alt="" coords="1165,5293,1324,5335"/>
-<area shape="rect" id="node178" href="$classLineEditContext.html#a1aa233cff187028ebd725d6ee9628c71" title="refresh screen from cursor onwards " alt="" coords="1631,5141,1794,5183"/>
-<area shape="rect" id="node181" href="$classLineEditContext.html#a347304e997f587298b31ca56b87b2826" title="move the cursor " alt="" coords="1861,5093,2039,5119"/>
-<area shape="rect" id="node170" href="$classLineHistory.html#abfa2c2d6b04085d21cf343395ba12d6e" title="replace the last line of this history " alt="" coords="1399,4887,1564,4914"/>
-<area shape="rect" id="node167" href="$classLineHistory.html#a65f9dbc23912fc543e4433659ffc81ed" title="start a new up/down sequence " alt="" coords="1652,4786,1773,4813"/>
-<area shape="rect" id="node166" href="$classAvec.html#a014cc622b9ec09014dab1982b0ee59ab" title="return true iff av is a whitespace char (ASCII 0..32 (including)) " alt="" coords="1896,4685,2004,4711"/>
-<area shape="rect" id="node168" href="$classLineHistory.html#aceeccf250636b19569342cd888a14916" title="move to next older entry " alt="" coords="1895,4837,2005,4863"/>
-<area shape="rect" id="node172" href="$classLineEditContext.html#a78bbd5426c6abecda70bac7daac39fb6" title="total length (prompt + user_line) " alt="" coords="1411,4619,1552,4660"/>
-<area shape="rect" id="node173" href="$classCIN__ostream.html#a181f092c83f8cb272de489f3e7f198c9" title="set cursor to y:x (upper left corner is 0:0, negative y: from bottom) " alt="" coords="2097,5093,2267,5119"/>
-<area shape="rect" id="node174" href="$classCIN__ostream.html#a17aba6e323a182af53fe456594daabc7" title="clear to end of screen supported ? " alt="" coords="1851,5222,2049,5249"/>
-<area shape="rect" id="node175" href="$classCIN__ostream.html#a3368041939b78c9a2f0c3b49da3acd12" title="clear to end of line " alt="" coords="1865,5321,2035,5347"/>
-<area shape="rect" id="node176" href="$classCIN__ostream.html#a8777dd22d169776cecdac82084419137" title="clear to end of line " alt="" coords="1865,5469,2035,5495"/>
-<area shape="rect" id="node177" href="$classLineEditContext.html#a44d0521ecccc6559b5a2fb7541059911" title="refresh screen from prompt (including) onwards " alt="" coords="1390,4989,1573,5015"/>
-<area shape="rect" id="node179" href="$classLineEditContext.html#a42e54e34054a3d943bedba1021973f0a" title="set the cursor (writing the appropriate ESC sequence to CIN) " alt="" coords="1879,5027,2021,5068"/>
-<area shape="rect" id="node180" href="$classLineEditContext.html#a8daeb0f45a6bb42428a42dce38e45704" title="refresh cursor if its position may be wrong (due to forward or backward wraparound being enabled or n..." alt="" coords="1869,5619,2031,5660"/>
-<area shape="rect" id="node186" href="$classTabExpansion.html#ad8c4300a7d2e9aa47e6c3a1d19285db7" title="perform tab expansion " alt="" coords="1391,3499,1571,3526"/>
-<area shape="rect" id="node187" href="$classTabExpansion.html#a793d1f4391a7f92f1455a03678582c12" title="tab&#45;expand a user&#45;defined name " alt="" coords="1635,3675,1790,3716"/>
-<area shape="rect" id="node188" href="$classTabExpansion.html#a155d53238b8490e82776eb2caddefceb" title="tab&#45;expand an APL command " alt="" coords="1635,3557,1790,3599"/>
-<area shape="rect" id="node189" href="$classTabExpansion.html#a784e980ca3a749da8358ce658b4557a4" title="tab&#45;expand a system&#45;defined name (⎕xxx) " alt="" coords="1635,3492,1790,3533"/>
-<area shape="rect" id="node192" href="$classUCS__string.html#a52cd4088451200cd78eb2db03b44a8ac" title="erase 1 (!) character at pos " alt="" coords="1416,3741,1547,3767"/>
-<area shape="rect" id="node195" href="$classUCS__string.html#a522289839ffbbcbe43b4577858926858" title="more intuitive insert() function " alt="" coords="1179,5359,1310,5386"/>
-<area shape="rect" id="node198" href="$classThread__context.html#abe4280ff16a15a70e0c903bb2db70c87" title="return the context for core n " alt="" coords="680,2395,819,2436"/>
+<area shape="rect" id="node2" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string " alt="" coords="1646,3965,1786,3992"/>
+<area shape="rect" id="node3" href="$classUCS__string.html#ad14d08312e34ad5d733360eccf9a745a" title="append 0&#45;terminated ASCII string str to this string. str is NOT interpreted as UTF8 string (use appen..." alt="" coords="227,4729,367,4770"/>
+<area shape="rect" id="node4" href="$classUCS__string.html#afd4c5d6cd5482ce0979527de1f3699b5" title="the inverse of un_escape(). " alt="" coords="1395,4067,1556,4093"/>
+<area shape="rect" id="node5" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length " alt="" coords="1899,4155,2022,4181"/>
+<area shape="rect" id="node6" href="$classUCS__string.html#a03aed5b59ab15793af300f63abf20de6" title="return true if this ends with suffix (ASCII, case matters). " alt="" coords="218,4627,375,4653"/>
+<area shape="rect" id="node7" href="$classLineInput.html#a7ce871a5af18773d431be4e0746a18eb" title="return the history " alt="" coords="223,4795,370,4821"/>
+<area shape="rect" id="node8" href="$classInputMux.html#a8a79cbe5207cde162fb36133ad9defdd" title="get one line " alt="" coords="232,3477,361,3504"/>
+<area shape="rect" id="node121" href="$classUCS__string.html#a67ea87cb92e687105b21917ffb4a2a6f" title="remove the last character in this string " alt="" coords="1639,5907,1793,5933"/>
+<area shape="rect" id="node199" href="$classWorkspace.html#ae7c0cc7419eedbf2c519dc1c202b901b" title="return the APL prompt " alt="" coords="216,4845,377,4872"/>
+<area shape="rect" id="node200" href="$classUCS__string.html#a5ee12a6873e023f9ad76ffafd7aa9c20" title="prepend character uni " alt="" coords="225,4896,369,4923"/>
+<area shape="rect" id="node9" href="$structInputFile.html#afbca3c136d4281d5309bca6e79d50226" title="return true iff the current input file exists and is a test file " alt="" coords="921,3528,1073,3555"/>
+<area shape="rect" id="node10" href="$classQuad__QUOTE.html#a5cd6bf7b6aa6c66c6d8b285623f948fc" title="end of ⍞ (output, but no input: clear prompt) " alt="" coords="445,3893,587,3920"/>
+<area shape="rect" id="node11" href="$structInputFile.html#a762adde559f6f9cb2defe81c29cf86a5" title="increment the line number of the current file " alt="" coords="447,3731,585,3773"/>
+<area shape="rect" id="node12" href="$structInputFile.html#a880e1d4560f201586d43c5ed578b2383" title="return true iff the current input file exists and is a pushed immediate execution ..." alt="" coords="443,3376,589,3403"/>
+<area shape="rect" id="node13" href="$classIO__Files.html#acc91875b8e0c7a5ad44e3ead0e3dda7b" title="get one line from the current file, open the next file if necceessary " alt="" coords="442,2119,590,2145"/>
+<area shape="rect" id="node28" href="$classUTF8__string.html#af0f7724e5743d48d9e29776de5d53c71" title="return this string as a 0&#45;terminated C string " alt="" coords="1410,376,1541,403"/>
+<area shape="rect" id="node118" href="$classCommand.html#aafd8a7df22d24109a5ea7de47267f241" title="clean&#45;up and exit from APL interpreter " alt="" coords="923,2705,1071,2732"/>
+<area shape="rect" id="node120" href="$classUTF8__string.html#a7b07ddeb39d90c41cf03575d8d23dc37" title="prevent basic_string::erase() with its dangerous default value for the number of erased character..." alt="" coords="449,3427,583,3453"/>
+<area shape="rect" id="node122" href="$classUCS__string.html#ace70327ef899c525ad9c3f2bffd43697" title="append 0&#45;terminated UTF8 string str to this UCS_string. " alt="" coords="426,3629,606,3656"/>
+<area shape="rect" id="node123" href="$classWorkspace.html#abb16bf711a1e681119ab5a4f78cc4bc5" title="increase the wait time for user input as reported in ⎕AI " alt="" coords="442,3528,590,3555"/>
+<area shape="rect" id="node124" href="$classCPU__pool.html#a78aa1ff8ffbef7ea5e46adc7ffdfa3af" title="make all pool members lock on their pool_sema " alt="" coords="443,3111,589,3137"/>
+<area shape="rect" id="node132" href="$classThread__context.html#a4360395b00f2c003ab2a09fbe7635b7b" title="terminate all worker threads " alt="" coords="1157,3107,1324,3133"/>
+<area shape="rect" id="node143" href="$classLineInput.html#a96f6a9062450af940d63ecff847646e4" title="get a line from the user " alt="" coords="425,3680,607,3707"/>
+<area shape="rect" id="node197" href="$classCPU__pool.html#a317b0a234d6dc8cbb6bab12088ec1aad" title="unlock all pool members from their pool_sema " alt="" coords="437,3325,595,3352"/>
+<area shape="rect" id="node14" href="$structInputFile.html#aecc9494cdddf176dac35cdf8f48dd897" title="the current file " alt="" coords="1169,1520,1313,1547"/>
+<area shape="rect" id="node15" href="$classIO__Files.html#aa29d2b92365b65b91d6db6288d55ae5d" title="open the next test file " alt="" coords="668,2195,831,2221"/>
+<area shape="rect" id="node22" href="$classIO__Files.html#a9cd4e5d7e3467ff6ad303dc1063e5004" title="read one line from the current input file with CR and LF removed " alt="" coords="672,1317,827,1344"/>
+<area shape="rect" id="node51" href="$classWorkspace.html#af444fb0d5974a5b22751c72f19e5beae" title="return the current ⎕LX " alt="" coords="681,2093,818,2120"/>
+<area shape="rect" id="node52" href="$classIO__Files.html#aa05a2917c11a88b9abfc4afa6ca04a3e" title="dito (close files, print errors, summary etc). " alt="" coords="655,2043,844,2069"/>
+<area shape="rect" id="node117" href="$classIO__Files.html#aa2c6031cd53afc14eb880778ec929238" title="return the total number of errors " alt="" coords="925,1571,1069,1597"/>
+<area shape="rect" id="node119" href="$classIO__Files.html#a168f41b75e3b6ea0a6e5aa41f50c1872" title="write testcases summary file " alt="" coords="667,2144,832,2171"/>
+<area shape="rect" id="node16" href="$structInputFile.html#a307af49dcf496c919a73d361cb8941db" title="set the pushed_pending flag " alt="" coords="923,2639,1070,2681"/>
+<area shape="rect" id="node17" href="$structInputFile.html#ad254fe07bec5402c0ea674c483bbf65b" title="the name of the currrent file " alt="" coords="1415,2078,1535,2119"/>
+<area shape="rect" id="node18" href="$structInputFile.html#ade3c052ce91c9b15b90566e5dc028141" title="open current file unless already open " alt="" coords="1151,2043,1330,2069"/>
+<area shape="rect" id="node19" href="$classOutput.html#aef5f941952e0a8ee19481212c472e587" title="reset() dout_filebuf " alt="" coords="931,2588,1062,2615"/>
+<area shape="rect" id="node21" href="$classIO__Files.html#ac9e3a19700b3d04e053494784e71e40d" title="count an error " alt="" coords="923,2093,1071,2120"/>
+<area shape="rect" id="node20" href="$classDiffOut.html#a2953159be1130890fcb3ad9d363e2c81" title="discard all characters " alt="" coords="1190,2803,1291,2829"/>
+<area shape="rect" id="node23" href="$structInputFile.html#aeccf06ed0bace1099f6d190c46543e2a" title="the line number of the currrent file " alt="" coords="1181,1433,1301,1474"/>
+<area shape="rect" id="node24" href="$classUTF8__string.html#ae72a6d597692993ab2760837dda316d3" title="return true iff string starts with path (usually a file path) " alt="" coords="913,1216,1080,1243"/>
+<area shape="rect" id="node25" href="$structInputFile.html#a5b408d866236d1071ee4717e4a97aec3" title="set the current HTML mode " alt="" coords="931,1267,1062,1293"/>
+<area shape="rect" id="node26" href="$structInputFile.html#a0a42938e22f9d89d1a24eef4ae241d2d" title="return the current HTML mode " alt="" coords="931,1317,1062,1344"/>
+<area shape="rect" id="node27" href="$classUTF8__string.html#a507460fd4d97100d36765fb89ebdfbc5" title="skip over &lt; ... &gt; and expand &lt; and friends " alt="" coords="1161,619,1320,645"/>
+<area shape="rect" id="node29" href="$structInputFile.html#a0f449701206a5127e239886ea3591f57" title="return true if this file as an oject filter (from )COPY file names...) " alt="" coords="925,1150,1068,1191"/>
+<area shape="rect" id="node30" href="$structInputFile.html#a162970480cc07daba1ba85a3ae2580e8" title="check the current line and return true if the line is permitted by the object_filter. This function also updates in_function and in_variable " alt="" coords="1167,1233,1314,1260"/>
+<area shape="rect" id="node48" href="$structInputFile.html#ac872e443cab2dc1325defd93aaa35063" title="true if echo (of the input) is on for the current file " alt="" coords="1151,1157,1330,1184"/>
+<area shape="rect" id="node49" href="$structInputFile.html#a1e6384a302fddad91c1b245610cc12ce" title="close the current file and perform some cleanup " alt="" coords="1149,1335,1332,1361"/>
+<area shape="rect" id="node50" href="$structInputFile.html#a68e5c221c42fd0ec4a924d297332fa4e" title="randomize the order of test_file_names " alt="" coords="1171,810,1311,851"/>
+<area shape="rect" id="node31" href="$classUCS__string.html#a91556379049e71071410cec015b960db" title="remove leading and trailing whitespaces " alt="" coords="1404,3219,1547,3275"/>
+<area shape="rect" id="node32" href="$classUCS__string.html#ad8e1ed8807d094b4b0b596db077af391" title="return this string with the first drop_count characters removed " alt="" coords="1414,672,1537,699"/>
+<area shape="rect" id="node33" href="$classUserFunction__header.html#abcc2f6d70da90e3123e630a226b9e931" title="return the name of the function " alt="" coords="1402,723,1549,765"/>
+<area shape="rect" id="node34" href="$classAvec.html#a88cc8af75e4a2c4d8a1d382637ca07b4" title="return true if unicode uni is a quad (⎕ or ▯) " alt="" coords="1423,427,1528,453"/>
+<area shape="rect" id="node47" href="$classAvec.html#af31e35e3049f3bc48cb1ff8d70262dd7" title="Return true iff av is a valid char in a user defined symbol. " alt="" coords="1385,2499,1565,2525"/>
+<area shape="rect" id="node35" href="$classAvec.html#af9d230b25c7dab2ce52b4f12e7ceb886" title="return the value (0..9 if decimal, or 0..15 if hex) for uni, or &#45;1 if uni is not a decimal or hex dig..." alt="" coords="1655,123,1777,149"/>
+<area shape="rect" id="node36" href="$classAvec.html#aec63ac86774c2cd648cd2d7df094eba2" title="return true if unicode uni needs ⎕UCS in 2 ⎕TF or )OUT " alt="" coords="1654,173,1778,200"/>
+<area shape="rect" id="node37" href="$classAvec.html#a07575efd64c4dda554ccde848d2debd3" title="return true iff a token printed after av never needs a space " alt="" coords="1641,224,1791,251"/>
+<area shape="rect" id="node38" href="$classAvec.html#af087e9a2ea710680225e809ac2f8e654" title="return true iff a token printed before av never needs a space " alt="" coords="1637,275,1795,301"/>
+<area shape="rect" id="node39" href="$classAvec.html#a853a006d231bce379ea5cb88eec5a216" title="return the subscript char for digit i (i = 0..9) " alt="" coords="1659,325,1773,352"/>
+<area shape="rect" id="node40" href="$classAvec.html#aa1d4c24515f876ab1eb51158349e0a71" title="return the superscript char for digit i (i = 0..9) " alt="" coords="1654,376,1778,403"/>
+<area shape="rect" id="node41" href="$classAvec.html#af37308ba6e99635253c4d487d4bf87fb" title="Find av in character_table. Return AV position if found or MAX_AV. " alt="" coords="1651,427,1781,453"/>
+<area shape="rect" id="node42" href="$classAvec.html#a844e2fc3a73ef90f42e63a9c268f36b8" title="Find av in character_table. Return position or Invalid_CHT. " alt="" coords="1659,477,1773,504"/>
+<area shape="rect" id="node43" href="$classAvec.html#a0641640e6b1cc18a1e4c525dcf5e83a4" title="Find return position of alt_av, or Invalid_AV if not found. " alt="" coords="1624,528,1808,555"/>
+<area shape="rect" id="node44" href="$classAvec.html#a15bfa417923b425ec3c2baf973d2a5f9" title="a pointer to 256 Unicode characters that are exactly the APL2 character set (⎕AV) shown in lrm Appen..." alt="" coords="1644,579,1788,605"/>
+<area shape="rect" id="node45" href="$classAvec.html#a24bf275107eb974d9a47ba0732153edc" title="search uni in inverse_ibm_av and return its position in the IBM ⎕AV (= its code in ..." alt="" coords="1644,5,1788,32"/>
+<area shape="rect" id="node46" href="$classAvec.html#ae3911626674255ce3f75abd5cd4ca3be" title="recompute inverse_ibm_av from ibm_av and print it " alt="" coords="1649,57,1783,98"/>
+<area shape="rect" id="node53" href="$classWorkspace.html#a64cef901fd41c19f4521bdd1175d0be7" title="the number of SI entries " alt="" coords="924,1774,1069,1815"/>
+<area shape="rect" id="node54" href="$classWorkspace.html#a30f12a0dafdc723ce2c67dae3d4b0fd3" title="print the SI on out " alt="" coords="1409,789,1542,816"/>
+<area shape="rect" id="node62" href="$classIO__Files.html#ac7a14dfc38263d79ac39142ac269dfe0" title="count an APL error " alt="" coords="932,1672,1061,1699"/>
+<area shape="rect" id="node63" href="$classValue.html#a1b6bbee82c30a98ca37cffbc5fb6bd0a" title="print incomplete Values, and return the number of incomplete Values. " alt="" coords="1161,1992,1320,2019"/>
+<area shape="rect" id="node67" href="$classValue.html#a80c3e1a7208f4f97985e5c742ec93b2d" title="print stale Values, and return the number of stale Values. " alt="" coords="935,1891,1058,1917"/>
+<area shape="rect" id="node101" href="$classValue.html#a38979fd196c826557e1614fa0514bbaa" title="erase stale values " alt="" coords="931,2296,1062,2323"/>
+<area shape="rect" id="node109" href="$classIndexExpr.html#aa16a458ef14025e0bd3af2c7d8513fcb" title="print stale IndexExprs, and return the number of stale IndexExprs. " alt="" coords="922,2473,1071,2500"/>
+<area shape="rect" id="node111" href="$classIndexExpr.html#af6ce132f19fe86699668a8cd523ffd01" title="erase stale IndexExprs " alt="" coords="919,2537,1075,2564"/>
+<area shape="rect" id="node55" href="$classWorkspace.html#a057e0d77702810d071560c7b72c2f8d6" title="the top of the SI stack (the SI pushed last) " alt="" coords="2125,728,2260,755"/>
+<area shape="rect" id="node56" href="$classStateIndicator.html#a2d4915de712ba06900582f0918f053a8" title="return the SI that has called this one " alt="" coords="1651,782,1781,823"/>
+<area shape="rect" id="node57" href="$classStateIndicator.html#ada4ebcec84c67d51bb6f406d68eabfe7" title="return the child SI (if any) that parent has called " alt="" coords="1895,782,2027,823"/>
+<area shape="rect" id="node58" href="$classStateIndicator.html#ae0a10cdfaa6db7599a737c5974b3c869" title="return the level at which sym is pushed for the nth. time " alt="" coords="1879,848,2043,875"/>
+<area shape="rect" id="node59" href="$classStateIndicator.html#aa4153144590405f8f78d3a8dd7de207a" title="return pointer to the current user function, statements, or execute " alt="" coords="2128,845,2257,886"/>
+<area shape="rect" id="node60" href="$classExecutable.html#af5c77881cb3e8da636a0eeb73950c39c" title="return true if this Executable localizes Symbol sym " alt="" coords="2108,911,2277,937"/>
+<area shape="rect" id="node61" href="$classStateIndicator.html#aa60ca9df0350c7b2e4c0825f061f300e" title="return the nesting level (oldest SI has level 0, next has level 1, ...) " alt="" coords="2128,779,2257,821"/>
+<area shape="rect" id="node64" href="$classDynamicObject.html#aa6f0b4349f295e162cd881377bb193fc" title="return the previous DynamicObject in its list " alt="" coords="1390,1925,1561,1952"/>
+<area shape="rect" id="node65" href="$classDynamicObject.html#a5f0541dc59c1cf509d38af50a41325bc" title="cast to const Value *. Caller must check that this cast is valid. " alt="" coords="1395,1976,1555,2003"/>
+<area shape="rect" id="node66" href="$classValue.html#a6c2eb3ec5ec6136eae948bc936c3ae35" title="true if Value flag complete is set " alt="" coords="1409,2027,1542,2053"/>
+<area shape="rect" id="node68" href="$classValue.html#a82fd0d84f4c7f0b22a6b035e0201506a" title="print info related to a stale value " alt="" coords="1165,1723,1316,1749"/>
+<area shape="rect" id="node93" href="$classValue.html#ae90fe6c7d36e56f4768abbc0628c7b06" title="mark all values, except static values " alt="" coords="1157,1774,1325,1815"/>
+<area shape="rect" id="node94" href="$classWorkspace.html#a85160b618521a453657a892f454323d4" title="clear the marked flag in all values known in this workspace " alt="" coords="1396,891,1555,933"/>
+<area shape="rect" id="node97" href="$classMacro.html#a767e050c31df6b991809b2c72d597f50" title="unmark all values used in the bodies of all macros " alt="" coords="1151,1891,1330,1917"/>
+<area shape="rect" id="node98" href="$classValue.html#a84cb4f9a86540d04c52bfae177a97bc8" title="true if Value flag marked is set " alt="" coords="1414,2347,1537,2373"/>
+<area shape="rect" id="node99" href="$classValue.html#a69a8e1aa89135b7ae26d26516524bfe1" title="clear marked flag on this value and its nested sub&#45;values " alt="" coords="1422,1621,1529,1648"/>
+<area shape="rect" id="node69" href="$classDynamicObject.html#a5919356f13bb4cf24de09ca83c9b30d8" title="where this value was allocated. " alt="" coords="1639,2390,1793,2431"/>
+<area shape="rect" id="node70" href="$classValue.html#aa7a89fbbca076c1c0c1a579702bf5ff1" title="return the current flags " alt="" coords="1658,1789,1774,1816"/>
+<area shape="rect" id="node71" href="$classVH__entry.html#ae422e396e1a7268221697abfd927ead0" title="print the history of value " alt="" coords="1397,2600,1553,2627"/>
+<area shape="rect" id="node73" href="$classValue.html#a913cbd7a14e7333d56818d1272f717e3" title="print address, shape, and flags of this value " alt="" coords="1402,1773,1549,1800"/>
+<area shape="rect" id="node80" href="$classQuad__CR.html#ac6f426118cad09841c8545efd5ba8a8f" title="compute a ⎕CR B " alt="" coords="1411,1283,1540,1309"/>
+<area shape="rect" id="node72" href="$classVH__entry.html#a8ea2cd7b38e8e88b545eba58f6a2ffff" title="print the event " alt="" coords="1661,2600,1771,2627"/>
+<area shape="rect" id="node74" href="$classValue.html#a06683bcfcb7626f2b824dae1824903bc" title="compute the depth of this value. " alt="" coords="1640,2093,1792,2120"/>
+<area shape="rect" id="node75" href="$classValue.html#a0d7debc5273aad742471b2d7990a6c8a" title="return the first element of the ravel (which is always present). same as get_cproto(), but named differently to indicate its context. " alt="" coords="1902,1485,2019,1512"/>
+<area shape="rect" id="node76" href="$classCell.html#a367b9df7e0d4b805e5f31641658113f6" title="Return the APL value of a cell (Asserts for non&#45;pointer cells) " alt="" coords="1883,2043,2038,2069"/>
+<area shape="rect" id="node77" href="$classValue.html#ac5b54e3a13cab0837442f1575b3299a5" title="return the number of elements, but at least 1 (for the prototype). " alt="" coords="1876,2093,2045,2120"/>
+<area shape="rect" id="node78" href="$classValue.html#a4429dcb041368962591397a45cb23d9b" title="return the shape of this value " alt="" coords="1899,1713,2022,1740"/>
+<area shape="rect" id="node79" href="$classCell.html#ae98b3988a7fa52c6c157b4911b043dde" title="Return true iff this cell is a pointer (to a sub&#45;array) cell. " alt="" coords="1648,1739,1784,1765"/>
+<area shape="rect" id="node81" href="$classPrintContext.html#a787257953d929f80db2ba1698d59b905" title="set the print style to be used " alt="" coords="1638,1941,1794,1968"/>
+<area shape="rect" id="node82" href="$classQuad__CR.html#a3391279d18ae51b8d27a4fef8a387e33" title="compute 5 ⎕CR B or 6 ⎕CR B " alt="" coords="1641,1536,1791,1563"/>
+<area shape="rect" id="node83" href="$classQuad__CR.html#aa527f599e0a335bea8fba29a03a66f49" title="compute 10 ⎕CR B " alt="" coords="1645,1333,1787,1360"/>
+<area shape="rect" id="node84" href="$classQuad__CR.html#a3354155958711356b7e5c62c977b40f0" title="compute 11 ⎕CR B " alt="" coords="1645,1384,1787,1411"/>
+<area shape="rect" id="node85" href="$classQuad__CR.html#ad2703aa51ad4924a7b5bc147de7451ce" title="compute 12 ⎕CR B " alt="" coords="1645,1131,1787,1157"/>
+<area shape="rect" id="node86" href="$classQuad__CR.html#acc72f7116159eb1b8bb3a27202d4e0d1" title="compute 13 ⎕CR B " alt="" coords="1645,1485,1787,1512"/>
+<area shape="rect" id="node87" href="$classQuad__CR.html#a8a501dc7662e5f525c5e6162d84a6f94" title="compute 14 ⎕CR B " alt="" coords="1645,1181,1787,1208"/>
+<area shape="rect" id="node88" href="$classQuad__CR.html#a4e09292fd07306db8b2fe5749c05c2dc" title="compute 15 ⎕CR B " alt="" coords="1645,979,1787,1005"/>
+<area shape="rect" id="node89" href="$classQuad__CR.html#abf0cf8ede4fbe148b84686db2536b1d3" title="compute 16 ⎕CR B " alt="" coords="1645,1029,1787,1056"/>
+<area shape="rect" id="node90" href="$classQuad__CR.html#af3d458b36e4e7ac23d5924a689fc8d85" title="compute 17 ⎕CR B " alt="" coords="1645,1080,1787,1107"/>
+<area shape="rect" id="node91" href="$classQuad__CR.html#a3a9dffbc22507dbd4b3d40fc8c599bff" title="compute 18 ⎕CR B " alt="" coords="1645,1232,1787,1259"/>
+<area shape="rect" id="node92" href="$classQuad__CR.html#a63f8105118882eb132c8c13d0b03b6fd" title="compute 19 ⎕CR B " alt="" coords="1645,1283,1787,1309"/>
+<area shape="rect" id="node95" href="$classSymbolTable.html#aff60aea6044524b4466cf73d69b5997f" title="clear the marked flag of all symbols " alt="" coords="1641,847,1791,889"/>
+<area shape="rect" id="node96" href="$classSymbol.html#ae1b457133fd35d84c76f96160ad0ddfe" title="clear the marked flag of all entries " alt="" coords="1647,913,1785,954"/>
+<area shape="rect" id="node100" href="$classValue.html#a6c84896ec53d4baae44a1a9c2a4134f6" title="true if Value flag packed is set " alt="" coords="1655,1688,1777,1715"/>
+<area shape="rect" id="node102" href="$classDynamicObject.html#ace2cb31c2bcf6043c3a16311f7f1f6bf" title="return the next DynamicObject in its list " alt="" coords="1155,2499,1326,2525"/>
+<area shape="rect" id="node103" href="$classDynamicObject.html#ac46ced35e2661f48b0514b0b1f0b80c8" title="print the list of objects starting at this object " alt="" coords="1403,2651,1548,2693"/>
+<area shape="rect" id="node104" href="$classValue.html#a926a6bd11f4d27c077c19bbb03c333cf" title="list a value " alt="" coords="1187,2245,1295,2272"/>
+<area shape="rect" id="node105" href="$classValue.html#aa8295760964d5f1d9dea8912c2c630dd" title="true if Value flag member is set " alt="" coords="1653,2245,1779,2272"/>
+<area shape="rect" id="node106" href="$classValue.html#a21369bf72b3fb40d1e9558cb1497a6b0" title="print this value (line break at Workspace::get_PW()) " alt="" coords="1431,2195,1519,2221"/>
+<area shape="rect" id="node108" href="$classWorkspace.html#a5d85f6457bf1dda2d17162c5dbcda14a" title="print all owners of value " alt="" coords="1387,840,1563,867"/>
+<area shape="rect" id="node107" href="$classWorkspace.html#a002e2f097bece67c9d082b7c89db11ae" title="return style and the current ⎕PP, and ⎕PW " alt="" coords="1619,2760,1813,2787"/>
+<area shape="rect" id="node110" href="$classDynamicObject.html#a17ab8b65022f5a21359f80eeeeccb2d1" title="cast to IndexExpr *. Caller must check that this cast is valid. " alt="" coords="1382,2768,1569,2795"/>
+<area shape="rect" id="node112" href="$classDynamicObject.html#adb527eca75c7201c033f8c1937e08a78" title="unlink this DynamicObject from its list " alt="" coords="1163,2600,1318,2627"/>
+<area shape="rect" id="node115" href="$classIndexExpr.html#a7cb8dc69ee2b77d786296d674f459f46" title="return the number of values (= number of semicolons + 1) " alt="" coords="1161,2549,1320,2576"/>
+<area shape="rect" id="node116" href="$classWorkspace.html#a3eaa0cc324b4e8e0f3fb0039efcd1b0c" title="return the current ⎕PW " alt="" coords="1169,2955,1312,2981"/>
+<area shape="rect" id="node113" href="$classDynamicObject.html#ada55c9a5ae831ea5d332b3c1ee5b67e9" title="print this object " alt="" coords="1403,2549,1548,2576"/>
+<area shape="rect" id="node114" href="$classDynamicObject.html#a1555a4463cbd47150f1f4f3fce1025e3" title="print new object message " alt="" coords="1387,2717,1563,2744"/>
+<area shape="rect" id="node125" href="$classThread__context.html#a8ef1d4db160a21f5616530cf737e4b18" title="number of currently used cores " alt="" coords="680,3267,819,3309"/>
+<area shape="rect" id="node133" href="$classThread__context.html#aadea40f94c3086eb73d86ce866b6e71d" title="return the context of the master " alt="" coords="680,3049,819,3090"/>
+<area shape="rect" id="node134" href="$classThread__context.html#a994dd1fef316d70072e8757310671aed" title="make all workers lock on pool_sema " alt="" coords="900,2955,1093,2981"/>
+<area shape="rect" id="node138" href="$classThread__context.html#a770b7101581894235605003726ebdc62" title="print all TaskTree nodes " alt="" coords="1393,2920,1558,2947"/>
+<area shape="rect" id="node142" href="$classThread__context.html#aee8c70aa8c5f5e771db87b9d90617bfb" title="end parallel execution of work at the master " alt="" coords="670,3165,829,3192"/>
+<area shape="rect" id="node126" href="$classThread__context.html#a9da7115c28c4372c40d393c8046bda22" title="set the number of currently used cores " alt="" coords="927,3267,1066,3309"/>
+<area shape="rect" id="node127" href="$classThread__context.html#a06a054fa3fadfda7020d64748371799e" title="initialize thread_contexts[n] " alt="" coords="1172,3209,1309,3250"/>
+<area shape="rect" id="node128" href="$classThread__context.html#afd854477bd87d3e80b3786ac2a7d5d9f" title="initialize all thread contexts (set all but N and thread) " alt="" coords="1407,3153,1544,3194"/>
+<area shape="rect" id="node129" href="$classThread__context.html#ab5c1f95ee686270b4ac6e1806a5bd23f" title="bind thread to core " alt="" coords="1403,3299,1547,3341"/>
+<area shape="rect" id="node130" href="$classCPU__pool.html#a745603fb69c0ee5d4f4d728028fabff6" title="get the number of (active) CPUs " alt="" coords="1167,3325,1314,3352"/>
+<area shape="rect" id="node131" href="$classCPU__pool.html#a9a0ceffddddc5e7b239c2f443fa6a559" title="get the idx;th CPU " alt="" coords="1169,3376,1313,3403"/>
+<area shape="rect" id="node135" href="$classThread__context.html#ad6131c6d7c657ae4fbf75a71db9c574a" title="start parallel execution of work at the master " alt="" coords="1161,3056,1321,3083"/>
+<area shape="rect" id="node136" href="$classThread__context.html#aba6ab97ae2a6542738f93831bd73fa14" title="return the number of the core executing this context " alt="" coords="1883,2895,2038,2921"/>
+<area shape="rect" id="node137" href="$classThread__context.html#a51a35755b357c769f56bcad57a408734" title="end parallel execution of work in a worker " alt="" coords="1159,3005,1323,3032"/>
+<area shape="rect" id="node139" href="$classThread__context.html#adc73bb9ae1ecb7b10830bd073201f7ea" title="print this TaskTree node " alt="" coords="1643,2920,1789,2947"/>
+<area shape="rect" id="node140" href="$classThread__context.html#a980dc6d5a2cef07422e21447c5925899" title="print all mileages nodes " alt="" coords="1403,3022,1548,3063"/>
+<area shape="rect" id="node141" href="$classThread__context.html#a1965a1f7a7d1e9da522a55148c09bcaa" title="initialize all thread contexts (set all but N and thread) " alt="" coords="1407,3087,1544,3129"/>
+<area shape="rect" id="node144" href="$classOutput.html#a7f5a3baf917253208de9aae748cb121d" title="set the color mode (if colors_enabled). Outputs the escape sequence for mode when the color mode chan..." alt="" coords="669,3680,830,3707"/>
+<area shape="rect" id="node145" href="$classLineInput.html#a81610349f86404c67f583eb296666bb1" title="get a line from from user " alt="" coords="684,4219,815,4245"/>
+<area shape="rect" id="node146" href="$classLineInput.html#ab188d7e07879a811c96002b02908b9a0" title="get one character from user " alt="" coords="934,4741,1059,4768"/>
+<area shape="rect" id="node150" href="$classLineEditContext.html#a3ce189997980bb505f3d776cf388b4ce" title="toggle the insert mode " alt="" coords="917,3782,1076,3823"/>
+<area shape="rect" id="node151" href="$classLineEditContext.html#a909c03d41ba5b42d8fae1e8804bd7789" title="move cursor home " alt="" coords="893,3848,1100,3875"/>
+<area shape="rect" id="node152" href="$classLineEditContext.html#a8810889507384d9a98db8a8d60344a1b" title="move cursor to end " alt="" coords="899,3899,1094,3925"/>
+<area shape="rect" id="node153" href="$classLineEditContext.html#a227f4e1074583815d54370e2a9f07a5c" title="move cursor left " alt="" coords="897,3949,1096,3976"/>
+<area shape="rect" id="node154" href="$classLineEditContext.html#a4d98991491704bcdd530d8850b0779e8" title="move cursor right " alt="" coords="917,4051,1076,4093"/>
+<area shape="rect" id="node155" href="$classLineEditContext.html#a8e52f296fc6f747ddfce8d6550f2db45" title="move forward in history " alt="" coords="892,4995,1101,5021"/>
+<area shape="rect" id="node157" href="$classLineHistory.html#a870ae7c7f0a0abcc27623195bca68b20" title="add one line to this history " alt="" coords="1403,5603,1547,5629"/>
+<area shape="rect" id="node158" href="$classUCS__string.html#ac43d98d8d13b5a91d670fe9af9250861" title="return true if this string contains non&#45;whitespace characters " alt="" coords="1637,5536,1795,5563"/>
+<area shape="rect" id="node179" href="$classLineEditContext.html#afb1bb78e3774564eb2fc1c58a672365c" title="move backwards in history " alt="" coords="904,5147,1089,5173"/>
+<area shape="rect" id="node180" href="$classLineEditContext.html#adc5ab21d52a2ea0c7219357dcd0c067f" title="search line history " alt="" coords="917,5249,1076,5290"/>
+<area shape="rect" id="node181" href="$classLineEditContext.html#a47d5284983336a22fdcdbcdddc736826" title="clear (after ^C) " alt="" coords="921,4117,1072,4144"/>
+<area shape="rect" id="node182" href="$classLineEditContext.html#a2af6d28c635eacfafd95d6d8a03b1197" title="delete char at cursor position " alt="" coords="1380,5755,1571,5781"/>
+<area shape="rect" id="node184" href="$classLineEditContext.html#a43cc3cfb93095a5d3e0121aec6ab1071" title="shortcut calling update_search() of member history with argument user_line " alt="" coords="1159,5705,1322,5746"/>
+<area shape="rect" id="node185" href="$classLineEditContext.html#a2e597d200d17b9434fe83d58df393769" title="move cursor left and delete char " alt="" coords="911,4168,1083,4195"/>
+<area shape="rect" id="node186" href="$classLineEditContext.html#a8908cfbf56371294323892784508eca7" title="tab expansion " alt="" coords="926,4489,1067,4530"/>
+<area shape="rect" id="node191" href="$classLineEditContext.html#a7717b306eedb8f3a3949d420f0687172" title="cut from cursor to end of line " alt="" coords="1405,4321,1546,4362"/>
+<area shape="rect" id="node192" href="$classLineEditContext.html#a2508faadc966340cdf4a5f2b1f5d11db" title="reset search substring " alt="" coords="917,5755,1076,5797"/>
+<area shape="rect" id="node193" href="$classLineEditContext.html#af149649722a0ac4532f47fe729f44f2f" title="paste to cursor position " alt="" coords="1398,4168,1553,4195"/>
+<area shape="rect" id="node194" href="$classLineEditContext.html#a671132bb9b96df8ace2ec1146bc486d6" title="insert uni at cursor position " alt="" coords="903,4000,1090,4027"/>
+<area shape="rect" id="node196" href="$classLineEditContext.html#ae1d81648a808d88cd0cd0a2a35df1863" title="return current user input " alt="" coords="926,4270,1067,4311"/>
+<area shape="rect" id="node147" href="$classLineInput.html#ae2d642d7025f5930c32a6154caf3bc9f" title="interrupt&#45;safe fgetc() " alt="" coords="1169,4741,1313,4768"/>
+<area shape="rect" id="node148" href="$structESCmap.html#a5b67213606c610861670a344d469cc3c" title="return true if an entry has prefix seq of length len " alt="" coords="1167,4893,1314,4920"/>
+<area shape="rect" id="node149" href="$structESCmap.html#af6cbce2074f2cc32f20d8d7fb48db905" title="return true if seq is a true prefix of this ESCmap " alt="" coords="1404,5045,1547,5072"/>
+<area shape="rect" id="node156" href="$classLineHistory.html#af918cad5b18471c0e34453a55e796d41" title="print relevant indices " alt="" coords="1182,5459,1299,5485"/>
+<area shape="rect" id="node163" href="$classLineHistory.html#a4c22c3a61eaa31f95b5c9a1db12cf23d" title="move to next newer entry " alt="" coords="1897,5831,2024,5857"/>
+<area shape="rect" id="node168" href="$classLineEditContext.html#ada01ee6a413a0a4bd4bf3c6065bd650c" title="adjust (increment) the allocated height (long lines) " alt="" coords="1161,5249,1320,5290"/>
+<area shape="rect" id="node175" href="$classLineEditContext.html#a1aa233cff187028ebd725d6ee9628c71" title="refresh screen from cursor onwards " alt="" coords="1635,5093,1797,5134"/>
+<area shape="rect" id="node178" href="$classLineEditContext.html#a347304e997f587298b31ca56b87b2826" title="move the cursor " alt="" coords="1871,4767,2050,4793"/>
+<area shape="rect" id="node167" href="$classLineHistory.html#abfa2c2d6b04085d21cf343395ba12d6e" title="replace the last line of this history " alt="" coords="1393,5552,1558,5579"/>
+<area shape="rect" id="node160" href="$classUCS__string.html#a186a76c22c3ac840f1e607ba49e253a0" title="return the last character in this string " alt="" coords="1653,5485,1779,5512"/>
+<area shape="rect" id="node161" href="$classLineHistory.html#a65f9dbc23912fc543e4433659ffc81ed" title="start a new up/down sequence " alt="" coords="1655,5856,1777,5883"/>
+<area shape="rect" id="node159" href="$classAvec.html#a014cc622b9ec09014dab1982b0ee59ab" title="return true iff av is a whitespace char (ASCII 0..32 (including)) " alt="" coords="1907,5552,2015,5579"/>
+<area shape="rect" id="node162" href="$classLineHistory.html#aceeccf250636b19569342cd888a14916" title="move to next older entry " alt="" coords="1905,5887,2016,5913"/>
+<area shape="rect" id="node164" href="$classLineHistory.html#ab77d293ddf6c21b9c877ea8828d26c33" title="update history search substring " alt="" coords="1899,6021,2023,6062"/>
+<area shape="rect" id="node165" href="$classLineHistory.html#a0c342eca06ac0e59347c0a486fc03a0e" title="update search substring (called when current line is edited) " alt="" coords="1893,5705,2028,5746"/>
+<area shape="rect" id="node166" href="$classLineHistory.html#ad32cb453ee5edaefa52a1da575c9856d" title="find entries like current line in history " alt="" coords="1893,5948,2028,5975"/>
+<area shape="rect" id="node169" href="$classLineEditContext.html#a78bbd5426c6abecda70bac7daac39fb6" title="total length (prompt + user_line) " alt="" coords="1645,5587,1787,5629"/>
+<area shape="rect" id="node170" href="$classCIN__ostream.html#a181f092c83f8cb272de489f3e7f198c9" title="set cursor to y:x (upper left corner is 0:0, negative y: from bottom) " alt="" coords="2108,5255,2277,5281"/>
+<area shape="rect" id="node171" href="$classCIN__ostream.html#a17aba6e323a182af53fe456594daabc7" title="clear to end of screen supported ? " alt="" coords="1861,5161,2060,5188"/>
+<area shape="rect" id="node172" href="$classCIN__ostream.html#a3368041939b78c9a2f0c3b49da3acd12" title="clear to end of line " alt="" coords="1875,5229,2046,5256"/>
+<area shape="rect" id="node173" href="$classCIN__ostream.html#a8777dd22d169776cecdac82084419137" title="clear to end of line " alt="" coords="1876,5331,2045,5357"/>
+<area shape="rect" id="node174" href="$classLineEditContext.html#a44d0521ecccc6559b5a2fb7541059911" title="refresh screen from prompt (including) onwards " alt="" coords="1384,4944,1567,4971"/>
+<area shape="rect" id="node176" href="$classLineEditContext.html#a42e54e34054a3d943bedba1021973f0a" title="set the cursor (writing the appropriate ESC sequence to CIN) " alt="" coords="1890,5486,2031,5527"/>
+<area shape="rect" id="node177" href="$classLineEditContext.html#a8daeb0f45a6bb42428a42dce38e45704" title="refresh cursor if its position may be wrong (due to forward or backward wraparound being enabled or n..." alt="" coords="1879,4451,2042,4493"/>
+<area shape="rect" id="node183" href="$classUCS__string.html#a52cd4088451200cd78eb2db03b44a8ac" title="erase 1 (!) character at pos " alt="" coords="1651,5704,1781,5731"/>
+<area shape="rect" id="node187" href="$classTabExpansion.html#ad8c4300a7d2e9aa47e6c3a1d19285db7" title="perform tab expansion " alt="" coords="1151,3732,1331,3759"/>
+<area shape="rect" id="node188" href="$classTabExpansion.html#a793d1f4391a7f92f1455a03678582c12" title="tab&#45;expand a user&#45;defined name " alt="" coords="1398,3615,1553,3657"/>
+<area shape="rect" id="node189" href="$classTabExpansion.html#a155d53238b8490e82776eb2caddefceb" title="tab&#45;expand an APL command " alt="" coords="1398,3783,1553,3825"/>
+<area shape="rect" id="node190" href="$classTabExpansion.html#a784e980ca3a749da8358ce658b4557a4" title="tab&#45;expand a system&#45;defined name (⎕xxx) " alt="" coords="1398,3849,1553,3890"/>
+<area shape="rect" id="node195" href="$classUCS__string.html#a522289839ffbbcbe43b4577858926858" title="more intuitive insert() function " alt="" coords="1175,4032,1306,4059"/>
+<area shape="rect" id="node198" href="$classThread__context.html#abe4280ff16a15a70e0c903bb2db70c87" title="return the context for core n " alt="" coords="680,3333,819,3374"/>
 </map>

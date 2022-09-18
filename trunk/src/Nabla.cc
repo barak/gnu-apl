@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -32,14 +32,14 @@
 #include "UserPreferences.hh"
 #include "Workspace.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Nabla::edit_function(const UCS_string & cmd)
 {
 Nabla nabla(cmd);
    nabla.edit();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Nabla::Nabla(const UCS_string & cmd)
    : defn_line_no(InputFile::current_line_no()),
      fun_symbol(0),
@@ -55,7 +55,7 @@ Nabla::Nabla(const UCS_string & cmd)
 {
    Workspace::more_error().clear();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Nabla::throw_edit_error(const char * why)
 {
@@ -71,12 +71,11 @@ Nabla::throw_edit_error(const char * why)
 
    Error::throw_define_error(fun_header, first_command, why);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Nabla::edit()
 {
-const char * error = start();
-   if (error)
+   if (const char * error = start())
       {
         Log(LOG_verbose_error)   if (Workspace::more_error().size() == 0)
            {
@@ -190,22 +189,23 @@ UserFunction * ufun = UserFunction::fix(fun_text, error_line, false,
 
    if (ufun == 0)   // UserFunction::fix() failed
       {
+        const UCS_string & MORE = Workspace::more_error();
         if (InputFile::running_script())
            {
              // the ∇-editor runs from a script, therefore warning the user
-             // interactively and asking to fix the fault makles no sense. We
+             // interactively and asking to fix the fault makes no sense. We
              // therefore exit with DEFN_ERROR, so that the scrip does not hang
              // in a endless try again loop.
              //
-             UTF8_string more_utf8(MORE_ERROR());
+             UTF8_string more_utf8(MORE);
              throw_edit_error(more_utf8.c_str());
            }
 
-        COUT << "Fatal error in defined function. Please correct "
-                "(or else delete with [∆" << error_line <<"])\n"
-                " the offending line indicated above.\n";
+        COUT << MORE << 
+"Fatal error in defined function line [" << error_line << "].\n"
+"Proceed with [" << error_line << "] ..., [∆" << error_line <<
+"], or [→] before ∇.\n";
         do_close = false;
-        COUT << MORE_ERROR();
         goto try_again;
 
       }
@@ -229,7 +229,7 @@ std::vector<Function_Line> trace_vec;
    ufun->set_trace_stop(stop_vec,  true);
    ufun->set_trace_stop(trace_vec, false);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 const char *
 Nabla::start()
 {
@@ -279,7 +279,14 @@ UCS_string::iterator c(first_command.begin());
       }
 
 UserFunction_header hdr(fun_header, false);
-   if (hdr.get_error())   return "Bad function header";
+   if (hdr.get_error())
+      {
+         static char cc[200];
+         snprintf(cc, sizeof(cc), "Bad function header (%s)",
+                  hdr.get_error_info());
+         cc[sizeof(cc) - 1] = 0;
+         return cc;
+      }
 
    fun_symbol = Workspace::lookup_symbol(hdr.get_name());
    Assert(fun_symbol);
@@ -302,7 +309,7 @@ UserFunction_header hdr(fun_header, false);
         if (loc)   return loc;   // error
       }
 
-   switch(fun_symbol->get_nc())
+   switch(fun_symbol->get_NC())
       {
         case NC_UNUSED_USER_NAME:   // open a new function
              function_existed = false;
@@ -367,7 +374,7 @@ UserFunction_header hdr(fun_header, false);
 
    return 0;   // no error
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 const char *
 Nabla::parse_oper(UCS_string & oper, bool initial)
 {
@@ -566,7 +573,7 @@ again:
 
    return 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 LineLabel
 Nabla::parse_lineno(UCS_string::iterator & c)
 {
@@ -586,7 +593,7 @@ LineLabel ret(0);
 
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 const char *
 Nabla::open_new_function()
 {
@@ -597,7 +604,7 @@ Nabla::open_new_function()
    lines.push_back(FunLine(0, fun_header));
    return 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 const char *
 Nabla::open_existing_function()
 {
@@ -627,7 +634,7 @@ Function_P function = fun_symbol->get_function();
    if (Workspace::is_called(fun_symbol->get_name()))
       return "function is used, pendent or suspended";
 
-const UserFunction * ufun = function->get_ufun1();
+const UserFunction * ufun = function->get_func_ufun();
    if (ufun == 0)
       return "function is not editable at " LOC;
 
@@ -670,7 +677,7 @@ UCS_string_vector tlines;
 
    return 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 const char *
 Nabla::execute_oper()
 {
@@ -701,7 +708,7 @@ const bool have_to = edit_to.ln_major != -1;
 
    return LOC;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 const char *
 Nabla::execute_show()
 {
@@ -752,7 +759,7 @@ const LineLabel user_edit_to = edit_to;
 
    return 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 const char *
 Nabla::execute_delete()
 {
@@ -779,7 +786,7 @@ const int idx_from = find_line(LineLabel(edit_from));
    current_line = lines.back().label;
    return 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 const char *
 Nabla::execute_edit()
 {
@@ -798,7 +805,7 @@ Nabla::execute_edit()
    if (current_line.is_header_line_number())   return edit_header_line();
    else                                        return edit_body_line();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 const char *
 Nabla::edit_header_line()
 {
@@ -828,7 +835,7 @@ const UCS_string & new_name = header.get_name();
         //
         Symbol * sym = Workspace::lookup_symbol(new_name);   // create if needed
         Assert(sym);
-        if (sym->get_nc() != NC_UNUSED_USER_NAME)
+        if (sym->get_NC() != NC_UNUSED_USER_NAME)
            {
              CERR << "BAD FUNCTION HEADER";
              COUT << endl;
@@ -842,7 +849,7 @@ const UCS_string & new_name = header.get_name();
    current_line.next();
    return 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 const char *
 Nabla::edit_body_line()
 {
@@ -900,7 +907,7 @@ const int idx_from = find_line(edit_from);
 
    return 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 const char *
 Nabla::execute_escape()
 {
@@ -910,7 +917,7 @@ const Function * fun = fun_symbol ? fun_symbol->get_function() : 0;
 
    if (fun)   // existing function
       {
-        const UserFunction * ufun = fun->get_ufun1();
+        const UserFunction * ufun = fun->get_func_ufun();
         Assert(ufun);
         loop(l, ufun->get_text_size())
             {
@@ -925,7 +932,7 @@ const Function * fun = fun_symbol ? fun_symbol->get_function() : 0;
 
    return 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Nabla::find_line(const LineLabel & lab) const
 {
@@ -935,7 +942,7 @@ Nabla::find_line(const LineLabel & lab) const
 
    return -1;   // not found.
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Nabla::FunLine::print(ostream & out) const
 {
@@ -946,7 +953,7 @@ Nabla::FunLine::print(ostream & out) const
    if (!text.is_comment_or_label())   out << " ";
    out << text << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 LineLabel::print(ostream & out) const
 {
@@ -962,7 +969,7 @@ UCS_string ucs("[");
    while (ucs.size() < 5)   ucs.append_UTF8(" ");
    out << ucs;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string
 LineLabel::print_prompt(int min_size) const
 {
@@ -979,7 +986,7 @@ UCS_string ret("[");
    while (ret.size() < min_size)   ret.append(UNI_SPACE);
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 LineLabel::next()
 {
@@ -995,33 +1002,33 @@ const Unicode cc = ln_minor[ln_minor.size() - 1];
    if (cc != UNI_9)   ln_minor[ln_minor.size() - 1] = Unicode(cc + 1);
    else                     ln_minor.append(UNI_1);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 LineLabel::insert()
 {
    ln_minor.append(UNI_1);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 LineLabel::operator ==(const LineLabel & other) const
 {
    return (ln_major == other.ln_major) && (ln_minor == other.ln_minor);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 LineLabel::operator <(const LineLabel & other) const
 {
    if (ln_major != other.ln_major)   return ln_major < other.ln_major;
  return  ln_minor.compare(other.ln_minor) < 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ostream &
 operator <<(ostream & out, const LineLabel & lab)
 {
    lab.print(out);
    return out;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string
 Nabla::FunLine::get_label_and_text() const
 {
@@ -1030,7 +1037,7 @@ UCS_string ret = label.print_prompt(6);
 
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string
 Nabla::get_label_and_text(int line, bool & is_current) const
 {
@@ -1038,5 +1045,5 @@ const FunLine & fl = lines[line];
    is_current = fl.label == current_line;
    return fl.get_label_and_text();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 

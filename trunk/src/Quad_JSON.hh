@@ -23,7 +23,7 @@
 
 #include "QuadFunction.hh"
 
-//------------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
    The system function ⎕JSON
  */
@@ -63,9 +63,10 @@ protected:
    /// convert JSON string to APL associative array
    static Value_P JSON_to_APL(const Value & B);
 
-   /// skip string token starting at ucs_B[b]. Return the content length.
-   /// @start: ucs_B[b] = left " of the string
-   /// @end:   ucs_B[b] = right " of the string
+   /// skip the string literal that starts at ucs_B[b]. Return the content length
+   /// an increment b.
+   /// at start: ucs_B[b] = the left " of the string
+   /// at return: ucs_B[b] = the right " of the string
    static size_t skip_string(const UCS_string & ucs_B, ShapeItem & b);
 
    /// return the length-1 of the number(-token) starting at \b b in \b ucs_B
@@ -100,14 +101,16 @@ protected:
    /// parse a JSON string
    static void parse_string(Value & Z, const UCS_string & ucs_B, ShapeItem b);
 
-   /// decode a \uUUUU sequence, return non-Unicode_0 on success and increment b,
+   /// decode a \\uUUUU sequence, return non-Unicode_0 on success and increment b,
    /// b, or else return Unicode_0 and leave b as is.
    static Unicode decode_UUUU(const UCS_string & ucs_B, ShapeItem b);
 
-   static bool is_high_surrogate(int uni)
+   /// return true iff uni is a high surrogate Unicode (0xD8xx)
+   static bool is_high_surrogate(Unicode uni)
       { return (uni & ~0x03FF) == 0xD800; }
 
-   static bool is_low_surrogate(int uni)
+   /// return true iff uni is a low surrogate Unicode (0xDCxx)
+   static bool is_low_surrogate(Unicode uni)
       { return (uni & ~0x03FF) == 0xDC00; }
 
    /// parse a JSON literal (false, null, or true)

@@ -77,7 +77,8 @@ Collaboration diagram for LineHistory:</div>
 <div class="dyncontent">
 <div class="center"><img src="classLineHistory__coll__graph.png" border="0" usemap="#LineHistory_coll__map" alt="Collaboration graph"/></div>
 <map name="LineHistory_coll__map" id="LineHistory_coll__map">
-<area shape="rect" id="node2" href="classUCS__string__vector.html" title="a vector of UCS_strings. " alt="" coords="27,81,160,108"/>
+<area shape="rect" id="node2" href="classUCS__string.html" title="A string of Unicode characters (32&#45;bit) " alt="" coords="39,96,130,123"/>
+<area shape="rect" id="node4" href="classUCS__string__vector.html" title="a vector of UCS_strings. " alt="" coords="174,96,307,123"/>
 </map>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
@@ -119,6 +120,18 @@ const <a class="el" href="classUCS__string.html">UCS_string</a> *&#160;</td><td 
 const <a class="el" href="classUCS__string.html">UCS_string</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLineHistory.html#a4c22c3a61eaa31f95b5c9a1db12cf23d">down</a> ()</td></tr>
 <tr class="memdesc:a4c22c3a61eaa31f95b5c9a1db12cf23d"><td class="mdescLeft">&#160;</td><td class="mdescRight">move to next newer entry <br /></td></tr>
 <tr class="separator:a4c22c3a61eaa31f95b5c9a1db12cf23d"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab77d293ddf6c21b9c877ea8828d26c33"><td class="memItemLeft" align="right" valign="top"><a id="ab77d293ddf6c21b9c877ea8828d26c33"></a>
+const void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLineHistory.html#ab77d293ddf6c21b9c877ea8828d26c33">clear_search</a> (void)</td></tr>
+<tr class="memdesc:ab77d293ddf6c21b9c877ea8828d26c33"><td class="mdescLeft">&#160;</td><td class="mdescRight">update history search substring <br /></td></tr>
+<tr class="separator:ab77d293ddf6c21b9c877ea8828d26c33"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0c342eca06ac0e59347c0a486fc03a0e"><td class="memItemLeft" align="right" valign="top"><a id="a0c342eca06ac0e59347c0a486fc03a0e"></a>
+const void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLineHistory.html#a0c342eca06ac0e59347c0a486fc03a0e">update_search</a> (<a class="el" href="classUCS__string.html">UCS_string</a> &amp;cur_line)</td></tr>
+<tr class="memdesc:a0c342eca06ac0e59347c0a486fc03a0e"><td class="mdescLeft">&#160;</td><td class="mdescRight">update search substring (called when current line is edited) <br /></td></tr>
+<tr class="separator:a0c342eca06ac0e59347c0a486fc03a0e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad32cb453ee5edaefa52a1da575c9856d"><td class="memItemLeft" align="right" valign="top"><a id="ad32cb453ee5edaefa52a1da575c9856d"></a>
+const <a class="el" href="classUCS__string.html">UCS_string</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLineHistory.html#ad32cb453ee5edaefa52a1da575c9856d">search</a> (<a class="el" href="classUCS__string.html">UCS_string</a> &amp;cur_line)</td></tr>
+<tr class="memdesc:ad32cb453ee5edaefa52a1da575c9856d"><td class="mdescLeft">&#160;</td><td class="mdescRight">find entries like current line in history <br /></td></tr>
+<tr class="separator:ad32cb453ee5edaefa52a1da575c9856d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af918cad5b18471c0e34453a55e796d41"><td class="memItemLeft" align="right" valign="top"><a id="af918cad5b18471c0e34453a55e796d41"></a>
 ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLineHistory.html#af918cad5b18471c0e34453a55e796d41">info</a> (ostream &amp;out) const</td></tr>
 <tr class="memdesc:af918cad5b18471c0e34453a55e796d41"><td class="mdescLeft">&#160;</td><td class="mdescRight">print relevant indices <br /></td></tr>
@@ -161,6 +174,14 @@ int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="class
 const int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLineHistory.html#aa90a2db4b74578e022c48b452cb3c9f7">max_lines</a></td></tr>
 <tr class="memdesc:aa90a2db4b74578e022c48b452cb3c9f7"><td class="mdescLeft">&#160;</td><td class="mdescRight">the max. history size <br /></td></tr>
 <tr class="separator:aa90a2db4b74578e022c48b452cb3c9f7"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa0708ecdbd1132eebe2ab0b71ed5f249"><td class="memItemLeft" align="right" valign="top"><a id="aa0708ecdbd1132eebe2ab0b71ed5f249"></a>
+<a class="el" href="classUCS__string.html">UCS_string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLineHistory.html#aa0708ecdbd1132eebe2ab0b71ed5f249">cur_search_substr</a></td></tr>
+<tr class="memdesc:aa0708ecdbd1132eebe2ab0b71ed5f249"><td class="mdescLeft">&#160;</td><td class="mdescRight">the current searched-for substring <br /></td></tr>
+<tr class="separator:aa0708ecdbd1132eebe2ab0b71ed5f249"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a13972a431ce7d1deb8cc56e267b79bc1"><td class="memItemLeft" align="right" valign="top"><a id="a13972a431ce7d1deb8cc56e267b79bc1"></a>
+int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLineHistory.html#a13972a431ce7d1deb8cc56e267b79bc1">last_search_line</a></td></tr>
+<tr class="memdesc:a13972a431ce7d1deb8cc56e267b79bc1"><td class="mdescLeft">&#160;</td><td class="mdescRight">the last searched-for line match <br /></td></tr>
+<tr class="separator:a13972a431ce7d1deb8cc56e267b79bc1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae5c373e9630f3f5fe685fd69f4ba12fb"><td class="memItemLeft" align="right" valign="top"><a id="ae5c373e9630f3f5fe685fd69f4ba12fb"></a>
 <a class="el" href="classUCS__string__vector.html">UCS_string_vector</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classLineHistory.html#ae5c373e9630f3f5fe685fd69f4ba12fb">hist_lines</a></td></tr>
 <tr class="memdesc:ae5c373e9630f3f5fe685fd69f4ba12fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">the history <br /></td></tr>
@@ -180,7 +201,7 @@ const int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href=
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="classLineHistory.html">LineHistory</a></li>
-    <li class="footer">Generated on Sun Aug 9 2020 16:43:42 for GNUAPL by
+    <li class="footer">Generated on Sun Jan 30 2022 20:14:26 for GNUAPL by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>

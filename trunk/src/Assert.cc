@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -30,7 +30,7 @@
 /// prevent recursive do_Assert() calls.
 static bool asserting = false;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 do_Assert(const char * cond, const char * fun, const char * file, int line)
 {
@@ -59,7 +59,7 @@ char * loc = new char[loc_len + 1];
         get_CERR() << "\n\n================ " << fun <<  " ================\n";
       }
 
-   get_CERR() << "Call stack:" << endl;
+   get_CERR() << "C/C++ call stack:" << endl;
 
    if (asserting)
       {
@@ -87,5 +87,5 @@ char * loc = new char[loc_len + 1];
 
    throw E_ASSERTION_FAILED;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 

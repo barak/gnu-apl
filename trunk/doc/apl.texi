@@ -3,6 +3,11 @@
 @documentencoding UTF-8
 @settitle GNU APL
 
+@c BOP: Bold OPtion
+@macro BOP{opt}
+@b{@verb{|-\opt\|}}
+@end macro
+
 @c ============================================================================
 @c ====== Part 2: Summary Description and Copyright ===========================
 @c ============================================================================
@@ -57,6 +62,9 @@ and texts about APL. We would like to refer the reader to the following:
 
     ISO Standard for APL: @*
     www.math.uwaterloo.ca/~ljdickey/apl-rep/docs/is13751.pdf
+
+Note that the file @b{is13751.pdf} above is compressed with gzip,
+therefore it must be expanded with e.g.  @b{gunzip} before it can be read.
 
     More pointers to APL resources on the Web: @*
     ftp://rtfm.mit.edu/pub/usenet-by-group/comp.lang.apl/APL_language_FAQ
@@ -130,7 +138,7 @@ $ apl
 
 or:
 
-$ apl ---id 1001
+$ apl @BOP{id} 1001
 
 GNU APL is script-able; a text file whose first line looks like this (assuming
 the APL interpreter binary is called 'apl' and is located in the current
@@ -162,7 +170,7 @@ GNU APL understands the following command line options:
 @itemize @bullet
 
 @item
-@option{-C new_root}
+@BOP{C new_root}
 
 perform chroot("new_root") followed by chdir("/"). This restricts the access
 of the the process running GNU APL to files in or below directory new_root, and
@@ -186,7 +194,7 @@ GNU APL processes the -C option (i.e. it calls chroot("new_root")) before
 all other command line options. As a consequence, file names in other command
 line options of GNU APL are also affected by -C. That means that the file
 names in command line options arr being interpreted relative to new_root
-and @strong{not} relative to the current directory of the process that had
+and @b{not} relative to the current directory of the process that had
 started GNU APL.
 
 @item
@@ -203,35 +211,35 @@ Depending on your platform, the process using -C may need root privileges.
 @end itemize
 
 @item
-@option{--cfg}
+@BOP{-cfg}
 
 show ./configure options that were used to configure GNU APL, and exit.
 
 @item
-@option{--[no]Color}
+@BOP{-[no]Color}
 
 start with ]COLOR ON [OFF].
 
 @item
-@option{-d}
+@BOP{d}
 
 run the APL interpreter (or APL script) in the background (i.e. as a daemon).
 For this to work you need to provide some input to the background process, e.g.
 via the -f option.
 
 @item
-@option{--emacs}
+@BOP{-emacs}
 
 run in (old) Emacs mode.
 
 @item
-@option{--emacs_arg arg}
+@BOP{-emacs_arg arg}
 
 run in (new) Emacs mode with argument arg.
 
 
 @item
-@option{--eval line}
+@BOP{-eval line}
 
 evaluate one APL line and exit. This option can be given several times; in
 that case several lines are being executed before GNU apl exits. Keep in
@@ -240,7 +248,7 @@ being passed to apl. Therefore sometimes quoting the argument of --eval may
 be needed and common wisdom has it to always quote the argument of --eval.
 
 @item
-@option{-f file}
+@BOP{f file}
 
 read input from @i{file} rather than from the keyboard. When the end of
 the file is reached, input is switched back to the keyboard. 
@@ -248,29 +256,29 @@ If you want to terminate the APL interpreter after executing the file,
 then use )OFF as last line in the file.
 
 @item
-@option{--gpl}
+@BOP{-gpl}
 
 show GNU APL license (GPL) and exit.
 
 @item
-@option{-L wsname}
+@BOP{L wsname}
 
 )LOAD wsname on start-up.
 
 @item
-@option{--LX expr}
+@BOP{-LX expr}
 
-execute @strong{expr} first. The workspaces behaves as if ⎕LX (latent
-expression) were set to @strong{expr} in the workspace.  This can be used,
+execute @b{expr} first. The workspaces behaves as if ⎕LX (latent
+expression) were set to @b{expr} in the workspace.  This can be used,
 for example, to start the same workspace with different start-up values.
 
 @item
-@option{-h}, @option{--help}
+@BOP{h}, @BOP{-help}
 
 print all command line options with a brief hint what they do.
 
 @item
-@option{--id proc}
+@BOP{-id proc}
 
 use processor ID proc for this interpreter. If no ID is provided, then the
 first unused ID > 1000 is taken by this interpreter and the ID becomes used
@@ -278,125 +286,190 @@ as long as the interpreter runs. Processor IDs are used by shared variables
 to identify share partners.
 
 @item
-@option{-l num}
+@BOP{l num}
 
-turn logging facility @strong{num} ON (provided that dynamic logging was
-configured). The logging facility 37 (start-up messages) is of particular
-importance for troubleshooting and works even if even if dynamic logging
-was not configured.
+turn logging facility @b{num} ON (provided that dynamic logging was
+./configure'd). The logging facility 37 (start-up messages) is of particular
+importance for troubleshooting and it works even if dynamic logging
+was not ./configure'd.
 
 @item
-@option{--echoCIN}
+@BOP{-mem [memory-limit]}
+
+tell the interpreter to not use more than memory-limit bytes of RAM. By
+using this option, the user is fully responsible for ensuring that the
+specified amount of memory will always be available. The following rules
+should be observed.
+
+The interpreter will exit at start-up if @BOP{-mem} is used and:
+
+@itemize
+@item the platform on which the interpreter runs has no /proc/meminfo, or
+@item the platform has no /proc/sys/vm/overcommit_memory, or
+@item /proc/sys/vm/overcommit_memory is not 2 (aka. 'never overcommit')
+@end itemize
+
+On GNU/Linux systems these conditions are normally satisfied, but the root
+user has to set /proc/sys/vm/overcommit_memory to 2 which differs from the
+default value 0 (aka. overcommit allowed).
+
+If no memory-limit is given, then a memory-limit of 50% is used.
+
+If a memory-limit is provided then it must have a unit of %, kB, MB, or GB.
+If the unit is % then the limit is computed as that percentage (between 5%
+and 95%) of parameter 'MemFree:' in /proc/meminfo. Otherwise the limit
+is the given amount in kB, MB, or GB.
+
+For example:
+
+@itemize
+@item @BOP{-mem}      (50% of MemFree: in /proc/meminfo are guaranteed)
+@item @BOP{-mem 80%}  (80% of MemFree: in /proc/meminfo are guaranteed)
+@item @BOP{-mem 5G}   (5 GB are guaranteed)
+@end itemize
+
+WARNING: The memory-limit is checked against parameter 'MemFree' in
+/proc/meminfo when GNU APL starts, but this does not protect against
+other processes consuming the free memory at a later point in time.
+
+If that happens (and according to the rules above the user has the
+responsibility to prevent it), then ⎕WA becomes unreliable and the
+interpreter may crash badly (i.e. without a WS FULL error, and without
+any chance to )SAVE the workspace) when the available memory is exhausted.
+
+@item
+@BOP{-echoCIN}
 copy the input line (after editing) to stdout. For creating session logs.
 
 @item
-@option{--noCIN}
+@BOP{-noCIN}
 
 do not echo stdin to stdout. Almost a must for scripting (unless you
 troubleshoot a script).
 
 @item
-@option{--noCONT}
+@BOP{-to_COUT}
+
+normally GNU APL writes its output to stderr (i.e. file descriptor 2) so that,
+when GNU APL is started in a script, the output of the script appears on stdout
+(i.e. file descriptor 1) while the output of GNU APL appears on stderr.
+
+This option redirects the stderr output of GNU APL to stdout. The same effect
+can be achieved with the option "OUTPUT-TO-COUT   Yes" in a preferences file.
+
+@item
+@BOP{-tcp_port PORT}
+
+this option starts GNU APL as server that listens on TCP port PORT.
+Every TCP connection accepted by the server forks a new GNU APL instance
+which has its stdin, stdout, and stderr redirected to the TCP connection.
+
+WARNING: This option is dangerous if PORT is directly exposed to the internet!
+
+@item
+@BOP{-noCONT}
 
 do not load a SETUP or CONTINUE workspace on start-up.
 
 @item
-@option{--OFF}
+@BOP{-OFF}
 
 This option causes GNU APL to perform an automatic )OFF command after the
 last line of the last input file (as per -f option) was executed.
 
 @item
-@option{--PW COLS}
+@BOP{-PW COLS}
 
 set the initial value of ⎕PW to COLS (min. 30, max. 10000)
 
 @item
-@option{--[no]SV}
+@BOP{-[no]SV}
 
 do [not] start APserver (a shared variable server) on start-up. This disables
 communication with other workspaces or auxiliary processors through
 shared variables.
 
 @item
-@option{-p N}
+@BOP{p N}
 
-use profile number N in preferences files.
+use profile number N in preferences files. A preference file may contain
+several sets of settings for different purposes; the profile number selectes
+one of these sets.
 
 @item
-@option{--par pproc}
+@BOP{-par pproc}
 
 use processor parent ID pproc (default: no parent ID).
 
 @item
-@option{--rawCIN}
+@BOP{-rawCIN}
 
 do not emit ESC sequences. Normally ESC sequences are emitted for colored
 output and during line editing. In scripts, however, ESC sequences usually
 not wanted and can be turned off with this option.
 
 @item
-@option{-s}, @option{--script}
+@BOP{s}, @BOP{-script}
 
 this option is an abbreviation for:
- @option{--silent} @option{--noCIN} @option{--noCONT} @option{-f -}
+ @BOP{-silent} @BOP{-noCIN} @BOP{-noCONT} @BOP{f -}
 which is a typical combination of options for APL scripts.
 
 @item
-@option{-q}, @option{--silent}
+@BOP{q}, @BOP{-silent}
 
 suppress printing of the GNU APL welcome message. Useful for scripts.
 
 @item
-@option{--safe}
+@BOP{-safe}
 
 disable shared variables and native functions
 
 
 @item
-@option{--show_bin_dir}
+@BOP{-show_bin_dir}
 
 display the binary directory (where, according to ./configure,  the programs
 apl, APserver, AP100, and AP210 are supposed to be installed. Then exit.
 
 @item
-@option{--show_doc_dir}
+@BOP{-show_doc_dir}
 
 display the directory where, according to ./configure,  documentation files
 for GNU APL are installed. Then exit.
 
 
 @item
-@option{--show_etc_dir}
+@BOP{-show_etc_dir}
 
 display the system configuration directory where, according to ./configure,
 the preferences file for GNU APL is installed. Then exit.
 
 
 @item
-@option{--show_lib_dir}
+@BOP{-show_lib_dir}
 
 display the library directory where, according to ./configure, shared
 library files and the workspaces shipped with GNU APL are installed. Then exit.
 
 
 @item
-@option{--show_src_dir}
+@BOP{-show_src_dir}
 
 display the source directory where, according to ./configure, GNU APL
-was compiled. Then exit. This can be used, for example, by native functions\
+was compiled. Then exit. This can be used, for example, by native functions
 that are built outside the GNU APL source tree to find GNU APL header files
 that are needed to compile the native function.
 
 
 @item
-@option{--show_all_dirs}
+@BOP{-show_all_dirs}
 
 display all the directories above. Then exit.
 
 
 @item
-@option{-T testcases ...}
+@BOP{T testcases ...}
 run testcases. Testcases are text files that contain both input to the APL
 interpreter and the expected response from the interpreter. The output from
 the interpreter is compared with the expected output in the testcase file(s)
@@ -405,67 +478,81 @@ whether or not each of the testcases was successful.
 
 @item
 
-@option{--TM mode}
+@BOP{-TM mode}
 
 test mode. This option how the interpreter shall behave
-when running a number of testcases (as specified with the @option{-T} option)
+when running a number of testcases (as specified with the @BOP{T} option)
 
-@option{--TM 0} (default) run all testcases and exit after the last testcase.
+@BOP{-TM 0} (default) run all testcases and exit after the last testcase.
 
-@option{--TM 1} like @option{--TM 0} if no error was detected.
+@BOP{-TM 1} like @BOP{-TM 0} if no error was detected.
 However, if one of the testcases has failed, then the interpreter
 does not exit so that the user can investigate the state of APL
 (SI, variable values, etc.).
 
-@option{--TM 2} like @option{--TM 1}, but stay in the interpreter even if
+@BOP{-TM 2} like @BOP{-TM 1}, but stay in the interpreter even if
 all testcases have passed. This can be useful in order to quickly bring
 the interpreter into a specific state and continue manual troubleshooting
 from that state.
 
-@option{--TM 3} like @option{--TM 1}, but stop testcase execution after the
+@BOP{-TM 3} like @BOP{-TM 1}, but stop testcase execution after the
 first failed testcase (i.e. do not exit).
 
-@option{--TM 4} like @option{--TM 3}, but exit after the first failed
+@BOP{-TM 4} like @BOP{-TM 3}, but exit after the first failed
 testcase. The is useful for automatic regression tests, where no errors
 are expected.
 
 @item
-@option{--TR}
+@BOP{-TR}
 
 executes test case files in random order.
 
 @item
-@option{--TS}
+@BOP{-TS}
 
-Normally, when the interpreter is run with the @option{-T} option,
+Normally, when the interpreter is run with the @BOP{T} option,
 then an existing summary.log file is overridden without notice.
 This option causes new test results to be appended to a possibly
 existing summary.log instead of overriding it.
 
 @item
-@option{-v}, @option{--version},
+@BOP{v}, @BOP{-version},
 
 show version information and exit.
 
 @item
-@option{-u UID}
+@BOP{u UID}
 
 run as user with UID 0. This option can only be used by the root user (who
 then wants to run as a different user).
 
 @item
-@option{-w milli}
+@BOP{w milli}
 
 wait milli milliseconds at start-up. Useful to give other programs that are
 started together with this interpreter time to initialize themselves.
 
+@item @b{@verb{|  +APPOPT|}}
+@item @b{@verb{| ++APPOPT ARG1|}}
+@item @b{@verb{|+++APPOPT ARG1 ARG2|}}
+@item ...
+
+   Those command line options above that start with - are understood by the
+   GNU APL binary and their arguments must follow the description given for
+   them. In addition the interpreter also accepts command line options that
+   start with +. However, these options are not checked by the interpreter
+   in any way, but are but merely copied to ⎕ARG (see below). In these options,
+   APPOPT, ARG1, ARG2, ... are arbitrary strings that should not contain any
+   whitespace characters. The purpose of these options is to control aspects
+   of the APL application from the command line.
+
 @item
-@option{--}
+@BOP{-}
 
 end of command line options for the interpreter. GNU APL provides the system
 variable ⎕ARG that returns all command line options with which the GNU APL
 interpreter was invoked (similar to variable argv in main(int argv,
-char * argv[]) in C/C++). Option ---- can be used to separate command line
+char * argv[]) in C/C++). Option @BOP{-} can be used to separate command line
 options for the APL interpreter from command line options understood by APL
 applications.
 
@@ -475,8 +562,8 @@ Thus,
 
 @code{(⎕ARG ⍳ ⊂'--') ↓ ⎕ARG} returns the options for the APL application.
 
-All command line options after @code{--} are ignored by the interpreter
-(except making them available in ⎕ARG).
+All command line options after @BOP{-} are ignored by the interpreter
+(except for including them in ⎕ARG).
 
 @end itemize
 
@@ -660,34 +747,35 @@ in a 'preferences' file still follow the library root scheme.
 * Section 2.7::   Direct Functions (Lambdas)
 * Section 2.8::   ]DOXY Command
 * Section 2.9::   )DUMP and DUMP-HTML Commands
-* Section 2.10::  History and TAB completion
-* Section 2.11::  Logging Facilities
-* Section 2.12::  Rational Numbers
-* Section 2.13::  Hex Numbers
-* Section 2.14::  User-defined Commands
-* Section 2.15::  Structured Variables and Associative Arrays
-* Section 2.16::  Monadic ⊢ and ⊣, dyadic ⊢ with Axis
-* Section 2.17::  Bit-wise Logical Functions ⊤∧, ⊤∨, ⊤⍲, and ⊤⍱
-* Section 2.18::  Generalized ⍳
-* Section 2.19::  ⌹[X] - QR Factorization
-* Section 2.20::  Dyadic ⎕CR
-* Section 2.21::  Dyadic ⎕FX (Native Functions)
-* Section 2.22::  ⎕ARG  - Interpreter command line arguments
-* Section 2.23::  ⎕DLX  - Knuth's Dancing Links Algorithm
-* Section 2.24::  ⎕ENV  - Environment Variable
-* Section 2.25::  ⎕FIO  - File I/O Functions
-* Section 2.26::  ⎕FFT  - Fast Fourier Transform
-* Section 2.27::  ⎕GTK  - GTK Interface
-* Section 2.28::  ⎕JSON - JSON Parsing
-* Section 2.29::  ⎕MAP  - Map Value
-* Section 2.30::  ⎕PLOT - Plot Data
-* Section 2.31::  ⎕PS   - Print Style
-* Section 2.32::  ⎕RE   - Regular Expressions
-* Section 2.33::  ⎕RVAL - Random APL value
-* Section 2.34::  ⎕SQL  - SQL Database Interface
-* Section 2.35::  ⎕SI   - State Indicator
-* Section 2.36::  ⎕SYL  - System limits
-* Section 2.37::  ⎕XML - XML Parsing
+* Section 2.10::  ]NEXTFILE and ]PUSHFILE Commands
+* Section 2.11::  History and TAB completion
+* Section 2.12::  Logging Facilities
+* Section 2.13::  Rational Numbers
+* Section 2.14::  Hex Numbers
+* Section 2.15::  User-defined Commands
+* Section 2.16::  Structured Variables and Associative Arrays
+* Section 2.17::  Monadic ⊢ and ⊣, dyadic ⊢ with Axis
+* Section 2.18::  Bit-wise Logical Functions ⊤∧, ⊤∨, ⊤⍲, and ⊤⍱
+* Section 2.19::  Generalized ⍳
+* Section 2.20::  ⌹[X] - QR Factorization
+* Section 2.21::  Dyadic ⎕CR
+* Section 2.22::  Dyadic ⎕FX (Native Functions)
+* Section 2.23::  ⎕ARG  - Interpreter command line arguments
+* Section 2.24::  ⎕DLX  - Knuth's Dancing Links Algorithm
+* Section 2.25::  ⎕ENV  - Environment Variable
+* Section 2.26::  ⎕FIO  - File I/O Functions
+* Section 2.27::  ⎕FFT  - Fast Fourier Transform
+* Section 2.28::  ⎕GTK  - GTK Interface
+* Section 2.29::  ⎕JSON - JSON Parsing
+* Section 2.30::  ⎕MAP  - Map Value
+* Section 2.31::  ⎕PLOT - Plot Data
+* Section 2.32::  ⎕PS   - Print Style
+* Section 2.33::  ⎕RE   - Regular Expressions
+* Section 2.34::  ⎕RVAL - Random APL value
+* Section 2.35::  ⎕SQL  - SQL Database Interface
+* Section 2.36::  ⎕SI   - State Indicator
+* Section 2.37::  ⎕SYL  - System limits
+* Section 2.38::  ⎕XML - XML Parsing
 @end menu
 
 There are a few hopefully useful features in GNU APL:
@@ -739,7 +827,7 @@ work, the first line of the script must have a special format
     #! /usr/local/bin/apl --script
 @end verbatim
 
-@option{--script} prevents: printing of a welcome banner, 
+@BOP{-script} prevents: printing of a welcome banner, 
 echoing of stdin to stdout, automatic loading of a )CONTINUE workspaces,
  and prevents starting of a thread for shared variable communication.
 
@@ -758,12 +846,12 @@ passed on to APL. We briefly discuss both cases:
 
 0. General Remark
 
-There is a convention in GNU APL that command line options (and
-possibly option arguments) that occur left of '----' are options directed
-to (and understood by) the APL interpreter while options right of '----' are
-passed to the APL application (and their exact format is defined by the
-application). The command line options that were used to start APL can be
-retrieved with ⎕ARG.
+There is a convention in (not only) GNU APL, that the command line options (and
+possibly an optional option argument) that occur left of @BOP{-} are options
+directed to (and understood by) the APL interpreter while the options right
+of @BOP{-} are passed to the APL application (and their exact format is then
+defined by the APL application). All command line options that were used to
+start APL can later be retrieved with the system variable ⎕ARG in APL.
 
 Example 1: APL started directly
 
@@ -785,13 +873,32 @@ app2
 
 Example 2: APL started indirectly
 
-Starting APL indirectly means that there is a script (a text file with execute
-permission) that contains APL code and has a special first line as described
-above. There are now two sets of command line options: those passed to the
-script and those on the first line of the scripts. When the script is started,
-possibly with command line arguments, then the command line arguments entered
-by the user are combined with the arguments on the first line of the script
-in a way that is described in 'man 2 execve'.
+A script is is a text file file which as execute permissions. The first line
+of a script, commonly known as the @b{shebang} of the script, has a
+special format which specifies how the subsequent lines of the script file
+shall be processed, see @b{man execve} for details.
+
+A GNU APL script is then a script whose shebang indicates the apl binary as
+the intepreter for the subsequent lines where those subsequent lines are
+either APL commands or APL statements. With some limitations, executing such
+an APL script yields the same result as entering the subsequent lines in
+immediate execution mode.
+
+When APL is started directly, then there is only one (possibly empty) set
+ of command lines options, which are processed by the shell and then passed
+to the apl binary.
+
+Starting APL indirectly refers to executing an APL script. In this case
+there are two sets of command line options:
+
+@itemize
+@item those passed to the script as command line arguments, and
+@item those on the shebang line of the scripts
+@end itemize
+
+When the APL script is started, possibly with command line arguments, then the
+command line arguments entered by the user are combined with the arguments
+on the shebang line of the script in a way that is described in 'man 2 execve'.
 
 Assume the script file SCRIPT.apl contains this (the file is shipped
 with GNU APL):
@@ -822,10 +929,11 @@ sarg1
 sarg2 
 @end verbatim
 
-This tells us that the different names are constructed by execve() in the
-following order:
+This suggests that the options and option argments are constructed by execve()
+(the function that is eventually responsible for processing scripts in shells
+and other executables) in the following order:
 
-1. Interpreter name (the first name in the script file, here: /usr/local/bin/apl)
+1. Interpreter name (the first name in the shebang, here: /usr/local/bin/apl)
 
 2. Optional Interpreter arguments (here: ----script)
 
@@ -837,7 +945,7 @@ CAUTION: as discussed in 'man 2 execve' the interpretation of the optional
 interpreter arguments (2. above) is system specific and possibly not portable.
 For that reason the optional interpreter argument should not be missing (you
 can use ---- to provide at least one argument) and also not more than one
-argument. On GNU/Linux systems the following first lines of the script are
+argument. On GNU/Linux systems the following shebang lines of the script are
 understood:
 
 @verbatim
@@ -849,28 +957,51 @@ understood:
 /usr/local/bin/apl --script --
 @end verbatim
 
-The recommended form is: /usr/local/bin/apl ----script
+The recommended form is: @verb{|/usr/local/bin/apl --script|}.
 
-Note that '----' and options that follow it ARE NOT shown in ⎕ARG if they
-are given on the first line of the script, while '----' and options that follow
-on the script command line ARE shown. There is no point in passing application
-options in the script file via the command line to apl; instead you can use
-them directly in the script.
+Note that @BOP{-} and any options that follow it on the shebang line
+MAY OR MAY NOT be occur in ⎕ARG (this depends on the platform used). In
+contrast,  options that follow @BOP{-} on the script command line
+WILL BE shown since this is controlled by GNU APL and not by the platform.
+There is normally no point in passing any application options on the shebang
+line to APL because such parameters can more easily be provided directly
+further down in the script. However in cases where the script has only
+application options it may be convenient to make @b{@verb{|--|}} the last
+option of the shebang so that the user of the script need not specify it
+manually.
 
-Using '----' as last argument on the first line of the script file prevents any
-of the options given to the script to be interpreted as APL options; all
-such options are passed to the application via ⎕ARG.
+Using @BOP{-} on the shebang line of the script file usually prevents
+subsequent options on the shebang line from being interpreted as APL options
+(and, more importantly, from causing @b{unknown option} errors when GNU APL
+starts). At least under GNU/Linux with @b{bash} the subsequent options will
+be passed to the APL application via ⎕ARG.
+
+Depending on this exact behaviour cannot be recommended. A cleaner approach is
+to use options starting with - or @BOP{-} only for the interpreter
+options, and options starting with + for application options. This should
+work on all platforms because for strings, say, APLOPT, ARG1, ARG2, ...,
+which contain no whitespace:
+
+@itemize
+@item @b{+APLOPT} is ignored, although shown in ⎕ARG,
+@item @b{++APLOPT ARG1} is ignored, although shown in ⎕ARG,
+@item @b{+++APLOPT ARG1 ARG2} is ignored, although shown in ⎕ARG,
+@item @b{...}
+@end itemize
 
 @subsection Helpful Features for Scripting
 
-In order to be really useful for scripting, three more features have been added:
+GNU APL provides three system variables and functions that are particularly
+useful for scripting:
 
 @itemize
-@item ⎕ARG: access to the command line arguments given to the interpreter
+@item ⎕ARG: access to the command line arguments given to the interpreter,
 @item ⎕ENV: access to the environment variables of the process running the
         interpreter, and
 @item ⎕INP: Here-Document-alike function for creating large text variables
 @end itemize
+
+@subsubsection ⎕ARG
 
 The system variable ⎕ARG contains all command line arguments passed to the
 interpreter. In the initial example above this would be a nested 3-element
@@ -880,26 +1011,50 @@ vector:
     /usr/local/bin/apl --id 1010
 @end verbatim
 
-A feature particularly useful for CGI scripting (where some information is
-passed to the APL script via environment variables) is the monadic system
-function ⎕ENV B. ⎕ENV B returns all environment variables whose name
-starts with B. If ⍴B is 0, like:
+@subsubsection ⎕ENV
+
+There are usually at least two ways of passing parameters to a script:
+
+@itemize
+@item as command line options, and/or
+@item by means of environment variables
+@end itemize
+
+Just like the system variable ⎕ARG makes the command line optios used available
+to APL, does the system function ⎕ENV make the environment variables available
+to APL. Since there normally exist far more environment variables than command
+line options, ⎕ENV is a monadic function whose argument is a filter for the
+name(s) of the variable(s) to be retrieved.
+
+⎕ENV B returns all environment variables whose name starts with B.
+If ⍴B is 0, like:
 
 @verbatim
     ⎕ENV ''
 @end verbatim
 
-then all environment variables are returned.
-The result of ⎕ENV is a N-by-2 matrix.
-The first column is the name of the environment variable.
-The second column is the value of the variable.
-The number N of environment variables returned obviously depends on
-the number of environment variables whose name begins with the prefix
-given in B. B is case sensitive; by convention the names of environment
-are all uppercase.
+then @b{all} environment variables of the process running GNU APL are
+returned.
 
-If you need to create a longer text, like the body of a web page, then you
-would normally construct it like this:
+The result of ⎕ENV is a (possibly empty) N×2 matrix. The first column
+contains the the name(s) of the environment variable(s), while the second
+column contains their value(s). The name and the value are both strings.
+
+The number N of environment variables returned by ⎕ENV obviously depends on
+the number of environment variables whose name begins with the prefix
+given in B; shorter prefixes B therefore result in higher counts N. B is case
+sensitive; by convention the names of environment variables are all uppercase.
+Note the subtle difference between shell variables and environment variables
+in shells like @b{bash}: ⎕ENV returns only environment variables (which
+are set with command @b{setenv} in bash), but not shell variables (which
+are set with command @b{set} in bash). For a shell variable to occur
+in ⎕ENV it must be @b{export}ed into the environment of the process
+before the GNU APL interpreter is started.
+
+@subsubsection ⎕INP
+
+If you need to create a longer static text, like the body of a web page,
+then you would normally construct it in APL like this:
 
 @verbatim
 BODY ← ⊂ 'First line'
@@ -908,8 +1063,8 @@ BODY ← BODY , ⊂ 'Third line'
    ...
 @end verbatim
 
-That is not very handy for longer texts. Instead you can write the following
-in an APL script:
+The above is obviously not very handy for longer texts. Instead you may
+write the following in a GNU  APL script:
 
 @verbatim
 BODY←⎕INP 'END-OF-⎕INP'
@@ -921,32 +1076,72 @@ END-OF-⎕INP
 @end verbatim
 
 This works like "Here documents" in @b{bash}. The right argument of ⎕INP is
-the end of text marker, ⎕INP also has a dyadic form where the left argument
-specifies an escape sequence from text to apl and back to the text, similar
-to PHP scripts:
+the end of text marker.
 
-'<?apl' '?>' ⎕INP 'END-OF-⎕INP'
+⎕INP also has a dyadic form where the left argument specifies an escape
+sequence from text to APL and back to the text, similar to PHP scripts.
+For example:
+
+@verbatim
+Z←'<?apl' '?>' ⎕INP 'END-OF-⎕INP'
 First line
 Time is now: <?apl ⍕⎕TS ?>
 Third line
 ...
 END-OF-⎕INP
+@end verbatim
+
+This creates a mainly static text with a small dynamic plug-in computed by
+APL:
+
+@verbatim
+      ⊃Z
+First line                       
+Time is now: 2022 8 4 15 15 2 177
+Third line                       
+...         
+@end verbatim
+
+
+It should be noted that, while ⎕INP simplifies the construction of multi-line
+strings compared to standard APL, it has come to age and these days an even
+simpler feature - Multi-line strings as described below - is provided for the
+same purpose. The monadic ⎕INP has therefore become obsolete.
+
+@subsection Double-quoted Strings
+
+Standard APL literals (aka. strings) such as 'Hello' are single quoted. As a
+matter of convenience, GNU APL also provides double-quoted strings which
+differ from single quoted strings in two ways:
+
+@itemize
+
+@item A standard single quoted APL is a vector if its length is ≠ 1 but a
+scalar if its length is = 1. This is sometimes inconvenient and therefore
+double-quoted strings are more consistent in always being vectors regardless
+of their length. In other words, 'A' is a scalar while "A" is a vector.
+
+@item doubly quoted strings understand the standard C escape sequences
+for control character, such as \n for ASCII line feed, \t for ASCII TAB etc.
+
+@end itemize
+
 
 @subsection Multi-Line Strings
 
 Another feature of GNU APL to simplify the creation of values that contain
 longer texts are strings that span several lines. One consequence of how ⎕INP
-works is that the strings read by ⎕INP always originate in stdin of the
+works is that the strings read by ⎕INP always originate in @b{stdin} of the
 interpreter. In immediate execution mode (and therefore also in APL scripts)
-stdin is the next lines entered by the user (interactive APL sessions) or
-the next lines in the script file (in APL scripts). Often, however, a
-programmer wants to specify long strings inside a defined function and not
-on the top-level of an APL script. That renders ⎕SI almost useless for
-defined functions.
+reading @b{stdin} returns either the next lines entered by the user
+(in interactive APL sessions) or else the next lines in the script file
+(in APL scripts). Often, however, a programmer wants to specify long strings
+inside a defined function and not e.g.  on the top-level of an APL script.
+That renders ⎕INP almost useless for defined functions.
 
-In order to provide a way for defining long strings inside defined functions,
-multi-line strings were introduced. They come in two flavors: old-style
-and new-style.
+In order to provide a better way for defining long strings inside defined
+functions, multi-line strings were introduced. They come in two flavors:
+old-style and new-style.
 
 @subsubsection Old-style Multi-Line Strings
 
@@ -956,10 +1151,13 @@ because could easily be entered by mistake (by simply forgetting the
 terminating " or ' of a string) and that would have obscured the traditional
 behavior of immediate execution mode.
 
-An  old-style multi-line string starts at the last " in a line of a defined
-function that has line with an odd number of " characters.  It continues over
-the subsequent function lines until the next ". The result is a nested APL
-value containing one nested string per line involved.
+An old-style multi-line string starts at the last " in a line of a defined
+function that has line with @b{an odd number of " characters}.  It continues
+over the subsequent function lines until the next ". The result is a nested
+APL value containing one nested string per line involved. This method of
+specifying a multi-line string was adopted from the @b{bash} shell. In
+immediate execution mode an old-style multi-line string yields
+@b{No string end found}.
 
 For example:
 @verbatim
@@ -1002,22 +1200,23 @@ ABC
 
 Even though the combination of ⎕INP for immediate execution and multi-line
 strings for defined functions achieved the goal of specifying large amounts
-of text in a simple manner, its  was certainly not very intuitive or elegant
-to have different approaches for different APL modes.
+of text in a simple manner, it was certainly neither intuitive nor elegant
+to have different approaches for the different APL modes.
 
 This was leading to the new-style multi-line strings. They adopted the triple
 quote (""") syntax know from e.g. the Python language. The syntax of new-style
-multi-line strings cleaner: empty lines are handled more consistently and the
-string lines are completely separated from the APL code lines.
+multi-line strings is cleaner: empty lines are handled more consistently and
+the string lines are completely separated from the APL code lines.
 More importantly, new-style multi-line strings work alike in immediate
 execution mode, in scripts, and in defined functions. New-style strings are a
-little different and more restrictive than their old-style companions:
+little different and syntactically stricter than their old-style companions:
 
 @itemize
-@item the starting """ must be placed at the end of an APL code line, i.e. no
-mixing of APL code and string content on the same line. In old-style strings
-the APL line on which the string started became part of the string while
-in new-style strings the strings begins at the following line.
+@item the starting """ must be placed at the end of an APL code line, i.e.
+there is no more mixing of APL code and string content on the same line.
+An old-style string starts with APL code and ends with the first line of
+the string, while a new-style string starts with an APL code line and
+the string itself begins at the following line.
 
 @item the ending """ must be placed at the end of a separate lines with only
 spaces allowed before the """ (to vertically align it with the leading """ if
@@ -1079,7 +1278,7 @@ If SCRIPT.apl is redirected to stdin of the APL interpreter:
 
 then the first line @option{#! /usr/local/bin/apl --script} of file SCRIPT.apl 
 is merely a comment (GNU APL accepts both the traditional APL character
-⍝ and the character # as start of a comment). The @option{--script} option
+⍝ and the character # as start of a comment). The @BOP{-script} option
 is therefore ignored and the following mix of input and output is
 shown on the screen. The input from the script is indented by the
 usual APL prompt of 6 blanks, while the output of the APL interpreter
@@ -1108,7 +1307,7 @@ Then we get:
 
 @end verbatim
 
-The @option{--script} implies @option{--noCIN} so that the
+The @BOP{-script} implies @BOP{-noCIN} so that the
 input lines for the interpreter are no longer echoed to the output.
 That is most likely what you want when writing a script.
 
@@ -1196,8 +1395,8 @@ Use this feature carefully!
 
 The APL interpreter gets its input from the standard input (stdin),
 which is normally connected to the user's keyboard,
-but can also be a file if APL scripting, the @option{-f} option,
- or the @option{-T} option is used.
+but can also be a file if APL scripting, the @BOP{f} option,
+ or the @BOP{T} option is used.
 
 The APL interpreter prints its results on either the standard output (stdout)
 for normal APL output, or to the error output (stderr) for additional
@@ -1221,44 +1420,75 @@ contains a description of all possible color settings.
 @node    Section 2.4
 @section Comparison Rules
 
-Both IBM APL2 and the ISO standard require that the arguments of <, ≤, ≥, and
-> (but not of = or ≠) are integer or real numbers, and that the argument of
-monadic ⍋ or ⍒ is a vector of integer or real numbers. In contrast GNU APL
-also allows the comparison of characters and numbers or the comparison of
-complex numbers according to the following, more general, rules.
+Both IBM APL2 and the ISO standard require that the arguments of <, ≤, ≥,
+and > (but not of = or ≠) are integer or real numbers. As a consequence,
+the argument(s) of ⍋ or ⍒ (which require comparison) must also a vector of
+integer or real numbers.
 
-Let A and B two APL values to be compared. The first comparison below that
-succeeds (i.e. returns a result) is then the result of comparing A and B.
- 
-1. Comparison by rank: if (⍴⍴A) < (⍴⍴B) then A < B. And vice versa.
+In contrast, GNU APL also allows the comparison of characters and numbers or
+the comparison of complex numbers according to the following, more general,
+rules.
 
-2. Comparison by shape: if (⍴A) < (⍴B) then A < B. And vice versa. The
-   first different shape item decides.
+Let A and B two APL values to be compared. Then the final result of comparing
+A and B is the first verdict (i.e. either A < B, or A > B, or A = B) obtained
+when following the rules below (and in that order):
 
-3. Comparison of ravel elements: otherwise ⍴A and ⍴B are equal. If all
-   corresponding ravel elements of A and B are equal (i.e. tolerantly equal
-   within ⎕CT as defined in the ISO standard) then A = B. Otherwise let A1
-   and B1 the first corresponding ravel elements of A and B with A1≠B1.
-   If A1 < B1 then A < B and vice versa. The comparison A1 < B1 is made
-   according tho the following rules.
+@enumerate
+@item
+Comparison by rank: if (⍴⍴A) < (⍴⍴B) then A < B. And vice versa.
 
-4. Comparison by depth: if A1 is simple (a single character or number) and
-   B1 is not (i.e. B is nested) then A1 < B1 and vice versa. If A1 and B1 are
-   both nested, then the above rules are applied recursively. If both are simple
-   then they are compared according to the rules below.
+@item
+Comparison by shape: if (⍴A) < (⍴B) then A < B. And vice versa. The
+first differing shape item (from the left) decides.
 
-5. Comparison by Unicode: if A1 and B1 are both character values and
-   (⎕UCS A1) < (⎕UCS B1) then A < B. And vice versa.
+@item
+Comparison of ravel elements: at this point (⍴A) ≡ (⍴B). If all
+corresponding ravel elements of A and B are equal (i.e. tolerantly equal
+within ⎕CT as defined in the ISO standard) then A = B.
 
-6. Comparison by type: If A1 is a character and B1 is numeric, then A < B.
-   And vice versa.
+Otherwise let A1 and B1 the first corresponding ravel elements of A and B
+with A1 ≠ B1. If A1 < B1 then A < B and vice versa. The comparison A1 < B1
+is made according to the following rules 4. - 7. below.
 
-7. Comparison by numeric value: if A1 and B1 are both numeric values then:
+@item
+Comparison by depth:
 
-7a. Comparison by real part: if (9○A1) < (9○B1) then A < B. And vice versa.
+@itemize
+@item
+If A1 and B1 are both nested: the rules 1. - 4. above are (recursively)
+applied to corresponding ravel elements of ⊃A1 and ⊃B1 until a verdict is
+obtained.
 
-7a. Comparison by imaginary part: otherwise if (11○A1) < (11○B1) then A < B.
-    And vice versa.
+@item if A1 is simple and B1 is nested then A < B. And vice versa.
+
+@item
+otherwise (i.e.  A1 and B1 are both simple): A < B if A1 < B1 according to
+rules 5. - 8. below. And vice versa.
+@end itemize
+
+@item
+Comparison by Unicode: if A1 and B1 are both character values and
+(⎕UCS A1) < (⎕UCS B1) then A < B. And vice versa.
+
+@item
+Comparison by type: If A1 is a character and B1 is numeric, then A < B.
+And vice versa.
+
+@item
+Comparison by numeric value: if A1 and B1 are both numeric values then:
+
+@itemize
+@item
+Comparison by real part: if (9○A1) < (9○B1) then A < B. And vice versa.
+
+@item
+Comparison by imaginary part: otherwise if (11○A1) < (11○B1) then A < B.
+And vice versa.
+@end itemize
+
+@item
+Otherwise: A = B.
+@end enumerate
 
 Another way of describing the rules above is that the comparison of two values
 is comprised of sub-comparisons of certain properties of the values in the
@@ -1270,7 +1500,7 @@ following order:
 @item the first differing ravel element (in row-major order) of the values,
 @item the depths of the differing ravel elements,
 @item the types (character vs. numeric) of the differing ravel elements,
-@item the Unicodes of the differing ravel elements
+@item the Unicodes of the differing ravel elements (if applicable)
 @item the real parts of numeric values,
 @item the imaginary parts of numeric values,
 @end itemize
@@ -1294,13 +1524,12 @@ The reason for comparing complex numbers first by their real parts and then
 by their imaginary part and not, for example, first by their magnitude and
 then by their angle is that the chosen order gives more consistent results
 when comparing near-complex numbers or their true real companions. For
-example, a magnitude first comparison of complex numbers would make ¯1 < ¯2J∈
-for a near-complex ¯2J∈ but ¯1 > ¯2 for a true real ¯2.
+example, a magnitude first comparison of complex numbers would make
+¯2 < ¯1 < ¯2J0E¯20 for the near-complex number ¯2J0E¯20.
 
-
-@strong{CAUTION}: The comparison of two strings (i.e. nested character
+@b{CAUTION}: The comparison of two strings (i.e. nested character
 vectors) may give unexpected results because shorter strings come before
-longer strings. For example, 'Zoo' comes @strong{before} 'Adam' even
+longer strings. For example, 'Zoo' comes @b{before} 'Adam' even
 though one might expect the opposite.
 
 @verbatim
@@ -1313,7 +1542,7 @@ though one might expect the opposite.
 
 This pitfall can be avoided by enforcing the same length for all strings
 being compared or sorted. A simple way to achieve that is the use of
-@strong{⊂[2]⊃} like this (assuming IO←1):
+@b{⊂[2]⊃} like this (assuming IO←1):
 
 @verbatim
       Z[⍋Z ← ⊂[2]⊃ 'Adam' 'Zoo']
@@ -1522,7 +1751,7 @@ scripting).
 @subsection )DUMP-HTML Command
 
 The )DUMP-HTML command is similar to the )DUMP command. The output format
-is similar to the )DUMP command, the difference is that those characters\
+is similar to the )DUMP command, the difference is that those characters
 that need HTML-escaping (e.g. '<' becomes &lt;, '>' becomes '&gt;) are being
 HTML-escaped. The output of the )DUMP-HTML command can therefore be directly
 used by a web server to display workspace listings (in order to share the
@@ -1545,6 +1774,48 @@ is silently being ignored. This speeds up the )COPYing of libraries that
 occur in several )DUMPed or )SAVEd workspace.
 
 @node    Section 2.10
+@section ]NEXTFILE and ]PUSHFILE Commands
+
+@subsection ]NEXTFILE
+
+The debug command ]NEXTFILE, when used in an APL script file, terminates
+the processing of that file and continues processing in the next script file
+(if any) or else enters immediate execution mode. Unlike )OFF (which terminates
+the interpreter), ]NEXTFILE does not terminate the interpreter but only changes
+its input source to the next script file (if there is one remaining) and enters
+immediate execution only if all scripts were processed.
+
+The user may, for example, want to use the space near the end of the script
+to add longer comments (as to what the script does, how it works, how it is
+used, etc.) without the need to prepend every line with ⍝ or #.
+
+For example:
+
+@verbatim
+#/usr/local/bin/apl
+
+⍝ see documentation at the end of this file
+
+<APL CODE...>
+
+]NEXTFILE
+
+This workspace does the following...
+
+@end verbatim
+
+
+@subsection ]PUSHFILE
+
+The debug command ]PUSHFILE is similar to ]NEXTFILE in that it terminates the
+processing of the current script file. Unlike ]NEXTFILE, ]PUSHFILE does
+not proceed to the next script file but enters a new immediate execution
+context in which the user can interact with the interpreter. This context
+can be processes input until a ]NEXTFILE command is given. After the
+]NEXTFILE that leaves the immediate execution context processing proceeds
+at the next line after the ]PUSHFILE command.
+
+@node    Section 2.11
 @section History and TAB completion
 
 Until GNU APL 1.4 / SVN 465, GNU APL used libreadline for interactive user
@@ -1586,7 +1857,7 @@ recalling function lines (and which are not fully supported in GNU APL).
     function or variable name.
 
 
-@node    Section 2.11
+@node    Section 2.12
 @section Logging Facilities
 
 The APL interpreter has over 30 logging facilities. Each logging facility
@@ -1635,7 +1906,7 @@ state. The command
 toggles the state of logging facility N from OFF to ON and back.
 
 
-@node    Section 2.12
+@node    Section 2.13
 @section Rational Numbers
 
 GNU APL has limited support for rational numbers. Instead of dividing integers
@@ -1655,7 +1926,7 @@ For that reason support for rational numbers is disabled by default and must
 be enabled via ./configure (see README-2-configure).
 
 
-@node    Section 2.13
+@node    Section 2.14
 @section Hex Numbers
 
 GNU APL supports sedecimal numbers. They start with $ and can be uppercase or
@@ -1670,7 +1941,7 @@ lowercase:
 
 @end verbatim
 
-@node    Section 2.14
+@node    Section 2.15
 @section User-defined Commands
 
 There is a simple mechanism to define additional APL commands. This mechanism
@@ -1705,14 +1976,13 @@ be deleted like this:
       ]USERCMD REMOVE-ALL
 @end verbatim
 
-XXXXXX
 @c ----------------------------------------------------------------------------
-@node    Section 2.15
+@node    Section 2.16
 @section Structured Variables and Associative Arrays
 
 GNU APL has implemented two features that are closely related because, under the
-hood, they share the same implementation: @strong{structured variables} and
-@strong{associative arrays}.
+hood, they share the same implementation: @b{structured variables} and
+@b{associative arrays}.
 
 @c ----------------------------------------------------------------------------
 @subsection Structured Variables
@@ -1731,9 +2001,9 @@ structured variables and lowercase names for their members. For example:
       PERSON.address.street
 @end verbatim
 
-is a structured variable @strong{PERSON}, which has a member @strong{address},
-and @strong{PERSON.address} is a structured (sub-)variable of PERSON which has
-a member @strong{street}.
+is a structured variable @b{PERSON}, which has a member @b{address},
+and @b{PERSON.address} is a structured (sub-)variable of PERSON which has
+a member @b{street}.
 
 For a structured variable and all its sub-variables, the usual rules for
 normal variables apply. They can be created, erased, and even passed as
@@ -1754,7 +2024,7 @@ intermediate members are created automatically. For example:
       PERSON.address.street ←  '42 Main Street'   ⍝ implicitly creates PERSON.address
 @end verbatim
 
-Empty structured variables can be created with @strong{38 ⎕CR}:
+Empty structured variables can be created with @b{38 ⎕CR}:
 
 @verbatim
       EMPTY ← 38 ⎕CR CAPACITY ← 32
@@ -1765,13 +2035,13 @@ added to it. From time to time this expansion exceeds the space allocated
 for the members of the variable and then the existing members need to be
 copied into a new, larger structure. The overhead caused by this reorganization
 can be avoided by specifying a sufficiently large capacity when the structure is
-created (with @strong{38 ⎕CR}).
+created (with @b{38 ⎕CR}).
 
-An entire structured variable can be erased with @strong{⎕EX} or with\
-@strong{)ERASE} just like other variables. That erases the variable along
+An entire structured variable can be erased with @b{⎕EX} or with
+@b{)ERASE} just like other variables. That erases the variable along
 with all its members. In addition to erasing an entire structured variable,
-individual members at any depth can also be erased with @strong{⎕EX} or
-@strong{)ERASE}:
+individual members at any depth can also be erased with @b{⎕EX} or
+@b{)ERASE}:
 
 @verbatim
       )ERASE PERSON.address      ⍝ OK, PERSON.address exists
@@ -1798,11 +2068,11 @@ to the file system on a computer. This tree has:
 @itemize
 @item one root (which is the structured variable itself),
 
-@item zero or more non-leafs (like subdirectories of the top-level root
+@item zero or more non-leafs (like sub-directories of the top-level root
   directory), and
 
 @item zero or more leafs. The case of zero non-leafs occurs, for example, directly
-  after a new empty variable was created with @strong{38 ⎕CR}.
+  after a new empty variable was created with @b{38 ⎕CR}.
 @end itemize
 
 Due to their tree-like structure, structured variables need to be printed somewhat
@@ -1856,7 +2126,7 @@ structured variable is valid and concatenates the members:
 leaf-cde
 @end verbatim
 
-The file @strong{src/testcases/Structured_variable.tc} contains the examples
+The file @b{src/testcases/Structured_variable.tc} contains the examples
 above (and more) 
 
 @c ----------------------------------------------------------------------------
@@ -1864,9 +2134,9 @@ above (and more)
 
 APL arrays are primarily indexed with numbers (or arrays of numbers), which is
 also the most efficient method. Many other languages provide, in either addition
-or else alternatively, a method to index arrays by @strong{keys}, where the keys
+or else alternatively, a method to index arrays by @b{keys}, where the keys
 are frequently characters strings. Such arrays are commonly referred to
-as @strong{associative arrays}.
+as @b{associative arrays}.
 
 APL has no associative array per se, but the structured variables in GNU APL
 can be used for the same purpose. The only limitation is (currently) that the
@@ -1993,8 +2263,7 @@ returns all keys (= members) of ASSOC_ARRAY, therefore the number of members
 is ⍴ASSOC_ARRAY[;1] and the capacity is ↑⍴ASSOC_ARRAY.
 
 
-XXXXXX
-@node    Section 2.16
+@node    Section 2.17
 @section Monadic ⊢ and ⊣, dyadic ⊢ with Axis
 
 Monadic ⊢ is the identity function. It returns its (committed or non-committed)
@@ -2028,7 +2297,7 @@ the run-time of ⊣B from O(,B) to O(1). Also, ⊢B is marginally faster than �
 
 Dyadic ⊢ with axis is a selection function that generalizes ⊣ and ⊢.
 
-Let @b{Z←A[X] B}. Then:
+Let @b{Z←A ⊣[X] B}. Then:
 
 @itemize
 @item if X is a one-element vector and ↑X is 0 then Z ≡ A,
@@ -2060,7 +2329,7 @@ a*c
 @end verbatim
 
 
-@node    Section 2.17
+@node    Section 2.18
 @section Bit-wise Logical Functions ⊤∧, ⊤∨, ⊤⍲, ⊤⍱, T≠, and T=
 
 The APL functions And (∧), Or (∨), Nand (⍲), and Nor (⍱) operate primarily on
@@ -2119,7 +2388,7 @@ ABBADEAD
 @subsection Dyadic ⊤∧, ⊤∨, ⊤⍲, ⊤⍱, ⊤=, and ⊤≠
 
 The dyadic forms of @b{⊤∧}, @b{⊤∨}, @b{⊤⍲}, and @b{⊤⍱} are simply the bit-wise
-variants of their Boolean companions:
+variants of their Boolean counterparts:
 
 @verbatim
       A ⊤∧ B    ←→    2⊥ ((64⍴2)⊤A) ∧ (64⍴2)⊤B      ⍝ aka. AND
@@ -2132,7 +2401,7 @@ variants of their Boolean companions:
 
 @subsection Monadic ⊤∨ and ⊤⍱
 
-@b{⊤∧} and @b{⊤⍲}  have no monadic form, but @b{⊤∧}, @b{⊤∨}, and @b{⊤⍱} do.
+@b{⊤∧} and @b{⊤⍲} do not have a monadic form, but @b{⊤∧}, @b{⊤∨}, and @b{⊤⍱} do.
 Formally monadic @b{⊤∨} resp, @b{⊤⍱} are dyadic @b{⊤∨} resp, @b{⊤⍱} with
 a left argument of 0:
 
@@ -2235,7 +2504,7 @@ BE
 255 255 255 190
 @end verbatim
 
-@node    Section 2.18
+@node    Section 2.19
 @section Generalized ⍳
 
 @subsection Generalized monadic ⍳
@@ -2264,7 +2533,7 @@ Each item of the result Z is then either a nested integer vector (if the item
 was found) or @b{- different from the standard case (!) -} the empty vector ⍬
 if the item was not found).
 
-@node    Section 2.19
+@node    Section 2.20
 @section ⌹[X] - QR Factorization
 
 Z←⌹[X] B computes a QR factorization of the real or complex matrix B. The axis
@@ -2390,7 +2659,7 @@ Example 2 (complex over-determined B)
 Please note as well that QR factorization is currently experimental. So
 please double-check its results before using it in production code.
 
-@node    Section 2.20
+@node    Section 2.21
 @section Dyadic ⎕CR
 
 The ⎕CR function has an optional left argument that selects one of several
@@ -2514,7 +2783,7 @@ positive char in C/C++). Real, Complex, or rational numbers are never proper
 byte values even if their value is close to an integer. Nor are nested APL
 values or values being assigned.
 
-@node    Section 2.21
+@node    Section 2.22
 @section  Dyadic ⎕FX (Native Functions)
 
 A Native Function is a function that can be called in APL like a normal user
@@ -2590,14 +2859,14 @@ system function ⎕FIO. The syntax of ⎕FIO is the same as for FILE_IO. The
 )CLEAR workspace command will close all open files. 
 
 
-@node    Section 2.22
+@node    Section 2.23
 @section ⎕ARG - Interpreter command line arguments
 
 ⎕ARG contains the command line arguments with which GNU APL was invoked.
 @xref{Section 2.1}.
 
 
-@node    Section 2.23
+@node    Section 2.24
 @section ⎕DLX - Knuth's Dancing Links Algorithm
 
 ⎕DLX is an implementation of Donald Knuth's Dancing Links Algorithm (called
@@ -2689,10 +2958,21 @@ probably every programmer has programmed at some point in time):
       ⍝     rows   cols   diag1    diag2
       Q8←⊃{(R⌽RC),(C⌽RC),((C-R)⌽D),((¯7-R+C)⌽D)⊣(R C)←-8 8⊤⍵-⎕IO} ¨ ⍳64
       Z←¯1 ⎕DLX Q8
-      {⎕UCS (65+⌊⍵÷8)(49+8∣⍵←⍵-⎕IO)} ¨ ⊃Z[1 2 3 92] ⍝ solutions 1, 2, and 92
+      {⎕UCS (65+⌊⍵÷8)(49+8∣⍵←⍵-⎕IO)} ¨ ⊃Z[1 2 3 92] ⍝ solutions 1, 2, 3, and 92
+ A1 B5 C8 D6 G2 E3 F7 H4 
  A1 B6 C8 D3 E7 F4 G2 H5 
- A1 C5 F4 H3 D8 G6 B7 E2 
- A8 D6 H4 G7 C1 F5 B3 E2 
+ A1 B7 C4 E8 D6 G5 F2 H3 
+ A8 B4 C1 D3 G7 E6 F2 H5 
+
+      8 8⍴("+" "Q")[⎕IO+(⍳64)∈⊃Z[1]]   ⍝ visualize solution Z[1]
+Q + + + + + + + 
+ + + + + Q + + + 
+ + + + + + + + Q 
+ + + + + + Q + + 
+ + + Q + + + + + 
+ + + + + + + Q + 
+ + Q + + + + + + 
+ + + + Q + + + + 
 
 @end verbatim
 
@@ -2832,14 +3112,14 @@ a little more complicated, but the principle is the same. GNU APL is shipped
 with two workspaces: sudoku.apl (which solves sudokus without using ⎕DLX) and
 sudoku_DLX.apl (which solves sudokus using ⎕DLX).
 
-@node    Section 2.24
+@node    Section 2.25
 @section ⎕ENV - Environment Variables
 
 ⎕ENV contains the environment variables of the process that is running
 GNU APL. @xref{Section 2.1}.
 
 
-@node    Section 2.25
+@node    Section 2.26
 @section ⎕FIO - File I/O Functions
 
 As of GNU APL 1.6, the native function FILE_IO has been replaced by the
@@ -2984,7 +3264,7 @@ Z F¨Z←⎕FIO[49] 'filename'
 @end smallexample
 
 
-@node    Section 2.26
+@node    Section 2.27
 @section ⎕FFT - Fast Fourier Transform
 
 For those interested in signal processing and the like, GNU APL provides ⎕FFT:
@@ -3031,7 +3311,7 @@ multiplies B with a window function and then computes the FFT:
 
 ⍴⍴B can be 1 (one-dimensional FFT, the most common case) or more. The
 implementation of ⎕FFT uses libfftw3, aka. "The fastest Fourier Transform in
-the West". GNU APL checks the presence of libfftw3 when it is ./configured.
+the West". GNU APL checks the presence of libfftw3 when it is ./configure'd.
 If libfftw3 is present then ⎕FFT will hopefully return the expected result;
 if not then a DOMAIN ERROR will be raised when ⎕FFT is being used.
 
@@ -3039,7 +3319,7 @@ if not then a DOMAIN ERROR will be raised when ⎕FFT is being used.
 up the computations performed by ⎕FFT. Creating /etc/fftw/wisdom will take a
 few hours, though, so that creating it will not pay off for most mortals.
 
-@node    Section 2.27
+@node    Section 2.28
 @section ⎕GTK - GTK Interface
 
 GTK (Gimp Toolkit) is a rather powerful library for creating graphical user
@@ -3053,7 +3333,7 @@ and has therefore been put into a separate document.
 See: @b{HOWTOs/Quad-GTK.html}.
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.28
+@node    Section 2.29
 @section ⎕JSON - JSON Parsing
 
 GNU APL provides ⎕JSON for decoding and encoding JSON strings and files.
@@ -3080,34 +3360,52 @@ and where in B the error was detected.
 Z←A ⎕JSON B performs one of the following conversions:
 
 @itemize
-@item @strong{Z←0 ⎕JSON B} is the same as monadic Z←⎕JSON B.
+@item @b{Z←0 ⎕JSON B} is the same as monadic Z←⎕JSON B.
 
-@item @strong{Z←1 ⎕JSON B} is like Z←0 ⎕XML B, except that B is not the JSON
+@item @b{Z←1 ⎕JSON B} is like Z←0 ⎕XML B, except that B is not the JSON
 string itself but the name of a file from which an JSON string
 is read.
 
-@item @strong{Z←2 ⎕JSON B} is the inverse of Z←0 ⎕XML B. It converts an APL
+@item @b{Z←2 ⎕JSON B} is the inverse of Z←0 ⎕XML B. It converts an APL
 value to a JSON string.
 
-@item @strong{Z←3 ⎕JSON B} is like 2 ⎕JSON B, except that the member names
+@item @b{Z←3 ⎕JSON B} is like 2 ⎕JSON B, except that the member names
 (keys) of all JSON objects are sorted alphabetically. That is of little use
 (but costs perfomance) if Z is not displayed but processed further, but
 it could help troubleshooting when Z is displayed and the number of keys in Z
 is large.
 @end itemize
 
-@node    Section 2.29
+@node    Section 2.30
 @section ⎕MAP  - Map Value
 
 ⎕MAP changes the ravel items of its right argument according to a mapping
 table provided as its left argument. Let Z←A ⎕MAP B.
 
-The left argument A of ⎕MAP must be a N×2 matrix. Each 2-element row of
-A specifies a separate mapping. That is, the elements of B which are found
-in A[;1] are replaced by the corresponding element in A[;2]. The shape of
-the result Z is the shape of the right argument B.
+The left argument A of Z←A ⎕MAP B shall be a N×2 matrix. Each 2-element row of
+A, say A[J;], specifies a separate mapping A[J;1] → A[J;2]. The result Z has
+the same shape as the right argument B. The items Z[...] iof ther result are
+constructed from their corresponding items B[...] in B as follows:
 
-Example:
+@itemize
+
+@item if B[...] ≡ A[J;1] for some J then Z[...] is A[J;2].
+
+@item otherwise B[...] is different from all A[1;J] and then Z[...] is B[...]
+
+@end itemize
+
+In other words, Z is B, but with items of B found in A[;1] replaced by their
+mapped item A[;2].
+
+In practice th left argument A is frequently created from a literal APL value
+such as 5 2⍴'eEwWaAzZ92' in the example below. To simplify these cases, A ⎕MAP B
+also accepts a vector instead of a N×2 matrix:
+
+      A ⎕MAP B   ←→   ((N 2)⍴A) ⎕MAP B   if (2×N)   ←→    ⍴A
+
+
+Examples:
 
 @verbatim
       ⍝ the map A
@@ -3123,6 +3421,10 @@ zZ    ⍝ map 'z' → 'Z'
 Halloween
 
       ⍝ the result of A ⎕MAP B
+      A ⎕MAP B
+HAlloWEEn
+
+      A←'eEwWaAzZ92'   ⍝ vector A instead of N×2 matrix
       A ⎕MAP B
 HAlloWEEn
 
@@ -3151,6 +3453,7 @@ differ, then then depths of B and A ⎕MAP B may differ as well. That is, ⎕MAP
 conserves the shape of B, but not necessarily the depth of B.
 
 @item
+
 By default the mapping of B is non-recursive, i.e. the top-level items of
 B are compared with the top-level keys A[;1], and nested keys and items of B
 are handled as described above.
@@ -3180,7 +3483,7 @@ shown in the examples below.
 
 @end verbatim
 
-@node    Section 2.30
+@node    Section 2.31
 @section ⎕PLOT - Plot Data
 
 ⎕PLOT is a function for visualizing numerical APL values. The values to be
@@ -3212,7 +3515,7 @@ connecting them have the same color. However, all colors used, all diameters
 of points, and all thicknesses of the lines can be controlled by overriding
 the default values (dyadic A ⎕PLOT B).
 
-@subsubsection Complex Plot Data
+@subsubsection Complex Plot Data B
 
 If a data item B[N] or B[row;N] is @b{complex}, say B[N] = x + iy. then it is
 placed (after some scaling) at position (x, y) of the plot. The X-range
@@ -3238,7 +3541,7 @@ in text mode see file @b{doc/PLOT_circle.png}):
 
 @image{PLOT_circle}
 
-@subsubsection Real Plot Data
+@subsubsection Real Plot Data B
 
 On the other hand, if a data item B[N] or B[row;N] is @b{real}, then it is
 placed at position (N, x) of the plot. The X-range is then
@@ -3269,64 +3572,108 @@ all real items in B are taken as complex with imaginary part 0.
 
 @subsection The Plot Attributes A
 
-As can be displayed with ⎕PLOT '' there are a number of attributes that
-control how the resulting plot will look like:
+There are a number of attributes like colors, point sizes, line widths,
+etc. that control how the resulting plot will look like.
 
-Example:
+Similar to ⎕CR and ⎕FIO, an empty argument B in ⎕PLOT B displays a list of
+the arguments. The list of arguments grows over time and therefore the list
+displayed by ⎕PLOT '' may be more up-to-date than this description.
+For example:
 
 @verbatim
-      ⎕PLOT ''
 
    ⎕PLOT Usage:
 
    ⎕PLOT B     plot B with default attribute values
-   A ⎕PLOT B   plot B with attributes A
+   A ⎕PLOT B   plot B with attributes specified by A
 
    A is a nested vector of strings.
-   Each string has the form "Attribute: Value"
+   Each string A[i] has the form "Attribute: Value"
    Colors are specified either as #RGB or as #RRGGBB or as RR GG BB)
-   The attributes understood and their defaults are:
+
+   The attributes understood by ⎕PLOT and their default values are:
 
    1. Global (plot window) Attributes:
 
-caption:            GNU APL PLOT   (plot window caption)
-filename:                          (output file name)
+caption:            ⎕PLOT          (plot window caption)
+output_filename:                   (output file name)
+auto_close:         0              (= do not close X window automatically)
+                   (1)             (= close if file was written successfully)
+                   (2)             (= always close X window automatically)
+with_border:        1              (= write plot area and window borders)
+                   (0)             (= write only plot area to output file)
+pw_pos_X:           50 pixel       (plot window position X)
+pw_pos_Y:           50 pixel       (plot window position Y)
+border_width:       10 pixel       (width of the window border)
 pa_width:           600 pixel      (plotarea width)
 pa_height:          400 pixel      (plotarea height)
-pa_border_L:        30 pixel       (pixels left of the plotarea)
+pa_border_L:        50 pixel       (pixels left of the plotarea)
 pa_border_R:        20 pixel       (pixels right of the plotarea)
 pa_border_T:        25 pixel       (pixels above the plotarea)
 pa_border_B:        25 pixel       (pixels below the plotarea)
-gridx_style:        1              (X grid style (0-2))
-gridx_pixels:       44 pixel       (pixels between X grid lines)
-gridy_style:        1              (Y grid style (0-2))
-gridy_pixels:       33 pixel       (pixels between Y grid lines)
-border_width:       10 pixel       (width of the window border)
-canvas_color:       #FFFFFF        (background color of the plot window)
-gridX_color:        #000000        (color of the X-grid lines)
+gridX_style:        1              (X grid style = ──────── )
+                   (2)             (             = ╴╴╴╴╴╴╴╴ )
+                   (3)             (             = ─╴─╴─╴─╴ )
+axisX_arrow:        0              (X-axis arrow)
+axisX_label:        X              (X-axis label)
+axisY_arrow:        0              (Yaxis arrow)
+axisY_label:        Y              (Y-axis label)
+axisZ_arrow:        0              (Z-axis arrow)
+axisZ_label:        Z              (Z-axis label)
+gridX_pixels:       44 pixel       (pixels between X grid lines)
 gridX_line_width:   1 pixel        (thickness of the X-grid lines)
-gridY_color:        #000000        (color of the Y-grid lines)
+gridX_color:        #000000        (color of the X-grid lines)
+gridY_style:        1              (Y grid style, see gridX_style above)
+gridY_pixels:       33 pixel       (pixels between Y grid lines)
 gridY_line_width:   1 pixel        (thickness of the Y-grid lines)
+gridY_color:        #000000        (color of the Y-grid lines)
+gridZ_style:        1              (Z grid style, see gridX_style above)
+gridZ_pixels:       33 pixel       (pixels between Z grid lines)
+gridZ_line_width:   1 pixel        (thickness of the Z-grid lines)
+gridZ_color:        #000000        (color of the Z-grid lines)
+canvas_color:       #FFFFFF        (background color of the plot window)
+legend_color:       #F0F0F0        (background color of the legend)
 legend_X:           50 pixel       (the X position of the legend)
 legend_Y:           50 pixel       (the Y position of the legend)
 legend_dY:          15 pixel       (the distance between legend lines)
 legend_lX:          50 pixel       (the length of the legend lines)
+rangeX_min:         0.0            (the start of the X range to be plotted)
+rangeX_max:         0.0            (the end of the X range to be plotted)
+rangeY_min:         0.0            (the start of the Y range to be plotted)
+rangeY_max:         0.0            (the end of the Y range to be plotted)
+rangeZ_min:         0.0            (the start of the Z range to be plotted)
+rangeZ_max:         0.0            (the end of the Z range to be plotted)
+origin_X:           100 pixel      (X position offset of the origin)
+origin_Y:           100 pixel      (Y position offset of the origin)
+format_X:                          (number format for the X-axis)
+format_Y:                          (number format for the Y-axis)
+format_Z:                          (number format for the Z-axis)
+
+color_level-P:      (none)         (color gradient at P% (surface plots only))
 
    2. Local (plot line N) Attributes:
 
 line_color-N:       #00FF00        (the color of plot line N)
+line_style-N:       1              (line style, see gridX_style above)
 line_width-N:       3 pixel        (the thickness of plot line N)
-point_color-N:      #00FF00        (the color of the plot points)
-point_size-N:       8 pixel        (the diameter of the plot points)
+point_color-N:      #000000        (the color of the plot points)
+point_style-N:      1              (= plot_points: ● )
+                   (2)             (= plot_points: ▲ )
+                   (3)             (= plot_points: ▼ )
+                   (4)             (= plot_points: ◆ )
+                   (5)             (= plot_points: ■ )
+                   (6)             (= plot_points: 🞤   (GTK only)
+                   (7)             (= plot_points: 🞫   (GTK only)
+point_size-N:       8 pixel        (the outer diameter of the plot points)
+point_size2-N:      0 pixel        (the inner diameter of the plot points)
 legend_name-N:                     (the name of plot line N in the legend)
 
 @end verbatim
 
-There are 2 kinds of attributes: global attributes that affect the entire plot,
-and local (per-line) attributes that affect one of the plot lines (which
-corresponds to one row of B). The most convenient way to specify multiple
-attributes in one go is to use multi-line strings.
-
+There are 2 kinds of attributes: global attributes that affect the entire
+plot, and local (per-line) attributes that affect one of the plot lines
+(which corresponds to one row of B). One way to specify
+multiple attributes in one go is to use multi-line strings.
 
 For example (plot 2 lines of 10 random numbers each, named "random row 1" and
 "random row 2"):
@@ -3334,28 +3681,49 @@ For example (plot 2 lines of 10 random numbers each, named "random row 1" and
 @verbatim
       Data ← ?2 10⍴10   ⍝ two rows of random data
       Attributes  ← """
-legend_name-0: Random Row 1
-legend_name-1: Random Row 2
+legend_name-1: Random Row 1
+legend_name-2: Random Row 2
                     """
       Attributes ⎕PLOT Data
 @end verbatim
 
-If the global attribute "filename" is given, then the plot is not only being
-displayed in an X window on the screen but also written to a file with the
-name provided as attribute value. The file format is bitmap (typical file
-extension: .bmp) which can then eaily converted to other graphic formats
-such as .png or .jpg with tools like 'convert' from package imagemagick.
+While specifying the plot attributes A in one place is most convenient for
+a single plot window or when the attributes are read from some external
+test file, its is somretimes simpler to specify the plot attributes
+individually. This can be done by using a structured APL variable as left
+argument A:
+
+@verbatim
+Attributes.legend_name_1 ← "Random Row 1"
+Attributes.legend_name_2 ← "Random Row 2"
+      Attributes ⎕PLOT Data
+@end verbatim
+
+Note that (for syntactical reasons) the separation between the line attribute
+and the line number is @b{_} (underscore) if @b{A} is specified as
+a structured APL value and @b{-} (minus) if A is specified as a string
+of lines.
+
+If the global attribute @b{output_filename} is given, then the plot is
+not only being displayed in a window on the screen, but also written
+to a file with the name of the file provided as attribute value. 
+@xref{Output File Format}, below.
 
 For example:
 
 @verbatim
-      ⊣ ( ⊂ "filename: /tmp/bitmap.bmp" ) ⎕PLOT 1 3 1 4 2
+      ⊣ ( ⊂ "output_filename: /tmp/bitmap.png" ) ⎕PLOT 1 3 1 4 2
 @end verbatim
 
-writes the plot of a a zigzag curve to file /tmp/bitmap.bmp (note: ⎕PLOT
-with attribute filename overrides existing files without a warning. Lack
-of permissions to write the file raises a DOMAIN ERROR with )MORE providing
-details.
+writes the plot of a a zigzag curve to file @b{/tmp/bitmap.png}
+(@b{Caution}: ⎕PLOT with attribute output_filename overrides existing
+files without a warning). Lack of permissions to write the file raises
+a DOMAIN ERROR with )MORE possibly providing details.
+
+Some line attributes such as @b{line_width} or @b{point size} are
+frequently the same for several or all plot lines. In that case one can use
+the line attribute without a -N resp. _N suffix which is then used for all lines
+(unless overridden by the same attribute with -N resp. _N suffix.
 
 @subsection Plot Window Handling
 
@@ -3364,17 +3732,49 @@ server (which implies that ⎕PLOT requires X). That window runs in its own
 thread until it is being closed. A plot window can be closed in different ways:
 
 @itemize
-@item by clicking on the close button (at the top-right) of the
-  window, or
-@item by opening the drop down menu of the window (at the top left of
-  the window) and selecting the option named "Close", or
-@item from APL by calling ⎕PLOT ¯3 (which closes all open plot windows), or
-@item from APL by calling ⎕PLOT H (which closes a specific plot window),
+@item by clicking on the close button (often located near the top-right corner)
+  of the window,
+@item by opening the drop down menu of the window (near the top left-of
+  the window) and selecting the option named "Close",
+@item from APL by calling @b{⎕PLOT ¯3} (which closes @b{all} open
+  plot windows), or
+@item from APL by calling @b{⎕PLOT H} (which closes a specific plot window),
   where H is the plot window handle returned by monadic ⎕PLOT B or by dyadic
-  A ⎕PLOT B with plot attributes A
+  A ⎕PLOT B with plot attributes A.
 @end itemize
 
-@node    Section 2.31
+Note that the exact method for closing a plot window with the mouse (as opposed
+to @b{⎕PLOT ¯3} or @b{⎕PLOT H} from APL) differs between different
+window managers. The above stands for the standard method(s) for closing windows
+on your system.
+
+@node Output File Format
+@subsection Output File Format
+
+Early versions of ⎕PLOT were using @b{libxcb} to display the results of
+⎕PLOT while recent versions use @b{libgtk-3}. The primary driver for this
+change was the lack of full Unicode support in @b{libxcb} which made it,
+for example, difficult to properly display APL characters in window captions
+or in plot line legends.
+
+Writing the pixels of a plot to a file uses functions provided by either 
+@b{libxcb} or @b{libgtk-3}, and these functions generate different
+file formats.
+
+@b{libxcb} is the older of the two libraries and it therefore produces the
+older file format @b{.bmp} (bitmaps). @b{libgtk-3} is the newer
+library and it procuces the somewhat newer file format @b{.png}
+(portable network graphics). There are tools like @b{convert} from package
+@b{imagemagick} that can be used to convert different image file formats
+into each other and therefore this incompatibility should not cause too much 
+trouble.
+
+For backward compatibility, the @b{libxcb} option for ⎕PLOT will continue
+to exist for some time, but bug fixes and new features will only be made for the
+@b{libgtk-3} option.
+
+
+@node    Section 2.32
 @section ⎕PS - Print Style
 
 ⎕PS is an integer vector that currently (read: as of SVN 982) contains
@@ -3386,7 +3786,7 @@ The default value of ⎕PS is 0 0. ⎕PS is a session variable which survives
 
 ⎕PS[1] = 1: print rational quotients as A÷B
 
-Note: ⎕PS[1] has only an effect if rational numbers were ./configured.
+Note: ⎕PS[1] has only an effect if rational numbers were ./configure'd.
 
 ⎕PS[2] = 0: no "boxing" of APL values
 
@@ -3399,7 +3799,7 @@ Note: For compatibility with older workspaces, assigning a single value to
 ⎕PS assigns that value to ⎕PS[2] and sets ⎕PS[1] to 0.
 
 
-@node    Section 2.32
+@node    Section 2.33
 @section ⎕RE - Regular Expressions
 
 ⎕RE is a function that provides access to a subset of libpcre2, which is a
@@ -3445,33 +3845,36 @@ In fact, regular expressions are a language of their own, and it is impossible
 to describe them here. The user of ⎕RE is referred to the description that
 comes with libpcre2.
 
-See in particular:
-
-man pcre2pattern
+See in particular: @b{man pcre2pattern}
 
 @subsection The String(s) B Being Matched
 
-B is either (1) a simple character vector (which is then also passed unmodified
-to libpcre2) or (2) a (nested) APL array containing only simple character
-vectors.
+B is either:
 
-In the case (2) the result of ⎕RE is conceptually the same as if the EACH
-operator had been applied to ⎕RE:
+@enumerate
+@item a simple character vector (which is then also passed unmodified
+to libpcre2), or
+
+@item a (nested) APL array consisting of simple character vectors.
+@end enumerate
+
+In the second case above, the result of ⎕RE is conceptually the same as if
+the EACH operator had been applied to ⎕RE:
 
 @verbatim
     A ⎕RE B   ←→   A ⎕RE ¨ B
 @end verbatim
 
 The libpcre2 first compiles A into an internal representation that improves
-the matching (of B) speed. As a consequence, if several strings are matched
+the matching (of B) speed. As a consequence, if several strings shall be matched
 with the same regular expression A, then it is (sometimes considerably) faster
-to call ⎕RE once with several nested than to call calling ⎕RE multiple times
-with the same A but different Bs. This is in particular the case when longer
-text files with many lines is being matched.
+to A ⎕RE B once with several items of a nested B, than to A ⎕RE B multiple
+times with the same A but different Bs. This is in particular the case when
+longer text files with many lines shall be matched.
 
 If multiple (nested) strings B are used then A is compiled once and after that
 the different ⊃B[i] in B are passed unmodified to libpcre2. In that
-case the result is nested and (⍴B) ≡ (⍴A ⎕RE[X] B). We can therefore limit
+case the result Z is nested and (⍴B) ≡ (⍴Z←A ⎕RE[X] B). We can therefore limit
 the description to the case where B is a simple character vector.
 
 Any string B that is passed to libpcre2 is called "Subject" in the
@@ -3479,69 +3882,76 @@ libpcre2 documentation.
 
 @subsection The Flags X
 
-Without any flags (or with an empty flag string X) ⎕RE returns the first
-match of the regular expression A in the string B. The flags will change
-this behavior in order to adapt various aspects of the matching to satisfy
-different requirements that the user of ⎕RE may have. The X argument of
-⎕RE is a character vector where each character is a flag. The different flag
-characters are either flags understood by (and then passed unmodified to)
-libpcre2 or flags understood by ⎕RE itself (and then not passed to libpcre2).
+By default, i.e. without an axis argument X or - equivalently - with an empty
+string X←@b{""} as axis argument, ⎕RE returns the first match of the regular
+expression A in the string B as an APL string.
 
-@subsubsection libpcre2 flags: i, m, s, and x
+By means of the optional axis argument @b{X ≢ ""} (in the following called
+flags) one can change the default behavior in order to adapt various aspects
+of the matching to satisfy the requirements that the user of ⎕RE may have.
+
+The X argument of @b{A⎕RE[X] B} is a character vector where each character
+is a flag. Each flag is either understood by (and then passed unmodified to)
+libpcre2 or else understood by ⎕RE itself (and then not passed to libpcre2).
+
+@subsubsection The libpcre2 flags: i, m, s, and x
 
 The libpcre2 flags accepted by ⎕RE are: i, m, s, and x. They correspond to the
 following libpcre2 flags:
 
 @itemize
-@item i: PCRE2_CASELESS   (case insensitive matching)
-@item m: PCRE2_MULTILINE  (matching across multiple lines)
-@item s: PCRE2_DOTALL     (dot (.) also matches CR/LF)
+@item i: PCRE2_CASELESS   (perform case insensitive matching)
+@item m: PCRE2_MULTILINE  (perform matching across multiple lines)
+@item s: PCRE2_DOTALL     (dot (.) in A also matches CR/LF)
 @item x: PCRE2_EXTENDED   (see 'man pcre2pattern')
 @end itemize
 
-Please also consult the libpcre2 documentation for a description of these flags.
+Please consult the libpcre2 documentation for a more detailed description
+of these flags.
 
-@subsubsection The APL output format flags ↓, ⊂, and /
+@subsubsection The ⎕RE (APL output format) flags ↓, ⊂, and /
 
 ⎕RE provides different output formats, some of which are tailored to different
-APL functions. There are currently 4 different output formats:
+APL functions, so that these other APL functions can use the result of ⎕RE
+without major conversions . There are currently 4 different output formats:
 
 @itemize
-@item no flag: ⎕RE returns the matching sub-string of B
+@item no ⎕RE flag: ⎕RE returns the matching sub-string(s) of B.
 
-@item ↓ flag:  ⎕RE returns the position and the length of the matched sub-string of B,
-The result does not depend on ⎕IO and can be used by ↓ and ↑ to cut out the
-matched pieces.
+@item ↓ flag:  ⎕RE returns the position(s) and the length(s) of the matched
+sub-string of B, Like other left arguments of ↑ or ↓, the string position(s)
+in the result start at 0 (i.e. not at ⎕IO) and can therefore be used directly
+by dyadic ↓ and ↑. For instance to  cut out the matched pieces.
 
 @item ⊂ flag:  ⎕RE returns an integer vector suitable as the left argument of 
-   partition (⊂)
+   partition (dyadic ⊂).
 
 @item / flag:  ⎕RE returns an Boolean vector suitable as the left argument of 
-   compress (/)
+   compress (dyadic /).
 @end itemize
 
 The following examples may better explain the nature of the output flags:
 
 @verbatim
-      ⍝ return matched string
+      ⍝ return (first) matched string
       4 ⎕CR 'f..' ⎕RE[''] '__foo___fun____fox'
 ┏→━━┓
 ┃foo┃
 ┗━━━┛
 
-      ⍝ return possition and length
+      ⍝ return (first) pair (position, length)
       4 ⎕CR 'f..' ⎕RE['↓'] '__foo___fun____fox'
 ┏→━━┓
 ┃2 3┃
 ┗━━━┛
 
-      ⍝ return left argument of ⊂
+      ⍝ return left argument A of A ⊂ B
       4 ⎕CR 'f..' ⎕RE['⊂'] '__foo___fun____fox'
 ┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃0 0 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-      ⍝ return left argument of /
+      ⍝ return left argument A of A / B
       4 ⎕CR 'f..' ⎕RE['/'] '__foo___fun____fox'
 ┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃0 0 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0┃
@@ -3553,25 +3963,31 @@ In the absence of a 'g' flag (see below) the results of output formats
 
 @subsubsection the ⎕RE global flag g
 
-The default behavior of ⎕RE is to return only the first match in B.
-The 'g' flag causes ⎕RE to return all matches. For example:
+The default behavior of ⎕RE is to return only the first match of A in B.
+The 'g' flag causes ⎕RE to return all matches instead. For example:
 
 @verbatim
+      ⍝ return first match as string
       4 ⎕CR 'f..' ⎕RE[''] '__foo___fun____fox'
 ┏→━━┓
 ┃foo┃
 ┗━━━┛
+
+      ⍝ return all matches as strings
       4 ⎕CR 'f..' ⎕RE['g'] '__foo___fun____fox'
-┏→━━━━━━━━━━━━━━━━┓
+┏→━━━━━k━━━━━━━━━━━┓
 ┃┏→━━┓ ┏→━━┓ ┏→━━┓┃
 ┃┃foo┃ ┃fun┃ ┃fox┃┃
 ┃┗━━━┛ ┗━━━┛ ┗━━━┛┃
 ┗∊━━━━━━━━━━━━━━━━┛
 
+      ⍝ return first match as pair (position, length)
       4 ⎕CR 'f..' ⎕RE['↓'] '__foo___fun____fox'
 ┏→━━┓
 ┃2 3┃
 ┗━━━┛
+
+      ⍝ return all matches as pair (position, length)
       4 ⎕CR 'f..' ⎕RE['↓g'] '__foo___fun____fox'
 ┏→━━━━━━━━━━━━━━━━━┓
 ┃┏→━━┓ ┏→━━┓ ┏→━━━┓┃
@@ -3579,19 +3995,25 @@ The 'g' flag causes ⎕RE to return all matches. For example:
 ┃┗━━━┛ ┗━━━┛ ┗━━━━┛┃
 ┗∊━━━━━━━━━━━━━━━━━┛
 
+      ⍝ return first match as left argument of ⊂ (aka. partition)
       4 ⎕CR 'f..' ⎕RE['⊂'] '__foo___fun____fox'
 ┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃0 0 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+      ⍝ return all matches as left argument of ⊂ (aka. partition)
       4 ⎕CR 'f..' ⎕RE['⊂g'] '__foo___fun____fox'
 ┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃0 0 1 1 1 0 0 0 2 2 2 0 0 0 0 3 3 3┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
+      ⍝ return first match as left argument of / (aka. compress)
       4 ⎕CR 'f..' ⎕RE['/'] '__foo___fun____fox'
 ┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃0 0 1 1 1 0 0 0 0 0 0 0 0 0 0 0 0 0┃
 ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+      ⍝ return all matches as left argument of / (aka. compress)
       4 ⎕CR 'f..' ⎕RE['/g'] '__foo___fun____fox'
 ┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
 ┃0 0 1 1 1 0 0 0 1 1 1 0 0 0 0 1 1 1┃
@@ -3599,8 +4021,15 @@ The 'g' flag causes ⎕RE to return all matches. For example:
 @end verbatim
 
 Please note that the 'g' flag increments the depth of the result of the output
-formats string and position/length, but not of the result of output formats
-partition and compress.
+formats 'string' and 'position/length', but not of the result of output formats
+'partition' and 'compress'.
+
+The output formats ⊂ and / are related like this:
+
+@verbatim
+      A ⌷RE['/'] B   ←→   0 ≠ A  A ⌷RE['⊂'] B
+@end verbatim
+
 
 @subsubsection the ⎕RE error flag E
 
@@ -3625,7 +4054,10 @@ The 'E' flag has no effect if the 'g' flag is also given because in that case
 it is natural to check the length of the result:
 
 @verbatim
-       'g..' ⎕RE['Eg'] '__foo___fun____fox'
+      4 ⎕CR 'g..' ⎕RE['Eg'] '__foo___fun____fox'
+┏⊖┓
+┃0┃
+┗━┛
 
 @end verbatim
 
@@ -3699,11 +4131,11 @@ The same for the pos+len output format:
 ┗∊∊━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 @end verbatim
 
-@node    Section 2.33
+@node    Section 2.34
 @section ⎕RVAL - Random APL value
 
 The standard way to produce random numbers is the primitive function ?
-aka. @strong{Roll}. Roll returns a simple random array whose ravel elements are
+aka. @b{Roll}. Roll returns a simple random array whose ravel elements are
 positive integers chosen in a (pseudo-) random fashion. While this is sufficient
 for many applications, one sometimes needs APL values whose randomness not
 only affects the ravel elements themselves, but also other aspects like:
@@ -3757,7 +4189,8 @@ A=1 controls the ranks of the subsequent random APL values,
 A=2 controls the shapes of the subsequent random APL values,
 
 @item
-A=3 controls the data types in the ravels of the subsequent random APL values, and
+A=3 controls the data types in the ravels of the subsequent random APL values,
+and
 
 @item
 A=4 controls a maximum depth of the subsequent random APL values.
@@ -3804,20 +4237,22 @@ The rank of subsequently generated random values can be controlled with
 
 @itemize
 @item
-If B is a scalar 0 ≤ B < MAX_RANK (MAX_RANK is ./configurable with a
-default of 8) then subsequently generated random values will have
-the fixed rank B.
+If B is a non-negative scalar B with 0 ≤ B < MAX_RANK then the subsequently
+generated random values will have the fixed rank B. MAX_RANK is a 
+./configurable constant with a default of 8.
 
 @item
-If B is a scalar 0 > B > -MAX_RANK then the ranks of subsequently generated
-random values will be chosen at random between 0 and -B (including). All
-possible ranks 0, ... MAX_RANK have the same probability P = 100÷1-B %.
+If B is a negative scalar B with 0 > B > -MAX_RANK then the ranks of the
+subsequently generated random values will be chosen at random between
+0 and -B (including). All possible ranks 0 ... B will have the same
+probability P = 100÷1-B %.
 
 @item
 Otherwise B must be a vector of positive integers. The integers are the
 relative frequencies of the ranks 0, 1, ... MAX_RANK respectively. Too many
-integers will give raise LENGTH ERROR while fewer (than MAX_RANK) are
-set to 0.
+integers (i.e. MAX_RANK > ⍴B) will raise a LENGTH ERROR while fewer (than
+MAX_RANK) are set to 0.
+
 @end itemize
 
 1 ⎕RVAL always returns its previous setting (i.e. before applying B).
@@ -3989,11 +4424,14 @@ Examples:
 @end verbatim
 
 
-@node    Section 2.34
+@node    Section 2.35
 @section ⎕SQL - SQL Database Interface
 
 As of GNU APL 1.6, the native function SQL has been replaced by the
-system function ⎕SQL, described below.
+system function ⎕SQL, described below. ⎕SQL has an axis argument that
+selects a sub-function of ⎕SQL.
+
+@subsection ⎕SQL[0] : display subfunctions
 
 @verbatim
       ⎕SQL[0]''
@@ -4009,16 +4447,19 @@ query ⎕SQL[4,db] params - send SQL update
 ref   ⎕SQL[9] table     - list columns for table
 @end verbatim
 
+@subsection ref ← A ⎕SQL[1] B : open database
+
 @verbatim
       type  ⎕SQL[1] file
 @end verbatim
 
-Connect to database of type L using connection arguments R.
+Connect to database of type A using connection arguments B. The result is a
+database handle @b{ref} to be used in the other ⎕SQL functions.
 
-L must be a string indicating the database type. Currently supported
+@b{A} must be a string indicating the database type. Currently supported
 values are 'postgresql' and 'sqlite'.
 
-R is the connection parameters which depends on the type of
+@b{B} is the connection parameters which depends on the type of
 database:
 
   - For type≡'sqlite': the argument is string pointing to the
@@ -4032,38 +4473,44 @@ using other SQL functions. This value should be seen as an opaque
 handle. It is, however, guaranteed that the handle is a scalar
 value.
 
+@subsection ⎕SQL[2] B : close database
+
 @verbatim
       ⎕SQL[2] ref
 @end verbatim
 
-Disconnect from database R.
+Disconnect from database @b{ref}.
 
-R is the database handle that should be disconnected. After this
+B is the database handle that should be disconnected. After this
 function has been called, no further operations are to be performed
-on this handle. Future calls to SQL∆Connect may reuse previously
+on this handle. Future calls to ⎕SQL[1]  may reuse previously
 disconnected handles.
 
+@subsection Z ← A ⎕SQL[3, ref] B : database query (with result)
+
 @verbatim
-      query ⎕SQL[3,db] params
+      query ⎕SQL[3, ref] params
 @end verbatim
 
 Execute a select statement and return the result table.
 
 The axis parameter indicates the database handle.
 
-L is a select statement to be executed. Positional parameters can
+A is a select statement to be executed. Positional parameters can
 be supplied by specifying a question mark "?" in the statement.
 
-R is an array containing the values for the positional parameters.
+B is an array containing the values for the positional parameters.
 If the array is of rank 2, the statement will be executed multiple
 times with each row being the values for each call.
 
-The return value is a rank-2 array representing the result of the
+The return value Z is a rank-2 array representing the result of the
 select statement. Null values are returned as ⍬ and empty strings
 are returned as ''.
 
+@subsection Z ← A ⎕SQL[4, ref] B : database query (w/o result)
+
 @verbatim
-      query ⎕SQL[4,db] params
+      query ⎕SQL[4, ref] params
 @end verbatim
 
 Execute an SQL statement that does not return a result.
@@ -4071,11 +4518,15 @@ Execute an SQL statement that does not return a result.
 This function is identical to SQL∆Select with the exception that it
 is used on statements which do not return a result table.
 
+@subsection ⎕SQL[5] B : start transaction
+
 @verbatim
       ⎕SQL[5] ref
 @end verbatim
 
 Begin a transaction.
+
+@subsection ⎕SQL[6] B : commit transaction
 
 @verbatim
       ⎕SQL[6] ref
@@ -4083,11 +4534,15 @@ Begin a transaction.
 
 Commit a transaction.
 
+@subsection ⎕SQL[7] B : rollback transaction
+
 @verbatim
       ⎕SQL[7] ref
 @end verbatim
 
 Rolls back the current transaction.
+
+@subsection Z←⎕SQL[8] B : table names
 
 @verbatim
       ⎕SQL[8] ref
@@ -4095,8 +4550,10 @@ Rolls back the current transaction.
 
 Return an array containing the name of all tables.
 
+@subsection Z←⎕SQL[9] B : column names
+
 @verbatim
-      ref   ⎕SQL[9] table
+      ref  ⎕SQL[9] table
 @end verbatim
 
 Return an array containing information about the columns in the
@@ -4109,7 +4566,7 @@ More columns containing extra information may be added in a future
 release.
 
 
-@node    Section 2.35
+@node    Section 2.36
 @section ⎕SI - State Indicator
 
 ⎕SI returns aspects of the current State Indicator, similar to the standard
@@ -4140,40 +4597,55 @@ to the assert() macro in C/C++:
 
 @end verbatim
 
-⎕SI is a system function whose right argument specifies which aspect of
-the State indicator shall be returned:
+The right argument of ⎕SI specifies which aspect of the State Indicator
+shall be returned:
 
-⎕SI 1: The name of the context. That is either the name of a user defined
-function, or ◊ for an immediate execution context, or ⍎ for an execute
-context.
+@itemize
 
+@item
+⎕SI 1: The name of the context. That name is either:
+@itemize
+@item the name of a defined function, or
+@item  ◊ for an immediate execution context, or
+@item  ⍎ for an execute context.
+@end itemize
+
+@item
 ⎕SI 2: The line number (of a defined function) or 0 for immediate execution
-and execute.
+and execute contexts.
 
-⎕SI 3: The function name and line number in square brackets, like foo[3]
+@item
+⎕SI 3: The function name and line number in square brackets, for example:
+@b{"FOO[3]"}
 
+@item
 ⎕SI 4: Either the statement text of the function line or the error text of
  an error that has occurred on the line
 
+@item
 ⎕SI 5: The program counter (= token number counted from the start of the
-function text
+function text)
 
+@item
 ⎕SI 6: the parse mode of the context (immediate execution, execute, or
 defined function).
 
-If no left argument is provided then the result of ⎕SI is a vector with
-one entry per State Indicator level (and hence ⍴⎕SI B is the depth of the SI).
+@end itemize
 
-If a left argument A is provided then specifies a particular level of the SI
-instead of the entire SI. A should be an integer scalar. If A is positive
-then the level is counted from the oldest entry to the latest, while negative
-A count from the latest to the oldest level.
+If no left argument is provided then the result of ⎕SI is a vector with
+one entry per State Indicator level (and hence ⍴⎕SI B is the depth of the SI
+stack).
+
+If the optional left argument A is provided then it specifies a particular
+level of the SI instead of the entire SI. A should be an integer scalar.
+If A is positive then the level is counted from the oldest entry to the latest,
+while negative A count from the latest to the oldest level.
 
 For example, ¯1 ⎕SI refers to the currently executing context, ¯2 ⎕SI is
 the caller, and so on.
 
 
-@node    Section 2.36
+@node    Section 2.37
 @section ⎕SYL - System limits
 
 System variable ⎕SYL shows a number of system limits when referenced:
@@ -4275,12 +4747,12 @@ is printed instead of VALUE. The shape SH is computed like this:
 @end verbatim
 
 @c ----------------------------------------------------------------------------
-@node    Section 2.37
+@node    Section 2.38
 @section ⎕XML - XML Parsing
 
 @subsection Purpose
 
-GNU APL provides ⎕XML as a means of performing @strong{elementary}
+GNU APL provides ⎕XML as a means of performing @b{elementary}
 manipulations of APL character strings that are formatted according
 to the XML standard. The anticipated procedure for such modifications
 is something like:
@@ -4402,12 +4874,12 @@ entities (i.e. &, <, >, ', and ") are recognized (and translated) by ⎕XML.
 The principal mapping between XML strings and APL values is:
 
 @itemize
-@item @strong{XML document} ←→ structured (top-level) APL value or variable
+@item @b{XML document} ←→ structured (top-level) APL value or variable
   (= an associative array)
-@item @strong{XML node}  ←→ structured APL (sub-) value (= an associative (sub-)
+@item @b{XML node}  ←→ structured APL (sub-) value (= an associative (sub-)
   array of either the top-level value or of another XML node)
-@item @strong{XML name} ←→ name of a member in a structured APL value
-@item @strong{Other} ←→ member value
+@item @b{XML name} ←→ name of a member in a structured APL value
+@item @b{Other} ←→ member value
 @end itemize
 
 Every valid name in XML is also a valid name for an APL variable or structure
@@ -4433,7 +4905,7 @@ work because:
 
 @item Likewise, at least for readability reasons, the order if XML the order
  of nodes attributes, should not be changed. XML documents are frequently
- processed with text tools like @strong{diff} which would incorrectly show
+ processed with text tools like @b{diff} which would incorrectly show
  differences between XML documents that are equivalent from an XML perspective.
 
 
@@ -4462,7 +4934,7 @@ name (and therefore a valid member name that is understood by the APL parser):
   the XML document as follows:
   @itemize
   @item the character ⍙ characterizes an attribute name, i.e. a names that
-  was used @strong{inside} (i.e. between < and >) of an XML start or leaf tag.
+  was used @b{inside} (i.e. between < and >) of an XML start or leaf tag.
   The character ⍙ alone is the name of a special member which is present
   in every associative array below the top-level and whose value is the
   original XML tag name of a tag, or
@@ -4472,12 +4944,12 @@ name (and therefore a valid member name that is understood by the APL parser):
   corresponding XML entity was not a tag (and therefore had no tag name), or
 
   @item the character _ characterizes the name of an XML entity, i.e. an
-    CML name that occur @strong{between} the
+    CML name that occur @b{between} the
   start tag and the corresponding end tag (if any: leaf tags have no such
   entities
   @end itemize
 
-@item a position prefix of the form @strong{NN}, where NN is the position
+@item a position prefix of the form @b{NN}, where NN is the position
  of the member in relation to the tag to which it belongs. The numbering
  starts at ⎕IO and restarts at every XML start or leaf tag.
 
@@ -4500,11 +4972,11 @@ Let NN be a sequence of decimal digits. Then only the following 4
 synthesized names are produced by ⎕XML:
 
 @itemize
-@item @strong{∆NNcomment} for XML comments, i.e. <!--- ... ---> in XML,
-@item @strong{∆NNdeclaration} for XML declarations, i.e. <? ... ?> in XML,
-@item @strong{∆NNdoctype} for document type declarations, i.e.i
+@item @b{∆NNcomment} for XML comments, i.e. <!--- ... ---> in XML,
+@item @b{∆NNdeclaration} for XML declarations, i.e. <? ... ?> in XML,
+@item @b{∆NNdoctype} for document type declarations, i.e.i
     <!DOCTYPE ... > in XML
-@item @strong{∆NNtext} for unstructured (and hence untagged) text segemnts
+@item @b{∆NNtext} for unstructured (and hence untagged) text segemnts
   in XML.
 @end itemize
 
@@ -4513,7 +4985,7 @@ valid APL names may also contain the characters ¯, ∆, and ⍙ which are not
 valid in XML and used in the naming convention above to clearly separate
 the member names used in APL from the names used in the XML document.
 
-The essence of all this is that @strong{everything} that belongs to an XML
+The essence of all this is that @b{everything} that belongs to an XML
 node or document, i.e. the attributes inside a tag, the sub-nodes between a
 start tag and its corresponding end tag (if any), declarations, etc. will
 be contained in a single associative array.
@@ -4532,10 +5004,10 @@ Examples of APL member names (assuming ⎕IO←1):
 
 @subsection Monadic ⎕XML
 
-@strong{Z ← ⎕XML B} converts APL string B that contains a valid XML document
+@b{Z ← ⎕XML B} converts APL string B that contains a valid XML document
 to an associative APL array Z and vice versa.
 
-@strong{Note}: If you convert an associative APL array back to a an XML document,
+@b{Note}: If you convert an associative APL array back to a an XML document,
 then the result is a possibly very long strings with containing several linefeed
 characters. That is OK if the string is written to a file, but causes problems
 when the string is being displayed and longer than ⎕PW. The standard APL folding
@@ -4549,7 +5021,7 @@ be suppressed in 2 ways:
 
 @subsection Dyadic ⎕XML
 
-@strong{Z ← A ⎕XML B} provides a number of convenience functions. Its left
+@b{Z ← A ⎕XML B} provides a number of convenience functions. Its left
 argument A is an interger function number, possibly followed by arguments
 of the function number ↑A.
 
@@ -4575,18 +5047,18 @@ APL←⎕XML XML
 Then
 
 @itemize
-@item @strong{Z←0 ⎕XML B} is the same as monadic Z←⎕XML B.
+@item @b{Z←0 ⎕XML B} is the same as monadic Z←⎕XML B.
 
-@item @strong{Z←1 ⎕XML B} is like 0 ⎕XML B, except that B is not the XML
+@item @b{Z←1 ⎕XML B} is like 0 ⎕XML B, except that B is not the XML
 document (string) itself but the name of a file from which an XML document
 is read.
 
-@item @strong{Z←2 ⎕XML B} splits an APL member path (a sequence of member names)
+@item @b{Z←2 ⎕XML B} splits an APL member path (a sequence of member names)
 into a vector P of (nested) member names. This vector P is understood by
 the ASPL primitive PICK (i.e. Z←P⊃APL or (P⊃APL←value) and can be used to
 address the data in an XML node.
 
-@item @strong{Z←3 ⎕XML B} splits an APL member name (as produced by e.g.
+@item @b{Z←3 ⎕XML B} splits an APL member name (as produced by e.g.
 monadic ⎕XML into a 3-item vector Z. Z[1] is a single character indicating
 the category (i.e. a character scalar ∆, ⍙, or _). Z[2] is the position (an
 integer scalar ≥ ⎕IO). Z[3] is a (nested) APL string. 3 ⎕XML has an
@@ -4615,7 +5087,7 @@ comment
 
 @end verbatim
 
-@item @strong{Z←4 ⎕XML B} is a string that shows the member names of the
+@item @b{Z←4 ⎕XML B} is a string that shows the member names of the
  associative array B in a tree-like fashion. For example:
 
 @verbatim
@@ -4629,7 +5101,7 @@ XML
              └─── Subtag
 @end verbatim
 
-@item @strong{Z←5 ⎕XML B} is like 4 ⎕XML but displays not only the XML tags but
+@item @b{Z←5 ⎕XML B} is like 4 ⎕XML but displays not only the XML tags but
 also other XML nodes (declarations, attributes, etc.):
 
 @verbatim
@@ -4655,7 +5127,7 @@ XML
        └─── _3∆text               
 @end verbatim
 
-@item @strong{Z←6 ⎕XML B} is like 4 ⎕XML but displays not only the member
+@item @b{Z←6 ⎕XML B} is like 4 ⎕XML but displays not only the member
 name but the entire path to the member:
 
 @verbatim
@@ -4669,7 +5141,7 @@ XML
              └─── ._3_Document._2_Tag1._4_Subtag
 @end verbatim
 
-@item @strong{Z←7 ⎕XML B} returns a list of all members in a depth-first order.
+@item @b{Z←7 ⎕XML B} returns a list of all members in a depth-first order.
 This list can be used as an iterator to traverse the entire tree (and possibly
 filter out items along the way).
 
@@ -4697,7 +5169,7 @@ filter out items along the way).
 ._3_Document._2_Tag1._4_Subtag._3∆text   
 @end verbatim
 
-@item @strong{Z←8 ⎕XML B} is like Z←7 ⎕XML B, except that only the aubset of
+@item @b{Z←8 ⎕XML B} is like Z←7 ⎕XML B, except that only the aubset of
 those members that are related to tags (the tag name ⍙ and tag attributes)
 are returned:
 
@@ -4710,7 +5182,7 @@ are returned:
 ._3Document._2Tag1._4Subtag.⍙2name
 @end verbatim
 
-@item @strong{Z←9 ⎕XML B} is like Z←7 ⎕XML B, except that only the aubset of
+@item @b{Z←9 ⎕XML B} is like Z←7 ⎕XML B, except that only the aubset of
 synthesized members other than ∆text are returned:
 
 @verbatim
@@ -4720,7 +5192,7 @@ synthesized members other than ∆text are returned:
 ._3Document._2Tag1._4Subtag.∆2comment
 @end verbatim
 
-@item @strong{Z←10 ⎕XML B} is like Z←7 ⎕XML B, except that only the aubset of
+@item @b{Z←10 ⎕XML B} is like Z←7 ⎕XML B, except that only the aubset of
 synthesized ∆text members are returned:
 
 @verbatim
@@ -4735,7 +5207,7 @@ synthesized ∆text members are returned:
 .∆18text··························
 @end verbatim
 
-@item @strong{Z←11 ⎕XML B} is like Z←7 ⎕XML B, except that only the tag
+@item @b{Z←11 ⎕XML B} is like Z←7 ⎕XML B, except that only the tag
 names are returned:
 
 @verbatim
@@ -4745,7 +5217,7 @@ names are returned:
 ._3Document._2Tag1._4Subtag
 @end verbatim
 
-@item @strong{Z←12 ⎕XML B} is like Z←7 ⎕XML B, except that all member
+@item @b{Z←12 ⎕XML B} is like Z←7 ⎕XML B, except that all member
 names of B are returned without descending into sub-tree:
 
 @verbatim
@@ -4759,7 +5231,7 @@ names of B are returned without descending into sub-tree:
 This variant may also be useful for structured variables that were not
 created by ⎕XML.
 
-@item @strong{Z←13 ⎕XML B} shows the (flat) tag names in B, but but does
+@item @b{Z←13 ⎕XML B} shows the (flat) tag names in B, but but does
 not descend into any sub-tree if B.
 
 @verbatim
@@ -4767,7 +5239,7 @@ not descend into any sub-tree if B.
  ._3Document 
 @end verbatim
 
-@item @strong{Z←(14 "member-name")  ⎕XML B} shows the next member in B
+@item @b{Z←(14 "member-name")  ⎕XML B} shows the next member in B
 after "member-name". It can be used as an iterator that walks through
 the tags. an empty member name returns the first member:
 
@@ -4825,7 +5297,7 @@ A 64-bit integer represents a value between -9223372036854775808L and
 9223372036854775807.
 
 If the result of a computation is integer by nature, for example +, -, or ×
-with integer arguments, @strong{and} falls into the guaranteed range, then
+with integer arguments, @b{and} falls into the guaranteed range, then
 the result will be an APL integer. If the result is to large for a 64-bit signed
 integer then the result will be automatically converted to an APL floating 
 point value. However, if the result is outside the guaranteed range but still

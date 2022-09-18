@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ extern Token missing_files(const char * qfun,
                            const char ** hdrs,
                            const char ** pkgs);
 
-//=============================================================================
+//============================================================================
 Token
 missing_files(const char * qfun,   // the function, e.g. "⎕RE"
               const char ** libs,  // the required libraries
@@ -85,9 +85,9 @@ UCS_string & more = MORE_ERROR() <<
 
    more <<
 "\n"
-"This instance of the GNU APL interpreter was configured as follows:\n"
+"This GNU APL interpreter instance was probably configured like this:\n"
 "\n"
-"      " << CONFIGURE_ARGS << "\n\n";
+"      " CONFIGURE_ARGS "\n\n";
 
    if (pkgs && pkgs[0])
       {
@@ -103,7 +103,7 @@ UCS_string & more = MORE_ERROR() <<
 "\n"
 "and after that, reconfigure, recompile, and reinstall GNU APL:\n\n" 
 "      ./configure    # if the ./configure options were incorrect, or else\n"
-"      " << CONFIGURE_ARGS << "\n"
+"      ./configure " CONFIGURE_ARGS "\n"
 "      make\n"
 "      sudo make install\n"
 "\n"
@@ -113,8 +113,8 @@ UCS_string & more = MORE_ERROR() <<
    SYNTAX_ERROR;
    return Token();
 }
-//=============================================================================
-//=============================================================================
+//============================================================================
+//============================================================================
 #if ! (defined(HAVE_LIBFFTW3) && defined(HAVE_FFTW3_H))
 
 Token
@@ -126,7 +126,7 @@ const char * pkgs[] = { "libfftw3-dev", 0 };
 
    return missing_files("⎕FFT", libs, hdrs, pkgs);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_FFT::eval_AB(Value_P A, Value_P B) const
 {
@@ -137,7 +137,7 @@ const char * pkgs[] = { "libfftw3-dev", 0 };
    return missing_files("⎕FFT", libs, hdrs, pkgs);
 }
 #endif
-//=============================================================================
+//============================================================================
 #if ! HAVE_GTK3
 
 Token
@@ -149,7 +149,7 @@ const char * pkgs[] = { "libgtk-3-dev", 0 };
 
    return missing_files("⎕GTK", libs, hdrs, pkgs);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_GTK::eval_B(Value_P B) const
 {
@@ -159,7 +159,7 @@ const char * pkgs[] = { "libgtk-3-dev", 0 };
 
    return missing_files("⎕GTK", libs, hdrs, pkgs);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_GTK::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
@@ -169,7 +169,7 @@ const char * pkgs[] = { "libgtk-3-dev", 0 };
 
    return missing_files("⎕GTK", libs, hdrs, pkgs);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_GTK::eval_XB(Value_P X, Value_P B) const
 {
@@ -179,14 +179,14 @@ const char * pkgs[] = { "libgtk-3-dev", 0 };
 
    return missing_files("⎕GTK", libs, hdrs, pkgs);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_GTK::clear()
 {
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 #endif   // ! HAVE_GTK3
-//=============================================================================
+//============================================================================
 #ifndef HAVE_LIBPCRE2_32
 Token
 Quad_RE::eval_AXB(Value_P A, Value_P X, Value_P B) const
@@ -198,4 +198,4 @@ const char * pkgs[] = { "libpcre3-dev", 0 };
    return missing_files("⎕RE", libs, hdrs, pkgs);
 }
 #endif
-//=============================================================================
+//============================================================================

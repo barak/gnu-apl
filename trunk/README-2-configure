@@ -1,5 +1,7 @@
 The GNU APL interpreter can be configured by means of ./configure options.
-The standard ./configure options are described in file INSTALL in this directory.
+The standard ./configure options are described in file INSTALL in this
+directory.
+
 In addition to the standard options provided by ./configure the following GNU
 APL specific ./configure options are recognized. If an option is NOT given
 on the ./configure command line, then either the default value for the option
@@ -58,7 +60,7 @@ APSERVER_TRANSPORT
 APSERVER_PORT
 APSERVER_PATH
    APserver is a program that is needed to support shared variables. APserver
-   is started automatically and has a communication channel to every APL
+   is started automatically and maintains a communication channel to every APL
    interpreter instance and to every AP started (manually or automatically
    by an APL interpreter instance). The communication channel can be TCP,
    abstract Unix domain sockets, or normal Unix domain sockets.
@@ -70,8 +72,9 @@ APSERVER_PATH
 
       ./configure APSERVER_TRANSPORT=TCP   APSERVER_PORT=40000
 
-   2. Abstract Unix domain sockets are a GNU/linux specific variant that 
-      allows for sockets without a corresponding file in the file system.
+   2. Abstract Unix domain sockets are a GNU/linux specific socket variant
+      that pretty much works like standard Unix domain sockets, but do not
+      need an actual file in the the underlying file system.
       APserver listens on socket named "/tmp/GNU-APL/APserver" by default;
       the name can be changed with APSERVER_PATH like this:
 
@@ -84,56 +87,66 @@ APSERVER_PATH
       the ownership and permissions for the file, GNU APL does not create the
       file but leaves that to the user. By default APserver listens on the
       socket named "/tmp/GNU-APL/APserver" (and a file with that name
-      should exist before APL is started); the name can be changed with
+      needs to exist before APL is started); the name can be changed with
       APSERVER_PATH like this:
 
       ./configure APSERVER_TRANSPORT=UNIX   APSERVER_PATH=my-APserver-path
 
 CORE_COUNT_WANTED
-   This experimental option specifies the number of CPU cores the 
-   intepreter is to use. The value is a number, 'all', 'argv', or 'syl'. 
-   The interpreter has sequential code and parallel code which is selected 
-    as follows:
+   This experimental option specifies the number of CPU cores the
+   intepreter shall use. The value is either a number, or else one of
+   the strings 'all', 'argv', or 'syl' (without quotes). For some of its
+   pimitives the GNU APL interpreter has both sequential and parallel code
+   which is selected with ./configure as follows:
 
-   value    code
-         0  sequential  (default, one core is used)
-         1  parallel    one core is used
-         N  parallel    N > 0 cores are used
-   all  -1  parallel    all existing cores are being used, 
-   argv -2  parallel    the number of cores can be set by command line option
-                        -cc N (same as all if -cc is not given).
-   syl  -3  parallel    the number of cores can be changed in APL via ⎕SYL,
-                        initially 1.
+   ╔═════════════════╤════════════╤═══════════════════════════════════════════╗
+   ║  ./configure    │  APL code  │ Comment                                   ║
+   ║ string │ number │            │                                           ║
+   ╟────────┼────────┼────────────┼───────────────────────────────────────────╢
+   ║        │   0    │ sequential │ one core is used (default)                ║
+   ╟────────┼────────┼────────────┼───────────────────────────────────────────╢
+   ║        │   1    │ parallel   │ one core is used                          ║
+   ╟────────┼────────┼────────────┼───────────────────────────────────────────╢
+   ║        │   N    │ parallel   │ N > 0 cores are used                      ║
+   ╟────────┼────────┼────────────┼───────────────────────────────────────────╢
+   ║ all    │  -1    │ parallel   │ all existing cores are being used,        ║
+   ╟────────┼────────┼────────────┼───────────────────────────────────────────╢
+   ║ argv   │  -2    │ parallel   │ the number of cores can be set by command ║
+   ║        │        │            │ line option -cc N (default: all)          ║
+   ╟────────┼────────┼────────────┼───────────────────────────────────────────╢
+   ║ syl    │  -3    │            │ initially 1 core is used, but the number  ║
+   ║        │        │ parallel   │ of cores can be later be increased        ║
+   ║        │        │            │ dynamically in APL via ⎕SYL;              ║
+   ╚════════╧════════╧════════════╧═══════════════════════════════════════════╝
 
    Example:
 
    ./configure CORE_COUNT_WANTED=4
-
 
    CIN_COLOR_WANTED
   CERR_COLOR_WANTED
   COUT_COLOR_WANTED
 RESET_COLORS_WANTED
    CLEAR_EOL_WANTED
-   These options were used in GNU APL 1.0 to configure output coloring.
-   Output coloring can now specified in GNU APL's preference file. This
-   is more flexible than configuring the colors at compile time.
+   These now obsolete options were used in GNU APL 1.0 to configure output
+   coloring. Output coloring can now specified in GNU APL's preference file,
+   which is is more flexible than configuring the colors at compile time.
 
 DYNAMIC_LOG_WANTED=yes
-    The APL interpreter has more than 30 log categories. Each log category can
-    be turned on or off if needed in order to troubleshoot the APL interpreter. 
-    There are two ways to control the logging categories: statically or
-    dynamically.
+   The APL interpreter has more than 40 log categories. Each log category can
+   be turned on or off if needed in order to troubleshoot the APL interpreter.
+   There are two ways to control the logging categories: statically or
+   dynamically.
 
-    Statically means that it is decided at compile time if a log category
-    shall be on or off. Dynamically means that a log category can be turned
-    on and off at run-time (with the command ]LOG).
+   Statically means that it is decided at compile time if a log category
+   shall be on or off. Dynamically means that a log category can be turned
+   on and off at run-time (with the debug command ]LOG).
 
-    Dynamic logging has a performance penalty since every potential log
-    printout has an if () statement that checks if the log category is turned
-    on or off. With static logging this if () statement has a constant value
-    that will be optimized away by the C++ compiler. Dynamic logging also
-    slightly increases the size of the APL interpreter.
+   Dynamic logging has a small performance penalty since every potential log
+   printout is controlled by an if () statement that checks if the log
+   category is turned on or off. With static logging this if () statement
+   has a constant value that will be optimized away by the C++ compiler.
+   Dynamic logging also slightly increases the size of the APL interpreter.
 
    In both cases (static or dynamic logging), the file src/Logging.def defines
    the logging categories at start-up of the APL interpreter. If the first 
@@ -142,16 +155,18 @@ DYNAMIC_LOG_WANTED=yes
    then the log category is initially enabled. The default for this option
    is static logging. Example:
 
-    ./configure DYNAMIC_LOG_WANTED=yes
+   ./configure DYNAMIC_LOG_WANTED=yes
 
 CXX_WERROR=yes/no
-    Do (not) add -Werror to the C++ compiler flags. By default GNU APL is being
-    compiled without -Werror, which turns compiler warnings into compiler errors
-    so that the build succeeds if the compiler issues warnings. Up to SVN
-    version 1304 the default was CXX_WERROR=yes, but a recent inflation of
-    bogus compiler warnings has triggered a change of the default value.
+   Do/do not add the C++ compiler flag -Werror. The -Werror compile flag
+   turns compiler warnings into compiler errors. By default GNU APL is
+   being compiled without -Werror, making it more portable on different
+   platforms/compilers.
+   Up to SVN version 1304 the default was CXX_WERROR=yes, but due to a
+   recent inflation of bogus compiler warnings deis default was changed 
+   to CXX_WERROR=no.
 
-    The old behavior can be reestablished by, for example:
+    The old behaviour can be reestablished by, for example:
 
     ./configure CXX_WERROR=yes
 
@@ -163,6 +178,9 @@ DEVELOP_WANTED
 
     Example:
     ./configure DEVELOP_WANTED=yes
+
+    Users who wish to submit patches for GNU APL should compile and test the
+    patched intepreter with DEVELOP_WANTED=yes.
 
 MAX_RANK_WANTED=n
     Set the maximum rank of APL values to n. The default value is 8. Ranks
@@ -219,10 +237,17 @@ SHORT_VALUE_LENGTH_WANTED=12
 
 
 GPROF_WANTED=yes
-   Setting GPROF_WANTED adds the flag -pg to CXXFLAGS and LDFLAGS and that
-   enables support for gprof profiling of the apl interpreter. Example:
+    Setting GPROF_WANTED adds the flag -pg to CXXFLAGS and LDFLAGS and that
+    enables support for gprof profiling of the apl interpreter. Example:
 
     ./configure GPROF_WANTED=yes
+    make clean all
+    cd src ; ./apl -f file...
+
+    The above will create a profile named 'gmon.out' that can then be analysed
+    with the utility gprof, for example:
+
+    gprof -b ./apl
 
 GCOV_WANTED=yes
    Setting GCOV_WANTED adds the flags -fprofile-arcs and -ftest-coverage flags
@@ -230,6 +255,9 @@ GCOV_WANTED=yes
    interpreter. Example:
 
     ./configure GCOV_WANTED=yes
+    make clean all
+    cd src ; ./apl -f file...
+    gcov  *.gcda   # convert .gcda files to .gcov files
 
 VISIBLE_MARKERS_WANTED=yes
    GNU APL uses a handful of Unicode characters as internal pad characters

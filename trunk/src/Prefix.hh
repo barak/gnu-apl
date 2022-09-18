@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ struct ReduceArg;
 /// the max. number of token in one reduction
 enum { MAX_REDUCTION_LEN = 6 };
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// how to continue after return from a reduce_XXX() function
 enum R_action
 {
@@ -41,7 +41,7 @@ enum R_action
    RA_CONTINUE = 0,
 
    /// push next token and repeat phrase matching with current stack
-   RA_PUSH_NEXT = 1,
+   RA_PUSH_NEXT = 1,   // aka. SHIFT
 
    /// return from parser with result arg[0]
    RA_RETURN = 2,
@@ -52,7 +52,7 @@ enum R_action
    /// internal error: action was not set by reduce_XXX() function
    RA_FIXME  = 4,
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// a class for reducing all statements of an Executable
 class Prefix
 {
@@ -72,6 +72,9 @@ public:
 
    /// return true if ufun is on the stack
    bool uses_function(const UserFunction * ufun) const;
+
+   /// return true if the state of \b this Prefix has ⎕R (and maybe ⎕L or ⎕X).
+   bool has_quad_LRX() const;
 
    /// print the state of this parser
    void print(ostream & out, int indent) const;
@@ -106,13 +109,13 @@ public:
    bool replace_AB(Value_P old_value, Value_P new_value);
 
    /// return the left argument of a failed primitive function (if any)
-   Token * locate_L();
+   Value_P * locate_L(UCS_string & function);
 
    /// return the axis argument of a failed primitive function (if any)
-   const Value_P * locate_X();
+   Value_P * locate_X(UCS_string & function);
 
    /// return the right argument of a failed primitive function (if any)
-   Token * locate_R();
+   Value_P * locate_R(UCS_string & function);
 
    /// return the current monadic function (if any)
    const Function * get_dyadic_fun() const
@@ -290,6 +293,9 @@ public:
        { Assert1(idx < put);   return content[put - idx - 1]; }
 
 protected:
+   /// return true if the left (back-)slash in M M means F M.
+   bool MM_is_FM(Function_PC PC);
+
    /// a unique identifier
    const uint64_t instance;
 
@@ -331,6 +337,6 @@ protected:
    /// a generator for unique identifiers
    static uint64_t instance_counter;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __PREFIX_HH_DEFINED__

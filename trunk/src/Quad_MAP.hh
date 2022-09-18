@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,7 +23,7 @@
 
 #include "QuadFunction.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// The implementation of ⎕MAP
 class Quad_MAP : public QuadFunction
 {
@@ -45,11 +45,10 @@ protected:
                            const void * cells);
 
    /// compute ⎕MAP with (indices of) sorted A
-   static Value_P do_map(const Cell * ravel_A, ShapeItem len_A,
-                  const ShapeItem * sorted_indices_A, const Value * B,
-                  bool recursive);
+   static Value_P do_map(const Value & A, const ShapeItem * sorted_indices_A,
+                         const Value * B, bool recursive);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __Quad_MAP_DEFINED__
 

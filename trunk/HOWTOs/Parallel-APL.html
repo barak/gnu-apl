@@ -1298,16 +1298,18 @@ computation of a scalar function, and the difference can be read in APL via
 <strong>⎕FIO[200]</strong> and <strong>⎕FIO[201]</strong>. Measuring execution times this way is far more
 precise than old-fashioned measurements using ⎕TS at APL level.</p></div>
 <div class="paragraph"><p>Scalar2.apl is most conveniently called from the command line, and what is
-being measured can be controlled via command line arguments. For example:</p></div>
+being measured can be controlled via command line arguments. For example
+(from the top-level directory of GNU APL):</p></div>
 <div class="listingblock">
 <div class="content">
 <pre>
 
-<code>apl -f workspaces/Scalar2.apl -- -c 3,6 -d 200×⍳20</code>
+<code>make parallel1      # runs ./configure with suitable options
+src/apl -f workspaces/Scalar2.apl -- -c 3,6 -d 200×⍳20</code>
 
 </pre>
 </div></div>
-<div class="paragraph"><p>The following command line options are supported by <strong>Scalar2.apl</strong>:</p></div>
+<div class="paragraph"><p>The <strong>Scalar2.apl</strong> workspace understands the following command line options:</p></div>
 <div class="tableblock">
 <table rules="all"
 width="75%"
@@ -1475,12 +1477,93 @@ arrays in parallel.</p></div>
 be set.</p></div>
 </div>
 </div>
+<div class="sect1">
+<h2 id="_the_optimal_vs_the_maximal_core_count">The Optimal vs. the Maximal Core Count</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>The last plot window shown by the <strong>Scalar2</strong> workspace summarizes the speedups
+that were achieved for the different core counts that were selected with the
+-c option.</p></div>
+<div class="imageblock">
+<div class="content">
+<img src="./APL5.png" alt="APL5" />
+</div>
+</div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<img src="/usr/share/asciidoc/icons/note.png" alt="Note" />
+</td>
+<td class="content">leave at least one of the available cores unused because otherwise the
+operating system could grab one of the cores for its own purposes and that
+core would then become much slower than the others. The operating system is
+usually smart enough to locate an unused core for its own purposes, but that
+must fail if all cores are fully loaded with APL work.</td>
+</tr></table>
+</div>
+<div class="paragraph"><p>The speedups plotted in the last window are usually reasonable if:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+the APL function that is being bench-marked (as selected by the -f option)
+  is not too lightweight, and
+</p>
+</li>
+<li>
+<p>
+the vector lengths (-d option) is not too short.
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>The measurement show above was executed on a 6-core i7-8700 CPU. The CPU has
+6 (physical) cores with 12 (logical) core threads where the 12 core threads
+are mapped to 12 "CPUs" in the operating system as (per <strong>/proc/cpuinfo</strong>).</p></div>
+<div class="paragraph"><p>The benchmark command used was:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>src/apl -f workspaces/Scalar2.apl -- -c ⍳11 -d 5000×⍳20 -f 39</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>which means that:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong>-f 39</strong> : selects <strong>Z←¯6○B</strong> aka. <strong>arccosh(B)</strong> as benchmarking function with
+  a mix of Integer, Real, and Complex numbers,
+</p>
+</li>
+<li>
+<p>
+<strong>-d 5000×⍳20</strong> : use vector lengths ⍴B = 5,000, 10,000, 15,000 &#8230; 100,000, and
+</p>
+</li>
+<li>
+<p>
+<strong>-c ⍳11</strong> : use core counts of 1, 2, 3, &#8230; and 11.
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>The 11 different core counts and 20 different vector lengths above
+amounted to a total of 220 (= 11×20) individual measurements in the benchmark
+plotted above.</p></div>
+<div class="paragraph"><p>Had we run the benchmark with <strong>-c ⍳12</strong> instead of <strong>-c ⍳11</strong> then the
+measurement with 12 cores would have shown a rather bad speedup (try it
+yourself with <strong>-c</strong> set to the number of cores on your computer).</p></div>
+<div class="paragraph"><p><strong>Corollary:</strong> the optimal performance is achieved when the number of cores used
+for parallel APL is slightly smaller than the number of cores available. The
+number of cores available is also influenced by other (even idle) processes on
+the machine because they also influence the scheduling of the threads that
+perform the APL work.</p></div>
+</div>
+</div>
 </div>
 <div id="footnotes"><hr /></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2020-07-25 13:02:37 CEST
+ 2022-06-20 19:55:57 CEST
 </div>
 </div>
 </body>

@@ -49,7 +49,7 @@ void FnTagCommand::run_command( NetworkConnection &conn, const std::vector<std::
             out << "function is not executable\n";
         }
         else {
-            const UserFunction *ufun = function->get_ufun1();
+            const UserFunction *ufun = function->get_func_ufun();
             if( ufun == NULL ) {
                 out << "not a user function";
             }

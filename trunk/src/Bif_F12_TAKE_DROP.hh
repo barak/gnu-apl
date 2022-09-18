@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -24,20 +24,20 @@
 #include "Common.hh"
 #include "PrimitiveFunction.hh"
 
-//=============================================================================
+//============================================================================
 /** primitive functions Take and First */
 /// The class implementing ↑
-class Bif_F12_TAKE : public NonscalarFunction
+class Bif_F12_TAKE : public NonscalarFunction_default_identity
 {
 public:
    /// Constructor
    Bif_F12_TAKE()
-   : NonscalarFunction(TOK_F12_TAKE)
+   : NonscalarFunction_default_identity(TOK_F12_TAKE)
    {}
 
    /// overloaded Function::eval_B()
    virtual Token eval_B(Value_P B) const
-      { return Token(TOK_APL_VALUE1, first(B));}
+      { return Token(TOK_APL_VALUE1, first(*B));}
 
    /// overloaded Function::eval_AB()
    virtual Token eval_AB(Value_P A, Value_P B) const;
@@ -45,24 +45,28 @@ public:
    /// overloaded Function::eval_AXB()
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
 
+   /// overloaded Function::eval_XB()
+   virtual Token eval_XB(Value_P X, Value_P B) const;
+
    /// Take from B according to ravel_A
-   static Value_P do_take(const Shape & shape_Zi, Value_P B);
+   static Value_P do_take(const Shape & shape_Zi, const Value & B,
+                          AxesBitmap axes);
 
    /// Fill Z with B, pad as necessary
-   static void fill(const Shape & shape_Zi, Cell * cZ, Value & Z_owner,
-                    Value_P B);
+   static void fill(const Shape & shape_Zi, Value & Z_owner,
+                    const Value & B, AxesBitmap axes);
 
    static Bif_F12_TAKE * fun;   ///< Built-in function
    static Bif_F12_TAKE  _fun;   ///< Built-in function
 
    /// ↑B
-   static Value_P first(Value_P B);
+   static Value_P first(const Value & B);
 
 protected:
    /// Take A from B
    Token take(Value_P A, Value_P B);
 };
-//=============================================================================
+//============================================================================
 /** primitive function drop */
 /// The class implementing ↓
 class Bif_F12_DROP : public NonscalarFunction
@@ -85,7 +89,7 @@ public:
 protected:
 
 };
-//=============================================================================
+//============================================================================
 /** A helper class for Bif_F12_TAKE and Bif_F12_DROP. It implements an iterator
     that iterates over the indices (as dictated by left argument A) of the
     right argument B of A↑B or A↓B,
@@ -101,12 +105,17 @@ public:
      has_overtake(false),
      done(false)
       {
+        // increase ⍴⍴B if necessary
+        //
+        ref_B.expand_rank(sh_A.get_rank());
+
         ShapeItem _weight = 1;
         loop(r, sh_A.get_rank())
             {
               const ShapeItem sA = sh_A.get_rank() == 0
                                  ? 1 : sh_A.get_transposed_shape_item(r);
-              const ShapeItem sB = sh_B.get_rank() == 0
+              const ShapeItem sB = (sh_B.get_rank() == 0 ||
+                                    r >= sh_B.get_rank())
                                  ? 1 : sh_B.get_transposed_shape_item(r);
 
               ShapeItem _from, _to;
@@ -197,6 +206,9 @@ public:
         done = true;
       }
 
+   /// return the prototype for an axis
+   ShapeItem axis_proto(AxesBitmap axes) const;
+
    /// return true iff this inerator has more items to come.
    bool more() const   { return !done; }
 
@@ -206,7 +218,7 @@ public:
 
 protected:
    /// shape of the source array
-   const Shape & ref_B;
+   Shape ref_B;
 
    /// from / to / weight / current
    struct _ftwc ftwc[MAX_RANK];
@@ -223,5 +235,5 @@ protected:
    /// true iff this interator has reached its final item
    bool done;
 };
-//=============================================================================
+//============================================================================
 #endif // __BIF_F12_TAKE_DROP_HH_DEFINED__

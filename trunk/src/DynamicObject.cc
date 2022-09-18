@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -25,14 +25,14 @@
 #include "PrintOperator.hh"
 #include "Value.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ostream &
 operator << (ostream & out, const DynamicObject & dob)
 {
    dob.print(out);
    return out;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 DynamicObject::print_chain(ostream & out) const
 {
@@ -49,13 +49,13 @@ int pos = 0;
           if (p == this)   break;
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 DynamicObject::print_new(ostream & out, const char * loc) const
 {
    out << "new    " << voidP(this) << " at " << loc << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 DynamicObject::print(ostream & out) const
 {
@@ -65,23 +65,31 @@ DynamicObject::print(ostream & out) const
        << "    next:      " << voidP(next)          << endl
        << "    allocated: " << where_allocated()    << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// cast DynamicObject to derived class Value.
-// This only works properly after #include Value.hh !
-Value *
-DynamicObject::pValue()
+/// This only works properly after including Value.hh !
+Value &
+DynamicObject::rValue()
 {
-   return static_cast<Value *>(this);
+   /* static_cast<> is inherently unsafe, but we cannot used dynamic_cast<>()
+      because DynamicObject is non-virtual. The caller must therefore be
+      careful and we allow only class Value to use rValue().
+    */
+   return *static_cast<Value *>(this);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// cast DynamicObject to derived class Value.
-// This only works properly after #include Value.hh !
-const Value *
-DynamicObject::pValue() const
+/// This only works properly after including Value.hh !
+const Value &
+DynamicObject::rValue() const
 {
-  return static_cast<const Value *>(this);
+   /* static_cast<> is inherently unsafe, but we cannot used dynamic_cast<>()
+      because DynamicObject is non-virtual. The caller must therefore be
+      careful and we allow only class Value to use rValue().
+    */
+  return *static_cast<const Value *>(this);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// cast DynamicObject to derived class IndexExpr.
 // This only works properly after #include IndexExpr.hh !
 const IndexExpr *
@@ -89,7 +97,7 @@ DynamicObject::pIndexExpr() const
 {
   return static_cast<const IndexExpr *>(this);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// cast DynamicObject to derived class Value.
 // This only works properly after #include IndexExpr.hh !
 IndexExpr *
@@ -97,5 +105,5 @@ DynamicObject::pIndexExpr()
 {
   return static_cast<IndexExpr *>(this);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -35,13 +35,13 @@
 Quad_JSON  Quad_JSON::_fun;
 Quad_JSON * Quad_JSON::fun = &Quad_JSON::_fun;
 
-//=============================================================================
+//============================================================================
 Token
 Quad_JSON::eval_AB(Value_P A, Value_P B) const
 {
    if (A->get_rank() > 0)   RANK_ERROR;
 
-const int function_number = A->get_ravel(0).get_int_value();
+const int function_number = A->get_cfirst().get_int_value();
    switch(function_number)
       {
         case 0:   // same as monadic ⎕JSON
@@ -51,17 +51,17 @@ const int function_number = A->get_ravel(0).get_int_value();
 
          case 1:   // read and convert a JSOM file
               {
-                return convert_file(B.getref());
+                return convert_file(*B);
               }
 
          case 2:   // read and convert a JSOM file (unsorted)
               {
-                return Token(TOK_APL_VALUE1, APL_to_JSON(B.getref(), false));
+                return Token(TOK_APL_VALUE1, APL_to_JSON(*B, false));
               }
 
          case 3:   // read and convert a JSOM file (sorted)
               {
-                return Token(TOK_APL_VALUE1, APL_to_JSON(B.getref(), true));
+                return Token(TOK_APL_VALUE1, APL_to_JSON(*B, true));
               }
 
       }
@@ -69,7 +69,7 @@ const int function_number = A->get_ravel(0).get_int_value();
    MORE_ERROR() << "A ⎕JSON B: Bad function number A=" << function_number;
    DOMAIN_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_JSON::convert_file(const Value & B) const
 {
@@ -121,17 +121,17 @@ Value_P json_string_value(json_string_ucs, LOC);
 
    return eval_B(json_string_value);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_JSON::eval_B(Value_P B) const
 {
    if (B->get_rank() != 1)   RANK_ERROR;
 
-Value_P Z = JSON_to_APL(B.getref());
+Value_P Z = JSON_to_APL(*B);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_JSON::APL_to_JSON(const Value & B, bool sorted)
 {
@@ -143,7 +143,7 @@ UCS_string ucs_Z;
 Value_P Z(ucs_Z, LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_JSON::APL_to_JSON_string(UCS_string & result, const Cell & cell,
                               bool level, bool sorted)
@@ -183,13 +183,13 @@ Quad_JSON::APL_to_JSON_string(UCS_string & result, const Cell & cell,
    // at this point the cell should end up as char vector. Determint its depth.
    //
 const Value * Z = cell.get_pointer_value().get();
-   if (!(Z->get_ravel(0).is_pointer_cell() && Z->is_scalar()))
+   if (!(Z->get_cfirst().is_pointer_cell() && Z->is_scalar()))
       {
         APL_to_JSON_string(result, *Z, level, sorted);
         return;
       }
 
-   Z = Z->get_ravel(0).get_pointer_value().get();
+   Z = Z->get_cfirst().get_pointer_value().get();
    if (!Z->is_char_vector())
       {
 FIXME;
@@ -208,14 +208,14 @@ const UCS_string lit_ucs(*Z);
                 << "'. Expecting ⊂'true', ⊂'false', or ⊂'null'";
    result.clear();   // indicate error
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_JSON::APL_to_JSON_string(UCS_string & result, const Value & B,
                               bool level, bool sorted)
 {
    if (B.is_scalar())   // number or literal
       {
-        APL_to_JSON_string(result, B.get_ravel(0), level, sorted);
+        APL_to_JSON_string(result, B.get_cfirst(), level, sorted);
         return;
       }
 
@@ -265,7 +265,7 @@ Quad_JSON::APL_to_JSON_string(UCS_string & result, const Value & B,
                    array = UCS_string(2*level + 2, UNI_SPACE);
                  }
 
-              APL_to_JSON_string(array, B.get_ravel(e), level + 1, sorted);
+              APL_to_JSON_string(array, B.get_cravel(e), level + 1, sorted);
               if (array.size() == 0)   // error in APL_to_JSON_string()
                  {
                    result.clear();   // indicate error
@@ -284,13 +284,13 @@ Quad_JSON::APL_to_JSON_string(UCS_string & result, const Value & B,
 
         loop(m, member_indices.size())
            {
-             const Cell & member_name = B.get_ravel(2*member_indices[m]);
-             const Cell & member_data = B.get_ravel(2*member_indices[m] + 1);
+             const Cell & member_name = B.get_cravel(2*member_indices[m]);
+             const Cell & member_data = B.get_cravel(2*member_indices[m] + 1);
 
              result.append(UCS_string(2*level, UNI_SPACE));   // level indent
              if (m)   result.append_UTF8("  \"");
              else     result.append_UTF8("{ \"");
-             UCS_string member(member_name.get_pointer_value().getref());
+             UCS_string member(*member_name.get_pointer_value());
              result.append(member_name);
              result.append_UTF8("\": ");
              APL_to_JSON_string(result, member_data, level + 1, sorted);
@@ -315,7 +315,7 @@ Quad_JSON::APL_to_JSON_string(UCS_string & result, const Value & B,
    MORE_ERROR() << "⎕JSON B: bad rank " << B.get_rank();
    result.clear();   // indicate error
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 size_t
 Quad_JSON::skip_string(const UCS_string & ucs_B, ShapeItem & b)
 {
@@ -376,7 +376,7 @@ ShapeItem content_len = 0;
    "⎕JSON B: No string end for string starting at " << B0 << "↓B";
    DOMAIN_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 size_t
 Quad_JSON::number_len(const UCS_string & ucs_B, ShapeItem b)
 {
@@ -405,7 +405,7 @@ const ShapeItem B0 = b;
 
    return b - B0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_JSON::JSON_to_APL(const Value & B)
 {
@@ -413,7 +413,7 @@ const ShapeItem len_B = B.element_count();
 
 UCS_string ucs_B;
    ucs_B.reserve(len_B + 1);
-   loop(b, len_B)   ucs_B += B.get_ravel(b).get_char_value();
+   loop(b, len_B)   ucs_B += B.get_cravel(b).get_char_value();
    ucs_B += Unicode_0;   // 0-terminate ucs_B to avoid too many length checks
 
    // tokenize ucs_B
@@ -463,7 +463,7 @@ std::vector<ShapeItem> tokens_B;
 
 Value_P Z(LOC);
 size_t token0 = 0;
-   parse_value(Z.getref(), ucs_B, tokens_B, token0);
+   parse_value(*Z, ucs_B, tokens_B, token0);
    Z->check_value(LOC);
 
    if (token0 != tokens_B.size())
@@ -477,15 +477,15 @@ size_t token0 = 0;
 
    if (Z->is_simple_scalar())
       {
-        Assert(Z->get_ravel(0).is_numeric());
+        Assert(Z->get_cfirst().is_numeric());
         return Z;   // number
       }
 
    Assert(Z->is_scalar());
-   Assert(Z->get_ravel(0).is_pointer_cell());
-   return Z->get_ravel(0).get_pointer_value();
+   Assert(Z->get_cfirst().is_pointer_cell());
+   return Z->get_cfirst().get_pointer_value();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_JSON::parse_value(Value & Z, const UCS_string & ucs_B,
                       const std::vector<ShapeItem> & tokens_B, size_t & token0)
@@ -530,10 +530,11 @@ const ShapeItem b = tokens_B.at(token0);
         default: FIXME;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_JSON::parse_array(Value & Z, const UCS_string & ucs_B,
-                       const std::vector<ShapeItem> & tokens_B, size_t & token0)
+                       const std::vector<ShapeItem> & tokens_B,
+                       size_t & token0)
 {
 size_t token_from = token0;
    Assert(ucs_B[tokens_B[token_from]] == UNI_L_BRACK);   // [
@@ -548,15 +549,15 @@ const size_t commas = comma_count(ucs_B, tokens_B, token0);
            {
              // CERR << "empty ARRAY" << std::endl;
              Value_P Zsub = Idx0(LOC);
-             new (Z.next_ravel()) PointerCell(Zsub.get(), Z);
+             Z.next_ravel_Pointer(Zsub.get());
            }
         else
            {
              // CERR << "One element ARRAY" << std::endl;
              Value_P Zsub(1, LOC);
-             parse_value(Zsub.getref(), ucs_B, tokens_B, token_from);
+             parse_value(*Zsub, ucs_B, tokens_B, token_from);
              Zsub->check_value(LOC);
-             Z.next_ravel()->init_from_value(Zsub.get(), Z, LOC);
+             Z.next_ravel_Value(Zsub.get());
            }
         ++token_from;   // skip ]
       }
@@ -568,7 +569,7 @@ const size_t commas = comma_count(ucs_B, tokens_B, token0);
         Value_P Zsub(len, LOC);
         loop(l, len)
             {
-              parse_value(Zsub.getref(), ucs_B, tokens_B, token_from);
+              parse_value(*Zsub, ucs_B, tokens_B, token_from);
               const Unicode uni = ucs_B[tokens_B[token_from]];
               if (uni == UNI_COMMA)           ++token_from;
               else if (uni == UNI_R_BRACK)    ++token_from;
@@ -581,13 +582,13 @@ const size_t commas = comma_count(ucs_B, tokens_B, token0);
                  }
             }
         Zsub->check_value(LOC);
-        Z.next_ravel()->init_from_value(Zsub.get(), Z, LOC);
+        Z.next_ravel_Value(Zsub.get());
       }
 
    ++token0;   // skip final ]
    Assert(token0 == token_from);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_JSON::parse_object(Value & Z, const UCS_string & ucs_B,
                         const std::vector<ShapeItem> & tokens_B,
@@ -600,7 +601,7 @@ const size_t commas = comma_count(ucs_B, tokens_B, token0);
    Assert(ucs_B[tokens_B[token0]] == UNI_R_CURLY);   // always }
 
 Value_P assoc_array = EmptyStruct(LOC);
-   new (Z.next_ravel()) PointerCell(assoc_array.get(), Z);
+   Z.next_ravel_Pointer(assoc_array.get());
 
    ++token_from;   // skip {
    if (commas == 0)   // { } or { 'name' : value }
@@ -613,8 +614,7 @@ Value_P assoc_array = EmptyStruct(LOC);
         else
            {
              // CERR << "One element OBJECT" << std::endl;
-             parse_object_member(assoc_array.getref(), ucs_B, tokens_B,
-                                 token_from);
+             parse_object_member(*assoc_array, ucs_B, tokens_B, token_from);
            }
       }
    else               // { 'name' : value , 'name' : value... }
@@ -624,15 +624,14 @@ Value_P assoc_array = EmptyStruct(LOC);
 
         loop(it, items)
             {
-              parse_object_member(assoc_array.getref(), ucs_B, tokens_B,
-                                  token_from);
+              parse_object_member(*assoc_array, ucs_B, tokens_B, token_from);
             }
       }
 
    ++token0;   // skip final }
    Assert(token0 == token_from);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_JSON::parse_object_member(Value & Z, const UCS_string & ucs_B,
                                const std::vector<ShapeItem> & tokens_B,
@@ -693,11 +692,11 @@ UCS_string member_name;
    // parse the member value
    {
      Value_P Zsub(LOC);
-     parse_value(Zsub.getref(), ucs_B, tokens_B, token_from);
+     parse_value(*Zsub, ucs_B, tokens_B, token_from);
      Zsub->check_value(LOC);
 
      Cell * member_data = Z.get_new_member(member_name);
-     member_data->init(Zsub->get_ravel(0), Z, LOC);
+     member_data->init(Zsub->get_cfirst(), Z, LOC);
    }
 
    // check member-seperator (or end of object).
@@ -713,7 +712,7 @@ UCS_string member_name;
         }
    }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_JSON::parse_number(Value & Z, const UCS_string & ucs_B, ShapeItem b)
 {
@@ -778,19 +777,19 @@ double dval = 0;
 
    if (need_fract)
       {
-        new (Z.next_ravel())   FloatCell(dval);
+        Z.next_ravel_Float(dval);
         return;
       }
    else if (have_expo)   // so strtoll wont work
       {
-        if (dval < 0)   new (Z.next_ravel())   IntCell(dval - 0.5);
-        else            new (Z.next_ravel())   IntCell(dval + 0.5);
+        if (dval < 0)   Z.next_ravel_Int(dval - 0.5);   // round negative → 0
+        else            Z.next_ravel_Int(dval + 0.5);   // round positive → 0
         return;
       }
    else
       {
-        const long long int ival =strtoll(cc, 0, 10);
-        new (Z.next_ravel())   IntCell(ival);
+        const long long int ival = strtoll(cc, 0, 10);
+        Z.next_ravel_Int(ival);
         return;
       }
 
@@ -799,7 +798,7 @@ number_too_long:
                 << "↓B (max. length is " << MAX_NUMLEN << ")";
    DOMAIN_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_JSON::parse_string(Value & Z, const UCS_string & ucs_B, ShapeItem b)
 {
@@ -851,13 +850,13 @@ Value_P Zsub(content_len, LOC);
                  }
             }
 
-         new (Zsub->next_ravel()) CharCell(uni);
+         Zsub->next_ravel_Char(uni);
        }
 
    Zsub->check_value(LOC);
-   new (Z.next_ravel())   PointerCell(Zsub.get(), Z);
+   Z.next_ravel_Pointer(Zsub.get());
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Unicode
 Quad_JSON::decode_UUUU(const UCS_string & ucs_B, ShapeItem b)
 {
@@ -873,7 +872,7 @@ char cc[5];
 
    return Unicode(strtol(cc, 0, 16));
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_JSON::parse_literal(Value & Z, const UCS_string & ucs_B,
                          ShapeItem b, const char * expected_literal)
@@ -892,28 +891,34 @@ const size_t len = strlen(expected_literal);
 
 Value_P Zsubsub(len, LOC);
    loop(l, len)
-       new (Zsubsub->next_ravel()) CharCell(Unicode(expected_literal[l]));
+       Zsubsub->next_ravel_Char(Unicode(expected_literal[l]));
    Zsubsub->check_value(LOC);
 
 Value_P Zsub(LOC);
-   new (Zsub->next_ravel()) PointerCell(Zsubsub.get(), Zsub.getref());
+   Zsub->next_ravel_Pointer(Zsubsub.get());
    Zsub->check_value(LOC);
 
-   new (Z.next_ravel())   PointerCell(Zsub.get(), Z);
+   Z.next_ravel_Pointer(Zsub.get());
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 size_t
 Quad_JSON::comma_count(const UCS_string & ucs_B,
-                       const std::vector<ShapeItem> & tokens_B, size_t & token0)
+                       const std::vector<ShapeItem> & tokens_B,
+                       size_t & token0)
 {
-const Unicode start = ucs_B[tokens_B[token0]];
+   // ucs_B is the JSON text string being parsed,
+   // tokens_B are the start positions (in ucs_B) of the tokenized ucs_B,
+   // token0 is the current token in tokens_B which is either [ (start of a
+   // JSON array) or { (start of a JSON object).
+   //
+const Unicode start = ucs_B[tokens_B[token0]];   // either [ or {/
 Unicode end;
    if      (start == UNI_L_BRACK)   end = UNI_R_BRACK;
    else if (start == UNI_L_CURLY)   end = UNI_R_CURLY;
    else FIXME;
 
-UCS_string stack(end);
-size_t commas = 0;
+UCS_string stack(end);   // a stack of ] amd } to track nested [...] and {...}
+size_t commas = 0;       // the numebr of (top-level-) commas
 bool expect_comma = false;
 bool expect_colon = true;
 
@@ -922,12 +927,12 @@ bool expect_colon = true;
          const Unicode uni = ucs_B[tokens_B[token0]];
          switch(uni)
                {
-                 case UNI_L_BRACK:
-                      stack += UNI_R_BRACK;
+                 case UNI_L_BRACK:            // [
+                      stack += UNI_R_BRACK;   // push ]
                       continue;
 
-                 case UNI_L_CURLY:
-                      stack += UNI_R_CURLY;
+                 case UNI_L_CURLY:            //      {
+                      stack += UNI_R_CURLY;   // push }
                       continue;
 
                  case UNI_COMMA:
@@ -975,6 +980,7 @@ bool expect_colon = true;
                          }
                       stack.pop_back();
                       if (stack.size() == 0)   return commas;
+                      expect_comma = true;
                       continue;
 
                  case UNI_R_CURLY:
@@ -988,6 +994,7 @@ bool expect_colon = true;
                          }
                       stack.pop_back();
                       if (stack.size() == 0)   return commas;
+                      expect_comma = true;
                       continue;
 
                  default:
@@ -1008,4 +1015,4 @@ bool expect_colon = true;
                 << " at " << tokens_B[token0] << "↓B ";
    DOMAIN_ERROR;
 }
-//=============================================================================
+//============================================================================

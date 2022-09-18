@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -43,10 +43,11 @@ class Executable;
 class StateIndicator;
 class UTF8_string;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
  The symbol tables of the Workspace. We put them into a base class for
- Workspace, so that they are initialized before all other members of Workspace.
+ Workspace, so that they are initialized before all other members of
+ Workspace.
  **/
 /// The symbol tables of an APL workspace
 class Workspace_0
@@ -59,7 +60,7 @@ protected:
    /// this workspace.
    SystemSymTab distinguished_names;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /**
     An APL workspace. This structure contains everyting (variables, functions,
     SI stack, etc.) belonging to a single APL workspace.
@@ -204,8 +205,8 @@ public:
    /// the topmost SI with parse mode PM_FUNCTION
    static StateIndicator * SI_top_fun();
 
-   /// the topmost SI with an error
-   static StateIndicator * SI_top_error();
+   /// the topmost SI with an error, maybe require ⎕L, ⎕R, or ⎕X.
+   static StateIndicator * SI_top_error(bool quad_LRX);
 
    /// lookup an existing name (user defined or ⎕xx, var or function).
    /// return 0 if not found.
@@ -274,7 +275,7 @@ public:
    //
 #define ro_sv_def(x, _str, _txt) /** return x **/ static x & get_v_ ## x() \
    { return the_workspace.v_ ## x; }
-#define rw_sv_def(x, _str, _txt) /** return ## x **/ static x & get_v_ ## x() \
+#define rw_sv_def(x, _str, _txt) /** return ## x **/ static x& get_v_ ## x() \
    { return the_workspace.v_ ## x; }
    rw_sv_def(Quad_Quad,  "", "⎕")
    rw_sv_def(Quad_QUOTE, "", "⍞")
@@ -322,6 +323,6 @@ protected:
    /// the current workspace (for objects that need one but don't have one).
    static Workspace the_workspace;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __WORKSPACE_HH_DEFINED__

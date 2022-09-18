@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@
 Quad_XML  Quad_XML::_fun;
 Quad_XML * Quad_XML::fun = &Quad_XML::_fun;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 XML_node::XML_node(XML_node * anchor, const UCS_string & string_B,
                    ShapeItem spos, ShapeItem slen)
   : src(string_B),
@@ -191,11 +191,11 @@ const Unicode ucs1 = src[src_pos + 1];          // the character after <
 
    Assert(node_type != NT_error);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 XML_node::~XML_node()
 {
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 XML_node::print(ostream & out) const
 {
@@ -204,7 +204,7 @@ XML_node::print(ostream & out) const
 const UCS_string item(src, src_pos, src_len);
    out << get_node_type_name() << "[" << level << "] '" << item << "'" << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 XML_node::print_all(ostream & out, const XML_node & anchor)
 {
@@ -213,7 +213,7 @@ XML_node::print_all(ostream & out, const XML_node & anchor)
           x->print(CERR);
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 const char *
 XML_node::get_node_type_name() const
 {
@@ -231,24 +231,24 @@ XML_node::get_node_type_name() const
 
    return "--???";
 }
-//=============================================================================
+//============================================================================
 Token
 Quad_XML::eval_B(Value_P B) const
 {
    if (B->is_structured())   // associative B array to XML string
       {
-        Value_P Z = APL_to_XML(B.getref());
+        Value_P Z = APL_to_XML(*B);
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
 
    if (B->get_rank() != 1)   RANK_ERROR;
 
-Value_P Z = XML_to_APL(B.getref());
+Value_P Z = XML_to_APL(*B);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_XML::APL_to_XML(const Value & B)
 {
@@ -263,14 +263,14 @@ Value_P Z(len_Z, LOC);
        {
          const UCS_string & entity = *entities[e];
          const ShapeItem len = entity.size();
-         loop(l, len)   new (Z->next_ravel()) CharCell(entity[l]);
+         loop(l, len)   Z->next_ravel_Char(entity[l]);
          delete entities[e];
        }
 
    Z->check_value(LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_XML::add_sorted_entities(vector<const UCS_string *> & entities,
                               const Value & B)
@@ -290,13 +290,13 @@ bool tag_open = false;
          ShapeItem member_pos;     // the position in the XML file
          Unicode category;
          UCS_string name;
-         const Value & member_name = B.get_ravel(2*member_indices[m])
-                                      .get_pointer_value().getref();
+         const Value & member_name = *B.get_cravel(2*member_indices[m])
+                                       .get_pointer_value();
 
          split_name(&category, &member_pos, &name, member_name);
 
-         const Value & member_data = B.get_ravel(2*member_indices[m] + 1)
-                                      .get_pointer_value().getref();
+         const Value & member_data = *B.get_cravel(2*member_indices[m] + 1)
+                                      .get_pointer_value();
 
          // one tag; the member_indices items occur in the following
          // order (also below):
@@ -383,7 +383,7 @@ bool tag_open = false;
         entities.push_back(new UCS_string(start_tag));
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_XML::XML_to_APL(const Value & B)
 {
@@ -395,7 +395,7 @@ UCS_string string_B(len_B, UNI_NUL);
 ShapeItem dest_B = 0;
    loop(src_B, len_B)
       {
-        const Unicode uni = B.get_ravel(src_B).get_char_value();
+        const Unicode uni = B.get_cravel(src_B).get_char_value();
         if (uni == UNI_CR)   // CR
            {
              // see XML standard "2.11 End-of-Line Handling"
@@ -406,7 +406,7 @@ ShapeItem dest_B = 0;
                   continue;
                 }
 
-             const Unicode uni_1 = B.get_ravel(src_B + 1).get_char_value();
+             const Unicode uni_1 = B.get_cravel(src_B + 1).get_char_value();
              if (string_B[uni_1] == UNI_LF)   // CR/LF
                 {
                   continue;   // discard CR (don't ++dest_B)
@@ -451,7 +451,7 @@ bool error = true;
    //
    loop(b, len_B)
        {
-         const Unicode uni_b = B.get_ravel(b).get_char_value();
+         const Unicode uni_b = B.get_cravel(b).get_char_value();
          if (uni_b == '<')
             {
               if (text_start != b)   // some text before the '<'
@@ -482,7 +482,7 @@ cleanup:
    if (error)   DOMAIN_ERROR;
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ShapeItem
 XML_node::get_taglen(const UCS_string & string_B, ShapeItem offset)
 {
@@ -542,7 +542,7 @@ UCS_string where(string_B, offset, len1);
    else            MORE_ERROR() << "No tag end found in: " << where;
    return -1;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 XML_node::translate(XML_node & anchor, XML_node & garbage)
 {
@@ -593,7 +593,7 @@ ShapeItem count = 0;
 
    return false;   // OK
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 XML_node::collect(XML_node & anchor, XML_node & garbage, Value * Z)
 {
@@ -728,7 +728,7 @@ vector<size_t> pos_stack;   // a stack of node positions
 
    return false;   // OK
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 XML_node::add_member(Value * Z, Unicode first, const char * cp_member_name,
                      int number, Value * member_value)
@@ -739,7 +739,7 @@ UCS_string member_name(first);
    member_name.append_UTF8(cp_member_name);
    Z->add_member(member_name, member_value);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 XML_node::merge_range(XML_node & start, XML_node & end, XML_node & garbage)
 {
@@ -800,7 +800,7 @@ size_t position = Workspace::get_IO();   // re-number sub nodes
 
    return false;   // OK
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 XML_node::parse_tag()
 {
@@ -878,7 +878,7 @@ size_t attribute_count = Workspace::get_IO();   // "⍙" gets ⎕IO
 
    return false;   // OK
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 XML_node::normalize_attribute_value(UCS_string & attval)
 {
@@ -991,7 +991,7 @@ enum { PREDEFINED_COUNT = sizeof(predefined_entities)
    attval.resize(dest);
    return false;   // OK
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string
 XML_node::denormalize_attribute_value(const UCS_string & attval, bool quoted)
 {
@@ -1030,7 +1030,7 @@ UCS_string ret;
 
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 XML_node::matches(const XML_node * end_tag) const
 {
@@ -1045,7 +1045,7 @@ ShapeItem d = end_tag->src_pos + 2;
           if (uni != end_tag->src[d++])   return false;
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string
 XML_node::get_tagname() const
 {
@@ -1081,7 +1081,7 @@ UCS_string ret;
    ret.append(UCS_string(src, start, end - start));
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 XML_node::is_XML_char(Unicode uni)
 {
@@ -1102,7 +1102,7 @@ XML_node::is_XML_char(Unicode uni)
 
    return true;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 XML_node::is_name_char(Unicode uni)
 {
@@ -1115,7 +1115,7 @@ XML_node::is_name_char(Unicode uni)
    if (uni >= 0x203F && uni <= 0x2040)   return true;
    return false;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 const int first_ranges[] =
 {
      0xC0,    0xD6,
@@ -1148,7 +1148,7 @@ XML_node::is_first_name_char(Unicode uni)
 
    return false;
 }
-//=============================================================================
+//============================================================================
 UCS_string
 Quad_XML::skip_pos_prefix(const UCS_string & ucs)
 {
@@ -1159,13 +1159,13 @@ UCS_string ret;
    while (pos < ucs.size())   ret += ucs[pos++];
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_XML::eval_AB(Value_P A, Value_P B) const
 {
    if (A->get_rank() > 1)   RANK_ERROR;
 
-const int function_number = A->get_ravel(0).get_int_value();
+const int function_number = A->get_cfirst().get_int_value();
    switch(function_number)
       {
          case 0:   // same as monadic ⎕XML
@@ -1175,83 +1175,83 @@ const int function_number = A->get_ravel(0).get_int_value();
 
          case 1:   // read and convert an XML file
               {
-                return convert_file(B.getref());
+                return convert_file(*B);
               }
 
          case 2:
               {
-                Value_P Z = path_split(B.getref());
+                Value_P Z = path_split(*B);
                 return Token(TOK_APL_VALUE1, Z);
               }
 
          case 3:
               {
-                Value_P Z = name_split(B.getref());
+                Value_P Z = name_split(*B);
                 return Token(TOK_APL_VALUE1, Z);
               }
 
          case -3:
               {
-                Value_P Z = name_unsplit(B.getref());
+                Value_P Z = name_unsplit(*B);
                 return Token(TOK_APL_VALUE1, Z);
               }
 
          case 4:
               {
-                Value_P Z = tree(B.getref(), tf_none);
+                Value_P Z = tree(*B, tf_none);
                 return Token(TOK_APL_VALUE1, Z);
               }
 
          case 5:
               {
-                Value_P Z = tree(B.getref(), tf_with_pos | tf_with_decl);
+                Value_P Z = tree(*B, tf_with_pos | tf_with_decl);
                 return Token(TOK_APL_VALUE1, Z);
               }
 
          case 6:
               {
-                Value_P Z = tree(B.getref(), tf_with_pos | tf_fullpath);
+                Value_P Z = tree(*B, tf_with_pos | tf_fullpath);
                 return Token(TOK_APL_VALUE1, Z);
               }
 
          case 7:
               {
-                return all_members(B.getref(), tf_all);
+                return all_members(*B, tf_all);
               }
 
          case 8:
               {
-                return all_members(B.getref(), tf_tagname);
+                return all_members(*B, tf_tagname);
               }
 
          case 9:
               {
-                return all_members(B.getref(), tf_decl);
+                return all_members(*B, tf_decl);
               }
 
          case 10:
               {
-                return all_members(B.getref(), tf_text);
+                return all_members(*B, tf_text);
               }
 
          case 11:
               {
-                return all_members(B.getref(), tf_sub);
+                return all_members(*B, tf_sub);
               }
 
          case 12:
               {
-                return all_members(B.getref(), tf_all | tf_flat);
+                return all_members(*B, tf_all | tf_flat);
               }
 
          case 13:
               {
-                return all_members(B.getref(), tf_sub | tf_flat);
+                return all_members(*B, tf_sub | tf_flat);
               }
 
          case 14:
               {
-                return next_member(A.getref(), B.getref());
+                return next_member(*A, *B);
               }
 
       }
@@ -1259,7 +1259,7 @@ const int function_number = A->get_ravel(0).get_int_value();
    MORE_ERROR() << "A ⎕XML B: Bad function number A=" << function_number;
    DOMAIN_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_XML::convert_file(const Value & B) const
 {
@@ -1319,7 +1319,7 @@ Value_P xml_document_value(xml_document_ucs, LOC);
 
    return eval_B(xml_document_value);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_XML::path_split(const Value & B)
 {
@@ -1349,7 +1349,7 @@ ShapeItem from = 0;
             {
               if (p == from)
                  {
-                   while (Cell * cell = Z->next_ravel())   new (cell) IntCell(0);
+                   while (Z->more())  Z->next_ravel_0();
                    Z->check_value(LOC);
                    MORE_ERROR() << "Empty member name in 2 ⎕XML";
                    LENGTH_ERROR;
@@ -1357,7 +1357,7 @@ ShapeItem from = 0;
 
               const UCS_string member(path, from, p - from);
               Value_P Zp(member, LOC);
-              new (Z->next_ravel())   PointerCell(Zp.get(), Z.getref());
+              Z->next_ravel_Pointer(Zp.get());
               from = p + 1;
             }
        }
@@ -1366,14 +1366,14 @@ ShapeItem from = 0;
       {
         const UCS_string member(path, from, len_Z - from);
         Value_P Zp(member, LOC);
-        new (Z->next_ravel())   PointerCell(Zp.get(), Z.getref());
+        Z->next_ravel_Pointer(Zp.get());
       }
 
 
    Z->check_value(LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_XML::name_split(const Value & B)
 {
@@ -1386,24 +1386,24 @@ UCS_string name;
    split_name(&category, &member_pos, &name, B);
 
 Value_P Z(3, LOC);
-   new(Z->next_ravel())   CharCell(category);
-   new (Z->next_ravel())  IntCell(member_pos);
+   Z->next_ravel_Char(category);
+   Z->next_ravel_Int(member_pos);
 
 Value_P Z3(name, LOC);
-   new (Z->next_ravel()) PointerCell(Z3.get(), Z.getref());
+   Z->next_ravel_Pointer(Z3.get());
    Z->check_value(LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_XML::name_unsplit(const Value & B)
 {
    if (B.get_rank() != 1)        RANK_ERROR;
    if (B.element_count() != 3)   LENGTH_ERROR;
 
-const Cell & b0 =  B.get_ravel(0);
-const Cell & b1 =  B.get_ravel(1);
-const Cell & b2 =  B.get_ravel(2);
+const Cell & b0 =  B.get_cfirst();
+const Cell & b1 =  B.get_cravel(1);
+const Cell & b2 =  B.get_cravel(2);
 
 const APL_Integer position = b1.get_int_value();
    if (position < Workspace::get_IO())
@@ -1431,13 +1431,13 @@ UCS_string UCS_Z;
            }
 
          const ShapeItem len_B2 = B2->element_count();
-         loop(bb, len_B2)   UCS_Z += B2->get_ravel(bb).get_char_value();
+         loop(bb, len_B2)   UCS_Z += B2->get_cravel(bb).get_char_value();
       }
 
 Value_P Z(UCS_Z, LOC);
    return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 Quad_XML::tree(const Value & B, int flags)
 {
@@ -1454,7 +1454,7 @@ const UCS_string name_prefix = "";
 
    return Value_P(z, LOC);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Quad_XML::split_name(Unicode * category, ShapeItem * position,
                      UCS_string * name, const Value & value)
@@ -1467,7 +1467,7 @@ Quad_XML::split_name(Unicode * category, ShapeItem * position,
 
 const ShapeItem len = value.element_count();
    Assert(len >= 1);
-const Cell * src = &value.get_ravel(0);
+const Cell * src = &value.get_cfirst();
 const Cell * end = src + len;
 
    // decode the category...
@@ -1505,7 +1505,7 @@ ShapeItem pos = 0;
    if (name)   { while (src < end)   *name += src++->get_char_value(); }
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_XML::tree(const Value & B, UCS_string & z, UCS_string & prefix,
                const UCS_string & name_prefix, int flags)
@@ -1530,7 +1530,7 @@ std::vector<const Cell *>member_values;
 
    loop(m, member_indices.size())
       {
-        const Cell * cB = &B.get_ravel(2*member_indices[m]);
+        const Cell * cB = &B.get_cravel(2*member_indices[m]);
         Assert(cB->is_pointer_cell());
         if (flags & tf_with_pos)
            member_names.push_back(cB->get_pointer_value()->get_UCS_ravel());
@@ -1593,7 +1593,7 @@ std::vector<const Cell *>member_values;
         UCS_string subname(name_prefix);
         subname += UNI_FULLSTOP;
         subname += member_names[m];
-        tree(sub.getref(), z, prefix, subname, flags);
+        tree(*sub, z, prefix, subname, flags);
         if (last_member && prefix.size() > 1)
            {
              // the char was │ initially, has now become └, and should be
@@ -1604,7 +1604,7 @@ std::vector<const Cell *>member_values;
       }
    prefix.pop_back();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_XML::all_members(const Value & B, int flags)
 {
@@ -1623,13 +1623,13 @@ Value_P Z(result.size(), LOC);
    loop(r, result.size())
        {
           Value_P Zr(result[r], LOC);
-          new (Z->next_ravel())   PointerCell(Zr.get(), Z.getref());
+          Z->next_ravel_Pointer(Zr.get());
        }
 
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Quad_XML::all_members(UCS_string_vector & result, const Value & B,
                       const UCS_string & name_prefix, int flags)
@@ -1648,7 +1648,7 @@ std::vector<UCS_string>member_names;
 std::vector<const Cell *>member_values;
    loop(m, member_indices.size())
       {
-        const Cell & cB = B.get_ravel(2*member_indices[m]);
+        const Cell & cB = B.get_cravel(2*member_indices[m]);
         Assert(cB.is_pointer_cell());
         const UCS_string member_name = cB.get_pointer_value()->get_UCS_ravel();
         member_names.push_back(member_name);
@@ -1691,11 +1691,11 @@ std::vector<const Cell *>member_values;
         const Cell & member_data = *member_values[m];
         if (!member_data.is_pointer_cell())   continue;  // can't recurse
 
-        const Value & sub = member_data.get_pointer_value().getref();
+        const Value & sub = *member_data.get_pointer_value();
         if (sub.is_structured())   all_members(result, sub, path, flags);
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Quad_XML::next_member(const Value & A, const Value & B)
 {
@@ -1721,7 +1721,7 @@ const ShapeItem B_total = B.get_all_members_count();
         LENGTH_ERROR; 
       }
 
-const Value & A1 = *A.get_ravel(1).get_pointer_value();
+const Value & A1 = *A.get_cravel(1).get_pointer_value();
    if (A1.element_count() == 0)
       {
         // an empty A1 shall return the smallest element
@@ -1729,9 +1729,9 @@ const Value & A1 = *A.get_ravel(1).get_pointer_value();
         std::vector<ShapeItem> member_indices;
         B.sorted_members(member_indices, /* filters */ 0);
 
-        const Cell & cell = B.get_ravel(2*member_indices[0]);
-        const Value & name =  cell.get_pointer_value().getref();
-        return Token(TOK_APL_VALUE1, name.clone(LOC));
+        const Cell & cell = B.get_cravel(2*member_indices[0]);
+        Value * name =  cell.get_pointer_value().get();
+        return Token(TOK_APL_VALUE1, CLONE(name, LOC));
       }
 
 Value_P path = path_split(A1);
@@ -1749,7 +1749,7 @@ const ShapeItem path_length = path->element_count();
 const Value * container = &B;
    for (size_t path_idx = 0; path_idx < size_t(path_length - 1); ++path_idx)
        {
-         const UCS_string member(path->get_ravel(path_idx));
+         const UCS_string member(path->get_cravel(path_idx));
          const Cell * data_cell = container->get_member_data(member);
          if (data_cell == 0)
             {
@@ -1770,8 +1770,8 @@ const Value * container = &B;
        }
 const Value & last_path_item = path_length == 1
                              ? A1
-                             : path->get_ravel(path_length - 1)
-                                    .get_pointer_value().getref();
+                             : *path->get_cravel(path_length - 1)
+                                    .get_pointer_value();
 ShapeItem leaf_position;
    {
      const int weight = split_name(0, &leaf_position, 0, last_path_item);
@@ -1783,20 +1783,20 @@ std::vector<ShapeItem> member_indices;
 
    loop(m, member_indices.size())
       {
-        const Cell & cell = container->get_ravel(2*member_indices[m]);
+        const Cell & cell = container->get_cravel(2*member_indices[m]);
         Assert(cell.is_pointer_cell());
 
-        const Value & name_m =  cell.get_pointer_value().getref();
+        Value * name_m =  cell.get_pointer_value().get();
         ShapeItem position_m;
-        const int weight = split_name(0, &position_m, 0, name_m);
+        const int weight = split_name(0, &position_m, 0, *name_m);
         position_m += weight*B_total;
 
         if (position_m > leaf_position)   // next item after leaf
            {
-             return Token(TOK_APL_VALUE1, name_m.clone(LOC));
+             return Token(TOK_APL_VALUE1, CLONE(name_m, LOC));
            }
       }
 
    return Token(TOK_APL_VALUE1, Str0(LOC));   // no next item: return ""
 }
-//=============================================================================
+//============================================================================

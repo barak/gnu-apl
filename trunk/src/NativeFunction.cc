@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -31,7 +31,7 @@
 
 std::vector<NativeFunction *> NativeFunction::valid_functions;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 NativeFunction::NativeFunction(const UCS_string & so_name,
                                const UCS_string & apl_name)
    : Function(ID_USER_SYMBOL, TOK_FUN2),
@@ -133,7 +133,7 @@ const char * why = sym->cant_be_defined();
 
    ev(eval_fill_B  , (                          Vr B, Th));
    ev(eval_fill_AB , (Vr A,                     Vr B, Th));
-   ev(eval_ident_Bx, (Vr B,             Axis x,       Th));
+   ev(eval_ident_Bx, (Vr B,            sAxis x,       Th));
 #undef ev
 
    // compute function tag based on the signature
@@ -143,14 +143,14 @@ const char * why = sym->cant_be_defined();
    else if (signature & SIG_B )   tag = TOK_FUN2;
    else                           tag = TOK_FUN0;
 
-   if (is_operator())   sym->set_nc(NC_OPERATOR, this);
-   else                 sym->set_nc(NC_FUNCTION, this);
+   if (is_operator())   sym->set_NC(NC_OPERATOR, this);
+   else                 sym->set_NC(NC_FUNCTION, this);
 
    Workspace::more_error().clear();
    valid = true;
    valid_functions.push_back(this);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 NativeFunction::~NativeFunction()
 {
   Log(LOG_UserFunction__enter_leave)
@@ -164,7 +164,7 @@ NativeFunction::~NativeFunction()
            }
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void *
 NativeFunction::try_one_file(const char * filename, UCS_string & t4)
 {
@@ -195,7 +195,7 @@ void * handle = dlopen(filename, RTLD_NOW);
 
    return handle;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void *
 NativeFunction::open_so_file(UCS_string & t4, UCS_string & so_path)
 {
@@ -304,7 +304,7 @@ const char * dirs[] =
 
    return 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 NativeFunction::cleanup()
 {
@@ -329,7 +329,7 @@ NativeFunction::cleanup()
         // fun is being deleted
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 NativeFunction::destroy()
 {
@@ -351,7 +351,7 @@ NativeFunction::destroy()
 
    delete this;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 NativeFunction *
 NativeFunction::fix(const UCS_string & so_name,
                     const UCS_string & function_name)
@@ -376,8 +376,8 @@ NativeFunction::fix(const UCS_string & so_name,
                   return 0;
                 }
 
-             if (fun->is_operator())   sym->set_nc(NC_OPERATOR, fun);
-             else                      sym->set_nc(NC_FUNCTION, fun);
+             if (fun->is_operator())   sym->set_NC(NC_OPERATOR, fun);
+             else                      sym->set_NC(NC_FUNCTION, fun);
              return fun;
            }
       }
@@ -397,13 +397,13 @@ NativeFunction * new_function = new NativeFunction(so_name, function_name);
 
    return new_function;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 NativeFunction::has_result() const
 {
    return signature & SIG_Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 NativeFunction::is_operator() const
 {
@@ -419,20 +419,20 @@ NativeFunction::is_operator() const
        || f_eval_LRXB
        || f_eval_ALRXB;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 NativeFunction::print_properties(ostream & out, int indent) const
 {
 UCS_string ind(indent, UNI_SPACE);
    out << ind << "Native Function " << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string
 NativeFunction::canonical(bool with_lines) const
 {
    return original_so_path;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ostream &
 NativeFunction::print(std::ostream & out) const
 {
@@ -441,7 +441,7 @@ NativeFunction::print(std::ostream & out) const
 
    return out;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string
 NativeFunction::load_emacs_library(const char * emacs_arg)
 {
@@ -477,7 +477,7 @@ const int error =
    t4.clear();   // success
    return t4;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 NativeFunction::eval_() const
 {
@@ -485,7 +485,7 @@ NativeFunction::eval_() const
 
    SYNTAX_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 NativeFunction::eval_B(Value_P B) const
 {
@@ -493,7 +493,7 @@ NativeFunction::eval_B(Value_P B) const
 
    SYNTAX_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 NativeFunction::eval_AB(Value_P A, Value_P B) const
 {
@@ -501,7 +501,7 @@ NativeFunction::eval_AB(Value_P A, Value_P B) const
 
    SYNTAX_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 NativeFunction::eval_LB(Token & LO, Value_P B) const
 {
@@ -509,7 +509,7 @@ NativeFunction::eval_LB(Token & LO, Value_P B) const
 
    SYNTAX_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 NativeFunction::eval_ALB(Value_P A, Token & LO, Value_P B) const
 {
@@ -517,7 +517,7 @@ NativeFunction::eval_ALB(Value_P A, Token & LO, Value_P B) const
 
    SYNTAX_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 NativeFunction::eval_LRB(Token & LO, Token & RO, Value_P B) const
 {
@@ -526,7 +526,7 @@ NativeFunction::eval_LRB(Token & LO, Token & RO, Value_P B) const
 
    SYNTAX_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 NativeFunction::eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const
 {
@@ -535,7 +535,7 @@ NativeFunction::eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const
 
    SYNTAX_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 NativeFunction::eval_XB(Value_P X, Value_P B) const
 {
@@ -544,7 +544,7 @@ NativeFunction::eval_XB(Value_P X, Value_P B) const
    if (f_eval_XB)   return (*f_eval_XB)(X, B, this);
    else             return eval_B(B);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 NativeFunction::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
@@ -553,7 +553,7 @@ NativeFunction::eval_AXB(Value_P A, Value_P X, Value_P B) const
    if (f_eval_AXB)   return (*f_eval_AXB)(A, X, B, this);
    else              return eval_AB(A, B);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 NativeFunction::eval_LXB(Token & LO, Value_P X, Value_P B) const
 {
@@ -562,7 +562,7 @@ NativeFunction::eval_LXB(Token & LO, Value_P X, Value_P B) const
    if (f_eval_LXB)   return (*f_eval_LXB)(*LO.get_function(), X, B, this);
    else              return eval_LB(LO, B);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 NativeFunction::eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B) const
 {
@@ -571,7 +571,7 @@ NativeFunction::eval_ALXB(Value_P A, Token & LO, Value_P X, Value_P B) const
    if (f_eval_ALXB)   return (*f_eval_ALXB)(A, *LO.get_function(), X, B, this);
    else               return eval_ALB(A, LO, B);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 NativeFunction::eval_LRXB(Token & LO, Token & RO, Value_P X, Value_P B) const
 {
@@ -581,7 +581,7 @@ NativeFunction::eval_LRXB(Token & LO, Token & RO, Value_P X, Value_P B) const
                                             *RO.get_function(), X, B, this);
    else                return eval_LRB(LO, RO, B);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 NativeFunction::eval_ALRXB(Value_P A, Token & LO, Token & RO, Value_P X, Value_P B) const
 {
@@ -591,7 +591,7 @@ NativeFunction::eval_ALRXB(Value_P A, Token & LO, Token & RO, Value_P X, Value_P
                                                  *RO.get_function(), X, B, this);
    else                return eval_ALRB(A, LO, RO, B);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 NativeFunction::eval_fill_B(Value_P B) const
 {
@@ -599,7 +599,7 @@ NativeFunction::eval_fill_B(Value_P B) const
 
    SYNTAX_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 NativeFunction::eval_fill_AB(Value_P A, Value_P B) const
 {
@@ -607,13 +607,13 @@ NativeFunction::eval_fill_AB(Value_P A, Value_P B) const
 
    SYNTAX_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
-NativeFunction::eval_identity_fun(Value_P B, Axis axis) const
+NativeFunction::eval_identity_fun(Value_P B, sAxis axis) const
 {
    if (f_eval_ident_Bx)   return (*f_eval_ident_Bx)(B, axis, this);
 
    SYNTAX_ERROR;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 

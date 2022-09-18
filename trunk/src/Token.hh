@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -315,7 +315,7 @@ protected:
    /// helper function to print Quad-function (system function or variable).
    ostream & print_quad(ostream & out) const;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// A sequence of Token
 class Token_string : public  std::vector<Token>
 {
@@ -341,7 +341,7 @@ private:
    /// prevent accidental copying
    Token_string & operator =(const Token_string & other);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** a token with its location information. For token copied from a function
     body: low = high = PC. For token from a reduction low is the low location
     of the first token and high is the high of the last token of the token
@@ -367,7 +367,7 @@ struct Token_loc
      pc(_pc)
    {}
 
-   /// copy this Token_loc to \b other
+   /// copy \b other to this Token_loc
    void copy(const Token_loc & other, const char * loc)
       {
         pc = other.pc;
@@ -380,6 +380,6 @@ struct Token_loc
    /// the PC of the leftmost (highest PC) token
    Function_PC pc;
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __TOKEN_HH_DEFINED__

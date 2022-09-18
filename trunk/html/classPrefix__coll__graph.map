@@ -1,29 +1,28 @@
 <map id="Prefix" name="Prefix">
-<area shape="rect" id="node24" href="$classStateIndicator.html" title="One entry of the state indicator (SI) of the APL interpreter. " alt="" coords="379,736,481,763"/>
-<area shape="rect" id="node2" href="$classToken__string.html" title="A sequence of Token. " alt="" coords="512,528,609,555"/>
-<area shape="rect" id="node25" href="$classExecutable.html" title="Base class for ExecuteList, StatementList, and UserFunction. " alt="" coords="288,632,375,659"/>
-<area shape="rect" id="node4" href="$structToken__loc.html" title="A Token and its location information (position in a Token_string) " alt="" coords="405,528,487,555"/>
-<area shape="rect" id="node5" href="$classToken.html" title="One atom of an APL function or expression. " alt="" coords="206,424,265,451"/>
-<area shape="rect" id="node30" href="$classDerivedFunction.html" title="An APL operator bounf to its function argument(s) " alt="" coords="106,528,223,555"/>
-<area shape="rect" id="node6" href="$unionToken_1_1sval.html" title="the optional value of the token. " alt="" coords="231,320,322,347"/>
+<area shape="rect" id="node24" href="$classStateIndicator.html" title="One entry of the state indicator (SI) of the APL interpreter. " alt="" coords="465,721,568,748"/>
+<area shape="rect" id="node2" href="$classToken__string.html" title="A sequence of Token. " alt="" coords="435,513,532,540"/>
+<area shape="rect" id="node25" href="$classExecutable.html" title="Base class for ExecuteList, StatementList, and UserFunction. " alt="" coords="473,617,560,644"/>
+<area shape="rect" id="node4" href="$structToken__loc.html" title="A Token and its location information (position in a Token_string) " alt="" coords="181,513,263,540"/>
+<area shape="rect" id="node5" href="$classToken.html" title="One atom of an APL function or expression. " alt="" coords="193,424,251,451"/>
+<area shape="rect" id="node6" href="$unionToken_1_1sval.html" title="the optional value of the token. " alt="" coords="177,320,267,347"/>
 <area shape="rect" id="node7" href="$classSymbol.html" title="Base class for variables, defined functions, and distinguished names. " alt="" coords="117,231,183,257"/>
 <area shape="rect" id="node8" href="$classNamedObject.html" title="A user&#45;defined variable or function. " alt="" coords="5,125,108,152"/>
 <area shape="rect" id="node11" href="$classFunction.html" title="Base class for all APL functions and operators (system or defined) " alt="" coords="21,231,93,257"/>
 <area shape="rect" id="node9" href="$classUCS__string.html" title="A string of Unicode characters (32&#45;bit) " alt="" coords="133,125,223,152"/>
-<area shape="rect" id="node12" href="$classValue__P__Base.html" title="A Value smart * and access functions (except constructors) " alt="" coords="597,13,705,39"/>
-<area shape="rect" id="node17" href="$structCell_1_1SomeValue_1_1__pval.html" title="a pointer to, and the owner of, a nested APL (sub&#45;) value " alt="" coords="723,125,881,152"/>
-<area shape="rect" id="node23" href="$classValue__P.html" title="A Value smart * (constructors) " alt="" coords="260,125,331,152"/>
-<area shape="rect" id="node13" href="$classValue.html" title="An APL Value (essentially a Shape and a ravel) " alt="" coords="657,424,712,451"/>
-<area shape="rect" id="node14" href="$classDynamicObject.html" title="A Value or an IndexExpr. " alt="" coords="355,125,467,152"/>
-<area shape="rect" id="node22" href="$classIndexExpr.html" title="The interal representation of some APL index [A1;A2;...;An]. " alt="" coords="336,231,417,257"/>
-<area shape="rect" id="node15" href="$classCell.html" title="The base class for all Cells. " alt="" coords="819,320,865,347"/>
-<area shape="rect" id="node16" href="$unionCell_1_1SomeValue.html" title="A union containing all possible cell values for the different Cell types. " alt="" coords="841,231,961,257"/>
-<area shape="rect" id="node18" href="$structCell_1_1SomeValue_1_1__fval.html" title="&lt; for FloatCell " alt="" coords="905,125,1061,152"/>
-<area shape="rect" id="node19" href="$unionCell_1_1SomeValue_1_1__fval_1_1__flt__num.html" title="either a floating point value, or the denominator of a quotient " alt="" coords="905,5,1061,47"/>
-<area shape="rect" id="node20" href="$struct__deleted__value.html" title="a linked list of deleted values " alt="" coords="346,320,455,347"/>
-<area shape="rect" id="node21" href="$classShape.html" title="the shape of an APL value " alt="" coords="533,320,591,347"/>
-<area shape="rect" id="node26" href="$classUCS__string__vector.html" title="a vector of UCS_strings. " alt="" coords="247,528,381,555"/>
-<area shape="rect" id="node28" href="$classError.html" title="An APL error and information related to it. " alt="" coords="405,632,455,659"/>
-<area shape="rect" id="node29" href="$classDerivedFunctionCache.html" title="a small cache for storing a few DerivedFunction objects " alt="" coords="107,632,262,659"/>
-<area shape="rect" id="node31" href="$structPrefix_1_1Phrase.html" title="one phrase in the phrase table " alt="" coords="633,528,739,555"/>
+<area shape="rect" id="node12" href="$classValue__P__Base.html" title="A Value smart * and access functions (except constructors) " alt="" coords="455,13,563,39"/>
+<area shape="rect" id="node17" href="$structCell_1_1SomeValue_1_1__pval.html" title="a pointer to, and the owner of, a nested APL (sub&#45;) value " alt="" coords="869,125,1028,152"/>
+<area shape="rect" id="node23" href="$classValue__P.html" title="A Value smart * (constructors) " alt="" coords="312,125,383,152"/>
+<area shape="rect" id="node13" href="$classValue.html" title="An APL Value (essentially a Shape and a ravel) " alt="" coords="821,424,876,451"/>
+<area shape="rect" id="node14" href="$classDynamicObject.html" title="A Value or an IndexExpr. " alt="" coords="407,125,519,152"/>
+<area shape="rect" id="node22" href="$classIndexExpr.html" title="The interal representation of some APL index [A1;A2;...;An]. " alt="" coords="312,231,393,257"/>
+<area shape="rect" id="node15" href="$classCell.html" title="The base class for all Cells. " alt="" coords="978,320,1023,347"/>
+<area shape="rect" id="node16" href="$unionCell_1_1SomeValue.html" title="A union containing all possible cell values for the different Cell types. " alt="" coords="894,231,1014,257"/>
+<area shape="rect" id="node18" href="$structCell_1_1SomeValue_1_1__fval.html" title="&lt; for FloatCell " alt="" coords="1052,125,1208,152"/>
+<area shape="rect" id="node19" href="$unionCell_1_1SomeValue_1_1__fval_1_1__flt__num.html" title="either a floating point value, or the denominator of a quotient " alt="" coords="1052,5,1208,47"/>
+<area shape="rect" id="node20" href="$struct__deleted__value.html" title="a linked list of deleted values " alt="" coords="709,320,818,347"/>
+<area shape="rect" id="node21" href="$classShape.html" title="the shape of an APL value " alt="" coords="895,320,954,347"/>
+<area shape="rect" id="node26" href="$classUCS__string__vector.html" title="a vector of UCS_strings. " alt="" coords="578,513,711,540"/>
+<area shape="rect" id="node28" href="$classError.html" title="An APL error and information related to it. " alt="" coords="590,617,641,644"/>
+<area shape="rect" id="node29" href="$classDerivedFunctionCache.html" title="a small cache for storing a few DerivedFunction objects " alt="" coords="665,617,819,644"/>
+<area shape="rect" id="node30" href="$structPrefix_1_1Phrase.html" title="one phrase in the phrase table " alt="" coords="305,513,411,540"/>
 </map>

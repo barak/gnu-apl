@@ -61,6 +61,7 @@ $(document).ready(function(){initNavTree('classXML__Loading__Archive.html','');}
   <div class="summary">
 <a href="#nested-classes">Classes</a> &#124;
 <a href="#pub-methods">Public Member Functions</a> &#124;
+<a href="#pro-types">Protected Types</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a> &#124;
 <a href="classXML__Loading__Archive-members.html">List of all members</a>  </div>
@@ -74,26 +75,41 @@ $(document).ready(function(){initNavTree('classXML__Loading__Archive.html','');}
 
 <p><code>#include &lt;<a class="el" href="Archive_8hh_source.html">Archive.hh</a>&gt;</code></p>
 <div class="dynheader">
+Inheritance diagram for XML_Loading_Archive:</div>
+<div class="dyncontent">
+<div class="center"><img src="classXML__Loading__Archive__inherit__graph.png" border="0" usemap="#XML__Loading__Archive_inherit__map" alt="Inheritance graph"/></div>
+<map name="XML__Loading__Archive_inherit__map" id="XML__Loading__Archive_inherit__map">
+<area shape="rect" id="node2" href="classXML__Archive.html" title="class for )SAVEing and )LOADing APL Workspaces in an XML file format " alt="" coords="31,5,131,32"/>
+</map>
+<center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
+<div class="dynheader">
 Collaboration diagram for XML_Loading_Archive:</div>
 <div class="dyncontent">
 <div class="center"><img src="classXML__Loading__Archive__coll__graph.png" border="0" usemap="#XML__Loading__Archive_coll__map" alt="Collaboration graph"/></div>
 <map name="XML__Loading__Archive_coll__map" id="XML__Loading__Archive_coll__map">
-<area shape="rect" id="node2" href="classUCS__string__vector.html" title="a vector of UCS_strings. " alt="" coords="27,81,160,108"/>
+<area shape="rect" id="node2" href="classXML__Archive.html" title="class for )SAVEing and )LOADing APL Workspaces in an XML file format " alt="" coords="10,81,110,108"/>
+<area shape="rect" id="node3" href="classUCS__string__vector.html" title="a vector of UCS_strings. " alt="" coords="135,81,268,108"/>
 </map>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
 Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structXML__Loading__Archive_1_1__derived__todo.html">_derived_todo</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">properties of a derived function  <a href="structXML__Loading__Archive_1_1__derived__todo.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structXML__Loading__Archive_1_1__vid__pvid.html">_vid_pvid</a></td></tr>
 <tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">a value <a class="el" href="classID.html" title="Identifier of an internal object of the APL interpreter. ">ID</a> and the <a class="el" href="classID.html" title="Identifier of an internal object of the APL interpreter. ">ID</a> of its parent  <a href="structXML__Loading__Archive_1_1__vid__pvid.html#details">More...</a><br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">struct &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structXML__Loading__Archive_1_1fun__map.html">fun_map</a></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">one mapping from an fid in the old (SAVEed) workspace to the function address in the new (LOADing) workspace  <a href="structXML__Loading__Archive_1_1fun__map.html#details">More...</a><br /></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:afb3ef30dff883e356ba2441184ae3a5b"><td class="memItemLeft" align="right" valign="top"><a id="afb3ef30dff883e356ba2441184ae3a5b"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#afb3ef30dff883e356ba2441184ae3a5b">XML_Loading_Archive</a> (const char *_filename, int &amp;dump_fd)</td></tr>
-<tr class="memdesc:afb3ef30dff883e356ba2441184ae3a5b"><td class="mdescLeft">&#160;</td><td class="mdescRight">constructor: remember file name and workspace <br /></td></tr>
-<tr class="separator:afb3ef30dff883e356ba2441184ae3a5b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afd0e9ad4162c5babd4805a1c6a8cff20"><td class="memItemLeft" align="right" valign="top"><a id="afd0e9ad4162c5babd4805a1c6a8cff20"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#afd0e9ad4162c5babd4805a1c6a8cff20">XML_Loading_Archive</a> (ostream &amp;_out, const char *_filename, int &amp;dump_fd)</td></tr>
+<tr class="memdesc:afd0e9ad4162c5babd4805a1c6a8cff20"><td class="mdescLeft">&#160;</td><td class="mdescRight">constructor: remember file name and workspace <br /></td></tr>
+<tr class="separator:afd0e9ad4162c5babd4805a1c6a8cff20"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7e840365086a663e8ed80f4c59eb3a19"><td class="memItemLeft" align="right" valign="top"><a id="a7e840365086a663e8ed80f4c59eb3a19"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#a7e840365086a663e8ed80f4c59eb3a19">~XML_Loading_Archive</a> ()</td></tr>
 <tr class="memdesc:a7e840365086a663e8ed80f4c59eb3a19"><td class="mdescLeft">&#160;</td><td class="mdescRight">destructor (unmap()s file). <br /></td></tr>
@@ -106,6 +122,10 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#a3ea748a15d0a90fe9a32c362b14da7fd">read_Workspace</a> (bool silent)</td></tr>
 <tr class="memdesc:a3ea748a15d0a90fe9a32c362b14da7fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">read an entire workspace, throw DOMAIN_ERROR on failure <br /></td></tr>
 <tr class="separator:a3ea748a15d0a90fe9a32c362b14da7fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a35057dcfcbb5ac2bb19a1d4d24ed7072"><td class="memItemLeft" align="right" valign="top"><a id="a35057dcfcbb5ac2bb19a1d4d24ed7072"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#a35057dcfcbb5ac2bb19a1d4d24ed7072">check_compatibility</a> ()</td></tr>
+<tr class="memdesc:a35057dcfcbb5ac2bb19a1d4d24ed7072"><td class="mdescLeft">&#160;</td><td class="mdescRight">check compatibility information in the workspace and maybe warn the user <br /></td></tr>
+<tr class="separator:a35057dcfcbb5ac2bb19a1d4d24ed7072"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adebcc96caecb4bc940b7d17bf799e3ef"><td class="memItemLeft" align="right" valign="top"><a id="adebcc96caecb4bc940b7d17bf799e3ef"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#adebcc96caecb4bc940b7d17bf799e3ef">set_protection</a> (bool prot, const <a class="el" href="classUCS__string__vector.html">UCS_string_vector</a> &amp;allowed)</td></tr>
 <tr class="memdesc:adebcc96caecb4bc940b7d17bf799e3ef"><td class="mdescLeft">&#160;</td><td class="mdescRight">set copying and maybe set protection <br /></td></tr>
@@ -122,25 +142,47 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#a45c9b23463cf5379d2788af1789a62f0">read_vids</a> ()</td></tr>
 <tr class="memdesc:a45c9b23463cf5379d2788af1789a62f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">read vids of top-level variables <br /></td></tr>
 <tr class="separator:a45c9b23463cf5379d2788af1789a62f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-</table><table class="memberdecls">
-<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
-Protected Member Functions</h2></td></tr>
 <tr class="memitem:a987f28e4f3139e5f1c96913468ea3057"><td class="memItemLeft" align="right" valign="top"><a id="a987f28e4f3139e5f1c96913468ea3057"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#a987f28e4f3139e5f1c96913468ea3057">next_tag</a> (const char *loc)</td></tr>
 <tr class="memdesc:a987f28e4f3139e5f1c96913468ea3057"><td class="mdescLeft">&#160;</td><td class="mdescRight">move to next tag, return true if EOF <br /></td></tr>
 <tr class="separator:a987f28e4f3139e5f1c96913468ea3057"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-types"></a>
+Protected Types</h2></td></tr>
+<tr class="memitem:aef5db2b0b8ce3c7b25f8167dc09fc0ea"><td class="memItemLeft" align="right" valign="top"><a id="aef5db2b0b8ce3c7b25f8167dc09fc0ea"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#aef5db2b0b8ce3c7b25f8167dc09fc0ea">Vid</a> { <b>NO_VID</b> = int(-1)
+ }<tr class="memdesc:aef5db2b0b8ce3c7b25f8167dc09fc0ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">a value <a class="el" href="classID.html" title="Identifier of an internal object of the APL interpreter. ">ID</a> in a )SAVEd workspace <br /></td></tr>
+</td></tr>
+<tr class="separator:aef5db2b0b8ce3c7b25f8167dc09fc0ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6c2f8ea8c8913f3d6e770e270111a1de"><td class="memItemLeft" align="right" valign="top"><a id="a6c2f8ea8c8913f3d6e770e270111a1de"></a>enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#a6c2f8ea8c8913f3d6e770e270111a1de">Fid</a> { <b>NO_FID</b> = int(-1)
+ }<tr class="memdesc:a6c2f8ea8c8913f3d6e770e270111a1de"><td class="mdescLeft">&#160;</td><td class="mdescRight">the address of a function in a )SAVEd workspace <br /></td></tr>
+</td></tr>
+<tr class="separator:a6c2f8ea8c8913f3d6e770e270111a1de"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="inherit_header pro_types_classXML__Archive"><td colspan="2" onclick="javascript:toggleInherit('pro_types_classXML__Archive')"><img src="closed.png" alt="-"/>&#160;Protected Types inherited from <a class="el" href="classXML__Archive.html">XML_Archive</a></td></tr>
+<tr class="memitem:a8a757015b585510640e6110f7db9a3bb inherit pro_types_classXML__Archive"><td class="memItemLeft" align="right" valign="top">enum &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Archive.html#a8a757015b585510640e6110f7db9a3bb">ArchiveSyntax</a> { <br />
+&#160;&#160;<a class="el" href="classXML__Archive.html#a8a757015b585510640e6110f7db9a3bba6da4992e89185ec6bc0557f8f0699aba">ASX_MAJOR</a> = 1, 
+<br />
+&#160;&#160;<a class="el" href="classXML__Archive.html#a8a757015b585510640e6110f7db9a3bba43853005263f5796f03228eda02687ec">ASX_MINOR</a> = 2, 
+<br />
+&#160;&#160;<a class="el" href="classXML__Archive.html#a8a757015b585510640e6110f7db9a3bba045c4066709cead32b1b5ab8235ada0c">ASX_OTHER</a> = 1
+<br />
+ }</td></tr>
+<tr class="separator:a8a757015b585510640e6110f7db9a3bb inherit pro_types_classXML__Archive"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-methods"></a>
+Protected Member Functions</h2></td></tr>
 <tr class="memitem:a475b4572fea93849b155009d78afbd66"><td class="memItemLeft" align="right" valign="top"><a id="a475b4572fea93849b155009d78afbd66"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#a475b4572fea93849b155009d78afbd66">read_Value</a> ()</td></tr>
-<tr class="memdesc:a475b4572fea93849b155009d78afbd66"><td class="mdescLeft">&#160;</td><td class="mdescRight">read next <a class="el" href="classValue.html" title="An APL Value (essentially a Shape and a ravel) ">Value</a> element, return true on success <br /></td></tr>
+<tr class="memdesc:a475b4572fea93849b155009d78afbd66"><td class="mdescLeft">&#160;</td><td class="mdescRight">read next <a class="el" href="classValue.html" title="An APL Value (essentially a Shape and a ravel) ">Value</a> element <br /></td></tr>
 <tr class="separator:a475b4572fea93849b155009d78afbd66"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa94a5825fbb0c3c7d5d894a3d8430221"><td class="memItemLeft" align="right" valign="top"><a id="aa94a5825fbb0c3c7d5d894a3d8430221"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#aa94a5825fbb0c3c7d5d894a3d8430221">read_Cells</a> (<a class="el" href="classCell.html">Cell</a> *&amp;cell, <a class="el" href="classValue.html">Value</a> &amp;cell_owner, const UTF8 *&amp;first)</td></tr>
-<tr class="memdesc:aa94a5825fbb0c3c7d5d894a3d8430221"><td class="mdescLeft">&#160;</td><td class="mdescRight">read cell(s) starting at <b>cell</b> from string starting at <b>first</b> to number of cells read <br /></td></tr>
-<tr class="separator:aa94a5825fbb0c3c7d5d894a3d8430221"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a26a97f07293abb0eb268c650c53aae8e"><td class="memItemLeft" align="right" valign="top"><a id="a26a97f07293abb0eb268c650c53aae8e"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#a26a97f07293abb0eb268c650c53aae8e">read_chars</a> (<a class="el" href="classUCS__string.html">UCS_string</a> &amp;ucs, const UTF8 *&amp;first)</td></tr>
-<tr class="memdesc:a26a97f07293abb0eb268c650c53aae8e"><td class="mdescLeft">&#160;</td><td class="mdescRight">read characters tagged with INI_PAD_U1 and INI_PAD_U2, until end of line <br /></td></tr>
-<tr class="separator:a26a97f07293abb0eb268c650c53aae8e"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3c747929c263a6913ea01f833ce2a9f0"><td class="memItemLeft" align="right" valign="top"><a id="a3c747929c263a6913ea01f833ce2a9f0"></a>
+const UTF8 *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#a3c747929c263a6913ea01f833ce2a9f0">read_Cells</a> (<a class="el" href="classValue.html">Value</a> &amp;Z, const UTF8 *input)</td></tr>
+<tr class="memdesc:a3c747929c263a6913ea01f833ce2a9f0"><td class="mdescLeft">&#160;</td><td class="mdescRight">read one or more <a class="el" href="classCell.html" title="The base class for all Cells. ">Cell(s)</a> from input into the ravel of Z; return the UTF8 * after the cells. <br /></td></tr>
+<tr class="separator:a3c747929c263a6913ea01f833ce2a9f0"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4c957a7b68bd8ef13162b63ff62bb7ed"><td class="memItemLeft" align="right" valign="top"><a id="a4c957a7b68bd8ef13162b63ff62bb7ed"></a>
+const UTF8 *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#a4c957a7b68bd8ef13162b63ff62bb7ed">read_XML_string</a> (<a class="el" href="classUCS__string.html">UCS_string</a> &amp;ucs, const UTF8 *input)</td></tr>
+<tr class="memdesc:a4c957a7b68bd8ef13162b63ff62bb7ed"><td class="mdescLeft">&#160;</td><td class="mdescRight">input is a UTF8-encoded sequence of bytes, terminated with ". UTF8-decode the sequence, thereby removing the escape tagging with ⁰ (aka. UNI_PAD_U0), ¹ (UNI_PAD_U1), ²(UNI_PAD_U2), and <br />
+. return the UTF8 * pointing to the terminating ". <br /></td></tr>
+<tr class="separator:a4c957a7b68bd8ef13162b63ff62bb7ed"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad200f5b98b9cf3e903ccf714a56a1d0f"><td class="memItemLeft" align="right" valign="top"><a id="ad200f5b98b9cf3e903ccf714a56a1d0f"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#ad200f5b98b9cf3e903ccf714a56a1d0f">read_Ravel</a> ()</td></tr>
 <tr class="memdesc:ad200f5b98b9cf3e903ccf714a56a1d0f"><td class="mdescLeft">&#160;</td><td class="mdescRight">read next Ravel element <br /></td></tr>
@@ -153,10 +195,18 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#a1233bd12e879f5670f4a234e0f37b7aa">read_Variable</a> (int d, <a class="el" href="classSymbol.html">Symbol</a> &amp;symbol)</td></tr>
 <tr class="memdesc:a1233bd12e879f5670f4a234e0f37b7aa"><td class="mdescLeft">&#160;</td><td class="mdescRight">read next Variable element <br /></td></tr>
 <tr class="separator:a1233bd12e879f5670f4a234e0f37b7aa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a01df65abe766135365ed2a2fd866d544"><td class="memItemLeft" align="right" valign="top"><a id="a01df65abe766135365ed2a2fd866d544"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#a01df65abe766135365ed2a2fd866d544">read_Function</a> ()</td></tr>
+<tr class="memdesc:a01df65abe766135365ed2a2fd866d544"><td class="mdescLeft">&#160;</td><td class="mdescRight">read next <a class="el" href="classFunction.html" title="Base class for all APL functions and operators (system or defined) ">Function</a> element <br /></td></tr>
+<tr class="separator:a01df65abe766135365ed2a2fd866d544"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2e7aed9883aa106937d3d9313163e10b"><td class="memItemLeft" align="right" valign="top"><a id="a2e7aed9883aa106937d3d9313163e10b"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#a2e7aed9883aa106937d3d9313163e10b">read_Function</a> (int d, <a class="el" href="classSymbol.html">Symbol</a> &amp;symbol)</td></tr>
 <tr class="memdesc:a2e7aed9883aa106937d3d9313163e10b"><td class="mdescLeft">&#160;</td><td class="mdescRight">read next <a class="el" href="classFunction.html" title="Base class for all APL functions and operators (system or defined) ">Function</a> element <br /></td></tr>
 <tr class="separator:a2e7aed9883aa106937d3d9313163e10b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af47c1ee37f477d083cf1a3a22bb608ac"><td class="memItemLeft" align="right" valign="top"><a id="af47c1ee37f477d083cf1a3a22bb608ac"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#af47c1ee37f477d083cf1a3a22bb608ac">read_Derived</a> (<a class="el" href="classStateIndicator.html">StateIndicator</a> &amp;si, int lev)</td></tr>
+<tr class="memdesc:af47c1ee37f477d083cf1a3a22bb608ac"><td class="mdescLeft">&#160;</td><td class="mdescRight">read next derived function <br /></td></tr>
+<tr class="separator:af47c1ee37f477d083cf1a3a22bb608ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a6fedb7030e4a251354c6d5cc6c9261ab"><td class="memItemLeft" align="right" valign="top"><a id="a6fedb7030e4a251354c6d5cc6c9261ab"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#a6fedb7030e4a251354c6d5cc6c9261ab">read_Label</a> (int d, <a class="el" href="classSymbol.html">Symbol</a> &amp;symbol)</td></tr>
 <tr class="memdesc:a6fedb7030e4a251354c6d5cc6c9261ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">read next Label element <br /></td></tr>
@@ -193,22 +243,22 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#a7381cad28d73cdca8a76bf741921c63d">read_Parser</a> (<a class="el" href="classStateIndicator.html">StateIndicator</a> &amp;si, int lev)</td></tr>
 <tr class="memdesc:a7381cad28d73cdca8a76bf741921c63d"><td class="mdescLeft">&#160;</td><td class="mdescRight">read parsers in SI entry <br /></td></tr>
 <tr class="separator:a7381cad28d73cdca8a76bf741921c63d"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a6a78e55137388c3ba253e27d6e98a1c6"><td class="memItemLeft" align="right" valign="top"><a id="a6a78e55137388c3ba253e27d6e98a1c6"></a>
-<a class="el" href="classExecutable.html">Executable</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#a6a78e55137388c3ba253e27d6e98a1c6">read_Execute</a> ()</td></tr>
-<tr class="memdesc:a6a78e55137388c3ba253e27d6e98a1c6"><td class="mdescLeft">&#160;</td><td class="mdescRight">read ⍎ <a class="el" href="classExecutable.html" title="Base class for ExecuteList, StatementList, and UserFunction. ">Executable</a> <br /></td></tr>
-<tr class="separator:a6a78e55137388c3ba253e27d6e98a1c6"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a319259c8e532c47946deaf6f8afee8f4"><td class="memItemLeft" align="right" valign="top"><a id="a319259c8e532c47946deaf6f8afee8f4"></a>
-<a class="el" href="classExecutable.html">Executable</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#a319259c8e532c47946deaf6f8afee8f4">read_Statement</a> ()</td></tr>
-<tr class="memdesc:a319259c8e532c47946deaf6f8afee8f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">read ◊ <a class="el" href="classExecutable.html" title="Base class for ExecuteList, StatementList, and UserFunction. ">Executable</a> <br /></td></tr>
-<tr class="separator:a319259c8e532c47946deaf6f8afee8f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7823097bb94ced4a46e153e77a919b45"><td class="memItemLeft" align="right" valign="top"><a id="a7823097bb94ced4a46e153e77a919b45"></a>
-<a class="el" href="classExecutable.html">Executable</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#a7823097bb94ced4a46e153e77a919b45">read_UserFunction</a> ()</td></tr>
-<tr class="memdesc:a7823097bb94ced4a46e153e77a919b45"><td class="mdescLeft">&#160;</td><td class="mdescRight">read a user defined <a class="el" href="classExecutable.html" title="Base class for ExecuteList, StatementList, and UserFunction. ">Executable</a> <br /></td></tr>
-<tr class="separator:a7823097bb94ced4a46e153e77a919b45"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a47c3635d861946a293de143bdda6e7d2"><td class="memItemLeft" align="right" valign="top"><a id="a47c3635d861946a293de143bdda6e7d2"></a>
-<a class="el" href="classExecutable.html">Executable</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#a47c3635d861946a293de143bdda6e7d2">read_lambda</a> (const UTF8 *lambda_name)</td></tr>
-<tr class="memdesc:a47c3635d861946a293de143bdda6e7d2"><td class="mdescLeft">&#160;</td><td class="mdescRight">read a lambda <br /></td></tr>
-<tr class="separator:a47c3635d861946a293de143bdda6e7d2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5085841ad5dd83bd88588db76c3a2838"><td class="memItemLeft" align="right" valign="top"><a id="a5085841ad5dd83bd88588db76c3a2838"></a>
+const <a class="el" href="classExecutable.html">Executable</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#a5085841ad5dd83bd88588db76c3a2838">read_Execute</a> ()</td></tr>
+<tr class="memdesc:a5085841ad5dd83bd88588db76c3a2838"><td class="mdescLeft">&#160;</td><td class="mdescRight">read ⍎ <a class="el" href="classExecutable.html" title="Base class for ExecuteList, StatementList, and UserFunction. ">Executable</a> <br /></td></tr>
+<tr class="separator:a5085841ad5dd83bd88588db76c3a2838"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5e165853b437a502be850f3527ef8b77"><td class="memItemLeft" align="right" valign="top"><a id="a5e165853b437a502be850f3527ef8b77"></a>
+const <a class="el" href="classExecutable.html">Executable</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#a5e165853b437a502be850f3527ef8b77">read_Statement</a> ()</td></tr>
+<tr class="memdesc:a5e165853b437a502be850f3527ef8b77"><td class="mdescLeft">&#160;</td><td class="mdescRight">read ◊ <a class="el" href="classExecutable.html" title="Base class for ExecuteList, StatementList, and UserFunction. ">Executable</a> <br /></td></tr>
+<tr class="separator:a5e165853b437a502be850f3527ef8b77"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0cd18fa421176354e241891d951f5169"><td class="memItemLeft" align="right" valign="top"><a id="a0cd18fa421176354e241891d951f5169"></a>
+const <a class="el" href="classExecutable.html">Executable</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#a0cd18fa421176354e241891d951f5169">read_UserFunction</a> ()</td></tr>
+<tr class="memdesc:a0cd18fa421176354e241891d951f5169"><td class="mdescLeft">&#160;</td><td class="mdescRight">read a user defined <a class="el" href="classExecutable.html" title="Base class for ExecuteList, StatementList, and UserFunction. ">Executable</a> <br /></td></tr>
+<tr class="separator:a0cd18fa421176354e241891d951f5169"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a16b4789e109bf0167ae481b86a1ebedb"><td class="memItemLeft" align="right" valign="top"><a id="a16b4789e109bf0167ae481b86a1ebedb"></a>
+<a class="el" href="classExecutable.html">Executable</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#a16b4789e109bf0167ae481b86a1ebedb">read_lambda</a> (const UTF8 *lambda_name)</td></tr>
+<tr class="memdesc:a16b4789e109bf0167ae481b86a1ebedb"><td class="mdescLeft">&#160;</td><td class="mdescRight">read a lambda <br /></td></tr>
+<tr class="separator:a16b4789e109bf0167ae481b86a1ebedb"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac4cdadb93d62fcd862579b84d3556804"><td class="memItemLeft" align="right" valign="top"><a id="ac4cdadb93d62fcd862579b84d3556804"></a>
 <a class="el" href="classUCS__string.html">UCS_string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#ac4cdadb93d62fcd862579b84d3556804">read_UCS</a> ()</td></tr>
 <tr class="memdesc:ac4cdadb93d62fcd862579b84d3556804"><td class="mdescLeft">&#160;</td><td class="mdescRight">read an UCS string <br /></td></tr>
@@ -217,24 +267,24 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#a619b73db295d1c88790d671a9ce7fef4">read_Token</a> (<a class="el" href="structToken__loc.html">Token_loc</a> &amp;tloc)</td></tr>
 <tr class="memdesc:a619b73db295d1c88790d671a9ce7fef4"><td class="mdescLeft">&#160;</td><td class="mdescRight">read a token <br /></td></tr>
 <tr class="separator:a619b73db295d1c88790d671a9ce7fef4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2d6bd9ac2758a86eb86ff5f754d96ceb"><td class="memItemLeft" align="right" valign="top"><a id="a2d6bd9ac2758a86eb86ff5f754d96ceb"></a>
-<a class="el" href="classFunction.html">Function</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#a2d6bd9ac2758a86eb86ff5f754d96ceb">read_Function_name</a> (const char *ufun_name, const char *si_level, const char *sysfun_id)</td></tr>
-<tr class="memdesc:a2d6bd9ac2758a86eb86ff5f754d96ceb"><td class="mdescLeft">&#160;</td><td class="mdescRight">read a system function with attribute id_prefix-id or a user defined functions with attributes 'ufun_prefix-ufun' and 'level_prefix-prefix' <br /></td></tr>
-<tr class="separator:a2d6bd9ac2758a86eb86ff5f754d96ceb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:add4673c6dc5cb2e75be26359693dd889"><td class="memItemLeft" align="right" valign="top"><a id="add4673c6dc5cb2e75be26359693dd889"></a>
-<a class="el" href="classFunction.html">Function</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#add4673c6dc5cb2e75be26359693dd889">find_lambda</a> (const <a class="el" href="classUCS__string.html">UCS_string</a> &amp;lambda)</td></tr>
-<tr class="memdesc:add4673c6dc5cb2e75be26359693dd889"><td class="mdescLeft">&#160;</td><td class="mdescRight">find a lambda in the current SI entry <br /></td></tr>
-<tr class="separator:add4673c6dc5cb2e75be26359693dd889"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac281f8500311f7c498243ec23ee1d143"><td class="memItemLeft" align="right" valign="top"><a id="ac281f8500311f7c498243ec23ee1d143"></a>
+<a class="el" href="classFunction.html">Function_P</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#ac281f8500311f7c498243ec23ee1d143">read_Function_name</a> ()</td></tr>
+<tr class="memdesc:ac281f8500311f7c498243ec23ee1d143"><td class="mdescLeft">&#160;</td><td class="mdescRight">read a system function with attribute id_prefix-id or a user defined functions with attributes 'ufun_prefix-ufun' and 'level_prefix-prefix' <br /></td></tr>
+<tr class="separator:ac281f8500311f7c498243ec23ee1d143"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a486705e0f7d900feed8c8fce0bbb9f46"><td class="memItemLeft" align="right" valign="top"><a id="a486705e0f7d900feed8c8fce0bbb9f46"></a>
+<a class="el" href="classFunction.html">Function_P</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#a486705e0f7d900feed8c8fce0bbb9f46">find_lambda</a> (const <a class="el" href="classUCS__string.html">UCS_string</a> &amp;lambda)</td></tr>
+<tr class="memdesc:a486705e0f7d900feed8c8fce0bbb9f46"><td class="mdescLeft">&#160;</td><td class="mdescRight">find a lambda in the current SI entry <br /></td></tr>
+<tr class="separator:a486705e0f7d900feed8c8fce0bbb9f46"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a0d14127092a86998ea23d842145bb39d"><td class="memItemLeft" align="right" valign="top"><a id="a0d14127092a86998ea23d842145bb39d"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#a0d14127092a86998ea23d842145bb39d">more</a> () const</td></tr>
 <tr class="memdesc:a0d14127092a86998ea23d842145bb39d"><td class="mdescLeft">&#160;</td><td class="mdescRight">return true iff there is more data in the file <br /></td></tr>
 <tr class="separator:a0d14127092a86998ea23d842145bb39d"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8bd29aeafec52ab250cc219be69c7560"><td class="memItemLeft" align="right" valign="top"><a id="a8bd29aeafec52ab250cc219be69c7560"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#a8bd29aeafec52ab250cc219be69c7560">where</a> (ostream &amp;out)</td></tr>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#a8bd29aeafec52ab250cc219be69c7560">where</a> (ostream &amp;<a class="el" href="classXML__Loading__Archive.html#a07ab3d8c5115b805cecd44dcc9195b06">out</a>)</td></tr>
 <tr class="memdesc:a8bd29aeafec52ab250cc219be69c7560"><td class="mdescLeft">&#160;</td><td class="mdescRight">show some characters starting at the current position <br /></td></tr>
 <tr class="separator:a8bd29aeafec52ab250cc219be69c7560"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2794bca6a47030fdb69759aacb80eb33"><td class="memItemLeft" align="right" valign="top"><a id="a2794bca6a47030fdb69759aacb80eb33"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#a2794bca6a47030fdb69759aacb80eb33">where_att</a> (ostream &amp;out)</td></tr>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#a2794bca6a47030fdb69759aacb80eb33">where_att</a> (ostream &amp;<a class="el" href="classXML__Loading__Archive.html#a07ab3d8c5115b805cecd44dcc9195b06">out</a>)</td></tr>
 <tr class="memdesc:a2794bca6a47030fdb69759aacb80eb33"><td class="mdescLeft">&#160;</td><td class="mdescRight">show attributes of current tag <br /></td></tr>
 <tr class="separator:a2794bca6a47030fdb69759aacb80eb33"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac05e6074cb18f1573377837473de29df"><td class="memItemLeft" align="right" valign="top"><a id="ac05e6074cb18f1573377837473de29df"></a>
@@ -250,24 +300,60 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <tr class="memdesc:ad8cf599287f50b63ee67539509c6dce1"><td class="mdescLeft">&#160;</td><td class="mdescRight">check that is_tag(prefix) is true and print error info if not <br /></td></tr>
 <tr class="separator:ad8cf599287f50b63ee67539509c6dce1"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a59a9b9839c3a2087ce5a350b3b9a9c06"><td class="memItemLeft" align="right" valign="top"><a id="a59a9b9839c3a2087ce5a350b3b9a9c06"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#a59a9b9839c3a2087ce5a350b3b9a9c06">print_tag</a> (ostream &amp;out) const</td></tr>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#a59a9b9839c3a2087ce5a350b3b9a9c06">print_tag</a> (ostream &amp;<a class="el" href="classXML__Loading__Archive.html#a07ab3d8c5115b805cecd44dcc9195b06">out</a>) const</td></tr>
 <tr class="memdesc:a59a9b9839c3a2087ce5a350b3b9a9c06"><td class="mdescLeft">&#160;</td><td class="mdescRight">print current tag <br /></td></tr>
 <tr class="separator:a59a9b9839c3a2087ce5a350b3b9a9c06"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad0c398f273df586ef1a2cb9b87b9cb41"><td class="memItemLeft" align="right" valign="top"><a id="ad0c398f273df586ef1a2cb9b87b9cb41"></a>
 const UTF8 *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#ad0c398f273df586ef1a2cb9b87b9cb41">find_attr</a> (const char *att_name, bool optional)</td></tr>
-<tr class="memdesc:ad0c398f273df586ef1a2cb9b87b9cb41"><td class="mdescLeft">&#160;</td><td class="mdescRight">find attribute <b>att_name</b> and return a pointer to its value if found) <br /></td></tr>
+<tr class="memdesc:ad0c398f273df586ef1a2cb9b87b9cb41"><td class="mdescLeft">&#160;</td><td class="mdescRight">find attribute <b>att_name</b> and return: a pointer to its value if found, 0 if optional is true, and throw DOMAIN ERROR if optional is false. <br /></td></tr>
 <tr class="separator:ad0c398f273df586ef1a2cb9b87b9cb41"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac0628d3b9035aa2ec3ed6cba88fd2888"><td class="memItemLeft" align="right" valign="top"><a id="ac0628d3b9035aa2ec3ed6cba88fd2888"></a>
+const UTF8 *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#ac0628d3b9035aa2ec3ed6cba88fd2888">find_mandatory_attr</a> (const char *att_name)</td></tr>
+<tr class="memdesc:ac0628d3b9035aa2ec3ed6cba88fd2888"><td class="mdescLeft">&#160;</td><td class="mdescRight">find mandatory attribute <b>att_name</b>. Return a pointer to its value if found and throw DOMAIN ERROR if not. <br /></td></tr>
+<tr class="separator:ac0628d3b9035aa2ec3ed6cba88fd2888"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae8176346c1ac6e66df411802460f41e6"><td class="memItemLeft" align="right" valign="top"><a id="ae8176346c1ac6e66df411802460f41e6"></a>
+const UTF8 *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#ae8176346c1ac6e66df411802460f41e6">find_optional_attr</a> (const char *att_name)</td></tr>
+<tr class="memdesc:ae8176346c1ac6e66df411802460f41e6"><td class="mdescLeft">&#160;</td><td class="mdescRight">find optional attribute <b>att_name</b>. Return a pointer to its value if found and 0 if not. <br /></td></tr>
+<tr class="separator:ae8176346c1ac6e66df411802460f41e6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab000726e8f5db4742338a6844c899541"><td class="memItemLeft" align="right" valign="top"><a id="ab000726e8f5db4742338a6844c899541"></a>
 int64_t&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#ab000726e8f5db4742338a6844c899541">find_int_attr</a> (const char *att_name, bool optional, int base)</td></tr>
 <tr class="memdesc:ab000726e8f5db4742338a6844c899541"><td class="mdescLeft">&#160;</td><td class="mdescRight">return integer value of attribute <b>att_name</b> <br /></td></tr>
 <tr class="separator:ab000726e8f5db4742338a6844c899541"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab8580e022dac6f86d619f3d2344a2f39"><td class="memItemLeft" align="right" valign="top"><a id="ab8580e022dac6f86d619f3d2344a2f39"></a>
+<a class="el" href="classXML__Loading__Archive.html#a6c2f8ea8c8913f3d6e770e270111a1de">Fid</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#ab8580e022dac6f86d619f3d2344a2f39">find_Fid_attr</a> (const char *att_name, bool optional, int base)</td></tr>
+<tr class="memdesc:ab8580e022dac6f86d619f3d2344a2f39"><td class="mdescLeft">&#160;</td><td class="mdescRight">return Fid value of attribute <b>att_name</b> <br /></td></tr>
+<tr class="separator:ab8580e022dac6f86d619f3d2344a2f39"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ada80c9a78cf66c57c5c7085a237c45b2"><td class="memItemLeft" align="right" valign="top"><a id="ada80c9a78cf66c57c5c7085a237c45b2"></a>
+<a class="el" href="classXML__Loading__Archive.html#aef5db2b0b8ce3c7b25f8167dc09fc0ea">Vid</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#ada80c9a78cf66c57c5c7085a237c45b2">find_Vid_attr</a> (const char *att_name, bool optional, int base)</td></tr>
+<tr class="memdesc:ada80c9a78cf66c57c5c7085a237c45b2"><td class="mdescLeft">&#160;</td><td class="mdescRight">return Fid value of attribute <b>att_name</b> <br /></td></tr>
+<tr class="separator:ada80c9a78cf66c57c5c7085a237c45b2"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1acad23f43b2ceb1287f378c3e001d33"><td class="memItemLeft" align="right" valign="top"><a id="a1acad23f43b2ceb1287f378c3e001d33"></a>
 <a class="el" href="classAPL__Float.html">APL_Float</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#a1acad23f43b2ceb1287f378c3e001d33">find_float_attr</a> (const char *att_name)</td></tr>
 <tr class="memdesc:a1acad23f43b2ceb1287f378c3e001d33"><td class="mdescLeft">&#160;</td><td class="mdescRight">return floating point value of attribute <b>att_name</b> <br /></td></tr>
 <tr class="separator:a1acad23f43b2ceb1287f378c3e001d33"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a93a89589ea91d036a7327823bcda95cb"><td class="memItemLeft" align="right" valign="top"><a id="a93a89589ea91d036a7327823bcda95cb"></a>
+<a class="el" href="structXML__Loading__Archive_1_1fun__map.html">fun_map</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#a93a89589ea91d036a7327823bcda95cb">find_fun_map</a> (<a class="el" href="classXML__Loading__Archive.html#a6c2f8ea8c8913f3d6e770e270111a1de">Fid</a> fid)</td></tr>
+<tr class="memdesc:a93a89589ea91d036a7327823bcda95cb"><td class="mdescLeft">&#160;</td><td class="mdescRight">return <a class="el" href="structXML__Loading__Archive_1_1fun__map.html" title="one mapping from an fid in the old (SAVEed) workspace to the function address in the new (LOADing) wo...">fun_map</a> for fid, or 0 if not found. <br /></td></tr>
+<tr class="separator:a93a89589ea91d036a7327823bcda95cb"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aeebe9f4714ef4ab37bb1f759f23419d9"><td class="memItemLeft" align="right" valign="top"><a id="aeebe9f4714ef4ab37bb1f759f23419d9"></a>
+<a class="el" href="classFunction.html">Function_P</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#aeebe9f4714ef4ab37bb1f759f23419d9">find_function</a> (<a class="el" href="classXML__Loading__Archive.html#a6c2f8ea8c8913f3d6e770e270111a1de">Fid</a> fid)</td></tr>
+<tr class="memdesc:aeebe9f4714ef4ab37bb1f759f23419d9"><td class="mdescLeft">&#160;</td><td class="mdescRight">return function for fid, or 0 if not found. <br /></td></tr>
+<tr class="separator:aeebe9f4714ef4ab37bb1f759f23419d9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab35641740ea48ef96237fe6d230d426b"><td class="memItemLeft" align="right" valign="top"><a id="ab35641740ea48ef96237fe6d230d426b"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#ab35641740ea48ef96237fe6d230d426b">add_fid_function</a> (<a class="el" href="classXML__Loading__Archive.html#a6c2f8ea8c8913f3d6e770e270111a1de">Fid</a> fid, <a class="el" href="classFunction.html">Function_P</a> new_fun, const char *loc)</td></tr>
+<tr class="memdesc:ab35641740ea48ef96237fe6d230d426b"><td class="mdescLeft">&#160;</td><td class="mdescRight">add fid and function to find_fun_map. Either fid must be new, or else an existing fid must have its new_fun == 0 (forward declaration). <br /></td></tr>
+<tr class="separator:ab35641740ea48ef96237fe6d230d426b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0b10760156dee11738606170c9084821"><td class="memItemLeft" align="right" valign="top"><a id="a0b10760156dee11738606170c9084821"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#a0b10760156dee11738606170c9084821">instantiate_derived_functions</a> (bool allocate)</td></tr>
+<tr class="memdesc:a0b10760156dee11738606170c9084821"><td class="mdescLeft">&#160;</td><td class="mdescRight">instantiate the derived functions in <b>derived_todos</b> <br /></td></tr>
+<tr class="separator:a0b10760156dee11738606170c9084821"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
+<tr class="memitem:a07ab3d8c5115b805cecd44dcc9195b06"><td class="memItemLeft" align="right" valign="top"><a id="a07ab3d8c5115b805cecd44dcc9195b06"></a>
+ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#a07ab3d8c5115b805cecd44dcc9195b06">out</a></td></tr>
+<tr class="memdesc:a07ab3d8c5115b805cecd44dcc9195b06"><td class="mdescLeft">&#160;</td><td class="mdescRight">where to send the "SAVED..." message <br /></td></tr>
+<tr class="separator:a07ab3d8c5115b805cecd44dcc9195b06"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac55dc91bb76192278fdc070f2d3cf1fe"><td class="memItemLeft" align="right" valign="top"><a id="ac55dc91bb76192278fdc070f2d3cf1fe"></a>
 int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#ac55dc91bb76192278fdc070f2d3cf1fe">fd</a></td></tr>
 <tr class="memdesc:ac55dc91bb76192278fdc070f2d3cf1fe"><td class="mdescLeft">&#160;</td><td class="mdescRight">the file descriptor for the mmap()ed workspace.xml file <br /></td></tr>
@@ -332,10 +418,10 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#a1b1ca89a2511ad238680e25ea1fa6c03">reading_vids</a></td></tr>
 <tr class="memdesc:a1b1ca89a2511ad238680e25ea1fa6c03"><td class="mdescLeft">&#160;</td><td class="mdescRight">true if reading vids (preparation for )COPY or )PCOPY) <br /></td></tr>
 <tr class="separator:a1b1ca89a2511ad238680e25ea1fa6c03"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4180cae61394cb08ba070c7ecd138ea5"><td class="memItemLeft" align="right" valign="top"><a id="a4180cae61394cb08ba070c7ecd138ea5"></a>
-std::vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#a4180cae61394cb08ba070c7ecd138ea5">vids_COPY</a></td></tr>
-<tr class="memdesc:a4180cae61394cb08ba070c7ecd138ea5"><td class="mdescLeft">&#160;</td><td class="mdescRight">the vids to be copied (empty if all) <br /></td></tr>
-<tr class="separator:a4180cae61394cb08ba070c7ecd138ea5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0356e65d9a88e5fd3bf44c84ce527c90"><td class="memItemLeft" align="right" valign="top"><a id="a0356e65d9a88e5fd3bf44c84ce527c90"></a>
+std::vector&lt; <a class="el" href="classXML__Loading__Archive.html#aef5db2b0b8ce3c7b25f8167dc09fc0ea">Vid</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#a0356e65d9a88e5fd3bf44c84ce527c90">vids_COPY</a></td></tr>
+<tr class="memdesc:a0356e65d9a88e5fd3bf44c84ce527c90"><td class="mdescLeft">&#160;</td><td class="mdescRight">the vids to be copied (empty if all) <br /></td></tr>
+<tr class="separator:a0356e65d9a88e5fd3bf44c84ce527c90"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a7eee7a67f5b415fc9dba9d604f67dcd6"><td class="memItemLeft" align="right" valign="top"><a id="a7eee7a67f5b415fc9dba9d604f67dcd6"></a>
 <a class="el" href="classUCS__string__vector.html">UCS_string_vector</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#a7eee7a67f5b415fc9dba9d604f67dcd6">allowed_objects</a></td></tr>
 <tr class="memdesc:a7eee7a67f5b415fc9dba9d604f67dcd6"><td class="mdescLeft">&#160;</td><td class="mdescRight">the names of objects (empty if all) <br /></td></tr>
@@ -344,10 +430,10 @@ std::vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a c
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#a02c56f13960c2355d285da61356e5dff">have_allowed_objects</a></td></tr>
 <tr class="memdesc:a02c56f13960c2355d285da61356e5dff"><td class="mdescLeft">&#160;</td><td class="mdescRight">true for selective copy (COPY with symbol names) <br /></td></tr>
 <tr class="separator:a02c56f13960c2355d285da61356e5dff"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aeacc5a4f0951f36624045b6831ff09c2"><td class="memItemLeft" align="right" valign="top"><a id="aeacc5a4f0951f36624045b6831ff09c2"></a>
-std::vector&lt; int &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#aeacc5a4f0951f36624045b6831ff09c2">parents</a></td></tr>
-<tr class="memdesc:aeacc5a4f0951f36624045b6831ff09c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">parents[vid] os the parent of vid, or -1 if vid is a top-level value <br /></td></tr>
-<tr class="separator:aeacc5a4f0951f36624045b6831ff09c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a273007e69cdfc7924fe72ce6f896cd6a"><td class="memItemLeft" align="right" valign="top"><a id="a273007e69cdfc7924fe72ce6f896cd6a"></a>
+std::vector&lt; <a class="el" href="classXML__Loading__Archive.html#aef5db2b0b8ce3c7b25f8167dc09fc0ea">Vid</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#a273007e69cdfc7924fe72ce6f896cd6a">parents</a></td></tr>
+<tr class="memdesc:a273007e69cdfc7924fe72ce6f896cd6a"><td class="mdescLeft">&#160;</td><td class="mdescRight">parents[vid] is the parent of vid, or NO_VID if vid is a top-level value <br /></td></tr>
+<tr class="separator:a273007e69cdfc7924fe72ce6f896cd6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a25c408dc73f2e4ee01c6d42f70664263"><td class="memItemLeft" align="right" valign="top"><a id="a25c408dc73f2e4ee01c6d42f70664263"></a>
 const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#a25c408dc73f2e4ee01c6d42f70664263">filename</a></td></tr>
 <tr class="memdesc:a25c408dc73f2e4ee01c6d42f70664263"><td class="mdescLeft">&#160;</td><td class="mdescRight">the file name from which this archive was read <br /></td></tr>
@@ -356,11 +442,19 @@ const char *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#ac088635672e79a9c3f9079eff4046bd9">file_is_complete</a></td></tr>
 <tr class="memdesc:ac088635672e79a9c3f9079eff4046bd9"><td class="mdescLeft">&#160;</td><td class="mdescRight">true if file contains a &lt;\/Workspace&gt; tag at the end <br /></td></tr>
 <tr class="separator:ac088635672e79a9c3f9079eff4046bd9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a65e29b4a4f9a012dc4041625cd8883c2"><td class="memItemLeft" align="right" valign="top"><a id="a65e29b4a4f9a012dc4041625cd8883c2"></a>
+std::vector&lt; <a class="el" href="structXML__Loading__Archive_1_1fun__map.html">fun_map</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#a65e29b4a4f9a012dc4041625cd8883c2">fid_to_function</a></td></tr>
+<tr class="memdesc:a65e29b4a4f9a012dc4041625cd8883c2"><td class="mdescLeft">&#160;</td><td class="mdescRight">all mappings from fids to functions <br /></td></tr>
+<tr class="separator:a65e29b4a4f9a012dc4041625cd8883c2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a336ac8fa752e11905ab371d129821a7c"><td class="memItemLeft" align="right" valign="top"><a id="a336ac8fa752e11905ab371d129821a7c"></a>
+vector&lt; <a class="el" href="structXML__Loading__Archive_1_1__derived__todo.html">_derived_todo</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classXML__Loading__Archive.html#a336ac8fa752e11905ab371d129821a7c">derived_todos</a></td></tr>
+<tr class="memdesc:a336ac8fa752e11905ab371d129821a7c"><td class="mdescLeft">&#160;</td><td class="mdescRight">derived functions that need to be instantiated <br /></td></tr>
+<tr class="separator:a336ac8fa752e11905ab371d129821a7c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>a helper class for loading an APL workspace </p>
 
-<p class="definition">Definition at line <a class="el" href="Archive_8hh_source.html#l00205">205</a> of file <a class="el" href="Archive_8hh_source.html">Archive.hh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Archive_8hh_source.html#l00237">237</a> of file <a class="el" href="Archive_8hh_source.html">Archive.hh</a>.</p>
 </div><hr/>The documentation for this class was generated from the following files:<ul>
 <li>src/<a class="el" href="Archive_8hh_source.html">Archive.hh</a></li>
 <li>src/<a class="el" href="Archive_8cc_source.html">Archive.cc</a></li>
@@ -371,7 +465,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="classXML__Loading__Archive.html">XML_Loading_Archive</a></li>
-    <li class="footer">Generated on Sun Aug 9 2020 16:43:42 for GNUAPL by
+    <li class="footer">Generated on Sun Jan 30 2022 20:14:27 for GNUAPL by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>

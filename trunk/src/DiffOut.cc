@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -27,12 +27,15 @@
 #include "Performance.hh"
 #include "UTF8_string.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 DiffOut::overflow(int c)
 {
+   // process one output character c from APL.
+   //
 PERFORMANCE_START(cout_perf)
-   Output::set_color_mode(errout ? Output::COLM_UERROR : Output::COLM_OUTPUT);
+   Output::set_color_mode(errout ? Output::COLM_UERROR
+                                 : Output::COLM_OUTPUT);
 
    // expand LF to CRLF if desired
    //
@@ -53,39 +56,42 @@ PERFORMANCE_START(cout_perf)
         return 0;
       }
 
-   // complete line received
+   // complete APL output line received. Compare it with the reference (= the
+   // next input line) and write the comparison result into the current
+   // .tc.log file.
    //
-ofstream & rep = IO_Files::get_current_testreport();
-   Assert(rep.is_open());
+ofstream & report = IO_Files::get_current_testreport();
+   Assert(report.is_open());
 
-const char * apl = aplout.c_str();
-UTF8_string ref;
+const char * apl = aplout.c_str();   // the APL output
+UTF8_string ref;                     // the expected output (= the reference)
 bool eof = false;
-size_t diff_pos = 0;
+size_t diff_pos = 0;                 // the first mismatch
    IO_Files::read_file_line(ref, eof);
-   if (eof)   // nothing in current_testfile
+   if (eof)                // nothing in current_testfile
       {
-        rep << "extra: " << apl << endl;
+        report << "extra: " << apl << endl;
       }
    else if (different(utf8P(apl), utf8P(ref.c_str()), diff_pos))
       {
         IO_Files::diff_error();
-        rep << "apl: ⋅⋅⋅" << apl << "⋅⋅⋅" << endl
+        report << "apl: ⋅⋅⋅" << apl << "⋅⋅⋅" << endl
             << "ref: ⋅⋅⋅" << ref.c_str() << "⋅⋅⋅" << endl
             << " ∆ : ⋅⋅⋅";
-        loop(p, diff_pos)   rep << " ";
-        rep << "^" << endl;
+        loop(p, diff_pos)   report << " ";
+        report << "^" << endl;
       }
    else                    // same
       {
-        rep << "== " << apl << endl;
+        report << "== " << apl << endl;
       }
 
    aplout.clear();
    PERFORMANCE_END(fs_COUT_B, cout_perf, 1)
+   cout << flush;
    return 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 DiffOut::different(const UTF8 * apl, const UTF8 * ref, size_t & pos)
 {
@@ -200,4 +206,4 @@ DiffOut::different(const UTF8 * apl, const UTF8 * ref, size_t & pos)
 
    return false;   // not different
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------

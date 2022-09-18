@@ -118,6 +118,10 @@ Public Member Functions</h2></td></tr>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue__P.html#a33d1110ab7cd265b54f256af150d12ab">Value_P</a> (const <a class="el" href="classShape.html">Shape</a> &amp;sh, const char *loc)</td></tr>
 <tr class="memdesc:a33d1110ab7cd265b54f256af150d12ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">a new value with shape sh and un-initialized ravel <br /></td></tr>
 <tr class="separator:a33d1110ab7cd265b54f256af150d12ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6a433ab52110c16c03314b46e768ea63"><td class="memItemLeft" align="right" valign="top"><a id="a6a433ab52110c16c03314b46e768ea63"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue__P.html#a6a433ab52110c16c03314b46e768ea63">Value_P</a> (const <a class="el" href="classShape.html">Shape</a> &amp;sh, uint8_t *bits, const char *loc)</td></tr>
+<tr class="memdesc:a6a433ab52110c16c03314b46e768ea63"><td class="mdescLeft">&#160;</td><td class="mdescRight">constructor: a packed array with shape <b>sh</b> <br /></td></tr>
+<tr class="separator:a6a433ab52110c16c03314b46e768ea63"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a62158cb0dac18acfd794b1415d24b353"><td class="memItemLeft" align="right" valign="top"><a id="a62158cb0dac18acfd794b1415d24b353"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue__P.html#a62158cb0dac18acfd794b1415d24b353">Value_P</a> (const <a class="el" href="classUCS__string.html">UCS_string</a> &amp;ucs, const char *loc)</td></tr>
 <tr class="memdesc:a62158cb0dac18acfd794b1415d24b353"><td class="mdescLeft">&#160;</td><td class="mdescRight">a new vector value from a UCS string <br /></td></tr>
@@ -167,6 +171,10 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue__P__Base.html#acd0622e5c6de2fd89d6f6425e3afd411">clear</a> (const char *loc)</td></tr>
 <tr class="memdesc:acd0622e5c6de2fd89d6f6425e3afd411 inherit pub_methods_classValue__P__Base"><td class="mdescLeft">&#160;</td><td class="mdescRight">reset and add value event <br /></td></tr>
 <tr class="separator:acd0622e5c6de2fd89d6f6425e3afd411 inherit pub_methods_classValue__P__Base"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab52639de0f96a2b6e45f8c689f3a09b7 inherit pub_methods_classValue__P__Base"><td class="memItemLeft" align="right" valign="top"><a id="ab52639de0f96a2b6e45f8c689f3a09b7"></a>
+bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue__P__Base.html#ab52639de0f96a2b6e45f8c689f3a09b7">operator+</a> () const</td></tr>
+<tr class="memdesc:ab52639de0f96a2b6e45f8c689f3a09b7 inherit pub_methods_classValue__P__Base"><td class="mdescLeft">&#160;</td><td class="mdescRight">return true if the pointer is valid <br /></td></tr>
+<tr class="separator:ab52639de0f96a2b6e45f8c689f3a09b7 inherit pub_methods_classValue__P__Base"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aee6bd462a6536906d93335ba0743bf9f inherit pub_methods_classValue__P__Base"><td class="memItemLeft" align="right" valign="top"><a id="aee6bd462a6536906d93335ba0743bf9f"></a>
 bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classValue__P__Base.html#aee6bd462a6536906d93335ba0743bf9f">operator!</a> () const</td></tr>
 <tr class="memdesc:aee6bd462a6536906d93335ba0743bf9f inherit pub_methods_classValue__P__Base"><td class="mdescLeft">&#160;</td><td class="mdescRight">return true if the pointer is invalid <br /></td></tr>
@@ -232,7 +240,7 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>A <a class="el" href="classValue.html" title="An APL Value (essentially a Shape and a ravel) ">Value</a> smart * (constructors) </p>
 
-<p class="definition">Definition at line <a class="el" href="Value__P_8hh_source.html#l00108">108</a> of file <a class="el" href="Value__P_8hh_source.html">Value_P.hh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="Value__P_8hh_source.html#l00112">112</a> of file <a class="el" href="Value__P_8hh_source.html">Value_P.hh</a>.</p>
 </div><hr/>The documentation for this class was generated from the following file:<ul>
 <li>src/<a class="el" href="Value__P_8hh_source.html">Value_P.hh</a></li>
 </ul>
@@ -242,7 +250,7 @@ static void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hre
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="classValue__P.html">Value_P</a></li>
-    <li class="footer">Generated on Sun Aug 9 2020 16:43:42 for GNUAPL by
+    <li class="footer">Generated on Sun Jan 30 2022 20:14:27 for GNUAPL by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>

@@ -63,6 +63,7 @@ phrase(BS_A_F+4      , A    , M    , C    , B    , DITO )   // e.g. A /[X] B
 // monadic operator
 //
 phrase(BS_LO_OP+2    , F    , M    ,      ,      , DITO )   // e.g. +/
+phrase(BS_LO_OP+2    , M    , M    ,      ,      , DITO )   // e.g. /¨
 phrase(BS_LO_OP+3    , F    , M    , C    ,      , DITO )   // e.g. +/[2]
 phrase(BS_LO_OP+3    , F    , C    , M    ,      , DITO )   // e.g. ,[2]/
 phrase(BS_LO_OP+4    , F    , C    , M    , C    , DITO )   // e.g. ,[2]/[2]

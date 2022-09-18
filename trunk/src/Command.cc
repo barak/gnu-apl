@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -31,9 +31,10 @@
 #include "Doxy.hh"
 #include "Executable.hh"
 #include "FloatCell.hh"
-#include "IndexExpr.hh"
-#include "IntCell.hh"
 #include "IO_Files.hh"
+#include "IndexExpr.hh"
+#include "InputFile.hh"
+#include "IntCell.hh"
 #include "LineInput.hh"
 #include "Nabla.hh"
 #include "NativeFunction.hh"
@@ -42,6 +43,8 @@
 #include "Prefix.hh"
 #include "Quad_FX.hh"
 #include "Quad_TF.hh"
+#include "Security.hh"
+#include <signal.h>
 #include "StateIndicator.hh"
 #include "Svar_DB.hh"
 #include "Symbol.hh"
@@ -58,7 +61,7 @@ ShapeItem Command::APL_expression_count = 0;
 
 UCS_string_vector Command::copy_once_table;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Command::process_line()
 {
@@ -102,7 +105,7 @@ UCS_string prompt = Workspace::get_prompt();
             }
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Command::process_line(UCS_string & line)
 {
@@ -135,7 +138,7 @@ Command::process_line(UCS_string & line)
    ++APL_expression_count;
    do_APL_expression(line);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Command::do_APL_command(ostream & out, UCS_string & line)
 {
@@ -177,7 +180,7 @@ UCS_string_vector args = split_arg(arg);
      out << "BAD COMMAND" << endl;
      return false;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Command::check_params(ostream & out, const char * command, int argc,
                       const char * args)
@@ -250,7 +253,7 @@ UCS_string args_ucs(args);
 
    return false;   // OK
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Command::do_APL_expression(UCS_string & line)
 {
@@ -325,7 +328,7 @@ Executable * statements = 0;
    Workspace::push_SI(statements, LOC);
    finish_context();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Command::finish_context()
 {
@@ -557,7 +560,7 @@ check_EOC:
    //
    Workspace::pop_SI(LOC);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Command::cmd_XTERM(ostream & out, const UCS_string & arg)
 {
@@ -582,7 +585,7 @@ const char * term = getenv("TERM");
         return;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string_vector
 Command::split_arg(const UCS_string & arg)
 {
@@ -596,7 +599,7 @@ UCS_string_vector result;
         result.push_back(next);
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Command::cmd_BOXING(ostream & out, const UCS_string & arg)
 {
@@ -632,124 +635,153 @@ int format = arg.atoi();
    out << "BAD ]BOXING PARAMETER+" << endl;
    MORE_ERROR() << "Parameter " << arg << " is not valid for command ]BOXING.\n"
       "  Valid parameters are OFF, N, and -N with\n"
-      "  N ∈ { 2, 3, 4, 7, 8, 9, 20, 21, 22, 23, 24, 25, 29 }";
+      "  N ϵ { 2, 3, 4, 7, 8, 9, 20, 21, 22, 23, 24, 25, 29 }";
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Command::val_val::compare_val_val(const val_val & A,
                                   const val_val & B, const void *)
 {
    return A.child > B.child;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Command::val_val::compare_val_val1(const void * key, const void * B)
 {
 const void * Bv = reinterpret_cast<const val_val *>(B)->child;
    return charP(key) - charP(Bv);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Command::cmd_CHECK(ostream & out)
 {
-   // erase stale functions from failed ⎕EX
+   // 1. erase stale functions from failed ⎕EX
    //
    {
      bool erased = false;
-     int stale = Workspace::cleanup_expunged(CERR, erased);
-     if (stale)
+     if (const int stale = Workspace::cleanup_expunged(CERR, erased))
         {
           out << "WARNING - " << stale << " stale functions ("
                << (erased ? "" : "not ") << "erased)" << endl;
         }
-     else out << "OK      - no stale functions" << endl;
+     else
+        {
+          out << "OK      - no stale functions" << endl;
+        }
    }
 
+   // 2. print stale values (if any)
+   //
    {
-     const int stale = Value::print_stale(CERR);
-     if (stale)
+     if (const int stale = Value::print_stale(CERR))
         {
           out << "ERROR   - " << stale << " stale values" << endl;
           IO_Files::apl_error(LOC);
         }
-     else out << "OK      - no stale values" << endl;
+     else
+        {
+          out << "OK      - no stale values" << endl;
+        }
    }
+
+   // 3. print stale index expressions (if any)
    {
-     const int stale = IndexExpr::print_stale(CERR);
-     if (stale)
+     if (const int stale = IndexExpr::print_stale(CERR))
         {
           out << "ERROR   - " << stale << " stale indices" << endl;
           IO_Files::apl_error(LOC);
         }
-     else out << "OK      - no stale indices" << endl;
+     else
+        {
+          out << "OK      - no stale indices" << endl;
+        }
    }
 
-   // discover duplicate parents
+   // 4. discover duplicate parents. In the old clone() scheme every nested value    //    has (at most) one parent. In the new clone() scheme, however, a nested
+   //    value can be reused and have multiple parents.
+   {
+#ifndef NEW_CLONE   // old clone
+     // 4a. create a { parent = 0, value } vector<val_val> of all values
+     //
+     std::vector<val_val> values;
+     ShapeItem duplicate_parents = 0;
+     for (const DynamicObject * obj =
+                DynamicObject::get_all_values()->get_next();
+          obj != DynamicObject::get_all_values(); obj = obj->get_next())
+         {
+           const Value * val = static_cast<const Value *>(obj);
+
+           val_val vv = { 0, val };   // no parent
+           values.push_back(vv);
+         }
+
+     // 4b. sort vector<val_val> values by address so we can bsearch it.
+     //
+     Heapsort<val_val>::sort(&values[0], values.size(), 0,
+                             &val_val::compare_val_val);
+     loop(v, (values.size() - 1))
+         Assert(&values[v].child < &values[v + 1].child);
+
+      // 4c. set parents of pointer cells
+      //
+      loop(v, values.size())   // for every .child (acting as parent here)
+          {
+            const Value * val = values[v].child;
+            const ShapeItem ec = val->nz_element_count();
+            loop(e, ec)   // for every ravel cell of the (parent-) value
+                {
+                  const Cell & cP = val->get_cravel(e);
+                  if (!cP.is_pointer_cell())   continue;   // not a parent
+
+                  const Value * sub = cP.get_pointer_value().get();
+                  Assert1(sub);
+
+                  val_val * vvp = reinterpret_cast<val_val *>
+                       (bsearch(sub, &values[0], values.size(),
+                                sizeof(val_val), val_val::compare_val_val1));
+                  Assert(vvp);
+                  if (vvp->parent == 0)   // child has no parent (OK)
+                     {
+                       vvp->parent = val;
+                       continue;
+                     }
+
+                  // the child already has a parent (which is bad).
+                  // print its history to help figuring why.
+                  //
+                  ++duplicate_parents;
+                  out << "Value * vvp=" << voidP(vvp) << " already has parent "
+                      << voidP(vvp->parent) << " when checking Value * val="
+                      << voidP(vvp) << endl;
+
+                  out << "History of the child:" << endl;
+                  VH_entry::print_history(out, *vvp->child, LOC);
+                  out << "History of the first parent:" << endl;
+                  VH_entry::print_history(out, *vvp->parent, LOC);
+                  out << "History of the second parent:" << endl;
+                  VH_entry::print_history(out, *val, LOC);
+                  out << endl;
+               }
+          }
+
+     if (duplicate_parents)
+          {
+            out << "ERROR   - " << duplicate_parents
+                << " duplicate parents" << endl;
+            IO_Files::apl_error(LOC);
+          }
+     else
+#endif
+          {
+            out << "OK      - no duplicate parents" << endl;
+          }
+   }
+
+   // 5. discover strange Cells and counters.
    //
-std::vector<val_val> values;
-ShapeItem duplicate_parents = 0;
-   for (const DynamicObject * obj = DynamicObject::get_all_values()->get_next();
-        obj != DynamicObject::get_all_values(); obj = obj->get_next())
-       {
-         const Value * val = static_cast<const Value *>(obj);
-
-         val_val vv = { 0, val };   // no parent
-         values.push_back(vv);
-       }
-
-   Heapsort<val_val>::sort(&values[0], values.size(), 0,
-                           &val_val::compare_val_val);
-   loop(v, (values.size() - 1))
-       Assert(&values[v].child < &values[v + 1].child);
-
-   /// set parents
-   loop(v, values.size())   // for every .child (acting as parent here)
-      {
-        const Value * val = values[v].child;
-        const ShapeItem ec = val->nz_element_count();
-        loop(e, ec)   // for every ravel cell of the (parent-) value
-            {
-              const Cell & cP = val->get_ravel(e);
-              if (!cP.is_pointer_cell())   continue;   // not a parent
-
-              const Value * sub = cP.get_pointer_value().get();
-              Assert1(sub);
-
-              val_val * vvp = reinterpret_cast<val_val *>
-                    (bsearch(sub, &values[0], values.size(), sizeof(val_val),
-                            val_val::compare_val_val1));
-              Assert(vvp);
-              if (vvp->parent == 0)   // child has no parent
-                 {
-                   vvp->parent = val;
-                 }
-              else
-                 {
-                   ++duplicate_parents;
-                   out << "Value * vvp=" << voidP(vvp) << " already has parent "
-                       << voidP(vvp->parent) << " when checking Value * val="
-                       << voidP(vvp) << endl;
-
-                   out << "History of the child:" << endl;
-                   VH_entry::print_history(out, vvp->child, LOC);
-                   out << "History of the first parent:" << endl;
-                   VH_entry::print_history(out, vvp->parent, LOC);
-                   out << "History of the second parent:" << endl;
-                   VH_entry::print_history(out, val, LOC);
-                   out << endl;
-                 }
-           }
-      }
-
-   if (duplicate_parents)
-        {
-          out << "ERROR   - " << duplicate_parents
-              << " duplicate parents" << endl;
-          IO_Files::apl_error(LOC);
-        }
-   else out << "OK      - no duplicate parents" << endl;
+   Value::check_all_Cells(out);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Command::cmd_CONTINUE(ostream & out)
 {
@@ -758,7 +790,7 @@ UCS_string wsname("CONTINUE");
    Workspace::save_WS(out, LIB0, wsname, true);   // )SAVE
    cmd_OFF(0);                                    // )OFF
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Command::cmd_COPY(ostream & out, UCS_string_vector & args, bool protection)
 {
@@ -785,7 +817,7 @@ UCS_string wsname = args[0];
    args.erase(0);
    Workspace::copy_WS(out, libref, wsname, args, protection);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Command::cmd_COPY_ONCE(ostream & out, UCS_string_vector & args)
 {
@@ -848,12 +880,23 @@ UCS_string lib_wsname(Unicode(libref + UNI_0));
 
    // add it to the table;
    //
-CERR << "NEW )COPY_ONCE workspace:" << lib_wsname << endl;
+   CERR << "NEW )COPY_ONCE workspace: "
+        << Unicode(libref + UNI_0) << " " << wsname << endl;
 
    copy_once_table.push_back(lib_wsname);
    Workspace::copy_WS(out, libref, wsname, args, false);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+void
+Command::clear_copy_once_table()
+{
+   if (const size_t count = copy_once_table.size())
+      {
+        copy_once_table.clear();
+        CERR << ")COPY_ONCE table cleared (" << count << " entries)" << endl;
+      }
+}
+//----------------------------------------------------------------------------
 void
 Command::cmd_DOXY(ostream & out, UCS_string_vector & args)
 {
@@ -878,7 +921,7 @@ UTF8_string root("/tmp");
      }
    catch (...) {}
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Command::cmd_DROP(ostream & out, const UCS_string_vector & lib_ws)
 {
@@ -907,11 +950,13 @@ const int result = unlink(filename.c_str());
         Workspace::get_v_Quad_TZ().print_timestamp(out, now()) << endl;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Command::cmd_DUMP(ostream & out, const UCS_string_vector & args,
                   bool html, bool silent)
 {
+   CHECK_SECURITY(disable_SAVE_command);
+
    // Command is:
    //
    // )DUMP
@@ -927,7 +972,7 @@ Command::cmd_DUMP(ostream & out, const UCS_string_vector & args,
         return;
       }
 
-   // )DUMP: use )WSID unless CLEAR WS
+   // )DUMP: use )WSID unless it is CLEAR WS
    //
 LibRef wsid_lib = LIB0;
 UCS_string wsid_name = Workspace::get_WS_name();
@@ -950,13 +995,13 @@ UCS_string wsid_name = Workspace::get_WS_name();
 
    Workspace::dump_WS(out, wsid_lib, wsid_name, html, silent);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Command::cmd_ERASE(ostream & out, UCS_string_vector & args)
 {
    Workspace::erase_symbols(out, args);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Command::cmd_KEYB(ostream & out)
 {
@@ -991,8 +1036,8 @@ Command::cmd_KEYB(ostream & out)
 "║ ~  ║ !⌶ ║ @⍫ ║ #⍒ ║ $⍋ ║ %⌽ ║ ^⍉ ║ &⊖ ║ *⍟ ║ (⍱ ║ )⍲ ║ _! ║ +⌹ ║         ║\n"
 "║ `◊ ║ 1¨ ║ 2¯ ║ 3< ║ 4≤ ║ 5= ║ 6≥ ║ 7> ║ 8≠ ║ 9∨ ║ 0∧ ║ -× ║ =÷ ║ BACKSP  ║\n"
 "╠════╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦═╩══╦══════╣\n"
-"║       ║ Q  ║ W⍹ ║ E⋸ ║ R  ║ T⍨ ║ Y¥ ║ U  ║ I⍸ ║ O⍥ ║ P⍣ ║ {⍞ ║ }⍬ ║  |⊣  ║\n"
-"║  TAB  ║ q? ║ w⍵ ║ e∈ ║ r⍴ ║ t∼ ║ y↑ ║ u↓ ║ i⍳ ║ o○ ║ p⋆ ║ [← ║ ]→ ║  \\⊢  ║\n"
+"║       ║ Q  ║ W⍹ ║ E⍷ ║ R  ║ T⍨ ║ Y¥ ║ U  ║ I⍸ ║ O⍥ ║ P⍣ ║ {⍞ ║ }⍬ ║  |⊣  ║\n"
+"║  TAB  ║ q? ║ w⍵ ║ eϵ ║ r⍴ ║ t∼ ║ y↑ ║ u↓ ║ i⍳ ║ o○ ║ p⋆ ║ [← ║ ]→ ║  \\⊢  ║\n"
 "╠═══════╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩═╦══╩══════╣\n"
 "║ (CAPS   ║ A⍶ ║ S  ║ D  ║ F  ║ G  ║ H  ║ J⍤ ║ K  ║ L⌷ ║ :≡ ║ \"≢ ║         ║\n"
 "║  LOCK)  ║ a⍺ ║ s⌈ ║ d⌊ ║ f_ ║ g∇ ║ h∆ ║ j∘ ║ k' ║ l⎕ ║ ;⍎ ║ '⍕ ║ RETURN  ║\n"
@@ -1002,7 +1047,7 @@ Command::cmd_KEYB(ostream & out)
 "╚═════════════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩══════════╝\n"
    << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Command::cmd_PSTAT(ostream & out, const UCS_string & arg)
 {
@@ -1054,40 +1099,48 @@ Pfstat_ID iarg = PFS_ALL;
 
    Performance::print(iarg, out);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Command::primitive_help(ostream & out, const char * arg, int arity,
-                        const char * prim, const char * name,
+                        const char * prim,  const char * name,
                         const char * brief, const char * descr)
 {
    if (strcmp(arg, prim))   return;
 
    switch(arity)
       {
-        case -5: out << "   quasi-dyadic operator:   Z ← A (∘ "
-                     << prim << " G) B";                                  break;
-        case -4: out << "   dyadic operator:   Z ← A (F "
-                     << prim << " G) B";                                  break;
-        case -3: out << "   dyadic operator:   Z ← (F "
-                     << prim << " G) B";                                  break;
-        case -2: out << "   monadic operator:  Z ← A (F "
-                     << prim << ") B";                                    break;
-        case -1: out << "   monadic operator:  Z ← (F "
-                     << prim << ") B";                                    break;
-        case 0:  out << "    niladic function: Z ← " << prim;             break;
-        case 1:  out << "    monadic function: Z ← " << prim << " B";     break;
-        case 2:  out << "    dyadic function:  Z ← A " << prim << " B";   break;
+        case -6: out << "   " << name << ":   " << brief << endl
+                     << "    " << descr << endl;            return;
+
+        case -5: out << "   quasi-dyadic operator:"
+                        "   Z ← A (∘ . G) B";               break;
+        case -4: out << "   dyadic primitive operator:"
+                        "   Z ← A (F . G) B";               break;
+        case -3: out << "   dyadic primitive operator:"
+                        "   Z ← (F " << prim << " G) B";    break;
+        case -2: out << "   monadic primitive operator:"
+                        "  Z ← A (F " << prim << ") B";     break;
+        case -1: out << "   monadic primitive operator:"
+                        "  Z ← (F " << prim << ") B";       break;
+        case  0: out << "   niladic primitive function:"
+                        " Z ← " << prim;                    break;
+        case  1: out << "   monadic primitive function:"
+                        " Z ← " << prim << " B";            break;
+        case  2: out << "   dyadic primitive function:"
+                        "  Z ← A " << prim << " B";         break;
+
         default: FIXME;
       }
 
-   out << "  (" << name  <<  ")" << endl
-       << "    " << brief << endl;
+   if (*name)   out << "  ("  << name  <<  ")";
+   out << endl;
+   if (*brief)  out << "    " << brief << endl;
 
    if (descr)   out << descr << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
-/// return the lengt differece between a UCS_string and its UTF8 encoding
+/// return the length differece between a UCS_string and its UTF8 encoding
 static inline int
 len_diff(const char * txt)
 {
@@ -1097,8 +1150,13 @@ int ret = 0;
 }
 
 void
-Command::cmd_HELP(ostream & out, const UCS_string & arg)
+Command::cmd_HELP(ostream & out, const UCS_string & _arg)
 {
+   // map alternate APL characters to standard ones
+   //
+UCS_string arg;
+   loop(a, _arg.size())   arg += Avec::make_standard(_arg[a]);
+
    if (arg.size() > 0 && Avec::is_first_symbol_char(arg[0]))
       {
         // help for a user defined name
@@ -1124,7 +1182,7 @@ Command::cmd_HELP(ostream & out, const UCS_string & arg)
              return;
            }
 
-        switch(vs->get_nc())
+        switch(vs->get_NC())
            {
              case NC_INVALID:
                   CERR << "has no valid name class" << endl;
@@ -1135,14 +1193,14 @@ Command::cmd_HELP(ostream & out, const UCS_string & arg)
                   return;
 
              case NC_LABEL:
-                  CERR << "is a label (line " << vs->sym_val.label
+                  CERR << "is a label (line " << vs->get_label()
                        << ")" << endl;
                   return;
 
              case NC_VARIABLE:
                   {
                     CERR << "is a variable:" << endl;
-                    Value_P val = sym->get_value();
+                    Value_P val = sym->get_apl_value();
                     if (+val)   val->print_properties(CERR, 4, true);
                   }
                   CERR << endl;
@@ -1169,7 +1227,7 @@ Command::cmd_HELP(ostream & out, const UCS_string & arg)
                     else                                    CERR << "niladic";
                     CERR << " defined function:" << endl;
 
-                    const UserFunction * ufun = fun->get_ufun1();
+                    const UserFunction * ufun = fun->get_func_ufun();
                     Assert(ufun);
                     ufun->help(CERR);
                   }
@@ -1184,13 +1242,13 @@ Command::cmd_HELP(ostream & out, const UCS_string & arg)
                     else                                CERR << "monadic";
                     CERR << " defined operator:" << endl;
 
-                    const UserFunction * ufun = fun->get_ufun1();
+                    const UserFunction * ufun = fun->get_func_ufun();
                     Assert(ufun);
                     ufun->help(CERR);
                   }
                   return;
 
-             case NC_SHARED_VAR:
+             case NC_SYSTEM_VAR:
                   CERR << "is a shared variable" << endl;
                   return;
 
@@ -1201,17 +1259,24 @@ Command::cmd_HELP(ostream & out, const UCS_string & arg)
         return;
       }
 
-   if (arg.size() == 1)   // help for an APL primitive
-      {
-        UTF8_string arg_utf(arg);
-        const char * arg_cp = arg_utf.c_str();
+   {
+     bool prim = arg.size() == 1;   // standard (1-character) APL primitive
+     if (arg.size() == 2)
+        prim = arg[0] == UNI_DOWN_TACK ||
+              (arg[0] == UNI_COMMENT && arg[1] == UNI_COMMENT);
+
+     if (prim)
+        {
+          UTF8_string arg_utf(arg);
+          const char * arg_cp = arg_utf.c_str();
 
 #define help_def(ar, prim, name, title, descr)              \
    primitive_help(out, arg_cp, ar, prim, name, title, descr);
 #include "Help.def"
 
          return;
-      }
+        }
+   }
 
    enum { COL2 = 40 };   ///< where the second column starts
 
@@ -1283,15 +1348,15 @@ bool left_col = true;
    left_col = !left_col;
 #include "SystemVariable.def"
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Command::cmd_HISTORY(ostream & out, const UCS_string & arg)
 {
-   if (arg.size() == 0)                  LineInput::print_history(out);
+   if      (arg.size() == 0)             LineInput::print_history(out);
    else if (arg.starts_iwith("CLEAR"))   LineInput::clear_history(out);
    else                                  out << "BAD COMMAND" << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Command::cmd_HOST(ostream & out, const UCS_string & arg)
 {
@@ -1311,6 +1376,9 @@ FILE * pipe = popen(host_cmd.c_str(), "r");
         return;
       }
 
+   // reset SIGCHLD to its default so that pclose() works as expected
+   //
+   signal(SIGCHLD, SIG_DFL);
    for (;;)
        {
          const int cc = fgetc(pipe);
@@ -1318,15 +1386,18 @@ FILE * pipe = popen(host_cmd.c_str(), "r");
          out << char(cc);
        }
 
-int result = pclose(pipe);
+   errno = 0;
+const int result = pclose(pipe);
    Log(LOG_verbose_error)
       {
-        if (result)   CERR << "pclose(" << arg << ") says: "
-                           << strerror(errno) << endl;
+        if (result)   CERR << "NOTE: pclose(" << arg << ") says: errno="
+                           << errno << " (" << strerror(errno) << ")" << endl;
       }
-   out << endl << IntCell(result) << endl;
+
+   out << endl << result << ' ' << endl;
+   signal(SIGCHLD, SIG_IGN);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Command::cmd_IN(ostream & out, UCS_string_vector & args, bool protection)
 {
@@ -1394,7 +1465,7 @@ transfer_context tctx(protection);
 
    fclose(in);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Command::cmd_LOAD(ostream & out, UCS_string_vector & args,
                   UCS_string & quad_lx, bool silent)
@@ -1410,7 +1481,7 @@ UCS_string wsname;
 
    Workspace::load_WS(out, lib, wsname, quad_lx, silent);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Command::cmd_LIBS(ostream & out, const UCS_string_vector & args)
 {
@@ -1494,7 +1565,7 @@ Command::cmd_LIBS(ostream & out, const UCS_string_vector & args)
 "       └── PWD:   the path is relative to current directory $PWD (last resort)"
        << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 DIR *
 Command::open_LIB_dir(UTF8_string & path, ostream & out,
                       const UCS_string_vector & args)
@@ -1558,7 +1629,7 @@ DIR * dir = opendir(path.c_str());
 
    return dir;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Command::is_directory(dirent * entry, const UTF8_string & path)
 {
@@ -1575,7 +1646,7 @@ DIR * dir = opendir(filename.c_str());
    if (dir) closedir(dir);
    return dir != 0;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Command::lib_common(ostream & out, const UCS_string_vector & args_range,
                     int variant)
@@ -1741,7 +1812,7 @@ std::vector<int> col_widths;
            }
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Command::cmd_LIB1(ostream & out, const UCS_string_vector & args)
 {
@@ -1754,7 +1825,7 @@ Command::cmd_LIB1(ostream & out, const UCS_string_vector & args)
 
    Command::lib_common(out, args, 1);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Command::cmd_LIB2(ostream & out, const UCS_string_vector & args)
 {
@@ -1767,7 +1838,7 @@ Command::cmd_LIB2(ostream & out, const UCS_string_vector & args)
 
    Command::lib_common(out, args, 2);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Command::cmd_LOG(ostream & out, const UCS_string & arg)
 {
@@ -1792,7 +1863,7 @@ Command::cmd_LOG(ostream & out, const UCS_string & arg)
 
 #endif
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Command::cmd_MORE(ostream & out)
 {
@@ -1805,11 +1876,10 @@ Command::cmd_MORE(ostream & out)
    out << Workspace::more_error() << endl;
    return;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Command::cmd_OFF(int exit_val)
 {
-   cleanup(true);
    COUT << endl;
    if (!uprefs.silent)
       {
@@ -1822,8 +1892,9 @@ Command::cmd_OFF(int exit_val)
         COUT << "Goodbye." << endl
              << "Session duration: " << (end.tv_sec + 0.000001*end.tv_usec)
              << " seconds " << endl;
-
       }
+
+   cleanup(true);
 
    // restore the initial memory rlimit
    //
@@ -1838,7 +1909,22 @@ rlimit rl;
 
    exit(exit_val);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
+void
+Command::cmd_PUSHFILE()
+{
+   CERR <<
+"*** Pushing an immediate execution context (leave it with ]NEXTFILE)"
+        << endl;
+
+   if (InputFile::files_todo.size())
+      InputFile::files_todo[0].set_pushed_pending(true);
+
+InputFile fam("stdin", stdin, false, true, true, no_LX);
+   fam.set_pushed_IE();
+   InputFile::files_todo.insert(InputFile::files_todo.begin(), fam);
+}
+//----------------------------------------------------------------------------
 void
 Command::cmd_OUT(ostream & out, UCS_string_vector & args)
 {
@@ -1863,7 +1949,7 @@ uint64_t seq = 1;   // sequence number for records written
 
    fclose(atf);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Command::check_name_conflict(ostream & out, const UCS_string & cnew,
                              const UCS_string cold)
@@ -1885,7 +1971,7 @@ int len = cnew.size();
 
    return true;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Command::check_redefinition(ostream & out, const UCS_string & cnew,
                             const UCS_string fnew, const int mnew)
@@ -1910,10 +1996,12 @@ Command::check_redefinition(ostream & out, const UCS_string & cnew,
 
    return false;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Command::cmd_SAVE(ostream & out, const UCS_string_vector & args)
 {
+   CHECK_SECURITY(disable_SAVE_command);
+
    // )SAVE
    // )SAVE workspace
    // )SAVE lib workspace
@@ -1950,7 +2038,7 @@ UCS_string wsid_name = Workspace::get_WS_name();
 
    Workspace::save_WS(out, wsid_lib, wsid_name, true);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Command::resolve_lib_wsname(ostream & out, const UCS_string_vector & args,
                             LibRef &lib, UCS_string & wsname)
@@ -1974,7 +2062,7 @@ Command::resolve_lib_wsname(ostream & out, const UCS_string_vector & args,
    wsname = args[1];
    return false;   // OK
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
                      UCS_string_vector & args)
@@ -2098,7 +2186,7 @@ Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
    loop(c, command_name.size())
       {
         bool error = false;
-        if (c == 0)   error = error || command_name[c] != ']';
+        if (c == 0)   command_name[c] != ']' && command_name[c] != ')';
         else          error = error || !Avec::is_symbol_char(command_name[c]);
         if (error)
            {
@@ -2142,7 +2230,7 @@ user_command new_user_command = { command_name, apl_fun, mode };
    out << "    User-defined command "
        << new_user_command.prefix << " installed." << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Command::do_USERCMD(ostream & out, UCS_string & apl_cmd,
                     const UCS_string & line, const UCS_string & cmd,
@@ -2163,7 +2251,7 @@ Command::do_USERCMD(ostream & out, UCS_string & apl_cmd,
    apl_cmd.append(UNI_SPACE);
    apl_cmd.append_quoted(line);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 #ifdef DYNAMIC_LOG_WANTED
 void
 Command::log_control(const UCS_string & arg)
@@ -2192,19 +2280,22 @@ int on_off = -1;
 
    if (val >= LID_MIN && val <= LID_MAX)
       {
-        const char * info = Log_info(val);
-        Assert(info);
         bool new_status = !Log_status(val);   // toggle
         if (on_off == 0)        new_status = false;
         else if (on_off == 1)   new_status = true;
-
         Log_control(val, new_status);
-        CERR << "    Log facility '" << info << "' is now "
+
+        const char * info = Log_info(val);
+        Assert(info);
+        char cc[100];
+        size_t cc_len = snprintf(cc, sizeof(cc), "%s", info);
+        while (cc_len && cc[cc_len - 1] <= ' ')   cc[--cc_len] = 0;
+        CERR << "    Logging facility '" << cc << "' is now "
              << (new_status ? "ON " : "OFF") << endl;
       }
 }
 #endif
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Command::transfer_context::process_record(const UTF8 * record,
                                           const UCS_string_vector & objects)
@@ -2283,7 +2374,7 @@ const char sub_type = record[1];
              << "*** bad record type '" << rec_type << endl;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 uint32_t
 Command::transfer_context::get_nrs(UCS_string & name, Shape & shape) const
 {
@@ -2321,7 +2412,7 @@ int rank = 0;
   
    return idx;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Command::transfer_context::numeric_1TF(const UCS_string_vector & objects) const
 {
@@ -2361,28 +2452,26 @@ Token_string tos;
  
    if (tos.size() != size_t(shape.get_volume()))   return;
 
-Value_P val(shape, LOC);
-   new (&val->get_ravel(0)) IntCell(0);   // prototype
+Value_P Z(shape, LOC);
+   Z->set_proto_Int();   // prototype
 
-const ShapeItem ec = val->element_count();
+const ShapeItem ec = Z->element_count();
    loop(e, ec)
       {
-        const TokenTag tag = tos[e].get_tag();
-        Cell * C = val->next_ravel();
-        if      (tag == TOK_INTEGER)  new (C) IntCell(tos[e].get_int_val());
-        else if (tag == TOK_REAL)     new (C) FloatCell(tos[e].get_flt_val());
-        else if (tag == TOK_COMPLEX)  new (C)
-                                          ComplexCell(tos[e].get_cpx_real(),
-                                                      tos[e].get_cpx_imag());
+        const Token & tok = tos[e];
+        const TokenTag tag = tok.get_tag();
+        if      (tag == TOK_INTEGER)  Z->next_ravel_Int(tok.get_int_val());
+        else if (tag == TOK_REAL)     Z->next_ravel_Float(tok.get_flt_val());
+        else if (tag == TOK_COMPLEX)  Z->next_ravel_Complex(tok.get_cpx_real(),
+                                                            tok.get_cpx_imag());
         else FIXME;
       }
-
-   val->check_value(LOC);
+   Z->check_value(LOC);
 
    Assert(sym);
-   sym->assign(val, false, LOC);
+   sym->assign(Z, false, LOC);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Command::transfer_context::chars_1TF(const UCS_string_vector & objects) const
 {
@@ -2405,7 +2494,7 @@ Symbol * sym = 0;
         sym = Workspace::lookup_symbol(var_name);
         Assert(sym);
       }
-   
+
    Log(LOG_command_IN)
       {
         CERR << endl << var_name << " shape " << shape << " IS: '";
@@ -2413,9 +2502,9 @@ Symbol * sym = 0;
         CERR << "'" << endl;
       }
 
-Value_P val(shape, LOC);
-const ShapeItem ec = val->element_count();
-   new (&val->get_ravel(0)) CharCell(UNI_SPACE);   // prototype
+Value_P Z(shape, LOC);
+const ShapeItem ec = Z->element_count();
+   Z->set_proto_Spc();   // prototype
 
 ShapeItem padded = 0;
    loop(e, ec)
@@ -2423,7 +2512,7 @@ ShapeItem padded = 0;
         Unicode uni = UNI_SPACE;
         if (e < (data.size() - idx))   uni = data[e + idx];
         else                           ++padded;
-         new (&val->get_ravel(e)) CharCell(uni);
+        Z->next_ravel_Char(uni);
       }
 
    if (padded)
@@ -2432,12 +2521,12 @@ ShapeItem padded = 0;
              << padded << " spaces added)" << endl;
       }
 
-   val->check_value(LOC);
+   Z->check_value(LOC);
 
    Assert(sym);
-   sym->assign(val, false, LOC);
+   sym->assign(Z, false, LOC);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Command::transfer_context::array_2TF(const UCS_string_vector & objects) const
 {
@@ -2465,10 +2554,10 @@ UCS_string var_or_fun;
 
    if (var_or_fun.size() == 0)
       {
-        CERR << "ERROR: inverse 2 ⎕TF failed for '" << data1 << ";" << endl;
+        CERR << "ERROR: inverse 2 ⎕TF failed for '" << data1 << "'" << endl;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Command::transfer_context::function_2TF(const UCS_string_vector & objects)const
 {
@@ -2512,13 +2601,14 @@ Symbol * sym1 = Workspace::lookup_existing_symbol(fun_name1);
             << "." << ymdhmsu.micro << " (" << timestamp << ")" << endl;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Command::transfer_context::add(const UTF8 * str, int len)
 {
 
 #if 0
-   // helper to print the uni_to_cp_map when given a cp_to_uni_map.
+   // helper function to print the uni_to_cp_map table when given the inverse
+   // cp_to_uni_map. Before that the IBM ⎕AV is printed
    //
    Avec::print_inverse_IBM_quad_AV();
    DOMAIN_ERROR;
@@ -2537,7 +2627,7 @@ const Unicode * cp_to_uni_map = Avec::IBM_quad_AV();
            }
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Command::parse_from_to(UCS_string & from, UCS_string & to,
                        const UCS_string & user_arg)
@@ -2598,7 +2688,7 @@ bool got_minus = false;
 
    return false;   // OK
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 Command::is_lib_ref(const UCS_string & lib)
 {
@@ -2618,4 +2708,4 @@ Command::is_lib_ref(const UCS_string & lib)
 
    return false;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------

@@ -14,7 +14,7 @@
 <area shape="rect" id="node11" href="$classInputMux.html#a8a79cbe5207cde162fb36133ad9defdd" title="get one line " alt="" coords="1123,201,1252,228"/>
 <area shape="rect" id="node12" href="$classCommand.html#ad5c9241b1bb935841fe3c0d81546b7b3" title="process a single line entered by the user (in immediate execution mode) " alt="" coords="1327,100,1490,127"/>
 <area shape="rect" id="node16" href="$classNabla.html#a610d94a179335126e82e9eea07918d5a" title="edit this function " alt="" coords="1596,224,1681,251"/>
-<area shape="rect" id="node18" href="$classQuad__INP.html#a8bc961ccabcf7323bf8623523d57f26a" title="overloaded Function::eval_XB(). " alt="" coords="1339,201,1479,228"/>
+<area shape="rect" id="node18" href="$classQuad__INP.html#ac137efd86abe0a8f7b6082f01165de32" title="overloaded Function::eval_XB(). " alt="" coords="1339,201,1479,228"/>
 <area shape="rect" id="node19" href="$classQuad__INP.html#a0a38d500683e36b13e0d848249837d97" title="read raw_lines from stdin or file, stop at end_marker " alt="" coords="1327,252,1490,279"/>
 <area shape="rect" id="node20" href="$classQuad__Quad.html#a253824f3a533bef36063138ea6ce0673" title="overloaded Symbol::resolve(). " alt="" coords="1338,303,1479,329"/>
 <area shape="rect" id="node21" href="$classQuad__QUOTE.html#a3306dffadf270cb0b3f377ffaca8d269" title="overloaded Symbol::get_apl_value(). " alt="" coords="1330,354,1487,395"/>
@@ -26,6 +26,6 @@
 <area shape="rect" id="node25" href="$classXML__Saving__Archive.html#acc327395cab545ea7797d92f5c931cab" title="write entire workspace " alt="" coords="900,393,1047,434"/>
 <area shape="rect" id="node26" href="$classWorkspace.html#a8a4f1d898d523818dbd9d7efa6f2cf92" title="save this workspace " alt="" coords="1111,420,1264,447"/>
 <area shape="rect" id="node27" href="$classCommand.html#ad61e749290966d00856ce1dd4f6abe42" title=")SAVE active WS as CONTINUE and )OFF " alt="" coords="1312,471,1505,497"/>
-<area shape="rect" id="node28" href="$classCommand.html#aec0c4c6efbb9df9a34220b510f58905a" title=")SAVE: save a workspace file (.xml) " alt="" coords="1329,420,1488,447"/>
+<area shape="rect" id="node28" href="$classCommand.html#ab17fe02c2ece3341b2ea51fee69f0cfd" title=")SAVE: save a workspace file (.xml) " alt="" coords="1329,420,1488,447"/>
 <area shape="rect" id="node30" href="$classValue.html#a3a578f458da8a4ab67052dba0f7bffdd" title="destructor " alt="" coords="469,223,573,249"/>
 </map>

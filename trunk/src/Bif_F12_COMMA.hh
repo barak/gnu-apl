@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -23,15 +23,15 @@
 
 #include "PrimitiveFunction.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** Comma related functions (catenate, laminate, and ravel.) */
 /// Base class for , and ⍪
-class Bif_COMMA : public NonscalarFunction
+class Bif_COMMA : public NonscalarFunction_default_identity
 {
 public:
    /// Constructor
    Bif_COMMA(TokenTag tag)
-   : NonscalarFunction(tag)
+   : NonscalarFunction_default_identity(tag)
    {}
 
    /// ravel along axis, with axis being the first (⍪( or last (,) axis of B
@@ -41,17 +41,23 @@ public:
    static Token ravel(const Shape & new_shape, Value_P B);
 
    /// Catenate A and B
-   static Token catenate(Value_P A, Axis axis, Value_P B);
+   static Value_P catenate(const Value & A, sAxis axis, const Value & B);
+
    /// Laminate A and B
-   static Token laminate(Value_P A, Axis axis, Value_P B);
+   static Value_P laminate(const Value & A, sAxis axis, const Value & B);
+
+   /// either catenate A and B or laminate A and B
+   static Value_P catenate_or_laminate(const Value & A, const Value & X,
+                                       const Value & B);
 
    /// Prepend scalar cell_A to B along axis
-   static Value_P prepend_scalar(const Cell & cell_A, uAxis axis, Value_P B);
+   static Value_P prepend_scalar(const Cell & cell_A, uAxis axis,
+                                 const Value & B);
 
    /// Prepend scalar cell_B to A along axis
-   static Value_P append_scalar(Value_P A, uAxis axis, const Cell & cell_B);
+   static Value_P append_scalar(const Value & A, uAxis axis, const Cell & cell_B);
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** primitive functions catenate, laminate, and ravel along last axis */
 /// The class implementing ,
 class Bif_F12_COMMA : public Bif_COMMA
@@ -73,14 +79,16 @@ public:
       { return ravel_axis(X, B, B->get_rank()); }
 
    /// overloaded Function::eval_AXB()
-   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
+   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
+      { return Token(TOK_APL_VALUE1,
+               catenate_or_laminate(*A, *X, *B)); }
 
    static Bif_F12_COMMA * fun;   ///< Built-in function
    static Bif_F12_COMMA  _fun;   ///< Built-in function
 
 protected:
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /** primitive functions catenate and laminate along first axis, table */
 /// The class implementing ⍪
 class Bif_F12_COMMA1 : public Bif_COMMA
@@ -102,13 +110,15 @@ public:
       { return ravel_axis(X, B, 0); }
 
   /// overloaded Function::eval_AXB()
-   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
+   virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
+      { return Token(TOK_APL_VALUE1, catenate_or_laminate(*A, *X, *B)); }
 
    static Bif_F12_COMMA1 * fun;   ///< Built-in function
    static Bif_F12_COMMA1  _fun;   ///< Built-in function
+
 protected:
 };
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __BIF_COMMA_HH_DEFINED__
 

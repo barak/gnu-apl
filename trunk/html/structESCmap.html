@@ -77,6 +77,8 @@ $(document).ready(function(){initNavTree('structESCmap.html','');});
 Collaboration diagram for ESCmap:</div>
 <div class="dyncontent">
 <div class="center"><img src="structESCmap__coll__graph.png" border="0" usemap="#ESCmap_coll__map" alt="Collaboration graph"/></div>
+<map name="ESCmap_coll__map" id="ESCmap_coll__map">
+</map>
 <center><span class="legend">[<a target="top" href="graph_legend.html">legend</a>]</span></center></div>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
@@ -126,7 +128,7 @@ Static Public Attributes</h2></td></tr>
 <div class="textblock"><p>A mapping from ANSI ESC sequences to internal Unicodes. </p>
 <p>A mapping from ESC sequences to (internal) pseudo-Unicodes such as UNI_CursorUp and friends </p>
 
-<p class="definition">Definition at line <a class="el" href="LineInput_8hh_source.html#l00359">359</a> of file <a class="el" href="LineInput_8hh_source.html">LineInput.hh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LineInput_8hh_source.html#l00388">388</a> of file <a class="el" href="LineInput_8hh_source.html">LineInput.hh</a>.</p>
 </div><h2 class="groupheader">Member Data Documentation</h2>
 <a id="a3c0acac26a65bf7fa087d02a9ff44470"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a3c0acac26a65bf7fa087d02a9ff44470">&#9670;&nbsp;</a></span>the_ESCmap</h2>
@@ -147,10 +149,10 @@ Static Public Attributes</h2></td></tr>
   </tr>
 </table>
 </div><div class="memdoc">
-<b>Initial value:</b><div class="fragment"><div class="line">=</div><div class="line">{</div><div class="line">   </div><div class="line">  { 3, <a class="code" href="classOutput.html#a0b1a607549b9d4b0ab6d258254894e5d">Output::ESC_CursorUp</a>,      UNI_CursorUp     },</div><div class="line">  { 3, <a class="code" href="classOutput.html#a64014666397ed90004b18a5dd9176ee2">Output::ESC_CursorDown</a>,    UNI_CursorDown   },</div><div class="line">  { 3, <a class="code" href="classOutput.html#a44e3630d72e78c2dcafe735f15f3a55e">Output::ESC_CursorRight</a>,   UNI_CursorRight  },</div><div class="line">  { 3, <a class="code" href="classOutput.html#a9623dc7cb86b4dd993e3173e1bac034c">Output::ESC_CursorLeft</a>,    UNI_CursorLeft   },</div><div class="line">  { 3, <a class="code" href="classOutput.html#aa380e9c6a5d30c4f0765f40faefa9658">Output::ESC_CursorEnd</a>,     UNI_CursorEnd    },</div><div class="line">  { 3, <a class="code" href="classOutput.html#a6b267b49995913d0be1f35d1344e07a1">Output::ESC_CursorHome</a>,    UNI_CursorHome   },</div><div class="line">  { 4, <a class="code" href="classOutput.html#ad3bd229281324b3054b10d40000de172">Output::ESC_InsertMode</a>,    UNI_InsertMode   },</div><div class="line">  { 4, <a class="code" href="classOutput.html#a10023dbfede11027fd443b7b0636e486">Output::ESC_Delete</a>,        UNI_ASCII_DELETE },</div><div class="line"></div><div class="line">   </div><div class="line">  { 6, <a class="code" href="classOutput.html#a8ad23ea79dec108fd9c7d4dd8816d365">Output::ESC_CursorUp_1</a>,    UNI_CursorUp     },</div><div class="line">  { 6, <a class="code" href="classOutput.html#a9a0276cfc39cde9edf202397159cec0c">Output::ESC_CursorDown_1</a>,  UNI_CursorDown   },</div><div class="line">  { 6, <a class="code" href="classOutput.html#ae3e445c0cfb8b46a35244b108d92af18">Output::ESC_CursorRight_1</a>, UNI_CursorRight  },</div><div class="line">  { 6, <a class="code" href="classOutput.html#a7be70f6f1ea19b8faada8ba4e017091a">Output::ESC_CursorLeft_1</a>,  UNI_CursorLeft   },</div><div class="line">  { 6, <a class="code" href="classOutput.html#a58556b7f5b89a36e24e6866b7a9321eb">Output::ESC_CursorEnd_1</a>,   UNI_CursorEnd    },</div><div class="line">  { 6, <a class="code" href="classOutput.html#a5f3b534467d26d91d965b0ced7872987">Output::ESC_CursorHome_1</a>,  UNI_CursorHome   },</div><div class="line">  { 6, <a class="code" href="classOutput.html#aaec91d184bdb8ec51e3e90a04b17f4c3">Output::ESC_InsertMode_1</a>,  UNI_InsertMode   },</div><div class="line">  { 6, <a class="code" href="classOutput.html#a6208ab84a0483cc161645bee5886e067">Output::ESC_Delete_1</a>,      UNI_ASCII_DELETE },</div><div class="line">}</div></div><!-- fragment -->
+<b>Initial value:</b><div class="fragment"><div class="line">=</div><div class="line">{</div><div class="line">   </div><div class="line">  { 3, <a class="code" href="classOutput.html#a0b1a607549b9d4b0ab6d258254894e5d">Output::ESC_CursorUp</a>,      UNI_CursorUp     },</div><div class="line">  { 3, <a class="code" href="classOutput.html#a64014666397ed90004b18a5dd9176ee2">Output::ESC_CursorDown</a>,    UNI_CursorDown   },</div><div class="line">  { 3, <a class="code" href="classOutput.html#a44e3630d72e78c2dcafe735f15f3a55e">Output::ESC_CursorRight</a>,   UNI_CursorRight  },</div><div class="line">  { 3, <a class="code" href="classOutput.html#a9623dc7cb86b4dd993e3173e1bac034c">Output::ESC_CursorLeft</a>,    UNI_CursorLeft   },</div><div class="line">  { 3, <a class="code" href="classOutput.html#aa380e9c6a5d30c4f0765f40faefa9658">Output::ESC_CursorEnd</a>,     UNI_CursorEnd    },</div><div class="line">  { 3, <a class="code" href="classOutput.html#a6b267b49995913d0be1f35d1344e07a1">Output::ESC_CursorHome</a>,    UNI_CursorHome   },</div><div class="line">  { 4, <a class="code" href="classOutput.html#ad3bd229281324b3054b10d40000de172">Output::ESC_InsertMode</a>,    UNI_InsertMode   },</div><div class="line">  { 4, <a class="code" href="classOutput.html#a10023dbfede11027fd443b7b0636e486">Output::ESC_Delete</a>,        UNI_DELETE },</div><div class="line"></div><div class="line">   </div><div class="line">  { 6, <a class="code" href="classOutput.html#a8ad23ea79dec108fd9c7d4dd8816d365">Output::ESC_CursorUp_1</a>,    UNI_CursorUp     },</div><div class="line">  { 6, <a class="code" href="classOutput.html#a9a0276cfc39cde9edf202397159cec0c">Output::ESC_CursorDown_1</a>,  UNI_CursorDown   },</div><div class="line">  { 6, <a class="code" href="classOutput.html#ae3e445c0cfb8b46a35244b108d92af18">Output::ESC_CursorRight_1</a>, UNI_CursorRight  },</div><div class="line">  { 6, <a class="code" href="classOutput.html#a7be70f6f1ea19b8faada8ba4e017091a">Output::ESC_CursorLeft_1</a>,  UNI_CursorLeft   },</div><div class="line">  { 6, <a class="code" href="classOutput.html#a58556b7f5b89a36e24e6866b7a9321eb">Output::ESC_CursorEnd_1</a>,   UNI_CursorEnd    },</div><div class="line">  { 6, <a class="code" href="classOutput.html#a5f3b534467d26d91d965b0ced7872987">Output::ESC_CursorHome_1</a>,  UNI_CursorHome   },</div><div class="line">  { 6, <a class="code" href="classOutput.html#aaec91d184bdb8ec51e3e90a04b17f4c3">Output::ESC_InsertMode_1</a>,  UNI_InsertMode   },</div><div class="line">  { 6, <a class="code" href="classOutput.html#a6208ab84a0483cc161645bee5886e067">Output::ESC_Delete_1</a>,      UNI_DELETE },</div><div class="line">}</div></div><!-- fragment -->
 <p>a mapping from keyboard escape sequences to Unicodes </p>
 
-<p class="definition">Definition at line <a class="el" href="LineInput_8hh_source.html#l00383">383</a> of file <a class="el" href="LineInput_8hh_source.html">LineInput.hh</a>.</p>
+<p class="definition">Definition at line <a class="el" href="LineInput_8hh_source.html#l00412">412</a> of file <a class="el" href="LineInput_8hh_source.html">LineInput.hh</a>.</p>
 
 <p class="reference">Referenced by <a class="el" href="LineInput_8cc_source.html#l00119">refresh_lengths()</a>.</p>
 
@@ -166,7 +168,7 @@ Static Public Attributes</h2></td></tr>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="structESCmap.html">ESCmap</a></li>
-    <li class="footer">Generated on Sun Aug 9 2020 16:43:42 for GNUAPL by
+    <li class="footer">Generated on Sun Jan 30 2022 20:14:26 for GNUAPL by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>

@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -27,18 +27,18 @@
 #include "Value.hh"
 #include "Workspace.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
-CDR::to_CDR(CDR_string & result, const Value & value)
+CDR::to_CDR(CDR_string & result, const Value * value)
 {
-const CDR_type type = value.get_CDR_type();
-const int len = value.total_size_brutto(type);
+const CDR_type type = value->get_CDR_type();
+const int len = value->total_CDR_size_brutto(type);
    result.reserve(len + 1);
    result.clear();
 
-   fill(result, type, len, value);
+   fill(result, type, len, *value);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 CDR::fill(CDR_string & result, int type, int len, const Value & val)
 {
@@ -107,7 +107,7 @@ const uint32_t nelm = val.element_count();
         loop(e, nelm)
            {
              const int bit = e%8;
-             const APL_Integer i = val.get_ravel(e).get_int_value();
+             const APL_Integer i = val.get_cravel(e).get_int_value();
              Assert(i == 0 || i == 1);
              if (i)   accu |= 0x80 >> bit;
              if (bit == 7)
@@ -127,7 +127,7 @@ const uint32_t nelm = val.element_count();
       {
         loop(e, nelm)
            {
-             uint64_t i = val.get_ravel(e).get_int_value();
+             uint64_t i = val.get_cravel(e).get_int_value();
              result.push_back(Unicode(i & 0xFF));   i >>= 8;
              result.push_back(Unicode(i & 0xFF));   i >>= 8;
              result.push_back(Unicode(i & 0xFF));   i >>= 8;
@@ -139,7 +139,7 @@ const uint32_t nelm = val.element_count();
       {
         loop(e, nelm)
            {
-             const APL_Float v = val.get_ravel(e).get_real_value();
+             const APL_Float v = val.get_cravel(e).get_real_value();
              const APL_Float * dv = &v;
              uint64_t i = *reinterpret_cast<const uint64_t *>(dv);
              result.push_back(Unicode(i & 0xFF));   i >>= 8;
@@ -156,7 +156,7 @@ const uint32_t nelm = val.element_count();
       {
         loop(e, nelm)
            {
-             APL_Float v = val.get_ravel(e).get_real_value();
+             APL_Float v = val.get_cravel(e).get_real_value();
              const APL_Float * dv = &v;
              uint64_t i = *reinterpret_cast<const uint64_t *>(dv);
              result.push_back(Unicode(i & 0xFF));   i >>= 8;
@@ -168,7 +168,7 @@ const uint32_t nelm = val.element_count();
              result.push_back(Unicode(i & 0xFF));   i >>= 8;
              result.push_back(Unicode(i & 0xFF));   i >>= 8;
 
-             v = val.get_ravel(e).get_imag_value();
+             v = val.get_cravel(e).get_imag_value();
              dv = &v;
              i = *reinterpret_cast<const uint64_t *>(dv);
              result.push_back(Unicode(i & 0xFF));   i >>= 8;
@@ -185,7 +185,7 @@ const uint32_t nelm = val.element_count();
       {
         loop(e, nelm)
            {
-             const Unicode uni = val.get_ravel(e).get_char_value();
+             const Unicode uni = val.get_cravel(e).get_char_value();
              Assert(uni >= 0);
              Assert(uni < 256);
              result.push_back(uni);
@@ -195,7 +195,7 @@ const uint32_t nelm = val.element_count();
       {
         loop(e, nelm)
            {
-             uint32_t i = val.get_ravel(e).get_char_value();
+             uint32_t i = val.get_cravel(e).get_char_value();
              result.push_back(Unicode(i & 0xFF));   i >>= 8;
              result.push_back(Unicode(i & 0xFF));   i >>= 8;
              result.push_back(Unicode(i & 0xFF));   i >>= 8;
@@ -240,7 +240,7 @@ const uint32_t nelm = val.element_count();
              result.push_back(Unicode(offset >> 16 & 0xFF));
              result.push_back(Unicode(offset >> 24 & 0xFF));
 
-             const Cell & cell = val.get_ravel(e);
+             const Cell & cell = val.get_cravel(e);
              if (cell.is_simple_cell())
                 {
                   // a non-pointer sub value: 16 byte header,
@@ -252,7 +252,7 @@ const uint32_t nelm = val.element_count();
                 {
                   const Value & sub_val = *cell.get_pointer_value();
                   const CDR_type sub_type = sub_val.get_CDR_type();
-                  offset += sub_val.total_size_brutto(sub_type);
+                  offset += sub_val.total_CDR_size_brutto(sub_type);
                 }
               else
                 DOMAIN_ERROR;
@@ -267,14 +267,14 @@ const uint32_t nelm = val.element_count();
         //
         loop(e, nelm)
            {
-             const Cell & cell = val.get_ravel(e);
+             const Cell & cell = val.get_cravel(e);
              if (cell.is_simple_cell())
                 {
                   Value_P sub_val(LOC);
-                  sub_val->get_ravel(0).init(cell, sub_val.getref(), LOC);
+                  sub_val->set_ravel_Cell(0, cell);
 
                   const CDR_type sub_type = sub_val->get_CDR_type();
-                  const int sub_len = sub_val->total_size_brutto(sub_type);
+                  const int sub_len = sub_val->total_CDR_size_brutto(sub_type);
                   fill(result, sub_type, sub_len, *sub_val);
                 }
               else
@@ -282,7 +282,7 @@ const uint32_t nelm = val.element_count();
                   Value_P sub_val = cell.get_pointer_value();
 
                   const CDR_type sub_type = sub_val->get_CDR_type();
-                  const int sub_len = sub_val->total_size_brutto(sub_type);
+                  const int sub_len = sub_val->total_CDR_size_brutto(sub_type);
                   fill(result, sub_type, sub_len, *sub_val);
                 }
            }
@@ -297,7 +297,7 @@ const uint32_t nelm = val.element_count();
    //
    while (result.size() & 15)   result.push_back(Unicode_0);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value_P
 CDR::from_CDR(const CDR_string & cdr, const char * loc)
 {
@@ -326,7 +326,7 @@ const uint8_t * data = cdr.get_items();
 
 const uint32_t nelm = get_4_be(data + 8);
 const CDR_type vtype = CDR_type(data[12]);
-const Rank rank = data[13];
+const sRank rank = data[13];
 Shape shape;
    loop(r, rank)
       {
@@ -334,7 +334,7 @@ Shape shape;
         shape.add_shape_item(sh);
       }
 
-Value_P ret(shape, loc);
+Value_P Z(shape, loc);
 
 const uint8_t * ravel = data + 16 + 4*rank;
 
@@ -343,8 +343,7 @@ const uint8_t * ravel = data + 16 + 4*rank;
         loop(n, nelm)
            {
              const int bit = ravel[n >> 3] & (0x80 >> (n & 7));
-             if (bit)   new (&ret->get_ravel(n)) IntCell(1);
-             else       new (&ret->get_ravel(n)) IntCell(0);
+             Z->next_ravel_Int(bit ? 1 : 0);
            }
       }
    else if (vtype == CDR_INT32)   // 4 byte ints vector
@@ -353,7 +352,7 @@ const uint8_t * ravel = data + 16 + 4*rank;
            {
              APL_Integer d = *reinterpret_cast<const uint32_t *>(ravel + 4*n);
              if (d & 0x80000000)   d |= 0xFFFFFFFF00000000ULL;
-             new (&ret->get_ravel(n)) IntCell(d);
+             Z->next_ravel_Int(d);
            }
       }
    else if (vtype == CDR_FLT64)   // 8 byte float vector
@@ -362,7 +361,7 @@ const uint8_t * ravel = data + 16 + 4*rank;
            {
              const APL_Float v =
                   *reinterpret_cast<const APL_Float *>(ravel + 8*n);
-             new (&ret->get_ravel(n)) FloatCell(v);
+             Z->next_ravel_Float(v);
            }
       }
   else if (vtype == CDR_CPLX128)   // 16 byte complex vector
@@ -373,7 +372,7 @@ const uint8_t * ravel = data + 16 + 4*rank;
                   *reinterpret_cast<const APL_Float *>(ravel + 16*n);
              const APL_Float vi =
                   *reinterpret_cast<const APL_Float *>(ravel + 16*n + 8);
-             new (&ret->get_ravel(n)) ComplexCell(vr, vi);
+             Z->next_ravel_Complex(vr, vi);
            }
       }
    else if (vtype == CDR_CHAR8)   // 1 byte char vector
@@ -382,7 +381,7 @@ const uint8_t * ravel = data + 16 + 4*rank;
            {
              uint32_t d = ravel[n];
              if (d & 0x80)   d |= 0xFFFFFFFFFFFFFF00ULL;
-             new (&ret->get_ravel(n)) CharCell(Unicode(d));
+             Z->next_ravel_Char(Unicode(d));
            }
       }
    else if (vtype == CDR_CHAR32)   // 4 byte UNICODE vector
@@ -390,7 +389,7 @@ const uint8_t * ravel = data + 16 + 4*rank;
         loop(n, nelm)
            {
              const uint32_t d = *reinterpret_cast<const uint32_t *>(ravel+4*n);
-             new (&ret->get_ravel(n)) CharCell(Unicode(d));
+             Z->next_ravel_Char(Unicode(d));
            }
       }
    else if (vtype == CDR_NEST32)   // packed vector with 4 bytes offsets.
@@ -401,7 +400,7 @@ const uint8_t * ravel = data + 16 + 4*rank;
                          *reinterpret_cast<const uint32_t *>(ravel + 4*n);
               const uint8_t * sub_data = data + offset;
               const uint32_t sub_vtype = sub_data[12];
-              const Rank sub_rank = sub_data[13];
+              const sRank sub_rank = sub_data[13];
               const uint8_t * sub_ravel = sub_data + 16 + 4*sub_rank;
 
               // if the sub-item is a non-nested scalar then we append it to
@@ -411,8 +410,7 @@ const uint8_t * ravel = data + 16 + 4*rank;
                  {
                    if (sub_vtype == 0)        // bit
                       {
-                        new (&ret->get_ravel(n))
-                            IntCell((*sub_ravel & 0x80) ? 1 : 0);
+                        Z->next_ravel_Int((*sub_ravel & 0x80) ? 1 : 0);
                         continue;   // next n
                       }
 
@@ -421,39 +419,37 @@ const uint8_t * ravel = data + 16 + 4*rank;
                         APL_Integer d = *reinterpret_cast<const uint32_t *>
                                                          (sub_ravel);
                         if (d & 0x80000000)   d |= 0xFFFFFFFF00000000ULL;
-                        new (&ret->get_ravel(n)) IntCell(d);
+                        Z->next_ravel_Int(d);
                         continue;   // next n
                       }
 
                    if (sub_vtype == 2)        // 8 byte real
                       {
-                        new (&ret->get_ravel(n))
-                            FloatCell(*reinterpret_cast<const APL_Float *>
-                                                       (sub_ravel));
+                        Z->next_ravel_Float(
+                                        *reinterpret_cast<const APL_Float *>
+                                                                (sub_ravel));
                         continue;   // next n
                       }
 
                    if (sub_vtype == 3)        // 16 byte complex
                       {
-                        new (&ret->get_ravel(n))
-                            ComplexCell(*reinterpret_cast<const APL_Float *>
-                                                         (sub_ravel),
+                        Z->next_ravel_Complex(
                                         *reinterpret_cast<const APL_Float *>
-                                                         (sub_ravel + 8));
+                                                                (sub_ravel),
+                                        *reinterpret_cast<const APL_Float *>
+                                                                (sub_ravel + 8));
                         continue;   // next n
                       }
 
-                   if (sub_vtype == 4)        // 1 byte char
+                   if (sub_vtype == 4)        // 1 byte ASCII char
                       {
-                        new (&ret->get_ravel(n))
-                            CharCell((Unicode(*sub_ravel)));
+                        Z->next_ravel_Char(Unicode(*sub_ravel));
                         continue;   // next n
                       }
 
                    if (sub_vtype == 5)        // 4 byte Unicode
                       {
-                        new (&ret->get_ravel(n))
-                            CharCell(Unicode(get_4_be(sub_ravel)));
+                        Z->next_ravel_Char(Unicode(get_4_be(sub_ravel)));
                         continue;   // next n
                       }
 
@@ -481,7 +477,7 @@ const uint8_t * ravel = data + 16 + 4*rank;
                    const APL_Integer qio = Workspace::get_IO();
                    loop(v, sh.get_volume())
                        {
-                         new (&sub_val->get_ravel(v))   IntCell(v + qio);
+                         sub_val->next_ravel_Int(v + qio);
                        }
 
                    continue;   // next n
@@ -491,7 +487,7 @@ const uint8_t * ravel = data + 16 + 4*rank;
               CDR_string sub_cdr(sub_data, sub_cdr_len);
               Value_P sub_val = from_CDR(sub_cdr, LOC);
               Assert(+sub_val);
-              new (&ret->get_ravel(n))   PointerCell(sub_val.get(), ret.getref());
+              Z->next_ravel_Pointer(sub_val.get());
             }
       }
    else
@@ -500,8 +496,8 @@ const uint8_t * ravel = data + 16 + 4*rank;
         Assert(0 && "Bad/unsupported CDR type");
       }
 
-   ret->check_value(LOC);
-   return ret;
+   Z->check_value(LOC);
+   return Z;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 

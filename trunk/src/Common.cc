@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -46,7 +46,7 @@
 
 bool got_WINCH = false;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 static bool attention_raised = false;
 static uint64_t attention_count = 0;
 
@@ -62,7 +62,7 @@ bool attention_is_raised()
 {
    return attention_raised;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 APL_time_us interrupt_when = 0;
 uint64_t interrupt_count = 0;
 static bool interrupt_raised = false;
@@ -78,13 +78,18 @@ bool interrupt_is_raised()
 {
    return interrupt_raised;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 init_1(const char * argv0, bool log_startup)
 {
    // init the workspace memory limits
    //
    Quad_WA::init(log_startup);
+
+   enum { VALUE_HEADER = sizeof(Value)
+                       - sizeof(Shape)
+                       - SHORT_VALUE_LENGTH_WANTED * sizeof(Cell)
+        };
 
    if (log_startup)
       CERR << endl
@@ -99,14 +104,19 @@ init_1(const char * argv0, bool log_startup)
            << "sizeof(Symbol) is         " << sizeof(Symbol)            << endl
            << "sizeof(Token) is          " << sizeof(Token)             << endl
            << "sizeof(Value) is          " << sizeof(Value)
-           << " (including " << SHORT_VALUE_LENGTH_WANTED << " Cells)"  << endl
+           << " (" << VALUE_HEADER << " byte header + "
+                   << sizeof(Shape) << " byte shape + "
+                   << SHORT_VALUE_LENGTH_WANTED << " Cells)"            << endl
            << "sizeof(ValueStackItem) is " << sizeof(ValueStackItem)    << endl
            << "sizeof(UCS_string) is     " << sizeof(UCS_string)        << endl
            << "sizeof(UserFunction) is   " << sizeof(UserFunction)      << endl
            << endl
            << "⎕WA total memory is       " << Quad_WA::total_memory
            << " bytes (" << (Quad_WA::total_memory/1000000) << " MB, 0x"
-           << hex << Quad_WA::total_memory << ")" << dec << endl;
+           << hex << Quad_WA::total_memory << ")" << dec                << endl
+                                                                        << endl
+           << "configure command: " << CONFIGURE_ARGS                   << endl
+                                                                        << endl;
 
    // CYGWIN does not have RLIMIT_NPROC
    //
@@ -122,7 +132,7 @@ rlimit rl;
    rl.rlim_cur = RLIM_INFINITY;
    setrlimit(RLIMIT_NPROC, &rl);
 
-   // limit the virtual memory size to avoid new() problem with large values
+   // limit the virtual memory size to avoid new() problems with large values
    //
 #endif
 
@@ -131,7 +141,7 @@ rlimit rl;
    Value::init();
    VH_entry::init();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// initialize subsystems that depend on argv[]
 void
 init_2(bool log_startup)
@@ -146,7 +156,7 @@ const int retry_max = uprefs.emacs_mode ? 15 : 5;
 
    Parallel::init(log_startup || LOG_Parallel);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /// the opposite of init()
 void
 cleanup(bool soft)
@@ -173,7 +183,7 @@ cleanup(bool soft)
         Output::reset_colors();
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 control_C(int)
 {
@@ -191,7 +201,7 @@ APL_time_us when = now();
 
    interrupt_when = when;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 // Probes...
 
@@ -205,7 +215,7 @@ Probe & Probe::P_3 = probes[Probe::PROBE_COUNT - 3];
 Probe & Probe::P_4 = probes[Probe::PROBE_COUNT - 4];
 Probe & Probe::P_5 = probes[Probe::PROBE_COUNT - 5];
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void *
 common_new(size_t size)
 {
@@ -215,14 +225,14 @@ const uint64_t iret = uint64_t(ret);
         << "  (" << HEX(size) << ")" << endl;
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 common_delete(void * p)
 {
    CERR << "DEL " << HEX(uint64_t(p)) << endl;
    free(p);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 APL_time_us
 now()
 {
@@ -234,7 +244,7 @@ APL_time_us ret = tv_now.tv_sec;
    ret += tv_now.tv_usec;
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 YMDhmsu::YMDhmsu(APL_time_us at)
    : micro(at % 1000000)
 {
@@ -248,7 +258,7 @@ struct tm * t = gmtime(&secs);
    minute = t->tm_min;
    second = t->tm_sec;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 APL_time_us
 YMDhmsu::get() const
 {
@@ -266,20 +276,20 @@ APL_time_us ret =  mktime(&t);
    ret += micro;
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ostream &
 operator << (ostream & out, const Function_PC2 & ft)
 {
    return out << ft.low << ":" << ft.high;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ostream &
 print_flags(ostream & out, ValueFlags flags)
 {
    return out << ((flags & VF_marked)   ?  "M" : "-")
               << ((flags & VF_complete) ?  "C" : "-");
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 nibble(Unicode uni)
 {
@@ -293,7 +303,7 @@ nibble(Unicode uni)
 
    return -1;   // uni is not a hex digit
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 sixbit(Unicode uni)
 {
@@ -316,4 +326,4 @@ sixbit(Unicode uni)
 
    return -1;   // uni is not a hex digit
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------

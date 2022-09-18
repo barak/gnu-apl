@@ -111,7 +111,8 @@ extern LIBAPL_error apl_exec(const char * line_utf8);
 /// line_ucs is a 0-terminated string of unicode integers
 extern LIBAPL_error apl_exec_ucs(const unsigned int * line_ucs);
 
-/// Pass `command` to the command processor and return its output.
+/// Pass `command` to the command processor and return its output. The result
+/// was allocated with strndup(), therefore the caller must free() it.
 extern const char * apl_command(const char * command_utf8);
 
 /// Pass `command` to the command processor and return its output. line_ucs
@@ -364,6 +365,11 @@ extern APL_value eval__L_oper_X_B(APL_function L, APL_function fun,
 /// dyadic operator oper with functions L and R, axis X, and argument B
 extern APL_value eval__L_oper_R_X_B(APL_function L, APL_function fun,
                                     APL_function R, APL_value X, APL_value B);
+
+/// lib APL is, by default, started in safe_mode (which disables some
+/// potentially dangerous functions and commands. disable_safe_mode() undoes
+/// that.
+extern void disable_safe_mode();
 
 #ifdef __cplusplus
 }

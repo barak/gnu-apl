@@ -2,6 +2,6 @@
 <area shape="rect" id="node2" href="$classWorkspace.html#ade3a373ad48eb7a8fbad97a28472db7f" title="clear the workspace " alt="" coords="247,5,400,32"/>
 <area shape="rect" id="node5" href="$classWorkspace.html#a7ffca45a4446b644e7caf093a1699ba2" title="write symbols for )OUT command " alt="" coords="244,56,403,83"/>
 <area shape="rect" id="node3" href="$classWorkspace.html#a77c7b25908cf2479dc087cc3bcf44dcb" title="load lib_ws into the_workspace, maybe set ⎕LX of the new WS. " alt="" coords="451,5,601,32"/>
-<area shape="rect" id="node4" href="$classCommand.html#ad222a6de11eb55501624a4d0dea3a464" title=")LOAD: load a workspace file " alt="" coords="649,5,808,32"/>
+<area shape="rect" id="node4" href="$classCommand.html#a6f873ead3eb848fbec9037a01c5cc58b" title=")LOAD: load a workspace file " alt="" coords="649,5,808,32"/>
 <area shape="rect" id="node6" href="$classCommand.html#a4afcbbdbee3fd2f536db12651861110b" title=")OUT: export a workspace file " alt="" coords="451,56,601,83"/>
 </map>

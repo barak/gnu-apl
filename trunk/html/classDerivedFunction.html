@@ -62,13 +62,14 @@ $(document).ready(function(){initNavTree('classDerivedFunction.html','');});
 <a href="#pub-methods">Public Member Functions</a> &#124;
 <a href="#pro-methods">Protected Member Functions</a> &#124;
 <a href="#pro-attribs">Protected Attributes</a> &#124;
+<a href="#pri-methods">Private Member Functions</a> &#124;
 <a href="classDerivedFunction-members.html">List of all members</a>  </div>
   <div class="headertitle">
 <div class="title">DerivedFunction Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p>An APL operator bounf to its function argument(s)  
+<p>An APL operator bound to its function operand(s)  
  <a href="classDerivedFunction.html#details">More...</a></p>
 
 <p><code>#include &lt;<a class="el" href="DerivedFunction_8hh_source.html">DerivedFunction.hh</a>&gt;</code></p>
@@ -99,7 +100,7 @@ Collaboration diagram for DerivedFunction:</div>
 <area shape="rect" id="node11" href="classDynamicObject.html" title="A Value or an IndexExpr. " alt="" coords="415,125,527,152"/>
 <area shape="rect" id="node19" href="classIndexExpr.html" title="The interal representation of some APL index [A1;A2;...;An]. " alt="" coords="312,231,393,257"/>
 <area shape="rect" id="node12" href="classCell.html" title="The base class for all Cells. " alt="" coords="550,320,595,347"/>
-<area shape="rect" id="node13" href="unionCell_1_1SomeValue.html" title="A union containing all possible cell values for the different Cell types. " alt="" coords="659,231,779,257"/>
+<area shape="rect" id="node13" href="unionCell_1_1SomeValue.html" title="A union containing all possible cell values for the different Cell types. " alt="" coords="638,231,758,257"/>
 <area shape="rect" id="node15" href="structCell_1_1SomeValue_1_1__fval.html" title="&lt; for FloatCell " alt="" coords="667,125,823,152"/>
 <area shape="rect" id="node16" href="unionCell_1_1SomeValue_1_1__fval_1_1__flt__num.html" title="either a floating point value, or the denominator of a quotient " alt="" coords="827,5,983,47"/>
 <area shape="rect" id="node17" href="struct__deleted__value.html" title="a linked list of deleted values " alt="" coords="619,320,729,347"/>
@@ -113,26 +114,30 @@ Public Member Functions</h2></td></tr>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDerivedFunction.html#ae82cdc3de00a1db294344e9b948c7ce9">DerivedFunction</a> ()</td></tr>
 <tr class="memdesc:ae82cdc3de00a1db294344e9b948c7ce9"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor for <a class="el" href="classDerivedFunctionCache.html" title="a small cache for storing a few DerivedFunction objects ">DerivedFunctionCache</a>. <br /></td></tr>
 <tr class="separator:ae82cdc3de00a1db294344e9b948c7ce9"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2f13521e18d01fd8632288618d72f1f5"><td class="memItemLeft" align="right" valign="top"><a id="a2f13521e18d01fd8632288618d72f1f5"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDerivedFunction.html#a2f13521e18d01fd8632288618d72f1f5">DerivedFunction</a> (<a class="el" href="classToken.html">Token</a> &amp;lf, <a class="el" href="classFunction.html">Function</a> *dyop, <a class="el" href="classToken.html">Token</a> &amp;rf, const char *loc)</td></tr>
-<tr class="memdesc:a2f13521e18d01fd8632288618d72f1f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor (dyadic operator) <br /></td></tr>
-<tr class="separator:a2f13521e18d01fd8632288618d72f1f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3f7403ec0b6b5603c1e9fc661090c1f4"><td class="memItemLeft" align="right" valign="top"><a id="a3f7403ec0b6b5603c1e9fc661090c1f4"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDerivedFunction.html#a3f7403ec0b6b5603c1e9fc661090c1f4">DerivedFunction</a> (<a class="el" href="classToken.html">Token</a> &amp;lf, <a class="el" href="classFunction.html">Function</a> *dyop, <a class="el" href="classValue__P.html">Value_P</a> X, <a class="el" href="classToken.html">Token</a> &amp;rval, const char *loc)</td></tr>
-<tr class="memdesc:a3f7403ec0b6b5603c1e9fc661090c1f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor (dyadic operator with axis: fun ⍤[] rval) <br /></td></tr>
-<tr class="separator:a3f7403ec0b6b5603c1e9fc661090c1f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2d6734e851819be5d64a593a83aaa922"><td class="memItemLeft" align="right" valign="top"><a id="a2d6734e851819be5d64a593a83aaa922"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDerivedFunction.html#a2d6734e851819be5d64a593a83aaa922">DerivedFunction</a> (<a class="el" href="classToken.html">Token</a> &amp;lfun, <a class="el" href="classFunction.html">Function</a> *monop, const char *loc)</td></tr>
-<tr class="memdesc:a2d6734e851819be5d64a593a83aaa922"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor (monadic operator, no axis) <br /></td></tr>
-<tr class="separator:a2d6734e851819be5d64a593a83aaa922"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8e1686d66d64ff108a7b0cc2aae0a952"><td class="memItemLeft" align="right" valign="top"><a id="a8e1686d66d64ff108a7b0cc2aae0a952"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDerivedFunction.html#a8e1686d66d64ff108a7b0cc2aae0a952">DerivedFunction</a> (<a class="el" href="classToken.html">Token</a> &amp;lf, <a class="el" href="classFunction.html">Function</a> *monop, <a class="el" href="classValue__P.html">Value_P</a> X, const char *loc)</td></tr>
-<tr class="memdesc:a8e1686d66d64ff108a7b0cc2aae0a952"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor (monadic operator, with axis) <br /></td></tr>
-<tr class="separator:a8e1686d66d64ff108a7b0cc2aae0a952"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a832f2192bfe0710ed57de5e633e5832b"><td class="memItemLeft" align="right" valign="top"><a id="a832f2192bfe0710ed57de5e633e5832b"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDerivedFunction.html#a832f2192bfe0710ed57de5e633e5832b">DerivedFunction</a> (<a class="el" href="classFunction.html">Function</a> *func, <a class="el" href="classValue__P.html">Value_P</a> X, const char *loc)</td></tr>
-<tr class="memdesc:a832f2192bfe0710ed57de5e633e5832b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor (function with axis) <br /></td></tr>
-<tr class="separator:a832f2192bfe0710ed57de5e633e5832b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9e5e492dff36a3031d3b2681e6179e44"><td class="memItemLeft" align="right" valign="top"><a id="a9e5e492dff36a3031d3b2681e6179e44"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDerivedFunction.html#a9e5e492dff36a3031d3b2681e6179e44">DerivedFunction</a> (<a class="el" href="classToken.html">Token</a> &amp;lf, <a class="el" href="classFunction.html">Function_P</a> dyop, <a class="el" href="classToken.html">Token</a> &amp;rf, const char *loc)</td></tr>
+<tr class="memdesc:a9e5e492dff36a3031d3b2681e6179e44"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor (dyadic operator) <br /></td></tr>
+<tr class="separator:a9e5e492dff36a3031d3b2681e6179e44"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a69f32212e7f4a6f7ba0a96d5c74e3b1c"><td class="memItemLeft" align="right" valign="top"><a id="a69f32212e7f4a6f7ba0a96d5c74e3b1c"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDerivedFunction.html#a69f32212e7f4a6f7ba0a96d5c74e3b1c">DerivedFunction</a> (<a class="el" href="classToken.html">Token</a> &amp;lf, <a class="el" href="classFunction.html">Function_P</a> dyop, <a class="el" href="classValue__P.html">Value_P</a> X, <a class="el" href="classToken.html">Token</a> &amp;rval, const char *loc)</td></tr>
+<tr class="memdesc:a69f32212e7f4a6f7ba0a96d5c74e3b1c"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor (dyadic operator with axis: fun ⍤[] rval) <br /></td></tr>
+<tr class="separator:a69f32212e7f4a6f7ba0a96d5c74e3b1c"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a63ef4a98fc485eeee78b85743da4a3f6"><td class="memItemLeft" align="right" valign="top"><a id="a63ef4a98fc485eeee78b85743da4a3f6"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDerivedFunction.html#a63ef4a98fc485eeee78b85743da4a3f6">DerivedFunction</a> (<a class="el" href="classToken.html">Token</a> &amp;lfun, <a class="el" href="classFunction.html">Function_P</a> monop, const char *loc)</td></tr>
+<tr class="memdesc:a63ef4a98fc485eeee78b85743da4a3f6"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor (monadic operator, no axis) <br /></td></tr>
+<tr class="separator:a63ef4a98fc485eeee78b85743da4a3f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac63b200347f5aac3e7174ed727e5226f"><td class="memItemLeft" align="right" valign="top"><a id="ac63b200347f5aac3e7174ed727e5226f"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDerivedFunction.html#ac63b200347f5aac3e7174ed727e5226f">DerivedFunction</a> (<a class="el" href="classToken.html">Token</a> &amp;lf, <a class="el" href="classFunction.html">Function_P</a> monop, <a class="el" href="classValue__P.html">Value_P</a> X, const char *loc)</td></tr>
+<tr class="memdesc:ac63b200347f5aac3e7174ed727e5226f"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor (monadic operator, with axis) <br /></td></tr>
+<tr class="separator:ac63b200347f5aac3e7174ed727e5226f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a34592106233fef94906f6f607e77d397"><td class="memItemLeft" align="right" valign="top"><a id="a34592106233fef94906f6f607e77d397"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDerivedFunction.html#a34592106233fef94906f6f607e77d397">DerivedFunction</a> (<a class="el" href="classFunction.html">Function_P</a> func, <a class="el" href="classValue__P.html">Value_P</a> X, const char *loc)</td></tr>
+<tr class="memdesc:a34592106233fef94906f6f607e77d397"><td class="mdescLeft">&#160;</td><td class="mdescRight">Constructor (function with axis) <br /></td></tr>
+<tr class="separator:a34592106233fef94906f6f607e77d397"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3ee41331e93b8f1a8dbaf9cc067b21f4"><td class="memItemLeft" align="right" valign="top"><a id="a3ee41331e93b8f1a8dbaf9cc067b21f4"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDerivedFunction.html#a3ee41331e93b8f1a8dbaf9cc067b21f4">destroy_derived</a> (const char *loc)</td></tr>
+<tr class="memdesc:a3ee41331e93b8f1a8dbaf9cc067b21f4"><td class="mdescLeft">&#160;</td><td class="mdescRight">deallocate resources held by this <a class="el" href="classDerivedFunction.html" title="An APL operator bound to its function operand(s) ">DerivedFunction</a> <br /></td></tr>
+<tr class="separator:a3ee41331e93b8f1a8dbaf9cc067b21f4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac6d415fca035491c184c41e4a6f392f6"><td class="memItemLeft" align="right" valign="top"><a id="ac6d415fca035491c184c41e4a6f392f6"></a>
 virtual ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDerivedFunction.html#ac6d415fca035491c184c41e4a6f392f6">print</a> (ostream &amp;out) const</td></tr>
 <tr class="memdesc:ac6d415fca035491c184c41e4a6f392f6"><td class="mdescLeft">&#160;</td><td class="mdescRight">overloaded <a class="el" href="classFunction.html#a60934d6c068b6f6c0641c46116fe578c" title="Print this function. ">Function::print()</a>; <br /></td></tr>
@@ -141,10 +146,34 @@ virtual ostream &amp;&#160;</td><td class="memItemRight" valign="bottom"><a clas
 virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDerivedFunction.html#aa62a8281daa2ed64d0d58167b7314b35">is_derived</a> () const</td></tr>
 <tr class="memdesc:aa62a8281daa2ed64d0d58167b7314b35"><td class="mdescLeft">&#160;</td><td class="mdescRight">overloaded <a class="el" href="classFunction.html#af2588ccbf97a2a9ad1a2169c04b63bf4" title="return true iff this function is a derived function ">Function::is_derived()</a>; <br /></td></tr>
 <tr class="separator:aa62a8281daa2ed64d0d58167b7314b35"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a179a452d6e7e3a3e542d3cfdc37c77ab"><td class="memItemLeft" align="right" valign="top"><a id="a179a452d6e7e3a3e542d3cfdc37c77ab"></a>
-virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDerivedFunction.html#a179a452d6e7e3a3e542d3cfdc37c77ab">has_result</a> () const</td></tr>
-<tr class="memdesc:a179a452d6e7e3a3e542d3cfdc37c77ab"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloaded <a class="el" href="classFunction.html#ab42920100ef5ae42e00bc02b915526d1" title="return 1 if the function returns a result, otherwise 0. For non-user defined functions, throw DOMAIN_ERROR. ">Function::has_result()</a> <br /></td></tr>
-<tr class="separator:a179a452d6e7e3a3e542d3cfdc37c77ab"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:addf26f2a99cb0c6707aaeeb9739b1e76"><td class="memItemLeft" align="right" valign="top"><a id="addf26f2a99cb0c6707aaeeb9739b1e76"></a>
+<a class="el" href="classFunction.html">Function_P</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDerivedFunction.html#addf26f2a99cb0c6707aaeeb9739b1e76">get_LO</a> () const</td></tr>
+<tr class="memdesc:addf26f2a99cb0c6707aaeeb9739b1e76"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the left operand of this derived function <br /></td></tr>
+<tr class="separator:addf26f2a99cb0c6707aaeeb9739b1e76"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3061064a37bc70bd2fb3495504ec746f"><td class="memItemLeft" align="right" valign="top"><a id="a3061064a37bc70bd2fb3495504ec746f"></a>
+<a class="el" href="classValue__P.html">Value_P</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDerivedFunction.html#a3061064a37bc70bd2fb3495504ec746f">get_bound_LO_value</a> () const</td></tr>
+<tr class="memdesc:a3061064a37bc70bd2fb3495504ec746f"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the value (if any) bound to an operator (that allows it) <br /></td></tr>
+<tr class="separator:a3061064a37bc70bd2fb3495504ec746f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3b46a9e383239b13ecd258a4aa77df59"><td class="memItemLeft" align="right" valign="top"><a id="a3b46a9e383239b13ecd258a4aa77df59"></a>
+<a class="el" href="classFunction.html">Function_P</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDerivedFunction.html#a3b46a9e383239b13ecd258a4aa77df59">get_OPER</a> () const</td></tr>
+<tr class="memdesc:a3b46a9e383239b13ecd258a4aa77df59"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the operator of this derived function <br /></td></tr>
+<tr class="separator:a3b46a9e383239b13ecd258a4aa77df59"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7f5aafa6d9a443ef6d25339ad11e3abd"><td class="memItemLeft" align="right" valign="top"><a id="a7f5aafa6d9a443ef6d25339ad11e3abd"></a>
+<a class="el" href="classFunction.html">Function_P</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDerivedFunction.html#a7f5aafa6d9a443ef6d25339ad11e3abd">get_RO</a> () const</td></tr>
+<tr class="memdesc:a7f5aafa6d9a443ef6d25339ad11e3abd"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the right operand (or 0) of this derived function <br /></td></tr>
+<tr class="separator:a7f5aafa6d9a443ef6d25339ad11e3abd"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae4a919caf42d6cb221519d185a5f935a"><td class="memItemLeft" align="right" valign="top"><a id="ae4a919caf42d6cb221519d185a5f935a"></a>
+const <a class="el" href="classValue.html">Value</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDerivedFunction.html#ae4a919caf42d6cb221519d185a5f935a">get_AXIS</a> () const</td></tr>
+<tr class="memdesc:ae4a919caf42d6cb221519d185a5f935a"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the axis (or 0) of this derived function <br /></td></tr>
+<tr class="separator:ae4a919caf42d6cb221519d185a5f935a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af8900878d387c5015c4736777f015bbe"><td class="memItemLeft" align="right" valign="top"><a id="af8900878d387c5015c4736777f015bbe"></a>
+virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDerivedFunction.html#af8900878d387c5015c4736777f015bbe">has_result</a> () const</td></tr>
+<tr class="memdesc:af8900878d387c5015c4736777f015bbe"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloaded <a class="el" href="classFunction.html#ab42920100ef5ae42e00bc02b915526d1" title="return 1 if the function returns a result, otherwise 0. For non-user defined functions, throw DOMAIN_ERROR. ">Function::has_result()</a>;. <br /></td></tr>
+<tr class="separator:af8900878d387c5015c4736777f015bbe"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a7323e9dff09b9abee1a4cf1213784f2f"><td class="memItemLeft" align="right" valign="top"><a id="a7323e9dff09b9abee1a4cf1213784f2f"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDerivedFunction.html#a7323e9dff09b9abee1a4cf1213784f2f">unmark_all_values</a> () const</td></tr>
+<tr class="memdesc:a7323e9dff09b9abee1a4cf1213784f2f"><td class="mdescLeft">&#160;</td><td class="mdescRight">clear the marked bit in values bound to this derived functions (if any). <br /></td></tr>
+<tr class="separator:a7323e9dff09b9abee1a4cf1213784f2f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="inherit_header pub_methods_classFunction"><td colspan="2" onclick="javascript:toggleInherit('pub_methods_classFunction')"><img src="closed.png" alt="-"/>&#160;Public Member Functions inherited from <a class="el" href="classFunction.html">Function</a></td></tr>
 <tr class="memitem:a8c7982d9972ae73857f0c09a81dce365 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a8c7982d9972ae73857f0c09a81dce365"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a8c7982d9972ae73857f0c09a81dce365">Function</a> (TokenTag _tag)</td></tr>
@@ -174,13 +203,17 @@ virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a735c9e2d01eda71ddece9dc3c527b7b2">is_macro</a> () const</td></tr>
 <tr class="memdesc:a735c9e2d01eda71ddece9dc3c527b7b2 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">return <b>true</b> iff <b>this</b> function is a macro <br /></td></tr>
 <tr class="separator:a735c9e2d01eda71ddece9dc3c527b7b2 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a02f71337eaa985efd2ce198c9c21b313 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a02f71337eaa985efd2ce198c9c21b313"></a>
+virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a02f71337eaa985efd2ce198c9c21b313">is_defined</a> () const</td></tr>
+<tr class="memdesc:a02f71337eaa985efd2ce198c9c21b313 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">return <b>true</b> iff <b>this</b> function is defined (= has an APL body) <br /></td></tr>
+<tr class="separator:a02f71337eaa985efd2ce198c9c21b313 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1e98de20de09c81c7b5e257880eb2c89 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a1e98de20de09c81c7b5e257880eb2c89"></a>
 virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a1e98de20de09c81c7b5e257880eb2c89">get_fun_valence</a> () const</td></tr>
 <tr class="memdesc:a1e98de20de09c81c7b5e257880eb2c89 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the number of value arguments (0, 1, or 2) of a user defined function, For non-user defined functions, throw DOMAIN_ERROR. <br /></td></tr>
 <tr class="separator:a1e98de20de09c81c7b5e257880eb2c89 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac69b8cfa3ac1577ef8cf98500002e6ef inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="ac69b8cfa3ac1577ef8cf98500002e6ef"></a>
 virtual int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#ac69b8cfa3ac1577ef8cf98500002e6ef">get_oper_valence</a> () const</td></tr>
-<tr class="memdesc:ac69b8cfa3ac1577ef8cf98500002e6ef inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the number of function arguments (1 or 2) of an operator. <br /></td></tr>
+<tr class="memdesc:ac69b8cfa3ac1577ef8cf98500002e6ef inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the number of function arguments (1 or 2) of an operator, or 0 for a "normal" function that isn't an operator. <br /></td></tr>
 <tr class="separator:ac69b8cfa3ac1577ef8cf98500002e6ef inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a54a1f42ec67c604380f61b48b69d25f9 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a54a1f42ec67c604380f61b48b69d25f9"></a>
 virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a54a1f42ec67c604380f61b48b69d25f9">has_axis</a> () const</td></tr>
@@ -190,14 +223,14 @@ virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 virtual const <a class="el" href="classFunction.html">Function</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a0bb0246b1ad11b9c0c6e561a60350457">get_function</a> () const</td></tr>
 <tr class="memdesc:a0bb0246b1ad11b9c0c6e561a60350457 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">overloaded <a class="el" href="classNamedObject.html#ac7787482f65cf0641c4027b7ab6ada1f" title="return the function for this Id (if any) or 0 if this Id does (currently) represent a function...">NamedObject::get_function()</a> <br /></td></tr>
 <tr class="separator:a0bb0246b1ad11b9c0c6e561a60350457 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7989631960b693a29696da19141a2391 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a7989631960b693a29696da19141a2391"></a>
-virtual <a class="el" href="classFunction.html">Function</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a7989631960b693a29696da19141a2391">get_monadic_inverse</a> () const</td></tr>
-<tr class="memdesc:a7989631960b693a29696da19141a2391 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">the monadic inverse function of <b>this</b> function (if any) <br /></td></tr>
-<tr class="separator:a7989631960b693a29696da19141a2391 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a5efdf292a6ac47afcd50505cc0ba9e0d inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a5efdf292a6ac47afcd50505cc0ba9e0d"></a>
-virtual <a class="el" href="classFunction.html">Function</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a5efdf292a6ac47afcd50505cc0ba9e0d">get_dyadic_inverse</a> () const</td></tr>
-<tr class="memdesc:a5efdf292a6ac47afcd50505cc0ba9e0d inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">the dyadic inverse function of <b>this</b> function (if any) <br /></td></tr>
-<tr class="separator:a5efdf292a6ac47afcd50505cc0ba9e0d inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4ea53675833b68d1776f297f10e0549d inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a4ea53675833b68d1776f297f10e0549d"></a>
+virtual <a class="el" href="classFunction.html">Function_P</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a4ea53675833b68d1776f297f10e0549d">get_monadic_inverse</a> () const</td></tr>
+<tr class="memdesc:a4ea53675833b68d1776f297f10e0549d inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">the monadic inverse function of <b>this</b> function (if any) <br /></td></tr>
+<tr class="separator:a4ea53675833b68d1776f297f10e0549d inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3d44e6a47d37c404bec6a8e9a9249c68 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a3d44e6a47d37c404bec6a8e9a9249c68"></a>
+virtual <a class="el" href="classFunction.html">Function_P</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a3d44e6a47d37c404bec6a8e9a9249c68">get_dyadic_inverse</a> () const</td></tr>
+<tr class="memdesc:a3d44e6a47d37c404bec6a8e9a9249c68 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">the dyadic inverse function of <b>this</b> function (if any) <br /></td></tr>
+<tr class="separator:a3d44e6a47d37c404bec6a8e9a9249c68 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a2ea41f5c122b8b9ad7a32b742b3ce4a0 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a2ea41f5c122b8b9ad7a32b742b3ce4a0"></a>
 APL_time_us&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a2ea41f5c122b8b9ad7a32b742b3ce4a0">get_creation_time</a> () const</td></tr>
 <tr class="memdesc:a2ea41f5c122b8b9ad7a32b742b3ce4a0 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">GMT when this function was created; 0 for system functions. <br /></td></tr>
@@ -210,10 +243,10 @@ void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 virtual const int *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a1e71e36e1f81d6963d1ebba0b67495b3">get_exec_properties</a> () const</td></tr>
 <tr class="memdesc:a1e71e36e1f81d6963d1ebba0b67495b3 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the execution properties (3 ⎕AT) for this function <br /></td></tr>
 <tr class="separator:a1e71e36e1f81d6963d1ebba0b67495b3 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad164dda2ffe635ac4eb66dc90e6aba06 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="ad164dda2ffe635ac4eb66dc90e6aba06"></a>
-virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#ad164dda2ffe635ac4eb66dc90e6aba06">get_attributes</a> (int mode, <a class="el" href="classCell.html">Cell</a> *dest) const</td></tr>
-<tr class="memdesc:ad164dda2ffe635ac4eb66dc90e6aba06 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">store the attributes (as per ⎕AT) of symbol at dest, ... <br /></td></tr>
-<tr class="separator:ad164dda2ffe635ac4eb66dc90e6aba06 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac48150e2a6e8797e78d74ba9e9967de2 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="ac48150e2a6e8797e78d74ba9e9967de2"></a>
+virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#ac48150e2a6e8797e78d74ba9e9967de2">get_attributes</a> (int mode, <a class="el" href="classValue.html">Value</a> &amp;Z) const</td></tr>
+<tr class="memdesc:ac48150e2a6e8797e78d74ba9e9967de2 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">store the attributes (as per ⎕AT) of symbol in Z, ... <br /></td></tr>
+<tr class="separator:ac48150e2a6e8797e78d74ba9e9967de2 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:adbd055c988c2284dc98bdfacea3268aa inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="adbd055c988c2284dc98bdfacea3268aa"></a>
 virtual <a class="el" href="classUserFunction.html">UserFunction</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#adbd055c988c2284dc98bdfacea3268aa">get_ufun1</a> ()</td></tr>
 <tr class="memdesc:adbd055c988c2284dc98bdfacea3268aa inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">return a pointer to <b>this</b> <a class="el" href="classUserFunction.html" title="One user-defined function. ">UserFunction</a> (if it is one) <br /></td></tr>
@@ -234,58 +267,62 @@ virtual prim_f2&#160;</td><td class="memItemRight" valign="bottom"><a class="el"
 virtual <a class="el" href="classFunction.html#aa9eb1a12a24aa17004ebdfd2d9dfef56">assoc_f2</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#ad30c5f83a063d7951a4cef9bf4f60528">get_assoc</a> () const</td></tr>
 <tr class="memdesc:ad30c5f83a063d7951a4cef9bf4f60528 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">if this function is an associative scalar function then return its associative cell function, otherwise 0. <br /></td></tr>
 <tr class="separator:ad30c5f83a063d7951a4cef9bf4f60528 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a90afe275cefc1230fb019a4bf788a9c2 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a90afe275cefc1230fb019a4bf788a9c2"></a>
-<a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a90afe275cefc1230fb019a4bf788a9c2">get_token</a> ()</td></tr>
-<tr class="memdesc:a90afe275cefc1230fb019a4bf788a9c2 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">set <b>tok</b> to a <b><a class="el" href="classToken.html" title="One atom of an APL function or expression. ">Token</a></b> for <b>this</b> function. <br /></td></tr>
-<tr class="separator:a90afe275cefc1230fb019a4bf788a9c2 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a1a9b0b11e2a27b48dc021711d7a7185e inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a1a9b0b11e2a27b48dc021711d7a7185e"></a>
-virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a1a9b0b11e2a27b48dc021711d7a7185e">eval_</a> ()</td></tr>
-<tr class="memdesc:a1a9b0b11e2a27b48dc021711d7a7185e inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">plain function, 0 arguments <br /></td></tr>
-<tr class="separator:a1a9b0b11e2a27b48dc021711d7a7185e inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:adddaa59d714dd5aec0d9b0c958c6ac47 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="adddaa59d714dd5aec0d9b0c958c6ac47"></a>
-virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#adddaa59d714dd5aec0d9b0c958c6ac47">eval_ALB</a> (<a class="el" href="classValue__P.html">Value_P</a> A, <a class="el" href="classToken.html">Token</a> &amp;LO, <a class="el" href="classValue__P.html">Value_P</a> B)</td></tr>
-<tr class="memdesc:adddaa59d714dd5aec0d9b0c958c6ac47 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">monadic operator, 2 arguments <br /></td></tr>
-<tr class="separator:adddaa59d714dd5aec0d9b0c958c6ac47 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8a11576ed58d179a7a25df84e87d3204 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a8a11576ed58d179a7a25df84e87d3204"></a>
-virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a8a11576ed58d179a7a25df84e87d3204">eval_ALRB</a> (<a class="el" href="classValue__P.html">Value_P</a> A, <a class="el" href="classToken.html">Token</a> &amp;LO, <a class="el" href="classToken.html">Token</a> &amp;RO, <a class="el" href="classValue__P.html">Value_P</a> B)</td></tr>
-<tr class="memdesc:a8a11576ed58d179a7a25df84e87d3204 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">dyadic operator, 2 arguments <br /></td></tr>
-<tr class="separator:a8a11576ed58d179a7a25df84e87d3204 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac797264dc258f8cef80c8bab4c698f6f inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="ac797264dc258f8cef80c8bab4c698f6f"></a>
-virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#ac797264dc258f8cef80c8bab4c698f6f">eval_ALXB</a> (<a class="el" href="classValue__P.html">Value_P</a> A, <a class="el" href="classToken.html">Token</a> &amp;LO, <a class="el" href="classValue__P.html">Value_P</a> X, <a class="el" href="classValue__P.html">Value_P</a> B)</td></tr>
-<tr class="memdesc:ac797264dc258f8cef80c8bab4c698f6f inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">monadic operator, 2 arguments, with axis <br /></td></tr>
-<tr class="separator:ac797264dc258f8cef80c8bab4c698f6f inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8be6e118677d6709bb215fb4b13ea7d4 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a8be6e118677d6709bb215fb4b13ea7d4"></a>
-virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a8be6e118677d6709bb215fb4b13ea7d4">eval_ALRXB</a> (<a class="el" href="classValue__P.html">Value_P</a> A, <a class="el" href="classToken.html">Token</a> &amp;LO, <a class="el" href="classToken.html">Token</a> &amp;RO, <a class="el" href="classValue__P.html">Value_P</a> X, <a class="el" href="classValue__P.html">Value_P</a> B)</td></tr>
-<tr class="memdesc:a8be6e118677d6709bb215fb4b13ea7d4 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">dyadic operator, 2 arguments, with axis <br /></td></tr>
-<tr class="separator:a8be6e118677d6709bb215fb4b13ea7d4 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8a27b990784bb708731d82a828ee3efe inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a8a27b990784bb708731d82a828ee3efe"></a>
-virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a8a27b990784bb708731d82a828ee3efe">eval_LB</a> (<a class="el" href="classToken.html">Token</a> &amp;LO, <a class="el" href="classValue__P.html">Value_P</a> B)</td></tr>
-<tr class="memdesc:a8a27b990784bb708731d82a828ee3efe inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">monadic operator, 1 argument <br /></td></tr>
-<tr class="separator:a8a27b990784bb708731d82a828ee3efe inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a91d8488dd755554b90fd7a2576b6127a inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a91d8488dd755554b90fd7a2576b6127a"></a>
-virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a91d8488dd755554b90fd7a2576b6127a">eval_LXB</a> (<a class="el" href="classToken.html">Token</a> &amp;LO, <a class="el" href="classValue__P.html">Value_P</a> X, <a class="el" href="classValue__P.html">Value_P</a> B)</td></tr>
-<tr class="memdesc:a91d8488dd755554b90fd7a2576b6127a inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">monadic operator, 1 arguments, with axis <br /></td></tr>
-<tr class="separator:a91d8488dd755554b90fd7a2576b6127a inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0c5c1f004a70817b5c9e2ddb34b07513 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a0c5c1f004a70817b5c9e2ddb34b07513"></a>
-virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a0c5c1f004a70817b5c9e2ddb34b07513">eval_LRB</a> (<a class="el" href="classToken.html">Token</a> &amp;LO, <a class="el" href="classToken.html">Token</a> &amp;RO, <a class="el" href="classValue__P.html">Value_P</a> B)</td></tr>
-<tr class="memdesc:a0c5c1f004a70817b5c9e2ddb34b07513 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">dyadic operator, 1 arguments <br /></td></tr>
-<tr class="separator:a0c5c1f004a70817b5c9e2ddb34b07513 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac38e746e7e30d28807b451c134026473 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="ac38e746e7e30d28807b451c134026473"></a>
-virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#ac38e746e7e30d28807b451c134026473">eval_LRXB</a> (<a class="el" href="classToken.html">Token</a> &amp;LO, <a class="el" href="classToken.html">Token</a> &amp;RO, <a class="el" href="classValue__P.html">Value_P</a> X, <a class="el" href="classValue__P.html">Value_P</a> B)</td></tr>
-<tr class="memdesc:ac38e746e7e30d28807b451c134026473 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">dyadic operator, 1 arguments, with axis <br /></td></tr>
-<tr class="separator:ac38e746e7e30d28807b451c134026473 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0759cc8a205653eaac99d12449b5f906 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a0759cc8a205653eaac99d12449b5f906"></a>
-virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a0759cc8a205653eaac99d12449b5f906">eval_fill_B</a> (<a class="el" href="classValue__P.html">Value_P</a> B)</td></tr>
-<tr class="memdesc:a0759cc8a205653eaac99d12449b5f906 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate <b>the</b> fill function. <br /></td></tr>
-<tr class="separator:a0759cc8a205653eaac99d12449b5f906 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa41ed7223cf7a97e8bb09c86d9a84cc6 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="aa41ed7223cf7a97e8bb09c86d9a84cc6"></a>
-virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#aa41ed7223cf7a97e8bb09c86d9a84cc6">eval_fill_AB</a> (<a class="el" href="classValue__P.html">Value_P</a> A, <a class="el" href="classValue__P.html">Value_P</a> B)</td></tr>
-<tr class="memdesc:aa41ed7223cf7a97e8bb09c86d9a84cc6 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate <b>the</b> fill function. <br /></td></tr>
-<tr class="separator:aa41ed7223cf7a97e8bb09c86d9a84cc6 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a205a0f5275a713c1f7642e12c25a7fe7 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a205a0f5275a713c1f7642e12c25a7fe7"></a>
-virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a205a0f5275a713c1f7642e12c25a7fe7">eval_identity_fun</a> (<a class="el" href="classValue__P.html">Value_P</a> B, Axis axis)</td></tr>
-<tr class="memdesc:a205a0f5275a713c1f7642e12c25a7fe7 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate <b>the</b> identity function. <br /></td></tr>
-<tr class="separator:a205a0f5275a713c1f7642e12c25a7fe7 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a74163ba976576a5bb03a060d42fd96e5 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a74163ba976576a5bb03a060d42fd96e5"></a>
+<a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a74163ba976576a5bb03a060d42fd96e5">get_token</a> () const</td></tr>
+<tr class="memdesc:a74163ba976576a5bb03a060d42fd96e5 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">return a <b><a class="el" href="classToken.html" title="One atom of an APL function or expression. ">Token</a></b> for <b>this</b> function. <br /></td></tr>
+<tr class="separator:a74163ba976576a5bb03a060d42fd96e5 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af2539d67c687a61587781ec78c9e060a inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="af2539d67c687a61587781ec78c9e060a"></a>
+TokenTag&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#af2539d67c687a61587781ec78c9e060a">get_tag</a> () const</td></tr>
+<tr class="memdesc:af2539d67c687a61587781ec78c9e060a inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the <b><a class="el" href="classToken.html" title="One atom of an APL function or expression. ">Token</a></b> Tag for <b>this</b> function. <br /></td></tr>
+<tr class="separator:af2539d67c687a61587781ec78c9e060a inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a590e23020b0a7098725988201a213954 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a590e23020b0a7098725988201a213954"></a>
+virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a590e23020b0a7098725988201a213954">eval_</a> () const</td></tr>
+<tr class="memdesc:a590e23020b0a7098725988201a213954 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">plain function, 0 arguments <br /></td></tr>
+<tr class="separator:a590e23020b0a7098725988201a213954 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5b55cbacebf9d08b224319bfbb835647 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a5b55cbacebf9d08b224319bfbb835647"></a>
+virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a5b55cbacebf9d08b224319bfbb835647">eval_ALB</a> (<a class="el" href="classValue__P.html">Value_P</a> A, <a class="el" href="classToken.html">Token</a> &amp;LO, <a class="el" href="classValue__P.html">Value_P</a> B) const</td></tr>
+<tr class="memdesc:a5b55cbacebf9d08b224319bfbb835647 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">monadic operator, 2 arguments <br /></td></tr>
+<tr class="separator:a5b55cbacebf9d08b224319bfbb835647 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a63a00f3563902b8d7312964f0678858c inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a63a00f3563902b8d7312964f0678858c"></a>
+virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a63a00f3563902b8d7312964f0678858c">eval_ALRB</a> (<a class="el" href="classValue__P.html">Value_P</a> A, <a class="el" href="classToken.html">Token</a> &amp;LO, <a class="el" href="classToken.html">Token</a> &amp;RO, <a class="el" href="classValue__P.html">Value_P</a> B) const</td></tr>
+<tr class="memdesc:a63a00f3563902b8d7312964f0678858c inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">dyadic operator, 2 arguments <br /></td></tr>
+<tr class="separator:a63a00f3563902b8d7312964f0678858c inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ae284af98a212a517303efb63a4b6b0cb inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="ae284af98a212a517303efb63a4b6b0cb"></a>
+virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#ae284af98a212a517303efb63a4b6b0cb">eval_ALXB</a> (<a class="el" href="classValue__P.html">Value_P</a> A, <a class="el" href="classToken.html">Token</a> &amp;LO, <a class="el" href="classValue__P.html">Value_P</a> X, <a class="el" href="classValue__P.html">Value_P</a> B) const</td></tr>
+<tr class="memdesc:ae284af98a212a517303efb63a4b6b0cb inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">monadic operator, 2 arguments, with axis <br /></td></tr>
+<tr class="separator:ae284af98a212a517303efb63a4b6b0cb inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ade3d2f3b0bbad4dc077c780b025b97a3 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="ade3d2f3b0bbad4dc077c780b025b97a3"></a>
+virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#ade3d2f3b0bbad4dc077c780b025b97a3">eval_ALRXB</a> (<a class="el" href="classValue__P.html">Value_P</a> A, <a class="el" href="classToken.html">Token</a> &amp;LO, <a class="el" href="classToken.html">Token</a> &amp;RO, <a class="el" href="classValue__P.html">Value_P</a> X, <a class="el" href="classValue__P.html">Value_P</a> B) const</td></tr>
+<tr class="memdesc:ade3d2f3b0bbad4dc077c780b025b97a3 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">dyadic operator, 2 arguments, with axis <br /></td></tr>
+<tr class="separator:ade3d2f3b0bbad4dc077c780b025b97a3 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8d5fd6988d3b4bccecd653f894938d12 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a8d5fd6988d3b4bccecd653f894938d12"></a>
+virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a8d5fd6988d3b4bccecd653f894938d12">eval_LB</a> (<a class="el" href="classToken.html">Token</a> &amp;LO, <a class="el" href="classValue__P.html">Value_P</a> B) const</td></tr>
+<tr class="memdesc:a8d5fd6988d3b4bccecd653f894938d12 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">monadic operator, 1 argument <br /></td></tr>
+<tr class="separator:a8d5fd6988d3b4bccecd653f894938d12 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a132c17d68b03f8e4d016f83eb766f1bd inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a132c17d68b03f8e4d016f83eb766f1bd"></a>
+virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a132c17d68b03f8e4d016f83eb766f1bd">eval_LXB</a> (<a class="el" href="classToken.html">Token</a> &amp;LO, <a class="el" href="classValue__P.html">Value_P</a> X, <a class="el" href="classValue__P.html">Value_P</a> B) const</td></tr>
+<tr class="memdesc:a132c17d68b03f8e4d016f83eb766f1bd inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">monadic operator, 1 arguments, with axis <br /></td></tr>
+<tr class="separator:a132c17d68b03f8e4d016f83eb766f1bd inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a97aa070fdf3c11a56b593fa0992dfcaf inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a97aa070fdf3c11a56b593fa0992dfcaf"></a>
+virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a97aa070fdf3c11a56b593fa0992dfcaf">eval_LRB</a> (<a class="el" href="classToken.html">Token</a> &amp;LO, <a class="el" href="classToken.html">Token</a> &amp;RO, <a class="el" href="classValue__P.html">Value_P</a> B) const</td></tr>
+<tr class="memdesc:a97aa070fdf3c11a56b593fa0992dfcaf inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">dyadic operator, 1 arguments <br /></td></tr>
+<tr class="separator:a97aa070fdf3c11a56b593fa0992dfcaf inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afacffc07ad46ee7b2b828d422d6872c7 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="afacffc07ad46ee7b2b828d422d6872c7"></a>
+virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#afacffc07ad46ee7b2b828d422d6872c7">eval_LRXB</a> (<a class="el" href="classToken.html">Token</a> &amp;LO, <a class="el" href="classToken.html">Token</a> &amp;RO, <a class="el" href="classValue__P.html">Value_P</a> X, <a class="el" href="classValue__P.html">Value_P</a> B) const</td></tr>
+<tr class="memdesc:afacffc07ad46ee7b2b828d422d6872c7 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">dyadic operator, 1 arguments, with axis <br /></td></tr>
+<tr class="separator:afacffc07ad46ee7b2b828d422d6872c7 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad6f2ff385ca5806385a43500cf9b609b inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="ad6f2ff385ca5806385a43500cf9b609b"></a>
+virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#ad6f2ff385ca5806385a43500cf9b609b">eval_fill_B</a> (<a class="el" href="classValue__P.html">Value_P</a> B) const</td></tr>
+<tr class="memdesc:ad6f2ff385ca5806385a43500cf9b609b inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate <b>the</b> fill function. <br /></td></tr>
+<tr class="separator:ad6f2ff385ca5806385a43500cf9b609b inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad5b78ee8001b4733e3525408bed88970 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="ad5b78ee8001b4733e3525408bed88970"></a>
+virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#ad5b78ee8001b4733e3525408bed88970">eval_fill_AB</a> (<a class="el" href="classValue__P.html">Value_P</a> A, <a class="el" href="classValue__P.html">Value_P</a> B) const</td></tr>
+<tr class="memdesc:ad5b78ee8001b4733e3525408bed88970 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate <b>the</b> fill function. <br /></td></tr>
+<tr class="separator:ad5b78ee8001b4733e3525408bed88970 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aba071b9c8c35cb0c466a20d674a5d8ad inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="aba071b9c8c35cb0c466a20d674a5d8ad"></a>
+virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#aba071b9c8c35cb0c466a20d674a5d8ad">eval_identity_fun</a> (<a class="el" href="classValue__P.html">Value_P</a> B, Axis axis) const</td></tr>
+<tr class="memdesc:aba071b9c8c35cb0c466a20d674a5d8ad inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">Evaluate <b>the</b> identity function. <br /></td></tr>
+<tr class="separator:aba071b9c8c35cb0c466a20d674a5d8ad inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a09e640b5cb6a7acdf243a31e9c93afaa inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a09e640b5cb6a7acdf243a31e9c93afaa"></a>
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a09e640b5cb6a7acdf243a31e9c93afaa">destroy</a> ()</td></tr>
 <tr class="memdesc:a09e640b5cb6a7acdf243a31e9c93afaa inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">Delete this function (do nothing, overloaded by <a class="el" href="classUserFunction.html" title="One user-defined function. ">UserFunction</a>). <br /></td></tr>
@@ -294,6 +331,10 @@ virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" hr
 virtual <a class="el" href="classUCS__string.html">UCS_string</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a5d1ea5b6f6267431f7ca2773fa0955b9">canonical</a> (bool with_lines) const</td></tr>
 <tr class="memdesc:a5d1ea5b6f6267431f7ca2773fa0955b9 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight"><a class="el" href="classQuad__CR.html" title="The class implementing ⎕CR. ">Quad_CR</a> of this function. <br /></td></tr>
 <tr class="separator:a5d1ea5b6f6267431f7ca2773fa0955b9 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a257d0b6a80edf8b535b07ec9e44a10a9 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a257d0b6a80edf8b535b07ec9e44a10a9"></a>
+virtual ShapeItem&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a257d0b6a80edf8b535b07ec9e44a10a9">string_to_int</a> (const <a class="el" href="classUCS__string.html">UCS_string</a> &amp;name) const</td></tr>
+<tr class="memdesc:a257d0b6a80edf8b535b07ec9e44a10a9 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">return a (pseudo-) axis for <b>name</b> <br /></td></tr>
+<tr class="separator:a257d0b6a80edf8b535b07ec9e44a10a9 inherit pub_methods_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5a8e930a7ee14744736f5d01d6e69aa9 inherit pub_methods_classFunction"><td class="memItemLeft" align="right" valign="top"><a id="a5a8e930a7ee14744736f5d01d6e69aa9"></a>
 Fun_signature&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a5a8e930a7ee14744736f5d01d6e69aa9">get_signature</a> () const</td></tr>
 <tr class="memdesc:a5a8e930a7ee14744736f5d01d6e69aa9 inherit pub_methods_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">return the signature of this function (currently only valid for user-defined functions) <br /></td></tr>
@@ -354,44 +395,44 @@ Protected Member Functions</h2></td></tr>
 virtual void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDerivedFunction.html#a1890dcdda20f35e21fb8c04eb071f902">print_properties</a> (ostream &amp;out, int indent) const</td></tr>
 <tr class="memdesc:a1890dcdda20f35e21fb8c04eb071f902"><td class="mdescLeft">&#160;</td><td class="mdescRight">Overloaded <a class="el" href="classFunction.html#a8bbe98a71584e81ce93f0e1f7526d1df" title="print the properties of this function ">Function::print_properties()</a> <br /></td></tr>
 <tr class="separator:a1890dcdda20f35e21fb8c04eb071f902"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad854e4d46ae209e5564bdd2fd17912d1"><td class="memItemLeft" align="right" valign="top"><a id="ad854e4d46ae209e5564bdd2fd17912d1"></a>
-virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDerivedFunction.html#ad854e4d46ae209e5564bdd2fd17912d1">eval_B</a> (<a class="el" href="classValue__P.html">Value_P</a> B)</td></tr>
-<tr class="memdesc:ad854e4d46ae209e5564bdd2fd17912d1"><td class="mdescLeft">&#160;</td><td class="mdescRight">overloaded <a class="el" href="classFunction.html#a05392c6830cbcb5947af1d085a87acae" title="plain function, 1 argument ">Function::eval_B()</a>; <br /></td></tr>
-<tr class="separator:ad854e4d46ae209e5564bdd2fd17912d1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:af4df58419b70da0c5e317337bc5fef48"><td class="memItemLeft" align="right" valign="top"><a id="af4df58419b70da0c5e317337bc5fef48"></a>
-virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDerivedFunction.html#af4df58419b70da0c5e317337bc5fef48">eval_XB</a> (<a class="el" href="classValue__P.html">Value_P</a> X, <a class="el" href="classValue__P.html">Value_P</a> B)</td></tr>
-<tr class="memdesc:af4df58419b70da0c5e317337bc5fef48"><td class="mdescLeft">&#160;</td><td class="mdescRight">overloaded <a class="el" href="classFunction.html#aa563fa68e0c78ffa660fee7395a25997" title="plain function, 1 arguments, with axis ">Function::eval_XB()</a>; <br /></td></tr>
-<tr class="separator:af4df58419b70da0c5e317337bc5fef48"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3fa5d635e22babf899801f2523828418"><td class="memItemLeft" align="right" valign="top"><a id="a3fa5d635e22babf899801f2523828418"></a>
-virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDerivedFunction.html#a3fa5d635e22babf899801f2523828418">eval_AB</a> (<a class="el" href="classValue__P.html">Value_P</a> A, <a class="el" href="classValue__P.html">Value_P</a> B)</td></tr>
-<tr class="memdesc:a3fa5d635e22babf899801f2523828418"><td class="mdescLeft">&#160;</td><td class="mdescRight">overloaded <a class="el" href="classFunction.html#a6a1446fc93c3e4ee7253c22bcc91bf72" title="plain function, 2 arguments ">Function::eval_AB()</a>; <br /></td></tr>
-<tr class="separator:a3fa5d635e22babf899801f2523828418"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0f7dafe0c08d79a0c5784dd621efdbd1"><td class="memItemLeft" align="right" valign="top"><a id="a0f7dafe0c08d79a0c5784dd621efdbd1"></a>
-virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDerivedFunction.html#a0f7dafe0c08d79a0c5784dd621efdbd1">eval_AXB</a> (<a class="el" href="classValue__P.html">Value_P</a> A, <a class="el" href="classValue__P.html">Value_P</a> X, <a class="el" href="classValue__P.html">Value_P</a> B)</td></tr>
-<tr class="memdesc:a0f7dafe0c08d79a0c5784dd621efdbd1"><td class="mdescLeft">&#160;</td><td class="mdescRight">overloaded <a class="el" href="classFunction.html#aa682f53485367d23815a1e84dee25d5e" title="plain function, 2 arguments, with axis ">Function::eval_AXB()</a> <br /></td></tr>
-<tr class="separator:a0f7dafe0c08d79a0c5784dd621efdbd1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2c5a104f171298ef727220a508f41db4"><td class="memItemLeft" align="right" valign="top"><a id="a2c5a104f171298ef727220a508f41db4"></a>
+virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDerivedFunction.html#a2c5a104f171298ef727220a508f41db4">eval_B</a> (<a class="el" href="classValue__P.html">Value_P</a> B) const</td></tr>
+<tr class="memdesc:a2c5a104f171298ef727220a508f41db4"><td class="mdescLeft">&#160;</td><td class="mdescRight">overloaded <a class="el" href="classFunction.html#a1baa953a35d9dea5fd20bfa095daf360" title="plain function, 1 argument ">Function::eval_B()</a>; <br /></td></tr>
+<tr class="separator:a2c5a104f171298ef727220a508f41db4"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9ef952fcc895b3983d3d1466af6c2109"><td class="memItemLeft" align="right" valign="top"><a id="a9ef952fcc895b3983d3d1466af6c2109"></a>
+virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDerivedFunction.html#a9ef952fcc895b3983d3d1466af6c2109">eval_XB</a> (<a class="el" href="classValue__P.html">Value_P</a> X, <a class="el" href="classValue__P.html">Value_P</a> B) const</td></tr>
+<tr class="memdesc:a9ef952fcc895b3983d3d1466af6c2109"><td class="mdescLeft">&#160;</td><td class="mdescRight">overloaded <a class="el" href="classFunction.html#a3952082e43c93f98fbeb9b2981666e91" title="plain function, 1 arguments, with axis ">Function::eval_XB()</a>; <br /></td></tr>
+<tr class="separator:a9ef952fcc895b3983d3d1466af6c2109"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a4b7f21dabefb731d87c4c7027f6e3f83"><td class="memItemLeft" align="right" valign="top"><a id="a4b7f21dabefb731d87c4c7027f6e3f83"></a>
+virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDerivedFunction.html#a4b7f21dabefb731d87c4c7027f6e3f83">eval_AB</a> (<a class="el" href="classValue__P.html">Value_P</a> A, <a class="el" href="classValue__P.html">Value_P</a> B) const</td></tr>
+<tr class="memdesc:a4b7f21dabefb731d87c4c7027f6e3f83"><td class="mdescLeft">&#160;</td><td class="mdescRight">overloaded <a class="el" href="classFunction.html#a1d8e47de79dffa81c189730a1a19f80d" title="plain function, 2 arguments ">Function::eval_AB()</a>; <br /></td></tr>
+<tr class="separator:a4b7f21dabefb731d87c4c7027f6e3f83"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a6791a953bd91dca121ac386ff10c2fc4"><td class="memItemLeft" align="right" valign="top"><a id="a6791a953bd91dca121ac386ff10c2fc4"></a>
+virtual <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDerivedFunction.html#a6791a953bd91dca121ac386ff10c2fc4">eval_AXB</a> (<a class="el" href="classValue__P.html">Value_P</a> A, <a class="el" href="classValue__P.html">Value_P</a> X, <a class="el" href="classValue__P.html">Value_P</a> B) const</td></tr>
+<tr class="memdesc:a6791a953bd91dca121ac386ff10c2fc4"><td class="mdescLeft">&#160;</td><td class="mdescRight">overloaded <a class="el" href="classFunction.html#ac0152c32dcec821e0ea500f3a34bb20e" title="plain function, 2 arguments, with axis ">Function::eval_AXB()</a> <br /></td></tr>
+<tr class="separator:a6791a953bd91dca121ac386ff10c2fc4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1826fa581c39cfba7cff8daf65a08134"><td class="memItemLeft" align="right" valign="top"><a id="a1826fa581c39cfba7cff8daf65a08134"></a>
 virtual bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDerivedFunction.html#a1826fa581c39cfba7cff8daf65a08134">may_push_SI</a> () const</td></tr>
 <tr class="memdesc:a1826fa581c39cfba7cff8daf65a08134"><td class="mdescLeft">&#160;</td><td class="mdescRight">overloaded <a class="el" href="classFunction.html#a8574fdc7dcf72d8e7bfc8e5575819547" title="return true if eval_XXX may push the SI. True for ⍎, user defined functions, and operators derived f...">Function::may_push_SI()</a> <br /></td></tr>
 <tr class="separator:a1826fa581c39cfba7cff8daf65a08134"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a264cdcf54c3ebd6aaa8d135e398c6870"><td class="memItemLeft" align="right" valign="top"><a id="a264cdcf54c3ebd6aaa8d135e398c6870"></a>
-virtual <a class="el" href="classValue__P.html">Value_P</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDerivedFunction.html#a264cdcf54c3ebd6aaa8d135e398c6870">locate_X</a> ()</td></tr>
-<tr class="memdesc:a264cdcf54c3ebd6aaa8d135e398c6870"><td class="mdescLeft">&#160;</td><td class="mdescRight">overloaded <a class="el" href="classFunction.html#aefffcc63fb1972f2e276e8355868c21a" title="return axis (non-0 only for derived functions) ">Function::locate_X()</a> <br /></td></tr>
-<tr class="separator:a264cdcf54c3ebd6aaa8d135e398c6870"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aac64b0c63da84a5143fcc1eff3de49d5"><td class="memItemLeft" align="right" valign="top"><a id="aac64b0c63da84a5143fcc1eff3de49d5"></a>
+virtual const <a class="el" href="classValue__P.html">Value_P</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDerivedFunction.html#aac64b0c63da84a5143fcc1eff3de49d5">locate_X</a> () const</td></tr>
+<tr class="memdesc:aac64b0c63da84a5143fcc1eff3de49d5"><td class="mdescLeft">&#160;</td><td class="mdescRight">overloaded <a class="el" href="classFunction.html#a6ed58d7507c55f89c44b4d3a71e06b27" title="return axis (non-0 only for derived functions) ">Function::locate_X()</a> <br /></td></tr>
+<tr class="separator:aac64b0c63da84a5143fcc1eff3de49d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pro-attribs"></a>
 Protected Attributes</h2></td></tr>
-<tr class="memitem:a891adcb1dd9d5bd30e2f130d3a985b23"><td class="memItemLeft" align="right" valign="top"><a id="a891adcb1dd9d5bd30e2f130d3a985b23"></a>
-<a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDerivedFunction.html#a891adcb1dd9d5bd30e2f130d3a985b23">left_fun</a></td></tr>
-<tr class="memdesc:a891adcb1dd9d5bd30e2f130d3a985b23"><td class="mdescLeft">&#160;</td><td class="mdescRight">the function (to the left of the operator) <br /></td></tr>
-<tr class="separator:a891adcb1dd9d5bd30e2f130d3a985b23"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a0bfb99291a9b29e062c684708d6e4c92"><td class="memItemLeft" align="right" valign="top"><a id="a0bfb99291a9b29e062c684708d6e4c92"></a>
-<a class="el" href="classFunction.html">Function</a> *&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDerivedFunction.html#a0bfb99291a9b29e062c684708d6e4c92">oper</a></td></tr>
-<tr class="memdesc:a0bfb99291a9b29e062c684708d6e4c92"><td class="mdescLeft">&#160;</td><td class="mdescRight">the monadic operator (to the right of the function) <br /></td></tr>
-<tr class="separator:a0bfb99291a9b29e062c684708d6e4c92"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a70351a62c0fa6ea62278843c3ebb505a"><td class="memItemLeft" align="right" valign="top"><a id="a70351a62c0fa6ea62278843c3ebb505a"></a>
+<a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDerivedFunction.html#a70351a62c0fa6ea62278843c3ebb505a">left_arg</a></td></tr>
+<tr class="memdesc:a70351a62c0fa6ea62278843c3ebb505a"><td class="mdescLeft">&#160;</td><td class="mdescRight">the function (to the left of the operator) <br /></td></tr>
+<tr class="separator:a70351a62c0fa6ea62278843c3ebb505a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:af9844c36f4add02059a04057924b36fd"><td class="memItemLeft" align="right" valign="top"><a id="af9844c36f4add02059a04057924b36fd"></a>
+<a class="el" href="classFunction.html">Function_P</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDerivedFunction.html#af9844c36f4add02059a04057924b36fd">oper</a></td></tr>
+<tr class="memdesc:af9844c36f4add02059a04057924b36fd"><td class="mdescLeft">&#160;</td><td class="mdescRight">the monadic operator (to the right of the function) <br /></td></tr>
+<tr class="separator:af9844c36f4add02059a04057924b36fd"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a659888f62d2a54534ff7a64d66fb45e8"><td class="memItemLeft" align="right" valign="top"><a id="a659888f62d2a54534ff7a64d66fb45e8"></a>
 <a class="el" href="classToken.html">Token</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDerivedFunction.html#a659888f62d2a54534ff7a64d66fb45e8">right_fun</a></td></tr>
-<tr class="memdesc:a659888f62d2a54534ff7a64d66fb45e8"><td class="mdescLeft">&#160;</td><td class="mdescRight">the function on the right of the (dyadic) operator (if any) <br /></td></tr>
+<tr class="memdesc:a659888f62d2a54534ff7a64d66fb45e8"><td class="mdescLeft">&#160;</td><td class="mdescRight">the (normally) function on the right of the (dyadic) operator (if any). <br /></td></tr>
 <tr class="separator:a659888f62d2a54534ff7a64d66fb45e8"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a79fd3737f690cc02b290a2348c80e5d3"><td class="memItemLeft" align="right" valign="top"><a id="a79fd3737f690cc02b290a2348c80e5d3"></a>
 <a class="el" href="classValue__P.html">Value_P</a>&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDerivedFunction.html#a79fd3737f690cc02b290a2348c80e5d3">axis</a></td></tr>
@@ -406,6 +447,13 @@ TokenTag&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 ShapeItem&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classFunction.html#a307404550b76e8ad322cb4f836603371">parallel_thresholds</a> [2]</td></tr>
 <tr class="memdesc:a307404550b76e8ad322cb4f836603371 inherit pro_attribs_classFunction"><td class="mdescLeft">&#160;</td><td class="mdescRight">the thresholds for parallel execution <br /></td></tr>
 <tr class="separator:a307404550b76e8ad322cb4f836603371 inherit pro_attribs_classFunction"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pri-methods"></a>
+Private Member Functions</h2></td></tr>
+<tr class="memitem:a7866eeb9a1373b8459ec14a2fdbdd2f5"><td class="memItemLeft" align="right" valign="top"><a id="a7866eeb9a1373b8459ec14a2fdbdd2f5"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classDerivedFunction.html#a7866eeb9a1373b8459ec14a2fdbdd2f5">~DerivedFunction</a> ()</td></tr>
+<tr class="memdesc:a7866eeb9a1373b8459ec14a2fdbdd2f5"><td class="mdescLeft">&#160;</td><td class="mdescRight">destructor <br /></td></tr>
+<tr class="separator:a7866eeb9a1373b8459ec14a2fdbdd2f5"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="inherited"></a>
 Additional Inherited Members</h2></td></tr>
@@ -426,8 +474,8 @@ const Id&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 <tr class="separator:a51374b15f95c9841b9021619915e66bd inherit pub_attribs_classNamedObject"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
-<div class="textblock"><p>An APL operator bounf to its function argument(s) </p>
-<p>an operator bound to one or more functions. The bound operator is then another operator (e.g. (+.) or a function (e.g. (+.×) or (+/). </p>
+<div class="textblock"><p>An APL operator bound to its function operand(s) </p>
+<p>an operator bound to its left and (in the case of a dyadic operator) to its right operand. </p>
 
 <p class="definition">Definition at line <a class="el" href="DerivedFunction_8hh_source.html#l00033">33</a> of file <a class="el" href="DerivedFunction_8hh_source.html">DerivedFunction.hh</a>.</p>
 </div><hr/>The documentation for this class was generated from the following files:<ul>
@@ -440,7 +488,7 @@ const Id&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="classDerivedFunction.html">DerivedFunction</a></li>
-    <li class="footer">Generated on Sun Aug 9 2020 16:43:42 for GNUAPL by
+    <li class="footer">Generated on Sun Jan 30 2022 20:14:26 for GNUAPL by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.13 </li>
   </ul>

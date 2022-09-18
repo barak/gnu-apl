@@ -9,5 +9,5 @@ var classTakeDropIterator =
     [ "ftwc", "classTakeDropIterator.html#a04643889202c22fcc3da983022b78e5b", null ],
     [ "has_overtake", "classTakeDropIterator.html#a8ac90a7a815536471dc71a06662d2cbc", null ],
     [ "outside_B", "classTakeDropIterator.html#a5f6403edd716b35d55bb53201cbcf3b0", null ],
-    [ "ref_B", "classTakeDropIterator.html#a8668a91ab2983078f77b6a464bab36ba", null ]
+    [ "ref_B", "classTakeDropIterator.html#af652a35b99dc5cc3fad6baa305325b2d", null ]
 ];

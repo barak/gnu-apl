@@ -1,3 +1,4 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$unionSockAddr.html" title="A union holding a sockaddr and a sockaddr_in as to avoid casting between sockaddr and a sockaddr_in..." alt="" coords="5,5,84,32"/>
+<area shape="rect" id="node1" href="$classSig__item__int.html" title="Sig_item_int\&lt; uint64\l_t, bytes \&gt;" alt="" coords="5,5,147,47"/>
+<area shape="rect" id="node2" href="$classSig__item__xint.html" title="Sig_item_xint\&lt; uint64\l_t, 8 \&gt;" alt="" coords="195,5,343,47"/>
 </map>

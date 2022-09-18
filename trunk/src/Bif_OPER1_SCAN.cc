@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ Bif_OPER1_SCAN1   Bif_OPER1_SCAN1::_fun;
 Bif_OPER1_SCAN  * Bif_OPER1_SCAN ::fun = &Bif_OPER1_SCAN ::_fun;
 Bif_OPER1_SCAN1 * Bif_OPER1_SCAN1::fun = &Bif_OPER1_SCAN1::_fun;
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_SCAN::expand(Value_P A, Value_P B, uAxis axis)
 {
@@ -55,7 +55,7 @@ std::vector<ShapeItem> rep_counts;
    rep_counts.reserve(ec_A);
    loop(a, ec_A)
       {
-        APL_Integer rep_A = A->get_ravel(a).get_near_int();
+        APL_Integer rep_A = A->get_cravel(a).get_near_int();
         rep_counts.push_back(rep_A);
         if      (rep_A == 0)        ;
         else if (rep_A == 1)        ++ones_A;
@@ -77,7 +77,7 @@ Value_P Z(shape_Z, LOC);
 
 const Shape3 shape_Z3(shape_Z, axis);
 
-const Cell * cB = &B->get_ravel(0);
+const Cell * cB = &B->get_cfirst();
 const bool lval = cB->is_lval_cell();
 
 ShapeItem inc_1 = shape_Z3.l();   // increment after result l items
@@ -98,21 +98,18 @@ ShapeItem inc_2 = 0;              // increment after result m*l items
            {
              if (rep_counts[m] == 1)   // copy items from B
                 {
-                  loop(l, shape_Z3.l())
-                      Z->next_ravel()->init(cB[l], Z.getref(), LOC);
+                  loop(l, shape_Z3.l())   Z->next_ravel_Cell(cB[l]);
                   cB += inc_1;
                 }
              else                      // init items
                 {
                   if (lval)
                      {
-                       loop(l, shape_Z3.l())
-                           new (Z->next_ravel()) LvalCell(0, 0);
+                       loop(l, shape_Z3.l())   Z->next_ravel_Lval(0, 0);
                      }
                   else
                      {
-                       loop(l, shape_Z3.l())
-                           Z->next_ravel()->init_type(fill[l], Z.getref(), LOC);
+                       loop(l, shape_Z3.l())   Z->next_ravel_Proto(fill[l]);
                      }
                 }
            }
@@ -125,13 +122,13 @@ ShapeItem inc_2 = 0;              // increment after result m*l items
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_SCAN::scan(Token & tok_LO, Value_P B, uAxis axis) const
 {
    // if B is a scalar, then Z is B.
    //
-   if (B->get_rank() == 0)      return Token(TOK_APL_VALUE1, B->clone(LOC));
+   if (B->get_rank() == 0)      return Token(TOK_APL_VALUE1, CLONE_P(B, LOC));
 
    if (!tok_LO.is_function())
       {
@@ -160,7 +157,7 @@ Function_P LO = tok_LO.get_function();
 
 const ShapeItem m_len = B->get_shape_item(axis);
 
-   if (m_len == 0)      return Token(TOK_APL_VALUE1, B->clone(LOC));
+   if (m_len == 0)      return Token(TOK_APL_VALUE1, CLONE_P(B, LOC));
 
    if (m_len == 1)
       {
@@ -177,35 +174,31 @@ ErrorCode (Cell::*assoc_f2)(Cell *, const Cell *) const = LO->get_assoc();
       {
         // LO is an associative primitive scalar function.
         //
-        const Cell * cB = &B->get_ravel(0);
+        const Cell * cB = &B->get_cfirst();
+        ShapeItem z = 0;
         loop(h, shape_Z3.h())
         loop(m, shape_Z3.m())
         loop(l, shape_Z3.l())
             {
-              Cell * cZ = Z->next_ravel();
-              if (m == 0)
+              if (m == 0)   // first item in scanned vector
                  {
-                   cZ->init(*cB++, Z.getref(), LOC);
+                   Z->next_ravel_Cell(*cB++);
                  }
-              else
+              else          // subsequent item in scanned vector
                  {
+                   const Cell & prev_Z = Z->get_cravel(z - shape_Z3.l());
 
-                   Value_P AA(LOC);
-                   AA->next_ravel()->init(cZ[-shape_Z3.l()], AA.getref(), LOC);
-                   AA->set_complete();
-
-                   Value_P BB(LOC);
-                   BB->next_ravel()->init(*cB++, BB.getref(), LOC);
-                   BB->set_complete();
+                   Value_P AA(prev_Z, LOC);   // AA is Z[h; m-1; l]
+                   Value_P BB(*cB++, LOC);    // BB is B[h; m  ; l]
 
                    Token tok = LO->eval_AB(AA, BB);
-                   if (!tok.is_apl_val())   return tok;
+                   if (!tok.is_apl_val())   return tok;   // error in AA LO BB
 
-                   Value_P ZZ = tok.get_apl_val();
-                   cZ->init(ZZ->get_ravel(0), ZZ.getref(), LOC);
-                   ZZ->set_complete();
+                   Z->next_ravel_Cell(tok.get_apl_val()->get_cscalar());
                  }
+              ++z;
             }
+
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
@@ -216,45 +209,45 @@ const Shape3 Z3(B->get_shape(), axis);
    if (LO->may_push_SI())   // user defined LO
       {
         Value_P X4(4, LOC);
-        new (X4->next_ravel())   IntCell(axis + Workspace::get_IO());
-        new (X4->next_ravel())   IntCell(Z3.h());
-        new (X4->next_ravel())   IntCell(Z3.m());
-        new (X4->next_ravel())   IntCell(Z3.l());
+        X4->next_ravel_Int(axis + Workspace::get_IO());
+        X4->next_ravel_Int(Z3.h());
+        X4->next_ravel_Int(Z3.m());
+        X4->next_ravel_Int(Z3.l());
         X4->check_value(LOC);
         return Macro::get_macro(Macro::MAC_Z__LO_SCAN_X4_B)
-                    ->eval_LXB(tok_LO, X4, B);
+                                ->eval_LXB(tok_LO, X4, B);
       }
 
    if (B->get_shape().is_empty())   return LO->eval_identity_fun(B, axis);
 
    return Bif_REDUCE::do_reduce(B->get_shape(), Z3, -1, LO, B, m_len);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_OPER1_SCAN::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
-const Rank axis = Value::get_single_axis(X.get(), B->get_rank());
+const sAxis axis = Value::get_single_axis(X.get(), B->get_rank());
    return expand(A, B, axis);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_OPER1_SCAN::eval_LXB(Token & LO, Value_P X, Value_P B) const
 {
-const Rank axis = Value::get_single_axis(X.get(), B->get_rank());
+const sAxis axis = Value::get_single_axis(X.get(), B->get_rank());
    return scan(LO, B, axis);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_OPER1_SCAN1::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
-const Rank axis = Value::get_single_axis(X.get(), B->get_rank());
+const sAxis axis = Value::get_single_axis(X.get(), B->get_rank());
    return expand(A, B, axis);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token
 Bif_OPER1_SCAN1::eval_LXB(Token & LO, Value_P X, Value_P B) const
 {
-const Rank axis = Value::get_single_axis(X.get(), B->get_rank());
+const sAxis axis = Value::get_single_axis(X.get(), B->get_rank());
    return scan(LO, B, axis);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------

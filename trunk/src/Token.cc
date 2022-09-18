@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -27,54 +27,63 @@
 #include "Token.hh"
 #include "Workspace.hh"
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token::Token(const Token & other)
    : tag(TOK_VOID)
 {
    copy_1(other, "Token::Token(const Token & other)");
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Token::Token(const Token & other, const char * loc)
    : tag(TOK_VOID)
 {
    copy_1(other, loc);
 }
-//-----------------------------------------------------------------------------
-Token::Token(TokenTag tg, IndexExpr & idx)
+//----------------------------------------------------------------------------
+Token::Token(TokenTag t, IndexExpr & idx)
 {
-   if (tg == TOK_PINDEX)
+   /* construct a token for an index expressions. There are 3 cases which
+      differ by tag and by value type:
+
+      1. t indicates a partial index. Partial indices are used after the
+         trailing ] but before the leading [ was parsed (remember that we
+         parse right to left). Tag is TOK_PINDEX / TV_INDEX
+
+      2. t indicates a complete token (after parsing [). There are 2 sub-cases:
+
+      2a. idx has rank 1: [ axis ]. IndexExpr is converted to a (single) value,
+          possibly 0 to indicate an elided index []. Tag is TOK_AXIS / TV_VAL
+
+      2b. idx is [i1;i2...]: Tag is TOK_INDEX / TV_INDEX.
+
+      In case 1. and 2b. the tag == t; only in case 2a. is the caller's
+      t == TOK_INDEX replaced with tok == TOK_AXIS.
+    */
+
+   if (t == TOK_PINDEX)   // case 1. (partial index   ...] )
       {
         // this token is a partial index in the prefix parser.
         // use it as is.
         //
         tag = TOK_PINDEX;
-        value.index_val = &idx;
+        value.index_val = &idx;        // type is TV_INDEX
       }
-   else
+   else                   // case 2. (complete index [ ... ] )
       {
-        // this token is a complete index
-        //
-        Assert(tg == TOK_INDEX);
-        if (idx.value_count() < 2)   // [idx] or []
+        Assert(t == TOK_INDEX);
+        if (idx.get_rank() < 2)   // case 2a. [idx] or []
            {
              tag = TOK_AXIS;
-             if (idx.value_count() == 0)   // []
-                {
-                  new (&value.apl_val) Value_P;
-                }
-             else                          // [x]
-                {
-                  new (&value.apl_val)   Value_P(idx.extract_value(0));
-                }
+             value.apl_val = idx.extract_axis();   // type is TV_VAL
            }
-        else                         // [idx; ...]
+        else                           // [idx; ...]
            {
              tag = TOK_INDEX;
-             value.index_val = &idx;
+             value.index_val = &idx;   // type is TV_INDEX
            }
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ostream &
 operator << (ostream & out, TokenTag tag)
 {
@@ -83,7 +92,7 @@ operator << (ostream & out, TokenTag tag)
 
    return out;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ostream &
 operator << (ostream & out, TokenClass tc)
 {
@@ -124,7 +133,7 @@ operator << (ostream & out, TokenClass tc)
 
    return out;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ostream &
 operator << (ostream & out, const Token & token)
 {
@@ -152,8 +161,8 @@ operator << (ostream & out, const Token & token)
 
         const PrintContext pctx(PR_APL);
         PrintBuffer pb(*value, pctx, 0);
-        bool more = pb.get_height() > 1;
-        if (pb.get_height() > 0)
+        bool more = pb.get_row_count() > 1;
+        if (pb.get_row_count() > 0)
            {
              UCS_string ucs = pb.get_line(0).no_pad();
              if (ucs.size() > 20)
@@ -239,7 +248,7 @@ operator << (ostream & out, const Token & token)
 
    return out <<  "{-unknown Token " << token.get_tag() << "-}";
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Token::ChangeTag(TokenTag new_tag)
 {
@@ -247,7 +256,7 @@ Token::ChangeTag(TokenTag new_tag)
    // tag is ia const TokenTag, so we cheat a little here.
    const_cast<TokenTag &>(tag) = new_tag;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Token::value_use_count() const
 {
@@ -255,13 +264,13 @@ Token::value_use_count() const
    if (!value.apl_val)   return -98;
    return value.apl_val->get_owner_count();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Token::extract_apl_val(const char * loc)
 {
    if (is_apl_val())   value.apl_val.reset();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Value *
 Token::extract_and_keep(const char * loc)
 {
@@ -271,7 +280,7 @@ Value * ret = value.apl_val.get();
    value.apl_val.clear_pointer(loc);
    return ret;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ostream &
 Token::print_function(ostream & out) const
 {
@@ -390,7 +399,7 @@ Token::print_function(ostream & out) const
       }
    return out <<  ", }";
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ostream &
 Token::print_value(ostream & out) const
 {
@@ -425,7 +434,7 @@ Token::print_value(ostream & out) const
                       }
 
                    const PrintContext pctx(PR_APL, 2, 80);
-                   out << UCS_string(v->get_ravel(e)
+                   out << UCS_string(v->get_cravel(e)
                                        .character_representation(pctx), 0, 80)
                        << " ";
                  }
@@ -466,7 +475,7 @@ Token::print_value(ostream & out) const
 
    return out <<  ", }";
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Token::show_trace(ostream & out, const UCS_string & fun_name, 
                   Function_Line line) const
@@ -517,7 +526,7 @@ const Value & val = *get_apl_val();
    else if (val.get_rank() == 1)   // vector
       {
         if (val.element_count() == 0 &&   // empty vector
-            val.get_ravel(0).is_simple_cell())
+            val.get_cfirst().is_simple_cell())
            {
              out << endl;
              return;
@@ -532,21 +541,21 @@ const Value & val = *get_apl_val();
 
 PrintBuffer pb(val, pctx, 0);
 const UCS_string indent(fn.size(), UNI_SPACE);
-   loop(l, pb.get_height())
+   loop(l, pb.get_row_count())
       {
         if (l)   out << indent;
         out << pb.get_line(l).no_pad() << endl;
       }
 
-   if (pb.get_height() == 0)   out << endl;
+   if (pb.get_row_count() == 0)   out << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ostream &
 Token::print_quad(ostream & out) const
 {
    return out << UNI_Quad_Quad << get_Id();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string
 Token::canonical(PrintStyle style) const
 {
@@ -569,7 +578,7 @@ UCS_string ucs;
                 ucs.append(UNI_SEMICOLON);
              else
                 Assert(0);
-                break;
+             break;
 
         case TC_R_BRACK:
              ucs.append(UNI_R_BRACK);
@@ -588,7 +597,7 @@ UCS_string ucs;
              {
                PrintContext pctx(style, DEFAULT_Quad_PP, DEFAULT_Quad_PW);
                PrintBuffer pbuf(*get_apl_val(), pctx, 0);
-               if (pbuf.get_height() == 0)   return ucs;
+               if (pbuf.get_row_count() == 0)   return ucs;
                return pbuf.l1();
              }
 
@@ -620,7 +629,7 @@ UCS_string ucs;
 
    return ucs;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UCS_string
 Token::tag_name() const
 {
@@ -636,7 +645,7 @@ char cc[40];
 UCS_string ucs(cc);
    return ucs;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 Token::error_info(UCS_string & ucs) const
 {
@@ -654,7 +663,7 @@ bool need_space = ! (Avec::no_space_after(c1) || Avec::no_space_before(c2));
    ucs.append(can);
    return need_space ? -can.size() : can.size();
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 const char * 
 Token::short_class_name(TokenClass cls)
 {
@@ -697,7 +706,7 @@ Token::short_class_name(TokenClass cls)
 
    return "???";
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ostream &
 operator << (ostream & out, const Token_string & tos)
 {
@@ -707,7 +716,7 @@ operator << (ostream & out, const Token_string & tos)
    out << endl;
    return out;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 const char *
 Token::class_name(TokenClass tc)
 {
@@ -752,7 +761,7 @@ Token::class_name(TokenClass tc)
 
    return "*** Obscure token class ***";
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 inline void
 Token::copy_N(const Token & src)
 {
@@ -776,7 +785,7 @@ Token::copy_N(const Token & src)
         default:       FIXME;
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Token::copy_1(const Token & src, const char * loc)
 {
@@ -796,7 +805,7 @@ Token::copy_1(const Token & src, const char * loc)
 
    copy_N(src);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Token::move_1(Token & src, const char * loc)
 {
@@ -813,7 +822,7 @@ Token::move_1(Token & src, const char * loc)
            }
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Token::move_2(const Token & src, const char * loc)
 {
@@ -830,7 +839,7 @@ Token::move_2(const Token & src, const char * loc)
            }
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Token_string::reverse_from_to(ShapeItem from, ShapeItem to)
 {
@@ -842,7 +851,7 @@ Token * t2 = &at(to);
 
    while (t1 < t2)   t1++->Hswap(*t2--);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 Token_string::print(ostream & out, bool details) const
 {
@@ -860,4 +869,4 @@ Token_string::print(ostream & out, bool details) const
 
    out << endl;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------

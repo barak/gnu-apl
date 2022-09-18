@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -52,7 +52,7 @@
    6-byte encodings
 */
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 UTF8_string::UTF8_string(const UCS_string & ucs)
 {
    Log(LOG_char_conversion)
@@ -130,15 +130,7 @@ UTF8_string::UTF8_string(const UCS_string & ucs)
    Log(LOG_char_conversion)
       CERR << "UTF8_string::UTF8_string(): utf = " << *this << endl;
 }
-//-----------------------------------------------------------------------------
-UTF8_string::UTF8_string(const Value & value)
-{
-   loop(v, value.element_count())
-       {
-         *this += value.get_ravel(v).get_char_value() & 0xFF;
-       }
-}
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ostream &
 UTF8_string::dump_hex(ostream & out, int max_bytes) const
 {
@@ -152,7 +144,7 @@ UTF8_string::dump_hex(ostream & out, int max_bytes) const
 
    return out;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Unicode
 UTF8_string::toUni(const UTF8 * string, int & len, bool verbose)
 {
@@ -203,7 +195,7 @@ uint32_t uni = 0;
 
    return Unicode(bx | uni);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 Unicode
 UTF8_string::getc(istream & in)
 {
@@ -245,7 +237,7 @@ uint32_t uni = 0;
 
    return Unicode(bx | uni);
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 UTF8_string::starts_with(const char * path) const
 {
@@ -259,7 +251,7 @@ const size_t path_len = strlen(path);
    loop(p, path_len)   if (at(p) != path[p])   return false;
    return true;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 UTF8_string::ends_with(const char * ext) const
 {
@@ -273,7 +265,7 @@ const size_t ext_len = strlen(ext);
    loop(e, ext_len)   if (at(size() - ext_len + e) != ext[e])   return false;
    return true;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 int
 UTF8_string::un_HTML(int in_HTML)
 {
@@ -365,7 +357,7 @@ bool got_tag = false;
    resize(dest);
    return in_HTML;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 bool
 UTF8_string::round_0_1()
 {
@@ -396,18 +388,18 @@ UTF8_string::round_0_1()
    pop_back();
    return true;   // 1.0 → 0.1
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 ostream &
 operator<<(ostream & os, const UTF8_string & utf)
 {
    loop(c, utf.size())   os << utf[c];
    return os;
 }
-//=============================================================================
+//============================================================================
 int
 UTF8_filebuf::overflow(int c)
 {
    data += c;
    return 0;
 }
-//=============================================================================
+//============================================================================

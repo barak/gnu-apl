@@ -1,3 +1,5 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classInputMux.html" title="a multiplexer selecting the input to the APL interpreter " alt="" coords="5,5,81,32"/>
+<area shape="rect" id="node1" href="$classIndexIterator.html" title="Base class for ElidedIndexIterator and TrueIndexIterator. " alt="" coords="5,31,100,57"/>
+<area shape="rect" id="node2" href="$classElidedIndexIterator.html" title="Iterator for an elided index (= ⍳(⍴B)[N] for some N) " alt="" coords="148,5,279,32"/>
+<area shape="rect" id="node3" href="$classTrueIndexIterator.html" title="an IndexIterator for a true (i.e. non&#45;elided) index array " alt="" coords="153,56,274,83"/>
 </map>

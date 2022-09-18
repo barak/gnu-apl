@@ -3,7 +3,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
 #ifndef __CELL_ICC_DEFINED__
 #define __CELL_ICC_DEFINED__
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 inline bool
 Cell::tolerantly_equal(APL_Float A, APL_Float B, double C)
 {
@@ -41,7 +41,7 @@ const APL_Float dist_A_B = A > B ? (A - B) : (B - A);
 
    return dist_A_B < C*mag_max;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 inline bool
 Cell::same_half_plane(APL_Complex A, APL_Complex B)
 {
@@ -53,7 +53,7 @@ Cell::same_half_plane(APL_Complex A, APL_Complex B)
 
    return false;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 inline bool
 Cell::tolerantly_equal(APL_Complex A, APL_Complex B, double C)
 {
@@ -94,7 +94,7 @@ const APL_Float mag2_max = Cmag2_A > Cmag2_B ? Cmag2_A : Cmag2_B;
    //
    return dist2_A_B <= mag2_max;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 inline bool
 Cell::integral_within(APL_Float A, double qct)
 {
@@ -115,7 +115,7 @@ const APL_Float real_dn = floor(A) + qct;
 
    return A > real_up || A < real_dn;
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 #endif // __CELL_ICC_DEFINED__
 

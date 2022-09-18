@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -41,7 +41,7 @@ bool Parallel::run_parallel = true;
 
 bool Parallel::init_done = false;
 
-//=============================================================================
+//============================================================================
 void
 Parallel::init(bool logit)
 {
@@ -81,6 +81,10 @@ Parallel::init(bool logit)
               return;
             }
 
+         // pthread_setname_np() fails for names ≥ 16 chars (including \0).
+         char worker_name[40];   // max 16 chars!
+         snprintf(worker_name, sizeof(worker_name) - 1, "apl/pool-%d", w);
+         pthread_setname_np(tctx->thread, worker_name);
          // wait until new thread has reached its work loop
          sem_wait(pthread_create_sema);
        }
@@ -116,7 +120,7 @@ sem_t __pthread_create_sema;
 sem_t * Parallel::print_sema          = &__print_sema;
 sem_t * Parallel::pthread_create_sema = &__pthread_create_sema;
 
-//=============================================================================
+//============================================================================
 bool
 CPU_pool::change_core_count(CoreCount new_count, bool logit)
 {
@@ -174,7 +178,7 @@ const CoreCount current_count = Thread_context::get_active_core_count();
 
    return false;   // no error
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 #if PARALLEL_ENABLED
 void
 CPU_pool::init(bool logit)
@@ -307,7 +311,7 @@ CPU_pool::init(bool logit)
 }
 #endif  // not PARALLEL_ENABLED
 
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 CPU_pool::lock_pool(bool logit)
 {
@@ -323,7 +327,7 @@ CPU_pool::lock_pool(bool logit)
         Thread_context::print_all(CERR);
       }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void
 CPU_pool::unlock_pool(bool logit)
 {
@@ -347,7 +351,7 @@ CPU_pool::unlock_pool(bool logit)
             sem_post(&Thread_context::get_context(CoreNumber(a))->pool_sema);
        }
 }
-//-----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 void *
 Parallel::worker_main(void * arg)
 {
@@ -384,4 +388,4 @@ Thread_context & tctx = *reinterpret_cast<Thread_context *>(arg);
    /* not reached */
    return 0;
 }
-//=============================================================================
+//============================================================================

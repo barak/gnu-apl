@@ -1,10 +1,10 @@
 var classBif__F12__CIRCLE =
 [
     [ "Bif_F12_CIRCLE", "classBif__F12__CIRCLE.html#a3c7b14079b3934a2e0dd0baa540c5734", null ],
-    [ "eval_AB", "classBif__F12__CIRCLE.html#adee129ca53991770d7190aa99aa60104", null ],
-    [ "eval_B", "classBif__F12__CIRCLE.html#a434174323bd86e83be7d5dd4bc7b06f8", null ],
-    [ "get_dyadic_inverse", "classBif__F12__CIRCLE.html#a978e373d000815690f664b498fd78042", null ],
-    [ "get_monadic_inverse", "classBif__F12__CIRCLE.html#af251fba8742e7aae3e05ccbb02372e1c", null ],
+    [ "eval_AB", "classBif__F12__CIRCLE.html#a97d94f041311b6d6698e8dbc70784ad8", null ],
+    [ "eval_B", "classBif__F12__CIRCLE.html#a6c3a7a1fe80b44bbfee3fa27fbb42c33", null ],
+    [ "get_dyadic_inverse", "classBif__F12__CIRCLE.html#ac64e9aff59f67e3b4e8d8b70a89d10a3", null ],
+    [ "get_monadic_inverse", "classBif__F12__CIRCLE.html#a4bdf5f1d8c236c586500772f2f2d8be0", null ],
     [ "get_scalar_f2", "classBif__F12__CIRCLE.html#a44bfe896a0d21357db3caf0931f0b0c5", null ],
     [ "_fun", "classBif__F12__CIRCLE.html#ad73ea540d6f83aca22e7d2162624411c", null ],
     [ "_fun_inverse", "classBif__F12__CIRCLE.html#ad3fa53353e290e045366cd0df5b6e840", null ],

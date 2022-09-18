@@ -23,6 +23,7 @@ dist_noinst_DATA =                              \
         Catenate_with_Axis.tc                   \
         Ceiling.tc                              \
         Circle_Functions.tc                     \
+        Clone.tc                                \
         Cloning.tc                              \
         Commute.tc                              \
         Compress.tc                             \
@@ -95,6 +96,7 @@ dist_noinst_DATA =                              \
         Oper_userfun.tc                         \
         Or.tc                                   \
         OuterProduct.tc                         \
+        Parallel.tc                             \
         Partition.tc                            \
         Partition_with_axis.tc                  \
         Pick.tc                                 \
@@ -216,7 +218,6 @@ dist_noinst_DATA =                              \
         ZZ33_Regression.tc                      \
         ZZ34_Regression.tc                      \
         ZZ35_Regression.tc                      \
-        ZZ36_Regression.tc                      \
         ZZ37_Regression.tc                      \
         ZZ38_Regression.tc                      \
         ZZ39_Regression.tc                      \
@@ -232,6 +233,10 @@ dist_noinst_DATA =                              \
         ZZ49_Regression.tc                      \
         ZZ50_Regression.tc                      \
         ZZ51_Regression.tc                      \
+        ZZ52_Regression.tc                      \
+        ZZ53_Regression.tc                      \
+        ZZ54_Regression.tc                      \
+        ZZ55_Regression.tc                      \
         ZZZ0_Standard_08x,tc                    \
         ZZZ0_Standard_09x.tc                    \
         ZZZ0_Standard_10x.tc                    \

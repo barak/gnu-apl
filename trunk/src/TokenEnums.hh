@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2020  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ enum TokenClass
    // token classes.
    //
 
-   // permanent token classes. Token of these classes can appear in
+   // permanent token classes. Only Token of these classes can appear in
    // the body of a defined function.
    //
    TC_ASSIGN        = 0x01,   ///< ←
@@ -53,11 +53,12 @@ enum TokenClass
 
    TC_MAX_PERM,               ///< permanent token are < TC_MAX_PERM
 
+   // token class aliases
    TC_FUN1          = TC_FUN12,   ///< monadic function
    TC_FUN2          = TC_FUN12,   ///< dyadic function
 
-   // temporary token classes. Token of these classes can appear as
-   // intermediate results during tokenization and execution
+   // temporary Token classes. Token of these classes can appear as
+   // intermediate results during tokenization and prefix parsing
    //
    TC_PINDEX        = 0x10,   ///< partial index
    TC_VOID          = 0x11,
@@ -81,7 +82,7 @@ enum TokenClass
    TC_MASK          = 0xFF,
    TC_INVALID       = 0xFF,
 
-   // short token class names for phrase table
+   // shorter token class names for phrase table
    //
    SN_A             = TC_VALUE,
    SN_ASS           = TC_ASSIGN,
@@ -156,12 +157,20 @@ enum TokenTag
 #include "Token.def"
 
    TOK_FUN1 = TOK_FUN2,
-   TOK_NONE = -1          // invalid tag
-
+   TOK_NONE = -1,         // invalid tag
 };
 
+/// exchange TokenTags \b t1 and \b t2
 inline void
 Hswap(TokenTag & t1, TokenTag & t2)
 { const TokenTag tmp = t1;   t1 = t2;   t2 = tmp; }
+
+/// return true for / ⌿ \ and ⍀
+inline bool
+is_SLASH_or_BACKSLASH(TokenTag tag)
+{
+   return tag == TOK_OPER1_REDUCE  || tag == TOK_OPER1_SCAN ||
+          tag == TOK_OPER1_REDUCE1 || tag == TOK_OPER1_SCAN1;
+}
 
 #endif // __TOKENENUMS_HH_DEFINED__
