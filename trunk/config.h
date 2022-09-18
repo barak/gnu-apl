@@ -106,6 +106,9 @@
 /* Define to 1 if you have the `pcre2-32' library (-lpcre2-32). */
 #define HAVE_LIBPCRE2_32 1
 
+/* Define to 1 if you have the `png' library (-lpng). */
+#define HAVE_LIBPNG 1
+
 /* Define to 1 if you have the `pthread' library (-lpthread). */
 #define HAVE_LIBPTHREAD 1
 
@@ -123,6 +126,9 @@
 
 /* Define to 1 if you have the `xcb' library (-lxcb). */
 #define HAVE_LIBXCB 1
+
+/* Define to 1 if you have the `z' library (-lz). */
+#define HAVE_LIBZ 1
 
 /* Define to 1 if you have the <memory.h> header file. */
 #define HAVE_MEMORY_H 1
@@ -219,6 +225,9 @@
 
 /* Define to 1 if you have the <xcb/xcb.h> header file. */
 #define HAVE_XCB_XCB_H 1
+
+/* Define to 1 if you have the <zlib.h> header file. */
+#define HAVE_ZLIB_H 1
 
 /* Define to 1 if the system has the type `_Bool'. */
 /* #undef HAVE__BOOL */

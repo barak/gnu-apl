@@ -22,7 +22,7 @@
 /** @file **/
 
 /// debug verbosity
-static int verbosity;
+static int verbosity = 0;
 
 #include "Common.hh"
 
@@ -96,7 +96,7 @@ struct Plot_context
    GtkWidget * drawing_area;
 };
 
-/// all Plot_contexts (= all open windows)
+/// all Plot_contexts (= all open windows) for ⎕PLOT
 static vector<Plot_context *> all_plot_contexts;
 
 /// the number of open plot windows (to see when the last one was closed).
@@ -1442,9 +1442,8 @@ draw_callback(GtkWidget * drawing_area, cairo_t * cr, gpointer user_data)
 const int new_width  = gtk_widget_get_allocated_width(drawing_area);
 const int new_height = gtk_widget_get_allocated_height(drawing_area);
    if (verbosity & SHOW_EVENTS)
-      CERR << "draw_callback(drawing_area = " << drawing_area << ")  " 
-
-   << "width: " << new_width << ", height: " << new_height << endl;
+      CERR << "draw_callback(drawing_area = " << drawing_area << ")  "
+           << "width: " << new_width << ", height: " << new_height << endl;
 
    // find the Plot_context for this event...
    //
@@ -1559,7 +1558,6 @@ Plot_window_properties & w_props =
 
    XInitThreads();
 
-static bool gtk_init_done = false;
    if (!gtk_init_done)
       {
         int argc = 0;

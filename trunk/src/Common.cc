@@ -46,6 +46,8 @@
 
 bool got_WINCH = false;
 
+bool gtk_init_done = false;
+
 //----------------------------------------------------------------------------
 static bool attention_raised = false;
 static uint64_t attention_count = 0;

@@ -93,7 +93,9 @@ SYNC:	DIST
 	echo "exported from SVN version " `svnversion` > \
     ../savannah-repo-apl/trunk/exported_from
 	rm -Rf apl-$(VERSION)
-	cd ../savannah-repo-apl ; svn add . --force -q ; git add --update
+	cd ../savannah-repo-apl ; svn add . --force -q 
+	cd ../savannah-repo-apl ; git add --update
+	cd ../savannah-repo-apl ; git commit -m "sync from SVN"
 
 # build all packages and SYNC
 #

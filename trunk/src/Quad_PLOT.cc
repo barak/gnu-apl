@@ -327,7 +327,7 @@ Quad_PLOT::eval_B(Value_P B) const
              pthread_t thread;                         // xcb
            } u;
 
-        u.B0 = B->get_cfirst().get_int_value();
+        u.B0 = B->get_cscalar().get_int_value();
         if (u.B0 == 0)                 // reset plot verbosity
            {
              verbosity = 0;

@@ -80,6 +80,9 @@ using namespace std;
 /// true when a WINCH (window size changed) signal was received
 extern bool got_WINCH;
 
+/// true when gtk_init() was called (from ⎕PLOT or from ⎕PNG)
+extern bool gtk_init_done;
+
 /// initialize
 extern void init_1(const char * argv0, bool log_startup);
 extern void init_2(bool log_startup);

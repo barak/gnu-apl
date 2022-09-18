@@ -88,7 +88,8 @@ AC_CHECK_HEADERS([  \
     X11/Xlib.h      \
     X11/Xlib-xcb.h  \
     X11/Xutil.h     \
-    utmpx.h])
+    utmpx.h]        \
+    zlib.h)
 
 # xcb/xproto.h needs xcb/xcb.h
 AC_CHECK_HEADER(xcb/xproto.h, [], [], [#include <xcb/xcb.h>])
@@ -125,6 +126,7 @@ AC_FUNC_ERROR_AT_LINE
 AC_FUNC_MMAP
 AC_CHECK_FUNCS([floor memset munmap pow sqrt strchr strerror])
 
+AC_CHECK_LIB([z],         [uncompress])
 AC_CHECK_LIB([X11-xcb],   [XGetXCBConnection])
 AC_CHECK_LIB([X11],       [XOpenDisplay])
 AC_CHECK_LIB([xcb],       [xcb_connect])
@@ -142,6 +144,7 @@ AC_CHECK_LIB([execinfo],  [backtrace])
 AC_CHECK_LIB([dl],        [dlopen])
 AC_CHECK_LIB([cairo],     [cairo_fill])
 AC_CHECK_LIB([c],         [initstate_r])
+AC_CHECK_LIB([png],       [png_init_io])
 AC_CHECK_LIB([atomicity], [__atomic_fetch_add_4])
 
 # check if SQLite3 is wanted and installed

@@ -171,6 +171,7 @@ qv( PS                 , "⎕PS"     ,          )
 qv( PW                 , "⎕PW"     , = 0x5009 )
 sf( OPER2_POWER        , "⍣"       ,          )
 qf( PLOT               , "⎕PLOT"   ,          )
+qf( PNG                , "⎕PNG"     ,          )
 
 st( Quad_Quad          , "⎕"       , = 0x5101 )
 st( QUOTE1             , "'"       ,          )

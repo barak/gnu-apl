@@ -32,7 +32,7 @@
 class Plot_window_properties;
 class Plot_data;
 
-/// ⎕PLOT verbosity
+/// ⎕PLOT verbosity bitmap
 enum
 {
    SHOW_EVENTS = 1,   ///< show X events
@@ -61,7 +61,7 @@ public:
    static std::vector<pthread_t> plot_threads;
 
 protected:
-   /// Denstructor.
+   /// Destructor.
    ~Quad_PLOT();
 
    /// overloaded Function::eval_AB()

@@ -17539,7 +17539,8 @@ for ac_header in   \
     X11/Xlib.h      \
     X11/Xlib-xcb.h  \
     X11/Xutil.h     \
-    utmpx.h
+    utmpx.h        \
+    zlib.h
 do :
   as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
 ac_fn_cxx_check_header_mongrel "$LINENO" "$ac_header" "$as_ac_Header" "$ac_includes_default"
@@ -18054,6 +18055,51 @@ _ACEOF
 fi
 done
 
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for uncompress in -lz" >&5
+$as_echo_n "checking for uncompress in -lz... " >&6; }
+if ${ac_cv_lib_z_uncompress+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lz  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char uncompress ();
+int
+main ()
+{
+return uncompress ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_z_uncompress=yes
+else
+  ac_cv_lib_z_uncompress=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_z_uncompress" >&5
+$as_echo "$ac_cv_lib_z_uncompress" >&6; }
+if test "x$ac_cv_lib_z_uncompress" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBZ 1
+_ACEOF
+
+  LIBS="-lz $LIBS"
+
+fi
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for XGetXCBConnection in -lX11-xcb" >&5
 $as_echo_n "checking for XGetXCBConnection in -lX11-xcb... " >&6; }
@@ -18817,6 +18863,51 @@ if test "x$ac_cv_lib_c_initstate_r" = xyes; then :
 _ACEOF
 
   LIBS="-lc $LIBS"
+
+fi
+
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for png_init_io in -lpng" >&5
+$as_echo_n "checking for png_init_io in -lpng... " >&6; }
+if ${ac_cv_lib_png_png_init_io+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lpng  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char png_init_io ();
+int
+main ()
+{
+return png_init_io ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_png_png_init_io=yes
+else
+  ac_cv_lib_png_png_init_io=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_png_png_init_io" >&5
+$as_echo "$ac_cv_lib_png_png_init_io" >&6; }
+if test "x$ac_cv_lib_png_png_init_io" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBPNG 1
+_ACEOF
+
+  LIBS="-lpng $LIBS"
 
 fi
 

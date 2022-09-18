@@ -63,12 +63,11 @@ protected:
     **/
    enum ArchiveSyntax
       {
-        ASX_MAJOR = 1,   ///< XML file format change incompatible
+        ASX_MAJOR = 1,   ///< XML file format change (incompatible change)
         ASX_MINOR = 2,   ///< XML file format change (backward compatible)
-        ASX_OTHER = 1,   ///< XML file format not changed
+        ASX_OTHER = 2,   ///< XML file format not changed
       };
 };
-
 //----------------------------------------------------------------------------
 /// a helper class for saving an APL workspace
 class XML_Saving_Archive: public XML_Archive
