@@ -3956,6 +3956,20 @@ the GNU APL color model into a PNG file.
       ⍝ display PNG file image.png without storing it in a variable
       ⎕PNG ⎕PNG 'image.png'
 
+      ⍝ Simple color conversions...
+
+      ⍝ convert a monochrome image into the equivalent RGB image
+      RGB_Gray ← 3 ⌿ Mono
+
+      ⍝ paint all pixels of a monochrome image red
+      RGB_Red ← 1 0 0 ⍀ Mono
+
+      ⍝ paint all pixels of a monochrome image green
+      RGB_Green ← 0 1 0 ⍀ Mono
+
+      ⍝ paint all pixels of a monochrome image green
+      RGB_Blue ← 0 0 1 ⍀ Mono
+
 @end verbatim
 
 @node    Section 2.33

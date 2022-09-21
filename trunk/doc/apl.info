@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-September 18, 2022
+September 19, 2022
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
@@ -3828,6 +3828,20 @@ GNU APL color model into a PNG file.
       ⍝ display PNG file image.png without storing it in a variable
       ⎕PNG ⎕PNG 'image.png'
 
+      ⍝ Simple color conversions...
+
+      ⍝ convert a monochrome image into the equivalent RGB image
+      RGB_Gray ← 3 ⌿ Mono
+
+      ⍝ paint all pixels of a monochrome image red
+      RGB_Red ← 1 0 0 ⍀ Mono
+
+      ⍝ paint all pixels of a monochrome image green
+      RGB_Green ← 0 1 0 ⍀ Mono
+
+      ⍝ paint all pixels of a monochrome image green
+      RGB_Blue ← 0 0 1 ⍀ Mono
+
 
 
 File: apl.info,  Node: Section 2.33,  Next: Section 2.34,  Prev: Section 2.32,  Up: Chapter 2
@@ -6783,30 +6797,30 @@ Node: Section 2.30126040
 Node: Section 2.31129829
 Node: Output File Format141829
 Node: Section 2.32143004
-Node: Section 2.33151480
-Node: Section 2.34152507
-Node: Section 2.35167223
-Node: Section 2.36177290
-Node: Section 2.37181409
-Node: Section 2.38183504
-Node: Section 2.39187929
-Node: Chapter 3209279
-Node: Chapter 4211780
-Node: Chapter 5212906
-Node: Section 5.1214443
-Node: Section 5.2215723
-Node: Section 5.3216083
-Node: Section 5.4216325
-Node: Section 5.5216987
-Node: Section 5.6217465
-Node: Section 5.7218237
-Node: Section 5.8218694
-Node: Chapter 6219096
-Node: Section 6.1219515
-Node: Section 6.2220202
-Node: Chapter 7221033
-Node: Section 7.1221536
-Node: Section 7.2246850
+Node: Section 2.33151885
+Node: Section 2.34152912
+Node: Section 2.35167628
+Node: Section 2.36177695
+Node: Section 2.37181814
+Node: Section 2.38183909
+Node: Section 2.39188334
+Node: Chapter 3209684
+Node: Chapter 4212185
+Node: Chapter 5213311
+Node: Section 5.1214848
+Node: Section 5.2216128
+Node: Section 5.3216488
+Node: Section 5.4216730
+Node: Section 5.5217392
+Node: Section 5.6217870
+Node: Section 5.7218642
+Node: Section 5.8219099
+Node: Chapter 6219501
+Node: Section 6.1219920
+Node: Section 6.2220607
+Node: Chapter 7221438
+Node: Section 7.1221941
+Node: Section 7.2247255
 
 End Tag Table
 
