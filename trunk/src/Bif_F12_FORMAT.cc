@@ -961,7 +961,6 @@ const ShapeItem len_A = A->element_count();
       }
 
 PrintBuffer pb;
-
    loop(col, cols_B)
        {
          APL_Integer col_width;
@@ -1025,7 +1024,10 @@ bool has_complex = false;
              has_num = true;
              if (cell.is_complex_cell())   has_complex = true;
            }
-        else has_char = true;
+        else
+           {
+             has_char = true;
+           }
       }
 
    if (has_complex)
@@ -1105,8 +1107,11 @@ bool has_complex = false;
 
         APL_Float value = cB[r*cols].get_real_value();
 
-        if (precision >= 0)   // floating format
+        if (precision >= 0)   // integer or floating format
           {
+            // precision == 0 means integer;
+            // precision  > 0 is the number of digits AFTER the decimal point
+
             // fix values close to 0 as 0 so that, for example, we never
             // see ¯.0000 in the formatted output.
             //
@@ -1114,7 +1119,7 @@ bool has_complex = false;
             loop(p,  precision)   minval /= 10;
             if (value < minval && value > -minval)   value = 0.0;
 
-             UCS_string data = format_spec_float(value, precision);
+             UCS_string data = format_float_by_spec(value, precision);
              if (width && data.size() > width)   // overflow
                 {
                   if (Workspace::get_FC(3) == UNI_0)   DOMAIN_ERROR;
@@ -1125,8 +1130,12 @@ bool has_complex = false;
            }
         else                  // exponential format
            {
-             UCS_string data = UCS_string::from_double_expo_prec(value,
-                                            -precision - 1);
+             // precision < 0 is the TOTAL (!) number of digits, which is
+             // one more than the digits AFTER the decimal point.
+             //
+             const int fract_digits = (-precision) - 1;
+             UCS_string data = UCS_string::from_double_to_expo(value,
+                                                               fract_digits);
              add_row(ret, r, has_char, has_num, UNI_E, data);
           }
       }
@@ -1166,9 +1175,9 @@ Bif_F12_FORMAT::add_row(PrintBuffer & ret, int row, bool has_char,
 }
 //----------------------------------------------------------------------------
 UCS_string
-Bif_F12_FORMAT::format_spec_float(APL_Float value, int precision)
+Bif_F12_FORMAT::format_float_by_spec(APL_Float value, int precision)
 {
-UCS_string ret = UCS_string::from_double_fixed_prec(value, precision);
+UCS_string ret = UCS_string::from_double_to_fixed(value, precision);
 
    // Note: the examples in the apl standard use a leading 0 (like  0.00)
    // while lrm shows .00 instead. We follow lrm and remove a leading 0.

@@ -373,7 +373,8 @@ public:
    UCS_string::iterator begin() const
       { return iterator(*this, 0); }
 
-   /// round last digit and discard it.
+   /// round last digit and discard it. Note that \b this is always expected
+   /// to be in floating point format and never in exponential format
    void round_last_digit();
 
    /// return true if \b this string contains \b uni
@@ -398,13 +399,13 @@ public:
    /// from value
    static UCS_string from_big(APL_Float & value);
 
-   /// convert double \b value to an UCS_string with \b fract_digits fractional
-   /// digits in scaled (exponential) format
-   static UCS_string from_double_expo_prec(APL_Float value, int fract_digits);
+   /// convert the double \b value to an UCS_string scaled (exponential) format
+   /// (with \b fract_digits fractional digits).
+   static UCS_string from_double_to_expo(APL_Float value, int fract_digits);
 
-   /// convert double \b value to an UCS_string with \b fract_digits fractional
-   /// digits in fixed point format
-   static UCS_string from_double_fixed_prec(APL_Float value, int fract_digits);
+   /// convert the double \b value to an UCS_string in fixed point format
+   /// (with \b fract_digits fractional digits).
+   static UCS_string from_double_to_fixed(APL_Float value, int fract_digits);
 
    /// convert double \b value to an UCS_string with \b quad_pp significant
    /// digits in scaled (exponential) format

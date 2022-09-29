@@ -1333,7 +1333,7 @@ UCS_string ret;
 }
 //----------------------------------------------------------------------------
 UCS_string
-UCS_string::from_double_expo_prec(APL_Float v, int fract_digits)
+UCS_string::from_double_to_expo(APL_Float v, int fract_digits)
 {
 UCS_string ret;
 
@@ -1350,7 +1350,7 @@ UCS_string ret;
         return ret;
       }
 
-   if (v < 0.0)   { ret.append(UNI_OVERBAR);   v = - v; }
+   if (v < 0.0)   { ret.append(UNI_OVERBAR);   v = -v; }
 
 int expo = 0;
    while (v >= 1.0E1)
@@ -1424,19 +1424,35 @@ int expo = 0;
    Assert(v >= 1.0);
    Assert(v < 10.0);
 
-   // print mantissa in fixed format
+   // print the mantissa in fixed format. Normally the mantissa is ≥ 1.0 and
+   // < 10.0, i.e. excluding 10.0. However, rounding up to fract_digits could
+   // make it 10 (including)
    //
-UCS_string mantissa = from_double_fixed_prec(v, fract_digits);
-   if (mantissa.size() > 2 &&
-       mantissa[0] == UNI_1 &&
-       mantissa[1] == UNI_0 &&
-       mantissa[2] == UNI_FULLSTOP)   // 9.xxx rounded up to 10.xxx
+UCS_string mantissa = from_double_to_fixed(v, fract_digits);
+   if (mantissa.size() >= 2 && mantissa[0] == UNI_1 && mantissa[1] == UNI_0)
       {
-        mantissa[1] = UNI_FULLSTOP;
-        mantissa[2] = UNI_0;
-       ++expo;
+        // mantissa starts with 10
+        //
+        if (mantissa.size() == 2)   // 10Ee → 1.0yyyEe+1
+           {
+             mantissa[0] = UNI_1;
+             mantissa.resize(1);
+             if (fract_digits)
+                {
+                  mantissa += UNI_FULLSTOP;
+                  loop(z, fract_digits)   mantissa += UNI_0;
+                }
+             ++expo;
+           }
+        else if (mantissa[2] == UNI_FULLSTOP)   // 10.yyyEe →  1.0yyyEe+1
+           {
+             mantissa[1] = UNI_FULLSTOP;
+             mantissa[2] = UNI_0;
+             mantissa.pop_back();
+             ++expo;
+           }
       }
-       
+
    ret.append(mantissa);
    ret.append(UNI_E);
    ret.append(from_int(expo));
@@ -1445,62 +1461,77 @@ UCS_string mantissa = from_double_fixed_prec(v, fract_digits);
 }
 //----------------------------------------------------------------------------
 UCS_string
-UCS_string::from_double_fixed_prec(APL_Float v, int fract_digits)
+UCS_string::from_double_to_fixed(APL_Float v, int fract_digits)
 {
-UCS_string ret;
+   // fract_digits shall be the number of digitsd AFTER the decimal point
 
+UCS_string ret;
    if (v < 0.0)   { ret.append(UNI_OVERBAR);   v = - v; }
 
-   // in the loop below, there could be rounding errors when casting float
-   // to int. We therefore increase v slighly (by 0.3 of the rounded digit)
-   // to avoid that.
+   // store the integer part of v in ret, leaving the fract part in v.
    //
-   v += 0.03 * pow(10.0, -fract_digits);
-
-   ret.append(from_big(v));   // leaves fractional part of v in v
-
+   ret.append(from_big(v));   // from_big() leaves fractional part of v in v
    ret.append(UNI_FULLSTOP);
 
+   // append one more fractional digit than needed (the last one will be
+   // rounded
    loop(f, fract_digits + 1)
       {
         v = v * 10.0;
-        const int vv = v;   // subject to rounding errors!
+        const int vv = v;
         ret.append(Unicode(UNI_0 + vv));
         v -= vv;
       }
 
+   // round to last digit may increase the length
+const int ret_len = ret.size();
    ret.round_last_digit();
+   while (ret.size() > ret_len)   ret.pop_back();
    return ret;
 }
 //----------------------------------------------------------------------------
 void
 UCS_string::round_last_digit()
 {
-   Assert1(size() > 1);
-   if (back() >= UNI_5)   // round up
+   Assert(size() > 1);
+
+   // if the number ends with digits 0..4 then we simply discard
+   // the trailing digit and return
+   //
+const bool round_down = back() <= UNI_4;   // remember direction
+   pop_back();   // discard the digit that is rounded up or down
+   if (size() && back() == UNI_FULLSTOP)   pop_back();   // trailing .
+
+   Assert(size() > 0);
+   if (round_down)   // round down (= discard last digit)
       {
-        for (int q = size() - 2; q >= 0; --q)
-            {
-              const Unicode cc = at(q);
-              if (cc < UNI_0)   continue;   // not a digit
-              if (cc > UNI_9)   continue;   // not a digit
-
-              at(q) = Unicode(cc + 1);   // round up
-              if (cc != UNI_9)   break;    // 0-8 rounded up: stop
-
-              at(q) = UNI_0;    // 9 rounded up: say 0 and repeat
-              if (q)   continue;   // not first difit
-
-              // something like 9.xxx has been rounded up to, say, 0.xxx
-              // but should be 10.xxx Fix it.
-              //
-              for (int d = size() - 1; d > 0; --d)  at(d) = at(d - 1);
-              at(0) = UNI_1;
-            }
+        return;
       }
 
-   pop_back();
-   if (back() == UNI_FULLSTOP)   pop_back();
+bool carry = true;   // from the rounded up digit
+
+   for (int q = size() - 1; q >= 0; --q)
+       {
+         const Unicode cc = at(q);
+         if (cc < UNI_0)   continue;   // not a digit, e.g. ¯ or .
+         if (cc > UNI_9)   continue;   // not a digit, e.g. ¯ or .
+         if (cc == UNI_9)
+            {
+              at(q) = UNI_0;   // 9 → 0 and keep carry
+            }
+         else
+            {
+              at(q) = Unicode(cc + 1);   // round cc up and clear carry
+              carry = false;
+              break;
+            }
+       }
+
+   if (size() && back() == UNI_FULLSTOP)   pop_back();
+   if (carry)
+      {
+        insert(at(0) == UNI_OVERBAR || at(0) == UNI_MINUS ? 1 : 0, UNI_1);
+      }
 }
 //----------------------------------------------------------------------------
 bool

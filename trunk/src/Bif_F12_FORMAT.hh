@@ -170,15 +170,16 @@ protected:
                                    std::vector<UCS_string> & col_formats);
 
    /// A character array with one column of B formatted by specification
-   static PrintBuffer format_one_col_by_spec(int width, int precision, const Cell * cB,
-                               ShapeItem cols, ShapeItem rows);
+   static PrintBuffer format_one_col_by_spec(int width, int precision,
+                                             const Cell * cB, ShapeItem cols,
+                                             ShapeItem rows);
 
    /// add a row (consisting of \b data) to \b PrintBuffer \b ret
    static void add_row(PrintBuffer & ret, int row, bool has_char, bool has_num,
                 Unicode align_char, UCS_string & data);
 
    /// format value with \b precision mantissa digits (floating format)
-   static UCS_string format_spec_float(APL_Float value, int precision);
+   static UCS_string format_float_by_spec(APL_Float value, int precision);
 };
 //----------------------------------------------------------------------------
 
