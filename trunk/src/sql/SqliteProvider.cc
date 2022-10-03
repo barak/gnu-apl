@@ -21,6 +21,9 @@
 #include "SqliteProvider.hh"
 #include "SqliteConnection.hh"
 
+SqliteProvider::~SqliteProvider()
+{}
+
 static SqliteConnection *create_sqlite_connection( Value_P B )
 {
     if( !B->is_char_string() ) {

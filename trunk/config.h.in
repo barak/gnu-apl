@@ -165,7 +165,7 @@
 /* Define to 1 iff atomic_add_32_nv() is available */
 #undef HAVE_SOLARIS_ATOMIC
 
-/* Have the SQLITE3 library */
+/* Define to 1 if libsqlite3 library is available */
 #undef HAVE_SQLITE3
 
 /* Define to 1 if you have the `sqrt' function. */

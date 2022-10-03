@@ -20,9 +20,10 @@
 
 #include "Provider.hh"
 
-class SqliteProvider : public Provider {
+class SqliteProvider : public Provider
+{
 public:
-    virtual ~SqliteProvider() {}
-    virtual const string get_name( void ) { return "sqlite"; }
-    virtual Connection *open_database( Value_P B );
+    virtual ~SqliteProvider();
+    virtual const string get_name()   { return "sqlite"; }
+    virtual Connection * open_database(Value_P B);
 };

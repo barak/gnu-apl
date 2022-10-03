@@ -18958,46 +18958,6 @@ fi
 
 
 # check if SQLite3 is wanted and installed
-# ===========================================================================
-#      http://www.gnu.org/software/autoconf-archive/ax_lib_sqlite3.html
-# ===========================================================================
-#
-# SYNOPSIS
-#
-#   AX_LIB_SQLITE3([MINIMUM-VERSION])
-#
-# DESCRIPTION
-#
-#   Test for the SQLite 3 library of a particular version (or newer)
-#
-#   This macro takes only one optional argument, required version of SQLite
-#   3 library. If required version is not passed, 3.0.0 is used in the test
-#   of existance of SQLite 3.
-#
-#   If no intallation prefix to the installed SQLite library is given the
-#   macro searches under /usr, /usr/local, and /opt.
-#
-#   This macro calls:
-#
-#     AC_SUBST(SQLITE3_CFLAGS)
-#     AC_SUBST(SQLITE3_LDFLAGS)
-#     AC_SUBST(SQLITE3_VERSION)
-#
-#   And sets:
-#
-#     HAVE_SQLITE3
-#
-# LICENSE
-#
-#   Copyright (c) 2008 Mateusz Loskot <mateusz@loskot.net>
-#
-#   Copying and distribution of this file, with or without modification, are
-#   permitted in any medium without royalty provided the copyright notice
-#   and this notice are preserved. This file is offered as-is, without any
-#   warranty.
-
-#serial 14
-
 
 
 
@@ -19009,11 +18969,9 @@ if test "${with_sqlite3+set}" = set; then :
             WANT_SQLITE3="no"
         elif test "$withval" = "yes"; then
             WANT_SQLITE3="yes"
-            WANT1_SQLITE3="yes"
             ac_sqlite3_path=""
         else
             WANT_SQLITE3="yes"
-            WANT1_SQLITE3="yes"
             ac_sqlite3_path="$withval"
         fi
 
@@ -19055,8 +19013,8 @@ $as_echo_n "checking for SQLite3 library >= $sqlite3_version_req... " >&6; }
                 if test -f "$ac_sqlite3_path_tmp/include/$ac_sqlite3_header" \
                     && test -r "$ac_sqlite3_path_tmp/include/$ac_sqlite3_header"; then
                     ac_sqlite3_path=$ac_sqlite3_path_tmp
-                    ac_sqlite3_cppflags="-I$ac_sqlite3_path_tmp/include"
-                    ac_sqlite3_ldflags="-L$ac_sqlite3_path_tmp/lib"
+                    ac_sqlite3_ldflags="-I$ac_sqlite3_path_tmp/include"
+                    ac_sqlite3_cppflags="-L$ac_sqlite3_path_tmp/lib"
                     break;
                 fi
             done
@@ -19067,11 +19025,11 @@ $as_echo_n "checking for SQLite3 library >= $sqlite3_version_req... " >&6; }
         saved_CPPFLAGS="$CPPFLAGS"
         CPPFLAGS="$CPPFLAGS $ac_sqlite3_cppflags"
 
-        ac_ext=c
-ac_cpp='$CPP $CPPFLAGS'
-ac_compile='$CC -c $CFLAGS $CPPFLAGS conftest.$ac_ext >&5'
-ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
-ac_compiler_gnu=$ac_cv_c_compiler_gnu
+        ac_ext=cpp
+ac_cpp='$CXXCPP $CPPFLAGS'
+ac_compile='$CXX -c $CXXFLAGS $CPPFLAGS conftest.$ac_ext >&5'
+ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $LIBS >&5'
+ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
         cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
@@ -19082,7 +19040,7 @@ main ()
 {
 
 #if (SQLITE_VERSION_NUMBER >= $sqlite3_version_req_number)
-/* Everything is okay */
+// Everything is okay
 #else
 #  error SQLite version is too old
 #endif
@@ -19093,7 +19051,7 @@ main ()
 }
 
 _ACEOF
-if ac_fn_c_try_compile "$LINENO"; then :
+if ac_fn_cxx_try_compile "$LINENO"; then :
 
             { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
@@ -19104,7 +19062,7 @@ else
 
             { $as_echo "$as_me:${as_lineno-$LINENO}: result: not found" >&5
 $as_echo "not found" >&6; }
-            success="no"
+            succees="no"
 
 
 fi
@@ -19132,8 +19090,8 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
                 if test $ac_sqlite3_version != ""; then
                     SQLITE3_VERSION=$ac_sqlite3_version
                 else
-                    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Cannot find SQLITE_VERSION macro in sqlite3.h header to retrieve SQLite version!" >&5
-$as_echo "$as_me: WARNING: Cannot find SQLITE_VERSION macro in sqlite3.h header to retrieve SQLite version!" >&2;}
+                    { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Can not find SQLITE_VERSION macro in sqlite3.h header to retrieve SQLite version!" >&5
+$as_echo "$as_me: WARNING: Can not find SQLITE_VERSION macro in sqlite3.h header to retrieve SQLite version!" >&2;}
                 fi
             fi
 
@@ -19141,7 +19099,8 @@ $as_echo "$as_me: WARNING: Cannot find SQLITE_VERSION macro in sqlite3.h header 
 
 
 
-$as_echo "#define HAVE_SQLITE3 /**/" >>confdefs.h
+$as_echo "#define HAVE_SQLITE3 1" >>confdefs.h
+
 
         fi
     fi

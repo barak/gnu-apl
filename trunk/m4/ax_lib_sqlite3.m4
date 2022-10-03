@@ -1,47 +1,34 @@
-# ===========================================================================
-#      http://www.gnu.org/software/autoconf-archive/ax_lib_sqlite3.html
-# ===========================================================================
-#
-# SYNOPSIS
-#
-#   AX_LIB_SQLITE3([MINIMUM-VERSION])
-#
-# DESCRIPTION
-#
-#   Test for the SQLite 3 library of a particular version (or newer)
-#
-#   This macro takes only one optional argument, required version of SQLite
-#   3 library. If required version is not passed, 3.0.0 is used in the test
-#   of existance of SQLite 3.
-#
-#   If no intallation prefix to the installed SQLite library is given the
-#   macro searches under /usr, /usr/local, and /opt.
-#
-#   This macro calls:
-#
-#     AC_SUBST(SQLITE3_CFLAGS)
-#     AC_SUBST(SQLITE3_LDFLAGS)
-#     AC_SUBST(SQLITE3_VERSION)
-#
-#   And sets:
-#
-#     HAVE_SQLITE3
-#
-# LICENSE
-#
-#   Copyright (c) 2008 Mateusz Loskot <mateusz@loskot.net>
-#
-#   Copying and distribution of this file, with or without modification, are
-#   permitted in any medium without royalty provided the copyright notice
-#   and this notice are preserved. This file is offered as-is, without any
-#   warranty.
-
-#serial 14
+dnl @synopsis AX_LIB_SQLITE3([MINIMUM-VERSION])
+dnl
+dnl Test for the SQLite 3 library of a particular version (or newer)
+dnl
+dnl This macro takes only one optional argument, required version of
+dnl SQLite 3 library. If required version is not passed, 3.0.0 is used
+dnl in the test of existance of SQLite 3.
+dnl
+dnl If no intallation prefix to the installed SQLite library is given
+dnl the macro searches under /usr, /usr/local, and /opt.
+dnl
+dnl This macro calls:
+dnl
+dnl   AC_SUBST(SQLITE3_CFLAGS)
+dnl   AC_SUBST(SQLITE3_LDFLAGS)
+dnl   AC_SUBST(SQLITE3_VERSION)
+dnl
+dnl And sets:
+dnl
+dnl   HAVE_SQLITE3
+dnl
+dnl @category InstalledPackages
+dnl @category Cxx
+dnl @author Mateusz Loskot <mateusz@loskot.net>
+dnl @version 2006-07-15
+dnl @license AllPermissive
 
 AC_DEFUN([AX_LIB_SQLITE3],
 [
     AC_ARG_WITH([sqlite3],
-        AS_HELP_STRING(
+        AC_HELP_STRING(
             [--with-sqlite3=@<:@ARG@:>@],
             [use SQLite 3 library @<:@default=yes@:>@, optionally specify the prefix for sqlite3 library]
         ),
@@ -50,11 +37,9 @@ AC_DEFUN([AX_LIB_SQLITE3],
             WANT_SQLITE3="no"
         elif test "$withval" = "yes"; then
             WANT_SQLITE3="yes"
-            WANT1_SQLITE3="yes"
             ac_sqlite3_path=""
         else
             WANT_SQLITE3="yes"
-            WANT1_SQLITE3="yes"
             ac_sqlite3_path="$withval"
         fi
         ],
@@ -92,8 +77,8 @@ AC_DEFUN([AX_LIB_SQLITE3],
                 if test -f "$ac_sqlite3_path_tmp/include/$ac_sqlite3_header" \
                     && test -r "$ac_sqlite3_path_tmp/include/$ac_sqlite3_header"; then
                     ac_sqlite3_path=$ac_sqlite3_path_tmp
-                    ac_sqlite3_cppflags="-I$ac_sqlite3_path_tmp/include"
-                    ac_sqlite3_ldflags="-L$ac_sqlite3_path_tmp/lib"
+                    ac_sqlite3_ldflags="-I$ac_sqlite3_path_tmp/include"
+                    ac_sqlite3_cppflags="-L$ac_sqlite3_path_tmp/lib"
                     break;
                 fi
             done
@@ -104,13 +89,13 @@ AC_DEFUN([AX_LIB_SQLITE3],
         saved_CPPFLAGS="$CPPFLAGS"
         CPPFLAGS="$CPPFLAGS $ac_sqlite3_cppflags"
 
-        AC_LANG_PUSH(C)
+        AC_LANG_PUSH(C++)
         AC_COMPILE_IFELSE(
             [
             AC_LANG_PROGRAM([[@%:@include <sqlite3.h>]],
                 [[
 #if (SQLITE_VERSION_NUMBER >= $sqlite3_version_req_number)
-/* Everything is okay */
+// Everything is okay
 #else
 #  error SQLite version is too old
 #endif
@@ -124,10 +109,10 @@ AC_DEFUN([AX_LIB_SQLITE3],
             ],
             [
             AC_MSG_RESULT([not found])
-            success="no"
+            succees="no"
             ]
         )
-        AC_LANG_POP(C)
+        AC_LANG_POP([C++])
 
         CPPFLAGS="$saved_CPPFLAGS"
 
@@ -146,15 +131,16 @@ AC_DEFUN([AX_LIB_SQLITE3],
                 if test $ac_sqlite3_version != ""; then
                     SQLITE3_VERSION=$ac_sqlite3_version
                 else
-                    AC_MSG_WARN([Cannot find SQLITE_VERSION macro in sqlite3.h header to retrieve SQLite version!])
+                    AC_MSG_WARN([Can not find SQLITE_VERSION macro in sqlite3.h header to retrieve SQLite version!])
                 fi
             fi
 
             AC_SUBST(SQLITE3_CFLAGS)
             AC_SUBST(SQLITE3_LDFLAGS)
             AC_SUBST(SQLITE3_VERSION)
-            AC_DEFINE([HAVE_SQLITE3], [], [Have the SQLITE3 library])
+            AC_DEFINE([HAVE_SQLITE3], [1], 
+                [Define to 1 if libsqlite3 library is available])
+
         fi
     fi
 ])
-
