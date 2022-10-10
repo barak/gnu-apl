@@ -8,6 +8,7 @@ make		from a GNU mirror (directory: gcc, file: make-?.?.tar.gz)
 If you are using Ubuntu, then the following commands may do the trick:
 
     apt-get install g++
+    apt-get install build-essential
 
 For Fedora:
 

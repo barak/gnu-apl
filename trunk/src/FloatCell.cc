@@ -781,7 +781,7 @@ const APL_Float b = this->dfval();
          else          return FloatCell::zF(Z, b);
       }
 
-   // delegate to A
+   // complex A and float B: delegate to A
    //
    return A->bif_maximum(Z, this);
 }
@@ -800,11 +800,11 @@ const APL_Float b = this->dfval();
    if (A->is_float_cell())
       {
          const APL_Float a = A->get_real_value();
-         if (a <= b)   return IntCell::zI(Z, a);
+         if (a <= b)   return FloatCell::zF(Z, a);
          else          return FloatCell::zF(Z, b);
       }
 
-   // delegate to A
+   // complex A and float B: delegate to A
    //
    return A->bif_minimum(Z, this);
 }
