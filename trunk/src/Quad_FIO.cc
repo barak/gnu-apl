@@ -594,7 +594,8 @@ public:
         next = uni;
       }
 
-   /// scan a long long in a string or in a file
+   /// scan a long long in a string or in a file. Return either 0 or 1 for
+   /// the number of successful conversions.
    int scanf_long_long(const char * fmt, long long * val)
       {
          if (file)
@@ -638,7 +639,8 @@ public:
          return sscanf(cc, fmt, val);
       }
 
-   /// scan a double in string or file
+   /// scan a double in string or file. Return either 0 or 1 for
+   /// the number of successful conversions.
    int scanf_double(const char * fmt, APL_Float * val)
       {
          if (file)
@@ -679,10 +681,10 @@ public:
       }
 
 protected:
-   /// UTF8-encoded source
+   /// UTF8-encoded source file (or 0 for string input)
    FILE * file;
 
-   /// UCS_string source
+   /// UCS_string source (or 0 for file source)
    const UCS_string * string;
 
    /// next character in string
@@ -793,11 +795,11 @@ Unicode lookahead = input.get_next();
              const char fmt[] = { '%', 'l', 'l', char(conv), 0 };
              long long val = 0;
              const int count = input.scanf_long_long(fmt, & val);
+             if (count == 1 && !suppress)   Z->next_ravel_Int(val);
+             else                           goto out;
+
              lookahead = input.get_next();
              if (lookahead == UNI_EOF)   goto out;
-             if (count != 1)   goto out;
-
-             if (!suppress)   Z->next_ravel_Int(val);
            }
         else if (strchr("fFeg", conv))  // float conversion
            {
@@ -805,11 +807,11 @@ Unicode lookahead = input.get_next();
              const char fmt[] = { '%', 'l', char(conv), 0 };
              APL_Float val = 0;
              const int count = input.scanf_double(fmt, &val);
+             if (count == 1 && !suppress)   Z->next_ravel_Float(val);
+             else                           goto out;
+
              lookahead = input.get_next();
              if (lookahead == UNI_EOF)   goto out;
-             if (count != 1)   goto out;
-
-             if (!suppress)   Z->next_ravel_Float(val);
            }
         else if (conv == UNI_c)  // char(s)
            {
@@ -1092,7 +1094,7 @@ Quad_FIO::list_functions(ostream & out, bool mapping)
 "   Zy9←    ⎕FIO[52] Bi    localtime(Bi) Note: Jan 2, 2017 is: 2017 1 2 ...\n"
 "   Zy9←    ⎕FIO[53] Bi    gmtime(Bi)    Note: Jan 2, 2017 is: 2017 1 2 ...\n"
 "   Zi ←    ⎕FIO[54] Bs    chdir(Bs)\n"
-"   Ze ← Af ⎕FIO[55] Bs    sscanf(Bs, As) Af is the format string\n"
+"   Ze ← Af ⎕FIO[55] Bs    sscanf(Bs, Af) Af is the format string\n"
 "   Zs ← As ⎕FIO[56] Bs    write nested lines As to file named Bs\n"
 "   Zh ←    ⎕FIO[57] Bs    fork() and execve(Bs, { Bs, 0}, {0})\n"
 "   Zs ← Af ⎕FIO[58] B     sprintf(Af, B...) As is the format string\n"
