@@ -148,6 +148,9 @@
 /* Define to 1 iff OSAtomicAdd32Barrier() is available */
 /* #undef HAVE_OSX_ATOMIC */
 
+/* Define to 1 if you have the <png.h> header file. */
+#define HAVE_PNG_H 1
+
 /* Define to 1 if PostgreSQL libraries are available */
 #define HAVE_POSTGRESQL 1
 

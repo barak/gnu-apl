@@ -77,19 +77,20 @@ AC_CHECK_HEADERS([  \
     fcntl.h         \
     fftw3.h         \
     inttypes.h      \
+    png.h           \
     stdint.h        \
     stdlib.h        \
     string.h        \
     strings.h       \
     unistd.h        \
+    utmpx.h         \
     sys/un.h        \
     ext/atomicity.h \
     xcb/xcb.h       \
+    zlib.h          \
     X11/Xlib.h      \
     X11/Xlib-xcb.h  \
-    X11/Xutil.h     \
-    utmpx.h]        \
-    zlib.h)
+    X11/Xutil.h])
 
 # xcb/xproto.h needs xcb/xcb.h
 AC_CHECK_HEADER(xcb/xproto.h, [], [], [#include <xcb/xcb.h>])

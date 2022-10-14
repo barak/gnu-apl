@@ -31,6 +31,7 @@
 #include "Error_macros.hh"
 #include "Quad_FFT.hh"
 #include "Quad_GTK.hh"
+#include "Quad_PNG.hh"
 #include "Quad_RE.hh"
 #include "Token.hh"
 
@@ -102,8 +103,7 @@ UCS_string & more = MORE_ERROR() <<
 "\n"
 "\n"
 "and after that, reconfigure, recompile, and reinstall GNU APL:\n\n" 
-"      ./configure    # if the ./configure options were incorrect, or else\n"
-"      ./configure " CONFIGURE_ARGS "\n"
+"      " CONFIGURE_ARGS "\n"
 "      make\n"
 "      sudo make install\n"
 "\n"
@@ -198,4 +198,34 @@ const char * pkgs[] = { "libpcre3-dev", 0 };
    return missing_files("⎕RE", libs, hdrs, pkgs);
 }
 #endif
+//============================================================================
+#if defined( HAVE_GTK3     ) && \
+    defined( HAVE_LIBGTK_3 ) && \
+    defined( HAVE_LIBZ     ) && \
+    defined( HAVE_ZLIB_H   ) && \
+    defined( HAVE_LIBPNG   ) && \
+    defined ( HAVE_PNG_H   )
+
+ // OK, Quad_PNG::eval_AB() and Quad_PNG::eval_B() are defined in Quad_PNG.cc
+
+#else
+
+Token
+Quad_PNG::eval_AB(Value_P A, Value_P B) const
+{ return eval_B(B); }
+
+Token
+Quad_PNG::eval_B(Value_P B) const
+{
+const char * libs[] = { "libpng.so",  "libgtk-3.so",  0 };
+const char * hdrs[] = { "png.h",      "gtk/gtk.h",    0 };
+const char * pkgs[] = { "libpng-dev", "libgtk-3-dev", 0 };
+
+   return missing_files("⎕PNG", libs, hdrs, pkgs);
+}
+
+Quad_PNG::Quad_PNG() : QuadFunction(TOK_Quad_PNG)   {}
+Quad_PNG::~Quad_PNG()   {}
+
+#endif   // ! (HAVE_LIBPNG && HAVE_PNG_H)
 //============================================================================
