@@ -718,9 +718,9 @@ const char * pkgs[] = { "libgtk-3-dev", 0 };
    return missing_files("⎕GTK", libs, hdrs, pkgs);
 }
 
-Token Quad_GTK::eval_AB(Value_P A, Value_P B) const             { eval_B(B); }
-Token Quad_GTK::eval_AXB(Value_P A, Value_P X, Value_P B) const { eval_B(B); }
-Token Quad_GTK::eval_XB(Value_P X, Value_P B) const             { eval_B(B); }
+Token Quad_GTK::eval_AB(Value_P A, Value_P B) const        { return eval_B(B); }
+Token Quad_GTK::eval_AXB(Value_P A, Value_P X, Value_P B) const { return eval_B(B); }
+Token Quad_GTK::eval_XB(Value_P X, Value_P B) const        { return eval_B(B); }
 void Quad_GTK::clear() { }
 
 #endif   // HAVE_GTK3

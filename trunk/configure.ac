@@ -113,13 +113,17 @@ AC_DEFINE_UNQUOTED([CONFIGURE_ARGS],
 
 ##############################################################################
 #
-# Various checks for library functions. We use inverse alphabetic order although
-# the order should be least-dependent to most-dependent (or vice versa?). The
-# checks that come earlier in this file come later on the linker command line.
+# Various checks for library functions. We use inverse alphabetical order
+# although the order should be least-dependent to most-dependent (or vice
+# versa?). The checks that come earlier in this file come later on the linker
+# command line.
 #
-# That is, if e.g. lib_A requires lib_B, then the linker command line should be
-# ... lib_A ... lib_B   and the test for lib_B should come before the test for
-# lib_A in this file.
+# That is, if e.g. lib_A requires lib_B, then the linker command line should
+# be # ... lib_A ... lib_B and the test for lib_B should come before the test
+# for lib_A in this file.
+#
+# Most libraries are not dependent and in that case we use the alphabetical
+# order as to improve the reability of the linker command
 #
 ##############################################################################
 
