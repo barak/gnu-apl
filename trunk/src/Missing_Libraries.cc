@@ -18,31 +18,17 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-/* This file contains eval_XXX() functions that are (conditionally) compiled
-   only if their corresponding real functions (with the same name) could not
-   be compiled because some library or header file could not be found by
-   ./configure, i.e. before compliling GNU APL.
-
-   All such functions in this file add some more information to )MORE and then
-   raise a SYNTAX ERROR.
- */
-
 #include "Common.hh"
 #include "Error_macros.hh"
-#include "Quad_FFT.hh"
-#include "Quad_GTK.hh"
-#include "Quad_PNG.hh"
-#include "Quad_RE.hh"
 #include "Token.hh"
 
-/// a generic function for all ⎕XXX errors. Declared extern (rather than
-/// static) to avoid -Wunused-function warnings.
-extern Token missing_files(const char * qfun,
-                           const char ** libs,
-                           const char ** hdrs,
-                           const char ** pkgs);
+extern Token missing_files(const char * qfun,  const char ** libs,
+                           const char ** hdrs, const char ** pkgs);
 
 //============================================================================
+/// a generic function for all ⎕XXX errors caused by missing libraries.
+/// Declared extern (rather than /// static) to avoid -Wunused-function
+/// warnings.
 Token
 missing_files(const char * qfun,   // the function, e.g. "⎕RE"
               const char ** libs,  // the required libraries
@@ -113,119 +99,4 @@ UCS_string & more = MORE_ERROR() <<
    SYNTAX_ERROR;
    return Token();
 }
-//============================================================================
-//============================================================================
-#if ! (defined(HAVE_LIBFFTW3) && defined(HAVE_FFTW3_H))
-
-Token
-Quad_FFT::eval_B(Value_P B) const
-{
-const char * libs[] = { "libfftw3.so",   0 };
-const char * hdrs[] = { "fftw3.h",      0 };
-const char * pkgs[] = { "libfftw3-dev", 0 };
-
-   return missing_files("⎕FFT", libs, hdrs, pkgs);
-}
-//----------------------------------------------------------------------------
-Token
-Quad_FFT::eval_AB(Value_P A, Value_P B) const
-{
-const char * libs[] = { "libfftw3.so",   0 };
-const char * hdrs[] = { "fftw3.h",      0 };
-const char * pkgs[] = { "libfftw3-dev", 0 };
-
-   return missing_files("⎕FFT", libs, hdrs, pkgs);
-}
-#endif
-//============================================================================
-#if ! HAVE_GTK3
-
-Token
-Quad_GTK::eval_AB(Value_P A, Value_P B) const
-{
-const char * libs[] = { "libgtk-3.so",  0 };
-const char * hdrs[] = { "gtk/gtk.h",    0 };
-const char * pkgs[] = { "libgtk-3-dev", 0 };
-
-   return missing_files("⎕GTK", libs, hdrs, pkgs);
-}
-//----------------------------------------------------------------------------
-Token
-Quad_GTK::eval_B(Value_P B) const
-{
-const char * libs[] = { "libgtk-3.so",  0 };
-const char * hdrs[] = { "gtk/gtk.h",    0 };
-const char * pkgs[] = { "libgtk-3-dev", 0 };
-
-   return missing_files("⎕GTK", libs, hdrs, pkgs);
-}
-//----------------------------------------------------------------------------
-Token
-Quad_GTK::eval_AXB(Value_P A, Value_P X, Value_P B) const
-{
-const char * libs[] = { "libgtk-3.so",  0 };
-const char * hdrs[] = { "gtk/gtk.h",    0 };
-const char * pkgs[] = { "libgtk-3-dev", 0 };
-
-   return missing_files("⎕GTK", libs, hdrs, pkgs);
-}
-//----------------------------------------------------------------------------
-Token
-Quad_GTK::eval_XB(Value_P X, Value_P B) const
-{
-const char * libs[] = { "libgtk-3.so",  0 };
-const char * hdrs[] = { "gtk/gtk.h",    0 };
-const char * pkgs[] = { "libgtk-3-dev", 0 };
-
-   return missing_files("⎕GTK", libs, hdrs, pkgs);
-}
-//----------------------------------------------------------------------------
-void
-Quad_GTK::clear()
-{
-}
-//----------------------------------------------------------------------------
-#endif   // ! HAVE_GTK3
-//============================================================================
-#ifndef HAVE_LIBPCRE2_32
-Token
-Quad_RE::eval_AXB(Value_P A, Value_P X, Value_P B) const
-{
-const char * libs[] = { "libpcre.so",   0 };
-const char * hdrs[] = { "pcre2.h",      0 };
-const char * pkgs[] = { "libpcre3-dev", 0 };
-
-   return missing_files("⎕RE", libs, hdrs, pkgs);
-}
-#endif
-//============================================================================
-#if defined( HAVE_GTK3     ) && \
-    defined( HAVE_LIBGTK_3 ) && \
-    defined( HAVE_LIBZ     ) && \
-    defined( HAVE_ZLIB_H   ) && \
-    defined( HAVE_LIBPNG   ) && \
-    defined ( HAVE_PNG_H   )
-
- // OK, Quad_PNG::eval_AB() and Quad_PNG::eval_B() are defined in Quad_PNG.cc
-
-#else
-
-Token
-Quad_PNG::eval_AB(Value_P A, Value_P B) const
-{ return eval_B(B); }
-
-Token
-Quad_PNG::eval_B(Value_P B) const
-{
-const char * libs[] = { "libpng.so",  "libgtk-3.so",  0 };
-const char * hdrs[] = { "png.h",      "gtk/gtk.h",    0 };
-const char * pkgs[] = { "libpng-dev", "libgtk-3-dev", 0 };
-
-   return missing_files("⎕PNG", libs, hdrs, pkgs);
-}
-
-Quad_PNG::Quad_PNG() : QuadFunction(TOK_Quad_PNG)   {}
-Quad_PNG::~Quad_PNG()   {}
-
-#endif   // ! (HAVE_LIBPNG && HAVE_PNG_H)
 //============================================================================

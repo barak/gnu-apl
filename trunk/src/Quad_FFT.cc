@@ -299,9 +299,24 @@ ShapeItem rlen = 1;
 
          rlen *= axis_len;
        }
-
 }
-//----------------------------------------------------------------------------
+
+#else
+
+extern Token missing_files(const char * qfun,  const char ** libs,
+                           const char ** hdrs, const char ** pkgs);
+
+Token Quad_FFT::eval_AB(Value_P A, Value_P B) const { return eval_B(B); }
+
+Token
+Quad_FFT::eval_B(Value_P B) const
+{
+const char * libs[] = { "libfftw3.so",   0 };
+const char * hdrs[] = { "fftw3.h",      0 };
+const char * pkgs[] = { "libfftw3-dev", 0 };
+
+   return missing_files("⎕FFT", libs, hdrs, pkgs);
+}
 
 #endif // defined(HAVE_LIBFFTW3) && defined(HAVE_FFTW3_H)
 

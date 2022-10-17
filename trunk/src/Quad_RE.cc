@@ -408,6 +408,20 @@ Value_P Z(shape, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
-//----------------------------------------------------------------------------
 
-#endif
+#else // ! HAVE_LIBPCRE2_32
+
+extern Token missing_files(const char * qfun,  const char ** libs,
+                           const char ** hdrs, const char ** pkgs);
+
+Token
+Quad_RE::eval_AXB(Value_P A, Value_P X, Value_P B) const
+{
+const char * libs[] = { "libpcre.so",   0 };
+const char * hdrs[] = { "pcre2.h",      0 };
+const char * pkgs[] = { "libpcre3-dev", 0 };
+
+   return missing_files("⎕RE", libs, hdrs, pkgs);
+}
+
+#endif   // HAVE_LIBPCRE2_32

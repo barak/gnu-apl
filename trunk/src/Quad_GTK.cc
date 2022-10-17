@@ -702,6 +702,26 @@ window_entry we = { fd };
    open_windows.push_back(we);
    return fd;
 }
-//----------------------------------------------------------------------------
+
+#else   // ! HAVE_GTK3
+
+extern Token missing_files(const char * qfun,  const char ** libs,
+                           const char ** hdrs, const char ** pkgs);
+
+Token
+Quad_GTK::eval_B(Value_P B) const
+{
+const char * libs[] = { "libgtk-3.so",  0 };
+const char * hdrs[] = { "gtk/gtk.h",    0 };
+const char * pkgs[] = { "libgtk-3-dev", 0 };
+
+   return missing_files("⎕GTK", libs, hdrs, pkgs);
+}
+
+Token Quad_GTK::eval_AB(Value_P A, Value_P B) const             { eval_B(B); }
+Token Quad_GTK::eval_AXB(Value_P A, Value_P X, Value_P B) const { eval_B(B); }
+Token Quad_GTK::eval_XB(Value_P X, Value_P B) const             { eval_B(B); }
+void Quad_GTK::clear() { }
+
 #endif   // HAVE_GTK3
 
