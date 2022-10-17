@@ -152,92 +152,14 @@ AC_CHECK_LIB([c],         [initstate_r])
 AC_CHECK_LIB([png],       [png_init_io])
 AC_CHECK_LIB([atomicity], [__atomic_fetch_add_4])
 
-# check if SQLite3 is wanted and installed
-m4_include([m4/ax_lib_sqlite3.m4])            AX_LIB_SQLITE3([])
-if test "x$WANT1_SQLITE3" = "xyes"; then
-   AC_DEFINE_UNQUOTED([REALLY_WANT_SQLITE3], [1],
-                      [./configure with --with-sqlite3])
-fi
+echo
+echo "   *** checks for optional libraries ... ***"
+echo
 
-
-# check if PostgreSQL is wanted and installed
-m4_include([m4/ax_lib_postgresql.m4])         AX_LIB_POSTGRESQL([])
-if test "x$want1_postgresql" = "xyes"; then
-   AC_DEFINE_UNQUOTED([REALLY_WANT_PostgreSQL], [1],
-                      [./configure with --with-postgresql])
-fi
-
-# check if PostgreSQL is usable (if present)
-if test "x$found_postgresql" = "xyes" ; then
-    AC_MSG_CHECKING([for PostgreSQL usability])
-    saved_CPPFLAGS="$CPPFLAGS"
-    CPPFLAGS="$CPPFLAGS $POSTGRESQL_CFLAGS"
-    AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[@%:@include <libpq-fe.h>]],
-                      [[PGconn *db = PQconnectdbParams( 0, 0, 1 );]])],
-                      [USABLE_PostgreSQL=yes],
-                      [USABLE_PostgreSQL=no])
-
-    CPPFLAGS="$saved_CPPFLAGS"
-    AC_MSG_RESULT([$USABLE_PostgreSQL])
-    if test "x$USABLE_PostgreSQL" = "xyes"; then
-        AC_DEFINE_UNQUOTED([USABLE_PostgreSQL], [1], [PostgreSQL code compiles])
-    fi
-fi
-
-# check if libpcre is installed
-m4_include([m4/ax_path_lib_pcre.m4])
-   AX_PATH_LIB_PCRE([])
-AM_CONDITIONAL(HAVE_LIBPCRE2_32,
-               test "x$ac_cv_lib_pcre2_32_pcre2_compile_32" = xyes)
-
-################################# GTK3 check #################################
-#
-AC_ARG_WITH([gtk3],
-    AS_HELP_STRING([--with-gtk3],
-    [enable ⎕GTK (interface to GTK+ version 3; needs libgtk-3 and more)]))
-
-HAVE_gtk3=no
-AC_SUBST(GTK_LDFLAGS)
-AC_SUBST(GTK_CFLAGS)
-GTK_LDFLAGS=
-GTK_CFLAGS=
-AC_MSG_CHECKING([whether support for ⎕GTK (needs GTK version 3) is desired])
-if test "x$with_gtk3" = "xno"       # user has explicitly disabled GTK
-then
-    AC_MSG_RESULT([no - (user has explicitly disabled ⎕GTK)])
-else
-    # user wants ⎕GTK)
-    AC_MSG_RESULT([yes])
-
-    AC_PATH_PROG(PKG_CONFIG, pkg-config, no)  # locate pkg-config
-    if test x$PKG_CONFIG != xno
-    then
-        AC_MSG_CHECKING([if package gtk+-3.0 is installed])
-        if $PKG_CONFIG --exists gtk+-3.0
-        then
-            AC_MSG_RESULT([yes])
-            GTK_CFLAGS=`$PKG_CONFIG --cflags gtk+-3.0`
-            GTK_LDFLAGS=`$PKG_CONFIG --libs gtk+-3.0`
-            HAVE_gtk3=yes
-        else
-            AC_MSG_RESULT([no])
-            HAVE_gtk3=no
-        fi
-    else
-        AC_MSG_RESULT([no (cannot use GTK without pkg-config)])
-        HAVE_gtk3=no
-    fi
-fi
-
-# make HAVE_GTK3 visible in Makefile.am
-AM_CONDITIONAL(HAVE_GTK3, test "x$HAVE_gtk3" = xyes)
-
-# make HAVE_GTK3 visible im config.h
-if test "x$HAVE_gtk3" = xyes; then
-   AC_DEFINE_UNQUOTED(HAVE_GTK3, [1], [GTK+ version 3 installed])
-else
-   AC_DEFINE_UNQUOTED(HAVE_GTK3, [0], [GTK+ version 3 NOT installed])
-fi
+m4_include([m4/check_SQLITE.m4])
+m4_include([m4/check_POSTGRES.m4])
+m4_include([m4/check_PCRE.m4])
+m4_include([m4/check_GTK.m4])
 
 ################################# rdtsc check ################################
 # check if rdtsc (read CPU cycle counter is available.
@@ -365,7 +287,6 @@ AC_COMPILE_IFELSE(
     ],
     [HAVE_SOLARIS_ATOMIC=no])
 AC_MSG_RESULT([$HAVE_SOLARIS_ATOMIC])
-
 
 echo
 echo "   *** decisions made by the user ... ***"

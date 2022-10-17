@@ -61,7 +61,7 @@
 /* Define to 1 iff the OS has gettimeofday() */
 #define HAVE_GETTIMEOFDAY 1
 
-/* GTK+ version 3 NOT installed */
+/* GTK+ version 3 installed */
 #define HAVE_GTK3 1
 
 /* Define to 1 if you have the <inttypes.h> header file. */

@@ -17796,13 +17796,17 @@ _ACEOF
 
 ##############################################################################
 #
-# Various checks for library functions. We use inverse alphabetic order although
-# the order should be least-dependent to most-dependent (or vice versa?). The
-# checks that come earlier in this file come later on the linker command line.
+# Various checks for library functions. We use inverse alphabetical order
+# although the order should be least-dependent to most-dependent (or vice
+# versa?). The checks that come earlier in this file come later on the linker
+# command line.
 #
-# That is, if e.g. lib_A requires lib_B, then the linker command line should be
-# ... lib_A ... lib_B   and the test for lib_B should come before the test for
-# lib_A in this file.
+# That is, if e.g. lib_A requires lib_B, then the linker command line should
+# be # ... lib_A ... lib_B and the test for lib_B should come before the test
+# for lib_A in this file.
+#
+# Most libraries are not dependent and in that case we use the alphabetical
+# order as to improve the reability of the linker command
 #
 ##############################################################################
 
@@ -18958,7 +18962,13 @@ _ACEOF
 fi
 
 
+echo
+echo "   *** checks for optional libraries ... ***"
+echo
+
+
 # check if SQLite3 is wanted and installed
+
 
 
 
@@ -19107,6 +19117,7 @@ $as_echo "#define HAVE_SQLITE3 1" >>confdefs.h
         fi
     fi
 
+
 if test "x$WANT1_SQLITE3" = "xyes"; then
 
 cat >>confdefs.h <<_ACEOF
@@ -19114,6 +19125,7 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
 fi
+
 
 
 # check if PostgreSQL is wanted and installed
@@ -19353,6 +19365,8 @@ _ACEOF
     fi
 fi
 
+
+
 # check if libpcre is installed
 # ===========================================================================
 #     https://www.gnu.org/software/autoconf-archive/ax_path_lib_pcre.html
@@ -19539,6 +19553,8 @@ else
 fi
 
 
+
+
 ################################# GTK3 check #################################
 #
 
@@ -19628,7 +19644,7 @@ $as_echo "no (cannot use GTK without pkg-config)" >&6; }
     fi
 fi
 
-# make HAVE_GTK3 visible in Makefile.am
+# export HAVE_GTK3 to Makefile
  if test "x$HAVE_gtk3" = xyes; then
   HAVE_GTK3_TRUE=
   HAVE_GTK3_FALSE='#'
@@ -19638,20 +19654,16 @@ else
 fi
 
 
-# make HAVE_GTK3 visible im config.h
+# export HAVE_GTK3 to config.h
 if test "x$HAVE_gtk3" = xyes; then
 
 cat >>confdefs.h <<_ACEOF
 #define HAVE_GTK3 1
 _ACEOF
 
-else
-
-cat >>confdefs.h <<_ACEOF
-#define HAVE_GTK3 0
-_ACEOF
-
 fi
+
+
 
 ################################# rdtsc check ################################
 # check if rdtsc (read CPU cycle counter is available.
@@ -19933,7 +19945,6 @@ fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $HAVE_SOLARIS_ATOMIC" >&5
 $as_echo "$HAVE_SOLARIS_ATOMIC" >&6; }
-
 
 echo
 echo "   *** decisions made by the user ... ***"

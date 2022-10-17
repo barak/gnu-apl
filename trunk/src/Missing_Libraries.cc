@@ -88,12 +88,15 @@ UCS_string & more = MORE_ERROR() <<
         more <<
 "\n"
 "\n"
-"and after that, reconfigure, recompile, and reinstall GNU APL:\n\n" 
+"and, after that, reconfigure, recompile, and reinstall GNU APL:\n\n" 
 "      " CONFIGURE_ARGS "\n"
 "      make\n"
 "      sudo make install\n"
 "\n"
-"in the top-level directory of the GNU APL package.\n";
+"in the top-level directory of the GNU APL package. On GNU/Linux distros\n"
+"other than Debian, the package manager may not be apt, and the name of the\n"
+"may also differ slightly. Always use the -dev variant of the package (which\n"
+"also contains the required header files).\n";
       }
 
    SYNTAX_ERROR;
