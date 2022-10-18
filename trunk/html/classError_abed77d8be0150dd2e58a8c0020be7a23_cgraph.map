@@ -1,0 +1,4 @@
+<map id="Error::is_syntax_or_value_error" name="Error::is_syntax_or_value_error">
+<area shape="rect" id="node1" title="return true iff error_code is some SYNTAX ERROR or VALUE ERROR" alt="" coords="5,5,137,45"/>
+<area shape="rect" id="node2" href="$classError.html#a33ba37d70f5a977c648c23c72f0d7706" title="return the major class (⎕ET) of the error" alt="" coords="185,13,308,38"/>
+</map>

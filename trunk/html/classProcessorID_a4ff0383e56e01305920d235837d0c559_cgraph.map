@@ -1,0 +1,4 @@
+<map id="ProcessorID::read_network_profile" name="ProcessorID::read_network_profile">
+<area shape="rect" id="node1" title="read the network profile file from its default location" alt="" coords="5,29,187,69"/>
+<area shape="rect" id="node2" href="$classLibPaths.html#a3aa488a8671b0aed624c2f8351eca950" title="return the path (directory) of the APL interpreter binary" alt="" coords="235,37,421,62"/>
+</map>

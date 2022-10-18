@@ -1,0 +1,5 @@
+<map id="Backtrace::show_item" name="Backtrace::show_item">
+<area shape="rect" id="node1" title="show one item in the backtrace" alt="" coords="5,5,157,31"/>
+<area shape="rect" id="node2" href="$classBacktrace.html#a07bdcf0cb769b764a3c6fc9b0ab74894" title="find the source for PC pc" alt="" coords="205,5,340,31"/>
+<area shape="rect" id="node3" href="$classBacktrace.html#a76c5fe0d5b88ac892b378660f6ff4feb" title="compare PCs (helper for binary search)" alt="" coords="388,5,523,31"/>
+</map>

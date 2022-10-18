@@ -1,0 +1,7 @@
+<map id="Symbol::get_first_cell" name="Symbol::get_first_cell">
+<area shape="rect" id="node1" title="return the first Cell of this value without creating a value" alt="" coords="184,80,332,105"/>
+<area shape="rect" id="node2" href="$classQuad__CT.html#a53c2280efa195cd06b9e22955a3aa685" title="return the current comparison tolerance. MUST NOT CALL get_apl_value() because it can be called from ..." alt="" coords="7,5,134,31"/>
+<area shape="rect" id="node3" href="$classQuad__IO.html#a2024913a565c06a217ecca3ea5481b66" title="Return the current index origin. MUST NOT CALL get_apl_value() because it can be called from parallel..." alt="" coords="9,55,132,80"/>
+<area shape="rect" id="node4" href="$classQuad__PP.html#a014f2cc017c535845efbf300695a8e7c" title="Return the current print precision. MUST NOT CALL get_apl_value() because it can be called from paral..." alt="" coords="7,104,134,129"/>
+<area shape="rect" id="node5" href="$classQuad__PW.html#acf1abdf3ee9c51e71f52a78e14187bc9" title="return the current ⎕PW. MUST NOT CALL get_apl_value() because it can be called from parallel Cell fun..." alt="" coords="5,153,136,179"/>
+</map>

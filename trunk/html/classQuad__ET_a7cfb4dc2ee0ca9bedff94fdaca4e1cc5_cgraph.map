@@ -1,0 +1,8 @@
+<map id="Quad_ET::get_apl_value" name="Quad_ET::get_apl_value">
+<area shape="rect" id="node1" title="overloaded Symbol::get_apl_value()." alt="" coords="5,112,171,137"/>
+<area shape="rect" id="node2" href="$classError.html#a33ba37d70f5a977c648c23c72f0d7706" title="return the major class (⎕ET) of the error" alt="" coords="231,5,353,31"/>
+<area shape="rect" id="node3" href="$classError.html#a3f6880790017e4919b5eb872281802af" title="return the category (⎕ET) of the error" alt="" coords="231,55,353,80"/>
+<area shape="rect" id="node4" href="$classUserFunction__header.html#a02e0fedf3b2ad3d50a2d3903bb9be6f9" title="return error if header was not parsed successfully" alt="" coords="219,105,365,145"/>
+<area shape="rect" id="node5" href="$classStateIndicator.html#a44d07945c56abef5505efcfdc98ec090" title="return the SI that has called this one" alt="" coords="227,169,357,209"/>
+<area shape="rect" id="node6" href="$classWorkspace.html#a8083efc2d51067edb25ae8dd4f014173" title="the top of the SI stack (the SI pushed last)" alt="" coords="225,233,359,259"/>
+</map>

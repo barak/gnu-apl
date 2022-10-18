@@ -1,0 +1,11 @@
+<map id="Quad_JSON::comma_count" name="Quad_JSON::comma_count">
+<area shape="rect" id="node1" title="return the number of name&#45;separators or value&#45;separators at the top&#45;level of the object or array star..." alt="" coords="1333,171,1520,196"/>
+<area shape="rect" id="node2" href="$classQuad__JSON.html#ad6c1178f70936d2d153b1581e28e8d52" title="parse a JSON array: [ value (, value)* ] and increment token0 along the way." alt="" coords="1113,117,1285,143"/>
+<area shape="rect" id="node9" href="$classQuad__JSON.html#a089835d5e18fc87f25971bb49046ae88" title="parse a JSON object: { member ( , member)* } and increment token0" alt="" coords="425,145,604,171"/>
+<area shape="rect" id="node3" href="$classQuad__JSON.html#a1e973192b2dccc89283c8ba4697923fc" title="parse a JSON value (false, null, true, object, array, number, or string) and increment along the way." alt="" coords="891,117,1065,143"/>
+<area shape="rect" id="node4" href="$classQuad__JSON.html#ae101226211d05605bee074e4d3a66f8e" title="convert JSON string to APL associative array" alt="" coords="652,31,843,56"/>
+<area shape="rect" id="node8" href="$classQuad__JSON.html#af9e8ac641cd521e54d250971dd66e0b4" title="parse a JSON object member: &quot;name&quot; : value , ; and increment token0 along the way." alt="" coords="658,81,837,121"/>
+<area shape="rect" id="node5" href="$classQuad__JSON.html#a7488f4e12a005de36c3fa9887e4909e5" title="overloaded Function::eval_B()" alt="" coords="443,31,587,56"/>
+<area shape="rect" id="node6" href="$classQuad__JSON.html#a2ed44b39f5d092ab5f7e1768c6b8615a" title="return JSON file (&#45;name in B) converted to APL structured value" alt="" coords="207,5,377,31"/>
+<area shape="rect" id="node7" href="$classQuad__JSON.html#a3adb4fba903343bf38b0c3a1dd10feb8" title="overloaded Function::eval_B()" alt="" coords="5,31,159,56"/>
+</map>

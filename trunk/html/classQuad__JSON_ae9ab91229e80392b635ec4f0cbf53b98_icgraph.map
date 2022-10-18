@@ -1,0 +1,13 @@
+<map id="Quad_JSON::decode_UUUU" name="Quad_JSON::decode_UUUU">
+<area shape="rect" id="node1" title="decode a \uUUUU sequence, return non&#45;Unicode_0 on success and increment b, b, or else return Unicode_..." alt="" coords="1551,82,1744,107"/>
+<area shape="rect" id="node2" href="$classQuad__JSON.html#a37c48107838296678bbb4b89e3567df8" title="parse a JSON string" alt="" coords="1113,57,1288,82"/>
+<area shape="rect" id="node11" href="$classQuad__JSON.html#abe2edc1ebe777b57e9221b509fa53252" title="skip the string literal that starts at ucs_B[b]. Return the content length an increment b...." alt="" coords="1336,107,1503,133"/>
+<area shape="rect" id="node3" href="$classQuad__JSON.html#a1e973192b2dccc89283c8ba4697923fc" title="parse a JSON value (false, null, true, object, array, number, or string) and increment along the way." alt="" coords="891,55,1065,81"/>
+<area shape="rect" id="node4" href="$classQuad__JSON.html#ae101226211d05605bee074e4d3a66f8e" title="convert JSON string to APL associative array" alt="" coords="652,141,843,166"/>
+<area shape="rect" id="node8" href="$classQuad__JSON.html#ad6c1178f70936d2d153b1581e28e8d52" title="parse a JSON array: [ value (, value)* ] and increment token0 along the way." alt="" coords="661,26,833,51"/>
+<area shape="rect" id="node9" href="$classQuad__JSON.html#af9e8ac641cd521e54d250971dd66e0b4" title="parse a JSON object member: &quot;name&quot; : value , ; and increment token0 along the way." alt="" coords="658,76,837,116"/>
+<area shape="rect" id="node5" href="$classQuad__JSON.html#a7488f4e12a005de36c3fa9887e4909e5" title="overloaded Function::eval_B()" alt="" coords="443,141,587,166"/>
+<area shape="rect" id="node6" href="$classQuad__JSON.html#a2ed44b39f5d092ab5f7e1768c6b8615a" title="return JSON file (&#45;name in B) converted to APL structured value" alt="" coords="207,115,377,141"/>
+<area shape="rect" id="node7" href="$classQuad__JSON.html#a3adb4fba903343bf38b0c3a1dd10feb8" title="overloaded Function::eval_B()" alt="" coords="5,141,159,166"/>
+<area shape="rect" id="node10" href="$classQuad__JSON.html#a089835d5e18fc87f25971bb49046ae88" title="parse a JSON object: { member ( , member)* } and increment token0" alt="" coords="425,30,604,55"/>
+</map>

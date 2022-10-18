@@ -1,0 +1,6 @@
+<map id="FloatCell::equal" name="FloatCell::equal">
+<area shape="rect" id="node1" title="Overloaded Cell::equal()." alt="" coords="5,42,119,67"/>
+<area shape="rect" id="node2" href="$classFloatCell.html#a59ae608bcfefddbbe174d95796eb129c" title="Overloaded Cell::get_real_value()." alt="" coords="175,5,303,45"/>
+<area shape="rect" id="node4" href="$classCell.html#acc03ae0226f88b85fcf8bed44f7c2c07" title="ISO p.19: return true if real A is tolerantly equal to real B within C." alt="" coords="167,70,311,95"/>
+<area shape="rect" id="node3" href="$classFloatCell.html#afa1a46cfd36a3c2166559f7d425f094d" title="return the value of this cell as a double (even if the value is rational)" alt="" coords="359,13,469,38"/>
+</map>

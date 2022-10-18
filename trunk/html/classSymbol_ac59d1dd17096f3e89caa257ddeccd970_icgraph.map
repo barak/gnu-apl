@@ -1,0 +1,8 @@
+<map id="Symbol::clear_vs" name="Symbol::clear_vs">
+<area shape="rect" id="node1" title="clear the value stack of this symbol" alt="" coords="827,42,949,67"/>
+<area shape="rect" id="node2" href="$classSymbolTable.html#a63125005c7124354304526f8d63d188f" title="erase one symbol, return true on error, false on success" alt="" coords="640,5,779,45"/>
+<area shape="rect" id="node6" href="$classSymbol.html#a0f129c4040fac10b29e9e9a3cddb2e69" title="destructor" alt="" coords="646,70,773,95"/>
+<area shape="rect" id="node3" href="$classSymbolTable.html#aa20ff3f01e0b8558455dd750f9f19cc3" title="erase symbols from this SymbolTable" alt="" coords="453,5,592,45"/>
+<area shape="rect" id="node4" href="$classWorkspace.html#a28f04b4a3bfcdc52f82d24c060475c61" title="erase the symbols in symbols from the symbol table" alt="" coords="221,13,405,38"/>
+<area shape="rect" id="node5" href="$classCommand.html#a11ccda9c4eea7546be450e30a029650a" title=")ERASE: erase symbols" alt="" coords="5,13,173,38"/>
+</map>

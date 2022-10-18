@@ -1,0 +1,5 @@
+<map id="Quad_PS::get_print_quotients" name="Quad_PS::get_print_quotients">
+<area shape="rect" id="node2" href="$classSystemVariable.html#aa9fb9f055069da325c93333df6e04b5b" title="overloaded Symbol::assign(). " alt="" coords="189,5,349,32"/>
+<area shape="rect" id="node4" href="$classSystemVariable.html#abda1cc368360f2275e193dbf31f6dc01" title="overloaded Symbol::assign_indexed(). " alt="" coords="189,57,349,98"/>
+<area shape="rect" id="node3" href="$classNamedObject.html#a3ff29d3b8f3eed6c55f535e1af8dbc91" title="return the Id of this object (ID_USER_SYMBOL for user defined objects) " alt="" coords="397,35,544,61"/>
+</map>

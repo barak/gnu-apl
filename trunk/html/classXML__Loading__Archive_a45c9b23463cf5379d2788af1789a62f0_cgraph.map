@@ -1,0 +1,6 @@
+<map id="XML_Loading_Archive::read_vids" name="XML_Loading_Archive::read_vids">
+<area shape="rect" id="node1" title="read vids of top&#45;level variables" alt="" coords="5,37,157,77"/>
+<area shape="rect" id="node2" href="$classXML__Loading__Archive.html#a3ea748a15d0a90fe9a32c362b14da7fd" title="read an entire workspace, throw DOMAIN_ERROR on failure" alt="" coords="205,5,357,45"/>
+<area shape="rect" id="node3" href="$classXML__Loading__Archive.html#a2dce39a2eb0bb8bc55d0306606bb86d6" title="reset archive to the start position" alt="" coords="205,69,357,109"/>
+<area shape="rect" id="node4" href="$classXML__Loading__Archive.html#a987f28e4f3139e5f1c96913468ea3057" title="move to next tag, return true if EOF" alt="" coords="405,69,557,109"/>
+</map>

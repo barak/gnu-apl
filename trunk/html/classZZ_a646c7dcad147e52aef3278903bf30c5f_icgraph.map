@@ -1,0 +1,6 @@
+<map id="ZZ::real" name="ZZ::real">
+<area shape="rect" id="node1" title="return the real part of this" alt="" coords="148,55,215,80"/>
+<area shape="rect" id="node2" href="$classDZ.html#a3d3aef9f67edc14d3331de321e99eada" title="return z conjugated" alt="" coords="10,5,95,31"/>
+<area shape="rect" id="node3" href="$classDZ.html#a8c1c8736b366ffefc84e47bb9afbf96d" title="return the real part of x" alt="" coords="5,55,100,80"/>
+<area shape="rect" id="node4" href="$classDZ.html#a104002b2b9b8e1796d6546d428e5d1c7" title="return the inverse of zz" alt="" coords="20,104,85,129"/>
+</map>

@@ -1,0 +1,13 @@
+<map id="Quad_FIO::do_sprintf" name="Quad_FIO::do_sprintf">
+<area shape="rect" id="node1" title="sprintf with format string A and Data items B" alt="" coords="5,244,152,269"/>
+<area shape="rect" id="node2" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="437,44,577,69"/>
+<area shape="rect" id="node3" href="$classUCS__string.html#ad14d08312e34ad5d733360eccf9a745a" title="append 0&#45;terminated ASCII string str to this string. str is NOT interpreted as UTF8 string (use appen..." alt="" coords="437,131,577,171"/>
+<area shape="rect" id="node4" href="$classUCS__string.html#ace70327ef899c525ad9c3f2bffd43697" title="append 0&#45;terminated UTF8 string str to this UCS_string." alt="" coords="205,44,385,69"/>
+<area shape="rect" id="node5" href="$classValue__P__Base.html#a1c3bf1b6f708eb2c1ba4b97c83adb9aa" title="return a const pointer to the Value" alt="" coords="227,269,362,295"/>
+<area shape="rect" id="node6" href="$classWorkspace.html#a09f10a68b5a249c789bf8c1839f3208c" title="return element pos of the current ⎕FC (pos should be 0..5)" alt="" coords="438,207,577,232"/>
+<area shape="rect" id="node7" href="$classCell.html#ad165f9ab69abf46b2cf44d301a700a1c" title="Return the integer value of a cell." alt="" coords="229,319,360,344"/>
+<area shape="rect" id="node8" href="$classCell.html#a9a0028fd74f00deb001a8062a55916c6" title="Return the real part of a cell." alt="" coords="226,368,363,393"/>
+<area shape="rect" id="node9" href="$classQuad__FIO.html#ab3523798ecfe2751308a1c1308770a88" title="append ASCII&#45;buffer buffer to dest, inserting thousands&#39; separators. Note: buffer may be modified." alt="" coords="200,117,389,143"/>
+<area shape="rect" id="node10" href="$classCell.html#a30d0c83ab2c46ef830cd1301c77eb772" title="Return true iff this cell is an integer cell." alt="" coords="227,417,363,443"/>
+<area shape="rect" id="node11" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="233,467,356,492"/>
+</map>

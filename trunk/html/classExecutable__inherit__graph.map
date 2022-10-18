@@ -1,6 +1,7 @@
 <map id="Executable" name="Executable">
-<area shape="rect" id="node2" href="$classExecuteList.html" title="The token of an execute expression ⍎&#39;...&#39;. " alt="" coords="5,80,96,107"/>
-<area shape="rect" id="node3" href="$classStatementList.html" title="The token of an statement list cmd ◊ cmd ... ◊ cmd. " alt="" coords="121,80,223,107"/>
-<area shape="rect" id="node4" href="$classUserFunction.html" title="One user&#45;defined function. " alt="" coords="247,80,347,107"/>
-<area shape="rect" id="node5" href="$classMacro.html" title="a system function or operator implemented as an internal defined function " alt="" coords="268,155,327,181"/>
+<area shape="rect" id="node1" title="Base class for ExecuteList, StatementList, and UserFunction." alt="" coords="129,5,215,31"/>
+<area shape="rect" id="node2" href="$classExecuteList.html" title="The token of an execute expression ⍎&#39;...&#39;." alt="" coords="5,79,96,104"/>
+<area shape="rect" id="node3" href="$classStatementList.html" title="The token of an statement list cmd ◊ cmd ... ◊ cmd." alt="" coords="121,79,223,104"/>
+<area shape="rect" id="node4" href="$classUserFunction.html" title="One user&#45;defined function." alt="" coords="247,79,347,104"/>
+<area shape="rect" id="node5" href="$classMacro.html" title="a system function or operator implemented as an internal defined function" alt="" coords="268,152,327,177"/>
 </map>

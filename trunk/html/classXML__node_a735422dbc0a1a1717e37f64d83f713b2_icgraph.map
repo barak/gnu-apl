@@ -1,0 +1,4 @@
+<map id="XML_node::normalize_attribute_value" name="XML_node::normalize_attribute_value">
+<area shape="rect" id="node1" title="perform an in&#45;place attribute value normalization (XML standard 3.3.3). On error set MORE_ERROR() and..." alt="" coords="203,5,351,45"/>
+<area shape="rect" id="node2" href="$classXML__node.html#aaab7a6011fdbbfcff7617a1e3029119e" title="parse an XML start or leaf tag, store result in this&#45;&gt;APL_value On error set MORE_ERROR() and return ..." alt="" coords="5,13,155,38"/>
+</map>

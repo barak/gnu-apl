@@ -1,0 +1,32 @@
+<map id="StateIndicator::list" name="StateIndicator::list">
+<area shape="rect" id="node1" title="list the stack entry (for commands ]SI, )SI, and )SIS)" alt="" coords="5,507,133,532"/>
+<area shape="rect" id="node2" href="$classError.html#a73c1f4ab40f4e313f504562d52bb001e" title="return the error code of this error" alt="" coords="385,98,529,123"/>
+<area shape="rect" id="node3" href="$classError.html#ab28f2939af175480877baa459190a14a" title="return error_message_2. This is the second of 3 error lines. It contains the failed statement and is ..." alt="" coords="381,147,532,172"/>
+<area shape="rect" id="node4" href="$classError.html#a782d3b90b8d5e00842b9aa46b510de77" title="compute the caret line. This is the third of the 3 error lines. It contains the failure position the ..." alt="" coords="381,196,532,222"/>
+<area shape="rect" id="node6" href="$classExecutable.html#aac3043f85d550ff3a589d828a2012098" title="return a UserFunction * (if this is one) or else 0." alt="" coords="367,508,547,534"/>
+<area shape="rect" id="node7" href="$classUserFunction.html#a91d607b9654e8c3caedaaea4868edb87" title="return e.g. &#39;FOO[10]&#39;" alt="" coords="374,246,539,286"/>
+<area shape="rect" id="node13" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="895,632,1018,658"/>
+<area shape="rect" id="node14" href="$classStateIndicator.html#aa6584f8a9afaf76a334fb33517e36987" title="return the mode of this entry" alt="" coords="392,608,521,648"/>
+<area shape="rect" id="node16" href="$classStateIndicator.html#a93fdf9b10d3c4253c3d79e018c799fcb" title="return the current PC" alt="" coords="379,672,534,698"/>
+<area shape="rect" id="node18" href="$classStateIndicator.html#ae8f1a9f49c7933c492f6f899fccd437f" title="list the stack entry (for command ]SI)" alt="" coords="181,410,317,435"/>
+<area shape="rect" id="node23" href="$classExecutable.html#ae33855096d44e35f756909e2921e779b" title="return the text of statement at pc" alt="" coords="365,558,548,583"/>
+<area shape="rect" id="node29" href="$classUserFunction.html#ae13e0f81551da047f1ffddc5dab60c8d" title="print the local variables for command )SINL" alt="" coords="183,882,316,922"/>
+<area shape="rect" id="node5" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="887,196,1027,222"/>
+<area shape="rect" id="node8" href="$classUCS__string.html#a5776e51c6faa53537409322cd0ebf07a" title="append number (in ASCII encoding like d) to this string" alt="" coords="629,217,769,257"/>
+<area shape="rect" id="node9" href="$classWorkspace.html#a6df77441fb6f94f7da08d19b465503e1" title="return the name to which lambda ia assigned (empty if not found)" alt="" coords="596,282,801,307"/>
+<area shape="rect" id="node11" href="$classUserFunction.html#acfbba5ba41dc21a5d60890f5acad0670" title="overloaded Executable::get_line()" alt="" coords="622,52,775,78"/>
+<area shape="rect" id="node12" href="$classUserFunction__header.html#abcc2f6d70da90e3123e630a226b9e931" title="return the name of the function" alt="" coords="625,102,772,142"/>
+<area shape="rect" id="node10" href="$classSymbolTable.html#a591b83178ad60a065b68917b0dea471a" title="return the name to which lambda ia assigned (empty if not found)" alt="" coords="849,282,1064,307"/>
+<area shape="rect" id="node15" href="$classExecutable.html#a02b3dd7f7dbb3c3e099e3ab553034baa" title="the parse mode of this Executable" alt="" coords="603,732,794,758"/>
+<area shape="rect" id="node17" href="$classPrefix.html#ade9d0ae7c2c578907265991484876535" title="return the current PC" alt="" coords="645,782,753,807"/>
+<area shape="rect" id="node19" href="$classExecutable.html#a11724212451aab10562b577a62678b88" title="return the body of this executable" alt="" coords="383,410,531,435"/>
+<area shape="rect" id="node20" href="$classError.html#a739e9351b9ce25524248bd3326039930" title="return ⎕EM[1;]. This is the first of 3 error lines. It contains the error name (like SYNTAX ERROR,..." alt="" coords="381,459,532,484"/>
+<area shape="rect" id="node21" href="$classExecutable.html#a3ecfb113708ab2c4590d0714280897ea" title="return function line n (0 = header line)" alt="" coords="385,311,528,336"/>
+<area shape="rect" id="node22" href="$classError.html#a91ed5e0c804bdb677bad85a6873255cb" title="return the source code location where the error was thrown" alt="" coords="387,360,526,386"/>
+<area shape="rect" id="node24" href="$classUCS__string.html#a186a76c22c3ac840f1e607ba49e253a0" title="return the last character in this string" alt="" coords="635,683,762,708"/>
+<area shape="rect" id="node25" href="$classExecutable.html#acc35b347a5624e399f271c27778a2dbb" title="get the line number for pc" alt="" coords="629,434,769,459"/>
+<area shape="rect" id="node26" href="$classAvec.html#a3a2dcac522444cd99f9ec4c3fdd6db8c" title="return true iff av is one of the various diamond characters" alt="" coords="635,483,762,508"/>
+<area shape="rect" id="node27" href="$classExecutable.html#a46c33c9f26010c1774c7b8182f916237" title="return the first PC of the line" alt="" coords="625,582,773,607"/>
+<area shape="rect" id="node28" href="$classUCS__string.html#a67ea87cb92e687105b21917ffb4a2a6f" title="remove the last character in this string" alt="" coords="621,532,776,558"/>
+<area shape="rect" id="node30" href="$classUserFunction__header.html#a4458c814190fd935badd2f264cdc6ec8" title="print the local variables for command )SINL" alt="" coords="383,882,530,922"/>
+</map>

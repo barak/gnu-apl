@@ -1,0 +1,11 @@
+<map id="Bif_F12_TRANSPOSE::permute" name="Bif_F12_TRANSPOSE::permute">
+<area shape="rect" id="node1" title="return sh permuted according to permutation perm" alt="" coords="645,101,811,141"/>
+<area shape="rect" id="node2" href="$classBif__F12__TRANSPOSE.html#a82fdb72c75a88b3ea271ec7d63d1a5a4" title="Transpose B according to axes A (without diagonals)" alt="" coords="432,69,597,109"/>
+<area shape="rect" id="node9" href="$classBif__F12__TRANSPOSE.html#afb52d5e5f98a0b344ee7168b99801156" title="Transpose B according to axes A (with diagonals)" alt="" coords="432,133,597,173"/>
+<area shape="rect" id="node3" href="$classBif__F12__PICK.html#addeecdccc96628ddf5e957d7daa8d167" title="⊃[X]B" alt="" coords="220,5,383,45"/>
+<area shape="rect" id="node5" href="$classBif__F12__TRANSPOSE.html#ac26306fa58433144e147e0cf436b639e" title="implementation of eval_B()" alt="" coords="219,69,384,109"/>
+<area shape="rect" id="node8" href="$classBif__F12__TRANSPOSE.html#a02edd5a8bcffd81efc32738a2c585e46" title="overloaded Function::eval_AB()" alt="" coords="219,133,384,173"/>
+<area shape="rect" id="node4" href="$classBif__F12__PICK.html#ad21f06a298fdf42e3e4db81cda42bcff" title="overloaded Function::eval_XB()" alt="" coords="7,13,169,38"/>
+<area shape="rect" id="node6" href="$classBif__F12__TRANSPOSE.html#a2a01e99f2b3533213143964f7acffbc3" title="overloaded Function::eval_B()" alt="" coords="5,67,171,107"/>
+<area shape="rect" id="node7" href="$classBif__F12__DOMINO.html#ac85466d7ba807123bff312e03c596f46" title="overloaded Function::eval_fill_B()" alt="" coords="7,131,169,171"/>
+</map>

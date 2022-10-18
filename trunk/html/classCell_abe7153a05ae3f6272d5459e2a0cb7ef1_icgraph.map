@@ -1,0 +1,4 @@
+<map id="Cell::bif_pi_times" name="Cell::bif_pi_times">
+<area shape="rect" id="node1" title="store pi times the value of this Cell in Z" alt="" coords="225,5,348,31"/>
+<area shape="rect" id="node2" href="$classBif__F12__CIRCLE.html#a6c3a7a1fe80b44bbfee3fa27fbb42c33" title="overloaded Function::eval_B()." alt="" coords="5,5,177,31"/>
+</map>

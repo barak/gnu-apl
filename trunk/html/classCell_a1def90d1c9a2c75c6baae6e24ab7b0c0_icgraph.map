@@ -1,0 +1,6 @@
+<map id="Cell::bif_greater_than" name="Cell::bif_greater_than">
+<area shape="rect" id="node1" title="store 1 in Z if A &gt; the value of this cell in Z, else 0" alt="" coords="252,55,399,80"/>
+<area shape="rect" id="node2" href="$classBif__F2__GREATER.html#a04cac547cfea1d9b78d0092dfc02cd7f" title="overloaded Function::eval_AB()." alt="" coords="10,5,199,31"/>
+<area shape="rect" id="node3" href="$classBif__F2__GREATER.html#ab593a3afacb4fce3922f2d7214f01b1d" title="overloaded Function::eval_AXB()." alt="" coords="5,55,204,80"/>
+<area shape="rect" id="node4" href="$classBif__F2__GREATER.html#a550565eaa86b769f6f7e6885d7282e5a" title="overloaded Function::get_scalar_f2" alt="" coords="25,105,184,145"/>
+</map>

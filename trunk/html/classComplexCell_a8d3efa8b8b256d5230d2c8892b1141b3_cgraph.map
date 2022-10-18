@@ -1,0 +1,8 @@
+<map id="ComplexCell::bif_divide" name="ComplexCell::bif_divide">
+<area shape="rect" id="node1" title="overloaded from the corresponding Cell:: function (see class Cell)." alt="" coords="5,66,165,92"/>
+<area shape="rect" id="node2" href="$classComplexCell.html#ae93d7078736e5c3b20970a687565b3d1" title="return the complex value of this cell" alt="" coords="440,9,569,34"/>
+<area shape="rect" id="node3" href="$classComplexCell.html#ac31c8fb018b164f5016a94dd7ca4ab06" title="overloaded Cell::get_complex_value()" alt="" coords="213,30,392,70"/>
+<area shape="rect" id="node4" href="$classIntCell.html#a7da78424dbf8c5a7ee6b9630f7daac97" title="initialize the (un&#45;initialized) Cell *Z to integer 1" alt="" coords="261,94,344,120"/>
+<area shape="rect" id="node6" href="$classComplexCell.html#a9ccb64da2c504a517c725dc2c41940da" title="initialize the (un&#45;initialized) Cell *Z to complex r + ij" alt="" coords="241,144,364,169"/>
+<area shape="rect" id="node5" href="$classIntCell.html#a88c653b2f968c451ee1c1c53a983fa13" title="Construct an integer cell with value 0." alt="" coords="451,94,558,120"/>
+</map>

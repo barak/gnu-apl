@@ -1,0 +1,5 @@
+<map id="Svar_DB::get_offering_processors" name="Svar_DB::get_offering_processors">
+<area shape="rect" id="node1" title="add processors with pending offers to to_proc. Duplicates are OK and will be removed later" alt="" coords="423,5,573,45"/>
+<area shape="rect" id="node2" href="$classQuad__SVQ.html#a1f96d0bb6b3d8f568bf9e7e48d448c3c" title="return processors with matching offers" alt="" coords="189,13,375,38"/>
+<area shape="rect" id="node3" href="$classQuad__SVQ.html#aa99fb69058db1016c7501c008749daf6" title="Overloaded Function::eval_AB()." alt="" coords="5,13,141,38"/>
+</map>

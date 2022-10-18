@@ -1,0 +1,4 @@
+<map id="Shape::abs" name="Shape::abs">
+<area shape="rect" id="node1" title="return a shape like this, but with negative elements made positive" alt="" coords="5,5,93,31"/>
+<area shape="rect" id="node2" href="$classShape.html#aeb018b67601d3f1c4bea3d2c2b877b7e" title="add a dimension of length len at the end" alt="" coords="141,5,304,31"/>
+</map>

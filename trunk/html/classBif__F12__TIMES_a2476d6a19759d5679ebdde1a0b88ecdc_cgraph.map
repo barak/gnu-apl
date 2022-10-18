@@ -1,0 +1,5 @@
+<map id="Bif_F12_TIMES::get_scalar_f2" name="Bif_F12_TIMES::get_scalar_f2">
+<area shape="rect" id="node1" title="overloaded Function::get_scalar_f2()" alt="" coords="5,27,147,67"/>
+<area shape="rect" id="node2" href="$classCell.html#ad0834d2e711f5e9b8d76c02d03f4156c" title="store the product of A and this cell in Z" alt="" coords="195,5,313,31"/>
+<area shape="rect" id="node3" href="$classCell.html#ad47eaeacb68da350b5f64f5bd3978cfb" title="the inverse of bif_bif_multiply" alt="" coords="195,55,313,95"/>
+</map>

@@ -1,0 +1,35 @@
+<map id="StateIndicator::get_PC" name="StateIndicator::get_PC">
+<area shape="rect" id="node1" title="return the current PC" alt="" coords="1155,444,1309,469"/>
+<area shape="rect" id="node2" href="$classQuad__SI.html#a703fb389406e0f834f26f993e0997384" title="overloaded Function::eval_AB()." alt="" coords="957,177,1087,203"/>
+<area shape="rect" id="node3" href="$classQuad__SI.html#adf45c0e846d98374b2ce1e2633de3101" title="overloaded Function::eval_AB()." alt="" coords="961,227,1083,252"/>
+<area shape="rect" id="node4" href="$classStateIndicator.html#a80d5ee43a04486d61d84f75df40f5ed8" title="return the current line number" alt="" coords="944,276,1100,301"/>
+<area shape="rect" id="node21" href="$classStateIndicator.html#aa636ac2579a55a35c007b2763096f74e" title="print a short debug info" alt="" coords="956,393,1088,419"/>
+<area shape="rect" id="node25" href="$classStateIndicator.html#a0129e968c738e1c300e20b16533fca55" title="list the stack entry (for commands ]SI, )SI, and )SIS)" alt="" coords="733,495,861,520"/>
+<area shape="rect" id="node26" href="$classStateIndicator.html#ae8f1a9f49c7933c492f6f899fccd437f" title="list the stack entry (for command ]SI)" alt="" coords="954,495,1090,520"/>
+<area shape="rect" id="node27" href="$classXML__Saving__Archive.html#a3bc62d82baa6be004398f70faa1b3e8b" title="write StateIndicator entry si" alt="" coords="949,545,1095,585"/>
+<area shape="rect" id="node32" href="$classStateIndicator.html#abf0d83f5f9a8fec57751bf5636933687" title="Maybe print B (according to tag) and erase B." alt="" coords="937,609,1107,649"/>
+<area shape="rect" id="node33" href="$classError.html#adf8e47c02b1ae0be1368a0587f7daed4" title="update error information in this and copy it to si" alt="" coords="943,673,1101,699"/>
+<area shape="rect" id="node5" href="$classNabla.html#a610d94a179335126e82e9eea07918d5a" title="edit this function" alt="" coords="754,5,839,31"/>
+<area shape="rect" id="node6" href="$classQuad__INP.html#ac137efd86abe0a8f7b6082f01165de32" title="overloaded Function::eval_XB()." alt="" coords="249,81,389,107"/>
+<area shape="rect" id="node7" href="$classQuad__QUOTE.html#a3306dffadf270cb0b3f377ffaca8d269" title="overloaded Symbol::get_apl_value()." alt="" coords="718,174,875,214"/>
+<area shape="rect" id="node8" href="$classStateIndicator.html#abe48451c67c413334c2f9b1bb43014aa" title="continue this StateIndicator (to line N after →N back into it)" alt="" coords="727,239,866,264"/>
+<area shape="rect" id="node12" href="$classCommand.html#ad5c9241b1bb935841fe3c0d81546b7b3" title="process a single line entered by the user (in immediate execution mode)" alt="" coords="715,312,878,337"/>
+<area shape="rect" id="node17" href="$classQuad__INP.html#a0a38d500683e36b13e0d848249837d97" title="read raw_lines from stdin or file, stop at end_marker" alt="" coords="715,124,878,149"/>
+<area shape="rect" id="node20" href="$classQuad__Quad.html#a253824f3a533bef36063138ea6ce0673" title="overloaded Symbol::resolve()." alt="" coords="493,419,634,444"/>
+<area shape="rect" id="node9" href="$classCommand.html#a879617e7645bea2e4052154f16999634" title="finish the current SI&#45;&gt;top() and pop it when done" alt="" coords="478,205,649,231"/>
+<area shape="rect" id="node10" href="$classCommand.html#af36741357bfd4e183b34ee8b747bc7c5" title="process line which contains APL statements" alt="" coords="216,205,423,231"/>
+<area shape="rect" id="node11" href="$classCommand.html#ae26693534d4df16372f51e55e505b8d7" title="process line which contains a command or statements" alt="" coords="5,205,168,231"/>
+<area shape="rect" id="node13" href="$classIO__Files.html#acc91875b8e0c7a5ad44e3ead0e3dda7b" title="get one line from the current file, open the next file if necceessary" alt="" coords="489,255,637,280"/>
+<area shape="rect" id="node15" href="$classWorkspace.html#a8c147249a197f0d605f7cfc535969c92" title="create and execute one immediate execution context" alt="" coords="485,305,641,345"/>
+<area shape="rect" id="node16" href="$main_8cc.html#aa0321421b17def7b58fc0cabc8890260" title="initialize the interpreter" alt="" coords="532,369,595,395"/>
+<area shape="rect" id="node14" href="$classInputMux.html#a8a79cbe5207cde162fb36133ad9defdd" title="get one line" alt="" coords="255,255,384,280"/>
+<area shape="rect" id="node18" href="$classQuad__INP.html#acbb48b1a9762cc3e23008018a8c1f836" title="overloaded Function::eval_AB()." alt="" coords="493,156,633,181"/>
+<area shape="rect" id="node19" href="$classQuad__INP.html#a5867e5abcd804f15c4edf4f272cb975a" title="overloaded Function::eval_B()." alt="" coords="498,107,629,132"/>
+<area shape="rect" id="node22" href="$classBif__F1__EXECUTE.html#aefdd09df4262f08f508f9be8543896b7" title="execute string containing an APL expression or an APL command" alt="" coords="704,430,889,470"/>
+<area shape="rect" id="node23" href="$classBif__F1__EXECUTE.html#a4e1a5917e6a3bb368b459fb21c2b63a1" title="overladed Function::eval_B()" alt="" coords="474,468,653,493"/>
+<area shape="rect" id="node24" href="$classBif__F1__EXECUTE.html#a8445cd77207db38ab66f5c3278a831df" title="execute string containing an APL command" alt="" coords="471,518,656,558"/>
+<area shape="rect" id="node28" href="$classXML__Saving__Archive.html#acc327395cab545ea7797d92f5c931cab" title="write entire workspace" alt="" coords="723,569,870,609"/>
+<area shape="rect" id="node29" href="$classWorkspace.html#a8a4f1d898d523818dbd9d7efa6f2cf92" title="save this workspace" alt="" coords="487,583,640,608"/>
+<area shape="rect" id="node30" href="$classCommand.html#ad61e749290966d00856ce1dd4f6abe42" title=")SAVE active WS as CONTINUE and )OFF" alt="" coords="223,557,416,583"/>
+<area shape="rect" id="node31" href="$classCommand.html#aec0c4c6efbb9df9a34220b510f58905a" title=")SAVE: save a workspace file (.xml)" alt="" coords="240,607,399,632"/>
+</map>

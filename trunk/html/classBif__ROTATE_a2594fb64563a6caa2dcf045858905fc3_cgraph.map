@@ -1,0 +1,7 @@
+<map id="Bif_ROTATE::rotate" name="Bif_ROTATE::rotate">
+<area shape="rect" id="node1" title="Rotate B according to A along axis." alt="" coords="5,81,145,107"/>
+<area shape="rect" id="node2" href="$classShape3.html#a075643abf890c05401f1b7abdc5339cf" title="the dimensions above r the axis" alt="" coords="200,5,281,31"/>
+<area shape="rect" id="node3" href="$classShape3.html#a49f7a7796824adce7e955770239d48c4" title="return the offset of ravel item [hh;mm;ll] (from [0;0;0])" alt="" coords="193,107,288,132"/>
+<area shape="rect" id="node4" href="$classShape3.html#ad3ff2e3be69b9ca0085d211e3ecb2801" title="the dimensions below the axis" alt="" coords="340,83,417,108"/>
+<area shape="rect" id="node5" href="$classShape3.html#a7dda151f14bb5ee7a624372f0b167b7d" title="the axis dimension" alt="" coords="336,132,421,157"/>
+</map>

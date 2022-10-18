@@ -1,0 +1,6 @@
+<map id="Value::get_all_members_count" name="Value::get_all_members_count">
+<area shape="rect" id="node1" title="return the (recursive) number of members in this value" alt="" coords="628,29,791,69"/>
+<area shape="rect" id="node2" href="$classValue.html#abe3195d6faf086d15f3af75f247f15f0" title="store the row numbers (starting at 0) so that this[rows] is sorted in result. Only used rows are retu..." alt="" coords="420,37,580,62"/>
+<area shape="rect" id="node3" href="$classQuad__XML.html#a2c3c8a5e317d6e322a52426b36d1e233" title="iterator: return the next member after A in structured value B" alt="" coords="197,37,372,62"/>
+<area shape="rect" id="node4" href="$classQuad__XML.html#ad5de89a09c7528bcea93377a1f9424a8" title="overloaded Function::eval_AB()" alt="" coords="5,37,149,62"/>
+</map>

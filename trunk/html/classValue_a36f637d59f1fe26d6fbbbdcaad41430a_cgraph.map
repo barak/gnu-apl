@@ -1,0 +1,6 @@
+<map id="Value::try_implode" name="Value::try_implode">
+<area shape="rect" id="node1" title="try to implode (pack) this unpacked value. Return 0 on success or reason on error;" alt="" coords="5,31,136,56"/>
+<area shape="rect" id="node2" href="$classValue.html#a6c84896ec53d4baae44a1a9c2a4134f6" title="true if Value flag packed is set" alt="" coords="207,5,330,31"/>
+<area shape="rect" id="node3" href="$classValue.html#ac5b54e3a13cab0837442f1575b3299a5" title="return the number of elements, but at least 1 (for the prototype)." alt="" coords="184,55,353,80"/>
+<area shape="rect" id="node4" href="$classShape.html#a6f32f749601dca80263493fd06be12c4" title="return the number of ravel elements, but at least 1 (for empty values and scalars) else product of sh..." alt="" coords="401,55,556,80"/>
+</map>

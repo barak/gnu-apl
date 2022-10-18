@@ -1,0 +1,9 @@
+<map id="Quad_TF::tf2_reduce_ENCLOSE" name="Quad_TF::tf2_reduce_ENCLOSE">
+<area shape="rect" id="node2" href="$classValue__P__Base.html#a64e77a99509cdb6ecbe4cf273a2e7694" title="return a const pointer to the Value " alt="" coords="199,5,333,32"/>
+<area shape="rect" id="node3" href="$classFunction.html#af2539d67c687a61587781ec78c9e060a" title="return the Token Tag for this function. " alt="" coords="205,56,327,83"/>
+<area shape="rect" id="node4" href="$classFunction.html#a590e23020b0a7098725988201a213954" title="plain function, 0 arguments " alt="" coords="394,5,505,32"/>
+<area shape="rect" id="node7" href="$classFunction.html#a1d8e47de79dffa81c189730a1a19f80d" title="plain function, 2 arguments " alt="" coords="385,56,514,83"/>
+<area shape="rect" id="node8" href="$classFunction.html#a5b55cbacebf9d08b224319bfbb835647" title="monadic operator, 2 arguments " alt="" coords="381,107,517,133"/>
+<area shape="rect" id="node5" href="$classNamedObject.html#adf8b778a154d1d6e35c7d8a169aaaeb5" title="return the name of the named object " alt="" coords="565,56,732,83"/>
+<area shape="rect" id="node6" href="$classID.html#af1bb0741450971c1882af59af87eef29" title="return the printable name for id as UCS_string " alt="" coords="780,56,917,83"/>
+</map>

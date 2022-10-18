@@ -1,0 +1,9 @@
+<map id="Thread_context::set_active_core_count" name="Thread_context::set_active_core_count">
+<area shape="rect" id="node2" href="$classThread__context.html#ab5c1f95ee686270b4ac6e1806a5bd23f" title="bind thread to core " alt="" coords="203,5,347,47"/>
+<area shape="rect" id="node3" href="$Common_8hh.html#acf998c7ff90fc36e3fdb700bbbb46fcd" title="get_CERR" alt="" coords="232,71,319,98"/>
+<area shape="rect" id="node4" href="$classCPU__pool.html#a745603fb69c0ee5d4f4d728028fabff6" title="get the number of (active) CPUs " alt="" coords="202,122,349,149"/>
+<area shape="rect" id="node5" href="$classCPU__pool.html#a9a0ceffddddc5e7b239c2f443fa6a559" title="get the idx;th CPU " alt="" coords="203,173,347,199"/>
+<area shape="rect" id="node6" href="$classThread__context.html#a06a054fa3fadfda7020d64748371799e" title="initialize thread_contexts[n] " alt="" coords="207,224,344,265"/>
+<area shape="rect" id="node7" href="$classThread__context.html#afd854477bd87d3e80b3786ac2a7d5d9f" title="initialize all thread contexts (set all but N and thread) " alt="" coords="207,289,344,331"/>
+<area shape="rect" id="node8" href="$classThread__context.html#a4360395b00f2c003ab2a09fbe7635b7b" title="terminate all worker threads " alt="" coords="192,355,359,382"/>
+</map>

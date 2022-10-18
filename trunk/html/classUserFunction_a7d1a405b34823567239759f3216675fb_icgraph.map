@@ -1,0 +1,9 @@
+<map id="UserFunction::get_stop_lines" name="UserFunction::get_stop_lines">
+<area shape="rect" id="node2" href="$classQuad__STOP.html#aba7f51dfbb36d3c2d25ce2e7deb0f278" title="Overloaded Function::eval_AB() " alt="" coords="212,5,365,32"/>
+<area shape="rect" id="node3" href="$classQuad__STOP.html#a4076635597129ebe8ce51e1793bc0e85" title="Overloaded Function::eval_B() " alt="" coords="217,56,361,83"/>
+<area shape="rect" id="node4" href="$classNabla.html#a19c7ba833ddf21a1ac5c4309fd44921c" title="open an existing function, or create a new one. " alt="" coords="217,107,361,149"/>
+<area shape="rect" id="node5" href="$classNabla.html#a894eac5264914ef7eedcfc14643cc7ee" title="start editing, return source location if first_command is bad. " alt="" coords="413,115,504,141"/>
+<area shape="rect" id="node6" href="$classNabla.html#a610d94a179335126e82e9eea07918d5a" title="edit this function " alt="" coords="552,115,637,141"/>
+<area shape="rect" id="node7" href="$classNabla.html#a5571a862b4a619a9c6404dcb7fcf385f" title="edit the function specified in cmd (e.g. cmd = &quot;∇FUN&quot;) " alt="" coords="685,115,824,141"/>
+<area shape="rect" id="node8" href="$classCommand.html#ae26693534d4df16372f51e55e505b8d7" title="process line which contains a command or statements " alt="" coords="872,115,1035,141"/>
+</map>

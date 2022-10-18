@@ -1,0 +1,7 @@
+<map id="Bif_F12_DOMINO::Matrix::imag" name="Bif_F12_DOMINO::Matrix::imag">
+<area shape="rect" id="node1" title="return the imaginary part of A[x;y]" alt="" coords="227,101,400,141"/>
+<area shape="rect" id="node2" href="$classBif__F12__DOMINO_1_1Matrix.html#a9ecae5b7c7f0c9702b4cee740a3affcb" title="set this matrix to A +.× B" alt="" coords="5,5,179,45"/>
+<area shape="rect" id="node3" href="$classBif__F12__DOMINO_1_1Matrix.html#a6b4fbda5e7622628c8643beb5f2895e7" title="initialize this complex matrix to be the outer product of the first column of the complex matrix src ..." alt="" coords="5,69,179,109"/>
+<area shape="rect" id="node4" href="$classBif__F12__DOMINO.html#ae6f7bb2d954d3d7c33f48ddcb14d6e52" title="inver a complex upper&#45;triangle matrix" alt="" coords="7,133,177,173"/>
+<area shape="rect" id="node5" href="$classBif__F12__DOMINO_1_1Matrix.html#a676ba715575dc86c2747c024ee512d2d" title="assign complex matrix src to this complex matrix" alt="" coords="5,197,179,237"/>
+</map>

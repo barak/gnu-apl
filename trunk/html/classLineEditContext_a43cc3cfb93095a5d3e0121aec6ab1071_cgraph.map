@@ -1,0 +1,4 @@
+<map id="LineEditContext::update_SEARCH" name="LineEditContext::update_SEARCH">
+<area shape="rect" id="node1" title="shortcut calling update_search() of member history with argument user_line" alt="" coords="5,5,168,45"/>
+<area shape="rect" id="node2" href="$classLineHistory.html#a0c342eca06ac0e59347c0a486fc03a0e" title="update search substring (called when current line is edited)" alt="" coords="216,5,351,45"/>
+</map>

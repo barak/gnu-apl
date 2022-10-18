@@ -1,0 +1,83 @@
+<map id="Command::cmd_OUT" name="Command::cmd_OUT">
+<area shape="rect" id="node1" title=")OUT: export a workspace file" alt="" coords="5,159,156,184"/>
+<area shape="rect" id="node2" href="$classUTF8__string.html#a922bd7ebc6a8ea5c6ba9c54159b18a93" title="return this string as a 0&#45;terminated C string" alt="" coords="728,21,859,47"/>
+<area shape="rect" id="node3" href="$classUCS__string__vector.html#a410ffa588704260e23f324e87cfb751e" title="replacement for erase(std::vector::iterator position)" alt="" coords="221,122,362,162"/>
+<area shape="rect" id="node4" href="$classLibPaths.html#a0da8dd5e9a90282d75239ec86ebb15d4" title="return full path for file name, possibly adding .ext1 or .ext2" alt="" coords="204,187,379,212"/>
+<area shape="rect" id="node11" href="$classWorkspace.html#a7ffca45a4446b644e7caf093a1699ba2" title="write symbols for )OUT command" alt="" coords="212,1905,371,1931"/>
+<area shape="rect" id="node5" href="$classUTF8__string.html#aabaebbdfbe8fad48e44655144f5fbd5e" title="append a 0&#45;terminated C string" alt="" coords="721,99,865,139"/>
+<area shape="rect" id="node6" href="$classUTF8__string.html#ae512c0617f7a13fe5011655d898ca6c1" title="append the UTF8_string suffix" alt="" coords="701,236,885,261"/>
+<area shape="rect" id="node7" href="$classUTF8__string.html#a75b4e440d7576c690934bc7b5f863ac6" title="return true iff string ends with ext (usually a file name extension)" alt="" coords="459,337,620,363"/>
+<area shape="rect" id="node8" href="$classLibPaths.html#a4316cbd8878626733273cb0db73cfd82" title="return library path (from config file or from libroot)" alt="" coords="469,236,609,261"/>
+<area shape="rect" id="node9" href="$classLibPaths.html#a4f885147c87d4a70e0d199cebf5a0aa8" title="maybe warn the user if two files that differ only by extension exist" alt="" coords="462,71,617,111"/>
+<area shape="rect" id="node10" href="$classUTF8__string.html#ae72a6d597692993ab2760837dda316d3" title="return true iff string starts with path (usually a file path)" alt="" coords="456,187,623,212"/>
+<area shape="rect" id="node12" href="$classNamedObject.html#a3ff29d3b8f3eed6c55f535e1af8dbc91" title="return the Id of this object (ID_USER_SYMBOL for user defined objects)" alt="" coords="1427,2437,1573,2463"/>
+<area shape="rect" id="node13" href="$classNamedObject.html#aedd3379d48b75bb087baab1d086f8e2f" title="return the symbol for this user defined symbol (if any) or 0 if this Id refers to a system name" alt="" coords="935,1755,1112,1780"/>
+<area shape="rect" id="node14" href="$classWorkspace.html#af85e6f80d45ba8d1735c78602085f699" title="return the symbol table of the current workspace." alt="" coords="458,2345,621,2385"/>
+<area shape="rect" id="node15" href="$classWorkspace.html#aeb7918729e70694fff5b22575756f50f" title="lookup an existing name (user defined or ⎕xx, var or function). return 0 if not found." alt="" coords="427,2032,652,2057"/>
+<area shape="rect" id="node41" href="$classWorkspace.html#ad59928bcb6527147b5c5ca3e34106fe3" title="lookup an existing symbol (user defined or ⎕xx)." alt="" coords="700,2259,887,2299"/>
+<area shape="rect" id="node42" href="$classSymbolTable.html#a0b765d0f544c5419b78ef8b56b2f9451" title="write all symbols in )OUT format to file out" alt="" coords="472,1690,607,1730"/>
+<area shape="rect" id="node43" href="$classSymbol.html#a6b9b4537d95855e6490a8ec1b64b6cce" title="write this symbol in )OUT format to file out" alt="" coords="471,1080,608,1105"/>
+<area shape="rect" id="node16" href="$classToken.html#a049cd3eb72ae0c6427e523d399876b86" title="return the TokenClass of this token." alt="" coords="961,2057,1086,2083"/>
+<area shape="rect" id="node17" href="$classSymbol.html#a071c9e8a32253986503751296e4b34a2" title="Return the current function (or throw a VALUE_ERROR)" alt="" coords="721,2108,866,2133"/>
+<area shape="rect" id="node18" href="$classToken.html#a4d19f279ca06bc64e549c9d63ca677b0" title="return the Function_P value of this token" alt="" coords="725,1956,862,1981"/>
+<area shape="rect" id="node21" href="$classNamedObject.html#a169e78235759ac3b4c6e31fcee2631ce" title="Get current NameClass of this name." alt="" coords="716,1805,871,1831"/>
+<area shape="rect" id="node26" href="$classWorkspace.html#acb39e0420fcef7558220b9576b809e97" title="return a token for system function or variable ucs" alt="" coords="949,2208,1098,2233"/>
+<area shape="rect" id="node33" href="$classAvec.html#a88cc8af75e4a2c4d8a1d382637ca07b4" title="return true if unicode uni is a quad (⎕ or ▯)" alt="" coords="1198,1908,1303,1933"/>
+<area shape="rect" id="node36" href="$classSymbolTableBase.html#a58cddd45598f27eff5711db23ce9043c" title="return a Symbol with name name in this SymbolTable." alt="" coords="1163,2322,1338,2362"/>
+<area shape="rect" id="node39" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="1882,1808,2005,1833"/>
+<area shape="rect" id="node40" href="$classToken.html#a7ca97b588068b17bd396d8ae9d30ea7a" title="return the Symbol * value of this token" alt="" coords="954,2107,1093,2132"/>
+<area shape="rect" id="node19" href="$classToken.html#abe9f60f29fc7644214b48cc2715a21ad" title="return true if this token is a function (or operator)" alt="" coords="959,1956,1088,1981"/>
+<area shape="rect" id="node20" href="$classToken.html#a1a31afbb07e3f1dbb86d5f872ce5c297" title="return the TokenValueType of this token." alt="" coords="1174,1859,1327,1884"/>
+<area shape="rect" id="node22" href="$classNamedObject.html#adf8b778a154d1d6e35c7d8a169aaaeb5" title="return the name of the named object" alt="" coords="940,1804,1107,1829"/>
+<area shape="rect" id="node23" href="$classID.html#af1bb0741450971c1882af59af87eef29" title="return the printable name for id as UCS_string" alt="" coords="1182,1757,1319,1783"/>
+<area shape="rect" id="node24" href="$classID.html#a1c80b7bfa291882045116dcec6d50098" title="return the printable name for id as UTF8 *" alt="" coords="1449,1757,1551,1783"/>
+<area shape="rect" id="node25" href="$structId__name.html#a3202cdf13a9726257a4a3652a66285dd" title="compare key with item (for bsearch())" alt="" coords="1678,1757,1809,1783"/>
+<area shape="rect" id="node27" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="1673,748,1813,773"/>
+<area shape="rect" id="node28" href="$classSystemName.html#a172f0a34194f5e512f521800dca3a339" title="return the function (if any) that this name represents" alt="" coords="1160,2059,1341,2084"/>
+<area shape="rect" id="node29" href="$classSystemVariable.html#adfd61017d46f4b022af485637a768c76" title="return the TokenTag for this system variable" alt="" coords="1181,2258,1321,2298"/>
+<area shape="rect" id="node31" href="$classFunction.html#a74163ba976576a5bb03a060d42fd96e5" title="return a Token for this function." alt="" coords="1182,2108,1319,2133"/>
+<area shape="rect" id="node32" href="$classSystemName.html#a38a91b3cff0213ca7b89f4ddfa7d135a" title="return the variable (if any) that this name represents" alt="" coords="1161,2157,1341,2183"/>
+<area shape="rect" id="node34" href="$classAvec.html#a76a72fdcb1782be1c490b3670c45504f" title="Return true iff av is a valid char in a user defined symbol." alt="" coords="1175,2009,1326,2035"/>
+<area shape="rect" id="node30" href="$classID.html#a4e45a9557dbd8b94bcdf0ecbe280a386" title="return the TokenTag for id" alt="" coords="1437,2265,1563,2291"/>
+<area shape="rect" id="node35" href="$classAvec.html#afe30f62f26ec74019a95e5cbd6eaa111" title="Find av in character_table. Return position or Invalid_CHT." alt="" coords="1687,1483,1800,1508"/>
+<area shape="rect" id="node37" href="$classSymbolTableBase.html#ad231d005a78e9d44f0536aeb1caea62c" title="compute a 16&#45;bit hash for name" alt="" coords="1389,2315,1611,2340"/>
+<area shape="rect" id="node38" href="$classUCS__string.html#af5956757116853a2e1bc5a0533624d2e" title="return the FNV (Fowler&#45;Noll&#45;Vo) hash of this_string" alt="" coords="1663,2313,1823,2339"/>
+<area shape="rect" id="node44" href="$classToken.html#a205e0b499e06999ff91c272ff28c9013" title="return the Value_P value of this token. The token could be TOK_NO_VALUE; in that case VALUE_ERROR is ..." alt="" coords="727,1604,859,1629"/>
+<area shape="rect" id="node47" href="$classSymbol.html#a126fc214ca7a2e2d364e0982a36b2ace" title="The name of this Symbol." alt="" coords="728,1104,859,1129"/>
+<area shape="rect" id="node48" href="$classSymbol.html#a0a986591d86d6aa79e6c8b4ea7164525" title="return a const pointer to the current APL value" alt="" coords="721,539,866,564"/>
+<area shape="rect" id="node49" href="$classQuad__TF.html#a0bb664557663f85e4e8a86c756ac8139" title="store B in transfer format 2 (new APL format) into ucs" alt="" coords="947,488,1099,513"/>
+<area shape="rect" id="node57" href="$classAvec.html#a24bf275107eb974d9a47ba0732153edc" title="search uni in inverse_ibm_av and return its position in the IBM ⎕AV (= its code in ...." alt="" coords="1671,288,1815,313"/>
+<area shape="rect" id="node62" href="$classQuad__TF.html#ad0f2e059d5ff7a0262921192e18c48a0" title="return B in transfer format 2 (new APL format) for a variable" alt="" coords="731,1055,855,1080"/>
+<area shape="rect" id="node45" href="$unionToken_1_1sval.html#a22a0be9d3742c2a8168e59d530dd659e" title="a shortcut for accessing apl_val" alt="" coords="950,1653,1097,1679"/>
+<area shape="rect" id="node46" href="$classToken.html#a11e37aa69b8eb64f293702293b00f50c" title="return true iff this token is an apl value" alt="" coords="961,1604,1085,1629"/>
+<area shape="rect" id="node50" href="$classUCS__string.html#ace70327ef899c525ad9c3f2bffd43697" title="append 0&#45;terminated UTF8 string str to this UCS_string." alt="" coords="1410,489,1590,515"/>
+<area shape="rect" id="node51" href="$classFunction.html#a5d1ea5b6f6267431f7ca2773fa0955b9" title="Quad_CR of this function." alt="" coords="1183,388,1318,413"/>
+<area shape="rect" id="node52" href="$classFunction.html#ac4a44eddbd86c8278f240ec95c5f1553" title="return true iff this is a native function" alt="" coords="1185,437,1317,463"/>
+<area shape="rect" id="node53" href="$classQuad__TF.html#afe6a5cf3472f8d500820353afe9c8882" title="store simple character vector vec in ucs, either as &#39;xxx&#39; or as (UCS nn nnn ...)" alt="" coords="1171,539,1330,564"/>
+<area shape="rect" id="node59" href="$classUCS__string.html#ab5b13246e180a21b266bf4721ca87cac" title="split this multi&#45;line string into individual lines, removing the CR and NL chars in this string." alt="" coords="1175,337,1327,363"/>
+<area shape="rect" id="node54" href="$classUCS__string.html#a5776e51c6faa53537409322cd0ebf07a" title="append number (in ASCII encoding like d) to this string" alt="" coords="1430,741,1570,781"/>
+<area shape="rect" id="node55" href="$classAvec.html#aec63ac86774c2cd648cd2d7df094eba2" title="return true if unicode uni needs ⎕UCS in 2 ⎕TF or )OUT" alt="" coords="1438,539,1562,564"/>
+<area shape="rect" id="node56" href="$classAvec.html#ac1a3f05db620e46d7ecdc6d65a7c25d5" title="return true iff av is a control char (ASCII 0..32 (excluding))" alt="" coords="1685,539,1801,564"/>
+<area shape="rect" id="node58" href="$classAvec.html#a584e4653f79d47cd53be20f9830cbc74" title="compare the unicodes of two entries ua and u2 in inverse_IBM_quad_AV" alt="" coords="1876,288,2011,313"/>
+<area shape="rect" id="node60" href="$classUCS__string.html#ad092030b348adfd762de621c43d75812" title="default constructor: empty string" alt="" coords="1417,337,1583,363"/>
+<area shape="rect" id="node61" href="$classUCS__string.html#a40523238d26f5405f5392df03d242627" title="common part of all constructors" alt="" coords="1676,337,1811,363"/>
+<area shape="rect" id="node63" href="$classCell.html#a367b9df7e0d4b805e5f31641658113f6" title="Return the APL value of a cell (Asserts for non&#45;pointer cells)" alt="" coords="1423,1555,1577,1580"/>
+<area shape="rect" id="node66" href="$classCell.html#ae98b3988a7fa52c6c157b4911b043dde" title="Return true iff this cell is a pointer (to a sub&#45;array) cell." alt="" coords="1432,905,1568,931"/>
+<area shape="rect" id="node67" href="$classQuad__TF.html#a4aa501720adbb19aed9599912a8a8b07" title="append ravel of value in tf2_format to ucs. Return true iff the value should be enclosed in parenthes..." alt="" coords="955,1055,1092,1080"/>
+<area shape="rect" id="node64" href="$classCell.html#a38a6a25f0ad091f35e3d9abfe5608a50" title="return the type of this cell" alt="" coords="1678,1544,1809,1569"/>
+<area shape="rect" id="node65" href="$classCell.html#a6c3fdef3d82f53649d1c3f16d37eedd7" title="the name of ct" alt="" coords="1659,1593,1828,1619"/>
+<area shape="rect" id="node68" href="$classCell.html#ab3d14978f78ba264d40e9ed1a4823be2" title="Return true iff this cell is a character cell." alt="" coords="1175,816,1326,841"/>
+<area shape="rect" id="node69" href="$classQuad__TF.html#a3093ae63771a602fe15f892e57386897" title="append the ravel of a simple character array (of any rank)" alt="" coords="1175,866,1326,906"/>
+<area shape="rect" id="node70" href="$classQuad__TF.html#a7cecac14ed05f07d7b44a5c90d820f03" title="append ravel cells in tf2_format to ucs." alt="" coords="1183,1180,1318,1205"/>
+<area shape="rect" id="node79" href="$classQuad__TF.html#a160b51803b3fc7f0378701651a25c717" title="append shape in tf2_format to ucs." alt="" coords="1180,955,1321,980"/>
+<area shape="rect" id="node71" href="$classCell.html#a089e3fdcacd165cad6e82a42ab49f2a7" title="the Quad_CR representation of this cell" alt="" coords="1402,1156,1598,1181"/>
+<area shape="rect" id="node72" href="$classCell.html#a0e6b9239fa77e3222f32400d51c8f114" title="Return the imaginary part of a cell." alt="" coords="1428,1205,1572,1231"/>
+<area shape="rect" id="node73" href="$classCell.html#a9a0028fd74f00deb001a8062a55916c6" title="Return the real part of a cell." alt="" coords="1431,1255,1569,1280"/>
+<area shape="rect" id="node74" href="$classCell.html#a62919edef3b6b585e544dcf2865402eb" title="Return true iff this cell is a complex number cell." alt="" coords="1427,1304,1573,1329"/>
+<area shape="rect" id="node75" href="$classCell.html#a122ed26d321f4d27ca63c8cea0134595" title="Return true iff this cell is a floating point cell." alt="" coords="1439,1353,1561,1379"/>
+<area shape="rect" id="node76" href="$classCell.html#af8746e4049278c9a46f25e6ee0d71fcc" title="Return true iff this cell is a pointer to a cell." alt="" coords="1441,1107,1559,1132"/>
+<area shape="rect" id="node77" href="$classPrintBuffer.html#a8fd6b4066b13cea99f550ebdb91063c3" title="return the first (and only) line" alt="" coords="1449,1403,1551,1428"/>
+<area shape="rect" id="node78" href="$classPrintBuffer.html#ac13295601812e379a3eac618ce239426" title="return the number of rows" alt="" coords="1674,1395,1813,1435"/>
+<area shape="rect" id="node80" href="$classShape.html#a017e9a35dd20f4bc4fdeb7ea29b6805d" title="return the rank" alt="" coords="1441,856,1559,881"/>
+<area shape="rect" id="node81" href="$classShape.html#a592d2ade68aa8c21c5d84627c3a0e001" title="return the length of dimension r" alt="" coords="1421,955,1579,980"/>
+</map>

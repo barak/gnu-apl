@@ -1,0 +1,12 @@
+<map id="ProcessorID::init" name="ProcessorID::init">
+<area shape="rect" id="node1" title="initialize our own process ID, return non&#45;0 on error. proc_id == 0 uses the next free ID &gt; 1000; othe..." alt="" coords="5,33,125,59"/>
+<area shape="rect" id="node2" href="$classSvar__DB.html#ac10f9507c18657397c050432da27cdac" title="return the fd towards APserver" alt="" coords="637,5,789,31"/>
+<area shape="rect" id="node3" href="$classSvar__DB.html#af2422421bf0cdce4c4e129e006e6c584" title="return true if id is registered in APserver" alt="" coords="173,59,348,84"/>
+<area shape="rect" id="node4" href="$classSignal__base.html#ab59487084a293204fc9b0a62b973adf4" title="APserver result: yes (1) or no (0) access functions for signal YES_NO..." alt="" coords="409,81,569,121"/>
+<area shape="rect" id="node7" href="$classSvar__DB.html#a8e5d83427d476f8db6752dbf86c78e96" title="get TCP socket to APserver, complain if not connected" alt="" coords="396,31,583,56"/>
+<area shape="rect" id="node8" href="$classSignal__base.html#ae6862da3b4684bf41e1a427ebece92e9" title="receive a signal (TCP)" alt="" coords="409,145,569,171"/>
+<area shape="rect" id="node5" href="$classSignal__base.html#a4e35a5a0fd9ced011b83a11ac304724c" title="get function for an item that is not defined for the signal" alt="" coords="640,88,787,113"/>
+<area shape="rect" id="node6" href="$classSignal__base.html#a77d69692410bd7b7d49033b73fcfc8fc" title="return the name of the ID of the signal" alt="" coords="844,88,1023,113"/>
+<area shape="rect" id="node9" href="$classSig__item__int.html#a5e6903d94a367f8e7e9540881ddf389e" title="return the value of the item" alt="" coords="631,141,796,167"/>
+<area shape="rect" id="node10" href="$classSignal__base.html#a774958a4504fa7536cc941a3736d5b2c" title="print the signal" alt="" coords="650,191,777,216"/>
+</map>

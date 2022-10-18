@@ -1,0 +1,5 @@
+<map id="Bif_F12_FORMAT::Format_LIFER::format_size" name="Bif_F12_FORMAT::Format_LIFER::format_size">
+<area shape="rect" id="node1" title="return the size of the format" alt="" coords="5,5,184,45"/>
+<area shape="rect" id="node2" href="$structFormat__sub.html#a872fece2e509a22858f33d3b42536a95" title="return the number of characters in format" alt="" coords="232,13,355,38"/>
+<area shape="rect" id="node3" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="403,13,525,38"/>
+</map>

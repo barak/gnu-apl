@@ -1,0 +1,5 @@
+<map id="DLX_Node::print" name="DLX_Node::print">
+<area shape="rect" id="node1" title="print this node" alt="" coords="5,31,124,56"/>
+<area shape="rect" id="node2" href="$classDLX__Node.html#a5d50e5bca233bcd8e46c8cfca5ee6c79" title="check the consistency of the up, down, left, and right links" alt="" coords="181,5,310,31"/>
+<area shape="rect" id="node3" href="$classDLX__Node.html#a8412d43f28f22f4018b18d844d9bf6dc" title="print the row and columns of this node" alt="" coords="172,55,319,80"/>
+</map>

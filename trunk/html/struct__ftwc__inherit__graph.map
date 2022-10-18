@@ -1,3 +1,4 @@
 <map id="_ftwc" name="_ftwc">
-<area shape="rect" id="node2" href="$struct__twc.html" title="The end and the state of an abstract iterator along one axis (to / weight / current) ..." alt="" coords="7,5,58,32"/>
+<area shape="rect" id="node1" title="The range and the state of an abstract iterator along one axis (from / to / weight / current)" alt="" coords="5,79,60,104"/>
+<area shape="rect" id="node2" href="$struct__twc.html" title="The end and the state of an abstract iterator along one axis (to / weight / current)" alt="" coords="7,5,58,31"/>
 </map>

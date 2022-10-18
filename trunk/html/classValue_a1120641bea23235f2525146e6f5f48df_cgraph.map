@@ -1,0 +1,13 @@
+<map id="Value::init_ravel" name="Value::init_ravel">
+<area shape="rect" id="node1" title="init the ravel of an APL value, return the ravel length" alt="" coords="5,129,120,155"/>
+<area shape="rect" id="node2" href="$classValue.html#a10289415c33695f6df77388ea09a83c8" title="return the offset&#39;th ravel cell (of an unpack&#39;ed ravel)" alt="" coords="170,5,301,31"/>
+<area shape="rect" id="node3" href="$classWorkspace.html#adb2006f054a1cebb8ae0252b61bd1d1b" title="return the current ⎕IO" alt="" coords="168,55,303,80"/>
+<area shape="rect" id="node4" href="$classShape.html#af39e05bad7be900fa1437a6eb6035e97" title="return the number of ravel elements (1 for scalars,i else product of shapes)" alt="" coords="168,104,303,129"/>
+<area shape="rect" id="node5" href="$classValue.html#a54205b69c66acaabc99a43a8870950c2" title="return the first element of the ravel (which is always present) same as wfirst(), but named different..." alt="" coords="172,153,299,179"/>
+<area shape="rect" id="node9" href="$classIntCell.html#afd60fd9e3a5581ac99c1e053d9218fe7" title="initialize the (un&#45;initialized) Cell *Z to integer 0" alt="" coords="194,203,277,228"/>
+<area shape="rect" id="node11" href="$classIntCell.html#aa99b7212ce13da0f241adeb18e350198" title="initialize Z to APL_Integer v" alt="" coords="196,252,275,277"/>
+<area shape="rect" id="node6" href="$classValue.html#af5c079fe8530d8f90a87c53439d9c924" title="return the (writable) idx&#39;th element of the ravel." alt="" coords="351,153,477,179"/>
+<area shape="rect" id="node7" href="$classValue.html#ac5b54e3a13cab0837442f1575b3299a5" title="return the number of elements, but at least 1 (for the prototype)." alt="" coords="525,153,695,179"/>
+<area shape="rect" id="node8" href="$classShape.html#a6f32f749601dca80263493fd06be12c4" title="return the number of ravel elements, but at least 1 (for empty values and scalars) else product of sh..." alt="" coords="743,153,897,179"/>
+<area shape="rect" id="node10" href="$classIntCell.html#a88c653b2f968c451ee1c1c53a983fa13" title="Construct an integer cell with value 0." alt="" coords="361,227,467,252"/>
+</map>

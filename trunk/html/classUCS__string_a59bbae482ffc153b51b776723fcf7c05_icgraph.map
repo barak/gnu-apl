@@ -1,0 +1,7 @@
+<map id="UCS_string::compute_chunk_length" name="UCS_string::compute_chunk_length">
+<area shape="rect" id="node1" title="compute the length of an output row" alt="" coords="645,35,793,75"/>
+<area shape="rect" id="node2" href="$classPrintBuffer.html#a3e967210dc153c8382a99f84eeddc10e" title="print this buffer, interruptible with ^C" alt="" coords="455,5,573,45"/>
+<area shape="rect" id="node5" href="$classUCS__string.html#a4e0f5eaa20456b1baf0f75ef758130ea" title="constructor: UCS_string from print buffer" alt="" coords="431,70,597,95"/>
+<area shape="rect" id="node3" href="$classPrintBuffer.html#adb9b7f5903b37ffeae4de10ada9cfc6d" title="helper for non&#45;trivial PrintBuffer(const Value &amp; ...) constructor" alt="" coords="208,13,383,38"/>
+<area shape="rect" id="node4" href="$classPrintBuffer.html#a5abec40efca2993a2b522e199694730f" title="contructor: a PrintBuffer from an APL value" alt="" coords="5,13,160,38"/>
+</map>

@@ -1,0 +1,8 @@
+<map id="CollatingCache::get_comp_len" name="CollatingCache::get_comp_len">
+<area shape="rect" id="node1" title="return the number of items to compare" alt="" coords="683,23,820,63"/>
+<area shape="rect" id="node2" href="$classCollatingCache.html#a49519a2ba001d9415a541b2f6aa0f10b" title="compare cache items ia and ib ascendingly. comp_arg is a CollatingCache pointer" alt="" coords="447,5,633,31"/>
+<area shape="rect" id="node6" href="$classCollatingCache.html#a47e6ce25b5268c1876f9091e45b43aa7" title="compare cache items ia and ib descendingly. comp_arg is a CollatingCache pointer" alt="" coords="445,55,635,80"/>
+<area shape="rect" id="node3" href="$classBif__F12__SORT.html#a4b4cc3a9de168e5e27a1514c1a02781b" title="sort char vector B according to collationg sequence A" alt="" coords="256,23,397,63"/>
+<area shape="rect" id="node4" href="$classBif__F12__SORT__ASC.html#a6af56fadf76ad6584c760bf78452bbf5" title="overloaded Function::eval_AB()" alt="" coords="5,5,208,31"/>
+<area shape="rect" id="node5" href="$classBif__F12__SORT__DES.html#a8d8c210e4072ba4cee223c83945f371e" title="overloaded Function::eval_AB()" alt="" coords="5,55,208,80"/>
+</map>

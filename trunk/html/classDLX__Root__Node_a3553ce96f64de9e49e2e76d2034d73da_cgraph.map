@@ -1,0 +1,12 @@
+<map id="DLX_Root_Node::DLX_Root_Node" name="DLX_Root_Node::DLX_Root_Node">
+<area shape="rect" id="node1" title="constructor" alt="" coords="5,147,160,187"/>
+<area shape="rect" id="node2" href="$classCell.html#a2999919fc2782b3cebfd925c63cc1fac" title="Return the character value of a cell." alt="" coords="429,29,570,55"/>
+<area shape="rect" id="node5" href="$classDLX__Node.html#ace049ce44b5c35aec8b3bd682dee0336" title="return the type of column" alt="" coords="208,129,376,155"/>
+<area shape="rect" id="node6" href="$classCell.html#ad165f9ab69abf46b2cf44d301a700a1c" title="Return the integer value of a cell." alt="" coords="434,80,565,105"/>
+<area shape="rect" id="node7" href="$classCell.html#ab3d14978f78ba264d40e9ed1a4823be2" title="Return true iff this cell is a character cell." alt="" coords="424,179,575,204"/>
+<area shape="rect" id="node9" href="$classWorkspace.html#adb2006f054a1cebb8ae0252b61bd1d1b" title="return the current ⎕IO" alt="" coords="225,231,359,256"/>
+<area shape="rect" id="node10" href="$classCell.html#a30d0c83ab2c46ef830cd1301c77eb772" title="Return true iff this cell is an integer cell." alt="" coords="224,280,360,305"/>
+<area shape="rect" id="node3" href="$classCell.html#a38a6a25f0ad091f35e3d9abfe5608a50" title="return the type of this cell" alt="" coords="642,5,773,31"/>
+<area shape="rect" id="node4" href="$classCell.html#a6c3fdef3d82f53649d1c3f16d37eedd7" title="the name of ct" alt="" coords="623,55,792,80"/>
+<area shape="rect" id="node8" href="$classCell.html#a4ce158d2f937ff444732ec5c43a5093f" title="Return true iff this cell is an integer, float, or complex cell." alt="" coords="441,129,557,155"/>
+</map>

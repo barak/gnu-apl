@@ -1,0 +1,5 @@
+<map id="Prefix::set_action" name="Prefix::set_action">
+<area shape="rect" id="node1" title="set the prefix parser action according to (result&#45;) Token type" alt="" coords="5,31,129,56"/>
+<area shape="rect" id="node2" href="$classToken.html#a049cd3eb72ae0c6427e523d399876b86" title="return the TokenClass of this token." alt="" coords="177,5,303,31"/>
+<area shape="rect" id="node3" href="$classToken.html#a13e8b65088f8a7d103772acc6cfb5140" title="return the tag of this token" alt="" coords="185,55,295,80"/>
+</map>

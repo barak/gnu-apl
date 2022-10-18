@@ -1,0 +1,7 @@
+<map id="Value::print" name="Value::print">
+<area shape="rect" id="node1" title="print this value (line break at Workspace::get_PW())" alt="" coords="368,43,456,68"/>
+<area shape="rect" id="node2" href="$classValue.html#a8f4efc08e1cf758c79dec03f9a42f9a6" title="check that this value was completely initialized, and set VF_complete if so." alt="" coords="184,12,320,37"/>
+<area shape="rect" id="node4" href="$classValue.html#a926a6bd11f4d27c077c19bbb03c333cf" title="list a value" alt="" coords="198,67,306,92"/>
+<area shape="rect" id="node3" href="$classValue.html#a700520f88c4f5facadbbf1ca8e21c7ec" title="constructor: a scalar value (i.e. a value with rank 0) from a cell" alt="" coords="23,5,119,31"/>
+<area shape="rect" id="node5" href="$classValue.html#a38979fd196c826557e1614fa0514bbaa" title="erase stale values" alt="" coords="5,79,136,104"/>
+</map>

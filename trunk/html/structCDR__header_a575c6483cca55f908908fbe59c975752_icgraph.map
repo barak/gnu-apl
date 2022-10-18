@@ -1,0 +1,38 @@
+<map id="CDR_header::get_be32" name="CDR_header::get_be32">
+<area shape="rect" id="node1" title="convert big endian 32 bit value to 32 bit host value (== ntohl())" alt="" coords="2159,195,2317,221"/>
+<area shape="rect" id="node2" href="$classCDR__string.html#a76e5524bb6cc587949e264e297a58371" title="return 4 bytes of the header (the header is always big endian)" alt="" coords="1966,271,2097,297"/>
+<area shape="rect" id="node6" href="$classCDR.html#a52b514abc54de6143e10925ebba08d55" title="return 4 bytes starting at data in network byte order" alt="" coords="1975,119,2088,145"/>
+<area shape="rect" id="node35" href="$structCDR__header.html#ac7e2e12e936eee0d8d75edb9e6911948" title="return the number of bytes in host endian" alt="" coords="1759,170,1904,195"/>
+<area shape="rect" id="node36" href="$structCDR__header.html#acf7252e1bfa2d763489a0990d13a16d6" title="return the number of elements in host endian" alt="" coords="1952,221,2111,246"/>
+<area shape="rect" id="node3" href="$classCDR__string.html#a30f36dfd3f3cf0a986088599a89f8ca5" title="return non&#45;zero if this CDR is malformed" alt="" coords="1562,246,1697,271"/>
+<area shape="rect" id="node5" href="$classCDR__string.html#aeaaf234e15bed19abf7f480b48a5ce82" title="return the tag of this CDR" alt="" coords="1762,322,1901,347"/>
+<area shape="rect" id="node4" href="$classCDR__string.html#afffda21a8a84990808848717452a1c8e" title="print properties" alt="" coords="1365,246,1500,271"/>
+<area shape="rect" id="node7" href="$classCDR.html#a0e0125de11ed6a4c8ea775892dfccda9" title="create a value from a CDR_string, throwing DOMAIN ERROR if cdr is ill&#45;formed" alt="" coords="1770,70,1893,95"/>
+<area shape="rect" id="node34" href="$classCDR.html#aa7ee6ff24de26a85949942fe6bc449ee" title="return 8 bytes starting at data in network byte order" alt="" coords="1775,119,1888,145"/>
+<area shape="rect" id="node8" href="$classQuad__CR.html#a085c9286020d2b50c5c46374a52f77e2" title="compute 12 ⎕CR B" alt="" coords="1558,70,1701,95"/>
+<area shape="rect" id="node25" href="$classQuad__CR.html#ad756cf2747097bf79593af513e845183" title="compute 15 ⎕CR B" alt="" coords="1558,119,1701,145"/>
+<area shape="rect" id="node26" href="$classSymbol.html#aa0dca7ac8099794adada168657747776" title="set token according to the current NC/sym_val of this shared var" alt="" coords="1548,5,1711,45"/>
+<area shape="rect" id="node9" href="$classQuad__CR.html#ac6f426118cad09841c8545efd5ba8a8f" title="compute a ⎕CR B" alt="" coords="1368,118,1497,143"/>
+<area shape="rect" id="node10" href="$classQuad__CR.html#ac60b988ceaf002189a8c60337752048f" title="overloaded Function::eval_AB()" alt="" coords="1161,66,1299,91"/>
+<area shape="rect" id="node12" href="$classValue.html#a6f574c5690fbcf4024a78ed14a8375db" title="print this value in 4 ⎕CR style" alt="" coords="1165,115,1295,141"/>
+<area shape="rect" id="node13" href="$classValue.html#a82fd0d84f4c7f0b22a6b035e0201506a" title="print info related to a stale value" alt="" coords="1155,165,1305,190"/>
+<area shape="rect" id="node24" href="$classStateIndicator.html#abf0d83f5f9a8fec57751bf5636933687" title="Maybe print B (according to tag) and erase B." alt="" coords="1145,215,1315,255"/>
+<area shape="rect" id="node11" href="$classQuad__CR.html#a4a7057e997df3f1607b2e003ef7279f6" title="overloaded Function::eval_XB()" alt="" coords="957,66,1095,91"/>
+<area shape="rect" id="node14" href="$classValue.html#a80c3e1a7208f4f97985e5c742ec93b2d" title="print stale Values, and return the number of stale Values." alt="" coords="965,165,1087,190"/>
+<area shape="rect" id="node15" href="$classCommand.html#af5d73db57801b2363c954b402f19186d" title="check workspace integrity (stale Value and IndexExpr objects, etc)" alt="" coords="729,115,900,141"/>
+<area shape="rect" id="node20" href="$classIO__Files.html#aa05a2917c11a88b9abfc4afa6ca04a3e" title="dito (close files, print errors, summary etc)." alt="" coords="720,169,909,194"/>
+<area shape="rect" id="node16" href="$classXML__Saving__Archive.html#acc327395cab545ea7797d92f5c931cab" title="write entire workspace" alt="" coords="513,104,660,144"/>
+<area shape="rect" id="node17" href="$classWorkspace.html#a8a4f1d898d523818dbd9d7efa6f2cf92" title="save this workspace" alt="" coords="273,111,427,137"/>
+<area shape="rect" id="node18" href="$classCommand.html#ad61e749290966d00856ce1dd4f6abe42" title=")SAVE active WS as CONTINUE and )OFF" alt="" coords="5,85,199,110"/>
+<area shape="rect" id="node19" href="$classCommand.html#aec0c4c6efbb9df9a34220b510f58905a" title=")SAVE: save a workspace file (.xml)" alt="" coords="23,134,181,159"/>
+<area shape="rect" id="node21" href="$classIO__Files.html#acc91875b8e0c7a5ad44e3ead0e3dda7b" title="get one line from the current file, open the next file if necceessary" alt="" coords="513,218,661,243"/>
+<area shape="rect" id="node23" href="$classIO__Files.html#a5ac43f7fe811ca95a419f8ba7a11682e" title="close current testcase file (prematurely) and opem mext one" alt="" coords="523,169,651,194"/>
+<area shape="rect" id="node22" href="$classInputMux.html#a8a79cbe5207cde162fb36133ad9defdd" title="get one line" alt="" coords="285,218,415,243"/>
+<area shape="rect" id="node27" href="$classSymbol.html#a72a3e4ed8ddafaaf215806962e017380" title="set token according to the current NC/sym_val of this Symbol" alt="" coords="1375,13,1491,38"/>
+<area shape="rect" id="node28" href="$classPrefix.html#a5478ff7d771d95a161c8ee393d50d7b1" title="execute one context (user defined function or operator, execute, or immediate execution)" alt="" coords="1143,13,1317,38"/>
+<area shape="rect" id="node29" href="$classStateIndicator.html#aa99bc8ce846dfd1f09c0ca2f250d940e" title="execute token in body..." alt="" coords="961,13,1091,38"/>
+<area shape="rect" id="node30" href="$classExecutable.html#a56bddb63158eedc401fe8ec3ce04f787" title="execute the body of this executable" alt="" coords="727,13,903,38"/>
+<area shape="rect" id="node31" href="$classCommand.html#a879617e7645bea2e4052154f16999634" title="finish the current SI&#45;&gt;top() and pop it when done" alt="" coords="501,13,672,38"/>
+<area shape="rect" id="node32" href="$classCommand.html#af36741357bfd4e183b34ee8b747bc7c5" title="process line which contains APL statements" alt="" coords="247,13,453,38"/>
+<area shape="rect" id="node33" href="$classCommand.html#ae26693534d4df16372f51e55e505b8d7" title="process line which contains a command or statements" alt="" coords="21,13,183,38"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="Svar_record::set_state" name="Svar_record::set_state">
+<area shape="rect" id="node1" title="update the state when using or setting this variable, and clear events" alt="" coords="5,80,160,105"/>
+<area shape="rect" id="node2" href="$structSvar__record.html#abdb5a461d505c7e674260f0794cc2bf0" title="complain about proc" alt="" coords="215,5,369,31"/>
+<area shape="rect" id="node3" href="$structSvar__partner.html#a3fb77c18c091930a1a8c361e399c8c04" title="return the control bits of this partner (as seen by the offering" alt="" coords="208,55,376,80"/>
+<area shape="rect" id="node4" href="$classProcessorID.html#a834b72a9d1c965b8b07a96e2088f5972" title="return the own id, parent, and grand&#45;parent" alt="" coords="223,104,361,129"/>
+<area shape="rect" id="node5" href="$structSvar__record.html#adac196c0626b7b0e28cd54f94e31aaae" title="print a name" alt="" coords="210,153,374,179"/>
+</map>

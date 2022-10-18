@@ -1,0 +1,5 @@
+<map id="Signal_base::get__SET_CONTROL__key" name="Signal_base::get__SET_CONTROL__key">
+<area shape="rect" id="node1" title="APserver request: set control of shared var key access functions for signal SET_CONTROL...." alt="" coords="5,5,164,45"/>
+<area shape="rect" id="node2" href="$classSignal__base.html#a4e35a5a0fd9ced011b83a11ac304724c" title="get function for an item that is not defined for the signal" alt="" coords="212,13,359,38"/>
+<area shape="rect" id="node3" href="$classSignal__base.html#a77d69692410bd7b7d49033b73fcfc8fc" title="return the name of the ID of the signal" alt="" coords="407,13,585,38"/>
+</map>

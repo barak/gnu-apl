@@ -1,0 +1,8 @@
+<map id="Bif_F12_ROTATE1::eval_AB" name="Bif_F12_ROTATE1::eval_AB">
+<area shape="rect" id="node1" title="overloaded Function::eval_AB()" alt="" coords="5,81,197,107"/>
+<area shape="rect" id="node2" href="$classBif__ROTATE.html#a2594fb64563a6caa2dcf045858905fc3" title="Rotate B according to A along axis." alt="" coords="245,81,385,107"/>
+<area shape="rect" id="node3" href="$classShape3.html#a075643abf890c05401f1b7abdc5339cf" title="the dimensions above r the axis" alt="" coords="440,5,521,31"/>
+<area shape="rect" id="node4" href="$classShape3.html#a49f7a7796824adce7e955770239d48c4" title="return the offset of ravel item [hh;mm;ll] (from [0;0;0])" alt="" coords="433,107,528,132"/>
+<area shape="rect" id="node5" href="$classShape3.html#ad3ff2e3be69b9ca0085d211e3ecb2801" title="the dimensions below the axis" alt="" coords="580,83,657,108"/>
+<area shape="rect" id="node6" href="$classShape3.html#a7dda151f14bb5ee7a624372f0b167b7d" title="the axis dimension" alt="" coords="576,132,661,157"/>
+</map>

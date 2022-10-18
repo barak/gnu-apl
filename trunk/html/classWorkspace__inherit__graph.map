@@ -1,3 +1,4 @@
 <map id="Workspace" name="Workspace">
-<area shape="rect" id="node2" href="$classWorkspace__0.html" title="The symbol tables of an APL workspace. " alt="" coords="5,5,108,32"/>
+<area shape="rect" id="node1" title="An APL workspace." alt="" coords="13,79,101,104"/>
+<area shape="rect" id="node2" href="$classWorkspace__0.html" title="The symbol tables of an APL workspace." alt="" coords="5,5,108,31"/>
 </map>

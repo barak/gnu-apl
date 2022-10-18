@@ -1,0 +1,59 @@
+<map id="Executable::get_exec_ufun" name="Executable::get_exec_ufun">
+<area shape="rect" id="node1" title="return a UserFunction * (if this is one) or else 0." alt="" coords="1647,596,1827,621"/>
+<area shape="rect" id="node2" href="$classExecutable.html#a0c3cf319bbbff10c2ac5d21471c761dc" title="decrement the reference counter" alt="" coords="1421,135,1577,175"/>
+<area shape="rect" id="node13" href="$classStateIndicator.html#abe48451c67c413334c2f9b1bb43014aa" title="continue this StateIndicator (to line N after →N back into it)" alt="" coords="1429,396,1568,421"/>
+<area shape="rect" id="node17" href="$classExecutable.html#a5f1a0c24eb29a98e47988c5ce370bded" title="increment the reference counter" alt="" coords="1423,302,1575,342"/>
+<area shape="rect" id="node35" href="$classStateIndicator.html#a979049848a45945d27a18ead9045b036" title="evaluate a →N statement. Update pc, return true iff context has changed" alt="" coords="1429,496,1568,521"/>
+<area shape="rect" id="node36" href="$classStateIndicator.html#a0129e968c738e1c300e20b16533fca55" title="list the stack entry (for commands ]SI, )SI, and )SIS)" alt="" coords="1199,596,1327,621"/>
+<area shape="rect" id="node37" href="$classExecutable.html#adc77483a89c69c67f7294bebdbcfbca7" title="parse the body line number line of this function" alt="" coords="1404,647,1593,672"/>
+<area shape="rect" id="node38" href="$classWorkspace.html#a4c393e0cc87db7d5148100e25d525729" title="Remove the current SI&#45;entry from the SI stack." alt="" coords="1430,447,1567,472"/>
+<area shape="rect" id="node46" href="$classStateIndicator.html#ae8f1a9f49c7933c492f6f899fccd437f" title="list the stack entry (for command ]SI)" alt="" coords="1431,545,1567,571"/>
+<area shape="rect" id="node47" href="$classXML__Saving__Archive.html#a3bc62d82baa6be004398f70faa1b3e8b" title="write StateIndicator entry si" alt="" coords="1425,697,1572,737"/>
+<area shape="rect" id="node52" href="$classDoxy.html#adb0f60780eef8f3246d952596a3a19a6" title="HTML&#45;print a table with the SI stack to &#39;page&#39;." alt="" coords="1444,761,1553,787"/>
+<area shape="rect" id="node55" href="$classStateIndicator.html#abf0d83f5f9a8fec57751bf5636933687" title="Maybe print B (according to tag) and erase B." alt="" coords="1414,811,1583,851"/>
+<area shape="rect" id="node56" href="$classError.html#adf8e47c02b1ae0be1368a0587f7daed4" title="update error information in this and copy it to si" alt="" coords="1419,876,1578,901"/>
+<area shape="rect" id="node57" href="$classStateIndicator.html#a5b64f5fed3bc19bb0f2d5968d9ea48e5" title="destructor" alt="" coords="1399,925,1599,951"/>
+<area shape="rect" id="node3" href="$classExecutable.html#a8eef6c70e728b412b2291576ae8e74b1" title="delete values in body and (maybe) remove lambdas" alt="" coords="1184,81,1343,107"/>
+<area shape="rect" id="node12" href="$classUserFunction.html#ad8bb1cae303dedac232d7538b043d2fc" title="overloaded Function::destroy()" alt="" coords="1188,143,1339,168"/>
+<area shape="rect" id="node4" href="$classUserFunction.html#a1aa032e76cb608c07de66ac13d41809b" title="recompile the body" alt="" coords="713,64,888,89"/>
+<area shape="rect" id="node11" href="$classExecutable.html#aa3afb65823b666cf3ae8b4eb335bb402" title="destructor: release values held by the body" alt="" coords="953,31,1121,56"/>
+<area shape="rect" id="node5" href="$classUserFunction.html#a2bedc3c56fb8daa8e4e760bbc912de68" title="set trace or stop vector" alt="" coords="455,55,650,80"/>
+<area shape="rect" id="node10" href="$classUserFunction.html#a37c955f6a76f58d168d4533389249cae" title="constructor for a normal (i.e. non&#45;lambda) user defined function" alt="" coords="459,5,646,31"/>
+<area shape="rect" id="node6" href="$classStop__Trace.html#a1f0aad5536348d1e52721cd04e2f9548" title="return assign lines in new_value to stop or trace vector in ufun" alt="" coords="241,55,376,80"/>
+<area shape="rect" id="node9" href="$classNabla.html#a610d94a179335126e82e9eea07918d5a" title="edit this function" alt="" coords="266,5,351,31"/>
+<area shape="rect" id="node7" href="$classQuad__STOP.html#aba7f51dfbb36d3c2d25ce2e7deb0f278" title="Overloaded Function::eval_AB()" alt="" coords="10,80,163,105"/>
+<area shape="rect" id="node8" href="$classQuad__TRACE.html#a59e7875554f651f1f64d83d79111fecd" title="Overloaded Function::eval_AB()" alt="" coords="5,31,168,56"/>
+<area shape="rect" id="node14" href="$classCommand.html#a879617e7645bea2e4052154f16999634" title="finish the current SI&#45;&gt;top() and pop it when done" alt="" coords="1178,396,1349,421"/>
+<area shape="rect" id="node15" href="$classCommand.html#af36741357bfd4e183b34ee8b747bc7c5" title="process line which contains APL statements" alt="" coords="449,399,656,424"/>
+<area shape="rect" id="node16" href="$classCommand.html#ae26693534d4df16372f51e55e505b8d7" title="process line which contains a command or statements" alt="" coords="227,399,390,424"/>
+<area shape="rect" id="node18" href="$classXML__Loading__Archive.html#a2e7aed9883aa106937d3d9313163e10b" title="read next Function element" alt="" coords="1187,331,1339,371"/>
+<area shape="rect" id="node19" href="$classXML__Loading__Archive.html#a16b4789e109bf0167ae481b86a1ebedb" title="read a lambda" alt="" coords="961,301,1113,341"/>
+<area shape="rect" id="node23" href="$classExecutable.html#a67ef983c8fb9a0265b334fa2827641fa" title="extract one lambda expressions from body and store it in lambdas" alt="" coords="1186,217,1341,257"/>
+<area shape="rect" id="node20" href="$classXML__Loading__Archive.html#a0cd18fa421176354e241891d951f5169" title="read a user defined Executable" alt="" coords="725,327,877,367"/>
+<area shape="rect" id="node21" href="$classXML__Loading__Archive.html#adfa844fcc401d3c335cafa5abda2f35d" title="read next StateIndicator entry" alt="" coords="233,283,385,323"/>
+<area shape="rect" id="node22" href="$classXML__Loading__Archive.html#ad2f1d88070976eab8a41f0fdcd1e0ec1" title="read next StateIndicator element" alt="" coords="11,283,163,323"/>
+<area shape="rect" id="node24" href="$classExecutable.html#a70a75e5fb01bef90215dc8cd4dfd9d75" title="extract all lambda expressions from body and store them in lambdas" alt="" coords="945,224,1128,249"/>
+<area shape="rect" id="node25" href="$classExecuteList.html#a6f8688070be985996a46dad98ee3d2f9" title="compute body token from text data" alt="" coords="744,172,857,197"/>
+<area shape="rect" id="node32" href="$classStatementList.html#a20b0b6ca4bd952856e75bdecc7fc110a" title="compute body token from text data" alt="" coords="738,227,863,252"/>
+<area shape="rect" id="node34" href="$classUserFunction.html#a78bee7603d9d21f0dc4e2101505937d4" title="constructor for a lambda" alt="" coords="707,276,894,301"/>
+<area shape="rect" id="node26" href="$classQuad__EC.html#a856174e390a934b63bc19affe232937e" title="overloaded Function::eval_B()." alt="" coords="489,169,616,195"/>
+<area shape="rect" id="node27" href="$classBif__F1__EXECUTE.html#aefdd09df4262f08f508f9be8543896b7" title="execute string containing an APL expression or an APL command" alt="" coords="460,105,645,145"/>
+<area shape="rect" id="node31" href="$classXML__Loading__Archive.html#a5085841ad5dd83bd88588db76c3a2838" title="read ⍎ Executable" alt="" coords="477,219,629,259"/>
+<area shape="rect" id="node28" href="$classBif__F1__EXECUTE.html#a4e1a5917e6a3bb368b459fb21c2b63a1" title="overladed Function::eval_B()" alt="" coords="219,219,398,244"/>
+<area shape="rect" id="node29" href="$classBif__F1__EXECUTE.html#a8445cd77207db38ab66f5c3278a831df" title="execute string containing an APL command" alt="" coords="216,105,401,145"/>
+<area shape="rect" id="node30" href="$classQuad__Quad.html#a253824f3a533bef36063138ea6ce0673" title="overloaded Symbol::resolve()." alt="" coords="238,169,379,195"/>
+<area shape="rect" id="node33" href="$classXML__Loading__Archive.html#a5e165853b437a502be850f3527ef8b77" title="read ◊ Executable" alt="" coords="477,283,629,323"/>
+<area shape="rect" id="node39" href="$classWorkspace.html#a87ccdd5258241c8e7d30cd38d8f609bf" title="clear the SI" alt="" coords="1191,497,1335,523"/>
+<area shape="rect" id="node43" href="$classQuad__ES.html#a4c53438162ec63acf71b2a766c533fae" title="common inplementation for eval_AB() and eval_B()" alt="" coords="1176,547,1351,572"/>
+<area shape="rect" id="node40" href="$classWorkspace.html#ade3a373ad48eb7a8fbad97a28472db7f" title="clear the workspace" alt="" coords="960,497,1113,523"/>
+<area shape="rect" id="node41" href="$classWorkspace.html#a77c7b25908cf2479dc087cc3bcf44dcb" title="load lib_ws into the_workspace, maybe set ⎕LX of the new WS." alt="" coords="726,497,875,523"/>
+<area shape="rect" id="node42" href="$classCommand.html#ad222a6de11eb55501624a4d0dea3a464" title=")LOAD: load a workspace file" alt="" coords="473,497,632,523"/>
+<area shape="rect" id="node44" href="$classQuad__ES.html#a15637aafd2f0819de2b50a6e0ae1d638" title="overloaded Function::eval_AB()." alt="" coords="969,596,1104,621"/>
+<area shape="rect" id="node45" href="$classQuad__ES.html#a82fc7201ef710a3514568169a912d92a" title="overloaded Function::eval_B()." alt="" coords="973,547,1100,572"/>
+<area shape="rect" id="node48" href="$classXML__Saving__Archive.html#acc327395cab545ea7797d92f5c931cab" title="write entire workspace" alt="" coords="1190,697,1337,737"/>
+<area shape="rect" id="node49" href="$classWorkspace.html#a8a4f1d898d523818dbd9d7efa6f2cf92" title="save this workspace" alt="" coords="960,704,1113,729"/>
+<area shape="rect" id="node50" href="$classCommand.html#ad61e749290966d00856ce1dd4f6abe42" title=")SAVE active WS as CONTINUE and )OFF" alt="" coords="704,679,897,704"/>
+<area shape="rect" id="node51" href="$classCommand.html#aec0c4c6efbb9df9a34220b510f58905a" title=")SAVE: save a workspace file (.xml)" alt="" coords="721,728,880,753"/>
+<area shape="rect" id="node53" href="$classDoxy.html#ad8abe2e8a1b686a7b35e582c369d41ae" title="generate the entire documentation" alt="" coords="1222,761,1305,787"/>
+<area shape="rect" id="node54" href="$classCommand.html#a834eac0e797a5d1c992018b7d0c049a4" title="]DOXY: create doxygen&#45;like documentation of the current workspace" alt="" coords="957,761,1117,787"/>
+</map>

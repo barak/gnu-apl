@@ -15,7 +15,7 @@ var classDLX__Node =
     [ "insert_ud", "classDLX__Node.html#a84aa1d52ac44b5aa278ee24e5962b655", null ],
     [ "operator=", "classDLX__Node.html#a381c06571a596e1311554cfbeb295e32", null ],
     [ "print", "classDLX__Node.html#a2c21df946edd8453ae3b05365be75573", null ],
-    [ "print_RC", "classDLX__Node.html#a21c79df8c919f642d3a74556be861dc4", null ],
+    [ "print_RC", "classDLX__Node.html#a8412d43f28f22f4018b18d844d9bf6dc", null ],
     [ "remove_lr", "classDLX__Node.html#acd8abea5547ce468cb57e461fe886417", null ],
     [ "remove_ud", "classDLX__Node.html#af863b7a6f3052af9c0b4df2987ec41c7", null ],
     [ "col", "classDLX__Node.html#a03aec761d4c70aa3ebc53304c80d9fe3", null ],

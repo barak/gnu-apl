@@ -1,0 +1,4 @@
+<map id="Value::init_ravel" name="Value::init_ravel">
+<area shape="rect" id="node1" title="init the ravel of an APL value, return the ravel length" alt="" coords="149,5,264,31"/>
+<area shape="rect" id="node2" href="$classValue.html#a8a12230cec8b3ea13d547152a4d3ce9e" title="constructor: scalar value (i.e. a value with rank 0)." alt="" coords="5,5,101,31"/>
+</map>

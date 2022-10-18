@@ -1,0 +1,10 @@
+<map id="Value::~Value" name="Value::~Value">
+<area shape="rect" id="node1" title="destructor" alt="" coords="5,121,109,146"/>
+<area shape="rect" id="node2" href="$classValue.html#af3d98202f94c1dce3e8c9b03afd7ffc0" title="return the PointerCell count" alt="" coords="171,5,298,45"/>
+<area shape="rect" id="node3" href="$classValue.html#a1a9a1968e0e00d6251ff16ff22a469fd" title="return the first element of the ravel (which is always present) Same as get_wproto() and get_wscalar(..." alt="" coords="175,70,295,95"/>
+<area shape="rect" id="node5" href="$classValue.html#ac5b54e3a13cab0837442f1575b3299a5" title="return the number of elements, but at least 1 (for the prototype)." alt="" coords="535,95,704,121"/>
+<area shape="rect" id="node7" href="$classCell.html#ac4bb8b0cf0718bf4ec7a17f1a0271df0" title="Release content pointed to (complex, APL value)" alt="" coords="187,171,282,197"/>
+<area shape="rect" id="node8" href="$classDynamicObject.html#adb527eca75c7201c033f8c1937e08a78" title="unlink this DynamicObject from its list" alt="" coords="157,221,312,246"/>
+<area shape="rect" id="node4" href="$classValue.html#af5c079fe8530d8f90a87c53439d9c924" title="return the (writable) idx&#39;th element of the ravel." alt="" coords="360,70,487,95"/>
+<area shape="rect" id="node6" href="$classShape.html#a6f32f749601dca80263493fd06be12c4" title="return the number of ravel elements, but at least 1 (for empty values and scalars) else product of sh..." alt="" coords="752,95,907,121"/>
+</map>

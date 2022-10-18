@@ -1,0 +1,7 @@
+<map id="XML_node::print" name="XML_node::print">
+<area shape="rect" id="node2" href="$classXML__node.html#ad740e8b2a306d73e260482af9be89192" title="append garbage to this garbage can (for later deletion) " alt="" coords="171,52,305,79"/>
+<area shape="rect" id="node3" href="$classXML__node.html#af7768a8292eebe36599f6d958dde6731" title="collect nodes starting at anchor, return true on error " alt="" coords="568,5,699,32"/>
+<area shape="rect" id="node5" href="$classXML__node.html#ae6f77f0b4ebb0311ee13abdc69d696f0" title="merge the items from start(&#45;tag) to (end(&#45;tag) into start tag " alt="" coords="353,52,520,79"/>
+<area shape="rect" id="node6" href="$classXML__node.html#ac15dcafb582e4d7595ee24d28a5f0f21" title="reduce nodes starting at start, return true on error " alt="" coords="365,103,508,129"/>
+<area shape="rect" id="node4" href="$classQuad__XML.html#a8e4ca50c2d54d630895c22115857325e" title="convert XML string to APL associative array " alt="" coords="747,47,919,73"/>
+</map>

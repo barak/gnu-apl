@@ -1,6 +1,5 @@
 var classOutput =
 [
-    [ "MAX_ESC_LEN", "classOutput.html#afb89a8651b304b8167ba0b0b2f69bcbca5dd75cfada076a927084f6b07fd25324", null ],
     [ "ColorMode", "classOutput.html#a805f7b9468198cc1b245e91a51960fa6", [
       [ "COLM_UNDEF", "classOutput.html#a805f7b9468198cc1b245e91a51960fa6a40fff0d7d86d5bba2fd2237f1bbbb293", null ],
       [ "COLM_INPUT", "classOutput.html#a805f7b9468198cc1b245e91a51960fa6a8bdefa34a3a8009770d8f34c7ee141fe", null ],

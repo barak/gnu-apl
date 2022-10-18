@@ -1,0 +1,12 @@
+<map id="Quad_QUOTE::get_apl_value" name="Quad_QUOTE::get_apl_value">
+<area shape="rect" id="node1" title="overloaded Symbol::get_apl_value()." alt="" coords="5,71,163,111"/>
+<area shape="rect" id="node2" href="$classQuad__QUOTE.html#a5cd6bf7b6aa6c66c6d8b285623f948fc" title="end of ⍞ (output, but no input: clear prompt)" alt="" coords="217,29,360,54"/>
+<area shape="rect" id="node3" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="431,29,553,54"/>
+<area shape="rect" id="node4" href="$classStateIndicator.html#a80d5ee43a04486d61d84f75df40f5ed8" title="return the current line number" alt="" coords="211,177,367,202"/>
+<area shape="rect" id="node8" href="$classWorkspace.html#a3589f03a4f37fadf366dddbf934b38fc" title="return the current ⎕PR" alt="" coords="219,127,359,153"/>
+<area shape="rect" id="node9" href="$classUCS__string.html#afed3b4eed48968619c0895a98700b554" title="return a string like this, but with pad chars mapped to spaces" alt="" coords="219,78,359,103"/>
+<area shape="rect" id="node5" href="$classExecutable.html#acc35b347a5624e399f271c27778a2dbb" title="get the line number for pc" alt="" coords="422,127,562,153"/>
+<area shape="rect" id="node6" href="$classStateIndicator.html#a93fdf9b10d3c4253c3d79e018c799fcb" title="return the current PC" alt="" coords="415,177,569,202"/>
+<area shape="rect" id="node7" href="$classPrefix.html#ade9d0ae7c2c578907265991484876535" title="return the current PC" alt="" coords="617,177,725,202"/>
+<area shape="rect" id="node10" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="422,78,562,103"/>
+</map>

@@ -1,6 +1,7 @@
 <map id="UserPreferences::read_config_file" name="UserPreferences::read_config_file">
-<area shape="rect" id="node2" href="$classUTF8__string.html#aabaebbdfbe8fad48e44655144f5fbd5e" title="append a 0&#45;terminated C string " alt="" coords="220,5,364,47"/>
-<area shape="rect" id="node3" href="$structUserPreferences.html#afd15a9f4cbd24930f47fe6a44eba0290" title="decode a byte in a preferences file. The byte can be given as ASCII name (currently only ESC is under..." alt="" coords="207,71,377,112"/>
-<area shape="rect" id="node4" href="$structUserPreferences.html#a07c2933cafe4e981cd07f03232a6b7b5" title="open a user&#45;supplied config file (in $HOME or gnu&#45;apl.d) " alt="" coords="214,136,370,177"/>
-<area shape="rect" id="node5" href="$classLibPaths.html#a6c671db38ef40ad989618b9138689573" title="set library path (from config file) " alt="" coords="222,202,362,229"/>
+<area shape="rect" id="node1" title="read a preference file and update parameters set there" alt="" coords="5,101,159,141"/>
+<area shape="rect" id="node2" href="$classUTF8__string.html#aabaebbdfbe8fad48e44655144f5fbd5e" title="append a 0&#45;terminated C string" alt="" coords="220,5,364,45"/>
+<area shape="rect" id="node3" href="$structUserPreferences.html#afd15a9f4cbd24930f47fe6a44eba0290" title="decode a byte in a preferences file. The byte can be given as ASCII name (currently only ESC is under..." alt="" coords="207,69,377,109"/>
+<area shape="rect" id="node4" href="$structUserPreferences.html#a07c2933cafe4e981cd07f03232a6b7b5" title="open a user&#45;supplied config file (in $HOME or gnu&#45;apl.d)" alt="" coords="214,133,370,173"/>
+<area shape="rect" id="node5" href="$classLibPaths.html#a6c671db38ef40ad989618b9138689573" title="set library path (from config file)" alt="" coords="222,198,362,223"/>
 </map>

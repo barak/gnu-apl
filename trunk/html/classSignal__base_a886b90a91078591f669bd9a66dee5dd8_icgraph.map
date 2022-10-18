@@ -1,4 +1,6 @@
 <map id="Signal_base::get__OFFERED_VARS_ARE__offered_vars" name="Signal_base::get__OFFERED_VARS_ARE__offered_vars">
-<area shape="rect" id="node2" href="$classSvar__DB.html#afeae1fefc378b93724c456d9d7d051f4" title="return all variables shared between to_proc and from_proc " alt="" coords="251,5,399,47"/>
-<area shape="rect" id="node3" href="$classQuad__SVQ.html#a5fdb64a94ed29742ac9470233fc4976c" title="return variables offered by processor proc " alt="" coords="447,13,620,39"/>
+<area shape="rect" id="node1" title="APserver result for: get offered variables (⎕SVQ) access functions for signal OFFERED_VARS_ARE...." alt="" coords="607,5,804,45"/>
+<area shape="rect" id="node2" href="$classSvar__DB.html#afeae1fefc378b93724c456d9d7d051f4" title="return all variables shared between to_proc and from_proc" alt="" coords="411,5,559,45"/>
+<area shape="rect" id="node3" href="$classQuad__SVQ.html#a5fdb64a94ed29742ac9470233fc4976c" title="return variables offered by processor proc" alt="" coords="189,13,363,38"/>
+<area shape="rect" id="node4" href="$classQuad__SVQ.html#aa99fb69058db1016c7501c008749daf6" title="Overloaded Function::eval_AB()." alt="" coords="5,13,141,38"/>
 </map>

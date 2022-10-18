@@ -1,0 +1,5 @@
+<map id="XML_Loading_Archive::skip_to_tag" name="XML_Loading_Archive::skip_to_tag">
+<area shape="rect" id="node1" title="skip to tag tag, return EOF if end of file" alt="" coords="5,37,157,77"/>
+<area shape="rect" id="node2" href="$classXML__Loading__Archive.html#adb5a5f67fc6ceffb3260e61b5fe9994c" title="return true iff tagname starts with prefix" alt="" coords="205,5,357,45"/>
+<area shape="rect" id="node3" href="$classXML__Loading__Archive.html#a987f28e4f3139e5f1c96913468ea3057" title="move to next tag, return true if EOF" alt="" coords="205,69,357,109"/>
+</map>

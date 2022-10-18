@@ -1,0 +1,7 @@
+<map id="Bif_F12_ELEMENT::do_eval_B" name="Bif_F12_ELEMENT::do_eval_B">
+<area shape="rect" id="node1" title="implementation of eval_B()" alt="" coords="577,23,736,63"/>
+<area shape="rect" id="node2" href="$classBif__F12__ELEMENT.html#a8334dc7204bf088137c793bf580390ea" title="overloaded Function::eval_B()" alt="" coords="344,5,529,31"/>
+<area shape="rect" id="node3" href="$classDoxy.html#a226cb7889fd26eca46ab7be00cf517eb" title="HTML&#45;print a table with all variables to &#39;page&#39;." alt="" coords="363,55,511,80"/>
+<area shape="rect" id="node4" href="$classDoxy.html#ad8abe2e8a1b686a7b35e582c369d41ae" title="generate the entire documentation" alt="" coords="213,55,296,80"/>
+<area shape="rect" id="node5" href="$classCommand.html#a834eac0e797a5d1c992018b7d0c049a4" title="]DOXY: create doxygen&#45;like documentation of the current workspace" alt="" coords="5,55,165,80"/>
+</map>

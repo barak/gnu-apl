@@ -1,0 +1,6 @@
+<map id="UCS_string::atoi" name="UCS_string::atoi">
+<area shape="rect" id="node1" title="return integer value for a string starting with optional whitespaces, followed by digits." alt="" coords="228,55,347,80"/>
+<area shape="rect" id="node2" href="$classCommand.html#a209e6b7262396300ee80f7764fc21da3" title=")BOXING command" alt="" coords="5,5,180,31"/>
+<area shape="rect" id="node3" href="$classCommand.html#a0b7131627e1a36bee1370e5a7572063f" title="show performance counters" alt="" coords="10,55,175,80"/>
+<area shape="rect" id="node4" href="$classIO__Files.html#ab4774669e92aa8fba8f5fb122bbd7dbf" title="reset APL errors, expecting cnt" alt="" coords="21,105,164,145"/>
+</map>

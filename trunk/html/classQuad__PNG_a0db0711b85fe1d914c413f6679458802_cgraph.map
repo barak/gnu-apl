@@ -1,0 +1,19 @@
+<map id="Quad_PNG::eval_B" name="Quad_PNG::eval_B">
+<area shape="rect" id="node1" title="overloaded Function::eval_B()" alt="" coords="5,373,143,398"/>
+<area shape="rect" id="node2" href="$classQuad__PNG.html#a0d1b1dbcb28ce932b9af8223ee46a93e" title="display an RGB matrix (interpreter code)" alt="" coords="191,159,400,185"/>
+<area shape="rect" id="node11" href="$classQuad__PNG.html#ab85dfd3c052e99bf359fcb40b622e1f3" title="read PNG file filename and return its pixels as 4×N×M matrix" alt="" coords="204,373,387,398"/>
+<area shape="rect" id="node17" href="$classQuad__PNG.html#a95f84dd92443dc9f8dabc2223c8c1ec7" title="control logging etc. of ⎕PNG" alt="" coords="202,422,389,447"/>
+<area shape="rect" id="node3" href="$structPNG__context.html#a6766e87d90a4bb8c394abb9575eb5fd4" title="return the window height" alt="" coords="449,5,608,45"/>
+<area shape="rect" id="node4" href="$structPNG__context.html#aebea7b86a118a9d7660720d51880a03a" title="return the window width" alt="" coords="449,69,608,109"/>
+<area shape="rect" id="node5" href="$Plot__gtk_8cc.html#ac53bb222e6c64ba3600814aab8463a9e" title="make gtk_main() suitable for pthread_create() and maybe tell when it is finished" alt="" coords="465,134,593,159"/>
+<area shape="rect" id="node6" href="$Quad__PNG_8cc.html#a9a9491d1e4cdc0fcf04a7016e8ff95be" title="Gtk callback to draw the ⎕PNG window." alt="" coords="458,183,599,209"/>
+<area shape="rect" id="node10" href="$Quad__PNG_8cc.html#af0ad17f8595f166a638777f6375d1173" title="callback when the plot window is destroyed" alt="" coords="457,233,600,258"/>
+<area shape="rect" id="node7" href="$Quad__PNG_8cc.html#abd30e7bef2c721ebdf9fef4407af1598" title="convert APL pixel data to a Gtk/Cairo surface" alt="" coords="657,183,740,209"/>
+<area shape="rect" id="node8" href="$classValue__P__Base.html#a1c3bf1b6f708eb2c1ba4b97c83adb9aa" title="return a const pointer to the Value" alt="" coords="800,154,935,179"/>
+<area shape="rect" id="node9" href="$structPNG__context.html#ab4950d0d70d6acf87c1243c3132a20e2" title="return the current pixel matrix as APL value" alt="" coords="788,204,947,244"/>
+<area shape="rect" id="node12" href="$classUTF8__string.html#aabaebbdfbe8fad48e44655144f5fbd5e" title="append a 0&#45;terminated C string" alt="" coords="457,283,601,323"/>
+<area shape="rect" id="node13" href="$classUTF8__string.html#a922bd7ebc6a8ea5c6ba9c54159b18a93" title="return this string as a 0&#45;terminated C string" alt="" coords="463,347,594,373"/>
+<area shape="rect" id="node14" href="$classUTF8__string.html#a75b4e440d7576c690934bc7b5f863ac6" title="return true iff string ends with ext (usually a file name extension)" alt="" coords="448,397,609,422"/>
+<area shape="rect" id="node15" href="$Quad__PNG_8cc.html#a3943cc310023d7accfbb3ee9c711edf1" title="callback for libpng errors" alt="" coords="492,446,565,471"/>
+<area shape="rect" id="node16" href="$Quad__PNG_8cc.html#a433f99e363c749b4713e3567f3e80b75" title="callback for libpng warnings" alt="" coords="485,495,572,521"/>
+</map>

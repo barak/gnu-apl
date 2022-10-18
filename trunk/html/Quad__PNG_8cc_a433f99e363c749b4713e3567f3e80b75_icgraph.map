@@ -1,0 +1,7 @@
+<map id="PNG_warn" name="PNG_warn">
+<area shape="rect" id="node1" title="callback for libpng warnings" alt="" coords="433,31,520,56"/>
+<area shape="rect" id="node2" href="$classQuad__PNG.html#ab85dfd3c052e99bf359fcb40b622e1f3" title="read PNG file filename and return its pixels as 4×N×M matrix" alt="" coords="201,5,384,31"/>
+<area shape="rect" id="node4" href="$classQuad__PNG.html#aec95f6eab85b55e0f54436fd3f9efe9d" title="write APL pixel matrix B PNG file filename" alt="" coords="200,55,385,80"/>
+<area shape="rect" id="node3" href="$classQuad__PNG.html#a0db0711b85fe1d914c413f6679458802" title="overloaded Function::eval_B()" alt="" coords="10,5,147,31"/>
+<area shape="rect" id="node5" href="$classQuad__PNG.html#a0987f76de9c44afe296ba61fdbcb2dfa" title="overloaded Function::eval_AB()" alt="" coords="5,55,152,80"/>
+</map>

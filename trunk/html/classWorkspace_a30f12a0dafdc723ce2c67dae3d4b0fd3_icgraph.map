@@ -1,0 +1,7 @@
+<map id="Workspace::list_SI" name="Workspace::list_SI">
+<area shape="rect" id="node1" title="print the SI on out" alt="" coords="616,31,749,56"/>
+<area shape="rect" id="node2" href="$classIO__Files.html#aa05a2917c11a88b9abfc4afa6ca04a3e" title="dito (close files, print errors, summary etc)." alt="" coords="379,31,568,56"/>
+<area shape="rect" id="node3" href="$classIO__Files.html#acc91875b8e0c7a5ad44e3ead0e3dda7b" title="get one line from the current file, open the next file if necceessary" alt="" coords="183,5,331,31"/>
+<area shape="rect" id="node5" href="$classIO__Files.html#a5ac43f7fe811ca95a419f8ba7a11682e" title="close current testcase file (prematurely) and opem mext one" alt="" coords="193,55,321,80"/>
+<area shape="rect" id="node4" href="$classInputMux.html#a8a79cbe5207cde162fb36133ad9defdd" title="get one line" alt="" coords="5,5,135,31"/>
+</map>

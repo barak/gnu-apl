@@ -1,0 +1,6 @@
+<map id="Cell::bif_nor" name="Cell::bif_nor">
+<area shape="rect" id="node1" title="store the logical NOR of A and this cell in Z" alt="" coords="236,55,328,80"/>
+<area shape="rect" id="node2" href="$classBif__F2__NOR.html#ae7168c3c28e7ce560dbbd8f48ea45e2e" title="overloaded Function::eval_AB()." alt="" coords="19,5,174,31"/>
+<area shape="rect" id="node3" href="$classBif__F2__NOR.html#a09e622c87fdca910256244885c2e3e5a" title="overloaded Function::eval_AXB()." alt="" coords="15,55,178,80"/>
+<area shape="rect" id="node4" href="$classBif__F2__NOR.html#a95722299429928b3713050cd524e7925" title="overloaded Function::get_scalar_f2()" alt="" coords="5,104,188,129"/>
+</map>

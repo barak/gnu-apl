@@ -1,0 +1,5 @@
+<map id="gemv" name="gemv">
+<area shape="rect" id="node2" href="$classVector.html#a8c70d81e7dc1e45db9120b0ef2dc1923" title="return this[i] " alt="" coords="111,5,190,32"/>
+<area shape="rect" id="node3" href="$classMatrix.html#ac6a7b1bda54bed438cd37377f4353266" title="return this[i, j] " alt="" coords="112,56,189,83"/>
+<area shape="rect" id="node4" href="$classDZ.html#a5ef72a76df265a1abe2a4f6a7b81b566" title="return x conjugated " alt="" coords="108,107,193,133"/>
+</map>

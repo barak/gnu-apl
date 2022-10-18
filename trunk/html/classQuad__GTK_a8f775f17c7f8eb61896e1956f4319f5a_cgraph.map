@@ -1,0 +1,5 @@
+<map id="Quad_GTK::close_window" name="Quad_GTK::close_window">
+<area shape="rect" id="node1" title="close the window with file descriptor fd" alt="" coords="5,31,183,56"/>
+<area shape="rect" id="node2" href="$classQuad__FIO.html#a230fc3fc2c113e6d14cd99c763890470" title="close a file descriptor (and its FILE * if any)" alt="" coords="231,5,397,31"/>
+<area shape="rect" id="node3" href="$classQuad__GTK.html#a89a221039ea3e73ecb7b1826564dd9e6" title="write a TLV with an empty V (thus L=0)" alt="" coords="238,55,390,80"/>
+</map>

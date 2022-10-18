@@ -1,0 +1,6 @@
+<map id="Svar_DB::init" name="Svar_DB::init">
+<area shape="rect" id="node1" title="open (and possibly initialize) the shared variable database" alt="" coords="5,35,105,60"/>
+<area shape="rect" id="node2" href="$classSvar__DB.html#a1db5cbd82fd5d61c5a415c963e533987" title="return true if the connection to APserver is up" alt="" coords="153,5,348,31"/>
+<area shape="rect" id="node3" href="$classSvar__DB.html#af7b580fe3e950076530dbe121f69cb64" title="return a socket that is connect to APserver" alt="" coords="177,55,324,95"/>
+<area shape="rect" id="node4" href="$classSvar__DB.html#a9a7551390b49554688b4233cd73e14a8" title="start an APserver process, return true on failure" alt="" coords="396,63,567,88"/>
+</map>

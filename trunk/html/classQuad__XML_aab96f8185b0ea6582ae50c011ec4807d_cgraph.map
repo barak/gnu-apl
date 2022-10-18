@@ -1,0 +1,6 @@
+<map id="Quad_XML::split_name" name="Quad_XML::split_name">
+<area shape="rect" id="node1" title="split src, e.g. &quot;_2_name&quot; into integer 2, Unicode &#39;_&#39;, and UCS_string &#39;name&#39;. Null pointers if not re..." alt="" coords="5,31,164,56"/>
+<area shape="rect" id="node2" href="$classCell.html#a2999919fc2782b3cebfd925c63cc1fac" title="Return the character value of a cell." alt="" coords="212,31,353,56"/>
+<area shape="rect" id="node3" href="$classCell.html#a38a6a25f0ad091f35e3d9abfe5608a50" title="return the type of this cell" alt="" coords="421,5,551,31"/>
+<area shape="rect" id="node4" href="$classCell.html#a6c3fdef3d82f53649d1c3f16d37eedd7" title="the name of ct" alt="" coords="401,55,571,80"/>
+</map>

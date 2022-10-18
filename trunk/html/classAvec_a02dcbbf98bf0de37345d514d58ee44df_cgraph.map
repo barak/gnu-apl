@@ -1,0 +1,5 @@
+<map id="Avec::is_digit_or_space" name="Avec::is_digit_or_space">
+<area shape="rect" id="node1" title="Return true iff av is a digit or a space." alt="" coords="5,31,167,56"/>
+<area shape="rect" id="node2" href="$classAvec.html#af6b90a707281ad128da1764d92d85cd7" title="Return true iff av is a digit (i.e. 0 ≤ av ≤ 9)" alt="" coords="218,5,319,31"/>
+<area shape="rect" id="node3" href="$classAvec.html#a014cc622b9ec09014dab1982b0ee59ab" title="return true iff av is a whitespace char (ASCII 0..32 (including))" alt="" coords="215,55,323,80"/>
+</map>

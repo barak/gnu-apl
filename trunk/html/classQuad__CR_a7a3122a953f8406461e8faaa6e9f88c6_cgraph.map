@@ -1,0 +1,19 @@
+<map id="Quad_CR::do_CR30" name="Quad_CR::do_CR30">
+<area shape="rect" id="node1" title="compute 30 ⎕CR B" alt="" coords="5,245,148,270"/>
+<area shape="rect" id="node2" href="$classShape.html#aeb018b67601d3f1c4bea3d2c2b877b7e" title="add a dimension of length len at the end" alt="" coords="624,10,787,36"/>
+<area shape="rect" id="node3" href="$classBif__F12__TAKE.html#a3c786a32b82e6d9c41d0c701278744d2" title="Take from B according to ravel_A." alt="" coords="196,97,359,122"/>
+<area shape="rect" id="node9" href="$classShape.html#ab0b1b642b7e251ff8f7a3afd01be01cc" title="possibly increase rank by prepending axes of length 1" alt="" coords="207,146,348,172"/>
+<area shape="rect" id="node10" href="$classCell.html#a367b9df7e0d4b805e5f31641658113f6" title="Return the APL value of a cell (Asserts for non&#45;pointer cells)" alt="" coords="200,196,355,221"/>
+<area shape="rect" id="node13" href="$classShape.html#a017e9a35dd20f4bc4fdeb7ea29b6805d" title="return the rank" alt="" coords="219,245,336,270"/>
+<area shape="rect" id="node14" href="$classShape.html#a592d2ade68aa8c21c5d84627c3a0e001" title="return the length of dimension r" alt="" coords="198,294,357,320"/>
+<area shape="rect" id="node15" href="$classShape.html#af39e05bad7be900fa1437a6eb6035e97" title="return the number of ravel elements (1 for scalars,i else product of shapes)" alt="" coords="210,344,345,369"/>
+<area shape="rect" id="node16" href="$classCell.html#af8746e4049278c9a46f25e6ee0d71fcc" title="Return true iff this cell is a pointer to a cell." alt="" coords="219,393,336,418"/>
+<area shape="rect" id="node17" href="$classCell.html#ae98b3988a7fa52c6c157b4911b043dde" title="Return true iff this cell is a pointer (to a sub&#45;array) cell." alt="" coords="209,442,345,468"/>
+<area shape="rect" id="node4" href="$classShape.html#a190d62a53b8617463c01e67a5d9addde" title="return a shape like this, but with negative elements made positive" alt="" coords="447,48,535,73"/>
+<area shape="rect" id="node5" href="$classBif__F12__TAKE.html#a0b5765e94b6f7bde194df34b26e8a5ca" title="Fill Z with B, pad as necessary." alt="" coords="426,97,557,122"/>
+<area shape="rect" id="node8" href="$classShape.html#a3a7c1dfbab2d8c181f0e1153a5736249" title="return true iff this shape is empty (some dimension is 0)." alt="" coords="431,146,551,172"/>
+<area shape="rect" id="node6" href="$classValue.html#a35a1c313fbca5c1bef209f8d978ef9b6" title="initialize the next ravel cell from another Cell" alt="" coords="629,85,782,110"/>
+<area shape="rect" id="node7" href="$classValue.html#a825bb984c11a131c55729a3af8eeeec5" title="initialize the next ravel cell from the type of another Cell" alt="" coords="625,134,786,160"/>
+<area shape="rect" id="node11" href="$classCell.html#a38a6a25f0ad091f35e3d9abfe5608a50" title="return the type of this cell" alt="" coords="426,196,557,221"/>
+<area shape="rect" id="node12" href="$classCell.html#a6c3fdef3d82f53649d1c3f16d37eedd7" title="the name of ct" alt="" coords="407,245,576,270"/>
+</map>

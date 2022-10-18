@@ -1,0 +1,6 @@
+<map id="Symbol::set_NC" name="Symbol::set_NC">
+<area shape="rect" id="node1" title="Set current NameClass of this Symbol to nc and function fun." alt="" coords="5,70,124,95"/>
+<area shape="rect" id="node2" href="$classValueStackItem.html#a840db29e855ea1f1ab427fdffebb09c3" title="delete the function" alt="" coords="181,5,331,45"/>
+<area shape="rect" id="node3" href="$classValueStackItem.html#a27453c0dfda1004c6f5e68a0c2530eae" title="return the name class for this ValueStackItem" alt="" coords="172,70,340,95"/>
+<area shape="rect" id="node4" href="$classValueStackItem.html#a396d7686077ac51251f50c417c338431" title="set function to fun" alt="" coords="185,120,327,160"/>
+</map>

@@ -1,0 +1,6 @@
+<map id="LibPaths::is_present" name="LibPaths::is_present">
+<area shape="rect" id="node1" title="return true iff directory lib) is present" alt="" coords="5,31,147,56"/>
+<area shape="rect" id="node2" href="$classUTF8__string.html#a922bd7ebc6a8ea5c6ba9c54159b18a93" title="return this string as a 0&#45;terminated C string" alt="" coords="199,5,330,31"/>
+<area shape="rect" id="node3" href="$classLibPaths.html#a4316cbd8878626733273cb0db73cfd82" title="return library path (from config file or from libroot)" alt="" coords="195,55,335,80"/>
+<area shape="rect" id="node4" href="$classUTF8__string.html#ae512c0617f7a13fe5011655d898ca6c1" title="append the UTF8_string suffix" alt="" coords="383,55,567,80"/>
+</map>

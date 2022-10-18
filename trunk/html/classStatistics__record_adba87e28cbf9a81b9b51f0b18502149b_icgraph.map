@@ -1,0 +1,7 @@
+<map id="Statistics_record::get_sum" name="Statistics_record::get_sum">
+<area shape="rect" id="node1" title="return the sum of samples" alt="" coords="399,55,527,95"/>
+<area shape="rect" id="node2" href="$classQuad__FIO.html#aeaba4a7f5a55bbab8ad6b7d3d7c932fa" title="overloaded Function::eval_AXB()." alt="" coords="206,5,345,31"/>
+<area shape="rect" id="node4" href="$classCellFunctionStatistics.html#aa35e3d1e5f4c556f1a11dcf4779f22b5" title="return the cycles sum" alt="" coords="200,55,351,95"/>
+<area shape="rect" id="node5" href="$classFunctionStatistics.html#a28d0d5eea811ef0bec0accc661675260" title="overloaded Statistics::print()" alt="" coords="212,119,339,159"/>
+<area shape="rect" id="node3" href="$classQuad__FIO.html#a24ac2813d6425ad61471166fe019ba33" title="overloaded Function::eval_LXB()." alt="" coords="5,5,152,31"/>
+</map>

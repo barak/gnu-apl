@@ -1,0 +1,6 @@
+<map id="InputFile::running_script" name="InputFile::running_script">
+<area shape="rect" id="node1" title="return true iff input comes from a script (as opposed to running interactively)" alt="" coords="469,27,592,67"/>
+<area shape="rect" id="node2" href="$classNabla.html#a610d94a179335126e82e9eea07918d5a" title="edit this function" alt="" coords="5,6,91,32"/>
+<area shape="rect" id="node3" href="$classNabla.html#a19c7ba833ddf21a1ac5c4309fd44921c" title="open an existing function, or create a new one." alt="" coords="277,27,421,67"/>
+<area shape="rect" id="node4" href="$classNabla.html#a894eac5264914ef7eedcfc14643cc7ee" title="start editing, return source location if first_command is bad." alt="" coords="139,34,229,60"/>
+</map>

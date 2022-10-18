@@ -1,0 +1,8 @@
+<map id="Quad_CR::do_CR5_6" name="Quad_CR::do_CR5_6">
+<area shape="rect" id="node1" title="compute 5 ⎕CR B or 6 ⎕CR B" alt="" coords="5,80,156,105"/>
+<area shape="rect" id="node2" href="$classShape.html#aeb018b67601d3f1c4bea3d2c2b877b7e" title="add a dimension of length len at the end" alt="" coords="204,5,367,31"/>
+<area shape="rect" id="node3" href="$classCell.html#a5ba7cf69ad5fce61cf3ce8c2acb26c72" title="Return the byte value (&#45;128..255 incl) of a cell." alt="" coords="215,55,356,80"/>
+<area shape="rect" id="node4" href="$classShape.html#a017e9a35dd20f4bc4fdeb7ea29b6805d" title="return the rank" alt="" coords="227,104,344,129"/>
+<area shape="rect" id="node5" href="$classShape.html#afcd3708c8c18a30cb3c0c1fa1a630f71" title="modify dimension r" alt="" coords="206,153,365,179"/>
+<area shape="rect" id="node6" href="$classShape.html#a189c92d0b74f3313bd83c8aa7565e9c5" title="recompute volume (after changing a dimension of len 0)" alt="" coords="415,153,592,179"/>
+</map>

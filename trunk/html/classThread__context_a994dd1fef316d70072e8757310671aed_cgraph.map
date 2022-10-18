@@ -1,0 +1,5 @@
+<map id="Thread_context::M_lock_pool" name="Thread_context::M_lock_pool">
+<area shape="rect" id="node1" title="make all workers lock on pool_sema" alt="" coords="5,13,199,38"/>
+<area shape="rect" id="node2" href="$classThread__context.html#ad6131c6d7c657ae4fbf75a71db9c574a" title="start parallel execution of work at the master" alt="" coords="247,13,407,38"/>
+<area shape="rect" id="node3" href="$classThread__context.html#ab8bd91c72792a1e187c521f38c9e4f6e" title="return the context of the master" alt="" coords="455,5,593,45"/>
+</map>

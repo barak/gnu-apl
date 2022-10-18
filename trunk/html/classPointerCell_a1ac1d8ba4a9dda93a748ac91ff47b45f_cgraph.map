@@ -1,0 +1,19 @@
+<map id="PointerCell::PointerCell" name="PointerCell::PointerCell">
+<area shape="rect" id="node1" title="constructor: a cell containing nested sub&#45;array val." alt="" coords="5,92,164,117"/>
+<area shape="rect" id="node2" href="$classValue.html#a4dbee7eead7d72ec234a45d164c38e97" title="increase nz_subcell_count by count" alt="" coords="223,5,367,31"/>
+<area shape="rect" id="node3" href="$classValue.html#a553c4b723218b35f615f9dda928d7e72" title="increment the PointerCell count" alt="" coords="212,55,379,95"/>
+<area shape="rect" id="node4" href="$classValue.html#afe347be3317e5838c2a2f1efce084a47" title="return true iff this value is a simple (i.e. depth 0) scalar." alt="" coords="215,292,375,317"/>
+<area shape="rect" id="node7" href="$classValue.html#ac5b54e3a13cab0837442f1575b3299a5" title="return the number of elements, but at least 1 (for the prototype)." alt="" coords="848,171,1017,196"/>
+<area shape="rect" id="node5" href="$classValue.html#a6b8aa5e58b68236c77a09385365468d5" title="return the first element of the ravel (which is always present). same as get_cproto(),..." alt="" coords="453,200,571,225"/>
+<area shape="rect" id="node9" href="$classValue.html#a568f71b7c67f0fea6bf44b475638dced" title="return true iff this value is an lval (selective assignment) i.e. return true if at least one leaf va..." alt="" coords="427,292,597,317"/>
+<area shape="rect" id="node15" href="$classCell.html#ae98b3988a7fa52c6c157b4911b043dde" title="Return true iff this cell is a pointer (to a sub&#45;array) cell." alt="" coords="655,435,791,460"/>
+<area shape="rect" id="node16" href="$classValue.html#a20c818ea1c1f3fdb8b95c6e0d93955ab" title="return true iff this value is a scalar." alt="" coords="455,471,569,496"/>
+<area shape="rect" id="node6" href="$classValue.html#aa0572b1b7fa249cb79694fd152130b38" title="return the (constant) idx&#39;th element of the ravel." alt="" coords="661,171,784,196"/>
+<area shape="rect" id="node8" href="$classShape.html#a6f32f749601dca80263493fd06be12c4" title="return the number of ravel elements, but at least 1 (for empty values and scalars) else product of sh..." alt="" coords="1065,171,1220,196"/>
+<area shape="rect" id="node10" href="$classLvalCell.html#a86dbb9a22797b3611d852ce91e1e97b6" title="return the owner of the cell pointed to" alt="" coords="661,271,784,311"/>
+<area shape="rect" id="node11" href="$classCell.html#a367b9df7e0d4b805e5f31641658113f6" title="Return the APL value of a cell (Asserts for non&#45;pointer cells)" alt="" coords="645,336,800,361"/>
+<area shape="rect" id="node14" href="$classCell.html#af8746e4049278c9a46f25e6ee0d71fcc" title="Return true iff this cell is a pointer to a cell." alt="" coords="664,385,781,411"/>
+<area shape="rect" id="node12" href="$classCell.html#a38a6a25f0ad091f35e3d9abfe5608a50" title="return the type of this cell" alt="" coords="867,312,998,337"/>
+<area shape="rect" id="node13" href="$classCell.html#a6c3fdef3d82f53649d1c3f16d37eedd7" title="the name of ct" alt="" coords="848,361,1017,387"/>
+<area shape="rect" id="node17" href="$classShape.html#a017e9a35dd20f4bc4fdeb7ea29b6805d" title="return the rank" alt="" coords="664,484,781,509"/>
+</map>

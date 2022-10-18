@@ -1,12 +1,26 @@
 var classAvec =
 [
+    [ "Character_definition", "structAvec_1_1Character__definition.html", "structAvec_1_1Character__definition" ],
     [ "Unicode_to_IBM_codepoint", "structAvec_1_1Unicode__to__IBM__codepoint.html", "structAvec_1_1Unicode__to__IBM__codepoint" ],
-    [ "check_av_table", "classAvec.html#a35ee7f96b3fd5f09915684ec542f60cd", null ],
+    [ "CharacterFlag", "classAvec.html#a26f0bd1f8c35988eef0b5253ad3f1320", [
+      [ "FLG_NONE", "classAvec.html#a26f0bd1f8c35988eef0b5253ad3f1320a67a7d2b4f1d7618144f297ac7ed31324", null ],
+      [ "FLG_SYMBOL", "classAvec.html#a26f0bd1f8c35988eef0b5253ad3f1320afc8b99d22de4d7fb1944365303e58d1a", null ],
+      [ "FLG_DIGIT", "classAvec.html#a26f0bd1f8c35988eef0b5253ad3f1320a94b290d6aac57f16947d1b37c81f9a3c", null ],
+      [ "FLG_NO_SPACE_AFTER", "classAvec.html#a26f0bd1f8c35988eef0b5253ad3f1320a8934da49068c48c26b9c3a5ee242126c", null ],
+      [ "FLG_NO_SPACE_BEFORE", "classAvec.html#a26f0bd1f8c35988eef0b5253ad3f1320a79364192021a816d2f05df2afdaa327a", null ],
+      [ "FLG_NO_SPACE", "classAvec.html#a26f0bd1f8c35988eef0b5253ad3f1320aaedfb49f8c6f1637493e709afaaa878d", null ],
+      [ "FLG_NUMERIC", "classAvec.html#a26f0bd1f8c35988eef0b5253ad3f1320a39c85da2e1d08f653d7bea18c591c96c", null ]
+    ] ],
+    [ "CHT_Index", "classAvec.html#af4d67995f5f2c47f244e41db6c71a3ae", [
+      [ "Invalid_CHT", "classAvec.html#af4d67995f5f2c47f244e41db6c71a3aeaf2216da4d5fa7cbfea8b42f20169b2dd", null ],
+      [ "MAX_AV", "classAvec.html#af4d67995f5f2c47f244e41db6c71a3aea6d9265cab7ed2df6f15cd29521a36098", null ]
+    ] ],
+    [ "check_av_table", "classAvec.html#a666636a6311c083efd37668dc7da68c2", null ],
     [ "check_file", "classAvec.html#aa853fc89b23e2ef5d02a56a2339357bd", null ],
     [ "compare_uni", "classAvec.html#a584e4653f79d47cd53be20f9830cbc74", null ],
     [ "digit_value", "classAvec.html#af9d230b25c7dab2ce52b4f12e7ceb886", null ],
     [ "find_av_pos", "classAvec.html#af37308ba6e99635253c4d487d4bf87fb", null ],
-    [ "find_char", "classAvec.html#a844e2fc3a73ef90f42e63a9c268f36b8", null ],
+    [ "find_char", "classAvec.html#afe30f62f26ec74019a95e5cbd6eaa111", null ],
     [ "get_av_pos", "classAvec.html#a01fc79211fc2962b985fbde59438a08a", null ],
     [ "IBM_quad_AV", "classAvec.html#a15bfa417923b425ec3c2baf973d2a5f9", null ],
     [ "init", "classAvec.html#a9188425612180914156bba6bbcf881fe", null ],
@@ -23,16 +37,18 @@ var classAvec =
     [ "is_single_quote", "classAvec.html#a45e64bd4305c106314a395fb35addb39", null ],
     [ "is_symbol_char", "classAvec.html#a76a72fdcb1782be1c490b3670c45504f", null ],
     [ "is_white", "classAvec.html#a014cc622b9ec09014dab1982b0ee59ab", null ],
-    [ "map_alternative_char", "classAvec.html#a0641640e6b1cc18a1e4c525dcf5e83a4", null ],
+    [ "make_standard", "classAvec.html#a01b46752a18611c40e5dab44dc766580", null ],
+    [ "map_alternative_char", "classAvec.html#ad45bd7c00f8480d9e72c5cd40c702ef3", null ],
     [ "need_UCS", "classAvec.html#aec63ac86774c2cd648cd2d7df094eba2", null ],
     [ "no_space_after", "classAvec.html#a07575efd64c4dda554ccde848d2debd3", null ],
     [ "no_space_before", "classAvec.html#af087e9a2ea710680225e809ac2f8e654", null ],
     [ "print_inverse_IBM_quad_AV", "classAvec.html#ae3911626674255ce3f75abd5cd4ca3be", null ],
-    [ "show_error_pos", "classAvec.html#aac8c05d8c907fd168a639d5a724ce38c", null ],
+    [ "show_error_pos", "classAvec.html#af661703d237577f046b2a5df64b965f6", null ],
     [ "subscript", "classAvec.html#a853a006d231bce379ea5cb88eec5a216", null ],
     [ "superscript", "classAvec.html#aa1d4c24515f876ab1eb51158349e0a71", null ],
     [ "uni_to_token", "classAvec.html#a9adba9efe915ef9eae7c9e969aa9ceb6", null ],
     [ "unicode", "classAvec.html#a5ad25a71540f8de1ce72dc6b7f59629b", null ],
     [ "unicode_to_cp", "classAvec.html#a24bf275107eb974d9a47ba0732153edc", null ],
+    [ "character_table", "classAvec.html#a703f19252bac33f1fdb12a04363f4aea", null ],
     [ "inverse_ibm_av", "classAvec.html#a8d4a031e792db94b336b59e6bfdcd3ec", null ]
 ];

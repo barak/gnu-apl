@@ -1,0 +1,6 @@
+<map id="UserFunction_header::UserFunction_header" name="UserFunction_header::UserFunction_header">
+<area shape="rect" id="node1" title="constructor from signature (for lambdas)" alt="" coords="5,26,160,66"/>
+<area shape="rect" id="node2" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="403,5,543,31"/>
+<area shape="rect" id="node3" href="$classUCS__string.html#a5776e51c6faa53537409322cd0ebf07a" title="append number (in ASCII encoding like d) to this string" alt="" coords="211,26,351,66"/>
+<area shape="rect" id="node4" href="$classUserFunction__header.html#a963329caf6fac2cd769b2229fc3d483f" title="return true iff bitmap sig is a valid funvtion signature" alt="" coords="208,90,355,130"/>
+</map>

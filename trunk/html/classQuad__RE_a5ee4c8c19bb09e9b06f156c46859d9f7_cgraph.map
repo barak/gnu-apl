@@ -1,0 +1,7 @@
+<map id="Quad_RE::partition_result" name="Quad_RE::partition_result">
+<area shape="rect" id="node1" title="return a result that can be used directly by ⊂ or /" alt="" coords="5,92,139,132"/>
+<area shape="rect" id="node2" href="$classQuad__RE_1_1Flags.html#a70ad67137eb728499eb82a0590446e27" title="return global (return all matches and not only first match)" alt="" coords="203,5,349,45"/>
+<area shape="rect" id="node3" href="$classRegexpMatch.html#a2f0e4cc171e3527c30a01e658d198281" title="return the offset pairs in a match" alt="" coords="187,70,365,95"/>
+<area shape="rect" id="node4" href="$classQuad__RE_1_1Flags.html#a22a64580a994d911db95653cbdcfa3e3" title="return the result type" alt="" coords="203,120,349,160"/>
+<area shape="rect" id="node5" href="$classRegexpMatch.html#a797cd101f5118444cba22b238228296a" title="return true if there was a match" alt="" coords="194,185,358,210"/>
+</map>

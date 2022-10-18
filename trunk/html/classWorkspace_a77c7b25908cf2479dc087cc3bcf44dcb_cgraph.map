@@ -1,0 +1,57 @@
+<map id="Workspace::load_WS" name="Workspace::load_WS">
+<area shape="rect" id="node1" title="load lib_ws into the_workspace, maybe set ⎕LX of the new WS." alt="" coords="5,706,155,731"/>
+<area shape="rect" id="node2" href="$classUTF8__string.html#a922bd7ebc6a8ea5c6ba9c54159b18a93" title="return this string as a 0&#45;terminated C string" alt="" coords="683,23,813,49"/>
+<area shape="rect" id="node3" href="$classWorkspace.html#ade3a373ad48eb7a8fbad97a28472db7f" title="clear the workspace" alt="" coords="213,609,367,634"/>
+<area shape="rect" id="node33" href="$classLibPaths.html#a0da8dd5e9a90282d75239ec86ebb15d4" title="return full path for file name, possibly adding .ext1 or .ext2" alt="" coords="203,214,377,239"/>
+<area shape="rect" id="node40" href="$classWorkspace.html#af444fb0d5974a5b22751c72f19e5beae" title="return the current ⎕LX" alt="" coords="221,677,359,702"/>
+<area shape="rect" id="node41" href="$classXML__Loading__Archive.html#ad4c53f35045efe69711fab7d20911deb" title="return true iff constructor could open the file" alt="" coords="214,727,366,767"/>
+<area shape="rect" id="node42" href="$classWorkspace.html#a25b1479320040415ecbe9fb7466743d7" title="load )DUMPed file from open file descriptor fd (closes fd)" alt="" coords="207,851,373,877"/>
+<area shape="rect" id="node45" href="$classXML__Loading__Archive.html#a3ea748a15d0a90fe9a32c362b14da7fd" title="read an entire workspace, throw DOMAIN_ERROR on failure" alt="" coords="214,901,366,941"/>
+<area shape="rect" id="node46" href="$classWorkspace.html#ad8aedac4ca9e22cc8881d07eef87dcfe" title="set or inquire the workspace ID" alt="" coords="229,1253,351,1278"/>
+<area shape="rect" id="node4" href="$classQuad__FIO.html#ab60b22f93502fae57ac4fd7d9bb24ab7" title="close all open files" alt="" coords="457,535,576,561"/>
+<area shape="rect" id="node5" href="$classQuad__GTK.html#a7245c5bc51e416d9f3833a8d3d83a3fa" title="close all open windows" alt="" coords="455,585,578,610"/>
+<area shape="rect" id="node9" href="$classSymbolTable.html#ade6b111b81c69288916e49dd374f2855" title="clear this symbol table (remove all user&#45;defined symbols)" alt="" coords="449,634,584,659"/>
+<area shape="rect" id="node17" href="$classCommand.html#accec0f85a888212c343a6f7fc89f1181" title="clear the copy_once_table." alt="" coords="440,733,593,773"/>
+<area shape="rect" id="node18" href="$classWorkspace.html#a87ccdd5258241c8e7d30cd38d8f609bf" title="clear the SI" alt="" coords="445,683,589,709"/>
+<area shape="rect" id="node29" href="$classWorkspace.html#a9d95fe58db1301e25929139af7bbe15f" title="Return all user&#45;defined commands." alt="" coords="443,797,590,837"/>
+<area shape="rect" id="node30" href="$classWorkspace.html#a81618932a28523c1274fb1c2ed3d9553" title="return reference to more info about last error" alt="" coords="437,387,596,413"/>
+<area shape="rect" id="node31" href="$classWorkspace.html#ab055a0407dd155b6e3e3ec76118698e0" title="set the current ⎕PW" alt="" coords="445,437,588,462"/>
+<area shape="rect" id="node32" href="$classWorkspace.html#a016ae4cac389b19f735b3c70a17cc508" title="set the name of the current workspace." alt="" coords="425,486,608,511"/>
+<area shape="rect" id="node6" href="$classQuad__GTK.html#a8f775f17c7f8eb61896e1956f4319f5a" title="close the window with file descriptor fd" alt="" coords="659,390,837,415"/>
+<area shape="rect" id="node7" href="$classQuad__FIO.html#a230fc3fc2c113e6d14cd99c763890470" title="close a file descriptor (and its FILE * if any)" alt="" coords="895,390,1061,415"/>
+<area shape="rect" id="node8" href="$classQuad__GTK.html#a89a221039ea3e73ecb7b1826564dd9e6" title="write a TLV with an empty V (thus L=0)" alt="" coords="902,341,1054,366"/>
+<area shape="rect" id="node10" href="$classSymbolTable.html#abcec1c02231416b792701cb6c9fba068" title="clear one slot (hash) in this symbol table" alt="" coords="667,539,829,565"/>
+<area shape="rect" id="node14" href="$classWorkspace.html#a64cef901fd41c19f4521bdd1175d0be7" title="the number of SI entries" alt="" coords="675,619,821,659"/>
+<area shape="rect" id="node11" href="$classSymbol.html#ad925a9e935af935d1f31f7a26a3d1533" title="call the monitor callback function (if any) with event ev" alt="" coords="906,504,1050,544"/>
+<area shape="rect" id="node12" href="$classSymbol.html#a126fc214ca7a2e2d364e0982a36b2ace" title="The name of this Symbol." alt="" coords="913,569,1043,594"/>
+<area shape="rect" id="node13" href="$classNamedObject.html#a88f09fc969608fe1d61ae33468a13d14" title="return true, iff this object is user&#45;defined" alt="" coords="902,440,1054,480"/>
+<area shape="rect" id="node15" href="$classStateIndicator.html#aa60ca9df0350c7b2e4c0825f061f300e" title="return the nesting level (oldest SI has level 0, next has level 1, ...)" alt="" coords="913,619,1043,659"/>
+<area shape="rect" id="node16" href="$classWorkspace.html#a8083efc2d51067edb25ae8dd4f014173" title="the top of the SI stack (the SI pushed last)" alt="" coords="911,683,1045,709"/>
+<area shape="rect" id="node19" href="$classStateIndicator.html#afca13502d9ce16b01d8b7ec95da872fd" title="Escape from user function (exit from each invocation until immediate execution is reached)" alt="" coords="671,734,825,759"/>
+<area shape="rect" id="node20" href="$classWorkspace.html#a4c393e0cc87db7d5148100e25d525729" title="Remove the current SI&#45;entry from the SI stack." alt="" coords="679,798,817,823"/>
+<area shape="rect" id="node21" href="$classExecutable.html#aac3043f85d550ff3a589d828a2012098" title="return a UserFunction * (if this is one) or else 0." alt="" coords="888,913,1068,938"/>
+<area shape="rect" id="node22" href="$classStateIndicator.html#a82ad7a8a8f81d5fe9fc94bb15ed408fc" title="return pointer to the current user function, statements, or execute" alt="" coords="913,963,1043,1003"/>
+<area shape="rect" id="node23" href="$classUserFunction.html#a59a4ca14c199edd678c1f10ba95e2f43" title="return the name of this function" alt="" coords="895,1027,1061,1053"/>
+<area shape="rect" id="node25" href="$classStateIndicator.html#a44d07945c56abef5505efcfdc98ec090" title="return the SI that has called this one" alt="" coords="913,733,1043,773"/>
+<area shape="rect" id="node26" href="$classExecutable.html#a02b3dd7f7dbb3c3e099e3ab553034baa" title="the parse mode of this Executable" alt="" coords="1311,827,1501,853"/>
+<area shape="rect" id="node27" href="$classStateIndicator.html#a69e6ba87c41a4fa4fabb794ce72dba13" title="return the name of the parse mode" alt="" coords="909,848,1047,888"/>
+<area shape="rect" id="node24" href="$classUserFunction__header.html#abcc2f6d70da90e3123e630a226b9e931" title="return the name of the function" alt="" coords="1116,1020,1263,1060"/>
+<area shape="rect" id="node28" href="$classStateIndicator.html#aa6584f8a9afaf76a334fb33517e36987" title="return the mode of this entry" alt="" coords="1125,848,1254,888"/>
+<area shape="rect" id="node34" href="$classUTF8__string.html#aabaebbdfbe8fad48e44655144f5fbd5e" title="append a 0&#45;terminated C string" alt="" coords="676,103,820,143"/>
+<area shape="rect" id="node35" href="$classUTF8__string.html#ae512c0617f7a13fe5011655d898ca6c1" title="append the UTF8_string suffix" alt="" coords="656,238,840,263"/>
+<area shape="rect" id="node36" href="$classUTF8__string.html#a75b4e440d7576c690934bc7b5f863ac6" title="return true iff string ends with ext (usually a file name extension)" alt="" coords="436,239,597,265"/>
+<area shape="rect" id="node37" href="$classLibPaths.html#a4316cbd8878626733273cb0db73cfd82" title="return library path (from config file or from libroot)" alt="" coords="447,338,587,363"/>
+<area shape="rect" id="node38" href="$classLibPaths.html#a4f885147c87d4a70e0d199cebf5a0aa8" title="maybe warn the user if two files that differ only by extension exist" alt="" coords="439,73,594,113"/>
+<area shape="rect" id="node39" href="$classUTF8__string.html#ae72a6d597692993ab2760837dda316d3" title="return true iff string starts with path (usually a file path)" alt="" coords="433,289,600,314"/>
+<area shape="rect" id="node43" href="$structInputFile.html#a171f3f85dfe2dfb9186cf9bdc5be22ca" title="add object to object_filter" alt="" coords="450,861,583,901"/>
+<area shape="rect" id="node44" href="$structInputFile.html#adbba18806cd166da001a34b438cc5d4a" title="set the from_COPY flag" alt="" coords="445,926,588,951"/>
+<area shape="rect" id="node47" href="$classUCS__string.html#a52cd4088451200cd78eb2db03b44a8ac" title="erase 1 (!) character at pos" alt="" coords="451,1329,582,1354"/>
+<area shape="rect" id="node48" href="$classUCS__string.html#a5ee12a6873e023f9ad76ffafd7aa9c20" title="prepend character uni" alt="" coords="445,1378,589,1403"/>
+<area shape="rect" id="node50" href="$classUCS__string.html#a91556379049e71071410cec015b960db" title="remove leading and trailing whitespaces" alt="" coords="445,1147,588,1202"/>
+<area shape="rect" id="node51" href="$classUCS__string.html#a07e8673ec73ad31228be88053aeff1b1" title="remove leading blanks, tabs, etc" alt="" coords="673,1213,823,1253"/>
+<area shape="rect" id="node52" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="1128,1177,1251,1202"/>
+<area shape="rect" id="node49" href="$classUCS__string.html#a522289839ffbbcbe43b4577858926858" title="more intuitive insert() function" alt="" coords="683,1378,813,1403"/>
+<area shape="rect" id="node53" href="$classUCS__string.html#a6a4540c3a5a7621f91406454b4f93cd0" title="remove trailing blanks, tabs, etc" alt="" coords="675,1135,821,1175"/>
+<area shape="rect" id="node54" href="$classUCS__string.html#a186a76c22c3ac840f1e607ba49e253a0" title="return the last character in this string" alt="" coords="915,1077,1041,1102"/>
+<area shape="rect" id="node55" href="$classUCS__string.html#a67ea87cb92e687105b21917ffb4a2a6f" title="remove the last character in this string" alt="" coords="901,1126,1055,1151"/>
+</map>

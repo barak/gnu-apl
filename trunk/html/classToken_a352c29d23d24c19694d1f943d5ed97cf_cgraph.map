@@ -1,0 +1,6 @@
+<map id="Token::extract_apl_val" name="Token::extract_apl_val">
+<area shape="rect" id="node1" title="clear the Value_P value (if any) of this token, updating its refcount as needed" alt="" coords="5,31,160,56"/>
+<area shape="rect" id="node2" href="$classToken.html#a11e37aa69b8eb64f293702293b00f50c" title="return true iff this token is an apl value" alt="" coords="219,5,343,31"/>
+<area shape="rect" id="node4" href="$classValue__P__Base.html#ad07a670c61c71b7aecc8ca9a6170b796" title="decrement owner&#45;count and reset pointer to 0" alt="" coords="208,55,353,80"/>
+<area shape="rect" id="node3" href="$classToken.html#a1a31afbb07e3f1dbb86d5f872ce5c297" title="return the TokenValueType of this token." alt="" coords="401,5,555,31"/>
+</map>

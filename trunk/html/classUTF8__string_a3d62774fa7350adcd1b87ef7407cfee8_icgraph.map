@@ -1,0 +1,4 @@
+<map id="UTF8_string::getc" name="UTF8_string::getc">
+<area shape="rect" id="node1" title="return the next UTF8 encoded char from an input file" alt="" coords="220,5,347,31"/>
+<area shape="rect" id="node2" href="$classUCS__string.html#abdc7eb0dea04fbe060b3740defa8f009" title="constructor: read one line from UTF8&#45;encoded file." alt="" coords="5,5,172,31"/>
+</map>

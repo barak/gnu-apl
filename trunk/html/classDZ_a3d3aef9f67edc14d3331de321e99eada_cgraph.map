@@ -1,0 +1,5 @@
+<map id="DZ::CONJ" name="DZ::CONJ">
+<area shape="rect" id="node1" title="return z conjugated" alt="" coords="5,31,91,56"/>
+<area shape="rect" id="node2" href="$classZZ.html#acda4690b6802c0511c02bdae67ff8ebe" title="return the imag part of this" alt="" coords="139,5,213,31"/>
+<area shape="rect" id="node3" href="$classZZ.html#a646c7dcad147e52aef3278903bf30c5f" title="return the real part of this" alt="" coords="143,55,209,80"/>
+</map>

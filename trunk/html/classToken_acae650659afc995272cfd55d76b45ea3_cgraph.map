@@ -1,0 +1,5 @@
+<map id="Token::get_ErrorCode" name="Token::get_ErrorCode">
+<area shape="rect" id="node1" title="return the error code value of this token" alt="" coords="5,31,156,56"/>
+<area shape="rect" id="node2" href="$classToken.html#a13e8b65088f8a7d103772acc6cfb5140" title="return the tag of this token" alt="" coords="226,5,335,31"/>
+<area shape="rect" id="node3" href="$classToken.html#a1a31afbb07e3f1dbb86d5f872ce5c297" title="return the TokenValueType of this token." alt="" coords="204,55,357,80"/>
+</map>

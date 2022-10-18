@@ -8,7 +8,7 @@ var classDLX__Root__Node =
     [ "get_cover_count", "classDLX__Root__Node.html#a5c1bde4be89c0b773eb0a9bfa145c91e", null ],
     [ "get_pick_count", "classDLX__Root__Node.html#a9e2fc0fae36e9facbe6c293a8b9dafe3", null ],
     [ "get_solution_count", "classDLX__Root__Node.html#a427ca83e61bc46b4672cd696cc2764bb", null ],
-    [ "indent", "classDLX__Root__Node.html#a4ee02dea08e0d52a808f4e4532e23681", null ],
+    [ "indent", "classDLX__Root__Node.html#aeaf98facca43ebf207de72184d8bc760", null ],
     [ "preset", "classDLX__Root__Node.html#a361309d7f1cc268ab987fee4c2003558", null ],
     [ "solve", "classDLX__Root__Node.html#a3c37a6cf9975dda2d0ddd30defdaf8c0", null ],
     [ "uncover", "classDLX__Root__Node.html#a955017dab559c56d54c72e08af5ba1cb", null ],

@@ -1,0 +1,4 @@
+<map id="FloatCell::need_scaling" name="FloatCell::need_scaling">
+<area shape="rect" id="node1" title="Return true iff the (fixed point) floating point number num shall be printed in scaled form (like 1...." alt="" coords="5,5,164,31"/>
+<area shape="rect" id="node2" href="$classFloatCell.html#aba74029d9fbbe9caf95b596ab24283e3" title="return true if the integer part of val is longer than ⎕PP" alt="" coords="212,5,328,31"/>
+</map>

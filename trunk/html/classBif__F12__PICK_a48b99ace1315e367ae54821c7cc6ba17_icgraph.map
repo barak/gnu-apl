@@ -1,0 +1,5 @@
+<map id="Bif_F12_PICK::pick_offset" name="Bif_F12_PICK::pick_offset">
+<area shape="rect" id="node1" title="compute the offset of the Cell in B that shall be picked." alt="" coords="403,22,541,62"/>
+<area shape="rect" id="node2" href="$classBif__F12__PICK.html#a2d3da6f8ebc821a18d269a0d37bfd0f3" title="Pick from B according to cA and len_A. cell_owner is non&#45;zero if a left&#45;vlues is picked,..." alt="" coords="216,29,355,55"/>
+<area shape="rect" id="node3" href="$classBif__F12__PICK.html#aa2ad8015735ab7969cae2d7b5349991f" title="overloaded Function::eval_AB()" alt="" coords="5,29,168,55"/>
+</map>

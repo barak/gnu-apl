@@ -1,0 +1,9 @@
+<map id="Error::get_error_line_1" name="Error::get_error_line_1">
+<area shape="rect" id="node1" title="return ⎕EM[1;]. This is the first of 3 error lines. It contains the error name (like SYNTAX ERROR,..." alt="" coords="428,55,579,80"/>
+<area shape="rect" id="node2" href="$classQuad__EM.html#af44f390bce05f712cdff0ad13f834a12" title="overloaded Symbol::get_apl_value()" alt="" coords="212,5,380,31"/>
+<area shape="rect" id="node3" href="$classStateIndicator.html#ae8f1a9f49c7933c492f6f899fccd437f" title="list the stack entry (for command ]SI)" alt="" coords="228,55,364,80"/>
+<area shape="rect" id="node5" href="$classError.html#a1c91620311957635852e42ba8cd695c4" title="print the 3 error message lines as per ⎕EM" alt="" coords="242,108,350,133"/>
+<area shape="rect" id="node4" href="$classStateIndicator.html#a0129e968c738e1c300e20b16533fca55" title="list the stack entry (for commands ]SI, )SI, and )SIS)" alt="" coords="21,51,149,76"/>
+<area shape="rect" id="node6" href="$classWorkspace.html#a8c147249a197f0d605f7cfc535969c92" title="create and execute one immediate execution context" alt="" coords="7,101,163,141"/>
+<area shape="rect" id="node7" href="$classError.html#adf8e47c02b1ae0be1368a0587f7daed4" title="update error information in this and copy it to si" alt="" coords="5,165,164,191"/>
+</map>

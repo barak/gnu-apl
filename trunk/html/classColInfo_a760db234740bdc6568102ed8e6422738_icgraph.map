@@ -1,0 +1,5 @@
+<map id="ColInfo::consider" name="ColInfo::consider">
+<area shape="rect" id="node1" title="update the properties of this ColInfo according to the properties of other" alt="" coords="431,5,552,31"/>
+<area shape="rect" id="node2" href="$classPrintBuffer.html#adb9b7f5903b37ffeae4de10ada9cfc6d" title="helper for non&#45;trivial PrintBuffer(const Value &amp; ...) constructor" alt="" coords="208,5,383,31"/>
+<area shape="rect" id="node3" href="$classPrintBuffer.html#a5abec40efca2993a2b522e199694730f" title="contructor: a PrintBuffer from an APL value" alt="" coords="5,5,160,31"/>
+</map>

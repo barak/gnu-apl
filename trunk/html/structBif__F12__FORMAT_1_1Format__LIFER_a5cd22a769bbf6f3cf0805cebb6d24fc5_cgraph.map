@@ -1,0 +1,7 @@
+<map id="Bif_F12_FORMAT::Format_LIFER::fill_data_fields" name="Bif_F12_FORMAT::Format_LIFER::fill_data_fields">
+<area shape="rect" id="node1" title="Print value into int, fract, and expo fields." alt="" coords="5,73,184,113"/>
+<area shape="rect" id="node2" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="232,5,372,31"/>
+<area shape="rect" id="node3" href="$classWorkspace.html#a09f10a68b5a249c789bf8c1839f3208c" title="return element pos of the current ⎕FC (pos should be 0..5)" alt="" coords="233,55,371,80"/>
+<area shape="rect" id="node4" href="$structFormat__sub.html#a872fece2e509a22858f33d3b42536a95" title="return the number of characters in format" alt="" coords="241,104,363,129"/>
+<area shape="rect" id="node5" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="420,129,543,155"/>
+</map>

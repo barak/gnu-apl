@@ -1,0 +1,8 @@
+<map id="Cell::compare_ptr" name="Cell::compare_ptr">
+<area shape="rect" id="node1" title="a stable compare function to be used with Heapsort. The cell contents are ignored and only the cell a..." alt="" coords="692,55,817,80"/>
+<area shape="rect" id="node2" href="$classBif__F2__INTER.html#aea1da324cf89caf1f4ab2c31201ebcb8" title="overloaded Function::eval_AB()" alt="" coords="475,5,640,31"/>
+<area shape="rect" id="node3" href="$classBif__F12__UNION.html#aa78bb6fe147dcc3a3343c3c1f7ad6c66" title="overloaded Function::eval_B()" alt="" coords="474,55,641,80"/>
+<area shape="rect" id="node4" href="$classBif__F12__WITHOUT.html#a82df83f764b15e8bc01f7629bdf4bc80" title="eval_AB for large A and/or B" alt="" coords="471,105,644,145"/>
+<area shape="rect" id="node5" href="$classBif__F12__WITHOUT.html#a3a0bc2f2615b3de67edb0fa0a84727e0" title="Compute A without B. overloaded Function::eval_AB()." alt="" coords="228,112,423,137"/>
+<area shape="rect" id="node6" href="$classBif__F12__UNION.html#a0929eb6bc282f9c312db42fdfa78686d" title="overloaded Function::eval_AB()" alt="" coords="5,112,180,137"/>
+</map>

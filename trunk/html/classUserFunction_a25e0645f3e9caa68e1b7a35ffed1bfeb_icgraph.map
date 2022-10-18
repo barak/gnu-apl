@@ -1,0 +1,7 @@
+<map id="UserFunction::fix" name="UserFunction::fix">
+<area shape="rect" id="node1" title="create a user defined function according to data of length len in workspace w." alt="" coords="212,80,335,105"/>
+<area shape="rect" id="node2" href="$classQuad__FX.html#a8bf850cc2a939e11fccbb21abc79a0e7" title="do ⎕FX with execution properties exec_props" alt="" coords="5,5,164,31"/>
+<area shape="rect" id="node3" href="$classNabla.html#a610d94a179335126e82e9eea07918d5a" title="edit this function" alt="" coords="42,55,127,80"/>
+<area shape="rect" id="node4" href="$classUserFunction.html#ab642f0280320a5cdccb8c40c812b3f25" title="Load this function into the workspace named workspace." alt="" coords="19,104,151,129"/>
+<area shape="rect" id="node5" href="$classXML__Loading__Archive.html#a2e7aed9883aa106937d3d9313163e10b" title="read next Function element" alt="" coords="9,154,161,194"/>
+</map>

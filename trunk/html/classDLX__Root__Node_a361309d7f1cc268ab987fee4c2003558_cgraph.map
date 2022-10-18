@@ -1,0 +1,9 @@
+<map id="DLX_Root_Node::preset" name="DLX_Root_Node::preset">
+<area shape="rect" id="node1" title="do some dance steps with the constraints matrix" alt="" coords="5,145,171,171"/>
+<area shape="rect" id="node2" href="$classDLX__Root__Node.html#a2398a37e28c8fcfb9143d3a4dd1f61f9" title="cover columns j (see Knuth)" alt="" coords="219,5,380,31"/>
+<area shape="rect" id="node3" href="$classDLX__Root__Node.html#ade1a97489fbe1c0e5886c95db923c193" title="return the (decreasing) number of columns" alt="" coords="226,55,373,95"/>
+<area shape="rect" id="node4" href="$classCell.html#ad165f9ab69abf46b2cf44d301a700a1c" title="Return the integer value of a cell." alt="" coords="234,120,365,145"/>
+<area shape="rect" id="node5" href="$classWorkspace.html#adb2006f054a1cebb8ae0252b61bd1d1b" title="return the current ⎕IO" alt="" coords="232,169,367,195"/>
+<area shape="rect" id="node6" href="$classCell.html#a30d0c83ab2c46ef830cd1301c77eb772" title="Return true iff this cell is an integer cell." alt="" coords="231,219,367,244"/>
+<area shape="rect" id="node7" href="$classDLX__Node.html#a8412d43f28f22f4018b18d844d9bf6dc" title="print the row and columns of this node" alt="" coords="226,268,373,293"/>
+</map>

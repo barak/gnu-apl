@@ -1,0 +1,4 @@
+<map id="XML_node::get_taglen" name="XML_node::get_taglen">
+<area shape="rect" id="node1" title="return the length of the tag at string_B + offset..." alt="" coords="5,5,157,31"/>
+<area shape="rect" id="node2" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="205,5,328,31"/>
+</map>

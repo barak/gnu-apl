@@ -1,0 +1,5 @@
+<map id="Avec::uni_to_token" name="Avec::uni_to_token">
+<area shape="rect" id="node1" title="Return a token containing av." alt="" coords="5,31,140,56"/>
+<area shape="rect" id="node2" href="$classAvec.html#afe30f62f26ec74019a95e5cbd6eaa111" title="Find av in character_table. Return position or Invalid_CHT." alt="" coords="223,5,337,31"/>
+<area shape="rect" id="node3" href="$classAvec.html#ad45bd7c00f8480d9e72c5cd40c702ef3" title="Find return position of alt_av, or Invalid_AV if not found." alt="" coords="188,55,372,80"/>
+</map>

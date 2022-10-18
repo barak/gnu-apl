@@ -1,0 +1,6 @@
+<map id="IndexExpr::print_stale" name="IndexExpr::print_stale">
+<area shape="rect" id="node1" title="print stale IndexExprs, and return the number of stale IndexExprs." alt="" coords="5,55,155,80"/>
+<area shape="rect" id="node2" href="$classDynamicObject.html#a1e474e9faac99829c40774e489fc3db8" title="return the next DynamicObject in its list" alt="" coords="211,5,381,31"/>
+<area shape="rect" id="node3" href="$classDynamicObject.html#a17ab8b65022f5a21359f80eeeeccb2d1" title="cast to IndexExpr *. Caller must check that this cast is valid." alt="" coords="203,55,389,80"/>
+<area shape="rect" id="node4" href="$classDynamicObject.html#ac9b664a8c6ed70696c7319925fd5a63a" title="where this value was allocated." alt="" coords="219,105,373,145"/>
+</map>

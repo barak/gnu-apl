@@ -1,0 +1,4 @@
+<map id="Command::cmd_LOG" name="Command::cmd_LOG">
+<area shape="rect" id="node1" title="control logging facilities" alt="" coords="5,5,155,31"/>
+<area shape="rect" id="node2" href="$classCommand.html#ac70a0a220bae16cdb98b389f4872c85d" title="parse the argument of the ]LOG command and set logging accordingly" alt="" coords="203,5,356,31"/>
+</map>

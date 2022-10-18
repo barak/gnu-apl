@@ -1,0 +1,6 @@
+<map id="Value::is_int_array" name="Value::is_int_array">
+<area shape="rect" id="node1" title="return true iff this value is a (simple) integer array, allowing near&#45;int values (but NOT necessatily..." alt="" coords="5,31,136,56"/>
+<area shape="rect" id="node2" href="$classValue.html#aa0572b1b7fa249cb79694fd152130b38" title="return the (constant) idx&#39;th element of the ravel." alt="" coords="184,5,307,31"/>
+<area shape="rect" id="node3" href="$classValue.html#ac5b54e3a13cab0837442f1575b3299a5" title="return the number of elements, but at least 1 (for the prototype)." alt="" coords="355,31,524,56"/>
+<area shape="rect" id="node4" href="$classShape.html#a6f32f749601dca80263493fd06be12c4" title="return the number of ravel elements, but at least 1 (for empty values and scalars) else product of sh..." alt="" coords="572,31,727,56"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="Function::get_tag" name="Function::get_tag">
+<area shape="rect" id="node2" href="$classFunction.html#a590e23020b0a7098725988201a213954" title="plain function, 0 arguments " alt="" coords="189,5,299,32"/>
+<area shape="rect" id="node5" href="$classFunction.html#a1d8e47de79dffa81c189730a1a19f80d" title="plain function, 2 arguments " alt="" coords="179,56,309,83"/>
+<area shape="rect" id="node6" href="$classFunction.html#a5b55cbacebf9d08b224319bfbb835647" title="monadic operator, 2 arguments " alt="" coords="176,107,312,133"/>
+<area shape="rect" id="node3" href="$classNamedObject.html#adf8b778a154d1d6e35c7d8a169aaaeb5" title="return the name of the named object " alt="" coords="360,56,527,83"/>
+<area shape="rect" id="node4" href="$classID.html#af1bb0741450971c1882af59af87eef29" title="return the printable name for id as UCS_string " alt="" coords="575,56,712,83"/>
+</map>

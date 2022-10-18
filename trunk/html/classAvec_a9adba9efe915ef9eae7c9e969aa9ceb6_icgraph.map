@@ -1,0 +1,9 @@
+<map id="Avec::uni_to_token" name="Avec::uni_to_token">
+<area shape="rect" id="node1" title="Return a token containing av." alt="" coords="589,35,724,60"/>
+<area shape="rect" id="node2" href="$classTokenizer.html#a9c9924450a3c4dd6076911aa8f342171" title="tokenize UCS string input into token string tos." alt="" coords="200,5,357,31"/>
+<area shape="rect" id="node3" href="$classTokenizer.html#a1416dfa21301d3cf8abd209e79e2c0ed" title="tokenize a primitive (1&#45;character) function" alt="" coords="405,55,541,95"/>
+<area shape="rect" id="node4" href="$classQuad__FIO.html#a36fdeb894607c2125307cd673284fb69" title="overloaded Function::eval_AXB()." alt="" coords="205,55,353,80"/>
+<area shape="rect" id="node5" href="$classQuad__FIO.html#aeaba4a7f5a55bbab8ad6b7d3d7c932fa" title="overloaded Function::eval_AXB()." alt="" coords="209,104,348,129"/>
+<area shape="rect" id="node7" href="$classTokenizer.html#a936f1452039ebe1391301a47dd26b11c" title="tokenize a function" alt="" coords="211,154,347,194"/>
+<area shape="rect" id="node6" href="$classQuad__FIO.html#a24ac2813d6425ad61471166fe019ba33" title="overloaded Function::eval_LXB()." alt="" coords="5,104,152,129"/>
+</map>

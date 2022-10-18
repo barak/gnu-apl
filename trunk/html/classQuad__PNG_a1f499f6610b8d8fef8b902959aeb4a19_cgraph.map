@@ -1,0 +1,4 @@
+<map id="Quad_PNG::read_pixels" name="Quad_PNG::read_pixels">
+<area shape="rect" id="node1" title="read the pixels of an uncompressed IDAT chunk." alt="" coords="5,5,168,31"/>
+<area shape="rect" id="node2" href="$classQuad__PNG.html#a0936ea7743092fdc9e51fa4067a4b156" title="return abs(p &#45; q)" alt="" coords="216,5,341,31"/>
+</map>

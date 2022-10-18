@@ -1,0 +1,8 @@
+<map id="UTF8_string::pop_back" name="UTF8_string::pop_back">
+<area shape="rect" id="node1" title="discard the last byte in this string" alt="" coords="817,55,976,80"/>
+<area shape="rect" id="node2" href="$classUserFunction.html#ab642f0280320a5cdccb8c40c812b3f25" title="Load this function into the workspace named workspace." alt="" coords="622,5,754,31"/>
+<area shape="rect" id="node3" href="$classUTF8__string.html#a000b976e22f0ff0ed798682f37e5c817" title="round a digit string is the fractional part of a number between 0.0... and 0.9... up or down accordin..." alt="" coords="607,55,769,80"/>
+<area shape="rect" id="node4" href="$classTokenizer.html#a866fc216ee57f7072f3c61d3615b1742" title="tokenize a real number (integer or floating point)." alt="" coords="395,80,559,105"/>
+<area shape="rect" id="node5" href="$classTokenizer.html#aa5b5fd6f253e7318f319d1419023e5bf" title="tokenize a number (integer, floating point, or complex)." alt="" coords="211,73,347,113"/>
+<area shape="rect" id="node6" href="$classTokenizer.html#a9c9924450a3c4dd6076911aa8f342171" title="tokenize UCS string input into token string tos." alt="" coords="5,80,163,105"/>
+</map>

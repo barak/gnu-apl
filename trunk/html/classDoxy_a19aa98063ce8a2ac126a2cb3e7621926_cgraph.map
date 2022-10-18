@@ -1,0 +1,4 @@
+<map id="Doxy::set_call_graph_root" name="Doxy::set_call_graph_root">
+<area shape="rect" id="node1" title="make the call graph start from function ufun and set nodes to those nodes that are reachable from ufu..." alt="" coords="5,5,180,31"/>
+<area shape="rect" id="node2" href="$classSymbol.html#a071c9e8a32253986503751296e4b34a2" title="Return the current function (or throw a VALUE_ERROR)" alt="" coords="228,5,373,31"/>
+</map>

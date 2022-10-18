@@ -1,5 +1,4 @@
 <map id="UserPreferences::read_config_file" name="UserPreferences::read_config_file">
-<area shape="rect" id="node2" href="$main_8cc.html#aa0321421b17def7b58fc0cabc8890260" title="initialize the interpreter " alt="" coords="289,5,351,32"/>
-<area shape="rect" id="node4" href="$structUserPreferences.html#aaf377cc53e470138ca91e289dd3f93a6" title="UserPreferences::UserPreferences" alt="" coords="207,56,433,83"/>
-<area shape="rect" id="node3" href="$main_8cc.html#ac0f2228420376f4db7e1274f2b41667c" title="dito. " alt="" coords="481,5,532,32"/>
+<area shape="rect" id="node1" title="read a preference file and update parameters set there" alt="" coords="116,5,269,45"/>
+<area shape="rect" id="node2" href="$main_8cc.html#aa0321421b17def7b58fc0cabc8890260" title="initialize the interpreter" alt="" coords="5,13,68,38"/>
 </map>

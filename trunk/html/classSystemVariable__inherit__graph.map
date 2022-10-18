@@ -1,33 +1,34 @@
 <map id="SystemVariable" name="SystemVariable">
-<area shape="rect" id="node4" href="$classNL__SystemVariable.html" title="Base class for all APL system variables that cannot be localized. " alt="" coords="433,157,572,184"/>
-<area shape="rect" id="node22" href="$classQuad__CT.html" title="The class implementing ⎕CT. " alt="" coords="463,208,542,235"/>
-<area shape="rect" id="node23" href="$classQuad__FC.html" title="The class implementing ⎕FC. " alt="" coords="463,259,542,285"/>
-<area shape="rect" id="node24" href="$classQuad__IO.html" title="The class implementing ⎕IO. " alt="" coords="465,309,540,336"/>
-<area shape="rect" id="node25" href="$classQuad__PP.html" title="The class implementing ⎕PP. " alt="" coords="463,360,542,387"/>
-<area shape="rect" id="node26" href="$classQuad__PR.html" title="The class implementing ⎕PR. " alt="" coords="463,411,542,437"/>
-<area shape="rect" id="node27" href="$classQuad__PS.html" title="The class implementing ⎕PS. " alt="" coords="463,461,542,488"/>
-<area shape="rect" id="node28" href="$classQuad__PW.html" title="The class implementing ⎕PW. " alt="" coords="461,512,544,539"/>
-<area shape="rect" id="node29" href="$classQuad__Quad.html" title="The class implementing ⎕ " alt="" coords="457,563,548,589"/>
-<area shape="rect" id="node30" href="$classQuad__QUOTE.html" title="The class implementing ⍞ " alt="" coords="449,613,556,640"/>
-<area shape="rect" id="node31" href="$classQuad__RL.html" title="Quad_RL" alt="" coords="464,664,541,691"/>
-<area shape="rect" id="node32" href="$classQuad__TZ.html" title="The class implementing ⎕TZ. " alt="" coords="465,715,541,741"/>
-<area shape="rect" id="node2" href="$classSymbol.html" title="Base class for variables, defined functions, and distinguished names. " alt="" coords="156,436,223,463"/>
-<area shape="rect" id="node3" href="$classNamedObject.html" title="A user&#45;defined variable or function. " alt="" coords="5,436,108,463"/>
-<area shape="rect" id="node5" href="$classQuad__L.html" title="The class implementing ⎕L. " alt="" coords="657,5,724,32"/>
-<area shape="rect" id="node6" href="$classQuad__LX.html" title="The class implementing ⎕LX. " alt="" coords="653,56,729,83"/>
-<area shape="rect" id="node7" href="$classQuad__R.html" title="The class implementing ⎕R. " alt="" coords="655,107,726,133"/>
-<area shape="rect" id="node8" href="$classQuad__SVE.html" title="The implementation of ⎕SVE. " alt="" coords="647,157,734,184"/>
-<area shape="rect" id="node9" href="$classQuad__SYL.html" title="The class implementing ⎕SYL. " alt="" coords="648,208,733,235"/>
-<area shape="rect" id="node10" href="$classQuad__X.html" title="The class implementing ⎕X. " alt="" coords="656,259,725,285"/>
-<area shape="rect" id="node11" href="$classRO__SystemVariable.html" title="Base class for all read&#45;only APL system variables. " alt="" coords="620,309,761,336"/>
-<area shape="rect" id="node12" href="$classQuad__AI.html" title="The class implementing ⎕AI. " alt="" coords="817,81,891,108"/>
-<area shape="rect" id="node13" href="$classQuad__ARG.html" title="The class implementing ⎕ARG. " alt="" coords="809,132,899,159"/>
-<area shape="rect" id="node14" href="$classQuad__AV.html" title="The class implementing ⎕AV. " alt="" coords="815,183,893,209"/>
-<area shape="rect" id="node15" href="$classQuad__EM.html" title="The class implementing ⎕EM. " alt="" coords="814,233,894,260"/>
-<area shape="rect" id="node16" href="$classQuad__ET.html" title="The class implementing ⎕ET. " alt="" coords="815,284,893,311"/>
-<area shape="rect" id="node17" href="$classQuad__LC.html" title="The class implementing ⎕LC. " alt="" coords="815,335,893,361"/>
-<area shape="rect" id="node18" href="$classQuad__TC.html" title="The class implementing ⎕TC. " alt="" coords="815,385,893,412"/>
-<area shape="rect" id="node19" href="$classQuad__TS.html" title="The class implementing ⎕TS. " alt="" coords="815,436,893,463"/>
-<area shape="rect" id="node20" href="$classQuad__UL.html" title="The class implementing ⎕UL. " alt="" coords="815,487,893,513"/>
-<area shape="rect" id="node21" href="$classQuad__WA.html" title="The class implementing ⎕WA. " alt="" coords="813,537,895,564"/>
+<area shape="rect" id="node1" title="Base class for all APL system variables." alt="" coords="271,425,385,451"/>
+<area shape="rect" id="node4" href="$classNL__SystemVariable.html" title="Base class for all APL system variables that cannot be localized." alt="" coords="433,153,572,179"/>
+<area shape="rect" id="node22" href="$classQuad__CT.html" title="The class implementing ⎕CT." alt="" coords="463,203,542,228"/>
+<area shape="rect" id="node23" href="$classQuad__FC.html" title="The class implementing ⎕FC." alt="" coords="463,252,542,277"/>
+<area shape="rect" id="node24" href="$classQuad__IO.html" title="The class implementing ⎕IO." alt="" coords="465,301,540,327"/>
+<area shape="rect" id="node25" href="$classQuad__PP.html" title="The class implementing ⎕PP." alt="" coords="463,351,542,376"/>
+<area shape="rect" id="node26" href="$classQuad__PR.html" title="The class implementing ⎕PR." alt="" coords="463,400,542,425"/>
+<area shape="rect" id="node27" href="$classQuad__PS.html" title="The class implementing ⎕PS." alt="" coords="463,449,542,475"/>
+<area shape="rect" id="node28" href="$classQuad__PW.html" title="The class implementing ⎕PW." alt="" coords="461,499,544,524"/>
+<area shape="rect" id="node29" href="$classQuad__QUOTE.html" title="The class that implements ⍞" alt="" coords="449,548,556,573"/>
+<area shape="rect" id="node30" href="$classQuad__Quad.html" title="The class implementing ⎕" alt="" coords="457,597,548,623"/>
+<area shape="rect" id="node31" href="$classQuad__RL.html" title=" " alt="" coords="464,647,541,672"/>
+<area shape="rect" id="node32" href="$classQuad__TZ.html" title="The class implementing ⎕TZ." alt="" coords="465,696,541,721"/>
+<area shape="rect" id="node2" href="$classSymbol.html" title="Base class for variables, defined functions, and distinguished names." alt="" coords="156,425,223,451"/>
+<area shape="rect" id="node3" href="$classNamedObject.html" title="A user&#45;defined variable or function." alt="" coords="5,425,108,451"/>
+<area shape="rect" id="node5" href="$classQuad__L.html" title="The class implementing ⎕L." alt="" coords="657,5,724,31"/>
+<area shape="rect" id="node6" href="$classQuad__LX.html" title="The class implementing ⎕LX." alt="" coords="653,55,729,80"/>
+<area shape="rect" id="node7" href="$classQuad__R.html" title="The class implementing ⎕R." alt="" coords="655,104,726,129"/>
+<area shape="rect" id="node8" href="$classQuad__SVE.html" title="The implementation of ⎕SVE." alt="" coords="647,153,734,179"/>
+<area shape="rect" id="node9" href="$classQuad__SYL.html" title="The class implementing ⎕SYL." alt="" coords="648,203,733,228"/>
+<area shape="rect" id="node10" href="$classQuad__X.html" title="The class implementing ⎕X." alt="" coords="656,252,725,277"/>
+<area shape="rect" id="node11" href="$classRO__SystemVariable.html" title="Base class for all read&#45;only APL system variables." alt="" coords="620,301,761,327"/>
+<area shape="rect" id="node12" href="$classQuad__AI.html" title="The class implementing ⎕AI." alt="" coords="817,79,891,104"/>
+<area shape="rect" id="node13" href="$classQuad__ARG.html" title="The class implementing ⎕ARG." alt="" coords="809,128,899,153"/>
+<area shape="rect" id="node14" href="$classQuad__AV.html" title="The class implementing ⎕AV." alt="" coords="815,177,893,203"/>
+<area shape="rect" id="node15" href="$classQuad__EM.html" title="The class implementing ⎕EM." alt="" coords="814,227,894,252"/>
+<area shape="rect" id="node16" href="$classQuad__ET.html" title="The class implementing ⎕ET." alt="" coords="815,276,893,301"/>
+<area shape="rect" id="node17" href="$classQuad__LC.html" title="The class implementing ⎕LC." alt="" coords="815,325,893,351"/>
+<area shape="rect" id="node18" href="$classQuad__TC.html" title="The class implementing ⎕TC." alt="" coords="815,375,893,400"/>
+<area shape="rect" id="node19" href="$classQuad__TS.html" title="The class implementing ⎕TS." alt="" coords="815,424,893,449"/>
+<area shape="rect" id="node20" href="$classQuad__UL.html" title="The class implementing ⎕UL." alt="" coords="815,473,893,499"/>
+<area shape="rect" id="node21" href="$classQuad__WA.html" title="The class implementing ⎕WA." alt="" coords="813,523,895,548"/>
 </map>

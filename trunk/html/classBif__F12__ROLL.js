@@ -5,6 +5,7 @@ var classBif__F12__ROLL =
     [ "eval_AB", "classBif__F12__ROLL.html#afe59b85a350624fff7937205cb603307", null ],
     [ "eval_B", "classBif__F12__ROLL.html#a0b67f39c345c98d9b16f63c457ad0557", null ],
     [ "get_scalar_f2", "classBif__F12__ROLL.html#a6499f45dbc2240bfc55113e6e7982c50", null ],
+    [ "may_parallel", "classBif__F12__ROLL.html#a8f7d5839ac68104c3743e0233da06f21", null ],
     [ "_fun", "classBif__F12__ROLL.html#a91113c1fbf4b4744c0076119caaef38c", null ],
     [ "fun", "classBif__F12__ROLL.html#aec63b99f0158fa1e00a2319117effd9a", null ]
 ];

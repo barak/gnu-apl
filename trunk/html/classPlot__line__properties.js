@@ -1,31 +1,8 @@
 var classPlot__line__properties =
 [
     [ "Plot_line_properties", "classPlot__line__properties.html#aaf04b5806e1f6487cbcdc277b8435664", null ],
-    [ "get_legend_name", "classPlot__line__properties.html#a113be944c151e6c60bde8000f5f2358f", null ],
-    [ "get_line_color", "classPlot__line__properties.html#a99948299d79dadc83af3f8ba4e9cac4a", null ],
-    [ "get_line_style", "classPlot__line__properties.html#a00a64b7960432d09b196cfde6d3557f0", null ],
-    [ "get_line_width", "classPlot__line__properties.html#a90a147505caaa471f0accf68cbcbea79", null ],
-    [ "get_point_color", "classPlot__line__properties.html#a918d828603c9631c6b734514cfa3d602", null ],
-    [ "get_point_size", "classPlot__line__properties.html#a8b0166c8f9bbf310ea1d1068697a01c8", null ],
-    [ "get_point_size2", "classPlot__line__properties.html#a410f314f0037467f5a29a560942efa04", null ],
-    [ "get_point_style", "classPlot__line__properties.html#abbbe0374f4b1b5b02cf1f5807474a84d", null ],
+    [ "is_line_property", "classPlot__line__properties.html#a4509663ddb2070e40b779409922a44e5", null ],
     [ "print", "classPlot__line__properties.html#a9131cf48bc483bdaad185748b9a7d1c5", null ],
-    [ "set_legend_name", "classPlot__line__properties.html#ade57ed4629d89cf69faf892df0205f02", null ],
-    [ "set_line_color", "classPlot__line__properties.html#aa601b96678452ea3cf786ae5bc5b7a64", null ],
-    [ "set_line_style", "classPlot__line__properties.html#a897f13537aece7df3f44420a3cb5bd08", null ],
-    [ "set_line_width", "classPlot__line__properties.html#a5552811712f82106fcd3dfb22930e533", null ],
-    [ "set_point_color", "classPlot__line__properties.html#a779e8d437db8af709ff950ebfc3569f7", null ],
-    [ "set_point_size", "classPlot__line__properties.html#a64e26e34b422af6a7ac2e57d2e33206b", null ],
-    [ "set_point_size2", "classPlot__line__properties.html#aacb9ff7bc425d1b482c076a5ba5ce9b9", null ],
-    [ "set_point_style", "classPlot__line__properties.html#a495b5ebbe2bf5d84e36d313d3c51da1c", null ],
-    [ "legend_name", "classPlot__line__properties.html#a23ac83dca05752fba1c682545e549295", null ],
     [ "legend_name_buffer", "classPlot__line__properties.html#a392e99784f980ff52fc70e792cce6610", null ],
-    [ "line_color", "classPlot__line__properties.html#a781fc135fea0b08a6736a6462d79c33f", null ],
-    [ "line_number", "classPlot__line__properties.html#a558e07abb5790d1ee97c2a2ebc5f48b6", null ],
-    [ "line_style", "classPlot__line__properties.html#a2bc5e0f8496369cac7fb3e7b285f9551", null ],
-    [ "line_width", "classPlot__line__properties.html#a025a4de7a8e7005432b8a9b4bb780834", null ],
-    [ "point_color", "classPlot__line__properties.html#a4e7099b75134c855264ecc9ab761eb12", null ],
-    [ "point_size", "classPlot__line__properties.html#a3eff1d4497a3541df3f6c2424a5de946", null ],
-    [ "point_size2", "classPlot__line__properties.html#ae1f1ecf0154ee14d3595321cef6840ca", null ],
-    [ "point_style", "classPlot__line__properties.html#a900ce5cbb2e640736f1ecf3d345333f6", null ]
+    [ "line_number", "classPlot__line__properties.html#a558e07abb5790d1ee97c2a2ebc5f48b6", null ]
 ];

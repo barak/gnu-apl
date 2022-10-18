@@ -1,0 +1,5 @@
+<map id="FloatCell::is_near_int" name="FloatCell::is_near_int">
+<area shape="rect" id="node1" title="Overloaded Cell::is_near_int()." alt="" coords="5,31,151,56"/>
+<area shape="rect" id="node2" href="$classFloatCell.html#afa1a46cfd36a3c2166559f7d425f094d" title="return the value of this cell as a double (even if the value is rational)" alt="" coords="201,5,312,31"/>
+<area shape="rect" id="node3" href="$classCell.html#ac8ce4cebc1b8ac383bc62723d645914a" title="True iff value is numeric and close to an int." alt="" coords="199,55,315,80"/>
+</map>

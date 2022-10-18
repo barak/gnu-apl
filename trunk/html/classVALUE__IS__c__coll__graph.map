@@ -1,7 +1,8 @@
 <map id="VALUE_IS_c" name="VALUE_IS_c">
-<area shape="rect" id="node2" href="$classSignal__base.html" title="the base class for all signal classes " alt="" coords="223,5,317,32"/>
-<area shape="rect" id="node3" href="$classSig__item__int.html" title="Sig_item_int\&lt; uint32\l_t, 4 \&gt;" alt="" coords="199,57,341,98"/>
-<area shape="rect" id="node4" href="$classSig__item__xint.html" title="Sig_item_xint\&lt; uint64\l_t, 8 \&gt;" alt="" coords="196,122,344,163"/>
-<area shape="rect" id="node5" href="$classSig__item__int.html" title="Sig_item_int\&lt; uint64\l_t, bytes \&gt;" alt="" coords="5,122,147,163"/>
-<area shape="rect" id="node6" href="$classSig__item__string.html" title="a string signal item of size bytes " alt="" coords="214,188,326,215"/>
+<area shape="rect" id="node1" title="APserver result for: X←SVAR." alt="" coords="479,95,579,120"/>
+<area shape="rect" id="node2" href="$classSignal__base.html" title="the base class for all signal classes" alt="" coords="249,5,342,31"/>
+<area shape="rect" id="node3" href="$classSig__item__xint.html" title=" " alt="" coords="221,55,369,95"/>
+<area shape="rect" id="node4" href="$classSig__item__int.html" title="an integer signal item of size bytes" alt="" coords="5,63,172,88"/>
+<area shape="rect" id="node5" href="$classSig__item__int.html" title=" " alt="" coords="225,119,366,159"/>
+<area shape="rect" id="node6" href="$classSig__item__string.html" title="a string signal item of size bytes" alt="" coords="239,185,351,211"/>
 </map>

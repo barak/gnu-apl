@@ -1,3 +1,4 @@
 <map id="Svar_partner" name="Svar_partner">
-<area shape="rect" id="node2" href="$structAP__num3.html" title="three AP numbers that uniquely identify a processor " alt="" coords="14,5,93,32"/>
+<area shape="rect" id="node1" title="one of the two partners of a shared vaiable" alt="" coords="5,93,101,119"/>
+<area shape="rect" id="node2" href="$structAP__num3.html" title="three AP numbers that uniquely identify a processor" alt="" coords="14,5,93,31"/>
 </map>

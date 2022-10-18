@@ -1,0 +1,4 @@
+<map id="LibPaths::search_APL_lib_root" name="LibPaths::search_APL_lib_root">
+<area shape="rect" id="node1" title="set library root, searching from APL_bin_path" alt="" coords="5,5,157,45"/>
+<area shape="rect" id="node2" href="$classLibPaths.html#af7466c5c66b0fcc0a8a54dbdf835f2cf" title="return true if directory dir contains two (files or sub&#45;directories) workspaces and wslib1" alt="" coords="205,13,345,38"/>
+</map>

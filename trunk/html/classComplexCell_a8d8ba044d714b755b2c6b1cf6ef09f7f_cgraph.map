@@ -1,0 +1,5 @@
+<map id="ComplexCell::bif_within_quad_CT" name="ComplexCell::bif_within_quad_CT">
+<area shape="rect" id="node1" title="overloaded Cell::bif_within_quad_CT()" alt="" coords="5,23,165,63"/>
+<area shape="rect" id="node2" href="$classWorkspace.html#a84f9084505dfcbc3a26414ea895dd7ca" title="return the current ⎕CT" alt="" coords="213,5,352,31"/>
+<area shape="rect" id="node3" href="$classComplexCell.html#a9ccb64da2c504a517c725dc2c41940da" title="initialize the (un&#45;initialized) Cell *Z to complex r + ij" alt="" coords="221,55,344,80"/>
+</map>

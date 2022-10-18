@@ -1,0 +1,4 @@
+<map id="UCS_string::double_quote_last" name="UCS_string::double_quote_last">
+<area shape="rect" id="node1" title="return the position of the last (rightmost) unescaped &quot; in this string (if any), or else &#45;1" alt="" coords="5,5,141,45"/>
+<area shape="rect" id="node2" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="189,13,312,38"/>
+</map>

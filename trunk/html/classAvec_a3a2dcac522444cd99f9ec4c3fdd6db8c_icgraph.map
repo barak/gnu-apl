@@ -1,0 +1,11 @@
+<map id="Avec::is_diamond" name="Avec::is_diamond">
+<area shape="rect" id="node1" title="return true iff av is one of the various diamond characters" alt="" coords="804,105,931,131"/>
+<area shape="rect" id="node2" href="$classExecutable.html#ae33855096d44e35f756909e2921e779b" title="return the text of statement at pc" alt="" coords="573,105,756,131"/>
+<area shape="rect" id="node3" href="$classQuad__SI.html#a703fb389406e0f834f26f993e0997384" title="overloaded Function::eval_AB()." alt="" coords="392,5,523,31"/>
+<area shape="rect" id="node4" href="$classQuad__SI.html#adf45c0e846d98374b2ce1e2633de3101" title="overloaded Function::eval_AB()." alt="" coords="397,55,518,80"/>
+<area shape="rect" id="node5" href="$classStateIndicator.html#a0129e968c738e1c300e20b16533fca55" title="list the stack entry (for commands ]SI, )SI, and )SIS)" alt="" coords="213,131,341,156"/>
+<area shape="rect" id="node6" href="$classStateIndicator.html#ae8f1a9f49c7933c492f6f899fccd437f" title="list the stack entry (for command ]SI)" alt="" coords="389,156,525,181"/>
+<area shape="rect" id="node7" href="$classDoxy.html#adb0f60780eef8f3246d952596a3a19a6" title="HTML&#45;print a table with the SI stack to &#39;page&#39;." alt="" coords="403,205,512,231"/>
+<area shape="rect" id="node8" href="$classDoxy.html#ad8abe2e8a1b686a7b35e582c369d41ae" title="generate the entire documentation" alt="" coords="236,205,319,231"/>
+<area shape="rect" id="node9" href="$classCommand.html#a834eac0e797a5d1c992018b7d0c049a4" title="]DOXY: create doxygen&#45;like documentation of the current workspace" alt="" coords="5,205,165,231"/>
+</map>

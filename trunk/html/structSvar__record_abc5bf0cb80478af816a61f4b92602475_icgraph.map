@@ -1,0 +1,5 @@
+<map id="Svar_record::clear" name="Svar_record::clear">
+<area shape="rect" id="node1" title="invalidate this entry" alt="" coords="196,35,324,60"/>
+<area shape="rect" id="node2" href="$structSvar__record.html#a876f177ff00f7f7d4587d83137d7421a" title="retract the offer made by the calling ID." alt="" coords="8,5,145,31"/>
+<area shape="rect" id="node3" href="$classSvar__record__P.html#aae435bcd8b70390ab066782a478c4bb5" title="constructor: fetch record with key key from APserver" alt="" coords="5,55,148,95"/>
+</map>

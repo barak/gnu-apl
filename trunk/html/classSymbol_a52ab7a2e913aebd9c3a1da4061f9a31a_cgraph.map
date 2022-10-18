@@ -1,0 +1,6 @@
+<map id="Symbol::get_exec_ufun_depth" name="Symbol::get_exec_ufun_depth">
+<area shape="rect" id="node1" title="return the depth (global == 0) of ufun on the stack. Use the largest depth if ufun is pushed multiple..." alt="" coords="5,63,164,103"/>
+<area shape="rect" id="node2" href="$classValueStackItem.html#a3a9ea0ee5b4129f7e5aa4a92c851abfd" title="return the function (caller must have checked NC_FUNOPER)." alt="" coords="229,5,370,45"/>
+<area shape="rect" id="node3" href="$classValueStackItem.html#a27453c0dfda1004c6f5e68a0c2530eae" title="return the name class for this ValueStackItem" alt="" coords="215,70,383,95"/>
+<area shape="rect" id="node4" href="$classSymbol.html#ada4b68d3cdfdd1ec7228cb65ef9a1062" title="return the size of the value stack" alt="" coords="212,119,387,145"/>
+</map>

@@ -1,0 +1,65 @@
+<map id="Prefix::size" name="Prefix::size">
+<area shape="rect" id="node1" title="return the number of token currently in the FIFO" alt="" coords="1820,857,1908,883"/>
+<area shape="rect" id="node2" href="$classPrefix.html#aab0f5b3d51f6afb49220e176b615d428" title="return the leftmost token (e.g. A in A←B)" alt="" coords="1646,141,1735,167"/>
+<area shape="rect" id="node3" href="$classPrefix.html#ab28350d62a481a1aadc3d694f8ffd020" title="return the leftmost token (e.g. A in A←B)" alt="" coords="1649,243,1732,268"/>
+<area shape="rect" id="node5" href="$classPrefix.html#a5478ff7d771d95a161c8ee393d50d7b1" title="execute one context (user defined function or operator, execute, or immediate execution)" alt="" coords="1136,608,1311,633"/>
+<area shape="rect" id="node14" href="$classPrefix.html#a146aeaba41b7b0368ec895af973b465b" title="return the left argument of a failed primitive function (if any)" alt="" coords="1405,180,1518,205"/>
+<area shape="rect" id="node18" href="$classPrefix.html#af46f71c6ad198d4112ff410f9a580a2b" title="return the right argument of a failed primitive function (if any)" alt="" coords="1403,229,1519,255"/>
+<area shape="rect" id="node22" href="$classPrefix.html#a492aebeb400a3616395c40320742ffff" title="return the second token from the left (e.g. ← in A←B)" alt="" coords="1649,417,1732,443"/>
+<area shape="rect" id="node25" href="$classPrefix.html#a58d1fdb572a64140dba1ad2bf200d219" title="return true if the state of this Prefix has ⎕R (and maybe ⎕L or ⎕X)." alt="" coords="1385,481,1538,507"/>
+<area shape="rect" id="node26" href="$classPrefix.html#a9bdebcd5d7e051156ed3b37e04c3235e" title="return the third token from the left (e.g. B in A←B)" alt="" coords="1420,784,1503,809"/>
+<area shape="rect" id="node27" href="$classPrefix.html#adce2065df74cb6ab3e589df5dd7aa421" title="return the fourth token from the left (e.g. B in A+/B)" alt="" coords="1420,883,1503,908"/>
+<area shape="rect" id="node28" href="$classPrefix.html#a29e0262f6b901531ac5d08aedc072250" title="destructor" alt="" coords="1633,807,1749,832"/>
+<area shape="rect" id="node37" href="$classPrefix.html#abca1c5517cd1ceb9c10b89d9412ef314" title="highest PC in current statement" alt="" coords="1615,959,1767,984"/>
+<area shape="rect" id="node39" href="$classPrefix.html#a0d7ac74b5bc532a8e823bbaa6e5a4a60" title="lowest PC in current statement" alt="" coords="1617,1008,1765,1033"/>
+<area shape="rect" id="node40" href="$classPrefix.html#a11013d4b3f0993c21825e0cfa981d989" title="return the axis argument of a failed primitive function (if any)" alt="" coords="1633,1057,1748,1083"/>
+<area shape="rect" id="node44" href="$classPrefix.html#a47d95dbe64dbe7fc68ed9a3def5e57b9" title="remove the leftmost token (e,g, A in A←B) from the stack and return it" alt="" coords="1419,932,1504,957"/>
+<area shape="rect" id="node45" href="$classPrefix.html#aae9b98ae829e9481cbd30eec99fe06b8" title="discard the leftmost token (e,g, A in A←B) from the stack" alt="" coords="1609,1107,1772,1132"/>
+<area shape="rect" id="node46" href="$classPrefix.html#a78e45d1d5c213ad0f97bb064268caf22" title="pop prefix_len items and push result" alt="" coords="1615,1157,1767,1197"/>
+<area shape="rect" id="node47" href="$classPrefix.html#abcd6120faa5a3a9ef9b2fab0512b0a1b" title="print the state of this parser" alt="" coords="1646,1221,1735,1247"/>
+<area shape="rect" id="node48" href="$classPrefix.html#a810037eaa8e8141565a0aa3e8b5b3d53" title="print the current stack" alt="" coords="1627,532,1755,557"/>
+<area shape="rect" id="node49" href="$classPrefix.html#a7820ecce4dcb55d04c80785c4143fe02" title="store one more token" alt="" coords="1645,583,1737,608"/>
+<area shape="rect" id="node50" href="$classPrefix.html#aa11ccbf3d31df907568423176ed84b00" title="replace the left or right argument of a function (for retry) and return true on success" alt="" coords="1625,1271,1756,1296"/>
+<area shape="rect" id="node51" href="$classXML__Saving__Archive.html#a6d474efaefd9567ab70fe498729bb186" title="write the Prefix parser of si (and its derived functions)" alt="" coords="1617,1321,1764,1361"/>
+<area shape="rect" id="node57" href="$classPrefix.html#a9b2f1a5b9a782b8887ae94ccb8bf5044" title="print all owners of value" alt="" coords="1619,1385,1763,1411"/>
+<area shape="rect" id="node59" href="$classPrefix.html#a60f0ca34b6c8b96944d326f8733133d1" title="throw an E_LEFT_SYNTAX_ERROR or an E_SYNTAX_ERROR" alt="" coords="1623,705,1759,731"/>
+<area shape="rect" id="node61" href="$classPrefix.html#aaef6d084d78f13f25ca2f6619b0f0d10" title="clear the mark flag of all values in this Prefix" alt="" coords="1627,1435,1754,1475"/>
+<area shape="rect" id="node63" href="$classPrefix.html#a4db8d2580625358671504473d728c62d" title="return true if ufun is on the stack" alt="" coords="1618,1500,1763,1525"/>
+<area shape="rect" id="node4" href="$classPrefix.html#af52a5ff8931128ebd4a09c493bd9f1f0" title="return true if the next token binds stronger than the best match" alt="" coords="1394,380,1529,405"/>
+<area shape="rect" id="node8" href="$classCommand.html#a879617e7645bea2e4052154f16999634" title="finish the current SI&#45;&gt;top() and pop it when done" alt="" coords="471,608,641,633"/>
+<area shape="rect" id="node11" href="$classPrefix.html#a1d8c4c1017a6d890516d96e5f4711b97" title="return the current dyadic function (if any)" alt="" coords="1380,55,1543,80"/>
+<area shape="rect" id="node6" href="$classStateIndicator.html#aa99bc8ce846dfd1f09c0ca2f250d940e" title="execute token in body..." alt="" coords="943,608,1073,633"/>
+<area shape="rect" id="node7" href="$classExecutable.html#a56bddb63158eedc401fe8ec3ce04f787" title="execute the body of this executable" alt="" coords="698,608,874,633"/>
+<area shape="rect" id="node9" href="$classCommand.html#af36741357bfd4e183b34ee8b747bc7c5" title="process line which contains APL statements" alt="" coords="216,608,423,633"/>
+<area shape="rect" id="node10" href="$classCommand.html#ae26693534d4df16372f51e55e505b8d7" title="process line which contains a command or statements" alt="" coords="5,608,168,633"/>
+<area shape="rect" id="node12" href="$classBif__F12__COMMA.html#afa66ea4c892000935201255d3c7fe919" title="overloaded Function::eval_B()" alt="" coords="1137,5,1310,31"/>
+<area shape="rect" id="node13" href="$classBif__F12__COMMA1.html#a70a46c5186a166722569dd512044e342" title="overloaded Function::eval_B()" alt="" coords="1133,55,1313,80"/>
+<area shape="rect" id="node15" href="$classStateIndicator.html#a880de915c4feb1a656b35700133f8c4f" title="return left arg (and set function)" alt="" coords="1152,156,1295,181"/>
+<area shape="rect" id="node16" href="$classStateIndicator.html#a012038237bfdd0910f3052cde2ffbefb" title="change left arg" alt="" coords="1152,205,1295,231"/>
+<area shape="rect" id="node17" href="$classQuad__L.html#ac7853dccb87b43b644e307ec3d140608" title="overloaded Symbol::assign()" alt="" coords="951,205,1065,231"/>
+<area shape="rect" id="node19" href="$classStateIndicator.html#aed48ec786a6d1c59334415cc01acef57" title="return right arg (and set function)" alt="" coords="1150,255,1297,280"/>
+<area shape="rect" id="node20" href="$classStateIndicator.html#a2020e90d88b6b9ed76ddbfb62b38f13c" title="change right arg" alt="" coords="1150,304,1297,329"/>
+<area shape="rect" id="node21" href="$classQuad__R.html#a1c59d295f67723e023348a8476e05fb2" title="overloaded Symbol::assign()" alt="" coords="950,304,1066,329"/>
+<area shape="rect" id="node23" href="$classPrefix.html#ad765ce0737c0ba9fa4589d0bd5323948" title="return the current monadic function (if any)" alt="" coords="1385,279,1537,304"/>
+<area shape="rect" id="node24" href="$classBif__F12__RHO.html#a3c656971eb4bbcff9e08008030f425f6" title="overloaded Function::eval_AB()" alt="" coords="1143,353,1304,379"/>
+<area shape="rect" id="node29" href="$classPrefix.html#aceebcb5133f4ac2659d49acdfb12a56c" title="reset statement to empty state (e.g. after →N)" alt="" coords="1415,981,1508,1007"/>
+<area shape="rect" id="node36" href="$classStateIndicator.html#a5b64f5fed3bc19bb0f2d5968d9ea48e5" title="destructor" alt="" coords="1361,833,1561,859"/>
+<area shape="rect" id="node30" href="$classStateIndicator.html#abe48451c67c413334c2f9b1bb43014aa" title="continue this StateIndicator (to line N after →N back into it)" alt="" coords="717,931,855,956"/>
+<area shape="rect" id="node31" href="$classPrefix.html#a00d0f5152e3c1c6bb3eec7d3aa1cdae5" title="set a new PC" alt="" coords="1169,981,1277,1007"/>
+<area shape="rect" id="node32" href="$classStateIndicator.html#abab6fb3f97723c662eaadf1f28b0f718" title="set the current PC" alt="" coords="931,981,1085,1007"/>
+<area shape="rect" id="node33" href="$classStateIndicator.html#a979049848a45945d27a18ead9045b036" title="evaluate a →N statement. Update pc, return true iff context has changed" alt="" coords="717,980,855,1005"/>
+<area shape="rect" id="node34" href="$classXML__Loading__Archive.html#adfa844fcc401d3c335cafa5abda2f35d" title="read next StateIndicator entry" alt="" coords="710,1030,862,1070"/>
+<area shape="rect" id="node35" href="$classXML__Loading__Archive.html#ad2f1d88070976eab8a41f0fdcd1e0ec1" title="read next StateIndicator element" alt="" coords="480,1030,632,1070"/>
+<area shape="rect" id="node38" href="$classError.html#adf8e47c02b1ae0be1368a0587f7daed4" title="update error information in this and copy it to si" alt="" coords="1382,1031,1541,1056"/>
+<area shape="rect" id="node41" href="$classStateIndicator.html#ad407506718254a4ce357eb0a8f864733" title="return axis arg (and set function)" alt="" coords="1389,1080,1534,1105"/>
+<area shape="rect" id="node42" href="$classStateIndicator.html#a9bf33fdcfb56c1bee7a9833c4113646e" title="change axis arg" alt="" coords="1389,1129,1534,1155"/>
+<area shape="rect" id="node43" href="$classQuad__X.html#a7498eb3d92143d88eaf3c3a4b062dce1" title="overloaded Symbol::assign()" alt="" coords="1166,1129,1281,1155"/>
+<area shape="rect" id="node52" href="$classXML__Saving__Archive.html#a3bc62d82baa6be004398f70faa1b3e8b" title="write StateIndicator entry si" alt="" coords="1388,1314,1535,1354"/>
+<area shape="rect" id="node53" href="$classXML__Saving__Archive.html#acc327395cab545ea7797d92f5c931cab" title="write entire workspace" alt="" coords="1150,1314,1297,1354"/>
+<area shape="rect" id="node54" href="$classWorkspace.html#a8a4f1d898d523818dbd9d7efa6f2cf92" title="save this workspace" alt="" coords="931,1321,1085,1347"/>
+<area shape="rect" id="node55" href="$classCommand.html#ad61e749290966d00856ce1dd4f6abe42" title=")SAVE active WS as CONTINUE and )OFF" alt="" coords="689,1296,883,1321"/>
+<area shape="rect" id="node56" href="$classCommand.html#aec0c4c6efbb9df9a34220b510f58905a" title=")SAVE: save a workspace file (.xml)" alt="" coords="707,1345,865,1371"/>
+<area shape="rect" id="node58" href="$classStateIndicator.html#a1a7b4b0c7c80fd491313a728aec8383d" title="print all owners of value" alt="" coords="1390,1378,1533,1418"/>
+<area shape="rect" id="node60" href="$classPrefix.html#a2904dfebdfabc5fe910a5e98acd6b23a" title="return true if the left (back&#45;)slash in M M means F M." alt="" coords="1397,735,1526,760"/>
+<area shape="rect" id="node62" href="$classStateIndicator.html#a275a02d6a84b6dc259fa9c5e74d56c65" title="clear the marked bit in the executable, in the fun_oper_cache, and in all parsers" alt="" coords="1384,1442,1539,1482"/>
+</map>

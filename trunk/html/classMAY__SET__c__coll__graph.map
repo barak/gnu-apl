@@ -1,6 +1,7 @@
 <map id="MAY_SET_c" name="MAY_SET_c">
-<area shape="rect" id="node2" href="$classSignal__base.html" title="the base class for all signal classes " alt="" coords="5,103,99,130"/>
-<area shape="rect" id="node3" href="$classSig__item__xint.html" title="Sig_item_xint\&lt; uint64\l_t, 8 \&gt;" alt="" coords="123,96,271,137"/>
-<area shape="rect" id="node4" href="$classSig__item__int.html" title="Sig_item_int\&lt; uint64\l_t, bytes \&gt;" alt="" coords="127,5,268,47"/>
-<area shape="rect" id="node5" href="$classSig__item__int.html" title="Sig_item_int\&lt; int32\l_t, 4 \&gt;" alt="" coords="295,96,430,137"/>
+<area shape="rect" id="node1" title="APserver request: Can svar key be assigned ?" alt="" coords="148,183,247,208"/>
+<area shape="rect" id="node2" href="$classSignal__base.html" title="the base class for all signal classes" alt="" coords="5,87,99,113"/>
+<area shape="rect" id="node3" href="$classSig__item__xint.html" title=" " alt="" coords="123,80,271,120"/>
+<area shape="rect" id="node4" href="$classSig__item__int.html" title="an integer signal item of size bytes" alt="" coords="114,5,281,31"/>
+<area shape="rect" id="node5" href="$classSig__item__int.html" title=" " alt="" coords="295,80,430,120"/>
 </map>

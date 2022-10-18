@@ -1,0 +1,13 @@
+<map id="draw_line" name="draw_line">
+<area shape="rect" id="node1" title="draw a line from P0 to P1" alt="" coords="573,157,651,183"/>
+<area shape="rect" id="node2" href="$Plot__xcb_8cc.html#a89109127b5f5b3a1ebd9daf60d9953d5" title="draw the legend" alt="" coords="264,5,359,31"/>
+<area shape="rect" id="node5" href="$Plot__xcb_8cc.html#a748f5a40fd403da8a150a98011bd5944" title="draw the plot lines" alt="" coords="255,56,367,81"/>
+<area shape="rect" id="node6" href="$Plot__xcb_8cc.html#a6004b2c57c13517082271e5d6e209eb2" title="draw the surface plot lines" alt="" coords="244,105,379,131"/>
+<area shape="rect" id="node7" href="$Plot__xcb_8cc.html#ad0c18c85c237ccb535e36cf75f02ffb1" title="draw a triangular area of a 3D plot" alt="" coords="427,157,525,183"/>
+<area shape="rect" id="node9" href="$Plot__xcb_8cc.html#a75d0bfd0254822f11b8200f5319af6d6" title="draw the (vertical) grid lines that start at the X axis" alt="" coords="429,207,523,232"/>
+<area shape="rect" id="node10" href="$Plot__xcb_8cc.html#a8811c2e8a98a56d19bffce04a1219983" title="draw the (horizontal) grid lines that start at the Y axis" alt="" coords="429,256,523,281"/>
+<area shape="rect" id="node11" href="$Plot__xcb_8cc.html#af8b7f4198442f7b356d7e87b14ac5cc9" title="draw the grid lines that start at the Z axis" alt="" coords="429,305,523,331"/>
+<area shape="rect" id="node3" href="$Plot__xcb_8cc.html#a9387ad8c9e85cbf5b602ab83b47425a0" title="draw the content of a plot window" alt="" coords="132,156,196,181"/>
+<area shape="rect" id="node4" href="$Plot__xcb_8cc.html#a897990543dc934261ba8e7a124446b11" title="the pthread that handles one plot window." alt="" coords="5,156,84,181"/>
+<area shape="rect" id="node8" href="$Plot__xcb_8cc.html#af288859aef185afe0338f45b4b20d4c9" title="draw a triangular plot point (∆ or ∇)" alt="" coords="262,155,361,180"/>
+</map>

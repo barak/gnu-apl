@@ -1,0 +1,10 @@
+<map id="draw_triangle" name="draw_triangle">
+<area shape="rect" id="node1" title="draw a triangular plot point (∆ or ∇)" alt="" coords="5,109,104,135"/>
+<area shape="rect" id="node2" href="$Plot__xcb_8cc.html#ad0c18c85c237ccb535e36cf75f02ffb1" title="draw a triangular area of a 3D plot" alt="" coords="152,84,251,109"/>
+<area shape="rect" id="node8" href="$Plot__xcb_8cc.html#a66ba857e7779309700b9b408cd601fb8" title="swap pixels at P0 (with value Y0) and P1 (with value Y1) and" alt="" coords="164,133,239,159"/>
+<area shape="rect" id="node3" href="$structPixel__XY.html#ac4e6790839beb78de3fb40478ab1672f" title="the square of the distance between this and other" alt="" coords="309,5,449,31"/>
+<area shape="rect" id="node4" href="$Plot__xcb_8cc.html#a538424ee91ee3a1698b531dcfce0659a" title="draw a line from P0 to P1" alt="" coords="340,55,417,80"/>
+<area shape="rect" id="node5" href="$classPlot__window__properties.html#abadf9d1f9cf63db3c78d21b88614d9d3" title="for level 0.0 &lt;= alpha &lt;= 1.0: return the color for alpha according to gradient" alt="" coords="299,105,459,145"/>
+<area shape="rect" id="node6" href="$Plot__xcb_8cc.html#abb3a45e07e2c89cd4db26199d9ebccaf" title="set the foreground color of a xcb_gcontext_t" alt="" coords="311,169,446,195"/>
+<area shape="rect" id="node7" href="$Plot__xcb_8cc.html#a5461d12dc379b438dce62186d2c07f20" title="set the an attribute of a xcb_gcontext_t" alt="" coords="507,169,600,195"/>
+</map>

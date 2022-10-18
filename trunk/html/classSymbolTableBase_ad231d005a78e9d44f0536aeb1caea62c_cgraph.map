@@ -1,0 +1,5 @@
+<map id="SymbolTableBase::compute_hash" name="SymbolTableBase::compute_hash">
+<area shape="rect" id="node1" title="compute a 16&#45;bit hash for name" alt="" coords="5,31,227,56"/>
+<area shape="rect" id="node2" href="$classUCS__string.html#af5956757116853a2e1bc5a0533624d2e" title="return the FNV (Fowler&#45;Noll&#45;Vo) hash of this_string" alt="" coords="275,5,435,31"/>
+<area shape="rect" id="node3" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="483,31,605,56"/>
+</map>

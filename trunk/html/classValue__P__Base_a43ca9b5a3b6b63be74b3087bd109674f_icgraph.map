@@ -1,0 +1,5 @@
+<map id="Value_P_Base::isolate" name="Value_P_Base::isolate">
+<area shape="rect" id="node2" href="$classValue__P__Base.html#a24b4ca2e8be96ef0c748ce23ab657719" title="return a pointer to the Value " alt="" coords="221,5,356,32"/>
+<area shape="rect" id="node3" href="$classPointerCell.html#a854ece49efd38e443243c2e4e7bafbb6" title="isolate value.pval.valp (make value.pval the sole owner) " alt="" coords="223,56,355,83"/>
+<area shape="rect" id="node4" href="$classValueStackItem.html#aee2fb8a19d74903ddded9158768f090f" title="make apl_val the sole owner of apl_val.value " alt="" coords="208,107,369,133"/>
+</map>

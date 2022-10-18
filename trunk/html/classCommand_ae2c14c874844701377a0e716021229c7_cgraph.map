@@ -1,0 +1,25 @@
+<map id="Command::cmd_LIB1" name="Command::cmd_LIB1">
+<area shape="rect" id="node1" title="list content of workspace and wslib directories: )LIB [N]" alt="" coords="5,457,155,483"/>
+<area shape="rect" id="node2" href="$classCommand.html#aeb8671f785d828bbfac0d9b9ff46437d" title="list library: common helper" alt="" coords="203,457,363,483"/>
+<area shape="rect" id="node3" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="636,5,776,31"/>
+<area shape="rect" id="node4" href="$classUCS__string__vector.html#affd2be085b10c39ad48659a884cf2ab1" title="compute columns width so that items align nicely (for )VARS, )FNS, etc.)" alt="" coords="418,531,577,571"/>
+<area shape="rect" id="node6" href="$classUTF8__string.html#a75b4e440d7576c690934bc7b5f863ac6" title="return true iff string ends with ext (usually a file name extension)" alt="" coords="417,596,578,621"/>
+<area shape="rect" id="node7" href="$classCommand.html#af95676cbc57e2564feb00e5166d07512" title="return true if entry is a directory" alt="" coords="419,432,576,457"/>
+<area shape="rect" id="node10" href="$classAvec.html#a76a72fdcb1782be1c490b3670c45504f" title="Return true iff av is a valid char in a user defined symbol." alt="" coords="422,645,573,671"/>
+<area shape="rect" id="node12" href="$classUCS__string.html#ae748097bb3a84f52c658900006587e5b" title="case&#45;sensitive comparison: return true iff this comes before other" alt="" coords="430,695,565,735"/>
+<area shape="rect" id="node13" href="$classCommand.html#ae0699916c54054bb56d0dccc46d2b767" title="open directory arg and follow symlinks" alt="" coords="414,333,581,359"/>
+<area shape="rect" id="node16" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="859,156,981,181"/>
+<area shape="rect" id="node17" href="$classCommand.html#a429d0c585e845bf29a504a24889cb761" title="parse user&#45;suplied argument (of )VARS, )OPS, or )NMS commands) into strings from and to" alt="" coords="411,81,584,107"/>
+<area shape="rect" id="node19" href="$classUCS__string__vector.html#a4c548acafd0c03ebbe43ad8643dc07d0" title="sort the strings in this vector alphabetically" alt="" coords="416,481,579,507"/>
+<area shape="rect" id="node5" href="$classWorkspace.html#a3eaa0cc324b4e8e0f3fb0039efcd1b0c" title="return the current ⎕PW" alt="" coords="635,647,777,672"/>
+<area shape="rect" id="node8" href="$classUTF8__string.html#ae512c0617f7a13fe5011655d898ca6c1" title="append the UTF8_string suffix" alt="" coords="828,308,1012,333"/>
+<area shape="rect" id="node9" href="$classUTF8__string.html#a922bd7ebc6a8ea5c6ba9c54159b18a93" title="return this string as a 0&#45;terminated C string" alt="" coords="641,407,771,432"/>
+<area shape="rect" id="node11" href="$classAvec.html#afe30f62f26ec74019a95e5cbd6eaa111" title="Find av in character_table. Return position or Invalid_CHT." alt="" coords="649,696,763,721"/>
+<area shape="rect" id="node14" href="$classLibPaths.html#a4316cbd8878626733273cb0db73cfd82" title="return library path (from config file or from libroot)" alt="" coords="636,308,776,333"/>
+<area shape="rect" id="node15" href="$classAvec.html#af6b90a707281ad128da1764d92d85cd7" title="Return true iff av is a digit (i.e. 0 ≤ av ≤ 9)" alt="" coords="655,357,757,383"/>
+<area shape="rect" id="node18" href="$classUCS__string.html#a186a76c22c3ac840f1e607ba49e253a0" title="return the last character in this string" alt="" coords="643,55,769,80"/>
+<area shape="rect" id="node20" href="$classUCS__string.html#aed83d678e9bfcad18a5c89cd88002ac9" title="return true if n1 &lt; n2" alt="" coords="632,582,780,622"/>
+<area shape="rect" id="node22" href="$classUCS__string.html#a59f472bb1ee082cca5ac2a6c128f4918" title="sort the characters in this string by their Unicode" alt="" coords="646,532,766,557"/>
+<area shape="rect" id="node21" href="$classUCS__string.html#a9a80a1621c030d847983275d62902411" title="compare this with UCS_string other" alt="" coords="846,589,994,615"/>
+<area shape="rect" id="node23" href="$classUCS__string.html#a3c03c3e5b4d7be0e435a7cfee8a424ae" title="helper function for Heapsort&lt;Unicode&gt;::sort()" alt="" coords="839,532,1001,557"/>
+</map>

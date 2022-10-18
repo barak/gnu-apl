@@ -1,0 +1,13 @@
+<map id="Bif_F12_TAKE::eval_AXB" name="Bif_F12_TAKE::eval_AXB">
+<area shape="rect" id="node1" title="overloaded Function::eval_AXB()" alt="" coords="5,104,180,129"/>
+<area shape="rect" id="node2" href="$classBif__F12__TAKE.html#a3c786a32b82e6d9c41d0c701278744d2" title="Take from B according to ravel_A." alt="" coords="228,55,391,80"/>
+<area shape="rect" id="node9" href="$classWorkspace.html#adb2006f054a1cebb8ae0252b61bd1d1b" title="return the current ⎕IO" alt="" coords="242,104,377,129"/>
+<area shape="rect" id="node10" href="$classShape.html#afcd3708c8c18a30cb3c0c1fa1a630f71" title="modify dimension r" alt="" coords="230,153,389,179"/>
+<area shape="rect" id="node3" href="$classShape.html#a190d62a53b8617463c01e67a5d9addde" title="return a shape like this, but with negative elements made positive" alt="" coords="483,5,571,31"/>
+<area shape="rect" id="node5" href="$classBif__F12__TAKE.html#a0b5765e94b6f7bde194df34b26e8a5ca" title="Fill Z with B, pad as necessary." alt="" coords="462,55,593,80"/>
+<area shape="rect" id="node8" href="$classShape.html#a3a7c1dfbab2d8c181f0e1153a5736249" title="return true iff this shape is empty (some dimension is 0)." alt="" coords="467,104,587,129"/>
+<area shape="rect" id="node4" href="$classShape.html#aeb018b67601d3f1c4bea3d2c2b877b7e" title="add a dimension of length len at the end" alt="" coords="664,5,827,31"/>
+<area shape="rect" id="node6" href="$classValue.html#a35a1c313fbca5c1bef209f8d978ef9b6" title="initialize the next ravel cell from another Cell" alt="" coords="669,55,822,80"/>
+<area shape="rect" id="node7" href="$classValue.html#a825bb984c11a131c55729a3af8eeeec5" title="initialize the next ravel cell from the type of another Cell" alt="" coords="665,104,826,129"/>
+<area shape="rect" id="node11" href="$classShape.html#a189c92d0b74f3313bd83c8aa7565e9c5" title="recompute volume (after changing a dimension of len 0)" alt="" coords="439,153,616,179"/>
+</map>

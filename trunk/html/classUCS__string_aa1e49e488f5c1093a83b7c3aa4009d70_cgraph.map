@@ -1,0 +1,15 @@
+<map id="UCS_string::UCS_string" name="UCS_string::UCS_string">
+<area shape="rect" id="node1" title="constructor: UCS_string from a double with quad_pp valid digits. (eg. 3.33 has 3 digits),..." alt="" coords="5,257,172,282"/>
+<area shape="rect" id="node2" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="448,49,588,74"/>
+<area shape="rect" id="node3" href="$classUCS__string.html#a5776e51c6faa53537409322cd0ebf07a" title="append number (in ASCII encoding like d) to this string" alt="" coords="240,41,380,81"/>
+<area shape="rect" id="node4" href="$classUCS__string.html#ace70327ef899c525ad9c3f2bffd43697" title="append 0&#45;terminated UTF8 string str to this UCS_string." alt="" coords="220,106,400,131"/>
+<area shape="rect" id="node5" href="$classUCS__string.html#a186a76c22c3ac840f1e607ba49e253a0" title="return the last character in this string" alt="" coords="247,155,373,181"/>
+<area shape="rect" id="node6" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="457,330,579,355"/>
+<area shape="rect" id="node7" href="$classUCS__string.html#a40523238d26f5405f5392df03d242627" title="common part of all constructors" alt="" coords="243,257,377,282"/>
+<area shape="rect" id="node8" href="$classPrintContext.html#ad9230a07565823a9052d079dd25a96d7" title="return the print precision to be used" alt="" coords="237,306,383,331"/>
+<area shape="rect" id="node9" href="$classPrintContext.html#a5ef45c5babbe3ebf9988a9b659a2e407" title="return the print style to be used" alt="" coords="232,355,388,381"/>
+<area shape="rect" id="node10" href="$classUCS__string.html#a522289839ffbbcbe43b4577858926858" title="more intuitive insert() function" alt="" coords="245,405,375,430"/>
+<area shape="rect" id="node11" href="$classFloatCell.html#a2c4411b8d81f22aaf0b02fa5caac3e45" title="replace normal chars by special chars specified in ⎕FC" alt="" coords="244,503,376,529"/>
+<area shape="rect" id="node13" href="$classUCS__string.html#a67ea87cb92e687105b21917ffb4a2a6f" title="remove the last character in this string" alt="" coords="233,454,387,479"/>
+<area shape="rect" id="node12" href="$classWorkspace.html#a09f10a68b5a249c789bf8c1839f3208c" title="return element pos of the current ⎕FC (pos should be 0..5)" alt="" coords="449,503,587,529"/>
+</map>

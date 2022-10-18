@@ -1,0 +1,13 @@
+<map id="throw_illegal_db_id" name="throw_illegal_db_id">
+<area shape="rect" id="node2" href="$Quad__SQL_8cc.html#a17a426430d8c20357997aea13d15e32e" title="close_database" alt="" coords="199,25,313,52"/>
+<area shape="rect" id="node4" href="$Quad__SQL_8cc.html#aba36eb69c1b2d5909da1e5c50fed28d2" title="db_id_to_connection" alt="" coords="185,165,327,192"/>
+<area shape="rect" id="node7" href="$Quad__SQL_8cc.html#acafea294e8c103c4e1facd4ab22883bb" title="value_to_db_id" alt="" coords="375,140,484,167"/>
+<area shape="rect" id="node3" href="$classQuad__SQL.html#a38925ace990d37679d26dafa0fa4456c" title="overloaded Function::eval_XB(). " alt="" coords="747,89,890,116"/>
+<area shape="rect" id="node5" href="$Quad__SQL_8cc.html#aa869bc6004d41bbacb16f4a723b5babc" title="param_to_db" alt="" coords="381,241,478,268"/>
+<area shape="rect" id="node6" href="$classQuad__SQL.html#afb3ed61a068156aec7186ad6f4e17a54" title="overloaded Function::eval_AXB(). " alt="" coords="743,267,895,293"/>
+<area shape="rect" id="node8" href="$Quad__SQL_8cc.html#ac387a059ca88dd3749a72df78f444f33" title="run_transaction_begin" alt="" coords="539,39,688,65"/>
+<area shape="rect" id="node9" href="$Quad__SQL_8cc.html#a55d5bc433d0bfc1f6c4e7cc43a9e6a98" title="run_transaction_commit" alt="" coords="533,89,694,116"/>
+<area shape="rect" id="node10" href="$Quad__SQL_8cc.html#a5bd6f941bc6b2458a6e35def14b32282" title="run_transaction_rollback" alt="" coords="532,140,695,167"/>
+<area shape="rect" id="node11" href="$Quad__SQL_8cc.html#ada3432b670f34b6c402076e1584ba792" title="show_tables" alt="" coords="566,191,661,217"/>
+<area shape="rect" id="node12" href="$Quad__SQL_8cc.html#a2466376bd3d0ee1bf45e3fcbf2d79fb8" title="show_cols" alt="" coords="571,241,655,268"/>
+</map>

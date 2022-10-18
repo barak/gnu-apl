@@ -1,0 +1,11 @@
+<map id="Bif_F2_EQUAL::get_scalar_f2" name="Bif_F2_EQUAL::get_scalar_f2">
+<area shape="rect" id="node1" title="overloaded Function::get_scalar_f2" alt="" coords="5,104,204,129"/>
+<area shape="rect" id="node2" href="$classCell.html#a60149bda5f348d9fb1ca2d27bbf3bb17" title="store 1 in Z if A == the value of this cell in Z, else 0" alt="" coords="252,104,357,129"/>
+<area shape="rect" id="node3" href="$classCell.html#a4cb1f7ae7e4ad956ec55f1d507a0e938" title="return true if this cell is equal to other" alt="" coords="439,5,523,31"/>
+<area shape="rect" id="node5" href="$classWorkspace.html#a84f9084505dfcbc3a26414ea895dd7ca" title="return the current ⎕CT" alt="" coords="411,55,550,80"/>
+<area shape="rect" id="node6" href="$classCell.html#ab3d14978f78ba264d40e9ed1a4823be2" title="Return true iff this cell is a character cell." alt="" coords="405,104,556,129"/>
+<area shape="rect" id="node7" href="$classIntCell.html#afd60fd9e3a5581ac99c1e053d9218fe7" title="initialize the (un&#45;initialized) Cell *Z to integer 0" alt="" coords="439,153,522,179"/>
+<area shape="rect" id="node9" href="$classIntCell.html#aa99b7212ce13da0f241adeb18e350198" title="initialize Z to APL_Integer v" alt="" coords="441,203,520,228"/>
+<area shape="rect" id="node4" href="$classCell.html#ad08fb9a79b3c5b38d92bf5ef4bf47145" title="return the name of the class" alt="" coords="604,5,745,31"/>
+<area shape="rect" id="node8" href="$classIntCell.html#a88c653b2f968c451ee1c1c53a983fa13" title="Construct an integer cell with value 0." alt="" coords="621,177,728,203"/>
+</map>

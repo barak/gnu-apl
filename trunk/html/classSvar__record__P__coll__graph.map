@@ -1,5 +1,5 @@
 <map id="Svar_record_P" name="Svar_record_P">
-<area shape="rect" id="node2" href="$structSvar__record.html" title="one shared variable. " alt="" coords="13,199,105,225"/>
-<area shape="rect" id="node3" href="$structSvar__partner.html" title="one of the two partners of a shared vaiable " alt="" coords="11,95,107,121"/>
-<area shape="rect" id="node4" href="$structAP__num3.html" title="three AP numbers that uniquely identify a processor " alt="" coords="20,5,99,32"/>
+<area shape="rect" id="node1" title="a pointer to one record (one shared variable) of the shared Svar_DB_memory" alt="" coords="5,196,113,221"/>
+<area shape="rect" id="node2" href="$structSvar__record.html" title="one shared variable." alt="" coords="13,108,105,133"/>
+<area shape="rect" id="node3" href="$structSvar__partner.html" title="one of the two partners of a shared vaiable" alt="" coords="11,5,107,31"/>
 </map>

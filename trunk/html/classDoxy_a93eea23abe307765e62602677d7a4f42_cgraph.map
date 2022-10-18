@@ -1,0 +1,5 @@
+<map id="Doxy::fun_anchor" name="Doxy::fun_anchor">
+<area shape="rect" id="node1" title="return an HTML&#45;anchor for function name (in the output files)" alt="" coords="5,35,131,60"/>
+<area shape="rect" id="node2" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="179,5,319,31"/>
+<area shape="rect" id="node3" href="$classUCS__string.html#ad14d08312e34ad5d733360eccf9a745a" title="append 0&#45;terminated ASCII string str to this string. str is NOT interpreted as UTF8 string (use appen..." alt="" coords="179,55,319,95"/>
+</map>

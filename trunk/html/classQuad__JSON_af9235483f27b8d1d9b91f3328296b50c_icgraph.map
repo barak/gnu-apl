@@ -1,0 +1,7 @@
+<map id="Quad_JSON::number_len" name="Quad_JSON::number_len">
+<area shape="rect" id="node1" title="return the length&#45;1 of the number(&#45;token) starting at b in ucs_B" alt="" coords="856,31,1027,56"/>
+<area shape="rect" id="node2" href="$classQuad__JSON.html#ae101226211d05605bee074e4d3a66f8e" title="convert JSON string to APL associative array" alt="" coords="617,31,808,56"/>
+<area shape="rect" id="node3" href="$classQuad__JSON.html#a7488f4e12a005de36c3fa9887e4909e5" title="overloaded Function::eval_B()" alt="" coords="425,31,569,56"/>
+<area shape="rect" id="node4" href="$classQuad__JSON.html#a2ed44b39f5d092ab5f7e1768c6b8615a" title="return JSON file (&#45;name in B) converted to APL structured value" alt="" coords="207,5,377,31"/>
+<area shape="rect" id="node5" href="$classQuad__JSON.html#a3adb4fba903343bf38b0c3a1dd10feb8" title="overloaded Function::eval_B()" alt="" coords="5,31,159,56"/>
+</map>

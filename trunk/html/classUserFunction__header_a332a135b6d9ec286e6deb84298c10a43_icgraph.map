@@ -1,0 +1,5 @@
+<map id="UserFunction_header::remove_duplicate_local_variables" name="UserFunction_header::remove_duplicate_local_variables">
+<area shape="rect" id="node1" title="Check that all function params, local vars. and labels are unique." alt="" coords="403,5,569,60"/>
+<area shape="rect" id="node2" href="$classUserFunction__header.html#a7ce5d64cb355876f5a5a5606476d1696" title="init the local variables from text" alt="" coords="208,13,355,53"/>
+<area shape="rect" id="node3" href="$classUserFunction__header.html#a003ac8f5ff1ec67f3fe5e6ad0ef850de" title="constructor from first line in txt (for proper defined functions)" alt="" coords="5,13,160,53"/>
+</map>

@@ -1,0 +1,11 @@
+<map id="Quad_FX::do_eval_B" name="Quad_FX::do_eval_B">
+<area shape="rect" id="node1" title="implementation of eval_B()" alt="" coords="5,104,152,129"/>
+<area shape="rect" id="node2" href="$classQuad__FX.html#a17ec48da11ee4ba2f96a899cf22add7e" title="do ⎕FX with execution properties exec_props" alt="" coords="200,104,359,129"/>
+<area shape="rect" id="node3" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="414,5,554,31"/>
+<area shape="rect" id="node4" href="$classCell.html#a2999919fc2782b3cebfd925c63cc1fac" title="Return the character value of a cell." alt="" coords="413,104,555,129"/>
+<area shape="rect" id="node7" href="$classCell.html#a367b9df7e0d4b805e5f31641658113f6" title="Return the APL value of a cell (Asserts for non&#45;pointer cells)" alt="" coords="407,55,561,80"/>
+<area shape="rect" id="node8" href="$classCell.html#ab3d14978f78ba264d40e9ed1a4823be2" title="Return true iff this cell is a character cell." alt="" coords="409,153,559,179"/>
+<area shape="rect" id="node9" href="$classCell.html#ae98b3988a7fa52c6c157b4911b043dde" title="Return true iff this cell is a pointer (to a sub&#45;array) cell." alt="" coords="416,203,552,228"/>
+<area shape="rect" id="node5" href="$classCell.html#a38a6a25f0ad091f35e3d9abfe5608a50" title="return the type of this cell" alt="" coords="629,55,759,80"/>
+<area shape="rect" id="node6" href="$classCell.html#a6c3fdef3d82f53649d1c3f16d37eedd7" title="the name of ct" alt="" coords="609,104,779,129"/>
+</map>

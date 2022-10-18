@@ -1,0 +1,8 @@
+<map id="Prefix::print_stack" name="Prefix::print_stack">
+<area shape="rect" id="node1" title="print the current stack" alt="" coords="5,104,133,129"/>
+<area shape="rect" id="node2" href="$classPrefix.html#aa1e98b0f6cf6e81ab90765af9bd3ce4e" title="return the idx&#39;th Token_loc (from put position)" alt="" coords="212,5,287,31"/>
+<area shape="rect" id="node3" href="$classToken.html#a7955f89bcbc2ab3f5c736218c0a745e8" title="the name of tc" alt="" coords="181,55,317,80"/>
+<area shape="rect" id="node4" href="$classToken.html#a049cd3eb72ae0c6427e523d399876b86" title="return the TokenClass of this token." alt="" coords="187,104,312,129"/>
+<area shape="rect" id="node5" href="$classStateIndicator.html#aa60ca9df0350c7b2e4c0825f061f300e" title="return the nesting level (oldest SI has level 0, next has level 1, ...)" alt="" coords="185,154,314,194"/>
+<area shape="rect" id="node6" href="$classPrefix.html#a07a35c8b69a8c9f685225e2a2586a2fd" title="return the number of token currently in the FIFO" alt="" coords="205,219,293,244"/>
+</map>

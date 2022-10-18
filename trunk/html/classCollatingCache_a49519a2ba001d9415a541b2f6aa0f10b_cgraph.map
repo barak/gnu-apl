@@ -1,0 +1,7 @@
+<map id="CollatingCache::greater_vec" name="CollatingCache::greater_vec">
+<area shape="rect" id="node1" title="compare cache items ia and ib ascendingly. comp_arg is a CollatingCache pointer" alt="" coords="5,95,192,121"/>
+<area shape="rect" id="node2" href="$classCollatingCache.html#a552ac1c111785fb1ecb467550207c537" title="return the number of items to compare" alt="" coords="256,5,393,45"/>
+<area shape="rect" id="node3" href="$classCell.html#ad165f9ab69abf46b2cf44d301a700a1c" title="Return the integer value of a cell." alt="" coords="259,70,390,95"/>
+<area shape="rect" id="node4" href="$classIntCell.html#af181a9f593c5d20bb9396450061bc2c2" title="overloaded Cell::get_int_value()" alt="" coords="252,119,397,145"/>
+<area shape="rect" id="node5" href="$classCollatingCache.html#abdc08589db04d53e2c21ce2e67baf3b9" title="return the number of dimensions of the collating sequence" alt="" coords="240,169,409,194"/>
+</map>

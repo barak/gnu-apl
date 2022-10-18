@@ -1,0 +1,10 @@
+<map id="Quad_RL::get_random" name="Quad_RL::get_random">
+<area shape="rect" id="node2" href="$classWorkspace.html#a233dce47cf2f5a75b3e3f9cc8f52f978" title="return the Quad&#45;RL (to be taken % mod) " alt="" coords="207,81,345,108"/>
+<area shape="rect" id="node3" href="$classComplexCell.html#a69ca7247a26db55fdb7f7264ea066b63" title="overloaded from the corresponding Cell:: function (see class Cell). " alt="" coords="405,5,547,32"/>
+<area shape="rect" id="node5" href="$classFloatCell.html#a6723d1250207bdfaed8a63ea224c8986" title="Overloaded from the corresponding Cell:: function (see class Cell). " alt="" coords="416,56,536,83"/>
+<area shape="rect" id="node7" href="$classIntCell.html#a265004ec0692ee51f8cad70012c2ba7d" title="overloaded from the corresponding Cell:: function (see class Cell) " alt="" coords="423,107,529,133"/>
+<area shape="rect" id="node9" href="$classBif__F12__ROLL.html#afe59b85a350624fff7937205cb603307" title="dial A from B. overloaded Function::eval_AB(). " alt="" coords="393,157,559,184"/>
+<area shape="rect" id="node4" href="$classComplexCell.html#a978a6ef7d34a3446b796a0597c05d074" title="Overloaded Cell::is_finite(). " alt="" coords="607,5,757,32"/>
+<area shape="rect" id="node6" href="$classFloatCell.html#ab33d5fb8782321e100cec38cbed5ea18" title="Overloaded Cell::is_finite(). " alt="" coords="619,56,745,83"/>
+<area shape="rect" id="node8" href="$classIntCell.html#a57acd6c6da8ad45753bb27b304ca597b" title="overloaded Cell::is_integer_cell() " alt="" coords="607,107,757,133"/>
+</map>

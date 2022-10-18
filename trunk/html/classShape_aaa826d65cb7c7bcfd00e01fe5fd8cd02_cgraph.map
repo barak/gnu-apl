@@ -1,0 +1,4 @@
+<map id="Shape::without_first_axis" name="Shape::without_first_axis">
+<area shape="rect" id="node1" title="return a shape like this, but with the first axis (↑⍴) removed" alt="" coords="5,5,175,31"/>
+<area shape="rect" id="node2" href="$classShape.html#aeb018b67601d3f1c4bea3d2c2b877b7e" title="add a dimension of length len at the end" alt="" coords="223,5,385,31"/>
+</map>

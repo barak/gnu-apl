@@ -1,3 +1,4 @@
 <map id="SvoPid" name="SvoPid">
-<area shape="rect" id="node2" href="$structAP__num3.html" title="three AP numbers that uniquely identify a processor " alt="" coords="5,5,84,32"/>
+<area shape="rect" id="node1" title="a mapping between the left argument of ⎕SVO or ⎕SVQ and AP numbers" alt="" coords="13,93,77,119"/>
+<area shape="rect" id="node2" href="$structAP__num3.html" title="three AP numbers that uniquely identify a processor" alt="" coords="5,5,84,31"/>
 </map>

@@ -1,0 +1,4 @@
+<map id="UCS_string::append_hex" name="UCS_string::append_hex">
+<area shape="rect" id="node1" title="append number (in ASCII encoding like X or x) to this string" alt="" coords="5,5,173,31"/>
+<area shape="rect" id="node2" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="221,5,361,31"/>
+</map>

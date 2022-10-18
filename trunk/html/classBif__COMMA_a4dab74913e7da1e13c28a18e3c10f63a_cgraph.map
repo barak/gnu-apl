@@ -1,0 +1,14 @@
+<map id="Bif_COMMA::catenate" name="Bif_COMMA::catenate">
+<area shape="rect" id="node1" title="Catenate A and B." alt="" coords="5,164,160,189"/>
+<area shape="rect" id="node2" href="$classShape.html#aeb018b67601d3f1c4bea3d2c2b877b7e" title="add a dimension of length len at the end" alt="" coords="221,5,383,31"/>
+<area shape="rect" id="node3" href="$classBif__COMMA.html#a110e26c20b2479e3a99b67d9e69e234d" title="Prepend scalar cell_B to A along axis." alt="" coords="208,221,396,247"/>
+<area shape="rect" id="node4" href="$classCell.html#a62e4fd0b2c216efc0e23904e53ca7ecc" title="copy (deep) count cells from src to dest)" alt="" coords="483,69,564,95"/>
+<area shape="rect" id="node6" href="$classValue__P__Base.html#a1c3bf1b6f708eb2c1ba4b97c83adb9aa" title="return a const pointer to the Value" alt="" coords="456,119,591,144"/>
+<area shape="rect" id="node8" href="$classShape3.html#a075643abf890c05401f1b7abdc5339cf" title="the dimensions above r the axis" alt="" coords="483,267,564,292"/>
+<area shape="rect" id="node9" href="$classShape3.html#ad3ff2e3be69b9ca0085d211e3ecb2801" title="the dimensions below the axis" alt="" coords="485,316,562,341"/>
+<area shape="rect" id="node12" href="$classBif__COMMA.html#ad0ad030408ae664de7312b5722ae1507" title="Prepend scalar cell_A to B along axis." alt="" coords="227,157,377,197"/>
+<area shape="rect" id="node7" href="$classShape.html#a592d2ade68aa8c21c5d84627c3a0e001" title="return the length of dimension r" alt="" coords="444,168,603,193"/>
+<area shape="rect" id="node10" href="$classShape.html#afcd3708c8c18a30cb3c0c1fa1a630f71" title="modify dimension r" alt="" coords="444,217,603,243"/>
+<area shape="rect" id="node5" href="$classCell.html#aab9681b3e735d10ef92978c5c17bf95d" title="init (uninitialized) Cell other from this initialized cell" alt="" coords="686,69,793,95"/>
+<area shape="rect" id="node11" href="$classShape.html#a189c92d0b74f3313bd83c8aa7565e9c5" title="recompute volume (after changing a dimension of len 0)" alt="" coords="651,217,828,243"/>
+</map>

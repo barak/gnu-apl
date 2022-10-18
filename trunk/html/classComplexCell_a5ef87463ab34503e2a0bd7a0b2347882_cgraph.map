@@ -1,0 +1,6 @@
+<map id="ComplexCell::bif_add" name="ComplexCell::bif_add">
+<area shape="rect" id="node1" title="overloaded from the corresponding Cell:: function (see class Cell)." alt="" coords="5,42,152,67"/>
+<area shape="rect" id="node2" href="$classComplexCell.html#ac31c8fb018b164f5016a94dd7ca4ab06" title="overloaded Cell::get_complex_value()" alt="" coords="200,5,379,45"/>
+<area shape="rect" id="node4" href="$classComplexCell.html#a9ccb64da2c504a517c725dc2c41940da" title="initialize the (un&#45;initialized) Cell *Z to complex r + ij" alt="" coords="228,70,351,95"/>
+<area shape="rect" id="node3" href="$classComplexCell.html#ae93d7078736e5c3b20970a687565b3d1" title="return the complex value of this cell" alt="" coords="427,13,556,38"/>
+</map>

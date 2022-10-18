@@ -1,0 +1,25 @@
+<map id="Executable::get_text_size" name="Executable::get_text_size">
+<area shape="rect" id="node1" title="return number of function lines (including header line 0)" alt="" coords="1100,300,1273,325"/>
+<area shape="rect" id="node2" href="$classNabla.html#ad6fd204af3a77146a45cfebde9a612d9" title="restore function" alt="" coords="891,52,1050,77"/>
+<area shape="rect" id="node6" href="$classUserFunction.html#a25e0645f3e9caa68e1b7a35ffed1bfeb" title="create a user defined function according to data of length len in workspace w." alt="" coords="909,128,1032,153"/>
+<area shape="rect" id="node10" href="$classDoxy.html#a76067b55e9395dec0889368d1daa6247" title="write the page for one defined function. If the define function is a named lambda,..." alt="" coords="899,458,1042,484"/>
+<area shape="rect" id="node11" href="$classDoxy.html#a5eb9b5605981c826438d5a51f38bf5a4" title="HTML&#45;print a table containing all defined functions to page." alt="" coords="679,433,829,458"/>
+<area shape="rect" id="node14" href="$classUserFunction.html#af4a520e7ab3a61ca3c3f4be32f463810" title="print help for this function on out (for the )HELP command)" alt="" coords="905,508,1037,533"/>
+<area shape="rect" id="node16" href="$classUserFunction.html#a1aa032e76cb608c07de66ac13d41809b" title="recompile the body" alt="" coords="667,292,841,317"/>
+<area shape="rect" id="node21" href="$classUserFunction.html#a37c955f6a76f58d168d4533389249cae" title="constructor for a normal (i.e. non&#45;lambda) user defined function" alt="" coords="428,324,615,349"/>
+<area shape="rect" id="node22" href="$classUserFunction.html#a0ad584a87a63e6d50191b3967d64140e" title="transform a function body containing (old&#45;style) multi&#45;lines into a standard function body" alt="" coords="889,228,1052,268"/>
+<area shape="rect" id="node23" href="$classUserFunction.html#a85d555fc355a3a64c4a72c64957e60bc" title="transform a function body containing (new&#45;style) multi&#45;lines into a standard function body" alt="" coords="889,292,1052,332"/>
+<area shape="rect" id="node3" href="$classNabla.html#ae88cd2f873ba2df8d694f6b3a36ded1d" title="execute an edit operation" alt="" coords="683,26,825,52"/>
+<area shape="rect" id="node4" href="$classNabla.html#a610d94a179335126e82e9eea07918d5a" title="edit this function" alt="" coords="253,52,339,77"/>
+<area shape="rect" id="node5" href="$classNabla.html#a894eac5264914ef7eedcfc14643cc7ee" title="start editing, return source location if first_command is bad." alt="" coords="476,26,567,52"/>
+<area shape="rect" id="node7" href="$classQuad__FX.html#a8bf850cc2a939e11fccbb21abc79a0e7" title="do ⎕FX with execution properties exec_props" alt="" coords="675,128,833,153"/>
+<area shape="rect" id="node8" href="$classUserFunction.html#ab642f0280320a5cdccb8c40c812b3f25" title="Load this function into the workspace named workspace." alt="" coords="688,177,820,202"/>
+<area shape="rect" id="node9" href="$classXML__Loading__Archive.html#a2e7aed9883aa106937d3d9313163e10b" title="read next Function element" alt="" coords="678,227,830,267"/>
+<area shape="rect" id="node12" href="$classDoxy.html#ad8abe2e8a1b686a7b35e582c369d41ae" title="generate the entire documentation" alt="" coords="480,433,563,458"/>
+<area shape="rect" id="node13" href="$classCommand.html#a834eac0e797a5d1c992018b7d0c049a4" title="]DOXY: create doxygen&#45;like documentation of the current workspace" alt="" coords="216,433,376,458"/>
+<area shape="rect" id="node15" href="$classCommand.html#a925cc5f77af57e1705b8c96a522e6a55" title="show list of commands" alt="" coords="675,508,833,533"/>
+<area shape="rect" id="node17" href="$classUserFunction.html#a2bedc3c56fb8daa8e4e760bbc912de68" title="set trace or stop vector" alt="" coords="424,185,619,210"/>
+<area shape="rect" id="node18" href="$classStop__Trace.html#a1f0aad5536348d1e52721cd04e2f9548" title="return assign lines in new_value to stop or trace vector in ufun" alt="" coords="229,185,363,210"/>
+<area shape="rect" id="node19" href="$classQuad__STOP.html#aba7f51dfbb36d3c2d25ce2e7deb0f278" title="Overloaded Function::eval_AB()" alt="" coords="10,161,163,186"/>
+<area shape="rect" id="node20" href="$classQuad__TRACE.html#a59e7875554f651f1f64d83d79111fecd" title="Overloaded Function::eval_AB()" alt="" coords="5,210,168,236"/>
+</map>

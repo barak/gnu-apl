@@ -1,6 +1,7 @@
 <map id="Bif_OPER1_COMMUTE" name="Bif_OPER1_COMMUTE">
-<area shape="rect" id="node2" href="$classPrimitiveOperator.html" title="Base class for all primitive APL operators. " alt="" coords="27,229,150,256"/>
-<area shape="rect" id="node3" href="$classPrimitiveFunction.html" title="Base class for all internal functions of the interpreter. " alt="" coords="27,155,150,181"/>
-<area shape="rect" id="node4" href="$classFunction.html" title="Base class for all APL functions and operators (system or defined) " alt="" coords="53,80,125,107"/>
-<area shape="rect" id="node5" href="$classNamedObject.html" title="A user&#45;defined variable or function. " alt="" coords="37,5,140,32"/>
+<area shape="rect" id="node1" title="The class implementing ⍨" alt="" coords="5,299,172,324"/>
+<area shape="rect" id="node2" href="$classPrimitiveOperator.html" title="Base class for all primitive APL operators." alt="" coords="27,225,150,251"/>
+<area shape="rect" id="node3" href="$classPrimitiveFunction.html" title="Base class for all internal functions of the interpreter." alt="" coords="27,152,150,177"/>
+<area shape="rect" id="node4" href="$classFunction.html" title="Base class for all APL functions and operators (system or defined)" alt="" coords="53,79,125,104"/>
+<area shape="rect" id="node5" href="$classNamedObject.html" title="A user&#45;defined variable or function." alt="" coords="37,5,140,31"/>
 </map>

@@ -1,0 +1,11 @@
+<map id="Bif_F12_DOMINO::invert_upper_triangle_matrix" name="Bif_F12_DOMINO::invert_upper_triangle_matrix">
+<area shape="rect" id="node1" title="inver a complex upper&#45;triangle matrix" alt="" coords="5,229,175,269"/>
+<area shape="rect" id="node2" href="$classBif__F12__DOMINO_1_1Matrix.html#adb08c178b7485d7113436c1f2a33ea10" title="print this matrix boxed with name" alt="" coords="223,5,396,45"/>
+<area shape="rect" id="node3" href="$classBif__F12__DOMINO_1_1Matrix.html#a8ea8df8351e5a4b8d76a9b1e70780d6e" title="divide the matrix element at row y, col x by val." alt="" coords="223,69,396,109"/>
+<area shape="rect" id="node4" href="$classBif__F12__DOMINO_1_1Matrix.html#a02399d9c35be47d1be235eab9cfadfd4" title="return the complex number at row y, column x of this matrix" alt="" coords="223,133,396,173"/>
+<area shape="rect" id="node5" href="$classBif__F12__DOMINO_1_1Matrix.html#a142ec301838bb7aacf99aacd2a4d73f1" title="return the imaginary part of A[x;y]" alt="" coords="223,197,396,237"/>
+<area shape="rect" id="node6" href="$classBif__F12__DOMINO_1_1Matrix.html#a267913456cf5b847fd7d04293322acd0" title="initialize this matrix to the identity matrix" alt="" coords="223,261,396,301"/>
+<area shape="rect" id="node7" href="$classBif__F12__DOMINO_1_1Matrix.html#a0cfd11a56d2d6cf4c0db0c9cc8617715" title="return the real part of A[x;y]" alt="" coords="223,325,396,365"/>
+<area shape="rect" id="node8" href="$classBif__F12__DOMINO_1_1Matrix.html#a6e6c6471d9d72782952ddb88f5f21556" title="set the complex number at row y, column x of this matrix" alt="" coords="223,389,396,429"/>
+<area shape="rect" id="node9" href="$classBif__F12__DOMINO_1_1Matrix.html#a1645937f2b0162b9bb9d846c16a9848f" title="subtract val from the matrix element at row y, column x." alt="" coords="223,453,396,493"/>
+</map>

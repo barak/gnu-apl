@@ -1,0 +1,5 @@
+<map id="RealCell::do_bif_circle_fun" name="RealCell::do_bif_circle_fun">
+<area shape="rect" id="node1" title="compute circle function fun" alt="" coords="211,35,389,60"/>
+<area shape="rect" id="node2" href="$classRealCell.html#aed27521634af9fed4dd213807f93a2c8" title="overloaded Cell::bif_circle_fun()." alt="" coords="5,5,163,31"/>
+<area shape="rect" id="node3" href="$classRealCell.html#aa5cb568d949ab777e9ce4eba530b2121" title="overloaded Cell::bif_circle_fun_inverse()." alt="" coords="18,55,150,95"/>
+</map>

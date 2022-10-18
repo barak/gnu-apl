@@ -1,0 +1,20 @@
+<map id="XML_Loading_Archive::read_lambda" name="XML_Loading_Archive::read_lambda">
+<area shape="rect" id="node1" title="read a lambda" alt="" coords="5,201,157,241"/>
+<area shape="rect" id="node2" href="$classXML__Loading__Archive.html#ad8cf599287f50b63ee67539509c6dce1" title="check that is_tag(prefix) is true and print error info if not" alt="" coords="215,23,367,63"/>
+<area shape="rect" id="node5" href="$classUserFunction.html#a3fb5d002175b6e8a7adf754159583ee9" title="(re&#45;)create a lambda" alt="" coords="205,353,376,378"/>
+<area shape="rect" id="node10" href="$classExecutable.html#a5f1a0c24eb29a98e47988c5ce370bded" title="increment the reference counter" alt="" coords="215,448,367,488"/>
+<area shape="rect" id="node12" href="$classXML__Loading__Archive.html#a987f28e4f3139e5f1c96913468ea3057" title="move to next tag, return true if EOF" alt="" coords="652,109,804,149"/>
+<area shape="rect" id="node13" href="$classXML__Loading__Archive.html#ac4cdadb93d62fcd862579b84d3556804" title="read an UCS string" alt="" coords="215,201,367,241"/>
+<area shape="rect" id="node3" href="$classXML__Loading__Archive.html#adb5a5f67fc6ceffb3260e61b5fe9994c" title="return true iff tagname starts with prefix" alt="" coords="652,5,804,45"/>
+<area shape="rect" id="node4" href="$classXML__Loading__Archive.html#a59a9b9839c3a2087ce5a350b3b9a9c06" title="print current tag" alt="" coords="438,23,590,63"/>
+<area shape="rect" id="node6" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="658,326,798,351"/>
+<area shape="rect" id="node7" href="$classUCS__string.html#a186a76c22c3ac840f1e607ba49e253a0" title="return the last character in this string" alt="" coords="451,381,577,406"/>
+<area shape="rect" id="node9" href="$classUCS__string.html#a67ea87cb92e687105b21917ffb4a2a6f" title="remove the last character in this string" alt="" coords="437,430,591,455"/>
+<area shape="rect" id="node8" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="667,405,789,430"/>
+<area shape="rect" id="node11" href="$classExecutable.html#aac3043f85d550ff3a589d828a2012098" title="return a UserFunction * (if this is one) or else 0." alt="" coords="424,479,604,505"/>
+<area shape="rect" id="node14" href="$classXML__Loading__Archive.html#a3ea850c7fb68b3e908615f81bb9304d2" title="find mandatory attribute att_name. Return a pointer to its value if found and throw DOMAIN ERROR if n..." alt="" coords="438,201,590,241"/>
+<area shape="rect" id="node16" href="$classXML__Loading__Archive.html#a4c957a7b68bd8ef13162b63ff62bb7ed" title="input is a UTF8&#45;encoded sequence of bytes, terminated with &quot;. UTF8&#45;decode the sequence,..." alt="" coords="438,265,590,305"/>
+<area shape="rect" id="node18" href="$classXML__Loading__Archive.html#a44bf13ce1569bd63ad5de5e460ed3ace" title="skip to tag tag, return EOF if end of file" alt="" coords="438,137,590,177"/>
+<area shape="rect" id="node15" href="$classXML__Loading__Archive.html#ad0c398f273df586ef1a2cb9b87b9cb41" title="find attribute att_name and return: a pointer to its value if found, 0 if optional is true,..." alt="" coords="652,201,804,241"/>
+<area shape="rect" id="node17" href="$classUTF8__string.html#a27a630b44bca173fe9ea5005bcb3e460" title="convert the first char in UTF8&#45;encoded string to Unicode, setting len to the number of bytes in the U..." alt="" coords="661,273,795,298"/>
+</map>

@@ -1,0 +1,6 @@
+<map id="Signal_base::get__EVENTS_ARE__events" name="Signal_base::get__EVENTS_ARE__events">
+<area shape="rect" id="node1" title="&lt; dito" alt="" coords="423,35,609,75"/>
+<area shape="rect" id="node2" href="$classSvar__DB.html#a323b6d6f9492aa2a9fc58b2979d051f1" title="clear all events, return the current event bitmap." alt="" coords="236,5,367,45"/>
+<area shape="rect" id="node4" href="$classSvar__DB.html#a1c4eca4e63db0fb74cb122fd87ec480d" title="return events for processor proc" alt="" coords="228,70,375,95"/>
+<area shape="rect" id="node3" href="$classQuad__SVE.html#a9366ede668cf142b1e7f4a4337f3033b" title="Overloaded Symbol::get_apl_value()." alt="" coords="5,42,180,67"/>
+</map>

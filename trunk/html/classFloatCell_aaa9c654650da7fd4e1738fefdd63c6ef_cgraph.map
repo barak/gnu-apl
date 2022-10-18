@@ -1,0 +1,11 @@
+<map id="FloatCell::bif_add" name="FloatCell::bif_add">
+<area shape="rect" id="node1" title="Overloaded Cell::bif_add()." alt="" coords="5,145,129,171"/>
+<area shape="rect" id="node2" href="$classFloatCell.html#a1c809407ae6c0e97a1e2994b8a6b67b5" title="greatest common divisor, Knuth Vol. 1 p. 14" alt="" coords="193,5,296,31"/>
+<area shape="rect" id="node3" href="$classFloatCell.html#a59ae608bcfefddbbe174d95796eb129c" title="Overloaded Cell::get_real_value()." alt="" coords="181,55,309,95"/>
+<area shape="rect" id="node5" href="$classCell.html#af630cfd77068be118565b53e96766fa0" title="return true if multiplying a and b will (probably) overflow. For some huge a or b the result may inco..." alt="" coords="177,120,312,145"/>
+<area shape="rect" id="node6" href="$classCell.html#a17615f94cbd941e6d84a33cdc913b36c" title="return true if z = a + b had an overflow." alt="" coords="177,169,312,195"/>
+<area shape="rect" id="node7" href="$classFloatCell.html#a88217aaf5cd286cc89a85d2885876dda" title="initialize the (un&#45;initialized) Cell *Z to APL_Float flt" alt="" coords="196,219,293,244"/>
+<area shape="rect" id="node8" href="$classIntCell.html#aa99b7212ce13da0f241adeb18e350198" title="initialize Z to APL_Integer v" alt="" coords="205,268,284,293"/>
+<area shape="rect" id="node4" href="$classFloatCell.html#afa1a46cfd36a3c2166559f7d425f094d" title="return the value of this cell as a double (even if the value is rational)" alt="" coords="360,63,471,88"/>
+<area shape="rect" id="node9" href="$classIntCell.html#a88c653b2f968c451ee1c1c53a983fa13" title="Construct an integer cell with value 0." alt="" coords="362,268,469,293"/>
+</map>

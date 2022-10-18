@@ -1,0 +1,5 @@
+<map id="Bif_F12_RHO::do_reshape" name="Bif_F12_RHO::do_reshape">
+<area shape="rect" id="node2" href="$classValue.html#a9fc8bbaf9fefe6835dea7db0f71b8b6c" title="return the number of elements (the product of the shapes). " alt="" coords="232,5,380,32"/>
+<area shape="rect" id="node3" href="$classValue.html#af0b07dd0be944ea021c18d1128f04f99" title="return the first element of the ravel (which is always present) same as get_first(), but named differently to indicate its context. " alt="" coords="244,56,368,83"/>
+<area shape="rect" id="node4" href="$classValue.html#a113fa41969aed3b011b477ea199c6157" title="return the (constant) idx&#39;th element of the ravel. " alt="" coords="245,107,367,133"/>
+</map>

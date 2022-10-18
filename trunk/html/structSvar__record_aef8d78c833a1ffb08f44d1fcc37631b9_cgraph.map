@@ -1,0 +1,7 @@
+<map id="Svar_record::may_use" name="Svar_record::may_use">
+<area shape="rect" id="node1" title="return true iff the calling partner may use the current value" alt="" coords="5,80,159,105"/>
+<area shape="rect" id="node2" href="$structSvar__record.html#abdb5a461d505c7e674260f0794cc2bf0" title="complain about proc" alt="" coords="214,5,367,31"/>
+<area shape="rect" id="node3" href="$structSvar__partner.html#a3fb77c18c091930a1a8c361e399c8c04" title="return the control bits of this partner (as seen by the offering" alt="" coords="207,55,375,80"/>
+<area shape="rect" id="node4" href="$classProcessorID.html#a834b72a9d1c965b8b07a96e2088f5972" title="return the own id, parent, and grand&#45;parent" alt="" coords="221,104,360,129"/>
+<area shape="rect" id="node5" href="$structSvar__partner.html#a08989d19706b526a4054398b2d0b5480" title="return true if this partner is active. Note that this can be the case even though tcp_fd is invalid." alt="" coords="213,153,369,179"/>
+</map>

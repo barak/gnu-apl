@@ -1,0 +1,9 @@
+<map id="ComplexCell::get_imag_value" name="ComplexCell::get_imag_value">
+<area shape="rect" id="node1" title="overloaded Cell::get_imag_value()." alt="" coords="425,97,584,137"/>
+<area shape="rect" id="node2" href="$classComplexCell.html#a4d7ddbf864c2e7d34db3036154be7a42" title="overloaded from the corresponding Cell:: function (see class Cell)." alt="" coords="201,5,375,31"/>
+<area shape="rect" id="node3" href="$classComplexCell.html#a2297b787ece47255fc7821eebe8ac42f" title="overloaded from the corresponding Cell:: function (see class Cell)." alt="" coords="209,55,367,80"/>
+<area shape="rect" id="node4" href="$classComplexCell.html#a8b0c84adf9799295fb470bf3945e6899" title="overloaded from the corresponding Cell:: function (see class Cell)." alt="" coords="202,104,374,129"/>
+<area shape="rect" id="node5" href="$classComplexCell.html#a2c40d9e586d2e7f78ff6cf5e6c61f723" title="overloaded from the corresponding Cell:: function (see class Cell)." alt="" coords="199,153,377,179"/>
+<area shape="rect" id="node6" href="$classComplexCell.html#ad2790f63cacb1084c752374ec1bf3066" title="overloaded Cell::compare()" alt="" coords="211,203,365,228"/>
+<area shape="rect" id="node7" href="$classComplexCell.html#afea8bc960e26dfcc6dd7c8866b9489d7" title="overloaded Cell::greater()." alt="" coords="5,203,151,228"/>
+</map>

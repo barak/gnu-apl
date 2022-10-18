@@ -1,0 +1,12 @@
+<map id="Quad_CR::figure_default" name="Quad_CR::figure_default">
+<area shape="rect" id="node1" title="compute a good default type and value for the top&#45;level ⍴ of 10 ⎕CR. Return true for INT and false fo..." alt="" coords="1755,55,1921,80"/>
+<area shape="rect" id="node2" href="$classQuad__CR.html#a8b2ba6751ee90f286cae088a14101ff8" title="compute the prolog (e,g, ((⎕IO+2)⊃X)←) for the pick of left" alt="" coords="1527,55,1707,80"/>
+<area shape="rect" id="node3" href="$classQuad__CR.html#acbf51c3bd2e75e0d23884d426cc736d1" title="compute 10 ⎕CR recursively" alt="" coords="1297,55,1479,80"/>
+<area shape="rect" id="node4" href="$classQuad__CR.html#a9a5d503eccac9d627b13ee6be3f14cad" title="compute 10 ⎕CR recursively (structured variable)" alt="" coords="1041,29,1249,55"/>
+<area shape="rect" id="node5" href="$classQuad__CR.html#adb8eb84c4716584168f16f226c1a0ba4" title="portable variable encoding of value name (varname or varname ⊂)" alt="" coords="799,55,993,80"/>
+<area shape="rect" id="node6" href="$classQuad__CR.html#ad98ce37f2b329eb37ddae9d0fcf7832f" title="10 ⎕CR symbol_name (variable or function name). Also used for )OUT" alt="" coords="608,29,751,55"/>
+<area shape="rect" id="node7" href="$classSymbol.html#a9f5e43c937f34053d09f3406f01dacbd" title="dump this symbol to out" alt="" coords="626,79,733,104"/>
+<area shape="rect" id="node8" href="$classSymbolTable.html#ae8e03d7855f323239450e78d66b4b29d" title="dump symbols to out" alt="" coords="421,79,560,104"/>
+<area shape="rect" id="node9" href="$classWorkspace.html#a15d8cb5c62016f547b9718e820c94efd" title="dump this workspace" alt="" coords="216,79,373,104"/>
+<area shape="rect" id="node10" href="$classCommand.html#a98e7d1dd0c01014d79f2120292588a70" title=")DUMP: dump a workspace file (.apl)" alt="" coords="5,79,168,104"/>
+</map>

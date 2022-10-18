@@ -1,3 +1,4 @@
 <map id="Plot_window_properties::print" name="Plot_window_properties::print">
-<area shape="rect" id="node2" href="$classPlot__data.html#a36b1cdef69de2db9c31d06db9c5098be" title="convert a Color to a string " alt="" coords="213,13,369,39"/>
+<area shape="rect" id="node1" title="print the properties (for debugging purposes)" alt="" coords="5,5,165,45"/>
+<area shape="rect" id="node2" href="$classPlot__data.html#a9c02ce3e312d8187c58c63a2b56b485f" title="convert a Color to a string" alt="" coords="213,13,369,38"/>
 </map>

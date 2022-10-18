@@ -1,7 +1,30 @@
+/*
+ @licstart  The following is the entire license notice for the JavaScript code in this file.
+
+ The MIT License (MIT)
+
+ Copyright (C) 1997-2020 by Dimitri van Heesch
+
+ Permission is hereby granted, free of charge, to any person obtaining a copy of this software
+ and associated documentation files (the "Software"), to deal in the Software without restriction,
+ including without limitation the rights to use, copy, modify, merge, publish, distribute,
+ sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is
+ furnished to do so, subject to the following conditions:
+
+ The above copyright notice and this permission notice shall be included in all copies or
+ substantial portions of the Software.
+
+ THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING
+ BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+ NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
+ DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+
+ @licend  The above is the entire license notice for the JavaScript code in this file
+*/
 var NAVTREE =
 [
-  [ "GNUAPL", "index.html", [
-    [ "GNU APL", "index.html", null ],
+  [ "GNU APL", "index.html", [
     [ "Classes", "annotated.html", [
       [ "Class List", "annotated.html", "annotated_dup" ],
       [ "Class Index", "classes.html", null ],
@@ -16,12 +39,14 @@ var NAVTREE =
         [ "Related Functions", "functions_rela.html", null ]
       ] ]
     ] ],
-    [ "Files", null, [
-      [ "File List", "files.html", "files" ],
+    [ "Files", "files.html", [
+      [ "File List", "files.html", "files_dup" ],
       [ "File Members", "globals.html", [
         [ "All", "globals.html", null ],
         [ "Functions", "globals_func.html", null ],
-        [ "Variables", "globals_vars.html", null ]
+        [ "Variables", "globals_vars.html", null ],
+        [ "Enumerator", "globals_eval.html", null ],
+        [ "Macros", "globals_defs.html", null ]
       ] ]
     ] ]
   ] ]
@@ -30,31 +55,30 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "APL__Float__as__class_8hh_source.html",
-"annotated.html",
-"classBif__F12__DOMINO_1_1Matrix.html#aa655e0c1fc9ca5ce65b3074b87a1d50f",
-"classBif__F12__TIMES.html#a6f711d13e067a3122c99195040dbdb6b",
-"classBif__OPER1__SCAN.html#aa91d83000baa8554f890cc8dad86ec93",
-"classCellFunctionStatistics.html#ab1184e4891a1032dc0d46a21cd731463",
-"classDLX__Root__Node.html#a61f1d84ebcc965e42c062024c98be5be",
-"classFIND__OFFERING__ID__c.html#abc36c9bbc6d5f1f462d47b357d24ac58",
-"classIO__Files.html#ad1612493689498433417a31ece2c4794",
-"classLvalCell.html#ae15318b3c40b49207f7c08db7c0089e1",
-"classNumericCell.html#a7cebf4c76a5b6281920e54983ddcf61b",
-"classPerformance.html#a8c035d346e3ca0098b88bc644326f6bf",
-"classPlot__window__properties.html#a89fda6c509bde4cdc10a73dee1cf16a5",
-"classPrintBuffer.html#a43da75e9d48c2b94f9e4c614e5bf859e",
-"classQuad__FFT.html#a10d9575068fba221516bcb6d31cad1bf",
-"classQuad__PR.html#a9ad1303c52acfdde228b2fdbaefa810b",
-"classQuad__WA.html#a17d405124006925906922422170d8354",
-"classShape3.html#a09f8990d1320272de7b55247633abe49",
-"classSymbol.html#a3b4c0297499f3c651814c39113aacf3e",
-"classTokenizer.html#ad7706aec4bdc9bf3ef0166a16bfa9373",
-"classUserFunction__header.html#a332a135b6d9ec286e6deb84298c10a43",
-"classValue.html#adcada8db3d31b0fc0791755ed40dc1d0",
-"classXML__Loading__Archive.html#a0d14127092a86998ea23d842145bb39d",
-"functions_q.html",
-"structInputFile.html#a307af49dcf496c919a73d361cb8941db",
-"structXML__Loading__Archive_1_1__vid__pvid.html#a8761e15bc116de1bd7dba48dac3043b7"
+"Quad__PNG_8cc.html#a4a17440557df8ba09cbb5794047cb28a",
+"classBif__F0__ZILDE.html#a4a3323e10032b6b0a5d4932ac8ac69b1",
+"classBif__F12__POWER.html",
+"classBif__F2__NAND.html#a9fa6771b6ba922a554ff189bbf2e48ab",
+"classCell.html#a2014a67c4600b238c7617cba328d0c48",
+"classComplexCell.html#a8d8ba044d714b755b2c6b1cf6ef09f7f",
+"classElidedIndexIterator.html#a3567035d32461087c5e12dd6aead289e",
+"classFunction.html#ae0a99f6cd86b1ffd21160fcf082dc0d7",
+"classLibPaths.html#af7466c5c66b0fcc0a8a54dbdf835f2cf",
+"classNabla.html#ae59ff07347338688d040c647b60b8d24",
+"classParallel.html#a2bfaddf8fa4ef315808cb51b13bc2ac6",
+"classPrefix.html#a9b2f1a5b9a782b8887ae94ccb8bf5044",
+"classQuad__EA.html#a3791e3ee3083a057e05e49ae8c6e19d4",
+"classQuad__PNG.html#a0d1b1dbcb28ce932b9af8223ee46a93e",
+"classQuad__TZ.html#a7deabddc904b13c5b4c1807cc6cba6db",
+"classShape.html#a4e6d26fd3c12826ace50d88d0efa2c2b",
+"classSvar__DB.html#afb713e152f4da766cafce38a1b10ea4d",
+"classToken.html#acae650659afc995272cfd55d76b45ea3",
+"classUserFunction.html#abefce80b85241b77af698c0e3ce81340",
+"classValue.html#ab9083ca4fb91e26a15cbf060ae215a5c",
+"classXML__Loading__Archive.html#a3ea850c7fb68b3e908615f81bb9304d2",
+"functions_vars_l.html",
+"structInputFile.html#ae396278f61a49cc9f7c0128e85865314",
+"structXML__Saving__Archive_1_1__val__par.html#aa244b5ee23bfb8318a5267cc3e48221b"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

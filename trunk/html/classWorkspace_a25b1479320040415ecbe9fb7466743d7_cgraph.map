@@ -1,0 +1,5 @@
+<map id="Workspace::load_DUMP" name="Workspace::load_DUMP">
+<area shape="rect" id="node1" title="load )DUMPed file from open file descriptor fd (closes fd)" alt="" coords="5,42,172,67"/>
+<area shape="rect" id="node2" href="$structInputFile.html#a171f3f85dfe2dfb9186cf9bdc5be22ca" title="add object to object_filter" alt="" coords="225,5,358,45"/>
+<area shape="rect" id="node3" href="$structInputFile.html#adbba18806cd166da001a34b438cc5d4a" title="set the from_COPY flag" alt="" coords="220,70,363,95"/>
+</map>

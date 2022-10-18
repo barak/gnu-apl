@@ -1,0 +1,14 @@
+<map id="Bif_F12_FORMAT::format_by_example" name="Bif_F12_FORMAT::format_by_example">
+<area shape="rect" id="node1" title="A character array with B formatted by example." alt="" coords="5,157,180,197"/>
+<area shape="rect" id="node2" href="$classShape.html#aeb018b67601d3f1c4bea3d2c2b877b7e" title="add a dimension of length len at the end" alt="" coords="240,5,403,31"/>
+<area shape="rect" id="node3" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="472,107,612,132"/>
+<area shape="rect" id="node4" href="$classCell.html#a9a0028fd74f00deb001a8062a55916c6" title="Return the real part of a cell." alt="" coords="253,221,390,247"/>
+<area shape="rect" id="node5" href="$classCell.html#a79b6c0333d176833fb4fbc10fab94f7b" title="Return true iff this cell is an integer or float cell." alt="" coords="262,271,381,296"/>
+<area shape="rect" id="node6" href="$classShape.html#a81a02847b9950622a44fa93c777d7abe" title="set last dimension to sh" alt="" coords="228,320,415,345"/>
+<area shape="rect" id="node9" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="697,157,819,183"/>
+<area shape="rect" id="node10" href="$classBif__F12__FORMAT.html#adc0465141b443e1733208fb2dd14466c" title="split entire format string string into column format strings" alt="" coords="240,157,403,197"/>
+<area shape="rect" id="node7" href="$classShape.html#afcd3708c8c18a30cb3c0c1fa1a630f71" title="modify dimension r" alt="" coords="463,320,621,345"/>
+<area shape="rect" id="node8" href="$classShape.html#a189c92d0b74f3313bd83c8aa7565e9c5" title="recompute volume (after changing a dimension of len 0)" alt="" coords="669,320,847,345"/>
+<area shape="rect" id="node11" href="$classUCS__string.html#a186a76c22c3ac840f1e607ba49e253a0" title="return the last character in this string" alt="" coords="479,208,605,233"/>
+<area shape="rect" id="node12" href="$classAvec.html#af6b90a707281ad128da1764d92d85cd7" title="Return true iff av is a digit (i.e. 0 ≤ av ≤ 9)" alt="" coords="491,257,593,283"/>
+</map>

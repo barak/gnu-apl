@@ -1,0 +1,5 @@
+<map id="Vector::conjugate" name="Vector::conjugate">
+<area shape="rect" id="node1" title="conjugate this" alt="" coords="5,43,129,68"/>
+<area shape="rect" id="node2" href="$classZZ.html#a7f23d944c82ddeb3ae65ba781eec9e1c" title="conjugate this" alt="" coords="177,5,280,31"/>
+<area shape="rect" id="node3" href="$classVector.html#a71433ad4ba0b0d71a2253d390742286f" title="return true if this is a vector of complex numbers (and not a vector of real numbers" alt="" coords="178,79,279,104"/>
+</map>

@@ -1,0 +1,11 @@
+<map id="Token::get_fun_line" name="Token::get_fun_line">
+<area shape="rect" id="node1" title="return the Function_Line value of this token" alt="" coords="1421,31,1557,56"/>
+<area shape="rect" id="node2" href="$classXML__Saving__Archive.html#a7be3cd4709e0783821a20738ee44433f" title="emit a token value up to (excluding) the &#39;&gt;&#39; of the end token" alt="" coords="1227,23,1373,63"/>
+<area shape="rect" id="node3" href="$classXML__Saving__Archive.html#a2595cc03a54882176e3d9bddd9bbff60" title="write Token_loc tloc" alt="" coords="1032,23,1179,63"/>
+<area shape="rect" id="node4" href="$classXML__Saving__Archive.html#a6d474efaefd9567ab70fe498729bb186" title="write the Prefix parser of si (and its derived functions)" alt="" coords="837,23,984,63"/>
+<area shape="rect" id="node5" href="$classXML__Saving__Archive.html#a3bc62d82baa6be004398f70faa1b3e8b" title="write StateIndicator entry si" alt="" coords="643,23,789,63"/>
+<area shape="rect" id="node6" href="$classXML__Saving__Archive.html#acc327395cab545ea7797d92f5c931cab" title="write entire workspace" alt="" coords="448,23,595,63"/>
+<area shape="rect" id="node7" href="$classWorkspace.html#a8a4f1d898d523818dbd9d7efa6f2cf92" title="save this workspace" alt="" coords="247,31,400,56"/>
+<area shape="rect" id="node8" href="$classCommand.html#ad61e749290966d00856ce1dd4f6abe42" title=")SAVE active WS as CONTINUE and )OFF" alt="" coords="5,5,199,31"/>
+<area shape="rect" id="node9" href="$classCommand.html#aec0c4c6efbb9df9a34220b510f58905a" title=")SAVE: save a workspace file (.xml)" alt="" coords="23,55,181,80"/>
+</map>

@@ -1,0 +1,4 @@
+<map id="Quad_TF::is_inverse" name="Quad_TF::is_inverse">
+<area shape="rect" id="node1" title="return true if val contains an 1⎕TF or 2⎕TF record" alt="" coords="187,5,329,31"/>
+<area shape="rect" id="node2" href="$classQuad__TF.html#a27ed4b02d5f1a1c8a8b0a1fcbe2756f8" title="Overloaded Function::eval_AB()." alt="" coords="5,5,139,31"/>
+</map>

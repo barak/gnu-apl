@@ -1,6 +1,7 @@
 <map id="REGISTER_PROCESSOR_c" name="REGISTER_PROCESSOR_c">
-<area shape="rect" id="node2" href="$classSignal__base.html" title="the base class for all signal classes " alt="" coords="5,13,99,39"/>
-<area shape="rect" id="node3" href="$classSig__item__int.html" title="Sig_item_int\&lt; uint32\l_t, 4 \&gt;" alt="" coords="123,5,264,47"/>
-<area shape="rect" id="node4" href="$classSig__item__string.html" title="a string signal item of size bytes " alt="" coords="288,13,400,39"/>
-<area shape="rect" id="node5" href="$classSig__item__int.html" title="Sig_item_int\&lt; uint16\l_t, 1 \&gt;" alt="" coords="424,5,565,47"/>
+<area shape="rect" id="node1" title="APserver request: register processor proc in APserver." alt="" coords="177,137,375,163"/>
+<area shape="rect" id="node2" href="$classSignal__base.html" title="the base class for all signal classes" alt="" coords="5,13,99,38"/>
+<area shape="rect" id="node3" href="$classSig__item__int.html" title=" " alt="" coords="123,5,264,45"/>
+<area shape="rect" id="node4" href="$classSig__item__int.html" title=" " alt="" coords="288,5,429,45"/>
+<area shape="rect" id="node5" href="$classSig__item__string.html" title="a string signal item of size bytes" alt="" coords="453,13,565,38"/>
 </map>

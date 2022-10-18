@@ -1,0 +1,5 @@
+<map id="Bif_OPER2_INNER::PF_scalar_inner_product" name="Bif_OPER2_INNER::PF_scalar_inner_product">
+<area shape="rect" id="node1" title="the main loop for an inner product with scalar functions" alt="" coords="499,5,664,45"/>
+<area shape="rect" id="node2" href="$classBif__OPER2__INNER.html#a9218a41fbb082b2fd9abc316d388296d" title="inner product for scalar LO and RO" alt="" coords="268,5,451,45"/>
+<area shape="rect" id="node3" href="$classBif__OPER2__INNER.html#adbaaf10669f72e39cc58d5dcdab6c5fe" title="Overloaded Function::eval_ALRB()." alt="" coords="5,13,220,38"/>
+</map>

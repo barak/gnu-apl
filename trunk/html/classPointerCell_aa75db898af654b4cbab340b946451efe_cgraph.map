@@ -1,0 +1,5 @@
+<map id="PointerCell::init_other" name="PointerCell::init_other">
+<area shape="rect" id="node1" title="overloaded Cell::init_other" alt="" coords="5,5,152,31"/>
+<area shape="rect" id="node2" href="$classValue__P__Base.html#a1c3bf1b6f708eb2c1ba4b97c83adb9aa" title="return a const pointer to the Value" alt="" coords="407,5,541,31"/>
+<area shape="rect" id="node3" href="$classPointerCell.html#a4f3f4eebed4b98ea6161b66b5a81c48d" title="overloaded Cell::get_pointer_value()" alt="" coords="200,26,359,66"/>
+</map>

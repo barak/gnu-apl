@@ -1,0 +1,5 @@
+<map id="XML_Loading_Archive::read_XML_string" name="XML_Loading_Archive::read_XML_string">
+<area shape="rect" id="node1" title="input is a UTF8&#45;encoded sequence of bytes, terminated with &quot;. UTF8&#45;decode the sequence,..." alt="" coords="5,23,157,63"/>
+<area shape="rect" id="node2" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="205,5,345,31"/>
+<area shape="rect" id="node3" href="$classUTF8__string.html#a27a630b44bca173fe9ea5005bcb3e460" title="convert the first char in UTF8&#45;encoded string to Unicode, setting len to the number of bytes in the U..." alt="" coords="209,55,342,80"/>
+</map>

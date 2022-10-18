@@ -1,4 +1,5 @@
 <map id="PrintBuffer::update_info" name="PrintBuffer::update_info">
-<area shape="rect" id="node2" href="$classPrintBuffer.html#adb9b7f5903b37ffeae4de10ada9cfc6d" title="helper for non&#45;trivial PrintBuffer(const Value &amp; ...) constructor " alt="" coords="212,5,387,32"/>
-<area shape="rect" id="node3" href="$classPrintBuffer.html#a5abec40efca2993a2b522e199694730f" title="contructor: a PrintBuffer from an APL value " alt="" coords="435,31,589,57"/>
+<area shape="rect" id="node1" title="update col_info after a change of buffer" alt="" coords="431,31,589,56"/>
+<area shape="rect" id="node2" href="$classPrintBuffer.html#adb9b7f5903b37ffeae4de10ada9cfc6d" title="helper for non&#45;trivial PrintBuffer(const Value &amp; ...) constructor" alt="" coords="208,5,383,31"/>
+<area shape="rect" id="node3" href="$classPrintBuffer.html#a5abec40efca2993a2b522e199694730f" title="contructor: a PrintBuffer from an APL value" alt="" coords="5,31,160,56"/>
 </map>

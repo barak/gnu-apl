@@ -1,0 +1,4 @@
+<map id="Function::is_lambda" name="Function::is_lambda">
+<area shape="rect" id="node1" title="return true iff this function is a lambda" alt="" coords="196,5,335,31"/>
+<area shape="rect" id="node2" href="$classQuad__CR.html#ad98ce37f2b329eb37ddae9d0fcf7832f" title="10 ⎕CR symbol_name (variable or function name). Also used for )OUT" alt="" coords="5,5,148,31"/>
+</map>

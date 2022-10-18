@@ -1,0 +1,4 @@
+<map id="show_welcome" name="show_welcome">
+<area shape="rect" id="node1" title="print a welcome message (copyright notice)" alt="" coords="116,5,228,31"/>
+<area shape="rect" id="node2" href="$main_8cc.html#aa0321421b17def7b58fc0cabc8890260" title="initialize the interpreter" alt="" coords="5,5,68,31"/>
+</map>

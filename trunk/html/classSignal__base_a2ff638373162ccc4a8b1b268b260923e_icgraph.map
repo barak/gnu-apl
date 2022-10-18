@@ -1,0 +1,38 @@
+<map id="Signal_base::send_TCP" name="Signal_base::send_TCP">
+<area shape="rect" id="node1" title="send this signal on TCP (or AF_UNIX) socket tcp_sock" alt="" coords="292,1032,455,1057"/>
+<area shape="rect" id="node2" href="$classADD__EVENT__c.html#ae73508b0697e4bf9a22e41aaa3c429d9" title="contructor that creates the signal and sends it on TCP socket s" alt="" coords="15,5,235,31"/>
+<area shape="rect" id="node3" href="$classASSIGN__VALUE__c.html#a63eb6a253974a0b0da32f9de2017f83b" title="contructor that creates the signal and sends it on TCP socket s" alt="" coords="26,55,223,95"/>
+<area shape="rect" id="node4" href="$classASSIGN__WSWS__VAR__c.html#ad4c54df2216ada939c3b1d37af2fefd6" title="contructor that creates the signal and sends it on TCP socket s" alt="" coords="34,119,215,159"/>
+<area shape="rect" id="node5" href="$classCLEAR__ALL__EVENTS__c.html#a73a91b8f3e11c57e4f9a80f021eaa429" title="contructor that creates the signal and sends it on TCP socket s" alt="" coords="35,183,215,223"/>
+<area shape="rect" id="node6" href="$classEVENTS__ARE__c.html#ad30589a29f6bcf0f7733f06bb3fb8b3a" title="contructor that creates the signal and sends it on TCP socket s" alt="" coords="31,247,218,287"/>
+<area shape="rect" id="node7" href="$classFIND__OFFERING__ID__c.html#a69470cff706eeb70f7f63c8b794abf62" title="contructor that creates the signal and sends it on TCP socket s" alt="" coords="38,311,211,351"/>
+<area shape="rect" id="node8" href="$classFIND__PAIRING__KEY__c.html#a477e64106f023028335c53ada25d8fa7" title="contructor that creates the signal and sends it on TCP socket s" alt="" coords="38,375,211,415"/>
+<area shape="rect" id="node9" href="$classGET__EVENTS__c.html#a10abffcb133cc1dd3816618ea55650be" title="contructor that creates the signal and sends it on TCP socket s" alt="" coords="7,440,242,465"/>
+<area shape="rect" id="node10" href="$classGET__OFFERED__VARS__c.html#a6051220e0c1dd194f5a0b8760295735a" title="contructor that creates the signal and sends it on TCP socket s" alt="" coords="31,490,218,530"/>
+<area shape="rect" id="node11" href="$classGET__OFFERING__PROCS__c.html#acd04f6b8dc5acdbe715145c02272552a" title="contructor that creates the signal and sends it on TCP socket s" alt="" coords="17,554,233,594"/>
+<area shape="rect" id="node12" href="$classGET__VALUE__c.html#a28f24d0f4a1e4da9ab81657802331f65" title="contructor that creates the signal and sends it on TCP socket s" alt="" coords="17,619,232,644"/>
+<area shape="rect" id="node13" href="$classIS__REGISTERED__ID__c.html#af4442e55f471777a7f500b39779d387c" title="contructor that creates the signal and sends it on TCP socket s" alt="" coords="38,669,211,709"/>
+<area shape="rect" id="node14" href="$classMAKE__OFFER__c.html#a9cffe855cd1f60b01965dc2d8c3482af" title="contructor that creates the signal and sends it on TCP socket s" alt="" coords="39,733,211,773"/>
+<area shape="rect" id="node15" href="$classMATCH__OR__MAKE__c.html#a77e66eeb43f591ab6ffc1f194b2b2ad0" title="contructor that creates the signal and sends it on TCP socket s" alt="" coords="19,797,231,837"/>
+<area shape="rect" id="node16" href="$classMATCH__OR__MAKE__RESULT__c.html#a85133c3bd6fcf870f60e58f0a9f9aab5" title="contructor that creates the signal and sends it on TCP socket s" alt="" coords="5,861,244,901"/>
+<area shape="rect" id="node17" href="$classMAY__SET__c.html#a8575fb8a977fb019adf9a90e6e59f588" title="contructor that creates the signal and sends it on TCP socket s" alt="" coords="33,925,216,951"/>
+<area shape="rect" id="node18" href="$classMAY__USE__c.html#ae203b20da5c7128b685dac8d1e18687e" title="contructor that creates the signal and sends it on TCP socket s" alt="" coords="31,975,218,1000"/>
+<area shape="rect" id="node19" href="$classOFFERED__VARS__ARE__c.html#a2c3ef613f4972e819fe5114b471c49c9" title="contructor that creates the signal and sends it on TCP socket s" alt="" coords="31,1025,218,1065"/>
+<area shape="rect" id="node20" href="$classOFFERING__ID__IS__c.html#a2da1d0a4cd9c1dae5e3f965010d8c32c" title="contructor that creates the signal and sends it on TCP socket s" alt="" coords="13,1089,236,1129"/>
+<area shape="rect" id="node21" href="$classOFFERING__PROCS__ARE__c.html#aaac3648cc782398d44cbbdf736123050" title="contructor that creates the signal and sends it on TCP socket s" alt="" coords="16,1153,233,1193"/>
+<area shape="rect" id="node22" href="$classPAIRING__KEY__IS__c.html#a1031246764ffb8099c8570935171d921" title="contructor that creates the signal and sends it on TCP socket s" alt="" coords="19,1217,230,1257"/>
+<area shape="rect" id="node23" href="$classPRINT__SVAR__DB__c.html#a73e39ba48ba8ad1c81623bad5953b6e8" title="contructor that creates the signal and sends it on TCP socket s" alt="" coords="27,1281,223,1321"/>
+<area shape="rect" id="node24" href="$classREAD__SVAR__RECORD__c.html#a7796eada35eb818e136980232760fafc" title="contructor that creates the signal and sends it on TCP socket s" alt="" coords="29,1345,221,1385"/>
+<area shape="rect" id="node25" href="$classREAD__WSWS__VAR__c.html#a5732b7d55f92b3d402a08acc1bb4fbca" title="contructor that creates the signal and sends it on TCP socket s" alt="" coords="21,1409,228,1449"/>
+<area shape="rect" id="node26" href="$classREGISTER__PROCESSOR__c.html#abffbcd50f0cdd90e7fe24732ef09595f" title="contructor that creates the signal and sends it on TCP socket s" alt="" coords="15,1473,235,1513"/>
+<area shape="rect" id="node27" href="$classRETRACT__OFFER__c.html#aec195c940cbfd239d1601038e4f7022e" title="contructor that creates the signal and sends it on TCP socket s" alt="" coords="13,1537,237,1577"/>
+<area shape="rect" id="node28" href="$classRETRACT__VAR__c.html#ae7c0113f6ac8341dc111f1a3bedd620e" title="contructor that creates the signal and sends it on TCP socket s" alt="" coords="21,1601,228,1641"/>
+<area shape="rect" id="node29" href="$classSET__CONTROL__c.html#a12347a2eca0a09946b868a9a10317f77" title="contructor that creates the signal and sends it on TCP socket s" alt="" coords="41,1665,209,1705"/>
+<area shape="rect" id="node30" href="$classSET__STATE__c.html#a84b2872e6c078984ab6b955ec36911ed" title="contructor that creates the signal and sends it on TCP socket s" alt="" coords="19,1729,230,1755"/>
+<area shape="rect" id="node31" href="$classSVAR__ASSIGNED__c.html#a8f23da0b2436981c4d3d7f1b26046198" title="contructor that creates the signal and sends it on TCP socket s" alt="" coords="27,1779,222,1819"/>
+<area shape="rect" id="node32" href="$classSVAR__DB__PRINTED__c.html#adfaf147ef4625f9cad0845f5f6495540" title="contructor that creates the signal and sends it on TCP socket s" alt="" coords="37,1843,212,1883"/>
+<area shape="rect" id="node33" href="$classSVAR__RECORD__IS__c.html#a3b51bdf8eb9e7b2b1f229a418a8cb2e9" title="contructor that creates the signal and sends it on TCP socket s" alt="" coords="23,1907,227,1947"/>
+<area shape="rect" id="node34" href="$classVALUE__IS__c.html#a8fca022ab834ff4e5295bd1d7f46f2f1" title="contructor that creates the signal and sends it on TCP socket s" alt="" coords="31,1972,218,1997"/>
+<area shape="rect" id="node35" href="$classWSWS__VALUE__IS__c.html#a8a777d95f6a824b0013c746bc0f4ac85" title="contructor that creates the signal and sends it on TCP socket s" alt="" coords="23,2022,226,2062"/>
+<area shape="rect" id="node36" href="$classYES__NO__c.html#ab1267d3dbf84a5fde3977ca0a82832c1" title="contructor that creates the signal and sends it on TCP socket s" alt="" coords="41,2087,208,2112"/>
+</map>

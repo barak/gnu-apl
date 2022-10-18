@@ -1,5 +1,6 @@
 <map id="READ_WSWS_VAR_c" name="READ_WSWS_VAR_c">
-<area shape="rect" id="node2" href="$classSignal__base.html" title="the base class for all signal classes " alt="" coords="17,103,111,130"/>
-<area shape="rect" id="node3" href="$classSig__item__xint.html" title="Sig_item_xint\&lt; uint64\l_t, 8 \&gt;" alt="" coords="135,96,283,137"/>
-<area shape="rect" id="node4" href="$classSig__item__int.html" title="Sig_item_int\&lt; uint64\l_t, bytes \&gt;" alt="" coords="139,5,280,47"/>
+<area shape="rect" id="node1" title="APserver request: X←ws&#45;ws SVAR." alt="" coords="5,183,165,208"/>
+<area shape="rect" id="node2" href="$classSignal__base.html" title="the base class for all signal classes" alt="" coords="17,87,111,113"/>
+<area shape="rect" id="node3" href="$classSig__item__xint.html" title=" " alt="" coords="135,80,283,120"/>
+<area shape="rect" id="node4" href="$classSig__item__int.html" title="an integer signal item of size bytes" alt="" coords="126,5,293,31"/>
 </map>

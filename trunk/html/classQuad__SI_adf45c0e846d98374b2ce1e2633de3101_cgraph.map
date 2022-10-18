@@ -1,0 +1,24 @@
+<map id="Quad_SI::eval_B" name="Quad_SI::eval_B">
+<area shape="rect" id="node1" title="overloaded Function::eval_AB()." alt="" coords="5,423,127,449"/>
+<area shape="rect" id="node2" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="421,10,561,35"/>
+<area shape="rect" id="node3" href="$classUCS__string.html#a5776e51c6faa53537409322cd0ebf07a" title="append number (in ASCII encoding like d) to this string" alt="" coords="200,5,340,45"/>
+<area shape="rect" id="node4" href="$classStateIndicator.html#ada4ebcec84c67d51bb6f406d68eabfe7" title="return the child SI (if any) that parent has called" alt="" coords="204,301,336,341"/>
+<area shape="rect" id="node6" href="$classWorkspace.html#a8083efc2d51067edb25ae8dd4f014173" title="the top of the SI stack (the SI pushed last)" alt="" coords="423,423,558,449"/>
+<area shape="rect" id="node7" href="$classValue__P__Base.html#a1c3bf1b6f708eb2c1ba4b97c83adb9aa" title="return a const pointer to the Value" alt="" coords="203,481,337,506"/>
+<area shape="rect" id="node8" href="$classUserFunction__header.html#a02e0fedf3b2ad3d50a2d3903bb9be6f9" title="return error if header was not parsed successfully" alt="" coords="197,531,343,571"/>
+<area shape="rect" id="node9" href="$classStateIndicator.html#a82ad7a8a8f81d5fe9fc94bb15ed408fc" title="return pointer to the current user function, statements, or execute" alt="" coords="205,595,335,635"/>
+<area shape="rect" id="node10" href="$classExecutable.html#acc35b347a5624e399f271c27778a2dbb" title="get the line number for pc" alt="" coords="421,59,561,85"/>
+<area shape="rect" id="node11" href="$classExecutable.html#a57c1ce1db5bf5710338d1b9cf84a6dfd" title="return the name of this function, or ◊ or ⍎" alt="" coords="194,659,346,685"/>
+<area shape="rect" id="node12" href="$classExecutable.html#a02b3dd7f7dbb3c3e099e3ab553034baa" title="the parse mode of this Executable" alt="" coords="175,709,365,734"/>
+<area shape="rect" id="node13" href="$classStateIndicator.html#a93fdf9b10d3c4253c3d79e018c799fcb" title="return the current PC" alt="" coords="193,758,347,783"/>
+<area shape="rect" id="node15" href="$classWorkspace.html#a64cef901fd41c19f4521bdd1175d0be7" title="the number of SI entries" alt="" coords="197,416,343,456"/>
+<area shape="rect" id="node17" href="$classExecutable.html#ae33855096d44e35f756909e2921e779b" title="return the text of statement at pc" alt="" coords="179,205,361,230"/>
+<area shape="rect" id="node5" href="$classStateIndicator.html#a44d07945c56abef5505efcfdc98ec090" title="return the SI that has called this one" alt="" coords="426,359,555,399"/>
+<area shape="rect" id="node14" href="$classPrefix.html#ade9d0ae7c2c578907265991484876535" title="return the current PC" alt="" coords="437,758,545,783"/>
+<area shape="rect" id="node16" href="$classStateIndicator.html#aa60ca9df0350c7b2e4c0825f061f300e" title="return the nesting level (oldest SI has level 0, next has level 1, ...)" alt="" coords="426,473,555,513"/>
+<area shape="rect" id="node18" href="$classUCS__string.html#a186a76c22c3ac840f1e607ba49e253a0" title="return the last character in this string" alt="" coords="427,309,554,334"/>
+<area shape="rect" id="node19" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="616,258,739,283"/>
+<area shape="rect" id="node20" href="$classAvec.html#a3a2dcac522444cd99f9ec4c3fdd6db8c" title="return true iff av is one of the various diamond characters" alt="" coords="427,158,554,183"/>
+<area shape="rect" id="node21" href="$classExecutable.html#a46c33c9f26010c1774c7b8182f916237" title="return the first PC of the line" alt="" coords="417,207,565,233"/>
+<area shape="rect" id="node22" href="$classUCS__string.html#a67ea87cb92e687105b21917ffb4a2a6f" title="remove the last character in this string" alt="" coords="413,109,568,134"/>
+</map>

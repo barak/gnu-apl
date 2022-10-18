@@ -1,0 +1,5 @@
+<map id="Signal_base::get__MAY_USE__key" name="Signal_base::get__MAY_USE__key">
+<area shape="rect" id="node1" title="APserver request: Can svar key be referenced ? access functions for signal MAY_USE...." alt="" coords="5,5,168,45"/>
+<area shape="rect" id="node2" href="$classSignal__base.html#a4e35a5a0fd9ced011b83a11ac304724c" title="get function for an item that is not defined for the signal" alt="" coords="216,13,363,38"/>
+<area shape="rect" id="node3" href="$classSignal__base.html#a77d69692410bd7b7d49033b73fcfc8fc" title="return the name of the ID of the signal" alt="" coords="411,13,589,38"/>
+</map>

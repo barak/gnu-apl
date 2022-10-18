@@ -1,0 +1,37 @@
+<map id="Parser::parse" name="Parser::parse">
+<area shape="rect" id="node1" title="Parse UCS_string input into token string tos." alt="" coords="5,712,105,738"/>
+<area shape="rect" id="node2" href="$classParser.html#a3eeeb92bcac2c60b355c30b5ccd4060e" title="Parse token string tos (a statement without diamonds)." alt="" coords="153,604,319,630"/>
+<area shape="rect" id="node33" href="$classTokenizer.html#ad7706aec4bdc9bf3ef0166a16bfa9373" title="tokenize UTF&#45;8 string input into token string tos." alt="" coords="168,819,304,844"/>
+<area shape="rect" id="node3" href="$classParser.html#aa6206be9b275310ea5c9ecca098fc113" title="Collect consecutive smaller APL values or value token into vectors." alt="" coords="375,504,546,530"/>
+<area shape="rect" id="node25" href="$classToken__string.html#a08d6f453bc7850828e3f664f00dfa624" title="print this token string" alt="" coords="996,576,1127,602"/>
+<area shape="rect" id="node26" href="$classParser.html#ad6ae52cbe0094ff62852548096166b97" title="Collect groups." alt="" coords="385,554,537,579"/>
+<area shape="rect" id="node27" href="$classParser.html#a06c324088335f43e2bc02f9c8ac926e0" title="mark next symbol left of ← on the same level as LSYMB" alt="" coords="391,655,530,680"/>
+<area shape="rect" id="node28" href="$classParser.html#ade07c889dc129dce5307b7df3084b8de" title="compute distances between matching (), [], and {}" alt="" coords="383,704,538,730"/>
+<area shape="rect" id="node29" href="$classParser.html#add79f0c7ff21368d32001e64aaa06c8f" title="Replace (X) by X and ((..) by (..) in string. (X is a single token)" alt="" coords="367,754,555,794"/>
+<area shape="rect" id="node31" href="$classParser.html#ac1050bb2f65d5e4eb7f06a8d4e67f2d1" title="remove VOID token from tos (compacting tos)" alt="" coords="389,376,532,416"/>
+<area shape="rect" id="node32" href="$classParser.html#ab1db68c3ac564adb8724beb0dbb2485f" title="Replace ∧∧, ∨∨, ⍲⍲, and ⍱⍱ by their bitwise variant." alt="" coords="381,440,540,480"/>
+<area shape="rect" id="node4" href="$classParser.html#a2ec94a9ef33782db92065a4c15e53295" title="Create one APL value from len values." alt="" coords="603,452,745,478"/>
+<area shape="rect" id="node5" href="$classParser.html#a2eef18990564bb557f9014b0465a256d" title="Create one scalar APL value from a token." alt="" coords="793,240,940,280"/>
+<area shape="rect" id="node23" href="$classParser.html#a29c256f9df4d2c0d2da0d728e1d12526" title="Create one vector APL value from value_count single values." alt="" coords="793,366,940,406"/>
+<area shape="rect" id="node6" href="$classToken.html#aaeae570a5fa2e6a83ca2b824c6013ef9" title="return the Unicode value of this token" alt="" coords="991,120,1131,146"/>
+<area shape="rect" id="node8" href="$classToken.html#a74ebddaf8dce2b11c59cddfb61594816" title="return the complex imag value of this token" alt="" coords="988,424,1135,450"/>
+<area shape="rect" id="node9" href="$classToken.html#a2a53219afbfd9ec64b5dd449c225ed68" title="return the complex real value of this token" alt="" coords="991,22,1131,47"/>
+<area shape="rect" id="node10" href="$classToken.html#abbcd765b2cb1c9da24d762ca451eefa4" title="return the float value of this token" alt="" coords="1201,523,1328,548"/>
+<area shape="rect" id="node11" href="$classToken.html#a9721c23968d7272edd1abae91ba77193" title="return the integer value of this token" alt="" coords="997,71,1126,96"/>
+<area shape="rect" id="node12" href="$classToken.html#a13e8b65088f8a7d103772acc6cfb5140" title="return the tag of this token" alt="" coords="1007,323,1116,348"/>
+<area shape="rect" id="node13" href="$classToken.html#a9b575ee45601717762ee3966b5959b1b" title="move mutable src into this token. clears APL value pointer in src (if any) and add events as needed" alt="" coords="1005,222,1117,247"/>
+<area shape="rect" id="node7" href="$classToken.html#a1a31afbb07e3f1dbb86d5f872ce5c297" title="return the TokenValueType of this token." alt="" coords="1605,347,1759,372"/>
+<area shape="rect" id="node14" href="$classToken.html#a7ba4a6caa16d32029320a2d6402cb732" title="clear this token, properly clearing Value token" alt="" coords="1217,172,1312,198"/>
+<area shape="rect" id="node15" href="$classToken.html#a11e37aa69b8eb64f293702293b00f50c" title="return true iff this token is an apl value" alt="" coords="1414,271,1538,296"/>
+<area shape="rect" id="node18" href="$classToken.html#a90696c3f45f9af044b6129071232dd97" title="copy src to this token, updating ref counts for APL values" alt="" coords="1209,422,1320,447"/>
+<area shape="rect" id="node20" href="$classValue__P__Base.html#a1c3bf1b6f708eb2c1ba4b97c83adb9aa" title="return a const pointer to the Value" alt="" coords="1197,323,1332,348"/>
+<area shape="rect" id="node21" href="$classToken.html#a59c13ceda2896520c6a41cacf67a20ea" title="return value usage counter" alt="" coords="1183,274,1347,299"/>
+<area shape="rect" id="node16" href="$classValue__P__Base.html#ad07a670c61c71b7aecc8ca9a6170b796" title="decrement owner&#45;count and reset pointer to 0" alt="" coords="1403,222,1549,247"/>
+<area shape="rect" id="node17" href="$classToken.html#aa3c5868ba4115f3189df6b2ac5b36f39" title="Construct a VOID token. VOID token are used for two purposes: (1) to fill positions when e...." alt="" coords="1425,172,1527,198"/>
+<area shape="rect" id="node19" href="$unionToken_1_1sval.html#a22a0be9d3742c2a8168e59d530dd659e" title="a shortcut for accessing apl_val" alt="" coords="1403,371,1549,396"/>
+<area shape="rect" id="node22" href="$classValue.html#a8103d85e8d44c2e4fc99ecd31c163e6f" title="return the number of Value_P pointing to this value" alt="" coords="1395,320,1557,346"/>
+<area shape="rect" id="node24" href="$classToken.html#a205e0b499e06999ff91c272ff28c9013" title="return the Value_P value of this token. The token could be TOK_NO_VALUE; in that case VALUE_ERROR is ..." alt="" coords="1199,372,1331,398"/>
+<area shape="rect" id="node30" href="$classParser.html#a0979c1e2733274ff5e535aecddab0a7e" title="find closing paranthesis; throw error if not found." alt="" coords="605,754,743,794"/>
+<area shape="rect" id="node34" href="$classError.html#a73c1f4ab40f4e313f504562d52bb001e" title="return the error code of this error" alt="" coords="389,819,533,844"/>
+<area shape="rect" id="node35" href="$classError.html#a2ee02a4706e3c07b95d8f29aafe6cbbb" title="set the second error line" alt="" coords="385,868,536,894"/>
+</map>

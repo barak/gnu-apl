@@ -1,0 +1,15 @@
+<map id="Bif_F12_COMMA::eval_AB" name="Bif_F12_COMMA::eval_AB">
+<area shape="rect" id="node1" title="overloaded Function::eval_AB()" alt="" coords="5,164,188,189"/>
+<area shape="rect" id="node2" href="$classBif__COMMA.html#a4dab74913e7da1e13c28a18e3c10f63a" title="Catenate A and B." alt="" coords="236,164,391,189"/>
+<area shape="rect" id="node3" href="$classShape.html#aeb018b67601d3f1c4bea3d2c2b877b7e" title="add a dimension of length len at the end" alt="" coords="451,5,614,31"/>
+<area shape="rect" id="node4" href="$classBif__COMMA.html#a110e26c20b2479e3a99b67d9e69e234d" title="Prepend scalar cell_B to A along axis." alt="" coords="439,221,627,247"/>
+<area shape="rect" id="node5" href="$classCell.html#a62e4fd0b2c216efc0e23904e53ca7ecc" title="copy (deep) count cells from src to dest)" alt="" coords="713,69,795,95"/>
+<area shape="rect" id="node7" href="$classValue__P__Base.html#a1c3bf1b6f708eb2c1ba4b97c83adb9aa" title="return a const pointer to the Value" alt="" coords="687,119,821,144"/>
+<area shape="rect" id="node9" href="$classShape3.html#a075643abf890c05401f1b7abdc5339cf" title="the dimensions above r the axis" alt="" coords="713,267,795,292"/>
+<area shape="rect" id="node10" href="$classShape3.html#ad3ff2e3be69b9ca0085d211e3ecb2801" title="the dimensions below the axis" alt="" coords="715,316,793,341"/>
+<area shape="rect" id="node13" href="$classBif__COMMA.html#ad0ad030408ae664de7312b5722ae1507" title="Prepend scalar cell_A to B along axis." alt="" coords="457,157,608,197"/>
+<area shape="rect" id="node8" href="$classShape.html#a592d2ade68aa8c21c5d84627c3a0e001" title="return the length of dimension r" alt="" coords="675,168,833,193"/>
+<area shape="rect" id="node11" href="$classShape.html#afcd3708c8c18a30cb3c0c1fa1a630f71" title="modify dimension r" alt="" coords="675,217,833,243"/>
+<area shape="rect" id="node6" href="$classCell.html#aab9681b3e735d10ef92978c5c17bf95d" title="init (uninitialized) Cell other from this initialized cell" alt="" coords="917,69,1023,95"/>
+<area shape="rect" id="node12" href="$classShape.html#a189c92d0b74f3313bd83c8aa7565e9c5" title="recompute volume (after changing a dimension of len 0)" alt="" coords="881,217,1059,243"/>
+</map>

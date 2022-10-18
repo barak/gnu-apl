@@ -1,0 +1,17 @@
+<map id="CollatingCache::CollatingCache" name="CollatingCache::CollatingCache">
+<area shape="rect" id="node1" title="constructor: cache of rank r and comparison length clen" alt="" coords="5,228,176,268"/>
+<area shape="rect" id="node2" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="449,34,589,59"/>
+<area shape="rect" id="node3" href="$classCollatingCache.html#a7fe389dd2639ae135fd56813b67439cf" title="find (the index of) the entry for uni" alt="" coords="233,228,373,268"/>
+<area shape="rect" id="node5" href="$classShape.html#a017e9a35dd20f4bc4fdeb7ea29b6805d" title="return the rank" alt="" coords="245,293,362,318"/>
+<area shape="rect" id="node6" href="$classShape.html#a592d2ade68aa8c21c5d84627c3a0e001" title="return the length of dimension r" alt="" coords="224,342,383,367"/>
+<area shape="rect" id="node7" href="$classShape.html#afcd3708c8c18a30cb3c0c1fa1a630f71" title="modify dimension r" alt="" coords="224,393,383,418"/>
+<area shape="rect" id="node9" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="676,109,799,134"/>
+<area shape="rect" id="node10" href="$classUCS__string.html#a51d85c53091e0d0c3d6a4ab1173904be" title="return the characters in this string (sorted and duplicates removed)" alt="" coords="235,178,371,203"/>
+<area shape="rect" id="node4" href="$structCollatingCacheEntry.html#a2d49fc4b9a42635240f1cd40e46ee744" title="compare key with entry (for Heapsort::search())" alt="" coords="448,360,591,400"/>
+<area shape="rect" id="node8" href="$classShape.html#a189c92d0b74f3313bd83c8aa7565e9c5" title="recompute volume (after changing a dimension of len 0)" alt="" coords="431,425,608,450"/>
+<area shape="rect" id="node11" href="$classUCS__string.html#a186a76c22c3ac840f1e607ba49e253a0" title="return the last character in this string" alt="" coords="456,83,583,109"/>
+<area shape="rect" id="node12" href="$classUCS__string.html#a3c03c3e5b4d7be0e435a7cfee8a424ae" title="helper function for Heapsort&lt;Unicode&gt;::sort()" alt="" coords="656,234,819,259"/>
+<area shape="rect" id="node13" href="$classUCS__string.html#a59f472bb1ee082cca5ac2a6c128f4918" title="sort the characters in this string by their Unicode" alt="" coords="459,209,579,234"/>
+<area shape="rect" id="node14" href="$classUCS__string.html#ad092030b348adfd762de621c43d75812" title="default constructor: empty string" alt="" coords="436,310,603,335"/>
+<area shape="rect" id="node15" href="$classUCS__string.html#a40523238d26f5405f5392df03d242627" title="common part of all constructors" alt="" coords="670,310,805,335"/>
+</map>

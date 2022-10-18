@@ -1,0 +1,201 @@
+<map id="ScalarFunction::may_parallel" name="ScalarFunction::may_parallel">
+<area shape="rect" id="node2" href="$classScalarFunction.html#adf25464d573374e243a0f83d6018a72b" title="A helper function for eval_fill_AB(). " alt="" coords="853,43,984,85"/>
+<area shape="rect" id="node3" href="$classScalarFunction.html#a388037ffbc81f826635a66d5c52656a2" title="A helper function for eval_fill_B(). " alt="" coords="1089,43,1219,85"/>
+<area shape="rect" id="node4" href="$classScalarFunction.html#acf5075b41e5a000feb694cf66638524f" title="compute the dyadic scalar function fun along one ravel " alt="" coords="635,1315,766,1357"/>
+<area shape="rect" id="node61" href="$classScalarFunction.html#a254898c12f19ee61f71837247d2efaa9" title="compute the monadic scalar function fun along one ravel " alt="" coords="635,733,766,774"/>
+<area shape="rect" id="node72" href="$classScalarFunction.html#a7e4a8a06834fb15f2d22636a7bbf3cae" title="Evaluate a scalar function dyadically with axis. " alt="" coords="205,854,346,895"/>
+<area shape="rect" id="node195" href="$classScalarFunction.html#a318237a9bdd1727a380fad0d2908be88" title="Evaluate the identity function. " alt="" coords="205,919,346,961"/>
+<area shape="rect" id="node196" href="$classScalarFunction.html#ac0e9e42f145d16a623c91240d4099f60" title="compute cell_A fun cell_B, scalar&#45;extending PointerCells " alt="" coords="196,2189,355,2230"/>
+<area shape="rect" id="node5" href="$classPJob__scalar__AB.html#a88845bcc7704f61b1c0ae7131d2ff16c" title="return A[z] " alt="" coords="841,1751,996,1777"/>
+<area shape="rect" id="node6" href="$classParallel.html#a19b05d2cf8eeb254a3585645bd276227" title="acquire lock " alt="" coords="1081,1039,1227,1065"/>
+<area shape="rect" id="node10" href="$classParallel__job__list.html#a487a771b3b681d45dcf9f7a26f34409f" title="add job to jobs " alt="" coords="858,947,979,989"/>
+<area shape="rect" id="node11" href="$classPJob__scalar__AB.html#ac52849fcf29742cb26e8602f4357c509" title="return B[z] " alt="" coords="841,1297,996,1324"/>
+<area shape="rect" id="node12" href="$classScalarFunction.html#a9ea901f89c06203ab9f0b907e13c8b0f" title="return the conforming shape of sh_A and sh_A, or set ec and return 0 if shapes cannot be conformed..." alt="" coords="828,1399,1009,1441"/>
+<area shape="rect" id="node14" href="$classShape.html#af39e05bad7be900fa1437a6eb6035e97" title="return the number of ravel elements (1 for scalars,i else product of shapes) " alt="" coords="1087,1343,1221,1369"/>
+<area shape="rect" id="node15" href="$classPrimitiveFunction.html#a0a9ea9498169b49951d197bd30ac0eef" title="overloaded Function::eval_fill_AB() " alt="" coords="1089,329,1219,370"/>
+<area shape="rect" id="node19" href="$classValue__P__Base.html#a64e77a99509cdb6ecbe4cf273a2e7694" title="return a const pointer to the Value " alt="" coords="2463,4241,2598,4268"/>
+<area shape="rect" id="node20" href="$classThread__context.html#a8ef1d4db160a21f5616530cf737e4b18" title="number of currently used cores " alt="" coords="849,1853,988,1894"/>
+<area shape="rect" id="node29" href="$classToken.html#a205e0b499e06999ff91c272ff28c9013" title="return the Value_P value of this token. The token could be TOK_NO_VALUE; in that case VALUE_ERROR is ..." alt="" coords="2217,4557,2349,4584"/>
+<area shape="rect" id="node34" href="$classThread__context.html#abe4280ff16a15a70e0c903bb2db70c87" title="return the context for core n " alt="" coords="849,4491,988,4533"/>
+<area shape="rect" id="node35" href="$classFunction.html#a411981c924e92927db6d53ed61f82dc8" title="return break&#45;even point for dyadic parallel execution " alt="" coords="847,1517,990,1558"/>
+<area shape="rect" id="node36" href="$classToken.html#a9721c23968d7272edd1abae91ba77193" title="return the integer value of this token " alt="" coords="2218,4304,2347,4331"/>
+<area shape="rect" id="node37" href="$classThread__context.html#aadea40f94c3086eb73d86ce866b6e71d" title="return the context of the master " alt="" coords="849,598,988,639"/>
+<area shape="rect" id="node39" href="$classThread__context.html#ad6131c6d7c657ae4fbf75a71db9c574a" title="start parallel execution of work at the master " alt="" coords="1302,704,1462,731"/>
+<area shape="rect" id="node40" href="$classThread__context.html#aba6ab97ae2a6542738f93831bd73fa14" title="return the number of the core executing this context " alt="" coords="1973,521,2127,548"/>
+<area shape="rect" id="node46" href="$classCell.html#a367b9df7e0d4b805e5f31641658113f6" title="Return the APL value of a cell (Asserts for non&#45;pointer cells) " alt="" coords="2453,2047,2608,2073"/>
+<area shape="rect" id="node51" href="$classPrimitiveFunction.html#a671dd4fc921e2253cada08d0a385d2f5" title="return the dyadic cell statistics of this (scalar) function " alt="" coords="853,1685,984,1726"/>
+<area shape="rect" id="node52" href="$classToken.html#a13e8b65088f8a7d103772acc6cfb5140" title="return the tag of this token " alt="" coords="2228,3360,2337,3387"/>
+<area shape="rect" id="node53" href="$classCell.html#ae98b3988a7fa52c6c157b4911b043dde" title="Return true iff this cell is a pointer (to a sub&#45;array) cell. " alt="" coords="2463,1317,2599,1344"/>
+<area shape="rect" id="node54" href="$classThread__context.html#aee8c70aa8c5f5e771db87b9d90617bfb" title="end parallel execution of work at the master " alt="" coords="839,496,998,523"/>
+<area shape="rect" id="node55" href="$classParallel__job__list.html#a02f0d953e2836a0220dcfdfd492f6a3f" title="set current job. CAUTION: jobs may be modified by the execution of current_job. Therefore we copy cur..." alt="" coords="858,1013,979,1054"/>
+<area shape="rect" id="node56" href="$classParallel.html#a9c0ccb1c4a321f9f09beda11cea2c54e" title="release lock " alt="" coords="845,664,992,691"/>
+<area shape="rect" id="node57" href="$classParallel__job__list.html#a3600568259de8e941c747a255ebb94e1" title="start execution of jobs " alt="" coords="858,882,979,923"/>
+<area shape="rect" id="node58" href="$classPJob__scalar__AB.html#a1e010cc5a9ecdcd426ecdc013a14c062" title="return Z[z] " alt="" coords="842,1633,995,1660"/>
+<area shape="rect" id="node59" href="$classPJob__scalar__AB.html#aeca0f56f302fae097f146a0a1ba1fe5f" title="destructor " alt="" coords="836,1181,1001,1222"/>
+<area shape="rect" id="node7" href="$Parallel_8hh.html#a5b2787a9f816f0b0902e108175f41f74" title="add to counter " alt="" coords="1556,831,1645,857"/>
+<area shape="rect" id="node8" href="$Parallel_8hh.html#ab833380bae4cc7989028f357e6c1e143" title="atomic_fetch_add" alt="" coords="1763,856,1888,883"/>
+<area shape="rect" id="node9" href="$Parallel_8hh.html#a2cb96bbc3c18b436983a5f92ef8e40e0" title="read counter " alt="" coords="1779,648,1872,675"/>
+<area shape="rect" id="node13" href="$classShape.html#a017e9a35dd20f4bc4fdeb7ea29b6805d" title="return the rank " alt="" coords="1095,1292,1213,1319"/>
+<area shape="rect" id="node16" href="$classFunction.html#a1d8e47de79dffa81c189730a1a19f80d" title="plain function, 2 arguments " alt="" coords="1317,309,1447,336"/>
+<area shape="rect" id="node17" href="$classNamedObject.html#adf8b778a154d1d6e35c7d8a169aaaeb5" title="return the name of the named object " alt="" coords="1517,281,1684,308"/>
+<area shape="rect" id="node18" href="$classID.html#af1bb0741450971c1882af59af87eef29" title="return the printable name for id as UCS_string " alt="" coords="1757,281,1894,308"/>
+<area shape="rect" id="node21" href="$classThread__context.html#a9da7115c28c4372c40d393c8046bda22" title="set the number of currently used cores " alt="" coords="1085,1445,1223,1486"/>
+<area shape="rect" id="node22" href="$Common_8hh.html#acf998c7ff90fc36e3fdb700bbbb46fcd" title="get_CERR" alt="" coords="1339,1368,1425,1395"/>
+<area shape="rect" id="node23" href="$classThread__context.html#a06a054fa3fadfda7020d64748371799e" title="initialize thread_contexts[n] " alt="" coords="1313,1419,1451,1461"/>
+<area shape="rect" id="node24" href="$classThread__context.html#afd854477bd87d3e80b3786ac2a7d5d9f" title="initialize all thread contexts (set all but N and thread) " alt="" coords="1532,998,1669,1039"/>
+<area shape="rect" id="node25" href="$classThread__context.html#ab5c1f95ee686270b4ac6e1806a5bd23f" title="bind thread to core " alt="" coords="1529,933,1673,974"/>
+<area shape="rect" id="node26" href="$classCPU__pool.html#a745603fb69c0ee5d4f4d728028fabff6" title="get the number of (active) CPUs " alt="" coords="1309,1485,1455,1512"/>
+<area shape="rect" id="node27" href="$classCPU__pool.html#a9a0ceffddddc5e7b239c2f443fa6a559" title="get the idx;th CPU " alt="" coords="1310,1317,1454,1344"/>
+<area shape="rect" id="node28" href="$classThread__context.html#a4360395b00f2c003ab2a09fbe7635b7b" title="terminate all worker threads " alt="" coords="1299,940,1465,967"/>
+<area shape="rect" id="node30" href="$classToken.html#a11e37aa69b8eb64f293702293b00f50c" title="return true iff this token is an apl value " alt="" coords="2469,4627,2593,4653"/>
+<area shape="rect" id="node32" href="$unionToken_1_1sval.html#a6718675efc326cfa39f09a7f503cdd50" title="a shortcut for accessing apl_val " alt="" coords="2457,4544,2604,4571"/>
+<area shape="rect" id="node31" href="$classToken.html#a1a31afbb07e3f1dbb86d5f872ce5c297" title="return the TokenValueType of this token. " alt="" coords="2690,4659,2843,4685"/>
+<area shape="rect" id="node33" href="$classToken.html#a7955f89bcbc2ab3f5c736218c0a745e8" title="the name of tc " alt="" coords="2699,4017,2835,4044"/>
+<area shape="rect" id="node38" href="$classThread__context.html#a994dd1fef316d70072e8757310671aed" title="make all workers lock on pool_sema " alt="" coords="1057,552,1251,579"/>
+<area shape="rect" id="node41" href="$classThread__context.html#a51a35755b357c769f56bcad57a408734" title="end parallel execution of work in a worker " alt="" coords="1300,649,1464,676"/>
+<area shape="rect" id="node42" href="$classThread__context.html#a770b7101581894235605003726ebdc62" title="print all TaskTree nodes " alt="" coords="1518,547,1683,573"/>
+<area shape="rect" id="node43" href="$classThread__context.html#adc73bb9ae1ecb7b10830bd073201f7ea" title="print this TaskTree node " alt="" coords="1753,547,1898,573"/>
+<area shape="rect" id="node44" href="$classThread__context.html#a980dc6d5a2cef07422e21447c5925899" title="print all mileages nodes " alt="" coords="1528,699,1673,741"/>
+<area shape="rect" id="node45" href="$classThread__context.html#a1965a1f7a7d1e9da522a55148c09bcaa" title="initialize all thread contexts (set all but N and thread) " alt="" coords="1532,765,1669,806"/>
+<area shape="rect" id="node47" href="$classCell.html#a38a6a25f0ad091f35e3d9abfe5608a50" title="return the type of this cell " alt="" coords="2701,3120,2832,3147"/>
+<area shape="rect" id="node48" href="$classCell.html#a6c3fdef3d82f53649d1c3f16d37eedd7" title="the name of ct " alt="" coords="2682,2047,2851,2073"/>
+<area shape="rect" id="node49" href="$Common_8hh.html#aecfb781b36a8a772310228edb5410b15" title="MORE_ERROR" alt="" coords="2707,3512,2826,3539"/>
+<area shape="rect" id="node50" href="$classWorkspace.html#a5ebd29d8c860b589b9f1d8118a949514" title="return reference to more info about last error " alt="" coords="2902,3933,3061,3960"/>
+<area shape="rect" id="node60" href="$classValue__P__Base.html#acd0622e5c6de2fd89d6f6425e3afd411" title="reset and add value event " alt="" coords="1082,1140,1226,1167"/>
+<area shape="rect" id="node62" href="$classPJob__scalar__B.html#a7af00cbe17918cde1848fea3e31ac86c" title="return Bbz] " alt="" coords="846,109,991,136"/>
+<area shape="rect" id="node63" href="$classFunction.html#a19780167d6b18086a308754fa7b5cb39" title="return break&#45;even point for monadic parallel execution " alt="" coords="841,161,996,202"/>
+<area shape="rect" id="node64" href="$classPrimitiveFunction.html#a5e61f38f2f16d01d82a3c31f69ea66c9" title="return the monadic cell statistics of this (scalar) function " alt="" coords="853,329,984,370"/>
+<area shape="rect" id="node70" href="$classPJob__scalar__B.html#aa44fdf59fc9519953c01f015782135c0" title="return Z[z] " alt="" coords="847,227,991,253"/>
+<area shape="rect" id="node71" href="$classPJob__scalar__B.html#a5c8157de35792dd5d34c41877dab287e" title="destructor " alt="" coords="841,817,997,858"/>
+<area shape="rect" id="node65" href="$classPrimitiveFunction.html#a9158cf6560841b92e712c22e65c61e3c" title="overloaded Function::eval_fill_B() " alt="" coords="1089,146,1219,187"/>
+<area shape="rect" id="node67" href="$classPrimitiveFunction.html#a872389b6d0bbadd7a0a8c17b1a03d25c" title="Print the name of this PrimitiveFunction to out. " alt="" coords="1317,217,1447,258"/>
+<area shape="rect" id="node69" href="$classPrimitiveFunction.html#abbfceea746a97391601469d6b787bef8" title="overloaded Function::print_properties() " alt="" coords="1089,211,1219,253"/>
+<area shape="rect" id="node66" href="$classFunction.html#a1baa953a35d9dea5fd20bfa095daf360" title="plain function, 1 argument " alt="" coords="1322,163,1442,189"/>
+<area shape="rect" id="node68" href="$classNamedObject.html#a3ff29d3b8f3eed6c55f535e1af8dbc91" title="return the Id of this object (ID_USER_SYMBOL for user defined objects) " alt="" coords="1527,224,1674,251"/>
+<area shape="rect" id="node73" href="$classScalarFunction.html#aa8c567527713578fb2c1eac26d00843f" title="Evaluate a scalar function dyadically. " alt="" coords="417,2094,559,2135"/>
+<area shape="rect" id="node194" href="$classWorkspace.html#adb2006f054a1cebb8ae0252b61bd1d1b" title="return the current ⎕IO " alt="" coords="421,861,555,888"/>
+<area shape="rect" id="node74" href="$classThread__context.html#aeafb43f10e42329e23bf1ec842615b67" title="cancel all dyadic jobs in all thread contexts " alt="" coords="621,3346,780,3387"/>
+<area shape="rect" id="node76" href="$Error_8cc.html#a1bf60365b9809c784438b78f71284633" title="throw an Error with code only (typically a standard APL error) " alt="" coords="645,5029,756,5056"/>
+<area shape="rect" id="node75" href="$classParallel__job__list.html#ad0759619b570cb362d79edf3d673ae17" title="cancel the entire job list " alt="" coords="858,4557,979,4598"/>
+<area shape="rect" id="node77" href="$classError.html#a9dbfb665cecfad231189862c5f414c48" title="return a string describing the error " alt="" coords="2705,5241,2828,5268"/>
+<area shape="rect" id="node78" href="$classUserFunction.html#a1f67b2b2e508214fa884cf70d7e93b1d" title="return the execution properties (dyadic ⎕FX) of this defined function " alt="" coords="1969,5150,2131,5191"/>
+<area shape="rect" id="node79" href="$classExecutable.html#a6cfcf85995d43dc07f144d1f7faae810" title="return a UserFunction * (if this is one) or else 0. " alt="" coords="3111,4101,3291,4128"/>
+<area shape="rect" id="node80" href="$classStateIndicator.html#aa4153144590405f8f78d3a8dd7de207a" title="return pointer to the current user function, statements, or execute " alt="" coords="1536,5161,1665,5202"/>
+<area shape="rect" id="node96" href="$classStateIndicator.html#aed5cced5e7997bb7b12d4e4cf948f165" title="return the number of pending ⎕ECs (or other safe execution contexts) " alt="" coords="854,4993,983,5034"/>
+<area shape="rect" id="node97" href="$classWorkspace.html#a057e0d77702810d071560c7b72c2f8d6" title="the top of the SI stack (the SI pushed last) " alt="" coords="2215,2027,2350,2053"/>
+<area shape="rect" id="node98" href="$classError.html#adf8e47c02b1ae0be1368a0587f7daed4" title="update error information in this and copy it to si " alt="" coords="839,2624,998,2651"/>
+<area shape="rect" id="node81" href="$classStateIndicator.html#a69e6ba87c41a4fa4fabb794ce72dba13" title="return the name of the parse mode " alt="" coords="1981,5318,2119,5359"/>
+<area shape="rect" id="node82" href="$classStateIndicator.html#aa6584f8a9afaf76a334fb33517e36987" title="return the mode of this entry " alt="" coords="2218,5470,2347,5511"/>
+<area shape="rect" id="node83" href="$classExecutable.html#a02b3dd7f7dbb3c3e099e3ab553034baa" title="the parse mode of this Executable " alt="" coords="2435,5419,2626,5445"/>
+<area shape="rect" id="node91" href="$classStateIndicator.html#a979049848a45945d27a18ead9045b036" title="evaluate a →N statement. Update pc, return true iff context has changed " alt="" coords="2461,5520,2600,5547"/>
+<area shape="rect" id="node84" href="$classExecutable.html#a8eef6c70e728b412b2291576ae8e74b1" title="delete values in body and (maybe) remove lambdas " alt="" coords="2687,4760,2846,4787"/>
+<area shape="rect" id="node86" href="$classExecutable.html#a57c1ce1db5bf5710338d1b9cf84a6dfd" title="return the name of this function, or ◊ or ⍎ " alt="" coords="3125,5525,3277,5552"/>
+<area shape="rect" id="node85" href="$classExecutable.html#a0c3cf319bbbff10c2ac5d21471c761dc" title="decrement the reference counter " alt="" coords="2903,4035,3059,4077"/>
+<area shape="rect" id="node87" href="$classUserFunction.html#ac4673156caea5cc5c006a58bee8f9d25" title="overloaded Function::is_lambda() " alt="" coords="3117,3807,3284,3833"/>
+<area shape="rect" id="node90" href="$classFunction.html#a32e9fa7444947d243d1f76d3146caede" title="return a pointer to this UserFunction (if it is one) " alt="" coords="2900,4785,3063,4812"/>
+<area shape="rect" id="node89" href="$classExecutable.html#a21af255757553fcdbd9c7bafd44d16ab" title="print the text of this user defined executable to out " alt="" coords="3126,4043,3275,4069"/>
+<area shape="rect" id="node88" href="$classUserFunction__header.html#abcc2f6d70da90e3123e630a226b9e931" title="return the name of the function " alt="" coords="3339,3353,3485,3394"/>
+<area shape="rect" id="node92" href="$classStateIndicator.html#abab6fb3f97723c662eaadf1f28b0f718" title="set the current PC " alt="" coords="2689,5627,2844,5653"/>
+<area shape="rect" id="node95" href="$classUserFunction.html#a40ad71e67fd9b1ecfc5f506a7055eeb4" title="return the pc of the first token in line l (valid line), or the pc of the last token in the function ..." alt="" coords="2681,5424,2852,5451"/>
+<area shape="rect" id="node93" href="$classPrefix.html#a00d0f5152e3c1c6bb3eec7d3aa1cdae5" title="set a new PC " alt="" coords="2927,5627,3035,5653"/>
+<area shape="rect" id="node94" href="$classPrefix.html#aceebcb5133f4ac2659d49acdfb12a56c" title="reset statement to empty state (e.g. after →N) " alt="" coords="3154,5627,3247,5653"/>
+<area shape="rect" id="node99" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string " alt="" coords="2697,1153,2837,1180"/>
+<area shape="rect" id="node100" href="$classUTF8__string.html#af0f7724e5743d48d9e29776de5d53c71" title="return this string as a 0&#45;terminated C string " alt="" coords="2217,1520,2348,1547"/>
+<area shape="rect" id="node101" href="$classStateIndicator.html#ab5a1edc34e723251bd11b4767d7c49b2" title="return the error related info in this context " alt="" coords="1089,2617,1219,2658"/>
+<area shape="rect" id="node102" href="$classUserFunction.html#a91d607b9654e8c3caedaaea4868edb87" title="return e.g. &#39;FOO[10]&#39; " alt="" coords="2200,1099,2365,1141"/>
+<area shape="rect" id="node103" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length " alt="" coords="2469,1577,2592,1604"/>
+<area shape="rect" id="node108" href="$classStateIndicator.html#a2d4915de712ba06900582f0918f053a8" title="return the SI that has called this one " alt="" coords="1089,2682,1219,2723"/>
+<area shape="rect" id="node114" href="$classStateIndicator.html#a93fdf9b10d3c4253c3d79e018c799fcb" title="return the current PC " alt="" coords="1973,4471,2127,4497"/>
+<area shape="rect" id="node166" href="$classStateIndicator.html#a192beb8b85f88094f6ec841821166939" title="get the current prefix parser " alt="" coords="2218,4035,2347,4077"/>
+<area shape="rect" id="node177" href="$classPrefix.html#abca1c5517cd1ceb9c10b89d9412ef314" title="highest PC in current statement " alt="" coords="1974,5267,2126,5293"/>
+<area shape="rect" id="node178" href="$classPrefix.html#a0d7ac74b5bc532a8e823bbaa6e5a4a60" title="lowest PC in current statement " alt="" coords="1976,5216,2124,5243"/>
+<area shape="rect" id="node179" href="$classError.html#a2a9587b068a842d9e3d9f1f0e9a887a4" title="return the show_locked flag " alt="" coords="1303,4104,1461,4131"/>
+<area shape="rect" id="node180" href="$classError.html#a1c91620311957635852e42ba8cd695c4" title="print the 3 error message lines as per ⎕EM " alt="" coords="1996,1368,2104,1395"/>
+<area shape="rect" id="node184" href="$classExecutable.html#aab856b7b03ef2bd54010ad032e91aca4" title="compute lines 2 and 3 in error " alt="" coords="1513,2397,1688,2424"/>
+<area shape="rect" id="node188" href="$classError.html#a2ee02a4706e3c07b95d8f29aafe6cbbb" title="set the second error line " alt="" coords="1750,1739,1901,1765"/>
+<area shape="rect" id="node189" href="$classError.html#ab3e67c83419205263f2314eac79e2935" title="set the left caret (^) position in the third error line " alt="" coords="1757,2565,1894,2592"/>
+<area shape="rect" id="node190" href="$classError.html#a18631a867da20b1d971f85a9dd397f61" title="set the right caret (^) position in the third error line " alt="" coords="1753,2347,1897,2373"/>
+<area shape="rect" id="node191" href="$classUserFunction.html#a8514600d6fec34ed9fdade576d0ad721" title="compute lines 2 and 3 in error " alt="" coords="1515,2057,1686,2098"/>
+<area shape="rect" id="node104" href="$classWorkspace.html#a6df77441fb6f94f7da08d19b465503e1" title="return the name to which lambda ia assigned (empty if not found) " alt="" coords="2428,1267,2633,1293"/>
+<area shape="rect" id="node106" href="$classUserFunction.html#acfbba5ba41dc21a5d60890f5acad0670" title="overloaded Executable::get_line() " alt="" coords="2454,1149,2607,1176"/>
+<area shape="rect" id="node107" href="$classUCS__string.html#a5776e51c6faa53537409322cd0ebf07a" title="append number (in ASCII encoding like d) to this string " alt="" coords="2461,1201,2601,1242"/>
+<area shape="rect" id="node105" href="$Logging_8def.html#ab5ab82c1e9b9d4715660ab4a568026e2" title="value" alt="" coords="2740,5140,2793,5167"/>
+<area shape="rect" id="node109" href="$classStateIndicator.html#ada4ebcec84c67d51bb6f406d68eabfe7" title="return the child SI (if any) that parent has called " alt="" coords="1316,2666,1448,2707"/>
+<area shape="rect" id="node110" href="$classStateIndicator.html#ae0a10cdfaa6db7599a737c5974b3c869" title="return the level at which sym is pushed for the nth. time " alt="" coords="1300,2732,1464,2759"/>
+<area shape="rect" id="node111" href="$classExecutable.html#af5c77881cb3e8da636a0eeb73950c39c" title="return true if this Executable localizes Symbol sym " alt="" coords="1516,2732,1685,2759"/>
+<area shape="rect" id="node112" href="$classStateIndicator.html#aa60ca9df0350c7b2e4c0825f061f300e" title="return the nesting level (oldest SI has level 0, next has level 1, ...) " alt="" coords="1536,4329,1665,4370"/>
+<area shape="rect" id="node113" href="$classStateIndicator.html#a80d5ee43a04486d61d84f75df40f5ed8" title="return the current line number " alt="" coords="1747,4369,1903,4396"/>
+<area shape="rect" id="node120" href="$classStateIndicator.html#abf0d83f5f9a8fec57751bf5636933687" title="Maybe print B (according to tag) and erase B. " alt="" coords="1741,4003,1910,4045"/>
+<area shape="rect" id="node162" href="$classStateIndicator.html#afca13502d9ce16b01d8b7ec95da872fd" title="Escape from user function (exit from each invocation until immediate execution is reached) ..." alt="" coords="1749,4319,1902,4345"/>
+<area shape="rect" id="node163" href="$classStateIndicator.html#aa99bc8ce846dfd1f09c0ca2f250d940e" title="execute token in body... " alt="" coords="1761,3803,1890,3829"/>
+<area shape="rect" id="node168" href="$classStateIndicator.html#a275a02d6a84b6dc259fa9c5e74d56c65" title="clear the marked bit in the executable, in the fun_oper_cache, and in all parsers ..." alt="" coords="1748,4725,1903,4766"/>
+<area shape="rect" id="node172" href="$classStateIndicator.html#a1a7b4b0c7c80fd491313a728aec8383d" title="print all owners of value " alt="" coords="1754,4790,1897,4831"/>
+<area shape="rect" id="node175" href="$classStateIndicator.html#aa636ac2579a55a35c007b2763096f74e" title="print a short debug info " alt="" coords="1759,4572,1891,4599"/>
+<area shape="rect" id="node116" href="$classExecutable.html#acc35b347a5624e399f271c27778a2dbb" title="get the line number for pc " alt="" coords="1980,4420,2120,4447"/>
+<area shape="rect" id="node117" href="$python__apl_8cc.html#ab066adc359a78f5fa6ca475a826ef0a7" title="python_result_callback" alt="" coords="1973,4217,2127,4244"/>
+<area shape="rect" id="node115" href="$classPrefix.html#ade9d0ae7c2c578907265991484876535" title="return the current PC " alt="" coords="2229,4456,2337,4483"/>
+<area shape="rect" id="node118" href="$python__apl_8cc.html#a191eb6b76076a025c32d9562aebfe2c8" title="apl_to_python" alt="" coords="2231,2736,2334,2763"/>
+<area shape="rect" id="node119" href="$classValue.html#a5ac7131d2f89d0bc8b8907d960cbd125" title="return the rank of this value " alt="" coords="2474,2761,2587,2788"/>
+<area shape="rect" id="node121" href="$classToken.html#ace0d8862fa4ed10ca0eea1fdb4ac0f2b" title="show trace output for this token " alt="" coords="1983,2997,2117,3024"/>
+<area shape="rect" id="node123" href="$classWorkspace.html#a002e2f097bece67c9d082b7c89db11ae" title="return style and the current ⎕PP, and ⎕PW " alt="" coords="2185,3309,2380,3336"/>
+<area shape="rect" id="node132" href="$classUserFunction.html#a59a4ca14c199edd678c1f10ba95e2f43" title="return the name of this function " alt="" coords="1967,3531,2133,3557"/>
+<area shape="rect" id="node147" href="$classDerivedFunctionCache.html#a380131358e2a17860810a0d267e2949c" title="reset (clear) the cache " alt="" coords="1973,3679,2127,3721"/>
+<area shape="rect" id="node148" href="$libapl_8cc.html#a9cb8942a4a0c3525eb29f2c3ec773217" title="print_value" alt="" coords="2007,3897,2093,3924"/>
+<area shape="rect" id="node149" href="$classQuad__QUOTE.html#a5cd6bf7b6aa6c66c6d8b285623f948fc" title="end of ⍞ (output, but no input: clear prompt) " alt="" coords="1979,2043,2121,2069"/>
+<area shape="rect" id="node150" href="$classCommand.html#a17f06ef96321da6229cab6218f04b910" title="return the current boxing format " alt="" coords="1973,3949,2127,3990"/>
+<area shape="rect" id="node151" href="$classBif__F12__TAKE.html#a3c786a32b82e6d9c41d0c701278744d2" title="Take from B according to ravel_A. " alt="" coords="1969,2195,2131,2221"/>
+<area shape="rect" id="node155" href="$classQuad__CR.html#ac6f426118cad09841c8545efd5ba8a8f" title="compute a ⎕CR B " alt="" coords="1985,2787,2115,2813"/>
+<area shape="rect" id="node161" href="$classWorkspace.html#a3eaa0cc324b4e8e0f3fb0039efcd1b0c" title="return the current ⎕PW " alt="" coords="1979,4015,2121,4041"/>
+<area shape="rect" id="node122" href="$classUCS__string.html#ace70327ef899c525ad9c3f2bffd43697" title="append 0&#45;terminated UTF8 string str to this UCS_string. " alt="" coords="2441,1716,2621,1743"/>
+<area shape="rect" id="node124" href="$classPrintContext.html#a787257953d929f80db2ba1698d59b905" title="set the print style to be used " alt="" coords="2205,2888,2361,2915"/>
+<area shape="rect" id="node125" href="$classValue.html#a9fc8bbaf9fefe6835dea7db0f71b8b6c" title="return the number of elements (the product of the shapes). " alt="" coords="2457,2660,2605,2687"/>
+<area shape="rect" id="node126" href="$classValue.html#a0d7debc5273aad742471b2d7990a6c8a" title="return the first element of the ravel (which is always present). same as get_cproto(), but named differently to indicate its context. " alt="" coords="2472,2960,2589,2987"/>
+<area shape="rect" id="node127" href="$classCell.html#ad4edf9a2c4c464abefb221a8c24a3a37" title="Return true iff this cell is a numeric cor character cell. " alt="" coords="2463,3145,2598,3172"/>
+<area shape="rect" id="node128" href="$classPrintContext.html#a5ef45c5babbe3ebf9988a9b659a2e407" title="return the print style to be used " alt="" coords="2205,2939,2361,2965"/>
+<area shape="rect" id="node129" href="$classPrintBuffer.html#ac13295601812e379a3eac618ce239426" title="return the number of rows " alt="" coords="2213,2990,2352,3031"/>
+<area shape="rect" id="node130" href="$classPrintBuffer.html#a19446afa6beccd70a7fcdd5526cdc6a8" title="return line y " alt="" coords="2214,3056,2351,3083"/>
+<area shape="rect" id="node131" href="$classUCS__string.html#afed3b4eed48968619c0895a98700b554" title="return a string like this, but with pad chars mapped to spaces " alt="" coords="2213,1723,2353,1749"/>
+<area shape="rect" id="node133" href="$classUserFunction.html#afe2969d5186bfae3d93ac7a8f6a66d02" title="Overloaded Function::print_properties() " alt="" coords="2216,3563,2349,3605"/>
+<area shape="rect" id="node134" href="$classUserFunction.html#abbebb7ee280c1b30af0b5bb17859ace4" title=")SAVE this function in the workspace named workspace (in the file system). " alt="" coords="2215,3629,2351,3656"/>
+<area shape="rect" id="node135" href="$classUserFunction.html#a3569715fe882440f2d4d998306e5a62a" title=")LOAD this function into the workspace named workspace. Return a pounter to this newly created functi..." alt="" coords="2217,3832,2349,3859"/>
+<area shape="rect" id="node137" href="$classUserFunction.html#ad8bb1cae303dedac232d7538b043d2fc" title="overloaded Function::destroy() " alt="" coords="2691,3832,2842,3859"/>
+<area shape="rect" id="node138" href="$classUserFunction.html#a5d5d879e71d6eb3239d01d6606c7f7ab" title="overloaded Executable::pushes_sym() const " alt="" coords="2191,2533,2374,2560"/>
+<area shape="rect" id="node141" href="$classUserFunction.html#af4a520e7ab3a61ca3c3f4be32f463810" title="print help for this function on out (for the )HELP command) " alt="" coords="2217,3208,2349,3235"/>
+<area shape="rect" id="node144" href="$classUserFunction.html#a25e0645f3e9caa68e1b7a35ffed1bfeb" title="create a user defined function according to data of length len in workspace w. " alt="" coords="2221,3461,2344,3488"/>
+<area shape="rect" id="node146" href="$classUserFunction.html#a3fb5d002175b6e8a7adf754159583ee9" title="(re&#45;)create a lambda " alt="" coords="2197,1824,2368,1851"/>
+<area shape="rect" id="node136" href="$classError.html#ac3d41db87a1c0aa40928ed6d2c12bc33" title="print the error and its related information " alt="" coords="2489,5013,2572,5040"/>
+<area shape="rect" id="node139" href="$classUserFunction__header.html#aaaebafa2a7463e4ddc072fb6f91970c0" title="return the Symbol for the left argument " alt="" coords="2449,2261,2612,2288"/>
+<area shape="rect" id="node140" href="$classUserFunction__header.html#a9455edb3f124d15dd3cde42e0252feca" title="return the Symbol for the right argument " alt="" coords="2449,2439,2612,2465"/>
+<area shape="rect" id="node142" href="$classExecutable.html#a426a4201fb401213c4e13b3f27d35284" title="return function line n (0 = header line) " alt="" coords="2459,3411,2602,3437"/>
+<area shape="rect" id="node143" href="$classSymbol.html#a126fc214ca7a2e2d364e0982a36b2ace" title="The name of this Symbol. " alt="" coords="2465,2552,2596,2579"/>
+<area shape="rect" id="node145" href="$Common_8hh.html#ab824aa3e1de51cff5987b902d647d1e0" title="cast to a const void * " alt="" coords="2503,3731,2558,3757"/>
+<area shape="rect" id="node152" href="$classShape.html#a190d62a53b8617463c01e67a5d9addde" title="return a shape like this, but with negative elements made positive " alt="" coords="2239,2128,2327,2155"/>
+<area shape="rect" id="node153" href="$classBif__F12__TAKE.html#a0b5765e94b6f7bde194df34b26e8a5ca" title="Fill Z with B, pad as necessary. " alt="" coords="2217,2179,2348,2205"/>
+<area shape="rect" id="node154" href="$classShape.html#a3a7c1dfbab2d8c181f0e1153a5736249" title="return true iff this shape is empty (some dimension is 0). " alt="" coords="2223,2077,2343,2104"/>
+<area shape="rect" id="node156" href="$classQuad__CR.html#a8de5392a4b70aeef7c103370f2c4ba2e" title="compute 10 ⎕CR B " alt="" coords="2211,3512,2354,3539"/>
+<area shape="rect" id="node157" href="$classQuad__CR.html#a73b6a66e808cb4075e91d314e0016842" title="compute 11 ⎕CR B " alt="" coords="2211,2432,2354,2459"/>
+<area shape="rect" id="node158" href="$classQuad__CR.html#a085c9286020d2b50c5c46374a52f77e2" title="compute 12 ⎕CR B " alt="" coords="2211,2685,2354,2712"/>
+<area shape="rect" id="node159" href="$classQuad__CR.html#aa0581675aa15c6ad92ccaced0d73e753" title="compute 13 ⎕CR B " alt="" coords="2211,2787,2354,2813"/>
+<area shape="rect" id="node160" href="$classQuad__CR.html#acf63173379842853574a2d46a6f357e3" title="compute 14 ⎕CR B " alt="" coords="2211,2483,2354,2509"/>
+<area shape="rect" id="node164" href="$classPrefix.html#a5478ff7d771d95a161c8ee393d50d7b1" title="execute one context (user defined function or operator, execute, or immediate execution) ..." alt="" coords="1963,3796,2137,3823"/>
+<area shape="rect" id="node165" href="$classPrefix.html#a32e238464846f32c7954f72feb3a473b" title="return the idx&#39;th Token_loc (from put position) " alt="" coords="2245,5165,2320,5192"/>
+<area shape="rect" id="node167" href="$classPrefix.html#a07a35c8b69a8c9f685225e2a2586a2fd" title="return the number of token currently in the FIFO " alt="" coords="2239,5216,2327,5243"/>
+<area shape="rect" id="node169" href="$classExecutable.html#a473c132689c8a2d38f52ed4eab8c69aa" title="clear marked flag in all body token " alt="" coords="1981,4814,2119,4855"/>
+<area shape="rect" id="node170" href="$classPrefix.html#aaef6d084d78f13f25ca2f6619b0f0d10" title="clear the mark flag of all values in this Prefix " alt="" coords="1987,4982,2113,5023"/>
+<area shape="rect" id="node171" href="$classDerivedFunctionCache.html#a0d26600266b1da2e95c1e6e84a3f00cc" title="clear the marked bit in values bound to derived functions (if any). " alt="" coords="1973,4725,2127,4766"/>
+<area shape="rect" id="node173" href="$classExecutable.html#a3e2055a4ff3807adea8fa7088fd8f95f" title="print all owners of value " alt="" coords="1963,4880,2137,4907"/>
+<area shape="rect" id="node174" href="$classPrefix.html#a9b2f1a5b9a782b8887ae94ccb8bf5044" title="print all owners of value " alt="" coords="1978,4931,2122,4957"/>
+<area shape="rect" id="node176" href="$classExecutable.html#a9313b673c82a383c9c5b1a853a80bf58" title="say where this SI entry was allocated " alt="" coords="2698,5525,2835,5552"/>
+<area shape="rect" id="node181" href="$classError.html#add470c20ef998392f47607c2d1a5b7fd" title="return ⎕EM[1;]. This is the first of 3 error lines. It contains the error name (like SYNTAX ERROR..." alt="" coords="2207,1317,2358,1344"/>
+<area shape="rect" id="node182" href="$classError.html#a780179b6629a91e2aff82f6165e6d4bd" title="return error_message_2. This is the second of 3 error lines. It contains the failed statement and is ..." alt="" coords="2207,1419,2358,1445"/>
+<area shape="rect" id="node183" href="$classError.html#a782d3b90b8d5e00842b9aa46b510de77" title="compute the caret line. This is the third of the 3 error lines. It contains the failure position the ..." alt="" coords="2455,1048,2606,1075"/>
+<area shape="rect" id="node185" href="$classError.html#a73c1f4ab40f4e313f504562d52bb001e" title="return the error code of this error " alt="" coords="1753,2448,1897,2475"/>
+<area shape="rect" id="node186" href="$classError.html#a38919f5705b2b67a8b89dd28e135468e" title="return the left caret (^) position in the third error line " alt="" coords="1757,2296,1894,2323"/>
+<area shape="rect" id="node187" href="$classExecutable.html#ace2b09edae698fd095eaeff889a22bc1" title="return the start of the statement to which pc belongs " alt="" coords="1736,2499,1915,2541"/>
+<area shape="rect" id="node192" href="$classSymbol.html#a8f6dd744b09b0629eca34fc2231bf2a9" title="return the current APL value (or throw a VALUE_ERROR) " alt="" coords="1748,2093,1903,2120"/>
+<area shape="rect" id="node193" href="$classError.html#af47d2ce6f771f8d502d4d1cd05d6f81d" title="throw an Error related to Symbol symbol " alt="" coords="1981,1875,2119,1917"/>
+<area shape="rect" id="node197" href="$classValue.html#a5723f5f86b97a1870f7e784ad6a3bfba" title="return the number of (so far) initialized items " alt="" coords="415,2159,561,2201"/>
+<area shape="rect" id="node198" href="$classValue.html#a5060aba17dac4ad78c0d76efecf2a88e" title="return the (writable) idx&#39;th element of the ravel. " alt="" coords="425,2225,551,2252"/>
+<area shape="rect" id="node199" href="$classValue.html#adb495fbb836373de3d3558acfd986eed" title="initialize the next ravel cell with integer 0 " alt="" coords="419,2276,557,2303"/>
+<area shape="rect" id="node200" href="$classValue.html#a3a424b54ee7bfa4fcd69ff972e1c7add" title="initialize the next ravel cell with an APL sub&#45;value " alt="" coords="403,2327,573,2353"/>
+</map>

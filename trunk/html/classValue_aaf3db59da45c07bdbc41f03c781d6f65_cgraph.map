@@ -1,0 +1,9 @@
+<map id="Value::is_int_vector" name="Value::is_int_vector">
+<area shape="rect" id="node1" title="return true iff this value is a (simple) integer vector." alt="" coords="5,31,143,56"/>
+<area shape="rect" id="node2" href="$classValue.html#a5ac7131d2f89d0bc8b8907d960cbd125" title="return the rank of this value" alt="" coords="199,5,313,31"/>
+<area shape="rect" id="node4" href="$classValue.html#a016a6f75865624afef86a3f6a2b6170f" title="return true iff this value is a (simple) integer array, allowing near&#45;int values (but NOT necessatily..." alt="" coords="191,55,321,80"/>
+<area shape="rect" id="node3" href="$classShape.html#a017e9a35dd20f4bc4fdeb7ea29b6805d" title="return the rank" alt="" coords="372,5,489,31"/>
+<area shape="rect" id="node5" href="$classValue.html#aa0572b1b7fa249cb79694fd152130b38" title="return the (constant) idx&#39;th element of the ravel." alt="" coords="369,55,492,80"/>
+<area shape="rect" id="node6" href="$classValue.html#ac5b54e3a13cab0837442f1575b3299a5" title="return the number of elements, but at least 1 (for the prototype)." alt="" coords="540,80,709,105"/>
+<area shape="rect" id="node7" href="$classShape.html#a6f32f749601dca80263493fd06be12c4" title="return the number of ravel elements, but at least 1 (for empty values and scalars) else product of sh..." alt="" coords="757,80,912,105"/>
+</map>

@@ -1,0 +1,4 @@
+<map id="Value::get_last_shape_item" name="Value::get_last_shape_item">
+<area shape="rect" id="node1" title="return the length of the last dimension of this value, i.e. ¯1↑⍴this" alt="" coords="211,5,393,31"/>
+<area shape="rect" id="node2" href="$classValue.html#a21237b2c7e26efd23b9a86780dfad6d5" title="get the min spacing for this column and set/clear if there is/isn&#39;t a numeric item in the column...." alt="" coords="5,5,163,31"/>
+</map>

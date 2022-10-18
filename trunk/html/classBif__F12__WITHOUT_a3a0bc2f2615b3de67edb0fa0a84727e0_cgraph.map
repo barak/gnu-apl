@@ -1,0 +1,13 @@
+<map id="Bif_F12_WITHOUT::eval_AB" name="Bif_F12_WITHOUT::eval_AB">
+<area shape="rect" id="node1" title="Compute A without B. overloaded Function::eval_AB()." alt="" coords="5,153,200,179"/>
+<area shape="rect" id="node2" href="$classCell.html#a4cb1f7ae7e4ad956ec55f1d507a0e938" title="return true if this cell is equal to other" alt="" coords="500,276,584,301"/>
+<area shape="rect" id="node4" href="$classWorkspace.html#a84f9084505dfcbc3a26414ea895dd7ca" title="return the current ⎕CT" alt="" coords="473,5,611,31"/>
+<area shape="rect" id="node5" href="$classBif__F12__WITHOUT.html#a82df83f764b15e8bc01f7629bdf4bc80" title="eval_AB for large A and/or B" alt="" coords="248,146,421,186"/>
+<area shape="rect" id="node3" href="$classCell.html#ad08fb9a79b3c5b38d92bf5ef4bf47145" title="return the name of the class" alt="" coords="673,227,815,252"/>
+<area shape="rect" id="node6" href="$classCell.html#afe8af4bc1c528780e63cc415d5a7ec03" title="a stable compare function to be used with Heapsort. The cell contents are ignored and only the cell a..." alt="" coords="479,177,605,203"/>
+<area shape="rect" id="node7" href="$classCell.html#aa8e2deb46fcc9f0a3997b4a156f09162" title="a stable compare function to be used with Heapsort. Equal cells are compared by their address...." alt="" coords="469,227,615,252"/>
+<area shape="rect" id="node8" href="$classCell.html#a957ed66e4cb8e019ed6e80713dd79fc6" title="Return true if this cell is greater than other, with:" alt="" coords="495,128,589,153"/>
+<area shape="rect" id="node9" href="$classUCS__string.html#a59f472bb1ee082cca5ac2a6c128f4918" title="sort the characters in this string by their Unicode" alt="" coords="482,79,602,104"/>
+<area shape="rect" id="node10" href="$classUCS__string.html#a3c03c3e5b4d7be0e435a7cfee8a424ae" title="helper function for Heapsort&lt;Unicode&gt;::sort()" alt="" coords="663,55,825,80"/>
+<area shape="rect" id="node11" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="683,104,805,129"/>
+</map>

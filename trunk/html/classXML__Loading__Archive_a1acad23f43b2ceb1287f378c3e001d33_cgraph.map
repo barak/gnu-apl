@@ -1,0 +1,5 @@
+<map id="XML_Loading_Archive::find_float_attr" name="XML_Loading_Archive::find_float_attr">
+<area shape="rect" id="node2" href="$Common_8hh.html#a6d4ca0c6b6648fa2a606993c967dd8f8" title="frequently used cast to const char * " alt="" coords="253,5,309,32"/>
+<area shape="rect" id="node3" href="$classXML__Loading__Archive.html#ac0628d3b9035aa2ec3ed6cba88fd2888" title="find mandatory attribute att_name. Return a pointer to its value if found and throw DOMAIN ERROR if n..." alt="" coords="205,57,357,98"/>
+<area shape="rect" id="node4" href="$Logging_8def.html#ab5ab82c1e9b9d4715660ab4a568026e2" title="value" alt="" coords="255,123,308,149"/>
+</map>

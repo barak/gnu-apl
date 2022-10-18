@@ -1,0 +1,7 @@
+<map id="CharCell::greater" name="CharCell::greater">
+<area shape="rect" id="node1" title="overloaded Cell::greater()" alt="" coords="5,55,127,80"/>
+<area shape="rect" id="node2" href="$classCell.html#a38a6a25f0ad091f35e3d9abfe5608a50" title="return the type of this cell" alt="" coords="383,5,514,31"/>
+<area shape="rect" id="node3" href="$classCell.html#a2999919fc2782b3cebfd925c63cc1fac" title="Return the character value of a cell." alt="" coords="175,55,316,80"/>
+<area shape="rect" id="node5" href="$classCharCell.html#ac1722ae72774937539bc00951b199732" title="overloaded Cell::get_char_value()" alt="" coords="180,105,311,145"/>
+<area shape="rect" id="node4" href="$classCell.html#a6c3fdef3d82f53649d1c3f16d37eedd7" title="the name of ct" alt="" coords="364,55,533,80"/>
+</map>

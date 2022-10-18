@@ -1,0 +1,4 @@
+<map id="PointerCell::isolate" name="PointerCell::isolate">
+<area shape="rect" id="node1" title="isolate value.pval.valp (make value.pval the sole owner)" alt="" coords="5,5,137,31"/>
+<area shape="rect" id="node2" href="$classValue__P__Base.html#a43ca9b5a3b6b63be74b3087bd109674f" title="clone value if more than one Value_P points to it" alt="" coords="185,5,340,31"/>
+</map>

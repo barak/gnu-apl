@@ -1,0 +1,5 @@
+<map id="GET_VALUE_c::GET_VALUE_c" name="GET_VALUE_c::GET_VALUE_c">
+<area shape="rect" id="node1" title="contructor that creates the signal and sends it on TCP socket s" alt="" coords="5,5,220,31"/>
+<area shape="rect" id="node2" href="$classSignal__base.html#a2ff638373162ccc4a8b1b268b260923e" title="send this signal on TCP (or AF_UNIX) socket tcp_sock" alt="" coords="268,5,431,31"/>
+<area shape="rect" id="node3" href="$classSignal__base.html#a68f2f5d807d706a6e46709abef26cfb1" title="store (encode) the signal into buffer" alt="" coords="479,5,609,31"/>
+</map>

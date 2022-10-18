@@ -1,0 +1,4 @@
+<map id="ComplexCell::is_near_int" name="ComplexCell::is_near_int">
+<area shape="rect" id="node1" title="overloaded Cell::is_near_int()" alt="" coords="5,5,173,31"/>
+<area shape="rect" id="node2" href="$classCell.html#ac8ce4cebc1b8ac383bc62723d645914a" title="True iff value is numeric and close to an int." alt="" coords="221,5,337,31"/>
+</map>

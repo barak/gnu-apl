@@ -1,0 +1,80 @@
+<map id="UCS_string::append_number" name="UCS_string::append_number">
+<area shape="rect" id="node1" title="append number (in ASCII encoding like d) to this string" alt="" coords="2039,888,2179,928"/>
+<area shape="rect" id="node2" href="$classPrintBuffer.html#ad067956533b46f2b61e71fc2c4cba37e" title="add a decorator frame around this buffer" alt="" coords="1827,39,1980,65"/>
+<area shape="rect" id="node4" href="$classXML__node.html#a738e88d62255e4a6e89ff4b3071956eb" title="add member name with value value to structured value Z" alt="" coords="1820,221,1987,246"/>
+<area shape="rect" id="node12" href="$classUCS__string.html#a8111c41576c13b04095ddb7df13eddd3" title="append shape (in APL encoding tke left arg of ↑) this string" alt="" coords="1833,509,1973,549"/>
+<area shape="rect" id="node13" href="$classQuad__CR.html#a8b2ba6751ee90f286cae088a14101ff8" title="compute the prolog (e,g, ((⎕IO+2)⊃X)←) for the pick of left" alt="" coords="1582,614,1762,639"/>
+<area shape="rect" id="node23" href="$classQuad__CR.html#a59678f59cbdc13f8c82978a21128c41f" title="one ravel item in 10 ⎕CR symbol_name" alt="" coords="1816,398,1991,423"/>
+<area shape="rect" id="node25" href="$classNabla.html#a610d94a179335126e82e9eea07918d5a" title="edit this function" alt="" coords="1629,663,1715,689"/>
+<area shape="rect" id="node26" href="$classQuad__SI.html#a703fb389406e0f834f26f993e0997384" title="overloaded Function::eval_AB()." alt="" coords="1838,725,1969,750"/>
+<area shape="rect" id="node27" href="$classQuad__SI.html#adf45c0e846d98374b2ce1e2633de3101" title="overloaded Function::eval_AB()." alt="" coords="1843,774,1964,799"/>
+<area shape="rect" id="node28" href="$classTabExpansion.html#a3caac165f0b8c4454d8964fa05a775d3" title="perform tab expansion for a workspace name" alt="" coords="1826,824,1981,864"/>
+<area shape="rect" id="node37" href="$classQuad__CR_1_1Picker.html#a12e2d746e25baeb47dab2f24ce5b50b0" title="indexed varname or pick of varname" alt="" coords="1597,448,1747,488"/>
+<area shape="rect" id="node38" href="$classUserFunction.html#a91d607b9654e8c3caedaaea4868edb87" title="return e.g. &#39;FOO[10]&#39;" alt="" coords="1821,888,1986,928"/>
+<area shape="rect" id="node45" href="$classXML__node.html#a736e72ce2e086ebe9db5a9d86834bfd9" title="return the tagname of this node. Starts with a valid XML name, thus no leading &lt;, /m or _." alt="" coords="1820,297,1987,322"/>
+<area shape="rect" id="node46" href="$classSymbolTable.html#ac7e63c55db6fdfe52327260e26d50b3e" title="List all symbols in this SymbolTable (for )VARS, )FNS etc.)" alt="" coords="1842,977,1965,1002"/>
+<area shape="rect" id="node48" href="$classNativeFunction.html#a1a29c2dde6fdafb672e5040e646e3141" title="load shared lib for emacs mode, return error info on failure" alt="" coords="1832,1027,1975,1067"/>
+<area shape="rect" id="node50" href="$classQuad__XML.html#aa4641da84bb47a049da380f0305ae362" title="MEMBER_NAME ← POS CATEGORY TAG_NAME." alt="" coords="859,97,1031,122"/>
+<area shape="rect" id="node51" href="$classUCS__string.html#a7000eacac8933739dbc0c7c95f6d30bc" title="append number num" alt="" coords="1823,1091,1984,1117"/>
+<area shape="rect" id="node52" href="$classRegexp.html#a9c761d089d265fa1a1dd5a5191d7549b" title="return a description for error code eec" alt="" coords="1837,1141,1970,1166"/>
+<area shape="rect" id="node55" href="$structLineLabel.html#a49c3cdcce5593810109c8b4a004a6d39" title="print the line number" alt="" coords="1848,1190,1959,1215"/>
+<area shape="rect" id="node57" href="$structLineLabel.html#abaa6e95c0ca623f8b0746a0e621343b1" title="print a prompt like [1.2] into buffer" alt="" coords="1825,675,1982,701"/>
+<area shape="rect" id="node60" href="$classXML__Loading__Archive.html#a2e7aed9883aa106937d3d9313163e10b" title="read next Function element" alt="" coords="1827,1240,1979,1280"/>
+<area shape="rect" id="node61" href="$classToken.html#ace0d8862fa4ed10ca0eea1fdb4ac0f2b" title="show trace output for this token" alt="" coords="1837,1305,1970,1330"/>
+<area shape="rect" id="node63" href="$classQuad__TF.html#a434cc143d2da53d0f3ae37a9e9e9ce10" title="return B in transfer format 1 (old APL format) for variable B" alt="" coords="1854,1354,1953,1379"/>
+<area shape="rect" id="node64" href="$classQuad__TF.html#a3093ae63771a602fe15f892e57386897" title="append the ravel of a simple character array (of any rank)" alt="" coords="1828,1404,1979,1444"/>
+<area shape="rect" id="node73" href="$classQuad__TF.html#afe6a5cf3472f8d500820353afe9c8882" title="store simple character vector vec in ucs, either as &#39;xxx&#39; or as (UCS nn nnn ...)" alt="" coords="1824,1518,1983,1543"/>
+<area shape="rect" id="node76" href="$classQuad__TF.html#a160b51803b3fc7f0378701651a25c717" title="append shape in tf2_format to ucs." alt="" coords="1833,1469,1974,1494"/>
+<area shape="rect" id="node77" href="$classUCS__string.html#aa1e49e488f5c1093a83b7c3aa4009d70" title="constructor: UCS_string from a double with quad_pp valid digits. (eg. 3.33 has 3 digits),..." alt="" coords="1820,1567,1987,1593"/>
+<area shape="rect" id="node78" href="$classUserFunction__header.html#ab1dffd12344c108071b5f03276c6b9fe" title="constructor from signature (for lambdas)" alt="" coords="1826,1617,1981,1657"/>
+<area shape="rect" id="node3" href="$classPointerCell.html#acccd604366a71acc67657ce5e4f034e0" title="the Quad_CR representation of this cell" alt="" coords="1598,29,1746,69"/>
+<area shape="rect" id="node5" href="$classXML__node.html#af7768a8292eebe36599f6d958dde6731" title="collect nodes starting at anchor, return true on error" alt="" coords="1372,245,1503,270"/>
+<area shape="rect" id="node10" href="$classXML__node.html#ae6f77f0b4ebb0311ee13abdc69d696f0" title="merge the items from start(&#45;tag) to (end(&#45;tag) into start tag" alt="" coords="1589,246,1755,271"/>
+<area shape="rect" id="node11" href="$classXML__node.html#aaab7a6011fdbbfcff7617a1e3029119e" title="parse an XML start or leaf tag, store result in this&#45;&gt;APL_value On error set MORE_ERROR() and return ..." alt="" coords="1597,145,1747,170"/>
+<area shape="rect" id="node6" href="$classQuad__XML.html#a8e4ca50c2d54d630895c22115857325e" title="convert XML string to APL associative array" alt="" coords="1109,233,1281,258"/>
+<area shape="rect" id="node7" href="$classQuad__XML.html#afb56e2b1109a16c834b1d2d6862b95cc" title="overloaded Function::eval_B()" alt="" coords="878,226,1013,251"/>
+<area shape="rect" id="node8" href="$classQuad__XML.html#acda08006d2a9ee1558e6a68adbb8ac59" title="return XML file (&#45;name in B) converted to APL structured value" alt="" coords="637,175,800,201"/>
+<area shape="rect" id="node9" href="$classQuad__XML.html#ad5de89a09c7528bcea93377a1f9424a8" title="overloaded Function::eval_AB()" alt="" coords="445,175,589,201"/>
+<area shape="rect" id="node14" href="$classQuad__CR.html#acbf51c3bd2e75e0d23884d426cc736d1" title="compute 10 ⎕CR recursively" alt="" coords="1347,485,1528,510"/>
+<area shape="rect" id="node22" href="$classQuad__CR_1_1Picker.html#a0e581444af3ec444122c21912f7a29b7" title="varname or pick of varname" alt="" coords="1597,513,1747,538"/>
+<area shape="rect" id="node15" href="$classQuad__CR.html#a9a5d503eccac9d627b13ee6be3f14cad" title="compute 10 ⎕CR recursively (structured variable)" alt="" coords="1091,522,1299,547"/>
+<area shape="rect" id="node16" href="$classQuad__CR.html#adb8eb84c4716584168f16f226c1a0ba4" title="portable variable encoding of value name (varname or varname ⊂)" alt="" coords="848,485,1043,510"/>
+<area shape="rect" id="node17" href="$classQuad__CR.html#ad98ce37f2b329eb37ddae9d0fcf7832f" title="10 ⎕CR symbol_name (variable or function name). Also used for )OUT" alt="" coords="647,510,790,535"/>
+<area shape="rect" id="node18" href="$classSymbol.html#a9f5e43c937f34053d09f3406f01dacbd" title="dump this symbol to out" alt="" coords="665,461,772,486"/>
+<area shape="rect" id="node19" href="$classSymbolTable.html#ae8e03d7855f323239450e78d66b4b29d" title="dump symbols to out" alt="" coords="448,461,587,486"/>
+<area shape="rect" id="node20" href="$classWorkspace.html#a15d8cb5c62016f547b9718e820c94efd" title="dump this workspace" alt="" coords="228,461,385,486"/>
+<area shape="rect" id="node21" href="$classCommand.html#a98e7d1dd0c01014d79f2120292588a70" title=")DUMP: dump a workspace file (.apl)" alt="" coords="5,461,168,486"/>
+<area shape="rect" id="node24" href="$classQuad__CR.html#a9f1588cf6a3aa22665fe70c1855d1c4e" title="try to emit value in short format. Retrun true if that is not possible." alt="" coords="1596,347,1748,373"/>
+<area shape="rect" id="node29" href="$classTabExpansion.html#a87242c56b4445fadcf7ac9a1181a15ea" title="perform tab expansion for a filename" alt="" coords="1595,777,1749,817"/>
+<area shape="rect" id="node30" href="$classTabExpansion.html#ad99a9df8a0a9ba9ad03f75e654de0bd4" title="perform tab expansion for command arguments" alt="" coords="1360,777,1515,817"/>
+<area shape="rect" id="node31" href="$classTabExpansion.html#a155d53238b8490e82776eb2caddefceb" title="tab&#45;expand an APL command" alt="" coords="1117,777,1272,817"/>
+<area shape="rect" id="node32" href="$classTabExpansion.html#ad8c4300a7d2e9aa47e6c3a1d19285db7" title="perform tab expansion" alt="" coords="855,785,1035,810"/>
+<area shape="rect" id="node33" href="$classLineEditContext.html#a8908cfbf56371294323892784508eca7" title="tab expansion" alt="" coords="648,777,789,817"/>
+<area shape="rect" id="node34" href="$classLineInput.html#a81610349f86404c67f583eb296666bb1" title="get a line from from user" alt="" coords="452,785,583,810"/>
+<area shape="rect" id="node35" href="$classLineInput.html#a96f6a9062450af940d63ecff847646e4" title="get a line from the user" alt="" coords="216,785,397,810"/>
+<area shape="rect" id="node36" href="$classInputMux.html#a8a79cbe5207cde162fb36133ad9defdd" title="get one line" alt="" coords="22,785,151,810"/>
+<area shape="rect" id="node39" href="$classStateIndicator.html#a0129e968c738e1c300e20b16533fca55" title="list the stack entry (for commands ]SI, )SI, and )SIS)" alt="" coords="1373,966,1501,991"/>
+<area shape="rect" id="node40" href="$classStateIndicator.html#ae8f1a9f49c7933c492f6f899fccd437f" title="list the stack entry (for command ]SI)" alt="" coords="1604,941,1740,966"/>
+<area shape="rect" id="node41" href="$classDoxy.html#adb0f60780eef8f3246d952596a3a19a6" title="HTML&#45;print a table with the SI stack to &#39;page&#39;." alt="" coords="1617,891,1727,917"/>
+<area shape="rect" id="node44" href="$classError.html#adf8e47c02b1ae0be1368a0587f7daed4" title="update error information in this and copy it to si" alt="" coords="1593,842,1751,867"/>
+<area shape="rect" id="node42" href="$classDoxy.html#ad8abe2e8a1b686a7b35e582c369d41ae" title="generate the entire documentation" alt="" coords="1396,891,1479,917"/>
+<area shape="rect" id="node43" href="$classCommand.html#a834eac0e797a5d1c992018b7d0c049a4" title="]DOXY: create doxygen&#45;like documentation of the current workspace" alt="" coords="1115,891,1275,917"/>
+<area shape="rect" id="node47" href="$classWorkspace.html#a3196f2463ad078822206e8eabf4eff1b" title="list all symbols (of category which) with names in from_to" alt="" coords="1615,1042,1729,1067"/>
+<area shape="rect" id="node49" href="$main_8cc.html#aa0321421b17def7b58fc0cabc8890260" title="initialize the interpreter" alt="" coords="1641,1091,1703,1117"/>
+<area shape="rect" id="node53" href="$classRegexp.html#a75b2beb60da3138d51d804151dc41301" title="constructor" alt="" coords="1612,1190,1732,1215"/>
+<area shape="rect" id="node54" href="$classRegexpMatch.html#a989e37f5051866d330562133d61f3aee" title="constructor" alt="" coords="1576,1141,1768,1166"/>
+<area shape="rect" id="node56" href="$structNabla_1_1FunLine.html#a0686a641df5a1123e8402dd5e44b47b8" title="print the line" alt="" coords="1601,1239,1743,1265"/>
+<area shape="rect" id="node58" href="$structNabla_1_1FunLine.html#acb10b18671fa5864824dbcf871e7eb9f" title="return the line label (sucah as [1]) and the line text" alt="" coords="1604,713,1740,753"/>
+<area shape="rect" id="node59" href="$classNabla.html#a672cb6353bdc6ef24ab702b781bd09c7" title="return the line label (sucah as [1]) and the line text, Set is_current iff line is the current line o..." alt="" coords="1351,721,1524,746"/>
+<area shape="rect" id="node62" href="$classStateIndicator.html#abf0d83f5f9a8fec57751bf5636933687" title="Maybe print B (according to tag) and erase B." alt="" coords="1587,1297,1757,1337"/>
+<area shape="rect" id="node65" href="$classQuad__TF.html#a4aa501720adbb19aed9599912a8a8b07" title="append ravel of value in tf2_format to ucs. Return true iff the value should be enclosed in parenthes..." alt="" coords="1603,1414,1741,1439"/>
+<area shape="rect" id="node66" href="$classQuad__TF.html#a7cecac14ed05f07d7b44a5c90d820f03" title="append ravel cells in tf2_format to ucs." alt="" coords="1370,1414,1505,1439"/>
+<area shape="rect" id="node67" href="$classQuad__TF.html#ad0f2e059d5ff7a0262921192e18c48a0" title="return B in transfer format 2 (new APL format) for a variable" alt="" coords="1375,1463,1499,1489"/>
+<area shape="rect" id="node68" href="$classQuad__TF.html#aad2b15f3268d7098d75babcd03e5c762" title="return B in transfer format 2 (new APL2 format)" alt="" coords="1145,1551,1244,1577"/>
+<area shape="rect" id="node70" href="$classSymbol.html#a6b9b4537d95855e6490a8ec1b64b6cce" title="write this symbol in )OUT format to file out" alt="" coords="1126,1477,1263,1502"/>
+<area shape="rect" id="node69" href="$classQuad__TF.html#a27ed4b02d5f1a1c8a8b0a1fcbe2756f8" title="Overloaded Function::eval_AB()." alt="" coords="879,1551,1012,1577"/>
+<area shape="rect" id="node71" href="$classWorkspace.html#a7ffca45a4446b644e7caf093a1699ba2" title="write symbols for )OUT command" alt="" coords="866,1477,1025,1502"/>
+<area shape="rect" id="node72" href="$classCommand.html#a4afcbbdbee3fd2f536db12651861110b" title=")OUT: export a workspace file" alt="" coords="643,1477,794,1502"/>
+<area shape="rect" id="node74" href="$classQuad__TF.html#a0bb664557663f85e4e8a86c756ac8139" title="store B in transfer format 2 (new APL format) into ucs" alt="" coords="1596,1518,1748,1543"/>
+<area shape="rect" id="node75" href="$classQuad__TF.html#a4bd033c3e755ec0a60c0254438199b91" title="return B in transfer format 2 (new APL format) for a function" alt="" coords="1375,1565,1499,1590"/>
+</map>

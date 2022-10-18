@@ -1,0 +1,5 @@
+<map id="Cell::diff_overflow" name="Cell::diff_overflow">
+<area shape="rect" id="node1" title="return true if z = a &#45; b had an overflow." alt="" coords="204,31,331,56"/>
+<area shape="rect" id="node2" href="$classFloatCell.html#ae261ecf59ba690674cd5409f5e973f41" title="Overloaded Cell::bif_subtract()." alt="" coords="5,5,156,31"/>
+<area shape="rect" id="node3" href="$classIntCell.html#a501cbdaa250c9a9fdfe11cb461058710" title="overloaded Cell::bif_subtract()" alt="" coords="13,55,149,80"/>
+</map>

@@ -1,0 +1,11 @@
+<map id="TabExpansion::expand_distinguished_name" name="TabExpansion::expand_distinguished_name">
+<area shape="rect" id="node1" title="tab&#45;expand a system&#45;defined name (⎕xxx)" alt="" coords="5,85,160,125"/>
+<area shape="rect" id="node2" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="219,5,359,31"/>
+<area shape="rect" id="node3" href="$classTabExpansion.html#a6cf1a848b8a5be83e6971035dd6baaba" title="compute the lenght of the common part in all matches" alt="" coords="208,55,371,95"/>
+<area shape="rect" id="node4" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="635,133,757,159"/>
+<area shape="rect" id="node5" href="$classUCS__string__vector.html#a4c548acafd0c03ebbe43ad8643dc07d0" title="sort the strings in this vector alphabetically" alt="" coords="208,195,371,220"/>
+<area shape="rect" id="node6" href="$classUCS__string.html#aed83d678e9bfcad18a5c89cd88002ac9" title="return true if n1 &lt; n2" alt="" coords="419,245,567,285"/>
+<area shape="rect" id="node8" href="$classUCS__string.html#a59f472bb1ee082cca5ac2a6c128f4918" title="sort the characters in this string by their Unicode" alt="" coords="433,195,553,220"/>
+<area shape="rect" id="node7" href="$classUCS__string.html#a9a80a1621c030d847983275d62902411" title="compare this with UCS_string other" alt="" coords="622,252,770,277"/>
+<area shape="rect" id="node9" href="$classUCS__string.html#a3c03c3e5b4d7be0e435a7cfee8a424ae" title="helper function for Heapsort&lt;Unicode&gt;::sort()" alt="" coords="615,195,777,220"/>
+</map>

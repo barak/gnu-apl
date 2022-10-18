@@ -1,0 +1,38 @@
+<map id="LvalCell::get_cell_owner" name="LvalCell::get_cell_owner">
+<area shape="rect" id="node1" title="return the owner of the cell pointed to" alt="" coords="1815,259,1937,299"/>
+<area shape="rect" id="node2" href="$classValue.html#a5be5b6031f53082438fa9de824732fbe" title="assign val to the cell references in this value." alt="" coords="1606,107,1757,132"/>
+<area shape="rect" id="node3" href="$classQuad__CR.html#a8be335143dfde84775d8905acb017d07" title="compute 27 ⎕CR B or 28 ⎕CR B" alt="" coords="1599,180,1763,205"/>
+<area shape="rect" id="node20" href="$classBif__F12__ELEMENT.html#a18cbe47e844984fae074495a4abcdd7e" title="implementation of eval_B()" alt="" coords="1602,230,1761,270"/>
+<area shape="rect" id="node25" href="$classXML__Saving__Archive.html#ae0384623223c3d4e87ea98f2ec0adf5c" title="emit one ravel cell cell" alt="" coords="1382,287,1529,327"/>
+<area shape="rect" id="node27" href="$classValue.html#a568f71b7c67f0fea6bf44b475638dced" title="return true iff this value is an lval (selective assignment) i.e. return true if at least one leaf va..." alt="" coords="1596,345,1767,371"/>
+<area shape="rect" id="node36" href="$classLvalCell.html#a955ddeec11837546b46b2a654098ef87" title="overloaded Cell::init_other" alt="" coords="1616,395,1747,420"/>
+<area shape="rect" id="node4" href="$classQuad__CR.html#ac6f426118cad09841c8545efd5ba8a8f" title="compute a ⎕CR B" alt="" coords="1391,104,1520,129"/>
+<area shape="rect" id="node5" href="$classQuad__CR.html#ac60b988ceaf002189a8c60337752048f" title="overloaded Function::eval_AB()" alt="" coords="1161,5,1299,31"/>
+<area shape="rect" id="node7" href="$classValue.html#a6f574c5690fbcf4024a78ed14a8375db" title="print this value in 4 ⎕CR style" alt="" coords="1165,55,1295,80"/>
+<area shape="rect" id="node8" href="$classValue.html#a82fd0d84f4c7f0b22a6b035e0201506a" title="print info related to a stale value" alt="" coords="1155,104,1305,129"/>
+<area shape="rect" id="node19" href="$classStateIndicator.html#abf0d83f5f9a8fec57751bf5636933687" title="Maybe print B (according to tag) and erase B." alt="" coords="1145,154,1315,194"/>
+<area shape="rect" id="node6" href="$classQuad__CR.html#a4a7057e997df3f1607b2e003ef7279f6" title="overloaded Function::eval_XB()" alt="" coords="933,5,1071,31"/>
+<area shape="rect" id="node9" href="$classValue.html#a80c3e1a7208f4f97985e5c742ec93b2d" title="print stale Values, and return the number of stale Values." alt="" coords="941,112,1063,137"/>
+<area shape="rect" id="node10" href="$classCommand.html#af5d73db57801b2363c954b402f19186d" title="check workspace integrity (stale Value and IndexExpr objects, etc)" alt="" coords="666,189,837,215"/>
+<area shape="rect" id="node15" href="$classIO__Files.html#aa05a2917c11a88b9abfc4afa6ca04a3e" title="dito (close files, print errors, summary etc)." alt="" coords="657,112,846,137"/>
+<area shape="rect" id="node11" href="$classXML__Saving__Archive.html#acc327395cab545ea7797d92f5c931cab" title="write entire workspace" alt="" coords="449,217,595,257"/>
+<area shape="rect" id="node12" href="$classWorkspace.html#a8a4f1d898d523818dbd9d7efa6f2cf92" title="save this workspace" alt="" coords="247,224,400,249"/>
+<area shape="rect" id="node13" href="$classCommand.html#ad61e749290966d00856ce1dd4f6abe42" title=")SAVE active WS as CONTINUE and )OFF" alt="" coords="5,199,199,224"/>
+<area shape="rect" id="node14" href="$classCommand.html#aec0c4c6efbb9df9a34220b510f58905a" title=")SAVE: save a workspace file (.xml)" alt="" coords="23,248,181,273"/>
+<area shape="rect" id="node16" href="$classIO__Files.html#acc91875b8e0c7a5ad44e3ead0e3dda7b" title="get one line from the current file, open the next file if necceessary" alt="" coords="448,137,596,163"/>
+<area shape="rect" id="node18" href="$classIO__Files.html#a5ac43f7fe811ca95a419f8ba7a11682e" title="close current testcase file (prematurely) and opem mext one" alt="" coords="458,88,586,113"/>
+<area shape="rect" id="node17" href="$classInputMux.html#a8a79cbe5207cde162fb36133ad9defdd" title="get one line" alt="" coords="259,137,388,163"/>
+<area shape="rect" id="node21" href="$classBif__F12__ELEMENT.html#a8334dc7204bf088137c793bf580390ea" title="overloaded Function::eval_B()" alt="" coords="1363,237,1548,263"/>
+<area shape="rect" id="node22" href="$classDoxy.html#a226cb7889fd26eca46ab7be00cf517eb" title="HTML&#45;print a table with all variables to &#39;page&#39;." alt="" coords="1381,188,1529,213"/>
+<area shape="rect" id="node23" href="$classDoxy.html#ad8abe2e8a1b686a7b35e582c369d41ae" title="generate the entire documentation" alt="" coords="1189,219,1271,244"/>
+<area shape="rect" id="node24" href="$classCommand.html#a834eac0e797a5d1c992018b7d0c049a4" title="]DOXY: create doxygen&#45;like documentation of the current workspace" alt="" coords="922,219,1082,244"/>
+<area shape="rect" id="node26" href="$classXML__Saving__Archive.html#a91f354b394601f7dc6369c6485670e5f" title="write ravel of Value v" alt="" coords="678,247,825,287"/>
+<area shape="rect" id="node28" href="$classValue.html#afe347be3317e5838c2a2f1efce084a47" title="return true iff this value is a simple (i.e. depth 0) scalar." alt="" coords="1375,365,1535,391"/>
+<area shape="rect" id="node29" href="$classBif__OPER1__EACH.html#a27235a66582af39ea624bfb6db1f85b9" title="implementation of eval_LB()" alt="" coords="1151,358,1309,398"/>
+<area shape="rect" id="node35" href="$classPointerCell.html#a1ac1d8ba4a9dda93a748ac91ff47b45f" title="constructor: a cell containing nested sub&#45;array val." alt="" coords="1151,423,1309,448"/>
+<area shape="rect" id="node30" href="$classBif__F12__PARTITION.html#af115071efaa0c6562d4fc738e3da3e4b" title="enclose_with_axes" alt="" coords="925,370,1079,410"/>
+<area shape="rect" id="node33" href="$classBif__OPER1__EACH.html#afd91f92ab4e07e5f7e6ce2fd47935c70" title="Overloaded Function::eval_LB()." alt="" coords="907,435,1097,460"/>
+<area shape="rect" id="node34" href="$classQuad__FIO.html#a24ac2813d6425ad61471166fe019ba33" title="overloaded Function::eval_LXB()." alt="" coords="929,320,1075,345"/>
+<area shape="rect" id="node31" href="$classBif__OPER2__INNER.html#adbaaf10669f72e39cc58d5dcdab6c5fe" title="Overloaded Function::eval_ALRB()." alt="" coords="644,407,859,432"/>
+<area shape="rect" id="node32" href="$classBif__F12__PARTITION.html#a93f7a529d2b49ecb0e1262ee5b3ce893" title="overloaded Function::eval_XB()" alt="" coords="674,342,829,382"/>
+</map>

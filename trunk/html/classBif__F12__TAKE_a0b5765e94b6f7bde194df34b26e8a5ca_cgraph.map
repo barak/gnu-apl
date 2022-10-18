@@ -1,0 +1,5 @@
+<map id="Bif_F12_TAKE::fill" name="Bif_F12_TAKE::fill">
+<area shape="rect" id="node1" title="Fill Z with B, pad as necessary." alt="" coords="5,31,136,56"/>
+<area shape="rect" id="node2" href="$classValue.html#a35a1c313fbca5c1bef209f8d978ef9b6" title="initialize the next ravel cell from another Cell" alt="" coords="188,5,341,31"/>
+<area shape="rect" id="node3" href="$classValue.html#a825bb984c11a131c55729a3af8eeeec5" title="initialize the next ravel cell from the type of another Cell" alt="" coords="184,55,345,80"/>
+</map>

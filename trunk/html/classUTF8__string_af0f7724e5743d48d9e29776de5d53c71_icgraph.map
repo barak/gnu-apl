@@ -1,0 +1,201 @@
+<map id="UTF8_string::c_str" name="UTF8_string::c_str">
+<area shape="rect" id="node2" href="$classWorkspace.html#a32f98466d32d215fd27bbf3ab68facee" title="backup an existing file filename, return true on error " alt="" coords="411,91,625,117"/>
+<area shape="rect" id="node3" href="$classWorkspace.html#a8a4f1d898d523818dbd9d7efa6f2cf92" title="save this workspace " alt="" coords="710,75,863,101"/>
+<area shape="rect" id="node6" href="$classWorkspace.html#a15d8cb5c62016f547b9718e820c94efd" title="dump this workspace " alt="" coords="708,125,865,152"/>
+<area shape="rect" id="node8" href="$classCommand.html#a427a447f00c0b3b928b87b74ebd467ea" title=")DROP: delete a workspace file " alt="" coords="706,395,867,421"/>
+<area shape="rect" id="node9" href="$classCommand.html#a925cc5f77af57e1705b8c96a522e6a55" title="show list of commands " alt="" coords="1215,1523,1373,1549"/>
+<area shape="rect" id="node10" href="$classCommand.html#a9d079b240efe9dfd37038cc2de6828e7" title=")HOST: execute OS command " alt="" coords="194,2576,353,2603"/>
+<area shape="rect" id="node11" href="$classCommand.html#aa0764d08a6ae9c8270907ab7d5dc37cf" title=")IN: import a workspace file " alt="" coords="719,445,855,472"/>
+<area shape="rect" id="node12" href="$classCommand.html#a27d91074be8c72a8876a0d557ceb5333" title="show US keyboard layout " alt="" coords="194,2627,353,2653"/>
+<area shape="rect" id="node13" href="$classCommand.html#ade7fa861e534f953d5439040e78fe433" title="list paths of workspace and wslib directories " alt="" coords="976,851,1127,877"/>
+<area shape="rect" id="node14" href="$classCommand.html#a4afcbbdbee3fd2f536db12651861110b" title=")OUT: export a workspace file " alt="" coords="711,496,862,523"/>
+<area shape="rect" id="node15" href="$classLibPaths.html#a5320980bca540558509c8c6f5afb3f87" title="compute the location of the apl binary " alt="" coords="425,917,611,944"/>
+<area shape="rect" id="node20" href="$main_8cc.html#aa0321421b17def7b58fc0cabc8890260" title="initialize the interpreter " alt="" coords="1765,1145,1827,1172"/>
+<area shape="rect" id="node23" href="$classQuad__JSON.html#a2ed44b39f5d092ab5f7e1768c6b8615a" title="return JSON file (&#45;name in B) converted to APL structured value " alt="" coords="188,2677,359,2704"/>
+<area shape="rect" id="node25" href="$classQuad__XML.html#acda08006d2a9ee1558e6a68adbb8ac59" title="return XML file (&#45;name in B) converted to APL structured value " alt="" coords="192,2728,355,2755"/>
+<area shape="rect" id="node26" href="$classWorkspace.html#a20b0659f2d3987a4bb21d6c399e0a436" title="copy objects from another workspace " alt="" coords="710,699,863,725"/>
+<area shape="rect" id="node29" href="$classQuad__FIO.html#ae90ef97dc252197287179ab112e7446a" title="fork(), execve(), and return a connection to fd 3 of forked process " alt="" coords="196,2829,351,2856"/>
+<area shape="rect" id="node30" href="$classQuad__FIO.html#aeaba4a7f5a55bbab8ad6b7d3d7c932fa" title="overloaded Function::eval_AXB(). " alt="" coords="449,2829,587,2856"/>
+<area shape="rect" id="node33" href="$classDoxy.html#ab9e7e5e50e16cf9b5ecff2ebbf7dd099" title="Constructor: create (and remember) the root directory. " alt="" coords="472,2905,564,2932"/>
+<area shape="rect" id="node34" href="$classNabla.html#a610d94a179335126e82e9eea07918d5a" title="edit this function " alt="" coords="1500,1628,1585,1655"/>
+<area shape="rect" id="node37" href="$classQuad__CR.html#ac60b988ceaf002189a8c60337752048f" title="overloaded Function::eval_AB() " alt="" coords="449,3032,587,3059"/>
+<area shape="rect" id="node40" href="$classQuad__PLOT.html#acc4187c32c3bad52f276a724b226b429" title="overloaded Function::eval_AB() " alt="" coords="1467,3743,1618,3769"/>
+<area shape="rect" id="node41" href="$classQuad__FIO.html#a36fdeb894607c2125307cd673284fb69" title="overloaded Function::eval_AXB(). " alt="" coords="199,3083,347,3109"/>
+<area shape="rect" id="node42" href="$classQuad__ES.html#a4c53438162ec63acf71b2a766c533fae" title="common inplementation for eval_AB() and eval_B() " alt="" coords="1207,3005,1381,3032"/>
+<area shape="rect" id="node43" href="$classTabExpansion.html#a87242c56b4445fadcf7ac9a1181a15ea" title="perform tab expansion for a filename " alt="" coords="974,358,1129,399"/>
+<area shape="rect" id="node47" href="$classTabExpansion.html#a3caac165f0b8c4454d8964fa05a775d3" title="perform tab expansion for a workspace name " alt="" coords="709,177,864,218"/>
+<area shape="rect" id="node48" href="$classDoxy.html#a76067b55e9395dec0889368d1daa6247" title="write the page for one defined function. If the define function is a named lambda, then lambda_owner is the Symbol to which the lambda was assigned. " alt="" coords="447,3323,589,3349"/>
+<area shape="rect" id="node50" href="$classDoxy.html#ad8abe2e8a1b686a7b35e582c369d41ae" title="generate the entire documentation " alt="" coords="1010,3309,1093,3336"/>
+<area shape="rect" id="node52" href="$classIO__Files.html#acc91875b8e0c7a5ad44e3ead0e3dda7b" title="get one line from the current file, open the next file if necceessary " alt="" coords="977,1371,1125,1397"/>
+<area shape="rect" id="node53" href="$classInputMux.html#a8a79cbe5207cde162fb36133ad9defdd" title="get one line " alt="" coords="1229,1472,1359,1499"/>
+<area shape="rect" id="node64" href="$classLibPaths.html#a0da8dd5e9a90282d75239ec86ebb15d4" title="return full path for file name, possibly adding .ext1 or .ext2 " alt="" coords="431,547,605,573"/>
+<area shape="rect" id="node65" href="$classWorkspace.html#a77c7b25908cf2479dc087cc3bcf44dcb" title="load lib_ws into the_workspace, maybe set ⎕LX of the new WS. " alt="" coords="712,749,861,776"/>
+<area shape="rect" id="node67" href="$classCommand.html#af95676cbc57e2564feb00e5166d07512" title="return true if entry is a directory " alt="" coords="195,293,352,320"/>
+<area shape="rect" id="node71" href="$classTabExpansion.html#ab9d75ee0d642d9144a37b3db8d6c5aeb" title="read filenames in dir and append matching filenames to matches " alt="" coords="445,243,591,285"/>
+<area shape="rect" id="node72" href="$classLibPaths.html#ae240dc7e041df568a0cd61ec0270eb2a" title="return true iff directory lib) is present " alt="" coords="447,664,589,691"/>
+<area shape="rect" id="node74" href="$libapl_8cc.html#a0e98e959f9ee5fe7680e32b0a1bd4bab" title="libapl_glfu" alt="" coords="233,3336,313,3363"/>
+<area shape="rect" id="node76" href="$classLineInput.html#a0aae1872575d24398116793e24c33fc0" title="constructor " alt="" coords="205,1093,341,1120"/>
+<area shape="rect" id="node79" href="$classNativeFunction.html#a1a29c2dde6fdafb672e5040e646e3141" title="load shared lib for emacs mode, return error info on failure " alt="" coords="447,969,589,1010"/>
+<area shape="rect" id="node80" href="$classLibPaths.html#a4f885147c87d4a70e0d199cebf5a0aa8" title="maybe warn the user if two files that differ only by extension exist " alt="" coords="196,598,351,639"/>
+<area shape="rect" id="node81" href="$classDoxy.html#ac9842076620bf4fe90f3e80922c5499c" title="write the page for one native function. " alt="" coords="453,3221,583,3248"/>
+<area shape="rect" id="node82" href="$classCommand.html#ae0699916c54054bb56d0dccc46d2b767" title="open directory arg and follow symlinks " alt="" coords="190,344,357,371"/>
+<area shape="rect" id="node83" href="$classNativeFunction.html#ad1a62a0e847dcd7a571b31c0a892c88d" title="open .so file in one of several directories. On success set handle and update so_path. " alt="" coords="200,1027,347,1069"/>
+<area shape="rect" id="node89" href="$classDiffOut.html#ad6b18fc9495445c000ff292b491a2248" title="overloaded filebuf::overflow() " alt="" coords="991,1421,1112,1448"/>
+<area shape="rect" id="node90" href="$classXML__node.html#aaab7a6011fdbbfcff7617a1e3029119e" title="parse an XML start or leaf tag, store result in this&#45;&gt;APL_value On error set MORE_ERROR() and return ..." alt="" coords="199,3387,348,3413"/>
+<area shape="rect" id="node96" href="$libapl_8cc.html#a5a56e200c4fdc0565eaf69860a12941a" title="print_ucs" alt="" coords="236,3437,311,3464"/>
+<area shape="rect" id="node97" href="$structInputFile.html#a68e5c221c42fd0ec4a924d297332fa4e" title="randomize the order of test_file_names " alt="" coords="203,1145,343,1186"/>
+<area shape="rect" id="node102" href="$classPlot__window__properties.html#a7904712c062a280d3698da8270b548bb" title="for e.g. A.pa_width ← 600&quot; set pa_width to 600. Return error string on error. " alt="" coords="193,3489,353,3530"/>
+<area shape="rect" id="node103" href="$classExecutable.html#aab856b7b03ef2bd54010ad032e91aca4" title="compute lines 2 and 3 in error " alt="" coords="699,2837,874,2864"/>
+<area shape="rect" id="node114" href="$classError.html#adf8e47c02b1ae0be1368a0587f7daed4" title="update error information in this and copy it to si " alt="" coords="972,2925,1131,2952"/>
+<area shape="rect" id="node164" href="$classError.html#a1293bdad8906f25b5a0d2697bf9351c4" title="set error line 2, left caret, and right caret " alt="" coords="198,3555,349,3581"/>
+<area shape="rect" id="node165" href="$classUserFunction.html#a8514600d6fec34ed9fdade576d0ad721" title="compute lines 2 and 3 in error " alt="" coords="701,2889,872,2930"/>
+<area shape="rect" id="node167" href="$classQuad__CR.html#a41e8d6f8fcf3ee7403fb0ca697e0e06f" title="overloaded Function::subfun_to_axis() " alt="" coords="185,3032,361,3059"/>
+<area shape="rect" id="node169" href="$classQuad__FIO.html#a3d732007fca1640b4584e0980531f936" title="overloaded Function::subfun_to_axis " alt="" coords="184,3605,363,3632"/>
+<area shape="rect" id="node171" href="$classError.html#a43d09e798cc3a316cfaa2cad291d10c9" title="throw a DEFN ERROR for function fun " alt="" coords="985,1675,1117,1717"/>
+<area shape="rect" id="node173" href="$classError.html#af47d2ce6f771f8d502d4d1cd05d6f81d" title="throw an Error related to Symbol symbol " alt="" coords="204,1794,343,1835"/>
+<area shape="rect" id="node197" href="$classUTF8__string.html#a507460fd4d97100d36765fb89ebdfbc5" title="skip over &lt; ... &gt; and expand &lt; and friends " alt="" coords="194,1371,353,1397"/>
+<area shape="rect" id="node198" href="$classDoxy.html#a896515dce3e139da1676d61a0d2e8f3f" title="write the call graph (if caller == false), or else the caller graph " alt="" coords="196,3235,351,3261"/>
+<area shape="rect" id="node199" href="$classDoxy.html#a91828c64e2f513ea1ad16f70927dbe7f" title="write a fixed CSS file " alt="" coords="215,2931,332,2957"/>
+<area shape="rect" id="node200" href="$classLineInput.html#a274f2cf701dd5f4887a303b610295868" title="destructor " alt="" coords="201,3656,345,3683"/>
+<area shape="rect" id="node4" href="$classCommand.html#ad61e749290966d00856ce1dd4f6abe42" title=")SAVE active WS as CONTINUE and )OFF " alt="" coords="955,24,1148,51"/>
+<area shape="rect" id="node5" href="$classCommand.html#ab17fe02c2ece3341b2ea51fee69f0cfd" title=")SAVE: save a workspace file (.xml) " alt="" coords="972,75,1131,101"/>
+<area shape="rect" id="node7" href="$classCommand.html#a4452851fc718555cd4cdc7c2a146ccbb" title=")DUMP: dump a workspace file (.apl) " alt="" coords="970,125,1133,152"/>
+<area shape="rect" id="node16" href="$classLibPaths.html#a38284f405676e112eda549c3114343d1" title="return source that configured this entry " alt="" coords="712,851,861,877"/>
+<area shape="rect" id="node17" href="$classLibPaths.html#af75b13427d048d7e91b94c45c9bb0875" title="initialize library paths based on the location of the APL binary " alt="" coords="737,952,836,979"/>
+<area shape="rect" id="node18" href="$python__apl_8cc.html#aee295305833e734a4c4874e6244c5241" title="initialize " alt="" coords="1025,968,1078,995"/>
+<area shape="rect" id="node19" href="$python__apl_8cc.html#ae849a1ba58af8d9a9e7afea1d4a690bd" title="do_init" alt="" coords="1264,1052,1324,1079"/>
+<area shape="rect" id="node21" href="$main_8cc.html#ac0f2228420376f4db7e1274f2b41667c" title="dito. " alt="" coords="2022,1265,2073,1292"/>
+<area shape="rect" id="node22" href="$classBacktrace.html#aec4c7866f70a4cd3c4c0883b6729c507" title="open file apl.lines " alt="" coords="2203,1265,2377,1292"/>
+<area shape="rect" id="node24" href="$classQuad__JSON.html#a3adb4fba903343bf38b0c3a1dd10feb8" title="overloaded Function::eval_B() " alt="" coords="441,2677,595,2704"/>
+<area shape="rect" id="node27" href="$classCommand.html#af7f6672b5e942553710d19388a22ae8c" title=")COPY: copy a workspace file " alt="" coords="971,648,1131,675"/>
+<area shape="rect" id="node28" href="$classCommand.html#a2f7425e3673258dfb78045919e82f69f" title=")COPY_ONCE: copy a workspace file, nut at most once " alt="" coords="948,699,1155,725"/>
+<area shape="rect" id="node31" href="$classQuad__FIO.html#a24ac2813d6425ad61471166fe019ba33" title="overloaded Function::eval_LXB(). " alt="" coords="713,3107,860,3133"/>
+<area shape="rect" id="node32" href="$classQuad__FIO.html#a8b7be28798cb9bfe3e59de4e5f692167" title="overloaded Function::get_oper_valence(). " alt="" coords="981,3107,1121,3149"/>
+<area shape="rect" id="node35" href="$classNabla.html#a5571a862b4a619a9c6404dcb7fcf385f" title="edit the function specified in cmd (e.g. cmd = &quot;∇FUN&quot;) " alt="" coords="1978,1425,2117,1452"/>
+<area shape="rect" id="node36" href="$classCommand.html#ae26693534d4df16372f51e55e505b8d7" title="process line which contains a command or statements " alt="" coords="2209,1451,2371,1477"/>
+<area shape="rect" id="node38" href="$classQuad__CR.html#a4a7057e997df3f1607b2e003ef7279f6" title="overloaded Function::eval_XB() " alt="" coords="718,3157,855,3184"/>
+<area shape="rect" id="node39" href="$classQuad__CR.html#a636bff25ad9c9bf3148b3c9a700b905f" title="Constructor. " alt="" coords="713,3208,860,3235"/>
+<area shape="rect" id="node44" href="$classTabExpansion.html#ad99a9df8a0a9ba9ad03f75e654de0bd4" title="perform tab expansion for command arguments " alt="" coords="1217,358,1371,399"/>
+<area shape="rect" id="node45" href="$classTabExpansion.html#a155d53238b8490e82776eb2caddefceb" title="tab&#45;expand an APL command " alt="" coords="1465,358,1620,399"/>
+<area shape="rect" id="node46" href="$classTabExpansion.html#ad8c4300a7d2e9aa47e6c3a1d19285db7" title="perform tab expansion " alt="" coords="1706,365,1886,392"/>
+<area shape="rect" id="node49" href="$classDoxy.html#af9ca0f4064c30a802fa110c53d42c37b" title="HTML&#45;print a table containing all defined functions to page. " alt="" coords="712,3309,861,3336"/>
+<area shape="rect" id="node51" href="$classCommand.html#a834eac0e797a5d1c992018b7d0c049a4" title="]DOXY: create doxygen&#45;like documentation of the current workspace " alt="" coords="1214,3309,1374,3336"/>
+<area shape="rect" id="node54" href="$classQuad__INP.html#ac137efd86abe0a8f7b6082f01165de32" title="overloaded Function::eval_XB(). " alt="" coords="1473,1917,1613,1944"/>
+<area shape="rect" id="node55" href="$classQuad__QUOTE.html#a3306dffadf270cb0b3f377ffaca8d269" title="overloaded Symbol::get_apl_value(). " alt="" coords="1464,1487,1621,1529"/>
+<area shape="rect" id="node56" href="$classCommand.html#ad5c9241b1bb935841fe3c0d81546b7b3" title="process a single line entered by the user (in immediate execution mode) " alt="" coords="1461,1343,1624,1369"/>
+<area shape="rect" id="node62" href="$classQuad__INP.html#a0a38d500683e36b13e0d848249837d97" title="read raw_lines from stdin or file, stop at end_marker " alt="" coords="1461,1436,1624,1463"/>
+<area shape="rect" id="node63" href="$classQuad__Quad.html#a253824f3a533bef36063138ea6ce0673" title="overloaded Symbol::resolve(). " alt="" coords="1977,1683,2118,1709"/>
+<area shape="rect" id="node57" href="$libapl_8cc.html#a21fc974e185362476138f34ac9be87ad" title="apl_exec" alt="" coords="1759,1375,1833,1401"/>
+<area shape="rect" id="node58" href="$libapl_8cc.html#afc86cfcf9cbfa83c83e97dac92b777b0" title="apl_exec_ucs" alt="" coords="1745,1207,1847,1233"/>
+<area shape="rect" id="node59" href="$classCommand.html#a879617e7645bea2e4052154f16999634" title="finish the current SI&#45;&gt;top() and pop it when done " alt="" coords="1711,1476,1881,1503"/>
+<area shape="rect" id="node61" href="$classWorkspace.html#a8c147249a197f0d605f7cfc535969c92" title="create and execute one immediate execution context " alt="" coords="1718,1258,1874,1299"/>
+<area shape="rect" id="node60" href="$classCommand.html#af36741357bfd4e183b34ee8b747bc7c5" title="process line which contains APL statements " alt="" coords="1944,1476,2151,1503"/>
+<area shape="rect" id="node66" href="$classCommand.html#a6f873ead3eb848fbec9037a01c5cc58b" title=")LOAD: load a workspace file " alt="" coords="972,749,1131,776"/>
+<area shape="rect" id="node68" href="$classCommand.html#aeb8671f785d828bbfac0d9b9ff46437d" title="list library: common helper " alt="" coords="438,327,598,353"/>
+<area shape="rect" id="node69" href="$classCommand.html#ae2c14c874844701377a0e716021229c7" title="list content of workspace and wslib directories: )LIB [N] " alt="" coords="712,344,861,371"/>
+<area shape="rect" id="node70" href="$classCommand.html#a7d3c3284d54674356d89f268949109c6" title="list content of workspace and wslib directories: ]LIB [N] " alt="" coords="712,293,861,320"/>
+<area shape="rect" id="node73" href="$classLibPaths.html#ac148131bcc9dc69d298ed62b866bdcd5" title="return directory containing (file or directory) workspaces and wslib1 " alt="" coords="697,800,877,827"/>
+<area shape="rect" id="node75" href="$libapl_8cc.html#a1660b6a4c9503b7fb9ae0b5e49bb4ad5" title="install_get_line_from\l_user_cb" alt="" coords="447,3374,589,3415"/>
+<area shape="rect" id="node77" href="$classLineInput.html#a82f2182e4096c10a3d78f2506a35213b" title="initialize the input subsystem " alt="" coords="737,1104,837,1131"/>
+<area shape="rect" id="node78" href="$python__apl_8cc.html#a92c32fcaffa2fb0062c5f3bfbfc5bd52" title="initialize subsystems that depend on argv[] " alt="" coords="1025,1136,1078,1163"/>
+<area shape="rect" id="node84" href="$classNativeFunction.html#a2d409bb7a5a9ac2b815f1450bc428cc0" title="constructor (only fix() may call it) " alt="" coords="415,1035,621,1061"/>
+<area shape="rect" id="node85" href="$classNativeFunction.html#a07ab61a74e4a64f38424a2bbd0c6b38b" title="⎕FX a native funtion from a shared library (dlopen) handle " alt="" coords="721,1053,853,1080"/>
+<area shape="rect" id="node86" href="$classQuad__FX.html#a947e9f6703c642fd112cda058ef2c2d1" title="⎕FX with native function and optional library reference " alt="" coords="969,1085,1134,1112"/>
+<area shape="rect" id="node87" href="$classNativeFunction.html#aa3c7c980f71b2b498067dd31b969b4f0" title="return true if the .so library was successfully loaded " alt="" coords="987,1305,1115,1346"/>
+<area shape="rect" id="node88" href="$classXML__Loading__Archive.html#a2e7aed9883aa106937d3d9313163e10b" title="read next Function element " alt="" coords="975,1019,1127,1061"/>
+<area shape="rect" id="node91" href="$classXML__node.html#ad740e8b2a306d73e260482af9be89192" title="append garbage to this garbage can (for later deletion) " alt="" coords="451,3473,585,3500"/>
+<area shape="rect" id="node92" href="$classXML__node.html#ac15dcafb582e4d7595ee24d28a5f0f21" title="reduce nodes starting at start, return true on error " alt="" coords="715,3411,858,3437"/>
+<area shape="rect" id="node94" href="$classXML__node.html#af7768a8292eebe36599f6d958dde6731" title="collect nodes starting at anchor, return true on error " alt="" coords="986,3473,1117,3500"/>
+<area shape="rect" id="node95" href="$classXML__node.html#ae6f77f0b4ebb0311ee13abdc69d696f0" title="merge the items from start(&#45;tag) to (end(&#45;tag) into start tag " alt="" coords="703,3536,870,3563"/>
+<area shape="rect" id="node93" href="$classQuad__XML.html#a8e4ca50c2d54d630895c22115857325e" title="convert XML string to APL associative array " alt="" coords="1208,3447,1380,3473"/>
+<area shape="rect" id="node98" href="$structInputFile.html#a0f449701206a5127e239886ea3591f57" title="return true if this file as an oject filter (from )COPY file names...) " alt="" coords="447,1254,589,1295"/>
+<area shape="rect" id="node100" href="$structUserPreferences.html#afbb29191d4c126b0f767f92eb427d568" title="parse command line parameters (AFTER reading preference files) " alt="" coords="438,1137,598,1178"/>
+<area shape="rect" id="node99" href="$classIO__Files.html#a9cd4e5d7e3467ff6ad303dc1063e5004" title="read one line from the current input file with CR and LF removed " alt="" coords="709,1371,864,1397"/>
+<area shape="rect" id="node101" href="$structUserPreferences.html#aaf377cc53e470138ca91e289dd3f93a6" title="UserPreferences::UserPreferences" alt="" coords="673,1205,900,1232"/>
+<area shape="rect" id="node104" href="$classExecutable.html#ab64b98a2d81eb92dac0038e08a0dcfa0" title="adjust line starts before calling Parser::remove_void_token(body) " alt="" coords="986,2551,1117,2593"/>
+<area shape="rect" id="node105" href="$classExecutable.html#a70a75e5fb01bef90215dc8cd4dfd9d75" title="extract all lambda expressions from body and store them in lambdas " alt="" coords="1203,2391,1385,2417"/>
+<area shape="rect" id="node106" href="$classExecuteList.html#a6f8688070be985996a46dad98ee3d2f9" title="compute body token from text data " alt="" coords="1486,2048,1599,2075"/>
+<area shape="rect" id="node110" href="$classStatementList.html#a20b0b6ca4bd952856e75bdecc7fc110a" title="compute body token from text data " alt="" coords="1480,1683,1605,1709"/>
+<area shape="rect" id="node111" href="$classExecutable.html#a9313b673c82a383c9c5b1a853a80bf58" title="say where this SI entry was allocated " alt="" coords="1474,2401,1611,2428"/>
+<area shape="rect" id="node112" href="$classUserFunction.html#a1aa032e76cb608c07de66ac13d41809b" title="recompile the body " alt="" coords="1455,2452,1630,2479"/>
+<area shape="rect" id="node113" href="$classUserFunction.html#a78bee7603d9d21f0dc4e2101505937d4" title="constructor for a lambda " alt="" coords="1449,2351,1636,2377"/>
+<area shape="rect" id="node107" href="$classQuad__EC.html#a856174e390a934b63bc19affe232937e" title="overloaded Function::eval_B(). " alt="" coords="1733,2048,1859,2075"/>
+<area shape="rect" id="node108" href="$classBif__F1__EXECUTE.html#aefdd09df4262f08f508f9be8543896b7" title="execute string containing an APL expression or an APL command " alt="" coords="1703,1779,1889,1821"/>
+<area shape="rect" id="node109" href="$classXML__Loading__Archive.html#a5085841ad5dd83bd88588db76c3a2838" title="read ⍎ Executable " alt="" coords="1720,2099,1872,2141"/>
+<area shape="rect" id="node115" href="$classError.html#abe0b8d1e092e62ed9f68f3b38a93694d" title="set the source code line where a parse error was thrown " alt="" coords="1223,1963,1365,1989"/>
+<area shape="rect" id="node116" href="$Error__macros_8hh.html#a1bf60365b9809c784438b78f71284633" title="throw an Error with code only (typically a standard APL error) " alt="" coords="1239,2955,1349,2981"/>
+<area shape="rect" id="node117" href="$classSymbol.html#aef255b023c09e835233c3af3fe0b51e1" title="Assign value to this Symbol (which is a shared variable) " alt="" coords="1463,2569,1622,2610"/>
+<area shape="rect" id="node123" href="$classShape.html#a6a9b28acc8c962efe80c31b3a4e8f3f3" title="throw an APL error if this shape differs from shape B " alt="" coords="1472,2635,1613,2661"/>
+<area shape="rect" id="node126" href="$classBif__REDUCE.html#a74ec7563f72cc91111801a73284c6373" title="common implementation of reduce() and reduce_n_wise. " alt="" coords="1457,3473,1628,3500"/>
+<area shape="rect" id="node129" href="$classBif__OPER2__INNER.html#adbaaf10669f72e39cc58d5dcdab6c5fe" title="Overloaded Function::eval_ALRB(). " alt="" coords="1940,3659,2155,3685"/>
+<area shape="rect" id="node133" href="$classBif__F12__ROLL.html#afe59b85a350624fff7937205cb603307" title="dial A from B. overloaded Function::eval_AB(). " alt="" coords="1460,3068,1625,3095"/>
+<area shape="rect" id="node134" href="$classBif__OPER2__OUTER.html#a2e9a34f12130439dd28c6d528ffadbc3" title="Overloaded Function::eval_ALRB(). " alt="" coords="1433,3119,1652,3145"/>
+<area shape="rect" id="node135" href="$classScalarFunction.html#aa8c567527713578fb2c1eac26d00843f" title="Evaluate a scalar function dyadically. " alt="" coords="1472,3002,1613,3043"/>
+<area shape="rect" id="node152" href="$classScalarFunction.html#a6f542f78d8c0f36e2c6f6e6f28fec2af" title="Evaluate a scalar function monadically. " alt="" coords="1472,3525,1613,3566"/>
+<area shape="rect" id="node153" href="$classBif__F1__EXECUTE.html#a8445cd77207db38ab66f5c3278a831df" title="execute string containing an APL command " alt="" coords="1450,2937,1635,2978"/>
+<area shape="rect" id="node154" href="$classValue.html#a1120641bea23235f2525146e6f5f48df" title="init the ravel of an APL value, return the ravel length " alt="" coords="1485,3641,1600,3668"/>
+<area shape="rect" id="node155" href="$classUserFunction.html#ab642f0280320a5cdccb8c40c812b3f25" title="Load this function into the workspace named workspace. " alt="" coords="1477,3692,1609,3719"/>
+<area shape="rect" id="node156" href="$classSymbol.html#a9d96454a43766cfd42ec1b899f12de99" title="resolve a variable name for an assignment " alt="" coords="1476,2885,1609,2912"/>
+<area shape="rect" id="node157" href="$classSymbol.html#aa0dca7ac8099794adada168657747776" title="set token according to the current NC/sym_val of this shared var " alt="" coords="1461,2503,1624,2545"/>
+<area shape="rect" id="node162" href="$classPrefix.html#a60f0ca34b6c8b96944d326f8733133d1" title="throw an E_LEFT_SYNTAX_ERROR or an E_SYNTAX_ERROR " alt="" coords="1475,2736,1611,2763"/>
+<area shape="rect" id="node118" href="$classSymbol.html#a739f019bbd3b466914ac56f3437496db" title="Assign value to this Symbol. " alt="" coords="1740,2351,1852,2377"/>
+<area shape="rect" id="node119" href="$classQuad__FC.html#a57ec0637b3d519da4a9537d9cf593129" title="overloaded Symbol::assign_indexed(). " alt="" coords="1959,2567,2135,2593"/>
+<area shape="rect" id="node120" href="$classQuad__PW.html#a84cf3d5027ed9672b5aba090181f923e" title="Push an undefined entry onto the stack of this Symbol. " alt="" coords="1988,2115,2107,2141"/>
+<area shape="rect" id="node121" href="$classSymbol.html#a8eb0881471fcf614e9b4d9bd0a4a721b" title="share variable with proc " alt="" coords="1982,2325,2113,2352"/>
+<area shape="rect" id="node122" href="$classQuad__SVO.html#a92d931679e0b1836d24e1cc1ab60ed02" title="Overloaded Function::eval_AB(). " alt="" coords="2217,2325,2363,2352"/>
+<area shape="rect" id="node124" href="$classShape.html#a8c7b0e80bbaad57b5ac6a1418487c500" title="return ⌽ × ⍴ ⌽ this " alt="" coords="1727,2452,1865,2479"/>
+<area shape="rect" id="node125" href="$classBif__COMMA.html#a284b9c9c294add93f329950870949ef4" title="Laminate A and B. " alt="" coords="1719,2401,1873,2428"/>
+<area shape="rect" id="node127" href="$classBif__REDUCE.html#abc7103a727c123bdde6a44344e6bf68e" title="Constructor. " alt="" coords="1700,3583,1892,3609"/>
+<area shape="rect" id="node128" href="$classBif__REDUCE.html#ac3430120da57197d5099b5ccabf1004c" title="LO&#45;reduce B along axis. " alt="" coords="1721,3633,1871,3660"/>
+<area shape="rect" id="node131" href="$classBif__REDUCE.html#a450260486cb0a169a1f13602cae9ab97" title="LO&#45;reduce B n&#45;wise along axis. " alt="" coords="1721,3466,1871,3507"/>
+<area shape="rect" id="node132" href="$classBif__SCAN.html#a796038c05f7946ae72143ef64c773a1f" title="Compute the LO&#45;scan of B. " alt="" coords="1737,3532,1855,3559"/>
+<area shape="rect" id="node130" href="$classBif__OPER2__INNER.html#af0437dd86d98ef9412317252127cb86f" title="Constructor. " alt="" coords="2208,3651,2372,3693"/>
+<area shape="rect" id="node136" href="$classBif__F12__BINOM.html#a779da85c5d212c67e29585bd0df56891" title="overloaded Function::eval_AB(). " alt="" coords="1709,2655,1883,2681"/>
+<area shape="rect" id="node137" href="$classBif__F2__LESS.html#a58506ea2a176d8f282f31ccf95b59517" title="overloaded Function::eval_AB(). " alt="" coords="1717,2705,1875,2732"/>
+<area shape="rect" id="node138" href="$classBif__F2__EQUAL.html#a6736ce332581d9bc8c4c2ddd0ba4e8fc" title="overloaded Function::eval_AB(). " alt="" coords="1711,2756,1881,2783"/>
+<area shape="rect" id="node139" href="$classBif__F2__EQUAL__B.html#a6ca998969a9d51ad79afe74ec4c8705b" title="overloaded Function::eval_AB(). " alt="" coords="1703,2807,1889,2833"/>
+<area shape="rect" id="node140" href="$classBif__F2__UNEQ__B.html#a29cbf3223dd94bf614ba9281bfcbe0d7" title="overloaded Function::eval_AB(). " alt="" coords="1707,2857,1885,2884"/>
+<area shape="rect" id="node141" href="$classBif__F2__GREATER.html#a04cac547cfea1d9b78d0092dfc02cd7f" title="overloaded Function::eval_AB(). " alt="" coords="1701,2908,1891,2935"/>
+<area shape="rect" id="node142" href="$classBif__F2__AND.html#ab7c0e341131d8efda503d6004e06b937" title="overloaded Function::eval_AB(). " alt="" coords="1719,2959,1873,2985"/>
+<area shape="rect" id="node143" href="$classBif__F2__AND__B.html#a2a2fa9032e550484a35574d32e99c930" title="overloaded Function::eval_AB(). " alt="" coords="1711,3009,1881,3036"/>
+<area shape="rect" id="node144" href="$classBif__F2__OR.html#a3c8f98bc174001f08dcb1a040944ee23" title="overloaded Function::eval_AB(). " alt="" coords="1724,3060,1868,3087"/>
+<area shape="rect" id="node145" href="$classBif__F2__OR__B.html#a9435ad23b29955918cac355488160c09" title="overloaded Function::eval_AB(). " alt="" coords="1716,3111,1876,3137"/>
+<area shape="rect" id="node146" href="$classBif__F2__LEQU.html#a2313b85abb6f1d7c43691c3463d7bf25" title="overloaded Function::eval_AB(). " alt="" coords="1716,3161,1876,3188"/>
+<area shape="rect" id="node147" href="$classBif__F2__MEQU.html#ad21bc3f57642671ed5d0016f0a5c7ad0" title="overloaded Function::eval_AB(). " alt="" coords="1714,3212,1878,3239"/>
+<area shape="rect" id="node148" href="$classBif__F2__UNEQU.html#a57a2d80a782cf7d221afe07ee27cc32f" title="overloaded Function::eval_AB(). " alt="" coords="1709,3263,1883,3289"/>
+<area shape="rect" id="node149" href="$classBif__F2__NOR.html#ae7168c3c28e7ce560dbbd8f48ea45e2e" title="overloaded Function::eval_AB(). " alt="" coords="1719,3313,1873,3340"/>
+<area shape="rect" id="node150" href="$classBif__F2__NOR__B.html#a942a34a35440e437647308f438bddd81" title="overloaded Function::eval_AB(). " alt="" coords="1711,3364,1881,3391"/>
+<area shape="rect" id="node151" href="$classBif__F2__NAND.html#a2d32df816a11487483bffa2325a5617f" title="overloaded Function::eval_AB(). " alt="" coords="1715,3415,1877,3441"/>
+<area shape="rect" id="node158" href="$classSymbol.html#a72a3e4ed8ddafaaf215806962e017380" title="set token according to the current NC/sym_val of this Symbol " alt="" coords="1738,1997,1854,2024"/>
+<area shape="rect" id="node159" href="$libapl_8cc.html#a28bbafb7ff627b2b2e10d1ca985fb3cb" title="get_function_ucs" alt="" coords="1987,1997,2108,2024"/>
+<area shape="rect" id="node160" href="$classPrefix.html#a5478ff7d771d95a161c8ee393d50d7b1" title="execute one context (user defined function or operator, execute, or immediate execution) ..." alt="" coords="1960,2415,2135,2441"/>
+<area shape="rect" id="node161" href="$classStateIndicator.html#aa99bc8ce846dfd1f09c0ca2f250d940e" title="execute token in body... " alt="" coords="2225,2415,2355,2441"/>
+<area shape="rect" id="node163" href="$classPrefix.html#a7d2419d61a50e62c132a60306c28b829" title="reduce phrase RETC " alt="" coords="1712,2503,1880,2529"/>
+<area shape="rect" id="node166" href="$classUserFunction.html#afcfbceabaaaa2977561464a72a56f505" title="overloaded Executable::get_sym_Z() " alt="" coords="1207,2711,1381,2737"/>
+<area shape="rect" id="node168" href="$classQuad__CR.html#a0ca74c37998bbfa946eca5cd880529e3" title="overloaded Function::has_subfuns() " alt="" coords="437,3083,599,3109"/>
+<area shape="rect" id="node170" href="$classQuad__FIO.html#a3dc0a75f1c51fff9a619e5722237352d" title="overloaded Function::has_subfuns() " alt="" coords="436,3605,600,3632"/>
+<area shape="rect" id="node172" href="$classNabla.html#ac91b5998dce85ca10ace4dd1e1d805e0" title="throw a DEFN error with some additional information " alt="" coords="1215,1655,1373,1681"/>
+<area shape="rect" id="node174" href="$classQuad__SVC.html#a5b0103a375525734c11f8fb93f3fb84a" title="Overloaded Function::eval_AB(). " alt="" coords="445,1776,591,1803"/>
+<area shape="rect" id="node175" href="$classQuad__AT.html#a448f15072466e3d72daa9bed9e739c29" title="overloaded Function::eval_AB(). " alt="" coords="451,1877,585,1904"/>
+<area shape="rect" id="node176" href="$classQuad__SVC.html#a71be219cdc82f2922f94f02b7aab09f8" title="Overloaded Function::eval_AB(). " alt="" coords="450,2272,586,2299"/>
+<area shape="rect" id="node177" href="$classQuad__SVS.html#a2d81f92913a3709bccfb3b42240d81e3" title="Overloaded Function::eval_AB(). " alt="" coords="451,1725,585,1752"/>
+<area shape="rect" id="node178" href="$classSymbol.html#a8f6dd744b09b0629eca34fc2231bf2a9" title="return the current APL value (or throw a VALUE_ERROR) " alt="" coords="441,2221,595,2248"/>
+<area shape="rect" id="node179" href="$classSymbol.html#a09c284745e26103acf5aee747f464b7a" title="Indexed (one&#45;dimensional) assign value to this Symbol. " alt="" coords="705,2080,869,2107"/>
+<area shape="rect" id="node180" href="$classQuad__FC.html#a2b4b1ea967c2388a23de30668c3c562b" title="return the current format control (used by Workspace::get_FC()) " alt="" coords="723,2197,850,2224"/>
+<area shape="rect" id="node181" href="$classQuad__PR.html#a558f71d48d90bc8ffa898e7a9d0a017f" title="Return the current prompt replacement, aka. ⎕PR. " alt="" coords="723,2248,850,2275"/>
+<area shape="rect" id="node182" href="$classQuad__CR.html#ad98ce37f2b329eb37ddae9d0fcf7832f" title="10 ⎕CR symbol_name (variable or function name). Also used for )OUT " alt="" coords="715,2299,858,2325"/>
+<area shape="rect" id="node183" href="$classQuad__Quad.html#a12265cc43565f0afe8b1168ff50d2ffd" title="return the current APL value (or throw a VALUE_ERROR) " alt="" coords="716,2350,857,2391"/>
+<area shape="rect" id="node184" href="$classSystemVariable.html#aab4fab0cb66063a3f649c73962d72144" title="overloaded Symbol::get_attributes(). " alt="" coords="717,2131,857,2173"/>
+<area shape="rect" id="node186" href="$classQuad__TZ.html#af1018fdc6242f9ec1ee3348e47a0f646" title="Pop latest entry from the stack of this Symbol. " alt="" coords="734,2416,839,2443"/>
+<area shape="rect" id="node187" href="$classQuad__EM.html#a010db5a741fff9217f6719dd5633b835" title="Constructor. " alt="" coords="713,2467,860,2493"/>
+<area shape="rect" id="node188" href="$classQuad__ET.html#a82fcbe2b69a5889f6c54e968770466fe" title="Constructor. " alt="" coords="717,2517,857,2544"/>
+<area shape="rect" id="node189" href="$classQuad__SYL.html#a55b0ee3eee281c657bbb2ea34ba67d84" title="Constructor. " alt="" coords="709,2568,865,2595"/>
+<area shape="rect" id="node190" href="$classRO__SystemVariable.html#ae4b3c5ab0a0617fad99bcc03e4040b31" title="overloaded Symbol::resolve(). Since push(), pop(), and assign() do nothing, we can call get_apl_value..." alt="" coords="712,2619,861,2661"/>
+<area shape="rect" id="node191" href="$classQuad__L.html#a364aa588473a7ed32c23177566d7f029" title="overloaded Symbol::save() " alt="" coords="735,2685,838,2712"/>
+<area shape="rect" id="node192" href="$classQuad__R.html#a05aecddaec96707d6e26f7acc003636c" title="overloaded Symbol::save() " alt="" coords="733,1877,840,1904"/>
+<area shape="rect" id="node193" href="$classQuad__X.html#a8c93ca6758ccef48b94a3e83827a2385" title="overloaded Symbol::save() " alt="" coords="734,1928,839,1955"/>
+<area shape="rect" id="node194" href="$classQuad__TF.html#aad2b15f3268d7098d75babcd03e5c762" title="return B in transfer format 2 (new APL2 format) " alt="" coords="737,2029,836,2056"/>
+<area shape="rect" id="node196" href="$classQuad__TF.html#a690180778642f09f9471a909fd6dd633" title="return B in transfer format 3 (APL2 CDR format) " alt="" coords="737,1979,836,2005"/>
+<area shape="rect" id="node185" href="$classSystemVariable.html#adfd61017d46f4b022af485637a768c76" title="return the TokenTag for this system variable " alt="" coords="981,2131,1121,2173"/>
+<area shape="rect" id="node195" href="$classQuad__TF.html#a27ed4b02d5f1a1c8a8b0a1fcbe2756f8" title="Overloaded Function::eval_AB(). " alt="" coords="985,2004,1118,2031"/>
+</map>

@@ -1,0 +1,21 @@
+<map id="Value::compute_depth" name="Value::compute_depth">
+<area shape="rect" id="node1" title="compute the depth of this value." alt="" coords="1501,79,1653,104"/>
+<area shape="rect" id="node2" href="$classValue.html#a926a6bd11f4d27c077c19bbb03c333cf" title="list a value" alt="" coords="1323,29,1431,55"/>
+<area shape="rect" id="node4" href="$classValue.html#aba71d1729c23c4569be131aa921972d6" title="print the properties (shape, flags etc) of this value" alt="" coords="1301,79,1453,104"/>
+<area shape="rect" id="node8" href="$classValue.html#a913cbd7a14e7333d56818d1272f717e3" title="print address, shape, and flags of this value" alt="" coords="1304,128,1451,153"/>
+<area shape="rect" id="node3" href="$classValue.html#a38979fd196c826557e1614fa0514bbaa" title="erase stale values" alt="" coords="1112,29,1243,55"/>
+<area shape="rect" id="node5" href="$classSymbol.html#a88ce92302e3a54792fa677cbc3d96fb9" title="Print this Symbol and its stack to out." alt="" coords="1101,79,1253,104"/>
+<area shape="rect" id="node6" href="$classSymbolTable.html#a9bacf3be9c6c2145a68d891c42076cf2" title="List details of single symbol in buf." alt="" coords="881,79,1053,104"/>
+<area shape="rect" id="node7" href="$classWorkspace.html#a47e76e3abe40a5240a3a230fab2cdedd" title="list all symbols with names in buf" alt="" coords="657,79,820,104"/>
+<area shape="rect" id="node9" href="$classValue.html#a82fd0d84f4c7f0b22a6b035e0201506a" title="print info related to a stale value" alt="" coords="1102,128,1253,153"/>
+<area shape="rect" id="node10" href="$classValue.html#a80c3e1a7208f4f97985e5c742ec93b2d" title="print stale Values, and return the number of stale Values." alt="" coords="906,128,1029,153"/>
+<area shape="rect" id="node11" href="$classCommand.html#af5d73db57801b2363c954b402f19186d" title="check workspace integrity (stale Value and IndexExpr objects, etc)" alt="" coords="653,128,824,153"/>
+<area shape="rect" id="node16" href="$classIO__Files.html#aa05a2917c11a88b9abfc4afa6ca04a3e" title="dito (close files, print errors, summary etc)." alt="" coords="644,181,833,207"/>
+<area shape="rect" id="node12" href="$classXML__Saving__Archive.html#acc327395cab545ea7797d92f5c931cab" title="write entire workspace" alt="" coords="449,117,595,157"/>
+<area shape="rect" id="node13" href="$classWorkspace.html#a8a4f1d898d523818dbd9d7efa6f2cf92" title="save this workspace" alt="" coords="247,124,400,149"/>
+<area shape="rect" id="node14" href="$classCommand.html#ad61e749290966d00856ce1dd4f6abe42" title=")SAVE active WS as CONTINUE and )OFF" alt="" coords="5,100,199,125"/>
+<area shape="rect" id="node15" href="$classCommand.html#aec0c4c6efbb9df9a34220b510f58905a" title=")SAVE: save a workspace file (.xml)" alt="" coords="23,149,181,175"/>
+<area shape="rect" id="node17" href="$classIO__Files.html#acc91875b8e0c7a5ad44e3ead0e3dda7b" title="get one line from the current file, open the next file if necceessary" alt="" coords="448,181,596,207"/>
+<area shape="rect" id="node19" href="$classIO__Files.html#a5ac43f7fe811ca95a419f8ba7a11682e" title="close current testcase file (prematurely) and opem mext one" alt="" coords="458,231,586,256"/>
+<area shape="rect" id="node18" href="$classInputMux.html#a8a79cbe5207cde162fb36133ad9defdd" title="get one line" alt="" coords="259,181,388,207"/>
+</map>

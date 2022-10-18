@@ -1,0 +1,11 @@
+<map id="UserFunction::transform_multi_line_strings_3" name="UserFunction::transform_multi_line_strings_3">
+<area shape="rect" id="node1" title="transform a function body containing (new&#45;style) multi&#45;lines into a standard function body" alt="" coords="5,149,168,189"/>
+<area shape="rect" id="node2" href="$classExecutable.html#a429ff2c5769035309f5c2427cb82ec86" title="clear the text of line n (0 = header line)" alt="" coords="227,5,379,31"/>
+<area shape="rect" id="node3" href="$classUCS__string.html#afd4c5d6cd5482ce0979527de1f3699b5" title="the inverse of un_escape()." alt="" coords="222,55,383,80"/>
+<area shape="rect" id="node5" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="446,105,569,131"/>
+<area shape="rect" id="node6" href="$classUCS__string.html#a03aed5b59ab15793af300f63abf20de6" title="return true if this ends with suffix (ASCII, case matters)." alt="" coords="224,156,381,181"/>
+<area shape="rect" id="node7" href="$classExecutable.html#a3ecfb113708ab2c4590d0714280897ea" title="return function line n (0 = header line)" alt="" coords="231,205,374,231"/>
+<area shape="rect" id="node8" href="$classExecutable.html#aaa630db77581506910d16126a4eb3bc5" title="return number of function lines (including header line 0)" alt="" coords="216,255,389,280"/>
+<area shape="rect" id="node9" href="$classExecutable.html#ab9016100326b2860bf482e9d325d4bb3" title="set the text of line n (0 = header line)" alt="" coords="231,304,374,329"/>
+<area shape="rect" id="node4" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="437,55,577,80"/>
+</map>

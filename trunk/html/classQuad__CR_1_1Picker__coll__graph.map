@@ -1,3 +1,5 @@
 <map id="Quad_CR::Picker" name="Quad_CR::Picker">
-<area shape="rect" id="node2" href="$classUCS__string.html" title="A string of Unicode characters (32&#45;bit) " alt="" coords="23,96,114,123"/>
+<area shape="rect" id="node1" title="the left argument of Pick (⊃) which selects a sub&#45;item of a variable being constructed" alt="" coords="6,183,131,208"/>
+<area shape="rect" id="node2" href="$classUCS__string.html" title="A string of Unicode characters (32&#45;bit)" alt="" coords="23,95,114,120"/>
+<area shape="rect" id="node3" title=" " alt="" coords="5,5,132,45"/>
 </map>

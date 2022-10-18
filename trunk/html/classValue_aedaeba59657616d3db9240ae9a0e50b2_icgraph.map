@@ -1,0 +1,6 @@
+<map id="Value::next_ravel_Byte" name="Value::next_ravel_Byte">
+<area shape="rect" id="node2" href="$classXML__Loading__Archive.html#a3c747929c263a6913ea01f833ce2a9f0" title="read one or more Cell(s) from input into the ravel of Z; return the UTF8 * after the cells..." alt="" coords="211,5,363,47"/>
+<area shape="rect" id="node3" href="$classXML__Loading__Archive.html#ad200f5b98b9cf3e903ccf714a56a1d0f" title="read next Ravel element " alt="" coords="411,5,563,47"/>
+<area shape="rect" id="node4" href="$classXML__Loading__Archive.html#a3ea748a15d0a90fe9a32c362b14da7fd" title="read an entire workspace, throw DOMAIN_ERROR on failure " alt="" coords="611,5,763,47"/>
+<area shape="rect" id="node5" href="$classXML__Loading__Archive.html#a45c9b23463cf5379d2788af1789a62f0" title="read vids of top&#45;level variables " alt="" coords="811,5,963,47"/>
+</map>

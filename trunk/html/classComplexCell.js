@@ -40,7 +40,7 @@ var classComplexCell =
     [ "gamma", "classComplexCell.html#af05c8d8f2555842260867eea123b7d21", null ],
     [ "get_cell_type", "classComplexCell.html#ab58d30c8a6636afdf9e19cb493a28179", null ],
     [ "get_checked_near_int", "classComplexCell.html#a4f6434753627299e11dec4cba24962ef", null ],
-    [ "get_classname", "classComplexCell.html#a88fba92620c8027f6bc60bdfdf6bb9a7", null ],
+    [ "get_classname", "classComplexCell.html#a5b9b4f79f993ebfeb822be484a93264c", null ],
     [ "get_complex_value", "classComplexCell.html#ac31c8fb018b164f5016a94dd7ca4ab06", null ],
     [ "get_imag_value", "classComplexCell.html#adf8b4fb74fa6bec21f7302050c3a272c", null ],
     [ "get_near_bool", "classComplexCell.html#aa0734a99ed27d9dd6876a37d1da1afa4", null ],
@@ -61,11 +61,6 @@ var classComplexCell =
     [ "need_scaling", "classComplexCell.html#a8882c2a4701f26a80e9bc1aa2dd450be", null ],
     [ "ONE", "classComplexCell.html#ae41a9c3b768daa6c34b1a36a7827da34", null ],
     [ "PLUS_i", "classComplexCell.html#aad6c296915a85820d2e39ee01f64c74b", null ],
-    [ "zC", "classComplexCell.html#a9ccb64da2c504a517c725dc2c41940da", null ],
     [ "zC", "classComplexCell.html#a76bdd67691bee87877efcc5cccd8199f", null ],
-    [ "FloatCell", "classComplexCell.html#a4616ec755694d9c27a390c15e91d5a24", null ],
-    [ "IntCell", "classComplexCell.html#afd3c49de8dc518c6464f91986959e0af", null ],
-    [ "NumericCell", "classComplexCell.html#a3f00a33db902b73442acfc08d7f19716", null ],
-    [ "RealCell", "classComplexCell.html#affcb4d972251e07660a6122bbdd90d89", null ],
-    [ "Value", "classComplexCell.html#aeceedf6e1a7d48a588516ce2b1983d6f", null ]
+    [ "zC", "classComplexCell.html#a9ccb64da2c504a517c725dc2c41940da", null ]
 ];

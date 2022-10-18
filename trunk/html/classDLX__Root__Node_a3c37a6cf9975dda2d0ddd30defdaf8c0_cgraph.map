@@ -1,0 +1,10 @@
+<map id="DLX_Root_Node::solve" name="DLX_Root_Node::solve">
+<area shape="rect" id="node1" title="solve the constraints matrix" alt="" coords="5,145,165,171"/>
+<area shape="rect" id="node2" href="$classDLX__Root__Node.html#a2398a37e28c8fcfb9143d3a4dd1f61f9" title="cover columns j (see Knuth)" alt="" coords="220,5,381,31"/>
+<area shape="rect" id="node3" href="$classDLX__Root__Node.html#a8edd9873d66b0a0dfc9df745042f0eda" title="check of all nodes" alt="" coords="222,55,379,95"/>
+<area shape="rect" id="node5" href="$classWorkspace.html#adb2006f054a1cebb8ae0252b61bd1d1b" title="return the current ⎕IO" alt="" coords="233,120,368,145"/>
+<area shape="rect" id="node6" href="$classDLX__Root__Node.html#aeaf98facca43ebf207de72184d8bc760" title="indent for current level" alt="" coords="219,169,383,195"/>
+<area shape="rect" id="node7" href="$classDLX__Node.html#a8412d43f28f22f4018b18d844d9bf6dc" title="print the row and columns of this node" alt="" coords="227,219,374,244"/>
+<area shape="rect" id="node8" href="$classDLX__Root__Node.html#a955017dab559c56d54c72e08af5ba1cb" title="uncover columns j (see Knuth)" alt="" coords="213,268,388,293"/>
+<area shape="rect" id="node4" href="$classDLX__Node.html#a5d50e5bca233bcd8e46c8cfca5ee6c79" title="check the consistency of the up, down, left, and right links" alt="" coords="436,63,565,88"/>
+</map>

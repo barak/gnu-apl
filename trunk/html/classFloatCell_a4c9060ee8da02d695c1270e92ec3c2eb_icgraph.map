@@ -1,0 +1,4 @@
+<map id="FloatCell::compare" name="FloatCell::compare">
+<area shape="rect" id="node1" title="compare this with other, throw DOMAIN ERROR on illegal comparisons" alt="" coords="176,5,308,31"/>
+<area shape="rect" id="node2" href="$classFloatCell.html#aae75ec1cf35bf5f9a97b86046573255c" title="Overloaded Cell::greater()." alt="" coords="5,5,128,31"/>
+</map>

@@ -1,4 +1,6 @@
 <map id="LibPaths" name="LibPaths">
-<area shape="rect" id="node2" href="$structLibPaths_1_1LibDir.html" title="one library directory " alt="" coords="11,185,126,212"/>
-<area shape="rect" id="node3" href="$classUTF8__string.html" title="an UTF8 encoded Unicode (RFC 3629) string " alt="" coords="21,96,116,123"/>
+<area shape="rect" id="node1" title="a class mapping library reference numbers to directories" alt="" coords="32,271,105,296"/>
+<area shape="rect" id="node2" href="$structLibPaths_1_1LibDir.html" title="one library directory" alt="" coords="11,183,126,208"/>
+<area shape="rect" id="node3" href="$classUTF8__string.html" title="an UTF8 encoded Unicode (RFC 3629) string" alt="" coords="21,95,116,120"/>
+<area shape="rect" id="node4" title=" " alt="" coords="5,5,132,45"/>
 </map>

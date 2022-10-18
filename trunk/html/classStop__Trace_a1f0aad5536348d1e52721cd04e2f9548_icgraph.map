@@ -1,0 +1,5 @@
+<map id="Stop_Trace::assign" name="Stop_Trace::assign">
+<area shape="rect" id="node1" title="return assign lines in new_value to stop or trace vector in ufun" alt="" coords="216,31,351,56"/>
+<area shape="rect" id="node2" href="$classQuad__STOP.html#aba7f51dfbb36d3c2d25ce2e7deb0f278" title="Overloaded Function::eval_AB()" alt="" coords="10,5,163,31"/>
+<area shape="rect" id="node3" href="$classQuad__TRACE.html#a59e7875554f651f1f64d83d79111fecd" title="Overloaded Function::eval_AB()" alt="" coords="5,55,168,80"/>
+</map>

@@ -1,0 +1,10 @@
+<map id="Unicode_source::rest" name="Unicode_source::rest">
+<area shape="rect" id="node1" title="return the number of remaining items" alt="" coords="429,157,576,183"/>
+<area shape="rect" id="node2" href="$classTokenizer.html#a9c9924450a3c4dd6076911aa8f342171" title="tokenize UCS string input into token string tos." alt="" coords="5,187,163,212"/>
+<area shape="rect" id="node3" href="$classUnicode__source.html#a680d1c59911428676ebf807f708aa309" title="shrink the source to rest new_rest" alt="" coords="211,43,381,68"/>
+<area shape="rect" id="node4" href="$classTokenizer.html#aa5b5fd6f253e7318f319d1419023e5bf" title="tokenize a number (integer, floating point, or complex)." alt="" coords="228,93,364,133"/>
+<area shape="rect" id="node5" href="$classTokenizer.html#a675447bc15638963f65fc8e5bea848e1" title="tokenize a Quad function or variable" alt="" coords="211,157,381,183"/>
+<area shape="rect" id="node6" href="$classTokenizer.html#a0682563437325fa3d9f6330a971e7a36" title="tokenize a single quoted string" alt="" coords="228,207,364,247"/>
+<area shape="rect" id="node7" href="$classTokenizer.html#a56f335a801b4c3c1855e19549c7579c0" title="tokenize a double quoted string" alt="" coords="228,271,364,311"/>
+<area shape="rect" id="node8" href="$classTokenizer.html#afc540b601fb7d49f3d9b1bc88fc5cb3a" title="tokenize a symbol" alt="" coords="228,335,364,375"/>
+</map>

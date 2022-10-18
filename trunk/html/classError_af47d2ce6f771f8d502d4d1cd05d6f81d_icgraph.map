@@ -1,0 +1,31 @@
+<map id="Error::throw_symbol_error" name="Error::throw_symbol_error">
+<area shape="rect" id="node1" title="throw an Error related to Symbol symbol" alt="" coords="1740,278,1879,318"/>
+<area shape="rect" id="node2" href="$classQuad__SVC.html#a5b0103a375525734c11f8fb93f3fb84a" title="Overloaded Function::eval_AB()." alt="" coords="1542,161,1687,187"/>
+<area shape="rect" id="node3" href="$classQuad__AT.html#a448f15072466e3d72daa9bed9e739c29" title="overloaded Function::eval_AB()." alt="" coords="1547,211,1682,236"/>
+<area shape="rect" id="node4" href="$classQuad__SVC.html#a71be219cdc82f2922f94f02b7aab09f8" title="Overloaded Function::eval_AB()." alt="" coords="1547,260,1683,285"/>
+<area shape="rect" id="node5" href="$classQuad__SVS.html#a2d81f92913a3709bccfb3b42240d81e3" title="Overloaded Function::eval_AB()." alt="" coords="1547,309,1682,335"/>
+<area shape="rect" id="node6" href="$classSymbol.html#a8f6dd744b09b0629eca34fc2231bf2a9" title="return the current APL value (or throw a VALUE_ERROR)" alt="" coords="1537,359,1692,384"/>
+<area shape="rect" id="node15" href="$classSymbol.html#a72a3e4ed8ddafaaf215806962e017380" title="set token according to the current NC/sym_val of this Symbol" alt="" coords="1343,695,1459,720"/>
+<area shape="rect" id="node7" href="$classQuad__FC.html#a57ec0637b3d519da4a9537d9cf593129" title="overloaded Symbol::assign_indexed()." alt="" coords="1313,55,1489,80"/>
+<area shape="rect" id="node8" href="$classSymbol.html#a09c284745e26103acf5aee747f464b7a" title="Indexed (one&#45;dimensional) assign value to this Symbol." alt="" coords="1319,104,1483,129"/>
+<area shape="rect" id="node9" href="$classCommand.html#a925cc5f77af57e1705b8c96a522e6a55" title="show list of commands" alt="" coords="1323,153,1480,179"/>
+<area shape="rect" id="node10" href="$classQuad__FC.html#a2b4b1ea967c2388a23de30668c3c562b" title="return the current format control (used by Workspace::get_FC())" alt="" coords="1338,203,1465,228"/>
+<area shape="rect" id="node11" href="$classQuad__PR.html#a558f71d48d90bc8ffa898e7a9d0a017f" title="Return the current prompt replacement, aka. ⎕PR." alt="" coords="1338,252,1465,277"/>
+<area shape="rect" id="node12" href="$classQuad__CR.html#ad98ce37f2b329eb37ddae9d0fcf7832f" title="10 ⎕CR symbol_name (variable or function name). Also used for )OUT" alt="" coords="1330,301,1473,327"/>
+<area shape="rect" id="node13" href="$classSystemVariable.html#aab4fab0cb66063a3f649c73962d72144" title="overloaded Symbol::get_attributes()." alt="" coords="1331,351,1471,391"/>
+<area shape="rect" id="node14" href="$classQuad__TZ.html#af1018fdc6242f9ec1ee3348e47a0f646" title="Pop latest entry from the stack of this Symbol." alt="" coords="1349,416,1454,441"/>
+<area shape="rect" id="node22" href="$classRO__SystemVariable.html#ae4b3c5ab0a0617fad99bcc03e4040b31" title="overloaded Symbol::resolve(). Since push(), pop(), and assign() do nothing, we can call get_apl_value..." alt="" coords="1327,466,1476,506"/>
+<area shape="rect" id="node23" href="$classUserFunction.html#a8514600d6fec34ed9fdade576d0ad721" title="compute lines 2 and 3 in error" alt="" coords="1316,581,1487,621"/>
+<area shape="rect" id="node25" href="$classSymbol.html#a8eb0881471fcf614e9b4d9bd0a4a721b" title="share variable with proc" alt="" coords="1336,645,1467,671"/>
+<area shape="rect" id="node27" href="$classQuad__TF.html#aad2b15f3268d7098d75babcd03e5c762" title="return B in transfer format 2 (new APL2 format)" alt="" coords="1352,531,1451,556"/>
+<area shape="rect" id="node29" href="$classQuad__TF.html#a690180778642f09f9471a909fd6dd633" title="return B in transfer format 3 (APL2 CDR format)" alt="" coords="1352,5,1451,31"/>
+<area shape="rect" id="node16" href="$classPrefix.html#a5478ff7d771d95a161c8ee393d50d7b1" title="execute one context (user defined function or operator, execute, or immediate execution)" alt="" coords="1091,695,1265,720"/>
+<area shape="rect" id="node17" href="$classStateIndicator.html#aa99bc8ce846dfd1f09c0ca2f250d940e" title="execute token in body..." alt="" coords="913,695,1043,720"/>
+<area shape="rect" id="node18" href="$classExecutable.html#a56bddb63158eedc401fe8ec3ce04f787" title="execute the body of this executable" alt="" coords="689,695,865,720"/>
+<area shape="rect" id="node19" href="$classCommand.html#a879617e7645bea2e4052154f16999634" title="finish the current SI&#45;&gt;top() and pop it when done" alt="" coords="471,695,641,720"/>
+<area shape="rect" id="node20" href="$classCommand.html#af36741357bfd4e183b34ee8b747bc7c5" title="process line which contains APL statements" alt="" coords="216,695,423,720"/>
+<area shape="rect" id="node21" href="$classCommand.html#ae26693534d4df16372f51e55e505b8d7" title="process line which contains a command or statements" alt="" coords="5,695,168,720"/>
+<area shape="rect" id="node24" href="$classError.html#adf8e47c02b1ae0be1368a0587f7daed4" title="update error information in this and copy it to si" alt="" coords="1099,588,1257,613"/>
+<area shape="rect" id="node26" href="$classQuad__SVO.html#a92d931679e0b1836d24e1cc1ab60ed02" title="Overloaded Function::eval_AB()." alt="" coords="1105,645,1251,671"/>
+<area shape="rect" id="node28" href="$classQuad__TF.html#a27ed4b02d5f1a1c8a8b0a1fcbe2756f8" title="Overloaded Function::eval_AB()." alt="" coords="1111,268,1245,293"/>
+</map>

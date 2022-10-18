@@ -1,0 +1,9 @@
+<map id="Workspace::get_WS_name" name="Workspace::get_WS_name">
+<area shape="rect" id="node1" title="return the name of the current workspace." alt="" coords="659,81,841,107"/>
+<area shape="rect" id="node2" href="$classCommand.html#a98e7d1dd0c01014d79f2120292588a70" title=")DUMP: dump a workspace file (.apl)" alt="" coords="448,5,611,31"/>
+<area shape="rect" id="node3" href="$classCommand.html#aec0c4c6efbb9df9a34220b510f58905a" title=")SAVE: save a workspace file (.xml)" alt="" coords="23,85,181,111"/>
+<area shape="rect" id="node4" href="$classDoxy.html#ab9e7e5e50e16cf9b5ecff2ebbf7dd099" title="Constructor: create (and remember) the root directory." alt="" coords="483,107,575,132"/>
+<area shape="rect" id="node5" href="$classXML__Saving__Archive.html#acc327395cab545ea7797d92f5c931cab" title="write entire workspace" alt="" coords="456,157,603,197"/>
+<area shape="rect" id="node6" href="$classWorkspace.html#a8a4f1d898d523818dbd9d7efa6f2cf92" title="save this workspace" alt="" coords="247,135,400,160"/>
+<area shape="rect" id="node7" href="$classCommand.html#ad61e749290966d00856ce1dd4f6abe42" title=")SAVE active WS as CONTINUE and )OFF" alt="" coords="5,135,199,160"/>
+</map>

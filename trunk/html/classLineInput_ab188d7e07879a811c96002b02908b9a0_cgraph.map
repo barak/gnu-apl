@@ -1,0 +1,6 @@
+<map id="LineInput::get_uni" name="LineInput::get_uni">
+<area shape="rect" id="node1" title="get one character from user" alt="" coords="5,31,131,56"/>
+<area shape="rect" id="node2" href="$structESCmap.html#a5b67213606c610861670a344d469cc3c" title="return true if an entry has prefix seq of length len" alt="" coords="179,5,325,31"/>
+<area shape="rect" id="node4" href="$classLineInput.html#ae2d642d7025f5930c32a6154caf3bc9f" title="interrupt&#45;safe fgetc()" alt="" coords="180,55,324,80"/>
+<area shape="rect" id="node3" href="$structESCmap.html#af6cbce2074f2cc32f20d8d7fb48db905" title="return true if seq is a true prefix of this ESCmap" alt="" coords="373,5,516,31"/>
+</map>

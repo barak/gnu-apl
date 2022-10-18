@@ -1,0 +1,6 @@
+<map id="RegexpMatch::RegexpMatch" name="RegexpMatch::RegexpMatch">
+<area shape="rect" id="node1" title="constructor" alt="" coords="5,13,197,38"/>
+<area shape="rect" id="node2" href="$classRegexp.html#a9c761d089d265fa1a1dd5a5191d7549b" title="return a description for error code eec" alt="" coords="245,13,379,38"/>
+<area shape="rect" id="node3" href="$classUCS__string.html#a5776e51c6faa53537409322cd0ebf07a" title="append number (in ASCII encoding like d) to this string" alt="" coords="427,5,567,45"/>
+<area shape="rect" id="node4" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="615,13,755,38"/>
+</map>

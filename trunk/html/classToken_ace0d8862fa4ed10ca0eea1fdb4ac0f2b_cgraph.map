@@ -1,0 +1,29 @@
+<map id="Token::show_trace" name="Token::show_trace">
+<area shape="rect" id="node1" title="show trace output for this token" alt="" coords="5,397,139,422"/>
+<area shape="rect" id="node2" href="$classUCS__string.html#a5776e51c6faa53537409322cd0ebf07a" title="append number (in ASCII encoding like d) to this string" alt="" coords="214,5,354,45"/>
+<area shape="rect" id="node4" href="$classUCS__string.html#ace70327ef899c525ad9c3f2bffd43697" title="append 0&#45;terminated UTF8 string str to this UCS_string." alt="" coords="194,70,374,95"/>
+<area shape="rect" id="node5" href="$classValue.html#a9fc8bbaf9fefe6835dea7db0f71b8b6c" title="return the number of elements (the product of the shapes)." alt="" coords="210,221,358,246"/>
+<area shape="rect" id="node7" href="$classToken.html#a205e0b499e06999ff91c272ff28c9013" title="return the Value_P value of this token. The token could be TOK_NO_VALUE; in that case VALUE_ERROR is ..." alt="" coords="218,270,350,295"/>
+<area shape="rect" id="node11" href="$classValue.html#a6b8aa5e58b68236c77a09385365468d5" title="return the first element of the ravel (which is always present). same as get_cproto(),..." alt="" coords="225,371,343,397"/>
+<area shape="rect" id="node15" href="$classToken.html#a9721c23968d7272edd1abae91ba77193" title="return the integer value of this token" alt="" coords="438,322,567,347"/>
+<area shape="rect" id="node16" href="$classPrintBuffer.html#a19446afa6beccd70a7fcdd5526cdc6a8" title="return line y" alt="" coords="215,473,353,498"/>
+<area shape="rect" id="node17" href="$classPrintBuffer.html#ac13295601812e379a3eac618ce239426" title="return the number of rows" alt="" coords="433,444,572,484"/>
+<area shape="rect" id="node18" href="$classWorkspace.html#a002e2f097bece67c9d082b7c89db11ae" title="return style and the current ⎕PP, and ⎕PW" alt="" coords="187,522,381,547"/>
+<area shape="rect" id="node19" href="$classValue.html#a5ac7131d2f89d0bc8b8907d960cbd125" title="return the rank of this value" alt="" coords="227,571,341,597"/>
+<area shape="rect" id="node21" href="$classPrintContext.html#a5ef45c5babbe3ebf9988a9b659a2e407" title="return the print style to be used" alt="" coords="206,621,362,646"/>
+<area shape="rect" id="node22" href="$classToken.html#a13e8b65088f8a7d103772acc6cfb5140" title="return the tag of this token" alt="" coords="229,670,339,695"/>
+<area shape="rect" id="node23" href="$classCell.html#ad4edf9a2c4c464abefb221a8c24a3a37" title="Return true iff this cell is a numeric cor character cell." alt="" coords="217,719,351,745"/>
+<area shape="rect" id="node25" href="$classUCS__string.html#afed3b4eed48968619c0895a98700b554" title="return a string like this, but with pad chars mapped to spaces" alt="" coords="214,119,354,145"/>
+<area shape="rect" id="node26" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="441,122,564,147"/>
+<area shape="rect" id="node27" href="$classPrintContext.html#a787257953d929f80db2ba1698d59b905" title="set the print style to be used" alt="" coords="206,769,362,794"/>
+<area shape="rect" id="node3" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="433,70,573,95"/>
+<area shape="rect" id="node6" href="$classShape.html#af39e05bad7be900fa1437a6eb6035e97" title="return the number of ravel elements (1 for scalars,i else product of shapes)" alt="" coords="435,174,570,199"/>
+<area shape="rect" id="node8" href="$unionToken_1_1sval.html#a22a0be9d3742c2a8168e59d530dd659e" title="a shortcut for accessing apl_val" alt="" coords="429,223,576,249"/>
+<area shape="rect" id="node9" href="$classToken.html#a11e37aa69b8eb64f293702293b00f50c" title="return true iff this token is an apl value" alt="" coords="441,273,565,298"/>
+<area shape="rect" id="node10" href="$classToken.html#a1a31afbb07e3f1dbb86d5f872ce5c297" title="return the TokenValueType of this token." alt="" coords="632,322,785,347"/>
+<area shape="rect" id="node12" href="$classValue.html#aa0572b1b7fa249cb79694fd152130b38" title="return the (constant) idx&#39;th element of the ravel." alt="" coords="441,371,564,397"/>
+<area shape="rect" id="node13" href="$classValue.html#ac5b54e3a13cab0837442f1575b3299a5" title="return the number of elements, but at least 1 (for the prototype)." alt="" coords="624,371,793,397"/>
+<area shape="rect" id="node14" href="$classShape.html#a6f32f749601dca80263493fd06be12c4" title="return the number of ravel elements, but at least 1 (for empty values and scalars) else product of sh..." alt="" coords="841,371,996,397"/>
+<area shape="rect" id="node20" href="$classShape.html#a017e9a35dd20f4bc4fdeb7ea29b6805d" title="return the rank" alt="" coords="444,571,561,597"/>
+<area shape="rect" id="node24" href="$classCell.html#a38a6a25f0ad091f35e3d9abfe5608a50" title="return the type of this cell" alt="" coords="437,719,568,745"/>
+</map>

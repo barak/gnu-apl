@@ -1,0 +1,30 @@
+<map id="Bif_F12_CIRCLE::eval_B" name="Bif_F12_CIRCLE::eval_B">
+<area shape="rect" id="node1" title="overloaded Function::eval_B()." alt="" coords="5,77,177,102"/>
+<area shape="rect" id="node2" href="$classCell.html#abe7153a05ae3f6272d5459e2a0cb7ef1" title="store pi times the value of this Cell in Z" alt="" coords="235,19,357,45"/>
+<area shape="rect" id="node3" href="$classCell.html#a2d6f62ff6a3c287b2266dbe6846a25c3" title="store pi times the value of this Cell in Z" alt="" coords="235,69,357,109"/>
+<area shape="rect" id="node4" href="$classScalarFunction.html#a6f542f78d8c0f36e2c6f6e6f28fec2af" title="Evaluate a scalar function monadically." alt="" coords="225,133,367,173"/>
+<area shape="rect" id="node5" href="$classThread__context.html#a565d6510df7bd9a3b2c8fa42c63b24c7" title="cancel all monadic jobs in all thread contexts" alt="" coords="415,73,573,113"/>
+<area shape="rect" id="node7" href="$classThread__context.html#a8ef1d4db160a21f5616530cf737e4b18" title="number of currently used cores" alt="" coords="632,5,771,45"/>
+<area shape="rect" id="node8" href="$classThread__context.html#adf3aed1f9a9fbe5854dca582816dae4e" title="return the context for core n" alt="" coords="632,133,771,173"/>
+<area shape="rect" id="node9" href="$classScalarFunction.html#a388037ffbc81f826635a66d5c52656a2" title="A helper function for eval_fill_B()." alt="" coords="429,540,559,580"/>
+<area shape="rect" id="node10" href="$classScalarFunction.html#a254898c12f19ee61f71837247d2efaa9" title="compute the monadic scalar function fun along one ravel" alt="" coords="429,476,559,516"/>
+<area shape="rect" id="node6" href="$classParallel__job__list.html#ad0759619b570cb362d79edf3d673ae17" title="cancel the entire job list" alt="" coords="641,69,762,109"/>
+<area shape="rect" id="node11" href="$classParallel__job__list.html#a487a771b3b681d45dcf9f7a26f34409f" title="add job to jobs" alt="" coords="641,719,762,759"/>
+<area shape="rect" id="node12" href="$classPJob__scalar__B.html#affa1cdc6bdd1949d20706349ecc12cf9" title="return Bbz]" alt="" coords="629,783,774,809"/>
+<area shape="rect" id="node13" href="$classValue__P__Base.html#a1c3bf1b6f708eb2c1ba4b97c83adb9aa" title="return a const pointer to the Value" alt="" coords="634,833,769,858"/>
+<area shape="rect" id="node14" href="$classThread__context.html#ab8bd91c72792a1e187c521f38c9e4f6e" title="return the context of the master" alt="" coords="845,901,983,941"/>
+<area shape="rect" id="node15" href="$classFunction.html#a19780167d6b18086a308754fa7b5cb39" title="return break&#45;even point for monadic parallel execution" alt="" coords="624,984,779,1024"/>
+<area shape="rect" id="node16" href="$classCell.html#a367b9df7e0d4b805e5f31641658113f6" title="Return the APL value of a cell (Asserts for non&#45;pointer cells)" alt="" coords="624,198,779,223"/>
+<area shape="rect" id="node19" href="$classPrimitiveFunction.html#af43349e89e705b02d56c75870de0c41b" title="return the monadic cell statistics of this (scalar) function" alt="" coords="636,248,767,288"/>
+<area shape="rect" id="node20" href="$classCell.html#ae98b3988a7fa52c6c157b4911b043dde" title="Return true iff this cell is a pointer (to a sub&#45;array) cell." alt="" coords="633,313,769,338"/>
+<area shape="rect" id="node21" href="$classThread__context.html#ad6131c6d7c657ae4fbf75a71db9c574a" title="start parallel execution of work at the master" alt="" coords="621,934,781,959"/>
+<area shape="rect" id="node22" href="$classThread__context.html#aee8c70aa8c5f5e771db87b9d90617bfb" title="end parallel execution of work at the master" alt="" coords="622,362,781,387"/>
+<area shape="rect" id="node23" href="$classScalarFunction.html#adb8daa5af9eb305915236ceca2aa841d" title="return true if this function can be parallelized" alt="" coords="630,412,773,452"/>
+<area shape="rect" id="node24" href="$classParallel__job__list.html#a828d3fbe684c33fb544269c1cc20b3b8" title="set current job. CAUTION: jobs may be modified by the execution of current_job. Therefore we copy cur..." alt="" coords="641,476,762,516"/>
+<area shape="rect" id="node25" href="$classParallel__job__list.html#a3600568259de8e941c747a255ebb94e1" title="start execution of jobs" alt="" coords="641,540,762,580"/>
+<area shape="rect" id="node26" href="$classPJob__scalar__B.html#a2d63382c318e15d8e22825561275b2f6" title="return Z[z]" alt="" coords="629,605,773,630"/>
+<area shape="rect" id="node27" href="$classPJob__scalar__B.html#a5c8157de35792dd5d34c41877dab287e" title="destructor" alt="" coords="623,655,779,695"/>
+<area shape="rect" id="node17" href="$classCell.html#a38a6a25f0ad091f35e3d9abfe5608a50" title="return the type of this cell" alt="" coords="849,223,979,249"/>
+<area shape="rect" id="node18" href="$classCell.html#a6c3fdef3d82f53649d1c3f16d37eedd7" title="the name of ct" alt="" coords="829,174,999,199"/>
+<area shape="rect" id="node28" href="$classValue__P__Base.html#acd0622e5c6de2fd89d6f6425e3afd411" title="reset and add value event" alt="" coords="842,662,986,687"/>
+</map>

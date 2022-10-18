@@ -1,0 +1,17 @@
+<map id="draw_X_grid" name="draw_X_grid">
+<area shape="rect" id="node1" title="draw the (vertical) grid lines that start at the X axis" alt="" coords="5,321,100,347"/>
+<area shape="rect" id="node2" href="$Plot__xcb_8cc.html#a538424ee91ee3a1698b531dcfce0659a" title="draw a line from P0 to P1" alt="" coords="189,5,267,31"/>
+<area shape="rect" id="node3" href="$Plot__xcb_8cc.html#a0e658785c02a1e28fb1b4eb3e40ceb5e" title="draw text label at position xy" alt="" coords="189,55,267,80"/>
+<area shape="rect" id="node5" href="$Plot__xcb_8cc.html#af4fda3629142aa3775d1fd5f5fee5d0e" title="return the text of a grid tick with value val" alt="" coords="185,104,271,129"/>
+<area shape="rect" id="node6" href="$classPlot__window__properties.html#ab09be3e5e80e7db4f6b5b5b7b64410eb" title="return the last index of the X grid" alt="" coords="148,154,308,194"/>
+<area shape="rect" id="node7" href="$classPlot__window__properties.html#a92d2adee39b082bada6f0e136ed3608f" title="return the largest Y value" alt="" coords="148,218,308,258"/>
+<area shape="rect" id="node8" href="$classPlot__window__properties.html#a577510e3bcf6ba61978dc60d778dc967" title="return the smallest X value" alt="" coords="148,282,308,322"/>
+<area shape="rect" id="node9" href="$classPlot__window__properties.html#af27f118d1e90664680b2efd1a2460a03" title="return the smallest Y value" alt="" coords="148,346,308,386"/>
+<area shape="rect" id="node10" href="$classPlot__window__properties.html#aa49ac73a83ce1fc318ef680d9a90517d" title="return the X&#45;value difference for one tile (= between two X grid lines)" alt="" coords="148,410,308,450"/>
+<area shape="rect" id="node11" href="$Plot__xcb_8cc.html#abb3a45e07e2c89cd4db26199d9ebccaf" title="set the foreground color of a xcb_gcontext_t" alt="" coords="161,475,295,500"/>
+<area shape="rect" id="node13" href="$Plot__xcb_8cc.html#a62eaa2c0379a0672af80deafa17d4a41" title="set the line width of a xcb_gcontext_t" alt="" coords="162,524,294,549"/>
+<area shape="rect" id="node14" href="$classPlot__window__properties.html#a087dfd5eee09a66161eb76c87680d14c" title="convert &#160;&#160;val_X to the X coordinate of the pixel in the plot area" alt="" coords="148,574,308,614"/>
+<area shape="rect" id="node15" href="$classPlot__window__properties.html#ae727cdd8ecd4888c8785c5fd53dc6b93" title="convert &#160;&#160;val_Y to the Y coordinate of the pixel in the plot area" alt="" coords="148,638,308,678"/>
+<area shape="rect" id="node4" href="$Plot__xcb_8cc.html#afe42b34c6761e2b88414556cecc7d987" title="test obtaining of a cookie" alt="" coords="360,55,445,80"/>
+<area shape="rect" id="node12" href="$Plot__xcb_8cc.html#a5461d12dc379b438dce62186d2c07f20" title="set the an attribute of a xcb_gcontext_t" alt="" coords="356,499,449,524"/>
+</map>

@@ -1,0 +1,4 @@
+<map id="Token::get_flt_val" name="Token::get_flt_val">
+<area shape="rect" id="node1" title="return the float value of this token" alt="" coords="5,5,132,31"/>
+<area shape="rect" id="node2" href="$classToken.html#a1a31afbb07e3f1dbb86d5f872ce5c297" title="return the TokenValueType of this token." alt="" coords="180,5,333,31"/>
+</map>

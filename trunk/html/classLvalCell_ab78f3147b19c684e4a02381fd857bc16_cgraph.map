@@ -1,0 +1,5 @@
+<map id="LvalCell::get_cell_owner" name="LvalCell::get_cell_owner">
+<area shape="rect" id="node2" href="$classLvalCell.html#a7e9431a8994e633b37c396d2d6becc1f" title="make sure that owner (if any) owns this Cell " alt="" coords="176,31,365,57"/>
+<area shape="rect" id="node3" href="$classValue.html#a0d7debc5273aad742471b2d7990a6c8a" title="return the first element of the ravel (which is always present). same as get_cproto(), but named differently to indicate its context. " alt="" coords="439,5,557,32"/>
+<area shape="rect" id="node4" href="$classValue.html#ac5b54e3a13cab0837442f1575b3299a5" title="return the number of elements, but at least 1 (for the prototype). " alt="" coords="413,56,583,83"/>
+</map>

@@ -1,0 +1,6 @@
+<map id="IndexIterator::print" name="IndexIterator::print">
+<area shape="rect" id="node1" title="print this iterator (for debugging purposes)." alt="" coords="5,77,133,102"/>
+<area shape="rect" id="node2" href="$classIndexIterator.html#a5833585ada2b82a93553a2c62fb13a2b" title="get the number of indices." alt="" coords="195,5,317,45"/>
+<area shape="rect" id="node3" href="$classIndexIterator.html#ae27d9d5c7cf77fc56dc18a3375ad9e82" title="return the current index" alt="" coords="195,69,317,109"/>
+<area shape="rect" id="node4" href="$classIndexIterator.html#ae312175e3429335b1ebc57f8f49c0020" title="return the current index" alt="" coords="181,134,331,159"/>
+</map>

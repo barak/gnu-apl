@@ -1,0 +1,4 @@
+<map id="Value::get_rows" name="Value::get_rows">
+<area shape="rect" id="node1" title="return the product of all but the the last axis, or 1 for scalars" alt="" coords="5,5,121,31"/>
+<area shape="rect" id="node2" href="$classShape.html#ae23c2dd79c376b0c4ffb1ec48f1ffbcd" title="return the product of all but the the last dimension, or 1 for scalars" alt="" coords="169,5,289,31"/>
+</map>

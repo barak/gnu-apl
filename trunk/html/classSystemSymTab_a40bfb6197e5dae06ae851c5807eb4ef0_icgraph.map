@@ -1,0 +1,4 @@
+<map id="SystemSymTab::clear_slot" name="SystemSymTab::clear_slot">
+<area shape="rect" id="node1" title="clear one slot (hash) in this symbol table" alt="" coords="205,5,385,31"/>
+<area shape="rect" id="node2" href="$classSystemSymTab.html#abcf7925dd99f6be67e9976759e2eec8c" title="clear this symbol table (remove all user&#45;defined symbols)" alt="" coords="5,5,157,31"/>
+</map>

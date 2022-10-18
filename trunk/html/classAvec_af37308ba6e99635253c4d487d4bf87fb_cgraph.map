@@ -1,0 +1,4 @@
+<map id="Avec::find_av_pos" name="Avec::find_av_pos">
+<area shape="rect" id="node1" title="Find av in character_table. Return AV position if found or MAX_AV." alt="" coords="5,5,136,31"/>
+<area shape="rect" id="node2" href="$classAvec.html#afe30f62f26ec74019a95e5cbd6eaa111" title="Find av in character_table. Return position or Invalid_CHT." alt="" coords="184,5,297,31"/>
+</map>

@@ -1,0 +1,8 @@
+<map id="Cell::near_int" name="Cell::near_int">
+<area shape="rect" id="node1" title="return value if it is close to int, or else throw DOMAIN_ERROR" alt="" coords="653,42,752,67"/>
+<area shape="rect" id="node2" href="$classFloatCell.html#ae1af3fe9beba45e78ed2597e49a9f0e9" title="Overloaded Cell::get_near_int()." alt="" coords="452,13,605,38"/>
+<area shape="rect" id="node4" href="$classNumericCell.html#a59c9e232b6a1cb365a3252196b41604a" title="N over K for positive integers N and K." alt="" coords="458,63,599,103"/>
+<area shape="rect" id="node3" href="$classFloatCell.html#a06d60ffa82a19783d085ce7e258161ed" title="overloaded Cell::bif_near_int()" alt="" coords="250,5,378,45"/>
+<area shape="rect" id="node5" href="$classNumericCell.html#a4f123c9528fe4e9a1fc9c75585aa2de3" title="compute binomial funtion for integers a and b" alt="" coords="224,70,404,95"/>
+<area shape="rect" id="node6" href="$classNumericCell.html#a3fd3970233551bf557f5e52330b5610c" title="overloaded Cell::bif_binomial()" alt="" coords="5,70,176,95"/>
+</map>

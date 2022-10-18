@@ -1,0 +1,7 @@
+<map id="PrintContext::get_PP" name="PrintContext::get_PP">
+<area shape="rect" id="node1" title="return the print precision to be used" alt="" coords="449,107,596,133"/>
+<area shape="rect" id="node2" href="$classComplexCell.html#a59526d0bf663861a811c939ab6308fcd" title="the Quad_CR representation of this cell." alt="" coords="239,5,397,45"/>
+<area shape="rect" id="node3" href="$classComplexCell.html#a8882c2a4701f26a80e9bc1aa2dd450be" title="return true iff this cell needs scaling (exponential format) in pctx." alt="" coords="5,107,187,133"/>
+<area shape="rect" id="node4" href="$classFloatCell.html#ad2bf434993646c6d2434942bdf1086e2" title="return true iff this cell needs scaling (exponential format) in pctx." alt="" coords="239,145,397,170"/>
+<area shape="rect" id="node5" href="$classUCS__string.html#aa1e49e488f5c1093a83b7c3aa4009d70" title="constructor: UCS_string from a double with quad_pp valid digits. (eg. 3.33 has 3 digits),..." alt="" coords="235,194,401,219"/>
+</map>

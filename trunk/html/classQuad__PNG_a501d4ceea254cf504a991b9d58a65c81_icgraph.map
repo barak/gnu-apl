@@ -1,0 +1,5 @@
+<map id="Quad_PNG::valid_type_and_bits" name="Quad_PNG::valid_type_and_bits">
+<area shape="rect" id="node1" title="return true iff the combination of color_type and bit_depth is valid in the PNG standard AND supporte..." alt="" coords="433,5,589,45"/>
+<area shape="rect" id="node2" href="$classQuad__PNG.html#aec95f6eab85b55e0f54436fd3f9efe9d" title="write APL pixel matrix B PNG file filename" alt="" coords="200,13,385,38"/>
+<area shape="rect" id="node3" href="$classQuad__PNG.html#a0987f76de9c44afe296ba61fdbcb2dfa" title="overloaded Function::eval_AB()" alt="" coords="5,13,152,38"/>
+</map>

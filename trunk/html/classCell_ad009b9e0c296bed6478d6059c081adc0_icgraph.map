@@ -1,0 +1,6 @@
+<map id="Cell::bif_nand_bitwise" name="Cell::bif_nand_bitwise">
+<area shape="rect" id="node1" title="store the bitwise nand of A and this cell in Z" alt="" coords="241,55,392,80"/>
+<area shape="rect" id="node2" href="$classBif__F2__NAND__B.html#ae79ff2f35722db3264084002f058837b" title="overloaded Function::eval_AB()." alt="" coords="10,5,189,31"/>
+<area shape="rect" id="node3" href="$classBif__F2__NAND__B.html#ab428b6e16fde87d9fd44e5be280dd7ad" title="overloaded Function::eval_AXB()." alt="" coords="5,55,193,80"/>
+<area shape="rect" id="node4" href="$classBif__F2__NAND__B.html#ae5315b54ac11e1c324540c63fdc0833a" title="overloaded Function::get_scalar_f2()" alt="" coords="25,105,173,145"/>
+</map>

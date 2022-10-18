@@ -1,0 +1,6 @@
+<map id="Value::get_cscalar" name="Value::get_cscalar">
+<area shape="rect" id="node1" title="return the first element of the ravel of a scalar same as get_cfirst(), but named differently to indi..." alt="" coords="196,63,327,88"/>
+<area shape="rect" id="node2" href="$classQuad__FIO.html#a14780e1a24f30dc0cdb966f540e911d8" title="return the open FILE * (APL integer) handle" alt="" coords="5,5,148,31"/>
+<area shape="rect" id="node3" href="$classQuad__FIO.html#ab95b44edeb5f6bd5a57e0573e0b8f69a" title="return the open file for (APL integer) handle" alt="" coords="11,55,143,95"/>
+<area shape="rect" id="node4" href="$classValue.html#aad04e796b926355040d462e81b9d7f11" title="return this indexed by (one&#45;dimensional) IDX." alt="" coords="29,120,124,145"/>
+</map>

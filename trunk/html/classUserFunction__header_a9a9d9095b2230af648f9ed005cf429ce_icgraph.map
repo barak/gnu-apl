@@ -1,0 +1,6 @@
+<map id="UserFunction_header::get_error_info" name="UserFunction_header::get_error_info">
+<area shape="rect" id="node1" title="return source location where error was detected" alt="" coords="373,23,520,63"/>
+<area shape="rect" id="node2" href="$classNabla.html#a894eac5264914ef7eedcfc14643cc7ee" title="start editing, return source location if first_command is bad." alt="" coords="187,5,277,31"/>
+<area shape="rect" id="node4" href="$classUserFunction.html#a37c955f6a76f58d168d4533389249cae" title="constructor for a normal (i.e. non&#45;lambda) user defined function" alt="" coords="139,55,325,80"/>
+<area shape="rect" id="node3" href="$classNabla.html#a610d94a179335126e82e9eea07918d5a" title="edit this function" alt="" coords="5,5,91,31"/>
+</map>

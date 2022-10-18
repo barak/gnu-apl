@@ -1,0 +1,8 @@
+<map id="Cell::smaller_cp" name="Cell::smaller_cp">
+<area shape="rect" id="node1" title="compare cells[a] and cells[b] descendingly" alt="" coords="680,31,796,56"/>
+<area shape="rect" id="node2" href="$classCell.html#aea7b72b319c82a644d893455516dd8a1" title="return length indices i1, i2, ... iN so that ravel[i1] &lt; ravel[i2] &lt; ... &lt; ravel[iN]...." alt="" coords="495,31,632,56"/>
+<area shape="rect" id="node3" href="$classBif__F12__INDEX__OF.html#a43b0e0b7ab6be3b999471b2348442127" title="overloaded Function::eval_AB()" alt="" coords="248,5,447,31"/>
+<area shape="rect" id="node4" href="$classBif__F12__SORT.html#a96a04ad4c64826d8a72c7a02fddebe3d" title="sort integer vector B" alt="" coords="277,55,418,80"/>
+<area shape="rect" id="node5" href="$classBif__F12__SORT__ASC.html#a15d6a3708a79fe24e5194fcde4dacbd4" title="overloaded Function::eval_B()" alt="" coords="5,29,200,55"/>
+<area shape="rect" id="node6" href="$classBif__F12__SORT__DES.html#a6dd1b508746a56afb06f971ed69ae978" title="overloaded Function::eval_B()" alt="" coords="5,79,200,104"/>
+</map>

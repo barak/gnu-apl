@@ -1,0 +1,6 @@
+<map id="IntCell::need_scaling" name="IntCell::need_scaling">
+<area shape="rect" id="node2" href="$classIntCell.html#a77089ad490d047a720a3b17f005826a1" title="overloaded Cell::bif_add_inverse() " alt="" coords="197,5,356,32"/>
+<area shape="rect" id="node4" href="$classIntCell.html#affde792f28f19781bc57d395f55e4836" title="overloaded Cell::bif_multiply_inverse() " alt="" coords="209,57,344,98"/>
+<area shape="rect" id="node3" href="$classCell.html#a59d5a291b5324ae2b3814dda77df9798" title="store the difference between A and this cell in Z " alt="" coords="404,5,525,32"/>
+<area shape="rect" id="node5" href="$classCell.html#a664c3af5f6e0e44e0d8e0f327f13ee99" title="store the quotient between A and this cell in Z " alt="" coords="411,64,519,91"/>
+</map>

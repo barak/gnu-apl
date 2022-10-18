@@ -1,0 +1,7 @@
+<map id="Nabla::execute_escape" name="Nabla::execute_escape">
+<area shape="rect" id="node1" title="restore function" alt="" coords="5,80,164,105"/>
+<area shape="rect" id="node2" href="$classFunction.html#a4d321dbaeb262169b114f23de61e1d30" title="return a pointer to this UserFunction (if it is one)" alt="" coords="217,5,380,31"/>
+<area shape="rect" id="node3" href="$classSymbol.html#a071c9e8a32253986503751296e4b34a2" title="Return the current function (or throw a VALUE_ERROR)" alt="" coords="226,55,371,80"/>
+<area shape="rect" id="node4" href="$classExecutable.html#a3ecfb113708ab2c4590d0714280897ea" title="return function line n (0 = header line)" alt="" coords="227,104,370,129"/>
+<area shape="rect" id="node5" href="$classExecutable.html#aaa630db77581506910d16126a4eb3bc5" title="return number of function lines (including header line 0)" alt="" coords="212,153,385,179"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="Quad_CR::close_mode" name="Quad_CR::close_mode">
+<area shape="rect" id="node1" title="close current mode (ending &#39; for &#39;&#39; or ) for ⎕UCS())" alt="" coords="5,5,164,31"/>
+<area shape="rect" id="node2" href="$classUCS__string.html#ace70327ef899c525ad9c3f2bffd43697" title="append 0&#45;terminated UTF8 string str to this UCS_string." alt="" coords="212,5,392,31"/>
+<area shape="rect" id="node3" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="440,5,580,31"/>
+</map>

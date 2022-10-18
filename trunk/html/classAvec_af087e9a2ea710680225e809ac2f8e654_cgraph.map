@@ -1,0 +1,4 @@
+<map id="Avec::no_space_before" name="Avec::no_space_before">
+<area shape="rect" id="node1" title="return true iff a token printed before av never needs a space" alt="" coords="5,5,164,31"/>
+<area shape="rect" id="node2" href="$classAvec.html#afe30f62f26ec74019a95e5cbd6eaa111" title="Find av in character_table. Return position or Invalid_CHT." alt="" coords="212,5,325,31"/>
+</map>

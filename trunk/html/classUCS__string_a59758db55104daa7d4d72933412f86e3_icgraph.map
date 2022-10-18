@@ -1,0 +1,18 @@
+<map id="UCS_string::starts_iwith" name="UCS_string::starts_iwith">
+<area shape="rect" id="node1" title="return true if this starts with prefix (ASCII, case insensitive)." alt="" coords="947,173,1077,213"/>
+<area shape="rect" id="node2" href="$classCommand.html#a209e6b7262396300ee80f7764fc21da3" title=")BOXING command" alt="" coords="711,5,886,31"/>
+<area shape="rect" id="node3" href="$classCommand.html#a1e93c9bde851ee11f10b840c5cf72821" title="show or clear input history" alt="" coords="707,55,890,80"/>
+<area shape="rect" id="node4" href="$classCommand.html#a0b7131627e1a36bee1370e5a7572063f" title="show performance counters" alt="" coords="716,104,881,129"/>
+<area shape="rect" id="node5" href="$classCommand.html#a44d50f4ab683653103d3adad9d767826" title="enable and disable colors" alt="" coords="473,257,643,283"/>
+<area shape="rect" id="node6" href="$classCommand.html#ac143785ae5217051a7ef49bcbde1893c" title="process line which contains an APL command. Return true iff the command was user&#45;defined (and then th..." alt="" coords="699,205,899,231"/>
+<area shape="rect" id="node7" href="$classBif__F1__EXECUTE.html#a8445cd77207db38ab66f5c3278a831df" title="execute string containing an APL command" alt="" coords="465,143,651,183"/>
+<area shape="rect" id="node12" href="$classXML__Loading__Archive.html#a1233bd12e879f5670f4a234e0f37b7aa" title="read next Variable element" alt="" coords="723,357,875,397"/>
+<area shape="rect" id="node15" href="$classOutput.html#a366b2a6643a87e6c1f4d46eb01b9948f" title="set or toggle color mode (implementation of command ]XTERM)" alt="" coords="729,307,868,332"/>
+<area shape="rect" id="node11" href="$classCommand.html#ae26693534d4df16372f51e55e505b8d7" title="process line which contains a command or statements" alt="" coords="477,208,639,233"/>
+<area shape="rect" id="node8" href="$classBif__F1__EXECUTE.html#aefdd09df4262f08f508f9be8543896b7" title="execute string containing an APL expression or an APL command" alt="" coords="232,143,417,183"/>
+<area shape="rect" id="node9" href="$classBif__F1__EXECUTE.html#a4e1a5917e6a3bb368b459fb21c2b63a1" title="overladed Function::eval_B()" alt="" coords="5,125,184,151"/>
+<area shape="rect" id="node10" href="$classQuad__Quad.html#a253824f3a533bef36063138ea6ce0673" title="overloaded Symbol::resolve()." alt="" coords="24,175,165,200"/>
+<area shape="rect" id="node13" href="$classXML__Loading__Archive.html#a75730a7dd5af9238d0d1aa223a54060e" title="read next Symbol element" alt="" coords="482,357,634,397"/>
+<area shape="rect" id="node14" href="$classXML__Loading__Archive.html#a2a4f7a3fff06dfd2351348bf26fc90a3" title="read next Symbol element" alt="" coords="249,357,401,397"/>
+<area shape="rect" id="node16" href="$main_8cc.html#aa0321421b17def7b58fc0cabc8890260" title="initialize the interpreter" alt="" coords="527,307,589,332"/>
+</map>

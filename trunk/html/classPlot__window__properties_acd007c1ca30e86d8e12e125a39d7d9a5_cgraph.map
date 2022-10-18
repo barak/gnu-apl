@@ -1,0 +1,9 @@
+<map id="Plot_window_properties::valXYZ2pixelXY" name="Plot_window_properties::valXYZ2pixelXY">
+<area shape="rect" id="node1" title="convert values val_X, val_Y, and val_Z, to the X and Y coordinate of the pixel below the Z=0 plane of..." alt="" coords="5,165,165,205"/>
+<area shape="rect" id="node2" href="$classPlot__window__properties.html#a577510e3bcf6ba61978dc60d778dc967" title="return the smallest X value" alt="" coords="213,5,373,45"/>
+<area shape="rect" id="node3" href="$classPlot__window__properties.html#af27f118d1e90664680b2efd1a2460a03" title="return the smallest Y value" alt="" coords="213,69,373,109"/>
+<area shape="rect" id="node4" href="$classPlot__window__properties.html#a0640b99b583131dabf64478a88265e66" title="return the smallest Z value" alt="" coords="213,133,373,173"/>
+<area shape="rect" id="node5" href="$classPlot__window__properties.html#a087dfd5eee09a66161eb76c87680d14c" title="convert &#160;&#160;val_X to the X coordinate of the pixel in the plot area" alt="" coords="213,197,373,237"/>
+<area shape="rect" id="node6" href="$classPlot__window__properties.html#ae727cdd8ecd4888c8785c5fd53dc6b93" title="convert &#160;&#160;val_Y to the Y coordinate of the pixel in the plot area" alt="" coords="213,261,373,301"/>
+<area shape="rect" id="node7" href="$classPlot__window__properties.html#af978c228065cbaba8381af79bc1fce95" title="convert &#160;&#160;val_Z to the relative Z vector (q. quadrant)" alt="" coords="213,325,373,365"/>
+</map>

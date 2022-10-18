@@ -1,0 +1,9 @@
+<map id="Bif_COMMA::catenate" name="Bif_COMMA::catenate">
+<area shape="rect" id="node1" title="Catenate A and B." alt="" coords="489,108,644,133"/>
+<area shape="rect" id="node2" href="$classBif__COMMA.html#a54274d01c09566054ae5b08d34f65118" title="either catenate A and B or laminate A and B" alt="" coords="269,43,424,83"/>
+<area shape="rect" id="node5" href="$classBif__F12__COMMA.html#a87fad1aaa970af9f453d357390ef4299" title="overloaded Function::eval_AB()" alt="" coords="255,108,438,133"/>
+<area shape="rect" id="node7" href="$classBif__F12__COMMA1.html#adb234524e9ba2ad95fba11a405c070a4" title="overloaded Function::eval_AB()" alt="" coords="252,157,441,183"/>
+<area shape="rect" id="node3" href="$classBif__F12__COMMA.html#a22e1c5309fdfe1e3d450b6f586c35cc4" title="overloaded Function::eval_AXB()" alt="" coords="9,5,200,31"/>
+<area shape="rect" id="node4" href="$classBif__F12__COMMA1.html#a96459b1e66a6cb3b2327b3be37455b61" title="overloaded Function::eval_AXB()" alt="" coords="5,55,204,80"/>
+<area shape="rect" id="node6" href="$classBif__F12__UNION.html#a0929eb6bc282f9c312db42fdfa78686d" title="overloaded Function::eval_AB()" alt="" coords="17,108,192,133"/>
+</map>

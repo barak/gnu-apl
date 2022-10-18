@@ -1,0 +1,6 @@
+<map id="Avec::show_error_pos" name="Avec::show_error_pos">
+<area shape="rect" id="node2" href="$classAvec.html#a666636a6311c083efd37668dc7da68c2" title="check that the character table that is used in this class is correct " alt="" coords="205,5,356,32"/>
+<area shape="rect" id="node3" href="$classAvec.html#aa853fc89b23e2ef5d02a56a2339357bd" title="check that all characters in the UTF&#45;8 encoded file are known (through char_def() or char_uni() macro..." alt="" coords="221,56,340,83"/>
+<area shape="rect" id="node4" href="$classAvec.html#a9188425612180914156bba6bbcf881fe" title="initialize the static tables of this class and check them " alt="" coords="242,107,319,133"/>
+<area shape="rect" id="node5" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length " alt="" coords="219,157,342,184"/>
+</map>

@@ -1,0 +1,10 @@
+<map id="LineInput::add_history_line" name="LineInput::add_history_line">
+<area shape="rect" id="node1" title="add a line to the history" alt="" coords="5,80,183,106"/>
+<area shape="rect" id="node2" href="$classLineHistory.html#a870ae7c7f0a0abcc27623195bca68b20" title="add one line to this history" alt="" coords="231,80,375,106"/>
+<area shape="rect" id="node3" href="$classUCS__string.html#a186a76c22c3ac840f1e607ba49e253a0" title="return the last character in this string" alt="" coords="438,80,565,106"/>
+<area shape="rect" id="node4" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="628,56,751,82"/>
+<area shape="rect" id="node5" href="$classUCS__string.html#ac43d98d8d13b5a91d670fe9af9250861" title="return true if this string contains non&#45;whitespace characters" alt="" coords="423,179,580,204"/>
+<area shape="rect" id="node7" href="$classLineHistory.html#a65f9dbc23912fc543e4433659ffc81ed" title="start a new up/down sequence" alt="" coords="441,130,562,155"/>
+<area shape="rect" id="node8" href="$classUCS__string.html#a67ea87cb92e687105b21917ffb4a2a6f" title="remove the last character in this string" alt="" coords="424,31,579,56"/>
+<area shape="rect" id="node6" href="$classAvec.html#a014cc622b9ec09014dab1982b0ee59ab" title="return true iff av is a whitespace char (ASCII 0..32 (including))" alt="" coords="635,179,743,204"/>
+</map>

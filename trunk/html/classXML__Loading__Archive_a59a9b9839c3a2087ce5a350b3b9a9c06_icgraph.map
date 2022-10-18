@@ -1,0 +1,18 @@
+<map id="XML_Loading_Archive::print_tag" name="XML_Loading_Archive::print_tag">
+<area shape="rect" id="node1" title="print current tag" alt="" coords="1005,321,1157,361"/>
+<area shape="rect" id="node2" href="$classXML__Loading__Archive.html#ad8cf599287f50b63ee67539509c6dce1" title="check that is_tag(prefix) is true and print error info if not" alt="" coords="805,321,957,361"/>
+<area shape="rect" id="node3" href="$classXML__Loading__Archive.html#a28b4a906759f6035d41007056b0f4498" title="read next Command element" alt="" coords="605,5,757,45"/>
+<area shape="rect" id="node4" href="$classXML__Loading__Archive.html#aa277539e63e84953fa49069c6d51ea47" title="read all user&#45;defined commands" alt="" coords="405,31,557,71"/>
+<area shape="rect" id="node5" href="$classXML__Loading__Archive.html#a5085841ad5dd83bd88588db76c3a2838" title="read ⍎ Executable" alt="" coords="405,376,557,416"/>
+<area shape="rect" id="node7" href="$classXML__Loading__Archive.html#ad2f1d88070976eab8a41f0fdcd1e0ec1" title="read next StateIndicator element" alt="" coords="5,211,157,251"/>
+<area shape="rect" id="node8" href="$classXML__Loading__Archive.html#a2e7aed9883aa106937d3d9313163e10b" title="read next Function element" alt="" coords="605,235,757,275"/>
+<area shape="rect" id="node9" href="$classXML__Loading__Archive.html#a16b4789e109bf0167ae481b86a1ebedb" title="read a lambda" alt="" coords="605,171,757,211"/>
+<area shape="rect" id="node11" href="$classXML__Loading__Archive.html#a7381cad28d73cdca8a76bf741921c63d" title="read parsers in SI entry" alt="" coords="405,307,557,347"/>
+<area shape="rect" id="node12" href="$classXML__Loading__Archive.html#a5e165853b437a502be850f3527ef8b77" title="read ◊ Executable" alt="" coords="405,451,557,491"/>
+<area shape="rect" id="node13" href="$classXML__Loading__Archive.html#a75730a7dd5af9238d0d1aa223a54060e" title="read next Symbol element" alt="" coords="605,515,757,555"/>
+<area shape="rect" id="node14" href="$classXML__Loading__Archive.html#a2a4f7a3fff06dfd2351348bf26fc90a3" title="read next Symbol element" alt="" coords="405,543,557,583"/>
+<area shape="rect" id="node15" href="$classXML__Loading__Archive.html#a619b73db295d1c88790d671a9ce7fef4" title="read a token" alt="" coords="605,349,757,389"/>
+<area shape="rect" id="node16" href="$classXML__Loading__Archive.html#a475b4572fea93849b155009d78afbd66" title="read next Value element" alt="" coords="605,629,757,669"/>
+<area shape="rect" id="node6" href="$classXML__Loading__Archive.html#adfa844fcc401d3c335cafa5abda2f35d" title="read next StateIndicator entry" alt="" coords="205,307,357,347"/>
+<area shape="rect" id="node10" href="$classXML__Loading__Archive.html#a0cd18fa421176354e241891d951f5169" title="read a user defined Executable" alt="" coords="405,207,557,247"/>
+</map>

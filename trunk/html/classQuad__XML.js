@@ -1,0 +1,35 @@
+var classQuad__XML =
+[
+    [ "tree_flags", "classQuad__XML.html#a1b1e3817a4cc4035e3ddcb9fe82ce5e4", [
+      [ "tf_none", "classQuad__XML.html#a1b1e3817a4cc4035e3ddcb9fe82ce5e4a832b08e86c21e0fad2411e7f267f0d62", null ],
+      [ "tf_with_pos", "classQuad__XML.html#a1b1e3817a4cc4035e3ddcb9fe82ce5e4ac5d01e05b4ba3a8e01caa13bdf688198", null ],
+      [ "tf_with_decl", "classQuad__XML.html#a1b1e3817a4cc4035e3ddcb9fe82ce5e4a577b2fe2ee986df58751cac56978c04c", null ],
+      [ "tf_fullpath", "classQuad__XML.html#a1b1e3817a4cc4035e3ddcb9fe82ce5e4a1a718fd6d326313a973dd07865558e6e", null ],
+      [ "tf_tagname", "classQuad__XML.html#a1b1e3817a4cc4035e3ddcb9fe82ce5e4a998024fa687f51d05450456e9fa3f257", null ],
+      [ "tf_decl", "classQuad__XML.html#a1b1e3817a4cc4035e3ddcb9fe82ce5e4aee7396e5f592f326d0cc6ffd7f7fd501", null ],
+      [ "tf_text", "classQuad__XML.html#a1b1e3817a4cc4035e3ddcb9fe82ce5e4a95518d45c04d861dd99ddb06cd7b7c4b", null ],
+      [ "tf_sub", "classQuad__XML.html#a1b1e3817a4cc4035e3ddcb9fe82ce5e4a826cc6e4021612914df8d8cd958a9065", null ],
+      [ "tf_all", "classQuad__XML.html#a1b1e3817a4cc4035e3ddcb9fe82ce5e4aa0849ba69da7c0a37dae87903c6188f0", null ],
+      [ "tf_flat", "classQuad__XML.html#a1b1e3817a4cc4035e3ddcb9fe82ce5e4a3b3c7c46373e84994fef2df46c95b424", null ],
+      [ "tf_delta", "classQuad__XML.html#a1b1e3817a4cc4035e3ddcb9fe82ce5e4a6746151c9eec75f93f7f98e02239fb30", null ]
+    ] ],
+    [ "Quad_XML", "classQuad__XML.html#a5b69c0d3ae12a26cfab1ee4089225d20", null ],
+    [ "add_sorted_entities", "classQuad__XML.html#a08fc4c7594b99bc7a667105ceab0b728", null ],
+    [ "all_members", "classQuad__XML.html#a245916c12bdc27c2931868d6b6f46dbb", null ],
+    [ "all_members", "classQuad__XML.html#af494dd922a2e9247f05971e30eb295be", null ],
+    [ "APL_to_XML", "classQuad__XML.html#aa0a04e6cd3d25a34a042a5b2dcee0530", null ],
+    [ "convert_file", "classQuad__XML.html#acda08006d2a9ee1558e6a68adbb8ac59", null ],
+    [ "eval_AB", "classQuad__XML.html#ad5de89a09c7528bcea93377a1f9424a8", null ],
+    [ "eval_B", "classQuad__XML.html#afb56e2b1109a16c834b1d2d6862b95cc", null ],
+    [ "name_split", "classQuad__XML.html#a870bccc69998ab12a7e8fb035061470c", null ],
+    [ "name_unsplit", "classQuad__XML.html#aa4641da84bb47a049da380f0305ae362", null ],
+    [ "next_member", "classQuad__XML.html#a2c3c8a5e317d6e322a52426b36d1e233", null ],
+    [ "path_split", "classQuad__XML.html#ab5b8b53a86054137e1ba52a8eeb8b909", null ],
+    [ "skip_pos_prefix", "classQuad__XML.html#a70ca0d48249c0832099e440b364e397d", null ],
+    [ "split_name", "classQuad__XML.html#aab96f8185b0ea6582ae50c011ec4807d", null ],
+    [ "tree", "classQuad__XML.html#a2d9bbea1efb1cffbac04fc89884ccf2c", null ],
+    [ "tree", "classQuad__XML.html#a5bcd4e24ec77d46d3d97ca72023148a2", null ],
+    [ "XML_to_APL", "classQuad__XML.html#a8e4ca50c2d54d630895c22115857325e", null ],
+    [ "_fun", "classQuad__XML.html#a8df8efb185f948525f0f21d7ed83bbb5", null ],
+    [ "fun", "classQuad__XML.html#aa97b12260318f2538117812afe160eda", null ]
+];

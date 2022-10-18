@@ -1,0 +1,7 @@
+<map id="ComplexCell::need_scaling" name="ComplexCell::need_scaling">
+<area shape="rect" id="node1" title="return true iff this cell needs scaling (exponential format) in pctx." alt="" coords="5,22,187,48"/>
+<area shape="rect" id="node2" href="$classPrintContext.html#ad9230a07565823a9052d079dd25a96d7" title="return the print precision to be used" alt="" coords="457,9,604,34"/>
+<area shape="rect" id="node3" href="$classComplexCell.html#a028e5e684fcb55f616d876dd8a22166c" title="overloaded Cell::is_near_real()" alt="" coords="235,22,409,48"/>
+<area shape="rect" id="node4" href="$classFloatCell.html#ad2bf434993646c6d2434942bdf1086e2" title="return true iff this cell needs scaling (exponential format) in pctx." alt="" coords="243,96,401,121"/>
+<area shape="rect" id="node5" href="$classFloatCell.html#afa1a46cfd36a3c2166559f7d425f094d" title="return the value of this cell as a double (even if the value is rational)" alt="" coords="475,96,586,121"/>
+</map>

@@ -1,7 +1,7 @@
 var classQuad__TZ =
 [
     [ "Quad_TZ", "classQuad__TZ.html#ad84775d7b640638a658b46ecffa7a353", null ],
-    [ "assign", "classQuad__TZ.html#aabbd3c7e58b0f70fdf15983b8f2b371d", null ],
+    [ "assign", "classQuad__TZ.html#a696589f470ef673dd05581d393b1db7f", null ],
     [ "compute_offset", "classQuad__TZ.html#ab5bdac48e5615676a033a1496e281cc4", null ],
     [ "get_offset", "classQuad__TZ.html#aca7ab6c3b090bca821fc85536b6a67c1", null ],
     [ "pop", "classQuad__TZ.html#af1018fdc6242f9ec1ee3348e47a0f646", null ],

@@ -1,0 +1,8 @@
+<map id="Quad_PNG::eval_AB" name="Quad_PNG::eval_AB">
+<area shape="rect" id="node1" title="overloaded Function::eval_AB()" alt="" coords="5,31,152,56"/>
+<area shape="rect" id="node2" href="$classUTF8__string.html#a922bd7ebc6a8ea5c6ba9c54159b18a93" title="return this string as a 0&#45;terminated C string" alt="" coords="227,5,358,31"/>
+<area shape="rect" id="node3" href="$classQuad__PNG.html#aec95f6eab85b55e0f54436fd3f9efe9d" title="write APL pixel matrix B PNG file filename" alt="" coords="200,55,385,80"/>
+<area shape="rect" id="node4" href="$Quad__PNG_8cc.html#a3943cc310023d7accfbb3ee9c711edf1" title="callback for libpng errors" alt="" coords="475,5,548,31"/>
+<area shape="rect" id="node5" href="$Quad__PNG_8cc.html#a433f99e363c749b4713e3567f3e80b75" title="callback for libpng warnings" alt="" coords="468,55,555,80"/>
+<area shape="rect" id="node6" href="$classQuad__PNG.html#a501d4ceea254cf504a991b9d58a65c81" title="return true iff the combination of color_type and bit_depth is valid in the PNG standard AND supporte..." alt="" coords="433,105,589,145"/>
+</map>

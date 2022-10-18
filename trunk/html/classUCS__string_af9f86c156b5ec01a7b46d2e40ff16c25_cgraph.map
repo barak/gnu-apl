@@ -1,0 +1,7 @@
+<map id="UCS_string::remove_trailing_padchars" name="UCS_string::remove_trailing_padchars">
+<area shape="rect" id="node1" title="remove trailing pad characters" alt="" coords="5,74,147,114"/>
+<area shape="rect" id="node2" href="$classUCS__string.html#a186a76c22c3ac840f1e607ba49e253a0" title="return the last character in this string" alt="" coords="209,5,335,31"/>
+<area shape="rect" id="node3" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="397,81,520,107"/>
+<area shape="rect" id="node4" href="$classUCS__string.html#a0b30b7def05056722f3e1eda0b816e4e" title="return true if this string contains uni" alt="" coords="199,107,345,132"/>
+<area shape="rect" id="node5" href="$classUCS__string.html#a67ea87cb92e687105b21917ffb4a2a6f" title="remove the last character in this string" alt="" coords="195,156,349,181"/>
+</map>

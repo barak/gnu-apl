@@ -1,6 +1,5 @@
 <map id="UserPreferences::usage" name="UserPreferences::usage">
-<area shape="rect" id="node2" href="$structUserPreferences.html#afbb29191d4c126b0f767f92eb427d568" title="parse command line parameters (after reading preference files) " alt="" coords="216,5,376,47"/>
-<area shape="rect" id="node5" href="$structUserPreferences.html#aaf377cc53e470138ca91e289dd3f93a6" title="UserPreferences::UserPreferences" alt="" coords="424,67,651,94"/>
-<area shape="rect" id="node3" href="$main_8cc.html#aa0321421b17def7b58fc0cabc8890260" title="initialize the interpreter " alt="" coords="506,13,569,39"/>
-<area shape="rect" id="node4" href="$main_8cc.html#ac0f2228420376f4db7e1274f2b41667c" title="dito. " alt="" coords="699,13,749,39"/>
+<area shape="rect" id="node1" title="print possible command line options and exit" alt="" coords="324,13,487,38"/>
+<area shape="rect" id="node2" href="$structUserPreferences.html#afbb29191d4c126b0f767f92eb427d568" title="parse command line parameters (AFTER reading preference files) Parses all valid options." alt="" coords="116,5,276,45"/>
+<area shape="rect" id="node3" href="$main_8cc.html#aa0321421b17def7b58fc0cabc8890260" title="initialize the interpreter" alt="" coords="5,13,68,38"/>
 </map>

@@ -1,0 +1,4 @@
+<map id="InputFile::open_current_file" name="InputFile::open_current_file">
+<area shape="rect" id="node1" title="open current file unless already open" alt="" coords="5,13,184,38"/>
+<area shape="rect" id="node2" href="$structInputFile.html#a18512cd0e41c3508dcb5aea08a3662c7" title="the name of the currrent file" alt="" coords="232,5,352,45"/>
+</map>

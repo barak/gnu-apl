@@ -4,7 +4,7 @@ var classBif__F2__OR__B =
     [ "eval_AB", "classBif__F2__OR__B.html#a9435ad23b29955918cac355488160c09", null ],
     [ "eval_AXB", "classBif__F2__OR__B.html#ac81751d6e2e20ea2dceb834871c08633", null ],
     [ "eval_B", "classBif__F2__OR__B.html#aca40b9b69a30f974ba243019c923b4ff", null ],
-    [ "eval_identity_fun", "classBif__F2__OR__B.html#a78b00188b18c2cba4b8c63b7c74ead8e", null ],
+    [ "eval_identity_fun", "classBif__F2__OR__B.html#a5d071574c84607b8fa504d8b9d0b757c", null ],
     [ "get_assoc", "classBif__F2__OR__B.html#a86a3d18b4d913d923dd571c1449ed72f", null ],
     [ "get_scalar_f2", "classBif__F2__OR__B.html#a4586ca375872ca37ae152b5492ad3032", null ],
     [ "_fun", "classBif__F2__OR__B.html#aa94eb5bf75f2447d0315e74ee2990a69", null ],

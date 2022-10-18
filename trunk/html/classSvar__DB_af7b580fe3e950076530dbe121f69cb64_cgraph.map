@@ -1,0 +1,4 @@
+<map id="Svar_DB::connect_to_APserver" name="Svar_DB::connect_to_APserver">
+<area shape="rect" id="node1" title="return a socket that is connect to APserver" alt="" coords="5,5,152,45"/>
+<area shape="rect" id="node2" href="$classSvar__DB.html#a9a7551390b49554688b4233cd73e14a8" title="start an APserver process, return true on failure" alt="" coords="200,13,371,38"/>
+</map>

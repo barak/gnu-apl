@@ -1,0 +1,4 @@
+<map id="NativeFunction::load_emacs_library" name="NativeFunction::load_emacs_library">
+<area shape="rect" id="node1" title="load shared lib for emacs mode, return error info on failure" alt="" coords="116,5,259,45"/>
+<area shape="rect" id="node2" href="$main_8cc.html#aa0321421b17def7b58fc0cabc8890260" title="initialize the interpreter" alt="" coords="5,13,68,38"/>
+</map>

@@ -1,0 +1,13 @@
+<map id="Nabla::edit_body_line" name="Nabla::edit_body_line">
+<area shape="rect" id="node1" title="edit body line" alt="" coords="5,80,152,105"/>
+<area shape="rect" id="node2" href="$classNabla.html#aaecb4d9949ecf1b3211fd08889d16926" title="return index of line with label lab, or &#45;1 if not found." alt="" coords="223,5,335,31"/>
+<area shape="rect" id="node3" href="$classWorkspace.html#a81618932a28523c1274fb1c2ed3d9553" title="return reference to more info about last error" alt="" coords="200,55,359,80"/>
+<area shape="rect" id="node4" href="$structLineLabel.html#a8544cde47bc94d5f9f7e0141e8029633" title="increase the line number" alt="" coords="224,104,335,129"/>
+<area shape="rect" id="node7" href="$classUCS__string.html#a91556379049e71071410cec015b960db" title="remove leading and trailing whitespaces" alt="" coords="208,153,351,208"/>
+<area shape="rect" id="node5" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="410,55,550,80"/>
+<area shape="rect" id="node6" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="804,220,927,245"/>
+<area shape="rect" id="node8" href="$classUCS__string.html#a07e8673ec73ad31228be88053aeff1b1" title="remove leading blanks, tabs, etc" alt="" coords="603,155,754,195"/>
+<area shape="rect" id="node9" href="$classUCS__string.html#a6a4540c3a5a7621f91406454b4f93cd0" title="remove trailing blanks, tabs, etc" alt="" coords="407,239,553,279"/>
+<area shape="rect" id="node10" href="$classUCS__string.html#a186a76c22c3ac840f1e607ba49e253a0" title="return the last character in this string" alt="" coords="615,271,742,296"/>
+<area shape="rect" id="node11" href="$classUCS__string.html#a67ea87cb92e687105b21917ffb4a2a6f" title="remove the last character in this string" alt="" coords="601,320,756,345"/>
+</map>

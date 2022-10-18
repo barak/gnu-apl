@@ -1,0 +1,5 @@
+<map id="CDR_header::get_nelm" name="CDR_header::get_nelm">
+<area shape="rect" id="node1" title="return the number of elements in host endian" alt="" coords="371,5,529,31"/>
+<area shape="rect" id="node2" href="$classCDR__string.html#a30f36dfd3f3cf0a986088599a89f8ca5" title="return non&#45;zero if this CDR is malformed" alt="" coords="188,5,323,31"/>
+<area shape="rect" id="node3" href="$classCDR__string.html#afffda21a8a84990808848717452a1c8e" title="print properties" alt="" coords="5,5,140,31"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="CDR_string::get_type" name="CDR_string::get_type">
+<area shape="rect" id="node1" title="return the CDR type of this CDR" alt="" coords="407,55,556,80"/>
+<area shape="rect" id="node2" href="$classCDR__string.html#a30f36dfd3f3cf0a986088599a89f8ca5" title="return non&#45;zero if this CDR is malformed" alt="" coords="206,5,341,31"/>
+<area shape="rect" id="node4" href="$classCDR__string.html#ade9734126c60d5aa61617a183e8e1331" title="return true if this CDR is character" alt="" coords="188,55,359,80"/>
+<area shape="rect" id="node5" href="$classCDR__string.html#a2a590a335b86096935aae4cb570645f1" title="return true if this CDR is bool or integer" alt="" coords="196,104,351,129"/>
+<area shape="rect" id="node3" href="$classCDR__string.html#afffda21a8a84990808848717452a1c8e" title="print properties" alt="" coords="5,5,140,31"/>
+</map>

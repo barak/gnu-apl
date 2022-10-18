@@ -1,0 +1,9 @@
+<map id="Quad_TF::tf2_fun_ucs" name="Quad_TF::tf2_fun_ucs">
+<area shape="rect" id="node1" title="store B in transfer format 2 (new APL format) into ucs" alt="" coords="596,31,748,56"/>
+<area shape="rect" id="node2" href="$classQuad__TF.html#a4bd033c3e755ec0a60c0254438199b91" title="return B in transfer format 2 (new APL format) for a function" alt="" coords="417,5,541,31"/>
+<area shape="rect" id="node5" href="$classSymbol.html#a6b9b4537d95855e6490a8ec1b64b6cce" title="write this symbol in )OUT format to file out" alt="" coords="411,55,548,80"/>
+<area shape="rect" id="node3" href="$classQuad__TF.html#aad2b15f3268d7098d75babcd03e5c762" title="return B in transfer format 2 (new APL2 format)" alt="" coords="234,5,333,31"/>
+<area shape="rect" id="node4" href="$classQuad__TF.html#a27ed4b02d5f1a1c8a8b0a1fcbe2756f8" title="Overloaded Function::eval_AB()." alt="" coords="14,5,147,31"/>
+<area shape="rect" id="node6" href="$classWorkspace.html#a7ffca45a4446b644e7caf093a1699ba2" title="write symbols for )OUT command" alt="" coords="204,55,363,80"/>
+<area shape="rect" id="node7" href="$classCommand.html#a4afcbbdbee3fd2f536db12651861110b" title=")OUT: export a workspace file" alt="" coords="5,55,156,80"/>
+</map>

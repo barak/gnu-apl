@@ -1,6 +1,5 @@
 var structFormat__sub =
 [
-    [ "Format_sub", "structFormat__sub.html#a582146af2b5266f3dc8fe4fc47e58e86", null ],
     [ "do_float", "structFormat__sub.html#ad0eaaa99b04739d720fbb70728a41f2b", null ],
     [ "insert_fract_commas", "structFormat__sub.html#adb55b58d19ee1fb9f53292b9ec135e65", null ],
     [ "insert_int_commas", "structFormat__sub.html#a52e45dee4cebe1d7193c96dfee019067", null ],

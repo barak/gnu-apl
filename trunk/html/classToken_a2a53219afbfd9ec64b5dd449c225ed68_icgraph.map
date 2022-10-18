@@ -1,0 +1,23 @@
+<map id="Token::get_cpx_real" name="Token::get_cpx_real">
+<area shape="rect" id="node1" title="return the complex real value of this token" alt="" coords="1539,141,1679,166"/>
+<area shape="rect" id="node2" href="$classParser.html#a2eef18990564bb557f9014b0465a256d" title="Create one scalar APL value from a token." alt="" coords="1325,5,1472,45"/>
+<area shape="rect" id="node8" href="$classParser.html#a29c256f9df4d2c0d2da0d728e1d12526" title="Create one vector APL value from value_count single values." alt="" coords="1325,69,1472,109"/>
+<area shape="rect" id="node9" href="$classXML__Saving__Archive.html#a7be3cd4709e0783821a20738ee44433f" title="emit a token value up to (excluding) the &#39;&gt;&#39; of the end token" alt="" coords="1325,133,1472,173"/>
+<area shape="rect" id="node17" href="$structCommand_1_1transfer__context.html#a692d84840f69d40df03843f0d7589017" title="process an &#39;N&#39; (numeric in 1 ⎕TF format) item." alt="" coords="1307,197,1491,237"/>
+<area shape="rect" id="node20" href="$classQuad__TF.html#aa5afb1189a241875b5e94b71a3ebe79a" title="return inverse transfer format 1 (old APL format) for a variable" alt="" coords="1337,262,1460,287"/>
+<area shape="rect" id="node3" href="$classParser.html#a2ec94a9ef33782db92065a4c15e53295" title="Create one APL value from len values." alt="" coords="1095,55,1238,81"/>
+<area shape="rect" id="node4" href="$classParser.html#aa6206be9b275310ea5c9ecca098fc113" title="Collect consecutive smaller APL values or value token into vectors." alt="" coords="856,33,1027,58"/>
+<area shape="rect" id="node7" href="$classParser.html#ad6ae52cbe0094ff62852548096166b97" title="Collect groups." alt="" coords="865,82,1017,107"/>
+<area shape="rect" id="node5" href="$classParser.html#a3eeeb92bcac2c60b355c30b5ccd4060e" title="Parse token string tos (a statement without diamonds)." alt="" coords="643,81,808,106"/>
+<area shape="rect" id="node6" href="$classParser.html#af5fc690941afdce0fd36c6c9629e5186" title="Parse UCS_string input into token string tos." alt="" coords="471,81,571,106"/>
+<area shape="rect" id="node10" href="$classXML__Saving__Archive.html#a2595cc03a54882176e3d9bddd9bbff60" title="write Token_loc tloc" alt="" coords="1093,133,1240,173"/>
+<area shape="rect" id="node11" href="$classXML__Saving__Archive.html#a6d474efaefd9567ab70fe498729bb186" title="write the Prefix parser of si (and its derived functions)" alt="" coords="868,133,1015,173"/>
+<area shape="rect" id="node12" href="$classXML__Saving__Archive.html#a3bc62d82baa6be004398f70faa1b3e8b" title="write StateIndicator entry si" alt="" coords="652,133,799,173"/>
+<area shape="rect" id="node13" href="$classXML__Saving__Archive.html#acc327395cab545ea7797d92f5c931cab" title="write entire workspace" alt="" coords="448,133,595,173"/>
+<area shape="rect" id="node14" href="$classWorkspace.html#a8a4f1d898d523818dbd9d7efa6f2cf92" title="save this workspace" alt="" coords="247,141,400,166"/>
+<area shape="rect" id="node15" href="$classCommand.html#ad61e749290966d00856ce1dd4f6abe42" title=")SAVE active WS as CONTINUE and )OFF" alt="" coords="5,115,199,141"/>
+<area shape="rect" id="node16" href="$classCommand.html#aec0c4c6efbb9df9a34220b510f58905a" title=")SAVE: save a workspace file (.xml)" alt="" coords="23,165,181,190"/>
+<area shape="rect" id="node18" href="$structCommand_1_1transfer__context.html#a9c4651f90f36f6cc728e7146a3a4a0aa" title="process one record of a workspace file" alt="" coords="1075,197,1259,237"/>
+<area shape="rect" id="node19" href="$classCommand.html#aa0764d08a6ae9c8270907ab7d5dc37cf" title=")IN: import a workspace file" alt="" coords="873,205,1009,230"/>
+<area shape="rect" id="node21" href="$classQuad__TF.html#a27ed4b02d5f1a1c8a8b0a1fcbe2756f8" title="Overloaded Function::eval_AB()." alt="" coords="1100,262,1233,287"/>
+</map>

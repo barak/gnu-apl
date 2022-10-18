@@ -1,0 +1,9 @@
+<map id="Error::error_minor" name="Error::error_minor">
+<area shape="rect" id="node1" title="return the category (⎕ET) of the error" alt="" coords="903,55,1025,80"/>
+<area shape="rect" id="node2" href="$classQuad__EC.html#a44e3cc95f4d9c98ced01bf1810c32208" title="end of context handler for ⎕EC" alt="" coords="718,5,826,31"/>
+<area shape="rect" id="node6" href="$classQuad__EC.html#a856174e390a934b63bc19affe232937e" title="overloaded Function::eval_B()." alt="" coords="709,55,835,80"/>
+<area shape="rect" id="node7" href="$classQuad__ET.html#a7cfb4dc2ee0ca9bedff94fdaca4e1cc5" title="overloaded Symbol::get_apl_value()." alt="" coords="689,104,855,129"/>
+<area shape="rect" id="node3" href="$classCommand.html#a879617e7645bea2e4052154f16999634" title="finish the current SI&#45;&gt;top() and pop it when done" alt="" coords="471,5,641,31"/>
+<area shape="rect" id="node4" href="$classCommand.html#af36741357bfd4e183b34ee8b747bc7c5" title="process line which contains APL statements" alt="" coords="216,5,423,31"/>
+<area shape="rect" id="node5" href="$classCommand.html#ae26693534d4df16372f51e55e505b8d7" title="process line which contains a command or statements" alt="" coords="5,5,168,31"/>
+</map>

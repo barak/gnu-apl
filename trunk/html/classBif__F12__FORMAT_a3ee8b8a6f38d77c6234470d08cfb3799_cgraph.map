@@ -1,0 +1,11 @@
+<map id="Bif_F12_FORMAT::format_spec_float" name="Bif_F12_FORMAT::format_spec_float">
+<area shape="rect" id="node1" title="format value with precision mantissa digits (floating format)" alt="" coords="5,77,180,117"/>
+<area shape="rect" id="node2" href="$classUCS__string.html#a52cd4088451200cd78eb2db03b44a8ac" title="erase 1 (!) character at pos" alt="" coords="247,27,378,52"/>
+<area shape="rect" id="node3" href="$classUCS__string.html#aa709505bf047198286576ec964a34fc8" title="convert double value to an UCS_string with fract_digits fractional digits in fixed point format" alt="" coords="228,77,397,117"/>
+<area shape="rect" id="node8" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="855,135,977,160"/>
+<area shape="rect" id="node4" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="659,5,799,31"/>
+<area shape="rect" id="node5" href="$classUCS__string.html#a725b0579ccbb59a9c090692e83ad302b" title="convert the integer part of value to an UCS_string and remove it from value" alt="" coords="451,55,599,80"/>
+<area shape="rect" id="node6" href="$classUCS__string.html#a6a6dd45662d5d5024b50ba031c2c6ac6" title="round last digit and discard it." alt="" coords="445,105,604,145"/>
+<area shape="rect" id="node7" href="$classUCS__string.html#a186a76c22c3ac840f1e607ba49e253a0" title="return the last character in this string" alt="" coords="666,59,793,84"/>
+<area shape="rect" id="node9" href="$classUCS__string.html#a67ea87cb92e687105b21917ffb4a2a6f" title="remove the last character in this string" alt="" coords="652,160,807,185"/>
+</map>

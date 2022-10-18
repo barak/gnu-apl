@@ -1,0 +1,8 @@
+<map id="StateIndicator::nth_push" name="StateIndicator::nth_push">
+<area shape="rect" id="node1" title="return the level at which sym is pushed for the nth. time" alt="" coords="736,31,900,56"/>
+<area shape="rect" id="node2" href="$classSymbol.html#a5065001703f1e4b076830d51e42d189c" title="return the level of fun on the stack of this Symbol) on the SI stack" alt="" coords="541,31,688,56"/>
+<area shape="rect" id="node3" href="$classDoxy.html#a5eb9b5605981c826438d5a51f38bf5a4" title="HTML&#45;print a table containing all defined functions to page." alt="" coords="344,5,493,31"/>
+<area shape="rect" id="node6" href="$classDoxy.html#a226cb7889fd26eca46ab7be00cf517eb" title="HTML&#45;print a table with all variables to &#39;page&#39;." alt="" coords="345,55,493,80"/>
+<area shape="rect" id="node4" href="$classDoxy.html#ad8abe2e8a1b686a7b35e582c369d41ae" title="generate the entire documentation" alt="" coords="213,31,296,56"/>
+<area shape="rect" id="node5" href="$classCommand.html#a834eac0e797a5d1c992018b7d0c049a4" title="]DOXY: create doxygen&#45;like documentation of the current workspace" alt="" coords="5,31,165,56"/>
+</map>

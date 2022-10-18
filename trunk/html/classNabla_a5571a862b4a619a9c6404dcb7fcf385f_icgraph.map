@@ -1,0 +1,4 @@
+<map id="Nabla::edit_function" name="Nabla::edit_function">
+<area shape="rect" id="node1" title="edit the function specified in cmd (e.g. cmd = &quot;∇FUN&quot;)" alt="" coords="216,5,355,31"/>
+<area shape="rect" id="node2" href="$classCommand.html#ae26693534d4df16372f51e55e505b8d7" title="process line which contains a command or statements" alt="" coords="5,5,168,31"/>
+</map>

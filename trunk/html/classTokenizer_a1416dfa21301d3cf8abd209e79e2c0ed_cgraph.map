@@ -1,0 +1,7 @@
+<map id="Tokenizer::tokenize_function" name="Tokenizer::tokenize_function">
+<area shape="rect" id="node1" title="tokenize a primitive (1&#45;character) function" alt="" coords="5,23,141,63"/>
+<area shape="rect" id="node2" href="$classToken.html#a13e8b65088f8a7d103772acc6cfb5140" title="return the tag of this token" alt="" coords="202,5,311,31"/>
+<area shape="rect" id="node3" href="$classAvec.html#a9adba9efe915ef9eae7c9e969aa9ceb6" title="Return a token containing av." alt="" coords="189,55,324,80"/>
+<area shape="rect" id="node4" href="$classAvec.html#afe30f62f26ec74019a95e5cbd6eaa111" title="Find av in character_table. Return position or Invalid_CHT." alt="" coords="407,29,521,55"/>
+<area shape="rect" id="node5" href="$classAvec.html#ad45bd7c00f8480d9e72c5cd40c702ef3" title="Find return position of alt_av, or Invalid_AV if not found." alt="" coords="372,79,556,104"/>
+</map>

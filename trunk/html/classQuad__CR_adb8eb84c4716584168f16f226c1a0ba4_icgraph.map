@@ -1,0 +1,8 @@
+<map id="Quad_CR::do_CR10_variable" name="Quad_CR::do_CR10_variable">
+<area shape="rect" id="node1" title="portable variable encoding of value name (varname or varname ⊂)" alt="" coords="799,31,993,56"/>
+<area shape="rect" id="node2" href="$classQuad__CR.html#ad98ce37f2b329eb37ddae9d0fcf7832f" title="10 ⎕CR symbol_name (variable or function name). Also used for )OUT" alt="" coords="608,5,751,31"/>
+<area shape="rect" id="node3" href="$classSymbol.html#a9f5e43c937f34053d09f3406f01dacbd" title="dump this symbol to out" alt="" coords="626,55,733,80"/>
+<area shape="rect" id="node4" href="$classSymbolTable.html#ae8e03d7855f323239450e78d66b4b29d" title="dump symbols to out" alt="" coords="421,55,560,80"/>
+<area shape="rect" id="node5" href="$classWorkspace.html#a15d8cb5c62016f547b9718e820c94efd" title="dump this workspace" alt="" coords="216,55,373,80"/>
+<area shape="rect" id="node6" href="$classCommand.html#a98e7d1dd0c01014d79f2120292588a70" title=")DUMP: dump a workspace file (.apl)" alt="" coords="5,55,168,80"/>
+</map>

@@ -1,0 +1,4 @@
+<map id="InputFile::pushed_file" name="InputFile::pushed_file">
+<area shape="rect" id="node1" title="return true iff the current input file exists and is a pushed immediate execution" alt="" coords="183,5,329,31"/>
+<area shape="rect" id="node2" href="$classInputMux.html#a8a79cbe5207cde162fb36133ad9defdd" title="get one line" alt="" coords="5,5,135,31"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="Value::get_pointer_cell_count" name="Value::get_pointer_cell_count">
+<area shape="rect" id="node1" title="return the PointerCell count" alt="" coords="188,23,315,63"/>
+<area shape="rect" id="node2" href="$classValue.html#ad7690feabb8b39935c70033b754e5138" title="check the cells of this value, return the number of errors." alt="" coords="5,5,140,31"/>
+<area shape="rect" id="node3" href="$classValue.html#a3a578f458da8a4ab67052dba0f7bffdd" title="destructor" alt="" coords="21,55,125,80"/>
+</map>

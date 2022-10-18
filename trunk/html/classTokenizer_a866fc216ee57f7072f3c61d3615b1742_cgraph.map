@@ -1,0 +1,10 @@
+<map id="Tokenizer::tokenize_real" name="Tokenizer::tokenize_real">
+<area shape="rect" id="node1" title="tokenize a real number (integer or floating point)." alt="" coords="5,157,169,183"/>
+<area shape="rect" id="node2" href="$classUTF8__string.html#ae512c0617f7a13fe5011655d898ca6c1" title="append the UTF8_string suffix" alt="" coords="217,5,401,31"/>
+<area shape="rect" id="node3" href="$classUTF8__string.html#aa50b9387ce82e49d133df6a77bfe007c" title="return the last byte in this string" alt="" coords="463,81,594,107"/>
+<area shape="rect" id="node4" href="$classUTF8__string.html#a7b07ddeb39d90c41cf03575d8d23dc37" title="prevent basic_string::erase() with its dangerous default value for the number of erased character." alt="" coords="242,208,377,233"/>
+<area shape="rect" id="node5" href="$classAvec.html#af6b90a707281ad128da1764d92d85cd7" title="Return true iff av is a digit (i.e. 0 ≤ av ≤ 9)" alt="" coords="478,284,579,309"/>
+<area shape="rect" id="node6" href="$classAvec.html#a66092df90d68797a7c980b609b9b66e2" title="Return true iff av is a digit (i.e. 0 ≤ av ≤ 9)" alt="" coords="245,309,374,335"/>
+<area shape="rect" id="node7" href="$classUTF8__string.html#aa8e2ee7b64f5efb0c8372bf951fb0704" title="discard the last byte in this string" alt="" coords="449,144,608,169"/>
+<area shape="rect" id="node8" href="$classUTF8__string.html#a000b976e22f0ff0ed798682f37e5c817" title="round a digit string is the fractional part of a number between 0.0... and 0.9... up or down accordin..." alt="" coords="228,107,391,132"/>
+</map>

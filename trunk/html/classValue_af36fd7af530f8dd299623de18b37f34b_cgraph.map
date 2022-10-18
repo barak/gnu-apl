@@ -1,0 +1,4 @@
+<map id="Value::erase_all" name="Value::erase_all">
+<area shape="rect" id="node1" title="erase all values (clean&#45;up after )CLEAR)" alt="" coords="5,5,120,31"/>
+<area shape="rect" id="node2" href="$classDynamicObject.html#a1e474e9faac99829c40774e489fc3db8" title="return the next DynamicObject in its list" alt="" coords="168,5,339,31"/>
+</map>

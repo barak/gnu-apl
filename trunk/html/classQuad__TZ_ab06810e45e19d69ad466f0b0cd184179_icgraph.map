@@ -1,0 +1,14 @@
+<map id="Quad_TZ::print_timestamp" name="Quad_TZ::print_timestamp">
+<area shape="rect" id="node2" href="$classCommand.html#a427a447f00c0b3b928b87b74ebd467ea" title=")DROP: delete a workspace file " alt="" coords="233,5,395,32"/>
+<area shape="rect" id="node3" href="$classWorkspace.html#a15d8cb5c62016f547b9718e820c94efd" title="dump this workspace " alt="" coords="235,56,393,83"/>
+<area shape="rect" id="node5" href="$classWorkspace.html#a25b1479320040415ecbe9fb7466743d7" title="load )DUMPed file from open file descriptor fd (closes fd) " alt="" coords="231,107,397,133"/>
+<area shape="rect" id="node11" href="$classWorkspace.html#a8a4f1d898d523818dbd9d7efa6f2cf92" title="save this workspace " alt="" coords="237,183,391,209"/>
+<area shape="rect" id="node4" href="$classCommand.html#a4452851fc718555cd4cdc7c2a146ccbb" title=")DUMP: dump a workspace file (.apl) " alt="" coords="461,31,623,57"/>
+<area shape="rect" id="node6" href="$classWorkspace.html#a77c7b25908cf2479dc087cc3bcf44dcb" title="load lib_ws into the_workspace, maybe set ⎕LX of the new WS. " alt="" coords="467,81,617,108"/>
+<area shape="rect" id="node8" href="$classWorkspace.html#a20b0659f2d3987a4bb21d6c399e0a436" title="copy objects from another workspace " alt="" coords="465,132,619,159"/>
+<area shape="rect" id="node7" href="$classCommand.html#a6f873ead3eb848fbec9037a01c5cc58b" title=")LOAD: load a workspace file " alt="" coords="711,81,869,108"/>
+<area shape="rect" id="node9" href="$classCommand.html#af7f6672b5e942553710d19388a22ae8c" title=")COPY: copy a workspace file " alt="" coords="710,132,870,159"/>
+<area shape="rect" id="node10" href="$classCommand.html#a2f7425e3673258dfb78045919e82f69f" title=")COPY_ONCE: copy a workspace file, nut at most once " alt="" coords="687,183,893,209"/>
+<area shape="rect" id="node12" href="$classCommand.html#ad61e749290966d00856ce1dd4f6abe42" title=")SAVE active WS as CONTINUE and )OFF " alt="" coords="445,183,639,209"/>
+<area shape="rect" id="node13" href="$classCommand.html#ab17fe02c2ece3341b2ea51fee69f0cfd" title=")SAVE: save a workspace file (.xml) " alt="" coords="463,233,621,260"/>
+</map>

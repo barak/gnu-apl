@@ -1,0 +1,11 @@
+<map id="Quad_XML::split_name" name="Quad_XML::split_name">
+<area shape="rect" id="node1" title="split src, e.g. &quot;_2_name&quot; into integer 2, Unicode &#39;_&#39;, and UCS_string &#39;name&#39;. Null pointers if not re..." alt="" coords="1045,132,1204,157"/>
+<area shape="rect" id="node2" href="$classQuad__XML.html#a08fc4c7594b99bc7a667105ceab0b728" title="return the entities in B, sorted by their position prefix" alt="" coords="838,42,997,82"/>
+<area shape="rect" id="node7" href="$classQuad__XML.html#a870bccc69998ab12a7e8fb035061470c" title="(POS CATEGORY TAG_NAME) ← MEMBER_NAME" alt="" coords="408,107,567,132"/>
+<area shape="rect" id="node8" href="$classQuad__XML.html#a2c3c8a5e317d6e322a52426b36d1e233" title="iterator: return the next member after A in structured value B" alt="" coords="615,157,789,183"/>
+<area shape="rect" id="node9" href="$classValue.html#abe3195d6faf086d15f3af75f247f15f0" title="store the row numbers (starting at 0) so that this[rows] is sorted in result. Only used rows are retu..." alt="" coords="837,208,997,233"/>
+<area shape="rect" id="node3" href="$classQuad__XML.html#aa0a04e6cd3d25a34a042a5b2dcee0530" title="convert APL associative array to XML string" alt="" coords="616,49,788,75"/>
+<area shape="rect" id="node4" href="$classQuad__XML.html#afb56e2b1109a16c834b1d2d6862b95cc" title="overloaded Function::eval_B()" alt="" coords="420,49,555,75"/>
+<area shape="rect" id="node5" href="$classQuad__XML.html#acda08006d2a9ee1558e6a68adbb8ac59" title="return XML file (&#45;name in B) converted to APL structured value" alt="" coords="197,5,360,31"/>
+<area shape="rect" id="node6" href="$classQuad__XML.html#ad5de89a09c7528bcea93377a1f9424a8" title="overloaded Function::eval_AB()" alt="" coords="5,81,149,107"/>
+</map>

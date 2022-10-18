@@ -1,0 +1,200 @@
+<map id="Sig_item_int::get_svalue" name="Sig_item_int::get_svalue">
+<area shape="rect" id="node1" title="return the value of the item" alt="" coords="2469,2005,2635,2030"/>
+<area shape="rect" id="node2" href="$classADD__EVENT__c.html#aa72660241e27c3364d47b06c37966d46" title="return item grand of this signal" alt="" coords="2189,5,2376,45"/>
+<area shape="rect" id="node3" href="$classADD__EVENT__c.html#a60be51a51ec78f3787c4370d1b8074c7" title="return item key of this signal" alt="" coords="2189,69,2376,109"/>
+<area shape="rect" id="node4" href="$classADD__EVENT__c.html#aef62e6b09ebbc84bcb6deb90bbaac0c9" title="return item parent of this signal" alt="" coords="2189,133,2376,173"/>
+<area shape="rect" id="node5" href="$classADD__EVENT__c.html#a5eb9ee63d60ed55091f0d8bd7543328a" title="return item proc of this signal" alt="" coords="2189,197,2376,237"/>
+<area shape="rect" id="node6" href="$classASSIGN__VALUE__c.html#a6dcc0589584ecbb858186024b6900843" title="return item key of this signal" alt="" coords="2196,261,2369,301"/>
+<area shape="rect" id="node7" href="$classASSIGN__WSWS__VAR__c.html#ad8564b1b70e29498b610d7e6b3335b7d" title="return item key of this signal" alt="" coords="2169,325,2396,365"/>
+<area shape="rect" id="node8" href="$classCLEAR__ALL__EVENTS__c.html#a57715f5501d7774babe4bbb4e71e764b" title="return item grand of this signal" alt="" coords="2183,390,2382,445"/>
+<area shape="rect" id="node9" href="$classCLEAR__ALL__EVENTS__c.html#afda05beba3a93d1aa78fb7d6cba6eb5b" title="return item parent of this signal" alt="" coords="2183,469,2382,523"/>
+<area shape="rect" id="node10" href="$classCLEAR__ALL__EVENTS__c.html#a8e9e835c7e99f4e18ad751aba80e9194" title="return item proc of this signal" alt="" coords="2164,548,2401,588"/>
+<area shape="rect" id="node11" href="$classEVENTS__ARE__c.html#af286df0ae851ad21bd95db1ffd32496d" title="return item events of this signal" alt="" coords="2197,612,2368,652"/>
+<area shape="rect" id="node12" href="$classEVENTS__ARE__c.html#af33048253f8eb28b5e72fe5ad5654ea0" title="return item key of this signal" alt="" coords="2203,676,2362,716"/>
+<area shape="rect" id="node13" href="$classFIND__OFFERING__ID__c.html#a7587a8a7a7bf72cabcf81d206d4f1920" title="return item key of this signal" alt="" coords="2197,741,2368,795"/>
+<area shape="rect" id="node14" href="$classFIND__PAIRING__KEY__c.html#ad652356304223440610e101c3e674c73" title="return item key of this signal" alt="" coords="2200,819,2365,874"/>
+<area shape="rect" id="node15" href="$classGET__EVENTS__c.html#aaa42e8aba833f51fbb6456919d8ab6a8" title="return item grand of this signal" alt="" coords="2201,899,2364,939"/>
+<area shape="rect" id="node16" href="$classGET__EVENTS__c.html#a4e5b88358db3d7572f0866444db85aa9" title="return item parent of this signal" alt="" coords="2199,963,2366,1003"/>
+<area shape="rect" id="node17" href="$classGET__EVENTS__c.html#aeb371770c5cc5e717179944a3ebe9dad" title="return item proc of this signal" alt="" coords="2204,1027,2361,1067"/>
+<area shape="rect" id="node18" href="$classGET__OFFERED__VARS__c.html#af595274137efada3af30eee41d08e39c" title="return item accepted_by_proc of this signal" alt="" coords="2181,1091,2385,1146"/>
+<area shape="rect" id="node19" href="$classGET__OFFERED__VARS__c.html#a85a6d4b7b7c338dc7737900e16573fa7" title="return item offered_to_proc of this signal" alt="" coords="2181,1170,2385,1225"/>
+<area shape="rect" id="node20" href="$classGET__OFFERING__PROCS__c.html#a6369e1c45eb6fdc217bc8c85bae9fa59" title="return item offered_to_proc of this signal" alt="" coords="2192,1249,2373,1303"/>
+<area shape="rect" id="node21" href="$classGET__VALUE__c.html#a85cf42d02c31e7a84416b5bc4c8243f7" title="return item key of this signal" alt="" coords="2192,1328,2373,1368"/>
+<area shape="rect" id="node22" href="$classIS__REGISTERED__ID__c.html#ad875a4155240fe6a760a9bbe45d7f631" title="return item grand of this signal" alt="" coords="2197,1393,2368,1447"/>
+<area shape="rect" id="node23" href="$classIS__REGISTERED__ID__c.html#a9066e592611efc7f4c59e021cc1f12f3" title="return item parent of this signal" alt="" coords="2197,1471,2368,1526"/>
+<area shape="rect" id="node24" href="$classIS__REGISTERED__ID__c.html#a48dd73070522d4be676573821eb5ffe8" title="return item proc of this signal" alt="" coords="2197,1550,2368,1605"/>
+<area shape="rect" id="node25" href="$classMAKE__OFFER__c.html#ae3f69e3206e220a833674cbc854d271d" title="return item key of this signal" alt="" coords="2203,1629,2362,1669"/>
+<area shape="rect" id="node26" href="$classMATCH__OR__MAKE__c.html#a34e29c3277c45e8594df7e5d3d7aa64a" title="return item from_grand of this signal" alt="" coords="2165,1693,2400,1733"/>
+<area shape="rect" id="node27" href="$classMATCH__OR__MAKE__c.html#a4f1cbc1f4263915e9ef12967c1d80bf0" title="return item from_parent of this signal" alt="" coords="2185,1758,2381,1813"/>
+<area shape="rect" id="node28" href="$classMATCH__OR__MAKE__c.html#a2be9adfd0b7af8f630ed90ccddc0ecf8" title="return item from_proc of this signal" alt="" coords="2169,1837,2397,1877"/>
+<area shape="rect" id="node29" href="$classMATCH__OR__MAKE__c.html#a11a502d01da61e66bd449778639f3fa3" title="return item to_grand of this signal" alt="" coords="2173,1901,2393,1941"/>
+<area shape="rect" id="node30" href="$classMATCH__OR__MAKE__c.html#a47bc53f04a418faa2f982dbc2f1853b2" title="return item to_parent of this signal" alt="" coords="2171,1965,2395,2005"/>
+<area shape="rect" id="node31" href="$classMATCH__OR__MAKE__c.html#a8f3cf0ba0771db63793c4b0b8dd80c8f" title="return item to_proc of this signal" alt="" coords="2176,2029,2389,2069"/>
+<area shape="rect" id="node32" href="$classMATCH__OR__MAKE__RESULT__c.html#aa3bddf519f700e390b82cd4070642883" title="return item key of this signal" alt="" coords="2181,2094,2384,2149"/>
+<area shape="rect" id="node33" href="$classMAY__SET__c.html#a1ef0aeccf17f68ec41d289ad349621ad" title="return item attempt of this signal" alt="" coords="2199,2173,2366,2213"/>
+<area shape="rect" id="node34" href="$classMAY__SET__c.html#adfdcdf7a91eb2859376ffa1d3c63f666" title="return item key of this signal" alt="" coords="2199,2237,2366,2277"/>
+<area shape="rect" id="node35" href="$classMAY__USE__c.html#a69dd462e43ece637a6670dc351ba4ad2" title="return item attempt of this signal" alt="" coords="2198,2301,2367,2341"/>
+<area shape="rect" id="node36" href="$classMAY__USE__c.html#a591855ea5ab4568fa409a77fa46783b4" title="return item key of this signal" alt="" coords="2198,2365,2367,2405"/>
+<area shape="rect" id="node37" href="$classOFFERING__ID__IS__c.html#a11b59f7ee31710c70bcb1850af16277c" title="return item grand of this signal" alt="" coords="2187,2429,2379,2469"/>
+<area shape="rect" id="node38" href="$classOFFERING__ID__IS__c.html#a62dfbb19805d828a6dc6fdd3a39cc5d6" title="return item parent of this signal" alt="" coords="2185,2493,2381,2533"/>
+<area shape="rect" id="node39" href="$classOFFERING__ID__IS__c.html#ac368164a5bc364ceb5f2a5ce8a912d4a" title="return item proc of this signal" alt="" coords="2190,2557,2375,2597"/>
+<area shape="rect" id="node40" href="$classPAIRING__KEY__IS__c.html#a68c5b5692fcfe8f43e18457e927b0c71" title="return item pairing_key of this signal" alt="" coords="2169,2621,2396,2661"/>
+<area shape="rect" id="node41" href="$classREAD__SVAR__RECORD__c.html#adbc5a2c8364182bd8aa96b952a4b83e3" title="return item key of this signal" alt="" coords="2160,2685,2405,2725"/>
+<area shape="rect" id="node42" href="$classREAD__WSWS__VAR__c.html#aca7f8bdab4ff7b1ce7f63fdb4b3440e1" title="return item key of this signal" alt="" coords="2185,2749,2380,2789"/>
+<area shape="rect" id="node43" href="$classREGISTER__PROCESSOR__c.html#aa11d35e4bab1c8e4805113f01a4a4e5e" title="return item evconn of this signal" alt="" coords="2163,2814,2402,2869"/>
+<area shape="rect" id="node44" href="$classREGISTER__PROCESSOR__c.html#ae0a67da77ac57444f8d1d6edd9c5c689" title="return item grand of this signal" alt="" coords="2163,2893,2402,2947"/>
+<area shape="rect" id="node45" href="$classREGISTER__PROCESSOR__c.html#aff340f3b40f19880d4a25fdbe15ca2b7" title="return item parent of this signal" alt="" coords="2163,2971,2402,3026"/>
+<area shape="rect" id="node46" href="$classREGISTER__PROCESSOR__c.html#a0ad95b9843650120761d0b3e2f013ed2" title="return item proc of this signal" alt="" coords="2144,3051,2421,3091"/>
+<area shape="rect" id="node47" href="$classRETRACT__OFFER__c.html#a85d951f61f7a03f95830484c31c66ac8" title="return item key of this signal" alt="" coords="2189,3115,2376,3155"/>
+<area shape="rect" id="node48" href="$classRETRACT__VAR__c.html#ac01fc478f9ab1d6e3dbc1eaf41805b4d" title="return item key of this signal" alt="" coords="2197,3179,2368,3219"/>
+<area shape="rect" id="node49" href="$classSET__CONTROL__c.html#a0e047504f6f4988edd94373d13105847" title="return item key of this signal" alt="" coords="2198,3243,2367,3283"/>
+<area shape="rect" id="node50" href="$classSET__CONTROL__c.html#ad31c080d2ab6e8036088fabb9f11db61" title="return item new_control of this signal" alt="" coords="2173,3307,2392,3347"/>
+<area shape="rect" id="node51" href="$classSET__STATE__c.html#ad497b03dd736500ced8709698658c58b" title="return item key of this signal" alt="" coords="2193,3371,2372,3411"/>
+<area shape="rect" id="node52" href="$classSET__STATE__c.html#a801f239d183a9448ca8d7012bc8873aa" title="return item new_state of this signal" alt="" coords="2193,3435,2372,3475"/>
+<area shape="rect" id="node53" href="$classSVAR__ASSIGNED__c.html#ab78c31b0beb61a038ff3659601471244" title="return item error of this signal" alt="" coords="2187,3499,2378,3539"/>
+<area shape="rect" id="node54" href="$classSVAR__ASSIGNED__c.html#af78d17fa02d6dbbc3447975c0728283c" title="return item key of this signal" alt="" coords="2190,3563,2375,3603"/>
+<area shape="rect" id="node55" href="$classVALUE__IS__c.html#a8f855bdcda3cef8354ba582b26ec1281" title="return item error of this signal" alt="" coords="2191,3627,2375,3667"/>
+<area shape="rect" id="node56" href="$classVALUE__IS__c.html#a50462a6b570e3f44714aaf920bf4b879" title="return item key of this signal" alt="" coords="2191,3691,2375,3731"/>
+<area shape="rect" id="node57" href="$classYES__NO__c.html#a18db539218dedb5acccd4233d75eef97" title="return item yes of this signal" alt="" coords="2204,3755,2361,3795"/>
+<area shape="rect" id="node58" href="$classSignal__base.html#ae6862da3b4684bf41e1a427ebece92e9" title="receive a signal (TCP)" alt="" coords="2203,3819,2363,3845"/>
+<area shape="rect" id="node198" href="$classSig__item__string.html#a35c363645c61dd373f3e64b7bcf3771a" title="construct (deserialize) this item from a (received) buffer" alt="" coords="2213,3869,2352,3909"/>
+<area shape="rect" id="node59" href="$classSymbol.html#aef255b023c09e835233c3af3fe0b51e1" title="Assign value to this Symbol (which is a shared variable)" alt="" coords="1699,3927,1857,3967"/>
+<area shape="rect" id="node172" href="$classSvar__DB.html#a323b6d6f9492aa2a9fc58b2979d051f1" title="clear all events, return the current event bitmap." alt="" coords="1942,3517,2073,3557"/>
+<area shape="rect" id="node174" href="$classSvar__DB.html#afb713e152f4da766cafce38a1b10ea4d" title="find ID of the procesdsor that has offered the variable with key key" alt="" coords="1922,3582,2093,3607"/>
+<area shape="rect" id="node175" href="$classSvar__DB.html#ac3b3cb10ae769236ebf7d7de485f07e5" title="some shared variables names belong to a pair, like CTL and DAT in AP210. return the key of the other ..." alt="" coords="1919,3631,2096,3657"/>
+<area shape="rect" id="node176" href="$classSvar__DB.html#a1c4eca4e63db0fb74cb122fd87ec480d" title="return events for processor proc" alt="" coords="1934,3467,2081,3493"/>
+<area shape="rect" id="node177" href="$classSvar__DB.html#afeae1fefc378b93724c456d9d7d051f4" title="return all variables shared between to_proc and from_proc" alt="" coords="1933,3780,2081,3820"/>
+<area shape="rect" id="node180" href="$classSvar__DB.html#ab7b9c1fb34db2ad039ceb9ea7a35fb07" title="add processors with pending offers to to_proc. Duplicates are OK and will be removed later" alt="" coords="1932,3844,2083,3884"/>
+<area shape="rect" id="node182" href="$classSvar__DB.html#af2422421bf0cdce4c4e129e006e6c584" title="return true if id is registered in APserver" alt="" coords="1920,3730,2095,3755"/>
+<area shape="rect" id="node185" href="$classSvar__DB.html#a584aebd41e88e5fa35eb04a479217a99" title="match a new offer against the DB. Return: 0 on error, 1 if the new offer was inserted into the DB (si..." alt="" coords="1919,3681,2095,3706"/>
+<area shape="rect" id="node186" href="$classSvar__DB.html#a8cf506f1f7d5efa7f15b5c4fd254f639" title="return true iff setting the shared variable is allowed" alt="" coords="1941,3959,2074,3985"/>
+<area shape="rect" id="node187" href="$classSvar__DB.html#a082a426abf113e7ee96863d1a3b885a7" title="return true iff reading the shared variable is allowed" alt="" coords="1939,4009,2075,4034"/>
+<area shape="rect" id="node188" href="$classSymbol.html#aa0dca7ac8099794adada168657747776" title="set token according to the current NC/sym_val of this shared var" alt="" coords="1697,4052,1859,4092"/>
+<area shape="rect" id="node196" href="$classSvar__DB.html#aa917fbca583efe38c6cdf0bb4b9f2bb4" title="print the database" alt="" coords="1953,4110,2061,4135"/>
+<area shape="rect" id="node197" href="$classSvar__record__P.html#aae435bcd8b70390ab066782a478c4bb5" title="constructor: fetch record with key key from APserver" alt="" coords="1936,4160,2079,4200"/>
+<area shape="rect" id="node60" href="$classSymbol.html#a739f019bbd3b466914ac56f3437496db" title="Assign value to this Symbol." alt="" coords="1513,3934,1625,3959"/>
+<area shape="rect" id="node61" href="$classQuad__CT.html#abc36f7422a7b77edfd15e4a13487cf57" title="overloaded Symbol::assign()" alt="" coords="1291,2882,1415,2907"/>
+<area shape="rect" id="node62" href="$classQuad__FC.html#aa38e75ae45ea6f7b88ea24e02075ad3c" title="overloaded Symbol::assign()." alt="" coords="1291,2931,1415,2957"/>
+<area shape="rect" id="node64" href="$classQuad__IO.html#afa387c7eed5445e423f5bc07955c47fb" title="overloaded Symbol::assign()." alt="" coords="1293,2981,1413,3006"/>
+<area shape="rect" id="node65" href="$classQuad__LX.html#a0a1ae8bcb102029c61cb2fb5466dbf43" title="overloaded Symbol::assign()." alt="" coords="1292,3030,1415,3055"/>
+<area shape="rect" id="node66" href="$classQuad__PP.html#af053828f9848845e77cea6e7e2c08a03" title="overloaded Symbol::assign()." alt="" coords="1291,3079,1415,3105"/>
+<area shape="rect" id="node67" href="$classQuad__PR.html#a425d3ef3e275483ece89a4a1ad68b7bc" title="overloaded Symbol::assign()." alt="" coords="1291,3129,1416,3154"/>
+<area shape="rect" id="node68" href="$classQuad__PS.html#aac7544d049d60522bd686e7105673b64" title="overloaded Symbol::assign()." alt="" coords="1291,3178,1415,3203"/>
+<area shape="rect" id="node69" href="$classQuad__PW.html#a0b03074d9b18f3e639022beba4befe80" title="overloaded Symbol::assign()." alt="" coords="1289,3227,1417,3253"/>
+<area shape="rect" id="node70" href="$classQuad__SYL.html#ae8aaefa3c6344b1c6c9602cfa393e20c" title="overloaded Symbol::assign()" alt="" coords="1288,3277,1419,3302"/>
+<area shape="rect" id="node72" href="$classQuad__TZ.html#a696589f470ef673dd05581d393b1db7f" title="overloaded Symbol::assign()." alt="" coords="1292,3326,1415,3351"/>
+<area shape="rect" id="node73" href="$classQuad__RL.html#ac4926f9ce6af075951a17538eced4f4c" title="overloaded Symbol::assign()" alt="" coords="1292,3375,1415,3401"/>
+<area shape="rect" id="node74" href="$classLAMBDA.html#a894bcf722e8cbb5c9ef131404a44c73f" title="overloaded Symbol::assign(), suppressing assignment if not localized" alt="" coords="1292,3425,1415,3450"/>
+<area shape="rect" id="node75" href="$classALPHA.html#a1161f4c1342561b5f9e98fcc213d9268" title="overloaded Symbol::assign(), suppressing assignment if not localized" alt="" coords="1297,3474,1409,3499"/>
+<area shape="rect" id="node76" href="$classALPHA__U.html#a296d98b21a697a68a8d07113da3d29a1" title="overloaded Symbol::assign(), suppressing assignment if not localized" alt="" coords="1289,3523,1418,3549"/>
+<area shape="rect" id="node77" href="$classCHI.html#a1c4fbd2a8d1faa18a5b9e41637787ad7" title="overloaded Symbol::assign(), suppressing assignment if not localized" alt="" coords="1307,3573,1399,3598"/>
+<area shape="rect" id="node78" href="$classOMEGA.html#ac94f2e43c7bf7348badf4291a9afa7e2" title="overloaded Symbol::assign(), suppressing assignment if not localized" alt="" coords="1295,3622,1412,3647"/>
+<area shape="rect" id="node79" href="$classOMEGA__U.html#ab855d102284a9910f0cad404493eae46" title="overloaded Symbol::assign(), suppressing assignment if not localized" alt="" coords="1286,3671,1421,3697"/>
+<area shape="rect" id="node80" href="$classQuad__FC.html#a57ec0637b3d519da4a9537d9cf593129" title="overloaded Symbol::assign_indexed()." alt="" coords="1265,3721,1441,3746"/>
+<area shape="rect" id="node81" href="$classQuad__PS.html#a1dffed74e823c513fe1db292f5c88a52" title="overloaded Symbol::assign_indexed()" alt="" coords="1265,3770,1441,3795"/>
+<area shape="rect" id="node82" href="$structCommand_1_1transfer__context.html#a73ebb1258e33db67a0d2ea54ff3efe97" title="process a &#39;C&#39; (character, in 1 ⎕TF format) item." alt="" coords="1261,4280,1445,4320"/>
+<area shape="rect" id="node85" href="$structCommand_1_1transfer__context.html#a692d84840f69d40df03843f0d7589017" title="process an &#39;N&#39; (numeric in 1 ⎕TF format) item." alt="" coords="1261,3820,1445,3860"/>
+<area shape="rect" id="node86" href="$classQuad__CT.html#af036fb0663ca7a71b5622c128ec363b1" title="Push an undefined entry onto the stack of this Symbol." alt="" coords="1296,3885,1411,3910"/>
+<area shape="rect" id="node87" href="$classQuad__FC.html#a465e364162c44bef915c7b237baf9b74" title="Push an undefined entry onto the stack of this Symbol." alt="" coords="1296,3934,1411,3959"/>
+<area shape="rect" id="node88" href="$classQuad__IO.html#a5cdc443fff3ac68688354ae816d43f39" title="Push an undefined entry onto the stack of this Symbol." alt="" coords="1298,3983,1409,4009"/>
+<area shape="rect" id="node89" href="$classQuad__PP.html#a9359cae1ad20ba4320479e32d41055cc" title="Push an undefined entry onto the stack of this Symbol." alt="" coords="1296,4033,1411,4058"/>
+<area shape="rect" id="node90" href="$classQuad__PR.html#a9ad1303c52acfdde228b2fdbaefa810b" title="Push an undefined entry onto the stack of this Symbol." alt="" coords="1296,4082,1411,4107"/>
+<area shape="rect" id="node91" href="$classQuad__PS.html#af245d42b5be2ef86c3559be3733b57b0" title="overloaded Symbol::push()" alt="" coords="1296,4131,1411,4157"/>
+<area shape="rect" id="node92" href="$classQuad__PW.html#a84cf3d5027ed9672b5aba090181f923e" title="Push an undefined entry onto the stack of this Symbol." alt="" coords="1294,4181,1413,4206"/>
+<area shape="rect" id="node93" href="$classQuad__TZ.html#a7deabddc904b13c5b4c1807cc6cba6db" title="Push an undefined entry onto the stack of this Symbol." alt="" coords="1297,4230,1409,4255"/>
+<area shape="rect" id="node94" href="$classSymbol.html#a86e5ce17e25d84f7491642bc0764712a" title="Push an APL value onto the stack of this Symbol." alt="" coords="1283,2718,1423,2743"/>
+<area shape="rect" id="node144" href="$classQuad__AI.html#ad19785f12f3ef2d0708b38ed02b23e1c" title="Constructor." alt="" coords="1287,4345,1419,4370"/>
+<area shape="rect" id="node145" href="$classQuad__AV.html#a6c7ff957e68963b17ed82adb85543e9f" title="Constructor." alt="" coords="1282,4394,1425,4419"/>
+<area shape="rect" id="node146" href="$classQuad__CT.html#a8d1197c723911171d7ce255e436db348" title="constructor" alt="" coords="1282,4443,1425,4469"/>
+<area shape="rect" id="node147" href="$classQuad__FC.html#a9ce93c83e29ff1ac2e9d5d989e5b63da" title="Constructor." alt="" coords="1282,4493,1425,4518"/>
+<area shape="rect" id="node148" href="$classQuad__IO.html#a7c2218240a7011b4cd7afbb3b6ca2b1f" title="Constructor." alt="" coords="1286,4542,1421,4567"/>
+<area shape="rect" id="node149" href="$classQuad__L.html#a62b75cca8ebd9ab40ed6ca8176cb3188" title="Constructor." alt="" coords="1293,4591,1413,4617"/>
+<area shape="rect" id="node150" href="$classQuad__LC.html#a014f2c298164b26eb19d4c44c97a533d" title="Constructor." alt="" coords="1283,4641,1423,4666"/>
+<area shape="rect" id="node151" href="$classQuad__LX.html#a3a758461519b41ebbe9e6de4554a442e" title="Constructor." alt="" coords="1284,4690,1423,4715"/>
+<area shape="rect" id="node152" href="$classQuad__PP.html#af9116eea07c77684dccb93b9fbf57089" title="Constructor." alt="" coords="1282,4739,1425,4765"/>
+<area shape="rect" id="node153" href="$classQuad__PR.html#a547b0d959a652248cfc692b041f01869" title="Constructor." alt="" coords="1281,4789,1425,4814"/>
+<area shape="rect" id="node154" href="$classQuad__PS.html#ae3278680896ca39d56c735381404a3a5" title="Constructor." alt="" coords="1282,4838,1425,4863"/>
+<area shape="rect" id="node155" href="$classQuad__PW.html#a194ae879a85e86946d1cc830e94910c2" title="Constructor." alt="" coords="1278,4887,1429,4913"/>
+<area shape="rect" id="node156" href="$classQuad__QUOTE.html#a8b8989182813b7cfccd641435bd32bca" title="Constructor." alt="" coords="1253,4937,1453,4962"/>
+<area shape="rect" id="node157" href="$classQuad__R.html#a0141ffe01bbd50d82145fcca4d86de73" title="Constructor." alt="" coords="1290,4986,1417,5011"/>
+<area shape="rect" id="node158" href="$classQuad__RL.html#a119715f32d6514b127a29d454261c232" title="Constructor." alt="" coords="1283,5035,1423,5061"/>
+<area shape="rect" id="node159" href="$classQuad__SVE.html#a452f80781e13302a235a1bb3ea2e8318" title="Constructor." alt="" coords="1273,5085,1433,5110"/>
+<area shape="rect" id="node160" href="$classQuad__TC.html#a2c1f6627480a1f221b5ca376bb40d28f" title="Constructor." alt="" coords="1282,5134,1425,5159"/>
+<area shape="rect" id="node161" href="$classQuad__TS.html#a7717611fc7a83c6df31371cc82d0a774" title="Constructor." alt="" coords="1283,5183,1423,5209"/>
+<area shape="rect" id="node162" href="$classQuad__TZ.html#ad84775d7b640638a658b46ecffa7a353" title="Constructor." alt="" coords="1284,5233,1423,5258"/>
+<area shape="rect" id="node163" href="$classQuad__UL.html#aa5d9054e3101dbfb7c78add685e4d7f4" title="Constructor." alt="" coords="1283,5282,1423,5307"/>
+<area shape="rect" id="node164" href="$classQuad__WA.html#a7e032e65b4a750308066279b2633484a" title="Constructor." alt="" coords="1278,2619,1429,2645"/>
+<area shape="rect" id="node165" href="$classQuad__X.html#a225b41c31083e2f9cc343ad2ead30b18" title="Constructor." alt="" coords="1291,2669,1415,2694"/>
+<area shape="rect" id="node166" href="$classXML__Loading__Archive.html#a1233bd12e879f5670f4a234e0f37b7aa" title="read next Variable element" alt="" coords="1277,2768,1429,2808"/>
+<area shape="rect" id="node169" href="$classSymbol.html#a8eb0881471fcf614e9b4d9bd0a4a721b" title="share variable with proc" alt="" coords="1288,2489,1419,2514"/>
+<area shape="rect" id="node171" href="$classSymbol.html#ae009e8d00baa9c95f1b31f56e2b91915" title="perform a vector assignment (like (A B C)←1 2 3) for variables in symbols with values values" alt="" coords="1261,2833,1445,2858"/>
+<area shape="rect" id="node63" href="$classQuad__FC.html#a96387561d24ab0767a8138a00553a788" title="overloaded Symbol::assign_indexed()." alt="" coords="1025,3301,1201,3326"/>
+<area shape="rect" id="node71" href="$classQuad__SYL.html#a55b0ee3eee281c657bbb2ea34ba67d84" title="Constructor." alt="" coords="1035,3350,1191,3375"/>
+<area shape="rect" id="node83" href="$structCommand_1_1transfer__context.html#a9c4651f90f36f6cc728e7146a3a4a0aa" title="process one record of a workspace file" alt="" coords="1021,4051,1205,4091"/>
+<area shape="rect" id="node84" href="$classCommand.html#aa0764d08a6ae9c8270907ab7d5dc37cf" title=")IN: import a workspace file" alt="" coords="796,4058,932,4083"/>
+<area shape="rect" id="node95" href="$classUserFunction.html#a65257f7d5b89edcc965fd92fbae48f46" title="Overloaded Function::eval_AB()" alt="" coords="1035,2481,1192,2506"/>
+<area shape="rect" id="node98" href="$classUserFunction.html#ab936593d2fe00b7d564b56ea8c2b1960" title="Overloaded Function::eval_ALB." alt="" coords="1031,2530,1195,2555"/>
+<area shape="rect" id="node101" href="$classUserFunction.html#ac557d25c3d12886b50782d710eb9adaf" title="Overloaded Function::eval_ALRB()" alt="" coords="1026,2579,1201,2605"/>
+<area shape="rect" id="node107" href="$classUserFunction.html#adc359655922e961d13364f3bf740a8a4" title="Overloaded Function::eval_ALRXB()" alt="" coords="1047,2629,1179,2669"/>
+<area shape="rect" id="node108" href="$classUserFunction.html#a6f3ffdf03f5a0d2ace6d53db6cc6b205" title="Overloaded Function::eval_ALXB()" alt="" coords="1027,2793,1200,2818"/>
+<area shape="rect" id="node117" href="$classUserFunction.html#a53d4c8701829336de21980237a0abfb9" title="Overloaded Function::eval_AXB()" alt="" coords="1030,2743,1197,2769"/>
+<area shape="rect" id="node118" href="$classUserFunction.html#ac5a1bc9fbc8a69cc5d2084e8c6988227" title="Overloaded Function::eval_B()" alt="" coords="1039,3087,1187,3113"/>
+<area shape="rect" id="node125" href="$classUserFunction.html#a42aac3e7913bc310a67346a39efdb9cb" title="Overloaded Function::eval_LB." alt="" coords="1036,3186,1191,3211"/>
+<area shape="rect" id="node126" href="$classUserFunction.html#ac5c12a65ee7e51bd26827703d9923cb6" title="Overloaded Function::eval_LRB()" alt="" coords="1031,2694,1196,2719"/>
+<area shape="rect" id="node127" href="$classUserFunction.html#aba7e511f0a354b5189f2f5725d69fc54" title="Overloaded Function::eval_LRXB()" alt="" coords="1026,3137,1201,3162"/>
+<area shape="rect" id="node128" href="$classUserFunction.html#a22d837a3b90a55015c65b4e9c9b3e01d" title="Overloaded Function::eval_LXB()" alt="" coords="1031,3038,1195,3063"/>
+<area shape="rect" id="node142" href="$classUserFunction.html#af1bd185a565ac29ab5aefc716cbe7426" title="Overloaded Function::eval_XB()" alt="" coords="1035,2382,1192,2407"/>
+<area shape="rect" id="node143" href="$classQuad__RL.html#aa0e2238897c08ed2601281cbbb8eaadc" title="overloaded Symbol::push()" alt="" coords="1057,2431,1170,2457"/>
+<area shape="rect" id="node96" href="$classQuad__EA.html#a3791e3ee3083a057e05e49ae8c6e19d4" title="overloaded Function::eval_AB()." alt="" coords="797,2349,931,2374"/>
+<area shape="rect" id="node97" href="$classQuad__EB.html#af9245a9add8bd214616bda4dd0e0ccda" title="overloaded Function::eval_AB()." alt="" coords="797,2299,931,2325"/>
+<area shape="rect" id="node99" href="$classBif__OPER1__EACH.html#ae7a90f347aff589d61b1b5bc1892aab9" title="Overloaded Function::eval_ALB()." alt="" coords="765,2398,963,2423"/>
+<area shape="rect" id="node100" href="$classBif__OPER2__OUTER.html#a2e9a34f12130439dd28c6d528ffadbc3" title="Overloaded Function::eval_ALRB()." alt="" coords="755,2447,973,2473"/>
+<area shape="rect" id="node102" href="$classBif__OPER2__INNER.html#adbaaf10669f72e39cc58d5dcdab6c5fe" title="Overloaded Function::eval_ALRB()." alt="" coords="216,3178,431,3203"/>
+<area shape="rect" id="node103" href="$classBif__OPER2__POWER.html#a708b42a09509be8c639d330d8e06cf62" title="eval_ALRB() or eval_LRB() for numeric RO (aka. Form 1)" alt="" coords="774,2612,954,2652"/>
+<area shape="rect" id="node106" href="$classBif__OPER2__POWER.html#a8b9df7074bc55dfb2c2bc21937b83ca6" title="eval_ALRB() or eval_LRB() for numeric RO (aka. Form 1)" alt="" coords="774,2548,954,2588"/>
+<area shape="rect" id="node104" href="$classBif__OPER2__POWER.html#afdfa97e5be93ef265df90ae09b7cfd81" title="overloaded Function::eval_ALRB()" alt="" coords="481,2506,704,2531"/>
+<area shape="rect" id="node105" href="$classBif__OPER2__POWER.html#a31db2049a45999f2d068d6569ac9b6e4" title="overloaded Function::eval_LRB()" alt="" coords="486,2555,699,2581"/>
+<area shape="rect" id="node109" href="$classBif__OPER2__RANK.html#ab979b51a46eef84ddff874b4358d592e" title="the &#39;normalized&#39; implementation of all eval_ALxxx*( functions" alt="" coords="785,2827,943,2867"/>
+<area shape="rect" id="node112" href="$classBif__REDUCE.html#a450260486cb0a169a1f13602cae9ab97" title="LO&#45;reduce B n&#45;wise along axis." alt="" coords="789,2712,939,2752"/>
+<area shape="rect" id="node110" href="$classBif__OPER2__RANK.html#af386afe437eb506495d05219013e07c7" title="overloaded Function::eval_ALRB()" alt="" coords="488,2834,697,2859"/>
+<area shape="rect" id="node111" href="$classBif__OPER2__RANK.html#a34d34df4c656d09dd8e216ee44513a68" title="overloaded Function::eval_ALRXB()" alt="" coords="509,2884,676,2924"/>
+<area shape="rect" id="node113" href="$classBif__OPER1__REDUCE.html#a584c1a00ef6b21b457c869a862fe4775" title="Overloaded Function::eval_ALB()." alt="" coords="483,2605,702,2630"/>
+<area shape="rect" id="node114" href="$classBif__OPER1__REDUCE1.html#a1c98ca9e70231d9a1fe491c64e46f8a8" title="Overloaded Function::eval_ALB()." alt="" coords="507,2655,678,2695"/>
+<area shape="rect" id="node115" href="$classBif__OPER1__REDUCE.html#a06f59f7c71977fda6d2ca0e99389b659" title="Overloaded Function::eval_ALXB()." alt="" coords="479,2719,707,2745"/>
+<area shape="rect" id="node116" href="$classBif__OPER1__REDUCE1.html#ad48531d0b47915421f4aca74bab3b31d" title="Overloaded Function::eval_ALXB()." alt="" coords="507,2769,678,2809"/>
+<area shape="rect" id="node119" href="$classBif__OPER1__EACH.html#a27235a66582af39ea624bfb6db1f85b9" title="implementation of eval_LB()" alt="" coords="785,3500,943,3540"/>
+<area shape="rect" id="node124" href="$classQuad__INP.html#acbb48b1a9762cc3e23008018a8c1f836" title="overloaded Function::eval_AB()." alt="" coords="794,3401,934,3426"/>
+<area shape="rect" id="node120" href="$classBif__F12__PARTITION.html#af115071efaa0c6562d4fc738e3da3e4b" title="enclose_with_axes" alt="" coords="515,3525,670,3565"/>
+<area shape="rect" id="node122" href="$classBif__OPER1__EACH.html#afd91f92ab4e07e5f7e6ce2fd47935c70" title="Overloaded Function::eval_LB()." alt="" coords="497,3639,688,3665"/>
+<area shape="rect" id="node123" href="$classQuad__FIO.html#a24ac2813d6425ad61471166fe019ba33" title="overloaded Function::eval_LXB()." alt="" coords="519,3590,666,3615"/>
+<area shape="rect" id="node121" href="$classBif__F12__PARTITION.html#a93f7a529d2b49ecb0e1262ee5b3ce893" title="overloaded Function::eval_XB()" alt="" coords="246,3525,401,3565"/>
+<area shape="rect" id="node129" href="$classBif__OPER2__RANK.html#a374a3baed400c3b9b27f99c1db3f69a7" title="the &#39;normalized&#39; implementation of all eval_Lxxx*( functions" alt="" coords="766,3351,962,3377"/>
+<area shape="rect" id="node132" href="$classBif__REDUCE.html#ac3430120da57197d5099b5ccabf1004c" title="LO&#45;reduce B along axis." alt="" coords="789,3051,939,3077"/>
+<area shape="rect" id="node137" href="$classBif__SCAN.html#a796038c05f7946ae72143ef64c773a1f" title="Compute the LO&#45;scan of B." alt="" coords="805,3278,923,3303"/>
+<area shape="rect" id="node130" href="$classBif__OPER2__RANK.html#a5a578fc5a08d42a3e2ce8500f9a4467f" title="overloaded Function::eval_LRB()" alt="" coords="493,3475,693,3501"/>
+<area shape="rect" id="node131" href="$classBif__OPER2__RANK.html#accbd6d641ff942e856fc1c2cf845ac08" title="overloaded Function::eval_LRXB()" alt="" coords="488,3426,697,3451"/>
+<area shape="rect" id="node133" href="$classBif__OPER1__REDUCE.html#a1f613b8ac81791d7c61b3e0a9f6e70ba" title="Overloaded Function::eval_LB()." alt="" coords="487,2949,698,2974"/>
+<area shape="rect" id="node134" href="$classBif__OPER1__REDUCE1.html#a6bd690931eba7929294983c39655ffa1" title="Overloaded Function::eval_LB()." alt="" coords="507,2999,678,3039"/>
+<area shape="rect" id="node135" href="$classBif__OPER1__REDUCE.html#aed5704b99e4ff296d84b329cfcc9048c" title="Overloaded Function::eval_LXB()." alt="" coords="483,3063,702,3089"/>
+<area shape="rect" id="node136" href="$classBif__OPER1__REDUCE1.html#a9bb990c9c5944c780452941e13d39c0d" title="Overloaded Function::eval_LXB()." alt="" coords="507,3113,678,3153"/>
+<area shape="rect" id="node138" href="$classBif__OPER1__SCAN.html#afaa44934b4c7bc25b517e3acfe41507b" title="Overloaded Function::eval_LB()." alt="" coords="497,3327,688,3353"/>
+<area shape="rect" id="node139" href="$classBif__OPER1__SCAN1.html#a191214991f49b5ce2649400f76f25893" title="Overloaded Function::eval_ALB()." alt="" coords="494,3377,691,3402"/>
+<area shape="rect" id="node140" href="$classBif__OPER1__SCAN.html#ace7710f31a43abd663e582cf96cb9169" title="Overloaded Function::eval_LXB()." alt="" coords="493,3229,692,3254"/>
+<area shape="rect" id="node141" href="$classBif__OPER1__SCAN1.html#adb20c6d87fb95f93fc8230f4984c4041" title="Overloaded Function::eval_ALXB()." alt="" coords="489,3278,696,3303"/>
+<area shape="rect" id="node167" href="$classXML__Loading__Archive.html#a75730a7dd5af9238d0d1aa223a54060e" title="read next Symbol element" alt="" coords="1037,3236,1189,3276"/>
+<area shape="rect" id="node168" href="$classXML__Loading__Archive.html#a2a4f7a3fff06dfd2351348bf26fc90a3" title="read next Symbol element" alt="" coords="788,3564,940,3604"/>
+<area shape="rect" id="node170" href="$classQuad__SVO.html#a92d931679e0b1836d24e1cc1ab60ed02" title="Overloaded Function::eval_AB()." alt="" coords="1041,2333,1186,2358"/>
+<area shape="rect" id="node173" href="$classQuad__SVE.html#a9366ede668cf142b1e7f4a4337f3033b" title="Overloaded Symbol::get_apl_value()." alt="" coords="1691,3497,1865,3522"/>
+<area shape="rect" id="node178" href="$classQuad__SVQ.html#a5fdb64a94ed29742ac9470233fc4976c" title="return variables offered by processor proc" alt="" coords="1691,3791,1865,3817"/>
+<area shape="rect" id="node179" href="$classQuad__SVQ.html#aa99fb69058db1016c7501c008749daf6" title="Overloaded Function::eval_AB()." alt="" coords="1501,3819,1637,3845"/>
+<area shape="rect" id="node181" href="$classQuad__SVQ.html#a1f96d0bb6b3d8f568bf9e7e48d448c3c" title="return processors with matching offers" alt="" coords="1685,3847,1871,3873"/>
+<area shape="rect" id="node183" href="$classProcessorID.html#a61b505bf9c0cf9b386c39d487946a0a9" title="initialize our own process ID, return non&#45;0 on error. proc_id == 0 uses the next free ID &gt; 1000; othe..." alt="" coords="1718,3734,1838,3759"/>
+<area shape="rect" id="node184" href="$classQuad__SVO.html#aefe8710645494d9dc6b8879b3f09b913" title="share one variable" alt="" coords="1700,3669,1856,3709"/>
+<area shape="rect" id="node189" href="$classSymbol.html#a72a3e4ed8ddafaaf215806962e017380" title="set token according to the current NC/sym_val of this Symbol" alt="" coords="1511,4707,1627,4733"/>
+<area shape="rect" id="node190" href="$classPrefix.html#a5478ff7d771d95a161c8ee393d50d7b1" title="execute one context (user defined function or operator, execute, or immediate execution)" alt="" coords="1266,5331,1441,5357"/>
+<area shape="rect" id="node191" href="$classStateIndicator.html#aa99bc8ce846dfd1f09c0ca2f250d940e" title="execute token in body..." alt="" coords="1049,5331,1178,5357"/>
+<area shape="rect" id="node192" href="$classExecutable.html#a56bddb63158eedc401fe8ec3ce04f787" title="execute the body of this executable" alt="" coords="776,5331,952,5357"/>
+<area shape="rect" id="node193" href="$classCommand.html#a879617e7645bea2e4052154f16999634" title="finish the current SI&#45;&gt;top() and pop it when done" alt="" coords="507,5331,678,5357"/>
+<area shape="rect" id="node194" href="$classCommand.html#af36741357bfd4e183b34ee8b747bc7c5" title="process line which contains APL statements" alt="" coords="220,5331,427,5357"/>
+<area shape="rect" id="node195" href="$classCommand.html#ae26693534d4df16372f51e55e505b8d7" title="process line which contains a command or statements" alt="" coords="5,5331,168,5357"/>
+</map>

@@ -1,0 +1,12 @@
+<map id="Tokenizer::tokenize" name="Tokenizer::tokenize">
+<area shape="rect" id="node1" title="tokenize UTF&#45;8 string input into token string tos." alt="" coords="653,141,789,166"/>
+<area shape="rect" id="node2" href="$classUserFunction__header.html#a7ce5d64cb355876f5a5a5606476d1696" title="init the local variables from text" alt="" coords="440,5,587,45"/>
+<area shape="rect" id="node4" href="$classUserFunction__header.html#af72aea0d6de982a6ed4002dc61c173ab" title="init the signature from text" alt="" coords="440,69,587,109"/>
+<area shape="rect" id="node5" href="$structCommand_1_1transfer__context.html#a692d84840f69d40df03843f0d7589017" title="process an &#39;N&#39; (numeric in 1 ⎕TF format) item." alt="" coords="421,133,605,173"/>
+<area shape="rect" id="node8" href="$classParser.html#af5fc690941afdce0fd36c6c9629e5186" title="Parse UCS_string input into token string tos." alt="" coords="463,222,563,247"/>
+<area shape="rect" id="node9" href="$classQuad__TF.html#aa5afb1189a241875b5e94b71a3ebe79a" title="return inverse transfer format 1 (old APL format) for a variable" alt="" coords="452,271,575,297"/>
+<area shape="rect" id="node3" href="$classUserFunction__header.html#a003ac8f5ff1ec67f3fe5e6ad0ef850de" title="constructor from first line in txt (for proper defined functions)" alt="" coords="204,37,359,77"/>
+<area shape="rect" id="node6" href="$structCommand_1_1transfer__context.html#a9c4651f90f36f6cc728e7146a3a4a0aa" title="process one record of a workspace file" alt="" coords="189,133,373,173"/>
+<area shape="rect" id="node7" href="$classCommand.html#aa0764d08a6ae9c8270907ab7d5dc37cf" title=")IN: import a workspace file" alt="" coords="5,141,141,166"/>
+<area shape="rect" id="node10" href="$classQuad__TF.html#a27ed4b02d5f1a1c8a8b0a1fcbe2756f8" title="Overloaded Function::eval_AB()." alt="" coords="215,271,348,297"/>
+</map>

@@ -1,0 +1,22 @@
+<map id="PrimitiveFunction::get_statistics_B" name="PrimitiveFunction::get_statistics_B">
+<area shape="rect" id="node2" href="$classScalarFunction.html#a254898c12f19ee61f71837247d2efaa9" title="compute the monadic scalar function fun along one ravel " alt="" coords="184,469,315,510"/>
+<area shape="rect" id="node3" href="$classScalarFunction.html#a6f542f78d8c0f36e2c6f6e6f28fec2af" title="Evaluate a scalar function monadically. " alt="" coords="363,403,505,445"/>
+<area shape="rect" id="node21" href="$classScalarFunction.html#adb8daa5af9eb305915236ceca2aa841d" title="return true if this function can be parallelized " alt="" coords="363,469,505,510"/>
+<area shape="rect" id="node4" href="$classBif__F12__ROLL.html#a0b67f39c345c98d9b16f63c457ad0557" title="overloaded Function::eval_B(). " alt="" coords="577,5,733,32"/>
+<area shape="rect" id="node5" href="$classScalarFunction.html#a1c3af7c78bbc4be29d3e993ec1619a55" title="Construct a ScalarFunction with Id id. " alt="" coords="553,56,757,83"/>
+<area shape="rect" id="node6" href="$classBif__F12__BINOM.html#a3596f99aa601d0147864acd62c489c03" title="overloaded Function::eval_B(). " alt="" coords="572,107,739,133"/>
+<area shape="rect" id="node7" href="$classBif__F2__AND__B.html#a6e07c234cf33e1d174006d1458e1a22d" title="overloaded Function::eval_B(). " alt="" coords="575,157,735,184"/>
+<area shape="rect" id="node8" href="$classBif__F2__OR__B.html#aca40b9b69a30f974ba243019c923b4ff" title="overloaded Function::eval_B(). " alt="" coords="580,208,731,235"/>
+<area shape="rect" id="node9" href="$classBif__F2__NOR__B.html#a132420f480ec102175985eca2599795a" title="overloaded Function::eval_B(). " alt="" coords="575,259,736,285"/>
+<area shape="rect" id="node10" href="$classBif__F12__POWER.html#a8bfa0ebd2146db96e9b4a9dc46206f04" title="overloaded Function::eval_B(). " alt="" coords="569,309,742,336"/>
+<area shape="rect" id="node11" href="$classBif__F12__PLUS.html#a56e4964cac0278cea3970e7d3b12f291" title="overloaded Function::eval_B(). " alt="" coords="577,360,734,387"/>
+<area shape="rect" id="node12" href="$classBif__F12__MINUS.html#a2e3cea00d72e560ecdfc904011d5ebba" title="overloaded Function::eval_B(). " alt="" coords="572,411,739,437"/>
+<area shape="rect" id="node13" href="$classBif__F12__WITHOUT.html#a6eb017585dbc330e820d4ef1d69835b6" title="overloaded Function::eval_B(). " alt="" coords="563,461,748,488"/>
+<area shape="rect" id="node14" href="$classBif__F12__TIMES.html#a14cbf46ddc0446de17af6a1030e6fc3e" title="overloaded Function::eval_B(). " alt="" coords="574,512,737,539"/>
+<area shape="rect" id="node15" href="$classBif__F12__DIVIDE.html#a57eb5c0cccf0163d7c740eda8f9f9531" title="overloaded Function::eval_B(). " alt="" coords="571,563,739,589"/>
+<area shape="rect" id="node16" href="$classBif__F12__CIRCLE.html#a6c3a7a1fe80b44bbfee3fa27fbb42c33" title="overloaded Function::eval_B(). " alt="" coords="569,613,741,640"/>
+<area shape="rect" id="node17" href="$classBif__F12__RND__UP.html#a3d3ec8abbf84ac0c59cec71a8ff3c0b5" title="overloaded Function::eval_B(). " alt="" coords="566,664,745,691"/>
+<area shape="rect" id="node18" href="$classBif__F12__RND__DN.html#aa0b14c469b99ffb2eeeac9c1e7253389" title="overloaded Function::eval_B(). " alt="" coords="566,715,745,741"/>
+<area shape="rect" id="node19" href="$classBif__F12__STILE.html#ac487d336d5e5b62bc7902a777c51decf" title="overloaded Function::eval_B(). " alt="" coords="576,765,735,792"/>
+<area shape="rect" id="node20" href="$classBif__F12__LOGA.html#ac8e17b085ce08e02da68da6338dbcc17" title="overloaded Function::eval_B(). " alt="" coords="576,816,735,843"/>
+</map>

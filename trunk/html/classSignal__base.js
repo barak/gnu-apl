@@ -73,8 +73,8 @@ var classSignal__base =
     [ "get__WSWS_VALUE_IS__cdr_value", "classSignal__base.html#a75394fee3f77a324b43c7ccef120c41d", null ],
     [ "get__YES_NO__yes", "classSignal__base.html#ab59487084a293204fc9b0a62b973adf4", null ],
     [ "get_sigID", "classSignal__base.html#a6f28cd17975bd12c01ce3789a4cf022e", null ],
-    [ "get_sigName", "classSignal__base.html#a6626c5d03fc977a6eb798dac17e1ae36", null ],
-    [ "print", "classSignal__base.html#a4ddd25f4628ffc80a1d7063d5c68a2da", null ],
+    [ "get_sigName", "classSignal__base.html#a77d69692410bd7b7d49033b73fcfc8fc", null ],
+    [ "print", "classSignal__base.html#a774958a4504fa7536cc941a3736d5b2c", null ],
     [ "recv_TCP", "classSignal__base.html#ae6862da3b4684bf41e1a427ebece92e9", null ],
     [ "send_TCP", "classSignal__base.html#a2ff638373162ccc4a8b1b268b260923e", null ],
     [ "store", "classSignal__base.html#a68f2f5d807d706a6e46709abef26cfb1", null ]

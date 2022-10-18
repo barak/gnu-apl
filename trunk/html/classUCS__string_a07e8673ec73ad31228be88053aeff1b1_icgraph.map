@@ -1,0 +1,49 @@
+<map id="UCS_string::remove_leading_whitespaces" name="UCS_string::remove_leading_whitespaces">
+<area shape="rect" id="node1" title="remove leading blanks, tabs, etc" alt="" coords="1736,201,1887,241"/>
+<area shape="rect" id="node2" href="$classCommand.html#a98e7d1dd0c01014d79f2120292588a70" title=")DUMP: dump a workspace file (.apl)" alt="" coords="591,234,753,259"/>
+<area shape="rect" id="node3" href="$classCommand.html#aec0c4c6efbb9df9a34220b510f58905a" title=")SAVE: save a workspace file (.xml)" alt="" coords="1521,94,1680,119"/>
+<area shape="rect" id="node4" href="$classTabExpansion.html#a0019a0d3e9b164dc63c39acbba352fdc" title="tab&#45;expand or show help for user defined functions" alt="" coords="1523,144,1678,184"/>
+<area shape="rect" id="node5" href="$classBif__F12__FORMAT.html#ad7f677afc847fa6df13f16decdecd992" title="A character array with one column of B formatted by specification." alt="" coords="1513,29,1688,69"/>
+<area shape="rect" id="node9" href="$classCommand.html#ae26693534d4df16372f51e55e505b8d7" title="process line which contains a command or statements" alt="" coords="1519,259,1682,285"/>
+<area shape="rect" id="node10" href="$classUCS__string.html#a91556379049e71071410cec015b960db" title="remove leading and trailing whitespaces" alt="" coords="1529,521,1672,575"/>
+<area shape="rect" id="node44" href="$classWorkspace.html#ad8aedac4ca9e22cc8881d07eef87dcfe" title="set or inquire the workspace ID" alt="" coords="1307,883,1429,909"/>
+<area shape="rect" id="node6" href="$classBif__F12__FORMAT.html#ad945541c06e489c1079ae401f4d1db28" title="A character array with B formatted by specification." alt="" coords="1281,29,1455,69"/>
+<area shape="rect" id="node7" href="$classBif__F12__DOMINO_1_1Matrix.html#ad45f8929c6f666dea17836a79c657456" title="print debug infos for this real matrix" alt="" coords="1039,59,1213,99"/>
+<area shape="rect" id="node8" href="$classBif__F12__FORMAT.html#a5164cf7d2b85131b9c9fa11c3239602a" title="Overloaded Function::eval_AB()" alt="" coords="1033,9,1219,34"/>
+<area shape="rect" id="node11" href="$structInputFile.html#a162970480cc07daba1ba85a3ae2580e8" title="check the current line and return true if the line is permitted by the object_filter...." alt="" coords="1295,358,1441,383"/>
+<area shape="rect" id="node16" href="$classSymbol.html#a9f5e43c937f34053d09f3406f01dacbd" title="dump this symbol to out" alt="" coords="1315,259,1421,285"/>
+<area shape="rect" id="node19" href="$classNabla.html#a7a9484fa4c398147d3b5681f23400da0" title="edit body line" alt="" coords="1295,457,1441,482"/>
+<area shape="rect" id="node24" href="$classBif__F1__EXECUTE.html#aefdd09df4262f08f508f9be8543896b7" title="execute string containing an APL expression or an APL command" alt="" coords="1275,557,1461,597"/>
+<area shape="rect" id="node27" href="$classQuad__Quad.html#a253824f3a533bef36063138ea6ce0673" title="overloaded Symbol::resolve()." alt="" coords="1055,622,1197,647"/>
+<area shape="rect" id="node28" href="$classTabExpansion.html#ad8c4300a7d2e9aa47e6c3a1d19285db7" title="perform tab expansion" alt="" coords="801,469,981,494"/>
+<area shape="rect" id="node32" href="$classDoxy.html#a5eb9b5605981c826438d5a51f38bf5a4" title="HTML&#45;print a table containing all defined functions to page." alt="" coords="1293,723,1443,749"/>
+<area shape="rect" id="node35" href="$classUserFunction.html#af4a520e7ab3a61ca3c3f4be32f463810" title="print help for this function on out (for the )HELP command)" alt="" coords="1302,774,1434,799"/>
+<area shape="rect" id="node37" href="$classSymbolTable.html#a9bacf3be9c6c2145a68d891c42076cf2" title="List details of single symbol in buf." alt="" coords="1282,827,1454,853"/>
+<area shape="rect" id="node39" href="$classQuad__PLOT.html#ae6f31438074669d8b69f651556c8fa39" title="parse the (all&#45;optional) attributes in A" alt="" coords="1271,309,1465,334"/>
+<area shape="rect" id="node41" href="$classUCS__string.html#a9332c2147c89d03e41ec2c30e826a6ac" title="this is a command with optional args. Remove leading and trailing whitespaces, append args to rest,..." alt="" coords="1295,673,1441,698"/>
+<area shape="rect" id="node43" href="$classUserFunction.html#a37c955f6a76f58d168d4533389249cae" title="constructor for a normal (i.e. non&#45;lambda) user defined function" alt="" coords="1275,407,1461,433"/>
+<area shape="rect" id="node12" href="$classIO__Files.html#a9cd4e5d7e3467ff6ad303dc1063e5004" title="read one line from the current input file with CR and LF removed" alt="" coords="1049,358,1203,383"/>
+<area shape="rect" id="node13" href="$classIO__Files.html#acc91875b8e0c7a5ad44e3ead0e3dda7b" title="get one line from the current file, open the next file if necceessary" alt="" coords="199,367,347,393"/>
+<area shape="rect" id="node15" href="$classDiffOut.html#ad6b18fc9495445c000ff292b491a2248" title="overloaded filebuf::overflow()" alt="" coords="831,361,952,386"/>
+<area shape="rect" id="node14" href="$classInputMux.html#a8a79cbe5207cde162fb36133ad9defdd" title="get one line" alt="" coords="5,405,135,430"/>
+<area shape="rect" id="node17" href="$classSymbolTable.html#ae8e03d7855f323239450e78d66b4b29d" title="dump symbols to out" alt="" coords="1057,259,1195,285"/>
+<area shape="rect" id="node18" href="$classWorkspace.html#a15d8cb5c62016f547b9718e820c94efd" title="dump this workspace" alt="" coords="813,259,970,285"/>
+<area shape="rect" id="node20" href="$classNabla.html#a55039f88d1dba99e9be9efb152ec2cbe" title="edit function line" alt="" coords="1057,407,1195,433"/>
+<area shape="rect" id="node21" href="$classNabla.html#ae88cd2f873ba2df8d694f6b3a36ded1d" title="execute an edit operation" alt="" coords="820,410,963,435"/>
+<area shape="rect" id="node22" href="$classNabla.html#a610d94a179335126e82e9eea07918d5a" title="edit this function" alt="" coords="435,375,520,401"/>
+<area shape="rect" id="node23" href="$classNabla.html#a894eac5264914ef7eedcfc14643cc7ee" title="start editing, return source location if first_command is bad." alt="" coords="627,411,717,437"/>
+<area shape="rect" id="node25" href="$classBif__F1__EXECUTE.html#a4e1a5917e6a3bb368b459fb21c2b63a1" title="overladed Function::eval_B()" alt="" coords="1037,573,1215,598"/>
+<area shape="rect" id="node26" href="$classBif__F1__EXECUTE.html#a8445cd77207db38ab66f5c3278a831df" title="execute string containing an APL command" alt="" coords="1033,508,1219,548"/>
+<area shape="rect" id="node29" href="$classLineEditContext.html#a8908cfbf56371294323892784508eca7" title="tab expansion" alt="" coords="601,461,743,501"/>
+<area shape="rect" id="node30" href="$classLineInput.html#a81610349f86404c67f583eb296666bb1" title="get a line from from user" alt="" coords="412,454,543,479"/>
+<area shape="rect" id="node31" href="$classLineInput.html#a96f6a9062450af940d63ecff847646e4" title="get a line from the user" alt="" coords="183,429,364,454"/>
+<area shape="rect" id="node33" href="$classDoxy.html#ad8abe2e8a1b686a7b35e582c369d41ae" title="generate the entire documentation" alt="" coords="1085,737,1167,762"/>
+<area shape="rect" id="node34" href="$classCommand.html#a834eac0e797a5d1c992018b7d0c049a4" title="]DOXY: create doxygen&#45;like documentation of the current workspace" alt="" coords="811,737,971,762"/>
+<area shape="rect" id="node36" href="$classCommand.html#a925cc5f77af57e1705b8c96a522e6a55" title="show list of commands" alt="" coords="1047,786,1205,811"/>
+<area shape="rect" id="node38" href="$classWorkspace.html#a47e76e3abe40a5240a3a230fab2cdedd" title="list all symbols with names in buf" alt="" coords="1045,835,1207,861"/>
+<area shape="rect" id="node40" href="$classQuad__PLOT.html#acc4187c32c3bad52f276a724b226b429" title="overloaded Function::eval_AB()" alt="" coords="1051,309,1201,334"/>
+<area shape="rect" id="node42" href="$classTabExpansion.html#a155d53238b8490e82776eb2caddefceb" title="tab&#45;expand an APL command" alt="" coords="1049,672,1203,712"/>
+<area shape="rect" id="node45" href="$classCommand.html#ad61e749290966d00856ce1dd4f6abe42" title=")SAVE active WS as CONTINUE and )OFF" alt="" coords="1029,934,1223,959"/>
+<area shape="rect" id="node46" href="$classWorkspace.html#a77c7b25908cf2479dc087cc3bcf44dcb" title="load lib_ws into the_workspace, maybe set ⎕LX of the new WS." alt="" coords="1051,885,1201,910"/>
+<area shape="rect" id="node47" href="$classCommand.html#ad222a6de11eb55501624a4d0dea3a464" title=")LOAD: load a workspace file" alt="" coords="812,885,971,910"/>
+</map>

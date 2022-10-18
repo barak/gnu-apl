@@ -1,0 +1,5 @@
+<map id="Quad_WA::init" name="Quad_WA::init">
+<area shape="rect" id="node1" title="initialize total_memory" alt="" coords="5,5,112,31"/>
+<area shape="rect" id="node2" href="$classQuad__WA.html#ab79e01d2d0778bd0c877511367cdeb34" title="estimate (!) the amount of free memory" alt="" coords="160,5,351,31"/>
+<area shape="rect" id="node3" href="$classQuad__WA.html#a5e6486128134180c354cf092476397d1" title="read /proc/meminfo, return the number of items found" alt="" coords="399,5,571,31"/>
+</map>

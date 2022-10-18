@@ -1,0 +1,21 @@
+<map id="floor" name="floor">
+<area shape="rect" id="node2" href="$classComplexCell.html#a874f50fbe29a5dbdc8ee38c022f31994" title="overloaded from the corresponding Cell:: function (see class Cell). " alt="" coords="105,5,255,32"/>
+<area shape="rect" id="node4" href="$classIntCell.html#a9e1eae19e23516df1eb5350a10883e24" title="overloaded from the corresponding Cell:: function (see class Cell) " alt="" coords="571,188,702,215"/>
+<area shape="rect" id="node7" href="$classComplexCell.html#a8d8ba044d714b755b2c6b1cf6ef09f7f" title="overloaded Cell::bif_within_quad_CT() " alt="" coords="100,57,260,98"/>
+<area shape="rect" id="node10" href="$classFloatCell.html#ae990ca2c347e3b8b1b24b2797e796f18" title="overloaded Cell::bif_within_quad_CT() " alt="" coords="111,122,249,163"/>
+<area shape="rect" id="node13" href="$FloatCell_8cc.html#a3cc04ad7e7e0a10b78a5af96e17289e6" title="p_modulo_q" alt="" coords="134,239,226,265"/>
+<area shape="rect" id="node17" href="$classPlot__window__properties.html#aa186844af6e9dcff730d76bd62b98459" title="update derived properties after changing primary ones, return true on error " alt="" coords="100,319,260,361"/>
+<area shape="rect" id="node3" href="$classComplexCell.html#a978a6ef7d34a3446b796a0597c05d074" title="Overloaded Cell::is_finite(). " alt="" coords="813,31,964,57"/>
+<area shape="rect" id="node5" href="$classIntCell.html#a57acd6c6da8ad45753bb27b304ca597b" title="overloaded Cell::is_integer_cell() " alt="" coords="813,213,964,240"/>
+<area shape="rect" id="node6" href="$classBif__F12__ENCODE.html#a7fdbd7f4683430ee6daeab1014523504" title="encode *ib() according to A (integer A and b) " alt="" coords="787,163,991,189"/>
+<area shape="rect" id="node8" href="$classComplexCell.html#a4f6434753627299e11dec4cba24962ef" title="overloaded Cell::get_checked_near_int() " alt="" coords="308,57,487,98"/>
+<area shape="rect" id="node9" href="$classComplexCell.html#a69ca7247a26db55fdb7f7264ea066b63" title="overloaded from the corresponding Cell:: function (see class Cell). " alt="" coords="565,60,708,87"/>
+<area shape="rect" id="node11" href="$classFloatCell.html#a20e1f90166a304aff2fa11cf1a328f2a" title="Overloaded Cell::is_near_int64_t(). " alt="" coords="335,122,459,163"/>
+<area shape="rect" id="node12" href="$classFloatCell.html#a06d60ffa82a19783d085ce7e258161ed" title="overloaded Cell::bif_near_int() " alt="" coords="573,122,701,163"/>
+<area shape="rect" id="node14" href="$classFloatCell.html#ae6357d73eb4a9cd95598ca2d1a32a623" title="Overloaded from the corresponding Cell:: function (see class Cell). " alt="" coords="325,239,470,265"/>
+<area shape="rect" id="node15" href="$classFloatCell.html#ab33d5fb8782321e100cec38cbed5ea18" title="Overloaded Cell::is_finite(). " alt="" coords="573,239,700,265"/>
+<area shape="rect" id="node16" href="$classBif__F12__ENCODE.html#a42891c138d5ceb942cc1d6fda44d7d27" title="encode *ib() according to A " alt="" coords="535,289,739,316"/>
+<area shape="rect" id="node18" href="$classPlot__window__properties.html#a9967e651d5469f0b0437798271a938f9" title="constructor " alt="" coords="313,407,481,449"/>
+<area shape="rect" id="node19" href="$classPlot__window__properties.html#adff5407307aa8e7236e7778dce9d8863" title="handle window resize event " alt="" coords="317,290,477,331"/>
+<area shape="rect" id="node20" href="$classQuad__PLOT.html#acc4187c32c3bad52f276a724b226b429" title="overloaded Function::eval_AB() " alt="" coords="322,356,473,383"/>
+</map>

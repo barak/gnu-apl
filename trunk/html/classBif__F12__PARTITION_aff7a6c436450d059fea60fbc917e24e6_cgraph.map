@@ -1,0 +1,9 @@
+<map id="Bif_F12_PARTITION::eval_AB" name="Bif_F12_PARTITION::eval_AB">
+<area shape="rect" id="node1" title="overloaded Function::eval_AB()" alt="" coords="5,73,160,113"/>
+<area shape="rect" id="node2" href="$classBif__F12__PARTITION.html#a76f44ed4e399944ce12c8e9bfd312e8b" title="Partition B according to A." alt="" coords="208,73,363,113"/>
+<area shape="rect" id="node3" href="$classShape3.html#a075643abf890c05401f1b7abdc5339cf" title="the dimensions above r the axis" alt="" coords="449,5,531,31"/>
+<area shape="rect" id="node4" href="$classShape3.html#ad3ff2e3be69b9ca0085d211e3ecb2801" title="the dimensions below the axis" alt="" coords="451,55,529,80"/>
+<area shape="rect" id="node5" href="$classShape3.html#a7dda151f14bb5ee7a624372f0b167b7d" title="the axis dimension" alt="" coords="447,104,533,129"/>
+<area shape="rect" id="node6" href="$classShape.html#afcd3708c8c18a30cb3c0c1fa1a630f71" title="modify dimension r" alt="" coords="411,153,569,179"/>
+<area shape="rect" id="node7" href="$classShape.html#a189c92d0b74f3313bd83c8aa7565e9c5" title="recompute volume (after changing a dimension of len 0)" alt="" coords="617,153,795,179"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="DLX_Node::get_col_type" name="DLX_Node::get_col_type">
+<area shape="rect" id="node1" title="return the type of column" alt="" coords="5,104,173,129"/>
+<area shape="rect" id="node2" href="$classCell.html#a2999919fc2782b3cebfd925c63cc1fac" title="Return the character value of a cell." alt="" coords="226,29,367,55"/>
+<area shape="rect" id="node5" href="$classCell.html#ad165f9ab69abf46b2cf44d301a700a1c" title="Return the integer value of a cell." alt="" coords="231,79,362,104"/>
+<area shape="rect" id="node6" href="$classCell.html#ab3d14978f78ba264d40e9ed1a4823be2" title="Return true iff this cell is a character cell." alt="" coords="221,128,372,153"/>
+<area shape="rect" id="node7" href="$classCell.html#a4ce158d2f937ff444732ec5c43a5093f" title="Return true iff this cell is an integer, float, or complex cell." alt="" coords="239,177,355,203"/>
+<area shape="rect" id="node3" href="$classCell.html#a38a6a25f0ad091f35e3d9abfe5608a50" title="return the type of this cell" alt="" coords="439,5,570,31"/>
+<area shape="rect" id="node4" href="$classCell.html#a6c3fdef3d82f53649d1c3f16d37eedd7" title="the name of ct" alt="" coords="420,55,589,80"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="Value::is_simple" name="Value::is_simple">
+<area shape="rect" id="node1" title="return true iff this value is simple (i.e. not nested)." alt="" coords="5,31,124,56"/>
+<area shape="rect" id="node2" href="$classValue.html#a9fc8bbaf9fefe6835dea7db0f71b8b6c" title="return the number of elements (the product of the shapes)." alt="" coords="172,5,320,31"/>
+<area shape="rect" id="node4" href="$classValue.html#a6b8aa5e58b68236c77a09385365468d5" title="return the first element of the ravel (which is always present). same as get_cproto(),..." alt="" coords="187,55,305,80"/>
+<area shape="rect" id="node3" href="$classShape.html#af39e05bad7be900fa1437a6eb6035e97" title="return the number of ravel elements (1 for scalars,i else product of shapes)" alt="" coords="368,5,503,31"/>
+<area shape="rect" id="node5" href="$classValue.html#aa0572b1b7fa249cb79694fd152130b38" title="return the (constant) idx&#39;th element of the ravel." alt="" coords="374,55,497,80"/>
+<area shape="rect" id="node6" href="$classValue.html#ac5b54e3a13cab0837442f1575b3299a5" title="return the number of elements, but at least 1 (for the prototype)." alt="" coords="551,55,720,80"/>
+<area shape="rect" id="node7" href="$classShape.html#a6f32f749601dca80263493fd06be12c4" title="return the number of ravel elements, but at least 1 (for empty values and scalars) else product of sh..." alt="" coords="768,55,923,80"/>
+</map>

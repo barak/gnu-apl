@@ -1,0 +1,9 @@
+<map id="Nabla::get_label_and_text" name="Nabla::get_label_and_text">
+<area shape="rect" id="node1" title="return the line label (sucah as [1]) and the line text, Set is_current iff line is the current line o..." alt="" coords="5,13,179,38"/>
+<area shape="rect" id="node2" href="$structNabla_1_1FunLine.html#acb10b18671fa5864824dbcf871e7eb9f" title="return the line label (sucah as [1]) and the line text" alt="" coords="227,5,363,45"/>
+<area shape="rect" id="node3" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="844,38,984,63"/>
+<area shape="rect" id="node4" href="$structLineLabel.html#abaa6e95c0ca623f8b0746a0e621343b1" title="print a prompt like [1.2] into buffer" alt="" coords="411,66,568,91"/>
+<area shape="rect" id="node5" href="$classUCS__string.html#a5776e51c6faa53537409322cd0ebf07a" title="append number (in ASCII encoding like d) to this string" alt="" coords="636,59,776,99"/>
+<area shape="rect" id="node6" href="$classUCS__string.html#ace70327ef899c525ad9c3f2bffd43697" title="append 0&#45;terminated UTF8 string str to this UCS_string." alt="" coords="616,123,796,149"/>
+<area shape="rect" id="node7" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="645,173,767,198"/>
+</map>

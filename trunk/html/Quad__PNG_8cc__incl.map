@@ -1,0 +1,84 @@
+<map id="src/Quad_PNG.cc" name="src/Quad_PNG.cc">
+<area shape="rect" id="node1" title=" " alt="" coords="799,5,929,31"/>
+<area shape="rect" id="node2" title=" " alt="" coords="45,1692,113,1717"/>
+<area shape="rect" id="node3" href="$Quad__PNG_8hh_source.html" title=" " alt="" coords="759,79,865,104"/>
+<area shape="rect" id="node9" href="$Common_8hh_source.html" title=" " alt="" coords="720,1619,813,1644"/>
+<area shape="rect" id="node13" title=" " alt="" coords="1347,1692,1408,1717"/>
+<area shape="rect" id="node79" title=" " alt="" coords="889,79,943,104"/>
+<area shape="rect" id="node80" title=" " alt="" coords="967,79,1022,104"/>
+<area shape="rect" id="node81" title=" " alt="" coords="1047,79,1129,104"/>
+<area shape="rect" id="node82" title=" " alt="" coords="1154,79,1227,104"/>
+<area shape="rect" id="node4" title=" " alt="" coords="1529,152,1605,177"/>
+<area shape="rect" id="node5" title=" " alt="" coords="763,152,861,177"/>
+<area shape="rect" id="node6" title=" " alt="" coords="2499,1619,2557,1644"/>
+<area shape="rect" id="node7" href="$QuadFunction_8hh_source.html" title=" " alt="" coords="1383,152,1505,177"/>
+<area shape="rect" id="node8" href="$PrimitiveFunction_8hh_source.html" title=" " alt="" coords="1777,299,1919,324"/>
+<area shape="rect" id="node74" href="$StateIndicator_8hh_source.html" title=" " alt="" coords="1383,225,1505,251"/>
+<area shape="rect" id="node28" href="$Function_8hh_source.html" title=" " alt="" coords="1457,372,1548,397"/>
+<area shape="rect" id="node33" href="$Id_8hh_source.html" title=" " alt="" coords="2015,1399,2065,1424"/>
+<area shape="rect" id="node48" href="$Value_8hh_source.html" title=" " alt="" coords="1098,592,1171,617"/>
+<area shape="rect" id="node72" href="$Performance_8hh_source.html" title=" " alt="" coords="2759,1545,2873,1571"/>
+<area shape="rect" id="node10" title=" " alt="" coords="531,1692,613,1717"/>
+<area shape="rect" id="node11" title=" " alt="" coords="137,1692,202,1717"/>
+<area shape="rect" id="node12" title=" " alt="" coords="1707,1765,1773,1791"/>
+<area shape="rect" id="node14" title=" " alt="" coords="637,1692,701,1717"/>
+<area shape="rect" id="node15" title=" " alt="" coords="725,1692,808,1717"/>
+<area shape="rect" id="node16" title=" " alt="" coords="482,1765,553,1791"/>
+<area shape="rect" id="node17" title=" " alt="" coords="1927,1692,1999,1717"/>
+<area shape="rect" id="node18" title=" " alt="" coords="1011,1692,1077,1717"/>
+<area shape="rect" id="node19" title=" " alt="" coords="1101,1692,1168,1717"/>
+<area shape="rect" id="node20" href="$APL__types_8hh_source.html" title=" " alt="" coords="832,1692,936,1717"/>
+<area shape="rect" id="node23" href="$Assert_8hh_source.html" title=" " alt="" coords="1193,1692,1271,1717"/>
+<area shape="rect" id="node24" href="$Logging_8hh_source.html" title=" " alt="" coords="371,1692,456,1717"/>
+<area shape="rect" id="node26" href="$SystemLimits_8hh_source.html" title=" " alt="" coords="227,1692,347,1717"/>
+<area shape="rect" id="node21" title=" " alt="" coords="895,1765,964,1791"/>
+<area shape="rect" id="node22" title=" " alt="" coords="807,1765,870,1791"/>
+<area shape="rect" id="node25" href="$Logging_8def_source.html" title=" " alt="" coords="369,1765,458,1791"/>
+<area shape="rect" id="node27" href="$SystemLimits_8def_source.html" title=" " alt="" coords="221,1765,345,1791"/>
+<area shape="rect" id="node29" title=" " alt="" coords="1457,445,1548,471"/>
+<area shape="rect" id="node30" href="$Error_8hh_source.html" title=" " alt="" coords="893,1179,961,1204"/>
+<area shape="rect" id="node47" href="$NamedObject_8hh_source.html" title=" " alt="" coords="1623,519,1743,544"/>
+<area shape="rect" id="node51" href="$PrintBuffer_8hh_source.html" title=" " alt="" coords="1467,1032,1570,1057"/>
+<area shape="rect" id="node70" href="$Parser_8hh_source.html" title=" " alt="" coords="1674,445,1753,471"/>
+<area shape="rect" id="node31" href="$Backtrace_8hh_source.html" title=" " alt="" coords="1151,1252,1249,1277"/>
+<area shape="rect" id="node40" href="$UCS__string_8hh_source.html" title=" " alt="" coords="1686,1472,1794,1497"/>
+<area shape="rect" id="node44" href="$ErrorCode_8hh_source.html" title=" " alt="" coords="977,1252,1076,1277"/>
+<area shape="rect" id="node46" title=" " alt="" coords="791,1252,852,1277"/>
+<area shape="rect" id="node32" href="$PrintOperator_8hh_source.html" title=" " alt="" coords="1537,1325,1655,1351"/>
+<area shape="rect" id="node36" href="$TokenEnums_8hh_source.html" title=" " alt="" coords="2164,1472,2281,1497"/>
+<area shape="rect" id="node42" href="$Unicode_8hh_source.html" title=" " alt="" coords="1463,1545,1551,1571"/>
+<area shape="rect" id="node34" href="$IdEnums_8hh_source.html" title=" " alt="" coords="2287,1545,2379,1571"/>
+<area shape="rect" id="node38" href="$UTF8__string_8hh_source.html" title=" " alt="" coords="1828,1545,1940,1571"/>
+<area shape="rect" id="node35" href="$Id_8def_source.html" title=" " alt="" coords="2306,1619,2361,1644"/>
+<area shape="rect" id="node37" href="$Token_8def_source.html" title=" " alt="" coords="2183,1545,2263,1571"/>
+<area shape="rect" id="node39" title=" " alt="" coords="1779,1619,1834,1644"/>
+<area shape="rect" id="node41" href="$Heapsort_8hh_source.html" title=" " alt="" coords="2065,1545,2159,1571"/>
+<area shape="rect" id="node43" href="$Avec_8def_source.html" title=" " alt="" coords="1499,1619,1573,1644"/>
+<area shape="rect" id="node45" href="$Error_8def_source.html" title=" " alt="" coords="977,1325,1049,1351"/>
+<area shape="rect" id="node49" href="$CharCell_8hh_source.html" title=" " alt="" coords="1097,739,1188,764"/>
+<area shape="rect" id="node54" href="$Shape_8hh_source.html" title=" " alt="" coords="436,1105,513,1131"/>
+<area shape="rect" id="node57" href="$Value__P_8hh_source.html" title=" " alt="" coords="1122,1032,1211,1057"/>
+<area shape="rect" id="node58" href="$ComplexCell_8hh_source.html" title=" " alt="" coords="807,665,921,691"/>
+<area shape="rect" id="node59" href="$NumericCell_8hh_source.html" title=" " alt="" coords="817,885,929,911"/>
+<area shape="rect" id="node60" href="$IntCell_8hh_source.html" title=" " alt="" coords="741,739,819,764"/>
+<area shape="rect" id="node62" href="$DynamicObject_8hh_source.html" title=" " alt="" coords="1375,1252,1505,1277"/>
+<area shape="rect" id="node65" href="$FloatCell_8hh_source.html" title=" " alt="" coords="639,665,731,691"/>
+<area shape="rect" id="node66" href="$LvalCell_8hh_source.html" title=" " alt="" coords="1047,812,1134,837"/>
+<area shape="rect" id="node67" href="$PointerCell_8hh_source.html" title=" " alt="" coords="956,885,1060,911"/>
+<area shape="rect" id="node68" title=" " alt="" coords="1199,665,1275,691"/>
+<area shape="rect" id="node69" title=" " alt="" coords="1299,665,1391,691"/>
+<area shape="rect" id="node50" href="$Cell_8hh_source.html" title=" " alt="" coords="995,959,1058,984"/>
+<area shape="rect" id="node52" href="$Avec_8hh_source.html" title=" " alt="" coords="1729,1105,1799,1131"/>
+<area shape="rect" id="node53" href="$PrintContext_8hh_source.html" title=" " alt="" coords="146,1545,259,1571"/>
+<area shape="rect" id="node56" href="$UCS__string__vector_8hh_source.html" title=" " alt="" coords="1834,1179,1985,1204"/>
+<area shape="rect" id="node55" href="$Error__macros_8hh_source.html" title=" " alt="" coords="1097,1179,1215,1204"/>
+<area shape="rect" id="node61" href="$RealCell_8hh_source.html" title=" " alt="" coords="689,812,780,837"/>
+<area shape="rect" id="node63" href="$Output_8hh_source.html" title=" " alt="" coords="1291,1399,1370,1424"/>
+<area shape="rect" id="node64" title=" " alt="" coords="1477,1472,1547,1497"/>
+<area shape="rect" id="node71" href="$Token_8hh_source.html" title=" " alt="" coords="1767,519,1843,544"/>
+<area shape="rect" id="node73" href="$Performance_8def_source.html" title=" " alt="" coords="2659,1619,2778,1644"/>
+<area shape="rect" id="node75" href="$DerivedFunction_8hh_source.html" title=" " alt="" coords="1167,299,1302,324"/>
+<area shape="rect" id="node76" href="$Executable_8hh_source.html" title=" " alt="" coords="1870,445,1975,471"/>
+<area shape="rect" id="node77" href="$Prefix_8hh_source.html" title=" " alt="" coords="1359,445,1433,471"/>
+<area shape="rect" id="node78" href="$Prefix_8def_source.html" title=" " alt="" coords="1367,519,1446,544"/>
+</map>

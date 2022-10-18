@@ -1,0 +1,62 @@
+<map id="Value::get_wravel" name="Value::get_wravel">
+<area shape="rect" id="node2" href="$classValue.html#a5be5b6031f53082438fa9de824732fbe" title="assign val to the cell references in this value. " alt="" coords="211,601,362,628"/>
+<area shape="rect" id="node3" href="$classBif__F12__ENCODE.html#a4639bbd2488d2f02ca88a5e362a1229a" title="encode *ib() according to A " alt="" coords="180,652,393,679"/>
+<area shape="rect" id="node4" href="$classBif__F12__ENCODE.html#a42891c138d5ceb942cc1d6fda44d7d27" title="encode *ib() according to A " alt="" coords="185,703,389,729"/>
+<area shape="rect" id="node5" href="$classBif__F12__ENCODE.html#a7fdbd7f4683430ee6daeab1014523504" title="encode *ib() according to A (integer A and b) " alt="" coords="185,753,389,780"/>
+<area shape="rect" id="node6" href="$classScalarFunction.html#ac0e9e42f145d16a623c91240d4099f60" title="compute cell_A fun cell_B, scalar&#45;extending PointerCells " alt="" coords="207,805,366,846"/>
+<area shape="rect" id="node28" href="$classValue.html#a5fe3659073f7ba9ad8dca424ed45c657" title="return a value containing pointers to all ravel cells of this value. the result is non&#45;nested and has..." alt="" coords="221,871,352,897"/>
+<area shape="rect" id="node29" href="$classValue.html#a7c6b3e9d0c395e71cce8c394eb8bb84e" title="return the Cell (if any) containing the data of structured value member member, or 0 if member not fo..." alt="" coords="203,921,370,948"/>
+<area shape="rect" id="node30" href="$classValue.html#acd6b3044148fdc7c650af80d2401bbe9" title="create a new member and return the Cell containing the data for it " alt="" coords="203,972,370,999"/>
+<area shape="rect" id="node49" href="$classXML__Loading__Archive.html#a3c747929c263a6913ea01f833ce2a9f0" title="read one or more Cell(s) from input into the ravel of Z; return the UTF8 * after the cells..." alt="" coords="211,1049,363,1090"/>
+<area shape="rect" id="node53" href="$classValue.html#af55f0cce10102b5f7b1447bf59924d2f" title="recursively replace all numeric ravel elements with 0 and all characters with blank. See lrm p. 46. " alt="" coords="233,1115,340,1141"/>
+<area shape="rect" id="node7" href="$classScalarFunction.html#a1a92d9a696bd4158cee9b2b6950d14d1" title="A helper function for eval_scalar_AXB(). " alt="" coords="460,739,601,781"/>
+<area shape="rect" id="node8" href="$classScalarFunction.html#adb8daa5af9eb305915236ceca2aa841d" title="return true if this function can be parallelized " alt="" coords="459,805,602,846"/>
+<area shape="rect" id="node9" href="$classScalarFunction.html#a254898c12f19ee61f71837247d2efaa9" title="compute the monadic scalar function fun along one ravel " alt="" coords="693,805,824,846"/>
+<area shape="rect" id="node10" href="$classScalarFunction.html#a6f542f78d8c0f36e2c6f6e6f28fec2af" title="Evaluate a scalar function monadically. " alt="" coords="914,429,1055,470"/>
+<area shape="rect" id="node11" href="$classBif__F12__BINOM.html#a3596f99aa601d0147864acd62c489c03" title="overloaded Function::eval_B(). " alt="" coords="1139,563,1305,589"/>
+<area shape="rect" id="node12" href="$classBif__F2__AND__B.html#a6e07c234cf33e1d174006d1458e1a22d" title="overloaded Function::eval_B(). " alt="" coords="1142,613,1302,640"/>
+<area shape="rect" id="node13" href="$classBif__F2__OR__B.html#aca40b9b69a30f974ba243019c923b4ff" title="overloaded Function::eval_B(). " alt="" coords="1147,664,1297,691"/>
+<area shape="rect" id="node14" href="$classBif__F2__NOR__B.html#a132420f480ec102175985eca2599795a" title="overloaded Function::eval_B(). " alt="" coords="1141,715,1303,741"/>
+<area shape="rect" id="node15" href="$classBif__F12__POWER.html#a8bfa0ebd2146db96e9b4a9dc46206f04" title="overloaded Function::eval_B(). " alt="" coords="1135,765,1309,792"/>
+<area shape="rect" id="node16" href="$classBif__F12__PLUS.html#a56e4964cac0278cea3970e7d3b12f291" title="overloaded Function::eval_B(). " alt="" coords="1143,816,1301,843"/>
+<area shape="rect" id="node17" href="$classBif__F12__MINUS.html#a2e3cea00d72e560ecdfc904011d5ebba" title="overloaded Function::eval_B(). " alt="" coords="1139,5,1305,32"/>
+<area shape="rect" id="node18" href="$classBif__F12__ROLL.html#a0b67f39c345c98d9b16f63c457ad0557" title="overloaded Function::eval_B(). " alt="" coords="1144,56,1300,83"/>
+<area shape="rect" id="node19" href="$classBif__F12__WITHOUT.html#a6eb017585dbc330e820d4ef1d69835b6" title="overloaded Function::eval_B(). " alt="" coords="1129,107,1315,133"/>
+<area shape="rect" id="node20" href="$classBif__F12__TIMES.html#a14cbf46ddc0446de17af6a1030e6fc3e" title="overloaded Function::eval_B(). " alt="" coords="1141,157,1303,184"/>
+<area shape="rect" id="node21" href="$classBif__F12__DIVIDE.html#a57eb5c0cccf0163d7c740eda8f9f9531" title="overloaded Function::eval_B(). " alt="" coords="1138,208,1306,235"/>
+<area shape="rect" id="node22" href="$classBif__F12__CIRCLE.html#a6c3a7a1fe80b44bbfee3fa27fbb42c33" title="overloaded Function::eval_B(). " alt="" coords="1136,259,1308,285"/>
+<area shape="rect" id="node23" href="$classBif__F12__RND__UP.html#a3d3ec8abbf84ac0c59cec71a8ff3c0b5" title="overloaded Function::eval_B(). " alt="" coords="1133,309,1311,336"/>
+<area shape="rect" id="node24" href="$classBif__F12__RND__DN.html#aa0b14c469b99ffb2eeeac9c1e7253389" title="overloaded Function::eval_B(). " alt="" coords="1133,360,1311,387"/>
+<area shape="rect" id="node25" href="$classBif__F12__STILE.html#ac487d336d5e5b62bc7902a777c51decf" title="overloaded Function::eval_B(). " alt="" coords="1143,411,1301,437"/>
+<area shape="rect" id="node26" href="$classBif__F12__LOGA.html#ac8e17b085ce08e02da68da6338dbcc17" title="overloaded Function::eval_B(). " alt="" coords="1143,461,1301,488"/>
+<area shape="rect" id="node27" href="$classScalarFunction.html#a1c3af7c78bbc4be29d3e993ec1619a55" title="Construct a ScalarFunction with Id id. " alt="" coords="1120,512,1324,539"/>
+<area shape="rect" id="node31" href="$classValue.html#a411b407ccbe6440be35bd0bae2b72f8c" title="double the ravel length of this value (by appending integer 0s). " alt="" coords="463,972,599,999"/>
+<area shape="rect" id="node32" href="$classValue.html#a873ba3775e10ac85406de7a369bd03ed" title="return member of this value, defined by members. The first name in members is the deepest..." alt="" coords="463,1023,598,1049"/>
+<area shape="rect" id="node41" href="$classQuad__JSON.html#af9e8ac641cd521e54d250971dd66e0b4" title="parse a JSON object member: &quot;name&quot; : value , ; and increment token0 along the way. " alt="" coords="441,906,620,947"/>
+<area shape="rect" id="node33" href="$classValue.html#a3117ef45bf1740b787751f5186220828" title="add a member to a structured variable " alt="" coords="689,1023,828,1049"/>
+<area shape="rect" id="node34" href="$classXML__node.html#a738e88d62255e4a6e89ff4b3071956eb" title="add member name with value value to structured value Z " alt="" coords="901,1023,1068,1049"/>
+<area shape="rect" id="node35" href="$classXML__node.html#af7768a8292eebe36599f6d958dde6731" title="collect nodes starting at anchor, return true on error " alt="" coords="1157,1069,1287,1096"/>
+<area shape="rect" id="node37" href="$classXML__node.html#ad740e8b2a306d73e260482af9be89192" title="append garbage to this garbage can (for later deletion) " alt="" coords="1397,993,1531,1020"/>
+<area shape="rect" id="node39" href="$classXML__node.html#ae6f77f0b4ebb0311ee13abdc69d696f0" title="merge the items from start(&#45;tag) to (end(&#45;tag) into start tag " alt="" coords="1606,1044,1773,1071"/>
+<area shape="rect" id="node40" href="$classXML__node.html#aaab7a6011fdbbfcff7617a1e3029119e" title="parse an XML start or leaf tag, store result in this&#45;&gt;APL_value On error set MORE_ERROR() and return ..." alt="" coords="1147,1019,1297,1045"/>
+<area shape="rect" id="node36" href="$classQuad__XML.html#a8e4ca50c2d54d630895c22115857325e" title="convert XML string to APL associative array " alt="" coords="1823,1044,1995,1071"/>
+<area shape="rect" id="node38" href="$classXML__node.html#ac15dcafb582e4d7595ee24d28a5f0f21" title="reduce nodes starting at start, return true on error " alt="" coords="1618,993,1761,1020"/>
+<area shape="rect" id="node42" href="$classQuad__JSON.html#a089835d5e18fc87f25971bb49046ae88" title="parse a JSON object: { member ( , member)* } and increment token0 " alt="" coords="669,943,848,969"/>
+<area shape="rect" id="node43" href="$classQuad__JSON.html#a1e973192b2dccc89283c8ba4697923fc" title="parse a JSON value (false, null, true, object, array, number, or string) and increment along the way..." alt="" coords="897,917,1072,944"/>
+<area shape="rect" id="node44" href="$classQuad__JSON.html#ae101226211d05605bee074e4d3a66f8e" title="convert JSON string to APL associative array " alt="" coords="1127,867,1317,893"/>
+<area shape="rect" id="node48" href="$classQuad__JSON.html#ad6c1178f70936d2d153b1581e28e8d52" title="parse a JSON array: [ value (, value)* ] and increment token0 along the way. " alt="" coords="1136,917,1308,944"/>
+<area shape="rect" id="node45" href="$classQuad__JSON.html#a7488f4e12a005de36c3fa9887e4909e5" title="overloaded Function::eval_B() " alt="" coords="1392,867,1536,893"/>
+<area shape="rect" id="node46" href="$classQuad__JSON.html#a2ed44b39f5d092ab5f7e1768c6b8615a" title="return JSON file (&#45;name in B) converted to APL structured value " alt="" coords="1604,841,1775,868"/>
+<area shape="rect" id="node47" href="$classQuad__JSON.html#a3adb4fba903343bf38b0c3a1dd10feb8" title="overloaded Function::eval_B() " alt="" coords="1832,867,1985,893"/>
+<area shape="rect" id="node50" href="$classXML__Loading__Archive.html#ad200f5b98b9cf3e903ccf714a56a1d0f" title="read next Ravel element " alt="" coords="455,1074,607,1115"/>
+<area shape="rect" id="node51" href="$classXML__Loading__Archive.html#a3ea748a15d0a90fe9a32c362b14da7fd" title="read an entire workspace, throw DOMAIN_ERROR on failure " alt="" coords="683,1074,835,1115"/>
+<area shape="rect" id="node52" href="$classXML__Loading__Archive.html#a45c9b23463cf5379d2788af1789a62f0" title="read vids of top&#45;level variables " alt="" coords="909,1074,1061,1115"/>
+<area shape="rect" id="node54" href="$classQuad__TF.html#ac63b0e65bfd18c05cdff0da9e32ac043" title="in&#45;place exchange of IntCells and CharCells " alt="" coords="442,1140,619,1167"/>
+<area shape="rect" id="node55" href="$classQuad__TF.html#a499c2aa8ed4589243493cf4d93db0bbf" title="replace ⎕UCS n... with the corresponding Unicodes, " alt="" coords="668,1140,849,1167"/>
+<area shape="rect" id="node56" href="$classQuad__TF.html#a0d12bc9c1c1710992edb76fca1b7c6af" title="simplify tos by removing UCS nnn etc. " alt="" coords="912,1169,1057,1196"/>
+<area shape="rect" id="node57" href="$classQuad__TF.html#a293263bd9b2bf923dc9e4113dded832f" title="try inverse ⎕TF2 of ucs, set new_var_or_fun if successful " alt="" coords="1148,1225,1296,1252"/>
+<area shape="rect" id="node58" href="$structCommand_1_1transfer__context.html#a4e80a2899a02285ba89e58792e6150ea" title="process a &#39;A&#39; (array in 2 ⎕TF format) item. " alt="" coords="1372,1313,1556,1354"/>
+<area shape="rect" id="node59" href="$classQuad__TF.html#a27ed4b02d5f1a1c8a8b0a1fcbe2756f8" title="Overloaded Function::eval_AB(). " alt="" coords="1397,1196,1531,1223"/>
+<area shape="rect" id="node61" href="$structCommand_1_1transfer__context.html#afee6856208966168d158de45145dd4ca" title="process an &#39;F&#39; (function in 2 ⎕TF format) item. " alt="" coords="1372,1247,1556,1289"/>
+<area shape="rect" id="node60" href="$classQuad__TF.html#ae9b15fd0ae227d3a550f01a164f76af8" title="Constructor. " alt="" coords="1620,1196,1759,1223"/>
+</map>

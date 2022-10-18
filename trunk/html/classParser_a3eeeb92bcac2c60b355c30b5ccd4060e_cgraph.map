@@ -1,0 +1,33 @@
+<map id="Parser::parse_statement" name="Parser::parse_statement">
+<area shape="rect" id="node1" title="Parse token string tos (a statement without diamonds)." alt="" coords="5,680,171,706"/>
+<area shape="rect" id="node2" href="$classParser.html#aa6206be9b275310ea5c9ecca098fc113" title="Collect consecutive smaller APL values or value token into vectors." alt="" coords="227,503,398,528"/>
+<area shape="rect" id="node24" href="$classToken__string.html#a08d6f453bc7850828e3f664f00dfa624" title="print this token string" alt="" coords="848,576,979,602"/>
+<area shape="rect" id="node25" href="$classParser.html#ad6ae52cbe0094ff62852548096166b97" title="Collect groups." alt="" coords="237,554,389,579"/>
+<area shape="rect" id="node26" href="$classParser.html#a06c324088335f43e2bc02f9c8ac926e0" title="mark next symbol left of ← on the same level as LSYMB" alt="" coords="243,655,382,680"/>
+<area shape="rect" id="node27" href="$classParser.html#ade07c889dc129dce5307b7df3084b8de" title="compute distances between matching (), [], and {}" alt="" coords="235,704,390,730"/>
+<area shape="rect" id="node28" href="$classParser.html#add79f0c7ff21368d32001e64aaa06c8f" title="Replace (X) by X and ((..) by (..) in string. (X is a single token)" alt="" coords="219,754,407,794"/>
+<area shape="rect" id="node30" href="$classParser.html#ac1050bb2f65d5e4eb7f06a8d4e67f2d1" title="remove VOID token from tos (compacting tos)" alt="" coords="241,818,384,858"/>
+<area shape="rect" id="node31" href="$classParser.html#ab1db68c3ac564adb8724beb0dbb2485f" title="Replace ∧∧, ∨∨, ⍲⍲, and ⍱⍱ by their bitwise variant." alt="" coords="233,882,392,922"/>
+<area shape="rect" id="node3" href="$classParser.html#a2ec94a9ef33782db92065a4c15e53295" title="Create one APL value from len values." alt="" coords="455,452,597,478"/>
+<area shape="rect" id="node4" href="$classParser.html#a2eef18990564bb557f9014b0465a256d" title="Create one scalar APL value from a token." alt="" coords="645,240,792,280"/>
+<area shape="rect" id="node22" href="$classParser.html#a29c256f9df4d2c0d2da0d728e1d12526" title="Create one vector APL value from value_count single values." alt="" coords="645,366,792,406"/>
+<area shape="rect" id="node5" href="$classToken.html#aaeae570a5fa2e6a83ca2b824c6013ef9" title="return the Unicode value of this token" alt="" coords="843,120,983,146"/>
+<area shape="rect" id="node7" href="$classToken.html#a74ebddaf8dce2b11c59cddfb61594816" title="return the complex imag value of this token" alt="" coords="840,424,987,450"/>
+<area shape="rect" id="node8" href="$classToken.html#a2a53219afbfd9ec64b5dd449c225ed68" title="return the complex real value of this token" alt="" coords="843,22,983,47"/>
+<area shape="rect" id="node9" href="$classToken.html#abbcd765b2cb1c9da24d762ca451eefa4" title="return the float value of this token" alt="" coords="1053,523,1180,548"/>
+<area shape="rect" id="node10" href="$classToken.html#a9721c23968d7272edd1abae91ba77193" title="return the integer value of this token" alt="" coords="849,71,978,96"/>
+<area shape="rect" id="node11" href="$classToken.html#a13e8b65088f8a7d103772acc6cfb5140" title="return the tag of this token" alt="" coords="859,323,968,348"/>
+<area shape="rect" id="node12" href="$classToken.html#a9b575ee45601717762ee3966b5959b1b" title="move mutable src into this token. clears APL value pointer in src (if any) and add events as needed" alt="" coords="857,222,969,247"/>
+<area shape="rect" id="node6" href="$classToken.html#a1a31afbb07e3f1dbb86d5f872ce5c297" title="return the TokenValueType of this token." alt="" coords="1457,347,1611,372"/>
+<area shape="rect" id="node13" href="$classToken.html#a7ba4a6caa16d32029320a2d6402cb732" title="clear this token, properly clearing Value token" alt="" coords="1069,172,1164,198"/>
+<area shape="rect" id="node14" href="$classToken.html#a11e37aa69b8eb64f293702293b00f50c" title="return true iff this token is an apl value" alt="" coords="1266,271,1390,296"/>
+<area shape="rect" id="node17" href="$classToken.html#a90696c3f45f9af044b6129071232dd97" title="copy src to this token, updating ref counts for APL values" alt="" coords="1061,422,1172,447"/>
+<area shape="rect" id="node19" href="$classValue__P__Base.html#a1c3bf1b6f708eb2c1ba4b97c83adb9aa" title="return a const pointer to the Value" alt="" coords="1049,323,1184,348"/>
+<area shape="rect" id="node20" href="$classToken.html#a59c13ceda2896520c6a41cacf67a20ea" title="return value usage counter" alt="" coords="1035,274,1199,299"/>
+<area shape="rect" id="node15" href="$classValue__P__Base.html#ad07a670c61c71b7aecc8ca9a6170b796" title="decrement owner&#45;count and reset pointer to 0" alt="" coords="1255,222,1401,247"/>
+<area shape="rect" id="node16" href="$classToken.html#aa3c5868ba4115f3189df6b2ac5b36f39" title="Construct a VOID token. VOID token are used for two purposes: (1) to fill positions when e...." alt="" coords="1277,172,1379,198"/>
+<area shape="rect" id="node18" href="$unionToken_1_1sval.html#a22a0be9d3742c2a8168e59d530dd659e" title="a shortcut for accessing apl_val" alt="" coords="1255,371,1401,396"/>
+<area shape="rect" id="node21" href="$classValue.html#a8103d85e8d44c2e4fc99ecd31c163e6f" title="return the number of Value_P pointing to this value" alt="" coords="1247,320,1409,346"/>
+<area shape="rect" id="node23" href="$classToken.html#a205e0b499e06999ff91c272ff28c9013" title="return the Value_P value of this token. The token could be TOK_NO_VALUE; in that case VALUE_ERROR is ..." alt="" coords="1051,372,1183,398"/>
+<area shape="rect" id="node29" href="$classParser.html#a0979c1e2733274ff5e535aecddab0a7e" title="find closing paranthesis; throw error if not found." alt="" coords="457,754,595,794"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="Cell::bif_divide" name="Cell::bif_divide">
+<area shape="rect" id="node1" title="store the quotient between A and this cell in Z" alt="" coords="739,80,847,105"/>
+<area shape="rect" id="node2" href="$classComplexCell.html#a5d1fbc198fc98df8f0f91869cbd161f5" title="overloaded from the corresponding Cell:: function (see class Cell)." alt="" coords="513,5,681,31"/>
+<area shape="rect" id="node5" href="$classBif__F12__DIVIDE.html#a81c28403d9dfb6e9a1f405c98d1c8f86" title="overloaded Function::eval_AB()." alt="" coords="509,55,686,80"/>
+<area shape="rect" id="node6" href="$classBif__F12__DIVIDE.html#ad26ed8ed64a20ffe1569eb7d809e2dc7" title="overloaded Function::eval_AXB()." alt="" coords="504,104,691,129"/>
+<area shape="rect" id="node7" href="$classBif__F12__DIVIDE.html#acd77b9afb4fa0f33a087373c10f61d7e" title="overloaded Function::get_scalar_f2" alt="" coords="524,154,671,194"/>
+<area shape="rect" id="node3" href="$classBif__F12__ENCODE.html#a4639bbd2488d2f02ca88a5e362a1229a" title="encode *ib() according to A" alt="" coords="243,5,456,31"/>
+<area shape="rect" id="node4" href="$classBif__F12__ENCODE.html#a003a77890ec532d2909d23e3ce5dcb89" title="overloaded Function::eval_AB()" alt="" coords="5,5,195,31"/>
+</map>

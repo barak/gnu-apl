@@ -1,0 +1,10 @@
+<map id="PointerCell::release" name="PointerCell::release">
+<area shape="rect" id="node1" title="overloaded Cell::release()" alt="" coords="5,127,141,152"/>
+<area shape="rect" id="node2" href="$classValue.html#a4dbee7eead7d72ec234a45d164c38e97" title="increase nz_subcell_count by count" alt="" coords="203,5,347,31"/>
+<area shape="rect" id="node3" href="$classValue.html#af7b85fd389faaeb27431b6aaf659e93a" title="decrement the PointerCell count" alt="" coords="189,55,360,95"/>
+<area shape="rect" id="node4" href="$classPointerCell.html#a4f3f4eebed4b98ea6161b66b5a81c48d" title="overloaded Cell::get_pointer_value()" alt="" coords="195,119,354,159"/>
+<area shape="rect" id="node6" href="$classValue__P__Base.html#ad07a670c61c71b7aecc8ca9a6170b796" title="decrement owner&#45;count and reset pointer to 0" alt="" coords="202,184,347,209"/>
+<area shape="rect" id="node7" href="$classIntCell.html#afd60fd9e3a5581ac99c1e053d9218fe7" title="initialize the (un&#45;initialized) Cell *Z to integer 0" alt="" coords="233,233,316,259"/>
+<area shape="rect" id="node5" href="$classValue__P__Base.html#a1c3bf1b6f708eb2c1ba4b97c83adb9aa" title="return a const pointer to the Value" alt="" coords="408,127,543,152"/>
+<area shape="rect" id="node8" href="$classIntCell.html#a88c653b2f968c451ee1c1c53a983fa13" title="Construct an integer cell with value 0." alt="" coords="422,233,529,259"/>
+</map>

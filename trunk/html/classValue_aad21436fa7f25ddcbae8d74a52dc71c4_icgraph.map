@@ -1,0 +1,5 @@
+<map id="Value::get_UCS_ravel" name="Value::get_UCS_ravel">
+<area shape="rect" id="node1" title="return the ravel of this value as UCS string, or throw DOMAIN error if the ravel contains non&#45;char or..." alt="" coords="447,5,599,31"/>
+<area shape="rect" id="node2" href="$classQuad__PLOT.html#ae6f31438074669d8b69f651556c8fa39" title="parse the (all&#45;optional) attributes in A" alt="" coords="204,5,399,31"/>
+<area shape="rect" id="node3" href="$classQuad__PLOT.html#acc4187c32c3bad52f276a724b226b429" title="overloaded Function::eval_AB()" alt="" coords="5,5,156,31"/>
+</map>

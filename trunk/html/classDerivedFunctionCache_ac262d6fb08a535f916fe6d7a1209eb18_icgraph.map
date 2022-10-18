@@ -1,0 +1,12 @@
+<map id="DerivedFunctionCache::size" name="DerivedFunctionCache::size">
+<area shape="rect" id="node1" title="return the number of items in the cache" alt="" coords="1243,55,1397,95"/>
+<area shape="rect" id="node2" href="$classXML__Saving__Archive.html#a7b02c75d8e22694c05c14ab5d8d808c8" title="write derived functions cache" alt="" coords="1044,23,1191,63"/>
+<area shape="rect" id="node9" href="$classDerivedFunctionCache.html#a0d26600266b1da2e95c1e6e84a3f00cc" title="clear the marked bit in values bound to derived functions (if any)." alt="" coords="1040,87,1195,127"/>
+<area shape="rect" id="node3" href="$classXML__Saving__Archive.html#a6d474efaefd9567ab70fe498729bb186" title="write the Prefix parser of si (and its derived functions)" alt="" coords="841,23,988,63"/>
+<area shape="rect" id="node4" href="$classXML__Saving__Archive.html#a3bc62d82baa6be004398f70faa1b3e8b" title="write StateIndicator entry si" alt="" coords="643,23,789,63"/>
+<area shape="rect" id="node5" href="$classXML__Saving__Archive.html#acc327395cab545ea7797d92f5c931cab" title="write entire workspace" alt="" coords="448,23,595,63"/>
+<area shape="rect" id="node6" href="$classWorkspace.html#a8a4f1d898d523818dbd9d7efa6f2cf92" title="save this workspace" alt="" coords="247,31,400,56"/>
+<area shape="rect" id="node7" href="$classCommand.html#ad61e749290966d00856ce1dd4f6abe42" title=")SAVE active WS as CONTINUE and )OFF" alt="" coords="5,5,199,31"/>
+<area shape="rect" id="node8" href="$classCommand.html#aec0c4c6efbb9df9a34220b510f58905a" title=")SAVE: save a workspace file (.xml)" alt="" coords="23,55,181,80"/>
+<area shape="rect" id="node10" href="$classStateIndicator.html#a275a02d6a84b6dc259fa9c5e74d56c65" title="clear the marked bit in the executable, in the fun_oper_cache, and in all parsers" alt="" coords="837,87,992,127"/>
+</map>

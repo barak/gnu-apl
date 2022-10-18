@@ -1,0 +1,4 @@
+<map id="setup_font_gc" name="setup_font_gc">
+<area shape="rect" id="node1" title="return a xcb_gcontext_t for font font_name" alt="" coords="5,5,109,31"/>
+<area shape="rect" id="node2" href="$Plot__xcb_8cc.html#afe42b34c6761e2b88414556cecc7d987" title="test obtaining of a cookie" alt="" coords="157,5,243,31"/>
+</map>

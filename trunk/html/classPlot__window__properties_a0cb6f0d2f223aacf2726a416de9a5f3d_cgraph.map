@@ -1,0 +1,5 @@
+<map id="Plot_window_properties::set_attribute" name="Plot_window_properties::set_attribute">
+<area shape="rect" id="node1" title="for e.g. att_and_val = &quot;pa_width: 600&quot; set pa_width to 600. Return error string on error." alt="" coords="5,23,165,63"/>
+<area shape="rect" id="node2" href="$classPlot__data.html#a5f15fbee96e212fcc74f4d429f353dd4" title="convert a string like &quot;#RGB&quot; or &quot;#RRGGB&quot; to a color" alt="" coords="213,5,384,31"/>
+<area shape="rect" id="node3" href="$classWorkspace.html#adb2006f054a1cebb8ae0252b61bd1d1b" title="return the current ⎕IO" alt="" coords="231,55,366,80"/>
+</map>

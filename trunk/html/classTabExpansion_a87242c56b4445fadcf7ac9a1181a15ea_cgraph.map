@@ -1,0 +1,21 @@
+<map id="TabExpansion::expand_filename" name="TabExpansion::expand_filename">
+<area shape="rect" id="node1" title="perform tab expansion for a filename" alt="" coords="5,414,160,454"/>
+<area shape="rect" id="node2" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="650,243,790,268"/>
+<area shape="rect" id="node3" href="$classUTF8__string.html#a922bd7ebc6a8ea5c6ba9c54159b18a93" title="return this string as a 0&#45;terminated C string" alt="" coords="876,184,1007,210"/>
+<area shape="rect" id="node4" href="$classUCS__string.html#ad8e1ed8807d094b4b0b596db077af391" title="return this string with the first drop_count characters removed" alt="" coords="224,580,347,606"/>
+<area shape="rect" id="node5" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="659,504,781,530"/>
+<area shape="rect" id="node8" href="$classUCS__string.html#a52cd4088451200cd78eb2db03b44a8ac" title="erase 1 (!) character at pos" alt="" coords="220,732,351,758"/>
+<area shape="rect" id="node9" href="$classTabExpansion.html#a3caac165f0b8c4454d8964fa05a775d3" title="perform tab expansion for a workspace name" alt="" coords="208,300,363,340"/>
+<area shape="rect" id="node14" href="$classTabExpansion.html#ab9d75ee0d642d9144a37b3db8d6c5aeb" title="read filenames in dir and append matching filenames to matches" alt="" coords="428,84,573,124"/>
+<area shape="rect" id="node17" href="$classTabExpansion.html#aea44664e432733d7ac80c7ebc529c1a9" title="show the different alternatives for tab expansions" alt="" coords="429,414,573,454"/>
+<area shape="rect" id="node19" href="$classLibPaths.html#ae240dc7e041df568a0cd61ec0270eb2a" title="return true iff directory lib) is present" alt="" coords="215,34,356,59"/>
+<area shape="rect" id="node6" href="$classUCS__string.html#ad092030b348adfd762de621c43d75812" title="default constructor: empty string" alt="" coords="417,631,584,656"/>
+<area shape="rect" id="node7" href="$classUCS__string.html#a40523238d26f5405f5392df03d242627" title="common part of all constructors" alt="" coords="653,631,787,656"/>
+<area shape="rect" id="node10" href="$classUCS__string.html#a5776e51c6faa53537409322cd0ebf07a" title="append number (in ASCII encoding like d) to this string" alt="" coords="431,300,571,340"/>
+<area shape="rect" id="node11" href="$classUCS__string.html#ace70327ef899c525ad9c3f2bffd43697" title="append 0&#45;terminated UTF8 string str to this UCS_string." alt="" coords="411,199,591,224"/>
+<area shape="rect" id="node12" href="$classLibPaths.html#a4316cbd8878626733273cb0db73cfd82" title="return library path (from config file or from libroot)" alt="" coords="431,34,571,59"/>
+<area shape="rect" id="node13" href="$classUTF8__string.html#ae512c0617f7a13fe5011655d898ca6c1" title="append the UTF8_string suffix" alt="" coords="849,84,1033,110"/>
+<area shape="rect" id="node15" href="$classUTF8__string.html#a75b4e440d7576c690934bc7b5f863ac6" title="return true iff string ends with ext (usually a file name extension)" alt="" coords="639,84,801,110"/>
+<area shape="rect" id="node16" href="$classCommand.html#af95676cbc57e2564feb00e5166d07512" title="return true if entry is a directory" alt="" coords="641,134,799,159"/>
+<area shape="rect" id="node18" href="$classTabExpansion.html#a6cf1a848b8a5be83e6971035dd6baaba" title="compute the lenght of the common part in all matches" alt="" coords="639,414,801,454"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="UCS_string::sort" name="UCS_string::sort">
+<area shape="rect" id="node1" title="sort the characters in this string by their Unicode" alt="" coords="5,31,125,56"/>
+<area shape="rect" id="node2" href="$classUCS__string.html#a3c03c3e5b4d7be0e435a7cfee8a424ae" title="helper function for Heapsort&lt;Unicode&gt;::sort()" alt="" coords="173,5,336,31"/>
+<area shape="rect" id="node3" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="193,55,316,80"/>
+</map>

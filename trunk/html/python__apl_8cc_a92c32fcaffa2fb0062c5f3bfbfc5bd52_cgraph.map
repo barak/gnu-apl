@@ -1,0 +1,52 @@
+<map id="init_2" name="init_2">
+<area shape="rect" id="node2" href="$classLibPaths.html#a9f8737f429fae3f2fbd6e9a6d2996723" title="return the name (without directory) of the APL interpreter binary " alt="" coords="107,89,301,116"/>
+<area shape="rect" id="node3" href="$classLibPaths.html#ab1afd280b452765532afe261596690e0" title="return the path (directory) of the APL interpreter binary " alt="" coords="111,140,297,167"/>
+<area shape="rect" id="node4" href="$classSvar__DB.html#a888eb02324ac05c16bd820d13937d991" title="open (and possibly initialize) the shared variable database " alt="" coords="154,191,254,217"/>
+<area shape="rect" id="node6" href="$classOutput.html#a65364a05686d3f27ee78ea5747b4cbdd" title="initialize curses library " alt="" coords="161,241,247,268"/>
+<area shape="rect" id="node8" href="$classParallel.html#a187281fddfd8c5b100ceb4c04153b9de" title="initialize " alt="" coords="159,507,249,533"/>
+<area shape="rect" id="node36" href="$classLineInput.html#a82f2182e4096c10a3d78f2506a35213b" title="initialize the input subsystem " alt="" coords="154,815,254,841"/>
+<area shape="rect" id="node5" href="$Svar__DB_8cc.html#a71acfcb14978e888c49c9dd5e1cbe9b7" title="get_CERR" alt="" coords="388,5,475,32"/>
+<area shape="rect" id="node7" href="$Output_8cc.html#af760840c2587fef3e3e1fab59d388b80" title="CERR" alt="" coords="401,56,462,83"/>
+<area shape="rect" id="node9" href="$classCPU__pool.html#a0497ef4a33503f32e6cc92cd5086ea26" title="initialize the pool " alt="" coords="591,696,698,723"/>
+<area shape="rect" id="node10" href="$classThread__context.html#afd854477bd87d3e80b3786ac2a7d5d9f" title="initialize all thread contexts (set all but N and thread) " alt="" coords="1435,478,1573,519"/>
+<area shape="rect" id="node11" href="$classCPU__pool.html#a745603fb69c0ee5d4f4d728028fabff6" title="get the number of (active) CPUs " alt="" coords="991,376,1138,403"/>
+<area shape="rect" id="node12" href="$classThread__context.html#abe4280ff16a15a70e0c903bb2db70c87" title="return the context for core n " alt="" coords="575,310,714,351"/>
+<area shape="rect" id="node13" href="$classParallel.html#a2bfaddf8fa4ef315808cb51b13bc2ac6" title="return the core number for idx " alt="" coords="358,848,505,875"/>
+<area shape="rect" id="node23" href="$classThread__context.html#ab5c1f95ee686270b4ac6e1806a5bd23f" title="bind thread to core " alt="" coords="1432,413,1576,454"/>
+<area shape="rect" id="node24" href="$classThread__context.html#a770b7101581894235605003726ebdc62" title="print all TaskTree nodes " alt="" coords="1421,307,1587,333"/>
+<area shape="rect" id="node27" href="$classThread__context.html#a1965a1f7a7d1e9da522a55148c09bcaa" title="initialize all thread contexts (set all but N and thread) " alt="" coords="1435,909,1573,950"/>
+<area shape="rect" id="node29" href="$classThread__context.html#a9da7115c28c4372c40d393c8046bda22" title="set the number of currently used cores " alt="" coords="779,529,917,570"/>
+<area shape="rect" id="node32" href="$classCPU__pool.html#a9a0ceffddddc5e7b239c2f443fa6a559" title="get the idx;th CPU " alt="" coords="993,747,1137,773"/>
+<area shape="rect" id="node33" href="$classCPU__pool.html#a7119580b2ca4452fdf86542ec2178d31" title="set new active core count, return true on error " alt="" coords="349,499,513,541"/>
+<area shape="rect" id="node35" href="$classCPU__pool.html#af7e1bd909acac4fc6974a9dcecaba6d3" title="add a CPU to the pool " alt="" coords="358,797,505,824"/>
+<area shape="rect" id="node14" href="$classThread__context.html#aba6ab97ae2a6542738f93831bd73fa14" title="return the number of the core executing this context " alt="" coords="1828,831,1983,857"/>
+<area shape="rect" id="node15" href="$classThread__context.html#a20aaeaa16df5aaff472886710c70abc1" title="start parallel execution of work in a worker " alt="" coords="561,899,728,925"/>
+<area shape="rect" id="node16" href="$classThread__context.html#aadea40f94c3086eb73d86ce866b6e71d" title="return the context of the master " alt="" coords="779,841,917,882"/>
+<area shape="rect" id="node22" href="$classThread__context.html#a51a35755b357c769f56bcad57a408734" title="end parallel execution of work in a worker " alt="" coords="1209,653,1373,680"/>
+<area shape="rect" id="node17" href="$classThread__context.html#a994dd1fef316d70072e8757310671aed" title="make all workers lock on pool_sema " alt="" coords="968,848,1161,875"/>
+<area shape="rect" id="node28" href="$classThread__context.html#a4360395b00f2c003ab2a09fbe7635b7b" title="terminate all worker threads " alt="" coords="981,696,1148,723"/>
+<area shape="rect" id="node18" href="$classThread__context.html#ad6131c6d7c657ae4fbf75a71db9c574a" title="start parallel execution of work at the master " alt="" coords="1211,881,1371,908"/>
+<area shape="rect" id="node19" href="$Parallel_8hh.html#a5b2787a9f816f0b0902e108175f41f74" title="add to counter " alt="" coords="1459,771,1549,797"/>
+<area shape="rect" id="node20" href="$Parallel_8hh.html#ab833380bae4cc7989028f357e6c1e143" title="atomic_fetch_add" alt="" coords="1645,771,1770,797"/>
+<area shape="rect" id="node21" href="$Parallel_8hh.html#a2cb96bbc3c18b436983a5f92ef8e40e0" title="read counter " alt="" coords="1661,687,1754,713"/>
+<area shape="rect" id="node25" href="$classThread__context.html#adc73bb9ae1ecb7b10830bd073201f7ea" title="print this TaskTree node " alt="" coords="1635,603,1780,629"/>
+<area shape="rect" id="node26" href="$classThread__context.html#a980dc6d5a2cef07422e21447c5925899" title="print all mileages nodes " alt="" coords="1431,705,1577,746"/>
+<area shape="rect" id="node30" href="$Common_8hh.html#acf998c7ff90fc36e3fdb700bbbb46fcd" title="get_CERR" alt="" coords="1021,595,1108,621"/>
+<area shape="rect" id="node31" href="$classThread__context.html#a06a054fa3fadfda7020d64748371799e" title="initialize thread_contexts[n] " alt="" coords="996,529,1133,570"/>
+<area shape="rect" id="node34" href="$classThread__context.html#a8ef1d4db160a21f5616530cf737e4b18" title="number of currently used cores " alt="" coords="575,529,714,570"/>
+<area shape="rect" id="node37" href="$classLineInput.html#a0aae1872575d24398116793e24c33fc0" title="constructor " alt="" coords="363,1121,499,1148"/>
+<area shape="rect" id="node38" href="$classLineHistory.html#a1c4bc5b3af8fd0d38b425b2aeefcf9a6" title="read history from file " alt="" coords="561,1193,728,1220"/>
+<area shape="rect" id="node51" href="$classUTF8__string.html#af0f7724e5743d48d9e29776de5d53c71" title="return this string as a 0&#45;terminated C string " alt="" coords="579,1121,710,1148"/>
+<area shape="rect" id="node39" href="$classLineHistory.html#a870ae7c7f0a0abcc27623195bca68b20" title="add one line to this history " alt="" coords="776,1311,920,1337"/>
+<area shape="rect" id="node45" href="$classLineHistory.html#a65f9dbc23912fc543e4433659ffc81ed" title="start a new up/down sequence " alt="" coords="1004,1193,1125,1220"/>
+<area shape="rect" id="node40" href="$classUCS__string.html#ac43d98d8d13b5a91d670fe9af9250861" title="return true if this string contains non&#45;whitespace characters " alt="" coords="986,1336,1143,1363"/>
+<area shape="rect" id="node41" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length " alt="" coords="1230,1336,1353,1363"/>
+<area shape="rect" id="node43" href="$classUCS__string.html#a186a76c22c3ac840f1e607ba49e253a0" title="return the last character in this string " alt="" coords="1001,1387,1128,1413"/>
+<area shape="rect" id="node44" href="$classUCS__string.html#a67ea87cb92e687105b21917ffb4a2a6f" title="remove the last character in this string " alt="" coords="987,1437,1142,1464"/>
+<area shape="rect" id="node42" href="$classAvec.html#a014cc622b9ec09014dab1982b0ee59ab" title="return true iff av is a whitespace char (ASCII 0..32 (including)) " alt="" coords="1237,1387,1345,1413"/>
+<area shape="rect" id="node46" href="$classLineHistory.html#aceeccf250636b19569342cd888a14916" title="move to next older entry " alt="" coords="1236,1168,1347,1195"/>
+<area shape="rect" id="node47" href="$classLineHistory.html#a4c22c3a61eaa31f95b5c9a1db12cf23d" title="move to next newer entry " alt="" coords="1228,1219,1355,1245"/>
+<area shape="rect" id="node48" href="$classLineHistory.html#ab77d293ddf6c21b9c877ea8828d26c33" title="update history search substring " alt="" coords="1229,1270,1353,1311"/>
+<area shape="rect" id="node49" href="$classLineHistory.html#a0c342eca06ac0e59347c0a486fc03a0e" title="update search substring (called when current line is edited) " alt="" coords="1224,1051,1359,1093"/>
+<area shape="rect" id="node50" href="$classLineHistory.html#ad32cb453ee5edaefa52a1da575c9856d" title="find entries like current line in history " alt="" coords="1224,1117,1359,1144"/>
+</map>

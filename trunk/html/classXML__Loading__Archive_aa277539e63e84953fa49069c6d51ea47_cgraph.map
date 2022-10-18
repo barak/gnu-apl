@@ -1,0 +1,12 @@
+<map id="XML_Loading_Archive::read_Commands" name="XML_Loading_Archive::read_Commands">
+<area shape="rect" id="node1" title="read all user&#45;defined commands" alt="" coords="5,124,157,164"/>
+<area shape="rect" id="node2" href="$classXML__Loading__Archive.html#ad8cf599287f50b63ee67539509c6dce1" title="check that is_tag(prefix) is true and print error info if not" alt="" coords="405,37,557,77"/>
+<area shape="rect" id="node5" href="$classXML__Loading__Archive.html#ab000726e8f5db4742338a6844c899541" title="return integer value of attribute att_name" alt="" coords="405,101,557,141"/>
+<area shape="rect" id="node6" href="$classXML__Loading__Archive.html#a987f28e4f3139e5f1c96913468ea3057" title="move to next tag, return true if EOF" alt="" coords="205,216,357,256"/>
+<area shape="rect" id="node7" href="$classXML__Loading__Archive.html#a28b4a906759f6035d41007056b0f4498" title="read next Command element" alt="" coords="205,152,357,192"/>
+<area shape="rect" id="node3" href="$classXML__Loading__Archive.html#adb5a5f67fc6ceffb3260e61b5fe9994c" title="return true iff tagname starts with prefix" alt="" coords="605,69,757,109"/>
+<area shape="rect" id="node4" href="$classXML__Loading__Archive.html#a59a9b9839c3a2087ce5a350b3b9a9c06" title="print current tag" alt="" coords="605,5,757,45"/>
+<area shape="rect" id="node8" href="$classXML__Loading__Archive.html#a3ea850c7fb68b3e908615f81bb9304d2" title="find mandatory attribute att_name. Return a pointer to its value if found and throw DOMAIN ERROR if n..." alt="" coords="405,165,557,205"/>
+<area shape="rect" id="node10" href="$classWorkspace.html#a9d95fe58db1301e25929139af7bbe15f" title="Return all user&#45;defined commands." alt="" coords="408,229,555,269"/>
+<area shape="rect" id="node9" href="$classXML__Loading__Archive.html#ad0c398f273df586ef1a2cb9b87b9cb41" title="find attribute att_name and return: a pointer to its value if found, 0 if optional is true,..." alt="" coords="605,165,757,205"/>
+</map>

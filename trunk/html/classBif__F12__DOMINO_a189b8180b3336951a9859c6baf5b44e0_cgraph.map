@@ -1,0 +1,16 @@
+<map id="Bif_F12_DOMINO::householder" name="Bif_F12_DOMINO::householder">
+<area shape="rect" id="node1" title="compute the householder transformation Q of B = QR" alt="" coords="5,364,212,389"/>
+<area shape="rect" id="node2" href="$classBif__F12__DOMINO_1_1Matrix.html#a87d656c73cd7fcada133a3db55f4e3f1" title="return the square of the length of the item at row x column y" alt="" coords="481,367,655,407"/>
+<area shape="rect" id="node3" href="$classBif__F12__DOMINO_1_1Matrix.html#aa655e0c1fc9ca5ce65b3074b87a1d50f" title="add or subtract val to/from a so that the result has the largest length." alt="" coords="260,50,433,90"/>
+<area shape="rect" id="node4" href="$classBif__F12__DOMINO_1_1Matrix.html#ae9118a3e16bd1b5e2817c460719071df" title="return the lengts of the first column(&#45;vector) in different forms" alt="" coords="260,114,433,154"/>
+<area shape="rect" id="node5" href="$classBif__F12__DOMINO_1_1Matrix.html#adb08c178b7485d7113436c1f2a33ea10" title="print this matrix boxed with name" alt="" coords="260,178,433,218"/>
+<area shape="rect" id="node6" href="$classBif__F12__DOMINO_1_1Matrix.html#a722f6733764660d9eb6a90d18842b069" title="return the elements of matrix 1 1↓this" alt="" coords="260,242,433,282"/>
+<area shape="rect" id="node7" href="$classWorkspace.html#a84f9084505dfcbc3a26414ea895dd7ca" title="return the current ⎕CT" alt="" coords="277,306,416,332"/>
+<area shape="rect" id="node8" href="$classBif__F12__DOMINO_1_1Matrix.html#a1c35a8d59db0452a3eef6bce374ac1dd" title="imbed matrix S into this matrix" alt="" coords="260,356,433,396"/>
+<area shape="rect" id="node9" href="$classBif__F12__DOMINO_1_1Matrix.html#a267913456cf5b847fd7d04293322acd0" title="initialize this matrix to the identity matrix" alt="" coords="260,420,433,460"/>
+<area shape="rect" id="node10" href="$classBif__F12__DOMINO_1_1Matrix.html#a1938af6ea4a9afe7ae63ddf1487c7a4e" title="set this matrix to A +.× B" alt="" coords="260,484,433,524"/>
+<area shape="rect" id="node11" href="$classBif__F12__DOMINO_1_1Matrix.html#ac6df95d63346555fbb0b5ee5a4318324" title="initialize this matrix to be the outer product of the first column of src with itself" alt="" coords="260,548,433,588"/>
+<area shape="rect" id="node12" href="$classBif__F12__DOMINO_1_1Matrix.html#a0cfd11a56d2d6cf4c0db0c9cc8617715" title="return the real part of A[x;y]" alt="" coords="260,612,433,652"/>
+<area shape="rect" id="node13" href="$classBif__F12__DOMINO_1_1Matrix.html#a95421096cd02645687c4a14b674d5efa" title="resize a (nulti&#45;purpose) matrix to size M×N" alt="" coords="260,676,433,716"/>
+<area shape="rect" id="node14" href="$classBif__F12__DOMINO_1_1Matrix.html#adca8315692183802640edcab13b7a636" title="true if this matrix is significant with respect to bmax and eps" alt="" coords="260,740,433,780"/>
+</map>

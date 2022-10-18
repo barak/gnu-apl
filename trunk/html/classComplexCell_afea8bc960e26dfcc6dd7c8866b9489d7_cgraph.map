@@ -1,0 +1,17 @@
+<map id="ComplexCell::greater" name="ComplexCell::greater">
+<area shape="rect" id="node1" title="overloaded Cell::greater()." alt="" coords="5,282,151,307"/>
+<area shape="rect" id="node2" href="$classComplexCell.html#ad2790f63cacb1084c752374ec1bf3066" title="overloaded Cell::compare()" alt="" coords="199,257,353,282"/>
+<area shape="rect" id="node15" href="$classCell.html#a38a6a25f0ad091f35e3d9abfe5608a50" title="return the type of this cell" alt="" coords="211,306,341,331"/>
+<area shape="rect" id="node3" href="$classComplexCell.html#ac7fd574cfe9edf6967fc831ca4322080" title="overloaded Cell::equal()." alt="" coords="413,19,549,45"/>
+<area shape="rect" id="node6" href="$classCell.html#acc03ae0226f88b85fcf8bed44f7c2c07" title="ISO p.19: return true if real A is tolerantly equal to real B within C." alt="" coords="625,70,769,95"/>
+<area shape="rect" id="node7" href="$classWorkspace.html#a84f9084505dfcbc3a26414ea895dd7ca" title="return the current ⎕CT" alt="" coords="411,121,550,146"/>
+<area shape="rect" id="node8" href="$classCell.html#a0e6b9239fa77e3222f32400d51c8f114" title="Return the imaginary part of a cell." alt="" coords="409,170,553,195"/>
+<area shape="rect" id="node9" href="$classComplexCell.html#adf8b4fb74fa6bec21f7302050c3a272c" title="overloaded Cell::get_imag_value()." alt="" coords="401,220,560,260"/>
+<area shape="rect" id="node10" href="$classCell.html#a9a0028fd74f00deb001a8062a55916c6" title="Return the real part of a cell." alt="" coords="412,285,549,310"/>
+<area shape="rect" id="node11" href="$classComplexCell.html#afbb52d9c46b3b4e9eb5e813d3e4aab7c" title="overloaded Cell::get_real_value()." alt="" coords="405,335,556,375"/>
+<area shape="rect" id="node12" href="$classCell.html#ab3d14978f78ba264d40e9ed1a4823be2" title="Return true iff this cell is a character cell." alt="" coords="405,399,556,425"/>
+<area shape="rect" id="node13" href="$classCell.html#a4ce158d2f937ff444732ec5c43a5093f" title="Return true iff this cell is an integer, float, or complex cell." alt="" coords="423,449,539,474"/>
+<area shape="rect" id="node14" href="$classCell.html#ae98b3988a7fa52c6c157b4911b043dde" title="Return true iff this cell is a pointer (to a sub&#45;array) cell." alt="" coords="413,498,549,523"/>
+<area shape="rect" id="node4" href="$classComplexCell.html#ac31c8fb018b164f5016a94dd7ca4ab06" title="overloaded Cell::get_complex_value()" alt="" coords="608,5,787,45"/>
+<area shape="rect" id="node5" href="$classComplexCell.html#ae93d7078736e5c3b20970a687565b3d1" title="return the complex value of this cell" alt="" coords="835,13,964,38"/>
+</map>

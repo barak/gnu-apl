@@ -1,0 +1,4 @@
+<map id="save_file" name="save_file">
+<area shape="rect" id="node1" title="save the pixels of the plot to a file" alt="" coords="5,5,80,31"/>
+<area shape="rect" id="node2" href="$Plot__gtk_8cc.html#ac8a3a84cc5fb89581433b38cc07998d2" title="return a new surface with window borders, or 0 on failure" alt="" coords="128,5,215,31"/>
+</map>

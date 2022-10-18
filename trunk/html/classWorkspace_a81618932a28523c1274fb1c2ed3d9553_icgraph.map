@@ -1,0 +1,29 @@
+<map id="Workspace::more_error" name="Workspace::more_error">
+<area shape="rect" id="node1" title="return reference to more info about last error" alt="" coords="1108,304,1267,329"/>
+<area shape="rect" id="node2" href="$classWorkspace.html#ade3a373ad48eb7a8fbad97a28472db7f" title="clear the workspace" alt="" coords="880,5,1033,31"/>
+<area shape="rect" id="node5" href="$classCommand.html#aa0764d08a6ae9c8270907ab7d5dc37cf" title=")IN: import a workspace file" alt="" coords="889,55,1025,80"/>
+<area shape="rect" id="node6" href="$classCommand.html#a942f9d187d7dcb5b05c8b57eac6552a7" title="print more error info" alt="" coords="875,104,1038,129"/>
+<area shape="rect" id="node7" href="$classCommand.html#ac143785ae5217051a7ef49bcbde1893c" title="process line which contains an APL command. Return true iff the command was user&#45;defined (and then th..." alt="" coords="857,203,1057,228"/>
+<area shape="rect" id="node13" href="$classCommand.html#af36741357bfd4e183b34ee8b747bc7c5" title="process line which contains APL statements" alt="" coords="365,300,572,325"/>
+<area shape="rect" id="node14" href="$classNabla.html#a610d94a179335126e82e9eea07918d5a" title="edit this function" alt="" coords="5,241,91,267"/>
+<area shape="rect" id="node15" href="$classNabla.html#a7a9484fa4c398147d3b5681f23400da0" title="edit body line" alt="" coords="883,153,1030,179"/>
+<area shape="rect" id="node19" href="$classError.html#a2d66baa5692af7b9b83df2ff10e4256b" title="constructor: error with error code ec" alt="" coords="913,353,1000,379"/>
+<area shape="rect" id="node20" href="$classNabla.html#ac226a1b174ffe93643a5071fa6ad30db" title="constructor" alt="" coords="907,403,1006,428"/>
+<area shape="rect" id="node21" href="$classNativeFunction.html#a2d409bb7a5a9ac2b815f1450bc428cc0" title="constructor (only fix() may call it)" alt="" coords="853,452,1060,477"/>
+<area shape="rect" id="node22" href="$classError.html#ac3d41db87a1c0aa40928ed6d2c12bc33" title="print the error and its related information" alt="" coords="915,304,998,329"/>
+<area shape="rect" id="node26" href="$classXML__Loading__Archive.html#a2e7aed9883aa106937d3d9313163e10b" title="read next Function element" alt="" coords="881,553,1033,593"/>
+<area shape="rect" id="node27" href="$classNabla.html#ac91b5998dce85ca10ace4dd1e1d805e0" title="throw a DEFN error with some additional information" alt="" coords="149,423,307,448"/>
+<area shape="rect" id="node3" href="$classWorkspace.html#a77c7b25908cf2479dc087cc3bcf44dcb" title="load lib_ws into the_workspace, maybe set ⎕LX of the new WS." alt="" coords="638,5,787,31"/>
+<area shape="rect" id="node4" href="$classCommand.html#ad222a6de11eb55501624a4d0dea3a464" title=")LOAD: load a workspace file" alt="" coords="389,5,548,31"/>
+<area shape="rect" id="node8" href="$classBif__F1__EXECUTE.html#a8445cd77207db38ab66f5c3278a831df" title="execute string containing an APL command" alt="" coords="620,138,805,178"/>
+<area shape="rect" id="node12" href="$classCommand.html#ae26693534d4df16372f51e55e505b8d7" title="process line which contains a command or statements" alt="" coords="147,292,309,317"/>
+<area shape="rect" id="node9" href="$classBif__F1__EXECUTE.html#aefdd09df4262f08f508f9be8543896b7" title="execute string containing an APL expression or an APL command" alt="" coords="376,138,561,178"/>
+<area shape="rect" id="node10" href="$classBif__F1__EXECUTE.html#a4e1a5917e6a3bb368b459fb21c2b63a1" title="overladed Function::eval_B()" alt="" coords="139,217,317,243"/>
+<area shape="rect" id="node11" href="$classQuad__Quad.html#a253824f3a533bef36063138ea6ce0673" title="overloaded Symbol::resolve()." alt="" coords="157,168,299,193"/>
+<area shape="rect" id="node16" href="$classNabla.html#a55039f88d1dba99e9be9efb152ec2cbe" title="edit function line" alt="" coords="643,88,782,113"/>
+<area shape="rect" id="node17" href="$classNabla.html#ae88cd2f873ba2df8d694f6b3a36ded1d" title="execute an edit operation" alt="" coords="397,88,540,113"/>
+<area shape="rect" id="node18" href="$classNabla.html#a894eac5264914ef7eedcfc14643cc7ee" title="start editing, return source location if first_command is bad." alt="" coords="183,67,273,92"/>
+<area shape="rect" id="node23" href="$classCommand.html#a879617e7645bea2e4052154f16999634" title="finish the current SI&#45;&gt;top() and pop it when done" alt="" coords="627,304,798,329"/>
+<area shape="rect" id="node24" href="$classUserFunction.html#a3569715fe882440f2d4d998306e5a62a" title=")LOAD this function into the workspace named workspace. Return a pounter to this newly created functi..." alt="" coords="647,429,779,455"/>
+<area shape="rect" id="node25" href="$classUserFunction.html#abbebb7ee280c1b30af0b5bb17859ace4" title=")SAVE this function in the workspace named workspace (in the file system)." alt="" coords="401,429,537,455"/>
+</map>

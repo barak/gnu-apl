@@ -1,0 +1,16 @@
+<map id="IntCell::get_int_value" name="IntCell::get_int_value">
+<area shape="rect" id="node1" title="overloaded Cell::get_int_value()" alt="" coords="683,228,828,253"/>
+<area shape="rect" id="node2" href="$classIntCell.html#ada7d1067fc4dbcfee831207a818e61fd" title="overloaded Cell::bif_add()" alt="" coords="485,5,595,31"/>
+<area shape="rect" id="node3" href="$classIntCell.html#a4b99fe69953fa5c1228d1c508508ce52" title="overloaded Cell::bif_divide()" alt="" coords="479,55,601,80"/>
+<area shape="rect" id="node4" href="$classIntCell.html#a665f4e1c33f10120e9494cf33238dbaa" title="overloaded Cell::bif_multiply()" alt="" coords="473,104,607,129"/>
+<area shape="rect" id="node5" href="$classIntCell.html#a0cfcfcc6b43e135bc481122227d7c186" title="overloaded Cell::bif_power()" alt="" coords="478,153,602,179"/>
+<area shape="rect" id="node6" href="$classIntCell.html#a501cbdaa250c9a9fdfe11cb461058710" title="overloaded Cell::bif_subtract()" alt="" coords="472,203,608,228"/>
+<area shape="rect" id="node7" href="$classIntCell.html#ac56b53741c17c65adfd9169189c6285b" title="overloaded Cell::CDR_size()" alt="" coords="475,252,605,277"/>
+<area shape="rect" id="node8" href="$classIntCell.html#a6bbc6fd82045e146ef6174a11c4c712f" title="the Quad_CR representation of this cell" alt="" coords="479,302,601,342"/>
+<area shape="rect" id="node9" href="$classIntCell.html#aab19e1674cbf6f5e3cef614eb3061fc3" title="overloaded Cell::greater()" alt="" coords="486,367,594,392"/>
+<area shape="rect" id="node10" href="$classCollatingCache.html#a49519a2ba001d9415a541b2f6aa0f10b" title="compare cache items ia and ib ascendingly. comp_arg is a CollatingCache pointer" alt="" coords="447,416,633,441"/>
+<area shape="rect" id="node14" href="$classCollatingCache.html#a47e6ce25b5268c1876f9091e45b43aa7" title="compare cache items ia and ib descendingly. comp_arg is a CollatingCache pointer" alt="" coords="445,465,635,491"/>
+<area shape="rect" id="node11" href="$classBif__F12__SORT.html#a4b4cc3a9de168e5e27a1514c1a02781b" title="sort char vector B according to collationg sequence A" alt="" coords="256,434,397,474"/>
+<area shape="rect" id="node12" href="$classBif__F12__SORT__ASC.html#a6af56fadf76ad6584c760bf78452bbf5" title="overloaded Function::eval_AB()" alt="" coords="5,416,208,441"/>
+<area shape="rect" id="node13" href="$classBif__F12__SORT__DES.html#a8d8c210e4072ba4cee223c83945f371e" title="overloaded Function::eval_AB()" alt="" coords="5,465,208,491"/>
+</map>

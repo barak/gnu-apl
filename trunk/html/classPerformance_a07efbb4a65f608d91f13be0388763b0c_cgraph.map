@@ -1,0 +1,7 @@
+<map id="Performance::print" name="Performance::print">
+<area shape="rect" id="node1" title="print all counters" alt="" coords="5,95,135,121"/>
+<area shape="rect" id="node2" href="$classStatistics__record.html#a96ac5b533b4cb113eaf33f4ab2285bca" title="the average of count items with sum sum" alt="" coords="210,5,338,45"/>
+<area shape="rect" id="node3" href="$classPerformance.html#a9eecd04ea5805c2053c5288812c14dd3" title="return statistics object for ID id" alt="" coords="183,70,365,95"/>
+<area shape="rect" id="node4" href="$classStatistics.html#aba9af2fc3f17062540bf23dbde37f6f3" title="print statistics" alt="" coords="219,119,329,145"/>
+<area shape="rect" id="node5" href="$classStatistics__record.html#aeb857e0128a5ffe466261a40695a2a55" title="print num as 5 characters (digits, dot, and multiplier (k, m, g, ...)" alt="" coords="210,169,338,209"/>
+</map>

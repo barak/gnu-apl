@@ -1,0 +1,11 @@
+<map id="Quad_XML::add_sorted_entities" name="Quad_XML::add_sorted_entities">
+<area shape="rect" id="node1" title="return the entities in B, sorted by their position prefix" alt="" coords="5,81,164,121"/>
+<area shape="rect" id="node2" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="665,5,805,31"/>
+<area shape="rect" id="node3" href="$classUCS__string.html#ace70327ef899c525ad9c3f2bffd43697" title="append 0&#45;terminated UTF8 string str to this UCS_string." alt="" coords="423,31,603,56"/>
+<area shape="rect" id="node4" href="$classXML__node.html#a2ea5dcbf083d0bc6e1e05f92a6685061" title="return the inverse of normalize_attribute_value()" alt="" coords="212,81,375,121"/>
+<area shape="rect" id="node5" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="451,117,574,143"/>
+<area shape="rect" id="node6" href="$classQuad__XML.html#aab96f8185b0ea6582ae50c011ec4807d" title="split src, e.g. &quot;_2_name&quot; into integer 2, Unicode &#39;_&#39;, and UCS_string &#39;name&#39;. Null pointers if not re..." alt="" coords="214,196,373,221"/>
+<area shape="rect" id="node7" href="$classCell.html#a2999919fc2782b3cebfd925c63cc1fac" title="Return the character value of a cell." alt="" coords="442,196,583,221"/>
+<area shape="rect" id="node8" href="$classCell.html#a38a6a25f0ad091f35e3d9abfe5608a50" title="return the type of this cell" alt="" coords="670,171,801,196"/>
+<area shape="rect" id="node9" href="$classCell.html#a6c3fdef3d82f53649d1c3f16d37eedd7" title="the name of ct" alt="" coords="651,220,820,245"/>
+</map>

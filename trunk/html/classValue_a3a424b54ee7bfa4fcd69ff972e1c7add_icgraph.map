@@ -1,0 +1,35 @@
+<map id="Value::next_ravel_Pointer" name="Value::next_ravel_Pointer">
+<area shape="rect" id="node2" href="$classScalarFunction.html#ac0e9e42f145d16a623c91240d4099f60" title="compute cell_A fun cell_B, scalar&#45;extending PointerCells " alt="" coords="232,661,391,702"/>
+<area shape="rect" id="node24" href="$classQuad__JSON.html#ad6c1178f70936d2d153b1581e28e8d52" title="parse a JSON array: [ value (, value)* ] and increment token0 along the way. " alt="" coords="699,1069,871,1096"/>
+<area shape="rect" id="node31" href="$classQuad__JSON.html#a089835d5e18fc87f25971bb49046ae88" title="parse a JSON object: { member ( , member)* } and increment token0 " alt="" coords="1395,943,1573,969"/>
+<area shape="rect" id="node32" href="$classQuad__JSON.html#a22849f05e4305f7652eae1664e1f7fca" title="parse a JSON literal (false, null, or true) " alt="" coords="224,968,399,995"/>
+<area shape="rect" id="node34" href="$classQuad__JSON.html#a37c48107838296678bbb4b89e3567df8" title="parse a JSON string " alt="" coords="697,968,872,995"/>
+<area shape="rect" id="node3" href="$classScalarFunction.html#a1a92d9a696bd4158cee9b2b6950d14d1" title="A helper function for eval_scalar_AXB(). " alt="" coords="477,661,619,702"/>
+<area shape="rect" id="node4" href="$classScalarFunction.html#adb8daa5af9eb305915236ceca2aa841d" title="return true if this function can be parallelized " alt="" coords="477,499,619,541"/>
+<area shape="rect" id="node5" href="$classScalarFunction.html#a254898c12f19ee61f71837247d2efaa9" title="compute the monadic scalar function fun along one ravel " alt="" coords="719,499,850,541"/>
+<area shape="rect" id="node6" href="$classScalarFunction.html#a6f542f78d8c0f36e2c6f6e6f28fec2af" title="Evaluate a scalar function monadically. " alt="" coords="937,429,1078,470"/>
+<area shape="rect" id="node7" href="$classBif__F12__BINOM.html#a3596f99aa601d0147864acd62c489c03" title="overloaded Function::eval_B(). " alt="" coords="1161,208,1328,235"/>
+<area shape="rect" id="node8" href="$classBif__F2__AND__B.html#a6e07c234cf33e1d174006d1458e1a22d" title="overloaded Function::eval_B(). " alt="" coords="1165,259,1325,285"/>
+<area shape="rect" id="node9" href="$classBif__F2__OR__B.html#aca40b9b69a30f974ba243019c923b4ff" title="overloaded Function::eval_B(). " alt="" coords="1169,309,1320,336"/>
+<area shape="rect" id="node10" href="$classBif__F2__NOR__B.html#a132420f480ec102175985eca2599795a" title="overloaded Function::eval_B(). " alt="" coords="1164,360,1325,387"/>
+<area shape="rect" id="node11" href="$classBif__F12__POWER.html#a8bfa0ebd2146db96e9b4a9dc46206f04" title="overloaded Function::eval_B(). " alt="" coords="1158,411,1331,437"/>
+<area shape="rect" id="node12" href="$classBif__F12__PLUS.html#a56e4964cac0278cea3970e7d3b12f291" title="overloaded Function::eval_B(). " alt="" coords="1166,461,1323,488"/>
+<area shape="rect" id="node13" href="$classBif__F12__MINUS.html#a2e3cea00d72e560ecdfc904011d5ebba" title="overloaded Function::eval_B(). " alt="" coords="1161,512,1328,539"/>
+<area shape="rect" id="node14" href="$classBif__F12__ROLL.html#a0b67f39c345c98d9b16f63c457ad0557" title="overloaded Function::eval_B(). " alt="" coords="1167,563,1323,589"/>
+<area shape="rect" id="node15" href="$classBif__F12__WITHOUT.html#a6eb017585dbc330e820d4ef1d69835b6" title="overloaded Function::eval_B(). " alt="" coords="1152,613,1337,640"/>
+<area shape="rect" id="node16" href="$classBif__F12__TIMES.html#a14cbf46ddc0446de17af6a1030e6fc3e" title="overloaded Function::eval_B(). " alt="" coords="1163,664,1326,691"/>
+<area shape="rect" id="node17" href="$classBif__F12__DIVIDE.html#a57eb5c0cccf0163d7c740eda8f9f9531" title="overloaded Function::eval_B(). " alt="" coords="1161,715,1329,741"/>
+<area shape="rect" id="node18" href="$classBif__F12__CIRCLE.html#a6c3a7a1fe80b44bbfee3fa27fbb42c33" title="overloaded Function::eval_B(). " alt="" coords="1159,765,1331,792"/>
+<area shape="rect" id="node19" href="$classBif__F12__RND__UP.html#a3d3ec8abbf84ac0c59cec71a8ff3c0b5" title="overloaded Function::eval_B(). " alt="" coords="1155,816,1334,843"/>
+<area shape="rect" id="node20" href="$classBif__F12__RND__DN.html#aa0b14c469b99ffb2eeeac9c1e7253389" title="overloaded Function::eval_B(). " alt="" coords="1155,5,1334,32"/>
+<area shape="rect" id="node21" href="$classBif__F12__STILE.html#ac487d336d5e5b62bc7902a777c51decf" title="overloaded Function::eval_B(). " alt="" coords="1165,56,1324,83"/>
+<area shape="rect" id="node22" href="$classBif__F12__LOGA.html#ac8e17b085ce08e02da68da6338dbcc17" title="overloaded Function::eval_B(). " alt="" coords="1165,107,1324,133"/>
+<area shape="rect" id="node23" href="$classScalarFunction.html#a1c3af7c78bbc4be29d3e993ec1619a55" title="Construct a ScalarFunction with Id id. " alt="" coords="1143,157,1347,184"/>
+<area shape="rect" id="node25" href="$classQuad__JSON.html#a1e973192b2dccc89283c8ba4697923fc" title="parse a JSON value (false, null, true, object, array, number, or string) and increment along the way..." alt="" coords="920,1019,1095,1045"/>
+<area shape="rect" id="node26" href="$classQuad__JSON.html#ae101226211d05605bee074e4d3a66f8e" title="convert JSON string to APL associative array " alt="" coords="1149,1052,1340,1079"/>
+<area shape="rect" id="node30" href="$classQuad__JSON.html#af9e8ac641cd521e54d250971dd66e0b4" title="parse a JSON object member: &quot;name&quot; : value , ; and increment token0 along the way. " alt="" coords="1155,935,1334,977"/>
+<area shape="rect" id="node27" href="$classQuad__JSON.html#a7488f4e12a005de36c3fa9887e4909e5" title="overloaded Function::eval_B() " alt="" coords="1412,1052,1556,1079"/>
+<area shape="rect" id="node28" href="$classQuad__JSON.html#a2ed44b39f5d092ab5f7e1768c6b8615a" title="return JSON file (&#45;name in B) converted to APL structured value " alt="" coords="1621,1027,1792,1053"/>
+<area shape="rect" id="node29" href="$classQuad__JSON.html#a3adb4fba903343bf38b0c3a1dd10feb8" title="overloaded Function::eval_B() " alt="" coords="1840,1052,1993,1079"/>
+<area shape="rect" id="node33" href="$classQuad__JSON.html#ae12c440a7435aa9bb9a114767a4a1541" title="return true iff uni is a low surrogate Unicode (0xDCxx) " alt="" coords="447,968,649,995"/>
+</map>

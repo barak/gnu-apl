@@ -1,0 +1,6 @@
+<map id="PrintBuffer::add_column" name="PrintBuffer::add_column">
+<area shape="rect" id="node1" title="add padding and a column pb to this PrintBuffer" alt="" coords="5,75,168,101"/>
+<area shape="rect" id="node2" href="$classPrintBuffer.html#a1cedbbcfe6835e1d3a2d02b9f2334c2c" title="print properties of this PrintBuffer" alt="" coords="216,50,343,75"/>
+<area shape="rect" id="node4" href="$classPrintBuffer.html#ac13295601812e379a3eac618ce239426" title="return the number of rows" alt="" coords="401,93,539,133"/>
+<area shape="rect" id="node3" href="$classPrintBuffer.html#af6f689e8c4e930b7c37099bf5fdfe57d" title="return the number of columns" alt="" coords="391,29,549,69"/>
+</map>

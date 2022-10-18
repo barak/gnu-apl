@@ -1,0 +1,5 @@
+<map id="ComplexCell::bif_floor" name="ComplexCell::bif_floor">
+<area shape="rect" id="node1" title="overloaded from the corresponding Cell:: function (see class Cell)." alt="" coords="5,31,156,56"/>
+<area shape="rect" id="node2" href="$classWorkspace.html#a84f9084505dfcbc3a26414ea895dd7ca" title="return the current ⎕CT" alt="" coords="204,5,343,31"/>
+<area shape="rect" id="node3" href="$classNumericCell.html#ad3e0fc6450b7cdf6f5a0fa53c2a54817" title="initialize the (un&#45;initialized) Cell *Z to (if possible) an IntCell or else to a FloatCell with value..." alt="" coords="214,55,333,80"/>
+</map>

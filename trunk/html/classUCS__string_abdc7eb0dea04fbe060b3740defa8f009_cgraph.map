@@ -1,0 +1,6 @@
+<map id="UCS_string::UCS_string" name="UCS_string::UCS_string">
+<area shape="rect" id="node1" title="constructor: read one line from UTF8&#45;encoded file." alt="" coords="5,55,172,80"/>
+<area shape="rect" id="node2" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="220,5,360,31"/>
+<area shape="rect" id="node3" href="$classUCS__string.html#a40523238d26f5405f5392df03d242627" title="common part of all constructors" alt="" coords="223,55,357,80"/>
+<area shape="rect" id="node4" href="$classUTF8__string.html#a3d62774fa7350adcd1b87ef7407cfee8" title="return the next UTF8 encoded char from an input file" alt="" coords="227,104,353,129"/>
+</map>

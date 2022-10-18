@@ -1,0 +1,5 @@
+<map id="install_get_line_from_user_cb" name="install_get_line_from_user_cb">
+<area shape="rect" id="node2" href="$classInputMux.html#aacff58635a3704fdebdd82961f6cc115" title="install a get_line() replacement, return old one " alt="" coords="195,5,337,47"/>
+<area shape="rect" id="node3" href="$libapl_8cc.html#a0e98e959f9ee5fe7680e32b0a1bd4bab" title="libapl_glfu" alt="" coords="226,71,306,98"/>
+<area shape="rect" id="node4" href="$classUTF8__string.html#af0f7724e5743d48d9e29776de5d53c71" title="return this string as a 0&#45;terminated C string " alt="" coords="385,71,516,98"/>
+</map>

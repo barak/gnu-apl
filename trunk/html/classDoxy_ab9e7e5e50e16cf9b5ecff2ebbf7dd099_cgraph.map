@@ -1,0 +1,12 @@
+<map id="Doxy::Doxy" name="Doxy::Doxy">
+<area shape="rect" id="node1" title="Constructor: create (and remember) the root directory." alt="" coords="5,192,97,217"/>
+<area shape="rect" id="node2" href="$classUTF8__string.html#aabaebbdfbe8fad48e44655144f5fbd5e" title="append a 0&#45;terminated C string" alt="" coords="377,36,521,76"/>
+<area shape="rect" id="node3" href="$classUTF8__string.html#ae512c0617f7a13fe5011655d898ca6c1" title="append the UTF8_string suffix" alt="" coords="145,44,329,69"/>
+<area shape="rect" id="node4" href="$classUTF8__string.html#a922bd7ebc6a8ea5c6ba9c54159b18a93" title="return this string as a 0&#45;terminated C string" alt="" coords="384,221,515,246"/>
+<area shape="rect" id="node5" href="$classUCS__string.html#a9a80a1621c030d847983275d62902411" title="compare this with UCS_string other" alt="" coords="163,142,311,168"/>
+<area shape="rect" id="node6" href="$classWorkspace.html#ad9b53c340bc04dff86b2244ddd51cff6" title="return the name of the current workspace." alt="" coords="146,192,329,217"/>
+<area shape="rect" id="node7" href="$classAvec.html#af6b90a707281ad128da1764d92d85cd7" title="Return true iff av is a digit (i.e. 0 ≤ av ≤ 9)" alt="" coords="187,241,288,266"/>
+<area shape="rect" id="node8" href="$classAvec.html#a014cc622b9ec09014dab1982b0ee59ab" title="return true iff av is a whitespace char (ASCII 0..32 (including))" alt="" coords="183,290,291,316"/>
+<area shape="rect" id="node9" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="176,340,299,365"/>
+<area shape="rect" id="node10" href="$classDoxy.html#a91828c64e2f513ea1ad16f70927dbe7f" title="write a fixed CSS file" alt="" coords="179,93,296,118"/>
+</map>

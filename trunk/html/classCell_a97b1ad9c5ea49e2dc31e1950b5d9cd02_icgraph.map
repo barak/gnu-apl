@@ -1,0 +1,6 @@
+<map id="Cell::bif_power" name="Cell::bif_power">
+<area shape="rect" id="node1" title="store A to the power of this cell in Z" alt="" coords="244,55,353,80"/>
+<area shape="rect" id="node2" href="$classBif__F12__POWER.html#ab99d652c3313085ae35e74d606679f84" title="overloaded Function::eval_AB()." alt="" coords="9,5,192,31"/>
+<area shape="rect" id="node3" href="$classBif__F12__POWER.html#a0c6af22f63c85b04e325dce6cbf4cb75" title="overloaded Function::eval_AXB()." alt="" coords="5,55,196,80"/>
+<area shape="rect" id="node4" href="$classBif__F12__POWER.html#aeeae2b094136f7e0a5bc8e711f3b2c64" title="overloaded Function::get_scalar_f2()" alt="" coords="25,105,176,145"/>
+</map>

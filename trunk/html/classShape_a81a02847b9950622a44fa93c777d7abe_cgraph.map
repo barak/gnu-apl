@@ -1,0 +1,5 @@
+<map id="Shape::set_last_shape_item" name="Shape::set_last_shape_item">
+<area shape="rect" id="node1" title="set last dimension to sh" alt="" coords="5,5,192,31"/>
+<area shape="rect" id="node2" href="$classShape.html#afcd3708c8c18a30cb3c0c1fa1a630f71" title="modify dimension r" alt="" coords="240,5,399,31"/>
+<area shape="rect" id="node3" href="$classShape.html#a189c92d0b74f3313bd83c8aa7565e9c5" title="recompute volume (after changing a dimension of len 0)" alt="" coords="447,5,624,31"/>
+</map>

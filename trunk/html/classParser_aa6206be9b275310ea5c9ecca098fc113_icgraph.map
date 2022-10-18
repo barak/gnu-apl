@@ -1,0 +1,5 @@
+<map id="Parser::collect_constants" name="Parser::collect_constants">
+<area shape="rect" id="node1" title="Collect consecutive smaller APL values or value token into vectors." alt="" coords="367,29,537,55"/>
+<area shape="rect" id="node2" href="$classParser.html#a3eeeb92bcac2c60b355c30b5ccd4060e" title="Parse token string tos (a statement without diamonds)." alt="" coords="153,29,319,55"/>
+<area shape="rect" id="node3" href="$classParser.html#af5fc690941afdce0fd36c6c9629e5186" title="Parse UCS_string input into token string tos." alt="" coords="5,29,105,55"/>
+</map>

@@ -1,0 +1,61 @@
+<map id="Cell::integral_within" name="Cell::integral_within">
+<area shape="rect" id="node2" href="$classCell.html#aab9681b3e735d10ef92978c5c17bf95d" title="init (uninitialized) Cell other from this initialized cell " alt="" coords="189,560,296,587"/>
+<area shape="rect" id="node54" href="$FloatCell_8cc.html#a3cc04ad7e7e0a10b78a5af96e17289e6" title="p_modulo_q" alt="" coords="197,905,289,932"/>
+<area shape="rect" id="node3" href="$classValue.html#ae9ed3cf5066ae8ab15514c1470c8de4c" title="return a deep copy of this value " alt="" coords="369,509,464,536"/>
+<area shape="rect" id="node4" href="$classCell.html#a62e4fd0b2c216efc0e23904e53ca7ecc" title="copy (deep) count cells from src to dest) " alt="" coords="376,1044,457,1071"/>
+<area shape="rect" id="node16" href="$classCell.html#ace1480b3a8beacc93cac91ebce845905" title="init this Cell from a (possibly deep) copy of other " alt="" coords="381,203,452,229"/>
+<area shape="rect" id="node53" href="$classCell.html#a6ff584df467249c47c95570553d1f05e" title="init this Cell from value. If value is a scalar then its first element is used (and value is erased)..." alt="" coords="346,560,487,587"/>
+<area shape="rect" id="node5" href="$classBif__COMMA.html#a110e26c20b2479e3a99b67d9e69e234d" title="Prepend scalar cell_B to A along axis. " alt="" coords="545,1153,733,1180"/>
+<area shape="rect" id="node7" href="$classBif__COMMA.html#a4dab74913e7da1e13c28a18e3c10f63a" title="Catenate A and B. " alt="" coords="814,1103,969,1129"/>
+<area shape="rect" id="node14" href="$classBif__COMMA.html#a284b9c9c294add93f329950870949ef4" title="Laminate A and B. " alt="" coords="815,985,968,1012"/>
+<area shape="rect" id="node15" href="$classBif__COMMA.html#ad0ad030408ae664de7312b5722ae1507" title="Prepend scalar cell_A to B along axis. " alt="" coords="564,1037,715,1078"/>
+<area shape="rect" id="node6" href="$classBif__COMMA.html#aca0328e5d2b45430ab047851dc4d12fc" title="Constructor. " alt="" coords="1327,1048,1506,1075"/>
+<area shape="rect" id="node8" href="$classBif__COMMA.html#a54274d01c09566054ae5b08d34f65118" title="either catenate A and B or laminate A and B " alt="" coords="1078,931,1233,973"/>
+<area shape="rect" id="node11" href="$classBif__F12__COMMA.html#a87fad1aaa970af9f453d357390ef4299" title="overloaded Function::eval_AB() " alt="" coords="1064,1149,1247,1176"/>
+<area shape="rect" id="node13" href="$classBif__F12__COMMA1.html#adb234524e9ba2ad95fba11a405c070a4" title="overloaded Function::eval_AB() " alt="" coords="1061,1200,1250,1227"/>
+<area shape="rect" id="node9" href="$classBif__F12__COMMA.html#a22e1c5309fdfe1e3d450b6f586c35cc4" title="overloaded Function::eval_AXB() " alt="" coords="1321,913,1512,940"/>
+<area shape="rect" id="node10" href="$classBif__F12__COMMA1.html#a96459b1e66a6cb3b2327b3be37455b61" title="overloaded Function::eval_AXB() " alt="" coords="1317,964,1516,991"/>
+<area shape="rect" id="node12" href="$classBif__F12__UNION.html#a0929eb6bc282f9c312db42fdfa78686d" title="overloaded Function::eval_AB() " alt="" coords="1329,1149,1504,1176"/>
+<area shape="rect" id="node17" href="$classSymbol.html#a09c284745e26103acf5aee747f464b7a" title="Indexed (one&#45;dimensional) assign value to this Symbol. " alt="" coords="557,560,721,587"/>
+<area shape="rect" id="node18" href="$classQuad__MAP.html#a0885bc62185d5c56e90fc5c0b9b5508f" title="compute ⎕MAP with (indices of) sorted A " alt="" coords="568,85,711,112"/>
+<area shape="rect" id="node20" href="$classBif__REDUCE.html#a74ec7563f72cc91111801a73284c6373" title="common implementation of reduce() and reduce_n_wise. " alt="" coords="554,509,725,536"/>
+<area shape="rect" id="node42" href="$classQuad__JSON.html#af9e8ac641cd521e54d250971dd66e0b4" title="parse a JSON object member: &quot;name&quot; : value , ; and increment token0 along the way. " alt="" coords="550,137,729,178"/>
+<area shape="rect" id="node50" href="$classPrefix.html#acd28cf08ded62eca44eda712aae2bd8d" title="reduce phrase D V " alt="" coords="564,203,715,229"/>
+<area shape="rect" id="node52" href="$libapl_8cc.html#a8ce400c611c2042329828e48699b2435" title="set_value" alt="" coords="600,35,679,61"/>
+<area shape="rect" id="node19" href="$classQuad__MAP.html#af2931692d6fcc941e0ae64b9c4404c38" title="overloaded Function::eval_AB() " alt="" coords="818,43,965,69"/>
+<area shape="rect" id="node21" href="$classBif__REDUCE.html#abc7103a727c123bdde6a44344e6bf68e" title="Constructor. " alt="" coords="795,779,987,805"/>
+<area shape="rect" id="node22" href="$classBif__REDUCE.html#ac3430120da57197d5099b5ccabf1004c" title="LO&#45;reduce B along axis. " alt="" coords="816,261,967,288"/>
+<area shape="rect" id="node30" href="$classBif__REDUCE.html#a450260486cb0a169a1f13602cae9ab97" title="LO&#45;reduce B n&#45;wise along axis. " alt="" coords="816,502,967,543"/>
+<area shape="rect" id="node36" href="$classBif__SCAN.html#a796038c05f7946ae72143ef64c773a1f" title="Compute the LO&#45;scan of B. " alt="" coords="832,728,951,755"/>
+<area shape="rect" id="node23" href="$classBif__OPER2__INNER.html#adbaaf10669f72e39cc58d5dcdab6c5fe" title="Overloaded Function::eval_ALRB(). " alt="" coords="1048,341,1263,368"/>
+<area shape="rect" id="node25" href="$classBif__OPER1__REDUCE.html#a1f613b8ac81791d7c61b3e0a9f6e70ba" title="Overloaded Function::eval_LB(). " alt="" coords="1050,56,1261,83"/>
+<area shape="rect" id="node26" href="$classBif__OPER1__REDUCE1.html#a6bd690931eba7929294983c39655ffa1" title="Overloaded Function::eval_LB(). " alt="" coords="1070,107,1241,149"/>
+<area shape="rect" id="node27" href="$classBif__OPER1__REDUCE.html#aed5704b99e4ff296d84b329cfcc9048c" title="Overloaded Function::eval_LXB(). " alt="" coords="1046,173,1265,200"/>
+<area shape="rect" id="node28" href="$classBif__OPER1__REDUCE1.html#a9bb990c9c5944c780452941e13d39c0d" title="Overloaded Function::eval_LXB(). " alt="" coords="1070,225,1241,266"/>
+<area shape="rect" id="node29" href="$classBif__REDUCE.html#a1911534b040d2520b4108e479c3bfa38" title="overloaded Function::has_result() " alt="" coords="1070,291,1241,317"/>
+<area shape="rect" id="node24" href="$classBif__OPER2__INNER.html#af0437dd86d98ef9412317252127cb86f" title="Constructor. " alt="" coords="1335,334,1499,375"/>
+<area shape="rect" id="node31" href="$classBif__OPER1__REDUCE.html#a584c1a00ef6b21b457c869a862fe4775" title="Overloaded Function::eval_ALB(). " alt="" coords="1046,560,1265,587"/>
+<area shape="rect" id="node32" href="$classBif__OPER1__REDUCE1.html#a1c98ca9e70231d9a1fe491c64e46f8a8" title="Overloaded Function::eval_ALB(). " alt="" coords="1070,611,1241,653"/>
+<area shape="rect" id="node33" href="$classBif__OPER1__REDUCE.html#a06f59f7c71977fda6d2ca0e99389b659" title="Overloaded Function::eval_ALXB(). " alt="" coords="1041,392,1269,419"/>
+<area shape="rect" id="node34" href="$classBif__OPER1__REDUCE1.html#ad48531d0b47915421f4aca74bab3b31d" title="Overloaded Function::eval_ALXB(). " alt="" coords="1070,443,1241,485"/>
+<area shape="rect" id="node35" href="$classBif__REDUCE.html#ab33877fbb6938417e4053761eab5e0d5" title="overloaded Function::may_push_SI() " alt="" coords="1060,509,1251,536"/>
+<area shape="rect" id="node37" href="$classBif__SCAN.html#a4465ed3ac86af96e5b44610bde2d7a81" title="Constructor. " alt="" coords="1079,829,1231,856"/>
+<area shape="rect" id="node38" href="$classBif__OPER1__SCAN.html#afaa44934b4c7bc25b517e3acfe41507b" title="Overloaded Function::eval_LB(). " alt="" coords="1060,880,1251,907"/>
+<area shape="rect" id="node39" href="$classBif__OPER1__SCAN1.html#a191214991f49b5ce2649400f76f25893" title="Overloaded Function::eval_ALB(). " alt="" coords="1057,677,1254,704"/>
+<area shape="rect" id="node40" href="$classBif__OPER1__SCAN.html#ace7710f31a43abd663e582cf96cb9169" title="Overloaded Function::eval_LXB(). " alt="" coords="1056,728,1255,755"/>
+<area shape="rect" id="node41" href="$classBif__OPER1__SCAN1.html#adb20c6d87fb95f93fc8230f4984c4041" title="Overloaded Function::eval_ALXB(). " alt="" coords="1052,779,1259,805"/>
+<area shape="rect" id="node43" href="$classQuad__JSON.html#a089835d5e18fc87f25971bb49046ae88" title="parse a JSON object: { member ( , member)* } and increment token0 " alt="" coords="802,93,981,120"/>
+<area shape="rect" id="node44" href="$classQuad__JSON.html#a1e973192b2dccc89283c8ba4697923fc" title="parse a JSON value (false, null, true, object, array, number, or string) and increment along the way..." alt="" coords="1068,5,1243,32"/>
+<area shape="rect" id="node45" href="$classQuad__JSON.html#ae101226211d05605bee074e4d3a66f8e" title="convert JSON string to APL associative array " alt="" coords="1321,56,1512,83"/>
+<area shape="rect" id="node49" href="$classQuad__JSON.html#ad6c1178f70936d2d153b1581e28e8d52" title="parse a JSON array: [ value (, value)* ] and increment token0 along the way. " alt="" coords="1331,5,1503,32"/>
+<area shape="rect" id="node46" href="$classQuad__JSON.html#a7488f4e12a005de36c3fa9887e4909e5" title="overloaded Function::eval_B() " alt="" coords="1564,56,1708,83"/>
+<area shape="rect" id="node47" href="$classQuad__JSON.html#a3adb4fba903343bf38b0c3a1dd10feb8" title="overloaded Function::eval_B() " alt="" coords="1975,56,2128,83"/>
+<area shape="rect" id="node48" href="$classQuad__JSON.html#a2ed44b39f5d092ab5f7e1768c6b8615a" title="return JSON file (&#45;name in B) converted to APL structured value " alt="" coords="1756,81,1927,108"/>
+<area shape="rect" id="node51" href="$classPrefix.html#a8d61c8a29f9c33343577b681a6b38ef6" title="reduce phrase D V ASS B " alt="" coords="823,195,959,237"/>
+<area shape="rect" id="node55" href="$classFloatCell.html#ae6357d73eb4a9cd95598ca2d1a32a623" title="Overloaded from the corresponding Cell:: function (see class Cell). " alt="" coords="344,1229,489,1256"/>
+<area shape="rect" id="node56" href="$classFloatCell.html#ab33d5fb8782321e100cec38cbed5ea18" title="Overloaded Cell::is_finite(). " alt="" coords="576,1255,703,1281"/>
+<area shape="rect" id="node57" href="$classIntCell.html#a9e1eae19e23516df1eb5350a10883e24" title="overloaded from the corresponding Cell:: function (see class Cell) " alt="" coords="574,1305,705,1332"/>
+<area shape="rect" id="node60" href="$classBif__F12__ENCODE.html#a42891c138d5ceb942cc1d6fda44d7d27" title="encode *ib() according to A " alt="" coords="537,1204,741,1231"/>
+<area shape="rect" id="node58" href="$classIntCell.html#a57acd6c6da8ad45753bb27b304ca597b" title="overloaded Cell::is_integer_cell() " alt="" coords="816,1305,967,1332"/>
+<area shape="rect" id="node59" href="$classBif__F12__ENCODE.html#a7fdbd7f4683430ee6daeab1014523504" title="encode *ib() according to A (integer A and b) " alt="" coords="789,1356,993,1383"/>
+</map>

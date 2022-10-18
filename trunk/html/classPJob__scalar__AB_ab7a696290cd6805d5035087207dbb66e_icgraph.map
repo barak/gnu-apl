@@ -1,0 +1,62 @@
+<map id="PJob_scalar_AB::A_at" name="PJob_scalar_AB::A_at">
+<area shape="rect" id="node1" title="return A[z]" alt="" coords="857,696,1012,721"/>
+<area shape="rect" id="node2" href="$classScalarFunction.html#acf5075b41e5a000feb694cf66638524f" title="compute the dyadic scalar function fun along one ravel" alt="" coords="679,689,809,729"/>
+<area shape="rect" id="node3" href="$classScalarFunction.html#aa8c567527713578fb2c1eac26d00843f" title="Evaluate a scalar function dyadically." alt="" coords="489,689,631,729"/>
+<area shape="rect" id="node4" href="$classBif__F12__BINOM.html#a779da85c5d212c67e29585bd0df56891" title="overloaded Function::eval_AB()." alt="" coords="259,5,434,31"/>
+<area shape="rect" id="node5" href="$classBif__F2__LESS.html#a58506ea2a176d8f282f31ccf95b59517" title="overloaded Function::eval_AB()." alt="" coords="267,55,426,80"/>
+<area shape="rect" id="node6" href="$classBif__F2__EQUAL.html#a6736ce332581d9bc8c4c2ddd0ba4e8fc" title="overloaded Function::eval_AB()." alt="" coords="262,104,431,129"/>
+<area shape="rect" id="node7" href="$classBif__F2__EQUAL__B.html#a6ca998969a9d51ad79afe74ec4c8705b" title="overloaded Function::eval_AB()." alt="" coords="254,153,439,179"/>
+<area shape="rect" id="node8" href="$classBif__F2__UNEQ__B.html#a29cbf3223dd94bf614ba9281bfcbe0d7" title="overloaded Function::eval_AB()." alt="" coords="257,203,436,228"/>
+<area shape="rect" id="node9" href="$classBif__F2__GREATER.html#a04cac547cfea1d9b78d0092dfc02cd7f" title="overloaded Function::eval_AB()." alt="" coords="252,252,441,277"/>
+<area shape="rect" id="node10" href="$classBif__F2__AND.html#ab7c0e341131d8efda503d6004e06b937" title="overloaded Function::eval_AB()." alt="" coords="270,301,423,327"/>
+<area shape="rect" id="node11" href="$classBif__F2__AND__B.html#a2a2fa9032e550484a35574d32e99c930" title="overloaded Function::eval_AB()." alt="" coords="262,351,431,376"/>
+<area shape="rect" id="node12" href="$classBif__F2__OR.html#a3c8f98bc174001f08dcb1a040944ee23" title="overloaded Function::eval_AB()." alt="" coords="275,400,419,425"/>
+<area shape="rect" id="node13" href="$classBif__F2__OR__B.html#a9435ad23b29955918cac355488160c09" title="overloaded Function::eval_AB()." alt="" coords="267,449,427,475"/>
+<area shape="rect" id="node14" href="$classBif__F2__LEQU.html#a2313b85abb6f1d7c43691c3463d7bf25" title="overloaded Function::eval_AB()." alt="" coords="267,499,427,524"/>
+<area shape="rect" id="node15" href="$classBif__F2__MEQU.html#ad21bc3f57642671ed5d0016f0a5c7ad0" title="overloaded Function::eval_AB()." alt="" coords="265,548,429,573"/>
+<area shape="rect" id="node16" href="$classBif__F2__UNEQU.html#a57a2d80a782cf7d221afe07ee27cc32f" title="overloaded Function::eval_AB()." alt="" coords="260,597,433,623"/>
+<area shape="rect" id="node17" href="$classBif__F2__NOR.html#ae7168c3c28e7ce560dbbd8f48ea45e2e" title="overloaded Function::eval_AB()." alt="" coords="269,647,424,672"/>
+<area shape="rect" id="node18" href="$classBif__F2__NOR__B.html#a942a34a35440e437647308f438bddd81" title="overloaded Function::eval_AB()." alt="" coords="261,696,432,721"/>
+<area shape="rect" id="node19" href="$classBif__F2__NAND.html#a2d32df816a11487483bffa2325a5617f" title="overloaded Function::eval_AB()." alt="" coords="265,745,428,771"/>
+<area shape="rect" id="node20" href="$classBif__F2__NAND__B.html#ae79ff2f35722db3264084002f058837b" title="overloaded Function::eval_AB()." alt="" coords="257,795,436,820"/>
+<area shape="rect" id="node21" href="$classBif__F12__POWER.html#ab99d652c3313085ae35e74d606679f84" title="overloaded Function::eval_AB()." alt="" coords="255,844,438,869"/>
+<area shape="rect" id="node22" href="$classBif__F12__PLUS.html#a968a04f3de8ac82ecfd0483cb67ee5a7" title="overloaded Function::eval_AB()." alt="" coords="263,893,430,919"/>
+<area shape="rect" id="node23" href="$classBif__F12__MINUS.html#a93dac5b38819e6dc13e563c6dfd48b54" title="overloaded Function::eval_AB()" alt="" coords="259,943,434,968"/>
+<area shape="rect" id="node24" href="$classBif__F12__TIMES.html#a51d1b6e40c634539276c72aaf871cd56" title="overloaded Function::eval_AB()." alt="" coords="261,992,433,1017"/>
+<area shape="rect" id="node25" href="$classBif__F12__DIVIDE.html#a81c28403d9dfb6e9a1f405c98d1c8f86" title="overloaded Function::eval_AB()." alt="" coords="258,1041,435,1067"/>
+<area shape="rect" id="node26" href="$classBif__F12__CIRCLE.html#a97d94f041311b6d6698e8dbc70784ad8" title="overloaded Function::eval_AB()." alt="" coords="256,1091,437,1116"/>
+<area shape="rect" id="node27" href="$classBif__F12__RND__UP.html#a3c7b564f75b0094b8d44e7fd51c0cc62" title="overloaded Function::eval_AB()." alt="" coords="253,1140,440,1165"/>
+<area shape="rect" id="node28" href="$classBif__F12__RND__DN.html#a03780e295be37dd5e8ce3aee6806fb32" title="overloaded Function::eval_AB()." alt="" coords="253,1189,441,1215"/>
+<area shape="rect" id="node29" href="$classBif__F12__STILE.html#aadd5c5366d23f89c0204fa9e6e9e339a" title="overloaded Function::eval_AB()." alt="" coords="263,1239,431,1264"/>
+<area shape="rect" id="node31" href="$classBif__F12__LOGA.html#af891e9916c0fbd6e661df657c28cf0a1" title="overloaded Function::eval_AB()." alt="" coords="263,1288,430,1313"/>
+<area shape="rect" id="node32" href="$classScalarFunction.html#a7e4a8a06834fb15f2d22636a7bbf3cae" title="Evaluate a scalar function dyadically with axis." alt="" coords="276,1362,417,1402"/>
+<area shape="rect" id="node59" href="$classScalarFunction.html#ac0e9e42f145d16a623c91240d4099f60" title="compute cell_A fun cell_B, scalar&#45;extending PointerCells" alt="" coords="267,1718,426,1758"/>
+<area shape="rect" id="node30" href="$classBif__F12__ENCODE.html#a003a77890ec532d2909d23e3ce5dcb89" title="overloaded Function::eval_AB()" alt="" coords="10,703,199,728"/>
+<area shape="rect" id="node33" href="$classBif__F12__BINOM.html#a80ee16bfec928fef0450583f11bc72d3" title="overloaded Function::eval_AXB()." alt="" coords="13,752,197,777"/>
+<area shape="rect" id="node34" href="$classBif__F2__LESS.html#a6c6d9486b064cd271e64adb78e41a5a1" title="overloaded Function::eval_AXB()." alt="" coords="21,801,188,827"/>
+<area shape="rect" id="node35" href="$classBif__F2__EQUAL.html#a96242b66e6691e1aead4722fbc677f61" title="overloaded Function::eval_AXB()." alt="" coords="15,851,194,876"/>
+<area shape="rect" id="node36" href="$classBif__F2__EQUAL__B.html#a9bf2c20b9edcc5cf2232af47e5b69f16" title="overloaded Function::eval_AXB()." alt="" coords="7,900,202,925"/>
+<area shape="rect" id="node37" href="$classBif__F2__UNEQ__B.html#ab7cce1365a3b209894c226d7e24f1dcf" title="overloaded Function::eval_AXB()." alt="" coords="11,949,199,975"/>
+<area shape="rect" id="node38" href="$classBif__F2__GREATER.html#ab593a3afacb4fce3922f2d7214f01b1d" title="overloaded Function::eval_AXB()." alt="" coords="5,999,204,1024"/>
+<area shape="rect" id="node39" href="$classBif__F2__AND.html#a5d02b428a278ee5bd96ee7e63a57fbf0" title="overloaded Function::eval_AXB()." alt="" coords="23,1048,186,1073"/>
+<area shape="rect" id="node40" href="$classBif__F2__AND__B.html#a43378d32cad915ff0bb69d664ce9f69b" title="overloaded Function::eval_AXB()." alt="" coords="15,1097,194,1123"/>
+<area shape="rect" id="node41" href="$classBif__F2__OR.html#a5031dcee13017e77a4277d03dad1721d" title="overloaded Function::eval_AXB()." alt="" coords="28,1147,181,1172"/>
+<area shape="rect" id="node42" href="$classBif__F2__OR__B.html#ac81751d6e2e20ea2dceb834871c08633" title="overloaded Function::eval_AXB()." alt="" coords="20,1196,189,1221"/>
+<area shape="rect" id="node43" href="$classBif__F2__LEQU.html#aa8ef87d98be0aed75703e095b7088603" title="overloaded Function::eval_AXB()." alt="" coords="20,1245,189,1271"/>
+<area shape="rect" id="node44" href="$classBif__F2__MEQU.html#aababe4a951b06feba3657359e99d873d" title="overloaded Function::eval_AXB()." alt="" coords="18,1295,191,1320"/>
+<area shape="rect" id="node45" href="$classBif__F2__UNEQU.html#a06baa148839dad462754b3aceeb16fc8" title="overloaded Function::eval_AXB()." alt="" coords="13,1344,196,1369"/>
+<area shape="rect" id="node46" href="$classBif__F2__NOR.html#a09e622c87fdca910256244885c2e3e5a" title="overloaded Function::eval_AXB()." alt="" coords="23,1393,186,1419"/>
+<area shape="rect" id="node47" href="$classBif__F2__NOR__B.html#a2c607625b860d897ed2f9555c6b43e4a" title="overloaded Function::eval_AXB()." alt="" coords="15,1443,194,1468"/>
+<area shape="rect" id="node48" href="$classBif__F2__NAND.html#aa707b77746849a40d7987b3b3cd1ef00" title="overloaded Function::eval_AXB()." alt="" coords="19,1492,191,1517"/>
+<area shape="rect" id="node49" href="$classBif__F2__NAND__B.html#ab428b6e16fde87d9fd44e5be280dd7ad" title="overloaded Function::eval_AXB()." alt="" coords="11,1541,199,1567"/>
+<area shape="rect" id="node50" href="$classBif__F12__POWER.html#a0c6af22f63c85b04e325dce6cbf4cb75" title="overloaded Function::eval_AXB()." alt="" coords="9,1591,200,1616"/>
+<area shape="rect" id="node51" href="$classBif__F12__PLUS.html#a42753ba037260bdac37c0da1015855af" title="overloaded Function::eval_AXB()." alt="" coords="17,1640,192,1665"/>
+<area shape="rect" id="node52" href="$classBif__F12__MINUS.html#a80dac35e6996c3a64d31b67527089bfc" title="overloaded Function::eval_AXB()." alt="" coords="13,1689,197,1715"/>
+<area shape="rect" id="node53" href="$classBif__F12__TIMES.html#af4a357aaeb4d8b06ce3addea8e00c72d" title="overloaded Function::eval_AXB()." alt="" coords="14,1739,195,1764"/>
+<area shape="rect" id="node54" href="$classBif__F12__DIVIDE.html#ad26ed8ed64a20ffe1569eb7d809e2dc7" title="overloaded Function::eval_AXB()." alt="" coords="11,1788,198,1813"/>
+<area shape="rect" id="node55" href="$classBif__F12__RND__UP.html#a7fbf168e1472e308e7ba0e6fe5ab5353" title="overloaded Function::eval_AXB()." alt="" coords="7,1837,203,1863"/>
+<area shape="rect" id="node56" href="$classBif__F12__RND__DN.html#a55e7926e16a001bbf73de65a62809772" title="overloaded Function::eval_AXB()." alt="" coords="6,1887,203,1912"/>
+<area shape="rect" id="node57" href="$classBif__F12__STILE.html#abb96905a146836e13af83198f326bae3" title="overloaded Function::eval_AXB()." alt="" coords="16,1936,193,1961"/>
+<area shape="rect" id="node58" href="$classBif__F12__LOGA.html#a445eb9cc67c96f044b7bd7322dac9826" title="overloaded Function::eval_AXB()." alt="" coords="17,1985,193,2011"/>
+<area shape="rect" id="node60" href="$classScalarFunction.html#a1a92d9a696bd4158cee9b2b6950d14d1" title="A helper function for eval_scalar_AXB()." alt="" coords="34,2035,175,2075"/>
+</map>

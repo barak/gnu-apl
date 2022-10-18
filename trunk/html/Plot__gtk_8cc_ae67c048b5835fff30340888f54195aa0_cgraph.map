@@ -1,0 +1,4 @@
+<map id="cairo_multiline_size" name="cairo_multiline_size">
+<area shape="rect" id="node1" title="return the size len_x:len_y of the multi_line string lines when printed with font font_name of size f..." alt="" coords="5,5,141,31"/>
+<area shape="rect" id="node2" href="$Plot__gtk_8cc.html#a5e97fc1b80b16b714315808c7fb1181d" title="return the size of single_line string text when printed with font font_name of /// size font_size" alt="" coords="189,5,309,31"/>
+</map>

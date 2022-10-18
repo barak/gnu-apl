@@ -1,0 +1,4 @@
+<map id="Value::Value" name="Value::Value">
+<area shape="rect" id="node1" title="constructor: a packed array with shape sh. The caller has allocated the ravel (bits)" alt="" coords="5,5,101,31"/>
+<area shape="rect" id="node2" href="$classShape.html#a6f32f749601dca80263493fd06be12c4" title="return the number of ravel elements, but at least 1 (for empty values and scalars) else product of sh..." alt="" coords="149,5,304,31"/>
+</map>

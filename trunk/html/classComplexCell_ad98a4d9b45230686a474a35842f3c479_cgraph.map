@@ -1,0 +1,15 @@
+<map id="ComplexCell::bif_circle_fun" name="ComplexCell::bif_circle_fun">
+<area shape="rect" id="node1" title="overloaded from the corresponding Cell:: function (see class Cell)." alt="" coords="5,215,188,240"/>
+<area shape="rect" id="node2" href="$classComplexCell.html#ae93d7078736e5c3b20970a687565b3d1" title="return the complex value of this cell" alt="" coords="664,11,793,36"/>
+<area shape="rect" id="node3" href="$classComplexCell.html#a2976da06693d3ba08e67dbf1181db9c3" title="compute circle function fun" alt="" coords="236,178,376,218"/>
+<area shape="rect" id="node11" href="$classCell.html#a4a4fff9745f6938e16764875eba04c2d" title="Return true unless this cell contains infinity or NaN." alt="" coords="257,243,355,268"/>
+<area shape="rect" id="node12" href="$classIntCell.html#afd60fd9e3a5581ac99c1e053d9218fe7" title="initialize the (un&#45;initialized) Cell *Z to integer 0" alt="" coords="265,337,347,363"/>
+<area shape="rect" id="node4" href="$classComplexCell.html#a889cf7ce2ff0bd0b2d2fea7dda4798cd" title="overloaded from the corresponding Cell:: function (see class Cell)." alt="" coords="424,35,616,60"/>
+<area shape="rect" id="node5" href="$classComplexCell.html#a9ccb64da2c504a517c725dc2c41940da" title="initialize the (un&#45;initialized) Cell *Z to complex r + ij" alt="" coords="667,60,790,85"/>
+<area shape="rect" id="node6" href="$classCell.html#a92ec561cfe084fd35cdc2bd529ce5ea1" title="Return the complex value of a cell." alt="" coords="437,136,603,161"/>
+<area shape="rect" id="node7" href="$classCell.html#a0070bc8a15c9ea3742aea0f9407ab934" title="return true iff value is numeric and close to 0" alt="" coords="457,185,583,211"/>
+<area shape="rect" id="node8" href="$classComplexCell.html#aa4fd8402d65ab55628abeec7e284c117" title="the square of the magnitude of aJb (= a² + b²)" alt="" coords="451,235,589,260"/>
+<area shape="rect" id="node9" href="$classComplexCell.html#a03581312b5e48120aef8a0fb1fa6097c" title="&#45;i" alt="" coords="441,284,599,309"/>
+<area shape="rect" id="node10" href="$classComplexCell.html#ae41a9c3b768daa6c34b1a36a7827da34" title="1.0" alt="" coords="453,333,587,359"/>
+<area shape="rect" id="node13" href="$classIntCell.html#a88c653b2f968c451ee1c1c53a983fa13" title="Construct an integer cell with value 0." alt="" coords="467,383,573,408"/>
+</map>

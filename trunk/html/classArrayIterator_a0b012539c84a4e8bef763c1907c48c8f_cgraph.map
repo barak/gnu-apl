@@ -1,0 +1,6 @@
+<map id="ArrayIterator::more" name="ArrayIterator::more">
+<area shape="rect" id="node1" title="return true iff this iterator has more items to come." alt="" coords="5,42,136,67"/>
+<area shape="rect" id="node2" href="$classArrayIterator.html#ae22a7d117e25647e77c8702f5060dabc" title="return the iterator for axis a" alt="" coords="187,5,307,45"/>
+<area shape="rect" id="node3" href="$classAxisIterator.html#aebd890c1dc68f6563c2175d3322e9f43" title="true if more items coming" alt="" coords="184,70,311,95"/>
+<area shape="rect" id="node4" href="$classAxisIterator.html#a4be672c597d51afa412f22d6df941cd0" title="true if this is an iterator for a scalar value." alt="" coords="359,63,508,103"/>
+</map>

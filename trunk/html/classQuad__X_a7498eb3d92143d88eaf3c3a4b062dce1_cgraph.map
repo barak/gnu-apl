@@ -1,0 +1,14 @@
+<map id="Quad_X::assign" name="Quad_X::assign">
+<area shape="rect" id="node1" title="overloaded Symbol::assign()" alt="" coords="5,70,120,95"/>
+<area shape="rect" id="node2" href="$classUserFunction__header.html#a02e0fedf3b2ad3d50a2d3903bb9be6f9" title="return error if header was not parsed successfully" alt="" coords="174,5,321,45"/>
+<area shape="rect" id="node3" href="$classStateIndicator.html#a9bf33fdcfb56c1bee7a9833c4113646e" title="change axis arg" alt="" coords="175,70,320,95"/>
+<area shape="rect" id="node10" href="$classWorkspace.html#a4f16b318ce57e107a03017eb87c80983" title="the topmost SI with parse mode PM_FUNCTION" alt="" coords="168,123,327,149"/>
+<area shape="rect" id="node4" href="$classPrefix.html#a11013d4b3f0993c21825e0cfa981d989" title="return the axis argument of a failed primitive function (if any)" alt="" coords="385,66,499,91"/>
+<area shape="rect" id="node5" href="$classToken.html#a8c8bd515f80f71dbe213125c32cefd19" title="return the address of the Value_P value of this token." alt="" coords="557,41,696,66"/>
+<area shape="rect" id="node9" href="$classPrefix.html#a07a35c8b69a8c9f685225e2a2586a2fd" title="return the number of token currently in the FIFO" alt="" coords="583,90,671,115"/>
+<area shape="rect" id="node6" href="$unionToken_1_1sval.html#a22a0be9d3742c2a8168e59d530dd659e" title="a shortcut for accessing apl_val" alt="" coords="744,17,891,42"/>
+<area shape="rect" id="node7" href="$classToken.html#a11e37aa69b8eb64f293702293b00f50c" title="return true iff this token is an apl value" alt="" coords="755,66,879,91"/>
+<area shape="rect" id="node8" href="$classToken.html#a1a31afbb07e3f1dbb86d5f872ce5c297" title="return the TokenValueType of this token." alt="" coords="939,66,1092,91"/>
+<area shape="rect" id="node11" href="$classStateIndicator.html#a44d07945c56abef5505efcfdc98ec090" title="return the SI that has called this one" alt="" coords="377,116,507,156"/>
+<area shape="rect" id="node12" href="$classWorkspace.html#a8083efc2d51067edb25ae8dd4f014173" title="the top of the SI stack (the SI pushed last)" alt="" coords="375,181,509,206"/>
+</map>

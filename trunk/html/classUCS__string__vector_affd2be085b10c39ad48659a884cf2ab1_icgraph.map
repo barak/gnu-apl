@@ -1,0 +1,8 @@
+<map id="UCS_string_vector::compute_column_width" name="UCS_string_vector::compute_column_width">
+<area shape="rect" id="node1" title="compute columns width so that items align nicely (for )VARS, )FNS, etc.)" alt="" coords="411,73,569,113"/>
+<area shape="rect" id="node2" href="$classCommand.html#aeb8671f785d828bbfac0d9b9ff46437d" title="list library: common helper" alt="" coords="203,43,363,68"/>
+<area shape="rect" id="node5" href="$classSymbolTable.html#ac7e63c55db6fdfe52327260e26d50b3e" title="List all symbols in this SymbolTable (for )VARS, )FNS etc.)" alt="" coords="221,116,344,141"/>
+<area shape="rect" id="node3" href="$classCommand.html#ae2c14c874844701377a0e716021229c7" title="list content of workspace and wslib directories: )LIB [N]" alt="" coords="5,5,155,31"/>
+<area shape="rect" id="node4" href="$classCommand.html#a7d3c3284d54674356d89f268949109c6" title="list content of workspace and wslib directories: ]LIB [N]" alt="" coords="5,55,155,80"/>
+<area shape="rect" id="node6" href="$classWorkspace.html#a3196f2463ad078822206e8eabf4eff1b" title="list all symbols (of category which) with names in from_to" alt="" coords="23,116,137,141"/>
+</map>

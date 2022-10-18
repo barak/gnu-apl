@@ -1,0 +1,6 @@
+<map id="UCS_string::to_HTML" name="UCS_string::to_HTML">
+<area shape="rect" id="node1" title="return this string HTML&#45;escaped, starting at offset, and using   for blanks" alt="" coords="5,63,157,88"/>
+<area shape="rect" id="node2" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="205,5,345,31"/>
+<area shape="rect" id="node3" href="$classUCS__string.html#ad14d08312e34ad5d733360eccf9a745a" title="append 0&#45;terminated ASCII string str to this string. str is NOT interpreted as UTF8 string (use appen..." alt="" coords="205,55,345,95"/>
+<area shape="rect" id="node4" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="214,120,337,145"/>
+</map>

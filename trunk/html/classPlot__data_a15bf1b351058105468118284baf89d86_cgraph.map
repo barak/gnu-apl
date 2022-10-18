@@ -1,0 +1,5 @@
+<map id="Plot_data::get_XY" name="Plot_data::get_XY">
+<area shape="rect" id="node1" title="return the X and Y values of the data matrix row/col" alt="" coords="5,31,133,56"/>
+<area shape="rect" id="node2" href="$classPlot__data__row.html#ad4e5545752fa410dbb014efcb3188d25" title="return the n&#45;th X coordinate" alt="" coords="181,5,328,31"/>
+<area shape="rect" id="node3" href="$classPlot__data__row.html#a33dc8b966628255b8300f95a7c261b44" title="return the n&#45;th Y coordinate" alt="" coords="181,55,328,80"/>
+</map>

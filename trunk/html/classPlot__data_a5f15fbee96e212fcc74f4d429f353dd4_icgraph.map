@@ -1,0 +1,7 @@
+<map id="Plot_data::Color_from_str" name="Plot_data::Color_from_str">
+<area shape="rect" id="node1" title="convert a string like &quot;#RGB&quot; or &quot;#RRGGB&quot; to a color" alt="" coords="655,35,825,60"/>
+<area shape="rect" id="node2" href="$classPlot__window__properties.html#a0cb6f0d2f223aacf2726a416de9a5f3d" title="for e.g. att_and_val = &quot;pa_width: 600&quot; set pa_width to 600. Return error string on error." alt="" coords="447,27,607,67"/>
+<area shape="rect" id="node3" href="$classQuad__PLOT.html#ae6f31438074669d8b69f651556c8fa39" title="parse the (all&#45;optional) attributes in A" alt="" coords="204,5,399,31"/>
+<area shape="rect" id="node5" href="$classPlot__window__properties.html#a7904712c062a280d3698da8270b548bb" title="for e.g. A.pa_width ← 600&quot; set pa_width to 600. Return error string on error." alt="" coords="221,55,381,95"/>
+<area shape="rect" id="node4" href="$classQuad__PLOT.html#acc4187c32c3bad52f276a724b226b429" title="overloaded Function::eval_AB()" alt="" coords="5,5,156,31"/>
+</map>

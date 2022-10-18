@@ -1,0 +1,6 @@
+<map id="Function::get_dyadic_inverse" name="Function::get_dyadic_inverse">
+<area shape="rect" id="node1" title="the dyadic inverse function of this function (if any)" alt="" coords="504,23,647,63"/>
+<area shape="rect" id="node2" href="$classBif__OPER2__POWER.html#a708b42a09509be8c639d330d8e06cf62" title="eval_ALRB() or eval_LRB() for numeric RO (aka. Form 1)" alt="" coords="276,23,456,63"/>
+<area shape="rect" id="node3" href="$classBif__OPER2__POWER.html#afdfa97e5be93ef265df90ae09b7cfd81" title="overloaded Function::eval_ALRB()" alt="" coords="5,5,228,31"/>
+<area shape="rect" id="node4" href="$classBif__OPER2__POWER.html#a31db2049a45999f2d068d6569ac9b6e4" title="overloaded Function::eval_LRB()" alt="" coords="10,55,223,80"/>
+</map>

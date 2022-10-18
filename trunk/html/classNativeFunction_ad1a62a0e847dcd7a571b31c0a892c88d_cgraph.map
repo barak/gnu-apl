@@ -1,0 +1,9 @@
+<map id="NativeFunction::open_so_file" name="NativeFunction::open_so_file">
+<area shape="rect" id="node1" title="open .so file in one of several directories. On success set handle and update so_path." alt="" coords="5,74,152,114"/>
+<area shape="rect" id="node2" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="660,5,800,31"/>
+<area shape="rect" id="node3" href="$classUCS__string.html#ace70327ef899c525ad9c3f2bffd43697" title="append 0&#45;terminated UTF8 string str to this UCS_string." alt="" coords="432,31,612,56"/>
+<area shape="rect" id="node4" href="$classUTF8__string.html#ae512c0617f7a13fe5011655d898ca6c1" title="append the UTF8_string suffix" alt="" coords="200,81,384,107"/>
+<area shape="rect" id="node5" href="$classUTF8__string.html#a922bd7ebc6a8ea5c6ba9c54159b18a93" title="return this string as a 0&#45;terminated C string" alt="" coords="227,131,357,156"/>
+<area shape="rect" id="node6" href="$classNativeFunction.html#a921982adc19e1056d5be819f206cc926" title="try to open one .so file" alt="" coords="225,181,359,221"/>
+<area shape="rect" id="node7" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="461,188,583,213"/>
+</map>

@@ -1,0 +1,23 @@
+<map id="Value::index" name="Value::index">
+<area shape="rect" id="node1" title="return this indexed by (multi&#45;dimensional) IDX." alt="" coords="5,312,100,337"/>
+<area shape="rect" id="node2" href="$classShape.html#aeb018b67601d3f1c4bea3d2c2b877b7e" title="add a dimension of length len at the end" alt="" coords="148,5,311,31"/>
+<area shape="rect" id="node3" href="$classIndexExpr.html#a0fdf2bb8f2c463d7c424c9fb4231b9ae" title="check that all indices indices of this IndexExpr are valid indices for shape, raise INDEX_ERROR if no..." alt="" coords="148,305,311,345"/>
+<area shape="rect" id="node5" href="$classValue__P__Base.html#a1c3bf1b6f708eb2c1ba4b97c83adb9aa" title="return a const pointer to the Value" alt="" coords="586,184,721,209"/>
+<area shape="rect" id="node8" href="$classValue.html#aa0572b1b7fa249cb79694fd152130b38" title="return the (constant) idx&#39;th element of the ravel." alt="" coords="168,55,291,80"/>
+<area shape="rect" id="node11" href="$classWorkspace.html#adb2006f054a1cebb8ae0252b61bd1d1b" title="return the current ⎕IO" alt="" coords="162,205,297,231"/>
+<area shape="rect" id="node12" href="$classIndexExpr.html#a7bb1bdcdda0c546a5defe28fda90d252" title="return the number of values (= number of semicolons + 1), including elided indices" alt="" coords="160,255,299,280"/>
+<area shape="rect" id="node13" href="$classValue.html#a5ac7131d2f89d0bc8b8907d960cbd125" title="return the rank of this value" alt="" coords="173,156,286,181"/>
+<area shape="rect" id="node14" href="$classValue.html#a65d183d6ebf87a5727143b2b46759168" title="return the product of all but the the last axis, or 1 for scalars" alt="" coords="171,468,287,493"/>
+<area shape="rect" id="node16" href="$classValue.html#abf966781ab7b9c91e944721d3646edfb" title="return the shape of this value" alt="" coords="168,419,291,444"/>
+<area shape="rect" id="node17" href="$classValue.html#a8cecab341fdc0bd55b67c07848463d37" title="return the r&#39;th shape element of this value" alt="" coords="152,369,307,395"/>
+<area shape="rect" id="node18" href="$classIndexExpr.html#a68c1db08fe0526455ac96736cc6c4c12" title="return true iff the number of dimensions is 1 (i.e. no ; and non&#45;empty)" alt="" coords="164,517,295,543"/>
+<area shape="rect" id="node19" href="$classValue.html#aa8295760964d5f1d9dea8912c2c630dd" title="true if Value flag member is set" alt="" coords="166,567,293,592"/>
+<area shape="rect" id="node20" href="$classMultiIndexIterator.html#a4215dfd1d1cdacac448dd44a02bb280f" title="return true if more indices are coming" alt="" coords="168,617,291,657"/>
+<area shape="rect" id="node4" href="$classIndexExpr.html#a20d2d922d384eddff090fadcbc761559" title="return axis rk (rk in shape order as opposed to index order)" alt="" coords="374,267,513,307"/>
+<area shape="rect" id="node6" href="$classShape.html#a017e9a35dd20f4bc4fdeb7ea29b6805d" title="return the rank" alt="" coords="385,168,502,193"/>
+<area shape="rect" id="node7" href="$classShape.html#a592d2ade68aa8c21c5d84627c3a0e001" title="return the length of dimension r" alt="" coords="364,345,523,371"/>
+<area shape="rect" id="node9" href="$classValue.html#ac5b54e3a13cab0837442f1575b3299a5" title="return the number of elements, but at least 1 (for the prototype)." alt="" coords="359,55,528,80"/>
+<area shape="rect" id="node10" href="$classShape.html#a6f32f749601dca80263493fd06be12c4" title="return the number of ravel elements, but at least 1 (for empty values and scalars) else product of sh..." alt="" coords="576,55,731,80"/>
+<area shape="rect" id="node15" href="$classShape.html#ae23c2dd79c376b0c4ffb1ec48f1ffbcd" title="return the product of all but the the last dimension, or 1 for scalars" alt="" coords="383,468,503,493"/>
+<area shape="rect" id="node21" href="$classIndexIterator.html#a29dd1728e6013cd6cd186079d641d7ff" title="return true if more indices are coming" alt="" coords="377,624,509,649"/>
+</map>

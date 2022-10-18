@@ -1,0 +1,13 @@
+<map id="Error::get_error_line_3" name="Error::get_error_line_3">
+<area shape="rect" id="node1" title="compute the caret line. This is the third of the 3 error lines. It contains the failure position the ..." alt="" coords="905,128,1056,154"/>
+<area shape="rect" id="node2" href="$classCommand.html#af36741357bfd4e183b34ee8b747bc7c5" title="process line which contains APL statements" alt="" coords="216,28,423,54"/>
+<area shape="rect" id="node4" href="$classQuad__EC.html#a44e3cc95f4d9c98ced01bf1810c32208" title="end of context handler for ⎕EC" alt="" coords="719,54,827,79"/>
+<area shape="rect" id="node6" href="$classQuad__EM.html#af44f390bce05f712cdff0ad13f834a12" title="overloaded Symbol::get_apl_value()" alt="" coords="689,103,857,128"/>
+<area shape="rect" id="node7" href="$classStateIndicator.html#a0129e968c738e1c300e20b16533fca55" title="list the stack entry (for commands ]SI, )SI, and )SIS)" alt="" coords="492,164,620,190"/>
+<area shape="rect" id="node8" href="$classStateIndicator.html#ae8f1a9f49c7933c492f6f899fccd437f" title="list the stack entry (for command ]SI)" alt="" coords="705,204,841,230"/>
+<area shape="rect" id="node9" href="$classError.html#a1c91620311957635852e42ba8cd695c4" title="print the 3 error message lines as per ⎕EM" alt="" coords="719,254,827,279"/>
+<area shape="rect" id="node3" href="$classCommand.html#ae26693534d4df16372f51e55e505b8d7" title="process line which contains a command or statements" alt="" coords="5,28,168,54"/>
+<area shape="rect" id="node5" href="$classCommand.html#a879617e7645bea2e4052154f16999634" title="finish the current SI&#45;&gt;top() and pop it when done" alt="" coords="471,54,641,79"/>
+<area shape="rect" id="node10" href="$classWorkspace.html#a8c147249a197f0d605f7cfc535969c92" title="create and execute one immediate execution context" alt="" coords="478,236,634,276"/>
+<area shape="rect" id="node11" href="$classError.html#adf8e47c02b1ae0be1368a0587f7daed4" title="update error information in this and copy it to si" alt="" coords="477,300,635,326"/>
+</map>

@@ -1,0 +1,17 @@
+<map id="Plot_data::get_max_X" name="Plot_data::get_max_X">
+<area shape="rect" id="node1" title="return the largest X value in the data matrix" alt="" coords="1273,174,1424,199"/>
+<area shape="rect" id="node2" href="$classPlot__data.html#a25d0c255cfb4b5ccc0d707d21aaca21d" title="add a row to the data matrix" alt="" coords="667,227,801,253"/>
+<area shape="rect" id="node9" href="$classPlot__window__properties.html#aa186844af6e9dcff730d76bd62b98459" title="update derived properties after changing primary ones, return true on error" alt="" coords="1065,92,1225,132"/>
+<area shape="rect" id="node3" href="$classQuad__PLOT.html#ae1e925602a5aa3e147a5ab0604e6fcbe" title="initialize the data to be plotted for a 2D plot (except case 2b.)" alt="" coords="428,285,619,310"/>
+<area shape="rect" id="node7" href="$classQuad__PLOT.html#a95842c8dc17feac8764ea008bb3fbd53" title="initialize the data to be plotted for a 2D plot (case 2b.)" alt="" coords="440,171,607,211"/>
+<area shape="rect" id="node8" href="$classQuad__PLOT.html#a0344b18d427b88bc7eb86c631c3fc6f2" title="initialize the data to be plotted for a 3D plot" alt="" coords="428,235,619,261"/>
+<area shape="rect" id="node4" href="$classQuad__PLOT.html#a1b83b17c0196cfcf1802bb96e2b0a231" title="initialize the data to be plotted" alt="" coords="209,178,375,203"/>
+<area shape="rect" id="node5" href="$classQuad__PLOT.html#acc4187c32c3bad52f276a724b226b429" title="overloaded Function::eval_AB()" alt="" coords="5,125,156,150"/>
+<area shape="rect" id="node6" href="$classQuad__PLOT.html#a1b17ca0481f0d7fcc98732b3b1d2eefb" title="overloaded Function::eval_B()" alt="" coords="9,174,152,199"/>
+<area shape="rect" id="node10" href="$classPlot__window__properties.html#a9967e651d5469f0b0437798271a938f9" title="constructor" alt="" coords="849,5,1017,45"/>
+<area shape="rect" id="node11" href="$classPlot__window__properties.html#adff5407307aa8e7236e7778dce9d8863" title="handle window resize event" alt="" coords="853,120,1013,160"/>
+<area shape="rect" id="node12" href="$Plot__gtk_8cc.html#af71ef5256eb8aee2ba62880e3e8806ba" title="callback when the plot window shall be redrawn" alt="" coords="681,170,787,195"/>
+<area shape="rect" id="node15" href="$Plot__xcb_8cc.html#a897990543dc934261ba8e7a124446b11" title="the pthread that handles one plot window." alt="" coords="695,121,773,146"/>
+<area shape="rect" id="node13" href="$Plot__gtk_8cc.html#a897990543dc934261ba8e7a124446b11" title="the main() program of the thread that handles one plot window." alt="" coords="484,121,563,146"/>
+<area shape="rect" id="node14" href="$classQuad__PLOT.html#a0161f15bc1b55d2d79b634ce35c15ec0" title="plot the data (creating a new plot window in X)" alt="" coords="204,125,380,150"/>
+</map>

@@ -1,0 +1,4 @@
+<map id="ConstCell_P::operator+" name="ConstCell_P::operator+">
+<area shape="rect" id="node1" title="return true iff offset is valid (and then *() != 0). For this to work, increment needs to be true" alt="" coords="216,5,375,31"/>
+<area shape="rect" id="node2" href="$classConstCell__P.html#a1dc9086d78a9bb489e615e428754a10b" title="return a pointer to the current Cell (or 0 at the end)" alt="" coords="5,5,168,31"/>
+</map>

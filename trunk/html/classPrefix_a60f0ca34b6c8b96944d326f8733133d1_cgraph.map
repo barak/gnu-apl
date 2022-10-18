@@ -1,0 +1,13 @@
+<map id="Prefix::syntax_error" name="Prefix::syntax_error">
+<area shape="rect" id="node1" title="throw an E_LEFT_SYNTAX_ERROR or an E_SYNTAX_ERROR" alt="" coords="5,141,141,167"/>
+<area shape="rect" id="node2" href="$classPrefix.html#aa1e98b0f6cf6e81ab90765af9bd3ce4e" title="return the idx&#39;th Token_loc (from put position)" alt="" coords="221,5,295,31"/>
+<area shape="rect" id="node3" href="$classToken.html#a205e0b499e06999ff91c272ff28c9013" title="return the Value_P value of this token. The token could be TOK_NO_VALUE; in that case VALUE_ERROR is ..." alt="" coords="192,55,324,80"/>
+<area shape="rect" id="node7" href="$classPrefix.html#afdd4d7c0aa09d4bc4c9d8588d3872bd6" title="return the current assignment state" alt="" coords="195,105,321,145"/>
+<area shape="rect" id="node8" href="$classToken.html#a049cd3eb72ae0c6427e523d399876b86" title="return the TokenClass of this token." alt="" coords="195,169,321,195"/>
+<area shape="rect" id="node9" href="$classToken.html#a4d19f279ca06bc64e549c9d63ca677b0" title="return the Function_P value of this token" alt="" coords="189,219,327,244"/>
+<area shape="rect" id="node11" href="$classPrefix.html#a07a35c8b69a8c9f685225e2a2586a2fd" title="return the number of token currently in the FIFO" alt="" coords="214,268,302,293"/>
+<area shape="rect" id="node4" href="$unionToken_1_1sval.html#a22a0be9d3742c2a8168e59d530dd659e" title="a shortcut for accessing apl_val" alt="" coords="375,55,521,80"/>
+<area shape="rect" id="node5" href="$classToken.html#a11e37aa69b8eb64f293702293b00f50c" title="return true iff this token is an apl value" alt="" coords="386,120,510,145"/>
+<area shape="rect" id="node6" href="$classToken.html#a1a31afbb07e3f1dbb86d5f872ce5c297" title="return the TokenValueType of this token." alt="" coords="569,177,723,203"/>
+<area shape="rect" id="node10" href="$classToken.html#abe9f60f29fc7644214b48cc2715a21ad" title="return true if this token is a function (or operator)" alt="" coords="383,201,513,227"/>
+</map>

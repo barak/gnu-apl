@@ -1,0 +1,10 @@
+<map id="IO_Files::open_next_file" name="IO_Files::open_next_file">
+<area shape="rect" id="node1" title="open the next test file" alt="" coords="5,132,168,157"/>
+<area shape="rect" id="node2" href="$structInputFile.html#a8dc157767e0af4c57eefa4225629e7f8" title="the current file" alt="" coords="233,5,377,31"/>
+<area shape="rect" id="node3" href="$structInputFile.html#a18512cd0e41c3508dcb5aea08a3662c7" title="the name of the currrent file" alt="" coords="443,70,563,110"/>
+<area shape="rect" id="node4" href="$structInputFile.html#ade3c052ce91c9b15b90566e5dc028141" title="open current file unless already open" alt="" coords="216,107,395,132"/>
+<area shape="rect" id="node5" href="$classOutput.html#aef5f941952e0a8ee19481212c472e587" title="reset() dout_filebuf" alt="" coords="240,156,371,181"/>
+<area shape="rect" id="node7" href="$classIO__Files.html#ac9e3a19700b3d04e053494784e71e40d" title="count an error" alt="" coords="231,205,379,231"/>
+<area shape="rect" id="node8" href="$structInputFile.html#a307af49dcf496c919a73d361cb8941db" title="set the pushed_pending flag" alt="" coords="232,255,379,295"/>
+<area shape="rect" id="node6" href="$classDiffOut.html#a2953159be1130890fcb3ad9d363e2c81" title="discard all characters" alt="" coords="452,156,553,181"/>
+</map>

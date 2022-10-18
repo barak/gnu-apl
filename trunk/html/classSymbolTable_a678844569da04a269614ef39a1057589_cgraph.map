@@ -1,0 +1,7 @@
+<map id="SymbolTable::lookup_symbol" name="SymbolTable::lookup_symbol">
+<area shape="rect" id="node1" title="Return or create a Symbol with name ucs in this SymbolTable." alt="" coords="5,123,149,163"/>
+<area shape="rect" id="node2" href="$classSymbolTableBase.html#a8b6fdeffe7abdc7b3163d07befa9962a" title="add sym to the symbol table. The caller has checked that new_name does not yet exist in the symbol ta..." alt="" coords="197,5,409,60"/>
+<area shape="rect" id="node3" href="$classSymbolTableBase.html#ad231d005a78e9d44f0536aeb1caea62c" title="compute a 16&#45;bit hash for name" alt="" coords="197,84,409,139"/>
+<area shape="rect" id="node4" href="$classAvec.html#a88cc8af75e4a2c4d8a1d382637ca07b4" title="return true if unicode uni is a quad (⎕ or ▯)" alt="" coords="251,163,356,188"/>
+<area shape="rect" id="node5" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="242,212,365,237"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="Shape::expand_rank" name="Shape::expand_rank">
+<area shape="rect" id="node2" href="$classShape.html#ad12cb615bc4a005f55e2cc8d565553b1" title="possibly expand rank and increase axes so that B fits into this shape " alt="" coords="205,5,315,32"/>
+<area shape="rect" id="node4" href="$classShape.html#a43848d34e48a77bd29e2c4c317b08f31" title="return a shape like this, but with a new dimension of length len inserted so that Shape[axis] == len ..." alt="" coords="195,56,325,83"/>
+<area shape="rect" id="node3" href="$classShape.html#a017e9a35dd20f4bc4fdeb7ea29b6805d" title="return the rank " alt="" coords="396,5,513,32"/>
+<area shape="rect" id="node5" href="$classShape.html#aeb018b67601d3f1c4bea3d2c2b877b7e" title="add a dimension of length len at the end " alt="" coords="373,56,536,83"/>
+<area shape="rect" id="node6" href="$classShape.html#a592d2ade68aa8c21c5d84627c3a0e001" title="return the length of dimension r " alt="" coords="375,107,534,133"/>
+</map>

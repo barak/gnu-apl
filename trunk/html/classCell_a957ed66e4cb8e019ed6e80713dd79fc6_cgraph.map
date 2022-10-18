@@ -1,3 +1,4 @@
 <map id="Cell::greater" name="Cell::greater">
-<area shape="rect" id="node2" href="$classCell.html#aa4993861d1c965a633ee959562f2177e" title="return the name of the class " alt="" coords="147,5,288,32"/>
+<area shape="rect" id="node1" title="Return true if this cell is greater than other, with:" alt="" coords="5,5,99,31"/>
+<area shape="rect" id="node2" href="$classCell.html#ad08fb9a79b3c5b38d92bf5ef4bf47145" title="return the name of the class" alt="" coords="147,5,288,31"/>
 </map>

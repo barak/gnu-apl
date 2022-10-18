@@ -1,0 +1,5 @@
+<map id="PrintBuffer::pad_height" name="PrintBuffer::pad_height">
+<area shape="rect" id="node1" title="append lines to reach height" alt="" coords="5,69,160,94"/>
+<area shape="rect" id="node2" href="$classPrintBuffer.html#af6f689e8c4e930b7c37099bf5fdfe57d" title="return the number of columns" alt="" coords="208,29,367,69"/>
+<area shape="rect" id="node3" href="$classPrintBuffer.html#ac13295601812e379a3eac618ce239426" title="return the number of rows" alt="" coords="218,93,357,133"/>
+</map>

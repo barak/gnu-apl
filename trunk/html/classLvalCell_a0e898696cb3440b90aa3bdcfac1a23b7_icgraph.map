@@ -1,0 +1,16 @@
+<map id="LvalCell::get_lval_value" name="LvalCell::get_lval_value">
+<area shape="rect" id="node1" title="Overloaded Cell::get_lval_value()" alt="" coords="1089,87,1212,127"/>
+<area shape="rect" id="node2" href="$classValue.html#a5be5b6031f53082438fa9de824732fbe" title="assign val to the cell references in this value." alt="" coords="887,5,1037,31"/>
+<area shape="rect" id="node3" href="$classBif__F12__ELEMENT.html#a18cbe47e844984fae074495a4abcdd7e" title="implementation of eval_B()" alt="" coords="883,55,1041,95"/>
+<area shape="rect" id="node8" href="$classXML__Saving__Archive.html#ae0384623223c3d4e87ea98f2ec0adf5c" title="emit one ravel cell cell" alt="" coords="889,119,1035,159"/>
+<area shape="rect" id="node14" href="$classLvalCell.html#a955ddeec11837546b46b2a654098ef87" title="overloaded Cell::init_other" alt="" coords="897,184,1027,209"/>
+<area shape="rect" id="node4" href="$classBif__F12__ELEMENT.html#a8334dc7204bf088137c793bf580390ea" title="overloaded Function::eval_B()" alt="" coords="649,17,835,43"/>
+<area shape="rect" id="node5" href="$classDoxy.html#a226cb7889fd26eca46ab7be00cf517eb" title="HTML&#45;print a table with all variables to &#39;page&#39;." alt="" coords="668,67,816,92"/>
+<area shape="rect" id="node6" href="$classDoxy.html#ad8abe2e8a1b686a7b35e582c369d41ae" title="generate the entire documentation" alt="" coords="487,67,569,92"/>
+<area shape="rect" id="node7" href="$classCommand.html#a834eac0e797a5d1c992018b7d0c049a4" title="]DOXY: create doxygen&#45;like documentation of the current workspace" alt="" coords="247,67,407,92"/>
+<area shape="rect" id="node9" href="$classXML__Saving__Archive.html#a91f354b394601f7dc6369c6485670e5f" title="write ravel of Value v" alt="" coords="669,119,815,159"/>
+<area shape="rect" id="node10" href="$classXML__Saving__Archive.html#acc327395cab545ea7797d92f5c931cab" title="write entire workspace" alt="" coords="455,119,601,159"/>
+<area shape="rect" id="node11" href="$classWorkspace.html#a8a4f1d898d523818dbd9d7efa6f2cf92" title="save this workspace" alt="" coords="250,127,403,152"/>
+<area shape="rect" id="node12" href="$classCommand.html#ad61e749290966d00856ce1dd4f6abe42" title=")SAVE active WS as CONTINUE and )OFF" alt="" coords="5,101,199,127"/>
+<area shape="rect" id="node13" href="$classCommand.html#aec0c4c6efbb9df9a34220b510f58905a" title=")SAVE: save a workspace file (.xml)" alt="" coords="23,151,181,176"/>
+</map>

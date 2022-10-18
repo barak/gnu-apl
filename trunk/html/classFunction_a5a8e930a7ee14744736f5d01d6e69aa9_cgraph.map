@@ -1,0 +1,7 @@
+<map id="Function::get_signature" name="Function::get_signature">
+<area shape="rect" id="node1" title="return the signature of this function (currently only valid for user&#45;defined functions)" alt="" coords="5,92,164,117"/>
+<area shape="rect" id="node2" href="$classFunction.html#a1e98de20de09c81c7b5e257880eb2c89" title="return the number of value arguments (0, 1, or 2) of a user defined function, For non&#45;user defined fu..." alt="" coords="212,5,387,31"/>
+<area shape="rect" id="node3" href="$classFunction.html#ac69b8cfa3ac1577ef8cf98500002e6ef" title="return the number of function arguments (1 or 2) of an operator, or 0 for a &quot;normal&quot; function that is..." alt="" coords="234,55,365,95"/>
+<area shape="rect" id="node4" href="$classFunction.html#a54a1f42ec67c604380f61b48b69d25f9" title="return true iff the function has and axis (system defined functions always have an axis even thogh mo..." alt="" coords="233,120,365,145"/>
+<area shape="rect" id="node5" href="$classFunction.html#ab42920100ef5ae42e00bc02b915526d1" title="return 1 if the function returns a result, otherwise 0. For non&#45;user defined functions,..." alt="" coords="229,169,369,195"/>
+</map>

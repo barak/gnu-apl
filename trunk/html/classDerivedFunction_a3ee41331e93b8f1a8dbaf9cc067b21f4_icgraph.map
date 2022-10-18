@@ -1,0 +1,7 @@
+<map id="DerivedFunction::destroy_derived" name="DerivedFunction::destroy_derived">
+<area shape="rect" id="node1" title="deallocate resources held by this DerivedFunction" alt="" coords="456,69,624,109"/>
+<area shape="rect" id="node2" href="$classDerivedFunctionCache.html#a380131358e2a17860810a0d267e2949c" title="reset (clear) the cache" alt="" coords="253,69,408,109"/>
+<area shape="rect" id="node3" href="$classStateIndicator.html#abf0d83f5f9a8fec57751bf5636933687" title="Maybe print B (according to tag) and erase B." alt="" coords="21,5,190,45"/>
+<area shape="rect" id="node4" href="$classDerivedFunctionCache.html#aa57d9b62c101077a02204563dda4428f" title="destructor" alt="" coords="20,69,191,109"/>
+<area shape="rect" id="node5" href="$classStateIndicator.html#a5b64f5fed3bc19bb0f2d5968d9ea48e5" title="destructor" alt="" coords="5,134,205,159"/>
+</map>

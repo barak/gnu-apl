@@ -1,0 +1,10 @@
+<map id="APL_Float_Base::_get" name="APL_Float_Base::_get">
+<area shape="rect" id="node2" href="$APL__Float__as__class_8hh.html#a5901d5ca4f24f84995314e5edbfdb44a" title="isnormal() for APL_Float " alt="" coords="207,81,277,108"/>
+<area shape="rect" id="node3" href="$classFloatCell.html#ae6357d73eb4a9cd95598ca2d1a32a623" title="Overloaded from the corresponding Cell:: function (see class Cell). " alt="" coords="336,56,481,83"/>
+<area shape="rect" id="node9" href="$classUCS__string.html#aa1e49e488f5c1093a83b7c3aa4009d70" title="constructor: UCS_string from a double with quad_pp valid digits. (eg. 3.33 has 3 digits), In standard APL format. " alt="" coords="325,107,492,133"/>
+<area shape="rect" id="node4" href="$classFloatCell.html#ab33d5fb8782321e100cec38cbed5ea18" title="Overloaded Cell::is_finite(). " alt="" coords="579,5,705,32"/>
+<area shape="rect" id="node5" href="$classIntCell.html#a9e1eae19e23516df1eb5350a10883e24" title="overloaded from the corresponding Cell:: function (see class Cell) " alt="" coords="577,56,707,83"/>
+<area shape="rect" id="node8" href="$classBif__F12__ENCODE.html#a42891c138d5ceb942cc1d6fda44d7d27" title="encode *ib() according to A " alt="" coords="540,107,744,133"/>
+<area shape="rect" id="node6" href="$classIntCell.html#a57acd6c6da8ad45753bb27b304ca597b" title="overloaded Cell::is_integer_cell() " alt="" coords="819,31,969,57"/>
+<area shape="rect" id="node7" href="$classBif__F12__ENCODE.html#a7fdbd7f4683430ee6daeab1014523504" title="encode *ib() according to A (integer A and b) " alt="" coords="792,81,996,108"/>
+</map>

@@ -1,6 +1,3 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node2" href="$classCDR__string.html" title="a string containing a CDR record " alt="" coords="133,5,224,32"/>
-<area shape="rect" id="node3" href="$classCollatingCache.html" title="A cache for speeding up dyadic ⍋ and ⍒ " alt="" coords="123,56,234,83"/>
-<area shape="rect" id="node4" href="$classToken__string.html" title="A sequence of Token. " alt="" coords="130,107,227,133"/>
-<area shape="rect" id="node5" href="$classUCS__string__vector.html" title="a vector of UCS_strings. " alt="" coords="112,157,245,184"/>
+<area shape="rect" id="node1" href="$structCDR__header.html" title="the header of a CDR record" alt="" coords="5,5,104,31"/>
 </map>

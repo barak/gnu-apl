@@ -1,0 +1,7 @@
+<map id="SystemSymTab::add_variable" name="SystemSymTab::add_variable">
+<area shape="rect" id="node1" title="add variable to the symbol table" alt="" coords="5,77,203,102"/>
+<area shape="rect" id="node2" href="$classSystemSymTab.html#af26a43b225c33b7ac0315d88e874da0d" title="add a function or variable" alt="" coords="251,69,421,109"/>
+<area shape="rect" id="node3" href="$classSymbolTableBase.html#a8b6fdeffe7abdc7b3163d07befa9962a" title="add sym to the symbol table. The caller has checked that new_name does not yet exist in the symbol ta..." alt="" coords="470,5,694,45"/>
+<area shape="rect" id="node4" href="$classSymbolTableBase.html#a58cddd45598f27eff5711db23ce9043c" title="return a Symbol with name name in this SymbolTable." alt="" coords="469,69,695,109"/>
+<area shape="rect" id="node5" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="521,134,643,159"/>
+</map>

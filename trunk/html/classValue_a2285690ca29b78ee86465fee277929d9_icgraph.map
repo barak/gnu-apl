@@ -1,0 +1,8 @@
+<map id="Value::get_enlist_count" name="Value::get_enlist_count">
+<area shape="rect" id="node2" href="$classQuad__JSON.html#a87624a1b477fd625968d0686c51534e2" title="convert APL value to JSON string " alt="" coords="212,5,403,32"/>
+<area shape="rect" id="node4" href="$classBif__F12__ELEMENT.html#a18cbe47e844984fae074495a4abcdd7e" title="implementation of eval_B() " alt="" coords="228,57,387,98"/>
+<area shape="rect" id="node3" href="$classQuad__JSON.html#a3adb4fba903343bf38b0c3a1dd10feb8" title="overloaded Function::eval_B() " alt="" coords="451,5,604,32"/>
+<area shape="rect" id="node5" href="$classDoxy.html#ad310686a39a631dd99823ec9c2e5ace0" title="HTML&#45;print a table with all variables to &#39;page&#39;. " alt="" coords="453,64,601,91"/>
+<area shape="rect" id="node6" href="$classDoxy.html#ad8abe2e8a1b686a7b35e582c369d41ae" title="generate the entire documentation " alt="" coords="652,64,735,91"/>
+<area shape="rect" id="node7" href="$classCommand.html#a834eac0e797a5d1c992018b7d0c049a4" title="]DOXY: create doxygen&#45;like documentation of the current workspace " alt="" coords="783,64,943,91"/>
+</map>

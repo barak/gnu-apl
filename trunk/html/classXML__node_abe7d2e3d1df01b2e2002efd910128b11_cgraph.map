@@ -1,0 +1,11 @@
+<map id="XML_node::get_src_len" name="XML_node::get_src_len">
+<area shape="rect" id="node2" href="$classXML__node.html#a736e72ce2e086ebe9db5a9d86834bfd9" title="return the tagname of this node. Starts with a valid XML name, thus no leading &lt;, /m or _..." alt="" coords="212,173,379,199"/>
+<area shape="rect" id="node3" href="$classXML__node.html#af3c57bac633564b2e755294b1da74e88" title="return the type of this node as string " alt="" coords="441,5,586,47"/>
+<area shape="rect" id="node4" href="$classXML__node.html#a2a35cbd734b00030af77d2c652008f3a" title="return true if uni is a valid first char in an XML tag name " alt="" coords="662,85,793,127"/>
+<area shape="rect" id="node5" href="$classXML__node.html#a6ef0db71846deb6a0a4318d8388edca2" title="return true if uni is a validchar " alt="" coords="427,122,600,149"/>
+<area shape="rect" id="node6" href="$Common_8hh.html#aecfb781b36a8a772310228edb5410b15" title="MORE_ERROR" alt="" coords="454,173,573,199"/>
+<area shape="rect" id="node8" href="$classXML__node.html#adf9656aeb2add17990dd78e7ca0281a8" title="return the (source&#45;) string for this node " alt="" coords="442,223,585,250"/>
+<area shape="rect" id="node9" href="$classUCS__string.html#a5776e51c6faa53537409322cd0ebf07a" title="append number (in ASCII encoding like d) to this string " alt="" coords="443,275,583,316"/>
+<area shape="rect" id="node10" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string " alt="" coords="657,311,797,338"/>
+<area shape="rect" id="node7" href="$classWorkspace.html#a5ebd29d8c860b589b9f1d8118a949514" title="return reference to more info about last error " alt="" coords="648,173,807,199"/>
+</map>

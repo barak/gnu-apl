@@ -1,0 +1,13 @@
+<map id="Value::to_type" name="Value::to_type">
+<area shape="rect" id="node1" title="recursively replace all numeric ravel elements with 0 and all characters with blank...." alt="" coords="5,180,112,205"/>
+<area shape="rect" id="node2" href="$classCell.html#a367b9df7e0d4b805e5f31641658113f6" title="Return the APL value of a cell (Asserts for non&#45;pointer cells)" alt="" coords="160,29,315,55"/>
+<area shape="rect" id="node5" href="$classValue.html#af5c079fe8530d8f90a87c53439d9c924" title="return the (writable) idx&#39;th element of the ravel." alt="" coords="174,79,301,104"/>
+<area shape="rect" id="node6" href="$classValue.html#ac5b54e3a13cab0837442f1575b3299a5" title="return the number of elements, but at least 1 (for the prototype)." alt="" coords="363,104,532,129"/>
+<area shape="rect" id="node8" href="$classCell.html#ab3d14978f78ba264d40e9ed1a4823be2" title="Return true iff this cell is a character cell." alt="" coords="162,180,313,205"/>
+<area shape="rect" id="node9" href="$classCell.html#ae98b3988a7fa52c6c157b4911b043dde" title="Return true iff this cell is a pointer (to a sub&#45;array) cell." alt="" coords="169,229,305,255"/>
+<area shape="rect" id="node10" href="$classValue.html#a72edd0065e9f22b270ddeda972ed9534" title="set ravel[offset] to uni" alt="" coords="162,279,313,304"/>
+<area shape="rect" id="node11" href="$classValue.html#aa76de15be071eea1c129aae6045ffa93" title="set ravel[offset] to aint" alt="" coords="168,328,307,353"/>
+<area shape="rect" id="node3" href="$classCell.html#a38a6a25f0ad091f35e3d9abfe5608a50" title="return the type of this cell" alt="" coords="382,5,513,31"/>
+<area shape="rect" id="node4" href="$classCell.html#a6c3fdef3d82f53649d1c3f16d37eedd7" title="the name of ct" alt="" coords="363,55,532,80"/>
+<area shape="rect" id="node7" href="$classShape.html#a6f32f749601dca80263493fd06be12c4" title="return the number of ravel elements, but at least 1 (for empty values and scalars) else product of sh..." alt="" coords="580,104,735,129"/>
+</map>

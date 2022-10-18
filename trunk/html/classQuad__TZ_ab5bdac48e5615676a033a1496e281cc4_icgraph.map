@@ -1,0 +1,6 @@
+<map id="Quad_TZ::compute_offset" name="Quad_TZ::compute_offset">
+<area shape="rect" id="node1" title="compute the offset (in seconds) from GMT" alt="" coords="192,55,367,80"/>
+<area shape="rect" id="node2" href="$main_8cc.html#aa0321421b17def7b58fc0cabc8890260" title="initialize the interpreter" alt="" coords="43,5,106,31"/>
+<area shape="rect" id="node3" href="$classQuad__TZ.html#a7deabddc904b13c5b4c1807cc6cba6db" title="Push an undefined entry onto the stack of this Symbol." alt="" coords="19,55,131,80"/>
+<area shape="rect" id="node4" href="$classQuad__TZ.html#ad84775d7b640638a658b46ecffa7a353" title="Constructor." alt="" coords="5,104,144,129"/>
+</map>

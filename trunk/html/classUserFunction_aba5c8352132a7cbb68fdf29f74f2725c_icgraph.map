@@ -1,0 +1,8 @@
+<map id="UserFunction::get_trace_lines" name="UserFunction::get_trace_lines">
+<area shape="rect" id="node1" title="return trace lines (from S∆fun ← lines)" alt="" coords="488,47,651,87"/>
+<area shape="rect" id="node2" href="$classQuad__TRACE.html#a59e7875554f651f1f64d83d79111fecd" title="Overloaded Function::eval_AB()" alt="" coords="277,5,440,31"/>
+<area shape="rect" id="node3" href="$classQuad__TRACE.html#a1a54a3b1bc1b4b8b25370bb442269a24" title="Overloaded Function::eval_B()" alt="" coords="281,55,436,80"/>
+<area shape="rect" id="node4" href="$classNabla.html#a19c7ba833ddf21a1ac5c4309fd44921c" title="open an existing function, or create a new one." alt="" coords="287,105,431,145"/>
+<area shape="rect" id="node5" href="$classNabla.html#a894eac5264914ef7eedcfc14643cc7ee" title="start editing, return source location if first_command is bad." alt="" coords="139,112,229,137"/>
+<area shape="rect" id="node6" href="$classNabla.html#a610d94a179335126e82e9eea07918d5a" title="edit this function" alt="" coords="5,112,91,137"/>
+</map>

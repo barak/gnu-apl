@@ -1,0 +1,252 @@
+<map id="UCS_string::append" name="UCS_string::append">
+<area shape="rect" id="node1" title="append UCS_string other to this string" alt="" coords="2140,6120,2280,6146"/>
+<area shape="rect" id="node2" href="$classPrintBuffer.html#ad067956533b46f2b61e71fc2c4cba37e" title="add a decorator frame around this buffer" alt="" coords="1663,1914,1817,1939"/>
+<area shape="rect" id="node3" href="$classPointerCell.html#acccd604366a71acc67657ce5e4f034e0" title="the Quad_CR representation of this cell" alt="" coords="1408,1732,1556,1772"/>
+<area shape="rect" id="node4" href="$classPrintBuffer.html#a720232f76255d2c25f22fd62e7571d2e" title="add an outer frame around this buffer" alt="" coords="1914,6257,2063,6297"/>
+<area shape="rect" id="node6" href="$classPrintBuffer.html#a5abec40efca2993a2b522e199694730f" title="contructor: a PrintBuffer from an APL value" alt="" coords="1405,6322,1559,6347"/>
+<area shape="rect" id="node8" href="$classPrintBuffer.html#a3c3030436502e7ec4054cb4b6223d92d" title="PrintBuffer from an APL value in function&#45;style." alt="" coords="1676,6397,1804,6437"/>
+<area shape="rect" id="node9" href="$classBif__F12__FORMAT.html#a1dd354ab627b5eef74f5c49b79a786e9" title="add a row (consisting of data) to PrintBuffer ret" alt="" coords="1647,6678,1833,6703"/>
+<area shape="rect" id="node10" href="$classBif__F12__FORMAT.html#ad7f677afc847fa6df13f16decdecd992" title="A character array with one column of B formatted by specification." alt="" coords="1131,6592,1305,6632"/>
+<area shape="rect" id="node14" href="$classQuad__XML.html#a08fc4c7594b99bc7a667105ceab0b728" title="return the entities in B, sorted by their position prefix" alt="" coords="1403,2668,1561,2708"/>
+<area shape="rect" id="node18" href="$classQuad__XML.html#af494dd922a2e9247f05971e30eb295be" title="return all member names according to flags" alt="" coords="1904,8135,2073,8160"/>
+<area shape="rect" id="node19" href="$classQuad__JSON.html#a1fa347b95372cd4c4ab4b7fd6d4b5358" title="append Cell value to JSON string result" alt="" coords="1645,1685,1835,1725"/>
+<area shape="rect" id="node20" href="$classPrintBuffer.html#a47de98d96a3326a1b8734e6242ea1ee5" title="append ucs, aligned at char align." alt="" coords="1921,6625,2056,6665"/>
+<area shape="rect" id="node21" href="$classUCS__string.html#a954e44dcc81234ff7d561e54aa84668d" title="append number (in ASCII encoding like lf) to this string" alt="" coords="1919,8185,2059,8225"/>
+<area shape="rect" id="node22" href="$classUCS__string.html#a6a5963aeaadb5eb211b55b10bfbe1df0" title="append number (in ASCII encoding like X or x) to this string" alt="" coords="1905,8250,2073,8275"/>
+<area shape="rect" id="node23" href="$classUCS__string.html#acdeb732cc6e74a14c4edd4070140df00" title="append members (like x.y.z) starting at members[m] and going backwards from the end of members to thi..." alt="" coords="1919,8300,2059,8340"/>
+<area shape="rect" id="node24" href="$classUCS__string.html#a5776e51c6faa53537409322cd0ebf07a" title="append number (in ASCII encoding like d) to this string" alt="" coords="1919,3718,2059,3758"/>
+<area shape="rect" id="node27" href="$classXML__node.html#ae6f77f0b4ebb0311ee13abdc69d696f0" title="merge the items from start(&#45;tag) to (end(&#45;tag) into start tag" alt="" coords="1399,3287,1565,3312"/>
+<area shape="rect" id="node29" href="$classUCS__string.html#a8111c41576c13b04095ddb7df13eddd3" title="append shape (in APL encoding tke left arg of ↑) this string" alt="" coords="1670,2417,1810,2457"/>
+<area shape="rect" id="node30" href="$classQuad__CR.html#a8b2ba6751ee90f286cae088a14101ff8" title="compute the prolog (e,g, ((⎕IO+2)⊃X)←) for the pick of left" alt="" coords="1392,2422,1572,2447"/>
+<area shape="rect" id="node31" href="$classQuad__CR.html#acbf51c3bd2e75e0d23884d426cc736d1" title="compute 10 ⎕CR recursively" alt="" coords="883,2270,1065,2295"/>
+<area shape="rect" id="node32" href="$classQuad__CR.html#a9a5d503eccac9d627b13ee6be3f14cad" title="compute 10 ⎕CR recursively (structured variable)" alt="" coords="625,2219,833,2244"/>
+<area shape="rect" id="node34" href="$classQuad__CR.html#ad98ce37f2b329eb37ddae9d0fcf7832f" title="10 ⎕CR symbol_name (variable or function name). Also used for )OUT" alt="" coords="192,820,335,846"/>
+<area shape="rect" id="node37" href="$classQuad__CR_1_1Picker.html#a0e581444af3ec444122c21912f7a29b7" title="varname or pick of varname" alt="" coords="1407,2372,1557,2398"/>
+<area shape="rect" id="node38" href="$classQuad__CR.html#a59678f59cbdc13f8c82978a21128c41f" title="one ravel item in 10 ⎕CR symbol_name" alt="" coords="1653,2316,1827,2342"/>
+<area shape="rect" id="node39" href="$classQuad__CR.html#a9f1588cf6a3aa22665fe70c1855d1c4e" title="try to emit value in short format. Retrun true if that is not possible." alt="" coords="1142,2144,1294,2170"/>
+<area shape="rect" id="node40" href="$classNabla.html#a610d94a179335126e82e9eea07918d5a" title="edit this function" alt="" coords="437,3714,523,3739"/>
+<area shape="rect" id="node41" href="$classQuad__SI.html#a703fb389406e0f834f26f993e0997384" title="overloaded Function::eval_AB()." alt="" coords="1675,5036,1805,5062"/>
+<area shape="rect" id="node42" href="$classQuad__SI.html#adf45c0e846d98374b2ce1e2633de3101" title="overloaded Function::eval_AB()." alt="" coords="1679,5086,1801,5111"/>
+<area shape="rect" id="node43" href="$classTabExpansion.html#a3caac165f0b8c4454d8964fa05a775d3" title="perform tab expansion for a workspace name" alt="" coords="1663,7324,1817,7364"/>
+<area shape="rect" id="node44" href="$classTabExpansion.html#a87242c56b4445fadcf7ac9a1181a15ea" title="perform tab expansion for a filename" alt="" coords="1405,7349,1559,7389"/>
+<area shape="rect" id="node46" href="$classTabExpansion.html#a155d53238b8490e82776eb2caddefceb" title="tab&#45;expand an APL command" alt="" coords="897,7349,1051,7389"/>
+<area shape="rect" id="node48" href="$classLineEditContext.html#a8908cfbf56371294323892784508eca7" title="tab expansion" alt="" coords="409,7577,551,7617"/>
+<area shape="rect" id="node51" href="$classUserFunction.html#a91d607b9654e8c3caedaaea4868edb87" title="return e.g. &#39;FOO[10]&#39;" alt="" coords="1657,4644,1823,4684"/>
+<area shape="rect" id="node56" href="$classError.html#adf8e47c02b1ae0be1368a0587f7daed4" title="update error information in this and copy it to si" alt="" coords="1403,5314,1561,5339"/>
+<area shape="rect" id="node57" href="$classXML__node.html#a736e72ce2e086ebe9db5a9d86834bfd9" title="return the tagname of this node. Starts with a valid XML name, thus no leading &lt;, /m or _." alt="" coords="1657,3344,1823,3370"/>
+<area shape="rect" id="node58" href="$classSymbolTable.html#ac7e63c55db6fdfe52327260e26d50b3e" title="List all symbols in this SymbolTable (for )VARS, )FNS etc.)" alt="" coords="1679,7932,1801,7958"/>
+<area shape="rect" id="node60" href="$classNativeFunction.html#a1a29c2dde6fdafb672e5040e646e3141" title="load shared lib for emacs mode, return error info on failure" alt="" coords="1147,3849,1289,3889"/>
+<area shape="rect" id="node61" href="$main_8cc.html#aa0321421b17def7b58fc0cabc8890260" title="initialize the interpreter" alt="" coords="943,4543,1005,4568"/>
+<area shape="rect" id="node67" href="$structLineLabel.html#a49c3cdcce5593810109c8b4a004a6d39" title="print the line number" alt="" coords="1685,3495,1795,3520"/>
+<area shape="rect" id="node69" href="$structLineLabel.html#abaa6e95c0ca623f8b0746a0e621343b1" title="print a prompt like [1.2] into buffer" alt="" coords="1661,3964,1819,3990"/>
+<area shape="rect" id="node70" href="$structNabla_1_1FunLine.html#acb10b18671fa5864824dbcf871e7eb9f" title="return the line label (sucah as [1]) and the line text" alt="" coords="1414,4088,1550,4128"/>
+<area shape="rect" id="node72" href="$classXML__Loading__Archive.html#a2e7aed9883aa106937d3d9313163e10b" title="read next Function element" alt="" coords="1664,8032,1816,8072"/>
+<area shape="rect" id="node75" href="$classQuad__TF.html#a434cc143d2da53d0f3ae37a9e9e9ce10" title="return B in transfer format 1 (old APL format) for variable B" alt="" coords="1691,4063,1789,4088"/>
+<area shape="rect" id="node76" href="$classQuad__TF.html#a3093ae63771a602fe15f892e57386897" title="append the ravel of a simple character array (of any rank)" alt="" coords="1665,1749,1815,1789"/>
+<area shape="rect" id="node77" href="$classQuad__TF.html#a4aa501720adbb19aed9599912a8a8b07" title="append ravel of value in tf2_format to ucs. Return true iff the value should be enclosed in parenthes..." alt="" coords="1413,1231,1551,1256"/>
+<area shape="rect" id="node78" href="$classQuad__TF.html#a7cecac14ed05f07d7b44a5c90d820f03" title="append ravel cells in tf2_format to ucs." alt="" coords="1151,1207,1285,1232"/>
+<area shape="rect" id="node79" href="$classQuad__TF.html#ad0f2e059d5ff7a0262921192e18c48a0" title="return B in transfer format 2 (new APL format) for a variable" alt="" coords="1156,1079,1280,1104"/>
+<area shape="rect" id="node82" href="$classSymbol.html#a6b9b4537d95855e6490a8ec1b64b6cce" title="write this symbol in )OUT format to file out" alt="" coords="905,1028,1043,1054"/>
+<area shape="rect" id="node84" href="$classQuad__TF.html#afe6a5cf3472f8d500820353afe9c8882" title="store simple character vector vec in ucs, either as &#39;xxx&#39; or as (UCS nn nnn ...)" alt="" coords="1661,1864,1819,1890"/>
+<area shape="rect" id="node85" href="$classQuad__TF.html#a0bb664557663f85e4e8a86c756ac8139" title="store B in transfer format 2 (new APL format) into ucs" alt="" coords="1406,1307,1558,1332"/>
+<area shape="rect" id="node87" href="$classQuad__TF.html#a160b51803b3fc7f0378701651a25c717" title="append shape in tf2_format to ucs." alt="" coords="1669,1382,1811,1407"/>
+<area shape="rect" id="node90" href="$classUCS__string.html#aaa6ebd4a175a47347101721aa86322dd" title="append other in quotes, doubling quoted in other" alt="" coords="1919,5509,2059,5549"/>
+<area shape="rect" id="node91" href="$classCommand.html#a2f17c91a8b65e540a207da7c3be94dec" title="execute a user defined command" alt="" coords="1650,5390,1830,5415"/>
+<area shape="rect" id="node96" href="$classPrintBuffer.html#a6f5d5b5fc0e2cb55c75dab3c613c68f5" title="append UCS_string ucs to this PrintBuffer" alt="" coords="1907,6196,2070,6222"/>
+<area shape="rect" id="node101" href="$classUCS__string.html#ace70327ef899c525ad9c3f2bffd43697" title="append 0&#45;terminated UTF8 string str to this UCS_string." alt="" coords="1899,2562,2079,2587"/>
+<area shape="rect" id="node106" href="$classQuad__FIO.html#a578627a47769516d68daedaa81ef9790" title="sprintf with format string A and Data items B" alt="" coords="1667,7807,1813,7832"/>
+<area shape="rect" id="node109" href="$classExecutable.html#a36fd5d3b2c114e09b57a09afbdc6514b" title="extract the skip&#39;th { ... } from the function text" alt="" coords="1673,3065,1807,3105"/>
+<area shape="rect" id="node110" href="$classExecutable.html#a67ef983c8fb9a0265b334fa2827641fa" title="extract one lambda expressions from body and store it in lambdas" alt="" coords="1405,3388,1559,3428"/>
+<area shape="rect" id="node112" href="$classUserFunction.html#a1aa032e76cb608c07de66ac13d41809b" title="recompile the body" alt="" coords="887,4276,1061,4302"/>
+<area shape="rect" id="node116" href="$classNativeFunction.html#ad1a62a0e847dcd7a571b31c0a892c88d" title="open .so file in one of several directories. On success set handle and update so_path." alt="" coords="1409,2748,1555,2788"/>
+<area shape="rect" id="node120" href="$structCommand_1_1transfer__context.html#a4e80a2899a02285ba89e58792e6150ea" title="process a &#39;A&#39; (array in 2 ⎕TF format) item." alt="" coords="1126,302,1310,342"/>
+<area shape="rect" id="node123" href="$classQuad__QUOTE.html#a0d74bec9110b151f4f8b72f95ff0033b" title="overloaded Symbol::assign()." alt="" coords="1663,4987,1817,5012"/>
+<area shape="rect" id="node124" href="$classUserFunction.html#a33987249eae73499f4213d3c63a101ec" title="Quad_CR of this function." alt="" coords="1907,7058,2070,7083"/>
+<area shape="rect" id="node127" href="$classToken.html#af5ca64d07f1b9c4f0f4ea7bff69c47e3" title="the Quad_CR representation of the token." alt="" coords="1928,8415,2049,8440"/>
+<area shape="rect" id="node128" href="$classToken.html#a8da320e73d998f8ed44dfb8d81237bc8" title="print the token to out in the format used by print_error_info(). return the number of characters prin..." alt="" coords="1680,8415,1800,8440"/>
+<area shape="rect" id="node129" href="$classCharCell.html#aae6423f93b0da562d152984558326237" title="the Quad_CR representation of this cell" alt="" coords="1921,8514,2056,8554"/>
+<area shape="rect" id="node130" href="$classComplexCell.html#a59526d0bf663861a811c939ab6308fcd" title="the Quad_CR representation of this cell." alt="" coords="1403,6782,1561,6822"/>
+<area shape="rect" id="node131" href="$classFloatCell.html#a57057543ddb1712a7be5ebafb051906d" title="the Quad_CR representation of this cell." alt="" coords="1672,6777,1808,6817"/>
+<area shape="rect" id="node132" href="$classIntCell.html#a6bbc6fd82045e146ef6174a11c4c712f" title="the Quad_CR representation of this cell" alt="" coords="1421,6857,1543,6897"/>
+<area shape="rect" id="node133" href="$classXML__Loading__Archive.html#a35057dcfcbb5ac2bb19a1d4d24ed7072" title="check compatibility information in the workspace and maybe warn the user" alt="" coords="1913,8578,2065,8618"/>
+<area shape="rect" id="node134" href="$classCommand.html#a2f7425e3673258dfb78045919e82f69f" title=")COPY_ONCE: copy a workspace file, nut at most once" alt="" coords="1885,8643,2092,8668"/>
+<area shape="rect" id="node135" href="$classCollatingCache.html#a2e4b2f7cd40bdec4d8f3e51174f5d86a" title="constructor: cache of rank r and comparison length clen" alt="" coords="1655,8712,1825,8752"/>
+<area shape="rect" id="node136" href="$classUCS__string.html#a21c71f20fbd921dd1933404a2674c3cb" title="skip leading whitespaces starting at idx, append the following non&#45;whitespaces (if any) to dest,..." alt="" coords="1907,5642,2071,5667"/>
+<area shape="rect" id="node138" href="$classQuad__CR.html#a8cf383d918c4ecfc74a646b506b9199b" title="compute 35 ⎕CR B" alt="" coords="1917,6095,2060,6120"/>
+<area shape="rect" id="node143" href="$classValue.html#adcada8db3d31b0fc0791755ed40dc1d0" title="print this member value" alt="" coords="1669,6095,1811,6120"/>
+<area shape="rect" id="node145" href="$classQuad__CR.html#ab42652c4ddc90ace7dc2d154652a74e9" title="compute 36 ⎕CR B" alt="" coords="1917,6046,2060,6071"/>
+<area shape="rect" id="node146" href="$classUCS__string.html#afd4c5d6cd5482ce0979527de1f3699b5" title="the inverse of un_escape()." alt="" coords="1908,4418,2069,4443"/>
+<area shape="rect" id="node147" href="$classCommand.html#ad5c9241b1bb935841fe3c0d81546b7b3" title="process a single line entered by the user (in immediate execution mode)" alt="" coords="1659,4594,1821,4619"/>
+<area shape="rect" id="node152" href="$classQuad__FX.html#a17ec48da11ee4ba2f96a899cf22add7e" title="do ⎕FX with execution properties exec_props" alt="" coords="1909,180,2068,206"/>
+<area shape="rect" id="node156" href="$structCommand_1_1transfer__context.html#afee6856208966168d158de45145dd4ca" title="process an &#39;F&#39; (function in 2 ⎕TF format) item." alt="" coords="1126,366,1310,406"/>
+<area shape="rect" id="node159" href="$classQuad__TF.html#aa5afb1189a241875b5e94b71a3ebe79a" title="return inverse transfer format 1 (old APL format) for a variable" alt="" coords="1157,202,1279,227"/>
+<area shape="rect" id="node160" href="$classQuad__FIO.html#a0d8c64c720db4d63a3a548141b868420" title="perform an fscanf() from file" alt="" coords="1411,7907,1553,7932"/>
+<area shape="rect" id="node161" href="$classQuad__AT.html#a448f15072466e3d72daa9bed9e739c29" title="overloaded Function::eval_AB()." alt="" coords="1151,660,1285,686"/>
+<area shape="rect" id="node162" href="$classQuad__GTK.html#a70b5c6ed0d555a6ce10a96590d73af51" title="overloaded Function::eval_AXB()" alt="" coords="1912,8794,2065,8819"/>
+<area shape="rect" id="node163" href="$classQuad__GTK.html#ab6a35d8bf7fdd5670abad7a190d3bb06" title="overloaded Function::eval_B()" alt="" coords="1921,8843,2056,8868"/>
+<area shape="rect" id="node164" href="$classQuad__ENV.html#aed42c8bc9b71c4e51f1a64dd201c36c1" title="overloaded Function::eval_B()." alt="" coords="1921,8892,2057,8918"/>
+<area shape="rect" id="node165" href="$classQuad__ES.html#a4c53438162ec63acf71b2a766c533fae" title="common inplementation for eval_AB() and eval_B()" alt="" coords="1901,8942,2076,8967"/>
+<area shape="rect" id="node168" href="$classExecutable.html#a3597e9445f07803e2c25e4989d10b4ff" title="constructor" alt="" coords="1909,8991,2069,9016"/>
+<area shape="rect" id="node169" href="$classTabExpansion.html#a784e980ca3a749da8358ce658b4557a4" title="tab&#45;expand a system&#45;defined name (⎕xxx)" alt="" coords="897,7641,1051,7681"/>
+<area shape="rect" id="node170" href="$structBif__F12__FORMAT_1_1Format__LIFER.html#a5cd22a769bbf6f3cf0805cebb6d24fc5" title="Print value into int, fract, and expo fields." alt="" coords="1899,9041,2078,9081"/>
+<area shape="rect" id="node172" href="$classUserFunction.html#a3fb5d002175b6e8a7adf754159583ee9" title="(re&#45;)create a lambda" alt="" coords="1903,8020,2074,8046"/>
+<area shape="rect" id="node175" href="$classBif__F12__FORMAT.html#a9a2278ed7ab90821a0eb131339f6eebb" title="A character array with B formatted by example." alt="" coords="1653,6942,1827,6982"/>
+<area shape="rect" id="node176" href="$structBif__F12__FORMAT_1_1Format__LIFER.html#a649dc954daf0c670e3d5ce419cb7de8a" title="format the left decorator and integer part (everything left of the decimal dot)" alt="" coords="1899,9105,2078,9145"/>
+<area shape="rect" id="node177" href="$structBif__F12__FORMAT_1_1Format__LIFER.html#a8ae85726d6ff5657a4f2a77deaf4a608" title="constructor" alt="" coords="1899,9233,2078,9273"/>
+<area shape="rect" id="node178" href="$structBif__F12__FORMAT_1_1Format__LIFER.html#a8758d1a5eb21191e82c353482b95ab9e" title="format the fract part, exponent, and right decorator (everything left of the decimal dot)" alt="" coords="1899,9169,2078,9209"/>
+<area shape="rect" id="node179" href="$classUCS__string.html#a725b0579ccbb59a9c090692e83ad302b" title="convert the integer part of value to an UCS_string and remove it from value" alt="" coords="1915,6474,2063,6499"/>
+<area shape="rect" id="node180" href="$classUCS__string.html#ac119f7bfd8799ce0ccf54a4002bb6029" title="convert the double value to an UCS_string in fixed point format (with fract_digits fractional digits)..." alt="" coords="1655,6562,1825,6602"/>
+<area shape="rect" id="node182" href="$classUCS__string.html#a62918fcda706b9c19dd63d0d9666bd09" title="convert the double value to an UCS_string scaled (exponential) format (with fract_digits fractional d..." alt="" coords="1397,6498,1567,6538"/>
+<area shape="rect" id="node183" href="$classUCS__string.html#a4f6f837c5526cc425de1cc7e3e239d22" title="convert an unsigned integer value to an UCS_string (like sprintf())" alt="" coords="1913,6740,2065,6766"/>
+<area shape="rect" id="node185" href="$classDoxy.html#a93eea23abe307765e62602677d7a4f42" title="return an HTML&#45;anchor for function name (in the output files)" alt="" coords="1926,5719,2051,5744"/>
+<area shape="rect" id="node187" href="$classStateIndicator.html#aed8bbe8f6617d63ce0292de72e20b4e0" title="Return the function name, or &quot;*&quot; for an immediate execution context." alt="" coords="1891,9298,2087,9323"/>
+<area shape="rect" id="node188" href="$classError.html#a782d3b90b8d5e00842b9aa46b510de77" title="compute the caret line. This is the third of the 3 error lines. It contains the failure position the ..." alt="" coords="1913,5895,2064,5920"/>
+<area shape="rect" id="node190" href="$structCommand_1_1transfer__context.html#a36395b934377269c3f923a110904f9d3" title="get the name, rank, and shape of a 1 ⎕TF record" alt="" coords="1897,9348,2081,9388"/>
+<area shape="rect" id="node191" href="$classWorkspace.html#acb39e0420fcef7558220b9576b809e97" title="return a token for system function or variable ucs" alt="" coords="1914,718,2063,743"/>
+<area shape="rect" id="node198" href="$classNabla.html#a894eac5264914ef7eedcfc14643cc7ee" title="start editing, return source location if first_command is bad." alt="" coords="1437,3503,1527,3528"/>
+<area shape="rect" id="node201" href="$classTokenizer.html#a675447bc15638963f65fc8e5bea848e1" title="tokenize a Quad function or variable" alt="" coords="1655,1332,1825,1358"/>
+<area shape="rect" id="node203" href="$classValue.html#aad21436fa7f25ddcbae8d74a52dc71c4" title="return the ravel of this value as UCS string, or throw DOMAIN error if the ravel contains non&#45;char or..." alt="" coords="1913,9412,2065,9438"/>
+<area shape="rect" id="node205" href="$classQuad__FIO.html#ab3523798ecfe2751308a1c1308770a88" title="append ASCII&#45;buffer buffer to dest, inserting thousands&#39; separators. Note: buffer may be modified." alt="" coords="1894,7716,2083,7742"/>
+<area shape="rect" id="node206" href="$structLineLabel.html#ae1a0a199553acb8cd50eba410b429519" title="increase the line number" alt="" coords="1930,4815,2047,4840"/>
+<area shape="rect" id="node208" href="$classLineEditContext.html#a671132bb9b96df8ace2ec1146bc486d6" title="insert uni at cursor position" alt="" coords="387,7706,573,7731"/>
+<area shape="rect" id="node209" href="$structFormat__sub.html#adb55b58d19ee1fb9f53292b9ec135e65" title="Fill buf at position x,y with data according to fmt." alt="" coords="1923,9462,2054,9502"/>
+<area shape="rect" id="node210" href="$structFormat__sub.html#a52e45dee4cebe1d7193c96dfee019067" title="Fill buf at position x,y with data according to fmt." alt="" coords="1675,9541,1805,9581"/>
+<area shape="rect" id="node211" href="$classCommand.html#aeb8671f785d828bbfac0d9b9ff46437d" title="list library: common helper" alt="" coords="1660,7982,1820,8007"/>
+<area shape="rect" id="node214" href="$structLineLabel.html#a8544cde47bc94d5f9f7e0141e8029633" title="increase the line number" alt="" coords="1933,4732,2044,4758"/>
+<area shape="rect" id="node216" href="$classUCS__string.html#afed3b4eed48968619c0895a98700b554" title="return a string like this, but with pad chars mapped to spaces" alt="" coords="1919,4898,2059,4923"/>
+<area shape="rect" id="node219" href="$classQuad__TF.html#a4ad62507efae73aa10d72b8989c05f50" title="undo ⎕UCS() created by tf2_char_vec" alt="" coords="1921,256,2056,282"/>
+<area shape="rect" id="node220" href="$classPrintBuffer.html#afe55bc37668a451de718112388a7ab6a" title="pad the fraction part to wanted_fract_len with &#39;0&#39;" alt="" coords="1907,9627,2070,9652"/>
+<area shape="rect" id="node222" href="$classCommand.html#a429d0c585e845bf29a504a24889cb761" title="parse user&#45;suplied argument (of )VARS, )OPS, or )NMS commands) into strings from and to" alt="" coords="1902,7868,2075,7894"/>
+<area shape="rect" id="node223" href="$classNabla.html#ad807a47227d5a997bdc1075d186109a5" title="parse [nn.mm] into a LineLabel;" alt="" coords="1920,3446,2057,3471"/>
+<area shape="rect" id="node224" href="$classNabla.html#ae4562224aeb0ce0598cd25f428443045" title="parse an operation (something like [...], e.g. [⎕3])" alt="" coords="1676,3446,1804,3471"/>
+<area shape="rect" id="node225" href="$classLineEditContext.html#af149649722a0ac4532f47fe729f44f2f" title="paste to cursor position" alt="" coords="403,7755,557,7780"/>
+<area shape="rect" id="node226" href="$classTabExpansion.html#ab9d75ee0d642d9144a37b3db8d6c5aeb" title="read filenames in dir and append matching filenames to matches" alt="" coords="1916,7361,2061,7401"/>
+<area shape="rect" id="node227" href="$classXML__Loading__Archive.html#a4c957a7b68bd8ef13162b63ff62bb7ed" title="input is a UTF8&#45;encoded sequence of bytes, terminated with &quot;. UTF8&#45;decode the sequence,..." alt="" coords="1913,8070,2065,8110"/>
+<area shape="rect" id="node232" href="$classUCS__string.html#a5363a5ada17cb88cd428fcf63dd2b371" title="return a string like this, but with pad chars removed" alt="" coords="1904,8464,2073,8490"/>
+<area shape="rect" id="node233" href="$classUCS__string.html#af37b0914d3d5544074c85f91d7b35a1a" title="return this string reversed (i.e. characters from back to front)." alt="" coords="1918,9578,2059,9603"/>
+<area shape="rect" id="node234" href="$classUserFunction.html#a8514600d6fec34ed9fdade576d0ad721" title="compute lines 2 and 3 in error" alt="" coords="1903,5274,2074,5314"/>
+<area shape="rect" id="node235" href="$classTabExpansion.html#aea44664e432733d7ac80c7ebc529c1a9" title="show the different alternatives for tab expansions" alt="" coords="1917,7425,2061,7465"/>
+<area shape="rect" id="node238" href="$classBif__F12__FORMAT.html#adc0465141b443e1733208fb2dd14466c" title="split entire format string string into column format strings" alt="" coords="1907,6993,2070,7033"/>
+<area shape="rect" id="node239" href="$classUCS__string.html#a9332c2147c89d03e41ec2c30e826a6ac" title="this is a command with optional args. Remove leading and trailing whitespaces, append args to rest,..." alt="" coords="1145,7172,1291,7198"/>
+<area shape="rect" id="node240" href="$classExecutable.html#ae33855096d44e35f756909e2921e779b" title="return the text of statement at pc" alt="" coords="1897,5183,2080,5208"/>
+<area shape="rect" id="node241" href="$classUCS__string.html#a8c862d40c28f79f092c0b9518560defc" title="return this string HTML&#45;escaped, starting at offset, and using   for blanks" alt="" coords="1913,5768,2065,5794"/>
+<area shape="rect" id="node243" href="$classTokenizer.html#a0682563437325fa3d9f6330a971e7a36" title="tokenize a single quoted string" alt="" coords="1921,2900,2057,2940"/>
+<area shape="rect" id="node244" href="$classTokenizer.html#a56f335a801b4c3c1855e19549c7579c0" title="tokenize a double quoted string" alt="" coords="1921,2836,2057,2876"/>
+<area shape="rect" id="node245" href="$classTokenizer.html#afc540b601fb7d49f3d9b1bc88fc5cb3a" title="tokenize a symbol" alt="" coords="1921,2964,2057,3004"/>
+<area shape="rect" id="node246" href="$classUCS__string.html#aa112b1a21da69df3602fd7a13ee3298d" title="constructor: UCS_string from UTF8_string" alt="" coords="1905,9676,2072,9702"/>
+<area shape="rect" id="node247" href="$classUCS__string__vector.html#af02e67b327f1926204ac28bd62dc91a6" title="constructor: from APL character matrix (removes trailing blanks)" alt="" coords="1918,9726,2059,9766"/>
+<area shape="rect" id="node248" href="$classUCS__string.html#a9bf4de59de7ba3e67a9e3916f435d482" title="return this string with &quot;escape sequences&quot; replaced by their real characters (&#39;&#39; → &#39; if single quoted..." alt="" coords="1908,9791,2069,9816"/>
+<area shape="rect" id="node249" href="$classUCS__string.html#a51d85c53091e0d0c3d6a4ab1173904be" title="return the characters in this string (sorted and duplicates removed)" alt="" coords="1921,8744,2057,8770"/>
+<area shape="rect" id="node250" href="$classUserFunction__header.html#a003ac8f5ff1ec67f3fe5e6ad0ef850de" title="constructor from first line in txt (for proper defined functions)" alt="" coords="1911,9841,2066,9881"/>
+<area shape="rect" id="node5" href="$classPrintBuffer.html#adb9b7f5903b37ffeae4de10ada9cfc6d" title="helper for non&#45;trivial PrintBuffer(const Value &amp; ...) constructor" alt="" coords="1653,6247,1827,6272"/>
+<area shape="rect" id="node7" href="$classPrintBuffer.html#adefc49d1f2c2b71e33dba8f3da4155aa" title="PrintBuffer from an empty APL value." alt="" coords="1665,6296,1815,6322"/>
+<area shape="rect" id="node11" href="$classBif__F12__FORMAT.html#ad945541c06e489c1079ae401f4d1db28" title="A character array with B formatted by specification." alt="" coords="887,6718,1061,6758"/>
+<area shape="rect" id="node12" href="$classBif__F12__DOMINO_1_1Matrix.html#ad45f8929c6f666dea17836a79c657456" title="print debug infos for this real matrix" alt="" coords="643,6718,816,6758"/>
+<area shape="rect" id="node13" href="$classBif__F12__FORMAT.html#a5164cf7d2b85131b9c9fa11c3239602a" title="Overloaded Function::eval_AB()" alt="" coords="636,6880,823,6906"/>
+<area shape="rect" id="node15" href="$classQuad__XML.html#aa0a04e6cd3d25a34a042a5b2dcee0530" title="convert APL associative array to XML string" alt="" coords="1132,2682,1304,2707"/>
+<area shape="rect" id="node16" href="$classQuad__XML.html#afb56e2b1109a16c834b1d2d6862b95cc" title="overloaded Function::eval_B()" alt="" coords="907,3042,1041,3067"/>
+<area shape="rect" id="node17" href="$classQuad__XML.html#ad5de89a09c7528bcea93377a1f9424a8" title="overloaded Function::eval_AB()" alt="" coords="657,3503,801,3528"/>
+<area shape="rect" id="node25" href="$classXML__node.html#a738e88d62255e4a6e89ff4b3071956eb" title="add member name with value value to structured value Z" alt="" coords="1657,3295,1823,3320"/>
+<area shape="rect" id="node50" href="$classQuad__CR_1_1Picker.html#a12e2d746e25baeb47dab2f24ce5b50b0" title="indexed varname or pick of varname" alt="" coords="1665,3230,1815,3270"/>
+<area shape="rect" id="node62" href="$classQuad__XML.html#aa4641da84bb47a049da380f0305ae362" title="MEMBER_NAME ← POS CATEGORY TAG_NAME." alt="" coords="888,3503,1060,3528"/>
+<area shape="rect" id="node63" href="$classUCS__string.html#a7000eacac8933739dbc0c7c95f6d30bc" title="append number num" alt="" coords="1659,3698,1821,3723"/>
+<area shape="rect" id="node64" href="$classRegexp.html#a9c761d089d265fa1a1dd5a5191d7549b" title="return a description for error code eec" alt="" coords="1673,3812,1807,3838"/>
+<area shape="rect" id="node73" href="$classToken.html#ace0d8862fa4ed10ca0eea1fdb4ac0f2b" title="show trace output for this token" alt="" coords="1673,4014,1807,4039"/>
+<area shape="rect" id="node88" href="$classUCS__string.html#aa1e49e488f5c1093a83b7c3aa4009d70" title="constructor: UCS_string from a double with quad_pp valid digits. (eg. 3.33 has 3 digits),..." alt="" coords="1657,3180,1823,3206"/>
+<area shape="rect" id="node89" href="$classUserFunction__header.html#ab1dffd12344c108071b5f03276c6b9fe" title="constructor from signature (for lambdas)" alt="" coords="1663,3748,1817,3788"/>
+<area shape="rect" id="node26" href="$classXML__node.html#af7768a8292eebe36599f6d958dde6731" title="collect nodes starting at anchor, return true on error" alt="" coords="1153,3287,1283,3312"/>
+<area shape="rect" id="node28" href="$classXML__node.html#aaab7a6011fdbbfcff7617a1e3029119e" title="parse an XML start or leaf tag, store result in this&#45;&gt;APL_value On error set MORE_ERROR() and return ..." alt="" coords="1407,3238,1557,3263"/>
+<area shape="rect" id="node33" href="$classQuad__CR.html#adb8eb84c4716584168f16f226c1a0ba4" title="portable variable encoding of value name (varname or varname ⊂)" alt="" coords="383,2244,577,2270"/>
+<area shape="rect" id="node35" href="$classSymbol.html#a9f5e43c937f34053d09f3406f01dacbd" title="dump this symbol to out" alt="" coords="210,4668,317,4694"/>
+<area shape="rect" id="node36" href="$classSymbolTable.html#ae8e03d7855f323239450e78d66b4b29d" title="dump symbols to out" alt="" coords="5,4668,144,4694"/>
+<area shape="rect" id="node45" href="$classTabExpansion.html#ad99a9df8a0a9ba9ad03f75e654de0bd4" title="perform tab expansion for command arguments" alt="" coords="1141,7349,1295,7389"/>
+<area shape="rect" id="node47" href="$classTabExpansion.html#ad8c4300a7d2e9aa47e6c3a1d19285db7" title="perform tab expansion" alt="" coords="639,7584,819,7610"/>
+<area shape="rect" id="node49" href="$classLineInput.html#a81610349f86404c67f583eb296666bb1" title="get a line from from user" alt="" coords="198,7706,329,7731"/>
+<area shape="rect" id="node52" href="$classStateIndicator.html#a0129e968c738e1c300e20b16533fca55" title="list the stack entry (for commands ]SI, )SI, and )SIS)" alt="" coords="1154,5162,1282,5187"/>
+<area shape="rect" id="node53" href="$classStateIndicator.html#ae8f1a9f49c7933c492f6f899fccd437f" title="list the stack entry (for command ]SI)" alt="" coords="1414,5187,1550,5212"/>
+<area shape="rect" id="node54" href="$classDoxy.html#adb0f60780eef8f3246d952596a3a19a6" title="HTML&#45;print a table with the SI stack to &#39;page&#39;." alt="" coords="1427,5251,1537,5276"/>
+<area shape="rect" id="node55" href="$classDoxy.html#ad8abe2e8a1b686a7b35e582c369d41ae" title="generate the entire documentation" alt="" coords="1177,5339,1259,5364"/>
+<area shape="rect" id="node59" href="$classWorkspace.html#a3196f2463ad078822206e8eabf4eff1b" title="list all symbols (of category which) with names in from_to" alt="" coords="1425,7956,1539,7982"/>
+<area shape="rect" id="node65" href="$classRegexp.html#a75b2beb60da3138d51d804151dc41301" title="constructor" alt="" coords="1422,3812,1542,3838"/>
+<area shape="rect" id="node66" href="$classRegexpMatch.html#a989e37f5051866d330562133d61f3aee" title="constructor" alt="" coords="1386,3714,1578,3739"/>
+<area shape="rect" id="node68" href="$structNabla_1_1FunLine.html#a0686a641df5a1123e8402dd5e44b47b8" title="print the line" alt="" coords="1411,3552,1553,3578"/>
+<area shape="rect" id="node71" href="$classNabla.html#a672cb6353bdc6ef24ab702b781bd09c7" title="return the line label (sucah as [1]) and the line text, Set is_current iff line is the current line o..." alt="" coords="1131,4095,1305,4120"/>
+<area shape="rect" id="node74" href="$classStateIndicator.html#abf0d83f5f9a8fec57751bf5636933687" title="Maybe print B (according to tag) and erase B." alt="" coords="1397,4428,1567,4468"/>
+<area shape="rect" id="node80" href="$classQuad__TF.html#aad2b15f3268d7098d75babcd03e5c762" title="return B in transfer format 2 (new APL2 format)" alt="" coords="925,636,1023,662"/>
+<area shape="rect" id="node81" href="$classQuad__TF.html#a27ed4b02d5f1a1c8a8b0a1fcbe2756f8" title="Overloaded Function::eval_AB()." alt="" coords="663,252,796,278"/>
+<area shape="rect" id="node83" href="$classWorkspace.html#a7ffca45a4446b644e7caf093a1699ba2" title="write symbols for )OUT command" alt="" coords="650,764,809,790"/>
+<area shape="rect" id="node86" href="$classQuad__TF.html#a4bd033c3e755ec0a60c0254438199b91" title="return B in transfer format 2 (new APL format) for a function" alt="" coords="1156,1256,1280,1282"/>
+<area shape="rect" id="node92" href="$classCommand.html#ac143785ae5217051a7ef49bcbde1893c" title="process line which contains an APL command. Return true iff the command was user&#45;defined (and then th..." alt="" coords="1382,5540,1582,5566"/>
+<area shape="rect" id="node93" href="$classBif__F1__EXECUTE.html#a8445cd77207db38ab66f5c3278a831df" title="execute string containing an APL command" alt="" coords="1125,5485,1311,5525"/>
+<area shape="rect" id="node95" href="$classCommand.html#ae26693534d4df16372f51e55e505b8d7" title="process line which contains a command or statements" alt="" coords="893,5808,1055,5834"/>
+<area shape="rect" id="node94" href="$classBif__F1__EXECUTE.html#aefdd09df4262f08f508f9be8543896b7" title="execute string containing an APL expression or an APL command" alt="" coords="881,5485,1067,5525"/>
+<area shape="rect" id="node97" href="$classQuad__EC.html#a44e3cc95f4d9c98ced01bf1810c32208" title="end of context handler for ⎕EC" alt="" coords="1686,5895,1794,5920"/>
+<area shape="rect" id="node100" href="$classQuad__EM.html#af44f390bce05f712cdff0ad13f834a12" title="overloaded Symbol::get_apl_value()" alt="" coords="1656,5996,1824,6022"/>
+<area shape="rect" id="node98" href="$classCommand.html#a879617e7645bea2e4052154f16999634" title="finish the current SI&#45;&gt;top() and pop it when done" alt="" coords="1397,5895,1567,5920"/>
+<area shape="rect" id="node99" href="$classCommand.html#af36741357bfd4e183b34ee8b747bc7c5" title="process line which contains APL statements" alt="" coords="1115,5895,1321,5920"/>
+<area shape="rect" id="node102" href="$classUCS__string.html#a2782990739118fb1a8cfdad52be3f058" title="same as app(const UTF8 * str)" alt="" coords="1650,2015,1830,2040"/>
+<area shape="rect" id="node103" href="$classQuad__CR.html#a0294e9347de31429cebcd1788005de7a" title="close current mode (ending &#39; for &#39;&#39; or ) for ⎕UCS())" alt="" coords="1661,2267,1819,2292"/>
+<area shape="rect" id="node104" href="$classQuad__CR.html#aabf394be562c03b413b6f4beb4a70907" title="print item separator" alt="" coords="1395,2068,1569,2094"/>
+<area shape="rect" id="node105" href="$classXML__node.html#a2ea5dcbf083d0bc6e1e05f92a6685061" title="return the inverse of normalize_attribute_value()" alt="" coords="1659,2582,1821,2622"/>
+<area shape="rect" id="node115" href="$classInputMux.html#a8a79cbe5207cde162fb36133ad9defdd" title="get one line" alt="" coords="1153,3663,1283,3688"/>
+<area shape="rect" id="node118" href="$classUCS__string.html#a8b1b2e1b3506b3d401ee7f18e9c94609" title="append C&#45;string str" alt="" coords="1659,2064,1821,2090"/>
+<area shape="rect" id="node119" href="$classNativeFunction.html#a921982adc19e1056d5be819f206cc926" title="try to open one .so file" alt="" coords="1673,2748,1807,2788"/>
+<area shape="rect" id="node107" href="$classQuad__FIO.html#afc0d29b9ac52baf3fb101b9bae907623" title="printf A to out" alt="" coords="1412,7858,1552,7883"/>
+<area shape="rect" id="node108" href="$classQuad__FIO.html#a36fdeb894607c2125307cd673284fb69" title="overloaded Function::eval_AXB()." alt="" coords="1144,7858,1292,7883"/>
+<area shape="rect" id="node111" href="$classExecutable.html#a70a75e5fb01bef90215dc8cd4dfd9d75" title="extract all lambda expressions from body and store them in lambdas" alt="" coords="1127,3562,1309,3587"/>
+<area shape="rect" id="node113" href="$classUserFunction.html#a2bedc3c56fb8daa8e4e760bbc912de68" title="set trace or stop vector" alt="" coords="632,4122,827,4147"/>
+<area shape="rect" id="node114" href="$classUserFunction.html#a37c955f6a76f58d168d4533389249cae" title="constructor for a normal (i.e. non&#45;lambda) user defined function" alt="" coords="636,4276,823,4302"/>
+<area shape="rect" id="node117" href="$classNativeFunction.html#a2d409bb7a5a9ac2b815f1450bc428cc0" title="constructor (only fix() may call it)" alt="" coords="1115,2755,1321,2780"/>
+<area shape="rect" id="node121" href="$structCommand_1_1transfer__context.html#a9c4651f90f36f6cc728e7146a3a4a0aa" title="process one record of a workspace file" alt="" coords="882,398,1066,438"/>
+<area shape="rect" id="node122" href="$classCommand.html#aa0764d08a6ae9c8270907ab7d5dc37cf" title=")IN: import a workspace file" alt="" coords="661,406,797,431"/>
+<area shape="rect" id="node125" href="$classXML__Saving__Archive.html#a3bc62d82baa6be004398f70faa1b3e8b" title="write StateIndicator entry si" alt="" coords="1667,7006,1813,7046"/>
+<area shape="rect" id="node126" href="$classXML__Saving__Archive.html#acc327395cab545ea7797d92f5c931cab" title="write entire workspace" alt="" coords="1409,7006,1555,7046"/>
+<area shape="rect" id="node137" href="$classCommand.html#a3c8718c78546d294a18e5793329e9df0" title="split whitespace separated arguments into individual arguments" alt="" coords="1671,5540,1809,5566"/>
+<area shape="rect" id="node139" href="$classQuad__CR.html#ac6f426118cad09841c8545efd5ba8a8f" title="compute a ⎕CR B" alt="" coords="1675,6046,1805,6071"/>
+<area shape="rect" id="node140" href="$classQuad__CR.html#ac60b988ceaf002189a8c60337752048f" title="overloaded Function::eval_AB()" alt="" coords="1413,6046,1551,6071"/>
+<area shape="rect" id="node141" href="$classValue.html#a6f574c5690fbcf4024a78ed14a8375db" title="print this value in 4 ⎕CR style" alt="" coords="1417,5996,1547,6022"/>
+<area shape="rect" id="node142" href="$classValue.html#a82fd0d84f4c7f0b22a6b035e0201506a" title="print info related to a stale value" alt="" coords="1407,6095,1557,6120"/>
+<area shape="rect" id="node144" href="$classValue.html#a21369bf72b3fb40d1e9558cb1497a6b0" title="print this value (line break at Workspace::get_PW())" alt="" coords="1438,6144,1526,6170"/>
+<area shape="rect" id="node150" href="$classUserFunction.html#a0ad584a87a63e6d50191b3967d64140e" title="transform a function body containing (old&#45;style) multi&#45;lines into a standard function body" alt="" coords="1137,4326,1299,4366"/>
+<area shape="rect" id="node151" href="$classUserFunction.html#a85d555fc355a3a64c4a72c64957e60bc" title="transform a function body containing (new&#45;style) multi&#45;lines into a standard function body" alt="" coords="1137,4434,1299,4474"/>
+<area shape="rect" id="node148" href="$classIO__Files.html#acc91875b8e0c7a5ad44e3ead0e3dda7b" title="get one line from the current file, open the next file if necceessary" alt="" coords="1408,4378,1556,4403"/>
+<area shape="rect" id="node149" href="$classWorkspace.html#a8c147249a197f0d605f7cfc535969c92" title="create and execute one immediate execution context" alt="" coords="1404,5030,1560,5070"/>
+<area shape="rect" id="node153" href="$classQuad__FX.html#a620032b8691c925b536077a2262e868a" title="implementation of eval_AB()" alt="" coords="1663,155,1817,180"/>
+<area shape="rect" id="node155" href="$classQuad__TF.html#a293263bd9b2bf923dc9e4113dded832f" title="try inverse ⎕TF2 of ucs, set new_var_or_fun if successful" alt="" coords="1408,255,1556,280"/>
+<area shape="rect" id="node157" href="$classQuad__FX.html#a3a7f6f355bc2d885b7d33eb94f20b58a" title="implementation of eval_B()" alt="" coords="1667,106,1813,131"/>
+<area shape="rect" id="node154" href="$classQuad__FX.html#ac19c7a3976e58dd741f7c73dafabd25a" title="overloaded Function::eval_AB()." alt="" coords="1415,206,1549,231"/>
+<area shape="rect" id="node158" href="$classQuad__FX.html#a7a13759fcc31321b9d5dd0309908305e" title="overloaded Function::eval_B()." alt="" coords="1419,156,1545,182"/>
+<area shape="rect" id="node166" href="$classQuad__ES.html#a15637aafd2f0819de2b50a6e0ae1d638" title="overloaded Function::eval_AB()." alt="" coords="1673,8967,1807,8992"/>
+<area shape="rect" id="node167" href="$classQuad__ES.html#a82fc7201ef710a3514568169a912d92a" title="overloaded Function::eval_B()." alt="" coords="1677,8918,1803,8943"/>
+<area shape="rect" id="node171" href="$structBif__F12__FORMAT_1_1Format__LIFER.html#ae046e9320007ab09735c27412f2fae29" title="format value by example" alt="" coords="1651,9105,1829,9145"/>
+<area shape="rect" id="node173" href="$classXML__Loading__Archive.html#a16b4789e109bf0167ae481b86a1ebedb" title="read a lambda" alt="" coords="1406,8126,1558,8166"/>
+<area shape="rect" id="node174" href="$classXML__Loading__Archive.html#a0cd18fa421176354e241891d951f5169" title="read a user defined Executable" alt="" coords="1142,8126,1294,8166"/>
+<area shape="rect" id="node181" href="$classBif__F12__FORMAT.html#a9d12f7ec1f6ecd8def2dd073c2a7794d" title="format value with precision mantissa digits (floating format)" alt="" coords="1395,6562,1569,6602"/>
+<area shape="rect" id="node184" href="$classUCS__string.html#ae01f4ac46af41b8f788a327a942944b9" title="convert a signed integer value to an UCS_string (like sprintf())" alt="" coords="1667,6727,1813,6752"/>
+<area shape="rect" id="node186" href="$classDoxy.html#a5eb9b5605981c826438d5a51f38bf5a4" title="HTML&#45;print a table containing all defined functions to page." alt="" coords="1407,5718,1557,5743"/>
+<area shape="rect" id="node189" href="$classError.html#a1c91620311957635852e42ba8cd695c4" title="print the 3 error message lines as per ⎕EM" alt="" coords="1686,5491,1794,5516"/>
+<area shape="rect" id="node192" href="$structCommand_1_1transfer__context.html#a73ebb1258e33db67a0d2ea54ff3efe97" title="process a &#39;C&#39; (character, in 1 ⎕TF format) item." alt="" coords="1126,430,1310,470"/>
+<area shape="rect" id="node193" href="$classNamedObject.html#a169e78235759ac3b4c6e31fcee2631ce" title="Get current NameClass of this name." alt="" coords="1663,876,1817,902"/>
+<area shape="rect" id="node196" href="$classQuad__NC.html#aa205d8959cefccd30b58f1c8d150eb44" title="return the ⎕NC for variable name var" alt="" coords="1151,815,1285,840"/>
+<area shape="rect" id="node197" href="$classWorkspace.html#aeb7918729e70694fff5b22575756f50f" title="lookup an existing name (user defined or ⎕xx, var or function). return 0 if not found." alt="" coords="1369,559,1595,584"/>
+<area shape="rect" id="node199" href="$classWorkspace.html#ad59928bcb6527147b5c5ca3e34106fe3" title="lookup an existing symbol (user defined or ⎕xx)." alt="" coords="1389,710,1575,750"/>
+<area shape="rect" id="node200" href="$structCommand_1_1transfer__context.html#a692d84840f69d40df03843f0d7589017" title="process an &#39;N&#39; (numeric in 1 ⎕TF format) item." alt="" coords="1126,494,1310,534"/>
+<area shape="rect" id="node194" href="$classQuad__NL.html#a0b9854df99461da52090eec2228d0440" title="return A ⎕NL B" alt="" coords="1403,826,1561,851"/>
+<area shape="rect" id="node195" href="$classNabla.html#aef3171c3257feab4ccf1d3309f5dd6a2" title="edit function header" alt="" coords="1403,3763,1561,3788"/>
+<area shape="rect" id="node202" href="$classTokenizer.html#a9c9924450a3c4dd6076911aa8f342171" title="tokenize UCS string input into token string tos." alt="" coords="1403,2888,1561,2914"/>
+<area shape="rect" id="node204" href="$classQuad__PLOT.html#ae6f31438074669d8b69f651556c8fa39" title="parse the (all&#45;optional) attributes in A" alt="" coords="1643,9412,1837,9438"/>
+<area shape="rect" id="node207" href="$classNabla.html#aab142fa44fcb466efd8ad5538c1c2030" title="show function" alt="" coords="1666,4758,1814,4783"/>
+<area shape="rect" id="node212" href="$classCommand.html#ae2c14c874844701377a0e716021229c7" title="list content of workspace and wslib directories: )LIB [N]" alt="" coords="1407,8006,1557,8031"/>
+<area shape="rect" id="node213" href="$classCommand.html#a7d3c3284d54674356d89f268949109c6" title="list content of workspace and wslib directories: ]LIB [N]" alt="" coords="1407,8055,1557,8080"/>
+<area shape="rect" id="node215" href="$classNabla.html#a7a9484fa4c398147d3b5681f23400da0" title="edit body line" alt="" coords="1667,4708,1813,4734"/>
+<area shape="rect" id="node217" href="$classQuad__QUOTE.html#a3306dffadf270cb0b3f377ffaca8d269" title="overloaded Symbol::get_apl_value()." alt="" coords="1661,4858,1819,4898"/>
+<area shape="rect" id="node218" href="$classLineEditContext.html#ac85e210ce3dd99ff8644b448ddedcb8e" title="constructor" alt="" coords="1655,4922,1825,4962"/>
+<area shape="rect" id="node221" href="$classPrintBuffer.html#ab939341e6e27bf73584db5adeafdd07e" title="align this real&#45;only PrintBuffer to col" alt="" coords="1668,9627,1812,9652"/>
+<area shape="rect" id="node228" href="$classXML__Loading__Archive.html#a3c747929c263a6913ea01f833ce2a9f0" title="read one or more Cell(s) from input into the ravel of Z; return the UTF8 * after the cells." alt="" coords="1664,8210,1816,8250"/>
+<area shape="rect" id="node229" href="$classXML__Loading__Archive.html#a5085841ad5dd83bd88588db76c3a2838" title="read ⍎ Executable" alt="" coords="1664,8274,1816,8314"/>
+<area shape="rect" id="node230" href="$classXML__Loading__Archive.html#a5e165853b437a502be850f3527ef8b77" title="read ◊ Executable" alt="" coords="1664,8338,1816,8378"/>
+<area shape="rect" id="node231" href="$classXML__Loading__Archive.html#ac4cdadb93d62fcd862579b84d3556804" title="read an UCS string" alt="" coords="1664,8146,1816,8186"/>
+<area shape="rect" id="node236" href="$classTabExpansion.html#a0019a0d3e9b164dc63c39acbba352fdc" title="tab&#45;expand or show help for user defined functions" alt="" coords="1663,7489,1817,7529"/>
+<area shape="rect" id="node237" href="$classTabExpansion.html#a793d1f4391a7f92f1455a03678582c12" title="tab&#45;expand a user&#45;defined name" alt="" coords="897,7577,1051,7617"/>
+<area shape="rect" id="node242" href="$classDoxy.html#a76067b55e9395dec0889368d1daa6247" title="write the page for one defined function. If the define function is a named lambda,..." alt="" coords="1669,5743,1811,5768"/>
+</map>

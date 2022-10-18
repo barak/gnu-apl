@@ -1,0 +1,6 @@
+<map id="DLX_Root_Node::get_pick_count" name="DLX_Root_Node::get_pick_count">
+<area shape="rect" id="node1" title="return the number of items picked" alt="" coords="385,23,532,63"/>
+<area shape="rect" id="node2" href="$classQuad__DLX.html#a24405a11778fa85f2ac67fe1302433ed" title="common part of eval_AB() and eval_B()" alt="" coords="196,31,337,56"/>
+<area shape="rect" id="node3" href="$classQuad__DLX.html#a519a1bbba3ab6694a935bc5b71857e0a" title="overloaded Function::eval_AB()." alt="" coords="5,5,148,31"/>
+<area shape="rect" id="node4" href="$classQuad__DLX.html#ae66d41ec74eeefefcb7d638245024e9a" title="overloaded Function::eval_B()." alt="" coords="9,55,144,80"/>
+</map>

@@ -1,123 +1,126 @@
 <map id="Function" name="Function">
-<area shape="rect" id="node3" href="$classDerivedFunction.html" title="An APL operator bound to its function operand(s) " alt="" coords="279,1905,396,1932"/>
-<area shape="rect" id="node4" href="$classNativeFunction.html" title="A defined function written in C++. " alt="" coords="282,1956,393,1983"/>
-<area shape="rect" id="node5" href="$classPrimitiveFunction.html" title="Base class for all internal functions of the interpreter. " alt="" coords="276,2007,399,2033"/>
-<area shape="rect" id="node121" href="$classUserFunction.html" title="One user&#45;defined function. " alt="" coords="287,3425,387,3452"/>
-<area shape="rect" id="node2" href="$classNamedObject.html" title="A user&#45;defined variable or function. " alt="" coords="5,1981,108,2008"/>
-<area shape="rect" id="node6" href="$classBif__JOT.html" title="The class implementing ∘ " alt="" coords="477,639,547,665"/>
-<area shape="rect" id="node7" href="$classNonscalarFunction.html" title="Base class for all internal non&#45;scalar functions of the interpreter. " alt="" coords="447,689,577,716"/>
-<area shape="rect" id="node39" href="$classPrimitiveOperator.html" title="Base class for all primitive APL operators. " alt="" coords="451,1500,573,1527"/>
-<area shape="rect" id="node52" href="$classQuadFunction.html" title="Base class for all system functions. " alt="" coords="461,2539,563,2565"/>
-<area shape="rect" id="node90" href="$classScalarFunction.html" title="Base class for all scalar functions. " alt="" coords="457,4160,567,4187"/>
-<area shape="rect" id="node8" href="$classBif__COMMA.html" title="Base class for , and ⍪ " alt="" coords="672,31,768,57"/>
-<area shape="rect" id="node11" href="$classBif__F0__ZILDE.html" title="The class implementing ⍬ (the empty numeric vector) " alt="" coords="667,81,773,108"/>
-<area shape="rect" id="node12" href="$classBif__F12__DECODE.html" title="The class implementing ⊥ " alt="" coords="654,132,786,159"/>
-<area shape="rect" id="node13" href="$classBif__F12__DOMINO.html" title="The class implementing ⌹ " alt="" coords="655,183,785,209"/>
-<area shape="rect" id="node14" href="$classBif__F12__DROP.html" title="The class implementing ↓ " alt="" coords="663,233,777,260"/>
-<area shape="rect" id="node15" href="$classBif__F12__ELEMENT.html" title="The class implementing ∈ " alt="" coords="651,284,789,311"/>
-<area shape="rect" id="node16" href="$classBif__F12__ENCODE.html" title="The class implementing ⊤ " alt="" coords="654,335,786,361"/>
-<area shape="rect" id="node17" href="$classBif__F12__EQUIV.html" title="The class implementing ≡ " alt="" coords="662,385,778,412"/>
-<area shape="rect" id="node18" href="$classBif__F12__FORMAT.html" title="The class implementing ⍕ " alt="" coords="655,436,785,463"/>
-<area shape="rect" id="node19" href="$classBif__F12__INDEX__OF.html" title="The class implementing ⍳ " alt="" coords="649,487,791,513"/>
-<area shape="rect" id="node20" href="$classBif__F12__INTERVAL__INDEX.html" title="The class implementing ⍸ " alt="" coords="625,537,815,564"/>
-<area shape="rect" id="node21" href="$classBif__F12__NEQUIV.html" title="The class implementing ≡ " alt="" coords="657,588,783,615"/>
-<area shape="rect" id="node22" href="$classBif__F12__PARTITION.html" title="The class implementing ⊂ " alt="" coords="647,639,793,665"/>
-<area shape="rect" id="node23" href="$classBif__F12__PICK.html" title="The class implementing ⊃ " alt="" coords="667,689,773,716"/>
-<area shape="rect" id="node24" href="$classBif__F12__RHO.html" title="The class implementing ⍴ " alt="" coords="668,740,772,767"/>
-<area shape="rect" id="node25" href="$classBif__F12__SORT.html" title="Base class for ⍋ and ⍒ " alt="" coords="665,791,775,817"/>
-<area shape="rect" id="node28" href="$classBif__F12__TAKE.html" title="The class implementing ↑ " alt="" coords="665,841,775,868"/>
-<area shape="rect" id="node29" href="$classBif__F12__TRANSPOSE.html" title="The class implementing ⍉ " alt="" coords="641,892,799,919"/>
-<area shape="rect" id="node30" href="$classBif__F12__UNION.html" title="The class implementing ∪ " alt="" coords="661,943,779,969"/>
-<area shape="rect" id="node31" href="$classBif__F1__EXECUTE.html" title="The class implementing ⍎ " alt="" coords="655,993,785,1020"/>
-<area shape="rect" id="node32" href="$classBif__F2__INDEX.html" title="The class implementing ⌷ " alt="" coords="665,1044,775,1071"/>
-<area shape="rect" id="node33" href="$classBif__F2__INTER.html" title="The class implementing ∩ " alt="" coords="666,1095,774,1121"/>
-<area shape="rect" id="node34" href="$classBif__F2__LEFT.html" title="The class implementing ⊣ " alt="" coords="671,1145,769,1172"/>
-<area shape="rect" id="node35" href="$classBif__F2__RIGHT.html" title="The class implementing ⊢ " alt="" coords="665,1196,775,1223"/>
-<area shape="rect" id="node36" href="$classBif__ROTATE.html" title="Base class for implementing ⌽ and ⊖ " alt="" coords="671,1247,769,1273"/>
-<area shape="rect" id="node9" href="$classBif__F12__COMMA.html" title="The class implementing ,. " alt="" coords="881,5,1007,32"/>
-<area shape="rect" id="node10" href="$classBif__F12__COMMA1.html" title="The class implementing ⍪ " alt="" coords="878,56,1010,83"/>
-<area shape="rect" id="node26" href="$classBif__F12__SORT__ASC.html" title="The class implementing ⍋ " alt="" coords="871,765,1017,792"/>
-<area shape="rect" id="node27" href="$classBif__F12__SORT__DES.html" title="The class implementing ⍒ " alt="" coords="871,816,1017,843"/>
-<area shape="rect" id="node37" href="$classBif__F12__ROTATE.html" title="The class implementing ⌽ " alt="" coords="880,1221,1008,1248"/>
-<area shape="rect" id="node38" href="$classBif__F12__ROTATE1.html" title="The class implementing ⊖ " alt="" coords="877,1272,1011,1299"/>
-<area shape="rect" id="node40" href="$classBif__OPER1__COMMUTE.html" title="The class implementing ⍨ " alt="" coords="637,1297,803,1324"/>
-<area shape="rect" id="node41" href="$classBif__OPER1__EACH.html" title="The class implementing ¨ " alt="" coords="653,1348,787,1375"/>
-<area shape="rect" id="node42" href="$classBif__OPER2__INNER.html" title="The class implementing f.g. " alt="" coords="650,1399,790,1425"/>
-<area shape="rect" id="node43" href="$classBif__OPER2__OUTER.html" title="The class implementing ∘.g. " alt="" coords="648,1449,792,1476"/>
-<area shape="rect" id="node44" href="$classBif__OPER2__POWER.html" title="The class implementing ⍣ " alt="" coords="646,1500,794,1527"/>
-<area shape="rect" id="node45" href="$classBif__OPER2__RANK.html" title="The class implementing ⍤ " alt="" coords="653,1551,787,1577"/>
-<area shape="rect" id="node46" href="$classBif__REDUCE.html" title="Base class for / and ⌿ " alt="" coords="669,1601,771,1628"/>
-<area shape="rect" id="node49" href="$classBif__SCAN.html" title="Base class for &#160;and ⍀ " alt="" coords="679,1652,761,1679"/>
-<area shape="rect" id="node47" href="$classBif__OPER1__REDUCE.html" title="The class implementing /. " alt="" coords="867,1551,1021,1577"/>
-<area shape="rect" id="node48" href="$classBif__OPER1__REDUCE1.html" title="The class implementing ⌿ " alt="" coords="863,1601,1025,1628"/>
-<area shape="rect" id="node50" href="$classBif__OPER1__SCAN.html" title="The class implementing . " alt="" coords="877,1652,1011,1679"/>
-<area shape="rect" id="node51" href="$classBif__OPER1__SCAN1.html" title="The class implementing ⍀ " alt="" coords="873,1703,1015,1729"/>
-<area shape="rect" id="node53" href="$classQuad__AF.html" title="The class implementing ⎕AF. " alt="" coords="681,1703,759,1729"/>
-<area shape="rect" id="node54" href="$classQuad__AT.html" title="The class implementing ⎕AI. " alt="" coords="681,1753,759,1780"/>
-<area shape="rect" id="node55" href="$classQuad__CR.html" title="The class implementing ⎕CR. " alt="" coords="680,1804,760,1831"/>
-<area shape="rect" id="node56" href="$classQuad__DL.html" title="The class implementing ⎕DL. " alt="" coords="681,1855,759,1881"/>
-<area shape="rect" id="node57" href="$classQuad__DLX.html" title="The class implementing ⎕DLX. " alt="" coords="677,1905,763,1932"/>
-<area shape="rect" id="node58" href="$classQuad__EA.html" title="The class implementing ⎕EA. " alt="" coords="681,1956,759,1983"/>
-<area shape="rect" id="node59" href="$classQuad__EB.html" title="The class implementing ⎕EB. " alt="" coords="681,2007,759,2033"/>
-<area shape="rect" id="node60" href="$classQuad__EC.html" title="The class implementing ⎕EC. " alt="" coords="681,2057,759,2084"/>
-<area shape="rect" id="node61" href="$classQuad__ENV.html" title="The class implementing ⎕ENV. " alt="" coords="676,2108,764,2135"/>
-<area shape="rect" id="node62" href="$classQuad__ES.html" title="The class implementing ⎕ES. " alt="" coords="681,2159,759,2185"/>
-<area shape="rect" id="node63" href="$classQuad__EX.html" title="The class implementing ⎕EX. " alt="" coords="681,2209,759,2236"/>
-<area shape="rect" id="node64" href="$classQuad__FFT.html" title="The class implementing ⎕FFT. " alt="" coords="678,2260,762,2287"/>
-<area shape="rect" id="node65" href="$classQuad__FIO.html" title="The class implementing ⎕FIO. " alt="" coords="679,2311,761,2337"/>
-<area shape="rect" id="node66" href="$classQuad__FX.html" title="The class implementing ⎕FX. " alt="" coords="681,2361,759,2388"/>
-<area shape="rect" id="node67" href="$classQuad__GTK.html" title="The class implementing ⎕GTK. " alt="" coords="677,2412,763,2439"/>
-<area shape="rect" id="node68" href="$classQuad__INP.html" title="The class implementing ⎕INP. " alt="" coords="679,2463,761,2489"/>
-<area shape="rect" id="node69" href="$classQuad__JSON.html" title="The class implementing ⎕JSON. " alt="" coords="672,2513,768,2540"/>
-<area shape="rect" id="node70" href="$classQuad__MAP.html" title="The implementation of ⎕MAP. " alt="" coords="675,2564,765,2591"/>
-<area shape="rect" id="node71" href="$classQuad__NA.html" title="The class implementing ⎕NA. " alt="" coords="681,2615,759,2641"/>
-<area shape="rect" id="node72" href="$classQuad__NC.html" title="The class implementing ⎕NC. " alt="" coords="680,2665,760,2692"/>
-<area shape="rect" id="node73" href="$classQuad__NL.html" title="The class implementing ⎕NL. " alt="" coords="681,2716,759,2743"/>
-<area shape="rect" id="node74" href="$classQuad__PLOT.html" title="The class implementing ⎕PLOT. " alt="" coords="673,2767,767,2793"/>
-<area shape="rect" id="node75" href="$classQuad__RE.html" title="The class implementing ⎕RE. " alt="" coords="681,2817,759,2844"/>
-<area shape="rect" id="node76" href="$classQuad__RVAL.html" title="a random APL value " alt="" coords="673,2868,767,2895"/>
-<area shape="rect" id="node77" href="$classQuad__SI.html" title="The class implementing ⎕SI. " alt="" coords="683,2919,757,2945"/>
-<area shape="rect" id="node78" href="$classQuad__SQL.html" title="The class implementing ⎕SQL. " alt="" coords="677,2969,763,2996"/>
-<area shape="rect" id="node79" href="$classQuad__SVC.html" title="The class implementing ⎕SVC. " alt="" coords="676,3020,764,3047"/>
-<area shape="rect" id="node80" href="$classQuad__SVO.html" title="The implementation of ⎕SVO. " alt="" coords="676,3071,764,3097"/>
-<area shape="rect" id="node81" href="$classQuad__SVQ.html" title="The implementation of ⎕SVQ. " alt="" coords="676,3121,764,3148"/>
-<area shape="rect" id="node82" href="$classQuad__SVR.html" title="The implementation of ⎕SVR. " alt="" coords="676,3172,764,3199"/>
-<area shape="rect" id="node83" href="$classQuad__SVS.html" title="The implementation of ⎕SVS. " alt="" coords="677,3223,763,3249"/>
-<area shape="rect" id="node84" href="$classQuad__TF.html" title="The class implementing ⎕TF. " alt="" coords="682,3273,758,3300"/>
-<area shape="rect" id="node85" href="$classQuad__UCS.html" title="The class implementing ⎕UCS. " alt="" coords="675,3324,765,3351"/>
-<area shape="rect" id="node86" href="$classQuad__XML.html" title="The class implementing ⎕XML. " alt="" coords="677,3375,763,3401"/>
-<area shape="rect" id="node87" href="$classStop__Trace.html" title="Base class for ⎕STOP and ⎕TRACE. " alt="" coords="675,3425,765,3452"/>
-<area shape="rect" id="node88" href="$classQuad__STOP.html" title="The class implementing ⎕STOP. " alt="" coords="896,3400,992,3427"/>
-<area shape="rect" id="node89" href="$classQuad__TRACE.html" title="The class implementing ⎕TRACE. " alt="" coords="891,3451,997,3477"/>
-<area shape="rect" id="node91" href="$classBif__F12__BINOM.html" title="The class implementing ! " alt="" coords="661,3476,779,3503"/>
-<area shape="rect" id="node92" href="$classBif__F12__CIRCLE.html" title="The class implementing ○ " alt="" coords="658,3527,782,3553"/>
-<area shape="rect" id="node93" href="$classBif__F12__DIVIDE.html" title="The class implementing ÷ " alt="" coords="660,3577,780,3604"/>
-<area shape="rect" id="node94" href="$classBif__F12__LOGA.html" title="The class implementing ⍟ " alt="" coords="665,3628,775,3655"/>
-<area shape="rect" id="node95" href="$classBif__F12__MINUS.html" title="The class implementing &#45;. " alt="" coords="661,3679,779,3705"/>
-<area shape="rect" id="node96" href="$classBif__F12__PLUS.html" title="The class implementing +. " alt="" coords="665,3729,775,3756"/>
-<area shape="rect" id="node97" href="$classBif__F12__POWER.html" title="The class implementing ⋆ " alt="" coords="657,3780,783,3807"/>
-<area shape="rect" id="node98" href="$classBif__F12__RND__DN.html" title="The class implementing ⌊ " alt="" coords="655,3831,785,3857"/>
-<area shape="rect" id="node99" href="$classBif__F12__RND__UP.html" title="The class implementing ⌈ " alt="" coords="655,3881,785,3908"/>
-<area shape="rect" id="node100" href="$classBif__F12__ROLL.html" title="The class implementing ? " alt="" coords="666,3932,774,3959"/>
-<area shape="rect" id="node101" href="$classBif__F12__STILE.html" title="The class implementing ∣ " alt="" coords="665,3983,775,4009"/>
-<area shape="rect" id="node102" href="$classBif__F12__TIMES.html" title="The class implementing × " alt="" coords="663,4033,777,4060"/>
-<area shape="rect" id="node103" href="$classBif__F12__WITHOUT.html" title="The class implementing ∼ " alt="" coords="651,4084,789,4111"/>
-<area shape="rect" id="node104" href="$classBif__F2__AND.html" title="The class implementing ∧ " alt="" coords="672,4135,768,4161"/>
-<area shape="rect" id="node105" href="$classBif__F2__AND__B.html" title="The class implementing ⊤∧ " alt="" coords="664,4185,776,4212"/>
-<area shape="rect" id="node106" href="$classBif__F2__EQUAL.html" title="The class implementing =. " alt="" coords="664,4236,776,4263"/>
-<area shape="rect" id="node107" href="$classBif__F2__EQUAL__B.html" title="The class implementing ⊤=. " alt="" coords="656,4287,784,4313"/>
-<area shape="rect" id="node108" href="$classBif__F2__FIND.html" title="The class implementing ⋸ " alt="" coords="671,4337,769,4364"/>
-<area shape="rect" id="node109" href="$classBif__F2__GREATER.html" title="The class implementing &gt; " alt="" coords="654,4388,786,4415"/>
-<area shape="rect" id="node110" href="$classBif__F2__LEQU.html" title="The class implementing ≤ " alt="" coords="669,4439,771,4465"/>
-<area shape="rect" id="node111" href="$classBif__F2__LESS.html" title="The class implementing &lt;. " alt="" coords="669,4489,771,4516"/>
-<area shape="rect" id="node112" href="$classBif__F2__MEQU.html" title="The class implementing ≥ " alt="" coords="667,4540,773,4567"/>
-<area shape="rect" id="node113" href="$classBif__F2__NAND.html" title="The class implementing ⍲ " alt="" coords="667,4591,773,4617"/>
-<area shape="rect" id="node114" href="$classBif__F2__NAND__B.html" title="The class implementing ⊤⍲ " alt="" coords="659,4641,781,4668"/>
-<area shape="rect" id="node115" href="$classBif__F2__NOR.html" title="The class implementing ⍱ " alt="" coords="671,4692,769,4719"/>
-<area shape="rect" id="node116" href="$classBif__F2__NOR__B.html" title="The class implementing ⊤⍱ " alt="" coords="663,4743,777,4769"/>
-<area shape="rect" id="node117" href="$classBif__F2__OR.html" title="The class implementing ∨ " alt="" coords="677,4793,763,4820"/>
-<area shape="rect" id="node118" href="$classBif__F2__OR__B.html" title="The class implementing ⊤∨ " alt="" coords="669,4844,771,4871"/>
-<area shape="rect" id="node119" href="$classBif__F2__UNEQ__B.html" title="The class implementing ⊤≠ " alt="" coords="659,4895,781,4921"/>
-<area shape="rect" id="node120" href="$classBif__F2__UNEQU.html" title="The class implementing ≠ " alt="" coords="662,4945,778,4972"/>
-<area shape="rect" id="node122" href="$classMacro.html" title="a system function or operator implemented as an internal defined function " alt="" coords="483,4211,541,4237"/>
+<area shape="rect" id="node1" title="Base class for all APL functions and operators (system or defined)" alt="" coords="156,1651,228,1676"/>
+<area shape="rect" id="node3" href="$classDerivedFunction.html" title="An APL operator bound to its function operand(s)" alt="" coords="279,1576,396,1601"/>
+<area shape="rect" id="node4" href="$classNativeFunction.html" title="A defined function written in C++." alt="" coords="282,1625,393,1651"/>
+<area shape="rect" id="node5" href="$classPrimitiveFunction.html" title="Base class for all internal functions of the interpreter." alt="" coords="276,1675,399,1700"/>
+<area shape="rect" id="node123" href="$classUserFunction.html" title="One user&#45;defined function." alt="" coords="287,2513,387,2539"/>
+<area shape="rect" id="node2" href="$classNamedObject.html" title="A user&#45;defined variable or function." alt="" coords="5,1651,108,1676"/>
+<area shape="rect" id="node6" href="$classBif__JOT.html" title="The class implementing ∘" alt="" coords="477,449,547,475"/>
+<area shape="rect" id="node7" href="$classNonscalarFunction.html" title="Base class for all internal non&#45;scalar functions of the interpreter." alt="" coords="447,499,577,524"/>
+<area shape="rect" id="node40" href="$classPrimitiveOperator.html" title="Base class for all primitive APL operators." alt="" coords="451,1156,573,1181"/>
+<area shape="rect" id="node53" href="$classQuadFunction.html" title="Base class for all system functions." alt="" coords="461,2192,563,2217"/>
+<area shape="rect" id="node92" href="$classScalarFunction.html" title="Base class for all scalar functions." alt="" coords="457,3795,567,3820"/>
+<area shape="rect" id="node8" href="$classBif__F0__ZILDE.html" title="The class implementing ⍬ (the empty numeric vector)" alt="" coords="667,5,773,31"/>
+<area shape="rect" id="node9" href="$classBif__F12__DECODE.html" title="The class implementing ⊥" alt="" coords="654,55,786,80"/>
+<area shape="rect" id="node10" href="$classBif__F12__DROP.html" title="The class implementing ↓" alt="" coords="663,104,777,129"/>
+<area shape="rect" id="node11" href="$classBif__F12__ELEMENT.html" title="The class implementing ϵ" alt="" coords="651,153,789,179"/>
+<area shape="rect" id="node12" href="$classBif__F12__ENCODE.html" title="The class implementing ⊤" alt="" coords="654,203,786,228"/>
+<area shape="rect" id="node13" href="$classBif__F12__EQUIV.html" title="The class implementing ≡" alt="" coords="662,252,778,277"/>
+<area shape="rect" id="node14" href="$classBif__F12__FORMAT.html" title="The class implementing ⍕" alt="" coords="655,301,785,327"/>
+<area shape="rect" id="node15" href="$classBif__F12__INDEX__OF.html" title="The class implementing ⍳" alt="" coords="649,351,791,376"/>
+<area shape="rect" id="node16" href="$classBif__F12__INTERVAL__INDEX.html" title="The class implementing ⍸" alt="" coords="625,400,815,425"/>
+<area shape="rect" id="node17" href="$classBif__F12__NEQUIV.html" title="The class implementing ≡" alt="" coords="657,449,783,475"/>
+<area shape="rect" id="node18" href="$classBif__F12__PICK.html" title="The class implementing ⊃" alt="" coords="667,499,773,524"/>
+<area shape="rect" id="node19" href="$classBif__F12__SORT.html" title="Base class for ⍋ and ⍒" alt="" coords="665,548,775,573"/>
+<area shape="rect" id="node22" href="$classBif__F12__UNION.html" title="The class implementing ∪" alt="" coords="661,597,779,623"/>
+<area shape="rect" id="node23" href="$classBif__F1__EXECUTE.html" title="The class implementing ⍎" alt="" coords="655,647,785,672"/>
+<area shape="rect" id="node24" href="$classBif__F2__INDEX.html" title="The class implementing ⌷" alt="" coords="665,696,775,721"/>
+<area shape="rect" id="node25" href="$classBif__F2__INTER.html" title="The class implementing ∩" alt="" coords="666,745,774,771"/>
+<area shape="rect" id="node26" href="$classBif__F2__LEFT.html" title="The class implementing ⊣" alt="" coords="671,795,769,820"/>
+<area shape="rect" id="node27" href="$classBif__F2__RIGHT.html" title="The class implementing ⊢" alt="" coords="665,844,775,869"/>
+<area shape="rect" id="node28" href="$classNonscalarFunction__default__identity.html" title="Base class for all internal non&#45;scalar functions of the interpreter." alt="" coords="631,894,809,934"/>
+<area shape="rect" id="node20" href="$classBif__F12__SORT__ASC.html" title="The class implementing ⍋" alt="" coords="871,524,1017,549"/>
+<area shape="rect" id="node21" href="$classBif__F12__SORT__DES.html" title="The class implementing ⍒" alt="" coords="871,573,1017,599"/>
+<area shape="rect" id="node29" href="$classBif__COMMA.html" title="Base class for , and ⍪" alt="" coords="896,753,992,779"/>
+<area shape="rect" id="node32" href="$classBif__F12__DOMINO.html" title="The class implementing ⌹" alt="" coords="879,803,1009,828"/>
+<area shape="rect" id="node33" href="$classBif__F12__PARTITION.html" title="The class implementing ⊂" alt="" coords="871,852,1017,877"/>
+<area shape="rect" id="node34" href="$classBif__F12__RHO.html" title="The class implementing ⍴" alt="" coords="892,901,996,927"/>
+<area shape="rect" id="node35" href="$classBif__F12__TAKE.html" title="The class implementing ↑" alt="" coords="889,951,999,976"/>
+<area shape="rect" id="node36" href="$classBif__F12__TRANSPOSE.html" title="The class implementing ⍉" alt="" coords="865,1000,1023,1025"/>
+<area shape="rect" id="node37" href="$classBif__ROTATE.html" title="Base class for implementing ⌽ and ⊖" alt="" coords="895,1049,993,1075"/>
+<area shape="rect" id="node30" href="$classBif__F12__COMMA.html" title="The class implementing ,." alt="" coords="1078,729,1203,755"/>
+<area shape="rect" id="node31" href="$classBif__F12__COMMA1.html" title="The class implementing ⍪" alt="" coords="1075,779,1207,804"/>
+<area shape="rect" id="node38" href="$classBif__F12__ROTATE.html" title="The class implementing ⌽" alt="" coords="1077,1025,1205,1051"/>
+<area shape="rect" id="node39" href="$classBif__F12__ROTATE1.html" title="The class implementing ⊖" alt="" coords="1073,1075,1208,1100"/>
+<area shape="rect" id="node41" href="$classBif__OPER1__COMMUTE.html" title="The class implementing ⍨" alt="" coords="637,959,803,984"/>
+<area shape="rect" id="node42" href="$classBif__OPER1__EACH.html" title="The class implementing ¨" alt="" coords="653,1008,787,1033"/>
+<area shape="rect" id="node43" href="$classBif__OPER2__INNER.html" title="The class implementing f.g." alt="" coords="650,1057,790,1083"/>
+<area shape="rect" id="node44" href="$classBif__OPER2__OUTER.html" title="The class implementing ∘.g." alt="" coords="648,1107,792,1132"/>
+<area shape="rect" id="node45" href="$classBif__OPER2__POWER.html" title="The class implementing ⍣" alt="" coords="646,1156,794,1181"/>
+<area shape="rect" id="node46" href="$classBif__OPER2__RANK.html" title="The class implementing ⍤" alt="" coords="653,1205,787,1231"/>
+<area shape="rect" id="node47" href="$classBif__REDUCE.html" title="Base class for / and ⌿" alt="" coords="669,1255,771,1280"/>
+<area shape="rect" id="node50" href="$classBif__SCAN.html" title="Base class for \ and ⍀" alt="" coords="679,1304,761,1329"/>
+<area shape="rect" id="node48" href="$classBif__OPER1__REDUCE.html" title="The class implementing /." alt="" coords="867,1205,1021,1231"/>
+<area shape="rect" id="node49" href="$classBif__OPER1__REDUCE1.html" title="The class implementing ⌿" alt="" coords="863,1255,1025,1280"/>
+<area shape="rect" id="node51" href="$classBif__OPER1__SCAN.html" title="The class implementing ." alt="" coords="877,1304,1011,1329"/>
+<area shape="rect" id="node52" href="$classBif__OPER1__SCAN1.html" title="The class implementing ⍀" alt="" coords="873,1353,1015,1379"/>
+<area shape="rect" id="node54" href="$classQuad__AF.html" title="The class implementing ⎕AF." alt="" coords="681,1353,759,1379"/>
+<area shape="rect" id="node55" href="$classQuad__AT.html" title="The class implementing ⎕AI." alt="" coords="681,1403,759,1428"/>
+<area shape="rect" id="node56" href="$classQuad__CR.html" title="The class implementing ⎕CR." alt="" coords="680,1452,760,1477"/>
+<area shape="rect" id="node57" href="$classQuad__DL.html" title="The class implementing ⎕DL." alt="" coords="681,1501,759,1527"/>
+<area shape="rect" id="node58" href="$classQuad__DLX.html" title="The class implementing ⎕DLX." alt="" coords="677,1551,763,1576"/>
+<area shape="rect" id="node59" href="$classQuad__EA.html" title="The class implementing ⎕EA." alt="" coords="681,1600,759,1625"/>
+<area shape="rect" id="node60" href="$classQuad__EB.html" title="The class implementing ⎕EB." alt="" coords="681,1649,759,1675"/>
+<area shape="rect" id="node61" href="$classQuad__EC.html" title="The class implementing ⎕EC." alt="" coords="681,1699,759,1724"/>
+<area shape="rect" id="node62" href="$classQuad__ENV.html" title="The class implementing ⎕ENV." alt="" coords="676,1748,764,1773"/>
+<area shape="rect" id="node63" href="$classQuad__ES.html" title="The class implementing ⎕ES." alt="" coords="681,1797,759,1823"/>
+<area shape="rect" id="node64" href="$classQuad__EX.html" title="The class implementing ⎕EX." alt="" coords="681,1847,759,1872"/>
+<area shape="rect" id="node65" href="$classQuad__FFT.html" title="The class implementing ⎕FFT." alt="" coords="678,1896,762,1921"/>
+<area shape="rect" id="node66" href="$classQuad__FIO.html" title="The class implementing ⎕FIO." alt="" coords="679,1945,761,1971"/>
+<area shape="rect" id="node67" href="$classQuad__FX.html" title="The class implementing ⎕FX." alt="" coords="681,1995,759,2020"/>
+<area shape="rect" id="node68" href="$classQuad__GTK.html" title="The class implementing ⎕GTK." alt="" coords="677,2044,763,2069"/>
+<area shape="rect" id="node69" href="$classQuad__INP.html" title="The class implementing ⎕INP." alt="" coords="679,2093,761,2119"/>
+<area shape="rect" id="node70" href="$classQuad__JSON.html" title="The class implementing ⎕JSON." alt="" coords="672,2143,768,2168"/>
+<area shape="rect" id="node71" href="$classQuad__MAP.html" title="The implementation of ⎕MAP." alt="" coords="675,2192,765,2217"/>
+<area shape="rect" id="node72" href="$classQuad__NA.html" title="The class implementing ⎕NA." alt="" coords="681,2241,759,2267"/>
+<area shape="rect" id="node73" href="$classQuad__NC.html" title="The class implementing ⎕NC." alt="" coords="680,2291,760,2316"/>
+<area shape="rect" id="node74" href="$classQuad__NL.html" title="The class implementing ⎕NL." alt="" coords="681,2340,759,2365"/>
+<area shape="rect" id="node75" href="$classQuad__PLOT.html" title="The class implementing ⎕PLOT." alt="" coords="673,2389,767,2415"/>
+<area shape="rect" id="node76" href="$classQuad__PNG.html" title="The class implementing ⎕PNG." alt="" coords="675,2439,765,2464"/>
+<area shape="rect" id="node77" href="$classQuad__RE.html" title="The class implementing ⎕RE." alt="" coords="681,2488,759,2513"/>
+<area shape="rect" id="node78" href="$classQuad__RVAL.html" title="a random APL value" alt="" coords="673,2537,767,2563"/>
+<area shape="rect" id="node79" href="$classQuad__SI.html" title="The class implementing ⎕SI." alt="" coords="683,2587,757,2612"/>
+<area shape="rect" id="node80" href="$classQuad__SQL.html" title="The class implementing ⎕SQL." alt="" coords="677,2636,763,2661"/>
+<area shape="rect" id="node81" href="$classQuad__SVC.html" title="The class implementing ⎕SVC." alt="" coords="676,2685,764,2711"/>
+<area shape="rect" id="node82" href="$classQuad__SVO.html" title="The implementation of ⎕SVO." alt="" coords="676,2735,764,2760"/>
+<area shape="rect" id="node83" href="$classQuad__SVQ.html" title="The implementation of ⎕SVQ." alt="" coords="676,2784,764,2809"/>
+<area shape="rect" id="node84" href="$classQuad__SVR.html" title="The implementation of ⎕SVR." alt="" coords="676,2833,764,2859"/>
+<area shape="rect" id="node85" href="$classQuad__SVS.html" title="The implementation of ⎕SVS." alt="" coords="677,2883,763,2908"/>
+<area shape="rect" id="node86" href="$classQuad__TF.html" title="The class implementing ⎕TF." alt="" coords="682,2932,758,2957"/>
+<area shape="rect" id="node87" href="$classQuad__UCS.html" title="The class implementing ⎕UCS." alt="" coords="675,2981,765,3007"/>
+<area shape="rect" id="node88" href="$classQuad__XML.html" title="The class implementing ⎕XML." alt="" coords="677,3031,763,3056"/>
+<area shape="rect" id="node89" href="$classStop__Trace.html" title="Base class for ⎕STOP and ⎕TRACE." alt="" coords="675,3080,765,3105"/>
+<area shape="rect" id="node90" href="$classQuad__STOP.html" title="The class implementing ⎕STOP." alt="" coords="896,3056,992,3081"/>
+<area shape="rect" id="node91" href="$classQuad__TRACE.html" title="The class implementing ⎕TRACE." alt="" coords="891,3105,997,3131"/>
+<area shape="rect" id="node93" href="$classBif__F12__BINOM.html" title="The class implementing !" alt="" coords="661,3129,779,3155"/>
+<area shape="rect" id="node94" href="$classBif__F12__CIRCLE.html" title="The class implementing ○" alt="" coords="658,3179,782,3204"/>
+<area shape="rect" id="node95" href="$classBif__F12__DIVIDE.html" title="The class implementing ÷" alt="" coords="660,3228,780,3253"/>
+<area shape="rect" id="node96" href="$classBif__F12__LOGA.html" title="The class implementing ⍟" alt="" coords="665,3277,775,3303"/>
+<area shape="rect" id="node97" href="$classBif__F12__MINUS.html" title="The class implementing &#45;." alt="" coords="661,3327,779,3352"/>
+<area shape="rect" id="node98" href="$classBif__F12__PLUS.html" title="The class implementing +." alt="" coords="665,3376,775,3401"/>
+<area shape="rect" id="node99" href="$classBif__F12__POWER.html" title="The class implementing ⋆" alt="" coords="657,3425,783,3451"/>
+<area shape="rect" id="node100" href="$classBif__F12__RND__DN.html" title="The class implementing ⌊" alt="" coords="655,3475,785,3500"/>
+<area shape="rect" id="node101" href="$classBif__F12__RND__UP.html" title="The class implementing ⌈" alt="" coords="655,3524,785,3549"/>
+<area shape="rect" id="node102" href="$classBif__F12__ROLL.html" title="The class implementing ?" alt="" coords="666,3573,774,3599"/>
+<area shape="rect" id="node103" href="$classBif__F12__STILE.html" title="The class implementing ∣" alt="" coords="665,3623,775,3648"/>
+<area shape="rect" id="node104" href="$classBif__F12__TIMES.html" title="The class implementing ×" alt="" coords="663,3672,777,3697"/>
+<area shape="rect" id="node105" href="$classBif__F12__WITHOUT.html" title="The class implementing ∼" alt="" coords="651,3721,789,3747"/>
+<area shape="rect" id="node106" href="$classBif__F2__AND.html" title="The class implementing ∧" alt="" coords="672,3771,768,3796"/>
+<area shape="rect" id="node107" href="$classBif__F2__AND__B.html" title="The class implementing ⊤∧" alt="" coords="664,3820,776,3845"/>
+<area shape="rect" id="node108" href="$classBif__F2__EQUAL.html" title="The class implementing =." alt="" coords="664,3869,776,3895"/>
+<area shape="rect" id="node109" href="$classBif__F2__EQUAL__B.html" title="The class implementing ⊤=." alt="" coords="656,3919,784,3944"/>
+<area shape="rect" id="node110" href="$classBif__F2__FIND.html" title="The class implementing ⋸" alt="" coords="671,3968,769,3993"/>
+<area shape="rect" id="node111" href="$classBif__F2__GREATER.html" title="The class implementing &gt;" alt="" coords="654,4017,786,4043"/>
+<area shape="rect" id="node112" href="$classBif__F2__LEQU.html" title="The class implementing ≤" alt="" coords="669,4067,771,4092"/>
+<area shape="rect" id="node113" href="$classBif__F2__LESS.html" title="The class implementing &lt;." alt="" coords="669,4116,771,4141"/>
+<area shape="rect" id="node114" href="$classBif__F2__MEQU.html" title="The class implementing ≥" alt="" coords="667,4165,773,4191"/>
+<area shape="rect" id="node115" href="$classBif__F2__NAND.html" title="The class implementing ⍲" alt="" coords="667,4215,773,4240"/>
+<area shape="rect" id="node116" href="$classBif__F2__NAND__B.html" title="The class implementing ⊤⍲" alt="" coords="659,4264,781,4289"/>
+<area shape="rect" id="node117" href="$classBif__F2__NOR.html" title="The class implementing ⍱" alt="" coords="671,4313,769,4339"/>
+<area shape="rect" id="node118" href="$classBif__F2__NOR__B.html" title="The class implementing ⊤⍱" alt="" coords="663,4363,777,4388"/>
+<area shape="rect" id="node119" href="$classBif__F2__OR.html" title="The class implementing ∨" alt="" coords="677,4412,763,4437"/>
+<area shape="rect" id="node120" href="$classBif__F2__OR__B.html" title="The class implementing ⊤∨" alt="" coords="669,4461,771,4487"/>
+<area shape="rect" id="node121" href="$classBif__F2__UNEQU.html" title="The class implementing ≠" alt="" coords="662,4511,778,4536"/>
+<area shape="rect" id="node122" href="$classBif__F2__UNEQ__B.html" title="The class implementing ⊤≠" alt="" coords="659,4560,781,4585"/>
+<area shape="rect" id="node124" href="$classMacro.html" title="a system function or operator implemented as an internal defined function" alt="" coords="483,3844,541,3869"/>
 </map>

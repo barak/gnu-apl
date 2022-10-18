@@ -1,0 +1,4 @@
+<map id="Svar_partner::set_control" name="Svar_partner::set_control">
+<area shape="rect" id="node1" title="set the control bits of this partner (as seen by the offering partner)" alt="" coords="217,5,385,31"/>
+<area shape="rect" id="node2" href="$structSvar__record.html#a4909c9c63d6fe45b4cdfb4b6cad7762f" title="set the control bits of this variable" alt="" coords="5,5,169,31"/>
+</map>

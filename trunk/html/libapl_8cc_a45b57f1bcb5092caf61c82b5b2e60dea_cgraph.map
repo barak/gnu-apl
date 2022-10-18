@@ -1,0 +1,13 @@
+<map id="apl_command_ucs" name="apl_command_ucs">
+<area shape="rect" id="node2" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string " alt="" coords="1073,139,1213,165"/>
+<area shape="rect" id="node3" href="$classCommand.html#ac143785ae5217051a7ef49bcbde1893c" title="process line which contains an APL command. Return true iff the command was user&#45;defined (and then th..." alt="" coords="184,277,384,304"/>
+<area shape="rect" id="node5" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length " alt="" coords="1082,341,1205,368"/>
+<area shape="rect" id="node4" href="$classUCS__string.html#a21c71f20fbd921dd1933404a2674c3cb" title="skip leading whitespaces starting at idx, append the following non&#45;whitespaces (if any) to dest..." alt="" coords="861,261,1025,288"/>
+<area shape="rect" id="node6" href="$classCommand.html#a3c8718c78546d294a18e5793329e9df0" title="split whitespace separated arguments into individual arguments " alt="" coords="667,312,806,339"/>
+<area shape="rect" id="node7" href="$classUCS__string.html#a59758db55104daa7d4d72933412f86e3" title="return true if this starts with prefix (ASCII, case insensitive). " alt="" coords="878,363,1009,405"/>
+<area shape="rect" id="node8" href="$classWorkspace.html#a5ebd29d8c860b589b9f1d8118a949514" title="return reference to more info about last error " alt="" coords="443,277,601,304"/>
+<area shape="rect" id="node9" href="$classWorkspace.html#a24d1064a95b346bac85d5b2423c7148c" title="Return all user&#45;defined commands. " alt="" coords="663,43,810,85"/>
+<area shape="rect" id="node10" href="$classCommand.html#a2f17c91a8b65e540a207da7c3be94dec" title="execute a user defined command " alt="" coords="432,168,612,195"/>
+<area shape="rect" id="node11" href="$classUCS__string.html#aaa6ebd4a175a47347101721aa86322dd" title="append other in quotes, doubling quoted in other " alt="" coords="873,161,1013,202"/>
+<area shape="rect" id="node12" href="$classCommand.html#ac70a0a220bae16cdb98b389f4872c85d" title="parse the argument of the ]LOG command and set logging accordingly " alt="" coords="660,211,813,237"/>
+</map>

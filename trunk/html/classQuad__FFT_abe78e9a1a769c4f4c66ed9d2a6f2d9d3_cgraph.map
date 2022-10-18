@@ -1,0 +1,18 @@
+<map id="Quad_FFT::eval_AB" name="Quad_FFT::eval_AB">
+<area shape="rect" id="node1" title="overloaded Function::eval_AB()" alt="" coords="5,223,147,249"/>
+<area shape="rect" id="node2" href="$classQuad__FFT.html#a9926610e55253b1936787331d2478b3c" title="return the Blackman&#45;Harris window value for sample n of N" alt="" coords="219,5,367,45"/>
+<area shape="rect" id="node3" href="$classQuad__FFT.html#a2b398321ae8bcbb3aba02bbec1238c83" title="return the Blackman&#45;Nuttallwindow value for sample n of N" alt="" coords="219,69,367,109"/>
+<area shape="rect" id="node4" href="$classQuad__FFT.html#a2aaa7325f217cd9cea58b7f24860c9f9" title="return the Hann window value for sample n of N" alt="" coords="219,133,367,173"/>
+<area shape="rect" id="node5" href="$classQuad__FFT.html#a7a8006752a7ad3e4305c26f98355e7a3" title="compute forward or backward FFT" alt="" coords="230,198,355,223"/>
+<area shape="rect" id="node10" href="$classQuad__FFT.html#a61cc29705b43d43468f5188e4a0204f7" title="return the values of the window function win for length N" alt="" coords="214,247,371,273"/>
+<area shape="rect" id="node14" href="$classQuad__FFT.html#a7593a802f5513cff5794efff68d7f90f" title="return the Flat&#45;Top window value for sample n of N" alt="" coords="225,297,360,322"/>
+<area shape="rect" id="node15" href="$classQuad__FFT.html#a45763fda1380416bd1d11446e3294351" title="return the Hamming window value for sample n of N" alt="" coords="195,346,391,371"/>
+<area shape="rect" id="node16" href="$classQuad__FFT.html#acc5cbe8e18a33c9e58e118872475a511" title="return the Hann window value for sample n of N" alt="" coords="207,395,378,421"/>
+<area shape="rect" id="node6" href="$classQuad__FFT.html#a61b50203a79543db43ad5cbfb44e0648" title="initialize in from B" alt="" coords="449,146,575,171"/>
+<area shape="rect" id="node7" href="$classQuad__FFT.html#a47ae31a9881643eb3caf1397d6584fb6" title="set up a multi&#45;dimensional window for shape sh, using the window function win" alt="" coords="633,171,789,197"/>
+<area shape="rect" id="node8" href="$classShape.html#a017e9a35dd20f4bc4fdeb7ea29b6805d" title="return the rank" alt="" coords="858,146,975,171"/>
+<area shape="rect" id="node9" href="$classShape.html#a592d2ade68aa8c21c5d84627c3a0e001" title="return the length of dimension r" alt="" coords="837,195,996,221"/>
+<area shape="rect" id="node11" href="$classCell.html#a0e6b9239fa77e3222f32400d51c8f114" title="Return the imaginary part of a cell." alt="" coords="440,247,584,273"/>
+<area shape="rect" id="node12" href="$classCell.html#a9a0028fd74f00deb001a8062a55916c6" title="Return the real part of a cell." alt="" coords="443,297,581,322"/>
+<area shape="rect" id="node13" href="$classCell.html#a62919edef3b6b585e544dcf2865402eb" title="Return true iff this cell is a complex number cell." alt="" coords="439,346,585,371"/>
+</map>

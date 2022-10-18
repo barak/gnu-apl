@@ -1,0 +1,8 @@
+<map id="Quad_PNG::read_PNG_file" name="Quad_PNG::read_PNG_file">
+<area shape="rect" id="node1" title="read PNG file filename and return its pixels as 4×N×M matrix" alt="" coords="5,119,188,145"/>
+<area shape="rect" id="node2" href="$classUTF8__string.html#aabaebbdfbe8fad48e44655144f5fbd5e" title="append a 0&#45;terminated C string" alt="" coords="245,5,389,45"/>
+<area shape="rect" id="node3" href="$classUTF8__string.html#a922bd7ebc6a8ea5c6ba9c54159b18a93" title="return this string as a 0&#45;terminated C string" alt="" coords="251,70,382,95"/>
+<area shape="rect" id="node4" href="$classUTF8__string.html#a75b4e440d7576c690934bc7b5f863ac6" title="return true iff string ends with ext (usually a file name extension)" alt="" coords="236,119,397,145"/>
+<area shape="rect" id="node5" href="$Quad__PNG_8cc.html#a3943cc310023d7accfbb3ee9c711edf1" title="callback for libpng errors" alt="" coords="280,169,353,194"/>
+<area shape="rect" id="node6" href="$Quad__PNG_8cc.html#a433f99e363c749b4713e3567f3e80b75" title="callback for libpng warnings" alt="" coords="273,218,360,243"/>
+</map>

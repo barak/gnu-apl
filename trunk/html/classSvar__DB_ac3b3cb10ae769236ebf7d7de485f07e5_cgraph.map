@@ -1,0 +1,10 @@
+<map id="Svar_DB::find_pairing_key" name="Svar_DB::find_pairing_key">
+<area shape="rect" id="node1" title="some shared variables names belong to a pair, like CTL and DAT in AP210. return the key of the other ..." alt="" coords="5,70,183,95"/>
+<area shape="rect" id="node2" href="$classSignal__base.html#acd5af5fa5f97f2e9840bdabdc0573b8e" title="APserver result for: find pairing key access functions for signal PAIRING_KEY_IS....." alt="" coords="231,5,420,45"/>
+<area shape="rect" id="node5" href="$classSvar__DB.html#ac10f9507c18657397c050432da27cdac" title="return the fd towards APserver" alt="" coords="249,70,401,95"/>
+<area shape="rect" id="node6" href="$classSignal__base.html#ae6862da3b4684bf41e1a427ebece92e9" title="receive a signal (TCP)" alt="" coords="245,119,405,145"/>
+<area shape="rect" id="node3" href="$classSignal__base.html#a4e35a5a0fd9ced011b83a11ac304724c" title="get function for an item that is not defined for the signal" alt="" coords="477,13,624,38"/>
+<area shape="rect" id="node4" href="$classSignal__base.html#a77d69692410bd7b7d49033b73fcfc8fc" title="return the name of the ID of the signal" alt="" coords="681,13,860,38"/>
+<area shape="rect" id="node7" href="$classSig__item__int.html#a5e6903d94a367f8e7e9540881ddf389e" title="return the value of the item" alt="" coords="468,94,633,119"/>
+<area shape="rect" id="node8" href="$classSignal__base.html#a774958a4504fa7536cc941a3736d5b2c" title="print the signal" alt="" coords="487,143,614,169"/>
+</map>

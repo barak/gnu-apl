@@ -1,0 +1,14 @@
+<map id="signal_TERM_handler" name="signal_TERM_handler">
+<area shape="rect" id="node2" href="$Common_8cc.html#a4fd787706217602dfbb3ff11be93c163" title="the opposite of init() " alt="" coords="253,157,320,184"/>
+<area shape="rect" id="node11" href="$classThread__context.html#a770b7101581894235605003726ebdc62" title="print all TaskTree nodes " alt="" coords="204,259,369,285"/>
+<area shape="rect" id="node3" href="$classNativeFunction.html#aba529e2fce0340cdceffd925e7d4afaa" title="close all shared libs " alt="" coords="419,5,582,32"/>
+<area shape="rect" id="node4" href="$classID.html#a715753f745ba4da22ccfb9e717551d67" title="release UCS_strings with ID names " alt="" coords="456,56,545,83"/>
+<area shape="rect" id="node5" href="$classThread__context.html#a4d1afd3b11805b10245fff9bd67b8fa2" title="remove all thread contexts (when the APL interpreter exits) " alt="" coords="418,107,583,133"/>
+<area shape="rect" id="node6" href="$classLineInput.html#a1d571190d496dcbabb4539843c1fcc22" title="close this line input, maybe updating the history " alt="" coords="443,157,558,184"/>
+<area shape="rect" id="node7" href="$classProcessorID.html#a99bcbea1c74ee07fcc5dffea80fd120f" title="disconnect from APnnn process " alt="" coords="417,208,584,235"/>
+<area shape="rect" id="node10" href="$classOutput.html#a2692045d0f0457f8ce9b476e8ba4dad3" title="reset colors to black and white " alt="" coords="431,259,571,285"/>
+<area shape="rect" id="node8" href="$classSvar__DB.html#aca738ecf3248e35512167439caa9f0a9" title="print TCP error information " alt="" coords="632,208,792,235"/>
+<area shape="rect" id="node9" href="$Svar__DB_8cc.html#a71acfcb14978e888c49c9dd5e1cbe9b7" title="get_CERR" alt="" coords="840,208,927,235"/>
+<area shape="rect" id="node12" href="$classThread__context.html#adc73bb9ae1ecb7b10830bd073201f7ea" title="print this TaskTree node " alt="" coords="428,309,573,336"/>
+<area shape="rect" id="node13" href="$classThread__context.html#aba6ab97ae2a6542738f93831bd73fa14" title="return the number of the core executing this context " alt="" coords="635,309,789,336"/>
+</map>

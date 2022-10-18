@@ -1,0 +1,7 @@
+<map id="Quad_R::get_apl_value" name="Quad_R::get_apl_value">
+<area shape="rect" id="node1" title="overloaded Symbol::get_apl_value()." alt="" coords="5,77,164,102"/>
+<area shape="rect" id="node2" href="$classWorkspace.html#adb5d3a5778463b45027083a09b8d2eb3" title="the topmost SI with an error, maybe require ⎕L, ⎕R, or ⎕X." alt="" coords="212,77,379,102"/>
+<area shape="rect" id="node3" href="$classUserFunction__header.html#a02e0fedf3b2ad3d50a2d3903bb9be6f9" title="return error if header was not parsed successfully" alt="" coords="427,5,573,45"/>
+<area shape="rect" id="node4" href="$classStateIndicator.html#a44d07945c56abef5505efcfdc98ec090" title="return the SI that has called this one" alt="" coords="435,69,565,109"/>
+<area shape="rect" id="node5" href="$classWorkspace.html#a8083efc2d51067edb25ae8dd4f014173" title="the top of the SI stack (the SI pushed last)" alt="" coords="433,134,567,159"/>
+</map>

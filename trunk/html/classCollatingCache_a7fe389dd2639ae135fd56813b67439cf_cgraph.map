@@ -1,0 +1,4 @@
+<map id="CollatingCache::find_entry" name="CollatingCache::find_entry">
+<area shape="rect" id="node1" title="find (the index of) the entry for uni" alt="" coords="5,5,145,45"/>
+<area shape="rect" id="node2" href="$structCollatingCacheEntry.html#a2d49fc4b9a42635240f1cd40e46ee744" title="compare key with entry (for Heapsort::search())" alt="" coords="193,5,336,45"/>
+</map>

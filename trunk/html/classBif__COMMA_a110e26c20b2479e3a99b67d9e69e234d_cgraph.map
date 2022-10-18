@@ -1,0 +1,11 @@
+<map id="Bif_COMMA::append_scalar" name="Bif_COMMA::append_scalar">
+<area shape="rect" id="node1" title="Prepend scalar cell_B to A along axis." alt="" coords="5,129,193,155"/>
+<area shape="rect" id="node2" href="$classCell.html#a62e4fd0b2c216efc0e23904e53ca7ecc" title="copy (deep) count cells from src to dest)" alt="" coords="280,5,361,31"/>
+<area shape="rect" id="node4" href="$classValue__P__Base.html#a1c3bf1b6f708eb2c1ba4b97c83adb9aa" title="return a const pointer to the Value" alt="" coords="253,55,388,80"/>
+<area shape="rect" id="node5" href="$classShape.html#a592d2ade68aa8c21c5d84627c3a0e001" title="return the length of dimension r" alt="" coords="241,104,400,129"/>
+<area shape="rect" id="node6" href="$classShape3.html#a075643abf890c05401f1b7abdc5339cf" title="the dimensions above r the axis" alt="" coords="280,153,361,179"/>
+<area shape="rect" id="node7" href="$classShape3.html#ad3ff2e3be69b9ca0085d211e3ecb2801" title="the dimensions below the axis" alt="" coords="282,203,359,228"/>
+<area shape="rect" id="node8" href="$classShape.html#afcd3708c8c18a30cb3c0c1fa1a630f71" title="modify dimension r" alt="" coords="241,252,400,277"/>
+<area shape="rect" id="node3" href="$classCell.html#aab9681b3e735d10ef92978c5c17bf95d" title="init (uninitialized) Cell other from this initialized cell" alt="" coords="483,5,590,31"/>
+<area shape="rect" id="node9" href="$classShape.html#a189c92d0b74f3313bd83c8aa7565e9c5" title="recompute volume (after changing a dimension of len 0)" alt="" coords="448,252,625,277"/>
+</map>

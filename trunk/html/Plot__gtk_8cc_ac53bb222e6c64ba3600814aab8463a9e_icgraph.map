@@ -1,0 +1,9 @@
+<map id="gtk_main_wrapper" name="gtk_main_wrapper">
+<area shape="rect" id="node1" title="make gtk_main() suitable for pthread_create() and maybe tell when it is finished" alt="" coords="685,31,813,56"/>
+<area shape="rect" id="node2" href="$classQuad__PNG.html#a0d1b1dbcb28ce932b9af8223ee46a93e" title="display an RGB matrix (interpreter code)" alt="" coords="428,5,637,31"/>
+<area shape="rect" id="node4" href="$Plot__gtk_8cc.html#a897990543dc934261ba8e7a124446b11" title="the main() program of the thread that handles one plot window." alt="" coords="493,55,572,80"/>
+<area shape="rect" id="node3" href="$classQuad__PNG.html#a0db0711b85fe1d914c413f6679458802" title="overloaded Function::eval_B()" alt="" coords="223,5,361,31"/>
+<area shape="rect" id="node5" href="$classQuad__PLOT.html#a0161f15bc1b55d2d79b634ce35c15ec0" title="plot the data (creating a new plot window in X)" alt="" coords="204,55,380,80"/>
+<area shape="rect" id="node6" href="$classQuad__PLOT.html#acc4187c32c3bad52f276a724b226b429" title="overloaded Function::eval_AB()" alt="" coords="5,29,156,55"/>
+<area shape="rect" id="node7" href="$classQuad__PLOT.html#a1b17ca0481f0d7fcc98732b3b1d2eefb" title="overloaded Function::eval_B()" alt="" coords="9,79,152,104"/>
+</map>

@@ -1,0 +1,20 @@
+<map id="Bif_F12_FORMAT::add_row" name="Bif_F12_FORMAT::add_row">
+<area shape="rect" id="node1" title="add a row (consisting of data) to PrintBuffer ret" alt="" coords="5,405,192,431"/>
+<area shape="rect" id="node2" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="1031,605,1171,631"/>
+<area shape="rect" id="node3" href="$classPrintBuffer.html#a47de98d96a3326a1b8734e6242ea1ee5" title="append ucs, aligned at char align." alt="" coords="240,306,375,346"/>
+<area shape="rect" id="node7" href="$classPrintBuffer.html#af6f689e8c4e930b7c37099bf5fdfe57d" title="return the number of columns" alt="" coords="1021,373,1180,413"/>
+<area shape="rect" id="node11" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="1039,531,1162,556"/>
+<area shape="rect" id="node12" href="$classPrintBuffer.html#a9bd0c0bdbbfe10fc25285c3f659f433c" title="prepend buffer with count characters pad" alt="" coords="831,5,953,31"/>
+<area shape="rect" id="node13" href="$classPrintBuffer.html#adef4048693e699b9bfac4b2adf719f63" title="append count charactera pad to buffer" alt="" coords="830,55,954,80"/>
+<area shape="rect" id="node18" href="$classPrintBuffer.html#a6f5d5b5fc0e2cb55c75dab3c613c68f5" title="append UCS_string ucs to this PrintBuffer" alt="" coords="811,505,973,531"/>
+<area shape="rect" id="node4" href="$classPrintBuffer.html#a86a56d7bdb48737a037db660dd7f313a" title="align this PrintBuffer to col" alt="" coords="423,204,541,229"/>
+<area shape="rect" id="node17" href="$classPrintBuffer.html#adae7aa63347e6aba983449dde7d50c33" title="return true iff all strings have the same size." alt="" coords="589,280,763,305"/>
+<area shape="rect" id="node5" href="$classPrintBuffer.html#ab939341e6e27bf73584db5adeafdd07e" title="align this real&#45;only PrintBuffer to col" alt="" coords="604,204,748,229"/>
+<area shape="rect" id="node15" href="$classPrintBuffer.html#a93639b0634e1c018cbdd4405b95fd75d" title="align this complex PrintBuffer to col" alt="" coords="611,105,741,131"/>
+<area shape="rect" id="node16" href="$classPrintBuffer.html#a47febc07014e4aa97c91a2e5d08a5264" title="align this char&#45;only PrintBuffer to col" alt="" coords="604,155,748,180"/>
+<area shape="rect" id="node6" href="$classPrintBuffer.html#a1cedbbcfe6835e1d3a2d02b9f2334c2c" title="print properties of this PrintBuffer" alt="" coords="829,104,955,129"/>
+<area shape="rect" id="node9" href="$classColInfo.html#a5f32e52d0bcc4c605a98553e6f8817ad" title="true if this ColInfo has an exponent field" alt="" coords="825,203,959,228"/>
+<area shape="rect" id="node10" href="$classPrintBuffer.html#afe55bc37668a451de718112388a7ab6a" title="pad the fraction part to wanted_fract_len with &#39;0&#39;" alt="" coords="811,456,973,481"/>
+<area shape="rect" id="node14" href="$classColInfo.html#ac78d77fa426879cc6efabd5282c55e0a" title="the total length" alt="" coords="831,153,953,179"/>
+<area shape="rect" id="node8" href="$classPrintBuffer.html#ac13295601812e379a3eac618ce239426" title="return the number of rows" alt="" coords="1031,171,1170,211"/>
+</map>

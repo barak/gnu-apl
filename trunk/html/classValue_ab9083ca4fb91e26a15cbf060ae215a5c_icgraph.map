@@ -1,0 +1,8 @@
+<map id="Value::check_all_Cells" name="Value::check_all_Cells">
+<area shape="rect" id="node1" title="check the cells of all values, return the number of bad Values." alt="" coords="861,31,1016,56"/>
+<area shape="rect" id="node2" href="$classCommand.html#af5d73db57801b2363c954b402f19186d" title="check workspace integrity (stale Value and IndexExpr objects, etc)" alt="" coords="643,31,813,56"/>
+<area shape="rect" id="node3" href="$classXML__Saving__Archive.html#acc327395cab545ea7797d92f5c931cab" title="write entire workspace" alt="" coords="448,23,595,63"/>
+<area shape="rect" id="node4" href="$classWorkspace.html#a8a4f1d898d523818dbd9d7efa6f2cf92" title="save this workspace" alt="" coords="247,31,400,56"/>
+<area shape="rect" id="node5" href="$classCommand.html#ad61e749290966d00856ce1dd4f6abe42" title=")SAVE active WS as CONTINUE and )OFF" alt="" coords="5,5,199,31"/>
+<area shape="rect" id="node6" href="$classCommand.html#aec0c4c6efbb9df9a34220b510f58905a" title=")SAVE: save a workspace file (.xml)" alt="" coords="23,55,181,80"/>
+</map>

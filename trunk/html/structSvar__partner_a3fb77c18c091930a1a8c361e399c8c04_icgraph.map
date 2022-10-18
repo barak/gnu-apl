@@ -1,0 +1,9 @@
+<map id="Svar_partner::get_control" name="Svar_partner::get_control">
+<area shape="rect" id="node1" title="return the control bits of this partner (as seen by the offering" alt="" coords="217,129,385,155"/>
+<area shape="rect" id="node2" href="$classQuad__SVC.html#a5b0103a375525734c11f8fb93f3fb84a" title="Overloaded Function::eval_AB()." alt="" coords="15,5,160,31"/>
+<area shape="rect" id="node3" href="$classQuad__SVC.html#a71be219cdc82f2922f94f02b7aab09f8" title="Overloaded Function::eval_AB()." alt="" coords="19,55,155,80"/>
+<area shape="rect" id="node4" href="$structSvar__record.html#a8230991843905bfccc74688ba6ed57af" title="return the control bits of this variable" alt="" coords="5,104,169,129"/>
+<area shape="rect" id="node5" href="$structSvar__record.html#ad302e64b27153b59db464445b70c58d2" title="return true iff the calling partner may set the current value" alt="" coords="12,153,163,179"/>
+<area shape="rect" id="node6" href="$structSvar__record.html#aef8d78c833a1ffb08f44d1fcc37631b9" title="return true iff the calling partner may use the current value" alt="" coords="11,203,164,228"/>
+<area shape="rect" id="node7" href="$structSvar__record.html#ae5d9c8b3fc4eaf74f45a87455ee9dd65" title="update the state when using or setting this variable, and clear events" alt="" coords="10,252,165,277"/>
+</map>

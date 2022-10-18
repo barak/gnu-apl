@@ -1,0 +1,4 @@
+<map id="Thread_context::M_fork" name="Thread_context::M_fork">
+<area shape="rect" id="node1" title="start parallel execution of work at the master" alt="" coords="5,13,165,38"/>
+<area shape="rect" id="node2" href="$classThread__context.html#ab8bd91c72792a1e187c521f38c9e4f6e" title="return the context of the master" alt="" coords="213,5,352,45"/>
+</map>

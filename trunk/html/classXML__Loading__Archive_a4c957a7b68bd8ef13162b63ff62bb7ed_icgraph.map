@@ -1,0 +1,13 @@
+<map id="XML_Loading_Archive::read_XML_string" name="XML_Loading_Archive::read_XML_string">
+<area shape="rect" id="node1" title="input is a UTF8&#45;encoded sequence of bytes, terminated with &quot;. UTF8&#45;decode the sequence,..." alt="" coords="1005,120,1157,160"/>
+<area shape="rect" id="node2" href="$classXML__Loading__Archive.html#a3c747929c263a6913ea01f833ce2a9f0" title="read one or more Cell(s) from input into the ravel of Z; return the UTF8 * after the cells." alt="" coords="805,5,957,45"/>
+<area shape="rect" id="node4" href="$classXML__Loading__Archive.html#a5085841ad5dd83bd88588db76c3a2838" title="read ⍎ Executable" alt="" coords="405,88,557,128"/>
+<area shape="rect" id="node7" href="$classXML__Loading__Archive.html#a2e7aed9883aa106937d3d9313163e10b" title="read next Function element" alt="" coords="805,120,957,160"/>
+<area shape="rect" id="node8" href="$classXML__Loading__Archive.html#a5e165853b437a502be850f3527ef8b77" title="read ◊ Executable" alt="" coords="605,171,757,211"/>
+<area shape="rect" id="node9" href="$classXML__Loading__Archive.html#ac4cdadb93d62fcd862579b84d3556804" title="read an UCS string" alt="" coords="805,235,957,275"/>
+<area shape="rect" id="node3" href="$classXML__Loading__Archive.html#ad200f5b98b9cf3e903ccf714a56a1d0f" title="read next Ravel element" alt="" coords="605,5,757,45"/>
+<area shape="rect" id="node5" href="$classXML__Loading__Archive.html#adfa844fcc401d3c335cafa5abda2f35d" title="read next StateIndicator entry" alt="" coords="205,171,357,211"/>
+<area shape="rect" id="node6" href="$classXML__Loading__Archive.html#ad2f1d88070976eab8a41f0fdcd1e0ec1" title="read next StateIndicator element" alt="" coords="5,171,157,211"/>
+<area shape="rect" id="node10" href="$classXML__Loading__Archive.html#a16b4789e109bf0167ae481b86a1ebedb" title="read a lambda" alt="" coords="605,235,757,275"/>
+<area shape="rect" id="node11" href="$classXML__Loading__Archive.html#a0cd18fa421176354e241891d951f5169" title="read a user defined Executable" alt="" coords="405,231,557,271"/>
+</map>

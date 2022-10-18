@@ -1,0 +1,4 @@
+<map id="UserFunction::load" name="UserFunction::load">
+<area shape="rect" id="node1" title=")LOAD this function into the workspace named workspace. Return a pounter to this newly created functi..." alt="" coords="189,29,321,55"/>
+<area shape="rect" id="node2" href="$classUserFunction.html#abbebb7ee280c1b30af0b5bb17859ace4" title=")SAVE this function in the workspace named workspace (in the file system)." alt="" coords="5,29,141,55"/>
+</map>

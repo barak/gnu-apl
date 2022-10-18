@@ -1,0 +1,5 @@
+<map id="CharCell::bif_not_bitwise" name="CharCell::bif_not_bitwise">
+<area shape="rect" id="node1" title="overloaded Cell::bif_not_bitwise()" alt="" coords="5,42,173,67"/>
+<area shape="rect" id="node2" href="$classCharCell.html#ac1722ae72774937539bc00951b199732" title="overloaded Cell::get_char_value()" alt="" coords="221,5,352,45"/>
+<area shape="rect" id="node3" href="$classCharCell.html#ad3823b522d81960850e438ac95c5aeba" title="initialize the (un&#45;initialized) Cell *Z to Unicode uni" alt="" coords="237,70,336,95"/>
+</map>

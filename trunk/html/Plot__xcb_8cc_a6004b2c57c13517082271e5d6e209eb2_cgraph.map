@@ -1,0 +1,30 @@
+<map id="draw_surface_lines" name="draw_surface_lines">
+<area shape="rect" id="node1" title="draw the surface plot lines" alt="" coords="5,443,140,469"/>
+<area shape="rect" id="node2" href="$structPixel__XY.html#ac4e6790839beb78de3fb40478ab1672f" title="the square of the distance between this and other" alt="" coords="406,7,546,33"/>
+<area shape="rect" id="node3" href="$Plot__xcb_8cc.html#a538424ee91ee3a1698b531dcfce0659a" title="draw a line from P0 to P1" alt="" coords="437,57,515,82"/>
+<area shape="rect" id="node4" href="$Plot__xcb_8cc.html#ab4371c12b41e0d3563876092f2a4e5ed" title="draw a plot point (representing one data value) at position xy" alt="" coords="225,157,311,182"/>
+<area shape="rect" id="node5" href="$Plot__xcb_8cc.html#abb3a45e07e2c89cd4db26199d9ebccaf" title="set the foreground color of a xcb_gcontext_t" alt="" coords="409,190,543,215"/>
+<area shape="rect" id="node7" href="$Plot__xcb_8cc.html#ad0c18c85c237ccb535e36cf75f02ffb1" title="draw a triangular area of a 3D plot" alt="" coords="219,107,317,133"/>
+<area shape="rect" id="node9" href="$classPlot__window__properties.html#aa152e0e672fc6083139705184e7216c5" title="return the 3D color gradient" alt="" coords="188,308,348,348"/>
+<area shape="rect" id="node10" href="$classPlot__window__properties.html#a7231114ba94d70fa8b54beef8d9e590c" title="an array of plot line properties" alt="" coords="188,372,348,412"/>
+<area shape="rect" id="node11" href="$classPlot__window__properties.html#a92d2adee39b082bada6f0e136ed3608f" title="return the largest Y value" alt="" coords="188,436,348,476"/>
+<area shape="rect" id="node12" href="$classPlot__window__properties.html#af27f118d1e90664680b2efd1a2460a03" title="return the smallest Y value" alt="" coords="396,359,556,399"/>
+<area shape="rect" id="node13" href="$classPlot__data.html#a78d41cb9faca37e7251ae3ddf9bd2072" title="return the number of plot lines" alt="" coords="203,615,333,655"/>
+<area shape="rect" id="node14" href="$classPlot__window__properties.html#a72755a68b6c76ed13fbad937f853fe0f" title="return the verbosity when plotting" alt="" coords="188,679,348,719"/>
+<area shape="rect" id="node15" href="$classPlot__data.html#ab2e462ccd83506c4bd58a0a2bfad1a04" title="return the X coordinate at row and col" alt="" coords="209,743,327,769"/>
+<area shape="rect" id="node17" href="$classPlot__data.html#a9d863a39e73098620164e06d7f7b58e6" title="return the Y coordinate at row and col" alt="" coords="209,793,327,818"/>
+<area shape="rect" id="node19" href="$classPlot__data.html#a48aa9406aa7b71cc210d12c82e2f1c94" title="return the Z coordinate at row and col" alt="" coords="209,842,327,867"/>
+<area shape="rect" id="node21" href="$Plot__xcb_8cc.html#a221304b480c0058decadaaf65ec5c086" title=" " alt="" coords="223,891,313,917"/>
+<area shape="rect" id="node22" href="$Plot__xcb_8cc.html#a62eaa2c0379a0672af80deafa17d4a41" title="set the line width of a xcb_gcontext_t" alt="" coords="202,258,334,283"/>
+<area shape="rect" id="node23" href="$classPlot__window__properties.html#acd007c1ca30e86d8e12e125a39d7d9a5" title="convert values val_X, val_Y, and val_Z, to the X and Y coordinate of the pixel below the Z=0 plane of..." alt="" coords="188,551,348,591"/>
+<area shape="rect" id="node6" href="$Plot__xcb_8cc.html#a5461d12dc379b438dce62186d2c07f20" title="set the an attribute of a xcb_gcontext_t" alt="" coords="604,233,697,258"/>
+<area shape="rect" id="node8" href="$classPlot__window__properties.html#abadf9d1f9cf63db3c78d21b88614d9d3" title="for level 0.0 &lt;= alpha &lt;= 1.0: return the color for alpha according to gradient" alt="" coords="396,107,556,147"/>
+<area shape="rect" id="node16" href="$classPlot__data__row.html#ad4e5545752fa410dbb014efcb3188d25" title="return the n&#45;th X coordinate" alt="" coords="403,743,549,769"/>
+<area shape="rect" id="node18" href="$classPlot__data__row.html#a33dc8b966628255b8300f95a7c261b44" title="return the n&#45;th Y coordinate" alt="" coords="403,793,549,818"/>
+<area shape="rect" id="node20" href="$classPlot__data__row.html#a4b64a5cf137e1b8eff94c1dc2127d065" title="return the n&#45;th Z coordinate" alt="" coords="403,842,549,867"/>
+<area shape="rect" id="node24" href="$classPlot__window__properties.html#a577510e3bcf6ba61978dc60d778dc967" title="return the smallest X value" alt="" coords="396,551,556,591"/>
+<area shape="rect" id="node25" href="$classPlot__window__properties.html#a0640b99b583131dabf64478a88265e66" title="return the smallest Z value" alt="" coords="396,615,556,655"/>
+<area shape="rect" id="node26" href="$classPlot__window__properties.html#a087dfd5eee09a66161eb76c87680d14c" title="convert &#160;&#160;val_X to the X coordinate of the pixel in the plot area" alt="" coords="396,679,556,719"/>
+<area shape="rect" id="node27" href="$classPlot__window__properties.html#ae727cdd8ecd4888c8785c5fd53dc6b93" title="convert &#160;&#160;val_Y to the Y coordinate of the pixel in the plot area" alt="" coords="396,423,556,463"/>
+<area shape="rect" id="node28" href="$classPlot__window__properties.html#af978c228065cbaba8381af79bc1fce95" title="convert &#160;&#160;val_Z to the relative Z vector (q. quadrant)" alt="" coords="396,487,556,527"/>
+</map>

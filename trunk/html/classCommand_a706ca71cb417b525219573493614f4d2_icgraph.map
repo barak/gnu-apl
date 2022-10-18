@@ -1,0 +1,5 @@
+<map id="Command::get_APL_expression_count" name="Command::get_APL_expression_count">
+<area shape="rect" id="node1" title="return the number of APL expressions entered in immediate execution mode" alt="" coords="395,5,605,45"/>
+<area shape="rect" id="node2" href="$classQuad__AI.html#ae4c75345c9405175f157d8b8a4425fb9" title="overloaded Symbol::get_apl_value()." alt="" coords="185,13,347,38"/>
+<area shape="rect" id="node3" href="$classQuad__AI.html#ad19785f12f3ef2d0708b38ed02b23e1c" title="Constructor." alt="" coords="5,13,137,38"/>
+</map>

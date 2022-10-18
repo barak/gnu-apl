@@ -1,0 +1,4 @@
+<map id="GET_OFFERED_VARS_c::get__GET_OFFERED_VARS__offered_to_proc" name="GET_OFFERED_VARS_c::get__GET_OFFERED_VARS__offered_to_proc">
+<area shape="rect" id="node1" title="return item offered_to_proc of this signal" alt="" coords="5,5,209,60"/>
+<area shape="rect" id="node2" href="$classSig__item__int.html#a5e6903d94a367f8e7e9540881ddf389e" title="return the value of the item" alt="" coords="257,20,423,45"/>
+</map>

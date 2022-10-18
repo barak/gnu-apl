@@ -1,0 +1,28 @@
+<map id="Avec::map_alternative_char" name="Avec::map_alternative_char">
+<area shape="rect" id="node1" title="Find return position of alt_av, or Invalid_AV if not found." alt="" coords="2029,99,2213,124"/>
+<area shape="rect" id="node2" href="$classAvec.html#a01b46752a18611c40e5dab44dc766580" title="map possibly non&#45;standard APL character to its standard character" alt="" coords="1832,20,1981,45"/>
+<area shape="rect" id="node4" href="$classAvec.html#a9adba9efe915ef9eae7c9e969aa9ceb6" title="Return a token containing av." alt="" coords="1839,99,1974,124"/>
+<area shape="rect" id="node11" href="$classXML__Saving__Archive.html#a8b0a3a2f1f9c91af785edf994b4fa48d" title="return true if uni prints nicely and is allowed in XML &quot;...&quot; strings" alt="" coords="1833,181,1980,221"/>
+<area shape="rect" id="node3" href="$classCommand.html#a925cc5f77af57e1705b8c96a522e6a55" title="show list of commands" alt="" coords="1627,5,1784,31"/>
+<area shape="rect" id="node5" href="$classTokenizer.html#a9c9924450a3c4dd6076911aa8f342171" title="tokenize UCS string input into token string tos." alt="" coords="1421,35,1579,60"/>
+<area shape="rect" id="node6" href="$classTokenizer.html#a1416dfa21301d3cf8abd209e79e2c0ed" title="tokenize a primitive (1&#45;character) function" alt="" coords="1637,106,1773,146"/>
+<area shape="rect" id="node7" href="$classQuad__FIO.html#a36fdeb894607c2125307cd673284fb69" title="overloaded Function::eval_AXB()." alt="" coords="1426,84,1574,109"/>
+<area shape="rect" id="node8" href="$classQuad__FIO.html#aeaba4a7f5a55bbab8ad6b7d3d7c932fa" title="overloaded Function::eval_AXB()." alt="" coords="1431,133,1569,159"/>
+<area shape="rect" id="node10" href="$classTokenizer.html#a936f1452039ebe1391301a47dd26b11c" title="tokenize a function" alt="" coords="1432,183,1568,223"/>
+<area shape="rect" id="node9" href="$classQuad__FIO.html#a24ac2813d6425ad61471166fe019ba33" title="overloaded Function::eval_LXB()." alt="" coords="1227,133,1373,159"/>
+<area shape="rect" id="node12" href="$classXML__Saving__Archive.html#a792fe70c4d59b79b9f1da76945377e35" title="emit one unicode character (inside &quot;...&quot;)" alt="" coords="1632,247,1779,287"/>
+<area shape="rect" id="node13" href="$classXML__Saving__Archive.html#ae0384623223c3d4e87ea98f2ec0adf5c" title="emit one ravel cell cell" alt="" coords="1427,247,1573,287"/>
+<area shape="rect" id="node19" href="$classXML__Saving__Archive.html#a7c5dbf639d8ffda3ed1478a7004ba357" title="write UCS_string str" alt="" coords="1427,327,1573,367"/>
+<area shape="rect" id="node14" href="$classXML__Saving__Archive.html#a91f354b394601f7dc6369c6485670e5f" title="write ravel of Value v" alt="" coords="1032,207,1179,247"/>
+<area shape="rect" id="node15" href="$classXML__Saving__Archive.html#acc327395cab545ea7797d92f5c931cab" title="write entire workspace" alt="" coords="448,271,595,311"/>
+<area shape="rect" id="node16" href="$classWorkspace.html#a8a4f1d898d523818dbd9d7efa6f2cf92" title="save this workspace" alt="" coords="247,279,400,304"/>
+<area shape="rect" id="node17" href="$classCommand.html#ad61e749290966d00856ce1dd4f6abe42" title=")SAVE active WS as CONTINUE and )OFF" alt="" coords="5,253,199,279"/>
+<area shape="rect" id="node18" href="$classCommand.html#aec0c4c6efbb9df9a34220b510f58905a" title=")SAVE: save a workspace file (.xml)" alt="" coords="23,303,181,328"/>
+<area shape="rect" id="node20" href="$classXML__Saving__Archive.html#a40ab403b1e7dd05196c9b36c8678a140" title="write user&#45;defined function fun" alt="" coords="1227,327,1373,367"/>
+<area shape="rect" id="node23" href="$classXML__Saving__Archive.html#a3bc62d82baa6be004398f70faa1b3e8b" title="write StateIndicator entry si" alt="" coords="643,335,789,375"/>
+<area shape="rect" id="node21" href="$classXML__Saving__Archive.html#a7b02c75d8e22694c05c14ab5d8d808c8" title="write derived functions cache" alt="" coords="1032,335,1179,375"/>
+<area shape="rect" id="node24" href="$classXML__Saving__Archive.html#a5c1f7b87ab7b4a1a2cfcf33513029e40" title="write ValueStackItem vsi" alt="" coords="1032,271,1179,311"/>
+<area shape="rect" id="node22" href="$classXML__Saving__Archive.html#a6d474efaefd9567ab70fe498729bb186" title="write the Prefix parser of si (and its derived functions)" alt="" coords="837,335,984,375"/>
+<area shape="rect" id="node25" href="$classXML__Saving__Archive.html#a1019a371e3f70c855f8af07d42f49c7c" title="write Symbol sym" alt="" coords="837,271,984,311"/>
+<area shape="rect" id="node26" href="$classXML__Saving__Archive.html#a92142d2fec9d5a49667566e0bb86f55c" title="write SymbolTable symtab" alt="" coords="643,271,789,311"/>
+</map>

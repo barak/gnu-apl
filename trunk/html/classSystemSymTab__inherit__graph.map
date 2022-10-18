@@ -1,3 +1,4 @@
 <map id="SystemSymTab" name="SystemSymTab">
-<area shape="rect" id="node2" href="$classSymbolTableBase.html" title="SymbolTableBase\&lt; SystemName,\l 256 &#45; 1 \&gt;" alt="" coords="5,5,229,47"/>
+<area shape="rect" id="node1" title="The table containing all system defined symbols (aka. distinguished names)" alt="" coords="59,93,175,119"/>
+<area shape="rect" id="node2" href="$classSymbolTableBase.html" title=" " alt="" coords="5,5,229,45"/>
 </map>

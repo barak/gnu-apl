@@ -1,0 +1,14 @@
+<map id="Symbol::expunge" name="Symbol::expunge">
+<area shape="rect" id="node1" title="set current NameClass of this Symbol to NC_UNUSED_USER_NAME and remove any values associated with thi..." alt="" coords="5,221,128,246"/>
+<area shape="rect" id="node2" href="$classWorkspace.html#a57ad917999afbef0a94ffdddd6aacf84" title="add ufun to list of that were ⎕EX&#39;ed while on the SI stack" alt="" coords="176,5,356,45"/>
+<area shape="rect" id="node3" href="$classSymbol.html#ad925a9e935af935d1f31f7a26a3d1533" title="call the monitor callback function (if any) with event ev" alt="" coords="194,69,338,109"/>
+<area shape="rect" id="node4" href="$classValueStackItem.html#a719a94c5d8c1196c0f5f045b979dcf81" title="reset this ValueStackItem to being unused" alt="" coords="191,134,341,159"/>
+<area shape="rect" id="node6" href="$classValueStackItem.html#a3a9ea0ee5b4129f7e5aa4a92c851abfd" title="return the function (caller must have checked NC_FUNOPER)." alt="" coords="195,184,337,224"/>
+<area shape="rect" id="node7" href="$classValueStackItem.html#a27453c0dfda1004c6f5e68a0c2530eae" title="return the name class for this ValueStackItem" alt="" coords="182,249,350,274"/>
+<area shape="rect" id="node8" href="$classWorkspace.html#ad7b96da66783767d15336f40250fa7cd" title="return oldest SI entry that is running exex, or 0 if none" alt="" coords="183,363,349,389"/>
+<area shape="rect" id="node11" href="$classValueStackItem.html#a20bfcd074d69d780a020428764edb7a1" title="reset (clear) the APL value in this ValueStackItem" alt="" coords="190,299,342,339"/>
+<area shape="rect" id="node12" href="$classValueStackItem.html#ac15a4517af12271c9828fdfbb8cbdafe" title="set the name class for this ValueStackItem" alt="" coords="182,413,350,438"/>
+<area shape="rect" id="node5" href="$classValue__P__Base.html#ad07a670c61c71b7aecc8ca9a6170b796" title="decrement owner&#45;count and reset pointer to 0" alt="" coords="404,219,549,245"/>
+<area shape="rect" id="node9" href="$classStateIndicator.html#a44d07945c56abef5505efcfdc98ec090" title="return the SI that has called this one" alt="" coords="412,327,541,367"/>
+<area shape="rect" id="node10" href="$classWorkspace.html#a8083efc2d51067edb25ae8dd4f014173" title="the top of the SI stack (the SI pushed last)" alt="" coords="409,391,544,417"/>
+</map>

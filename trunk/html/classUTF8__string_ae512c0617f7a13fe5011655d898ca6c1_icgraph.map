@@ -1,0 +1,49 @@
+<map id="UTF8_string::append_UTF8" name="UTF8_string::append_UTF8">
+<area shape="rect" id="node1" title="append the UTF8_string suffix" alt="" coords="2349,313,2533,339"/>
+<area shape="rect" id="node2" href="$classDoxy.html#ab9e7e5e50e16cf9b5ecff2ebbf7dd099" title="Constructor: create (and remember) the root directory." alt="" coords="2173,5,2265,31"/>
+<area shape="rect" id="node3" href="$classDoxy.html#a76067b55e9395dec0889368d1daa6247" title="write the page for one defined function. If the define function is a named lambda,..." alt="" coords="1915,208,2057,233"/>
+<area shape="rect" id="node5" href="$classDoxy.html#ad8abe2e8a1b686a7b35e582c369d41ae" title="generate the entire documentation" alt="" coords="1481,107,1563,132"/>
+<area shape="rect" id="node7" href="$classLibPaths.html#a4316cbd8878626733273cb0db73cfd82" title="return library path (from config file or from libroot)" alt="" coords="2149,429,2289,455"/>
+<area shape="rect" id="node18" href="$classLibPaths.html#a0da8dd5e9a90282d75239ec86ebb15d4" title="return full path for file name, possibly adding .ext1 or .ext2" alt="" coords="1899,572,2073,597"/>
+<area shape="rect" id="node34" href="$classCommand.html#ae0699916c54054bb56d0dccc46d2b767" title="open directory arg and follow symlinks" alt="" coords="1903,523,2069,548"/>
+<area shape="rect" id="node38" href="$classCommand.html#af95676cbc57e2564feb00e5166d07512" title="return true if entry is a directory" alt="" coords="2141,313,2298,339"/>
+<area shape="rect" id="node40" href="$classDoxy.html#ac9842076620bf4fe90f3e80922c5499c" title="write the page for one native function." alt="" coords="1921,107,2051,132"/>
+<area shape="rect" id="node41" href="$classNativeFunction.html#ad1a62a0e847dcd7a571b31c0a892c88d" title="open .so file in one of several directories. On success set handle and update so_path." alt="" coords="2146,641,2293,681"/>
+<area shape="rect" id="node44" href="$classTokenizer.html#a866fc216ee57f7072f3c61d3615b1742" title="tokenize a real number (integer or floating point)." alt="" coords="2137,733,2301,759"/>
+<area shape="rect" id="node47" href="$classDoxy.html#a896515dce3e139da1676d61a0d2e8f3f" title="write the call graph (if caller == false), or else the caller graph" alt="" coords="2142,196,2297,221"/>
+<area shape="rect" id="node4" href="$classDoxy.html#a5eb9b5605981c826438d5a51f38bf5a4" title="HTML&#45;print a table containing all defined functions to page." alt="" coords="1679,107,1829,132"/>
+<area shape="rect" id="node6" href="$classCommand.html#a834eac0e797a5d1c992018b7d0c049a4" title="]DOXY: create doxygen&#45;like documentation of the current workspace" alt="" coords="1211,107,1371,132"/>
+<area shape="rect" id="node8" href="$classCommand.html#ade7fa861e534f953d5439040e78fe433" title="list paths of workspace and wslib directories" alt="" coords="1911,473,2061,499"/>
+<area shape="rect" id="node9" href="$classTabExpansion.html#a3caac165f0b8c4454d8964fa05a775d3" title="perform tab expansion for a workspace name" alt="" coords="1677,258,1831,298"/>
+<area shape="rect" id="node33" href="$classLibPaths.html#ae240dc7e041df568a0cd61ec0270eb2a" title="return true iff directory lib) is present" alt="" coords="1915,424,2057,449"/>
+<area shape="rect" id="node10" href="$classTabExpansion.html#a87242c56b4445fadcf7ac9a1181a15ea" title="perform tab expansion for a filename" alt="" coords="1445,258,1599,298"/>
+<area shape="rect" id="node11" href="$classTabExpansion.html#ad99a9df8a0a9ba9ad03f75e654de0bd4" title="perform tab expansion for command arguments" alt="" coords="1213,258,1368,298"/>
+<area shape="rect" id="node12" href="$classTabExpansion.html#a155d53238b8490e82776eb2caddefceb" title="tab&#45;expand an APL command" alt="" coords="1008,258,1163,298"/>
+<area shape="rect" id="node13" href="$classTabExpansion.html#ad8c4300a7d2e9aa47e6c3a1d19285db7" title="perform tab expansion" alt="" coords="780,265,960,291"/>
+<area shape="rect" id="node14" href="$classLineEditContext.html#a8908cfbf56371294323892784508eca7" title="tab expansion" alt="" coords="591,258,732,298"/>
+<area shape="rect" id="node15" href="$classLineInput.html#a81610349f86404c67f583eb296666bb1" title="get a line from from user" alt="" coords="412,265,543,291"/>
+<area shape="rect" id="node16" href="$classLineInput.html#a96f6a9062450af940d63ecff847646e4" title="get a line from the user" alt="" coords="183,265,364,291"/>
+<area shape="rect" id="node17" href="$classInputMux.html#a8a79cbe5207cde162fb36133ad9defdd" title="get one line" alt="" coords="5,265,135,291"/>
+<area shape="rect" id="node19" href="$classCommand.html#a427a447f00c0b3b928b87b74ebd467ea" title=")DROP: delete a workspace file" alt="" coords="1673,719,1835,744"/>
+<area shape="rect" id="node20" href="$classCommand.html#aa0764d08a6ae9c8270907ab7d5dc37cf" title=")IN: import a workspace file" alt="" coords="1686,423,1822,448"/>
+<area shape="rect" id="node21" href="$classCommand.html#a4afcbbdbee3fd2f536db12651861110b" title=")OUT: export a workspace file" alt="" coords="1679,472,1829,497"/>
+<area shape="rect" id="node22" href="$classWorkspace.html#a20b0659f2d3987a4bb21d6c399e0a436" title="copy objects from another workspace" alt="" coords="1677,521,1831,547"/>
+<area shape="rect" id="node25" href="$classWorkspace.html#a15d8cb5c62016f547b9718e820c94efd" title="dump this workspace" alt="" coords="1675,571,1833,596"/>
+<area shape="rect" id="node27" href="$main_8cc.html#aa0321421b17def7b58fc0cabc8890260" title="initialize the interpreter" alt="" coords="1723,768,1785,793"/>
+<area shape="rect" id="node28" href="$classWorkspace.html#a77c7b25908cf2479dc087cc3bcf44dcb" title="load lib_ws into the_workspace, maybe set ⎕LX of the new WS." alt="" coords="1679,620,1829,645"/>
+<area shape="rect" id="node30" href="$classWorkspace.html#a8a4f1d898d523818dbd9d7efa6f2cf92" title="save this workspace" alt="" coords="1677,669,1831,695"/>
+<area shape="rect" id="node23" href="$classCommand.html#a51b8fbdb5d65baf2fddfc930b9b142cf" title=")COPY: copy a workspace file" alt="" coords="1442,521,1602,547"/>
+<area shape="rect" id="node24" href="$classCommand.html#a2f7425e3673258dfb78045919e82f69f" title=")COPY_ONCE: copy a workspace file, nut at most once" alt="" coords="1419,472,1625,497"/>
+<area shape="rect" id="node26" href="$classCommand.html#a98e7d1dd0c01014d79f2120292588a70" title=")DUMP: dump a workspace file (.apl)" alt="" coords="1441,571,1603,596"/>
+<area shape="rect" id="node29" href="$classCommand.html#ad222a6de11eb55501624a4d0dea3a464" title=")LOAD: load a workspace file" alt="" coords="1443,620,1601,645"/>
+<area shape="rect" id="node31" href="$classCommand.html#ad61e749290966d00856ce1dd4f6abe42" title=")SAVE active WS as CONTINUE and )OFF" alt="" coords="1425,719,1619,744"/>
+<area shape="rect" id="node32" href="$classCommand.html#aec0c4c6efbb9df9a34220b510f58905a" title=")SAVE: save a workspace file (.xml)" alt="" coords="1443,669,1601,695"/>
+<area shape="rect" id="node35" href="$classCommand.html#aeb8671f785d828bbfac0d9b9ff46437d" title="list library: common helper" alt="" coords="1674,373,1834,399"/>
+<area shape="rect" id="node36" href="$classCommand.html#ae2c14c874844701377a0e716021229c7" title="list content of workspace and wslib directories: )LIB [N]" alt="" coords="1447,348,1597,373"/>
+<area shape="rect" id="node37" href="$classCommand.html#a7d3c3284d54674356d89f268949109c6" title="list content of workspace and wslib directories: ]LIB [N]" alt="" coords="1447,397,1597,423"/>
+<area shape="rect" id="node39" href="$classTabExpansion.html#ab9d75ee0d642d9144a37b3db8d6c5aeb" title="read filenames in dir and append matching filenames to matches" alt="" coords="1913,258,2059,298"/>
+<area shape="rect" id="node42" href="$classNativeFunction.html#a1a29c2dde6fdafb672e5040e646e3141" title="load shared lib for emacs mode, return error info on failure" alt="" coords="1915,641,2057,681"/>
+<area shape="rect" id="node43" href="$classNativeFunction.html#a2d409bb7a5a9ac2b815f1450bc428cc0" title="constructor (only fix() may call it)" alt="" coords="1883,705,2089,731"/>
+<area shape="rect" id="node45" href="$classTokenizer.html#aa5b5fd6f253e7318f319d1419023e5bf" title="tokenize a number (integer, floating point, or complex)." alt="" coords="1918,791,2054,831"/>
+<area shape="rect" id="node46" href="$classTokenizer.html#a9c9924450a3c4dd6076911aa8f342171" title="tokenize UCS string input into token string tos." alt="" coords="1675,817,1833,843"/>
+</map>

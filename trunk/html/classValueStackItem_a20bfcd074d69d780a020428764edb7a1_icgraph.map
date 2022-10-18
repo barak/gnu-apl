@@ -1,0 +1,12 @@
+<map id="ValueStackItem::reset_apl_value" name="ValueStackItem::reset_apl_value">
+<area shape="rect" id="node1" title="reset (clear) the APL value in this ValueStackItem" alt="" coords="997,57,1149,97"/>
+<area shape="rect" id="node2" href="$classSymbol.html#ac59d1dd17096f3e89caa257ddeccd970" title="clear the value stack of this symbol" alt="" coords="827,39,949,64"/>
+<area shape="rect" id="node8" href="$classSymbol.html#a35d1a9b891e5e78ad10eb372fe185b2b" title="set current NameClass of this Symbol to NC_UNUSED_USER_NAME and remove any values associated with thi..." alt="" coords="827,88,949,113"/>
+<area shape="rect" id="node3" href="$classSymbolTable.html#a63125005c7124354304526f8d63d188f" title="erase one symbol, return true on error, false on success" alt="" coords="640,55,779,95"/>
+<area shape="rect" id="node7" href="$classSymbol.html#a0f129c4040fac10b29e9e9a3cddb2e69" title="destructor" alt="" coords="646,5,773,31"/>
+<area shape="rect" id="node4" href="$classSymbolTable.html#aa20ff3f01e0b8558455dd750f9f19cc3" title="erase symbols from this SymbolTable" alt="" coords="453,55,592,95"/>
+<area shape="rect" id="node5" href="$classWorkspace.html#a28f04b4a3bfcdc52f82d24c060475c61" title="erase the symbols in symbols from the symbol table" alt="" coords="221,63,405,88"/>
+<area shape="rect" id="node6" href="$classCommand.html#a11ccda9c4eea7546be450e30a029650a" title=")ERASE: erase symbols" alt="" coords="5,63,173,88"/>
+<area shape="rect" id="node9" href="$classQuad__EX.html#abcf496d389093ac1198c0a32c955a9f4" title="disassociate name from value, return 0 on failure or 1 on success." alt="" coords="642,120,777,145"/>
+<area shape="rect" id="node10" href="$classQuad__EX.html#a6997cfab873822792674de357334841e" title="overloaded Function::eval_B()." alt="" coords="459,120,586,145"/>
+</map>

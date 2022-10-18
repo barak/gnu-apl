@@ -1,0 +1,8 @@
+<map id="Token::print_function" name="Token::print_function">
+<area shape="rect" id="node1" title="helper function to print a function." alt="" coords="5,56,149,81"/>
+<area shape="rect" id="node2" href="$classToken.html#a4d19f279ca06bc64e549c9d63ca677b0" title="return the Function_P value of this token" alt="" coords="197,5,335,31"/>
+<area shape="rect" id="node5" href="$classToken.html#af36d5b92b8e2f75af0bdc4d1d6bdd1c8" title="return the Id of this token." alt="" coords="396,81,499,107"/>
+<area shape="rect" id="node6" href="$classToken.html#a8a6297e3da6b1cab03fca1fb3432aca4" title="helper function to print Quad&#45;function (system function or variable)." alt="" coords="203,107,329,132"/>
+<area shape="rect" id="node3" href="$classToken.html#abe9f60f29fc7644214b48cc2715a21ad" title="return true if this token is a function (or operator)" alt="" coords="383,5,512,31"/>
+<area shape="rect" id="node4" href="$classToken.html#a1a31afbb07e3f1dbb86d5f872ce5c297" title="return the TokenValueType of this token." alt="" coords="560,5,713,31"/>
+</map>

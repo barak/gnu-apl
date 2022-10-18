@@ -1,0 +1,23 @@
+<map id="Function::get_tag" name="Function::get_tag">
+<area shape="rect" id="node1" title="return the Token Tag for this function." alt="" coords="1497,106,1620,131"/>
+<area shape="rect" id="node2" href="$classUserFunction.html#a78f43c8d4d7cbf3a393317f27ebe8497" title="overloaded Executable::adjust_line_starts" alt="" coords="1305,5,1447,45"/>
+<area shape="rect" id="node3" href="$classXML__Saving__Archive.html#a40ab403b1e7dd05196c9b36c8678a140" title="write user&#45;defined function fun" alt="" coords="1303,69,1449,109"/>
+<area shape="rect" id="node14" href="$classQuad__TF.html#a293263bd9b2bf923dc9e4113dded832f" title="try inverse ⎕TF2 of ucs, set new_var_or_fun if successful" alt="" coords="912,191,1060,217"/>
+<area shape="rect" id="node20" href="$classQuad__TF.html#a4fee42ec370b052d2593e3d2695e7d74" title="replace pattern , B in tos with single token (,B); return true iff done so." alt="" coords="1303,184,1449,224"/>
+<area shape="rect" id="node4" href="$classXML__Saving__Archive.html#a7b02c75d8e22694c05c14ab5d8d808c8" title="write derived functions cache" alt="" coords="1108,5,1255,45"/>
+<area shape="rect" id="node11" href="$classXML__Saving__Archive.html#a5c1f7b87ab7b4a1a2cfcf33513029e40" title="write ValueStackItem vsi" alt="" coords="1108,69,1255,109"/>
+<area shape="rect" id="node5" href="$classXML__Saving__Archive.html#a6d474efaefd9567ab70fe498729bb186" title="write the Prefix parser of si (and its derived functions)" alt="" coords="913,5,1059,45"/>
+<area shape="rect" id="node6" href="$classXML__Saving__Archive.html#a3bc62d82baa6be004398f70faa1b3e8b" title="write StateIndicator entry si" alt="" coords="699,5,845,45"/>
+<area shape="rect" id="node7" href="$classXML__Saving__Archive.html#acc327395cab545ea7797d92f5c931cab" title="write entire workspace" alt="" coords="467,41,613,81"/>
+<area shape="rect" id="node8" href="$classWorkspace.html#a8a4f1d898d523818dbd9d7efa6f2cf92" title="save this workspace" alt="" coords="247,49,400,74"/>
+<area shape="rect" id="node9" href="$classCommand.html#ad61e749290966d00856ce1dd4f6abe42" title=")SAVE active WS as CONTINUE and )OFF" alt="" coords="5,23,199,49"/>
+<area shape="rect" id="node10" href="$classCommand.html#aec0c4c6efbb9df9a34220b510f58905a" title=")SAVE: save a workspace file (.xml)" alt="" coords="23,73,181,98"/>
+<area shape="rect" id="node12" href="$classXML__Saving__Archive.html#a1019a371e3f70c855f8af07d42f49c7c" title="write Symbol sym" alt="" coords="913,69,1059,109"/>
+<area shape="rect" id="node13" href="$classXML__Saving__Archive.html#a92142d2fec9d5a49667566e0bb86f55c" title="write SymbolTable symtab" alt="" coords="699,69,845,109"/>
+<area shape="rect" id="node15" href="$structCommand_1_1transfer__context.html#a4e80a2899a02285ba89e58792e6150ea" title="process a &#39;A&#39; (array in 2 ⎕TF format) item." alt="" coords="680,133,864,173"/>
+<area shape="rect" id="node18" href="$classQuad__TF.html#a27ed4b02d5f1a1c8a8b0a1fcbe2756f8" title="Overloaded Function::eval_AB()." alt="" coords="705,198,839,223"/>
+<area shape="rect" id="node19" href="$structCommand_1_1transfer__context.html#afee6856208966168d158de45145dd4ca" title="process an &#39;F&#39; (function in 2 ⎕TF format) item." alt="" coords="680,248,864,288"/>
+<area shape="rect" id="node16" href="$structCommand_1_1transfer__context.html#a9c4651f90f36f6cc728e7146a3a4a0aa" title="process one record of a workspace file" alt="" coords="448,163,632,203"/>
+<area shape="rect" id="node17" href="$classCommand.html#aa0764d08a6ae9c8270907ab7d5dc37cf" title=")IN: import a workspace file" alt="" coords="255,170,391,195"/>
+<area shape="rect" id="node21" href="$classQuad__TF.html#a0d12bc9c1c1710992edb76fca1b7c6af" title="simplify tos by removing UCS nnn etc." alt="" coords="1109,191,1254,217"/>
+</map>

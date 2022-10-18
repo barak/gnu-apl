@@ -1,0 +1,20 @@
+<map id="Value::is_char_array" name="Value::is_char_array">
+<area shape="rect" id="node1" title="return true iff all ravel elements of this value are characters" alt="" coords="1493,208,1635,233"/>
+<area shape="rect" id="node2" href="$classValue.html#a738825347c08e85d421cbf79fd87ec59" title="return true iff this value is a simple character scalar or vector." alt="" coords="1299,179,1443,204"/>
+<area shape="rect" id="node17" href="$classValue.html#af888cebca232681238b61fa15be641f1" title="return true iff this value is a simple character vector." alt="" coords="1297,232,1445,257"/>
+<area shape="rect" id="node3" href="$classQuad__CR.html#a9a5d503eccac9d627b13ee6be3f14cad" title="compute 10 ⎕CR recursively (structured variable)" alt="" coords="1041,55,1249,80"/>
+<area shape="rect" id="node10" href="$classStop__Trace.html#a956aa496c1f8036fc7f3c8167359c0e4" title="find UserFunction named fun_name" alt="" coords="1067,153,1224,179"/>
+<area shape="rect" id="node15" href="$classQuad__PLOT.html#ae6f31438074669d8b69f651556c8fa39" title="parse the (all&#45;optional) attributes in A" alt="" coords="1048,203,1243,228"/>
+<area shape="rect" id="node4" href="$classQuad__CR.html#adb8eb84c4716584168f16f226c1a0ba4" title="portable variable encoding of value name (varname or varname ⊂)" alt="" coords="799,29,993,55"/>
+<area shape="rect" id="node5" href="$classQuad__CR.html#ad98ce37f2b329eb37ddae9d0fcf7832f" title="10 ⎕CR symbol_name (variable or function name). Also used for )OUT" alt="" coords="608,5,751,31"/>
+<area shape="rect" id="node6" href="$classSymbol.html#a9f5e43c937f34053d09f3406f01dacbd" title="dump this symbol to out" alt="" coords="626,55,733,80"/>
+<area shape="rect" id="node7" href="$classSymbolTable.html#ae8e03d7855f323239450e78d66b4b29d" title="dump symbols to out" alt="" coords="421,55,560,80"/>
+<area shape="rect" id="node8" href="$classWorkspace.html#a15d8cb5c62016f547b9718e820c94efd" title="dump this workspace" alt="" coords="216,55,373,80"/>
+<area shape="rect" id="node9" href="$classCommand.html#a98e7d1dd0c01014d79f2120292588a70" title=")DUMP: dump a workspace file (.apl)" alt="" coords="5,55,168,80"/>
+<area shape="rect" id="node11" href="$classQuad__STOP.html#aba7f51dfbb36d3c2d25ce2e7deb0f278" title="Overloaded Function::eval_AB()" alt="" coords="819,79,973,104"/>
+<area shape="rect" id="node12" href="$classQuad__TRACE.html#a59e7875554f651f1f64d83d79111fecd" title="Overloaded Function::eval_AB()" alt="" coords="815,128,977,153"/>
+<area shape="rect" id="node13" href="$classQuad__STOP.html#a4076635597129ebe8ce51e1793bc0e85" title="Overloaded Function::eval_B()" alt="" coords="824,177,968,203"/>
+<area shape="rect" id="node14" href="$classQuad__TRACE.html#a1a54a3b1bc1b4b8b25370bb442269a24" title="Overloaded Function::eval_B()" alt="" coords="819,227,973,252"/>
+<area shape="rect" id="node16" href="$classQuad__PLOT.html#acc4187c32c3bad52f276a724b226b429" title="overloaded Function::eval_AB()" alt="" coords="821,276,971,301"/>
+<area shape="rect" id="node18" href="$classQuad__JSON.html#a1fa347b95372cd4c4ab4b7fd6d4b5358" title="append Cell value to JSON string result" alt="" coords="1050,253,1241,293"/>
+</map>

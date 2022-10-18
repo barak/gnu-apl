@@ -1,0 +1,5 @@
+<map id="ID::get_name_UCS" name="ID::get_name_UCS">
+<area shape="rect" id="node1" title="return the printable name for id as UCS_string" alt="" coords="5,5,143,31"/>
+<area shape="rect" id="node2" href="$classID.html#a1c80b7bfa291882045116dcec6d50098" title="return the printable name for id as UTF8 *" alt="" coords="191,5,292,31"/>
+<area shape="rect" id="node3" href="$structId__name.html#a3202cdf13a9726257a4a3652a66285dd" title="compare key with item (for bsearch())" alt="" coords="340,5,471,31"/>
+</map>

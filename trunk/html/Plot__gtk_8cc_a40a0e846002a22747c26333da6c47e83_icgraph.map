@@ -1,0 +1,4 @@
+<map id="pv_swap" name="pv_swap">
+<area shape="rect" id="node1" title="swap pixels P0 with value Y0, and P1 with value Y1" alt="" coords="152,5,227,31"/>
+<area shape="rect" id="node2" href="$Plot__gtk_8cc.html#aceaeffa0cae7c133b82db5ecf7113577" title="draw a 3D triangle where the points P0, P1, and P2 are at visual heights H0, H1, and H2 respectively...." alt="" coords="5,5,104,31"/>
+</map>

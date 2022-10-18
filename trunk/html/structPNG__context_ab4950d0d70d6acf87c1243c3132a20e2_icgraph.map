@@ -1,0 +1,7 @@
+<map id="PNG_context::get_APL_value" name="PNG_context::get_APL_value">
+<area shape="rect" id="node1" title="return the current pixel matrix as APL value" alt="" coords="768,5,927,45"/>
+<area shape="rect" id="node2" href="$Quad__PNG_8cc.html#abd30e7bef2c721ebdf9fef4407af1598" title="convert APL pixel data to a Gtk/Cairo surface" alt="" coords="637,13,720,38"/>
+<area shape="rect" id="node3" href="$Quad__PNG_8cc.html#a9a9491d1e4cdc0fcf04a7016e8ff95be" title="Gtk callback to draw the ⎕PNG window." alt="" coords="448,13,589,38"/>
+<area shape="rect" id="node4" href="$classQuad__PNG.html#a0d1b1dbcb28ce932b9af8223ee46a93e" title="display an RGB matrix (interpreter code)" alt="" coords="191,13,400,38"/>
+<area shape="rect" id="node5" href="$classQuad__PNG.html#a0db0711b85fe1d914c413f6679458802" title="overloaded Function::eval_B()" alt="" coords="5,13,143,38"/>
+</map>

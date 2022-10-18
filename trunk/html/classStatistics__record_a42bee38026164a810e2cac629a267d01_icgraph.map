@@ -1,0 +1,8 @@
+<map id="Statistics_record::reset" name="Statistics_record::reset">
+<area shape="rect" id="node1" title="reset record to count 0, mean 0, variance 0" alt="" coords="411,69,539,109"/>
+<area shape="rect" id="node2" href="$classFunctionStatistics.html#aa57e7e8cbee85feebbf8c96d2d5dd0f4" title="overloaded Statistics::print()" alt="" coords="224,5,351,45"/>
+<area shape="rect" id="node4" href="$classCellFunctionStatistics.html#ab41658fef3571cf5c2dec2cb2139b76e" title="reset this statistics: clear first and subsequent records" alt="" coords="212,69,363,109"/>
+<area shape="rect" id="node6" href="$classStatistics__record.html#ab1928ad915cb58f691bf0b306d6fccad" title="constructor" alt="" coords="223,133,351,173"/>
+<area shape="rect" id="node3" href="$classFunctionStatistics.html#a6d9f477fb25e6736d3bbf18ae8524bd8" title="constructor: FunctionStatistics with ID id" alt="" coords="17,5,152,45"/>
+<area shape="rect" id="node5" href="$classCellFunctionStatistics.html#add1002197fe879c28772c9e25f320f6c" title="constructor: reset this statistics" alt="" coords="5,69,164,109"/>
+</map>

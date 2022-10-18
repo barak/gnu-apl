@@ -1,0 +1,4 @@
+<map id="Value::is_scalar" name="Value::is_scalar">
+<area shape="rect" id="node1" title="return true iff this value is a scalar." alt="" coords="5,5,120,31"/>
+<area shape="rect" id="node2" href="$classShape.html#a017e9a35dd20f4bc4fdeb7ea29b6805d" title="return the rank" alt="" coords="168,5,285,31"/>
+</map>

@@ -1,0 +1,20 @@
+<map id="src/DiffOut.hh" name="src/DiffOut.hh">
+<area shape="rect" id="node4" href="$Assert_8hh.html" title="Assert.hh" alt="" coords="978,304,1057,331"/>
+<area shape="rect" id="node27" href="$PrintOperator_8hh.html" title="PrintOperator.hh" alt="" coords="1719,80,1836,107"/>
+<area shape="rect" id="node33" href="$UTF8__string_8hh.html" title="UTF8_string.hh" alt="" coords="1525,304,1637,331"/>
+<area shape="rect" id="node5" href="$Common_8hh.html" title="Common.hh" alt="" coords="893,379,987,405"/>
+<area shape="rect" id="node18" href="$APL__types_8hh.html" title="APL_types.hh" alt="" coords="232,453,336,480"/>
+<area shape="rect" id="node23" href="$Logging_8hh.html" title="Logging.hh" alt="" coords="451,453,536,480"/>
+<area shape="rect" id="node25" href="$SystemLimits_8hh.html" title="SystemLimits.hh" alt="" coords="560,453,680,480"/>
+<area shape="rect" id="node21" href="$Unicode_8hh.html" title="Unicode.hh" alt="" coords="1543,528,1631,555"/>
+<area shape="rect" id="node22" href="$Avec_8def.html" title="Avec.def" alt="" coords="1549,603,1624,629"/>
+<area shape="rect" id="node24" href="$Logging_8def.html" title="Logging.def" alt="" coords="447,528,537,555"/>
+<area shape="rect" id="node26" href="$SystemLimits_8def.html" title="SystemLimits.def" alt="" coords="561,528,685,555"/>
+<area shape="rect" id="node28" href="$Id_8hh.html" title="Id.hh" alt="" coords="1700,155,1751,181"/>
+<area shape="rect" id="node31" href="$TokenEnums_8hh.html" title="TokenEnums.hh" alt="" coords="1792,229,1909,256"/>
+<area shape="rect" id="node29" href="$IdEnums_8hh.html" title="IdEnums.hh" alt="" coords="1662,304,1754,331"/>
+<area shape="rect" id="node35" href="$UCS__string_8hh.html" title="UCS_string.hh" alt="" coords="1299,229,1407,256"/>
+<area shape="rect" id="node30" href="$Id_8def.html" title="Id.def" alt="" coords="1681,379,1735,405"/>
+<area shape="rect" id="node32" href="$Token_8def.html" title="Token.def" alt="" coords="1829,304,1909,331"/>
+<area shape="rect" id="node36" href="$Heapsort_8hh.html" title="Heapsort.hh" alt="" coords="1307,304,1400,331"/>
+</map>

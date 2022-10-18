@@ -1,0 +1,8 @@
+<map id="Avec::IBM_quad_AV" name="Avec::IBM_quad_AV">
+<area shape="rect" id="node1" title="a pointer to 256 Unicode characters that are exactly the APL2 character set (⎕AV) shown in lrm Append..." alt="" coords="683,42,827,67"/>
+<area shape="rect" id="node2" href="$structCommand_1_1transfer__context.html#a77c5f0fa4e25decf8d996cb8b69ac06a" title="add len UTF8 bytes to this transfer_context" alt="" coords="421,15,635,41"/>
+<area shape="rect" id="node5" href="$classQuad__FIO.html#a60874d4f95aaaa8df54150af1731af97" title="overloaded Function::eval_B()." alt="" coords="463,66,593,91"/>
+<area shape="rect" id="node3" href="$structCommand_1_1transfer__context.html#a9c4651f90f36f6cc728e7146a3a4a0aa" title="process one record of a workspace file" alt="" coords="189,5,373,45"/>
+<area shape="rect" id="node4" href="$classCommand.html#aa0764d08a6ae9c8270907ab7d5dc37cf" title=")IN: import a workspace file" alt="" coords="5,13,141,38"/>
+<area shape="rect" id="node6" href="$classQuad__FIO.html#a24ac2813d6425ad61471166fe019ba33" title="overloaded Function::eval_LXB()." alt="" coords="208,70,355,95"/>
+</map>

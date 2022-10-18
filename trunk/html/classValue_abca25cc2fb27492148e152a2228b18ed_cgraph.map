@@ -1,0 +1,11 @@
+<map id="Value::can_be_compared" name="Value::can_be_compared">
+<area shape="rect" id="node1" title="return true if this value can be compared. This is the case when all cells (including nested ones) ar..." alt="" coords="5,132,175,157"/>
+<area shape="rect" id="node2" href="$classCell.html#a38a6a25f0ad091f35e3d9abfe5608a50" title="return the type of this cell" alt="" coords="445,107,575,132"/>
+<area shape="rect" id="node3" href="$classValue.html#aa0572b1b7fa249cb79694fd152130b38" title="return the (constant) idx&#39;th element of the ravel." alt="" coords="239,5,361,31"/>
+<area shape="rect" id="node4" href="$classValue.html#ac5b54e3a13cab0837442f1575b3299a5" title="return the number of elements, but at least 1 (for the prototype)." alt="" coords="425,31,595,56"/>
+<area shape="rect" id="node6" href="$classCell.html#a367b9df7e0d4b805e5f31641658113f6" title="Return the APL value of a cell (Asserts for non&#45;pointer cells)" alt="" coords="223,157,377,183"/>
+<area shape="rect" id="node8" href="$classCell.html#a361d896dc8f4fa470864e8e1588d2409" title="return true iff value is numeric and close to a real number" alt="" coords="239,207,361,232"/>
+<area shape="rect" id="node9" href="$classCell.html#ae98b3988a7fa52c6c157b4911b043dde" title="Return true iff this cell is a pointer (to a sub&#45;array) cell." alt="" coords="232,256,368,281"/>
+<area shape="rect" id="node5" href="$classShape.html#a6f32f749601dca80263493fd06be12c4" title="return the number of ravel elements, but at least 1 (for empty values and scalars) else product of sh..." alt="" coords="643,31,797,56"/>
+<area shape="rect" id="node7" href="$classCell.html#a6c3fdef3d82f53649d1c3f16d37eedd7" title="the name of ct" alt="" coords="425,157,595,183"/>
+</map>

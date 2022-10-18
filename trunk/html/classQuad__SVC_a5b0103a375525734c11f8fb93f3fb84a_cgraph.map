@@ -1,0 +1,31 @@
+<map id="Quad_SVC::eval_AB" name="Quad_SVC::eval_AB">
+<area shape="rect" id="node1" title="Overloaded Function::eval_AB()." alt="" coords="5,340,151,365"/>
+<area shape="rect" id="node2" href="$classShape.html#aeb018b67601d3f1c4bea3d2c2b877b7e" title="add a dimension of length len at the end" alt="" coords="211,212,373,237"/>
+<area shape="rect" id="node3" href="$structSvar__partner.html#a3fb77c18c091930a1a8c361e399c8c04" title="return the control bits of this partner (as seen by the offering" alt="" coords="208,261,376,287"/>
+<area shape="rect" id="node4" href="$classSymbol.html#a15f5ddcfd9ba68e366a3e14e84fe8c1d" title="return the current SV_key (or throw a VALUE_ERROR)" alt="" coords="219,311,365,336"/>
+<area shape="rect" id="node5" href="$classWorkspace.html#ad59928bcb6527147b5c5ca3e34106fe3" title="lookup an existing symbol (user defined or ⎕xx)." alt="" coords="199,361,385,401"/>
+<area shape="rect" id="node24" href="$classSvar__DB.html#a8851294d9200535803c14f3aa9efc04a" title="set the current control vector of this variable" alt="" coords="219,685,365,711"/>
+<area shape="rect" id="node27" href="$classError.html#af47d2ce6f771f8d502d4d1cd05d6f81d" title="throw an Error related to Symbol symbol" alt="" coords="223,574,361,614"/>
+<area shape="rect" id="node6" href="$classToken.html#a049cd3eb72ae0c6427e523d399876b86" title="return the TokenClass of this token." alt="" coords="464,228,589,253"/>
+<area shape="rect" id="node7" href="$classWorkspace.html#acb39e0420fcef7558220b9576b809e97" title="return a token for system function or variable ucs" alt="" coords="452,277,601,303"/>
+<area shape="rect" id="node15" href="$classAvec.html#a88cc8af75e4a2c4d8a1d382637ca07b4" title="return true if unicode uni is a quad (⎕ or ▯)" alt="" coords="706,5,811,31"/>
+<area shape="rect" id="node18" href="$classSymbolTableBase.html#a58cddd45598f27eff5711db23ce9043c" title="return a Symbol with name name in this SymbolTable." alt="" coords="671,55,846,95"/>
+<area shape="rect" id="node21" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="1375,120,1497,145"/>
+<area shape="rect" id="node22" href="$classToken.html#a7ca97b588068b17bd396d8ae9d30ea7a" title="return the Symbol * value of this token" alt="" coords="457,509,596,535"/>
+<area shape="rect" id="node8" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="689,171,829,196"/>
+<area shape="rect" id="node9" href="$classSystemName.html#a172f0a34194f5e512f521800dca3a339" title="return the function (if any) that this name represents" alt="" coords="668,220,849,245"/>
+<area shape="rect" id="node10" href="$classSystemVariable.html#adfd61017d46f4b022af485637a768c76" title="return the TokenTag for this system variable" alt="" coords="689,270,829,310"/>
+<area shape="rect" id="node13" href="$classFunction.html#a74163ba976576a5bb03a060d42fd96e5" title="return a Token for this function." alt="" coords="690,335,827,360"/>
+<area shape="rect" id="node14" href="$classSystemName.html#a38a91b3cff0213ca7b89f4ddfa7d135a" title="return the variable (if any) that this name represents" alt="" coords="669,384,849,409"/>
+<area shape="rect" id="node16" href="$classAvec.html#a76a72fdcb1782be1c490b3670c45504f" title="Return true iff av is a valid char in a user defined symbol." alt="" coords="683,433,834,459"/>
+<area shape="rect" id="node11" href="$classNamedObject.html#a3ff29d3b8f3eed6c55f535e1af8dbc91" title="return the Id of this object (ID_USER_SYMBOL for user defined objects)" alt="" coords="935,253,1081,279"/>
+<area shape="rect" id="node12" href="$classID.html#a4e45a9557dbd8b94bcdf0ecbe280a386" title="return the TokenTag for id" alt="" coords="945,303,1071,328"/>
+<area shape="rect" id="node17" href="$classAvec.html#afe30f62f26ec74019a95e5cbd6eaa111" title="Find av in character_table. Return position or Invalid_CHT." alt="" coords="951,433,1065,459"/>
+<area shape="rect" id="node19" href="$classSymbolTableBase.html#ad231d005a78e9d44f0536aeb1caea62c" title="compute a 16&#45;bit hash for name" alt="" coords="897,63,1119,88"/>
+<area shape="rect" id="node20" href="$classUCS__string.html#af5956757116853a2e1bc5a0533624d2e" title="return the FNV (Fowler&#45;Noll&#45;Vo) hash of this_string" alt="" coords="1167,69,1327,95"/>
+<area shape="rect" id="node23" href="$classToken.html#a1a31afbb07e3f1dbb86d5f872ce5c297" title="return the TokenValueType of this token." alt="" coords="682,535,835,560"/>
+<area shape="rect" id="node25" href="$classSvar__DB.html#a8e5d83427d476f8db6752dbf86c78e96" title="get TCP socket to APserver, complain if not connected" alt="" coords="433,709,620,735"/>
+<area shape="rect" id="node26" href="$classSvar__DB.html#ac10f9507c18657397c050432da27cdac" title="return the fd towards APserver" alt="" coords="683,709,835,735"/>
+<area shape="rect" id="node28" href="$classUTF8__string.html#a922bd7ebc6a8ea5c6ba9c54159b18a93" title="return this string as a 0&#45;terminated C string" alt="" coords="461,559,592,584"/>
+<area shape="rect" id="node29" href="$classWorkspace.html#a8083efc2d51067edb25ae8dd4f014173" title="the top of the SI stack (the SI pushed last)" alt="" coords="459,660,594,685"/>
+</map>

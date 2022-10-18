@@ -1,0 +1,8 @@
+<map id="ComplexCell::bif_power" name="ComplexCell::bif_power">
+<area shape="rect" id="node1" title="overloaded from the corresponding Cell:: function (see class Cell)." alt="" coords="5,80,167,105"/>
+<area shape="rect" id="node2" href="$classComplexCell.html#ae93d7078736e5c3b20970a687565b3d1" title="return the complex value of this cell" alt="" coords="215,5,344,31"/>
+<area shape="rect" id="node3" href="$classIntCell.html#afd60fd9e3a5581ac99c1e053d9218fe7" title="initialize the (un&#45;initialized) Cell *Z to integer 0" alt="" coords="238,55,321,80"/>
+<area shape="rect" id="node5" href="$classIntCell.html#a7da78424dbf8c5a7ee6b9630f7daac97" title="initialize the (un&#45;initialized) Cell *Z to integer 1" alt="" coords="238,104,321,129"/>
+<area shape="rect" id="node6" href="$classComplexCell.html#a9ccb64da2c504a517c725dc2c41940da" title="initialize the (un&#45;initialized) Cell *Z to complex r + ij" alt="" coords="218,153,341,179"/>
+<area shape="rect" id="node4" href="$classIntCell.html#a88c653b2f968c451ee1c1c53a983fa13" title="Construct an integer cell with value 0." alt="" coords="392,80,499,105"/>
+</map>

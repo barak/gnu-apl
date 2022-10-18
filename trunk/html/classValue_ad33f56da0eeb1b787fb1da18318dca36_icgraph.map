@@ -1,0 +1,5 @@
+<map id="Value::to_shape" name="Value::to_shape">
+<area shape="rect" id="node1" title="convert the ravel of Value val to a shape (normalized to ⎕IO←0) An elided index, for example B[],..." alt="" coords="216,42,332,67"/>
+<area shape="rect" id="node2" href="$classBif__F12__PARTITION.html#a93f7a529d2b49ecb0e1262ee5b3ce893" title="overloaded Function::eval_XB()" alt="" coords="9,5,164,45"/>
+<area shape="rect" id="node3" href="$classBif__F12__PICK.html#ad21f06a298fdf42e3e4db81cda42bcff" title="overloaded Function::eval_XB()" alt="" coords="5,70,168,95"/>
+</map>

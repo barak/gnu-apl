@@ -1,0 +1,13 @@
+<map id="PrintBuffer::pb_for_function" name="PrintBuffer::pb_for_function">
+<area shape="rect" id="node1" title="PrintBuffer from an APL value in function&#45;style." alt="" coords="5,159,133,199"/>
+<area shape="rect" id="node2" href="$classPrintBuffer.html#a720232f76255d2c25f22fd62e7571d2e" title="add an outer frame around this buffer" alt="" coords="184,130,333,170"/>
+<area shape="rect" id="node3" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="401,5,541,31"/>
+<area shape="rect" id="node10" href="$classPrintContext.html#a6d5f964f0a49121bf6096291fec901a6" title="return the print width to be used" alt="" coords="183,195,334,220"/>
+<area shape="rect" id="node11" href="$classPrintBuffer.html#ac908299d64de169dc59f0666fe323167" title="contructor: empty PrintBuffer" alt="" coords="181,244,336,269"/>
+<area shape="rect" id="node4" href="$classPrintBuffer.html#af6f689e8c4e930b7c37099bf5fdfe57d" title="return the number of columns" alt="" coords="605,169,764,209"/>
+<area shape="rect" id="node5" href="$classPrintBuffer.html#a7f4647903888bbde606c371f64109e5e" title="return the characters for style pst" alt="" coords="395,155,546,195"/>
+<area shape="rect" id="node6" href="$classPrintBuffer.html#ac13295601812e379a3eac618ce239426" title="return the number of rows" alt="" coords="615,258,754,298"/>
+<area shape="rect" id="node7" href="$classUCS__string__vector.html#a16fca0c736760dae8fbf220634fc500d" title="replacement for insert(std::vector::iterator position, value)" alt="" coords="400,270,541,310"/>
+<area shape="rect" id="node8" href="$classPrintBuffer.html#adae7aa63347e6aba983449dde7d50c33" title="return true iff all strings have the same size." alt="" coords="384,220,557,245"/>
+<area shape="rect" id="node9" href="$classPrintBuffer.html#a6fe77535d5ab96ae9d8fcc8b3ddbe78f" title="Set the char in column x and row y to uc." alt="" coords="399,55,542,80"/>
+</map>

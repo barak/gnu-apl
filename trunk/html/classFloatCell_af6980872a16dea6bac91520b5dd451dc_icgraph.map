@@ -1,0 +1,5 @@
+<map id="FloatCell::bif_add_inverse" name="FloatCell::bif_add_inverse">
+<area shape="rect" id="node2" href="$classFloatCell.html#ad2bf434993646c6d2434942bdf1086e2" title="return true iff this cell needs scaling (exponential format) in pctx. " alt="" coords="177,13,336,39"/>
+<area shape="rect" id="node3" href="$classComplexCell.html#a8882c2a4701f26a80e9bc1aa2dd450be" title="return true iff this cell needs scaling (exponential format) in pctx. " alt="" coords="384,13,565,39"/>
+<area shape="rect" id="node4" href="$classComplexCell.html#a978a6ef7d34a3446b796a0597c05d074" title="Overloaded Cell::is_finite(). " alt="" coords="613,13,764,39"/>
+</map>

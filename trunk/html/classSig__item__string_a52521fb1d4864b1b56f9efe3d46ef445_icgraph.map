@@ -1,0 +1,15 @@
+<map id="Sig_item_string::print" name="Sig_item_string::print">
+<area shape="rect" id="node1" title="print the item" alt="" coords="245,289,391,315"/>
+<area shape="rect" id="node2" href="$classSET__STATE__c.html#a558f184b72b27478140df7263a6f8db0" title="print this signal on out." alt="" coords="29,5,174,31"/>
+<area shape="rect" id="node3" href="$classVALUE__IS__c.html#a5eb76a1253fef9f9ded902d61324ff5d" title="print this signal on out." alt="" coords="35,55,168,80"/>
+<area shape="rect" id="node4" href="$classASSIGN__VALUE__c.html#aa6975e74979dc8f74c04ad40977dce06" title="print this signal on out." alt="" coords="16,104,187,129"/>
+<area shape="rect" id="node5" href="$classSVAR__ASSIGNED__c.html#a922164a7d6be0d0141aad9d06e99a65f" title="print this signal on out." alt="" coords="10,153,193,179"/>
+<area shape="rect" id="node6" href="$classSVAR__RECORD__IS__c.html#abd46116dbc81b357ff915ed21f4202ca" title="print this signal on out." alt="" coords="5,203,197,228"/>
+<area shape="rect" id="node7" href="$classREGISTER__PROCESSOR__c.html#ade7f9a91ee8690e68f6385735ee4bd16" title="print this signal on out." alt="" coords="9,253,193,293"/>
+<area shape="rect" id="node8" href="$classMATCH__OR__MAKE__c.html#a87d320adb0809258a45ead6597fcc634" title="print this signal on out." alt="" coords="7,317,196,343"/>
+<area shape="rect" id="node9" href="$classOFFERING__PROCS__ARE__c.html#a87562452aca5b5219459e1a3d02cf9df" title="print this signal on out." alt="" coords="11,367,192,407"/>
+<area shape="rect" id="node10" href="$classOFFERED__VARS__ARE__c.html#a0843a5e1f1fce30cacd2caa587f1f5da" title="print this signal on out." alt="" coords="12,431,191,471"/>
+<area shape="rect" id="node11" href="$classASSIGN__WSWS__VAR__c.html#ad9ecd82bb3e89ade71130e5dc3d3da2c" title="print this signal on out." alt="" coords="11,495,192,535"/>
+<area shape="rect" id="node12" href="$classWSWS__VALUE__IS__c.html#aa58d526f1911b64ecdc93373a6488fb6" title="print this signal on out." alt="" coords="9,560,193,585"/>
+<area shape="rect" id="node13" href="$classSVAR__DB__PRINTED__c.html#a9b44605ddb70a96bde2f95ac5408d4ab" title="print this signal on out." alt="" coords="14,610,189,650"/>
+</map>

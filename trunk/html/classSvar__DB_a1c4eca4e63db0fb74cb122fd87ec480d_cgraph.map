@@ -1,0 +1,12 @@
+<map id="Svar_DB::get_events" name="Svar_DB::get_events">
+<area shape="rect" id="node1" title="return events for processor proc" alt="" coords="5,106,152,131"/>
+<area shape="rect" id="node2" href="$classSignal__base.html#a6b928c50a9f4d3c81b2ef300cd13d1fa" title="&lt; dito" alt="" coords="200,5,387,45"/>
+<area shape="rect" id="node5" href="$classSignal__base.html#a69ce00dc7ae165d96444770d312d00d7" title="APserver result for: clear all events for one processor (first cleared svar access functions for sign..." alt="" coords="200,69,387,109"/>
+<area shape="rect" id="node6" href="$classSvar__DB.html#a8e5d83427d476f8db6752dbf86c78e96" title="get TCP socket to APserver, complain if not connected" alt="" coords="200,134,387,159"/>
+<area shape="rect" id="node8" href="$classSignal__base.html#ae6862da3b4684bf41e1a427ebece92e9" title="receive a signal (TCP)" alt="" coords="213,183,373,209"/>
+<area shape="rect" id="node3" href="$classSignal__base.html#a4e35a5a0fd9ced011b83a11ac304724c" title="get function for an item that is not defined for the signal" alt="" coords="444,45,591,70"/>
+<area shape="rect" id="node4" href="$classSignal__base.html#a77d69692410bd7b7d49033b73fcfc8fc" title="return the name of the ID of the signal" alt="" coords="648,45,827,70"/>
+<area shape="rect" id="node7" href="$classSvar__DB.html#ac10f9507c18657397c050432da27cdac" title="return the fd towards APserver" alt="" coords="441,134,593,159"/>
+<area shape="rect" id="node9" href="$classSig__item__int.html#a5e6903d94a367f8e7e9540881ddf389e" title="return the value of the item" alt="" coords="435,183,600,209"/>
+<area shape="rect" id="node10" href="$classSignal__base.html#a774958a4504fa7536cc941a3736d5b2c" title="print the signal" alt="" coords="454,233,581,258"/>
+</map>

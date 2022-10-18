@@ -1,0 +1,7 @@
+<map id="NumericCell::complex_binomial" name="NumericCell::complex_binomial">
+<area shape="rect" id="node1" title="N over K for complex A and/or B." alt="" coords="5,97,156,137"/>
+<area shape="rect" id="node2" href="$classComplexCell.html#af05c8d8f2555842260867eea123b7d21" title="the lanczos approximation for gamma(x + iy)" alt="" coords="204,29,352,55"/>
+<area shape="rect" id="node3" href="$classCell.html#a0e6b9239fa77e3222f32400d51c8f114" title="Return the imaginary part of a cell." alt="" coords="206,79,350,104"/>
+<area shape="rect" id="node4" href="$classCell.html#a9a0028fd74f00deb001a8062a55916c6" title="Return the real part of a cell." alt="" coords="209,128,347,153"/>
+<area shape="rect" id="node5" href="$classComplexCell.html#a9ccb64da2c504a517c725dc2c41940da" title="initialize the (un&#45;initialized) Cell *Z to complex r + ij" alt="" coords="217,177,339,203"/>
+</map>

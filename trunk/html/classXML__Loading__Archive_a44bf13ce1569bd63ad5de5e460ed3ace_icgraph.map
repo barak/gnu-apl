@@ -1,0 +1,10 @@
+<map id="XML_Loading_Archive::skip_to_tag" name="XML_Loading_Archive::skip_to_tag">
+<area shape="rect" id="node1" title="skip to tag tag, return EOF if end of file" alt="" coords="1005,43,1157,83"/>
+<area shape="rect" id="node2" href="$classXML__Loading__Archive.html#ad2f1d88070976eab8a41f0fdcd1e0ec1" title="read next StateIndicator element" alt="" coords="5,31,157,71"/>
+<area shape="rect" id="node3" href="$classXML__Loading__Archive.html#a75730a7dd5af9238d0d1aa223a54060e" title="read next Symbol element" alt="" coords="805,43,957,83"/>
+<area shape="rect" id="node5" href="$classXML__Loading__Archive.html#ac4cdadb93d62fcd862579b84d3556804" title="read an UCS string" alt="" coords="805,107,957,147"/>
+<area shape="rect" id="node4" href="$classXML__Loading__Archive.html#a2a4f7a3fff06dfd2351348bf26fc90a3" title="read next Symbol element" alt="" coords="605,43,757,83"/>
+<area shape="rect" id="node6" href="$classXML__Loading__Archive.html#a16b4789e109bf0167ae481b86a1ebedb" title="read a lambda" alt="" coords="605,107,757,147"/>
+<area shape="rect" id="node7" href="$classXML__Loading__Archive.html#a0cd18fa421176354e241891d951f5169" title="read a user defined Executable" alt="" coords="405,91,557,131"/>
+<area shape="rect" id="node8" href="$classXML__Loading__Archive.html#adfa844fcc401d3c335cafa5abda2f35d" title="read next StateIndicator entry" alt="" coords="205,59,357,99"/>
+</map>

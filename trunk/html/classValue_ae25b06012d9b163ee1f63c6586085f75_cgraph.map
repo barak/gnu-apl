@@ -1,0 +1,12 @@
+<map id="Value::CDR_data_size" name="Value::CDR_data_size">
+<area shape="rect" id="node1" title="return the CDR size in bytes for the data of value, not including the CDR header and padding" alt="" coords="5,131,161,156"/>
+<area shape="rect" id="node2" href="$classCell.html#a664a77c44dc2991d35e1fff84533d5dd" title="return the minimum number of data bytes to store this cell in CDR format. The actual number of data b..." alt="" coords="229,5,344,31"/>
+<area shape="rect" id="node3" href="$classValue.html#aa0572b1b7fa249cb79694fd152130b38" title="return the (constant) idx&#39;th element of the ravel." alt="" coords="225,55,348,80"/>
+<area shape="rect" id="node4" href="$classValue.html#ac5b54e3a13cab0837442f1575b3299a5" title="return the number of elements, but at least 1 (for the prototype)." alt="" coords="412,80,581,105"/>
+<area shape="rect" id="node6" href="$classCell.html#a367b9df7e0d4b805e5f31641658113f6" title="Return the APL value of a cell (Asserts for non&#45;pointer cells)" alt="" coords="209,156,364,181"/>
+<area shape="rect" id="node9" href="$classCell.html#ae98b3988a7fa52c6c157b4911b043dde" title="Return true iff this cell is a pointer (to a sub&#45;array) cell." alt="" coords="219,205,355,231"/>
+<area shape="rect" id="node10" href="$classCell.html#ad4edf9a2c4c464abefb221a8c24a3a37" title="Return true iff this cell is a numeric cor character cell." alt="" coords="219,255,354,280"/>
+<area shape="rect" id="node5" href="$classShape.html#a6f32f749601dca80263493fd06be12c4" title="return the number of ravel elements, but at least 1 (for empty values and scalars) else product of sh..." alt="" coords="629,80,784,105"/>
+<area shape="rect" id="node7" href="$classCell.html#a38a6a25f0ad091f35e3d9abfe5608a50" title="return the type of this cell" alt="" coords="431,229,562,255"/>
+<area shape="rect" id="node8" href="$classCell.html#a6c3fdef3d82f53649d1c3f16d37eedd7" title="the name of ct" alt="" coords="412,156,581,181"/>
+</map>

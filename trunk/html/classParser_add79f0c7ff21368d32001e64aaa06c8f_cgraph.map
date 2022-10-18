@@ -1,0 +1,4 @@
+<map id="Parser::remove_nongrouping_parantheses" name="Parser::remove_nongrouping_parantheses">
+<area shape="rect" id="node1" title="Replace (X) by X and ((..) by (..) in string. (X is a single token)" alt="" coords="5,5,193,45"/>
+<area shape="rect" id="node2" href="$classParser.html#a0979c1e2733274ff5e535aecddab0a7e" title="find closing paranthesis; throw error if not found." alt="" coords="241,5,379,45"/>
+</map>

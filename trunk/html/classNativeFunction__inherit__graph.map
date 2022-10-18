@@ -1,4 +1,5 @@
 <map id="NativeFunction" name="NativeFunction">
-<area shape="rect" id="node2" href="$classFunction.html" title="Base class for all APL functions and operators (system or defined) " alt="" coords="25,80,97,107"/>
-<area shape="rect" id="node3" href="$classNamedObject.html" title="A user&#45;defined variable or function. " alt="" coords="9,5,112,32"/>
+<area shape="rect" id="node1" title="A defined function written in C++." alt="" coords="5,152,116,177"/>
+<area shape="rect" id="node2" href="$classFunction.html" title="Base class for all APL functions and operators (system or defined)" alt="" coords="25,79,97,104"/>
+<area shape="rect" id="node3" href="$classNamedObject.html" title="A user&#45;defined variable or function." alt="" coords="9,5,112,31"/>
 </map>

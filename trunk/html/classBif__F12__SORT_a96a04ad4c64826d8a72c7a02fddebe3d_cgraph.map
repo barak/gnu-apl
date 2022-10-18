@@ -1,0 +1,11 @@
+<map id="Bif_F12_SORT::sort" name="Bif_F12_SORT::sort">
+<area shape="rect" id="node1" title="sort integer vector B" alt="" coords="5,31,147,56"/>
+<area shape="rect" id="node2" href="$classWorkspace.html#adb2006f054a1cebb8ae0252b61bd1d1b" title="return the current ⎕IO" alt="" coords="196,5,331,31"/>
+<area shape="rect" id="node3" href="$classCell.html#aea7b72b319c82a644d893455516dd8a1" title="return length indices i1, i2, ... iN so that ravel[i1] &lt; ravel[i2] &lt; ... &lt; ravel[iN]...." alt="" coords="195,55,332,80"/>
+<area shape="rect" id="node4" href="$classCell.html#a98a5d83df230577f432930eac851f57d" title="compare cells[a] and cells[b] ascendingly" alt="" coords="383,5,497,31"/>
+<area shape="rect" id="node6" href="$classCell.html#a4c308856d54530f72ba77429b8b5f174" title="compare cells[a] and cells[b] descendingly" alt="" coords="382,55,498,80"/>
+<area shape="rect" id="node7" href="$classUCS__string.html#a59f472bb1ee082cca5ac2a6c128f4918" title="sort the characters in this string by their Unicode" alt="" coords="380,128,500,153"/>
+<area shape="rect" id="node5" href="$classCell.html#ab5bc0bd0d336863996b9b5bc58f3ddef" title="compare this with other, throw DOMAIN ERROR on illegal comparisons" alt="" coords="578,24,681,49"/>
+<area shape="rect" id="node8" href="$classUCS__string.html#a3c03c3e5b4d7be0e435a7cfee8a424ae" title="helper function for Heapsort&lt;Unicode&gt;::sort()" alt="" coords="548,91,711,116"/>
+<area shape="rect" id="node9" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="568,140,691,165"/>
+</map>

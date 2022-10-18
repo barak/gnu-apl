@@ -1,0 +1,15 @@
+<map id="Command::cmd_HISTORY" name="Command::cmd_HISTORY">
+<area shape="rect" id="node1" title="show or clear input history" alt="" coords="5,283,188,308"/>
+<area shape="rect" id="node2" href="$classLineInput.html#ad491f420acc05aad15024db06deadd3f" title="clear history" alt="" coords="236,181,393,207"/>
+<area shape="rect" id="node6" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="1011,155,1133,180"/>
+<area shape="rect" id="node11" href="$classLineInput.html#a67380e434a21599b5ac579e542b27379" title="print history to out" alt="" coords="237,311,392,336"/>
+<area shape="rect" id="node13" href="$classUCS__string.html#a59758db55104daa7d4d72933412f86e3" title="return true if this starts with prefix (ASCII, case insensitive)." alt="" coords="620,334,751,374"/>
+<area shape="rect" id="node3" href="$classLineHistory.html#ae97a45176203e977a0ca11e2a2ad6197" title="clear history" alt="" coords="441,135,565,175"/>
+<area shape="rect" id="node4" href="$classLineHistory.html#a870ae7c7f0a0abcc27623195bca68b20" title="add one line to this history" alt="" coords="613,131,757,156"/>
+<area shape="rect" id="node5" href="$classUCS__string.html#a186a76c22c3ac840f1e607ba49e253a0" title="return the last character in this string" alt="" coords="821,55,947,80"/>
+<area shape="rect" id="node7" href="$classUCS__string.html#ac43d98d8d13b5a91d670fe9af9250861" title="return true if this string contains non&#45;whitespace characters" alt="" coords="805,5,963,31"/>
+<area shape="rect" id="node9" href="$classLineHistory.html#a65f9dbc23912fc543e4433659ffc81ed" title="start a new up/down sequence" alt="" coords="823,156,945,181"/>
+<area shape="rect" id="node10" href="$classUCS__string.html#a67ea87cb92e687105b21917ffb4a2a6f" title="remove the last character in this string" alt="" coords="807,205,961,231"/>
+<area shape="rect" id="node8" href="$classAvec.html#a014cc622b9ec09014dab1982b0ee59ab" title="return true iff av is a whitespace char (ASCII 0..32 (including))" alt="" coords="1018,5,1126,31"/>
+<area shape="rect" id="node12" href="$classLineHistory.html#a14a157b351f0276325f28b171809f19c" title="print history to out" alt="" coords="443,306,564,346"/>
+</map>

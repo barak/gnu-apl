@@ -1,0 +1,13 @@
+<map id="UserFunction_header::UserFunction_header" name="UserFunction_header::UserFunction_header">
+<area shape="rect" id="node1" title="constructor from first line in txt (for proper defined functions)" alt="" coords="5,87,160,127"/>
+<area shape="rect" id="node2" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="211,5,351,31"/>
+<area shape="rect" id="node3" href="$classUserFunction__header.html#a7ce5d64cb355876f5a5a5606476d1696" title="init the local variables from text" alt="" coords="208,55,355,95"/>
+<area shape="rect" id="node9" href="$classUserFunction__header.html#af72aea0d6de982a6ed4002dc61c173ab" title="init the signature from text" alt="" coords="208,119,355,159"/>
+<area shape="rect" id="node11" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="220,184,343,209"/>
+<area shape="rect" id="node4" href="$classUserFunction__header.html#a332a135b6d9ec286e6deb84298c10a43" title="Check that all function params, local vars. and labels are unique." alt="" coords="403,24,569,79"/>
+<area shape="rect" id="node6" href="$classTokenizer.html#ad7706aec4bdc9bf3ef0166a16bfa9373" title="tokenize UTF&#45;8 string input into token string tos." alt="" coords="418,103,554,128"/>
+<area shape="rect" id="node5" href="$classUserFunction__header.html#af00a60b75d11d89318c278f153b9c3a8" title="remove sym from local_vars if it occurs at pos or above" alt="" coords="617,31,808,71"/>
+<area shape="rect" id="node7" href="$classError.html#a73c1f4ab40f4e313f504562d52bb001e" title="return the error code of this error" alt="" coords="641,99,785,124"/>
+<area shape="rect" id="node8" href="$classError.html#a2ee02a4706e3c07b95d8f29aafe6cbbb" title="set the second error line" alt="" coords="637,148,788,173"/>
+<area shape="rect" id="node10" href="$classSymbol.html#a126fc214ca7a2e2d364e0982a36b2ace" title="The name of this Symbol." alt="" coords="421,152,551,177"/>
+</map>

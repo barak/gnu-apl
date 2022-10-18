@@ -1,4 +1,8 @@
 <map id="UTF8_ostream" name="UTF8_ostream">
-<area shape="rect" id="node3" href="$classUTF8__filebuf.html" title="A UTF8 string to be used as filebuf in UTF8_ostream. " alt="" coords="99,185,197,212"/>
-<area shape="rect" id="node5" href="$classUTF8__string.html" title="an UTF8 encoded Unicode (RFC 3629) string " alt="" coords="165,96,259,123"/>
+<area shape="rect" id="node1" title="a UTF8 string that can be used as ostream" alt="" coords="7,271,116,296"/>
+<area shape="rect" id="node2" title=" " alt="" coords="5,183,75,208"/>
+<area shape="rect" id="node3" href="$classUTF8__filebuf.html" title="A UTF8 string to be used as filebuf in UTF8_ostream." alt="" coords="99,183,197,208"/>
+<area shape="rect" id="node4" title=" " alt="" coords="83,95,141,120"/>
+<area shape="rect" id="node5" href="$classUTF8__string.html" title="an UTF8 encoded Unicode (RFC 3629) string" alt="" coords="165,95,259,120"/>
+<area shape="rect" id="node6" title=" " alt="" coords="149,5,275,45"/>
 </map>

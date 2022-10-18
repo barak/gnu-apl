@@ -1,0 +1,7 @@
+<map id="Value::print1" name="Value::print1">
+<area shape="rect" id="node1" title="print this value (line break at print_width)" alt="" coords="5,55,100,80"/>
+<area shape="rect" id="node2" href="$classValue.html#a5ac7131d2f89d0bc8b8907d960cbd125" title="return the rank of this value" alt="" coords="169,5,283,31"/>
+<area shape="rect" id="node4" href="$classPrintContext.html#a5ef45c5babbe3ebf9988a9b659a2e407" title="return the print style to be used" alt="" coords="148,55,304,80"/>
+<area shape="rect" id="node5" href="$classPrintContext.html#a787257953d929f80db2ba1698d59b905" title="set the print style to be used" alt="" coords="148,104,304,129"/>
+<area shape="rect" id="node3" href="$classShape.html#a017e9a35dd20f4bc4fdeb7ea29b6805d" title="return the rank" alt="" coords="352,5,469,31"/>
+</map>

@@ -1,5 +1,6 @@
 <map id="READ_SVAR_RECORD_c" name="READ_SVAR_RECORD_c">
-<area shape="rect" id="node2" href="$classSignal__base.html" title="the base class for all signal classes " alt="" coords="29,103,123,130"/>
-<area shape="rect" id="node3" href="$classSig__item__xint.html" title="Sig_item_xint\&lt; uint64\l_t, 8 \&gt;" alt="" coords="147,96,295,137"/>
-<area shape="rect" id="node4" href="$classSig__item__int.html" title="Sig_item_int\&lt; uint64\l_t, bytes \&gt;" alt="" coords="151,5,292,47"/>
+<area shape="rect" id="node1" title="APserver request: read SVAR database record from APserver." alt="" coords="5,183,189,208"/>
+<area shape="rect" id="node2" href="$classSignal__base.html" title="the base class for all signal classes" alt="" coords="29,87,123,113"/>
+<area shape="rect" id="node3" href="$classSig__item__xint.html" title=" " alt="" coords="147,80,295,120"/>
+<area shape="rect" id="node4" href="$classSig__item__int.html" title="an integer signal item of size bytes" alt="" coords="138,5,305,31"/>
 </map>

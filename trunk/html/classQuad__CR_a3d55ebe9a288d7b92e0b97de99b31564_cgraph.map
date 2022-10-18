@@ -1,0 +1,7 @@
+<map id="Quad_CR::do_CR40" name="Quad_CR::do_CR40">
+<area shape="rect" id="node1" title="compute 40 ⎕CR B" alt="" coords="5,31,148,56"/>
+<area shape="rect" id="node2" href="$classCell.html#acad8d4255191ceae01a96c778debeb83" title="Return value if it is close to int, or else throw DOMAIN_ERROR." alt="" coords="197,5,321,31"/>
+<area shape="rect" id="node3" href="$classCell.html#aa8d4bc14c8641781d38dea605f814248" title="return true iff value is numeric and close to 0 or 1" alt="" coords="196,55,323,80"/>
+<area shape="rect" id="node4" href="$classCell.html#a9aa348b66fb831af844bbb3bdff44b66" title="return true iff value is numeric and close to 1" alt="" coords="373,29,495,55"/>
+<area shape="rect" id="node5" href="$classCell.html#a0070bc8a15c9ea3742aea0f9407ab934" title="return true iff value is numeric and close to 0" alt="" coords="371,79,497,104"/>
+</map>

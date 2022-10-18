@@ -1,0 +1,11 @@
+<map id="Svar_record::retract" name="Svar_record::retract">
+<area shape="rect" id="node1" title="retract the offer made by the calling ID." alt="" coords="5,129,143,155"/>
+<area shape="rect" id="node2" href="$structSvar__record.html#abdb5a461d505c7e674260f0794cc2bf0" title="complain about proc" alt="" coords="201,5,354,31"/>
+<area shape="rect" id="node3" href="$structSvar__record.html#abc5bf0cb80478af816a61f4b92602475" title="invalidate this entry" alt="" coords="213,104,341,129"/>
+<area shape="rect" id="node5" href="$structSvar__record.html#ab4d3d8caaff62e4f3c5ef75488b5af93" title="return the coupling of the variable" alt="" coords="191,55,364,80"/>
+<area shape="rect" id="node7" href="$classProcessorID.html#a834b72a9d1c965b8b07a96e2088f5972" title="return the own id, parent, and grand&#45;parent" alt="" coords="208,153,347,179"/>
+<area shape="rect" id="node8" href="$structSvar__record.html#a27e4a3a442aa3c56c81662af59b6677b" title="remove accepting partner" alt="" coords="206,203,349,243"/>
+<area shape="rect" id="node9" href="$structSvar__record.html#a05a2cee19ff4688fa05925bf8526bee0" title="remove offering partner" alt="" coords="206,267,349,307"/>
+<area shape="rect" id="node4" href="$structSvar__partner.html#a148d5da4954b8a79e30ddcc70bb1fc2f" title="clear this partner" alt="" coords="424,211,556,236"/>
+<area shape="rect" id="node6" href="$structSvar__partner.html#a08989d19706b526a4054398b2d0b5480" title="return true if this partner is active. Note that this can be the case even though tcp_fd is invalid." alt="" coords="412,55,568,80"/>
+</map>

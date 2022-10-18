@@ -1,0 +1,6 @@
+<map id="Thread_context::cancel_all_monadic_jobs" name="Thread_context::cancel_all_monadic_jobs">
+<area shape="rect" id="node1" title="cancel all monadic jobs in all thread contexts" alt="" coords="5,69,164,109"/>
+<area shape="rect" id="node2" href="$classParallel__job__list.html#ad0759619b570cb362d79edf3d673ae17" title="cancel the entire job list" alt="" coords="221,5,342,45"/>
+<area shape="rect" id="node3" href="$classThread__context.html#a8ef1d4db160a21f5616530cf737e4b18" title="number of currently used cores" alt="" coords="212,69,351,109"/>
+<area shape="rect" id="node4" href="$classThread__context.html#adf3aed1f9a9fbe5854dca582816dae4e" title="return the context for core n" alt="" coords="212,133,351,173"/>
+</map>

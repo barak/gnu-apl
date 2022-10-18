@@ -1,0 +1,7 @@
+<map id="Quad_RE::Flags::get_result_type" name="Quad_RE::Flags::get_result_type">
+<area shape="rect" id="node1" title="return the result type" alt="" coords="777,35,923,75"/>
+<area shape="rect" id="node2" href="$classQuad__RE.html#a5ee4c8c19bb09e9b06f156c46859d9f7" title="return a result that can be used directly by ⊂ or /" alt="" coords="596,5,729,45"/>
+<area shape="rect" id="node3" href="$classQuad__RE.html#ac30c86b0ec6520f8ab4c20e97f6b053f" title="return a result whose format is given by flags" alt="" coords="383,42,548,67"/>
+<area shape="rect" id="node4" href="$classQuad__RE.html#a28ca16be0e639ffb29d1597cdf18e0a9" title="overloaded Function::eval_AXB()." alt="" coords="189,42,335,67"/>
+<area shape="rect" id="node5" href="$classQuad__RE.html#aaf1c135d558953f69556ba615ba103ec" title="overloaded Function::eval_AB()." alt="" coords="5,42,141,67"/>
+</map>

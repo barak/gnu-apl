@@ -1,0 +1,16 @@
+<map id="Bif_F12_SORT_DES::eval_AB" name="Bif_F12_SORT_DES::eval_AB">
+<area shape="rect" id="node1" title="overloaded Function::eval_AB()" alt="" coords="5,119,208,145"/>
+<area shape="rect" id="node2" href="$classBif__F12__SORT.html#a4b4cc3a9de168e5e27a1514c1a02781b" title="sort char vector B according to collationg sequence A" alt="" coords="256,112,397,152"/>
+<area shape="rect" id="node3" href="$classCollatingCache.html#a7fe389dd2639ae135fd56813b67439cf" title="find (the index of) the entry for uni" alt="" coords="470,5,610,45"/>
+<area shape="rect" id="node5" href="$classWorkspace.html#adb2006f054a1cebb8ae0252b61bd1d1b" title="return the current ⎕IO" alt="" coords="473,70,607,95"/>
+<area shape="rect" id="node6" href="$classCollatingCache.html#a49519a2ba001d9415a541b2f6aa0f10b" title="compare cache items ia and ib ascendingly. comp_arg is a CollatingCache pointer" alt="" coords="447,169,633,194"/>
+<area shape="rect" id="node11" href="$classCollatingCache.html#a47e6ce25b5268c1876f9091e45b43aa7" title="compare cache items ia and ib descendingly. comp_arg is a CollatingCache pointer" alt="" coords="445,119,635,145"/>
+<area shape="rect" id="node12" href="$classUCS__string.html#a59f472bb1ee082cca5ac2a6c128f4918" title="sort the characters in this string by their Unicode" alt="" coords="480,283,600,309"/>
+<area shape="rect" id="node4" href="$structCollatingCacheEntry.html#a2d49fc4b9a42635240f1cd40e46ee744" title="compare key with entry (for Heapsort::search())" alt="" coords="696,5,839,45"/>
+<area shape="rect" id="node7" href="$classCollatingCache.html#a552ac1c111785fb1ecb467550207c537" title="return the number of items to compare" alt="" coords="699,219,836,259"/>
+<area shape="rect" id="node8" href="$classCell.html#ad165f9ab69abf46b2cf44d301a700a1c" title="Return the integer value of a cell." alt="" coords="702,70,833,95"/>
+<area shape="rect" id="node9" href="$classIntCell.html#af181a9f593c5d20bb9396450061bc2c2" title="overloaded Cell::get_int_value()" alt="" coords="695,119,840,145"/>
+<area shape="rect" id="node10" href="$classCollatingCache.html#abdc08589db04d53e2c21ce2e67baf3b9" title="return the number of dimensions of the collating sequence" alt="" coords="683,169,852,194"/>
+<area shape="rect" id="node13" href="$classUCS__string.html#a3c03c3e5b4d7be0e435a7cfee8a424ae" title="helper function for Heapsort&lt;Unicode&gt;::sort()" alt="" coords="686,333,849,358"/>
+<area shape="rect" id="node14" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="706,283,829,309"/>
+</map>

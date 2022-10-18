@@ -1,3 +1,4 @@
 <map id="StatementList" name="StatementList">
-<area shape="rect" id="node2" href="$classExecutable.html" title="Base class for ExecuteList, StatementList, and UserFunction. " alt="" coords="13,5,100,32"/>
+<area shape="rect" id="node1" title="The token of an statement list cmd ◊ cmd ... ◊ cmd." alt="" coords="5,79,108,104"/>
+<area shape="rect" id="node2" href="$classExecutable.html" title="Base class for ExecuteList, StatementList, and UserFunction." alt="" coords="13,5,100,31"/>
 </map>

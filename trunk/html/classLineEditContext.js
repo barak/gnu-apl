@@ -19,7 +19,7 @@ var classLineEditContext =
     [ "get_screen_cols", "classLineEditContext.html#a3e9927045829501ae6fc20f46a804c08", null ],
     [ "get_screen_rows", "classLineEditContext.html#aff445984ce92b68bc2b5aa552210300c", null ],
     [ "get_total_length", "classLineEditContext.html#a78bbd5426c6abecda70bac7daac39fb6", null ],
-    [ "get_user_line", "classLineEditContext.html#ae1d81648a808d88cd0cd0a2a35df1863", null ],
+    [ "get_user_line", "classLineEditContext.html#a2e9f7cacd8cfb267b48b15ec066c7da4", null ],
     [ "insert_char", "classLineEditContext.html#a671132bb9b96df8ace2ec1146bc486d6", null ],
     [ "move_idx", "classLineEditContext.html#a347304e997f587298b31ca56b87b2826", null ],
     [ "on_bad_col", "classLineEditContext.html#addd7f59de96e6c964539cf8d37e3fb87", null ],

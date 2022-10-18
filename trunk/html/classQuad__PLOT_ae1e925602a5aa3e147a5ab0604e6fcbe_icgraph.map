@@ -1,0 +1,6 @@
+<map id="Quad_PLOT::setup_data_2D" name="Quad_PLOT::setup_data_2D">
+<area shape="rect" id="node1" title="initialize the data to be plotted for a 2D plot (except case 2b.)" alt="" coords="419,31,609,56"/>
+<area shape="rect" id="node2" href="$classQuad__PLOT.html#a1b83b17c0196cfcf1802bb96e2b0a231" title="initialize the data to be plotted" alt="" coords="204,31,371,56"/>
+<area shape="rect" id="node3" href="$classQuad__PLOT.html#acc4187c32c3bad52f276a724b226b429" title="overloaded Function::eval_AB()" alt="" coords="5,5,156,31"/>
+<area shape="rect" id="node4" href="$classQuad__PLOT.html#a1b17ca0481f0d7fcc98732b3b1d2eefb" title="overloaded Function::eval_B()" alt="" coords="9,55,152,80"/>
+</map>

@@ -1,0 +1,51 @@
+<map id="Value::Value" name="Value::Value">
+<area shape="rect" id="node1" title="constructor: a scalar value (i.e. a value with rank 0) from a cell" alt="" coords="5,749,101,774"/>
+<area shape="rect" id="node2" href="$classValue.html#a8f4efc08e1cf758c79dec03f9a42f9a6" title="check that this value was completely initialized, and set VF_complete if so." alt="" coords="155,597,291,622"/>
+<area shape="rect" id="node43" href="$classValue.html#a1120641bea23235f2525146e6f5f48df" title="init the ravel of an APL value, return the ravel length" alt="" coords="348,825,463,850"/>
+<area shape="rect" id="node49" href="$classValue.html#ab3c0dbf393c94f1aa17f7e31c8e45116" title="set ravel[offset] to cell." alt="" coords="149,799,296,825"/>
+<area shape="rect" id="node3" href="$classValue.html#a9fc8bbaf9fefe6835dea7db0f71b8b6c" title="return the number of elements (the product of the shapes)." alt="" coords="538,571,686,597"/>
+<area shape="rect" id="node5" href="$classValue.html#a6b8aa5e58b68236c77a09385365468d5" title="return the first element of the ravel (which is always present). same as get_cproto(),..." alt="" coords="553,622,671,647"/>
+<area shape="rect" id="node7" href="$classValue.html#ac5b54e3a13cab0837442f1575b3299a5" title="return the number of elements, but at least 1 (for the prototype)." alt="" coords="981,723,1150,749"/>
+<area shape="rect" id="node9" href="$classValue.html#abf966781ab7b9c91e944721d3646edfb" title="return the shape of this value" alt="" coords="344,447,467,473"/>
+<area shape="rect" id="node10" href="$classValue.html#a21369bf72b3fb40d1e9558cb1497a6b0" title="print this value (line break at Workspace::get_PW())" alt="" coords="361,497,449,522"/>
+<area shape="rect" id="node4" href="$classShape.html#af39e05bad7be900fa1437a6eb6035e97" title="return the number of ravel elements (1 for scalars,i else product of shapes)" alt="" coords="998,623,1133,649"/>
+<area shape="rect" id="node6" href="$classValue.html#aa0572b1b7fa249cb79694fd152130b38" title="return the (constant) idx&#39;th element of the ravel." alt="" coords="777,622,900,647"/>
+<area shape="rect" id="node8" href="$classShape.html#a6f32f749601dca80263493fd06be12c4" title="return the number of ravel elements, but at least 1 (for empty values and scalars) else product of sh..." alt="" coords="1213,810,1367,835"/>
+<area shape="rect" id="node11" href="$classWorkspace.html#a002e2f097bece67c9d082b7c89db11ae" title="return style and the current ⎕PP, and ⎕PW" alt="" coords="515,522,709,547"/>
+<area shape="rect" id="node12" href="$classValue.html#a5ac7131d2f89d0bc8b8907d960cbd125" title="return the rank of this value" alt="" coords="1233,81,1347,106"/>
+<area shape="rect" id="node14" href="$classPrintContext.html#a5ef45c5babbe3ebf9988a9b659a2e407" title="return the print style to be used" alt="" coords="534,374,690,399"/>
+<area shape="rect" id="node15" href="$classValue.html#aa8295760964d5f1d9dea8912c2c630dd" title="true if Value flag member is set" alt="" coords="549,423,675,449"/>
+<area shape="rect" id="node16" href="$classValue.html#adcada8db3d31b0fc0791755ed40dc1d0" title="print this member value" alt="" coords="541,322,683,347"/>
+<area shape="rect" id="node42" href="$classPrintContext.html#a787257953d929f80db2ba1698d59b905" title="set the print style to be used" alt="" coords="534,473,690,498"/>
+<area shape="rect" id="node13" href="$classShape.html#a017e9a35dd20f4bc4fdeb7ea29b6805d" title="return the rank" alt="" coords="1443,81,1561,106"/>
+<area shape="rect" id="node17" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="995,54,1135,79"/>
+<area shape="rect" id="node18" href="$classBif__F12__PICK.html#a49b2c6d2d06a094709eb02c32b936587" title="⊃B" alt="" coords="757,415,920,441"/>
+<area shape="rect" id="node20" href="$classValue__P__Base.html#a1c3bf1b6f708eb2c1ba4b97c83adb9aa" title="return a const pointer to the Value" alt="" coords="1223,206,1357,231"/>
+<area shape="rect" id="node22" href="$classCell.html#a367b9df7e0d4b805e5f31641658113f6" title="Return the APL value of a cell (Asserts for non&#45;pointer cells)" alt="" coords="1213,317,1367,342"/>
+<area shape="rect" id="node28" href="$classCell.html#ae98b3988a7fa52c6c157b4911b043dde" title="Return true iff this cell is a pointer (to a sub&#45;array) cell." alt="" coords="1222,514,1358,539"/>
+<area shape="rect" id="node35" href="$classQuad__CR.html#a8cf383d918c4ecfc74a646b506b9199b" title="compute 35 ⎕CR B" alt="" coords="767,105,910,130"/>
+<area shape="rect" id="node36" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="1004,155,1127,181"/>
+<area shape="rect" id="node37" href="$classValue.html#a65d183d6ebf87a5727143b2b46759168" title="return the product of all but the the last axis, or 1 for scalars" alt="" coords="781,317,897,342"/>
+<area shape="rect" id="node39" href="$classCell.html#ac4bb8b0cf0718bf4ec7a17f1a0271df0" title="Release content pointed to (complex, APL value)" alt="" coords="791,465,886,490"/>
+<area shape="rect" id="node40" href="$classIntCell.html#afd60fd9e3a5581ac99c1e053d9218fe7" title="initialize the (un&#45;initialized) Cell *Z to integer 0" alt="" coords="797,874,880,899"/>
+<area shape="rect" id="node19" href="$classBif__F12__PICK.html#a9f06f88953b9fe5a411175b2a4a57527" title="the shape of the items being disclosed" alt="" coords="983,408,1147,448"/>
+<area shape="rect" id="node29" href="$classBif__F12__PICK.html#a4052ea32200b2bc5ac3f668849fb47d6" title="create a copy of B_item, pad as needed to have item_shape, and store it in Z, starteding at Z_start." alt="" coords="968,574,1163,599"/>
+<area shape="rect" id="node21" href="$classCell.html#a2bb41deb2c1209725e934f2397d339ca" title="Return the APL value of a cell (Asserts for non&#45;lval cells)" alt="" coords="1222,465,1358,490"/>
+<area shape="rect" id="node25" href="$classValue.html#a8cecab341fdc0bd55b67c07848463d37" title="return the r&#39;th shape element of this value" alt="" coords="1213,366,1367,391"/>
+<area shape="rect" id="node27" href="$classCell.html#af8746e4049278c9a46f25e6ee0d71fcc" title="Return true iff this cell is a pointer to a cell." alt="" coords="1231,415,1349,441"/>
+<area shape="rect" id="node23" href="$classCell.html#a38a6a25f0ad091f35e3d9abfe5608a50" title="return the type of this cell" alt="" coords="1437,267,1567,293"/>
+<area shape="rect" id="node24" href="$classCell.html#a6c3fdef3d82f53649d1c3f16d37eedd7" title="the name of ct" alt="" coords="1417,317,1587,342"/>
+<area shape="rect" id="node26" href="$classShape.html#a592d2ade68aa8c21c5d84627c3a0e001" title="return the length of dimension r" alt="" coords="1423,366,1581,391"/>
+<area shape="rect" id="node30" href="$classCell.html#ab3d14978f78ba264d40e9ed1a4823be2" title="Return true iff this cell is a character cell." alt="" coords="1215,711,1365,737"/>
+<area shape="rect" id="node31" href="$classValue.html#adb495fbb836373de3d3558acfd986eed" title="initialize the next ravel cell with integer 0" alt="" coords="1221,761,1359,786"/>
+<area shape="rect" id="node32" href="$classValue.html#a35a1c313fbca5c1bef209f8d978ef9b6" title="initialize the next ravel cell from another Cell" alt="" coords="1213,563,1367,589"/>
+<area shape="rect" id="node33" href="$classValue.html#a131a7844810059a3ab8eb411fd713e3b" title="initialize the next ravel cell with a character value" alt="" coords="1211,613,1369,638"/>
+<area shape="rect" id="node34" href="$classValue.html#a23f74a9841ee7c005ee16e673f72f84b" title="initialize the next ravel cell with a pointer to another Cell" alt="" coords="1213,662,1367,687"/>
+<area shape="rect" id="node38" href="$classShape.html#ae23c2dd79c376b0c4ffb1ec48f1ffbcd" title="return the product of all but the the last dimension, or 1 for scalars" alt="" coords="1005,307,1125,333"/>
+<area shape="rect" id="node41" href="$classIntCell.html#a88c653b2f968c451ee1c1c53a983fa13" title="Construct an integer cell with value 0." alt="" coords="1012,849,1119,874"/>
+<area shape="rect" id="node44" href="$classValue.html#a10289415c33695f6df77388ea09a83c8" title="return the offset&#39;th ravel cell (of an unpack&#39;ed ravel)" alt="" coords="547,875,677,901"/>
+<area shape="rect" id="node45" href="$classWorkspace.html#adb2006f054a1cebb8ae0252b61bd1d1b" title="return the current ⎕IO" alt="" coords="545,925,679,950"/>
+<area shape="rect" id="node46" href="$classValue.html#a54205b69c66acaabc99a43a8870950c2" title="return the first element of the ravel (which is always present) same as wfirst(), but named different..." alt="" coords="549,774,675,799"/>
+<area shape="rect" id="node48" href="$classIntCell.html#aa99b7212ce13da0f241adeb18e350198" title="initialize Z to APL_Integer v" alt="" coords="799,825,878,850"/>
+<area shape="rect" id="node47" href="$classValue.html#af5c079fe8530d8f90a87c53439d9c924" title="return the (writable) idx&#39;th element of the ravel." alt="" coords="775,774,902,799"/>
+</map>

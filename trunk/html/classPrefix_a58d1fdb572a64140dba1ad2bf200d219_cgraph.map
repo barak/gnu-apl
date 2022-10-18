@@ -1,0 +1,6 @@
+<map id="Prefix::has_quad_LRX" name="Prefix::has_quad_LRX">
+<area shape="rect" id="node1" title="return true if the state of this Prefix has ⎕R (and maybe ⎕L or ⎕X)." alt="" coords="5,55,159,80"/>
+<area shape="rect" id="node2" href="$classPrefix.html#aa1e98b0f6cf6e81ab90765af9bd3ce4e" title="return the idx&#39;th Token_loc (from put position)" alt="" coords="211,5,285,31"/>
+<area shape="rect" id="node3" href="$classPrefix.html#a492aebeb400a3616395c40320742ffff" title="return the second token from the left (e.g. ← in A←B)" alt="" coords="207,55,289,80"/>
+<area shape="rect" id="node4" href="$classPrefix.html#a07a35c8b69a8c9f685225e2a2586a2fd" title="return the number of token currently in the FIFO" alt="" coords="337,80,425,105"/>
+</map>

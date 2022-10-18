@@ -1,0 +1,4 @@
+<map id="DynamicObject::print_new" name="DynamicObject::print_new">
+<area shape="rect" id="node1" title="print new object message" alt="" coords="264,5,440,31"/>
+<area shape="rect" id="node2" href="$classDynamicObject.html#a08cf0551afbc672b60af3b41cf88ee07" title="constructor: a DynamicObject allocated at source location loc" alt="" coords="5,5,216,31"/>
+</map>

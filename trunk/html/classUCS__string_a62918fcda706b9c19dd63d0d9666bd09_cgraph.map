@@ -1,0 +1,15 @@
+<map id="UCS_string::from_double_to_expo" name="UCS_string::from_double_to_expo">
+<area shape="rect" id="node1" title="convert the double value to an UCS_string scaled (exponential) format (with fract_digits fractional d..." alt="" coords="5,201,175,241"/>
+<area shape="rect" id="node2" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="660,81,800,107"/>
+<area shape="rect" id="node3" href="$classUCS__string.html#ac119f7bfd8799ce0ccf54a4002bb6029" title="convert the double value to an UCS_string in fixed point format (with fract_digits fractional digits)..." alt="" coords="223,201,392,241"/>
+<area shape="rect" id="node5" href="$classUCS__string.html#a67ea87cb92e687105b21917ffb4a2a6f" title="remove the last character in this string" alt="" coords="653,391,807,416"/>
+<area shape="rect" id="node6" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="867,341,990,367"/>
+<area shape="rect" id="node10" href="$classUCS__string.html#ae01f4ac46af41b8f788a327a942944b9" title="convert a signed integer value to an UCS_string (like sprintf())" alt="" coords="235,5,380,31"/>
+<area shape="rect" id="node4" href="$classUCS__string.html#a725b0579ccbb59a9c090692e83ad302b" title="convert the integer part of value to an UCS_string and remove it from value" alt="" coords="445,157,593,183"/>
+<area shape="rect" id="node7" href="$classUCS__string.html#a6a6dd45662d5d5024b50ba031c2c6ac6" title="round last digit and discard it. Note that this is always expected to be in floating point format and..." alt="" coords="440,275,599,315"/>
+<area shape="rect" id="node8" href="$classUCS__string.html#a186a76c22c3ac840f1e607ba49e253a0" title="return the last character in this string" alt="" coords="667,341,793,367"/>
+<area shape="rect" id="node9" href="$classUCS__string.html#a522289839ffbbcbe43b4577858926858" title="more intuitive insert() function" alt="" coords="665,292,795,317"/>
+<area shape="rect" id="node11" href="$classUCS__string.html#a4f6f837c5526cc425de1cc7e3e239d22" title="convert an unsigned integer value to an UCS_string (like sprintf())" alt="" coords="443,5,595,31"/>
+<area shape="rect" id="node12" href="$classUCS__string.html#ad092030b348adfd762de621c43d75812" title="default constructor: empty string" alt="" coords="647,5,813,31"/>
+<area shape="rect" id="node13" href="$classUCS__string.html#a40523238d26f5405f5392df03d242627" title="common part of all constructors" alt="" coords="861,5,996,31"/>
+</map>

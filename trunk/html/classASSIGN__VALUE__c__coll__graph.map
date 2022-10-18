@@ -1,6 +1,7 @@
 <map id="ASSIGN_VALUE_c" name="ASSIGN_VALUE_c">
-<area shape="rect" id="node2" href="$classSignal__base.html" title="the base class for all signal classes " alt="" coords="5,103,99,130"/>
-<area shape="rect" id="node3" href="$classSig__item__xint.html" title="Sig_item_xint\&lt; uint64\l_t, 8 \&gt;" alt="" coords="123,96,271,137"/>
-<area shape="rect" id="node4" href="$classSig__item__int.html" title="Sig_item_int\&lt; uint64\l_t, bytes \&gt;" alt="" coords="127,5,268,47"/>
-<area shape="rect" id="node5" href="$classSig__item__string.html" title="a string signal item of size bytes " alt="" coords="296,103,408,130"/>
+<area shape="rect" id="node1" title="APserver request: SVAR←X." alt="" coords="128,183,267,208"/>
+<area shape="rect" id="node2" href="$classSignal__base.html" title="the base class for all signal classes" alt="" coords="5,87,99,113"/>
+<area shape="rect" id="node3" href="$classSig__item__xint.html" title=" " alt="" coords="123,80,271,120"/>
+<area shape="rect" id="node4" href="$classSig__item__int.html" title="an integer signal item of size bytes" alt="" coords="114,5,281,31"/>
+<area shape="rect" id="node5" href="$classSig__item__string.html" title="a string signal item of size bytes" alt="" coords="296,87,408,113"/>
 </map>

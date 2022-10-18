@@ -1,0 +1,7 @@
+<map id="CharCell::get_char_value" name="CharCell::get_char_value">
+<area shape="rect" id="node1" title="overloaded Cell::get_char_value()" alt="" coords="221,77,352,117"/>
+<area shape="rect" id="node2" href="$classCharCell.html#a0bf013749582353290ace2dcbe0a538c" title="overloaded Cell::bif_not_bitwise()" alt="" coords="5,5,173,31"/>
+<area shape="rect" id="node3" href="$classCharCell.html#a42be0230f84fdb43710d22b60c8361c5" title="overloaded Cell::CDR_size()" alt="" coords="18,55,161,80"/>
+<area shape="rect" id="node4" href="$classCharCell.html#aae6423f93b0da562d152984558326237" title="the Quad_CR representation of this cell" alt="" coords="22,105,157,145"/>
+<area shape="rect" id="node5" href="$classCharCell.html#aa22b55f220318f86dabbcadb3bc60a7b" title="overloaded Cell::greater()" alt="" coords="29,169,150,195"/>
+</map>

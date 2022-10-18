@@ -1,0 +1,48 @@
+<map id="Bif_F12_FORMAT::format_one_col_by_spec" name="Bif_F12_FORMAT::format_one_col_by_spec">
+<area shape="rect" id="node1" title="A character array with one column of B formatted by specification." alt="" coords="5,1642,180,1682"/>
+<area shape="rect" id="node2" href="$classBif__F12__FORMAT.html#a1dd354ab627b5eef74f5c49b79a786e9" title="add a row (consisting of data) to PrintBuffer ret" alt="" coords="228,1161,415,1187"/>
+<area shape="rect" id="node3" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="1348,261,1488,287"/>
+<area shape="rect" id="node8" href="$classPrintBuffer.html#af6f689e8c4e930b7c37099bf5fdfe57d" title="return the number of columns" alt="" coords="1339,1114,1497,1154"/>
+<area shape="rect" id="node12" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="1357,741,1479,767"/>
+<area shape="rect" id="node13" href="$classPrintBuffer.html#a9bd0c0bdbbfe10fc25285c3f659f433c" title="prepend buffer with count characters pad" alt="" coords="1146,1523,1269,1548"/>
+<area shape="rect" id="node19" href="$classPrintBuffer.html#a6f5d5b5fc0e2cb55c75dab3c613c68f5" title="append UCS_string ucs to this PrintBuffer" alt="" coords="1126,919,1289,944"/>
+<area shape="rect" id="node20" href="$classBif__F12__FORMAT.html#a9d12f7ec1f6ecd8def2dd073c2a7794d" title="format value with precision mantissa digits (floating format)" alt="" coords="463,619,637,659"/>
+<area shape="rect" id="node28" href="$classUCS__string.html#a62918fcda706b9c19dd63d0d9666bd09" title="convert the double value to an UCS_string scaled (exponential) format (with fract_digits fractional d..." alt="" coords="465,349,635,389"/>
+<area shape="rect" id="node33" href="$classCell.html#a2999919fc2782b3cebfd925c63cc1fac" title="Return the character value of a cell." alt="" coords="251,1675,392,1700"/>
+<area shape="rect" id="node36" href="$classWorkspace.html#a09f10a68b5a249c789bf8c1839f3208c" title="return element pos of the current ⎕FC (pos should be 0..5)" alt="" coords="252,1773,391,1799"/>
+<area shape="rect" id="node37" href="$classCell.html#a0e6b9239fa77e3222f32400d51c8f114" title="Return the imaginary part of a cell." alt="" coords="249,1823,393,1848"/>
+<area shape="rect" id="node38" href="$classPrintBuffer.html#a19446afa6beccd70a7fcdd5526cdc6a8" title="return line y" alt="" coords="481,1675,619,1700"/>
+<area shape="rect" id="node39" href="$classCell.html#a367b9df7e0d4b805e5f31641658113f6" title="Return the APL value of a cell (Asserts for non&#45;pointer cells)" alt="" coords="244,1724,399,1749"/>
+<area shape="rect" id="node40" href="$classCell.html#a9a0028fd74f00deb001a8062a55916c6" title="Return the real part of a cell." alt="" coords="253,1872,390,1897"/>
+<area shape="rect" id="node41" href="$classCell.html#ab3d14978f78ba264d40e9ed1a4823be2" title="Return true iff this cell is a character cell." alt="" coords="246,1921,397,1947"/>
+<area shape="rect" id="node42" href="$classCell.html#a62919edef3b6b585e544dcf2865402eb" title="Return true iff this cell is a complex number cell." alt="" coords="248,1971,395,1996"/>
+<area shape="rect" id="node43" href="$classCell.html#a4ce158d2f937ff444732ec5c43a5093f" title="Return true iff this cell is an integer, float, or complex cell." alt="" coords="263,2020,379,2045"/>
+<area shape="rect" id="node44" href="$classCell.html#ae98b3988a7fa52c6c157b4911b043dde" title="Return true iff this cell is a pointer (to a sub&#45;array) cell." alt="" coords="253,2069,389,2095"/>
+<area shape="rect" id="node45" href="$classCell.html#a79b6c0333d176833fb4fbc10fab94f7b" title="Return true iff this cell is an integer or float cell." alt="" coords="262,2119,381,2144"/>
+<area shape="rect" id="node46" href="$classUCS__string.html#a07e8673ec73ad31228be88053aeff1b1" title="remove leading blanks, tabs, etc" alt="" coords="695,803,845,843"/>
+<area shape="rect" id="node4" href="$classPrintBuffer.html#a47de98d96a3326a1b8734e6242ea1ee5" title="append ucs, aligned at char align." alt="" coords="483,1193,617,1233"/>
+<area shape="rect" id="node14" href="$classPrintBuffer.html#adef4048693e699b9bfac4b2adf719f63" title="append count charactera pad to buffer" alt="" coords="1145,1472,1269,1497"/>
+<area shape="rect" id="node5" href="$classPrintBuffer.html#a86a56d7bdb48737a037db660dd7f313a" title="align this PrintBuffer to col" alt="" coords="711,1273,829,1299"/>
+<area shape="rect" id="node18" href="$classPrintBuffer.html#adae7aa63347e6aba983449dde7d50c33" title="return true iff all strings have the same size." alt="" coords="903,1223,1076,1248"/>
+<area shape="rect" id="node6" href="$classPrintBuffer.html#ab939341e6e27bf73584db5adeafdd07e" title="align this real&#45;only PrintBuffer to col" alt="" coords="917,1272,1061,1297"/>
+<area shape="rect" id="node16" href="$classPrintBuffer.html#a93639b0634e1c018cbdd4405b95fd75d" title="align this complex PrintBuffer to col" alt="" coords="925,1371,1054,1396"/>
+<area shape="rect" id="node17" href="$classPrintBuffer.html#a47febc07014e4aa97c91a2e5d08a5264" title="align this char&#45;only PrintBuffer to col" alt="" coords="917,1321,1061,1347"/>
+<area shape="rect" id="node7" href="$classPrintBuffer.html#a1cedbbcfe6835e1d3a2d02b9f2334c2c" title="print properties of this PrintBuffer" alt="" coords="1144,1423,1271,1448"/>
+<area shape="rect" id="node10" href="$classColInfo.html#a5f32e52d0bcc4c605a98553e6f8817ad" title="true if this ColInfo has an exponent field" alt="" coords="1140,1373,1275,1399"/>
+<area shape="rect" id="node11" href="$classPrintBuffer.html#afe55bc37668a451de718112388a7ab6a" title="pad the fraction part to wanted_fract_len with &#39;0&#39;" alt="" coords="1126,1020,1289,1045"/>
+<area shape="rect" id="node15" href="$classColInfo.html#ac78d77fa426879cc6efabd5282c55e0a" title="the total length" alt="" coords="1147,1324,1268,1349"/>
+<area shape="rect" id="node9" href="$classPrintBuffer.html#ac13295601812e379a3eac618ce239426" title="return the number of rows" alt="" coords="1349,1415,1487,1455"/>
+<area shape="rect" id="node21" href="$classUCS__string.html#a52cd4088451200cd78eb2db03b44a8ac" title="erase 1 (!) character at pos" alt="" coords="705,601,835,627"/>
+<area shape="rect" id="node22" href="$classUCS__string.html#ac119f7bfd8799ce0ccf54a4002bb6029" title="convert the double value to an UCS_string in fixed point format (with fract_digits fractional digits)..." alt="" coords="685,507,855,547"/>
+<area shape="rect" id="node23" href="$classUCS__string.html#a725b0579ccbb59a9c090692e83ad302b" title="convert the integer part of value to an UCS_string and remove it from value" alt="" coords="915,363,1063,388"/>
+<area shape="rect" id="node24" href="$classUCS__string.html#a67ea87cb92e687105b21917ffb4a2a6f" title="remove the last character in this string" alt="" coords="1130,464,1285,489"/>
+<area shape="rect" id="node25" href="$classUCS__string.html#a6a6dd45662d5d5024b50ba031c2c6ac6" title="round last digit and discard it. Note that this is always expected to be in floating point format and..." alt="" coords="910,565,1069,605"/>
+<area shape="rect" id="node26" href="$classUCS__string.html#a186a76c22c3ac840f1e607ba49e253a0" title="return the last character in this string" alt="" coords="1144,615,1271,640"/>
+<area shape="rect" id="node27" href="$classUCS__string.html#a522289839ffbbcbe43b4577858926858" title="more intuitive insert() function" alt="" coords="1142,513,1273,539"/>
+<area shape="rect" id="node29" href="$classUCS__string.html#ae01f4ac46af41b8f788a327a942944b9" title="convert a signed integer value to an UCS_string (like sprintf())" alt="" coords="697,109,843,135"/>
+<area shape="rect" id="node30" href="$classUCS__string.html#a4f6f837c5526cc425de1cc7e3e239d22" title="convert an unsigned integer value to an UCS_string (like sprintf())" alt="" coords="913,109,1065,135"/>
+<area shape="rect" id="node31" href="$classUCS__string.html#ad092030b348adfd762de621c43d75812" title="default constructor: empty string" alt="" coords="1124,59,1291,84"/>
+<area shape="rect" id="node32" href="$classUCS__string.html#a40523238d26f5405f5392df03d242627" title="common part of all constructors" alt="" coords="1351,59,1485,84"/>
+<area shape="rect" id="node34" href="$classCell.html#a38a6a25f0ad091f35e3d9abfe5608a50" title="return the type of this cell" alt="" coords="485,1724,615,1749"/>
+<area shape="rect" id="node35" href="$classCell.html#a6c3fdef3d82f53649d1c3f16d37eedd7" title="the name of ct" alt="" coords="465,1773,635,1799"/>
+</map>

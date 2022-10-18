@@ -1,0 +1,5 @@
+<map id="Svar_DB::retract_var" name="Svar_DB::retract_var">
+<area shape="rect" id="node1" title="retract an offer, return previous coupling" alt="" coords="5,5,151,31"/>
+<area shape="rect" id="node2" href="$classSvar__DB.html#a8e5d83427d476f8db6752dbf86c78e96" title="get TCP socket to APserver, complain if not connected" alt="" coords="199,5,385,31"/>
+<area shape="rect" id="node3" href="$classSvar__DB.html#ac10f9507c18657397c050432da27cdac" title="return the fd towards APserver" alt="" coords="433,5,585,31"/>
+</map>

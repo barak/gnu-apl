@@ -1,0 +1,8 @@
+<map id="Backtrace::show" name="Backtrace::show">
+<area shape="rect" id="node1" title="show the current function call stack." alt="" coords="5,31,125,56"/>
+<area shape="rect" id="node2" href="$classBacktrace.html#aec4c7866f70a4cd3c4c0883b6729c507" title="open file apl.lines" alt="" coords="173,5,348,31"/>
+<area shape="rect" id="node4" href="$classBacktrace.html#a5c94ed510dd515e043325a0a034d9c00" title="show one item in the backtrace" alt="" coords="185,55,337,80"/>
+<area shape="rect" id="node3" href="$main_8cc.html#ac0f2228420376f4db7e1274f2b41667c" title="dito." alt="" coords="438,5,489,31"/>
+<area shape="rect" id="node5" href="$classBacktrace.html#a07bdcf0cb769b764a3c6fc9b0ab74894" title="find the source for PC pc" alt="" coords="396,55,531,80"/>
+<area shape="rect" id="node6" href="$classBacktrace.html#a76c5fe0d5b88ac892b378660f6ff4feb" title="compare PCs (helper for binary search)" alt="" coords="579,55,713,80"/>
+</map>

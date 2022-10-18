@@ -1,5 +1,6 @@
 <map id="Parallel_job_list_base" name="Parallel_job_list_base">
-<area shape="rect" id="node2" href="$classParallel__job__list.html" title="A linked list of parallel jobs. " alt="" coords="217,5,357,47"/>
-<area shape="rect" id="node3" href="$classParallel__job__list.html" title="Parallel_job_list\&lt;\l PJob_scalar_AB, false \&gt;" alt="" coords="201,71,372,112"/>
-<area shape="rect" id="node4" href="$classParallel__job__list.html" title="Parallel_job_list\&lt;\l PJob_scalar_B, false \&gt;" alt="" coords="205,136,368,177"/>
+<area shape="rect" id="node1" title="a number of jobs, where each job can be executed in parallel" alt="" coords="5,77,153,102"/>
+<area shape="rect" id="node2" href="$classParallel__job__list.html" title=" " alt="" coords="205,5,368,45"/>
+<area shape="rect" id="node3" href="$classParallel__job__list.html" title=" " alt="" coords="201,69,372,109"/>
+<area shape="rect" id="node4" href="$classParallel__job__list.html" title="A linked list of parallel jobs." alt="" coords="217,133,357,173"/>
 </map>

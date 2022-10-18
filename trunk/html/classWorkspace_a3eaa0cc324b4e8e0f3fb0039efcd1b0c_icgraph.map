@@ -1,0 +1,20 @@
+<map id="Workspace::get_PW" name="Workspace::get_PW">
+<area shape="rect" id="node1" title="return the current ⎕PW" alt="" coords="1636,171,1779,196"/>
+<area shape="rect" id="node2" href="$classPointerCell.html#acccd604366a71acc67657ce5e4f034e0" title="the Quad_CR representation of this cell" alt="" coords="1429,42,1577,82"/>
+<area shape="rect" id="node3" href="$classUCS__string__vector.html#affd2be085b10c39ad48659a884cf2ab1" title="compute columns width so that items align nicely (for )VARS, )FNS, etc.)" alt="" coords="1424,106,1583,146"/>
+<area shape="rect" id="node9" href="$classLineInput.html#a81610349f86404c67f583eb296666bb1" title="get a line from from user" alt="" coords="412,200,543,225"/>
+<area shape="rect" id="node12" href="$classTabExpansion.html#a6da83ac1066425ec3d7d427d57b0435b" title="show the names of all APL primitives and user defined functions" alt="" coords="1426,221,1581,261"/>
+<area shape="rect" id="node18" href="$classStateIndicator.html#abf0d83f5f9a8fec57751bf5636933687" title="Maybe print B (according to tag) and erase B." alt="" coords="1419,285,1588,325"/>
+<area shape="rect" id="node4" href="$classCommand.html#aeb8671f785d828bbfac0d9b9ff46437d" title="list library: common helper" alt="" coords="1211,43,1371,68"/>
+<area shape="rect" id="node7" href="$classSymbolTable.html#ac7e63c55db6fdfe52327260e26d50b3e" title="List all symbols in this SymbolTable (for )VARS, )FNS etc.)" alt="" coords="1229,116,1352,141"/>
+<area shape="rect" id="node5" href="$classCommand.html#ae2c14c874844701377a0e716021229c7" title="list content of workspace and wslib directories: )LIB [N]" alt="" coords="1011,5,1160,31"/>
+<area shape="rect" id="node6" href="$classCommand.html#a7d3c3284d54674356d89f268949109c6" title="list content of workspace and wslib directories: ]LIB [N]" alt="" coords="1011,55,1160,80"/>
+<area shape="rect" id="node8" href="$classWorkspace.html#a3196f2463ad078822206e8eabf4eff1b" title="list all symbols (of category which) with names in from_to" alt="" coords="1029,116,1142,141"/>
+<area shape="rect" id="node10" href="$classLineInput.html#a96f6a9062450af940d63ecff847646e4" title="get a line from the user" alt="" coords="183,200,364,225"/>
+<area shape="rect" id="node11" href="$classInputMux.html#a8a79cbe5207cde162fb36133ad9defdd" title="get one line" alt="" coords="5,200,135,225"/>
+<area shape="rect" id="node13" href="$classTabExpansion.html#ad99a9df8a0a9ba9ad03f75e654de0bd4" title="perform tab expansion for command arguments" alt="" coords="1213,221,1368,261"/>
+<area shape="rect" id="node17" href="$classTabExpansion.html#a0019a0d3e9b164dc63c39acbba352fdc" title="tab&#45;expand or show help for user defined functions" alt="" coords="1213,285,1368,325"/>
+<area shape="rect" id="node14" href="$classTabExpansion.html#a155d53238b8490e82776eb2caddefceb" title="tab&#45;expand an APL command" alt="" coords="1008,221,1163,261"/>
+<area shape="rect" id="node15" href="$classTabExpansion.html#ad8c4300a7d2e9aa47e6c3a1d19285db7" title="perform tab expansion" alt="" coords="780,228,960,253"/>
+<area shape="rect" id="node16" href="$classLineEditContext.html#a8908cfbf56371294323892784508eca7" title="tab expansion" alt="" coords="591,221,732,261"/>
+</map>

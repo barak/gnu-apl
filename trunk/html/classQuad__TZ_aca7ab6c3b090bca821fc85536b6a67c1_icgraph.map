@@ -1,0 +1,4 @@
+<map id="Quad_TZ::get_offset" name="Quad_TZ::get_offset">
+<area shape="rect" id="node1" title="return the offset from GMT of the current timezone (in seconds). we make this int64_t rather than int..." alt="" coords="231,5,373,31"/>
+<area shape="rect" id="node2" href="$classQuad__TZ.html#ab06810e45e19d69ad466f0b0cd184179" title="print e.g. 2017&#45;05&#45;17 15:09:12 (GMT+2) to out (no trailing endl)" alt="" coords="5,5,183,31"/>
+</map>

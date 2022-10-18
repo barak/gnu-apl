@@ -1,0 +1,9 @@
+<map id="XML_Saving_Archive::save_shape" name="XML_Saving_Archive::save_shape">
+<area shape="rect" id="node1" title="write Value v except its ravel" alt="" coords="5,88,152,128"/>
+<area shape="rect" id="node2" href="$classXML__Saving__Archive.html#ab1e1e0d523a391379f41e5e8efa7ff66" title="indent by indent levels, return space left on line" alt="" coords="204,5,351,45"/>
+<area shape="rect" id="node3" href="$classValue.html#aa7a89fbbca076c1c0c1a579702bf5ff1" title="return the current flags" alt="" coords="219,70,335,95"/>
+<area shape="rect" id="node4" href="$classValue.html#a5ac7131d2f89d0bc8b8907d960cbd125" title="return the rank of this value" alt="" coords="221,119,334,145"/>
+<area shape="rect" id="node6" href="$classValue.html#a8cecab341fdc0bd55b67c07848463d37" title="return the r&#39;th shape element of this value" alt="" coords="200,169,355,194"/>
+<area shape="rect" id="node5" href="$classShape.html#a017e9a35dd20f4bc4fdeb7ea29b6805d" title="return the rank" alt="" coords="423,119,541,145"/>
+<area shape="rect" id="node7" href="$classShape.html#a592d2ade68aa8c21c5d84627c3a0e001" title="return the length of dimension r" alt="" coords="403,169,561,194"/>
+</map>

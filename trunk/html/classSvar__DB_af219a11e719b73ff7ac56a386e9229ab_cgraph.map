@@ -1,0 +1,5 @@
+<map id="Svar_DB::set_state" name="Svar_DB::set_state">
+<area shape="rect" id="node1" title="set the current state of this variable" alt="" coords="5,5,143,31"/>
+<area shape="rect" id="node2" href="$classSvar__DB.html#a8e5d83427d476f8db6752dbf86c78e96" title="get TCP socket to APserver, complain if not connected" alt="" coords="191,5,377,31"/>
+<area shape="rect" id="node3" href="$classSvar__DB.html#ac10f9507c18657397c050432da27cdac" title="return the fd towards APserver" alt="" coords="425,5,577,31"/>
+</map>

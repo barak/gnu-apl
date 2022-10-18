@@ -1,0 +1,10 @@
+<map id="UserFunction::transform_multi_line_strings_3" name="UserFunction::transform_multi_line_strings_3">
+<area shape="rect" id="node1" title="transform a function body containing (new&#45;style) multi&#45;lines into a standard function body" alt="" coords="864,71,1027,111"/>
+<area shape="rect" id="node2" href="$classUserFunction.html#a1aa032e76cb608c07de66ac13d41809b" title="recompile the body" alt="" coords="641,79,816,104"/>
+<area shape="rect" id="node3" href="$classUserFunction.html#a2bedc3c56fb8daa8e4e760bbc912de68" title="set trace or stop vector" alt="" coords="399,53,593,79"/>
+<area shape="rect" id="node8" href="$classUserFunction.html#a37c955f6a76f58d168d4533389249cae" title="constructor for a normal (i.e. non&#45;lambda) user defined function" alt="" coords="403,103,589,128"/>
+<area shape="rect" id="node4" href="$classStop__Trace.html#a1f0aad5536348d1e52721cd04e2f9548" title="return assign lines in new_value to stop or trace vector in ufun" alt="" coords="216,29,351,55"/>
+<area shape="rect" id="node7" href="$classNabla.html#a610d94a179335126e82e9eea07918d5a" title="edit this function" alt="" coords="241,79,326,104"/>
+<area shape="rect" id="node5" href="$classQuad__STOP.html#aba7f51dfbb36d3c2d25ce2e7deb0f278" title="Overloaded Function::eval_AB()" alt="" coords="10,5,163,31"/>
+<area shape="rect" id="node6" href="$classQuad__TRACE.html#a59e7875554f651f1f64d83d79111fecd" title="Overloaded Function::eval_AB()" alt="" coords="5,55,168,80"/>
+</map>

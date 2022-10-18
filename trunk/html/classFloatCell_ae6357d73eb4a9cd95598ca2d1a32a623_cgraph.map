@@ -1,0 +1,8 @@
+<map id="FloatCell::bif_residue" name="FloatCell::bif_residue">
+<area shape="rect" id="node1" title="Overloaded from the corresponding Cell:: function (see class Cell)." alt="" coords="5,64,151,89"/>
+<area shape="rect" id="node2" href="$classFloatCell.html#afa1a46cfd36a3c2166559f7d425f094d" title="return the value of this cell as a double (even if the value is rational)" alt="" coords="375,7,485,32"/>
+<area shape="rect" id="node3" href="$classFloatCell.html#a59ae608bcfefddbbe174d95796eb129c" title="Overloaded Cell::get_real_value()." alt="" coords="199,27,327,67"/>
+<area shape="rect" id="node4" href="$classIntCell.html#afd60fd9e3a5581ac99c1e053d9218fe7" title="initialize the (un&#45;initialized) Cell *Z to integer 0" alt="" coords="221,92,304,117"/>
+<area shape="rect" id="node6" href="$classFloatCell.html#a88217aaf5cd286cc89a85d2885876dda" title="initialize the (un&#45;initialized) Cell *Z to APL_Float flt" alt="" coords="214,141,311,167"/>
+<area shape="rect" id="node5" href="$classIntCell.html#a88c653b2f968c451ee1c1c53a983fa13" title="Construct an integer cell with value 0." alt="" coords="377,92,483,117"/>
+</map>

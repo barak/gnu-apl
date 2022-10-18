@@ -1,0 +1,7 @@
+<map id="Quad_SVx::start_AP" name="Quad_SVx::start_AP">
+<area shape="rect" id="node1" title="start the auxiliary processor proc" alt="" coords="5,80,149,105"/>
+<area shape="rect" id="node2" href="$classLibPaths.html#a3aa488a8671b0aed624c2f8351eca950" title="return the path (directory) of the APL interpreter binary" alt="" coords="197,5,384,31"/>
+<area shape="rect" id="node3" href="$classProcessorID.html#aef543afcb84129b87246dbac888a1441" title="return the processor ID of this apl interpreter" alt="" coords="204,55,377,80"/>
+<area shape="rect" id="node4" href="$classProcessorID.html#a70c0806a4539012077f5042c2f98f861" title="return the processor ID of the parent of this apl interpreter" alt="" coords="198,104,383,129"/>
+<area shape="rect" id="node5" href="$classQuad__SVx.html#aa2ec10c6b0e7079c047455a4af229b62" title="return true iff filename is executable by everybody" alt="" coords="204,153,377,179"/>
+</map>

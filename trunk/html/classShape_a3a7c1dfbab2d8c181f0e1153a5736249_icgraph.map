@@ -1,0 +1,57 @@
+<map id="Shape::is_empty" name="Shape::is_empty">
+<area shape="rect" id="node1" title="return true iff this shape is empty (some dimension is 0)." alt="" coords="2080,555,2200,580"/>
+<area shape="rect" id="node2" href="$classBif__OPER2__RANK.html#ab979b51a46eef84ddff874b4358d592e" title="the &#39;normalized&#39; implementation of all eval_ALxxx*( functions" alt="" coords="1855,55,2013,95"/>
+<area shape="rect" id="node5" href="$classBif__OPER2__RANK.html#a374a3baed400c3b9b27f99c1db3f69a7" title="the &#39;normalized&#39; implementation of all eval_Lxxx*( functions" alt="" coords="1836,169,2032,195"/>
+<area shape="rect" id="node8" href="$classBif__F12__TAKE.html#a3c786a32b82e6d9c41d0c701278744d2" title="Take from B according to ravel_A." alt="" coords="1853,369,2015,395"/>
+<area shape="rect" id="node30" href="$classBif__F12__PARTITION.html#af115071efaa0c6562d4fc738e3da3e4b" title="enclose_with_axes" alt="" coords="1857,518,2011,558"/>
+<area shape="rect" id="node33" href="$classBif__F12__DROP.html#a6f12f99ed865770d6e7cd10696a37fb7" title="overloaded Function::eval_AB()" alt="" coords="1849,583,2019,608"/>
+<area shape="rect" id="node34" href="$classValue.html#a5986cb3e13af1fdb60c5057170a8e551" title="return true iff this value is empty (some dimension is 0)." alt="" coords="1876,648,1992,673"/>
+<area shape="rect" id="node44" href="$classBif__REDUCE.html#a450260486cb0a169a1f13602cae9ab97" title="LO&#45;reduce B n&#45;wise along axis." alt="" coords="1859,755,2009,795"/>
+<area shape="rect" id="node49" href="$classBif__F12__TRANSPOSE.html#a82fdb72c75a88b3ea271ec7d63d1a5a4" title="Transpose B according to axes A (without diagonals)" alt="" coords="1851,966,2017,1006"/>
+<area shape="rect" id="node3" href="$classBif__OPER2__RANK.html#af386afe437eb506495d05219013e07c7" title="overloaded Function::eval_ALRB()" alt="" coords="1569,5,1779,31"/>
+<area shape="rect" id="node4" href="$classBif__OPER2__RANK.html#a34d34df4c656d09dd8e216ee44513a68" title="overloaded Function::eval_ALRXB()" alt="" coords="1591,55,1757,95"/>
+<area shape="rect" id="node6" href="$classBif__OPER2__RANK.html#a5a578fc5a08d42a3e2ce8500f9a4467f" title="overloaded Function::eval_LRB()" alt="" coords="1574,120,1774,145"/>
+<area shape="rect" id="node7" href="$classBif__OPER2__RANK.html#accbd6d641ff942e856fc1c2cf845ac08" title="overloaded Function::eval_LRXB()" alt="" coords="1569,169,1779,195"/>
+<area shape="rect" id="node9" href="$classQuad__CR.html#a7a3122a953f8406461e8faaa6e9f88c6" title="compute 30 ⎕CR B" alt="" coords="1603,219,1745,244"/>
+<area shape="rect" id="node25" href="$classStateIndicator.html#abf0d83f5f9a8fec57751bf5636933687" title="Maybe print B (according to tag) and erase B." alt="" coords="1113,266,1283,306"/>
+<area shape="rect" id="node26" href="$classBif__F12__TAKE.html#ad7427455f2701cd90af415f8c7c5bd0d" title="overloaded Function::eval_AB()" alt="" coords="1591,320,1757,345"/>
+<area shape="rect" id="node27" href="$classBif__F12__TAKE.html#ac89340f87b53b9cd121e8dbc32b36ea6" title="overloaded Function::eval_AXB()" alt="" coords="1587,369,1761,395"/>
+<area shape="rect" id="node28" href="$classBif__F12__DROP.html#a6e662b76f695dbb34c783ae8a8c7bb57" title="overloaded Function::eval_AXB()" alt="" coords="1585,419,1763,444"/>
+<area shape="rect" id="node29" href="$classBif__F12__TAKE.html#a0f81de28346c0a20c2cd1ae6ebf47cd5" title="overloaded Function::eval_XB()" alt="" coords="1591,468,1757,493"/>
+<area shape="rect" id="node10" href="$classQuad__CR.html#ac6f426118cad09841c8545efd5ba8a8f" title="compute a ⎕CR B" alt="" coords="1357,216,1486,241"/>
+<area shape="rect" id="node11" href="$classQuad__CR.html#ac60b988ceaf002189a8c60337752048f" title="overloaded Function::eval_AB()" alt="" coords="1129,117,1267,143"/>
+<area shape="rect" id="node13" href="$classValue.html#a6f574c5690fbcf4024a78ed14a8375db" title="print this value in 4 ⎕CR style" alt="" coords="1133,167,1263,192"/>
+<area shape="rect" id="node14" href="$classValue.html#a82fd0d84f4c7f0b22a6b035e0201506a" title="print info related to a stale value" alt="" coords="1123,216,1273,241"/>
+<area shape="rect" id="node12" href="$classQuad__CR.html#a4a7057e997df3f1607b2e003ef7279f6" title="overloaded Function::eval_XB()" alt="" coords="923,117,1060,143"/>
+<area shape="rect" id="node15" href="$classValue.html#a80c3e1a7208f4f97985e5c742ec93b2d" title="print stale Values, and return the number of stale Values." alt="" coords="930,216,1053,241"/>
+<area shape="rect" id="node16" href="$classCommand.html#af5d73db57801b2363c954b402f19186d" title="check workspace integrity (stale Value and IndexExpr objects, etc)" alt="" coords="689,191,860,216"/>
+<area shape="rect" id="node21" href="$classIO__Files.html#aa05a2917c11a88b9abfc4afa6ca04a3e" title="dito (close files, print errors, summary etc)." alt="" coords="680,244,869,269"/>
+<area shape="rect" id="node17" href="$classXML__Saving__Archive.html#acc327395cab545ea7797d92f5c931cab" title="write entire workspace" alt="" coords="467,179,613,219"/>
+<area shape="rect" id="node18" href="$classWorkspace.html#a8a4f1d898d523818dbd9d7efa6f2cf92" title="save this workspace" alt="" coords="247,187,400,212"/>
+<area shape="rect" id="node19" href="$classCommand.html#ad61e749290966d00856ce1dd4f6abe42" title=")SAVE active WS as CONTINUE and )OFF" alt="" coords="5,163,199,188"/>
+<area shape="rect" id="node20" href="$classCommand.html#aec0c4c6efbb9df9a34220b510f58905a" title=")SAVE: save a workspace file (.xml)" alt="" coords="23,212,181,237"/>
+<area shape="rect" id="node22" href="$classIO__Files.html#acc91875b8e0c7a5ad44e3ead0e3dda7b" title="get one line from the current file, open the next file if necceessary" alt="" coords="466,244,614,269"/>
+<area shape="rect" id="node24" href="$classIO__Files.html#a5ac43f7fe811ca95a419f8ba7a11682e" title="close current testcase file (prematurely) and opem mext one" alt="" coords="476,293,604,319"/>
+<area shape="rect" id="node23" href="$classInputMux.html#a8a79cbe5207cde162fb36133ad9defdd" title="get one line" alt="" coords="259,244,388,269"/>
+<area shape="rect" id="node31" href="$classBif__OPER2__INNER.html#adbaaf10669f72e39cc58d5dcdab6c5fe" title="Overloaded Function::eval_ALRB()." alt="" coords="1567,517,1781,543"/>
+<area shape="rect" id="node32" href="$classBif__F12__PARTITION.html#a93f7a529d2b49ecb0e1262ee5b3ce893" title="overloaded Function::eval_XB()" alt="" coords="1597,567,1751,607"/>
+<area shape="rect" id="node35" href="$classQuad__TF.html#ac63b0e65bfd18c05cdff0da9e32ac043" title="in&#45;place exchange of IntCells and CharCells" alt="" coords="1585,656,1763,681"/>
+<area shape="rect" id="node36" href="$classQuad__TF.html#a499c2aa8ed4589243493cf4d93db0bbf" title="replace ⎕UCS n... with the corresponding Unicodes," alt="" coords="1331,656,1512,681"/>
+<area shape="rect" id="node37" href="$classQuad__TF.html#a0d12bc9c1c1710992edb76fca1b7c6af" title="simplify tos by removing UCS nnn etc." alt="" coords="1125,656,1271,681"/>
+<area shape="rect" id="node38" href="$classQuad__TF.html#a293263bd9b2bf923dc9e4113dded832f" title="try inverse ⎕TF2 of ucs, set new_var_or_fun if successful" alt="" coords="917,656,1065,681"/>
+<area shape="rect" id="node39" href="$structCommand_1_1transfer__context.html#a4e80a2899a02285ba89e58792e6150ea" title="process a &#39;A&#39; (array in 2 ⎕TF format) item." alt="" coords="683,591,867,631"/>
+<area shape="rect" id="node42" href="$classQuad__TF.html#a27ed4b02d5f1a1c8a8b0a1fcbe2756f8" title="Overloaded Function::eval_AB()." alt="" coords="708,656,841,681"/>
+<area shape="rect" id="node43" href="$structCommand_1_1transfer__context.html#afee6856208966168d158de45145dd4ca" title="process an &#39;F&#39; (function in 2 ⎕TF format) item." alt="" coords="683,706,867,746"/>
+<area shape="rect" id="node40" href="$structCommand_1_1transfer__context.html#a9c4651f90f36f6cc728e7146a3a4a0aa" title="process one record of a workspace file" alt="" coords="448,649,632,689"/>
+<area shape="rect" id="node41" href="$classCommand.html#aa0764d08a6ae9c8270907ab7d5dc37cf" title=")IN: import a workspace file" alt="" coords="255,656,391,681"/>
+<area shape="rect" id="node45" href="$classBif__OPER1__REDUCE.html#a584c1a00ef6b21b457c869a862fe4775" title="Overloaded Function::eval_ALB()." alt="" coords="1565,705,1783,731"/>
+<area shape="rect" id="node46" href="$classBif__OPER1__REDUCE1.html#a1c98ca9e70231d9a1fe491c64e46f8a8" title="Overloaded Function::eval_ALB()." alt="" coords="1589,755,1759,795"/>
+<area shape="rect" id="node47" href="$classBif__OPER1__REDUCE.html#a06f59f7c71977fda6d2ca0e99389b659" title="Overloaded Function::eval_ALXB()." alt="" coords="1560,820,1788,845"/>
+<area shape="rect" id="node48" href="$classBif__OPER1__REDUCE1.html#ad48531d0b47915421f4aca74bab3b31d" title="Overloaded Function::eval_ALXB()." alt="" coords="1589,870,1759,910"/>
+<area shape="rect" id="node50" href="$classBif__F12__PICK.html#addeecdccc96628ddf5e957d7daa8d167" title="⊃[X]B" alt="" coords="1593,934,1755,974"/>
+<area shape="rect" id="node52" href="$classBif__F12__TRANSPOSE.html#ac26306fa58433144e147e0cf436b639e" title="implementation of eval_B()" alt="" coords="1591,998,1757,1038"/>
+<area shape="rect" id="node55" href="$classBif__F12__TRANSPOSE.html#a02edd5a8bcffd81efc32738a2c585e46" title="overloaded Function::eval_AB()" alt="" coords="1591,1062,1757,1102"/>
+<area shape="rect" id="node51" href="$classBif__F12__PICK.html#ad21f06a298fdf42e3e4db81cda42bcff" title="overloaded Function::eval_XB()" alt="" coords="1340,941,1503,967"/>
+<area shape="rect" id="node53" href="$classBif__F12__TRANSPOSE.html#a2a01e99f2b3533213143964f7acffbc3" title="overloaded Function::eval_B()" alt="" coords="1339,994,1504,1034"/>
+<area shape="rect" id="node54" href="$classBif__F12__DOMINO.html#ac85466d7ba807123bff312e03c596f46" title="overloaded Function::eval_fill_B()" alt="" coords="1341,1058,1502,1098"/>
+</map>

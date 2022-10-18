@@ -1,0 +1,7 @@
+<map id="Idx0_0" name="Idx0_0">
+<area shape="rect" id="node2" href="$classQuad__EC.html#a44e3cc95f4d9c98ced01bf1810c32208" title="end of context handler for ⎕EC " alt="" coords="120,5,228,32"/>
+<area shape="rect" id="node6" href="$classValue.html#a9eae09e4e46c3f8f2150ead431fb521a" title="restrict use of &amp; (which is frequently a mistake) " alt="" coords="115,56,233,83"/>
+<area shape="rect" id="node3" href="$classCommand.html#a879617e7645bea2e4052154f16999634" title="finish the current SI&#45;&gt;top() and pop it when done " alt="" coords="281,5,452,32"/>
+<area shape="rect" id="node4" href="$classCommand.html#af36741357bfd4e183b34ee8b747bc7c5" title="process line which contains APL statements " alt="" coords="500,5,707,32"/>
+<area shape="rect" id="node5" href="$classCommand.html#ae26693534d4df16372f51e55e505b8d7" title="process line which contains a command or statements " alt="" coords="755,5,917,32"/>
+</map>

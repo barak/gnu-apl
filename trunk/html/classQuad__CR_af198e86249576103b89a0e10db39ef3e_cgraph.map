@@ -1,0 +1,15 @@
+<map id="Quad_CR::do_CR31_32" name="Quad_CR::do_CR31_32">
+<area shape="rect" id="node1" title="compute 31 ⎕CR B or 32 ⎕CR B" alt="" coords="5,191,169,216"/>
+<area shape="rect" id="node2" href="$classPrintBuffer.html#a8de75b742569bcc7053d458a80cd16b1" title="add padding and a column pb to this PrintBuffer" alt="" coords="233,240,396,265"/>
+<area shape="rect" id="node5" href="$classPrintBuffer.html#ac13295601812e379a3eac618ce239426" title="return the number of rows" alt="" coords="673,183,811,223"/>
+<area shape="rect" id="node6" href="$classValue__P__Base.html#a1c3bf1b6f708eb2c1ba4b97c83adb9aa" title="return a const pointer to the Value" alt="" coords="247,92,382,117"/>
+<area shape="rect" id="node7" href="$classWorkspace.html#a002e2f097bece67c9d082b7c89db11ae" title="return style and the current ⎕PP, and ⎕PW" alt="" coords="217,141,412,167"/>
+<area shape="rect" id="node8" href="$classPrintContext.html#a5ef45c5babbe3ebf9988a9b659a2e407" title="return the print style to be used" alt="" coords="237,191,393,216"/>
+<area shape="rect" id="node9" href="$classPrintBuffer.html#a8fd6b4066b13cea99f550ebdb91063c3" title="return the first (and only) line" alt="" coords="486,89,589,115"/>
+<area shape="rect" id="node10" href="$classPrintBuffer.html#a03c0a54c0dec4294ed672a24d35fa582" title="append lines to reach height" alt="" coords="460,287,615,312"/>
+<area shape="rect" id="node11" href="$classPrintBuffer.html#a1e9e8be086aa5b8021b85b8c797113e5" title="prepend lines to reach height" alt="" coords="460,337,615,377"/>
+<area shape="rect" id="node13" href="$classPrintContext.html#a787257953d929f80db2ba1698d59b905" title="set the print style to be used" alt="" coords="237,392,393,417"/>
+<area shape="rect" id="node3" href="$classPrintBuffer.html#a1cedbbcfe6835e1d3a2d02b9f2334c2c" title="print properties of this PrintBuffer" alt="" coords="474,237,601,263"/>
+<area shape="rect" id="node4" href="$classPrintBuffer.html#af6f689e8c4e930b7c37099bf5fdfe57d" title="return the number of columns" alt="" coords="663,275,821,315"/>
+<area shape="rect" id="node12" href="$classUCS__string__vector.html#a16fca0c736760dae8fbf220634fc500d" title="replacement for insert(std::vector::iterator position, value)" alt="" coords="671,339,813,379"/>
+</map>

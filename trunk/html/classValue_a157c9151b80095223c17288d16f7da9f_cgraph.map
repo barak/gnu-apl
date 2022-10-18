@@ -1,0 +1,17 @@
+<map id="Value::Value" name="Value::Value">
+<area shape="rect" id="node1" title="constructor: a integer vector containing the items of a shape" alt="" coords="5,131,101,156"/>
+<area shape="rect" id="node2" href="$classShape.html#a017e9a35dd20f4bc4fdeb7ea29b6805d" title="return the rank" alt="" coords="170,5,287,31"/>
+<area shape="rect" id="node3" href="$classShape.html#a592d2ade68aa8c21c5d84627c3a0e001" title="return the length of dimension r" alt="" coords="149,55,308,80"/>
+<area shape="rect" id="node4" href="$classValue.html#a54205b69c66acaabc99a43a8870950c2" title="return the first element of the ravel (which is always present) same as wfirst(), but named different..." alt="" coords="360,32,487,57"/>
+<area shape="rect" id="node8" href="$classValue.html#a1120641bea23235f2525146e6f5f48df" title="init the ravel of an APL value, return the ravel length" alt="" coords="171,156,286,181"/>
+<area shape="rect" id="node12" href="$classIntCell.html#afd60fd9e3a5581ac99c1e053d9218fe7" title="initialize the (un&#45;initialized) Cell *Z to integer 0" alt="" coords="382,279,465,304"/>
+<area shape="rect" id="node15" href="$classValue.html#ab3a0d3914977f611bfddf54178edd477" title="initialize the next ravel cell with an integer value" alt="" coords="156,257,301,283"/>
+<area shape="rect" id="node5" href="$classValue.html#af5c079fe8530d8f90a87c53439d9c924" title="return the (writable) idx&#39;th element of the ravel." alt="" coords="539,32,665,57"/>
+<area shape="rect" id="node6" href="$classValue.html#ac5b54e3a13cab0837442f1575b3299a5" title="return the number of elements, but at least 1 (for the prototype)." alt="" coords="713,32,883,57"/>
+<area shape="rect" id="node7" href="$classShape.html#a6f32f749601dca80263493fd06be12c4" title="return the number of ravel elements, but at least 1 (for empty values and scalars) else product of sh..." alt="" coords="931,32,1085,57"/>
+<area shape="rect" id="node9" href="$classValue.html#a10289415c33695f6df77388ea09a83c8" title="return the offset&#39;th ravel cell (of an unpack&#39;ed ravel)" alt="" coords="358,81,489,107"/>
+<area shape="rect" id="node10" href="$classWorkspace.html#adb2006f054a1cebb8ae0252b61bd1d1b" title="return the current ⎕IO" alt="" coords="356,131,491,156"/>
+<area shape="rect" id="node11" href="$classShape.html#af39e05bad7be900fa1437a6eb6035e97" title="return the number of ravel elements (1 for scalars,i else product of shapes)" alt="" coords="356,180,491,205"/>
+<area shape="rect" id="node14" href="$classIntCell.html#aa99b7212ce13da0f241adeb18e350198" title="initialize Z to APL_Integer v" alt="" coords="384,229,463,255"/>
+<area shape="rect" id="node13" href="$classIntCell.html#a88c653b2f968c451ee1c1c53a983fa13" title="Construct an integer cell with value 0." alt="" coords="549,253,655,279"/>
+</map>

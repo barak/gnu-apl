@@ -1,0 +1,5 @@
+<map id="Value::get_cscalar" name="Value::get_cscalar">
+<area shape="rect" id="node2" href="$classQuad__FIO.html#adc9c697824accc5069aa03ed5dc5f3a0" title="return the open FILE * (APL integer) handle " alt="" coords="184,5,327,32"/>
+<area shape="rect" id="node3" href="$classQuad__FIO.html#a1b6512662a837a3113ed189b8f42d18a" title="return the open file for (APL integer) handle " alt="" coords="189,57,321,98"/>
+<area shape="rect" id="node4" href="$classValue.html#aad04e796b926355040d462e81b9d7f11" title="return this indexed by (one&#45;dimensional) IDX. " alt="" coords="208,123,303,149"/>
+</map>

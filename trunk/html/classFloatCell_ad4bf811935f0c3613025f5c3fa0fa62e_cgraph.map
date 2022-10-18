@@ -1,0 +1,6 @@
+<map id="FloatCell::bif_nat_log" name="FloatCell::bif_nat_log">
+<area shape="rect" id="node1" title="Overloaded from the corresponding Cell:: function (see class Cell)." alt="" coords="5,55,151,80"/>
+<area shape="rect" id="node2" href="$classFloatCell.html#afa1a46cfd36a3c2166559f7d425f094d" title="return the value of this cell as a double (even if the value is rational)" alt="" coords="205,5,315,31"/>
+<area shape="rect" id="node3" href="$classComplexCell.html#a9ccb64da2c504a517c725dc2c41940da" title="initialize the (un&#45;initialized) Cell *Z to complex r + ij" alt="" coords="199,55,321,80"/>
+<area shape="rect" id="node4" href="$classFloatCell.html#a88217aaf5cd286cc89a85d2885876dda" title="initialize the (un&#45;initialized) Cell *Z to APL_Float flt" alt="" coords="211,104,309,129"/>
+</map>

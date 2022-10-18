@@ -1,0 +1,19 @@
+<map id="Value::get_single_axis" name="Value::get_single_axis">
+<area shape="rect" id="node1" title="If this value is a single axis between ⎕IO and ⎕IO + max_axis then return that axis...." alt="" coords="281,423,435,448"/>
+<area shape="rect" id="node2" href="$classBif__OPER1__REDUCE.html#a06f59f7c71977fda6d2ca0e99389b659" title="Overloaded Function::eval_ALXB()." alt="" coords="5,5,233,31"/>
+<area shape="rect" id="node3" href="$classBif__OPER1__REDUCE1.html#ad48531d0b47915421f4aca74bab3b31d" title="Overloaded Function::eval_ALXB()." alt="" coords="34,55,205,95"/>
+<area shape="rect" id="node4" href="$classBif__F12__PARTITION.html#a119646a27f2537b4da898e5646988857" title="overloaded Function::eval_AXB()" alt="" coords="42,119,197,159"/>
+<area shape="rect" id="node5" href="$classBif__OPER1__REDUCE.html#ab0e3bfadabe90022fd47547d758efcb4" title="Overloaded Function::eval_AXB()." alt="" coords="9,184,230,209"/>
+<area shape="rect" id="node6" href="$classBif__OPER1__REDUCE1.html#a22cc3a3474783da8abd628c60feb7256" title="Overloaded Function::eval_AXB()." alt="" coords="34,234,205,274"/>
+<area shape="rect" id="node7" href="$classBif__OPER1__SCAN.html#acb0af1437c6bf8c4371883b7f90f4cd6" title="Overloaded Function::eval_AXB()." alt="" coords="19,299,220,324"/>
+<area shape="rect" id="node8" href="$classBif__OPER1__SCAN1.html#a9443990df8bba319cb2599c324bbb9e9" title="Overloaded Function::eval_AXB()." alt="" coords="15,348,223,373"/>
+<area shape="rect" id="node9" href="$classBif__F12__ROTATE.html#aaef77c4a19df99c926818b1ef3f519fe" title="overloaded Function::eval_AXB()" alt="" coords="22,397,217,423"/>
+<area shape="rect" id="node10" href="$classBif__F12__ROTATE1.html#af159c64ab4196cfa690bf9e98129f4fb" title="overloaded Function::eval_AXB()" alt="" coords="19,447,220,472"/>
+<area shape="rect" id="node11" href="$classQuad__FX.html#a5f8e649505baa6e008f2aa11706b2b06" title="overloaded Function::eval_AXB()." alt="" coords="48,496,191,521"/>
+<area shape="rect" id="node12" href="$classBif__OPER1__REDUCE.html#aed5704b99e4ff296d84b329cfcc9048c" title="Overloaded Function::eval_LXB()." alt="" coords="10,545,229,571"/>
+<area shape="rect" id="node13" href="$classBif__OPER1__REDUCE1.html#a9bb990c9c5944c780452941e13d39c0d" title="Overloaded Function::eval_LXB()." alt="" coords="34,595,205,635"/>
+<area shape="rect" id="node14" href="$classBif__OPER1__SCAN.html#ace7710f31a43abd663e582cf96cb9169" title="Overloaded Function::eval_LXB()." alt="" coords="20,660,219,685"/>
+<area shape="rect" id="node15" href="$classBif__OPER1__SCAN1.html#adb20c6d87fb95f93fc8230f4984c4041" title="Overloaded Function::eval_ALXB()." alt="" coords="16,709,223,735"/>
+<area shape="rect" id="node16" href="$classBif__F12__ROTATE.html#a2d6d04db12790ef356b201f36db0e756" title="overloaded Function::eval_XB()" alt="" coords="27,759,212,784"/>
+<area shape="rect" id="node17" href="$classBif__F12__ROTATE1.html#ae2a7ea53107706f45edf954d76532a64" title="overloaded Function::eval_XB()" alt="" coords="23,808,215,833"/>
+</map>

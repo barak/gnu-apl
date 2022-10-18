@@ -1,0 +1,22 @@
+<map id="draw_legend" name="draw_legend">
+<area shape="rect" id="node1" title="draw a legend for the different plot lines" alt="" coords="5,201,100,227"/>
+<area shape="rect" id="node2" href="$Plot__gtk_8cc.html#ad3c35c71233bf7716802110531ce36bb" title="same as standard cairo_set_RGB_source() but with Color instead of double red, green,..." alt="" coords="565,105,723,131"/>
+<area shape="rect" id="node3" href="$Plot__gtk_8cc.html#a5e97fc1b80b16b714315808c7fb1181d" title="return the size of single_line string text when printed with font font_name of /// size font_size" alt="" coords="168,176,288,201"/>
+<area shape="rect" id="node4" href="$Plot__gtk_8cc.html#a12790f315bc24ef6e2ca35b323b766e9" title="draw a line from P0 to P1" alt="" coords="397,31,475,56"/>
+<area shape="rect" id="node5" href="$Plot__gtk_8cc.html#a5974ed8d074320e72c4e8cf11f740c72" title="draw a point with given point_style and size around P" alt="" coords="185,127,271,152"/>
+<area shape="rect" id="node10" href="$Plot__gtk_8cc.html#a7fe4d2e0d8c0208c0e805b1ad9de2683" title="draw single&#45;line string text at position xy" alt="" coords="189,225,267,251"/>
+<area shape="rect" id="node11" href="$classPlot__window__properties.html#a93800299d67a2fd7c285595e90411b45" title="return the number of plot lines" alt="" coords="148,275,308,315"/>
+<area shape="rect" id="node12" href="$classPlot__window__properties.html#a7231114ba94d70fa8b54beef8d9e590c" title="an array of plot line properties" alt="" coords="148,339,308,379"/>
+<area shape="rect" id="node13" href="$classPlot__window__properties.html#aa4db62e171eab805cd9e1a3cbc253c3c" title="return the pixel position of the point where the X, Y, and possibly Z&#45;axis cross." alt="" coords="148,403,308,443"/>
+<area shape="rect" id="node6" href="$Plot__gtk_8cc.html#a9edae1218c5d31a0b9a4559d5fe94e9b" title="draw a circle with diameter size around P0" alt="" coords="392,80,480,105"/>
+<area shape="rect" id="node7" href="$Plot__gtk_8cc.html#ae7281e8b20ed86f06c6a39424231928b" title="draw a 🞤 or 🞫 with given size around P0" alt="" coords="391,129,481,155"/>
+<area shape="rect" id="node8" href="$Plot__gtk_8cc.html#ad93bc9bc62f2ddf10507308397a42277" title="draw a ▲ or ▼ with given size around P0" alt="" coords="393,179,479,204"/>
+<area shape="rect" id="node9" href="$Plot__gtk_8cc.html#a016d3738646de7950db9c228368b09ed" title="draw a ■ or ◆ with given size around P0" alt="" coords="393,228,479,253"/>
+<area shape="rect" id="node14" href="$classPlot__window__properties.html#a577510e3bcf6ba61978dc60d778dc967" title="return the smallest X value" alt="" coords="564,266,724,306"/>
+<area shape="rect" id="node15" href="$classPlot__window__properties.html#af27f118d1e90664680b2efd1a2460a03" title="return the smallest Y value" alt="" coords="564,330,724,370"/>
+<area shape="rect" id="node16" href="$classPlot__window__properties.html#a0640b99b583131dabf64478a88265e66" title="return the smallest Z value" alt="" coords="564,458,724,498"/>
+<area shape="rect" id="node17" href="$classPlot__window__properties.html#a087dfd5eee09a66161eb76c87680d14c" title="convert &#160;&#160;val_X to the X coordinate of the pixel in the plot area" alt="" coords="564,522,724,562"/>
+<area shape="rect" id="node18" href="$classPlot__window__properties.html#acd007c1ca30e86d8e12e125a39d7d9a5" title="convert values val_X, val_Y, and val_Z, to the X and Y coordinate of the pixel below the Z=0 plane of..." alt="" coords="356,401,516,441"/>
+<area shape="rect" id="node19" href="$classPlot__window__properties.html#ae727cdd8ecd4888c8785c5fd53dc6b93" title="convert &#160;&#160;val_Y to the Y coordinate of the pixel in the plot area" alt="" coords="564,586,724,626"/>
+<area shape="rect" id="node20" href="$classPlot__window__properties.html#af978c228065cbaba8381af79bc1fce95" title="convert &#160;&#160;val_Z to the relative Z vector (q. quadrant)" alt="" coords="564,394,724,434"/>
+</map>

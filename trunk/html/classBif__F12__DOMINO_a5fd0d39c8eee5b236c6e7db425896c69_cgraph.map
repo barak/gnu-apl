@@ -1,0 +1,24 @@
+<map id="Bif_F12_DOMINO::Bif_F12_DOMINO" name="Bif_F12_DOMINO::Bif_F12_DOMINO">
+<area shape="rect" id="node2" href="$classBif__F12__DOMINO.html#a3c3c6ba1a43a4ac039bb7c8a1ab2f200" title="overloaded Function::eval_AB() " alt="" coords="449,12,636,39"/>
+<area shape="rect" id="node11" href="$classBif__F12__DOMINO.html#abdd6603496561e9169fc9fa37dd0e97a" title="overloaded Function::eval_AXB() " alt="" coords="207,208,401,235"/>
+<area shape="rect" id="node12" href="$classBif__F12__DOMINO.html#a19873faacf1ea284bbc2d1410d8dcf32" title="overloaded Function::eval_B() " alt="" coords="215,81,393,108"/>
+<area shape="rect" id="node13" href="$classBif__F12__DOMINO.html#a46560282bf8a387ca5fd85cdd2b36fbb" title="overloaded Function::eval_XB() " alt="" coords="211,157,397,184"/>
+<area shape="rect" id="node3" href="$classShape.html#aeb018b67601d3f1c4bea3d2c2b877b7e" title="add a dimension of length len at the end " alt="" coords="689,12,852,39"/>
+<area shape="rect" id="node4" href="$Bif__F12__DOMINO_8cc.html#a1dc45727a575f2b09520a9800261aa47" title="a macro to enable debug printouts " alt="" coords="721,113,820,140"/>
+<area shape="rect" id="node10" href="$classValue__P__Base.html#a64e77a99509cdb6ecbe4cf273a2e7694" title="return a const pointer to the Value " alt="" coords="703,164,838,191"/>
+<area shape="rect" id="node5" href="$classWorkspace.html#a84f9084505dfcbc3a26414ea895dd7ca" title="return the current ⎕CT " alt="" coords="923,5,1062,32"/>
+<area shape="rect" id="node6" href="$classCell.html#a0e6b9239fa77e3222f32400d51c8f114" title="Return the imaginary part of a cell. " alt="" coords="921,157,1065,184"/>
+<area shape="rect" id="node7" href="$classCell.html#a9a0028fd74f00deb001a8062a55916c6" title="Return the real part of a cell. " alt="" coords="924,208,1061,235"/>
+<area shape="rect" id="node8" href="$classValue.html#afd08a9cd66afb49ff0e654b56d718616" title="set ravel[offset] to Complex(real, imag) " alt="" coords="905,56,1080,83"/>
+<area shape="rect" id="node9" href="$classValue.html#a543709a9fcb4273395465ad8ff21ae5b" title="set ravel[offset] to flt " alt="" coords="917,107,1069,133"/>
+<area shape="rect" id="node14" href="$classBif__F12__DOMINO.html#abb12309ad9a3abcd453dbe5c4a17ec6e" title="compute the Q matrix of B = QR " alt="" coords="464,326,621,367"/>
+<area shape="rect" id="node15" href="$classBif__F12__DOMINO.html#ac54c0fb865d9ca1443f7d8d293c258b4" title="initialize complex D with Cells cB " alt="" coords="686,229,855,270"/>
+<area shape="rect" id="node19" href="$classBif__F12__DOMINO_1_1Matrix.html#a0e90cbf5e271060dc9b6ce715e1acb86" title="transpose the upper left M×M submatrix of this matrix " alt="" coords="684,359,857,401"/>
+<area shape="rect" id="node20" href="$classBif__F12__DOMINO_1_1Matrix.html#a1938af6ea4a9afe7ae63ddf1487c7a4e" title="set this matrix to A +.× B " alt="" coords="684,425,857,466"/>
+<area shape="rect" id="node21" href="$classBif__F12__DOMINO_1_1Matrix.html#adb08c178b7485d7113436c1f2a33ea10" title="print this matrix boxed with name " alt="" coords="684,490,857,531"/>
+<area shape="rect" id="node22" href="$classBif__F12__DOMINO.html#a7fa14fd8db44fde58b262c5f46adbc00" title="initialize real D with Cells cB " alt="" coords="686,294,855,335"/>
+<area shape="rect" id="node23" href="$APL__Float__as__class_8hh.html#ae0c942b22a49f59b05397b3934e4dd7b" title="isfinite" alt="" coords="741,556,801,583"/>
+<area shape="rect" id="node16" href="$classCell.html#a122ed26d321f4d27ca63c8cea0134595" title="Return true iff this cell is a floating point cell. " alt="" coords="931,309,1054,336"/>
+<area shape="rect" id="node17" href="$classCell.html#a30d0c83ab2c46ef830cd1301c77eb772" title="Return true iff this cell is an integer cell. " alt="" coords="925,360,1061,387"/>
+<area shape="rect" id="node18" href="$classCell.html#a62919edef3b6b585e544dcf2865402eb" title="Return true iff this cell is a complex number cell. " alt="" coords="919,259,1066,285"/>
+</map>

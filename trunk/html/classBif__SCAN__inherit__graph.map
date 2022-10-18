@@ -1,8 +1,9 @@
 <map id="Bif_SCAN" name="Bif_SCAN">
-<area shape="rect" id="node6" href="$classBif__OPER1__SCAN.html" title="The class implementing . " alt="" coords="5,379,140,405"/>
-<area shape="rect" id="node7" href="$classBif__OPER1__SCAN1.html" title="The class implementing ⍀ " alt="" coords="164,379,307,405"/>
-<area shape="rect" id="node2" href="$classPrimitiveOperator.html" title="Base class for all primitive APL operators. " alt="" coords="93,229,215,256"/>
-<area shape="rect" id="node3" href="$classPrimitiveFunction.html" title="Base class for all internal functions of the interpreter. " alt="" coords="93,155,215,181"/>
-<area shape="rect" id="node4" href="$classFunction.html" title="Base class for all APL functions and operators (system or defined) " alt="" coords="118,80,190,107"/>
-<area shape="rect" id="node5" href="$classNamedObject.html" title="A user&#45;defined variable or function. " alt="" coords="103,5,205,32"/>
+<area shape="rect" id="node1" title="Base class for \ and ⍀" alt="" coords="113,299,195,324"/>
+<area shape="rect" id="node6" href="$classBif__OPER1__SCAN.html" title="The class implementing ." alt="" coords="5,372,140,397"/>
+<area shape="rect" id="node7" href="$classBif__OPER1__SCAN1.html" title="The class implementing ⍀" alt="" coords="164,372,307,397"/>
+<area shape="rect" id="node2" href="$classPrimitiveOperator.html" title="Base class for all primitive APL operators." alt="" coords="93,225,215,251"/>
+<area shape="rect" id="node3" href="$classPrimitiveFunction.html" title="Base class for all internal functions of the interpreter." alt="" coords="93,152,215,177"/>
+<area shape="rect" id="node4" href="$classFunction.html" title="Base class for all APL functions and operators (system or defined)" alt="" coords="118,79,190,104"/>
+<area shape="rect" id="node5" href="$classNamedObject.html" title="A user&#45;defined variable or function." alt="" coords="103,5,205,31"/>
 </map>

@@ -1,0 +1,6 @@
+<map id="PrintBuffer::pad_height_above" name="PrintBuffer::pad_height_above">
+<area shape="rect" id="node1" title="prepend lines to reach height" alt="" coords="5,93,160,133"/>
+<area shape="rect" id="node2" href="$classPrintBuffer.html#af6f689e8c4e930b7c37099bf5fdfe57d" title="return the number of columns" alt="" coords="208,29,367,69"/>
+<area shape="rect" id="node3" href="$classPrintBuffer.html#ac13295601812e379a3eac618ce239426" title="return the number of rows" alt="" coords="218,93,357,133"/>
+<area shape="rect" id="node4" href="$classUCS__string__vector.html#a16fca0c736760dae8fbf220634fc500d" title="replacement for insert(std::vector::iterator position, value)" alt="" coords="217,157,358,197"/>
+</map>

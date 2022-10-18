@@ -1,0 +1,9 @@
+<map id="Cell::sorted_indices" name="Cell::sorted_indices">
+<area shape="rect" id="node1" title="return length indices i1, i2, ... iN so that ravel[i1] &lt; ravel[i2] &lt; ... &lt; ravel[iN]...." alt="" coords="5,55,143,80"/>
+<area shape="rect" id="node2" href="$classCell.html#a98a5d83df230577f432930eac851f57d" title="compare cells[a] and cells[b] ascendingly" alt="" coords="193,5,308,31"/>
+<area shape="rect" id="node4" href="$classCell.html#a4c308856d54530f72ba77429b8b5f174" title="compare cells[a] and cells[b] descendingly" alt="" coords="193,55,309,80"/>
+<area shape="rect" id="node5" href="$classUCS__string.html#a59f472bb1ee082cca5ac2a6c128f4918" title="sort the characters in this string by their Unicode" alt="" coords="191,128,311,153"/>
+<area shape="rect" id="node3" href="$classCell.html#ab5bc0bd0d336863996b9b5bc58f3ddef" title="compare this with other, throw DOMAIN ERROR on illegal comparisons" alt="" coords="389,24,491,49"/>
+<area shape="rect" id="node6" href="$classUCS__string.html#a3c03c3e5b4d7be0e435a7cfee8a424ae" title="helper function for Heapsort&lt;Unicode&gt;::sort()" alt="" coords="359,91,521,116"/>
+<area shape="rect" id="node7" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="379,140,501,165"/>
+</map>

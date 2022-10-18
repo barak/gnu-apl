@@ -1,0 +1,10 @@
+<map id="Command::cmd_USERCMD" name="Command::cmd_USERCMD">
+<area shape="rect" id="node1" title="create a user defined command" alt="" coords="5,132,196,157"/>
+<area shape="rect" id="node2" href="$classUCS__string.html#a186a76c22c3ac840f1e607ba49e253a0" title="return the last character in this string" alt="" coords="278,5,405,31"/>
+<area shape="rect" id="node3" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="499,56,621,81"/>
+<area shape="rect" id="node4" href="$classCommand.html#a13b5e986bc7eae259343aca362870bba" title="check if a command is being redefined" alt="" coords="244,156,439,181"/>
+<area shape="rect" id="node5" href="$classWorkspace.html#a9d95fe58db1301e25929139af7bbe15f" title="Return all user&#45;defined commands." alt="" coords="487,170,633,210"/>
+<area shape="rect" id="node6" href="$classUCS__string.html#a0b30b7def05056722f3e1eda0b816e4e" title="return true if this string contains uni" alt="" coords="268,107,415,132"/>
+<area shape="rect" id="node7" href="$classAvec.html#a76a72fdcb1782be1c490b3670c45504f" title="Return true iff av is a valid char in a user defined symbol." alt="" coords="266,257,417,283"/>
+<area shape="rect" id="node8" href="$classAvec.html#afe30f62f26ec74019a95e5cbd6eaa111" title="Find av in character_table. Return position or Invalid_CHT." alt="" coords="503,257,617,283"/>
+</map>

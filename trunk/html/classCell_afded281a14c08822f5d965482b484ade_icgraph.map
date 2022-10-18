@@ -1,0 +1,7 @@
+<map id="Cell::bif_floor" name="Cell::bif_floor">
+<area shape="rect" id="node1" title="Round the value of this Cell down and store the result in Z." alt="" coords="731,31,829,56"/>
+<area shape="rect" id="node2" href="$classComplexCell.html#a5d1fbc198fc98df8f0f91869cbd161f5" title="overloaded from the corresponding Cell:: function (see class Cell)." alt="" coords="509,5,677,31"/>
+<area shape="rect" id="node5" href="$classBif__F12__RND__DN.html#aa0b14c469b99ffb2eeeac9c1e7253389" title="overloaded Function::eval_B()." alt="" coords="504,55,683,80"/>
+<area shape="rect" id="node3" href="$classBif__F12__ENCODE.html#a4639bbd2488d2f02ca88a5e362a1229a" title="encode *ib() according to A" alt="" coords="243,5,456,31"/>
+<area shape="rect" id="node4" href="$classBif__F12__ENCODE.html#a003a77890ec532d2909d23e3ce5dcb89" title="overloaded Function::eval_AB()" alt="" coords="5,5,195,31"/>
+</map>

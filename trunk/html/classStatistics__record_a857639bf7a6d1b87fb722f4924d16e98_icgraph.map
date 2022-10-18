@@ -1,0 +1,9 @@
+<map id="Statistics_record::get_count" name="Statistics_record::get_count">
+<area shape="rect" id="node1" title="return the number of samples" alt="" coords="399,119,527,159"/>
+<area shape="rect" id="node2" href="$classQuad__FIO.html#aeaba4a7f5a55bbab8ad6b7d3d7c932fa" title="overloaded Function::eval_AXB()." alt="" coords="206,5,345,31"/>
+<area shape="rect" id="node4" href="$classCellFunctionStatistics.html#a42cd5195f0d3331b07fd087204854571" title="return the number of all executions" alt="" coords="200,55,351,95"/>
+<area shape="rect" id="node5" href="$classCellFunctionStatistics.html#ace7f75930dfb066e9c15282c6f4515f4" title="return the number of first executions" alt="" coords="200,119,351,159"/>
+<area shape="rect" id="node6" href="$classCellFunctionStatistics.html#acca1fd9e9bbf6588d054040029e0c19b" title="return the number of subsequent executions" alt="" coords="200,183,351,223"/>
+<area shape="rect" id="node7" href="$classFunctionStatistics.html#a28d0d5eea811ef0bec0accc661675260" title="overloaded Statistics::print()" alt="" coords="212,247,339,287"/>
+<area shape="rect" id="node3" href="$classQuad__FIO.html#a24ac2813d6425ad61471166fe019ba33" title="overloaded Function::eval_LXB()." alt="" coords="5,5,152,31"/>
+</map>

@@ -1,0 +1,4 @@
+<map id="Backtrace::demangle_line" name="Backtrace::demangle_line">
+<area shape="rect" id="node1" title="demangle a line returned by backtrace_symbols()" alt="" coords="173,5,345,31"/>
+<area shape="rect" id="node2" href="$classBacktrace.html#add6f58c6442cf88f20958817d8fa720b" title="show the current caller (only valid while being called)" alt="" coords="5,5,125,31"/>
+</map>

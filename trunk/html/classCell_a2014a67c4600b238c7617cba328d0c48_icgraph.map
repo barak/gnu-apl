@@ -1,0 +1,10 @@
+<map id="Cell::bif_add" name="Cell::bif_add">
+<area shape="rect" id="node1" title="store the sum of A and this cell in Z" alt="" coords="747,104,841,129"/>
+<area shape="rect" id="node2" href="$classComplexCell.html#a5d1fbc198fc98df8f0f91869cbd161f5" title="overloaded from the corresponding Cell:: function (see class Cell)." alt="" coords="517,5,685,31"/>
+<area shape="rect" id="node5" href="$classBif__F12__PLUS.html#a968a04f3de8ac82ecfd0483cb67ee5a7" title="overloaded Function::eval_AB()." alt="" coords="518,55,685,80"/>
+<area shape="rect" id="node6" href="$classBif__F12__PLUS.html#a42753ba037260bdac37c0da1015855af" title="overloaded Function::eval_AXB()." alt="" coords="514,104,689,129"/>
+<area shape="rect" id="node7" href="$classBif__F12__PLUS.html#a86988fac1172288af2cedb38affa8f56" title="return the associative cell function of this function" alt="" coords="513,153,690,179"/>
+<area shape="rect" id="node8" href="$classBif__F12__PLUS.html#a6b4a5b869b59ec53a6f82f3dbf814c4c" title="overloaded Function::get_scalar_f2()" alt="" coords="504,203,699,228"/>
+<area shape="rect" id="node3" href="$classBif__F12__ENCODE.html#a4639bbd2488d2f02ca88a5e362a1229a" title="encode *ib() according to A" alt="" coords="243,5,456,31"/>
+<area shape="rect" id="node4" href="$classBif__F12__ENCODE.html#a003a77890ec532d2909d23e3ce5dcb89" title="overloaded Function::eval_AB()" alt="" coords="5,5,195,31"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="ZZ" name="ZZ">
+<area shape="rect" id="node1" title="a complex number" alt="" coords="46,183,85,208"/>
+<area shape="rect" id="node2" href="$classAPL__Float.html" title="a non&#45;rational APL floating point value" alt="" coords="24,80,107,105"/>
+<area shape="rect" id="node3" href="$classAPL__Float__Base.html" title="the essential data of an APL_Float, so that it can be used in a union" alt="" coords="5,5,125,31"/>
+</map>

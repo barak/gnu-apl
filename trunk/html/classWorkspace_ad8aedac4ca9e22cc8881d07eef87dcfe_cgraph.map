@@ -1,0 +1,12 @@
+<map id="Workspace::wsid" name="Workspace::wsid">
+<area shape="rect" id="node1" title="set or inquire the workspace ID" alt="" coords="5,105,128,131"/>
+<area shape="rect" id="node2" href="$classUCS__string.html#a52cd4088451200cd78eb2db03b44a8ac" title="erase 1 (!) character at pos" alt="" coords="183,5,313,31"/>
+<area shape="rect" id="node3" href="$classUCS__string.html#a5ee12a6873e023f9ad76ffafd7aa9c20" title="prepend character uni" alt="" coords="176,55,320,80"/>
+<area shape="rect" id="node5" href="$classUCS__string.html#a91556379049e71071410cec015b960db" title="remove leading and trailing whitespaces" alt="" coords="177,156,319,211"/>
+<area shape="rect" id="node6" href="$classUCS__string.html#a07e8673ec73ad31228be88053aeff1b1" title="remove leading blanks, tabs, etc" alt="" coords="368,99,519,139"/>
+<area shape="rect" id="node7" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="769,171,892,196"/>
+<area shape="rect" id="node4" href="$classUCS__string.html#a522289839ffbbcbe43b4577858926858" title="more intuitive insert() function" alt="" coords="378,49,509,75"/>
+<area shape="rect" id="node8" href="$classUCS__string.html#a6a4540c3a5a7621f91406454b4f93cd0" title="remove trailing blanks, tabs, etc" alt="" coords="370,163,517,203"/>
+<area shape="rect" id="node9" href="$classUCS__string.html#a186a76c22c3ac840f1e607ba49e253a0" title="return the last character in this string" alt="" coords="581,171,707,196"/>
+<area shape="rect" id="node10" href="$classUCS__string.html#a67ea87cb92e687105b21917ffb4a2a6f" title="remove the last character in this string" alt="" coords="567,220,721,245"/>
+</map>

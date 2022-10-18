@@ -1,0 +1,6 @@
+<map id="Quad_RVAL::choose_integer" name="Quad_RVAL::choose_integer">
+<area shape="rect" id="node1" title="choose an integer value at random according to distribution dist" alt="" coords="457,55,648,80"/>
+<area shape="rect" id="node2" href="$classQuad__RVAL.html#a81c1da0db16f22bf6f91e554a655828b" title="do eval_B(B);" alt="" coords="245,55,409,80"/>
+<area shape="rect" id="node3" href="$classQuad__RVAL.html#a7d40e7a59f23d2d062027b9deee5eaf5" title="overloaded Function::eval_B()" alt="" coords="30,5,173,31"/>
+<area shape="rect" id="node4" href="$classQuad__RVAL.html#a21dfbb10ecc92dcb3275383d12c86289" title="initialize cell with a random nested value" alt="" coords="5,55,197,80"/>
+</map>

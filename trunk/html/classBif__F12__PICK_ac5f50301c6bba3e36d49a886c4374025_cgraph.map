@@ -1,0 +1,23 @@
+<map id="Bif_F12_PICK::eval_B" name="Bif_F12_PICK::eval_B">
+<area shape="rect" id="node1" title="overloaded Function::eval_B()" alt="" coords="5,276,160,301"/>
+<area shape="rect" id="node2" href="$classBif__F12__PICK.html#a49b2c6d2d06a094709eb02c32b936587" title="⊃B" alt="" coords="208,276,371,301"/>
+<area shape="rect" id="node3" href="$classBif__F12__PICK.html#a9f06f88953b9fe5a411175b2a4a57527" title="the shape of the items being disclosed" alt="" coords="434,173,598,213"/>
+<area shape="rect" id="node6" href="$classCell.html#a367b9df7e0d4b805e5f31641658113f6" title="Return the APL value of a cell (Asserts for non&#45;pointer cells)" alt="" coords="663,55,818,80"/>
+<area shape="rect" id="node14" href="$classCell.html#ae98b3988a7fa52c6c157b4911b043dde" title="Return true iff this cell is a pointer (to a sub&#45;array) cell." alt="" coords="673,301,809,327"/>
+<area shape="rect" id="node15" href="$classBif__F12__PICK.html#a4052ea32200b2bc5ac3f668849fb47d6" title="create a copy of B_item, pad as needed to have item_shape, and store it in Z, starteding at Z_start." alt="" coords="419,327,613,352"/>
+<area shape="rect" id="node21" href="$classShape.html#af39e05bad7be900fa1437a6eb6035e97" title="return the number of ravel elements (1 for scalars,i else product of shapes)" alt="" coords="449,376,583,401"/>
+<area shape="rect" id="node4" href="$classValue__P__Base.html#a1c3bf1b6f708eb2c1ba4b97c83adb9aa" title="return a const pointer to the Value" alt="" coords="673,5,808,31"/>
+<area shape="rect" id="node5" href="$classCell.html#a2bb41deb2c1209725e934f2397d339ca" title="Return the APL value of a cell (Asserts for non&#45;lval cells)" alt="" coords="673,203,809,228"/>
+<area shape="rect" id="node9" href="$classValue.html#a5ac7131d2f89d0bc8b8907d960cbd125" title="return the rank of this value" alt="" coords="684,104,797,129"/>
+<area shape="rect" id="node11" href="$classValue.html#a8cecab341fdc0bd55b67c07848463d37" title="return the r&#39;th shape element of this value" alt="" coords="663,153,818,179"/>
+<area shape="rect" id="node13" href="$classCell.html#af8746e4049278c9a46f25e6ee0d71fcc" title="Return true iff this cell is a pointer to a cell." alt="" coords="682,252,799,277"/>
+<area shape="rect" id="node7" href="$classCell.html#a38a6a25f0ad091f35e3d9abfe5608a50" title="return the type of this cell" alt="" coords="887,5,1018,31"/>
+<area shape="rect" id="node8" href="$classCell.html#a6c3fdef3d82f53649d1c3f16d37eedd7" title="the name of ct" alt="" coords="868,55,1037,80"/>
+<area shape="rect" id="node10" href="$classShape.html#a017e9a35dd20f4bc4fdeb7ea29b6805d" title="return the rank" alt="" coords="894,104,1011,129"/>
+<area shape="rect" id="node12" href="$classShape.html#a592d2ade68aa8c21c5d84627c3a0e001" title="return the length of dimension r" alt="" coords="873,153,1032,179"/>
+<area shape="rect" id="node16" href="$classCell.html#ab3d14978f78ba264d40e9ed1a4823be2" title="Return true iff this cell is a character cell." alt="" coords="665,400,816,425"/>
+<area shape="rect" id="node17" href="$classValue.html#adb495fbb836373de3d3558acfd986eed" title="initialize the next ravel cell with integer 0" alt="" coords="672,449,809,475"/>
+<area shape="rect" id="node18" href="$classValue.html#a35a1c313fbca5c1bef209f8d978ef9b6" title="initialize the next ravel cell from another Cell" alt="" coords="664,499,817,524"/>
+<area shape="rect" id="node19" href="$classValue.html#a131a7844810059a3ab8eb411fd713e3b" title="initialize the next ravel cell with a character value" alt="" coords="661,548,820,573"/>
+<area shape="rect" id="node20" href="$classValue.html#a23f74a9841ee7c005ee16e673f72f84b" title="initialize the next ravel cell with a pointer to another Cell" alt="" coords="663,351,818,376"/>
+</map>

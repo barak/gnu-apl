@@ -1,0 +1,5 @@
+<map id="Value::is_vector" name="Value::is_vector">
+<area shape="rect" id="node1" title="return true iff this value is a vector." alt="" coords="5,5,121,31"/>
+<area shape="rect" id="node2" href="$classValue.html#a5ac7131d2f89d0bc8b8907d960cbd125" title="return the rank of this value" alt="" coords="169,5,283,31"/>
+<area shape="rect" id="node3" href="$classShape.html#a017e9a35dd20f4bc4fdeb7ea29b6805d" title="return the rank" alt="" coords="331,5,448,31"/>
+</map>

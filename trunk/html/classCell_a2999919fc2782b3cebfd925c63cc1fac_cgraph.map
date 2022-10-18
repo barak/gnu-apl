@@ -1,0 +1,5 @@
+<map id="Cell::get_char_value" name="Cell::get_char_value">
+<area shape="rect" id="node1" title="Return the character value of a cell." alt="" coords="5,31,147,56"/>
+<area shape="rect" id="node2" href="$classCell.html#a38a6a25f0ad091f35e3d9abfe5608a50" title="return the type of this cell" alt="" coords="214,5,345,31"/>
+<area shape="rect" id="node3" href="$classCell.html#a6c3fdef3d82f53649d1c3f16d37eedd7" title="the name of ct" alt="" coords="195,55,364,80"/>
+</map>

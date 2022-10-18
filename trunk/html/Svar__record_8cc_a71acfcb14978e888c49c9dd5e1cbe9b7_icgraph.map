@@ -1,0 +1,5 @@
+<map id="get_CERR" name="get_CERR">
+<area shape="rect" id="node2" href="$structSvar__record.html#abdb5a461d505c7e674260f0794cc2bf0" title="complain about proc " alt="" coords="145,5,299,32"/>
+<area shape="rect" id="node3" href="$structSvar__record.html#a4909c9c63d6fe45b4cdfb4b6cad7762f" title="set the control bits of this variable " alt="" coords="140,56,304,83"/>
+<area shape="rect" id="node4" href="$structSvar__record.html#ae5d9c8b3fc4eaf74f45a87455ee9dd65" title="update the state when using or setting this variable, and clear events " alt="" coords="145,107,299,133"/>
+</map>

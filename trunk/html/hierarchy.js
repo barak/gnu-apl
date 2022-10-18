@@ -5,17 +5,14 @@ var hierarchy =
     [ "XML_Loading_Archive::_derived_todo", "structXML__Loading__Archive_1_1__derived__todo.html", null ],
     [ "Cell::SomeValue::_fval::_flt_num", "unionCell_1_1SomeValue_1_1__fval_1_1__flt__num.html", null ],
     [ "Cell::SomeValue::_fval", "structCell_1_1SomeValue_1_1__fval.html", null ],
+    [ "_help", "struct__help.html", null ],
     [ "Quad_WA::_mem_info", "structQuad__WA_1_1__mem__info.html", null ],
     [ "Cell::SomeValue::_pval", "structCell_1_1SomeValue_1_1__pval.html", null ],
     [ "Quad_CR::_sub_fun", "structQuad__CR_1_1__sub__fun.html", null ],
     [ "Quad_FIO::_sub_fun", "structQuad__FIO_1_1__sub__fun.html", null ],
     [ "ValueStackItem::_sym_val", "unionValueStackItem_1_1__sym__val.html", null ],
-    [ "_twc", "struct__twc.html", [
-      [ "_ftwc", "struct__ftwc.html", null ]
-    ] ],
     [ "XML_Saving_Archive::_val_par", "structXML__Saving__Archive_1_1__val__par.html", null ],
     [ "XML_Loading_Archive::_vid_pvid", "structXML__Loading__Archive_1_1__vid__pvid.html", null ],
-    [ "AP_num3", "structAP__num3.html", null ],
     [ "APL_Float_Base", "classAPL__Float__Base.html", [
       [ "APL_Float", "classAPL__Float.html", null ]
     ] ],
@@ -23,7 +20,7 @@ var hierarchy =
     [ "Avec", "classAvec.html", null ],
     [ "AxisIterator", "classAxisIterator.html", null ],
     [ "Backtrace", "classBacktrace.html", null ],
-    [ "basic_string", null, [
+    [ "std::basic_string", null, [
       [ "UCS_string", "classUCS__string.html", null ],
       [ "UTF8_string", "classUTF8__string.html", null ]
     ] ],
@@ -42,7 +39,7 @@ var hierarchy =
       [ "PointerCell", "classPointerCell.html", null ]
     ] ],
     [ "Bif_F12_SORT::char_shape", "structBif__F12__SORT_1_1char__shape.html", null ],
-    [ "Character_definition", "structCharacter__definition.html", null ],
+    [ "Avec::Character_definition", "structAvec_1_1Character__definition.html", null ],
     [ "ColInfo", "classColInfo.html", null ],
     [ "CollatingCacheEntry", "structCollatingCacheEntry.html", null ],
     [ "Command", "classCommand.html", null ],
@@ -78,10 +75,11 @@ var hierarchy =
       [ "ErrOut", "classErrOut.html", null ],
       [ "UTF8_filebuf", "classUTF8__filebuf.html", null ]
     ] ],
+    [ "Quad_PNG::filter_info", "structQuad__PNG_1_1filter__info.html", null ],
+    [ "Quad_RE::Flags", "classQuad__RE_1_1Flags.html", null ],
     [ "Bif_F12_FORMAT::Format_LIFER", "structBif__F12__FORMAT_1_1Format__LIFER.html", null ],
     [ "Format_sub", "structFormat__sub.html", null ],
     [ "XML_Loading_Archive::fun_map", "structXML__Loading__Archive_1_1fun__map.html", null ],
-    [ "Function_PC2", "structFunction__PC2.html", null ],
     [ "Nabla::FunLine", "structNabla_1_1FunLine.html", null ],
     [ "Heapsort< T >", "classHeapsort.html", null ],
     [ "ID", "classID.html", null ],
@@ -94,7 +92,6 @@ var hierarchy =
     [ "InputMux", "classInputMux.html", null ],
     [ "IO_Files", "classIO__Files.html", null ],
     [ "UCS_string::iterator", "classUCS__string_1_1iterator.html", null ],
-    [ "labVal", "structlabVal.html", null ],
     [ "level_color", "structlevel__color.html", null ],
     [ "LibPaths::LibDir", "structLibPaths_1_1LibDir.html", null ],
     [ "LibPaths", "classLibPaths.html", null ],
@@ -102,8 +99,8 @@ var hierarchy =
     [ "LineHistory", "classLineHistory.html", null ],
     [ "LineInput", "classLineInput.html", null ],
     [ "LineLabel", "structLineLabel.html", null ],
-    [ "Matrix< T >", "classMatrix.html", null ],
     [ "Bif_F12_DOMINO::Matrix< cplx >", "classBif__F12__DOMINO_1_1Matrix.html", null ],
+    [ "Matrix< T >", "classMatrix.html", null ],
     [ "Probe::measurement", "structProbe_1_1measurement.html", null ],
     [ "MultiIndexIterator", "classMultiIndexIterator.html", null ],
     [ "Nabla", "classNabla.html", null ],
@@ -114,13 +111,8 @@ var hierarchy =
         [ "PrimitiveFunction", "classPrimitiveFunction.html", [
           [ "Bif_JOT", "classBif__JOT.html", null ],
           [ "NonscalarFunction", "classNonscalarFunction.html", [
-            [ "Bif_COMMA", "classBif__COMMA.html", [
-              [ "Bif_F12_COMMA", "classBif__F12__COMMA.html", null ],
-              [ "Bif_F12_COMMA1", "classBif__F12__COMMA1.html", null ]
-            ] ],
             [ "Bif_F0_ZILDE", "classBif__F0__ZILDE.html", null ],
             [ "Bif_F12_DECODE", "classBif__F12__DECODE.html", null ],
-            [ "Bif_F12_DOMINO", "classBif__F12__DOMINO.html", null ],
             [ "Bif_F12_DROP", "classBif__F12__DROP.html", null ],
             [ "Bif_F12_ELEMENT", "classBif__F12__ELEMENT.html", null ],
             [ "Bif_F12_ENCODE", "classBif__F12__ENCODE.html", null ],
@@ -129,24 +121,31 @@ var hierarchy =
             [ "Bif_F12_INDEX_OF", "classBif__F12__INDEX__OF.html", null ],
             [ "Bif_F12_INTERVAL_INDEX", "classBif__F12__INTERVAL__INDEX.html", null ],
             [ "Bif_F12_NEQUIV", "classBif__F12__NEQUIV.html", null ],
-            [ "Bif_F12_PARTITION", "classBif__F12__PARTITION.html", null ],
             [ "Bif_F12_PICK", "classBif__F12__PICK.html", null ],
-            [ "Bif_F12_RHO", "classBif__F12__RHO.html", null ],
             [ "Bif_F12_SORT", "classBif__F12__SORT.html", [
               [ "Bif_F12_SORT_ASC", "classBif__F12__SORT__ASC.html", null ],
               [ "Bif_F12_SORT_DES", "classBif__F12__SORT__DES.html", null ]
             ] ],
-            [ "Bif_F12_TAKE", "classBif__F12__TAKE.html", null ],
-            [ "Bif_F12_TRANSPOSE", "classBif__F12__TRANSPOSE.html", null ],
             [ "Bif_F12_UNION", "classBif__F12__UNION.html", null ],
             [ "Bif_F1_EXECUTE", "classBif__F1__EXECUTE.html", null ],
             [ "Bif_F2_INDEX", "classBif__F2__INDEX.html", null ],
             [ "Bif_F2_INTER", "classBif__F2__INTER.html", null ],
             [ "Bif_F2_LEFT", "classBif__F2__LEFT.html", null ],
             [ "Bif_F2_RIGHT", "classBif__F2__RIGHT.html", null ],
-            [ "Bif_ROTATE", "classBif__ROTATE.html", [
-              [ "Bif_F12_ROTATE", "classBif__F12__ROTATE.html", null ],
-              [ "Bif_F12_ROTATE1", "classBif__F12__ROTATE1.html", null ]
+            [ "NonscalarFunction_default_identity", "classNonscalarFunction__default__identity.html", [
+              [ "Bif_COMMA", "classBif__COMMA.html", [
+                [ "Bif_F12_COMMA", "classBif__F12__COMMA.html", null ],
+                [ "Bif_F12_COMMA1", "classBif__F12__COMMA1.html", null ]
+              ] ],
+              [ "Bif_F12_DOMINO", "classBif__F12__DOMINO.html", null ],
+              [ "Bif_F12_PARTITION", "classBif__F12__PARTITION.html", null ],
+              [ "Bif_F12_RHO", "classBif__F12__RHO.html", null ],
+              [ "Bif_F12_TAKE", "classBif__F12__TAKE.html", null ],
+              [ "Bif_F12_TRANSPOSE", "classBif__F12__TRANSPOSE.html", null ],
+              [ "Bif_ROTATE", "classBif__ROTATE.html", [
+                [ "Bif_F12_ROTATE", "classBif__F12__ROTATE.html", null ],
+                [ "Bif_F12_ROTATE1", "classBif__F12__ROTATE1.html", null ]
+              ] ]
             ] ]
           ] ],
           [ "PrimitiveOperator", "classPrimitiveOperator.html", [
@@ -188,6 +187,7 @@ var hierarchy =
             [ "Quad_NC", "classQuad__NC.html", null ],
             [ "Quad_NL", "classQuad__NL.html", null ],
             [ "Quad_PLOT", "classQuad__PLOT.html", null ],
+            [ "Quad_PNG", "classQuad__PNG.html", null ],
             [ "Quad_RE", "classQuad__RE.html", null ],
             [ "Quad_RVAL", "classQuad__RVAL.html", null ],
             [ "Quad_SI", "classQuad__SI.html", null ],
@@ -234,8 +234,8 @@ var hierarchy =
             [ "Bif_F2_NOR_B", "classBif__F2__NOR__B.html", null ],
             [ "Bif_F2_OR", "classBif__F2__OR.html", null ],
             [ "Bif_F2_OR_B", "classBif__F2__OR__B.html", null ],
-            [ "Bif_F2_UNEQ_B", "classBif__F2__UNEQ__B.html", null ],
-            [ "Bif_F2_UNEQU", "classBif__F2__UNEQU.html", null ]
+            [ "Bif_F2_UNEQU", "classBif__F2__UNEQU.html", null ],
+            [ "Bif_F2_UNEQ_B", "classBif__F2__UNEQ__B.html", null ]
           ] ]
         ] ],
         [ "UserFunction", "classUserFunction.html", null ]
@@ -275,8 +275,8 @@ var hierarchy =
           [ "Quad_PR", "classQuad__PR.html", null ],
           [ "Quad_PS", "classQuad__PS.html", null ],
           [ "Quad_PW", "classQuad__PW.html", null ],
-          [ "Quad_Quad", "classQuad__Quad.html", null ],
           [ "Quad_QUOTE", "classQuad__QUOTE.html", null ],
+          [ "Quad_Quad", "classQuad__Quad.html", null ],
           [ "Quad_RL", "classQuad__RL.html", null ],
           [ "Quad_TZ", "classQuad__TZ.html", null ]
         ] ]
@@ -292,14 +292,14 @@ var hierarchy =
     [ "Output", "classOutput.html", null ],
     [ "Parallel", "classParallel.html", null ],
     [ "Parallel_job_list_base", "classParallel__job__list__base.html", [
-      [ "Parallel_job_list< T, has_destructor >", "classParallel__job__list.html", null ],
+      [ "Parallel_job_list< PJob_scalar_B, false >", "classParallel__job__list.html", null ],
       [ "Parallel_job_list< PJob_scalar_AB, false >", "classParallel__job__list.html", null ],
-      [ "Parallel_job_list< PJob_scalar_B, false >", "classParallel__job__list.html", null ]
+      [ "Parallel_job_list< T, has_destructor >", "classParallel__job__list.html", null ]
     ] ],
     [ "Parser", "classParser.html", null ],
+    [ "Bif_F12_PARTITION::Partition", "structBif__F12__PARTITION_1_1Partition.html", null ],
     [ "Backtrace::PC_src", "structBacktrace_1_1PC__src.html", null ],
     [ "Performance", "classPerformance.html", null ],
-    [ "Prefix::Phrase", "structPrefix_1_1Phrase.html", null ],
     [ "Phrase", "structPhrase.html", null ],
     [ "Quad_CR::Picker", "classQuad__CR_1_1Picker.html", null ],
     [ "Pixel_XY", "structPixel__XY.html", null ],
@@ -307,10 +307,12 @@ var hierarchy =
     [ "Bif_OPER2_OUTER::PJob_product", "structBif__OPER2__OUTER_1_1PJob__product.html", null ],
     [ "PJob_scalar_AB", "classPJob__scalar__AB.html", null ],
     [ "PJob_scalar_B", "classPJob__scalar__B.html", null ],
+    [ "Plot_context", "structPlot__context.html", null ],
     [ "Plot_data", "classPlot__data.html", null ],
     [ "Plot_data_row", "classPlot__data__row.html", null ],
     [ "Plot_line_properties", "classPlot__line__properties.html", null ],
     [ "Plot_window_properties", "classPlot__window__properties.html", null ],
+    [ "PNG_context", "structPNG__context.html", null ],
     [ "Prefix", "classPrefix.html", null ],
     [ "PrintBuffer", "classPrintBuffer.html", null ],
     [ "PrintContext", "classPrintContext.html", null ],
@@ -325,21 +327,19 @@ var hierarchy =
       [ "Quad_SVR", "classQuad__SVR.html", null ],
       [ "Quad_SVS", "classQuad__SVS.html", null ]
     ] ],
-    [ "ravel_comp_len", "structravel__comp__len.html", null ],
     [ "Regexp", "classRegexp.html", null ],
     [ "RegexpMatch", "classRegexpMatch.html", null ],
     [ "Shape", "classShape.html", [
       [ "Shape3", "classShape3.html", null ]
     ] ],
     [ "Sig_item_int< T, bytes >", "classSig__item__int.html", [
+      [ "Sig_item_xint< uint64_t, 8 >", "classSig__item__xint.html", null ],
       [ "Sig_item_xint< T, bytes >", "classSig__item__xint.html", null ]
     ] ],
     [ "Sig_item_int< int32_t, 4 >", "classSig__item__int.html", null ],
     [ "Sig_item_int< uint16_t, 1 >", "classSig__item__int.html", null ],
     [ "Sig_item_int< uint32_t, 4 >", "classSig__item__int.html", null ],
-    [ "Sig_item_int< uint64_t, bytes >", "classSig__item__int.html", [
-      [ "Sig_item_xint< uint64_t, 8 >", "classSig__item__xint.html", null ]
-    ] ],
+    [ "Sig_item_int< uint64_t, bytes >", "classSig__item__int.html", null ],
     [ "Sig_item_string", "classSig__item__string.html", null ],
     [ "Signal_base", "classSignal__base.html", [
       [ "ADD_EVENT_c", "classADD__EVENT__c.html", null ],
@@ -355,8 +355,8 @@ var hierarchy =
       [ "GET_VALUE_c", "classGET__VALUE__c.html", null ],
       [ "IS_REGISTERED_ID_c", "classIS__REGISTERED__ID__c.html", null ],
       [ "MAKE_OFFER_c", "classMAKE__OFFER__c.html", null ],
-      [ "MATCH_OR_MAKE_c", "classMATCH__OR__MAKE__c.html", null ],
       [ "MATCH_OR_MAKE_RESULT_c", "classMATCH__OR__MAKE__RESULT__c.html", null ],
+      [ "MATCH_OR_MAKE_c", "classMATCH__OR__MAKE__c.html", null ],
       [ "MAY_SET_c", "classMAY__SET__c.html", null ],
       [ "MAY_USE_c", "classMAY__USE__c.html", null ],
       [ "OFFERED_VARS_ARE_c", "classOFFERED__VARS__ARE__c.html", null ],
@@ -390,6 +390,7 @@ var hierarchy =
     [ "streambuf", null, [
       [ "HTML_streambuf", "classHTML__streambuf.html", null ]
     ] ],
+    [ "string_width_height", "structstring__width__height.html", null ],
     [ "Token::sval", "unionToken_1_1sval.html", null ],
     [ "Svar_DB", "classSvar__DB.html", null ],
     [ "Svar_partner", "structSvar__partner.html", null ],
@@ -421,13 +422,13 @@ var hierarchy =
       [ "Value_P", "classValue__P.html", null ]
     ] ],
     [ "ValueStackItem", "classValueStackItem.html", null ],
-    [ "Vector< T >", "classVector.html", null ],
-    [ "vector", null, [
+    [ "std::vector", null, [
       [ "CDR_string", "classCDR__string.html", null ],
       [ "CollatingCache", "classCollatingCache.html", null ],
       [ "Token_string", "classToken__string.html", null ],
       [ "UCS_string_vector", "classUCS__string__vector.html", null ]
     ] ],
+    [ "Vector< T >", "classVector.html", null ],
     [ "VH_entry", "classVH__entry.html", null ],
     [ "Quad_GTK::window_entry", "structQuad__GTK_1_1window__entry.html", null ],
     [ "Workspace_0", "classWorkspace__0.html", [

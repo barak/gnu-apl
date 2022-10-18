@@ -1,3 +1,5 @@
 <map id="Quad_FIO::file_entry" name="Quad_FIO::file_entry">
-<area shape="rect" id="node2" href="$classUTF8__string.html" title="an UTF8 encoded Unicode (RFC 3629) string " alt="" coords="29,96,124,123"/>
+<area shape="rect" id="node1" title="one file (openend with open(), fopen(), or fdopen()). : handle == fd, and FILE * may or may not exist..." alt="" coords="5,183,148,208"/>
+<area shape="rect" id="node2" href="$classUTF8__string.html" title="an UTF8 encoded Unicode (RFC 3629) string" alt="" coords="29,95,124,120"/>
+<area shape="rect" id="node3" title=" " alt="" coords="13,5,140,45"/>
 </map>

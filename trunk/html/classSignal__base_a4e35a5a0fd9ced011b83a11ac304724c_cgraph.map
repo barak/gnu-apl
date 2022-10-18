@@ -1,0 +1,4 @@
+<map id="Signal_base::bad_get" name="Signal_base::bad_get">
+<area shape="rect" id="node1" title="get function for an item that is not defined for the signal" alt="" coords="5,5,152,31"/>
+<area shape="rect" id="node2" href="$classSignal__base.html#a77d69692410bd7b7d49033b73fcfc8fc" title="return the name of the ID of the signal" alt="" coords="200,5,379,31"/>
+</map>

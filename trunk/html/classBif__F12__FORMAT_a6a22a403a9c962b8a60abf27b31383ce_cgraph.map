@@ -1,0 +1,7 @@
+<map id="Bif_F12_FORMAT::monadic_format" name="Bif_F12_FORMAT::monadic_format">
+<area shape="rect" id="node1" title="A character array with the display of B." alt="" coords="5,109,192,149"/>
+<area shape="rect" id="node2" href="$classPrintBuffer.html#a43da75e9d48c2b94f9e4c614e5bf859e" title="Return the char in column x and row y." alt="" coords="266,5,409,31"/>
+<area shape="rect" id="node3" href="$classPrintBuffer.html#af6f689e8c4e930b7c37099bf5fdfe57d" title="return the number of columns" alt="" coords="258,79,417,119"/>
+<area shape="rect" id="node4" href="$classWorkspace.html#a002e2f097bece67c9d082b7c89db11ae" title="return style and the current ⎕PP, and ⎕PW" alt="" coords="240,144,435,169"/>
+<area shape="rect" id="node5" href="$classPrintBuffer.html#ac13295601812e379a3eac618ce239426" title="return the number of rows" alt="" coords="268,194,407,234"/>
+</map>

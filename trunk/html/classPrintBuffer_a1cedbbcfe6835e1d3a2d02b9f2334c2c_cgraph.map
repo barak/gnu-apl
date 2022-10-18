@@ -1,0 +1,5 @@
+<map id="PrintBuffer::debug" name="PrintBuffer::debug">
+<area shape="rect" id="node1" title="print properties of this PrintBuffer" alt="" coords="5,69,132,94"/>
+<area shape="rect" id="node2" href="$classPrintBuffer.html#af6f689e8c4e930b7c37099bf5fdfe57d" title="return the number of columns" alt="" coords="180,29,339,69"/>
+<area shape="rect" id="node3" href="$classPrintBuffer.html#ac13295601812e379a3eac618ce239426" title="return the number of rows" alt="" coords="190,93,329,133"/>
+</map>

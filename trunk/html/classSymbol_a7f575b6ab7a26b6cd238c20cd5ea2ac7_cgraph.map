@@ -1,0 +1,12 @@
+<map id="Symbol::unshare_var" name="Symbol::unshare_var">
+<area shape="rect" id="node1" title="unshare a shared variable" alt="" coords="5,129,151,155"/>
+<area shape="rect" id="node2" href="$structSvar__record.html#ab4d3d8caaff62e4f3c5ef75488b5af93" title="return the coupling of the variable" alt="" coords="199,5,372,31"/>
+<area shape="rect" id="node4" href="$classValueStackItem.html#a27453c0dfda1004c6f5e68a0c2530eae" title="return the name class for this ValueStackItem" alt="" coords="201,55,369,80"/>
+<area shape="rect" id="node5" href="$classSymbol.html#a15f5ddcfd9ba68e366a3e14e84fe8c1d" title="return the current SV_key (or throw a VALUE_ERROR)" alt="" coords="213,104,358,129"/>
+<area shape="rect" id="node6" href="$classSvar__DB.html#a99c0f5342e3fd6eda5d4b619272af98f" title="retract an offer, return previous coupling" alt="" coords="213,153,358,179"/>
+<area shape="rect" id="node9" href="$classValueStackItem.html#ac15a4517af12271c9828fdfbb8cbdafe" title="set the name class for this ValueStackItem" alt="" coords="201,203,369,228"/>
+<area shape="rect" id="node10" href="$classSymbol.html#a312d14342061dc96996a48a5d1f28aed" title="set the current SV_key" alt="" coords="213,252,358,277"/>
+<area shape="rect" id="node3" href="$structSvar__partner.html#a08989d19706b526a4054398b2d0b5480" title="return true if this partner is active. Note that this can be the case even though tcp_fd is invalid." alt="" coords="435,5,591,31"/>
+<area shape="rect" id="node7" href="$classSvar__DB.html#a8e5d83427d476f8db6752dbf86c78e96" title="get TCP socket to APserver, complain if not connected" alt="" coords="420,153,607,179"/>
+<area shape="rect" id="node8" href="$classSvar__DB.html#ac10f9507c18657397c050432da27cdac" title="return the fd towards APserver" alt="" coords="655,153,807,179"/>
+</map>

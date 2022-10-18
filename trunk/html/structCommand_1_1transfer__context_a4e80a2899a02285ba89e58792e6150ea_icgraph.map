@@ -1,0 +1,5 @@
+<map id="Command::transfer_context::array_2TF" name="Command::transfer_context::array_2TF">
+<area shape="rect" id="node1" title="process a &#39;A&#39; (array in 2 ⎕TF format) item." alt="" coords="421,5,605,45"/>
+<area shape="rect" id="node2" href="$structCommand_1_1transfer__context.html#a9c4651f90f36f6cc728e7146a3a4a0aa" title="process one record of a workspace file" alt="" coords="189,5,373,45"/>
+<area shape="rect" id="node3" href="$classCommand.html#aa0764d08a6ae9c8270907ab7d5dc37cf" title=")IN: import a workspace file" alt="" coords="5,13,141,38"/>
+</map>

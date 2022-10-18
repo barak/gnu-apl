@@ -1,0 +1,6 @@
+<map id="asinh" name="asinh">
+<area shape="rect" id="node2" href="$classRealCell.html#af52c6c260e11975f8334f583872985c6" title="compute circle function fun " alt="" coords="107,56,285,83"/>
+<area shape="rect" id="node3" href="$classRealCell.html#aed27521634af9fed4dd213807f93a2c8" title="overloaded Cell::bif_circle_fun(). " alt="" coords="333,5,491,32"/>
+<area shape="rect" id="node4" href="$classRealCell.html#ac30508908bf8e8cb7234f756e04be692" title="overloaded Cell::is_real_cell(). " alt="" coords="539,56,684,83"/>
+<area shape="rect" id="node5" href="$classRealCell.html#aa5cb568d949ab777e9ce4eba530b2121" title="overloaded Cell::bif_circle_fun_inverse(). " alt="" coords="346,107,478,149"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="ScalarFunction::ScalarFunction" name="ScalarFunction::ScalarFunction">
+<area shape="rect" id="node1" title="Construct a ScalarFunction with Id id." alt="" coords="5,45,209,70"/>
+<area shape="rect" id="node2" href="$classFunction.html#a8db2751ba320d0d928388822b72c64ce" title="set the break&#45;even point for dyadic parallel execution" alt="" coords="263,5,406,45"/>
+<area shape="rect" id="node3" href="$classFunction.html#a0cfae556a45d1e2e31c6d16ff9d49834" title="set the break&#45;even point for monadic parallel execution" alt="" coords="257,69,412,109"/>
+</map>

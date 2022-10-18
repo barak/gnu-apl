@@ -1,19 +1,21 @@
 <map id="PJob_scalar_AB" name="PJob_scalar_AB">
-<area shape="rect" id="node2" href="$classConstCell__P.html" title="a &quot;smart&quot; Cell *, allowing only a subset of what a normal Cell * is capable of. MUST NOT BE USED FOR ..." alt="" coords="193,247,289,273"/>
-<area shape="rect" id="node3" href="$classCell.html" title="The base class for all Cells. " alt="" coords="101,125,147,152"/>
-<area shape="rect" id="node4" href="$unionCell_1_1SomeValue.html" title="A union containing all possible cell values for the different Cell types. " alt="" coords="108,545,228,572"/>
-<area shape="rect" id="node6" href="$classValue.html" title="An APL Value (essentially a Shape and a ravel) " alt="" coords="470,247,525,273"/>
-<area shape="rect" id="node5" href="$structCell_1_1SomeValue_1_1__pval.html" title="a pointer to, and the owner of, a nested APL (sub&#45;) value " alt="" coords="315,456,474,483"/>
-<area shape="rect" id="node10" href="$classValue__P__Base.html" title="A Value smart * and access functions (except constructors) " alt="" coords="341,359,449,386"/>
-<area shape="rect" id="node7" href="$classDynamicObject.html" title="A Value or an IndexExpr. " alt="" coords="712,125,824,152"/>
-<area shape="rect" id="node8" href="$struct__deleted__value.html" title="a linked list of deleted values " alt="" coords="443,125,552,152"/>
-<area shape="rect" id="node9" href="$classShape.html" title="the shape of an APL value " alt="" coords="629,125,688,152"/>
-<area shape="rect" id="node11" href="$structCell_1_1SomeValue_1_1__fval.html" title="&lt; for FloatCell " alt="" coords="530,456,686,483"/>
-<area shape="rect" id="node12" href="$unionCell_1_1SomeValue_1_1__fval_1_1__flt__num.html" title="either a floating point value, or the denominator of a quotient " alt="" coords="562,352,718,393"/>
-<area shape="rect" id="node13" href="$classPrimitiveFunction.html" title="Base class for all internal functions of the interpreter. " alt="" coords="313,247,436,273"/>
-<area shape="rect" id="node14" href="$classFunction.html" title="Base class for all APL functions and operators (system or defined) " alt="" coords="347,125,419,152"/>
-<area shape="rect" id="node15" href="$classNamedObject.html" title="A user&#45;defined variable or function. " alt="" coords="331,5,434,32"/>
-<area shape="rect" id="node16" href="$classCellFunctionStatistics.html" title="Performance counters for one cell level function. " alt="" coords="171,125,322,152"/>
-<area shape="rect" id="node17" href="$classStatistics.html" title="Base class for different kinds of statistics. " alt="" coords="85,5,163,32"/>
-<area shape="rect" id="node18" href="$classStatistics__record.html" title="one statistics for computing the mean and the variance of samples " alt="" coords="187,5,307,32"/>
+<area shape="rect" id="node1" title="one dyadic scalar job" alt="" coords="411,567,530,592"/>
+<area shape="rect" id="node2" href="$classValue__P.html" title="A Value smart * (constructors)" alt="" coords="714,247,785,273"/>
+<area shape="rect" id="node3" href="$classValue__P__Base.html" title="A Value smart * and access functions (except constructors)" alt="" coords="925,101,1033,126"/>
+<area shape="rect" id="node12" href="$structCell_1_1SomeValue_1_1__pval.html" title="a pointer to, and the owner of, a nested APL (sub&#45;) value" alt="" coords="899,196,1058,221"/>
+<area shape="rect" id="node4" href="$classValue.html" title="An APL Value (essentially a Shape and a ravel)" alt="" coords="869,567,923,592"/>
+<area shape="rect" id="node5" href="$classDynamicObject.html" title="A Value or an IndexExpr." alt="" coords="568,433,680,458"/>
+<area shape="rect" id="node6" href="$classShape.html" title="the shape of an APL value" alt="" coords="823,433,881,458"/>
+<area shape="rect" id="node7" href="$classCell.html" title="The base class for all Cells." alt="" coords="448,433,493,458"/>
+<area shape="rect" id="node8" href="$unionCell_1_1SomeValue.html" title="A union containing all possible cell values for the different Cell types." alt="" coords="373,299,493,324"/>
+<area shape="rect" id="node9" href="$classAPL__Float__Base.html" title="the essential data of an APL_Float, so that it can be used in a union" alt="" coords="379,5,499,31"/>
+<area shape="rect" id="node11" href="$unionCell_1_1SomeValue_1_1__fval_1_1__flt__num.html" title="either a floating point value, or the denominator of a quotient" alt="" coords="455,93,611,133"/>
+<area shape="rect" id="node10" href="$structCell_1_1SomeValue_1_1__fval.html" title="&lt; for FloatCell" alt="" coords="455,196,611,221"/>
+<area shape="rect" id="node13" href="$struct__deleted__value.html" title="a linked list of deleted values" alt="" coords="905,433,1015,458"/>
+<area shape="rect" id="node14" href="$classPrimitiveFunction.html" title="Base class for all internal functions of the interpreter." alt="" coords="252,433,375,458"/>
+<area shape="rect" id="node15" href="$classFunction.html" title="Base class for all APL functions and operators (system or defined)" alt="" coords="277,299,349,324"/>
+<area shape="rect" id="node16" href="$classNamedObject.html" title="A user&#45;defined variable or function." alt="" coords="262,196,365,221"/>
+<area shape="rect" id="node17" href="$classCellFunctionStatistics.html" title="Performance counters for one cell level function." alt="" coords="102,299,253,324"/>
+<area shape="rect" id="node18" href="$classStatistics.html" title="Base class for different kinds of statistics." alt="" coords="149,196,227,221"/>
+<area shape="rect" id="node19" href="$classStatistics__record.html" title="one statistics for computing the mean and the variance of samples" alt="" coords="5,196,125,221"/>
 </map>

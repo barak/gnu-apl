@@ -1,0 +1,25 @@
+<map id="Bif_F12_PARTITION::eval_AXB" name="Bif_F12_PARTITION::eval_AXB">
+<area shape="rect" id="node1" title="overloaded Function::eval_AXB()" alt="" coords="5,122,160,162"/>
+<area shape="rect" id="node2" href="$classValue__P__Base.html#a1c3bf1b6f708eb2c1ba4b97c83adb9aa" title="return a const pointer to the Value" alt="" coords="218,80,353,105"/>
+<area shape="rect" id="node3" href="$classValue.html#ae157da9180f8879875f30ba5f4fafd09" title="If this value is a single axis between ⎕IO and ⎕IO + max_axis then return that axis...." alt="" coords="209,129,362,155"/>
+<area shape="rect" id="node18" href="$classBif__F12__PARTITION.html#a76f44ed4e399944ce12c8e9bfd312e8b" title="Partition B according to A." alt="" coords="208,310,363,350"/>
+<area shape="rect" id="node4" href="$classValue.html#a6b8aa5e58b68236c77a09385365468d5" title="return the first element of the ravel (which is always present). same as get_cproto(),..." alt="" coords="431,5,549,31"/>
+<area shape="rect" id="node8" href="$classWorkspace.html#adb2006f054a1cebb8ae0252b61bd1d1b" title="return the current ⎕IO" alt="" coords="423,55,557,80"/>
+<area shape="rect" id="node9" href="$classCell.html#acad8d4255191ceae01a96c778debeb83" title="Return value if it is close to int, or else throw DOMAIN_ERROR." alt="" coords="428,104,552,129"/>
+<area shape="rect" id="node10" href="$classCell.html#ac8ce4cebc1b8ac383bc62723d645914a" title="True iff value is numeric and close to an int." alt="" coords="432,153,548,179"/>
+<area shape="rect" id="node11" href="$classValue.html#a63031d7125398ff914ed8be36fb7fa26" title="return true iff this value is a scalar or vector of length 1." alt="" coords="423,203,557,243"/>
+<area shape="rect" id="node5" href="$classValue.html#aa0572b1b7fa249cb79694fd152130b38" title="return the (constant) idx&#39;th element of the ravel." alt="" coords="645,5,767,31"/>
+<area shape="rect" id="node6" href="$classValue.html#ac5b54e3a13cab0837442f1575b3299a5" title="return the number of elements, but at least 1 (for the prototype)." alt="" coords="843,5,1012,31"/>
+<area shape="rect" id="node7" href="$classShape.html#a6f32f749601dca80263493fd06be12c4" title="return the number of ravel elements, but at least 1 (for empty values and scalars) else product of sh..." alt="" coords="1060,5,1215,31"/>
+<area shape="rect" id="node12" href="$classValue.html#a8cecab341fdc0bd55b67c07848463d37" title="return the r&#39;th shape element of this value" alt="" coords="629,160,783,185"/>
+<area shape="rect" id="node14" href="$classValue.html#a20c818ea1c1f3fdb8b95c6e0d93955ab" title="return true iff this value is a scalar." alt="" coords="870,211,985,236"/>
+<area shape="rect" id="node16" href="$classValue.html#a69abfd22e53fc92da77cc45159e29908" title="return true iff this value is a vector." alt="" coords="648,261,764,287"/>
+<area shape="rect" id="node13" href="$classShape.html#a592d2ade68aa8c21c5d84627c3a0e001" title="return the length of dimension r" alt="" coords="848,160,1007,185"/>
+<area shape="rect" id="node15" href="$classShape.html#a017e9a35dd20f4bc4fdeb7ea29b6805d" title="return the rank" alt="" coords="1079,235,1196,260"/>
+<area shape="rect" id="node17" href="$classValue.html#a5ac7131d2f89d0bc8b8907d960cbd125" title="return the rank of this value" alt="" coords="871,260,984,285"/>
+<area shape="rect" id="node19" href="$classShape3.html#a075643abf890c05401f1b7abdc5339cf" title="the dimensions above r the axis" alt="" coords="449,268,531,293"/>
+<area shape="rect" id="node20" href="$classShape3.html#ad3ff2e3be69b9ca0085d211e3ecb2801" title="the dimensions below the axis" alt="" coords="451,317,529,343"/>
+<area shape="rect" id="node21" href="$classShape3.html#a7dda151f14bb5ee7a624372f0b167b7d" title="the axis dimension" alt="" coords="447,367,533,392"/>
+<area shape="rect" id="node22" href="$classShape.html#afcd3708c8c18a30cb3c0c1fa1a630f71" title="modify dimension r" alt="" coords="411,416,569,441"/>
+<area shape="rect" id="node23" href="$classShape.html#a189c92d0b74f3313bd83c8aa7565e9c5" title="recompute volume (after changing a dimension of len 0)" alt="" coords="617,416,795,441"/>
+</map>

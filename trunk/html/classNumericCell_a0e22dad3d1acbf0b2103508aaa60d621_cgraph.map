@@ -1,0 +1,6 @@
+<map id="NumericCell::real_binomial" name="NumericCell::real_binomial">
+<area shape="rect" id="node1" title="N over K for non&#45;integer A and/or B." alt="" coords="5,55,184,80"/>
+<area shape="rect" id="node2" href="$classCell.html#a9a0028fd74f00deb001a8062a55916c6" title="Return the real part of a cell." alt="" coords="232,5,369,31"/>
+<area shape="rect" id="node3" href="$classCell.html#ac8ce4cebc1b8ac383bc62723d645914a" title="True iff value is numeric and close to an int." alt="" coords="243,55,359,80"/>
+<area shape="rect" id="node4" href="$classFloatCell.html#a88217aaf5cd286cc89a85d2885876dda" title="initialize the (un&#45;initialized) Cell *Z to APL_Float flt" alt="" coords="252,104,349,129"/>
+</map>

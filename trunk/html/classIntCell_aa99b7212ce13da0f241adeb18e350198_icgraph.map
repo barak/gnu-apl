@@ -1,0 +1,78 @@
+<map id="IntCell::zI" name="IntCell::zI">
+<area shape="rect" id="node1" title="initialize Z to APL_Integer v" alt="" coords="985,1248,1064,1273"/>
+<area shape="rect" id="node2" href="$classFloatCell.html#aaa9c654650da7fd4e1738fefdd63c6ef" title="Overloaded Cell::bif_add()." alt="" coords="784,5,908,31"/>
+<area shape="rect" id="node3" href="$classIntCell.html#ada7d1067fc4dbcfee831207a818e61fd" title="overloaded Cell::bif_add()" alt="" coords="791,55,901,80"/>
+<area shape="rect" id="node4" href="$classNumericCell.html#a7cebf4c76a5b6281920e54983ddcf61b" title="overloaded Cell::bif_and()" alt="" coords="774,104,918,129"/>
+<area shape="rect" id="node5" href="$classNumericCell.html#a532aa6dc26e7edd10347082c4110a736" title="overloaded Cell::bif_and_bitwise()" alt="" coords="774,154,918,194"/>
+<area shape="rect" id="node6" href="$classFloatCell.html#a696085042c3e325a231c1ebad351c632" title="Overloaded from the corresponding Cell:: function (see class Cell)." alt="" coords="776,219,916,244"/>
+<area shape="rect" id="node7" href="$classIntCell.html#adf2dfe55d28ce2a5bea440c143b90b0a" title="overloaded from the corresponding Cell:: function (see class Cell)" alt="" coords="783,268,909,293"/>
+<area shape="rect" id="node8" href="$classIntCell.html#a79afa78e9d97768a60b33eb27406f087" title="overloaded from the corresponding Cell:: function (see class Cell)" alt="" coords="773,317,919,343"/>
+<area shape="rect" id="node9" href="$classFloatCell.html#a5d4d04d8663628bac8adea9e713a7c76" title="Overloaded from the corresponding Cell:: function (see class Cell)." alt="" coords="770,367,922,392"/>
+<area shape="rect" id="node10" href="$classIntCell.html#aa5cef6266f54e36a868aba2fd4459689" title="overloaded from the corresponding Cell:: function (see class Cell)" alt="" coords="777,416,915,441"/>
+<area shape="rect" id="node11" href="$classIntCell.html#a4b99fe69953fa5c1228d1c508508ce52" title="overloaded Cell::bif_divide()" alt="" coords="785,465,907,491"/>
+<area shape="rect" id="node12" href="$classCell.html#a60149bda5f348d9fb1ca2d27bbf3bb17" title="store 1 in Z if A == the value of this cell in Z, else 0" alt="" coords="793,779,899,804"/>
+<area shape="rect" id="node19" href="$classNumericCell.html#a2b3f4394c119377e1d14f23155679f75" title="overloaded Cell::bif_equal_bitwise()" alt="" coords="769,566,923,606"/>
+<area shape="rect" id="node20" href="$classIntCell.html#aa8c3404f60287a73fee149560a02d5e8" title="overloaded from the corresponding Cell:: function (see class Cell)" alt="" coords="779,631,913,656"/>
+<area shape="rect" id="node21" href="$classFloatCell.html#ad08f84e7b5a4b745247f691ff35ea511" title="Overloaded from the corresponding Cell:: function (see class Cell)." alt="" coords="782,680,910,705"/>
+<area shape="rect" id="node22" href="$classIntCell.html#a1601022bcb48d220f002dbd35dba753d" title="overloaded from the corresponding Cell:: function (see class Cell)" alt="" coords="789,729,903,755"/>
+<area shape="rect" id="node23" href="$classCell.html#a0e7bec79d1ffe526a25c210c141949f5" title="store 1 in Z if A is &gt;= the value of this cell in Z, else 0" alt="" coords="779,828,913,853"/>
+<area shape="rect" id="node27" href="$classCell.html#a1def90d1c9a2c75c6baae6e24ab7b0c0" title="store 1 in Z if A &gt; the value of this cell in Z, else 0" alt="" coords="773,877,919,903"/>
+<area shape="rect" id="node31" href="$classCell.html#a7badf53d857dd12c17bfa77625a48235" title="store 1 in Z if A &lt;= the value of this cell in Z, else 0" alt="" coords="787,927,905,952"/>
+<area shape="rect" id="node35" href="$classCell.html#a837224e4c2b2c93e69d30d37e52878da" title="store 1 in Z if A &lt; the value of this cell in Z, else 0" alt="" coords="781,976,911,1001"/>
+<area shape="rect" id="node39" href="$classIntCell.html#a90eb8f9c50ea1ca3fa974199cf5cc5dd" title="overloaded from the corresponding Cell:: function (see class Cell)" alt="" coords="531,1625,680,1651"/>
+<area shape="rect" id="node40" href="$classComplexCell.html#ab67bebf69d8efeb7e4ca95d7a2b61be2" title="Overloaded from the corresponding Cell:: function (see class Cell)." alt="" coords="755,1025,937,1051"/>
+<area shape="rect" id="node41" href="$classFloatCell.html#a6582ec2c86f0aa7298932e254136a05b" title="Overloaded from the corresponding Cell:: function (see class Cell)." alt="" coords="766,1075,926,1100"/>
+<area shape="rect" id="node42" href="$classIntCell.html#afdf5aa1e546f117f3f399ffe65a1022d" title="overloaded from the corresponding Cell:: function (see class Cell)" alt="" coords="773,1124,919,1149"/>
+<area shape="rect" id="node43" href="$classComplexCell.html#a11271df65dc314ce610506860f77bbc2" title="Overloaded from the corresponding Cell:: function (see class Cell)." alt="" coords="757,1173,935,1199"/>
+<area shape="rect" id="node44" href="$classFloatCell.html#a33c81fd764d4a4016f5d650b0bb709c2" title="Overloaded from the corresponding Cell:: function (see class Cell)." alt="" coords="768,1223,924,1248"/>
+<area shape="rect" id="node45" href="$classIntCell.html#a8fb681ded9ad2580d84446e136ccde1b" title="overloaded from the corresponding Cell:: function (see class Cell)" alt="" coords="775,1272,917,1297"/>
+<area shape="rect" id="node46" href="$classFloatCell.html#abc04878f0a7a04579f5f8ccdfe65c089" title="Overloaded Cell::bif_multiply()." alt="" coords="772,1321,920,1347"/>
+<area shape="rect" id="node48" href="$classIntCell.html#a665f4e1c33f10120e9494cf33238dbaa" title="overloaded Cell::bif_multiply()" alt="" coords="779,1371,913,1396"/>
+<area shape="rect" id="node49" href="$classNumericCell.html#a6ba83172d14d8550297d46acb670dba5" title="overloaded Cell::bif_nand_bitwise()" alt="" coords="771,1421,921,1461"/>
+<area shape="rect" id="node50" href="$classFloatCell.html#a06d60ffa82a19783d085ce7e258161ed" title="overloaded Cell::bif_near_int()" alt="" coords="782,1485,910,1525"/>
+<area shape="rect" id="node51" href="$classIntCell.html#a7b990aef109b7ff8b45e3bfb9dfe14ad" title="overloaded Cell::bif_near_int64_t()" alt="" coords="766,1549,926,1575"/>
+<area shape="rect" id="node52" href="$classIntCell.html#aa111450e3c312ff858c2b628723b9008" title="overloaded from the corresponding Cell:: function (see class Cell)" alt="" coords="777,1651,915,1676"/>
+<area shape="rect" id="node53" href="$classIntCell.html#a501cbdaa250c9a9fdfe11cb461058710" title="overloaded Cell::bif_subtract()" alt="" coords="537,1752,673,1777"/>
+<area shape="rect" id="node54" href="$classNumericCell.html#a6233e579fcb1d076309d3b417bc9fc95" title="overloaded Cell::bif_nor_bitwise()" alt="" coords="775,1701,917,1741"/>
+<area shape="rect" id="node55" href="$classNumericCell.html#a9c9dcac7df0f7e7da067d1c076345fc8" title="overloaded Cell::bif_not_bitwise()" alt="" coords="775,1765,917,1805"/>
+<area shape="rect" id="node56" href="$classCell.html#a8f2e58f7e57f35b532952573dcf89291" title="store 1 in Z if A != the value of this cell in Z, else 0" alt="" coords="781,2157,911,2183"/>
+<area shape="rect" id="node60" href="$classNumericCell.html#a2e9c156aa01d52fc1658398f8ee393ee" title="overloaded Cell::bif_not_equal_bitwise()" alt="" coords="775,1879,917,1919"/>
+<area shape="rect" id="node61" href="$classNumericCell.html#ad637e39552ebd544e0b41e7c91a48787" title="overloaded Cell::bif_or()" alt="" coords="779,1944,913,1969"/>
+<area shape="rect" id="node62" href="$classNumericCell.html#a220314d27b9fd8fac3e6e987c2044f6f" title="overloaded Cell::bif_or_bitwise()" alt="" coords="779,1994,913,2034"/>
+<area shape="rect" id="node63" href="$classIntCell.html#a0cfcfcc6b43e135bc481122227d7c186" title="overloaded Cell::bif_power()" alt="" coords="784,2059,908,2084"/>
+<area shape="rect" id="node64" href="$classFloatCell.html#a0e721d9eeaef9db6759da2a4662cee1d" title="Overloaded from the corresponding Cell:: function (see class Cell)." alt="" coords="767,2108,925,2133"/>
+<area shape="rect" id="node65" href="$classIntCell.html#a9e1eae19e23516df1eb5350a10883e24" title="overloaded from the corresponding Cell:: function (see class Cell)" alt="" coords="540,471,671,496"/>
+<area shape="rect" id="node67" href="$classComplexCell.html#a69ca7247a26db55fdb7f7264ea066b63" title="overloaded from the corresponding Cell:: function (see class Cell)." alt="" coords="775,2207,917,2232"/>
+<area shape="rect" id="node68" href="$classFloatCell.html#a6723d1250207bdfaed8a63ea224c8986" title="Overloaded from the corresponding Cell:: function (see class Cell)." alt="" coords="786,2256,906,2281"/>
+<area shape="rect" id="node69" href="$classIntCell.html#a265004ec0692ee51f8cad70012c2ba7d" title="overloaded from the corresponding Cell:: function (see class Cell)" alt="" coords="793,2305,899,2331"/>
+<area shape="rect" id="node70" href="$classFloatCell.html#ae261ecf59ba690674cd5409f5e973f41" title="Overloaded Cell::bif_subtract()." alt="" coords="771,2355,921,2380"/>
+<area shape="rect" id="node71" href="$classIntCell.html#ac3666de18c9da8741efb123ea6d4d350" title="overloaded Cell::bif_within_quad_CT()" alt="" coords="785,2405,907,2445"/>
+<area shape="rect" id="node72" href="$classValue.html#a1120641bea23235f2525146e6f5f48df" title="init the ravel of an APL value, return the ravel length" alt="" coords="789,2469,903,2495"/>
+<area shape="rect" id="node74" href="$classNumericCell.html#a59c9e232b6a1cb365a3252196b41604a" title="N over K for positive integers N and K." alt="" coords="775,2519,917,2559"/>
+<area shape="rect" id="node75" href="$classNumericCell.html#a4f123c9528fe4e9a1fc9c75585aa2de3" title="compute binomial funtion for integers a and b" alt="" coords="515,2555,695,2580"/>
+<area shape="rect" id="node13" href="$classComplexCell.html#a5d1fbc198fc98df8f0f91869cbd161f5" title="overloaded from the corresponding Cell:: function (see class Cell)." alt="" coords="521,668,689,693"/>
+<area shape="rect" id="node16" href="$classBif__F2__EQUAL.html#a6736ce332581d9bc8c4c2ddd0ba4e8fc" title="overloaded Function::eval_AB()." alt="" coords="521,569,690,595"/>
+<area shape="rect" id="node17" href="$classBif__F2__EQUAL.html#a96242b66e6691e1aead4722fbc677f61" title="overloaded Function::eval_AXB()." alt="" coords="516,619,695,644"/>
+<area shape="rect" id="node18" href="$classBif__F2__EQUAL.html#ab40a3f595066b92d3f99d7fbe6ab18bc" title="overloaded Function::get_scalar_f2" alt="" coords="506,520,705,545"/>
+<area shape="rect" id="node14" href="$classBif__F12__ENCODE.html#a4639bbd2488d2f02ca88a5e362a1229a" title="encode *ib() according to A" alt="" coords="243,631,456,656"/>
+<area shape="rect" id="node15" href="$classBif__F12__ENCODE.html#a003a77890ec532d2909d23e3ce5dcb89" title="overloaded Function::eval_AB()" alt="" coords="5,569,195,595"/>
+<area shape="rect" id="node24" href="$classBif__F2__MEQU.html#ad21bc3f57642671ed5d0016f0a5c7ad0" title="overloaded Function::eval_AB()." alt="" coords="523,767,687,792"/>
+<area shape="rect" id="node25" href="$classBif__F2__MEQU.html#aababe4a951b06feba3657359e99d873d" title="overloaded Function::eval_AXB()." alt="" coords="519,816,692,841"/>
+<area shape="rect" id="node26" href="$classBif__F2__MEQU.html#a3994a32025c6761f631db1f33c8328e5" title="overloaded Function::get_scalar_f2()" alt="" coords="509,717,702,743"/>
+<area shape="rect" id="node28" href="$classBif__F2__GREATER.html#a04cac547cfea1d9b78d0092dfc02cd7f" title="overloaded Function::eval_AB()." alt="" coords="511,931,700,956"/>
+<area shape="rect" id="node29" href="$classBif__F2__GREATER.html#ab593a3afacb4fce3922f2d7214f01b1d" title="overloaded Function::eval_AXB()." alt="" coords="506,980,705,1005"/>
+<area shape="rect" id="node30" href="$classBif__F2__GREATER.html#a550565eaa86b769f6f7e6885d7282e5a" title="overloaded Function::get_scalar_f2" alt="" coords="526,866,685,906"/>
+<area shape="rect" id="node32" href="$classBif__F2__LEQU.html#a2313b85abb6f1d7c43691c3463d7bf25" title="overloaded Function::eval_AB()." alt="" coords="525,1079,685,1104"/>
+<area shape="rect" id="node33" href="$classBif__F2__LEQU.html#aa8ef87d98be0aed75703e095b7088603" title="overloaded Function::eval_AXB()." alt="" coords="521,1128,690,1153"/>
+<area shape="rect" id="node34" href="$classBif__F2__LEQU.html#a04ca3eaca72a11c74adb4e3c55b3b1a5" title="overloaded Function::get_scalar_f2()" alt="" coords="511,1029,700,1055"/>
+<area shape="rect" id="node36" href="$classBif__F2__LESS.html#a58506ea2a176d8f282f31ccf95b59517" title="overloaded Function::eval_AB()." alt="" coords="526,1227,685,1252"/>
+<area shape="rect" id="node37" href="$classBif__F2__LESS.html#a6c6d9486b064cd271e64adb78e41a5a1" title="overloaded Function::eval_AXB()." alt="" coords="522,1276,689,1301"/>
+<area shape="rect" id="node38" href="$classBif__F2__LESS.html#adb605ceccfb902458cd744ee4ebe2484" title="overloaded Function::get_scalar_f2" alt="" coords="512,1177,699,1203"/>
+<area shape="rect" id="node47" href="$classFloatCell.html#aae34ca615e293a91c37667d78f97b5d6" title="Overloaded Cell::bif_divide()." alt="" coords="537,1325,674,1351"/>
+<area shape="rect" id="node57" href="$classBif__F2__UNEQU.html#a57a2d80a782cf7d221afe07ee27cc32f" title="overloaded Function::eval_AB()." alt="" coords="519,2157,692,2183"/>
+<area shape="rect" id="node58" href="$classBif__F2__UNEQU.html#a06baa148839dad462754b3aceeb16fc8" title="overloaded Function::eval_AXB()." alt="" coords="514,2207,697,2232"/>
+<area shape="rect" id="node59" href="$classBif__F2__UNEQU.html#a22c22e9e5d86ab19f647ef50af745b4f" title="overloaded Function::get_scalar_f2()" alt="" coords="504,2108,707,2133"/>
+<area shape="rect" id="node66" href="$classBif__F12__ENCODE.html#a7fdbd7f4683430ee6daeab1014523504" title="encode *ib() according to A (integer A and b)" alt="" coords="247,508,451,533"/>
+<area shape="rect" id="node73" href="$classValue.html#a8a12230cec8b3ea13d547152a4d3ce9e" title="constructor: scalar value (i.e. a value with rank 0)." alt="" coords="557,2469,653,2495"/>
+<area shape="rect" id="node76" href="$classNumericCell.html#a3fd3970233551bf557f5e52330b5610c" title="overloaded Cell::bif_binomial()" alt="" coords="264,2555,435,2580"/>
+</map>

@@ -1,0 +1,4 @@
+<map id="Token::get_cpx_real" name="Token::get_cpx_real">
+<area shape="rect" id="node1" title="return the complex real value of this token" alt="" coords="5,5,145,31"/>
+<area shape="rect" id="node2" href="$classToken.html#a1a31afbb07e3f1dbb86d5f872ce5c297" title="return the TokenValueType of this token." alt="" coords="193,5,347,31"/>
+</map>

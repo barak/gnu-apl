@@ -1,0 +1,4 @@
+<map id="Quad_WA::get_free_memory" name="Quad_WA::get_free_memory">
+<area shape="rect" id="node1" title="estimate (!) the amount of free memory" alt="" coords="5,5,196,31"/>
+<area shape="rect" id="node2" href="$classQuad__WA.html#a5e6486128134180c354cf092476397d1" title="read /proc/meminfo, return the number of items found" alt="" coords="244,5,416,31"/>
+</map>

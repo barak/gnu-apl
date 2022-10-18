@@ -1,0 +1,4 @@
+<map id="Workspace::add_wait" name="Workspace::add_wait">
+<area shape="rect" id="node1" title="increase the wait time for user input as reported in ⎕AI" alt="" coords="183,29,331,55"/>
+<area shape="rect" id="node2" href="$classInputMux.html#a8a79cbe5207cde162fb36133ad9defdd" title="get one line" alt="" coords="5,29,135,55"/>
+</map>

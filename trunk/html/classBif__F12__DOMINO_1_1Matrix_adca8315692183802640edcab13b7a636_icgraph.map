@@ -1,0 +1,4 @@
+<map id="Bif_F12_DOMINO::Matrix::significant" name="Bif_F12_DOMINO::Matrix::significant">
+<area shape="rect" id="node1" title="true if this matrix is significant with respect to bmax and eps" alt="" coords="260,5,433,45"/>
+<area shape="rect" id="node2" href="$classBif__F12__DOMINO.html#a189b8180b3336951a9859c6baf5b44e0" title="compute the householder transformation Q of B = QR" alt="" coords="5,13,212,38"/>
+</map>

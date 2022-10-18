@@ -1,0 +1,9 @@
+<map id="Workspace::set_PW" name="Workspace::set_PW">
+<area shape="rect" id="node1" title="set the current ⎕PW" alt="" coords="617,85,760,111"/>
+<area shape="rect" id="node2" href="$classWorkspace.html#ade3a373ad48eb7a8fbad97a28472db7f" title="clear the workspace" alt="" coords="413,5,566,31"/>
+<area shape="rect" id="node5" href="$main_8cc.html#aa0321421b17def7b58fc0cabc8890260" title="initialize the interpreter" alt="" coords="255,113,318,139"/>
+<area shape="rect" id="node6" href="$structUserPreferences.html#afbb29191d4c126b0f767f92eb427d568" title="parse command line parameters (AFTER reading preference files) Parses all valid options." alt="" coords="409,106,569,146"/>
+<area shape="rect" id="node7" href="$main_8cc.html#af2f6fe0729f09a3109c3ccb8190b9764" title="signal handler for SIGWINCH" alt="" coords="410,171,569,196"/>
+<area shape="rect" id="node3" href="$classWorkspace.html#a77c7b25908cf2479dc087cc3bcf44dcb" title="load lib_ws into the_workspace, maybe set ⎕LX of the new WS." alt="" coords="212,5,361,31"/>
+<area shape="rect" id="node4" href="$classCommand.html#ad222a6de11eb55501624a4d0dea3a464" title=")LOAD: load a workspace file" alt="" coords="5,5,164,31"/>
+</map>

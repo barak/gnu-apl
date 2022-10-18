@@ -1,0 +1,9 @@
+<map id="Shape::insert_axis" name="Shape::insert_axis">
+<area shape="rect" id="node2" href="$classShape.html#ab0b1b642b7e251ff8f7a3afd01be01cc" title="possibly increase rank by prepending axes of length 1 " alt="" coords="190,5,331,32"/>
+<area shape="rect" id="node4" href="$classBif__COMMA.html#a284b9c9c294add93f329950870949ef4" title="Laminate A and B. " alt="" coords="184,56,337,83"/>
+<area shape="rect" id="node3" href="$classShape.html#ad12cb615bc4a005f55e2cc8d565553b1" title="possibly expand rank and increase axes so that B fits into this shape " alt="" coords="408,5,517,32"/>
+<area shape="rect" id="node5" href="$classBif__COMMA.html#aca0328e5d2b45430ab047851dc4d12fc" title="Constructor. " alt="" coords="598,57,777,84"/>
+<area shape="rect" id="node6" href="$classBif__COMMA.html#a54274d01c09566054ae5b08d34f65118" title="either catenate A and B or laminate A and B " alt="" coords="385,107,540,149"/>
+<area shape="rect" id="node7" href="$classBif__F12__COMMA.html#a22e1c5309fdfe1e3d450b6f586c35cc4" title="overloaded Function::eval_AXB() " alt="" coords="592,112,783,139"/>
+<area shape="rect" id="node8" href="$classBif__F12__COMMA1.html#a96459b1e66a6cb3b2327b3be37455b61" title="overloaded Function::eval_AXB() " alt="" coords="588,163,787,189"/>
+</map>

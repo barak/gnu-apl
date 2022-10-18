@@ -2,13 +2,14 @@
 <area shape="rect" id="node2" href="$classNativeFunction.html#a07ab61a74e4a64f38424a2bbd0c6b38b" title="⎕FX a native funtion from a shared library (dlopen) handle " alt="" coords="260,78,392,105"/>
 <area shape="rect" id="node3" href="$classXML__Loading__Archive.html#a2e7aed9883aa106937d3d9313163e10b" title="read next Function element " alt="" coords="447,5,599,47"/>
 <area shape="rect" id="node4" href="$classNativeFunction.html#aa3c7c980f71b2b498067dd31b969b4f0" title="return true if the .so library was successfully loaded " alt="" coords="459,71,587,112"/>
-<area shape="rect" id="node6" href="$classQuad__FX.html#a550a9ac4f2bd7ed3d945994f31847012" title="⎕FX with native function and optional library reference " alt="" coords="440,137,605,163"/>
-<area shape="rect" id="node5" href="$classCommand.html#a925cc5f77af57e1705b8c96a522e6a55" title="show list of commands " alt="" coords="653,78,811,105"/>
-<area shape="rect" id="node7" href="$classQuad__FX.html#a4e16cbd12b82eb185437fdda9673ec35" title="overloaded Function::eval_AB(). " alt="" coords="665,133,799,159"/>
-<area shape="rect" id="node13" href="$classQuad__FX.html#a5f8e649505baa6e008f2aa11706b2b06" title="overloaded Function::eval_AXB(). " alt="" coords="661,183,803,210"/>
-<area shape="rect" id="node8" href="$classQuad__TF.html#a293263bd9b2bf923dc9e4113dded832f" title="try inverse ⎕TF2 of ucs, set new_var_or_fun if successful " alt="" coords="859,133,1007,159"/>
-<area shape="rect" id="node9" href="$structCommand_1_1transfer__context.html#a4e80a2899a02285ba89e58792e6150ea" title="process a &#39;A&#39; (array in 2 ⎕TF format) item. " alt="" coords="1055,60,1239,101"/>
-<area shape="rect" id="node10" href="$structCommand_1_1transfer__context.html#afee6856208966168d158de45145dd4ca" title="process an &#39;F&#39; (function in 2 ⎕TF format) item. " alt="" coords="1055,125,1239,167"/>
-<area shape="rect" id="node11" href="$classQuad__TF.html#a27ed4b02d5f1a1c8a8b0a1fcbe2756f8" title="Overloaded Function::eval_AB(). " alt="" coords="1080,191,1213,218"/>
-<area shape="rect" id="node12" href="$classQuad__TF.html#ae9b15fd0ae227d3a550f01a164f76af8" title="Constructor. " alt="" coords="1287,191,1425,218"/>
+<area shape="rect" id="node6" href="$classQuad__FX.html#a947e9f6703c642fd112cda058ef2c2d1" title="⎕FX with native function and optional library reference " alt="" coords="440,147,605,174"/>
+<area shape="rect" id="node5" href="$classCommand.html#a925cc5f77af57e1705b8c96a522e6a55" title="show list of commands " alt="" coords="653,67,811,94"/>
+<area shape="rect" id="node7" href="$classQuad__FX.html#a620032b8691c925b536077a2262e868a" title="implementation of eval_AB() " alt="" coords="655,219,809,246"/>
+<area shape="rect" id="node8" href="$classQuad__FX.html#ac19c7a3976e58dd741f7c73dafabd25a" title="overloaded Function::eval_AB(). " alt="" coords="865,169,1000,195"/>
+<area shape="rect" id="node14" href="$classQuad__FX.html#a5f8e649505baa6e008f2aa11706b2b06" title="overloaded Function::eval_AXB(). " alt="" coords="661,169,803,195"/>
+<area shape="rect" id="node9" href="$classQuad__TF.html#a293263bd9b2bf923dc9e4113dded832f" title="try inverse ⎕TF2 of ucs, set new_var_or_fun if successful " alt="" coords="859,219,1007,246"/>
+<area shape="rect" id="node10" href="$structCommand_1_1transfer__context.html#a4e80a2899a02285ba89e58792e6150ea" title="process a &#39;A&#39; (array in 2 ⎕TF format) item. " alt="" coords="1055,147,1239,188"/>
+<area shape="rect" id="node11" href="$structCommand_1_1transfer__context.html#afee6856208966168d158de45145dd4ca" title="process an &#39;F&#39; (function in 2 ⎕TF format) item. " alt="" coords="1055,212,1239,253"/>
+<area shape="rect" id="node12" href="$classQuad__TF.html#a27ed4b02d5f1a1c8a8b0a1fcbe2756f8" title="Overloaded Function::eval_AB(). " alt="" coords="1080,278,1213,305"/>
+<area shape="rect" id="node13" href="$classQuad__TF.html#ae9b15fd0ae227d3a550f01a164f76af8" title="Constructor. " alt="" coords="1287,278,1425,305"/>
 </map>

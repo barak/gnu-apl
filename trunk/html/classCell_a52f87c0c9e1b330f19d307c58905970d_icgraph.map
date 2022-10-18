@@ -1,0 +1,5 @@
+<map id="Cell::bif_circle_fun" name="Cell::bif_circle_fun">
+<area shape="rect" id="node1" title="store a circle function (according to A) of this cell in Z" alt="" coords="235,35,365,60"/>
+<area shape="rect" id="node2" href="$classBif__F12__CIRCLE.html#a97d94f041311b6d6698e8dbc70784ad8" title="overloaded Function::eval_AB()." alt="" coords="5,5,187,31"/>
+<area shape="rect" id="node3" href="$classBif__F12__CIRCLE.html#a44bfe896a0d21357db3caf0931f0b0c5" title="overloaded Function::get_scalar_f2" alt="" coords="21,55,171,95"/>
+</map>

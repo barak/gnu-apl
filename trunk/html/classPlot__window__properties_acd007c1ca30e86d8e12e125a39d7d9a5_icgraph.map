@@ -1,0 +1,15 @@
+<map id="Plot_window_properties::valXYZ2pixelXY" name="Plot_window_properties::valXYZ2pixelXY">
+<area shape="rect" id="node1" title="convert values val_X, val_Y, and val_Z, to the X and Y coordinate of the pixel below the Z=0 plane of..." alt="" coords="1171,74,1331,114"/>
+<area shape="rect" id="node2" href="$Plot__gtk_8cc.html#a9fda0abefef58d0042b77795ebf2dbf8" title="draw surface (3D) data lines" alt="" coords="975,5,1110,31"/>
+<area shape="rect" id="node9" href="$Plot__gtk_8cc.html#a17ed7b10e15b1f6440e8d60ced32125d" title="draw the (horizontal) Y grid&#45;lines of the plot (starting at the Y axis)" alt="" coords="820,57,915,83"/>
+<area shape="rect" id="node10" href="$Plot__gtk_8cc.html#a02d7e85e859c174d83c546c9eb641085" title="draw the (slanted) Z grid&#45;lines of the plot" alt="" coords="821,107,914,132"/>
+<area shape="rect" id="node11" href="$classPlot__window__properties.html#aa4db62e171eab805cd9e1a3cbc253c3c" title="return the pixel position of the point where the X, Y, and possibly Z&#45;axis cross." alt="" coords="963,157,1123,197"/>
+<area shape="rect" id="node3" href="$Plot__gtk_8cc.html#aee8ee06e4281931fdfd2560f7cc57865" title="plot the data" alt="" coords="708,107,772,132"/>
+<area shape="rect" id="node4" href="$Plot__gtk_8cc.html#af71ef5256eb8aee2ba62880e3e8806ba" title="callback when the plot window shall be redrawn" alt="" coords="555,107,660,132"/>
+<area shape="rect" id="node5" href="$Plot__gtk_8cc.html#a897990543dc934261ba8e7a124446b11" title="the main() program of the thread that handles one plot window." alt="" coords="428,107,507,132"/>
+<area shape="rect" id="node6" href="$classQuad__PLOT.html#a0161f15bc1b55d2d79b634ce35c15ec0" title="plot the data (creating a new plot window in X)" alt="" coords="204,107,380,132"/>
+<area shape="rect" id="node7" href="$classQuad__PLOT.html#acc4187c32c3bad52f276a724b226b429" title="overloaded Function::eval_AB()" alt="" coords="5,81,156,107"/>
+<area shape="rect" id="node8" href="$classQuad__PLOT.html#a1b17ca0481f0d7fcc98732b3b1d2eefb" title="overloaded Function::eval_B()" alt="" coords="9,131,152,156"/>
+<area shape="rect" id="node12" href="$Plot__gtk_8cc.html#aa642621b0f37eee12fadcf5876e131f8" title="draw a legend for the different plot lines" alt="" coords="820,205,915,231"/>
+<area shape="rect" id="node13" href="$Plot__gtk_8cc.html#aa99a51342dc56a4850f1cbf3f13c9e86" title="draw the (vertical) X grid&#45;lines of the plot (starting from the X axis)" alt="" coords="820,156,915,181"/>
+</map>

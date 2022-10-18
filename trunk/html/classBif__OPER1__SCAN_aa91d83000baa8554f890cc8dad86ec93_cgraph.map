@@ -1,0 +1,12 @@
+<map id="Bif_OPER1_SCAN::eval_AB" name="Bif_OPER1_SCAN::eval_AB">
+<area shape="rect" id="node1" title="Overloaded Function::eval_AB()." alt="" coords="5,153,197,179"/>
+<area shape="rect" id="node2" href="$classBif__SCAN.html#aa358f899fe16ac87ca4908b0ae8f30f9" title="Expand B according to A." alt="" coords="245,153,379,179"/>
+<area shape="rect" id="node3" href="$classShape.html#aeb018b67601d3f1c4bea3d2c2b877b7e" title="add a dimension of length len at the end" alt="" coords="427,5,589,31"/>
+<area shape="rect" id="node4" href="$classShape.html#a017e9a35dd20f4bc4fdeb7ea29b6805d" title="return the rank" alt="" coords="449,55,567,80"/>
+<area shape="rect" id="node5" href="$classShape.html#a592d2ade68aa8c21c5d84627c3a0e001" title="return the length of dimension r" alt="" coords="429,104,587,129"/>
+<area shape="rect" id="node6" href="$classShape3.html#a075643abf890c05401f1b7abdc5339cf" title="the dimensions above r the axis" alt="" coords="467,153,549,179"/>
+<area shape="rect" id="node7" href="$classCell.html#af8746e4049278c9a46f25e6ee0d71fcc" title="Return true iff this cell is a pointer to a cell." alt="" coords="449,203,567,228"/>
+<area shape="rect" id="node8" href="$classShape3.html#ad3ff2e3be69b9ca0085d211e3ecb2801" title="the dimensions below the axis" alt="" coords="469,252,547,277"/>
+<area shape="rect" id="node9" href="$classShape.html#afcd3708c8c18a30cb3c0c1fa1a630f71" title="modify dimension r" alt="" coords="429,301,587,327"/>
+<area shape="rect" id="node10" href="$classShape.html#a189c92d0b74f3313bd83c8aa7565e9c5" title="recompute volume (after changing a dimension of len 0)" alt="" coords="637,301,815,327"/>
+</map>

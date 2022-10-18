@@ -1,0 +1,8 @@
+<map id="UCS_string::remove_leading_and_trailing_whitespaces" name="UCS_string::remove_leading_and_trailing_whitespaces">
+<area shape="rect" id="node1" title="remove leading and trailing whitespaces" alt="" coords="5,39,148,94"/>
+<area shape="rect" id="node2" href="$classUCS__string.html#a07e8673ec73ad31228be88053aeff1b1" title="remove leading blanks, tabs, etc" alt="" coords="196,5,347,45"/>
+<area shape="rect" id="node4" href="$classUCS__string.html#a6a4540c3a5a7621f91406454b4f93cd0" title="remove trailing blanks, tabs, etc" alt="" coords="198,79,345,119"/>
+<area shape="rect" id="node3" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="597,79,720,105"/>
+<area shape="rect" id="node5" href="$classUCS__string.html#a186a76c22c3ac840f1e607ba49e253a0" title="return the last character in this string" alt="" coords="409,105,535,130"/>
+<area shape="rect" id="node6" href="$classUCS__string.html#a67ea87cb92e687105b21917ffb4a2a6f" title="remove the last character in this string" alt="" coords="395,154,549,179"/>
+</map>

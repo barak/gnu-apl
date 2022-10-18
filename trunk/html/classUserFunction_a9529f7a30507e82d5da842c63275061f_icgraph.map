@@ -1,0 +1,8 @@
+<map id="UserFunction::get_stop_lines" name="UserFunction::get_stop_lines">
+<area shape="rect" id="node1" title="return stop lines (from S∆fun ← lines)" alt="" coords="479,47,637,87"/>
+<area shape="rect" id="node2" href="$classQuad__STOP.html#aba7f51dfbb36d3c2d25ce2e7deb0f278" title="Overloaded Function::eval_AB()" alt="" coords="277,5,431,31"/>
+<area shape="rect" id="node3" href="$classQuad__STOP.html#a4076635597129ebe8ce51e1793bc0e85" title="Overloaded Function::eval_B()" alt="" coords="282,55,426,80"/>
+<area shape="rect" id="node4" href="$classNabla.html#a19c7ba833ddf21a1ac5c4309fd44921c" title="open an existing function, or create a new one." alt="" coords="282,105,426,145"/>
+<area shape="rect" id="node5" href="$classNabla.html#a894eac5264914ef7eedcfc14643cc7ee" title="start editing, return source location if first_command is bad." alt="" coords="139,112,229,137"/>
+<area shape="rect" id="node6" href="$classNabla.html#a610d94a179335126e82e9eea07918d5a" title="edit this function" alt="" coords="5,112,91,137"/>
+</map>

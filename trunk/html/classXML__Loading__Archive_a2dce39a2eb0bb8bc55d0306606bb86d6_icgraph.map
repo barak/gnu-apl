@@ -1,0 +1,8 @@
+<map id="XML_Loading_Archive::reset" name="XML_Loading_Archive::reset">
+<area shape="rect" id="node1" title="reset archive to the start position" alt="" coords="669,55,821,95"/>
+<area shape="rect" id="node2" href="$classXML__Loading__Archive.html#a45c9b23463cf5379d2788af1789a62f0" title="read vids of top&#45;level variables" alt="" coords="465,23,617,63"/>
+<area shape="rect" id="node6" href="$classXML__Loading__Archive.html#afd0e9ad4162c5babd4805a1c6a8cff20" title="constructor: remember file name and workspace" alt="" coords="461,87,621,127"/>
+<area shape="rect" id="node3" href="$classWorkspace.html#a20b0659f2d3987a4bb21d6c399e0a436" title="copy objects from another workspace" alt="" coords="260,31,413,56"/>
+<area shape="rect" id="node4" href="$classCommand.html#a51b8fbdb5d65baf2fddfc930b9b142cf" title=")COPY: copy a workspace file" alt="" coords="29,5,189,31"/>
+<area shape="rect" id="node5" href="$classCommand.html#a2f7425e3673258dfb78045919e82f69f" title=")COPY_ONCE: copy a workspace file, nut at most once" alt="" coords="5,55,212,80"/>
+</map>

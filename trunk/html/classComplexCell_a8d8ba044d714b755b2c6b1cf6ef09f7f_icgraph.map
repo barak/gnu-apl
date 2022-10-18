@@ -1,0 +1,5 @@
+<map id="ComplexCell::bif_within_quad_CT" name="ComplexCell::bif_within_quad_CT">
+<area shape="rect" id="node2" href="$classComplexCell.html#a4f6434753627299e11dec4cba24962ef" title="overloaded Cell::get_checked_near_int() " alt="" coords="213,5,392,47"/>
+<area shape="rect" id="node3" href="$classComplexCell.html#a69ca7247a26db55fdb7f7264ea066b63" title="overloaded from the corresponding Cell:: function (see class Cell). " alt="" coords="440,13,583,39"/>
+<area shape="rect" id="node4" href="$classComplexCell.html#a978a6ef7d34a3446b796a0597c05d074" title="Overloaded Cell::is_finite(). " alt="" coords="631,13,781,39"/>
+</map>

@@ -1,0 +1,4 @@
+<map id="Command::get_boxing_format" name="Command::get_boxing_format">
+<area shape="rect" id="node1" title="return the current boxing format" alt="" coords="223,5,376,45"/>
+<area shape="rect" id="node2" href="$classStateIndicator.html#abf0d83f5f9a8fec57751bf5636933687" title="Maybe print B (according to tag) and erase B." alt="" coords="5,5,175,45"/>
+</map>

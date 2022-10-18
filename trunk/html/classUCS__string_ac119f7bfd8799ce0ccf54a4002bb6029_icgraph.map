@@ -1,0 +1,9 @@
+<map id="UCS_string::from_double_to_fixed" name="UCS_string::from_double_to_fixed">
+<area shape="rect" id="node1" title="convert the double value to an UCS_string in fixed point format (with fract_digits fractional digits)..." alt="" coords="908,37,1077,77"/>
+<area shape="rect" id="node2" href="$classBif__F12__FORMAT.html#a9d12f7ec1f6ecd8def2dd073c2a7794d" title="format value with precision mantissa digits (floating format)" alt="" coords="685,5,860,45"/>
+<area shape="rect" id="node7" href="$classUCS__string.html#a62918fcda706b9c19dd63d0d9666bd09" title="convert the double value to an UCS_string scaled (exponential) format (with fract_digits fractional d..." alt="" coords="688,69,857,109"/>
+<area shape="rect" id="node3" href="$classBif__F12__FORMAT.html#ad7f677afc847fa6df13f16decdecd992" title="A character array with one column of B formatted by specification." alt="" coords="463,37,637,77"/>
+<area shape="rect" id="node4" href="$classBif__F12__FORMAT.html#ad945541c06e489c1079ae401f4d1db28" title="A character array with B formatted by specification." alt="" coords="240,37,415,77"/>
+<area shape="rect" id="node5" href="$classBif__F12__DOMINO_1_1Matrix.html#ad45f8929c6f666dea17836a79c657456" title="print debug infos for this real matrix" alt="" coords="12,8,185,48"/>
+<area shape="rect" id="node6" href="$classBif__F12__FORMAT.html#a5164cf7d2b85131b9c9fa11c3239602a" title="Overloaded Function::eval_AB()" alt="" coords="5,73,192,98"/>
+</map>

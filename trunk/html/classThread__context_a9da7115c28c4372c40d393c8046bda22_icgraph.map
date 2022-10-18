@@ -1,0 +1,7 @@
+<map id="Thread_context::set_active_core_count" name="Thread_context::set_active_core_count">
+<area shape="rect" id="node1" title="set the number of currently used cores" alt="" coords="679,35,817,75"/>
+<area shape="rect" id="node2" href="$classCPU__pool.html#a7119580b2ca4452fdf86542ec2178d31" title="set new active core count, return true on error" alt="" coords="467,5,631,45"/>
+<area shape="rect" id="node5" href="$classParallel.html#a187281fddfd8c5b100ceb4c04153b9de" title="initialize" alt="" coords="282,66,373,91"/>
+<area shape="rect" id="node3" href="$classQuad__SYL.html#aec0e3350d7316886ebcac043a7b4a033" title="overloaded Symbol::assign_indexed()" alt="" coords="236,13,419,38"/>
+<area shape="rect" id="node4" href="$classQuad__SYL.html#a3a73a2d9505f81a66a5a9f6aacc31ce0" title="overloaded Symbol::assign_indexed()" alt="" coords="5,13,188,38"/>
+</map>

@@ -1,0 +1,39 @@
+<map id="XML_Saving_Archive::save_Function" name="XML_Saving_Archive::save_Function">
+<area shape="rect" id="node1" title="write user&#45;defined function fun" alt="" coords="5,617,152,657"/>
+<area shape="rect" id="node2" href="$classFunction.html#a5d1ea5b6f6267431f7ca2773fa0955b9" title="Quad_CR of this function." alt="" coords="227,5,361,31"/>
+<area shape="rect" id="node3" href="$classXML__Saving__Archive.html#ab1e1e0d523a391379f41e5e8efa7ff66" title="indent by indent levels, return space left on line" alt="" coords="631,79,777,119"/>
+<area shape="rect" id="node4" href="$classXML__Saving__Archive.html#a161f686e1065cddaf30ab5c06f4a56a1" title="return the index of val in values" alt="" coords="221,271,367,311"/>
+<area shape="rect" id="node6" href="$classDerivedFunction.html#a07b958f4d87edd4b6e6e96acfe3b2997" title="return the axis argument (or 0 if none) of this derived function" alt="" coords="203,336,385,361"/>
+<area shape="rect" id="node8" href="$classFunction.html#a2ea41f5c122b8b9ad7a32b742b3ce4a0" title="GMT when this function was created; 0 for system functions." alt="" coords="203,385,385,411"/>
+<area shape="rect" id="node9" href="$classFunction.html#a672efc3b25bc3a86fd3917de4cd5057b" title="return the execution properties (3 ⎕AT) for this function" alt="" coords="227,435,361,475"/>
+<area shape="rect" id="node10" href="$classFunction.html#a4d321dbaeb262169b114f23de61e1d30" title="return a pointer to this UserFunction (if it is one)" alt="" coords="213,500,375,525"/>
+<area shape="rect" id="node11" href="$classNamedObject.html#a3ff29d3b8f3eed6c55f535e1af8dbc91" title="return the Id of this object (ID_USER_SYMBOL for user defined objects)" alt="" coords="221,549,367,575"/>
+<area shape="rect" id="node12" href="$classDerivedFunction.html#addf26f2a99cb0c6707aaeeb9739b1e76" title="return the left operand of this derived function" alt="" coords="211,599,377,624"/>
+<area shape="rect" id="node16" href="$classUserFunction.html#ac2cf5908480af0d1d0cd4cd6dccd5bd2" title="return the macro number (if this function is one) or &#45;1" alt="" coords="203,697,385,723"/>
+<area shape="rect" id="node17" href="$classID.html#af1bb0741450971c1882af59af87eef29" title="return the printable name for id as UCS_string" alt="" coords="225,747,363,772"/>
+<area shape="rect" id="node20" href="$classDerivedFunction.html#a3b46a9e383239b13ecd258a4aa77df59" title="return the operator of this derived function" alt="" coords="200,796,388,821"/>
+<area shape="rect" id="node21" href="$classDerivedFunction.html#a7f5aafa6d9a443ef6d25339ad11e3abd" title="return the right operand (or 0) of this derived function" alt="" coords="209,648,379,673"/>
+<area shape="rect" id="node23" href="$classFunction.html#af2539d67c687a61587781ec78c9e060a" title="return the Token Tag for this function." alt="" coords="233,845,355,871"/>
+<area shape="rect" id="node24" href="$classFunction.html#a02f71337eaa985efd2ce198c9c21b313" title="return true iff this function is defined (= has an APL body)" alt="" coords="225,895,363,920"/>
+<area shape="rect" id="node25" href="$classFunction.html#af2588ccbf97a2a9ad1a2169c04b63bf4" title="return true iff this function is a derived function" alt="" coords="225,944,363,969"/>
+<area shape="rect" id="node26" href="$classFunction.html#a735c9e2d01eda71ddece9dc3c527b7b2" title="return true iff this function is a macro" alt="" coords="227,993,361,1019"/>
+<area shape="rect" id="node27" href="$classFunction.html#ac4a44eddbd86c8278f240ec95c5f1553" title="return true iff this is a native function" alt="" coords="228,1043,360,1068"/>
+<area shape="rect" id="node28" href="$classXML__Saving__Archive.html#a9f6e29bdf473f32fc5fe461f3dd61d78" title="return true iff (the definition of) fun was already saved." alt="" coords="221,1093,367,1133"/>
+<area shape="rect" id="node29" href="$classXML__Saving__Archive.html#a7c5dbf639d8ffda3ed1478a7004ba357" title="write UCS_string str" alt="" coords="221,207,367,247"/>
+<area shape="rect" id="node5" href="$structXML__Saving__Archive_1_1__val__par.html#aa244b5ee23bfb8318a5267cc3e48221b" title="compare function for bsearch()" alt="" coords="436,373,583,428"/>
+<area shape="rect" id="node7" href="$classValue__P__Base.html#a1c3bf1b6f708eb2c1ba4b97c83adb9aa" title="return a const pointer to the Value" alt="" coords="442,452,577,477"/>
+<area shape="rect" id="node13" href="$classToken.html#a4d19f279ca06bc64e549c9d63ca677b0" title="return the Function_P value of this token" alt="" coords="441,599,578,624"/>
+<area shape="rect" id="node14" href="$classToken.html#abe9f60f29fc7644214b48cc2715a21ad" title="return true if this token is a function (or operator)" alt="" coords="639,599,769,624"/>
+<area shape="rect" id="node15" href="$classToken.html#a1a31afbb07e3f1dbb86d5f872ce5c297" title="return the TokenValueType of this token." alt="" coords="841,599,994,624"/>
+<area shape="rect" id="node18" href="$classID.html#a1c80b7bfa291882045116dcec6d50098" title="return the printable name for id as UTF8 *" alt="" coords="459,747,560,772"/>
+<area shape="rect" id="node19" href="$structId__name.html#a3202cdf13a9726257a4a3652a66285dd" title="compare key with item (for bsearch())" alt="" coords="639,747,769,772"/>
+<area shape="rect" id="node22" href="$classToken.html#a13e8b65088f8a7d103772acc6cfb5140" title="return the tag of this token" alt="" coords="455,648,564,673"/>
+<area shape="rect" id="node30" href="$classXML__Saving__Archive.html#a3da33c8ba02d437ae1803eac0464c945" title="decrement space by length of str and return str" alt="" coords="631,143,777,183"/>
+<area shape="rect" id="node31" href="$classXML__Saving__Archive.html#a792fe70c4d59b79b9f1da76945377e35" title="emit one unicode character (inside &quot;...&quot;)" alt="" coords="436,207,583,247"/>
+<area shape="rect" id="node33" href="$classXML__Saving__Archive.html#a0164ae31af80f800810671ff2d959931" title="leave char mode. maybe print ⁰ and return the number of chars printed" alt="" coords="631,335,777,375"/>
+<area shape="rect" id="node37" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="448,272,571,297"/>
+<area shape="rect" id="node32" href="$classXML__Saving__Archive.html#ad702bc84ef313abaf5eabbc0487cce4a" title="enter char mode. maybe print ² and return the number of chars printed" alt="" coords="631,271,777,311"/>
+<area shape="rect" id="node34" href="$classXML__Saving__Archive.html#a8b0a3a2f1f9c91af785edf994b4fa48d" title="return true if uni prints nicely and is allowed in XML &quot;...&quot; strings" alt="" coords="631,207,777,247"/>
+<area shape="rect" id="node35" href="$classAvec.html#afe30f62f26ec74019a95e5cbd6eaa111" title="Find av in character_table. Return position or Invalid_CHT." alt="" coords="861,240,974,265"/>
+<area shape="rect" id="node36" href="$classAvec.html#ad45bd7c00f8480d9e72c5cd40c702ef3" title="Find return position of alt_av, or Invalid_AV if not found." alt="" coords="825,191,1009,216"/>
+</map>

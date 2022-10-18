@@ -1,0 +1,30 @@
+<map id="XML_Saving_Archive::save_Ravel" name="XML_Saving_Archive::save_Ravel">
+<area shape="rect" id="node1" title="write ravel of Value v" alt="" coords="5,516,152,556"/>
+<area shape="rect" id="node2" href="$classXML__Saving__Archive.html#a3da33c8ba02d437ae1803eac0464c945" title="decrement space by length of str and return str" alt="" coords="609,5,755,45"/>
+<area shape="rect" id="node3" href="$classXML__Saving__Archive.html#ab1e1e0d523a391379f41e5e8efa7ff66" title="indent by indent levels, return space left on line" alt="" coords="609,69,755,109"/>
+<area shape="rect" id="node4" href="$classXML__Saving__Archive.html#ae0384623223c3d4e87ea98f2ec0adf5c" title="emit one ravel cell cell" alt="" coords="200,516,347,556"/>
+<area shape="rect" id="node7" href="$classXML__Saving__Archive.html#a0164ae31af80f800810671ff2d959931" title="leave char mode. maybe print ⁰ and return the number of chars printed" alt="" coords="609,261,755,301"/>
+<area shape="rect" id="node22" href="$classValue.html#a6b8aa5e58b68236c77a09385365468d5" title="return the first element of the ravel (which is always present). same as get_cproto(),..." alt="" coords="623,862,741,887"/>
+<area shape="rect" id="node24" href="$classValue.html#ac5b54e3a13cab0837442f1575b3299a5" title="return the number of elements, but at least 1 (for the prototype)." alt="" coords="1047,837,1216,862"/>
+<area shape="rect" id="node28" href="$classValue.html#a6c84896ec53d4baae44a1a9c2a4134f6" title="true if Value flag packed is set" alt="" coords="212,1013,335,1038"/>
+<area shape="rect" id="node5" href="$classXML__Saving__Archive.html#a792fe70c4d59b79b9f1da76945377e35" title="emit one unicode character (inside &quot;...&quot;)" alt="" coords="399,153,545,193"/>
+<area shape="rect" id="node11" href="$classXML__Saving__Archive.html#a161f686e1065cddaf30ab5c06f4a56a1" title="return the index of val in values" alt="" coords="399,319,545,359"/>
+<area shape="rect" id="node13" href="$classValue__P__Base.html#a1c3bf1b6f708eb2c1ba4b97c83adb9aa" title="return a const pointer to the Value" alt="" coords="405,383,539,409"/>
+<area shape="rect" id="node14" href="$classLvalCell.html#a86dbb9a22797b3611d852ce91e1e97b6" title="return the owner of the cell pointed to" alt="" coords="411,433,533,473"/>
+<area shape="rect" id="node15" href="$classCell.html#a38a6a25f0ad091f35e3d9abfe5608a50" title="return the type of this cell" alt="" coords="617,549,747,574"/>
+<area shape="rect" id="node16" href="$classCell.html#a2999919fc2782b3cebfd925c63cc1fac" title="Return the character value of a cell." alt="" coords="401,549,543,574"/>
+<area shape="rect" id="node18" href="$classCell.html#a0e6b9239fa77e3222f32400d51c8f114" title="Return the imaginary part of a cell." alt="" coords="400,647,544,673"/>
+<area shape="rect" id="node19" href="$classCell.html#ad165f9ab69abf46b2cf44d301a700a1c" title="Return the integer value of a cell." alt="" coords="407,697,537,722"/>
+<area shape="rect" id="node20" href="$classLvalCell.html#a0e898696cb3440b90aa3bdcfac1a23b7" title="Overloaded Cell::get_lval_value()" alt="" coords="411,747,533,787"/>
+<area shape="rect" id="node21" href="$classValue.html#a0cc27364712e6ae2195b15ec54f516a2" title="return the position of cell in the ravel of this value." alt="" coords="411,862,533,887"/>
+<area shape="rect" id="node26" href="$classCell.html#a367b9df7e0d4b805e5f31641658113f6" title="Return the APL value of a cell (Asserts for non&#45;pointer cells)" alt="" coords="395,598,549,623"/>
+<area shape="rect" id="node27" href="$classCell.html#a9a0028fd74f00deb001a8062a55916c6" title="Return the real part of a cell." alt="" coords="403,911,541,937"/>
+<area shape="rect" id="node6" href="$classXML__Saving__Archive.html#ad702bc84ef313abaf5eabbc0487cce4a" title="enter char mode. maybe print ² and return the number of chars printed" alt="" coords="609,133,755,173"/>
+<area shape="rect" id="node8" href="$classXML__Saving__Archive.html#a8b0a3a2f1f9c91af785edf994b4fa48d" title="return true if uni prints nicely and is allowed in XML &quot;...&quot; strings" alt="" coords="609,197,755,237"/>
+<area shape="rect" id="node9" href="$classAvec.html#afe30f62f26ec74019a95e5cbd6eaa111" title="Find av in character_table. Return position or Invalid_CHT." alt="" coords="850,181,963,206"/>
+<area shape="rect" id="node10" href="$classAvec.html#ad45bd7c00f8480d9e72c5cd40c702ef3" title="Find return position of alt_av, or Invalid_AV if not found." alt="" coords="815,230,999,255"/>
+<area shape="rect" id="node12" href="$structXML__Saving__Archive_1_1__val__par.html#aa244b5ee23bfb8318a5267cc3e48221b" title="compare function for bsearch()" alt="" coords="609,326,755,381"/>
+<area shape="rect" id="node17" href="$classCell.html#a6c3fdef3d82f53649d1c3f16d37eedd7" title="the name of ct" alt="" coords="597,598,767,623"/>
+<area shape="rect" id="node23" href="$classValue.html#aa0572b1b7fa249cb79694fd152130b38" title="return the (constant) idx&#39;th element of the ravel." alt="" coords="845,862,968,887"/>
+<area shape="rect" id="node25" href="$classShape.html#a6f32f749601dca80263493fd06be12c4" title="return the number of ravel elements, but at least 1 (for empty values and scalars) else product of sh..." alt="" coords="1264,837,1419,862"/>
+</map>

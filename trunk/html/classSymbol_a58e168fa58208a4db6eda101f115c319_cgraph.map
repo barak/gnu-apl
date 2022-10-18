@@ -1,0 +1,15 @@
+<map id="Symbol::show_owners" name="Symbol::show_owners">
+<area shape="rect" id="node1" title="print variables owning value" alt="" coords="5,149,160,174"/>
+<area shape="rect" id="node2" href="$classValueStackItem.html#a3a9ea0ee5b4129f7e5aa4a92c851abfd" title="return the function (caller must have checked NC_FUNOPER)." alt="" coords="225,5,366,45"/>
+<area shape="rect" id="node3" href="$classSymbol.html#a126fc214ca7a2e2d364e0982a36b2ace" title="The name of this Symbol." alt="" coords="230,70,361,95"/>
+<area shape="rect" id="node4" href="$classValueStackItem.html#a27453c0dfda1004c6f5e68a0c2530eae" title="return the name class for this ValueStackItem" alt="" coords="211,119,379,145"/>
+<area shape="rect" id="node5" href="$classValueStackItem.html#aa4f30b4a74d206179d0af5f24b93c547" title="return the APL value of this ValueStackItem, or 0 if it has none. Only used to iterate over the Value..." alt="" coords="225,169,366,209"/>
+<area shape="rect" id="node7" href="$classValue.html#a09c4a80045df1f0640bf8f4f48a6c323" title="returen true if sub == val or sub is contained in val" alt="" coords="433,234,580,259"/>
+<area shape="rect" id="node8" href="$classExecutable.html#a3e2055a4ff3807adea8fa7088fd8f95f" title="print all owners of value" alt="" coords="208,285,383,310"/>
+<area shape="rect" id="node6" href="$classValue__P__Base.html#a1c3bf1b6f708eb2c1ba4b97c83adb9aa" title="return a const pointer to the Value" alt="" coords="439,161,574,186"/>
+<area shape="rect" id="node9" href="$classToken.html#a205e0b499e06999ff91c272ff28c9013" title="return the Value_P value of this token. The token could be TOK_NO_VALUE; in that case VALUE_ERROR is ..." alt="" coords="441,335,573,361"/>
+<area shape="rect" id="node12" href="$classToken.html#a1a31afbb07e3f1dbb86d5f872ce5c297" title="return the TokenValueType of this token." alt="" coords="825,335,979,361"/>
+<area shape="rect" id="node13" href="$classExecutable.html#a57c1ce1db5bf5710338d1b9cf84a6dfd" title="return the name of this function, or ◊ or ⍎" alt="" coords="431,385,583,410"/>
+<area shape="rect" id="node10" href="$unionToken_1_1sval.html#a22a0be9d3742c2a8168e59d530dd659e" title="a shortcut for accessing apl_val" alt="" coords="631,335,777,361"/>
+<area shape="rect" id="node11" href="$classToken.html#a11e37aa69b8eb64f293702293b00f50c" title="return true iff this token is an apl value" alt="" coords="642,385,766,410"/>
+</map>

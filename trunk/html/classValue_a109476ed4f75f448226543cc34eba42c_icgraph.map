@@ -1,0 +1,11 @@
+<map id="Value::NOTCHAR" name="Value::NOTCHAR">
+<area shape="rect" id="node2" href="$classQuad__TF.html#a4aa501720adbb19aed9599912a8a8b07" title="append ravel of value in tf2_format to ucs. Return true iff the value should be enclosed in parenthes..." alt="" coords="184,5,321,32"/>
+<area shape="rect" id="node3" href="$classQuad__TF.html#a7cecac14ed05f07d7b44a5c90d820f03" title="append ravel cells in tf2_format to ucs. " alt="" coords="369,5,504,32"/>
+<area shape="rect" id="node4" href="$classQuad__TF.html#ad0f2e059d5ff7a0262921192e18c48a0" title="return B in transfer format 2 (new APL format) for a variable " alt="" coords="375,56,499,83"/>
+<area shape="rect" id="node5" href="$classQuad__TF.html#aad2b15f3268d7098d75babcd03e5c762" title="return B in transfer format 2 (new APL2 format) " alt="" coords="571,31,670,57"/>
+<area shape="rect" id="node8" href="$classSymbol.html#a6b9b4537d95855e6490a8ec1b64b6cce" title="write this symbol in )OUT format to file out " alt="" coords="552,81,689,108"/>
+<area shape="rect" id="node6" href="$classQuad__TF.html#a27ed4b02d5f1a1c8a8b0a1fcbe2756f8" title="Overloaded Function::eval_AB(). " alt="" coords="750,31,883,57"/>
+<area shape="rect" id="node7" href="$classQuad__TF.html#ae9b15fd0ae227d3a550f01a164f76af8" title="Constructor. " alt="" coords="950,31,1089,57"/>
+<area shape="rect" id="node9" href="$classWorkspace.html#a7ffca45a4446b644e7caf093a1699ba2" title="write symbols for )OUT command " alt="" coords="737,81,896,108"/>
+<area shape="rect" id="node10" href="$classCommand.html#a4afcbbdbee3fd2f536db12651861110b" title=")OUT: export a workspace file " alt="" coords="944,81,1095,108"/>
+</map>

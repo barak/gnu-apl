@@ -1,0 +1,5 @@
+<map id="Svar_DB::match_or_make" name="Svar_DB::match_or_make">
+<area shape="rect" id="node1" title="match a new offer against the DB. Return: 0 on error, 1 if the new offer was inserted into the DB (si..." alt="" coords="403,13,579,38"/>
+<area shape="rect" id="node2" href="$classQuad__SVO.html#aefe8710645494d9dc6b8879b3f09b913" title="share one variable" alt="" coords="199,5,355,45"/>
+<area shape="rect" id="node3" href="$classQuad__SVO.html#a92d931679e0b1836d24e1cc1ab60ed02" title="Overloaded Function::eval_AB()." alt="" coords="5,13,151,38"/>
+</map>

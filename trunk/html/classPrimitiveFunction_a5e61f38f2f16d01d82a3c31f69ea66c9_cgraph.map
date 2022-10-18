@@ -1,0 +1,11 @@
+<map id="PrimitiveFunction::get_statistics_B" name="PrimitiveFunction::get_statistics_B">
+<area shape="rect" id="node2" href="$classPrimitiveFunction.html#a0a9ea9498169b49951d197bd30ac0eef" title="overloaded Function::eval_fill_AB() " alt="" coords="184,5,315,47"/>
+<area shape="rect" id="node6" href="$classPrimitiveFunction.html#a9158cf6560841b92e712c22e65c61e3c" title="overloaded Function::eval_fill_B() " alt="" coords="184,71,315,112"/>
+<area shape="rect" id="node8" href="$classPrimitiveFunction.html#a872389b6d0bbadd7a0a8c17b1a03d25c" title="Print the name of this PrimitiveFunction to out. " alt="" coords="363,155,493,196"/>
+<area shape="rect" id="node10" href="$classPrimitiveFunction.html#abbfceea746a97391601469d6b787bef8" title="overloaded Function::print_properties() " alt="" coords="184,188,315,229"/>
+<area shape="rect" id="node3" href="$classFunction.html#a1d8e47de79dffa81c189730a1a19f80d" title="plain function, 2 arguments " alt="" coords="363,17,493,43"/>
+<area shape="rect" id="node4" href="$classNamedObject.html#adf8b778a154d1d6e35c7d8a169aaaeb5" title="return the name of the named object " alt="" coords="541,46,708,73"/>
+<area shape="rect" id="node5" href="$classID.html#af1bb0741450971c1882af59af87eef29" title="return the printable name for id as UCS_string " alt="" coords="756,46,893,73"/>
+<area shape="rect" id="node7" href="$classFunction.html#a1baa953a35d9dea5fd20bfa095daf360" title="plain function, 1 argument " alt="" coords="368,74,488,101"/>
+<area shape="rect" id="node9" href="$classNamedObject.html#a3ff29d3b8f3eed6c55f535e1af8dbc91" title="return the Id of this object (ID_USER_SYMBOL for user defined objects) " alt="" coords="551,162,698,189"/>
+</map>

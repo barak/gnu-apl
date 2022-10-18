@@ -1,0 +1,7 @@
+<map id="Value::same_shape" name="Value::same_shape">
+<area shape="rect" id="node1" title="return true iff this value has the same shape as other." alt="" coords="5,31,143,56"/>
+<area shape="rect" id="node2" href="$classValue.html#a5ac7131d2f89d0bc8b8907d960cbd125" title="return the rank of this value" alt="" coords="211,5,325,31"/>
+<area shape="rect" id="node4" href="$classValue.html#a8cecab341fdc0bd55b67c07848463d37" title="return the r&#39;th shape element of this value" alt="" coords="191,55,345,80"/>
+<area shape="rect" id="node3" href="$classShape.html#a017e9a35dd20f4bc4fdeb7ea29b6805d" title="return the rank" alt="" coords="414,5,531,31"/>
+<area shape="rect" id="node5" href="$classShape.html#a592d2ade68aa8c21c5d84627c3a0e001" title="return the length of dimension r" alt="" coords="393,55,552,80"/>
+</map>

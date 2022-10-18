@@ -1,0 +1,4 @@
+<map id="PointerCell::get_pointer_value" name="PointerCell::get_pointer_value">
+<area shape="rect" id="node1" title="overloaded Cell::get_pointer_value()" alt="" coords="5,5,164,45"/>
+<area shape="rect" id="node2" href="$classValue__P__Base.html#a1c3bf1b6f708eb2c1ba4b97c83adb9aa" title="return a const pointer to the Value" alt="" coords="212,13,347,38"/>
+</map>

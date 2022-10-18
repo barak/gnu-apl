@@ -1,0 +1,4 @@
+<map id="Quad_FIO::get_FILE" name="Quad_FIO::get_FILE">
+<area shape="rect" id="node1" title="return the open FILE * for (APL integer) handle" alt="" coords="5,13,148,38"/>
+<area shape="rect" id="node2" href="$classQuad__FIO.html#ade0112438bef799ea7f16c683cd35668" title="return the open file for (APL integer) handle" alt="" coords="196,5,328,45"/>
+</map>

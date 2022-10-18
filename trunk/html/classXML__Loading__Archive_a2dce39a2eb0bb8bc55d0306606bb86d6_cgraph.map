@@ -1,0 +1,4 @@
+<map id="XML_Loading_Archive::reset" name="XML_Loading_Archive::reset">
+<area shape="rect" id="node1" title="reset archive to the start position" alt="" coords="5,5,157,45"/>
+<area shape="rect" id="node2" href="$classXML__Loading__Archive.html#a987f28e4f3139e5f1c96913468ea3057" title="move to next tag, return true if EOF" alt="" coords="205,5,357,45"/>
+</map>

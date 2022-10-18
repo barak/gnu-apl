@@ -1,0 +1,7 @@
+<map id="InputFile::get_html" name="InputFile::get_html">
+<area shape="rect" id="node1" title="return the current HTML mode" alt="" coords="581,31,712,56"/>
+<area shape="rect" id="node2" href="$classIO__Files.html#a9cd4e5d7e3467ff6ad303dc1063e5004" title="read one line from the current input file with CR and LF removed" alt="" coords="379,31,533,56"/>
+<area shape="rect" id="node3" href="$classIO__Files.html#acc91875b8e0c7a5ad44e3ead0e3dda7b" title="get one line from the current file, open the next file if necceessary" alt="" coords="183,5,331,31"/>
+<area shape="rect" id="node5" href="$classDiffOut.html#ad6b18fc9495445c000ff292b491a2248" title="overloaded filebuf::overflow()" alt="" coords="196,55,317,80"/>
+<area shape="rect" id="node4" href="$classInputMux.html#a8a79cbe5207cde162fb36133ad9defdd" title="get one line" alt="" coords="5,5,135,31"/>
+</map>

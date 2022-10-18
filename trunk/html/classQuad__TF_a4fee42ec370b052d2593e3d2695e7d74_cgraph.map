@@ -1,0 +1,4 @@
+<map id="Quad_TF::tf2_reduce_COMMA" name="Quad_TF::tf2_reduce_COMMA">
+<area shape="rect" id="node1" title="replace pattern , B in tos with single token (,B); return true iff done so." alt="" coords="5,5,151,45"/>
+<area shape="rect" id="node2" href="$classFunction.html#af2539d67c687a61587781ec78c9e060a" title="return the Token Tag for this function." alt="" coords="199,13,321,38"/>
+</map>

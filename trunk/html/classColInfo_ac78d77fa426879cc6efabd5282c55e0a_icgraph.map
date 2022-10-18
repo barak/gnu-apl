@@ -1,0 +1,13 @@
+<map id="ColInfo::total_len" name="ColInfo::total_len">
+<area shape="rect" id="node1" title="the total length" alt="" coords="1501,71,1623,97"/>
+<area shape="rect" id="node2" href="$classPrintBuffer.html#ab939341e6e27bf73584db5adeafdd07e" title="align this real&#45;only PrintBuffer to col" alt="" coords="1309,71,1453,97"/>
+<area shape="rect" id="node3" href="$classPrintBuffer.html#a86a56d7bdb48737a037db660dd7f313a" title="align this PrintBuffer to col" alt="" coords="1143,71,1261,97"/>
+<area shape="rect" id="node4" href="$classPrintBuffer.html#a47de98d96a3326a1b8734e6242ea1ee5" title="append ucs, aligned at char align." alt="" coords="940,35,1075,75"/>
+<area shape="rect" id="node10" href="$classPrintBuffer.html#adb9b7f5903b37ffeae4de10ada9cfc6d" title="helper for non&#45;trivial PrintBuffer(const Value &amp; ...) constructor" alt="" coords="920,99,1095,125"/>
+<area shape="rect" id="node5" href="$classBif__F12__FORMAT.html#a1dd354ab627b5eef74f5c49b79a786e9" title="add a row (consisting of data) to PrintBuffer ret" alt="" coords="685,42,872,67"/>
+<area shape="rect" id="node6" href="$classBif__F12__FORMAT.html#ad7f677afc847fa6df13f16decdecd992" title="A character array with one column of B formatted by specification." alt="" coords="463,35,637,75"/>
+<area shape="rect" id="node7" href="$classBif__F12__FORMAT.html#ad945541c06e489c1079ae401f4d1db28" title="A character array with B formatted by specification." alt="" coords="240,35,415,75"/>
+<area shape="rect" id="node8" href="$classBif__F12__DOMINO_1_1Matrix.html#ad45f8929c6f666dea17836a79c657456" title="print debug infos for this real matrix" alt="" coords="12,5,185,45"/>
+<area shape="rect" id="node9" href="$classBif__F12__FORMAT.html#a5164cf7d2b85131b9c9fa11c3239602a" title="Overloaded Function::eval_AB()" alt="" coords="5,70,192,95"/>
+<area shape="rect" id="node11" href="$classPrintBuffer.html#a5abec40efca2993a2b522e199694730f" title="contructor: a PrintBuffer from an APL value" alt="" coords="701,99,856,125"/>
+</map>

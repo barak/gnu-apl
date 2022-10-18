@@ -1,0 +1,10 @@
+<map id="Workspace::get_symbol_table" name="Workspace::get_symbol_table">
+<area shape="rect" id="node2" href="$classDoxy.html#ad8abe2e8a1b686a7b35e582c369d41ae" title="generate the entire documentation " alt="" coords="254,5,337,32"/>
+<area shape="rect" id="node4" href="$classXML__Saving__Archive.html#acc327395cab545ea7797d92f5c931cab" title="write entire workspace " alt="" coords="222,57,369,98"/>
+<area shape="rect" id="node8" href="$classWorkspace.html#a7ffca45a4446b644e7caf093a1699ba2" title="write symbols for )OUT command " alt="" coords="216,123,375,149"/>
+<area shape="rect" id="node3" href="$classCommand.html#a834eac0e797a5d1c992018b7d0c049a4" title="]DOXY: create doxygen&#45;like documentation of the current workspace " alt="" coords="423,5,583,32"/>
+<area shape="rect" id="node5" href="$classWorkspace.html#a8a4f1d898d523818dbd9d7efa6f2cf92" title="save this workspace " alt="" coords="426,64,579,91"/>
+<area shape="rect" id="node6" href="$classCommand.html#ad61e749290966d00856ce1dd4f6abe42" title=")SAVE active WS as CONTINUE and )OFF " alt="" coords="631,39,824,65"/>
+<area shape="rect" id="node7" href="$classCommand.html#ab17fe02c2ece3341b2ea51fee69f0cfd" title=")SAVE: save a workspace file (.xml) " alt="" coords="648,89,807,116"/>
+<area shape="rect" id="node9" href="$classCommand.html#a4afcbbdbee3fd2f536db12651861110b" title=")OUT: export a workspace file " alt="" coords="427,123,578,149"/>
+</map>

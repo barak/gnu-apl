@@ -1,0 +1,4 @@
+<map id="FloatCell::is_big" name="FloatCell::is_big">
+<area shape="rect" id="node1" title="return true if the integer part of val is longer than ⎕PP" alt="" coords="212,5,328,31"/>
+<area shape="rect" id="node2" href="$classFloatCell.html#af74c3b872fffd4c8ff3f95106793bbe8" title="Return true iff the (fixed point) floating point number num shall be printed in scaled form (like 1...." alt="" coords="5,5,164,31"/>
+</map>

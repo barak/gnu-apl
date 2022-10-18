@@ -1,3 +1,4 @@
 <map id="APL_Float_Base::pAPL_Float" name="APL_Float_Base::pAPL_Float">
-<area shape="rect" id="node2" href="$classAPL__Float__Base.html#a93432cc2e625b39bc3dd0ff19263cb4b" title="return the value as double " alt="" coords="213,13,367,39"/>
+<area shape="rect" id="node1" title="up&#45;cast APL_Float_Base * to APL_Float *" alt="" coords="5,29,165,69"/>
+<area shape="rect" id="node2" href="$classAPL__Float__Base.html#ac0f3239468a7742311f611abbf55a167" title="up&#45;cast const APL_Float_Base * to const APL_Float *" alt="" coords="213,29,373,69"/>
 </map>

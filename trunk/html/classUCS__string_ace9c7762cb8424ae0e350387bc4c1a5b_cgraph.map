@@ -1,0 +1,4 @@
+<map id="UCS_string::starts_with" name="UCS_string::starts_with">
+<area shape="rect" id="node1" title="return true if this starts with prefix (case sensitive)." alt="" coords="5,5,168,31"/>
+<area shape="rect" id="node2" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="216,5,339,31"/>
+</map>

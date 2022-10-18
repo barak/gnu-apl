@@ -1,0 +1,4 @@
+<map id="Command::check_redefinition" name="Command::check_redefinition">
+<area shape="rect" id="node1" title="check if a command is being redefined" alt="" coords="5,13,200,38"/>
+<area shape="rect" id="node2" href="$classWorkspace.html#a9d95fe58db1301e25929139af7bbe15f" title="Return all user&#45;defined commands." alt="" coords="248,5,395,45"/>
+</map>

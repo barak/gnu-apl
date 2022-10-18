@@ -1,8 +1,9 @@
 <map id="Bif_F12_SORT" name="Bif_F12_SORT">
-<area shape="rect" id="node6" href="$classBif__F12__SORT__ASC.html" title="The class implementing ⍋ " alt="" coords="5,379,152,405"/>
-<area shape="rect" id="node7" href="$classBif__F12__SORT__DES.html" title="The class implementing ⍒ " alt="" coords="176,379,323,405"/>
-<area shape="rect" id="node2" href="$classNonscalarFunction.html" title="Base class for all internal non&#45;scalar functions of the interpreter. " alt="" coords="99,229,229,256"/>
-<area shape="rect" id="node3" href="$classPrimitiveFunction.html" title="Base class for all internal functions of the interpreter. " alt="" coords="103,155,225,181"/>
-<area shape="rect" id="node4" href="$classFunction.html" title="Base class for all APL functions and operators (system or defined) " alt="" coords="128,80,200,107"/>
-<area shape="rect" id="node5" href="$classNamedObject.html" title="A user&#45;defined variable or function. " alt="" coords="113,5,215,32"/>
+<area shape="rect" id="node1" title="Base class for ⍋ and ⍒" alt="" coords="109,299,219,324"/>
+<area shape="rect" id="node6" href="$classBif__F12__SORT__ASC.html" title="The class implementing ⍋" alt="" coords="5,372,152,397"/>
+<area shape="rect" id="node7" href="$classBif__F12__SORT__DES.html" title="The class implementing ⍒" alt="" coords="176,372,323,397"/>
+<area shape="rect" id="node2" href="$classNonscalarFunction.html" title="Base class for all internal non&#45;scalar functions of the interpreter." alt="" coords="99,225,229,251"/>
+<area shape="rect" id="node3" href="$classPrimitiveFunction.html" title="Base class for all internal functions of the interpreter." alt="" coords="103,152,225,177"/>
+<area shape="rect" id="node4" href="$classFunction.html" title="Base class for all APL functions and operators (system or defined)" alt="" coords="128,79,200,104"/>
+<area shape="rect" id="node5" href="$classNamedObject.html" title="A user&#45;defined variable or function." alt="" coords="113,5,215,31"/>
 </map>

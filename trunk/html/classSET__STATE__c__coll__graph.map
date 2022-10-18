@@ -1,7 +1,8 @@
 <map id="SET_STATE_c" name="SET_STATE_c">
-<area shape="rect" id="node2" href="$classSignal__base.html" title="the base class for all signal classes " alt="" coords="223,5,317,32"/>
-<area shape="rect" id="node3" href="$classSig__item__xint.html" title="Sig_item_xint\&lt; uint64\l_t, 8 \&gt;" alt="" coords="196,57,344,98"/>
-<area shape="rect" id="node4" href="$classSig__item__int.html" title="Sig_item_int\&lt; uint64\l_t, bytes \&gt;" alt="" coords="5,57,147,98"/>
-<area shape="rect" id="node5" href="$classSig__item__string.html" title="a string signal item of size bytes " alt="" coords="214,123,326,149"/>
-<area shape="rect" id="node6" href="$classSig__item__int.html" title="Sig_item_int\&lt; uint16\l_t, 1 \&gt;" alt="" coords="199,174,341,215"/>
+<area shape="rect" id="node1" title="APserver request: set state of shared var key." alt="" coords="483,95,595,120"/>
+<area shape="rect" id="node2" href="$classSignal__base.html" title="the base class for all signal classes" alt="" coords="249,5,342,31"/>
+<area shape="rect" id="node3" href="$classSig__item__xint.html" title=" " alt="" coords="221,55,369,95"/>
+<area shape="rect" id="node4" href="$classSig__item__int.html" title="an integer signal item of size bytes" alt="" coords="5,63,172,88"/>
+<area shape="rect" id="node5" href="$classSig__item__int.html" title=" " alt="" coords="225,119,366,159"/>
+<area shape="rect" id="node6" href="$classSig__item__string.html" title="a string signal item of size bytes" alt="" coords="239,184,351,209"/>
 </map>

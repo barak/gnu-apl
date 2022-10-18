@@ -1,0 +1,4 @@
+<map id="Value::get_cproto" name="Value::get_cproto">
+<area shape="rect" id="node1" title="return the first element of the ravel (which is always present) same as get_first(),..." alt="" coords="148,5,272,31"/>
+<area shape="rect" id="node2" href="$classValue.html#ae9ed3cf5066ae8ab15514c1470c8de4c" title="return a deep copy of this value" alt="" coords="5,5,100,31"/>
+</map>

@@ -1,0 +1,11 @@
+<map id="InputFile::current_filename" name="InputFile::current_filename">
+<area shape="rect" id="node1" title="the name of the currrent file" alt="" coords="843,99,963,139"/>
+<area shape="rect" id="node2" href="$classNabla.html#a610d94a179335126e82e9eea07918d5a" title="edit this function" alt="" coords="663,5,748,31"/>
+<area shape="rect" id="node3" href="$classIO__Files.html#aa05a2917c11a88b9abfc4afa6ca04a3e" title="dito (close files, print errors, summary etc)." alt="" coords="379,57,568,83"/>
+<area shape="rect" id="node7" href="$structInputFile.html#ade3c052ce91c9b15b90566e5dc028141" title="open current file unless already open" alt="" coords="616,107,795,132"/>
+<area shape="rect" id="node8" href="$classIO__Files.html#aa29d2b92365b65b91d6db6288d55ae5d" title="open the next test file" alt="" coords="392,107,555,132"/>
+<area shape="rect" id="node9" href="$classVH__entry.html#ae4a4efcf39e0a7e046ad6c46f63356eb" title="Constructor: event for val." alt="" coords="635,208,775,233"/>
+<area shape="rect" id="node4" href="$classIO__Files.html#acc91875b8e0c7a5ad44e3ead0e3dda7b" title="get one line from the current file, open the next file if necceessary" alt="" coords="183,57,331,83"/>
+<area shape="rect" id="node6" href="$classIO__Files.html#a5ac43f7fe811ca95a419f8ba7a11682e" title="close current testcase file (prematurely) and opem mext one" alt="" coords="193,107,321,132"/>
+<area shape="rect" id="node5" href="$classInputMux.html#a8a79cbe5207cde162fb36133ad9defdd" title="get one line" alt="" coords="5,57,135,83"/>
+</map>

@@ -1,4 +1,5 @@
 <map id="OFFERING_PROCS_ARE_c" name="OFFERING_PROCS_ARE_c">
-<area shape="rect" id="node2" href="$classSignal__base.html" title="the base class for all signal classes " alt="" coords="5,5,99,32"/>
-<area shape="rect" id="node3" href="$classSig__item__string.html" title="a string signal item of size bytes " alt="" coords="123,5,235,32"/>
+<area shape="rect" id="node1" title="APserver result for: get offering processors (⎕SVQ)" alt="" coords="17,93,212,119"/>
+<area shape="rect" id="node2" href="$classSignal__base.html" title="the base class for all signal classes" alt="" coords="5,5,99,31"/>
+<area shape="rect" id="node3" href="$classSig__item__string.html" title="a string signal item of size bytes" alt="" coords="123,5,235,31"/>
 </map>

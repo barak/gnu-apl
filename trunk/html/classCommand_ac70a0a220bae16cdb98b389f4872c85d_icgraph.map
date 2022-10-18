@@ -1,0 +1,9 @@
+<map id="Command::log_control" name="Command::log_control">
+<area shape="rect" id="node2" href="$classCommand.html#a9903751e0c1e4659a85434234b27491e" title="control logging facilities " alt="" coords="222,35,371,61"/>
+<area shape="rect" id="node3" href="$classCommand.html#a2f17c91a8b65e540a207da7c3be94dec" title="execute a user defined command " alt="" coords="207,85,387,112"/>
+<area shape="rect" id="node4" href="$classCommand.html#ac143785ae5217051a7ef49bcbde1893c" title="process line which contains an APL command. Return true iff the command was user&#45;defined (and then th..." alt="" coords="435,85,635,112"/>
+<area shape="rect" id="node5" href="$libapl_8cc.html#aadeef19266424a9a07fa07b254532939" title="apl_command" alt="" coords="724,5,827,32"/>
+<area shape="rect" id="node6" href="$libapl_8cc.html#a45b57f1bcb5092caf61c82b5b2e60dea" title="apl_command_ucs" alt="" coords="710,56,841,83"/>
+<area shape="rect" id="node7" href="$classBif__F1__EXECUTE.html#a8445cd77207db38ab66f5c3278a831df" title="execute string containing an APL command " alt="" coords="683,107,868,149"/>
+<area shape="rect" id="node8" href="$classCommand.html#ae26693534d4df16372f51e55e505b8d7" title="process line which contains a command or statements " alt="" coords="694,173,857,200"/>
+</map>

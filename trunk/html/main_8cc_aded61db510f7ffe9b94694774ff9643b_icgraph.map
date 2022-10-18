@@ -1,0 +1,4 @@
+<map id="signal_SEGV_handler" name="signal_SEGV_handler">
+<area shape="rect" id="node1" title="signal handler for segfaults" alt="" coords="116,5,265,31"/>
+<area shape="rect" id="node2" href="$main_8cc.html#aa0321421b17def7b58fc0cabc8890260" title="initialize the interpreter" alt="" coords="5,5,68,31"/>
+</map>

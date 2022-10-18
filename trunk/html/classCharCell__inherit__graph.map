@@ -1,3 +1,4 @@
 <map id="CharCell" name="CharCell">
-<area shape="rect" id="node2" href="$classCell.html" title="The base class for all Cells. " alt="" coords="19,5,65,32"/>
+<area shape="rect" id="node1" title="A Cell containing a single Unicode character." alt="" coords="5,79,79,104"/>
+<area shape="rect" id="node2" href="$classCell.html" title="The base class for all Cells." alt="" coords="19,5,65,31"/>
 </map>

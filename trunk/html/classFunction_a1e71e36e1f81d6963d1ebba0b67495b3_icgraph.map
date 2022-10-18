@@ -1,0 +1,7 @@
+<map id="Function::get_exec_properties" name="Function::get_exec_properties">
+<area shape="rect" id="node2" href="$classQuad__CR.html#ad98ce37f2b329eb37ddae9d0fcf7832f" title="10 ⎕CR symbol_name (variable or function name). Also used for )OUT " alt="" coords="195,5,337,32"/>
+<area shape="rect" id="node3" href="$classFunction.html#ac48150e2a6e8797e78d74ba9e9967de2" title="store the attributes (as per ⎕AT) of symbol in Z, ... " alt="" coords="187,56,345,83"/>
+<area shape="rect" id="node6" href="$classXML__Saving__Archive.html#a40ab403b1e7dd05196c9b36c8678a140" title="write user&#45;defined function fun " alt="" coords="193,107,339,149"/>
+<area shape="rect" id="node4" href="$classSymbol.html#ab25b15a68f43d4a770d783e09b8ba30b" title="store the attributes (as per ⎕AT) of symbol in Z... " alt="" coords="393,56,547,83"/>
+<area shape="rect" id="node5" href="$classQuad__AT.html#a448f15072466e3d72daa9bed9e739c29" title="overloaded Function::eval_AB(). " alt="" coords="595,56,729,83"/>
+</map>

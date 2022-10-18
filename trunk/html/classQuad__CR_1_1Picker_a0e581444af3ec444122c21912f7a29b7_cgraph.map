@@ -1,0 +1,9 @@
+<map id="Quad_CR::Picker::get" name="Quad_CR::Picker::get">
+<area shape="rect" id="node1" title="varname or pick of varname" alt="" coords="5,136,156,162"/>
+<area shape="rect" id="node2" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="639,30,779,55"/>
+<area shape="rect" id="node3" href="$classUCS__string.html#a8111c41576c13b04095ddb7df13eddd3" title="append shape (in APL encoding tke left arg of ↑) this string" alt="" coords="224,100,364,140"/>
+<area shape="rect" id="node5" href="$classShape.html#a017e9a35dd20f4bc4fdeb7ea29b6805d" title="return the rank" alt="" coords="453,164,570,190"/>
+<area shape="rect" id="node7" href="$classUCS__string.html#ace70327ef899c525ad9c3f2bffd43697" title="append 0&#45;terminated UTF8 string str to this UCS_string." alt="" coords="204,215,384,240"/>
+<area shape="rect" id="node4" href="$classUCS__string.html#a5776e51c6faa53537409322cd0ebf07a" title="append number (in ASCII encoding like d) to this string" alt="" coords="441,50,581,90"/>
+<area shape="rect" id="node6" href="$classShape.html#a592d2ade68aa8c21c5d84627c3a0e001" title="return the length of dimension r" alt="" coords="432,115,591,140"/>
+</map>

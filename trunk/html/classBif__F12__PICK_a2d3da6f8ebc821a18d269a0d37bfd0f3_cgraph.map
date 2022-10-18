@@ -1,0 +1,12 @@
+<map id="Bif_F12_PICK::pick" name="Bif_F12_PICK::pick">
+<area shape="rect" id="node1" title="Pick from B according to cA and len_A. cell_owner is non&#45;zero if a left&#45;vlues is picked,..." alt="" coords="5,107,144,132"/>
+<area shape="rect" id="node2" href="$classCell.html#a2bb41deb2c1209725e934f2397d339ca" title="Return the APL value of a cell (Asserts for non&#45;lval cells)" alt="" coords="193,5,329,31"/>
+<area shape="rect" id="node3" href="$classCell.html#a367b9df7e0d4b805e5f31641658113f6" title="Return the APL value of a cell (Asserts for non&#45;pointer cells)" alt="" coords="381,57,535,83"/>
+<area shape="rect" id="node6" href="$classCell.html#af8746e4049278c9a46f25e6ee0d71fcc" title="Return true iff this cell is a pointer to a cell." alt="" coords="203,221,320,247"/>
+<area shape="rect" id="node7" href="$classCell.html#ae98b3988a7fa52c6c157b4911b043dde" title="Return true iff this cell is a pointer (to a sub&#45;array) cell." alt="" coords="390,109,526,135"/>
+<area shape="rect" id="node8" href="$classBif__F12__PICK.html#a48b99ace1315e367ae54821c7cc6ba17" title="compute the offset of the Cell in B that shall be picked." alt="" coords="192,157,331,197"/>
+<area shape="rect" id="node4" href="$classCell.html#a38a6a25f0ad091f35e3d9abfe5608a50" title="return the type of this cell" alt="" coords="605,33,735,59"/>
+<area shape="rect" id="node5" href="$classCell.html#a6c3fdef3d82f53649d1c3f16d37eedd7" title="the name of ct" alt="" coords="585,83,755,108"/>
+<area shape="rect" id="node9" href="$classCell.html#acad8d4255191ceae01a96c778debeb83" title="Return value if it is close to int, or else throw DOMAIN_ERROR." alt="" coords="396,163,520,188"/>
+<area shape="rect" id="node10" href="$classShape.html#a592d2ade68aa8c21c5d84627c3a0e001" title="return the length of dimension r" alt="" coords="379,212,537,237"/>
+</map>

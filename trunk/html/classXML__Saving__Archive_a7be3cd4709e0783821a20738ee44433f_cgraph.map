@@ -1,0 +1,38 @@
+<map id="XML_Saving_Archive::emit_token_val" name="XML_Saving_Archive::emit_token_val">
+<area shape="rect" id="node1" title="emit a token value up to (excluding) the &#39;&gt;&#39; of the end token" alt="" coords="5,405,152,445"/>
+<area shape="rect" id="node2" href="$classXML__Saving__Archive.html#a161f686e1065cddaf30ab5c06f4a56a1" title="return the index of val in values" alt="" coords="204,17,351,57"/>
+<area shape="rect" id="node4" href="$classValue__P__Base.html#a1c3bf1b6f708eb2c1ba4b97c83adb9aa" title="return a const pointer to the Value" alt="" coords="210,84,345,109"/>
+<area shape="rect" id="node5" href="$classToken.html#a205e0b499e06999ff91c272ff28c9013" title="return the Value_P value of this token. The token could be TOK_NO_VALUE; in that case VALUE_ERROR is ..." alt="" coords="211,133,343,159"/>
+<area shape="rect" id="node8" href="$classToken.html#a1a31afbb07e3f1dbb86d5f872ce5c297" title="return the TokenValueType of this token." alt="" coords="644,384,797,409"/>
+<area shape="rect" id="node9" href="$classToken.html#aaeae570a5fa2e6a83ca2b824c6013ef9" title="return the Unicode value of this token" alt="" coords="424,235,564,260"/>
+<area shape="rect" id="node10" href="$classToken.html#a74ebddaf8dce2b11c59cddfb61594816" title="return the complex imag value of this token" alt="" coords="421,284,567,309"/>
+<area shape="rect" id="node11" href="$classToken.html#a2a53219afbfd9ec64b5dd449c225ed68" title="return the complex real value of this token" alt="" coords="424,333,564,359"/>
+<area shape="rect" id="node12" href="$classToken.html#abbcd765b2cb1c9da24d762ca451eefa4" title="return the float value of this token" alt="" coords="214,387,341,412"/>
+<area shape="rect" id="node13" href="$classToken.html#a785302e067658aeeeb65a45815b9d9da" title="return the Function_Line value of this token" alt="" coords="209,436,345,461"/>
+<area shape="rect" id="node14" href="$classToken.html#a4d19f279ca06bc64e549c9d63ca677b0" title="return the Function_P value of this token" alt="" coords="209,485,346,511"/>
+<area shape="rect" id="node16" href="$classToken.html#acccc54a6daf952041d1a7633a1c22758" title="return the IndexExpr value of this token" alt="" coords="204,535,351,560"/>
+<area shape="rect" id="node17" href="$classToken.html#a9721c23968d7272edd1abae91ba77193" title="return the integer value of this token" alt="" coords="213,584,342,609"/>
+<area shape="rect" id="node18" href="$classSymbol.html#a126fc214ca7a2e2d364e0982a36b2ace" title="The name of this Symbol." alt="" coords="212,633,343,659"/>
+<area shape="rect" id="node19" href="$classIndexExpr.html#a7bb1bdcdda0c546a5defe28fda90d252" title="return the number of values (= number of semicolons + 1), including elided indices" alt="" coords="208,683,347,708"/>
+<area shape="rect" id="node20" href="$classToken.html#a7ca97b588068b17bd396d8ae9d30ea7a" title="return the Symbol * value of this token" alt="" coords="208,732,347,757"/>
+<area shape="rect" id="node21" href="$classXML__Saving__Archive.html#a5a8c95da48ffd10d3b5d852f35ab3809" title="write either the name and SI&#45;level of user&#45;defined function or the id of a system function...." alt="" coords="200,794,355,834"/>
+<area shape="rect" id="node3" href="$structXML__Saving__Archive_1_1__val__par.html#aa244b5ee23bfb8318a5267cc3e48221b" title="compare function for bsearch()" alt="" coords="421,5,567,60"/>
+<area shape="rect" id="node6" href="$unionToken_1_1sval.html#a22a0be9d3742c2a8168e59d530dd659e" title="a shortcut for accessing apl_val" alt="" coords="421,84,567,109"/>
+<area shape="rect" id="node7" href="$classToken.html#a11e37aa69b8eb64f293702293b00f50c" title="return true iff this token is an apl value" alt="" coords="432,133,556,159"/>
+<area shape="rect" id="node15" href="$classToken.html#abe9f60f29fc7644214b48cc2715a21ad" title="return true if this token is a function (or operator)" alt="" coords="429,485,559,511"/>
+<area shape="rect" id="node22" href="$classSymbol.html#a52ab7a2e913aebd9c3a1da4061f9a31a" title="return the depth (global == 0) of ufun on the stack. Use the largest depth if ufun is pushed multiple..." alt="" coords="415,687,573,727"/>
+<area shape="rect" id="node26" href="$classFunction.html#a4d321dbaeb262169b114f23de61e1d30" title="return a pointer to this UserFunction (if it is one)" alt="" coords="413,752,575,777"/>
+<area shape="rect" id="node27" href="$classNamedObject.html#a3ff29d3b8f3eed6c55f535e1af8dbc91" title="return the Id of this object (ID_USER_SYMBOL for user defined objects)" alt="" coords="421,801,567,827"/>
+<area shape="rect" id="node28" href="$classUserFunction.html#a59a4ca14c199edd678c1f10ba95e2f43" title="return the name of this function" alt="" coords="411,851,577,876"/>
+<area shape="rect" id="node30" href="$classFunction.html#af2588ccbf97a2a9ad1a2169c04b63bf4" title="return true iff this function is a derived function" alt="" coords="425,900,563,925"/>
+<area shape="rect" id="node31" href="$classWorkspace.html#a99b1f4c9234de25fdf6f5a320d18fb57" title="lookup an existing user defined symbol. If not found, create one (unless this would be a quad symbol)" alt="" coords="403,949,585,975"/>
+<area shape="rect" id="node23" href="$classValueStackItem.html#a3a9ea0ee5b4129f7e5aa4a92c851abfd" title="return the function (caller must have checked NC_FUNOPER)." alt="" coords="650,630,791,670"/>
+<area shape="rect" id="node24" href="$classValueStackItem.html#a27453c0dfda1004c6f5e68a0c2530eae" title="return the name class for this ValueStackItem" alt="" coords="637,695,805,720"/>
+<area shape="rect" id="node25" href="$classSymbol.html#ada4b68d3cdfdd1ec7228cb65ef9a1062" title="return the size of the value stack" alt="" coords="633,744,808,769"/>
+<area shape="rect" id="node29" href="$classUserFunction__header.html#abcc2f6d70da90e3123e630a226b9e931" title="return the name of the function" alt="" coords="647,843,794,883"/>
+<area shape="rect" id="node32" href="$classSymbolTable.html#a678844569da04a269614ef39a1057589" title="Return or create a Symbol with name ucs in this SymbolTable." alt="" coords="649,942,793,982"/>
+<area shape="rect" id="node33" href="$classSymbolTableBase.html#a8b6fdeffe7abdc7b3163d07befa9962a" title="add sym to the symbol table. The caller has checked that new_name does not yet exist in the symbol ta..." alt="" coords="856,824,1068,879"/>
+<area shape="rect" id="node34" href="$classSymbolTableBase.html#ad231d005a78e9d44f0536aeb1caea62c" title="compute a 16&#45;bit hash for name" alt="" coords="856,903,1068,957"/>
+<area shape="rect" id="node35" href="$classAvec.html#a88cc8af75e4a2c4d8a1d382637ca07b4" title="return true if unicode uni is a quad (⎕ or ▯)" alt="" coords="909,981,1015,1007"/>
+<area shape="rect" id="node36" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="901,1031,1023,1056"/>
+</map>

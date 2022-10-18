@@ -1,0 +1,7 @@
+<map id="Cell::bif_or" name="Cell::bif_or">
+<area shape="rect" id="node1" title="store the logical OR of A and this cell in Z" alt="" coords="227,80,312,105"/>
+<area shape="rect" id="node2" href="$classBif__F2__OR.html#a3c8f98bc174001f08dcb1a040944ee23" title="overloaded Function::eval_AB()." alt="" coords="20,5,164,31"/>
+<area shape="rect" id="node3" href="$classBif__F2__OR.html#a5031dcee13017e77a4277d03dad1721d" title="overloaded Function::eval_AXB()." alt="" coords="15,55,169,80"/>
+<area shape="rect" id="node4" href="$classBif__F2__OR.html#aada0ca622b7af8abb4607b60422f068b" title="return the associative cell function of this function" alt="" coords="15,104,169,129"/>
+<area shape="rect" id="node5" href="$classBif__F2__OR.html#a9f8bc0c97e6d3556ce04f0ce7ff76da2" title="overloaded Function::get_scalar_f2" alt="" coords="5,153,179,179"/>
+</map>

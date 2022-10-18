@@ -1,0 +1,5 @@
+<map id="XML_node::matches" name="XML_node::matches">
+<area shape="rect" id="node1" title="return true iff end_tag matches this start tag" alt="" coords="5,13,148,38"/>
+<area shape="rect" id="node2" href="$classXML__node.html#a6ef0db71846deb6a0a4318d8388edca2" title="return true if uni is a validchar" alt="" coords="196,13,369,38"/>
+<area shape="rect" id="node3" href="$classXML__node.html#a2a35cbd734b00030af77d2c652008f3a" title="return true if uni is a valid first char in an XML tag name" alt="" coords="417,5,548,45"/>
+</map>

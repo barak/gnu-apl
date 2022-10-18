@@ -1,0 +1,8 @@
+<map id="IntCell::equal" name="IntCell::equal">
+<area shape="rect" id="node1" title="overloaded Cell::equal()" alt="" coords="5,80,104,105"/>
+<area shape="rect" id="node2" href="$classCell.html#a4cb1f7ae7e4ad956ec55f1d507a0e938" title="return true if this cell is equal to other" alt="" coords="178,5,262,31"/>
+<area shape="rect" id="node4" href="$classCell.html#ad165f9ab69abf46b2cf44d301a700a1c" title="Return the integer value of a cell." alt="" coords="155,55,285,80"/>
+<area shape="rect" id="node5" href="$classCell.html#a30d0c83ab2c46ef830cd1301c77eb772" title="Return true iff this cell is an integer cell." alt="" coords="152,104,288,129"/>
+<area shape="rect" id="node6" href="$classCell.html#a4ce158d2f937ff444732ec5c43a5093f" title="Return true iff this cell is an integer, float, or complex cell." alt="" coords="162,153,278,179"/>
+<area shape="rect" id="node3" href="$classCell.html#ad08fb9a79b3c5b38d92bf5ef4bf47145" title="return the name of the class" alt="" coords="336,5,477,31"/>
+</map>

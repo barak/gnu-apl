@@ -1,0 +1,4 @@
+<map id="ucs_to_codepoints" name="ucs_to_codepoints">
+<area shape="rect" id="node2" href="$classUCS__string_1_1iterator.html#a7f7dd0029f880842ee36bb2566300bda" title="return true iff there are more chars in the string " alt="" coords="184,5,323,47"/>
+<area shape="rect" id="node3" href="$classUCS__string_1_1iterator.html#a23713ff134e82418920d093150df877f" title="return next char " alt="" coords="184,71,323,112"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="InputFile::set_COPY" name="InputFile::set_COPY">
+<area shape="rect" id="node1" title="set the from_COPY flag" alt="" coords="676,80,819,105"/>
+<area shape="rect" id="node2" href="$classWorkspace.html#a25b1479320040415ecbe9fb7466743d7" title="load )DUMPed file from open file descriptor fd (closes fd)" alt="" coords="461,80,628,105"/>
+<area shape="rect" id="node3" href="$classWorkspace.html#a20b0659f2d3987a4bb21d6c399e0a436" title="copy objects from another workspace" alt="" coords="260,55,413,80"/>
+<area shape="rect" id="node6" href="$classWorkspace.html#a77c7b25908cf2479dc087cc3bcf44dcb" title="load lib_ws into the_workspace, maybe set ⎕LX of the new WS." alt="" coords="262,104,411,129"/>
+<area shape="rect" id="node4" href="$classCommand.html#a51b8fbdb5d65baf2fddfc930b9b142cf" title=")COPY: copy a workspace file" alt="" coords="29,5,189,31"/>
+<area shape="rect" id="node5" href="$classCommand.html#a2f7425e3673258dfb78045919e82f69f" title=")COPY_ONCE: copy a workspace file, nut at most once" alt="" coords="5,55,212,80"/>
+<area shape="rect" id="node7" href="$classCommand.html#ad222a6de11eb55501624a4d0dea3a464" title=")LOAD: load a workspace file" alt="" coords="29,104,188,129"/>
+</map>

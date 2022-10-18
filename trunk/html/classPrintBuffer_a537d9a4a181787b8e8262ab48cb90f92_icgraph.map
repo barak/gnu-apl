@@ -1,0 +1,8 @@
+<map id="PrintBuffer::get_info" name="PrintBuffer::get_info">
+<area shape="rect" id="node2" href="$classPointerCell.html#acccd604366a71acc67657ce5e4f034e0" title="the Quad_CR representation of this cell " alt="" coords="205,5,353,47"/>
+<area shape="rect" id="node4" href="$classComplexCell.html#a59526d0bf663861a811c939ab6308fcd" title="the Quad_CR representation of this cell. " alt="" coords="200,71,359,112"/>
+<area shape="rect" id="node6" href="$classPrintBuffer.html#adb9b7f5903b37ffeae4de10ada9cfc6d" title="helper for non&#45;trivial PrintBuffer(const Value &amp; ...) constructor " alt="" coords="192,137,367,163"/>
+<area shape="rect" id="node3" href="$classPointerCell.html#ada09bbf55cb9d549f4ad75d67b5c41a5" title="overloaded Cell::is_pointer_cell() " alt="" coords="415,13,592,39"/>
+<area shape="rect" id="node5" href="$classComplexCell.html#a978a6ef7d34a3446b796a0597c05d074" title="Overloaded Cell::is_finite(). " alt="" coords="428,78,579,105"/>
+<area shape="rect" id="node7" href="$classPrintBuffer.html#a5abec40efca2993a2b522e199694730f" title="contructor: a PrintBuffer from an APL value " alt="" coords="426,137,581,163"/>
+</map>

@@ -1,0 +1,28 @@
+<map id="UCS_string::insert" name="UCS_string::insert">
+<area shape="rect" id="node1" title="more intuitive insert() function" alt="" coords="1411,244,1541,269"/>
+<area shape="rect" id="node2" href="$classLineEditContext.html#a671132bb9b96df8ace2ec1146bc486d6" title="insert uni at cursor position" alt="" coords="1176,107,1363,132"/>
+<area shape="rect" id="node6" href="$classUCS__string.html#a5ee12a6873e023f9ad76ffafd7aa9c20" title="prepend character uni" alt="" coords="1197,215,1341,240"/>
+<area shape="rect" id="node18" href="$classUCS__string.html#a6a6dd45662d5d5024b50ba031c2c6ac6" title="round last digit and discard it. Note that this is always expected to be in floating point format and..." alt="" coords="1190,265,1349,305"/>
+<area shape="rect" id="node26" href="$classUCS__string.html#aa1e49e488f5c1093a83b7c3aa4009d70" title="constructor: UCS_string from a double with quad_pp valid digits. (eg. 3.33 has 3 digits),..." alt="" coords="1186,329,1353,355"/>
+<area shape="rect" id="node3" href="$classLineInput.html#a81610349f86404c67f583eb296666bb1" title="get a line from from user" alt="" coords="978,47,1109,72"/>
+<area shape="rect" id="node4" href="$classLineInput.html#a96f6a9062450af940d63ecff847646e4" title="get a line from the user" alt="" coords="723,5,905,31"/>
+<area shape="rect" id="node5" href="$classInputMux.html#a8a79cbe5207cde162fb36133ad9defdd" title="get one line" alt="" coords="501,31,631,56"/>
+<area shape="rect" id="node7" href="$classCommand.html#ad5c9241b1bb935841fe3c0d81546b7b3" title="process a single line entered by the user (in immediate execution mode)" alt="" coords="962,161,1125,187"/>
+<area shape="rect" id="node14" href="$classWorkspace.html#ad8aedac4ca9e22cc8881d07eef87dcfe" title="set or inquire the workspace ID" alt="" coords="982,268,1105,293"/>
+<area shape="rect" id="node8" href="$classCommand.html#a879617e7645bea2e4052154f16999634" title="finish the current SI&#45;&gt;top() and pop it when done" alt="" coords="729,104,899,129"/>
+<area shape="rect" id="node11" href="$classIO__Files.html#acc91875b8e0c7a5ad44e3ead0e3dda7b" title="get one line from the current file, open the next file if necceessary" alt="" coords="740,55,888,80"/>
+<area shape="rect" id="node12" href="$classWorkspace.html#a8c147249a197f0d605f7cfc535969c92" title="create and execute one immediate execution context" alt="" coords="736,154,892,194"/>
+<area shape="rect" id="node13" href="$main_8cc.html#aa0321421b17def7b58fc0cabc8890260" title="initialize the interpreter" alt="" coords="783,219,845,244"/>
+<area shape="rect" id="node9" href="$classCommand.html#af36741357bfd4e183b34ee8b747bc7c5" title="process line which contains APL statements" alt="" coords="463,104,669,129"/>
+<area shape="rect" id="node10" href="$classCommand.html#ae26693534d4df16372f51e55e505b8d7" title="process line which contains a command or statements" alt="" coords="246,104,409,129"/>
+<area shape="rect" id="node15" href="$classCommand.html#ad61e749290966d00856ce1dd4f6abe42" title=")SAVE active WS as CONTINUE and )OFF" alt="" coords="717,268,911,293"/>
+<area shape="rect" id="node16" href="$classWorkspace.html#a77c7b25908cf2479dc087cc3bcf44dcb" title="load lib_ws into the_workspace, maybe set ⎕LX of the new WS." alt="" coords="739,317,889,343"/>
+<area shape="rect" id="node17" href="$classCommand.html#ad222a6de11eb55501624a4d0dea3a464" title=")LOAD: load a workspace file" alt="" coords="487,317,645,343"/>
+<area shape="rect" id="node19" href="$classUCS__string.html#ac119f7bfd8799ce0ccf54a4002bb6029" title="convert the double value to an UCS_string in fixed point format (with fract_digits fractional digits)..." alt="" coords="959,367,1128,407"/>
+<area shape="rect" id="node20" href="$classBif__F12__FORMAT.html#a9d12f7ec1f6ecd8def2dd073c2a7794d" title="format value with precision mantissa digits (floating format)" alt="" coords="727,367,901,407"/>
+<area shape="rect" id="node25" href="$classUCS__string.html#a62918fcda706b9c19dd63d0d9666bd09" title="convert the double value to an UCS_string scaled (exponential) format (with fract_digits fractional d..." alt="" coords="729,431,899,471"/>
+<area shape="rect" id="node21" href="$classBif__F12__FORMAT.html#ad7f677afc847fa6df13f16decdecd992" title="A character array with one column of B formatted by specification." alt="" coords="479,411,653,451"/>
+<area shape="rect" id="node22" href="$classBif__F12__FORMAT.html#ad945541c06e489c1079ae401f4d1db28" title="A character array with B formatted by specification." alt="" coords="240,411,415,451"/>
+<area shape="rect" id="node23" href="$classBif__F12__DOMINO_1_1Matrix.html#ad45f8929c6f666dea17836a79c657456" title="print debug infos for this real matrix" alt="" coords="12,382,185,422"/>
+<area shape="rect" id="node24" href="$classBif__F12__FORMAT.html#a5164cf7d2b85131b9c9fa11c3239602a" title="Overloaded Function::eval_AB()" alt="" coords="5,447,192,472"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="paint_data" name="paint_data">
+<area shape="rect" id="node1" title="convert APL pixel data to a Gtk/Cairo surface" alt="" coords="5,35,88,60"/>
+<area shape="rect" id="node2" href="$classValue__P__Base.html#a1c3bf1b6f708eb2c1ba4b97c83adb9aa" title="return a const pointer to the Value" alt="" coords="148,5,283,31"/>
+<area shape="rect" id="node3" href="$structPNG__context.html#ab4950d0d70d6acf87c1243c3132a20e2" title="return the current pixel matrix as APL value" alt="" coords="136,55,295,95"/>
+</map>

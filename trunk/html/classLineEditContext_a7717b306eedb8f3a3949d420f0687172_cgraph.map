@@ -1,0 +1,16 @@
+<map id="LineEditContext::cut_to_EOL" name="LineEditContext::cut_to_EOL">
+<area shape="rect" id="node1" title="cut from cursor to end of line" alt="" coords="5,419,147,459"/>
+<area shape="rect" id="node2" href="$classLineEditContext.html#a1aa233cff187028ebd725d6ee9628c71" title="refresh screen from cursor onwards" alt="" coords="195,288,357,328"/>
+<area shape="rect" id="node8" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="1298,448,1421,473"/>
+<area shape="rect" id="node3" href="$classLineEditContext.html#ada01ee6a413a0a4bd4bf3c6065bd650c" title="adjust (increment) the allocated height (long lines)" alt="" coords="405,180,564,220"/>
+<area shape="rect" id="node4" href="$classCIN__ostream.html#a17aba6e323a182af53fe456594daabc7" title="clear to end of screen supported ?" alt="" coords="612,44,811,69"/>
+<area shape="rect" id="node5" href="$classCIN__ostream.html#abdf0a2e42d4b45ebc4248d8a3b5b40ca" title="clear to end of line" alt="" coords="627,246,796,272"/>
+<area shape="rect" id="node6" href="$classCIN__ostream.html#a0a691f3374049b4c5c45d29978d441b5" title="clear to end of line" alt="" coords="626,296,797,321"/>
+<area shape="rect" id="node10" href="$classLineEditContext.html#a347304e997f587298b31ca56b87b2826" title="move the cursor" alt="" coords="859,340,1037,365"/>
+<area shape="rect" id="node11" href="$classLineEditContext.html#a42e54e34054a3d943bedba1021973f0a" title="set the cursor (writing the appropriate ESC sequence to CIN)" alt="" coords="1085,376,1227,416"/>
+<area shape="rect" id="node12" href="$classCIN__ostream.html#a181f092c83f8cb272de489f3e7f198c9" title="set cursor to y:x (upper left corner is 0:0, negative y: from bottom)" alt="" coords="1275,120,1444,145"/>
+<area shape="rect" id="node13" href="$classLineEditContext.html#a8daeb0f45a6bb42428a42dce38e45704" title="refresh cursor if its position may be wrong (due to forward or backward wraparound being enabled or n..." alt="" coords="867,440,1029,480"/>
+<area shape="rect" id="node7" href="$classLineEditContext.html#a78bbd5426c6abecda70bac7daac39fb6" title="total length (prompt + user_line)" alt="" coords="877,235,1019,275"/>
+<area shape="rect" id="node9" href="$classLineEditContext.html#a44d0521ecccc6559b5a2fb7541059911" title="refresh screen from prompt (including) onwards" alt="" coords="620,145,803,170"/>
+<area shape="rect" id="node14" href="$classLineEditContext.html#addd7f59de96e6c964539cf8d37e3fb87" title="return true if prompt + offset is on column 0" alt="" coords="1087,440,1225,480"/>
+</map>

@@ -1,0 +1,6 @@
+<map id="p_modulo_q" name="p_modulo_q">
+<area shape="rect" id="node2" href="$APL__Float__as__class_8hh.html#a1823fc1825d017fe92820a6fefca1922" title="floor" alt="" coords="191,5,238,32"/>
+<area shape="rect" id="node3" href="$classWorkspace.html#a84f9084505dfcbc3a26414ea895dd7ca" title="return the current ⎕CT " alt="" coords="145,56,284,83"/>
+<area shape="rect" id="node4" href="$classCell.html#aa88c7c2322e8f607052d341ea3a594df" title="ISO p. 19: A is integral (close to a Gaussian Integer) within qct. " alt="" coords="147,107,283,133"/>
+<area shape="rect" id="node5" href="$APL__Float__as__class_8hh.html#ae0c942b22a49f59b05397b3934e4dd7b" title="isfinite" alt="" coords="185,157,245,184"/>
+</map>

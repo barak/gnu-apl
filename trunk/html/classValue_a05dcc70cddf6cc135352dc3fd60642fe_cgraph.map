@@ -1,0 +1,5 @@
+<map id="Value::get_ravel_end" name="Value::get_ravel_end">
+<area shape="rect" id="node1" title="return the next byte after the ravel" alt="" coords="5,5,149,31"/>
+<area shape="rect" id="node2" href="$classValue.html#ac5b54e3a13cab0837442f1575b3299a5" title="return the number of elements, but at least 1 (for the prototype)." alt="" coords="197,5,367,31"/>
+<area shape="rect" id="node3" href="$classShape.html#a6f32f749601dca80263493fd06be12c4" title="return the number of ravel elements, but at least 1 (for empty values and scalars) else product of sh..." alt="" coords="415,5,569,31"/>
+</map>

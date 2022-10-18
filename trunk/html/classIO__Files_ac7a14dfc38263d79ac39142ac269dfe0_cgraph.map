@@ -1,0 +1,5 @@
+<map id="IO_Files::apl_error" name="IO_Files::apl_error">
+<area shape="rect" id="node1" title="count an APL error" alt="" coords="5,35,135,60"/>
+<area shape="rect" id="node2" href="$structInputFile.html#a8dc157767e0af4c57eefa4225629e7f8" title="the current file" alt="" coords="183,5,327,31"/>
+<area shape="rect" id="node3" href="$structInputFile.html#aeccf06ed0bace1099f6d190c46543e2a" title="the line number of the currrent file" alt="" coords="195,55,315,95"/>
+</map>

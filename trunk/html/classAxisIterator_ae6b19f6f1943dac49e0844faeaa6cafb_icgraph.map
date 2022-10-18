@@ -1,0 +1,4 @@
+<map id="AxisIterator::get_weight" name="AxisIterator::get_weight">
+<area shape="rect" id="node1" title="return the weight (ravel increment for one next() call of this iterator" alt="" coords="219,5,379,31"/>
+<area shape="rect" id="node2" href="$classArrayIterator.html#a360d678e5a2d15cb46378692da1a9d87" title="the work&#45;horse of this iterator." alt="" coords="5,5,171,31"/>
+</map>

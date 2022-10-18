@@ -1,0 +1,8 @@
+<map id="format_tick" name="format_tick">
+<area shape="rect" id="node1" title="return the text of a grid tick with value val" alt="" coords="387,55,473,80"/>
+<area shape="rect" id="node2" href="$Plot__xcb_8cc.html#a75d0bfd0254822f11b8200f5319af6d6" title="draw the (vertical) grid lines that start at the X axis" alt="" coords="244,5,339,31"/>
+<area shape="rect" id="node5" href="$Plot__xcb_8cc.html#a8811c2e8a98a56d19bffce04a1219983" title="draw the (horizontal) grid lines that start at the Y axis" alt="" coords="244,55,339,80"/>
+<area shape="rect" id="node6" href="$Plot__xcb_8cc.html#af8b7f4198442f7b356d7e87b14ac5cc9" title="draw the grid lines that start at the Z axis" alt="" coords="245,104,338,129"/>
+<area shape="rect" id="node3" href="$Plot__xcb_8cc.html#a9387ad8c9e85cbf5b602ab83b47425a0" title="draw the content of a plot window" alt="" coords="132,55,196,80"/>
+<area shape="rect" id="node4" href="$Plot__xcb_8cc.html#a897990543dc934261ba8e7a124446b11" title="the pthread that handles one plot window." alt="" coords="5,55,84,80"/>
+</map>

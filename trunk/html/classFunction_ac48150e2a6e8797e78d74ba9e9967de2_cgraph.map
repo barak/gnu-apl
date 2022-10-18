@@ -1,0 +1,10 @@
+<map id="Function::get_attributes" name="Function::get_attributes">
+<area shape="rect" id="node1" title="store the attributes (as per ⎕AT) of symbol in Z, ..." alt="" coords="5,177,164,203"/>
+<area shape="rect" id="node2" href="$classFunction.html#a2ea41f5c122b8b9ad7a32b742b3ce4a0" title="GMT when this function was created; 0 for system functions." alt="" coords="212,5,395,31"/>
+<area shape="rect" id="node3" href="$classFunction.html#a672efc3b25bc3a86fd3917de4cd5057b" title="return the execution properties (3 ⎕AT) for this function" alt="" coords="237,55,370,95"/>
+<area shape="rect" id="node4" href="$classFunction.html#a1e98de20de09c81c7b5e257880eb2c89" title="return the number of value arguments (0, 1, or 2) of a user defined function, For non&#45;user defined fu..." alt="" coords="216,120,391,145"/>
+<area shape="rect" id="node5" href="$classFunction.html#ac69b8cfa3ac1577ef8cf98500002e6ef" title="return the number of function arguments (1 or 2) of an operator, or 0 for a &quot;normal&quot; function that is..." alt="" coords="238,170,369,210"/>
+<area shape="rect" id="node6" href="$classFunction.html#ab42920100ef5ae42e00bc02b915526d1" title="return 1 if the function returns a result, otherwise 0. For non&#45;user defined functions,..." alt="" coords="233,235,373,260"/>
+<area shape="rect" id="node7" href="$classValue.html#adb495fbb836373de3d3558acfd986eed" title="initialize the next ravel cell with integer 0" alt="" coords="235,284,372,309"/>
+<area shape="rect" id="node8" href="$classValue.html#ab3a0d3914977f611bfddf54178edd477" title="initialize the next ravel cell with an integer value" alt="" coords="231,333,376,359"/>
+</map>

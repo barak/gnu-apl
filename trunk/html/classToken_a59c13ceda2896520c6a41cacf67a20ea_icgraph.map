@@ -1,0 +1,55 @@
+<map id="Token::value_use_count" name="Token::value_use_count">
+<area shape="rect" id="node1" title="return value usage counter" alt="" coords="1952,311,2116,336"/>
+<area shape="rect" id="node2" href="$classToken.html#a1da2698e32e4c4ce5bed70964edd2f05" title="copy src into this token. leaving APL value pointer in src (if any) and add events as needed" alt="" coords="1796,311,1904,336"/>
+<area shape="rect" id="node13" href="$classToken.html#a9b575ee45601717762ee3966b5959b1b" title="move mutable src into this token. clears APL value pointer in src (if any) and add events as needed" alt="" coords="1616,495,1728,520"/>
+<area shape="rect" id="node52" href="$classToken.html#a1a5dd781884f5a8004834ce2b0fe8789" title="move const src into this token. clears APL value pointer in src (if any) and add events as needed" alt="" coords="1616,204,1728,229"/>
+<area shape="rect" id="node3" href="$structToken__loc.html#ae816f5a75e37eabd65d1837068023865" title="copy other to this Token_loc" alt="" coords="1613,368,1731,393"/>
+<area shape="rect" id="node11" href="$classPrefix.html#a78e45d1d5c213ad0f97bb064268caf22" title="pop prefix_len items and push result" alt="" coords="1596,303,1748,343"/>
+<area shape="rect" id="node12" href="$classToken.html#a28857fe5c15e75db89ef881dd5a90bea" title="copy constructor" alt="" coords="1621,253,1723,279"/>
+<area shape="rect" id="node4" href="$classPrefix.html#a7820ecce4dcb55d04c80785c4143fe02" title="store one more token" alt="" coords="1429,285,1521,311"/>
+<area shape="rect" id="node5" href="$classPrefix.html#a5478ff7d771d95a161c8ee393d50d7b1" title="execute one context (user defined function or operator, execute, or immediate execution)" alt="" coords="1179,336,1353,361"/>
+<area shape="rect" id="node6" href="$classStateIndicator.html#aa99bc8ce846dfd1f09c0ca2f250d940e" title="execute token in body..." alt="" coords="975,121,1104,147"/>
+<area shape="rect" id="node7" href="$classExecutable.html#a56bddb63158eedc401fe8ec3ce04f787" title="execute the body of this executable" alt="" coords="719,60,895,85"/>
+<area shape="rect" id="node8" href="$classCommand.html#a879617e7645bea2e4052154f16999634" title="finish the current SI&#45;&gt;top() and pop it when done" alt="" coords="483,5,653,31"/>
+<area shape="rect" id="node9" href="$classCommand.html#af36741357bfd4e183b34ee8b747bc7c5" title="process line which contains APL statements" alt="" coords="216,31,423,56"/>
+<area shape="rect" id="node10" href="$classCommand.html#ae26693534d4df16372f51e55e505b8d7" title="process line which contains a command or statements" alt="" coords="5,31,168,56"/>
+<area shape="rect" id="node14" href="$classExecutable.html#a55505be9cc4b30c504be17bd39120101" title="body[b ... bend] is a lambda. Move these token from this body to the body of the lambda and clear the..." alt="" coords="1402,487,1547,527"/>
+<area shape="rect" id="node36" href="$classParser.html#a2eef18990564bb557f9014b0465a256d" title="Create one scalar APL value from a token." alt="" coords="1401,666,1548,706"/>
+<area shape="rect" id="node42" href="$classSymbol.html#a72a3e4ed8ddafaaf215806962e017380" title="set token according to the current NC/sym_val of this Symbol" alt="" coords="1417,387,1533,412"/>
+<area shape="rect" id="node43" href="$classQuad__TF.html#a2c6ecebcb3bb8acc6cad8172d766b424" title="replace pattern value1 value2... in tos with the single token" alt="" coords="1409,552,1540,577"/>
+<area shape="rect" id="node51" href="$classQuad__TF.html#a4fc3182ce4bb5659453fe2610a624062" title="replace pattern ( B ) in tos with B; return true iff done so." alt="" coords="1402,602,1547,642"/>
+<area shape="rect" id="node15" href="$classExecutable.html#a67ef983c8fb9a0265b334fa2827641fa" title="extract one lambda expressions from body and store it in lambdas" alt="" coords="1189,437,1343,477"/>
+<area shape="rect" id="node16" href="$classExecutable.html#a70a75e5fb01bef90215dc8cd4dfd9d75" title="extract all lambda expressions from body and store them in lambdas" alt="" coords="948,339,1131,364"/>
+<area shape="rect" id="node17" href="$classExecuteList.html#a6f8688070be985996a46dad98ee3d2f9" title="compute body token from text data" alt="" coords="750,339,863,364"/>
+<area shape="rect" id="node26" href="$classStatementList.html#a20b0b6ca4bd952856e75bdecc7fc110a" title="compute body token from text data" alt="" coords="744,113,869,139"/>
+<area shape="rect" id="node28" href="$classUserFunction.html#a1aa032e76cb608c07de66ac13d41809b" title="recompile the body" alt="" coords="719,400,894,425"/>
+<area shape="rect" id="node35" href="$classUserFunction.html#a78bee7603d9d21f0dc4e2101505937d4" title="constructor for a lambda" alt="" coords="713,289,900,315"/>
+<area shape="rect" id="node18" href="$classQuad__EC.html#a856174e390a934b63bc19affe232937e" title="overloaded Function::eval_B()." alt="" coords="505,285,631,311"/>
+<area shape="rect" id="node19" href="$classBif__F1__EXECUTE.html#aefdd09df4262f08f508f9be8543896b7" title="execute string containing an APL expression or an APL command" alt="" coords="475,335,661,375"/>
+<area shape="rect" id="node23" href="$classXML__Loading__Archive.html#a5085841ad5dd83bd88588db76c3a2838" title="read ⍎ Executable" alt="" coords="492,170,644,210"/>
+<area shape="rect" id="node20" href="$classBif__F1__EXECUTE.html#a4e1a5917e6a3bb368b459fb21c2b63a1" title="overladed Function::eval_B()" alt="" coords="230,400,409,425"/>
+<area shape="rect" id="node21" href="$classBif__F1__EXECUTE.html#a8445cd77207db38ab66f5c3278a831df" title="execute string containing an APL command" alt="" coords="227,335,412,375"/>
+<area shape="rect" id="node22" href="$classQuad__Quad.html#a253824f3a533bef36063138ea6ce0673" title="overloaded Symbol::resolve()." alt="" coords="249,248,390,273"/>
+<area shape="rect" id="node24" href="$classXML__Loading__Archive.html#adfa844fcc401d3c335cafa5abda2f35d" title="read next StateIndicator entry" alt="" coords="243,158,395,198"/>
+<area shape="rect" id="node25" href="$classXML__Loading__Archive.html#ad2f1d88070976eab8a41f0fdcd1e0ec1" title="read next StateIndicator element" alt="" coords="11,158,163,198"/>
+<area shape="rect" id="node27" href="$classXML__Loading__Archive.html#a5e165853b437a502be850f3527ef8b77" title="read ◊ Executable" alt="" coords="492,106,644,146"/>
+<area shape="rect" id="node29" href="$classUserFunction.html#a2bedc3c56fb8daa8e4e760bbc912de68" title="set trace or stop vector" alt="" coords="471,449,665,475"/>
+<area shape="rect" id="node34" href="$classUserFunction.html#a37c955f6a76f58d168d4533389249cae" title="constructor for a normal (i.e. non&#45;lambda) user defined function" alt="" coords="475,400,661,425"/>
+<area shape="rect" id="node30" href="$classStop__Trace.html#a1f0aad5536348d1e52721cd04e2f9548" title="return assign lines in new_value to stop or trace vector in ufun" alt="" coords="252,449,387,475"/>
+<area shape="rect" id="node33" href="$classNabla.html#a610d94a179335126e82e9eea07918d5a" title="edit this function" alt="" coords="277,499,362,524"/>
+<area shape="rect" id="node31" href="$classQuad__STOP.html#aba7f51dfbb36d3c2d25ce2e7deb0f278" title="Overloaded Function::eval_AB()" alt="" coords="10,475,163,500"/>
+<area shape="rect" id="node32" href="$classQuad__TRACE.html#a59e7875554f651f1f64d83d79111fecd" title="Overloaded Function::eval_AB()" alt="" coords="5,425,168,451"/>
+<area shape="rect" id="node37" href="$classParser.html#a2ec94a9ef33782db92065a4c15e53295" title="Create one APL value from len values." alt="" coords="1195,673,1337,699"/>
+<area shape="rect" id="node38" href="$classParser.html#aa6206be9b275310ea5c9ecca098fc113" title="Collect consecutive smaller APL values or value token into vectors." alt="" coords="954,640,1125,665"/>
+<area shape="rect" id="node41" href="$classParser.html#ad6ae52cbe0094ff62852548096166b97" title="Collect groups." alt="" coords="963,689,1115,715"/>
+<area shape="rect" id="node39" href="$classParser.html#a3eeeb92bcac2c60b355c30b5ccd4060e" title="Parse token string tos (a statement without diamonds)." alt="" coords="724,675,889,700"/>
+<area shape="rect" id="node40" href="$classParser.html#af5fc690941afdce0fd36c6c9629e5186" title="Parse UCS_string input into token string tos." alt="" coords="518,675,618,700"/>
+<area shape="rect" id="node44" href="$classQuad__TF.html#a0d12bc9c1c1710992edb76fca1b7c6af" title="simplify tos by removing UCS nnn etc." alt="" coords="1193,560,1339,585"/>
+<area shape="rect" id="node45" href="$classQuad__TF.html#a293263bd9b2bf923dc9e4113dded832f" title="try inverse ⎕TF2 of ucs, set new_var_or_fun if successful" alt="" coords="965,560,1113,585"/>
+<area shape="rect" id="node46" href="$structCommand_1_1transfer__context.html#a4e80a2899a02285ba89e58792e6150ea" title="process a &#39;A&#39; (array in 2 ⎕TF format) item." alt="" coords="715,553,899,593"/>
+<area shape="rect" id="node49" href="$classQuad__TF.html#a27ed4b02d5f1a1c8a8b0a1fcbe2756f8" title="Overloaded Function::eval_AB()." alt="" coords="740,617,873,643"/>
+<area shape="rect" id="node50" href="$structCommand_1_1transfer__context.html#afee6856208966168d158de45145dd4ca" title="process an &#39;F&#39; (function in 2 ⎕TF format) item." alt="" coords="715,489,899,529"/>
+<area shape="rect" id="node47" href="$structCommand_1_1transfer__context.html#a9c4651f90f36f6cc728e7146a3a4a0aa" title="process one record of a workspace file" alt="" coords="476,547,660,587"/>
+<area shape="rect" id="node48" href="$classCommand.html#aa0764d08a6ae9c8270907ab7d5dc37cf" title=")IN: import a workspace file" alt="" coords="251,555,387,580"/>
+<area shape="rect" id="node53" href="$classQuad__EC.html#a44e3cc95f4d9c98ced01bf1810c32208" title="end of context handler for ⎕EC" alt="" coords="1212,97,1320,123"/>
+</map>

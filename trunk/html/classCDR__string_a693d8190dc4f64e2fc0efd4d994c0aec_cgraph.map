@@ -1,0 +1,4 @@
+<map id="CDR_string::get_type" name="CDR_string::get_type">
+<area shape="rect" id="node1" title="return the CDR type of this CDR" alt="" coords="5,5,155,31"/>
+<area shape="rect" id="node2" href="$classCDR__string.html#abf4a46a9dc0d7a61b4222b339675b09a" title="return the header of this CDR" alt="" coords="203,5,341,31"/>
+</map>

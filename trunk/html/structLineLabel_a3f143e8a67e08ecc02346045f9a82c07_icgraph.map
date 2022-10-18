@@ -1,0 +1,7 @@
+<map id="LineLabel::is_header_line_number" name="LineLabel::is_header_line_number">
+<area shape="rect" id="node1" title="return true iff this line number is the header line [0]" alt="" coords="655,5,796,45"/>
+<area shape="rect" id="node2" href="$classNabla.html#a55039f88d1dba99e9be9efb152ec2cbe" title="edit function line" alt="" coords="468,13,607,38"/>
+<area shape="rect" id="node3" href="$classNabla.html#ae88cd2f873ba2df8d694f6b3a36ded1d" title="execute an edit operation" alt="" coords="277,13,420,38"/>
+<area shape="rect" id="node4" href="$classNabla.html#a610d94a179335126e82e9eea07918d5a" title="edit this function" alt="" coords="5,13,91,38"/>
+<area shape="rect" id="node5" href="$classNabla.html#a894eac5264914ef7eedcfc14643cc7ee" title="start editing, return source location if first_command is bad." alt="" coords="139,38,229,63"/>
+</map>

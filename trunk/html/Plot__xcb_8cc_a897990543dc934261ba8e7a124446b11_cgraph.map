@@ -1,0 +1,74 @@
+<map id="plot_main" name="plot_main">
+<area shape="rect" id="node1" title="the pthread that handles one plot window." alt="" coords="5,3100,84,3125"/>
+<area shape="rect" id="node2" href="$Plot__xcb_8cc.html#a9387ad8c9e85cbf5b602ab83b47425a0" title="draw the content of a plot window" alt="" coords="180,1585,244,1611"/>
+<area shape="rect" id="node9" href="$Plot__xcb_8cc.html#afe42b34c6761e2b88414556cecc7d987" title="test obtaining of a cookie" alt="" coords="807,3075,892,3100"/>
+<area shape="rect" id="node28" href="$classPlot__window__properties.html#a72755a68b6c76ed13fbad937f853fe0f" title="return the verbosity when plotting" alt="" coords="561,2831,721,2871"/>
+<area shape="rect" id="node48" href="$classPlot__window__properties.html#a124970fb533c7e2ad4001808986677b4" title="return the height of the plot window" alt="" coords="347,2427,507,2467"/>
+<area shape="rect" id="node49" href="$classPlot__window__properties.html#a8304c43e98b8633caa8f7a61d6d402f5" title="return the width of the plot window" alt="" coords="347,2574,507,2614"/>
+<area shape="rect" id="node51" href="$Plot__xcb_8cc.html#a0148f311a6e469b937b5f7f017b76262" title="obtain an ID for name" alt="" coords="163,3125,261,3151"/>
+<area shape="rect" id="node52" href="$classPlot__window__properties.html#a123fbf1e0c3e8b161583cadb90f40db5" title="return the date to be plotted" alt="" coords="132,3175,292,3215"/>
+<area shape="rect" id="node53" href="$Plot__xcb_8cc.html#a20bdd1a656066388673864226adfd885" title="save plot window to file named outfile" alt="" coords="175,3240,249,3265"/>
+<area shape="rect" id="node57" href="$classPlot__window__properties.html#adff5407307aa8e7236e7778dce9d8863" title="handle window resize event" alt="" coords="132,3395,292,3435"/>
+<area shape="rect" id="node72" href="$Plot__xcb_8cc.html#a6d62460c89bf8e10fc97f8f5d1e56130" title="return a xcb_gcontext_t for font font_name" alt="" coords="160,3717,264,3743"/>
+<area shape="rect" id="node3" href="$Plot__xcb_8cc.html#a89109127b5f5b3a1ebd9daf60d9953d5" title="draw the legend" alt="" coords="379,988,474,1013"/>
+<area shape="rect" id="node7" href="$Plot__xcb_8cc.html#a5461d12dc379b438dce62186d2c07f20" title="set the an attribute of a xcb_gcontext_t" alt="" coords="977,1092,1071,1117"/>
+<area shape="rect" id="node13" href="$Plot__xcb_8cc.html#a748f5a40fd403da8a150a98011bd5944" title="draw the plot lines" alt="" coords="371,1143,483,1168"/>
+<area shape="rect" id="node22" href="$Plot__xcb_8cc.html#a6004b2c57c13517082271e5d6e209eb2" title="draw the surface plot lines" alt="" coords="359,685,494,711"/>
+<area shape="rect" id="node37" href="$Plot__xcb_8cc.html#a75d0bfd0254822f11b8200f5319af6d6" title="draw the (vertical) grid lines that start at the X axis" alt="" coords="379,1585,474,1611"/>
+<area shape="rect" id="node41" href="$Plot__xcb_8cc.html#a8811c2e8a98a56d19bffce04a1219983" title="draw the (horizontal) grid lines that start at the Y axis" alt="" coords="379,2287,474,2312"/>
+<area shape="rect" id="node45" href="$Plot__xcb_8cc.html#af8b7f4198442f7b356d7e87b14ac5cc9" title="draw the grid lines that start at the Z axis" alt="" coords="380,2336,473,2361"/>
+<area shape="rect" id="node50" href="$classPlot__data.html#a0b7e3af1a5556bf513cd6f288aca14e3" title="return true for surface plots" alt="" coords="340,5,513,31"/>
+<area shape="rect" id="node4" href="$Plot__xcb_8cc.html#a538424ee91ee3a1698b531dcfce0659a" title="draw a line from P0 to P1" alt="" coords="811,965,888,991"/>
+<area shape="rect" id="node5" href="$Plot__xcb_8cc.html#ab4371c12b41e0d3563876092f2a4e5ed" title="draw a plot point (representing one data value) at position xy" alt="" coords="599,787,684,812"/>
+<area shape="rect" id="node6" href="$Plot__xcb_8cc.html#abb3a45e07e2c89cd4db26199d9ebccaf" title="set the foreground color of a xcb_gcontext_t" alt="" coords="782,1092,917,1117"/>
+<area shape="rect" id="node8" href="$Plot__xcb_8cc.html#a0e658785c02a1e28fb1b4eb3e40ceb5e" title="draw text label at position xy" alt="" coords="602,2336,681,2361"/>
+<area shape="rect" id="node10" href="$classPlot__window__properties.html#a93800299d67a2fd7c285595e90411b45" title="return the number of plot lines" alt="" coords="561,257,721,297"/>
+<area shape="rect" id="node11" href="$classPlot__window__properties.html#a7231114ba94d70fa8b54beef8d9e590c" title="an array of plot line properties" alt="" coords="561,901,721,941"/>
+<area shape="rect" id="node12" href="$Plot__xcb_8cc.html#a62eaa2c0379a0672af80deafa17d4a41" title="set the line width of a xcb_gcontext_t" alt="" coords="575,1219,707,1244"/>
+<area shape="rect" id="node14" href="$classPlot__window__properties.html#a577510e3bcf6ba61978dc60d778dc967" title="return the smallest X value" alt="" coords="769,2177,929,2217"/>
+<area shape="rect" id="node15" href="$classPlot__window__properties.html#af27f118d1e90664680b2efd1a2460a03" title="return the smallest Y value" alt="" coords="769,1733,929,1773"/>
+<area shape="rect" id="node16" href="$classPlot__data.html#a78d41cb9faca37e7251ae3ddf9bd2072" title="return the number of plot lines" alt="" coords="576,837,707,877"/>
+<area shape="rect" id="node17" href="$classPlot__data.html#a15bf1b351058105468118284baf89d86" title="return the X and Y values of the data matrix row/col" alt="" coords="577,321,705,347"/>
+<area shape="rect" id="node20" href="$classPlot__window__properties.html#a087dfd5eee09a66161eb76c87680d14c" title="convert &#160;&#160;val_X to the X coordinate of the pixel in the plot area" alt="" coords="769,2278,929,2318"/>
+<area shape="rect" id="node21" href="$classPlot__window__properties.html#ae727cdd8ecd4888c8785c5fd53dc6b93" title="convert &#160;&#160;val_Y to the Y coordinate of the pixel in the plot area" alt="" coords="769,1910,929,1950"/>
+<area shape="rect" id="node18" href="$classPlot__data__row.html#ad4e5545752fa410dbb014efcb3188d25" title="return the n&#45;th X coordinate" alt="" coords="776,120,923,145"/>
+<area shape="rect" id="node19" href="$classPlot__data__row.html#a33dc8b966628255b8300f95a7c261b44" title="return the n&#45;th Y coordinate" alt="" coords="776,196,923,221"/>
+<area shape="rect" id="node23" href="$structPixel__XY.html#ac4e6790839beb78de3fb40478ab1672f" title="the square of the distance between this and other" alt="" coords="779,260,919,285"/>
+<area shape="rect" id="node24" href="$Plot__xcb_8cc.html#ad0c18c85c237ccb535e36cf75f02ffb1" title="draw a triangular area of a 3D plot" alt="" coords="592,420,691,445"/>
+<area shape="rect" id="node26" href="$classPlot__window__properties.html#aa152e0e672fc6083139705184e7216c5" title="return the 3D color gradient" alt="" coords="561,570,721,610"/>
+<area shape="rect" id="node27" href="$classPlot__window__properties.html#a92d2adee39b082bada6f0e136ed3608f" title="return the largest Y value" alt="" coords="561,1370,721,1410"/>
+<area shape="rect" id="node29" href="$classPlot__data.html#ab2e462ccd83506c4bd58a0a2bfad1a04" title="return the X coordinate at row and col" alt="" coords="582,107,701,132"/>
+<area shape="rect" id="node30" href="$classPlot__data.html#a9d863a39e73098620164e06d7f7b58e6" title="return the Y coordinate at row and col" alt="" coords="582,156,701,181"/>
+<area shape="rect" id="node31" href="$classPlot__data.html#a48aa9406aa7b71cc210d12c82e2f1c94" title="return the Z coordinate at row and col" alt="" coords="582,371,701,396"/>
+<area shape="rect" id="node33" href="$Plot__xcb_8cc.html#a221304b480c0058decadaaf65ec5c086" title=" " alt="" coords="597,469,686,495"/>
+<area shape="rect" id="node34" href="$classPlot__window__properties.html#acd007c1ca30e86d8e12e125a39d7d9a5" title="convert values val_X, val_Y, and val_Z, to the X and Y coordinate of the pixel below the Z=0 plane of..." alt="" coords="561,2069,721,2109"/>
+<area shape="rect" id="node25" href="$classPlot__window__properties.html#abadf9d1f9cf63db3c78d21b88614d9d3" title="for level 0.0 &lt;= alpha &lt;= 1.0: return the color for alpha according to gradient" alt="" coords="769,417,929,457"/>
+<area shape="rect" id="node32" href="$classPlot__data__row.html#a4b64a5cf137e1b8eff94c1dc2127d065" title="return the n&#45;th Z coordinate" alt="" coords="776,367,923,392"/>
+<area shape="rect" id="node35" href="$classPlot__window__properties.html#a0640b99b583131dabf64478a88265e66" title="return the smallest Z value" alt="" coords="769,2615,929,2655"/>
+<area shape="rect" id="node36" href="$classPlot__window__properties.html#af978c228065cbaba8381af79bc1fce95" title="convert &#160;&#160;val_Z to the relative Z vector (q. quadrant)" alt="" coords="769,2069,929,2109"/>
+<area shape="rect" id="node38" href="$Plot__xcb_8cc.html#af4fda3629142aa3775d1fd5f5fee5d0e" title="return the text of a grid tick with value val" alt="" coords="598,2515,685,2540"/>
+<area shape="rect" id="node39" href="$classPlot__window__properties.html#ab09be3e5e80e7db4f6b5b5b7b64410eb" title="return the last index of the X grid" alt="" coords="561,1434,721,1474"/>
+<area shape="rect" id="node40" href="$classPlot__window__properties.html#aa49ac73a83ce1fc318ef680d9a90517d" title="return the X&#45;value difference for one tile (= between two X grid lines)" alt="" coords="561,1498,721,1538"/>
+<area shape="rect" id="node42" href="$classPlot__window__properties.html#a70eb2f0f8d62feeabeef70ee5a5a6f3c" title="return the last index of the Y grid" alt="" coords="561,2386,721,2426"/>
+<area shape="rect" id="node43" href="$classPlot__window__properties.html#ab6c4b25fe72b37acc9a4296e96ae8961" title="return the largest X value" alt="" coords="561,2666,721,2706"/>
+<area shape="rect" id="node44" href="$classPlot__window__properties.html#ac36264f34884d74dd5d14d99fa359015" title="return the Y&#45;value difference for one tile (= between two Y grid lines)" alt="" coords="561,2450,721,2490"/>
+<area shape="rect" id="node46" href="$classPlot__window__properties.html#af9a204917cef526e2ee1fe77add80c98" title="return the last index of the Y grid" alt="" coords="561,2946,721,2986"/>
+<area shape="rect" id="node47" href="$classPlot__window__properties.html#ae4ad1b9db6c731e320f1177f614ba44c" title="return the Z&#45;value difference for one tile (= between two Z grid lines)" alt="" coords="561,3010,721,3050"/>
+<area shape="rect" id="node54" href="$classUTF8__string.html#aabaebbdfbe8fad48e44655144f5fbd5e" title="append a 0&#45;terminated C string" alt="" coords="355,3290,499,3330"/>
+<area shape="rect" id="node55" href="$classUTF8__string.html#a922bd7ebc6a8ea5c6ba9c54159b18a93" title="return this string as a 0&#45;terminated C string" alt="" coords="361,3191,492,3216"/>
+<area shape="rect" id="node56" href="$classUTF8__string.html#a75b4e440d7576c690934bc7b5f863ac6" title="return true iff string ends with ext (usually a file name extension)" alt="" coords="346,3240,507,3265"/>
+<area shape="rect" id="node58" href="$classPlot__window__properties.html#aa186844af6e9dcff730d76bd62b98459" title="update derived properties after changing primary ones, return true on error" alt="" coords="347,3474,507,3514"/>
+<area shape="rect" id="node59" href="$classPlot__data.html#aab4c0f48bedfc8dba45ad81da8f14a78" title="return the largest X value in the data matrix" alt="" coords="566,3509,717,3535"/>
+<area shape="rect" id="node60" href="$classPlot__data.html#a96752d336cf0754a359fe1e4254b9cb4" title="return the largest Y value in the data matrix" alt="" coords="566,3559,717,3584"/>
+<area shape="rect" id="node61" href="$classPlot__data.html#a132a74079392080882f8764b29531a0f" title="return the largest Z value in the data matrix" alt="" coords="566,3608,717,3633"/>
+<area shape="rect" id="node62" href="$classPlot__data.html#ad3a4ef165ceb1b00ca7aaae3a498b37d" title="return the smallest X value in the data matrix" alt="" coords="568,3657,715,3683"/>
+<area shape="rect" id="node63" href="$classPlot__data.html#a72c6c1078a9a17c7ee9c7f0e3f49617f" title="return the smallest Y value in the data matrix" alt="" coords="568,3707,715,3732"/>
+<area shape="rect" id="node64" href="$classPlot__data.html#a98e535718ec532277ef6c93957915407" title="return the smallest Z value in the data matrix" alt="" coords="568,3756,715,3781"/>
+<area shape="rect" id="node65" href="$classPlot__window__properties.html#a73f3ef105131a5533e392694d2b8e77e" title="return true iff a rangeX_max property was specified" alt="" coords="561,3806,721,3846"/>
+<area shape="rect" id="node66" href="$classPlot__window__properties.html#a31b41b5b5c0687fa5e84aae98dc733b9" title="return true iff a rangeX_min property was specified" alt="" coords="561,3125,721,3165"/>
+<area shape="rect" id="node67" href="$classPlot__window__properties.html#a6fc257664086ee773fd232edebe9b0b1" title="return true iff a rangeY_max property was specified" alt="" coords="561,3189,721,3229"/>
+<area shape="rect" id="node68" href="$classPlot__window__properties.html#a22e53f61bdfd9a132aaa000cec979f80" title="return true iff a rangeY_min property was specified" alt="" coords="561,3253,721,3293"/>
+<area shape="rect" id="node69" href="$classPlot__window__properties.html#a759d86acc99f5fad81d770b6bdcc3846" title="return true iff a rangeZ_max property was specified" alt="" coords="561,3317,721,3357"/>
+<area shape="rect" id="node70" href="$classPlot__window__properties.html#a14248da030cecf3fa7b98012e0b8def4" title="return true iff a rangeZ_min property was specified" alt="" coords="561,3381,721,3421"/>
+<area shape="rect" id="node71" href="$classPlot__window__properties.html#a85b9ea43830064e114dded7905ac4c1b" title="round val up to the next higher 1/2/5×10^N" alt="" coords="561,3445,721,3485"/>
+</map>

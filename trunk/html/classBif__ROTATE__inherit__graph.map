@@ -1,8 +1,10 @@
 <map id="Bif_ROTATE" name="Bif_ROTATE">
-<area shape="rect" id="node6" href="$classBif__F12__ROTATE.html" title="The class implementing ⌽ " alt="" coords="5,379,133,405"/>
-<area shape="rect" id="node7" href="$classBif__F12__ROTATE1.html" title="The class implementing ⊖ " alt="" coords="158,379,293,405"/>
-<area shape="rect" id="node2" href="$classNonscalarFunction.html" title="Base class for all internal non&#45;scalar functions of the interpreter. " alt="" coords="81,229,212,256"/>
-<area shape="rect" id="node3" href="$classPrimitiveFunction.html" title="Base class for all internal functions of the interpreter. " alt="" coords="85,155,208,181"/>
-<area shape="rect" id="node4" href="$classFunction.html" title="Base class for all APL functions and operators (system or defined) " alt="" coords="111,80,183,107"/>
-<area shape="rect" id="node5" href="$classNamedObject.html" title="A user&#45;defined variable or function. " alt="" coords="95,5,198,32"/>
+<area shape="rect" id="node1" title="Base class for implementing ⌽ and ⊖" alt="" coords="97,387,196,412"/>
+<area shape="rect" id="node7" href="$classBif__F12__ROTATE.html" title="The class implementing ⌽" alt="" coords="5,460,133,485"/>
+<area shape="rect" id="node8" href="$classBif__F12__ROTATE1.html" title="The class implementing ⊖" alt="" coords="158,460,293,485"/>
+<area shape="rect" id="node2" href="$classNonscalarFunction__default__identity.html" title="Base class for all internal non&#45;scalar functions of the interpreter." alt="" coords="58,299,235,339"/>
+<area shape="rect" id="node3" href="$classNonscalarFunction.html" title="Base class for all internal non&#45;scalar functions of the interpreter." alt="" coords="81,225,212,251"/>
+<area shape="rect" id="node4" href="$classPrimitiveFunction.html" title="Base class for all internal functions of the interpreter." alt="" coords="85,152,208,177"/>
+<area shape="rect" id="node5" href="$classFunction.html" title="Base class for all APL functions and operators (system or defined)" alt="" coords="111,79,183,104"/>
+<area shape="rect" id="node6" href="$classNamedObject.html" title="A user&#45;defined variable or function." alt="" coords="95,5,198,31"/>
 </map>

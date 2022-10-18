@@ -1,0 +1,20 @@
+<map id="Parallel::init" name="Parallel::init">
+<area shape="rect" id="node1" title="initialize" alt="" coords="5,311,96,336"/>
+<area shape="rect" id="node2" href="$classCPU__pool.html#af7e1bd909acac4fc6974a9dcecaba6d3" title="add a CPU to the pool" alt="" coords="153,5,299,31"/>
+<area shape="rect" id="node3" href="$classThread__context.html#ab5c1f95ee686270b4ac6e1806a5bd23f" title="bind thread to core" alt="" coords="154,55,298,95"/>
+<area shape="rect" id="node4" href="$classCPU__pool.html#a7119580b2ca4452fdf86542ec2178d31" title="set new active core count, return true on error" alt="" coords="144,221,308,261"/>
+<area shape="rect" id="node6" href="$classThread__context.html#adf3aed1f9a9fbe5854dca582816dae4e" title="return the context for core n" alt="" coords="369,13,508,53"/>
+<area shape="rect" id="node7" href="$classCPU__pool.html#a745603fb69c0ee5d4f4d728028fabff6" title="get the number of (active) CPUs" alt="" coords="365,77,512,103"/>
+<area shape="rect" id="node10" href="$classThread__context.html#a770b7101581894235605003726ebdc62" title="print all TaskTree nodes" alt="" coords="356,355,521,380"/>
+<area shape="rect" id="node12" href="$classThread__context.html#a9da7115c28c4372c40d393c8046bda22" title="set the number of currently used cores" alt="" coords="369,405,508,445"/>
+<area shape="rect" id="node14" href="$classCPU__pool.html#a9a0ceffddddc5e7b239c2f443fa6a559" title="get the idx;th CPU" alt="" coords="154,387,298,412"/>
+<area shape="rect" id="node15" href="$classAvec.html#a9188425612180914156bba6bbcf881fe" title="initialize the static tables of this class and check them" alt="" coords="187,436,265,461"/>
+<area shape="rect" id="node16" href="$classThread__context.html#afd854477bd87d3e80b3786ac2a7d5d9f" title="initialize all thread contexts (set all but N and thread)" alt="" coords="157,486,295,526"/>
+<area shape="rect" id="node17" href="$classThread__context.html#a1965a1f7a7d1e9da522a55148c09bcaa" title="initialize all thread contexts (set all but N and thread)" alt="" coords="157,550,295,590"/>
+<area shape="rect" id="node18" href="$classParallel.html#a2bfaddf8fa4ef315808cb51b13bc2ac6" title="return the core number for idx" alt="" coords="153,615,299,640"/>
+<area shape="rect" id="node5" href="$classThread__context.html#a8ef1d4db160a21f5616530cf737e4b18" title="number of currently used cores" alt="" coords="369,127,508,167"/>
+<area shape="rect" id="node8" href="$classThread__context.html#ab8bd91c72792a1e187c521f38c9e4f6e" title="return the context of the master" alt="" coords="369,191,508,231"/>
+<area shape="rect" id="node9" href="$classCPU__pool.html#a78aa1ff8ffbef7ea5e46adc7ffdfa3af" title="make all pool members lock on their pool_sema" alt="" coords="366,256,511,281"/>
+<area shape="rect" id="node13" href="$classCPU__pool.html#a317b0a234d6dc8cbb6bab12088ec1aad" title="unlock all pool members from their pool_sema" alt="" coords="359,305,518,331"/>
+<area shape="rect" id="node11" href="$classThread__context.html#adc73bb9ae1ecb7b10830bd073201f7ea" title="print this TaskTree node" alt="" coords="569,355,715,380"/>
+</map>

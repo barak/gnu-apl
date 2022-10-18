@@ -1,4 +1,3 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classAPL__Float__Base.html" title="the essential data of an APL_Float, so that it can be used in a union " alt="" coords="5,5,125,32"/>
-<area shape="rect" id="node2" href="$classAPL__Float.html" title="a non&#45;rational APL floating point value " alt="" coords="173,5,256,32"/>
+<area shape="rect" id="node1" href="$classArrayIterator.html" title="An iterator counting along all axes of shape." alt="" coords="5,5,100,31"/>
 </map>

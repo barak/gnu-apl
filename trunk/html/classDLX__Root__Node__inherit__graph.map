@@ -1,3 +1,4 @@
 <map id="DLX_Root_Node" name="DLX_Root_Node">
-<area shape="rect" id="node2" href="$classDLX__Node.html" title="one &#39;1&#39; in a sparse constraint matrix " alt="" coords="23,5,109,32"/>
+<area shape="rect" id="node1" title="The root node of the constraints matrix." alt="" coords="5,79,127,104"/>
+<area shape="rect" id="node2" href="$classDLX__Node.html" title="one &#39;1&#39; in a sparse constraint matrix" alt="" coords="23,5,109,31"/>
 </map>

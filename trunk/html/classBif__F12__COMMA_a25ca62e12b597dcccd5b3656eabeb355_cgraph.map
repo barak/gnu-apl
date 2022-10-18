@@ -1,0 +1,11 @@
+<map id="Bif_F12_COMMA::eval_XB" name="Bif_F12_COMMA::eval_XB">
+<area shape="rect" id="node1" title="overloaded Function::eval_XB()" alt="" coords="5,153,188,179"/>
+<area shape="rect" id="node2" href="$classBif__COMMA.html#a6db4c6e1f1f1deb3d7a410e871046496" title="ravel along axis, with axis being the first (⍪( or last (,) axis of B" alt="" coords="236,153,399,179"/>
+<area shape="rect" id="node3" href="$classShape.html#aeb018b67601d3f1c4bea3d2c2b877b7e" title="add a dimension of length len at the end" alt="" coords="459,5,622,31"/>
+<area shape="rect" id="node4" href="$classShape.html#a6cb953364cc9903453564615829f3788" title="return the length of the first axis, or 1 for scalars" alt="" coords="447,55,635,80"/>
+<area shape="rect" id="node5" href="$classWorkspace.html#adb2006f054a1cebb8ae0252b61bd1d1b" title="return the current ⎕IO" alt="" coords="473,104,608,129"/>
+<area shape="rect" id="node6" href="$classShape.html#ab086eda5bc8feb3a58771973ddb3c379" title="return the length of the last axis, or 1 for scalars" alt="" coords="447,153,634,179"/>
+<area shape="rect" id="node7" href="$classShape.html#a017e9a35dd20f4bc4fdeb7ea29b6805d" title="return the rank" alt="" coords="482,203,599,228"/>
+<area shape="rect" id="node8" href="$classShape.html#a592d2ade68aa8c21c5d84627c3a0e001" title="return the length of dimension r" alt="" coords="461,252,620,277"/>
+<area shape="rect" id="node9" href="$classBif__COMMA.html#abd19d993bdeb2cc2bd5f68864228b760" title="Return the ravel of B as APL value." alt="" coords="475,301,607,327"/>
+</map>

@@ -1,0 +1,6 @@
+<map id="Value::next_ravel" name="Value::next_ravel">
+<area shape="rect" id="node1" title="return the next ravel cell to be initialized (excluding prototype)" alt="" coords="5,5,128,31"/>
+<area shape="rect" id="node2" href="$classValue.html#ab8c3bc165a2d9635f9f2b0713e9a3e08" title="return true iff more ravel items (as per shape) need to be initialized. (the prototype of empty value..." alt="" coords="176,5,268,31"/>
+<area shape="rect" id="node3" href="$classValue.html#a9fc8bbaf9fefe6835dea7db0f71b8b6c" title="return the number of elements (the product of the shapes)." alt="" coords="316,5,464,31"/>
+<area shape="rect" id="node4" href="$classShape.html#af39e05bad7be900fa1437a6eb6035e97" title="return the number of ravel elements (1 for scalars,i else product of shapes)" alt="" coords="512,5,647,31"/>
+</map>

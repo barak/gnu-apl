@@ -1,0 +1,4 @@
+<map id="ValueStackItem::get_val_wptr" name="ValueStackItem::get_val_wptr">
+<area shape="rect" id="node1" title="return the APL value of this ValueStackItem, or 0 if it has none Only used in ⎕RL for quick in&#45;place ..." alt="" coords="5,5,147,45"/>
+<area shape="rect" id="node2" href="$classValue__P__Base.html#a1c3bf1b6f708eb2c1ba4b97c83adb9aa" title="return a const pointer to the Value" alt="" coords="195,13,329,38"/>
+</map>

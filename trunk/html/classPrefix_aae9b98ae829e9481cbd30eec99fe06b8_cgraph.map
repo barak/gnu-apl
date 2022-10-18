@@ -1,0 +1,4 @@
+<map id="Prefix::pop_and_discard" name="Prefix::pop_and_discard">
+<area shape="rect" id="node1" title="discard the leftmost token (e,g, A in A←B) from the stack" alt="" coords="5,5,168,31"/>
+<area shape="rect" id="node2" href="$classPrefix.html#a07a35c8b69a8c9f685225e2a2586a2fd" title="return the number of token currently in the FIFO" alt="" coords="216,5,304,31"/>
+</map>

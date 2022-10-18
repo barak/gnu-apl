@@ -1,0 +1,60 @@
+<map id="XML_Loading_Archive::read_Parser" name="XML_Loading_Archive::read_Parser">
+<area shape="rect" id="node1" title="read parsers in SI entry" alt="" coords="5,241,157,281"/>
+<area shape="rect" id="node2" href="$classXML__Loading__Archive.html#ad8cf599287f50b63ee67539509c6dce1" title="check that is_tag(prefix) is true and print error info if not" alt="" coords="423,63,575,103"/>
+<area shape="rect" id="node3" href="$classXML__Loading__Archive.html#adb5a5f67fc6ceffb3260e61b5fe9994c" title="return true iff tagname starts with prefix" alt="" coords="655,5,807,45"/>
+<area shape="rect" id="node5" href="$classXML__Loading__Archive.html#ab000726e8f5db4742338a6844c899541" title="return integer value of attribute att_name" alt="" coords="655,363,807,403"/>
+<area shape="rect" id="node6" href="$classXML__Loading__Archive.html#a987f28e4f3139e5f1c96913468ea3057" title="move to next tag, return true if EOF" alt="" coords="205,273,357,313"/>
+<area shape="rect" id="node7" href="$classXML__Loading__Archive.html#af47c1ee37f477d083cf1a3a22bb608ac" title="read next derived function" alt="" coords="205,209,357,249"/>
+<area shape="rect" id="node13" href="$classXML__Loading__Archive.html#a619b73db295d1c88790d671a9ce7fef4" title="read a token" alt="" coords="205,549,357,589"/>
+<area shape="rect" id="node4" href="$classXML__Loading__Archive.html#a59a9b9839c3a2087ce5a350b3b9a9c06" title="print current tag" alt="" coords="655,69,807,109"/>
+<area shape="rect" id="node8" href="$classXML__Loading__Archive.html#ab35641740ea48ef96237fe6d230d426b" title="add fid and function to find_fun_map. Either fid must be new, or else an existing fid must have its n..." alt="" coords="423,177,575,217"/>
+<area shape="rect" id="node10" href="$classXML__Loading__Archive.html#ab8580e022dac6f86d619f3d2344a2f39" title="return Fid value of attribute att_name" alt="" coords="423,241,575,281"/>
+<area shape="rect" id="node11" href="$classXML__Loading__Archive.html#ada80c9a78cf66c57c5c7085a237c45b2" title="return Fid value of attribute att_name" alt="" coords="423,305,575,345"/>
+<area shape="rect" id="node12" href="$classDerivedFunctionCache.html#a9932cdc5cbbbe2ab585aa92b40b1e86d" title="return the last cache entry and increment idx. To be used with placement new." alt="" coords="408,127,589,153"/>
+<area shape="rect" id="node9" href="$classXML__Loading__Archive.html#a93a89589ea91d036a7327823bcda95cb" title="return fun_map for fid, or 0 if not found." alt="" coords="655,177,807,217"/>
+<area shape="rect" id="node14" href="$classIndexExpr.html#ac40bdce7aab1e79c5ab784903c7c27bc" title="append a value." alt="" coords="425,471,573,497"/>
+<area shape="rect" id="node15" href="$classXML__Loading__Archive.html#a1acad23f43b2ceb1287f378c3e001d33" title="return floating point value of attribute att_name" alt="" coords="423,521,575,561"/>
+<area shape="rect" id="node16" href="$classXML__Loading__Archive.html#a3ea850c7fb68b3e908615f81bb9304d2" title="find mandatory attribute att_name. Return a pointer to its value if found and throw DOMAIN ERROR if n..." alt="" coords="423,1709,575,1749"/>
+<area shape="rect" id="node18" href="$classAvec.html#a88cc8af75e4a2c4d8a1d382637ca07b4" title="return true if unicode uni is a quad (⎕ or ▯)" alt="" coords="1167,493,1273,518"/>
+<area shape="rect" id="node19" href="$classWorkspace.html#ad59928bcb6527147b5c5ca3e34106fe3" title="lookup an existing symbol (user defined or ⎕xx)." alt="" coords="405,1032,592,1072"/>
+<area shape="rect" id="node37" href="$classWorkspace.html#a99b1f4c9234de25fdf6f5a320d18fb57" title="lookup an existing user defined symbol. If not found, create one (unless this would be a quad symbol)" alt="" coords="640,637,823,662"/>
+<area shape="rect" id="node40" href="$classXML__Loading__Archive.html#ac281f8500311f7c498243ec23ee1d143" title="read a system function with attribute id_prefix&#45;id or a user defined functions with attributes &#39;ufun_..." alt="" coords="423,1545,575,1585"/>
+<area shape="rect" id="node17" href="$classXML__Loading__Archive.html#ad0c398f273df586ef1a2cb9b87b9cb41" title="find attribute att_name and return: a pointer to its value if found, 0 if optional is true,..." alt="" coords="890,1840,1042,1880"/>
+<area shape="rect" id="node20" href="$classToken.html#a049cd3eb72ae0c6427e523d399876b86" title="return the TokenClass of this token." alt="" coords="669,1145,794,1170"/>
+<area shape="rect" id="node21" href="$classWorkspace.html#acb39e0420fcef7558220b9576b809e97" title="return a token for system function or variable ucs" alt="" coords="657,858,806,883"/>
+<area shape="rect" id="node31" href="$classSymbolTableBase.html#a58cddd45598f27eff5711db23ce9043c" title="return a Symbol with name name in this SymbolTable." alt="" coords="879,1032,1053,1072"/>
+<area shape="rect" id="node34" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="1587,873,1709,898"/>
+<area shape="rect" id="node35" href="$classToken.html#a7ca97b588068b17bd396d8ae9d30ea7a" title="return the Symbol * value of this token" alt="" coords="897,1147,1035,1173"/>
+<area shape="rect" id="node22" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="896,834,1036,859"/>
+<area shape="rect" id="node23" href="$classSystemName.html#a172f0a34194f5e512f521800dca3a339" title="return the function (if any) that this name represents" alt="" coords="875,883,1057,909"/>
+<area shape="rect" id="node24" href="$classSystemVariable.html#adfd61017d46f4b022af485637a768c76" title="return the TokenTag for this system variable" alt="" coords="896,719,1036,759"/>
+<area shape="rect" id="node27" href="$classFunction.html#a74163ba976576a5bb03a060d42fd96e5" title="return a Token for this function." alt="" coords="897,933,1035,958"/>
+<area shape="rect" id="node28" href="$classSystemName.html#a38a91b3cff0213ca7b89f4ddfa7d135a" title="return the variable (if any) that this name represents" alt="" coords="876,982,1056,1007"/>
+<area shape="rect" id="node29" href="$classAvec.html#a76a72fdcb1782be1c490b3670c45504f" title="Return true iff av is a valid char in a user defined symbol." alt="" coords="891,669,1041,694"/>
+<area shape="rect" id="node25" href="$classNamedObject.html#a3ff29d3b8f3eed6c55f535e1af8dbc91" title="return the Id of this object (ID_USER_SYMBOL for user defined objects)" alt="" coords="1147,771,1293,797"/>
+<area shape="rect" id="node26" href="$classID.html#a4e45a9557dbd8b94bcdf0ecbe280a386" title="return the TokenTag for id" alt="" coords="1157,722,1283,747"/>
+<area shape="rect" id="node30" href="$classAvec.html#afe30f62f26ec74019a95e5cbd6eaa111" title="Find av in character_table. Return position or Invalid_CHT." alt="" coords="1163,673,1277,698"/>
+<area shape="rect" id="node32" href="$classSymbolTableBase.html#ad231d005a78e9d44f0536aeb1caea62c" title="compute a 16&#45;bit hash for name" alt="" coords="1109,898,1331,923"/>
+<area shape="rect" id="node33" href="$classUCS__string.html#af5956757116853a2e1bc5a0533624d2e" title="return the FNV (Fowler&#45;Noll&#45;Vo) hash of this_string" alt="" coords="1379,873,1539,898"/>
+<area shape="rect" id="node36" href="$classToken.html#a1a31afbb07e3f1dbb86d5f872ce5c297" title="return the TokenValueType of this token." alt="" coords="1382,1198,1535,1223"/>
+<area shape="rect" id="node38" href="$classSymbolTable.html#a678844569da04a269614ef39a1057589" title="Return or create a Symbol with name ucs in this SymbolTable." alt="" coords="894,604,1038,644"/>
+<area shape="rect" id="node39" href="$classSymbolTableBase.html#a8b6fdeffe7abdc7b3163d07befa9962a" title="add sym to the symbol table. The caller has checked that new_name does not yet exist in the symbol ta..." alt="" coords="1114,594,1326,649"/>
+<area shape="rect" id="node41" href="$classXML__Loading__Archive.html#a486705e0f7d900feed8c8fce0bbb9f46" title="find a lambda in the current SI entry" alt="" coords="655,1463,807,1503"/>
+<area shape="rect" id="node45" href="$classValueStackItem.html#a3a9ea0ee5b4129f7e5aa4a92c851abfd" title="return the function (caller must have checked NC_FUNOPER)." alt="" coords="895,1627,1037,1667"/>
+<area shape="rect" id="node51" href="$classValueStackItem.html#a27453c0dfda1004c6f5e68a0c2530eae" title="return the name class for this ValueStackItem" alt="" coords="882,1691,1050,1717"/>
+<area shape="rect" id="node53" href="$classSymbol.html#ada4b68d3cdfdd1ec7228cb65ef9a1062" title="return the size of the value stack" alt="" coords="879,1741,1053,1766"/>
+<area shape="rect" id="node54" href="$classXML__Loading__Archive.html#a24f7c04b8608953c16b246568f6fd738" title="find optional attribute att_name. Return a pointer to its value if found and 0 if not." alt="" coords="655,1679,807,1719"/>
+<area shape="rect" id="node55" href="$classID.html#af1bb0741450971c1882af59af87eef29" title="return the printable name for id as UCS_string" alt="" coords="663,1793,800,1818"/>
+<area shape="rect" id="node58" href="$classID.html#a341968b9dc03776b8fda037e99451efc" title="If id is the ID of primitive function, primitive operator, or quad function, then return a pointer to..." alt="" coords="649,1743,814,1769"/>
+<area shape="rect" id="node42" href="$classExecutable.html#a11724212451aab10562b577a62678b88" title="return the body of this executable" alt="" coords="892,1577,1040,1602"/>
+<area shape="rect" id="node43" href="$classStateIndicator.html#a82ad7a8a8f81d5fe9fc94bb15ed408fc" title="return pointer to the current user function, statements, or execute" alt="" coords="901,1247,1031,1287"/>
+<area shape="rect" id="node44" href="$classUserFunction.html#a85b3b772932a3616dc1eeaee3063f51f" title="overloaded Function::get_func_ufun()" alt="" coords="871,1311,1061,1337"/>
+<area shape="rect" id="node46" href="$classToken.html#a4d19f279ca06bc64e549c9d63ca677b0" title="return the Function_P value of this token" alt="" coords="897,1197,1035,1222"/>
+<area shape="rect" id="node48" href="$classStateIndicator.html#aa60ca9df0350c7b2e4c0825f061f300e" title="return the nesting level (oldest SI has level 0, next has level 1, ...)" alt="" coords="901,1361,1031,1401"/>
+<area shape="rect" id="node49" href="$classUserFunction.html#a59a4ca14c199edd678c1f10ba95e2f43" title="return the name of this function" alt="" coords="883,1426,1049,1451"/>
+<area shape="rect" id="node52" href="$classWorkspace.html#a8083efc2d51067edb25ae8dd4f014173" title="the top of the SI stack (the SI pushed last)" alt="" coords="899,1475,1033,1501"/>
+<area shape="rect" id="node47" href="$classToken.html#abe9f60f29fc7644214b48cc2715a21ad" title="return true if this token is a function (or operator)" alt="" coords="1155,1198,1285,1223"/>
+<area shape="rect" id="node50" href="$classUserFunction__header.html#abcc2f6d70da90e3123e630a226b9e931" title="return the name of the function" alt="" coords="1147,1419,1293,1459"/>
+<area shape="rect" id="node56" href="$classID.html#a1c80b7bfa291882045116dcec6d50098" title="return the printable name for id as UTF8 *" alt="" coords="915,1790,1017,1815"/>
+<area shape="rect" id="node57" href="$structId__name.html#a3202cdf13a9726257a4a3652a66285dd" title="compare key with item (for bsearch())" alt="" coords="1155,1790,1285,1815"/>
+</map>

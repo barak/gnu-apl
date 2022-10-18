@@ -1,0 +1,19 @@
+<map id="XML_Loading_Archive::next_tag" name="XML_Loading_Archive::next_tag">
+<area shape="rect" id="node2" href="$classXML__Loading__Archive.html#aa277539e63e84953fa49069c6d51ea47" title="read all user&#45;defined commands " alt="" coords="813,45,965,87"/>
+<area shape="rect" id="node3" href="$classXML__Loading__Archive.html#a3ea748a15d0a90fe9a32c362b14da7fd" title="read an entire workspace, throw DOMAIN_ERROR on failure " alt="" coords="1413,481,1565,523"/>
+<area shape="rect" id="node5" href="$classXML__Loading__Archive.html#a5085841ad5dd83bd88588db76c3a2838" title="read ⍎ Executable " alt="" coords="613,227,765,268"/>
+<area shape="rect" id="node6" href="$classXML__Loading__Archive.html#adfa844fcc401d3c335cafa5abda2f35d" title="read next StateIndicator entry " alt="" coords="1013,332,1165,373"/>
+<area shape="rect" id="node7" href="$classXML__Loading__Archive.html#ad2f1d88070976eab8a41f0fdcd1e0ec1" title="read next StateIndicator element " alt="" coords="1213,423,1365,464"/>
+<area shape="rect" id="node8" href="$classXML__Loading__Archive.html#a2e7aed9883aa106937d3d9313163e10b" title="read next Function element " alt="" coords="205,731,357,772"/>
+<area shape="rect" id="node9" href="$classXML__Loading__Archive.html#a16b4789e109bf0167ae481b86a1ebedb" title="read a lambda " alt="" coords="613,365,765,407"/>
+<area shape="rect" id="node11" href="$classXML__Loading__Archive.html#a7381cad28d73cdca8a76bf741921c63d" title="read parsers in SI entry " alt="" coords="813,300,965,341"/>
+<area shape="rect" id="node12" href="$classXML__Loading__Archive.html#a5e165853b437a502be850f3527ef8b77" title="read ◊ Executable " alt="" coords="409,365,561,407"/>
+<area shape="rect" id="node13" href="$classXML__Loading__Archive.html#a75730a7dd5af9238d0d1aa223a54060e" title="read next Symbol element " alt="" coords="409,548,561,589"/>
+<area shape="rect" id="node14" href="$classXML__Loading__Archive.html#a2a4f7a3fff06dfd2351348bf26fc90a3" title="read next Symbol element " alt="" coords="613,599,765,640"/>
+<area shape="rect" id="node15" href="$classXML__Loading__Archive.html#a2dce39a2eb0bb8bc55d0306606bb86d6" title="reset archive to the start position " alt="" coords="205,665,357,707"/>
+<area shape="rect" id="node17" href="$classXML__Loading__Archive.html#a44bf13ce1569bd63ad5de5e460ed3ace" title="skip to tag tag, return EOF if end of file " alt="" coords="205,445,357,487"/>
+<area shape="rect" id="node4" href="$classXML__Loading__Archive.html#a45c9b23463cf5379d2788af1789a62f0" title="read vids of top&#45;level variables " alt="" coords="1613,599,1765,640"/>
+<area shape="rect" id="node10" href="$classXML__Loading__Archive.html#a0cd18fa421176354e241891d951f5169" title="read a user defined Executable " alt="" coords="813,365,965,407"/>
+<area shape="rect" id="node16" href="$classXML__Loading__Archive.html#afd0e9ad4162c5babd4805a1c6a8cff20" title="constructor: remember file name and workspace " alt="" coords="405,716,565,757"/>
+<area shape="rect" id="node18" href="$classXML__Loading__Archive.html#ac4cdadb93d62fcd862579b84d3556804" title="read an UCS string " alt="" coords="409,431,561,472"/>
+</map>

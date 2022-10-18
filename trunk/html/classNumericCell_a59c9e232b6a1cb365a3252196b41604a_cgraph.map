@@ -1,0 +1,9 @@
+<map id="NumericCell::integer_binomial" name="NumericCell::integer_binomial">
+<area shape="rect" id="node1" title="N over K for positive integers N and K." alt="" coords="5,97,147,137"/>
+<area shape="rect" id="node2" href="$classCell.html#a19f013bdb9ddb5d594f29afafd3f979c" title="True iff value is numeric and close to an int." alt="" coords="195,5,336,31"/>
+<area shape="rect" id="node3" href="$classCell.html#ab61bca6fe0175014ea6c2d0d91f411e6" title="return value if it is close to int, or else throw DOMAIN_ERROR" alt="" coords="216,55,315,80"/>
+<area shape="rect" id="node4" href="$classIntCell.html#afd60fd9e3a5581ac99c1e053d9218fe7" title="initialize the (un&#45;initialized) Cell *Z to integer 0" alt="" coords="224,104,307,129"/>
+<area shape="rect" id="node6" href="$classFloatCell.html#a88217aaf5cd286cc89a85d2885876dda" title="initialize the (un&#45;initialized) Cell *Z to APL_Float flt" alt="" coords="217,153,314,179"/>
+<area shape="rect" id="node7" href="$classIntCell.html#aa99b7212ce13da0f241adeb18e350198" title="initialize Z to APL_Integer v" alt="" coords="226,203,305,228"/>
+<area shape="rect" id="node5" href="$classIntCell.html#a88c653b2f968c451ee1c1c53a983fa13" title="Construct an integer cell with value 0." alt="" coords="384,153,491,179"/>
+</map>

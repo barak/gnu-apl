@@ -1,0 +1,8 @@
+<map id="Bif_F12_DOMINO::Matrix::real" name="Bif_F12_DOMINO::Matrix::real">
+<area shape="rect" id="node1" title="return the real part of A[x;y]" alt="" coords="260,119,433,159"/>
+<area shape="rect" id="node2" href="$classBif__F12__DOMINO.html#a189b8180b3336951a9859c6baf5b44e0" title="compute the householder transformation Q of B = QR" alt="" coords="5,5,212,31"/>
+<area shape="rect" id="node3" href="$classBif__F12__DOMINO_1_1Matrix.html#a537c14841f72ee0cb86824c2f4732597" title="set this matrix to A +.× B" alt="" coords="22,55,195,95"/>
+<area shape="rect" id="node4" href="$classBif__F12__DOMINO_1_1Matrix.html#af7cccb72c8c8ee04d677d430348706b4" title="initialize this real matrix to be the outer product of the first column of the real matrix src with i..." alt="" coords="22,119,195,159"/>
+<area shape="rect" id="node5" href="$classBif__F12__DOMINO.html#ac16aea4e12503987e47564b86b5c0fba" title="inver a real upper&#45;triangle matrix" alt="" coords="24,183,193,223"/>
+<area shape="rect" id="node6" href="$classBif__F12__DOMINO_1_1Matrix.html#a7694b78550a0593311921482c7349673" title="assign real matrix src to this real matrix" alt="" coords="22,247,195,287"/>
+</map>

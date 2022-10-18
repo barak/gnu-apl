@@ -1,0 +1,5 @@
+<map id="Command::transfer_context::add" name="Command::transfer_context::add">
+<area shape="rect" id="node1" title="add len UTF8 bytes to this transfer_context" alt="" coords="5,35,219,60"/>
+<area shape="rect" id="node2" href="$classAvec.html#a15bfa417923b425ec3c2baf973d2a5f9" title="a pointer to 256 Unicode characters that are exactly the APL2 character set (⎕AV) shown in lrm Append..." alt="" coords="267,5,411,31"/>
+<area shape="rect" id="node3" href="$classAvec.html#ae3911626674255ce3f75abd5cd4ca3be" title="recompute inverse_ibm_av from ibm_av and print it" alt="" coords="271,55,406,95"/>
+</map>

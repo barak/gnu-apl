@@ -1,0 +1,4 @@
+<map id="Command::cmd_KEYB" name="Command::cmd_KEYB">
+<area shape="rect" id="node1" title="show US keyboard layout" alt="" coords="5,5,164,31"/>
+<area shape="rect" id="node2" href="$classUTF8__string.html#a922bd7ebc6a8ea5c6ba9c54159b18a93" title="return this string as a 0&#45;terminated C string" alt="" coords="212,5,343,31"/>
+</map>

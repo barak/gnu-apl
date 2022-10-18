@@ -1,0 +1,5 @@
+<map id="PrintBuffer::print_interruptible" name="PrintBuffer::print_interruptible">
+<area shape="rect" id="node1" title="print this buffer, interruptible with ^C" alt="" coords="431,5,548,45"/>
+<area shape="rect" id="node2" href="$classPrintBuffer.html#adb9b7f5903b37ffeae4de10ada9cfc6d" title="helper for non&#45;trivial PrintBuffer(const Value &amp; ...) constructor" alt="" coords="208,13,383,38"/>
+<area shape="rect" id="node3" href="$classPrintBuffer.html#a5abec40efca2993a2b522e199694730f" title="contructor: a PrintBuffer from an APL value" alt="" coords="5,13,160,38"/>
+</map>

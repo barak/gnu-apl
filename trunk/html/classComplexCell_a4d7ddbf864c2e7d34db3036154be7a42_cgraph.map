@@ -1,0 +1,9 @@
+<map id="ComplexCell::bif_direction" name="ComplexCell::bif_direction">
+<area shape="rect" id="node1" title="overloaded from the corresponding Cell:: function (see class Cell)." alt="" coords="5,127,180,152"/>
+<area shape="rect" id="node2" href="$classComplexCell.html#ae93d7078736e5c3b20970a687565b3d1" title="return the complex value of this cell" alt="" coords="243,5,372,31"/>
+<area shape="rect" id="node3" href="$classComplexCell.html#adf8b4fb74fa6bec21f7302050c3a272c" title="overloaded Cell::get_imag_value()." alt="" coords="228,55,387,95"/>
+<area shape="rect" id="node4" href="$classComplexCell.html#afbb52d9c46b3b4e9eb5e813d3e4aab7c" title="overloaded Cell::get_real_value()." alt="" coords="232,119,383,159"/>
+<area shape="rect" id="node5" href="$classIntCell.html#afd60fd9e3a5581ac99c1e053d9218fe7" title="initialize the (un&#45;initialized) Cell *Z to integer 0" alt="" coords="266,184,349,209"/>
+<area shape="rect" id="node7" href="$classComplexCell.html#a9ccb64da2c504a517c725dc2c41940da" title="initialize the (un&#45;initialized) Cell *Z to complex r + ij" alt="" coords="246,233,369,259"/>
+<area shape="rect" id="node6" href="$classIntCell.html#a88c653b2f968c451ee1c1c53a983fa13" title="Construct an integer cell with value 0." alt="" coords="435,184,541,209"/>
+</map>

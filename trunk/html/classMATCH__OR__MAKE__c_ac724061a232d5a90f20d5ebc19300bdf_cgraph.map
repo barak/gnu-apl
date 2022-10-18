@@ -1,0 +1,5 @@
+<map id="MATCH_OR_MAKE_c::store" name="MATCH_OR_MAKE_c::store">
+<area shape="rect" id="node1" title="store (aka. serialize) this signal into a buffer" alt="" coords="5,5,199,31"/>
+<area shape="rect" id="node2" href="$classSig__item__int.html#a388d7bb49f81f13fcb8b3c006e67fe7f" title="store (aka. serialize) this item into a string" alt="" coords="444,5,575,31"/>
+<area shape="rect" id="node3" href="$classSig__item__string.html#a62d13f45dc7ec4667bf115161bfbfde6" title="store (aka. serialize) this item into a buffer" alt="" coords="247,31,396,56"/>
+</map>

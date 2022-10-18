@@ -1,0 +1,4 @@
+<map id="Bif_F2_NAND_B::get_scalar_f2" name="Bif_F2_NAND_B::get_scalar_f2">
+<area shape="rect" id="node1" title="overloaded Function::get_scalar_f2()" alt="" coords="5,5,153,45"/>
+<area shape="rect" id="node2" href="$classCell.html#ad009b9e0c296bed6478d6059c081adc0" title="store the bitwise nand of A and this cell in Z" alt="" coords="201,13,352,38"/>
+</map>

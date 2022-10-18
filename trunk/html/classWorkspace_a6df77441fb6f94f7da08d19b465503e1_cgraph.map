@@ -1,0 +1,4 @@
+<map id="Workspace::find_lambda_name" name="Workspace::find_lambda_name">
+<area shape="rect" id="node1" title="return the name to which lambda ia assigned (empty if not found)" alt="" coords="5,5,211,31"/>
+<area shape="rect" id="node2" href="$classSymbolTable.html#a591b83178ad60a065b68917b0dea471a" title="return the name to which lambda ia assigned (empty if not found)" alt="" coords="259,5,473,31"/>
+</map>

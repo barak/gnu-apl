@@ -1,0 +1,4 @@
+<map id="IntCell::bif_reciprocal" name="IntCell::bif_reciprocal">
+<area shape="rect" id="node1" title="overloaded from the corresponding Cell:: function (see class Cell)" alt="" coords="176,5,321,31"/>
+<area shape="rect" id="node2" href="$classIntCell.html#a4b99fe69953fa5c1228d1c508508ce52" title="overloaded Cell::bif_divide()" alt="" coords="5,5,128,31"/>
+</map>

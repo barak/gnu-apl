@@ -1,5 +1,13 @@
 <map id="Plot_window_properties::get_origin_Y" name="Plot_window_properties::get_origin_Y">
-<area shape="rect" id="node2" href="$classPlot__window__properties.html#acd007c1ca30e86d8e12e125a39d7d9a5" title="convert values val_X, val_Y, and val_Z, to the X and Y coordinate of the pixel below the Z=0 plane of..." alt="" coords="213,5,373,47"/>
-<area shape="rect" id="node3" href="$classPlot__window__properties.html#af978c228065cbaba8381af79bc1fce95" title="convert &#160;&#160;val_Z to the relative Z vector (q. quadrant) " alt="" coords="421,5,581,47"/>
-<area shape="rect" id="node4" href="$classPlot__window__properties.html#aa4db62e171eab805cd9e1a3cbc253c3c" title="return the pixel position of the point where the X, Y, and possibly Z&#45;axis cross. ..." alt="" coords="421,71,581,112"/>
+<area shape="rect" id="node2" href="$Plot__gtk_8cc.html#a02d7e85e859c174d83c546c9eb641085" title="draw the (slanted) Z grid&#45;lines of the plot " alt="" coords="455,71,548,98"/>
+<area shape="rect" id="node8" href="$structPlot__context.html#ae4285a04e68fbf6bd0b472bd66bcb55c" title="return the required height of the entire plot area " alt="" coords="425,5,578,47"/>
+<area shape="rect" id="node9" href="$classPlot__window__properties.html#acd007c1ca30e86d8e12e125a39d7d9a5" title="convert values val_X, val_Y, and val_Z, to the X and Y coordinate of the pixel below the Z=0 plane of..." alt="" coords="213,123,373,164"/>
+<area shape="rect" id="node3" href="$Plot__gtk_8cc.html#aee8ee06e4281931fdfd2560f7cc57865" title="plot the data " alt="" coords="629,67,693,94"/>
+<area shape="rect" id="node4" href="$Plot__gtk_8cc.html#af71ef5256eb8aee2ba62880e3e8806ba" title="callback when the plot window shall be redrawn " alt="" coords="741,66,847,93"/>
+<area shape="rect" id="node5" href="$Plot__gtk_8cc.html#a1e31fd39155ef1eb8c2345913253101b" title="save the pixels of the plot to a file " alt="" coords="897,66,971,93"/>
+<area shape="rect" id="node6" href="$Plot__gtk_8cc.html#a897990543dc934261ba8e7a124446b11" title="the main() program of the thread that handles one plot window. " alt="" coords="895,14,973,41"/>
+<area shape="rect" id="node7" href="$classQuad__PLOT.html#acc4187c32c3bad52f276a724b226b429" title="overloaded Function::eval_AB() " alt="" coords="1021,14,1172,41"/>
+<area shape="rect" id="node10" href="$Plot__gtk_8cc.html#a9fda0abefef58d0042b77795ebf2dbf8" title="draw surface (3D) data lines " alt="" coords="434,254,569,281"/>
+<area shape="rect" id="node11" href="$classPlot__window__properties.html#af978c228065cbaba8381af79bc1fce95" title="convert &#160;&#160;val_Z to the relative Z vector (q. quadrant) " alt="" coords="421,123,581,164"/>
+<area shape="rect" id="node12" href="$classPlot__window__properties.html#aa4db62e171eab805cd9e1a3cbc253c3c" title="return the pixel position of the point where the X, Y, and possibly Z&#45;axis cross. ..." alt="" coords="421,188,581,229"/>
 </map>

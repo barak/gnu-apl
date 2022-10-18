@@ -1,0 +1,13 @@
+<map id="Bif_F12_PICK::compute_item_shape" name="Bif_F12_PICK::compute_item_shape">
+<area shape="rect" id="node1" title="the shape of the items being disclosed" alt="" coords="1000,63,1164,103"/>
+<area shape="rect" id="node2" href="$classBif__F12__PICK.html#a49b2c6d2d06a094709eb02c32b936587" title="⊃B" alt="" coords="789,70,952,95"/>
+<area shape="rect" id="node3" href="$classBif__F12__PICK.html#addeecdccc96628ddf5e957d7daa8d167" title="⊃[X]B" alt="" coords="579,5,741,45"/>
+<area shape="rect" id="node5" href="$classBif__F12__PICK.html#ac5f50301c6bba3e36d49a886c4374025" title="overloaded Function::eval_B()" alt="" coords="583,70,737,95"/>
+<area shape="rect" id="node6" href="$classValue.html#adcada8db3d31b0fc0791755ed40dc1d0" title="print this member value" alt="" coords="589,119,731,145"/>
+<area shape="rect" id="node4" href="$classBif__F12__PICK.html#ad21f06a298fdf42e3e4db81cda42bcff" title="overloaded Function::eval_XB()" alt="" coords="368,13,531,38"/>
+<area shape="rect" id="node7" href="$classValue.html#a21369bf72b3fb40d1e9558cb1497a6b0" title="print this value (line break at Workspace::get_PW())" alt="" coords="405,119,493,145"/>
+<area shape="rect" id="node8" href="$classValue.html#a8f4efc08e1cf758c79dec03f9a42f9a6" title="check that this value was completely initialized, and set VF_complete if so." alt="" coords="184,89,320,114"/>
+<area shape="rect" id="node10" href="$classValue.html#a926a6bd11f4d27c077c19bbb03c333cf" title="list a value" alt="" coords="198,143,306,169"/>
+<area shape="rect" id="node9" href="$classValue.html#a700520f88c4f5facadbbf1ca8e21c7ec" title="constructor: a scalar value (i.e. a value with rank 0) from a cell" alt="" coords="23,82,119,107"/>
+<area shape="rect" id="node11" href="$classValue.html#a38979fd196c826557e1614fa0514bbaa" title="erase stale values" alt="" coords="5,155,136,181"/>
+</map>

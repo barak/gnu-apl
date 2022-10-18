@@ -1,0 +1,8 @@
+<map id="signal_SEGV_handler" name="signal_SEGV_handler">
+<area shape="rect" id="node1" title="signal handler for segfaults" alt="" coords="5,55,155,80"/>
+<area shape="rect" id="node2" href="$classIO__Files.html#a6101bf6358b96faf4025eca0462bf5b8" title="count a failed assertion" alt="" coords="211,5,359,31"/>
+<area shape="rect" id="node4" href="$classCommand.html#aafd8a7df22d24109a5ea7de47267f241" title="clean&#45;up and exit from APL interpreter" alt="" coords="211,55,359,80"/>
+<area shape="rect" id="node5" href="$classThread__context.html#a770b7101581894235605003726ebdc62" title="print all TaskTree nodes" alt="" coords="203,104,368,129"/>
+<area shape="rect" id="node3" href="$structInputFile.html#a8dc157767e0af4c57eefa4225629e7f8" title="the current file" alt="" coords="417,5,561,31"/>
+<area shape="rect" id="node6" href="$classThread__context.html#adc73bb9ae1ecb7b10830bd073201f7ea" title="print this TaskTree node" alt="" coords="416,104,561,129"/>
+</map>

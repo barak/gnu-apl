@@ -1,0 +1,21 @@
+<map id="Workspace::lookup_existing_symbol" name="Workspace::lookup_existing_symbol">
+<area shape="rect" id="node1" title="lookup an existing symbol (user defined or ⎕xx)." alt="" coords="5,406,192,446"/>
+<area shape="rect" id="node2" href="$classToken.html#a049cd3eb72ae0c6427e523d399876b86" title="return the TokenClass of this token." alt="" coords="252,237,377,263"/>
+<area shape="rect" id="node3" href="$classWorkspace.html#acb39e0420fcef7558220b9576b809e97" title="return a token for system function or variable ucs" alt="" coords="240,287,389,312"/>
+<area shape="rect" id="node11" href="$classAvec.html#a88cc8af75e4a2c4d8a1d382637ca07b4" title="return true if unicode uni is a quad (⎕ or ▯)" alt="" coords="475,385,581,411"/>
+<area shape="rect" id="node14" href="$classSymbolTableBase.html#a58cddd45598f27eff5711db23ce9043c" title="return a Symbol with name name in this SymbolTable." alt="" coords="441,435,615,475"/>
+<area shape="rect" id="node17" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="1144,421,1267,447"/>
+<area shape="rect" id="node18" href="$classToken.html#a7ca97b588068b17bd396d8ae9d30ea7a" title="return the Symbol * value of this token" alt="" coords="245,551,384,576"/>
+<area shape="rect" id="node4" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="458,287,598,312"/>
+<area shape="rect" id="node5" href="$classSystemName.html#a172f0a34194f5e512f521800dca3a339" title="return the function (if any) that this name represents" alt="" coords="437,336,619,361"/>
+<area shape="rect" id="node6" href="$classSystemVariable.html#adfd61017d46f4b022af485637a768c76" title="return the TokenTag for this system variable" alt="" coords="458,22,598,62"/>
+<area shape="rect" id="node9" href="$classFunction.html#a74163ba976576a5bb03a060d42fd96e5" title="return a Token for this function." alt="" coords="459,87,597,112"/>
+<area shape="rect" id="node10" href="$classSystemName.html#a38a91b3cff0213ca7b89f4ddfa7d135a" title="return the variable (if any) that this name represents" alt="" coords="438,136,618,161"/>
+<area shape="rect" id="node12" href="$classAvec.html#a76a72fdcb1782be1c490b3670c45504f" title="Return true iff av is a valid char in a user defined symbol." alt="" coords="453,185,603,211"/>
+<area shape="rect" id="node7" href="$classNamedObject.html#a3ff29d3b8f3eed6c55f535e1af8dbc91" title="return the Id of this object (ID_USER_SYMBOL for user defined objects)" alt="" coords="704,5,851,31"/>
+<area shape="rect" id="node8" href="$classID.html#a4e45a9557dbd8b94bcdf0ecbe280a386" title="return the TokenTag for id" alt="" coords="714,55,841,80"/>
+<area shape="rect" id="node13" href="$classAvec.html#afe30f62f26ec74019a95e5cbd6eaa111" title="Find av in character_table. Return position or Invalid_CHT." alt="" coords="721,185,834,211"/>
+<area shape="rect" id="node15" href="$classSymbolTableBase.html#ad231d005a78e9d44f0536aeb1caea62c" title="compute a 16&#45;bit hash for name" alt="" coords="667,443,888,468"/>
+<area shape="rect" id="node16" href="$classUCS__string.html#af5956757116853a2e1bc5a0533624d2e" title="return the FNV (Fowler&#45;Noll&#45;Vo) hash of this_string" alt="" coords="936,447,1096,472"/>
+<area shape="rect" id="node19" href="$classToken.html#a1a31afbb07e3f1dbb86d5f872ce5c297" title="return the TokenValueType of this token." alt="" coords="451,551,605,576"/>
+</map>

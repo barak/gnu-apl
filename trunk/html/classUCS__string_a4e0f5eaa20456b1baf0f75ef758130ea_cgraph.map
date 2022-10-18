@@ -1,0 +1,15 @@
+<map id="UCS_string::UCS_string" name="UCS_string::UCS_string">
+<area shape="rect" id="node1" title="constructor: UCS_string from print buffer" alt="" coords="5,200,172,225"/>
+<area shape="rect" id="node2" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="455,16,595,41"/>
+<area shape="rect" id="node3" href="$classUCS__string.html#ace70327ef899c525ad9c3f2bffd43697" title="append 0&#45;terminated UTF8 string str to this UCS_string." alt="" coords="220,48,400,73"/>
+<area shape="rect" id="node4" href="$classUCS__string.html#a59bbae482ffc153b51b776723fcf7c05" title="compute the length of an output row" alt="" coords="451,85,599,125"/>
+<area shape="rect" id="node5" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="651,396,773,421"/>
+<area shape="rect" id="node6" href="$classUCS__string.html#a40523238d26f5405f5392df03d242627" title="common part of all constructors" alt="" coords="243,200,377,225"/>
+<area shape="rect" id="node7" href="$classPrintBuffer.html#af6f689e8c4e930b7c37099bf5fdfe57d" title="return the number of columns" alt="" coords="231,274,389,314"/>
+<area shape="rect" id="node8" href="$classPrintBuffer.html#a19446afa6beccd70a7fcdd5526cdc6a8" title="return line y" alt="" coords="241,339,379,364"/>
+<area shape="rect" id="node9" href="$classPrintBuffer.html#ac13295601812e379a3eac618ce239426" title="return the number of rows" alt="" coords="456,306,595,346"/>
+<area shape="rect" id="node10" href="$classUCS__string.html#af9f86c156b5ec01a7b46d2e40ff16c25" title="remove trailing pad characters" alt="" coords="239,439,381,479"/>
+<area shape="rect" id="node11" href="$classUCS__string.html#a186a76c22c3ac840f1e607ba49e253a0" title="return the last character in this string" alt="" coords="462,421,589,447"/>
+<area shape="rect" id="node12" href="$classUCS__string.html#a0b30b7def05056722f3e1eda0b816e4e" title="return true if this string contains uni" alt="" coords="452,471,599,496"/>
+<area shape="rect" id="node13" href="$classUCS__string.html#a67ea87cb92e687105b21917ffb4a2a6f" title="remove the last character in this string" alt="" coords="448,520,603,545"/>
+</map>

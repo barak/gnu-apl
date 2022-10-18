@@ -1,0 +1,11 @@
+<map id="Plot_window_properties::update" name="Plot_window_properties::update">
+<area shape="rect" id="node1" title="update derived properties after changing primary ones, return true on error" alt="" coords="924,51,1084,91"/>
+<area shape="rect" id="node2" href="$classQuad__PLOT.html#acc4187c32c3bad52f276a724b226b429" title="overloaded Function::eval_AB()" alt="" coords="5,5,156,31"/>
+<area shape="rect" id="node3" href="$classPlot__window__properties.html#a9967e651d5469f0b0437798271a938f9" title="constructor" alt="" coords="708,51,876,91"/>
+<area shape="rect" id="node4" href="$classPlot__window__properties.html#adff5407307aa8e7236e7778dce9d8863" title="handle window resize event" alt="" coords="712,115,872,155"/>
+<area shape="rect" id="node5" href="$Plot__gtk_8cc.html#af71ef5256eb8aee2ba62880e3e8806ba" title="callback when the plot window shall be redrawn" alt="" coords="555,71,660,96"/>
+<area shape="rect" id="node9" href="$Plot__xcb_8cc.html#a897990543dc934261ba8e7a124446b11" title="the pthread that handles one plot window." alt="" coords="568,123,647,148"/>
+<area shape="rect" id="node6" href="$Plot__gtk_8cc.html#a897990543dc934261ba8e7a124446b11" title="the main() program of the thread that handles one plot window." alt="" coords="428,60,507,85"/>
+<area shape="rect" id="node7" href="$classQuad__PLOT.html#a0161f15bc1b55d2d79b634ce35c15ec0" title="plot the data (creating a new plot window in X)" alt="" coords="204,55,380,80"/>
+<area shape="rect" id="node8" href="$classQuad__PLOT.html#a1b17ca0481f0d7fcc98732b3b1d2eefb" title="overloaded Function::eval_B()" alt="" coords="9,55,152,80"/>
+</map>

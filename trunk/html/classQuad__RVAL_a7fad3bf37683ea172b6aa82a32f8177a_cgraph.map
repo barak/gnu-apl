@@ -1,0 +1,4 @@
+<map id="Quad_RVAL::choose_integer" name="Quad_RVAL::choose_integer">
+<area shape="rect" id="node1" title="choose an integer value at random according to distribution dist" alt="" coords="5,5,196,31"/>
+<area shape="rect" id="node2" href="$classQuad__RVAL.html#a6fe97d65ef1815968c5b74030abf271f" title="return a 17&#45;bit random number" alt="" coords="244,5,387,31"/>
+</map>

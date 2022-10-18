@@ -1,0 +1,4 @@
+<map id="CDR_string::get_4" name="CDR_string::get_4">
+<area shape="rect" id="node1" title="return 4 bytes of the header (the header is always big endian)" alt="" coords="5,5,136,31"/>
+<area shape="rect" id="node2" href="$structCDR__header.html#a575c6483cca55f908908fbe59c975752" title="convert big endian 32 bit value to 32 bit host value (== ntohl())" alt="" coords="184,5,343,31"/>
+</map>

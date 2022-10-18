@@ -1,3 +1,4 @@
 <map id="FunctionStatistics" name="FunctionStatistics">
-<area shape="rect" id="node2" href="$classStatistics.html" title="Base class for different kinds of statistics. " alt="" coords="30,5,107,32"/>
+<area shape="rect" id="node1" title="Performance counters for an entire APL system function." alt="" coords="5,79,132,104"/>
+<area shape="rect" id="node2" href="$classStatistics.html" title="Base class for different kinds of statistics." alt="" coords="30,5,107,31"/>
 </map>

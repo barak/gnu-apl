@@ -1,0 +1,5 @@
+<map id="Quad_JSON::parse_literal" name="Quad_JSON::parse_literal">
+<area shape="rect" id="node1" title="parse a JSON literal (false, null, or true)" alt="" coords="5,31,180,56"/>
+<area shape="rect" id="node2" href="$classValue__P__Base.html#a1c3bf1b6f708eb2c1ba4b97c83adb9aa" title="return a const pointer to the Value" alt="" coords="246,5,381,31"/>
+<area shape="rect" id="node3" href="$classValue.html#a3a424b54ee7bfa4fcd69ff972e1c7add" title="initialize the next ravel cell with an APL sub&#45;value" alt="" coords="228,55,399,80"/>
+</map>

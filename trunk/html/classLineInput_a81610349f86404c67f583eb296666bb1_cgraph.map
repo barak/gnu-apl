@@ -1,0 +1,96 @@
+<map id="LineInput::edit_line" name="LineInput::edit_line">
+<area shape="rect" id="node1" title="get a line from from user" alt="" coords="5,3057,136,3082"/>
+<area shape="rect" id="node2" href="$classLineHistory.html#a870ae7c7f0a0abcc27623195bca68b20" title="add one line to this history" alt="" coords="1408,1539,1552,1565"/>
+<area shape="rect" id="node4" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="1869,1945,1991,1970"/>
+<area shape="rect" id="node5" href="$classUCS__string.html#ac43d98d8d13b5a91d670fe9af9250861" title="return true if this string contains non&#45;whitespace characters" alt="" coords="1629,1414,1786,1439"/>
+<area shape="rect" id="node9" href="$classLineEditContext.html#a2e597d200d17b9434fe83d58df393769" title="move cursor left and delete char" alt="" coords="184,3183,356,3209"/>
+<area shape="rect" id="node10" href="$classLineEditContext.html#a2af6d28c635eacfafd95d6d8a03b1197" title="delete char at cursor position" alt="" coords="413,2307,604,2333"/>
+<area shape="rect" id="node24" href="$classLineEditContext.html#a47d5284983336a22fdcdbcdddc736826" title="clear (after ^C)" alt="" coords="195,3867,345,3893"/>
+<area shape="rect" id="node25" href="$classLineEditContext.html#a2508faadc966340cdf4a5f2b1f5d11db" title="reset search substring" alt="" coords="429,3664,588,3704"/>
+<area shape="rect" id="node28" href="$classLineEditContext.html#a8e52f296fc6f747ddfce8d6550f2db45" title="move forward in history" alt="" coords="404,3411,613,3437"/>
+<area shape="rect" id="node30" href="$classLineEditContext.html#a8810889507384d9a98db8a8d60344a1b" title="move cursor to end" alt="" coords="1146,1835,1341,1861"/>
+<area shape="rect" id="node31" href="$classLineEditContext.html#a909c03d41ba5b42d8fae1e8804bd7789" title="move cursor home" alt="" coords="889,3737,1096,3762"/>
+<area shape="rect" id="node32" href="$classLineEditContext.html#a227f4e1074583815d54370e2a9f07a5c" title="move cursor left" alt="" coords="893,3830,1092,3855"/>
+<area shape="rect" id="node33" href="$classLineEditContext.html#a4d98991491704bcdd530d8850b0779e8" title="move cursor right" alt="" coords="1164,2219,1323,2259"/>
+<area shape="rect" id="node34" href="$classLineEditContext.html#adc5ab21d52a2ea0c7219357dcd0c067f" title="search line history" alt="" coords="429,3024,588,3064"/>
+<area shape="rect" id="node36" href="$classLineEditContext.html#afb1bb78e3774564eb2fc1c58a672365c" title="move backwards in history" alt="" coords="416,3259,601,3285"/>
+<area shape="rect" id="node38" href="$classLineEditContext.html#a7717b306eedb8f3a3949d420f0687172" title="cut from cursor to end of line" alt="" coords="438,2357,579,2397"/>
+<area shape="rect" id="node39" href="$classWorkspace.html#a3eaa0cc324b4e8e0f3fb0039efcd1b0c" title="return the current ⎕PW" alt="" coords="1409,171,1551,197"/>
+<area shape="rect" id="node40" href="$classLineInput.html#ab188d7e07879a811c96002b02908b9a0" title="get one character from user" alt="" coords="207,3917,333,3942"/>
+<area shape="rect" id="node44" href="$classLineEditContext.html#a2e9f7cacd8cfb267b48b15ec066c7da4" title="return current user input" alt="" coords="199,3967,341,4007"/>
+<area shape="rect" id="node45" href="$classLineEditContext.html#a671132bb9b96df8ace2ec1146bc486d6" title="insert uni at cursor position" alt="" coords="415,2587,602,2613"/>
+<area shape="rect" id="node48" href="$structInputFile.html#afbca3c136d4281d5309bca6e79d50226" title="return true iff the current input file exists and is a test file" alt="" coords="194,4031,346,4057"/>
+<area shape="rect" id="node49" href="$classLineEditContext.html#af149649722a0ac4532f47fe729f44f2f" title="paste to cursor position" alt="" coords="431,2746,586,2771"/>
+<area shape="rect" id="node50" href="$classLineEditContext.html#a8908cfbf56371294323892784508eca7" title="tab expansion" alt="" coords="199,2841,341,2881"/>
+<area shape="rect" id="node92" href="$classLineEditContext.html#a3ce189997980bb505f3d776cf388b4ce" title="toggle the insert mode" alt="" coords="191,4081,349,4121"/>
+<area shape="rect" id="node93" href="$classLineEditContext.html#a43cc3cfb93095a5d3e0121aec6ab1071" title="shortcut calling update_search() of member history with argument user_line" alt="" coords="189,4145,351,4185"/>
+<area shape="rect" id="node3" href="$classUCS__string.html#a186a76c22c3ac840f1e607ba49e253a0" title="return the last character in this string" alt="" coords="1644,1617,1771,1642"/>
+<area shape="rect" id="node7" href="$classLineHistory.html#a65f9dbc23912fc543e4433659ffc81ed" title="start a new up/down sequence" alt="" coords="1647,1515,1768,1541"/>
+<area shape="rect" id="node8" href="$classUCS__string.html#a67ea87cb92e687105b21917ffb4a2a6f" title="remove the last character in this string" alt="" coords="1630,1666,1785,1691"/>
+<area shape="rect" id="node6" href="$classAvec.html#a014cc622b9ec09014dab1982b0ee59ab" title="return true iff av is a whitespace char (ASCII 0..32 (including))" alt="" coords="1876,727,1984,753"/>
+<area shape="rect" id="node19" href="$classLineEditContext.html#a347304e997f587298b31ca56b87b2826" title="move the cursor" alt="" coords="1391,3361,1569,3386"/>
+<area shape="rect" id="node11" href="$classUCS__string.html#a52cd4088451200cd78eb2db03b44a8ac" title="erase 1 (!) character at pos" alt="" coords="1415,1713,1545,1738"/>
+<area shape="rect" id="node12" href="$classLineEditContext.html#a78bbd5426c6abecda70bac7daac39fb6" title="total length (prompt + user_line)" alt="" coords="1173,2333,1314,2373"/>
+<area shape="rect" id="node13" href="$classLineEditContext.html#a1aa233cff187028ebd725d6ee9628c71" title="refresh screen from cursor onwards" alt="" coords="670,2739,833,2779"/>
+<area shape="rect" id="node20" href="$classLineEditContext.html#a42e54e34054a3d943bedba1021973f0a" title="set the cursor (writing the appropriate ESC sequence to CIN)" alt="" coords="1637,2799,1778,2839"/>
+<area shape="rect" id="node14" href="$classLineEditContext.html#ada01ee6a413a0a4bd4bf3c6065bd650c" title="adjust (increment) the allocated height (long lines)" alt="" coords="913,3043,1072,3083"/>
+<area shape="rect" id="node15" href="$classCIN__ostream.html#a17aba6e323a182af53fe456594daabc7" title="clear to end of screen supported ?" alt="" coords="1144,2933,1343,2958"/>
+<area shape="rect" id="node16" href="$classCIN__ostream.html#abdf0a2e42d4b45ebc4248d8a3b5b40ca" title="clear to end of line" alt="" coords="1159,2982,1328,3007"/>
+<area shape="rect" id="node17" href="$classCIN__ostream.html#a0a691f3374049b4c5c45d29978d441b5" title="clear to end of line" alt="" coords="1158,3031,1329,3057"/>
+<area shape="rect" id="node21" href="$classCIN__ostream.html#a181f092c83f8cb272de489f3e7f198c9" title="set cursor to y:x (upper left corner is 0:0, negative y: from bottom)" alt="" coords="1845,3145,2015,3170"/>
+<area shape="rect" id="node22" href="$classLineEditContext.html#a8daeb0f45a6bb42428a42dce38e45704" title="refresh cursor if its position may be wrong (due to forward or backward wraparound being enabled or n..." alt="" coords="911,2665,1074,2705"/>
+<area shape="rect" id="node18" href="$classLineEditContext.html#a44d0521ecccc6559b5a2fb7541059911" title="refresh screen from prompt (including) onwards" alt="" coords="1152,3183,1335,3209"/>
+<area shape="rect" id="node23" href="$classLineEditContext.html#addd7f59de96e6c964539cf8d37e3fb87" title="return true if prompt + offset is on column 0" alt="" coords="1175,2615,1312,2655"/>
+<area shape="rect" id="node26" href="$classLineHistory.html#ab77d293ddf6c21b9c877ea8828d26c33" title="update history search substring" alt="" coords="689,3664,813,3704"/>
+<area shape="rect" id="node27" href="$classLineHistory.html#a3a213c7b4c35025e3b534af7c692edb0" title="print relevant indices" alt="" coords="693,3361,810,3386"/>
+<area shape="rect" id="node29" href="$classLineHistory.html#a4c22c3a61eaa31f95b5c9a1db12cf23d" title="move to next newer entry" alt="" coords="688,3513,815,3538"/>
+<area shape="rect" id="node35" href="$classLineHistory.html#ad32cb453ee5edaefa52a1da575c9856d" title="find entries like current line in history" alt="" coords="684,3006,819,3031"/>
+<area shape="rect" id="node37" href="$classLineHistory.html#aceeccf250636b19569342cd888a14916" title="move to next older entry" alt="" coords="696,3259,807,3285"/>
+<area shape="rect" id="node41" href="$structESCmap.html#a5b67213606c610861670a344d469cc3c" title="return true if an entry has prefix seq of length len" alt="" coords="435,3954,582,3979"/>
+<area shape="rect" id="node43" href="$classLineInput.html#ae2d642d7025f5930c32a6154caf3bc9f" title="interrupt&#45;safe fgetc()" alt="" coords="437,3905,581,3930"/>
+<area shape="rect" id="node42" href="$structESCmap.html#af6cbce2074f2cc32f20d8d7fb48db905" title="return true if seq is a true prefix of this ESCmap" alt="" coords="680,3954,823,3979"/>
+<area shape="rect" id="node46" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="1860,591,2000,617"/>
+<area shape="rect" id="node47" href="$classUCS__string.html#a522289839ffbbcbe43b4577858926858" title="more intuitive insert() function" alt="" coords="686,2537,817,2562"/>
+<area shape="rect" id="node51" href="$classTabExpansion.html#ad8c4300a7d2e9aa47e6c3a1d19285db7" title="perform tab expansion" alt="" coords="419,1582,599,1607"/>
+<area shape="rect" id="node52" href="$classTabExpansion.html#a155d53238b8490e82776eb2caddefceb" title="tab&#45;expand an APL command" alt="" coords="674,1155,829,1195"/>
+<area shape="rect" id="node82" href="$classUCS__string.html#a91556379049e71071410cec015b960db" title="remove leading and trailing whitespaces" alt="" coords="1172,1582,1315,1637"/>
+<area shape="rect" id="node85" href="$classTabExpansion.html#a784e980ca3a749da8358ce658b4557a4" title="tab&#45;expand a system&#45;defined name (⎕xxx)" alt="" coords="1166,340,1321,380"/>
+<area shape="rect" id="node86" href="$classTabExpansion.html#a793d1f4391a7f92f1455a03678582c12" title="tab&#45;expand a user&#45;defined name" alt="" coords="1166,1027,1321,1067"/>
+<area shape="rect" id="node88" href="$classAvec.html#af31e35e3049f3bc48cb1ff8d70262dd7" title="Return true iff av is a valid char in a user defined symbol." alt="" coords="661,1987,841,2013"/>
+<area shape="rect" id="node53" href="$classTabExpansion.html#ad99a9df8a0a9ba9ad03f75e654de0bd4" title="perform tab expansion for command arguments" alt="" coords="915,1127,1070,1167"/>
+<area shape="rect" id="node67" href="$classTabExpansion.html#aea44664e432733d7ac80c7ebc529c1a9" title="show the different alternatives for tab expansions" alt="" coords="1635,448,1779,488"/>
+<area shape="rect" id="node81" href="$classUCS__string.html#a9332c2147c89d03e41ec2c30e826a6ac" title="this is a command with optional args. Remove leading and trailing whitespaces, append args to rest,..." alt="" coords="919,1191,1066,1217"/>
+<area shape="rect" id="node54" href="$classTabExpansion.html#a87242c56b4445fadcf7ac9a1181a15ea" title="perform tab expansion for a filename" alt="" coords="1166,1153,1321,1193"/>
+<area shape="rect" id="node70" href="$classTabExpansion.html#a6da83ac1066425ec3d7d427d57b0435b" title="show the names of all APL primitives and user defined functions" alt="" coords="1166,912,1321,952"/>
+<area shape="rect" id="node55" href="$classUTF8__string.html#a922bd7ebc6a8ea5c6ba9c54159b18a93" title="return this string as a 0&#45;terminated C string" alt="" coords="2089,937,2220,962"/>
+<area shape="rect" id="node56" href="$classUCS__string.html#ad8e1ed8807d094b4b0b596db077af391" title="return this string with the first drop_count characters removed" alt="" coords="1419,2017,1541,2042"/>
+<area shape="rect" id="node59" href="$classTabExpansion.html#a3caac165f0b8c4454d8964fa05a775d3" title="perform tab expansion for a workspace name" alt="" coords="1403,671,1557,711"/>
+<area shape="rect" id="node64" href="$classTabExpansion.html#ab9d75ee0d642d9144a37b3db8d6c5aeb" title="read filenames in dir and append matching filenames to matches" alt="" coords="1635,880,1780,920"/>
+<area shape="rect" id="node69" href="$classLibPaths.html#ae240dc7e041df568a0cd61ec0270eb2a" title="return true iff directory lib) is present" alt="" coords="1409,1186,1551,1211"/>
+<area shape="rect" id="node57" href="$classUCS__string.html#ad092030b348adfd762de621c43d75812" title="default constructor: empty string" alt="" coords="1624,2426,1791,2451"/>
+<area shape="rect" id="node58" href="$classUCS__string.html#a40523238d26f5405f5392df03d242627" title="common part of all constructors" alt="" coords="1863,2426,1997,2451"/>
+<area shape="rect" id="node60" href="$classUCS__string.html#a5776e51c6faa53537409322cd0ebf07a" title="append number (in ASCII encoding like d) to this string" alt="" coords="1637,613,1777,653"/>
+<area shape="rect" id="node61" href="$classUCS__string.html#ace70327ef899c525ad9c3f2bffd43697" title="append 0&#45;terminated UTF8 string str to this UCS_string." alt="" coords="1617,678,1797,703"/>
+<area shape="rect" id="node62" href="$classLibPaths.html#a4316cbd8878626733273cb0db73cfd82" title="return library path (from config file or from libroot)" alt="" coords="1637,945,1777,970"/>
+<area shape="rect" id="node63" href="$classUTF8__string.html#ae512c0617f7a13fe5011655d898ca6c1" title="append the UTF8_string suffix" alt="" coords="2063,986,2247,1011"/>
+<area shape="rect" id="node65" href="$classUTF8__string.html#a75b4e440d7576c690934bc7b5f863ac6" title="return true iff string ends with ext (usually a file name extension)" alt="" coords="1849,887,2011,913"/>
+<area shape="rect" id="node66" href="$classCommand.html#af95676cbc57e2564feb00e5166d07512" title="return true if entry is a directory" alt="" coords="1851,937,2009,962"/>
+<area shape="rect" id="node68" href="$classTabExpansion.html#a6cf1a848b8a5be83e6971035dd6baaba" title="compute the lenght of the common part in all matches" alt="" coords="1849,252,2011,292"/>
+<area shape="rect" id="node71" href="$classWorkspace.html#a23b068568662a869b33c760afba61cf3" title="copy all allocated symbols into table of size table_size" alt="" coords="1413,1071,1547,1111"/>
+<area shape="rect" id="node73" href="$classSymbol.html#a126fc214ca7a2e2d364e0982a36b2ace" title="The name of this Symbol." alt="" coords="1415,919,1545,945"/>
+<area shape="rect" id="node74" href="$classSymbol.html#a34b203a4879ba48c148f0c271cd029a2" title="return true, iff this Symbol is not used (i.e. erased)" alt="" coords="1415,1021,1545,1046"/>
+<area shape="rect" id="node76" href="$classUCS__string__vector.html#a4c548acafd0c03ebbe43ad8643dc07d0" title="sort the strings in this vector alphabetically" alt="" coords="1399,347,1561,373"/>
+<area shape="rect" id="node72" href="$classSymbolTable.html#a96e1d725bb82c9c25d33d444bfb1cb2d" title="return all symbols (including erased symbols)" alt="" coords="1635,1147,1779,1187"/>
+<area shape="rect" id="node75" href="$classSymbol.html#ada4b68d3cdfdd1ec7228cb65ef9a1062" title="return the size of the value stack" alt="" coords="1620,1097,1795,1122"/>
+<area shape="rect" id="node77" href="$classUCS__string.html#aed83d678e9bfcad18a5c89cd88002ac9" title="return true if n1 &lt; n2" alt="" coords="1633,5,1781,45"/>
+<area shape="rect" id="node79" href="$classUCS__string.html#a59f472bb1ee082cca5ac2a6c128f4918" title="sort the characters in this string by their Unicode" alt="" coords="1647,347,1767,373"/>
+<area shape="rect" id="node78" href="$classUCS__string.html#a9a80a1621c030d847983275d62902411" title="compare this with UCS_string other" alt="" coords="1856,13,2004,38"/>
+<area shape="rect" id="node80" href="$classUCS__string.html#a3c03c3e5b4d7be0e435a7cfee8a424ae" title="helper function for Heapsort&lt;Unicode&gt;::sort()" alt="" coords="1849,347,2011,373"/>
+<area shape="rect" id="node83" href="$classUCS__string.html#a07e8673ec73ad31228be88053aeff1b1" title="remove leading blanks, tabs, etc" alt="" coords="1405,2117,1555,2157"/>
+<area shape="rect" id="node84" href="$classUCS__string.html#a6a4540c3a5a7621f91406454b4f93cd0" title="remove trailing blanks, tabs, etc" alt="" coords="1407,1597,1553,1637"/>
+<area shape="rect" id="node87" href="$classUCS__string.html#a7be4a989b0a98baf7a1256beba7bcb49" title="return true if this starts with prefix (ASCII, case matters)." alt="" coords="1399,1363,1561,1389"/>
+<area shape="rect" id="node89" href="$classAvec.html#af6b90a707281ad128da1764d92d85cd7" title="Return true iff av is a digit (i.e. 0 ≤ av ≤ 9)" alt="" coords="942,2037,1043,2062"/>
+<area shape="rect" id="node90" href="$classAvec.html#a76a72fdcb1782be1c490b3670c45504f" title="Return true iff av is a valid char in a user defined symbol." alt="" coords="917,1987,1068,2013"/>
+<area shape="rect" id="node91" href="$classAvec.html#afe30f62f26ec74019a95e5cbd6eaa111" title="Find av in character_table. Return position or Invalid_CHT." alt="" coords="1187,1987,1300,2013"/>
+<area shape="rect" id="node94" href="$classLineHistory.html#a0c342eca06ac0e59347c0a486fc03a0e" title="update search substring (called when current line is edited)" alt="" coords="441,4145,576,4185"/>
+</map>

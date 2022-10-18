@@ -1,0 +1,4 @@
+<map id="Workspace::get_all_symbols" name="Workspace::get_all_symbols">
+<area shape="rect" id="node1" title="copy all allocated symbols into table of size table_size" alt="" coords="5,5,140,45"/>
+<area shape="rect" id="node2" href="$classSymbolTable.html#a96e1d725bb82c9c25d33d444bfb1cb2d" title="return all symbols (including erased symbols)" alt="" coords="188,5,332,45"/>
+</map>

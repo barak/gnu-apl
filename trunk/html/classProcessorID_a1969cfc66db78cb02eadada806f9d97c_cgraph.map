@@ -1,0 +1,6 @@
+<map id="ProcessorID::read_network_profile" name="ProcessorID::read_network_profile">
+<area shape="rect" id="node1" title="read the network profile file from file file" alt="" coords="5,47,187,87"/>
+<area shape="rect" id="node2" href="$structNetwork__Profile.html#a79c9d5f3d31c8c498614e2c55e162137" title="clear everything" alt="" coords="252,5,403,31"/>
+<area shape="rect" id="node3" href="$classProcessorID.html#ad88d0c685f351a8764bb7e46def52c8a" title="read one ProcAuth entry from file" alt="" coords="235,55,420,80"/>
+<area shape="rect" id="node4" href="$classProcessorID.html#aff81c64d4391ac9a27566568eb21c2f5" title="read one SvoPid entry from file" alt="" coords="241,104,414,129"/>
+</map>

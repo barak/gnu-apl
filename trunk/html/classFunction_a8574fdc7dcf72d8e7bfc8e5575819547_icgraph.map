@@ -1,0 +1,31 @@
+<map id="Function::may_push_SI" name="Function::may_push_SI">
+<area shape="rect" id="node1" title="return true if eval_XXX may push the SI. True for ⍎, user defined functions, and operators derived fr..." alt="" coords="811,479,971,505"/>
+<area shape="rect" id="node2" href="$classBif__OPER1__EACH.html#a27235a66582af39ea624bfb6db1f85b9" title="implementation of eval_LB()" alt="" coords="575,336,732,376"/>
+<area shape="rect" id="node4" href="$classBif__OPER2__INNER.html#adbaaf10669f72e39cc58d5dcdab6c5fe" title="Overloaded Function::eval_ALRB()." alt="" coords="5,286,220,311"/>
+<area shape="rect" id="node8" href="$classBif__OPER1__EACH.html#ae7a90f347aff589d61b1b5bc1892aab9" title="Overloaded Function::eval_ALB()." alt="" coords="554,401,753,426"/>
+<area shape="rect" id="node9" href="$classBif__OPER2__OUTER.html#a2e9a34f12130439dd28c6d528ffadbc3" title="Overloaded Function::eval_ALRB()." alt="" coords="544,450,763,475"/>
+<area shape="rect" id="node10" href="$classBif__OPER2__POWER.html#a708b42a09509be8c639d330d8e06cf62" title="eval_ALRB() or eval_LRB() for numeric RO (aka. Form 1)" alt="" coords="563,500,743,540"/>
+<area shape="rect" id="node13" href="$classBif__OPER2__POWER.html#a8b9df7074bc55dfb2c2bc21937b83ca6" title="eval_ALRB() or eval_LRB() for numeric RO (aka. Form 1)" alt="" coords="563,564,743,604"/>
+<area shape="rect" id="node14" href="$classDerivedFunction.html#a1826fa581c39cfba7cff8daf65a08134" title="overloaded Function::may_push_SI()" alt="" coords="578,628,729,668"/>
+<area shape="rect" id="node15" href="$classBif__REDUCE.html#ac3430120da57197d5099b5ccabf1004c" title="LO&#45;reduce B along axis." alt="" coords="578,157,729,182"/>
+<area shape="rect" id="node20" href="$classBif__REDUCE.html#a450260486cb0a169a1f13602cae9ab97" title="LO&#45;reduce B n&#45;wise along axis." alt="" coords="578,692,729,732"/>
+<area shape="rect" id="node25" href="$classBif__SCAN.html#a796038c05f7946ae72143ef64c773a1f" title="Compute the LO&#45;scan of B." alt="" coords="594,885,713,910"/>
+<area shape="rect" id="node3" href="$classBif__F12__PARTITION.html#af115071efaa0c6562d4fc738e3da3e4b" title="enclose_with_axes" alt="" coords="305,336,459,376"/>
+<area shape="rect" id="node6" href="$classBif__OPER1__EACH.html#afd91f92ab4e07e5f7e6ce2fd47935c70" title="Overloaded Function::eval_LB()." alt="" coords="287,401,477,426"/>
+<area shape="rect" id="node7" href="$classQuad__FIO.html#a24ac2813d6425ad61471166fe019ba33" title="overloaded Function::eval_LXB()." alt="" coords="309,450,455,475"/>
+<area shape="rect" id="node5" href="$classBif__F12__PARTITION.html#a93f7a529d2b49ecb0e1262ee5b3ce893" title="overloaded Function::eval_XB()" alt="" coords="35,336,190,376"/>
+<area shape="rect" id="node11" href="$classBif__OPER2__POWER.html#afdfa97e5be93ef265df90ae09b7cfd81" title="overloaded Function::eval_ALRB()" alt="" coords="271,557,493,582"/>
+<area shape="rect" id="node12" href="$classBif__OPER2__POWER.html#a31db2049a45999f2d068d6569ac9b6e4" title="overloaded Function::eval_LRB()" alt="" coords="275,507,489,533"/>
+<area shape="rect" id="node16" href="$classBif__OPER1__REDUCE.html#a1f613b8ac81791d7c61b3e0a9f6e70ba" title="Overloaded Function::eval_LB()." alt="" coords="277,185,487,210"/>
+<area shape="rect" id="node17" href="$classBif__OPER1__REDUCE1.html#a6bd690931eba7929294983c39655ffa1" title="Overloaded Function::eval_LB()." alt="" coords="297,5,467,45"/>
+<area shape="rect" id="node18" href="$classBif__OPER1__REDUCE.html#aed5704b99e4ff296d84b329cfcc9048c" title="Overloaded Function::eval_LXB()." alt="" coords="273,70,491,95"/>
+<area shape="rect" id="node19" href="$classBif__OPER1__REDUCE1.html#a9bb990c9c5944c780452941e13d39c0d" title="Overloaded Function::eval_LXB()." alt="" coords="297,120,467,160"/>
+<area shape="rect" id="node21" href="$classBif__OPER1__REDUCE.html#a584c1a00ef6b21b457c869a862fe4775" title="Overloaded Function::eval_ALB()." alt="" coords="273,671,491,697"/>
+<area shape="rect" id="node22" href="$classBif__OPER1__REDUCE1.html#a1c98ca9e70231d9a1fe491c64e46f8a8" title="Overloaded Function::eval_ALB()." alt="" coords="297,721,467,761"/>
+<area shape="rect" id="node23" href="$classBif__OPER1__REDUCE.html#a06f59f7c71977fda6d2ca0e99389b659" title="Overloaded Function::eval_ALXB()." alt="" coords="268,786,496,811"/>
+<area shape="rect" id="node24" href="$classBif__OPER1__REDUCE1.html#ad48531d0b47915421f4aca74bab3b31d" title="Overloaded Function::eval_ALXB()." alt="" coords="297,607,467,647"/>
+<area shape="rect" id="node26" href="$classBif__OPER1__SCAN.html#afaa44934b4c7bc25b517e3acfe41507b" title="Overloaded Function::eval_LB()." alt="" coords="287,885,477,910"/>
+<area shape="rect" id="node27" href="$classBif__OPER1__SCAN1.html#a191214991f49b5ce2649400f76f25893" title="Overloaded Function::eval_ALB()." alt="" coords="283,934,481,959"/>
+<area shape="rect" id="node28" href="$classBif__OPER1__SCAN.html#ace7710f31a43abd663e582cf96cb9169" title="Overloaded Function::eval_LXB()." alt="" coords="283,983,481,1009"/>
+<area shape="rect" id="node29" href="$classBif__OPER1__SCAN1.html#adb20c6d87fb95f93fc8230f4984c4041" title="Overloaded Function::eval_ALXB()." alt="" coords="279,835,485,861"/>
+</map>

@@ -1,0 +1,11 @@
+<map id="Quad_JSON::APL_to_JSON" name="Quad_JSON::APL_to_JSON">
+<area shape="rect" id="node1" title="convert APL value to JSON string" alt="" coords="5,231,196,256"/>
+<area shape="rect" id="node2" href="$classQuad__JSON.html#a5fa39236f3369b35d05af7b326cf0ffc" title="append APL value to JSON string result" alt="" coords="244,149,435,189"/>
+<area shape="rect" id="node6" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="734,231,857,256"/>
+<area shape="rect" id="node3" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="725,129,865,155"/>
+<area shape="rect" id="node4" href="$classUCS__string.html#ace70327ef899c525ad9c3f2bffd43697" title="append 0&#45;terminated UTF8 string str to this UCS_string." alt="" coords="483,131,663,156"/>
+<area shape="rect" id="node5" href="$classUCS__string.html#a186a76c22c3ac840f1e607ba49e253a0" title="return the last character in this string" alt="" coords="509,180,636,205"/>
+<area shape="rect" id="node7" href="$classCell.html#a367b9df7e0d4b805e5f31641658113f6" title="Return the APL value of a cell (Asserts for non&#45;pointer cells)" alt="" coords="495,29,650,55"/>
+<area shape="rect" id="node8" href="$classCell.html#a38a6a25f0ad091f35e3d9abfe5608a50" title="return the type of this cell" alt="" coords="730,5,861,31"/>
+<area shape="rect" id="node9" href="$classCell.html#a6c3fdef3d82f53649d1c3f16d37eedd7" title="the name of ct" alt="" coords="711,55,880,80"/>
+</map>

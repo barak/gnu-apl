@@ -1,0 +1,4 @@
+<map id="Probe::get_time" name="Probe::get_time">
+<area shape="rect" id="node1" title="get the m&#39;th time of the p&#39;th probe" alt="" coords="5,5,120,31"/>
+<area shape="rect" id="node2" href="$classProbe.html#ac3c749d7e2e6ed68902bdd63c475b03b" title="get the m&#39;th time (from P1 to P2) of this probe" alt="" coords="168,5,283,31"/>
+</map>

@@ -1,0 +1,9 @@
+<map id="IntCell::bif_subtract" name="IntCell::bif_subtract">
+<area shape="rect" id="node1" title="overloaded Cell::bif_subtract()" alt="" coords="5,107,141,132"/>
+<area shape="rect" id="node2" href="$classIntCell.html#aa111450e3c312ff858c2b628723b9008" title="overloaded from the corresponding Cell:: function (see class Cell)" alt="" coords="193,5,331,31"/>
+<area shape="rect" id="node3" href="$classIntCell.html#aa99b7212ce13da0f241adeb18e350198" title="initialize Z to APL_Integer v" alt="" coords="383,31,461,56"/>
+<area shape="rect" id="node5" href="$classCell.html#a211a5091164c9a75d486d48f956e5a20" title="return true if z = a &#45; b had an overflow." alt="" coords="199,107,325,132"/>
+<area shape="rect" id="node6" href="$classIntCell.html#af181a9f593c5d20bb9396450061bc2c2" title="overloaded Cell::get_int_value()" alt="" coords="189,156,335,181"/>
+<area shape="rect" id="node7" href="$classFloatCell.html#a88217aaf5cd286cc89a85d2885876dda" title="initialize the (un&#45;initialized) Cell *Z to APL_Float flt" alt="" coords="213,205,311,231"/>
+<area shape="rect" id="node4" href="$classIntCell.html#a88c653b2f968c451ee1c1c53a983fa13" title="Construct an integer cell with value 0." alt="" coords="509,31,616,56"/>
+</map>

@@ -1,0 +1,8 @@
+<map id="Symbol::get_apl_value" name="Symbol::get_apl_value">
+<area shape="rect" id="node1" title="return the current APL value (or throw a VALUE_ERROR)" alt="" coords="5,35,160,60"/>
+<area shape="rect" id="node2" href="$classSymbol.html#a126fc214ca7a2e2d364e0982a36b2ace" title="The name of this Symbol." alt="" coords="212,5,343,31"/>
+<area shape="rect" id="node3" href="$classError.html#af47d2ce6f771f8d502d4d1cd05d6f81d" title="throw an Error related to Symbol symbol" alt="" coords="208,55,347,95"/>
+<area shape="rect" id="node4" href="$classUTF8__string.html#a922bd7ebc6a8ea5c6ba9c54159b18a93" title="return this string as a 0&#45;terminated C string" alt="" coords="397,13,527,39"/>
+<area shape="rect" id="node5" href="$classWorkspace.html#a8083efc2d51067edb25ae8dd4f014173" title="the top of the SI stack (the SI pushed last)" alt="" coords="395,63,529,88"/>
+<area shape="rect" id="node6" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="401,112,523,137"/>
+</map>

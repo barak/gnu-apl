@@ -1,0 +1,27 @@
+<map id="IO_Files::read_file_line" name="IO_Files::read_file_line">
+<area shape="rect" id="node1" title="read one line from the current input file with CR and LF removed" alt="" coords="5,395,160,420"/>
+<area shape="rect" id="node2" href="$structInputFile.html#a162970480cc07daba1ba85a3ae2580e8" title="check the current line and return true if the line is permitted by the object_filter...." alt="" coords="218,202,365,227"/>
+<area shape="rect" id="node18" href="$structInputFile.html#a8dc157767e0af4c57eefa4225629e7f8" title="the current file" alt="" coords="219,251,363,276"/>
+<area shape="rect" id="node19" href="$structInputFile.html#aeccf06ed0bace1099f6d190c46543e2a" title="the line number of the currrent file" alt="" coords="231,301,351,341"/>
+<area shape="rect" id="node20" href="$structInputFile.html#a0a42938e22f9d89d1a24eef4ae241d2d" title="return the current HTML mode" alt="" coords="226,366,357,391"/>
+<area shape="rect" id="node21" href="$structInputFile.html#a0f449701206a5127e239886ea3591f57" title="return true if this file as an oject filter (from )COPY file names...)" alt="" coords="220,416,363,456"/>
+<area shape="rect" id="node22" href="$structInputFile.html#a5b408d866236d1071ee4717e4a97aec3" title="set the current HTML mode" alt="" coords="226,480,357,506"/>
+<area shape="rect" id="node23" href="$classUTF8__string.html#ae72a6d597692993ab2760837dda316d3" title="return true iff string starts with path (usually a file path)" alt="" coords="208,530,375,555"/>
+<area shape="rect" id="node24" href="$classUTF8__string.html#a507460fd4d97100d36765fb89ebdfbc5" title="skip over &lt; ... &gt; and expand &lt; and friends" alt="" coords="212,579,371,604"/>
+<area shape="rect" id="node3" href="$classUCS__string.html#ad8e1ed8807d094b4b0b596db077af391" title="return this string with the first drop_count characters removed" alt="" coords="451,66,574,91"/>
+<area shape="rect" id="node4" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="1068,266,1191,291"/>
+<area shape="rect" id="node7" href="$classUserFunction__header.html#abcc2f6d70da90e3123e630a226b9e931" title="return the name of the function" alt="" coords="439,166,586,206"/>
+<area shape="rect" id="node8" href="$classAvec.html#af31e35e3049f3bc48cb1ff8d70262dd7" title="Return true iff av is a valid char in a user defined symbol." alt="" coords="423,231,603,256"/>
+<area shape="rect" id="node12" href="$classAvec.html#a88cc8af75e4a2c4d8a1d382637ca07b4" title="return true if unicode uni is a quad (⎕ or ▯)" alt="" coords="460,280,565,306"/>
+<area shape="rect" id="node13" href="$classUCS__string.html#a91556379049e71071410cec015b960db" title="remove leading and trailing whitespaces" alt="" coords="441,330,584,384"/>
+<area shape="rect" id="node5" href="$classUCS__string.html#ad092030b348adfd762de621c43d75812" title="default constructor: empty string" alt="" coords="651,66,817,91"/>
+<area shape="rect" id="node6" href="$classUCS__string.html#a40523238d26f5405f5392df03d242627" title="common part of all constructors" alt="" coords="875,66,1010,91"/>
+<area shape="rect" id="node9" href="$classAvec.html#af6b90a707281ad128da1764d92d85cd7" title="Return true iff av is a digit (i.e. 0 ≤ av ≤ 9)" alt="" coords="683,182,785,207"/>
+<area shape="rect" id="node10" href="$classAvec.html#a76a72fdcb1782be1c490b3670c45504f" title="Return true iff av is a valid char in a user defined symbol." alt="" coords="659,231,809,256"/>
+<area shape="rect" id="node11" href="$classAvec.html#afe30f62f26ec74019a95e5cbd6eaa111" title="Find av in character_table. Return position or Invalid_CHT." alt="" coords="886,179,999,204"/>
+<area shape="rect" id="node14" href="$classUCS__string.html#a07e8673ec73ad31228be88053aeff1b1" title="remove leading blanks, tabs, etc" alt="" coords="867,229,1018,269"/>
+<area shape="rect" id="node15" href="$classUCS__string.html#a6a4540c3a5a7621f91406454b4f93cd0" title="remove trailing blanks, tabs, etc" alt="" coords="661,337,807,377"/>
+<area shape="rect" id="node16" href="$classUCS__string.html#a186a76c22c3ac840f1e607ba49e253a0" title="return the last character in this string" alt="" coords="879,344,1006,370"/>
+<area shape="rect" id="node17" href="$classUCS__string.html#a67ea87cb92e687105b21917ffb4a2a6f" title="remove the last character in this string" alt="" coords="865,394,1020,419"/>
+<area shape="rect" id="node25" href="$classUTF8__string.html#a922bd7ebc6a8ea5c6ba9c54159b18a93" title="return this string as a 0&#45;terminated C string" alt="" coords="447,579,578,604"/>
+</map>

@@ -1,0 +1,10 @@
+<map id="Nabla::throw_edit_error" name="Nabla::throw_edit_error">
+<area shape="rect" id="node1" title="throw a DEFN error with some additional information" alt="" coords="5,56,163,81"/>
+<area shape="rect" id="node2" href="$classWorkspace.html#a81618932a28523c1274fb1c2ed3d9553" title="return reference to more info about last error" alt="" coords="211,5,369,31"/>
+<area shape="rect" id="node3" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="429,56,552,81"/>
+<area shape="rect" id="node4" href="$classError.html#a43d09e798cc3a316cfaa2cad291d10c9" title="throw a DEFN ERROR for function fun" alt="" coords="224,106,356,146"/>
+<area shape="rect" id="node5" href="$classUTF8__string.html#a922bd7ebc6a8ea5c6ba9c54159b18a93" title="return this string as a 0&#45;terminated C string" alt="" coords="425,105,556,131"/>
+<area shape="rect" id="node6" href="$classWorkspace.html#ab14078db4d52fae10a31ea8659844be0" title="return information in SI_top()" alt="" coords="417,155,564,180"/>
+<area shape="rect" id="node8" href="$classWorkspace.html#a8083efc2d51067edb25ae8dd4f014173" title="the top of the SI stack (the SI pushed last)" alt="" coords="618,205,753,231"/>
+<area shape="rect" id="node7" href="$classUserFunction__header.html#a02e0fedf3b2ad3d50a2d3903bb9be6f9" title="return error if header was not parsed successfully" alt="" coords="612,141,759,181"/>
+</map>

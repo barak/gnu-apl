@@ -1,0 +1,26 @@
+<map id="draw_Z_grid" name="draw_Z_grid">
+<area shape="rect" id="node1" title="draw the (slanted) Z grid&#45;lines of the plot" alt="" coords="5,513,99,538"/>
+<area shape="rect" id="node2" href="$Plot__gtk_8cc.html#ae67c048b5835fff30340888f54195aa0" title="return the size len_x:len_y of the multi_line string lines when printed with font font_name of size f..." alt="" coords="159,49,295,74"/>
+<area shape="rect" id="node3" href="$Plot__gtk_8cc.html#a5e97fc1b80b16b714315808c7fb1181d" title="return the size of single_line string text when printed with font font_name of /// size font_size" alt="" coords="375,49,495,74"/>
+<area shape="rect" id="node4" href="$Plot__gtk_8cc.html#aa1990c146692aeb515569550f866f59d" title="draw an arrow from O to A" alt="" coords="182,148,271,173"/>
+<area shape="rect" id="node5" href="$Plot__gtk_8cc.html#a12790f315bc24ef6e2ca35b323b766e9" title="draw a line from P0 to P1" alt="" coords="188,197,265,222"/>
+<area shape="rect" id="node7" href="$Plot__gtk_8cc.html#a894d0194a7680dad77a0d89e85b11ae7" title="draw multi&#45;line string lines at position xy" alt="" coords="174,98,279,124"/>
+<area shape="rect" id="node8" href="$Plot__gtk_8cc.html#a7fe4d2e0d8c0208c0e805b1ad9de2683" title="draw single&#45;line string text at position xy" alt="" coords="187,246,266,272"/>
+<area shape="rect" id="node9" href="$Plot__gtk_8cc.html#aa0b174aaa1dec2d7426015541ee4ed0b" title="format the text of tick idx (with value val) according to format." alt="" coords="183,296,270,321"/>
+<area shape="rect" id="node11" href="$classPlot__window__properties.html#ab09be3e5e80e7db4f6b5b5b7b64410eb" title="return the last index of the X grid" alt="" coords="147,346,307,386"/>
+<area shape="rect" id="node12" href="$classPlot__window__properties.html#a70eb2f0f8d62feeabeef70ee5a5a6f3c" title="return the last index of the Y grid" alt="" coords="147,410,307,450"/>
+<area shape="rect" id="node13" href="$classPlot__window__properties.html#af9a204917cef526e2ee1fe77add80c98" title="return the last index of the Y grid" alt="" coords="147,474,307,514"/>
+<area shape="rect" id="node14" href="$classPlot__window__properties.html#ab6c4b25fe72b37acc9a4296e96ae8961" title="return the largest X value" alt="" coords="147,538,307,578"/>
+<area shape="rect" id="node15" href="$classPlot__window__properties.html#a92d2adee39b082bada6f0e136ed3608f" title="return the largest Y value" alt="" coords="147,602,307,642"/>
+<area shape="rect" id="node16" href="$classPlot__window__properties.html#a577510e3bcf6ba61978dc60d778dc967" title="return the smallest X value" alt="" coords="563,740,723,780"/>
+<area shape="rect" id="node17" href="$classPlot__window__properties.html#af27f118d1e90664680b2efd1a2460a03" title="return the smallest Y value" alt="" coords="563,804,723,844"/>
+<area shape="rect" id="node18" href="$classPlot__window__properties.html#a0640b99b583131dabf64478a88265e66" title="return the smallest Z value" alt="" coords="563,932,723,972"/>
+<area shape="rect" id="node19" href="$classPlot__window__properties.html#aa4db62e171eab805cd9e1a3cbc253c3c" title="return the pixel position of the point where the X, Y, and possibly Z&#45;axis cross." alt="" coords="147,868,307,908"/>
+<area shape="rect" id="node20" href="$classPlot__window__properties.html#a087dfd5eee09a66161eb76c87680d14c" title="convert &#160;&#160;val_X to the X coordinate of the pixel in the plot area" alt="" coords="563,996,723,1036"/>
+<area shape="rect" id="node21" href="$classPlot__window__properties.html#acd007c1ca30e86d8e12e125a39d7d9a5" title="convert values val_X, val_Y, and val_Z, to the X and Y coordinate of the pixel below the Z=0 plane of..." alt="" coords="355,868,515,908"/>
+<area shape="rect" id="node22" href="$classPlot__window__properties.html#ae727cdd8ecd4888c8785c5fd53dc6b93" title="convert &#160;&#160;val_Y to the Y coordinate of the pixel in the plot area" alt="" coords="563,1078,723,1118"/>
+<area shape="rect" id="node24" href="$classPlot__window__properties.html#ae4ad1b9db6c731e320f1177f614ba44c" title="return the Z&#45;value difference for one tile (= between two Z grid lines)" alt="" coords="147,1236,307,1276"/>
+<area shape="rect" id="node6" href="$Plot__gtk_8cc.html#ad3c35c71233bf7716802110531ce36bb" title="same as standard cairo_set_RGB_source() but with Color instead of double red, green,..." alt="" coords="356,197,513,222"/>
+<area shape="rect" id="node10" href="$Plot__gtk_8cc.html#ad4aa42d6c7a8bd63261a281c9a3a5a55" title="format val according to format (with percent pointing to % in format, e.g. d or f like in printf())." alt="" coords="375,296,494,321"/>
+<area shape="rect" id="node23" href="$classPlot__window__properties.html#af978c228065cbaba8381af79bc1fce95" title="convert &#160;&#160;val_Z to the relative Z vector (q. quadrant)" alt="" coords="563,868,723,908"/>
+</map>

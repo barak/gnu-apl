@@ -1,0 +1,6 @@
+<map id="CDR_string::get_rank" name="CDR_string::get_rank">
+<area shape="rect" id="node1" title="return the rank of this CDR" alt="" coords="371,31,520,56"/>
+<area shape="rect" id="node2" href="$classCDR__string.html#a30f36dfd3f3cf0a986088599a89f8ca5" title="return non&#45;zero if this CDR is malformed" alt="" coords="188,5,323,31"/>
+<area shape="rect" id="node4" href="$classCDR__string.html#a55e4df56597eca4980540fbe8763fa74" title="return the ravel of this CDR" alt="" coords="192,55,319,80"/>
+<area shape="rect" id="node3" href="$classCDR__string.html#afffda21a8a84990808848717452a1c8e" title="print properties" alt="" coords="5,5,140,31"/>
+</map>

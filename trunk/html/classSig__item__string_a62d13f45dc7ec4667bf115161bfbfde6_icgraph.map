@@ -1,0 +1,15 @@
+<map id="Sig_item_string::store" name="Sig_item_string::store">
+<area shape="rect" id="node1" title="store (aka. serialize) this item into a buffer" alt="" coords="249,289,399,315"/>
+<area shape="rect" id="node2" href="$classSET__STATE__c.html#a8568f0f0eace3e70b167e495d7f24065" title="store (aka. serialize) this signal into a buffer" alt="" coords="29,5,178,31"/>
+<area shape="rect" id="node3" href="$classVALUE__IS__c.html#a88ecbd7e3b029950d9769a90cff3b91f" title="store (aka. serialize) this signal into a buffer" alt="" coords="35,55,172,80"/>
+<area shape="rect" id="node4" href="$classASSIGN__VALUE__c.html#aae1a3df9003fa7da755dddd718caca90" title="store (aka. serialize) this signal into a buffer" alt="" coords="16,104,191,129"/>
+<area shape="rect" id="node5" href="$classSVAR__ASSIGNED__c.html#a3c39eab443b4935da199d63939732b8d" title="store (aka. serialize) this signal into a buffer" alt="" coords="10,153,197,179"/>
+<area shape="rect" id="node6" href="$classSVAR__RECORD__IS__c.html#ab531a24855f38083e53f503f02d1698a" title="store (aka. serialize) this signal into a buffer" alt="" coords="5,203,201,228"/>
+<area shape="rect" id="node7" href="$classREGISTER__PROCESSOR__c.html#af5c8065afcaa526e36f50888a53fda44" title="store (aka. serialize) this signal into a buffer" alt="" coords="11,253,195,293"/>
+<area shape="rect" id="node8" href="$classMATCH__OR__MAKE__c.html#ac724061a232d5a90f20d5ebc19300bdf" title="store (aka. serialize) this signal into a buffer" alt="" coords="7,317,200,343"/>
+<area shape="rect" id="node9" href="$classOFFERING__PROCS__ARE__c.html#acb45b71daddc292c159f1c5f090ffa8c" title="store (aka. serialize) this signal into a buffer" alt="" coords="13,367,194,407"/>
+<area shape="rect" id="node10" href="$classOFFERED__VARS__ARE__c.html#a1b3987d4e503fa8d0947ea2d2c8ff6dc" title="store (aka. serialize) this signal into a buffer" alt="" coords="14,431,193,471"/>
+<area shape="rect" id="node11" href="$classASSIGN__WSWS__VAR__c.html#a42735ca60d3440cd92eda7db48539d8c" title="store (aka. serialize) this signal into a buffer" alt="" coords="13,495,194,535"/>
+<area shape="rect" id="node12" href="$classWSWS__VALUE__IS__c.html#ad90f45c85a82584f2fec9fa1b2521742" title="store (aka. serialize) this signal into a buffer" alt="" coords="9,560,197,585"/>
+<area shape="rect" id="node13" href="$classSVAR__DB__PRINTED__c.html#a1ba823de69733d2f257ce5bd7badc8ac" title="store (aka. serialize) this signal into a buffer" alt="" coords="16,610,191,650"/>
+</map>

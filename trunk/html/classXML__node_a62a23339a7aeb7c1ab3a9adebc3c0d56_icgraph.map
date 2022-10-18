@@ -1,0 +1,8 @@
+<map id="XML_node::get_next" name="XML_node::get_next">
+<area shape="rect" id="node2" href="$classXML__node.html#af7768a8292eebe36599f6d958dde6731" title="collect nodes starting at anchor, return true on error " alt="" coords="199,108,330,134"/>
+<area shape="rect" id="node4" href="$classXML__node.html#ae6f77f0b4ebb0311ee13abdc69d696f0" title="merge the items from start(&#45;tag) to (end(&#45;tag) into start tag " alt="" coords="564,108,731,134"/>
+<area shape="rect" id="node5" href="$classXML__node.html#ac15dcafb582e4d7595ee24d28a5f0f21" title="reduce nodes starting at start, return true on error " alt="" coords="576,57,719,84"/>
+<area shape="rect" id="node6" href="$classQuad__XML.html#a8e4ca50c2d54d630895c22115857325e" title="convert XML string to APL associative array " alt="" coords="779,57,951,84"/>
+<area shape="rect" id="node7" href="$classXML__node.html#af135d78f296b35c25c3523965d60d226" title="(debug&#45;) print all nodes· " alt="" coords="196,57,333,84"/>
+<area shape="rect" id="node3" href="$classXML__node.html#ad740e8b2a306d73e260482af9be89192" title="append garbage to this garbage can (for later deletion) " alt="" coords="381,57,516,84"/>
+</map>

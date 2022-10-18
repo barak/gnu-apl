@@ -1,0 +1,4 @@
+<map id="Cell::bif_roll" name="Cell::bif_roll">
+<area shape="rect" id="node1" title="store a random number between 1 and the value of this Cell in Z" alt="" coords="209,5,300,31"/>
+<area shape="rect" id="node2" href="$classBif__F12__ROLL.html#a0b67f39c345c98d9b16f63c457ad0557" title="overloaded Function::eval_B()." alt="" coords="5,5,161,31"/>
+</map>

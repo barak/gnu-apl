@@ -1,0 +1,7 @@
+<map id="Cell::bif_residue" name="Cell::bif_residue">
+<area shape="rect" id="node1" title="store A modulo this cell in Z" alt="" coords="468,55,584,80"/>
+<area shape="rect" id="node2" href="$classBif__F12__STILE.html#aadd5c5366d23f89c0204fa9e6e9e339a" title="overloaded Function::eval_AB()." alt="" coords="247,5,415,31"/>
+<area shape="rect" id="node4" href="$classBif__F12__STILE.html#abb96905a146836e13af83198f326bae3" title="overloaded Function::eval_AXB()." alt="" coords="243,55,420,80"/>
+<area shape="rect" id="node5" href="$classBif__F12__STILE.html#a0de2bd3776444ab2316cdde0043a5b6a" title="overloaded Function::get_scalar_f2()" alt="" coords="263,105,400,145"/>
+<area shape="rect" id="node3" href="$classBif__F12__ENCODE.html#a003a77890ec532d2909d23e3ce5dcb89" title="overloaded Function::eval_AB()" alt="" coords="5,5,195,31"/>
+</map>

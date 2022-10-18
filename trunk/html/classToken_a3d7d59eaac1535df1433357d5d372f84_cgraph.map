@@ -1,0 +1,7 @@
+<map id="Token::~Token" name="Token::~Token">
+<area shape="rect" id="node1" title="destructor" alt="" coords="5,31,116,56"/>
+<area shape="rect" id="node2" href="$classToken.html#a352c29d23d24c19694d1f943d5ed97cf" title="clear the Value_P value (if any) of this token, updating its refcount as needed" alt="" coords="164,31,319,56"/>
+<area shape="rect" id="node3" href="$classToken.html#a11e37aa69b8eb64f293702293b00f50c" title="return true iff this token is an apl value" alt="" coords="377,5,501,31"/>
+<area shape="rect" id="node5" href="$classValue__P__Base.html#ad07a670c61c71b7aecc8ca9a6170b796" title="decrement owner&#45;count and reset pointer to 0" alt="" coords="367,55,512,80"/>
+<area shape="rect" id="node4" href="$classToken.html#a1a31afbb07e3f1dbb86d5f872ce5c297" title="return the TokenValueType of this token." alt="" coords="560,5,713,31"/>
+</map>

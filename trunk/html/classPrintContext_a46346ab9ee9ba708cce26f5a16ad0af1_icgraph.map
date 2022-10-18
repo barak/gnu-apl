@@ -1,0 +1,6 @@
+<map id="PrintContext::get_scaled" name="PrintContext::get_scaled">
+<area shape="rect" id="node1" title="return true iff exponential format shall be used" alt="" coords="396,57,563,82"/>
+<area shape="rect" id="node2" href="$classComplexCell.html#a59526d0bf663861a811c939ab6308fcd" title="the Quad_CR representation of this cell." alt="" coords="5,5,164,45"/>
+<area shape="rect" id="node3" href="$classFloatCell.html#a57057543ddb1712a7be5ebafb051906d" title="the Quad_CR representation of this cell." alt="" coords="212,49,348,89"/>
+<area shape="rect" id="node4" href="$classIntCell.html#a6bbc6fd82045e146ef6174a11c4c712f" title="the Quad_CR representation of this cell" alt="" coords="23,81,146,121"/>
+</map>

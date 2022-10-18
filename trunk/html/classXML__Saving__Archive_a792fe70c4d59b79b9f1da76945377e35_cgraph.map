@@ -1,0 +1,10 @@
+<map id="XML_Saving_Archive::emit_unicode" name="XML_Saving_Archive::emit_unicode">
+<area shape="rect" id="node1" title="emit one unicode character (inside &quot;...&quot;)" alt="" coords="5,133,152,173"/>
+<area shape="rect" id="node2" href="$classXML__Saving__Archive.html#a3da33c8ba02d437ae1803eac0464c945" title="decrement space by length of str and return str" alt="" coords="200,5,347,45"/>
+<area shape="rect" id="node3" href="$classXML__Saving__Archive.html#ab1e1e0d523a391379f41e5e8efa7ff66" title="indent by indent levels, return space left on line" alt="" coords="200,69,347,109"/>
+<area shape="rect" id="node4" href="$classXML__Saving__Archive.html#ad702bc84ef313abaf5eabbc0487cce4a" title="enter char mode. maybe print ² and return the number of chars printed" alt="" coords="200,133,347,173"/>
+<area shape="rect" id="node5" href="$classXML__Saving__Archive.html#a0164ae31af80f800810671ff2d959931" title="leave char mode. maybe print ⁰ and return the number of chars printed" alt="" coords="200,197,347,237"/>
+<area shape="rect" id="node6" href="$classXML__Saving__Archive.html#a8b0a3a2f1f9c91af785edf994b4fa48d" title="return true if uni prints nicely and is allowed in XML &quot;...&quot; strings" alt="" coords="200,261,347,301"/>
+<area shape="rect" id="node7" href="$classAvec.html#afe30f62f26ec74019a95e5cbd6eaa111" title="Find av in character_table. Return position or Invalid_CHT." alt="" coords="430,243,543,269"/>
+<area shape="rect" id="node8" href="$classAvec.html#ad45bd7c00f8480d9e72c5cd40c702ef3" title="Find return position of alt_av, or Invalid_AV if not found." alt="" coords="395,293,579,318"/>
+</map>

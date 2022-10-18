@@ -1,0 +1,15 @@
+<map id="PrintBuffer::add_frame" name="PrintBuffer::add_frame">
+<area shape="rect" id="node1" title="add a decorator frame around this buffer" alt="" coords="5,304,159,330"/>
+<area shape="rect" id="node2" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="451,30,591,55"/>
+<area shape="rect" id="node3" href="$classUCS__string.html#a5776e51c6faa53537409322cd0ebf07a" title="append number (in ASCII encoding like d) to this string" alt="" coords="230,50,370,90"/>
+<area shape="rect" id="node4" href="$classPrintBuffer.html#af6f689e8c4e930b7c37099bf5fdfe57d" title="return the number of columns" alt="" coords="441,265,600,305"/>
+<area shape="rect" id="node5" href="$classPrintBuffer.html#a7f4647903888bbde606c371f64109e5e" title="return the characters for style pst" alt="" coords="225,165,375,205"/>
+<area shape="rect" id="node6" href="$classShape.html#ab086eda5bc8feb3a58771973ddb3c379" title="return the length of the last axis, or 1 for scalars" alt="" coords="207,230,393,255"/>
+<area shape="rect" id="node7" href="$classShape.html#a017e9a35dd20f4bc4fdeb7ea29b6805d" title="return the rank" alt="" coords="241,279,359,304"/>
+<area shape="rect" id="node8" href="$classPrintBuffer.html#ac13295601812e379a3eac618ce239426" title="return the number of rows" alt="" coords="451,378,590,418"/>
+<area shape="rect" id="node9" href="$classShape.html#a592d2ade68aa8c21c5d84627c3a0e001" title="return the length of dimension r" alt="" coords="221,378,379,403"/>
+<area shape="rect" id="node10" href="$classUCS__string__vector.html#a16fca0c736760dae8fbf220634fc500d" title="replacement for insert(std::vector::iterator position, value)" alt="" coords="229,428,371,468"/>
+<area shape="rect" id="node11" href="$classPrintBuffer.html#adae7aa63347e6aba983449dde7d50c33" title="return true iff all strings have the same size." alt="" coords="213,328,387,354"/>
+<area shape="rect" id="node12" href="$classPrintBuffer.html#a6fe77535d5ab96ae9d8fcc8b3ddbe78f" title="Set the char in column x and row y to uc." alt="" coords="229,543,371,568"/>
+<area shape="rect" id="node13" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="239,592,361,618"/>
+</map>

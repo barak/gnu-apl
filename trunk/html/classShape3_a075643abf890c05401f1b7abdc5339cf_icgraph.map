@@ -1,0 +1,47 @@
+<map id="Shape3::h" name="Shape3::h">
+<area shape="rect" id="node1" title="the dimensions above r the axis" alt="" coords="995,383,1076,408"/>
+<area shape="rect" id="node2" href="$classBif__COMMA.html#a110e26c20b2479e3a99b67d9e69e234d" title="Prepend scalar cell_B to A along axis." alt="" coords="759,29,947,55"/>
+<area shape="rect" id="node3" href="$classBif__COMMA.html#a4dab74913e7da1e13c28a18e3c10f63a" title="Catenate A and B." alt="" coords="523,29,677,55"/>
+<area shape="rect" id="node10" href="$classBif__SCAN.html#aa358f899fe16ac87ca4908b0ae8f30f9" title="Expand B according to A." alt="" coords="786,195,919,220"/>
+<area shape="rect" id="node15" href="$classBif__COMMA.html#a284b9c9c294add93f329950870949ef4" title="Laminate A and B." alt="" coords="776,309,929,335"/>
+<area shape="rect" id="node16" href="$classBif__F12__PARTITION.html#a76f44ed4e399944ce12c8e9bfd312e8b" title="Partition B according to A." alt="" coords="775,375,930,415"/>
+<area shape="rect" id="node19" href="$classBif__COMMA.html#ad0ad030408ae664de7312b5722ae1507" title="Prepend scalar cell_A to B along axis." alt="" coords="777,130,928,170"/>
+<area shape="rect" id="node20" href="$classBif__REDUCE.html#ac3430120da57197d5099b5ccabf1004c" title="LO&#45;reduce B along axis." alt="" coords="777,543,928,568"/>
+<area shape="rect" id="node26" href="$classBif__REDUCE.html#a8937351ae76a1d057601e19b8d40b295" title="Replicate B according to A along axis." alt="" coords="773,800,933,825"/>
+<area shape="rect" id="node31" href="$classBif__ROTATE.html#af700d2f9dfa4a1dd5719dfaf721700e7" title="Reverse B along axis." alt="" coords="777,1013,928,1039"/>
+<area shape="rect" id="node36" href="$classBif__ROTATE.html#a2594fb64563a6caa2dcf045858905fc3" title="Rotate B according to A along axis." alt="" coords="783,1211,923,1236"/>
+<area shape="rect" id="node41" href="$classBif__SCAN.html#a796038c05f7946ae72143ef64c773a1f" title="Compute the LO&#45;scan of B." alt="" coords="793,1408,912,1433"/>
+<area shape="rect" id="node4" href="$classBif__COMMA.html#a54274d01c09566054ae5b08d34f65118" title="either catenate A and B or laminate A and B" alt="" coords="269,186,424,226"/>
+<area shape="rect" id="node7" href="$classBif__F12__COMMA.html#a87fad1aaa970af9f453d357390ef4299" title="overloaded Function::eval_AB()" alt="" coords="255,55,438,80"/>
+<area shape="rect" id="node9" href="$classBif__F12__COMMA1.html#adb234524e9ba2ad95fba11a405c070a4" title="overloaded Function::eval_AB()" alt="" coords="252,5,441,31"/>
+<area shape="rect" id="node5" href="$classBif__F12__COMMA.html#a22e1c5309fdfe1e3d450b6f586c35cc4" title="overloaded Function::eval_AXB()" alt="" coords="9,164,200,189"/>
+<area shape="rect" id="node6" href="$classBif__F12__COMMA1.html#a96459b1e66a6cb3b2327b3be37455b61" title="overloaded Function::eval_AXB()" alt="" coords="5,213,204,239"/>
+<area shape="rect" id="node8" href="$classBif__F12__UNION.html#a0929eb6bc282f9c312db42fdfa78686d" title="overloaded Function::eval_AB()" alt="" coords="17,55,192,80"/>
+<area shape="rect" id="node11" href="$classBif__OPER1__SCAN.html#aa91d83000baa8554f890cc8dad86ec93" title="Overloaded Function::eval_AB()." alt="" coords="504,128,696,153"/>
+<area shape="rect" id="node12" href="$classBif__OPER1__SCAN1.html#a15b0287a6b81235bef3efb4f2d574ab7" title="Overloaded Function::eval_AB()." alt="" coords="501,177,699,203"/>
+<area shape="rect" id="node13" href="$classBif__OPER1__SCAN.html#acb0af1437c6bf8c4371883b7f90f4cd6" title="Overloaded Function::eval_AXB()." alt="" coords="499,227,701,252"/>
+<area shape="rect" id="node14" href="$classBif__OPER1__SCAN1.html#a9443990df8bba319cb2599c324bbb9e9" title="Overloaded Function::eval_AXB()." alt="" coords="496,79,704,104"/>
+<area shape="rect" id="node17" href="$classBif__F12__PARTITION.html#aff7a6c436450d059fea60fbc917e24e6" title="overloaded Function::eval_AB()" alt="" coords="523,391,677,431"/>
+<area shape="rect" id="node18" href="$classBif__F12__PARTITION.html#a119646a27f2537b4da898e5646988857" title="overloaded Function::eval_AXB()" alt="" coords="523,327,677,367"/>
+<area shape="rect" id="node21" href="$classBif__OPER2__INNER.html#adbaaf10669f72e39cc58d5dcdab6c5fe" title="Overloaded Function::eval_ALRB()." alt="" coords="493,685,707,711"/>
+<area shape="rect" id="node22" href="$classBif__OPER1__REDUCE.html#a1f613b8ac81791d7c61b3e0a9f6e70ba" title="Overloaded Function::eval_LB()." alt="" coords="495,456,705,481"/>
+<area shape="rect" id="node23" href="$classBif__OPER1__REDUCE1.html#a6bd690931eba7929294983c39655ffa1" title="Overloaded Function::eval_LB()." alt="" coords="515,506,685,546"/>
+<area shape="rect" id="node24" href="$classBif__OPER1__REDUCE.html#aed5704b99e4ff296d84b329cfcc9048c" title="Overloaded Function::eval_LXB()." alt="" coords="491,571,709,596"/>
+<area shape="rect" id="node25" href="$classBif__OPER1__REDUCE1.html#a9bb990c9c5944c780452941e13d39c0d" title="Overloaded Function::eval_LXB()." alt="" coords="515,621,685,661"/>
+<area shape="rect" id="node27" href="$classBif__OPER1__REDUCE.html#a19caf24e6cb4485bb7b853da1869295a" title="Overloaded Function::eval_AB()." alt="" coords="494,800,706,825"/>
+<area shape="rect" id="node28" href="$classBif__OPER1__REDUCE1.html#a9461c2e8d943fb975798bf887e43d799" title="Overloaded Function::eval_AB()." alt="" coords="515,850,685,890"/>
+<area shape="rect" id="node29" href="$classBif__OPER1__REDUCE.html#ab0e3bfadabe90022fd47547d758efcb4" title="Overloaded Function::eval_AXB()." alt="" coords="489,915,711,940"/>
+<area shape="rect" id="node30" href="$classBif__OPER1__REDUCE1.html#a22cc3a3474783da8abd628c60feb7256" title="Overloaded Function::eval_AXB()." alt="" coords="515,735,685,775"/>
+<area shape="rect" id="node32" href="$classBif__F12__ROTATE.html#a770fdf8ebd144972e0f0f972cbd65674" title="overloaded Function::eval_B()" alt="" coords="512,1013,688,1039"/>
+<area shape="rect" id="node33" href="$classBif__F12__ROTATE1.html#aa57711fb9ab3d187c27cc43181de50d7" title="overloaded Function::eval_B()" alt="" coords="509,1063,691,1088"/>
+<area shape="rect" id="node34" href="$classBif__F12__ROTATE.html#a2d6d04db12790ef356b201f36db0e756" title="overloaded Function::eval_XB()" alt="" coords="507,1112,693,1137"/>
+<area shape="rect" id="node35" href="$classBif__F12__ROTATE1.html#ae2a7ea53107706f45edf954d76532a64" title="overloaded Function::eval_XB()" alt="" coords="504,964,696,989"/>
+<area shape="rect" id="node37" href="$classBif__F12__ROTATE.html#a5425880fd1d9e82dd9368235fe77323b" title="overloaded Function::eval_AB()" alt="" coords="507,1211,693,1236"/>
+<area shape="rect" id="node38" href="$classBif__F12__ROTATE1.html#a0942eb6caa435ff0157dc05bb7a4ff31" title="overloaded Function::eval_AB()" alt="" coords="504,1260,696,1285"/>
+<area shape="rect" id="node39" href="$classBif__F12__ROTATE.html#aaef77c4a19df99c926818b1ef3f519fe" title="overloaded Function::eval_AXB()" alt="" coords="503,1309,697,1335"/>
+<area shape="rect" id="node40" href="$classBif__F12__ROTATE1.html#af159c64ab4196cfa690bf9e98129f4fb" title="overloaded Function::eval_AXB()" alt="" coords="499,1161,701,1187"/>
+<area shape="rect" id="node42" href="$classBif__OPER1__SCAN.html#afaa44934b4c7bc25b517e3acfe41507b" title="Overloaded Function::eval_LB()." alt="" coords="505,1408,695,1433"/>
+<area shape="rect" id="node43" href="$classBif__OPER1__SCAN1.html#a191214991f49b5ce2649400f76f25893" title="Overloaded Function::eval_ALB()." alt="" coords="501,1457,699,1483"/>
+<area shape="rect" id="node44" href="$classBif__OPER1__SCAN.html#ace7710f31a43abd663e582cf96cb9169" title="Overloaded Function::eval_LXB()." alt="" coords="501,1507,699,1532"/>
+<area shape="rect" id="node45" href="$classBif__OPER1__SCAN1.html#adb20c6d87fb95f93fc8230f4984c4041" title="Overloaded Function::eval_ALXB()." alt="" coords="497,1359,703,1384"/>
+</map>

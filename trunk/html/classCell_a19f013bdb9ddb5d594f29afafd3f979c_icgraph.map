@@ -1,0 +1,17 @@
+<map id="Cell::is_near_int64_t" name="Cell::is_near_int64_t">
+<area shape="rect" id="node1" title="True iff value is numeric and close to an int." alt="" coords="655,301,796,326"/>
+<area shape="rect" id="node2" href="$classNumericCell.html#a532aa6dc26e7edd10347082c4110a736" title="overloaded Cell::bif_and_bitwise()" alt="" coords="457,5,601,45"/>
+<area shape="rect" id="node3" href="$classNumericCell.html#a2b3f4394c119377e1d14f23155679f75" title="overloaded Cell::bif_equal_bitwise()" alt="" coords="452,69,607,109"/>
+<area shape="rect" id="node4" href="$classNumericCell.html#a6ba83172d14d8550297d46acb670dba5" title="overloaded Cell::bif_nand_bitwise()" alt="" coords="454,133,605,173"/>
+<area shape="rect" id="node5" href="$classNumericCell.html#a6233e579fcb1d076309d3b417bc9fc95" title="overloaded Cell::bif_nor_bitwise()" alt="" coords="459,197,600,237"/>
+<area shape="rect" id="node6" href="$classNumericCell.html#a9c9dcac7df0f7e7da067d1c076345fc8" title="overloaded Cell::bif_not_bitwise()" alt="" coords="459,261,600,301"/>
+<area shape="rect" id="node7" href="$classNumericCell.html#a2e9c156aa01d52fc1658398f8ee393ee" title="overloaded Cell::bif_not_equal_bitwise()" alt="" coords="459,325,600,365"/>
+<area shape="rect" id="node8" href="$classNumericCell.html#a220314d27b9fd8fac3e6e987c2044f6f" title="overloaded Cell::bif_or_bitwise()" alt="" coords="462,389,597,429"/>
+<area shape="rect" id="node9" href="$classNumericCell.html#a59c9e232b6a1cb365a3252196b41604a" title="N over K for positive integers N and K." alt="" coords="459,453,600,493"/>
+<area shape="rect" id="node12" href="$classComplexCell.html#af84098a01f329c4460d5f7b17171cccc" title="overloaded Cell::is_near_int64_t()" alt="" coords="456,517,603,557"/>
+<area shape="rect" id="node14" href="$classFloatCell.html#a20e1f90166a304aff2fa11cf1a328f2a" title="Overloaded Cell::is_near_int64_t()." alt="" coords="467,581,591,621"/>
+<area shape="rect" id="node10" href="$classNumericCell.html#a4f123c9528fe4e9a1fc9c75585aa2de3" title="compute binomial funtion for integers a and b" alt="" coords="224,461,404,486"/>
+<area shape="rect" id="node11" href="$classNumericCell.html#a3fd3970233551bf557f5e52330b5610c" title="overloaded Cell::bif_binomial()" alt="" coords="5,461,176,486"/>
+<area shape="rect" id="node13" href="$classComplexCell.html#aa691b84f65cde9167b0cab372f8b854f" title="overloaded Cell::bif_near_int64_t()" alt="" coords="239,517,389,557"/>
+<area shape="rect" id="node15" href="$classFloatCell.html#a06d60ffa82a19783d085ce7e258161ed" title="overloaded Cell::bif_near_int()" alt="" coords="250,581,378,621"/>
+</map>

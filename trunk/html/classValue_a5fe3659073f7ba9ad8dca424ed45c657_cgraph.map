@@ -1,0 +1,10 @@
+<map id="Value::get_cellrefs" name="Value::get_cellrefs">
+<area shape="rect" id="node1" title="return a value containing pointers to all ravel cells of this value. the result is non&#45;nested and has..." alt="" coords="5,80,136,105"/>
+<area shape="rect" id="node2" href="$classValue.html#a9fc8bbaf9fefe6835dea7db0f71b8b6c" title="return the number of elements (the product of the shapes)." alt="" coords="184,5,332,31"/>
+<area shape="rect" id="node4" href="$classValue.html#abf966781ab7b9c91e944721d3646edfb" title="return the shape of this value" alt="" coords="197,55,319,80"/>
+<area shape="rect" id="node5" href="$classValue.html#a54205b69c66acaabc99a43a8870950c2" title="return the first element of the ravel (which is always present) same as wfirst(), but named different..." alt="" coords="195,104,321,129"/>
+<area shape="rect" id="node6" href="$classValue.html#af5c079fe8530d8f90a87c53439d9c924" title="return the (writable) idx&#39;th element of the ravel." alt="" coords="384,129,511,155"/>
+<area shape="rect" id="node3" href="$classShape.html#af39e05bad7be900fa1437a6eb6035e97" title="return the number of ravel elements (1 for scalars,i else product of shapes)" alt="" coords="380,5,515,31"/>
+<area shape="rect" id="node7" href="$classValue.html#ac5b54e3a13cab0837442f1575b3299a5" title="return the number of elements, but at least 1 (for the prototype)." alt="" coords="563,129,732,155"/>
+<area shape="rect" id="node8" href="$classShape.html#a6f32f749601dca80263493fd06be12c4" title="return the number of ravel elements, but at least 1 (for empty values and scalars) else product of sh..." alt="" coords="780,129,935,155"/>
+</map>

@@ -1,3 +1,7 @@
 <map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="node1" href="$classStatistics__record.html" title="one statistics for computing the mean and the variance of samples " alt="" coords="5,5,125,32"/>
+<area shape="rect" id="node1" title=" " alt="" coords="5,80,89,105"/>
+<area shape="rect" id="node2" href="$classCDR__string.html" title="a string containing a CDR record" alt="" coords="159,5,249,31"/>
+<area shape="rect" id="node3" href="$classCollatingCache.html" title="A cache for speeding up dyadic ⍋ and ⍒" alt="" coords="149,55,259,80"/>
+<area shape="rect" id="node4" href="$classToken__string.html" title="A sequence of Token." alt="" coords="155,104,253,129"/>
+<area shape="rect" id="node5" href="$classUCS__string__vector.html" title="a vector of UCS_strings." alt="" coords="137,153,271,179"/>
 </map>

@@ -1,4 +1,5 @@
 <map id="DLX_Node" name="DLX_Node">
-<area shape="rect" id="node2" href="$classDLX__Header__Node.html" title="A (column&#45;) header node. " alt="" coords="5,80,140,107"/>
-<area shape="rect" id="node3" href="$classDLX__Root__Node.html" title="The root node of the constraints matrix. " alt="" coords="164,80,285,107"/>
+<area shape="rect" id="node1" title="one &#39;1&#39; in a sparse constraint matrix" alt="" coords="105,5,192,31"/>
+<area shape="rect" id="node2" href="$classDLX__Header__Node.html" title="A (column&#45;) header node." alt="" coords="5,79,140,104"/>
+<area shape="rect" id="node3" href="$classDLX__Root__Node.html" title="The root node of the constraints matrix." alt="" coords="164,79,285,104"/>
 </map>

@@ -1,0 +1,5 @@
+<map id="UCS_string::has_black" name="UCS_string::has_black">
+<area shape="rect" id="node1" title="return true if this string contains non&#45;whitespace characters" alt="" coords="5,31,163,56"/>
+<area shape="rect" id="node2" href="$classAvec.html#a014cc622b9ec09014dab1982b0ee59ab" title="return true iff av is a whitespace char (ASCII 0..32 (including))" alt="" coords="218,5,326,31"/>
+<area shape="rect" id="node3" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="211,55,333,80"/>
+</map>

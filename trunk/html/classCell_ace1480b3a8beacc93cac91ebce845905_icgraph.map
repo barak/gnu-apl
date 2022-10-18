@@ -1,0 +1,48 @@
+<map id="Cell::init" name="Cell::init">
+<area shape="rect" id="node1" title="init this Cell from a (possibly deep) copy of other" alt="" coords="1872,377,1943,403"/>
+<area shape="rect" id="node2" href="$classSymbol.html#a09c284745e26103acf5aee747f464b7a" title="Indexed (one&#45;dimensional) assign value to this Symbol." alt="" coords="1653,255,1817,280"/>
+<area shape="rect" id="node3" href="$classQuad__CR.html#a36fa2877177bb7642ab744f904da42d1" title="compute 38 ⎕CR B" alt="" coords="1663,304,1806,329"/>
+<area shape="rect" id="node20" href="$classQuad__MAP.html#a0885bc62185d5c56e90fc5c0b9b5508f" title="compute ⎕MAP with (indices of) sorted A" alt="" coords="1663,377,1806,403"/>
+<area shape="rect" id="node22" href="$classBif__REDUCE.html#a74ec7563f72cc91111801a73284c6373" title="common implementation of reduce() and reduce_n_wise." alt="" coords="1649,512,1820,537"/>
+<area shape="rect" id="node39" href="$classQuad__JSON.html#af9e8ac641cd521e54d250971dd66e0b4" title="parse a JSON object member: &quot;name&quot; : value , ; and increment token0 along the way." alt="" coords="1645,866,1824,906"/>
+<area shape="rect" id="node4" href="$classQuad__CR.html#ac6f426118cad09841c8545efd5ba8a8f" title="compute a ⎕CR B" alt="" coords="1443,104,1573,129"/>
+<area shape="rect" id="node5" href="$classQuad__CR.html#ac60b988ceaf002189a8c60337752048f" title="overloaded Function::eval_AB()" alt="" coords="1188,5,1325,31"/>
+<area shape="rect" id="node7" href="$classValue.html#a6f574c5690fbcf4024a78ed14a8375db" title="print this value in 4 ⎕CR style" alt="" coords="1191,55,1322,80"/>
+<area shape="rect" id="node8" href="$classValue.html#a82fd0d84f4c7f0b22a6b035e0201506a" title="print info related to a stale value" alt="" coords="1181,104,1332,129"/>
+<area shape="rect" id="node19" href="$classStateIndicator.html#abf0d83f5f9a8fec57751bf5636933687" title="Maybe print B (according to tag) and erase B." alt="" coords="1172,154,1341,194"/>
+<area shape="rect" id="node6" href="$classQuad__CR.html#a4a7057e997df3f1607b2e003ef7279f6" title="overloaded Function::eval_XB()" alt="" coords="931,5,1068,31"/>
+<area shape="rect" id="node9" href="$classValue.html#a80c3e1a7208f4f97985e5c742ec93b2d" title="print stale Values, and return the number of stale Values." alt="" coords="938,104,1061,129"/>
+<area shape="rect" id="node10" href="$classCommand.html#af5d73db57801b2363c954b402f19186d" title="check workspace integrity (stale Value and IndexExpr objects, etc)" alt="" coords="676,77,847,103"/>
+<area shape="rect" id="node15" href="$classIO__Files.html#aa05a2917c11a88b9abfc4afa6ca04a3e" title="dito (close files, print errors, summary etc)." alt="" coords="667,131,856,156"/>
+<area shape="rect" id="node11" href="$classXML__Saving__Archive.html#acc327395cab545ea7797d92f5c931cab" title="write entire workspace" alt="" coords="460,66,607,106"/>
+<area shape="rect" id="node12" href="$classWorkspace.html#a8a4f1d898d523818dbd9d7efa6f2cf92" title="save this workspace" alt="" coords="247,73,400,99"/>
+<area shape="rect" id="node13" href="$classCommand.html#ad61e749290966d00856ce1dd4f6abe42" title=")SAVE active WS as CONTINUE and )OFF" alt="" coords="5,49,199,75"/>
+<area shape="rect" id="node14" href="$classCommand.html#aec0c4c6efbb9df9a34220b510f58905a" title=")SAVE: save a workspace file (.xml)" alt="" coords="23,99,181,124"/>
+<area shape="rect" id="node16" href="$classIO__Files.html#acc91875b8e0c7a5ad44e3ead0e3dda7b" title="get one line from the current file, open the next file if necceessary" alt="" coords="459,131,607,156"/>
+<area shape="rect" id="node18" href="$classIO__Files.html#a5ac43f7fe811ca95a419f8ba7a11682e" title="close current testcase file (prematurely) and opem mext one" alt="" coords="469,180,597,205"/>
+<area shape="rect" id="node17" href="$classInputMux.html#a8a79cbe5207cde162fb36133ad9defdd" title="get one line" alt="" coords="259,131,388,156"/>
+<area shape="rect" id="node21" href="$classQuad__MAP.html#af2931692d6fcc941e0ae64b9c4404c38" title="overloaded Function::eval_AB()" alt="" coords="1435,333,1581,359"/>
+<area shape="rect" id="node23" href="$classBif__REDUCE.html#ac3430120da57197d5099b5ccabf1004c" title="LO&#45;reduce B along axis." alt="" coords="1433,383,1583,408"/>
+<area shape="rect" id="node29" href="$classBif__REDUCE.html#a450260486cb0a169a1f13602cae9ab97" title="LO&#45;reduce B n&#45;wise along axis." alt="" coords="1433,547,1583,587"/>
+<area shape="rect" id="node34" href="$classBif__SCAN.html#a796038c05f7946ae72143ef64c773a1f" title="Compute the LO&#45;scan of B." alt="" coords="1449,776,1567,801"/>
+<area shape="rect" id="node24" href="$classBif__OPER2__INNER.html#adbaaf10669f72e39cc58d5dcdab6c5fe" title="Overloaded Function::eval_ALRB()." alt="" coords="1149,219,1364,244"/>
+<area shape="rect" id="node25" href="$classBif__OPER1__REDUCE.html#a1f613b8ac81791d7c61b3e0a9f6e70ba" title="Overloaded Function::eval_LB()." alt="" coords="1151,268,1362,293"/>
+<area shape="rect" id="node26" href="$classBif__OPER1__REDUCE1.html#a6bd690931eba7929294983c39655ffa1" title="Overloaded Function::eval_LB()." alt="" coords="1171,318,1342,358"/>
+<area shape="rect" id="node27" href="$classBif__OPER1__REDUCE.html#aed5704b99e4ff296d84b329cfcc9048c" title="Overloaded Function::eval_LXB()." alt="" coords="1147,383,1366,408"/>
+<area shape="rect" id="node28" href="$classBif__OPER1__REDUCE1.html#a9bb990c9c5944c780452941e13d39c0d" title="Overloaded Function::eval_LXB()." alt="" coords="1171,433,1342,473"/>
+<area shape="rect" id="node30" href="$classBif__OPER1__REDUCE.html#a584c1a00ef6b21b457c869a862fe4775" title="Overloaded Function::eval_ALB()." alt="" coords="1147,497,1366,523"/>
+<area shape="rect" id="node31" href="$classBif__OPER1__REDUCE1.html#a1c98ca9e70231d9a1fe491c64e46f8a8" title="Overloaded Function::eval_ALB()." alt="" coords="1171,547,1342,587"/>
+<area shape="rect" id="node32" href="$classBif__OPER1__REDUCE.html#a06f59f7c71977fda6d2ca0e99389b659" title="Overloaded Function::eval_ALXB()." alt="" coords="1143,612,1371,637"/>
+<area shape="rect" id="node33" href="$classBif__OPER1__REDUCE1.html#ad48531d0b47915421f4aca74bab3b31d" title="Overloaded Function::eval_ALXB()." alt="" coords="1171,662,1342,702"/>
+<area shape="rect" id="node35" href="$classBif__OPER1__SCAN.html#afaa44934b4c7bc25b517e3acfe41507b" title="Overloaded Function::eval_LB()." alt="" coords="1161,727,1352,752"/>
+<area shape="rect" id="node36" href="$classBif__OPER1__SCAN1.html#a191214991f49b5ce2649400f76f25893" title="Overloaded Function::eval_ALB()." alt="" coords="1158,776,1355,801"/>
+<area shape="rect" id="node37" href="$classBif__OPER1__SCAN.html#ace7710f31a43abd663e582cf96cb9169" title="Overloaded Function::eval_LXB()." alt="" coords="1157,825,1356,851"/>
+<area shape="rect" id="node38" href="$classBif__OPER1__SCAN1.html#adb20c6d87fb95f93fc8230f4984c4041" title="Overloaded Function::eval_ALXB()." alt="" coords="1153,875,1360,900"/>
+<area shape="rect" id="node40" href="$classQuad__JSON.html#a089835d5e18fc87f25971bb49046ae88" title="parse a JSON object: { member ( , member)* } and increment token0" alt="" coords="1419,873,1597,899"/>
+<area shape="rect" id="node41" href="$classQuad__JSON.html#a1e973192b2dccc89283c8ba4697923fc" title="parse a JSON value (false, null, true, object, array, number, or string) and increment along the way." alt="" coords="1169,924,1344,949"/>
+<area shape="rect" id="node42" href="$classQuad__JSON.html#ae101226211d05605bee074e4d3a66f8e" title="convert JSON string to APL associative array" alt="" coords="904,875,1095,900"/>
+<area shape="rect" id="node46" href="$classQuad__JSON.html#ad6c1178f70936d2d153b1581e28e8d52" title="parse a JSON array: [ value (, value)* ] and increment token0 along the way." alt="" coords="913,924,1085,949"/>
+<area shape="rect" id="node43" href="$classQuad__JSON.html#a7488f4e12a005de36c3fa9887e4909e5" title="overloaded Function::eval_B()" alt="" coords="689,875,833,900"/>
+<area shape="rect" id="node44" href="$classQuad__JSON.html#a2ed44b39f5d092ab5f7e1768c6b8615a" title="return JSON file (&#45;name in B) converted to APL structured value" alt="" coords="448,849,619,875"/>
+<area shape="rect" id="node45" href="$classQuad__JSON.html#a3adb4fba903343bf38b0c3a1dd10feb8" title="overloaded Function::eval_B()" alt="" coords="247,875,400,900"/>
+</map>

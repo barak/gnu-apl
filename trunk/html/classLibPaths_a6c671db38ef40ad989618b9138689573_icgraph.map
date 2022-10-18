@@ -1,0 +1,6 @@
+<map id="LibPaths::set_lib_dir" name="LibPaths::set_lib_dir">
+<area shape="rect" id="node1" title="set library path (from config file)" alt="" coords="317,35,457,60"/>
+<area shape="rect" id="node2" href="$classCommand.html#ade7fa861e534f953d5439040e78fe433" title="list paths of workspace and wslib directories" alt="" coords="117,5,268,31"/>
+<area shape="rect" id="node3" href="$structUserPreferences.html#a1831227aad6eb6d2fcd28e4d5d0067c3" title="read a preference file and update parameters set there" alt="" coords="116,55,269,95"/>
+<area shape="rect" id="node4" href="$main_8cc.html#aa0321421b17def7b58fc0cabc8890260" title="initialize the interpreter" alt="" coords="5,63,68,88"/>
+</map>

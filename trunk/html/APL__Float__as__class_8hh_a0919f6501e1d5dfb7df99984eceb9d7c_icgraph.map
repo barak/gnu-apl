@@ -1,0 +1,19 @@
+<map id="log" name="log">
+<area shape="rect" id="node2" href="$classRealCell.html#a4d54d91ae4cacf6d1ccaf726158e1dba" title="overloaded Cell::bif_logarithm(). " alt="" coords="551,66,705,93"/>
+<area shape="rect" id="node4" href="$classComplexCell.html#a2c40d9e586d2e7f78ff6cf5e6c61f723" title="overloaded from the corresponding Cell:: function (see class Cell). " alt="" coords="92,66,271,93"/>
+<area shape="rect" id="node6" href="$classComplexCell.html#a6c5da00c1a1a8299f662529ce0116090" title="overloaded from the corresponding Cell:: function (see class Cell). " alt="" coords="97,117,265,144"/>
+<area shape="rect" id="node7" href="$classIntCell.html#acaaff34767ee47e98b5940aa4a30169c" title="overloaded from the corresponding Cell:: function (see class Cell) " alt="" coords="116,168,247,194"/>
+<area shape="rect" id="node9" href="$classFloatCell.html#ad4bf811935f0c3613025f5c3fa0fa62e" title="Overloaded from the corresponding Cell:: function (see class Cell). " alt="" coords="109,218,254,245"/>
+<area shape="rect" id="node11" href="$classComplexCell.html#a2976da06693d3ba08e67dbf1181db9c3" title="compute circle function fun " alt="" coords="111,295,251,336"/>
+<area shape="rect" id="node18" href="$classSvar__record__P.html#aae435bcd8b70390ab066782a478c4bb5" title="constructor: fetch record with key key from APserver " alt="" coords="110,360,253,402"/>
+<area shape="rect" id="node3" href="$classRealCell.html#ac30508908bf8e8cb7234f756e04be692" title="overloaded Cell::is_real_cell(). " alt="" coords="755,382,900,409"/>
+<area shape="rect" id="node5" href="$classComplexCell.html#a978a6ef7d34a3446b796a0597c05d074" title="Overloaded Cell::is_finite(). " alt="" coords="553,218,703,245"/>
+<area shape="rect" id="node8" href="$classIntCell.html#a57acd6c6da8ad45753bb27b304ca597b" title="overloaded Cell::is_integer_cell() " alt="" coords="335,168,485,194"/>
+<area shape="rect" id="node10" href="$classFloatCell.html#ab33d5fb8782321e100cec38cbed5ea18" title="Overloaded Cell::is_finite(). " alt="" coords="347,218,473,245"/>
+<area shape="rect" id="node12" href="$classComplexCell.html#ad98a4d9b45230686a474a35842f3c479" title="overloaded from the corresponding Cell:: function (see class Cell). " alt="" coords="319,269,501,296"/>
+<area shape="rect" id="node13" href="$classComplexCell.html#ac5df000a61c2f00dc900fa90c11e6ed6" title="overloaded from the corresponding Cell:: function (see class Cell). " alt="" coords="331,320,489,362"/>
+<area shape="rect" id="node14" href="$classComplexCell.html#ad44af83730914bbe8cd52e34c5abee7b" title="the square of the magnitude (a² + b² for aJb) " alt="" coords="341,386,479,413"/>
+<area shape="rect" id="node15" href="$classRealCell.html#af52c6c260e11975f8334f583872985c6" title="compute circle function fun " alt="" coords="321,437,499,464"/>
+<area shape="rect" id="node16" href="$classRealCell.html#aed27521634af9fed4dd213807f93a2c8" title="overloaded Cell::bif_circle_fun(). " alt="" coords="549,408,707,434"/>
+<area shape="rect" id="node17" href="$classRealCell.html#aa5cb568d949ab777e9ce4eba530b2121" title="overloaded Cell::bif_circle_fun_inverse(). " alt="" coords="562,459,694,500"/>
+</map>

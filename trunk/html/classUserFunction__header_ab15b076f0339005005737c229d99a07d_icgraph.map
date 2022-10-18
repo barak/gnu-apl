@@ -1,0 +1,6 @@
+<map id="UserFunction_header::is_operator" name="UserFunction_header::is_operator">
+<area shape="rect" id="node1" title="return true if this defined function header is an operator" alt="" coords="407,27,553,67"/>
+<area shape="rect" id="node2" href="$classUserFunction.html#a40d9c0fa769c7ccadf1fef03e2e47b63" title="Overloaded Function::is_operator." alt="" coords="187,5,359,31"/>
+<area shape="rect" id="node3" href="$classUserFunction__header.html#aa3510fbda561cbad0f734260603f6aff" title="print local vars etc." alt="" coords="199,55,346,95"/>
+<area shape="rect" id="node4" href="$classUserFunction.html#afe2969d5186bfae3d93ac7a8f6a66d02" title="Overloaded Function::print_properties()" alt="" coords="5,55,139,95"/>
+</map>

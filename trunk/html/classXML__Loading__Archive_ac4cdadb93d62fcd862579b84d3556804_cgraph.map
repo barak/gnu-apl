@@ -1,0 +1,11 @@
+<map id="XML_Loading_Archive::read_UCS" name="XML_Loading_Archive::read_UCS">
+<area shape="rect" id="node1" title="read an UCS string" alt="" coords="5,88,157,128"/>
+<area shape="rect" id="node2" href="$classXML__Loading__Archive.html#a3ea850c7fb68b3e908615f81bb9304d2" title="find mandatory attribute att_name. Return a pointer to its value if found and throw DOMAIN ERROR if n..." alt="" coords="205,15,357,55"/>
+<area shape="rect" id="node4" href="$classXML__Loading__Archive.html#a4c957a7b68bd8ef13162b63ff62bb7ed" title="input is a UTF8&#45;encoded sequence of bytes, terminated with &quot;. UTF8&#45;decode the sequence,..." alt="" coords="205,88,357,128"/>
+<area shape="rect" id="node7" href="$classXML__Loading__Archive.html#a44bf13ce1569bd63ad5de5e460ed3ace" title="skip to tag tag, return EOF if end of file" alt="" coords="205,169,357,209"/>
+<area shape="rect" id="node3" href="$classXML__Loading__Archive.html#ad0c398f273df586ef1a2cb9b87b9cb41" title="find attribute att_name and return: a pointer to its value if found, 0 if optional is true,..." alt="" coords="405,5,557,45"/>
+<area shape="rect" id="node5" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="411,70,551,95"/>
+<area shape="rect" id="node6" href="$classUTF8__string.html#a27a630b44bca173fe9ea5005bcb3e460" title="convert the first char in UTF8&#45;encoded string to Unicode, setting len to the number of bytes in the U..." alt="" coords="415,119,548,145"/>
+<area shape="rect" id="node8" href="$classXML__Loading__Archive.html#adb5a5f67fc6ceffb3260e61b5fe9994c" title="return true iff tagname starts with prefix" alt="" coords="405,169,557,209"/>
+<area shape="rect" id="node9" href="$classXML__Loading__Archive.html#a987f28e4f3139e5f1c96913468ea3057" title="move to next tag, return true if EOF" alt="" coords="405,233,557,273"/>
+</map>

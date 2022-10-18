@@ -4,7 +4,7 @@ var classBif__F12__POWER =
     [ "eval_AB", "classBif__F12__POWER.html#ab99d652c3313085ae35e74d606679f84", null ],
     [ "eval_AXB", "classBif__F12__POWER.html#a0c6af22f63c85b04e325dce6cbf4cb75", null ],
     [ "eval_B", "classBif__F12__POWER.html#a8bfa0ebd2146db96e9b4a9dc46206f04", null ],
-    [ "eval_identity_fun", "classBif__F12__POWER.html#a7923153324b3dc4de97ee9a9304bf3d0", null ],
+    [ "eval_identity_fun", "classBif__F12__POWER.html#aea5ae25d4c7f4dd81166022332c0ddc0", null ],
     [ "get_dyadic_inverse", "classBif__F12__POWER.html#a4689b0a05e4aa86a97b8d727c7dee8d7", null ],
     [ "get_monadic_inverse", "classBif__F12__POWER.html#ae6aa46918ecb257174bb95a4cb76d77d", null ],
     [ "get_scalar_f2", "classBif__F12__POWER.html#aeeae2b094136f7e0a5bc8e711f3b2c64", null ],

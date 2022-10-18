@@ -17,13 +17,13 @@ var classNumericCell =
     [ "cpx_gcd", "classNumericCell.html#aee0049caed89a7aa466ef6d36fc2efbd", null ],
     [ "cpx_max_real", "classNumericCell.html#a597c08fedf6ed884631b2f790ba1654c", null ],
     [ "flt_gcd", "classNumericCell.html#a0d8cbae9ade43f4a8b2de0cdc853a06b", null ],
-    [ "get_classname", "classNumericCell.html#a7b750222396638ef9094b3e6c1e62824", null ],
+    [ "get_classname", "classNumericCell.html#a798f799764ef63c6bdaa03d94ca18d12", null ],
     [ "int_gcd", "classNumericCell.html#a812dfdb6111940658e2893c9d4464212", null ],
     [ "integer_binomial", "classNumericCell.html#a59c9e232b6a1cb365a3252196b41604a", null ],
     [ "is_numeric", "classNumericCell.html#ac197ab40484c2be78b2291fb1ee2a84d", null ],
     [ "K33_binomial", "classNumericCell.html#a4f123c9528fe4e9a1fc9c75585aa2de3", null ],
     [ "real_binomial", "classNumericCell.html#a0e22dad3d1acbf0b2103508aaa60d621", null ],
-    [ "zV", "classNumericCell.html#ad3e0fc6450b7cdf6f5a0fa53c2a54817", null ],
     [ "zV", "classNumericCell.html#a28f9418e7fa8d2d475582a11d89f9245", null ],
+    [ "zV", "classNumericCell.html#ad3e0fc6450b7cdf6f5a0fa53c2a54817", null ],
     [ "zV", "classNumericCell.html#a018355fe7524a9472adcb4d3684c8fe6", null ]
 ];

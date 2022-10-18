@@ -1,0 +1,13 @@
+<map id="Plot_window_properties::valZ2pixel" name="Plot_window_properties::valZ2pixel">
+<area shape="rect" id="node2" href="$classPlot__window__properties.html#acd007c1ca30e86d8e12e125a39d7d9a5" title="convert values val_X, val_Y, and val_Z, to the X and Y coordinate of the pixel below the Z=0 plane of..." alt="" coords="213,271,373,313"/>
+<area shape="rect" id="node3" href="$APL__Float__as__class_8hh.html#a11d698fa254ac8c97ddd741e415c127c" title="atan2" alt="" coords="474,5,529,32"/>
+<area shape="rect" id="node4" href="$APL__Float__as__class_8hh.html#a382deaecbcb25520d8ac7dc9f1e1ed44" title="cos" alt="" coords="480,56,523,83"/>
+<area shape="rect" id="node5" href="$classPlot__window__properties.html#a577510e3bcf6ba61978dc60d778dc967" title="return the smallest X value " alt="" coords="421,107,581,149"/>
+<area shape="rect" id="node6" href="$classPlot__window__properties.html#af27f118d1e90664680b2efd1a2460a03" title="return the smallest Y value " alt="" coords="421,173,581,214"/>
+<area shape="rect" id="node7" href="$classPlot__window__properties.html#a0640b99b583131dabf64478a88265e66" title="return the smallest Z value " alt="" coords="421,238,581,279"/>
+<area shape="rect" id="node8" href="$classPlot__window__properties.html#a22ce1d3133dece6718f7527b7adf713a" title="Plot_window_properties\l::get_origin_X" alt="" coords="421,303,581,345"/>
+<area shape="rect" id="node9" href="$classPlot__window__properties.html#a091a339ce7641a7874ee602c6b3b127e" title="Plot_window_properties\l::get_origin_Y" alt="" coords="421,369,581,410"/>
+<area shape="rect" id="node10" href="$APL__Float__as__class_8hh.html#a8f62712d50618f12a51a854f77a91c98" title="sin" alt="" coords="482,435,521,461"/>
+<area shape="rect" id="node11" href="$classPlot__window__properties.html#a087dfd5eee09a66161eb76c87680d14c" title="convert &#160;&#160;val_X to the X coordinate of the pixel in the plot area " alt="" coords="421,486,581,527"/>
+<area shape="rect" id="node12" href="$classPlot__window__properties.html#ae727cdd8ecd4888c8785c5fd53dc6b93" title="convert &#160;&#160;val_Y to the Y coordinate of the pixel in the plot area " alt="" coords="421,551,581,593"/>
+</map>

@@ -1,0 +1,7 @@
+<map id="PointerCell::PointerCell" name="PointerCell::PointerCell">
+<area shape="rect" id="node1" title="constructor: a cell containing nested sub&#45;array val where val is allowed to be a simple scalar (used ..." alt="" coords="5,63,164,88"/>
+<area shape="rect" id="node2" href="$classValue.html#a4dbee7eead7d72ec234a45d164c38e97" title="increase nz_subcell_count by count" alt="" coords="225,5,369,31"/>
+<area shape="rect" id="node3" href="$classValue.html#a553c4b723218b35f615f9dda928d7e72" title="increment the PointerCell count" alt="" coords="213,55,380,95"/>
+<area shape="rect" id="node4" href="$classValue.html#ac5b54e3a13cab0837442f1575b3299a5" title="return the number of elements, but at least 1 (for the prototype)." alt="" coords="212,120,381,145"/>
+<area shape="rect" id="node5" href="$classShape.html#a6f32f749601dca80263493fd06be12c4" title="return the number of ravel elements, but at least 1 (for empty values and scalars) else product of sh..." alt="" coords="429,120,584,145"/>
+</map>

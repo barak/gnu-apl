@@ -1,0 +1,10 @@
+<map id="NumericCell::bif_nor" name="NumericCell::bif_nor">
+<area shape="rect" id="node1" title="overloaded Cell::bif_nor()" alt="" coords="5,80,147,105"/>
+<area shape="rect" id="node2" href="$classCell.html#a5e074ac9160b606201b57d96b44252eb" title="Return value if it is close to boolean, or else throw DOMAIN_ERROR." alt="" coords="195,5,329,31"/>
+<area shape="rect" id="node3" href="$classCell.html#aa8d4bc14c8641781d38dea605f814248" title="return true iff value is numeric and close to 0 or 1" alt="" coords="199,55,325,80"/>
+<area shape="rect" id="node6" href="$classIntCell.html#afd60fd9e3a5581ac99c1e053d9218fe7" title="initialize the (un&#45;initialized) Cell *Z to integer 0" alt="" coords="221,104,303,129"/>
+<area shape="rect" id="node8" href="$classIntCell.html#a7da78424dbf8c5a7ee6b9630f7daac97" title="initialize the (un&#45;initialized) Cell *Z to integer 1" alt="" coords="221,153,303,179"/>
+<area shape="rect" id="node4" href="$classCell.html#a9aa348b66fb831af844bbb3bdff44b66" title="return true iff value is numeric and close to 1" alt="" coords="379,31,502,56"/>
+<area shape="rect" id="node5" href="$classCell.html#a0070bc8a15c9ea3742aea0f9407ab934" title="return true iff value is numeric and close to 0" alt="" coords="377,80,504,105"/>
+<area shape="rect" id="node7" href="$classIntCell.html#a88c653b2f968c451ee1c1c53a983fa13" title="Construct an integer cell with value 0." alt="" coords="387,141,494,167"/>
+</map>

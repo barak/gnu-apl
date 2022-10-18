@@ -1,0 +1,5 @@
+<map id="Bif_F12_ROLL::eval_AB" name="Bif_F12_ROLL::eval_AB">
+<area shape="rect" id="node1" title="dial A from B. overloaded Function::eval_AB()." alt="" coords="5,31,171,56"/>
+<area shape="rect" id="node2" href="$classWorkspace.html#adb2006f054a1cebb8ae0252b61bd1d1b" title="return the current ⎕IO" alt="" coords="221,5,355,31"/>
+<area shape="rect" id="node3" href="$classWorkspace.html#a233dce47cf2f5a75b3e3f9cc8f52f978" title="return the Quad&#45;RL (to be taken % mod)" alt="" coords="219,55,357,80"/>
+</map>

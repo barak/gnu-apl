@@ -1,0 +1,5 @@
+<map id="XML_Loading_Archive::expect_tag" name="XML_Loading_Archive::expect_tag">
+<area shape="rect" id="node1" title="check that is_tag(prefix) is true and print error info if not" alt="" coords="5,37,157,77"/>
+<area shape="rect" id="node2" href="$classXML__Loading__Archive.html#adb5a5f67fc6ceffb3260e61b5fe9994c" title="return true iff tagname starts with prefix" alt="" coords="205,5,357,45"/>
+<area shape="rect" id="node3" href="$classXML__Loading__Archive.html#a59a9b9839c3a2087ce5a350b3b9a9c06" title="print current tag" alt="" coords="205,69,357,109"/>
+</map>

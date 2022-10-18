@@ -1,3 +1,4 @@
 <map id="Bif_F12_SORT::char_shape" name="Bif_F12_SORT::char_shape">
-<area shape="rect" id="node2" href="$classShape.html" title="the shape of an APL value " alt="" coords="48,5,107,32"/>
+<area shape="rect" id="node1" title="a helper structure for sorting: a char and a shape" alt="" coords="5,93,149,133"/>
+<area shape="rect" id="node2" href="$classShape.html" title="the shape of an APL value" alt="" coords="48,5,107,31"/>
 </map>

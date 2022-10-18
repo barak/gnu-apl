@@ -1,4 +1,5 @@
 <map id="Signal_base::get__EVENTS_ARE__key" name="Signal_base::get__EVENTS_ARE__key">
-<area shape="rect" id="node2" href="$classSvar__DB.html#a1c4eca4e63db0fb74cb122fd87ec480d" title="return events for processor proc " alt="" coords="240,13,387,39"/>
-<area shape="rect" id="node3" href="$classQuad__SVE.html#a9366ede668cf142b1e7f4a4337f3033b" title="Overloaded Symbol::get_apl_value(). " alt="" coords="435,13,609,39"/>
+<area shape="rect" id="node1" title="APserver result for: clear all events for one processor (first cleared svar access functions for sign..." alt="" coords="423,5,609,45"/>
+<area shape="rect" id="node2" href="$classSvar__DB.html#a1c4eca4e63db0fb74cb122fd87ec480d" title="return events for processor proc" alt="" coords="228,13,375,38"/>
+<area shape="rect" id="node3" href="$classQuad__SVE.html#a9366ede668cf142b1e7f4a4337f3033b" title="Overloaded Symbol::get_apl_value()." alt="" coords="5,13,180,38"/>
 </map>

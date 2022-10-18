@@ -1,0 +1,8 @@
+<map id="Plot_window_properties::get_gridX_style" name="Plot_window_properties::get_gridX_style">
+<area shape="rect" id="node2" href="$Plot__gtk_8cc.html#aa99a51342dc56a4850f1cbf3f13c9e86" title="draw the (vertical) X grid&#45;lines of the plot " alt="" coords="213,13,308,39"/>
+<area shape="rect" id="node3" href="$Plot__gtk_8cc.html#aee8ee06e4281931fdfd2560f7cc57865" title="plot the data " alt="" coords="356,13,420,39"/>
+<area shape="rect" id="node4" href="$Plot__gtk_8cc.html#af71ef5256eb8aee2ba62880e3e8806ba" title="callback when the plot window shall be redrawn " alt="" coords="468,13,573,39"/>
+<area shape="rect" id="node5" href="$Plot__gtk_8cc.html#a1e31fd39155ef1eb8c2345913253101b" title="save the pixels of the plot to a file " alt="" coords="623,13,698,39"/>
+<area shape="rect" id="node6" href="$Plot__gtk_8cc.html#a897990543dc934261ba8e7a124446b11" title="the main() program of the thread that handles one plot window. " alt="" coords="621,63,700,90"/>
+<area shape="rect" id="node7" href="$classQuad__PLOT.html#acc4187c32c3bad52f276a724b226b429" title="overloaded Function::eval_AB() " alt="" coords="748,63,899,90"/>
+</map>

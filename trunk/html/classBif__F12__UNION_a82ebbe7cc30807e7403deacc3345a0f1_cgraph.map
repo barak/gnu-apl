@@ -1,0 +1,6 @@
+<map id="Bif_F12_UNION::append_zone" name="Bif_F12_UNION::append_zone">
+<area shape="rect" id="node1" title="find the unique(s) in cells_B[B_from] ... cells_B[B_to] and appendi it/them to cells_Z...." alt="" coords="5,42,208,67"/>
+<area shape="rect" id="node2" href="$structBif__F12__UNION_1_1Zone.html#a948da4c581ec1979054795687e3e7e7c" title="return the number of elements (indices) in this zone" alt="" coords="256,5,411,45"/>
+<area shape="rect" id="node3" href="$classCell.html#a4cb1f7ae7e4ad956ec55f1d507a0e938" title="return true if this cell is equal to other" alt="" coords="291,70,375,95"/>
+<area shape="rect" id="node4" href="$classCell.html#ad08fb9a79b3c5b38d92bf5ef4bf47145" title="return the name of the class" alt="" coords="459,70,600,95"/>
+</map>

@@ -1,0 +1,4 @@
+<map id="Shape::operator+" name="Shape::operator+">
+<area shape="rect" id="node1" title="catenate two shapes, this shape provides the higher dimensions while lower provides the lower dimensi..." alt="" coords="5,5,128,31"/>
+<area shape="rect" id="node2" href="$classShape.html#aeb018b67601d3f1c4bea3d2c2b877b7e" title="add a dimension of length len at the end" alt="" coords="176,5,339,31"/>
+</map>

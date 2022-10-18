@@ -1,0 +1,11 @@
+<map id="Quad_FIO::close_handle" name="Quad_FIO::close_handle">
+<area shape="rect" id="node1" title="close a file descriptor (and its FILE * if any)" alt="" coords="1028,56,1195,81"/>
+<area shape="rect" id="node2" href="$classQuad__GTK.html#a8f775f17c7f8eb61896e1956f4319f5a" title="close the window with file descriptor fd" alt="" coords="803,31,980,56"/>
+<area shape="rect" id="node8" href="$classQuad__GTK.html#a508616b9b4b573b2728db9d84b2abf52" title="open the GTH window described by gui_filename and optional css_filename" alt="" coords="804,80,979,105"/>
+<area shape="rect" id="node3" href="$classQuad__GTK.html#a7245c5bc51e416d9f3833a8d3d83a3fa" title="close all open windows" alt="" coords="621,5,744,31"/>
+<area shape="rect" id="node7" href="$classQuad__GTK.html#ab883ecf4b9278985bac3382588e43b7a" title="overloaded Function::eval_AB()" alt="" coords="611,55,755,80"/>
+<area shape="rect" id="node4" href="$classWorkspace.html#ade3a373ad48eb7a8fbad97a28472db7f" title="clear the workspace" alt="" coords="409,5,563,31"/>
+<area shape="rect" id="node5" href="$classWorkspace.html#a77c7b25908cf2479dc087cc3bcf44dcb" title="load lib_ws into the_workspace, maybe set ⎕LX of the new WS." alt="" coords="212,5,361,31"/>
+<area shape="rect" id="node6" href="$classCommand.html#ad222a6de11eb55501624a4d0dea3a464" title=")LOAD: load a workspace file" alt="" coords="5,5,164,31"/>
+<area shape="rect" id="node9" href="$classQuad__GTK.html#ab6a35d8bf7fdd5670abad7a190d3bb06" title="overloaded Function::eval_B()" alt="" coords="615,104,750,129"/>
+</map>

@@ -1,0 +1,10 @@
+<map id="Value::is_char_string" name="Value::is_char_string">
+<area shape="rect" id="node1" title="return true iff this value is a simple character scalar or vector." alt="" coords="5,31,149,56"/>
+<area shape="rect" id="node2" href="$classValue.html#a5ac7131d2f89d0bc8b8907d960cbd125" title="return the rank of this value" alt="" coords="211,5,325,31"/>
+<area shape="rect" id="node4" href="$classValue.html#ad36d0f1c7064b2115df2ae30edefcbb3" title="return true iff all ravel elements of this value are characters" alt="" coords="197,55,339,80"/>
+<area shape="rect" id="node3" href="$classShape.html#a017e9a35dd20f4bc4fdeb7ea29b6805d" title="return the rank" alt="" coords="387,5,504,31"/>
+<area shape="rect" id="node5" href="$classValue.html#a6b8aa5e58b68236c77a09385365468d5" title="return the first element of the ravel (which is always present). same as get_cproto(),..." alt="" coords="387,55,504,80"/>
+<area shape="rect" id="node7" href="$classValue.html#ac5b54e3a13cab0837442f1575b3299a5" title="return the number of elements, but at least 1 (for the prototype)." alt="" coords="723,80,892,105"/>
+<area shape="rect" id="node6" href="$classValue.html#aa0572b1b7fa249cb79694fd152130b38" title="return the (constant) idx&#39;th element of the ravel." alt="" coords="552,55,675,80"/>
+<area shape="rect" id="node8" href="$classShape.html#a6f32f749601dca80263493fd06be12c4" title="return the number of ravel elements, but at least 1 (for empty values and scalars) else product of sh..." alt="" coords="940,80,1095,105"/>
+</map>

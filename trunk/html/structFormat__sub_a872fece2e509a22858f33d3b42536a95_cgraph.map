@@ -1,0 +1,4 @@
+<map id="Format_sub::size" name="Format_sub::size">
+<area shape="rect" id="node1" title="return the number of characters in format" alt="" coords="5,5,128,31"/>
+<area shape="rect" id="node2" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="176,5,299,31"/>
+</map>

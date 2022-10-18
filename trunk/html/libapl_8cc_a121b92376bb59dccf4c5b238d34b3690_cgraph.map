@@ -1,0 +1,5 @@
+<map id="int_scalar" name="int_scalar">
+<area shape="rect" id="node2" href="$classValue__P__Base.html#a64e77a99509cdb6ecbe4cf273a2e7694" title="return a const pointer to the Value " alt="" coords="146,5,281,32"/>
+<area shape="rect" id="node3" href="$classValue.html#a83e9d9285f63de5aa2ee4918c4db9cff" title="increment the number of (smart&#45;) pointers to this value " alt="" coords="132,57,295,98"/>
+<area shape="rect" id="node4" href="$Common_8hh.html#a6d4ca0c6b6648fa2a606993c967dd8f8" title="frequently used cast to const char * " alt="" coords="343,64,399,91"/>
+</map>

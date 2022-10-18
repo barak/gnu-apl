@@ -1,0 +1,7 @@
+<map id="Quad_XML::add_sorted_entities" name="Quad_XML::add_sorted_entities">
+<area shape="rect" id="node1" title="return the entities in B, sorted by their position prefix" alt="" coords="811,29,969,69"/>
+<area shape="rect" id="node2" href="$classQuad__XML.html#aa0a04e6cd3d25a34a042a5b2dcee0530" title="convert APL associative array to XML string" alt="" coords="591,37,763,62"/>
+<area shape="rect" id="node3" href="$classQuad__XML.html#afb56e2b1109a16c834b1d2d6862b95cc" title="overloaded Function::eval_B()" alt="" coords="408,37,543,62"/>
+<area shape="rect" id="node4" href="$classQuad__XML.html#acda08006d2a9ee1558e6a68adbb8ac59" title="return XML file (&#45;name in B) converted to APL structured value" alt="" coords="197,11,360,37"/>
+<area shape="rect" id="node5" href="$classQuad__XML.html#ad5de89a09c7528bcea93377a1f9424a8" title="overloaded Function::eval_AB()" alt="" coords="5,37,149,62"/>
+</map>

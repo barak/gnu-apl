@@ -1,0 +1,42 @@
+<map id="PointerCell::is_pointer_cell" name="PointerCell::is_pointer_cell">
+<area shape="rect" id="node2" href="$classPointerCell.html#acccd604366a71acc67657ce5e4f034e0" title="the Quad_CR representation of this cell " alt="" coords="449,234,597,275"/>
+<area shape="rect" id="node22" href="$classPointerCell.html#a4f3f4eebed4b98ea6161b66b5a81c48d" title="overloaded Cell::get_pointer_value() " alt="" coords="656,866,815,907"/>
+<area shape="rect" id="node25" href="$classPointerCell.html#a12ce200aca7c79b60c16e6b1f449353c" title="compare this with other, throw DOMAIN ERROR on illegal comparisons " alt="" coords="451,932,595,959"/>
+<area shape="rect" id="node31" href="$classPointerCell.html#a717788f9c8ce9ae79fc4c0a825c560af" title="overloaded Cell::equal() " alt="" coords="460,983,585,1009"/>
+<area shape="rect" id="node33" href="$classPointerCell.html#a62bd5b43e13b7abfdeb9d4fade773ee2" title="overloaded Cell::greater() " alt="" coords="243,932,377,959"/>
+<area shape="rect" id="node34" href="$classPointerCell.html#a82dfac0595e8b91a18049092611ae88b" title="overloaded Cell::_is_member_anchor() " alt="" coords="231,1198,389,1239"/>
+<area shape="rect" id="node36" href="$classPointerCell.html#a6eaa0baf6ce7d6c866c1787675817922" title="overloaded Cell::release() " alt="" coords="242,1071,378,1097"/>
+<area shape="rect" id="node3" href="$classPrintBuffer.html#ad067956533b46f2b61e71fc2c4cba37e" title="add a decorator frame around this buffer " alt="" coords="659,511,812,537"/>
+<area shape="rect" id="node6" href="$classPrintBuffer.html#af6f689e8c4e930b7c37099bf5fdfe57d" title="return the number of columns " alt="" coords="1097,402,1256,443"/>
+<area shape="rect" id="node8" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string " alt="" coords="1107,183,1247,209"/>
+<area shape="rect" id="node20" href="$classValue__P__Base.html#a64e77a99509cdb6ecbe4cf273a2e7694" title="return a const pointer to the Value " alt="" coords="889,881,1023,908"/>
+<area shape="rect" id="node21" href="$classPrintBuffer.html#a537d9a4a181787b8e8262ab48cb90f92" title="return the ColInfo of this PrintBuffer " alt="" coords="666,5,805,32"/>
+<area shape="rect" id="node23" href="$classWorkspace.html#a3eaa0cc324b4e8e0f3fb0039efcd1b0c" title="return the current ⎕PW " alt="" coords="664,56,807,83"/>
+<area shape="rect" id="node24" href="$classPrintContext.html#a5ef45c5babbe3ebf9988a9b659a2e407" title="return the print style to be used " alt="" coords="657,107,813,133"/>
+<area shape="rect" id="node4" href="$classPrintBuffer.html#adae7aa63347e6aba983449dde7d50c33" title="return true iff all strings have the same size. " alt="" coords="869,460,1043,487"/>
+<area shape="rect" id="node5" href="$classPrintBuffer.html#ac13295601812e379a3eac618ce239426" title="return the number of rows " alt="" coords="1107,486,1246,527"/>
+<area shape="rect" id="node7" href="$classPrintBuffer.html#a7f4647903888bbde606c371f64109e5e" title="return the characters for style pst " alt="" coords="881,343,1031,385"/>
+<area shape="rect" id="node9" href="$classUCS__string__vector.html#a16fca0c736760dae8fbf220634fc500d" title="replacement for insert(std::vector::iterator position, value) " alt="" coords="885,765,1027,806"/>
+<area shape="rect" id="node12" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length " alt="" coords="1313,743,1436,769"/>
+<area shape="rect" id="node15" href="$classPrintBuffer.html#a6fe77535d5ab96ae9d8fcc8b3ddbe78f" title="Set the char in column x and row y to uc. " alt="" coords="885,561,1027,588"/>
+<area shape="rect" id="node16" href="$classShape.html#a017e9a35dd20f4bc4fdeb7ea29b6805d" title="return the rank " alt="" coords="897,612,1015,639"/>
+<area shape="rect" id="node17" href="$classUCS__string.html#a5776e51c6faa53537409322cd0ebf07a" title="append number (in ASCII encoding like d) to this string " alt="" coords="886,175,1026,217"/>
+<area shape="rect" id="node18" href="$classShape.html#ab086eda5bc8feb3a58771973ddb3c379" title="return the length of the last axis, or 1 for scalars " alt="" coords="863,663,1049,689"/>
+<area shape="rect" id="node19" href="$classShape.html#a592d2ade68aa8c21c5d84627c3a0e001" title="return the length of dimension r " alt="" coords="877,713,1035,740"/>
+<area shape="rect" id="node10" href="$classUCS__string__vector.html#afa3b6be58263a29c6feac04fad12e814" title="print items of this vector in a table with column_count columns " alt="" coords="1106,649,1247,690"/>
+<area shape="rect" id="node11" href="$classUCS__string__vector.html#a0ee9c9648dfd9fdb2e3d09c46952a908" title="return the size of the longest UCS_string in this vector. " alt="" coords="1304,619,1445,661"/>
+<area shape="rect" id="node13" href="$classUCS__string__vector.html#a410ffa588704260e23f324e87cfb751e" title="replacement for erase(std::vector::iterator position) " alt="" coords="1106,714,1247,755"/>
+<area shape="rect" id="node14" href="$Logging_8def.html#ab5ab82c1e9b9d4715660ab4a568026e2" title="value" alt="" coords="1150,780,1203,807"/>
+<area shape="rect" id="node26" href="$classCell.html#a38a6a25f0ad091f35e3d9abfe5608a50" title="return the type of this cell " alt="" coords="891,932,1021,959"/>
+<area shape="rect" id="node27" href="$classCell.html#a367b9df7e0d4b805e5f31641658113f6" title="Return the APL value of a cell (Asserts for non&#45;pointer cells) " alt="" coords="658,983,813,1009"/>
+<area shape="rect" id="node28" href="$classCell.html#a6c3fdef3d82f53649d1c3f16d37eedd7" title="the name of ct " alt="" coords="871,983,1041,1009"/>
+<area shape="rect" id="node29" href="$Common_8hh.html#aecfb781b36a8a772310228edb5410b15" title="MORE_ERROR" alt="" coords="897,1033,1015,1060"/>
+<area shape="rect" id="node30" href="$classWorkspace.html#a5ebd29d8c860b589b9f1d8118a949514" title="return reference to more info about last error " alt="" coords="1097,1033,1256,1060"/>
+<area shape="rect" id="node32" href="$classCell.html#ae98b3988a7fa52c6c157b4911b043dde" title="Return true iff this cell is a pointer (to a sub&#45;array) cell. " alt="" coords="667,1033,803,1060"/>
+<area shape="rect" id="node35" href="$classValue.html#aa8295760964d5f1d9dea8912c2c630dd" title="true if Value flag member is set " alt="" coords="459,1252,586,1279"/>
+<area shape="rect" id="node37" href="$classValue.html#af7b85fd389faaeb27431b6aaf659e93a" title="decrement the PointerCell count " alt="" coords="437,1034,608,1075"/>
+<area shape="rect" id="node38" href="$classValue.html#a4dbee7eead7d72ec234a45d164c38e97" title="increase nz_subcell_count by count " alt="" coords="451,1100,595,1127"/>
+<area shape="rect" id="node39" href="$classValue__P__Base.html#ad07a670c61c71b7aecc8ca9a6170b796" title="decrement owner&#45;count and reset pointer to 0 " alt="" coords="450,1151,595,1177"/>
+<area shape="rect" id="node40" href="$classIntCell.html#afd60fd9e3a5581ac99c1e053d9218fe7" title="initialize the (un&#45;initialized) Cell *Z to integer 0 " alt="" coords="481,1201,564,1228"/>
+<area shape="rect" id="node41" href="$classIntCell.html#a88c653b2f968c451ee1c1c53a983fa13" title="Construct an integer cell with value 0. " alt="" coords="682,1201,789,1228"/>
+</map>

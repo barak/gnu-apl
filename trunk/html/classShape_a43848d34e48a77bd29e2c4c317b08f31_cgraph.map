@@ -1,0 +1,6 @@
+<map id="Shape::insert_axis" name="Shape::insert_axis">
+<area shape="rect" id="node1" title="return a shape like this, but with a new dimension of length len inserted so that Shape[axis] == len ..." alt="" coords="5,55,136,80"/>
+<area shape="rect" id="node2" href="$classShape.html#aeb018b67601d3f1c4bea3d2c2b877b7e" title="add a dimension of length len at the end" alt="" coords="184,5,347,31"/>
+<area shape="rect" id="node3" href="$classShape.html#a017e9a35dd20f4bc4fdeb7ea29b6805d" title="return the rank" alt="" coords="207,55,324,80"/>
+<area shape="rect" id="node4" href="$classShape.html#a592d2ade68aa8c21c5d84627c3a0e001" title="return the length of dimension r" alt="" coords="186,104,345,129"/>
+</map>

@@ -1,0 +1,5 @@
+<map id="Quad_AI::get_apl_value" name="Quad_AI::get_apl_value">
+<area shape="rect" id="node1" title="overloaded Symbol::get_apl_value()." alt="" coords="5,42,167,67"/>
+<area shape="rect" id="node2" href="$classCommand.html#a706ca71cb417b525219573493614f4d2" title="return the number of APL expressions entered in immediate execution mode" alt="" coords="215,5,425,45"/>
+<area shape="rect" id="node3" href="$classProcessorID.html#aef543afcb84129b87246dbac888a1441" title="return the processor ID of this apl interpreter" alt="" coords="233,70,407,95"/>
+</map>

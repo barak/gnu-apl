@@ -1,0 +1,28 @@
+<map id="Prefix::is_value_parenthesis" name="Prefix::is_value_parenthesis">
+<area shape="rect" id="node1" title="read and resolve the token class left of )" alt="" coords="5,297,192,323"/>
+<area shape="rect" id="node2" href="$classSymbol.html#a071c9e8a32253986503751296e4b34a2" title="Return the current function (or throw a VALUE_ERROR)" alt="" coords="245,219,390,244"/>
+<area shape="rect" id="node3" href="$classNamedObject.html#a169e78235759ac3b4c6e31fcee2631ce" title="Get current NameClass of this name." alt="" coords="240,268,395,293"/>
+<area shape="rect" id="node25" href="$classFunction.html#ac69b8cfa3ac1577ef8cf98500002e6ef" title="return the number of function arguments (1 or 2) of an operator, or 0 for a &quot;normal&quot; function that is..." alt="" coords="252,318,383,358"/>
+<area shape="rect" id="node26" href="$classFunction.html#a8ebf47875cd55e64c3fdb0aeced31356" title="return true iff this is an operator." alt="" coords="245,383,389,408"/>
+<area shape="rect" id="node4" href="$classToken.html#a049cd3eb72ae0c6427e523d399876b86" title="return the TokenClass of this token." alt="" coords="469,169,594,195"/>
+<area shape="rect" id="node5" href="$classNamedObject.html#adf8b778a154d1d6e35c7d8a169aaaeb5" title="return the name of the named object" alt="" coords="448,219,615,244"/>
+<area shape="rect" id="node9" href="$classWorkspace.html#acb39e0420fcef7558220b9576b809e97" title="return a token for system function or variable ucs" alt="" coords="457,268,606,293"/>
+<area shape="rect" id="node17" href="$classAvec.html#a88cc8af75e4a2c4d8a1d382637ca07b4" title="return true if unicode uni is a quad (⎕ or ▯)" alt="" coords="706,483,811,508"/>
+<area shape="rect" id="node24" href="$classNamedObject.html#aedd3379d48b75bb087baab1d086f8e2f" title="return the symbol for this user defined symbol (if any) or 0 if this Id refers to a system name" alt="" coords="443,369,620,395"/>
+<area shape="rect" id="node6" href="$classID.html#af1bb0741450971c1882af59af87eef29" title="return the printable name for id as UCS_string" alt="" coords="690,5,827,31"/>
+<area shape="rect" id="node7" href="$classID.html#a1c80b7bfa291882045116dcec6d50098" title="return the printable name for id as UTF8 *" alt="" coords="957,5,1059,31"/>
+<area shape="rect" id="node8" href="$structId__name.html#a3202cdf13a9726257a4a3652a66285dd" title="compare key with item (for bsearch())" alt="" coords="1181,5,1312,31"/>
+<area shape="rect" id="node10" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="689,55,829,80"/>
+<area shape="rect" id="node11" href="$classSystemName.html#a172f0a34194f5e512f521800dca3a339" title="return the function (if any) that this name represents" alt="" coords="668,104,849,129"/>
+<area shape="rect" id="node12" href="$classSystemVariable.html#adfd61017d46f4b022af485637a768c76" title="return the TokenTag for this system variable" alt="" coords="689,154,829,194"/>
+<area shape="rect" id="node15" href="$classFunction.html#a74163ba976576a5bb03a060d42fd96e5" title="return a Token for this function." alt="" coords="690,219,827,244"/>
+<area shape="rect" id="node16" href="$classSystemName.html#a38a91b3cff0213ca7b89f4ddfa7d135a" title="return the variable (if any) that this name represents" alt="" coords="669,268,849,293"/>
+<area shape="rect" id="node18" href="$classAvec.html#a76a72fdcb1782be1c490b3670c45504f" title="Return true iff av is a valid char in a user defined symbol." alt="" coords="683,317,834,343"/>
+<area shape="rect" id="node20" href="$classSymbolTableBase.html#a58cddd45598f27eff5711db23ce9043c" title="return a Symbol with name name in this SymbolTable." alt="" coords="671,367,846,407"/>
+<area shape="rect" id="node23" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="1375,381,1497,407"/>
+<area shape="rect" id="node13" href="$classNamedObject.html#a3ff29d3b8f3eed6c55f535e1af8dbc91" title="return the Id of this object (ID_USER_SYMBOL for user defined objects)" alt="" coords="935,137,1081,163"/>
+<area shape="rect" id="node14" href="$classID.html#a4e45a9557dbd8b94bcdf0ecbe280a386" title="return the TokenTag for id" alt="" coords="945,187,1071,212"/>
+<area shape="rect" id="node19" href="$classAvec.html#afe30f62f26ec74019a95e5cbd6eaa111" title="Find av in character_table. Return position or Invalid_CHT." alt="" coords="951,317,1065,343"/>
+<area shape="rect" id="node21" href="$classSymbolTableBase.html#ad231d005a78e9d44f0536aeb1caea62c" title="compute a 16&#45;bit hash for name" alt="" coords="897,375,1119,400"/>
+<area shape="rect" id="node22" href="$classUCS__string.html#af5956757116853a2e1bc5a0533624d2e" title="return the FNV (Fowler&#45;Noll&#45;Vo) hash of this_string" alt="" coords="1167,331,1327,356"/>
+</map>

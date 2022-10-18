@@ -1,0 +1,6 @@
+<map id="Avec::is_first_symbol_char" name="Avec::is_first_symbol_char">
+<area shape="rect" id="node1" title="Return true iff av is a valid char in a user defined symbol." alt="" coords="5,31,185,56"/>
+<area shape="rect" id="node2" href="$classAvec.html#af6b90a707281ad128da1764d92d85cd7" title="Return true iff av is a digit (i.e. 0 ≤ av ≤ 9)" alt="" coords="258,5,359,31"/>
+<area shape="rect" id="node3" href="$classAvec.html#a76a72fdcb1782be1c490b3670c45504f" title="Return true iff av is a valid char in a user defined symbol." alt="" coords="233,55,384,80"/>
+<area shape="rect" id="node4" href="$classAvec.html#afe30f62f26ec74019a95e5cbd6eaa111" title="Find av in character_table. Return position or Invalid_CHT." alt="" coords="432,55,545,80"/>
+</map>

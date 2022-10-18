@@ -1,0 +1,7 @@
+<map id="PrintBuffer::align_left" name="PrintBuffer::align_left">
+<area shape="rect" id="node1" title="align this char&#45;only PrintBuffer to col" alt="" coords="5,77,149,102"/>
+<area shape="rect" id="node2" href="$classPrintBuffer.html#a1cedbbcfe6835e1d3a2d02b9f2334c2c" title="print properties of this PrintBuffer" alt="" coords="197,51,324,77"/>
+<area shape="rect" id="node5" href="$classPrintBuffer.html#adef4048693e699b9bfac4b2adf719f63" title="append count charactera pad to buffer" alt="" coords="199,101,323,126"/>
+<area shape="rect" id="node3" href="$classPrintBuffer.html#af6f689e8c4e930b7c37099bf5fdfe57d" title="return the number of columns" alt="" coords="372,29,531,69"/>
+<area shape="rect" id="node4" href="$classPrintBuffer.html#ac13295601812e379a3eac618ce239426" title="return the number of rows" alt="" coords="382,93,521,133"/>
+</map>

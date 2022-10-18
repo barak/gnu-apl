@@ -1,0 +1,9 @@
+<map id="Svar_record::set_control" name="Svar_record::set_control">
+<area shape="rect" id="node1" title="set the control bits of this variable" alt="" coords="5,104,169,129"/>
+<area shape="rect" id="node2" href="$structSvar__record.html#abdb5a461d505c7e674260f0794cc2bf0" title="complain about proc" alt="" coords="227,5,381,31"/>
+<area shape="rect" id="node3" href="$structSvar__record.html#ab4d3d8caaff62e4f3c5ef75488b5af93" title="return the coupling of the variable" alt="" coords="217,55,391,80"/>
+<area shape="rect" id="node5" href="$classProcessorID.html#a834b72a9d1c965b8b07a96e2088f5972" title="return the own id, parent, and grand&#45;parent" alt="" coords="235,104,373,129"/>
+<area shape="rect" id="node6" href="$structSvar__record.html#adac196c0626b7b0e28cd54f94e31aaae" title="print a name" alt="" coords="222,153,386,179"/>
+<area shape="rect" id="node7" href="$structSvar__partner.html#a77ab10001515c974163154e762785432" title="set the control bits of this partner (as seen by the offering partner)" alt="" coords="220,203,388,228"/>
+<area shape="rect" id="node4" href="$structSvar__partner.html#a08989d19706b526a4054398b2d0b5480" title="return true if this partner is active. Note that this can be the case even though tcp_fd is invalid." alt="" coords="439,55,595,80"/>
+</map>

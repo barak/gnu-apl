@@ -1,0 +1,5 @@
+<map id="IO_Files::assert_error" name="IO_Files::assert_error">
+<area shape="rect" id="node1" title="count a failed assertion" alt="" coords="313,5,461,31"/>
+<area shape="rect" id="node2" href="$main_8cc.html#aded61db510f7ffe9b94694774ff9643b" title="signal handler for segfaults" alt="" coords="116,5,265,31"/>
+<area shape="rect" id="node3" href="$main_8cc.html#aa0321421b17def7b58fc0cabc8890260" title="initialize the interpreter" alt="" coords="5,5,68,31"/>
+</map>

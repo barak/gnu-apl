@@ -1,0 +1,4 @@
+<map id="PrimitiveFunction::print" name="PrimitiveFunction::print">
+<area shape="rect" id="node1" title="Print the name of this PrimitiveFunction to out." alt="" coords="5,5,136,45"/>
+<area shape="rect" id="node2" href="$classNamedObject.html#a3ff29d3b8f3eed6c55f535e1af8dbc91" title="return the Id of this object (ID_USER_SYMBOL for user defined objects)" alt="" coords="184,13,331,38"/>
+</map>

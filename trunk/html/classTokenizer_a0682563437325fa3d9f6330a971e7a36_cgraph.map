@@ -1,0 +1,10 @@
+<map id="Tokenizer::tokenize_string1" name="Tokenizer::tokenize_string1">
+<area shape="rect" id="node1" title="tokenize a single quoted string" alt="" coords="5,122,141,162"/>
+<area shape="rect" id="node2" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="195,5,335,31"/>
+<area shape="rect" id="node3" href="$classUnicode__source.html#afc915a9530243b2aff7efda46fdad6ed" title="get next item" alt="" coords="193,55,336,80"/>
+<area shape="rect" id="node4" href="$classAvec.html#a45e64bd4305c106314a395fb35addb39" title="return true iff av is one of the single quote characters &#39; ‘ or ’" alt="" coords="189,104,340,129"/>
+<area shape="rect" id="node5" href="$classUnicode__source.html#a0ab44079b7c3f68a88993cb917479f22" title="return the number of remaining items" alt="" coords="191,153,338,179"/>
+<area shape="rect" id="node6" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="203,203,326,228"/>
+<area shape="rect" id="node7" href="$classError.html#a9b063bbb799ab949fd0f6ed2b6ad2709" title="throw a error with a parser location" alt="" coords="200,253,329,293"/>
+<area shape="rect" id="node8" href="$classError.html#a9dbfb665cecfad231189862c5f414c48" title="return a string describing the error" alt="" coords="388,260,511,285"/>
+</map>

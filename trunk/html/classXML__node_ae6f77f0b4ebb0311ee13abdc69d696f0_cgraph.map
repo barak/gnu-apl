@@ -1,0 +1,52 @@
+<map id="XML_node::merge_range" name="XML_node::merge_range">
+<area shape="rect" id="node1" title="merge the items from start(&#45;tag) to (end(&#45;tag) into start tag" alt="" coords="5,980,172,1005"/>
+<area shape="rect" id="node2" href="$classXML__node.html#a738e88d62255e4a6e89ff4b3071956eb" title="add member name with value value to structured value Z" alt="" coords="225,808,392,833"/>
+<area shape="rect" id="node7" href="$classValue__P__Base.html#a1c3bf1b6f708eb2c1ba4b97c83adb9aa" title="return a const pointer to the Value" alt="" coords="1092,205,1227,230"/>
+<area shape="rect" id="node39" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="673,912,813,937"/>
+<area shape="rect" id="node41" href="$classXML__node.html#ad740e8b2a306d73e260482af9be89192" title="append garbage to this garbage can (for later deletion)" alt="" coords="241,930,376,956"/>
+<area shape="rect" id="node42" href="$classWorkspace.html#adb2006f054a1cebb8ae0252b61bd1d1b" title="return the current ⎕IO" alt="" coords="241,980,376,1005"/>
+<area shape="rect" id="node43" href="$classXML__node.html#a29a56f2f044b1895b92be0b1feeebd53" title="return the next XML node in the document" alt="" coords="237,1029,380,1054"/>
+<area shape="rect" id="node44" href="$classXML__node.html#a7cf6bf62e084f4e3a2195507f960d98e" title="return the type of this node" alt="" coords="220,1078,397,1104"/>
+<area shape="rect" id="node45" href="$classXML__node.html#a736e72ce2e086ebe9db5a9d86834bfd9" title="return the tagname of this node. Starts with a valid XML name, thus no leading &lt;, /m or _." alt="" coords="225,1128,392,1153"/>
+<area shape="rect" id="node50" href="$classXML__node.html#a0ebf5eaa6a8a7fd92f3bd1829a2defe1" title="unlink this node from the doubly&#45;linked list that contains it" alt="" coords="245,1177,372,1202"/>
+<area shape="rect" id="node3" href="$classValue.html#a3117ef45bf1740b787751f5186220828" title="add a member to a structured variable" alt="" coords="466,748,605,773"/>
+<area shape="rect" id="node38" href="$classUCS__string.html#a5776e51c6faa53537409322cd0ebf07a" title="append number (in ASCII encoding like d) to this string" alt="" coords="465,847,605,887"/>
+<area shape="rect" id="node40" href="$classUCS__string.html#ace70327ef899c525ad9c3f2bffd43697" title="append 0&#45;terminated UTF8 string str to this UCS_string." alt="" coords="445,797,625,822"/>
+<area shape="rect" id="node4" href="$classValue.html#a153214571900086a49a7678bebd515f9" title="return member of this value, defined by members. The first name in members is the deepest,..." alt="" coords="676,357,811,382"/>
+<area shape="rect" id="node37" href="$classValue.html#a1e5dccb394253ea13877c788980325d3" title="return true if this variable is is_member() and a N×2 matrix with proper keys" alt="" coords="1090,709,1229,734"/>
+<area shape="rect" id="node5" href="$classUCS__string.html#a186a76c22c3ac840f1e607ba49e253a0" title="return the last character in this string" alt="" coords="881,104,1008,129"/>
+<area shape="rect" id="node8" href="$classValue.html#aa9bd9dbce742e109397ab21834745754" title="return the length of the last axis, or 1 for scalars" alt="" coords="1315,704,1427,729"/>
+<area shape="rect" id="node10" href="$classValue.html#ad44d777caa4b4add818d784b2fcf1ccd" title="return the Cell (if any) containing the data of structured value member member, or 0 if member not fo..." alt="" coords="1076,306,1243,332"/>
+<area shape="rect" id="node15" href="$classCell.html#a367b9df7e0d4b805e5f31641658113f6" title="Return the APL value of a cell (Asserts for non&#45;pointer cells)" alt="" coords="1293,306,1448,332"/>
+<area shape="rect" id="node20" href="$classCell.html#ae98b3988a7fa52c6c157b4911b043dde" title="Return true iff this cell is a pointer (to a sub&#45;array) cell." alt="" coords="1303,356,1439,381"/>
+<area shape="rect" id="node21" href="$classValue.html#acd6b3044148fdc7c650af80d2401bbe9" title="create a new member and return the Cell containing the data for it" alt="" coords="861,458,1028,484"/>
+<area shape="rect" id="node23" href="$classValue.html#a5ac7131d2f89d0bc8b8907d960cbd125" title="return the rank of this value" alt="" coords="1314,802,1427,828"/>
+<area shape="rect" id="node25" href="$classValue.html#aa8295760964d5f1d9dea8912c2c630dd" title="true if Value flag member is set" alt="" coords="1307,753,1434,778"/>
+<area shape="rect" id="node34" href="$classValue.html#ab8c3bc165a2d9635f9f2b0713e9a3e08" title="return true iff more ravel items (as per shape) need to be initialized. (the prototype of empty value..." alt="" coords="899,54,991,80"/>
+<area shape="rect" id="node6" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="1526,180,1649,205"/>
+<area shape="rect" id="node9" href="$classShape.html#a23b39245b6fe6a91dc33c184c3b0bde4" title="return the length of the last axis, or 1 for scalars" alt="" coords="1529,704,1645,729"/>
+<area shape="rect" id="node11" href="$classUCS__string.html#af5956757116853a2e1bc5a0533624d2e" title="return the FNV (Fowler&#45;Noll&#45;Vo) hash of this_string" alt="" coords="1291,256,1451,281"/>
+<area shape="rect" id="node12" href="$classValue.html#aa0572b1b7fa249cb79694fd152130b38" title="return the (constant) idx&#39;th element of the ravel." alt="" coords="1309,457,1432,482"/>
+<area shape="rect" id="node18" href="$classValue.html#a65d183d6ebf87a5727143b2b46759168" title="return the product of all but the the last axis, or 1 for scalars" alt="" coords="1313,506,1429,532"/>
+<area shape="rect" id="node13" href="$classValue.html#ac5b54e3a13cab0837442f1575b3299a5" title="return the number of elements, but at least 1 (for the prototype)." alt="" coords="1503,432,1672,457"/>
+<area shape="rect" id="node14" href="$classShape.html#a6f32f749601dca80263493fd06be12c4" title="return the number of ravel elements, but at least 1 (for empty values and scalars) else product of sh..." alt="" coords="1724,432,1879,457"/>
+<area shape="rect" id="node16" href="$classCell.html#a38a6a25f0ad091f35e3d9abfe5608a50" title="return the type of this cell" alt="" coords="1522,332,1653,357"/>
+<area shape="rect" id="node17" href="$classCell.html#a6c3fdef3d82f53649d1c3f16d37eedd7" title="the name of ct" alt="" coords="1503,282,1672,308"/>
+<area shape="rect" id="node19" href="$classShape.html#ae23c2dd79c376b0c4ffb1ec48f1ffbcd" title="return the product of all but the the last dimension, or 1 for scalars" alt="" coords="1527,506,1647,532"/>
+<area shape="rect" id="node22" href="$classValue.html#a411b407ccbe6440be35bd0bae2b72f8c" title="double the ravel length of this value (by appending integer 0s)." alt="" coords="1091,608,1227,633"/>
+<area shape="rect" id="node31" href="$classCell.html#ad165f9ab69abf46b2cf44d301a700a1c" title="Return the integer value of a cell." alt="" coords="1094,509,1225,534"/>
+<area shape="rect" id="node32" href="$classValue.html#af5c079fe8530d8f90a87c53439d9c924" title="return the (writable) idx&#39;th element of the ravel." alt="" coords="1096,408,1223,433"/>
+<area shape="rect" id="node33" href="$classCell.html#a30d0c83ab2c46ef830cd1301c77eb772" title="Return true iff this cell is an integer cell." alt="" coords="1091,558,1227,584"/>
+<area shape="rect" id="node26" href="$classCell.html#ac4bb8b0cf0718bf4ec7a17f1a0271df0" title="Release content pointed to (complex, APL value)" alt="" coords="1323,605,1418,630"/>
+<area shape="rect" id="node27" href="$classShape.html#afcd3708c8c18a30cb3c0c1fa1a630f71" title="modify dimension r" alt="" coords="1291,654,1450,680"/>
+<area shape="rect" id="node29" href="$classIntCell.html#afd60fd9e3a5581ac99c1e053d9218fe7" title="initialize the (un&#45;initialized) Cell *Z to integer 0" alt="" coords="1329,556,1412,581"/>
+<area shape="rect" id="node24" href="$classShape.html#a017e9a35dd20f4bc4fdeb7ea29b6805d" title="return the rank" alt="" coords="1529,802,1646,828"/>
+<area shape="rect" id="node28" href="$classShape.html#a189c92d0b74f3313bd83c8aa7565e9c5" title="recompute volume (after changing a dimension of len 0)" alt="" coords="1499,654,1676,680"/>
+<area shape="rect" id="node30" href="$classIntCell.html#a88c653b2f968c451ee1c1c53a983fa13" title="Construct an integer cell with value 0." alt="" coords="1534,556,1641,581"/>
+<area shape="rect" id="node35" href="$classValue.html#a9fc8bbaf9fefe6835dea7db0f71b8b6c" title="return the number of elements (the product of the shapes)." alt="" coords="1085,53,1233,78"/>
+<area shape="rect" id="node36" href="$classShape.html#af39e05bad7be900fa1437a6eb6035e97" title="return the number of ravel elements (1 for scalars,i else product of shapes)" alt="" coords="1303,53,1438,78"/>
+<area shape="rect" id="node46" href="$classXML__node.html#adf9656aeb2add17990dd78e7ca0281a8" title="return the (source&#45;) string for this node" alt="" coords="464,1048,607,1073"/>
+<area shape="rect" id="node47" href="$classXML__node.html#af3c57bac633564b2e755294b1da74e88" title="return the type of this node as string" alt="" coords="463,1098,608,1138"/>
+<area shape="rect" id="node48" href="$classXML__node.html#a2a35cbd734b00030af77d2c652008f3a" title="return true if uni is a valid first char in an XML tag name" alt="" coords="678,1180,809,1220"/>
+<area shape="rect" id="node49" href="$classXML__node.html#a6ef0db71846deb6a0a4318d8388edca2" title="return true if uni is a validchar" alt="" coords="449,1213,622,1238"/>
+</map>

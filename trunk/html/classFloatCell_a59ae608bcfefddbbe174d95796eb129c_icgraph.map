@@ -1,0 +1,13 @@
+<map id="FloatCell::get_real_value" name="FloatCell::get_real_value">
+<area shape="rect" id="node1" title="Overloaded Cell::get_real_value()." alt="" coords="873,97,1001,137"/>
+<area shape="rect" id="node2" href="$classFloatCell.html#aaa9c654650da7fd4e1738fefdd63c6ef" title="Overloaded Cell::bif_add()." alt="" coords="688,5,812,31"/>
+<area shape="rect" id="node3" href="$classFloatCell.html#ae6357d73eb4a9cd95598ca2d1a32a623" title="Overloaded from the corresponding Cell:: function (see class Cell)." alt="" coords="677,55,823,80"/>
+<area shape="rect" id="node8" href="$classFloatCell.html#ae261ecf59ba690674cd5409f5e973f41" title="Overloaded Cell::bif_subtract()." alt="" coords="675,104,825,129"/>
+<area shape="rect" id="node9" href="$classFloatCell.html#aa16abfa5686cca559418c5cd2fd097b3" title="Overloaded Cell::equal()." alt="" coords="693,153,807,179"/>
+<area shape="rect" id="node11" href="$classFloatCell.html#aae75ec1cf35bf5f9a97b86046573255c" title="Overloaded Cell::greater()." alt="" coords="283,179,406,204"/>
+<area shape="rect" id="node4" href="$classIntCell.html#a9e1eae19e23516df1eb5350a10883e24" title="overloaded from the corresponding Cell:: function (see class Cell)" alt="" coords="495,28,626,53"/>
+<area shape="rect" id="node7" href="$classBif__F12__ENCODE.html#a42891c138d5ceb942cc1d6fda44d7d27" title="encode *ib() according to A" alt="" coords="243,79,447,104"/>
+<area shape="rect" id="node5" href="$classBif__F12__ENCODE.html#a7fdbd7f4683430ee6daeab1014523504" title="encode *ib() according to A (integer A and b)" alt="" coords="243,29,447,55"/>
+<area shape="rect" id="node6" href="$classBif__F12__ENCODE.html#a003a77890ec532d2909d23e3ce5dcb89" title="overloaded Function::eval_AB()" alt="" coords="5,55,195,80"/>
+<area shape="rect" id="node10" href="$classFloatCell.html#a4c9060ee8da02d695c1270e92ec3c2eb" title="compare this with other, throw DOMAIN ERROR on illegal comparisons" alt="" coords="495,153,627,179"/>
+</map>

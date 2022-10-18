@@ -1,0 +1,4 @@
+<map id="Cell::bif_exponential" name="Cell::bif_exponential">
+<area shape="rect" id="node1" title="store e to the power of the value of this Cell in Z" alt="" coords="227,5,367,31"/>
+<area shape="rect" id="node2" href="$classBif__F12__POWER.html#a8bfa0ebd2146db96e9b4a9dc46206f04" title="overloaded Function::eval_B()." alt="" coords="5,5,179,31"/>
+</map>

@@ -1,0 +1,10 @@
+<map id="Quad_FIO::eval_B" name="Quad_FIO::eval_B">
+<area shape="rect" id="node1" title="overloaded Function::eval_B()." alt="" coords="5,159,136,185"/>
+<area shape="rect" id="node2" href="$classStateIndicator.html#a44d07945c56abef5505efcfdc98ec090" title="return the SI that has called this one" alt="" coords="203,5,332,45"/>
+<area shape="rect" id="node3" href="$classUCS__string.html#aa5c463f8756e6d63f83d0efdce8fe032" title="return the total number of UCS_strings" alt="" coords="193,69,341,109"/>
+<area shape="rect" id="node4" href="$classAvec.html#a15bfa417923b425ec3c2baf973d2a5f9" title="a pointer to 256 Unicode characters that are exactly the APL2 character set (⎕AV) shown in lrm Append..." alt="" coords="195,134,339,159"/>
+<area shape="rect" id="node5" href="$classProbe.html#ae85a135d0cdb5421f51a17d91decaccb" title="initialize all probes" alt="" coords="217,183,318,209"/>
+<area shape="rect" id="node7" href="$classQuad__FIO.html#ae1289de257ce88f633e1106c9b5c7392" title="list all ⎕IO functions to out" alt="" coords="184,233,351,258"/>
+<area shape="rect" id="node8" href="$classWorkspace.html#a8083efc2d51067edb25ae8dd4f014173" title="the top of the SI stack (the SI pushed last)" alt="" coords="200,282,335,307"/>
+<area shape="rect" id="node6" href="$classProbe.html#a2e10b21a91ac7b547270fea3ff23bd28" title="initialize this probe" alt="" coords="399,183,480,209"/>
+</map>

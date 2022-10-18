@@ -1,0 +1,5 @@
+<map id="READ_SVAR_RECORD_c::READ_SVAR_RECORD_c" name="READ_SVAR_RECORD_c::READ_SVAR_RECORD_c">
+<area shape="rect" id="node1" title="contructor that creates the signal and sends it on TCP socket s" alt="" coords="5,5,197,45"/>
+<area shape="rect" id="node2" href="$classSignal__base.html#a2ff638373162ccc4a8b1b268b260923e" title="send this signal on TCP (or AF_UNIX) socket tcp_sock" alt="" coords="245,13,408,38"/>
+<area shape="rect" id="node3" href="$classSignal__base.html#a68f2f5d807d706a6e46709abef26cfb1" title="store (encode) the signal into buffer" alt="" coords="456,13,587,38"/>
+</map>

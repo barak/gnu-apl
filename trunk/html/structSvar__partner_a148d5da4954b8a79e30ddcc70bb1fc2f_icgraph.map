@@ -1,0 +1,8 @@
+<map id="Svar_partner::clear" name="Svar_partner::clear">
+<area shape="rect" id="node1" title="clear this partner" alt="" coords="387,77,519,102"/>
+<area shape="rect" id="node2" href="$structSvar__record.html#abc5bf0cb80478af816a61f4b92602475" title="invalidate this entry" alt="" coords="203,134,331,159"/>
+<area shape="rect" id="node5" href="$structSvar__record.html#a27e4a3a442aa3c56c81662af59b6677b" title="remove accepting partner" alt="" coords="196,5,339,45"/>
+<area shape="rect" id="node6" href="$structSvar__record.html#a05a2cee19ff4688fa05925bf8526bee0" title="remove offering partner" alt="" coords="196,69,339,109"/>
+<area shape="rect" id="node3" href="$structSvar__record.html#a876f177ff00f7f7d4587d83137d7421a" title="retract the offer made by the calling ID." alt="" coords="8,77,145,102"/>
+<area shape="rect" id="node4" href="$classSvar__record__P.html#aae435bcd8b70390ab066782a478c4bb5" title="constructor: fetch record with key key from APserver" alt="" coords="5,127,148,167"/>
+</map>

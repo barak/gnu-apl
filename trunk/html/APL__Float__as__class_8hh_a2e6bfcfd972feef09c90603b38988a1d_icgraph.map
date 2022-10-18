@@ -1,0 +1,28 @@
+<map id="pow" name="pow">
+<area shape="rect" id="node2" href="$classIntCell.html#a0cfcfcc6b43e135bc481122227d7c186" title="overloaded Cell::bif_power() " alt="" coords="343,19,467,45"/>
+<area shape="rect" id="node4" href="$classFloatCell.html#ad567228c5087d9f142d9f3fd02882e04" title="Overloaded Cell::bif_power(). " alt="" coords="335,69,474,96"/>
+<area shape="rect" id="node6" href="$APL__Float__as__class_8hh.html#a33081d9f61033e78191bddc96e263cc9" title="complex_power" alt="" coords="128,120,241,147"/>
+<area shape="rect" id="node16" href="$classUCS__string.html#aa709505bf047198286576ec964a34fc8" title="convert double value to an UCS_string with fract_digits fractional digits in fixed point format ..." alt="" coords="100,259,269,301"/>
+<area shape="rect" id="node23" href="$classPlot__window__properties.html#a85b9ea43830064e114dded7905ac4c1b" title="round val up to the next higher 1/2/5×10^N " alt="" coords="105,357,265,398"/>
+<area shape="rect" id="node3" href="$classIntCell.html#a57acd6c6da8ad45753bb27b304ca597b" title="overloaded Cell::is_integer_cell() " alt="" coords="552,5,703,32"/>
+<area shape="rect" id="node5" href="$classFloatCell.html#ab33d5fb8782321e100cec38cbed5ea18" title="Overloaded Cell::is_finite(). " alt="" coords="564,56,691,83"/>
+<area shape="rect" id="node7" href="$classComplexCell.html#ab6db1468d3d503b6f43acb1d8502399f" title="overloaded from the corresponding Cell:: function (see class Cell). " alt="" coords="324,120,485,147"/>
+<area shape="rect" id="node9" href="$classComplexCell.html#af05c8d8f2555842260867eea123b7d21" title="the lanczos approximation for gamma(x + iy) " alt="" coords="331,183,479,209"/>
+<area shape="rect" id="node8" href="$classComplexCell.html#a978a6ef7d34a3446b796a0597c05d074" title="Overloaded Cell::is_finite(). " alt="" coords="783,139,933,165"/>
+<area shape="rect" id="node10" href="$classComplexCell.html#a8b0c84adf9799295fb470bf3945e6899" title="overloaded from the corresponding Cell:: function (see class Cell). " alt="" coords="541,208,713,235"/>
+<area shape="rect" id="node11" href="$classComplexCell.html#ad44af83730914bbe8cd52e34c5abee7b" title="the square of the magnitude (a² + b² for aJb) " alt="" coords="559,157,696,184"/>
+<area shape="rect" id="node12" href="$classNumericCell.html#ad5631ea40adcd27ecef5803742f7a649" title="N over K for complex A and/or B. " alt="" coords="552,259,703,301"/>
+<area shape="rect" id="node13" href="$classNumericCell.html#a3fd3970233551bf557f5e52330b5610c" title="overloaded Cell::bif_binomial() " alt="" coords="773,271,943,297"/>
+<area shape="rect" id="node15" href="$classNumericCell.html#a7b750222396638ef9094b3e6c1e62824" title="overloaded Cell::get_classname() " alt="" coords="763,220,953,247"/>
+<area shape="rect" id="node14" href="$classNumericCell.html#ac197ab40484c2be78b2291fb1ee2a84d" title="overloaded Cell::is_numeric() " alt="" coords="1012,271,1177,297"/>
+<area shape="rect" id="node17" href="$classBif__F12__FORMAT.html#a3ee8b8a6f38d77c6234470d08cfb3799" title="format value with precision mantissa digits (floating format) " alt="" coords="317,259,492,301"/>
+<area shape="rect" id="node22" href="$classUCS__string.html#acf989475b404d3df7084c2698ea04a01" title="convert double value to an UCS_string with fract_digits fractional digits in scaled (exponential) for..." alt="" coords="320,325,489,366"/>
+<area shape="rect" id="node18" href="$classBif__F12__FORMAT.html#ad7f677afc847fa6df13f16decdecd992" title="A character array with one column of B formatted by specification. " alt="" coords="540,325,715,366"/>
+<area shape="rect" id="node19" href="$classBif__F12__FORMAT.html#ad945541c06e489c1079ae401f4d1db28" title="A character array with B formatted by specification. " alt="" coords="771,325,945,366"/>
+<area shape="rect" id="node20" href="$classBif__F12__DOMINO_1_1Matrix.html#a661800bf67538f99ed9eb5c57e4ced86" title="print debug infos for this real matrix " alt="" coords="1008,377,1181,418"/>
+<area shape="rect" id="node21" href="$classBif__F12__FORMAT.html#a5164cf7d2b85131b9c9fa11c3239602a" title="Overloaded Function::eval_AB() " alt="" coords="1001,325,1188,352"/>
+<area shape="rect" id="node24" href="$classPlot__window__properties.html#aa186844af6e9dcff730d76bd62b98459" title="update derived properties after changing primary ones, return true on error " alt="" coords="325,422,485,463"/>
+<area shape="rect" id="node25" href="$classPlot__window__properties.html#a9967e651d5469f0b0437798271a938f9" title="constructor " alt="" coords="543,390,711,431"/>
+<area shape="rect" id="node26" href="$classPlot__window__properties.html#adff5407307aa8e7236e7778dce9d8863" title="handle window resize event " alt="" coords="547,455,707,497"/>
+<area shape="rect" id="node27" href="$classQuad__PLOT.html#acc4187c32c3bad52f276a724b226b429" title="overloaded Function::eval_AB() " alt="" coords="552,521,703,548"/>
+</map>

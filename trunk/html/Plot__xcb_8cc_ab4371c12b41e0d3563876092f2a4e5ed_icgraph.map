@@ -1,0 +1,8 @@
+<map id="draw_point" name="draw_point">
+<area shape="rect" id="node1" title="draw a plot point (representing one data value) at position xy" alt="" coords="427,55,512,80"/>
+<area shape="rect" id="node2" href="$Plot__xcb_8cc.html#a89109127b5f5b3a1ebd9daf60d9953d5" title="draw the legend" alt="" coords="264,5,359,31"/>
+<area shape="rect" id="node5" href="$Plot__xcb_8cc.html#a748f5a40fd403da8a150a98011bd5944" title="draw the plot lines" alt="" coords="255,55,367,80"/>
+<area shape="rect" id="node6" href="$Plot__xcb_8cc.html#a6004b2c57c13517082271e5d6e209eb2" title="draw the surface plot lines" alt="" coords="244,104,379,129"/>
+<area shape="rect" id="node3" href="$Plot__xcb_8cc.html#a9387ad8c9e85cbf5b602ab83b47425a0" title="draw the content of a plot window" alt="" coords="132,55,196,80"/>
+<area shape="rect" id="node4" href="$Plot__xcb_8cc.html#a897990543dc934261ba8e7a124446b11" title="the pthread that handles one plot window." alt="" coords="5,55,84,80"/>
+</map>

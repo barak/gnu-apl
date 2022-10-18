@@ -1,0 +1,5 @@
+<map id="XML_Loading_Archive::instantiate_derived_functions" name="XML_Loading_Archive::instantiate_derived_functions">
+<area shape="rect" id="node1" title="instantiate the derived functions in derived_todos" alt="" coords="5,5,157,60"/>
+<area shape="rect" id="node2" href="$classXML__Loading__Archive.html#aeebe9f4714ef4ab37bb1f759f23419d9" title="return function for fid, or 0 if not found." alt="" coords="205,13,357,53"/>
+<area shape="rect" id="node3" href="$classXML__Loading__Archive.html#a93a89589ea91d036a7327823bcda95cb" title="return fun_map for fid, or 0 if not found." alt="" coords="405,13,557,53"/>
+</map>

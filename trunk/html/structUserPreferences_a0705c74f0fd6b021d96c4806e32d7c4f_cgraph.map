@@ -1,0 +1,6 @@
+<map id="UserPreferences::show_configure_options" name="UserPreferences::show_configure_options">
+<area shape="rect" id="node1" title="print how the interpreter was configured (via ./configure) and exit" alt="" coords="5,37,164,77"/>
+<area shape="rect" id="node2" href="$structUserPreferences.html#a47230a845b7252e5fe57afa236a34a63" title="return &quot; (default)&quot; if yes is true" alt="" coords="222,5,361,45"/>
+<area shape="rect" id="node3" href="$structUserPreferences.html#ab6368a769817bd502b6392b4c8d4c0c3" title="show version information" alt="" coords="212,69,371,109"/>
+<area shape="rect" id="node4" href="$classOutput.html#a7f5a3baf917253208de9aae748cb121d" title="set the color mode (if colors_enabled). Outputs the escape sequence for mode when the color mode chan..." alt="" coords="419,77,580,102"/>
+</map>

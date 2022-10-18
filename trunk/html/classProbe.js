@@ -1,8 +1,6 @@
 var classProbe =
 [
     [ "measurement", "structProbe_1_1measurement.html", "structProbe_1_1measurement" ],
-    [ "PROBE_COUNT", "classProbe.html#afe31538283baf508bf7d87c460b407d7a716bcb3d7e4a4e245026ba8c182e61ed", null ],
-    [ "PROBE_LEN", "classProbe.html#afe31538283baf508bf7d87c460b407d7a257c1e70f71c78fd42dde63af9b2b067", null ],
     [ "Probe", "classProbe.html#a958304cf599a29251722228c45b305f5", null ],
     [ "get_length", "classProbe.html#a64f0c024f790bcc07164bc3cf36d8aec", null ],
     [ "get_start", "classProbe.html#ab3c28ecba9cd68af170bd610c5fecc20", null ],

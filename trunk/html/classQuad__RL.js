@@ -1,6 +1,5 @@
 var classQuad__RL =
 [
-    [ "INITIAL_SEED", "classQuad__RL.html#ab6cc772e42d787e27b1f21c4da41e3feacc90d4574ab589806efeb282bad75c64", null ],
     [ "Quad_RL", "classQuad__RL.html#a119715f32d6514b127a29d454261c232", null ],
     [ "assign", "classQuad__RL.html#ac4926f9ce6af075951a17538eced4f4c", null ],
     [ "get_random", "classQuad__RL.html#af8caae56c7ddc6c9e92b073950bb5c3f", null ],

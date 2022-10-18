@@ -1,0 +1,4 @@
+<map id="Matrix::is_ZZ" name="Matrix::is_ZZ">
+<area shape="rect" id="node1" title="return true if this is a matrix of complex numbers (and not a matrix of real numbers" alt="" coords="180,5,279,31"/>
+<area shape="rect" id="node2" href="$classMatrix.html#a3fa7af3c46122eaa6edf972bb5265454" title="return the length of the largest element" alt="" coords="5,5,132,31"/>
+</map>

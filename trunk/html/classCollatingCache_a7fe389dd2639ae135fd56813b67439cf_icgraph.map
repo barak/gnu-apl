@@ -1,0 +1,7 @@
+<map id="CollatingCache::find_entry" name="CollatingCache::find_entry">
+<area shape="rect" id="node1" title="find (the index of) the entry for uni" alt="" coords="475,37,615,77"/>
+<area shape="rect" id="node2" href="$classCollatingCache.html#a2e4b2f7cd40bdec4d8f3e51174f5d86a" title="constructor: cache of rank r and comparison length clen" alt="" coords="256,5,427,45"/>
+<area shape="rect" id="node3" href="$classBif__F12__SORT.html#a4b4cc3a9de168e5e27a1514c1a02781b" title="sort char vector B according to collationg sequence A" alt="" coords="271,69,412,109"/>
+<area shape="rect" id="node4" href="$classBif__F12__SORT__ASC.html#a6af56fadf76ad6584c760bf78452bbf5" title="overloaded Function::eval_AB()" alt="" coords="5,51,208,77"/>
+<area shape="rect" id="node5" href="$classBif__F12__SORT__DES.html#a8d8c210e4072ba4cee223c83945f371e" title="overloaded Function::eval_AB()" alt="" coords="5,101,208,126"/>
+</map>

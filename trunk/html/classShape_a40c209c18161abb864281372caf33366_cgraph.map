@@ -1,0 +1,5 @@
+<map id="Shape::low_shape" name="Shape::low_shape">
+<area shape="rect" id="node1" title="return a shape with the lower cnt dimensions of this shape" alt="" coords="5,31,135,56"/>
+<area shape="rect" id="node2" href="$classShape.html#a017e9a35dd20f4bc4fdeb7ea29b6805d" title="return the rank" alt="" coords="183,5,300,31"/>
+<area shape="rect" id="node3" href="$classShape.html#aaa8d87171e65e0d8ba3c5459978992a7" title="constructor: shape of a scalar." alt="" coords="189,55,293,80"/>
+</map>

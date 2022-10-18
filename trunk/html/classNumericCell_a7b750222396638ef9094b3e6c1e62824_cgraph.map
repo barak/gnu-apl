@@ -1,0 +1,40 @@
+<map id="NumericCell::get_classname" name="NumericCell::get_classname">
+<area shape="rect" id="node2" href="$classNumericCell.html#ad5631ea40adcd27ecef5803742f7a649" title="N over K for complex A and/or B. " alt="" coords="260,150,411,191"/>
+<area shape="rect" id="node16" href="$classNumericCell.html#aee0049caed89a7aa466ef6d36fc2efbd" title="return the greatest common divisor of complex a and b " alt="" coords="260,487,411,513"/>
+<area shape="rect" id="node18" href="$classNumericCell.html#a0d8cbae9ade43f4a8b2de0cdc853a06b" title="return the greatest common divisor of real a and b " alt="" coords="478,563,619,589"/>
+<area shape="rect" id="node23" href="$classNumericCell.html#a597c08fedf6ed884631b2f790ba1654c" title="multiply a by 1, &#45;1, i, or &#45;i so that a.real is maximal " alt="" coords="244,723,427,749"/>
+<area shape="rect" id="node24" href="$classNumericCell.html#a812dfdb6111940658e2893c9d4464212" title="return the greatest common divisor of integers a and b " alt="" coords="263,820,407,847"/>
+<area shape="rect" id="node26" href="$classNumericCell.html#a59c9e232b6a1cb365a3252196b41604a" title="N over K for positive integers N and K. " alt="" coords="265,657,406,698"/>
+<area shape="rect" id="node38" href="$classNumericCell.html#a0e22dad3d1acbf0b2103508aaa60d621" title="N over K for non&#45;integer A and/or B. " alt="" coords="246,335,425,361"/>
+<area shape="rect" id="node3" href="$classComplexCell.html#af05c8d8f2555842260867eea123b7d21" title="the lanczos approximation for gamma(x + iy) " alt="" coords="475,107,623,133"/>
+<area shape="rect" id="node12" href="$classCell.html#a0e6b9239fa77e3222f32400d51c8f114" title="Return the imaginary part of a cell. " alt="" coords="477,157,621,184"/>
+<area shape="rect" id="node13" href="$classCell.html#a9a0028fd74f00deb001a8062a55916c6" title="Return the real part of a cell. " alt="" coords="480,208,617,235"/>
+<area shape="rect" id="node14" href="$classComplexCell.html#a9ccb64da2c504a517c725dc2c41940da" title="initialize the (un&#45;initialized) Cell *Z to complex r + ij " alt="" coords="487,31,610,57"/>
+<area shape="rect" id="node4" href="$APL__Float__as__class_8hh.html#a694117ee0bf9d87b98a1d953aafbe85c" title="complex_exponent" alt="" coords="695,208,826,235"/>
+<area shape="rect" id="node6" href="$APL__Float__as__class_8hh.html#a33081d9f61033e78191bddc96e263cc9" title="complex_power" alt="" coords="704,56,817,83"/>
+<area shape="rect" id="node8" href="$APL__Float__as__class_8hh.html#a04b7d603c7db24af0a106192478fba20" title="complex_sqrt" alt="" coords="711,107,811,133"/>
+<area shape="rect" id="node10" href="$APL__Float__as__class_8hh.html#ae0c942b22a49f59b05397b3934e4dd7b" title="isfinite" alt="" coords="731,284,791,311"/>
+<area shape="rect" id="node11" href="$APL__Float__as__class_8hh.html#a8f62712d50618f12a51a854f77a91c98" title="sin" alt="" coords="741,157,780,184"/>
+<area shape="rect" id="node5" href="$APL__Float__as__class_8hh.html#ad82a5e001cab363907c6a8cdb4fff98a" title="exp" alt="" coords="945,208,987,235"/>
+<area shape="rect" id="node7" href="$APL__Float__as__class_8hh.html#a2e6bfcfd972feef09c90603b38988a1d" title="pow" alt="" coords="943,56,989,83"/>
+<area shape="rect" id="node9" href="$APL__Float__as__class_8hh.html#af4afb79827037c54fe30103f27cfe227" title="sqrt" alt="" coords="944,107,988,133"/>
+<area shape="rect" id="node15" href="$classComplexCell.html#a5acdc850c125e92f5f9810564d288f70" title="Construct an complex number cell from a complex number. " alt="" coords="671,5,851,32"/>
+<area shape="rect" id="node17" href="$APL__Float__as__class_8hh.html#aa32e9cc9c8a7b31b68e2fc0ab9f3a000" title="abs" alt="" coords="527,461,570,488"/>
+<area shape="rect" id="node20" href="$classCell.html#a0070bc8a15c9ea3742aea0f9407ab934" title="return true iff value is numeric and close to 0 " alt="" coords="697,461,824,488"/>
+<area shape="rect" id="node21" href="$classCell.html#ac8ce4cebc1b8ac383bc62723d645914a" title="True iff value is numeric and close to an int. " alt="" coords="491,360,607,387"/>
+<area shape="rect" id="node22" href="$APL__Float__as__class_8hh.html#a7a27f48085739f3bdff2fe4485895a46" title="round" alt="" coords="521,512,576,539"/>
+<area shape="rect" id="node19" href="$APL__Float__as__class_8hh.html#a83d150e612ac074d741cc2c66c48b95c" title="fmod" alt="" coords="735,563,786,589"/>
+<area shape="rect" id="node25" href="$classFloatCell.html#a1c809407ae6c0e97a1e2994b8a6b67b5" title="greatest common divisor, Knuth Vol. 1 p. 14 " alt="" coords="497,867,600,893"/>
+<area shape="rect" id="node27" href="$classIntCell.html#afd60fd9e3a5581ac99c1e053d9218fe7" title="initialize the (un&#45;initialized) Cell *Z to integer 0 " alt="" coords="507,715,590,741"/>
+<area shape="rect" id="node29" href="$classIntCell.html#aa99b7212ce13da0f241adeb18e350198" title="initialize Z to APL_Integer v " alt="" coords="509,664,588,691"/>
+<area shape="rect" id="node30" href="$classCell.html#a19f013bdb9ddb5d594f29afafd3f979c" title="True iff value is numeric and close to an int. " alt="" coords="478,816,619,843"/>
+<area shape="rect" id="node31" href="$classCell.html#ab61bca6fe0175014ea6c2d0d91f411e6" title="return value if it is close to int, or else throw DOMAIN_ERROR " alt="" coords="499,765,598,792"/>
+<area shape="rect" id="node32" href="$classFloatCell.html#a88217aaf5cd286cc89a85d2885876dda" title="initialize the (un&#45;initialized) Cell *Z to APL_Float flt " alt="" coords="500,613,597,640"/>
+<area shape="rect" id="node28" href="$classIntCell.html#a88c653b2f968c451ee1c1c53a983fa13" title="Construct an integer cell with value 0. " alt="" coords="707,689,814,716"/>
+<area shape="rect" id="node33" href="$classFloatCell.html#a48d2e4f2d44cccc87f56c6edb4899e1b" title="Construct an floating point cell from a double r. " alt="" coords="693,613,828,640"/>
+<area shape="rect" id="node34" href="$classFloatCell.html#afa1a46cfd36a3c2166559f7d425f094d" title="return the value of this cell as a double (even if the value is rational) " alt="" coords="911,588,1021,615"/>
+<area shape="rect" id="node35" href="$classAPL__Float__Base.html#ac0f3239468a7742311f611abbf55a167" title="up&#45;cast const APL_Float_Base * to const APL_Float * " alt="" coords="1081,555,1241,597"/>
+<area shape="rect" id="node36" href="$classCell.html#ac4bb8b0cf0718bf4ec7a17f1a0271df0" title="Release content pointed to (complex, APL value) " alt="" coords="1114,643,1209,669"/>
+<area shape="rect" id="node37" href="$classFloatCell.html#aaa2b1d2de8b20d58dcfcd6ccb2443dad" title="overloaded Cell::init_other " alt="" coords="899,639,1033,665"/>
+<area shape="rect" id="node39" href="$APL__Float__as__class_8hh.html#a7e7be0f9928842e8953e912740a33c57" title="tgamma" alt="" coords="514,259,583,285"/>
+</map>

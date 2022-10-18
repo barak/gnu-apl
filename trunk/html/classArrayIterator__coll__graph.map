@@ -1,3 +1,4 @@
 <map id="ArrayIterator" name="ArrayIterator">
-<area shape="rect" id="node2" href="$classAxisIterator.html" title="An iterator counting 0, 1, 2, ... ⍴[N&#45;1] along one axis of length N. " alt="" coords="8,5,97,32"/>
+<area shape="rect" id="node1" title="An iterator counting along all axes of shape." alt="" coords="5,93,100,119"/>
+<area shape="rect" id="node2" href="$classAxisIterator.html" title="An iterator counting 0, 1, 2, ... ⍴[N&#45;1] along one axis of length N." alt="" coords="8,5,97,31"/>
 </map>

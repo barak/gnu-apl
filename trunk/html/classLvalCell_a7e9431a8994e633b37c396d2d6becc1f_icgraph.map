@@ -1,0 +1,6 @@
+<map id="LvalCell::check_consistency" name="LvalCell::check_consistency">
+<area shape="rect" id="node1" title="make sure that owner (if any) owns this Cell" alt="" coords="455,31,644,56"/>
+<area shape="rect" id="node2" href="$classValue.html#a5dbf7a1bbd982188052432b2f3ccd26c" title="check that this left&#45;value is consistent and return its cell owner. If quick then the first owner is ..." alt="" coords="204,5,407,31"/>
+<area shape="rect" id="node4" href="$classLvalCell.html#af32cb78f01622bd5f620afa07fee382b" title="Constructor: a cell pointing to another cell." alt="" coords="243,55,367,80"/>
+<area shape="rect" id="node3" href="$classValue.html#a5be5b6031f53082438fa9de824732fbe" title="assign val to the cell references in this value." alt="" coords="5,5,156,31"/>
+</map>

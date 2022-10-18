@@ -1,0 +1,7 @@
+<map id="Workspace::get_LX" name="Workspace::get_LX">
+<area shape="rect" id="node1" title="return the current ⎕LX" alt="" coords="409,31,547,56"/>
+<area shape="rect" id="node2" href="$classIO__Files.html#acc91875b8e0c7a5ad44e3ead0e3dda7b" title="get one line from the current file, open the next file if necceessary" alt="" coords="213,5,361,31"/>
+<area shape="rect" id="node4" href="$classWorkspace.html#a77c7b25908cf2479dc087cc3bcf44dcb" title="load lib_ws into the_workspace, maybe set ⎕LX of the new WS." alt="" coords="212,55,361,80"/>
+<area shape="rect" id="node3" href="$classInputMux.html#a8a79cbe5207cde162fb36133ad9defdd" title="get one line" alt="" coords="20,5,149,31"/>
+<area shape="rect" id="node5" href="$classCommand.html#ad222a6de11eb55501624a4d0dea3a464" title=")LOAD: load a workspace file" alt="" coords="5,55,164,80"/>
+</map>

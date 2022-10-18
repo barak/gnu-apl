@@ -1,0 +1,4 @@
+<map id="ProcessorID::disconnect" name="ProcessorID::disconnect">
+<area shape="rect" id="node1" title="disconnect from APnnn process" alt="" coords="5,5,172,31"/>
+<area shape="rect" id="node2" href="$classSvar__DB.html#aca738ecf3248e35512167439caa9f0a9" title="print TCP error information" alt="" coords="220,5,380,31"/>
+</map>

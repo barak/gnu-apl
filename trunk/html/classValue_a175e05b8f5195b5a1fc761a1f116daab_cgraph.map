@@ -1,0 +1,6 @@
+<map id="Value::catch_exception" name="Value::catch_exception">
+<area shape="rect" id="node1" title="handler for catch(exception) in init_ravel() (never called)" alt="" coords="5,42,164,67"/>
+<area shape="rect" id="node2" href="$classWorkspace.html#a64cef901fd41c19f4521bdd1175d0be7" title="the number of SI entries" alt="" coords="212,35,357,75"/>
+<area shape="rect" id="node3" href="$classStateIndicator.html#aa60ca9df0350c7b2e4c0825f061f300e" title="return the nesting level (oldest SI has level 0, next has level 1, ...)" alt="" coords="408,5,537,45"/>
+<area shape="rect" id="node4" href="$classWorkspace.html#a8083efc2d51067edb25ae8dd4f014173" title="the top of the SI stack (the SI pushed last)" alt="" coords="405,70,540,95"/>
+</map>

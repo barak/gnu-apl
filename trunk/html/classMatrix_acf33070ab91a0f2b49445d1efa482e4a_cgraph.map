@@ -1,0 +1,4 @@
+<map id="Matrix::sub_yx" name="Matrix::sub_yx">
+<area shape="rect" id="node1" title="return the sub&#45;matrix starting at row y and column x" alt="" coords="5,5,113,31"/>
+<area shape="rect" id="node2" href="$classMatrix.html#aa29e74e3795360daf7a95738d1039405" title="return this[i, j]" alt="" coords="161,5,239,31"/>
+</map>

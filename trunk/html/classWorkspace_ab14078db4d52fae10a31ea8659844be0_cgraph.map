@@ -1,0 +1,5 @@
+<map id="Workspace::get_error" name="Workspace::get_error">
+<area shape="rect" id="node1" title="return information in SI_top()" alt="" coords="5,42,152,67"/>
+<area shape="rect" id="node2" href="$classUserFunction__header.html#a02e0fedf3b2ad3d50a2d3903bb9be6f9" title="return error if header was not parsed successfully" alt="" coords="200,5,347,45"/>
+<area shape="rect" id="node3" href="$classWorkspace.html#a8083efc2d51067edb25ae8dd4f014173" title="the top of the SI stack (the SI pushed last)" alt="" coords="206,70,341,95"/>
+</map>

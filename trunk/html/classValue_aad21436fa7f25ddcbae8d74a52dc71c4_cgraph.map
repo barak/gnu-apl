@@ -1,0 +1,9 @@
+<map id="Value::get_UCS_ravel" name="Value::get_UCS_ravel">
+<area shape="rect" id="node1" title="return the ravel of this value as UCS string, or throw DOMAIN error if the ravel contains non&#45;char or..." alt="" coords="5,55,157,80"/>
+<area shape="rect" id="node2" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="209,5,349,31"/>
+<area shape="rect" id="node3" href="$classValue.html#a9fc8bbaf9fefe6835dea7db0f71b8b6c" title="return the number of elements (the product of the shapes)." alt="" coords="205,55,353,80"/>
+<area shape="rect" id="node5" href="$classValue.html#aa0572b1b7fa249cb79694fd152130b38" title="return the (constant) idx&#39;th element of the ravel." alt="" coords="218,104,341,129"/>
+<area shape="rect" id="node4" href="$classShape.html#af39e05bad7be900fa1437a6eb6035e97" title="return the number of ravel elements (1 for scalars,i else product of shapes)" alt="" coords="419,55,553,80"/>
+<area shape="rect" id="node6" href="$classValue.html#ac5b54e3a13cab0837442f1575b3299a5" title="return the number of elements, but at least 1 (for the prototype)." alt="" coords="401,104,571,129"/>
+<area shape="rect" id="node7" href="$classShape.html#a6f32f749601dca80263493fd06be12c4" title="return the number of ravel elements, but at least 1 (for empty values and scalars) else product of sh..." alt="" coords="619,104,773,129"/>
+</map>

@@ -1,0 +1,16 @@
+<map id="Quad_CR::compute_prolog" name="Quad_CR::compute_prolog">
+<area shape="rect" id="node1" title="compute the prolog (e,g, ((⎕IO+2)⊃X)←) for the pick of left" alt="" coords="5,130,185,155"/>
+<area shape="rect" id="node2" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="683,63,823,89"/>
+<area shape="rect" id="node3" href="$classUCS__string.html#a5776e51c6faa53537409322cd0ebf07a" title="append number (in ASCII encoding like d) to this string" alt="" coords="471,27,611,67"/>
+<area shape="rect" id="node4" href="$classUCS__string.html#a8111c41576c13b04095ddb7df13eddd3" title="append shape (in APL encoding tke left arg of ↑) this string" alt="" coords="253,123,393,163"/>
+<area shape="rect" id="node7" href="$classUCS__string.html#ace70327ef899c525ad9c3f2bffd43697" title="append 0&#45;terminated UTF8 string str to this UCS_string." alt="" coords="233,215,413,241"/>
+<area shape="rect" id="node8" href="$classQuad__CR.html#a7d3d50ced3ae494671b6a5d63556241d" title="compute a good default type and value for the top&#45;level ⍴ of 10 ⎕CR. Return true for INT and false fo..." alt="" coords="240,342,407,367"/>
+<area shape="rect" id="node5" href="$classShape.html#a017e9a35dd20f4bc4fdeb7ea29b6805d" title="return the rank" alt="" coords="482,142,599,167"/>
+<area shape="rect" id="node6" href="$classShape.html#a592d2ade68aa8c21c5d84627c3a0e001" title="return the length of dimension r" alt="" coords="461,191,620,217"/>
+<area shape="rect" id="node9" href="$classCell.html#a2999919fc2782b3cebfd925c63cc1fac" title="Return the character value of a cell." alt="" coords="470,293,611,318"/>
+<area shape="rect" id="node12" href="$classCell.html#ad165f9ab69abf46b2cf44d301a700a1c" title="Return the integer value of a cell." alt="" coords="475,342,606,367"/>
+<area shape="rect" id="node13" href="$classCell.html#ab3d14978f78ba264d40e9ed1a4823be2" title="Return true iff this cell is a character cell." alt="" coords="465,391,616,417"/>
+<area shape="rect" id="node14" href="$classCell.html#a30d0c83ab2c46ef830cd1301c77eb772" title="Return true iff this cell is an integer cell." alt="" coords="473,441,609,466"/>
+<area shape="rect" id="node10" href="$classCell.html#a38a6a25f0ad091f35e3d9abfe5608a50" title="return the type of this cell" alt="" coords="687,269,818,294"/>
+<area shape="rect" id="node11" href="$classCell.html#a6c3fdef3d82f53649d1c3f16d37eedd7" title="the name of ct" alt="" coords="668,318,837,343"/>
+</map>

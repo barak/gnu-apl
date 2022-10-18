@@ -1,0 +1,25 @@
+<map id="LineEditContext::set_cursor" name="LineEditContext::set_cursor">
+<area shape="rect" id="node1" title="set the cursor (writing the appropriate ESC sequence to CIN)" alt="" coords="2025,61,2167,101"/>
+<area shape="rect" id="node2" href="$classLineEditContext.html#a2af6d28c635eacfafd95d6d8a03b1197" title="delete char at cursor position" alt="" coords="855,30,1045,55"/>
+<area shape="rect" id="node7" href="$classLineEditContext.html#a347304e997f587298b31ca56b87b2826" title="move the cursor" alt="" coords="1799,617,1977,642"/>
+<area shape="rect" id="node19" href="$classLineEditContext.html#a1aa233cff187028ebd725d6ee9628c71" title="refresh screen from cursor onwards" alt="" coords="1121,360,1283,400"/>
+<area shape="rect" id="node23" href="$classLineEditContext.html#a8daeb0f45a6bb42428a42dce38e45704" title="refresh cursor if its position may be wrong (due to forward or backward wraparound being enabled or n..." alt="" coords="1353,131,1516,171"/>
+<area shape="rect" id="node3" href="$classLineEditContext.html#a2e597d200d17b9434fe83d58df393769" title="move cursor left and delete char" alt="" coords="608,81,780,106"/>
+<area shape="rect" id="node4" href="$classLineInput.html#a81610349f86404c67f583eb296666bb1" title="get a line from from user" alt="" coords="412,577,543,602"/>
+<area shape="rect" id="node5" href="$classLineInput.html#a96f6a9062450af940d63ecff847646e4" title="get a line from the user" alt="" coords="183,577,364,602"/>
+<area shape="rect" id="node6" href="$classInputMux.html#a8a79cbe5207cde162fb36133ad9defdd" title="get one line" alt="" coords="5,577,135,602"/>
+<area shape="rect" id="node8" href="$classLineEditContext.html#a8e52f296fc6f747ddfce8d6550f2db45" title="move forward in history" alt="" coords="845,577,1055,602"/>
+<area shape="rect" id="node9" href="$classLineEditContext.html#a8810889507384d9a98db8a8d60344a1b" title="move cursor to end" alt="" coords="1105,881,1299,906"/>
+<area shape="rect" id="node10" href="$classLineEditContext.html#a909c03d41ba5b42d8fae1e8804bd7789" title="move cursor home" alt="" coords="591,906,797,931"/>
+<area shape="rect" id="node11" href="$classLineEditContext.html#a227f4e1074583815d54370e2a9f07a5c" title="move cursor left" alt="" coords="1103,982,1301,1007"/>
+<area shape="rect" id="node12" href="$classLineEditContext.html#a4d98991491704bcdd530d8850b0779e8" title="move cursor right" alt="" coords="1580,1032,1739,1072"/>
+<area shape="rect" id="node13" href="$classLineEditContext.html#adc5ab21d52a2ea0c7219357dcd0c067f" title="search line history" alt="" coords="871,659,1029,699"/>
+<area shape="rect" id="node14" href="$classLineEditContext.html#afb1bb78e3774564eb2fc1c58a672365c" title="move backwards in history" alt="" coords="857,767,1043,793"/>
+<area shape="rect" id="node15" href="$classLineEditContext.html#a671132bb9b96df8ace2ec1146bc486d6" title="insert uni at cursor position" alt="" coords="857,246,1043,271"/>
+<area shape="rect" id="node16" href="$classLineEditContext.html#af149649722a0ac4532f47fe729f44f2f" title="paste to cursor position" alt="" coords="873,367,1027,393"/>
+<area shape="rect" id="node17" href="$classLineEditContext.html#a44d0521ecccc6559b5a2fb7541059911" title="refresh screen from prompt (including) onwards" alt="" coords="1568,557,1751,582"/>
+<area shape="rect" id="node21" href="$classLineEditContext.html#a8908cfbf56371294323892784508eca7" title="tab expansion" alt="" coords="879,468,1021,508"/>
+<area shape="rect" id="node18" href="$classLineEditContext.html#ada01ee6a413a0a4bd4bf3c6065bd650c" title="adjust (increment) the allocated height (long lines)" alt="" coords="1355,613,1514,653"/>
+<area shape="rect" id="node22" href="$classLineEditContext.html#ac85e210ce3dd99ff8644b448ddedcb8e" title="constructor" alt="" coords="1349,549,1520,589"/>
+<area shape="rect" id="node20" href="$classLineEditContext.html#a7717b306eedb8f3a3949d420f0687172" title="cut from cursor to end of line" alt="" coords="623,444,765,484"/>
+</map>

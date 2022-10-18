@@ -1,0 +1,4 @@
+<map id="UCS_string::compute_chunk_length" name="UCS_string::compute_chunk_length">
+<area shape="rect" id="node1" title="compute the length of an output row" alt="" coords="5,5,153,45"/>
+<area shape="rect" id="node2" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="201,13,324,38"/>
+</map>

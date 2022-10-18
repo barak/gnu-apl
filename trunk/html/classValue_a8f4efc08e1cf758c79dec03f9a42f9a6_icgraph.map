@@ -1,0 +1,4 @@
+<map id="Value::check_value" name="Value::check_value">
+<area shape="rect" id="node1" title="check that this value was completely initialized, and set VF_complete if so." alt="" coords="149,5,285,31"/>
+<area shape="rect" id="node2" href="$classValue.html#a700520f88c4f5facadbbf1ca8e21c7ec" title="constructor: a scalar value (i.e. a value with rank 0) from a cell" alt="" coords="5,5,101,31"/>
+</map>
