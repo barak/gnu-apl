@@ -1,5 +1,0 @@
-<map id="FunctionStatistics::FunctionStatistics" name="FunctionStatistics::FunctionStatistics">
-<area shape="rect" id="node1" title="constructor: FunctionStatistics with ID id" alt="" coords="5,5,140,45"/>
-<area shape="rect" id="node2" href="$classFunctionStatistics.html#aa57e7e8cbee85feebbf8c96d2d5dd0f4" title="overloaded Statistics::print()" alt="" coords="188,5,315,45"/>
-<area shape="rect" id="node3" href="$classStatistics__record.html#a42bee38026164a810e2cac629a267d01" title="reset record to count 0, mean 0, variance 0" alt="" coords="363,5,491,45"/>
-</map>

@@ -1,7 +1,0 @@
-<map id="DerivedFunction::get_bound_LO_value" name="DerivedFunction::get_bound_LO_value">
-<area shape="rect" id="node1" title="return the value (if any) bound to an operator (that allows it)" alt="" coords="5,23,148,63"/>
-<area shape="rect" id="node2" href="$classToken.html#a205e0b499e06999ff91c272ff28c9013" title="return the Value_P value of this token. The token could be TOK_NO_VALUE; in that case VALUE_ERROR is ..." alt="" coords="196,5,328,31"/>
-<area shape="rect" id="node4" href="$classToken.html#a11e37aa69b8eb64f293702293b00f50c" title="return true iff this token is an apl value" alt="" coords="387,55,511,80"/>
-<area shape="rect" id="node3" href="$unionToken_1_1sval.html#a22a0be9d3742c2a8168e59d530dd659e" title="a shortcut for accessing apl_val" alt="" coords="376,5,523,31"/>
-<area shape="rect" id="node5" href="$classToken.html#a1a31afbb07e3f1dbb86d5f872ce5c297" title="return the TokenValueType of this token." alt="" coords="571,55,724,80"/>
-</map>

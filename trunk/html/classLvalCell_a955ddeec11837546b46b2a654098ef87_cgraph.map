@@ -1,5 +1,0 @@
-<map id="LvalCell::init_other" name="LvalCell::init_other">
-<area shape="rect" id="node1" title="overloaded Cell::init_other" alt="" coords="5,45,136,70"/>
-<area shape="rect" id="node2" href="$classLvalCell.html#a86dbb9a22797b3611d852ce91e1e97b6" title="return the owner of the cell pointed to" alt="" coords="184,5,307,45"/>
-<area shape="rect" id="node3" href="$classLvalCell.html#a0e898696cb3440b90aa3bdcfac1a23b7" title="Overloaded Cell::get_lval_value()" alt="" coords="184,69,307,109"/>
-</map>

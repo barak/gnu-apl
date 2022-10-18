@@ -1,4 +1,0 @@
-<map id="signal_WINCH_handler" name="signal_WINCH_handler">
-<area shape="rect" id="node1" title="signal handler for SIGWINCH" alt="" coords="5,5,164,31"/>
-<area shape="rect" id="node2" href="$classWorkspace.html#ab055a0407dd155b6e3e3ec76118698e0" title="set the current ⎕PW" alt="" coords="212,5,355,31"/>
-</map>

@@ -1,6 +1,0 @@
-<map id="GET_VALUE_c" name="GET_VALUE_c">
-<area shape="rect" id="node1" title="APserver request: X←SVAR." alt="" coords="16,183,131,208"/>
-<area shape="rect" id="node2" href="$classSignal__base.html" title="the base class for all signal classes" alt="" coords="5,87,99,113"/>
-<area shape="rect" id="node3" href="$classSig__item__xint.html" title=" " alt="" coords="123,80,271,120"/>
-<area shape="rect" id="node4" href="$classSig__item__int.html" title="an integer signal item of size bytes" alt="" coords="114,5,281,31"/>
-</map>

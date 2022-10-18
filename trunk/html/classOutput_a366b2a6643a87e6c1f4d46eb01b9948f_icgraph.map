@@ -1,5 +1,0 @@
-<map id="Output::toggle_color" name="Output::toggle_color">
-<area shape="rect" id="node1" title="set or toggle color mode (implementation of command ]XTERM)" alt="" coords="223,31,361,56"/>
-<area shape="rect" id="node2" href="$classCommand.html#a44d50f4ab683653103d3adad9d767826" title="enable and disable colors" alt="" coords="5,5,175,31"/>
-<area shape="rect" id="node3" href="$main_8cc.html#aa0321421b17def7b58fc0cabc8890260" title="initialize the interpreter" alt="" coords="59,55,121,80"/>
-</map>

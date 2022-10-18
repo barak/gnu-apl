@@ -1,5 +1,0 @@
-<map id="Quad_CR::do_CR13" name="Quad_CR::do_CR13">
-<area shape="rect" id="node1" title="compute 13 ⎕CR B" alt="" coords="5,5,148,31"/>
-<area shape="rect" id="node2" href="$classShape.html#afcd3708c8c18a30cb3c0c1fa1a630f71" title="modify dimension r" alt="" coords="196,5,355,31"/>
-<area shape="rect" id="node3" href="$classShape.html#a189c92d0b74f3313bd83c8aa7565e9c5" title="recompute volume (after changing a dimension of len 0)" alt="" coords="403,5,580,31"/>
-</map>

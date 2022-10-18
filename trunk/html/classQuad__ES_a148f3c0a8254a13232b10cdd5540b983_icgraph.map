@@ -1,6 +1,0 @@
-<map id="Quad_ES::get_error_code" name="Quad_ES::get_error_code">
-<area shape="rect" id="node1" title="compute error code for B" alt="" coords="411,31,583,56"/>
-<area shape="rect" id="node2" href="$classQuad__ES.html#a4c53438162ec63acf71b2a766c533fae" title="common inplementation for eval_AB() and eval_B()" alt="" coords="188,31,363,56"/>
-<area shape="rect" id="node3" href="$classQuad__ES.html#a15637aafd2f0819de2b50a6e0ae1d638" title="overloaded Function::eval_AB()." alt="" coords="5,5,140,31"/>
-<area shape="rect" id="node4" href="$classQuad__ES.html#a82fc7201ef710a3514568169a912d92a" title="overloaded Function::eval_B()." alt="" coords="9,55,136,80"/>
-</map>

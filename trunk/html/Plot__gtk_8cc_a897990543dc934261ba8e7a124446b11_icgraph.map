@@ -1,6 +1,0 @@
-<map id="plot_main" name="plot_main">
-<area shape="rect" id="node1" title="the main() program of the thread that handles one plot window." alt="" coords="428,31,507,56"/>
-<area shape="rect" id="node2" href="$classQuad__PLOT.html#a0161f15bc1b55d2d79b634ce35c15ec0" title="plot the data (creating a new plot window in X)" alt="" coords="204,31,380,56"/>
-<area shape="rect" id="node3" href="$classQuad__PLOT.html#acc4187c32c3bad52f276a724b226b429" title="overloaded Function::eval_AB()" alt="" coords="5,5,156,31"/>
-<area shape="rect" id="node4" href="$classQuad__PLOT.html#a1b17ca0481f0d7fcc98732b3b1d2eefb" title="overloaded Function::eval_B()" alt="" coords="9,55,152,80"/>
-</map>

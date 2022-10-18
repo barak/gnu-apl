@@ -1,5 +1,0 @@
-<map id="SET_CONTROL_c::print" name="SET_CONTROL_c::print">
-<area shape="rect" id="node1" title="print this signal on out." alt="" coords="5,31,172,56"/>
-<area shape="rect" id="node2" href="$classSig__item__int.html#ae23ccce7226c3f3fdc793e3781505e21" title="print the item" alt="" coords="224,5,351,31"/>
-<area shape="rect" id="node3" href="$classSig__item__xint.html#ae4b0f63b20ce36cec5a0a2733816dacd" title="print the item" alt="" coords="220,55,355,80"/>
-</map>

@@ -1,8 +1,0 @@
-<map id="SVAR_ASSIGNED_c" name="SVAR_ASSIGNED_c">
-<area shape="rect" id="node1" title="APserver result for: SVAR←X." alt="" coords="472,95,623,120"/>
-<area shape="rect" id="node2" href="$classSignal__base.html" title="the base class for all signal classes" alt="" coords="249,5,342,31"/>
-<area shape="rect" id="node3" href="$classSig__item__xint.html" title=" " alt="" coords="221,55,369,95"/>
-<area shape="rect" id="node4" href="$classSig__item__int.html" title="an integer signal item of size bytes" alt="" coords="5,63,172,88"/>
-<area shape="rect" id="node5" href="$classSig__item__int.html" title=" " alt="" coords="225,119,366,159"/>
-<area shape="rect" id="node6" href="$classSig__item__string.html" title="a string signal item of size bytes" alt="" coords="239,184,351,209"/>
-</map>

@@ -1,4 +1,0 @@
-<map id="NumericCell::int_gcd" name="NumericCell::int_gcd">
-<area shape="rect" id="node1" title="return the greatest common divisor of integers a and b" alt="" coords="5,5,149,31"/>
-<area shape="rect" id="node2" href="$classFloatCell.html#a1c809407ae6c0e97a1e2994b8a6b67b5" title="greatest common divisor, Knuth Vol. 1 p. 14" alt="" coords="197,5,300,31"/>
-</map>

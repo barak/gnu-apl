@@ -1,4 +1,0 @@
-<map id="Plot_data::get_Y" name="Plot_data::get_Y">
-<area shape="rect" id="node1" title="return the Y coordinate at row and col" alt="" coords="5,5,124,31"/>
-<area shape="rect" id="node2" href="$classPlot__data__row.html#a33dc8b966628255b8300f95a7c261b44" title="return the n&#45;th Y coordinate" alt="" coords="172,5,319,31"/>
-</map>

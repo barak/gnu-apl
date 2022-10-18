@@ -1,4 +1,0 @@
-<map id="Thread_context::PF_join" name="Thread_context::PF_join">
-<area shape="rect" id="node1" title="end parallel execution of work in a worker" alt="" coords="5,13,169,38"/>
-<area shape="rect" id="node2" href="$classThread__context.html#ab8bd91c72792a1e187c521f38c9e4f6e" title="return the context of the master" alt="" coords="217,5,356,45"/>
-</map>

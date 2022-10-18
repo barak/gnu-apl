@@ -1,4 +1,0 @@
-<map id="Parser::check_if_value" name="Parser::check_if_value">
-<area shape="rect" id="node1" title="check if tos[pos] is the end of a value or of a function" alt="" coords="5,29,160,55"/>
-<area shape="rect" id="node2" href="$classParser.html#a89a4c948758299b4735586a6347a3c67" title="find opening bracket; throw error if not found" alt="" coords="208,22,349,62"/>
-</map>

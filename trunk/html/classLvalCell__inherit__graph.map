@@ -1,4 +1,0 @@
-<map id="LvalCell" name="LvalCell">
-<area shape="rect" id="node1" title="A cell pointing to another cell (which shall be updated)" alt="" coords="5,79,75,104"/>
-<area shape="rect" id="node2" href="$classCell.html" title="The base class for all Cells." alt="" coords="17,5,63,31"/>
-</map>

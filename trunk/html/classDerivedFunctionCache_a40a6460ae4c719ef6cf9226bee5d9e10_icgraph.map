@@ -1,6 +1,0 @@
-<map id="DerivedFunctionCache::at" name="DerivedFunctionCache::at">
-<area shape="rect" id="node1" title="return the i&#39;th derived function" alt="" coords="411,45,585,70"/>
-<area shape="rect" id="node2" href="$classDerivedFunctionCache.html#ac97e879431a3eb7bb8f9e8460c7039ca" title="return the i&#39;th derived function" alt="" coords="208,5,363,45"/>
-<area shape="rect" id="node3" href="$classDerivedFunctionCache.html#a0d26600266b1da2e95c1e6e84a3f00cc" title="clear the marked bit in values bound to derived functions (if any)." alt="" coords="208,69,363,109"/>
-<area shape="rect" id="node4" href="$classStateIndicator.html#a275a02d6a84b6dc259fa9c5e74d56c65" title="clear the marked bit in the executable, in the fun_oper_cache, and in all parsers" alt="" coords="5,69,160,109"/>
-</map>

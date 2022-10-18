@@ -1,4 +1,0 @@
-<map id="ValueStackItem::clear" name="ValueStackItem::clear">
-<area shape="rect" id="node1" title="reset this ValueStackItem to being unused" alt="" coords="5,5,156,31"/>
-<area shape="rect" id="node2" href="$classValue__P__Base.html#ad07a670c61c71b7aecc8ca9a6170b796" title="decrement owner&#45;count and reset pointer to 0" alt="" coords="204,5,349,31"/>
-</map>

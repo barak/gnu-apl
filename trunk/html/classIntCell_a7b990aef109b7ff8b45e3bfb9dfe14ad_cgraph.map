@@ -1,5 +1,0 @@
-<map id="IntCell::bif_near_int64_t" name="IntCell::bif_near_int64_t">
-<area shape="rect" id="node1" title="overloaded Cell::bif_near_int64_t()" alt="" coords="5,5,165,31"/>
-<area shape="rect" id="node2" href="$classIntCell.html#aa99b7212ce13da0f241adeb18e350198" title="initialize Z to APL_Integer v" alt="" coords="213,5,292,31"/>
-<area shape="rect" id="node3" href="$classIntCell.html#a88c653b2f968c451ee1c1c53a983fa13" title="Construct an integer cell with value 0." alt="" coords="340,5,447,31"/>
-</map>

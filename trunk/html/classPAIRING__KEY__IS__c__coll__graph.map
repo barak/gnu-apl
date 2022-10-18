@@ -1,6 +1,0 @@
-<map id="PAIRING_KEY_IS_c" name="PAIRING_KEY_IS_c">
-<area shape="rect" id="node1" title="APserver result for: find pairing key." alt="" coords="5,183,152,208"/>
-<area shape="rect" id="node2" href="$classSignal__base.html" title="the base class for all signal classes" alt="" coords="11,87,104,113"/>
-<area shape="rect" id="node3" href="$classSig__item__xint.html" title=" " alt="" coords="129,80,277,120"/>
-<area shape="rect" id="node4" href="$classSig__item__int.html" title="an integer signal item of size bytes" alt="" coords="119,5,286,31"/>
-</map>

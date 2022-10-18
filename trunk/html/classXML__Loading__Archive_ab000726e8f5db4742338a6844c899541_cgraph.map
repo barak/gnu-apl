@@ -1,7 +1,0 @@
-<map id="XML_Loading_Archive::find_int_attr" name="XML_Loading_Archive::find_int_attr">
-<area shape="rect" id="node2" href="$Common_8hh.html#a6d4ca0c6b6648fa2a606993c967dd8f8" title="frequently used cast to const char * " alt="" coords="437,5,493,32"/>
-<area shape="rect" id="node3" href="$classXML__Loading__Archive.html#ad0c398f273df586ef1a2cb9b87b9cb41" title="find attribute att_name and return: a pointer to its value if found, 0 if optional is true..." alt="" coords="205,53,357,94"/>
-<area shape="rect" id="node6" href="$Logging_8def.html#ab5ab82c1e9b9d4715660ab4a568026e2" title="value" alt="" coords="255,119,308,145"/>
-<area shape="rect" id="node4" href="$Common_8hh.html#aecfb781b36a8a772310228edb5410b15" title="MORE_ERROR" alt="" coords="405,60,524,87"/>
-<area shape="rect" id="node5" href="$classWorkspace.html#a5ebd29d8c860b589b9f1d8118a949514" title="return reference to more info about last error " alt="" coords="572,60,731,87"/>
-</map>

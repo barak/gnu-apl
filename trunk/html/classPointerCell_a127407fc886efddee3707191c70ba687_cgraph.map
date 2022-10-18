@@ -1,5 +1,0 @@
-<map id="PointerCell::deep_cell_subtypes" name="PointerCell::deep_cell_subtypes">
-<area shape="rect" id="node1" title="overloaded Cell::deep_cell_types()" alt="" coords="5,29,155,69"/>
-<area shape="rect" id="node2" href="$classPointerCell.html#a4f3f4eebed4b98ea6161b66b5a81c48d" title="overloaded Cell::get_pointer_value()" alt="" coords="203,29,361,69"/>
-<area shape="rect" id="node3" href="$classValue__P__Base.html#a1c3bf1b6f708eb2c1ba4b97c83adb9aa" title="return a const pointer to the Value" alt="" coords="409,37,544,62"/>
-</map>

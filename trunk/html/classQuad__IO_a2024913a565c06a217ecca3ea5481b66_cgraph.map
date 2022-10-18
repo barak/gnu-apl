@@ -1,5 +1,0 @@
-<map id="Quad_IO::current" name="Quad_IO::current">
-<area shape="rect" id="node1" title="Return the current index origin. MUST NOT CALL get_apl_value() because it can be called from parallel..." alt="" coords="5,31,128,56"/>
-<area shape="rect" id="node2" href="$classSymbol.html#ab542d76beae55342e23bac625c2912e4" title="return the first Cell of this value without creating a value" alt="" coords="176,5,324,31"/>
-<area shape="rect" id="node3" href="$classCell.html#ad165f9ab69abf46b2cf44d301a700a1c" title="Return the integer value of a cell." alt="" coords="185,55,315,80"/>
-</map>

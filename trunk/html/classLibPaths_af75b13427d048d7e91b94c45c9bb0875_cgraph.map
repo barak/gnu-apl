@@ -1,7 +1,0 @@
-<map id="LibPaths::init" name="LibPaths::init">
-<area shape="rect" id="node1" title="initialize library paths based on the location of the APL binary" alt="" coords="5,35,104,60"/>
-<area shape="rect" id="node2" href="$classLibPaths.html#a5320980bca540558509c8c6f5afb3f87" title="compute the location of the apl binary" alt="" coords="152,5,339,31"/>
-<area shape="rect" id="node4" href="$classLibPaths.html#a030fce9d9304dbbfbfee31b52ce2e7bc" title="set library root, searching from APL_bin_path" alt="" coords="169,55,321,95"/>
-<area shape="rect" id="node3" href="$classUTF8__string.html#a922bd7ebc6a8ea5c6ba9c54159b18a93" title="return this string as a 0&#45;terminated C string" alt="" coords="391,5,522,31"/>
-<area shape="rect" id="node5" href="$classLibPaths.html#af7466c5c66b0fcc0a8a54dbdf835f2cf" title="return true if directory dir contains two (files or sub&#45;directories) workspaces and wslib1" alt="" coords="387,63,527,88"/>
-</map>

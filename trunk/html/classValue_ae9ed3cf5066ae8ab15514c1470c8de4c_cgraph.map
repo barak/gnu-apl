@@ -1,9 +1,0 @@
-<map id="Value::clone" name="Value::clone">
-<area shape="rect" id="node1" title="return a deep copy of this value" alt="" coords="5,107,100,132"/>
-<area shape="rect" id="node2" href="$classValue.html#af5c51aefac3892bb5ef1abe838dd873a" title="return the first element of the ravel (which is always present) same as get_first(),..." alt="" coords="148,5,272,31"/>
-<area shape="rect" id="node3" href="$classValue.html#aa0572b1b7fa249cb79694fd152130b38" title="return the (constant) idx&#39;th element of the ravel." alt="" coords="320,56,443,81"/>
-<area shape="rect" id="node4" href="$classValue.html#ac5b54e3a13cab0837442f1575b3299a5" title="return the number of elements, but at least 1 (for the prototype)." alt="" coords="491,81,660,107"/>
-<area shape="rect" id="node6" href="$classValue.html#abf966781ab7b9c91e944721d3646edfb" title="return the shape of this value" alt="" coords="149,157,271,183"/>
-<area shape="rect" id="node7" href="$classCell.html#aab9681b3e735d10ef92978c5c17bf95d" title="init (uninitialized) Cell other from this initialized cell" alt="" coords="157,207,263,232"/>
-<area shape="rect" id="node5" href="$classShape.html#a6f32f749601dca80263493fd06be12c4" title="return the number of ravel elements, but at least 1 (for empty values and scalars) else product of sh..." alt="" coords="708,81,863,107"/>
-</map>

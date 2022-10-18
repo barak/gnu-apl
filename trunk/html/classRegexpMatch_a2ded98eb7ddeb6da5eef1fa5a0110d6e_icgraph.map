@@ -1,8 +1,0 @@
-<map id="RegexpMatch::get_ovector_count" name="RegexpMatch::get_ovector_count">
-<area shape="rect" id="node1" title="return the number of offset pairs in a match" alt="" coords="803,23,981,63"/>
-<area shape="rect" id="node2" href="$classQuad__RE.html#a3f7c5552e6498ac82109871b5f4a35b6" title="return a result that can be used by [] (position and length)" alt="" coords="597,5,754,31"/>
-<area shape="rect" id="node6" href="$classQuad__RE.html#a06a851c449b5efa9a9d4f0fb7b5d8b1a" title="return a result that contains the matched strings" alt="" coords="596,55,755,80"/>
-<area shape="rect" id="node3" href="$classQuad__RE.html#ac30c86b0ec6520f8ab4c20e97f6b053f" title="return a result whose format is given by flags" alt="" coords="383,31,548,56"/>
-<area shape="rect" id="node4" href="$classQuad__RE.html#a28ca16be0e639ffb29d1597cdf18e0a9" title="overloaded Function::eval_AXB()." alt="" coords="189,31,335,56"/>
-<area shape="rect" id="node5" href="$classQuad__RE.html#aaf1c135d558953f69556ba615ba103ec" title="overloaded Function::eval_AB()." alt="" coords="5,31,141,56"/>
-</map>

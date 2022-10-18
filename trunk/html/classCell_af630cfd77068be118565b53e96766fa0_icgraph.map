@@ -1,7 +1,0 @@
-<map id="Cell::prod_overflow" name="Cell::prod_overflow">
-<area shape="rect" id="node1" title="return true if multiplying a and b will (probably) overflow. For some huge a or b the result may inco..." alt="" coords="389,55,524,80"/>
-<area shape="rect" id="node2" href="$classFloatCell.html#aaa9c654650da7fd4e1738fefdd63c6ef" title="Overloaded Cell::bif_add()." alt="" coords="204,5,328,31"/>
-<area shape="rect" id="node3" href="$classFloatCell.html#abc04878f0a7a04579f5f8ccdfe65c089" title="Overloaded Cell::bif_multiply()." alt="" coords="192,55,340,80"/>
-<area shape="rect" id="node5" href="$classFloatCell.html#ae261ecf59ba690674cd5409f5e973f41" title="Overloaded Cell::bif_subtract()." alt="" coords="191,104,341,129"/>
-<area shape="rect" id="node4" href="$classFloatCell.html#aae34ca615e293a91c37667d78f97b5d6" title="Overloaded Cell::bif_divide()." alt="" coords="5,55,143,80"/>
-</map>

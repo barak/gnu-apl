@@ -1,6 +1,0 @@
-<map id="Quad_FIO::group_thousands" name="Quad_FIO::group_thousands">
-<area shape="rect" id="node1" title="append ASCII&#45;buffer buffer to dest, inserting thousands&#39; separators. Note: buffer may be modified." alt="" coords="5,63,195,88"/>
-<area shape="rect" id="node2" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="243,5,383,31"/>
-<area shape="rect" id="node3" href="$classUCS__string.html#ad14d08312e34ad5d733360eccf9a745a" title="append 0&#45;terminated ASCII string str to this string. str is NOT interpreted as UTF8 string (use appen..." alt="" coords="243,55,383,95"/>
-<area shape="rect" id="node4" href="$classWorkspace.html#a09f10a68b5a249c789bf8c1839f3208c" title="return element pos of the current ⎕FC (pos should be 0..5)" alt="" coords="243,120,382,145"/>
-</map>

@@ -1,7 +1,0 @@
-<map id="Function::subfun_to_axis" name="Function::subfun_to_axis">
-<area shape="rect" id="node2" href="$classFunction.html#a5a8e930a7ee14744736f5d01d6e69aa9" title="return the signature of this function (currently only valid for user&#45;defined functions) ..." alt="" coords="221,93,380,120"/>
-<area shape="rect" id="node3" href="$classFunction.html#a1e98de20de09c81c7b5e257880eb2c89" title="return the number of value arguments (0, 1, or 2) of a user defined function, For non&#45;user defined fu..." alt="" coords="428,5,603,32"/>
-<area shape="rect" id="node4" href="$classFunction.html#ac69b8cfa3ac1577ef8cf98500002e6ef" title="return the number of function arguments (1 or 2) of an operator, or 0 for a &quot;normal&quot; function that is..." alt="" coords="450,57,581,98"/>
-<area shape="rect" id="node5" href="$classFunction.html#ab42920100ef5ae42e00bc02b915526d1" title="return 1 if the function returns a result, otherwise 0. For non&#45;user defined functions, throw DOMAIN_ERROR. " alt="" coords="651,93,791,120"/>
-<area shape="rect" id="node6" href="$classFunction.html#a54a1f42ec67c604380f61b48b69d25f9" title="return true iff the function has and axis (system defined functions always have an axis even thogh mo..." alt="" coords="449,173,581,200"/>
-</map>

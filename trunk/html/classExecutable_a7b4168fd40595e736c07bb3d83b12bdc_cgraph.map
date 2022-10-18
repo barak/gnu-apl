@@ -1,6 +1,0 @@
-<map id="Executable::parse_body_line" name="Executable::parse_body_line">
-<area shape="rect" id="node1" title="parse the body line number line of this function" alt="" coords="5,35,195,60"/>
-<area shape="rect" id="node2" href="$classExecutable.html#a02b3dd7f7dbb3c3e099e3ab553034baa" title="the parse mode of this Executable" alt="" coords="243,5,433,31"/>
-<area shape="rect" id="node3" href="$classError.html#a9b063bbb799ab949fd0f6ed2b6ad2709" title="throw a error with a parser location" alt="" coords="273,55,403,95"/>
-<area shape="rect" id="node4" href="$classError.html#a9dbfb665cecfad231189862c5f414c48" title="return a string describing the error" alt="" coords="481,63,604,88"/>
-</map>

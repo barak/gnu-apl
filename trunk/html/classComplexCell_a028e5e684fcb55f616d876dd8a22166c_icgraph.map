@@ -1,9 +1,0 @@
-<map id="ComplexCell::is_near_real" name="ComplexCell::is_near_real">
-<area shape="rect" id="node1" title="overloaded Cell::is_near_real()" alt="" coords="236,129,411,155"/>
-<area shape="rect" id="node2" href="$classComplexCell.html#a8b0c84adf9799295fb470bf3945e6899" title="overloaded from the corresponding Cell:: function (see class Cell)." alt="" coords="11,5,183,31"/>
-<area shape="rect" id="node3" href="$classComplexCell.html#ab67bebf69d8efeb7e4ca95d7a2b61be2" title="Overloaded from the corresponding Cell:: function (see class Cell)." alt="" coords="5,55,188,80"/>
-<area shape="rect" id="node4" href="$classComplexCell.html#a11271df65dc314ce610506860f77bbc2" title="Overloaded from the corresponding Cell:: function (see class Cell)." alt="" coords="7,104,186,129"/>
-<area shape="rect" id="node5" href="$classComplexCell.html#aae985d70d6d47202c20938cade95da98" title="overloaded from the corresponding Cell:: function (see class Cell)." alt="" coords="5,153,188,179"/>
-<area shape="rect" id="node6" href="$classComplexCell.html#a59526d0bf663861a811c939ab6308fcd" title="the Quad_CR representation of this cell." alt="" coords="17,203,176,243"/>
-<area shape="rect" id="node7" href="$classComplexCell.html#a8882c2a4701f26a80e9bc1aa2dd450be" title="return true iff this cell needs scaling (exponential format) in pctx." alt="" coords="6,268,187,293"/>
-</map>

@@ -1,9 +1,0 @@
-<map id="Cell::get_checked_near_int" name="Cell::get_checked_near_int">
-<area shape="rect" id="node1" title="Return value if it is (known to be) close to int, or else Assert()" alt="" coords="471,80,651,105"/>
-<area shape="rect" id="node2" href="$classNumericCell.html#a7cebf4c76a5b6281920e54983ddcf61b" title="overloaded Cell::bif_and()" alt="" coords="265,5,409,31"/>
-<area shape="rect" id="node3" href="$classNumericCell.html#a3fd3970233551bf557f5e52330b5610c" title="overloaded Cell::bif_binomial()" alt="" coords="252,55,423,80"/>
-<area shape="rect" id="node4" href="$classNumericCell.html#ad637e39552ebd544e0b41e7c91a48787" title="overloaded Cell::bif_or()" alt="" coords="270,104,405,129"/>
-<area shape="rect" id="node5" href="$classBif__COMMA.html#a54274d01c09566054ae5b08d34f65118" title="either catenate A and B or laminate A and B" alt="" coords="260,154,415,194"/>
-<area shape="rect" id="node6" href="$classBif__F12__COMMA.html#a22e1c5309fdfe1e3d450b6f586c35cc4" title="overloaded Function::eval_AXB()" alt="" coords="9,136,200,161"/>
-<area shape="rect" id="node7" href="$classBif__F12__COMMA1.html#a96459b1e66a6cb3b2327b3be37455b61" title="overloaded Function::eval_AXB()" alt="" coords="5,185,204,211"/>
-</map>

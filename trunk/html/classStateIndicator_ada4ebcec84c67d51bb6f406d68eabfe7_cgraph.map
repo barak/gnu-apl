@@ -1,5 +1,0 @@
-<map id="StateIndicator::find_child" name="StateIndicator::find_child">
-<area shape="rect" id="node1" title="return the child SI (if any) that parent has called" alt="" coords="5,35,137,75"/>
-<area shape="rect" id="node2" href="$classStateIndicator.html#a44d07945c56abef5505efcfdc98ec090" title="return the SI that has called this one" alt="" coords="188,5,317,45"/>
-<area shape="rect" id="node3" href="$classWorkspace.html#a8083efc2d51067edb25ae8dd4f014173" title="the top of the SI stack (the SI pushed last)" alt="" coords="185,70,320,95"/>
-</map>

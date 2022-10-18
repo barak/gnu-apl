@@ -1,6 +1,0 @@
-<map id="Prefix::locate_R" name="Prefix::locate_R">
-<area shape="rect" id="node1" title="return the right argument of a failed primitive function (if any)" alt="" coords="364,31,480,56"/>
-<area shape="rect" id="node2" href="$classStateIndicator.html#aed48ec786a6d1c59334415cc01acef57" title="return right arg (and set function)" alt="" coords="169,5,316,31"/>
-<area shape="rect" id="node3" href="$classStateIndicator.html#a2020e90d88b6b9ed76ddbfb62b38f13c" title="change right arg" alt="" coords="169,55,316,80"/>
-<area shape="rect" id="node4" href="$classQuad__R.html#a1c59d295f67723e023348a8476e05fb2" title="overloaded Symbol::assign()" alt="" coords="5,55,121,80"/>
-</map>

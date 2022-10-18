@@ -1,5 +1,0 @@
-<map id="Statistics_record::save_record" name="Statistics_record::save_record">
-<area shape="rect" id="node1" title="write count, data, and data2 to file" alt="" coords="204,37,332,77"/>
-<area shape="rect" id="node2" href="$classFunctionStatistics.html#ae66b7e9f0f297709d392dbad0fe2819f" title="overloaded Statistics::save_data()" alt="" coords="17,5,144,45"/>
-<area shape="rect" id="node3" href="$classCellFunctionStatistics.html#acf425ed34a3f7edabc5aa3fc0cfb6dcc" title="overloaded Statistics::save_data()" alt="" coords="5,69,156,109"/>
-</map>

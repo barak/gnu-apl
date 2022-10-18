@@ -1,5 +1,0 @@
-<map id="Quad_FIO::do_sprintf" name="Quad_FIO::do_sprintf">
-<area shape="rect" id="node1" title="sprintf with format string A and Data items B" alt="" coords="389,31,536,56"/>
-<area shape="rect" id="node2" href="$classQuad__FIO.html#afc0d29b9ac52baf3fb101b9bae907623" title="printf A to out" alt="" coords="201,5,341,31"/>
-<area shape="rect" id="node3" href="$classQuad__FIO.html#a36fdeb894607c2125307cd673284fb69" title="overloaded Function::eval_AXB()." alt="" coords="5,31,153,56"/>
-</map>

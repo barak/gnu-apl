@@ -1,6 +1,0 @@
-<map id="Cell::bif_logarithm" name="Cell::bif_logarithm">
-<area shape="rect" id="node1" title="store the base A logarithm of this cell in Z" alt="" coords="249,55,376,80"/>
-<area shape="rect" id="node2" href="$classBif__F12__LOGA.html#af891e9916c0fbd6e661df657c28cf0a1" title="overloaded Function::eval_AB()." alt="" coords="20,5,187,31"/>
-<area shape="rect" id="node3" href="$classBif__F12__LOGA.html#a445eb9cc67c96f044b7bd7322dac9826" title="overloaded Function::eval_AXB()." alt="" coords="15,55,191,80"/>
-<area shape="rect" id="node4" href="$classBif__F12__LOGA.html#aa38b23dc1fdc0fa38ddb47364c2a308a" title="overloaded Function::get_scalar_f2()" alt="" coords="5,104,201,129"/>
-</map>

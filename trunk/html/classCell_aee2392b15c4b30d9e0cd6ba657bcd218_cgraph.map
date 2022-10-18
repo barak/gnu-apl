@@ -1,7 +1,0 @@
-<map id="Cell::to_value" name="Cell::to_value">
-<area shape="rect" id="node1" title="return pointer value of a PointerCell or create a scalar with a copy of this cell." alt="" coords="5,55,108,80"/>
-<area shape="rect" id="node2" href="$classCell.html#a367b9df7e0d4b805e5f31641658113f6" title="Return the APL value of a cell (Asserts for non&#45;pointer cells)" alt="" coords="156,29,311,55"/>
-<area shape="rect" id="node5" href="$classCell.html#ae98b3988a7fa52c6c157b4911b043dde" title="Return true iff this cell is a pointer (to a sub&#45;array) cell." alt="" coords="165,79,301,104"/>
-<area shape="rect" id="node3" href="$classCell.html#a38a6a25f0ad091f35e3d9abfe5608a50" title="return the type of this cell" alt="" coords="378,5,509,31"/>
-<area shape="rect" id="node4" href="$classCell.html#a6c3fdef3d82f53649d1c3f16d37eedd7" title="the name of ct" alt="" coords="359,55,528,80"/>
-</map>

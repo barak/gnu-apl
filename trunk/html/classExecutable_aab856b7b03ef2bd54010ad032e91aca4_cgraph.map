@@ -1,5 +1,0 @@
-<map id="Executable::set_error_info" name="Executable::set_error_info">
-<area shape="rect" id="node1" title="compute lines 2 and 3 in error" alt="" coords="5,35,180,60"/>
-<area shape="rect" id="node2" href="$classUTF8__string.html#a922bd7ebc6a8ea5c6ba9c54159b18a93" title="return this string as a 0&#45;terminated C string" alt="" coords="252,5,383,31"/>
-<area shape="rect" id="node3" href="$classExecutable.html#ace2b09edae698fd095eaeff889a22bc1" title="return the start of the statement to which pc belongs" alt="" coords="228,55,407,95"/>
-</map>

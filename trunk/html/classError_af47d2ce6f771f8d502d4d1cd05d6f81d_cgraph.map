@@ -1,6 +1,0 @@
-<map id="Error::throw_symbol_error" name="Error::throw_symbol_error">
-<area shape="rect" id="node1" title="throw an Error related to Symbol symbol" alt="" coords="5,47,144,87"/>
-<area shape="rect" id="node2" href="$classUTF8__string.html#a922bd7ebc6a8ea5c6ba9c54159b18a93" title="return this string as a 0&#45;terminated C string" alt="" coords="194,5,325,31"/>
-<area shape="rect" id="node3" href="$classWorkspace.html#a8083efc2d51067edb25ae8dd4f014173" title="the top of the SI stack (the SI pushed last)" alt="" coords="192,55,327,80"/>
-<area shape="rect" id="node4" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="198,104,321,129"/>
-</map>

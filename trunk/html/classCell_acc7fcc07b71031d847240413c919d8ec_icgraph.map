@@ -1,4 +1,0 @@
-<map id="Cell::bif_factorial" name="Cell::bif_factorial">
-<area shape="rect" id="node1" title="store the factorial (N!) of the value of this Cell in Z" alt="" coords="220,5,340,31"/>
-<area shape="rect" id="node2" href="$classBif__F12__BINOM.html#a3596f99aa601d0147864acd62c489c03" title="overloaded Function::eval_B()." alt="" coords="5,5,172,31"/>
-</map>

@@ -1,6 +1,0 @@
-<map id="UCS_string::drop" name="UCS_string::drop">
-<area shape="rect" id="node1" title="return this string with the first drop_count characters removed" alt="" coords="5,31,128,56"/>
-<area shape="rect" id="node2" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="198,5,321,31"/>
-<area shape="rect" id="node3" href="$classUCS__string.html#ad092030b348adfd762de621c43d75812" title="default constructor: empty string" alt="" coords="176,55,343,80"/>
-<area shape="rect" id="node4" href="$classUCS__string.html#a40523238d26f5405f5392df03d242627" title="common part of all constructors" alt="" coords="391,55,525,80"/>
-</map>

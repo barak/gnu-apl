@@ -1,9 +1,0 @@
-<map id="Cell::is_near_real" name="Cell::is_near_real">
-<area shape="rect" id="node1" title="return true iff value is numeric and close to a real number" alt="" coords="224,129,347,155"/>
-<area shape="rect" id="node2" href="$classNumericCell.html#a7cebf4c76a5b6281920e54983ddcf61b" title="overloaded Cell::bif_and()" alt="" coords="19,5,163,31"/>
-<area shape="rect" id="node3" href="$classNumericCell.html#a3fd3970233551bf557f5e52330b5610c" title="overloaded Cell::bif_binomial()" alt="" coords="5,55,176,80"/>
-<area shape="rect" id="node4" href="$classNumericCell.html#ad637e39552ebd544e0b41e7c91a48787" title="overloaded Cell::bif_or()" alt="" coords="23,104,158,129"/>
-<area shape="rect" id="node5" href="$classValue.html#abca25cc2fb27492148e152a2228b18ed" title="return true if this value can be compared. This is the case when all cells (including nested ones) ar..." alt="" coords="6,153,175,179"/>
-<area shape="rect" id="node6" href="$classValue.html#a293f69e67956b05dbee418d8f71a2919" title="return true, if this value has complex cells, false iff it has only real cells. Throw domain error fo..." alt="" coords="26,203,155,228"/>
-<area shape="rect" id="node7" href="$classQuad__TF.html#a434cc143d2da53d0f3ae37a9e9e9ce10" title="return B in transfer format 1 (old APL format) for variable B" alt="" coords="41,252,140,277"/>
-</map>

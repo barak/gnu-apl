@@ -1,6 +1,0 @@
-<map id="Quad_TZ" name="Quad_TZ">
-<area shape="rect" id="node1" title="The class implementing ⎕TZ." alt="" coords="25,225,101,251"/>
-<area shape="rect" id="node2" href="$classSystemVariable.html" title="Base class for all APL system variables." alt="" coords="5,152,120,177"/>
-<area shape="rect" id="node3" href="$classSymbol.html" title="Base class for variables, defined functions, and distinguished names." alt="" coords="29,79,96,104"/>
-<area shape="rect" id="node4" href="$classNamedObject.html" title="A user&#45;defined variable or function." alt="" coords="11,5,114,31"/>
-</map>

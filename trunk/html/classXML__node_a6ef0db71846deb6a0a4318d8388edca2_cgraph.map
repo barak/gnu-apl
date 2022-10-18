@@ -1,4 +1,0 @@
-<map id="XML_node::is_name_char" name="XML_node::is_name_char">
-<area shape="rect" id="node1" title="return true if uni is a validchar" alt="" coords="5,13,179,38"/>
-<area shape="rect" id="node2" href="$classXML__node.html#a2a35cbd734b00030af77d2c652008f3a" title="return true if uni is a valid first char in an XML tag name" alt="" coords="227,5,357,45"/>
-</map>

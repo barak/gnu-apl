@@ -1,5 +1,0 @@
-<map id="Quad_TF::tf2_fun" name="Quad_TF::tf2_fun">
-<area shape="rect" id="node1" title="return B in transfer format 2 (new APL format) for a function" alt="" coords="333,5,457,31"/>
-<area shape="rect" id="node2" href="$classQuad__TF.html#aad2b15f3268d7098d75babcd03e5c762" title="return B in transfer format 2 (new APL2 format)" alt="" coords="187,5,285,31"/>
-<area shape="rect" id="node3" href="$classQuad__TF.html#a27ed4b02d5f1a1c8a8b0a1fcbe2756f8" title="Overloaded Function::eval_AB()." alt="" coords="5,5,139,31"/>
-</map>

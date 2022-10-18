@@ -1,7 +1,0 @@
-<map id="LvalCell::character_representation" name="LvalCell::character_representation">
-<area shape="rect" id="node1" title="Overloaded Cell::character_representation()" alt="" coords="5,47,136,87"/>
-<area shape="rect" id="node2" href="$classCell.html#a089e3fdcacd165cad6e82a42ab49f2a7" title="the Quad_CR representation of this cell" alt="" coords="184,5,380,31"/>
-<area shape="rect" id="node3" href="$classPrintBuffer.html#a9bd0c0bdbbfe10fc25285c3f659f433c" title="prepend buffer with count characters pad" alt="" coords="221,55,343,80"/>
-<area shape="rect" id="node5" href="$classPrintBuffer.html#adef4048693e699b9bfac4b2adf719f63" title="append count charactera pad to buffer" alt="" coords="220,104,344,129"/>
-<area shape="rect" id="node4" href="$classPrintBuffer.html#ac13295601812e379a3eac618ce239426" title="return the number of rows" alt="" coords="428,73,567,113"/>
-</map>

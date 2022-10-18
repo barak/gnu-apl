@@ -1,4 +1,0 @@
-<map id="Probe::get_stop" name="Probe::get_stop">
-<area shape="rect" id="node1" title="get the m&#39;th stop time of this probe" alt="" coords="168,5,283,31"/>
-<area shape="rect" id="node2" href="$classProbe.html#a4bdf40aa929386ccb339d61c6aaa8c88" title="get the m&#39;th stop time of the p&#39;th probe" alt="" coords="5,5,120,31"/>
-</map>

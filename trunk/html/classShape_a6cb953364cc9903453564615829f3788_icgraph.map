@@ -1,7 +1,0 @@
-<map id="Shape::get_first_shape_item" name="Shape::get_first_shape_item">
-<area shape="rect" id="node1" title="return the length of the first axis, or 1 for scalars" alt="" coords="475,31,663,56"/>
-<area shape="rect" id="node2" href="$classValue.html#a0afca8cbc9af848a14ed59862373b225" title="return the length of the last dimension of this value, i.e. ↑⍴this" alt="" coords="243,5,427,31"/>
-<area shape="rect" id="node3" href="$classBif__COMMA.html#a6db4c6e1f1f1deb3d7a410e871046496" title="ravel along axis, with axis being the first (⍪( or last (,) axis of B" alt="" coords="253,55,416,80"/>
-<area shape="rect" id="node4" href="$classBif__F12__COMMA.html#a25ca62e12b597dcccd5b3656eabeb355" title="overloaded Function::eval_XB()" alt="" coords="9,29,191,55"/>
-<area shape="rect" id="node5" href="$classBif__F12__COMMA1.html#afbcb8ff5f7f5e524196c6865a59ed099" title="overloaded Function::eval_XB()" alt="" coords="5,79,195,104"/>
-</map>

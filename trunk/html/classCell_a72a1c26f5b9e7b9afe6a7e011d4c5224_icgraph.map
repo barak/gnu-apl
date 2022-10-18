@@ -1,6 +1,0 @@
-<map id="Cell::bif_not_equal_bitwise" name="Cell::bif_not_equal_bitwise">
-<area shape="rect" id="node1" title="bitwise comparison of *this and A" alt="" coords="241,47,372,87"/>
-<area shape="rect" id="node2" href="$classBif__F2__UNEQ__B.html#a29cbf3223dd94bf614ba9281bfcbe0d7" title="overloaded Function::eval_AB()." alt="" coords="10,5,189,31"/>
-<area shape="rect" id="node3" href="$classBif__F2__UNEQ__B.html#ab7cce1365a3b209894c226d7e24f1dcf" title="overloaded Function::eval_AXB()." alt="" coords="5,55,193,80"/>
-<area shape="rect" id="node4" href="$classBif__F2__UNEQ__B.html#abc1a07f279a034762f3464c3db9953de" title="overloaded Function::get_scalar_f2" alt="" coords="25,105,173,145"/>
-</map>

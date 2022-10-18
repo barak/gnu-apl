@@ -1,4 +1,0 @@
-<map id="Token::get_int_val" name="Token::get_int_val">
-<area shape="rect" id="node1" title="return the integer value of this token" alt="" coords="5,5,135,31"/>
-<area shape="rect" id="node2" href="$classToken.html#a1a31afbb07e3f1dbb86d5f872ce5c297" title="return the TokenValueType of this token." alt="" coords="183,5,336,31"/>
-</map>

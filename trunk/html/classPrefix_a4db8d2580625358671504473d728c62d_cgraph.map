@@ -1,8 +1,0 @@
-<map id="Prefix::uses_function" name="Prefix::uses_function">
-<area shape="rect" id="node1" title="return true if ufun is on the stack" alt="" coords="5,80,151,105"/>
-<area shape="rect" id="node2" href="$classPrefix.html#aa1e98b0f6cf6e81ab90765af9bd3ce4e" title="return the idx&#39;th Token_loc (from put position)" alt="" coords="230,5,305,31"/>
-<area shape="rect" id="node3" href="$classToken.html#a4d19f279ca06bc64e549c9d63ca677b0" title="return the Function_P value of this token" alt="" coords="199,55,336,80"/>
-<area shape="rect" id="node5" href="$classToken.html#a1a31afbb07e3f1dbb86d5f872ce5c297" title="return the TokenValueType of this token." alt="" coords="561,80,715,105"/>
-<area shape="rect" id="node6" href="$classPrefix.html#a07a35c8b69a8c9f685225e2a2586a2fd" title="return the number of token currently in the FIFO" alt="" coords="223,156,311,181"/>
-<area shape="rect" id="node4" href="$classToken.html#abe9f60f29fc7644214b48cc2715a21ad" title="return true if this token is a function (or operator)" alt="" coords="384,55,513,80"/>
-</map>

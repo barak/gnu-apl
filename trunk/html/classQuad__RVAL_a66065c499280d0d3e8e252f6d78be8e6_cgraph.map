@@ -1,5 +1,0 @@
-<map id="Quad_RVAL::random_character" name="Quad_RVAL::random_character">
-<area shape="rect" id="node1" title="initialize cell with a random character" alt="" coords="5,31,212,56"/>
-<area shape="rect" id="node2" href="$classValue.html#a131a7844810059a3ab8eb411fd713e3b" title="initialize the next ravel cell with a character value" alt="" coords="260,5,419,31"/>
-<area shape="rect" id="node3" href="$classQuad__RVAL.html#a6fe97d65ef1815968c5b74030abf271f" title="return a 17&#45;bit random number" alt="" coords="268,55,411,80"/>
-</map>

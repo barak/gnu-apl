@@ -1,8 +1,0 @@
-<map id="Bif_F12_TAKE" name="Bif_F12_TAKE">
-<area shape="rect" id="node1" title="The class implementing ↑" alt="" coords="39,387,149,412"/>
-<area shape="rect" id="node2" href="$classNonscalarFunction__default__identity.html" title="Base class for all internal non&#45;scalar functions of the interpreter." alt="" coords="5,299,183,339"/>
-<area shape="rect" id="node3" href="$classNonscalarFunction.html" title="Base class for all internal non&#45;scalar functions of the interpreter." alt="" coords="29,225,159,251"/>
-<area shape="rect" id="node4" href="$classPrimitiveFunction.html" title="Base class for all internal functions of the interpreter." alt="" coords="33,152,155,177"/>
-<area shape="rect" id="node5" href="$classFunction.html" title="Base class for all APL functions and operators (system or defined)" alt="" coords="58,79,130,104"/>
-<area shape="rect" id="node6" href="$classNamedObject.html" title="A user&#45;defined variable or function." alt="" coords="43,5,145,31"/>
-</map>

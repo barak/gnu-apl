@@ -1,5 +1,0 @@
-<map id="Quad_WA::parse_mem" name="Quad_WA::parse_mem">
-<area shape="rect" id="node1" title="parse a &#45;mem command line option" alt="" coords="5,31,164,56"/>
-<area shape="rect" id="node2" href="$classQuad__WA.html#a5e6486128134180c354cf092476397d1" title="read /proc/meminfo, return the number of items found" alt="" coords="212,5,384,31"/>
-<area shape="rect" id="node3" href="$classQuad__WA.html#a17d405124006925906922422170d8354" title="read a (supposedly short) file in /proc" alt="" coords="216,55,380,80"/>
-</map>

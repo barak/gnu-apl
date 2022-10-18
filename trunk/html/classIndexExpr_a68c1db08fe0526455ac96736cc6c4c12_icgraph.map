@@ -1,8 +1,0 @@
-<map id="IndexExpr::is_axis" name="IndexExpr::is_axis">
-<area shape="rect" id="node1" title="return true iff the number of dimensions is 1 (i.e. no ; and non&#45;empty)" alt="" coords="229,128,360,153"/>
-<area shape="rect" id="node2" href="$classSymbol.html#aa3dbe2896e759bf153f109d44ed87a6c" title="Indexed (multi&#45;dimensional) assign value to this Symbol." alt="" coords="11,29,175,55"/>
-<area shape="rect" id="node3" href="$classQuad__FC.html#a96387561d24ab0767a8138a00553a788" title="overloaded Symbol::assign_indexed()." alt="" coords="5,79,181,104"/>
-<area shape="rect" id="node4" href="$classBif__F2__INDEX.html#a85e678157d596ed118034350f32fb247" title="overloaded Function::eval_AB()" alt="" coords="10,128,177,153"/>
-<area shape="rect" id="node5" href="$classBif__F2__INDEX.html#a81ae7c821f03f2c0fceca000cc9e243c" title="overloaded Function::eval_AXB()" alt="" coords="6,177,181,203"/>
-<area shape="rect" id="node6" href="$classValue.html#ad8cf427edc910f94e31db0d2c1c456fc" title="return this indexed by (multi&#45;dimensional) IDX." alt="" coords="46,227,141,252"/>
-</map>

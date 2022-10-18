@@ -1,4 +1,0 @@
-<map id="FloatCell::is_near_zero" name="FloatCell::is_near_zero">
-<area shape="rect" id="node1" title="Overloaded Cell::is_near_zero()." alt="" coords="5,5,161,31"/>
-<area shape="rect" id="node2" href="$classFloatCell.html#afa1a46cfd36a3c2166559f7d425f094d" title="return the value of this cell as a double (even if the value is rational)" alt="" coords="209,5,320,31"/>
-</map>

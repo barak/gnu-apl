@@ -1,7 +1,0 @@
-<map id="Cell::bif_and" name="Cell::bif_and">
-<area shape="rect" id="node1" title="store the logical and of A and this cell in Z" alt="" coords="236,80,331,105"/>
-<area shape="rect" id="node2" href="$classBif__F2__AND.html#ab7c0e341131d8efda503d6004e06b937" title="overloaded Function::eval_AB()." alt="" coords="20,5,173,31"/>
-<area shape="rect" id="node3" href="$classBif__F2__AND.html#a5d02b428a278ee5bd96ee7e63a57fbf0" title="overloaded Function::eval_AXB()." alt="" coords="15,55,178,80"/>
-<area shape="rect" id="node4" href="$classBif__F2__AND.html#a282e80513b309a14a149f417407d6c9b" title="return the associative cell function of this function" alt="" coords="15,104,179,129"/>
-<area shape="rect" id="node5" href="$classBif__F2__AND.html#ab38f610dddd0ca2613d1d88a3b1ab362" title="overloaded Function::get_scalar_f2" alt="" coords="5,153,188,179"/>
-</map>

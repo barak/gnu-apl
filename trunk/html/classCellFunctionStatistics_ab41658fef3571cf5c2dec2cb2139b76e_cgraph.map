@@ -1,4 +1,0 @@
-<map id="CellFunctionStatistics::reset" name="CellFunctionStatistics::reset">
-<area shape="rect" id="node1" title="reset this statistics: clear first and subsequent records" alt="" coords="5,5,156,45"/>
-<area shape="rect" id="node2" href="$classStatistics__record.html#a42bee38026164a810e2cac629a267d01" title="reset record to count 0, mean 0, variance 0" alt="" coords="204,5,332,45"/>
-</map>

@@ -1,5 +1,0 @@
-<map id="Workspace::SI_entry_count" name="Workspace::SI_entry_count">
-<area shape="rect" id="node1" title="the number of SI entries" alt="" coords="5,35,151,75"/>
-<area shape="rect" id="node2" href="$classStateIndicator.html#aa60ca9df0350c7b2e4c0825f061f300e" title="return the nesting level (oldest SI has level 0, next has level 1, ...)" alt="" coords="201,5,331,45"/>
-<area shape="rect" id="node3" href="$classWorkspace.html#a8083efc2d51067edb25ae8dd4f014173" title="the top of the SI stack (the SI pushed last)" alt="" coords="199,70,333,95"/>
-</map>

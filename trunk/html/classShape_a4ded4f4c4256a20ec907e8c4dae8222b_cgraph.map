@@ -1,5 +1,0 @@
-<map id="Shape::high_shape" name="Shape::high_shape">
-<area shape="rect" id="node1" title="return a shape with the upper cnt dimensions of this shape" alt="" coords="5,31,139,56"/>
-<area shape="rect" id="node2" href="$classShape.html#a017e9a35dd20f4bc4fdeb7ea29b6805d" title="return the rank" alt="" coords="187,5,304,31"/>
-<area shape="rect" id="node3" href="$classShape.html#aaa8d87171e65e0d8ba3c5459978992a7" title="constructor: shape of a scalar." alt="" coords="193,55,297,80"/>
-</map>

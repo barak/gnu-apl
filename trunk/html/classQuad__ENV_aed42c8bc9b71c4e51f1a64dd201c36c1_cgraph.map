@@ -1,5 +1,0 @@
-<map id="Quad_ENV::eval_B" name="Quad_ENV::eval_B">
-<area shape="rect" id="node1" title="overloaded Function::eval_B()." alt="" coords="5,31,141,56"/>
-<area shape="rect" id="node2" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="189,5,329,31"/>
-<area shape="rect" id="node3" href="$classValue__P__Base.html#a1c3bf1b6f708eb2c1ba4b97c83adb9aa" title="return a const pointer to the Value" alt="" coords="192,55,327,80"/>
-</map>

@@ -1,6 +1,0 @@
-<map id="Svar_DB::is_registered_id" name="Svar_DB::is_registered_id">
-<area shape="rect" id="node1" title="return true if id is registered in APserver" alt="" coords="403,35,577,60"/>
-<area shape="rect" id="node2" href="$classProcessorID.html#a61b505bf9c0cf9b386c39d487946a0a9" title="initialize our own process ID, return non&#45;0 on error. proc_id == 0 uses the next free ID &gt; 1000; othe..." alt="" coords="217,5,337,31"/>
-<area shape="rect" id="node3" href="$classQuad__SVO.html#aefe8710645494d9dc6b8879b3f09b913" title="share one variable" alt="" coords="199,55,355,95"/>
-<area shape="rect" id="node4" href="$classQuad__SVO.html#a92d931679e0b1836d24e1cc1ab60ed02" title="Overloaded Function::eval_AB()." alt="" coords="5,63,151,88"/>
-</map>

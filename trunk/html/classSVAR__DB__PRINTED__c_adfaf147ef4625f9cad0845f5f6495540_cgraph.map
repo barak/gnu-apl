@@ -1,5 +1,0 @@
-<map id="SVAR_DB_PRINTED_c::SVAR_DB_PRINTED_c" name="SVAR_DB_PRINTED_c::SVAR_DB_PRINTED_c">
-<area shape="rect" id="node1" title="contructor that creates the signal and sends it on TCP socket s" alt="" coords="5,5,180,45"/>
-<area shape="rect" id="node2" href="$classSignal__base.html#a2ff638373162ccc4a8b1b268b260923e" title="send this signal on TCP (or AF_UNIX) socket tcp_sock" alt="" coords="228,13,391,38"/>
-<area shape="rect" id="node3" href="$classSignal__base.html#a68f2f5d807d706a6e46709abef26cfb1" title="store (encode) the signal into buffer" alt="" coords="439,13,569,38"/>
-</map>

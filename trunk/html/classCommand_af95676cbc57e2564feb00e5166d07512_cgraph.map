@@ -1,5 +1,0 @@
-<map id="Command::is_directory" name="Command::is_directory">
-<area shape="rect" id="node1" title="return true if entry is a directory" alt="" coords="5,31,163,56"/>
-<area shape="rect" id="node2" href="$classUTF8__string.html#ae512c0617f7a13fe5011655d898ca6c1" title="append the UTF8_string suffix" alt="" coords="211,5,395,31"/>
-<area shape="rect" id="node3" href="$classUTF8__string.html#a922bd7ebc6a8ea5c6ba9c54159b18a93" title="return this string as a 0&#45;terminated C string" alt="" coords="237,55,368,80"/>
-</map>

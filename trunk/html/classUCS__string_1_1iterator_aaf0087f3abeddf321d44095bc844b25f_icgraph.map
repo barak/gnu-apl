@@ -1,8 +1,0 @@
-<map id="UCS_string::iterator::get" name="UCS_string::iterator::get">
-<area shape="rect" id="node2" href="$classNabla.html#ad807a47227d5a997bdc1075d186109a5" title="parse [nn.mm] into a LineLabel; " alt="" coords="217,5,355,32"/>
-<area shape="rect" id="node3" href="$classNabla.html#ae4562224aeb0ce0598cd25f428443045" title="parse an operation (something like [...], e.g. [⎕3]) " alt="" coords="403,5,531,32"/>
-<area shape="rect" id="node4" href="$classNabla.html#a610d94a179335126e82e9eea07918d5a" title="edit this function " alt="" coords="717,5,803,32"/>
-<area shape="rect" id="node7" href="$classNabla.html#a894eac5264914ef7eedcfc14643cc7ee" title="start editing, return source location if first_command is bad. " alt="" coords="579,31,669,57"/>
-<area shape="rect" id="node5" href="$classNabla.html#a5571a862b4a619a9c6404dcb7fcf385f" title="edit the function specified in cmd (e.g. cmd = &quot;∇FUN&quot;) " alt="" coords="851,5,989,32"/>
-<area shape="rect" id="node6" href="$classCommand.html#ae26693534d4df16372f51e55e505b8d7" title="process line which contains a command or statements " alt="" coords="1037,5,1200,32"/>
-</map>

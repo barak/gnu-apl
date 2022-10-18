@@ -1,8 +1,0 @@
-<map id="Quad_SVx::is_executable" name="Quad_SVx::is_executable">
-<area shape="rect" id="node1" title="return true iff filename is executable by everybody" alt="" coords="636,35,809,60"/>
-<area shape="rect" id="node2" href="$classQuad__SVQ.html#a1f96d0bb6b3d8f568bf9e7e48d448c3c" title="return processors with matching offers" alt="" coords="403,8,588,33"/>
-<area shape="rect" id="node4" href="$classQuad__SVx.html#aa59d7158927b2d2f99968b7ac2842cdb" title="start the auxiliary processor proc" alt="" coords="423,59,567,84"/>
-<area shape="rect" id="node3" href="$classQuad__SVQ.html#aa99fb69058db1016c7501c008749daf6" title="Overloaded Function::eval_AB()." alt="" coords="209,5,345,31"/>
-<area shape="rect" id="node5" href="$classQuad__SVO.html#aefe8710645494d9dc6b8879b3f09b913" title="share one variable" alt="" coords="199,55,355,95"/>
-<area shape="rect" id="node6" href="$classQuad__SVO.html#a92d931679e0b1836d24e1cc1ab60ed02" title="Overloaded Function::eval_AB()." alt="" coords="5,63,151,88"/>
-</map>

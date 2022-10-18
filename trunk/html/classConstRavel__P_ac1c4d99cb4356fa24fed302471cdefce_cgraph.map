@@ -1,6 +1,0 @@
-<map id="ConstRavel_P::operator*" name="ConstRavel_P::operator*">
-<area shape="rect" id="node1" title="return a reference to the current Cell" alt="" coords="5,5,172,31"/>
-<area shape="rect" id="node2" href="$classValue.html#aa0572b1b7fa249cb79694fd152130b38" title="return the (constant) idx&#39;th element of the ravel." alt="" coords="220,5,343,31"/>
-<area shape="rect" id="node3" href="$classValue.html#ac5b54e3a13cab0837442f1575b3299a5" title="return the number of elements, but at least 1 (for the prototype)." alt="" coords="391,5,560,31"/>
-<area shape="rect" id="node4" href="$classShape.html#a6f32f749601dca80263493fd06be12c4" title="return the number of ravel elements, but at least 1 (for empty values and scalars) else product of sh..." alt="" coords="608,5,763,31"/>
-</map>

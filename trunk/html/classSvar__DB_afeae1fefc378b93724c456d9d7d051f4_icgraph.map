@@ -1,5 +1,0 @@
-<map id="Svar_DB::get_offered_variables" name="Svar_DB::get_offered_variables">
-<area shape="rect" id="node1" title="return all variables shared between to_proc and from_proc" alt="" coords="411,5,559,45"/>
-<area shape="rect" id="node2" href="$classQuad__SVQ.html#a5fdb64a94ed29742ac9470233fc4976c" title="return variables offered by processor proc" alt="" coords="189,13,363,38"/>
-<area shape="rect" id="node3" href="$classQuad__SVQ.html#aa99fb69058db1016c7501c008749daf6" title="Overloaded Function::eval_AB()." alt="" coords="5,13,141,38"/>
-</map>

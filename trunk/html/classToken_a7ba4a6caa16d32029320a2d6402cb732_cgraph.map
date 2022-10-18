@@ -1,7 +1,0 @@
-<map id="Token::clear" name="Token::clear">
-<area shape="rect" id="node1" title="clear this token, properly clearing Value token" alt="" coords="5,55,100,80"/>
-<area shape="rect" id="node2" href="$classToken.html#a11e37aa69b8eb64f293702293b00f50c" title="return true iff this token is an apl value" alt="" coords="159,5,283,31"/>
-<area shape="rect" id="node4" href="$classValue__P__Base.html#ad07a670c61c71b7aecc8ca9a6170b796" title="decrement owner&#45;count and reset pointer to 0" alt="" coords="148,55,293,80"/>
-<area shape="rect" id="node5" href="$classToken.html#aa3c5868ba4115f3189df6b2ac5b36f39" title="Construct a VOID token. VOID token are used for two purposes: (1) to fill positions when e...." alt="" coords="169,104,272,129"/>
-<area shape="rect" id="node3" href="$classToken.html#a1a31afbb07e3f1dbb86d5f872ce5c297" title="return the TokenValueType of this token." alt="" coords="341,5,495,31"/>
-</map>

@@ -1,8 +1,0 @@
-<map id="Svar_record::print" name="Svar_record::print">
-<area shape="rect" id="node1" title="print the variable" alt="" coords="5,80,131,105"/>
-<area shape="rect" id="node2" href="$structSvar__record.html#ab4d3d8caaff62e4f3c5ef75488b5af93" title="return the coupling of the variable" alt="" coords="179,5,352,31"/>
-<area shape="rect" id="node4" href="$structSvar__record.html#a4b58603bd5c299da99915933d6af668f" title="return the state of this variable" alt="" coords="188,55,343,80"/>
-<area shape="rect" id="node5" href="$structSvar__partner.html#a27eb019060780bf439b4cac519dd5650" title="print this partner" alt="" coords="201,104,330,129"/>
-<area shape="rect" id="node6" href="$structSvar__record.html#adac196c0626b7b0e28cd54f94e31aaae" title="print a name" alt="" coords="183,153,347,179"/>
-<area shape="rect" id="node3" href="$structSvar__partner.html#a08989d19706b526a4054398b2d0b5480" title="return true if this partner is active. Note that this can be the case even though tcp_fd is invalid." alt="" coords="400,5,556,31"/>
-</map>

@@ -1,7 +1,0 @@
-<map id="SystemSymTab::clear" name="SystemSymTab::clear">
-<area shape="rect" id="node1" title="clear this symbol table (remove all user&#45;defined symbols)" alt="" coords="5,35,157,60"/>
-<area shape="rect" id="node2" href="$classSystemSymTab.html#a40bfb6197e5dae06ae851c5807eb4ef0" title="clear one slot (hash) in this symbol table" alt="" coords="205,5,385,31"/>
-<area shape="rect" id="node3" href="$classWorkspace.html#a64cef901fd41c19f4521bdd1175d0be7" title="the number of SI entries" alt="" coords="223,55,368,95"/>
-<area shape="rect" id="node4" href="$classStateIndicator.html#aa60ca9df0350c7b2e4c0825f061f300e" title="return the nesting level (oldest SI has level 0, next has level 1, ...)" alt="" coords="436,26,565,66"/>
-<area shape="rect" id="node5" href="$classWorkspace.html#a8083efc2d51067edb25ae8dd4f014173" title="the top of the SI stack (the SI pushed last)" alt="" coords="433,91,568,116"/>
-</map>

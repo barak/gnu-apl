@@ -1,5 +1,0 @@
-<map id="UserFunction_header::get_error" name="UserFunction_header::get_error">
-<area shape="rect" id="node2" href="$classUserFunction__header.html#a83260915329d2b9bb53fe1e71354f7c6" title="return true if this function localizes sym " alt="" coords="200,5,347,47"/>
-<area shape="rect" id="node3" href="$classUserFunction__header.html#aa3510fbda561cbad0f734260603f6aff" title="print local vars etc. " alt="" coords="200,71,347,112"/>
-<area shape="rect" id="node4" href="$classUserFunction__header.html#ab15b076f0339005005737c229d99a07d" title="return true if this defined function header is an operator " alt="" coords="395,71,541,112"/>
-</map>

@@ -1,6 +1,0 @@
-<map id="IO_Files::diff_error" name="IO_Files::diff_error">
-<area shape="rect" id="node1" title="count a output diff error" alt="" coords="5,55,136,80"/>
-<area shape="rect" id="node2" href="$structInputFile.html#a1e6384a302fddad91c1b245610cc12ce" title="close the current file and perform some cleanup" alt="" coords="184,5,367,31"/>
-<area shape="rect" id="node3" href="$classCommand.html#aafd8a7df22d24109a5ea7de47267f241" title="clean&#45;up and exit from APL interpreter" alt="" coords="201,55,349,80"/>
-<area shape="rect" id="node4" href="$structInputFile.html#a8dc157767e0af4c57eefa4225629e7f8" title="the current file" alt="" coords="203,104,347,129"/>
-</map>

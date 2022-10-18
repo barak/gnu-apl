@@ -1,7 +1,0 @@
-<map id="Value::set_shape" name="Value::set_shape">
-<area shape="rect" id="node1" title=" " alt="" coords="5,55,128,80"/>
-<area shape="rect" id="node2" href="$classShape.html#af39e05bad7be900fa1437a6eb6035e97" title="return the number of ravel elements (1 for scalars,i else product of shapes)" alt="" coords="193,5,328,31"/>
-<area shape="rect" id="node3" href="$classValue.html#a6c2eb3ec5ec6136eae948bc936c3ae35" title="true if Value flag complete is set" alt="" coords="194,55,327,80"/>
-<area shape="rect" id="node4" href="$classValue.html#ac5b54e3a13cab0837442f1575b3299a5" title="return the number of elements, but at least 1 (for the prototype)." alt="" coords="176,104,345,129"/>
-<area shape="rect" id="node5" href="$classShape.html#a6f32f749601dca80263493fd06be12c4" title="return the number of ravel elements, but at least 1 (for empty values and scalars) else product of sh..." alt="" coords="393,104,548,129"/>
-</map>

@@ -1,4 +1,0 @@
-<map id="TrueIndexIterator" name="TrueIndexIterator">
-<area shape="rect" id="node1" title="an IndexIterator for a true (i.e. non&#45;elided) index array" alt="" coords="5,80,127,105"/>
-<area shape="rect" id="node2" href="$classIndexIterator.html" title="Base class for ElidedIndexIterator and TrueIndexIterator." alt="" coords="19,5,113,31"/>
-</map>

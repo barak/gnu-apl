@@ -1,5 +1,0 @@
-<map id="NumericCell::int_gcd" name="NumericCell::int_gcd">
-<area shape="rect" id="node1" title="return the greatest common divisor of integers a and b" alt="" coords="197,31,341,56"/>
-<area shape="rect" id="node2" href="$classNumericCell.html#a7cebf4c76a5b6281920e54983ddcf61b" title="overloaded Cell::bif_and()" alt="" coords="5,5,149,31"/>
-<area shape="rect" id="node3" href="$classNumericCell.html#ad637e39552ebd544e0b41e7c91a48787" title="overloaded Cell::bif_or()" alt="" coords="10,55,145,80"/>
-</map>

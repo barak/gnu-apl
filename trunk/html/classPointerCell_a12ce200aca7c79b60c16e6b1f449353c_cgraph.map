@@ -1,8 +1,0 @@
-<map id="PointerCell::compare" name="PointerCell::compare">
-<area shape="rect" id="node1" title="compare this with other, throw DOMAIN ERROR on illegal comparisons" alt="" coords="5,55,149,80"/>
-<area shape="rect" id="node2" href="$classCell.html#a38a6a25f0ad091f35e3d9abfe5608a50" title="return the type of this cell" alt="" coords="423,5,554,31"/>
-<area shape="rect" id="node3" href="$classCell.html#a367b9df7e0d4b805e5f31641658113f6" title="Return the APL value of a cell (Asserts for non&#45;pointer cells)" alt="" coords="199,55,354,80"/>
-<area shape="rect" id="node5" href="$classPointerCell.html#a4f3f4eebed4b98ea6161b66b5a81c48d" title="overloaded Cell::get_pointer_value()" alt="" coords="197,105,356,145"/>
-<area shape="rect" id="node4" href="$classCell.html#a6c3fdef3d82f53649d1c3f16d37eedd7" title="the name of ct" alt="" coords="404,55,573,80"/>
-<area shape="rect" id="node6" href="$classValue__P__Base.html#a1c3bf1b6f708eb2c1ba4b97c83adb9aa" title="return a const pointer to the Value" alt="" coords="421,112,556,137"/>
-</map>

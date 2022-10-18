@@ -1,6 +1,0 @@
-<map id="Token::Token" name="Token::Token">
-<area shape="rect" id="node1" title="Construct a token for an index." alt="" coords="5,31,108,56"/>
-<area shape="rect" id="node2" href="$classIndexExpr.html#a0a0f5c633c7823fea081eb035e56a0ea" title="return the single axis value and clear it in this IndexExpr." alt="" coords="156,5,316,31"/>
-<area shape="rect" id="node4" href="$classIndexExpr.html#a7bb1bdcdda0c546a5defe28fda90d252" title="return the number of values (= number of semicolons + 1), including elided indices" alt="" coords="167,55,305,80"/>
-<area shape="rect" id="node3" href="$classValue__P__Base.html#ad07a670c61c71b7aecc8ca9a6170b796" title="decrement owner&#45;count and reset pointer to 0" alt="" coords="364,5,509,31"/>
-</map>

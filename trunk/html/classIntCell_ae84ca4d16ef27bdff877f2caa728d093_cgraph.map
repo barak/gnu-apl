@@ -1,7 +1,0 @@
-<map id="IntCell::bif_reciprocal" name="IntCell::bif_reciprocal">
-<area shape="rect" id="node1" title="overloaded from the corresponding Cell:: function (see class Cell)" alt="" coords="5,55,151,80"/>
-<area shape="rect" id="node2" href="$classIntCell.html#a7da78424dbf8c5a7ee6b9630f7daac97" title="initialize the (un&#45;initialized) Cell *Z to integer 1" alt="" coords="206,5,289,31"/>
-<area shape="rect" id="node4" href="$classIntCell.html#af58267131ee39ba9c2fae85067a06c42" title="initialize the (un&#45;initialized) Cell *Z to integer ¯1" alt="" coords="203,55,292,80"/>
-<area shape="rect" id="node5" href="$classFloatCell.html#a88217aaf5cd286cc89a85d2885876dda" title="initialize the (un&#45;initialized) Cell *Z to APL_Float flt" alt="" coords="199,104,296,129"/>
-<area shape="rect" id="node3" href="$classIntCell.html#a88c653b2f968c451ee1c1c53a983fa13" title="Construct an integer cell with value 0." alt="" coords="344,31,451,56"/>
-</map>

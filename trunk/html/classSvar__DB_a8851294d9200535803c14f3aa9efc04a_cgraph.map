@@ -1,5 +1,0 @@
-<map id="Svar_DB::set_control" name="Svar_DB::set_control">
-<area shape="rect" id="node1" title="set the current control vector of this variable" alt="" coords="5,5,152,31"/>
-<area shape="rect" id="node2" href="$classSvar__DB.html#a8e5d83427d476f8db6752dbf86c78e96" title="get TCP socket to APserver, complain if not connected" alt="" coords="200,5,387,31"/>
-<area shape="rect" id="node3" href="$classSvar__DB.html#ac10f9507c18657397c050432da27cdac" title="return the fd towards APserver" alt="" coords="435,5,587,31"/>
-</map>

@@ -1,7 +1,0 @@
-<map id="Cell::bif_maximum" name="Cell::bif_maximum">
-<area shape="rect" id="node1" title="store the larger of A and of this cell in Z" alt="" coords="249,84,380,109"/>
-<area shape="rect" id="node2" href="$classBif__F12__RND__UP.html#a3c7b564f75b0094b8d44e7fd51c0cc62" title="overloaded Function::eval_AB()." alt="" coords="10,5,197,31"/>
-<area shape="rect" id="node3" href="$classBif__F12__RND__UP.html#a7fbf168e1472e308e7ba0e6fe5ab5353" title="overloaded Function::eval_AXB()." alt="" coords="5,55,201,80"/>
-<area shape="rect" id="node4" href="$classBif__F12__RND__UP.html#a777bc3c23d3bcda67a1e8b78033dafde" title="return the associative cell function of this function" alt="" coords="25,105,181,145"/>
-<area shape="rect" id="node5" href="$classBif__F12__RND__UP.html#a722bfe4c345dd86f17cf3d771aad6526" title="overloaded Function::get_scalar_f2()" alt="" coords="25,169,181,209"/>
-</map>

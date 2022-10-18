@@ -1,5 +1,0 @@
-<map id="UserPreferences::decode_ASCII" name="UserPreferences::decode_ASCII">
-<area shape="rect" id="node1" title="decode a byte in a preferences file. The byte can be given as ASCII name (currently only ESC is under..." alt="" coords="317,5,488,45"/>
-<area shape="rect" id="node2" href="$structUserPreferences.html#a1831227aad6eb6d2fcd28e4d5d0067c3" title="read a preference file and update parameters set there" alt="" coords="116,5,269,45"/>
-<area shape="rect" id="node3" href="$main_8cc.html#aa0321421b17def7b58fc0cabc8890260" title="initialize the interpreter" alt="" coords="5,13,68,38"/>
-</map>

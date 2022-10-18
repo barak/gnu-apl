@@ -1,5 +1,0 @@
-<map id="Workspace::clear_WS" name="Workspace::clear_WS">
-<area shape="rect" id="node1" title="clear the workspace" alt="" coords="409,5,563,31"/>
-<area shape="rect" id="node2" href="$classWorkspace.html#a77c7b25908cf2479dc087cc3bcf44dcb" title="load lib_ws into the_workspace, maybe set ⎕LX of the new WS." alt="" coords="212,5,361,31"/>
-<area shape="rect" id="node3" href="$classCommand.html#ad222a6de11eb55501624a4d0dea3a464" title=")LOAD: load a workspace file" alt="" coords="5,5,164,31"/>
-</map>

@@ -1,6 +1,0 @@
-<map id="ZZ::imag" name="ZZ::imag">
-<area shape="rect" id="node1" title="return the imag part of this" alt="" coords="155,55,229,80"/>
-<area shape="rect" id="node2" href="$classDZ.html#a3d3aef9f67edc14d3331de321e99eada" title="return z conjugated" alt="" coords="13,5,99,31"/>
-<area shape="rect" id="node3" href="$classDZ.html#a561d3892d2c3e6e53a95034900356dcc" title="return the imaginary part of x" alt="" coords="5,55,107,80"/>
-<area shape="rect" id="node4" href="$classDZ.html#a104002b2b9b8e1796d6546d428e5d1c7" title="return the inverse of zz" alt="" coords="23,104,89,129"/>
-</map>

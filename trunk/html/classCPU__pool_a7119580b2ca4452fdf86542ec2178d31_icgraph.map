@@ -1,6 +1,0 @@
-<map id="CPU_pool::change_core_count" name="CPU_pool::change_core_count">
-<area shape="rect" id="node1" title="set new active core count, return true on error" alt="" coords="467,23,631,63"/>
-<area shape="rect" id="node2" href="$classQuad__SYL.html#aec0e3350d7316886ebcac043a7b4a033" title="overloaded Symbol::assign_indexed()" alt="" coords="236,5,419,31"/>
-<area shape="rect" id="node4" href="$classParallel.html#a187281fddfd8c5b100ceb4c04153b9de" title="initialize" alt="" coords="282,55,373,80"/>
-<area shape="rect" id="node3" href="$classQuad__SYL.html#a3a73a2d9505f81a66a5a9f6aacc31ce0" title="overloaded Symbol::assign_indexed()" alt="" coords="5,5,188,31"/>
-</map>

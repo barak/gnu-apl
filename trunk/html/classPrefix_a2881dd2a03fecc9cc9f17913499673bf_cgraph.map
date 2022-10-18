@@ -1,4 +1,0 @@
-<map id="Prefix::at0" name="Prefix::at0">
-<area shape="rect" id="node1" title="return the leftmost token (e.g. A in A←B)" alt="" coords="5,5,88,31"/>
-<area shape="rect" id="node2" href="$classPrefix.html#a07a35c8b69a8c9f685225e2a2586a2fd" title="return the number of token currently in the FIFO" alt="" coords="136,5,224,31"/>
-</map>

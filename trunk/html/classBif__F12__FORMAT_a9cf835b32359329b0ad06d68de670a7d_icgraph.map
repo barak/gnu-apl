@@ -1,7 +1,0 @@
-<map id="Bif_F12_FORMAT::is_control_char" name="Bif_F12_FORMAT::is_control_char">
-<area shape="rect" id="node1" title="Return true iff uni is &#39;0&#39; .. &#39;9&#39;, comma, or full&#45;stop." alt="" coords="456,47,604,87"/>
-<area shape="rect" id="node2" href="$classQuad__FC.html#aa38e75ae45ea6f7b88ea24e02075ad3c" title="overloaded Symbol::assign()." alt="" coords="257,5,381,31"/>
-<area shape="rect" id="node4" href="$classQuad__FC.html#a57ec0637b3d519da4a9537d9cf593129" title="overloaded Symbol::assign_indexed()." alt="" coords="231,55,407,80"/>
-<area shape="rect" id="node5" href="$structBif__F12__FORMAT_1_1Format__LIFER.html#a8ae85726d6ff5657a4f2a77deaf4a608" title="constructor" alt="" coords="229,105,408,145"/>
-<area shape="rect" id="node3" href="$classQuad__FC.html#a96387561d24ab0767a8138a00553a788" title="overloaded Symbol::assign_indexed()." alt="" coords="5,5,181,31"/>
-</map>

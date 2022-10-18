@@ -1,4 +1,0 @@
-<map id="InputFile::echo_current_file" name="InputFile::echo_current_file">
-<area shape="rect" id="node1" title="true if echo (of the input) is on for the current file" alt="" coords="173,5,352,31"/>
-<area shape="rect" id="node2" href="$classCinOut.html#a5f830e6831ee77abc91579d7ed5feace" title="overloaded filebuf::overflow" alt="" coords="5,5,125,31"/>
-</map>

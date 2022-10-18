@@ -1,4 +1,0 @@
-<map id="Avec::is_number" name="Avec::is_number">
-<area shape="rect" id="node1" title="return true iff av is a number char (digit, .)" alt="" coords="5,5,125,31"/>
-<area shape="rect" id="node2" href="$classAvec.html#af6b90a707281ad128da1764d92d85cd7" title="Return true iff av is a digit (i.e. 0 ≤ av ≤ 9)" alt="" coords="173,5,275,31"/>
-</map>

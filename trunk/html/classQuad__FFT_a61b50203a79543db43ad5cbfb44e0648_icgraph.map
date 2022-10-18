@@ -1,6 +1,0 @@
-<map id="Quad_FFT::init_in" name="Quad_FFT::init_in">
-<area shape="rect" id="node1" title="initialize in from B" alt="" coords="368,31,495,56"/>
-<area shape="rect" id="node2" href="$classQuad__FFT.html#a7a8006752a7ad3e4305c26f98355e7a3" title="compute forward or backward FFT" alt="" coords="195,31,320,56"/>
-<area shape="rect" id="node3" href="$classQuad__FFT.html#abe78e9a1a769c4f4c66ed9d2a6f2d9d3" title="overloaded Function::eval_AB()" alt="" coords="5,5,147,31"/>
-<area shape="rect" id="node4" href="$classQuad__FFT.html#ae726108d3bf0f2ffcf83d3ce29bd3297" title="overloaded Function::eval_B()" alt="" coords="10,55,142,80"/>
-</map>

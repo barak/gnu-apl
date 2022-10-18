@@ -1,8 +1,0 @@
-<map id="PrintBuffer::align_j" name="PrintBuffer::align_j">
-<area shape="rect" id="node1" title="align this complex PrintBuffer to col" alt="" coords="5,93,135,118"/>
-<area shape="rect" id="node2" href="$classPrintBuffer.html#a1cedbbcfe6835e1d3a2d02b9f2334c2c" title="print properties of this PrintBuffer" alt="" coords="183,43,309,69"/>
-<area shape="rect" id="node5" href="$classPrintBuffer.html#a9bd0c0bdbbfe10fc25285c3f659f433c" title="prepend buffer with count characters pad" alt="" coords="185,93,307,118"/>
-<area shape="rect" id="node6" href="$classPrintBuffer.html#adef4048693e699b9bfac4b2adf719f63" title="append count charactera pad to buffer" alt="" coords="184,142,308,167"/>
-<area shape="rect" id="node3" href="$classPrintBuffer.html#af6f689e8c4e930b7c37099bf5fdfe57d" title="return the number of columns" alt="" coords="357,29,516,69"/>
-<area shape="rect" id="node4" href="$classPrintBuffer.html#ac13295601812e379a3eac618ce239426" title="return the number of rows" alt="" coords="367,93,506,133"/>
-</map>

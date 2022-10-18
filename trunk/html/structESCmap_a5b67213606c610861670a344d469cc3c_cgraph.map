@@ -1,4 +1,0 @@
-<map id="ESCmap::need_more" name="ESCmap::need_more">
-<area shape="rect" id="node1" title="return true if an entry has prefix seq of length len" alt="" coords="5,5,152,31"/>
-<area shape="rect" id="node2" href="$structESCmap.html#af6cbce2074f2cc32f20d8d7fb48db905" title="return true if seq is a true prefix of this ESCmap" alt="" coords="200,5,343,31"/>
-</map>

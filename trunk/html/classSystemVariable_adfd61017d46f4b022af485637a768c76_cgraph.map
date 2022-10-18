@@ -1,5 +1,0 @@
-<map id="SystemVariable::get_token" name="SystemVariable::get_token">
-<area shape="rect" id="node1" title="return the TokenTag for this system variable" alt="" coords="5,23,145,63"/>
-<area shape="rect" id="node2" href="$classNamedObject.html#a3ff29d3b8f3eed6c55f535e1af8dbc91" title="return the Id of this object (ID_USER_SYMBOL for user defined objects)" alt="" coords="193,5,340,31"/>
-<area shape="rect" id="node3" href="$classID.html#a4e45a9557dbd8b94bcdf0ecbe280a386" title="return the TokenTag for id" alt="" coords="203,55,330,80"/>
-</map>

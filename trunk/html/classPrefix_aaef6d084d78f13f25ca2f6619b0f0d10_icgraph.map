@@ -1,4 +1,0 @@
-<map id="Prefix::unmark_all_values" name="Prefix::unmark_all_values">
-<area shape="rect" id="node1" title="clear the mark flag of all values in this Prefix" alt="" coords="208,5,335,45"/>
-<area shape="rect" id="node2" href="$classStateIndicator.html#a275a02d6a84b6dc259fa9c5e74d56c65" title="clear the marked bit in the executable, in the fun_oper_cache, and in all parsers" alt="" coords="5,5,160,45"/>
-</map>

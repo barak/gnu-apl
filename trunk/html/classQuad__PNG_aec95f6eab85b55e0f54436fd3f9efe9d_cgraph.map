@@ -1,6 +1,0 @@
-<map id="Quad_PNG::write_PNG_file" name="Quad_PNG::write_PNG_file">
-<area shape="rect" id="node1" title="write APL pixel matrix B PNG file filename" alt="" coords="5,55,191,80"/>
-<area shape="rect" id="node2" href="$Quad__PNG_8cc.html#a3943cc310023d7accfbb3ee9c711edf1" title="callback for libpng errors" alt="" coords="280,5,353,31"/>
-<area shape="rect" id="node3" href="$Quad__PNG_8cc.html#a433f99e363c749b4713e3567f3e80b75" title="callback for libpng warnings" alt="" coords="273,55,360,80"/>
-<area shape="rect" id="node4" href="$classQuad__PNG.html#a501d4ceea254cf504a991b9d58a65c81" title="return true iff the combination of color_type and bit_depth is valid in the PNG standard AND supporte..." alt="" coords="239,105,395,145"/>
-</map>

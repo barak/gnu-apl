@@ -1,9 +1,0 @@
-<map id="Backtrace::caller" name="Backtrace::caller">
-<area shape="rect" id="node2" href="$classBacktrace.html#aeacff0c96a9f9cb8f92088e549e44bb5" title="show the current function call stack. " alt="" coords="189,5,309,32"/>
-<area shape="rect" id="node3" href="$classUCS__string.html#a8c862d40c28f79f092c0b9518560defc" title="return this string HTML&#45;escaped, starting at offset, and using   for blanks " alt="" coords="173,56,325,83"/>
-<area shape="rect" id="node4" href="$classDoxy.html#adb0f60780eef8f3246d952596a3a19a6" title="HTML&#45;print a table with the SI stack to &#39;page&#39;. " alt="" coords="584,31,693,57"/>
-<area shape="rect" id="node7" href="$classDoxy.html#a76067b55e9395dec0889368d1daa6247" title="write the page for one defined function. If the define function is a named lambda, then lambda_owner is the Symbol to which the lambda was assigned. " alt="" coords="373,81,516,108"/>
-<area shape="rect" id="node5" href="$classDoxy.html#ad8abe2e8a1b686a7b35e582c369d41ae" title="generate the entire documentation " alt="" coords="761,56,844,83"/>
-<area shape="rect" id="node6" href="$classCommand.html#a834eac0e797a5d1c992018b7d0c049a4" title="]DOXY: create doxygen&#45;like documentation of the current workspace " alt="" coords="892,56,1052,83"/>
-<area shape="rect" id="node8" href="$classDoxy.html#af9ca0f4064c30a802fa110c53d42c37b" title="HTML&#45;print a table containing all defined functions to page. " alt="" coords="564,81,713,108"/>
-</map>

@@ -1,5 +1,0 @@
-<map id="REGISTER_PROCESSOR_c::print" name="REGISTER_PROCESSOR_c::print">
-<area shape="rect" id="node1" title="print this signal on out." alt="" coords="5,23,189,63"/>
-<area shape="rect" id="node2" href="$classSig__item__int.html#ae23ccce7226c3f3fdc793e3781505e21" title="print the item" alt="" coords="247,5,373,31"/>
-<area shape="rect" id="node3" href="$classSig__item__string.html#a52521fb1d4864b1b56f9efe3d46ef445" title="print the item" alt="" coords="237,55,383,80"/>
-</map>

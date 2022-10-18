@@ -1,4 +1,0 @@
-<map id="Value::get_wscalar" name="Value::get_wscalar">
-<area shape="rect" id="node1" title="return the first element of the ravel of a scalar value. Same as get_wfirst(), but named differently ..." alt="" coords="204,5,337,31"/>
-<area shape="rect" id="node2" href="$classValue.html#a5be5b6031f53082438fa9de824732fbe" title="assign val to the cell references in this value." alt="" coords="5,5,156,31"/>
-</map>

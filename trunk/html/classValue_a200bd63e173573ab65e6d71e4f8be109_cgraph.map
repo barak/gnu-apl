@@ -1,7 +1,0 @@
-<map id="Value::debug" name="Value::debug">
-<area shape="rect" id="node1" title="debug&#45;print this value" alt="" coords="5,94,104,119"/>
-<area shape="rect" id="node2" href="$classPrintBuffer.html#a1cedbbcfe6835e1d3a2d02b9f2334c2c" title="print properties of this PrintBuffer" alt="" coords="186,69,313,94"/>
-<area shape="rect" id="node5" href="$classWorkspace.html#a002e2f097bece67c9d082b7c89db11ae" title="return style and the current ⎕PP, and ⎕PW" alt="" coords="152,118,347,143"/>
-<area shape="rect" id="node3" href="$classPrintBuffer.html#af6f689e8c4e930b7c37099bf5fdfe57d" title="return the number of columns" alt="" coords="395,29,553,69"/>
-<area shape="rect" id="node4" href="$classPrintBuffer.html#ac13295601812e379a3eac618ce239426" title="return the number of rows" alt="" coords="405,93,543,133"/>
-</map>

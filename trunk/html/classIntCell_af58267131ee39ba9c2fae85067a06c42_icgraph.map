@@ -1,7 +1,0 @@
-<map id="IntCell::z_1" name="IntCell::z_1">
-<area shape="rect" id="node1" title="initialize the (un&#45;initialized) Cell *Z to integer ¯1" alt="" coords="376,55,465,80"/>
-<area shape="rect" id="node2" href="$classFloatCell.html#a5d4d04d8663628bac8adea9e713a7c76" title="Overloaded from the corresponding Cell:: function (see class Cell)." alt="" coords="176,5,328,31"/>
-<area shape="rect" id="node3" href="$classIntCell.html#a0cfcfcc6b43e135bc481122227d7c186" title="overloaded Cell::bif_power()" alt="" coords="190,55,314,80"/>
-<area shape="rect" id="node4" href="$classIntCell.html#ae84ca4d16ef27bdff877f2caa728d093" title="overloaded from the corresponding Cell:: function (see class Cell)" alt="" coords="179,104,325,129"/>
-<area shape="rect" id="node5" href="$classIntCell.html#a4b99fe69953fa5c1228d1c508508ce52" title="overloaded Cell::bif_divide()" alt="" coords="5,104,128,129"/>
-</map>

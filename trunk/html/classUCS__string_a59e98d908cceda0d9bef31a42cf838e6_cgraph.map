@@ -1,4 +1,0 @@
-<map id="UCS_string::substr_pos" name="UCS_string::substr_pos">
-<area shape="rect" id="node1" title="return the start position of sub in this string or &#45;1 if sub is not contained in this string" alt="" coords="5,5,168,31"/>
-<area shape="rect" id="node2" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="216,5,339,31"/>
-</map>

@@ -1,4 +1,0 @@
-<map id="FloatCell::map_FC" name="FloatCell::map_FC">
-<area shape="rect" id="node1" title="replace normal chars by special chars specified in ⎕FC" alt="" coords="220,5,352,31"/>
-<area shape="rect" id="node2" href="$classUCS__string.html#aa1e49e488f5c1093a83b7c3aa4009d70" title="constructor: UCS_string from a double with quad_pp valid digits. (eg. 3.33 has 3 digits),..." alt="" coords="5,5,172,31"/>
-</map>

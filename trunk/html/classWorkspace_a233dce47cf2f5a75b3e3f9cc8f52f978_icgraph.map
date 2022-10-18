@@ -1,7 +1,0 @@
-<map id="Workspace::get_RL" name="Workspace::get_RL">
-<area shape="rect" id="node1" title="return the Quad&#45;RL (to be taken % mod)" alt="" coords="219,80,357,105"/>
-<area shape="rect" id="node2" href="$classComplexCell.html#a69ca7247a26db55fdb7f7264ea066b63" title="overloaded from the corresponding Cell:: function (see class Cell)." alt="" coords="17,5,159,31"/>
-<area shape="rect" id="node3" href="$classFloatCell.html#a6723d1250207bdfaed8a63ea224c8986" title="Overloaded from the corresponding Cell:: function (see class Cell)." alt="" coords="28,55,148,80"/>
-<area shape="rect" id="node4" href="$classIntCell.html#a265004ec0692ee51f8cad70012c2ba7d" title="overloaded from the corresponding Cell:: function (see class Cell)" alt="" coords="35,104,141,129"/>
-<area shape="rect" id="node5" href="$classBif__F12__ROLL.html#afe59b85a350624fff7937205cb603307" title="dial A from B. overloaded Function::eval_AB()." alt="" coords="5,153,171,179"/>
-</map>

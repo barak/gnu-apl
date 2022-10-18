@@ -1,6 +1,0 @@
-<map id="StateIndicator::get_line" name="StateIndicator::get_line">
-<area shape="rect" id="node1" title="return the current line number" alt="" coords="5,31,161,56"/>
-<area shape="rect" id="node2" href="$classExecutable.html#acc35b347a5624e399f271c27778a2dbb" title="get the line number for pc" alt="" coords="217,5,357,31"/>
-<area shape="rect" id="node3" href="$classStateIndicator.html#a93fdf9b10d3c4253c3d79e018c799fcb" title="return the current PC" alt="" coords="209,55,364,80"/>
-<area shape="rect" id="node4" href="$classPrefix.html#ade9d0ae7c2c578907265991484876535" title="return the current PC" alt="" coords="412,55,520,80"/>
-</map>

@@ -1,4 +1,0 @@
-<map id="setup_font_gc" name="setup_font_gc">
-<area shape="rect" id="node1" title="return a xcb_gcontext_t for font font_name" alt="" coords="132,5,236,31"/>
-<area shape="rect" id="node2" href="$Plot__xcb_8cc.html#a897990543dc934261ba8e7a124446b11" title="the pthread that handles one plot window." alt="" coords="5,5,84,31"/>
-</map>

@@ -1,5 +1,0 @@
-<map id="UserPreferences::is_APL_script" name="UserPreferences::is_APL_script">
-<area shape="rect" id="node1" title="return true if file filename is an APL script (has execute permission and starts with #!" alt="" coords="367,5,505,45"/>
-<area shape="rect" id="node2" href="$structUserPreferences.html#a39abf091d48a0ddafa59606a28eec8a6" title="expand lumped arguments" alt="" coords="116,13,319,38"/>
-<area shape="rect" id="node3" href="$main_8cc.html#aa0321421b17def7b58fc0cabc8890260" title="initialize the interpreter" alt="" coords="5,13,68,38"/>
-</map>

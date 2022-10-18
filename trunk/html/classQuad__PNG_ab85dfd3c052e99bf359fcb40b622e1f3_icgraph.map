@@ -1,4 +1,0 @@
-<map id="Quad_PNG::read_PNG_file" name="Quad_PNG::read_PNG_file">
-<area shape="rect" id="node1" title="read PNG file filename and return its pixels as 4×N×M matrix" alt="" coords="191,5,373,31"/>
-<area shape="rect" id="node2" href="$classQuad__PNG.html#a0db0711b85fe1d914c413f6679458802" title="overloaded Function::eval_B()" alt="" coords="5,5,143,31"/>
-</map>

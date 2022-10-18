@@ -1,5 +1,0 @@
-<map id="draw_point" name="draw_point">
-<area shape="rect" id="node1" title="draw a plot point (representing one data value) at position xy" alt="" coords="5,5,91,31"/>
-<area shape="rect" id="node2" href="$Plot__xcb_8cc.html#abb3a45e07e2c89cd4db26199d9ebccaf" title="set the foreground color of a xcb_gcontext_t" alt="" coords="139,5,273,31"/>
-<area shape="rect" id="node3" href="$Plot__xcb_8cc.html#a5461d12dc379b438dce62186d2c07f20" title="set the an attribute of a xcb_gcontext_t" alt="" coords="321,5,415,31"/>
-</map>

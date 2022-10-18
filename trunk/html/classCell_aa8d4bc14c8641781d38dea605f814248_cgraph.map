@@ -1,5 +1,0 @@
-<map id="Cell::is_near_bool" name="Cell::is_near_bool">
-<area shape="rect" id="node1" title="return true iff value is numeric and close to 0 or 1" alt="" coords="5,31,132,56"/>
-<area shape="rect" id="node2" href="$classCell.html#a9aa348b66fb831af844bbb3bdff44b66" title="return true iff value is numeric and close to 1" alt="" coords="182,5,305,31"/>
-<area shape="rect" id="node3" href="$classCell.html#a0070bc8a15c9ea3742aea0f9407ab934" title="return true iff value is numeric and close to 0" alt="" coords="180,55,307,80"/>
-</map>

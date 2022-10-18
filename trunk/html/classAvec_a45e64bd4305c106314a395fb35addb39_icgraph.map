@@ -1,5 +1,0 @@
-<map id="Avec::is_single_quote" name="Avec::is_single_quote">
-<area shape="rect" id="node1" title="return true iff av is one of the single quote characters &#39; ‘ or ’" alt="" coords="395,13,545,38"/>
-<area shape="rect" id="node2" href="$classTokenizer.html#a0682563437325fa3d9f6330a971e7a36" title="tokenize a single quoted string" alt="" coords="211,5,347,45"/>
-<area shape="rect" id="node3" href="$classTokenizer.html#a9c9924450a3c4dd6076911aa8f342171" title="tokenize UCS string input into token string tos." alt="" coords="5,13,163,38"/>
-</map>

@@ -1,4 +1,0 @@
-<map id="Token::is_void" name="Token::is_void">
-<area shape="rect" id="node1" title="return true iff this token has no value" alt="" coords="5,5,112,31"/>
-<area shape="rect" id="node2" href="$classToken.html#a1a31afbb07e3f1dbb86d5f872ce5c297" title="return the TokenValueType of this token." alt="" coords="160,5,313,31"/>
-</map>

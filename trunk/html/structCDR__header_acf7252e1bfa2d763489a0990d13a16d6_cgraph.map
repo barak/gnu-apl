@@ -1,4 +1,0 @@
-<map id="CDR_header::get_nelm" name="CDR_header::get_nelm">
-<area shape="rect" id="node1" title="return the number of elements in host endian" alt="" coords="5,5,164,31"/>
-<area shape="rect" id="node2" href="$structCDR__header.html#a575c6483cca55f908908fbe59c975752" title="convert big endian 32 bit value to 32 bit host value (== ntohl())" alt="" coords="212,5,371,31"/>
-</map>

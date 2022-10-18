@@ -1,8 +1,0 @@
-<map id="Prefix::locate_X" name="Prefix::locate_X">
-<area shape="rect" id="node1" title="return the axis argument of a failed primitive function (if any)" alt="" coords="5,55,120,80"/>
-<area shape="rect" id="node2" href="$classToken.html#a8c8bd515f80f71dbe213125c32cefd19" title="return the address of the Value_P value of this token." alt="" coords="168,29,307,55"/>
-<area shape="rect" id="node6" href="$classPrefix.html#a07a35c8b69a8c9f685225e2a2586a2fd" title="return the number of token currently in the FIFO" alt="" coords="193,79,281,104"/>
-<area shape="rect" id="node3" href="$unionToken_1_1sval.html#a22a0be9d3742c2a8168e59d530dd659e" title="a shortcut for accessing apl_val" alt="" coords="355,5,501,31"/>
-<area shape="rect" id="node4" href="$classToken.html#a11e37aa69b8eb64f293702293b00f50c" title="return true iff this token is an apl value" alt="" coords="366,55,490,80"/>
-<area shape="rect" id="node5" href="$classToken.html#a1a31afbb07e3f1dbb86d5f872ce5c297" title="return the TokenValueType of this token." alt="" coords="549,55,703,80"/>
-</map>

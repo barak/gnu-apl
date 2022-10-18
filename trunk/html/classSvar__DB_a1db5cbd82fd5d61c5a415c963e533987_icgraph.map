@@ -1,5 +1,0 @@
-<map id="Svar_DB::APserver_available" name="Svar_DB::APserver_available">
-<area shape="rect" id="node1" title="return true if the connection to APserver is up" alt="" coords="196,35,391,60"/>
-<area shape="rect" id="node2" href="$classSvar__DB.html#a888eb02324ac05c16bd820d13937d991" title="open (and possibly initialize) the shared variable database" alt="" coords="27,5,127,31"/>
-<area shape="rect" id="node3" href="$classSvar__record__P.html#aae435bcd8b70390ab066782a478c4bb5" title="constructor: fetch record with key key from APserver" alt="" coords="5,55,148,95"/>
-</map>

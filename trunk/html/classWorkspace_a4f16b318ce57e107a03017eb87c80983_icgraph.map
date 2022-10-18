@@ -1,9 +1,0 @@
-<map id="Workspace::SI_top_fun" name="Workspace::SI_top_fun">
-<area shape="rect" id="node1" title="the topmost SI with parse mode PM_FUNCTION" alt="" coords="689,80,848,105"/>
-<area shape="rect" id="node2" href="$classQuad__L.html#ac7853dccb87b43b644e307ec3d140608" title="overloaded Symbol::assign()" alt="" coords="499,5,613,31"/>
-<area shape="rect" id="node3" href="$classQuad__R.html#a1c59d295f67723e023348a8476e05fb2" title="overloaded Symbol::assign()" alt="" coords="498,55,614,80"/>
-<area shape="rect" id="node4" href="$classQuad__X.html#a7498eb3d92143d88eaf3c3a4b062dce1" title="overloaded Symbol::assign()" alt="" coords="499,104,613,129"/>
-<area shape="rect" id="node5" href="$classCommand.html#a879617e7645bea2e4052154f16999634" title="finish the current SI&#45;&gt;top() and pop it when done" alt="" coords="471,153,641,179"/>
-<area shape="rect" id="node6" href="$classCommand.html#af36741357bfd4e183b34ee8b747bc7c5" title="process line which contains APL statements" alt="" coords="216,153,423,179"/>
-<area shape="rect" id="node7" href="$classCommand.html#ae26693534d4df16372f51e55e505b8d7" title="process line which contains a command or statements" alt="" coords="5,153,168,179"/>
-</map>

@@ -1,5 +1,0 @@
-<map id="IntCell::bif_negative" name="IntCell::bif_negative">
-<area shape="rect" id="node1" title="overloaded from the corresponding Cell:: function (see class Cell)" alt="" coords="203,31,341,56"/>
-<area shape="rect" id="node2" href="$classIntCell.html#a90eb8f9c50ea1ca3fa974199cf5cc5dd" title="overloaded from the corresponding Cell:: function (see class Cell)" alt="" coords="5,5,155,31"/>
-<area shape="rect" id="node3" href="$classIntCell.html#a501cbdaa250c9a9fdfe11cb461058710" title="overloaded Cell::bif_subtract()" alt="" coords="12,55,148,80"/>
-</map>

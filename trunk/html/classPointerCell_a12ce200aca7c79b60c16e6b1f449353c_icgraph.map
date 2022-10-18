@@ -1,4 +1,0 @@
-<map id="PointerCell::compare" name="PointerCell::compare">
-<area shape="rect" id="node1" title="compare this with other, throw DOMAIN ERROR on illegal comparisons" alt="" coords="188,29,332,55"/>
-<area shape="rect" id="node2" href="$classPointerCell.html#a62bd5b43e13b7abfdeb9d4fade773ee2" title="overloaded Cell::greater()" alt="" coords="5,29,140,55"/>
-</map>

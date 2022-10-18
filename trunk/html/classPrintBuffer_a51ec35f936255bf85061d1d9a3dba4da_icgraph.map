@@ -1,6 +1,0 @@
-<map id="PrintBuffer::append_col" name="PrintBuffer::append_col">
-<area shape="rect" id="node1" title="append PrintBuffer pb1 to this PrintBuffer" alt="" coords="463,42,621,67"/>
-<area shape="rect" id="node2" href="$classBif__F12__FORMAT.html#ad945541c06e489c1079ae401f4d1db28" title="A character array with B formatted by specification." alt="" coords="240,35,415,75"/>
-<area shape="rect" id="node3" href="$classBif__F12__DOMINO_1_1Matrix.html#ad45f8929c6f666dea17836a79c657456" title="print debug infos for this real matrix" alt="" coords="12,5,185,45"/>
-<area shape="rect" id="node4" href="$classBif__F12__FORMAT.html#a5164cf7d2b85131b9c9fa11c3239602a" title="Overloaded Function::eval_AB()" alt="" coords="5,70,192,95"/>
-</map>

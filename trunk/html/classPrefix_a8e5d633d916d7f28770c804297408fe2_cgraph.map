@@ -1,8 +1,0 @@
-<map id="Prefix::is_value_bracket" name="Prefix::is_value_bracket">
-<area shape="rect" id="node1" title="read and resolve the token class left of [ ... ], PC is at ]" alt="" coords="5,95,168,121"/>
-<area shape="rect" id="node2" href="$classPrefix.html#afdd4d7c0aa09d4bc4c9d8588d3872bd6" title="return the current assignment state" alt="" coords="230,5,357,45"/>
-<area shape="rect" id="node3" href="$classToken.html#a049cd3eb72ae0c6427e523d399876b86" title="return the TokenClass of this token." alt="" coords="231,70,356,95"/>
-<area shape="rect" id="node4" href="$classToken.html#a7ca97b588068b17bd396d8ae9d30ea7a" title="return the Symbol * value of this token" alt="" coords="224,119,363,145"/>
-<area shape="rect" id="node6" href="$classSymbol.html#a211389ecadf001bc448ac70dbc6c28de" title="return the token class of this Symbol WITHOUT calling resolve()" alt="" coords="216,169,371,194"/>
-<area shape="rect" id="node5" href="$classToken.html#a1a31afbb07e3f1dbb86d5f872ce5c297" title="return the TokenValueType of this token." alt="" coords="419,119,572,145"/>
-</map>

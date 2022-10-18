@@ -1,6 +1,0 @@
-<map id="Executable::print_token" name="Executable::print_token">
-<area shape="rect" id="node1" title="print this user defined executable to out" alt="" coords="5,31,164,56"/>
-<area shape="rect" id="node2" href="$classToken__string.html#a08d6f453bc7850828e3f664f00dfa624" title="print this token string" alt="" coords="212,31,343,56"/>
-<area shape="rect" id="node3" href="$classToken.html#abbcd765b2cb1c9da24d762ca451eefa4" title="return the float value of this token" alt="" coords="391,5,517,31"/>
-<area shape="rect" id="node4" href="$classToken.html#a1a31afbb07e3f1dbb86d5f872ce5c297" title="return the TokenValueType of this token." alt="" coords="565,31,719,56"/>
-</map>

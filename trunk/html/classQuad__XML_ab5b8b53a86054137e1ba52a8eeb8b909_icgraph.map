@@ -1,5 +1,0 @@
-<map id="Quad_XML::path_split" name="Quad_XML::path_split">
-<area shape="rect" id="node1" title="&quot;M1&quot; M2&quot; ... &quot;Mn&quot; ← &quot;M1.M2...Mn&quot;" alt="" coords="420,5,571,31"/>
-<area shape="rect" id="node2" href="$classQuad__XML.html#ad5de89a09c7528bcea93377a1f9424a8" title="overloaded Function::eval_AB()" alt="" coords="5,5,149,31"/>
-<area shape="rect" id="node3" href="$classQuad__XML.html#a2c3c8a5e317d6e322a52426b36d1e233" title="iterator: return the next member after A in structured value B" alt="" coords="197,31,372,56"/>
-</map>

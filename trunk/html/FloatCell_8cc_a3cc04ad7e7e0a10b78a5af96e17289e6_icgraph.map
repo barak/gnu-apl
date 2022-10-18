@@ -1,8 +1,0 @@
-<map id="p_modulo_q" name="p_modulo_q">
-<area shape="rect" id="node2" href="$classFloatCell.html#ae6357d73eb4a9cd95598ca2d1a32a623" title="Overloaded from the corresponding Cell:: function (see class Cell). " alt="" coords="145,56,291,83"/>
-<area shape="rect" id="node3" href="$classFloatCell.html#ab33d5fb8782321e100cec38cbed5ea18" title="Overloaded Cell::is_finite(). " alt="" coords="377,5,504,32"/>
-<area shape="rect" id="node4" href="$classIntCell.html#a9e1eae19e23516df1eb5350a10883e24" title="overloaded from the corresponding Cell:: function (see class Cell) " alt="" coords="375,56,506,83"/>
-<area shape="rect" id="node7" href="$classBif__F12__ENCODE.html#a42891c138d5ceb942cc1d6fda44d7d27" title="encode *ib() according to A " alt="" coords="339,107,543,133"/>
-<area shape="rect" id="node5" href="$classIntCell.html#a57acd6c6da8ad45753bb27b304ca597b" title="overloaded Cell::is_integer_cell() " alt="" coords="617,31,768,57"/>
-<area shape="rect" id="node6" href="$classBif__F12__ENCODE.html#a7fdbd7f4683430ee6daeab1014523504" title="encode *ib() according to A (integer A and b) " alt="" coords="591,81,795,108"/>
-</map>

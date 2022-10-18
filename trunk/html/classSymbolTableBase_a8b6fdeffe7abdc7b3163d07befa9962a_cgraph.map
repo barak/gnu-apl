@@ -1,6 +1,0 @@
-<map id="SymbolTableBase::add_symbol" name="SymbolTableBase::add_symbol">
-<area shape="rect" id="node1" title="add sym to the symbol table. The caller has checked that new_name does not yet exist in the symbol ta..." alt="" coords="5,23,163,63"/>
-<area shape="rect" id="node2" href="$classSymbolTableBase.html#ad231d005a78e9d44f0536aeb1caea62c" title="compute a 16&#45;bit hash for name" alt="" coords="211,31,432,56"/>
-<area shape="rect" id="node3" href="$classUCS__string.html#af5956757116853a2e1bc5a0533624d2e" title="return the FNV (Fowler&#45;Noll&#45;Vo) hash of this_string" alt="" coords="480,5,640,31"/>
-<area shape="rect" id="node4" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="688,31,811,56"/>
-</map>

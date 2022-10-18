@@ -1,5 +1,0 @@
-<map id="FloatCell::map_FC" name="FloatCell::map_FC">
-<area shape="rect" id="node1" title="replace normal chars by special chars specified in ⎕FC" alt="" coords="5,31,137,56"/>
-<area shape="rect" id="node2" href="$classWorkspace.html#a09f10a68b5a249c789bf8c1839f3208c" title="return element pos of the current ⎕FC (pos should be 0..5)" alt="" coords="185,5,324,31"/>
-<area shape="rect" id="node3" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="193,55,316,80"/>
-</map>

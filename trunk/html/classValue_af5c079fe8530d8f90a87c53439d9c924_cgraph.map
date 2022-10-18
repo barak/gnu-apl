@@ -1,5 +1,0 @@
-<map id="Value::get_wravel" name="Value::get_wravel">
-<area shape="rect" id="node1" title="return the (writable) idx&#39;th element of the ravel." alt="" coords="5,5,132,31"/>
-<area shape="rect" id="node2" href="$classValue.html#ac5b54e3a13cab0837442f1575b3299a5" title="return the number of elements, but at least 1 (for the prototype)." alt="" coords="180,5,349,31"/>
-<area shape="rect" id="node3" href="$classShape.html#a6f32f749601dca80263493fd06be12c4" title="return the number of ravel elements, but at least 1 (for empty values and scalars) else product of sh..." alt="" coords="397,5,552,31"/>
-</map>

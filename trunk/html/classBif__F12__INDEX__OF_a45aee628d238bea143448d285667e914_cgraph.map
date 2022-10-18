@@ -1,5 +1,0 @@
-<map id="Bif_F12_INDEX_OF::bs_cmp" name="Bif_F12_INDEX_OF::bs_cmp">
-<area shape="rect" id="node1" title="compare function for Heapsort&lt;ShapeItem&gt;::search&lt;const Cell &amp;&gt;" alt="" coords="5,31,200,56"/>
-<area shape="rect" id="node2" href="$classCell.html#ab5bc0bd0d336863996b9b5bc58f3ddef" title="compare this with other, throw DOMAIN ERROR on illegal comparisons" alt="" coords="265,5,367,31"/>
-<area shape="rect" id="node3" href="$classCell.html#ae98b3988a7fa52c6c157b4911b043dde" title="Return true iff this cell is a pointer (to a sub&#45;array) cell." alt="" coords="248,55,384,80"/>
-</map>

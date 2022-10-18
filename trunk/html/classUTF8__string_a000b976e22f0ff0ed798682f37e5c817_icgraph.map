@@ -1,6 +1,0 @@
-<map id="UTF8_string::round_0_1" name="UTF8_string::round_0_1">
-<area shape="rect" id="node1" title="round a digit string is the fractional part of a number between 0.0... and 0.9... up or down accordin..." alt="" coords="607,13,769,38"/>
-<area shape="rect" id="node2" href="$classTokenizer.html#a866fc216ee57f7072f3c61d3615b1742" title="tokenize a real number (integer or floating point)." alt="" coords="395,13,559,38"/>
-<area shape="rect" id="node3" href="$classTokenizer.html#aa5b5fd6f253e7318f319d1419023e5bf" title="tokenize a number (integer, floating point, or complex)." alt="" coords="211,5,347,45"/>
-<area shape="rect" id="node4" href="$classTokenizer.html#a9c9924450a3c4dd6076911aa8f342171" title="tokenize UCS string input into token string tos." alt="" coords="5,13,163,38"/>
-</map>

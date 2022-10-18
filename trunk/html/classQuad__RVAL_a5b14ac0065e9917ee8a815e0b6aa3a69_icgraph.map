@@ -1,8 +1,0 @@
-<map id="Quad_RVAL::result_maxdepth" name="Quad_RVAL::result_maxdepth">
-<area shape="rect" id="node1" title="set or return the desired max. depth of random numbers" alt="" coords="679,80,877,105"/>
-<area shape="rect" id="node2" href="$classQuad__RVAL.html#a4c008e4ca5104e6626d44bfc97091b0c" title="do eval_AB(A, B);" alt="" coords="457,80,631,105"/>
-<area shape="rect" id="node3" href="$classQuad__RVAL.html#a81c1da0db16f22bf6f91e554a655828b" title="do eval_B(B);" alt="" coords="245,55,409,80"/>
-<area shape="rect" id="node6" href="$classQuad__RVAL.html#a1ee05c8d88a524dcc24c52f25c609cab" title="overloaded Function::eval_AB()" alt="" coords="251,104,403,129"/>
-<area shape="rect" id="node4" href="$classQuad__RVAL.html#a7d40e7a59f23d2d062027b9deee5eaf5" title="overloaded Function::eval_B()" alt="" coords="30,5,173,31"/>
-<area shape="rect" id="node5" href="$classQuad__RVAL.html#a21dfbb10ecc92dcb3275383d12c86289" title="initialize cell with a random nested value" alt="" coords="5,55,197,80"/>
-</map>

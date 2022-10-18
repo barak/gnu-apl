@@ -1,6 +1,0 @@
-<map id="UCS_string::is_comment_or_label" name="UCS_string::is_comment_or_label">
-<area shape="rect" id="node1" title="return true if this string starts with # or ⍝ or x:" alt="" coords="5,23,175,63"/>
-<area shape="rect" id="node2" href="$classAvec.html#a76a72fdcb1782be1c490b3670c45504f" title="Return true iff av is a valid char in a user defined symbol." alt="" coords="223,5,373,31"/>
-<area shape="rect" id="node4" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="237,55,359,80"/>
-<area shape="rect" id="node3" href="$classAvec.html#afe30f62f26ec74019a95e5cbd6eaa111" title="Find av in character_table. Return position or Invalid_CHT." alt="" coords="421,5,535,31"/>
-</map>

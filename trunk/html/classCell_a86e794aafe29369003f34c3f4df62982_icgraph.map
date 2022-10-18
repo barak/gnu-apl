@@ -1,4 +1,0 @@
-<map id="Cell::bif_negative" name="Cell::bif_negative">
-<area shape="rect" id="node1" title="store the negative of the value of this Cell in Z" alt="" coords="220,5,343,31"/>
-<area shape="rect" id="node2" href="$classBif__F12__MINUS.html#a2e3cea00d72e560ecdfc904011d5ebba" title="overloaded Function::eval_B()." alt="" coords="5,5,172,31"/>
-</map>

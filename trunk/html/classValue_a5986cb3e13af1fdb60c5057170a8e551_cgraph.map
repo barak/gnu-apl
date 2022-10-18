@@ -1,4 +1,0 @@
-<map id="Value::is_empty" name="Value::is_empty">
-<area shape="rect" id="node1" title="return true iff this value is empty (some dimension is 0)." alt="" coords="5,5,121,31"/>
-<area shape="rect" id="node2" href="$classShape.html#a3a7c1dfbab2d8c181f0e1153a5736249" title="return true iff this shape is empty (some dimension is 0)." alt="" coords="169,5,289,31"/>
-</map>

@@ -1,6 +1,0 @@
-<map id="Quad_INP::read_strings" name="Quad_INP::read_strings">
-<area shape="rect" id="node1" title="read raw_lines from stdin or file, stop at end_marker" alt="" coords="381,31,544,56"/>
-<area shape="rect" id="node2" href="$classQuad__INP.html#acbb48b1a9762cc3e23008018a8c1f836" title="overloaded Function::eval_AB()." alt="" coords="193,5,333,31"/>
-<area shape="rect" id="node3" href="$classQuad__INP.html#a5867e5abcd804f15c4edf4f272cb975a" title="overloaded Function::eval_B()." alt="" coords="198,55,329,80"/>
-<area shape="rect" id="node4" href="$classQuad__INP.html#ac137efd86abe0a8f7b6082f01165de32" title="overloaded Function::eval_XB()." alt="" coords="5,55,145,80"/>
-</map>

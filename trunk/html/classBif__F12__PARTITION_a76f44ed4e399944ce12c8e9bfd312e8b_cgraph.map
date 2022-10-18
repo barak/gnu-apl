@@ -1,8 +1,0 @@
-<map id="Bif_F12_PARTITION::partition" name="Bif_F12_PARTITION::partition">
-<area shape="rect" id="node1" title="Partition B according to A." alt="" coords="5,73,160,113"/>
-<area shape="rect" id="node2" href="$classShape3.html#a075643abf890c05401f1b7abdc5339cf" title="the dimensions above r the axis" alt="" coords="247,5,328,31"/>
-<area shape="rect" id="node3" href="$classShape3.html#ad3ff2e3be69b9ca0085d211e3ecb2801" title="the dimensions below the axis" alt="" coords="249,55,326,80"/>
-<area shape="rect" id="node4" href="$classShape3.html#a7dda151f14bb5ee7a624372f0b167b7d" title="the axis dimension" alt="" coords="245,104,330,129"/>
-<area shape="rect" id="node5" href="$classShape.html#afcd3708c8c18a30cb3c0c1fa1a630f71" title="modify dimension r" alt="" coords="208,153,367,179"/>
-<area shape="rect" id="node6" href="$classShape.html#a189c92d0b74f3313bd83c8aa7565e9c5" title="recompute volume (after changing a dimension of len 0)" alt="" coords="415,153,592,179"/>
-</map>

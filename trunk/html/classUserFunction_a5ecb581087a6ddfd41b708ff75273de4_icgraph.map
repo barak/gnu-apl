@@ -1,6 +1,0 @@
-<map id="UserFunction::get_header" name="UserFunction::get_header">
-<area shape="rect" id="node2" href="$classDoxy.html#a5e43b207ccb0cfb6e7993dc0c0761030" title="(HTML&#45;)print a function header with the name in bold to file of " alt="" coords="225,5,349,32"/>
-<area shape="rect" id="node3" href="$classDoxy.html#af9ca0f4064c30a802fa110c53d42c37b" title="HTML&#45;print a table containing all defined functions to page. " alt="" coords="397,5,547,32"/>
-<area shape="rect" id="node4" href="$classDoxy.html#ad8abe2e8a1b686a7b35e582c369d41ae" title="generate the entire documentation " alt="" coords="595,5,677,32"/>
-<area shape="rect" id="node5" href="$classCommand.html#a834eac0e797a5d1c992018b7d0c049a4" title="]DOXY: create doxygen&#45;like documentation of the current workspace " alt="" coords="725,5,885,32"/>
-</map>

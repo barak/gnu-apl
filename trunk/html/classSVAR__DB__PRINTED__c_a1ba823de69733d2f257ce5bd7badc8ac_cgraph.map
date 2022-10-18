@@ -1,5 +1,0 @@
-<map id="SVAR_DB_PRINTED_c::store" name="SVAR_DB_PRINTED_c::store">
-<area shape="rect" id="node1" title="store (aka. serialize) this signal into a buffer" alt="" coords="5,5,180,45"/>
-<area shape="rect" id="node2" href="$classSig__item__int.html#a388d7bb49f81f13fcb8b3c006e67fe7f" title="store (aka. serialize) this item into a string" alt="" coords="425,13,556,38"/>
-<area shape="rect" id="node3" href="$classSig__item__string.html#a62d13f45dc7ec4667bf115161bfbfde6" title="store (aka. serialize) this item into a buffer" alt="" coords="228,38,377,63"/>
-</map>

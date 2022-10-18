@@ -1,8 +1,0 @@
-<map id="Bif_F12_DROP::eval_AB" name="Bif_F12_DROP::eval_AB">
-<area shape="rect" id="node1" title="overloaded Function::eval_AB()" alt="" coords="5,104,176,129"/>
-<area shape="rect" id="node2" href="$classShape.html#aeb018b67601d3f1c4bea3d2c2b877b7e" title="add a dimension of length len at the end" alt="" coords="224,5,387,31"/>
-<area shape="rect" id="node3" href="$classShape.html#a017e9a35dd20f4bc4fdeb7ea29b6805d" title="return the rank" alt="" coords="247,55,364,80"/>
-<area shape="rect" id="node4" href="$classShape.html#a592d2ade68aa8c21c5d84627c3a0e001" title="return the length of dimension r" alt="" coords="226,104,385,129"/>
-<area shape="rect" id="node5" href="$classShape.html#af39e05bad7be900fa1437a6eb6035e97" title="return the number of ravel elements (1 for scalars,i else product of shapes)" alt="" coords="238,153,373,179"/>
-<area shape="rect" id="node6" href="$classShape.html#a3a7c1dfbab2d8c181f0e1153a5736249" title="return true iff this shape is empty (some dimension is 0)." alt="" coords="245,203,365,228"/>
-</map>

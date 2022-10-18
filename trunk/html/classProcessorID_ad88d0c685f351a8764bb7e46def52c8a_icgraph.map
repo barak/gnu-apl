@@ -1,4 +1,0 @@
-<map id="ProcessorID::read_procauth" name="ProcessorID::read_procauth">
-<area shape="rect" id="node1" title="read one ProcAuth entry from file" alt="" coords="235,13,420,38"/>
-<area shape="rect" id="node2" href="$classProcessorID.html#a1969cfc66db78cb02eadada806f9d97c" title="read the network profile file from file file" alt="" coords="5,5,187,45"/>
-</map>

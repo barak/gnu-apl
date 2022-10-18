@@ -1,9 +1,0 @@
-<map id="Quad_CR::figure_default" name="Quad_CR::figure_default">
-<area shape="rect" id="node1" title="compute a good default type and value for the top&#45;level ⍴ of 10 ⎕CR. Return true for INT and false fo..." alt="" coords="5,104,172,129"/>
-<area shape="rect" id="node2" href="$classCell.html#a2999919fc2782b3cebfd925c63cc1fac" title="Return the character value of a cell." alt="" coords="225,29,366,55"/>
-<area shape="rect" id="node5" href="$classCell.html#ad165f9ab69abf46b2cf44d301a700a1c" title="Return the integer value of a cell." alt="" coords="230,79,361,104"/>
-<area shape="rect" id="node6" href="$classCell.html#ab3d14978f78ba264d40e9ed1a4823be2" title="Return true iff this cell is a character cell." alt="" coords="220,128,371,153"/>
-<area shape="rect" id="node7" href="$classCell.html#a30d0c83ab2c46ef830cd1301c77eb772" title="Return true iff this cell is an integer cell." alt="" coords="227,177,363,203"/>
-<area shape="rect" id="node3" href="$classCell.html#a38a6a25f0ad091f35e3d9abfe5608a50" title="return the type of this cell" alt="" coords="438,5,569,31"/>
-<area shape="rect" id="node4" href="$classCell.html#a6c3fdef3d82f53649d1c3f16d37eedd7" title="the name of ct" alt="" coords="419,55,588,80"/>
-</map>

@@ -1,7 +1,0 @@
-<map id="Format_sub::size" name="Format_sub::size">
-<area shape="rect" id="node1" title="return the number of characters in format" alt="" coords="459,77,581,102"/>
-<area shape="rect" id="node2" href="$structBif__F12__FORMAT_1_1Format__LIFER.html#a5cd22a769bbf6f3cf0805cebb6d24fc5" title="Print value into int, fract, and expo fields." alt="" coords="232,5,411,45"/>
-<area shape="rect" id="node4" href="$structBif__F12__FORMAT_1_1Format__LIFER.html#a8ae85726d6ff5657a4f2a77deaf4a608" title="constructor" alt="" coords="232,69,411,109"/>
-<area shape="rect" id="node5" href="$structBif__F12__FORMAT_1_1Format__LIFER.html#a563cf0bb3280dcfef6fc60a35d072a62" title="return the size of the format" alt="" coords="232,133,411,173"/>
-<area shape="rect" id="node3" href="$structBif__F12__FORMAT_1_1Format__LIFER.html#ae046e9320007ab09735c27412f2fae29" title="format value by example" alt="" coords="5,5,184,45"/>
-</map>

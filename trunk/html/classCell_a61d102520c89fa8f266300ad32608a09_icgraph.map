@@ -1,4 +1,0 @@
-<map id="Cell::bif_near_int64_t" name="Cell::bif_near_int64_t">
-<area shape="rect" id="node1" title="store the nearby integer of the value of this Cell in Z" alt="" coords="204,5,349,31"/>
-<area shape="rect" id="node2" href="$classBif__F2__OR__B.html#aca40b9b69a30f974ba243019c923b4ff" title="overloaded Function::eval_B()." alt="" coords="5,5,156,31"/>
-</map>

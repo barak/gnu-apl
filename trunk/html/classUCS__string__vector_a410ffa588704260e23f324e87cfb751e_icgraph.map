@@ -1,7 +1,0 @@
-<map id="UCS_string_vector::erase" name="UCS_string_vector::erase">
-<area shape="rect" id="node1" title="replacement for erase(std::vector::iterator position)" alt="" coords="260,73,401,113"/>
-<area shape="rect" id="node2" href="$classCommand.html#a51b8fbdb5d65baf2fddfc930b9b142cf" title=")COPY: copy a workspace file" alt="" coords="29,5,189,31"/>
-<area shape="rect" id="node3" href="$classCommand.html#a2f7425e3673258dfb78045919e82f69f" title=")COPY_ONCE: copy a workspace file, nut at most once" alt="" coords="5,55,212,80"/>
-<area shape="rect" id="node4" href="$classCommand.html#a4afcbbdbee3fd2f536db12651861110b" title=")OUT: export a workspace file" alt="" coords="33,104,184,129"/>
-<area shape="rect" id="node5" href="$classQuad__GTK.html#ab6a35d8bf7fdd5670abad7a190d3bb06" title="overloaded Function::eval_B()" alt="" coords="41,153,176,179"/>
-</map>

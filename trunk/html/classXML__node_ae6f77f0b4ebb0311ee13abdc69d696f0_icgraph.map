@@ -1,8 +1,0 @@
-<map id="XML_node::merge_range" name="XML_node::merge_range">
-<area shape="rect" id="node1" title="merge the items from start(&#45;tag) to (end(&#45;tag) into start tag" alt="" coords="989,31,1156,56"/>
-<area shape="rect" id="node2" href="$classXML__node.html#af7768a8292eebe36599f6d958dde6731" title="collect nodes starting at anchor, return true on error" alt="" coords="811,31,941,56"/>
-<area shape="rect" id="node3" href="$classQuad__XML.html#a8e4ca50c2d54d630895c22115857325e" title="convert XML string to APL associative array" alt="" coords="591,31,763,56"/>
-<area shape="rect" id="node4" href="$classQuad__XML.html#afb56e2b1109a16c834b1d2d6862b95cc" title="overloaded Function::eval_B()" alt="" coords="408,31,543,56"/>
-<area shape="rect" id="node5" href="$classQuad__XML.html#acda08006d2a9ee1558e6a68adbb8ac59" title="return XML file (&#45;name in B) converted to APL structured value" alt="" coords="197,5,360,31"/>
-<area shape="rect" id="node6" href="$classQuad__XML.html#ad5de89a09c7528bcea93377a1f9424a8" title="overloaded Function::eval_AB()" alt="" coords="5,31,149,56"/>
-</map>

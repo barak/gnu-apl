@@ -1,5 +1,0 @@
-<map id="IntCell::bif_residue" name="IntCell::bif_residue">
-<area shape="rect" id="node1" title="overloaded from the corresponding Cell:: function (see class Cell)" alt="" coords="495,5,625,31"/>
-<area shape="rect" id="node2" href="$classBif__F12__ENCODE.html#a7fdbd7f4683430ee6daeab1014523504" title="encode *ib() according to A (integer A and b)" alt="" coords="243,5,447,31"/>
-<area shape="rect" id="node3" href="$classBif__F12__ENCODE.html#a003a77890ec532d2909d23e3ce5dcb89" title="overloaded Function::eval_AB()" alt="" coords="5,5,195,31"/>
-</map>

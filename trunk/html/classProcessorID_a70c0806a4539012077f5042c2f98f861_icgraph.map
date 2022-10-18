@@ -1,6 +1,0 @@
-<map id="ProcessorID::get_parent_ID" name="ProcessorID::get_parent_ID">
-<area shape="rect" id="node1" title="return the processor ID of the parent of this apl interpreter" alt="" coords="595,13,780,38"/>
-<area shape="rect" id="node2" href="$classQuad__SVO.html#aefe8710645494d9dc6b8879b3f09b913" title="share one variable" alt="" coords="199,5,355,45"/>
-<area shape="rect" id="node4" href="$classQuad__SVx.html#aa59d7158927b2d2f99968b7ac2842cdb" title="start the auxiliary processor proc" alt="" coords="403,38,547,63"/>
-<area shape="rect" id="node3" href="$classQuad__SVO.html#a92d931679e0b1836d24e1cc1ab60ed02" title="Overloaded Function::eval_AB()." alt="" coords="5,13,151,38"/>
-</map>

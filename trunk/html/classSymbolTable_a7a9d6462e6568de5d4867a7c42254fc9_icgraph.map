@@ -1,6 +1,0 @@
-<map id="SymbolTable::show_owners" name="SymbolTable::show_owners">
-<area shape="rect" id="node1" title="print variables owning value" alt="" coords="564,29,751,55"/>
-<area shape="rect" id="node2" href="$classWorkspace.html#a5d85f6457bf1dda2d17162c5dbcda14a" title="print all owners of value" alt="" coords="340,29,516,55"/>
-<area shape="rect" id="node3" href="$classValue.html#a926a6bd11f4d27c077c19bbb03c333cf" title="list a value" alt="" coords="184,29,292,55"/>
-<area shape="rect" id="node4" href="$classValue.html#a38979fd196c826557e1614fa0514bbaa" title="erase stale values" alt="" coords="5,29,136,55"/>
-</map>

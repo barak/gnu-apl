@@ -1,4 +1,0 @@
-<map id="Value::mark_all_dynamic_values" name="Value::mark_all_dynamic_values">
-<area shape="rect" id="node1" title="mark all values, except static values" alt="" coords="5,5,173,45"/>
-<area shape="rect" id="node2" href="$classDynamicObject.html#aecddf7a05cce316f7df4c28a78a2b82c" title="return the previous DynamicObject in its list" alt="" coords="221,13,392,38"/>
-</map>

@@ -1,4 +1,0 @@
-<map id="FloatCell::is_near_one" name="FloatCell::is_near_one">
-<area shape="rect" id="node1" title="Overloaded Cell::is_near_one()." alt="" coords="5,5,157,31"/>
-<area shape="rect" id="node2" href="$classFloatCell.html#afa1a46cfd36a3c2166559f7d425f094d" title="return the value of this cell as a double (even if the value is rational)" alt="" coords="205,5,316,31"/>
-</map>

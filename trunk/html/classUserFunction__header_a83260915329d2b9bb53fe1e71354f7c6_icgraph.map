@@ -1,8 +1,0 @@
-<map id="UserFunction_header::localizes" name="UserFunction_header::localizes">
-<area shape="rect" id="node1" title="return true if this function localizes sym" alt="" coords="957,5,1104,45"/>
-<area shape="rect" id="node2" href="$classUserFunction.html#a98990a82bf551c1d707287ec3451c7b3" title="return true if this function localizes sym" alt="" coords="751,13,909,38"/>
-<area shape="rect" id="node3" href="$classDoxy.html#a7e9ee8f33d120444f078a24031f69570" title="add one symbol to the call graph. Note that one symbol can have different UserFunctions (at different..." alt="" coords="551,5,703,45"/>
-<area shape="rect" id="node4" href="$classDoxy.html#a70dd379b87866d8ffbba02ffa19aeeaf" title="create the call graph" alt="" coords="344,13,503,38"/>
-<area shape="rect" id="node5" href="$classDoxy.html#ad8abe2e8a1b686a7b35e582c369d41ae" title="generate the entire documentation" alt="" coords="213,13,296,38"/>
-<area shape="rect" id="node6" href="$classCommand.html#a834eac0e797a5d1c992018b7d0c049a4" title="]DOXY: create doxygen&#45;like documentation of the current workspace" alt="" coords="5,13,165,38"/>
-</map>

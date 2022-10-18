@@ -1,7 +1,0 @@
-<map id="CharCell::character_representation" name="CharCell::character_representation">
-<area shape="rect" id="node1" title="the Quad_CR representation of this cell" alt="" coords="5,85,140,125"/>
-<area shape="rect" id="node2" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="196,5,336,31"/>
-<area shape="rect" id="node3" href="$classCharCell.html#ac1722ae72774937539bc00951b199732" title="overloaded Cell::get_char_value()" alt="" coords="201,55,331,95"/>
-<area shape="rect" id="node4" href="$classPrintContext.html#a5ef45c5babbe3ebf9988a9b659a2e407" title="return the print style to be used" alt="" coords="188,120,344,145"/>
-<area shape="rect" id="node5" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="205,169,327,195"/>
-</map>

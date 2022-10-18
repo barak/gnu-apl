@@ -1,7 +1,0 @@
-<map id="Bif_SCAN::scan" name="Bif_SCAN::scan">
-<area shape="rect" id="node1" title="Compute the LO&#45;scan of B." alt="" coords="260,80,379,105"/>
-<area shape="rect" id="node2" href="$classBif__OPER1__SCAN.html#afaa44934b4c7bc25b517e3acfe41507b" title="Overloaded Function::eval_LB()." alt="" coords="13,5,204,31"/>
-<area shape="rect" id="node3" href="$classBif__OPER1__SCAN1.html#a191214991f49b5ce2649400f76f25893" title="Overloaded Function::eval_ALB()." alt="" coords="10,55,207,80"/>
-<area shape="rect" id="node4" href="$classBif__OPER1__SCAN.html#ace7710f31a43abd663e582cf96cb9169" title="Overloaded Function::eval_LXB()." alt="" coords="9,104,208,129"/>
-<area shape="rect" id="node5" href="$classBif__OPER1__SCAN1.html#adb20c6d87fb95f93fc8230f4984c4041" title="Overloaded Function::eval_ALXB()." alt="" coords="5,153,212,179"/>
-</map>

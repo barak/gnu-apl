@@ -1,6 +1,0 @@
-<map id="unm2r" name="unm2r">
-<area shape="rect" id="node2" href="$classDZ.html#a5ef72a76df265a1abe2a4f6a7b81b566" title="return x conjugated " alt="" coords="145,5,230,32"/>
-<area shape="rect" id="node3" href="$classMatrix.html#ac45063bd970c78d47713f9626d86261e" title="return this[i, i] " alt="" coords="142,56,233,83"/>
-<area shape="rect" id="node4" href="$classMatrix.html#ac4f069dd3203da7af5e9023337194db6" title="return the number of rows " alt="" coords="112,107,263,133"/>
-<area shape="rect" id="node5" href="$classMatrix.html#acf33070ab91a0f2b49445d1efa482e4a" title="return the sub&#45;matrix starting at row y and column x " alt="" coords="133,157,241,184"/>
-</map>

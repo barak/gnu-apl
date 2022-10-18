@@ -1,6 +1,0 @@
-<map id="Cell::bif_less_eq" name="Cell::bif_less_eq">
-<area shape="rect" id="node1" title="store 1 in Z if A &lt;= the value of this cell in Z, else 0" alt="" coords="243,55,361,80"/>
-<area shape="rect" id="node2" href="$classBif__F2__LEQU.html#a2313b85abb6f1d7c43691c3463d7bf25" title="overloaded Function::eval_AB()." alt="" coords="20,5,180,31"/>
-<area shape="rect" id="node3" href="$classBif__F2__LEQU.html#aa8ef87d98be0aed75703e095b7088603" title="overloaded Function::eval_AXB()." alt="" coords="15,55,185,80"/>
-<area shape="rect" id="node4" href="$classBif__F2__LEQU.html#a04ca3eaca72a11c74adb4e3c55b3b1a5" title="overloaded Function::get_scalar_f2()" alt="" coords="5,104,195,129"/>
-</map>

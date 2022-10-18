@@ -1,4 +1,0 @@
-<map id="UserPreferences::parse_argv_1" name="UserPreferences::parse_argv_1">
-<area shape="rect" id="node1" title="parse command line parameters (BEFORE reading preference files). Parses the &#45;l, &#45;p,..." alt="" coords="116,5,276,45"/>
-<area shape="rect" id="node2" href="$main_8cc.html#aa0321421b17def7b58fc0cabc8890260" title="initialize the interpreter" alt="" coords="5,13,68,38"/>
-</map>

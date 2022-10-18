@@ -1,5 +1,0 @@
-<map id="NumericCell::integer_binomial" name="NumericCell::integer_binomial">
-<area shape="rect" id="node1" title="N over K for positive integers N and K." alt="" coords="452,5,593,45"/>
-<area shape="rect" id="node2" href="$classNumericCell.html#a4f123c9528fe4e9a1fc9c75585aa2de3" title="compute binomial funtion for integers a and b" alt="" coords="224,13,404,38"/>
-<area shape="rect" id="node3" href="$classNumericCell.html#a3fd3970233551bf557f5e52330b5610c" title="overloaded Cell::bif_binomial()" alt="" coords="5,13,176,38"/>
-</map>

@@ -1,4 +1,0 @@
-<map id="Value::nz_element_count" name="Value::nz_element_count">
-<area shape="rect" id="node1" title="return the number of elements, but at least 1 (for the prototype)." alt="" coords="5,5,175,31"/>
-<area shape="rect" id="node2" href="$classShape.html#a6f32f749601dca80263493fd06be12c4" title="return the number of ravel elements, but at least 1 (for empty values and scalars) else product of sh..." alt="" coords="223,5,377,31"/>
-</map>

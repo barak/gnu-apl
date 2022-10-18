@@ -1,7 +1,0 @@
-<map id="Quad_RL::push" name="Quad_RL::push">
-<area shape="rect" id="node2" href="$classQuad__RL.html#aab73076cee457c15d479af873e362c27" title="reset the seed (eg. after )CEAR) " alt="" coords="167,31,316,57"/>
-<area shape="rect" id="node3" href="$classQuad__RL.html#a119715f32d6514b127a29d454261c232" title="Constructor. " alt="" coords="371,5,511,32"/>
-<area shape="rect" id="node4" href="$classWorkspace.html#ade3a373ad48eb7a8fbad97a28472db7f" title="clear the workspace " alt="" coords="364,56,517,83"/>
-<area shape="rect" id="node5" href="$classWorkspace.html#a77c7b25908cf2479dc087cc3bcf44dcb" title="load lib_ws into the_workspace, maybe set ⎕LX of the new WS. " alt="" coords="565,56,715,83"/>
-<area shape="rect" id="node6" href="$classCommand.html#a6f873ead3eb848fbec9037a01c5cc58b" title=")LOAD: load a workspace file " alt="" coords="763,56,921,83"/>
-</map>

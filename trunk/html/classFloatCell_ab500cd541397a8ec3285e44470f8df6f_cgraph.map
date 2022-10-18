@@ -1,4 +1,0 @@
-<map id="FloatCell::get_checked_near_int" name="FloatCell::get_checked_near_int">
-<area shape="rect" id="node1" title="Overloaded Cell::get_checked_near_int()." alt="" coords="5,5,161,45"/>
-<area shape="rect" id="node2" href="$classFloatCell.html#afa1a46cfd36a3c2166559f7d425f094d" title="return the value of this cell as a double (even if the value is rational)" alt="" coords="209,13,320,38"/>
-</map>

@@ -1,8 +1,0 @@
-<map id="SymbolTable" name="SymbolTable">
-<area shape="rect" id="node1" title="The table containing all user defined symbols." alt="" coords="68,360,167,385"/>
-<area shape="rect" id="node2" href="$classSymbolTableBase.html" title=" " alt="" coords="5,271,229,311"/>
-<area shape="rect" id="node3" href="$classSymbol.html" title="Base class for variables, defined functions, and distinguished names." alt="" coords="84,183,151,208"/>
-<area shape="rect" id="node4" href="$classNamedObject.html" title="A user&#45;defined variable or function." alt="" coords="45,95,147,120"/>
-<area shape="rect" id="node5" href="$classUCS__string.html" title="A string of Unicode characters (32&#45;bit)" alt="" coords="172,95,263,120"/>
-<area shape="rect" id="node6" title=" " alt="" coords="154,5,281,45"/>
-</map>

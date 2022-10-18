@@ -1,5 +1,0 @@
-<map id="Bif_F12_DOMINO::setup_complex_B" name="Bif_F12_DOMINO::setup_complex_B">
-<area shape="rect" id="node1" title="initialize complex D with Cells cB" alt="" coords="445,5,615,45"/>
-<area shape="rect" id="node2" href="$classBif__F12__DOMINO.html#abb12309ad9a3abcd453dbe5c4a17ec6e" title="compute the Q matrix of B = QR" alt="" coords="240,5,397,45"/>
-<area shape="rect" id="node3" href="$classBif__F12__DOMINO.html#a46560282bf8a387ca5fd85cdd2b36fbb" title="overloaded Function::eval_XB()" alt="" coords="5,13,192,38"/>
-</map>

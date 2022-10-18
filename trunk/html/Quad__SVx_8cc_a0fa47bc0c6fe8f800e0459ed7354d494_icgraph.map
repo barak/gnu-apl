@@ -1,6 +1,0 @@
-<map id="prog_name" name="prog_name">
-<area shape="rect" id="node2" href="$classProcessorID.html#a61b505bf9c0cf9b386c39d487946a0a9" title="initialize our own process ID, return non&#45;0 on error. proc_id == 0 uses the next free ID &gt; 1000; othe..." alt="" coords="140,5,260,32"/>
-<area shape="rect" id="node3" href="$main_8cc.html#aa0321421b17def7b58fc0cabc8890260" title="initialize the interpreter " alt="" coords="308,5,371,32"/>
-<area shape="rect" id="node4" href="$main_8cc.html#ac0f2228420376f4db7e1274f2b41667c" title="dito. " alt="" coords="419,5,469,32"/>
-<area shape="rect" id="node5" href="$classBacktrace.html#aec4c7866f70a4cd3c4c0883b6729c507" title="open file apl.lines " alt="" coords="517,5,692,32"/>
-</map>

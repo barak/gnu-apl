@@ -1,8 +1,0 @@
-<map id="StatementList::fix" name="StatementList::fix">
-<area shape="rect" id="node1" title="compute body token from text data" alt="" coords="671,35,796,60"/>
-<area shape="rect" id="node2" href="$classCommand.html#af36741357bfd4e183b34ee8b747bc7c5" title="process line which contains APL statements" alt="" coords="416,5,623,31"/>
-<area shape="rect" id="node4" href="$classXML__Loading__Archive.html#a5e165853b437a502be850f3527ef8b77" title="read ◊ Executable" alt="" coords="443,55,595,95"/>
-<area shape="rect" id="node3" href="$classCommand.html#ae26693534d4df16372f51e55e505b8d7" title="process line which contains a command or statements" alt="" coords="205,5,368,31"/>
-<area shape="rect" id="node5" href="$classXML__Loading__Archive.html#adfa844fcc401d3c335cafa5abda2f35d" title="read next StateIndicator entry" alt="" coords="211,55,363,95"/>
-<area shape="rect" id="node6" href="$classXML__Loading__Archive.html#ad2f1d88070976eab8a41f0fdcd1e0ec1" title="read next StateIndicator element" alt="" coords="5,55,157,95"/>
-</map>

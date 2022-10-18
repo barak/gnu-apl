@@ -1,5 +1,0 @@
-<map id="ComplexCell::bif_nat_log" name="ComplexCell::bif_nat_log">
-<area shape="rect" id="node1" title="overloaded from the corresponding Cell:: function (see class Cell)." alt="" coords="5,31,173,56"/>
-<area shape="rect" id="node2" href="$classComplexCell.html#ae93d7078736e5c3b20970a687565b3d1" title="return the complex value of this cell" alt="" coords="221,5,351,31"/>
-<area shape="rect" id="node3" href="$classComplexCell.html#a9ccb64da2c504a517c725dc2c41940da" title="initialize the (un&#45;initialized) Cell *Z to complex r + ij" alt="" coords="225,55,347,80"/>
-</map>

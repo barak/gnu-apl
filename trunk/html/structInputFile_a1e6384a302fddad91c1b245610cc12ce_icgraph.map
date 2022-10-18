@@ -1,9 +1,0 @@
-<map id="InputFile::close_current_file" name="InputFile::close_current_file">
-<area shape="rect" id="node1" title="close the current file and perform some cleanup" alt="" coords="616,31,799,56"/>
-<area shape="rect" id="node2" href="$classIO__Files.html#ab672c0a67bd7aa29dbd8d3c29bea86a2" title="count a output diff error" alt="" coords="408,5,539,31"/>
-<area shape="rect" id="node4" href="$classIO__Files.html#aa05a2917c11a88b9abfc4afa6ca04a3e" title="dito (close files, print errors, summary etc)." alt="" coords="379,55,568,80"/>
-<area shape="rect" id="node3" href="$classDiffOut.html#ad6b18fc9495445c000ff292b491a2248" title="overloaded filebuf::overflow()" alt="" coords="196,5,317,31"/>
-<area shape="rect" id="node5" href="$classIO__Files.html#acc91875b8e0c7a5ad44e3ead0e3dda7b" title="get one line from the current file, open the next file if necceessary" alt="" coords="183,55,331,80"/>
-<area shape="rect" id="node7" href="$classIO__Files.html#a5ac43f7fe811ca95a419f8ba7a11682e" title="close current testcase file (prematurely) and opem mext one" alt="" coords="193,104,321,129"/>
-<area shape="rect" id="node6" href="$classInputMux.html#a8a79cbe5207cde162fb36133ad9defdd" title="get one line" alt="" coords="5,55,135,80"/>
-</map>

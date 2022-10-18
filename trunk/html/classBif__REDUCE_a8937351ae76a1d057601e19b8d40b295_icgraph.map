@@ -1,7 +1,0 @@
-<map id="Bif_REDUCE::replicate" name="Bif_REDUCE::replicate">
-<area shape="rect" id="node1" title="Replicate B according to A along axis." alt="" coords="275,92,435,117"/>
-<area shape="rect" id="node2" href="$classBif__OPER1__REDUCE.html#a19caf24e6cb4485bb7b853da1869295a" title="Overloaded Function::eval_AB()." alt="" coords="10,5,222,31"/>
-<area shape="rect" id="node3" href="$classBif__OPER1__REDUCE1.html#a9461c2e8d943fb975798bf887e43d799" title="Overloaded Function::eval_AB()." alt="" coords="31,55,201,95"/>
-<area shape="rect" id="node4" href="$classBif__OPER1__REDUCE.html#ab0e3bfadabe90022fd47547d758efcb4" title="Overloaded Function::eval_AXB()." alt="" coords="5,120,227,145"/>
-<area shape="rect" id="node5" href="$classBif__OPER1__REDUCE1.html#a22cc3a3474783da8abd628c60feb7256" title="Overloaded Function::eval_AXB()." alt="" coords="31,170,201,210"/>
-</map>

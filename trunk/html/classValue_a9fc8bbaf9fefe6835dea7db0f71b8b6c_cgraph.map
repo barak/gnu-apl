@@ -1,4 +1,0 @@
-<map id="Value::element_count" name="Value::element_count">
-<area shape="rect" id="node1" title="return the number of elements (the product of the shapes)." alt="" coords="5,5,153,31"/>
-<area shape="rect" id="node2" href="$classShape.html#af39e05bad7be900fa1437a6eb6035e97" title="return the number of ravel elements (1 for scalars,i else product of shapes)" alt="" coords="201,5,336,31"/>
-</map>

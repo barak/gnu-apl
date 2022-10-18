@@ -1,8 +1,0 @@
-<map id="XML_Loading_Archive::find_lambda" name="XML_Loading_Archive::find_lambda">
-<area shape="rect" id="node1" title="find a lambda in the current SI entry" alt="" coords="1005,5,1157,45"/>
-<area shape="rect" id="node2" href="$classXML__Loading__Archive.html#ac281f8500311f7c498243ec23ee1d143" title="read a system function with attribute id_prefix&#45;id or a user defined functions with attributes &#39;ufun_..." alt="" coords="805,5,957,45"/>
-<area shape="rect" id="node3" href="$classXML__Loading__Archive.html#a619b73db295d1c88790d671a9ce7fef4" title="read a token" alt="" coords="605,5,757,45"/>
-<area shape="rect" id="node4" href="$classXML__Loading__Archive.html#a7381cad28d73cdca8a76bf741921c63d" title="read parsers in SI entry" alt="" coords="405,5,557,45"/>
-<area shape="rect" id="node5" href="$classXML__Loading__Archive.html#adfa844fcc401d3c335cafa5abda2f35d" title="read next StateIndicator entry" alt="" coords="205,5,357,45"/>
-<area shape="rect" id="node6" href="$classXML__Loading__Archive.html#ad2f1d88070976eab8a41f0fdcd1e0ec1" title="read next StateIndicator element" alt="" coords="5,5,157,45"/>
-</map>

@@ -1,4 +1,0 @@
-<map id="format_tick" name="format_tick">
-<area shape="rect" id="node1" title="format the text of tick idx (with value val) according to format." alt="" coords="5,5,92,31"/>
-<area shape="rect" id="node2" href="$Plot__gtk_8cc.html#ad4aa42d6c7a8bd63261a281c9a3a5a55" title="format val according to format (with percent pointing to % in format, e.g. d or f like in printf())." alt="" coords="140,5,259,31"/>
-</map>

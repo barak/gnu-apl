@@ -1,4 +1,0 @@
-<map id="Value::is_char_vector" name="Value::is_char_vector">
-<area shape="rect" id="node1" title="return true iff this value is a simple character vector." alt="" coords="244,13,392,38"/>
-<area shape="rect" id="node2" href="$classQuad__JSON.html#a1fa347b95372cd4c4ab4b7fd6d4b5358" title="append Cell value to JSON string result" alt="" coords="5,5,196,45"/>
-</map>

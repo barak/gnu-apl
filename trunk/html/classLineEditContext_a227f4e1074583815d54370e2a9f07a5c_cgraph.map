@@ -1,7 +1,0 @@
-<map id="LineEditContext::cursor_LEFT" name="LineEditContext::cursor_LEFT">
-<area shape="rect" id="node1" title="move cursor left" alt="" coords="5,31,204,56"/>
-<area shape="rect" id="node2" href="$classLineEditContext.html#a347304e997f587298b31ca56b87b2826" title="move the cursor" alt="" coords="252,31,431,56"/>
-<area shape="rect" id="node3" href="$classLineEditContext.html#a42e54e34054a3d943bedba1021973f0a" title="set the cursor (writing the appropriate ESC sequence to CIN)" alt="" coords="479,23,620,63"/>
-<area shape="rect" id="node4" href="$classCIN__ostream.html#a181f092c83f8cb272de489f3e7f198c9" title="set cursor to y:x (upper left corner is 0:0, negative y: from bottom)" alt="" coords="668,5,837,31"/>
-<area shape="rect" id="node5" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="691,55,814,80"/>
-</map>

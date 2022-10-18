@@ -1,6 +1,0 @@
-<map id="Prefix::reduce_RBRA___" name="Prefix::reduce_RBRA___">
-<area shape="rect" id="node2" href="$classPrefix.html#a84943b5d0ba357555e3c03c244382777" title="return the leftmost token (e.g. A in A←B) " alt="" coords="245,5,327,32"/>
-<area shape="rect" id="node3" href="$classPrefix.html#afdd4d7c0aa09d4bc4c9d8588d3872bd6" title="return the current assignment state " alt="" coords="223,57,349,98"/>
-<area shape="rect" id="node4" href="$classPrefix.html#a6161ea4f341e55bfdfa6c51e1d15e9e9" title="set the current assignment state " alt="" coords="223,122,349,163"/>
-<area shape="rect" id="node5" href="$Common_8hh.html#ab824aa3e1de51cff5987b902d647d1e0" title="cast to a const void * " alt="" coords="259,188,313,215"/>
-</map>

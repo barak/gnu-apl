@@ -1,6 +1,0 @@
-<map id="Plot_data_row::Plot_data_row" name="Plot_data_row::Plot_data_row">
-<area shape="rect" id="node1" title=" " alt="" coords="5,47,141,87"/>
-<area shape="rect" id="node2" href="$classPlot__data__row.html#ad4e5545752fa410dbb014efcb3188d25" title="return the n&#45;th X coordinate" alt="" coords="189,5,336,31"/>
-<area shape="rect" id="node3" href="$classPlot__data__row.html#a33dc8b966628255b8300f95a7c261b44" title="return the n&#45;th Y coordinate" alt="" coords="189,55,336,80"/>
-<area shape="rect" id="node4" href="$classPlot__data__row.html#a4b64a5cf137e1b8eff94c1dc2127d065" title="return the n&#45;th Z coordinate" alt="" coords="189,104,336,129"/>
-</map>

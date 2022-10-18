@@ -1,6 +1,0 @@
-<map id="Matrix::max_norm" name="Matrix::max_norm">
-<area shape="rect" id="node1" title="return the length of the largest element" alt="" coords="5,31,132,56"/>
-<area shape="rect" id="node2" href="$classDZ.html#a3f740770f5437110e2dbd4a50751a370" title="return the real part of x" alt="" coords="182,5,277,31"/>
-<area shape="rect" id="node3" href="$classMatrix.html#ab5d894fcccb100f6d1101239f8d7d976" title="return true if this is a matrix of complex numbers (and not a matrix of real numbers" alt="" coords="180,55,279,80"/>
-<area shape="rect" id="node4" href="$classVector.html#a71433ad4ba0b0d71a2253d390742286f" title="return true if this is a vector of complex numbers (and not a vector of real numbers" alt="" coords="327,55,428,80"/>
-</map>

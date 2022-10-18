@@ -1,6 +1,0 @@
-<map id="UCS_string::begin" name="UCS_string::begin">
-<area shape="rect" id="node1" title="an iterator set to the start of this string" alt="" coords="453,31,583,56"/>
-<area shape="rect" id="node2" href="$classNabla.html#ae4562224aeb0ce0598cd25f428443045" title="parse an operation (something like [...], e.g. [⎕3])" alt="" coords="277,5,405,31"/>
-<area shape="rect" id="node4" href="$classNabla.html#a894eac5264914ef7eedcfc14643cc7ee" title="start editing, return source location if first_command is bad." alt="" coords="139,56,229,81"/>
-<area shape="rect" id="node3" href="$classNabla.html#a610d94a179335126e82e9eea07918d5a" title="edit this function" alt="" coords="5,31,91,56"/>
-</map>

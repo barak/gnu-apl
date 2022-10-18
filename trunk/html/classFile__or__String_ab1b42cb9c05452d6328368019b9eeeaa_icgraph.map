@@ -1,5 +1,0 @@
-<map id="File_or_String::scanf_double" name="File_or_String::scanf_double">
-<area shape="rect" id="node1" title="scan a double in string or file. Return either 0 or 1 for the number of successful conversions." alt="" coords="392,5,535,45"/>
-<area shape="rect" id="node2" href="$classQuad__FIO.html#a0d8c64c720db4d63a3a548141b868420" title="perform an fscanf() from file" alt="" coords="201,13,344,38"/>
-<area shape="rect" id="node3" href="$classQuad__FIO.html#a36fdeb894607c2125307cd673284fb69" title="overloaded Function::eval_AXB()." alt="" coords="5,13,153,38"/>
-</map>

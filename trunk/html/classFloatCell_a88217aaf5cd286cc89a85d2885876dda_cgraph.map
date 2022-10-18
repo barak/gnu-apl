@@ -1,7 +1,0 @@
-<map id="FloatCell::zF" name="FloatCell::zF">
-<area shape="rect" id="node2" href="$classFloatCell.html#a48d2e4f2d44cccc87f56c6edb4899e1b" title="Construct an floating point cell from a double r. " alt="" coords="151,78,285,105"/>
-<area shape="rect" id="node3" href="$classFloatCell.html#afa1a46cfd36a3c2166559f7d425f094d" title="return the value of this cell as a double (even if the value is rational) " alt="" coords="345,53,456,79"/>
-<area shape="rect" id="node4" href="$classAPL__Float__Base.html#ac0f3239468a7742311f611abbf55a167" title="up&#45;cast const APL_Float_Base * to const APL_Float * " alt="" coords="516,5,676,47"/>
-<area shape="rect" id="node5" href="$classCell.html#ac4bb8b0cf0718bf4ec7a17f1a0271df0" title="Release content pointed to (complex, APL value) " alt="" coords="549,82,643,109"/>
-<area shape="rect" id="node6" href="$classFloatCell.html#aaa2b1d2de8b20d58dcfcd6ccb2443dad" title="overloaded Cell::init_other " alt="" coords="333,154,468,181"/>
-</map>

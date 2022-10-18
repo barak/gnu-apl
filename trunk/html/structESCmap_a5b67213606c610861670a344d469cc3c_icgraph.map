@@ -1,7 +1,0 @@
-<map id="ESCmap::need_more" name="ESCmap::need_more">
-<area shape="rect" id="node1" title="return true if an entry has prefix seq of length len" alt="" coords="764,5,911,31"/>
-<area shape="rect" id="node2" href="$classLineInput.html#ab188d7e07879a811c96002b02908b9a0" title="get one character from user" alt="" coords="591,5,716,31"/>
-<area shape="rect" id="node3" href="$classLineInput.html#a81610349f86404c67f583eb296666bb1" title="get a line from from user" alt="" coords="412,5,543,31"/>
-<area shape="rect" id="node4" href="$classLineInput.html#a96f6a9062450af940d63ecff847646e4" title="get a line from the user" alt="" coords="183,5,364,31"/>
-<area shape="rect" id="node5" href="$classInputMux.html#a8a79cbe5207cde162fb36133ad9defdd" title="get one line" alt="" coords="5,5,135,31"/>
-</map>

@@ -1,5 +1,0 @@
-<map id="XML_node::normalize_attribute_value" name="XML_node::normalize_attribute_value">
-<area shape="rect" id="node1" title="perform an in&#45;place attribute value normalization (XML standard 3.3.3). On error set MORE_ERROR() and..." alt="" coords="5,23,153,63"/>
-<area shape="rect" id="node2" href="$classAvec.html#af9d230b25c7dab2ce52b4f12e7ceb886" title="return the value (0..9 if decimal, or 0..15 if hex) for uni, or &#45;1 if uni is not a decimal or hex dig..." alt="" coords="201,5,324,31"/>
-<area shape="rect" id="node3" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="201,55,324,80"/>
-</map>

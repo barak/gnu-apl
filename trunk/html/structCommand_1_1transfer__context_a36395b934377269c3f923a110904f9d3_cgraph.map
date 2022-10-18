@@ -1,5 +1,0 @@
-<map id="Command::transfer_context::get_nrs" name="Command::transfer_context::get_nrs">
-<area shape="rect" id="node1" title="get the name, rank, and shape of a 1 ⎕TF record" alt="" coords="5,23,189,63"/>
-<area shape="rect" id="node2" href="$classShape.html#aeb018b67601d3f1c4bea3d2c2b877b7e" title="add a dimension of length len at the end" alt="" coords="237,5,400,31"/>
-<area shape="rect" id="node3" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="249,55,389,80"/>
-</map>

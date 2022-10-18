@@ -1,9 +1,0 @@
-<map id="Quad_SVx" name="Quad_SVx">
-<area shape="rect" id="node1" title="Base class for ⎕SVC, ⎕SVE, ⎕SVO, ⎕SVQ, ⎕SVR, and ⎕SVS." alt="" coords="287,5,372,31"/>
-<area shape="rect" id="node2" href="$classQuad__SVC.html" title="The class implementing ⎕SVC." alt="" coords="5,79,93,104"/>
-<area shape="rect" id="node3" href="$classQuad__SVE.html" title="The implementation of ⎕SVE." alt="" coords="118,79,205,104"/>
-<area shape="rect" id="node4" href="$classQuad__SVO.html" title="The implementation of ⎕SVO." alt="" coords="229,79,317,104"/>
-<area shape="rect" id="node5" href="$classQuad__SVQ.html" title="The implementation of ⎕SVQ." alt="" coords="341,79,429,104"/>
-<area shape="rect" id="node6" href="$classQuad__SVR.html" title="The implementation of ⎕SVR." alt="" coords="453,79,541,104"/>
-<area shape="rect" id="node7" href="$classQuad__SVS.html" title="The implementation of ⎕SVS." alt="" coords="566,79,653,104"/>
-</map>

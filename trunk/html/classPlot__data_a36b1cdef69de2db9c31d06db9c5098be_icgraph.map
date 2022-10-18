@@ -1,5 +1,0 @@
-<map id="Plot_data::Color_to_str" name="Plot_data::Color_to_str">
-<area shape="rect" id="node2" href="$classPlot__window__properties.html#a70cc0ca1be65155f1df354fb3f04ff0e" title="print the properties (for debugging purposes) " alt="" coords="209,35,369,76"/>
-<area shape="rect" id="node3" href="$classPlot__window__properties.html#aa4db62e171eab805cd9e1a3cbc253c3c" title="return the pixel position of the point where the X, Y, and possibly Z&#45;axis cross. ..." alt="" coords="417,5,577,47"/>
-<area shape="rect" id="node4" href="$classQuad__PLOT.html#acc4187c32c3bad52f276a724b226b429" title="overloaded Function::eval_AB() " alt="" coords="422,71,573,98"/>
-</map>

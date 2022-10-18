@@ -1,7 +1,0 @@
-<map id="SystemSymTab::add_function" name="SystemSymTab::add_function">
-<area shape="rect" id="node1" title="add function to the symbol table" alt="" coords="5,77,204,102"/>
-<area shape="rect" id="node2" href="$classSystemSymTab.html#af26a43b225c33b7ac0315d88e874da0d" title="add a function or variable" alt="" coords="252,69,423,109"/>
-<area shape="rect" id="node3" href="$classSymbolTableBase.html#a8b6fdeffe7abdc7b3163d07befa9962a" title="add sym to the symbol table. The caller has checked that new_name does not yet exist in the symbol ta..." alt="" coords="471,5,695,45"/>
-<area shape="rect" id="node4" href="$classSymbolTableBase.html#a58cddd45598f27eff5711db23ce9043c" title="return a Symbol with name name in this SymbolTable." alt="" coords="471,69,696,109"/>
-<area shape="rect" id="node5" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="522,134,645,159"/>
-</map>

@@ -1,6 +1,0 @@
-<map id="run_generic_one_query" name="run_generic_one_query">
-<area shape="rect" id="node2" href="$Quad__SQL_8cc.html#a1e9c30a61f74ee4af92bda5c9788852a" title="run_generic" alt="" coords="209,31,299,57"/>
-<area shape="rect" id="node3" href="$Quad__SQL_8cc.html#a340e76fafaa5da1a8cb32be761a018bd" title="run_query" alt="" coords="351,5,429,32"/>
-<area shape="rect" id="node5" href="$Quad__SQL_8cc.html#ae96d3fb53413a013dc79322bd647bbd7" title="run_update" alt="" coords="347,56,433,83"/>
-<area shape="rect" id="node4" href="$classQuad__SQL.html#afb3ed61a068156aec7186ad6f4e17a54" title="overloaded Function::eval_AXB(). " alt="" coords="481,31,633,57"/>
-</map>

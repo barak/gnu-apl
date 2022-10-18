@@ -1,7 +1,0 @@
-<map id="IndexIterator::more" name="IndexIterator::more">
-<area shape="rect" id="node2" href="$classIndexIterator.html#ae27d9d5c7cf77fc56dc18a3375ad9e82" title="return the current index " alt="" coords="375,5,497,47"/>
-<area shape="rect" id="node3" href="$classIndexIterator.html#ae312175e3429335b1ebc57f8f49c0020" title="return the current index " alt="" coords="361,71,511,98"/>
-<area shape="rect" id="node4" href="$classIndexIterator.html#a1b32fa514c901a2fc834dfa73a922fff" title="print this iterator (for debugging purposes). " alt="" coords="185,121,313,147"/>
-<area shape="rect" id="node5" href="$Common_8hh.html#ab824aa3e1de51cff5987b902d647d1e0" title="cast to a const void * " alt="" coords="409,122,463,149"/>
-<area shape="rect" id="node6" href="$classIndexIterator.html#a5833585ada2b82a93553a2c62fb13a2b" title="get the number of indices. " alt="" coords="375,173,497,215"/>
-</map>

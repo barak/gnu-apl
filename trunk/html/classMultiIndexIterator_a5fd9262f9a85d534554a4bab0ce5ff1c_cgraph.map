@@ -1,6 +1,0 @@
-<map id="MultiIndexIterator::operator++" name="MultiIndexIterator::operator++">
-<area shape="rect" id="node1" title="get the current index (offset into a ravel) and increment iterators" alt="" coords="5,37,128,77"/>
-<area shape="rect" id="node2" href="$classIndexIterator.html#a7ed732078be0849b9eb80cad5973d87e" title="return the next higher IndexIterator" alt="" coords="177,5,298,45"/>
-<area shape="rect" id="node3" href="$classMultiIndexIterator.html#a4215dfd1d1cdacac448dd44a02bb280f" title="return true if more indices are coming" alt="" coords="176,69,299,109"/>
-<area shape="rect" id="node4" href="$classIndexIterator.html#a29dd1728e6013cd6cd186079d641d7ff" title="return true if more indices are coming" alt="" coords="347,77,479,102"/>
-</map>

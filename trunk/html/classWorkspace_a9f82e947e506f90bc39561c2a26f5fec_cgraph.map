@@ -1,8 +1,0 @@
-<map id="Workspace::cleanup_expunged" name="Workspace::cleanup_expunged">
-<area shape="rect" id="node1" title="maybe remove functions for which ⎕EX has failed" alt="" coords="5,41,147,81"/>
-<area shape="rect" id="node2" href="$classUserFunction.html#a59a4ca14c199edd678c1f10ba95e2f43" title="return the name of this function" alt="" coords="195,17,360,42"/>
-<area shape="rect" id="node4" href="$classWorkspace.html#a64cef901fd41c19f4521bdd1175d0be7" title="the number of SI entries" alt="" coords="205,69,350,109"/>
-<area shape="rect" id="node3" href="$classUserFunction__header.html#abcc2f6d70da90e3123e630a226b9e931" title="return the name of the function" alt="" coords="408,5,555,45"/>
-<area shape="rect" id="node5" href="$classStateIndicator.html#aa60ca9df0350c7b2e4c0825f061f300e" title="return the nesting level (oldest SI has level 0, next has level 1, ...)" alt="" coords="417,69,546,109"/>
-<area shape="rect" id="node6" href="$classWorkspace.html#a8083efc2d51067edb25ae8dd4f014173" title="the top of the SI stack (the SI pushed last)" alt="" coords="414,134,549,159"/>
-</map>

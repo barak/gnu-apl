@@ -1,5 +1,0 @@
-<map id="Shape::Shape" name="Shape::Shape">
-<area shape="rect" id="node1" title="constructor: shape of a scalar." alt="" coords="187,31,291,56"/>
-<area shape="rect" id="node2" href="$classShape.html#a4ded4f4c4256a20ec907e8c4dae8222b" title="return a shape with the upper cnt dimensions of this shape" alt="" coords="5,5,139,31"/>
-<area shape="rect" id="node3" href="$classShape.html#a40c209c18161abb864281372caf33366" title="return a shape with the lower cnt dimensions of this shape" alt="" coords="7,55,137,80"/>
-</map>

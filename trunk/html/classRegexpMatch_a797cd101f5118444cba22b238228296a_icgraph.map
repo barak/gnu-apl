@@ -1,9 +1,0 @@
-<map id="RegexpMatch::is_match" name="RegexpMatch::is_match">
-<area shape="rect" id="node1" title="return true if there was a match" alt="" coords="803,63,967,88"/>
-<area shape="rect" id="node2" href="$classQuad__RE.html#a3f7c5552e6498ac82109871b5f4a35b6" title="return a result that can be used by [] (position and length)" alt="" coords="597,5,754,31"/>
-<area shape="rect" id="node6" href="$classQuad__RE.html#a5ee4c8c19bb09e9b06f156c46859d9f7" title="return a result that can be used directly by ⊂ or /" alt="" coords="609,55,742,95"/>
-<area shape="rect" id="node7" href="$classQuad__RE.html#a06a851c449b5efa9a9d4f0fb7b5d8b1a" title="return a result that contains the matched strings" alt="" coords="596,120,755,145"/>
-<area shape="rect" id="node3" href="$classQuad__RE.html#ac30c86b0ec6520f8ab4c20e97f6b053f" title="return a result whose format is given by flags" alt="" coords="383,63,548,88"/>
-<area shape="rect" id="node4" href="$classQuad__RE.html#a28ca16be0e639ffb29d1597cdf18e0a9" title="overloaded Function::eval_AXB()." alt="" coords="189,63,335,88"/>
-<area shape="rect" id="node5" href="$classQuad__RE.html#aaf1c135d558953f69556ba615ba103ec" title="overloaded Function::eval_AB()." alt="" coords="5,63,141,88"/>
-</map>

@@ -1,8 +1,0 @@
-<map id="UserFunction::fix_lambda" name="UserFunction::fix_lambda">
-<area shape="rect" id="node1" title="(re&#45;)create a lambda" alt="" coords="805,45,976,70"/>
-<area shape="rect" id="node2" href="$classXML__Loading__Archive.html#a2e7aed9883aa106937d3d9313163e10b" title="read next Function element" alt="" coords="605,5,757,45"/>
-<area shape="rect" id="node3" href="$classXML__Loading__Archive.html#a16b4789e109bf0167ae481b86a1ebedb" title="read a lambda" alt="" coords="605,69,757,109"/>
-<area shape="rect" id="node4" href="$classXML__Loading__Archive.html#a0cd18fa421176354e241891d951f5169" title="read a user defined Executable" alt="" coords="405,69,557,109"/>
-<area shape="rect" id="node5" href="$classXML__Loading__Archive.html#adfa844fcc401d3c335cafa5abda2f35d" title="read next StateIndicator entry" alt="" coords="205,69,357,109"/>
-<area shape="rect" id="node6" href="$classXML__Loading__Archive.html#ad2f1d88070976eab8a41f0fdcd1e0ec1" title="read next StateIndicator element" alt="" coords="5,69,157,109"/>
-</map>

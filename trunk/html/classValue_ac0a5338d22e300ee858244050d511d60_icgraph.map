@@ -1,5 +1,0 @@
-<map id="Value::cell_fetcher" name="Value::cell_fetcher">
-<area shape="rect" id="node2" href="$classValue.html#aa914c68d753cc27daddc7fec5af8e81a" title="expand this (packed) Boolean value (in place) " alt="" coords="187,5,295,32"/>
-<area shape="rect" id="node3" href="$classValue.html#a1120641bea23235f2525146e6f5f48df" title="init the ravel of an APL value, return the ravel length " alt="" coords="184,56,299,83"/>
-<area shape="rect" id="node4" href="$classValue.html#a8a12230cec8b3ea13d547152a4d3ce9e" title="constructor: scalar value (i.e. a value with rank 0). " alt="" coords="347,56,443,83"/>
-</map>

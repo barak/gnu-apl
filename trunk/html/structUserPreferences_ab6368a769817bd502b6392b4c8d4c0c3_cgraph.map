@@ -1,4 +1,0 @@
-<map id="UserPreferences::show_version" name="UserPreferences::show_version">
-<area shape="rect" id="node1" title="show version information" alt="" coords="5,5,164,45"/>
-<area shape="rect" id="node2" href="$classOutput.html#a7f5a3baf917253208de9aae748cb121d" title="set the color mode (if colors_enabled). Outputs the escape sequence for mode when the color mode chan..." alt="" coords="212,13,373,38"/>
-</map>

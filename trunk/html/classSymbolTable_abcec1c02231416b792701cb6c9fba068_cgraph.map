@@ -1,6 +1,0 @@
-<map id="SymbolTable::clear_slot" name="SymbolTable::clear_slot">
-<area shape="rect" id="node1" title="clear one slot (hash) in this symbol table" alt="" coords="5,70,168,95"/>
-<area shape="rect" id="node2" href="$classSymbol.html#ad925a9e935af935d1f31f7a26a3d1533" title="call the monitor callback function (if any) with event ev" alt="" coords="220,5,364,45"/>
-<area shape="rect" id="node3" href="$classSymbol.html#a126fc214ca7a2e2d364e0982a36b2ace" title="The name of this Symbol." alt="" coords="227,70,357,95"/>
-<area shape="rect" id="node4" href="$classNamedObject.html#a88f09fc969608fe1d61ae33468a13d14" title="return true, iff this object is user&#45;defined" alt="" coords="216,120,368,160"/>
-</map>

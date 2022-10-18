@@ -1,5 +1,0 @@
-<map id="UserPreferences::show_configure_options" name="UserPreferences::show_configure_options">
-<area shape="rect" id="node1" title="print how the interpreter was configured (via ./configure) and exit" alt="" coords="324,5,483,45"/>
-<area shape="rect" id="node2" href="$structUserPreferences.html#afbb29191d4c126b0f767f92eb427d568" title="parse command line parameters (AFTER reading preference files) Parses all valid options." alt="" coords="116,5,276,45"/>
-<area shape="rect" id="node3" href="$main_8cc.html#aa0321421b17def7b58fc0cabc8890260" title="initialize the interpreter" alt="" coords="5,13,68,38"/>
-</map>

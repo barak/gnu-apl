@@ -1,5 +1,0 @@
-<map id="PrintBuffer::is_rectangular" name="PrintBuffer::is_rectangular">
-<area shape="rect" id="node1" title="return true iff all strings have the same size." alt="" coords="5,69,179,94"/>
-<area shape="rect" id="node2" href="$classPrintBuffer.html#af6f689e8c4e930b7c37099bf5fdfe57d" title="return the number of columns" alt="" coords="227,29,385,69"/>
-<area shape="rect" id="node3" href="$classPrintBuffer.html#ac13295601812e379a3eac618ce239426" title="return the number of rows" alt="" coords="237,93,375,133"/>
-</map>

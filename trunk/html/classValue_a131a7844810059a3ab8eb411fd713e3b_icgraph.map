@@ -1,8 +1,0 @@
-<map id="Value::next_ravel_Char" name="Value::next_ravel_Char">
-<area shape="rect" id="node2" href="$classBif__F12__PICK.html#a4052ea32200b2bc5ac3f668849fb47d6" title="create a copy of B_item, pad as needed to have item_shape, and store it in Z, starteding at Z_start..." alt="" coords="212,5,407,32"/>
-<area shape="rect" id="node3" href="$classXML__Loading__Archive.html#a3c747929c263a6913ea01f833ce2a9f0" title="read one or more Cell(s) from input into the ravel of Z; return the UTF8 * after the cells..." alt="" coords="233,57,385,98"/>
-<area shape="rect" id="node7" href="$classValue.html#a32a3b743de46da9b791cc794fb5349ec" title="constructor: a simple character vector from a UCS string. Rank is always 1, so that is_char_vector() ..." alt="" coords="261,123,357,149"/>
-<area shape="rect" id="node4" href="$classXML__Loading__Archive.html#ad200f5b98b9cf3e903ccf714a56a1d0f" title="read next Ravel element " alt="" coords="455,57,607,98"/>
-<area shape="rect" id="node5" href="$classXML__Loading__Archive.html#a3ea748a15d0a90fe9a32c362b14da7fd" title="read an entire workspace, throw DOMAIN_ERROR on failure " alt="" coords="655,57,807,98"/>
-<area shape="rect" id="node6" href="$classXML__Loading__Archive.html#a45c9b23463cf5379d2788af1789a62f0" title="read vids of top&#45;level variables " alt="" coords="855,57,1007,98"/>
-</map>

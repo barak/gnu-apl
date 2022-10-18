@@ -1,7 +1,0 @@
-<map id="ConstRavel_P::operator&#45;&gt;" name="ConstRavel_P::operator&#45;&gt;">
-<area shape="rect" id="node1" title="return a pointer to the current Cell (or 0 at the end)" alt="" coords="5,31,180,56"/>
-<area shape="rect" id="node2" href="$classValue.html#aa0572b1b7fa249cb79694fd152130b38" title="return the (constant) idx&#39;th element of the ravel." alt="" coords="252,5,375,31"/>
-<area shape="rect" id="node5" href="$classConstRavel__P.html#a478124083b4c281b98396461fdca7a08" title="return true iff offset is valid (and then *() != 0). For this to work, increment needs to be true" alt="" coords="228,55,399,80"/>
-<area shape="rect" id="node3" href="$classValue.html#ac5b54e3a13cab0837442f1575b3299a5" title="return the number of elements, but at least 1 (for the prototype)." alt="" coords="447,5,616,31"/>
-<area shape="rect" id="node4" href="$classShape.html#a6f32f749601dca80263493fd06be12c4" title="return the number of ravel elements, but at least 1 (for empty values and scalars) else product of sh..." alt="" coords="664,5,819,31"/>
-</map>

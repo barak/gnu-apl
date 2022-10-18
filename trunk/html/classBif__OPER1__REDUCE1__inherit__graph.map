@@ -1,8 +1,0 @@
-<map id="Bif_OPER1_REDUCE1" name="Bif_OPER1_REDUCE1">
-<area shape="rect" id="node1" title="The class implementing ⌿" alt="" coords="5,372,168,397"/>
-<area shape="rect" id="node2" href="$classBif__REDUCE.html" title="Base class for / and ⌿" alt="" coords="35,299,138,324"/>
-<area shape="rect" id="node3" href="$classPrimitiveOperator.html" title="Base class for all primitive APL operators." alt="" coords="25,225,148,251"/>
-<area shape="rect" id="node4" href="$classPrimitiveFunction.html" title="Base class for all internal functions of the interpreter." alt="" coords="25,152,148,177"/>
-<area shape="rect" id="node5" href="$classFunction.html" title="Base class for all APL functions and operators (system or defined)" alt="" coords="51,79,123,104"/>
-<area shape="rect" id="node6" href="$classNamedObject.html" title="A user&#45;defined variable or function." alt="" coords="35,5,138,31"/>
-</map>

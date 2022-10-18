@@ -1,6 +1,0 @@
-<map id="Prefix::locate_X" name="Prefix::locate_X">
-<area shape="rect" id="node1" title="return the axis argument of a failed primitive function (if any)" alt="" coords="361,31,476,56"/>
-<area shape="rect" id="node2" href="$classStateIndicator.html#ad407506718254a4ce357eb0a8f864733" title="return axis arg (and set function)" alt="" coords="168,5,313,31"/>
-<area shape="rect" id="node3" href="$classStateIndicator.html#a9bf33fdcfb56c1bee7a9833c4113646e" title="change axis arg" alt="" coords="168,55,313,80"/>
-<area shape="rect" id="node4" href="$classQuad__X.html#a7498eb3d92143d88eaf3c3a4b062dce1" title="overloaded Symbol::assign()" alt="" coords="5,55,120,80"/>
-</map>

@@ -1,6 +1,0 @@
-<map id="Bif_F12_TRANSPOSE::permute" name="Bif_F12_TRANSPOSE::permute">
-<area shape="rect" id="node1" title="return sh permuted according to permutation perm" alt="" coords="5,47,171,87"/>
-<area shape="rect" id="node2" href="$classShape.html#aeb018b67601d3f1c4bea3d2c2b877b7e" title="add a dimension of length len at the end" alt="" coords="219,5,381,31"/>
-<area shape="rect" id="node3" href="$classShape.html#a017e9a35dd20f4bc4fdeb7ea29b6805d" title="return the rank" alt="" coords="241,55,359,80"/>
-<area shape="rect" id="node4" href="$classShape.html#a592d2ade68aa8c21c5d84627c3a0e001" title="return the length of dimension r" alt="" coords="221,104,379,129"/>
-</map>

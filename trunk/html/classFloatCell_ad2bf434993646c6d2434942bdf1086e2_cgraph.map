@@ -1,5 +1,0 @@
-<map id="FloatCell::need_scaling" name="FloatCell::need_scaling">
-<area shape="rect" id="node1" title="return true iff this cell needs scaling (exponential format) in pctx." alt="" coords="5,31,164,56"/>
-<area shape="rect" id="node2" href="$classFloatCell.html#afa1a46cfd36a3c2166559f7d425f094d" title="return the value of this cell as a double (even if the value is rational)" alt="" coords="230,5,341,31"/>
-<area shape="rect" id="node3" href="$classPrintContext.html#ad9230a07565823a9052d079dd25a96d7" title="return the print precision to be used" alt="" coords="212,55,359,80"/>
-</map>

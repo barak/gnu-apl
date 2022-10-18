@@ -1,8 +1,0 @@
-<map id="Quad_FFT::eval_B" name="Quad_FFT::eval_B">
-<area shape="rect" id="node1" title="overloaded Function::eval_B()" alt="" coords="5,31,137,56"/>
-<area shape="rect" id="node2" href="$classQuad__FFT.html#a7a8006752a7ad3e4305c26f98355e7a3" title="compute forward or backward FFT" alt="" coords="185,31,311,56"/>
-<area shape="rect" id="node3" href="$classQuad__FFT.html#a61b50203a79543db43ad5cbfb44e0648" title="initialize in from B" alt="" coords="359,31,485,56"/>
-<area shape="rect" id="node4" href="$classQuad__FFT.html#a47ae31a9881643eb3caf1397d6584fb6" title="set up a multi&#45;dimensional window for shape sh, using the window function win" alt="" coords="533,31,689,56"/>
-<area shape="rect" id="node5" href="$classShape.html#a017e9a35dd20f4bc4fdeb7ea29b6805d" title="return the rank" alt="" coords="758,5,875,31"/>
-<area shape="rect" id="node6" href="$classShape.html#a592d2ade68aa8c21c5d84627c3a0e001" title="return the length of dimension r" alt="" coords="737,55,896,80"/>
-</map>

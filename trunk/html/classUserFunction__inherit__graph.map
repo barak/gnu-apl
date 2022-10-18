@@ -1,7 +1,0 @@
-<map id="UserFunction" name="UserFunction">
-<area shape="rect" id="node1" title="One user&#45;defined function." alt="" coords="59,152,159,177"/>
-<area shape="rect" id="node5" href="$classMacro.html" title="a system function or operator implemented as an internal defined function" alt="" coords="79,225,138,251"/>
-<area shape="rect" id="node2" href="$classFunction.html" title="Base class for all APL functions and operators (system or defined)" alt="" coords="21,79,93,104"/>
-<area shape="rect" id="node3" href="$classNamedObject.html" title="A user&#45;defined variable or function." alt="" coords="5,5,108,31"/>
-<area shape="rect" id="node4" href="$classExecutable.html" title="Base class for ExecuteList, StatementList, and UserFunction." alt="" coords="117,79,204,104"/>
-</map>

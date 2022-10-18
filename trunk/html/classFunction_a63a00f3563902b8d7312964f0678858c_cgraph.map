@@ -1,7 +1,0 @@
-<map id="Function::eval_ALRB" name="Function::eval_ALRB">
-<area shape="rect" id="node1" title="dyadic operator, 2 arguments" alt="" coords="5,5,152,31"/>
-<area shape="rect" id="node2" href="$classNamedObject.html#adf8b778a154d1d6e35c7d8a169aaaeb5" title="return the name of the named object" alt="" coords="200,5,367,31"/>
-<area shape="rect" id="node3" href="$classID.html#af1bb0741450971c1882af59af87eef29" title="return the printable name for id as UCS_string" alt="" coords="415,5,552,31"/>
-<area shape="rect" id="node4" href="$classID.html#a1c80b7bfa291882045116dcec6d50098" title="return the printable name for id as UTF8 *" alt="" coords="600,5,701,31"/>
-<area shape="rect" id="node5" href="$structId__name.html#a3202cdf13a9726257a4a3652a66285dd" title="compare key with item (for bsearch())" alt="" coords="749,5,880,31"/>
-</map>

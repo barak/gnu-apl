@@ -1,5 +1,0 @@
-<map id="Bif_F12_DECODE::decode_int" name="Bif_F12_DECODE::decode_int">
-<area shape="rect" id="node1" title="decode B according to len_A and cA (integer A, B and Z)" alt="" coords="5,31,208,56"/>
-<area shape="rect" id="node2" href="$classCell.html#acad8d4255191ceae01a96c778debeb83" title="Return value if it is close to int, or else throw DOMAIN_ERROR." alt="" coords="267,5,391,31"/>
-<area shape="rect" id="node3" href="$classValue.html#ab3a0d3914977f611bfddf54178edd477" title="initialize the next ravel cell with an integer value" alt="" coords="256,55,401,80"/>
-</map>

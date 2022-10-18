@@ -1,4 +1,0 @@
-<map id="PrintBuffer::do_PrintBuffer" name="PrintBuffer::do_PrintBuffer">
-<area shape="rect" id="node1" title="helper for non&#45;trivial PrintBuffer(const Value &amp; ...) constructor" alt="" coords="208,5,383,31"/>
-<area shape="rect" id="node2" href="$classPrintBuffer.html#a5abec40efca2993a2b522e199694730f" title="contructor: a PrintBuffer from an APL value" alt="" coords="5,5,160,31"/>
-</map>

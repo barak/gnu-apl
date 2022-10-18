@@ -1,7 +1,0 @@
-<map id="Avec::need_UCS" name="Avec::need_UCS">
-<area shape="rect" id="node1" title="return true if unicode uni needs ⎕UCS in 2 ⎕TF or )OUT" alt="" coords="5,55,129,80"/>
-<area shape="rect" id="node2" href="$classAvec.html#afe30f62f26ec74019a95e5cbd6eaa111" title="Find av in character_table. Return position or Invalid_CHT." alt="" coords="193,5,306,31"/>
-<area shape="rect" id="node3" href="$classAvec.html#ac1a3f05db620e46d7ecdc6d65a7c25d5" title="return true iff av is a control char (ASCII 0..32 (excluding))" alt="" coords="191,55,307,80"/>
-<area shape="rect" id="node4" href="$classAvec.html#a24bf275107eb974d9a47ba0732153edc" title="search uni in inverse_ibm_av and return its position in the IBM ⎕AV (= its code in ...." alt="" coords="177,104,321,129"/>
-<area shape="rect" id="node5" href="$classAvec.html#a584e4653f79d47cd53be20f9830cbc74" title="compare the unicodes of two entries ua and u2 in inverse_IBM_quad_AV" alt="" coords="369,104,504,129"/>
-</map>

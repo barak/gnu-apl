@@ -1,4 +1,0 @@
-<map id="FloatCell::need_scaling" name="FloatCell::need_scaling">
-<area shape="rect" id="node1" title="return true iff this cell needs scaling (exponential format) in pctx." alt="" coords="235,29,393,55"/>
-<area shape="rect" id="node2" href="$classComplexCell.html#a8882c2a4701f26a80e9bc1aa2dd450be" title="return true iff this cell needs scaling (exponential format) in pctx." alt="" coords="5,29,187,55"/>
-</map>

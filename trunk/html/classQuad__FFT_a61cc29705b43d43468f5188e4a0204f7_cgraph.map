@@ -1,9 +1,0 @@
-<map id="Quad_FFT::do_window" name="Quad_FFT::do_window">
-<area shape="rect" id="node1" title="return the values of the window function win for length N" alt="" coords="5,104,163,129"/>
-<area shape="rect" id="node2" href="$classQuad__FFT.html#a47ae31a9881643eb3caf1397d6584fb6" title="set up a multi&#45;dimensional window for shape sh, using the window function win" alt="" coords="211,29,367,55"/>
-<area shape="rect" id="node5" href="$classCell.html#a0e6b9239fa77e3222f32400d51c8f114" title="Return the imaginary part of a cell." alt="" coords="217,79,361,104"/>
-<area shape="rect" id="node6" href="$classCell.html#a9a0028fd74f00deb001a8062a55916c6" title="Return the real part of a cell." alt="" coords="220,128,357,153"/>
-<area shape="rect" id="node7" href="$classCell.html#a62919edef3b6b585e544dcf2865402eb" title="Return true iff this cell is a complex number cell." alt="" coords="215,177,362,203"/>
-<area shape="rect" id="node3" href="$classShape.html#a017e9a35dd20f4bc4fdeb7ea29b6805d" title="return the rank" alt="" coords="435,5,553,31"/>
-<area shape="rect" id="node4" href="$classShape.html#a592d2ade68aa8c21c5d84627c3a0e001" title="return the length of dimension r" alt="" coords="415,55,573,80"/>
-</map>

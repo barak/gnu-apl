@@ -1,6 +1,0 @@
-<map id="Quad_CR::do_CR35" name="Quad_CR::do_CR35">
-<area shape="rect" id="node1" title="compute 35 ⎕CR B" alt="" coords="5,55,148,80"/>
-<area shape="rect" id="node2" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="196,5,336,31"/>
-<area shape="rect" id="node3" href="$classValue__P__Base.html#a1c3bf1b6f708eb2c1ba4b97c83adb9aa" title="return a const pointer to the Value" alt="" coords="199,55,333,80"/>
-<area shape="rect" id="node4" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="205,104,327,129"/>
-</map>

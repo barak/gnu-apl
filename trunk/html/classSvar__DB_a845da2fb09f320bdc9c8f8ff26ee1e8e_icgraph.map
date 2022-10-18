@@ -1,7 +1,0 @@
-<map id="Svar_DB::get_coupling" name="Svar_DB::get_coupling">
-<area shape="rect" id="node2" href="$classQuad__SVO.html#a92d931679e0b1836d24e1cc1ab60ed02" title="Overloaded Function::eval_AB(). " alt="" coords="215,5,360,32"/>
-<area shape="rect" id="node3" href="$classQuad__SVO.html#a369a0fb998581b2ecb2b06d1e3d59980" title="Overloaded Function::eval_AB(). " alt="" coords="219,56,355,83"/>
-<area shape="rect" id="node4" href="$classQuad__SVO.html#aefe8710645494d9dc6b8879b3f09b913" title="share one variable " alt="" coords="209,107,365,149"/>
-<area shape="rect" id="node5" href="$classSymbol.html#a7f575b6ab7a26b6cd238c20cd5ea2ac7" title="unshare a shared variable " alt="" coords="215,173,360,200"/>
-<area shape="rect" id="node6" href="$classQuad__SVR.html#aea2ba17b1ab3e29a35bbb1ccf85b948f" title="Overloaded Function::eval_AB(). " alt="" coords="413,173,549,200"/>
-</map>

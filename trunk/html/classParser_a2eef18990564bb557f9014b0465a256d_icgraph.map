@@ -1,8 +1,0 @@
-<map id="Parser::create_scalar_value" name="Parser::create_scalar_value">
-<area shape="rect" id="node1" title="Create one scalar APL value from a token." alt="" coords="776,23,923,63"/>
-<area shape="rect" id="node2" href="$classParser.html#a2ec94a9ef33782db92065a4c15e53295" title="Create one APL value from len values." alt="" coords="585,31,728,56"/>
-<area shape="rect" id="node3" href="$classParser.html#aa6206be9b275310ea5c9ecca098fc113" title="Collect consecutive smaller APL values or value token into vectors." alt="" coords="367,5,537,31"/>
-<area shape="rect" id="node6" href="$classParser.html#ad6ae52cbe0094ff62852548096166b97" title="Collect groups." alt="" coords="376,55,528,80"/>
-<area shape="rect" id="node4" href="$classParser.html#a3eeeb92bcac2c60b355c30b5ccd4060e" title="Parse token string tos (a statement without diamonds)." alt="" coords="153,31,319,56"/>
-<area shape="rect" id="node5" href="$classParser.html#af5fc690941afdce0fd36c6c9629e5186" title="Parse UCS_string input into token string tos." alt="" coords="5,31,105,56"/>
-</map>

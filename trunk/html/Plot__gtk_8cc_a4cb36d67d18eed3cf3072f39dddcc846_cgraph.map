@@ -1,9 +1,0 @@
-<map id="draw_marker" name="draw_marker">
-<area shape="rect" id="node1" title="draw a red marker for debugging purposes (to show where pixel P0 is)" alt="" coords="5,80,103,105"/>
-<area shape="rect" id="node2" href="$Plot__gtk_8cc.html#a5974ed8d074320e72c4e8cf11f740c72" title="draw a point with given point_style and size around P" alt="" coords="151,80,236,105"/>
-<area shape="rect" id="node3" href="$Plot__gtk_8cc.html#a9edae1218c5d31a0b9a4559d5fe94e9b" title="draw a circle with diameter size around P0" alt="" coords="285,5,373,31"/>
-<area shape="rect" id="node5" href="$Plot__gtk_8cc.html#ae7281e8b20ed86f06c6a39424231928b" title="draw a 🞤 or 🞫 with given size around P0" alt="" coords="284,55,373,80"/>
-<area shape="rect" id="node6" href="$Plot__gtk_8cc.html#ad93bc9bc62f2ddf10507308397a42277" title="draw a ▲ or ▼ with given size around P0" alt="" coords="286,104,371,129"/>
-<area shape="rect" id="node7" href="$Plot__gtk_8cc.html#a016d3738646de7950db9c228368b09ed" title="draw a ■ or ◆ with given size around P0" alt="" coords="286,153,371,179"/>
-<area shape="rect" id="node4" href="$Plot__gtk_8cc.html#ad3c35c71233bf7716802110531ce36bb" title="same as standard cairo_set_RGB_source() but with Color instead of double red, green,..." alt="" coords="421,80,579,105"/>
-</map>

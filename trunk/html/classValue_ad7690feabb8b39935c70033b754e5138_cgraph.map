@@ -1,9 +1,0 @@
-<map id="Value::check_Cells" name="Value::check_Cells">
-<area shape="rect" id="node1" title="check the cells of this value, return the number of errors." alt="" coords="5,113,140,139"/>
-<area shape="rect" id="node2" href="$classValue.html#aa0572b1b7fa249cb79694fd152130b38" title="return the (constant) idx&#39;th element of the ravel." alt="" coords="195,5,317,31"/>
-<area shape="rect" id="node3" href="$classValue.html#ac5b54e3a13cab0837442f1575b3299a5" title="return the number of elements, but at least 1 (for the prototype)." alt="" coords="372,31,541,56"/>
-<area shape="rect" id="node5" href="$classValue.html#af3d98202f94c1dce3e8c9b03afd7ffc0" title="return the PointerCell count" alt="" coords="193,106,319,146"/>
-<area shape="rect" id="node6" href="$classCell.html#af8746e4049278c9a46f25e6ee0d71fcc" title="Return true iff this cell is a pointer to a cell." alt="" coords="197,171,315,196"/>
-<area shape="rect" id="node7" href="$classCell.html#ae98b3988a7fa52c6c157b4911b043dde" title="Return true iff this cell is a pointer (to a sub&#45;array) cell." alt="" coords="188,220,324,245"/>
-<area shape="rect" id="node4" href="$classShape.html#a6f32f749601dca80263493fd06be12c4" title="return the number of ravel elements, but at least 1 (for empty values and scalars) else product of sh..." alt="" coords="589,31,744,56"/>
-</map>

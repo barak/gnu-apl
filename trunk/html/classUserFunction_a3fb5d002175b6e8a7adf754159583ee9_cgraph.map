@@ -1,7 +1,0 @@
-<map id="UserFunction::fix_lambda" name="UserFunction::fix_lambda">
-<area shape="rect" id="node1" title="(re&#45;)create a lambda" alt="" coords="5,55,176,80"/>
-<area shape="rect" id="node2" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="231,5,371,31"/>
-<area shape="rect" id="node3" href="$classUCS__string.html#a186a76c22c3ac840f1e607ba49e253a0" title="return the last character in this string" alt="" coords="238,55,365,80"/>
-<area shape="rect" id="node5" href="$classUCS__string.html#a67ea87cb92e687105b21917ffb4a2a6f" title="remove the last character in this string" alt="" coords="224,104,379,129"/>
-<area shape="rect" id="node4" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="427,80,549,105"/>
-</map>

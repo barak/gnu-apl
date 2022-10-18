@@ -1,6 +1,0 @@
-<map id="Quad_FFT::init_in" name="Quad_FFT::init_in">
-<area shape="rect" id="node1" title="initialize in from B" alt="" coords="5,31,132,56"/>
-<area shape="rect" id="node2" href="$classQuad__FFT.html#a47ae31a9881643eb3caf1397d6584fb6" title="set up a multi&#45;dimensional window for shape sh, using the window function win" alt="" coords="180,31,336,56"/>
-<area shape="rect" id="node3" href="$classShape.html#a017e9a35dd20f4bc4fdeb7ea29b6805d" title="return the rank" alt="" coords="405,5,522,31"/>
-<area shape="rect" id="node4" href="$classShape.html#a592d2ade68aa8c21c5d84627c3a0e001" title="return the length of dimension r" alt="" coords="384,55,543,80"/>
-</map>
