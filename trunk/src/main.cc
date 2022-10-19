@@ -60,8 +60,8 @@
    (aka. Programming Language APL, Extended) and to \b IBM \b APL2.
 
    It is \b NOT meant to be a vehicle for adding new features to the
-   APL language. Its promary focus is on compatibility with APL2 and the
-   ISO standard and portability to different platforms.
+   APL language. Its primary focus is on compatibility with APL2 and the
+   ISO standard and on the portability to different platforms.
  **/
 
 /// when this file  was built

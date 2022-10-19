@@ -655,18 +655,19 @@ echo
 # create buildtag.hh and set apl_top to the directory that contains buildtag.sh
 #
 echo "configure: creating buildtag.hh..."
-apl_top=""
-for f in "." ".." "../.." "../../.."  "../../../.."
-do
-   if test -f "$f/buildtag.sh"
-   then
-      apl_top="$f"
-      . "$f/buildtag.sh"
-      abs_apl_top=$(realpath "$apl_top")
+abs_apl_top=""
+apl_top=$(pwd)
+for q in 1 2 3 4; do
+   if test -f "$apl_top/buildtag.sh"; then
+      abs_apl_top="$apl_top"
+      . "$abs_apl_top/buildtag.sh"
+      break;
+   else
+      apl_top=$(dirname($apl_top))
    fi
 done
 
-if test -z "$apl_top"
+if test -z "$abs_apl_top"
 then
    echo "configure: *** could not find top-level GNU APL directory, using '.'"
    apl_top="."
