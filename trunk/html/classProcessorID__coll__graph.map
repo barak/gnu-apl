@@ -1,4 +1,0 @@
-<map id="ProcessorID" name="ProcessorID">
-<area shape="rect" id="node1" title="One APL processor." alt="" coords="15,93,110,119"/>
-<area shape="rect" id="node2" href="$structNetwork__Profile.html" title="A network profile." alt="" coords="5,5,120,31"/>
-</map>

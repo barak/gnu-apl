@@ -1,7 +1,0 @@
-<map id="CellFunctionStatistics::print" name="CellFunctionStatistics::print">
-<area shape="rect" id="node1" title="overloaded Statistics::print()" alt="" coords="5,79,156,119"/>
-<area shape="rect" id="node2" href="$classStatistics.html#a030aa5e46f4885edbc42f9a890f342b1" title="return the name of this statistics" alt="" coords="204,29,347,55"/>
-<area shape="rect" id="node3" href="$classStatistics__record.html#a9104063061c876ff793cfceda2858c76" title="print count, data, and data2" alt="" coords="211,79,339,119"/>
-<area shape="rect" id="node5" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="214,144,337,169"/>
-<area shape="rect" id="node4" href="$classStatistics__record.html#aeb857e0128a5ffe466261a40695a2a55" title="print num as 5 characters (digits, dot, and multiplier (k, m, g, ...)" alt="" coords="395,79,523,119"/>
-</map>

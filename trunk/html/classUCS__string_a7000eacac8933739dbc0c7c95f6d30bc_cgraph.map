@@ -1,5 +1,0 @@
-<map id="UCS_string::operator&lt;&lt;" name="UCS_string::operator&lt;&lt;">
-<area shape="rect" id="node1" title="append number num" alt="" coords="5,13,167,38"/>
-<area shape="rect" id="node2" href="$classUCS__string.html#a5776e51c6faa53537409322cd0ebf07a" title="append number (in ASCII encoding like d) to this string" alt="" coords="215,5,355,45"/>
-<area shape="rect" id="node3" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="403,13,543,38"/>
-</map>

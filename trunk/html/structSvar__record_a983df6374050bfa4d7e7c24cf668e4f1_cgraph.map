@@ -1,5 +1,0 @@
-<map id="Svar_record::valid" name="Svar_record::valid">
-<area shape="rect" id="node1" title="true if this is a valid entry." alt="" coords="5,5,132,31"/>
-<area shape="rect" id="node2" href="$structSvar__record.html#ab4d3d8caaff62e4f3c5ef75488b5af93" title="return the coupling of the variable" alt="" coords="180,5,353,31"/>
-<area shape="rect" id="node3" href="$structSvar__partner.html#a08989d19706b526a4054398b2d0b5480" title="return true if this partner is active. Note that this can be the case even though tcp_fd is invalid." alt="" coords="401,5,557,31"/>
-</map>

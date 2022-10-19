@@ -1,4 +1,0 @@
-<map id="ID::get_name" name="ID::get_name">
-<area shape="rect" id="node1" title="return the printable name for id as UTF8 *" alt="" coords="5,5,107,31"/>
-<area shape="rect" id="node2" href="$structId__name.html#a3202cdf13a9726257a4a3652a66285dd" title="compare key with item (for bsearch())" alt="" coords="155,5,285,31"/>
-</map>

@@ -1,8 +1,0 @@
-<map id="Quad_CR::do_CR36" name="Quad_CR::do_CR36">
-<area shape="rect" id="node1" title="compute 36 ⎕CR B" alt="" coords="5,55,148,80"/>
-<area shape="rect" id="node2" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="200,5,340,31"/>
-<area shape="rect" id="node3" href="$classValue.html#a9fc8bbaf9fefe6835dea7db0f71b8b6c" title="return the number of elements (the product of the shapes)." alt="" coords="196,55,344,80"/>
-<area shape="rect" id="node5" href="$classValue.html#a5ac7131d2f89d0bc8b8907d960cbd125" title="return the rank of this value" alt="" coords="213,104,327,129"/>
-<area shape="rect" id="node4" href="$classShape.html#af39e05bad7be900fa1437a6eb6035e97" title="return the number of ravel elements (1 for scalars,i else product of shapes)" alt="" coords="392,55,527,80"/>
-<area shape="rect" id="node6" href="$classShape.html#a017e9a35dd20f4bc4fdeb7ea29b6805d" title="return the rank" alt="" coords="401,104,518,129"/>
-</map>

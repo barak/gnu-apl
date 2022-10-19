@@ -1,5 +1,0 @@
-<map id="Quad_TS::get_apl_value" name="Quad_TS::get_apl_value">
-<area shape="rect" id="node2" href="$classQuad__TZ.html#aca7ab6c3b090bca821fc85536b6a67c1" title="return the offset from GMT of the current timezone (in seconds). we make this int64_t rather than int..." alt="" coords="242,5,385,32"/>
-<area shape="rect" id="node3" href="$classWorkspace.html#a34c064c6760d7bfcc10e68700defe327" title="Workspace::get_v_Quad_TZ" alt="" coords="219,56,408,83"/>
-<area shape="rect" id="node4" href="$Common_8cc.html#aabe60dd5e5d6c1e8d911c6485565f73b" title="current time as microseconds since epoch " alt="" coords="290,107,337,133"/>
-</map>

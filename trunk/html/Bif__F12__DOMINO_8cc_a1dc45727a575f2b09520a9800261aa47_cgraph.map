@@ -1,7 +1,0 @@
-<map id="divide_matrix" name="divide_matrix">
-<area shape="rect" id="node2" href="$classWorkspace.html#a84f9084505dfcbc3a26414ea895dd7ca" title="return the current ⎕CT " alt="" coords="170,5,309,32"/>
-<area shape="rect" id="node3" href="$classCell.html#a0e6b9239fa77e3222f32400d51c8f114" title="Return the imaginary part of a cell. " alt="" coords="167,56,311,83"/>
-<area shape="rect" id="node4" href="$classCell.html#a9a0028fd74f00deb001a8062a55916c6" title="Return the real part of a cell. " alt="" coords="171,107,308,133"/>
-<area shape="rect" id="node5" href="$classValue.html#afd08a9cd66afb49ff0e654b56d718616" title="set ravel[offset] to Complex(real, imag) " alt="" coords="152,157,327,184"/>
-<area shape="rect" id="node6" href="$classValue.html#a543709a9fcb4273395465ad8ff21ae5b" title="set ravel[offset] to flt " alt="" coords="163,208,315,235"/>
-</map>

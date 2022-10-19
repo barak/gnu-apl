@@ -1,5 +1,0 @@
-<map id="PrimitiveFunction::print_properties" name="PrimitiveFunction::print_properties">
-<area shape="rect" id="node1" title="overloaded Function::print_properties()" alt="" coords="5,5,136,45"/>
-<area shape="rect" id="node2" href="$classPrimitiveFunction.html#a872389b6d0bbadd7a0a8c17b1a03d25c" title="Print the name of this PrimitiveFunction to out." alt="" coords="184,5,315,45"/>
-<area shape="rect" id="node3" href="$classNamedObject.html#a3ff29d3b8f3eed6c55f535e1af8dbc91" title="return the Id of this object (ID_USER_SYMBOL for user defined objects)" alt="" coords="363,13,509,38"/>
-</map>

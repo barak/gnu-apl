@@ -1,8 +1,0 @@
-<map id="ComplexCell::bif_reciprocal" name="ComplexCell::bif_reciprocal">
-<area shape="rect" id="node1" title="overloaded from the corresponding Cell:: function (see class Cell)." alt="" coords="5,104,188,129"/>
-<area shape="rect" id="node2" href="$classComplexCell.html#a028e5e684fcb55f616d876dd8a22166c" title="overloaded Cell::is_near_real()" alt="" coords="238,5,413,31"/>
-<area shape="rect" id="node3" href="$classComplexCell.html#ae99fa03039ce445df8cd5d3be23f2d88" title="overloaded Cell::is_near_zero()" alt="" coords="236,55,415,80"/>
-<area shape="rect" id="node4" href="$classComplexCell.html#aa4fd8402d65ab55628abeec7e284c117" title="the square of the magnitude of aJb (= a² + b²)" alt="" coords="257,104,394,129"/>
-<area shape="rect" id="node5" href="$classComplexCell.html#a9ccb64da2c504a517c725dc2c41940da" title="initialize the (un&#45;initialized) Cell *Z to complex r + ij" alt="" coords="264,153,387,179"/>
-<area shape="rect" id="node6" href="$classFloatCell.html#a88217aaf5cd286cc89a85d2885876dda" title="initialize the (un&#45;initialized) Cell *Z to APL_Float flt" alt="" coords="277,203,374,228"/>
-</map>

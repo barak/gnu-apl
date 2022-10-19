@@ -203,10 +203,8 @@ using namespace std;
 
  **/
 //============================================================================
-/**
-  The set of CPUs (= hyper-threads) over which the computational load is
-  being distrinuted.
- **/
+/// The set of CPUs (= hyper-threads) over which the computational load is
+/// being distrinuted.
 class CPU_pool
 {
 public:

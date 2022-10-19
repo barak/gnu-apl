@@ -1,7 +1,0 @@
-<map id="draw_triangle" name="draw_triangle">
-<area shape="rect" id="node1" title="draw a triangular area of a 3D plot" alt="" coords="427,31,525,56"/>
-<area shape="rect" id="node2" href="$Plot__xcb_8cc.html#a6004b2c57c13517082271e5d6e209eb2" title="draw the surface plot lines" alt="" coords="244,5,379,31"/>
-<area shape="rect" id="node5" href="$Plot__xcb_8cc.html#af288859aef185afe0338f45b4b20d4c9" title="draw a triangular plot point (∆ or ∇)" alt="" coords="262,55,361,80"/>
-<area shape="rect" id="node3" href="$Plot__xcb_8cc.html#a9387ad8c9e85cbf5b602ab83b47425a0" title="draw the content of a plot window" alt="" coords="132,5,196,31"/>
-<area shape="rect" id="node4" href="$Plot__xcb_8cc.html#a897990543dc934261ba8e7a124446b11" title="the pthread that handles one plot window." alt="" coords="5,5,84,31"/>
-</map>

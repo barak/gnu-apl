@@ -1,6 +1,0 @@
-<map id="LineLabel::print_prompt" name="LineLabel::print_prompt">
-<area shape="rect" id="node1" title="print a prompt like [1.2] into buffer" alt="" coords="411,35,568,60"/>
-<area shape="rect" id="node2" href="$classNabla.html#a610d94a179335126e82e9eea07918d5a" title="edit this function" alt="" coords="252,5,337,31"/>
-<area shape="rect" id="node3" href="$structNabla_1_1FunLine.html#acb10b18671fa5864824dbcf871e7eb9f" title="return the line label (sucah as [1]) and the line text" alt="" coords="227,55,363,95"/>
-<area shape="rect" id="node4" href="$classNabla.html#a672cb6353bdc6ef24ab702b781bd09c7" title="return the line label (sucah as [1]) and the line text, Set is_current iff line is the current line o..." alt="" coords="5,63,179,88"/>
-</map>

@@ -1,5 +1,0 @@
-<map id="UCS_string::do_escape" name="UCS_string::do_escape">
-<area shape="rect" id="node1" title="the inverse of un_escape()." alt="" coords="5,31,167,56"/>
-<area shape="rect" id="node2" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="215,5,355,31"/>
-<area shape="rect" id="node3" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="223,55,346,80"/>
-</map>

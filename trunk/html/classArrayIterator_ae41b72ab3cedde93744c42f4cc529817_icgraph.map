@@ -1,4 +1,0 @@
-<map id="ArrayIterator::get_shape_offset" name="ArrayIterator::get_shape_offset">
-<area shape="rect" id="node1" title="Get the current offset for axis r." alt="" coords="173,5,293,45"/>
-<area shape="rect" id="node2" href="$classArrayIterator.html#a4d1bb97a549707ef61c072fe068afdd4" title="return the offsets of the axis_iterators as a shape" alt="" coords="5,5,125,45"/>
-</map>

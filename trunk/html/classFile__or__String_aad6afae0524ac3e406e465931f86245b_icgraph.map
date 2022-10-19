@@ -1,7 +1,0 @@
-<map id="File_or_String::unget" name="File_or_String::unget">
-<area shape="rect" id="node1" title="unget uni. At most one Unicode (= lookahead char) can be ungotten." alt="" coords="583,31,725,56"/>
-<area shape="rect" id="node2" href="$classQuad__FIO.html#a0d8c64c720db4d63a3a548141b868420" title="perform an fscanf() from file" alt="" coords="201,31,344,56"/>
-<area shape="rect" id="node4" href="$classFile__or__String.html#ab1b42cb9c05452d6328368019b9eeeaa" title="scan a double in string or file. Return either 0 or 1 for the number of successful conversions." alt="" coords="392,24,535,64"/>
-<area shape="rect" id="node5" href="$classFile__or__String.html#ae4623d5b35159f5ae2e03075ad5749d1" title="scan a long long in a string or in a file. Return either 0 or 1 for the number of successful conversi..." alt="" coords="392,88,535,128"/>
-<area shape="rect" id="node3" href="$classQuad__FIO.html#a36fdeb894607c2125307cd673284fb69" title="overloaded Function::eval_AXB()." alt="" coords="5,31,153,56"/>
-</map>

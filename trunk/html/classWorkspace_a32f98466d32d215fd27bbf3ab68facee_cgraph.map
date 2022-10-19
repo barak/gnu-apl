@@ -1,5 +1,0 @@
-<map id="Workspace::backup_existing_file" name="Workspace::backup_existing_file">
-<area shape="rect" id="node1" title="backup an existing file filename, return true on error" alt="" coords="5,42,220,67"/>
-<area shape="rect" id="node2" href="$classUTF8__string.html#aabaebbdfbe8fad48e44655144f5fbd5e" title="append a 0&#45;terminated C string" alt="" coords="268,5,412,45"/>
-<area shape="rect" id="node3" href="$classUTF8__string.html#a922bd7ebc6a8ea5c6ba9c54159b18a93" title="return this string as a 0&#45;terminated C string" alt="" coords="275,70,405,95"/>
-</map>

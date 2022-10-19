@@ -1,4 +1,0 @@
-<map id="UCS_string::dump" name="UCS_string::dump">
-<area shape="rect" id="node1" title="dump this string to out (like U+nnn U+mmm ... )" alt="" coords="5,5,136,31"/>
-<area shape="rect" id="node2" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="184,5,307,31"/>
-</map>

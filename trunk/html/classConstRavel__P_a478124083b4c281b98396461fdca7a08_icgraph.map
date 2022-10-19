@@ -1,4 +1,0 @@
-<map id="ConstRavel_P::operator+" name="ConstRavel_P::operator+">
-<area shape="rect" id="node1" title="return true iff offset is valid (and then *() != 0). For this to work, increment needs to be true" alt="" coords="228,5,399,31"/>
-<area shape="rect" id="node2" href="$classConstRavel__P.html#aa04bc97d5999c5a9cfcd5cb7be079f11" title="return a pointer to the current Cell (or 0 at the end)" alt="" coords="5,5,180,31"/>
-</map>

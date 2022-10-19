@@ -1,8 +1,0 @@
-<map id="Bif_F12_INDEX_OF::find_B_in_sorted_A" name="Bif_F12_INDEX_OF::find_B_in_sorted_A">
-<area shape="rect" id="node1" title="find Cell B in the ravel A (of length len_A). Return the position (&lt; len_A) if found,..." alt="" coords="5,73,176,113"/>
-<area shape="rect" id="node2" href="$classBif__F12__INDEX__OF.html#a45aee628d238bea143448d285667e914" title="compare function for Heapsort&lt;ShapeItem&gt;::search&lt;const Cell &amp;&gt;" alt="" coords="224,55,419,80"/>
-<area shape="rect" id="node5" href="$classCell.html#a4cb1f7ae7e4ad956ec55f1d507a0e938" title="return true if this cell is equal to other" alt="" coords="279,104,363,129"/>
-<area shape="rect" id="node3" href="$classCell.html#ab5bc0bd0d336863996b9b5bc58f3ddef" title="compare this with other, throw DOMAIN ERROR on illegal comparisons" alt="" coords="486,5,589,31"/>
-<area shape="rect" id="node4" href="$classCell.html#ae98b3988a7fa52c6c157b4911b043dde" title="Return true iff this cell is a pointer (to a sub&#45;array) cell." alt="" coords="469,55,605,80"/>
-<area shape="rect" id="node6" href="$classCell.html#ad08fb9a79b3c5b38d92bf5ef4bf47145" title="return the name of the class" alt="" coords="467,104,608,129"/>
-</map>

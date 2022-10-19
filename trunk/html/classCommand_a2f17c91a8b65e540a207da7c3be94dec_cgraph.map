@@ -1,7 +1,0 @@
-<map id="Command::do_USERCMD" name="Command::do_USERCMD">
-<area shape="rect" id="node1" title="execute a user defined command" alt="" coords="5,59,185,84"/>
-<area shape="rect" id="node2" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="428,5,568,31"/>
-<area shape="rect" id="node3" href="$classUCS__string.html#aaa6ebd4a175a47347101721aa86322dd" title="append other in quotes, doubling quoted in other" alt="" coords="237,51,377,91"/>
-<area shape="rect" id="node5" href="$classWorkspace.html#a9d95fe58db1301e25929139af7bbe15f" title="Return all user&#45;defined commands." alt="" coords="233,115,380,155"/>
-<area shape="rect" id="node4" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="437,59,559,84"/>
-</map>

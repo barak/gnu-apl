@@ -1,5 +1,0 @@
-<map id="Quad_GTK::poll_all" name="Quad_GTK::poll_all">
-<area shape="rect" id="node1" title="poll all fds and insert events into event_queue until no more events are pending" alt="" coords="5,5,140,31"/>
-<area shape="rect" id="node2" href="$classQuad__GTK.html#a70ad8230ade1a543dffdf62400c326bb" title=" " alt="" coords="188,5,327,31"/>
-<area shape="rect" id="node3" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="375,5,497,31"/>
-</map>

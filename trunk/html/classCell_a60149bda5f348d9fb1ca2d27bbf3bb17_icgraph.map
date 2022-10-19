@@ -1,9 +1,0 @@
-<map id="Cell::bif_equal" name="Cell::bif_equal">
-<area shape="rect" id="node1" title="store 1 in Z if A == the value of this cell in Z, else 0" alt="" coords="751,80,856,105"/>
-<area shape="rect" id="node2" href="$classComplexCell.html#a5d1fbc198fc98df8f0f91869cbd161f5" title="overloaded from the corresponding Cell:: function (see class Cell)." alt="" coords="519,5,687,31"/>
-<area shape="rect" id="node5" href="$classBif__F2__EQUAL.html#a6736ce332581d9bc8c4c2ddd0ba4e8fc" title="overloaded Function::eval_AB()." alt="" coords="519,55,688,80"/>
-<area shape="rect" id="node6" href="$classBif__F2__EQUAL.html#a96242b66e6691e1aead4722fbc677f61" title="overloaded Function::eval_AXB()." alt="" coords="514,104,693,129"/>
-<area shape="rect" id="node7" href="$classBif__F2__EQUAL.html#ab40a3f595066b92d3f99d7fbe6ab18bc" title="overloaded Function::get_scalar_f2" alt="" coords="504,153,703,179"/>
-<area shape="rect" id="node3" href="$classBif__F12__ENCODE.html#a4639bbd2488d2f02ca88a5e362a1229a" title="encode *ib() according to A" alt="" coords="243,5,456,31"/>
-<area shape="rect" id="node4" href="$classBif__F12__ENCODE.html#a003a77890ec532d2909d23e3ce5dcb89" title="overloaded Function::eval_AB()" alt="" coords="5,5,195,31"/>
-</map>

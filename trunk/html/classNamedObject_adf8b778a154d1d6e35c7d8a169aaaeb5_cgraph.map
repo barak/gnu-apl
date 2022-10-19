@@ -1,6 +1,0 @@
-<map id="NamedObject::get_name" name="NamedObject::get_name">
-<area shape="rect" id="node1" title="return the name of the named object" alt="" coords="5,5,172,31"/>
-<area shape="rect" id="node2" href="$classID.html#af1bb0741450971c1882af59af87eef29" title="return the printable name for id as UCS_string" alt="" coords="220,5,357,31"/>
-<area shape="rect" id="node3" href="$classID.html#a1c80b7bfa291882045116dcec6d50098" title="return the printable name for id as UTF8 *" alt="" coords="405,5,507,31"/>
-<area shape="rect" id="node4" href="$structId__name.html#a3202cdf13a9726257a4a3652a66285dd" title="compare key with item (for bsearch())" alt="" coords="555,5,685,31"/>
-</map>

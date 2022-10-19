@@ -1,4 +1,0 @@
-<map id="PointerCell" name="PointerCell">
-<area shape="rect" id="node1" title="A cell pointing to a (nested) APL value." alt="" coords="5,79,92,104"/>
-<area shape="rect" id="node2" href="$classCell.html" title="The base class for all Cells." alt="" coords="26,5,71,31"/>
-</map>

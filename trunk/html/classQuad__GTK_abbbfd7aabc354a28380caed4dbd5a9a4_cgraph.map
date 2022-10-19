@@ -1,5 +1,0 @@
-<map id="Quad_GTK::poll_response" name="Quad_GTK::poll_response">
-<area shape="rect" id="node1" title="poll for a TLV on fd with a specific (reponse&#45;) tag" alt="" coords="5,5,180,31"/>
-<area shape="rect" id="node2" href="$classQuad__GTK.html#a70ad8230ade1a543dffdf62400c326bb" title=" " alt="" coords="228,5,367,31"/>
-<area shape="rect" id="node3" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="415,5,537,31"/>
-</map>

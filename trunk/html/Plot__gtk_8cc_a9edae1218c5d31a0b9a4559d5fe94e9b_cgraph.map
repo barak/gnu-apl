@@ -1,4 +1,0 @@
-<map id="draw_circle" name="draw_circle">
-<area shape="rect" id="node1" title="draw a circle with diameter size around P0" alt="" coords="5,5,93,31"/>
-<area shape="rect" id="node2" href="$Plot__gtk_8cc.html#ad3c35c71233bf7716802110531ce36bb" title="same as standard cairo_set_RGB_source() but with Color instead of double red, green,..." alt="" coords="141,5,299,31"/>
-</map>

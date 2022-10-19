@@ -1,4 +1,0 @@
-<map id="DerivedFunction::get_bound_LO_value" name="DerivedFunction::get_bound_LO_value">
-<area shape="rect" id="node1" title="return the value (if any) bound to an operator (that allows it)" alt="" coords="228,5,371,45"/>
-<area shape="rect" id="node2" href="$classBif__OPER1__COMMUTE.html#ae8f69339b356705ed4217c7588255e22" title="Overloaded Function::eval_LB()." alt="" coords="5,5,180,45"/>
-</map>

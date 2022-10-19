@@ -1,4 +1,0 @@
-<map id="IntCell::compare" name="IntCell::compare">
-<area shape="rect" id="node1" title="compare this with other, throw DOMAIN ERROR on illegal comparisons" alt="" coords="161,5,280,31"/>
-<area shape="rect" id="node2" href="$classIntCell.html#aab19e1674cbf6f5e3cef614eb3061fc3" title="overloaded Cell::greater()" alt="" coords="5,5,113,31"/>
-</map>

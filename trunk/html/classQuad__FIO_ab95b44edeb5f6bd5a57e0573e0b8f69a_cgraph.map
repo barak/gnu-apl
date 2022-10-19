@@ -1,9 +1,0 @@
-<map id="Quad_FIO::get_file_entry" name="Quad_FIO::get_file_entry">
-<area shape="rect" id="node1" title="return the open file for (APL integer) handle" alt="" coords="5,55,137,95"/>
-<area shape="rect" id="node2" href="$classValue.html#a661111569a240e8a6f020fc9fb8af045" title="return the first element of the ravel of a scalar same as get_cfirst(), but named differently to indi..." alt="" coords="186,5,317,31"/>
-<area shape="rect" id="node6" href="$classQuad__FIO.html#ade0112438bef799ea7f16c683cd35668" title="return the open file for (APL integer) handle" alt="" coords="185,55,317,95"/>
-<area shape="rect" id="node7" href="$classCell.html#acad8d4255191ceae01a96c778debeb83" title="Return value if it is close to int, or else throw DOMAIN_ERROR." alt="" coords="189,120,313,145"/>
-<area shape="rect" id="node3" href="$classValue.html#aa0572b1b7fa249cb79694fd152130b38" title="return the (constant) idx&#39;th element of the ravel." alt="" coords="365,5,488,31"/>
-<area shape="rect" id="node4" href="$classValue.html#ac5b54e3a13cab0837442f1575b3299a5" title="return the number of elements, but at least 1 (for the prototype)." alt="" coords="536,5,705,31"/>
-<area shape="rect" id="node5" href="$classShape.html#a6f32f749601dca80263493fd06be12c4" title="return the number of ravel elements, but at least 1 (for empty values and scalars) else product of sh..." alt="" coords="753,5,908,31"/>
-</map>

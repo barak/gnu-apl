@@ -1,5 +1,0 @@
-<map id="CDR_string::get_ptr" name="CDR_string::get_ptr">
-<area shape="rect" id="node1" title="return the tag of this CDR" alt="" coords="5,5,144,31"/>
-<area shape="rect" id="node2" href="$classCDR__string.html#a76e5524bb6cc587949e264e297a58371" title="return 4 bytes of the header (the header is always big endian)" alt="" coords="192,5,323,31"/>
-<area shape="rect" id="node3" href="$structCDR__header.html#a575c6483cca55f908908fbe59c975752" title="convert big endian 32 bit value to 32 bit host value (== ntohl())" alt="" coords="371,5,529,31"/>
-</map>

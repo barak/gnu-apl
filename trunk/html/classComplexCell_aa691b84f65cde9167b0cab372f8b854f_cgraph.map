@@ -1,7 +1,0 @@
-<map id="ComplexCell::bif_near_int64_t" name="ComplexCell::bif_near_int64_t">
-<area shape="rect" id="node1" title="overloaded Cell::bif_near_int64_t()" alt="" coords="5,63,156,103"/>
-<area shape="rect" id="node2" href="$classComplexCell.html#af84098a01f329c4460d5f7b17171cccc" title="overloaded Cell::is_near_int64_t()" alt="" coords="204,5,351,45"/>
-<area shape="rect" id="node4" href="$classComplexCell.html#a9ccb64da2c504a517c725dc2c41940da" title="initialize the (un&#45;initialized) Cell *Z to complex r + ij" alt="" coords="216,70,339,95"/>
-<area shape="rect" id="node5" href="$classFloatCell.html#a88217aaf5cd286cc89a85d2885876dda" title="initialize the (un&#45;initialized) Cell *Z to APL_Float flt" alt="" coords="229,119,326,145"/>
-<area shape="rect" id="node3" href="$classCell.html#a19f013bdb9ddb5d594f29afafd3f979c" title="True iff value is numeric and close to an int." alt="" coords="399,13,540,38"/>
-</map>

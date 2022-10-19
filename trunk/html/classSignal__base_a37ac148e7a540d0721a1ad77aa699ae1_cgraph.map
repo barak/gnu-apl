@@ -1,5 +1,0 @@
-<map id="Signal_base::get__GET_EVENTS__proc" name="Signal_base::get__GET_EVENTS__proc">
-<area shape="rect" id="node1" title="APserver result for: find pairing key (CTL vs. DAT or Cnnn vs. Dnnn) for AP210 get events for one pro..." alt="" coords="5,5,165,45"/>
-<area shape="rect" id="node2" href="$classSignal__base.html#a4e35a5a0fd9ced011b83a11ac304724c" title="get function for an item that is not defined for the signal" alt="" coords="213,13,360,38"/>
-<area shape="rect" id="node3" href="$classSignal__base.html#a77d69692410bd7b7d49033b73fcfc8fc" title="return the name of the ID of the signal" alt="" coords="408,13,587,38"/>
-</map>

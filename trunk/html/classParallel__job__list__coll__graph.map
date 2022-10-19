@@ -1,4 +1,0 @@
-<map id="Parallel_job_list&lt; T, has_destructor &gt;" name="Parallel_job_list&lt; T, has_destructor &gt;">
-<area shape="rect" id="node1" title="A linked list of parallel jobs." alt="" coords="9,79,149,119"/>
-<area shape="rect" id="node2" href="$classParallel__job__list__base.html" title="a number of jobs, where each job can be executed in parallel" alt="" coords="5,5,153,31"/>
-</map>

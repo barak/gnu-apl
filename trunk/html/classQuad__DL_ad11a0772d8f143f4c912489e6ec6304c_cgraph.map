@@ -1,6 +1,0 @@
-<map id="Quad_DL::eval_B" name="Quad_DL::eval_B">
-<area shape="rect" id="node2" href="$Common_8cc.html#a9666ed02b6303d46b59d9138f25623e0" title="true if Control&#45;C was hit (once) " alt="" coords="179,5,309,32"/>
-<area shape="rect" id="node3" href="$Value_8cc.html#a239f0231eadcaffba3ac527e7243bce8" title="floating&#45;point scalar " alt="" coords="200,56,288,83"/>
-<area shape="rect" id="node4" href="$Common_8cc.html#a9180a233c43adc95558076d4b96b4d49" title="true if Control&#45;C was hit twice within 500 ms " alt="" coords="180,107,308,133"/>
-<area shape="rect" id="node5" href="$Common_8cc.html#aabe60dd5e5d6c1e8d911c6485565f73b" title="current time as microseconds since epoch " alt="" coords="221,157,267,184"/>
-</map>

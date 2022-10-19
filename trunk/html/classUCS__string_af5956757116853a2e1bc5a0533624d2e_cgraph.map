@@ -1,4 +1,0 @@
-<map id="UCS_string::FNV_hash" name="UCS_string::FNV_hash">
-<area shape="rect" id="node1" title="return the FNV (Fowler&#45;Noll&#45;Vo) hash of this_string" alt="" coords="5,5,165,31"/>
-<area shape="rect" id="node2" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="213,5,336,31"/>
-</map>

@@ -1,8 +1,0 @@
-<map id="Bif_OPER1_EACH::do_eval_LB" name="Bif_OPER1_EACH::do_eval_LB">
-<area shape="rect" id="node1" title="implementation of eval_LB()" alt="" coords="507,83,664,123"/>
-<area shape="rect" id="node2" href="$classBif__F12__PARTITION.html#af115071efaa0c6562d4fc738e3da3e4b" title="enclose_with_axes" alt="" coords="286,26,441,66"/>
-<area shape="rect" id="node5" href="$classBif__OPER1__EACH.html#afd91f92ab4e07e5f7e6ce2fd47935c70" title="Overloaded Function::eval_LB()." alt="" coords="268,91,459,116"/>
-<area shape="rect" id="node6" href="$classQuad__FIO.html#a24ac2813d6425ad61471166fe019ba33" title="overloaded Function::eval_LXB()." alt="" coords="290,140,437,165"/>
-<area shape="rect" id="node3" href="$classBif__OPER2__INNER.html#adbaaf10669f72e39cc58d5dcdab6c5fe" title="Overloaded Function::eval_ALRB()." alt="" coords="5,5,220,31"/>
-<area shape="rect" id="node4" href="$classBif__F12__PARTITION.html#a93f7a529d2b49ecb0e1262ee5b3ce893" title="overloaded Function::eval_XB()" alt="" coords="35,55,190,95"/>
-</map>

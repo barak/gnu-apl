@@ -89,7 +89,7 @@ AC_DEFUN([AX_LIB_POSTGRESQL],
         if test "$PG_CONFIG" != "no"; then
             AC_MSG_CHECKING([for PostgreSQL libraries])
 
-            POSTGRESQL_CFLAGS="-I`$PG_CONFIG --includedir`"
+            POSTGRESQL_CFLAGS= "-I`$PG_CONFIG --includedir`"
             POSTGRESQL_LDFLAGS="-L`$PG_CONFIG --libdir` -lpq"
 
             POSTGRESQL_VERSION=`$PG_CONFIG --version | sed -e 's#PostgreSQL ##'`

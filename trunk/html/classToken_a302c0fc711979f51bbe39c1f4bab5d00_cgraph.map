@@ -1,5 +1,0 @@
-<map id="Token::get_axes" name="Token::get_axes">
-<area shape="rect" id="node1" title="return the axis specification of this token" alt="" coords="5,31,124,56"/>
-<area shape="rect" id="node2" href="$unionToken_1_1sval.html#a22a0be9d3742c2a8168e59d530dd659e" title="a shortcut for accessing apl_val" alt="" coords="172,5,319,31"/>
-<area shape="rect" id="node3" href="$classToken.html#a13e8b65088f8a7d103772acc6cfb5140" title="return the tag of this token" alt="" coords="191,55,300,80"/>
-</map>

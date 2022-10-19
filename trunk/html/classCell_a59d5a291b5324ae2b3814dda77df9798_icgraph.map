@@ -1,9 +1,0 @@
-<map id="Cell::bif_subtract" name="Cell::bif_subtract">
-<area shape="rect" id="node1" title="store the difference between A and this cell in Z" alt="" coords="736,80,857,105"/>
-<area shape="rect" id="node2" href="$classComplexCell.html#a5d1fbc198fc98df8f0f91869cbd161f5" title="overloaded from the corresponding Cell:: function (see class Cell)." alt="" coords="512,5,680,31"/>
-<area shape="rect" id="node5" href="$classBif__F12__MINUS.html#a93dac5b38819e6dc13e563c6dfd48b54" title="overloaded Function::eval_AB()" alt="" coords="509,55,683,80"/>
-<area shape="rect" id="node6" href="$classBif__F12__MINUS.html#a80dac35e6996c3a64d31b67527089bfc" title="overloaded Function::eval_AXB()." alt="" coords="504,104,688,129"/>
-<area shape="rect" id="node7" href="$classBif__F12__MINUS.html#a36c8b79a67c80ddf40ff18e6cdc1c831" title="overloaded Function::get_scalar_f2()" alt="" coords="524,154,668,194"/>
-<area shape="rect" id="node3" href="$classBif__F12__ENCODE.html#a4639bbd2488d2f02ca88a5e362a1229a" title="encode *ib() according to A" alt="" coords="243,5,456,31"/>
-<area shape="rect" id="node4" href="$classBif__F12__ENCODE.html#a003a77890ec532d2909d23e3ce5dcb89" title="overloaded Function::eval_AB()" alt="" coords="5,5,195,31"/>
-</map>

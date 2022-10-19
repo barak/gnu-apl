@@ -1,4 +1,0 @@
-<map id="Value::get_first_shape_item" name="Value::get_first_shape_item">
-<area shape="rect" id="node1" title="return the length of the last dimension of this value, i.e. ↑⍴this" alt="" coords="5,5,189,31"/>
-<area shape="rect" id="node2" href="$classShape.html#a6cb953364cc9903453564615829f3788" title="return the length of the first axis, or 1 for scalars" alt="" coords="237,5,425,31"/>
-</map>

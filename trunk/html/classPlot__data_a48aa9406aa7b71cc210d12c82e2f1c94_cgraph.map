@@ -1,4 +1,0 @@
-<map id="Plot_data::get_Z" name="Plot_data::get_Z">
-<area shape="rect" id="node1" title="return the Z coordinate at row and col" alt="" coords="5,5,124,31"/>
-<area shape="rect" id="node2" href="$classPlot__data__row.html#a4b64a5cf137e1b8eff94c1dc2127d065" title="return the n&#45;th Z coordinate" alt="" coords="172,5,319,31"/>
-</map>

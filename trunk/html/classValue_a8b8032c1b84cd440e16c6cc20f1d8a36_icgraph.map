@@ -1,4 +1,0 @@
-<map id="Value::is_scalar_extensible" name="Value::is_scalar_extensible">
-<area shape="rect" id="node1" title="return true iff this value can be scalar&#45;extended" alt="" coords="212,13,393,38"/>
-<area shape="rect" id="node2" href="$classValue.html#a1b3d9774062587550a227517c2fe87a4" title="return true iff this value has the same shape as other or one of the values is a scalar" alt="" coords="5,5,164,45"/>
-</map>

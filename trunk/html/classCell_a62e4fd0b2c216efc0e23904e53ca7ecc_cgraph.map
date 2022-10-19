@@ -1,4 +1,0 @@
-<map id="Cell::copy" name="Cell::copy">
-<area shape="rect" id="node1" title="copy (deep) count cells from src to dest)" alt="" coords="5,5,87,31"/>
-<area shape="rect" id="node2" href="$classCell.html#aab9681b3e735d10ef92978c5c17bf95d" title="init (uninitialized) Cell other from this initialized cell" alt="" coords="135,5,241,31"/>
-</map>

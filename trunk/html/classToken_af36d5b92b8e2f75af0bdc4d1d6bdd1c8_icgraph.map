@@ -1,9 +1,0 @@
-<map id="Token::get_Id" name="Token::get_Id">
-<area shape="rect" id="node1" title="return the Id of this token." alt="" coords="403,105,505,131"/>
-<area shape="rect" id="node2" href="$classToken.html#af5ca64d07f1b9c4f0f4ea7bff69c47e3" title="the Quad_CR representation of the token." alt="" coords="215,5,337,31"/>
-<area shape="rect" id="node4" href="$classTokenizer.html#a9c9924450a3c4dd6076911aa8f342171" title="tokenize UCS string input into token string tos." alt="" coords="197,55,355,80"/>
-<area shape="rect" id="node5" href="$classToken.html#a45a7222bd70e5ce0e037e26e27975c69" title="helper function to print a function." alt="" coords="5,132,149,157"/>
-<area shape="rect" id="node6" href="$classToken.html#a8a6297e3da6b1cab03fca1fb3432aca4" title="helper function to print Quad&#45;function (system function or variable)." alt="" coords="213,156,339,181"/>
-<area shape="rect" id="node7" href="$classToken.html#af769022fa7b042d51efdb289689e8514" title="helper function to print an APL value" alt="" coords="13,181,142,207"/>
-<area shape="rect" id="node3" href="$classToken.html#a8da320e73d998f8ed44dfb8d81237bc8" title="print the token to out in the format used by print_error_info(). return the number of characters prin..." alt="" coords="17,5,137,31"/>
-</map>

@@ -1,7 +1,0 @@
-<map id="Quad_FIO::function_name_to_int" name="Quad_FIO::function_name_to_int">
-<area shape="rect" id="node1" title="find function number for function name, &#45;1 if not found" alt="" coords="427,47,563,87"/>
-<area shape="rect" id="node2" href="$classQuad__FIO.html#a36fdeb894607c2125307cd673284fb69" title="overloaded Function::eval_AXB()." alt="" coords="215,5,363,31"/>
-<area shape="rect" id="node3" href="$classQuad__FIO.html#aeaba4a7f5a55bbab8ad6b7d3d7c932fa" title="overloaded Function::eval_AXB()." alt="" coords="220,55,359,80"/>
-<area shape="rect" id="node5" href="$classQuad__FIO.html#a3d732007fca1640b4584e0980531f936" title="overloaded Function::subfun_to_axis" alt="" coords="200,104,379,129"/>
-<area shape="rect" id="node4" href="$classQuad__FIO.html#a24ac2813d6425ad61471166fe019ba33" title="overloaded Function::eval_LXB()." alt="" coords="5,55,152,80"/>
-</map>

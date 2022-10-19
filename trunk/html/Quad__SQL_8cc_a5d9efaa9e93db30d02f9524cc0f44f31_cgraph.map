@@ -1,5 +1,0 @@
-<map id="make_string_cell" name="make_string_cell">
-<area shape="rect" id="node2" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length " alt="" coords="376,5,499,32"/>
-<area shape="rect" id="node3" href="$Quad__SQL_8cc.html#afa91820082e6fa56039915fb7939b529" title="ucs_string_from_string" alt="" coords="173,56,328,83"/>
-<area shape="rect" id="node4" href="$UTF8__string_8hh.html#a46ebe7dd55fde2dcb74325be8018adde" title="frequently used cast to const UTF8 * " alt="" coords="411,56,464,83"/>
-</map>

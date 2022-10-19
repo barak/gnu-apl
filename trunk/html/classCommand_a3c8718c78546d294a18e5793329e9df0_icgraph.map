@@ -1,9 +1,0 @@
-<map id="Command::split_arg" name="Command::split_arg">
-<area shape="rect" id="node1" title="split whitespace separated arguments into individual arguments" alt="" coords="947,60,1085,85"/>
-<area shape="rect" id="node2" href="$classCommand.html#ac143785ae5217051a7ef49bcbde1893c" title="process line which contains an APL command. Return true iff the command was user&#45;defined (and then th..." alt="" coords="699,60,899,85"/>
-<area shape="rect" id="node3" href="$classBif__F1__EXECUTE.html#a8445cd77207db38ab66f5c3278a831df" title="execute string containing an APL command" alt="" coords="465,23,651,63"/>
-<area shape="rect" id="node7" href="$classCommand.html#ae26693534d4df16372f51e55e505b8d7" title="process line which contains a command or statements" alt="" coords="477,88,639,113"/>
-<area shape="rect" id="node4" href="$classBif__F1__EXECUTE.html#aefdd09df4262f08f508f9be8543896b7" title="execute string containing an APL expression or an APL command" alt="" coords="232,23,417,63"/>
-<area shape="rect" id="node5" href="$classBif__F1__EXECUTE.html#a4e1a5917e6a3bb368b459fb21c2b63a1" title="overladed Function::eval_B()" alt="" coords="5,5,184,31"/>
-<area shape="rect" id="node6" href="$classQuad__Quad.html#a253824f3a533bef36063138ea6ce0673" title="overloaded Symbol::resolve()." alt="" coords="24,55,165,80"/>
-</map>

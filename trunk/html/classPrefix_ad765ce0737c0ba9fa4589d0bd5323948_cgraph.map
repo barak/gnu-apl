@@ -1,8 +1,0 @@
-<map id="Prefix::get_dyadic_fun" name="Prefix::get_dyadic_fun">
-<area shape="rect" id="node1" title="return the current monadic function (if any)" alt="" coords="5,55,157,80"/>
-<area shape="rect" id="node2" href="$classPrefix.html#a492aebeb400a3616395c40320742ffff" title="return the second token from the left (e.g. ← in A←B)" alt="" coords="233,5,315,31"/>
-<area shape="rect" id="node4" href="$classToken.html#a4d19f279ca06bc64e549c9d63ca677b0" title="return the Function_P value of this token" alt="" coords="205,55,343,80"/>
-<area shape="rect" id="node6" href="$classToken.html#a1a31afbb07e3f1dbb86d5f872ce5c297" title="return the TokenValueType of this token." alt="" coords="568,80,721,105"/>
-<area shape="rect" id="node3" href="$classPrefix.html#a07a35c8b69a8c9f685225e2a2586a2fd" title="return the number of token currently in the FIFO" alt="" coords="411,5,499,31"/>
-<area shape="rect" id="node5" href="$classToken.html#abe9f60f29fc7644214b48cc2715a21ad" title="return true if this token is a function (or operator)" alt="" coords="391,55,520,80"/>
-</map>

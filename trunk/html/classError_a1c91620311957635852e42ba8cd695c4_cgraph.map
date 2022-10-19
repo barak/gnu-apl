@@ -1,7 +1,0 @@
-<map id="Error::print_em" name="Error::print_em">
-<area shape="rect" id="node1" title="print the 3 error message lines as per ⎕EM" alt="" coords="5,55,113,80"/>
-<area shape="rect" id="node2" href="$classError.html#a739e9351b9ce25524248bd3326039930" title="return ⎕EM[1;]. This is the first of 3 error lines. It contains the error name (like SYNTAX ERROR,..." alt="" coords="161,5,312,31"/>
-<area shape="rect" id="node3" href="$classError.html#ab28f2939af175480877baa459190a14a" title="return error_message_2. This is the second of 3 error lines. It contains the failed statement and is ..." alt="" coords="161,55,312,80"/>
-<area shape="rect" id="node4" href="$classError.html#a782d3b90b8d5e00842b9aa46b510de77" title="compute the caret line. This is the third of the 3 error lines. It contains the failure position the ..." alt="" coords="161,104,312,129"/>
-<area shape="rect" id="node5" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="360,104,500,129"/>
-</map>

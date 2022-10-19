@@ -1,6 +1,0 @@
-<map id="IndexExpr::extract_axis" name="IndexExpr::extract_axis">
-<area shape="rect" id="node1" title="return the single axis value and clear it in this IndexExpr." alt="" coords="228,55,388,80"/>
-<area shape="rect" id="node2" href="$classBif__F2__INDEX.html#a85e678157d596ed118034350f32fb247" title="overloaded Function::eval_AB()" alt="" coords="9,5,176,31"/>
-<area shape="rect" id="node3" href="$classBif__F2__INDEX.html#a81ae7c821f03f2c0fceca000cc9e243c" title="overloaded Function::eval_AXB()" alt="" coords="5,55,180,80"/>
-<area shape="rect" id="node4" href="$classToken.html#ad64780ae10504be9e672bc9bd5b418d1" title="Construct a token for an index." alt="" coords="41,104,144,129"/>
-</map>

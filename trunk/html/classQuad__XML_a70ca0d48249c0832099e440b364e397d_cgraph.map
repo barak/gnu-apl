@@ -1,4 +1,0 @@
-<map id="Quad_XML::skip_pos_prefix" name="Quad_XML::skip_pos_prefix">
-<area shape="rect" id="node1" title="return ucs with leading _NNN (position) skipped." alt="" coords="5,5,152,45"/>
-<area shape="rect" id="node2" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="200,13,323,38"/>
-</map>

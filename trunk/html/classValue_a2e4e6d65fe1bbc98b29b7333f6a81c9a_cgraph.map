@@ -1,5 +1,0 @@
-<map id="Value::set_shape_item" name="Value::set_shape_item">
-<area shape="rect" id="node1" title="set the length of axis r to sh." alt="" coords="5,5,160,31"/>
-<area shape="rect" id="node2" href="$classShape.html#afcd3708c8c18a30cb3c0c1fa1a630f71" title="modify dimension r" alt="" coords="208,5,367,31"/>
-<area shape="rect" id="node3" href="$classShape.html#a189c92d0b74f3313bd83c8aa7565e9c5" title="recompute volume (after changing a dimension of len 0)" alt="" coords="415,5,592,31"/>
-</map>

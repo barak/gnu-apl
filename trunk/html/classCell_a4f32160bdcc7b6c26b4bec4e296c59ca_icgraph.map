@@ -1,7 +1,0 @@
-<map id="Cell::bif_or_bitwise" name="Cell::bif_or_bitwise">
-<area shape="rect" id="node1" title="store the bitwise or of A and this cell in Z" alt="" coords="243,80,376,105"/>
-<area shape="rect" id="node2" href="$classBif__F2__OR__B.html#a9435ad23b29955918cac355488160c09" title="overloaded Function::eval_AB()." alt="" coords="20,5,180,31"/>
-<area shape="rect" id="node3" href="$classBif__F2__OR__B.html#ac81751d6e2e20ea2dceb834871c08633" title="overloaded Function::eval_AXB()." alt="" coords="15,55,185,80"/>
-<area shape="rect" id="node4" href="$classBif__F2__OR__B.html#a86a3d18b4d913d923dd571c1449ed72f" title="return the associative cell function of this function" alt="" coords="15,104,185,129"/>
-<area shape="rect" id="node5" href="$classBif__F2__OR__B.html#a4586ca375872ca37ae152b5492ad3032" title="overloaded Function::get_scalar_f2" alt="" coords="5,153,195,179"/>
-</map>

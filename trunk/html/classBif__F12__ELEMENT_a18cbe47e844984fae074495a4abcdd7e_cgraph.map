@@ -1,5 +1,0 @@
-<map id="Bif_F12_ELEMENT::do_eval_B" name="Bif_F12_ELEMENT::do_eval_B">
-<area shape="rect" id="node1" title="implementation of eval_B()" alt="" coords="5,37,164,77"/>
-<area shape="rect" id="node2" href="$classLvalCell.html#a86dbb9a22797b3611d852ce91e1e97b6" title="return the owner of the cell pointed to" alt="" coords="212,5,335,45"/>
-<area shape="rect" id="node3" href="$classLvalCell.html#a0e898696cb3440b90aa3bdcfac1a23b7" title="Overloaded Cell::get_lval_value()" alt="" coords="212,69,335,109"/>
-</map>

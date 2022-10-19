@@ -1,5 +1,0 @@
-<map id="Error::get_throw_loc" name="Error::get_throw_loc">
-<area shape="rect" id="node1" title="return the source code location where the error was thrown" alt="" coords="365,5,504,31"/>
-<area shape="rect" id="node2" href="$classStateIndicator.html#ae8f1a9f49c7933c492f6f899fccd437f" title="list the stack entry (for command ]SI)" alt="" coords="181,5,317,31"/>
-<area shape="rect" id="node3" href="$classStateIndicator.html#a0129e968c738e1c300e20b16533fca55" title="list the stack entry (for commands ]SI, )SI, and )SIS)" alt="" coords="5,5,133,31"/>
-</map>

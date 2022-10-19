@@ -1,8 +1,0 @@
-<map id="Value::is_complex" name="Value::is_complex">
-<area shape="rect" id="node1" title="return true, if this value has complex cells, false iff it has only real cells. Throw domain error fo..." alt="" coords="5,81,135,107"/>
-<area shape="rect" id="node2" href="$classValue.html#aa0572b1b7fa249cb79694fd152130b38" title="return the (constant) idx&#39;th element of the ravel." alt="" coords="183,5,305,31"/>
-<area shape="rect" id="node3" href="$classValue.html#ac5b54e3a13cab0837442f1575b3299a5" title="return the number of elements, but at least 1 (for the prototype)." alt="" coords="353,31,523,56"/>
-<area shape="rect" id="node5" href="$classCell.html#a361d896dc8f4fa470864e8e1588d2409" title="return true iff value is numeric and close to a real number" alt="" coords="183,107,305,132"/>
-<area shape="rect" id="node6" href="$classCell.html#a4ce158d2f937ff444732ec5c43a5093f" title="Return true iff this cell is an integer, float, or complex cell." alt="" coords="186,156,302,181"/>
-<area shape="rect" id="node4" href="$classShape.html#a6f32f749601dca80263493fd06be12c4" title="return the number of ravel elements, but at least 1 (for empty values and scalars) else product of sh..." alt="" coords="571,31,725,56"/>
-</map>

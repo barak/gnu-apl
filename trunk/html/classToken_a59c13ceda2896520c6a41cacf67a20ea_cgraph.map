@@ -1,6 +1,0 @@
-<map id="Token::value_use_count" name="Token::value_use_count">
-<area shape="rect" id="node1" title="return value usage counter" alt="" coords="5,31,169,56"/>
-<area shape="rect" id="node2" href="$classValue.html#a8103d85e8d44c2e4fc99ecd31c163e6f" title="return the number of Value_P pointing to this value" alt="" coords="217,5,380,31"/>
-<area shape="rect" id="node3" href="$classToken.html#a11e37aa69b8eb64f293702293b00f50c" title="return true iff this token is an apl value" alt="" coords="237,55,361,80"/>
-<area shape="rect" id="node4" href="$classToken.html#a1a31afbb07e3f1dbb86d5f872ce5c297" title="return the TokenValueType of this token." alt="" coords="428,55,581,80"/>
-</map>

@@ -1,7 +1,0 @@
-<map id="NativeFunction::has_result" name="NativeFunction::has_result">
-<area shape="rect" id="node1" title="overloaded Function::has_result()" alt="" coords="720,5,859,45"/>
-<area shape="rect" id="node2" href="$classDoxy.html#ac9842076620bf4fe90f3e80922c5499c" title="write the page for one native function." alt="" coords="541,13,672,38"/>
-<area shape="rect" id="node3" href="$classDoxy.html#a5eb9b5605981c826438d5a51f38bf5a4" title="HTML&#45;print a table containing all defined functions to page." alt="" coords="344,13,493,38"/>
-<area shape="rect" id="node4" href="$classDoxy.html#ad8abe2e8a1b686a7b35e582c369d41ae" title="generate the entire documentation" alt="" coords="213,13,296,38"/>
-<area shape="rect" id="node5" href="$classCommand.html#a834eac0e797a5d1c992018b7d0c049a4" title="]DOXY: create doxygen&#45;like documentation of the current workspace" alt="" coords="5,13,165,38"/>
-</map>

@@ -1,5 +1,0 @@
-<map id="UCS_string::reverse" name="UCS_string::reverse">
-<area shape="rect" id="node1" title="return this string reversed (i.e. characters from back to front)." alt="" coords="5,31,147,56"/>
-<area shape="rect" id="node2" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="195,5,335,31"/>
-<area shape="rect" id="node3" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="203,55,326,80"/>
-</map>

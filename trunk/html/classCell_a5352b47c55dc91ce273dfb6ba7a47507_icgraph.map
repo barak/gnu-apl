@@ -1,4 +1,0 @@
-<map id="Cell::bif_conjugate" name="Cell::bif_conjugate">
-<area shape="rect" id="node1" title="conjugate the value of this Cell and store the result in Z" alt="" coords="211,5,341,31"/>
-<area shape="rect" id="node2" href="$classBif__F12__PLUS.html#a56e4964cac0278cea3970e7d3b12f291" title="overloaded Function::eval_B()." alt="" coords="5,5,163,31"/>
-</map>

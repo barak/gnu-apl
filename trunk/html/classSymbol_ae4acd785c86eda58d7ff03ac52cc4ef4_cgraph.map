@@ -1,5 +1,0 @@
-<map id="Symbol::get_function" name="Symbol::get_function">
-<area shape="rect" id="node1" title="overloaded NamedObject::get_function()" alt="" coords="5,42,151,67"/>
-<area shape="rect" id="node2" href="$classValueStackItem.html#a3a9ea0ee5b4129f7e5aa4a92c851abfd" title="return the function (caller must have checked NC_FUNOPER)." alt="" coords="212,5,353,45"/>
-<area shape="rect" id="node3" href="$classValueStackItem.html#a27453c0dfda1004c6f5e68a0c2530eae" title="return the name class for this ValueStackItem" alt="" coords="199,70,367,95"/>
-</map>

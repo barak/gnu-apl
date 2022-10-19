@@ -1,7 +1,0 @@
-<map id="DLX_Node::remove_lr" name="DLX_Node::remove_lr">
-<area shape="rect" id="node2" href="$classDLX__Root__Node.html#a2398a37e28c8fcfb9143d3a4dd1f61f9" title="cover columns j (see Knuth) " alt="" coords="204,31,365,57"/>
-<area shape="rect" id="node3" href="$classDLX__Root__Node.html#a3c37a6cf9975dda2d0ddd30defdaf8c0" title="solve the constraints matrix " alt="" coords="416,5,576,32"/>
-<area shape="rect" id="node5" href="$classDLX__Root__Node.html#a361309d7f1cc268ab987fee4c2003558" title="do some dance steps with the constraints matrix " alt="" coords="413,56,579,83"/>
-<area shape="rect" id="node4" href="$classQuad__DLX.html#a24405a11778fa85f2ac67fe1302433ed" title="common part of eval_AB() and eval_B() " alt="" coords="627,5,769,32"/>
-<area shape="rect" id="node6" href="$classQuad__DLX.html#a519a1bbba3ab6694a935bc5b71857e0a" title="overloaded Function::eval_AB(). " alt="" coords="627,56,769,83"/>
-</map>

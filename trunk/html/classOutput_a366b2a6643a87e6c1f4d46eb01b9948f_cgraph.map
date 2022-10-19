@@ -1,5 +1,0 @@
-<map id="Output::toggle_color" name="Output::toggle_color">
-<area shape="rect" id="node1" title="set or toggle color mode (implementation of command ]XTERM)" alt="" coords="5,13,144,38"/>
-<area shape="rect" id="node2" href="$classUCS__string.html#a59758db55104daa7d4d72933412f86e3" title="return true if this starts with prefix (ASCII, case insensitive)." alt="" coords="192,5,323,45"/>
-<area shape="rect" id="node3" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="371,13,493,38"/>
-</map>

@@ -1,6 +1,0 @@
-<map id="NumericCell::cpx_gcd" name="NumericCell::cpx_gcd">
-<area shape="rect" id="node1" title="return the greatest common divisor of complex a and b" alt="" coords="5,56,156,81"/>
-<area shape="rect" id="node2" href="$classNumericCell.html#a0d8cbae9ade43f4a8b2de0cdc853a06b" title="return the greatest common divisor of real a and b" alt="" coords="204,5,345,31"/>
-<area shape="rect" id="node3" href="$classCell.html#a0070bc8a15c9ea3742aea0f9407ab934" title="return true iff value is numeric and close to 0" alt="" coords="393,31,520,56"/>
-<area shape="rect" id="node4" href="$classCell.html#ac8ce4cebc1b8ac383bc62723d645914a" title="True iff value is numeric and close to an int." alt="" coords="217,107,333,132"/>
-</map>

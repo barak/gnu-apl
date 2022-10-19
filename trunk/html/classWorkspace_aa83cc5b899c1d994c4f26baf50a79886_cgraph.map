@@ -1,6 +1,0 @@
-<map id="Workspace::clear_error" name="Workspace::clear_error">
-<area shape="rect" id="node1" title="clear ⎕EM and ⎕ET related errors (error entries on SI up to (including) the next user&#45;defined functio..." alt="" coords="5,77,163,102"/>
-<area shape="rect" id="node2" href="$classUserFunction__header.html#a02e0fedf3b2ad3d50a2d3903bb9be6f9" title="return error if header was not parsed successfully" alt="" coords="211,5,357,45"/>
-<area shape="rect" id="node3" href="$classStateIndicator.html#a44d07945c56abef5505efcfdc98ec090" title="return the SI that has called this one" alt="" coords="219,69,349,109"/>
-<area shape="rect" id="node4" href="$classWorkspace.html#a8083efc2d51067edb25ae8dd4f014173" title="the top of the SI stack (the SI pushed last)" alt="" coords="217,134,351,159"/>
-</map>

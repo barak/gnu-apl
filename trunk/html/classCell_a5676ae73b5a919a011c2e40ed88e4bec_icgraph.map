@@ -1,6 +1,0 @@
-<map id="Cell::bif_nor_bitwise" name="Cell::bif_nor_bitwise">
-<area shape="rect" id="node1" title="store the bitwise NOR of A and this cell in Z" alt="" coords="252,55,392,80"/>
-<area shape="rect" id="node2" href="$classBif__F2__NOR__B.html#a942a34a35440e437647308f438bddd81" title="overloaded Function::eval_AB()." alt="" coords="19,5,190,31"/>
-<area shape="rect" id="node3" href="$classBif__F2__NOR__B.html#a2c607625b860d897ed2f9555c6b43e4a" title="overloaded Function::eval_AXB()." alt="" coords="15,55,194,80"/>
-<area shape="rect" id="node4" href="$classBif__F2__NOR__B.html#a06b4bdb495ad11affd085637b39a13db" title="overloaded Function::get_scalar_f2()" alt="" coords="5,104,204,129"/>
-</map>

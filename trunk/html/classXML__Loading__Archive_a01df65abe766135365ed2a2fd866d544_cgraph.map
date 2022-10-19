@@ -1,8 +1,0 @@
-<map id="XML_Loading_Archive::read_Function" name="XML_Loading_Archive::read_Function">
-<area shape="rect" id="node1" title="read next Function element" alt="" coords="5,99,157,139"/>
-<area shape="rect" id="node2" href="$classXML__Loading__Archive.html#ab35641740ea48ef96237fe6d230d426b" title="add fid and function to find_fun_map. Either fid must be new, or else an existing fid must have its n..." alt="" coords="212,5,364,45"/>
-<area shape="rect" id="node4" href="$classXML__Loading__Archive.html#ab8580e022dac6f86d619f3d2344a2f39" title="return Fid value of attribute att_name" alt="" coords="212,69,364,109"/>
-<area shape="rect" id="node5" href="$classXML__Loading__Archive.html#ab000726e8f5db4742338a6844c899541" title="return integer value of attribute att_name" alt="" coords="419,97,571,137"/>
-<area shape="rect" id="node6" href="$classID.html#a341968b9dc03776b8fda037e99451efc" title="If id is the ID of primitive function, primitive operator, or quad function, then return a pointer to..." alt="" coords="205,185,371,210"/>
-<area shape="rect" id="node3" href="$classXML__Loading__Archive.html#a93a89589ea91d036a7327823bcda95cb" title="return fun_map for fid, or 0 if not found." alt="" coords="419,5,571,45"/>
-</map>

@@ -1,9 +1,0 @@
-<map id="PrimitiveFunction::print" name="PrimitiveFunction::print">
-<area shape="rect" id="node1" title="Print the name of this PrimitiveFunction to out." alt="" coords="472,55,603,95"/>
-<area shape="rect" id="node2" href="$classQuad__EC.html#a856174e390a934b63bc19affe232937e" title="overloaded Function::eval_B()." alt="" coords="268,5,395,31"/>
-<area shape="rect" id="node3" href="$classBif__F1__EXECUTE.html#aefdd09df4262f08f508f9be8543896b7" title="execute string containing an APL expression or an APL command" alt="" coords="239,55,424,95"/>
-<area shape="rect" id="node7" href="$classPrimitiveFunction.html#abbfceea746a97391601469d6b787bef8" title="overloaded Function::print_properties()" alt="" coords="266,119,397,159"/>
-<area shape="rect" id="node4" href="$classBif__F1__EXECUTE.html#a4e1a5917e6a3bb368b459fb21c2b63a1" title="overladed Function::eval_B()" alt="" coords="9,5,187,31"/>
-<area shape="rect" id="node5" href="$classBif__F1__EXECUTE.html#a8445cd77207db38ab66f5c3278a831df" title="execute string containing an APL command" alt="" coords="5,55,191,95"/>
-<area shape="rect" id="node6" href="$classQuad__Quad.html#a253824f3a533bef36063138ea6ce0673" title="overloaded Symbol::resolve()." alt="" coords="27,120,169,145"/>
-</map>

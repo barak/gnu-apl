@@ -1,5 +1,0 @@
-<map id="PrintBuffer::separator_rows" name="PrintBuffer::separator_rows">
-<area shape="rect" id="node1" title="return the number of separator rows before row y in a value with shape shape" alt="" coords="5,31,187,56"/>
-<area shape="rect" id="node2" href="$classShape.html#a017e9a35dd20f4bc4fdeb7ea29b6805d" title="return the rank" alt="" coords="255,5,373,31"/>
-<area shape="rect" id="node3" href="$classShape.html#a592d2ade68aa8c21c5d84627c3a0e001" title="return the length of dimension r" alt="" coords="235,55,393,80"/>
-</map>

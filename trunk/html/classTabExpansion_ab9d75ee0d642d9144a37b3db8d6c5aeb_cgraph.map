@@ -1,8 +1,0 @@
-<map id="TabExpansion::read_matching_filenames" name="TabExpansion::read_matching_filenames">
-<area shape="rect" id="node1" title="read filenames in dir and append matching filenames to matches" alt="" coords="5,74,151,114"/>
-<area shape="rect" id="node2" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="209,5,349,31"/>
-<area shape="rect" id="node3" href="$classUTF8__string.html#a922bd7ebc6a8ea5c6ba9c54159b18a93" title="return this string as a 0&#45;terminated C string" alt="" coords="435,81,565,107"/>
-<area shape="rect" id="node4" href="$classUTF8__string.html#a75b4e440d7576c690934bc7b5f863ac6" title="return true iff string ends with ext (usually a file name extension)" alt="" coords="199,107,360,132"/>
-<area shape="rect" id="node5" href="$classCommand.html#af95676cbc57e2564feb00e5166d07512" title="return true if entry is a directory" alt="" coords="201,156,358,181"/>
-<area shape="rect" id="node6" href="$classUTF8__string.html#ae512c0617f7a13fe5011655d898ca6c1" title="append the UTF8_string suffix" alt="" coords="408,156,592,181"/>
-</map>

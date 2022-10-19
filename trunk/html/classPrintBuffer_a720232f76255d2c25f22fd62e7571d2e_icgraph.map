@@ -1,7 +1,0 @@
-<map id="PrintBuffer::add_outer_frame" name="PrintBuffer::add_outer_frame">
-<area shape="rect" id="node1" title="add an outer frame around this buffer" alt="" coords="431,74,580,114"/>
-<area shape="rect" id="node2" href="$classPrintBuffer.html#adb9b7f5903b37ffeae4de10ada9cfc6d" title="helper for non&#45;trivial PrintBuffer(const Value &amp; ...) constructor" alt="" coords="208,5,383,31"/>
-<area shape="rect" id="node3" href="$classPrintBuffer.html#a5abec40efca2993a2b522e199694730f" title="contructor: a PrintBuffer from an APL value" alt="" coords="5,81,160,107"/>
-<area shape="rect" id="node4" href="$classPrintBuffer.html#adefc49d1f2c2b71e33dba8f3da4155aa" title="PrintBuffer from an empty APL value." alt="" coords="221,107,370,132"/>
-<area shape="rect" id="node5" href="$classPrintBuffer.html#a3c3030436502e7ec4054cb4b6223d92d" title="PrintBuffer from an APL value in function&#45;style." alt="" coords="231,157,359,197"/>
-</map>

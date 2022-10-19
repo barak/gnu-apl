@@ -1,5 +1,0 @@
-<map id="CDR::get_8_be" name="CDR::get_8_be">
-<area shape="rect" id="node1" title="return 8 bytes starting at data in network byte order" alt="" coords="5,5,119,31"/>
-<area shape="rect" id="node2" href="$classCDR.html#a52b514abc54de6143e10925ebba08d55" title="return 4 bytes starting at data in network byte order" alt="" coords="167,5,280,31"/>
-<area shape="rect" id="node3" href="$structCDR__header.html#a575c6483cca55f908908fbe59c975752" title="convert big endian 32 bit value to 32 bit host value (== ntohl())" alt="" coords="328,5,487,31"/>
-</map>

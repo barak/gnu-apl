@@ -1,5 +1,0 @@
-<map id="UCS_string::UCS_string" name="UCS_string::UCS_string">
-<area shape="rect" id="node1" title="constructor: UCS_string from simple character vector value." alt="" coords="5,31,172,56"/>
-<area shape="rect" id="node2" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="220,5,360,31"/>
-<area shape="rect" id="node3" href="$classUCS__string.html#a40523238d26f5405f5392df03d242627" title="common part of all constructors" alt="" coords="223,55,357,80"/>
-</map>

@@ -1,4 +1,0 @@
-<map id="UserPreferences::read_threshold_file" name="UserPreferences::read_threshold_file">
-<area shape="rect" id="node1" title="read a parallel_thresholds file and update parameters set there" alt="" coords="5,5,159,45"/>
-<area shape="rect" id="node2" href="$structUserPreferences.html#a07c2933cafe4e981cd07f03232a6b7b5" title="open a user&#45;supplied config file (in $HOME or gnu&#45;apl.d)" alt="" coords="207,5,363,45"/>
-</map>

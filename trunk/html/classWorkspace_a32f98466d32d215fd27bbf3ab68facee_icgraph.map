@@ -1,8 +1,0 @@
-<map id="Workspace::backup_existing_file" name="Workspace::backup_existing_file">
-<area shape="rect" id="node1" title="backup an existing file filename, return true on error" alt="" coords="452,31,667,56"/>
-<area shape="rect" id="node2" href="$classWorkspace.html#a15d8cb5c62016f547b9718e820c94efd" title="dump this workspace" alt="" coords="247,5,404,31"/>
-<area shape="rect" id="node4" href="$classWorkspace.html#a8a4f1d898d523818dbd9d7efa6f2cf92" title="save this workspace" alt="" coords="249,55,402,80"/>
-<area shape="rect" id="node3" href="$classCommand.html#a98e7d1dd0c01014d79f2120292588a70" title=")DUMP: dump a workspace file (.apl)" alt="" coords="21,5,183,31"/>
-<area shape="rect" id="node5" href="$classCommand.html#ad61e749290966d00856ce1dd4f6abe42" title=")SAVE active WS as CONTINUE and )OFF" alt="" coords="5,55,199,80"/>
-<area shape="rect" id="node6" href="$classCommand.html#aec0c4c6efbb9df9a34220b510f58905a" title=")SAVE: save a workspace file (.xml)" alt="" coords="23,104,181,129"/>
-</map>

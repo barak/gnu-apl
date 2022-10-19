@@ -1,7 +1,0 @@
-<map id="Executable" name="Executable">
-<area shape="rect" id="node1" title="Base class for ExecuteList, StatementList, and UserFunction." alt="" coords="131,168,218,193"/>
-<area shape="rect" id="node2" href="$classUCS__string__vector.html" title="a vector of UCS_strings." alt="" coords="39,80,172,105"/>
-<area shape="rect" id="node3" title=" " alt="" coords="5,5,181,31"/>
-<area shape="rect" id="node4" href="$classToken__string.html" title="A sequence of Token." alt="" coords="218,80,315,105"/>
-<area shape="rect" id="node5" title=" " alt="" coords="205,5,349,31"/>
-</map>

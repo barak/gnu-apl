@@ -1,9 +1,0 @@
-<map id="PointerCell::equal" name="PointerCell::equal">
-<area shape="rect" id="node1" title="overloaded Cell::equal()" alt="" coords="5,108,131,133"/>
-<area shape="rect" id="node2" href="$classCell.html#a367b9df7e0d4b805e5f31641658113f6" title="Return the APL value of a cell (Asserts for non&#45;pointer cells)" alt="" coords="181,51,335,76"/>
-<area shape="rect" id="node5" href="$classPointerCell.html#a4f3f4eebed4b98ea6161b66b5a81c48d" title="overloaded Cell::get_pointer_value()" alt="" coords="179,101,337,141"/>
-<area shape="rect" id="node7" href="$classCell.html#ae98b3988a7fa52c6c157b4911b043dde" title="Return true iff this cell is a pointer (to a sub&#45;array) cell." alt="" coords="190,165,326,191"/>
-<area shape="rect" id="node3" href="$classCell.html#a38a6a25f0ad091f35e3d9abfe5608a50" title="return the type of this cell" alt="" coords="405,5,535,31"/>
-<area shape="rect" id="node4" href="$classCell.html#a6c3fdef3d82f53649d1c3f16d37eedd7" title="the name of ct" alt="" coords="385,55,555,80"/>
-<area shape="rect" id="node6" href="$classValue__P__Base.html#a1c3bf1b6f708eb2c1ba4b97c83adb9aa" title="return a const pointer to the Value" alt="" coords="403,108,537,133"/>
-</map>

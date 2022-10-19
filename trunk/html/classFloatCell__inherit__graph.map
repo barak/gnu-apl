@@ -1,6 +1,0 @@
-<map id="FloatCell" name="FloatCell">
-<area shape="rect" id="node1" title="A Cell containing a single floating point (or rational) value." alt="" coords="15,225,90,251"/>
-<area shape="rect" id="node2" href="$classRealCell.html" title="Base class for IntCell and FloatCell." alt="" coords="17,152,89,177"/>
-<area shape="rect" id="node3" href="$classNumericCell.html" title="Base class for RealCell and ComplexCell." alt="" coords="5,79,100,104"/>
-<area shape="rect" id="node4" href="$classCell.html" title="The base class for all Cells." alt="" coords="30,5,75,31"/>
-</map>

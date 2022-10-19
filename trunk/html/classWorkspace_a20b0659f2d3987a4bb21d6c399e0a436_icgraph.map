@@ -1,5 +1,0 @@
-<map id="Workspace::copy_WS" name="Workspace::copy_WS">
-<area shape="rect" id="node1" title="copy objects from another workspace" alt="" coords="260,31,413,56"/>
-<area shape="rect" id="node2" href="$classCommand.html#a51b8fbdb5d65baf2fddfc930b9b142cf" title=")COPY: copy a workspace file" alt="" coords="29,5,189,31"/>
-<area shape="rect" id="node3" href="$classCommand.html#a2f7425e3673258dfb78045919e82f69f" title=")COPY_ONCE: copy a workspace file, nut at most once" alt="" coords="5,55,212,80"/>
-</map>

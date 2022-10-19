@@ -1,7 +1,0 @@
-<map id="Command::cmd_XTERM" name="Command::cmd_XTERM">
-<area shape="rect" id="node1" title="enable and disable colors" alt="" coords="5,81,175,107"/>
-<area shape="rect" id="node2" href="$classOutput.html#a5fbec469bdc1d4ed4cd951ba98784118" title="true if xterm/color is on" alt="" coords="223,5,372,31"/>
-<area shape="rect" id="node3" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="599,85,721,111"/>
-<area shape="rect" id="node4" href="$classUCS__string.html#a59758db55104daa7d4d72933412f86e3" title="return true if this starts with prefix (ASCII, case insensitive)." alt="" coords="420,106,551,146"/>
-<area shape="rect" id="node5" href="$classOutput.html#a366b2a6643a87e6c1f4d46eb01b9948f" title="set or toggle color mode (implementation of command ]XTERM)" alt="" coords="228,157,367,183"/>
-</map>

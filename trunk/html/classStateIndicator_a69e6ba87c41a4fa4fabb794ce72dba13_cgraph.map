@@ -1,5 +1,0 @@
-<map id="StateIndicator::get_parse_mode_name" name="StateIndicator::get_parse_mode_name">
-<area shape="rect" id="node1" title="return the name of the parse mode" alt="" coords="5,5,144,45"/>
-<area shape="rect" id="node2" href="$classStateIndicator.html#aa6584f8a9afaf76a334fb33517e36987" title="return the mode of this entry" alt="" coords="192,5,321,45"/>
-<area shape="rect" id="node3" href="$classExecutable.html#a02b3dd7f7dbb3c3e099e3ab553034baa" title="the parse mode of this Executable" alt="" coords="369,13,560,38"/>
-</map>

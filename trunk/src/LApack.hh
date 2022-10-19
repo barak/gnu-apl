@@ -275,8 +275,8 @@ template<typename T>
 class Vector
 {
 public:
-   /// constructor: vector of length _len, with values _data
-   /// _data must outlive \b this!
+   /// constructor: vector of length _len, with values _data. Unlike for
+   /// std::vector<T>, \b _data must outlive \b this!
    Vector(T * _data, ShapeItem _len)
      : data(_data),
        len (_len)

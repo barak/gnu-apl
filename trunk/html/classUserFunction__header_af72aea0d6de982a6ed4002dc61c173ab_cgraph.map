@@ -1,7 +1,0 @@
-<map id="UserFunction_header::init_signature" name="UserFunction_header::init_signature">
-<area shape="rect" id="node1" title="init the signature from text" alt="" coords="5,23,152,63"/>
-<area shape="rect" id="node2" href="$classSymbol.html#a126fc214ca7a2e2d364e0982a36b2ace" title="The name of this Symbol." alt="" coords="203,5,333,31"/>
-<area shape="rect" id="node3" href="$classTokenizer.html#ad7706aec4bdc9bf3ef0166a16bfa9373" title="tokenize UTF&#45;8 string input into token string tos." alt="" coords="200,55,336,80"/>
-<area shape="rect" id="node4" href="$classError.html#a73c1f4ab40f4e313f504562d52bb001e" title="return the error code of this error" alt="" coords="387,29,531,55"/>
-<area shape="rect" id="node5" href="$classError.html#a2ee02a4706e3c07b95d8f29aafe6cbbb" title="set the second error line" alt="" coords="384,79,535,104"/>
-</map>

@@ -1,5 +1,0 @@
-<map id="Prefix::tos" name="Prefix::tos">
-<area shape="rect" id="node2" href="$classCommand.html#a879617e7645bea2e4052154f16999634" title="finish the current SI&#45;&gt;top() and pop it when done " alt="" coords="136,5,307,32"/>
-<area shape="rect" id="node3" href="$classCommand.html#af36741357bfd4e183b34ee8b747bc7c5" title="process line which contains APL statements " alt="" coords="355,5,561,32"/>
-<area shape="rect" id="node4" href="$classCommand.html#ae26693534d4df16372f51e55e505b8d7" title="process line which contains a command or statements " alt="" coords="609,5,772,32"/>
-</map>

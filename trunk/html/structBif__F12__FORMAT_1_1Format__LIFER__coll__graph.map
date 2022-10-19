@@ -1,6 +1,0 @@
-<map id="Bif_F12_FORMAT::Format_LIFER" name="Bif_F12_FORMAT::Format_LIFER">
-<area shape="rect" id="node1" title="An entire format field (LIFER = Left&#45;Int&#45;Fract&#45;Expo&#45;Right." alt="" coords="5,344,184,384"/>
-<area shape="rect" id="node2" href="$structFormat__sub.html" title="A helper for Bif_F12_FORMAT (sizes of the fields in a number)" alt="" coords="49,183,140,208"/>
-<area shape="rect" id="node3" href="$classUCS__string.html" title="A string of Unicode characters (32&#45;bit)" alt="" coords="49,95,140,120"/>
-<area shape="rect" id="node4" title=" " alt="" coords="31,5,158,45"/>
-</map>

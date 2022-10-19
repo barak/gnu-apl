@@ -1,5 +1,0 @@
-<map id="SVAR_RECORD_IS_c" name="SVAR_RECORD_IS_c">
-<area shape="rect" id="node1" title="APserver result (record) for: read SVAR database record from APserver." alt="" coords="35,93,194,119"/>
-<area shape="rect" id="node2" href="$classSignal__base.html" title="the base class for all signal classes" alt="" coords="5,5,99,31"/>
-<area shape="rect" id="node3" href="$classSig__item__string.html" title="a string signal item of size bytes" alt="" coords="123,5,235,31"/>
-</map>

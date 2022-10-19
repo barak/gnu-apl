@@ -1,8 +1,0 @@
-<map id="Function::eval_AXB" name="Function::eval_AXB">
-<area shape="rect" id="node1" title="plain function, 2 arguments, with axis" alt="" coords="228,120,367,145"/>
-<area shape="rect" id="node2" href="$classDerivedFunction.html#a4b7f21dabefb731d87c4c7027f6e3f83" title="overloaded Function::eval_AB();" alt="" coords="5,5,180,31"/>
-<area shape="rect" id="node3" href="$classBif__OPER1__COMMUTE.html#aaea5bf4e2ed6f23baee2309759970378" title="Overloaded Function::eval_ALXB()." alt="" coords="5,55,180,95"/>
-<area shape="rect" id="node4" href="$classDerivedFunction.html#a2c5a104f171298ef727220a508f41db4" title="overloaded Function::eval_B();" alt="" coords="10,120,175,145"/>
-<area shape="rect" id="node5" href="$classBif__OPER1__COMMUTE.html#a756ce1bfffaa65d82840686ab701ad31" title="Overloaded Function::eval_LXB()." alt="" coords="5,170,180,210"/>
-<area shape="rect" id="node6" href="$classDerivedFunction.html#a9ef952fcc895b3983d3d1466af6c2109" title="overloaded Function::eval_XB();" alt="" coords="5,235,180,260"/>
-</map>

@@ -1,5 +1,0 @@
-<map id="CellFunctionStatistics::CellFunctionStatistics" name="CellFunctionStatistics::CellFunctionStatistics">
-<area shape="rect" id="node1" title="constructor: reset this statistics" alt="" coords="5,5,164,45"/>
-<area shape="rect" id="node2" href="$classCellFunctionStatistics.html#ab41658fef3571cf5c2dec2cb2139b76e" title="reset this statistics: clear first and subsequent records" alt="" coords="212,5,363,45"/>
-<area shape="rect" id="node3" href="$classStatistics__record.html#a42bee38026164a810e2cac629a267d01" title="reset record to count 0, mean 0, variance 0" alt="" coords="411,5,539,45"/>
-</map>

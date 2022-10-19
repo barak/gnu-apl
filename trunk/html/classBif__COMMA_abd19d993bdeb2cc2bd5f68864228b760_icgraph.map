@@ -1,8 +1,0 @@
-<map id="Bif_COMMA::ravel" name="Bif_COMMA::ravel">
-<area shape="rect" id="node1" title="Return the ravel of B as APL value." alt="" coords="471,55,603,80"/>
-<area shape="rect" id="node2" href="$classBif__F12__COMMA.html#afa66ea4c892000935201255d3c7fe919" title="overloaded Function::eval_B()" alt="" coords="246,5,419,31"/>
-<area shape="rect" id="node3" href="$classBif__F12__COMMA1.html#a70a46c5186a166722569dd512044e342" title="overloaded Function::eval_B()" alt="" coords="243,55,423,80"/>
-<area shape="rect" id="node4" href="$classBif__COMMA.html#a6db4c6e1f1f1deb3d7a410e871046496" title="ravel along axis, with axis being the first (⍪( or last (,) axis of B" alt="" coords="251,104,414,129"/>
-<area shape="rect" id="node5" href="$classBif__F12__COMMA.html#a25ca62e12b597dcccd5b3656eabeb355" title="overloaded Function::eval_XB()" alt="" coords="9,79,191,104"/>
-<area shape="rect" id="node6" href="$classBif__F12__COMMA1.html#afbcb8ff5f7f5e524196c6865a59ed099" title="overloaded Function::eval_XB()" alt="" coords="5,128,195,153"/>
-</map>

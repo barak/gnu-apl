@@ -1,5 +1,0 @@
-<map id="Cell::sum_overflow" name="Cell::sum_overflow">
-<area shape="rect" id="node1" title="return true if z = a + b had an overflow." alt="" coords="177,31,312,56"/>
-<area shape="rect" id="node2" href="$classFloatCell.html#aaa9c654650da7fd4e1738fefdd63c6ef" title="Overloaded Cell::bif_add()." alt="" coords="5,5,129,31"/>
-<area shape="rect" id="node3" href="$classIntCell.html#ada7d1067fc4dbcfee831207a818e61fd" title="overloaded Cell::bif_add()" alt="" coords="12,55,123,80"/>
-</map>

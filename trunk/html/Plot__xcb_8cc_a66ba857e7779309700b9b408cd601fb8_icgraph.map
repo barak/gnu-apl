@@ -1,4 +1,0 @@
-<map id="pv_swap" name="pv_swap">
-<area shape="rect" id="node1" title="swap pixels at P0 (with value Y0) and P1 (with value Y1) and" alt="" coords="152,5,227,31"/>
-<area shape="rect" id="node2" href="$Plot__xcb_8cc.html#af288859aef185afe0338f45b4b20d4c9" title="draw a triangular plot point (∆ or ∇)" alt="" coords="5,5,104,31"/>
-</map>

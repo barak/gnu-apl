@@ -1,5 +1,0 @@
-<map id="UCS_string_vector::max_width" name="UCS_string_vector::max_width">
-<area shape="rect" id="node1" title="return the size of the longest UCS_string in this vector." alt="" coords="449,5,591,45"/>
-<area shape="rect" id="node2" href="$classUCS__string__vector.html#afa3b6be58263a29c6feac04fad12e814" title="print items of this vector in a table with column_count columns" alt="" coords="260,5,401,45"/>
-<area shape="rect" id="node3" href="$classCommand.html#a2f7425e3673258dfb78045919e82f69f" title=")COPY_ONCE: copy a workspace file, nut at most once" alt="" coords="5,13,212,38"/>
-</map>

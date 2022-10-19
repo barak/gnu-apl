@@ -1,4 +1,0 @@
-<map id="Cell::bif_ceiling" name="Cell::bif_ceiling">
-<area shape="rect" id="node1" title="round the value of this Cell up and store the result in Z" alt="" coords="232,5,343,31"/>
-<area shape="rect" id="node2" href="$classBif__F12__RND__UP.html#a3d3ec8abbf84ac0c59cec71a8ff3c0b5" title="overloaded Function::eval_B()." alt="" coords="5,5,184,31"/>
-</map>

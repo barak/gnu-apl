@@ -1,5 +1,0 @@
-<map id="Cell::get_cell_subtype" name="Cell::get_cell_subtype">
-<area shape="rect" id="node1" title="return the subtype of this cell. The subtype is the set of containers that can store the cell (only f..." alt="" coords="232,31,383,56"/>
-<area shape="rect" id="node2" href="$classValue.html#a08444940f39959c57451d21cec156217" title="recursive set of Cell types in this value" alt="" coords="5,5,184,31"/>
-<area shape="rect" id="node3" href="$classValue.html#a4f77e96696c420220a0229e4b50e4dc2" title="compute the cell subtypes contained in the top level of this value" alt="" coords="11,55,179,80"/>
-</map>

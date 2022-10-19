@@ -1,8 +1,0 @@
-<map id="Doxy::write_call_graph" name="Doxy::write_call_graph">
-<area shape="rect" id="node1" title="write the call graph (if caller == false), or else the caller graph" alt="" coords="732,55,887,80"/>
-<area shape="rect" id="node2" href="$classDoxy.html#a76067b55e9395dec0889368d1daa6247" title="write the page for one defined function. If the define function is a named lambda,..." alt="" coords="541,5,684,31"/>
-<area shape="rect" id="node4" href="$classDoxy.html#ad8abe2e8a1b686a7b35e582c369d41ae" title="generate the entire documentation" alt="" coords="213,80,296,105"/>
-<area shape="rect" id="node6" href="$classDoxy.html#ac9842076620bf4fe90f3e80922c5499c" title="write the page for one native function." alt="" coords="547,55,678,80"/>
-<area shape="rect" id="node3" href="$classDoxy.html#a5eb9b5605981c826438d5a51f38bf5a4" title="HTML&#45;print a table containing all defined functions to page." alt="" coords="344,55,493,80"/>
-<area shape="rect" id="node5" href="$classCommand.html#a834eac0e797a5d1c992018b7d0c049a4" title="]DOXY: create doxygen&#45;like documentation of the current workspace" alt="" coords="5,80,165,105"/>
-</map>

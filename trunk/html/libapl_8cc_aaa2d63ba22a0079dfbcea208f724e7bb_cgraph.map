@@ -1,9 +1,0 @@
-<map id="init_libapl" name="init_libapl">
-<area shape="rect" id="node2" href="$libapl_8cc.html#aee295305833e734a4c4874e6244c5241" title="initialize " alt="" coords="179,5,233,32"/>
-<area shape="rect" id="node3" href="$libapl_8cc.html#a92c32fcaffa2fb0062c5f3bfbfc5bd52" title="initialize subsystems that depend on argv[] " alt="" coords="179,56,233,83"/>
-<area shape="rect" id="node4" href="$structUserPreferences.html#a1831227aad6eb6d2fcd28e4d5d0067c3" title="read a preference file and update parameters set there " alt="" coords="129,107,283,149"/>
-<area shape="rect" id="node5" href="$structUserPreferences.html#a07c2933cafe4e981cd07f03232a6b7b5" title="open a user&#45;supplied config file (in $HOME or gnu&#45;apl.d) " alt="" coords="338,13,494,54"/>
-<area shape="rect" id="node6" href="$structUserPreferences.html#afd15a9f4cbd24930f47fe6a44eba0290" title="decode a byte in a preferences file. The byte can be given as ASCII name (currently only ESC is under..." alt="" coords="331,78,501,119"/>
-<area shape="rect" id="node7" href="$classLibPaths.html#a6c671db38ef40ad989618b9138689573" title="set library path (from config file) " alt="" coords="346,144,486,171"/>
-<area shape="rect" id="node8" href="$classUTF8__string.html#aabaebbdfbe8fad48e44655144f5fbd5e" title="append a 0&#45;terminated C string " alt="" coords="344,195,488,237"/>
-</map>

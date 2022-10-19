@@ -1,6 +1,0 @@
-<map id="VALUE_IS_c::print" name="VALUE_IS_c::print">
-<area shape="rect" id="node1" title="print this signal on out." alt="" coords="5,55,139,80"/>
-<area shape="rect" id="node2" href="$classSig__item__int.html#ae23ccce7226c3f3fdc793e3781505e21" title="print the item" alt="" coords="196,5,323,31"/>
-<area shape="rect" id="node3" href="$classSig__item__xint.html#ae4b0f63b20ce36cec5a0a2733816dacd" title="print the item" alt="" coords="192,55,327,80"/>
-<area shape="rect" id="node4" href="$classSig__item__string.html#a52521fb1d4864b1b56f9efe3d46ef445" title="print the item" alt="" coords="187,104,332,129"/>
-</map>

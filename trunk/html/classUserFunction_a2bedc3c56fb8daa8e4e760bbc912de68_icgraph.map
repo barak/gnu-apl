@@ -1,7 +1,0 @@
-<map id="UserFunction::set_trace_stop" name="UserFunction::set_trace_stop">
-<area shape="rect" id="node1" title="set trace or stop vector" alt="" coords="399,55,593,80"/>
-<area shape="rect" id="node2" href="$classStop__Trace.html#a1f0aad5536348d1e52721cd04e2f9548" title="return assign lines in new_value to stop or trace vector in ufun" alt="" coords="216,29,351,55"/>
-<area shape="rect" id="node5" href="$classNabla.html#a610d94a179335126e82e9eea07918d5a" title="edit this function" alt="" coords="241,79,326,104"/>
-<area shape="rect" id="node3" href="$classQuad__STOP.html#aba7f51dfbb36d3c2d25ce2e7deb0f278" title="Overloaded Function::eval_AB()" alt="" coords="10,5,163,31"/>
-<area shape="rect" id="node4" href="$classQuad__TRACE.html#a59e7875554f651f1f64d83d79111fecd" title="Overloaded Function::eval_AB()" alt="" coords="5,55,168,80"/>
-</map>

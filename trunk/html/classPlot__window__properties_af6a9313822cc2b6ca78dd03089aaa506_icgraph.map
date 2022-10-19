@@ -1,8 +1,0 @@
-<map id="Plot_window_properties::get_pa_border_L" name="Plot_window_properties::get_pa_border_L">
-<area shape="rect" id="node2" href="$structPlot__context.html#a923782040de2900544759e268a655678" title="return the required width of the entire plot area " alt="" coords="213,23,367,65"/>
-<area shape="rect" id="node3" href="$Plot__gtk_8cc.html#aee8ee06e4281931fdfd2560f7cc57865" title="plot the data " alt="" coords="415,5,479,32"/>
-<area shape="rect" id="node6" href="$Plot__gtk_8cc.html#a897990543dc934261ba8e7a124446b11" title="the main() program of the thread that handles one plot window. " alt="" coords="680,56,759,83"/>
-<area shape="rect" id="node4" href="$Plot__gtk_8cc.html#af71ef5256eb8aee2ba62880e3e8806ba" title="callback when the plot window shall be redrawn " alt="" coords="527,5,632,32"/>
-<area shape="rect" id="node5" href="$Plot__gtk_8cc.html#a1e31fd39155ef1eb8c2345913253101b" title="save the pixels of the plot to a file " alt="" coords="682,5,757,32"/>
-<area shape="rect" id="node7" href="$classQuad__PLOT.html#acc4187c32c3bad52f276a724b226b429" title="overloaded Function::eval_AB() " alt="" coords="807,56,957,83"/>
-</map>

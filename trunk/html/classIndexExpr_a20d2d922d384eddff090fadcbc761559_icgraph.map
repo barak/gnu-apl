@@ -1,6 +1,0 @@
-<map id="IndexExpr::get_axis_value" name="IndexExpr::get_axis_value">
-<area shape="rect" id="node1" title="return axis rk (rk in shape order as opposed to index order)" alt="" coords="379,27,517,67"/>
-<area shape="rect" id="node2" href="$classQuad__SYL.html#a3a73a2d9505f81a66a5a9f6aacc31ce0" title="overloaded Symbol::assign_indexed()" alt="" coords="148,5,331,31"/>
-<area shape="rect" id="node3" href="$classIndexExpr.html#a0fdf2bb8f2c463d7c424c9fb4231b9ae" title="check that all indices indices of this IndexExpr are valid indices for shape, raise INDEX_ERROR if no..." alt="" coords="158,55,321,95"/>
-<area shape="rect" id="node4" href="$classValue.html#ad8cf427edc910f94e31db0d2c1c456fc" title="return this indexed by (multi&#45;dimensional) IDX." alt="" coords="5,63,100,88"/>
-</map>

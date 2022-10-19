@@ -1,8 +1,0 @@
-<map id="Symbol::is_readonly" name="Symbol::is_readonly">
-<area shape="rect" id="node1" title="return true iff this variable is read&#45;only (overloaded by RO_SystemVariable)" alt="" coords="605,42,745,67"/>
-<area shape="rect" id="node2" href="$classXML__Loading__Archive.html#a1233bd12e879f5670f4a234e0f37b7aa" title="read next Variable element" alt="" coords="405,5,557,45"/>
-<area shape="rect" id="node5" href="$classQuad__TF.html#aa5afb1189a241875b5e94b71a3ebe79a" title="return inverse transfer format 1 (old APL format) for a variable" alt="" coords="420,70,543,95"/>
-<area shape="rect" id="node3" href="$classXML__Loading__Archive.html#a75730a7dd5af9238d0d1aa223a54060e" title="read next Symbol element" alt="" coords="205,5,357,45"/>
-<area shape="rect" id="node4" href="$classXML__Loading__Archive.html#a2a4f7a3fff06dfd2351348bf26fc90a3" title="read next Symbol element" alt="" coords="5,5,157,45"/>
-<area shape="rect" id="node6" href="$classQuad__TF.html#a27ed4b02d5f1a1c8a8b0a1fcbe2756f8" title="Overloaded Function::eval_AB()." alt="" coords="215,70,348,95"/>
-</map>

@@ -1,5 +1,0 @@
-<map id="IO_Files::print_summary" name="IO_Files::print_summary">
-<area shape="rect" id="node1" title="write testcases summary file" alt="" coords="379,5,544,31"/>
-<area shape="rect" id="node2" href="$classIO__Files.html#acc91875b8e0c7a5ad44e3ead0e3dda7b" title="get one line from the current file, open the next file if necceessary" alt="" coords="183,5,331,31"/>
-<area shape="rect" id="node3" href="$classInputMux.html#a8a79cbe5207cde162fb36133ad9defdd" title="get one line" alt="" coords="5,5,135,31"/>
-</map>

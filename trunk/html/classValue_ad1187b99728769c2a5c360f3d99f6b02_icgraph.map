@@ -1,5 +1,0 @@
-<map id="Value::release" name="Value::release">
-<area shape="rect" id="node2" href="$classQuad__EX.html#abcf496d389093ac1198c0a32c955a9f4" title="disassociate name from value, return 0 on failure or 1 on success. " alt="" coords="159,13,293,39"/>
-<area shape="rect" id="node3" href="$classSymbolTable.html#a63125005c7124354304526f8d63d188f" title="erase one symbol, return true on error, false on success " alt="" coords="341,5,480,47"/>
-<area shape="rect" id="node4" href="$classSymbolTable.html#aa20ff3f01e0b8558455dd750f9f19cc3" title="erase symbols from this SymbolTable " alt="" coords="528,5,667,47"/>
-</map>

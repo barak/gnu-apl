@@ -1,4 +1,0 @@
-<map id="Sig_item_string::store" name="Sig_item_string::store">
-<area shape="rect" id="node1" title="store (aka. serialize) this item into a buffer" alt="" coords="5,5,155,31"/>
-<area shape="rect" id="node2" href="$classSig__item__int.html#a388d7bb49f81f13fcb8b3c006e67fe7f" title="store (aka. serialize) this item into a string" alt="" coords="203,5,333,31"/>
-</map>

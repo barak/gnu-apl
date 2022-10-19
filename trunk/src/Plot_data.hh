@@ -60,9 +60,8 @@ struct Pixel_XY
    Pixel_Y y;   ///< vertical pixels
 };
 //============================================================================
-/** data for one plot line, aka. data row. The [plot line consists of N
-    data points with coordinate vectors X, Y, and Z.
- **/
+/// data for one plot line, aka. data row. The plot line consists of N
+/// data points, each with coordinates X, Y, and Z.
 class Plot_data_row
 {
 public:

@@ -1,8 +1,0 @@
-<map id="UserFunction_header::print_local_vars" name="UserFunction_header::print_local_vars">
-<area shape="rect" id="node1" title="print the local variables for command )SINL" alt="" coords="701,23,848,63"/>
-<area shape="rect" id="node2" href="$classUserFunction.html#ae13e0f81551da047f1ffddc5dab60c8d" title="print the local variables for command )SINL" alt="" coords="520,23,653,63"/>
-<area shape="rect" id="node3" href="$classStateIndicator.html#a0129e968c738e1c300e20b16533fca55" title="list the stack entry (for commands ]SI, )SI, and )SIS)" alt="" coords="344,5,472,31"/>
-<area shape="rect" id="node4" href="$classDoxy.html#adb0f60780eef8f3246d952596a3a19a6" title="HTML&#45;print a table with the SI stack to &#39;page&#39;." alt="" coords="353,55,463,80"/>
-<area shape="rect" id="node5" href="$classDoxy.html#ad8abe2e8a1b686a7b35e582c369d41ae" title="generate the entire documentation" alt="" coords="213,55,296,80"/>
-<area shape="rect" id="node6" href="$classCommand.html#a834eac0e797a5d1c992018b7d0c049a4" title="]DOXY: create doxygen&#45;like documentation of the current workspace" alt="" coords="5,55,165,80"/>
-</map>

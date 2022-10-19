@@ -1,6 +1,0 @@
-<map id="Command::resolve_lib_wsname" name="Command::resolve_lib_wsname">
-<area shape="rect" id="node1" title="resolve an optional lib followed by a WS name" alt="" coords="216,47,368,87"/>
-<area shape="rect" id="node2" href="$classCommand.html#a98e7d1dd0c01014d79f2120292588a70" title=")DUMP: dump a workspace file (.apl)" alt="" coords="5,5,168,31"/>
-<area shape="rect" id="node3" href="$classCommand.html#ad222a6de11eb55501624a4d0dea3a464" title=")LOAD: load a workspace file" alt="" coords="7,55,166,80"/>
-<area shape="rect" id="node4" href="$classCommand.html#aec0c4c6efbb9df9a34220b510f58905a" title=")SAVE: save a workspace file (.xml)" alt="" coords="7,104,166,129"/>
-</map>

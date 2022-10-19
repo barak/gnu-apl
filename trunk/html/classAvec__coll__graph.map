@@ -1,5 +1,0 @@
-<map id="Avec" name="Avec">
-<area shape="rect" id="node1" title="Static helper functions related to ⎕AV, character clasification, etc." alt="" coords="162,108,214,133"/>
-<area shape="rect" id="node2" href="$structAvec_1_1Character__definition.html" title="Various character attributes." alt="" coords="5,13,181,38"/>
-<area shape="rect" id="node3" href="$structAvec_1_1Unicode__to__IBM__codepoint.html" title="a Unicode and its position in the ⎕AV of IBM APL2" alt="" coords="205,5,363,45"/>
-</map>

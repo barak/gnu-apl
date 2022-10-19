@@ -1,5 +1,0 @@
-<map id="Quad_JSON::parse_number" name="Quad_JSON::parse_number">
-<area shape="rect" id="node1" title="parse a JSON number" alt="" coords="5,31,192,56"/>
-<area shape="rect" id="node2" href="$classValue.html#a1101e1fbe4fae7862fec5100c209917f" title="initialize the next ravel cell with a floating point value" alt="" coords="240,5,399,31"/>
-<area shape="rect" id="node3" href="$classValue.html#ab3a0d3914977f611bfddf54178edd477" title="initialize the next ravel cell with an integer value" alt="" coords="247,55,392,80"/>
-</map>

@@ -1,6 +1,0 @@
-<map id="Command::split_arg" name="Command::split_arg">
-<area shape="rect" id="node1" title="split whitespace separated arguments into individual arguments" alt="" coords="5,31,144,56"/>
-<area shape="rect" id="node2" href="$classUCS__string.html#a21c71f20fbd921dd1933404a2674c3cb" title="skip leading whitespaces starting at idx, append the following non&#45;whitespaces (if any) to dest,..." alt="" coords="192,5,356,31"/>
-<area shape="rect" id="node4" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="413,55,535,80"/>
-<area shape="rect" id="node3" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="404,5,544,31"/>
-</map>

@@ -1,5 +1,0 @@
-<map id="Shape3::Shape3" name="Shape3::Shape3">
-<area shape="rect" id="node1" title="construct a 3&#45;dimensional shape from a n&#45;dimensional shape" alt="" coords="5,31,124,56"/>
-<area shape="rect" id="node2" href="$classShape.html#a017e9a35dd20f4bc4fdeb7ea29b6805d" title="return the rank" alt="" coords="193,5,310,31"/>
-<area shape="rect" id="node3" href="$classShape.html#a592d2ade68aa8c21c5d84627c3a0e001" title="return the length of dimension r" alt="" coords="172,55,331,80"/>
-</map>

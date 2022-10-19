@@ -1,4 +1,0 @@
-<map id="LibPaths::get_lib_dir" name="LibPaths::get_lib_dir">
-<area shape="rect" id="node1" title="return library path (from config file or from libroot)" alt="" coords="5,5,145,31"/>
-<area shape="rect" id="node2" href="$classUTF8__string.html#ae512c0617f7a13fe5011655d898ca6c1" title="append the UTF8_string suffix" alt="" coords="193,5,377,31"/>
-</map>

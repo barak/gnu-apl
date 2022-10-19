@@ -1,6 +1,0 @@
-<map id="MATCH_OR_MAKE_c" name="MATCH_OR_MAKE_c">
-<area shape="rect" id="node1" title="APserver request: match offered shared variable or make a new offer." alt="" coords="101,181,257,207"/>
-<area shape="rect" id="node2" href="$classSignal__base.html" title="the base class for all signal classes" alt="" coords="5,13,99,38"/>
-<area shape="rect" id="node3" href="$classSig__item__string.html" title="a string signal item of size bytes" alt="" coords="123,13,235,38"/>
-<area shape="rect" id="node4" href="$classSig__item__int.html" title=" " alt="" coords="259,5,400,45"/>
-</map>

@@ -1,6 +1,0 @@
-<map id="Cell::bif_nand" name="Cell::bif_nand">
-<area shape="rect" id="node1" title="store the logical nand of A and this cell in Z" alt="" coords="245,55,348,80"/>
-<area shape="rect" id="node2" href="$classBif__F2__NAND.html#a2d32df816a11487483bffa2325a5617f" title="overloaded Function::eval_AB()." alt="" coords="20,5,183,31"/>
-<area shape="rect" id="node3" href="$classBif__F2__NAND.html#aa707b77746849a40d7987b3b3cd1ef00" title="overloaded Function::eval_AXB()." alt="" coords="15,55,187,80"/>
-<area shape="rect" id="node4" href="$classBif__F2__NAND.html#a9114ac439bca47bef84111cc12978dfa" title="overloaded Function::get_scalar_f2()" alt="" coords="5,104,197,129"/>
-</map>

@@ -1,4 +1,0 @@
-<map id="XML_Loading_Archive::read_Cells" name="XML_Loading_Archive::read_Cells">
-<area shape="rect" id="node1" title="read one or more Cell(s) from input into the ravel of Z; return the UTF8 * after the cells." alt="" coords="205,5,357,45"/>
-<area shape="rect" id="node2" href="$classXML__Loading__Archive.html#ad200f5b98b9cf3e903ccf714a56a1d0f" title="read next Ravel element" alt="" coords="5,5,157,45"/>
-</map>

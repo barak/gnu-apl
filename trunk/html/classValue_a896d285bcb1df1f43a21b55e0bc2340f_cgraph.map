@@ -1,9 +1,0 @@
-<map id="Value::is_one_dimensional" name="Value::is_one_dimensional">
-<area shape="rect" id="node1" title="return true iff this value and its ravel items have rank &lt; 2" alt="" coords="5,56,183,81"/>
-<area shape="rect" id="node2" href="$classValue.html#a6b8aa5e58b68236c77a09385365468d5" title="return the first element of the ravel (which is always present). same as get_cproto(),..." alt="" coords="231,5,348,31"/>
-<area shape="rect" id="node4" href="$classValue.html#ac5b54e3a13cab0837442f1575b3299a5" title="return the number of elements, but at least 1 (for the prototype)." alt="" coords="567,31,736,56"/>
-<area shape="rect" id="node6" href="$classValue.html#a5ac7131d2f89d0bc8b8907d960cbd125" title="return the rank of this value" alt="" coords="233,107,346,132"/>
-<area shape="rect" id="node3" href="$classValue.html#aa0572b1b7fa249cb79694fd152130b38" title="return the (constant) idx&#39;th element of the ravel." alt="" coords="396,5,519,31"/>
-<area shape="rect" id="node5" href="$classShape.html#a6f32f749601dca80263493fd06be12c4" title="return the number of ravel elements, but at least 1 (for empty values and scalars) else product of sh..." alt="" coords="784,31,939,56"/>
-<area shape="rect" id="node7" href="$classShape.html#a017e9a35dd20f4bc4fdeb7ea29b6805d" title="return the rank" alt="" coords="399,107,516,132"/>
-</map>

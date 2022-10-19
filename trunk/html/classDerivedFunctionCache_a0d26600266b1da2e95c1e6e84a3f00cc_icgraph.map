@@ -1,4 +1,0 @@
-<map id="DerivedFunctionCache::unmark_all_values" name="DerivedFunctionCache::unmark_all_values">
-<area shape="rect" id="node1" title="clear the marked bit in values bound to derived functions (if any)." alt="" coords="208,5,363,45"/>
-<area shape="rect" id="node2" href="$classStateIndicator.html#a275a02d6a84b6dc259fa9c5e74d56c65" title="clear the marked bit in the executable, in the fun_oper_cache, and in all parsers" alt="" coords="5,5,160,45"/>
-</map>

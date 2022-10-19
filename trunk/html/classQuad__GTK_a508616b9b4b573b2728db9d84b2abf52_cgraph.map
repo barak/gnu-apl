@@ -1,8 +1,0 @@
-<map id="Quad_GTK::open_window" name="Quad_GTK::open_window">
-<area shape="rect" id="node1" title="open the GTH window described by gui_filename and optional css_filename" alt="" coords="5,78,180,103"/>
-<area shape="rect" id="node2" href="$classUTF8__string.html#a922bd7ebc6a8ea5c6ba9c54159b18a93" title="return this string as a 0&#45;terminated C string" alt="" coords="463,29,593,54"/>
-<area shape="rect" id="node3" href="$classQuad__FIO.html#a230fc3fc2c113e6d14cd99c763890470" title="close a file descriptor (and its FILE * if any)" alt="" coords="238,29,405,54"/>
-<area shape="rect" id="node4" href="$classQuad__FIO.html#ae90ef97dc252197287179ab112e7446a" title="fork(), execve(), and return a connection to fd 3 of forked process" alt="" coords="244,78,399,103"/>
-<area shape="rect" id="node5" href="$classLibPaths.html#a3aa488a8671b0aed624c2f8351eca950" title="return the path (directory) of the APL interpreter binary" alt="" coords="228,127,415,153"/>
-<area shape="rect" id="node6" href="$classQuad__GTK.html#a89a221039ea3e73ecb7b1826564dd9e6" title="write a TLV with an empty V (thus L=0)" alt="" coords="245,177,397,202"/>
-</map>

@@ -1,5 +1,0 @@
-<map id="Quad_FIO::UNSAFE" name="Quad_FIO::UNSAFE">
-<area shape="rect" id="node1" title="throw a DOMAIN error if the interpreter runs in safe mode." alt="" coords="387,5,532,31"/>
-<area shape="rect" id="node2" href="$classQuad__FIO.html#aeaba4a7f5a55bbab8ad6b7d3d7c932fa" title="overloaded Function::eval_AXB()." alt="" coords="200,5,339,31"/>
-<area shape="rect" id="node3" href="$classQuad__FIO.html#a24ac2813d6425ad61471166fe019ba33" title="overloaded Function::eval_LXB()." alt="" coords="5,5,152,31"/>
-</map>

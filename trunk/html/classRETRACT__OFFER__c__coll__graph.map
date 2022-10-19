@@ -1,6 +1,0 @@
-<map id="RETRACT_OFFER_c" name="RETRACT_OFFER_c">
-<area shape="rect" id="node1" title="APserver request: ⎕SVR." alt="" coords="5,183,157,208"/>
-<area shape="rect" id="node2" href="$classSignal__base.html" title="the base class for all signal classes" alt="" coords="13,87,107,113"/>
-<area shape="rect" id="node3" href="$classSig__item__xint.html" title=" " alt="" coords="131,80,279,120"/>
-<area shape="rect" id="node4" href="$classSig__item__int.html" title="an integer signal item of size bytes" alt="" coords="122,5,289,31"/>
-</map>

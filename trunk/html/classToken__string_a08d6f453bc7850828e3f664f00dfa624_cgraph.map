@@ -1,5 +1,0 @@
-<map id="Token_string::print" name="Token_string::print">
-<area shape="rect" id="node1" title="print this token string" alt="" coords="5,31,136,56"/>
-<area shape="rect" id="node2" href="$classToken.html#abbcd765b2cb1c9da24d762ca451eefa4" title="return the float value of this token" alt="" coords="184,5,311,31"/>
-<area shape="rect" id="node3" href="$classToken.html#a1a31afbb07e3f1dbb86d5f872ce5c297" title="return the TokenValueType of this token." alt="" coords="359,31,512,56"/>
-</map>

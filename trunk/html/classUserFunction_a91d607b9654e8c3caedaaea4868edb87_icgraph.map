@@ -1,9 +1,0 @@
-<map id="UserFunction::get_name_and_line" name="UserFunction::get_name_and_line">
-<area shape="rect" id="node1" title="return e.g. &#39;FOO[10]&#39;" alt="" coords="596,49,761,89"/>
-<area shape="rect" id="node2" href="$classStateIndicator.html#a0129e968c738e1c300e20b16533fca55" title="list the stack entry (for commands ]SI, )SI, and )SIS)" alt="" coords="213,5,341,31"/>
-<area shape="rect" id="node3" href="$classStateIndicator.html#ae8f1a9f49c7933c492f6f899fccd437f" title="list the stack entry (for command ]SI)" alt="" coords="401,31,537,56"/>
-<area shape="rect" id="node4" href="$classDoxy.html#adb0f60780eef8f3246d952596a3a19a6" title="HTML&#45;print a table with the SI stack to &#39;page&#39;." alt="" coords="414,80,523,105"/>
-<area shape="rect" id="node7" href="$classError.html#adf8e47c02b1ae0be1368a0587f7daed4" title="update error information in this and copy it to si" alt="" coords="389,129,548,155"/>
-<area shape="rect" id="node5" href="$classDoxy.html#ad8abe2e8a1b686a7b35e582c369d41ae" title="generate the entire documentation" alt="" coords="236,80,319,105"/>
-<area shape="rect" id="node6" href="$classCommand.html#a834eac0e797a5d1c992018b7d0c049a4" title="]DOXY: create doxygen&#45;like documentation of the current workspace" alt="" coords="5,80,165,105"/>
-</map>

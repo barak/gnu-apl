@@ -1,8 +1,0 @@
-<map id="LibPaths::get_APL_lib_root" name="LibPaths::get_APL_lib_root">
-<area shape="rect" id="node2" href="$classLibPaths.html#a4316cbd8878626733273cb0db73cfd82" title="return library path (from config file or from libroot) " alt="" coords="461,5,601,32"/>
-<area shape="rect" id="node4" href="$classLibPaths.html#ae240dc7e041df568a0cd61ec0270eb2a" title="return true iff directory lib) is present " alt="" coords="253,56,394,83"/>
-<area shape="rect" id="node6" href="$classLibPaths.html#a12cc7234d6e91efb271bef954b95806f" title="set library root to new_root " alt="" coords="233,107,413,133"/>
-<area shape="rect" id="node7" href="$classLibPaths.html#a6c671db38ef40ad989618b9138689573" title="set library path (from config file) " alt="" coords="253,157,393,184"/>
-<area shape="rect" id="node3" href="$classUTF8__string.html#ae512c0617f7a13fe5011655d898ca6c1" title="append the UTF8_string suffix " alt="" coords="649,5,833,32"/>
-<area shape="rect" id="node5" href="$classUTF8__string.html#af0f7724e5743d48d9e29776de5d53c71" title="return this string as a 0&#45;terminated C string " alt="" coords="466,56,597,83"/>
-</map>

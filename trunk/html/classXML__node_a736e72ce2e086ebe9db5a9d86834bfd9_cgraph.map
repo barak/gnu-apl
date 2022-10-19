@@ -1,9 +1,0 @@
-<map id="XML_node::get_tagname" name="XML_node::get_tagname">
-<area shape="rect" id="node1" title="return the tagname of this node. Starts with a valid XML name, thus no leading &lt;, /m or _." alt="" coords="5,131,172,157"/>
-<area shape="rect" id="node2" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="441,17,581,42"/>
-<area shape="rect" id="node3" href="$classUCS__string.html#a5776e51c6faa53537409322cd0ebf07a" title="append number (in ASCII encoding like d) to this string" alt="" coords="237,37,377,77"/>
-<area shape="rect" id="node4" href="$classXML__node.html#adf9656aeb2add17990dd78e7ca0281a8" title="return the (source&#45;) string for this node" alt="" coords="235,102,378,127"/>
-<area shape="rect" id="node5" href="$classXML__node.html#af3c57bac633564b2e755294b1da74e88" title="return the type of this node as string" alt="" coords="234,152,379,192"/>
-<area shape="rect" id="node6" href="$classXML__node.html#a2a35cbd734b00030af77d2c652008f3a" title="return true if uni is a valid first char in an XML tag name" alt="" coords="446,235,577,275"/>
-<area shape="rect" id="node7" href="$classXML__node.html#a6ef0db71846deb6a0a4318d8388edca2" title="return true if uni is a validchar" alt="" coords="220,267,393,293"/>
-</map>

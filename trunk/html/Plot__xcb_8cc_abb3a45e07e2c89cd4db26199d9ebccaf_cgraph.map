@@ -1,4 +1,0 @@
-<map id="set_GC_foreground" name="set_GC_foreground">
-<area shape="rect" id="node1" title="set the foreground color of a xcb_gcontext_t" alt="" coords="5,5,140,31"/>
-<area shape="rect" id="node2" href="$Plot__xcb_8cc.html#a5461d12dc379b438dce62186d2c07f20" title="set the an attribute of a xcb_gcontext_t" alt="" coords="188,5,281,31"/>
-</map>

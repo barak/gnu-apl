@@ -1,5 +1,0 @@
-<map id="CinOut::overflow" name="CinOut::overflow">
-<area shape="rect" id="node1" title="overloaded filebuf::overflow" alt="" coords="5,31,125,56"/>
-<area shape="rect" id="node2" href="$structInputFile.html#ac872e443cab2dc1325defd93aaa35063" title="true if echo (of the input) is on for the current file" alt="" coords="173,5,352,31"/>
-<area shape="rect" id="node3" href="$classOutput.html#a7f5a3baf917253208de9aae748cb121d" title="set the color mode (if colors_enabled). Outputs the escape sequence for mode when the color mode chan..." alt="" coords="182,55,343,80"/>
-</map>

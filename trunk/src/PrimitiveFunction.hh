@@ -480,7 +480,7 @@ public:
    static Bif_F12_UNION  _fun;
 
 protected:
-   /// a range of indices (including \b from, excludinmg \b to)
+   /// a range of indices (including \b from, excluding \b to)
    struct Zone
       {
         /// constructor

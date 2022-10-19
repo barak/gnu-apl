@@ -1,4 +1,0 @@
-<map id="Cell::bif_nat_log" name="Cell::bif_nat_log">
-<area shape="rect" id="node1" title="store the base e logarithm of the value of this Cell in Z" alt="" coords="212,5,328,31"/>
-<area shape="rect" id="node2" href="$classBif__F12__LOGA.html#ac8e17b085ce08e02da68da6338dbcc17" title="overloaded Function::eval_B()." alt="" coords="5,5,164,31"/>
-</map>

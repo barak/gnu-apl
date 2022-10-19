@@ -1,3 +1,0 @@
-<map id="Bif_F12_ROLL::check_B" name="Bif_F12_ROLL::check_B">
-<area shape="rect" id="node1" title="recursively check that all ravel elements of B are integers ≥ 0 and return true iff not." alt="" coords="5,29,172,55"/>
-</map>

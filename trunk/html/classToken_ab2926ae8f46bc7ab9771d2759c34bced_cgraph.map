@@ -1,6 +1,0 @@
-<map id="Token::get_apl_valp" name="Token::get_apl_valp">
-<area shape="rect" id="node2" href="$unionToken_1_1sval.html#a6718675efc326cfa39f09a7f503cdd50" title="a shortcut for accessing apl_val " alt="" coords="192,5,339,32"/>
-<area shape="rect" id="node4" href="$classToken.html#a11e37aa69b8eb64f293702293b00f50c" title="return true iff this token is an apl value " alt="" coords="203,56,327,83"/>
-<area shape="rect" id="node3" href="$classToken.html#a7955f89bcbc2ab3f5c736218c0a745e8" title="the name of tc " alt="" coords="395,5,531,32"/>
-<area shape="rect" id="node5" href="$classToken.html#a1a31afbb07e3f1dbb86d5f872ce5c297" title="return the TokenValueType of this token. " alt="" coords="387,56,540,83"/>
-</map>

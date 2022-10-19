@@ -1,7 +1,0 @@
-<map id="UTF8_ostream::get_data" name="UTF8_ostream::get_data">
-<area shape="rect" id="node1" title="return the data in this UTF8_string" alt="" coords="699,31,865,56"/>
-<area shape="rect" id="node2" href="$classBif__F1__EXECUTE.html#a8445cd77207db38ab66f5c3278a831df" title="execute string containing an APL command" alt="" coords="465,23,651,63"/>
-<area shape="rect" id="node3" href="$classBif__F1__EXECUTE.html#aefdd09df4262f08f508f9be8543896b7" title="execute string containing an APL expression or an APL command" alt="" coords="232,23,417,63"/>
-<area shape="rect" id="node4" href="$classBif__F1__EXECUTE.html#a4e1a5917e6a3bb368b459fb21c2b63a1" title="overladed Function::eval_B()" alt="" coords="5,5,184,31"/>
-<area shape="rect" id="node5" href="$classQuad__Quad.html#a253824f3a533bef36063138ea6ce0673" title="overloaded Symbol::resolve()." alt="" coords="24,55,165,80"/>
-</map>

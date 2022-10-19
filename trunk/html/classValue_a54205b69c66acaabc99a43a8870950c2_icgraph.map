@@ -1,7 +1,0 @@
-<map id="Value::get_wproto" name="Value::get_wproto">
-<area shape="rect" id="node1" title="return the first element of the ravel (which is always present) same as wfirst(), but named different..." alt="" coords="328,55,455,80"/>
-<area shape="rect" id="node2" href="$classValue.html#a5fe3659073f7ba9ad8dca424ed45c657" title="return a value containing pointers to all ravel cells of this value. the result is non&#45;nested and has..." alt="" coords="149,5,280,31"/>
-<area shape="rect" id="node3" href="$classValue.html#a1120641bea23235f2525146e6f5f48df" title="init the ravel of an APL value, return the ravel length" alt="" coords="157,55,272,80"/>
-<area shape="rect" id="node5" href="$classValue.html#a157c9151b80095223c17288d16f7da9f" title="constructor: a integer vector containing the items of a shape" alt="" coords="167,104,263,129"/>
-<area shape="rect" id="node4" href="$classValue.html#a8a12230cec8b3ea13d547152a4d3ce9e" title="constructor: scalar value (i.e. a value with rank 0)." alt="" coords="5,55,101,80"/>
-</map>

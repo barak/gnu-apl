@@ -1,5 +1,0 @@
-<map id="Signal_base::get__SVAR_DB_PRINTED__printout" name="Signal_base::get__SVAR_DB_PRINTED__printout">
-<area shape="rect" id="node1" title="APserver request: print the entire database (for command ]SVARS) access functions for signal PRINT_SV..." alt="" coords="5,5,177,45"/>
-<area shape="rect" id="node2" href="$classSignal__base.html#a4e35a5a0fd9ced011b83a11ac304724c" title="get function for an item that is not defined for the signal" alt="" coords="225,13,372,38"/>
-<area shape="rect" id="node3" href="$classSignal__base.html#a77d69692410bd7b7d49033b73fcfc8fc" title="return the name of the ID of the signal" alt="" coords="420,13,599,38"/>
-</map>

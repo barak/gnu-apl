@@ -1,4 +1,0 @@
-<map id="XML_Loading_Archive::get_uni" name="XML_Loading_Archive::get_uni">
-<area shape="rect" id="node1" title="set current_char to next (UTF&#45;8 encoded) char, return true if EOF" alt="" coords="5,5,157,45"/>
-<area shape="rect" id="node2" href="$classUTF8__string.html#a27a630b44bca173fe9ea5005bcb3e460" title="convert the first char in UTF8&#45;encoded string to Unicode, setting len to the number of bytes in the U..." alt="" coords="205,13,339,38"/>
-</map>

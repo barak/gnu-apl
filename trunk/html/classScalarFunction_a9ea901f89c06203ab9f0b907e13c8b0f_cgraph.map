@@ -1,5 +1,0 @@
-<map id="ScalarFunction::conforming_shape" name="ScalarFunction::conforming_shape">
-<area shape="rect" id="node1" title="return the conforming shape of sh_A and sh_A, or set ec and return 0 if shapes cannot be conformed...." alt="" coords="5,23,187,63"/>
-<area shape="rect" id="node2" href="$classShape.html#a017e9a35dd20f4bc4fdeb7ea29b6805d" title="return the rank" alt="" coords="243,5,361,31"/>
-<area shape="rect" id="node3" href="$classShape.html#af39e05bad7be900fa1437a6eb6035e97" title="return the number of ravel elements (1 for scalars,i else product of shapes)" alt="" coords="235,55,369,80"/>
-</map>

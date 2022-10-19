@@ -1,5 +1,0 @@
-<map id="Bif_F12_INDEX_OF::find_B_in_A" name="Bif_F12_INDEX_OF::find_B_in_A">
-<area shape="rect" id="node1" title="find Cell B in the ravel A (of length len_A). Return the position (&lt; len_A) if found,..." alt="" coords="5,5,176,45"/>
-<area shape="rect" id="node2" href="$classCell.html#a4cb1f7ae7e4ad956ec55f1d507a0e938" title="return true if this cell is equal to other" alt="" coords="224,13,308,38"/>
-<area shape="rect" id="node3" href="$classCell.html#ad08fb9a79b3c5b38d92bf5ef4bf47145" title="return the name of the class" alt="" coords="356,13,497,38"/>
-</map>

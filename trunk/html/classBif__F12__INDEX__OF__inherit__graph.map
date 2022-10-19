@@ -1,7 +1,0 @@
-<map id="Bif_F12_INDEX_OF" name="Bif_F12_INDEX_OF">
-<area shape="rect" id="node1" title="The class implementing ⍳" alt="" coords="5,299,147,324"/>
-<area shape="rect" id="node2" href="$classNonscalarFunction.html" title="Base class for all internal non&#45;scalar functions of the interpreter." alt="" coords="11,225,141,251"/>
-<area shape="rect" id="node3" href="$classPrimitiveFunction.html" title="Base class for all internal functions of the interpreter." alt="" coords="15,152,137,177"/>
-<area shape="rect" id="node4" href="$classFunction.html" title="Base class for all APL functions and operators (system or defined)" alt="" coords="40,79,112,104"/>
-<area shape="rect" id="node5" href="$classNamedObject.html" title="A user&#45;defined variable or function." alt="" coords="25,5,127,31"/>
-</map>

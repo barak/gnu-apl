@@ -1,7 +1,0 @@
-<map id="UCS_string::append_shape" name="UCS_string::append_shape">
-<area shape="rect" id="node1" title="append shape (in APL encoding tke left arg of ↑) this string" alt="" coords="5,59,145,99"/>
-<area shape="rect" id="node2" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="400,9,540,35"/>
-<area shape="rect" id="node3" href="$classUCS__string.html#a5776e51c6faa53537409322cd0ebf07a" title="append number (in ASCII encoding like d) to this string" alt="" coords="203,30,343,70"/>
-<area shape="rect" id="node4" href="$classShape.html#a017e9a35dd20f4bc4fdeb7ea29b6805d" title="return the rank" alt="" coords="214,95,331,120"/>
-<area shape="rect" id="node5" href="$classShape.html#a592d2ade68aa8c21c5d84627c3a0e001" title="return the length of dimension r" alt="" coords="193,144,352,169"/>
-</map>

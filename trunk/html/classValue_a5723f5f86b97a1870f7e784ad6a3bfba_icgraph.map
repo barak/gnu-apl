@@ -1,5 +1,0 @@
-<map id="Value::get_valid_item_count" name="Value::get_valid_item_count">
-<area shape="rect" id="node1" title="return the number of (so far) initialized items" alt="" coords="401,5,548,45"/>
-<area shape="rect" id="node2" href="$classScalarFunction.html#ac0e9e42f145d16a623c91240d4099f60" title="compute cell_A fun cell_B, scalar&#45;extending PointerCells" alt="" coords="195,5,353,45"/>
-<area shape="rect" id="node3" href="$classScalarFunction.html#a1a92d9a696bd4158cee9b2b6950d14d1" title="A helper function for eval_scalar_AXB()." alt="" coords="5,5,147,45"/>
-</map>

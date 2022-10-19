@@ -1,6 +1,0 @@
-<map id="Quad_FX::do_eval_B" name="Quad_FX::do_eval_B">
-<area shape="rect" id="node1" title="implementation of eval_B()" alt="" coords="360,31,507,56"/>
-<area shape="rect" id="node2" href="$classQuad__FX.html#a7a13759fcc31321b9d5dd0309908305e" title="overloaded Function::eval_B()." alt="" coords="187,5,312,31"/>
-<area shape="rect" id="node3" href="$classQuad__TF.html#aa5afb1189a241875b5e94b71a3ebe79a" title="return inverse transfer format 1 (old APL format) for a variable" alt="" coords="188,55,311,80"/>
-<area shape="rect" id="node4" href="$classQuad__TF.html#a27ed4b02d5f1a1c8a8b0a1fcbe2756f8" title="Overloaded Function::eval_AB()." alt="" coords="5,55,139,80"/>
-</map>

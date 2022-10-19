@@ -1,4 +1,0 @@
-<map id="Probe" name="Probe">
-<area shape="rect" id="node1" title="CPU cycle counter for performance measurements." alt="" coords="49,132,105,157"/>
-<area shape="rect" id="node2" href="$structProbe_1_1measurement.html" title="one time measurement, measuring cCPU cycles spent between ttw points in the source code" alt="" coords="5,5,148,31"/>
-</map>

@@ -1,6 +1,0 @@
-<map id="FloatCell::FloatCell" name="FloatCell::FloatCell">
-<area shape="rect" id="node2" href="$classFloatCell.html#afa1a46cfd36a3c2166559f7d425f094d" title="return the value of this cell as a double (even if the value is rational) " alt="" coords="200,45,311,72"/>
-<area shape="rect" id="node3" href="$classCell.html#ac4bb8b0cf0718bf4ec7a17f1a0271df0" title="Release content pointed to (complex, APL value) " alt="" coords="403,5,498,32"/>
-<area shape="rect" id="node4" href="$classAPL__Float__Base.html#ac0f3239468a7742311f611abbf55a167" title="up&#45;cast const APL_Float_Base * to const APL_Float * " alt="" coords="371,67,531,109"/>
-<area shape="rect" id="node5" href="$classFloatCell.html#aaa2b1d2de8b20d58dcfcd6ccb2443dad" title="overloaded Cell::init_other " alt="" coords="188,147,323,173"/>
-</map>

@@ -1,7 +1,0 @@
-<map id="Cell::get_near_bool" name="Cell::get_near_bool">
-<area shape="rect" id="node1" title="Return value if it is close to boolean, or else throw DOMAIN_ERROR." alt="" coords="204,80,339,105"/>
-<area shape="rect" id="node2" href="$classNumericCell.html#ab1e6feef508632e1b3601edec1ddcf6c" title="overloaded Cell::bif_nand()" alt="" coords="5,5,156,31"/>
-<area shape="rect" id="node3" href="$classNumericCell.html#a0dcfd6e0610d7fc31a6af221ce7c1a39" title="overloaded Cell::bif_nor()" alt="" coords="10,55,151,80"/>
-<area shape="rect" id="node4" href="$classNumericCell.html#a0369f75ae560bcd54176e2512b60720f" title="overloaded Cell::bif_not()" alt="" coords="10,104,151,129"/>
-<area shape="rect" id="node5" href="$classNumericCell.html#ad637e39552ebd544e0b41e7c91a48787" title="overloaded Cell::bif_or()" alt="" coords="13,153,148,179"/>
-</map>

@@ -1,7 +1,0 @@
-<map id="Symbol::get_name_ptr" name="Symbol::get_name_ptr">
-<area shape="rect" id="node2" href="$classValueStackItem.html#a3a9ea0ee5b4129f7e5aa4a92c851abfd" title="return the function (caller must have checked NC_FUNOPER). " alt="" coords="207,5,348,47"/>
-<area shape="rect" id="node3" href="$libapl_8cc.html#a9232ece90a91662e420de9c96def9b25" title="return the (nested) value val[idx] (after having checked is_value()). The APL_value returned must be ..." alt="" coords="238,71,317,98"/>
-<area shape="rect" id="node4" href="$classValue__P__Base.html#a64e77a99509cdb6ecbe4cf273a2e7694" title="return a const pointer to the Value " alt="" coords="410,42,545,69"/>
-<area shape="rect" id="node5" href="$classValue.html#a83e9d9285f63de5aa2ee4918c4db9cff" title="increment the number of (smart&#45;) pointers to this value " alt="" coords="396,93,559,135"/>
-<area shape="rect" id="node6" href="$Common_8hh.html#a6d4ca0c6b6648fa2a606993c967dd8f8" title="frequently used cast to const char * " alt="" coords="607,101,663,127"/>
-</map>

@@ -1,5 +1,0 @@
-<map id="Avec::is_comment" name="Avec::is_comment">
-<area shape="rect" id="node1" title="return true iff av is a comment char (⍝ or #)" alt="" coords="447,5,577,31"/>
-<area shape="rect" id="node2" href="$classQuad__PLOT.html#ae6f31438074669d8b69f651556c8fa39" title="parse the (all&#45;optional) attributes in A" alt="" coords="204,5,399,31"/>
-<area shape="rect" id="node3" href="$classQuad__PLOT.html#acc4187c32c3bad52f276a724b226b429" title="overloaded Function::eval_AB()" alt="" coords="5,5,156,31"/>
-</map>

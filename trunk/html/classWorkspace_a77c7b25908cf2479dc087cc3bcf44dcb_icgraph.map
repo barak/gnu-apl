@@ -1,4 +1,0 @@
-<map id="Workspace::load_WS" name="Workspace::load_WS">
-<area shape="rect" id="node1" title="load lib_ws into the_workspace, maybe set ⎕LX of the new WS." alt="" coords="212,5,361,31"/>
-<area shape="rect" id="node2" href="$classCommand.html#ad222a6de11eb55501624a4d0dea3a464" title=")LOAD: load a workspace file" alt="" coords="5,5,164,31"/>
-</map>

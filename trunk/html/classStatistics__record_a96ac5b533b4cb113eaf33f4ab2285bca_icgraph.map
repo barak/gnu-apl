@@ -1,7 +1,0 @@
-<map id="Statistics_record::average" name="Statistics_record::average">
-<area shape="rect" id="node1" title="the average of count items with sum sum" alt="" coords="396,35,524,75"/>
-<area shape="rect" id="node2" href="$classStatistics__record.html#a40bb537029c98f9ef5bdcfc1368692f2" title="return the average" alt="" coords="219,5,347,45"/>
-<area shape="rect" id="node4" href="$classPerformance.html#a07efbb4a65f608d91f13be0388763b0c" title="print all counters" alt="" coords="219,70,348,95"/>
-<area shape="rect" id="node3" href="$classFunctionStatistics.html#a28d0d5eea811ef0bec0accc661675260" title="overloaded Statistics::print()" alt="" coords="25,5,151,45"/>
-<area shape="rect" id="node5" href="$classCommand.html#a0b7131627e1a36bee1370e5a7572063f" title="show performance counters" alt="" coords="5,70,171,95"/>
-</map>

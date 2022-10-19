@@ -1,9 +1,0 @@
-<map id="RealCell::bif_logarithm" name="RealCell::bif_logarithm">
-<area shape="rect" id="node1" title="overloaded Cell::bif_logarithm()." alt="" coords="5,104,160,129"/>
-<area shape="rect" id="node2" href="$classCell.html#a92ec561cfe084fd35cdc2bd529ce5ea1" title="Return the complex value of a cell." alt="" coords="208,5,373,31"/>
-<area shape="rect" id="node3" href="$classCell.html#a9a0028fd74f00deb001a8062a55916c6" title="Return the real part of a cell." alt="" coords="222,55,359,80"/>
-<area shape="rect" id="node4" href="$classIntCell.html#a7da78424dbf8c5a7ee6b9630f7daac97" title="initialize the (un&#45;initialized) Cell *Z to integer 1" alt="" coords="249,104,332,129"/>
-<area shape="rect" id="node6" href="$classComplexCell.html#a9ccb64da2c504a517c725dc2c41940da" title="initialize the (un&#45;initialized) Cell *Z to complex r + ij" alt="" coords="229,153,352,179"/>
-<area shape="rect" id="node7" href="$classFloatCell.html#a88217aaf5cd286cc89a85d2885876dda" title="initialize the (un&#45;initialized) Cell *Z to APL_Float flt" alt="" coords="242,203,339,228"/>
-<area shape="rect" id="node5" href="$classIntCell.html#a88c653b2f968c451ee1c1c53a983fa13" title="Construct an integer cell with value 0." alt="" coords="421,104,528,129"/>
-</map>

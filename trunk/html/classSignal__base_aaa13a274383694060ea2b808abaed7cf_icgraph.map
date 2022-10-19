@@ -1,6 +1,0 @@
-<map id="Signal_base::get__OFFERING_PROCS_ARE__offering_procs" name="Signal_base::get__OFFERING_PROCS_ARE__offering_procs">
-<area shape="rect" id="node1" title="APserver result for: get offering processors (⎕SVQ) access functions for signal OFFERING_PROCS_ARE...." alt="" coords="621,5,829,45"/>
-<area shape="rect" id="node2" href="$classSvar__DB.html#ab7b9c1fb34db2ad039ceb9ea7a35fb07" title="add processors with pending offers to to_proc. Duplicates are OK and will be removed later" alt="" coords="423,5,573,45"/>
-<area shape="rect" id="node3" href="$classQuad__SVQ.html#a1f96d0bb6b3d8f568bf9e7e48d448c3c" title="return processors with matching offers" alt="" coords="189,13,375,38"/>
-<area shape="rect" id="node4" href="$classQuad__SVQ.html#aa99fb69058db1016c7501c008749daf6" title="Overloaded Function::eval_AB()." alt="" coords="5,13,141,38"/>
-</map>

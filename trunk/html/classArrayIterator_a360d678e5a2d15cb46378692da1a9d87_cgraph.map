@@ -1,8 +1,0 @@
-<map id="ArrayIterator::operator++" name="ArrayIterator::operator++">
-<area shape="rect" id="node1" title="the work&#45;horse of this iterator." alt="" coords="5,106,171,131"/>
-<area shape="rect" id="node2" href="$classArrayIterator.html#ae22a7d117e25647e77c8702f5060dabc" title="return the iterator for axis a" alt="" coords="239,5,359,45"/>
-<area shape="rect" id="node3" href="$classAxisIterator.html#a7875df3fd114b87082b3a5a8ec31f68d" title="return the total weight (ravel increment for axis_length next() calls" alt="" coords="225,69,372,109"/>
-<area shape="rect" id="node4" href="$classAxisIterator.html#ae6b19f6f1943dac49e0844faeaa6cafb" title="return the weight (ravel increment for one next() call of this iterator" alt="" coords="219,134,379,159"/>
-<area shape="rect" id="node5" href="$classAxisIterator.html#af033e563d7eecc4ed62877f3e21f90ba" title=" " alt="" coords="237,183,360,209"/>
-<area shape="rect" id="node6" href="$classAxisIterator.html#a4be672c597d51afa412f22d6df941cd0" title="true if this is an iterator for a scalar value." alt="" coords="427,176,576,216"/>
-</map>

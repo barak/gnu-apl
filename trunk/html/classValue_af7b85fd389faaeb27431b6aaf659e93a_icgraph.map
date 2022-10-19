@@ -1,4 +1,0 @@
-<map id="Value::decrement_pointer_cell_count" name="Value::decrement_pointer_cell_count">
-<area shape="rect" id="node1" title="decrement the PointerCell count" alt="" coords="189,5,360,45"/>
-<area shape="rect" id="node2" href="$classPointerCell.html#a6eaa0baf6ce7d6c866c1787675817922" title="overloaded Cell::release()" alt="" coords="5,13,141,38"/>
-</map>

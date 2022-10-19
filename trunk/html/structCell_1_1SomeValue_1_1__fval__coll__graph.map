@@ -1,5 +1,0 @@
-<map id="Cell::SomeValue::_fval" name="Cell::SomeValue::_fval">
-<area shape="rect" id="node1" title="&lt; for FloatCell" alt="" coords="5,196,161,221"/>
-<area shape="rect" id="node2" href="$unionCell_1_1SomeValue_1_1__fval_1_1__flt__num.html" title="either a floating point value, or the denominator of a quotient" alt="" coords="5,93,161,133"/>
-<area shape="rect" id="node3" href="$classAPL__Float__Base.html" title="the essential data of an APL_Float, so that it can be used in a union" alt="" coords="23,5,143,31"/>
-</map>

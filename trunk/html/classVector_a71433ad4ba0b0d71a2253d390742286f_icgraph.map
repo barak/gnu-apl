@@ -1,6 +1,0 @@
-<map id="Vector::is_ZZ" name="Vector::is_ZZ">
-<area shape="rect" id="node1" title="return true if this is a vector of complex numbers (and not a vector of real numbers" alt="" coords="352,31,453,56"/>
-<area shape="rect" id="node2" href="$classVector.html#a306261cf3650f3a4d2c74e1ef18e0a84" title="conjugate this" alt="" coords="180,5,304,31"/>
-<area shape="rect" id="node3" href="$classMatrix.html#ab5d894fcccb100f6d1101239f8d7d976" title="return true if this is a matrix of complex numbers (and not a matrix of real numbers" alt="" coords="193,55,291,80"/>
-<area shape="rect" id="node4" href="$classMatrix.html#a3fa7af3c46122eaa6edf972bb5265454" title="return the length of the largest element" alt="" coords="5,55,132,80"/>
-</map>

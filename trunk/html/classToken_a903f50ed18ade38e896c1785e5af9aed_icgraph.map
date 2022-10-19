@@ -1,4 +1,0 @@
-<map id="Token::get_int_val2" name="Token::get_int_val2">
-<area shape="rect" id="node1" title="return the second integer value of this token" alt="" coords="208,5,344,31"/>
-<area shape="rect" id="node2" href="$classPrefix.html#a47fdf944b582e77934ec79d3de78574d" title="lookahead is a complete index. return true if it belongs to a value and is not a function axis." alt="" coords="5,5,160,31"/>
-</map>

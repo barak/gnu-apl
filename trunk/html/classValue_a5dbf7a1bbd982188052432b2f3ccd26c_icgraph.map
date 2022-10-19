@@ -1,4 +1,0 @@
-<map id="Value::check_lval_consistency" name="Value::check_lval_consistency">
-<area shape="rect" id="node1" title="check that this left&#45;value is consistent and return its cell owner. If quick then the first owner is ..." alt="" coords="204,5,407,31"/>
-<area shape="rect" id="node2" href="$classValue.html#a5be5b6031f53082438fa9de824732fbe" title="assign val to the cell references in this value." alt="" coords="5,5,156,31"/>
-</map>

@@ -1,9 +1,0 @@
-<map id="Value::is_scalar_or_len1_vector" name="Value::is_scalar_or_len1_vector">
-<area shape="rect" id="node1" title="return true iff this value is a scalar or vector of length 1." alt="" coords="5,49,139,89"/>
-<area shape="rect" id="node2" href="$classValue.html#a8cecab341fdc0bd55b67c07848463d37" title="return the r&#39;th shape element of this value" alt="" coords="187,5,341,31"/>
-<area shape="rect" id="node4" href="$classValue.html#a20c818ea1c1f3fdb8b95c6e0d93955ab" title="return true iff this value is a scalar." alt="" coords="411,56,526,81"/>
-<area shape="rect" id="node6" href="$classValue.html#a69abfd22e53fc92da77cc45159e29908" title="return true iff this value is a vector." alt="" coords="206,107,322,132"/>
-<area shape="rect" id="node3" href="$classShape.html#a592d2ade68aa8c21c5d84627c3a0e001" title="return the length of dimension r" alt="" coords="389,5,548,31"/>
-<area shape="rect" id="node5" href="$classShape.html#a017e9a35dd20f4bc4fdeb7ea29b6805d" title="return the rank" alt="" coords="596,81,713,107"/>
-<area shape="rect" id="node7" href="$classValue.html#a5ac7131d2f89d0bc8b8907d960cbd125" title="return the rank of this value" alt="" coords="412,105,525,131"/>
-</map>

@@ -1,6 +1,0 @@
-<map id="Performance" name="Performance">
-<area shape="rect" id="node2" href="$classFunctionStatistics.html" title="Performance counters for an entire APL system function. " alt="" coords="5,109,132,136"/>
-<area shape="rect" id="node3" href="$classStatistics.html" title="Base class for different kinds of statistics. " alt="" coords="38,5,115,32"/>
-<area shape="rect" id="node5" href="$classCellFunctionStatistics.html" title="Performance counters for one cell level function. " alt="" coords="156,109,307,136"/>
-<area shape="rect" id="node4" href="$classStatistics__record.html" title="one statistics for computing the mean and the variance of samples " alt="" coords="159,5,279,32"/>
-</map>

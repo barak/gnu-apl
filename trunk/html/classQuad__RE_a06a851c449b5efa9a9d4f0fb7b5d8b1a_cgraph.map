@@ -1,9 +1,0 @@
-<map id="Quad_RE::string_result" name="Quad_RE::string_result">
-<area shape="rect" id="node1" title="return a result that contains the matched strings" alt="" coords="5,163,164,189"/>
-<area shape="rect" id="node2" href="$classQuad__RE_1_1Flags.html#a3200e40eb9c87f9035f6ca9f23abc8be" title="return true if no match shall give an error" alt="" coords="236,5,381,45"/>
-<area shape="rect" id="node3" href="$classQuad__RE_1_1Flags.html#a70ad67137eb728499eb82a0590446e27" title="return global (return all matches and not only first match)" alt="" coords="236,69,381,109"/>
-<area shape="rect" id="node4" href="$classRegexpMatch.html#a2f0e4cc171e3527c30a01e658d198281" title="return the offset pairs in a match" alt="" coords="219,134,398,159"/>
-<area shape="rect" id="node5" href="$classRegexpMatch.html#a2ded98eb7ddeb6da5eef1fa5a0110d6e" title="return the number of offset pairs in a match" alt="" coords="219,184,398,224"/>
-<area shape="rect" id="node6" href="$classRegexpMatch.html#a797cd101f5118444cba22b238228296a" title="return true if there was a match" alt="" coords="227,249,391,274"/>
-<area shape="rect" id="node7" href="$classRegexpMatch.html#a339fa7be9d2572420c263c28defa558c" title="return the number of matches" alt="" coords="212,298,405,323"/>
-</map>

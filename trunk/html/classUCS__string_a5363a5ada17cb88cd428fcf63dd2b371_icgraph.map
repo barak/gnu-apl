@@ -1,4 +1,0 @@
-<map id="UCS_string::remove_pad" name="UCS_string::remove_pad">
-<area shape="rect" id="node1" title="return a string like this, but with pad chars removed" alt="" coords="173,5,343,31"/>
-<area shape="rect" id="node2" href="$classToken.html#a8da320e73d998f8ed44dfb8d81237bc8" title="print the token to out in the format used by print_error_info(). return the number of characters prin..." alt="" coords="5,5,125,31"/>
-</map>

@@ -1,5 +1,0 @@
-<map id="LineInput::~LineInput" name="LineInput::~LineInput">
-<area shape="rect" id="node1" title="destructor" alt="" coords="5,31,149,56"/>
-<area shape="rect" id="node2" href="$classUTF8__string.html#a922bd7ebc6a8ea5c6ba9c54159b18a93" title="return this string as a 0&#45;terminated C string" alt="" coords="217,5,348,31"/>
-<area shape="rect" id="node3" href="$classLineHistory.html#ac34561234bbaf42c80a4aeb56781e09a" title="save history to file" alt="" coords="197,55,368,80"/>
-</map>

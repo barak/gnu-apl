@@ -1,6 +1,0 @@
-<map id="Cell::bif_not_equal" name="Cell::bif_not_equal">
-<area shape="rect" id="node1" title="store 1 in Z if A != the value of this cell in Z, else 0" alt="" coords="256,55,387,80"/>
-<area shape="rect" id="node2" href="$classBif__F2__UNEQU.html#a57a2d80a782cf7d221afe07ee27cc32f" title="overloaded Function::eval_AB()." alt="" coords="20,5,193,31"/>
-<area shape="rect" id="node3" href="$classBif__F2__UNEQU.html#a06baa148839dad462754b3aceeb16fc8" title="overloaded Function::eval_AXB()." alt="" coords="15,55,198,80"/>
-<area shape="rect" id="node4" href="$classBif__F2__UNEQU.html#a22c22e9e5d86ab19f647ef50af745b4f" title="overloaded Function::get_scalar_f2()" alt="" coords="5,104,208,129"/>
-</map>

@@ -333,7 +333,7 @@ protected:
    static Probe probes[];
 };
 //----------------------------------------------------------------------------
-/// Year, Month, Day, hour, minute, second, millisecond
+/// Year, Month, Day, hour, minute, second, μsecond
 struct YMDhmsu
 {
    /// construct YMDhmsu from usec since Jan. 1. 1970 00:00:00

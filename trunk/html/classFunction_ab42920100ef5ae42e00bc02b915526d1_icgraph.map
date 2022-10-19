@@ -1,5 +1,0 @@
-<map id="Function::has_result" name="Function::has_result">
-<area shape="rect" id="node1" title="return 1 if the function returns a result, otherwise 0. For non&#45;user defined functions,..." alt="" coords="212,31,352,56"/>
-<area shape="rect" id="node2" href="$classFunction.html#ac48150e2a6e8797e78d74ba9e9967de2" title="store the attributes (as per ⎕AT) of symbol in Z, ..." alt="" coords="5,5,164,31"/>
-<area shape="rect" id="node3" href="$classFunction.html#a5a8e930a7ee14744736f5d01d6e69aa9" title="return the signature of this function (currently only valid for user&#45;defined functions)" alt="" coords="5,55,164,80"/>
-</map>

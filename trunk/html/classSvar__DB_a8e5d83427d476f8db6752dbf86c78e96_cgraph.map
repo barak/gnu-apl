@@ -1,4 +1,0 @@
-<map id="Svar_DB::get_Svar_DB_tcp" name="Svar_DB::get_Svar_DB_tcp">
-<area shape="rect" id="node1" title="get TCP socket to APserver, complain if not connected" alt="" coords="5,5,192,31"/>
-<area shape="rect" id="node2" href="$classSvar__DB.html#ac10f9507c18657397c050432da27cdac" title="return the fd towards APserver" alt="" coords="240,5,392,31"/>
-</map>

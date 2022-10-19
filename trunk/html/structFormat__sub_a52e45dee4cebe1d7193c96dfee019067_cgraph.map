@@ -1,9 +1,0 @@
-<map id="Format_sub::insert_int_commas" name="Format_sub::insert_int_commas">
-<area shape="rect" id="node1" title="Fill buf at position x,y with data according to fmt." alt="" coords="5,125,136,165"/>
-<area shape="rect" id="node2" href="$classUCS__string.html#a0c261a3c2ef77fe8b75d48820b69af28" title="return true if every character in this string is the digit &#39;0&#39;" alt="" coords="184,5,341,31"/>
-<area shape="rect" id="node3" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="398,56,521,81"/>
-<area shape="rect" id="node4" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="389,181,529,207"/>
-<area shape="rect" id="node5" href="$classWorkspace.html#a09f10a68b5a249c789bf8c1839f3208c" title="return element pos of the current ⎕FC (pos should be 0..5)" alt="" coords="193,156,332,181"/>
-<area shape="rect" id="node6" href="$classAvec.html#af6b90a707281ad128da1764d92d85cd7" title="Return true iff av is a digit (i.e. 0 ≤ av ≤ 9)" alt="" coords="212,205,313,231"/>
-<area shape="rect" id="node7" href="$classUCS__string.html#af37b0914d3d5544074c85f91d7b35a1a" title="return this string reversed (i.e. characters from back to front)." alt="" coords="192,107,333,132"/>
-</map>

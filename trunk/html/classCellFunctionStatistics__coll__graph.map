@@ -1,5 +1,0 @@
-<map id="CellFunctionStatistics" name="CellFunctionStatistics">
-<area shape="rect" id="node1" title="Performance counters for one cell level function." alt="" coords="30,108,181,133"/>
-<area shape="rect" id="node2" href="$classStatistics.html" title="Base class for different kinds of statistics." alt="" coords="5,5,83,31"/>
-<area shape="rect" id="node3" href="$classStatistics__record.html" title="one statistics for computing the mean and the variance of samples" alt="" coords="107,5,227,31"/>
-</map>

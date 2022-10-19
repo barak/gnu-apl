@@ -1,4 +1,0 @@
-<map id="Token::get_sym_ptr" name="Token::get_sym_ptr">
-<area shape="rect" id="node1" title="return the Symbol * value of this token" alt="" coords="5,5,144,31"/>
-<area shape="rect" id="node2" href="$classToken.html#a1a31afbb07e3f1dbb86d5f872ce5c297" title="return the TokenValueType of this token." alt="" coords="192,5,345,31"/>
-</map>

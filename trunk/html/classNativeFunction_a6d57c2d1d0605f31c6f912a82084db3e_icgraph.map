@@ -1,8 +1,0 @@
-<map id="NativeFunction::get_so_path" name="NativeFunction::get_so_path">
-<area shape="rect" id="node1" title="return the name of the .so library that implements this function" alt="" coords="747,23,883,63"/>
-<area shape="rect" id="node2" href="$classCommand.html#a925cc5f77af57e1705b8c96a522e6a55" title="show list of commands" alt="" coords="541,5,699,31"/>
-<area shape="rect" id="node3" href="$classDoxy.html#ac9842076620bf4fe90f3e80922c5499c" title="write the page for one native function." alt="" coords="555,55,685,80"/>
-<area shape="rect" id="node4" href="$classDoxy.html#a5eb9b5605981c826438d5a51f38bf5a4" title="HTML&#45;print a table containing all defined functions to page." alt="" coords="344,55,493,80"/>
-<area shape="rect" id="node5" href="$classDoxy.html#ad8abe2e8a1b686a7b35e582c369d41ae" title="generate the entire documentation" alt="" coords="213,55,296,80"/>
-<area shape="rect" id="node6" href="$classCommand.html#a834eac0e797a5d1c992018b7d0c049a4" title="]DOXY: create doxygen&#45;like documentation of the current workspace" alt="" coords="5,55,165,80"/>
-</map>

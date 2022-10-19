@@ -1,6 +1,0 @@
-<map id="Nabla::parse_lineno" name="Nabla::parse_lineno">
-<area shape="rect" id="node1" title="parse [nn.mm] into a LineLabel;" alt="" coords="453,5,591,31"/>
-<area shape="rect" id="node2" href="$classNabla.html#ae4562224aeb0ce0598cd25f428443045" title="parse an operation (something like [...], e.g. [⎕3])" alt="" coords="277,5,405,31"/>
-<area shape="rect" id="node3" href="$classNabla.html#a610d94a179335126e82e9eea07918d5a" title="edit this function" alt="" coords="5,5,91,31"/>
-<area shape="rect" id="node4" href="$classNabla.html#a894eac5264914ef7eedcfc14643cc7ee" title="start editing, return source location if first_command is bad." alt="" coords="139,31,229,56"/>
-</map>

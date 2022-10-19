@@ -1,5 +1,0 @@
-<map id="Workspace::dump_commands" name="Workspace::dump_commands">
-<area shape="rect" id="node1" title="dump the commands in this workspace" alt="" coords="421,5,620,31"/>
-<area shape="rect" id="node2" href="$classWorkspace.html#a15d8cb5c62016f547b9718e820c94efd" title="dump this workspace" alt="" coords="216,5,373,31"/>
-<area shape="rect" id="node3" href="$classCommand.html#a98e7d1dd0c01014d79f2120292588a70" title=")DUMP: dump a workspace file (.apl)" alt="" coords="5,5,168,31"/>
-</map>

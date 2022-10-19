@@ -1,4 +1,0 @@
-<map id="Avec::no_space_before" name="Avec::no_space_before">
-<area shape="rect" id="node1" title="return true iff a token printed before av never needs a space" alt="" coords="173,5,332,31"/>
-<area shape="rect" id="node2" href="$classToken.html#a8da320e73d998f8ed44dfb8d81237bc8" title="print the token to out in the format used by print_error_info(). return the number of characters prin..." alt="" coords="5,5,125,31"/>
-</map>

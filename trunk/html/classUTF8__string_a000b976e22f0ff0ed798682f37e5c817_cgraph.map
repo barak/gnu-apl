@@ -1,5 +1,0 @@
-<map id="UTF8_string::round_0_1" name="UTF8_string::round_0_1">
-<area shape="rect" id="node1" title="round a digit string is the fractional part of a number between 0.0... and 0.9... up or down accordin..." alt="" coords="5,31,168,56"/>
-<area shape="rect" id="node2" href="$classUTF8__string.html#aa50b9387ce82e49d133df6a77bfe007c" title="return the last byte in this string" alt="" coords="230,5,361,31"/>
-<area shape="rect" id="node3" href="$classUTF8__string.html#aa8e2ee7b64f5efb0c8372bf951fb0704" title="discard the last byte in this string" alt="" coords="216,55,375,80"/>
-</map>

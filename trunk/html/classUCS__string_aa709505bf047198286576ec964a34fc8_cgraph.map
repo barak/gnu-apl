@@ -1,9 +1,0 @@
-<map id="UCS_string::from_double_fixed_prec" name="UCS_string::from_double_fixed_prec">
-<area shape="rect" id="node1" title="convert double value to an UCS_string with fract_digits fractional digits in fixed point format" alt="" coords="5,45,175,85"/>
-<area shape="rect" id="node2" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="437,5,577,31"/>
-<area shape="rect" id="node3" href="$classUCS__string.html#a725b0579ccbb59a9c090692e83ad302b" title="convert the integer part of value to an UCS_string and remove it from value" alt="" coords="228,52,376,77"/>
-<area shape="rect" id="node4" href="$classUCS__string.html#a6a6dd45662d5d5024b50ba031c2c6ac6" title="round last digit and discard it." alt="" coords="223,102,381,142"/>
-<area shape="rect" id="node5" href="$classUCS__string.html#a186a76c22c3ac840f1e607ba49e253a0" title="return the last character in this string" alt="" coords="443,59,570,84"/>
-<area shape="rect" id="node6" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="632,109,755,135"/>
-<area shape="rect" id="node7" href="$classUCS__string.html#a67ea87cb92e687105b21917ffb4a2a6f" title="remove the last character in this string" alt="" coords="429,160,584,185"/>
-</map>

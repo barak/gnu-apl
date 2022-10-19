@@ -1,8 +1,0 @@
-<map id="Quad_SVR" name="Quad_SVR">
-<area shape="rect" id="node1" title="The implementation of ⎕SVR." alt="" coords="81,299,169,324"/>
-<area shape="rect" id="node2" href="$classQuadFunction.html" title="Base class for all system functions." alt="" coords="15,225,118,251"/>
-<area shape="rect" id="node3" href="$classPrimitiveFunction.html" title="Base class for all internal functions of the interpreter." alt="" coords="5,152,128,177"/>
-<area shape="rect" id="node4" href="$classFunction.html" title="Base class for all APL functions and operators (system or defined)" alt="" coords="31,79,103,104"/>
-<area shape="rect" id="node5" href="$classNamedObject.html" title="A user&#45;defined variable or function." alt="" coords="15,5,118,31"/>
-<area shape="rect" id="node6" href="$classQuad__SVx.html" title="Base class for ⎕SVC, ⎕SVE, ⎕SVO, ⎕SVQ, ⎕SVR, and ⎕SVS." alt="" coords="143,225,228,251"/>
-</map>

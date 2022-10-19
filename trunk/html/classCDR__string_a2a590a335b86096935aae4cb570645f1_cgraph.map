@@ -1,5 +1,0 @@
-<map id="CDR_string::is_integer" name="CDR_string::is_integer">
-<area shape="rect" id="node1" title="return true if this CDR is bool or integer" alt="" coords="5,5,160,31"/>
-<area shape="rect" id="node2" href="$classCDR__string.html#a693d8190dc4f64e2fc0efd4d994c0aec" title="return the CDR type of this CDR" alt="" coords="208,5,357,31"/>
-<area shape="rect" id="node3" href="$classCDR__string.html#abf4a46a9dc0d7a61b4222b339675b09a" title="return the header of this CDR" alt="" coords="405,5,544,31"/>
-</map>

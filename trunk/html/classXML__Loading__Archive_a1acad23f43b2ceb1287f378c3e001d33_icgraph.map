@@ -1,8 +1,0 @@
-<map id="XML_Loading_Archive::find_float_attr" name="XML_Loading_Archive::find_float_attr">
-<area shape="rect" id="node2" href="$classXML__Loading__Archive.html#a619b73db295d1c88790d671a9ce7fef4" title="read a token " alt="" coords="205,5,357,47"/>
-<area shape="rect" id="node3" href="$classXML__Loading__Archive.html#a7381cad28d73cdca8a76bf741921c63d" title="read parsers in SI entry " alt="" coords="405,5,557,47"/>
-<area shape="rect" id="node4" href="$classXML__Loading__Archive.html#adfa844fcc401d3c335cafa5abda2f35d" title="read next StateIndicator entry " alt="" coords="605,5,757,47"/>
-<area shape="rect" id="node5" href="$classXML__Loading__Archive.html#ad2f1d88070976eab8a41f0fdcd1e0ec1" title="read next StateIndicator element " alt="" coords="805,5,957,47"/>
-<area shape="rect" id="node6" href="$classXML__Loading__Archive.html#a3ea748a15d0a90fe9a32c362b14da7fd" title="read an entire workspace, throw DOMAIN_ERROR on failure " alt="" coords="1005,5,1157,47"/>
-<area shape="rect" id="node7" href="$classXML__Loading__Archive.html#a45c9b23463cf5379d2788af1789a62f0" title="read vids of top&#45;level variables " alt="" coords="1205,5,1357,47"/>
-</map>

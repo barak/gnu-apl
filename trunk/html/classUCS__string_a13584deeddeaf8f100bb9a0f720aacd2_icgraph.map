@@ -1,5 +1,0 @@
-<map id="UCS_string::is_comment_or_label" name="UCS_string::is_comment_or_label">
-<area shape="rect" id="node1" title="return true if this string starts with # or ⍝ or x:" alt="" coords="196,23,365,63"/>
-<area shape="rect" id="node2" href="$classQuad__CR.html#ad98ce37f2b329eb37ddae9d0fcf7832f" title="10 ⎕CR symbol_name (variable or function name). Also used for )OUT" alt="" coords="5,5,148,31"/>
-<area shape="rect" id="node3" href="$structNabla_1_1FunLine.html#a0686a641df5a1123e8402dd5e44b47b8" title="print the line" alt="" coords="5,55,148,80"/>
-</map>

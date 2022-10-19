@@ -1,8 +1,0 @@
-<map id="UserFunction_header::init_local_vars" name="UserFunction_header::init_local_vars">
-<area shape="rect" id="node1" title="init the local variables from text" alt="" coords="5,45,152,85"/>
-<area shape="rect" id="node2" href="$classUserFunction__header.html#a332a135b6d9ec286e6deb84298c10a43" title="Check that all function params, local vars. and labels are unique." alt="" coords="200,5,367,60"/>
-<area shape="rect" id="node4" href="$classTokenizer.html#ad7706aec4bdc9bf3ef0166a16bfa9373" title="tokenize UTF&#45;8 string input into token string tos." alt="" coords="215,84,351,109"/>
-<area shape="rect" id="node3" href="$classUserFunction__header.html#af00a60b75d11d89318c278f153b9c3a8" title="remove sym from local_vars if it occurs at pos or above" alt="" coords="415,13,605,53"/>
-<area shape="rect" id="node5" href="$classError.html#a73c1f4ab40f4e313f504562d52bb001e" title="return the error code of this error" alt="" coords="438,80,582,105"/>
-<area shape="rect" id="node6" href="$classError.html#a2ee02a4706e3c07b95d8f29aafe6cbbb" title="set the second error line" alt="" coords="435,129,585,155"/>
-</map>

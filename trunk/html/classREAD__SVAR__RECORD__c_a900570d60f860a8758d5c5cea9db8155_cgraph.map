@@ -1,4 +1,0 @@
-<map id="READ_SVAR_RECORD_c::store" name="READ_SVAR_RECORD_c::store">
-<area shape="rect" id="node1" title="store (aka. serialize) this signal into a buffer" alt="" coords="5,5,189,45"/>
-<area shape="rect" id="node2" href="$classSig__item__int.html#a388d7bb49f81f13fcb8b3c006e67fe7f" title="store (aka. serialize) this item into a string" alt="" coords="237,13,368,38"/>
-</map>

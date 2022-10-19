@@ -1,9 +1,0 @@
-<map id="Quad_CR::do_CR41" name="Quad_CR::do_CR41">
-<area shape="rect" id="node2" href="$classValue.html#a9fc8bbaf9fefe6835dea7db0f71b8b6c" title="return the number of elements (the product of the shapes). " alt="" coords="196,5,344,32"/>
-<area shape="rect" id="node3" href="$classValue.html#a0d7debc5273aad742471b2d7990a6c8a" title="return the first element of the ravel (which is always present). same as get_cproto(), but named differently to indicate its context. " alt="" coords="211,56,329,83"/>
-<area shape="rect" id="node4" href="$classValue.html#aa7a89fbbca076c1c0c1a579702bf5ff1" title="return the current flags " alt="" coords="212,107,328,133"/>
-<area shape="rect" id="node5" href="$classValue.html#a4429dcb041368962591397a45cb23d9b" title="return the shape of this value " alt="" coords="209,157,331,184"/>
-<area shape="rect" id="node6" href="$Value_8cc.html#a8f351554fdb7ee88b600632f843105e4" title="⍳0 (aka. ⍬) " alt="" coords="247,208,293,235"/>
-<area shape="rect" id="node7" href="$Common_8hh.html#aecfb781b36a8a772310228edb5410b15" title="MORE_ERROR" alt="" coords="211,259,329,285"/>
-<area shape="rect" id="node8" href="$classWorkspace.html#a5ebd29d8c860b589b9f1d8118a949514" title="return reference to more info about last error " alt="" coords="392,259,551,285"/>
-</map>

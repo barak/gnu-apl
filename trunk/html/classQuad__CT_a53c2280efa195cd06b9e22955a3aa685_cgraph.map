@@ -1,5 +1,0 @@
-<map id="Quad_CT::current" name="Quad_CT::current">
-<area shape="rect" id="node1" title="return the current comparison tolerance. MUST NOT CALL get_apl_value() because it can be called from ..." alt="" coords="5,31,132,56"/>
-<area shape="rect" id="node2" href="$classSymbol.html#ab542d76beae55342e23bac625c2912e4" title="return the first Cell of this value without creating a value" alt="" coords="180,5,328,31"/>
-<area shape="rect" id="node3" href="$classCell.html#a9a0028fd74f00deb001a8062a55916c6" title="Return the real part of a cell." alt="" coords="185,55,323,80"/>
-</map>

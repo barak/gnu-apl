@@ -1,5 +1,0 @@
-<map id="Signal_base::recv_TCP" name="Signal_base::recv_TCP">
-<area shape="rect" id="node1" title="receive a signal (TCP)" alt="" coords="5,31,165,56"/>
-<area shape="rect" id="node2" href="$classSig__item__int.html#a5e6903d94a367f8e7e9540881ddf389e" title="return the value of the item" alt="" coords="213,5,379,31"/>
-<area shape="rect" id="node3" href="$classSignal__base.html#a774958a4504fa7536cc941a3736d5b2c" title="print the signal" alt="" coords="233,55,359,80"/>
-</map>

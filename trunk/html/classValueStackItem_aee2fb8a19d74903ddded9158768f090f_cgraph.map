@@ -1,4 +1,0 @@
-<map id="ValueStackItem::isolate" name="ValueStackItem::isolate">
-<area shape="rect" id="node1" title="make apl_val the sole owner of apl_val.value" alt="" coords="5,5,167,31"/>
-<area shape="rect" id="node2" href="$classValue__P__Base.html#a43ca9b5a3b6b63be74b3087bd109674f" title="clone value if more than one Value_P points to it" alt="" coords="215,5,369,31"/>
-</map>

@@ -1,6 +1,0 @@
-<map id="ComplexCell::equal" name="ComplexCell::equal">
-<area shape="rect" id="node1" title="overloaded Cell::equal()." alt="" coords="5,42,141,67"/>
-<area shape="rect" id="node2" href="$classComplexCell.html#ac31c8fb018b164f5016a94dd7ca4ab06" title="overloaded Cell::get_complex_value()" alt="" coords="189,5,368,45"/>
-<area shape="rect" id="node4" href="$classCell.html#acc03ae0226f88b85fcf8bed44f7c2c07" title="ISO p.19: return true if real A is tolerantly equal to real B within C." alt="" coords="207,70,351,95"/>
-<area shape="rect" id="node3" href="$classComplexCell.html#ae93d7078736e5c3b20970a687565b3d1" title="return the complex value of this cell" alt="" coords="416,13,545,38"/>
-</map>

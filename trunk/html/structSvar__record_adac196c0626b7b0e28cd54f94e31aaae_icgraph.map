@@ -1,7 +1,0 @@
-<map id="Svar_record::print_name" name="Svar_record::print_name">
-<area shape="rect" id="node1" title="print a name" alt="" coords="217,80,381,105"/>
-<area shape="rect" id="node2" href="$structSvar__record.html#aeca41ca1c376ddbe0bb18bb46ff82898" title="print the variable" alt="" coords="25,5,150,31"/>
-<area shape="rect" id="node3" href="$structSvar__record.html#a189167d4fbf58758b9076351fdfabadb" title="print the name of this variable" alt="" coords="5,55,169,80"/>
-<area shape="rect" id="node4" href="$structSvar__record.html#a4909c9c63d6fe45b4cdfb4b6cad7762f" title="set the control bits of this variable" alt="" coords="5,104,169,129"/>
-<area shape="rect" id="node5" href="$structSvar__record.html#ae5d9c8b3fc4eaf74f45a87455ee9dd65" title="update the state when using or setting this variable, and clear events" alt="" coords="10,153,165,179"/>
-</map>

@@ -1,5 +1,0 @@
-<map id="Value::same_rank" name="Value::same_rank">
-<area shape="rect" id="node1" title="return true iff this value has the same rank as other." alt="" coords="5,5,132,31"/>
-<area shape="rect" id="node2" href="$classValue.html#a5ac7131d2f89d0bc8b8907d960cbd125" title="return the rank of this value" alt="" coords="180,5,293,31"/>
-<area shape="rect" id="node3" href="$classShape.html#a017e9a35dd20f4bc4fdeb7ea29b6805d" title="return the rank" alt="" coords="341,5,459,31"/>
-</map>

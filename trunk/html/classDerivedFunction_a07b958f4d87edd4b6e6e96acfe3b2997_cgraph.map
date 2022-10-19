@@ -1,4 +1,0 @@
-<map id="DerivedFunction::get_AXIS" name="DerivedFunction::get_AXIS">
-<area shape="rect" id="node1" title="return the axis argument (or 0 if none) of this derived function" alt="" coords="5,5,187,31"/>
-<area shape="rect" id="node2" href="$classValue__P__Base.html#a1c3bf1b6f708eb2c1ba4b97c83adb9aa" title="return a const pointer to the Value" alt="" coords="235,5,369,31"/>
-</map>

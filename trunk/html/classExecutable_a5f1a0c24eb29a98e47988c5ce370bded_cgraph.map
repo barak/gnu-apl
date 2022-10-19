@@ -1,4 +1,0 @@
-<map id="Executable::increment_refcount" name="Executable::increment_refcount">
-<area shape="rect" id="node1" title="increment the reference counter" alt="" coords="5,5,157,45"/>
-<area shape="rect" id="node2" href="$classExecutable.html#aac3043f85d550ff3a589d828a2012098" title="return a UserFunction * (if this is one) or else 0." alt="" coords="205,13,385,38"/>
-</map>

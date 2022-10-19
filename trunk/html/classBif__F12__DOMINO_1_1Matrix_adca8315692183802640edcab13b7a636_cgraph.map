@@ -1,4 +1,0 @@
-<map id="Bif_F12_DOMINO::Matrix::significant" name="Bif_F12_DOMINO::Matrix::significant">
-<area shape="rect" id="node1" title="true if this matrix is significant with respect to bmax and eps" alt="" coords="5,5,179,45"/>
-<area shape="rect" id="node2" href="$classBif__F12__DOMINO_1_1Matrix.html#a87d656c73cd7fcada133a3db55f4e3f1" title="return the square of the length of the item at row x column y" alt="" coords="227,5,400,45"/>
-</map>

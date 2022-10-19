@@ -1,4 +1,0 @@
-<map id="Bif_F12_FORMAT::is_control_char" name="Bif_F12_FORMAT::is_control_char">
-<area shape="rect" id="node1" title="Return true iff uni is &#39;0&#39; .. &#39;9&#39;, comma, or full&#45;stop." alt="" coords="5,5,153,45"/>
-<area shape="rect" id="node2" href="$classAvec.html#af6b90a707281ad128da1764d92d85cd7" title="Return true iff av is a digit (i.e. 0 ≤ av ≤ 9)" alt="" coords="201,13,303,38"/>
-</map>

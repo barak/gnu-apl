@@ -1,4 +1,0 @@
-<map id="Command::resolve_lib_wsname" name="Command::resolve_lib_wsname">
-<area shape="rect" id="node1" title="resolve an optional lib followed by a WS name" alt="" coords="5,5,157,45"/>
-<area shape="rect" id="node2" href="$classAvec.html#af6b90a707281ad128da1764d92d85cd7" title="Return true iff av is a digit (i.e. 0 ≤ av ≤ 9)" alt="" coords="205,13,307,38"/>
-</map>

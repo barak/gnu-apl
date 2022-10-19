@@ -1,5 +1,0 @@
-<map id="IndexIterator::get_upper" name="IndexIterator::get_upper">
-<area shape="rect" id="node1" title="return the next higher IndexIterator" alt="" coords="192,37,313,77"/>
-<area shape="rect" id="node2" href="$classMultiIndexIterator.html#a5fd9262f9a85d534554a4bab0ce5ff1c" title="get the current index (offset into a ravel) and increment iterators" alt="" coords="13,5,136,45"/>
-<area shape="rect" id="node3" href="$classMultiIndexIterator.html#a31817ab468e15dbbf22d97717dc1585e" title="destructor" alt="" coords="5,69,144,109"/>
-</map>

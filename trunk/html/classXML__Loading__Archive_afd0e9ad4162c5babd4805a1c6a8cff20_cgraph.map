@@ -1,5 +1,0 @@
-<map id="XML_Loading_Archive::XML_Loading_Archive" name="XML_Loading_Archive::XML_Loading_Archive">
-<area shape="rect" id="node1" title="constructor: remember file name and workspace" alt="" coords="5,5,165,45"/>
-<area shape="rect" id="node2" href="$classXML__Loading__Archive.html#a2dce39a2eb0bb8bc55d0306606bb86d6" title="reset archive to the start position" alt="" coords="213,5,365,45"/>
-<area shape="rect" id="node3" href="$classXML__Loading__Archive.html#a987f28e4f3139e5f1c96913468ea3057" title="move to next tag, return true if EOF" alt="" coords="413,5,565,45"/>
-</map>

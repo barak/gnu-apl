@@ -1,8 +1,0 @@
-<map id="Function::eval_fill_AB" name="Function::eval_fill_AB">
-<area shape="rect" id="node1" title="Evaluate the fill function." alt="" coords="529,91,679,116"/>
-<area shape="rect" id="node2" href="$classBif__OPER2__RANK.html#ab979b51a46eef84ddff874b4358d592e" title="the &#39;normalized&#39; implementation of all eval_ALxxx*( functions" alt="" coords="293,26,451,66"/>
-<area shape="rect" id="node5" href="$classBif__OPER1__EACH.html#ae7a90f347aff589d61b1b5bc1892aab9" title="Overloaded Function::eval_ALB()." alt="" coords="273,91,471,116"/>
-<area shape="rect" id="node6" href="$classBif__OPER2__OUTER.html#a2e9a34f12130439dd28c6d528ffadbc3" title="Overloaded Function::eval_ALRB()." alt="" coords="263,140,481,165"/>
-<area shape="rect" id="node3" href="$classBif__OPER2__RANK.html#af386afe437eb506495d05219013e07c7" title="overloaded Function::eval_ALRB()" alt="" coords="5,5,215,31"/>
-<area shape="rect" id="node4" href="$classBif__OPER2__RANK.html#a34d34df4c656d09dd8e216ee44513a68" title="overloaded Function::eval_ALRXB()" alt="" coords="27,55,193,95"/>
-</map>

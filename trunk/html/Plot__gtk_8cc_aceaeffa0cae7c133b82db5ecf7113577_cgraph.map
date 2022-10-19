@@ -1,9 +1,0 @@
-<map id="draw_triangle" name="draw_triangle">
-<area shape="rect" id="node1" title="draw a 3D triangle where the points P0, P1, and P2 are at visual heights H0, H1, and H2 respectively...." alt="" coords="5,91,104,116"/>
-<area shape="rect" id="node2" href="$Plot__gtk_8cc.html#a8cfbdf9e5b10caae909943348b5bda72" title="draw a 3D triangle where one point P0 is at visual height H0 and the other two points P1 and P2 are t..." alt="" coords="183,33,281,59"/>
-<area shape="rect" id="node6" href="$classPlot__window__properties.html#aa152e0e672fc6083139705184e7216c5" title="return the 3D color gradient" alt="" coords="152,83,312,123"/>
-<area shape="rect" id="node7" href="$Plot__gtk_8cc.html#a40a0e846002a22747c26333da6c47e83" title="swap pixels P0 with value Y0, and P1 with value Y1" alt="" coords="195,148,269,173"/>
-<area shape="rect" id="node3" href="$Plot__gtk_8cc.html#a12790f315bc24ef6e2ca35b323b766e9" title="draw a line from P0 to P1" alt="" coords="401,5,479,31"/>
-<area shape="rect" id="node5" href="$classPlot__window__properties.html#abadf9d1f9cf63db3c78d21b88614d9d3" title="for level 0.0 &lt;= alpha &lt;= 1.0: return the color for alpha according to gradient" alt="" coords="360,55,520,95"/>
-<area shape="rect" id="node4" href="$Plot__gtk_8cc.html#ad3c35c71233bf7716802110531ce36bb" title="same as standard cairo_set_RGB_source() but with Color instead of double red, green,..." alt="" coords="568,5,725,31"/>
-</map>

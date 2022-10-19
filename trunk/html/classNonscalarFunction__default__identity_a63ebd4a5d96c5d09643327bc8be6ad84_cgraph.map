@@ -1,8 +1,0 @@
-<map id="NonscalarFunction_default_identity::eval_identity_fun" name="NonscalarFunction_default_identity::eval_identity_fun">
-<area shape="rect" id="node1" title="Overloaded Function::eval_identity_fun()" alt="" coords="5,73,183,113"/>
-<area shape="rect" id="node2" href="$classShape.html#a017e9a35dd20f4bc4fdeb7ea29b6805d" title="return the rank" alt="" coords="251,5,369,31"/>
-<area shape="rect" id="node3" href="$classShape.html#a592d2ade68aa8c21c5d84627c3a0e001" title="return the length of dimension r" alt="" coords="231,55,389,80"/>
-<area shape="rect" id="node4" href="$classShape.html#af39e05bad7be900fa1437a6eb6035e97" title="return the number of ravel elements (1 for scalars,i else product of shapes)" alt="" coords="243,104,377,129"/>
-<area shape="rect" id="node5" href="$classShape.html#ae3678a4ad2bb58a1072171febeaa44ff" title="return a shape like this, but with axis axis removed" alt="" coords="240,153,380,179"/>
-<area shape="rect" id="node6" href="$classShape.html#aeb018b67601d3f1c4bea3d2c2b877b7e" title="add a dimension of length len at the end" alt="" coords="437,153,600,179"/>
-</map>

@@ -1,4 +1,0 @@
-<map id="XML_Loading_Archive::read_Ravel" name="XML_Loading_Archive::read_Ravel">
-<area shape="rect" id="node2" href="$classXML__Loading__Archive.html#a3ea748a15d0a90fe9a32c362b14da7fd" title="read an entire workspace, throw DOMAIN_ERROR on failure " alt="" coords="205,5,357,47"/>
-<area shape="rect" id="node3" href="$classXML__Loading__Archive.html#a45c9b23463cf5379d2788af1789a62f0" title="read vids of top&#45;level variables " alt="" coords="405,5,557,47"/>
-</map>

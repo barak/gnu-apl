@@ -1,6 +1,0 @@
-<map id="Bif_F12_DOMINO::invert_upper_triangle_matrix" name="Bif_F12_DOMINO::invert_upper_triangle_matrix">
-<area shape="rect" id="node1" title="inver a real upper&#45;triangle matrix" alt="" coords="5,69,175,109"/>
-<area shape="rect" id="node2" href="$classBif__F12__DOMINO_1_1Matrix.html#adb08c178b7485d7113436c1f2a33ea10" title="print this matrix boxed with name" alt="" coords="223,5,396,45"/>
-<area shape="rect" id="node3" href="$classBif__F12__DOMINO_1_1Matrix.html#a267913456cf5b847fd7d04293322acd0" title="initialize this matrix to the identity matrix" alt="" coords="223,69,396,109"/>
-<area shape="rect" id="node4" href="$classBif__F12__DOMINO_1_1Matrix.html#a0cfd11a56d2d6cf4c0db0c9cc8617715" title="return the real part of A[x;y]" alt="" coords="223,133,396,173"/>
-</map>

@@ -1,5 +1,0 @@
-<map id="Symbol::set_NC" name="Symbol::set_NC">
-<area shape="rect" id="node1" title="Set current NameClass of this Symbol to nc." alt="" coords="5,31,124,56"/>
-<area shape="rect" id="node2" href="$classValueStackItem.html#a27453c0dfda1004c6f5e68a0c2530eae" title="return the name class for this ValueStackItem" alt="" coords="172,5,340,31"/>
-<area shape="rect" id="node3" href="$classValueStackItem.html#ac15a4517af12271c9828fdfbb8cbdafe" title="set the name class for this ValueStackItem" alt="" coords="172,55,340,80"/>
-</map>

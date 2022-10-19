@@ -1,6 +1,0 @@
-<map id="Quad_FIO::subfun_to_axis" name="Quad_FIO::subfun_to_axis">
-<area shape="rect" id="node1" title="overloaded Function::subfun_to_axis" alt="" coords="5,35,184,60"/>
-<area shape="rect" id="node2" href="$classUTF8__string.html#a922bd7ebc6a8ea5c6ba9c54159b18a93" title="return this string as a 0&#45;terminated C string" alt="" coords="235,5,365,31"/>
-<area shape="rect" id="node3" href="$classQuad__FIO.html#ae0f6083523f52057b171bd2423b1c2b1" title="find function number for function name, &#45;1 if not found" alt="" coords="232,55,368,95"/>
-<area shape="rect" id="node4" href="$classQuad__FIO.html#a67655ca6fa181443570412c8dfe2e84c" title="compare two axis strings (function names)" alt="" coords="416,63,587,88"/>
-</map>

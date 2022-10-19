@@ -1,5 +1,0 @@
-<map id="Bif_F12_DOMINO::Matrix::init_outer_product" name="Bif_F12_DOMINO::Matrix::init_outer_product">
-<area shape="rect" id="node1" title="initialize this complex matrix to be the outer product of the first column of the complex matrix src ..." alt="" coords="5,37,179,77"/>
-<area shape="rect" id="node2" href="$classBif__F12__DOMINO_1_1Matrix.html#a142ec301838bb7aacf99aacd2a4d73f1" title="return the imaginary part of A[x;y]" alt="" coords="227,5,400,45"/>
-<area shape="rect" id="node3" href="$classBif__F12__DOMINO_1_1Matrix.html#a0cfd11a56d2d6cf4c0db0c9cc8617715" title="return the real part of A[x;y]" alt="" coords="227,69,400,109"/>
-</map>

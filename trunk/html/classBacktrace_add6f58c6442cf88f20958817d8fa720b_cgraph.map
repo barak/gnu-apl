@@ -1,4 +1,0 @@
-<map id="Backtrace::caller" name="Backtrace::caller">
-<area shape="rect" id="node1" title="show the current caller (only valid while being called)" alt="" coords="5,5,125,31"/>
-<area shape="rect" id="node2" href="$classBacktrace.html#a60b9a2f5cd0bd6f76c07875b5a9562e8" title="demangle a line returned by backtrace_symbols()" alt="" coords="173,5,345,31"/>
-</map>

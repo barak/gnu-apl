@@ -1,4 +1,0 @@
-<map id="Quad_FFT::hamming_window" name="Quad_FFT::hamming_window">
-<area shape="rect" id="node1" title="return the Hamming window value for sample n of N" alt="" coords="195,5,391,31"/>
-<area shape="rect" id="node2" href="$classQuad__FFT.html#abe78e9a1a769c4f4c66ed9d2a6f2d9d3" title="overloaded Function::eval_AB()" alt="" coords="5,5,147,31"/>
-</map>

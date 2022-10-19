@@ -1,7 +1,0 @@
-<map id="Symbol::print" name="Symbol::print">
-<area shape="rect" id="node1" title="Print this Symbol to out." alt="" coords="636,31,735,56"/>
-<area shape="rect" id="node2" href="$classToken.html#af769022fa7b042d51efdb289689e8514" title="helper function to print an APL value" alt="" coords="447,5,577,31"/>
-<area shape="rect" id="node3" href="$classSymbol.html#a88ce92302e3a54792fa677cbc3d96fb9" title="Print this Symbol and its stack to out." alt="" coords="436,55,588,80"/>
-<area shape="rect" id="node4" href="$classSymbolTable.html#a9bacf3be9c6c2145a68d891c42076cf2" title="List details of single symbol in buf." alt="" coords="216,55,388,80"/>
-<area shape="rect" id="node5" href="$classWorkspace.html#a47e76e3abe40a5240a3a230fab2cdedd" title="list all symbols with names in buf" alt="" coords="5,55,168,80"/>
-</map>

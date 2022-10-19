@@ -1,8 +1,0 @@
-<map id="Matrix::get_column_count" name="Matrix::get_column_count">
-<area shape="rect" id="node2" href="$LApack_8hh.html#aa5f7849e8a60e7f56ea32721e4d20907" title="LApack function estimating the rank of A. " alt="" coords="187,5,291,32"/>
-<area shape="rect" id="node3" href="$LApack_8hh.html#aa40c46c10d813986913ffbfb7020142c" title="scaled_gelsy" alt="" coords="339,56,437,83"/>
-<area shape="rect" id="node4" href="$LApack_8hh.html#a2b3db28df36f57039e0f2f786fee419e" title="gelsy" alt="" coords="485,81,539,108"/>
-<area shape="rect" id="node5" href="$LApack_8hh.html#a11281a955a70dca26cec13b74b42d11d" title="LApack function geqp3. " alt="" coords="210,157,267,184"/>
-<area shape="rect" id="node6" href="$LApack_8hh.html#a70627811c99ae8822513f0218c8f738e" title="LApack function laqp2. " alt="" coords="212,208,265,235"/>
-<area shape="rect" id="node7" href="$LApack_8hh.html#a2d94c2bcc27ee59e9b00d5c7166cb222" title="LApack function larf. " alt="" coords="219,259,259,285"/>
-</map>

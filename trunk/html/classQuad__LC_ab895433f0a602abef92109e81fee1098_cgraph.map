@@ -1,5 +1,0 @@
-<map id="Quad_LC::get_apl_value" name="Quad_LC::get_apl_value">
-<area shape="rect" id="node1" title="overloaded Symbol::get_apl_value()." alt="" coords="5,42,171,67"/>
-<area shape="rect" id="node2" href="$classStateIndicator.html#a44d07945c56abef5505efcfdc98ec090" title="return the SI that has called this one" alt="" coords="221,5,351,45"/>
-<area shape="rect" id="node3" href="$classWorkspace.html#a8083efc2d51067edb25ae8dd4f014173" title="the top of the SI stack (the SI pushed last)" alt="" coords="219,70,353,95"/>
-</map>

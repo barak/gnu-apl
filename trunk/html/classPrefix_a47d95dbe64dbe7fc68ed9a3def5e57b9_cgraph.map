@@ -1,4 +1,0 @@
-<map id="Prefix::pop" name="Prefix::pop">
-<area shape="rect" id="node1" title="remove the leftmost token (e,g, A in A←B) from the stack and return it" alt="" coords="5,5,91,31"/>
-<area shape="rect" id="node2" href="$classPrefix.html#a07a35c8b69a8c9f685225e2a2586a2fd" title="return the number of token currently in the FIFO" alt="" coords="139,5,227,31"/>
-</map>

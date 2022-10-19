@@ -1,9 +1,0 @@
-<map id="Bif_F12_FORMAT::Format_LIFER::Format_LIFER" name="Bif_F12_FORMAT::Format_LIFER::Format_LIFER">
-<area shape="rect" id="node1" title="constructor" alt="" coords="5,113,184,153"/>
-<area shape="rect" id="node2" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="239,5,379,31"/>
-<area shape="rect" id="node3" href="$classBif__F12__FORMAT.html#a9cf835b32359329b0ad06d68de670a7d" title="Return true iff uni is &#39;0&#39; .. &#39;9&#39;, comma, or full&#45;stop." alt="" coords="235,55,383,95"/>
-<area shape="rect" id="node5" href="$structFormat__sub.html#a2f60b91dbfd98ff5c0d2915ce31dc983" title="set flt_mask according to the digits in member format return the number of digits from &#39;1&#39; to &#39;4&#39; (in..." alt="" coords="232,120,387,145"/>
-<area shape="rect" id="node6" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="435,171,557,196"/>
-<area shape="rect" id="node7" href="$structFormat__sub.html#a872fece2e509a22858f33d3b42536a95" title="return the number of characters in format" alt="" coords="248,221,371,247"/>
-<area shape="rect" id="node4" href="$classAvec.html#af6b90a707281ad128da1764d92d85cd7" title="Return true iff av is a digit (i.e. 0 ≤ av ≤ 9)" alt="" coords="445,63,547,88"/>
-</map>

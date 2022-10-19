@@ -1,7 +1,0 @@
-<map id="Quad_LX" name="Quad_LX">
-<area shape="rect" id="node1" title="The class implementing ⎕LX." alt="" coords="37,299,113,324"/>
-<area shape="rect" id="node2" href="$classNL__SystemVariable.html" title="Base class for all APL system variables that cannot be localized." alt="" coords="5,225,144,251"/>
-<area shape="rect" id="node3" href="$classSystemVariable.html" title="Base class for all APL system variables." alt="" coords="17,152,132,177"/>
-<area shape="rect" id="node4" href="$classSymbol.html" title="Base class for variables, defined functions, and distinguished names." alt="" coords="41,79,108,104"/>
-<area shape="rect" id="node5" href="$classNamedObject.html" title="A user&#45;defined variable or function." alt="" coords="23,5,126,31"/>
-</map>

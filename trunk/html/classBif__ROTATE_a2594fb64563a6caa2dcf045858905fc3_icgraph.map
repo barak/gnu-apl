@@ -1,7 +1,0 @@
-<map id="Bif_ROTATE::rotate" name="Bif_ROTATE::rotate">
-<area shape="rect" id="node1" title="Rotate B according to A along axis." alt="" coords="255,80,395,105"/>
-<area shape="rect" id="node2" href="$classBif__F12__ROTATE.html#a5425880fd1d9e82dd9368235fe77323b" title="overloaded Function::eval_AB()" alt="" coords="13,5,199,31"/>
-<area shape="rect" id="node3" href="$classBif__F12__ROTATE1.html#a0942eb6caa435ff0157dc05bb7a4ff31" title="overloaded Function::eval_AB()" alt="" coords="10,55,202,80"/>
-<area shape="rect" id="node4" href="$classBif__F12__ROTATE.html#aaef77c4a19df99c926818b1ef3f519fe" title="overloaded Function::eval_AXB()" alt="" coords="9,104,203,129"/>
-<area shape="rect" id="node5" href="$classBif__F12__ROTATE1.html#af159c64ab4196cfa690bf9e98129f4fb" title="overloaded Function::eval_AXB()" alt="" coords="5,153,207,179"/>
-</map>

@@ -1,4 +1,0 @@
-<map id="UCS_string::iterator::next" name="UCS_string::iterator::next">
-<area shape="rect" id="node1" title="return next char" alt="" coords="5,5,144,45"/>
-<area shape="rect" id="node2" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="192,13,315,38"/>
-</map>

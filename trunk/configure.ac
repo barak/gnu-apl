@@ -662,7 +662,7 @@ do
    then
       apl_top="$f"
       . "$f/buildtag.sh"
-      abs_apl_top=$(readlink -f "$apl_top")
+      abs_apl_top=$(realpath "$apl_top")
    fi
 done
 

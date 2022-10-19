@@ -1,5 +1,0 @@
-<map id="Svar_record::get_control" name="Svar_record::get_control">
-<area shape="rect" id="node1" title="return the control bits of this variable" alt="" coords="5,31,169,56"/>
-<area shape="rect" id="node2" href="$structSvar__partner.html#a3fb77c18c091930a1a8c361e399c8c04" title="return the control bits of this partner (as seen by the offering" alt="" coords="217,5,385,31"/>
-<area shape="rect" id="node3" href="$classProcessorID.html#a834b72a9d1c965b8b07a96e2088f5972" title="return the own id, parent, and grand&#45;parent" alt="" coords="232,55,371,80"/>
-</map>

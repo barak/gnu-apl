@@ -1,5 +1,0 @@
-<map id="get_type" name="get_type">
-<area shape="rect" id="node2" href="$classCDR__string.html#a30f36dfd3f3cf0a986088599a89f8ca5" title="return non&#45;zero if this CDR is malformed " alt="" coords="143,5,278,32"/>
-<area shape="rect" id="node3" href="$classCDR__string.html#ade9734126c60d5aa61617a183e8e1331" title="return true if this CDR is character " alt="" coords="125,56,296,83"/>
-<area shape="rect" id="node4" href="$classCDR__string.html#a2a590a335b86096935aae4cb570645f1" title="return true if this CDR is bool or integer " alt="" coords="133,107,288,133"/>
-</map>

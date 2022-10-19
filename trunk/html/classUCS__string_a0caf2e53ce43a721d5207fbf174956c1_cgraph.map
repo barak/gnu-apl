@@ -1,5 +1,0 @@
-<map id="UCS_string::atoi" name="UCS_string::atoi">
-<area shape="rect" id="node1" title="return integer value for a string starting with optional whitespaces, followed by digits." alt="" coords="5,31,124,56"/>
-<area shape="rect" id="node2" href="$classAvec.html#a014cc622b9ec09014dab1982b0ee59ab" title="return true iff av is a whitespace char (ASCII 0..32 (including))" alt="" coords="179,5,287,31"/>
-<area shape="rect" id="node3" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="172,55,295,80"/>
-</map>

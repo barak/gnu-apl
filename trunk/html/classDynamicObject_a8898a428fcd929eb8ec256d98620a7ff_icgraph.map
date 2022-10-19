@@ -1,7 +1,0 @@
-<map id="DynamicObject::get_all_values" name="DynamicObject::get_all_values">
-<area shape="rect" id="node2" href="$classCommand.html#af5d73db57801b2363c954b402f19186d" title="check workspace integrity (stale Value and IndexExpr objects, etc) " alt="" coords="192,5,363,32"/>
-<area shape="rect" id="node3" href="$classXML__Saving__Archive.html#acc327395cab545ea7797d92f5c931cab" title="write entire workspace " alt="" coords="411,23,557,65"/>
-<area shape="rect" id="node4" href="$classWorkspace.html#a8a4f1d898d523818dbd9d7efa6f2cf92" title="save this workspace " alt="" coords="605,31,759,57"/>
-<area shape="rect" id="node5" href="$classCommand.html#ad61e749290966d00856ce1dd4f6abe42" title=")SAVE active WS as CONTINUE and )OFF " alt="" coords="807,5,1000,32"/>
-<area shape="rect" id="node6" href="$classCommand.html#ab17fe02c2ece3341b2ea51fee69f0cfd" title=")SAVE: save a workspace file (.xml) " alt="" coords="824,56,983,83"/>
-</map>

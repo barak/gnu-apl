@@ -1,8 +1,0 @@
-<map id="UserPreferences::is_default" name="UserPreferences::is_default">
-<area shape="rect" id="node2" href="$structUserPreferences.html#a0705c74f0fd6b021d96c4806e32d7c4f" title="print how the interpreter was configured (via ./configure) and exit " alt="" coords="192,56,351,97"/>
-<area shape="rect" id="node7" href="$structUserPreferences.html#aaf377cc53e470138ca91e289dd3f93a6" title="UserPreferences::UserPreferences" alt="" coords="607,71,833,98"/>
-<area shape="rect" id="node3" href="$structUserPreferences.html#afbb29191d4c126b0f767f92eb427d568" title="parse command line parameters (AFTER reading preference files) " alt="" coords="399,5,559,47"/>
-<area shape="rect" id="node4" href="$main_8cc.html#aa0321421b17def7b58fc0cabc8890260" title="initialize the interpreter " alt="" coords="689,13,751,39"/>
-<area shape="rect" id="node5" href="$main_8cc.html#ac0f2228420376f4db7e1274f2b41667c" title="dito. " alt="" coords="881,13,932,39"/>
-<area shape="rect" id="node6" href="$classBacktrace.html#aec4c7866f70a4cd3c4c0883b6729c507" title="open file apl.lines " alt="" coords="980,13,1155,39"/>
-</map>

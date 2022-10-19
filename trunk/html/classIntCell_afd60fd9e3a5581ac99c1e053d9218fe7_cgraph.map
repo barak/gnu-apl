@@ -1,4 +1,0 @@
-<map id="IntCell::z0" name="IntCell::z0">
-<area shape="rect" id="node1" title="initialize the (un&#45;initialized) Cell *Z to integer 0" alt="" coords="5,5,88,31"/>
-<area shape="rect" id="node2" href="$classIntCell.html#a88c653b2f968c451ee1c1c53a983fa13" title="Construct an integer cell with value 0." alt="" coords="136,5,243,31"/>
-</map>

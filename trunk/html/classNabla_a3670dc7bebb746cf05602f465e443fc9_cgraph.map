@@ -1,4 +1,0 @@
-<map id="Nabla::line_exists" name="Nabla::line_exists">
-<area shape="rect" id="node1" title="true if line with label lab exists" alt="" coords="5,5,132,31"/>
-<area shape="rect" id="node2" href="$classNabla.html#aaecb4d9949ecf1b3211fd08889d16926" title="return index of line with label lab, or &#45;1 if not found." alt="" coords="180,5,292,31"/>
-</map>

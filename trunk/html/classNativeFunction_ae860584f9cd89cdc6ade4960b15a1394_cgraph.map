@@ -1,7 +1,0 @@
-<map id="NativeFunction::eval_ALRXB" name="NativeFunction::eval_ALRXB">
-<area shape="rect" id="node1" title="Overloaded Function::eval_ALRXB()" alt="" coords="5,23,148,63"/>
-<area shape="rect" id="node2" href="$classNativeFunction.html#a07ba80cdaed86d561782d9c191ae1429" title="Overloaded Function::eval_ALRB()" alt="" coords="196,5,380,31"/>
-<area shape="rect" id="node3" href="$classToken.html#a4d19f279ca06bc64e549c9d63ca677b0" title="return the Function_P value of this token" alt="" coords="428,31,565,56"/>
-<area shape="rect" id="node4" href="$classToken.html#abe9f60f29fc7644214b48cc2715a21ad" title="return true if this token is a function (or operator)" alt="" coords="613,31,743,56"/>
-<area shape="rect" id="node5" href="$classToken.html#a1a31afbb07e3f1dbb86d5f872ce5c297" title="return the TokenValueType of this token." alt="" coords="791,31,944,56"/>
-</map>

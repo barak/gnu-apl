@@ -1,9 +1,0 @@
-<map id="Quad_INP::read_strings" name="Quad_INP::read_strings">
-<area shape="rect" id="node1" title="read raw_lines from stdin or file, stop at end_marker" alt="" coords="5,80,168,105"/>
-<area shape="rect" id="node2" href="$classStateIndicator.html#a80d5ee43a04486d61d84f75df40f5ed8" title="return the current line number" alt="" coords="219,29,375,55"/>
-<area shape="rect" id="node6" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="443,105,565,131"/>
-<area shape="rect" id="node7" href="$classUCS__string.html#a59e98d908cceda0d9bef31a42cf838e6" title="return the start position of sub in this string or &#45;1 if sub is not contained in this string" alt="" coords="216,131,379,156"/>
-<area shape="rect" id="node3" href="$classExecutable.html#acc35b347a5624e399f271c27778a2dbb" title="get the line number for pc" alt="" coords="434,5,574,31"/>
-<area shape="rect" id="node4" href="$classStateIndicator.html#a93fdf9b10d3c4253c3d79e018c799fcb" title="return the current PC" alt="" coords="427,55,581,80"/>
-<area shape="rect" id="node5" href="$classPrefix.html#ade9d0ae7c2c578907265991484876535" title="return the current PC" alt="" coords="629,55,737,80"/>
-</map>

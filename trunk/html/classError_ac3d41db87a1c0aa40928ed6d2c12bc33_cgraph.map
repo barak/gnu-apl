@@ -1,5 +1,0 @@
-<map id="Error::print" name="Error::print">
-<area shape="rect" id="node1" title="print the error and its related information" alt="" coords="5,31,88,56"/>
-<area shape="rect" id="node2" href="$classError.html#a9dbfb665cecfad231189862c5f414c48" title="return a string describing the error" alt="" coords="154,5,277,31"/>
-<area shape="rect" id="node3" href="$classWorkspace.html#a81618932a28523c1274fb1c2ed3d9553" title="return reference to more info about last error" alt="" coords="136,55,295,80"/>
-</map>

@@ -1,7 +1,0 @@
-<map id="PrintBuffer::pad_to_spaces" name="PrintBuffer::pad_to_spaces">
-<area shape="rect" id="node1" title="replace pad chars by spaces" alt="" coords="5,111,136,151"/>
-<area shape="rect" id="node2" href="$classPrintBuffer.html#a43da75e9d48c2b94f9e4c614e5bf859e" title="Return the char in column x and row y." alt="" coords="192,5,335,31"/>
-<area shape="rect" id="node3" href="$classPrintBuffer.html#af6f689e8c4e930b7c37099bf5fdfe57d" title="return the number of columns" alt="" coords="184,79,343,119"/>
-<area shape="rect" id="node4" href="$classPrintBuffer.html#ac13295601812e379a3eac618ce239426" title="return the number of rows" alt="" coords="194,143,333,183"/>
-<area shape="rect" id="node5" href="$classPrintBuffer.html#a6fe77535d5ab96ae9d8fcc8b3ddbe78f" title="Set the char in column x and row y to uc." alt="" coords="192,208,335,233"/>
-</map>

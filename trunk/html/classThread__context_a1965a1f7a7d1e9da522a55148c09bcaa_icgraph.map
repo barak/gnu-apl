@@ -1,4 +1,0 @@
-<map id="Thread_context::init_sequential" name="Thread_context::init_sequential">
-<area shape="rect" id="node1" title="initialize all thread contexts (set all but N and thread)" alt="" coords="144,5,281,45"/>
-<area shape="rect" id="node2" href="$classParallel.html#a187281fddfd8c5b100ceb4c04153b9de" title="initialize" alt="" coords="5,13,96,38"/>
-</map>

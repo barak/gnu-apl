@@ -1,6 +1,0 @@
-<map id="PNG_draw_callback" name="PNG_draw_callback">
-<area shape="rect" id="node1" title="Gtk callback to draw the ⎕PNG window." alt="" coords="5,35,147,60"/>
-<area shape="rect" id="node2" href="$Quad__PNG_8cc.html#abd30e7bef2c721ebdf9fef4407af1598" title="convert APL pixel data to a Gtk/Cairo surface" alt="" coords="195,35,277,60"/>
-<area shape="rect" id="node3" href="$classValue__P__Base.html#a1c3bf1b6f708eb2c1ba4b97c83adb9aa" title="return a const pointer to the Value" alt="" coords="337,5,472,31"/>
-<area shape="rect" id="node4" href="$structPNG__context.html#ab4950d0d70d6acf87c1243c3132a20e2" title="return the current pixel matrix as APL value" alt="" coords="325,55,484,95"/>
-</map>

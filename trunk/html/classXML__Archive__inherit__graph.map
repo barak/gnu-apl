@@ -1,5 +1,0 @@
-<map id="XML_Archive" name="XML_Archive">
-<area shape="rect" id="node1" title="class for )SAVEing and )LOADing APL Workspaces in an XML file format" alt="" coords="118,5,218,31"/>
-<area shape="rect" id="node2" href="$classXML__Loading__Archive.html" title="a helper class for loading an APL workspace" alt="" coords="5,79,157,104"/>
-<area shape="rect" id="node3" href="$classXML__Saving__Archive.html" title="a helper class for saving an APL workspace" alt="" coords="181,79,328,104"/>
-</map>

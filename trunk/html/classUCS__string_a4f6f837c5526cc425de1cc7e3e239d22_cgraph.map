@@ -1,6 +1,0 @@
-<map id="UCS_string::from_uint" name="UCS_string::from_uint">
-<area shape="rect" id="node1" title="convert an unsigned integer value to an UCS_string (like sprintf())" alt="" coords="5,31,157,56"/>
-<area shape="rect" id="node2" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="219,5,359,31"/>
-<area shape="rect" id="node3" href="$classUCS__string.html#ad092030b348adfd762de621c43d75812" title="default constructor: empty string" alt="" coords="205,55,372,80"/>
-<area shape="rect" id="node4" href="$classUCS__string.html#a40523238d26f5405f5392df03d242627" title="common part of all constructors" alt="" coords="420,55,555,80"/>
-</map>

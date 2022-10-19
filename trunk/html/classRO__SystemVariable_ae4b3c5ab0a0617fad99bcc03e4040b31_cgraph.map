@@ -1,9 +1,0 @@
-<map id="RO_SystemVariable::resolve" name="RO_SystemVariable::resolve">
-<area shape="rect" id="node1" title="overloaded Symbol::resolve(). Since push(), pop(), and assign() do nothing, we can call get_apl_value..." alt="" coords="5,27,155,67"/>
-<area shape="rect" id="node2" href="$classSymbol.html#a8f6dd744b09b0629eca34fc2231bf2a9" title="return the current APL value (or throw a VALUE_ERROR)" alt="" coords="203,35,357,60"/>
-<area shape="rect" id="node3" href="$classSymbol.html#a126fc214ca7a2e2d364e0982a36b2ace" title="The name of this Symbol." alt="" coords="409,5,540,31"/>
-<area shape="rect" id="node4" href="$classError.html#af47d2ce6f771f8d502d4d1cd05d6f81d" title="throw an Error related to Symbol symbol" alt="" coords="405,55,544,95"/>
-<area shape="rect" id="node5" href="$classUTF8__string.html#a922bd7ebc6a8ea5c6ba9c54159b18a93" title="return this string as a 0&#45;terminated C string" alt="" coords="594,13,725,39"/>
-<area shape="rect" id="node6" href="$classWorkspace.html#a8083efc2d51067edb25ae8dd4f014173" title="the top of the SI stack (the SI pushed last)" alt="" coords="592,63,727,88"/>
-<area shape="rect" id="node7" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="598,112,721,137"/>
-</map>

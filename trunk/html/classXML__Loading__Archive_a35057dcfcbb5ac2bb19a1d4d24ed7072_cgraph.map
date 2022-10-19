@@ -1,7 +1,0 @@
-<map id="XML_Loading_Archive::check_compatibility" name="XML_Loading_Archive::check_compatibility">
-<area shape="rect" id="node1" title="check compatibility information in the workspace and maybe warn the user" alt="" coords="5,55,157,95"/>
-<area shape="rect" id="node2" href="$classUCS__string.html#a0484e41b5bfb14e6ec82c5fd7217df56" title="append UCS_string other to this string" alt="" coords="211,5,351,31"/>
-<area shape="rect" id="node3" href="$classXML__Loading__Archive.html#a24f7c04b8608953c16b246568f6fd738" title="find optional attribute att_name. Return a pointer to its value if found and 0 if not." alt="" coords="205,55,357,95"/>
-<area shape="rect" id="node5" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="220,120,343,145"/>
-<area shape="rect" id="node4" href="$classXML__Loading__Archive.html#ad0c398f273df586ef1a2cb9b87b9cb41" title="find attribute att_name and return: a pointer to its value if found, 0 if optional is true,..." alt="" coords="405,55,557,95"/>
-</map>

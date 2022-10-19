@@ -1,5 +1,0 @@
-<map id="Token::copy_N" name="Token::copy_N">
-<area shape="rect" id="node1" title="copy src to this token, updating ref counts for APL values" alt="" coords="5,31,116,56"/>
-<area shape="rect" id="node2" href="$unionToken_1_1sval.html#a22a0be9d3742c2a8168e59d530dd659e" title="a shortcut for accessing apl_val" alt="" coords="167,5,314,31"/>
-<area shape="rect" id="node3" href="$classToken.html#a1a31afbb07e3f1dbb86d5f872ce5c297" title="return the TokenValueType of this token." alt="" coords="164,55,317,80"/>
-</map>

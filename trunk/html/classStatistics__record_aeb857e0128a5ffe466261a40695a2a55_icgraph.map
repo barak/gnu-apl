@@ -1,8 +1,0 @@
-<map id="Statistics_record::print5" name="Statistics_record::print5">
-<area shape="rect" id="node1" title="print num as 5 characters (digits, dot, and multiplier (k, m, g, ...)" alt="" coords="396,69,524,109"/>
-<area shape="rect" id="node2" href="$classStatistics__record.html#a9104063061c876ff793cfceda2858c76" title="print count, data, and data2" alt="" coords="219,5,347,45"/>
-<area shape="rect" id="node4" href="$classFunctionStatistics.html#a28d0d5eea811ef0bec0accc661675260" title="overloaded Statistics::print()" alt="" coords="220,69,347,109"/>
-<area shape="rect" id="node5" href="$classPerformance.html#a07efbb4a65f608d91f13be0388763b0c" title="print all counters" alt="" coords="219,134,348,159"/>
-<area shape="rect" id="node3" href="$classCellFunctionStatistics.html#ab7fda02a419916970d44d80e43383052" title="overloaded Statistics::print()" alt="" coords="13,5,163,45"/>
-<area shape="rect" id="node6" href="$classCommand.html#a0b7131627e1a36bee1370e5a7572063f" title="show performance counters" alt="" coords="5,134,171,159"/>
-</map>

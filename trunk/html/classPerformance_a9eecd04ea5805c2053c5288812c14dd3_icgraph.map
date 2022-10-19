@@ -1,7 +1,0 @@
-<map id="Performance::get_statistics" name="Performance::get_statistics">
-<area shape="rect" id="node1" title="return statistics object for ID id" alt="" coords="405,31,588,56"/>
-<area shape="rect" id="node2" href="$classQuad__FIO.html#aeaba4a7f5a55bbab8ad6b7d3d7c932fa" title="overloaded Function::eval_AXB()." alt="" coords="219,5,357,31"/>
-<area shape="rect" id="node4" href="$classPerformance.html#a07efbb4a65f608d91f13be0388763b0c" title="print all counters" alt="" coords="223,55,353,80"/>
-<area shape="rect" id="node3" href="$classQuad__FIO.html#a24ac2813d6425ad61471166fe019ba33" title="overloaded Function::eval_LXB()." alt="" coords="15,5,161,31"/>
-<area shape="rect" id="node5" href="$classCommand.html#a0b7131627e1a36bee1370e5a7572063f" title="show performance counters" alt="" coords="5,55,171,80"/>
-</map>

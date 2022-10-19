@@ -1,7 +1,0 @@
-<map id="Token::extract_and_keep" name="Token::extract_and_keep">
-<area shape="rect" id="node1" title="clear the Value_P (if any) without updating its refcount. Return the old Value * that was overridden" alt="" coords="5,70,175,95"/>
-<area shape="rect" id="node2" href="$classValue__P__Base.html#ac1b0e62be7e933d31d105670c09a99e6" title="clear the pointer (and possibly add an event)" alt="" coords="223,5,367,45"/>
-<area shape="rect" id="node3" href="$classValue__P__Base.html#a1c3bf1b6f708eb2c1ba4b97c83adb9aa" title="return a const pointer to the Value" alt="" coords="227,70,362,95"/>
-<area shape="rect" id="node4" href="$classToken.html#a11e37aa69b8eb64f293702293b00f50c" title="return true iff this token is an apl value" alt="" coords="233,119,357,145"/>
-<area shape="rect" id="node5" href="$classToken.html#a1a31afbb07e3f1dbb86d5f872ce5c297" title="return the TokenValueType of this token." alt="" coords="415,119,568,145"/>
-</map>

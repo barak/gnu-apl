@@ -1,6 +1,0 @@
-<map id="SymbolTable::clear" name="SymbolTable::clear">
-<area shape="rect" id="node1" title="clear this symbol table (remove all user&#45;defined symbols)" alt="" coords="611,5,745,31"/>
-<area shape="rect" id="node2" href="$classWorkspace.html#ade3a373ad48eb7a8fbad97a28472db7f" title="clear the workspace" alt="" coords="409,5,563,31"/>
-<area shape="rect" id="node3" href="$classWorkspace.html#a77c7b25908cf2479dc087cc3bcf44dcb" title="load lib_ws into the_workspace, maybe set ⎕LX of the new WS." alt="" coords="212,5,361,31"/>
-<area shape="rect" id="node4" href="$classCommand.html#ad222a6de11eb55501624a4d0dea3a464" title=")LOAD: load a workspace file" alt="" coords="5,5,164,31"/>
-</map>

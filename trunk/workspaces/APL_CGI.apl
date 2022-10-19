@@ -64,6 +64,7 @@ xDESCRIPTION←'Welcome to GNU APL'
 ⍝ some URIs used in the BODY
 ⍝
 xHTTP_GNU←"http://www.gnu.org/"
+xHTTP_DOXY←"http://svn.savannah.gnu.org/viewvc/*checkout*/apl/trunk/html/index.html"
 xHTTP_JSA←"http://192.168.0.110/apl/"
 xFTP_GNU←"ftp://ftp.gnu.org"
 xFTP_APL←xFTP_GNU,"/gnu/apl"
@@ -277,12 +278,12 @@ language, followed by s short description of almost all GNU APL features.
 <BR><BR>
 And, for those already familiar with APL, there is a slightly more detailed
 <?apl HTML∆x2y 'apl.html' HTML∆A "<B>info manual</B>" ?> for GNU APL whose
-focus on more the non-standard GNU APL features rather than on the APL
+focus is more on the non-standard GNU APL features than on the APL
 language itself.
 <BR><BR>
 Finally, all C++ source code files for GNU APL are Doxygen documented.
-You can generate this documentation by running <B>make DOXY</B> in the
-top level directory of the GNU APL package.
+You can either generate this documentation by running <B>make DOXY</B> in
+the top level directory of the GNU APL package.
 </DIV>
 <DIV class="c6">
 <?apl HTML∆H2[''] 'GNU APL Community' ?>

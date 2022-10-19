@@ -1,5 +1,0 @@
-<map id="XML_Saving_Archive::xml_allowed" name="XML_Saving_Archive::xml_allowed">
-<area shape="rect" id="node1" title="return true if uni prints nicely and is allowed in XML &quot;...&quot; strings" alt="" coords="5,23,152,63"/>
-<area shape="rect" id="node2" href="$classAvec.html#afe30f62f26ec74019a95e5cbd6eaa111" title="Find av in character_table. Return position or Invalid_CHT." alt="" coords="235,5,349,31"/>
-<area shape="rect" id="node3" href="$classAvec.html#ad45bd7c00f8480d9e72c5cd40c702ef3" title="Find return position of alt_av, or Invalid_AV if not found." alt="" coords="200,55,384,80"/>
-</map>

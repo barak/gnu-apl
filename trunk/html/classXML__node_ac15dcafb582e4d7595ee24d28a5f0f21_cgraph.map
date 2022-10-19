@@ -1,5 +1,0 @@
-<map id="XML_node::translate" name="XML_node::translate">
-<area shape="rect" id="node1" title="reduce nodes starting at start, return true on error" alt="" coords="5,31,148,56"/>
-<area shape="rect" id="node2" href="$classXML__node.html#ad740e8b2a306d73e260482af9be89192" title="append garbage to this garbage can (for later deletion)" alt="" coords="200,5,335,31"/>
-<area shape="rect" id="node3" href="$classXML__node.html#a29a56f2f044b1895b92be0b1feeebd53" title="return the next XML node in the document" alt="" coords="196,55,339,80"/>
-</map>

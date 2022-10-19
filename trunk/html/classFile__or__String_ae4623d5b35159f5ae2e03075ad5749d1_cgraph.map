@@ -1,8 +1,0 @@
-<map id="File_or_String::scanf_long_long" name="File_or_String::scanf_long_long">
-<area shape="rect" id="node1" title="scan a long long in a string or in a file. Return either 0 or 1 for the number of successful conversi..." alt="" coords="5,71,148,111"/>
-<area shape="rect" id="node2" href="$classFile__or__String.html#a0cb6fcc31ced2509c766e9b4cc2c47b8" title="get the next character" alt="" coords="196,29,356,55"/>
-<area shape="rect" id="node5" href="$classAvec.html#af6b90a707281ad128da1764d92d85cd7" title="Return true iff av is a digit (i.e. 0 ≤ av ≤ 9)" alt="" coords="225,79,327,104"/>
-<area shape="rect" id="node6" href="$classFile__or__String.html#aad6afae0524ac3e406e465931f86245b" title="unget uni. At most one Unicode (= lookahead char) can be ungotten." alt="" coords="205,128,347,153"/>
-<area shape="rect" id="node3" href="$classQuad__FIO.html#aa1a912f415eaaf8a19e706c8f8eac9d1" title="get one Unicode from file" alt="" coords="404,5,545,31"/>
-<area shape="rect" id="node4" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="413,55,536,80"/>
-</map>

@@ -1,8 +1,0 @@
-<map id="Quad_EM::Quad_EM" name="Quad_EM::Quad_EM">
-<area shape="rect" id="node2" href="$classSymbol.html#a8f6dd744b09b0629eca34fc2231bf2a9" title="return the current APL value (or throw a VALUE_ERROR) " alt="" coords="200,85,355,112"/>
-<area shape="rect" id="node3" href="$classError.html#af47d2ce6f771f8d502d4d1cd05d6f81d" title="throw an Error related to Symbol symbol " alt="" coords="403,49,541,90"/>
-<area shape="rect" id="node7" href="$classSymbol.html#a126fc214ca7a2e2d364e0982a36b2ace" title="The name of this Symbol. " alt="" coords="407,115,537,141"/>
-<area shape="rect" id="node4" href="$classUTF8__string.html#af0f7724e5743d48d9e29776de5d53c71" title="return this string as a 0&#45;terminated C string " alt="" coords="591,5,722,32"/>
-<area shape="rect" id="node5" href="$classWorkspace.html#a057e0d77702810d071560c7b72c2f8d6" title="the top of the SI stack (the SI pushed last) " alt="" coords="589,56,724,83"/>
-<area shape="rect" id="node6" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length " alt="" coords="595,107,718,133"/>
-</map>

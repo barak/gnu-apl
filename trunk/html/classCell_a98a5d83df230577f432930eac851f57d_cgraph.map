@@ -1,4 +1,0 @@
-<map id="Cell::greater_cp" name="Cell::greater_cp">
-<area shape="rect" id="node1" title="compare cells[a] and cells[b] ascendingly" alt="" coords="5,5,120,31"/>
-<area shape="rect" id="node2" href="$classCell.html#ab5bc0bd0d336863996b9b5bc58f3ddef" title="compare this with other, throw DOMAIN ERROR on illegal comparisons" alt="" coords="168,5,271,31"/>
-</map>

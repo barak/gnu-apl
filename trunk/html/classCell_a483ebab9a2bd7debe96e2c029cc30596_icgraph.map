@@ -1,7 +1,0 @@
-<map id="Cell::bif_minimum" name="Cell::bif_minimum">
-<area shape="rect" id="node1" title="store the smaller of A and of this cell in Z" alt="" coords="251,84,377,109"/>
-<area shape="rect" id="node2" href="$classBif__F12__RND__DN.html#a03780e295be37dd5e8ce3aee6806fb32" title="overloaded Function::eval_AB()." alt="" coords="10,5,198,31"/>
-<area shape="rect" id="node3" href="$classBif__F12__RND__DN.html#a55e7926e16a001bbf73de65a62809772" title="overloaded Function::eval_AXB()." alt="" coords="5,55,203,80"/>
-<area shape="rect" id="node4" href="$classBif__F12__RND__DN.html#addedbd60547c7e9c32c88641cce0e1f2" title="return the associative cell function of this function" alt="" coords="25,105,183,145"/>
-<area shape="rect" id="node5" href="$classBif__F12__RND__DN.html#a35a006d4594e2c2d277fad733d0fba5d" title="overloaded Function::get_scalar_f2()" alt="" coords="25,169,183,209"/>
-</map>

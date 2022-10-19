@@ -1,9 +1,0 @@
-<map id="FunctionStatistics::add_sample" name="FunctionStatistics::add_sample">
-<area shape="rect" id="node2" href="$classValue.html#ae9ed3cf5066ae8ab15514c1470c8de4c" title="return a deep copy of this value " alt="" coords="226,5,321,32"/>
-<area shape="rect" id="node3" href="$classBif__F12__RHO.html#a3c656971eb4bbcff9e08008030f425f6" title="overloaded Function::eval_AB() " alt="" coords="193,56,354,83"/>
-<area shape="rect" id="node4" href="$classBif__OPER2__INNER.html#a9218a41fbb082b2fd9abc316d388296d" title="inner product for scalar LO and RO " alt="" coords="182,107,365,149"/>
-<area shape="rect" id="node7" href="$classBif__OPER2__OUTER.html#ac215696d5837d589d01e83891ce559e8" title="outer product for scalar RO " alt="" coords="180,173,367,214"/>
-<area shape="rect" id="node5" href="$classBif__OPER2__INNER.html#adbaaf10669f72e39cc58d5dcdab6c5fe" title="Overloaded Function::eval_ALRB(). " alt="" coords="417,115,631,141"/>
-<area shape="rect" id="node6" href="$classBif__OPER2__INNER.html#af0437dd86d98ef9412317252127cb86f" title="Constructor. " alt="" coords="681,107,845,149"/>
-<area shape="rect" id="node8" href="$classBif__OPER2__OUTER.html#a2e9a34f12130439dd28c6d528ffadbc3" title="Overloaded Function::eval_ALRB(). " alt="" coords="415,180,633,207"/>
-</map>

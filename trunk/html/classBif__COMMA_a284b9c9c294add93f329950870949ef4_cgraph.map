@@ -1,9 +1,0 @@
-<map id="Bif_COMMA::laminate" name="Bif_COMMA::laminate">
-<area shape="rect" id="node1" title="Laminate A and B." alt="" coords="5,104,159,129"/>
-<area shape="rect" id="node2" href="$classCell.html#a62e4fd0b2c216efc0e23904e53ca7ecc" title="copy (deep) count cells from src to dest)" alt="" coords="233,5,315,31"/>
-<area shape="rect" id="node4" href="$classValue__P__Base.html#a1c3bf1b6f708eb2c1ba4b97c83adb9aa" title="return a const pointer to the Value" alt="" coords="207,55,341,80"/>
-<area shape="rect" id="node5" href="$classShape3.html#a075643abf890c05401f1b7abdc5339cf" title="the dimensions above r the axis" alt="" coords="233,104,315,129"/>
-<area shape="rect" id="node6" href="$classShape3.html#ad3ff2e3be69b9ca0085d211e3ecb2801" title="the dimensions below the axis" alt="" coords="235,153,313,179"/>
-<area shape="rect" id="node7" href="$classShape3.html#a7dda151f14bb5ee7a624372f0b167b7d" title="the axis dimension" alt="" coords="231,203,317,228"/>
-<area shape="rect" id="node3" href="$classCell.html#aab9681b3e735d10ef92978c5c17bf95d" title="init (uninitialized) Cell other from this initialized cell" alt="" coords="389,5,496,31"/>
-</map>

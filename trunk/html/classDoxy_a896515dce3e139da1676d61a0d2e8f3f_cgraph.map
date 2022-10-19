@@ -1,8 +1,0 @@
-<map id="Doxy::write_call_graph" name="Doxy::write_call_graph">
-<area shape="rect" id="node1" title="write the call graph (if caller == false), or else the caller graph" alt="" coords="5,119,160,145"/>
-<area shape="rect" id="node2" href="$classUTF8__string.html#aabaebbdfbe8fad48e44655144f5fbd5e" title="append a 0&#45;terminated C string" alt="" coords="228,5,372,45"/>
-<area shape="rect" id="node3" href="$classUTF8__string.html#ae512c0617f7a13fe5011655d898ca6c1" title="append the UTF8_string suffix" alt="" coords="208,70,392,95"/>
-<area shape="rect" id="node4" href="$classUTF8__string.html#a922bd7ebc6a8ea5c6ba9c54159b18a93" title="return this string as a 0&#45;terminated C string" alt="" coords="235,119,365,145"/>
-<area shape="rect" id="node5" href="$classDoxy.html#a75bba0fbbafccdbd963ade9fea51a44e" title="convert a graphviz .gv file to a .png file using program &#39;dot&#39;" alt="" coords="239,169,361,194"/>
-<area shape="rect" id="node6" href="$classDoxy.html#ad6c1957ed3c3748d2834aa2aab963627" title="return the index of ufun in nodes[] or &#45;1 if not found" alt="" coords="245,218,355,243"/>
-</map>

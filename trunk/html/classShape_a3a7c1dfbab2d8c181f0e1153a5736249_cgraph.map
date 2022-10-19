@@ -1,7 +1,0 @@
-<map id="Shape::is_empty" name="Shape::is_empty">
-<area shape="rect" id="node2" href="$classShape.html#a7005c2ba51b7276a8fd28af2d713d52d" title="return reue iff this shape is a permutation of 0, 1, ... rank&#45;1 " alt="" coords="175,56,327,83"/>
-<area shape="rect" id="node5" href="$classShape.html#a450b86735f0a9eaaf0b0d2b6db1dcc6a" title="the inverse of ravel_pos() " alt="" coords="173,107,329,133"/>
-<area shape="rect" id="node6" href="$classShape.html#ab56a74d45cbd359d292ca2bc5f81b9d2" title="return the position of idx in the ravel. " alt="" coords="190,5,313,32"/>
-<area shape="rect" id="node3" href="$classShape.html#a017e9a35dd20f4bc4fdeb7ea29b6805d" title="return the rank " alt="" coords="398,5,515,32"/>
-<area shape="rect" id="node4" href="$classShape.html#a592d2ade68aa8c21c5d84627c3a0e001" title="return the length of dimension r " alt="" coords="377,56,536,83"/>
-</map>

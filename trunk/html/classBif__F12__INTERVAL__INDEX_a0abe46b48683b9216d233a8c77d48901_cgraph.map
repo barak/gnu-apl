@@ -1,8 +1,0 @@
-<map id="Bif_F12_INTERVAL_INDEX::eval_B" name="Bif_F12_INTERVAL_INDEX::eval_B">
-<area shape="rect" id="node1" title="overloaded Function::eval_B()" alt="" coords="5,97,195,137"/>
-<area shape="rect" id="node2" href="$classWorkspace.html#adb2006f054a1cebb8ae0252b61bd1d1b" title="return the current ⎕IO" alt="" coords="255,5,389,31"/>
-<area shape="rect" id="node3" href="$classCell.html#acad8d4255191ceae01a96c778debeb83" title="Return value if it is close to int, or else throw DOMAIN_ERROR." alt="" coords="260,55,384,80"/>
-<area shape="rect" id="node4" href="$classShape.html#a017e9a35dd20f4bc4fdeb7ea29b6805d" title="return the rank" alt="" coords="263,104,381,129"/>
-<area shape="rect" id="node5" href="$classShape.html#a592d2ade68aa8c21c5d84627c3a0e001" title="return the length of dimension r" alt="" coords="243,153,401,179"/>
-<area shape="rect" id="node6" href="$classCell.html#ac8ce4cebc1b8ac383bc62723d645914a" title="True iff value is numeric and close to an int." alt="" coords="264,203,380,228"/>
-</map>

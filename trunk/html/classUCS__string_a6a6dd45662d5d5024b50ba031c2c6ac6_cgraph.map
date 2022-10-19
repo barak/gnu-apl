@@ -1,7 +1,0 @@
-<map id="UCS_string::round_last_digit" name="UCS_string::round_last_digit">
-<area shape="rect" id="node1" title="round last digit and discard it. Note that this is always expected to be in floating point format and..." alt="" coords="5,74,164,114"/>
-<area shape="rect" id="node2" href="$classUCS__string.html#a186a76c22c3ac840f1e607ba49e253a0" title="return the last character in this string" alt="" coords="226,5,353,31"/>
-<area shape="rect" id="node3" href="$classUCS__string.html#a3b92321d846e064514c29486acdee4e6" title="overload basic_string::size() so that it returns a signed length" alt="" coords="415,56,537,81"/>
-<area shape="rect" id="node4" href="$classUCS__string.html#a522289839ffbbcbe43b4577858926858" title="more intuitive insert() function" alt="" coords="224,107,355,132"/>
-<area shape="rect" id="node5" href="$classUCS__string.html#a67ea87cb92e687105b21917ffb4a2a6f" title="remove the last character in this string" alt="" coords="212,156,367,181"/>
-</map>

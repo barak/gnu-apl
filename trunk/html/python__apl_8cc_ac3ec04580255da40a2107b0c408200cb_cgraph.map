@@ -1,8 +1,0 @@
-<map id="make_ravel" name="make_ravel">
-<area shape="rect" id="node2" href="$classValue.html#a113fa41969aed3b011b477ea199c6157" title="return the (constant) idx&#39;th element of the ravel. " alt="" coords="166,5,289,32"/>
-<area shape="rect" id="node3" href="$classCell.html#ad165f9ab69abf46b2cf44d301a700a1c" title="Return the integer value of a cell. " alt="" coords="162,56,293,83"/>
-<area shape="rect" id="node4" href="$classCell.html#a9a0028fd74f00deb001a8062a55916c6" title="Return the real part of a cell. " alt="" coords="159,107,296,133"/>
-<area shape="rect" id="node5" href="$classCell.html#a122ed26d321f4d27ca63c8cea0134595" title="Return true iff this cell is a floating point cell. " alt="" coords="166,157,289,184"/>
-<area shape="rect" id="node6" href="$classCell.html#a30d0c83ab2c46ef830cd1301c77eb772" title="Return true iff this cell is an integer cell. " alt="" coords="159,208,295,235"/>
-<area shape="rect" id="node7" href="$classValue.html#ac5b54e3a13cab0837442f1575b3299a5" title="return the number of elements, but at least 1 (for the prototype). " alt="" coords="143,259,312,285"/>
-</map>

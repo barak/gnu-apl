@@ -1,5 +1,0 @@
-<map id="IndexIterator::get_index_count" name="IndexIterator::get_index_count">
-<area shape="rect" id="node1" title="get the number of indices." alt="" coords="220,23,341,63"/>
-<area shape="rect" id="node2" href="$classIndexIterator.html#a09519f88476c9805fcfcb0b71c1caee4" title="go the the next index" alt="" coords="5,5,172,31"/>
-<area shape="rect" id="node3" href="$classIndexIterator.html#a1b32fa514c901a2fc834dfa73a922fff" title="print this iterator (for debugging purposes)." alt="" coords="25,55,153,80"/>
-</map>

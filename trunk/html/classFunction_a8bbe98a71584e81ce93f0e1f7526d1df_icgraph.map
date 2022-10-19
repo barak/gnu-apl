@@ -1,6 +1,0 @@
-<map id="Function::print_properties" name="Function::print_properties">
-<area shape="rect" id="node1" title="print the properties of this function" alt="" coords="636,5,805,31"/>
-<area shape="rect" id="node2" href="$classSymbol.html#a88ce92302e3a54792fa677cbc3d96fb9" title="Print this Symbol and its stack to out." alt="" coords="436,5,588,31"/>
-<area shape="rect" id="node3" href="$classSymbolTable.html#a9bacf3be9c6c2145a68d891c42076cf2" title="List details of single symbol in buf." alt="" coords="216,5,388,31"/>
-<area shape="rect" id="node4" href="$classWorkspace.html#a47e76e3abe40a5240a3a230fab2cdedd" title="list all symbols with names in buf" alt="" coords="5,5,168,31"/>
-</map>

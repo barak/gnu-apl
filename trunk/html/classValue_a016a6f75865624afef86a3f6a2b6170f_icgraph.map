@@ -1,7 +1,0 @@
-<map id="Value::is_int_array" name="Value::is_int_array">
-<area shape="rect" id="node1" title="return true iff this value is a (simple) integer array, allowing near&#45;int values (but NOT necessatily..." alt="" coords="652,31,783,56"/>
-<area shape="rect" id="node2" href="$classValue.html#aaf3db59da45c07bdbc41f03c781d6f65" title="return true iff this value is a (simple) integer vector." alt="" coords="467,31,604,56"/>
-<area shape="rect" id="node3" href="$classQuad__PS.html#a1dffed74e823c513fe1db292f5c88a52" title="overloaded Symbol::assign_indexed()" alt="" coords="239,5,415,31"/>
-<area shape="rect" id="node4" href="$classQuad__SYL.html#aec0e3350d7316886ebcac043a7b4a033" title="overloaded Symbol::assign_indexed()" alt="" coords="236,55,419,80"/>
-<area shape="rect" id="node5" href="$classQuad__SYL.html#a3a73a2d9505f81a66a5a9f6aacc31ce0" title="overloaded Symbol::assign_indexed()" alt="" coords="5,55,188,80"/>
-</map>

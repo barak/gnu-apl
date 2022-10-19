@@ -1,4 +1,0 @@
-<map id="NumericCell::complex_binomial" name="NumericCell::complex_binomial">
-<area shape="rect" id="node1" title="N over K for complex A and/or B." alt="" coords="224,5,375,45"/>
-<area shape="rect" id="node2" href="$classNumericCell.html#a3fd3970233551bf557f5e52330b5610c" title="overloaded Cell::bif_binomial()" alt="" coords="5,13,176,38"/>
-</map>

@@ -1,4 +1,0 @@
-<map id="Cell::bif_not" name="Cell::bif_not">
-<area shape="rect" id="node1" title="store the logical complement of the value of this Cell in Z" alt="" coords="239,5,331,31"/>
-<area shape="rect" id="node2" href="$classBif__F12__WITHOUT.html#a6eb017585dbc330e820d4ef1d69835b6" title="overloaded Function::eval_B()." alt="" coords="5,5,191,31"/>
-</map>

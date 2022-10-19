@@ -1,5 +1,0 @@
-<map id="Shape::check_same" name="Shape::check_same">
-<area shape="rect" id="node1" title="throw an APL error if this shape differs from shape B" alt="" coords="5,31,147,56"/>
-<area shape="rect" id="node2" href="$classShape.html#a017e9a35dd20f4bc4fdeb7ea29b6805d" title="return the rank" alt="" coords="215,5,333,31"/>
-<area shape="rect" id="node3" href="$classShape.html#a592d2ade68aa8c21c5d84627c3a0e001" title="return the length of dimension r" alt="" coords="195,55,353,80"/>
-</map>

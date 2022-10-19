@@ -1,5 +1,0 @@
-<map id="Value::get_increment" name="Value::get_increment">
-<area shape="rect" id="node1" title="return the increment for iterators of this value. The increment is used for scalar&#45;extension of 1&#45;ele..." alt="" coords="5,5,151,31"/>
-<area shape="rect" id="node2" href="$classValue.html#a9fc8bbaf9fefe6835dea7db0f71b8b6c" title="return the number of elements (the product of the shapes)." alt="" coords="199,5,347,31"/>
-<area shape="rect" id="node3" href="$classShape.html#af39e05bad7be900fa1437a6eb6035e97" title="return the number of ravel elements (1 for scalars,i else product of shapes)" alt="" coords="395,5,529,31"/>
-</map>
