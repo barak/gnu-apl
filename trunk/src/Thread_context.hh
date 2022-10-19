@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef __THREAD_CONTEXT_HH_DEFINED__
 #define __THREAD_CONTEXT_HH_DEFINED__
 

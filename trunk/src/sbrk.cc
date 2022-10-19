@@ -18,7 +18,8 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-/** @file **/
+/** @file
+*/
 
 // this file provides a wrapper around sbrk() that allows sbrk(0) to be called
 // without #including unistd.h. The reason is to avoid a weird warning on

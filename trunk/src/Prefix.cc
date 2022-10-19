@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #include "Bif_OPER2_RANK.hh"
 #include "Common.hh"
 #include "DerivedFunction.hh"

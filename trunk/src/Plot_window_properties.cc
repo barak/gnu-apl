@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #include "Quad_PLOT.hh"
 #include "Plot_data.hh"
 #include "Plot_line_properties.hh"

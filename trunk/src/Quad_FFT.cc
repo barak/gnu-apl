@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #include "FloatCell.hh"
 #include "Quad_FFT.hh"
 #include "Workspace.hh"

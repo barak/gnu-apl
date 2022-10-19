@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef ARG_LIST_BUILDER_HH
 #define ARG_LIST_BUILDER_HH
 

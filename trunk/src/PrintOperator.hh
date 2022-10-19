@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef __PRINTOPERATOR_HH_DEFINED
 #define __PRINTOPERATOR_HH_DEFINED
 

@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 /// a macro to enable debug printouts
 // #define DOMINO_DEBUG
 

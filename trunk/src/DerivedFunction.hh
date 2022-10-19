@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef __DERIVED_FUNCTION__DEFINED__
 #define __DERIVED_FUNCTION__DEFINED__
 

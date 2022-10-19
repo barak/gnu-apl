@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef __PROCESSOR_ID_HH_DEFINED__
 #define __PROCESSOR_ID_HH_DEFINED__
 

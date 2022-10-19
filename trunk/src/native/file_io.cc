@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
    //
    // the file_io native function is now obsolete. It has been replaced by ⎕FIO
    // and the native function has become a wrapper to ⎕FIO

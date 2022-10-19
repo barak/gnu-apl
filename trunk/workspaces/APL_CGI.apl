@@ -281,7 +281,7 @@ And, for those already familiar with APL, there is a slightly more detailed
 focus is more on the non-standard GNU APL features than on the APL
 language itself.
 <BR><BR>
-Finally, all C++ source code files for GNU APL are Doxygen documented.
+Finally, all GNU APL C++ source code files are Doxygen documented.
 You can either generate this documentation by running <B>make DOXY</B> in
 the top level directory of the GNU APL package.
 </DIV>

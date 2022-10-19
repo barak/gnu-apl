@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #include "Assert.hh"
 #include "CDR.hh"
 #include "CharCell.hh"

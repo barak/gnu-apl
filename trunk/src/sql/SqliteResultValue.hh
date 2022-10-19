@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef RESULT_VALUE_HH
 #define RESULT_VALUE_HH
 

@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #include <stdint.h>
 #include <stdlib.h>
 #include <sys/resource.h>   // for ⎕WA

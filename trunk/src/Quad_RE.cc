@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #include "PointerCell.hh"
 #include "Quad_RE.hh"
 #include "Workspace.hh"

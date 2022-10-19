@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef STATIC_OBJECTS_HH_DEFINED
 #define STATIC_OBJECTS_HH_DEFINED
 

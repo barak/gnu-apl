@@ -18,6 +18,9 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+/** @file
+*/
+
 #ifndef PJOB_HH_DEFINED
 #define PJOB_HH_DEFINED
 
