@@ -23136,9 +23136,9 @@ for q in 1 2 3 4; do
    if test -f "$apl_top/buildtag.sh"; then
       abs_apl_top="$apl_top"
       . "$abs_apl_top/buildtag.sh"
-      break;
+      break
    else
-      apl_top=$(dirname($apl_top))
+      apl_top=$(dirname $apl_top)
    fi
 done
 
