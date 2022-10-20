@@ -284,7 +284,7 @@
 #define STDC_HEADERS 1
 
 /* PostgreSQL code compiles */
-/* #undef USABLE_PostgreSQL */
+#define USABLE_PostgreSQL 1
 
 /* Enable extensions on AIX 3, Interix.  */
 #ifndef _ALL_SOURCE

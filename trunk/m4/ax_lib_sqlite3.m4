@@ -79,7 +79,7 @@ AC_DEFUN([AX_LIB_SQLITE3],
                 && test -r "$ac_sqlite3_path_tmp/include/$ac_sqlite3_header"; then
                     ac_sqlite3_path=$ac_sqlite3_path_tmp
                     ac_sqlite3_cppflags="-I$ac_sqlite3_path_tmp/include"
-                    ac_sqlite3_ldflags= "-L$ac_sqlite3_path_tmp/lib"
+                    ac_sqlite3_ldflags="-L$ac_sqlite3_path_tmp/lib"
                     break;
                 fi
             done
