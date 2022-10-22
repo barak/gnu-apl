@@ -19,13 +19,13 @@
 /* core count */
 #define CORE_COUNT_WANTED 0
 
-/* define to set options typical for software development */
+/* Define to set options typical for software development */
 /* #undef DEVELOP_WANTED */
 
-/* define to enable dynamic logging */
+/* Define to enable dynamic logging */
 /* #undef DYNAMIC_LOG_WANTED */
 
-/* define to enable gprof profiling */
+/* Define to enable gprof profiling */
 #define GPROF_WANTED -pg
 
 /* Define to 1 iff pthread_setaffinity_np() is available */
@@ -262,10 +262,10 @@
 /* Define to the version of this package. */
 #define PACKAGE_VERSION "1.8"
 
-/* define to enable performance counters */
+/* Define to enable performance counters */
 /* #undef PERFORMANCE_COUNTERS_WANTED */
 
-/* define to have support for rational numbers (EXPERIMENTAL!) */
+/* Define to have support for rational numbers (EXPERIMENTAL!) */
 /* #undef RATIONAL_NUMBERS_WANTED */
 
 /* ./configure with --with-postgresql */
@@ -308,25 +308,25 @@
 #endif
 
 
-/* define to enable CHECK macro */
+/* Define to enable CHECK macro */
 /* #undef VALUE_CHECK_WANTED */
 
-/* define to enable value events */
+/* Define to enable value events */
 /* #undef VALUE_HISTORY_WANTED */
 
 /* Version number of package */
 #define VERSION "1.8"
 
-/* define to enable tracing of value flags */
+/* Define to enable tracing of value flags */
 /* #undef VF_TRACING_WANTED */
 
-/* define to have visible markers (DONT!) */
+/* Define to have visible markers (DONT!) */
 /* #undef VISIBLE_MARKERS_WANTED */
 
 /* Define if compiling for Android */
 /* #undef WANT_ANDROID */
 
-/* Define to make ^D a del-char and ^Z be EOT */
+/* Define to make ^D a del-char and ^Z be EOF */
 /* #undef WANT_CTRLD_DEL */
 
 /* Define if building the Erlang interface */

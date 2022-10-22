@@ -637,10 +637,6 @@ ac_header_list=
 ac_subst_vars='am__EXEEXT_FALSE
 am__EXEEXT_TRUE
 LTLIBOBJS
-POSTGRES_FALSE
-POSTGRES_TRUE
-SQLITE3_FALSE
-SQLITE3_TRUE
 DEVELOP_FALSE
 DEVELOP_TRUE
 ON_i686_FALSE
@@ -690,10 +686,14 @@ HAVE_LIBPCRE2_32_FALSE
 HAVE_LIBPCRE2_32_TRUE
 PCRE_CFLAGS
 PCRE_LIBS
+POSTGRES_FALSE
+POSTGRES_TRUE
 POSTGRESQL_LDFLAGS
 POSTGRESQL_CFLAGS
 POSTGRESQL_VERSION
 PG_CONFIG
+SQLITE3_FALSE
+SQLITE3_TRUE
 SQLITE3_VERSION
 SQLITE3_LDFLAGS
 SQLITE3_CFLAGS
@@ -5081,6 +5081,8 @@ ac_link='$CXX -o conftest$ac_exeext $CXXFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ex
 ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
+# initialize libtool in dlopen mode
+#
 case `pwd` in
   *\ * | *\	*)
     { $as_echo "$as_me:${as_lineno-$LINENO}: WARNING: Libtool does not cope well with whitespace in \`pwd\`" >&5
@@ -16479,6 +16481,8 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
 
+ $as_echo ; $as_echo "    *** basic checks... ***"; $as_echo ;
+
 # Checks for programs.
 #
 ac_ext=cpp
@@ -17468,7 +17472,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
 # add the current directory (i.e. from where ./configure was called) to the
-# include path do that the files created by ./configure are found. This
+# include path, so that the files created by ./configure are found. This
 # is (only) needed for VPATH builds since otherwise the directory from which
 # ./configure is run is the same as the directory where ./configure places
 # its output files (i.e. directory '.').
@@ -17476,10 +17480,12 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 CXXFLAGS="$CXXFLAGS -I $(pwd)"
 
 ##############################################################################
-# Checks for header files.
+# Checks for various header files.
 #
 
-# check for ncurses.h first and for curses.h if ncurses.h was not found
+ $as_echo ; $as_echo "    *** presence and usablility of header files... ***"; $as_echo ;
+
+# check for ncurses.h first and for curses.h only if ncurses.h was not found.
 
 
 ac_fn_cxx_check_header_mongrel "$LINENO" "ncurses.h" "ac_cv_header_ncurses_h" "$ac_includes_default"
@@ -17566,6 +17572,8 @@ fi
 
 # Checks for typedefs, structures, and compiler characteristics.
 #
+ $as_echo ; $as_echo "    *** standard types... ***"; $as_echo ;
+
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for stdbool.h that conforms to C99" >&5
 $as_echo_n "checking for stdbool.h that conforms to C99... " >&6; }
 if ${ac_cv_header_stdbool_h+:} false; then :
@@ -18061,186 +18069,6 @@ fi
 done
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for uncompress in -lz" >&5
-$as_echo_n "checking for uncompress in -lz... " >&6; }
-if ${ac_cv_lib_z_uncompress+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lz  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char uncompress ();
-int
-main ()
-{
-return uncompress ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_lib_z_uncompress=yes
-else
-  ac_cv_lib_z_uncompress=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_z_uncompress" >&5
-$as_echo "$ac_cv_lib_z_uncompress" >&6; }
-if test "x$ac_cv_lib_z_uncompress" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBZ 1
-_ACEOF
-
-  LIBS="-lz $LIBS"
-
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XGetXCBConnection in -lX11-xcb" >&5
-$as_echo_n "checking for XGetXCBConnection in -lX11-xcb... " >&6; }
-if ${ac_cv_lib_X11_xcb_XGetXCBConnection+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lX11-xcb  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char XGetXCBConnection ();
-int
-main ()
-{
-return XGetXCBConnection ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_lib_X11_xcb_XGetXCBConnection=yes
-else
-  ac_cv_lib_X11_xcb_XGetXCBConnection=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_X11_xcb_XGetXCBConnection" >&5
-$as_echo "$ac_cv_lib_X11_xcb_XGetXCBConnection" >&6; }
-if test "x$ac_cv_lib_X11_xcb_XGetXCBConnection" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBX11_XCB 1
-_ACEOF
-
-  LIBS="-lX11-xcb $LIBS"
-
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XOpenDisplay in -lX11" >&5
-$as_echo_n "checking for XOpenDisplay in -lX11... " >&6; }
-if ${ac_cv_lib_X11_XOpenDisplay+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lX11  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char XOpenDisplay ();
-int
-main ()
-{
-return XOpenDisplay ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_lib_X11_XOpenDisplay=yes
-else
-  ac_cv_lib_X11_XOpenDisplay=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_X11_XOpenDisplay" >&5
-$as_echo "$ac_cv_lib_X11_XOpenDisplay" >&6; }
-if test "x$ac_cv_lib_X11_XOpenDisplay" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBX11 1
-_ACEOF
-
-  LIBS="-lX11 $LIBS"
-
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for xcb_connect in -lxcb" >&5
-$as_echo_n "checking for xcb_connect in -lxcb... " >&6; }
-if ${ac_cv_lib_xcb_xcb_connect+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lxcb  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char xcb_connect ();
-int
-main ()
-{
-return xcb_connect ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_lib_xcb_xcb_connect=yes
-else
-  ac_cv_lib_xcb_xcb_connect=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_xcb_xcb_connect" >&5
-$as_echo "$ac_cv_lib_xcb_xcb_connect" >&6; }
-if test "x$ac_cv_lib_xcb_xcb_connect" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBXCB 1
-_ACEOF
-
-  LIBS="-lxcb $LIBS"
-
-fi
-
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for tparm in -ltinfo" >&5
 $as_echo_n "checking for tparm in -ltinfo... " >&6; }
 if ${ac_cv_lib_tinfo_tparm+:} false; then :
@@ -18556,141 +18384,6 @@ _ACEOF
 
 fi
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for gtk_init in -lgtk-3" >&5
-$as_echo_n "checking for gtk_init in -lgtk-3... " >&6; }
-if ${ac_cv_lib_gtk_3_gtk_init+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lgtk-3  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char gtk_init ();
-int
-main ()
-{
-return gtk_init ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_lib_gtk_3_gtk_init=yes
-else
-  ac_cv_lib_gtk_3_gtk_init=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_gtk_3_gtk_init" >&5
-$as_echo "$ac_cv_lib_gtk_3_gtk_init" >&6; }
-if test "x$ac_cv_lib_gtk_3_gtk_init" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBGTK_3 1
-_ACEOF
-
-  LIBS="-lgtk-3 $LIBS"
-
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for gdk_init in -lgdk-3" >&5
-$as_echo_n "checking for gdk_init in -lgdk-3... " >&6; }
-if ${ac_cv_lib_gdk_3_gdk_init+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lgdk-3  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char gdk_init ();
-int
-main ()
-{
-return gdk_init ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_lib_gdk_3_gdk_init=yes
-else
-  ac_cv_lib_gdk_3_gdk_init=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_gdk_3_gdk_init" >&5
-$as_echo "$ac_cv_lib_gdk_3_gdk_init" >&6; }
-if test "x$ac_cv_lib_gdk_3_gdk_init" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBGDK_3 1
-_ACEOF
-
-  LIBS="-lgdk-3 $LIBS"
-
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for fftw_plan_dft in -lfftw3" >&5
-$as_echo_n "checking for fftw_plan_dft in -lfftw3... " >&6; }
-if ${ac_cv_lib_fftw3_fftw_plan_dft+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lfftw3  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char fftw_plan_dft ();
-int
-main ()
-{
-return fftw_plan_dft ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_lib_fftw3_fftw_plan_dft=yes
-else
-  ac_cv_lib_fftw3_fftw_plan_dft=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_fftw3_fftw_plan_dft" >&5
-$as_echo "$ac_cv_lib_fftw3_fftw_plan_dft" >&6; }
-if test "x$ac_cv_lib_fftw3_fftw_plan_dft" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBFFTW3 1
-_ACEOF
-
-  LIBS="-lfftw3 $LIBS"
-
-fi
-
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for backtrace in -lexecinfo" >&5
 $as_echo_n "checking for backtrace in -lexecinfo... " >&6; }
 if ${ac_cv_lib_execinfo_backtrace+:} false; then :
@@ -18781,51 +18474,6 @@ _ACEOF
 
 fi
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for cairo_fill in -lcairo" >&5
-$as_echo_n "checking for cairo_fill in -lcairo... " >&6; }
-if ${ac_cv_lib_cairo_cairo_fill+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lcairo  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char cairo_fill ();
-int
-main ()
-{
-return cairo_fill ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_lib_cairo_cairo_fill=yes
-else
-  ac_cv_lib_cairo_cairo_fill=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_cairo_cairo_fill" >&5
-$as_echo "$ac_cv_lib_cairo_cairo_fill" >&6; }
-if test "x$ac_cv_lib_cairo_cairo_fill" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBCAIRO 1
-_ACEOF
-
-  LIBS="-lcairo $LIBS"
-
-fi
-
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for initstate_r in -lc" >&5
 $as_echo_n "checking for initstate_r in -lc... " >&6; }
 if ${ac_cv_lib_c_initstate_r+:} false; then :
@@ -18868,51 +18516,6 @@ if test "x$ac_cv_lib_c_initstate_r" = xyes; then :
 _ACEOF
 
   LIBS="-lc $LIBS"
-
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for png_init_io in -lpng" >&5
-$as_echo_n "checking for png_init_io in -lpng... " >&6; }
-if ${ac_cv_lib_png_png_init_io+:} false; then :
-  $as_echo_n "(cached) " >&6
-else
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lpng  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-/* Override any GCC internal prototype to avoid an error.
-   Use char because int might match the return type of a GCC
-   builtin and then its argument prototype would still apply.  */
-#ifdef __cplusplus
-extern "C"
-#endif
-char png_init_io ();
-int
-main ()
-{
-return png_init_io ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"; then :
-  ac_cv_lib_png_png_init_io=yes
-else
-  ac_cv_lib_png_png_init_io=no
-fi
-rm -f core conftest.err conftest.$ac_objext \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_png_png_init_io" >&5
-$as_echo "$ac_cv_lib_png_png_init_io" >&6; }
-if test "x$ac_cv_lib_png_png_init_io" = xyes; then :
-  cat >>confdefs.h <<_ACEOF
-#define HAVE_LIBPNG 1
-_ACEOF
-
-  LIBS="-lpng $LIBS"
 
 fi
 
@@ -18962,9 +18565,433 @@ _ACEOF
 fi
 
 
-echo
-echo "   *** checks for optional libraries ... ***"
-echo
+ $as_echo ; $as_echo "    *** checks for optional (not strictly required) libraries... ***"; $as_echo ;
+
+
+
+#       library,   function-in library, impact-if-missing
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking for cairo_fill in -lcairo" >&5
+$as_echo_n "checking for cairo_fill in -lcairo... " >&6; }
+if ${ac_cv_lib_cairo_cairo_fill+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lcairo  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char cairo_fill ();
+int
+main ()
+{
+return cairo_fill ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_cairo_cairo_fill=yes
+else
+  ac_cv_lib_cairo_cairo_fill=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_cairo_cairo_fill" >&5
+$as_echo "$ac_cv_lib_cairo_cairo_fill" >&6; }
+if test "x$ac_cv_lib_cairo_cairo_fill" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBCAIRO 1
+_ACEOF
+
+  LIBS="-lcairo $LIBS"
+
+else
+  echo "   └──── may affect: ⎕PLOT ";
+fi
+
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking for fftw_plan_dft in -lfftw3" >&5
+$as_echo_n "checking for fftw_plan_dft in -lfftw3... " >&6; }
+if ${ac_cv_lib_fftw3_fftw_plan_dft+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lfftw3  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char fftw_plan_dft ();
+int
+main ()
+{
+return fftw_plan_dft ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_fftw3_fftw_plan_dft=yes
+else
+  ac_cv_lib_fftw3_fftw_plan_dft=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_fftw3_fftw_plan_dft" >&5
+$as_echo "$ac_cv_lib_fftw3_fftw_plan_dft" >&6; }
+if test "x$ac_cv_lib_fftw3_fftw_plan_dft" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBFFTW3 1
+_ACEOF
+
+  LIBS="-lfftw3 $LIBS"
+
+else
+  echo "   └──── will affect ⎕FFT ";
+fi
+
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking for gtk_init in -lgtk-3" >&5
+$as_echo_n "checking for gtk_init in -lgtk-3... " >&6; }
+if ${ac_cv_lib_gtk_3_gtk_init+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lgtk-3  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char gtk_init ();
+int
+main ()
+{
+return gtk_init ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_gtk_3_gtk_init=yes
+else
+  ac_cv_lib_gtk_3_gtk_init=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_gtk_3_gtk_init" >&5
+$as_echo "$ac_cv_lib_gtk_3_gtk_init" >&6; }
+if test "x$ac_cv_lib_gtk_3_gtk_init" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBGTK_3 1
+_ACEOF
+
+  LIBS="-lgtk-3 $LIBS"
+
+else
+  echo "   └──── will affect: ⎕PNG ";
+fi
+
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking for gdk_init in -lgdk-3" >&5
+$as_echo_n "checking for gdk_init in -lgdk-3... " >&6; }
+if ${ac_cv_lib_gdk_3_gdk_init+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lgdk-3  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char gdk_init ();
+int
+main ()
+{
+return gdk_init ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_gdk_3_gdk_init=yes
+else
+  ac_cv_lib_gdk_3_gdk_init=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_gdk_3_gdk_init" >&5
+$as_echo "$ac_cv_lib_gdk_3_gdk_init" >&6; }
+if test "x$ac_cv_lib_gdk_3_gdk_init" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBGDK_3 1
+_ACEOF
+
+  LIBS="-lgdk-3 $LIBS"
+
+else
+  echo "   └──── will affect: ⎕PLOT, ⎕PNG ";
+fi
+
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking for png_init_io in -lpng" >&5
+$as_echo_n "checking for png_init_io in -lpng... " >&6; }
+if ${ac_cv_lib_png_png_init_io+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lpng  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char png_init_io ();
+int
+main ()
+{
+return png_init_io ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_png_png_init_io=yes
+else
+  ac_cv_lib_png_png_init_io=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_png_png_init_io" >&5
+$as_echo "$ac_cv_lib_png_png_init_io" >&6; }
+if test "x$ac_cv_lib_png_png_init_io" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBPNG 1
+_ACEOF
+
+  LIBS="-lpng $LIBS"
+
+else
+  echo "   └──── will affect: ⎕PLOT, ⎕PNG ";
+fi
+
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking for XGetXCBConnection in -lX11-xcb" >&5
+$as_echo_n "checking for XGetXCBConnection in -lX11-xcb... " >&6; }
+if ${ac_cv_lib_X11_xcb_XGetXCBConnection+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lX11-xcb  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char XGetXCBConnection ();
+int
+main ()
+{
+return XGetXCBConnection ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_X11_xcb_XGetXCBConnection=yes
+else
+  ac_cv_lib_X11_xcb_XGetXCBConnection=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_X11_xcb_XGetXCBConnection" >&5
+$as_echo "$ac_cv_lib_X11_xcb_XGetXCBConnection" >&6; }
+if test "x$ac_cv_lib_X11_xcb_XGetXCBConnection" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBX11_XCB 1
+_ACEOF
+
+  LIBS="-lX11-xcb $LIBS"
+
+else
+  echo "   └──── may affect: ⎕PLOT ";
+fi
+
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking for XOpenDisplay in -lX11" >&5
+$as_echo_n "checking for XOpenDisplay in -lX11... " >&6; }
+if ${ac_cv_lib_X11_XOpenDisplay+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lX11  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char XOpenDisplay ();
+int
+main ()
+{
+return XOpenDisplay ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_X11_XOpenDisplay=yes
+else
+  ac_cv_lib_X11_XOpenDisplay=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_X11_XOpenDisplay" >&5
+$as_echo "$ac_cv_lib_X11_XOpenDisplay" >&6; }
+if test "x$ac_cv_lib_X11_XOpenDisplay" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBX11 1
+_ACEOF
+
+  LIBS="-lX11 $LIBS"
+
+else
+  echo "   └──── may affect: ⎕PLOT ";
+fi
+
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking for xcb_connect in -lxcb" >&5
+$as_echo_n "checking for xcb_connect in -lxcb... " >&6; }
+if ${ac_cv_lib_xcb_xcb_connect+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lxcb  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char xcb_connect ();
+int
+main ()
+{
+return xcb_connect ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_xcb_xcb_connect=yes
+else
+  ac_cv_lib_xcb_xcb_connect=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_xcb_xcb_connect" >&5
+$as_echo "$ac_cv_lib_xcb_xcb_connect" >&6; }
+if test "x$ac_cv_lib_xcb_xcb_connect" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBXCB 1
+_ACEOF
+
+  LIBS="-lxcb $LIBS"
+
+else
+  echo "   └──── may affect: ⎕PLOT ";
+fi
+
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking for uncompress in -lz" >&5
+$as_echo_n "checking for uncompress in -lz... " >&6; }
+if ${ac_cv_lib_z_uncompress+:} false; then :
+  $as_echo_n "(cached) " >&6
+else
+  ac_check_lib_save_LIBS=$LIBS
+LIBS="-lz  $LIBS"
+cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+/* Override any GCC internal prototype to avoid an error.
+   Use char because int might match the return type of a GCC
+   builtin and then its argument prototype would still apply.  */
+#ifdef __cplusplus
+extern "C"
+#endif
+char uncompress ();
+int
+main ()
+{
+return uncompress ();
+  ;
+  return 0;
+}
+_ACEOF
+if ac_fn_cxx_try_link "$LINENO"; then :
+  ac_cv_lib_z_uncompress=yes
+else
+  ac_cv_lib_z_uncompress=no
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+LIBS=$ac_check_lib_save_LIBS
+fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_z_uncompress" >&5
+$as_echo "$ac_cv_lib_z_uncompress" >&6; }
+if test "x$ac_cv_lib_z_uncompress" = xyes; then :
+  cat >>confdefs.h <<_ACEOF
+#define HAVE_LIBZ 1
+_ACEOF
+
+  LIBS="-lz $LIBS"
+
+else
+  echo "   └──── will affect: ⎕PNG ";
+fi
 
 
 # check if SQLite3 is wanted and installed
@@ -19118,7 +19145,7 @@ $as_echo "#define HAVE_SQLITE3 1" >>confdefs.h
     fi
 
 
-if test "x$WANT1_SQLITE3" = "xyes"; then
+if  test "x$WANT1_SQLITE3" = "xyes" ; then
 
 cat >>confdefs.h <<_ACEOF
 #define REALLY_WANT_SQLITE3 1
@@ -19126,7 +19153,20 @@ _ACEOF
 
 fi
 
+# export found_sqlite to Makefile
+ if  test "x$found_sqlite" = "xyes" ; then
+  SQLITE3_TRUE=
+  SQLITE3_FALSE='#'
+else
+  SQLITE3_TRUE='#'
+  SQLITE3_FALSE=
+fi
 
+
+
+if  test "x$found_sqlite" != "xyes" ; then
+   $as_echo "   └──── may affect: ⎕SQL";
+fi
 
 # check if PostgreSQL is wanted and installed
 # ===========================================================================
@@ -19321,7 +19361,7 @@ $as_echo "no" >&6; }
 
 
 
-if test "x$want1_postgresql" = "xyes"; then
+if  test "x$want1_postgresql" = "xyes" ; then
 
 cat >>confdefs.h <<_ACEOF
 #define REALLY_WANT_PostgreSQL 1
@@ -19330,7 +19370,7 @@ _ACEOF
 fi
 
 # check if PostgreSQL is usable (if present)
-if test "x$found_postgresql" = "xyes" ; then
+if  test "x$found_postgresql" = "xyes"  ; then
     { $as_echo "$as_me:${as_lineno-$LINENO}: checking for PostgreSQL usability" >&5
 $as_echo_n "checking for PostgreSQL usability... " >&6; }
     saved_CPPFLAGS="$CPPFLAGS"
@@ -19356,7 +19396,7 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
     CPPFLAGS="$saved_CPPFLAGS"
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: $USABLE_PostgreSQL" >&5
 $as_echo "$USABLE_PostgreSQL" >&6; }
-    if test "x$USABLE_PostgreSQL" = "xyes"; then
+    if  test "x$USABLE_PostgreSQL" = "xyes" ; then
 
 cat >>confdefs.h <<_ACEOF
 #define USABLE_PostgreSQL 1
@@ -19365,7 +19405,20 @@ _ACEOF
     fi
 fi
 
+# export USABLE_PostgreSQL to Makefile
+ if  test "x$USABLE_PostgreSQL" = "xyes" ; then
+  POSTGRES_TRUE=
+  POSTGRES_FALSE='#'
+else
+  POSTGRES_TRUE='#'
+  POSTGRES_FALSE=
+fi
 
+
+
+if  test "x$USABLE_PostgreSQL" != "xyes" ; then
+   $as_echo "   └──── may affect: ⎕SQL";
+fi
 
 # check if libpcre is installed
 # ===========================================================================
@@ -19544,7 +19597,7 @@ esac
 
 
 
- if test "x$ac_cv_lib_pcre2_32_pcre2_compile_32" = xyes; then
+ if  test "x$ac_cv_lib_pcre2_32_pcre2_compile_32" = "xyes" ; then
   HAVE_LIBPCRE2_32_TRUE=
   HAVE_LIBPCRE2_32_FALSE='#'
 else
@@ -19554,6 +19607,9 @@ fi
 
 
 
+if  test "x$ac_cv_lib_pcre2_32_pcre2_compile_32" != "xyes" ; then
+   $as_echo "   └──── may affect: ⎕RE";
+fi
 
 ################################# GTK3 check #################################
 #
@@ -19571,7 +19627,7 @@ GTK_LDFLAGS=
 GTK_CFLAGS=
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether support for ⎕GTK (needs GTK version 3) is desired" >&5
 $as_echo_n "checking whether support for ⎕GTK (needs GTK version 3) is desired... " >&6; }
-if test "x$with_gtk3" = "xno"       # user has explicitly disabled GTK
+if  test "x$with_gtk3" = "xno"        # user has explicitly disabled GTK
 then
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: no - (user has explicitly disabled ⎕GTK)" >&5
 $as_echo "no - (user has explicitly disabled ⎕GTK)" >&6; }
@@ -19645,7 +19701,7 @@ $as_echo "no (cannot use GTK without pkg-config)" >&6; }
 fi
 
 # export HAVE_GTK3 to Makefile
- if test "x$HAVE_gtk3" = xyes; then
+ if  test "x$HAVE_gtk3" = "xyes" ; then
   HAVE_GTK3_TRUE=
   HAVE_GTK3_FALSE='#'
 else
@@ -19655,7 +19711,7 @@ fi
 
 
 # export HAVE_GTK3 to config.h
-if test "x$HAVE_gtk3" = xyes; then
+if  test "x$HAVE_gtk3" = "xyes" ; then
 
 cat >>confdefs.h <<_ACEOF
 #define HAVE_GTK3 1
@@ -19664,6 +19720,11 @@ _ACEOF
 fi
 
 
+if  test "x$HAVE_gtk3" != "xyes" ; then
+   $as_echo "   └──── will affect: ⎕PLOT, ⎕PNG";
+fi
+
+ $as_echo ; $as_echo "    *** check for functions that are missing on some platforms... ***"; $as_echo ;
 
 ################################# rdtsc check ################################
 # check if rdtsc (read CPU cycle counter is available.
@@ -19690,14 +19751,15 @@ else
   HAVE_rdtsc=no
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-if test "x$HAVE_rdtsc" = "xyes"; then
+if  test "x$HAVE_rdtsc" = "xyes" ; then
 
 cat >>confdefs.h <<_ACEOF
 #define HAVE_RDTSC 1
 _ACEOF
 
 fi
- if test "x$HAVE_rdtsc" = xyes; then
+
+ if  test "x$HAVE_rdtsc" = "xyes" ; then
   HAVE_RDTSC_TRUE=
   HAVE_RDTSC_FALSE='#'
 else
@@ -19731,23 +19793,15 @@ else
   HAVE_gettimeofday=no
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-if test "x$HAVE_gettimeofday" = "xyes"; then
+if  test "x$HAVE_gettimeofday" = "xyes" ; then
 
 cat >>confdefs.h <<_ACEOF
 #define HAVE_GETTIMEOFDAY 1
 _ACEOF
 
 fi
- if test "x$HAVE_rdtsc" = xyes; then
-  HAVE_RDTSC_TRUE=
-  HAVE_RDTSC_FALSE='#'
-else
-  HAVE_RDTSC_TRUE='#'
-  HAVE_RDTSC_FALSE=
-fi
-
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $HAVE_rdtsc" >&5
-$as_echo "$HAVE_rdtsc" >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $HAVE_gettimeofday" >&5
+$as_echo "$HAVE_gettimeofday" >&6; }
 
 ############################### sem_init() check ##############################
 # check if sem_init() works (it does not on OS-X)
@@ -19778,14 +19832,14 @@ else
   HAVE_SEM_INIT=no
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
-if test "x$HAVE_SEM_INIT" = "xyes"; then
+if  test "x$HAVE_SEM_INIT" = "xyes" ; then
 
 cat >>confdefs.h <<_ACEOF
 #define HAVE_SEM_INIT 1
 _ACEOF
 
 fi
- if test "x$HAVE_SEM_INIT" = xyes; then
+ if  test "x$HAVE_SEM_INIT" = "xyes" ; then
   HAVE_SEM_INIT_TRUE=
   HAVE_SEM_INIT_FALSE='#'
 else
@@ -19834,7 +19888,7 @@ else
   HAVE_AFFINITY_NP=no
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
- if test "x$HAVE_AFFINITY_NP" = xyes; then
+ if test "$HAVE_AFFINITY_NP" = yes; then
   HAVE_AFFINITY_NP_TRUE=
   HAVE_AFFINITY_NP_FALSE='#'
 else
@@ -19946,27 +20000,29 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $HAVE_SOLARIS_ATOMIC" >&5
 $as_echo "$HAVE_SOLARIS_ATOMIC" >&6; }
 
-echo
-echo "   *** decisions made by the user ... ***"
-echo
+ $as_echo ; $as_echo "    *** decisions made by the user (via ./configure arguments)... ***"; $as_echo ;
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if user wants ctrl-d to be del-char (moving EOT to ctrl-z)" >&5
-$as_echo_n "checking if user wants ctrl-d to be del-char (moving EOT to ctrl-z)... " >&6; }
-user_wants_ctrld_del=no
+# the standard convention is that ^D means EOF aka. end-of-file. Some users
+# prefer ^D to delete one character and ^Z to mean EOF.
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if ctrl-D shall delete one char (and ctrl-Z be EOF)" >&5
+$as_echo_n "checking if ctrl-D shall delete one char (and ctrl-Z be EOF)... " >&6; }
 
 # Check whether --with-ctrld_del was given.
 if test "${with_ctrld_del+set}" = set; then :
-  withval=$with_ctrld_del; user_wants_ctrld_del=$withval
+  withval=$with_ctrld_del; user_wants_ctrlD_del=$withval
+else
+  user_wants_ctrlD_del=no
 fi
 
 
-if test "x$user_wants_ctrld_del" = xyes ; then
+if  test "x$user_wants_ctrlD_del" = "xyes" ; then
 
 $as_echo "#define WANT_CTRLD_DEL 1" >>confdefs.h
 
 fi
-
- if test "x$user_wants_ctrld_del" = xyes; then
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $user_wants_ctrlD_del" >&5
+$as_echo "$user_wants_ctrlD_del" >&6; }
+ if  test "x$user_wants_ctrlD_del" = "xyes" ; then
   WANT_CTRLD_DEL_TRUE=
   WANT_CTRLD_DEL_FALSE='#'
 else
@@ -19974,27 +20030,26 @@ else
   WANT_CTRLD_DEL_FALSE=
 fi
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $user_wants_ctrld_del" >&5
-$as_echo "$user_wants_ctrld_del" >&6; }
 
 # check if the user compiles for ANDROID
 #
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking if we are compiling for Android" >&5
 $as_echo_n "checking if we are compiling for Android... " >&6; }
-user_wants_android=no
 
 # Check whether --with-android was given.
 if test "${with_android+set}" = set; then :
   withval=$with_android; user_wants_android=$withval
+else
+  user_wants_android=no
 fi
 
 
-if test "x$user_wants_android" = xyes ; then
+if  test "x$user_wants_android" = "xyes" ; then
 
 $as_echo "#define WANT_ANDROID 1" >>confdefs.h
 
 fi
- if test "x$user_wants_android" = xyes; then
+ if  test "x$user_wants_android" = "xyes" ; then
   WANT_ANDROID_TRUE=
   WANT_ANDROID_FALSE='#'
 else
@@ -20010,21 +20065,22 @@ $as_echo "$user_wants_android" >&6; }
 #
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking if we want to build an erlang interface (implies libapl.so)" >&5
 $as_echo_n "checking if we want to build an erlang interface (implies libapl.so)... " >&6; }
-user_wants_erlang=no
 
 # Check whether --with-erlang was given.
 if test "${with_erlang+set}" = set; then :
   withval=$with_erlang; user_wants_erlang=$withval
+else
+  user_wants_erlang=no
 fi
 
 
-if test "x$user_wants_libapl" = xyes ; then
+if  test "x$user_wants_libapl" = "xyes" ; then
 
 $as_echo "#define WANT_ERLANG 1" >>confdefs.h
 
 fi
 
- if test "x$user_wants_erlang" = xyes; then
+ if  test "x$user_wants_erlang" = "xyes" ; then
   WANT_ERLANG_TRUE=
   WANT_ERLANG_FALSE='#'
 else
@@ -20034,6 +20090,7 @@ fi
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $user_wants_erlang" >&5
 $as_echo "$user_wants_erlang" >&6; }
+
 
 # check if the user wants to build libapl.so
 #
@@ -20047,13 +20104,14 @@ if test "${with_libapl+set}" = set; then :
 fi
 
 
-if test "x$user_wants_libapl" = xyes ; then
+if  test "x$user_wants_libapl" = "xyes" ; then
 
 $as_echo "#define WANT_LIBAPL 1" >>confdefs.h
 
 fi
 
- if test "x$user_wants_libapl" = xyes; then
+
+ if  test "x$user_wants_libapl" = "xyes" ; then
   WANT_LIBAPL_TRUE=
   WANT_LIBAPL_FALSE='#'
 else
@@ -20064,7 +20122,7 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $user_wants_libapl" >&5
 $as_echo "$user_wants_libapl" >&6; }
 
-# check if the user wants to build the python extension gnu_apl.so
+# check if the user wants to build the python extension libpython_apl.so
 #
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking if we want to build libpython_apl.so" >&5
 $as_echo_n "checking if we want to build libpython_apl.so... " >&6; }
@@ -20078,7 +20136,7 @@ if test "${with_python+set}" = set; then :
 fi
 
 
-if test "$user_wants_python" = yes ; then
+if  test "x$user_wants_python" = "xyes" ; then
 
 $as_echo "#define WANT_PYTHON 1" >>confdefs.h
 
@@ -20123,13 +20181,13 @@ $as_echo "no" >&6; }
 fi
 
   # locate pkg-config
-    if test x$PKG_CONFIG != xno ; then        # we have pkg-config
+    if  test "x$PKG_CONFIG" != "xno" ; then        # we have pkg-config
        if $PKG_CONFIG --exists python ; then  # and pkg-config knows python
             PYTHON_CFLAGS=$( $PKG_CONFIG --cflags python3 )
        fi
    fi
 fi
- if test "x$user_wants_python" = xyes; then
+ if  test "x$user_wants_python" = "xyes" ; then
   WANT_PYTHON_TRUE=
   WANT_PYTHON_FALSE='#'
 else
@@ -20145,14 +20203,14 @@ ac_config_files="$ac_config_files Makefile build/Makefile debian/Makefile debian
 
 # AM_CXXFLAGS: do/dont -Werror ?
 
-if test "x$CXX_WERROR" = "xyes"; then CXX_WERROR="-Werror";
-                                 else CXX_WERROR=""; fi
+if  test "x$CXX_WERROR" = "xyes" ; then CXX_WERROR="-Werror";
+                              else CXX_WERROR=""; fi
 
 # APL: development configuration desired ? Set this before other xxx_WANTED
 # options so that the implied xxx_WANTED options set here can be overridden
 # further down
 
-if test "x$DEVELOP_WANTED" = "xyes"; then
+if  test "x$DEVELOP_WANTED" = "xyes" ; then
 
 cat >>confdefs.h <<_ACEOF
 #define DEVELOP_WANTED yes
@@ -20168,7 +20226,7 @@ fi
 
 # APL: max. rank ?
 
-if test "x$MAX_RANK_WANTED" = "x"; then MAX_RANK_WANTED=8; fi
+if  test "x$MAX_RANK_WANTED" = "x" ; then MAX_RANK_WANTED=8; fi
 
 cat >>confdefs.h <<_ACEOF
 #define MAX_RANK_WANTED $MAX_RANK_WANTED
@@ -20178,7 +20236,7 @@ _ACEOF
 
 # APL: CHECK() macro desired ?
 
-if test "x$VALUE_CHECK_WANTED" = "xyes"; then
+if  test "x$VALUE_CHECK_WANTED" = "xyes" ; then
 
 cat >>confdefs.h <<_ACEOF
 #define VALUE_CHECK_WANTED yes
@@ -20191,7 +20249,7 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether internal performance counters shall be enabled)" >&5
 $as_echo_n "checking whether internal performance counters shall be enabled)... " >&6; }
 
-if test "x$PERFORMANCE_COUNTERS_WANTED" = "xyes"; then
+if  test "x$PERFORMANCE_COUNTERS_WANTED" = "xyes" ; then
 
 cat >>confdefs.h <<_ACEOF
 #define PERFORMANCE_COUNTERS_WANTED yes
@@ -20207,7 +20265,7 @@ $as_echo "$PERFORMANCE_COUNTERS_WANTED" >&6; }
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether to remember the history of APL values (debug feature)" >&5
 $as_echo_n "checking whether to remember the history of APL values (debug feature)... " >&6; }
 
-if test "x$VALUE_HISTORY_WANTED" = "xyes"; then
+if  test "x$VALUE_HISTORY_WANTED" = "xyes" ; then
 
 cat >>confdefs.h <<_ACEOF
 #define VALUE_HISTORY_WANTED yes
@@ -20223,7 +20281,7 @@ $as_echo "$VALUE_HISTORY_WANTED" >&6; }
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether gprof profiling shall be enabled" >&5
 $as_echo_n "checking whether gprof profiling shall be enabled... " >&6; }
 
-if test "x$GPROF_WANTED" = "xyes"; then
+if  test "x$GPROF_WANTED" = "xyes" ; then
    GPROF_WANTED="-pg"
    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
@@ -20233,11 +20291,17 @@ else
 $as_echo "no" >&6; }
 fi
 
+cat >>confdefs.h <<_ACEOF
+#define GPROF_WANTED -pg
+_ACEOF
+
+
+
 # APL: gcov coverage testing ?
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether gcov coverage testing shall be enabled" >&5
 $as_echo_n "checking whether gcov coverage testing shall be enabled... " >&6; }
 
-if test "x$GCOV_WANTED" = "xyes"; then
+if  test "x$GCOV_WANTED" = "xyes" ; then
    GCOV_WANTED="--coverage"
    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
@@ -20248,17 +20312,11 @@ $as_echo "no" >&6; }
 fi
 
 
-cat >>confdefs.h <<_ACEOF
-#define GPROF_WANTED -pg
-_ACEOF
-
-
-
 # APL: dynamic logging desired ?
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether dynamic logging shall be enabled" >&5
 $as_echo_n "checking whether dynamic logging shall be enabled... " >&6; }
 
-if test "x$DYNAMIC_LOG_WANTED" = "xyes"; then
+if  test "x$DYNAMIC_LOG_WANTED" = "xyes" ; then
 
 cat >>confdefs.h <<_ACEOF
 #define DYNAMIC_LOG_WANTED yes
@@ -20274,7 +20332,7 @@ $as_echo "$DYNAMIC_LOG_WANTED" >&6; }
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether value flags shall be traced" >&5
 $as_echo_n "checking whether value flags shall be traced... " >&6; }
 
-if test "x$VF_TRACING_WANTED" = "xyes"; then
+if  test "x$VF_TRACING_WANTED" = "xyes" ; then
 
 cat >>confdefs.h <<_ACEOF
 #define VF_TRACING_WANTED yes
@@ -20287,10 +20345,10 @@ $as_echo "$VF_TRACING_WANTED" >&6; }
 
 
 # APL: desired assert level ?
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking how picky internal tests shall be" >&5
-$as_echo_n "checking how picky internal tests shall be... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking how picky (0=not, 1=somwhat, 2=very) internal tests shall be" >&5
+$as_echo_n "checking how picky (0=not, 1=somwhat, 2=very) internal tests shall be... " >&6; }
 
-if test "x$ASSERT_LEVEL_WANTED" = "x"; then ASSERT_LEVEL_WANTED=1; fi
+if  test "x$ASSERT_LEVEL_WANTED" = "x" ; then ASSERT_LEVEL_WANTED=1; fi
 
 cat >>confdefs.h <<_ACEOF
 #define ASSERT_LEVEL_WANTED $ASSERT_LEVEL_WANTED
@@ -20299,11 +20357,12 @@ _ACEOF
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $ASSERT_LEVEL_WANTED" >&5
 $as_echo "$ASSERT_LEVEL_WANTED" >&6; }
 
+
 # APL: desired security level ?
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking security level (0=none, 1=configured in preferences, 2=all)" >&5
 $as_echo_n "checking security level (0=none, 1=configured in preferences, 2=all)... " >&6; }
 
-if test "x$SECURITY_LEVEL_WANTED" = "x"; then SECURITY_LEVEL_WANTED=0; fi
+if  test "x$SECURITY_LEVEL_WANTED" = "x" ; then SECURITY_LEVEL_WANTED=0; fi
 
 cat >>confdefs.h <<_ACEOF
 #define SECURITY_LEVEL_WANTED $SECURITY_LEVEL_WANTED
@@ -20312,17 +20371,19 @@ _ACEOF
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $SECURITY_LEVEL_WANTED" >&5
 $as_echo "$SECURITY_LEVEL_WANTED" >&6; }
 
+
 # APL: number of cores ?
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking how many CPU cores shall be used by APL (experimental!)" >&5
 $as_echo_n "checking how many CPU cores shall be used by APL (experimental!)... " >&6; }
 
-if test "x$CORE_COUNT_WANTED" = "x";     then CORE_COUNT_WANTED=0;  fi
-if test "x$CORE_COUNT_WANTED" = "xall";  then CORE_COUNT_WANTED=-1; fi
-if test "x$CORE_COUNT_WANTED" = "xALL";  then CORE_COUNT_WANTED=-1; fi
-if test "x$CORE_COUNT_WANTED" = "xargv"; then CORE_COUNT_WANTED=-2; fi
-if test "x$CORE_COUNT_WANTED" = "xARGV"; then CORE_COUNT_WANTED=-2; fi
-if test "x$CORE_COUNT_WANTED" = "xsyl";  then CORE_COUNT_WANTED=-3; fi
-if test "x$CORE_COUNT_WANTED" = "xSYL";  then CORE_COUNT_WANTED=-3; fi
+  if  test "x$CORE_COUNT_WANTED" = "x" ; then CORE_COUNT_WANTED=0;
+elif  test "x$CORE_COUNT_WANTED" = "xall " ; then CORE_COUNT_WANTED=-1;
+elif  test "x$CORE_COUNT_WANTED" = "xALL " ; then CORE_COUNT_WANTED=-1;
+elif  test "x$CORE_COUNT_WANTED" = "xargv" ; then CORE_COUNT_WANTED=-2;
+elif  test "x$CORE_COUNT_WANTED" = "xARGV" ; then CORE_COUNT_WANTED=-2;
+elif  test "x$CORE_COUNT_WANTED" = "xsyl " ; then CORE_COUNT_WANTED=-3;
+elif  test "x$CORE_COUNT_WANTED" = "xSYL " ; then CORE_COUNT_WANTED=-3;
+  fi
 
 cat >>confdefs.h <<_ACEOF
 #define CORE_COUNT_WANTED $CORE_COUNT_WANTED
@@ -20331,14 +20392,16 @@ _ACEOF
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $CORE_COUNT_WANTED" >&5
 $as_echo "$CORE_COUNT_WANTED" >&6; }
 
-# APL: APserver transport ?
+
+# APL: APserver transport?
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking which type of socket APserver shall use" >&5
 $as_echo_n "checking which type of socket APserver shall use... " >&6; }
 
-if test "x$APSERVER_TRANSPORT" = "x";        then APSERVER_TRANSPORT=0;  fi
-if test "x$APSERVER_TRANSPORT" = "xTCP";     then APSERVER_TRANSPORT=0;  fi
-if test "x$APSERVER_TRANSPORT" = "xLINUX";   then APSERVER_TRANSPORT=1;  fi
-if test "x$APSERVER_TRANSPORT" = "xUNIX";    then APSERVER_TRANSPORT=2;  fi
+  if  test "x$APSERVER_TRANSPORT" = "x" ;   then APSERVER_TRANSPORT=0;
+elif  test "x$APSERVER_TRANSPORT" = "xTCP  " ;   then APSERVER_TRANSPORT=0;
+elif  test "x$APSERVER_TRANSPORT" = "xLINUX" ;   then APSERVER_TRANSPORT=1;
+elif  test "x$APSERVER_TRANSPORT" = "xUNIX " ;   then APSERVER_TRANSPORT=2;
+  fi
 
 cat >>confdefs.h <<_ACEOF
 #define APSERVER_TRANSPORT $APSERVER_TRANSPORT
@@ -20347,11 +20410,12 @@ _ACEOF
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $APSERVER_TRANSPORT" >&5
 $as_echo "$APSERVER_TRANSPORT" >&6; }
 
-# APL: APserver TCP port ?
+
+# APL: APserver TCP port number?
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking which port number APserver shall use for TCP or UDP sockets" >&5
 $as_echo_n "checking which port number APserver shall use for TCP or UDP sockets... " >&6; }
 
-if test "x$APSERVER_PORT" = "x";   then APSERVER_PORT=16366;  fi
+if  test "x$APSERVER_PORT" = "x" ;   then APSERVER_PORT=16366;  fi
 
 cat >>confdefs.h <<_ACEOF
 #define APSERVER_PORT $APSERVER_PORT
@@ -20360,11 +20424,12 @@ _ACEOF
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $APSERVER_PORT" >&5
 $as_echo "$APSERVER_PORT" >&6; }
 
+
 # APL: APserver port name ?
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking which unix port name APserver shall use" >&5
 $as_echo_n "checking which unix port name APserver shall use... " >&6; }
 
-if test "x$APSERVER_PATH" = "x";   then APSERVER_PATH="/tmp/GNU-APL/APserver";  fi
+if  test "x$APSERVER_PATH" = "x" ;   then APSERVER_PATH="/tmp/GNU-APL/APserver";  fi
 
 cat >>confdefs.h <<_ACEOF
 #define APSERVER_PATH "$APSERVER_PATH"
@@ -20373,11 +20438,12 @@ _ACEOF
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $APSERVER_PATH" >&5
 $as_echo "$APSERVER_PATH" >&6; }
 
+
 # APL: desired cellcount of short values ?
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking how long a short APL value shall be at most" >&5
 $as_echo_n "checking how long a short APL value shall be at most... " >&6; }
 
-if test "x$SHORT_VALUE_LENGTH_WANTED" = "x"; then SHORT_VALUE_LENGTH_WANTED=12; fi
+if  test "x$SHORT_VALUE_LENGTH_WANTED" = "x" ; then SHORT_VALUE_LENGTH_WANTED=12; fi
 
 cat >>confdefs.h <<_ACEOF
 #define SHORT_VALUE_LENGTH_WANTED $SHORT_VALUE_LENGTH_WANTED
@@ -20391,7 +20457,7 @@ $as_echo "$SHORT_VALUE_LENGTH_WANTED" >&6; }
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether visible markers shall be used" >&5
 $as_echo_n "checking whether visible markers shall be used... " >&6; }
 
-if test "x$VISIBLE_MARKERS_WANTED" = "xyes"; then
+if  test "x$VISIBLE_MARKERS_WANTED" = "xyes" ; then
 
 cat >>confdefs.h <<_ACEOF
 #define VISIBLE_MARKERS_WANTED yes
@@ -20402,11 +20468,12 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $VISIBLE_MARKERS_WANTED" >&5
 $as_echo "$VISIBLE_MARKERS_WANTED" >&6; }
 
-# APL: support for rational numbers ?
+
+# APL: support for rational numbers?
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether support for rational numbers is desired " >&5
 $as_echo_n "checking whether support for rational numbers is desired ... " >&6; }
 
-if test "x$RATIONAL_NUMBERS_WANTED" = "xyes"; then
+if  test "x$RATIONAL_NUMBERS_WANTED" = "xyes" ; then
 
 cat >>confdefs.h <<_ACEOF
 #define RATIONAL_NUMBERS_WANTED yes
@@ -20417,10 +20484,11 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $RATIONAL_NUMBERS_WANTED" >&5
 $as_echo "$RATIONAL_NUMBERS_WANTED" >&6; }
 
+
 # check if we are on i686 (to fix a strange rpmbuild problem)
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking whether we compile for an i686 CPU" >&5
 $as_echo_n "checking whether we compile for an i686 CPU... " >&6; }
- if test $( uname -m) = i686; then
+ if  test "x$(uname -m)" = "xi686" ; then
   ON_i686_TRUE=
   ON_i686_FALSE='#'
 else
@@ -20428,7 +20496,7 @@ else
   ON_i686_FALSE=
 fi
 
-if test `uname -m` = "i686" ; then
+if  test "x$(uname -m)" = "xi686" ; then
     { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
 else
@@ -20436,8 +20504,8 @@ else
 $as_echo "no" >&6; }
 fi
 
-# check if we want development options
- if test x$DEVELOP_WANTED    = xyes; then
+# export some of the options to Makefile
+ if  test "x$DEVELOP_WANTED" = "xyes" ; then
   DEVELOP_TRUE=
   DEVELOP_FALSE='#'
 else
@@ -20445,24 +20513,9 @@ else
   DEVELOP_FALSE=
 fi
 
- if test x$found_sqlite      = xyes; then
-  SQLITE3_TRUE=
-  SQLITE3_FALSE='#'
-else
-  SQLITE3_TRUE='#'
-  SQLITE3_FALSE=
-fi
 
- if test x$USABLE_PostgreSQL = xyes; then
-  POSTGRES_TRUE=
-  POSTGRES_FALSE='#'
-else
-  POSTGRES_TRUE='#'
-  POSTGRES_FALSE=
-fi
+ $as_echo ; $as_echo "    *** ./configure checks done, producing the output files... ***"; $as_echo ;
 
-
-echo
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
 # tests run on this system so they can be shared between configure
@@ -20608,16 +20661,20 @@ if test -z "${am__fastdepCXX_TRUE}" && test -z "${am__fastdepCXX_FALSE}"; then
   as_fn_error $? "conditional \"am__fastdepCXX\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
+if test -z "${SQLITE3_TRUE}" && test -z "${SQLITE3_FALSE}"; then
+  as_fn_error $? "conditional \"SQLITE3\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${POSTGRES_TRUE}" && test -z "${POSTGRES_FALSE}"; then
+  as_fn_error $? "conditional \"POSTGRES\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
 if test -z "${HAVE_LIBPCRE2_32_TRUE}" && test -z "${HAVE_LIBPCRE2_32_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_LIBPCRE2_32\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_GTK3_TRUE}" && test -z "${HAVE_GTK3_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_GTK3\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${HAVE_RDTSC_TRUE}" && test -z "${HAVE_RDTSC_FALSE}"; then
-  as_fn_error $? "conditional \"HAVE_RDTSC\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_RDTSC_TRUE}" && test -z "${HAVE_RDTSC_FALSE}"; then
@@ -20658,14 +20715,6 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${DEVELOP_TRUE}" && test -z "${DEVELOP_FALSE}"; then
   as_fn_error $? "conditional \"DEVELOP\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${SQLITE3_TRUE}" && test -z "${SQLITE3_FALSE}"; then
-  as_fn_error $? "conditional \"SQLITE3\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${POSTGRES_TRUE}" && test -z "${POSTGRES_FALSE}"; then
-  as_fn_error $? "conditional \"POSTGRES\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 
@@ -23130,47 +23179,62 @@ echo
 # create buildtag.hh and set apl_top to the directory that contains buildtag.sh
 #
 echo "configure: creating buildtag.hh..."
-abs_apl_top=""
-apl_top=$(pwd)
-for q in 1 2 3 4; do
-   if test -f "$apl_top/buildtag.sh"; then
-      abs_apl_top="$apl_top"
-      . "$abs_apl_top/buildtag.sh"
-      break
-   else
-      apl_top=$(dirname $apl_top)
+abs_apl_top="not-found"   # assume not found
+apl_top=$(pwd)            # start search at current directory
+for q in 1 2 3 4; do      # at most 4 times...
+   if test -f "$apl_top/buildtag.sh"    # does buildtag.sh exist in $apl_top ?
+   then                                 # yes...
+      . "$apl_top/buildtag.sh"              # source buildtag.sh
+      abs_apl_top="$apl_top"                # and remember the directory
+      break                                 # done.
+   else                                 # no...
+      apl_top=$(dirname $apl_top)           # move upwards towards /
    fi
 done
 
-if test -z "$abs_apl_top"
-then
+if  test "x$abs_apl_top" = "xnot-found" ; then
    echo "configure: *** could not find top-level GNU APL directory, using '.'"
    apl_top="."
 else
    echo "configure: top-level apl directory is: $abs_apl_top"
 fi
 
-# remove makefile.h
+# remove old makefile.h
 #
 if test -f "$apl_top/makefile.h"
 then
-   echo "configure: removing old $apl_top/makefile.h"
+   echo "
+configure: removing old $apl_top/makefile.h (if any).
+           NOTE: ./Makefile will create a fresh makefile.h automatically.
+           However, running 'make' in directory $apl_top/src
+           BEFORE running 'make' in $apl_top may
+           yield a compile error (which can fixed by running 'make' in
+           directory $apl_top first)."
    rm -f "$apl_top/makefile.h"
 fi
 
-# summary
+# print a summary or maybe complain
+#
   echo " "
-if test "x$USABLE_PostgreSQL" != "xyes" -a "x$want1_postgresql" = "xyes"; then
-  echo "NOTE: PostgreSQL support was requested, but the native function for "
-  echo "      accessing PostgreSQL cannot be built because your PostgreSQL "
-  echo "      installation appears to be missing or incomplete (see details above)"
-  echo " "
+if  test "x$want1_postgresql" = "xyes" ; then
+   if  test "x$USABLE_PostgreSQL" = "xyes" ; then
+      echo "      PostgreSQL looks good."
+   else
+      echo "NOTE: PostgreSQL support was requested, but the handler function"
+      echo "      for accessing PostgreSQL cannot be built. Your PostgreSQL"
+      echo "      installation is missing or incomplete. See details above."
+      echo " "
+   fi
 fi
 
- if test "x$found_sqlite" != "xyes" -a "x$WANT1_SQLITE3" = "xyes"; then
-  echo "NOTE: SQLite support was requested, but the native function for "
-  echo "      accessing SQLite cannot not be built because your SQLite "
-  echo "      installation appears to be missing or incomplete (see details above)"
-  echo " "
+if  test "x$WANT1_SQLITE3" = "xyes" ; then
+   if  test "x$found_sqlite" = "xyes" ; then
+      echo "      SQLite looks good."
+   else
+      echo "NOTE: SQLite support was requested, but the handler function for "
+      echo "      accessing SQLite cannot not be built. Your SQLite"
+      echo "      installation is missing or incomplete. See details above."
+      echo " "
+   fi
 fi
 
