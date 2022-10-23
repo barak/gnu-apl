@@ -149,7 +149,7 @@
 #define HAVE_PNG_H 1
 
 /* Define to 1 if PostgreSQL libraries are available */
-#define HAVE_POSTGRESQL 1
+/* #undef HAVE_POSTGRESQL */
 
 /* Define to 1 if you have the `pow' function. */
 #define HAVE_POW 1
@@ -266,7 +266,7 @@
 /* #undef RATIONAL_NUMBERS_WANTED */
 
 /* ./configure with --with-postgresql */
-#define REALLY_WANT_PostgreSQL 1
+/* #undef REALLY_WANT_PostgreSQL */
 
 /* SQLite available and wanted */
 #define REALLY_WANT_SQLITE3 1
@@ -361,7 +361,7 @@
 #define apl_GTK3 1
 
 /* PostgreSQL code compiles */
-#define apl_POSTGRES 1
+/* #undef apl_POSTGRES */
 
 /* SQLite available */
 #define apl_SQLITE3 1

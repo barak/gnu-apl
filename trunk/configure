@@ -19005,6 +19005,13 @@ fi
 
 # check if SQLite3 is wanted and installed
 
+apl_SQLITE3=no
+
+# no point to proceed without sqlite3.h
+
+ac_fn_cxx_check_header_mongrel "$LINENO" "sqlite3.h" "ac_cv_header_sqlite3_h" "$ac_includes_default"
+if test "x$ac_cv_header_sqlite3_h" = xyes; then :
+
 
 
 
@@ -19012,7 +19019,7 @@ fi
 
 # Check whether --with-sqlite3 was given.
 if test "${with_sqlite3+set}" = set; then :
-  withval=$with_sqlite3;
+  withval=$with_sqlite3;                      # with-sqlite3 given
         if test "$withval" = "no"; then
             WANT_SQLITE3="no"
         elif test "$withval" = "yes"; then
@@ -19024,7 +19031,9 @@ if test "${with_sqlite3+set}" = set; then :
         fi
 
 else
-  WANT_SQLITE3="yes"
+                       # with-sqlite3 not given
+        WANT_SQLITE3="yes"
+
 
 fi
 
@@ -19154,23 +19163,28 @@ $as_echo "#define HAVE_SQLITE3 1" >>confdefs.h
         fi
     fi
                    # sets: found_sqlite, WANT_SQLITE3
-   apl_SQLITE3=$found_sqlite            # import into apl_ namespace
 
-if  test "x$found_sqlite" = "xyes"  &&  test "x$WANT_SQLITE3" = "xyes" ; then
+       apl_SQLITE3=$found_sqlite            # import into apl_ namespace
+
+    if  test "x$found_sqlite" = "xyes"  &&  test "x$WANT_SQLITE3" = "xyes" ; then
 
 cat >>confdefs.h <<_ACEOF
 #define REALLY_WANT_SQLITE3 1
 _ACEOF
 
-fi
+    fi
 
-if  test "x$WANT_SQLITE3" = "xyes" ; then
+    if  test "x$WANT_SQLITE3" = "xyes" ; then
 
 cat >>confdefs.h <<_ACEOF
 #define apl_SQLITE3 1
 _ACEOF
 
-    fi
+        fi
+
+
+fi
+
 
 
 # export apl_SQLITE3 to Makefile.am
@@ -19189,7 +19203,14 @@ if  test "x$apl_SQLITE3" != "xyes" ; then
 fi
 
 # check if PostgreSQL is wanted and installed
-# ===========================================================================
+
+apl_POSTGRES=no
+
+# no point to proceed without libpq-fe.h
+ac_fn_cxx_check_header_mongrel "$LINENO" "libpq-fe.h" "ac_cv_header_libpq_fe_h" "$ac_includes_default"
+if test "x$ac_cv_header_libpq_fe_h" = xyes; then :
+
+    # ===========================================================================
 #     http://www.gnu.org/software/autoconf-archive/ax_lib_postgresql.html
 # ===========================================================================
 #
@@ -19381,29 +19402,24 @@ $as_echo "no" >&6; }
 
 
 
-                # sets: found_postgresql, want_postgresql
-   apl_POSTGRES=$found_postgresql       # import into apl_ namespace
+        # sets: found_postgresql, want_postgresql
+       apl_POSTGRES=$found_postgresql       # import into apl_ namespace
 
-if  test "x$found_postgresql" = "xyes"  &&  test "x$want_postgresql" = "xyes" ; then
+    if  test "x$found_postgresql" = "xyes"  &&  test "x$want_postgresql" = "xyes" ; then
 
 cat >>confdefs.h <<_ACEOF
 #define REALLY_WANT_PostgreSQL 1
 _ACEOF
 
-fi
+    fi
 
-$as_echo "
-*** found_postgresql: $found_postgresql
-*** want_postgresql:  $want_postgresql
-"
-
-# check if PostgreSQL is usable (if present)
-if  test "x$found_postgresql" = "xyes"  ; then
-    { $as_echo "$as_me:${as_lineno-$LINENO}: checking for PostgreSQL usability" >&5
+    # check if PostgreSQL is usable (if present)
+    if  test "x$found_postgresql" = "xyes"  ; then
+        { $as_echo "$as_me:${as_lineno-$LINENO}: checking for PostgreSQL usability" >&5
 $as_echo_n "checking for PostgreSQL usability... " >&6; }
-    saved_CPPFLAGS="$CPPFLAGS"
-    CPPFLAGS="$CPPFLAGS $POSTGRESQL_CFLAGS"
-    cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+        saved_CPPFLAGS="$CPPFLAGS"
+        CPPFLAGS="$CPPFLAGS $POSTGRESQL_CFLAGS"
+        cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <libpq-fe.h>
 int
@@ -19421,19 +19437,23 @@ else
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
-    CPPFLAGS="$saved_CPPFLAGS"
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $apl_POSTGRES" >&5
+        CPPFLAGS="$saved_CPPFLAGS"
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: $apl_POSTGRES" >&5
 $as_echo "$apl_POSTGRES" >&6; }
-    if  test "x$apl_POSTGRES" = "xyes" ; then
+        if  test "x$apl_POSTGRES" = "xyes" ; then
 
 cat >>confdefs.h <<_ACEOF
 #define apl_POSTGRES 1
 _ACEOF
 
+        fi
     fi
+
 fi
 
-# export apl_POSTGRES to Makefile
+
+
+# export apl_POSTGRES to Makefile.am
  if  test "x$apl_POSTGRES" = "xyes" ; then
   apl_POSTGRES_TRUE=
   apl_POSTGRES_FALSE='#'
@@ -19441,7 +19461,6 @@ else
   apl_POSTGRES_TRUE='#'
   apl_POSTGRES_FALSE=
 fi
-
 
 
 if  test "x$apl_POSTGRES" != "xyes" ; then

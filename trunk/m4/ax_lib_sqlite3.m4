@@ -31,8 +31,8 @@ AC_DEFUN([AX_LIB_SQLITE3],
         AC_HELP_STRING(
             [--with-sqlite3=@<:@ARG@:>@],
             [use SQLite 3 library @<:@default=yes@:>@, optionally specify the prefix for sqlite3 library]
-        ),
-        [
+                      ),
+        [                     # with-sqlite3 given
         if test "$withval" = "no"; then
             WANT_SQLITE3="no"
         elif test "$withval" = "yes"; then
@@ -43,7 +43,9 @@ AC_DEFUN([AX_LIB_SQLITE3],
             ac_sqlite3_path="$withval"
         fi
         ],
-        [WANT_SQLITE3="yes"]
+        [                     # with-sqlite3 not given
+        WANT_SQLITE3="yes"
+        ]
     )
 
     SQLITE3_CFLAGS=""
