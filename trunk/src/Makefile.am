@@ -10,10 +10,10 @@ SUBDIRS = native $(EXTRA_DIRS)
 
 all: ../makefile.h
 
-# depending on HAVE_GTK3 we want either Plot_gtk.cc or Plot_xcb.cc compiled,
+# depending on apl_GTK3 we want either Plot_gtk.cc or Plot_xcb.cc compiled,
 # but keep both source files in the tar file (hence EXTRA_apl_SOURCES).
 #
-if HAVE_GTK3
+if apl_GTK3
 SUBDIRS += Gtk
    plot_SOURCES      = Plot_gtk.cc
    plot_CXXFLAGS     = -Wno-parentheses
@@ -168,11 +168,11 @@ common_SOURCES += ValueHistory.cc				ValueHistory.hh
 common_SOURCES += Workspace.cc					Workspace.hh
 common_SOURCES += static_Objects.cc				static_Objects.hh
 
-if HAVE_LIBPCRE2_32
+if apl_PCRE
 common_SOURCES += Regexp.cc					Regexp.hh
 endif
 
-if SQLITE3
+if apl_SQLITE3
 common_CXXFLAGS += $(SQLITE3_CFLAGS)
 common_LDFLAGS  += $(SQLITE3_LDFLAGS)
 common_SOURCES += sql/SqliteArgListBuilder.cc			sql/SqliteArgListBuilder.hh
@@ -182,8 +182,8 @@ common_SOURCES += sql/SqliteProvider.cc				sql/SqliteProvider.hh
 common_SOURCES += sql/Connection.cc
 endif
 
-if POSTGRES
-if !SQLITE3
+if apl_POSTGRES
+if !apl_SQLITE3
 common_SOURCES += sql/Connection.cc
 endif
 

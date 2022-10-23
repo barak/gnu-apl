@@ -39,7 +39,7 @@ Quad_GTK * Quad_GTK::fun = &Quad_GTK::_fun;
 std::vector<Quad_GTK::window_entry> Quad_GTK::open_windows;
 UCS_string_vector Quad_GTK::event_queue;
 
-#if HAVE_GTK3
+#if apl_GTK3
 //----------------------------------------------------------------------------
 Token
 Quad_GTK::eval_AB(Value_P A, Value_P B) const
@@ -706,7 +706,7 @@ window_entry we = { fd };
    return fd;
 }
 
-#else   // ! HAVE_GTK3
+#else   // ! apl_GTK3
 
 extern Token missing_files(const char * qfun,  const char ** libs,
                            const char ** hdrs, const char ** pkgs);
@@ -726,5 +726,5 @@ Token Quad_GTK::eval_AXB(Value_P A, Value_P X, Value_P B) const { return eval_B(
 Token Quad_GTK::eval_XB(Value_P X, Value_P B) const        { return eval_B(B); }
 void Quad_GTK::clear() { }
 
-#endif   // HAVE_GTK3
+#endif   // apl_GTK3
 

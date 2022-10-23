@@ -40,7 +40,7 @@
 #  define MISSING1 " libX11.so"
 #endif       // HAVE_LIBX11
 
-#if HAVE_GTK3                            // ======== GTK based ⎕PLOT ========
+#if apl_GTK3                            // ======== GTK based ⎕PLOT ========
 
 # if defined( HAVE_LIBGTK_3 )
 #  define MISSING2 ""
@@ -63,7 +63,7 @@
 #  define MISSING4 " libcairo.so"
 #endif       // HAVE_LIBGTK_3_0
 
-#else    // don't HAVE_GTK3:             // ======== XCB based ⎕PLOT ========
+#else    // don't apl_GTK3:             // ======== XCB based ⎕PLOT ========
 
 # if defined( HAVE_LIBXCB )
 #  define MISSING2 ""
@@ -86,7 +86,7 @@
 #  define MISSING4 ""
 # endif      // HAVE_XCB_XCB_H
 
-#endif   // HAVE_GTK3                    // ======== GTK vs. XCB ========
+#endif   // apl_GTK3                    // ======== GTK vs. XCB ========
 
 #include "Avec.hh"
 #include "Common.hh"
@@ -191,7 +191,7 @@ using namespace std;
 // the pthread that handles one plot window.
 extern void * plot_main(void * vp_props);
 
-#if HAVE_GTK3
+#if apl_GTK3
 extern const Plot_window_properties *
              plot_stop(const Plot_window_properties * vp_props);
 #endif
@@ -354,7 +354,7 @@ Quad_PLOT::eval_B(Value_P B) const
 
         if (u.B0 == -3)   // close all windows
            {
-#if HAVE_GTK3
+#if apl_GTK3
              Value_P Z(plot_threads.size(), LOC);
              loop(p, plot_threads.size())
                 {
@@ -383,7 +383,7 @@ Quad_PLOT::eval_B(Value_P B) const
              return Token(TOK_APL_VALUE1, Idx0(LOC));
            }
 
-#if HAVE_GTK3
+#if apl_GTK3
 
         u.vp = plot_stop(u.w_props);
         return Token(TOK_APL_VALUE1, IntScalar(u.B0, LOC));
@@ -773,7 +773,7 @@ union
 } u;
    u.ret = 0;
 
-#if HAVE_GTK3   // GTK
+#if apl_GTK3   // GTK
    u.w_props = w_props;
    plot_main(w_props);
 #else          // XCB

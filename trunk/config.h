@@ -61,9 +61,6 @@
 /* Define to 1 iff the OS has gettimeofday() */
 #define HAVE_GETTIMEOFDAY 1
 
-/* GTK+ version 3 installed */
-#define HAVE_GTK3 1
-
 /* Define to 1 if you have the <inttypes.h> header file. */
 #define HAVE_INTTYPES_H 1
 
@@ -269,10 +266,10 @@
 /* #undef RATIONAL_NUMBERS_WANTED */
 
 /* ./configure with --with-postgresql */
-/* #undef REALLY_WANT_PostgreSQL */
+#define REALLY_WANT_PostgreSQL 1
 
-/* ./configure with --with-sqlite3 */
-/* #undef REALLY_WANT_SQLITE3 */
+/* SQLite available and wanted */
+#define REALLY_WANT_SQLITE3 1
 
 /* security level */
 #define SECURITY_LEVEL_WANTED 0
@@ -282,9 +279,6 @@
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
-
-/* PostgreSQL code compiles */
-#define USABLE_PostgreSQL 1
 
 /* Enable extensions on AIX 3, Interix.  */
 #ifndef _ALL_SOURCE
@@ -362,6 +356,15 @@
    <pthread.h>, or <semaphore.h> is not used. If the typedef were allowed, the
    #define below would cause a syntax error. */
 /* #undef _UINT8_T */
+
+/* GTK+ version 3 installed */
+#define apl_GTK3 1
+
+/* PostgreSQL code compiles */
+#define apl_POSTGRES 1
+
+/* SQLite available */
+#define apl_SQLITE3 1
 
 /* Define to `__inline__' or `__inline' if that's what the C compiler
    calls it, or to nothing if 'inline' is not supported under any name.  */

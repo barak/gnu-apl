@@ -1902,7 +1902,7 @@ INCLUDE_FILE_PATTERNS  =
 
 # need to #define some macros so that conditional sections (controlled by
 # ./configure) will be documented even if ./configure skipped them
-PREDEFINED             = HAVE_GTK3 HAVE_LIBFFTW3 HAVE_LIBPCRE2_32
+PREDEFINED             = apl_GTK3 apl_FFT apl_PCRE
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The

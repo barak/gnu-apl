@@ -639,8 +639,6 @@ am__EXEEXT_TRUE
 LTLIBOBJS
 DEVELOP_FALSE
 DEVELOP_TRUE
-ON_i686_FALSE
-ON_i686_TRUE
 RATIONAL_NUMBERS_WANTED
 VISIBLE_MARKERS_WANTED
 SHORT_VALUE_LENGTH_WANTED
@@ -671,29 +669,31 @@ WANT_ANDROID_FALSE
 WANT_ANDROID_TRUE
 WANT_CTRLD_DEL_FALSE
 WANT_CTRLD_DEL_TRUE
+ON_i686_FALSE
+ON_i686_TRUE
 HAVE_AFFINITY_NP_FALSE
 HAVE_AFFINITY_NP_TRUE
 HAVE_SEM_INIT_FALSE
 HAVE_SEM_INIT_TRUE
 HAVE_RDTSC_FALSE
 HAVE_RDTSC_TRUE
-HAVE_GTK3_FALSE
-HAVE_GTK3_TRUE
+apl_GTK3_FALSE
+apl_GTK3_TRUE
 PKG_CONFIG
 GTK_CFLAGS
 GTK_LDFLAGS
-HAVE_LIBPCRE2_32_FALSE
-HAVE_LIBPCRE2_32_TRUE
+apl_PCRE_FALSE
+apl_PCRE_TRUE
 PCRE_CFLAGS
 PCRE_LIBS
-POSTGRES_FALSE
-POSTGRES_TRUE
+apl_POSTGRES_FALSE
+apl_POSTGRES_TRUE
 POSTGRESQL_LDFLAGS
 POSTGRESQL_CFLAGS
 POSTGRESQL_VERSION
 PG_CONFIG
-SQLITE3_FALSE
-SQLITE3_TRUE
+apl_SQLITE3_FALSE
+apl_SQLITE3_TRUE
 SQLITE3_VERSION
 SQLITE3_LDFLAGS
 SQLITE3_CFLAGS
@@ -2929,7 +2929,6 @@ ac_link='$CC -o conftest$ac_exeext $CFLAGS $CPPFLAGS $LDFLAGS conftest.$ac_ext $
 ac_compiler_gnu=$ac_cv_c_compiler_gnu
 
 
-configure_options="$0 $*"
 
 ac_aux_dir=
 for ac_dir in . "$srcdir"/.; do
@@ -2959,6 +2958,9 @@ ac_config_guess="$SHELL $ac_aux_dir/config.guess"  # Please don't use this var.
 ac_config_sub="$SHELL $ac_aux_dir/config.sub"  # Please don't use this var.
 ac_configure="$SHELL $ac_aux_dir/configure"  # Please don't use this var.
 
+
+
+ { $as_echo ; $as_echo "    *** core tests... ***"; $as_echo ; }
 
 # Expand $ac_aux_dir to an absolute path.
 am_aux_dir=`cd "$ac_aux_dir" && pwd`
@@ -16481,7 +16483,9 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 
 
 
- $as_echo ; $as_echo "    *** basic checks... ***"; $as_echo ;
+apl_MAINTAINER_MODE = $USE_MAINTAINER_MODE
+
+ { $as_echo ; $as_echo "    *** basic checks... ***"; $as_echo ; }
 
 # Checks for programs.
 #
@@ -17483,7 +17487,7 @@ CXXFLAGS="$CXXFLAGS -I $(pwd)"
 # Checks for various header files.
 #
 
- $as_echo ; $as_echo "    *** presence and usablility of header files... ***"; $as_echo ;
+ { $as_echo ; $as_echo "    *** checks for the presence and usablility of header files... ***"; $as_echo ; }
 
 # check for ncurses.h first and for curses.h only if ncurses.h was not found.
 
@@ -17569,10 +17573,6 @@ if test "x$ac_cv_header_xcb_xproto_h" = xyes; then :
 fi
 
 
-
-# Checks for typedefs, structures, and compiler characteristics.
-#
- $as_echo ; $as_echo "    *** standard types... ***"; $as_echo ;
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for stdbool.h that conforms to C99" >&5
 $as_echo_n "checking for stdbool.h that conforms to C99... " >&6; }
@@ -17666,6 +17666,11 @@ if test $ac_cv_header_stdbool_h = yes; then
 $as_echo "#define HAVE_STDBOOL_H 1" >>confdefs.h
 
 fi
+
+
+# Checks for typedefs, structures, and compiler characteristics.
+#
+ { $as_echo ; $as_echo "    *** checks for standard C/C++ types... ***"; $as_echo ; }
 
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for inline" >&5
 $as_echo_n "checking for inline... " >&6; }
@@ -17796,6 +17801,8 @@ _ACEOF
   esac
 
 
+# export the ./configure args into config.h
+#
 
 cat >>confdefs.h <<_ACEOF
 #define CONFIGURE_ARGS "$0 $ac_configure_args"
@@ -18565,7 +18572,7 @@ _ACEOF
 fi
 
 
- $as_echo ; $as_echo "    *** checks for optional (not strictly required) libraries... ***"; $as_echo ;
+ { $as_echo ; $as_echo "    *** checks for optional (not strictly required) libraries... ***"; $as_echo ; }
 
 
 
@@ -18614,7 +18621,7 @@ _ACEOF
   LIBS="-lcairo $LIBS"
 
 else
-  echo "   └──── may affect: ⎕PLOT ";
+  $as_echo "   └──── may affect: ⎕PLOT ";
 fi
 
  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for fftw_plan_dft in -lfftw3" >&5
@@ -18661,9 +18668,10 @@ _ACEOF
   LIBS="-lfftw3 $LIBS"
 
 else
-  echo "   └──── will affect ⎕FFT ";
+  $as_echo "   └──── will affect ⎕FFT ";
 fi
 
+   apl_FFT=$ac_cv_lib_fftw3_fftw_plan_dft
  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for gtk_init in -lgtk-3" >&5
 $as_echo_n "checking for gtk_init in -lgtk-3... " >&6; }
 if ${ac_cv_lib_gtk_3_gtk_init+:} false; then :
@@ -18708,7 +18716,7 @@ _ACEOF
   LIBS="-lgtk-3 $LIBS"
 
 else
-  echo "   └──── will affect: ⎕PNG ";
+  $as_echo "   └──── will affect: ⎕PNG ";
 fi
 
  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for gdk_init in -lgdk-3" >&5
@@ -18755,7 +18763,7 @@ _ACEOF
   LIBS="-lgdk-3 $LIBS"
 
 else
-  echo "   └──── will affect: ⎕PLOT, ⎕PNG ";
+  $as_echo "   └──── may affect: ⎕PLOT, will affect: ⎕PNG ";
 fi
 
  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for png_init_io in -lpng" >&5
@@ -18802,9 +18810,10 @@ _ACEOF
   LIBS="-lpng $LIBS"
 
 else
-  echo "   └──── will affect: ⎕PLOT, ⎕PNG ";
+  $as_echo "   └──── may affect: ⎕PLOT, will affect: ⎕PNG ";
 fi
 
+   apl_PNG=$ac_cv_lib_png_png_init_io
  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for XGetXCBConnection in -lX11-xcb" >&5
 $as_echo_n "checking for XGetXCBConnection in -lX11-xcb... " >&6; }
 if ${ac_cv_lib_X11_xcb_XGetXCBConnection+:} false; then :
@@ -18849,7 +18858,7 @@ _ACEOF
   LIBS="-lX11-xcb $LIBS"
 
 else
-  echo "   └──── may affect: ⎕PLOT ";
+  $as_echo "   └──── may affect: ⎕PLOT ";
 fi
 
  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for XOpenDisplay in -lX11" >&5
@@ -18896,7 +18905,7 @@ _ACEOF
   LIBS="-lX11 $LIBS"
 
 else
-  echo "   └──── may affect: ⎕PLOT ";
+  $as_echo "   └──── may affect: ⎕PLOT ";
 fi
 
  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for xcb_connect in -lxcb" >&5
@@ -18943,7 +18952,7 @@ _ACEOF
   LIBS="-lxcb $LIBS"
 
 else
-  echo "   └──── may affect: ⎕PLOT ";
+  $as_echo "   └──── may affect: ⎕PLOT ";
 fi
 
  { $as_echo "$as_me:${as_lineno-$LINENO}: checking for uncompress in -lz" >&5
@@ -18990,11 +18999,12 @@ _ACEOF
   LIBS="-lz $LIBS"
 
 else
-  echo "   └──── will affect: ⎕PNG ";
+  $as_echo "   └──── will affect: ⎕PNG ";
 fi
 
 
 # check if SQLite3 is wanted and installed
+
 
 
 
@@ -19143,9 +19153,10 @@ $as_echo "#define HAVE_SQLITE3 1" >>confdefs.h
 
         fi
     fi
+                   # sets: found_sqlite, WANT_SQLITE3
+   apl_SQLITE3=$found_sqlite            # import into apl_ namespace
 
-
-if  test "x$WANT1_SQLITE3" = "xyes" ; then
+if  test "x$found_sqlite" = "xyes"  &&  test "x$WANT_SQLITE3" = "xyes" ; then
 
 cat >>confdefs.h <<_ACEOF
 #define REALLY_WANT_SQLITE3 1
@@ -19153,18 +19164,27 @@ _ACEOF
 
 fi
 
-# export found_sqlite to Makefile
- if  test "x$found_sqlite" = "xyes" ; then
-  SQLITE3_TRUE=
-  SQLITE3_FALSE='#'
+if  test "x$WANT_SQLITE3" = "xyes" ; then
+
+cat >>confdefs.h <<_ACEOF
+#define apl_SQLITE3 1
+_ACEOF
+
+    fi
+
+
+# export apl_SQLITE3 to Makefile.am
+ if  test "x$apl_SQLITE3" = "xyes" ; then
+  apl_SQLITE3_TRUE=
+  apl_SQLITE3_FALSE='#'
 else
-  SQLITE3_TRUE='#'
-  SQLITE3_FALSE=
+  apl_SQLITE3_TRUE='#'
+  apl_SQLITE3_FALSE=
 fi
 
 
 
-if  test "x$found_sqlite" != "xyes" ; then
+if  test "x$apl_SQLITE3" != "xyes" ; then
    $as_echo "   └──── may affect: ⎕SQL";
 fi
 
@@ -19216,6 +19236,7 @@ fi
 #   warranty.
 
 #serial 9
+
 
 
 
@@ -19360,14 +19381,21 @@ $as_echo "no" >&6; }
 
 
 
+                # sets: found_postgresql, want_postgresql
+   apl_POSTGRES=$found_postgresql       # import into apl_ namespace
 
-if  test "x$want1_postgresql" = "xyes" ; then
+if  test "x$found_postgresql" = "xyes"  &&  test "x$want_postgresql" = "xyes" ; then
 
 cat >>confdefs.h <<_ACEOF
 #define REALLY_WANT_PostgreSQL 1
 _ACEOF
 
 fi
+
+$as_echo "
+*** found_postgresql: $found_postgresql
+*** want_postgresql:  $want_postgresql
+"
 
 # check if PostgreSQL is usable (if present)
 if  test "x$found_postgresql" = "xyes"  ; then
@@ -19387,36 +19415,36 @@ PGconn *db = PQconnectdbParams( 0, 0, 1 );
 }
 _ACEOF
 if ac_fn_cxx_try_compile "$LINENO"; then :
-  USABLE_PostgreSQL=yes
+  apl_POSTGRES=yes
 else
-  USABLE_PostgreSQL=no
+  apl_POSTGRES=no
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
     CPPFLAGS="$saved_CPPFLAGS"
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $USABLE_PostgreSQL" >&5
-$as_echo "$USABLE_PostgreSQL" >&6; }
-    if  test "x$USABLE_PostgreSQL" = "xyes" ; then
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: $apl_POSTGRES" >&5
+$as_echo "$apl_POSTGRES" >&6; }
+    if  test "x$apl_POSTGRES" = "xyes" ; then
 
 cat >>confdefs.h <<_ACEOF
-#define USABLE_PostgreSQL 1
+#define apl_POSTGRES 1
 _ACEOF
 
     fi
 fi
 
-# export USABLE_PostgreSQL to Makefile
- if  test "x$USABLE_PostgreSQL" = "xyes" ; then
-  POSTGRES_TRUE=
-  POSTGRES_FALSE='#'
+# export apl_POSTGRES to Makefile
+ if  test "x$apl_POSTGRES" = "xyes" ; then
+  apl_POSTGRES_TRUE=
+  apl_POSTGRES_FALSE='#'
 else
-  POSTGRES_TRUE='#'
-  POSTGRES_FALSE=
+  apl_POSTGRES_TRUE='#'
+  apl_POSTGRES_FALSE=
 fi
 
 
 
-if  test "x$USABLE_PostgreSQL" != "xyes" ; then
+if  test "x$apl_POSTGRES" != "xyes" ; then
    $as_echo "   └──── may affect: ⎕SQL";
 fi
 
@@ -19596,18 +19624,21 @@ esac
 
 
 
+         # sets: ac_cv_lib_pcre2_32_pcre2_compile_32
+   apl_PCRE=$ac_cv_lib_pcre2_32_pcre2_compile_32
 
- if  test "x$ac_cv_lib_pcre2_32_pcre2_compile_32" = "xyes" ; then
-  HAVE_LIBPCRE2_32_TRUE=
-  HAVE_LIBPCRE2_32_FALSE='#'
+# export apl_PCRE to Makefile.am
+ if  test "x$apl_PCRE" = "xyes" ; then
+  apl_PCRE_TRUE=
+  apl_PCRE_FALSE='#'
 else
-  HAVE_LIBPCRE2_32_TRUE='#'
-  HAVE_LIBPCRE2_32_FALSE=
+  apl_PCRE_TRUE='#'
+  apl_PCRE_FALSE=
 fi
 
 
 
-if  test "x$ac_cv_lib_pcre2_32_pcre2_compile_32" != "xyes" ; then
+if  test "x$apl_PCRE" != "xyes" ; then
    $as_echo "   └──── may affect: ⎕RE";
 fi
 
@@ -19620,7 +19651,7 @@ if test "${with_gtk3+set}" = set; then :
 fi
 
 
-HAVE_gtk3=no
+apl_GTK3=no
 
 
 GTK_LDFLAGS=
@@ -19677,54 +19708,53 @@ $as_echo "no" >&6; }
 fi
 
   # locate pkg-config
-    if test x$PKG_CONFIG != xno
-    then
+    if  test "x$PKG_CONFIG" != "xno" ; then        # pkg-config present
         { $as_echo "$as_me:${as_lineno-$LINENO}: checking if package gtk+-3.0 is installed" >&5
 $as_echo_n "checking if package gtk+-3.0 is installed... " >&6; }
-        if $PKG_CONFIG --exists gtk+-3.0
+        if $PKG_CONFIG --exists gtk+-3.0         # package gtk+-3.0  exists
         then
             { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
             GTK_CFLAGS=`$PKG_CONFIG --cflags gtk+-3.0`
             GTK_LDFLAGS=`$PKG_CONFIG --libs gtk+-3.0`
-            HAVE_gtk3=yes
-        else
+            apl_GTK3=yes
+        else                                     # package gtk+-3.0 missing
             { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
 $as_echo "no" >&6; }
-            HAVE_gtk3=no
+            apl_GTK3=no
         fi
-    else
+    else                                      # pkg-config missing
         { $as_echo "$as_me:${as_lineno-$LINENO}: result: no (cannot use GTK without pkg-config)" >&5
 $as_echo "no (cannot use GTK without pkg-config)" >&6; }
-        HAVE_gtk3=no
+        apl_GTK3=no
     fi
 fi
 
-# export HAVE_GTK3 to Makefile
- if  test "x$HAVE_gtk3" = "xyes" ; then
-  HAVE_GTK3_TRUE=
-  HAVE_GTK3_FALSE='#'
+# export apl_GTK3 to Makefile
+ if  test "x$apl_GTK3" = "xyes" ; then
+  apl_GTK3_TRUE=
+  apl_GTK3_FALSE='#'
 else
-  HAVE_GTK3_TRUE='#'
-  HAVE_GTK3_FALSE=
+  apl_GTK3_TRUE='#'
+  apl_GTK3_FALSE=
 fi
 
 
-# export HAVE_GTK3 to config.h
-if  test "x$HAVE_gtk3" = "xyes" ; then
+# export apl_GTK3 to config.h
+if  test "x$apl_GTK3" = "xyes" ; then
 
 cat >>confdefs.h <<_ACEOF
-#define HAVE_GTK3 1
+#define apl_GTK3 1
 _ACEOF
 
 fi
 
 
-if  test "x$HAVE_gtk3" != "xyes" ; then
+if  test "x$apl_GTK3" != "xyes" ; then
    $as_echo "   └──── will affect: ⎕PLOT, ⎕PNG";
 fi
 
- $as_echo ; $as_echo "    *** check for functions that are missing on some platforms... ***"; $as_echo ;
+ { $as_echo ; $as_echo "    *** checks for functions that are missing on some platforms... ***"; $as_echo ; }
 
 ################################# rdtsc check ################################
 # check if rdtsc (read CPU cycle counter is available.
@@ -20000,7 +20030,28 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $HAVE_SOLARIS_ATOMIC" >&5
 $as_echo "$HAVE_SOLARIS_ATOMIC" >&6; }
 
- $as_echo ; $as_echo "    *** decisions made by the user (via ./configure arguments)... ***"; $as_echo ;
+
+# check if we are on i686 (to fix a strange rpmbuild problem)
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether we compile for an i686 CPU" >&5
+$as_echo_n "checking whether we compile for an i686 CPU... " >&6; }
+ if  test "x$(uname -m)" = "xi686" ; then
+  ON_i686_TRUE=
+  ON_i686_FALSE='#'
+else
+  ON_i686_TRUE='#'
+  ON_i686_FALSE=
+fi
+
+if  test "x$(uname -m)" = "xi686" ; then
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+$as_echo "yes" >&6; }
+else
+    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
+$as_echo "no" >&6; }
+fi
+
+
+ { $as_echo ; $as_echo "    *** choices made by the user (via ./configure arguments)... ***"; $as_echo ; }
 
 # the standard convention is that ^D means EOF aka. end-of-file. Some users
 # prefer ^D to delete one character and ^Z to mean EOF.
@@ -20485,25 +20536,6 @@ fi
 $as_echo "$RATIONAL_NUMBERS_WANTED" >&6; }
 
 
-# check if we are on i686 (to fix a strange rpmbuild problem)
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether we compile for an i686 CPU" >&5
-$as_echo_n "checking whether we compile for an i686 CPU... " >&6; }
- if  test "x$(uname -m)" = "xi686" ; then
-  ON_i686_TRUE=
-  ON_i686_FALSE='#'
-else
-  ON_i686_TRUE='#'
-  ON_i686_FALSE=
-fi
-
-if  test "x$(uname -m)" = "xi686" ; then
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-else
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
 # export some of the options to Makefile
  if  test "x$DEVELOP_WANTED" = "xyes" ; then
   DEVELOP_TRUE=
@@ -20514,7 +20546,7 @@ else
 fi
 
 
- $as_echo ; $as_echo "    *** ./configure checks done, producing the output files... ***"; $as_echo ;
+ { $as_echo ; $as_echo "    *** ./configure checks done, producing the output files... ***"; $as_echo ; }
 
 cat >confcache <<\_ACEOF
 # This file is a shell script that caches the results of configure
@@ -20661,20 +20693,20 @@ if test -z "${am__fastdepCXX_TRUE}" && test -z "${am__fastdepCXX_FALSE}"; then
   as_fn_error $? "conditional \"am__fastdepCXX\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
-if test -z "${SQLITE3_TRUE}" && test -z "${SQLITE3_FALSE}"; then
-  as_fn_error $? "conditional \"SQLITE3\" was never defined.
+if test -z "${apl_SQLITE3_TRUE}" && test -z "${apl_SQLITE3_FALSE}"; then
+  as_fn_error $? "conditional \"apl_SQLITE3\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
-if test -z "${POSTGRES_TRUE}" && test -z "${POSTGRES_FALSE}"; then
-  as_fn_error $? "conditional \"POSTGRES\" was never defined.
+if test -z "${apl_POSTGRES_TRUE}" && test -z "${apl_POSTGRES_FALSE}"; then
+  as_fn_error $? "conditional \"apl_POSTGRES\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
-if test -z "${HAVE_LIBPCRE2_32_TRUE}" && test -z "${HAVE_LIBPCRE2_32_FALSE}"; then
-  as_fn_error $? "conditional \"HAVE_LIBPCRE2_32\" was never defined.
+if test -z "${apl_PCRE_TRUE}" && test -z "${apl_PCRE_FALSE}"; then
+  as_fn_error $? "conditional \"apl_PCRE\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
-if test -z "${HAVE_GTK3_TRUE}" && test -z "${HAVE_GTK3_FALSE}"; then
-  as_fn_error $? "conditional \"HAVE_GTK3\" was never defined.
+if test -z "${apl_GTK3_TRUE}" && test -z "${apl_GTK3_FALSE}"; then
+  as_fn_error $? "conditional \"apl_GTK3\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_RDTSC_TRUE}" && test -z "${HAVE_RDTSC_FALSE}"; then
@@ -20687,6 +20719,10 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${HAVE_AFFINITY_NP_TRUE}" && test -z "${HAVE_AFFINITY_NP_FALSE}"; then
   as_fn_error $? "conditional \"HAVE_AFFINITY_NP\" was never defined.
+Usually this means the macro was only invoked conditionally." "$LINENO" 5
+fi
+if test -z "${ON_i686_TRUE}" && test -z "${ON_i686_FALSE}"; then
+  as_fn_error $? "conditional \"ON_i686\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${WANT_CTRLD_DEL_TRUE}" && test -z "${WANT_CTRLD_DEL_FALSE}"; then
@@ -20707,10 +20743,6 @@ Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${WANT_PYTHON_TRUE}" && test -z "${WANT_PYTHON_FALSE}"; then
   as_fn_error $? "conditional \"WANT_PYTHON\" was never defined.
-Usually this means the macro was only invoked conditionally." "$LINENO" 5
-fi
-if test -z "${ON_i686_TRUE}" && test -z "${ON_i686_FALSE}"; then
-  as_fn_error $? "conditional \"ON_i686\" was never defined.
 Usually this means the macro was only invoked conditionally." "$LINENO" 5
 fi
 if test -z "${DEVELOP_TRUE}" && test -z "${DEVELOP_FALSE}"; then
@@ -23174,11 +23206,11 @@ $as_echo "$as_me: WARNING: unrecognized options: $ac_unrecognized_opts" >&2;}
 fi
 
 
-echo
+$as_echo
 
 # create buildtag.hh and set apl_top to the directory that contains buildtag.sh
 #
-echo "configure: creating buildtag.hh..."
+$as_echo "configure: creating buildtag.hh..."
 abs_apl_top="not-found"   # assume not found
 apl_top=$(pwd)            # start search at current directory
 for q in 1 2 3 4; do      # at most 4 times...
@@ -23193,48 +23225,56 @@ for q in 1 2 3 4; do      # at most 4 times...
 done
 
 if  test "x$abs_apl_top" = "xnot-found" ; then
-   echo "configure: *** could not find top-level GNU APL directory, using '.'"
+   $as_echo "configure: *** could not find top-level GNU APL directory, using '.'"
    apl_top="."
 else
-   echo "configure: top-level apl directory is: $abs_apl_top"
+   $as_echo "configure: top-level apl directory is: $abs_apl_top"
 fi
 
 # remove old makefile.h
 #
 if test -f "$apl_top/makefile.h"
 then
-   echo "
+   $as_echo "
 configure: removing old $apl_top/makefile.h (if any).
            NOTE: ./Makefile will create a fresh makefile.h automatically.
            However, running 'make' in directory $apl_top/src
-           BEFORE running 'make' in $apl_top may
-           yield a compile error (which can fixed by running 'make' in
-           directory $apl_top first)."
+           BEFORE running 'make' in $apl_top may yield a
+           compile error (which can be fixed easily by running 'make'
+           in directory $apl_top first)."
    rm -f "$apl_top/makefile.h"
 fi
 
 # print a summary or maybe complain
 #
-  echo " "
+$as_echo " "
 if  test "x$want1_postgresql" = "xyes" ; then
-   if  test "x$USABLE_PostgreSQL" = "xyes" ; then
-      echo "      PostgreSQL looks good."
+   if  test "x$apl_POSTGRES" = "xyes" ; then
+      $as_echo "      PostgreSQL looks good."
    else
-      echo "NOTE: PostgreSQL support was requested, but the handler function"
-      echo "      for accessing PostgreSQL cannot be built. Your PostgreSQL"
-      echo "      installation is missing or incomplete. See details above."
-      echo " "
+      $as_echo "NOTE: PostgreSQL support was requested, but the handler function"
+      $as_echo "      for accessing PostgreSQL cannot be built. Your PostgreSQL"
+      $as_echo "      installation is missing or incomplete. See details above."
+      $as_echo " "
    fi
 fi
 
 if  test "x$WANT1_SQLITE3" = "xyes" ; then
-   if  test "x$found_sqlite" = "xyes" ; then
-      echo "      SQLite looks good."
-   else
-      echo "NOTE: SQLite support was requested, but the handler function for "
-      echo "      accessing SQLite cannot not be built. Your SQLite"
-      echo "      installation is missing or incomplete. See details above."
-      echo " "
+   if  test "x$apl_SQLITE3" != "xyes" ; then
+      $as_echo "NOTE: SQLite support was requested, but the handler function for "
+      $as_echo "      accessing SQLite cannot not be built. Your SQLite"
+      $as_echo "      installation is missing or incomplete. See details above."
+      $as_echo " "
    fi
 fi
 
+$as_echo "
+configure:    ---- SUMMARY ----
+    maintainer mode: $apl_MAINTAINER_MODE
+    FFT:             $apl_FFT        for: ⎕FFT
+    GTK3:            $apl_GTK3        for: ⎕PLOT, ⎕PNG, ⎕GTK
+    SQLITE3:         $apl_SQLITE3        for: ⎕SQL
+    POSTGRES:        $apl_POSTGRES        for: ⎕SQL
+    PCRE:            $apl_PCRE        for: ⎕RE
+    PNG:             $apl_PNG        for: ⎕PNG
+"

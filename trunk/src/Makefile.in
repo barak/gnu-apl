@@ -96,27 +96,30 @@ build_triplet = @build@
 host_triplet = @host@
 @WANT_ANDROID_FALSE@am__append_1 = APs emacs_mode sql workspaces
 
-# depending on HAVE_GTK3 we want either Plot_gtk.cc or Plot_xcb.cc compiled,
+# depending on apl_GTK3 we want either Plot_gtk.cc or Plot_xcb.cc compiled,
 # but keep both source files in the tar file (hence EXTRA_apl_SOURCES).
 #
-@HAVE_GTK3_TRUE@am__append_2 = Gtk
-@HAVE_LIBPCRE2_32_TRUE@am__append_3 = Regexp.cc					Regexp.hh
-@SQLITE3_TRUE@am__append_4 = $(SQLITE3_CFLAGS)
-@SQLITE3_TRUE@am__append_5 = $(SQLITE3_LDFLAGS)
-@SQLITE3_TRUE@am__append_6 = sql/SqliteArgListBuilder.cc \
-@SQLITE3_TRUE@	sql/SqliteArgListBuilder.hh \
-@SQLITE3_TRUE@	sql/SqliteConnection.cc sql/SqliteConnection.hh \
-@SQLITE3_TRUE@	sql/SqliteResultValue.cc \
-@SQLITE3_TRUE@	sql/SqliteResultValue.hh sql/SqliteProvider.cc \
-@SQLITE3_TRUE@	sql/SqliteProvider.hh sql/Connection.cc
-@POSTGRES_TRUE@@SQLITE3_FALSE@am__append_7 = sql/Connection.cc
-@POSTGRES_TRUE@am__append_8 = $(POSTGRESQL_CFLAGS)
-@POSTGRES_TRUE@am__append_9 = $(POSTGRESQL_LDFLAGS)
-@POSTGRES_TRUE@am__append_10 = sql/PostgresArgListBuilder.cc \
-@POSTGRES_TRUE@	sql/PostgresArgListBuilder.hh \
-@POSTGRES_TRUE@	sql/PostgresConnection.cc \
-@POSTGRES_TRUE@	sql/PostgresConnection.hh \
-@POSTGRES_TRUE@	sql/PostgresProvider.cc sql/PostgresProvider.hh
+@apl_GTK3_TRUE@am__append_2 = Gtk
+@apl_PCRE_TRUE@am__append_3 = Regexp.cc					Regexp.hh
+@apl_SQLITE3_TRUE@am__append_4 = $(SQLITE3_CFLAGS)
+@apl_SQLITE3_TRUE@am__append_5 = $(SQLITE3_LDFLAGS)
+@apl_SQLITE3_TRUE@am__append_6 = sql/SqliteArgListBuilder.cc \
+@apl_SQLITE3_TRUE@	sql/SqliteArgListBuilder.hh \
+@apl_SQLITE3_TRUE@	sql/SqliteConnection.cc \
+@apl_SQLITE3_TRUE@	sql/SqliteConnection.hh \
+@apl_SQLITE3_TRUE@	sql/SqliteResultValue.cc \
+@apl_SQLITE3_TRUE@	sql/SqliteResultValue.hh \
+@apl_SQLITE3_TRUE@	sql/SqliteProvider.cc sql/SqliteProvider.hh \
+@apl_SQLITE3_TRUE@	sql/Connection.cc
+@apl_POSTGRES_TRUE@@apl_SQLITE3_FALSE@am__append_7 = sql/Connection.cc
+@apl_POSTGRES_TRUE@am__append_8 = $(POSTGRESQL_CFLAGS)
+@apl_POSTGRES_TRUE@am__append_9 = $(POSTGRESQL_LDFLAGS)
+@apl_POSTGRES_TRUE@am__append_10 = sql/PostgresArgListBuilder.cc \
+@apl_POSTGRES_TRUE@	sql/PostgresArgListBuilder.hh \
+@apl_POSTGRES_TRUE@	sql/PostgresConnection.cc \
+@apl_POSTGRES_TRUE@	sql/PostgresConnection.hh \
+@apl_POSTGRES_TRUE@	sql/PostgresProvider.cc \
+@apl_POSTGRES_TRUE@	sql/PostgresProvider.hh
 @WANT_LIBAPL_TRUE@am__append_11 = libapl.la
 @WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@am__append_12 = lib_gnu_apl.la
 @WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@bin_PROGRAMS = apl$(EXEEXT)
@@ -241,21 +244,20 @@ am__lib_gnu_apl_la_SOURCES_DIST = Plot_xcb.cc Plot_gtk.cc \
 	sql/PostgresArgListBuilder.cc sql/PostgresArgListBuilder.hh \
 	sql/PostgresConnection.cc sql/PostgresConnection.hh \
 	sql/PostgresProvider.cc sql/PostgresProvider.hh python_apl.cc
-@HAVE_GTK3_FALSE@am__objects_1 = lib_gnu_apl_la-Plot_xcb.lo
-@HAVE_GTK3_TRUE@am__objects_1 = lib_gnu_apl_la-Plot_gtk.lo
-@HAVE_LIBPCRE2_32_TRUE@am__objects_2 = lib_gnu_apl_la-Regexp.lo
+@apl_GTK3_FALSE@am__objects_1 = lib_gnu_apl_la-Plot_xcb.lo
+@apl_GTK3_TRUE@am__objects_1 = lib_gnu_apl_la-Plot_gtk.lo
+@apl_PCRE_TRUE@am__objects_2 = lib_gnu_apl_la-Regexp.lo
 am__dirstamp = $(am__leading_dot)dirstamp
-@SQLITE3_TRUE@am__objects_3 =  \
-@SQLITE3_TRUE@	sql/lib_gnu_apl_la-SqliteArgListBuilder.lo \
-@SQLITE3_TRUE@	sql/lib_gnu_apl_la-SqliteConnection.lo \
-@SQLITE3_TRUE@	sql/lib_gnu_apl_la-SqliteResultValue.lo \
-@SQLITE3_TRUE@	sql/lib_gnu_apl_la-SqliteProvider.lo \
-@SQLITE3_TRUE@	sql/lib_gnu_apl_la-Connection.lo
-@POSTGRES_TRUE@@SQLITE3_FALSE@am__objects_4 = sql/lib_gnu_apl_la-Connection.lo
-@POSTGRES_TRUE@am__objects_5 =  \
-@POSTGRES_TRUE@	sql/lib_gnu_apl_la-PostgresArgListBuilder.lo \
-@POSTGRES_TRUE@	sql/lib_gnu_apl_la-PostgresConnection.lo \
-@POSTGRES_TRUE@	sql/lib_gnu_apl_la-PostgresProvider.lo
+@apl_SQLITE3_TRUE@am__objects_3 =  \
+@apl_SQLITE3_TRUE@	sql/lib_gnu_apl_la-SqliteArgListBuilder.lo \
+@apl_SQLITE3_TRUE@	sql/lib_gnu_apl_la-SqliteConnection.lo \
+@apl_SQLITE3_TRUE@	sql/lib_gnu_apl_la-SqliteResultValue.lo \
+@apl_SQLITE3_TRUE@	sql/lib_gnu_apl_la-SqliteProvider.lo \
+@apl_SQLITE3_TRUE@	sql/lib_gnu_apl_la-Connection.lo
+@apl_POSTGRES_TRUE@@apl_SQLITE3_FALSE@am__objects_4 = sql/lib_gnu_apl_la-Connection.lo
+@apl_POSTGRES_TRUE@am__objects_5 = sql/lib_gnu_apl_la-PostgresArgListBuilder.lo \
+@apl_POSTGRES_TRUE@	sql/lib_gnu_apl_la-PostgresConnection.lo \
+@apl_POSTGRES_TRUE@	sql/lib_gnu_apl_la-PostgresProvider.lo
 am__objects_6 = $(am__objects_1) lib_gnu_apl_la-Archive.lo \
 	lib_gnu_apl_la-Assert.lo lib_gnu_apl_la-Avec.lo \
 	lib_gnu_apl_la-Backtrace.lo lib_gnu_apl_la-Bif_F12_COMMA.lo \
@@ -412,20 +414,20 @@ am__libapl_la_SOURCES_DIST = Plot_xcb.cc Plot_gtk.cc ../buildtag.hh \
 	sql/PostgresConnection.cc sql/PostgresConnection.hh \
 	sql/PostgresProvider.cc sql/PostgresProvider.hh libapl.h \
 	libapl.cc
-@HAVE_GTK3_FALSE@am__objects_7 = libapl_la-Plot_xcb.lo
-@HAVE_GTK3_TRUE@am__objects_7 = libapl_la-Plot_gtk.lo
-@HAVE_LIBPCRE2_32_TRUE@am__objects_8 = libapl_la-Regexp.lo
-@SQLITE3_TRUE@am__objects_9 = sql/libapl_la-SqliteArgListBuilder.lo \
-@SQLITE3_TRUE@	sql/libapl_la-SqliteConnection.lo \
-@SQLITE3_TRUE@	sql/libapl_la-SqliteResultValue.lo \
-@SQLITE3_TRUE@	sql/libapl_la-SqliteProvider.lo \
-@SQLITE3_TRUE@	sql/libapl_la-Connection.lo
-@POSTGRES_TRUE@@SQLITE3_FALSE@am__objects_10 =  \
-@POSTGRES_TRUE@@SQLITE3_FALSE@	sql/libapl_la-Connection.lo
-@POSTGRES_TRUE@am__objects_11 =  \
-@POSTGRES_TRUE@	sql/libapl_la-PostgresArgListBuilder.lo \
-@POSTGRES_TRUE@	sql/libapl_la-PostgresConnection.lo \
-@POSTGRES_TRUE@	sql/libapl_la-PostgresProvider.lo
+@apl_GTK3_FALSE@am__objects_7 = libapl_la-Plot_xcb.lo
+@apl_GTK3_TRUE@am__objects_7 = libapl_la-Plot_gtk.lo
+@apl_PCRE_TRUE@am__objects_8 = libapl_la-Regexp.lo
+@apl_SQLITE3_TRUE@am__objects_9 =  \
+@apl_SQLITE3_TRUE@	sql/libapl_la-SqliteArgListBuilder.lo \
+@apl_SQLITE3_TRUE@	sql/libapl_la-SqliteConnection.lo \
+@apl_SQLITE3_TRUE@	sql/libapl_la-SqliteResultValue.lo \
+@apl_SQLITE3_TRUE@	sql/libapl_la-SqliteProvider.lo \
+@apl_SQLITE3_TRUE@	sql/libapl_la-Connection.lo
+@apl_POSTGRES_TRUE@@apl_SQLITE3_FALSE@am__objects_10 = sql/libapl_la-Connection.lo
+@apl_POSTGRES_TRUE@am__objects_11 =  \
+@apl_POSTGRES_TRUE@	sql/libapl_la-PostgresArgListBuilder.lo \
+@apl_POSTGRES_TRUE@	sql/libapl_la-PostgresConnection.lo \
+@apl_POSTGRES_TRUE@	sql/libapl_la-PostgresProvider.lo
 am__objects_12 = $(am__objects_7) libapl_la-Archive.lo \
 	libapl_la-Assert.lo libapl_la-Avec.lo libapl_la-Backtrace.lo \
 	libapl_la-Bif_F12_COMMA.lo libapl_la-Bif_F12_DOMINO.lo \
@@ -561,20 +563,20 @@ am__apl_SOURCES_DIST = main.cc Plot_xcb.cc Plot_gtk.cc ../buildtag.hh \
 	sql/PostgresArgListBuilder.cc sql/PostgresArgListBuilder.hh \
 	sql/PostgresConnection.cc sql/PostgresConnection.hh \
 	sql/PostgresProvider.cc sql/PostgresProvider.hh
-@HAVE_GTK3_FALSE@am__objects_13 = apl-Plot_xcb.$(OBJEXT)
-@HAVE_GTK3_TRUE@am__objects_13 = apl-Plot_gtk.$(OBJEXT)
-@HAVE_LIBPCRE2_32_TRUE@am__objects_14 = apl-Regexp.$(OBJEXT)
-@SQLITE3_TRUE@am__objects_15 = sql/apl-SqliteArgListBuilder.$(OBJEXT) \
-@SQLITE3_TRUE@	sql/apl-SqliteConnection.$(OBJEXT) \
-@SQLITE3_TRUE@	sql/apl-SqliteResultValue.$(OBJEXT) \
-@SQLITE3_TRUE@	sql/apl-SqliteProvider.$(OBJEXT) \
-@SQLITE3_TRUE@	sql/apl-Connection.$(OBJEXT)
-@POSTGRES_TRUE@@SQLITE3_FALSE@am__objects_16 =  \
-@POSTGRES_TRUE@@SQLITE3_FALSE@	sql/apl-Connection.$(OBJEXT)
-@POSTGRES_TRUE@am__objects_17 =  \
-@POSTGRES_TRUE@	sql/apl-PostgresArgListBuilder.$(OBJEXT) \
-@POSTGRES_TRUE@	sql/apl-PostgresConnection.$(OBJEXT) \
-@POSTGRES_TRUE@	sql/apl-PostgresProvider.$(OBJEXT)
+@apl_GTK3_FALSE@am__objects_13 = apl-Plot_xcb.$(OBJEXT)
+@apl_GTK3_TRUE@am__objects_13 = apl-Plot_gtk.$(OBJEXT)
+@apl_PCRE_TRUE@am__objects_14 = apl-Regexp.$(OBJEXT)
+@apl_SQLITE3_TRUE@am__objects_15 =  \
+@apl_SQLITE3_TRUE@	sql/apl-SqliteArgListBuilder.$(OBJEXT) \
+@apl_SQLITE3_TRUE@	sql/apl-SqliteConnection.$(OBJEXT) \
+@apl_SQLITE3_TRUE@	sql/apl-SqliteResultValue.$(OBJEXT) \
+@apl_SQLITE3_TRUE@	sql/apl-SqliteProvider.$(OBJEXT) \
+@apl_SQLITE3_TRUE@	sql/apl-Connection.$(OBJEXT)
+@apl_POSTGRES_TRUE@@apl_SQLITE3_FALSE@am__objects_16 = sql/apl-Connection.$(OBJEXT)
+@apl_POSTGRES_TRUE@am__objects_17 =  \
+@apl_POSTGRES_TRUE@	sql/apl-PostgresArgListBuilder.$(OBJEXT) \
+@apl_POSTGRES_TRUE@	sql/apl-PostgresConnection.$(OBJEXT) \
+@apl_POSTGRES_TRUE@	sql/apl-PostgresProvider.$(OBJEXT)
 am__objects_18 = $(am__objects_13) apl-Archive.$(OBJEXT) \
 	apl-Assert.$(OBJEXT) apl-Avec.$(OBJEXT) \
 	apl-Backtrace.$(OBJEXT) apl-Bif_F12_COMMA.$(OBJEXT) \
@@ -925,11 +927,11 @@ top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 EXTRA_DIRS = $(am__append_1)
 SUBDIRS = native $(EXTRA_DIRS) $(am__append_2)
-@HAVE_GTK3_FALSE@plot_SOURCES = Plot_xcb.cc
-@HAVE_GTK3_TRUE@plot_SOURCES = Plot_gtk.cc
-@HAVE_GTK3_TRUE@plot_CXXFLAGS = -Wno-parentheses
-@HAVE_GTK3_FALSE@EXTRA_apl_SOURCES = Plot_gtk.cc
-@HAVE_GTK3_TRUE@EXTRA_apl_SOURCES = Plot_xcb.cc
+@apl_GTK3_FALSE@plot_SOURCES = Plot_xcb.cc
+@apl_GTK3_TRUE@plot_SOURCES = Plot_gtk.cc
+@apl_GTK3_TRUE@plot_CXXFLAGS = -Wno-parentheses
+@apl_GTK3_FALSE@EXTRA_apl_SOURCES = Plot_gtk.cc
+@apl_GTK3_TRUE@EXTRA_apl_SOURCES = Plot_xcb.cc
 dist_noinst_DATA = valgrind.supp
 DIST_SUBDIRS = $(SUBDIRS) testcases
 

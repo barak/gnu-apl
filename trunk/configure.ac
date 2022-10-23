@@ -1,29 +1,85 @@
 #                                               -*- Autoconf -*-
 # vim: et:ts=4:sw=4
 #
-# Process this file (i.e. 'configure.ac') with autoconf (or, even better:
-# with autoreconf) as to produce the script 'configure'. The script 'configure'
-# will then be processed with /bin/sh (which is /bin/dash # on GNU/Linux).
-#
-# The AM_CONDITIONAL() macro exports the value of a variable int
-# Makefile.am, Makefile.in, and finally Makefile.
-#
-# The AC_DEFINE_UNQUOTED() macro exports the value of a variable into
-# config.h (and from there into the C/C++ files that #include config.h).
-#
-# autoconf quotes with [ ] rather than ` '.
+m4_ignore([
+
+  For newcomers to autoconf (and those who keep forgetting the following).
+
+  Process this file (i.e. 'configure.ac') with command autoconf (or, even
+  better: with command autoreconf) as to produce the script 'configure'.
+  The script 'configure' will then be processed with /bin/sh (which is a
+  symlink to /bin/dash on GNU/Linux).
+
+  A GNU APL designer typically does this:
+
+  autoreconf
+  ./configure
+  make
+
+  This requires that the autoconf and automake packages are installed. The
+  command autoconf and autoreconf come with the autoconf package, but
+  installing autoconf without automake makes little sense.
+
+  A GNU APL user, however, needs neither autoconf nor automake, but simply does:
+
+./configure
+make
+sudo make install
+
+  The AM_CONDITIONAL(VAR, VALUE) macro exports the VALUE of variable VAR
+  into all Makefile.am where it can be used like so:
+
+if VAR
+...
+else
+...
+endif
+
+  in any Makefile.am. It does NOT export VAR into any Makefile.in or Makefile.
+  Instead it generates variables @VAR_TRUE@ and @VAR_FALSE@ in all
+  Makefile.in, where one of them is empty and the other is # (making it
+  a Makefile comment).
+
+  The AC_SUBST(VAR) macro exports variable VAR into Makefile.am, Makefile.in,
+  and finally into Makefile as a Makefile variable for various purposes.
+
+  The AC_DEFINE_UNQUOTED() macro exports variable VAR into config.h, either
+  as an uncommented #define (if VAR was defined beforehand in ./configure),
+  or else as a commented #undef (if VAR was not defined). For example:
+
+#define VAR value   # VAR has value in ./configure
+/* #undef VAR */    # VAR has no value in ./configure
+
+  Many files in directory src #include ../config.h (either directly or
+  indirectly), which propagates the value of VAR into those source files.
+  Like above,
+
+  The following commands are useful to locate some or all of the macros above:
+
+autoconf -t AM_CONDITIONAL
+autoconf -t AC_SUBST
+autoconf -t AC_DEFINE_UNQUOTED
+autoconf -t AM_CONDITIONAL -t AC_SUBST -t AC_DEFINE_UNQUOTED
+
+  A final NOTE: autoconf quotes with [ ] rather than ` '.
+          ])
+
+configure_options="$0 $*"
 
 # TEST_EQ and TEST_NEQ are safe string comparisons that, unlike the vanilla
 # 'test A = B' and test A != B, also works for empty strings A and/or B.
 AC_DEFUN([TEST_EQ],  [ test "x$1" = "x$2" ])
 AC_DEFUN([TEST_NEQ], [ test "x$1" != "x$2" ])
-AC_DEFUN([TOPIC],    [ AS_ECHO(); AS_ECHO(["    *** $1... ***"]); AS_ECHO(); ])
+AC_DEFUN([TOPIC],
+         [ { AS_ECHO(); AS_ECHO(["    *** $1... ***"]); AS_ECHO(); } ])
 
 AC_PREREQ([2.65])
 AC_INIT([GNU APL], [1.8], [bug-apl@gnu.org])
-configure_options="$0 $*"
 AC_PREFIX_DEFAULT( /usr/local )
 AC_CONFIG_AUX_DIR([.])
+
+TOPIC([core tests])
+
 AC_USE_SYSTEM_EXTENSIONS
 
 # always enable dependency tracking regardless of the user's choice.
@@ -46,6 +102,8 @@ AC_LANG(C++)
 #
 LT_INIT([dlopen])
 
+apl_MAINTAINER_MODE = $USE_MAINTAINER_MODE
+
 TOPIC([basic checks])
 
 # Checks for programs.
@@ -67,7 +125,7 @@ CXXFLAGS="$CXXFLAGS -I $(pwd)"
 # Checks for various header files.
 #
 
-TOPIC([presence and usablility of header files])
+TOPIC([checks for the presence and usablility of header files])
 
 # check for ncurses.h first and for curses.h only if ncurses.h was not found.
 
@@ -117,11 +175,12 @@ AC_CHECK_HEADERS([  \
 # xcb/xproto.h needs xcb/xcb.h
 AC_CHECK_HEADER(xcb/xproto.h, [], [], [#include <xcb/xcb.h>])
 
+AC_HEADER_STDBOOL
+
 # Checks for typedefs, structures, and compiler characteristics.
 #
-TOPIC([standard types])
+TOPIC([checks for standard C/C++ types])
 
-AC_HEADER_STDBOOL
 AC_C_INLINE
 AC_TYPE_INT32_T
 AC_TYPE_INT64_T
@@ -131,6 +190,8 @@ AC_TYPE_UINT32_T
 AC_TYPE_UINT64_T
 AC_TYPE_UINT8_T
 
+# export the ./configure args into config.h
+#
 AC_DEFINE_UNQUOTED([CONFIGURE_ARGS],
                    "$0 $ac_configure_args",
                    [how ./configure was called])
@@ -169,36 +230,38 @@ AC_CHECK_LIB([atomicity], [__atomic_fetch_add_4])
 
 TOPIC([checks for optional (not strictly required) libraries])
 
-AC_DEFUN([OPT_LIB], [ AC_CHECK_LIB($1, $2, , [echo "   └──── $3 "; ])])
+AC_DEFUN([OPT_LIB], [ AC_CHECK_LIB($1, $2, , [AS_ECHO(["   └──── $3 "]); ])])
 
 #       library,   function-in library, impact-if-missing
 OPT_LIB([cairo],   [cairo_fill],        [may affect: ⎕PLOT])
 OPT_LIB([fftw3],   [fftw_plan_dft],     [will affect ⎕FFT])
+   apl_FFT=$ac_cv_lib_fftw3_fftw_plan_dft
 OPT_LIB([gtk-3],   [gtk_init],          [will affect: ⎕PNG])
-OPT_LIB([gdk-3],   [gdk_init],          [will affect: ⎕PLOT, ⎕PNG])
-OPT_LIB([png],     [png_init_io],       [will affect: ⎕PLOT, ⎕PNG])
+OPT_LIB([gdk-3],   [gdk_init],          [may affect: ⎕PLOT, will affect: ⎕PNG])
+OPT_LIB([png],     [png_init_io],       [may affect: ⎕PLOT, will affect: ⎕PNG])
+   apl_PNG=$ac_cv_lib_png_png_init_io
 OPT_LIB([X11-xcb], [XGetXCBConnection], [may affect: ⎕PLOT])
 OPT_LIB([X11],     [XOpenDisplay],      [may affect: ⎕PLOT])
 OPT_LIB([xcb],     [xcb_connect],       [may affect: ⎕PLOT])
 OPT_LIB([z],       [uncompress],        [will affect: ⎕PNG])
 m4_include([m4/check_SQLITE.m4])
-if TEST_NEQ($found_sqlite, yes); then
+if TEST_NEQ($apl_SQLITE3, yes); then
    AS_ECHO(["   └──── may affect: ⎕SQL"]);
 fi
 m4_include([m4/check_POSTGRES.m4])
-if TEST_NEQ($USABLE_PostgreSQL, yes); then
+if TEST_NEQ($apl_POSTGRES, yes); then
    AS_ECHO(["   └──── may affect: ⎕SQL"]);
 fi
 m4_include([m4/check_PCRE.m4])
-if TEST_NEQ($ac_cv_lib_pcre2_32_pcre2_compile_32, yes); then
+if TEST_NEQ($apl_PCRE, yes); then
    AS_ECHO(["   └──── may affect: ⎕RE"]);
 fi
 m4_include([m4/check_GTK.m4])
-if TEST_NEQ($HAVE_gtk3, yes); then
+if TEST_NEQ($apl_GTK3, yes); then
    AS_ECHO(["   └──── will affect: ⎕PLOT, ⎕PNG"]);
 fi
 
-TOPIC([check for functions that are missing on some platforms])
+TOPIC([checks for functions that are missing on some platforms])
 
 ################################# rdtsc check ################################
 # check if rdtsc (read CPU cycle counter is available.
@@ -327,7 +390,18 @@ AC_COMPILE_IFELSE(
     [HAVE_SOLARIS_ATOMIC=no])
 AC_MSG_RESULT([$HAVE_SOLARIS_ATOMIC])
 
-TOPIC([decisions made by the user (via ./configure arguments)])
+
+# check if we are on i686 (to fix a strange rpmbuild problem)
+AC_MSG_CHECKING([whether we compile for an i686 CPU])
+AM_CONDITIONAL([ON_i686], [TEST_EQ($(uname -m), i686)])
+if TEST_EQ($(uname -m), i686); then
+    AC_MSG_RESULT([yes])
+else
+    AC_MSG_RESULT([no])
+fi
+
+
+TOPIC([choices made by the user (via ./configure arguments)])
 
 # the standard convention is that ^D means EOF aka. end-of-file. Some users
 # prefer ^D to delete one character and ^Z to mean EOF.
@@ -683,15 +757,6 @@ fi
 AC_MSG_RESULT([$RATIONAL_NUMBERS_WANTED])
 
 
-# check if we are on i686 (to fix a strange rpmbuild problem)
-AC_MSG_CHECKING([whether we compile for an i686 CPU])
-AM_CONDITIONAL([ON_i686], [TEST_EQ($(uname -m), i686)])
-if TEST_EQ($(uname -m), i686); then
-    AC_MSG_RESULT([yes])
-else
-    AC_MSG_RESULT([no])
-fi
-
 # export some of the options to Makefile
 AM_CONDITIONAL([DEVELOP],  [TEST_EQ($DEVELOP_WANTED,    yes)])
 
@@ -699,11 +764,11 @@ TOPIC([./configure checks done, producing the output files])
 
 AC_OUTPUT
 
-echo
+AS_ECHO()
 
 # create buildtag.hh and set apl_top to the directory that contains buildtag.sh
 #
-echo "configure: creating buildtag.hh..."
+AS_ECHO(["configure: creating buildtag.hh..."])
 abs_apl_top="not-found"   # assume not found
 apl_top=$(pwd)            # start search at current directory
 for q in 1 2 3 4; do      # at most 4 times...
@@ -718,48 +783,56 @@ for q in 1 2 3 4; do      # at most 4 times...
 done
 
 if TEST_EQ($abs_apl_top, not-found); then
-   echo "configure: *** could not find top-level GNU APL directory, using '.'"
+   AS_ECHO(["configure: *** could not find top-level GNU APL directory, using '.'"])
    apl_top="."
 else
-   echo "configure: top-level apl directory is: $abs_apl_top"
+   AS_ECHO(["configure: top-level apl directory is: $abs_apl_top"])
 fi
 
 # remove old makefile.h
 #
 if test -f "$apl_top/makefile.h"
 then
-   echo "
+   AS_ECHO(["
 configure: removing old $apl_top/makefile.h (if any).
            NOTE: ./Makefile will create a fresh makefile.h automatically.
            However, running 'make' in directory $apl_top/src
-           BEFORE running 'make' in $apl_top may
-           yield a compile error (which can fixed by running 'make' in
-           directory $apl_top first)."
+           BEFORE running 'make' in $apl_top may yield a
+           compile error (which can be fixed easily by running 'make'
+           in directory $apl_top first)."])
    rm -f "$apl_top/makefile.h"
 fi
 
 # print a summary or maybe complain
 #
-  echo " "
+AS_ECHO([" "])
 if TEST_EQ($want1_postgresql, yes); then
-   if TEST_EQ($USABLE_PostgreSQL, yes); then
-      echo "      PostgreSQL looks good."
+   if TEST_EQ($apl_POSTGRES, yes); then
+      AS_ECHO(["      PostgreSQL looks good."])
    else
-      echo "NOTE: PostgreSQL support was requested, but the handler function"
-      echo "      for accessing PostgreSQL cannot be built. Your PostgreSQL"
-      echo "      installation is missing or incomplete. See details above."
-      echo " "
+      AS_ECHO(["NOTE: PostgreSQL support was requested, but the handler function"])
+      AS_ECHO(["      for accessing PostgreSQL cannot be built. Your PostgreSQL"])
+      AS_ECHO(["      installation is missing or incomplete. See details above."])
+      AS_ECHO([" "])
    fi
 fi
 
 if TEST_EQ($WANT1_SQLITE3, yes); then
-   if TEST_EQ($found_sqlite, yes); then
-      echo "      SQLite looks good."
-   else
-      echo "NOTE: SQLite support was requested, but the handler function for "
-      echo "      accessing SQLite cannot not be built. Your SQLite"
-      echo "      installation is missing or incomplete. See details above."
-      echo " "
+   if TEST_NEQ($apl_SQLITE3, yes); then
+      AS_ECHO(["NOTE: SQLite support was requested, but the handler function for "])
+      AS_ECHO(["      accessing SQLite cannot not be built. Your SQLite"])
+      AS_ECHO(["      installation is missing or incomplete. See details above."])
+      AS_ECHO([" "])
    fi
 fi
 
+AS_ECHO(["
+configure:    ---- SUMMARY ----
+    maintainer mode: $apl_MAINTAINER_MODE
+    FFT:             $apl_FFT        for: ⎕FFT
+    GTK3:            $apl_GTK3        for: ⎕PLOT, ⎕PNG, ⎕GTK
+    SQLITE3:         $apl_SQLITE3        for: ⎕SQL
+    POSTGRES:        $apl_POSTGRES        for: ⎕SQL
+    PCRE:            $apl_PCRE        for: ⎕RE
+    PNG:             $apl_PNG        for: ⎕PNG
+"])

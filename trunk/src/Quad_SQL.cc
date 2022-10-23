@@ -41,13 +41,13 @@ static std::vector<Connection *> connections;
 Quad_SQL  Quad_SQL::_fun;
 Quad_SQL * Quad_SQL::fun = &Quad_SQL::_fun;
 
-#ifdef HAVE_SQLITE3
+#ifdef apl_SQLITE3
 # include "sql/SqliteResultValue.hh"
 # include "sql/SqliteConnection.hh"
 # include "sql/SqliteProvider.hh"
 #endif
 
-#ifdef USABLE_PostgreSQL
+#ifdef apl_POSTGRES
 # include "sql/PostgresConnection.hh"
 # include "sql/PostgresProvider.hh"
 #endif
@@ -56,7 +56,7 @@ Quad_SQL * Quad_SQL::fun = &Quad_SQL::_fun;
 inline void
 init_provider_map()
 {
-#ifdef HAVE_SQLITE3
+#ifdef apl_SQLITE3
    Provider *sqliteProvider = new SqliteProvider();
    Assert(sqliteProvider);
    providers.push_back(sqliteProvider);
@@ -64,13 +64,13 @@ init_provider_map()
 # warning "SQLite3 unavailable since ./configure could not detect it"
 #endif
 
-#ifdef USABLE_PostgreSQL
+#ifdef apl_POSTGRES
    Provider *postgresProvider = new PostgresProvider();
    Assert(postgresProvider);
    providers.push_back(postgresProvider);
 #elif REALLY_WANT_PostgreSQL
 #  warning "PostgreSQL unavailable since ./configure could not detect it."
-# if HAVE_POSTGRESQL
+# if apl_POSTGRES
 #  warning "The PostgreSQL library seems to be installed, but the header file(s) are missing"
 # endif
 #endif

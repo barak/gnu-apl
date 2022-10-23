@@ -89,18 +89,18 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@SQLITE3_TRUE@am__append_1 = $(SQLITE3_CFLAGS)
-@SQLITE3_TRUE@am__append_2 = $(SQLITE3_LDFLAGS)
-@SQLITE3_TRUE@am__append_3 = SqliteArgListBuilder.cc	SqliteArgListBuilder.hh	\
-@SQLITE3_TRUE@			SqliteConnection.cc	SqliteConnection.hh	\
-@SQLITE3_TRUE@			SqliteResultValue.cc	SqliteResultValue.hh	\
-@SQLITE3_TRUE@			SqliteProvider.cc	SqliteProvider.hh
+@apl_SQLITE3_TRUE@am__append_1 = $(SQLITE3_CFLAGS)
+@apl_SQLITE3_TRUE@am__append_2 = $(SQLITE3_LDFLAGS)
+@apl_SQLITE3_TRUE@am__append_3 = SqliteArgListBuilder.cc	SqliteArgListBuilder.hh	\
+@apl_SQLITE3_TRUE@			SqliteConnection.cc	SqliteConnection.hh	\
+@apl_SQLITE3_TRUE@			SqliteResultValue.cc	SqliteResultValue.hh	\
+@apl_SQLITE3_TRUE@			SqliteProvider.cc	SqliteProvider.hh
 
-@POSTGRES_TRUE@am__append_4 = $(POSTGRESQL_CFLAGS)
-@POSTGRES_TRUE@am__append_5 = $(POSTGRESQL_LDFLAGS)
-@POSTGRES_TRUE@am__append_6 = PostgresArgListBuilder.cc PostgresArgListBuilder.hh \
-@POSTGRES_TRUE@			PostgresConnection.cc     PostgresConnection.hh	\
-@POSTGRES_TRUE@			PostgresProvider.cc       PostgresProvider.hh
+@apl_POSTGRES_TRUE@am__append_4 = $(POSTGRESQL_CFLAGS)
+@apl_POSTGRES_TRUE@am__append_5 = $(POSTGRESQL_LDFLAGS)
+@apl_POSTGRES_TRUE@am__append_6 = PostgresArgListBuilder.cc PostgresArgListBuilder.hh \
+@apl_POSTGRES_TRUE@			PostgresConnection.cc     PostgresConnection.hh	\
+@apl_POSTGRES_TRUE@			PostgresProvider.cc       PostgresProvider.hh
 
 subdir = src/sql
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
@@ -158,11 +158,11 @@ am__lib_sql_la_SOURCES_DIST = apl-sqlite.cc apl-sqlite.hh \
 	PostgresArgListBuilder.cc PostgresArgListBuilder.hh \
 	PostgresConnection.cc PostgresConnection.hh \
 	PostgresProvider.cc PostgresProvider.hh
-@SQLITE3_TRUE@am__objects_1 = SqliteArgListBuilder.lo \
-@SQLITE3_TRUE@	SqliteConnection.lo SqliteResultValue.lo \
-@SQLITE3_TRUE@	SqliteProvider.lo
-@POSTGRES_TRUE@am__objects_2 = PostgresArgListBuilder.lo \
-@POSTGRES_TRUE@	PostgresConnection.lo PostgresProvider.lo
+@apl_SQLITE3_TRUE@am__objects_1 = SqliteArgListBuilder.lo \
+@apl_SQLITE3_TRUE@	SqliteConnection.lo SqliteResultValue.lo \
+@apl_SQLITE3_TRUE@	SqliteProvider.lo
+@apl_POSTGRES_TRUE@am__objects_2 = PostgresArgListBuilder.lo \
+@apl_POSTGRES_TRUE@	PostgresConnection.lo PostgresProvider.lo
 am_lib_sql_la_OBJECTS = apl-sqlite.lo Connection.lo $(am__objects_1) \
 	$(am__objects_2)
 lib_sql_la_OBJECTS = $(am_lib_sql_la_OBJECTS)

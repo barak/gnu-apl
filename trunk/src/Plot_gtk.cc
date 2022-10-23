@@ -27,7 +27,7 @@ static int verbosity = 0;
 
 #include "Common.hh"
 
-#if HAVE_GTK3
+#if apl_GTK3
 
 #include <X11/Xlib.h>
 # include <gtk/gtk.h>
@@ -1607,4 +1607,4 @@ Plot_context * pctx = new Plot_context(w_props);
    return 0;
 }
 //----------------------------------------------------------------------------
-#endif // HAVE_GTK3
+#endif // apl_GTK3
