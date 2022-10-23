@@ -66,11 +66,11 @@ autoconf -t AM_CONDITIONAL -t AC_SUBST -t AC_DEFINE_UNQUOTED
 
 configure_options="$0 $*"
 
-# TEST_EQ and TEST_NEQ are safe string comparisons that, unlike the vanilla
+# apl_EQ and apl_NEQ are safe string comparisons that, unlike the vanilla
 # 'test A = B' and test A != B, also works for empty strings A and/or B.
-AC_DEFUN([TEST_EQ],  [ test "x$1" = "x$2" ])
-AC_DEFUN([TEST_NEQ], [ test "x$1" != "x$2" ])
-AC_DEFUN([TOPIC],
+AC_DEFUN([apl_EQ],  [ test "x$1" = "x$2" ])
+AC_DEFUN([apl_NEQ], [ test "x$1" != "x$2" ])
+AC_DEFUN([apl_TOPIC],
          [ { AS_ECHO(); AS_ECHO(["    *** $1... ***"]); AS_ECHO(); } ])
 
 AC_PREREQ([2.65])
@@ -78,7 +78,7 @@ AC_INIT([GNU APL], [1.8], [bug-apl@gnu.org])
 AC_PREFIX_DEFAULT( /usr/local )
 AC_CONFIG_AUX_DIR([.])
 
-TOPIC([core tests])
+apl_TOPIC([core tests])
 
 AC_USE_SYSTEM_EXTENSIONS
 
@@ -104,7 +104,7 @@ LT_INIT([dlopen])
 
 apl_MAINTAINER_MODE = $USE_MAINTAINER_MODE
 
-TOPIC([basic checks])
+apl_TOPIC([basic checks])
 
 # Checks for programs.
 #
@@ -125,7 +125,7 @@ CXXFLAGS="$CXXFLAGS -I $(pwd)"
 # Checks for various header files.
 #
 
-TOPIC([checks for the presence and usablility of header files])
+apl_TOPIC([checks for the presence and usablility of header files])
 
 # check for ncurses.h first and for curses.h only if ncurses.h was not found.
 
@@ -179,7 +179,7 @@ AC_HEADER_STDBOOL
 
 # Checks for typedefs, structures, and compiler characteristics.
 #
-TOPIC([checks for standard C/C++ types])
+apl_TOPIC([checks for standard C/C++ types])
 
 AC_C_INLINE
 AC_TYPE_INT32_T
@@ -228,7 +228,7 @@ AC_CHECK_LIB([dl],        [dlopen])
 AC_CHECK_LIB([c],         [initstate_r])
 AC_CHECK_LIB([atomicity], [__atomic_fetch_add_4])
 
-TOPIC([checks for optional (not strictly required) libraries])
+apl_TOPIC([checks for optional (not strictly required) libraries])
 
 AC_DEFUN([OPT_LIB], [ AC_CHECK_LIB($1, $2, , [AS_ECHO(["   └──── $3 "]); ])])
 
@@ -245,23 +245,23 @@ OPT_LIB([X11],     [XOpenDisplay],      [may affect: ⎕PLOT])
 OPT_LIB([xcb],     [xcb_connect],       [may affect: ⎕PLOT])
 OPT_LIB([z],       [uncompress],        [will affect: ⎕PNG])
 m4_include([m4/check_SQLITE.m4])
-if TEST_NEQ($apl_SQLITE3, yes); then
+if apl_NEQ($apl_SQLITE3, yes); then
    AS_ECHO(["   └──── may affect: ⎕SQL"]);
 fi
 m4_include([m4/check_POSTGRES.m4])
-if TEST_NEQ($apl_POSTGRES, yes); then
+if apl_NEQ($apl_POSTGRES, yes); then
    AS_ECHO(["   └──── may affect: ⎕SQL"]);
 fi
 m4_include([m4/check_PCRE.m4])
-if TEST_NEQ($apl_PCRE, yes); then
+if apl_NEQ($apl_PCRE, yes); then
    AS_ECHO(["   └──── may affect: ⎕RE"]);
 fi
 m4_include([m4/check_GTK.m4])
-if TEST_NEQ($apl_GTK3, yes); then
+if apl_NEQ($apl_GTK3, yes); then
    AS_ECHO(["   └──── will affect: ⎕PLOT, ⎕PNG"]);
 fi
 
-TOPIC([checks for functions that are missing on some platforms])
+apl_TOPIC([checks for functions that are missing on some platforms])
 
 ################################# rdtsc check ################################
 # check if rdtsc (read CPU cycle counter is available.
@@ -273,12 +273,12 @@ AC_COMPILE_IFELSE(
         [[unsigned int lo, hi;
           __asm__ __volatile__ ("rdtsc" : "=a" (lo), "=d" (hi));]]
     )], [HAVE_rdtsc=yes], [HAVE_rdtsc=no])
-if TEST_EQ($HAVE_rdtsc, yes); then
+if apl_EQ($HAVE_rdtsc, yes); then
    AC_DEFINE_UNQUOTED([HAVE_RDTSC], [1],
                       [Define to 1 iff the CPU has rdtsc opcode])
 fi
 
-AM_CONDITIONAL(HAVE_RDTSC, TEST_EQ($HAVE_rdtsc, yes))
+AM_CONDITIONAL(HAVE_RDTSC, apl_EQ($HAVE_rdtsc, yes))
 AC_MSG_RESULT([$HAVE_rdtsc])
 
 ################################# gettimeofday check #########################
@@ -289,7 +289,7 @@ AC_COMPILE_IFELSE(
         [AC_LANG_PROGRAM([[#include <sys/time.h>]],
         [[timeval tv; gettimeofday(&tv, 0); ]]
     )], [HAVE_gettimeofday=yes], [HAVE_gettimeofday=no])
-if TEST_EQ($HAVE_gettimeofday, yes); then
+if apl_EQ($HAVE_gettimeofday, yes); then
    AC_DEFINE_UNQUOTED([HAVE_GETTIMEOFDAY], [1],
                       [Define to 1 iff the OS has gettimeofday()])
 fi
@@ -309,10 +309,10 @@ AC_COMPILE_IFELSE(
           sem_init(&sema, 0, 0);
         ]]
     )], [HAVE_SEM_INIT=yes], [HAVE_SEM_INIT=no])
-if TEST_EQ($HAVE_SEM_INIT, yes); then
+if apl_EQ($HAVE_SEM_INIT, yes); then
    AC_DEFINE_UNQUOTED([HAVE_SEM_INIT], [1], [Define to 1 iff sem_init() works])
 fi
-AM_CONDITIONAL(HAVE_SEM_INIT, TEST_EQ($HAVE_SEM_INIT, yes))
+AM_CONDITIONAL(HAVE_SEM_INIT, apl_EQ($HAVE_SEM_INIT, yes))
 CXXFLAGS=$apl_save_CXXFLAGS
 AC_MSG_RESULT([$HAVE_SEM_INIT])
 
@@ -393,15 +393,15 @@ AC_MSG_RESULT([$HAVE_SOLARIS_ATOMIC])
 
 # check if we are on i686 (to fix a strange rpmbuild problem)
 AC_MSG_CHECKING([whether we compile for an i686 CPU])
-AM_CONDITIONAL([ON_i686], [TEST_EQ($(uname -m), i686)])
-if TEST_EQ($(uname -m), i686); then
+AM_CONDITIONAL([ON_i686], [apl_EQ($(uname -m), i686)])
+if apl_EQ($(uname -m), i686); then
     AC_MSG_RESULT([yes])
 else
     AC_MSG_RESULT([no])
 fi
 
 
-TOPIC([choices made by the user (via ./configure arguments)])
+apl_TOPIC([choices made by the user (via ./configure arguments)])
 
 # the standard convention is that ^D means EOF aka. end-of-file. Some users
 # prefer ^D to delete one character and ^Z to mean EOF.
@@ -412,12 +412,12 @@ AC_ARG_WITH( [ctrld_del],
              [user_wants_ctrlD_del=$withval],
              [user_wants_ctrlD_del=no])
 
-if TEST_EQ($user_wants_ctrlD_del, yes); then
+if apl_EQ($user_wants_ctrlD_del, yes); then
     AC_DEFINE([WANT_CTRLD_DEL], [1],
               [Define to make ^D a del-char and ^Z be EOF])
 fi
 AC_MSG_RESULT([$user_wants_ctrlD_del])
-AM_CONDITIONAL(WANT_CTRLD_DEL, TEST_EQ($user_wants_ctrlD_del, yes))
+AM_CONDITIONAL(WANT_CTRLD_DEL, apl_EQ($user_wants_ctrlD_del, yes))
 
 # check if the user compiles for ANDROID
 #
@@ -428,10 +428,10 @@ AC_ARG_WITH( [android],
              [user_wants_android=$withval],
              [user_wants_android=no])
 
-if TEST_EQ($user_wants_android, yes); then
+if apl_EQ($user_wants_android, yes); then
    AC_DEFINE([WANT_ANDROID], [1], [Define if compiling for Android])
 fi
-AM_CONDITIONAL(WANT_ANDROID, TEST_EQ($user_wants_android, yes))
+AM_CONDITIONAL(WANT_ANDROID, apl_EQ($user_wants_android, yes))
 AC_MSG_RESULT([$user_wants_android])
 
 
@@ -444,11 +444,11 @@ AC_ARG_WITH( [erlang],
              [user_wants_erlang=$withval],
              [user_wants_erlang=no])
 
-if TEST_EQ($user_wants_libapl, yes); then
+if apl_EQ($user_wants_libapl, yes); then
    AC_DEFINE([WANT_ERLANG], [1], [Define if building the Erlang interface])
 fi
 
-AM_CONDITIONAL(WANT_ERLANG, TEST_EQ($user_wants_erlang, yes))
+AM_CONDITIONAL(WANT_ERLANG, apl_EQ($user_wants_erlang, yes))
 AC_MSG_RESULT([$user_wants_erlang])
 
 
@@ -461,12 +461,12 @@ AC_ARG_WITH( [libapl],
                              [enable to build libapl.so])],
              [user_wants_libapl=$withval])
 
-if TEST_EQ($user_wants_libapl, yes); then
+if apl_EQ($user_wants_libapl, yes); then
    AC_DEFINE([WANT_LIBAPL], [1], [Define if building libapl.so])
 fi
 
 
-AM_CONDITIONAL(WANT_LIBAPL, TEST_EQ($user_wants_libapl, yes))
+AM_CONDITIONAL(WANT_LIBAPL, apl_EQ($user_wants_libapl, yes))
 AC_MSG_RESULT([$user_wants_libapl])
 
 # check if the user wants to build the python extension libpython_apl.so
@@ -480,16 +480,16 @@ AC_ARG_WITH( [python],
              [enable to build python extension lib_gnu_apl.so])],
              [user_wants_python=$withval])
 
-if TEST_EQ($user_wants_python, yes); then
+if apl_EQ($user_wants_python, yes); then
    AC_DEFINE([WANT_PYTHON], [1], [Define if building lib_gnu_apl.so])
     AC_PATH_PROG(PKG_CONFIG, pkg-config, no)  # locate pkg-config
-    if TEST_NEQ($PKG_CONFIG, no); then        # we have pkg-config
+    if apl_NEQ($PKG_CONFIG, no); then        # we have pkg-config
        if $PKG_CONFIG --exists python ; then  # and pkg-config knows python
             PYTHON_CFLAGS=$( $PKG_CONFIG --cflags python3 )
        fi
    fi
 fi
-AM_CONDITIONAL(WANT_PYTHON, TEST_EQ($user_wants_python, yes))
+AM_CONDITIONAL(WANT_PYTHON, apl_EQ($user_wants_python, yes))
 AC_MSG_RESULT([$user_wants_python])
 
 AC_CONFIG_FILES([Makefile
@@ -540,7 +540,7 @@ AC_CONFIG_FILES([Makefile
 # AM_CXXFLAGS: do/dont -Werror ?
 AC_ARG_VAR(CXX_WERROR,
    [ turn all warnings into errors (compiler flag -Werror) default: no) ])
-if TEST_EQ($CXX_WERROR, yes); then CXX_WERROR="-Werror";
+if apl_EQ($CXX_WERROR, yes); then CXX_WERROR="-Werror";
                               else CXX_WERROR=""; fi
 
 # APL: development configuration desired ? Set this before other xxx_WANTED
@@ -548,7 +548,7 @@ if TEST_EQ($CXX_WERROR, yes); then CXX_WERROR="-Werror";
 # further down
 AC_ARG_VAR(DEVELOP_WANTED,
    [ set development options (see README-2-configure) default: no])
-if TEST_EQ($DEVELOP_WANTED, yes); then
+if apl_EQ($DEVELOP_WANTED, yes); then
    AC_DEFINE_UNQUOTED([DEVELOP_WANTED], [yes],
                       [Define to set options typical for software development])
    ASSERT_LEVEL_WANTED=2
@@ -562,7 +562,7 @@ fi
 # APL: max. rank ?
 AC_ARG_VAR(MAX_RANK_WANTED,
    [ the max. Rank of APL values (see README-2-configure) default: 8) ])
-if TEST_EQ($MAX_RANK_WANTED, ); then MAX_RANK_WANTED=8; fi
+if apl_EQ($MAX_RANK_WANTED, ); then MAX_RANK_WANTED=8; fi
 AC_DEFINE_UNQUOTED([MAX_RANK_WANTED], [$MAX_RANK_WANTED],
                    [max. rank of APL values ])
 
@@ -570,7 +570,7 @@ AC_DEFINE_UNQUOTED([MAX_RANK_WANTED], [$MAX_RANK_WANTED],
 # APL: CHECK() macro desired ?
 AC_ARG_VAR(VALUE_CHECK_WANTED,
    [ enable CHECK() macro (see README-2-configure) default: no ])
-if TEST_EQ($VALUE_CHECK_WANTED, yes); then
+if apl_EQ($VALUE_CHECK_WANTED, yes); then
    AC_DEFINE_UNQUOTED([VALUE_CHECK_WANTED], [yes],
                       [ Define to enable CHECK macro ])
 fi
@@ -580,7 +580,7 @@ fi
 AC_MSG_CHECKING([whether internal performance counters shall be enabled)])
 AC_ARG_VAR(PERFORMANCE_COUNTERS_WANTED,
    [ enable performance counters (see README-2-configure) default: no ])
-if TEST_EQ($PERFORMANCE_COUNTERS_WANTED, yes); then
+if apl_EQ($PERFORMANCE_COUNTERS_WANTED, yes); then
    AC_DEFINE_UNQUOTED([PERFORMANCE_COUNTERS_WANTED], [yes],
                    [ Define to enable performance counters])
 else PERFORMANCE_COUNTERS_WANTED="no"
@@ -592,7 +592,7 @@ AC_MSG_RESULT([$PERFORMANCE_COUNTERS_WANTED])
 AC_MSG_CHECKING([whether to remember the history of APL values (debug feature)])
 AC_ARG_VAR(VALUE_HISTORY_WANTED,
    [ enable value events (a debug facility, see README-2-configure) default: no ])
-if TEST_EQ($VALUE_HISTORY_WANTED, yes); then
+if apl_EQ($VALUE_HISTORY_WANTED, yes); then
    AC_DEFINE_UNQUOTED([VALUE_HISTORY_WANTED], [yes],
                       [ Define to enable value events])
 else VALUE_HISTORY_WANTED="no"
@@ -604,7 +604,7 @@ AC_MSG_RESULT([$VALUE_HISTORY_WANTED])
 AC_MSG_CHECKING([whether gprof profiling shall be enabled])
 AC_ARG_VAR(GPROF_WANTED,
    [ enable gprof (-pg) (see README-2-configure) default: no ])
-if TEST_EQ($GPROF_WANTED, yes); then
+if apl_EQ($GPROF_WANTED, yes); then
    GPROF_WANTED="-pg"
    AC_MSG_RESULT([yes])
 else
@@ -619,7 +619,7 @@ AC_DEFINE_UNQUOTED([GPROF_WANTED], [-pg],
 AC_MSG_CHECKING([whether gcov coverage testing shall be enabled])
 AC_ARG_VAR(GCOV_WANTED,
    [ enable gcov (-fprofile-arcs and -ftest-coverage) (see README-2-configure) default: no ])
-if TEST_EQ($GCOV_WANTED, yes); then
+if apl_EQ($GCOV_WANTED, yes); then
    GCOV_WANTED="--coverage"
    AC_MSG_RESULT([yes])
 else
@@ -632,7 +632,7 @@ fi
 AC_MSG_CHECKING([whether dynamic logging shall be enabled])
 AC_ARG_VAR(DYNAMIC_LOG_WANTED,
    [ enable dynamic logging (see README-2-configure) default: no ])
-if TEST_EQ($DYNAMIC_LOG_WANTED, yes); then
+if apl_EQ($DYNAMIC_LOG_WANTED, yes); then
 AC_DEFINE_UNQUOTED([DYNAMIC_LOG_WANTED], [yes],
                    [ Define to enable dynamic logging ])
 else DYNAMIC_LOG_WANTED="no"
@@ -644,7 +644,7 @@ AC_MSG_RESULT([$DYNAMIC_LOG_WANTED])
 AC_MSG_CHECKING([whether value flags shall be traced])
 AC_ARG_VAR(VF_TRACING_WANTED,
    [ enable tracing of value flags (see README-2-configure) default: no ])
-if TEST_EQ($VF_TRACING_WANTED, yes); then
+if apl_EQ($VF_TRACING_WANTED, yes); then
    AC_DEFINE_UNQUOTED([VF_TRACING_WANTED], [yes],
                       [ Define to enable tracing of value flags ])
 else VF_TRACING_WANTED="no"
@@ -656,7 +656,7 @@ AC_MSG_RESULT([$VF_TRACING_WANTED])
 AC_MSG_CHECKING([how picky (0=not, 1=somwhat, 2=very) internal tests shall be])
 AC_ARG_VAR(ASSERT_LEVEL_WANTED,
    [ Assert level (see README-2-configure) default: 1) ])
-if TEST_EQ($ASSERT_LEVEL_WANTED, ); then ASSERT_LEVEL_WANTED=1; fi
+if apl_EQ($ASSERT_LEVEL_WANTED, ); then ASSERT_LEVEL_WANTED=1; fi
 AC_DEFINE_UNQUOTED([ASSERT_LEVEL_WANTED], [$ASSERT_LEVEL_WANTED],
                    [assert level])
 AC_MSG_RESULT([$ASSERT_LEVEL_WANTED])
@@ -666,7 +666,7 @@ AC_MSG_RESULT([$ASSERT_LEVEL_WANTED])
 AC_MSG_CHECKING([security level (0=none, 1=configured in preferences, 2=all)])
 AC_ARG_VAR(SECURITY_LEVEL_WANTED,
    [ Assert level (see README-2-configure) default: 0) ])
-if TEST_EQ($SECURITY_LEVEL_WANTED, ); then SECURITY_LEVEL_WANTED=0; fi
+if apl_EQ($SECURITY_LEVEL_WANTED, ); then SECURITY_LEVEL_WANTED=0; fi
 AC_DEFINE_UNQUOTED([SECURITY_LEVEL_WANTED], [$SECURITY_LEVEL_WANTED],
                    [security level])
 AC_MSG_RESULT([$SECURITY_LEVEL_WANTED])
@@ -676,13 +676,13 @@ AC_MSG_RESULT([$SECURITY_LEVEL_WANTED])
 AC_MSG_CHECKING([how many CPU cores shall be used by APL (experimental!)])
 AC_ARG_VAR(CORE_COUNT_WANTED,
            [ Core count (see README-2-configure) default: 0) ])
-  if TEST_EQ($CORE_COUNT_WANTED,     ); then CORE_COUNT_WANTED=0;
-elif TEST_EQ($CORE_COUNT_WANTED, all ); then CORE_COUNT_WANTED=-1;
-elif TEST_EQ($CORE_COUNT_WANTED, ALL ); then CORE_COUNT_WANTED=-1;
-elif TEST_EQ($CORE_COUNT_WANTED, argv); then CORE_COUNT_WANTED=-2;
-elif TEST_EQ($CORE_COUNT_WANTED, ARGV); then CORE_COUNT_WANTED=-2;
-elif TEST_EQ($CORE_COUNT_WANTED, syl ); then CORE_COUNT_WANTED=-3;
-elif TEST_EQ($CORE_COUNT_WANTED, SYL ); then CORE_COUNT_WANTED=-3;
+  if apl_EQ($CORE_COUNT_WANTED,     ); then CORE_COUNT_WANTED=0;
+elif apl_EQ($CORE_COUNT_WANTED, all ); then CORE_COUNT_WANTED=-1;
+elif apl_EQ($CORE_COUNT_WANTED, ALL ); then CORE_COUNT_WANTED=-1;
+elif apl_EQ($CORE_COUNT_WANTED, argv); then CORE_COUNT_WANTED=-2;
+elif apl_EQ($CORE_COUNT_WANTED, ARGV); then CORE_COUNT_WANTED=-2;
+elif apl_EQ($CORE_COUNT_WANTED, syl ); then CORE_COUNT_WANTED=-3;
+elif apl_EQ($CORE_COUNT_WANTED, SYL ); then CORE_COUNT_WANTED=-3;
   fi
 AC_DEFINE_UNQUOTED([CORE_COUNT_WANTED], [$CORE_COUNT_WANTED],
                    [core count])
@@ -693,10 +693,10 @@ AC_MSG_RESULT([$CORE_COUNT_WANTED])
 AC_MSG_CHECKING([which type of socket APserver shall use])
 AC_ARG_VAR(APSERVER_TRANSPORT,
    [ APserver transport (see README-2-configure) default: TCP) ])
-  if TEST_EQ($APSERVER_TRANSPORT,      );   then APSERVER_TRANSPORT=0;
-elif TEST_EQ($APSERVER_TRANSPORT, TCP  );   then APSERVER_TRANSPORT=0;
-elif TEST_EQ($APSERVER_TRANSPORT, LINUX);   then APSERVER_TRANSPORT=1;
-elif TEST_EQ($APSERVER_TRANSPORT, UNIX );   then APSERVER_TRANSPORT=2;
+  if apl_EQ($APSERVER_TRANSPORT,      );   then APSERVER_TRANSPORT=0;
+elif apl_EQ($APSERVER_TRANSPORT, TCP  );   then APSERVER_TRANSPORT=0;
+elif apl_EQ($APSERVER_TRANSPORT, LINUX);   then APSERVER_TRANSPORT=1;
+elif apl_EQ($APSERVER_TRANSPORT, UNIX );   then APSERVER_TRANSPORT=2;
   fi
 AC_DEFINE_UNQUOTED([APSERVER_TRANSPORT], [$APSERVER_TRANSPORT],
                    [APserver transport: TCP=0, LINUX=1, UNIX=2])
@@ -707,7 +707,7 @@ AC_MSG_RESULT([$APSERVER_TRANSPORT])
 AC_MSG_CHECKING([which port number APserver shall use for TCP or UDP sockets])
 AC_ARG_VAR(APSERVER_PORT,
    [ APserver transport (see README-2-configure) default: 16366) ])
-if TEST_EQ($APSERVER_PORT, );   then APSERVER_PORT=16366;  fi
+if apl_EQ($APSERVER_PORT, );   then APSERVER_PORT=16366;  fi
 AC_DEFINE_UNQUOTED([APSERVER_PORT], [$APSERVER_PORT],
                    [APserver TCP listen port])
 AC_MSG_RESULT([$APSERVER_PORT])
@@ -717,7 +717,7 @@ AC_MSG_RESULT([$APSERVER_PORT])
 AC_MSG_CHECKING([which unix port name APserver shall use])
 AC_ARG_VAR(APSERVER_PATH,
    [ APserver transport (see README-2-configure) default: /tmp/GNU-APL/APserver) ])
-if TEST_EQ($APSERVER_PATH, );   then APSERVER_PATH="/tmp/GNU-APL/APserver";  fi
+if apl_EQ($APSERVER_PATH, );   then APSERVER_PATH="/tmp/GNU-APL/APserver";  fi
 AC_DEFINE_UNQUOTED([APSERVER_PATH], ["$APSERVER_PATH"],
                    [APserver listen port name])
 AC_MSG_RESULT([$APSERVER_PATH])
@@ -727,7 +727,7 @@ AC_MSG_RESULT([$APSERVER_PATH])
 AC_MSG_CHECKING([how long a short APL value shall be at most])
 AC_ARG_VAR(SHORT_VALUE_LENGTH_WANTED,
     [ Cellcount of short values (see README-2-configure) default: 12) ])
-if TEST_EQ($SHORT_VALUE_LENGTH_WANTED, ); then SHORT_VALUE_LENGTH_WANTED=12; fi
+if apl_EQ($SHORT_VALUE_LENGTH_WANTED, ); then SHORT_VALUE_LENGTH_WANTED=12; fi
 AC_DEFINE_UNQUOTED([SHORT_VALUE_LENGTH_WANTED], [$SHORT_VALUE_LENGTH_WANTED],
                    [short value cellcount])
 AC_MSG_RESULT([$SHORT_VALUE_LENGTH_WANTED])
@@ -737,7 +737,7 @@ AC_MSG_RESULT([$SHORT_VALUE_LENGTH_WANTED])
 AC_MSG_CHECKING([whether visible markers shall be used])
 AC_ARG_VAR(VISIBLE_MARKERS_WANTED,
    [ enable visible formatting markers (debug facility, see README-2-configure) default: no ])
-if TEST_EQ($VISIBLE_MARKERS_WANTED, yes); then
+if apl_EQ($VISIBLE_MARKERS_WANTED, yes); then
 AC_DEFINE_UNQUOTED([VISIBLE_MARKERS_WANTED], [yes],
                    [ Define to have visible markers (DONT!)])
 else VISIBLE_MARKERS_WANTED="no"
@@ -749,7 +749,7 @@ AC_MSG_RESULT([$VISIBLE_MARKERS_WANTED])
 AC_MSG_CHECKING([whether support for rational numbers is desired ])
 AC_ARG_VAR(RATIONAL_NUMBERS_WANTED,
    [ enable support for rational numbers (see README-2-configure) default: no ])
-if TEST_EQ($RATIONAL_NUMBERS_WANTED, yes); then
+if apl_EQ($RATIONAL_NUMBERS_WANTED, yes); then
 AC_DEFINE_UNQUOTED([RATIONAL_NUMBERS_WANTED], [yes],
                    [ Define to have support for rational numbers (EXPERIMENTAL!)])
 else RATIONAL_NUMBERS_WANTED="no"
@@ -758,9 +758,9 @@ AC_MSG_RESULT([$RATIONAL_NUMBERS_WANTED])
 
 
 # export some of the options to Makefile
-AM_CONDITIONAL([DEVELOP],  [TEST_EQ($DEVELOP_WANTED,    yes)])
+AM_CONDITIONAL([DEVELOP],  [apl_EQ($DEVELOP_WANTED,    yes)])
 
-TOPIC([./configure checks done, producing the output files])
+apl_TOPIC([./configure checks done, producing the output files])
 
 AC_OUTPUT
 
@@ -782,7 +782,7 @@ for q in 1 2 3 4; do      # at most 4 times...
    fi
 done
 
-if TEST_EQ($abs_apl_top, not-found); then
+if apl_EQ($abs_apl_top, not-found); then
    AS_ECHO(["configure: *** could not find top-level GNU APL directory, using '.'"])
    apl_top="."
 else
@@ -806,8 +806,8 @@ fi
 # print a summary or maybe complain
 #
 AS_ECHO([" "])
-if TEST_EQ($want1_postgresql, yes); then
-   if TEST_EQ($apl_POSTGRES, yes); then
+if apl_EQ($want1_postgresql, yes); then
+   if apl_EQ($apl_POSTGRES, yes); then
       AS_ECHO(["      PostgreSQL looks good."])
    else
       AS_ECHO(["NOTE: PostgreSQL support was requested, but the handler function"])
@@ -817,8 +817,8 @@ if TEST_EQ($want1_postgresql, yes); then
    fi
 fi
 
-if TEST_EQ($WANT1_SQLITE3, yes); then
-   if TEST_NEQ($apl_SQLITE3, yes); then
+if apl_EQ($WANT1_SQLITE3, yes); then
+   if apl_NEQ($apl_SQLITE3, yes); then
       AS_ECHO(["NOTE: SQLite support was requested, but the handler function for "])
       AS_ECHO(["      accessing SQLite cannot not be built. Your SQLite"])
       AS_ECHO(["      installation is missing or incomplete. See details above."])
