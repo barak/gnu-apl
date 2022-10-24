@@ -94,7 +94,7 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@WANT_ANDROID_FALSE@am__append_1 = APs emacs_mode sql workspaces
+@apl_TARGET_ANDROID_FALSE@am__append_1 = APs emacs_mode sql workspaces
 
 # depending on apl_GTK3 we want either Plot_gtk.cc or Plot_xcb.cc compiled,
 # but keep both source files in the tar file (hence EXTRA_apl_SOURCES).
@@ -120,19 +120,20 @@ host_triplet = @host@
 @apl_POSTGRES_TRUE@	sql/PostgresConnection.hh \
 @apl_POSTGRES_TRUE@	sql/PostgresProvider.cc \
 @apl_POSTGRES_TRUE@	sql/PostgresProvider.hh
-@WANT_LIBAPL_TRUE@am__append_11 = libapl.la
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@am__append_12 = lib_gnu_apl.la
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@bin_PROGRAMS = apl$(EXEEXT)
+@apl_TARGET_LIBAPL_TRUE@am__append_11 = libapl.la
+@apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_TRUE@am__append_12 = lib_gnu_apl.la
+@apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_FALSE@bin_PROGRAMS = apl$(EXEEXT)
 subdir = src
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/depend.m4 \
-	$(top_srcdir)/m4/check_SQLITE.m4 \
+	$(top_srcdir)/m4/apl_sugar.m4 $(top_srcdir)/m4/check_SQLITE.m4 \
 	$(top_srcdir)/m4/ax_lib_sqlite3.m4 \
 	$(top_srcdir)/m4/check_POSTGRES.m4 \
 	$(top_srcdir)/m4/ax_lib_postgresql.m4 \
 	$(top_srcdir)/m4/check_PCRE.m4 \
 	$(top_srcdir)/m4/ax_path_lib_pcre.m4 \
-	$(top_srcdir)/m4/check_GTK.m4 $(top_srcdir)/configure.ac
+	$(top_srcdir)/m4/check_GTK.m4 $(top_srcdir)/m4/apl_TARGETs.m4 \
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 DIST_COMMON = $(srcdir)/Makefile.am $(dist_noinst_DATA) \
@@ -326,9 +327,8 @@ am__objects_6 = $(am__objects_1) lib_gnu_apl_la-Archive.lo \
 	lib_gnu_apl_la-ValueHistory.lo lib_gnu_apl_la-Workspace.lo \
 	lib_gnu_apl_la-static_Objects.lo $(am__objects_2) \
 	$(am__objects_3) $(am__objects_4) $(am__objects_5)
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@am_lib_gnu_apl_la_OBJECTS =  \
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	$(am__objects_6) \
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	lib_gnu_apl_la-python_apl.lo
+@apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_TRUE@am_lib_gnu_apl_la_OBJECTS = $(am__objects_6) \
+@apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_TRUE@	lib_gnu_apl_la-python_apl.lo
 lib_gnu_apl_la_OBJECTS = $(am_lib_gnu_apl_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
@@ -338,8 +338,9 @@ lib_gnu_apl_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CXXLD) \
 	$(lib_gnu_apl_la_CXXFLAGS) $(CXXFLAGS) \
 	$(lib_gnu_apl_la_LDFLAGS) $(LDFLAGS) -o $@
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@am_lib_gnu_apl_la_rpath = -rpath \
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	$(pkglibdir)
+@apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_TRUE@am_lib_gnu_apl_la_rpath =  \
+@apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_TRUE@	-rpath \
+@apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_TRUE@	$(pkglibdir)
 libapl_la_LIBADD =
 am__libapl_la_SOURCES_DIST = Plot_xcb.cc Plot_gtk.cc ../buildtag.hh \
 	../config.h APL_Float_as_class.hh APL_types.hh Archive.cc \
@@ -483,13 +484,13 @@ am__objects_12 = $(am__objects_7) libapl_la-Archive.lo \
 	libapl_la-Workspace.lo libapl_la-static_Objects.lo \
 	$(am__objects_8) $(am__objects_9) $(am__objects_10) \
 	$(am__objects_11)
-@WANT_LIBAPL_TRUE@am_libapl_la_OBJECTS = $(am__objects_12) \
-@WANT_LIBAPL_TRUE@	libapl_la-libapl.lo
+@apl_TARGET_LIBAPL_TRUE@am_libapl_la_OBJECTS = $(am__objects_12) \
+@apl_TARGET_LIBAPL_TRUE@	libapl_la-libapl.lo
 libapl_la_OBJECTS = $(am_libapl_la_OBJECTS)
 libapl_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CXX $(AM_LIBTOOLFLAGS) \
 	$(LIBTOOLFLAGS) --mode=link $(CXXLD) $(libapl_la_CXXFLAGS) \
 	$(CXXFLAGS) $(libapl_la_LDFLAGS) $(LDFLAGS) -o $@
-@WANT_LIBAPL_TRUE@am_libapl_la_rpath = -rpath $(pkglibdir)
+@apl_TARGET_LIBAPL_TRUE@am_libapl_la_rpath = -rpath $(pkglibdir)
 PROGRAMS = $(bin_PROGRAMS)
 am__apl_SOURCES_DIST = main.cc Plot_xcb.cc Plot_gtk.cc ../buildtag.hh \
 	../config.h APL_Float_as_class.hh APL_types.hh Archive.cc \
@@ -634,9 +635,8 @@ am__objects_18 = $(am__objects_13) apl-Archive.$(OBJEXT) \
 	apl-Workspace.$(OBJEXT) apl-static_Objects.$(OBJEXT) \
 	$(am__objects_14) $(am__objects_15) $(am__objects_16) \
 	$(am__objects_17)
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@am_apl_OBJECTS =  \
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@	apl-main.$(OBJEXT) \
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@	$(am__objects_18)
+@apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_FALSE@am_apl_OBJECTS = apl-main.$(OBJEXT) \
+@apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_FALSE@	$(am__objects_18)
 am__EXTRA_apl_SOURCES_DIST = Plot_gtk.cc Plot_xcb.cc
 apl_OBJECTS = $(am_apl_OBJECTS)
 am__DEPENDENCIES_1 =
@@ -854,6 +854,7 @@ PKG_CONFIG = @PKG_CONFIG@
 POSTGRESQL_CFLAGS = @POSTGRESQL_CFLAGS@
 POSTGRESQL_LDFLAGS = @POSTGRESQL_LDFLAGS@
 POSTGRESQL_VERSION = @POSTGRESQL_VERSION@
+POW_LIB = @POW_LIB@
 PYTHON_CFLAGS = @PYTHON_CFLAGS@
 RANLIB = @RANLIB@
 RATIONAL_NUMBERS_WANTED = @RATIONAL_NUMBERS_WANTED@
@@ -871,6 +872,7 @@ VALUE_HISTORY_WANTED = @VALUE_HISTORY_WANTED@
 VERSION = @VERSION@
 VF_TRACING_WANTED = @VF_TRACING_WANTED@
 VISIBLE_MARKERS_WANTED = @VISIBLE_MARKERS_WANTED@
+XMKMF = @XMKMF@
 abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
 abs_top_builddir = @abs_top_builddir@
@@ -1009,38 +1011,37 @@ common_SOURCES = $(plot_SOURCES) ../buildtag.hh ../config.h \
 	$(am__append_3) $(am__append_6) $(am__append_7) \
 	$(am__append_10)
 pkglib_LTLIBRARIES = $(am__append_11) $(am__append_12)
-@WANT_LIBAPL_TRUE@pkginclude_HEADERS = libapl.h Error.def
-@WANT_LIBAPL_TRUE@libapl_la_SOURCES = $(common_SOURCES) libapl.h libapl.cc
-@WANT_LIBAPL_TRUE@libapl_la_LDFLAGS = $(common_LDFLAGS) -avoid-version
+@apl_TARGET_LIBAPL_TRUE@pkginclude_HEADERS = libapl.h Error.def
+@apl_TARGET_LIBAPL_TRUE@libapl_la_SOURCES = $(common_SOURCES) libapl.h libapl.cc
+@apl_TARGET_LIBAPL_TRUE@libapl_la_LDFLAGS = $(common_LDFLAGS) \
+@apl_TARGET_LIBAPL_TRUE@	-avoid-version
 # libapl_la_LDFLAGS += -module
 # libapl_la_LDFLAGS += -shared
 # libapl_la_LDFLAGS += -export-dynamic
-@WANT_LIBAPL_TRUE@libapl_la_CXXFLAGS = $(common_CXXFLAGS) \
-@WANT_LIBAPL_TRUE@	$(GCOV_WANTED) $(GPROF_WANTED) \
-@WANT_LIBAPL_TRUE@	$(CXX_RDYNAMIC)
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@lib_gnu_apl_la_SOURCES = $(common_SOURCES) python_apl.cc
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@lib_gnu_apl_la_LDFLAGS =  \
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	$(common_LDFLAGS) \
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	-avoid-version
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@lib_gnu_apl_la_CXXFLAGS =  \
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	$(common_CXXFLAGS) \
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	$(GCOV_WANTED) \
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	$(GPROF_WANTED) \
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	$(CXX_RDYNAMIC) -DNDEBUG \
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	-D_FORTIFY_SOURCE=2 \
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	-fwrapv -fPIC \
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	-fstack-protector \
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	--param=ssp-buffer-size=4 \
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	-I/usr/include/python3.6m \
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	-I/usr/include/python3.8 \
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_TRUE@	# server58
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@apl_SOURCES = main.cc $(common_SOURCES)
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@apl_CXXFLAGS =  \
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@	$(common_CXXFLAGS) \
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@	$(GCOV_WANTED) \
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@	$(GPROF_WANTED) \
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@	$(CXX_RDYNAMIC)
-@WANT_LIBAPL_FALSE@@WANT_PYTHON_FALSE@apl_LDFLAGS = $(common_LDFLAGS)
+@apl_TARGET_LIBAPL_TRUE@libapl_la_CXXFLAGS = $(common_CXXFLAGS) \
+@apl_TARGET_LIBAPL_TRUE@	$(GCOV_WANTED) $(GPROF_WANTED) \
+@apl_TARGET_LIBAPL_TRUE@	$(CXX_RDYNAMIC)
+@apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_TRUE@lib_gnu_apl_la_SOURCES = $(common_SOURCES) python_apl.cc
+@apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_TRUE@lib_gnu_apl_la_LDFLAGS = $(common_LDFLAGS) \
+@apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_TRUE@	-avoid-version
+@apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_TRUE@lib_gnu_apl_la_CXXFLAGS = $(common_CXXFLAGS) \
+@apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_TRUE@	$(GCOV_WANTED) \
+@apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_TRUE@	$(GPROF_WANTED) \
+@apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_TRUE@	$(CXX_RDYNAMIC) \
+@apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_TRUE@	-DNDEBUG \
+@apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_TRUE@	-D_FORTIFY_SOURCE=2 \
+@apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_TRUE@	-fwrapv -fPIC \
+@apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_TRUE@	-fstack-protector \
+@apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_TRUE@	--param=ssp-buffer-size=4 \
+@apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_TRUE@	-I/usr/include/python3.6m \
+@apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_TRUE@	-I/usr/include/python3.8 \
+@apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_TRUE@	# server58
+@apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_FALSE@apl_SOURCES = main.cc $(common_SOURCES)
+@apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_FALSE@apl_CXXFLAGS = $(common_CXXFLAGS) \
+@apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_FALSE@	$(GCOV_WANTED) \
+@apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_FALSE@	$(GPROF_WANTED) \
+@apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_FALSE@	$(CXX_RDYNAMIC)
+@apl_TARGET_LIBAPL_FALSE@@apl_TARGET_PYTHON_FALSE@apl_LDFLAGS = $(common_LDFLAGS)
 apl_LDADD = $(LIBS)
 all: all-recursive
 

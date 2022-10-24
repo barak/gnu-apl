@@ -6,7 +6,7 @@ Gtk_server_SOURCES = Gtk_server.cc Gtk_map.def Gtk_enums.hh
 
 AM_CXXFLAGS = $(GTK_CFLAGS) $(GTK_LIBS)
 AM_LDFLAGS  = $(GTK_LDFLAGS) -lX11
-if DEVELOP
+if apl_DEVELOP
    AM_CXXFLAGS += $(WERROR) -Wall -Wno-strict-aliasing
 endif
 

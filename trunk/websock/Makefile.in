@@ -91,13 +91,14 @@ host_triplet = @host@
 subdir = websock
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/depend.m4 \
-	$(top_srcdir)/m4/check_SQLITE.m4 \
+	$(top_srcdir)/m4/apl_sugar.m4 $(top_srcdir)/m4/check_SQLITE.m4 \
 	$(top_srcdir)/m4/ax_lib_sqlite3.m4 \
 	$(top_srcdir)/m4/check_POSTGRES.m4 \
 	$(top_srcdir)/m4/ax_lib_postgresql.m4 \
 	$(top_srcdir)/m4/check_PCRE.m4 \
 	$(top_srcdir)/m4/ax_path_lib_pcre.m4 \
-	$(top_srcdir)/m4/check_GTK.m4 $(top_srcdir)/configure.ac
+	$(top_srcdir)/m4/check_GTK.m4 $(top_srcdir)/m4/apl_TARGETs.m4 \
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 DIST_COMMON = $(srcdir)/Makefile.am $(dist_doc_DATA) \
@@ -300,6 +301,7 @@ PKG_CONFIG = @PKG_CONFIG@
 POSTGRESQL_CFLAGS = @POSTGRESQL_CFLAGS@
 POSTGRESQL_LDFLAGS = @POSTGRESQL_LDFLAGS@
 POSTGRESQL_VERSION = @POSTGRESQL_VERSION@
+POW_LIB = @POW_LIB@
 PYTHON_CFLAGS = @PYTHON_CFLAGS@
 RANLIB = @RANLIB@
 RATIONAL_NUMBERS_WANTED = @RATIONAL_NUMBERS_WANTED@
@@ -317,6 +319,7 @@ VALUE_HISTORY_WANTED = @VALUE_HISTORY_WANTED@
 VERSION = @VERSION@
 VF_TRACING_WANTED = @VF_TRACING_WANTED@
 VISIBLE_MARKERS_WANTED = @VISIBLE_MARKERS_WANTED@
+XMKMF = @XMKMF@
 abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
 abs_top_builddir = @abs_top_builddir@

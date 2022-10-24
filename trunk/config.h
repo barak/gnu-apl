@@ -10,7 +10,7 @@
 /* APserver transport: TCP=0, LINUX=1, UNIX=2 */
 #define APSERVER_TRANSPORT 0
 
-/* assert level */
+/* desired ASSERT() level */
 #define ASSERT_LEVEL_WANTED 1
 
 /* how ./configure was called */
@@ -31,6 +31,9 @@
 /* Define to 1 iff pthread_setaffinity_np() is available */
 #define HAVE_AFFINITY_NP 1
 
+/* Define to 1 if you have the `alarm' function. */
+#define HAVE_ALARM 1
+
 /* Define to 1 iff <curses.h> is present */
 /* #undef HAVE_CURSES_H */
 
@@ -39,6 +42,9 @@
 
 /* Define to 1 if you have the <dlfcn.h> header file. */
 #define HAVE_DLFCN_H 1
+
+/* Define to 1 if you have the `dup2' function. */
+#define HAVE_DUP2 1
 
 /* Define to 1 if you have the <execinfo.h> header file. */
 #define HAVE_EXECINFO_H 1
@@ -49,11 +55,23 @@
 /* Define to 1 if you have the <fcntl.h> header file. */
 #define HAVE_FCNTL_H 1
 
+/* Define to 1 if you have the <fenv.h> header file. */
+#define HAVE_FENV_H 1
+
 /* Define to 1 if you have the <fftw3.h> header file. */
 #define HAVE_FFTW3_H 1
 
 /* Define to 1 if you have the `floor' function. */
 #define HAVE_FLOOR 1
+
+/* Define to 1 if you have the `fork' function. */
+#define HAVE_FORK 1
+
+/* Define to 1 if you have the `getcwd' function. */
+#define HAVE_GETCWD 1
+
+/* Define to 1 if you have the `gethostbyname' function. */
+#define HAVE_GETHOSTBYNAME 1
 
 /* Define to 1 if you have the `getpagesize' function. */
 #define HAVE_GETPAGESIZE 1
@@ -127,20 +145,42 @@
 /* Define to 1 if you have the `z' library (-lz). */
 #define HAVE_LIBZ 1
 
+/* Define to 1 if you have the <limits.h> header file. */
+#define HAVE_LIMITS_H 1
+
+/* Define to 1 if your system has a GNU libc compatible `malloc' function, and
+   to 0 otherwise. */
+#define HAVE_MALLOC 1
+
+/* Define to 1 if you have the <malloc.h> header file. */
+#define HAVE_MALLOC_H 1
+
 /* Define to 1 if you have the <memory.h> header file. */
 #define HAVE_MEMORY_H 1
 
 /* Define to 1 if you have the `memset' function. */
 #define HAVE_MEMSET 1
 
+/* Define to 1 if you have the `mkdir' function. */
+#define HAVE_MKDIR 1
+
 /* Define to 1 if you have a working `mmap' system call. */
 #define HAVE_MMAP 1
+
+/* Define to 1 if you have the `modf' function. */
+#define HAVE_MODF 1
 
 /* Define to 1 if you have the `munmap' function. */
 #define HAVE_MUNMAP 1
 
 /* Define to 1 iff <ncurses.h> is present */
 #define HAVE_NCURSES_H 1
+
+/* Define to 1 if you have the <netdb.h> header file. */
+#define HAVE_NETDB_H 1
+
+/* Define to 1 if you have the <netinet/in.h> header file. */
+#define HAVE_NETINET_IN_H 1
 
 /* Define to 1 iff OSAtomicAdd32Barrier() is available */
 /* #undef HAVE_OSX_ATOMIC */
@@ -149,7 +189,7 @@
 #define HAVE_PNG_H 1
 
 /* Define to 1 if PostgreSQL libraries are available */
-/* #undef HAVE_POSTGRESQL */
+#define HAVE_POSTGRESQL 1
 
 /* Define to 1 if you have the `pow' function. */
 #define HAVE_POW 1
@@ -160,8 +200,29 @@
 /* Define to 1 iff the CPU has rdtsc opcode */
 #define HAVE_RDTSC 1
 
+/* Define to 1 if you have the `realpath' function. */
+#define HAVE_REALPATH 1
+
+/* Define to 1 if you have the `rint' function. */
+#define HAVE_RINT 1
+
+/* Define to 1 if you have the `rmdir' function. */
+#define HAVE_RMDIR 1
+
+/* Define to 1 if you have the `select' function. */
+#define HAVE_SELECT 1
+
 /* Define to 1 iff sem_init() works */
 #define HAVE_SEM_INIT 1
+
+/* Define to 1 if you have the `setenv' function. */
+#define HAVE_SETENV 1
+
+/* Define to 1 if you have the `setlocale' function. */
+#define HAVE_SETLOCALE 1
+
+/* Define to 1 if you have the `socket' function. */
+#define HAVE_SOCKET 1
 
 /* Define to 1 iff atomic_add_32_nv() is available */
 /* #undef HAVE_SOLARIS_ATOMIC */
@@ -172,6 +233,9 @@
 /* Define to 1 if you have the `sqrt' function. */
 #define HAVE_SQRT 1
 
+/* Define to 1 if `st_blksize stat.st_rdev' is a member of `stat'. */
+/* #undef HAVE_STAT_ST_BLKSIZE_STAT_ST_RDEV */
+
 /* Define to 1 if stdbool.h conforms to C99. */
 /* #undef HAVE_STDBOOL_H */
 
@@ -181,8 +245,14 @@
 /* Define to 1 if you have the <stdlib.h> header file. */
 #define HAVE_STDLIB_H 1
 
+/* Define to 1 if you have the `strcasecmp' function. */
+#define HAVE_STRCASECMP 1
+
 /* Define to 1 if you have the `strchr' function. */
 #define HAVE_STRCHR 1
+
+/* Define to 1 if you have the `strdup' function. */
+#define HAVE_STRDUP 1
 
 /* Define to 1 if you have the `strerror' function. */
 #define HAVE_STRERROR 1
@@ -193,11 +263,42 @@
 /* Define to 1 if you have the <string.h> header file. */
 #define HAVE_STRING_H 1
 
+/* Define to 1 if you have the `strncasecmp' function. */
+#define HAVE_STRNCASECMP 1
+
+/* Define to 1 if you have the `strndup' function. */
+#define HAVE_STRNDUP 1
+
+/* Define to 1 if you have the `strrchr' function. */
+#define HAVE_STRRCHR 1
+
+/* Define to 1 if you have the `strstr' function. */
+#define HAVE_STRSTR 1
+
+/* Define to 1 if you have the `strtol' function. */
+#define HAVE_STRTOL 1
+
+/* Define to 1 if `st_blocks' is a member of `struct stat'. */
+#define HAVE_STRUCT_STAT_ST_BLOCKS 1
+
+/* Define to 1 if your `struct stat' has `st_blocks'. Deprecated, use
+   `HAVE_STRUCT_STAT_ST_BLOCKS' instead. */
+#define HAVE_ST_BLOCKS 1
+
+/* Define to 1 if you have the <sys/ioctl.h> header file. */
+#define HAVE_SYS_IOCTL_H 1
+
 /* Define to 1 if you have the <sys/param.h> header file. */
 #define HAVE_SYS_PARAM_H 1
 
+/* Define to 1 if you have the <sys/socket.h> header file. */
+#define HAVE_SYS_SOCKET_H 1
+
 /* Define to 1 if you have the <sys/stat.h> header file. */
 #define HAVE_SYS_STAT_H 1
+
+/* Define to 1 if you have the <sys/time.h> header file. */
+#define HAVE_SYS_TIME_H 1
 
 /* Define to 1 if you have the <sys/types.h> header file. */
 #define HAVE_SYS_TYPES_H 1
@@ -205,14 +306,32 @@
 /* Define to 1 if you have the <sys/un.h> header file. */
 #define HAVE_SYS_UN_H 1
 
+/* Define to 1 if you have the <termios.h> header file. */
+#define HAVE_TERMIOS_H 1
+
 /* Define to 1 iff <term.h> is present */
 #define HAVE_TERM_H 1
+
+/* Define to 1 if you have the `uname' function. */
+#define HAVE_UNAME 1
 
 /* Define to 1 if you have the <unistd.h> header file. */
 #define HAVE_UNISTD_H 1
 
 /* Define to 1 if you have the <utmpx.h> header file. */
 #define HAVE_UTMPX_H 1
+
+/* Define to 1 if you have the `vfork' function. */
+#define HAVE_VFORK 1
+
+/* Define to 1 if you have the <vfork.h> header file. */
+/* #undef HAVE_VFORK_H */
+
+/* Define to 1 if `fork' works. */
+#define HAVE_WORKING_FORK 1
+
+/* Define to 1 if `vfork' works. */
+#define HAVE_WORKING_VFORK 1
 
 /* Define to 1 if you have the <X11/Xlib.h> header file. */
 #define HAVE_X11_XLIB_H 1
@@ -266,7 +385,7 @@
 /* #undef RATIONAL_NUMBERS_WANTED */
 
 /* ./configure with --with-postgresql */
-/* #undef REALLY_WANT_PostgreSQL */
+#define REALLY_WANT_PostgreSQL 1
 
 /* SQLite available and wanted */
 #define REALLY_WANT_SQLITE3 1
@@ -279,6 +398,9 @@
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
+
+/* Define to 1 if you can safely include both <sys/time.h> and <time.h>. */
+#define TIME_WITH_SYS_TIME 1
 
 /* Enable extensions on AIX 3, Interix.  */
 #ifndef _ALL_SOURCE
@@ -317,20 +439,8 @@
 /* Define to have visible markers (DONT!) */
 /* #undef VISIBLE_MARKERS_WANTED */
 
-/* Define if compiling for Android */
-/* #undef WANT_ANDROID */
-
 /* Define to make ^D a del-char and ^Z be EOF */
 /* #undef WANT_CTRLD_DEL */
-
-/* Define if building the Erlang interface */
-/* #undef WANT_ERLANG */
-
-/* Define if building libapl.so */
-/* #undef WANT_LIBAPL */
-
-/* Define if building lib_gnu_apl.so */
-/* #undef WANT_PYTHON */
 
 /* Define to 1 if on MINIX. */
 /* #undef _MINIX */
@@ -361,16 +471,32 @@
 #define apl_GTK3 1
 
 /* PostgreSQL code compiles */
-/* #undef apl_POSTGRES */
+#define apl_POSTGRES 1
 
 /* SQLite available */
 #define apl_SQLITE3 1
+
+/* Define if compiling for Android */
+/* #undef apl_TARGET_ANDROID */
+
+/* Define if building the Erlang interface */
+/* #undef apl_TARGET_ERLANG */
+
+/* Define if building libapl.so */
+/* #undef apl_TARGET_LIBAPL */
+
+/* Define if building lib_gnu_apl.so */
+/* #undef apl_TARGET_PYTHON */
 
 /* Define to `__inline__' or `__inline' if that's what the C compiler
    calls it, or to nothing if 'inline' is not supported under any name.  */
 #ifndef __cplusplus
 /* #undef inline */
 #endif
+
+/* Define to the type of a signed integer type of width exactly 16 bits if
+   such a type exists and the standard includes do not define it. */
+/* #undef int16_t */
 
 /* Define to the type of a signed integer type of width exactly 32 bits if
    such a type exists and the standard includes do not define it. */
@@ -380,11 +506,24 @@
    such a type exists and the standard includes do not define it. */
 /* #undef int64_t */
 
+/* Define to rpl_malloc if the replacement function should be used. */
+/* #undef malloc */
+
 /* Define to `long int' if <sys/types.h> does not define. */
 /* #undef off_t */
 
+/* Define to `int' if <sys/types.h> does not define. */
+/* #undef pid_t */
+
 /* Define to `unsigned int' if <sys/types.h> does not define. */
 /* #undef size_t */
+
+/* Define to `int' if <sys/types.h> does not define. */
+/* #undef ssize_t */
+
+/* Define to the type of an unsigned integer type of width exactly 16 bits if
+   such a type exists and the standard includes do not define it. */
+/* #undef uint16_t */
 
 /* Define to the type of an unsigned integer type of width exactly 32 bits if
    such a type exists and the standard includes do not define it. */
@@ -397,3 +536,6 @@
 /* Define to the type of an unsigned integer type of width exactly 8 bits if
    such a type exists and the standard includes do not define it. */
 /* #undef uint8_t */
+
+/* Define as `fork' if `vfork' does not work. */
+/* #undef vfork */

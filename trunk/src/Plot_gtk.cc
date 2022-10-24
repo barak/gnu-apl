@@ -30,7 +30,7 @@ static int verbosity = 0;
 #if apl_GTK3
 
 #include <X11/Xlib.h>
-# include <gtk/gtk.h>
+#include <gtk/gtk.h>
 
 # include "Plot_data.hh"
 # include "Plot_line_properties.hh"

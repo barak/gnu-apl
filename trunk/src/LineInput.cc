@@ -731,11 +731,11 @@ LineInput::LineInput(bool do_read_history)
    current_termios.c_lflag &= ~(ECHO | ECHONL | ICANON | IEXTEN);
    current_termios.c_lflag |= ISIG;
 
-#ifndef WANT_LIBAPL
-# ifndef WANT_PYTHON
+#ifndef apl_TARGET_LIBAPL
+# ifndef apl_TARGET_PYTHON
    tcsetattr(STDIN_FILENO, TCSANOW, &current_termios);
-# endif // WANT_PYTHON
-#endif // WANT_LIBAPL
+# endif // apl_TARGET_PYTHON
+#endif // apl_TARGET_LIBAPL
 }
 //----------------------------------------------------------------------------
 LineInput::~LineInput()
@@ -744,11 +744,11 @@ LineInput::~LineInput()
 
    if (write_history)   history.save_history(uprefs.line_history_path.c_str());
 
-#ifndef WANT_LIBAPL
-# ifndef WANT_PYTHON
+#ifndef apl_TARGET_LIBAPL
+# ifndef apl_TARGET_PYTHON
    tcsetattr(STDIN_FILENO, TCSANOW, &initial_termios);
-# endif // WANT_PYTHON
-#endif // WANT_LIBAPL
+# endif // apl_TARGET_PYTHON
+#endif // apl_TARGET_LIBAPL
 }
 //----------------------------------------------------------------------------
 void
@@ -950,9 +950,9 @@ LineInput::edit_line(LineInputMode mode, const UCS_string & prompt,
                      UCS_string & user_line, bool & eof, LineHistory & hist)
 {
    the_line_input->current_termios.c_lflag &= ~ISIG;   // disable ^C
-#ifndef WANT_LIBAPL
+#ifndef apl_TARGET_LIBAPL
    tcsetattr(STDIN_FILENO, TCSANOW, &the_line_input->current_termios);
-#endif // WANT_LIBAPL
+#endif // apl_TARGET_LIBAPL
 
    user_line.clear();
 
@@ -1067,9 +1067,9 @@ LineEditContext lec(mode, 24, Workspace::get_PW(), hist, prompt);
        }
 
    the_line_input->current_termios.c_lflag |= ISIG;   // enable ^C
-#ifndef WANT_LIBAPL
+#ifndef apl_TARGET_LIBAPL
    tcsetattr(STDIN_FILENO, TCSANOW, &the_line_input->current_termios);
-#endif // WANT_LIBAPL
+#endif // apl_TARGET_LIBAPL
 
    user_line = lec.get_user_line();
 

@@ -3,7 +3,7 @@
 # AUTOMAKE_OPTIONS = no-dependencies
 
 EXTRA_DIRS =
-if ! WANT_ANDROID
+if ! apl_TARGET_ANDROID
 EXTRA_DIRS += APs emacs_mode sql workspaces
 endif
 SUBDIRS = native $(EXTRA_DIRS)
@@ -195,7 +195,7 @@ common_SOURCES += sql/PostgresProvider.cc       sql/PostgresProvider.hh
 endif
 
 pkglib_LTLIBRARIES =
-if WANT_LIBAPL
+if apl_TARGET_LIBAPL
 pkglib_LTLIBRARIES += libapl.la
 pkginclude_HEADERS = libapl.h Error.def
 libapl_la_SOURCES = $(common_SOURCES) libapl.h libapl.cc
@@ -208,7 +208,7 @@ libapl_la_CXXFLAGS = $(common_CXXFLAGS)
 libapl_la_CXXFLAGS += $(GCOV_WANTED) $(GPROF_WANTED) $(CXX_RDYNAMIC)
 
 else
-if WANT_PYTHON
+if apl_TARGETapl_TARGET_LIBAPL_PYTHON
 
 pkglib_LTLIBRARIES += lib_gnu_apl.la
 lib_gnu_apl_la_SOURCES   = $(common_SOURCES) python_apl.cc

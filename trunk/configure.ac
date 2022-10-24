@@ -66,12 +66,7 @@ autoconf -t AM_CONDITIONAL -t AC_SUBST -t AC_DEFINE_UNQUOTED
 
 configure_options="$0 $*"
 
-# apl_EQ and apl_NEQ are safe string comparisons that, unlike the vanilla
-# 'test A = B' and test A != B, also works for empty strings A and/or B.
-AC_DEFUN([apl_EQ],  [ test "x$1" = "x$2" ])
-AC_DEFUN([apl_NEQ], [ test "x$1" != "x$2" ])
-AC_DEFUN([apl_TOPIC],
-         [ { AS_ECHO(); AS_ECHO(["    *** $1... ***"]); AS_ECHO(); } ])
+m4_include(m4/apl_sugar.m4)
 
 AC_PREREQ([2.65])
 AC_INIT([GNU APL], [1.8], [bug-apl@gnu.org])
@@ -102,7 +97,7 @@ AC_LANG(C++)
 #
 LT_INIT([dlopen])
 
-apl_MAINTAINER_MODE = $USE_MAINTAINER_MODE
+apl_MAINTAINER_MODE=$USE_MAINTAINER_MODE
 
 apl_TOPIC([basic checks])
 
@@ -110,6 +105,7 @@ apl_TOPIC([basic checks])
 #
 AC_PROG_CXX
 AC_PROG_CC
+AC_PROG_RANLIB
 
 AC_GNU_SOURCE
 
@@ -151,26 +147,26 @@ AC_CHECK_HEADER(
       [ # endif ]
     ])
 
-AC_CHECK_HEADERS([  \
-    dirent.h        \
-    execinfo.h      \
-    fcntl.h         \
-    fftw3.h         \
-    inttypes.h      \
-    png.h           \
-    stdint.h        \
-    stdlib.h        \
-    string.h        \
-    strings.h       \
-    unistd.h        \
-    utmpx.h         \
-    sys/un.h        \
-    ext/atomicity.h \
-    xcb/xcb.h       \
-    zlib.h          \
-    X11/Xlib.h      \
-    X11/Xlib-xcb.h  \
-    X11/Xutil.h])
+apl_missing_headers=0
+AC_CHECK_HEADERS([                              \
+   dirent.h                                     \
+   execinfo.h                                   \
+   fcntl.h fenv.h fftw3.h                       \
+   inttypes.h                                   \
+   limits.h                                     \
+   malloc.h                                     \
+   netdb.h                                      \
+   png.h                                        \
+   stdint.h stdlib.h string.h strings.h         \
+   termios.h                                    \
+   unistd.h utmpx.h                             \
+   zlib.h                                       \
+   netinet/in.h                                 \
+   sys/ioctl.h sys/socket.h sys/time.h sys/un.h \
+   ext/atomicity.h                              \
+   xcb/xcb.h                                    \
+   X11/Xlib.h X11/Xlib-xcb.h X11/Xutil.h        \
+                 ],,apl_missing_headers=$((1+$apl_missing_headers)))
 
 # xcb/xproto.h needs xcb/xcb.h
 AC_CHECK_HEADER(xcb/xproto.h, [], [], [#include <xcb/xcb.h>])
@@ -182,10 +178,13 @@ AC_HEADER_STDBOOL
 apl_TOPIC([checks for standard C/C++ types])
 
 AC_C_INLINE
+AC_TYPE_INT16_T
 AC_TYPE_INT32_T
 AC_TYPE_INT64_T
 AC_TYPE_OFF_T
 AC_TYPE_SIZE_T
+AC_TYPE_SSIZE_T
+AC_TYPE_UINT16_T
 AC_TYPE_UINT32_T
 AC_TYPE_UINT64_T
 AC_TYPE_UINT8_T
@@ -212,9 +211,26 @@ AC_DEFINE_UNQUOTED([CONFIGURE_ARGS],
 #
 ##############################################################################
 
+AC_CHECK_MEMBERS(stat.st_blksize stat.st_rdev)
+
 AC_FUNC_ERROR_AT_LINE
+AC_FUNC_FORK
+AC_FUNC_MALLOC
+AC_FUNC_MKTIME
+AC_FUNC_STRTOD
 AC_FUNC_MMAP
-AC_CHECK_FUNCS([floor memset munmap pow sqrt strchr strerror])
+apl_missing_functions=0
+AC_CHECK_FUNCS([                                             \
+   dup2                                                      \
+   floor                                                     \
+   getcwd gethostbyname gettimeofday                         \
+   memset mkdir modf munmap                                  \
+   pow                                                       \
+   realpath rint rmdir                                       \
+   select setenv setlocale socket sqrt strcasecmp strchr     \
+   strdup strncasecmp strndup strerror strrchr strstr strtol \
+   uname                                                     \
+               ],,apl_missing_functions=$((1+$apl_missing_functions)))
 
 AC_CHECK_LIB([tinfo],     [tparm])
 AC_CHECK_LIB([socket],    [socket])   # for Solaris
@@ -227,6 +243,9 @@ AC_CHECK_LIB([execinfo],  [backtrace])
 AC_CHECK_LIB([dl],        [dlopen])
 AC_CHECK_LIB([c],         [initstate_r])
 AC_CHECK_LIB([atomicity], [__atomic_fetch_add_4])
+
+AC_STRUCT_ST_BLOCKS
+AC_PATH_X
 
 apl_TOPIC([checks for optional (not strictly required) libraries])
 
@@ -249,15 +268,15 @@ if apl_NEQ($apl_SQLITE3, yes); then
    AS_ECHO(["   └──── may affect: ⎕SQL"]);
 fi
 m4_include([m4/check_POSTGRES.m4])
-if apl_NEQ($apl_POSTGRES, yes); then
+if apl_NYES($apl_POSTGRES); then
    AS_ECHO(["   └──── may affect: ⎕SQL"]);
 fi
 m4_include([m4/check_PCRE.m4])
-if apl_NEQ($apl_PCRE, yes); then
+if apl_NYES($apl_PCRE); then
    AS_ECHO(["   └──── may affect: ⎕RE"]);
 fi
 m4_include([m4/check_GTK.m4])
-if apl_NEQ($apl_GTK3, yes); then
+if apl_NYES($apl_GTK3); then
    AS_ECHO(["   └──── will affect: ⎕PLOT, ⎕PNG"]);
 fi
 
@@ -273,12 +292,10 @@ AC_COMPILE_IFELSE(
         [[unsigned int lo, hi;
           __asm__ __volatile__ ("rdtsc" : "=a" (lo), "=d" (hi));]]
     )], [HAVE_rdtsc=yes], [HAVE_rdtsc=no])
-if apl_EQ($HAVE_rdtsc, yes); then
+if apl_YES($HAVE_rdtsc); then
    AC_DEFINE_UNQUOTED([HAVE_RDTSC], [1],
                       [Define to 1 iff the CPU has rdtsc opcode])
 fi
-
-AM_CONDITIONAL(HAVE_RDTSC, apl_EQ($HAVE_rdtsc, yes))
 AC_MSG_RESULT([$HAVE_rdtsc])
 
 ################################# gettimeofday check #########################
@@ -289,7 +306,7 @@ AC_COMPILE_IFELSE(
         [AC_LANG_PROGRAM([[#include <sys/time.h>]],
         [[timeval tv; gettimeofday(&tv, 0); ]]
     )], [HAVE_gettimeofday=yes], [HAVE_gettimeofday=no])
-if apl_EQ($HAVE_gettimeofday, yes); then
+if apl_YES($HAVE_gettimeofday); then
    AC_DEFINE_UNQUOTED([HAVE_GETTIMEOFDAY], [1],
                       [Define to 1 iff the OS has gettimeofday()])
 fi
@@ -309,10 +326,10 @@ AC_COMPILE_IFELSE(
           sem_init(&sema, 0, 0);
         ]]
     )], [HAVE_SEM_INIT=yes], [HAVE_SEM_INIT=no])
-if apl_EQ($HAVE_SEM_INIT, yes); then
+if apl_YES($HAVE_SEM_INIT); then
    AC_DEFINE_UNQUOTED([HAVE_SEM_INIT], [1], [Define to 1 iff sem_init() works])
 fi
-AM_CONDITIONAL(HAVE_SEM_INIT, apl_EQ($HAVE_SEM_INIT, yes))
+AM_CONDITIONAL(HAVE_SEM_INIT, apl_YES($HAVE_SEM_INIT))
 CXXFLAGS=$apl_save_CXXFLAGS
 AC_MSG_RESULT([$HAVE_SEM_INIT])
 
@@ -337,7 +354,6 @@ AC_COMPILE_IFELSE(
                         [Define to 1 iff pthread_setaffinity_np() is available])
     ],
     [HAVE_AFFINITY_NP=no])
-AM_CONDITIONAL(HAVE_AFFINITY_NP, test "$HAVE_AFFINITY_NP" = yes)
 AC_MSG_RESULT([$HAVE_AFFINITY_NP])
 
 ######################## pthread_setname_np() check #######################
@@ -393,7 +409,6 @@ AC_MSG_RESULT([$HAVE_SOLARIS_ATOMIC])
 
 # check if we are on i686 (to fix a strange rpmbuild problem)
 AC_MSG_CHECKING([whether we compile for an i686 CPU])
-AM_CONDITIONAL([ON_i686], [apl_EQ($(uname -m), i686)])
 if apl_EQ($(uname -m), i686); then
     AC_MSG_RESULT([yes])
 else
@@ -412,85 +427,13 @@ AC_ARG_WITH( [ctrld_del],
              [user_wants_ctrlD_del=$withval],
              [user_wants_ctrlD_del=no])
 
-if apl_EQ($user_wants_ctrlD_del, yes); then
+if apl_YES($user_wants_ctrlD_del); then
     AC_DEFINE([WANT_CTRLD_DEL], [1],
               [Define to make ^D a del-char and ^Z be EOF])
 fi
 AC_MSG_RESULT([$user_wants_ctrlD_del])
-AM_CONDITIONAL(WANT_CTRLD_DEL, apl_EQ($user_wants_ctrlD_del, yes))
 
-# check if the user compiles for ANDROID
-#
-AC_MSG_CHECKING([if we are compiling for Android])
-AC_ARG_WITH( [android],
-             [AS_HELP_STRING([--with-android],
-                             [enable when compiling for Android])],
-             [user_wants_android=$withval],
-             [user_wants_android=no])
-
-if apl_EQ($user_wants_android, yes); then
-   AC_DEFINE([WANT_ANDROID], [1], [Define if compiling for Android])
-fi
-AM_CONDITIONAL(WANT_ANDROID, apl_EQ($user_wants_android, yes))
-AC_MSG_RESULT([$user_wants_android])
-
-
-# check if the user wants the Erlang interface (and therefore also libapl)
-#
-AC_MSG_CHECKING([if we want to build an erlang interface (implies libapl.so)])
-AC_ARG_WITH( [erlang],
-             [AS_HELP_STRING([--with-erlang],
-                             [enable to build the Erlang interface])],
-             [user_wants_erlang=$withval],
-             [user_wants_erlang=no])
-
-if apl_EQ($user_wants_libapl, yes); then
-   AC_DEFINE([WANT_ERLANG], [1], [Define if building the Erlang interface])
-fi
-
-AM_CONDITIONAL(WANT_ERLANG, apl_EQ($user_wants_erlang, yes))
-AC_MSG_RESULT([$user_wants_erlang])
-
-
-# check if the user wants to build libapl.so
-#
-AC_MSG_CHECKING([if we want to build libapl.so])
-user_wants_libapl=$user_wants_erlang   # Erlang needs libapl
-AC_ARG_WITH( [libapl],
-             [AS_HELP_STRING([--with-libapl],
-                             [enable to build libapl.so])],
-             [user_wants_libapl=$withval])
-
-if apl_EQ($user_wants_libapl, yes); then
-   AC_DEFINE([WANT_LIBAPL], [1], [Define if building libapl.so])
-fi
-
-
-AM_CONDITIONAL(WANT_LIBAPL, apl_EQ($user_wants_libapl, yes))
-AC_MSG_RESULT([$user_wants_libapl])
-
-# check if the user wants to build the python extension libpython_apl.so
-#
-AC_MSG_CHECKING([if we want to build libpython_apl.so])
-user_wants_python=no
-AC_SUBST(PYTHON_CFLAGS)
-PYTHON_CFLAGS=
-AC_ARG_WITH( [python],
-             [AS_HELP_STRING([--with-python],
-             [enable to build python extension lib_gnu_apl.so])],
-             [user_wants_python=$withval])
-
-if apl_EQ($user_wants_python, yes); then
-   AC_DEFINE([WANT_PYTHON], [1], [Define if building lib_gnu_apl.so])
-    AC_PATH_PROG(PKG_CONFIG, pkg-config, no)  # locate pkg-config
-    if apl_NEQ($PKG_CONFIG, no); then        # we have pkg-config
-       if $PKG_CONFIG --exists python ; then  # and pkg-config knows python
-            PYTHON_CFLAGS=$( $PKG_CONFIG --cflags python3 )
-       fi
-   fi
-fi
-AM_CONDITIONAL(WANT_PYTHON, apl_EQ($user_wants_python, yes))
-AC_MSG_RESULT([$user_wants_python])
+m4_include(m4/apl_TARGETs.m4)
 
 AC_CONFIG_FILES([Makefile
                  build/Makefile
@@ -540,15 +483,15 @@ AC_CONFIG_FILES([Makefile
 # AM_CXXFLAGS: do/dont -Werror ?
 AC_ARG_VAR(CXX_WERROR,
    [ turn all warnings into errors (compiler flag -Werror) default: no) ])
-if apl_EQ($CXX_WERROR, yes); then CXX_WERROR="-Werror";
-                              else CXX_WERROR=""; fi
+if apl_YES($CXX_WERROR); then CXX_WERROR="-Werror";
+                         else CXX_WERROR=""; fi
 
 # APL: development configuration desired ? Set this before other xxx_WANTED
 # options so that the implied xxx_WANTED options set here can be overridden
 # further down
 AC_ARG_VAR(DEVELOP_WANTED,
    [ set development options (see README-2-configure) default: no])
-if apl_EQ($DEVELOP_WANTED, yes); then
+if apl_YES($DEVELOP_WANTED); then
    AC_DEFINE_UNQUOTED([DEVELOP_WANTED], [yes],
                       [Define to set options typical for software development])
    ASSERT_LEVEL_WANTED=2
@@ -558,19 +501,21 @@ if apl_EQ($DEVELOP_WANTED, yes); then
    VALUE_CHECK_WANTED=yes
    VALUE_HISTORY_WANTED=yes
 fi
+AM_CONDITIONAL([apl_DEVELOP],  [apl_YES($DEVELOP_WANTED)])
+
 
 # APL: max. rank ?
 AC_ARG_VAR(MAX_RANK_WANTED,
    [ the max. Rank of APL values (see README-2-configure) default: 8) ])
-if apl_EQ($MAX_RANK_WANTED, ); then MAX_RANK_WANTED=8; fi
+if apl_EQ($MAX_RANK_WANTED,); then MAX_RANK_WANTED=8; fi   # set default to 8
 AC_DEFINE_UNQUOTED([MAX_RANK_WANTED], [$MAX_RANK_WANTED],
-                   [max. rank of APL values ])
+                   [max. rank of APL values])
 
 
 # APL: CHECK() macro desired ?
 AC_ARG_VAR(VALUE_CHECK_WANTED,
    [ enable CHECK() macro (see README-2-configure) default: no ])
-if apl_EQ($VALUE_CHECK_WANTED, yes); then
+if apl_YES($VALUE_CHECK_WANTED); then
    AC_DEFINE_UNQUOTED([VALUE_CHECK_WANTED], [yes],
                       [ Define to enable CHECK macro ])
 fi
@@ -580,7 +525,7 @@ fi
 AC_MSG_CHECKING([whether internal performance counters shall be enabled)])
 AC_ARG_VAR(PERFORMANCE_COUNTERS_WANTED,
    [ enable performance counters (see README-2-configure) default: no ])
-if apl_EQ($PERFORMANCE_COUNTERS_WANTED, yes); then
+if apl_YES($PERFORMANCE_COUNTERS_WANTED); then
    AC_DEFINE_UNQUOTED([PERFORMANCE_COUNTERS_WANTED], [yes],
                    [ Define to enable performance counters])
 else PERFORMANCE_COUNTERS_WANTED="no"
@@ -592,7 +537,7 @@ AC_MSG_RESULT([$PERFORMANCE_COUNTERS_WANTED])
 AC_MSG_CHECKING([whether to remember the history of APL values (debug feature)])
 AC_ARG_VAR(VALUE_HISTORY_WANTED,
    [ enable value events (a debug facility, see README-2-configure) default: no ])
-if apl_EQ($VALUE_HISTORY_WANTED, yes); then
+if apl_YES($VALUE_HISTORY_WANTED); then
    AC_DEFINE_UNQUOTED([VALUE_HISTORY_WANTED], [yes],
                       [ Define to enable value events])
 else VALUE_HISTORY_WANTED="no"
@@ -604,7 +549,7 @@ AC_MSG_RESULT([$VALUE_HISTORY_WANTED])
 AC_MSG_CHECKING([whether gprof profiling shall be enabled])
 AC_ARG_VAR(GPROF_WANTED,
    [ enable gprof (-pg) (see README-2-configure) default: no ])
-if apl_EQ($GPROF_WANTED, yes); then
+if apl_YES($GPROF_WANTED); then
    GPROF_WANTED="-pg"
    AC_MSG_RESULT([yes])
 else
@@ -619,7 +564,7 @@ AC_DEFINE_UNQUOTED([GPROF_WANTED], [-pg],
 AC_MSG_CHECKING([whether gcov coverage testing shall be enabled])
 AC_ARG_VAR(GCOV_WANTED,
    [ enable gcov (-fprofile-arcs and -ftest-coverage) (see README-2-configure) default: no ])
-if apl_EQ($GCOV_WANTED, yes); then
+if apl_YES($GCOV_WANTED); then
    GCOV_WANTED="--coverage"
    AC_MSG_RESULT([yes])
 else
@@ -632,7 +577,7 @@ fi
 AC_MSG_CHECKING([whether dynamic logging shall be enabled])
 AC_ARG_VAR(DYNAMIC_LOG_WANTED,
    [ enable dynamic logging (see README-2-configure) default: no ])
-if apl_EQ($DYNAMIC_LOG_WANTED, yes); then
+if apl_YES($DYNAMIC_LOG_WANTED); then
 AC_DEFINE_UNQUOTED([DYNAMIC_LOG_WANTED], [yes],
                    [ Define to enable dynamic logging ])
 else DYNAMIC_LOG_WANTED="no"
@@ -644,7 +589,7 @@ AC_MSG_RESULT([$DYNAMIC_LOG_WANTED])
 AC_MSG_CHECKING([whether value flags shall be traced])
 AC_ARG_VAR(VF_TRACING_WANTED,
    [ enable tracing of value flags (see README-2-configure) default: no ])
-if apl_EQ($VF_TRACING_WANTED, yes); then
+if apl_YES($VF_TRACING_WANTED); then
    AC_DEFINE_UNQUOTED([VF_TRACING_WANTED], [yes],
                       [ Define to enable tracing of value flags ])
 else VF_TRACING_WANTED="no"
@@ -656,9 +601,9 @@ AC_MSG_RESULT([$VF_TRACING_WANTED])
 AC_MSG_CHECKING([how picky (0=not, 1=somwhat, 2=very) internal tests shall be])
 AC_ARG_VAR(ASSERT_LEVEL_WANTED,
    [ Assert level (see README-2-configure) default: 1) ])
-if apl_EQ($ASSERT_LEVEL_WANTED, ); then ASSERT_LEVEL_WANTED=1; fi
+if apl_EQ($ASSERT_LEVEL_WANTED, ); then ASSERT_LEVEL_WANTED=1; fi   # default: 1
 AC_DEFINE_UNQUOTED([ASSERT_LEVEL_WANTED], [$ASSERT_LEVEL_WANTED],
-                   [assert level])
+                   [desired ASSERT() level])
 AC_MSG_RESULT([$ASSERT_LEVEL_WANTED])
 
 
@@ -737,7 +682,7 @@ AC_MSG_RESULT([$SHORT_VALUE_LENGTH_WANTED])
 AC_MSG_CHECKING([whether visible markers shall be used])
 AC_ARG_VAR(VISIBLE_MARKERS_WANTED,
    [ enable visible formatting markers (debug facility, see README-2-configure) default: no ])
-if apl_EQ($VISIBLE_MARKERS_WANTED, yes); then
+if apl_YES($VISIBLE_MARKERS_WANTED); then
 AC_DEFINE_UNQUOTED([VISIBLE_MARKERS_WANTED], [yes],
                    [ Define to have visible markers (DONT!)])
 else VISIBLE_MARKERS_WANTED="no"
@@ -749,16 +694,13 @@ AC_MSG_RESULT([$VISIBLE_MARKERS_WANTED])
 AC_MSG_CHECKING([whether support for rational numbers is desired ])
 AC_ARG_VAR(RATIONAL_NUMBERS_WANTED,
    [ enable support for rational numbers (see README-2-configure) default: no ])
-if apl_EQ($RATIONAL_NUMBERS_WANTED, yes); then
+if apl_YES($RATIONAL_NUMBERS_WANTED); then
 AC_DEFINE_UNQUOTED([RATIONAL_NUMBERS_WANTED], [yes],
                    [ Define to have support for rational numbers (EXPERIMENTAL!)])
 else RATIONAL_NUMBERS_WANTED="no"
 fi
 AC_MSG_RESULT([$RATIONAL_NUMBERS_WANTED])
 
-
-# export some of the options to Makefile
-AM_CONDITIONAL([DEVELOP],  [apl_EQ($DEVELOP_WANTED,    yes)])
 
 apl_TOPIC([./configure checks done, producing the output files])
 
@@ -783,7 +725,8 @@ for q in 1 2 3 4; do      # at most 4 times...
 done
 
 if apl_EQ($abs_apl_top, not-found); then
-   AS_ECHO(["configure: *** could not find top-level GNU APL directory, using '.'"])
+   AS_ECHO_N(["configure: *** could not find top-level GNU APL directory,"])
+   AS_ECHO(  [" using '.' ***"])
    apl_top="."
 else
    AS_ECHO(["configure: top-level apl directory is: $abs_apl_top"])
@@ -806,8 +749,8 @@ fi
 # print a summary or maybe complain
 #
 AS_ECHO([" "])
-if apl_EQ($want1_postgresql, yes); then
-   if apl_EQ($apl_POSTGRES, yes); then
+if apl_YES($want1_postgresql); then
+   if apl_YES($apl_POSTGRES); then
       AS_ECHO(["      PostgreSQL looks good."])
    else
       AS_ECHO(["NOTE: PostgreSQL support was requested, but the handler function"])
@@ -817,8 +760,10 @@ if apl_EQ($want1_postgresql, yes); then
    fi
 fi
 
-if apl_EQ($WANT1_SQLITE3, yes); then
-   if apl_NEQ($apl_SQLITE3, yes); then
+if apl_YES($WANT1_SQLITE3); then
+   if apl_YES($apl_SQLITE3); then
+      AS_ECHO(["      SQLite looks good."])
+   else
       AS_ECHO(["NOTE: SQLite support was requested, but the handler function for "])
       AS_ECHO(["      accessing SQLite cannot not be built. Your SQLite"])
       AS_ECHO(["      installation is missing or incomplete. See details above."])
@@ -827,12 +772,15 @@ if apl_EQ($WANT1_SQLITE3, yes); then
 fi
 
 AS_ECHO(["
-configure:    ---- SUMMARY ----
-    maintainer mode: $apl_MAINTAINER_MODE
-    FFT:             $apl_FFT        for: ⎕FFT
-    GTK3:            $apl_GTK3        for: ⎕PLOT, ⎕PNG, ⎕GTK
-    SQLITE3:         $apl_SQLITE3        for: ⎕SQL
-    POSTGRES:        $apl_POSTGRES        for: ⎕SQL
-    PCRE:            $apl_PCRE        for: ⎕RE
-    PNG:             $apl_PNG        for: ⎕PNG
+configure:    ---- SUMMARY OF TESTS (please include in error reports) ----
+
+    apl_MAINTAINER_MODE:   $apl_MAINTAINER_MODE
+    apl_missing_headers:   $apl_missing_headers
+    apl_missing_functions: $apl_missing_functions
+    apl_FFT:               $apl_FFT		(affects: ⎕FFT)
+    apl_GTK3:              $apl_GTK3		(affects: ⎕PLOT, ⎕PNG, and ⎕GTK)
+    apl_PCRE:              $apl_PCRE		(affects: ⎕RE)
+    apl_PNG:               $apl_PNG		(affects: ⎕PNG)
+    apl_POSTGRES:          $apl_POSTGRES		(affects: ⎕SQL)
+    apl_SQLITE3:           $apl_SQLITE3		(affects: ⎕SQL)
 "])

@@ -88,17 +88,18 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-@DEVELOP_TRUE@@WANT_ERLANG_TRUE@am__append_1 = $(WERROR) -Wall -Wno-strict-aliasing
+@apl_DEVELOP_TRUE@@apl_TARGET_ERLANG_TRUE@am__append_1 = $(WERROR) -Wall -Wno-strict-aliasing
 subdir = erlang
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/depend.m4 \
-	$(top_srcdir)/m4/check_SQLITE.m4 \
+	$(top_srcdir)/m4/apl_sugar.m4 $(top_srcdir)/m4/check_SQLITE.m4 \
 	$(top_srcdir)/m4/ax_lib_sqlite3.m4 \
 	$(top_srcdir)/m4/check_POSTGRES.m4 \
 	$(top_srcdir)/m4/ax_lib_postgresql.m4 \
 	$(top_srcdir)/m4/check_PCRE.m4 \
 	$(top_srcdir)/m4/ax_path_lib_pcre.m4 \
-	$(top_srcdir)/m4/check_GTK.m4 $(top_srcdir)/configure.ac
+	$(top_srcdir)/m4/check_GTK.m4 $(top_srcdir)/m4/apl_TARGETs.m4 \
+	$(top_srcdir)/configure.ac
 am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 	$(ACLOCAL_M4)
 DIST_COMMON = $(srcdir)/Makefile.am $(am__DIST_COMMON)
@@ -138,8 +139,7 @@ LTLIBRARIES = $(pkglib_LTLIBRARIES)
 liberlang_APL_nif_la_LIBADD =
 am__liberlang_APL_nif_la_SOURCES_DIST = erlang_APL_nif.c README \
 	apl_example.erl
-@WANT_ERLANG_TRUE@am_liberlang_APL_nif_la_OBJECTS =  \
-@WANT_ERLANG_TRUE@	liberlang_APL_nif_la-erlang_APL_nif.lo
+@apl_TARGET_ERLANG_TRUE@am_liberlang_APL_nif_la_OBJECTS = liberlang_APL_nif_la-erlang_APL_nif.lo
 am__EXTRA_liberlang_APL_nif_la_SOURCES_DIST = apl.erl apl_example.erl
 liberlang_APL_nif_la_OBJECTS = $(am_liberlang_APL_nif_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
@@ -150,7 +150,8 @@ liberlang_APL_nif_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
 	$(liberlang_APL_nif_la_CFLAGS) $(CFLAGS) \
 	$(liberlang_APL_nif_la_LDFLAGS) $(LDFLAGS) -o $@
-@WANT_ERLANG_TRUE@am_liberlang_APL_nif_la_rpath = -rpath $(pkglibdir)
+@apl_TARGET_ERLANG_TRUE@am_liberlang_APL_nif_la_rpath = -rpath \
+@apl_TARGET_ERLANG_TRUE@	$(pkglibdir)
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -299,6 +300,7 @@ PKG_CONFIG = @PKG_CONFIG@
 POSTGRESQL_CFLAGS = @POSTGRESQL_CFLAGS@
 POSTGRESQL_LDFLAGS = @POSTGRESQL_LDFLAGS@
 POSTGRESQL_VERSION = @POSTGRESQL_VERSION@
+POW_LIB = @POW_LIB@
 PYTHON_CFLAGS = @PYTHON_CFLAGS@
 RANLIB = @RANLIB@
 RATIONAL_NUMBERS_WANTED = @RATIONAL_NUMBERS_WANTED@
@@ -316,6 +318,7 @@ VALUE_HISTORY_WANTED = @VALUE_HISTORY_WANTED@
 VERSION = @VERSION@
 VF_TRACING_WANTED = @VF_TRACING_WANTED@
 VISIBLE_MARKERS_WANTED = @VISIBLE_MARKERS_WANTED@
+XMKMF = @XMKMF@
 abs_builddir = @abs_builddir@
 abs_srcdir = @abs_srcdir@
 abs_top_builddir = @abs_top_builddir@
@@ -370,23 +373,25 @@ target_alias = @target_alias@
 top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
-@WANT_ERLANG_TRUE@AM_CFLAGS = $(CXX_RDYNAMIC) -g -O2 $(am__append_1)
-@WANT_ERLANG_TRUE@pkglib_LTLIBRARIES = liberlang_APL_nif.la
-@WANT_ERLANG_TRUE@liberlang_APL_nif_la_SOURCES = erlang_APL_nif.c README apl_example.erl
-@WANT_ERLANG_TRUE@EXTRA_liberlang_APL_nif_la_SOURCES = apl.erl apl_example.erl
-@WANT_ERLANG_TRUE@liberlang_APL_nif_la_CFLAGS = $(AM_CFLAGS) -I \
-@WANT_ERLANG_TRUE@	$(abs_top_srcdir) -fpic -shared -I \
-@WANT_ERLANG_TRUE@	$(pkgincludedir) -I $(pkgincludedir)/.. # \
-@WANT_ERLANG_TRUE@	e.g. /usr/local/include
-@WANT_ERLANG_TRUE@liberlang_APL_nif_la_LDFLAGS = -avoid-version -export-dynamic -E
+@apl_TARGET_ERLANG_TRUE@AM_CFLAGS = $(CXX_RDYNAMIC) -g -O2 \
+@apl_TARGET_ERLANG_TRUE@	$(am__append_1)
+@apl_TARGET_ERLANG_TRUE@pkglib_LTLIBRARIES = liberlang_APL_nif.la
+@apl_TARGET_ERLANG_TRUE@liberlang_APL_nif_la_SOURCES = erlang_APL_nif.c README apl_example.erl
+@apl_TARGET_ERLANG_TRUE@EXTRA_liberlang_APL_nif_la_SOURCES = apl.erl apl_example.erl
+@apl_TARGET_ERLANG_TRUE@liberlang_APL_nif_la_CFLAGS = $(AM_CFLAGS) -I \
+@apl_TARGET_ERLANG_TRUE@	$(abs_top_srcdir) -fpic -shared -I \
+@apl_TARGET_ERLANG_TRUE@	$(pkgincludedir) -I \
+@apl_TARGET_ERLANG_TRUE@	$(pkgincludedir)/.. # e.g. \
+@apl_TARGET_ERLANG_TRUE@	/usr/local/include
+@apl_TARGET_ERLANG_TRUE@liberlang_APL_nif_la_LDFLAGS = -avoid-version -export-dynamic -E
 
 # for some reason, using libtool causes Erlang to try to load the file
 # erlang_APL_nif.so.so instead of erlang_APL_nif.so. We therefore do not
 # use libtool but create the make targets manually. This seems to work on
 # Ubuntu but may require manual fixes on other platforms.
 #
-@WANT_ERLANG_TRUE@FILES = apl.beam apl_example.beam
-@WANT_ERLANG_TRUE@CLEANFILES = ${FILES}
+@apl_TARGET_ERLANG_TRUE@FILES = apl.beam apl_example.beam
+@apl_TARGET_ERLANG_TRUE@CLEANFILES = ${FILES}
 all: all-am
 
 .SUFFIXES:
@@ -717,13 +722,13 @@ uninstall-am: uninstall-pkglibLTLIBRARIES
 .PRECIOUS: Makefile
 
 
-@WANT_ERLANG_TRUE@all: apl.beam apl_example.beam
-@WANT_ERLANG_TRUE@.erl.beam:
-@WANT_ERLANG_TRUE@	erlc $<
+@apl_TARGET_ERLANG_TRUE@all: apl.beam apl_example.beam
+@apl_TARGET_ERLANG_TRUE@.erl.beam:
+@apl_TARGET_ERLANG_TRUE@	erlc $<
 
-@WANT_ERLANG_FALSE@.PHONY:	all
-@WANT_ERLANG_FALSE@all:
-@WANT_ERLANG_FALSE@	@echo "nothing to be done because GNU APL was NOT configured --with-erlang"
+@apl_TARGET_ERLANG_FALSE@.PHONY:	all
+@apl_TARGET_ERLANG_FALSE@all:
+@apl_TARGET_ERLANG_FALSE@	@echo "nothing to be done because GNU APL was NOT configured --with-erlang"
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

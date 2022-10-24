@@ -2,7 +2,7 @@
 AM_MAKEFLAGS = -j $(MAKE_J)
 
 AM_CXXFLAGS = $(CXX_RDYNAMIC) -I $(srcdir)/.. -g -O2
-if DEVELOP
+if apl_DEVELOP
    AM_CXXFLAGS += $(WERROR) -Wall -Wno-strict-aliasing
 endif
 

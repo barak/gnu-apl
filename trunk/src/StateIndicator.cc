@@ -489,13 +489,13 @@ int pc = get_PC();
    return executable->get_line(Function_PC(pc));
 }
 //----------------------------------------------------------------------------
-#ifdef WANT_LIBAPL
+#ifdef apl_TARGET_LIBAPL
 typedef int (*result_callback)(const Value * result, int committed);
 extern "C" result_callback res_callback;
 result_callback res_callback = 0;
 #endif
 
-#ifdef WANT_PYTHON
+#ifdef apl_TARGET_PYTHON
 extern bool python_result_callback(Token & result);
 #endif
 
@@ -526,7 +526,7 @@ StateIndicator::statement_result(Token & result, bool trace)
    //
    if (result.get_ValueType() != TV_VAL)
       {
-#ifdef WANT_PYTHON
+#ifdef apl_TARGET_PYTHON
          python_result_callback(result);
 #endif
 
@@ -541,7 +541,7 @@ Value_P B(result.get_apl_val());
    //
 bool print_value = tag == TOK_APL_VALUE1 || tag == TOK_APL_VALUE3;
 
-#ifdef WANT_LIBAPL
+#ifdef apl_TARGET_LIBAPL
    if (res_callback)   // callback installed
       {
         // the callback decides whether the value shall be printed (even
@@ -551,7 +551,7 @@ bool print_value = tag == TOK_APL_VALUE1 || tag == TOK_APL_VALUE3;
       }
 #endif
 
-#ifdef WANT_PYTHON
+#ifdef apl_TARGET_PYTHON
    print_value = python_result_callback(result);
 #endif
 

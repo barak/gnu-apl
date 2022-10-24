@@ -997,7 +997,7 @@ private:
    /// prevent delete[] of Value
    static void operator delete[](void* ptr);
 
-   /// restrict use of & (which is frequently a mistake)
+   /// limit the use of & (which is frequently a mistake)
    Value * operator &()   { return this; }
 };
 //----------------------------------------------------------------------------

@@ -1,7 +1,7 @@
-if WANT_ERLANG
+if apl_TARGET_ERLANG
 
 AM_CFLAGS = $(CXX_RDYNAMIC) -g -O2
-if DEVELOP
+if apl_DEVELOP
    AM_CFLAGS += $(WERROR) -Wall -Wno-strict-aliasing
 endif   # if DEVELOP
 
