@@ -51,7 +51,7 @@ DiffOut DOUT_filebuf(false);
 DiffOut UERR_filebuf(true);
 
 // Android is supposed to define its own CIN, COUT, CERR, and UERR ostreams
-#ifndef WANT_ANDROID
+#ifndef apl_TARGET_ANDROID
 
 CinOut CIN_filebuf;
 CIN_ostream CIN;
