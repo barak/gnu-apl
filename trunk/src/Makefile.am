@@ -208,7 +208,7 @@ libapl_la_CXXFLAGS = $(common_CXXFLAGS)
 libapl_la_CXXFLAGS += $(GCOV_WANTED) $(GPROF_WANTED) $(CXX_RDYNAMIC)
 
 else
-if apl_TARGETapl_TARGET_LIBAPL_PYTHON
+if apl_TARGET_PYTHON
 
 pkglib_LTLIBRARIES += lib_gnu_apl.la
 lib_gnu_apl_la_SOURCES   = $(common_SOURCES) python_apl.cc
