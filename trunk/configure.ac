@@ -156,27 +156,22 @@ AC_CHECK_HEADERS([                              \
    limits.h                                     \
    malloc.h                                     \
    netdb.h                                      \
+   netinet/in.h                                 \
    png.h                                        \
    stdint.h stdlib.h string.h strings.h         \
+   sys/un.h                                     \
    termios.h                                    \
    unistd.h utmpx.h                             \
    zlib.h                                       \
-   netinet/in.h                                 \
-   sys/ioctl.h sys/socket.h sys/time.h sys/un.h \
-   ext/atomicity.h                              \
-   xcb/xcb.h                                    \
-   X11/Xlib.h X11/Xlib-xcb.h X11/Xutil.h        \
-                 ],,apl_missing_headers=$((1+$apl_missing_headers)))
+                 ],, apl_missing_headers=$((1+$apl_missing_headers)))
 
-# xcb/xproto.h needs xcb/xcb.h
-AC_CHECK_HEADER(xcb/xproto.h, [], [], [#include <xcb/xcb.h>])
-
-AC_HEADER_STDBOOL
+m4_include([m4/check_X11.m4])
 
 # Checks for typedefs, structures, and compiler characteristics.
 #
 apl_TOPIC([checks for standard C/C++ types])
 
+AC_HEADER_STDBOOL
 AC_C_INLINE
 AC_TYPE_INT16_T
 AC_TYPE_INT32_T
@@ -245,24 +240,18 @@ AC_CHECK_LIB([c],         [initstate_r])
 AC_CHECK_LIB([atomicity], [__atomic_fetch_add_4])
 
 AC_STRUCT_ST_BLOCKS
-AC_PATH_X
 
 apl_TOPIC([checks for optional (not strictly required) libraries])
 
-AC_DEFUN([OPT_LIB], [ AC_CHECK_LIB($1, $2, , [AS_ECHO(["   └──── $3 "]); ])])
-
 #       library,   function-in library, impact-if-missing
-OPT_LIB([cairo],   [cairo_fill],        [may affect: ⎕PLOT])
-OPT_LIB([fftw3],   [fftw_plan_dft],     [will affect ⎕FFT])
+apl_OPT_LIB([cairo],   [cairo_fill],        [may affect: ⎕PLOT])
+apl_OPT_LIB([fftw3],   [fftw_plan_dft],     [will affect ⎕FFT])
    apl_FFT=$ac_cv_lib_fftw3_fftw_plan_dft
-OPT_LIB([gtk-3],   [gtk_init],          [will affect: ⎕PNG])
-OPT_LIB([gdk-3],   [gdk_init],          [may affect: ⎕PLOT, will affect: ⎕PNG])
-OPT_LIB([png],     [png_init_io],       [may affect: ⎕PLOT, will affect: ⎕PNG])
+apl_OPT_LIB([gtk-3],   [gtk_init],          [will affect: ⎕PNG])
+apl_OPT_LIB([gdk-3],   [gdk_init],          [may affect: ⎕PLOT, will affect: ⎕PNG])
+apl_OPT_LIB([png],     [png_init_io],       [may affect: ⎕PLOT, will affect: ⎕PNG])
    apl_PNG=$ac_cv_lib_png_png_init_io
-OPT_LIB([X11-xcb], [XGetXCBConnection], [may affect: ⎕PLOT])
-OPT_LIB([X11],     [XOpenDisplay],      [may affect: ⎕PLOT])
-OPT_LIB([xcb],     [xcb_connect],       [may affect: ⎕PLOT])
-OPT_LIB([z],       [uncompress],        [will affect: ⎕PNG])
+apl_OPT_LIB([z],       [uncompress],        [will affect: ⎕PNG])
 m4_include([m4/check_SQLITE.m4])
 if apl_NEQ($apl_SQLITE3, yes); then
    AS_ECHO(["   └──── may affect: ⎕SQL"]);
@@ -783,4 +772,5 @@ configure:    ---- SUMMARY OF TESTS (please include in error reports) ----
     apl_PNG:               $apl_PNG		(affects: ⎕PNG)
     apl_POSTGRES:          $apl_POSTGRES		(affects: ⎕SQL)
     apl_SQLITE3:           $apl_SQLITE3		(affects: ⎕SQL)
+    apl_X11:               $apl_X11		(fallback for ⎕PLOT)
 "])

@@ -62,8 +62,10 @@ union SockAddr
   /// an AF_INET socket address
   sockaddr_in inet;
 
+#if HAVE_SYS_UN_H
   ///  an AF_UNIX socket address
   sockaddr_un uNix;
+#endif
 };
 //----------------------------------------------------------------------------
 bool
