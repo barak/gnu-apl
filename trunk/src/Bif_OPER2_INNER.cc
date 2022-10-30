@@ -212,7 +212,7 @@ const bool B_enclosed = B->get_rank() > 1;
 void
 Bif_OPER2_INNER::scalar_inner_product() const
 {
-#ifdef PERFORMANCE_COUNTERS_WANTED
+#ifdef cfg_PERFORMANCE_COUNTERS_WANTED
 const uint64_t start_1 = cycle_counter();
 #endif
 
@@ -238,7 +238,7 @@ const uint64_t start_1 = cycle_counter();
         PF_scalar_inner_product(Thread_context::get_master());
       }
 
-#ifdef PERFORMANCE_COUNTERS_WANTED
+#ifdef cfg_PERFORMANCE_COUNTERS_WANTED
 const uint64_t end_1 = cycle_counter();
    Performance::fs_OPER2_INNER_AB.add_sample(end_1-start_1, job.ZAh * job.ZBl);
 #endif

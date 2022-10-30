@@ -29,7 +29,7 @@
 
 // set PARALLEL_ENABLED if wanted and its prerequisites are satisfied
 //
-#if CORE_COUNT_WANTED == 0
+#if cfg_CORE_COUNT_WANTED == 0
    //
    // parallel not wanted
    //

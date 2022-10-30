@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-October 19, 2022
+October 30, 2022
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
@@ -1134,10 +1134,10 @@ stricter than their old-style companions:
      line.
 
    • the ending """ must be placed at the end of a separate lines with
-     only spaces allowed before the """ (to vertically align it with the
-     leading """ if so desired).  In old-style strings the text up to
-     the termination " is part of the string while in new-style strings
-     it is not.
+     only spaces allowed before the """ (to horizontally align indent)
+     it with the leading """ if so desired).  In old-style strings the
+     text up to the termination " is part of the string while in
+     new-style strings it is not.
 
    • Neither the starting nor the ending line become nested strings of
      the result, and every line can be clearly identified as being
@@ -6765,62 +6765,62 @@ Node: Top383
 Node: Chapter 11575
 Node: Chapter 223285
 Node: Section 2.125234
-Node: Section 2.245799
-Node: Section 2.346558
-Node: Section 2.447833
-Node: Section 2.552278
-Node: Section 2.652451
-Node: Section 2.753081
-Node: Section 2.857034
-Node: Section 2.958569
-Node: Section 2.1060661
-Node: Section 2.1162215
-Node: Section 2.1264000
-Node: Section 2.1365940
-Node: Section 2.1466881
-Node: Section 2.1567133
-Node: Section 2.1668529
-Node: Section 2.1778642
-Node: Section 2.1881164
-Node: Section 2.1987871
-Node: Section 2.2089316
-Node: Section 2.2194977
-Node: Section 2.22100011
-Node: Section 2.23103292
-Node: Section 2.24103583
-Node: Section 2.25114408
-Node: Section 2.26114680
-Node: Section 2.27121258
-Node: Section 2.28123718
-Node: Section 2.29124387
-Node: Section 2.30126038
-Node: Section 2.31129827
-Node: Output File Format141827
-Node: Section 2.32143002
-Node: Section 2.33151883
-Node: Section 2.34152910
-Node: Section 2.35167626
-Node: Section 2.36177693
-Node: Section 2.37181812
-Node: Section 2.38183907
-Node: Section 2.39188332
-Node: Chapter 3209682
-Node: Chapter 4212183
-Node: Chapter 5213309
-Node: Section 5.1214846
-Node: Section 5.2216126
-Node: Section 5.3216486
-Node: Section 5.4216728
-Node: Section 5.5217390
-Node: Section 5.6217868
-Node: Section 5.7218640
-Node: Section 5.8219097
-Node: Chapter 6219499
-Node: Section 6.1219918
-Node: Section 6.2220605
-Node: Chapter 7221436
-Node: Section 7.1221939
-Node: Section 7.2247253
+Node: Section 2.245809
+Node: Section 2.346568
+Node: Section 2.447843
+Node: Section 2.552288
+Node: Section 2.652461
+Node: Section 2.753091
+Node: Section 2.857044
+Node: Section 2.958579
+Node: Section 2.1060671
+Node: Section 2.1162225
+Node: Section 2.1264010
+Node: Section 2.1365950
+Node: Section 2.1466891
+Node: Section 2.1567143
+Node: Section 2.1668539
+Node: Section 2.1778652
+Node: Section 2.1881174
+Node: Section 2.1987881
+Node: Section 2.2089326
+Node: Section 2.2194987
+Node: Section 2.22100021
+Node: Section 2.23103302
+Node: Section 2.24103593
+Node: Section 2.25114418
+Node: Section 2.26114690
+Node: Section 2.27121268
+Node: Section 2.28123728
+Node: Section 2.29124397
+Node: Section 2.30126048
+Node: Section 2.31129837
+Node: Output File Format141837
+Node: Section 2.32143012
+Node: Section 2.33151893
+Node: Section 2.34152920
+Node: Section 2.35167636
+Node: Section 2.36177703
+Node: Section 2.37181822
+Node: Section 2.38183917
+Node: Section 2.39188342
+Node: Chapter 3209692
+Node: Chapter 4212193
+Node: Chapter 5213319
+Node: Section 5.1214856
+Node: Section 5.2216136
+Node: Section 5.3216496
+Node: Section 5.4216738
+Node: Section 5.5217400
+Node: Section 5.6217878
+Node: Section 5.7218650
+Node: Section 5.8219107
+Node: Chapter 6219509
+Node: Section 6.1219928
+Node: Section 6.2220615
+Node: Chapter 7221446
+Node: Section 7.1221949
+Node: Section 7.2247263
 
 End Tag Table
 

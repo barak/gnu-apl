@@ -30,7 +30,7 @@
 
 #include "Common.hh"
 
-#if defined(PERFORMANCE_COUNTERS_WANTED)
+#if defined(cfg_PERFORMANCE_COUNTERS_WANTED)
 
 # define PERFORMANCE_START(counter) const uint64_t counter = cycle_counter();
 # define PERFORMANCE_END(statistics, counter, len) \

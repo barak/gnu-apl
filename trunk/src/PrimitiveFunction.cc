@@ -178,7 +178,7 @@ Value_P Z(B->get_rank(), LOC);
 Token
 Bif_F12_RHO::eval_AB(Value_P A, Value_P B) const
 {
-#ifdef PERFORMANCE_COUNTERS_WANTED
+#ifdef cfg_PERFORMANCE_COUNTERS_WANTED
 const uint64_t start_1 = cycle_counter();
 #endif
 
@@ -240,7 +240,7 @@ const ShapeItem len_Z = shape_Z.get_volume();
 
         B->set_shape(shape_Z);
 
-#ifdef PERFORMANCE_COUNTERS_WANTED
+#ifdef cfg_PERFORMANCE_COUNTERS_WANTED
 const uint64_t end_1 = cycle_counter();
    Performance::fs_F12_RHO_AB.add_sample(end_1 - start_1,
                                          B->nz_element_count());
@@ -249,7 +249,7 @@ const uint64_t end_1 = cycle_counter();
         return Token(TOK_APL_VALUE1, B);
       }
 
-#ifdef PERFORMANCE_COUNTERS_WANTED
+#ifdef cfg_PERFORMANCE_COUNTERS_WANTED
 Token ret = do_reshape(shape_Z, *B);
 const uint64_t end_1 = cycle_counter();
    Performance::fs_F12_RHO_AB.add_sample(end_1 - start_1,

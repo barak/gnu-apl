@@ -395,7 +395,7 @@ IntCell::bif_reciprocal(Cell * Z) const
         case -1: return IntCell::z_1(Z);
       }
 
-#ifdef RATIONAL_NUMBERS_WANTED
+#ifdef cfg_RATIONAL_NUMBERS_WANTED
    if (value.ival < 0)   // make denominator positive
       return FloatCell::zR(Z, -1, -value.ival);   // 1 ÷ X = ¯1 ÷ -X
    else
@@ -540,7 +540,7 @@ const bool A_zero = A->is_near_zero();
         //
         APL_Integer a = A->get_int_value();
 
-#ifdef RATIONAL_NUMBERS_WANTED
+#ifdef cfg_RATIONAL_NUMBERS_WANTED
         if (b < 0)   // make denominator positive
            {
              a = -a;

@@ -52,7 +52,7 @@ enum Unicode
    UNI_InsertMode  = -8,
 
    /// internal pad characters - will be removed before printout
-#ifdef VISIBLE_MARKERS_WANTED
+#ifdef cfg_VISIBLE_MARKERS_WANTED
    UNI_iPAD_U2    = UNI_PAD_U2,   // blank on the right after notchar column
    UNI_iPAD_U3    = UNI_PAD_U3,   // blank on the left before notchar column
    UNI_iPAD_U1    = UNI_PAD_U1,   // not (yet) a pad char

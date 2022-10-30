@@ -99,7 +99,7 @@ const ShapeItem length = shape.get_volume();
 
    // small values always succeed...
    //
-   if (length <= SHORT_VALUE_LENGTH_WANTED)
+   if (length <= cfg_SHORT_VALUE_LENGTH_WANTED)
       {
         check_ptr = charP(this) + 7;
         return;
@@ -2070,7 +2070,7 @@ Value_P Z(2, LOC);
 void
 Value::check_value(const char * loc)
 {
-#ifdef VALUE_CHECK_WANTED
+#ifdef cfg_VALUE_CHECK_WANTED
 
    // if value was initialized by means of a next_ravel_XXX() mechanism,
    // then all cells are supposed to be OK.

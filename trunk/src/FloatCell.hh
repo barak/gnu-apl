@@ -24,7 +24,7 @@
 #ifndef __FLOATCELL_HH_DEFINED__
 #define __FLOATCELL_HH_DEFINED__
 
-#include "Common.hh"   // for RATIONAL_NUMBERS_WANTED
+#include "Common.hh"   // for cfg_RATIONAL_NUMBERS_WANTED
 #include "IntCell.hh"
 #include "RealCell.hh"
 
@@ -52,7 +52,7 @@ public:
    FloatCell(APL_Float r)
       { value.fval.u1.flt = r;   value.fval.denominator = 0; }
 
-#ifdef RATIONAL_NUMBERS_WANTED
+#ifdef cfg_RATIONAL_NUMBERS_WANTED
    /// Construct an floating point cell from a quotient of integers. The caller
    /// must ensure that denom > 0 and that common divisors have been removed!
    FloatCell(APL_Integer numer, APL_Integer denom)
@@ -98,7 +98,7 @@ public:
       }
 # endif
 
-#else // no RATIONAL_NUMBERS_WANTED
+#else // not cfg_RATIONAL_NUMBERS_WANTED
    /// overloaded Cell::init_other
    virtual void init_other(void * other, Value & cell_owner, const char * loc)
       const { new (other)   FloatCell(dfval()); }
@@ -265,7 +265,7 @@ public:
       { new (Z) FloatCell(flt);   return E_NO_ERROR; }
 
 protected:
-#ifdef RATIONAL_NUMBERS_WANTED
+#ifdef cfg_RATIONAL_NUMBERS_WANTED
    /// initialize the (un-initialized) Cell *Z to APL_Float numer ÷ denom)
    static ErrorCode zR(Cell * Z, APL_Integer numer, APL_Integer denom)
       { new (Z) FloatCell(numer, denom);   return E_NO_ERROR; }

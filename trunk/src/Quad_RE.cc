@@ -150,12 +150,12 @@ ShapeItem B_offset = 0;   // updated by XXX_result() functions
 
       We handle this by:
 
-      1. starting with a ⍴Z of of SHORT_VALUE_LENGTH_WANTED, and
+      1. starting with a ⍴Z of of cfg_SHORT_VALUE_LENGTH_WANTED, and
       2. doubling ⍴Z whenever needed, and finally
       3. shrinking ⍴Z to the true number of matches.
     */
 
-Value_P Z(SHORT_VALUE_LENGTH_WANTED, LOC);
+Value_P Z(cfg_SHORT_VALUE_LENGTH_WANTED, LOC);
 
    for (;;)
        {

@@ -36,11 +36,11 @@
 
 const char * Parallel_job_list_base::started_loc = 0;
 
-#if CORE_COUNT_WANTED == 0
+#if cfg_CORE_COUNT_WANTED == 0
 bool Parallel::run_parallel = false;
-#else   // CORE_COUNT_WANTED != 0
+#else   // cfg_CORE_COUNT_WANTED != 0
 bool Parallel::run_parallel = true;
-#endif   // CORE_COUNT_WANTED == 0
+#endif   // cfg_CORE_COUNT_WANTED == 0
 
 bool Parallel::init_done = false;
 
@@ -104,7 +104,7 @@ Parallel::init(bool logit)
 
    // the threads above start in state locked. Wake them up...
    //
-# if CORE_COUNT_WANTED == -3
+# if cfg_CORE_COUNT_WANTED == -3
    CPU_pool::change_core_count(CCNT_1, logit);
 # else
    CPU_pool::change_core_count(CPU_pool::get_count(), logit);
@@ -189,43 +189,43 @@ CPU_pool::init(bool logit)
    // determine the max number of cores. We first handle the ./configure cases
    // that can live without pthread_getaffinity_np() and friends
    //
-CoreCount count = CoreCount(CORE_COUNT_WANTED);
+CoreCount count = CoreCount(cfg_CORE_COUNT_WANTED);
 
-#if CORE_COUNT_WANTED >= 1      // static parallel
+#if cfg_CORE_COUNT_WANTED >= 1      // static parallel
 
    Parallel::run_parallel = true;
-   loop(c, CORE_COUNT_WANTED)   add_CPU(CPU_Number(c));
+   loop(c, cfg_CORE_COUNT_WANTED)   add_CPU(CPU_Number(c));
    return;
 
-#elif CORE_COUNT_WANTED == 0    // sequential
+#elif cfg_CORE_COUNT_WANTED == 0    // sequential
 
    Parallel::run_parallel = false;
    add_CPU(CPU_0);
    return;
 
-#elif CORE_COUNT_WANTED == -1   // handled below
+#elif cfg_CORE_COUNT_WANTED == -1   // handled below
 # if ! HAVE_AFFINITY_NP
 #  error "CORE_COUNT_WANTED == -1 cannot be used on platforms without pthread_getaffinity_np"
 # endif
 
-#elif CORE_COUNT_WANTED == -2   // --cc N
+#elif cfg_CORE_COUNT_WANTED == -2   // --cc N
 
    Parallel::run_parallel = uprefs.requested_cc > 0;
    loop(c, uprefs.requested_cc)   add_CPU(CPU_Number(c));
    return;
 
-#elif CORE_COUNT_WANTED == -3   // handled below
+#elif cfg_CORE_COUNT_WANTED == -3   // handled below
 # if ! HAVE_AFFINITY_NP
 #  error "CORE_COUNT_WANTED == -3 cannot be used on platforms without pthread_getaffinity_np"
 # endif
 
-#else  // CORE_COUNT_WANTED == xxx
+#else  // cfg_CORE_COUNT_WANTED == xxx
 
 # error "Bad CORE_COUNT_WANTED value in ./configure"
 
-#endif // CORE_COUNT_WANTED == xxx
+#endif // cfg_CORE_COUNT_WANTED == xxx
 
-   // at this point CORE_COUNT_WANTED is -1 (all cores) or -3 (⎕SYL)
+   // at this point cfg_CORE_COUNT_WANTED is -1 (all cores) or -3 (⎕SYL)
    // Figure how many cores we have.
    //
 #if ! HAVE_AFFINITY_NP

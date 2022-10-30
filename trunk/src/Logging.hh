@@ -35,7 +35,7 @@ enum LogId
    LID_MIN = LID_NONE + 1,
 };
 
-#ifdef DYNAMIC_LOG_WANTED
+#ifdef cfg_DYNAMIC_LOG_WANTED
 
 #define log_def(val, item, txt) extern bool LOG_ ## item;
 #include "Logging.def"

@@ -37,7 +37,10 @@
 # include <sys/select.h>
 #endif
 
-#include "config.h"   // for HAVE_ macros
+#define __MAY_INCLUDE_CONFIG_H__
+#include "config.h"   // for HAVE_SYS_UN_H
+#undef __MAY_INCLUDE_CONFIG_H__
+
 #ifdef HAVE_SYS_UN_H
 #include <sys/un.h>
 #endif
@@ -979,8 +982,8 @@ main(int argc, char * argv[])
 {
    prog = argv[0];
 
-int listen_port = APSERVER_PORT;
-const char * listen_name = APSERVER_PATH;
+int listen_port = cfg_APSERVER_PORT;
+const char * listen_name = cfg_APSERVER_PATH;
 bool got_path = false;
 bool got_port = false;
 bool auto_start = false;
@@ -1012,13 +1015,14 @@ bool auto_start = false;
             }
          else if (!strcmp(opt, "-d"))
             {
-              cerr << "APSERVER_TRANSPORT is: " << APSERVER_TRANSPORT << endl;
+              cerr << "APSERVER_TRANSPORT is: "
+                   << cfg_APSERVER_TRANSPORT << endl;
 
-#if APSERVER_TRANSPORT == 0   // TCP
-              cerr << "APSERVER_PORT is: " << APSERVER_PORT << endl;
+#if cfg_APSERVER_TRANSPORT == 0   // TCP
+              cerr << "APSERVER_PORT is: " << cfg_APSERVER_PORT << endl;
               got_port = true;
 #else                         // AF_UNIX
-              cerr << "APSERVER_PATH is: " << APSERVER_PATH << endl;
+              cerr << "APSERVER_PATH is: " << cfg_APSERVER_PATH << endl;
               got_path = true;
 #endif
               ++verbosity;

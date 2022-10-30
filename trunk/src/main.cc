@@ -393,9 +393,9 @@ const bool log_startup = uprefs.parse_argv_1() || log_startup0;
       }
 
 
-#ifdef DYNAMIC_LOG_WANTED
+#ifdef cfg_DYNAMIC_LOG_WANTED
    if (log_startup)   Log_control(LID_startup, true);
-#endif // DYNAMIC_LOG_WANTED
+#endif // cfg_DYNAMIC_LOG_WANTED
 
    init_1(argv[0], log_startup);
 

@@ -1,32 +1,5 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
-/* APserver listen port name */
-#undef APSERVER_PATH
-
-/* APserver TCP listen port */
-#undef APSERVER_PORT
-
-/* APserver transport: TCP=0, LINUX=1, UNIX=2 */
-#undef APSERVER_TRANSPORT
-
-/* desired ASSERT() level */
-#undef ASSERT_LEVEL_WANTED
-
-/* how ./configure was called */
-#undef CONFIGURE_ARGS
-
-/* core count */
-#undef CORE_COUNT_WANTED
-
-/* Define to set options typical for software development */
-#undef DEVELOP_WANTED
-
-/* Define to enable dynamic logging */
-#undef DYNAMIC_LOG_WANTED
-
-/* Define to enable gprof profiling */
-#undef GPROF_WANTED
-
 /* Define to 1 iff pthread_setaffinity_np() is available */
 #undef HAVE_AFFINITY_NP
 
@@ -344,9 +317,6 @@
 /* Define to the sub-directory where libtool stores uninstalled libraries. */
 #undef LT_OBJDIR
 
-/* max. rank of APL values */
-#undef MAX_RANK_WANTED
-
 /* Name of package */
 #undef PACKAGE
 
@@ -367,24 +337,6 @@
 
 /* Define to the version of this package. */
 #undef PACKAGE_VERSION
-
-/* Define to enable performance counters */
-#undef PERFORMANCE_COUNTERS_WANTED
-
-/* Define to have support for rational numbers (EXPERIMENTAL!) */
-#undef RATIONAL_NUMBERS_WANTED
-
-/* ./configure with --with-postgresql */
-#undef REALLY_WANT_PostgreSQL
-
-/* SQLite available and wanted */
-#undef REALLY_WANT_SQLITE3
-
-/* security level */
-#undef SECURITY_LEVEL_WANTED
-
-/* short value cellcount */
-#undef SHORT_VALUE_LENGTH_WANTED
 
 /* Define to 1 if you have the ANSI C header files. */
 #undef STDC_HEADERS
@@ -414,23 +366,8 @@
 #endif
 
 
-/* Define to enable CHECK macro */
-#undef VALUE_CHECK_WANTED
-
-/* Define to enable value events */
-#undef VALUE_HISTORY_WANTED
-
 /* Version number of package */
 #undef VERSION
-
-/* Define to enable tracing of value flags */
-#undef VF_TRACING_WANTED
-
-/* Define to have visible markers (DONT!) */
-#undef VISIBLE_MARKERS_WANTED
-
-/* Define to make ^D a del-char and ^Z be EOF */
-#undef WANT_CTRLD_DEL
 
 /* Define to 1 if on MINIX. */
 #undef _MINIX
@@ -463,7 +400,7 @@
 /* PostgreSQL code compiles */
 #undef apl_POSTGRES
 
-/* SQLite available */
+/* SQLite code compiles */
 #undef apl_SQLITE3
 
 /* Define if compiling for Android */
@@ -477,6 +414,66 @@
 
 /* Define if building lib_gnu_apl.so */
 #undef apl_TARGET_PYTHON
+
+/* APserver listen port name */
+#undef cfg_APSERVER_PATH
+
+/* APserver TCP listen port */
+#undef cfg_APSERVER_PORT
+
+/* APserver transport: TCP=0, LINUX=1, UNIX=2 */
+#undef cfg_APSERVER_TRANSPORT
+
+/* the desired ASSERT() level (0=no, 1=some, 2=all assertions) */
+#undef cfg_ASSERT_LEVEL_WANTED
+
+/* how ./configure was called */
+#undef cfg_CONFIGURE_ARGS
+
+/* core count */
+#undef cfg_CORE_COUNT_WANTED
+
+/* Define to set options typical for software development */
+#undef cfg_DEVELOP_WANTED
+
+/* Define to enable dynamic logging */
+#undef cfg_DYNAMIC_LOG_WANTED
+
+/* max. rank of APL values */
+#undef cfg_MAX_RANK_WANTED
+
+/* Define to enable performance counters */
+#undef cfg_PERFORMANCE_COUNTERS_WANTED
+
+/* Define to have support for rational numbers (EXPERIMENTAL!) */
+#undef cfg_RATIONAL_NUMBERS_WANTED
+
+/* security level */
+#undef cfg_SECURITY_LEVEL_WANTED
+
+/* short value cellcount */
+#undef cfg_SHORT_VALUE_LENGTH_WANTED
+
+/* ./configure with --with-postgresql */
+#undef cfg_USER_WANTS_POSTGRES
+
+/* ./configure with --with-sqlite3 */
+#undef cfg_USER_WANTS_SQLITE3
+
+/* Define to enable CHECK macro */
+#undef cfg_VALUE_CHECK_WANTED
+
+/* Define to enable value events */
+#undef cfg_VALUE_HISTORY_WANTED
+
+/* Define to enable tracing of value flags */
+#undef cfg_VF_TRACING_WANTED
+
+/* Define to have visible markers (DONT!) */
+#undef cfg_VISIBLE_MARKERS_WANTED
+
+/* Define to make ^D a del-char and ^Z be EOF */
+#undef cfg_WANT_CTRLD_DEL
 
 /* Define to `__inline__' or `__inline' if that's what the C compiler
    calls it, or to nothing if 'inline' is not supported under any name.  */

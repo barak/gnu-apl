@@ -169,7 +169,7 @@ FloatCell::bif_conjugate(Cell * Z) const
 ErrorCode
 FloatCell::bif_negative(Cell * Z) const
 {
-#ifdef RATIONAL_NUMBERS_WANTED
+#ifdef cfg_RATIONAL_NUMBERS_WANTED
    if (const APL_Integer denom = get_denominator())
       return FloatCell::zR(Z, -get_numerator(), denom);
 #endif
@@ -182,7 +182,7 @@ FloatCell::bif_direction(Cell * Z) const
 {
    // Note: bif_direction does NOT use ⎕CT
    //
-#ifdef RATIONAL_NUMBERS_WANTED
+#ifdef cfg_RATIONAL_NUMBERS_WANTED
    // denominator is either 0 (for Floats) or positive (for quotients)
    if (const APL_Integer denom = get_denominator())
       {
@@ -200,7 +200,7 @@ FloatCell::bif_direction(Cell * Z) const
 ErrorCode
 FloatCell::bif_magnitude(Cell * Z) const
 {
-#ifdef RATIONAL_NUMBERS_WANTED
+#ifdef cfg_RATIONAL_NUMBERS_WANTED
    if (const APL_Integer denom = get_denominator())
       {
         const APL_Integer numer = get_numerator();
@@ -215,7 +215,7 @@ FloatCell::bif_magnitude(Cell * Z) const
 ErrorCode
 FloatCell::bif_reciprocal(Cell * Z) const
 {
-#ifdef RATIONAL_NUMBERS_WANTED
+#ifdef cfg_RATIONAL_NUMBERS_WANTED
    if (const APL_Integer denom = get_denominator())
       {
         if (uint64_t(denom) < 0x8000000000000000ULL)   // small enough for int32
@@ -267,7 +267,7 @@ FloatCell::bif_pi_times_inverse(Cell * Z) const
 ErrorCode
 FloatCell::bif_ceiling(Cell * Z) const
 {
-#ifdef RATIONAL_NUMBERS_WANTED
+#ifdef cfg_RATIONAL_NUMBERS_WANTED
    if (const APL_Integer denom = get_denominator())
       {
         // since the quotient is exact, we ignore ⎕CT
@@ -301,7 +301,7 @@ const APL_Float D = bi - b;
 ErrorCode
 FloatCell::bif_floor(Cell * Z) const
 {
-#ifdef RATIONAL_NUMBERS_WANTED
+#ifdef cfg_RATIONAL_NUMBERS_WANTED
    if (const APL_Integer denom = get_denominator())
       {
         // since the quotient is exact, we ignore ⎕CT
@@ -400,7 +400,7 @@ FloatCell::bif_add(Cell * Z, const Cell * A) const
 {
    if (A->is_real_cell())
       {
-#ifdef RATIONAL_NUMBERS_WANTED
+#ifdef cfg_RATIONAL_NUMBERS_WANTED
    if (const APL_Integer denom_B = get_denominator())
    if (const APL_Integer denom_A = A->get_denominator())
       {
@@ -453,7 +453,7 @@ FloatCell::bif_subtract(Cell * Z, const Cell * A) const
 {
    if (A->is_real_cell())   // real result
       {
-#ifdef RATIONAL_NUMBERS_WANTED
+#ifdef cfg_RATIONAL_NUMBERS_WANTED
    if (const APL_Integer denom_B = get_denominator())
    if (const APL_Integer denom_A = A->get_denominator())
       {
@@ -501,7 +501,7 @@ FloatCell::bif_subtract(Cell * Z, const Cell * A) const
 ErrorCode
 FloatCell::bif_multiply(Cell * Z, const Cell * A) const
 {
-#ifdef RATIONAL_NUMBERS_WANTED
+#ifdef cfg_RATIONAL_NUMBERS_WANTED
    if (APL_Integer denom_B = get_denominator())
    if (APL_Integer denom_A = A->get_denominator())
       {
@@ -559,7 +559,7 @@ FloatCell::bif_multiply_inverse(Cell * Z, const Cell * A) const
 ErrorCode
 FloatCell::bif_divide(Cell * Z, const Cell * A) const
 {
-#ifdef RATIONAL_NUMBERS_WANTED
+#ifdef cfg_RATIONAL_NUMBERS_WANTED
    if (const APL_Integer B_denom = get_denominator())  // B is rational
       {
         const APL_Integer B_numer = get_numerator();
@@ -818,7 +818,7 @@ const APL_Float b = this->dfval();
 PrintBuffer
 FloatCell::character_representation(const PrintContext & pctx) const
 {
-#ifdef RATIONAL_NUMBERS_WANTED
+#ifdef cfg_RATIONAL_NUMBERS_WANTED
    if (const APL_Integer denom = get_denominator())
       {
         if (Workspace::get_v_Quad_PS().get_print_quotients())   // show A÷B

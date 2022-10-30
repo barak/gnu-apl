@@ -275,7 +275,7 @@ struct Svar_record
 };
 //----------------------------------------------------------------------------
 
-#if APSERVER_TRANSPORT == 1
+#if cfg_APSERVER_TRANSPORT == 1
    enum {  ABSTRACT_OFFSET = 1 };
 #else
    enum {  ABSTRACT_OFFSET = 0 };

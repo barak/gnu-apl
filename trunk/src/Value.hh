@@ -107,7 +107,7 @@ public:
    virtual ~Value();
 
    /// packing makes no sense for short booleans
-   enum { PACKED_MINIMUM_LENGHT = SHORT_VALUE_LENGTH_WANTED };
+   enum { PACKED_MINIMUM_LENGHT = cfg_SHORT_VALUE_LENGTH_WANTED };
 
    /// return \b true iff \b this value is a scalar.
    bool is_scalar() const
@@ -496,7 +496,7 @@ public:
    /// initialize the next ravel cell with a floating point value
    inline void next_ravel_Float(APL_Float f);
 
-#ifdef RATIONAL_NUMBERS_WANTED
+#ifdef cfg_RATIONAL_NUMBERS_WANTED
    /// initialize the next ravel cell with a floating point value
    inline void next_ravel_Float(APL_Integer numer, APL_Integer denom);
 
@@ -509,7 +509,7 @@ public:
                                  next_ravel_Int(-numer);
          else                    next_ravel_Float(numer, denom);
       }
-#endif // RATIONAL_NUMBERS_WANTED
+#endif // cfg_RATIONAL_NUMBERS_WANTED
 
    /// initialize the next ravel cell with a floating point value, converting
    /// it to integer if possible
@@ -620,7 +620,7 @@ public:
    static void init();
 
 /// maybe enable LOC for set/clear of flags
-#if defined(VF_TRACING_WANTED) || defined(VALUE_HISTORY_WANTED)  // enable LOC
+#if defined(cfg_VF_TRACING_WANTED) || defined(cfg_VALUE_HISTORY_WANTED)  // enable LOC
 # define _LOC LOC
 # define _loc loc
 # define _loc_type const char *
@@ -630,7 +630,7 @@ public:
 # define _loc_type
 #endif
 
-#ifdef VF_TRACING_WANTED
+#ifdef cfg_VF_TRACING_WANTED
  # define FLAG_TRACE(f, b) flag_info(loc, VF_ ## f, #f, b);
 #else
  # define FLAG_TRACE(_f, _b)
@@ -935,8 +935,8 @@ protected:
    /// The ravel of \b this value.
    Cell * ravel;
 
-   /// the cells of a short (i.e. ⍴,value ≤ SHORT_VALUE_LENGTH_WANTED) value
-   Cell short_value[SHORT_VALUE_LENGTH_WANTED];
+   /// the cells of a short (i.e. ⍴,value ≤ cfg_SHORT_VALUE_LENGTH_WANTED) value
+   Cell short_value[cfg_SHORT_VALUE_LENGTH_WANTED];
 
    /// a linked list of values that have been deleted
    static _deleted_value * deleted_values;

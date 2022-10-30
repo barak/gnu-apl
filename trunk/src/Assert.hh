@@ -24,7 +24,7 @@
 /*
    #define macros Assert(cond) and Assert1(cond)
 
-   All macros may (depending on ASSERT_LEVEL_WANTED) evaluate the
+   All macros may (depending on cfg_ASSERT_LEVEL_WANTED) evaluate the
    condition-expression cond. If cond is true (the expected case),
    then no more actions are performed.
 
@@ -32,17 +32,17 @@
    show a stack-trace (both visible in APL). Interpretation of APL code will
    continue for the moment, but sooner or later the interpreter will crash.
 
-   ASSERT_LEVEL_WANTED = 0: neither Assert() nor Assert1() will complain
-   ASSERT_LEVEL_WANTED = 1: Assert() will complain. Assert1() will not
-   ASSERT_LEVEL_WANTED = 2: both Assert() and Assert1() will complain
+   cfg_ASSERT_LEVEL_WANTED = 0: neither Assert() nor Assert1() will complain
+   cfg_ASSERT_LEVEL_WANTED = 1: Assert() will complain. Assert1() will not
+   cfg_ASSERT_LEVEL_WANTED = 2: both Assert() and Assert1() will complain
 
-   That is, higher ASSERT_LEVEL_WANTED will raise more complaints.
+   That is, higher cfg_ASSERT_LEVEL_WANTED will raise more complaints.
 
    The default ./configure (intended for normal users) will have
-   ASSERT_LEVEL_WANTED = 0.
+   cfg_ASSERT_LEVEL_WANTED = 0.
 
    The ./configure DEVELOP_WANTED=yes (aka. make develop) will have
-   ASSERT_LEVEL_WANTED = 2.
+   cfg_ASSERT_LEVEL_WANTED = 2.
  */
 
 #ifndef __ASSERT_HH_DEFINED__
@@ -58,30 +58,30 @@ extern void do_Assert(const char * cond, const char * fun,
 #endif
 ;
 
-#ifndef ASSERT_LEVEL_WANTED
+#ifndef cfg_ASSERT_LEVEL_WANTED
 
 #error "ASSERT_LEVEL_WANTED not defined"
 
-#elif ASSERT_LEVEL_WANTED == 0
+#elif cfg_ASSERT_LEVEL_WANTED == 0
 
 // use 'if (x) {}' below to suppress 'uninitialized' compiler warnings
 
 #define Assert1(x) if (x) {}
 #define Assert(x)  if (x) {}
 
-#elif ASSERT_LEVEL_WANTED == 1
+#elif cfg_ASSERT_LEVEL_WANTED == 1
 
 #define Assert1(x) if (x) {}
 #define Assert(x)  if (!(x))   do_Assert(#x, __FUNCTION__, __FILE__, __LINE__)
 
-#elif ASSERT_LEVEL_WANTED == 2
+#elif cfg_ASSERT_LEVEL_WANTED == 2
 
 #define Assert1(x) if (!(x))   do_Assert(#x, __FUNCTION__, __FILE__, __LINE__)
 #define Assert(x)  if (!(x))   do_Assert(#x, __FUNCTION__, __FILE__, __LINE__)
 
 #else
 
-#error "Bad or #undef'ed ASSERT_LEVEL_WANTED"
+#error "Bad or #undef'ed cfg_ASSERT_LEVEL_WANTED"
 
 #endif
 

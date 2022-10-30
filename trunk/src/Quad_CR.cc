@@ -1282,7 +1282,7 @@ Value_P Z(len, LOC);
                                        reinterpret_cast<const LvalCell &>(cB);
                         data = APL_Integer(cB_lval.get_cell_owner());
                       }
-#ifdef RATIONAL_NUMBERS_WANTED
+#ifdef cfg_RATIONAL_NUMBERS_WANTED
                    else if (cB.get_cell_type() == CT_FLOAT)
                       {
                         memcpy(&data, cB.get_u1(), sizeof(data));

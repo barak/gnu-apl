@@ -93,7 +93,7 @@ init_1(const char * argv0, bool log_startup)
 
    enum { VALUE_HEADER = sizeof(Value)
                        - sizeof(Shape)
-                       - SHORT_VALUE_LENGTH_WANTED * sizeof(Cell)
+                       - cfg_SHORT_VALUE_LENGTH_WANTED * sizeof(Cell)
         };
 
    if (log_startup)
@@ -111,7 +111,7 @@ init_1(const char * argv0, bool log_startup)
            << "sizeof(Value) is          " << sizeof(Value)
            << " (" << VALUE_HEADER << " byte header + "
                    << sizeof(Shape) << " byte shape + "
-                   << SHORT_VALUE_LENGTH_WANTED << " Cells)"            << endl
+                   << cfg_SHORT_VALUE_LENGTH_WANTED << " Cells)"        << endl
            << "sizeof(ValueStackItem) is " << sizeof(ValueStackItem)    << endl
            << "sizeof(UCS_string) is     " << sizeof(UCS_string)        << endl
            << "sizeof(UserFunction) is   " << sizeof(UserFunction)      << endl
@@ -120,7 +120,7 @@ init_1(const char * argv0, bool log_startup)
            << " bytes (" << (Quad_WA::total_memory/1000000) << " MB, 0x"
            << hex << Quad_WA::total_memory << ")" << dec                << endl
                                                                         << endl
-           << "configure command: " << CONFIGURE_ARGS                   << endl
+           << "configure command: " << cfg_CONFIGURE_ARGS               << endl
                                                                         << endl;
 
    // CYGWIN does not have RLIMIT_NPROC

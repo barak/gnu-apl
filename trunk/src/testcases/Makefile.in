@@ -426,7 +426,8 @@ dist_noinst_DATA = \
         Quad_RL.tc                              \
         Quad_R.tc                               \
         Quad_RE.tc                              \
-        Quad_SQL.tc                             \
+        Quad_SQL_postgres.tc                    \
+        Quad_SQL_sqlite.tc                      \
         Quad_SVE.tc                             \
         Quad_SYL.tc                             \
         Quad.tc                                 \

@@ -24,7 +24,7 @@
 
 #include "Logging.hh"
 
-#ifdef DYNAMIC_LOG_WANTED
+#ifdef cfg_DYNAMIC_LOG_WANTED
 
 #define log_def(val, item, txt) bool LOG_ ## item = val;
 #include "Logging.def"

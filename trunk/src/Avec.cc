@@ -69,7 +69,7 @@ Avec::show_error_pos(int i, int line, bool cond, int def_line)
    return 0;   // OK
 }
 //----------------------------------------------------------------------------
-#ifdef DEVELOP_WANTED
+#ifdef cfg_DEVELOP_WANTED
 
 void
 Avec::check_file(const char * filename)
@@ -192,12 +192,12 @@ int errors = 0;
 
    if (errors)   exit(1);
 }
-#else  // ! DEVELOP_WANTED
+#else  // ! cfg_DEVELOP_WANTED
 
 void
 Avec::init() { }
 
-#endif // DEVELOP_WANTED
+#endif // cfg_DEVELOP_WANTED
 //----------------------------------------------------------------------------
 Unicode
 Avec::unicode(CHT_Index av)

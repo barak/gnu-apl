@@ -29,19 +29,19 @@
 
 extern void not_allowed(const char * what);
 
-#ifndef SECURITY_LEVEL_WANTED
+#ifndef cfg_SECURITY_LEVEL_WANTED
 
-#error "SECURITY_LEVEL_WANTED not defined"
+#error "cfg_SECURITY_LEVEL_WANTED not defined"
 
-#elif SECURITY_LEVEL_WANTED == 0
+#elif cfg_SECURITY_LEVEL_WANTED == 0
 
 #define CHECK_SECURITY(X)
 
-#elif SECURITY_LEVEL_WANTED == 1
+#elif cfg_SECURITY_LEVEL_WANTED == 1
 
 #define CHECK_SECURITY(X)  if (uprefs.X)   not_allowed(#X);
 
-#elif SECURITY_LEVEL_WANTED == 2
+#elif cfg_SECURITY_LEVEL_WANTED == 2
 
 #define CHECK_SECURITY(X)  not_allowed(#X);
 

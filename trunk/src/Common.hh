@@ -26,7 +26,9 @@
 
 // NOTE: the path to config.h and makefile.h is set as -I $(pwd) in ./configure
 //
+#define __MAY_INCLUDE_CONFIG_H__
 #include "config.h"   // for xxx_WANTED and other macros from ./configure
+#undef __MAY_INCLUDE_CONFIG_H__
 
 // makefile.h uses STR(), so define it before
 #define STR(x) #x
@@ -56,11 +58,11 @@
 #define RLIM_INFINITY (~rlim_t(0))
 #endif
 
-#ifndef MAX_RANK_WANTED
-# define MAX_RANK_WANTED 6
+#ifndef cfg_MAX_RANK_WANTED
+# define cfg_MAX_RANK_WANTED 8
 #endif
 
-enum { MAX_RANK = MAX_RANK_WANTED };
+enum { MAX_RANK = cfg_MAX_RANK_WANTED };
 
 // if someone (like curses on Solaris) has #defined erase() then
 // #undef it because class vector<> would complain about it
@@ -396,7 +398,7 @@ extern std::ostream & get_CERR();
 
 //----------------------------------------------------------------------------
 
-#ifdef VALUE_HISTORY_WANTED
+#ifdef cfg_VALUE_HISTORY_WANTED
 
    enum { VALUEHISTORY_SIZE = 100000 };
    extern void add_event(const Value * val, VH_event ev, int ia,

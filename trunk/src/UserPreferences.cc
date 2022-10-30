@@ -66,7 +66,7 @@ UserPreferences::usage(const char * prog)
 "    --id proc            use processor ID proc (default: first unused > 1000)\n"
    ;
 
-#ifdef DYNAMIC_LOG_WANTED
+#ifdef cfg_DYNAMIC_LOG_WANTED
    CERR <<
 "    -l num               turn logging facility num ON (1 ≤ num ≤ "
                              << (LID_MAX - 1) << ")\n";
@@ -75,7 +75,7 @@ UserPreferences::usage(const char * prog)
 "    -l 37                turn logging facility 37 (startup) ON\n";
 #endif
 
-#if CORE_COUNT_WANTED == -2
+#if cfg_CORE_COUNT_WANTED == -2
    CERR <<
 "    --cc count           use count cores (default: all)\n";
 #endif
@@ -348,7 +348,7 @@ UserPreferences::parse_argv_2(bool logit)
               continue;   // -C already handled in parse_argv_1()
             }
 
-#if CORE_COUNT_WANTED == -2
+#if cfg_CORE_COUNT_WANTED == -2
          if (!strcmp(opt, "--cc"))
             {
               ++a;
@@ -517,7 +517,7 @@ UserPreferences::parse_argv_2(bool logit)
             {
               ++a;
               if (val && atoi(val) == LID_startup)   logit = true;
-#ifdef DYNAMIC_LOG_WANTED
+#ifdef cfg_DYNAMIC_LOG_WANTED
               if (val)   Log_control(LogId(atoi(val)), true);
               else
                  {
@@ -528,7 +528,7 @@ UserPreferences::parse_argv_2(bool logit)
    if (val && atoi(val) == LID_startup)   ;
    else  CERR << "the -l option was ignored (requires ./configure "
                    "DYNAMIC_LOG_WANTED=yes)" << endl;
-#endif // DYNAMIC_LOG_WANTED
+#endif // cfg_DYNAMIC_LOG_WANTED
 
               continue;
             }
@@ -991,94 +991,94 @@ UserPreferences::show_configure_options()
 {
    enum { value_size = sizeof(Value),
           cell_size  = sizeof(Cell),
-          header_size = value_size - cell_size * SHORT_VALUE_LENGTH_WANTED,
+          header_size = value_size - cell_size * cfg_SHORT_VALUE_LENGTH_WANTED,
         };
 
    CERR << endl << "configurable options:" << endl <<
                    "---------------------" << endl <<
 
-   "    ASSERT_LEVEL_WANTED=" << ASSERT_LEVEL_WANTED
-        << is_default(ASSERT_LEVEL_WANTED == 1)
+   "    ASSERT_LEVEL_WANTED=" << cfg_ASSERT_LEVEL_WANTED
+        << is_default(cfg_ASSERT_LEVEL_WANTED == 1)
    << endl <<
 
-   "    SECURITY_LEVEL_WANTED=" << SECURITY_LEVEL_WANTED
-        << is_default(SECURITY_LEVEL_WANTED == 0)
+   "    SECURITY_LEVEL_WANTED=" << cfg_SECURITY_LEVEL_WANTED
+        << is_default(cfg_SECURITY_LEVEL_WANTED == 0)
    << endl <<
 
-   "    APSERVER_PATH=" << APSERVER_PATH
-        << is_default(!strcmp(APSERVER_PATH, "/tmp/GNU-APL/APserver"))
+   "    APSERVER_PATH=" << cfg_APSERVER_PATH
+        << is_default(!strcmp(cfg_APSERVER_PATH, "/tmp/GNU-APL/APserver"))
    << endl <<
 
-   "    APSERVER_PORT=" << APSERVER_PORT
-        << is_default(APSERVER_PORT == 16366)
+   "    APSERVER_PORT=" << cfg_APSERVER_PORT
+        << is_default(cfg_APSERVER_PORT == 16366)
    << endl <<
 
-   "    APSERVER_TRANSPORT=" << APSERVER_TRANSPORT
-        << is_default(APSERVER_TRANSPORT == 0)
+   "    APSERVER_TRANSPORT=" << cfg_APSERVER_TRANSPORT
+        << is_default(cfg_APSERVER_TRANSPORT == 0)
    << endl <<
 
-   "    CORE_COUNT_WANTED=" << CORE_COUNT_WANTED <<
-#if   CORE_COUNT_WANTED == -3
+   "    CORE_COUNT_WANTED=" << cfg_CORE_COUNT_WANTED <<
+#if   cfg_CORE_COUNT_WANTED == -3
    "  (= ⎕SYL)"
-#elif CORE_COUNT_WANTED == -2
+#elif cfg_CORE_COUNT_WANTED == -2
    "  (= argv (--cc))"
-#elif CORE_COUNT_WANTED == -1
+#elif cfg_CORE_COUNT_WANTED == -1
    "  (= all)"
-#elif CORE_COUNT_WANTED == 0
+#elif cfg_CORE_COUNT_WANTED == 0
    "  (= sequential) (default)"
 #else
    ""
 #endif
    << endl <<
 
-#ifdef DYNAMIC_LOG_WANTED
+#ifdef cfg_DYNAMIC_LOG_WANTED
    "    DYNAMIC_LOG_WANTED=yes"
 #else
    "    DYNAMIC_LOG_WANTED=no (default)"
 #endif
    << endl <<
 
-   "    MAX_RANK_WANTED="     << MAX_RANK_WANTED
-        << is_default(MAX_RANK_WANTED == 8)
+   "    MAX_RANK_WANTED="     << cfg_MAX_RANK_WANTED
+        << is_default(cfg_MAX_RANK_WANTED == 8)
    << endl <<
 
-#ifdef RATIONAL_NUMBERS_WANTED
+#ifdef cfg_RATIONAL_NUMBERS_WANTED
    "    RATIONAL_NUMBERS_WANTED=yes"
 #else
    "    RATIONAL_NUMBERS_WANTED=no (default)"
 #endif
    << endl <<
 
-   "    SHORT_VALUE_LENGTH_WANTED=" << SHORT_VALUE_LENGTH_WANTED
-        << is_default(SHORT_VALUE_LENGTH_WANTED == 1)
+   "    SHORT_VALUE_LENGTH_WANTED=" << cfg_SHORT_VALUE_LENGTH_WANTED
+        << is_default(cfg_SHORT_VALUE_LENGTH_WANTED == 1)
         << ", therefore:" << endl <<
    "        sizeof(Value)       : "  << value_size  << " bytes" << endl <<
    "        sizeof(Cell)        :  " << cell_size   << " bytes" << endl <<
    "        sizeof(Value header): "  << header_size << " bytes" << endl
    << endl <<
 
-#ifdef VALUE_CHECK_WANTED
+#ifdef cfg_VALUE_CHECK_WANTED
    "    VALUE_CHECK_WANTED=yes"
 #else
    "    VALUE_CHECK_WANTED=no (default)"
 #endif
    << endl <<
 
-#ifdef VALUE_HISTORY_WANTED
+#ifdef cfg_VALUE_HISTORY_WANTED
    "    VALUE_HISTORY_WANTED=yes"
 #else
    "    VALUE_HISTORY_WANTED=no (default)"
 #endif
    << endl <<
 
-#ifdef VF_TRACING_WANTED
+#ifdef cfg_VF_TRACING_WANTED
    "    VF_TRACING_WANTED=yes"
 #else
    "    VF_TRACING_WANTED=no (default)"
 #endif
    << endl <<
 
-#ifdef VISIBLE_MARKERS_WANTED
+#ifdef cfg_VISIBLE_MARKERS_WANTED
    "    VISIBLE_MARKERS_WANTED=yes"
 #else
    "    VISIBLE_MARKERS_WANTED=no (default)"
@@ -1087,7 +1087,7 @@ UserPreferences::show_configure_options()
    << endl
    << "how ./configure was (probably) called:" << endl
    << "--------------------------------------" << endl
-   << "    " CONFIGURE_ARGS << endl
+   << "    " cfg_CONFIGURE_ARGS << endl
    << endl;
 
    show_version(CERR);

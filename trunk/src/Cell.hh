@@ -453,7 +453,7 @@ public:
    virtual ErrorCode bif_circle_fun_inverse(Cell * Z, const Cell * A) const
       { return E_DOMAIN_ERROR; }
 
-#ifdef RATIONAL_NUMBERS_WANTED
+#ifdef cfg_RATIONAL_NUMBERS_WANTED
    /// return the numerator of a quotient
    virtual APL_Integer get_numerator() const   { FIXME }
 

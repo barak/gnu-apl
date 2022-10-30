@@ -49,22 +49,25 @@
 AC_DEFUN([AX_LIB_POSTGRESQL],
 [
     AC_ARG_WITH([postgresql],
-        AS_HELP_STRING([--with-postgresql=@<:@ARG@:>@],
-            [use PostgreSQL library @<:@default=yes@:>@, optionally specify path to pg_config]
-        ),
-        [
-        if test "$withval" = "no"; then
-            want_postgresql="no"
-        elif test "$withval" = "yes"; then
-            want_postgresql="yes"
-            want1_postgresql="yes"
-        else
-            want_postgresql="yes"
-            want1_postgresql="yes"
-            PG_CONFIG="$withval"
-        fi
-        ],
-        [want_postgresql="yes"]
+                 AS_HELP_STRING([--with-postgresql=@<:@PATH@:>@],
+                 m4_join([], [use PostgreSQL library @<:@default=yes@:>@, ],
+                             [optionally specify the PATH to pg_config])
+                                ),
+                [ postgresql_given="yes"
+                  if test "$withval" = "no"; then
+                     want_postgresql="no"
+                  elif test "$withval" = "yes"; then
+                     want_postgresql="yes"
+                     want1_postgresql="yes"
+                  else
+                     want_postgresql="yes"
+                     want1_postgresql="yes"
+                     PG_CONFIG="$withval"
+                  fi
+                ],
+                [ postgresql_given="no"
+                  want_postgresql="yes"
+                ]
     )
 
     POSTGRESQL_CFLAGS=""

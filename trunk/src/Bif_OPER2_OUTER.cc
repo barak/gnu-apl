@@ -146,7 +146,7 @@ Value_P RO_B;
 void
 Bif_OPER2_OUTER::scalar_outer_product() const
 {
-#ifdef PERFORMANCE_COUNTERS_WANTED
+#ifdef cfg_PERFORMANCE_COUNTERS_WANTED
 const uint64_t start_1 = cycle_counter();
 #endif
 
@@ -172,7 +172,7 @@ const uint64_t start_1 = cycle_counter();
         PF_scalar_outer_product(Thread_context::get_master());
       }
 
-#ifdef PERFORMANCE_COUNTERS_WANTED
+#ifdef cfg_PERFORMANCE_COUNTERS_WANTED
 const uint64_t end_1 = cycle_counter();
    Performance::fs_OPER2_OUTER_AB.add_sample(end_1 - start_1,
                                              job.ZAh * job.ZBl);

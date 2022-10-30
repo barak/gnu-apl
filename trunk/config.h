@@ -1,32 +1,9 @@
+#ifndef __MAY_INCLUDE_CONFIG_H__
+# error "DON'T #include file config.h directly; use file Common.hh instead."
+#endif // __MAY_INCLUDE_CONFIG_H__
+
 /* config.h.  Generated from config.h.in by configure.  */
 /* config.h.in.  Generated from configure.ac by autoheader.  */
-
-/* APserver listen port name */
-#define APSERVER_PATH "/tmp/GNU-APL/APserver"
-
-/* APserver TCP listen port */
-#define APSERVER_PORT 16366
-
-/* APserver transport: TCP=0, LINUX=1, UNIX=2 */
-#define APSERVER_TRANSPORT 0
-
-/* desired ASSERT() level */
-#define ASSERT_LEVEL_WANTED 1
-
-/* how ./configure was called */
-#define CONFIGURE_ARGS "./configure  '--disable-maintainer-mode'"
-
-/* core count */
-#define CORE_COUNT_WANTED 0
-
-/* Define to set options typical for software development */
-/* #undef DEVELOP_WANTED */
-
-/* Define to enable dynamic logging */
-/* #undef DYNAMIC_LOG_WANTED */
-
-/* Define to enable gprof profiling */
-#define GPROF_WANTED -pg
 
 /* Define to 1 iff pthread_setaffinity_np() is available */
 #define HAVE_AFFINITY_NP 1
@@ -345,9 +322,6 @@
 /* Define to the sub-directory where libtool stores uninstalled libraries. */
 #define LT_OBJDIR ".libs/"
 
-/* max. rank of APL values */
-#define MAX_RANK_WANTED 8
-
 /* Name of package */
 #define PACKAGE "apl"
 
@@ -368,24 +342,6 @@
 
 /* Define to the version of this package. */
 #define PACKAGE_VERSION "1.8"
-
-/* Define to enable performance counters */
-/* #undef PERFORMANCE_COUNTERS_WANTED */
-
-/* Define to have support for rational numbers (EXPERIMENTAL!) */
-/* #undef RATIONAL_NUMBERS_WANTED */
-
-/* ./configure with --with-postgresql */
-#define REALLY_WANT_PostgreSQL 1
-
-/* SQLite available and wanted */
-#define REALLY_WANT_SQLITE3 1
-
-/* security level */
-#define SECURITY_LEVEL_WANTED 0
-
-/* short value cellcount */
-#define SHORT_VALUE_LENGTH_WANTED 12
 
 /* Define to 1 if you have the ANSI C header files. */
 #define STDC_HEADERS 1
@@ -415,23 +371,8 @@
 #endif
 
 
-/* Define to enable CHECK macro */
-/* #undef VALUE_CHECK_WANTED */
-
-/* Define to enable value events */
-/* #undef VALUE_HISTORY_WANTED */
-
 /* Version number of package */
 #define VERSION "1.8"
-
-/* Define to enable tracing of value flags */
-/* #undef VF_TRACING_WANTED */
-
-/* Define to have visible markers (DONT!) */
-/* #undef VISIBLE_MARKERS_WANTED */
-
-/* Define to make ^D a del-char and ^Z be EOF */
-/* #undef WANT_CTRLD_DEL */
 
 /* Define to 1 if on MINIX. */
 /* #undef _MINIX */
@@ -464,7 +405,7 @@
 /* PostgreSQL code compiles */
 #define apl_POSTGRES 1
 
-/* SQLite available */
+/* SQLite code compiles */
 #define apl_SQLITE3 1
 
 /* Define if compiling for Android */
@@ -478,6 +419,66 @@
 
 /* Define if building lib_gnu_apl.so */
 /* #undef apl_TARGET_PYTHON */
+
+/* APserver listen port name */
+#define cfg_APSERVER_PATH "/tmp/GNU-APL/APserver"
+
+/* APserver TCP listen port */
+#define cfg_APSERVER_PORT 16366
+
+/* APserver transport: TCP=0, LINUX=1, UNIX=2 */
+#define cfg_APSERVER_TRANSPORT 0
+
+/* the desired ASSERT() level (0=no, 1=some, 2=all assertions) */
+#define cfg_ASSERT_LEVEL_WANTED 1
+
+/* how ./configure was called */
+#define cfg_CONFIGURE_ARGS "./configure  '--disable-maintainer-mode'"
+
+/* core count */
+#define cfg_CORE_COUNT_WANTED 0
+
+/* Define to set options typical for software development */
+/* #undef cfg_DEVELOP_WANTED */
+
+/* Define to enable dynamic logging */
+/* #undef cfg_DYNAMIC_LOG_WANTED */
+
+/* max. rank of APL values */
+#define cfg_MAX_RANK_WANTED 8
+
+/* Define to enable performance counters */
+/* #undef cfg_PERFORMANCE_COUNTERS_WANTED */
+
+/* Define to have support for rational numbers (EXPERIMENTAL!) */
+/* #undef cfg_RATIONAL_NUMBERS_WANTED */
+
+/* security level */
+#define cfg_SECURITY_LEVEL_WANTED 0
+
+/* short value cellcount */
+#define cfg_SHORT_VALUE_LENGTH_WANTED 12
+
+/* ./configure with --with-postgresql */
+/* #undef cfg_USER_WANTS_POSTGRES */
+
+/* ./configure with --with-sqlite3 */
+/* #undef cfg_USER_WANTS_SQLITE3 */
+
+/* Define to enable CHECK macro */
+/* #undef cfg_VALUE_CHECK_WANTED */
+
+/* Define to enable value events */
+/* #undef cfg_VALUE_HISTORY_WANTED */
+
+/* Define to enable tracing of value flags */
+/* #undef cfg_VF_TRACING_WANTED */
+
+/* Define to have visible markers (DONT!) */
+/* #undef cfg_VISIBLE_MARKERS_WANTED */
+
+/* Define to make ^D a del-char and ^Z be EOF */
+/* #undef cfg_WANT_CTRLD_DEL */
 
 /* Define to `__inline__' or `__inline' if that's what the C compiler
    calls it, or to nothing if 'inline' is not supported under any name.  */

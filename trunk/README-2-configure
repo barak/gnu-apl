@@ -80,8 +80,8 @@ APSERVER_PATH
 
       ./configure APSERVER_TRANSPORT=LINUX   APSERVER_PATH=my-APserver-path
 
-   3. Normal Unix domain sockets are a GNU/linux specific variant that requires
-      a file in the file system to work. The permissions of that file control
+   3. Normal Unix domain sockets are a socket variant that requires a file name
+      in the local file system to work. The permissions of that file control
       which programs can connect to APserver (BUT MAY ALSO PREVENT APserver
       FROM OPERATING PROPERLY!). Due to the many different possibilities for
       the ownership and permissions for the file, GNU APL does not create the

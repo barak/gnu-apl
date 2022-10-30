@@ -24,7 +24,7 @@
 #ifndef __INTCELL_HH_DEFINED__
 #define __INTCELL_HH_DEFINED__
 
-#include "Common.hh"   // for RATIONAL_NUMBERS_WANTED
+#include "Common.hh"   // for cfg_RATIONAL_NUMBERS_WANTED
 #include "RealCell.hh"
 
 //----------------------------------------------------------------------------
@@ -148,7 +148,7 @@ public:
    virtual bool need_scaling(const PrintContext &pctx) const
       { return false; }
 
-#ifdef RATIONAL_NUMBERS_WANTED
+#ifdef cfg_RATIONAL_NUMBERS_WANTED
    /// overloaded Cell::get_numerator()
    virtual APL_Integer get_numerator() const
       { return value.ival; }

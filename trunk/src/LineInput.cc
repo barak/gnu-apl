@@ -1005,7 +1005,7 @@ LineEditContext lec(mode, 24, Workspace::get_PW(), hist, prompt);
                    break;
 
 
-#ifdef WANT_CTRLD_DEL
+#ifdef cfg_WANT_CTRLD_DEL
               case UNI_SUB:   // ^Z
                    CERR << "^Z";
                    eof = true;
@@ -1211,7 +1211,7 @@ const int b0 = safe_fgetc();
              case UNI_DLE: return UNI_CursorUp;      // ^P
              case UNI_DC2: return UNI_DC2;           // ^R
              case UNI_EM:  return UNI_EM;            // ^Y
-#ifdef WANT_CTRLD_DEL
+#ifdef cfg_WANT_CTRLD_DEL
              case UNI_SUB: return UNI_SUB;     // ^Z (as alt EOT, allowing ^D as delete-char)
 #endif
 

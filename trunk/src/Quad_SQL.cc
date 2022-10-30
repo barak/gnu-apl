@@ -53,22 +53,26 @@ Quad_SQL * Quad_SQL::fun = &Quad_SQL::_fun;
 #endif
 
 //----------------------------------------------------------------------------
-inline void
+static void
 init_provider_map()
 {
 #ifdef apl_SQLITE3
-   Provider *sqliteProvider = new SqliteProvider();
-   Assert(sqliteProvider);
-   providers.push_back(sqliteProvider);
-#elif REALLY_WANT_SQLITE3
+   {
+     Provider * sqliteProvider = new SqliteProvider();
+     Assert(sqliteProvider);
+     providers.push_back(sqliteProvider);
+   }
+#elif cfg_USER_WANTS_SQLITE3
 # warning "SQLite3 unavailable since ./configure could not detect it"
 #endif
 
 #ifdef apl_POSTGRES
-   Provider *postgresProvider = new PostgresProvider();
+   {
+Provider * postgresProvider = new PostgresProvider();
    Assert(postgresProvider);
    providers.push_back(postgresProvider);
-#elif REALLY_WANT_PostgreSQL
+   }
+#elif cfg_USER_WANTS_POSTGRES
 #  warning "PostgreSQL unavailable since ./configure could not detect it."
 # if apl_POSTGRES
 #  warning "The PostgreSQL library seems to be installed, but the header file(s) are missing"
@@ -117,7 +121,7 @@ static int find_free_connection( void )
 Token open_database(Value_P A, Value_P B)
 {
     if(!A->is_apl_char_vector() ){
-        MORE_ERROR() << "Illegal database name";
+        MORE_ERROR() << "A ⎕SQL[1] B: Illegal database name B";
         VALUE_ERROR;
     }
 
@@ -132,7 +136,11 @@ string type = to_string(A->get_UCS_ravel());
             }
        }
 
-   MORE_ERROR() << "Unknown database type: " << type.c_str();
+   UCS_string & more = MORE_ERROR();
+   more << "⎕SQL: Unknown database provider type: " << type.c_str() << "\n"
+        << "      Supported providers are:";
+   loop(p, providers.size())   more << " " << providers[p]->get_name().c_str();
+
    VALUE_ERROR;
 }
 //----------------------------------------------------------------------------
@@ -421,28 +429,20 @@ Quad_SQL::eval_AXB(const Value_P A, const Value_P X, const Value_P B) const
 {
    CHECK_SECURITY(disable_Quad_SQL);
 
-    const int function_number = X->get_cravel( 0 ).get_near_int( );
+const int function_number = X->get_cfirst().get_near_int();
 
-    switch( function_number ) {
-    case 0:
-        return list_functions( CERR );
+   switch(function_number)
+      {
+        case 0: return list_functions(CERR);
+        case 1: return open_database(A, B);
+        case 3: return run_query(param_to_db(X), A, B);
+        case 4: return run_update(param_to_db(X), A, B);
+        case 9: return show_cols(A, B);
 
-    case 1:
-        return open_database( A, B );
-
-    case 3:
-        return run_query( param_to_db( X ), A, B );
-
-    case 4:
-        return run_update( param_to_db( X ), A, B );
-
-    case 9:
-        return show_cols( A, B );
-
-    default:
-        MORE_ERROR() << "Illegal function number";
-        DOMAIN_ERROR;
-    }
+        default: MORE_ERROR() << "A ⎕SQL[X] B: Illegal function number X="
+                              << function_number;
+                 DOMAIN_ERROR;
+      }
 }
 //----------------------------------------------------------------------------
 static const UCS_string

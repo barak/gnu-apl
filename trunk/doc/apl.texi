@@ -1220,9 +1220,9 @@ the string, while a new-style string starts with an APL code line and
 the string itself begins at the following line.
 
 @item the ending """ must be placed at the end of a separate lines with only
-spaces allowed before the """ (to vertically align it with the leading """ if
-so  desired). In old-style strings the text up to the termination " is part of
-the string while in new-style strings it is not.
+spaces allowed before the """ (to horizontally align indent) it with the
+leading """ if so  desired). In old-style strings the text up to the
+termination " is part of the string while in new-style strings it is not.
 
 @item Neither the starting nor the ending line become nested strings of the
 result, and every line can be clearly identified as being either APL code or

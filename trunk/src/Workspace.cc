@@ -1020,7 +1020,7 @@ XML_Loading_Archive in(out, filename.c_str(), dump_fd);
         // got open file. We assume that from here on everything will be fine.
         // clear current WS and load it from file
         //
-#ifdef DYNAMIC_LOG_WANTED
+#ifdef cfg_DYNAMIC_LOG_WANTED
         const bool logit = Log_status(LID_archive);
         the_workspace.clear_WS(out, true);
         Log_control(LID_archive, logit);

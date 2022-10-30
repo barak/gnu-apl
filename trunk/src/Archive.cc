@@ -274,7 +274,7 @@ char cc[80];
 
         case CT_FLOAT:   // uses UNI_PAD_U4 or UNI_PAD_U8
              space -= leave_char_mode();
-#ifdef RATIONAL_NUMBERS_WANTED
+#ifdef cfg_RATIONAL_NUMBERS_WANTED
              {
                const FloatCell & flt =
                                  reinterpret_cast<const FloatCell &>(cell);
@@ -1083,7 +1083,7 @@ ShapeItem idx = 0;
                         Command::cmd_CHECK(CERR);
                         CERR << endl;
 
-#if VALUE_HISTORY_WANTED
+#if cfg_VALUE_HISTORY_WANTED
 print_history(CERR, sub, 0);
 print_history(CERR, values[sub_idx]._par, 0);
 print_history(CERR, values[p]._val, 0);
@@ -1893,7 +1893,7 @@ char **pend = reinterpret_cast<char **>(&end);
                Assert((*end++ & 0xFF) == 0xB7);
                const uint64_t denom = strtoll(*pend, pend, 10);
                Assert(denom > 0);
-#ifdef RATIONAL_NUMBERS_WANTED
+#ifdef cfg_RATIONAL_NUMBERS_WANTED
                Z.next_ravel_Float(numer, denom);
 #else
                Z.next_ravel_Float((1.0*numer)/denom);

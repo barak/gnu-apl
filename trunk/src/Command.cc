@@ -1054,7 +1054,7 @@ Command::cmd_KEYB(ostream & out)
 void
 Command::cmd_PSTAT(ostream & out, const UCS_string & arg)
 {
-#ifndef PERFORMANCE_COUNTERS_WANTED
+#ifndef cfg_PERFORMANCE_COUNTERS_WANTED
    out << "\n"
 << "Command ]PSTAT is not available, since performance counters were not\n"
 "configured for this APL interpreter. To enable performance counters (which\n"
@@ -1845,7 +1845,7 @@ Command::cmd_LIB2(ostream & out, const UCS_string_vector & args)
 void
 Command::cmd_LOG(ostream & out, const UCS_string & arg)
 {
-#ifdef DYNAMIC_LOG_WANTED
+#ifdef cfg_DYNAMIC_LOG_WANTED
 
    log_control(arg);
 
@@ -2263,7 +2263,7 @@ Command::do_USERCMD(ostream & out, UCS_string & apl_cmd,
    apl_cmd.append_quoted(line);
 }
 //----------------------------------------------------------------------------
-#ifdef DYNAMIC_LOG_WANTED
+#ifdef cfg_DYNAMIC_LOG_WANTED
 void
 Command::log_control(const UCS_string & arg)
 {

@@ -33,7 +33,7 @@
 
 using namespace std;
 
-#if APSERVER_TRANSPORT == 1
+#if cfg_APSERVER_TRANSPORT == 1
 # define ABSTRACT_OFFSET 1
 #else
 # define ABSTRACT_OFFSET 0
