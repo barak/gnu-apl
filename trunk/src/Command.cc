@@ -70,6 +70,7 @@ Command::process_line()
 {
 UCS_string accu;   // for new-style multiline strings
 UCS_string prompt = Workspace::get_prompt();
+bool multiline = false;
    for (;;)
        {
          UCS_string line;
@@ -79,23 +80,25 @@ UCS_string prompt = Workspace::get_prompt();
 
          if (eof) CERR << "EOF at " << LOC << endl;
 
-         if (line.ends_with("\"\"\""))   /// start or end of multi-line
+         if (line.ends_with("\"\"\""))   /// start or end of multi-line string
             {
-               if (accu.size() == 0)    // start of multi-line
+              multiline = ! multiline;
+              if (multiline)    // start of multi-line
                   {
                     accu = line;
                     prompt.prepend(UNI_RIGHT_ARROW);
-                    accu.resize(line.size() - 3);   // discard """
+                    accu.resize(line.size() - 3);   // discard trailing """
                     accu.append(UNI_SPACE);
                   }
-               else                     // end of multi-line
+              else              // end of multi-line
                   {
                     accu.pop_back();   // trailing " "
+                    if (accu.size() == 1)   accu.append_ASCII(" \"\"");
                     process_line(accu);
                     return;
                   }
             }
-         else if (accu.size())   // inside multi-line
+         else if (multiline)   // inside multi-line
             {
               accu.append_ASCII("\"");
               accu.append(line.do_escape(true));
@@ -2284,25 +2287,50 @@ UCS_string_vector args = split_arg(arg);
         return;
       }
 
-const LogId val = LogId(args[0].atoi());
-int on_off = -1;
-   if      (args.size() > 1 && args[1].starts_iwith("ON"))    on_off = 1;
-   else if (args.size() > 1 && args[1].starts_iwith("OFf"))   on_off = 0;
+   /* at this point args is either:
 
-   if (val >= LID_MIN && val <= LID_MAX)
+      1. LID_1 ... LID_n ON   (enable the given logging facilities)
+      2. LID_1 ... LID_n OFF  (enable the given logging facilities)
+      3. LID_1 ... LID_n      (toggle the given logging facilities)
+    */
+
+int action = 3;   // assume 3. (toggle)
+   if (args.back().starts_iwith("ON"))
       {
-        bool new_status = !Log_status(val);   // toggle
-        if (on_off == 0)        new_status = false;
-        else if (on_off == 1)   new_status = true;
-        Log_control(val, new_status);
+        action = 1;          // enable
+        args.pop_back();   // drop action
+      }
+   else if (args.back().starts_iwith("OFF"))
+      {
+        action = 2;          // disable
+        args.pop_back();   // drop action
+      }
 
-        const char * info = Log_info(val);
-        Assert(info);
-        char cc[100];
-        size_t cc_len = snprintf(cc, sizeof(cc), "%s", info);
-        while (cc_len && cc[cc_len - 1] <= ' ')   cc[--cc_len] = 0;
-        CERR << "    Logging facility '" << cc << "' is now "
-             << (new_status ? "ON " : "OFF") << endl;
+   loop(a, args.size())
+       {
+         const LogId lid = LogId(args[a].atoi());
+
+         if (lid >= LID_MIN && lid <= LID_MAX)
+            {
+              bool new_status;
+              if  (action == 1)        new_status = true;
+              else if  (action == 1)   new_status = false;
+              else                     new_status = !Log_status(lid);
+              Log_control(lid, new_status);
+
+              const char * info = Log_info(lid);
+              Assert(info);
+              char cc[100];
+              size_t cc_len = snprintf(cc, sizeof(cc), "%s", info);
+              while (cc_len && cc[cc_len - 1] <= ' ')   cc[--cc_len] = 0;
+              CERR << "    Logging facility '" << cc << "' is now "
+                   << (new_status ? "ON " : "OFF") << endl;
+            }
+         else
+            {
+              CERR << "    Invalid logging facility '" << lid
+                   << " (not " << LID_MIN << "..." << LID_MAX << ")" << endl;
+            }
       }
 }
 #endif

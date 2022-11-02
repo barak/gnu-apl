@@ -1002,8 +1002,6 @@ private:
 };
 //----------------------------------------------------------------------------
 
-extern void print_history(ostream & out, const Value & val, const char * loc);
-
 // shortcuts for frequently used APL values...
 
 /// integer scalar

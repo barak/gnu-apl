@@ -1572,7 +1572,7 @@ Some influential environment variables:
   MAX_RANK_WANTED
               the max. Rank of APL values (see README-2-configure) default: 8)
   VALUE_CHECK_WANTED
-              enable CHECK() macro (see README-2-configure) default: no
+              enable Value::check_value() (see README-2-configure) default: no
   PERFORMANCE_COUNTERS_WANTED
               enable performance counters (see README-2-configure) default: no
   VALUE_HISTORY_WANTED
@@ -20307,7 +20307,6 @@ _ACEOF
    fi
 fi
 
-echo "apl_SQLITE3: $apl_SQLITE3"
 # export apl_SQLITE3 to config.h
 if test "x$apl_SQLITE3" = "xyes"; then
 
@@ -21215,8 +21214,8 @@ $as_echo "$WANT_CTRLD_DEL" >&6; }
 ###############################################################################
 # check if the user compiles for ANDROID
 #
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if we are compiling for Android" >&5
-$as_echo_n "checking if we are compiling for Android... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if the build target is Android" >&5
+$as_echo_n "checking if the build target is Android... " >&6; }
 
 # Check whether --with-android was given.
 if test "${with_android+set}" = set; then :
@@ -21245,8 +21244,8 @@ $as_echo "$apl_TARGET_ANDROID" >&6; }
 ###############################################################################
 # check if the user wants the Erlang interface (and therefore also libapl)
 #
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if we want to build an erlang interface (implies libapl.so)" >&5
-$as_echo_n "checking if we want to build an erlang interface (implies libapl.so)... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if the build target is the Erlang interface (implies libapl.so)" >&5
+$as_echo_n "checking if the build target is the Erlang interface (implies libapl.so)... " >&6; }
 
 # Check whether --with-erlang was given.
 if test "${with_erlang+set}" = set; then :
@@ -21278,8 +21277,8 @@ $as_echo "$apl_TARGET_ERLANG" >&6; }
 ###############################################################################
 # check if the user wants to build libapl.so
 #
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if we want to build libapl.so" >&5
-$as_echo_n "checking if we want to build libapl.so... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if the build target is libapl.so" >&5
+$as_echo_n "checking if the build target is libapl.so... " >&6; }
 apl_TARGET_LIBAPL=$apl_TARGET_ERLANG   # Erlang needs libapl
 
 # Check whether --with-libapl was given.
@@ -21309,8 +21308,8 @@ $as_echo "$apl_TARGET_LIBAPL" >&6; }
 ###############################################################################
 # check if the user wants to build the python extension libpython_apl.so
 #
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if we want to build libpython_apl.so" >&5
-$as_echo_n "checking if we want to build libpython_apl.so... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking if the build target is libpython_apl.so" >&5
+$as_echo_n "checking if the build target is libpython_apl.so... " >&6; }
 apl_TARGET_PYTHON=no
 
 PYTHON_CFLAGS=
@@ -21397,6 +21396,8 @@ if test "x$CXX_WERROR" = "xyes"; then CXX_WERROR="-Werror";
 # APL: development configuration desired ? Set this before other xxx_WANTED
 # options so that the implied xxx_WANTED options set here can be overridden
 # further down
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether development mode is desired" >&5
+$as_echo_n "checking whether development mode is desired... " >&6; }
 
 if test "x$DEVELOP_WANTED" = "xyes"; then
 
@@ -21405,11 +21406,11 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
    ASSERT_LEVEL_WANTED=2
-   DYNAMIC_LOG_WANTED=1
-   PERFORMANCE_COUNTERS_WANTED=1
-   RATIONAL_NUMBERS_WANTED=1
-   VALUE_CHECK_WANTED=1
-   VALUE_HISTORY_WANTED=1
+   DYNAMIC_LOG_WANTED=yes
+   PERFORMANCE_COUNTERS_WANTED=yes
+   VALUE_CHECK_WANTED=yes
+   VALUE_HISTORY_WANTED=yes
+else DEVELOP_WANTED=no
 fi
  if test "x$DEVELOP_WANTED" = "xyes"; then
   apl_DEVELOP_TRUE=
@@ -21419,6 +21420,8 @@ else
   apl_DEVELOP_FALSE=
 fi
 
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $DEVELOP_WANTED" >&5
+$as_echo "$DEVELOP_WANTED" >&6; }
 
 
 # APL: max. rank ?
@@ -21431,13 +21434,18 @@ _ACEOF
 
 
 
-# APL: CHECK() macro desired ?
+# APL: Value::check_value() desired ?
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether internal value checks shall be enabled" >&5
+$as_echo_n "checking whether internal value checks shall be enabled... " >&6; }
 
 if test "x$VALUE_CHECK_WANTED" = "xyes"; then
 
 $as_echo "#define cfg_VALUE_CHECK_WANTED 1" >>confdefs.h
 
+else VALUE_CHECK_WANTED="no"
 fi
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $VALUE_CHECK_WANTED" >&5
+$as_echo "$VALUE_CHECK_WANTED" >&6; }
 
 
 # APL: performance counters desired ?
@@ -24387,16 +24395,23 @@ fi
 $as_echo "
 $as_me:    ---- SUMMARY OF TESTS (please include in error reports) ----
 
-    apl_MAINTAINER_MODE:   $apl_MAINTAINER_MODE
-    apl_missing_headers:   $apl_missing_headers
-    apl_missing_functions: $apl_missing_functions
-    apl_FFT:               $apl_FFT	(affects: ⎕FFT)
-    apl_PCRE:              $apl_PCRE	(affects: ⎕RE)
-    apl_PNG:               $apl_PNG	(affects: ⎕PNG)
-    apl_POSTGRES:          $apl_POSTGRES	(may affect: ⎕SQL)
-    apl_SQLITE3:           $apl_SQLITE3	(may affect: ⎕SQL)
-    apl_SQL                $apl_SQL	(affects:    ⎕SQL)
-    apl_X11 (libxcb):      $apl_X11	(fallback for               ⎕PLOT)
-    apl_GTK3:              $apl_GTK3	(affects: ⎕PNG, ⎕GTK, maybe ⎕PLOT)
-    apl_GUI:               $apl_GUI	(affects:                   ⎕PLOT)
+    DEVELOP_WANTED:              $DEVELOP_WANTED
+    ASSERT_LEVEL_WANTED:         $ASSERT_LEVEL_WANTED
+    DYNAMIC_LOG_WANTED:          $DYNAMIC_LOG_WANTED
+    PERFORMANCE_COUNTERS_WANTED: $PERFORMANCE_COUNTERS_WANTED
+    VALUE_CHECK_WANTED:          $VALUE_CHECK_WANTED
+    VALUE_HISTORY_WANTED:        $VALUE_HISTORY_WANTED
+
+    apl_MAINTAINER_MODE:         $apl_MAINTAINER_MODE
+    apl_missing_headers:         $apl_missing_headers
+    apl_missing_functions:       $apl_missing_functions
+    apl_FFT:                     $apl_FFT	(affects: ⎕FFT)
+    apl_PCRE:                    $apl_PCRE	(affects: ⎕RE)
+    apl_PNG:                     $apl_PNG	(affects: ⎕PNG)
+    apl_POSTGRES:                $apl_POSTGRES	(may affect: ⎕SQL)
+    apl_SQLITE3:                 $apl_SQLITE3	(may affect: ⎕SQL)
+    apl_SQL                      $apl_SQL	(affects:    ⎕SQL)
+    apl_X11 (libxcb):            $apl_X11	(fallback for               ⎕PLOT)
+    apl_GTK3:                    $apl_GTK3	(affects: ⎕PNG, ⎕GTK, maybe ⎕PLOT)
+    apl_GUI:                     $apl_GUI	(affects:                   ⎕PLOT)
 "

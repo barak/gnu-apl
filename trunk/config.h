@@ -465,7 +465,7 @@
 /* ./configure with --with-sqlite3 */
 /* #undef cfg_USER_WANTS_SQLITE3 */
 
-/* Define to enable CHECK macro */
+/* Define to enable internal value checks */
 /* #undef cfg_VALUE_CHECK_WANTED */
 
 /* Define to enable value events */

@@ -79,6 +79,7 @@
 #include "UCS_string.hh"
 #include "UserFunction.hh"
 #include "Value.hh"
+#include "ValueHistory.hh"
 #include "Workspace.hh"
 
 using namespace std;
@@ -1047,7 +1048,7 @@ ShapeItem idx = 0;
    //
    Heapsort<_val_par>::sort(values, value_count, 0, &_val_par::compare_val_par);
    loop(v, (value_count - 1))   Assert(&values[v]._val < &values[v + 1]._val);
-   
+
    // set up parents of values
    //
    loop(p, value_count)   // for every (parent-) value
@@ -1084,9 +1085,9 @@ ShapeItem idx = 0;
                         CERR << endl;
 
 #if cfg_VALUE_HISTORY_WANTED
-print_history(CERR, sub, 0);
-print_history(CERR, values[sub_idx]._par, 0);
-print_history(CERR, values[p]._val, 0);
+VH_entry::print_history(CERR, *sub, 0);
+VH_entry::print_history(CERR, *values[sub_idx]._val, 0);
+VH_entry::print_history(CERR, *values[p]._val, 0);
 #endif
 
    CERR << endl <<

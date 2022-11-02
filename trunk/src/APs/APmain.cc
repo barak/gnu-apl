@@ -40,7 +40,7 @@
 #include "Svar_DB.hh"
 #include "Svar_signals.hh"
 
-#ifdef DYNAMIC_LOG_WANTED
+#ifdef cfg_DYNAMIC_LOG_WANTED
 extern bool LOG_startup;
 extern bool LOG_shared_variables;
 extern bool LOG_Svar_DB_signals;

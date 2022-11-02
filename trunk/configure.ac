@@ -505,19 +505,21 @@ if apl_YES($CXX_WERROR); then CXX_WERROR="-Werror";
 # APL: development configuration desired ? Set this before other xxx_WANTED
 # options so that the implied xxx_WANTED options set here can be overridden
 # further down
+AC_MSG_CHECKING([whether development mode is desired])
 AC_ARG_VAR(DEVELOP_WANTED,
    [ set development options (see README-2-configure) default: no])
 if apl_YES($DEVELOP_WANTED); then
    AC_DEFINE_UNQUOTED(cfg_DEVELOP_WANTED, 1,
              [Define to set options typical for software development])
    ASSERT_LEVEL_WANTED=2
-   DYNAMIC_LOG_WANTED=1
-   PERFORMANCE_COUNTERS_WANTED=1
-   RATIONAL_NUMBERS_WANTED=1
-   VALUE_CHECK_WANTED=1
-   VALUE_HISTORY_WANTED=1
+   DYNAMIC_LOG_WANTED=yes
+   PERFORMANCE_COUNTERS_WANTED=yes
+   VALUE_CHECK_WANTED=yes
+   VALUE_HISTORY_WANTED=yes
+else DEVELOP_WANTED=no
 fi
 AM_CONDITIONAL([apl_DEVELOP],  [apl_YES($DEVELOP_WANTED)])
+AC_MSG_RESULT([$DEVELOP_WANTED])
 
 
 # APL: max. rank ?
@@ -528,13 +530,16 @@ AC_DEFINE_UNQUOTED(cfg_MAX_RANK_WANTED, $MAX_RANK_WANTED,
           [max. rank of APL values])
 
 
-# APL: CHECK() macro desired ?
+# APL: Value::check_value() desired ?
+AC_MSG_CHECKING([whether internal value checks shall be enabled])
 AC_ARG_VAR(VALUE_CHECK_WANTED,
-   [ enable CHECK() macro (see README-2-configure) default: no ])
+   [ enable Value::check_value() (see README-2-configure) default: no ])
 if apl_YES($VALUE_CHECK_WANTED); then
    AC_DEFINE(cfg_VALUE_CHECK_WANTED, 1,
-             [ Define to enable CHECK macro ])
+             [ Define to enable internal value checks ])
+else VALUE_CHECK_WANTED="no"
 fi
+AC_MSG_RESULT([$VALUE_CHECK_WANTED])
 
 
 # APL: performance counters desired ?
@@ -800,16 +805,23 @@ fi
 AS_ECHO(["
 $as_me:    ---- SUMMARY OF TESTS (please include in error reports) ----
 
-    apl_MAINTAINER_MODE:   $apl_MAINTAINER_MODE
-    apl_missing_headers:   $apl_missing_headers
-    apl_missing_functions: $apl_missing_functions
-    apl_FFT:               $apl_FFT	(affects: ⎕FFT)
-    apl_PCRE:              $apl_PCRE	(affects: ⎕RE)
-    apl_PNG:               $apl_PNG	(affects: ⎕PNG)
-    apl_POSTGRES:          $apl_POSTGRES	(may affect: ⎕SQL)
-    apl_SQLITE3:           $apl_SQLITE3	(may affect: ⎕SQL)
-    apl_SQL                $apl_SQL	(affects:    ⎕SQL)
-    apl_X11 (libxcb):      $apl_X11	(fallback for               ⎕PLOT)
-    apl_GTK3:              $apl_GTK3	(affects: ⎕PNG, ⎕GTK, maybe ⎕PLOT)
-    apl_GUI:               $apl_GUI	(affects:                   ⎕PLOT)
+    DEVELOP_WANTED:              $DEVELOP_WANTED
+    ASSERT_LEVEL_WANTED:         $ASSERT_LEVEL_WANTED
+    DYNAMIC_LOG_WANTED:          $DYNAMIC_LOG_WANTED
+    PERFORMANCE_COUNTERS_WANTED: $PERFORMANCE_COUNTERS_WANTED
+    VALUE_CHECK_WANTED:          $VALUE_CHECK_WANTED
+    VALUE_HISTORY_WANTED:        $VALUE_HISTORY_WANTED
+
+    apl_MAINTAINER_MODE:         $apl_MAINTAINER_MODE
+    apl_missing_headers:         $apl_missing_headers
+    apl_missing_functions:       $apl_missing_functions
+    apl_FFT:                     $apl_FFT	(affects: ⎕FFT)
+    apl_PCRE:                    $apl_PCRE	(affects: ⎕RE)
+    apl_PNG:                     $apl_PNG	(affects: ⎕PNG)
+    apl_POSTGRES:                $apl_POSTGRES	(may affect: ⎕SQL)
+    apl_SQLITE3:                 $apl_SQLITE3	(may affect: ⎕SQL)
+    apl_SQL                      $apl_SQL	(affects:    ⎕SQL)
+    apl_X11 (libxcb):            $apl_X11	(fallback for               ⎕PLOT)
+    apl_GTK3:                    $apl_GTK3	(affects: ⎕PNG, ⎕GTK, maybe ⎕PLOT)
+    apl_GUI:                     $apl_GUI	(affects:                   ⎕PLOT)
 "])
