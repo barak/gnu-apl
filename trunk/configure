@@ -672,9 +672,9 @@ HAVE_SEM_INIT_FALSE
 HAVE_SEM_INIT_TRUE
 apl_GTK3_FALSE
 apl_GTK3_TRUE
-PKG_CONFIG
 GTK_CFLAGS
 GTK_LDFLAGS
+PKG_CONFIG
 apl_PCRE_FALSE
 apl_PCRE_TRUE
 PCRE_CFLAGS
@@ -17714,7 +17714,17 @@ done
 
 
 
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for X" >&5
+# wrap multiple tests into a single dash function from which we may
+# return prematurely (which m4 can't) if a sub-test fails...
+#
+dash_test_X11()
+{ {
+apl_X11=no
+
+local have_x                   # 'yes', 'no', or 'disabled' by AC_PATH_X()
+local x_includes x_libraries   # also set by AC_PATH_X(), normally empty
+
+{ { $as_echo "$as_me:${as_lineno-$LINENO}: checking for X" >&5
 $as_echo_n "checking for X... " >&6; }
 
 
@@ -17906,10 +17916,9 @@ else
   { $as_echo "$as_me:${as_lineno-$LINENO}: result: libraries $x_libraries, headers $x_includes" >&5
 $as_echo "libraries $x_libraries, headers $x_includes" >&6; }
 fi
+ } ; test "x$have_x" != "xyes" && return
 
-
-if test "x$have_x" = "xyes"; then
-   for ac_header in xcb/xcb.h X11/Xlib.h X11/Xlib-xcb.h X11/Xutil.h
+for ac_header in xcb/xcb.h X11/Xlib.h X11/Xlib-xcb.h X11/Xutil.h
 do :
   as_ac_Header=`$as_echo "ac_cv_header_$ac_header" | $as_tr_sh`
 ac_fn_cxx_check_header_mongrel "$LINENO" "$ac_header" "$as_ac_Header" "$ac_includes_default"
@@ -17917,25 +17926,27 @@ if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
   cat >>confdefs.h <<_ACEOF
 #define `$as_echo "HAVE_$ac_header" | $as_tr_cpp` 1
 _ACEOF
- apl_X11=yes
+
 else
-  apl_X11=no
+  return
 fi
 
 done
 
 
-   # xcb/xproto.h needs xcb/xcb.h
-   ac_fn_cxx_check_header_compile "$LINENO" "xcb/xproto.h" "ac_cv_header_xcb_xproto_h" "#include <xcb/xcb.h>
+# xcb/xproto.h needs xcb/xcb.h
+ac_fn_cxx_check_header_compile "$LINENO" "xcb/xproto.h" "ac_cv_header_xcb_xproto_h" "#include <xcb/xcb.h>
 "
 if test "x$ac_cv_header_xcb_xproto_h" = xyes; then :
 
+else
+  return
 fi
 
 
 
-   apl_have_opt_lib=yes   # assume all libs below are present
-   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for XOpenDisplay in -lX11" >&5
+apl_have_opt_lib=yes   # set to 'no' by apl_OPT_LIB() if missing
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XOpenDisplay in -lX11" >&5
 $as_echo_n "checking for XOpenDisplay in -lX11... " >&6; }
 if ${ac_cv_lib_X11_XOpenDisplay+:} false; then :
   $as_echo_n "(cached) " >&6
@@ -17982,7 +17993,7 @@ else
   $as_echo "   └──── may affect: ⎕PLOT "; apl_have_opt_lib=no
 fi
 
-   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for xcb_connect in -lxcb" >&5
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for xcb_connect in -lxcb" >&5
 $as_echo_n "checking for xcb_connect in -lxcb... " >&6; }
 if ${ac_cv_lib_xcb_xcb_connect+:} false; then :
   $as_echo_n "(cached) " >&6
@@ -18029,7 +18040,7 @@ else
   $as_echo "   └──── may affect: ⎕PLOT "; apl_have_opt_lib=no
 fi
 
-   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for XGetXCBConnection in -lX11-xcb" >&5
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for XGetXCBConnection in -lX11-xcb" >&5
 $as_echo_n "checking for XGetXCBConnection in -lX11-xcb... " >&6; }
 if ${ac_cv_lib_X11_xcb_XGetXCBConnection+:} false; then :
   $as_echo_n "(cached) " >&6
@@ -18076,10 +18087,9 @@ else
   $as_echo "   └──── may affect: ⎕PLOT "; apl_have_opt_lib=no
 fi
 
-   apl_X11=$apl_have_opt_lib
-else
-   apl_X11=no
-fi
+apl_X11=$apl_have_opt_lib
+} }
+dash_test_X11   # perform the X11 tests
 
 
 
@@ -20334,9 +20344,14 @@ if test "x$apl_SQLITE3" != "xyes"; then
    $as_echo "   └──── may affect: ⎕SQL";
 fi
 
-# {{ check if PostgreSQL is wanted and installed...
+# wrap multiple tests into a single dash function from which we may
+# return prematurely (which m4 can't) if a sub-test fails...
+#
+dash_test_POSTGRES()
+{ {
+apl_POSTGRES=no
 
-apl_POSTGRES=no   # assume neither wanted nor installed
+local found_postgresql   # 'yes' or 'no' by AX_LIB_POSTGRESQL()
 
 # ===========================================================================
 #     http://www.gnu.org/software/autoconf-archive/ax_lib_postgresql.html
@@ -20534,37 +20549,39 @@ $as_echo "no" >&6; }
 
                    # call AX_LIB_POSTGRESQL()
     #
-    # ./configure --with-postgresql="no"   →    $withval: "no"
-    # ./configure --without-postgresql     →    $withval: "no"
-    # ./configure                          →    $withval: "yes"
-    # ./configure --with-postgresql        →    $withval: "yes"
-    # ./configure --with-postgresql=yes    →    $withval: "yes"
-    # ./configure --with-postgresql=path   →    $withval: "path"
+    # ./configure --with-postgresql="no"   →    $with_postgresql: "no"
+    # ./configure --without-postgresql     →    $with_postgresql: "no"
+    # ./configure                          →    $with_postgresql: "yes"
+    # ./configure --with-postgresql        →    $with_postgresql: "yes"
+    # ./configure --with-postgresql=yes    →    $with_postgresql: "yes"
+    # ./configure --with-postgresql=path   →    $with_postgresql: "path"
     #
-if test "x$with_postgresql" != "xno"; then   # the user allows postgres (if available)
+test "x$with_postgresql" = "xno" && return   # the user rejects POSTSCRIPT
 
-   apl_POSTGRES=$found_postgresql   # set to yes/no in ax_lib_postgresql.m4
-   if test "x$postgresql_given" = "xyes"; then
+
+if test "x$postgresql_given" = "xyes"; then
 
 cat >>confdefs.h <<_ACEOF
 #define cfg_USER_WANTS_POSTGRES 1
 _ACEOF
 
-   fi
+fi
 
-    # if POSTGRES is present: check if it is usable
-    if test "x$found_postgresql" = "xyes" ; then
-       { $as_echo "$as_me:${as_lineno-$LINENO}: checking for PostgreSQL usability" >&5
+test "x$found_postgresql" != "xyes" && return   # no POSTSCRIPT
+
+    # POSTGRES is present. Check if it is usable (which is the final verdict).
+    #
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for PostgreSQL usability" >&5
 $as_echo_n "checking for PostgreSQL usability... " >&6; }
-       saved_CPPFLAGS="$CPPFLAGS"
-       CPPFLAGS="$CPPFLAGS $POSTGRESQL_CFLAGS"
-       cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+   saved_CPPFLAGS="$CPPFLAGS"
+   CPPFLAGS="$CPPFLAGS $POSTGRESQL_CFLAGS"
+   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
 /* end confdefs.h.  */
 #include <libpq-fe.h>
 int
 main ()
 {
-PGconn *db = PQconnectdbParams( 0, 0, 1 );
+PGconn *db = PQconnectdbParams(0, 0, 1);
   ;
   return 0;
 }
@@ -20576,18 +20593,19 @@ else
 fi
 rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 
-       CPPFLAGS="$saved_CPPFLAGS"
-       { $as_echo "$as_me:${as_lineno-$LINENO}: result: $apl_POSTGRES" >&5
+   CPPFLAGS="$saved_CPPFLAGS"
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $apl_POSTGRES" >&5
 $as_echo "$apl_POSTGRES" >&6; }
-       if test "x$apl_POSTGRES" = "xyes"; then
+
+if test "x$apl_POSTGRES" = "xyes"; then
 
 cat >>confdefs.h <<_ACEOF
 #define apl_POSTGRES 1
 _ACEOF
 
-        fi
-    fi
 fi
+} }
+dash_test_POSTGRES   # perform the POSTGRES tests
 
 # export apl_POSTGRES to Makefile.am
  if test "x$apl_POSTGRES" = "xyes"; then
@@ -20599,7 +20617,6 @@ else
 fi
 
 
-# }} end of PostgreSQL check.
 
 if test "x$apl_POSTGRES" != "xyes"; then
    $as_echo "   └──── may affect: ⎕SQL";
@@ -20663,7 +20680,7 @@ if test "x$apl_POSTGRES" = "xyes"; then   apl_SQL=yes;   fi
 #   exception to the GPL to apply to your modified version as well.
 
 
-
+   # define AX_PATH_LIB_PCRE()
 
 # Check whether --with-pcre was given.
 if test "${with_pcre+set}" = set; then :
@@ -20787,8 +20804,8 @@ esac
 
 
 
-         # sets: ac_cv_lib_pcre2_32_pcre2_compile_32
-   apl_PCRE=$ac_cv_lib_pcre2_32_pcre2_compile_32
+                   # set ac_cv_lib_pcre2_32_pcre2_compile_32
+apl_PCRE=$ac_cv_lib_pcre2_32_pcre2_compile_32
 
 # export apl_PCRE to Makefile.am
  if test "x$apl_PCRE" = "xyes"; then
@@ -20805,32 +20822,37 @@ if test "x$apl_PCRE" != "xyes"; then
    $as_echo "   └──── may affect: ⎕RE";
 fi
 
-################################# GTK3 check #################################
+# wrap multiple tests into a single dash function from which we may
+# return prematurely (which m4 can't) if a sub-test fails...
 #
+dash_test_GTK()
+{ {
+apl_GTK3=no
+
 
 # Check whether --with-gtk3 was given.
 if test "${with_gtk3+set}" = set; then :
   withval=$with_gtk3;
 fi
 
+    #
+    # ./configure --with-gtk3="no"   →    $with_gtk3: "no"
+    # ./configure --without-gtk3     →    $with_gtk3: "no"
+    # ./configure                    →    $with_gtk3: "yes"
+    # ./configure --with-gtk3        →    $with_gtk3: "yes"
+    # ./configure --with-gtk3=yes    →    $with_gtk3: "yes"
+    # ./configure --with-gtk3=path   →    $with_gtk3: "path"
+    #
+if test "x$with_gtk3" = "xno"; then       # user has explicitly disabled GTK
+   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for GTK" >&5
+$as_echo_n "checking for GTK... " >&6; }
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no - (explicitly disabled by user)" >&5
+$as_echo "no - (explicitly disabled by user)" >&6; }
+   return
+fi
 
-apl_GTK3=no
-
-
-GTK_LDFLAGS=
-GTK_CFLAGS=
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether support for ⎕GTK (needs GTK version 3) is desired" >&5
-$as_echo_n "checking whether support for ⎕GTK (needs GTK version 3) is desired... " >&6; }
-if test "x$with_gtk3" = "xno"       # user has explicitly disabled GTK
-then
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no - (user has explicitly disabled ⎕GTK)" >&5
-$as_echo "no - (user has explicitly disabled ⎕GTK)" >&6; }
-else
-    # user wants ⎕GTK)
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-
-    # Extract the first word of "pkg-config", so it can be a program name with args.
+   # user allows GTK, check for pkg-config
+# Extract the first word of "pkg-config", so it can be a program name with args.
 set dummy pkg-config; ac_word=$2
 { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
 $as_echo_n "checking for $ac_word... " >&6; }
@@ -20871,37 +20893,31 @@ $as_echo "no" >&6; }
 fi
 
   # locate pkg-config
-    if test "x$PKG_CONFIG" != "xno"; then        # pkg-config present
-        { $as_echo "$as_me:${as_lineno-$LINENO}: checking if package gtk+-3.0 is installed" >&5
-$as_echo_n "checking if package gtk+-3.0 is installed... " >&6; }
-        if $PKG_CONFIG --exists gtk+-3.0         # package gtk+-3.0  exists
-        then
-            { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
+if test "x$PKG_CONFIG" = "xno"; then             # pkg-config missing
+   { $as_echo "$as_me:${as_lineno-$LINENO}: checking for GTK" >&5
+$as_echo_n "checking for GTK... " >&6; }
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: no (prerequisite for GTK)" >&5
+$as_echo "no (prerequisite for GTK)" >&6; }
+   return
+fi
+
+
+
+GTK_LDFLAGS=
+GTK_CFLAGS=
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking for GTK (≥ version 3)" >&5
+$as_echo_n "checking for GTK (≥ version 3)... " >&6; }
+
+if $PKG_CONFIG --exists gtk+-3.0; then         # package gtk+-3.0  exists
+   { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
 $as_echo "yes" >&6; }
-            GTK_CFLAGS=`$PKG_CONFIG --cflags gtk+-3.0`
-            GTK_LDFLAGS=`$PKG_CONFIG --libs gtk+-3.0`
-            apl_GTK3=yes
-        else                                     # package gtk+-3.0 missing
-            { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-            apl_GTK3=no
-        fi
-    else                                      # pkg-config missing
-        { $as_echo "$as_me:${as_lineno-$LINENO}: result: no (cannot use GTK without pkg-config)" >&5
-$as_echo "no (cannot use GTK without pkg-config)" >&6; }
-        apl_GTK3=no
-    fi
+   GTK_CFLAGS=`$PKG_CONFIG --cflags gtk+-3.0`
+   GTK_LDFLAGS=`$PKG_CONFIG --libs gtk+-3.0`
+   apl_GTK3=yes
+else                                     # package gtk+-3.0 missing
+      { $as_echo "$as_me:${as_lineno-$LINENO}: result: no (says pkg-config)" >&5
+$as_echo "no (says pkg-config)" >&6; }
 fi
-
-# export apl_GTK3 to Makefile
- if test "x$apl_GTK3" = "xyes"; then
-  apl_GTK3_TRUE=
-  apl_GTK3_FALSE='#'
-else
-  apl_GTK3_TRUE='#'
-  apl_GTK3_FALSE=
-fi
-
 
 # export apl_GTK3 to config.h
 if test "x$apl_GTK3" = "xyes"; then
@@ -20911,6 +20927,18 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
 fi
+} }
+dash_test_GTK   # perform the GTK tests
+
+# export apl_GTK3 to Makefile.am
+ if test "x$apl_GTK3" = "xyes"; then
+  apl_GTK3_TRUE=
+  apl_GTK3_FALSE='#'
+else
+  apl_GTK3_TRUE='#'
+  apl_GTK3_FALSE=
+fi
+
 
 
 if test "x$apl_GTK3" != "xyes"; then
@@ -21616,8 +21644,8 @@ $as_echo "$APSERVER_PORT" >&6; }
 
 
 # APL: APserver port name ?
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking which unix port name APserver shall use" >&5
-$as_echo_n "checking which unix port name APserver shall use... " >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: checking which *nix port name APserver shall use" >&5
+$as_echo_n "checking which *nix port name APserver shall use... " >&6; }
 
 if test "x$APSERVER_PATH" = "x";   then APSERVER_PATH="/tmp/GNU-APL/APserver";  fi
 
@@ -24326,7 +24354,7 @@ apl_top=$(pwd)            # start search at current directory
 for q in 1 2 3 4; do      # at most 4 times...
    if test -f "$apl_top/buildtag.sh"    # does buildtag.sh exist in $apl_top ?
    then                                 # yes...
-      $as_echo "$as_me:    ├─── top-level apl directory is: $apl_top"
+      $as_echo "$as_me:    ├─── Found the top-level apl directory: $apl_top"
       . "$apl_top/buildtag.sh"              # source buildtag.sh
       abs_apl_top="$apl_top"                # and remember the directory
       break                                 # done.
@@ -24358,12 +24386,16 @@ $as_echo "$as_me:    └─── patching $abs_apl_top/config.h done."
 if test -f "$apl_top/makefile.h"
 then
    $as_echo "
-$as_me: removing old $apl_top/makefile.h (if any).
-           NOTE: ./Makefile will create a fresh makefile.h automatically.
-           However, running 'make' in directory $apl_top/src
-           BEFORE running 'make' in $apl_top may yield a
-           compile error (which can be fixed easily by running 'make'
-           in directory $apl_top first)."
+$as_me: removing old $apl_top/makefile.h.
+           WARNING: ./Makefile will create a fresh makefile.h (with the current
+           arguments of this ./configure) automatically. For this to work,
+           every execution of ./configure requires the execution of 'make'
+           in the top-level GNU APL directory $apl_top BEFORE
+           running 'make' in any sub-directory (such as
+           $apl_top/src).
+           Otherwise the missing makefile.h would produce a compile error in
+           the sub-directory (which can be fixed easily by running 'make' in
+           the top-level directory first)."
    rm -f "$apl_top/makefile.h"
 fi
 

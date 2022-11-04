@@ -2287,51 +2287,46 @@ UCS_string_vector args = split_arg(arg);
         return;
       }
 
-   /* at this point args is either:
+   // at this point args is a sequence of numbers (LIDss) and actions (ON or
+   // OFF). We parse args back to front. to acreate a vector of actions
+   // which is then executed from front to back.
+   //
+   enum OOT { Off = 0, On = 1, Toggle = 2 };
+struct lid_OOT { LogId lid;   OOT on_off_toggle; };
+vector<struct lid_OOT> lid_OOTs;
 
-      1. LID_1 ... LID_n ON   (enable the given logging facilities)
-      2. LID_1 ... LID_n OFF  (enable the given logging facilities)
-      3. LID_1 ... LID_n      (toggle the given logging facilities)
-    */
-
-int action = 3;   // assume 3. (toggle)
-   if (args.back().starts_iwith("ON"))
-      {
-        action = 1;          // enable
-        args.pop_back();   // drop action
-      }
-   else if (args.back().starts_iwith("OFF"))
-      {
-        action = 2;          // disable
-        args.pop_back();   // drop action
-      }
-
+OOT action = Toggle;
    loop(a, args.size())
        {
-         const LogId lid = LogId(args[a].atoi());
-
-         if (lid >= LID_MIN && lid <= LID_MAX)
+         const UCS_string & ucs = args[args.size() - a - 1];
+         if      (ucs.starts_iwith("ON"))    action = On;
+         else if (ucs.starts_iwith("OFF"))   action = Off;
+         else   // remember the LogId and its action and
             {
-              bool new_status;
-              if  (action == 1)        new_status = true;
-              else if  (action == 1)   new_status = false;
-              else                     new_status = !Log_status(lid);
-              Log_control(lid, new_status);
+              const LogId lid = LogId(ucs.atoi());
+              const lid_OOT lo = { lid, action };
+              if (lid >= LID_MIN && lid <= LID_MAX)
+                 lid_OOTs.push_back(lo);
+              else
+                 CERR << "    Invalid logging facility " << lid
+                      << " ignored. Valid logging facilities are: "
+                      << LID_MIN << ".." << LID_MAX << endl;
+            }
+       }
 
-              const char * info = Log_info(lid);
-              Assert(info);
-              char cc[100];
-              size_t cc_len = snprintf(cc, sizeof(cc), "%s", info);
-              while (cc_len && cc[cc_len - 1] <= ' ')   cc[--cc_len] = 0;
-              CERR << "    Logging facility '" << cc << "' is now "
-                   << (new_status ? "ON " : "OFF") << endl;
-            }
-         else
-            {
-              CERR << "    Invalid logging facility '" << lid
-                   << " (not " << LID_MIN << "..." << LID_MAX << ")" << endl;
-            }
-      }
+   loop(a, lid_OOTs.size())
+       {
+         const lid_OOT lo = lid_OOTs[lid_OOTs.size() - a - 1];
+         const LogId lid = lo.lid;
+         const char * info = Log_info(lid);
+         bool new_status = !Log_status(lid);   // assume toggle
+         if      (lo.on_off_toggle == On)   new_status = true;
+         else if (lo.on_off_toggle == Off)  new_status = false;
+         Log_control(lid, new_status);
+
+         CERR << "    Logging facility " << lid << ": " << info
+              << " is now " << (new_status ? "ON " : "OFF") << endl;
+       }
 }
 #endif
 //----------------------------------------------------------------------------

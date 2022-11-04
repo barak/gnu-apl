@@ -68,7 +68,7 @@ cmd_def( "]EXPECT"    , IO_Files::expect_apl_errors(arg);             , "error_c
 cmd_def( "]HELP"      , cmd_HELP(out, arg);                           , "[primitive]"               , EH_PRIMITIVE)
 cmd_def( "]KEYB"      , cmd_KEYB(out);                                , ""                          , EH_NO_PARAM)
 cmd_def( "]LIB"       , cmd_LIB2(out, args);                          , "[lib|path] [from-to]"      , EH_DIR_OR_LIB)
-cmd_def( "]LOG"       , cmd_LOG(out, arg);                            , "[facility ... [ON|OFF]]"   , EH_LOG_NUM)
+cmd_def( "]LOG"       , cmd_LOG(out, arg);                            , "[facility|ON|OFF] ..."     , EH_LOG_NUM)
 cmd_def( "]NEXTFILE"  , IO_Files::next_file();                        , ""                          , EH_NO_PARAM)
 cmd_def( "]PUSHFILE"  , cmd_PUSHFILE();                               , ""                          , EH_NO_PARAM)
 cmd_def( "]OWNERS"    , Value::list_all(out, true);                   , ""                          , EH_NO_PARAM)

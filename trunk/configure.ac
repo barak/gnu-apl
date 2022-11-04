@@ -82,7 +82,7 @@ autoconf -t AM_CONDITIONAL -t AC_SUBST -t AC_DEFINE_UNQUOTED
 
 configure_options="$0 $*"
 
-m4_include(m4/apl_sugar.m4)
+m4_include([m4/apl_sugar.m4])
 
 AC_PREREQ([2.65])
 AC_INIT([GNU APL], [1.8], [bug-apl@gnu.org])
@@ -449,7 +449,7 @@ if apl_YES($ctrld_del); then
 fi
 AC_MSG_RESULT([$WANT_CTRLD_DEL])
 
-m4_include(m4/apl_TARGETs.m4)
+m4_include([m4/apl_TARGETs.m4])
 
 AC_CONFIG_FILES([Makefile
                  build/Makefile
@@ -678,7 +678,7 @@ AC_MSG_RESULT([$APSERVER_PORT])
 
 
 # APL: APserver port name ?
-AC_MSG_CHECKING([which unix port name APserver shall use])
+AC_MSG_CHECKING([which *nix port name APserver shall use])
 AC_ARG_VAR(APSERVER_PATH,
    [ APserver transport (see README-2-configure) default: /tmp/GNU-APL/APserver) ])
 if apl_EQ($APSERVER_PATH, );   then APSERVER_PATH="/tmp/GNU-APL/APserver";  fi
@@ -736,7 +736,7 @@ apl_top=$(pwd)            # start search at current directory
 for q in 1 2 3 4; do      # at most 4 times...
    if test -f "$apl_top/buildtag.sh"    # does buildtag.sh exist in $apl_top ?
    then                                 # yes...
-      AS_ECHO(["$as_me:    ├─── top-level apl directory is: $apl_top"])
+      AS_ECHO(["$as_me:    ├─── Found the top-level apl directory: $apl_top"])
       . "$apl_top/buildtag.sh"              # source buildtag.sh
       abs_apl_top="$apl_top"                # and remember the directory
       break                                 # done.
@@ -768,12 +768,16 @@ AS_ECHO(["$as_me:    └─── patching $abs_apl_top/config.h done."])
 if test -f "$apl_top/makefile.h"
 then
    AS_ECHO(["
-$as_me: removing old $apl_top/makefile.h (if any).
-           NOTE: ./Makefile will create a fresh makefile.h automatically.
-           However, running 'make' in directory $apl_top/src
-           BEFORE running 'make' in $apl_top may yield a
-           compile error (which can be fixed easily by running 'make'
-           in directory $apl_top first)."])
+$as_me: removing old $apl_top/makefile.h.
+           WARNING: ./Makefile will create a fresh makefile.h (with the current
+           arguments of this ./configure) automatically. For this to work,
+           every execution of ./configure requires the execution of 'make'
+           in the top-level GNU APL directory $apl_top BEFORE
+           running 'make' in any sub-directory (such as
+           $apl_top/src).
+           Otherwise the missing makefile.h would produce a compile error in
+           the sub-directory (which can be fixed easily by running 'make' in
+           the top-level directory first)."])
    rm -f "$apl_top/makefile.h"
 fi
 
