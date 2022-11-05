@@ -32,9 +32,6 @@
 /* Define to 1 if you have the <fenv.h> header file. */
 #define HAVE_FENV_H 1
 
-/* Define to 1 if you have the <fftw3.h> header file. */
-#define HAVE_FFTW3_H 1
-
 /* Define to 1 if you have the `floor' function. */
 #define HAVE_FLOOR 1
 
@@ -158,9 +155,6 @@
 
 /* Define to 1 iff OSAtomicAdd32Barrier() is available */
 /* #undef HAVE_OSX_ATOMIC */
-
-/* Define to 1 if you have the <png.h> header file. */
-#define HAVE_PNG_H 1
 
 /* Define to 1 if PostgreSQL libraries are available */
 #define HAVE_POSTGRESQL 1
@@ -313,9 +307,6 @@
 /* Define to 1 if you have the <xcb/xcb.h> header file. */
 #define HAVE_XCB_XCB_H 1
 
-/* Define to 1 if you have the <zlib.h> header file. */
-#define HAVE_ZLIB_H 1
-
 /* Define to 1 if the system has the type `_Bool'. */
 /* #undef HAVE__BOOL */
 
@@ -419,6 +410,9 @@
 
 /* Define if building lib_gnu_apl.so */
 /* #undef apl_TARGET_PYTHON */
+
+/* X11 available */
+#define apl_X11 1
 
 /* APserver listen port name */
 #define cfg_APSERVER_PATH "/tmp/GNU-APL/APserver"

@@ -127,6 +127,7 @@ subdir = src
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/depend.m4 \
 	$(top_srcdir)/m4/apl_sugar.m4 $(top_srcdir)/m4/check_X11.m4 \
+	$(top_srcdir)/m4/check_FFT.m4 $(top_srcdir)/m4/check_PNG.m4 \
 	$(top_srcdir)/m4/check_SQLITE.m4 \
 	$(top_srcdir)/m4/ax_lib_sqlite3.m4 \
 	$(top_srcdir)/m4/check_POSTGRES.m4 \
@@ -943,7 +944,7 @@ DIST_SUBDIRS = $(SUBDIRS) testcases
 common_CXXFLAGS = -Wall $(plot_CXXFLAGS) -I sql -I $(abs_top_srcdir) \
 	$(CXX_WERROR) $(GTK_CFLAGS) $(GTK_LIBS) $(PYTHON_CFLAGS) \
 	$(am__append_4) $(am__append_8)
-common_LDFLAGS = -export-dynamic $(GTK_LDFLAGS) $(am__append_5) \
+common_LDFLAGS = -export-dynamic $(GTK_LDFLAGS) -lX11 $(am__append_5) \
 	$(am__append_9)
 common_SOURCES = $(plot_SOURCES) ../buildtag.hh ../config.h \
 	APL_Float_as_class.hh APL_types.hh Archive.cc Archive.hh \

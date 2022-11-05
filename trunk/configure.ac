@@ -89,6 +89,7 @@ AC_INIT([GNU APL], [1.8], [bug-apl@gnu.org])
 AC_PREFIX_DEFAULT( /usr/local )
 AC_CONFIG_AUX_DIR([.])
 
+
 apl_TOPIC([core tests])
 
 AC_USE_SYSTEM_EXTENSIONS
@@ -115,13 +116,14 @@ LT_INIT([dlopen])
 
 apl_MAINTAINER_MODE=$USE_MAINTAINER_MODE
 
+
 apl_TOPIC([basic checks])
 
 # Checks for programs.
 #
 AC_PROG_CXX
 AC_PROG_CC
-AC_PROG_RANLIB
+# AC_PROG_RANLIB   obsolteted by LT_INIT
 
 AC_GNU_SOURCE
 
@@ -136,7 +138,6 @@ CXXFLAGS="$CXXFLAGS -I $(pwd)"
 ##############################################################################
 # Checks for various header files.
 #
-
 apl_TOPIC([checks for the presence and usablility of header files])
 
 # check for ncurses.h first and for curses.h only if ncurses.h was not found.
@@ -156,32 +157,28 @@ AC_CHECK_HEADER(
     [AC_DEFINE( [HAVE_TERM_H], 1,
                 [Define to 1 iff <term.h> is present])],
     [],
-    [ [ # if HAVE_NCURSES_H   ]
+    [ [ #if HAVE_NCURSES_H   ]
       [ # include <ncurses.h> ]
-      [ # elif HAVE_CURSES_H  ]
+      [ #elif HAVE_CURSES_H  ]
       [ # include <curses.h>  ]
-      [ # endif ]
+      [ #endif ]
     ])
 
 apl_missing_headers=0
-AC_CHECK_HEADERS([                              \
-   dirent.h                                     \
-   execinfo.h                                   \
-   fcntl.h fenv.h fftw3.h                       \
-   inttypes.h                                   \
-   limits.h                                     \
-   malloc.h                                     \
-   netdb.h                                      \
-   netinet/in.h                                 \
-   png.h                                        \
-   stdint.h stdlib.h string.h strings.h         \
-   sys/un.h                                     \
-   termios.h                                    \
-   unistd.h utmpx.h                             \
-   zlib.h                                       \
+AC_CHECK_HEADERS([                      \
+   dirent.h                             \
+   execinfo.h                           \
+   fcntl.h fenv.h                       \
+   inttypes.h                           \
+   limits.h                             \
+   malloc.h                             \
+   netdb.h                              \
+   netinet/in.h                         \
+   stdint.h stdlib.h string.h strings.h \
+   sys/un.h                             \
+   termios.h                            \
+   unistd.h utmpx.h                     \
                  ],, apl_missing_headers=$((1+$apl_missing_headers)))
-
-m4_include([m4/check_X11.m4])
 
 # Checks for typedefs, structures, and compiler characteristics.
 #
@@ -258,43 +255,36 @@ AC_STRUCT_ST_BLOCKS
 
 apl_TOPIC([checks for optional (not strictly required) libraries])
 
-#       library,   function-in library, impact-if-missing
-apl_OPT_LIB([cairo],   [cairo_fill],        [may affect: ⎕PLOT])
-apl_OPT_LIB([fftw3],   [fftw_plan_dft],     [will affect ⎕FFT])
-   apl_FFT=$ac_cv_lib_fftw3_fftw_plan_dft
-apl_OPT_LIB([gtk-3],   [gtk_init],          [will affect: ⎕PNG])
-apl_OPT_LIB([gdk-3],   [gdk_init],          [may affect: ⎕PLOT, will affect: ⎕PNG])
-apl_OPT_LIB([png],     [png_init_io],       [may affect: ⎕PLOT, will affect: ⎕PNG])
-   apl_PNG=$ac_cv_lib_png_png_init_io
-apl_OPT_LIB([z],       [uncompress],        [will affect: ⎕PNG])
+m4_include([m4/check_X11.m4])
+   apl_NYES($apl_X11) && AS_ECHO(["   └──── may affect: ⎕PLOT"])
+
+m4_include([m4/check_FFT.m4])
+   apl_NYES($apl_FFT) && AS_ECHO(["   └──── will affect: ⎕FFT"])
+
+m4_include([m4/check_PNG.m4])
+   apl_NYES($apl_PNG) && AS_ECHO(["   └──── will affect: ⎕PNG"])
 
 m4_include([m4/check_SQLITE.m4])
-if apl_NYES($apl_SQLITE3, yes); then
-   AS_ECHO(["   └──── may affect: ⎕SQL"]);
-fi
+   apl_NYES($apl_SQLITE3) && AS_ECHO(["   └──── may affect: ⎕SQL"])
+
 m4_include([m4/check_POSTGRES.m4])
-if apl_NYES($apl_POSTGRES); then
-   AS_ECHO(["   └──── may affect: ⎕SQL"]);
-fi
+   apl_NYES($apl_POSTGRES) && AS_ECHO(["   └──── may affect: ⎕SQL"])
 
 # summarize apl_SQLITE3 and apl_POSTGRES as apl_SQL
 apl_SQL=no
-if apl_YES($apl_SQLITE3);  then   apl_SQL=yes;   fi
-if apl_YES($apl_POSTGRES); then   apl_SQL=yes;   fi
+apl_YES($apl_SQLITE3)  && apl_SQL=yes
+apl_YES($apl_POSTGRES) && apl_SQL=yes
 
 m4_include([m4/check_PCRE.m4])
-if apl_NYES($apl_PCRE); then
-   AS_ECHO(["   └──── may affect: ⎕RE"]);
-fi
+   apl_NYES($apl_PCRE) && AS_ECHO(["   └──── will affect: ⎕RE"])
+
 m4_include([m4/check_GTK.m4])
-if apl_NYES($apl_GTK3); then
-   AS_ECHO(["   └──── will affect: ⎕PLOT, ⎕PNG"]);
-fi
+   apl_NYES($apl_GTK3) && AS_ECHO(["   └──── may affect: ⎕PLOT, will affect ⎕PNG"])
 
 # summarize apl_GTK3 and apl_X11 as apl_GUI
 apl_GUI=no
-if apl_YES($apl_GTK3);   then apl_GUI=yes;   fi
-if apl_YES($apl_X11);   then apl_GUI=yes;   fi
+apl_YES($apl_GTK3) && apl_GUI=yes
+apl_YES($apl_X11)  && apl_GUI=yes
 
 apl_TOPIC([checks for functions that are missing on some platforms])
 
@@ -736,7 +726,7 @@ apl_top=$(pwd)            # start search at current directory
 for q in 1 2 3 4; do      # at most 4 times...
    if test -f "$apl_top/buildtag.sh"    # does buildtag.sh exist in $apl_top ?
    then                                 # yes...
-      AS_ECHO(["$as_me:    ├─── Found the top-level apl directory: $apl_top"])
+      AS_ECHO(["$as_me:    ├─── Found GNU APL top-level directory: $apl_top"])
       . "$apl_top/buildtag.sh"              # source buildtag.sh
       abs_apl_top="$apl_top"                # and remember the directory
       break                                 # done.
@@ -767,18 +757,18 @@ AS_ECHO(["$as_me:    └─── patching $abs_apl_top/config.h done."])
 #
 if test -f "$apl_top/makefile.h"
 then
-   AS_ECHO(["
-$as_me: removing old $apl_top/makefile.h.
-           WARNING: ./Makefile will create a fresh makefile.h (with the current
-           arguments of this ./configure) automatically. For this to work,
-           every execution of ./configure requires the execution of 'make'
-           in the top-level GNU APL directory $apl_top BEFORE
-           running 'make' in any sub-directory (such as
-           $apl_top/src).
-           Otherwise the missing makefile.h would produce a compile error in
-           the sub-directory (which can be fixed easily by running 'make' in
-           the top-level directory first)."])
    rm -f "$apl_top/makefile.h"
+   AS_ECHO(["
+$as_me: removed $apl_top/makefile.h (from previous ./configure).
+           WARNING: ./Makefile is able to create a fresh makefile.h (with the
+           current arguments of this ./configure) automatically. However,
+           that works only if, after every execution of ./configure, 'make'
+           is first executed in the top-level GNU APL directory, i.e. in
+           $apl_top.
+           Running 'make' in a sub-directory before executing 'make' in the
+           top-level directory will fail due to the now missing makefile.h.
+           This problem can be fixed, though, by executing 'make' in the
+           top-level directory again."])
 fi
 
 # print a summary or maybe complain
@@ -827,5 +817,5 @@ $as_me:    ---- SUMMARY OF TESTS (please include in error reports) ----
     apl_SQL                      $apl_SQL	(affects:    ⎕SQL)
     apl_X11 (libxcb):            $apl_X11	(fallback for               ⎕PLOT)
     apl_GTK3:                    $apl_GTK3	(affects: ⎕PNG, ⎕GTK, maybe ⎕PLOT)
-    apl_GUI:                     $apl_GUI	(affects:                   ⎕PLOT)
+    apl_GUI:                     $apl_GUI	(affects: ⎕PNG, ⎕GTK,       ⎕PLOT)
 "])
