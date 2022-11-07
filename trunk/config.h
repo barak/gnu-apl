@@ -1,9 +1,17 @@
-#ifndef __MAY_INCLUDE_CONFIG_H__
-# error "DON'T #include file config.h directly; use file Common.hh instead."
-#endif // __MAY_INCLUDE_CONFIG_H__
-
 /* config.h.  Generated from config.h.in by configure.  */
 /* config.h.in.  Generated from configure.ac by autoheader.  */
+
+#ifdef __MAY_INCLUDE_CONFIG_H__    // the user knows what she is doing 
+# undef __MAY_INCLUDE_CONFIG_H__   // no longer needed.
+#else
+# error "DO NOT #include file config.h directly; use file Common.hh instead."
+#endif // __MAY_INCLUDE_CONFIG_H__
+
+/* "SVN version of Archive.cc" */
+#define ARCHIVE_SVN " 19548"
+
+/* "How and when GNU APL was configured" */
+#define BUILDTAG PACKAGE_NAME, PACKAGE_VERSION " / SVN: 19557", "2022-11-07 18:34:33 UTC", "Linux 4.15.0-158-generic x86_64", "default ./configure options"
 
 /* Define to 1 iff pthread_setaffinity_np() is available */
 #define HAVE_AFFINITY_NP 1

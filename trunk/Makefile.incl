@@ -102,8 +102,6 @@ parallel1:
 .PHONY: VPATH_clean
 VPATH_clean: clean
 	echo "Making VPATH_clean..."
-	rm -f config.status
-	rm -f config.h
-	rm -f makefile.h
+	rm -f config.status config.h makefile.h
 	echo "Done VPATH_clean..."
 

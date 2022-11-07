@@ -80,7 +80,8 @@ autoconf -t AM_CONDITIONAL -t AC_SUBST -t AC_DEFINE_UNQUOTED
   A final NOTE: autoconf quotes with [ ] rather than with ` '.
           ])
 
-configure_options="$0 $*"
+configure_args="$*"
+configure_options="$0 $configure_args"
 
 m4_include([m4/apl_sugar.m4])
 
@@ -710,24 +711,17 @@ else RATIONAL_NUMBERS_WANTED="no"
 fi
 AC_MSG_RESULT([$RATIONAL_NUMBERS_WANTED])
 
-
-apl_TOPIC([./configure checks done, producing the output files])
-
-AC_OUTPUT
-
-AS_ECHO()
-
-# set 'apl_top to' the directory that contains our buildtag.sh script and
-# create buildtag.hh there.
+# set 'apl_top' the "real" top-level directory. The "real" top-level directory
+# contains our configure.ac, while the VPATH copies of it do not.
 #
-AS_ECHO(["$as_me: creating buildtag.hh..."])
+AS_ECHO(["
+$as_me: locating the real (non-VPATH) GNU APL top-level directory..."])
 abs_apl_top="not-found"   # assume not found
 apl_top=$(pwd)            # start search at current directory
 for q in 1 2 3 4; do      # at most 4 times...
-   if test -f "$apl_top/buildtag.sh"    # does buildtag.sh exist in $apl_top ?
+   if test -f "$apl_top/configure.ac"    # does configure.ac exist in $apl_top ?
    then                                 # yes...
-      AS_ECHO(["$as_me:    ├─── Found GNU APL top-level directory: $apl_top"])
-      . "$apl_top/buildtag.sh"              # source buildtag.sh
+      AS_ECHO(["$as_me: └── found at: $apl_top"])
       abs_apl_top="$apl_top"                # and remember the directory
       break                                 # done.
    else                                 # no...
@@ -742,16 +736,60 @@ if apl_EQ($abs_apl_top, not-found); then
    apl_top="."
 fi
 
-AS_ECHO(["$as_me:    ├─── patching $abs_apl_top/config.h"])
-   mv -f $abs_apl_top/config.h $abs_apl_top/config.h.orig
-   cat << _ACEOF > $abs_apl_top/config.h
-#ifndef __MAY_INCLUDE_CONFIG_H__
-# error "DON'T #include file config.h directly; use file Common.hh instead."
-#endif // __MAY_INCLUDE_CONFIG_H__
+if test -n "$SOURCE_DATE_EPOCH"
+then
+    apl_BUILD_DATE=`date -u "+%F %R:%S %Z" --date=@$SOURCE_DATE_EPOCH`
+    apl_BUILD_OS=""
+else
+    apl_BUILD_DATE=`date -u "+%F %R:%S %Z"`
+    apl_BUILD_OS=`uname -s -r -m`
+fi
 
-_ACEOF
-   cat $abs_apl_top/config.h.orig >> $abs_apl_top/config.h
-AS_ECHO(["$as_me:    └─── patching $abs_apl_top/config.h done."])
+# figure the SVN versions of the interpreter and the (usually older) Archive.cc
+#
+apl_SVNINFO="no-svnversion"
+apl_ARCHIVE_SVNINFO="no-svn"
+SVNPROG=$(which svn)
+SVNVERSION=$(which svnversion)
+test $SVNVERSION && test -x $SVNVERSION && apl_SVNINFO=$($SVNVERSION)
+
+if test $SVNPROG && test -x $SVNPROG; then
+   apl_ARCHIVE_SVNINFO=$($SVNPROG info "$apl_top"/src/Archive.cc \
+                        | grep "Last Changed Rev" \
+                        | awk -F : '{print $2;}')
+fi
+
+
+if test "$configure_args"; then
+   apl_CONFIGURE_OPTIONS=$configure_options
+else
+   apl_CONFIGURE_OPTIONS="default ./configure options"
+fi
+
+
+AC_DEFINE_UNQUOTED(BUILDTAG,
+[[PACKAGE_NAME], [PACKAGE_VERSION " / SVN: $apl_SVNINFO"], \
+"$apl_BUILD_DATE", "$apl_BUILD_OS", "$apl_CONFIGURE_OPTIONS" ],
+                  ["How and when GNU APL was configured"])
+
+AC_DEFINE_UNQUOTED(ARCHIVE_SVN, ["$apl_ARCHIVE_SVNINFO"],
+                     ["SVN version of Archive.cc"])
+
+apl_TOPIC([./configure checks done, producing the Makefiles and config.h])
+
+AC_OUTPUT   # the big bang: create config.h and all Makefiles
+
+AS_ECHO()
+AS_ECHO(["$as_me: patching $abs_apl_top/config.h"])
+   sed -i '4i \
+#ifdef __MAY_INCLUDE_CONFIG_H__    // the user knows what she is doing \
+# undef __MAY_INCLUDE_CONFIG_H__   // no longer needed.\
+#else\
+# error "DO NOT #include file config.h directly; use file Common.hh instead."\
+#endif // __MAY_INCLUDE_CONFIG_H__\
+' $abs_apl_top/config.h
+
+AS_ECHO(["$as_me: patching $abs_apl_top/config.h done."])
 
 # remove old makefile.h
 #

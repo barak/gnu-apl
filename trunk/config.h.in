@@ -1,5 +1,11 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
+/* "SVN version of Archive.cc" */
+#undef ARCHIVE_SVN
+
+/* "How and when GNU APL was configured" */
+#undef BUILDTAG
+
 /* Define to 1 iff pthread_setaffinity_np() is available */
 #undef HAVE_AFFINITY_NP
 

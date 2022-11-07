@@ -30,7 +30,6 @@
 #include <sys/types.h>
 
 #include "Archive.hh"
-#include "buildtag.hh"   // for ARCHIVE_SVN
 #include "Bif_F12_COMMA.hh"
 #include "Bif_F12_DOMINO.hh"
 #include "Bif_F12_FORMAT.hh"
@@ -1673,7 +1672,7 @@ bool mismatch = false;
 
    // old (SVN-version based) compatibility mechanism
 
-UCS_string saving_SVN;
+UCS_string saving_SVN;   // from the XML file
 UCS_string current_SVN(ARCHIVE_SVN);
    {
      const UTF8 * saving = find_optional_attr("saving_SVN");

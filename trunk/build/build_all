@@ -79,7 +79,7 @@ build_one()
 {
    # $1: configuration name
    # $2: ./configure options
-   # $3: expected result file (apl binary. libapl.so etc.)
+   # $3: expected result file (apl binary, libapl.so, etc.)
    #
 
    cd "$TOP_BUILD_dir"
@@ -99,8 +99,6 @@ build_one()
      ../../configure $2
      set +o xtrace
    } > "$Logfile" 2>&1
-
-   cp ../../buildtag.hh .
 
    Logfile="$TOP_LOG_dir/build-$1.log"
    echo "running make $J8 all for configuration \"$1\"..."
@@ -180,7 +178,7 @@ if [ "$?" != 0 ]; then
     echo "*** cannot build all since autoreconf failed ***"
     exit 42
 fi
-echo "  └─── autoreconf done (OK)."
+echo "  ├─── autoreconf done (OK)."
 
 # some shortcuts for various configure options
 #
@@ -267,8 +265,12 @@ build_develop()
 
   for config in \
       standard develop libxcb rational libapl parallel_bench erlang python
-      do build_$config
+  do
+        echo -n "  ├─── building configuration $config..." > /dev/stderr
+        build_$config
+        echo " done" > /dev/stderr
   done
+  echo "  └─── DONE." > /dev/stderr
 
   echo
   echo  "$build_errors build errors"

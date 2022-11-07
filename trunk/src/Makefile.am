@@ -35,10 +35,9 @@ host_os = @host_os@
 common_CXXFLAGS = -Wall $(plot_CXXFLAGS) -I sql -I $(abs_top_srcdir) $(CXX_WERROR)
 common_CXXFLAGS += $(GTK_CFLAGS) $(GTK_LIBS)
 common_CXXFLAGS += $(PYTHON_CFLAGS)
-common_LDFLAGS  = -export-dynamic $(GTK_LDFLAGS) -lX11
+common_LDFLAGS  = -export-dynamic $(GTK_LDFLAGS)
 
 common_SOURCES  = $(plot_SOURCES) 
-common_SOURCES +=						../buildtag.hh
 common_SOURCES +=						../config.h
 common_SOURCES +=						APL_Float_as_class.hh
 common_SOURCES +=						APL_types.hh

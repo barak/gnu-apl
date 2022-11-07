@@ -26,8 +26,6 @@
 #include <string.h>
 #include <sys/time.h>
 
-#include "buildtag.hh"
-
 #include "Bif_OPER2_INNER.hh"
 #include "Bif_OPER2_OUTER.hh"
 #include "Common.hh"

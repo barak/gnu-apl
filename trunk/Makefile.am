@@ -7,8 +7,6 @@ SUBDIRS		+= build doc erlang gnu-apl.d HOWTOs
 SUBDIRS		+= src support-files tools websock
 DIST_SUBDIRS	= $(SUBDIRS) rpm debian
 
-dist_noinst_SCRIPTS = buildtag.sh
-
 dist_doc_DATA = README					\
 		README-1-prerequisites			\
 		README-2-configure			\
@@ -26,7 +24,7 @@ dist_doc_DATA = README					\
 
 nobase_dist_sysconf_DATA = gnu-apl.d/preferences
 
-dist_noinst_DATA = Doxyfile Makefile.incl buildtag.hh config.h
+dist_noinst_DATA = Doxyfile Makefile.incl config.h
 
 include Makefile.incl
 
@@ -36,10 +34,6 @@ makefile.h: Makefile
 .PHONY: check_sources
 check_sources: tools/check_src
 	tools/check_src
-
-buildtag.hh: Makefile buildtag.sh
-	. ${top_srcdir}/buildtag.sh
-	touch $@
 
 # produce doxygen documentation
 #
@@ -88,7 +82,6 @@ SYNC:	DIST
 	rm -Rf apl-$(VERSION)
 	tar xvzf apl-$(VERSION).tar.gz
 	rm -f apl-$(VERSION)/makefile.h
-	rm -f apl-$(VERSION)/buildtag.hh
 	cp -a apl-$(VERSION)/* ../savannah-repo-apl/trunk/
 	echo "exported from SVN version " `svnversion` > \
     ../savannah-repo-apl/trunk/exported_from
@@ -104,7 +97,6 @@ EXPO:
 	tools/check_src
 	svn -m "auto-commit by make EXPO, local SVN: `svnversion`" commit
 	svn update
-	. ./buildtag.sh
 	svn -m "auto-commit by make EXPO" commit
 	./configure --disable-maintainer-mode
 	make all
@@ -117,7 +109,6 @@ EXPO:
 .PHONY:	EXPO1
 EXPO1:
 	tools/check_src
-	. buildtag.sh
 	./configure --disable-maintainer-mode
 	make
 	make dist
@@ -161,11 +152,13 @@ git-pull:
 
 makefile.h: Makefile
 	@echo creating a fresh $@...
-	@echo "/* this makefile.h exports some paths known by"    > $@
+	@echo "/* makefile.h.  Created from (and by) the top-level Makefile." > $@
+	@echo                                                    >> $@
+	@echo "   This makefile.h exports some paths known by"   >> $@
 	@echo "   Makefile. See chapter 20.5 of the autoconf"    >> $@
 	@echo "   manual (keyword: "dedicated header file")."    >> $@
 	@echo " */"                                              >> $@
-	@echo "#ifndef __makefile_h_DEFINED__"                   > $@
+	@echo "#ifndef __makefile_h_DEFINED__"                   >> $@
 	@echo "# define __makefile_h_DEFINED__"                  >> $@
 	@echo "# define Makefile__bindir     STR(${bindir})"     >> $@
 	@echo "# define Makefile__docdir     STR(${docdir})"     >> $@
