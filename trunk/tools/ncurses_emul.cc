@@ -30,9 +30,7 @@
    g++ -o ncurses_emul ncurses_emul.cc -ltinfo
  */
 
-#define __MAY_INCLUDE_CONFIG_H__
 #include "../config.h"   // for HAVE_XXX macros
-#undef __MAY_INCLUDE_CONFIG_H__
 
 #if HAVE_LIBTINFO && HAVE_NCURSES_H && HAVE_TERM_H
 

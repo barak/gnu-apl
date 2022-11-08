@@ -8,8 +8,6 @@ EXTRA_DIRS += APs emacs_mode sql workspaces
 endif
 SUBDIRS = native $(EXTRA_DIRS)
 
-all: ../makefile.h
-
 # depending on apl_GTK3 we want either Plot_gtk.cc or Plot_xcb.cc compiled,
 # but keep both source files in the tar file (hence EXTRA_apl_SOURCES).
 #

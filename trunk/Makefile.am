@@ -28,9 +28,6 @@ dist_noinst_DATA = Doxyfile Makefile.incl config.h
 
 include Makefile.incl
 
-all: makefile.h
-makefile.h: Makefile
-
 .PHONY: check_sources
 check_sources: tools/check_src
 	tools/check_src
@@ -81,7 +78,6 @@ SVNUP:
 SYNC:	DIST
 	rm -Rf apl-$(VERSION)
 	tar xvzf apl-$(VERSION).tar.gz
-	rm -f apl-$(VERSION)/makefile.h
 	cp -a apl-$(VERSION)/* ../savannah-repo-apl/trunk/
 	echo "exported from SVN version " `svnversion` > \
     ../savannah-repo-apl/trunk/exported_from
@@ -149,24 +145,4 @@ EXTRA_DIST = config.rpath m4/ChangeLog
 git-pull:
 	make -C src $@
 	make -C wslib5 $@
-
-makefile.h: Makefile
-	@echo creating a fresh $@...
-	@echo "/* makefile.h.  Created from (and by) the top-level Makefile." > $@
-	@echo                                                    >> $@
-	@echo "   This makefile.h exports some paths known by"   >> $@
-	@echo "   Makefile. See chapter 20.5 of the autoconf"    >> $@
-	@echo "   manual (keyword: "dedicated header file")."    >> $@
-	@echo " */"                                              >> $@
-	@echo "#ifndef __makefile_h_DEFINED__"                   >> $@
-	@echo "# define __makefile_h_DEFINED__"                  >> $@
-	@echo "# define Makefile__bindir     STR(${bindir})"     >> $@
-	@echo "# define Makefile__docdir     STR(${docdir})"     >> $@
-	@echo "# define Makefile__sysconfdir STR(${sysconfdir})" >> $@
-	@echo "# define Makefile__pkglibdir  STR(${pkglibdir})"  >> $@
-	@echo "# define Makefile__localedir  STR(${localedir})"  >> $@
-	@echo "# define Makefile__srcdir     STR(${abs_srcdir})" >> $@
-	@echo "# define Makefile__host_os    STR(${host_os})"    >> $@
-	@echo "#endif  // __makefile_h_DEFINED__"                >> $@
-	@echo ""                                                 >> $@
 

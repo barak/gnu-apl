@@ -5295,8 +5295,6 @@ uninstall-am: uninstall-binPROGRAMS uninstall-pkgincludeHEADERS \
 .PRECIOUS: Makefile
 
 
-all: ../makefile.h
-
 # normally we would say:
 #
 # Svar_signals.hh: Svar_signals.def tcp_signal.m4

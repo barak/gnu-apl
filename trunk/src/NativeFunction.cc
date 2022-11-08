@@ -230,13 +230,13 @@ NativeFunction::open_so_file(UCS_string & t4, UCS_string & so_path)
         return handle;
       }
 
-   // otherwise try Makefile__pkglibdir . /usr/lib/apl and /usr/local/lib/apl,
+   // otherwise try apl_DIR__pkglib, /usr/lib/apl and /usr/local/lib/apl,
    // avoiding duplicates
    //
 UTF8_string utf_so_path(so_path);
 const char * dirs[] =
 {
-  Makefile__pkglibdir,    // the normal case
+  apl_DIR__pkglib,    // the normal case
   "/usr/lib/apl",
   "/usr/local/lib/apl",
   ".",
@@ -244,11 +244,11 @@ const char * dirs[] =
   "./emacs_mode",         // if make install was not performed
 };
 
-   // most likely Makefile__pkglibdir is /usr/lib/apl or /usr/local/lib/apl.
+   // most likely apl_DIR__pkglib is /usr/lib/apl or /usr/local/lib/apl.
    // don't try them twice.
    //
-   if (!strcmp(Makefile__pkglibdir, dirs[1]))   dirs[1] = 0;
-   if (!strcmp(Makefile__pkglibdir, dirs[2]))   dirs[2] = 0;
+   if (!strcmp(apl_DIR__pkglib, dirs[1]))   dirs[1] = 0;
+   if (!strcmp(apl_DIR__pkglib, dirs[2]))   dirs[2] = 0;
 
    loop(d, sizeof(dirs) / sizeof(*dirs))
        {

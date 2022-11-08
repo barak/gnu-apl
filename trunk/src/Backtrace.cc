@@ -106,15 +106,12 @@ const time_t apl_lines_time = st.st_mtime;
 
    if (apl_lines_time < apl_time)
       {
-#ifndef Makefile__srcdir
-# define Makefile__srcdir "src"
-#endif
         close(fd);
         get_CERR() << endl
                    << "Cannot show line numbers, since apl.lines is older "
                       "than apl." << endl
                    << "Consider running 'make apl.lines' in directory " << endl
-                   << Makefile__srcdir " to fix this" << endl;
+                   << apl_DIR__src " to fix this" << endl;
         return;
       }
 

@@ -1,9 +1,9 @@
 /* config.h.in.  Generated from configure.ac by autoheader.  */
 
-/* "SVN version of Archive.cc" */
+/* the SVN version of Archive.cc */
 #undef ARCHIVE_SVN
 
-/* "How and when GNU APL was configured" */
+/* How and when GNU APL was configured */
 #undef BUILDTAG
 
 /* Define to 1 iff pthread_setaffinity_np() is available */
@@ -390,6 +390,24 @@
    <pthread.h>, or <semaphore.h> is not used. If the typedef were allowed, the
    #define below would cause a syntax error. */
 #undef _UINT8_T
+
+/* installation directory for binaries */
+#undef apl_DIR__bin
+
+/* installation directory for documentation files */
+#undef apl_DIR__doc
+
+/* installation directory for documentation files */
+#undef apl_DIR__locale
+
+/* installation directory for libraries */
+#undef apl_DIR__pkglib
+
+/* source directory */
+#undef apl_DIR__src
+
+/* installation directory for configuration files */
+#undef apl_DIR__sysconf
 
 /* GTK+ version 3 installed */
 #undef apl_GTK3

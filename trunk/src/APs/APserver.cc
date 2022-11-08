@@ -37,9 +37,7 @@
 # include <sys/select.h>
 #endif
 
-#define __MAY_INCLUDE_CONFIG_H__
 #include "config.h"   // for HAVE_SYS_UN_H
-#undef __MAY_INCLUDE_CONFIG_H__
 
 #ifdef HAVE_SYS_UN_H
 #include <sys/un.h>

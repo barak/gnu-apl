@@ -638,41 +638,41 @@ UserPreferences::parse_argv_2(bool logit)
 
          if (!strcmp(opt, "--show_bin_dir"))
             {
-              COUT << Makefile__bindir << endl;
+              COUT << apl_DIR__bin << endl;
               exit(0);
             }
 
          if (!strcmp(opt, "--show_doc_dir"))
             {
-              COUT << Makefile__docdir << endl;
+              COUT << apl_DIR__doc << endl;
               exit(0);
             }
 
          if (!strcmp(opt, "--show_etc_dir"))
             {
-              COUT << Makefile__sysconfdir << endl;
+              COUT << apl_DIR__sysconf << endl;
               exit(0);
             }
 
          if (!strcmp(opt, "--show_lib_dir"))
             {
-              COUT << Makefile__pkglibdir << endl;
+              COUT << apl_DIR__pkglib << endl;
               exit(0);
             }
 
          if (!strcmp(opt, "--show_src_dir"))
             {
-              COUT << Makefile__srcdir << endl;
+              COUT << apl_DIR__src << endl;
               exit(0);
             }
 
          if (!strcmp(opt, "--show_all_dirs"))
             {
-              COUT << "bindir: " << Makefile__bindir     << endl
-                   << "docdir: " << Makefile__docdir     << endl
-                   << "etcdir: " << Makefile__sysconfdir << endl
-                   << "libdir: " << Makefile__pkglibdir  << endl
-                   << "srcdir: " << Makefile__srcdir     << endl;
+              COUT << "bindir: " << apl_DIR__bin     << endl
+                   << "docdir: " << apl_DIR__doc     << endl
+                   << "etcdir: " << apl_DIR__sysconf << endl
+                   << "libdir: " << apl_DIR__pkglib  << endl
+                   << "srcdir: " << apl_DIR__src     << endl;
               exit(0);
             }
 
@@ -1098,7 +1098,7 @@ UserPreferences::open_user_file(const char * fname, char * filename,
    if (sys)   // filename in /etc/gnu-apl.d/preferences
       {
         snprintf(filename, APL_PATH_MAX,
-                 "%s/gnu-apl.d/%s", Makefile__sysconfdir, fname);
+                 "%s/gnu-apl.d/%s", apl_DIR__sysconf, fname);
       }
    else       // try $HOME/.gnu_apl
       {

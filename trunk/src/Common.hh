@@ -24,14 +24,13 @@
 #ifndef __COMMON_HH_DEFINED__
 #define __COMMON_HH_DEFINED__
 
-// NOTE: the path to config.h and makefile.h is set as -I $(pwd) in ./configure
+// NOTE: the path to config.h is set as -I $(pwd) in ./configure, so we do not
+// need ../config.h
 //
-#define __MAY_INCLUDE_CONFIG_H__   // #undef'ed in config.h
 #include "config.h"   // for xxx_WANTED and other macros from ./configure
 
-// makefile.h uses STR(), so define it before
+/// stringify x
 #define STR(x) #x
-#include "makefile.h"   // various paths
 
 // #include some notoriously needed include files, but only if they
 // exist on the platform

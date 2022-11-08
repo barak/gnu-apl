@@ -16552,7 +16552,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 apl_MAINTAINER_MODE=$USE_MAINTAINER_MODE
 
 
- { $as_echo ; $as_echo "    *** basic checks... ***"; $as_echo ; }
+ { $as_echo ; $as_echo "    *** compiler checks... ***"; $as_echo ; }
 
 # Checks for programs.
 #
@@ -17549,7 +17549,7 @@ ac_compiler_gnu=$ac_cv_cxx_compiler_gnu
 # ./configure is run is the same as the directory where ./configure places
 # its output files (i.e. directory '.').
 #
-CXXFLAGS="$CXXFLAGS -I $(pwd)"
+CXXFLAGS="$CXXFLAGS -I `pwd`"
 
 ##############################################################################
 # Checks for various header files.
@@ -21224,18 +21224,6 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 $as_echo "$HAVE_SOLARIS_ATOMIC" >&6; }
 
 
-# check if we are on i686 (to fix a strange rpmbuild problem)
-{ $as_echo "$as_me:${as_lineno-$LINENO}: checking whether we compile for an i686 CPU" >&5
-$as_echo_n "checking whether we compile for an i686 CPU... " >&6; }
-if test "x$(uname -m)" = "xi686"; then
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: yes" >&5
-$as_echo "yes" >&6; }
-else
-    { $as_echo "$as_me:${as_lineno-$LINENO}: result: no" >&5
-$as_echo "no" >&6; }
-fi
-
-
  { $as_echo ; $as_echo "    *** choices made by the user (via ./configure arguments)... ***"; $as_echo ; }
 
 # the standard convention is that ^D means EOF aka. end-of-file. Some users
@@ -21726,31 +21714,6 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $RATIONAL_NUMBERS_WANTED" >&5
 $as_echo "$RATIONAL_NUMBERS_WANTED" >&6; }
 
-# set 'apl_top' the "real" top-level directory. The "real" top-level directory
-# contains our configure.ac, while the VPATH copies of it do not.
-#
-$as_echo "
-$as_me: locating the real (non-VPATH) GNU APL top-level directory..."
-abs_apl_top="not-found"   # assume not found
-apl_top=$(pwd)            # start search at current directory
-for q in 1 2 3 4; do      # at most 4 times...
-   if test -f "$apl_top/configure.ac"    # does configure.ac exist in $apl_top ?
-   then                                 # yes...
-      $as_echo "$as_me: └── found at: $apl_top"
-      abs_apl_top="$apl_top"                # and remember the directory
-      break                                 # done.
-   else                                 # no...
-      apl_top=$(dirname $apl_top)           # move upwards towards /
-   fi
-done
-
-
-if test "x$abs_apl_top" = "xnot-found"; then
-   $as_echo_n "$as_me: *** could not find top-level GNU APL directory,"
-   $as_echo " using '.' ***"
-   apl_top="."
-fi
-
 if test -n "$SOURCE_DATE_EPOCH"
 then
     apl_BUILD_DATE=`date -u "+%F %R:%S %Z" --date=@$SOURCE_DATE_EPOCH`
@@ -21760,20 +21723,48 @@ else
     apl_BUILD_OS=`uname -s -r -m`
 fi
 
+# set 'abs_apl_top' to the "real" top-level directory. The "real" top-level
+# directory contains file configure.ac, while the VPATH copies of it do not.
+#
+if test -f configure.ac; then   # normal build
+   abs_apl_top=`pwd`
+else                            # VPATH build
+   abs_apl_top="not-found"      # assume not found
+   apl_top=`pwd`                # start search at current directory
+   $as_echo "
+   $as_me: VPATH build: locating the real GNU APL top-level directory..."
+
+   for q in 1 2 3 4; do                    # at most 4 times...
+      if test -f "$apl_top/configure.ac"   # configure.ac exists in $apl_top ?
+      then                                 # yes...
+         $as_echo "$as_me: └── found at: $apl_top"
+         abs_apl_top="$apl_top"            # and remember the directory
+         break                             # done.
+      else                                 # no...
+         apl_top=`dirname $apl_top`        # move upwards towards /
+      fi
+   done
+
+   if test "x$abs_apl_top" = "xnot-found"; then
+      abs_apl_top=`pwd`
+      $as_echo "$as_me: └── *** NOT FOUND, using . (i.e. $abs_apl_top)"
+   fi
+fi
+
+
 # figure the SVN versions of the interpreter and the (usually older) Archive.cc
 #
 apl_SVNINFO="no-svnversion"
 apl_ARCHIVE_SVNINFO="no-svn"
-SVNPROG=$(which svn)
-SVNVERSION=$(which svnversion)
-test $SVNVERSION && test -x $SVNVERSION && apl_SVNINFO=$($SVNVERSION)
+SVNPROG=`which svn`
+SVNVERSION=`which svnversion`
+test $SVNVERSION && test -x $SVNVERSION && apl_SVNINFO=`$SVNVERSION`
 
 if test $SVNPROG && test -x $SVNPROG; then
-   apl_ARCHIVE_SVNINFO=$($SVNPROG info "$apl_top"/src/Archive.cc \
+   apl_ARCHIVE_SVNINFO=`$SVNPROG info "$abs_apl_top"/src/Archive.cc \
                         | grep "Last Changed Rev" \
-                        | awk -F : '{print $2;}')
+                        | awk -F : '{print $2;}'`
 fi
-
 
 if test "$configure_args"; then
    apl_CONFIGURE_OPTIONS=$configure_options
@@ -21792,6 +21783,42 @@ _ACEOF
 
 cat >>confdefs.h <<_ACEOF
 #define ARCHIVE_SVN "$apl_ARCHIVE_SVNINFO"
+_ACEOF
+
+
+apl_prefix=$prefix
+test "x$prefix" = "xNONE" && apl_prefix="$ac_default_prefix"
+apl_exec_prefix=$exec_prefix
+test "x$exec_prefix" = "xNONE" && apl_exec_prefix="$ac_default_prefix"
+
+
+cat >>confdefs.h <<_ACEOF
+#define apl_DIR__bin "$apl_exec_prefix/bin"
+_ACEOF
+
+
+cat >>confdefs.h <<_ACEOF
+#define apl_DIR__doc "$apl_prefix/share/doc/$PACKAGE_TARNAME"
+_ACEOF
+
+
+cat >>confdefs.h <<_ACEOF
+#define apl_DIR__locale "$apl_prefix/share/locale"
+_ACEOF
+
+
+cat >>confdefs.h <<_ACEOF
+#define apl_DIR__sysconf "$apl_prefix/etc"
+_ACEOF
+
+
+cat >>confdefs.h <<_ACEOF
+#define apl_DIR__pkglib "$apl_exec_prefix/lib/$PACKAGE_TARNAME"
+_ACEOF
+
+
+cat >>confdefs.h <<_ACEOF
+#define apl_DIR__src "$abs_apl_top"
 _ACEOF
 
 
@@ -24442,36 +24469,6 @@ if test -n "$ac_unrecognized_opts" && test "$enable_option_checking" != no; then
 $as_echo "$as_me: WARNING: unrecognized options: $ac_unrecognized_opts" >&2;}
 fi
    # the big bang: create config.h and all Makefiles
-
-$as_echo
-$as_echo "$as_me: patching $abs_apl_top/config.h"
-   sed -i '4i \
-#ifdef __MAY_INCLUDE_CONFIG_H__    // the user knows what she is doing \
-# undef __MAY_INCLUDE_CONFIG_H__   // no longer needed.\
-#else\
-# error "DO NOT #include file config.h directly; use file Common.hh instead."\
-#endif // __MAY_INCLUDE_CONFIG_H__\
-' $abs_apl_top/config.h
-
-$as_echo "$as_me: patching $abs_apl_top/config.h done."
-
-# remove old makefile.h
-#
-if test -f "$apl_top/makefile.h"
-then
-   rm -f "$apl_top/makefile.h"
-   $as_echo "
-$as_me: removed $apl_top/makefile.h (from previous ./configure).
-           WARNING: ./Makefile is able to create a fresh makefile.h (with the
-           current arguments of this ./configure) automatically. However,
-           that works only if, after every execution of ./configure, 'make'
-           is first executed in the top-level GNU APL directory, i.e. in
-           $apl_top.
-           Running 'make' in a sub-directory before executing 'make' in the
-           top-level directory will fail due to the now missing makefile.h.
-           This problem can be fixed, though, by executing 'make' in the
-           top-level directory again."
-fi
 
 # print a summary or maybe complain
 #

@@ -1565,7 +1565,7 @@ Command::cmd_LIBS(ostream & out, const UCS_string_vector & args)
 "       ├── CMD:   the path was set with )LIBS N path\n"
 "       ├── ENV:   the path came from environment variable $APL_LIB_ROOT\n"
 "       ├── PSYS:  the path came from the system preferences in file\n"
-"       │                   " << Makefile__sysconfdir << "/gnu-apl.d/preferences\n"
+"       │                   " << apl_DIR__sysconf << "/gnu-apl.d/preferences\n"
 "       ├── PUSER: the path came from user preferences in file\n"
 "       │                   $HOME/.config/gnu-apl or $HOME/.gnu-apl\n"
 "       └── PWD:   the path is relative to current directory $PWD (last resort)"
