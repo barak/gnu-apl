@@ -21786,40 +21786,155 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
 
-apl_prefix=$prefix
-test "x$prefix" = "xNONE" && apl_prefix="$ac_default_prefix"
-apl_exec_prefix=$exec_prefix
-test "x$exec_prefix" = "xNONE" && apl_exec_prefix="$ac_default_prefix"
+# the user may override the install directories, either with --prefix or
+# --exec_prefix (affecting several directories), or by --bindir and friends.
+# Figure out the details.
+#
+# NOTE that, unfortunately, the variables in ./configure will be quoted:
+#
+# bindir='${exec_prefix}/bin'
+# libdir='${exec_prefix}/lib'
+# datarootdir='${prefix}/share'
+# sysconfdir='${prefix}/etc'
+# docdir='${datarootdir}/doc/${PACKAGE_TARNAME}'
+# ...
+#
+# Therefore, to figure if a user has overwritten them with ./configure command
+# line arguments, we need to prevent the expansion of variables in the second
+# argument of apl_EQ() by escaping their leading $. For example (note the \$
+# instead of $):
+#
+# if apl_EQ($bindir, \${exec_prefix}/bin)
+#
+# NOTE also that some ./configure variables will default to "NONE" instead
+#      of "" if the user does not overwrite them:
+#
+# exec_prefix=NONE
+# prefix=NONE
+# program_prefix=NONE
+# program_suffix=NONE
+# x_includes=NONE
+# x_libraries=NONE
+#
+if test "x$prefix" = "xNONE"
+then                                                       # no --prefix
+   apl_prefix="$ac_default_prefix"                         # default: /usr/local
+else                                                       # --prefix given
+   apl_prefix=$prefix
+   $as_echo "   --prefix overwrite: $apl_prefix"
+fi
+
+if test "x$exec_prefix" = "xNONE"
+then                                                       # no --exec_prefix
+   apl_exec_prefix="$apl_prefix"                           # default: PREFIX
+else                                                       # got --exec_prefix
+   apl_exec_prefix=$exec_prefix
+   $as_echo "   --exec_prefix overwrite: $apl_exec_prefix"
+fi
+
+
+if test "x$bindir" = "x\${exec_prefix}/bin"
+then                                                       # no --bindir
+   apl_bindir="$apl_exec_prefix/bin"                       # default: EPREFIX/bin
+else                                                       # got --bindir
+   apl_bindir="$bindir"
+   $as_echo "   --bindir overwrite: $apl_bindir"
+fi
+
+
+if test "x$libdir" = "x\${exec_prefix}/lib"
+then                                                       # no --libdir
+   apl_libdir="$apl_exec_prefix/lib"                       # default: EPREFIX/lib
+else                                                       # got --bindir
+   apl_libdir="$libdir"
+   $as_echo "   --libdir overwrite: $apl_libdir"
+fi
+
+
+if test "x$datarootdir" = "x\${prefix}/share"
+then                                                       # no --datarootdir
+   apl_datarootdir="${apl_prefix}/share"                   # default: PREFIX/share
+else                                                       # --datarootdir=
+   apl_datarootdir="${datarootdir}"
+   $as_echo "   --apl_datarootdir overwrite: ${apl_datarootdir}"
+fi
+
+
+if test "x$docdir" = "x\${datarootdir}/doc/\${PACKAGE_TARNAME}"
+then                                                       # no --docdir
+   apl_docdir="${apl_datarootdir}/doc/${PACKAGE_TARNAME}"  # default
+else                                                       # --docdir=
+   apl_docdir="$docdir"
+   $as_echo "   --docdir overwrite: $apl_docdir"
+fi
+
+if test "x$localedir" = "x\${datarootdir}/locale"
+then                                                       # no --localedir
+   apl_localedir="${apl_datarootdir}/locale"               # default
+else                                                       # --localedir=
+   apl_localedir="$localedir"
+   $as_echo "   --localedir overwrite: $apl_localedir"
+fi
+
+
+if test "x$sysconfdir" = "x\${prefix}/etc"
+then                                                       # no --sysconfdir
+   apl_sysconfdir="${apl_prefix}/etc"                      # default: PREFIX/etc
+else                                                       # --sysconfdir=
+   apl_sysconfdir="${sysconfdir}"
+   $as_echo "   --sysconfdir overwrite: ${apl_sysconfdir}"
+fi
 
 
 cat >>confdefs.h <<_ACEOF
-#define apl_DIR__bin "$apl_exec_prefix/bin"
+#define apl_DIR__bin "$apl_bindir"
 _ACEOF
 
 
 cat >>confdefs.h <<_ACEOF
-#define apl_DIR__doc "$apl_prefix/share/doc/$PACKAGE_TARNAME"
+#define apl_DIR__datarootdir "$apl_datarootdir"
 _ACEOF
 
 
 cat >>confdefs.h <<_ACEOF
-#define apl_DIR__locale "$apl_prefix/share/locale"
+#define apl_DIR__doc "$apl_docdir"
 _ACEOF
 
 
 cat >>confdefs.h <<_ACEOF
-#define apl_DIR__sysconf "$apl_prefix/etc"
+#define apl_DIR__exec_prefix "$apl_exec_prefix"
 _ACEOF
 
 
 cat >>confdefs.h <<_ACEOF
-#define apl_DIR__pkglib "$apl_exec_prefix/lib/$PACKAGE_TARNAME"
+#define apl_DIR__lib "$apl_libdir"
+_ACEOF
+
+
+cat >>confdefs.h <<_ACEOF
+#define apl_DIR__locale "$apl_localedir"
+_ACEOF
+
+
+cat >>confdefs.h <<_ACEOF
+#define apl_DIR__prefix "$apl_prefix"
 _ACEOF
 
 
 cat >>confdefs.h <<_ACEOF
 #define apl_DIR__src "$abs_apl_top"
 _ACEOF
+
+
+cat >>confdefs.h <<_ACEOF
+#define apl_DIR__sysconf "$apl_sysconfdir"
+_ACEOF
+
+
+cat >>confdefs.h <<_ACEOF
+#define apl_DIR__pkglib "$apl_libdir/$PACKAGE_TARNAME"
+_ACEOF
+
 
 
  { $as_echo ; $as_echo "    *** ./configure checks done, producing the Makefiles and config.h... ***"; $as_echo ; }

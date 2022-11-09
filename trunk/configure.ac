@@ -769,23 +769,117 @@ AC_DEFINE_UNQUOTED(BUILDTAG,
 AC_DEFINE_UNQUOTED(ARCHIVE_SVN, ["$apl_ARCHIVE_SVNINFO"],
                      [the SVN version of Archive.cc])
 
-apl_prefix=$prefix
-apl_EQ($prefix, NONE) && apl_prefix="$ac_default_prefix"
-apl_exec_prefix=$exec_prefix
-apl_EQ($exec_prefix, NONE) && apl_exec_prefix="$ac_default_prefix"
+# the user may override the install directories, either with --prefix or
+# --exec_prefix (affecting several directories), or by --bindir and friends. 
+# Figure out the details.
+#
+# NOTE that, unfortunately, the variables in ./configure will be quoted:
+#
+# bindir='${exec_prefix}/bin'
+# libdir='${exec_prefix}/lib'
+# datarootdir='${prefix}/share'
+# sysconfdir='${prefix}/etc'
+# docdir='${datarootdir}/doc/${PACKAGE_TARNAME}'
+# ...
+#
+# Therefore, to figure if a user has overwritten them with ./configure command
+# line arguments, we need to prevent the expansion of variables in the second
+# argument of apl_EQ() by escaping their leading $. For example (note the \$
+# instead of $):
+#
+# if apl_EQ($bindir, \${exec_prefix}/bin)
+#
+# NOTE also that some ./configure variables will default to "NONE" instead
+#      of "" if the user does not overwrite them:
+#
+# exec_prefix=NONE
+# prefix=NONE
+# program_prefix=NONE
+# program_suffix=NONE
+# x_includes=NONE
+# x_libraries=NONE
+#
+if apl_EQ($prefix, NONE)
+then                                                       # no --prefix
+   apl_prefix="$ac_default_prefix"                         # default: /usr/local
+else                                                       # --prefix given
+   apl_prefix=$prefix
+   AS_ECHO(["   --prefix overwrite: $apl_prefix"])
+fi
 
-AC_DEFINE_UNQUOTED(apl_DIR__bin, "$apl_exec_prefix/bin",
-                   [installation directory for binaries])
-AC_DEFINE_UNQUOTED(apl_DIR__doc, "$apl_prefix/share/doc/$PACKAGE_TARNAME",
-                   [installation directory for documentation files])
-AC_DEFINE_UNQUOTED(apl_DIR__locale, "$apl_prefix/share/locale",
-                   [installation directory for documentation files])
-AC_DEFINE_UNQUOTED(apl_DIR__sysconf, "$apl_prefix/etc",
-                   [installation directory for configuration files])
-AC_DEFINE_UNQUOTED(apl_DIR__pkglib, "$apl_exec_prefix/lib/$PACKAGE_TARNAME",
-                   [installation directory for libraries])
-AC_DEFINE_UNQUOTED(apl_DIR__src, "$abs_apl_top",
-                   [source directory])
+if apl_EQ($exec_prefix, NONE)
+then                                                       # no --exec_prefix
+   apl_exec_prefix="$apl_prefix"                           # default: PREFIX
+else                                                       # got --exec_prefix
+   apl_exec_prefix=$exec_prefix
+   AS_ECHO(["   --exec_prefix overwrite: $apl_exec_prefix"])
+fi
+
+
+if apl_EQ($bindir, \${exec_prefix}/bin)
+then                                                       # no --bindir
+   apl_bindir="$apl_exec_prefix/bin"                       # default: EPREFIX/bin
+else                                                       # got --bindir
+   apl_bindir="$bindir"
+   AS_ECHO(["   --bindir overwrite: $apl_bindir"])
+fi
+
+
+if apl_EQ($libdir, \${exec_prefix}/lib)
+then                                                       # no --libdir
+   apl_libdir="$apl_exec_prefix/lib"                       # default: EPREFIX/lib
+else                                                       # got --bindir
+   apl_libdir="$libdir"
+   AS_ECHO(["   --libdir overwrite: $apl_libdir"])
+fi
+
+
+if apl_EQ($datarootdir, \${prefix}/share)
+then                                                       # no --datarootdir
+   apl_datarootdir="${apl_prefix}/share"                   # default: PREFIX/share
+else                                                       # --datarootdir=
+   apl_datarootdir="${datarootdir}"
+   AS_ECHO(["   --apl_datarootdir overwrite: ${apl_datarootdir}"])
+fi
+
+
+if apl_EQ($docdir, \${datarootdir}/doc/\${PACKAGE_TARNAME})
+then                                                       # no --docdir
+   apl_docdir="${apl_datarootdir}/doc/${PACKAGE_TARNAME}"  # default
+else                                                       # --docdir=
+   apl_docdir="$docdir"
+   AS_ECHO(["   --docdir overwrite: $apl_docdir"])
+fi
+
+if apl_EQ($localedir, \${datarootdir}/locale)
+then                                                       # no --localedir
+   apl_localedir="${apl_datarootdir}/locale"               # default
+else                                                       # --localedir=
+   apl_localedir="$localedir"
+   AS_ECHO(["   --localedir overwrite: $apl_localedir"])
+fi
+
+
+if apl_EQ($sysconfdir, \${prefix}/etc)
+then                                                       # no --sysconfdir
+   apl_sysconfdir="${apl_prefix}/etc"                      # default: PREFIX/etc
+else                                                       # --sysconfdir=
+   apl_sysconfdir="${sysconfdir}"
+   AS_ECHO(["   --sysconfdir overwrite: ${apl_sysconfdir}"])
+fi
+
+AC_DEFINE_UNQUOTED(apl_DIR__bin,         "$apl_bindir",      [--bindir]        )
+AC_DEFINE_UNQUOTED(apl_DIR__datarootdir, "$apl_datarootdir", [--datarootdir]   )
+AC_DEFINE_UNQUOTED(apl_DIR__doc,         "$apl_docdir",      [--docdir]        )
+AC_DEFINE_UNQUOTED(apl_DIR__exec_prefix, "$apl_exec_prefix", [--exec_prefix]   )
+AC_DEFINE_UNQUOTED(apl_DIR__lib,         "$apl_libdir",      [--libdir]        )
+AC_DEFINE_UNQUOTED(apl_DIR__locale,      "$apl_localedir",   [--localedir]     )
+AC_DEFINE_UNQUOTED(apl_DIR__prefix,      "$apl_prefix",      [--prefix]        )
+AC_DEFINE_UNQUOTED(apl_DIR__src,         "$abs_apl_top",     [source directory])
+AC_DEFINE_UNQUOTED(apl_DIR__sysconf,     "$apl_sysconfdir",  [--sysconfdir])
+AC_DEFINE_UNQUOTED(apl_DIR__pkglib,      "$apl_libdir/$PACKAGE_TARNAME",
+                   [installation directory for GNU APL libraries])
+
 
 apl_TOPIC([./configure checks done, producing the Makefiles and config.h])
 

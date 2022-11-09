@@ -391,22 +391,34 @@
    #define below would cause a syntax error. */
 #undef _UINT8_T
 
-/* installation directory for binaries */
+/* --bindir */
 #undef apl_DIR__bin
 
-/* installation directory for documentation files */
+/* --datarootdir */
+#undef apl_DIR__datarootdir
+
+/* --docdir */
 #undef apl_DIR__doc
 
-/* installation directory for documentation files */
+/* --exec_prefix */
+#undef apl_DIR__exec_prefix
+
+/* --libdir */
+#undef apl_DIR__lib
+
+/* --localedir */
 #undef apl_DIR__locale
 
-/* installation directory for libraries */
+/* installation directory for GNU APL libraries */
 #undef apl_DIR__pkglib
+
+/* --prefix */
+#undef apl_DIR__prefix
 
 /* source directory */
 #undef apl_DIR__src
 
-/* installation directory for configuration files */
+/* --sysconfdir */
 #undef apl_DIR__sysconf
 
 /* GTK+ version 3 installed */

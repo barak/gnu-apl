@@ -5,7 +5,7 @@
 #define ARCHIVE_SVN " 19548"
 
 /* How and when GNU APL was configured */
-#define BUILDTAG PACKAGE_NAME, PACKAGE_VERSION " / SVN: 19562", "2022-11-08 16:22:18 UTC", "Linux 4.15.0-158-generic x86_64", "default ./configure options"
+#define BUILDTAG PACKAGE_NAME, PACKAGE_VERSION " / SVN: 19566", "2022-11-09 18:43:01 UTC", "Linux 4.15.0-158-generic x86_64", "default ./configure options"
 
 /* Define to 1 iff pthread_setaffinity_np() is available */
 #define HAVE_AFFINITY_NP 1
@@ -392,22 +392,34 @@
    #define below would cause a syntax error. */
 /* #undef _UINT8_T */
 
-/* installation directory for binaries */
+/* --bindir */
 #define apl_DIR__bin "/usr/local/bin"
 
-/* installation directory for documentation files */
+/* --datarootdir */
+#define apl_DIR__datarootdir "/usr/local/share"
+
+/* --docdir */
 #define apl_DIR__doc "/usr/local/share/doc/apl"
 
-/* installation directory for documentation files */
+/* --exec_prefix */
+#define apl_DIR__exec_prefix "/usr/local"
+
+/* --libdir */
+#define apl_DIR__lib "/usr/local/lib"
+
+/* --localedir */
 #define apl_DIR__locale "/usr/local/share/locale"
 
-/* installation directory for libraries */
+/* installation directory for GNU APL libraries */
 #define apl_DIR__pkglib "/usr/local/lib/apl"
+
+/* --prefix */
+#define apl_DIR__prefix "/usr/local"
 
 /* source directory */
 #define apl_DIR__src "/home/eedjsa/apl-1.8"
 
-/* installation directory for configuration files */
+/* --sysconfdir */
 #define apl_DIR__sysconf "/usr/local/etc"
 
 /* GTK+ version 3 installed */
