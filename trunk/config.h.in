@@ -415,7 +415,7 @@
 /* --prefix */
 #undef apl_DIR__prefix
 
-/* source directory */
+/* top-level GNU APL source directory */
 #undef apl_DIR__src
 
 /* --sysconfdir */

@@ -17617,7 +17617,7 @@ if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
 _ACEOF
 
 else
-  apl_missing_headers=$((1+$apl_missing_headers))
+  $(($apl_missing_headers++))
 fi
 
 done
@@ -18860,7 +18860,7 @@ if eval test \"x\$"$as_ac_var"\" = x"yes"; then :
 _ACEOF
 
 else
-  apl_missing_functions=$((1+$apl_missing_functions))
+  $((1+$apl_missing_functions++))
 fi
 done
 
@@ -21714,6 +21714,9 @@ fi
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $RATIONAL_NUMBERS_WANTED" >&5
 $as_echo "$RATIONAL_NUMBERS_WANTED" >&6; }
 
+# if $SOURCE_DATE_EPOCH is set, then this is supposedly a reproducible build.
+# reproducible builds should not contain any non-predictable data.
+#
 if test -n "$SOURCE_DATE_EPOCH"
 then
     apl_BUILD_DATE=`date -u "+%F %R:%S %Z" --date=@$SOURCE_DATE_EPOCH`
@@ -21817,70 +21820,70 @@ _ACEOF
 # x_libraries=NONE
 #
 if test "x$prefix" = "xNONE"
-then                                                       # no --prefix
-   apl_prefix="$ac_default_prefix"                         # default: /usr/local
-else                                                       # --prefix given
+then                                                   # no user --prefix
+   apl_prefix="$ac_default_prefix"                     # default: /usr/local
+else                                                   # --prefix given
    apl_prefix=$prefix
    $as_echo "   --prefix overwrite: $apl_prefix"
 fi
 
 if test "x$exec_prefix" = "xNONE"
-then                                                       # no --exec_prefix
-   apl_exec_prefix="$apl_prefix"                           # default: PREFIX
-else                                                       # got --exec_prefix
+then                                                   # no user --exec_prefix
+   apl_exec_prefix="$apl_prefix"                       # default: PREFIX
+else                                                   # --exec_prefix given
    apl_exec_prefix=$exec_prefix
    $as_echo "   --exec_prefix overwrite: $apl_exec_prefix"
 fi
 
 
 if test "x$bindir" = "x\${exec_prefix}/bin"
-then                                                       # no --bindir
-   apl_bindir="$apl_exec_prefix/bin"                       # default: EPREFIX/bin
-else                                                       # got --bindir
+then                                                   # no user --bindir
+   apl_bindir="$apl_exec_prefix/bin"                   # default: EPREFIX/bin
+else                                                   # --bindir given
    apl_bindir="$bindir"
    $as_echo "   --bindir overwrite: $apl_bindir"
 fi
 
 
 if test "x$libdir" = "x\${exec_prefix}/lib"
-then                                                       # no --libdir
-   apl_libdir="$apl_exec_prefix/lib"                       # default: EPREFIX/lib
-else                                                       # got --bindir
+then                                                   # no user --libdir
+   apl_libdir="$apl_exec_prefix/lib"                   # default: EPREFIX/lib
+else                                                   # --libdir given
    apl_libdir="$libdir"
    $as_echo "   --libdir overwrite: $apl_libdir"
 fi
 
 
 if test "x$datarootdir" = "x\${prefix}/share"
-then                                                       # no --datarootdir
-   apl_datarootdir="${apl_prefix}/share"                   # default: PREFIX/share
-else                                                       # --datarootdir=
+then                                                   # no user --datarootdir
+   apl_datarootdir="${apl_prefix}/share"               # default: PREFIX/share
+else                                                   # --datarootdir given
    apl_datarootdir="${datarootdir}"
    $as_echo "   --apl_datarootdir overwrite: ${apl_datarootdir}"
 fi
 
 
 if test "x$docdir" = "x\${datarootdir}/doc/\${PACKAGE_TARNAME}"
-then                                                       # no --docdir
-   apl_docdir="${apl_datarootdir}/doc/${PACKAGE_TARNAME}"  # default
-else                                                       # --docdir=
+then                                                   # no user --docdir
+   apl_docdir="${apl_datarootdir}/doc/apl"             # default
+else                                                   # --docdir given
    apl_docdir="$docdir"
    $as_echo "   --docdir overwrite: $apl_docdir"
 fi
 
 if test "x$localedir" = "x\${datarootdir}/locale"
-then                                                       # no --localedir
-   apl_localedir="${apl_datarootdir}/locale"               # default
-else                                                       # --localedir=
+then                                                   # no user --localedir
+   apl_localedir="${apl_datarootdir}/locale"           # default
+else                                                   # --localedir given
    apl_localedir="$localedir"
    $as_echo "   --localedir overwrite: $apl_localedir"
 fi
 
 
 if test "x$sysconfdir" = "x\${prefix}/etc"
-then                                                       # no --sysconfdir
-   apl_sysconfdir="${apl_prefix}/etc"                      # default: PREFIX/etc
-else                                                       # --sysconfdir=
+then                                                   # no user --sysconfdir
+   apl_sysconfdir="${apl_prefix}/etc"                  # default: PREFIX/etc
+else                                                   # --sysconfdir given
    apl_sysconfdir="${sysconfdir}"
    $as_echo "   --sysconfdir overwrite: ${apl_sysconfdir}"
 fi
@@ -21922,20 +21925,29 @@ _ACEOF
 
 
 cat >>confdefs.h <<_ACEOF
-#define apl_DIR__src "$abs_apl_top"
-_ACEOF
-
-
-cat >>confdefs.h <<_ACEOF
 #define apl_DIR__sysconf "$apl_sysconfdir"
 _ACEOF
 
 
 cat >>confdefs.h <<_ACEOF
-#define apl_DIR__pkglib "$apl_libdir/$PACKAGE_TARNAME"
+#define apl_DIR__pkglib "$apl_libdir/apl"
 _ACEOF
 
 
+if test -n "$SOURCE_DATE_EPOCH"
+then   # reproducible build
+
+cat >>confdefs.h <<_ACEOF
+#define apl_DIR__src "src"
+_ACEOF
+
+else   # normal build
+
+cat >>confdefs.h <<_ACEOF
+#define apl_DIR__src "$abs_apl_top"
+_ACEOF
+
+fi
 
  { $as_echo ; $as_echo "    *** ./configure checks done, producing the Makefiles and config.h... ***"; $as_echo ; }
 

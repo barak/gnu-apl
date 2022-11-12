@@ -179,7 +179,7 @@ AC_CHECK_HEADERS([                      \
    sys/un.h                             \
    termios.h                            \
    unistd.h utmpx.h                     \
-                 ],, apl_missing_headers=$((1+$apl_missing_headers)))
+                 ],, $(($apl_missing_headers++)))
 
 # Checks for typedefs, structures, and compiler characteristics.
 #
@@ -238,7 +238,7 @@ AC_CHECK_FUNCS([                                             \
    select setenv setlocale socket sqrt strcasecmp strchr     \
    strdup strncasecmp strndup strerror strrchr strstr strtol \
    uname                                                     \
-               ],,apl_missing_functions=$((1+$apl_missing_functions)))
+               ],, $((1+$apl_missing_functions++)))
 
 AC_CHECK_LIB([tinfo],     [tparm])
 AC_CHECK_LIB([socket],    [socket])   # for Solaris
@@ -702,6 +702,9 @@ else RATIONAL_NUMBERS_WANTED="no"
 fi
 AC_MSG_RESULT([$RATIONAL_NUMBERS_WANTED])
 
+# if $SOURCE_DATE_EPOCH is set, then this is supposedly a reproducible build.
+# reproducible builds should not contain any non-predictable data.
+#
 if test -n "$SOURCE_DATE_EPOCH"
 then
     apl_BUILD_DATE=`date -u "+%F %R:%S %Z" --date=@$SOURCE_DATE_EPOCH`
@@ -800,70 +803,70 @@ AC_DEFINE_UNQUOTED(ARCHIVE_SVN, ["$apl_ARCHIVE_SVNINFO"],
 # x_libraries=NONE
 #
 if apl_EQ($prefix, NONE)
-then                                                       # no --prefix
-   apl_prefix="$ac_default_prefix"                         # default: /usr/local
-else                                                       # --prefix given
+then                                                   # no user --prefix
+   apl_prefix="$ac_default_prefix"                     # default: /usr/local
+else                                                   # --prefix given
    apl_prefix=$prefix
    AS_ECHO(["   --prefix overwrite: $apl_prefix"])
 fi
 
 if apl_EQ($exec_prefix, NONE)
-then                                                       # no --exec_prefix
-   apl_exec_prefix="$apl_prefix"                           # default: PREFIX
-else                                                       # got --exec_prefix
+then                                                   # no user --exec_prefix
+   apl_exec_prefix="$apl_prefix"                       # default: PREFIX
+else                                                   # --exec_prefix given
    apl_exec_prefix=$exec_prefix
    AS_ECHO(["   --exec_prefix overwrite: $apl_exec_prefix"])
 fi
 
 
 if apl_EQ($bindir, \${exec_prefix}/bin)
-then                                                       # no --bindir
-   apl_bindir="$apl_exec_prefix/bin"                       # default: EPREFIX/bin
-else                                                       # got --bindir
+then                                                   # no user --bindir
+   apl_bindir="$apl_exec_prefix/bin"                   # default: EPREFIX/bin
+else                                                   # --bindir given
    apl_bindir="$bindir"
    AS_ECHO(["   --bindir overwrite: $apl_bindir"])
 fi
 
 
 if apl_EQ($libdir, \${exec_prefix}/lib)
-then                                                       # no --libdir
-   apl_libdir="$apl_exec_prefix/lib"                       # default: EPREFIX/lib
-else                                                       # got --bindir
+then                                                   # no user --libdir
+   apl_libdir="$apl_exec_prefix/lib"                   # default: EPREFIX/lib
+else                                                   # --libdir given
    apl_libdir="$libdir"
    AS_ECHO(["   --libdir overwrite: $apl_libdir"])
 fi
 
 
 if apl_EQ($datarootdir, \${prefix}/share)
-then                                                       # no --datarootdir
-   apl_datarootdir="${apl_prefix}/share"                   # default: PREFIX/share
-else                                                       # --datarootdir=
+then                                                   # no user --datarootdir
+   apl_datarootdir="${apl_prefix}/share"               # default: PREFIX/share
+else                                                   # --datarootdir given
    apl_datarootdir="${datarootdir}"
    AS_ECHO(["   --apl_datarootdir overwrite: ${apl_datarootdir}"])
 fi
 
 
 if apl_EQ($docdir, \${datarootdir}/doc/\${PACKAGE_TARNAME})
-then                                                       # no --docdir
-   apl_docdir="${apl_datarootdir}/doc/${PACKAGE_TARNAME}"  # default
-else                                                       # --docdir=
+then                                                   # no user --docdir
+   apl_docdir="${apl_datarootdir}/doc/apl"             # default
+else                                                   # --docdir given
    apl_docdir="$docdir"
    AS_ECHO(["   --docdir overwrite: $apl_docdir"])
 fi
 
 if apl_EQ($localedir, \${datarootdir}/locale)
-then                                                       # no --localedir
-   apl_localedir="${apl_datarootdir}/locale"               # default
-else                                                       # --localedir=
+then                                                   # no user --localedir
+   apl_localedir="${apl_datarootdir}/locale"           # default
+else                                                   # --localedir given
    apl_localedir="$localedir"
    AS_ECHO(["   --localedir overwrite: $apl_localedir"])
 fi
 
 
 if apl_EQ($sysconfdir, \${prefix}/etc)
-then                                                       # no --sysconfdir
-   apl_sysconfdir="${apl_prefix}/etc"                      # default: PREFIX/etc
-else                                                       # --sysconfdir=
+then                                                   # no user --sysconfdir
+   apl_sysconfdir="${apl_prefix}/etc"                  # default: PREFIX/etc
+else                                                   # --sysconfdir given
    apl_sysconfdir="${sysconfdir}"
    AS_ECHO(["   --sysconfdir overwrite: ${apl_sysconfdir}"])
 fi
@@ -875,11 +878,18 @@ AC_DEFINE_UNQUOTED(apl_DIR__exec_prefix, "$apl_exec_prefix", [--exec_prefix]   )
 AC_DEFINE_UNQUOTED(apl_DIR__lib,         "$apl_libdir",      [--libdir]        )
 AC_DEFINE_UNQUOTED(apl_DIR__locale,      "$apl_localedir",   [--localedir]     )
 AC_DEFINE_UNQUOTED(apl_DIR__prefix,      "$apl_prefix",      [--prefix]        )
-AC_DEFINE_UNQUOTED(apl_DIR__src,         "$abs_apl_top",     [source directory])
 AC_DEFINE_UNQUOTED(apl_DIR__sysconf,     "$apl_sysconfdir",  [--sysconfdir])
-AC_DEFINE_UNQUOTED(apl_DIR__pkglib,      "$apl_libdir/$PACKAGE_TARNAME",
+AC_DEFINE_UNQUOTED(apl_DIR__pkglib,      "$apl_libdir/apl",
                    [installation directory for GNU APL libraries])
 
+if test -n "$SOURCE_DATE_EPOCH"
+then   # reproducible build
+   AC_DEFINE_UNQUOTED(apl_DIR__src, "src",
+                      [top-level GNU APL source directory])
+else   # normal build
+   AC_DEFINE_UNQUOTED(apl_DIR__src, "$abs_apl_top",
+                      [top-level GNU APL source directory])
+fi
 
 apl_TOPIC([./configure checks done, producing the Makefiles and config.h])
 
