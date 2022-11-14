@@ -17617,7 +17617,7 @@ if eval test \"x\$"$as_ac_Header"\" = x"yes"; then :
 _ACEOF
 
 else
-  $(($apl_missing_headers++))
+  apl_missing_headers=$(($apl_missing_headers + 1))
 fi
 
 done
@@ -18860,7 +18860,7 @@ if eval test \"x\$"$as_ac_var"\" = x"yes"; then :
 _ACEOF
 
 else
-  $((1+$apl_missing_functions++))
+  apl_missing_functions=$(($apl_missing_functions + 1))
 fi
 done
 

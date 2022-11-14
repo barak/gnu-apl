@@ -5,7 +5,7 @@
 #define ARCHIVE_SVN " 19548"
 
 /* How and when GNU APL was configured */
-#define BUILDTAG PACKAGE_NAME, PACKAGE_VERSION " / SVN: 19568", "2022-11-12 12:55:16 UTC", "", "default ./configure options"
+#define BUILDTAG PACKAGE_NAME, PACKAGE_VERSION " / SVN: 19569", "2022-11-14 10:34:18 UTC", "Linux 4.15.0-158-generic x86_64", "default ./configure options"
 
 /* Define to 1 iff pthread_setaffinity_np() is available */
 #define HAVE_AFFINITY_NP 1
@@ -417,7 +417,7 @@
 #define apl_DIR__prefix "/usr/local"
 
 /* top-level GNU APL source directory */
-#define apl_DIR__src "src"
+#define apl_DIR__src "/home/eedjsa/apl-1.8"
 
 /* --sysconfdir */
 #define apl_DIR__sysconf "/usr/local/etc"

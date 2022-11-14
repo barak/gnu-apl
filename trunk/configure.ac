@@ -179,7 +179,7 @@ AC_CHECK_HEADERS([                      \
    sys/un.h                             \
    termios.h                            \
    unistd.h utmpx.h                     \
-                 ],, $(($apl_missing_headers++)))
+                 ],, apl_missing_headers=$(($apl_missing_headers + 1)))
 
 # Checks for typedefs, structures, and compiler characteristics.
 #
@@ -238,7 +238,7 @@ AC_CHECK_FUNCS([                                             \
    select setenv setlocale socket sqrt strcasecmp strchr     \
    strdup strncasecmp strndup strerror strrchr strstr strtol \
    uname                                                     \
-               ],, $((1+$apl_missing_functions++)))
+               ],, apl_missing_functions=$(($apl_missing_functions + 1)))
 
 AC_CHECK_LIB([tinfo],     [tparm])
 AC_CHECK_LIB([socket],    [socket])   # for Solaris
