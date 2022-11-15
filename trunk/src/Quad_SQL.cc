@@ -41,13 +41,13 @@ static std::vector<Connection *> connections;
 Quad_SQL  Quad_SQL::_fun;
 Quad_SQL * Quad_SQL::fun = &Quad_SQL::_fun;
 
-#ifdef apl_SQLITE3
+#if apl_SQLITE3
 # include "sql/SqliteResultValue.hh"
 # include "sql/SqliteConnection.hh"
 # include "sql/SqliteProvider.hh"
 #endif
 
-#ifdef apl_POSTGRES
+#if apl_POSTGRES
 # include "sql/PostgresConnection.hh"
 # include "sql/PostgresProvider.hh"
 #endif
@@ -56,7 +56,7 @@ Quad_SQL * Quad_SQL::fun = &Quad_SQL::_fun;
 static void
 init_provider_map()
 {
-#ifdef apl_SQLITE3
+#if apl_SQLITE3
    {
      Provider * sqliteProvider = new SqliteProvider();
      Assert(sqliteProvider);
@@ -66,7 +66,7 @@ init_provider_map()
 # warning "SQLite3 unavailable since ./configure could not detect it"
 #endif
 
-#ifdef apl_POSTGRES
+#if apl_POSTGRES
    {
 Provider * postgresProvider = new PostgresProvider();
    Assert(postgresProvider);

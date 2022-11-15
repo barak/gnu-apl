@@ -275,7 +275,7 @@ m4_include([m4/check_POSTGRES.m4])
 # summarize apl_SQLITE3 and apl_POSTGRES as apl_SQL
 apl_SQL=no
 apl_YES($apl_SQLITE3)  && apl_SQL=yes
-apl_YES($apl_POSTGRES) && apl_SQL=yes
+apl_YES($apl_POSTGRES) && apl_POSTGRES=yes
 
 m4_include([m4/check_PCRE.m4])
    apl_NYES($apl_PCRE) && AS_ECHO(["   └──── will affect: ⎕RE"])
@@ -892,9 +892,32 @@ else   # normal build
                       [top-level GNU APL source directory])
 fi
 
-AC_DEFINE_UNQUOTED(apl_CAPABILITIES,
-["⎕FFT", "GTK", "GUI","⎕PNG","POSTGRES","⎕PLOT","⎕RE","⎕SQL","SQLITE3","X11","XCB"],
-[available capabilities])
+# we want 0/1 instead of yes/no in config.h...
+#
+if (apl_YES($apl_FFT)); then
+   AC_DEFINE_UNQUOTED(apl_FFT, 1, [FFT available ?])
+else
+   AC_DEFINE_UNQUOTED(apl_FFT, 0, [FFT available])
+fi
+
+if (apl_YES($apl_GUI)); then
+   AC_DEFINE_UNQUOTED(apl_GUI, 1, [GUI (GTK or XCB) is available])
+else
+   AC_DEFINE_UNQUOTED(apl_GUI, 0, [GUI (GTK or XCB) not available ?])
+fi
+
+if (apl_YES($apl_PCRE)); then
+   AC_DEFINE_UNQUOTED(apl_PCRE, 1, [PCRE is available])
+else
+   AC_DEFINE_UNQUOTED(apl_PCRE, 0, [PCRE not available])
+fi
+
+if (apl_YES($apl_PNG)); then
+   AC_DEFINE_UNQUOTED(apl_PNG, 1, [PNG is available])
+else
+   AC_DEFINE_UNQUOTED(apl_PNG, 0, [PNG not available])
+fi
+
 
 apl_TOPIC([./configure checks done, producing the Makefiles and config.h])
 

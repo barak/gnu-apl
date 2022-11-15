@@ -5,7 +5,7 @@
 #define ARCHIVE_SVN " 19548"
 
 /* How and when GNU APL was configured */
-#define BUILDTAG PACKAGE_NAME, PACKAGE_VERSION " / SVN: 19574", "2022-11-15 10:20:39 UTC", "Linux 4.15.0-158-generic x86_64", "default ./configure options"
+#define BUILDTAG PACKAGE_NAME, PACKAGE_VERSION " / SVN: 19583", "2022-11-15 16:40:35 UTC", "Linux 4.15.0-158-generic x86_64", "default ./configure options"
 
 /* Define to 1 iff pthread_setaffinity_np() is available */
 #define HAVE_AFFINITY_NP 1
@@ -395,9 +395,6 @@
    #define below would cause a syntax error. */
 /* #undef _UINT8_T */
 
-/* available capabilities */
-#define apl_CAPABILITIES "⎕FFT", "GTK", "GUI","⎕PNG","POSTGRES","⎕PLOT","⎕RE","⎕SQL","SQLITE3","X11","XCB"
-
 /* --bindir */
 #define apl_DIR__bin "/usr/local/bin"
 
@@ -428,13 +425,25 @@
 /* --sysconfdir */
 #define apl_DIR__sysconf "/usr/local/etc"
 
-/* GTK+ version 3 installed */
+/* FFT available */
+#define apl_FFT 1
+
+/* GTK+ version 3 not installed */
 #define apl_GTK3 1
 
-/* PostgreSQL code compiles */
+/* GUI (GTK or XCB) not available ? */
+#define apl_GUI 1
+
+/* PCRE not available */
+#define apl_PCRE 1
+
+/* PNG not available */
+#define apl_PNG 1
+
+/* PostgreSQL code did not compile */
 #define apl_POSTGRES 1
 
-/* SQLite code compiles */
+/* SQLite code did not compile */
 #define apl_SQLITE3 1
 
 /* Define if compiling for Android */
@@ -449,7 +458,7 @@
 /* Define if building lib_gnu_apl.so */
 /* #undef apl_TARGET_PYTHON */
 
-/* X11 available */
+/* X11 not available */
 #define apl_X11 1
 
 /* APserver listen port name */

@@ -361,7 +361,7 @@ unsigned int max_e = 2;
 
    // Search for ⎕ backwards from the end
    //
-int qpos = -1;
+int qpos = -1;   // the position of ⎕ in user_input
 
    loop(e, max_e)
       {
@@ -435,72 +435,86 @@ TabExpansion::expand_capability(UCS_string & user_input)
    // user has entered ']NEXTFILE ' and possibly the prefix of a capability
    // argument on which ]NEXTFILE may depend. Expand the capability.
    //
-UCS_string prefix(user_input, 9, user_input.size() - 9);
-   prefix.remove_leading_whitespaces();
+
+   // split user_input into a (fixed) stem and a (partial) prefix.
+   // The prefix shall then be extended into a capability. The stem
+   // ends after rightmost blank in user_input.
+int prefix_len = 0;
+   for (int u = user_input.size(); u; --u)
+       {
+         if (user_input[u - 1] == UNI_SPACE)
+            {
+              prefix_len = u;
+              break;
+            }
+       }
+
+const char * CAPABILITIES[] = { apl_CAPABILITIES };
+enum { capabilities_count = sizeof(CAPABILITIES) / sizeof(*CAPABILITIES) };
+
+   if (prefix_len == 0)   // no capability argument: display all.
+      {
+        loop(c, capabilities_count)
+            {
+              const char * cap = CAPABILITIES[c];
+              COUT << "have-" << cap << " no-" << cap << " " << endl;
+            }
+
+         return ER_REPLACE;
+      }
+
+UCS_string stem(user_input, 0, prefix_len);
+UCS_string prefix = user_input.drop(prefix_len);
 
 // CERR << "\nCAPABILITY: '" << user_input << "'" << endl;
 // CERR << "PREFIX:     '" << prefix << "'" << endl;
 
-const char * capabilities[] = { apl_CAPABILITIES };  // in alphabetical order
-enum { capabilities_count = sizeof(capabilities) / sizeof(const char *) };
-
-   if (prefix.size() == 0)   // no capability yet: display all.
-      {
-        loop(c, capabilities_count)
-            {
-              const char * cap = capabilities[c];
-              COUT << "have-" << cap << " no-" << cap << " " << endl;
-            }
-
-         return ER_IGNORE;
-      }
-
-   // at this point, prefix should start with either have- or no-. Expand
-   // if appropriate
+   // at this point, prefix should start with either HAVE- or NO-.
+   // Expand prefix if appropriate
    if ( (prefix.size() == 1 && prefix.starts_iwith("H" ))  ||
         (prefix.size() == 2 && prefix.starts_iwith("HA"))  ||
         (prefix.size() == 3 && prefix.starts_iwith("HAV")) ||
         (prefix.size() == 4 && prefix.starts_iwith("HAVE")))
       {
-        user_input = UCS_string("]NEXTFILE HAVE-");
+        user_input = stem + UCS_string("HAVE-");
         return ER_REPLACE;
       }
 
    if ( (prefix.size() == 1 && prefix.starts_iwith("N" )) ||
         (prefix.size() == 2 && prefix.starts_iwith("NO")))
       {
-        user_input = UCS_string("]NEXTFILE NO-");
+        user_input = stem + UCS_string("NO-");
         return ER_REPLACE;
       }
 
    // got HAVE- or NO-; expand capability...
    //
 vector<const char *> matches;
-UCS_string result;
    if (prefix.size() >= 5 && prefix.starts_iwith("HAVE-"))
       {
-        result = UCS_string("]NEXTFILE HAVE-");
+        stem.append_ASCII(" HAVE-");
         const UCS_string suffix(prefix, 5, prefix.size() - 5);   // skip HAVE-
         loop(c, capabilities_count)
             {
-              const UTF8_string cap_utf8(capabilities[c]);
+              const UTF8_string cap_utf8(CAPABILITIES[c]);
               const UCS_string cap_ucs(cap_utf8);
               if (cap_ucs.starts_iwith(suffix))
-                 matches.push_back(capabilities[c]);
+                 matches.push_back(CAPABILITIES[c]);
             }
       }
    else if (prefix.size() >= 3 && prefix.starts_iwith("NO-"))
       {
-        result = UCS_string("]NEXTFILE NO-");
+        stem.append_ASCII(" NO-");
         const UCS_string suffix(prefix, 3, prefix.size() - 3);   // skip NO-
         loop(c, capabilities_count)
             {
-              const UTF8_string cap_utf8(capabilities[c]);
+              const UTF8_string cap_utf8(CAPABILITIES[c]);
               const UCS_string cap_ucs(cap_utf8);
               if (cap_ucs.starts_iwith(suffix))
-                 matches.push_back(capabilities[c]);
+                 matches.push_back(CAPABILITIES[c]);
             }
       }
+
    if (matches.size() == 0)   return ER_IGNORE;   // no match
    if (matches.size() > 1)
       {
@@ -513,9 +527,9 @@ UCS_string result;
 
    // unique match
    //
-   result.append_ASCII(matches[0]);
-   user_input = result;
-   return ER_REPLACE;
+const UTF8_string match(matches[0]);
+   user_input = stem + UCS_string(match);
+   return ER_REPLACE;   // unique match
 }
 //----------------------------------------------------------------------------
 ExpandResult

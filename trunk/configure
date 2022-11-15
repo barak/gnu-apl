@@ -19778,6 +19778,12 @@ cat >>confdefs.h <<_ACEOF
 #define apl_X11 1
 _ACEOF
 
+else
+
+cat >>confdefs.h <<_ACEOF
+#define apl_X11 0
+_ACEOF
+
 fi
 
 # export apl_X11 to Makefile.am
@@ -20194,6 +20200,12 @@ cat >>confdefs.h <<_ACEOF
 #define apl_SQLITE3 1
 _ACEOF
 
+else
+
+cat >>confdefs.h <<_ACEOF
+#define apl_SQLITE3 0
+_ACEOF
+
 fi
 
 
@@ -20463,15 +20475,24 @@ rm -f core conftest.err conftest.$ac_objext conftest.$ac_ext
 { $as_echo "$as_me:${as_lineno-$LINENO}: result: $apl_POSTGRES" >&5
 $as_echo "$apl_POSTGRES" >&6; }
 
+} }
+dash_test_POSTGRES   # set apl_POSTGRES to yes or no.
+
+# export apl_POSTGRES to config.h
 if test "x$apl_POSTGRES" = "xyes"; then
 
 cat >>confdefs.h <<_ACEOF
 #define apl_POSTGRES 1
 _ACEOF
 
+else
+
+cat >>confdefs.h <<_ACEOF
+#define apl_POSTGRES 0
+_ACEOF
+
 fi
-} }
-dash_test_POSTGRES   # set apl_POSTGRES to yes or no.
+
 
 # export apl_POSTGRES to Makefile.am
  if test "x$apl_POSTGRES" = "xyes"; then
@@ -20489,7 +20510,7 @@ fi
 # summarize apl_SQLITE3 and apl_POSTGRES as apl_SQL
 apl_SQL=no
 test "x$apl_SQLITE3" = "xyes"  && apl_SQL=yes
-test "x$apl_POSTGRES" = "xyes" && apl_SQL=yes
+test "x$apl_POSTGRES" = "xyes" && apl_POSTGRES=yes
 
 
 # check if libpcre is installed and usable
@@ -20950,6 +20971,9 @@ else                                     # package gtk+-3.0 missing
 $as_echo "no (says pkg-config)" >&6; }
 fi
 
+} }
+dash_test_GTK   # set apl_GTK3 to yes or no.
+
 # export apl_GTK3 to config.h
 if test "x$apl_GTK3" = "xyes"; then
 
@@ -20957,9 +20981,14 @@ cat >>confdefs.h <<_ACEOF
 #define apl_GTK3 1
 _ACEOF
 
+else
+
+cat >>confdefs.h <<_ACEOF
+#define apl_GTK3 0
+_ACEOF
+
 fi
-} }
-dash_test_GTK   # set apl_GTK3 to yes or no.
+
 
 # export apl_GTK3 to Makefile.am
  if test "x$apl_GTK3" = "xyes"; then
@@ -21950,10 +21979,63 @@ _ACEOF
 
 fi
 
+# we want 0/1 instead of yes/no in config.h...
+#
+if (test "x$apl_FFT" = "xyes"); then
 
 cat >>confdefs.h <<_ACEOF
-#define apl_CAPABILITIES "⎕FFT", "GTK", "GUI","⎕PNG","POSTGRES","⎕PLOT","⎕RE","⎕SQL","SQLITE3","X11","XCB"
+#define apl_FFT 1
 _ACEOF
+
+else
+
+cat >>confdefs.h <<_ACEOF
+#define apl_FFT 0
+_ACEOF
+
+fi
+
+if (test "x$apl_GUI" = "xyes"); then
+
+cat >>confdefs.h <<_ACEOF
+#define apl_GUI 1
+_ACEOF
+
+else
+
+cat >>confdefs.h <<_ACEOF
+#define apl_GUI 0
+_ACEOF
+
+fi
+
+if (test "x$apl_PCRE" = "xyes"); then
+
+cat >>confdefs.h <<_ACEOF
+#define apl_PCRE 1
+_ACEOF
+
+else
+
+cat >>confdefs.h <<_ACEOF
+#define apl_PCRE 0
+_ACEOF
+
+fi
+
+if (test "x$apl_PNG" = "xyes"); then
+
+cat >>confdefs.h <<_ACEOF
+#define apl_PNG 1
+_ACEOF
+
+else
+
+cat >>confdefs.h <<_ACEOF
+#define apl_PNG 0
+_ACEOF
+
+fi
 
 
  { $as_echo ; $as_echo "    *** ./configure checks done, producing the Makefiles and config.h... ***"; $as_echo ; }

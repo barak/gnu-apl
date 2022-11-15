@@ -1,6 +1,8 @@
 ⍝ Quad_RE.tc
 ⍝ ----------------------------------
 
+]NEXTFILE not-⎕RE
+
 ⍝ simple match (no axis = first/string)
 ⍝
 4 ⎕CR 'f..' ⎕RE '__foo__fun____fox'

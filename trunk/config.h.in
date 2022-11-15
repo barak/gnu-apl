@@ -394,9 +394,6 @@
    #define below would cause a syntax error. */
 #undef _UINT8_T
 
-/* available capabilities */
-#undef apl_CAPABILITIES
-
 /* --bindir */
 #undef apl_DIR__bin
 
@@ -427,13 +424,25 @@
 /* --sysconfdir */
 #undef apl_DIR__sysconf
 
-/* GTK+ version 3 installed */
+/* FFT available */
+#undef apl_FFT
+
+/* GTK+ version 3 not installed */
 #undef apl_GTK3
 
-/* PostgreSQL code compiles */
+/* GUI (GTK or XCB) not available ? */
+#undef apl_GUI
+
+/* PCRE not available */
+#undef apl_PCRE
+
+/* PNG not available */
+#undef apl_PNG
+
+/* PostgreSQL code did not compile */
 #undef apl_POSTGRES
 
-/* SQLite code compiles */
+/* SQLite code did not compile */
 #undef apl_SQLITE3
 
 /* Define if compiling for Android */
@@ -448,7 +457,7 @@
 /* Define if building lib_gnu_apl.so */
 #undef apl_TARGET_PYTHON
 
-/* X11 available */
+/* X11 not available */
 #undef apl_X11
 
 /* APserver listen port name */

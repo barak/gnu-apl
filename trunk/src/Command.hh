@@ -72,7 +72,7 @@ public:
    static void cmd_OFF(int exit_val);
 
    /// continue with (jump to) next input file.
-   static void cmd_NEXTFILE();
+   static void cmd_NEXTFILE(ostream & out, const UCS_string_vector & args);
 
    /// clean-up and exit from APL interpreter
    static void cmd_PUSHFILE();
@@ -137,7 +137,7 @@ protected:
    static void cmd_COPY_ONCE(ostream & out, UCS_string_vector & args);
 
    /// ]DOXY: create doxygen-like documentation of the current workspace
-   static void cmd_DOXY(ostream & out, UCS_string_vector & args);
+   static void cmd_DOXY(ostream & out, const UCS_string_vector & args);
 
    /// )DROP: delete a workspace file
    static void cmd_DROP(ostream & out, const UCS_string_vector & args);
@@ -300,6 +300,9 @@ protected:
 
    /// workspaces that shall not be copied twice
    static UCS_string_vector copy_once_table;
+
+   /// return true iff, according to config.h, capability \b capa is available
+   static bool have_capability(const UCS_string & capa);
 };
 //----------------------------------------------------------------------------
 inline void Hswap(Command::val_val & vp1, Command::val_val & vp2)

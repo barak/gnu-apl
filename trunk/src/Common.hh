@@ -83,6 +83,10 @@ using namespace std;
 /// true when a WINCH (window size changed) signal was received
 extern bool got_WINCH;
 
+/// interpreter capabilities (for ]NEXTFILE)
+#define  apl_CAPABILITIES  "⎕FFT", "GTK",  "GUI", "⎕PNG", "POSTGRES", "⎕PLOT", \
+ "⎕RE", "⎕SQL", "SQLITE3", "X11",  "XCB",
+
 /// true when gtk_init() was called (from ⎕PLOT or from ⎕PNG)
 extern bool gtk_init_done;
 

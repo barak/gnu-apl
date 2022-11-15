@@ -904,7 +904,7 @@ Command::clear_copy_once_table()
 }
 //----------------------------------------------------------------------------
 void
-Command::cmd_DOXY(ostream & out, UCS_string_vector & args)
+Command::cmd_DOXY(ostream & out, const UCS_string_vector & args)
 {
 UTF8_string root("/tmp");
    if (args.size())   root = UTF8_string(args[0]);
@@ -1917,9 +1917,58 @@ rlimit rl;
 }
 //----------------------------------------------------------------------------
 void
-Command::cmd_NEXTFILE()
+Command::cmd_NEXTFILE(ostream & out, const UCS_string_vector & args)
 {
+   loop(a, args.size())
+       {
+         const UCS_string & arg = args[a];
+
+         // figure HAVE- or NO- prefix and capability
+         //
+         if (arg.starts_iwith("HAVE-"))
+            {
+              if (! have_capability(arg.drop(5)))   return;
+            }
+         else if (arg.starts_iwith("NO-"))
+            {
+              if (have_capability(arg.drop(3)))   return;
+            }
+         else
+            {
+              CERR << "]NEXTFILE: unknown capability '" << arg
+                   << "' (ignored).\n"
+                      "Capabilities start with HAVE- or with NO- "
+                      "(try TAB expansion)."
+                   << endl;
+              continue;   // next arg
+            }
+       }
+
    IO_Files::next_file();
+}
+//----------------------------------------------------------------------------
+bool
+Command::have_capability(const UCS_string & capa)
+{
+const int len = capa.size();
+   if (capa[0] == UNI_Quad_Quad)   // ⎕xxx
+      {
+        const UCS_string capa1 = capa.drop(1);
+        if (len == 4 && capa1.starts_iwith("FFT"))       return apl_FFT;
+        if (len == 4 && capa1.starts_iwith("PNG"))       return apl_PNG;
+        if (len == 3 && capa1.starts_iwith("RE"))        return apl_PCRE;
+      }
+   else
+      {
+        if (len == 3 && capa.starts_iwith("GTK"))        return apl_GTK3;
+        if (len == 3 && capa.starts_iwith("GUI"))        return apl_GUI;
+        if (len == 8 && capa.starts_iwith("POSTGRES"))   return apl_POSTGRES;
+        if (len == 7 && capa.starts_iwith("SQLITE3"))    return apl_SQLITE3;
+        if (len == 3 && capa.starts_iwith("X11"))        return apl_X11;
+      }
+
+   CERR << "]NEXTFILE: Unknown capability '" << capa << "'" << endl;
+   return false;
 }
 //----------------------------------------------------------------------------
 void
