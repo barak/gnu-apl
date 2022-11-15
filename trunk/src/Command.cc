@@ -148,6 +148,19 @@ Command::process_line(UCS_string & line)
 bool
 Command::do_APL_command(ostream & out, UCS_string & line)
 {
+   if (line.contains(UNI_COMMENT))   // unlikely
+      {
+        loop(l, line.size())   // find ⍝
+            {
+              if (line[l] == UNI_COMMENT)   // found
+                 {
+                   line.resize(l);
+                   line.remove_trailing_whitespaces();
+                   break;
+                 }
+            }
+      }
+
 const UCS_string line1(line);   // the original line
 
    // split line into command and arguments
