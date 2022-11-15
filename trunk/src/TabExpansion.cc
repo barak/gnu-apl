@@ -23,6 +23,7 @@
 
 #include <errno.h>
 
+#include "Common.hh"
 #include "LibPaths.hh"
 #include "TabExpansion.hh"
 #include "Workspace.hh"
@@ -34,26 +35,26 @@ TabExpansion::TabExpansion(UCS_string & line)
 }
 //----------------------------------------------------------------------------
 ExpandResult
-TabExpansion::expand_tab(UCS_string & user)
+TabExpansion::expand_tab(UCS_string & user_input)
 {
    // skip leading and trailing blanks
    //
-   user.remove_leading_and_trailing_whitespaces();
+   user_input.remove_leading_and_trailing_whitespaces();
 
-   if (user.size() == 0)                      // nothing entered yet
-      return expand_user_name(user);
+   if (user_input.size() == 0)                      // nothing entered yet
+      return expand_user_name(user_input);
 
-   if (Avec::is_first_symbol_char(user[0]))   // start of user defined name
-      return expand_user_name(user);
+   if (Avec::is_first_symbol_char(user_input[0]))   // start of user defined name
+      return expand_user_name(user_input);
 
-   if (user[0] == ')' || user[0] == ']')      // APL command
-      return expand_APL_command(user);
+   if (user_input[0] == ')' || user_input[0] == ']')      // APL command
+      return expand_APL_command(user_input);
 
-   return expand_distinguished_name(user);
+   return expand_distinguished_name(user_input);
 }
 //----------------------------------------------------------------------------
 ExpandResult
-TabExpansion::expand_user_name(UCS_string & user)
+TabExpansion::expand_user_name(UCS_string & user_input)
 {
 std::vector<const Symbol *> symbols = Workspace::get_all_symbols();
 
@@ -64,7 +65,7 @@ UCS_string_vector matches;
         if (sym->is_erased())    continue;
 
         const UCS_string & sym_name = sym->get_name();
-        if (!sym_name.starts_with(user))   continue;
+        if (!sym_name.starts_with(user_input))   continue;
         matches.push_back(sym_name);
       }
 
@@ -72,18 +73,18 @@ UCS_string_vector matches;
 
    if (matches.size() > 1)    // multiple names match user input
       {
-        const int user_len = user.size();
-        user.clear();
-        return show_alternatives(user, user_len, matches);
+        const int user_len = user_input.size();
+        user_input.clear();
+        return show_alternatives(user_input, user_len, matches);
       }
 
    // unique match
    //
-   if (user.size() < matches[0].size())
+   if (user_input.size() < matches[0].size())
       {
-        // the name is longer than user, so we expand it.
+        // the name is longer than user_input, so we expand it.
         //
-        user = matches[0];
+        user_input = matches[0];
         return ER_REPLACE;
       }
 
@@ -91,12 +92,12 @@ UCS_string_vector matches;
 }
 //----------------------------------------------------------------------------
 ExpandResult
-TabExpansion::expand_APL_command(UCS_string & user)
+TabExpansion::expand_APL_command(UCS_string & user_input)
 {
 ExpandHint ehint = EH_NO_PARAM;
 const char * shint = 0;
 UCS_string_vector matches;
-UCS_string cmd = user;
+UCS_string cmd = user_input;
 UCS_string arg;
    cmd.split_ws(arg);
 
@@ -139,18 +140,18 @@ UCS_string arg;
    //
    if (matches.size() > 1)   // multiple commands match cmd
       {
-        user.clear();
-        return show_alternatives(user, cmd.size(), matches);
+        user_input.clear();
+        return show_alternatives(user_input, cmd.size(), matches);
       }
 
    // unique match
    //
    if (cmd.size() < matches[0].size())
       {
-        // the command is longer than user, so we expand it.
+        // the command is longer than user_input, so we expand it.
         //
-        user = matches[0];
-        if (ehint != EH_NO_PARAM)   user.append(UNI_SPACE);
+        user_input = matches[0];
+        if (ehint != EH_NO_PARAM)   user_input.append(UNI_SPACE);
         return ER_REPLACE;
       }
 
@@ -163,16 +164,16 @@ UCS_string arg;
              // command has arguments then append a space to indicate that.
              // Otherwiese fall throught to expand_command_arg();
              //
-             user = matches[0];
-             user.append(UNI_SPACE);
+             user_input = matches[0];
+             user_input.append(UNI_SPACE);
              return ER_REPLACE;
       }
 
-   return expand_command_arg(user, ehint, shint, matches[0], arg);
+   return expand_command_arg(user_input, ehint, shint, matches[0], arg);
 }
 //----------------------------------------------------------------------------
 ExpandResult
-TabExpansion::expand_command_arg(UCS_string & user, 
+TabExpansion::expand_command_arg(UCS_string & user_input,
                             ExpandHint ehint, const char * shint,
                             const UCS_string cmd, const UCS_string arg)
 {
@@ -188,10 +189,13 @@ TabExpansion::expand_command_arg(UCS_string & user,
         case EH_FILENAME:
         case EH_DIR_OR_LIB:
         case EH_WSNAME:
-             return expand_filename(user, ehint, shint, cmd, arg);
+             return expand_filename(user_input, ehint, shint, cmd, arg);
 
         case EH_PRIMITIVE:
-             return expand_help_topics(user);
+             return expand_help_topics(user_input);
+
+        case EH_CONFIG:
+             return expand_capability(user_input);
 
         default:
              CIN << endl;
@@ -201,12 +205,12 @@ TabExpansion::expand_command_arg(UCS_string & user,
 }
 //----------------------------------------------------------------------------
 ExpandResult
-TabExpansion::expand_help_topics(UCS_string & user)
+TabExpansion::expand_help_topics(UCS_string & user_input)
 {
-   if (user.size() <= 5)   return expand_help_topics();   // initial display
+   if (user_input.size() <= 5)   return expand_help_topics();   // initial display
 
-const UCS_string help(user, 0, 6);
-UCS_string prefix(user, 5, user.size() - 5);   // the name prefix
+const UCS_string help(user_input, 0, 6);
+UCS_string prefix(user_input, 5, user_input.size() - 5);   // the name prefix
    prefix.remove_leading_whitespaces();
 
 std::vector<const Symbol *> symbols = Workspace::get_all_symbols();
@@ -233,18 +237,18 @@ UCS_string_vector matches;
              // all matches can be extended in a unique way
              //
              matches[0].resize(common_len);
-             user = help + matches[0];
+             user_input = help + matches[0];
              return ER_REPLACE;
            }
 
         // all possible extensions are different
         //
-        return show_alternatives(user, prefix.size(), matches);
+        return show_alternatives(user_input, prefix.size(), matches);
       }
 
    // unique match
    //
-   user = help + matches[0];
+   user_input = help + matches[0];
    return ER_REPLACE;
 }
 //----------------------------------------------------------------------------
@@ -344,9 +348,8 @@ int c1 = col;
    return ER_AGAIN;
 }
 //----------------------------------------------------------------------------
-
 ExpandResult
-TabExpansion::expand_distinguished_name(UCS_string & user)
+TabExpansion::expand_distinguished_name(UCS_string & user_input)
 {
    // figure the length of longest ⎕xxx name (probably ⎕TRACE == 5)
    //
@@ -362,17 +365,17 @@ int qpos = -1;
 
    loop(e, max_e)
       {
-        if (e >= user.size())   break;
-        if (user[user.size() - e - 1] == UNI_Quad_Quad)
+        if (e >= user_input.size())   break;
+        if (user_input[user_input.size() - e - 1] == UNI_Quad_Quad)
            {
-             qpos = user.size() - e;
+             qpos = user_input.size() - e;
              break;
            }
       }
 
    if (qpos != -1)   // ⎕xxx at end
       {
-        UCS_string qxx(user, qpos, user.size() - qpos);
+        UCS_string qxx(user_input, qpos, user_input.size() - qpos);
         UCS_string_vector matches;
 
 #define ro_sv_def(_q, str, _txt) { UCS_string ustr(str);   \
@@ -410,16 +413,16 @@ int qpos = -1;
                  // qxx is a prefix of the common part of all matching ⎕xx.
                  // expand to common part.
                  //
-                 user = matches[0];
-                 user.resize(common_len);
+                 user_input = matches[0];
+                 user_input.resize(common_len);
                  return ER_REPLACE;
                }
            }
 
         // unique match
         //
-        user = UCS_string(UNI_Quad_Quad);
-        user.append(matches[0]);
+        user_input = UCS_string(UNI_Quad_Quad);
+        user_input.append(matches[0]);
         return ER_REPLACE;
       }
 
@@ -427,7 +430,96 @@ int qpos = -1;
 }
 //----------------------------------------------------------------------------
 ExpandResult
-TabExpansion::expand_filename(UCS_string & user,
+TabExpansion::expand_capability(UCS_string & user_input)
+{
+   // user has entered ']NEXTFILE ' and possibly the prefix of a capability
+   // argument on which ]NEXTFILE may depend. Expand the capability.
+   //
+UCS_string prefix(user_input, 9, user_input.size() - 9);
+   prefix.remove_leading_whitespaces();
+
+// CERR << "\nCAPABILITY: '" << user_input << "'" << endl;
+// CERR << "PREFIX:     '" << prefix << "'" << endl;
+
+const char * capabilities[] = { apl_CAPABILITIES };  // in alphabetical order
+enum { capabilities_count = sizeof(capabilities) / sizeof(const char *) };
+
+   if (prefix.size() == 0)   // no capability yet: display all.
+      {
+        loop(c, capabilities_count)
+            {
+              const char * cap = capabilities[c];
+              COUT << "have-" << cap << " no-" << cap << " " << endl;
+            }
+
+         return ER_IGNORE;
+      }
+
+   // at this point, prefix should start with either have- or no-. Expand
+   // if appropriate
+   if ( (prefix.size() == 1 && prefix.starts_iwith("H" ))  ||
+        (prefix.size() == 2 && prefix.starts_iwith("HA"))  ||
+        (prefix.size() == 3 && prefix.starts_iwith("HAV")) ||
+        (prefix.size() == 4 && prefix.starts_iwith("HAVE")))
+      {
+        user_input = UCS_string("]NEXTFILE HAVE-");
+        return ER_REPLACE;
+      }
+
+   if ( (prefix.size() == 1 && prefix.starts_iwith("N" )) ||
+        (prefix.size() == 2 && prefix.starts_iwith("NO")))
+      {
+        user_input = UCS_string("]NEXTFILE NO-");
+        return ER_REPLACE;
+      }
+
+   // got HAVE- or NO-; expand capability...
+   //
+vector<const char *> matches;
+UCS_string result;
+   if (prefix.size() >= 5 && prefix.starts_iwith("HAVE-"))
+      {
+        result = UCS_string("]NEXTFILE HAVE-");
+        const UCS_string suffix(prefix, 5, prefix.size() - 5);   // skip HAVE-
+        loop(c, capabilities_count)
+            {
+              const UTF8_string cap_utf8(capabilities[c]);
+              const UCS_string cap_ucs(cap_utf8);
+              if (cap_ucs.starts_iwith(suffix))
+                 matches.push_back(capabilities[c]);
+            }
+      }
+   else if (prefix.size() >= 3 && prefix.starts_iwith("NO-"))
+      {
+        result = UCS_string("]NEXTFILE NO-");
+        const UCS_string suffix(prefix, 3, prefix.size() - 3);   // skip NO-
+        loop(c, capabilities_count)
+            {
+              const UTF8_string cap_utf8(capabilities[c]);
+              const UCS_string cap_ucs(cap_utf8);
+              if (cap_ucs.starts_iwith(suffix))
+                 matches.push_back(capabilities[c]);
+            }
+      }
+   if (matches.size() == 0)   return ER_IGNORE;   // no match
+   if (matches.size() > 1)
+      {
+        COUT << endl;
+        loop(m, matches.size())   COUT << matches[m] << " ";
+        COUT << endl;
+
+        return ER_AGAIN;    // multiple matches
+      }
+
+   // unique match
+   //
+   result.append_ASCII(matches[0]);
+   user_input = result;
+   return ER_REPLACE;
+}
+//----------------------------------------------------------------------------
+ExpandResult
+TabExpansion::expand_filename(UCS_string & user_input,
                               ExpandHint ehint, const char * shint,
                               const UCS_string cmd, UCS_string arg)
 {
@@ -471,10 +563,10 @@ TabExpansion::expand_filename(UCS_string & user,
 
         if (arg.size() == 1 && !have_trailing_blank)   // no space yet
            {
-             user = cmd;
-             user.append(UNI_SPACE);
-             user.append(Unicode(arg[0]));
-             user.append(UNI_SPACE);
+             user_input = cmd;
+             user_input.append(UNI_SPACE);
+             user_input.append(Unicode(arg[0]));
+             user_input.append(UNI_SPACE);
              return ER_REPLACE;
            }
 
@@ -482,7 +574,7 @@ TabExpansion::expand_filename(UCS_string & user,
          //
          if (arg.size() == 1)   arg.erase(0);
          if (arg.size())        arg.erase(0);
-         return expand_wsname(user, cmd, lib, arg);
+         return expand_wsname(user_input, cmd, lib, arg);
       }
 
    // otherwise: real file name
@@ -544,18 +636,18 @@ TabExpansion::expand_filename(UCS_string & user,
      if (matches.size() > 1)
         {
           UCS_string prefix(base_utf);
-          user = cmd;                     // e.g. )LOAD
-          user.append(UNI_SPACE);
-          user.append(dir_ucs);           // e.g. )LOAD /usr/apl/
-          return show_alternatives(user, prefix.size(), matches);
+          user_input = cmd;                     // e.g. )LOAD
+          user_input.append(UNI_SPACE);
+          user_input.append(dir_ucs);           // e.g. )LOAD /usr/apl/
+          return show_alternatives(user_input, prefix.size(), matches);
         }
 
      // unique match
      //
-     user = cmd;
-     user.append(UNI_SPACE);
-     user.append(dir_ucs);
-     user.append(matches[0]);
+     user_input = cmd;
+     user_input.append(UNI_SPACE);
+     user_input.append(dir_ucs);
+     user_input.append(matches[0]);
      return ER_REPLACE;
    }
 
@@ -566,7 +658,7 @@ nothing:
 }
 //----------------------------------------------------------------------------
 ExpandResult
-TabExpansion::expand_wsname(UCS_string & user, const UCS_string cmd,
+TabExpansion::expand_wsname(UCS_string & user_input, const UCS_string cmd,
                        LibRef lib, const UCS_string filename)
 {
 UTF8_string path = LibPaths::get_lib_dir(lib);
@@ -591,8 +683,8 @@ DIR * dir = opendir(path.c_str());
 << "  At this point, you can use a path instead of the optional" << endl
 << "  library reference number and the workspace name." << endl;
 
-        user = cmd;
-        user.append(UNI_SPACE);
+        user_input = cmd;
+        user_input.append(UNI_SPACE);
         return ER_REPLACE;
       }
 
@@ -604,20 +696,20 @@ UTF8_string arg_utf(filename);
    if (matches.size() == 0)   goto nothing;
    if (matches.size() > 1)
       {
-        user = cmd;
-        user.append(UNI_SPACE);
-        user.append_number(lib);
-        user.append(UNI_SPACE);
-        return show_alternatives(user, filename.size(), matches);
+        user_input = cmd;
+        user_input.append(UNI_SPACE);
+        user_input.append_number(lib);
+        user_input.append(UNI_SPACE);
+        return show_alternatives(user_input, filename.size(), matches);
       }
 
    // unique match
    //
-   user = cmd;
-   user.append(UNI_SPACE);
-   user.append_UTF8(path.c_str());
-   user.append(UNI_SLASH);
-   user.append(matches[0]);
+   user_input = cmd;
+   user_input.append(UNI_SPACE);
+   user_input.append_UTF8(path.c_str());
+   user_input.append(UNI_SLASH);
+   user_input.append(matches[0]);
    return ER_REPLACE;
 
 nothing:
@@ -680,7 +772,7 @@ const bool only_workspaces = (ehint == EH_oLIB_WSNAME) ||
 }
 //----------------------------------------------------------------------------
 ExpandResult
-TabExpansion::show_alternatives(UCS_string & user, int prefix_len,
+TabExpansion::show_alternatives(UCS_string & user_input, int prefix_len,
                            UCS_string_vector & matches)
 {
 const int common_len = compute_common_length(prefix_len, matches);
@@ -703,9 +795,9 @@ const int common_len = compute_common_length(prefix_len, matches);
         // prefix is a prefix of the common part of all matching files.
         // expand to common part.
         //
-        const int usize = user.size();
-        user.append(matches[0]);
-        user.resize(usize + common_len);
+        const int usize = user_input.size();
+        user_input.append(matches[0]);
+        user_input.resize(usize + common_len);
         return ER_REPLACE;
       }
 }

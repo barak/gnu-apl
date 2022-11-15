@@ -17597,6 +17597,7 @@ apl_missing_headers=0
 for ac_header in                       \
    dirent.h                             \
    execinfo.h                           \
+   ext/atomicity.h                      \
    fcntl.h fenv.h                       \
    inttypes.h                           \
    limits.h                             \
@@ -21948,6 +21949,12 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
 fi
+
+
+cat >>confdefs.h <<_ACEOF
+#define apl_CAPABILITIES "⎕FFT", "GTK", "GUI","⎕PNG","POSTGRES","⎕PLOT","⎕RE","⎕SQL","SQLITE3","X11","XCB"
+_ACEOF
+
 
  { $as_echo ; $as_echo "    *** ./configure checks done, producing the Makefiles and config.h... ***"; $as_echo ; }
 

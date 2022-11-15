@@ -69,7 +69,7 @@ cmd_def( "]HELP"      , cmd_HELP(out, arg);                           , "[primit
 cmd_def( "]KEYB"      , cmd_KEYB(out);                                , ""                          , EH_NO_PARAM)
 cmd_def( "]LIB"       , cmd_LIB2(out, args);                          , "[lib|path] [from-to]"      , EH_DIR_OR_LIB)
 cmd_def( "]LOG"       , cmd_LOG(out, arg);                            , "[facility|ON|OFF] ..."     , EH_LOG_NUM)
-cmd_def( "]NEXTFILE"  , IO_Files::next_file();                        , ""                          , EH_NO_PARAM)
+cmd_def( "]NEXTFILE"  , cmd_NEXTFILE();                               , ""                          , EH_CONFIG)
 cmd_def( "]PUSHFILE"  , cmd_PUSHFILE();                               , ""                          , EH_NO_PARAM)
 cmd_def( "]OWNERS"    , Value::list_all(out, true);                   , ""                          , EH_NO_PARAM)
 cmd_def( "]PSTAT"     , cmd_PSTAT(out, arg);                          , "[CLEAR|SAVE]"              , EH_oCLEAR_SAVE)

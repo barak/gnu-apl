@@ -71,6 +71,9 @@ public:
    /// clean-up and exit from APL interpreter
    static void cmd_OFF(int exit_val);
 
+   /// continue with (jump to) next input file.
+   static void cmd_NEXTFILE();
+
    /// clean-up and exit from APL interpreter
    static void cmd_PUSHFILE();
 

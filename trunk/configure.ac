@@ -169,6 +169,7 @@ apl_missing_headers=0
 AC_CHECK_HEADERS([                      \
    dirent.h                             \
    execinfo.h                           \
+   ext/atomicity.h                      \
    fcntl.h fenv.h                       \
    inttypes.h                           \
    limits.h                             \
@@ -381,7 +382,7 @@ AC_COMPILE_IFELSE(
 AC_MSG_RESULT([$HAVE_PTHREAD_SETNAME_NP])
 
 ############################### atomicity checks ##############################
-# check for alternatives for ext/atomicity.h on OS/X 
+# check for alternatives for ext/atomicity.h on OS/X
 #
 AC_MSG_CHECKING([whether OSAtomicAdd32Barrier() is available])
 apl_save_CXXFLAGS=$CXXFLAGS
@@ -890,6 +891,10 @@ else   # normal build
    AC_DEFINE_UNQUOTED(apl_DIR__src, "$abs_apl_top",
                       [top-level GNU APL source directory])
 fi
+
+AC_DEFINE_UNQUOTED(apl_CAPABILITIES,
+["⎕FFT", "GTK", "GUI","⎕PNG","POSTGRES","⎕PLOT","⎕RE","⎕SQL","SQLITE3","X11","XCB"],
+[available capabilities])
 
 apl_TOPIC([./configure checks done, producing the Makefiles and config.h])
 

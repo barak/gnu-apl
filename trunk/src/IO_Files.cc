@@ -170,7 +170,7 @@ IO_Files::next_file()
       }
    else
       {
-        CERR << "]NEXTFILE: no file" << endl;
+        CERR << "]NEXTFILE: no current file" << endl;
       }
    open_next_file();
 }

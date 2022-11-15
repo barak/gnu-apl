@@ -5,7 +5,7 @@
 #define ARCHIVE_SVN " 19548"
 
 /* How and when GNU APL was configured */
-#define BUILDTAG PACKAGE_NAME, PACKAGE_VERSION " / SVN: 19569", "2022-11-14 10:34:18 UTC", "Linux 4.15.0-158-generic x86_64", "default ./configure options"
+#define BUILDTAG PACKAGE_NAME, PACKAGE_VERSION " / SVN: 19574", "2022-11-15 10:20:39 UTC", "Linux 4.15.0-158-generic x86_64", "default ./configure options"
 
 /* Define to 1 iff pthread_setaffinity_np() is available */
 #define HAVE_AFFINITY_NP 1
@@ -27,6 +27,9 @@
 
 /* Define to 1 if you have the <execinfo.h> header file. */
 #define HAVE_EXECINFO_H 1
+
+/* Define to 1 if you have the <ext/atomicity.h> header file. */
+#define HAVE_EXT_ATOMICITY_H 1
 
 /* Define to 1 if you have the <fcntl.h> header file. */
 #define HAVE_FCNTL_H 1
@@ -391,6 +394,9 @@
    <pthread.h>, or <semaphore.h> is not used. If the typedef were allowed, the
    #define below would cause a syntax error. */
 /* #undef _UINT8_T */
+
+/* available capabilities */
+#define apl_CAPABILITIES "⎕FFT", "GTK", "GUI","⎕PNG","POSTGRES","⎕PLOT","⎕RE","⎕SQL","SQLITE3","X11","XCB"
 
 /* --bindir */
 #define apl_DIR__bin "/usr/local/bin"

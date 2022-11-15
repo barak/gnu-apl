@@ -27,6 +27,9 @@
 /* Define to 1 if you have the <execinfo.h> header file. */
 #undef HAVE_EXECINFO_H
 
+/* Define to 1 if you have the <ext/atomicity.h> header file. */
+#undef HAVE_EXT_ATOMICITY_H
+
 /* Define to 1 if you have the <fcntl.h> header file. */
 #undef HAVE_FCNTL_H
 
@@ -390,6 +393,9 @@
    <pthread.h>, or <semaphore.h> is not used. If the typedef were allowed, the
    #define below would cause a syntax error. */
 #undef _UINT8_T
+
+/* available capabilities */
+#undef apl_CAPABILITIES
 
 /* --bindir */
 #undef apl_DIR__bin
