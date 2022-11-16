@@ -467,10 +467,14 @@ UCS_string prefix = user_input.drop(prefix_len);
       {
         loop(c, capabilities_count)
             {
-              const char * cap = CAPABILITIES[c];
-              COUT << "have-" << cap << " no-" << cap << " " << endl;
+               const UTF8_string capa_utf(CAPABILITIES[c]);
+               UCS_string capa_ucs(capa_utf);
+               capa_ucs.append_ASCII("            ");
+               if ((c % 3) == 0)   COUT << endl;
+               COUT << "have-" << UCS_string(capa_ucs, 0, 9)
+                    << "no-"   << UCS_string(capa_ucs, 0, 9);
             }
-
+         COUT << endl;
          return ER_AGAIN;
       }
 
