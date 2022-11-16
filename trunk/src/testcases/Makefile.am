@@ -132,6 +132,7 @@ dist_noinst_DATA =                              \
         Quad_NC.tc                              \
         Quad_NL.tc                              \
         Quad_PLOT.tc                            \
+        Quad_PNG.tc                             \
         Quad_PP.tc                              \
         Quad_PR.tc                              \
         Quad_PW.tc                              \

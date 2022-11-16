@@ -3791,9 +3791,9 @@ standard) a single pixel may have one, two, three, or four color components,
 or short colors, as follows:
 
 @itemize
-@item A pixel with @strong{one} color defines an uncolored (grayscale)
+@item a pixel with @strong{one} color defines an uncolored (grayscale)
 pixel between black and white,
-@item A pixel with @strong{two} colors defines a grayscale pixels between
+@item a pixel with @strong{two} colors defines a grayscale pixels between
 black and white, and its opacity (see below),
 @item a pixel with @strong{three} colors defines a colored pixel whose colors
 are red, green and blue (or RGB for short), and
@@ -3802,7 +3802,7 @@ are red, green and blue (or RGB for short), and
 @end itemize
 
 The opacity (sometimes called the "alpha channel" and abbreviated A in the
-RGBA foremat) defines how transparent a pixel is; lower values cause the
+RGBA format) defines how transparent a pixel is; lower values cause the
 background of a pixel to shine through while larger values make the pixel
 more opaque. One important use of the alpha channel is images that shall
 not appear rectangular (even though theirunderlying colour matrix is).
@@ -3832,9 +3832,9 @@ direction, and
 direction.
 @end itemize
 
-Above is: @strong{Width} is the number of pixels in the horizontal direction,
-@strong{Height} the number of the pixels in the vertical direction, and
-@strong{Colors} the number of color components as above. For simplicity we
+Above is: @strong{WIDTH} the number of pixels in the horizontal direction,
+@strong{HEIGHT} the number of the pixels in the vertical direction, and
+@strong{COLORS} the number of color components as above. For simplicity we
 can treat the opacity as yet another color although, strictly speaking, it
 is not.
 
@@ -3905,23 +3905,35 @@ the screen (interactive used of PNG), and
 The desired purpose is dictated by the properties of @strong{B}:
 
 @itemize
-@item If @strong{B} is an APL text vector (i.e. a string) then ⎕PNG will
-  read the file with that name and return an numeric APL array with rank 3
-  containing the color components of the image in the file as described above.
-@item If the rank of @strong{B} is 3 then @strong{B} must be numeric (with
-  values between 0.0 and 1.0) and is then is assumed to be an array in the
-  GNU APL color model (such as the result of the case above). This image is
-  is being displayed in a window on the screen (which survives even after
+@item Any APL text vector (i.e. a string) @strong{B} is taken as the name of
+   a file that supposedly contains an image in the PNG format. ⎕PNG will
+  read the file and return the pixels in it as a numeric APL array with rank 3.
+  The array containing the color components of the image in the file as
+  described above.
+@item Any array @strong{B} with rank 3 must be numeric (with values from
+  0.0 to 1.0) and is then assumed to be an array in the GNU APL color model
+  (such as the result of the case above). This image is is being displayed
+  in a new window on the screen; the windows survives even after
   ⎕PNG has returned.  The result returned by ⎕PNG is a window handle
-  (a number identifying this window) which may later be used (in the case
-  described below) to close the window programmatically from APL.
-  Alternatively the window can also be closed interactively by the user
-  via its close button.
+  (a positive integer identifying the window) which may later be used
+  (in the case described below) to close the window programmatically
+  from APL.  Alternatively the window can also be closed interactively by
+  the user via its close button.
 @item Finally, if @strong{B} is a numeric scalar then it fine-tunes the
-  ⎕PNG behaviour. Positive numbers are taken as window handles returned in
-  the case above and will close the window with that handle. ⎕PNG ¯3 closes
-  all open ⎕PNG windows, other numbers control debug facilities inside ⎕PNG
-  and are not of general interest here.
+  ⎕PNG behaviour:
+
+@itemize
+@item  ⎕PNG N with N ≥ 1 (as returned in the case above) closes the window 
+       with handle N programatically.
+
+@item ⎕PNG 0 disables all debug printouts related to ⎕PNG.
+@item ⎕PNG ¯1 turns on a debug printout related to ⎕PNG (X events).
+@item ⎕PNG ¯2 turns on a debug printout related to ⎕PNG (image data).
+@item ⎕PNG ¯3 closes all open ⎕PNG windows.
+@item ⎕PNG ¯4 turns on a debug printout related to ⎕PNG (GTK drawing).
+@item ⎕PNG ¯5 turns on a debug printout related to ⎕PNG (function calls).
+@item ⎕PNG ¯6 returns a vector of all all open ⎕PNG window handles.
+@end itemize
 @end itemize
 
 @subsection Dyadic ⎕PNG

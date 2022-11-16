@@ -30,27 +30,34 @@
 
 //----------------------------------------------------------------------------
 TabExpansion::TabExpansion(UCS_string & line)
-   : have_trailing_blank(line.size() && line.back() == ' ')
+   : have_trailing_blank(line.size() && line.back() == UNI_SPACE)
 {
 }
 //----------------------------------------------------------------------------
 ExpandResult
 TabExpansion::expand_tab(UCS_string & user_input)
 {
+   // the user has entered user_input and then pressed TAB.
+   // Try to expand user_input. At this level we distinguish between:
+   //
+   // user-defined names  (variables and functions),
+   // distinguished names (⎕xxx variables and functions), and
+   // APL commands,
+
    // skip leading and trailing blanks
    //
    user_input.remove_leading_and_trailing_whitespaces();
 
    if (user_input.size() == 0)                      // nothing entered yet
+      return expand_user_name(user_input);          // assume user-defined nam
+
+   if (Avec::is_first_symbol_char(user_input[0]))   // start of user-defined name
       return expand_user_name(user_input);
 
-   if (Avec::is_first_symbol_char(user_input[0]))   // start of user defined name
-      return expand_user_name(user_input);
-
-   if (user_input[0] == ')' || user_input[0] == ']')      // APL command
+   if (user_input[0] == ')' || user_input[0] == ']')   // APL command
       return expand_APL_command(user_input);
 
-   return expand_distinguished_name(user_input);
+   return expand_distinguished_name(user_input);       // ⎕xxx
 }
 //----------------------------------------------------------------------------
 ExpandResult
@@ -96,80 +103,75 @@ TabExpansion::expand_APL_command(UCS_string & user_input)
 {
 ExpandHint ehint = EH_NO_PARAM;
 const char * shint = 0;
-UCS_string_vector matches;
-UCS_string cmd = user_input;
-UCS_string arg;
-   cmd.split_ws(arg);
+UCS_string cmd = user_input;   // command and argument
+UCS_string arg;                // argument
+   cmd.split_ws(arg);          // command only
 
-#define cmd_def(cmd_str, code, arg, hint)                \
-   { UCS_string ustr(cmd_str);                           \
-     if (ustr.starts_iwith(cmd))                         \
+   // scan Command.def for all commands that start with cmd.
+   // have_trailing_blank tells if user_input is a command prefix or a
+   // complete command.
+   //
+UCS_string_vector matches;
+   if (have_trailing_blank || arg.size())   // cmd is a complete command
+      {
+#define cmd_def(cmd_str, code, arg, hint)                           \
+   { UCS_string ustr(cmd_str);                                      \
+     if (cmd.size() == strlen(cmd_str) && ustr.starts_iwith(cmd))   \
         { matches.push_back(ustr); ehint = hint; shint = arg; } }
 #include "Command.def"
+
+      }
+   else                       // command prefix
+      {
+#define cmd_def(cmd_str, code, arg, hint)                           \
+   { UCS_string ustr(cmd_str);                                      \
+     if (ustr.starts_iwith(cmd))                                    \
+        { matches.push_back(ustr); ehint = hint; shint = arg; } }
+#include "Command.def"
+      }
 
    // no match was found: ignore the TAB
    //
    if (matches.size() == 0)   return ER_IGNORE;
-
-   // if we have multiple matches but the user has provided a command
-   // argument then some matches were wrong. For example:
-   //
-   // LIB 3 matches LIB and LIBS
-   //
-   // remove wrong matches
-   //
-   if (matches.size() > 1 && arg.size() > 0)
-      {
-         again:
-        if (matches.size() > 1)
-           {
-             loop(m, matches.size())
-                {
-                  if (matches[m].size() != cmd.size())   // wrong match
-                     {
-                       matches[m].swap(matches.back());
-                       matches.pop_back();
-                       goto again;
-                     }
-                }
-           }
-      }
 
    // if multiple matches were found then either expand the common part
    // or list all matches
    //
    if (matches.size() > 1)   // multiple commands match cmd
       {
+        Assert(arg.size() == 0);   // due to parti
         user_input.clear();
         return show_alternatives(user_input, cmd.size(), matches);
       }
 
-   // unique match
+   // unique match for cmd
    //
-   if (cmd.size() < matches[0].size())
+const UCS_string & match = matches[0];
+   if (cmd.size() < match.size())   // cmd is a (unique) prefix of a command
       {
-        // the command is longer than user_input, so we expand it.
+        // the user input is a prefix of the matched command. Expand it.
         //
-        user_input = matches[0];
+        user_input = match;
         if (ehint != EH_NO_PARAM)   user_input.append(UNI_SPACE);
         return ER_REPLACE;
       }
 
-   if (cmd.size() == matches[0].size() &&
-       ehint != EH_NO_PARAM            &&
-       arg.size() == 0                 &&
-       !have_trailing_blank)   // no blank entered
+   Assert(cmd.size() == match.size());
+
+   if (ehint == EH_NO_PARAM)   return ER_IGNORE;
+
+   if (arg.size() == 0 && !have_trailing_blank)   // no args yet
       {
-             // the entire command was entered but without a blank. If the
-             // command has arguments then append a space to indicate that.
-             // Otherwiese fall throught to expand_command_arg();
-             //
-             user_input = matches[0];
-             user_input.append(UNI_SPACE);
-             return ER_REPLACE;
+        // the entire command was entered but without a blank. If the
+        // command has arguments then append a space to indicate that.
+        // Otherwiese fall throught to expand_command_arg();
+        //
+        user_input = match;
+        user_input.append(UNI_SPACE);
+        return ER_REPLACE;
       }
 
-   return expand_command_arg(user_input, ehint, shint, matches[0], arg);
+   return expand_command_arg(user_input, ehint, shint, match, arg);
 }
 //----------------------------------------------------------------------------
 ExpandResult
@@ -452,6 +454,15 @@ int prefix_len = 0;
 const char * CAPABILITIES[] = { apl_CAPABILITIES };
 enum { capabilities_count = sizeof(CAPABILITIES) / sizeof(*CAPABILITIES) };
 
+UCS_string stem(user_input, 0, prefix_len);
+UCS_string prefix = user_input.drop(prefix_len);
+
+#if 0
+    CERR << "\nUSER: '" << user_input << "'" << endl;
+    CERR << "STEM: '" << stem << "'" << endl;
+    CERR << "PREFIX: '" << prefix << "'" << endl;
+#endif
+
    if (prefix_len == 0)   // no capability argument: display all.
       {
         loop(c, capabilities_count)
@@ -460,14 +471,8 @@ enum { capabilities_count = sizeof(CAPABILITIES) / sizeof(*CAPABILITIES) };
               COUT << "have-" << cap << " no-" << cap << " " << endl;
             }
 
-         return ER_REPLACE;
+         return ER_AGAIN;
       }
-
-UCS_string stem(user_input, 0, prefix_len);
-UCS_string prefix = user_input.drop(prefix_len);
-
-// CERR << "\nCAPABILITY: '" << user_input << "'" << endl;
-// CERR << "PREFIX:     '" << prefix << "'" << endl;
 
    // at this point, prefix should start with either HAVE- or NO-.
    // Expand prefix if appropriate

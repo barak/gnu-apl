@@ -275,7 +275,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Chapter 1</a>, Up: <a href="
 <a name="GNU-APL"></a>
 <h1 class="top">GNU APL</h1>
 
-<p>November 5, 2022
+<p>November 16, 2022
 </p>
 <p>This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
@@ -4067,9 +4067,9 @@ standard) a single pixel may have one, two, three, or four color components,
 or short colors, as follows:
 </p>
 <ul>
-<li> A pixel with <strong>one</strong> color defines an uncolored (grayscale)
+<li> a pixel with <strong>one</strong> color defines an uncolored (grayscale)
 pixel between black and white,
-</li><li> A pixel with <strong>two</strong> colors defines a grayscale pixels between
+</li><li> a pixel with <strong>two</strong> colors defines a grayscale pixels between
 black and white, and its opacity (see below),
 </li><li> a pixel with <strong>three</strong> colors defines a colored pixel whose colors
 are red, green and blue (or RGB for short), and
@@ -4078,7 +4078,7 @@ are red, green and blue (or RGB for short), and
 </li></ul>
 
 <p>The opacity (sometimes called the &quot;alpha channel&quot; and abbreviated A in the
-RGBA foremat) defines how transparent a pixel is; lower values cause the
+RGBA format) defines how transparent a pixel is; lower values cause the
 background of a pixel to shine through while larger values make the pixel
 more opaque. One important use of the alpha channel is images that shall
 not appear rectangular (even though theirunderlying colour matrix is).
@@ -4108,9 +4108,9 @@ direction, and
 direction.
 </li></ul>
 
-<p>Above is: <strong>Width</strong> is the number of pixels in the horizontal direction,
-<strong>Height</strong> the number of the pixels in the vertical direction, and
-<strong>Colors</strong> the number of color components as above. For simplicity we
+<p>Above is: <strong>WIDTH</strong> the number of pixels in the horizontal direction,
+<strong>HEIGHT</strong> the number of the pixels in the vertical direction, and
+<strong>COLORS</strong> the number of color components as above. For simplicity we
 can treat the opacity as yet another color although, strictly speaking, it
 is not.
 </p>
@@ -4182,23 +4182,35 @@ the screen (interactive used of PNG), and
 <p>The desired purpose is dictated by the properties of <strong>B</strong>:
 </p>
 <ul>
-<li> If <strong>B</strong> is an APL text vector (i.e. a string) then ⎕PNG will
-  read the file with that name and return an numeric APL array with rank 3
-  containing the color components of the image in the file as described above.
-</li><li> If the rank of <strong>B</strong> is 3 then <strong>B</strong> must be numeric (with
-  values between 0.0 and 1.0) and is then is assumed to be an array in the
-  GNU APL color model (such as the result of the case above). This image is
-  is being displayed in a window on the screen (which survives even after
+<li> Any APL text vector (i.e. a string) <strong>B</strong> is taken as the name of
+   a file that supposedly contains an image in the PNG format. ⎕PNG will
+  read the file and return the pixels in it as a numeric APL array with rank 3.
+  The array containing the color components of the image in the file as
+  described above.
+</li><li> Any array <strong>B</strong> with rank 3 must be numeric (with values from
+  0.0 to 1.0) and is then assumed to be an array in the GNU APL color model
+  (such as the result of the case above). This image is is being displayed
+  in a new window on the screen; the windows survives even after
   ⎕PNG has returned.  The result returned by ⎕PNG is a window handle
-  (a number identifying this window) which may later be used (in the case
-  described below) to close the window programmatically from APL.
-  Alternatively the window can also be closed interactively by the user
-  via its close button.
+  (a positive integer identifying the window) which may later be used
+  (in the case described below) to close the window programmatically
+  from APL.  Alternatively the window can also be closed interactively by
+  the user via its close button.
 </li><li> Finally, if <strong>B</strong> is a numeric scalar then it fine-tunes the
-  ⎕PNG behaviour. Positive numbers are taken as window handles returned in
-  the case above and will close the window with that handle. ⎕PNG ¯3 closes
-  all open ⎕PNG windows, other numbers control debug facilities inside ⎕PNG
-  and are not of general interest here.
+  ⎕PNG behaviour:
+
+<ul>
+<li> ⎕PNG N with N ≥ 1 (as returned in the case above) closes the window 
+       with handle N programatically.
+
+</li><li> ⎕PNG 0 disables all debug printouts related to ⎕PNG.
+</li><li> ⎕PNG ¯1 turns on a debug printout related to ⎕PNG (X events).
+</li><li> ⎕PNG ¯2 turns on a debug printout related to ⎕PNG (image data).
+</li><li> ⎕PNG ¯3 closes all open ⎕PNG windows.
+</li><li> ⎕PNG ¯4 turns on a debug printout related to ⎕PNG (GTK drawing).
+</li><li> ⎕PNG ¯5 turns on a debug printout related to ⎕PNG (function calls).
+</li><li> ⎕PNG ¯6 returns a vector of all all open ⎕PNG window handles.
+</li></ul>
 </li></ul>
 
 <a name="Dyadic-_005b_003f_005dPNG"></a>

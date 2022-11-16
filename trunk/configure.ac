@@ -172,6 +172,7 @@ AC_CHECK_HEADERS([                      \
    ext/atomicity.h                      \
    fcntl.h fenv.h                       \
    inttypes.h                           \
+   libpng16/png.h                       \
    limits.h                             \
    malloc.h                             \
    netdb.h                              \
@@ -180,6 +181,7 @@ AC_CHECK_HEADERS([                      \
    sys/un.h                             \
    termios.h                            \
    unistd.h utmpx.h                     \
+   zlib.h                               \
                  ],, apl_missing_headers=$(($apl_missing_headers + 1)))
 
 # Checks for typedefs, structures, and compiler characteristics.

@@ -5,7 +5,7 @@
 #define ARCHIVE_SVN " 19548"
 
 /* How and when GNU APL was configured */
-#define BUILDTAG PACKAGE_NAME, PACKAGE_VERSION " / SVN: 19584", "2022-11-15 16:55:05 UTC", "Linux 4.15.0-158-generic x86_64", "default ./configure options"
+#define BUILDTAG PACKAGE_NAME, PACKAGE_VERSION " / SVN: 19590", "2022-11-16 15:40:28 UTC", "Linux 4.15.0-158-generic x86_64", "default ./configure options"
 
 /* Define to 1 iff pthread_setaffinity_np() is available */
 #define HAVE_AFFINITY_NP 1
@@ -99,6 +99,9 @@
 
 /* Define to 1 if you have the `png' library (-lpng). */
 #define HAVE_LIBPNG 1
+
+/* Define to 1 if you have the <libpng16/png.h> header file. */
+#define HAVE_LIBPNG16_PNG_H 1
 
 /* Define to 1 if you have the `pthread' library (-lpthread). */
 #define HAVE_LIBPTHREAD 1
@@ -311,6 +314,9 @@
 
 /* Define to 1 if you have the <xcb/xcb.h> header file. */
 #define HAVE_XCB_XCB_H 1
+
+/* Define to 1 if you have the <zlib.h> header file. */
+#define HAVE_ZLIB_H 1
 
 /* Define to 1 if the system has the type `_Bool'. */
 /* #undef HAVE__BOOL */

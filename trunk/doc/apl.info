@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-November 5, 2022
+November 16, 2022
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
@@ -3670,9 +3670,9 @@ language for manipulating images.  In GNU APL (and also in the PNG
 standard) a single pixel may have one, two, three, or four color
 components, or short colors, as follows:
 
-   • A pixel with *one* color defines an uncolored (grayscale) pixel
+   • a pixel with *one* color defines an uncolored (grayscale) pixel
      between black and white,
-   • A pixel with *two* colors defines a grayscale pixels between black
+   • a pixel with *two* colors defines a grayscale pixels between black
      and white, and its opacity (see below),
    • a pixel with *three* colors defines a colored pixel whose colors
      are red, green and blue (or RGB for short), and
@@ -3680,7 +3680,7 @@ components, or short colors, as follows:
      (RGBA for short).
 
    The opacity (sometimes called the "alpha channel" and abbreviated A
-in the RGBA foremat) defines how transparent a pixel is; lower values
+in the RGBA format) defines how transparent a pixel is; lower values
 cause the background of a pixel to shine through while larger values
 make the pixel more opaque.  One important use of the alpha channel is
 images that shall not appear rectangular (even though theirunderlying
@@ -3707,11 +3707,11 @@ dimenstional Array *Image* where:
    • *Width* is the number of pixels of the image in the horizontal
      direction.
 
-   Above is: *Width* is the number of pixels in the horizontal
-direction, *Height* the number of the pixels in the vertical direction,
-and *Colors* the number of color components as above.  For simplicity we
-can treat the opacity as yet another color although, strictly speaking,
-it is not.
+   Above is: *WIDTH* the number of pixels in the horizontal direction,
+*HEIGHT* the number of the pixels in the vertical direction, and
+*COLORS* the number of color components as above.  For simplicity we can
+treat the opacity as yet another color although, strictly speaking, it
+is not.
 
    For an image I, the horizontal pixel position I[;;x] increases from
 left to right and the vertical pixel position I[;y;] increases from top
@@ -3779,24 +3779,36 @@ Monadic ⎕PNG, i.e.  ⎕PNG B is used for 3 purposes:
 
    The desired purpose is dictated by the properties of *B*:
 
-   • If *B* is an APL text vector (i.e.  a string) then ⎕PNG will read
-     the file with that name and return an numeric APL array with rank 3
-     containing the color components of the image in the file as
-     described above.
-   • If the rank of *B* is 3 then *B* must be numeric (with values
-     between 0.0 and 1.0) and is then is assumed to be an array in the
-     GNU APL color model (such as the result of the case above).  This
-     image is is being displayed in a window on the screen (which
-     survives even after ⎕PNG has returned.  The result returned by ⎕PNG
-     is a window handle (a number identifying this window) which may
-     later be used (in the case described below) to close the window
+   • Any APL text vector (i.e.  a string) *B* is taken as the name of a
+     file that supposedly contains an image in the PNG format.  ⎕PNG
+     will read the file and return the pixels in it as a numeric APL
+     array with rank 3.  The array containing the color components of
+     the image in the file as described above.
+   • Any array *B* with rank 3 must be numeric (with values from 0.0 to
+     1.0) and is then assumed to be an array in the GNU APL color model
+     (such as the result of the case above).  This image is is being
+     displayed in a new window on the screen; the windows survives even
+     after ⎕PNG has returned.  The result returned by ⎕PNG is a window
+     handle (a positive integer identifying the window) which may later
+     be used (in the case described below) to close the window
      programmatically from APL. Alternatively the window can also be
      closed interactively by the user via its close button.
    • Finally, if *B* is a numeric scalar then it fine-tunes the ⎕PNG
-     behaviour.  Positive numbers are taken as window handles returned
-     in the case above and will close the window with that handle.  ⎕PNG
-     ¯3 closes all open ⎕PNG windows, other numbers control debug
-     facilities inside ⎕PNG and are not of general interest here.
+     behaviour:
+
+        • ⎕PNG N with N ≥ 1 (as returned in the case above) closes the
+          window with handle N programatically.
+
+        • ⎕PNG 0 disables all debug printouts related to ⎕PNG.
+        • ⎕PNG ¯1 turns on a debug printout related to ⎕PNG (X events).
+        • ⎕PNG ¯2 turns on a debug printout related to ⎕PNG (image
+          data).
+        • ⎕PNG ¯3 closes all open ⎕PNG windows.
+        • ⎕PNG ¯4 turns on a debug printout related to ⎕PNG (GTK
+          drawing).
+        • ⎕PNG ¯5 turns on a debug printout related to ⎕PNG (function
+          calls).
+        • ⎕PNG ¯6 returns a vector of all all open ⎕PNG window handles.
 
 2.32.3 Dyadic ⎕PNG
 ------------------
@@ -6762,65 +6774,65 @@ please read <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 
 Tag Table:
 Node: Top383
-Node: Chapter 11575
-Node: Chapter 223285
-Node: Section 2.125234
-Node: Section 2.245809
-Node: Section 2.346568
-Node: Section 2.447843
-Node: Section 2.552288
-Node: Section 2.652461
-Node: Section 2.753091
-Node: Section 2.857044
-Node: Section 2.958579
-Node: Section 2.1060671
-Node: Section 2.1162225
-Node: Section 2.1264010
-Node: Section 2.1365950
-Node: Section 2.1466891
-Node: Section 2.1567143
-Node: Section 2.1668539
-Node: Section 2.1778652
-Node: Section 2.1881174
-Node: Section 2.1987881
-Node: Section 2.2089326
-Node: Section 2.2194987
-Node: Section 2.22100021
-Node: Section 2.23103302
-Node: Section 2.24103593
-Node: Section 2.25114418
-Node: Section 2.26114690
-Node: Section 2.27121268
-Node: Section 2.28123728
-Node: Section 2.29124397
-Node: Section 2.30126048
-Node: Section 2.31129837
-Node: Output File Format141837
-Node: Section 2.32143012
-Node: Section 2.33151893
-Node: Section 2.34152920
-Node: Section 2.35167636
-Node: Section 2.36177703
-Node: Section 2.37181822
-Node: Section 2.38183917
-Node: Section 2.39188342
-Node: Chapter 3209692
-Node: Chapter 4212193
-Node: Chapter 5213319
-Node: Section 5.1214856
-Node: Section 5.2216136
-Node: Section 5.3216496
-Node: Section 5.4216738
-Node: Section 5.5217400
-Node: Section 5.6217878
-Node: Section 5.7218650
-Node: Section 5.8219107
-Node: Chapter 6219509
-Node: Section 6.1219928
-Node: Section 6.2220615
-Node: Chapter 7221446
-Node: Section 7.1221949
-Node: Section 7.2247263
+Node: Chapter 11576
+Node: Chapter 223286
+Node: Section 2.125235
+Node: Section 2.245810
+Node: Section 2.346569
+Node: Section 2.447844
+Node: Section 2.552289
+Node: Section 2.652462
+Node: Section 2.753092
+Node: Section 2.857045
+Node: Section 2.958580
+Node: Section 2.1060672
+Node: Section 2.1162226
+Node: Section 2.1264011
+Node: Section 2.1365951
+Node: Section 2.1466892
+Node: Section 2.1567144
+Node: Section 2.1668540
+Node: Section 2.1778653
+Node: Section 2.1881175
+Node: Section 2.1987882
+Node: Section 2.2089327
+Node: Section 2.2194988
+Node: Section 2.22100022
+Node: Section 2.23103303
+Node: Section 2.24103594
+Node: Section 2.25114419
+Node: Section 2.26114691
+Node: Section 2.27121269
+Node: Section 2.28123729
+Node: Section 2.29124398
+Node: Section 2.30126049
+Node: Section 2.31129838
+Node: Output File Format141838
+Node: Section 2.32143013
+Node: Section 2.33152411
+Node: Section 2.34153438
+Node: Section 2.35168154
+Node: Section 2.36178221
+Node: Section 2.37182340
+Node: Section 2.38184435
+Node: Section 2.39188860
+Node: Chapter 3210210
+Node: Chapter 4212711
+Node: Chapter 5213837
+Node: Section 5.1215374
+Node: Section 5.2216654
+Node: Section 5.3217014
+Node: Section 5.4217256
+Node: Section 5.5217918
+Node: Section 5.6218396
+Node: Section 5.7219168
+Node: Section 5.8219625
+Node: Chapter 6220027
+Node: Section 6.1220446
+Node: Section 6.2221133
+Node: Chapter 7221964
+Node: Section 7.1222467
+Node: Section 7.2247781
 
 End Tag Table
 

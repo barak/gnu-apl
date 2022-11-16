@@ -589,7 +589,7 @@ UCS_string::split_ws(UCS_string & rest)
 
    loop(clen, size())
        {
-         if (Avec::is_white(at(clen)))   // whilespace: end of command
+         if (Avec::is_white(at(clen)))   // first whilespace: end of command
             {
               ShapeItem arg = clen;
               while (arg < size() && Avec::is_white(at(arg)))   ++arg;
