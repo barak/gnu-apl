@@ -610,6 +610,8 @@ const bool log_startup = uprefs.parse_argv_1() || log_startup0;
 int
 main(int argc, const char *argv[])
 {
+   setlocale(LC_ALL, "C");   // needed for portable snprintf()
+
    if (const int ret = init_apl(argc, argv))   return ret;
 
    if (uprefs.eval_exprs.size())

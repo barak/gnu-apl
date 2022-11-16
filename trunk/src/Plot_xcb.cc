@@ -1237,6 +1237,8 @@ const Colormap cmap = XDefaultColormap(dpy, screen);
 void *
 plot_main(void * vp_props)
 {
+   setlocale(LC_ALL, "C");   // needed for portable snprintf()
+
 Plot_window_properties & w_props =
       *reinterpret_cast<Plot_window_properties *>(vp_props);
 const char * outfile = strdup(w_props.get_output_filename().c_str());

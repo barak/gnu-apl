@@ -1494,6 +1494,8 @@ cairo_surface_t * surface = gdk_window_create_similar_surface(
 static void *
 gtk_main_wrapper(void * w_props)
 {
+   setlocale(LC_ALL, "C");   // needed for portable snprintf()
+
    gtk_main();
 
    if (verbosity & SHOW_EVENTS)   CERR << "gtk_main() thread done" << endl;

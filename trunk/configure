@@ -17601,6 +17601,7 @@ for ac_header in                       \
    fcntl.h fenv.h                       \
    inttypes.h                           \
    libpng16/png.h                       \
+   locale.h                             \
    limits.h                             \
    malloc.h                             \
    netdb.h                              \

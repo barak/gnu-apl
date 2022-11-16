@@ -360,6 +360,8 @@ Parallel::worker_main(void * arg)
 {
 Thread_context & tctx = *reinterpret_cast<Thread_context *>(arg);
 
+   setlocale(LC_ALL, "C");   // needed for portable snprintf()
+
    Log(LOG_Parallel)
       {
         PRINT_LOCKED(CERR << "worker #" << tctx.get_N() << " started" << endl)

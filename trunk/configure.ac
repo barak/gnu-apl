@@ -173,6 +173,7 @@ AC_CHECK_HEADERS([                      \
    fcntl.h fenv.h                       \
    inttypes.h                           \
    libpng16/png.h                       \
+   locale.h                             \
    limits.h                             \
    malloc.h                             \
    netdb.h                              \
