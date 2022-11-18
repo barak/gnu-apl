@@ -1589,22 +1589,45 @@ Plot_context * pctx = new Plot_context(w_props);
 
    pctx->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
    Assert(pctx->window);
-   gtk_window_set_title(GTK_WINDOW(pctx->window),
-                          w_props.get_caption().c_str());
+   if (w_props.get_user_caption())   // the user has dictated the caption
+      {
+        gtk_window_set_title(GTK_WINDOW(pctx->window),
+                             w_props.get_caption().c_str());
+      }
+   else   // default caption ("⎕PLOT": add the handle
+     {
+       char cc[50];
+       snprintf(cc, sizeof(cc),
+                "%s %d", w_props.get_caption().c_str(), pctx->handle);
+        gtk_window_set_title(GTK_WINDOW(pctx->window), cc);
+     }
+
    gtk_window_set_resizable(GTK_WINDOW(pctx->window), true);
 
    pctx->drawing_area = gtk_drawing_area_new();
    gtk_container_add(GTK_CONTAINER(pctx->window), pctx->drawing_area);
 
-   // resize the drawing_area before showing it so that draw_callback() won't be
-   // called twice.
+   // resize the drawing_area before showing it so that draw_callback()
+   // will not be called twice.
    //
    gtk_widget_set_size_request(GTK_WIDGET(pctx->drawing_area),
                                           pctx->get_total_width(),
                                           pctx->get_total_height());
 
-   gtk_window_move(GTK_WINDOW(pctx->window), w_props.get_pw_pos_X(),
-                                             w_props.get_pw_pos_Y());
+   if (w_props.get_user_pw_pos())   // the user has dictated pw_pos
+      {
+        gtk_window_move(GTK_WINDOW(pctx->window),
+                        w_props.get_pw_pos_X(),
+                        w_props.get_pw_pos_Y());
+      }
+   else                             // the default pw_pos
+      {
+        // display the windows at different positions so that the user
+        // can see their captions (and their close buttons).
+        gtk_window_move(GTK_WINDOW(pctx->window),
+                        w_props.get_pw_pos_X() + 50*(pctx->handle - 1),
+                        w_props.get_pw_pos_Y() + 50*(pctx->handle - 1));
+      }
 
    gtk_widget_show_all(pctx->window);
 

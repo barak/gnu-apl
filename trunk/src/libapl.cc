@@ -25,6 +25,7 @@
 #include <sstream>
 #include <ostream>
 
+/// prevent 'protected:' declaration in some C functions.
 #define __LIBAPL__ 1
 
 #include <Command.hh>
@@ -115,7 +116,7 @@ Value_P Z(ucs, loc);
    return Z.get();
 }
 
-/******************************************************************************
+/** ***************************************************************************
    2. APL value destructor function. All non-0 APL_values must be released
       at some point in time (even const ones). release_value(0) is not needed
       but accepted.
@@ -219,6 +220,9 @@ Value_P sub = val->get_cravel(idx).get_pointer_value();
  */
 
 //----------------------------------------------------------------------------
+/// return a value with the given rank and shape with all ravel items
+/// initialized to 0. Optionally, assing that value to a variable with the
+/// given name.
 APL_value
 assign_var(const unsigned int * var_name_ucs, int rank, uint64_t * shape)
 {
@@ -231,9 +235,9 @@ Value_P Z(sh, LOC);
 
    if (var_name_ucs == 0)
       {
-        // the caller wants only q value initialized to 0 without
-        // assigning it to a value. We have to increment the owner count
-        // and the caller is responsiblr fopr decrementing it when the
+        // the caller wants only a value initialized to 0, but WITHOUT
+        // ASSIGNING IT TO A VARIABLE. We have to increment the owner count
+        // and the caller is responsible for decrementing it when the
         // value is no longer needed.
         //
         Z.get()->increment_owner_count(LOC);   // keep value

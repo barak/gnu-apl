@@ -33,6 +33,8 @@ Plot_window_properties::Plot_window_properties(const Plot_data * data,
      plot_data(*data),
 # define gdef(_ty,  na,  val, _descr) na(val),
 # include "Quad_PLOT.def"
+     user_pw_pos(false),
+     user_caption(false),
      window_width(pa_border_L  + origin_X + pa_width  + pa_border_R),
      window_height(pa_border_T + origin_Y + pa_height + pa_border_B),
      min_X(data->get_min_X()),
@@ -278,6 +280,11 @@ Plot_window_properties::set_attribute(const char * att_and_val)
 
       return 0 on success or else an appropriate error string.
     */
+
+   // remember if certain properties were set by the users
+   //
+   if      (!strncmp(att_and_val, "pw_pos_", 7))   user_pw_pos  = true;
+   else if (!strncmp(att_and_val, "pw_pos_", 7))   user_caption = true;
 
    // find ':' which separates the attribute name and the attribute value.
    //

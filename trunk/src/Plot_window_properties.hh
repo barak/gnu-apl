@@ -54,6 +54,12 @@ public:
    /// handle window resize event
    void set_window_size(Pixel_X width, Pixel_Y height);
 
+   /// return true iff the user has dictated a window position
+   bool get_user_pw_pos() const   { return user_pw_pos; }
+
+   /// return true iff the user has dictated a window caption
+   bool get_user_caption() const   { return user_caption; }
+
    // get_XXX() and set_XXX() functions for weindow properties
 # define gdef(ty,  na,  _val, _descr)                                     \
   /** return the value of na **/                                         \
@@ -229,6 +235,12 @@ protected:
 # define gdef(ty, na, _val, descr) /** descr **/ ty na;
 # include "Quad_PLOT.def"
 
+   /// whether the window position was dictated by the user
+   bool user_pw_pos;
+
+   /// whether the window caption was dictated by the user
+   bool user_caption;
+
    /// the width of the plot window
    Pixel_X window_width;
   /// the height of the plot window
@@ -304,8 +316,10 @@ protected:
    /// line \b line
    bool can_be_set(uint16_t line, uint16_t propnum);
 
-   /// a list of properties that have been set alreay (to protect items
-   /// from being overridden in set_all_XXX() functions
+   /// a list of properties that have been set alreay (to protect them from
+   /// from being overwridden in set_all_XXX() functions. Every 16-bit item
+   /// of \b properties_set is the line (upper 8 bits) and the property number
+   /// (lower 8 bits).
    vector<uint16_t> properties_set;
 };
 //============================================================================
