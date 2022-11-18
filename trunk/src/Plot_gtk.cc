@@ -22,10 +22,13 @@
 /** @file
 */
 
+#include "Common.hh"
+#if HAVE_LOCALE_H
+#include <locale.h>
+#endif
+
 /// debug verbosity
 static int verbosity = 0;
-
-#include "Common.hh"
 
 #if apl_GTK3
 
@@ -40,8 +43,7 @@ static int verbosity = 0;
 extern void * plot_main(void * vp_props);
 
 /// the window properties of one plot window.
-extern const Plot_window_properties *
-             plot_stop(const Plot_window_properties * vp_props);
+extern int plot_stop(int handle);
 
 # include "ComplexCell.hh"
 # include "FloatCell.hh"
@@ -64,7 +66,8 @@ struct Plot_context
 {
    /// constructor
    Plot_context(Plot_window_properties & pwp)
-   : w_props(pwp),
+   : handle(++next_handle),
+     w_props(pwp),
      window(0),
      drawing_area(0)
    {}
@@ -87,6 +90,9 @@ struct Plot_context
               + w_props.get_pa_border_B();
        }
 
+   /// the handle for identifying this PNG_context in APL
+   const int handle;
+
    /// the window properties (as choosen by the user)
    Plot_window_properties & w_props;
 
@@ -95,13 +101,18 @@ struct Plot_context
 
    /// the drawing area in the window of this Plot_context
    GtkWidget * drawing_area;
+
+   /// number of the window next handle returned by display_PNG_main()
+   static int next_handle;
 };
+
+int Plot_context::next_handle = 0;
 
 /// all Plot_contexts (= all open windows) for ⎕PLOT
 static vector<Plot_context *> all_plot_contexts;
 
 /// the number of open plot windows (to see when the last one was closed).
-static int plot_window_count = 0;
+static int GTK_window_count = 0;
 
 //----------------------------------------------------------------------------
 /// same as standard cairo_set_RGB_source() but with Color instead of double
@@ -263,11 +274,11 @@ const bool es = ! (point_style & 1);   // even style
    //
    if (inner_dia)   switch(point_style)
       {
-        case 1: draw_circle(cr, P0,     inner_color, inner_dia);   return;   // ●
-        case 2:                                                              // ▲
-        case 3: draw_delta( cr, P0, es, inner_color, inner_dia);   return;   // ▼
-        case 4:                                                              // ◆
-        case 5: draw_quad(  cr, P0, es, inner_color, inner_dia);   return;   // ■
+        case 1: draw_circle(cr, P0,     inner_color, inner_dia);  return;   // ●
+        case 2:                                                             // ▲
+        case 3: draw_delta( cr, P0, es, inner_color, inner_dia);  return;   // ▼
+        case 4:                                                             // ◆
+        case 5: draw_quad(  cr, P0, es, inner_color, inner_dia);  return;   // ■
       }
 }
 //----------------------------------------------------------------------------
@@ -1279,15 +1290,16 @@ plot_destroyed(GtkWidget * top_level)
    for (size_t th = 0; th < all_plot_contexts.size(); ++th)
        {
          const Plot_context * pctx = all_plot_contexts[th];
-         if (top_level == pctx->window)                       // mark it closed
+         if (top_level == pctx->window)                    // case 2.
             {
               all_plot_contexts[th] = all_plot_contexts.back();
               all_plot_contexts.pop_back();
-              break;
+              delete &pctx->w_props;
+              return TRUE;
             }
        }
 
-  // gtk_main_quit();
+  // case 1: gtk_main_quit();
   return TRUE;   // event handled by this handler
 }
 //----------------------------------------------------------------------------
@@ -1492,23 +1504,18 @@ cairo_surface_t * surface = gdk_window_create_similar_surface(
 /// make gtk_main() suitable for pthread_create() and maybe tell when it is
 /// finished
 static void *
-gtk_main_wrapper(void * w_props)
+gtk_main_wrapper(void *)
 {
-   setlocale(LC_ALL, "C");   // needed for portable snprintf()
-
    gtk_main();
 
    if (verbosity & SHOW_EVENTS)   CERR << "gtk_main() thread done" << endl;
 
-   if (verbosity & SHOW_EVENTS)
-      CERR << "wprops " << w_props << " deleted." << endl;
-
-   if (--plot_window_count == 0)   // last window closed
+   if (--GTK_window_count == 0)   // last window closed
       {
         while (all_plot_contexts.size())
            {
-             const Plot_context * p = all_plot_contexts.back();
-             delete &p->w_props;
+             const Plot_context * pctx = all_plot_contexts.back();
+             delete &pctx->w_props;
              all_plot_contexts.pop_back();
            }
       }
@@ -1516,18 +1523,17 @@ gtk_main_wrapper(void * w_props)
    return 0;
 }
 //----------------------------------------------------------------------------
-const Plot_window_properties *
-plot_stop(const Plot_window_properties * props)
+int
+plot_stop(int handle)
 {
-// CERR << "plot_stop(" << vp_props << ")" << endl;
+// CERR << "plot_stop(" << handle << ")" << endl;
 
    // find the Plot_context for this event...
    //
    for (size_t th = 0; th < all_plot_contexts.size(); ++th)
        {
          const Plot_context * pctx = all_plot_contexts[th];
-         const Plot_window_properties * w_props = &pctx->w_props;
-         if (w_props == props)
+         if (pctx->handle == handle)
             {
               const GtkWidget * top_level = pctx->window;
 
@@ -1538,11 +1544,11 @@ plot_stop(const Plot_window_properties * props)
               all_plot_contexts.pop_back();
 
               gtk_window_close(GTK_WINDOW(top_level));
-              return props;
+              return handle;
             }
        }
 
-   CERR << "*** Could not find w_props " << props
+   CERR << "*** Could not find handle " << handle
         << " in plot_stop() ***" << endl;
    return 0;
 }
@@ -1564,19 +1570,22 @@ Plot_window_properties & w_props =
    if (!gtk_init_done)
       {
         int argc = 0;
-        gtk_init(&argc, NULL);
-        pthread_t thread = 0;
-        pthread_create(&thread, 0, gtk_main_wrapper, &w_props);
-#if HAVE_PTHREAD_SETNAME_NP
-         pthread_setname_np(thread, "apl/⎕PLOT");
-#endif
+        char ** argv = { 0 };
+        gtk_init(&argc, &argv);   setlocale(LC_ALL, "C");
         gtk_init_done = true;
+
+        pthread_t thread = 0;
+        pthread_create(&thread, 0, gtk_main_wrapper, 0);
+#if HAVE_PTHREAD_SETNAME_NP
+         // show with e.g.   ps H -o 'pid tid cmd comm'
+         pthread_setname_np(thread, "apl/GTK");
+#endif
       }
 
 Plot_context * pctx = new Plot_context(w_props);
    Assert(pctx);
    all_plot_contexts.push_back(pctx);
-   ++plot_window_count;
+   ++GTK_window_count;
 
    pctx->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
    Assert(pctx->window);
@@ -1606,7 +1615,7 @@ Plot_context * pctx = new Plot_context(w_props);
                            G_CALLBACK(draw_callback), 0, G_CONNECT_AFTER);
 
    sem_post(Quad_PLOT::plot_window_sema);   // unleash the APL interpreter
-   return 0;
+   return reinterpret_cast<void *>(pctx->handle);
 }
 //----------------------------------------------------------------------------
 #endif // apl_GTK3

@@ -192,8 +192,7 @@ using namespace std;
 extern void * plot_main(void * vp_props);
 
 #if apl_GTK3
-extern const Plot_window_properties *
-             plot_stop(const Plot_window_properties * vp_props);
+extern int plot_stop(int handle);
 #endif
 
 //============================================================================
@@ -324,10 +323,9 @@ Quad_PLOT::eval_B(Value_P B) const
         // scalar (integer) argument: plot window control
         union
            {
-             APL_Integer B0;                           // APL
-             const Plot_window_properties * w_props;   // gtk
-             const void * vp;                          // plot_stop() result
-             pthread_t thread;                         // xcb
+             APL_Integer B0;     // APL
+             int handle;         // gtk
+             pthread_t thread;   // xcb
            } u;
 
         u.B0 = B->get_cscalar().get_int_value();
@@ -361,7 +359,7 @@ Quad_PLOT::eval_B(Value_P B) const
                   u.B0 = plot_threads[p];
                   Z->next_ravel_Int(u.B0);
 
-                  plot_stop(u.w_props);
+                  plot_stop(u.handle);
                 }
              plot_threads.clear();
              Z->check_value(LOC);
@@ -385,7 +383,7 @@ Quad_PLOT::eval_B(Value_P B) const
 
 #if apl_GTK3
 
-        u.vp = plot_stop(u.w_props);
+        u.handle = plot_stop(u.handle);
         return Token(TOK_APL_VALUE1, IntScalar(u.B0, LOC));
 
 #else   // XCB
@@ -767,15 +765,14 @@ Quad_PLOT::do_plot_data(Plot_window_properties * w_props,
 
 union
 {
-   pthread_t                      thread;    // xcb
-   const Plot_window_properties * w_props;   // gtk
-   APL_Integer                    ret;       // APL
+   APL_Integer Z;         // APL
+   const void * handle;   // gtk
+   pthread_t   thread;    // xcb
 } u;
-   u.ret = 0;
+   u.Z = 0;
 
 #if apl_GTK3   // GTK
-   u.w_props = w_props;
-   plot_main(w_props);
+   u.handle = plot_main(w_props);
 #else          // XCB
    pthread_create(&u.thread, 0, plot_main, w_props);
 #endif
@@ -785,7 +782,7 @@ union
    sem_post(plot_threads_sema);
 
    sem_wait(plot_window_sema);   // blocks until window shown
-   return IntScalar(u.ret, LOC);
+   return IntScalar(u.Z, LOC);
 }
 //----------------------------------------------------------------------------
 static UCS_string

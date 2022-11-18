@@ -26,6 +26,9 @@
 #include <errno.h>
 
 #include "Common.hh"
+#if HAVE_LOCALE_H
+#include <locale.h>
+#endif
 
 #if HAVE_LIBX11 && HAVE_LIBXCB && HAVE_LIBX11_XCB && HAVE_X11_XLIB_XCB_H
 
