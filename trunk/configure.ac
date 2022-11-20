@@ -426,10 +426,10 @@ AC_MSG_CHECKING([if ctrl-D shall delete one char (and ctrl-Z be EOF)])
 AC_ARG_WITH( [ctrld_del],
              [AS_HELP_STRING([--with-ctrld_del],
                              [enable to use ^D as del-char, ^Z as EOT])],
-             [WANT_CTRLD_DEL=$withval],
-             [WANT_CTRLD_DEL=no])
+             [cfg_CTRLD_DEL=$withval],
+             [cfg_CTRLD_DEL=no])
 
-if apl_YES($ctrld_del); then
+if apl_YES($cfg_CTRLD_DEL); then
     AC_DEFINE(cfg_WANT_CTRLD_DEL, 1,
               [Define to make ^D a del-char and ^Z be EOF])
 fi

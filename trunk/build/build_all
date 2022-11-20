@@ -158,7 +158,8 @@ test_one()
    local time_FROM=$(date +%s)
    local summ="$TOP_LOG_dir/summary.log"
    cd $VSRC_dir
-   cp $ROOT_dir/src/testcases/* testcases/
+   cp $ROOT_dir/src/testcases/* testcases/        # copy testcases
+   cp $ROOT_dir/src/workspaces/* workspaces/      # needed by testcases
    make test > /dev/null 2>&1
    local make_result=$?
    local time_TO=$(date +%s)
