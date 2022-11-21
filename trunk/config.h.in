@@ -436,16 +436,16 @@
 /* FFT available */
 #undef apl_FFT
 
-/* GTK+ version 3 not installed */
+/* GTK+ version 3 installed ? */
 #undef apl_GTK3
 
-/* GUI (GTK or XCB) not available ? */
+/* GUI (GTK or XCB) available ? */
 #undef apl_GUI
 
-/* PCRE not available */
+/* PCRE available ? */
 #undef apl_PCRE
 
-/* PNG not available */
+/* PNG available ? */
 #undef apl_PNG
 
 /* PostgreSQL code did not compile */
@@ -466,7 +466,7 @@
 /* Define if building lib_gnu_apl.so */
 #undef apl_TARGET_PYTHON
 
-/* X11 not available */
+/* X11 is available ? */
 #undef apl_X11
 
 /* APserver listen port name */

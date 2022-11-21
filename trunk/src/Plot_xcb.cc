@@ -43,12 +43,16 @@
 # include "Workspace.hh"
 
 // UTF8 support for XCB windows needs additional libraries that may
-// not be present. You can disable that with: XCB_WINDOWS_WITH_UTF8_CAPTIONS 0
-// or maybe CXXFLAGS=-D XCB_WINDOWS_WITH_UTF8_CAPTIONS=0 ./configure...
+// not be present. You can enable that with: XCB_WINDOWS_WITH_UTF8_CAPTIONS 1
+// in this file or better:
+//
+//  CXXFLAGS=-D XCB_WINDOWS_WITH_UTF8_CAPTIONS=1 ./configure. The
+//
+// default is disabled.
 //
 # ifndef XCB_WINDOWS_WITH_UTF8_CAPTIONS
-   /// undefined → 0
-#  define XCB_WINDOWS_WITH_UTF8_CAPTIONS 0
+   /// undefined → 1
+#  define XCB_WINDOWS_WITH_UTF8_CAPTIONS 1
 # endif
 
 # if XCB_WINDOWS_WITH_UTF8_CAPTIONS
@@ -88,12 +92,23 @@ extern void * plot_main(void * vp_props);
 
 // ===========================================================================
 /// Some xcb IDs (returned from the X server)
-struct Plot_context
+struct XCB_context
 {
    /// constructor
-   Plot_context(const Plot_window_properties & pwp)
-   : w_props(pwp)
+   XCB_context(const Plot_window_properties & props, int h)
+   : handle(h),
+     caption(0),
+     w_props(props)
    {}
+
+   ~XCB_context()
+      { free(caption); }
+
+   /// handle in APL
+   const int handle;
+
+   /// window caption
+   char * caption;
 
    /// the window properties (as choosen by the user)
    const Plot_window_properties & w_props;
@@ -108,12 +123,13 @@ struct Plot_context
    xcb_gcontext_t     text;       ///< the curren text style
    xcb_font_t         font;       ///< the curren font
 };
+
 //----------------------------------------------------------------------------
 /// the supposed width and the height of a string (in pixels)
 struct string_width_height
 {
    /// constructor: ask X-server for the size (in pixels) of \b string
-   string_width_height(const Plot_context & pctx, const char * string);
+   string_width_height(const XCB_context & pctx, const char * string);
 
    /// the width of the string (pixels)
    Pixel_X width;
@@ -122,7 +138,7 @@ struct string_width_height
    Pixel_Y height;
 };
 //----------------------------------------------------------------------------
-string_width_height::string_width_height(const Plot_context & pctx,
+string_width_height::string_width_height(const XCB_context & pctx,
                                          const char * string)
 {
 const size_t string_length = strlen(string);
@@ -168,7 +184,7 @@ testCookie(xcb_void_cookie_t cookie, xcb_connection_t * conn,
 //----------------------------------------------------------------------------
 /// return a xcb_gcontext_t for font \b font_name
 xcb_gcontext_t
-setup_font_gc(Plot_context & pctx, const char * font_name, Color canvas_color)
+setup_font_gc(XCB_context & pctx, const char * font_name, Color canvas_color)
 {
    /* get font */
 
@@ -192,7 +208,7 @@ uint32_t values[3] = { 0x00FFFFFF & ~canvas_color, canvas_color, pctx.font };
 
 /// draw text \b label at position \b xy
 void
-draw_text(const Plot_context & pctx, const char * label, const Pixel_XY & xy)
+draw_text(const XCB_context & pctx, const char * label, const Pixel_XY & xy)
 {
 # if XFT
 
@@ -310,7 +326,7 @@ const char * unit = 0;
 //----------------------------------------------------------------------------
 /// draw a line from P0 to P1
 void
-draw_line(const Plot_context & pctx, xcb_gcontext_t gc,
+draw_line(const XCB_context & pctx, xcb_gcontext_t gc,
           const Pixel_XY & P0, const Pixel_XY & P1)
 {
 const xcb_segment_t segment = { I1616(P0.x, P0.y), I1616(P1.x, P1.y) };
@@ -390,7 +406,7 @@ const double denom = ((-Bx)*(Dy-Ay) - (-By)*(Dx-Ax));     // right factor
 //----------------------------------------------------------------------------
 /// set the an attribute of a xcb_gcontext_t
 inline void
-set_GC_attr(const Plot_context & pctx, xcb_gcontext_t gc,
+set_GC_attr(const XCB_context & pctx, xcb_gcontext_t gc,
             xcb_gc_t mask, uint32_t value)
 {
    xcb_change_gc(pctx.conn, gc, mask, &value);
@@ -398,21 +414,21 @@ set_GC_attr(const Plot_context & pctx, xcb_gcontext_t gc,
 //----------------------------------------------------------------------------
 /// set the foreground color of a xcb_gcontext_t
 inline void
-set_GC_foreground(const Plot_context & pctx, xcb_gcontext_t gc, Color color)
+set_GC_foreground(const XCB_context & pctx, xcb_gcontext_t gc, Color color)
 {
    set_GC_attr(pctx, gc, XCB_GC_FOREGROUND, color);
 }
 //----------------------------------------------------------------------------
 /// set the line width of a xcb_gcontext_t
 inline void
-set_GC_line_width(const Plot_context & pctx, xcb_gcontext_t gc, int width)
+set_GC_line_width(const XCB_context & pctx, xcb_gcontext_t gc, int width)
 {
    set_GC_attr(pctx, gc, XCB_GC_LINE_WIDTH, width);
 }
 //----------------------------------------------------------------------------
 /// draw a triangular area of a 3D plot
 void
-draw_triangle(const Plot_context & pctx, int verbosity,
+draw_triangle(const XCB_context & pctx, int verbosity,
               Pixel_XY P0, double H0, Pixel_XY P1, Pixel_XY P2, double H12)
 {
    // draw a triangle with P1 and P2 at the same level H12
@@ -446,7 +462,7 @@ const double dH = (H12 - H0) / steps;
 //----------------------------------------------------------------------------
 /// draw a triangular plot point (∆ or ∇)
 void
-draw_triangle(const Plot_context & pctx, int verbosity, Pixel_XY P0, double H0,
+draw_triangle(const XCB_context & pctx, int verbosity, Pixel_XY P0, double H0,
               Pixel_XY P1, double H1, Pixel_XY P2, double H2)
 {
    // draw a triangle with P0, P1 and P2 at levels H0, H1, and H2
@@ -493,7 +509,7 @@ draw_triangle(const Plot_context & pctx, int verbosity, Pixel_XY P0, double H0,
 //----------------------------------------------------------------------------
 /// draw a plot point (representing one data value) at position \b xy
 void
-draw_point(const Plot_context & pctx, const Pixel_XY & xy, Color canvas_color,
+draw_point(const XCB_context & pctx, const Pixel_XY & xy, Color canvas_color,
            const Plot_line_properties & l_props)
 {
 const Pixel_X point_size  = l_props.get_point_size();   // outer point diameter
@@ -634,7 +650,7 @@ const Color point_color = l_props.get_point_color();
 //----------------------------------------------------------------------------
 /// draw the legend
 void
-draw_legend(const Plot_context & pctx, const Plot_window_properties & w_props)
+draw_legend(const XCB_context & pctx, const Plot_window_properties & w_props)
 {
 Plot_line_properties const * const * l_props = w_props.get_line_properties();
 const int line_count = w_props.get_line_count();
@@ -694,7 +710,7 @@ const int dy = w_props.get_legend_dY();
 //----------------------------------------------------------------------------
 /// draw the (vertical) grid lines that start at the X axis
 void
-draw_X_grid(const Plot_context & pctx, const Plot_window_properties & w_props,
+draw_X_grid(const XCB_context & pctx, const Plot_window_properties & w_props,
             bool surface)
 {
    set_GC_foreground(pctx, pctx.line, w_props.get_gridX_color());
@@ -742,7 +758,7 @@ const Pixel_Y py1 = w_props.valY2pixel(dy);
 //----------------------------------------------------------------------------
 /// draw the (horizontal) grid lines that start at the Y axis
 void
-draw_Y_grid(const Plot_context & pctx, const Plot_window_properties & w_props,
+draw_Y_grid(const XCB_context & pctx, const Plot_window_properties & w_props,
             bool surface)
 {
    set_GC_foreground(pctx, pctx.line, w_props.get_gridY_color());
@@ -792,7 +808,7 @@ const Pixel_X px1 = w_props.valX2pixel(dx) + w_props.get_origin_X();
 //----------------------------------------------------------------------------
 /// draw the grid lines that start at the Z axis
 void
-draw_Z_grid(const Plot_context & pctx, const Plot_window_properties & w_props)
+draw_Z_grid(const XCB_context & pctx, const Plot_window_properties & w_props)
 {
    set_GC_foreground(pctx, pctx.line, w_props.get_gridZ_color());
    set_GC_line_width(pctx, pctx.line, w_props.get_gridZ_line_width());
@@ -828,7 +844,7 @@ const Pixel_Y len_Y = w_props.valY2pixel(w_props.get_max_Y())
 //----------------------------------------------------------------------------
 /// draw the plot lines
 void
-draw_plot_lines(const Plot_context & pctx,
+draw_plot_lines(const XCB_context & pctx,
                 const Plot_window_properties & w_props, const Plot_data & data)
 {
 const Color canvas_color = w_props.get_canvas_color();
@@ -870,7 +886,7 @@ Plot_line_properties const * const * l_props = w_props.get_line_properties();
 //----------------------------------------------------------------------------
 /// draw the surface plot lines
 void
-draw_surface_lines(const Plot_context & pctx,
+draw_surface_lines(const XCB_context & pctx,
                    const Plot_window_properties & w_props,
                    const Plot_data & data)
 {
@@ -1043,7 +1059,7 @@ const int verbosity = w_props.get_verbosity();
 //----------------------------------------------------------------------------
 /// draw the content of a plot window
 void
-do_plot(const Plot_context & pctx,
+do_plot(const XCB_context & pctx,
         const Plot_window_properties & w_props, const Plot_data & data)
 {
    // draw the canvas background
@@ -1087,7 +1103,7 @@ xcb_intern_atom_reply_t & reply = *xcb_intern_atom_reply(conn, cookie, 0);
 /// save plot window to file named \b outfile
 void
 save_file(const char * outfile, Display * dpy, int window,
-          const Plot_context & pctx)
+          const XCB_context & pctx)
 {
    // figure position and size...
    //
@@ -1237,6 +1253,8 @@ const Colormap cmap = XDefaultColormap(dpy, screen);
    CERR << "output file " << outfile_utf8 << " written" << endl;
 }
 //----------------------------------------------------------------------------
+extern int next_XCB_handle;   // defined in Quad_PLOT.cc
+
 void *
 plot_main(void * vp_props)
 {
@@ -1246,7 +1264,8 @@ Plot_window_properties & w_props =
       *reinterpret_cast<Plot_window_properties *>(vp_props);
 const char * outfile = strdup(w_props.get_output_filename().c_str());
 
-Plot_context pctx(w_props);
+XCB_context pctx(w_props, next_XCB_handle);
+const int off = 50*next_XCB_handle;
 
 const Plot_data & data = w_props.get_plot_data();
 
@@ -1281,12 +1300,13 @@ const xcb_setup_t * setup = xcb_get_setup(pctx.conn);
                                XCB_EVENT_MASK_EXPOSURE
                              | XCB_EVENT_MASK_PROPERTY_CHANGE
                              | XCB_EVENT_MASK_STRUCTURE_NOTIFY };
+
      xcb_create_window(pctx.conn,                       // connection
                        XCB_COPY_FROM_PARENT,            // depth
                        pctx.window,                     // window Id
                        pctx.screen->root,               // parent window
-                       w_props.get_pw_pos_X(),          // X position on screen
-                       w_props.get_pw_pos_Y(),          // Y position on screen
+                       w_props.get_pw_pos_X() + off,    // X position on screen
+                       w_props.get_pw_pos_Y() + off,    // Y position on screen
                        w_props.get_window_width(),
                        w_props.get_window_height(),
                        w_props.get_border_width(),
@@ -1320,8 +1340,20 @@ const xcb_setup_t * setup = xcb_get_setup(pctx.conn);
      xcb_create_gc(pctx.conn, pctx.fill, pctx.screen->root, mask2, values2);
    }
 
-   {
+   if (w_props.get_user_caption())
+      {
+        pctx.caption = strdup(w_props.get_caption().c_str());
+      }
+   else   // default caption: ⎕PLOT
+      {
+       char cc[50];
+       snprintf(cc, sizeof(cc), "%s %d",
+                w_props.get_caption().c_str(), next_XCB_handle);
 
+        pctx.caption = strdup(cc);
+      }
+
+   {
 # if XCB_WINDOWS_WITH_UTF8_CAPTIONS
 
 // size (and position) hints for the window manager
@@ -1333,17 +1365,14 @@ XSizeHints size_hints;
    size_hints.y           = w_props.get_pw_pos_Y();
    size_hints.base_height = w_props.get_pw_pos_Y();
 
-static char * caption = strdup(w_props.get_caption().c_str());
-Xutf8SetWMProperties(dpy, pctx.window, caption,
-                     "icon", 0, 0, &size_hints, 0, 0);
-// free(caption);
+   Xutf8SetWMProperties(dpy, pctx.window, pctx.caption,
+                        "icon", 0, 0, &size_hints, 0, 0);
 
 # else   // not XCB_WINDOWS_WITH_UTF8_CAPTIONS
 
-     xcb_change_property(pctx.conn, XCB_PROP_MODE_REPLACE, pctx.window,
+   xcb_change_property(pctx.conn, XCB_PROP_MODE_REPLACE, pctx.window,
                        XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8,
-                       w_props.get_caption().size(),
-                       w_props.get_caption().c_str());
+                       strlen(pctx.caption), pctx.caption);
 
 # endif  // XCB_WINDOWS_WITH_UTF8_CAPTIONS
 

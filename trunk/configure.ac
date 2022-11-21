@@ -433,7 +433,7 @@ if apl_YES($cfg_CTRLD_DEL); then
     AC_DEFINE(cfg_WANT_CTRLD_DEL, 1,
               [Define to make ^D a del-char and ^Z be EOF])
 fi
-AC_MSG_RESULT([$WANT_CTRLD_DEL])
+AC_MSG_RESULT([$cfg_CTRLD_DEL])
 
 m4_include([m4/apl_TARGETs.m4])
 
@@ -904,21 +904,21 @@ else
 fi
 
 if (apl_YES($apl_GUI)); then
-   AC_DEFINE_UNQUOTED(apl_GUI, 1, [GUI (GTK or XCB) is available])
+   AC_DEFINE_UNQUOTED(apl_GUI, 1, [GUI (GTK or XCB) available ?])
 else
-   AC_DEFINE_UNQUOTED(apl_GUI, 0, [GUI (GTK or XCB) not available ?])
+   AC_DEFINE_UNQUOTED(apl_GUI, 0)
 fi
 
 if (apl_YES($apl_PCRE)); then
-   AC_DEFINE_UNQUOTED(apl_PCRE, 1, [PCRE is available])
+   AC_DEFINE_UNQUOTED(apl_PCRE, 1, [PCRE available ?])
 else
-   AC_DEFINE_UNQUOTED(apl_PCRE, 0, [PCRE not available])
+   AC_DEFINE_UNQUOTED(apl_PCRE, 0)
 fi
 
 if (apl_YES($apl_PNG)); then
-   AC_DEFINE_UNQUOTED(apl_PNG, 1, [PNG is available])
+   AC_DEFINE_UNQUOTED(apl_PNG, 1, [PNG available ?])
 else
-   AC_DEFINE_UNQUOTED(apl_PNG, 0, [PNG not available])
+   AC_DEFINE_UNQUOTED(apl_PNG, 0)
 fi
 
 

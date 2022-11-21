@@ -76,6 +76,7 @@ common_SOURCES +=						Error_macros.hh
 common_SOURCES +=						ErrorCode.hh
 common_SOURCES += Executable.cc					Executable.hh
 common_SOURCES += FloatCell.cc					FloatCell.hh
+common_SOURCES +=			Focus.icc
 common_SOURCES += Function.cc					Function.hh
 common_SOURCES +=			Help.def
 common_SOURCES +=						Heapsort.hh

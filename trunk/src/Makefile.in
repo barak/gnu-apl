@@ -196,20 +196,20 @@ am__lib_gnu_apl_la_SOURCES_DIST = Plot_xcb.cc Plot_gtk.cc ../config.h \
 	DerivedFunction.cc DerivedFunction.hh DiffOut.cc DiffOut.hh \
 	DynamicObject.cc DynamicObject.hh Error.cc Error.def Error.hh \
 	Error_macros.hh ErrorCode.hh Executable.cc Executable.hh \
-	FloatCell.cc FloatCell.hh Function.cc Function.hh Help.def \
-	Heapsort.hh Id.cc Id.def Id.hh IdEnums.hh IndexExpr.cc \
-	IndexExpr.hh IndexIterator.cc IndexIterator.hh InputFile.cc \
-	InputFile.hh IntCell.cc IntCell.hh IO_Files.cc IO_Files.hh \
-	LApack.cc LApack.hh LibPaths.cc LibPaths.hh LineInput.cc \
-	LineInput.hh Logging.cc Logging.def Logging.hh LvalCell.cc \
-	LvalCell.hh Malloc_hooks.cc Nabla.cc Nabla.hh Macro.cc \
-	Macro.def Macro.hh Missing_Libraries.cc NamedObject.cc \
-	NamedObject.hh NativeFunction.cc NativeFunction.hh \
-	Native_interface.hh NumericCell.cc NumericCell.icc \
-	NumericCell.hh Output.cc Output.hh PJob.hh Parallel.cc \
-	Parallel.hh Parser.cc Parser.hh Performance.cc Performance.def \
-	Performance.hh PointerCell.cc PointerCell.hh Prefix.cc \
-	Prefix.def Prefix.hh Plot_line_properties.cc \
+	FloatCell.cc FloatCell.hh Focus.icc Function.cc Function.hh \
+	Help.def Heapsort.hh Id.cc Id.def Id.hh IdEnums.hh \
+	IndexExpr.cc IndexExpr.hh IndexIterator.cc IndexIterator.hh \
+	InputFile.cc InputFile.hh IntCell.cc IntCell.hh IO_Files.cc \
+	IO_Files.hh LApack.cc LApack.hh LibPaths.cc LibPaths.hh \
+	LineInput.cc LineInput.hh Logging.cc Logging.def Logging.hh \
+	LvalCell.cc LvalCell.hh Malloc_hooks.cc Nabla.cc Nabla.hh \
+	Macro.cc Macro.def Macro.hh Missing_Libraries.cc \
+	NamedObject.cc NamedObject.hh NativeFunction.cc \
+	NativeFunction.hh Native_interface.hh NumericCell.cc \
+	NumericCell.icc NumericCell.hh Output.cc Output.hh PJob.hh \
+	Parallel.cc Parallel.hh Parser.cc Parser.hh Performance.cc \
+	Performance.def Performance.hh PointerCell.cc PointerCell.hh \
+	Prefix.cc Prefix.def Prefix.hh Plot_line_properties.cc \
 	Plot_line_properties.hh Plot_data.cc Plot_data.hh \
 	Plot_window_properties.cc Plot_window_properties.hh \
 	PrimitiveFunction.cc PrimitiveFunction.hh PrimitiveOperator.hh \
@@ -365,20 +365,20 @@ am__libapl_la_SOURCES_DIST = Plot_xcb.cc Plot_gtk.cc ../config.h \
 	DerivedFunction.cc DerivedFunction.hh DiffOut.cc DiffOut.hh \
 	DynamicObject.cc DynamicObject.hh Error.cc Error.def Error.hh \
 	Error_macros.hh ErrorCode.hh Executable.cc Executable.hh \
-	FloatCell.cc FloatCell.hh Function.cc Function.hh Help.def \
-	Heapsort.hh Id.cc Id.def Id.hh IdEnums.hh IndexExpr.cc \
-	IndexExpr.hh IndexIterator.cc IndexIterator.hh InputFile.cc \
-	InputFile.hh IntCell.cc IntCell.hh IO_Files.cc IO_Files.hh \
-	LApack.cc LApack.hh LibPaths.cc LibPaths.hh LineInput.cc \
-	LineInput.hh Logging.cc Logging.def Logging.hh LvalCell.cc \
-	LvalCell.hh Malloc_hooks.cc Nabla.cc Nabla.hh Macro.cc \
-	Macro.def Macro.hh Missing_Libraries.cc NamedObject.cc \
-	NamedObject.hh NativeFunction.cc NativeFunction.hh \
-	Native_interface.hh NumericCell.cc NumericCell.icc \
-	NumericCell.hh Output.cc Output.hh PJob.hh Parallel.cc \
-	Parallel.hh Parser.cc Parser.hh Performance.cc Performance.def \
-	Performance.hh PointerCell.cc PointerCell.hh Prefix.cc \
-	Prefix.def Prefix.hh Plot_line_properties.cc \
+	FloatCell.cc FloatCell.hh Focus.icc Function.cc Function.hh \
+	Help.def Heapsort.hh Id.cc Id.def Id.hh IdEnums.hh \
+	IndexExpr.cc IndexExpr.hh IndexIterator.cc IndexIterator.hh \
+	InputFile.cc InputFile.hh IntCell.cc IntCell.hh IO_Files.cc \
+	IO_Files.hh LApack.cc LApack.hh LibPaths.cc LibPaths.hh \
+	LineInput.cc LineInput.hh Logging.cc Logging.def Logging.hh \
+	LvalCell.cc LvalCell.hh Malloc_hooks.cc Nabla.cc Nabla.hh \
+	Macro.cc Macro.def Macro.hh Missing_Libraries.cc \
+	NamedObject.cc NamedObject.hh NativeFunction.cc \
+	NativeFunction.hh Native_interface.hh NumericCell.cc \
+	NumericCell.icc NumericCell.hh Output.cc Output.hh PJob.hh \
+	Parallel.cc Parallel.hh Parser.cc Parser.hh Performance.cc \
+	Performance.def Performance.hh PointerCell.cc PointerCell.hh \
+	Prefix.cc Prefix.def Prefix.hh Plot_line_properties.cc \
 	Plot_line_properties.hh Plot_data.cc Plot_data.hh \
 	Plot_window_properties.cc Plot_window_properties.hh \
 	PrimitiveFunction.cc PrimitiveFunction.hh PrimitiveOperator.hh \
@@ -515,20 +515,20 @@ am__apl_SOURCES_DIST = main.cc Plot_xcb.cc Plot_gtk.cc ../config.h \
 	DerivedFunction.cc DerivedFunction.hh DiffOut.cc DiffOut.hh \
 	DynamicObject.cc DynamicObject.hh Error.cc Error.def Error.hh \
 	Error_macros.hh ErrorCode.hh Executable.cc Executable.hh \
-	FloatCell.cc FloatCell.hh Function.cc Function.hh Help.def \
-	Heapsort.hh Id.cc Id.def Id.hh IdEnums.hh IndexExpr.cc \
-	IndexExpr.hh IndexIterator.cc IndexIterator.hh InputFile.cc \
-	InputFile.hh IntCell.cc IntCell.hh IO_Files.cc IO_Files.hh \
-	LApack.cc LApack.hh LibPaths.cc LibPaths.hh LineInput.cc \
-	LineInput.hh Logging.cc Logging.def Logging.hh LvalCell.cc \
-	LvalCell.hh Malloc_hooks.cc Nabla.cc Nabla.hh Macro.cc \
-	Macro.def Macro.hh Missing_Libraries.cc NamedObject.cc \
-	NamedObject.hh NativeFunction.cc NativeFunction.hh \
-	Native_interface.hh NumericCell.cc NumericCell.icc \
-	NumericCell.hh Output.cc Output.hh PJob.hh Parallel.cc \
-	Parallel.hh Parser.cc Parser.hh Performance.cc Performance.def \
-	Performance.hh PointerCell.cc PointerCell.hh Prefix.cc \
-	Prefix.def Prefix.hh Plot_line_properties.cc \
+	FloatCell.cc FloatCell.hh Focus.icc Function.cc Function.hh \
+	Help.def Heapsort.hh Id.cc Id.def Id.hh IdEnums.hh \
+	IndexExpr.cc IndexExpr.hh IndexIterator.cc IndexIterator.hh \
+	InputFile.cc InputFile.hh IntCell.cc IntCell.hh IO_Files.cc \
+	IO_Files.hh LApack.cc LApack.hh LibPaths.cc LibPaths.hh \
+	LineInput.cc LineInput.hh Logging.cc Logging.def Logging.hh \
+	LvalCell.cc LvalCell.hh Malloc_hooks.cc Nabla.cc Nabla.hh \
+	Macro.cc Macro.def Macro.hh Missing_Libraries.cc \
+	NamedObject.cc NamedObject.hh NativeFunction.cc \
+	NativeFunction.hh Native_interface.hh NumericCell.cc \
+	NumericCell.icc NumericCell.hh Output.cc Output.hh PJob.hh \
+	Parallel.cc Parallel.hh Parser.cc Parser.hh Performance.cc \
+	Performance.def Performance.hh PointerCell.cc PointerCell.hh \
+	Prefix.cc Prefix.def Prefix.hh Plot_line_properties.cc \
 	Plot_line_properties.hh Plot_data.cc Plot_data.hh \
 	Plot_window_properties.cc Plot_window_properties.hh \
 	PrimitiveFunction.cc PrimitiveFunction.hh PrimitiveOperator.hh \
@@ -966,20 +966,20 @@ common_SOURCES = $(plot_SOURCES) ../config.h APL_Float_as_class.hh \
 	DerivedFunction.cc DerivedFunction.hh DiffOut.cc DiffOut.hh \
 	DynamicObject.cc DynamicObject.hh Error.cc Error.def Error.hh \
 	Error_macros.hh ErrorCode.hh Executable.cc Executable.hh \
-	FloatCell.cc FloatCell.hh Function.cc Function.hh Help.def \
-	Heapsort.hh Id.cc Id.def Id.hh IdEnums.hh IndexExpr.cc \
-	IndexExpr.hh IndexIterator.cc IndexIterator.hh InputFile.cc \
-	InputFile.hh IntCell.cc IntCell.hh IO_Files.cc IO_Files.hh \
-	LApack.cc LApack.hh LibPaths.cc LibPaths.hh LineInput.cc \
-	LineInput.hh Logging.cc Logging.def Logging.hh LvalCell.cc \
-	LvalCell.hh Malloc_hooks.cc Nabla.cc Nabla.hh Macro.cc \
-	Macro.def Macro.hh Missing_Libraries.cc NamedObject.cc \
-	NamedObject.hh NativeFunction.cc NativeFunction.hh \
-	Native_interface.hh NumericCell.cc NumericCell.icc \
-	NumericCell.hh Output.cc Output.hh PJob.hh Parallel.cc \
-	Parallel.hh Parser.cc Parser.hh Performance.cc Performance.def \
-	Performance.hh PointerCell.cc PointerCell.hh Prefix.cc \
-	Prefix.def Prefix.hh Plot_line_properties.cc \
+	FloatCell.cc FloatCell.hh Focus.icc Function.cc Function.hh \
+	Help.def Heapsort.hh Id.cc Id.def Id.hh IdEnums.hh \
+	IndexExpr.cc IndexExpr.hh IndexIterator.cc IndexIterator.hh \
+	InputFile.cc InputFile.hh IntCell.cc IntCell.hh IO_Files.cc \
+	IO_Files.hh LApack.cc LApack.hh LibPaths.cc LibPaths.hh \
+	LineInput.cc LineInput.hh Logging.cc Logging.def Logging.hh \
+	LvalCell.cc LvalCell.hh Malloc_hooks.cc Nabla.cc Nabla.hh \
+	Macro.cc Macro.def Macro.hh Missing_Libraries.cc \
+	NamedObject.cc NamedObject.hh NativeFunction.cc \
+	NativeFunction.hh Native_interface.hh NumericCell.cc \
+	NumericCell.icc NumericCell.hh Output.cc Output.hh PJob.hh \
+	Parallel.cc Parallel.hh Parser.cc Parser.hh Performance.cc \
+	Performance.def Performance.hh PointerCell.cc PointerCell.hh \
+	Prefix.cc Prefix.def Prefix.hh Plot_line_properties.cc \
 	Plot_line_properties.hh Plot_data.cc Plot_data.hh \
 	Plot_window_properties.cc Plot_window_properties.hh \
 	PrimitiveFunction.cc PrimitiveFunction.hh PrimitiveOperator.hh \

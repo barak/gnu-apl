@@ -19782,8 +19782,7 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
 else
-
-cat >>confdefs.h <<_ACEOF
+   cat >>confdefs.h <<_ACEOF
 #define apl_X11 0
 _ACEOF
 
@@ -20985,8 +20984,7 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
 else
-
-cat >>confdefs.h <<_ACEOF
+   cat >>confdefs.h <<_ACEOF
 #define apl_GTK3 0
 _ACEOF
 
@@ -21277,8 +21275,8 @@ if test "x$cfg_CTRLD_DEL" = "xyes"; then
 $as_echo "#define cfg_WANT_CTRLD_DEL 1" >>confdefs.h
 
 fi
-{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $WANT_CTRLD_DEL" >&5
-$as_echo "$WANT_CTRLD_DEL" >&6; }
+{ $as_echo "$as_me:${as_lineno-$LINENO}: result: $cfg_CTRLD_DEL" >&5
+$as_echo "$cfg_CTRLD_DEL" >&6; }
 
 #
 # vim: et:ts=4:sw=4
@@ -22005,8 +22003,7 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
 else
-
-cat >>confdefs.h <<_ACEOF
+   cat >>confdefs.h <<_ACEOF
 #define apl_GUI 0
 _ACEOF
 
@@ -22019,8 +22016,7 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
 else
-
-cat >>confdefs.h <<_ACEOF
+   cat >>confdefs.h <<_ACEOF
 #define apl_PCRE 0
 _ACEOF
 
@@ -22033,8 +22029,7 @@ cat >>confdefs.h <<_ACEOF
 _ACEOF
 
 else
-
-cat >>confdefs.h <<_ACEOF
+   cat >>confdefs.h <<_ACEOF
 #define apl_PNG 0
 _ACEOF
 

@@ -1552,6 +1552,9 @@ plot_stop(int handle)
         << " in plot_stop() ***" << endl;
    return 0;
 }
+
+#include "Focus.icc"
+
 //----------------------------------------------------------------------------
 void *
 plot_main(void * vp_props)
@@ -1566,6 +1569,8 @@ Plot_window_properties & w_props =
    verbosity = w_props.get_verbosity();
 
    XInitThreads();
+
+   push_focus();
 
    if (!gtk_init_done)
       {
@@ -1636,6 +1641,8 @@ Plot_context * pctx = new Plot_context(w_props);
 
    g_signal_connect_object(pctx->drawing_area, "draw",
                            G_CALLBACK(draw_callback), 0, G_CONNECT_AFTER);
+
+   pop_focus();
 
    sem_post(Quad_PLOT::plot_window_sema);   // unleash the APL interpreter
    return reinterpret_cast<void *>(pctx->handle);

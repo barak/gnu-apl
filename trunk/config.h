@@ -5,7 +5,7 @@
 #define ARCHIVE_SVN " 19548"
 
 /* How and when GNU APL was configured */
-#define BUILDTAG PACKAGE_NAME, PACKAGE_VERSION " / SVN: 19601", "2022-11-20 10:55:15 UTC", "Linux 4.15.0-158-generic x86_64", "default ./configure options"
+#define BUILDTAG PACKAGE_NAME, PACKAGE_VERSION " / SVN: 19609", "2022-11-21 14:18:04 UTC", "Linux 4.15.0-158-generic x86_64", "default ./configure options"
 
 /* Define to 1 iff pthread_setaffinity_np() is available */
 #define HAVE_AFFINITY_NP 1
@@ -437,16 +437,16 @@
 /* FFT available */
 #define apl_FFT 1
 
-/* GTK+ version 3 not installed */
+/* GTK+ version 3 installed ? */
 #define apl_GTK3 1
 
-/* GUI (GTK or XCB) not available ? */
+/* GUI (GTK or XCB) available ? */
 #define apl_GUI 1
 
-/* PCRE not available */
+/* PCRE available ? */
 #define apl_PCRE 1
 
-/* PNG not available */
+/* PNG available ? */
 #define apl_PNG 1
 
 /* PostgreSQL code did not compile */
@@ -467,7 +467,7 @@
 /* Define if building lib_gnu_apl.so */
 /* #undef apl_TARGET_PYTHON */
 
-/* X11 not available */
+/* X11 is available ? */
 #define apl_X11 1
 
 /* APserver listen port name */
