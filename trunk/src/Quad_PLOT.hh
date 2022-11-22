@@ -59,9 +59,17 @@ public:
    /// a semaphore protecting plot_threads
    static sem_t * plot_threads_sema;
 
+#if apl_GTK3   // GTK
+   static std::vector<int> GTK_handles;
+
+   /// close the plot window with \b handle (from GTK)
+   static int plot_stop_GUI(int handle);
+
+#else         // XCB
    /// an array of threads (one per plot window) handling X events from the
    /// window
    static std::vector<pthread_t> plot_threads;
+#endif
 
 protected:
    /// Destructor.
@@ -79,6 +87,9 @@ protected:
    /// plot the data (creating a new plot window in X)
    static Value_P do_plot_data(Plot_window_properties * w_props,
                                const Plot_data * data);
+
+   /// close the plot window with \b handle (from APL)
+   static int plot_stop_APL(int handle);
 
    /// initialize the data to be plotted
    static Plot_data * setup_data(const Value & B);

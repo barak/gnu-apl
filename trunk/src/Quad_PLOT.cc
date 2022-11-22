@@ -112,9 +112,11 @@ sem_t * Quad_PLOT::plot_window_sema = &__plot_window_sema;
    its presence in plot_threads so that removing a thread from \b plot_threads
    causes the thread to close its plot window and then to exit.
  **/
-vector<pthread_t> Quad_PLOT::plot_threads;
 
-#if ! apl_GTK3 // XCB
+#if apl_GTK3 // GTK
+vector<int> Quad_PLOT::GTK_handles;
+#else         // XCB
+vector<pthread_t> Quad_PLOT::plot_threads;
 static vector<int> XCB_handles;
 extern int next_XCB_handle;   // also used by Plot_xcb
 int next_XCB_handle = 0;
@@ -195,12 +197,11 @@ using namespace std;
 #include "Plot_line_properties.hh"
 #include "Plot_window_properties.hh"
 
-// the pthread that handles one plot window.
-extern void * plot_main(void * vp_props);
+// the pthread that handles one plot window (XCB)
+extern void * plot_main_XCB(void * vp_props);
 
-#if apl_GTK3
-extern int plot_stop(int handle);
-#endif
+// the function that handles one plot window (GTK)
+extern int plot_main_GTK(void * vp_props);
 
 //============================================================================
 
@@ -359,26 +360,29 @@ Quad_PLOT::eval_B(Value_P B) const
 
         if (u.B0 == -3)   // close all windows
            {
-             Value_P Z(plot_threads.size(), LOC);
 #if apl_GTK3
-             loop(p, plot_threads.size())
+             Value_P Z(GTK_handles.size(), LOC);
+             loop(p, GTK_handles.size())
                 {
-                  u.B0 = plot_threads[p];
+                  u.B0 = GTK_handles[p];
                   Z->next_ravel_Int(u.B0);
 
-                  plot_stop(u.handle);
+                  plot_stop_APL(u.handle);
                 }
-             plot_threads.clear();
+             GTK_handles.clear();
+             Z->check_value(LOC);
+             return Token(TOK_APL_VALUE1, Z);
 #else   // XCB
+             Value_P Z(XCB_handles.size(), LOC);
              loop(p, XCB_handles.size())
                 {
                   Z->next_ravel_Int(XCB_handles[p]);
                 }
              plot_threads.clear();
              XCB_handles.clear();
-#endif
              Z->check_value(LOC);
              return Token(TOK_APL_VALUE1, Z);
+#endif
            }
 
         if (u.B0 == -4)                // enable SHOW_DRAW
@@ -392,8 +396,18 @@ Quad_PLOT::eval_B(Value_P B) const
    //
 #if apl_GTK3
 
-        u.handle = plot_stop(u.handle);
-        return Token(TOK_APL_VALUE1, IntScalar(u.B0, LOC));
+        const int handle = plot_stop_APL(u.B0);
+        loop(p, GTK_handles.size())
+            {
+              if (GTK_handles[p] == handle)
+                 {
+                   GTK_handles[p] = GTK_handles.back();
+                   GTK_handles.pop_back();
+                   break;
+                 }
+
+            }
+        return Token(TOK_APL_VALUE1, IntScalar(handle, LOC));
 
 #else   // XCB
 
@@ -786,16 +800,18 @@ union
       {
 #if apl_GTK3   // GTK
 
-   u.handle = plot_main(w_props);
-   plot_threads.push_back(u.thread);
+   u.Z = plot_main_GTK(w_props);
+   GTK_handles.push_back(u.Z);
 
 #else          // XCB
+
    u.Z = ++next_XCB_handle;
 pthread_t thread;
-   pthread_create(&thread, 0, plot_main, w_props);
+   pthread_create(&thread, 0, plot_main_XCB, w_props);
    plot_threads.push_back(thread);
    u.Z = next_XCB_handle;
    XCB_handles.push_back(u.Z);
+
 #endif
       }
    sem_post(plot_threads_sema);

@@ -77,7 +77,7 @@ using namespace std;
 # include "Plot_window_properties.hh"
 
 /// the pthread that handles one plot window.
-extern void * plot_main(void * vp_props);
+extern void * plot_main_XCB(void * vp_props);
 
 /// two int16_t
 #define I1616(x, y) int16_t(x), int16_t(y)
@@ -1256,7 +1256,7 @@ const Colormap cmap = XDefaultColormap(dpy, screen);
 extern int next_XCB_handle;   // defined in Quad_PLOT.cc
 
 void *
-plot_main(void * vp_props)
+plot_main_XCB(void * vp_props)
 {
    setlocale(LC_ALL, "C");   // needed for portable snprintf()
 

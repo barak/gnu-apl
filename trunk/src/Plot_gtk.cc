@@ -40,10 +40,7 @@ static int verbosity = 0;
 # include "Plot_window_properties.hh"
 
 /// the main() program of the thread that handles one plot window.
-extern void * plot_main(void * vp_props);
-
-/// the window properties of one plot window.
-extern int plot_stop(int handle);
+extern void * plot_main_GTK(void * vp_props);
 
 # include "ComplexCell.hh"
 # include "FloatCell.hh"
@@ -1295,6 +1292,7 @@ plot_destroyed(GtkWidget * top_level)
               all_plot_contexts[th] = all_plot_contexts.back();
               all_plot_contexts.pop_back();
               delete &pctx->w_props;
+              Quad_PLOT::plot_stop_GUI(pctx->handle);
               return TRUE;
             }
        }
@@ -1524,9 +1522,9 @@ gtk_main_wrapper(void *)
 }
 //----------------------------------------------------------------------------
 int
-plot_stop(int handle)
+Quad_PLOT::plot_stop_APL(int handle)
 {
-// CERR << "plot_stop(" << handle << ")" << endl;
+// CERR << "plot_stop_APL(" << handle << ")" << endl;
 
    // find the Plot_context for this event...
    //
@@ -1553,11 +1551,29 @@ plot_stop(int handle)
    return 0;
 }
 
+int
+Quad_PLOT::plot_stop_GUI(int handle)
+{
+// CERR << "plot_stop_GUI(" << handle << ")" << endl;
+
+   loop(h, GTK_handles.size())
+      {
+        if (GTK_handles[h] == handle)
+           {
+             GTK_handles[h] = GTK_handles.back();
+             GTK_handles.pop_back();
+             return handle;
+           }
+      }
+
+   return 0;
+}
+//----------------------------------------------------------------------------
+
 #include "Focus.icc"
 
-//----------------------------------------------------------------------------
 void *
-plot_main(void * vp_props)
+plot_main_GTK(void * vp_props)
 {
 // CERR << "plot_main(" << vp_props << ")" << endl;
 
