@@ -82,17 +82,31 @@ UCS_string & more = MORE_ERROR() <<
    if (pkgs && pkgs[0])
       {
         more <<
-"If the problem was caused by a missing library or header file, then (on a\n"
-" standard GNU/Linux/Debian system) it can usually be installed with the\n"
-"following command (as root and in a shell):\n"
+"If the problem was caused by missing libraries or header files, then (on a\n"
+" standard GNU/Linux/Debian system) they can usually be installed with the\n"
+"following command:\n"
 "\n"
 "      apt install";
         for (int j = 0; pkgs[j]; ++j)   more << " " << pkgs[j];
         more <<
 "\n"
 "\n"
-"and, after that, reconfigure, recompile, and reinstall GNU APL:\n\n" 
-"      " cfg_CONFIGURE_ARGS "\n"
+"and, after that, reconfigure, recompile, and reinstall GNU APL:\n\n"
+"      ";
+
+   if (strstr(cfg_CONFIGURE_ARGS, "without") ||
+       strstr(cfg_CONFIGURE_ARGS, "=no"))
+      {
+        // the user may have explicitly disabled something. We therefore
+        // do not want to propose her current ./configure options.
+        more << "./configure <configure-args ...>\n";
+      }
+   else
+      {
+        more << cfg_CONFIGURE_ARGS "\n";
+      }
+
+   more <<
 "      make\n"
 "      sudo make install\n"
 "\n"

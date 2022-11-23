@@ -59,13 +59,26 @@ public:
    /// a semaphore protecting plot_threads
    static sem_t * plot_threads_sema;
 
+   /// a small number that identifies a window
+   typedef int Handle;
+   static std::vector<Handle> window_handles;
+
+   /// the next handle (-1)
+   static Handle next_handle;
+
 #if apl_GTK3   // GTK
-   static std::vector<int> GTK_handles;
 
    /// close the plot window with \b handle (from GTK)
-   static int plot_stop_GUI(int handle);
+   static Handle plot_stop_GUI(Handle handle);
+
+   /// the GTK window that handles one plot window.
+   static void plot_main_GTK(void * vp_props);
 
 #else         // XCB
+
+   /// the pthread that handles one plot window.
+   static void * plot_main_XCB(void * vp_props);
+
    /// an array of threads (one per plot window) handling X events from the
    /// window
    static std::vector<pthread_t> plot_threads;
@@ -81,6 +94,9 @@ protected:
    /// overloaded Function::eval_B()
    virtual Token eval_B(Value_P B) const;
 
+   /// control logging etc. of ⎕PLOT
+   Value_P window_control(APL_Integer B) const;
+
    /// print attribute help text
    static void help();
 
@@ -89,7 +105,7 @@ protected:
                                const Plot_data * data);
 
    /// close the plot window with \b handle (from APL)
-   static int plot_stop_APL(int handle);
+   static Handle plot_stop_APL(Handle handle);
 
    /// initialize the data to be plotted
    static Plot_data * setup_data(const Value & B);

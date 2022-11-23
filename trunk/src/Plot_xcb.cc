@@ -74,10 +74,8 @@ using namespace std;
 
 # include "Plot_data.hh"
 # include "Plot_line_properties.hh"
-# include "Plot_window_properties.hh"
 
-/// the pthread that handles one plot window.
-extern void * plot_main_XCB(void * vp_props);
+# include "Plot_window_properties.hh"
 
 /// two int16_t
 #define I1616(x, y) int16_t(x), int16_t(y)
@@ -176,7 +174,9 @@ testCookie(xcb_void_cookie_t cookie, xcb_connection_t * conn,
 {
    if (xcb_generic_error_t * error = xcb_request_check(conn, cookie))
       {
-        CERR <<"ERROR: " << errMessage << " : " << error->error_code << endl;
+        CERR <<"FATA X ERROR: " << errMessage << " : "
+             << error->error_code << endl;
+        free(error);
         xcb_disconnect(conn);
         exit (-1);
       }
@@ -1253,10 +1253,8 @@ const Colormap cmap = XDefaultColormap(dpy, screen);
    CERR << "output file " << outfile_utf8 << " written" << endl;
 }
 //----------------------------------------------------------------------------
-extern int next_XCB_handle;   // defined in Quad_PLOT.cc
-
 void *
-plot_main_XCB(void * vp_props)
+Quad_PLOT::plot_main_XCB(void * vp_props)
 {
    setlocale(LC_ALL, "C");   // needed for portable snprintf()
 
@@ -1264,8 +1262,9 @@ Plot_window_properties & w_props =
       *reinterpret_cast<Plot_window_properties *>(vp_props);
 const char * outfile = strdup(w_props.get_output_filename().c_str());
 
-XCB_context pctx(w_props, next_XCB_handle);
-const int off = 50*next_XCB_handle;
+const Quad_PLOT::Handle handle = Quad_PLOT::next_handle;
+XCB_context pctx(w_props, handle);
+const int off = 50*handle;
 
 const Plot_data & data = w_props.get_plot_data();
 
@@ -1348,7 +1347,7 @@ const xcb_setup_t * setup = xcb_get_setup(pctx.conn);
       {
        char cc[50];
        snprintf(cc, sizeof(cc), "%s %d",
-                w_props.get_caption().c_str(), next_XCB_handle);
+                w_props.get_caption().c_str(), handle);
 
         pctx.caption = strdup(cc);
       }
@@ -1554,6 +1553,18 @@ bool file_saved = false;
 
    // at this point the plot window was closed
 
+   // remove the APL handle for this window
+   loop(h, Quad_PLOT::window_handles.size())
+       {
+         if (Quad_PLOT::window_handles[h] == handle)
+            {
+               Quad_PLOT::window_handles[h] = Quad_PLOT::window_handles.back();
+               Quad_PLOT::window_handles.pop_back();
+               if (Quad_PLOT::window_handles.size() == 0)
+                  Quad_PLOT::next_handle = 0;
+               break;
+            }
+       }
    // free the text_gc
    //
    testCookie(xcb_free_gc(pctx.conn, pctx.text), pctx.conn, "can't free gc");
@@ -1565,6 +1576,7 @@ bool file_saved = false;
    }
 
    xcb_disconnect(pctx.conn);
+
    delete &w_props;
    return 0;
 }
