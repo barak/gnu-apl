@@ -90,23 +90,39 @@ using namespace std;
 
 // ===========================================================================
 /// Some xcb IDs (returned from the X server)
-struct XCB_context
+class XCB_context : public Quad_PLOT::PLOT_context
 {
+public:
    /// constructor
-   XCB_context(const Plot_window_properties & props, int h)
-   : handle(h),
+   XCB_context(const Plot_window_properties & props, Quad_PLOT::Handle h)
+   : Quad_PLOT::PLOT_context(h),
+     thread(pthread_self()),
      caption(0),
-     w_props(props)
+     w_props(props),
+     window_goon(true)
    {}
 
-   ~XCB_context()
-      { free(caption); }
+   /// destructor
+   virtual ~XCB_context()
+      {
+        free(const_cast<char *>(caption));
+        delete &w_props;
+      }
 
-   /// handle in APL
-   const int handle;
+   /// overloaded PLOT_context::plot_stop()
+   virtual void plot_stop()
+      {
+        window_goon = false;
+      }
+
+   virtual pthread_t get_thread() const
+      { return thread; }
+
+   /// the pthread running the X event loop for the plot window
+   pthread_t thread;
 
    /// window caption
-   char * caption;
+   const char * caption;
 
    /// the window properties (as choosen by the user)
    const Plot_window_properties & w_props;
@@ -120,6 +136,9 @@ struct XCB_context
    xcb_gcontext_t     point;      ///< the curren point style
    xcb_gcontext_t     text;       ///< the curren text style
    xcb_font_t         font;       ///< the curren font
+
+   /// false if the window was closed from APL
+   bool window_goon;
 };
 
 //----------------------------------------------------------------------------
@@ -167,7 +186,7 @@ const xcb_query_text_extents_cookie_t cookie =
       }
 }
 //----------------------------------------------------------------------------
-/// test obtaining of a cookie
+/// test a returned cookie for errors (and print \b errMessage if any).
 void
 testCookie(xcb_void_cookie_t cookie, xcb_connection_t * conn,
            const char * errMessage)
@@ -1264,6 +1283,8 @@ const char * outfile = strdup(w_props.get_output_filename().c_str());
 
 const Quad_PLOT::Handle handle = Quad_PLOT::next_handle;
 XCB_context pctx(w_props, handle);
+   Quad_PLOT::all_PLOT_windows.push_back(&pctx);
+
 const int off = 50*handle;
 
 const Plot_data & data = w_props.get_plot_data();
@@ -1398,40 +1419,30 @@ const xcb_get_input_focus_reply_t * focusReply =
    // X main loop
    //
 bool file_saved = false;
-   for (bool goon = true; goon;)
+   while (pctx.window_goon)
       {
-        xcb_generic_event_t * event = xcb_poll_for_event(pctx.conn);
-        if (event == 0)   // nothing happened
+        union
            {
-             pthread_t thread = pthread_self();
-             bool zombie = true;
-             sem_wait(Quad_PLOT::plot_threads_sema);
-                loop(pt, Quad_PLOT::plot_threads.size())
-                    if (Quad_PLOT::plot_threads[pt] == thread)
-                       {
-                         zombie = false;
-                         break;   // loop(pt)
-                       }
-             sem_post(Quad_PLOT::plot_threads_sema);
-
-             if (zombie)
-                {
-                  free(event);
-                  goon = false;   // break the outer for ()
-                  continue;       // for ()
-                }
-
-             usleep(200000);
+             void                         * vp;
+             xcb_generic_event_t          * generic_event_t;
+             xcb_request_error_t          * request_error_t;
+             xcb_configure_notify_event_t * configure_notify_event_t;
+             xcb_property_notify_event_t  * property_notify_event_t;
+             xcb_client_message_event_t   * client_message_event_t;
+           } event;
+        event.generic_event_t = xcb_poll_for_event(pctx.conn);
+        if (event.vp == 0)   // nothing happened
+           {
+             if (pctx.window_goon)   usleep(200000);
              continue;
            }
 
-        switch(event->response_type & ~0x80)
+        switch(event.generic_event_t->response_type & ~0x80)
            {
              case 0:   // error
                   {
-                    const xcb_request_error_t * e = reinterpret_cast
-                          <const xcb_request_error_t *>(event);
-                    const int error_code = e->error_code;
+                    const xcb_request_error_t * e = event.request_error_t;
+                    const int error_code = event.request_error_t->error_code;
                     CERR << "\n*** X11 ERROR " << error_code             << endl
                          << "    major_opcode: " << int(e->major_opcode) << endl
                          << "    minor_opcode: " << int(e->minor_opcode) << endl
@@ -1453,18 +1464,21 @@ bool file_saved = false;
                        if (w_props.get_auto_close())
                           {
                             // wake-up the interpreter
-                            sem_post(Quad_PLOT::plot_window_sema);
-                            goon = false;
+                            sem_post(Quad_PLOT::expose_sema);
+                            pctx.window_goon = false;
                             continue;
                           }
                      }
 
                   if (focusReply)
                      {
-                       /* this is the first XCB_EXPOSE event. X has moved
-                          the focus away from our caller (the window that is
-                          running the apl interpreter) to the newly
-                          created window (which is somehat annoying).
+                       /* this is the first XCB_EXPOSE event (since we clear
+                          focusReply below). X has moved the focus away from
+                          our caller (the window that is running the GNU APL
+                          interpreter) to the newly created ⎕PLOT window.
+
+                          This focus change is rather annoying, and to fix it
+                          we move the focus back to the APL interpreter
 
                           Return the focus to the window from which we have
                           stolen it.
@@ -1474,7 +1488,7 @@ bool file_saved = false;
                        focusReply = 0;
                     }
                   xcb_flush(pctx.conn);
-                  sem_post(Quad_PLOT::plot_window_sema);
+                  sem_post(Quad_PLOT::expose_sema);   // unleash the interpreter
                   break;
 
              case XCB_UNMAP_NOTIFY:       // 18
@@ -1496,8 +1510,7 @@ bool file_saved = false;
                   // XCB_EXPOSE has occurred.
                   {
                     const xcb_configure_notify_event_t * notify =
-                          reinterpret_cast<const xcb_configure_notify_event_t*>
-                             (event);
+                          event.configure_notify_event_t;
                     w_props.set_window_size(notify->width, notify->height);
                   }
              break;
@@ -1505,8 +1518,7 @@ bool file_saved = false;
              case XCB_PROPERTY_NOTIFY:     // 28
                   {
                     const xcb_property_notify_event_t * notify =
-                          reinterpret_cast<const xcb_property_notify_event_t*>
-                          (event);
+                          event.property_notify_event_t;
                     if (w_props.get_verbosity() & SHOW_EVENTS)
                        CERR << "\n*** XCB_PROPERTY_NOTIFY"
                                " atom=" << int(notify->atom) <<
@@ -1515,56 +1527,49 @@ bool file_saved = false;
              break;
 
              case XCB_CLIENT_MESSAGE:     // 33
-                  if (reinterpret_cast<xcb_client_message_event_t *>(event)
-                           ->data.data32[0] == window_deleted)
+                  if (event.client_message_event_t->data.data32[0]
+                      == window_deleted)
                      {
                        // CERR << "Killed!" << endl;
-                       free(event);
+                       free(event.vp);
 
                        // make this thread a zombie
                        //
-                       sem_wait(Quad_PLOT::plot_threads_sema);
-                          const int count = Quad_PLOT::plot_threads.size();
+                       sem_wait(Quad_PLOT::all_PLOT_windows_sema);
+                          const int count = Quad_PLOT::all_PLOT_windows.size();
                           const pthread_t thread = pthread_self();
                           loop(pt, count)
-                              if (Quad_PLOT::plot_threads[pt] == thread)
+                              if (all_PLOT_windows[pt]->get_thread() == thread)
                                  {
-                                   Quad_PLOT::plot_threads[pt] =
-                                      Quad_PLOT::plot_threads[count - 1];
-                                   Quad_PLOT::plot_threads.pop_back();
+                                   Quad_PLOT::all_PLOT_windows[pt] =
+                                      Quad_PLOT::all_PLOT_windows[count - 1];
+                                   Quad_PLOT::all_PLOT_windows.pop_back();
                                    break;
                                  }
-                       sem_post(Quad_PLOT::plot_threads_sema);
+                       sem_post(Quad_PLOT::all_PLOT_windows_sema);
 
-                       goon = false;   // break the outer for ()
+                       pctx.window_goon = false;   // break the outer for ()
                        continue;   // for ()
                      }
                   break;   // switch()
 
              default:
                 if (w_props.get_verbosity() & SHOW_EVENTS)
-                   CERR << "unexpected event type "
-                        << int(event->response_type)
+                   CERR << "unexpected/unsupported event type "
+                        << int(event.generic_event_t->response_type)
                          << " (ignored)" << endl;
            }
 
-        free(event);
+        free(event.vp);
       }
 
    // at this point the plot window was closed
 
    // remove the APL handle for this window
-   loop(h, Quad_PLOT::window_handles.size())
-       {
-         if (Quad_PLOT::window_handles[h] == handle)
-            {
-               Quad_PLOT::window_handles[h] = Quad_PLOT::window_handles.back();
-               Quad_PLOT::window_handles.pop_back();
-               if (Quad_PLOT::window_handles.size() == 0)
-                  Quad_PLOT::next_handle = 0;
-               break;
-            }
-       }
+   //
+   Quad_PLOT::PLOT_context::remove_handle(pctx.handle);
+   if (Quad_PLOT::all_PLOT_windows.size() == 0)   Quad_PLOT::next_handle = 0;
+
    // free the text_gc
    //
    testCookie(xcb_free_gc(pctx.conn, pctx.text), pctx.conn, "can't free gc");
@@ -1576,8 +1581,8 @@ bool file_saved = false;
    }
 
    xcb_disconnect(pctx.conn);
+   free(const_cast<char *>(outfile));
 
-   delete &w_props;
    return 0;
 }
 // ===========================================================================

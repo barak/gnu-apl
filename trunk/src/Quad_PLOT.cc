@@ -94,31 +94,18 @@
 
 using namespace std;
 
-#define I1616(x, y) int16_t(x), int16_t(y)
-# define ITEMS(x) sizeof(x)/sizeof(*x), x
-
 Quad_PLOT  Quad_PLOT::_fun;
 Quad_PLOT * Quad_PLOT::fun = &Quad_PLOT::_fun;
 
+vector<Quad_PLOT::PLOT_context *> Quad_PLOT::all_PLOT_windows;
+
 Quad_PLOT::Handle Quad_PLOT::next_handle = 0;
 
-sem_t __plot_threads_sema;
-sem_t * Quad_PLOT::plot_threads_sema = &__plot_threads_sema;
+sem_t __all_PLOT_windows_sema;
+sem_t * Quad_PLOT::all_PLOT_windows_sema = &__all_PLOT_windows_sema;
 
-sem_t __plot_window_sema;
-sem_t * Quad_PLOT::plot_window_sema = &__plot_window_sema;
-
-/**
-   \b Quad_PLOT::plot_threads contains one thread per (open) plot window.
-   The thread handles the X main loop for the window. The thread also monitors
-   its presence in plot_threads so that removing a thread from \b plot_threads
-   causes the thread to close its plot window and then to exit.
- **/
-
-vector<int> Quad_PLOT::window_handles;
-#if ! apl_GTK3   // XCB
-vector<pthread_t> Quad_PLOT::plot_threads;
-#endif
+sem_t __expose_sema;
+sem_t * Quad_PLOT::expose_sema = &__expose_sema;
 
 int Quad_PLOT::verbosity = 0;
 
@@ -195,25 +182,19 @@ using namespace std;
 #include "Plot_line_properties.hh"
 #include "Plot_window_properties.hh"
 
-// the pthread that handles one plot window (XCB)
-extern void * plot_main_XCB(void * vp_props);
-
-// the function that handles one plot window (GTK)
-extern int plot_main_GTK(void * vp_props);
-
 //============================================================================
 
 Quad_PLOT::Quad_PLOT()
   : QuadFunction(TOK_Quad_PLOT)
 {
-   __sem_init(plot_threads_sema, 0, 1);
-   __sem_init(plot_window_sema, 1, 0);
+   __sem_init(all_PLOT_windows_sema, 0, 1);
+   __sem_init(expose_sema, 1, 0);
    verbosity = 0;
 }
 //----------------------------------------------------------------------------
 Quad_PLOT::~Quad_PLOT()
 {
-   __sem_destroy(plot_threads_sema);
+   __sem_destroy(all_PLOT_windows_sema);
 }
 //----------------------------------------------------------------------------
 Token
@@ -251,7 +232,8 @@ Plot_window_properties * w_props = new Plot_window_properties(data, verbosity);
 
    // do_plot_data takes ownership of w_props and will delete w_props
    //
-   return Token(TOK_APL_VALUE1, do_plot_data(w_props, data));
+const APL_Integer Z = do_plot_data(w_props, data);
+   return Token(TOK_APL_VALUE1, IntScalar(Z, LOC));
 }
 //----------------------------------------------------------------------------
 ErrorCode
@@ -353,7 +335,8 @@ Plot_window_properties * w_props = new Plot_window_properties(data, verbosity);
          WS_FULL;
       }
 
-   return Token(TOK_APL_VALUE1, do_plot_data(w_props, data));
+const APL_Integer Z = do_plot_data(w_props, data);
+   return Token(TOK_APL_VALUE1, IntScalar(Z, LOC));
 }
 //----------------------------------------------------------------------------
 Value_P
@@ -386,18 +369,12 @@ Quad_PLOT::window_control(APL_Integer B0) const
       {
         Value_P Z = window_control(-6);   // get all open handles, see below
 
-#if apl_GTK3   // GTK
-         loop(h, window_handles.size())
+         loop(h, all_PLOT_windows.size())
             {
-              const Handle handle = window_handles[h];
-              plot_stop_APL(handle);
+              all_PLOT_windows[h]->plot_stop();
             }
 
-#else          // XCB
-          plot_threads.clear();   // plot_main_XCB() will kill zombies
-#endif
-
-         window_handles.clear();
+         all_PLOT_windows.clear();
          next_handle = 0;
          Z->check_value(LOC);
          return Z;
@@ -412,13 +389,13 @@ Quad_PLOT::window_control(APL_Integer B0) const
 
     if (B0 == -6)                // (sorted) list of handles
        {
-         Value_P Z(window_handles.size(), LOC);
+         Value_P Z(all_PLOT_windows.size(), LOC);
          for (int offset = 0; Z->more(); offset += 64)
              {
                uint64_t bits = 0;
-               loop(h, window_handles.size())
+               loop(h, all_PLOT_windows.size())
                    {
-                     const int handle = window_handles[h];
+                     const int handle = all_PLOT_windows[h]->handle;
                      const int bit = handle - offset;
                      if (bit >= 0 && bit < 64)   bits |= 1ULL << bit;
                    }
@@ -436,40 +413,20 @@ Quad_PLOT::window_control(APL_Integer B0) const
    //
 bool found = false;
 
-#if apl_GTK3
-
-const int handle = plot_stop_APL(B0);
-    loop(p, window_handles.size())
-        {
-          if (window_handles[p] == handle)   // found
-             {
-               window_handles[p] = window_handles.back();
-               window_handles.pop_back();
-               found = true;
-               break;
-             }
-
-        }
-
-#else   // XCB
-
-   sem_wait(plot_threads_sema);
-       loop(pt, Quad_PLOT::plot_threads.size())
+   sem_wait(all_PLOT_windows_sema);
+       loop(w, Quad_PLOT::all_PLOT_windows.size())
            {
-             if (window_handles[pt] != B0)   continue;
+             if (all_PLOT_windows[w]->handle != B0)   continue;
 
-             plot_threads[pt] = plot_threads[plot_threads.size() - 1];
-             window_handles[pt] = window_handles[window_handles.size() - 1];
-             plot_threads.pop_back();
-             window_handles.pop_back();
+             all_PLOT_windows[w]->plot_stop();
+             all_PLOT_windows[w] = all_PLOT_windows.back();
+             all_PLOT_windows.pop_back();
              found = true;
              break;
            }
-   sem_post(plot_threads_sema);
+   sem_post(all_PLOT_windows_sema);
 
-#endif   // GTK vs. XCB
-
-   if (window_handles.size() == 0)   next_handle = 0;   // restart numbering
+   if (all_PLOT_windows.size() == 0)   next_handle = 0;   // restart numbering
 
    return IntScalar(found ? B0 : 0, LOC);
 }
@@ -782,7 +739,7 @@ const ShapeItem data_points = rows * cols;
    return data;
 }
 //----------------------------------------------------------------------------
-Value_P
+APL_Integer
 Quad_PLOT::do_plot_data(Plot_window_properties * w_props,
                         const Plot_data * data)
 {
@@ -810,25 +767,23 @@ Quad_PLOT::do_plot_data(Plot_window_properties * w_props,
       }
 
 const APL_Integer Z = ++next_handle;
-   sem_wait(plot_threads_sema);
+   sem_wait(all_PLOT_windows_sema);
       {
 #if apl_GTK3   // GTK
 
-   plot_main_GTK(w_props);
+   plot_main_GTK(w_props, Z);   // pushes a GTK_context into all_PLOT_windows.
 
 #else          // XCB
 
-pthread_t thread;
-   pthread_create(&thread, 0, plot_main_XCB, w_props);
-   plot_threads.push_back(thread);
+pthread_t th;
+   pthread_create(&th, 0, plot_main_XCB, w_props);   // pushes a XCB_context
 
 #endif
-   window_handles.push_back(next_handle);
       }
-   sem_post(plot_threads_sema);
+   sem_post(all_PLOT_windows_sema);
 
-   sem_wait(plot_window_sema);   // blocks until window shown
-   return IntScalar(Z, LOC);
+   sem_wait(expose_sema);   // blocks until window shown
+   return Z;
 }
 //----------------------------------------------------------------------------
 static UCS_string
@@ -880,6 +835,24 @@ Quad_PLOT::help()
 # include "Quad_PLOT.def"
 
    CERR << right;
+}
+//----------------------------------------------------------------------------
+Quad_PLOT::Handle
+Quad_PLOT::PLOT_context::remove_handle(Handle handle)
+{
+// CERR << "remove_handle(" << handle << ")" << endl;
+
+   loop(h, all_PLOT_windows.size())
+      {
+        if (all_PLOT_windows[h]->handle == handle)
+           {
+             all_PLOT_windows[h] = all_PLOT_windows.back();
+             all_PLOT_windows.pop_back();
+             return handle;
+           }
+      }
+
+   return 0;
 }
 //----------------------------------------------------------------------------
 #endif // defined(WHY_NOT)

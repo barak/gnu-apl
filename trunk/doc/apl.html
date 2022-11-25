@@ -275,7 +275,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Chapter 1</a>, Up: <a href="
 <a name="GNU-APL"></a>
 <h1 class="top">GNU APL</h1>
 
-<p>November 16, 2022
+<p>November 25, 2022
 </p>
 <p>This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
@@ -3761,7 +3761,7 @@ Next: <a href="#Section-2_002e32" accesskey="n" rel="next">Section 2.32</a>, Pre
 <p>⎕PLOT is a function for visualizing numerical APL values. The values to be
 plotted are provided as the right argument of ⎕PLOT while the optional
 left argument controls details of the output, such as the plot window size,
-colors for lines and grids, etc.
+colors for plot lines, points, and grids, etc.
 </p>
 <p>The general syntax of ⎕PLOT is:
 </p>
@@ -3769,10 +3769,11 @@ colors for lines and grids, etc.
    H←⎕PLOT B     ⍝ plot B with all attributes set to their default values
    H←A ⎕PLOT B   ⍝ plot B with some of the default attributes overridden
    ⎕PLOT H       ⍝ close the plot window with handle H
-   ⎕PLOT  0      ⍝ verbosity: OFF (do not print attribute values)
+   ⎕PLOT  0      ⍝ verbosity: OFF (no debug output)
    ⎕PLOT ¯1      ⍝ verbosity: ON (print attribute values before plotting)
    ⎕PLOT ¯2      ⍝ verbosity: DEBUG (also print debug information)
    ⎕PLOT ¯3      ⍝ close all plot windows
+   ⎕PLOT ¯6      ⍝ return all open plot window handles H
 </pre>
 <table class="menu" border="0" cellspacing="0">
 <tr><td align="left" valign="top">&bull; <a href="#Output-File-Format" accesskey="1">Output File Format</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">
@@ -3782,14 +3783,14 @@ colors for lines and grids, etc.
 <a name="The-Plot-Data-B"></a>
 <h4 class="subsection">2.31.1 The Plot Data B</h4>
 
-<p>The Plot Data B can be a vector (in that case a single plot line is being
-plotted) or a matrix (in that case one plot line per matrix row is being
-plotted, by default in different colors). Each data item has to be numeric
+<p>The plot data <b>B</b> can be a vector (for a single plot line to be drawn)
+or a matrix (in that case one plot line per matrix row is being
+drawn, by default in different colors). Each data item has to be numeric
 and represents one point in the plot. The points that are adjacent in a row
-of the matrix are connected by lines. By default plotted points and the lines
-connecting them have the same color. However, all colors used, all diameters
-of points, and all thicknesses of the lines can be controlled by overriding
-the default values (dyadic A ⎕PLOT B).
+of the matrix are connected by lines. By default plotted points are black and
+the lines connecting them are green (for the first plot line). However, all
+colors used, all diameters of points, and all thicknesses of the lines can
+be fine-tuned by overriding the default values (see dyadic A ⎕PLOT B below).
 </p>
 <a name="Complex-Plot-Data-B"></a>
 <h4 class="subsubsection">2.31.1.1 Complex Plot Data B</h4>
@@ -3971,46 +3972,56 @@ of lines.
 </p>
 <p>If the global attribute <b>output_filename</b> is given, then the plot is
 not only being displayed in a window on the screen, but also written
-to a file with the name of the file provided as attribute value. 
-See <a href="#Output-File-Format">Output File Format</a>, below.
+to a file with the name of the file provided as attribute value.
+See <a href="#Output-File-Format">Output File Format</a> below.
 </p>
 <p>For example:
 </p>
 <pre class="verbatim">      ⊣ ( ⊂ &quot;output_filename: /tmp/bitmap.png&quot; ) ⎕PLOT 1 3 1 4 2
 </pre>
-<p>writes the plot of a a zigzag curve to file <b>/tmp/bitmap.png</b>
-(<b>Caution</b>: ⎕PLOT with attribute output_filename overrides existing
-files without a warning). Lack of permissions to write the file raises
-a DOMAIN ERROR with )MORE possibly providing details.
+<p>writes the plot of a a zigzag curve to file <b>/tmp/bitmap.png</b>.
+</p>
+<p><b>Caution</b>: ⎕PLOT with attribute <b>output_filename</b> overrides existing
+files without any warning). Errors, most likely lack of permissions to write
+the output file, raises a DOMAIN ERROR with )MORE possibly providing details
+as to while the file could not be written.
 </p>
 <p>Some line attributes such as <b>line_width</b> or <b>point size</b> are
-frequently the same for several or all plot lines. In that case one can use
-the line attribute without a -N resp. _N suffix which is then used for all lines
-(unless overridden by the same attribute with -N resp. _N suffix.
+frequently the same for several or even all plot lines. In that case one can
+use the line attribute without a -N resp. _N suffix which is then used as the
+default for all lines (unless overridden by the same attribute with -N resp.
+_N suffix.
 </p>
+<p>For example:
+</p>
+<pre class="verbatim">Attributes.line_width   ← 2   ⍝ all plot lines:     2 pixels thick,
+Attributes.line_width-2 ← 4   ⍝ except plot line 2: 4 pixels thick
+</pre>
 <a name="Plot-Window-Handling"></a>
 <h4 class="subsection">2.31.3 Plot Window Handling</h4>
 
-<p>Each call of ⎕PLOT with some plot data B opens a separate window in the X
+<p>Each call of ⎕PLOT with some plot data <b>B</b> opens a separate window in the X
 server (which implies that ⎕PLOT requires X). That window runs in its own
 thread until it is being closed. A plot window can be closed in different ways:
 </p>
 <ul>
-<li> by clicking on the close button (often located near the top-right corner)
-  of the window,
-</li><li> by opening the drop down menu of the window (near the top left-of
-  the window) and selecting the option named &quot;Close&quot;,
-</li><li> from APL by calling <b>⎕PLOT ¯3</b> (which closes <b>all</b> open
-  plot windows), or
-</li><li> from APL by calling <b>⎕PLOT H</b> (which closes a specific plot window),
-  where H is the plot window handle returned by monadic ⎕PLOT B or by dyadic
-  A ⎕PLOT B with plot attributes A.
+<li> interactively by clicking on the close button (often located near the
+      top-right corner)  of the plot window,
+</li><li> interactively by opening the drop down menu (if any) of the window
+      (near the top left-of the window) and selecting the menu option named
+      <b>Close</b>,
+</li><li> programmatically from APL by calling <b>⎕PLOT ¯3</b> (which closes <b>all</b>
+     open plot windows), or
+</li><li> programmatically from APL by calling <b>⎕PLOT H</b> (which closes a
+      specific plot window), where H is the plot window handle returned by
+      monadic <b>⎕PLOT B</b>, or by dyadic <b>A ⎕PLOT B</b> with plot attributes
+      <b>A</b> and plot data <b>B</b>.
 </li></ul>
 
-<p>Note that the exact method for closing a plot window with the mouse (as opposed
-to <b>⎕PLOT ¯3</b> or <b>⎕PLOT H</b> from APL) differs between different
-window managers. The above stands for the standard method(s) for closing windows
-on your system.
+<p>Note that the exact method for closing a plot window interactively with the
+mouse or the keyboard (as opposed to programmatically <b>⎕PLOT ¯3</b> or
+<b>⎕PLOT H</b> from APL) differs between different window managers. The above
+stands for the typical method(s) for closing windows on most systems.
 </p>
 <hr>
 <a name="Output-File-Format"></a>

@@ -54,34 +54,53 @@ public:
    static Quad_PLOT  _fun;          ///< Built-in function.
 
    /// a semaphore blocking until the plot window has been EXPOSED
-   static sem_t * plot_window_sema;
+   static sem_t * expose_sema;
 
-   /// a semaphore protecting plot_threads
-   static sem_t * plot_threads_sema;
+   /// a semaphore protecting vector all_PLOT_windows
+   static sem_t * all_PLOT_windows_sema;
 
    /// a small number that identifies a window
    typedef int Handle;
-   static std::vector<Handle> window_handles;
 
    /// the next handle (-1)
    static Handle next_handle;
 
+   /// the GUI-independent part of ⎕PLOT (at APL level).
+   class PLOT_context
+      {
+        public:
+           /// constructor
+           PLOT_context(Handle h)
+           : handle(h)
+           {}
+
+           /// return the per-window thread (for GUIs that have one, i.e. XCB).
+           virtual pthread_t get_thread() const
+              { return 0; }
+
+           /// close the plot window in the GUI
+           virtual void plot_stop() = 0;
+
+           /// destructor (shall clean up the GUI-dependent context)
+           virtual ~PLOT_context() {}
+           const Handle handle;
+
+           /// close \b hnadle from all_PLOT_windows
+           static Handle remove_handle(Handle handle);   // GTK only
+      };
+
+   /// all open ⎕PLOT windows
+   static vector<PLOT_context *> all_PLOT_windows;
+
 #if apl_GTK3   // GTK
 
-   /// close the plot window with \b handle (from GTK)
-   static Handle plot_stop_GUI(Handle handle);
-
    /// the GTK window that handles one plot window.
-   static void plot_main_GTK(void * vp_props);
+   static void plot_main_GTK(void * vp_props, Handle handle);
 
 #else         // XCB
 
    /// the pthread that handles one plot window.
    static void * plot_main_XCB(void * vp_props);
-
-   /// an array of threads (one per plot window) handling X events from the
-   /// window
-   static std::vector<pthread_t> plot_threads;
 #endif
 
 protected:
@@ -101,8 +120,8 @@ protected:
    static void help();
 
    /// plot the data (creating a new plot window in X)
-   static Value_P do_plot_data(Plot_window_properties * w_props,
-                               const Plot_data * data);
+   static APL_Integer do_plot_data(Plot_window_properties * w_props,
+                                   const Plot_data * data);
 
    /// close the plot window with \b handle (from APL)
    static Handle plot_stop_APL(Handle handle);

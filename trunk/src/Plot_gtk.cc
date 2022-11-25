@@ -56,15 +56,28 @@ enum {  FONT_SIZE = 10 };
      plot data and plot attributes (Plot_window_properties) and
      GTK widgets (window, drawing_area).
  **/
-struct Plot_context
+class GTK_context : public Quad_PLOT::PLOT_context
 {
+public:
    /// constructor
-   Plot_context(Plot_window_properties & pwp)
-   : handle(Quad_PLOT::next_handle),
+   GTK_context(Plot_window_properties & pwp, Quad_PLOT::Handle handle)
+   : PLOT_context(handle),
      w_props(pwp),
      window(0),
      drawing_area(0)
    {}
+
+   // destructor
+   ~GTK_context()
+      {
+        delete &w_props;
+      }
+
+   /// overloaded PLOT_context::plot_stop()
+   virtual void plot_stop()
+      {
+        gtk_window_close(GTK_WINDOW(window));
+      }
 
    /// return the required width of the entire plot area
    int get_total_width() const
@@ -84,21 +97,15 @@ struct Plot_context
               + w_props.get_pa_border_B();
        }
 
-   /// the handle for identifying this PNG_context in APL
-   const int handle;
-
    /// the window properties (as choosen by the user)
    Plot_window_properties & w_props;
 
-   /// the window of this Plot_context
+   /// the window of this GTK_context
    GtkWidget * window;
 
-   /// the drawing area in the window of this Plot_context
+   /// the drawing area in the window of this GTK_context
    GtkWidget * drawing_area;
 };
-
-/// all Plot_contexts (= all open windows) for ⎕PLOT
-static vector<Plot_context *> all_plot_contexts;
 
 //----------------------------------------------------------------------------
 /// same as standard cairo_set_RGB_source() but with Color instead of double
@@ -405,10 +412,6 @@ short digits = 0;
    snprintf(fmt, sizeof(fmt), "%%.%uf", digits);   // e.g. %.2f
    snprintf(cc,  sizeof(cc) - 1, fmt, val);
 
-   // some locales produce , instead of . in snprintf(). We fix that here...
-   //
-   for (char * cp = cc; *cp; ++cp)   if (*cp == ',')   *cp = '.';
-
    // skip leading 0 in 0.xxx
    if (cc[1] == '.' && cc[0] == '0')   return cc + 1;
 
@@ -538,7 +541,7 @@ char line[strlen(lines) + 10];
 //----------------------------------------------------------------------------
 /// draw a legend for the different plot lines
 void
-draw_legend(cairo_t * cr, const Plot_context & pctx, bool surface_plot)
+draw_legend(cairo_t * cr, const GTK_context & pctx, bool surface_plot)
 {
 const Plot_window_properties & w_props = pctx.w_props;
 const int lx = w_props.get_legend_lX();
@@ -643,7 +646,7 @@ const Pixel_XY P = P0;   P0 = P1;   P1 = P;
 /// draw a 3D triangle where one point P0 is at visual height H0 and the
 /// other two points P1 and P2 are the same at visual height H12.
 void
-draw_triangle(cairo_t * cr, const Plot_context & pctx, int verbosity,
+draw_triangle(cairo_t * cr, const GTK_context & pctx, int verbosity,
               Pixel_XY P0, double H0, Pixel_XY P1, Pixel_XY P2, double H12)
 {
    // draw a triangle with P1 and P2 at the same level H12
@@ -680,7 +683,7 @@ const double dH = (H12 - H0) / steps;
 /// heights H0, H1, and H2 respectively. This is done by splitting the
 /// triangle into two triangles that each have 2 points at the same height.
 void
-draw_triangle(cairo_t * cr, const Plot_context & pctx, int verbosity,
+draw_triangle(cairo_t * cr, const GTK_context & pctx, int verbosity,
               Pixel_XY P0, double H0, Pixel_XY P1, double H1,
               Pixel_XY P2, double H2)
 {
@@ -736,7 +739,7 @@ const vector<level_color> & color_steps = w_props.get_gradient();
 //----------------------------------------------------------------------------
 /// draw the (vertical) X grid-lines of the plot (starting from the X axis)
 void
-draw_X_grid(cairo_t * cr, const Plot_context & pctx, bool surface_plot)
+draw_X_grid(cairo_t * cr, const GTK_context & pctx, bool surface_plot)
 {
 const Plot_window_properties & w_props = pctx.w_props;
 const int line_width = w_props.get_gridX_line_width();
@@ -800,7 +803,7 @@ const int grid_style = w_props.get_gridX_style();
 //----------------------------------------------------------------------------
 /// draw the (horizontal) Y grid-lines of the plot (starting at the Y axis)
 void
-draw_Y_grid(cairo_t * cr, const Plot_context & pctx, bool surface_plot)
+draw_Y_grid(cairo_t * cr, const GTK_context & pctx, bool surface_plot)
 {
 const Plot_window_properties & w_props = pctx.w_props;
 const int line_width = w_props.get_gridY_line_width();
@@ -887,7 +890,7 @@ const int grid_style = w_props.get_gridY_style();
 //----------------------------------------------------------------------------
 /// draw the (slanted) Z grid-lines of the plot
 void
-draw_Z_grid(cairo_t * cr, const Plot_context & pctx)
+draw_Z_grid(cairo_t * cr, const GTK_context & pctx)
 {
 const Plot_window_properties & w_props = pctx.w_props;
 const int line_width = w_props.get_gridZ_line_width();
@@ -1006,7 +1009,7 @@ int grid_style = w_props.get_gridZ_style();
 //----------------------------------------------------------------------------
 /// draw normal (2D) data lines
 void
-draw_plot_lines(cairo_t * cr, const Plot_context & pctx)
+draw_plot_lines(cairo_t * cr, const GTK_context & pctx)
 {
 const Plot_window_properties & w_props = pctx.w_props;
 const Plot_data & data = w_props.get_plot_data();
@@ -1052,7 +1055,7 @@ Plot_line_properties const * const * l_props = w_props.get_line_properties();
 //----------------------------------------------------------------------------
 /// draw surface (3D) data lines
 void
-draw_surface_lines(cairo_t * cr, const Plot_context & pctx)
+draw_surface_lines(cairo_t * cr, const GTK_context & pctx)
 {
 const Plot_window_properties & w_props = pctx.w_props;
 const Plot_data & data = w_props.get_plot_data();
@@ -1221,7 +1224,7 @@ const int point_style  = lp0.get_point_style();
 //----------------------------------------------------------------------------
 /// plot the data
 static void
-do_plot(GtkWidget * drawing_area, const Plot_context & pctx, cairo_t * cr)
+do_plot(GtkWidget * drawing_area, const GTK_context & pctx, cairo_t * cr)
 {
 const Plot_window_properties & w_props = pctx.w_props;
 const Color canvas_color = w_props.get_canvas_color();
@@ -1253,46 +1256,23 @@ const bool surface_plot = w_props.get_plot_data().is_surface_plot();
 //----------------------------------------------------------------------------
 /// callback when the plot window is destroyed
 extern "C" gboolean
-plot_destroyed(GtkWidget * top_level);
+plot_destroyed(GtkWidget * top_level, gpointer user_data);
 
 gboolean
-plot_destroyed(GtkWidget * top_level)
+plot_destroyed(GtkWidget * top_level, gpointer user_data)
 {
-   /* top_level is the window that was destroyed. Remove it from 
-      all_all_plot_contexts to avoid
-      'invalid unclassed pointer in cast to 'GtkWindow' assertions.
-
-      Case 1: the window was closed from APL. Then plot_stop() has already
-              removed the window from all_plot_contexts and we will not find it
-              below.
-
-      Case 2: the user has closed the window via the GUI. Then plot_stop() was
-              not yet called. We will then find top_level in all_plot_contexts
-              and remove it.
-    */
-
    if (verbosity & SHOW_EVENTS)   CERR << "PLOT DESTROYED" << endl;
 
-   for (size_t th = 0; th < all_plot_contexts.size(); ++th)
-       {
-         const Plot_context * pctx = all_plot_contexts[th];
-         if (top_level == pctx->window)                    // case 2.
-            {
-              all_plot_contexts[th] = all_plot_contexts.back();
-              all_plot_contexts.pop_back();
-              delete &pctx->w_props;
-              Quad_PLOT::plot_stop_GUI(pctx->handle);
-              return TRUE;
-            }
-       }
+const GTK_context * pctx = reinterpret_cast<GTK_context *>(user_data);
+   Quad_PLOT::PLOT_context::remove_handle(pctx->handle);
+   delete pctx;
 
-  // case 1: gtk_main_quit();
   return TRUE;   // event handled by this handler
 }
 //----------------------------------------------------------------------------
 /// return a new surface with window borders, or 0 on failure
 cairo_surface_t *
-add_border(const Plot_context & pctx, cairo_surface_t * old_surface)
+add_border(const GTK_context & pctx, cairo_surface_t * old_surface)
 {
    // gtk_win is the smaller window (excluding the borders created by the
    // window manager).
@@ -1340,8 +1320,8 @@ GdkWindow * root = gdk_get_default_root_window();
                                                         gtk_h + N_border
                                                               + ESW_border);
 
-        cairo_surface_t * ret = gdk_cairo_surface_create_from_pixbuf(pixbuf,
-                                                                     1, gdk_win);
+        cairo_surface_t * ret =
+              gdk_cairo_surface_create_from_pixbuf(pixbuf, 1, gdk_win);
 
         // at this point the window manager has already displayed the window
         // borders, but not the window content (since we have not yet returned
@@ -1366,8 +1346,8 @@ GdkWindow * root = gdk_get_default_root_window();
                                                         gtk_y + N_border,
                                                         gtk_w, gtk_h);
 
-        cairo_surface_t * ret = gdk_cairo_surface_create_from_pixbuf(pixbuf,
-                                                                     1, gdk_win);
+        cairo_surface_t * ret =
+              gdk_cairo_surface_create_from_pixbuf(pixbuf, 1, gdk_win);
 
         // at this point the window manager has already displayed the window
         // borders, but not the window content (since we have not yet returned
@@ -1387,7 +1367,7 @@ GdkWindow * root = gdk_get_default_root_window();
 //----------------------------------------------------------------------------
 /// save the pixels of the plot to a file
 static void
-save_file(Plot_context & pctx, cairo_surface_t * surface)
+save_file(GTK_context & pctx, cairo_surface_t * surface)
 {
 Plot_window_properties & w_props = pctx.w_props;
 
@@ -1395,7 +1375,8 @@ string fname = w_props.get_output_filename();
    if (fname.size() == 0)   return;   // no output_filename or already written
 
    // append .png unless already there
-   if (fname.size() < 4 || strcmp(".png", fname.c_str() + fname.size() - 4))
+   //
+   if (fname.size() <= 4 || strcmp(".png", fname.c_str() + fname.size() - 4))
       fname += ".png";
 
 cairo_status_t stat = CAIRO_STATUS_SUCCESS;
@@ -1415,14 +1396,13 @@ cairo_status_t stat = CAIRO_STATUS_SUCCESS;
       {
         CERR << "wrote output file: " << fname << endl;
 
-        // clear filename so it won;t be written again.
+        // clear filename so it will be written only once.
         //
         string empty;
         w_props.set_output_filename(empty);
   //    if (w_props.get_auto_close() == 1)   gtk_main_quit();
       }
-
-   else
+   else   // error writing file
       {
         CERR << "*** writing output file: '" << fname << "' failed: "
              << strerror(errno) << endl;
@@ -1445,26 +1425,9 @@ const int new_height = gtk_widget_get_allocated_height(drawing_area);
       CERR << "draw_callback(drawing_area = " << drawing_area << ")  "
            << "width: " << new_width << ", height: " << new_height << endl;
 
-   // find the Plot_context for this event...
-   //
-Plot_context * pctx = 0;
-   for (size_t th = 0; th < all_plot_contexts.size(); ++th)
-       {
-           if (all_plot_contexts[th]->drawing_area == drawing_area)
-              {
-                pctx = all_plot_contexts[th];
-                break;
-              }
-       }
-
-   if (pctx == 0)
-      {
-        CERR << "*** Could not find thread handling drawing_area "
-             << reinterpret_cast<void *>(drawing_area) << endl;
-        return false;
-      }
-
+GTK_context * pctx = reinterpret_cast<GTK_context *>(user_data);
    pctx->w_props.set_window_size(new_width, new_height);
+
 cairo_surface_t * surface = gdk_window_create_similar_surface(
                                 gtk_widget_get_window(drawing_area),
                                 CAIRO_CONTENT_COLOR, new_width, new_height);
@@ -1488,8 +1451,8 @@ cairo_surface_t * surface = gdk_window_create_similar_surface(
    return TRUE;   // event handled by this handler
 }
 //----------------------------------------------------------------------------
-/// make gtk_main() suitable for pthread_create() and maybe tell when it is
-/// finished
+/// make gtk_main() suitable for pthread_create() and warn if it returns
+/// (which is not expected to happen).
 static void *
 gtk_main_wrapper(void *)
 {
@@ -1497,55 +1460,7 @@ gtk_main_wrapper(void *)
 
    // not reached
 
-   if (verbosity & SHOW_EVENTS)   CERR << "gtk_main() thread done" << endl;
-
-   return 0;
-}
-//----------------------------------------------------------------------------
-Quad_PLOT::Handle
-Quad_PLOT::plot_stop_APL(Handle handle)
-{
-// CERR << "plot_stop_APL(" << handle << ")" << endl;
-
-   // find the Plot_context for this event...
-   //
-   for (size_t th = 0; th < all_plot_contexts.size(); ++th)
-       {
-         const Plot_context * pctx = all_plot_contexts[th];
-         if (pctx->handle == handle)
-            {
-              const GtkWidget * top_level = pctx->window;
-
-               // gtk_window_close() calls plot_destroyed() so we should
-               // remove it from all_plot_contexts beforehand.
-               //
-              all_plot_contexts[th] = all_plot_contexts.back();
-              all_plot_contexts.pop_back();
-
-              gtk_window_close(GTK_WINDOW(top_level));
-              return handle;
-            }
-       }
-
-   CERR << "*** Could not find handle " << handle
-        << " in plot_stop() ***" << endl;
-   return 0;
-}
-//-------------------------------------------------------------------------------
-Quad_PLOT::Handle
-Quad_PLOT::plot_stop_GUI(Handle handle)
-{
-// CERR << "plot_stop_GUI(" << handle << ")" << endl;
-
-   loop(h, window_handles.size())
-      {
-        if (window_handles[h] == handle)
-           {
-             window_handles[h] = window_handles.back();
-             window_handles.pop_back();
-             return handle;
-           }
-      }
+   CERR << "*** gtk_main() thread done." << endl;
 
    return 0;
 }
@@ -1554,7 +1469,7 @@ Quad_PLOT::plot_stop_GUI(Handle handle)
 #include "Focus.icc"
 
 void
-Quad_PLOT::plot_main_GTK(void * vp_props)
+Quad_PLOT::plot_main_GTK(void * vp_props, Handle handle)
 {
 // CERR << "plot_main(" << vp_props << ")" << endl;
 
@@ -1585,9 +1500,9 @@ Plot_window_properties & w_props =
 #endif
       }
 
-Plot_context * pctx = new Plot_context(w_props);
+GTK_context * pctx = new GTK_context(w_props, handle);
    Assert(pctx);
-   all_plot_contexts.push_back(pctx);
+   Quad_PLOT::all_PLOT_windows.push_back(pctx);
 
    pctx->window = gtk_window_new(GTK_WINDOW_TOPLEVEL);
    Assert(pctx->window);
@@ -1633,15 +1548,15 @@ Plot_context * pctx = new Plot_context(w_props);
 
    gtk_widget_show_all(pctx->window);
 
-   g_signal_connect_object(pctx->window, "destroy",
-                           G_CALLBACK(plot_destroyed), 0, G_CONNECT_AFTER);
+   g_signal_connect(pctx->window, "destroy",
+                    G_CALLBACK(plot_destroyed), pctx);
 
-   g_signal_connect_object(pctx->drawing_area, "draw",
-                           G_CALLBACK(draw_callback), 0, G_CONNECT_AFTER);
+   g_signal_connect(pctx->drawing_area, "draw",
+                    G_CALLBACK(draw_callback), pctx);
 
    pop_focus();
 
-   sem_post(Quad_PLOT::plot_window_sema);   // unleash the APL interpreter
+   sem_post(Quad_PLOT::expose_sema);   // unleash the APL interpreter
 }
 //----------------------------------------------------------------------------
 #endif // apl_GTK3
