@@ -899,8 +899,8 @@ UCS_string lib_wsname(Unicode(libref + UNI_0));
 
    // add it to the table;
    //
-   CERR << "NEW )COPY_ONCE workspace: "
-        << Unicode(libref + UNI_0) << " " << wsname << endl;
+   out << "NEW )COPY_ONCE workspace: "
+       << Unicode(libref + UNI_0) << " " << wsname << endl;
 
    copy_once_table.push_back(lib_wsname);
    Workspace::copy_WS(out, libref, wsname, args, false);

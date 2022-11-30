@@ -372,14 +372,19 @@ const int height = data & 0xFFFF;
 void
 static cmd_3_show_GUI()
 {
-  assert(builder);
+   assert(builder);
    if (top_level_widget)
       window = gtk_builder_get_object(builder, top_level_widget);
    else
       window = gtk_builder_get_object(builder, "window1");
 
-  assert(window);
-gtk_widget_show_all(GTK_WIDGET(window));
+   assert(window);
+
+   gtk_window_set_type_hint(GTK_WINDOW(window), GDK_WINDOW_TYPE_HINT_DIALOG);
+   gtk_window_set_deletable(GTK_WINDOW(window), false);
+   gtk_window_set_resizable(GTK_WINDOW(window), false);
+
+   gtk_widget_show_all(GTK_WIDGET(window));
 
 pthread_t thread = 0;
    pthread_create(&thread, 0, reinterpret_cast<void *(*)(void *)>(gtk_main), 0);

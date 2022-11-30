@@ -1048,22 +1048,30 @@ Workspace::copy_WS(ostream & out, LibRef libref, const UCS_string & WS_name,
 UTF8_string filename = LibPaths::get_lib_filename(libref, WS_name, true,
                                                   ".xml", ".apl");
 
+   // open filename. There are three cases:
+   //
+   // 1. filename.apl (i.e. file was )DUMPed). dump_fd: ≠ -1, in: closed
+   // 2. filename.xml (i.e. file was )SAVEd).  dump_fd: = -1, in: open
+   // 3. no such file.                         dump_fd: = -1, in: closed
+   //
 int dump_fd = -1;
 XML_Loading_Archive in(out, filename.c_str(), dump_fd);
-   if (dump_fd != -1)
+   if (dump_fd != -1)   // case 1: )DUMPed .apl file
       {
         load_DUMP(out, filename, dump_fd, no_LX, false, &lib_ws_objects);
         // load_DUMP closes dump_fd
         return;
       }
 
-   if (!in.is_open())   // open failed: try filename.xml unless already .xml
+   if (!in.is_open())   // case 3: open failed
       {
         CERR << ")COPY " << WS_name << " (file " << filename
              << ") failed: " << strerror(errno) << endl;
         return;
       }
 
+   // case 2: )SAVEd .xml file
+   //
    Log(LOG_command_IN)   CERR << "LOADING " << WS_name << " from file '"
                               << filename << "' ..." << endl;
 
