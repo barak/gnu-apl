@@ -48,6 +48,7 @@ Bif_F12_PARTITION::do_eval_B(Value_P B)
 
 Value_P Z(LOC);
 Value_P B0 = CLONE_P(B, LOC);
+
    Z->next_ravel_Pointer(B0.get());
    Z->check_value(LOC);
    return Z;
@@ -328,6 +329,7 @@ Bif_F12_PICK::disclose_item(Value & Z, ShapeItem b,
          //
         const Value & vB = *B_item.get_pointer_value();
         Bif_F12_TAKE::fill(item_shape, Z, vB, false);
+        if (vB.is_member())   Z.set_member();
       }
    else if (B_item.is_lval_cell())
       {

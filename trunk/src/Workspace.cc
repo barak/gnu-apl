@@ -599,6 +599,8 @@ const APL_Integer tz = the_workspace.v_Quad_TZ.get_offset();
    // close open files in ⎕FIO
    Quad_FIO::clear();
 
+   Quad_SQL::close_all_connections();
+
    set_WS_name(UCS_string("CLEAR WS"));
    if (!silent)   out << "CLEAR WS" << endl;
 }

@@ -53,6 +53,7 @@ Nabla::Nabla(const UCS_string & cmd)
      modified(false),
      do_close(false),
      locked(false),
+     out_of_order(false),
      current_line(1),
      first_command(cmd)
 {
@@ -445,7 +446,10 @@ command_loop:
    // optional edit_from
    //
    if (Avec::is_digit(c.get()) || c.get() == UNI_FULLSTOP)
-      edit_from = parse_lineno(c);
+      {
+        edit_from = parse_lineno(c);
+        out_of_order = true;
+      }
 
    // operation, which is one of:
    //
@@ -856,29 +860,45 @@ const UCS_string & new_name = header.get_name();
 const char *
 Nabla::edit_body_line()
 {
-const Parser parser(PM_FUNCTION, LOC, false);
-Token_string in;
+bool need_parse = true;
+   if (uprefs.multi_line_strings_3 && !out_of_order)   // most likely: script
+      {
+        UCS_string quote3("\"\"\"");
+        loop(i, lines.size())
+            {
+              if (-1 != lines[i].text.substr_pos(quote3))
+                 need_parse = ! need_parse;
+            }
+      }
 
+   if (need_parse)
+      {
+        const Parser parser(PM_FUNCTION, LOC, false);
+        Token_string in;
+
+        ErrorCode ec = parser.parse(current_text, in);
+        if (ec == E_NO_STRING_END && uprefs.multi_line_strings)
+           {
+             ec = E_NO_ERROR;
+             Workspace::more_error().clear();
+           }
+
+        if (ec)
+           {
+             CERR << "SYNTAX ERROR";
+             if (Workspace::more_error().size())
+                {
+                  CERR << "+" << endl << Workspace::more_error();
+                }
+             COUT << endl;
+             return 0;
+           }
+      }
+
+   // some users prefer the removal of leading and trailing whitespace
+   //
    if (uprefs.discard_indentation)
       current_text.remove_leading_and_trailing_whitespaces();
-
-ErrorCode ec = parser.parse(current_text, in);
-   if (ec == E_NO_STRING_END && uprefs.multi_line_strings)
-      {
-        ec = E_NO_ERROR;
-        Workspace::more_error().clear();
-      }
-
-   if (ec)
-      {
-        CERR << "SYNTAX ERROR";
-        if (Workspace::more_error().size())
-           {
-             CERR << "+" << endl << Workspace::more_error();
-           }
-        COUT << endl;
-        return 0;
-      }
 
    modified = true;
 
@@ -890,7 +910,7 @@ const int idx_from = find_line(edit_from);
         // find the largest label before edit_from (if any)
         //
         int before_idx = -1;
-        for (size_t i = 0; i < lines.size(); ++i)
+        loop(i, lines.size())
             {
               if (lines[i].label < edit_from)   before_idx = i;
               else                              break;

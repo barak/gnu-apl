@@ -1989,7 +1989,7 @@ hood, they share the same implementation: @b{structured variables} and
 @subsection Structured Variables
 
 A structured variable is an APL variable that contains several related but
-otherwise independent sub-variables aka members. Such structured variables
+otherwise independent sub-variables aka. @b{members}. Such structured variables
 can be convenient for passing many related arguments to a function, or
 for returning multiple results from a function.
 
@@ -2008,7 +2008,11 @@ a member @b{street}.
 
 For a structured variable and all its sub-variables, the usual rules for
 normal variables apply. They can be created, erased, and even passed as
-arguments to functions.
+arguments to functions. @b{Nota bene}: Some GNU APL operators are implemented
+as macros (i.e. internal defined APL functions). The macros may call APL
+primitives that invalidate fact that a value is structured, and as a
+consequence the operator results may become plain APL values. If this happens,
+then the structured nature of a plain APL value can be restored with 38 ⎕CR.
 
 A structured variable is created by assigning a value to one of its members.
 For example:
@@ -5235,7 +5239,7 @@ to an associative APL array Z and vice versa.
 then the result is a possibly very long strings with containing several linefeed
 characters. That is OK if the string is written to a file, but causes problems
 when the string is being displayed and longer than ⎕PW. The standard APL folding
-of output near ⎕PW make the string then look somewhat garbled. This effenct can
+of output near ⎕PW make the string then look somewhat garbled. This effect can
 be suppressed in 2 ways:
 
 @enumerate

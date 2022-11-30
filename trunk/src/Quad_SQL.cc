@@ -53,6 +53,17 @@ Quad_SQL * Quad_SQL::fun = &Quad_SQL::_fun;
 #endif
 
 //----------------------------------------------------------------------------
+void
+Quad_SQL::close_all_connections()
+{
+   loop(c, connections.size())
+      {
+        if (connections[c])   delete connections[c];
+        connections.clear();
+        connections.push_back(0);   // for the next connection
+      }
+}
+//----------------------------------------------------------------------------
 static void
 init_provider_map()
 {
@@ -177,7 +188,8 @@ static Connection *value_to_db_id( Value_P value )
     return db_id_to_connection(db_id);
  }
 //----------------------------------------------------------------------------
-static Token close_database( Value_P B )
+static Token
+close_database(Value_P B)
 {
     if (!B->is_int_scalar())
        {
@@ -186,8 +198,8 @@ static Token close_database( Value_P B )
         DOMAIN_ERROR;
        }
 
-    int db_id = B->get_cfirst().get_int_value();
-    if (db_id < 0 || db_id >= connections.size())
+int db_id = B->get_cfirst().get_int_value();
+   if (db_id < 0 || db_id >= connections.size())
        {
          throw_illegal_db_id();
         }

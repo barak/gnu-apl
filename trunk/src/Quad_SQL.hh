@@ -44,6 +44,9 @@ public:
    static Quad_SQL * fun;          ///< Built-in function.
    static Quad_SQL  _fun;          ///< Built-in function.
 
+   /// close all open connections
+   static void close_all_connections();
+
 protected:
    /// overloaded Function::eval_AB().
    virtual Token eval_AB(Value_P A, Value_P B) const;

@@ -4,7 +4,7 @@ noinst_DATA = Gtk_functions.asciidoc Gtk_events1.asciidoc Gtk_events2.asciidoc
 
 Gtk_server_SOURCES = Gtk_server.cc Gtk_map.def Gtk_enums.hh
 
-AM_CXXFLAGS = $(GTK_CFLAGS) $(GTK_LIBS)
+AM_CXXFLAGS = $(GTK_CFLAGS) $(GTK_LIBS) -rdynamic
 AM_LDFLAGS  = $(GTK_LDFLAGS) -lX11
 if apl_DEVELOP
    AM_CXXFLAGS += $(WERROR) -Wall -Wno-strict-aliasing

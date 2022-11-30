@@ -122,6 +122,7 @@ Unicode_source src(input);
                      MORE_ERROR() << "Tokenizer: No token for Unicode "
                                   <<  cc << uni << ")\nInput: " << input;
                      Error error(E_NO_TOKEN, LOC);
+BACKTRACE
                      throw error;
                    }
                    break;

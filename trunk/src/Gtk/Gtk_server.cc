@@ -42,7 +42,7 @@
 
 using namespace std;
 
-static int verbosity = 2;
+static int verbosity = 0;
 static bool verbose__calls     = false;
 static bool verbose__draw_data = false;
 static bool verbose__do_draw   = false;
@@ -751,7 +751,8 @@ char * V = TLV + 8;                  // the V part of the TLV buffer
           break;
        }
 
-   cerr << endl << "Gtk_server closed from client" << endl;
+   verbosity > 0 && cerr << endl
+                         << "Gtk_server closed from client (APL)" << endl;
    close(3);
    __sem_destroy(drawarea_sema);
    return 0;

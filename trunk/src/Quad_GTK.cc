@@ -619,7 +619,7 @@ int
 Quad_GTK::open_window(const UCS_string & gui_filename,
                    const UCS_string * css_filename)
 {
-   // locate the Gtk_server. It should  live in one of two places:
+   // locate the Gtk_server. It should live in one of two places:
    //
    // 1, for an installed apl: in the same directory as apl, or
    // 2. during development in subdir Gtk of the src directory

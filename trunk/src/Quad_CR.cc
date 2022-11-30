@@ -1654,10 +1654,10 @@ Quad_CR::do_CR38(const Value * B)
         return Z;
       }
 
-   // array to structured value...
+   // convert unstructured array to structured value...
    //
    if (B->get_rank() != 2)   RANK_ERROR;
-   if (B->get_cols() != 2)    LENGTH_ERROR;
+   if (B->get_cols() != 2)   LENGTH_ERROR;
 
 const ShapeItem rows_B = B->get_rows();
 ShapeItem valid_rows = B->get_member_count();
@@ -1679,13 +1679,13 @@ Value_P Z(shape_Z, LOC);
    loop(r, rows_B)
       {
         const Cell & member_name = B->get_cravel(2*r);
-        if (member_name.is_character_cell())             // valid row
+        if (member_name.is_character_cell())   // valid row (1-character member)
            {
              UCS_string name(member_name.get_char_value());
              Cell * data = Z->get_new_member(name);
              data->init(B->get_cravel(2*r + 1), *Z, LOC);
            }
-        else if (member_name.is_pointer_cell())               // valid row
+        else if (member_name.is_pointer_cell()) // valid row (string member)
            {
              UCS_string name(*member_name.get_pointer_value());
              Cell * data = Z->get_new_member(name);

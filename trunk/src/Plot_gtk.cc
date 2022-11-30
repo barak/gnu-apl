@@ -64,7 +64,8 @@ public:
    : PLOT_context(handle),
      w_props(pwp),
      window(0),
-     drawing_area(0)
+     drawing_area(0),
+     file_saved(false)
    {}
 
    // destructor
@@ -78,6 +79,12 @@ public:
       {
         gtk_window_close(GTK_WINDOW(window));
       }
+
+   /// save plot window to a .png file
+   void save_file(cairo_surface_t * surf);
+
+   /// return a new surface, with or without window borders, or 0 on failure
+   cairo_surface_t * add_border(cairo_surface_t * content) const;
 
    /// return the required width of the entire plot area
    int get_total_width() const
@@ -105,6 +112,9 @@ public:
 
    /// the drawing area in the window of this GTK_context
    GtkWidget * drawing_area;
+
+   /// true if the plot was saved to a file
+   bool file_saved;
 };
 
 //----------------------------------------------------------------------------
@@ -1270,131 +1280,90 @@ const GTK_context * pctx = reinterpret_cast<GTK_context *>(user_data);
   return TRUE;   // event handled by this handler
 }
 //----------------------------------------------------------------------------
-/// return a new surface with window borders, or 0 on failure
 cairo_surface_t *
-add_border(const GTK_context & pctx, cairo_surface_t * old_surface)
+GTK_context::add_border(cairo_surface_t * content) const
 {
-   // gtk_win is the smaller window (excluding the borders created by the
-   // window manager).
+   // this->window is the larger (outer) GTK window, which includes the borders
+   // created by the window manager.
    //
-GtkWindow * gtk_win = GTK_WINDOW(pctx.window);   // the plot window (GTK)
-   Assert(gtk_win);
+int gtk_x, gtk_y, gtk_w, gtk_h;   // GTK window geometry
+   gtk_window_get_position(GTK_WINDOW(window), &gtk_x, &gtk_y);
+   gtk_window_get_size(GTK_WINDOW(window), &gtk_w, &gtk_h);
 
-int gtk_x, gtk_y;   gtk_window_get_position(gtk_win, &gtk_x, &gtk_y);
-int gtk_w, gtk_h;   gtk_window_get_size(gtk_win, &gtk_w, &gtk_h);
-
-   // gdk_win is the larger window (i.e. including borders created by the window
-   //  manager.
+   // gdk_win is the smaller (inner) X11 window, which excludes the borders.
    //
-GdkWindow * gdk_win = gtk_widget_get_window(GTK_WIDGET(gtk_win));   // dito (GDK)
+GdkWindow * gdk_win = gtk_widget_get_window(window);
    Assert(gdk_win);
-int gdk_x, gdk_y;   gdk_window_get_position(gdk_win, &gdk_x, &gdk_y);
 
-   /* compute the border widths. We can assume that the thin east, south, and
-   // west borders are the same while the north boarder is thicker due to the
-   // window caption. We subtract the N/W corner of the (smaller) gtk_win from
-   // the N/W corner of the gdk_win. The x-difference is then the thinkness
-   // of the East- (and hence South and West-) border while the x-difference
-   // is the thinkness of the North- border.
-
-          ╔═════════════ Gdk window ═══ ...
-          ║    dy
-          ║    ┌──────── Gtk window ─── ...
-          ║ dx │
-          ║    │
-           ...
+   /* compute the border widths. We may assume that the thin East, South, and
+      West borders are the same. while the thicker North border differs due to
+      the window caption. The geometry of the N/W corner of the smaller gdk_win
+      tells us how thick the West and North borders are.
     */
 
-const int N_border   = gdk_y - gtk_y;   // north border (window caption)
-const int ESW_border = gdk_x - gtk_x;   // east, south, or west borders
+int N_border, E_border;
+   // gdk_window_get_geometry() works, gdk_window_get_position() does not.
+   gdk_window_get_geometry(gdk_win, &E_border, &N_border, 0, 0);
+const int S_border = E_border;
+const int W_border = E_border;
 
-   // create a GdkPixbuf. The gdk_get_default_root_window() contains the
-   // (north) window caption and east, south, aand weset borders, so they
-   // need to be added to that the GdkPixbuf does not get truncated.
-   //
-GdkWindow * root = gdk_get_default_root_window();
-   if (pctx.w_props.get_with_border())   // with window borders
-      {
-        GdkPixbuf * pixbuf = gdk_pixbuf_get_from_window(root, gtk_x, gtk_y,
-                                                        gtk_w + 2*ESW_border,
-                                                        gtk_h + N_border
-                                                              + ESW_border);
+   // create a GdkPixbuf. GDK windows cannot access their borders,
+   // we therefore copy from the parent of the (top-level) gdk_win.
 
-        cairo_surface_t * ret =
-              gdk_cairo_surface_create_from_pixbuf(pixbuf, 1, gdk_win);
+const bool outer = w_props.get_with_border();
 
-        // at this point the window manager has already displayed the window
-        // borders, but not the window content (since we have not yet returned
-        // from draw_callback()).  We fix that by copying the new content
-        //  (which is contained in old_surface) into ret.
-        //
-        cairo_t * cr2 = cairo_create(ret);
-        cairo_new_path(cr2);
-        cairo_set_source_surface(cr2, old_surface, ESW_border, N_border);
-        cairo_rectangle(cr2, ESW_border, N_border, gtk_w, gtk_h);
-        cairo_fill(cr2);
-        cairo_destroy(cr2);
+cairo_surface_t * ret;
+   {
+     GdkWindow * parent = gdk_window_get_parent(gdk_win);
+     GdkPixbuf * pixbuf = gdk_pixbuf_get_from_window(parent,
+                          gtk_x + (outer ? 0 : E_border),
+                          gtk_y + (outer ? 0 : N_border),
+                          gtk_w + (outer ? E_border + W_border : 0),
+                          gtk_h + (outer ? N_border + S_border : 0));
+     ret = gdk_cairo_surface_create_from_pixbuf(pixbuf, 1, gdk_win);
+   }
 
-        return ret;
-      }
-   else                                     // without window borders
-      {
-        // the pix buf starts a little later and is a little smaller
-        //
-        GdkPixbuf * pixbuf = gdk_pixbuf_get_from_window(root,
-                                                        gtk_x + ESW_border,
-                                                        gtk_y + N_border,
-                                                        gtk_w, gtk_h);
+const int r_x = outer ? E_border : 0;
+const int r_y = outer ? N_border : 0;
+cairo_t * cr = cairo_create(ret);
+   cairo_set_source_surface(cr, content, r_x, r_y);
+   cairo_rectangle(cr, r_x, r_y, gtk_w, gtk_h);
 
-        cairo_surface_t * ret =
-              gdk_cairo_surface_create_from_pixbuf(pixbuf, 1, gdk_win);
-
-        // at this point the window manager has already displayed the window
-        // borders, but not the window content (since we have not yet returned
-        // from draw_callback()).  We fix that by copying the new content
-        //  (which is contained in old_surface) into ret.
-        //
-        cairo_t * cr2 = cairo_create(ret);
-        cairo_new_path(cr2);
-        cairo_set_source_surface(cr2, old_surface, 0, 0);
-        cairo_rectangle(cr2, 0, 0, gtk_w, gtk_h);
-        cairo_fill(cr2);
-        cairo_destroy(cr2);
-
-        return ret;
-      }
+   cairo_fill(cr);
+   cairo_destroy(cr);
+   return ret;
 }
 //----------------------------------------------------------------------------
-/// save the pixels of the plot to a file
-static void
-save_file(GTK_context & pctx, cairo_surface_t * surface)
+/// save the pixels of the plot window into a file
+void
+GTK_context::save_file(cairo_surface_t * surf)
 {
-Plot_window_properties & w_props = pctx.w_props;
+   if (file_saved)   return;
+   file_saved = true;
 
-string fname = w_props.get_output_filename();
+UTF8_string fname(w_props.get_output_filename().c_str());
    if (fname.size() == 0)   return;   // no output_filename or already written
 
    // append .png unless already there
    //
-   if (fname.size() <= 4 || strcmp(".png", fname.c_str() + fname.size() - 4))
-      fname += ".png";
+   if (!fname.ends_with(".png"))   fname.append_ASCII(".png");
 
 cairo_status_t stat = CAIRO_STATUS_SUCCESS;
 
    errno = 0;
-   if (cairo_surface_t * file_surface = add_border(pctx, surface))
+   if (cairo_surface_t * file_surface = add_border(surf))
       {
         stat = cairo_surface_write_to_png(file_surface, fname.c_str());
         cairo_surface_destroy(file_surface);
       }
    else   // adding window border failed (or not desired)
       {
-        stat = cairo_surface_write_to_png(surface, fname.c_str());
+        stat = cairo_surface_write_to_png(surf, fname.c_str());
       }
 
    if (stat == CAIRO_STATUS_SUCCESS)
       {
-        CERR << "wrote output file: " << fname << endl;
+        verbosity && CERR << "wrote output file: " << fname << endl;
 
         // clear filename so it will be written only once.
         //
@@ -1443,7 +1412,7 @@ cairo_surface_t * surface = gdk_window_create_similar_surface(
    cairo_set_source_surface(cr, surface, 0, 0);
    cairo_paint(cr);
 
-   save_file(*pctx, surface);
+   pctx->save_file(surface);
 
    cairo_surface_destroy(surface);
 
@@ -1527,9 +1496,9 @@ GTK_context * pctx = new GTK_context(w_props, handle);
    // resize the drawing_area before showing it so that draw_callback()
    // will not be called twice.
    //
-   gtk_widget_set_size_request(GTK_WIDGET(pctx->drawing_area),
-                                          pctx->get_total_width(),
-                                          pctx->get_total_height());
+   gtk_widget_set_size_request(pctx->drawing_area,
+                               pctx->get_total_width(),
+                               pctx->get_total_height());
 
    if (w_props.get_user_pw_pos())   // the user has dictated pw_pos
       {
@@ -1547,6 +1516,16 @@ GTK_context * pctx = new GTK_context(w_props, handle);
       }
 
    gtk_widget_show_all(pctx->window);
+
+   // prevent the new pctx->window window from obtaining the focus (must
+   // only be called AFTER gtk_widget_show_all(), since otherwise gdk_win
+   // below would be 0.
+   {
+     GdkWindow * gdk_win = gtk_widget_get_window(pctx->window);
+     Assert(gdk_win);
+     gdk_window_set_focus_on_map(gdk_win, false);
+   }
+
 
    g_signal_connect(pctx->window, "destroy",
                     G_CALLBACK(plot_destroyed), pctx);

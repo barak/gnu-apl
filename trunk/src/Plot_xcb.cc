@@ -99,7 +99,8 @@ public:
      thread(pthread_self()),
      caption(0),
      w_props(props),
-     window_goon(true)
+     window_goon(true),
+     file_saved(false)
    {}
 
    /// destructor
@@ -115,8 +116,12 @@ public:
         window_goon = false;
       }
 
+   /// return the thread that handles this plott window
    virtual pthread_t get_thread() const
       { return thread; }
+
+   /// save plot window to a bmp (!) file
+   void save_file(const char * outfile);
 
    /// the pthread running the X event loop for the plot window
    pthread_t thread;
@@ -139,8 +144,10 @@ public:
 
    /// false if the window was closed from APL
    bool window_goon;
-};
 
+   /// plot window was written to an output file
+   bool file_saved;
+};
 //----------------------------------------------------------------------------
 /// the supposed width and the height of a string (in pixels)
 struct string_width_height
@@ -1121,20 +1128,24 @@ xcb_intern_atom_reply_t & reply = *xcb_intern_atom_reply(conn, cookie, 0);
 //----------------------------------------------------------------------------
 /// save plot window to file named \b outfile
 void
-save_file(const char * outfile, Display * dpy, int window,
-          const XCB_context & pctx)
+XCB_context::save_file(const char * outfile)
 {
+   // save the file only after the first EXPOSE
+   //
+   if (file_saved)   return;
+   file_saved = true;
+
    // figure position and size...
    //
 int x, y;   // position of the plot window in its parent
    {
      Window child;
-     XTranslateCoordinates(dpy, window, pctx.screen->root,
+     XTranslateCoordinates(display, window, screen->root,
                            0, 0, &x, &y, &child );
 
      /*
        XWindowAttributes xwa;
-       XGetWindowAttributes(dpy, window, &xwa);
+       XGetWindowAttributes(pctx.display, pctx.window, &xwa);
        CERR << "POS: " <<  (x - xwa.x) << ":" << (y - xwa.y) << endl;
      */
    }
@@ -1143,7 +1154,8 @@ Window geo_root;
 int geo_x, geo_y;
 unsigned int geo_w, geo_h;
 unsigned int geo_border_w, geo_depth;
-   if (XGetGeometry(dpy, window, &geo_root, &geo_x, &geo_y, &geo_w, &geo_h,
+   if (XGetGeometry(display, window,
+                    &geo_root, &geo_x, &geo_y, &geo_w, &geo_h,
                     &geo_border_w, &geo_depth))   // success
       {
         /*
@@ -1174,8 +1186,8 @@ const unsigned int width  = geo_x + geo_w + geo_x;
 const unsigned int height = geo_y + geo_h + geo_x;
 const unsigned long plane_mask = AllPlanes;
 const int format = XYPixmap;
-const int screen = XDefaultScreen(dpy);
-XImage * image = XGetImage(dpy, XRootWindow(dpy, screen),
+const int screen = XDefaultScreen(display);
+XImage * image = XGetImage(display, XRootWindow(display, screen),
                             x - geo_x, y - geo_y,
                             width, height, plane_mask, format);
 
@@ -1190,13 +1202,17 @@ XImage * image = XGetImage(dpy, XRootWindow(dpy, screen),
 UTF8_string outfile_utf8(outfile);
    if (!outfile_utf8.ends_with(".bmp"))   outfile_utf8.append_ASCII(".bmp");
 
+   // writing the file takes a while, so let the user know.
+   //
+   CERR << "writing ⎕PLOT output file " << outfile_utf8 << "..." << endl;
+
    errno = 0;
 FILE * bmp = fopen(outfile_utf8.c_str(), "w");
    if (bmp == 0)
       {
         CERR << "open " << outfile << ": " << strerror(errno) << endl;
         MORE_ERROR() << "save_file() failed: cannot open output file "
-                     << outfile;
+                     << outfile_utf8;
         DOMAIN_ERROR;
       }
 
@@ -1250,7 +1266,7 @@ int file_bytes = 0;
      file_bytes += fwrite(dib_header, 1, sizeof(dib_header), bmp);
    }
 
-const Colormap cmap = XDefaultColormap(dpy, screen);
+const Colormap cmap = XDefaultColormap(display, screen);
    for (int y = height - 1; y >= 0; --y)
        {
          uint8_t scanline[3*width + 10];
@@ -1258,7 +1274,7 @@ const Colormap cmap = XDefaultColormap(dpy, screen);
          for (unsigned int x = 0; x < width; ++x)
              {
                XColor c;   c.pixel = XGetPixel(image, x, y);
-               XQueryColor(dpy, cmap, &c);
+               XQueryColor(display, cmap, &c);
                *s++ = uint8_t(c.blue /256);
                *s++ = uint8_t(c.green/256);
                *s++ = uint8_t(c.red  /256);
@@ -1291,10 +1307,9 @@ const Plot_data & data = w_props.get_plot_data();
 
    // open a connection to the X server
    //
-Display * dpy = XOpenDisplay(0);
-   pctx.display = dpy;
+   pctx.display = XOpenDisplay(0);
 # if XCB_WINDOWS_WITH_UTF8_CAPTIONS
-   pctx.conn = XGetXCBConnection(dpy);
+   pctx.conn = XGetXCBConnection(pctx.display);
 
 # else   // not XCB_WINDOWS_WITH_UTF8_CAPTIONS
    pctx.conn = xcb_connect(0, 0);
@@ -1385,7 +1400,7 @@ XSizeHints size_hints;
    size_hints.y           = w_props.get_pw_pos_Y();
    size_hints.base_height = w_props.get_pw_pos_Y();
 
-   Xutf8SetWMProperties(dpy, pctx.window, pctx.caption,
+   Xutf8SetWMProperties(pctx.display, pctx.window, pctx.caption,
                         "icon", 0, 0, &size_hints, 0, 0);
 
 # else   // not XCB_WINDOWS_WITH_UTF8_CAPTIONS
@@ -1418,7 +1433,6 @@ const xcb_get_input_focus_reply_t * focusReply =
 
    // X main loop
    //
-bool file_saved = false;
    while (pctx.window_goon)
       {
         union
@@ -1457,13 +1471,12 @@ bool file_saved = false;
                   do_plot(pctx, w_props, data);
                   xcb_flush(pctx.conn);
 
-                  if (*outfile && !file_saved)
+                  if (outfile && *outfile)
                      {
-                       save_file(strdup(outfile), dpy, pctx.window, pctx);
-                       file_saved = true;
+                       pctx.save_file(outfile);
                        if (w_props.get_auto_close())
                           {
-                            // wake-up the interpreter
+                            // unleash the APL interpreter
                             sem_post(Quad_PLOT::expose_sema);
                             pctx.window_goon = false;
                             continue;

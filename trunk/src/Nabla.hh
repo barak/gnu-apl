@@ -29,7 +29,7 @@
 
 class Symbol;
 
-/// a line number like 1.2 while editing
+/// a line number like 1.2 while editing it
 struct LineLabel
 {
    /// empty constuctor
@@ -198,15 +198,12 @@ protected:
    /// editor commands
    enum Ecmd
       {
-        ECMD_NOP,    ///< do nothing
-        ECMD_SHOW,   ///< show function line(s) idx_from ... idx_to
-        ECMD_EDIT,   ///< edit function line edit_from
+        ECMD_NOP,      ///< do nothing
+        ECMD_SHOW,     ///< show function line(s) idx_from ... idx_to
+        ECMD_EDIT,     ///< edit function line edit_from
         ECMD_DELETE,   ///< delete function line(s) edit_from ... idx_to
         ECMD_ESCAPE,   ///< abort editing (discard changes made so far)
-      };
-
-   /// the current editor command
-   Ecmd ecmd;
+      } ecmd;          ///< the current editor command
 
    /// optional start of a range for an editor command
    LineLabel edit_from;
@@ -229,6 +226,9 @@ protected:
 
    /// true iff this function shall be locked
    bool locked;
+
+   // true if the user has (most likely interactively) entered a line number
+   bool out_of_order;
 
    /// the line number for the currently edited line
    LineLabel current_line;

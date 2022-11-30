@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-November 25, 2022
+November 28, 2022
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
@@ -1898,7 +1898,7 @@ and associative arrays.
 ---------------------------
 
 A structured variable is an APL variable that contains several related
-but otherwise independent sub-variables aka members.  Such structured
+but otherwise independent sub-variables aka.  members.  Such structured
 variables can be convenient for passing many related arguments to a
 function, or for returning multiple results from a function.
 
@@ -1916,7 +1916,12 @@ member street.
 
    For a structured variable and all its sub-variables, the usual rules
 for normal variables apply.  They can be created, erased, and even
-passed as arguments to functions.
+passed as arguments to functions.  Nota bene: Some GNU APL operators are
+implemented as macros (i.e.  internal defined APL functions).  The
+macros may call APL primitives that invalidate fact that a value is
+structured, and as a consequence the operator results may become plain
+APL values.  If this happens, then the structured nature of a plain APL
+value can be restored with 38 ⎕CR.
 
    A structured variable is created by assigning a value to one of its
 members.  For example:
@@ -5043,7 +5048,7 @@ document, then the result is a possibly very long strings with
 containing several linefeed characters.  That is OK if the string is
 written to a file, but causes problems when the string is being
 displayed and longer than ⎕PW. The standard APL folding of output near
-⎕PW make the string then look somewhat garbled.  This effenct can be
+⎕PW make the string then look somewhat garbled.  This effect can be
 suppressed in 2 ways:
 
   1. set ⎕PW large enough, or
@@ -6804,47 +6809,47 @@ Node: Section 2.1365951
 Node: Section 2.1466892
 Node: Section 2.1567144
 Node: Section 2.1668540
-Node: Section 2.1778653
-Node: Section 2.1881175
-Node: Section 2.1987882
-Node: Section 2.2089327
-Node: Section 2.2194988
-Node: Section 2.22100022
-Node: Section 2.23103303
-Node: Section 2.24103594
-Node: Section 2.25114419
-Node: Section 2.26114691
-Node: Section 2.27121269
-Node: Section 2.28123729
-Node: Section 2.29124398
-Node: Section 2.30126049
-Node: Section 2.31129838
-Node: Output File Format142329
-Node: Section 2.32143504
-Node: Section 2.33152902
-Node: Section 2.34153929
-Node: Section 2.35168645
-Node: Section 2.36178712
-Node: Section 2.37182831
-Node: Section 2.38184926
-Node: Section 2.39189351
-Node: Chapter 3210701
-Node: Chapter 4213202
-Node: Chapter 5214328
-Node: Section 5.1215865
-Node: Section 5.2217145
-Node: Section 5.3217505
-Node: Section 5.4217747
-Node: Section 5.5218409
-Node: Section 5.6218887
-Node: Section 5.7219659
-Node: Section 5.8220116
-Node: Chapter 6220518
-Node: Section 6.1220937
-Node: Section 6.2221624
-Node: Chapter 7222455
-Node: Section 7.1222958
-Node: Section 7.2248272
+Node: Section 2.1779009
+Node: Section 2.1881531
+Node: Section 2.1988238
+Node: Section 2.2089683
+Node: Section 2.2195344
+Node: Section 2.22100378
+Node: Section 2.23103659
+Node: Section 2.24103950
+Node: Section 2.25114775
+Node: Section 2.26115047
+Node: Section 2.27121625
+Node: Section 2.28124085
+Node: Section 2.29124754
+Node: Section 2.30126405
+Node: Section 2.31130194
+Node: Output File Format142685
+Node: Section 2.32143860
+Node: Section 2.33153258
+Node: Section 2.34154285
+Node: Section 2.35169001
+Node: Section 2.36179068
+Node: Section 2.37183187
+Node: Section 2.38185282
+Node: Section 2.39189707
+Node: Chapter 3211056
+Node: Chapter 4213557
+Node: Chapter 5214683
+Node: Section 5.1216220
+Node: Section 5.2217500
+Node: Section 5.3217860
+Node: Section 5.4218102
+Node: Section 5.5218764
+Node: Section 5.6219242
+Node: Section 5.7220014
+Node: Section 5.8220471
+Node: Chapter 6220873
+Node: Section 6.1221292
+Node: Section 6.2221979
+Node: Chapter 7222810
+Node: Section 7.1223313
+Node: Section 7.2248627
 
 End Tag Table
 

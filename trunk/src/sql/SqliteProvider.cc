@@ -27,7 +27,8 @@
 SqliteProvider::~SqliteProvider()
 {}
 
-static SqliteConnection *create_sqlite_connection( Value_P B )
+static SqliteConnection *
+create_sqlite_connection(Value_P B)
 {
     if( !B->is_char_string() ) {
         Workspace::more_error() = "SQLite database connect argument must be a single string";
@@ -46,8 +47,9 @@ static SqliteConnection *create_sqlite_connection( Value_P B )
     return new SqliteConnection( db );
 }
 
-Connection *SqliteProvider::open_database( Value_P B )
+Connection *
+SqliteProvider::open_database(Value_P B)
 {
-    Connection *connection = create_sqlite_connection( B );
+Connection * connection = create_sqlite_connection(B);
     return connection;
 }
