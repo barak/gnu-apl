@@ -390,7 +390,8 @@ CONTROL-Ds-TO-EXIT 0
 # immediate execution mode.
 #
 # By default both old-style and new-style multi line strings are enabled, but
-# old-style multi line strings will disappear in the near future.
+# old-style multi line strings will disappear in the near future. To disable
+# multi line strings, uncomment the following line(s).
 #
 # Old-Multi-Line-Strings No
 # New-Multi-Line-Strings No

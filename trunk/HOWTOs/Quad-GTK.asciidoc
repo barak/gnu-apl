@@ -1053,9 +1053,9 @@ of the events have the following meaning:
 
 * Gi (integer): the handle (= Gtk_server instance) on which the event was
   received (the handle was returned by *⎕GTK "file.ui"*).
-* Ns (string): the widget property *Widget Name* if given in glade tab
-  *Common*, or *""* if not.
-* Es (string): The event (callback name)
+* Ns (string): the widget property *Widget Name* (if provided in the glade tab
+  *Common*), or *""* if not provided.
+* Es (string): The event (callback name), for example "clicked"
 * Is (string): The ID of the widget that has sent the event (in glade tab
   *General*)
 * Cs (string): The Gtk class of the widget that has sent the event

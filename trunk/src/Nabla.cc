@@ -805,7 +805,11 @@ Nabla::execute_edit()
 
    // if the user has specified a line label without a text then we are done
    //
-   if (current_text.size() == 0)   return 0;
+   if (current_text.size() == 0)   // empty line (we MAY need it)
+      {
+        if (!uprefs.multi_line_strings_3)   return 0;   // we fo not
+        if (out_of_order)                   return 0;   // we fo not;
+      }
 
    // check that current_text is valid
    //

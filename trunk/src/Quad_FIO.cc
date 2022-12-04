@@ -243,16 +243,16 @@ Value_P Z(ShapeItem(fd_count), LOC);
 }
 //----------------------------------------------------------------------------
 Token
-Quad_FIO::do_printf(FILE * outf, Value_P A)
+Quad_FIO::do_fprintf(FILE * outf, Value_P A)
 {
-   // A is expected to be a nested APL value. The first element shall be a 
-   // format string, followed by the values for each % field. Result is the
-   // number of characters (not bytes!) printed.
+   // A is expected to be a nested APL value. A[1] is the format string,
+   // A[2...] are the values for each % field in A[1]. The result returned
+   // is the number of characters (not bytes!) written to the file.
    //
 UCS_string UZ;
 const Value & A1 = *A->get_cfirst().get_pointer_value();
 UCS_string A_format(A1);
-   do_sprintf(UZ, A_format, A.get(), 1);
+   do_sprintf(UZ, A_format, A.get(), 1, "⎕FIO.fprintf B");
 UTF8_string utf(UZ);
    fwrite(utf.c_str(), 1, utf.size(), outf);
    return Token(TOK_APL_VALUE1, IntScalar(UZ.size(), LOC));
@@ -260,16 +260,21 @@ UTF8_string utf(UZ);
 //----------------------------------------------------------------------------
 void
 Quad_FIO::do_sprintf(UCS_string & UZ, const UCS_string & A_format,
-                    const Value * B, int b)
+                    const Value * B, int off_B, const char * funname)
 {
-   // A is the format string, B is the nested APL values for each % field in A.
-   // Result is the formatted string.
+   // A is the format string, B the nested APL values for each % field in A.
+   // The result UZ is the formatted string. off_B is the starting point (1
+   // for fprintf(A, ...) and 0 for sprintf(format, B ...).
    //
 char numbuf[50];
+const int arg_count_B = B->element_count() - off_B;
+int conversion_count_A = 0;   // the number of conversions (in A_format)
 
-   for (int f = 0; f < A_format.size(); /* no f++ */ )
+#define COUNT_ARG if   (conversion_count_A++ >= arg_count_B)   goto missing_arg
+
+   for (int fA = 0; fA < A_format.size(); /* no fA++ */ )
        {
-         const Unicode uni = A_format[f++];
+         const Unicode uni = A_format[fA++];
          if (uni != UNI_PERCENT)   // not %
             {
               UZ.append(uni);
@@ -281,17 +286,19 @@ char numbuf[50];
          // That is, for e.g. format = "...%42.42llf..." we want fmt to be
          // "%42.42llf"
          //
-         char fmt[40];               // the naked format for one printf() argument
-         unsigned int fm = 0;        // an index into fmt;
-         fmt[fm++] = '%';            // copy the % into fmt
-         bool thousands = false;     // print thousands separator (',')
+         char fmt[40];             // the naked format for one printf() item
+         unsigned int fm = 0;      // an index into fmt;
+         fmt[fm++] = '%';          // copy the % into fmt
+         bool thousands = false;   // print thousands separator (',')
          for (;;)
              {
-               if (f >= A_format.size())
+               if (fA >= A_format.size())
                   {
-                    // end of format string reached without seeing the conversion
-                    // specifier. We print the string and are done. This happens
-                    // only if A_format was somewhat mal-formed.
+                    // After having seen a %, the end of the format string was
+                    // reached without seeing the conversion specifier.
+                    // Print the string and return. This happends only if
+                    // A_format is somewhat mal-formed (e.g. "ab %555"),
+                    // but the C/C++ printf() functions accept it.
                     //
                     UCS_string ufmt(fmt);
                     UZ.append(ufmt);
@@ -300,18 +307,17 @@ char numbuf[50];
 
                if (fm >= sizeof(fmt))
                   {
-                    // end of fmt reached without seeing the conversion specifier.
-                    // We print the string and are done.
-                    // (This may or may not be a mal-formed format string
-                    // from the user; we assume it is)
-                    //
+                    // After seeing a %, no conversion specifier was seen
+                    // within 40 characters. Most likely the user has
+                    // forgotten it. In theory the format string could be
+                    // proper, but we assumt it is mal-formed.
                     //
                     UCS_string ufmt(fmt);
                     UZ.append(ufmt);
                     goto field_done;
                   }
 
-               const Unicode uni_1 = A_format[f++];
+               const Unicode uni_1 = A_format[fA++];
                switch(uni_1)
                   {
                      // flag chars and field width/precision
@@ -343,7 +349,8 @@ char numbuf[50];
                      case 'd':   case 'i':   case 'o':
                      case 'u':   case 'x':   case 'X':   case 'p':
                           {
-                            const Cell & cell = B->get_cravel(b++);
+                            COUNT_ARG;
+                            const Cell & cell = B->get_cravel(off_B++);
                             APL_Integer int_val;
                             if (cell.is_integer_cell())
                                {
@@ -357,16 +364,17 @@ char numbuf[50];
                                }
                             fmt[fm++] = uni_1;   fmt[fm] = 0;
                             sprintf(numbuf, fmt, int_val);
-                            if (thousands)   group_thousands(UZ, numbuf, false);
-                            else             UZ.append_UTF8(numbuf);
+                            if (thousands)  group_thousands(UZ, numbuf, false);
+                            else            UZ.append_UTF8(numbuf);
                           }
                           goto field_done;
 
                      case 'e':   case 'E':   case 'f':   case 'F':
                      case 'g':   case 'G':   case 'a':   case 'A':
                           {
+                            COUNT_ARG;
                             const APL_Float float_val =
-                                  B->get_cravel(b++).get_real_value();
+                                  B->get_cravel(off_B++).get_real_value();
                             fmt[fm++] = uni_1;   fmt[fm] = 0;
                             sprintf(numbuf, fmt, float_val);
                             if (thousands)
@@ -388,24 +396,28 @@ char numbuf[50];
                           goto field_done;
 
                      case 's':   // string or char
-                          if (B->get_cravel(b).is_character_cell())
+                          COUNT_ARG;
+                          if (B->get_cravel(off_B).is_character_cell())
                              {
-                               UZ.append(B->get_cravel(b++).get_char_value());
+                               UZ.append(B->get_cravel(off_B++)
+                                           .get_char_value());
                                goto field_done;
                              }
                           {
                             Value_P str =
-                                        B->get_cravel(b++).get_pointer_value();
+                                    B->get_cravel(off_B++).get_pointer_value();
                             UCS_string ucs(*str.get());
                             UZ.append(ucs);
                           }
                           goto field_done;
 
                      case 'c':   // single char
-                          UZ.append(B->get_cravel(b++).get_char_value());
+                          COUNT_ARG;
+                          UZ.append(B->get_cravel(off_B++).get_char_value());
                           goto field_done;
 
                      case 'm':
+                          COUNT_ARG;
                           sprintf(numbuf, "%s", strerror(errno));
                           UZ.append_UTF8(numbuf);
                           goto field_done;
@@ -420,13 +432,31 @@ char numbuf[50];
 
                      default:
                           MORE_ERROR() << "invalid format character " << uni_1
-                                       << " in function 22 (aka. printf())"
-                                         " in module file_io:: ";
+                                       << " in " << funname;
                           DOMAIN_ERROR;   // bad format char
                   }
              }
          field_done: ;
        }
+
+   if (B->element_count() > off_B)
+      {
+        const int unused = B->element_count() - off_B;
+        MORE_ERROR() << unused << " unused argument(s) in argument B of: "
+                     << funname << "\n" << "    " << conversion_count_A
+                     << " argument(s) were used, but " << arg_count_B
+                     << " were provided.\n"
+                        "    The format string was: '" << A_format << "'";
+        LENGTH_ERROR;
+      }
+      return;
+
+missing_arg:
+   MORE_ERROR() << "Too few arguments in argument B of: " << funname << "\n"
+                   "    Only " << arg_count_B
+                <<   " argument(s) were provided in B.\n"
+                   "    The format string was: '" << A_format << "'";
+    LENGTH_ERROR;
 }
 //----------------------------------------------------------------------------
 void
@@ -2523,12 +2553,13 @@ int function_number = -1;
               }
               goto out_errno;
 
-         case 22:   // fprintf(Bh, A)
+         case 22:   // fprintf(Bh, A) ←→
+                    // fprintf(FILE *stream, const char *format, ...)
               {
                 errno = 0;
                 UCS_string UZ;
                 FILE * file = get_FILE(*B.get());
-                return do_printf(file, A);
+                return do_fprintf(file, A);
               }
 
          case 23:   // fwrite(Ac, 1, ⍴Ac, Bh) Unicode Ac Output UTF-8
@@ -2859,7 +2890,7 @@ int function_number = -1;
               {
                 const UCS_string A_format(*A);
                 UCS_string UZ;
-                do_sprintf(UZ, A_format, B.get(), 0);
+                do_sprintf(UZ, A_format, B.get(), 0, "A ⎕FIO.sprintf B");
                 Value_P Z(UZ, LOC);
                 return Token(TOK_APL_VALUE1, Z);
               }

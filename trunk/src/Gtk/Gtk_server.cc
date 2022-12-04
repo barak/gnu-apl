@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2019  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -42,7 +42,7 @@
 
 using namespace std;
 
-static int verbosity = 0;
+static int  verbosity = 0;
 static bool verbose__calls     = false;
 static bool verbose__draw_data = false;
 static bool verbose__do_draw   = false;
@@ -155,14 +155,24 @@ indent(int level)
    for (int l = 0; l < level; ++l)   cerr << "  ";
 }
 //-----------------------------------------------------------------------------
-static bool
-init_id_db(const char * filename)
+static const char *
+init_id_db(const char * gui, bool from_file)
 {
-FILE * f = fopen(filename, "r");
-   if (f == 0)   return true;   // error
+FILE * file = 0;
+const char * strg = 0;
+
+   if (from_file)
+      {
+        file = fopen(gui, "r");
+        if (file == 0)   return "No/bad .ui file";   // error
+      }
+   else
+      {
+        strg = gui;
+      }
 
 enum { MAX_level = 10 };
-char class_buf      [100*MAX_level];
+char class_buf[100*MAX_level];
    memset(class_buf, 0, sizeof(class_buf));
 char id_buf[100*MAX_level];
    memset(id_buf, 0, sizeof(id_buf));
@@ -171,13 +181,37 @@ char widget_name_buf[100*MAX_level];
 int level = -1;
 char line[200];
 
-   for (;;)
+   for (bool more = true; more;)   // more is only used for input strings
        {
-         const char * s = fgets(line, sizeof(line) - 1, f);
-         line[sizeof(line) - 1] = 0;
-         if (s == 0)   break;
+         if (from_file)   // read input from file
+            {
+              const char * s = fgets(line, sizeof(line) - 1, file);
+              line[sizeof(line) - 1] = 0;   // so strXXX() works
+              if (s == 0)   break;
+            }
+         else        // read input from string
+            {
+              if (const char * LF = strchr(strg, UNI_LF))
+                 {
+                   const size_t strg_len = LF - strg;   // \n in strg
+                   if (strg_len >= sizeof(line) -1)
+                      return "UI string too long";
+                   memcpy(line, strg, strg_len);
+                   line[strg_len] = 0;
+                   strg = LF + 1;
+                 }
+              else                                      // no \n in strg
+                 {
+                   more = false;
+                   const size_t strg_len = strlen(strg);
+                   if (strg_len >= sizeof(line))   return ".ui string too long";
+                   memcpy(line, strg, strg_len);
+                   line[strg_len] = 0;
+                 }
+            }
 
-         while (*s == ' ')   ++s;
+         const char * s = line;
+         while (*s == ' ')   ++s;   // skip leading whilespace
          if (!strncmp(s, "<object", 7))   ++level;
 
          char * cb = class_buf       + 100*level;
@@ -240,40 +274,56 @@ char line[200];
             }
        }
 
-   fclose(f);
-   return false;   // OK
+   if (file)   fclose(file);
+   return 0;   // OK
 }
 //-----------------------------------------------------------------------------
 static void
-cmd_1_load_GUI(const char * filename)
+cmd_1_load_GUI(const char * gui)
 {
-   verbosity > 0 && cerr << "Loading GUI: " << filename << endl;
+const bool from_file = !strchr(gui, UNI_LF);
 
-   if (init_id_db(filename))
+   verbosity > 0 && cerr << "Loading GUI... " << endl;
+
+   if (const char * why = init_id_db(gui, from_file))
       {
-        cerr << "*** reading " << filename << " failed: "
-          << strerror(errno) << endl;
+        if (from_file)
+           cerr << "*** reading " << gui << " failed: "
+                << strerror(errno) << endl;
+        else
+           cerr << "*** reading .ui from string failed: " << why << endl;
+        return;
       }
 
-   builder = gtk_builder_new_from_file(filename);
+   if (from_file)   builder = gtk_builder_new_from_file(gui);
+   else             builder = gtk_builder_new_from_string(gui, strlen(gui));
    assert(builder);
 
    // insert objects into id_db...
    //
    for (_ID_DB * entry = id_db; entry; entry = entry->next)
        {
-         if (!strncmp(entry->xml_id, "adjustment", 10))   continue;
-          if (const GObject * obj = G_OBJECT(gtk_builder_get_object(builder,
-                                                              entry->xml_id)))
+         const char * id = entry->xml_id;
+
+         // the id= attribute of an object is optional (e.g. not needed for
+         // read-only labels). Ignore such objects.
+         //
+         if (!*id)   continue;
+         if (!strncmp(id, "adjustment", 10))   continue;   // ignore
+
+          if (const GObject * obj = gtk_builder_get_object(builder, id))
              {
                verbosity > 0 && cerr <<
-                  "map glade id= '" << entry->xml_id << "' to GObject "
+                  "map glade id= '" << id << "' to GObject "
                                  << reinterpret_cast<const void *>(obj) << endl;
                entry->obj = obj;
              }
-           else cerr << "object '" << entry->xml_id << "' not found" << endl;
+           else
+             {
+               cerr << "Gtk_server: object '" << id
+                    << "' not found (by gtk_builder)" << endl;
+             }
        }
-
 
    gtk_builder_connect_signals(builder, NULL);
    verbosity > 0 && cerr << "GUI signals connected.\n";
@@ -334,26 +384,49 @@ gtk_drawingarea_set_Y_origin(GtkDrawingArea * widget, int data)
 }
 //-----------------------------------------------------------------------------
 static void
-cmd_2_load_CSS(const char * filename)
+cmd_2_load_CSS(const char * css)
 {
-   verbosity > 0 && cerr << "Loading CSS: " << filename << endl;
 
+GError * err = 0;
 GtkCssProvider * css_provider = gtk_css_provider_new();
    assert(css_provider);
 
-GError * err = 0;
-   gtk_css_provider_load_from_path(css_provider, filename, &err);
-   if (err)
+   if (strchr(css, UNI_LF))   // css is direct string
       {
-        cerr << "error " << err->code << " when parsing stylesheet file '"
-             << filename << "':\n    " << err->message << endl;
+        const size_t css_len = strlen(css);
+        verbosity > 0 && cerr << "Loading CSS freom string["
+                              << css_len << "]: " << css << endl;
+        gtk_css_provider_load_from_data(css_provider, css, css_len, &err);
+        if (err)
+           {
+             cerr << "error " << err->code
+                  << " when parsing stylesheet string[ '" << css_len
+                  << "]:\n    " << err->message << endl;
+           }
+        else
+           {
+             GtkStyleProvider * style = GTK_STYLE_PROVIDER(css_provider);
+             GdkScreen * screen = gdk_screen_get_default();
+             gtk_style_context_add_provider_for_screen(
+                         screen, style, GTK_STYLE_PROVIDER_PRIORITY_USER);
+           }
       }
-   else
+   else                       // css is a filname containing the CSS
       {
-        GtkStyleProvider * style_provider = GTK_STYLE_PROVIDER(css_provider);
-        GdkScreen * screen = gdk_screen_get_default();
-        gtk_style_context_add_provider_for_screen(
-                    screen, style_provider, GTK_STYLE_PROVIDER_PRIORITY_USER);
+        verbosity > 0 && cerr << "Loading CSS file: " << css << endl;
+        gtk_css_provider_load_from_path(css_provider, css, &err);
+        if (err)
+           {
+             cerr << "error " << err->code << " when parsing stylesheet file '"
+                  << css << "':\n    " << err->message << endl;
+           }
+        else
+           {
+             GtkStyleProvider * style = GTK_STYLE_PROVIDER(css_provider);
+             GdkScreen * screen = gdk_screen_get_default();
+             gtk_style_context_add_provider_for_screen(
+                         screen, style, GTK_STYLE_PROVIDER_PRIORITY_USER);
+           }
       }
 }
 //-----------------------------------------------------------------------------
@@ -736,9 +809,19 @@ char * V = TLV + 8;                  // the V part of the TLV buffer
                                                         continue;
                 case 8: cerr << "decreased verbosity to: "
                              << --verbosity << endl;    continue;
+                /***
 
-                // widget functions...
-                //
+    cases for widget functions. In macro gtk_fun_def() below:
+
+    glade_ID:   entry, label, ...             (in string or glade .ui file)
+    gtk_class:  GtkEntry, GtkLabel, ...       (in /usr/include/gtk-3.0/gtk/)
+    gtk_function: set_text, get_text, ...     (in /usr/include/gtk-3.0/gtk/)
+    _ZAname: Text, Fraction, ...              (in asciidoc, not used here)
+    Z: V S F I  aka. void/string/float/int:   function result type
+    A:  V S F I  aka. void/string/float/int:  function argument type
+    _help                                     (in asciidoc, not used here)
+                ***/
+
 #define gtk_fun_def(glade_ID, gtk_class, gtk_function, _ZAname, Z, A, _help)  \
          case Command_ ## gtk_class ## _ ## gtk_function:                     \
 { gtk_class * widget = reinterpret_cast<gtk_class *>(selected);               \
@@ -750,7 +833,8 @@ char * V = TLV + 8;                  // the V part of the TLV buffer
 
                 default:
                     cerr << endl << argv[0]
-                         << " got unexpected command " << TLV_tag << endl;
+                         << " got unexpected command " << TLV_tag
+                         << " from APL ⎕GTK" << endl;
                     continue;
              }
           break;

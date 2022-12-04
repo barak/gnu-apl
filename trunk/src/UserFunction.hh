@@ -243,11 +243,11 @@ public:
 
    /// transform a function body containing (old-style) multi-lines into a
    /// standard function body
-   ErrorCode transform_multi_line_strings();
+   ErrorCode transform_old_multi_lines();
 
    /// transform a function body containing (new-style) multi-lines into a
    /// standard function body
-   ErrorCode transform_multi_line_strings_3();
+   ErrorCode transform_new_multi_lines();
 
    /// recompile the body
    void parse_body(const char * loc, bool tolerant, bool macro);

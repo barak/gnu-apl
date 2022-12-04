@@ -193,12 +193,12 @@ protected:
    /// convert bits set in \b fds to an APL integer vector
    static Value_P fds_to_val(fd_set * fds, int max_fd);
 
-   /// printf A to \b out
-   static Token do_printf(FILE * out, Value_P A);
+   /// fprintf A to file \b out
+   static Token do_fprintf(FILE * out, Value_P A);
 
    /// sprintf with format string A and Data items B
    static void do_sprintf(UCS_string & UZ, const UCS_string & A_format,
-                   const Value * B, int B_start);
+                   const Value * B, int B_start, const char * funname);
 
    /// perform an fscanf() from file
    static Token do_scanf(File_or_String & input, const UCS_string & format,

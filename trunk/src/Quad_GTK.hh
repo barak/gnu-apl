@@ -89,9 +89,16 @@ protected:
    /// write a TLV
    static int write_TLV(int fd, int tag, const UTF8_string & value);
 
+   /// start a Gtk_server, return its file desriptor
+   static int start_Gtk_server();
+
+   /// send file or filename to the Gtk_server
+   static void send_name_or_data(int fd, int tag,
+                                 const UCS_string & name_or_data);
+
    /// open the GTH window described by gui_filename and optional css_filename
-   static int open_window(const UCS_string & gui_filename,
-                   const UCS_string * css_filename);
+   static int open_window(const UCS_string & gui_name_or_data,   // mandatory
+                   const UCS_string * css_name_or_data);         // optional
 
    /// return the handles of currently open windows
    static Value_P window_list();

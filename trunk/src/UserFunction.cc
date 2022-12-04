@@ -612,9 +612,9 @@ std::vector<bool> ts_lines;
 }
 //----------------------------------------------------------------------------
 ErrorCode
-UserFunction::transform_multi_line_strings()
+UserFunction::transform_old_multi_lines()
 {
-  /* convert a set of lines like
+  /* old-style multi-line strings. convert sets of lines like
 
      [k+1] PREFIX "L1
      [k+2] L2 ...
@@ -702,9 +702,9 @@ Line_status current = APL_text;
 }
 //----------------------------------------------------------------------------
 ErrorCode
-UserFunction::transform_multi_line_strings_3()
+UserFunction::transform_new_multi_lines()
 {
-  /* convert a set of lines like
+  /* new-style multi-line strings. convert sets of lines like
 
      [k+1] PREFIX """
      [k+2] L2 ...
@@ -761,7 +761,7 @@ Line_status current = APL_text;
                        }
                  }
             }
-         else              // no status change
+         else                            // no status change
             {
               status[l] = current;
             }
@@ -771,27 +771,51 @@ Line_status current = APL_text;
       {
          // multi-line string started but not ended.
          //
+         MORE_ERROR() << "No end of multi-line string found.";
          return E_DEFN_ERROR;
       }
 
    // modify lines...
    //
-   for (int l = 1; l < get_text_size(); )
+   for (int li = 1; li < get_text_size(); )
        {
-         if (status[l] == APL_text)   { ++l;   continue; }
-         const int start = l;
-         Assert1(status[l] == Start_of_string);
-         UCS_string accu = get_text(l++);
-         accu.resize(accu.size() - 3);   // remove trailing """
-         accu << " ";
-         while (status[l] == Inside_string)
+         if (status[li] == APL_text)   { ++li;   continue; }
+
+         // a multi-line string starts at line li...
+         //
+         const int start = li;
+         Assert1(status[li] == Start_of_string);
+         UCS_string prefix = get_text(li++);
+         prefix.resize(prefix.size() - 3);   // remove the trailing """
+         UCS_string accu("");
+         int count = 0;
+         while (status[li] == Inside_string)
                {
-                 accu << " \"" << get_text(l).do_escape(true) << "\"";
-                 clear_text(l++);
+                 ++count;
+                 accu << " \"" << get_text(li).do_escape(true) << "\"";
+                 clear_text(li++);
                }
-         Assert(status[l] == End_of_string);
-         set_text(start, accu);
-         clear_text(l++);
+
+         Assert(status[li] == End_of_string);
+
+         if (count == 0)        // nothing
+            {
+              const UTF8_string utf("0⍴⊂\"\"");   // 0⍴⊂""
+              prefix << UCS_string(utf);
+              set_text(start, prefix);
+            }
+         else if (count == 1)   // a single "string" would not nest
+            {
+              const UTF8_string utf("(,⊂");   // enclose the accu...)
+              UCS_string ucs(utf);
+              prefix << UCS_string(utf) << accu << ")";
+              set_text(start, prefix);
+            }
+         else
+            {
+              set_text(start, prefix + accu);
+            }
+         clear_text(li++);
        }
 
    // remove trailing empty lines...
@@ -813,8 +837,8 @@ UserFunction::parse_body(const char * loc, bool tolerant, bool macro)
 
 UCS_string_vector original_text;
    //
-   // The text is modified for parsing but restored afterwards so that e,g,
-   // ∇FUN[⎕]∇ shows the text enterd by the user.
+   // The function text is modified for parsing but restored afterwards
+   // so that e.g. ∇FUN[⎕]∇ shows the text entered by the user.
    //
    // original_text is only set if text was modified.
    //
@@ -822,46 +846,40 @@ UCS_string_vector original_text;
 
    if (uprefs.multi_line_strings_3)   // new-style multi-line strings allowed
       {
-        for (int l = 1; l < get_text_size(); ++l)
+        for (int li = 1; li < get_text_size(); ++li)
             {
-              const UCS_string & line = get_text(l);
-              const ShapeItem len = line.size();
-              if (len >= 3 &&
-                  line[len - 1] == UNI_DOUBLE_QUOTE &&
-                  line[len - 2] == UNI_DOUBLE_QUOTE &&
-                  line[len - 3] == UNI_DOUBLE_QUOTE)
-                 {
-                   original_text = text;
-                   const ErrorCode ec = transform_multi_line_strings_3();
-                   if (ec)
-                      {
-                        text = original_text;   // restore function text
-                        error_line = l;
-                        return;
-                      }
+              const UCS_string & line = get_text(li);
+              const ShapeItem multi = line.multi_pos();
+              if (multi == -1)   continue;   // line contains no """
 
-                   break;
+              original_text = text;   // precaution for errors
+              if (const ErrorCode ec = transform_new_multi_lines())
+                 {
+                   text = original_text;   // restore function text
+                   error_line = li;
+                   return;
                  }
+
+              break;   // transform_new_multi_lines() does all
             }
       }
 
-   if (uprefs.multi_line_strings)   // old-style multi-line strings allowed
+   if (uprefs.multi_line_strings)     // old-style multi-line strings allowed
       {
-        for (int l = 1; l < get_text_size(); ++l)
+        for (int li = 1; li < get_text_size(); ++li)
             {
-              if (get_text(l).double_quote_count(false) & 1)
-                 {
-                   original_text = text;
-                   const ErrorCode ec = transform_multi_line_strings();
-                   if (ec)
-                      {
-                        text = original_text;   // restore function text
-                        error_line = l;
-                        return;
-                      }
+              const UCS_string & line = get_text(li);
+              if (!(line.double_quote_count(false) & 1))   continue;
 
-                   break;
+              original_text = text;   // precaution for errors.
+              if (const ErrorCode ec = transform_old_multi_lines())
+                 {
+                   text = original_text;   // restore function text
+                   error_line = li;
+                   return;
                  }
+
+              break;   // transform_old_multi_lines() does all
             }
       }
 
@@ -933,7 +951,7 @@ UCS_string_vector original_text;
    if (header.Z())   body.push_back(Token(TOK_RETURN_SYMBOL, header.Z()));
    else              body.push_back(Token(TOK_RETURN_VOID));
 
-   // restore the original text (before multi-line expansion)
+   // restore the original text (before any multi-line expansion)
    if (original_text.size())   text = original_text;
 }
 //----------------------------------------------------------------------------

@@ -11,18 +11,18 @@
  T←2 6⍴'MatrixLine 5'
 ∇
 
-      foo
+      foo   ⍝ runn fo
 Vector Line 1
 Matrix
 Line 4
 
-      T∆foo←1 4 5
+      T∆foo←1 5 6
       foo
 foo[1] Vector Line 1
 Vector Line 1
 Matrix
 Line 4
-foo[4] Matrix
+foo[5] Matrix
        Line 5
 
 
@@ -30,7 +30,7 @@ foo[4] Matrix
       ⍝
       T∆foo←6 5 4 3 2 1 0 ¯1 ¯2
       T∆foo
-1 2 3 4
+1 2 3 4 5
 
 
       ⍝ examples in Lrm

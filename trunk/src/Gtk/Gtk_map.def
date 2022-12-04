@@ -1,14 +1,16 @@
 #ifdef gtk_fun_def
 /* a mapping from ⎕GTK function names (right string argument Bs in ⎕GTK Bs) to Gtk functions.
 
-   Every Gtk widget has an #include file below, say, /usr/include/gtk-2.0/gtk/. The widget prefix is roughly the name
-   of the widget like per id= in the <object ...> tag of the XML file produced by glade. Often the id assigned by
-   glade is the same as in the include file. For example, glade assigns id="entry1" and the set_text function in file
-   gtkentry.h is declared as gtk_entry_set_text(). Sometimes, however, the names differ by underscores, like
-   glade assigns id="comboboxtext1" but the function is declard as gtk_combo_box_text_get_active_text(). In these
-   cases the XML file produced by glade needs to be adjusted to the C function name.
+   Every GTK widget has a corresponding #include file in directory , say, /usr/include/gtk-3.0/gtk/.
 
-   APL Variable, Z, and help are only used for automatically producing the documentation.
+   The widget prefix is roughly the name of the widget like per id= in the <object ...> tag of the XML file produced by glade.
+
+   Usually the ID assigned by glade is the same as in the include file. For example, glade assigns id="entry1", and the
+   set_text() function declared in file gtkentry.h is declared as gtk_entry_set_text(). Sometimes, however, the names differ
+   by underscores, like glade assigns id="comboboxtext1" but the function is declared as gtk_combo_box_text_get_active_text().
+   In these cases the XML file produced by glade needs to be adjusted to the C function name.
+
+   The columns APL Variable, Z, and help are only used for automatically producing the asciidoc documentation.
 
            ╔═══════════════════════════════════════════════════════════════════════════════════════════════════════════════════╗
            ║                                                    Macro Argument                                                 ║

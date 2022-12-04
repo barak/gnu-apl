@@ -50,9 +50,9 @@ Quad_GTK::eval_AB(Value_P A, Value_P B) const
    if (B->get_rank() > 1)   RANK_ERROR;
    if (A->is_char_array() && B->is_char_array())
       {
-         const UCS_string css_filename = A->get_UCS_ravel();
-         const UCS_string gui_filename = B->get_UCS_ravel();
-         const int fd = open_window(gui_filename, &css_filename);
+         const UCS_string css_name_or_data = A->get_UCS_ravel();
+         const UCS_string gui_name_or_data = B->get_UCS_ravel();
+         const int fd = open_window(gui_name_or_data, &css_name_or_data);
          return Token(TOK_APL_VALUE1, IntScalar(fd, LOC));
       }
 
@@ -200,21 +200,48 @@ Quad_GTK::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
    CHECK_SECURITY(disable_Quad_GTK);
 
+   /*
+      1. Let:
+
+         GTK ← CSS ⎕GTK UI   ⍝ GTK handle, CSS is optional
+
+      2. Let UI be a file or string like:
+         ...
+         <object class="GtkWindow" id="window1">         (1)
+         ...
+             <object class="GtkEntry" id="entry1">       (2)
+         ...
+
+      3. Let:
+
+         X ← GTK, "window1"   ⍝ X is aka. H_ID
+         B ← "set_text"       ⍝ aka. the function name    (3)
+         Z ← A ⎕GTK[X] B
+
+         That selects per (1) above a GUI window, and per (2) a widget.
+         The Gtk_server resolves the class= in (1) and (3) into a function
+         and calls it.
+    */
+
    if (B->get_rank() > 1)   RANK_ERROR;
 
-UTF8_string window_id;                // e.g. "entry1"
-const int fd = resolve_window(X.get(), window_id);
-   write_TLV(fd, 6, window_id);   // select wodget
+   // split X into handle ↑X and widget_id 1↓X
+   //
+UTF8_string widget_id;            // e.g. "entry1" from id= in .ui
+const int fd = resolve_window(X.get(), widget_id);
+   write_TLV(fd, 6, widget_id);   // select widget
 
-int fun = FNUM_INVALID;
-   if (B->is_int_scalar())         fun = B->get_cfirst().get_int_value();
-   else if (B->is_char_string())   fun = resolve_fun_name(window_id, B.get());
+Fnum fun = FNUM_INVALID;
+   if      (B->is_int_scalar())    fun = Fnum(B->get_cfirst().get_int_value());
+   else if (B->is_char_string())   fun = resolve_fun_name(widget_id, B.get());
    else
       {
         MORE_ERROR() << "A ⎕GTK[X] B expects B to be an integer scalar"
                         " or a text vector";
         DOMAIN_ERROR;
       }
+
+   if (fun == FNUM_INVALID)   DOMAIN_ERROR;   // not found
 
 int command_tag = -1;
 int response_tag = -1;
@@ -281,15 +308,19 @@ Quad_GTK::eval_XB(Value_P X, Value_P B) const
 {
    CHECK_SECURITY(disable_Quad_GTK);
 
+   // see eval_AXB above for an explanation of X and B.
+
    if (B->get_rank() > 1)   RANK_ERROR;
 
-UTF8_string window_id;                // e.g. "entry1"
-const int fd = resolve_window(X.get(), window_id);
-   write_TLV(fd, 6, window_id);   // select wodget
+   // split X into handle ↑X and widget_id 1↓X
+   //
+UTF8_string widget_id;                // e.g. "entry1"
+const int fd = resolve_window(X.get(), widget_id);
+   write_TLV(fd, 6, widget_id);   // select widget
 
 int fun = FNUM_INVALID;
    if (B->is_int_scalar())         fun = B->get_cfirst().get_int_value();
-   else if (B->is_char_string())   fun = resolve_fun_name(window_id, B.get());
+   else if (B->is_char_string())   fun = resolve_fun_name(widget_id, B.get());
    else                            DOMAIN_ERROR;
 
 int command_tag = -1;
@@ -299,7 +330,7 @@ Gtype Atype = gtype_V;
    switch(fun)
       {
         case 0:
-           write_TLV(fd, 4, window_id);
+           write_TLV(fd, 4, widget_id);
            return Token(TOK_APL_VALUE1, IntScalar(fd, LOC));
 
 #define gtk_event_def(ev_ename, ...)
@@ -478,12 +509,12 @@ Value_P Z(open_windows.size(), LOC);
 }
 //----------------------------------------------------------------------------
 int
-Quad_GTK::resolve_window(const Value * X, UTF8_string & window_id)
+Quad_GTK::resolve_window(const Value * X, UTF8_string & widget_id)
 {
    if (X->get_rank() > 1)   RANK_ERROR;
 const int fd = X->get_cfirst().get_int_value();
 
-   // verify that ↑X is an open window...
+   // verify that the handle ↑X is an open window...
    //
 bool window_valid = false;
    loop(w, open_windows.size())
@@ -497,33 +528,34 @@ bool window_valid = false;
 
    if (!window_valid)
       {
-         MORE_ERROR() << "Invalid window " << fd
+         MORE_ERROR() << "Invalid GTK handle " << fd
                       << " in Quad_GTK::resolve_window()";
          DOMAIN_ERROR;
       }
 
+   // copy string 1↓X into widget_id
    loop(i, X->element_count())
        {
-         if (i)   window_id += X->get_cravel(i).get_char_value();
+         if (i)   widget_id += X->get_cravel(i).get_char_value();
        }
 
    return fd;
 }
 //----------------------------------------------------------------------------
 Quad_GTK::Fnum
-Quad_GTK::resolve_fun_name(UTF8_string & window_id, const Value * B)
+Quad_GTK::resolve_fun_name(UTF8_string & widget_id, const Value * B)
 {
-   // window_id is a class and an instance number, such as entry1
-   // Determine the length of the class prefix
+   // By convention, widget_id is a class prefix (lowercase a-z),i
+   // possibly followed // by an instance number (if glade is used),
+   // or something else (typically -suffix or _suffix).
+   // Compute the length of the class prefix.
    //
-int wid_len = window_id.size();
-   while (wid_len &&
-          window_id[wid_len - 1] >= '0' &&
-          window_id[wid_len - 1] <= '9')   --wid_len;
+int wid_len = 0;
+   while (widget_id[wid_len] >= 'a' && widget_id[wid_len] <= 'z')   ++wid_len;
 
 const UCS_string ucs_B(*B);
 UTF8_string utf_B(ucs_B);
-const char * wid_class = window_id.c_str();
+const char * wid_class = widget_id.c_str();
 const char * fun_name = utf_B.c_str();
 
 #define gtk_event_def(ev_ename, ...)
@@ -534,7 +566,7 @@ const char * fun_name = utf_B.c_str();
 
 #include "Gtk/Gtk_map.def"
 
-   MORE_ERROR() << "function string class=" << wid_class
+   MORE_ERROR() << "⎕GTK: function string class=" << wid_class
         << ", function=" << fun_name << " could not be resolved";
    return FNUM_INVALID;
 }
@@ -616,8 +648,33 @@ unsigned char TLV[TLV_len];
 }
 //----------------------------------------------------------------------------
 int
-Quad_GTK::open_window(const UCS_string & gui_filename,
-                   const UCS_string * css_filename)
+Quad_GTK::open_window(const UCS_string & gui_name_or_data,   // mandatory
+                      const UCS_string * css_name_or_data)   // optional
+{
+const int fd = start_Gtk_server();
+
+   // write either: TLVs 1 and 3       (no css_name_or_data)
+   // or else:      TLVs 1, 2, and 3   (with css_name_or_data)
+   // to the Gtk_server...
+   //
+   send_name_or_data(fd, 1 , gui_name_or_data);
+   if (css_name_or_data)   send_name_or_data(fd, 2, *css_name_or_data);
+
+
+   if (write_TL0(fd, 3))
+      {
+         Quad_FIO::close_handle(fd);
+         MORE_ERROR() << "write(Tag 3) failed in ⎕GTK";
+         DOMAIN_ERROR;
+      }
+
+window_entry we = { fd };
+   open_windows.push_back(we);
+   return fd;
+}
+//----------------------------------------------------------------------------
+int
+Quad_GTK::start_Gtk_server()
 {
    // locate the Gtk_server. It should live in one of two places:
    //
@@ -633,12 +690,12 @@ int slen = snprintf(path1, APL_PATH_MAX, "%s/Gtk/Gtk_server", bin_dir);
    if (slen >= APL_PATH_MAX)   path2[APL_PATH_MAX] = 0;
 
 const char * path = 0;
-   if (!access(path1, X_OK))        path = path1;
+   if      (!access(path1, X_OK))   path = path1;
    else if (!access(path2, X_OK))   path = path2;
    else
       {
         MORE_ERROR() << "No Gtk_server found in " << path1
-                     << "\nor " << path2;
+                   << "\nnor in                 " << path2;
         DOMAIN_ERROR;
       }
 
@@ -658,53 +715,45 @@ int envp_idx = 0;
               envp[envp_idx] = 0;
             }
        }
-const int fd = Quad_FIO::do_FIO_57(path, envp);
-
-   // write TLVs 1 and 3 or 1, 2, and 3 to Gtk_server...
-   //
-UTF8_string gui_utf8(gui_filename);
-   slen = snprintf(path1 + 8, APL_PATH_MAX, "%s", gui_utf8.c_str());
-   if (slen >= APL_PATH_MAX)   path1[APL_PATH_MAX] = 0;
-   memset(path1, 0, 8);
-   path1[3] = 1;   // tag = 1: gui filename
-   path1[6] = gui_utf8.size() >> 8;
-   path1[7] = gui_utf8.size() & 0xFF;
-   slen = write(fd, path1, 8 + gui_utf8.size());
-   if (slen == -1)
-      {
-         Quad_FIO::close_handle(fd);
-         MORE_ERROR() << "write(Tag 1) failed in ⎕GTK";
-         DOMAIN_ERROR;
-      }
-
-   if (css_filename)
-      {
-        UTF8_string css_utf8(*css_filename);
-        memset(path2, 0, 8);
-        slen = snprintf(path2 + 8, APL_PATH_MAX, "%s", css_utf8.c_str());
-        path2[3] = 2;   // tag = 2: css filename
-        path2[6] = css_utf8.size() >> 8;
-        path2[7] = css_utf8.size() & 0xFF;
-        slen = write(fd, path2, 8 + css_utf8.size());
-        if (slen == -1)
-           {
-              Quad_FIO::close_handle(fd);
-              MORE_ERROR() << "write(Tag 2) failed in ⎕GTK";
-              DOMAIN_ERROR;
-           }
-      }
-
-   if (write_TL0(fd, 3))
-      {
-         Quad_FIO::close_handle(fd);
-         MORE_ERROR() << "write(Tag 3) failed in ⎕GTK";
-         DOMAIN_ERROR;
-      }
-
-window_entry we = { fd };
-   open_windows.push_back(we);
-   return fd;
+   return Quad_FIO::do_FIO_57(path, envp);
 }
+//----------------------------------------------------------------------------
+void
+Quad_GTK::send_name_or_data(int fd, int tag, const UCS_string & name_or_data)
+{
+UTF8_string name_or_data_utf8(name_or_data);
+const size_t Vlen = name_or_data_utf8.size();
+const size_t TLV_len = 8 + Vlen;   // 4 nyte tag + byte 4 len + value
+char * del = 0;
+char short_path[1000];
+char * path = short_path;
+
+   if (TLV_len >= sizeof(short_path))
+      {
+        del = path = new char[TLV_len];
+      }
+
+   path[0] = tag >> 24;    // Tag: MSB
+   path[1] = tag >> 16;    // Tag: ..
+   path[2] = tag >> 8;     // Tag: ..
+   path[3] = tag;          // Tag: LSB (1 or 2)
+   path[4] = Vlen >> 24;   // Length MSB
+   path[5] = Vlen >> 16;   // Length ..
+   path[6] = Vlen >>  8;   // Length ..
+   path[7] = Vlen;         // Length LSB
+   memcpy(path + 8, name_or_data_utf8.c_str(), Vlen);
+const size_t wlen = write(fd, path, TLV_len);
+   if (wlen != TLV_len)
+      {
+         delete del;
+         Quad_FIO::close_handle(fd);
+         MORE_ERROR() << "write(Tag " << tag << ") failed in ⎕GTK";
+         DOMAIN_ERROR;
+      }
+
+   delete del;
+}
+//----------------------------------------------------------------------------
 
 #else   // ! apl_GTK3
 

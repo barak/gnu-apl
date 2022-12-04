@@ -156,7 +156,11 @@ public:
    /// is not contained in \b this string
    ShapeItem substr_pos(const UCS_string & sub) const;
 
-   /// return true if \b this string contains non-whitespace characters
+   /// return the start position of """ in \b this string or -1 if \b """
+   /// is not contained in \b this string
+   ShapeItem multi_pos() const;
+
+   /// return true if \b this string contains any non-whitespace characters
    bool has_black() const;
 
    /// return true if \b this starts with prefix (ASCII, case matters).
@@ -319,7 +323,7 @@ public:
         return COMP_EQ;
       }
 
-   /// append \b other in quotes, doubling quoted in \b other
+   /// append \b other in (single) quotes, doubling single quotes in \b other
    void append_quoted(const UCS_string & other);
 
    /// append number (in ASCII encoding like %d) to this string

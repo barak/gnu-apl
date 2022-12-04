@@ -638,7 +638,20 @@ const ShapeItem start_positions = 1 + size() - sub.size();
    return -1;   // not found
 }
 //----------------------------------------------------------------------------
-bool 
+ShapeItem
+UCS_string::multi_pos() const
+{
+   loop(p, size() - 2)
+       {
+         if (at(p)     == UNI_DOUBLE_QUOTE &&
+             at(p + 1) == UNI_DOUBLE_QUOTE &&
+             at(p + 2) == UNI_DOUBLE_QUOTE)   return p;
+       }
+
+   return -1;   // not found
+}
+//----------------------------------------------------------------------------
+bool
 UCS_string::has_black() const
 {
    loop(s, size())   if (!Avec::is_white(at(s)))   return true;

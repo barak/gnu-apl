@@ -68,9 +68,11 @@ UCS_string_vector Command::copy_once_table;
 void
 Command::process_line()
 {
-UCS_string accu;   // for new-style multiline strings
+UCS_string prefix;   // for new-style multiline strings
+UCS_string accu;     // for new-style multiline strings
 UCS_string prompt = Workspace::get_prompt();
 bool multiline = false;
+int count = 0;
    for (;;)
        {
          UCS_string line;
@@ -80,26 +82,46 @@ bool multiline = false;
 
          if (eof) CERR << "EOF at " << LOC << endl;
 
-         if (line.ends_with("\"\"\""))   /// start or end of multi-line string
+         const ShapeItem multi = line.multi_pos();
+         if (multi != -1)   /// start or end of multi-line string
             {
               multiline = ! multiline;
               if (multiline)    // start of multi-line
                   {
-                    accu = line;
+                    count = 0;
+                    prefix = line;
+                    prefix.resize(multi);   // discard trailing """ ff.
                     prompt.prepend(UNI_RIGHT_ARROW);
-                    accu.resize(line.size() - 3);   // discard trailing """
                     accu.append(UNI_SPACE);
                   }
               else              // end of multi-line
                   {
                     accu.pop_back();   // trailing " "
                     if (accu.size() == 1)   accu.append_ASCII(" \"\"");
-                    process_line(accu);
+
+                    if (count == 0)        // no string
+                       {
+                         const UTF8_string empty("0⍴⊂\"\"");   // 0⍴⊂""
+                         prefix << UCS_string(empty);
+                         process_line(prefix);
+                       }
+                    else if (count == 1)   // a single "string" would not nest
+                       {
+                         const UTF8_string encl("(,⊂");  // enclose accu...
+                         prefix << UCS_string(encl) << accu << ")";
+                         process_line(prefix);
+                       }
+                    else                   // true multi-string
+                       {
+                         prefix << accu;
+                         process_line(prefix);
+                       }
                     return;
                   }
             }
          else if (multiline)   // inside multi-line
             {
+              ++count;
               accu.append_ASCII("\"");
               accu.append(line.do_escape(true));
               accu.append_ASCII("\" ");
