@@ -162,14 +162,16 @@ char_def(R_CURLY           , '}'    , R_CURLY      , NO_SPACE ,  7D)
 char_def(TILDE             , '~'    , F12_WITHOUT  , NO_SPACE ,  7E)
 char_def(DELETE            , 0x7F   , END          , NO_SPACE , 07F)
 char_def(NO_BREAK_SPACE    , 0x00A0 , END          , NO_SPACE ,  FF) /*   */
-char_def(INVERTED_EXCLAM   , 0x00A1 , END          , NO_SPACE ,  8D) /* ¡ */
+char_uni(INVERTED_EXCLAM   , 0x00A1 , END          , NO_SPACE      ) /* ¡ */
 char_def(POUND             , 0x00A3 , END          , NO_SPACE ,  9C) /* £ */
 char_def(YEN               , 0x00A5 , END          , NO_SPACE , 080) /* ¥ */
 char_def(DIAERESIS         , 0x00A8 , OPER1_EACH   , NO_SPACE ,  FE) /* ¨ */
+char_def(LEFT_DAQ          , 0x00AB , QUOTE2       , NO_SPACE ,  85) /* « */
 char_def(OVERBAR           , 0x00AF , NUMERIC      , SYMBOL   ,  FD) /* ¯ */
 char_uni(PAD_U2            , 0x00B2 , END          , NO_SPACE      ) /* ² */
 char_uni(PAD_U3            , 0x00B3 , END          , NO_SPACE      ) /* ³ */
 char_uni(PAD_U1            , 0x00B9 , END          , NO_SPACE      ) /* ¹ */
+char_def(RIGHT_DAQ         , 0x00BB , QUOTE2       , NO_SPACE ,  8D) /* » */
 char_def(MULTIPLY          , 0x00D7 , F12_TIMES    , NO_SPACE ,  F5) /* × */
 char_def(DIVIDE            , 0x00F7 , F12_DIVIDE   , NO_SPACE ,  F6) /* ÷ */
 char_def(LAMBDA            , 0x03BB , SYMBOL       , SYMBOL   ,  99) /* λ */
@@ -224,7 +226,7 @@ char_def(EQUIVALENT        , 0x2261 , F12_EQUIV    , NO_SPACE ,  CF) /* ≡ */
 char_def(NEQUIVALENT       , 0x2262 , F12_NEQUIV   , NO_SPACE ,  A3) /* ≢ */
 char_def(LESS_OR_EQUAL     , 0x2264 , F2_LEQU      , NO_SPACE ,  F3) /* ≤ */
 char_def(MORE_OR_EQUAL     , 0x2265 , F2_MEQU      , NO_SPACE ,  F2) /* ≥ */
-char_def(BETWEEN           , 0x226C , END          , NO_SPACE , 085) /* ≬ */
+char_uni(BETWEEN           , 0x226C , END          , NO_SPACE      ) /* ≬ */
 char_def(SUBSET            , 0x2282 , F12_PARTITION, NO_SPACE ,  E2) /* ⊂ */
 char_def(SUPERSET          , 0x2283 , F12_PICK     , NO_SPACE ,  E3) /* ⊃ */
 char_def(CIRCLE_BAR        , 0x2296 , F12_ROTATE1  , NO_SPACE ,  E9) /* ⊖ */

@@ -82,19 +82,20 @@ int count = 0;
 
          if (eof) CERR << "EOF at " << LOC << endl;
 
-         const ShapeItem multi = line.multi_pos();
-         if (multi != -1)   /// start or end of multi-line string
+         const ShapeItem multi = line.multi_pos(multiline);
+         if (multi != -1)   /// line is START or END of multi-line string
             {
               multiline = ! multiline;
-              if (multiline)    // start of multi-line
+              if (multiline)    // START of multi-line string
                   {
                     count = 0;
                     prefix = line;
                     prefix.resize(multi);   // discard trailing """ ff.
+
                     prompt.prepend(UNI_RIGHT_ARROW);
                     accu.append(UNI_SPACE);
                   }
-              else              // end of multi-line
+              else              // END of multi-line string
                   {
                     accu.pop_back();   // trailing " "
                     if (accu.size() == 1)   accu.append_ASCII(" \"\"");

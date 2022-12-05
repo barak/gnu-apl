@@ -122,11 +122,11 @@ protected:
    /// tokenize a Quad function or variable
    void tokenize_quad(Unicode_source & src, Token_string & tos) const;
 
-   /// tokenize a single quoted string
+   /// tokenize a single quoted 'string'
    void tokenize_string1(Unicode_source & src, Token_string & tos,
                          size_t & rest_2) const;
 
-   /// tokenize a double quoted string
+   /// tokenize a double quoted "string"
    void tokenize_string2(Unicode_source & src, Token_string & tos,
                          size_t & rest_2) const;
 

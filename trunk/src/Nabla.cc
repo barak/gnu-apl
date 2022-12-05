@@ -198,8 +198,8 @@ UserFunction * ufun = UserFunction::fix(fun_text, error_line, false,
            {
              // the ∇-editor runs from a script, therefore warning the user
              // interactively and asking to fix the fault makes no sense. We
-             // therefore exit with DEFN_ERROR, so that the scrip does not hang
-             // in a endless try again loop.
+             // therefore exit with DEFN_ERROR, so that the scrip does not
+             // hang in a endless try again loop.
              //
              UTF8_string more_utf8(MORE);
              throw_edit_error(more_utf8.c_str());
@@ -867,12 +867,13 @@ Nabla::edit_body_line()
 bool need_parse = true;
    if (uprefs.multi_line_strings_3 && !out_of_order)   // most likely: script
       {
-        UCS_string quote3("\"\"\"");
+        bool multi = false;
         loop(i, lines.size())
             {
-              if (-1 != lines[i].text.substr_pos(quote3))
-                 need_parse = ! need_parse;
+              if (-1 == lines[i].text.multi_pos(multi))   continue;
+              multi = ! multi;
             }
+        need_parse = multi;   // line is in multi-line string
       }
 
    if (need_parse)

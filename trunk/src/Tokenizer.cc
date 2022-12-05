@@ -122,7 +122,6 @@ Unicode_source src(input);
                      MORE_ERROR() << "Tokenizer: No token for Unicode "
                                   <<  cc << uni << ")\nInput: " << input;
                      Error error(E_NO_TOKEN, LOC);
-BACKTRACE
                      throw error;
                    }
                    break;
@@ -546,13 +545,12 @@ Tokenizer::tokenize_string2(Unicode_source & src, Token_string & tos,
 {
    Log(LOG_tokenize)   CERR << "tokenize_string2(" << src << ")" << endl;
 
-   // skip the leading "
-   {
-     const Unicode uni = src.get();
-     if (uni)   { /* do nothing, needed for -Wall */ }
+   // remember the leading ", «. or »
 
-     Assert1(uni == UNI_DOUBLE_QUOTE);
-   }
+const Unicode first = src.get();
+   if (first != UNI_DOUBLE_QUOTE &&
+       first != UNI_LEFT_DAQ     &&
+       first != UNI_RIGHT_DAQ)   FIXME;   // internal error
 
 UCS_string string_value;
 bool got_end = false;
@@ -561,8 +559,40 @@ bool got_end = false;
        {
          const Unicode uni = src.get();
 
-         if (uni == UNI_DOUBLE_QUOTE)     // terminating "
+         if (uni  == UNI_DOUBLE_QUOTE &&
+            first == UNI_DOUBLE_QUOTE)   // last of "..."
             {
+              got_end = true;
+              break;
+            }
+
+         if (uni  == UNI_LEFT_DAQ &&
+            first == UNI_LEFT_DAQ)   // second of ««« ?
+            {
+              const Unicode uni2 = src.get();   // expect third « from «««
+              if (uni2 != UNI_LEFT_DAQ)   // bad «««
+                 {
+                   Error::throw_parse_error(E_BAD_MULTI_START, LOC, loc);
+                 }
+              got_end = true;
+              break;
+            }
+
+         if (uni == UNI_RIGHT_DAQ)     // »»» or last of «...»
+            {
+              if (first == UNI_LEFT_DAQ)   // last of «...»
+                 {
+                   got_end = true;
+                   break;
+                 }
+              else if (first == UNI_RIGHT_DAQ)   // »»
+                 {
+                   const Unicode uni2 = src.get();
+                   if (uni2 != UNI_RIGHT_DAQ)   // proper »»»
+                      {
+                        Error::throw_parse_error(E_BAD_MULTI_END, LOC, loc);
+                      }
+                 }
               got_end = true;
               break;
             }

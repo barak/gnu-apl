@@ -158,7 +158,7 @@ public:
 
    /// return the start position of """ in \b this string or -1 if \b """
    /// is not contained in \b this string
-   ShapeItem multi_pos() const;
+   ShapeItem multi_pos(bool expect_end) const;
 
    /// return true if \b this string contains any non-whitespace characters
    bool has_black() const;

@@ -738,7 +738,7 @@ Line_status current = APL_text;
        {
          const UCS_string & line = get_text(l);
          const ShapeItem len = line.size();
-         if (line.ends_with("\"\"\""))
+         if (-1 != line.multi_pos(current == Inside_string))
             {
               if (current == APL_text)   // start of multi-line string
                  {
@@ -849,7 +849,7 @@ UCS_string_vector original_text;
         for (int li = 1; li < get_text_size(); ++li)
             {
               const UCS_string & line = get_text(li);
-              const ShapeItem multi = line.multi_pos();
+              const ShapeItem multi = line.multi_pos(false);
               if (multi == -1)   continue;   // line contains no """
 
               original_text = text;   // precaution for errors

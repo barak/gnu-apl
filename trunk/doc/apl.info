@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-November 28, 2022
+December 5, 2022
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
@@ -1042,37 +1042,55 @@ which differ from single quoted strings in two ways:
 2.1.6 Multi-Line Strings
 ------------------------
 
-Another feature of GNU APL to simplify the creation of values that
-contain longer texts are strings that span several lines.  One
-consequence of how ⎕INP works is that the strings read by ⎕INP always
-originate in stdin of the interpreter.  In immediate execution mode (and
-therefore also in APL scripts) reading stdin returns either the next
-lines entered by the user (in interactive APL sessions) or else the next
-lines in the script file (in APL scripts).  Often, however, a programmer
-wants to specify long strings inside a defined function and not e.g.  on
-the top-level of an APL script.  That renders ⎕INP almost useless for
-defined functions.
-
-   In order to provide a better way for defining long strings inside
-defined functions, multi-line strings were introduced.  They come in two
-flavors: old-style and new-style.
+A substantial disadvantage of ⎕INP is that it only works in immediate
+execution mode (and consequently also in .apl scripts), but not the
+bodies of defined functions.  Multi-line strings fill this gap for
+string literals that span several lines of text inside the body of a
+defined functions.  Multi-Line Strings have become more and more
+advanced (and elegant) over time.  For this reason they currently come
+in different flavors (of which the older ones will disappear in the long
+run).
 
 2.1.6.1 Old-style Multi-Line Strings
 ....................................
 
 Old-style multi-line strings were the first attempt to provide long
-strings for defined functions.  These strings are not allowed in
-immediate execution mode because could easily be entered by mistake (by
-simply forgetting the terminating " or ’ of a string) and that would
-have obscured the traditional behavior of immediate execution mode.
+strings for defined functions.  The idea for the old-style multi-line
+strings was adopted from shells like bash where, for example,
 
-   An old-style multi-line string starts at the last " in a line of a
-defined function that has line with an odd number of " characters.  It
-continues over the subsequent function lines until the next ".  The
-result is a nested APL value containing one nested string per line
-involved.  This method of specifying a multi-line string was adopted
-from the bash shell.  In immediate execution mode an old-style
-multi-line string yields No string end found.
+echo "Line1
+   Line2"
+
+   prints:
+
+Line1
+   Line2
+
+   In simple terms this means that as long as the number of " characters
+is odd, the string remains open until the closing " is found (which
+makes the number even again).
+
+   Old-style multi-line strings are not allowed in immediate execution
+mode because they could easily be entered by mistake (by simply
+forgetting the terminating " or ’ of a standard string) and that would
+have obscured the familiar behavior of immediate execution mode.  In
+function definition mode, the total number of function lines is known
+and it can therefore checked if a multi-line string inside the function
+is properly terminated.  Immediate execution mode, however, is
+open-ended and therefore a forgotten closing """ can lead to a fatal
+misinterpretation of (intended) string content as (unintended) APL code,
+with lots of nonsense error messages.
+
+   Like in bash and also other shells, an old-style multi-line string
+starts at the last " on a line of a defined function that has an an odd
+number of " characters.  The string continues over the subsequent
+function lines until the next " is found.  The result is a nested APL
+value containing one nested string per line involved.
+
+   In immediate execution mode an old-style multi-line string yields,
+like in standard APL:
+
+No string end found+
 
    For example:
 
@@ -1111,14 +1129,15 @@ ABC
 2.1.6.2 New-style Multi-Line Strings
 ....................................
 
-Even though the combination of ⎕INP for immediate execution and
-multi-line strings for defined functions achieved the goal of specifying
-large amounts of text in a simple manner, it was certainly neither
-intuitive nor elegant to have different approaches for the different APL
-modes.
+The combination of ⎕INP for immediate execution mode and multi-line
+strings for defined functions achieved, at least in principle, the goal
+of specifying large amounts of text in a simpler manner than in standard
+APL. However, having different methods for creating multi-line string
+literals in different APL modes could not convince entirely.
 
-   This was leading to the new-style multi-line strings.  They adopted
-the triple quote (""") syntax know from e.g.  the Python language.  The
+   The search for a more intuitive and more consistent solution was then
+leading to new-style multi-line strings.  These strings adopted the
+triple quote (""") syntax know from e.g.  the Python language.  The
 syntax of new-style multi-line strings is cleaner: empty lines are
 handled more consistently and the string lines are completely separated
 from the APL code lines.  More importantly, new-style multi-line strings
@@ -1161,6 +1180,54 @@ prefixed by → to indicate that a Multi-Line String is being entered.
 
    ⎕INP and old-style strings will coexist for a while, but may
 disappear at some point in time.
+
+2.1.6.3 « » Strings
+...................
+
+When new-style multi-line strings are used in scripts then the related
+error reporting (if the syntax used incorrectly) can become cumbersome.
+For example, if one forgets the closing """ of a multi-line string then
+the next """ (which was meant as the start of a new multi-line string)
+is mistaken as the (forgotten) end of the previous one.  The often long
+content of the new string is then parsed as APL code and will usually
+produce many error messages, all of them nonsense.  Things get worse if
+the script itself is long because the odd/even nature of the quotes will
+then persists until then end of the string (or at least until the next
+forgotten quote, if any).
+
+   To deal with this problem, GNU APL also allows strings whose contents
+are enclosed in double angle quotation marks « and ».  In inline strings
+’...’ and "...", as well as in multi-line strings """ ...  """, there is
+no general (and reliable) way to decide if a user has forgotten the
+ending quote(s), which leads to the problems above.
+
+   For this reason, GNU APL now also allows inline and multi-line
+strings like, for example:
+
+      «Hello world»
+Hello world
+
+      8 ⎕CR «««
+→      Line 1
+→        Line 2
+→      »»»
+┌→──────────────────┐
+│┌→─────┐ ┌→───────┐│
+││Line 1│ │  Line 2││
+│└──────┘ └────────┘│
+└ϵ──────────────────┘
+
+      8 ⎕CR «««
+→      Line 1
+→        Line 2
+→      «««
+*** WARNING: see (second) ««« when expecting the closing »»»
+┌→──────────────────┐
+│┌→─────┐ ┌→───────┐│
+││Line 1│ │  Line 2││
+│└──────┘ └────────┘│
+└ϵ──────────────────┘
+
 
 2.1.7 Script Example
 --------------------
@@ -6791,65 +6858,65 @@ please read <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 
 Tag Table:
 Node: Top383
-Node: Chapter 11576
-Node: Chapter 223286
-Node: Section 2.125235
-Node: Section 2.245810
-Node: Section 2.346569
-Node: Section 2.447844
-Node: Section 2.552289
-Node: Section 2.652462
-Node: Section 2.753092
-Node: Section 2.857045
-Node: Section 2.958580
-Node: Section 2.1060672
-Node: Section 2.1162226
-Node: Section 2.1264011
-Node: Section 2.1365951
-Node: Section 2.1466892
-Node: Section 2.1567144
-Node: Section 2.1668540
-Node: Section 2.1779009
-Node: Section 2.1881531
-Node: Section 2.1988238
-Node: Section 2.2089683
-Node: Section 2.2195344
-Node: Section 2.22100378
-Node: Section 2.23103659
-Node: Section 2.24103950
-Node: Section 2.25114775
-Node: Section 2.26115047
-Node: Section 2.27121625
-Node: Section 2.28124085
-Node: Section 2.29124754
-Node: Section 2.30126405
-Node: Section 2.31130194
-Node: Output File Format142685
-Node: Section 2.32143860
-Node: Section 2.33153258
-Node: Section 2.34154285
-Node: Section 2.35169001
-Node: Section 2.36179068
-Node: Section 2.37183187
-Node: Section 2.38185282
-Node: Section 2.39189707
-Node: Chapter 3211056
-Node: Chapter 4213557
-Node: Chapter 5214683
-Node: Section 5.1216220
-Node: Section 5.2217500
-Node: Section 5.3217860
-Node: Section 5.4218102
-Node: Section 5.5218764
-Node: Section 5.6219242
-Node: Section 5.7220014
-Node: Section 5.8220471
-Node: Chapter 6220873
-Node: Section 6.1221292
-Node: Section 6.2221979
-Node: Chapter 7222810
-Node: Section 7.1223313
-Node: Section 7.2248627
+Node: Chapter 11575
+Node: Chapter 223285
+Node: Section 2.125234
+Node: Section 2.248299
+Node: Section 2.349058
+Node: Section 2.450333
+Node: Section 2.554778
+Node: Section 2.654951
+Node: Section 2.755581
+Node: Section 2.859534
+Node: Section 2.961069
+Node: Section 2.1063161
+Node: Section 2.1164715
+Node: Section 2.1266500
+Node: Section 2.1368440
+Node: Section 2.1469381
+Node: Section 2.1569633
+Node: Section 2.1671029
+Node: Section 2.1781498
+Node: Section 2.1884020
+Node: Section 2.1990727
+Node: Section 2.2092172
+Node: Section 2.2197833
+Node: Section 2.22102867
+Node: Section 2.23106148
+Node: Section 2.24106439
+Node: Section 2.25117264
+Node: Section 2.26117536
+Node: Section 2.27124114
+Node: Section 2.28126574
+Node: Section 2.29127243
+Node: Section 2.30128894
+Node: Section 2.31132683
+Node: Output File Format145174
+Node: Section 2.32146349
+Node: Section 2.33155747
+Node: Section 2.34156774
+Node: Section 2.35171490
+Node: Section 2.36181557
+Node: Section 2.37185676
+Node: Section 2.38187771
+Node: Section 2.39192196
+Node: Chapter 3213545
+Node: Chapter 4216046
+Node: Chapter 5217172
+Node: Section 5.1218709
+Node: Section 5.2219989
+Node: Section 5.3220349
+Node: Section 5.4220591
+Node: Section 5.5221253
+Node: Section 5.6221731
+Node: Section 5.7222503
+Node: Section 5.8222960
+Node: Chapter 6223362
+Node: Section 6.1223781
+Node: Section 6.2224468
+Node: Chapter 7225299
+Node: Section 7.1225802
+Node: Section 7.2251116
 
 End Tag Table
 

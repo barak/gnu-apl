@@ -7,6 +7,8 @@ CLEAR WS
 ⍝ NOTE: function definition mode: UserFunction::transform_multi_line_strings_3
 ⍝       immediate execution mode: Command::process_line()
 
+⍝ ══════ OLD STYLE ══════
+
 ∇FOO
  4 ⎕CR "123
         456
@@ -44,7 +46,122 @@ FOO
 ┃┗━━━┛ ┗━━━━━━━━━━━┛ ┗━━━━━━━━━━━┛       ┃
 ┗ϵ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-⍝ new style multi-line strings...
+⍝ ══════ NEW STYLE """...""" ══════
+
+      ⍝ multiple lines (in function definition mode)
+      ⍝
+)ERASE FOO
+
+∇Z←FOO
+ 1+2
+ Z←"""
+   line 3
+    line 4
+     line 5
+   """
+ 3+4
+∇
+
+4 ⎕CR FOO
+3
+7
+┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃┏→━━━━━━━━┓ ┏→━━━━━━━━━┓ ┏→━━━━━━━━━━┓┃
+┃┃   line 3┃ ┃    line 4┃ ┃     line 5┃┃
+┃┗━━━━━━━━━┛ ┗━━━━━━━━━━┛ ┗━━━━━━━━━━━┛┃
+┗ϵ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+      ⍝ single line (in function definition mode)
+      ⍝
+)ERASE FOO
+
+∇Z←FOO
+ 1+2
+ Z←«««
+   line 3
+   »»»
+ 3+4
+∇
+4 ⎕CR FOO
+3
+7
+┏→━━━━━━━━━━┓
+┃┏→━━━━━━━━┓┃
+┃┃   line 3┃┃
+┃┗━━━━━━━━━┛┃
+┗ϵ━━━━━━━━━━┛
+
+
+      ⍝ no line (in function definition mode)
+      ⍝
+)ERASE FOO
+
+∇Z←FOO
+ 1+2
+ Z←«««
+   »»»
+ 3+4
+∇
+4 ⎕CR FOO
+3
+7
+┏⊖━━┓
+┃┏⊖┓┃
+┃┃0┃┃
+┃┗━┛┃
+┗ϵ━━┛
+
+
+⍝ immediate execution mode...
+
+      ⍝ multiple lines (in immediate execution mode)
+      ⍝
+I←«««
+line 1
+ line \2
+  line "3"
+  »»»
+
+4 ⎕CR I
+┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃┏→━━━━━┓ ┏→━━━━━━━┓ ┏→━━━━━━━━━┓┃
+┃┃line 1┃ ┃ line \2┃ ┃  line "3"┃┃
+┃┗━━━━━━┛ ┗━━━━━━━━┛ ┗━━━━━━━━━━┛┃
+┗ϵ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+      ⍝ single line (in immediate execution mode)
+      ⍝
+4 ⎕CR «««
+     ⍝ comment
+      »»»
+┏→━━━━━━━━━━━━━━━┓
+┃┏→━━━━━━━━━━━━━┓┃
+┃┃     ⍝ comment┃┃
+┃┗━━━━━━━━━━━━━━┛┃
+┗ϵ━━━━━━━━━━━━━━━┛
+
+
+4 ⎕CR «««
+     ⍝ comment
+     ⍝ comment
+      »»»
+┏→━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
+┃┏→━━━━━━━━━━━━━┓ ┏→━━━━━━━━━━━━━┓┃
+┃┃     ⍝ comment┃ ┃     ⍝ comment┃┃
+┃┗━━━━━━━━━━━━━━┛ ┗━━━━━━━━━━━━━━┛┃
+┗ϵ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
+
+      ⍝ no line (in immediate execution mode)
+      ⍝
+4 ⎕CR «««
+      »»»
+┏⊖━━┓
+┃┏⊖┓┃
+┃┃0┃┃
+┃┗━┛┃
+┗ϵ━━┛
+
+⍝ ══════ NEW STYLE «««...»»» ══════
 
       ⍝ multiple lines (in function definition mode)
       ⍝
@@ -158,5 +275,4 @@ line 1
 ┃┃0┃┃
 ┃┗━┛┃
 ┗ϵ━━┛
-
 

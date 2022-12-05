@@ -1130,35 +1130,58 @@ for control character, such as \n for ASCII line feed, \t for ASCII TAB etc.
 
 @subsection Multi-Line Strings
 
-Another feature of GNU APL to simplify the creation of values that contain
-longer texts are strings that span several lines. One consequence of how ⎕INP
-works is that the strings read by ⎕INP always originate in @b{stdin} of the
-interpreter. In immediate execution mode (and therefore also in APL scripts)
-reading @b{stdin} returns either the next lines entered by the user
-(in interactive APL sessions) or else the next lines in the script file
-(in APL scripts). Often, however, a programmer wants to specify long strings
-inside a defined function and not e.g.  on the top-level of an APL script.
-That renders ⎕INP almost useless for defined functions.
-
-In order to provide a better way for defining long strings inside defined
-functions, multi-line strings were introduced. They come in two flavors:
-old-style and new-style.
+A substantial disadvantage of ⎕INP is that it only works in immediate execution
+mode (and consequently also in .apl scripts), but not the bodies of
+defined functions. Multi-line strings fill this gap for string literals that
+span several lines of text @b{inside} the body of a defined functions.
+Multi-Line Strings have become more and more advanced (and elegant) over time.
+For this reason they currently come in different flavors (of which the older
+ones will disappear in the long run).
 
 @subsubsection Old-style Multi-Line Strings
 
 Old-style multi-line strings were the first attempt to provide long strings for
-defined functions. These strings are not allowed in immediate execution mode
-because could easily be entered by mistake (by simply forgetting the
-terminating " or ' of a string) and that would have obscured the traditional
-behavior of immediate execution mode.
+defined functions. The idea for the old-style multi-line strings was adopted
+from shells like @b{bash} where, for example,
 
-An old-style multi-line string starts at the last " in a line of a defined
-function that has line with @b{an odd number of " characters}.  It continues
-over the subsequent function lines until the next ". The result is a nested
-APL value containing one nested string per line involved. This method of
-specifying a multi-line string was adopted from the @b{bash} shell. In
-immediate execution mode an old-style multi-line string yields
-@b{No string end found}.
+@verbatim
+echo "Line1
+   Line2"
+@end verbatim
+
+prints:
+
+@verbatim
+Line1
+   Line2
+@end verbatim
+
+In simple terms this means that as long as the number of " characters is
+odd, the string remains open until the closing " is found (which makes
+the number even again).
+
+Old-style multi-line strings are not allowed in immediate execution mode
+because they could easily be entered by mistake (by simply forgetting the
+terminating " or ' of a standard string) and that would have obscured the
+familiar behavior of immediate execution mode. In function definition
+mode, the total number of function lines is known and it can therefore
+checked if a multi-line string inside the function is properly terminated.
+Immediate execution mode, however, is open-ended and therefore a forgotten
+closing """ can lead to a fatal misinterpretation of (intended) string
+content as (unintended) APL code, with lots of nonsense error messages.
+
+Like in @b{bash} and also other shells, an old-style multi-line string starts
+at the last " on a line of a defined function that has an
+@b{an odd number of " characters}. The string continues over the subsequent
+function lines until the next " is found. The result is a nested
+APL value containing one nested string per line involved.
+
+In immediate execution mode an old-style multi-line string yields, like
+in standard APL:
+
+@verbatim
+No string end found+
+@end verbatim
 
 For example:
 @verbatim
@@ -1199,12 +1222,14 @@ ABC
 
 @subsubsection New-style Multi-Line Strings
 
-Even though the combination of ⎕INP for immediate execution and multi-line
-strings for defined functions achieved the goal of specifying large amounts
-of text in a simple manner, it was certainly neither intuitive nor elegant
-to have different approaches for the different APL modes.
+The combination of @b{⎕INP} for immediate execution mode and multi-line strings
+for defined functions achieved, at least in principle, the goal of
+specifying large amounts of text in a simpler manner than in standard APL.
+However, having different methods for creating multi-line string literals
+in different APL modes could not convince entirely.
 
-This was leading to the new-style multi-line strings. They adopted the triple
+The search for a more intuitive and more consistent solution was then
+leading to new-style multi-line strings. These strings adopted the triple
 quote (""") syntax know from e.g. the Python language. The syntax of new-style
 multi-line strings is cleaner: empty lines are handled more consistently and
 the string lines are completely separated from the APL code lines.
@@ -1249,6 +1274,55 @@ When entering a new-style multi-line strings then the prompt is prefixed by
 
 ⎕INP and old-style strings will coexist for a while, but may disappear at some
 point in time.
+
+@subsubsection « » Strings
+
+When new-style multi-line strings are used in scripts then the related error
+reporting (if the syntax used incorrectly) can become cumbersome. For example,
+if one forgets the closing """ of a multi-line string then the next """
+(which was meant as the start of a new multi-line string) is mistaken as the
+(forgotten) end of the previous one. The often long content of
+the new string is then parsed as APL code and will usually produce many
+error messages, all of them nonsense. Things get worse if the script itself
+is long because the odd/even nature of the quotes will then persists until
+then end of the string (or at least until the next forgotten quote, if any).
+
+To deal with this problem, GNU APL also allows strings whose contents are
+enclosed in double angle quotation marks « and ». In inline strings '...'
+and "...", as well as in multi-line strings """ ... """, there is no general
+(and reliable) way to decide if a user has forgotten the ending quote(s),
+which leads to the problems above.
+
+For this reason, GNU APL now also allows inline and multi-line strings
+like, for example:
+
+@verbatim
+      «Hello world»
+Hello world
+
+      8 ⎕CR «««
+→      Line 1
+→        Line 2
+→      »»»
+┌→──────────────────┐
+│┌→─────┐ ┌→───────┐│
+││Line 1│ │  Line 2││
+│└──────┘ └────────┘│
+└ϵ──────────────────┘
+
+      8 ⎕CR «««
+→      Line 1
+→        Line 2
+→      «««
+*** WARNING: see (second) ««« when expecting the closing »»»
+┌→──────────────────┐
+│┌→─────┐ ┌→───────┐│
+││Line 1│ │  Line 2││
+│└──────┘ └────────┘│
+└ϵ──────────────────┘
+
+@end verbatim
+
 
 @subsection Script Example
 
