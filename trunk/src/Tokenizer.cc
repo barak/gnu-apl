@@ -535,9 +535,11 @@ bool got_end = false;
       }
 }
 //----------------------------------------------------------------------------
-/** tokenize a double quoted string.
+/** tokenize a double quoted string, i.e.  "..." or «...».
  ** If the string is a single character, then we
- **  return a TOK_CHARACTER. Otherwise we return TOK_APL_VALUE1.
+ **  return a TOK_CHARACTER, otherwise TOK_APL_VALUE1.
+ **
+ ** for special cases ««« and »»» do nothing.
  **/
 void
 Tokenizer::tokenize_string2(Unicode_source & src, Token_string & tos,
@@ -548,9 +550,36 @@ Tokenizer::tokenize_string2(Unicode_source & src, Token_string & tos,
    // remember the leading ", «. or »
 
 const Unicode first = src.get();
-   if (first != UNI_DOUBLE_QUOTE &&
-       first != UNI_LEFT_DAQ     &&
-       first != UNI_RIGHT_DAQ)   FIXME;   // internal error
+Unicode last = Invalid_Unicode;   // no last
+   if (first == UNI_DOUBLE_QUOTE)
+      {
+        last = UNI_DOUBLE_QUOTE;
+      }
+   else if (first == UNI_LEFT_DAQ)
+      {
+        if (src.rest() >= 2        &&
+            src[0] == UNI_LEFT_DAQ &&
+            src[1] == UNI_LEFT_DAQ)
+           {
+             ++src;   ++src;   // discard second and third «
+             return;
+           }
+        last = UNI_RIGHT_DAQ;
+      }
+   else if (first == UNI_RIGHT_DAQ)
+      {
+        if (src.rest() >= 2        &&
+            src[0] == UNI_RIGHT_DAQ &&
+            src[1] == UNI_RIGHT_DAQ)   // special case: «««
+           {
+             ++src;   ++src;   // discard second and third »
+             return;
+           }
+      }
+   else    // internal error
+      {
+        FIXME;
+      }
 
 UCS_string string_value;
 bool got_end = false;
@@ -559,44 +588,13 @@ bool got_end = false;
        {
          const Unicode uni = src.get();
 
-         if (uni  == UNI_DOUBLE_QUOTE &&
-            first == UNI_DOUBLE_QUOTE)   // last of "..."
+         if (uni == last)
             {
               got_end = true;
               break;
             }
 
-         if (uni  == UNI_LEFT_DAQ &&
-            first == UNI_LEFT_DAQ)   // second of ««« ?
-            {
-              const Unicode uni2 = src.get();   // expect third « from «««
-              if (uni2 != UNI_LEFT_DAQ)   // bad «««
-                 {
-                   Error::throw_parse_error(E_BAD_MULTI_START, LOC, loc);
-                 }
-              got_end = true;
-              break;
-            }
-
-         if (uni == UNI_RIGHT_DAQ)     // »»» or last of «...»
-            {
-              if (first == UNI_LEFT_DAQ)   // last of «...»
-                 {
-                   got_end = true;
-                   break;
-                 }
-              else if (first == UNI_RIGHT_DAQ)   // »»
-                 {
-                   const Unicode uni2 = src.get();
-                   if (uni2 != UNI_RIGHT_DAQ)   // proper »»»
-                      {
-                        Error::throw_parse_error(E_BAD_MULTI_END, LOC, loc);
-                      }
-                 }
-              got_end = true;
-              break;
-            }
-         else if (uni == UNI_CR)          // ignore CR
+         if (uni == UNI_CR)          // ignore CR
             {
               continue;
             }
