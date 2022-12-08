@@ -183,7 +183,8 @@ protected:
    bool line_exists(const LineLabel & lab) const
       { return find_line(lab) != -1; }
 
-   /// the line number (in a .apl script file) of the ∇ that started the editor
+   /// source the line number (in a .apl script file) of the ∇ that
+   /// started the ∇-editor
    const int defn_line_no;
 
    /// the header of the function being edited
@@ -192,7 +193,7 @@ protected:
    /// the symbol for the function being edited
    Symbol * fun_symbol;
 
-   /// the lines of the function.
+   /// the lines of the function (aka. function texts).
    vector<FunLine> lines;
 
    /// editor commands
@@ -211,8 +212,8 @@ protected:
    /// optional end of a range for an editor command
    LineLabel edit_to;
 
-   /// true if user has entered a range, i.e. edit_from - edit_to, - edit_to,
-   ///  edit_from -
+   /// true if user has entered a range, i.e. [edit_from - edit_to],
+   /// [ - edit_to], or [ edit_from - ]
    bool got_minus;
 
    /// true iff this function existed before opening it

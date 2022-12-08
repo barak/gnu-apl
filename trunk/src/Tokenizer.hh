@@ -52,7 +52,7 @@ public:
    }
 
    /// return the number of remaining items
-   int32_t rest() const
+   int32_t rest_len() const
       { return end - idx; }
 
    /// lookup next item
@@ -77,7 +77,7 @@ public:
 
    /// shrink the source to rest \b new_rest
    void set_rest(int32_t new_rest)
-      { Assert(new_rest <= rest());   end = idx + new_rest; }
+      { Assert(new_rest <= rest_len());   end = idx + new_rest; }
 
    /// skip \b count elements
    void skip(int32_t count)

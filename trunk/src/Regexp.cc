@@ -26,15 +26,11 @@
 
 //----------------------------------------------------------------------------
 static const PCRE2_UCHAR32 *
-ucs_to_codepoints(const UCS_string &string)
+ucs_to_codepoints(const UCS_string & string)
 {
-    int size = string.size();
-    PCRE2_UCHAR32 *buf = new PCRE2_UCHAR32[size];
-    PCRE2_UCHAR32 *p = buf;
-    UCS_string::iterator i = string.begin();
-    while(i.more()) {
-        *p++ = i.next();
-    }
+int size = string.size();
+PCRE2_UCHAR32 * buf = new PCRE2_UCHAR32[size];
+    loop(i, size)   buf[i] = string[i];
     return buf;
 }
 //----------------------------------------------------------------------------

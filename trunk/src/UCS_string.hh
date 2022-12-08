@@ -29,6 +29,7 @@
 #include <string>
 
 #include "Assert.hh"
+#include "Avec.hh"
 #include "Common.hh"
 #include "Heapsort.hh"
 #include "Unicode.hh"
@@ -351,22 +352,30 @@ public:
       {
         public:
            /// constructor: start at position p
-           iterator(const UCS_string & ucs, int p)
+           iterator(const UCS_string & ucs)
            : s(ucs),
-             pos(p)
+             pos(0)
            {}
 
-           /// return char at offset off from current position
-           Unicode get(int off = 0) const
-              { return (pos + off) < s.size() ? s[pos+off] : Invalid_Unicode; }
+           /// return the next char (without pos increment)
+           Unicode lookup() const
+              { Assert(pos < s.size());    return s[pos]; }
 
-           /// return next char
+           /// return the next char
            Unicode next()
-              { return pos < s.size() ? s[pos++] : Invalid_Unicode; }
+              { Assert(pos < s.size());   return s[pos++]; }
 
-           /// return true iff there are more chars in the string
+           // undo a prio next();
+           void un_next()
+              { Assert(pos);   --pos; }
+
+           /// return true iff there are more chars available
            bool more() const
               { return pos < s.size(); }
+
+        /// skip whitespace
+        void skip_white()
+           { while (pos < s.size() && Avec::is_white(s[pos]))   ++pos; }
 
         protected:
            /// the string
@@ -375,10 +384,6 @@ public:
            /// the current position in the string
            int pos;
       };
-
-   /// an iterator set to the start of this string
-   UCS_string::iterator begin() const
-      { return iterator(*this, 0); }
 
    /// round last digit and discard it. Note that \b this is always expected
    /// to be in floating point format and never in exponential format

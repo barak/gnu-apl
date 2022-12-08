@@ -122,6 +122,9 @@ public:
    /// format for ]BOXING
    static int boxing_format;
 
+   /// automatically display )MORE info after errors
+   static bool auto_MORE;
+
 protected:
    /// )BOXING command
    static void cmd_BOXING(ostream & out, const UCS_string & arg);
@@ -197,7 +200,7 @@ protected:
    static void cmd_LIBS(ostream & out, const UCS_string_vector & lib_ref);
 
    /// print more error info
-   static void cmd_MORE(ostream & out);
+   static void cmd_MORE(ostream & out, const UCS_string_vector & args);
 
    /// )OUT: export a workspace file
    static void cmd_OUT(ostream & out, UCS_string_vector & args);

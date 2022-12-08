@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-December 5, 2022
+December 8, 2022
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
@@ -1229,7 +1229,59 @@ Hello world
 └ϵ──────────────────┘
 
 
-2.1.7 Script Example
+2.1.7 Automatic )MORE
+---------------------
+
+The GNU APL command )MORE provides, in some cases, additional
+information about a prior APL error.  The availability of such
+additional information is indicated by a + at the end of the error
+message.  The additional information is automatically discarded when the
+next non-empty line is entered.  For example:
+
+      "ABC"[4]
+INDEX ERROR+
+      'ABC'[4]
+      ^    ^
+      )MORE
+min index=⎕IO (=1), offending index=4, max index=⎕IO+2 (=3)
+      ◊ ⍝ clears )MORE
+
+      )MORE
+NO )MORE ERROR INFO
+
+@verbatim
+
+This is rather useful in purely interactive mode where the user can issue
+the )MORE command directly after an APL error has occurred, as to figure
+out what exactly went wrong. In a script, however, the standard )MORE command
+(as inherited from IBM APL2) is fairly useless for two reasons:
+
+@itemize
+@item An human user has a chance to issue the )MORE command interactively
+after an error has occurredi, while a script continues after displaying the
+error message, and
+@item It is rather difficult to predict where the next errors will occure,
+i.e. where to place the )MORE command in the script.
+@end itemize
+
+To make the )MORE command more useful for scripts, it can in GNU APL be
+augmented with an optional argument AUTO like this:
+
+@verbatim
+      )MORE AUTO ON
+Automatic )MORE is now: ON
+      
+      "ABC"[4]
+min index=⎕IO (=1), offending index=4, max index=⎕IO+2 (=3)
+INDEX ERROR+
+      'ABC'[4]
+      ^    ^
+
+   If ON/OFF is omitted then the automatic )MORE mode is toggled.  The
+additional )MORE information is displayed before the standard 3-line APL
+error message.
+
+2.1.8 Script Example
 --------------------
 
 Note that the two different ways of running an APL script have an impact
@@ -6861,62 +6913,62 @@ Node: Top383
 Node: Chapter 11575
 Node: Chapter 223285
 Node: Section 2.125234
-Node: Section 2.248299
-Node: Section 2.349058
-Node: Section 2.450333
-Node: Section 2.554778
-Node: Section 2.654951
-Node: Section 2.755581
-Node: Section 2.859534
-Node: Section 2.961069
-Node: Section 2.1063161
-Node: Section 2.1164715
-Node: Section 2.1266500
-Node: Section 2.1368440
-Node: Section 2.1469381
-Node: Section 2.1569633
-Node: Section 2.1671029
-Node: Section 2.1781498
-Node: Section 2.1884020
-Node: Section 2.1990727
-Node: Section 2.2092172
-Node: Section 2.2197833
-Node: Section 2.22102867
-Node: Section 2.23106148
-Node: Section 2.24106439
-Node: Section 2.25117264
-Node: Section 2.26117536
-Node: Section 2.27124114
-Node: Section 2.28126574
-Node: Section 2.29127243
-Node: Section 2.30128894
-Node: Section 2.31132683
-Node: Output File Format145174
-Node: Section 2.32146349
-Node: Section 2.33155747
-Node: Section 2.34156774
-Node: Section 2.35171490
-Node: Section 2.36181557
-Node: Section 2.37185676
-Node: Section 2.38187771
-Node: Section 2.39192196
-Node: Chapter 3213545
-Node: Chapter 4216046
-Node: Chapter 5217172
-Node: Section 5.1218709
-Node: Section 5.2219989
-Node: Section 5.3220349
-Node: Section 5.4220591
-Node: Section 5.5221253
-Node: Section 5.6221731
-Node: Section 5.7222503
-Node: Section 5.8222960
-Node: Chapter 6223362
-Node: Section 6.1223781
-Node: Section 6.2224468
-Node: Chapter 7225299
-Node: Section 7.1225802
-Node: Section 7.2251116
+Node: Section 2.249940
+Node: Section 2.350699
+Node: Section 2.451974
+Node: Section 2.556419
+Node: Section 2.656592
+Node: Section 2.757222
+Node: Section 2.861175
+Node: Section 2.962710
+Node: Section 2.1064802
+Node: Section 2.1166356
+Node: Section 2.1268141
+Node: Section 2.1370081
+Node: Section 2.1471022
+Node: Section 2.1571274
+Node: Section 2.1672670
+Node: Section 2.1783139
+Node: Section 2.1885661
+Node: Section 2.1992368
+Node: Section 2.2093813
+Node: Section 2.2199474
+Node: Section 2.22104508
+Node: Section 2.23107789
+Node: Section 2.24108080
+Node: Section 2.25118905
+Node: Section 2.26119177
+Node: Section 2.27125755
+Node: Section 2.28128215
+Node: Section 2.29128884
+Node: Section 2.30130535
+Node: Section 2.31134324
+Node: Output File Format146815
+Node: Section 2.32147990
+Node: Section 2.33157388
+Node: Section 2.34158415
+Node: Section 2.35173131
+Node: Section 2.36183198
+Node: Section 2.37187317
+Node: Section 2.38189412
+Node: Section 2.39193837
+Node: Chapter 3215186
+Node: Chapter 4217687
+Node: Chapter 5218813
+Node: Section 5.1220350
+Node: Section 5.2221630
+Node: Section 5.3221990
+Node: Section 5.4222232
+Node: Section 5.5222894
+Node: Section 5.6223372
+Node: Section 5.7224144
+Node: Section 5.8224601
+Node: Chapter 6225003
+Node: Section 6.1225422
+Node: Section 6.2226109
+Node: Chapter 7226940
+Node: Section 7.1227443
+Node: Section 7.2252757
 
 End Tag Table
 

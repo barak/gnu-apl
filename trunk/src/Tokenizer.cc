@@ -55,7 +55,7 @@
 
 //----------------------------------------------------------------------------
 inline ostream & operator << (ostream & out, const Unicode_source & src)
-   { loop(s, src.rest())   out << src[s];   return out; }
+   { loop(s, src.rest_len())   out << src[s];   return out; }
 //----------------------------------------------------------------------------
 /** convert \b UCS_string input into a Token_string tos.
 */
@@ -90,7 +90,7 @@ Tokenizer::do_tokenize(const UCS_string & input, Token_string & tos,
            << input << "»" << endl;
 
 Unicode_source src(input);
-   while ((rest_2 = src.rest()) != 0)
+   while ((rest_2 = src.rest_len()) != 0)
       {
         Unicode uni = *src;
         if (uni == UNI_COMMENT)       break;   // ⍝ comment
@@ -101,16 +101,16 @@ Unicode_source src(input);
         Log(LOG_tokenize)
            {
              Unicode_source s1(src, 0, 24);
-             CERR << "  tokenize(" <<  src.rest() << " chars) sees [tag "
+             CERR << "  tokenize(" <<  src.rest_len() << " chars) sees [tag "
                   << tok.tag_name() << " «" << uni << "»] " << s1;
-             if (src.rest() != s1.rest())   CERR << " ...";
+             if (src.rest_len() != s1.rest_len())   CERR << " ...";
              CERR << endl;
            }
 
         switch(tok.get_Class())
             {
               case TC_END:   // chars without APL meaning
-                   rest_2 = src.rest();
+                   rest_2 = src.rest_len();
                    {
                      Log(LOG_error_throw)
                      CERR << endl << "throwing "
@@ -134,14 +134,14 @@ Unicode_source src(input);
                         << " (" << tok << ")" << endl;
                    if (tok.get_tag() == TOK_CHARACTER)
                       CERR << "Unicode: " << UNI(tok.get_char_val()) << endl;
-                   rest_2 = src.rest();
+                   rest_2 = src.rest_len();
                    Error::throw_parse_error(E_NON_APL_CHAR, LOC, loc);
                    break;
 
               case TC_VOID:
                    // Avec::uni_to_token returns TC_VOID for non-apl characters
                    //
-                   rest_2 = src.rest();
+                   rest_2 = src.rest_len();
                    UERR << "Unknown APL character: " << uni
                         << " (" << UNI(uni) << ")" << endl;
                    Error::throw_parse_error(E_NON_APL_CHAR, LOC, loc);
@@ -181,7 +181,7 @@ Unicode_source src(input);
                         // this could be λ like in λ← ...
                         // or λ1 or λ2 or ... as in ... ⍺ λ1 ⍵
                         //
-                        if (src.rest() > 1 && Avec::is_digit(src[1]))   // λn
+                        if (src.rest_len() > 1 && Avec::is_digit(src[1]))   // λn
                            {
                              tokenize_symbol(src, tos);
                            }
@@ -217,7 +217,7 @@ Unicode_source src(input);
                    break;
 
               case TC_OPER2:
-                   if (tok.get_tag() == TOK_OPER2_INNER && src.rest())
+                   if (tok.get_tag() == TOK_OPER2_INNER && src.rest_len())
                       {
                         // tok is a dot. This could mean that . is either
                         //
@@ -225,7 +225,7 @@ Unicode_source src(input);
                         // or an operator:            e.g. +.*
                         // or a syntax error:         e.g. Done.
                         //
-                        if (src.rest() == 1)   // syntax error
+                        if (src.rest_len() == 1)   // syntax error
                            Error::throw_parse_error(E_SYNTAX_ERROR, LOC, loc);
 
                         Unicode uni_1 = src[1];
@@ -251,7 +251,7 @@ Unicode_source src(input);
 
               case TC_R_ARROW:
                    ++src;
-                   if (src.rest())   tos.push_back(tok);
+                   if (src.rest_len())   tos.push_back(tok);
                    else              tos.push_back(Token(TOK_ESCAPE));
                    break;
 
@@ -296,7 +296,7 @@ Unicode_source src(input);
               case TC_COLON:
                    if (pmode != PM_FUNCTION)
                       {
-                        rest_2 = src.rest();
+                        rest_2 = src.rest_len();
                         if (pmode == PM_EXECUTE)
                            Error::throw_parse_error(E_ILLEGAL_COLON_EXEC,
                                                     LOC, loc);
@@ -456,17 +456,17 @@ void
 Tokenizer::tokenize_quad(Unicode_source & src, Token_string & tos) const
 {
    Log(LOG_tokenize)
-      CERR << "tokenize_quad(" << src.rest() << " chars)"<< endl;
+      CERR << "tokenize_quad(" << src.rest_len() << " chars)"<< endl;
 
    src.get();               // discard (possibly alternative) ⎕
 UCS_string ucs(UNI_Quad_Quad);
    Assert(ucs[0]);
 
-   if (src.rest() > 0)   ucs.append(src[0]);
-   if (src.rest() > 1)   ucs.append(src[1]);
-   if (src.rest() > 2)   ucs.append(src[2]);
-   if (src.rest() > 3)   ucs.append(src[3]);
-   if (src.rest() > 4)   ucs.append(src[4]);
+   if (src.rest_len() > 0)   ucs.append(src[0]);
+   if (src.rest_len() > 1)   ucs.append(src[1]);
+   if (src.rest_len() > 2)   ucs.append(src[2]);
+   if (src.rest_len() > 3)   ucs.append(src[3]);
+   if (src.rest_len() > 4)   ucs.append(src[4]);
 
 int len = 0;
 const Token t = Workspace::get_quad(ucs, len);
@@ -490,7 +490,7 @@ const Unicode uni = src.get();
 UCS_string string_value;
 bool got_end = false;
 
-   while (src.rest())
+   while (src.rest_len())
        {
          const Unicode uni = src.get();
 
@@ -499,7 +499,7 @@ bool got_end = false;
               // a single ' is the end of the string, while a double '
               // (i.e. '') is a single '. 
               //
-              if ((src.rest() == 0) || !Avec::is_single_quote(*src))
+              if ((src.rest_len() == 0) || !Avec::is_single_quote(*src))
                  {
                    got_end = true;
                    break;
@@ -514,7 +514,7 @@ bool got_end = false;
             }
          else if (uni == UNI_LF)
             {
-              rest_2 = src.rest();
+              rest_2 = src.rest_len();
               Error::throw_parse_error(E_NO_STRING_END, LOC, loc);
             }
          else
@@ -557,21 +557,15 @@ Unicode last = Invalid_Unicode;   // no last
       }
    else if (first == UNI_LEFT_DAQ)
       {
-        if (src.rest() >= 2        &&
-            src[0] == UNI_LEFT_DAQ &&
-            src[1] == UNI_LEFT_DAQ)
-           {
-             ++src;   ++src;   // discard second and third «
-             return;
-           }
         last = UNI_RIGHT_DAQ;
       }
    else if (first == UNI_RIGHT_DAQ)
       {
-        if (src.rest() >= 2        &&
+        if (src.rest_len() >= 2        &&
             src[0] == UNI_RIGHT_DAQ &&
             src[1] == UNI_RIGHT_DAQ)   // special case: «««
            {
+BACKTRACE
              ++src;   ++src;   // discard second and third »
              return;
            }
@@ -584,7 +578,7 @@ Unicode last = Invalid_Unicode;   // no last
 UCS_string string_value;
 bool got_end = false;
 
-   while (src.rest())
+   while (src.rest_len())
        {
          const Unicode uni = src.get();
 
@@ -600,7 +594,7 @@ bool got_end = false;
             }
          else if (uni == UNI_LF)          // end of line before "
             {
-              rest_2 = src.rest();
+              rest_2 = src.rest_len();
               Error::throw_parse_error(E_NO_STRING_END, LOC, loc);
             }
          else if (uni == UNI_BACKSLASH)   // backslash
@@ -656,11 +650,11 @@ const bool real_valid = tokenize_real(src, real_need_float, real_flt, real_int);
    if (!real_need_float)   real_flt = real_int;
    if (!real_valid)
       {
-        rest_2 = src.rest();
+        rest_2 = src.rest_len();
         Error::throw_parse_error(E_BAD_NUMBER, LOC, loc);
       }
 
-   if (src.rest() && (*src == UNI_J || *src == UNI_j))
+   if (src.rest_len() && (*src == UNI_J || *src == UNI_j))
       {
         ++src;   // skip 'J'
 
@@ -693,7 +687,7 @@ const bool real_valid = tokenize_real(src, real_need_float, real_flt, real_int);
         Log(LOG_tokenize)   CERR << "  tokenize_number: complex "
                                  << real_flt << "J" << imag_flt << endl;
       }
-   else if (src.rest() && (*src == UNI_D || *src == UNI_d))
+   else if (src.rest_len() && (*src == UNI_D || *src == UNI_d))
       {
         ++src;   // skip 'D'
 
@@ -730,7 +724,7 @@ const bool real_valid = tokenize_real(src, real_need_float, real_flt, real_int);
         Log(LOG_tokenize)   CERR << "  tokenize_number: complex " << real
                                  << "J" << imag << endl;
       }
-   else if (src.rest() && (*src == UNI_R || *src == UNI_r))
+   else if (src.rest_len() && (*src == UNI_R || *src == UNI_r))
       {
         ++src;   // skip 'R'
 
@@ -795,7 +789,7 @@ done:
    // remaining to be checked are a numeric scalar literal followed by ¯
    // or by . (page 42)
    //
-   if (src.rest())
+   if (src.rest_len())
       {
         if (*src == UNI_OVERBAR || *src == '.')
            Error::throw_parse_error(E_BAD_NUMBER, LOC, loc);
@@ -849,11 +843,11 @@ bool dot_seen = false;
 
    // hexadecimal ?
    //
-   if (src.rest() > 1 && *src == UNI_DOLLAR_SIGN)
+   if (src.rest_len() > 1 && *src == UNI_DOLLAR_SIGN)
       {
         src.get();   // skip $
         if (!Avec::is_hex_digit(*src))   return false;   // no hex after $
-        while (src.rest())
+        while (src.rest_len())
            {
              int digit;
              if      (*src <  UNI_0)   break;
@@ -877,7 +871,7 @@ bool dot_seen = false;
    // 1e. the E between the fractional and exponent parts
    // 1f. a sign of the exponent part
    //
-   if (src.rest() && *src == UNI_OVERBAR)   // 1a.
+   if (src.rest_len() && *src == UNI_OVERBAR)   // 1a.
       {
         negative = true;
         ++src;
@@ -885,19 +879,19 @@ bool dot_seen = false;
 
    // 1b. skip leading zeros in integer part
    //
-   while (src.rest() && *src == '0')   { ++src;   skipped_0 = true; }
+   while (src.rest_len() && *src == '0')   { ++src;   skipped_0 = true; }
 
    // integer part
    //
-   while (src.rest() && Avec::is_digit(*src))   int_digits += src.get();
+   while (src.rest_len() && Avec::is_digit(*src))   int_digits += src.get();
 
    // fractional part
    //
-   if (src.rest() && *src == UNI_FULLSTOP)   // fract part present
+   if (src.rest_len() && *src == UNI_FULLSTOP)   // fract part present
       {
         ++src;   // 1c. skip '.'
         dot_seen = true;
-        while (src.rest() && Avec::is_digit(*src))
+        while (src.rest_len() && Avec::is_digit(*src))
            {
              fract_digits += src.get();
            }
@@ -914,31 +908,31 @@ bool dot_seen = false;
 
    // exponent part (but could also be a name starting with E or e)
    //
-   if (src.rest() >= 2 &&   // at least E and a digit or ¯
+   if (src.rest_len() >= 2 &&   // at least E and a digit or ¯
        (*src == UNI_E || *src == UNI_e))   // maybe exponent
       {
         expo_negative = (src[1] == UNI_OVERBAR);
         if (expo_negative   &&
-            src.rest() >= 3 &&
+            src.rest_len() >= 3 &&
             Avec::is_digit(src[2]))                    // E¯nnn
            {
              need_float = true;
              ++src;                        // skip e/E
              ++src;                        // skip ¯
-             while (src.rest() && Avec::is_digit(*src))
+             while (src.rest_len() && Avec::is_digit(*src))
                   expo_digits += src.get();
            }
         else if (Avec::is_digit(src[1]))               // Ennn
            {
              need_float = true;
              ++src;                        // skip e/E
-             while (src.rest() && Avec::is_digit(*src))
+             while (src.rest_len() && Avec::is_digit(*src))
                   expo_digits += src.get();
            }
       }
 
    // second dot ?
-   if (dot_seen && src.rest() && *src == UNI_FULLSTOP)
+   if (dot_seen && src.rest_len() && *src == UNI_FULLSTOP)
       return false;   // error
 
 int expo = 0;
@@ -1041,7 +1035,7 @@ UTF8_string digits = int_digits;
 void
 Tokenizer::tokenize_symbol(Unicode_source & src, Token_string & tos) const
 {
-   Log(LOG_tokenize)   CERR << "tokenize_symbol() : " << src.rest() << endl;
+   Log(LOG_tokenize)   CERR << "tokenize_symbol() : " << src.rest_len() << endl;
 
 UCS_string symbol;
    if (macro)
@@ -1051,7 +1045,7 @@ UCS_string symbol;
       }
    symbol.append(src.get());
 
-   while (src.rest())
+   while (src.rest_len())
        {
          const Unicode uni = *src;
          if (!Avec::is_symbol_char(uni))   break;
@@ -1064,14 +1058,14 @@ UCS_string symbol;
       {
         // S∆ or T∆
 
-        while (src.rest() && *src <= UNI_SPACE)   src.get();   // spaces
+        while (src.rest_len() && *src <= UNI_SPACE)   src.get();   // spaces
         UCS_string symbol1(symbol, 2, symbol.size() - 2);   // without S∆/T∆
         Value_P AB(symbol1, LOC);
         Function_P ST = 0;
         if (symbol[0] == UNI_S) ST = Quad_STOP::fun;
         else                          ST = Quad_TRACE::fun;
 
-        const bool assigned = (src.rest() && *src == UNI_LEFT_ARROW);
+        const bool assigned = (src.rest_len() && *src == UNI_LEFT_ARROW);
         if (assigned)   // dyadic: AB ∆fun
            {
              src.get();                                // skip ←

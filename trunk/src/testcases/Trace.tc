@@ -11,7 +11,7 @@
  T←2 6⍴'MatrixLine 5'
 ∇
 
-      foo   ⍝ runn fo
+      foo   ⍝ run foo
 Vector Line 1
 Matrix
 Line 4
@@ -22,15 +22,12 @@ foo[1] Vector Line 1
 Vector Line 1
 Matrix
 Line 4
-foo[5] Matrix
-       Line 5
-
 
       ⍝ T∆ sorts items and discards invalid lines
       ⍝
       T∆foo←6 5 4 3 2 1 0 ¯1 ¯2
       T∆foo
-1 2 3 4 5
+1 2 3 4
 
 
       ⍝ examples in Lrm

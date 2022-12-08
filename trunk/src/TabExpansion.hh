@@ -72,6 +72,7 @@ enum ExpandHint
    EH_BOXING,         ///< boxing parameter
    EH_PRIMITIVE,      ///< apl primitive
    EH_CONFIG,         ///< config.h item (capability)
+   EH_oAUTO,          ///< optional AUTO
 };
 //----------------------------------------------------------------------------
 /// a class for doing interactivw Tab-expansion on input lines

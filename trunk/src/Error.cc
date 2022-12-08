@@ -44,6 +44,9 @@ const char more = Workspace::more_error().size() ? '+' : 0;
    snprintf(error_message_1, sizeof(error_message_1), "%s%c",
             error_name(error_code), more);
 
+   if (more && Command::auto_MORE)
+      CERR << Workspace::more_error() << endl;
+
    *symbol_name = 0;
    *error_message_2 = 0;
 }

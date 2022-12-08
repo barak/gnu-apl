@@ -21,8 +21,6 @@
 /** @file
 */
 
-
-#include "Avec.hh"
 #include "Command.hh"
 #include "InputFile.hh"
 #include "LineInput.hh"
@@ -53,7 +51,6 @@ Nabla::Nabla(const UCS_string & cmd)
      modified(false),
      do_close(false),
      locked(false),
-     out_of_order(false),
      current_line(1),
      first_command(cmd)
 {
@@ -244,42 +241,48 @@ Nabla::start()
    // ∇FUN[⎕]∇
    // etc.
    //
-UCS_string::iterator c(first_command.begin());
+UCS_string::iterator c(first_command);
 
    // skip leading spaces
    //
-   while (c.more() && Avec::is_white(c.get()))   c.next();
+   c.skip_white();
 
    // skip leading nabla.
    //
-   if (c.next() != UNI_NABLA)   return "Bad ∇-command (no ∇)";
+   if (c.more() && c.next() != UNI_NABLA)   return "Bad ∇-command (no ∇)";
 
    // skip leading spaces
    //
-   while (c.more() && Avec::is_white(c.get()))   c.next();
+   c.skip_white();
 
    // function header.
    //
-   while (c.more() && c.get() != UNI_L_BRACK)
+   while (c.more() && c.lookup() != UNI_L_BRACK)
          fun_header.append(c.next());
 
-   // at this point there could be an axis specification [X] that
-   // could be confused with an operation like [⎕]. We take the first char
-   // after the [ to decide if there is an axis or an operation.
-   //
-   if (c.get() == UNI_L_BRACK)   // [
+   /* at this point there could be an axis specification [X] that
+      could be confused with an operation like [⎕]. We take the first char
+      after the [ to decide if there is an axis or a ∇-operation like [⎕].
+
+      For example:
+
+          ∇FOO[X] B : [ starts axis
+          ∇FOO[⎕]   : [ starts ∇operation [⎕] (display)
+    */
+   if (c.more() && c.lookup() == UNI_L_BRACK)   // [
       {
-        for (int off = 1; ; ++off)
-            {
-              if (Avec::is_white(c.get(off)))   continue; 
-              if (Avec::is_first_symbol_char(c.get(off)))   // axis
-                 {
-                   fun_header.append(c.next());   //  copy the [
-                   while (c.more() && c.get() != UNI_L_BRACK)
-                         fun_header.append(c.next());
-                 }
-              break;
-            }
+        c.next();   // the [
+        c.skip_white();
+        if (c.more() && Avec::is_first_symbol_char(c.lookup()))   // axis
+           {
+             fun_header.append(UNI_L_BRACK);   //  copy the [
+             while (c.more() && c.lookup() != UNI_L_BRACK)
+                   fun_header.append(c.next());
+           }
+        else                                                      // ∇-command
+           {
+             c.un_next();
+           }
       }
 
 UserFunction_header hdr(fun_header, false);
@@ -299,7 +302,7 @@ UserFunction_header hdr(fun_header, false);
 
    // optional operation
    //
-   if (c.get() == UNI_L_BRACK)
+   if (c.more() && c.lookup() == UNI_L_BRACK)
       {
         UCS_string oper;
         Unicode cc;
@@ -309,8 +312,7 @@ UserFunction_header hdr(fun_header, false);
             oper.append(cc = c.next());
           } while (cc != UNI_R_BRACK);
 
-        const char * loc = parse_oper(oper, true);
-        if (loc)   return loc;   // error
+        if (const char * loc = parse_oper(oper, true))   return loc;   // error
       }
 
    switch(fun_symbol->get_NC())
@@ -364,7 +366,7 @@ UserFunction_header hdr(fun_header, false);
    // immediate close (only show command is allowed here),
    // e.g. ∇fun[⎕]∇
    //
-   if (c.get() == UNI_NABLA)
+   if (c.more() && c.lookup() == UNI_NABLA)
       {
         if (ecmd != ECMD_SHOW)   return "illegal command between ∇ ... ∇";
         if (const char * loc = execute_oper())
@@ -407,8 +409,8 @@ Nabla::parse_oper(UCS_string & oper, bool initial)
 
    if (oper.size() == 0 && do_close)   return 0;
 
-UCS_string::iterator c(oper.begin());
-Unicode cc = c.next();
+UCS_string::iterator c(oper);
+Unicode cc = c.more() ? c.next() : Invalid_Unicode;
 UCS_string text = oper;
    while (cc == ' ')   cc = c.next();   // skip leading whitespace
 
@@ -425,7 +427,7 @@ UCS_string text = oper;
         ecmd = ECMD_EDIT;
         edit_from = current_line;
         current_text = text;
-//      for (; cc != Invalid_Unicode; cc = c.next())   current_text.append(cc);
+//      for (; c.more(); cc = c.next())   current_text.append(cc);
         return 0;
       }
 
@@ -439,16 +441,16 @@ command_loop:
    // at this point, [ was seen and skipped
 
    ecmd = ECMD_NOP;
-   edit_from.clear();
-   edit_to.clear();
-   got_minus = false;
+   edit_from.clear();   // set to missing
+   edit_to.clear();     // set to missing
+   got_minus = false;   // set to missing
 
-   // optional edit_from
+   // set optional edit_from (if present)
    //
-   if (Avec::is_digit(c.get()) || c.get() == UNI_FULLSTOP)
+   if (c.more() && (Avec::is_digit(c.lookup()) ||    // N.M
+                    c.lookup() == UNI_FULLSTOP))     //  .M
       {
         edit_from = parse_lineno(c);
-        out_of_order = true;
       }
 
    // operation, which is one of:
@@ -457,16 +459,17 @@ command_loop:
    // []   edit
    // [∆   delete
    // [→   abandon
-   switch (c.get())
+   //
+   if (!c.more())   return "Bad ∇-command";
+   switch (c.lookup())
       {
         case UNI_Quad_Quad:
         case UNI_Quad_Quad1:    ecmd = ECMD_SHOW;     c.next();   break;
-        case UNI_R_BRACK: ecmd = ECMD_EDIT;                 break;
+        case UNI_R_BRACK:       ecmd = ECMD_EDIT;                 break;
         case UNI_DELTA:         ecmd = ECMD_DELETE;   c.next();   break;
         case UNI_RIGHT_ARROW:   ecmd = ECMD_ESCAPE;   c.next();   break;
-        case Invalid_Unicode:   return "Bad ∇-command";
 
-        default: UERR << "Bad edit op '" << c.get() << "'" << endl;
+        default: UERR << "Bad edit op '" << c.lookup() << "'" << endl;
                  return "Bad ∇-command";
       }
 
@@ -478,20 +481,20 @@ command_loop:
       }
 
 again:
-   // optional edit_to
+   // set optional edit_to (if present)
    //
-   if (Avec::is_digit(c.get()))   edit_to = parse_lineno(c);
+   if (c.more() && Avec::is_digit(c.lookup()))   edit_to = parse_lineno(c);
 
-   if (c.get() == UNI_MINUS)   // range
+   if (c.more() && c.lookup() == UNI_MINUS)   // range
       {
         if (got_minus)   return "error: second -  in ∇-range";
         got_minus = true;
-        edit_from = edit_to;
-        c.next();   // eat the -
+        edit_from = edit_to;   // shift
+        c.next();   // consume the -
         goto again;
       }
 
-   if (c.next() != UNI_R_BRACK)   return "missing ] in ∇-range";
+   if (c.more() && c.next() != UNI_R_BRACK)   return "missing ] in ∇-range";
 
    // at this point we have parsed an editor command, like:
    //
@@ -499,9 +502,9 @@ again:
    // [from ∆ to]
    // [from]
 
-   while (Avec::is_white(c.get()))   c.next();
+   c.skip_white();
 
-   if (c.get() == UNI_L_BRACK)   // another command: ignore previous
+   if (c.more() && c.lookup() == UNI_L_BRACK)   // another command: ignore previous
       {
          c.next();   // eat the [
          goto command_loop;
@@ -510,13 +513,10 @@ again:
    // copy the rest to current_text. Set do_close if ∇ or ⍫ is seen
    // unless inside strings.
    //
-   for (;;)
+   while (c.more())
       {
         switch(cc = c.next())
            {
-             case Invalid_Unicode:     // regular end of input
-                  return 0;
-
              case UNI_NABLA:           // ∇
                   do_close = true;
                   return 0;
@@ -530,24 +530,24 @@ again:
                   current_text.append(cc);
                   for (;;)
                       {
-                        cc = c.next();
-                        if (cc == Invalid_Unicode)   // premature end of input
+                        if (!c.more())   // premature end of input
                            {
                              current_text.append(UNI_DOUBLE_QUOTE);
                              return 0;
                            }
+                        cc = c.next();
 
                         current_text.append(cc);
                         if (cc == UNI_DOUBLE_QUOTE)   break; // string end
                         if (cc == UNI_BACKSLASH)      // \x
                            {
-                             cc = c.next();
-                             if (cc == Invalid_Unicode)   // premature input end
+                             if (!c.more())   // premature end of input
                                 {
                                   current_text.append(UNI_BACKSLASH);
                                   current_text.append(UNI_DOUBLE_QUOTE);
                                   return 0;
                                 }
+                             cc = c.next();
                              current_text.append(cc);
                            }
                       }
@@ -561,13 +561,12 @@ again:
                         // handle ' ... '' ... ' like two adjacent strings
                         // instead of a string containing a (doubled) quote.
                         //
-                        cc = c.next();
-                        if (cc == Invalid_Unicode)   // premature end of input
+                        if (!c.more())   // premature end of input
                            {
                              current_text.append(UNI_SINGLE_QUOTE);
                              return 0;
                            }
-
+                        cc = c.next();
                         current_text.append(cc);
                         if (cc == UNI_SINGLE_QUOTE)      break;   // string end
                       }
@@ -578,7 +577,7 @@ again:
            }
       }
 
-   return 0;
+   return 0;   // OK
 }
 //----------------------------------------------------------------------------
 LineLabel
@@ -586,16 +585,17 @@ Nabla::parse_lineno(UCS_string::iterator & c)
 {
 LineLabel ret(0);
 
-   while (Avec::is_digit(c.get()))
+   while (c.more() && Avec::is_digit(c.lookup()))
       {
         ret.ln_major *= 10;
         ret.ln_major += c.next() - UNI_0;
       }
 
-   if (c.get() == UNI_FULLSTOP)
+   if (c.more() && c.lookup() == UNI_FULLSTOP)
       {
         c.next();   // eat the .
-        while (Avec::is_digit(c.get()))   ret.ln_minor.append(c.next());
+        while (c.more() && Avec::is_digit(c.lookup()))
+              ret.ln_minor.append(c.next());
       }
 
    return ret;
@@ -864,24 +864,43 @@ const UCS_string & new_name = header.get_name();
 const char *
 Nabla::edit_body_line()
 {
-bool need_parse = true;
-   if (uprefs.multi_line_strings_3 && !out_of_order)   // most likely: script
+UCS_string parse_text = current_text;   // a copy that can be modified.
+   if (uprefs.multi_line_strings_3)
       {
+        // figure the multi-line status from all lines before current_line
         bool multi = false;
         loop(i, lines.size())
             {
+              if (current_line == lines[i].label)   break;   // line replace
+              if (current_line <  lines[i].label)   break;   // after current
               if (-1 == lines[i].text.multi_pos(multi))   continue;
               multi = ! multi;
             }
-        need_parse = multi;   // line is in multi-line string
+
+        if (multi)   // line belongs to a multi-line string (incl. """ or »»»)
+           {
+             parse_text.clear();
+           }
+       else          // APL code outside multi-line strings (or start of one)
+           {
+             const int pos = parse_text.multi_pos(multi);
+             if (pos != -1)   // start of multi-line string (""" or «««)
+                {
+                  // for the sole purpose of parsing: replace the start of the
+                  // multi-line string (""" or »»») with the empty string ''.
+                  //
+                  parse_text.resize(pos);
+                  parse_text.append_ASCII("''");
+                }
+           }
       }
 
-   if (need_parse)
+   if (parse_text.size())
       {
         const Parser parser(PM_FUNCTION, LOC, false);
         Token_string in;
 
-        ErrorCode ec = parser.parse(current_text, in);
+        ErrorCode ec = parser.parse(parse_text, in);
         if (ec == E_NO_STRING_END && uprefs.multi_line_strings)
            {
              ec = E_NO_ERROR;

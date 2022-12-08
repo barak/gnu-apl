@@ -91,7 +91,8 @@ ul.no-bullet {list-style: none}
         <li><a name="toc-New_002dstyle-Multi_002dLine-Strings" href="#New_002dstyle-Multi_002dLine-Strings">2.1.6.2 New-style Multi-Line Strings</a></li>
         <li><a name="toc-_00ab-_00bb-Strings" href="#g_t_00ab-_00bb-Strings">2.1.6.3 « » Strings</a></li>
       </ul></li>
-      <li><a name="toc-Script-Example" href="#Script-Example">2.1.7 Script Example</a></li>
+      <li><a name="toc-Automatic-_0029MORE" href="#Automatic-_0029MORE">2.1.7 Automatic )MORE</a></li>
+      <li><a name="toc-Script-Example" href="#Script-Example">2.1.8 Script Example</a></li>
     </ul></li>
     <li><a name="toc-Axis-argument-in-defined-functions" href="#Section-2_002e2">2.2 Axis argument in defined functions</a></li>
     <li><a name="toc-Colored-Output" href="#Section-2_002e3">2.3 Colored Output</a></li>
@@ -276,7 +277,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Chapter 1</a>, Up: <a href="
 <a name="GNU-APL"></a>
 <h1 class="top">GNU APL</h1>
 
-<p>December 5, 2022
+<p>December 8, 2022
 </p>
 <p>This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
@@ -1529,8 +1530,60 @@ Hello world
 
 </pre>
 
+<a name="Automatic-_0029MORE"></a>
+<h4 class="subsection">2.1.7 Automatic )MORE</h4>
+
+<p>The GNU APL command )MORE provides, in some cases, additional information
+about a prior APL error. The availability of such additional information is
+indicated by a + at the end of the error message. The additional
+information is automatically discarded when the next non-empty line
+is entered. For example:
+</p>
+<pre class="verbatim">      &quot;ABC&quot;[4]
+INDEX ERROR+
+      'ABC'[4]
+      ^    ^
+      )MORE
+min index=⎕IO (=1), offending index=4, max index=⎕IO+2 (=3)
+      ◊ ⍝ clears )MORE
+
+      )MORE
+NO )MORE ERROR INFO
+
+@verbatim
+
+This is rather useful in purely interactive mode where the user can issue
+the )MORE command directly after an APL error has occurred, as to figure
+out what exactly went wrong. In a script, however, the standard )MORE command
+(as inherited from IBM APL2) is fairly useless for two reasons:
+
+@itemize
+@item An human user has a chance to issue the )MORE command interactively
+after an error has occurredi, while a script continues after displaying the
+error message, and
+@item It is rather difficult to predict where the next errors will occure,
+i.e. where to place the )MORE command in the script.
+@end itemize
+
+To make the )MORE command more useful for scripts, it can in GNU APL be
+augmented with an optional argument AUTO like this:
+
+@verbatim
+      )MORE AUTO ON
+Automatic )MORE is now: ON
+      
+      &quot;ABC&quot;[4]
+min index=⎕IO (=1), offending index=4, max index=⎕IO+2 (=3)
+INDEX ERROR+
+      'ABC'[4]
+      ^    ^
+</pre>
+<p>If ON/OFF is omitted then the automatic )MORE mode is toggled. The additional
+)MORE information is displayed before the standard 3-line APL error message.
+</p>
+
 <a name="Script-Example"></a>
-<h4 class="subsection">2.1.7 Script Example</h4>
+<h4 class="subsection">2.1.8 Script Example</h4>
 
 <p>Note that the two different ways of running an APL script have an impact on
 how ⎕ARG looks like. If stdin is redirected then there is only one (possibly

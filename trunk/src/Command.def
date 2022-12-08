@@ -42,7 +42,7 @@ cmd_def( ")IN"        , cmd_IN(out, args, false);                     , "filenam
 cmd_def( ")LIBS"      , cmd_LIBS(out, args);                          , "[[lib] path]"              , EH_oLIB_oPATH)
 cmd_def( ")LIB"       , cmd_LIB1(out, args);                          , "[lib|path] [from-to]"      , EH_DIR_OR_LIB)
 cmd_def( ")LOAD"      , Command::cmd_LOAD(out, args, line, false);    , "[lib] wsname"              , EH_oLIB_WSNAME)
-cmd_def( ")MORE"      , cmd_MORE(out);                                , ""                          , EH_NO_PARAM)
+cmd_def( ")MORE"      , cmd_MORE(out, args);                          , "[AUTO [ON|OFF]]"           , EH_oAUTO)
 cmd_def( ")NMS"       , Workspace::list(out, LIST_NAMES, arg);        , "[from-to]"                 , EH_oFROM_oTO)
 cmd_def( ")OFF"       , cmd_OFF(arg.atoi());                          , "[exit_code]"               , EH_COUNT)
 cmd_def( ")OPS"       , Workspace::list(out, LIST_OPERS, arg);        , "[from-to]"                 , EH_oFROM_oTO)

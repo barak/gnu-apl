@@ -59,6 +59,8 @@
 
 #include "Value.hh"
 
+bool Command::auto_MORE = false;
+
 int Command::boxing_format = 0;
 ShapeItem Command::APL_expression_count = 0;
 
@@ -287,7 +289,7 @@ UCS_string args_ucs(args);
    if (argc > (mandatory_args + opt_args))   // too many parameters
       {
         out << "BAD COMMAND+" << endl;
-        MORE_ERROR() << "too many (" << argc<< ") parameter(s) in command "
+        MORE_ERROR() << "too many (" << argc << ") parameter(s) in command "
                      << command << ". Usage:\n"
                      << "      " << command << " " << args;
         return true;
@@ -1907,11 +1909,44 @@ Command::cmd_LOG(ostream & out, const UCS_string & arg)
 }
 //----------------------------------------------------------------------------
 void
-Command::cmd_MORE(ostream & out)
+Command::cmd_MORE(ostream & out, const UCS_string_vector & args)
 {
+   if (args.size() > 0)   // optional AUTO ?
+      {
+        if (!args[0].starts_iwith("AUTO"))   // no
+           {
+             CERR << "BAD COMMAND+" << endl;
+             MORE_ERROR() << "Bad )MORE argument: " << args[0]
+                          << ". Use none or AUTO.";
+             return;
+           }
+
+        // )MORE AUTO...
+        //
+        if (args.size() > 1)   // optional ON/OFF ?
+           {
+             if      (args[1].starts_iwith("ON"))    auto_MORE = true;
+             else if (args[1].starts_iwith("OFF"))   auto_MORE = false;
+             else
+                {
+                  CERR << "BAD COMMAND+" << endl;
+                  MORE_ERROR() << "Bad )MORE AUTO argument: " << args[1]
+                               << ". Use none, ON, or OFF.";
+                  return;
+                }
+           }
+        else                   // no ON or OFF:
+           {
+             auto_MORE = ! auto_MORE;   // toggle
+           }
+        out << "Automatic )MORE is now: "
+            << (auto_MORE ? "ON" : "OFF") << endl;
+        return;
+      }
+
    if (Workspace::more_error().size() == 0)
       {
-        out << "NO MORE ERROR INFO" << endl;
+        out << "NO )MORE ERROR INFO" << endl;
         return;
       }
 
