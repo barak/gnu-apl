@@ -39,6 +39,8 @@ Quad_GTK * Quad_GTK::fun = &Quad_GTK::_fun;
 std::vector<Quad_GTK::window_entry> Quad_GTK::open_windows;
 UCS_string_vector Quad_GTK::event_queue;
 
+bool Quad_GTK::focus_on_map = false;   // focus for new windows
+
 #if apl_GTK3
 //----------------------------------------------------------------------------
 Token
@@ -112,6 +114,27 @@ Quad_GTK::eval_B(Value_P B) const
    CHECK_SECURITY(disable_Quad_GTK);
 
    if (B->get_rank() > 1)   RANK_ERROR;
+
+   if (B->element_count() == 0)   // GTK gelp
+      {
+        COUT <<
+"   ⎕GTK Usage:\n"
+"\n"
+"   H←    ⎕GTK XML   ⍝ with string XML (filename or content): open window\n"
+"   H←CSS ⎕GTK XML   ⍝ with strings CSS and XML: open window with styles CSS\n"
+"       H ⎕GTK 0     ⍝ close the window with handle H\n"
+"       H ⎕GTK 3     ⍝ increase the (debug-) for the window with handle H\n"
+"       H ⎕GTK 3     ⍝ decrease the (debug-) for the window with handle H\n"
+"   Z←    ⎕GTK 0     ⍝ list Z of open ⎕GTK handles\n"
+"   E←    ⎕GTK 1     ⍝ wait for GTK Event E (blocking)\n"
+"   E←    ⎕GTK 2     ⍝ poll for GTK Event E (non-blocking)\n"
+"         ⎕GTK 3     ⍝ focus_on_map (subsequent windows will have the focus)\n"
+"         ⎕GTK 4     ⍝ clear focus_on_map\n"
+             ;
+
+        return Token(TOK_APL_VALUE1, Idx0(LOC));
+      }
+
    if (B->is_char_array())
       {
          const UCS_string gui_filename = B->get_UCS_ravel();
@@ -138,10 +161,16 @@ const int function = B->get_cfirst().get_int_value();
              if (function == 2 && event_queue.size() == 0)   // non-blocking
                 return Token(TOK_APL_VALUE1, IntScalar(0, LOC));
 
-             // blocking
+             // blocking or events in event_queue...
+             //
+             // We can not really block because the user may want to bump
+             // out of ⎕GTK with ^C.
              //
              while (event_queue.size() == 0 && !interrupt_is_raised())
-                   poll_all();
+                   {
+                     usleep(10000);
+                     poll_all();
+                   }
 
              // at this point either event_queue.size() > 0 or an interrupt
              // was raised
@@ -153,10 +182,10 @@ const int function = B->get_cfirst().get_int_value();
                 }
 
              {
-               UCS_string HWF = event_queue[0];   // fd, widget : fun
+               UCS_string HWF = event_queue[0];   // H (fd) : Widget : Fun
                event_queue.erase(0);
 
-               // split (Unicode)Handle,"widget:function"
+               // split (Unicode)Handle:"widget:function"
                // into a 3-element APL vector Handle (⊂"widget") (⊂"function")
                //
                UCS_string_vector args;
@@ -176,7 +205,7 @@ const int function = B->get_cfirst().get_int_value();
                args.push_back(arg);
 
                Value_P Z(1 + args.size(), LOC);
-               Z->next_ravel_Char(HWF[0]);
+               Z->next_ravel_Int(HWF[0]);   // handle
                loop(a, args.size())
                    {
                      Value_P Za(args[a], LOC);
@@ -185,6 +214,14 @@ const int function = B->get_cfirst().get_int_value();
                Z->check_value(LOC);
                return Token(TOK_APL_VALUE1, Z);
              }
+
+        case 3: // set focus_on_map
+             focus_on_map = true;
+             return Token(TOK_APL_VALUE1, IntScalar(0, LOC));
+
+        case 4: // clear focus_on_map (default)
+             focus_on_map = false;
+             return Token(TOK_APL_VALUE1, IntScalar(0, LOC));
 
         default: MORE_ERROR() << "Invalid function number Bi=" << function
                               << " in ⎕GTK Bi";
@@ -245,7 +282,7 @@ Fnum fun = FNUM_INVALID;
 
 int command_tag = -1;
 int response_tag = -1;
-Gtype Atype = gtype_V;
+Gtype Atype = gtype_V;   // assume void
 
    switch(fun)
       {
@@ -253,11 +290,11 @@ Gtype Atype = gtype_V;
          case FNUM_0:   return Token(TOK_APL_VALUE1, IntScalar(fd, LOC));
 
 #define gtk_event_def(ev_ename, ...)
-#define gtk_fun_def(glade_ID, gtk_class, gtk_function, _ZAname,_Z, A,_help) \
+#define gtk_fun_def(glade_ID, gtk_class, gtk_function, _Z, A)               \
          case FNUM_ ## gtk_class ## _ ## gtk_function:                      \
               command_tag = Command_ ## gtk_class ## _ ## gtk_function;     \
               response_tag = Response_ ## gtk_class ## _ ## gtk_function;   \
-              Atype = gtype_ ## A;                                          \
+              Atype = get_gtype(#A);                                        \
               break;
 #include "Gtk/Gtk_map.def"
 
@@ -334,11 +371,11 @@ Gtype Atype = gtype_V;
            return Token(TOK_APL_VALUE1, IntScalar(fd, LOC));
 
 #define gtk_event_def(ev_ename, ...)
-#define gtk_fun_def(glade_ID, gtk_class, gtk_function, _ZAname, _Z, A, _help) \
-         case FNUM_ ## gtk_class ## _ ## gtk_function:                        \
-              command_tag = Command_ ## gtk_class ## _ ## gtk_function;       \
-              response_tag = Response_ ## gtk_class ## _ ## gtk_function;     \
-              Atype = gtype_ ## A;                                            \
+#define gtk_fun_def(glade_ID, gtk_class, gtk_function, _Z, A)               \
+         case FNUM_ ## gtk_class ## _ ## gtk_function:                      \
+              command_tag = Command_ ## gtk_class ## _ ## gtk_function;     \
+              response_tag = Response_ ##gtk_class ## _ ## gtk_function;   \
+              Atype = get_gtype(#A);                                        \
               break;
 #include "Gtk/Gtk_map.def"
       }
@@ -381,9 +418,10 @@ char * V = TLV + 8;
 
    // 1. check for events from generic_callback()
    //
-   if (TLV_tag == Event_widget_fun ||            // "H:button1:clicked"
-       TLV_tag == Event_widget_fun_id_class ||   // dito + :id:class
-       TLV_tag == Event_toplevel_window_done)
+   if (TLV_tag == Event_widget_fun           ||   // "H:button1:clicked"
+       TLV_tag == Event_widget_fun_id_class  ||   // dito + :id:class
+       TLV_tag == Event_toplevel_window_done ||
+       TLV_tag == Event_widget_ev_X_Y_B_L)        // dito + X/Y, Button, Line
       {
         // V is a string of the form H%s:%s:%s:% where H is a placeholder
         // for the fd over which we have received V.
@@ -559,9 +597,9 @@ const char * wid_class = widget_id.c_str();
 const char * fun_name = utf_B.c_str();
 
 #define gtk_event_def(ev_ename, ...)
-#define gtk_fun_def(glade_ID, gtk_class, gtk_function, _ZAname,_Z,_A,_help) \
-   if (!(strncmp(wid_class, #glade_ID, wid_len) ||                          \
-         strcmp(fun_name,   #gtk_function)))                                 \
+#define gtk_fun_def(glade_ID, gtk_class, gtk_function, _Z,_A)         \
+   if (!(strncmp(wid_class, #glade_ID, wid_len) ||                    \
+         strcmp(fun_name,   #gtk_function)))                          \
       return FNUM_ ## gtk_class ## _ ## gtk_function;
 
 #include "Gtk/Gtk_map.def"
@@ -572,9 +610,12 @@ const char * fun_name = utf_B.c_str();
 }
 //----------------------------------------------------------------------------
 void
-Quad_GTK::clear()
+Quad_GTK::close_all_windows()
 {
-   loop(w, open_windows.size())   close_window(open_windows[w].fd);
+   while(open_windows.size())
+      {
+        close_window(open_windows.back().fd);   // does open_windows.pop_back()
+      }
 }
 //----------------------------------------------------------------------------
 Value_P
@@ -652,6 +693,15 @@ Quad_GTK::open_window(const UCS_string & gui_name_or_data,   // mandatory
                       const UCS_string * css_name_or_data)   // optional
 {
 const int fd = start_Gtk_server();
+   fcntl(fd, F_SETFD, FD_CLOEXEC | fcntl(fd, F_GETFD, 0));
+
+   // maybe request that the new window shall grab the focus. This is normally
+   // annoying, but might be useful for taking screenshots (scrot -u).
+   //
+   if (focus_on_map)
+      {
+         write_TL0(fd, 9);
+      }
 
    // write either: TLVs 1 and 3       (no css_name_or_data)
    // or else:      TLVs 1, 2, and 3   (with css_name_or_data)
@@ -773,7 +823,7 @@ const char * pkgs[] = { "libgtk-3-dev", 0 };
 Token Quad_GTK::eval_AB(Value_P A, Value_P B) const        { return eval_B(B); }
 Token Quad_GTK::eval_AXB(Value_P A, Value_P X, Value_P B) const { return eval_B(B); }
 Token Quad_GTK::eval_XB(Value_P X, Value_P B) const        { return eval_B(B); }
-void Quad_GTK::clear() { }
+void Quad_GTK::close_all_windows() { }
 
 #endif   // apl_GTK3
 

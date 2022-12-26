@@ -26,39 +26,44 @@
 #include <string.h>
 #include "SqliteResultValue.hh"
 
-void SqliteArgListBuilder::init_sql( void )
+//-----------------------------------------------------------------------------
+void
+SqliteArgListBuilder::init_sql()
 {
-    const char *sql_charptr = sql.c_str();
-    if( sqlite3_prepare_v2( connection->get_db(),
-                            sql_charptr, strlen( sql_charptr ) + 1,
-                            &statement, NULL ) != SQLITE_OK ) {
-        connection->raise_sqlite_error( "Error preparing query" );
-    }
-}
+const char * sql_charptr = sql.c_str();
+   if (sqlite3_prepare_v2(connection->get_db(),
+                          sql_charptr, strlen(sql_charptr) + 1,
+                          &statement, NULL) == SQLITE_OK)   return;
 
-SqliteArgListBuilder::SqliteArgListBuilder( SqliteConnection *connection_in, const string &sql_in )
-    : sql( sql_in ), connection( connection_in )
+   connection->raise_sqlite_error( "Error preparing query" );
+}
+//-----------------------------------------------------------------------------
+SqliteArgListBuilder::SqliteArgListBuilder(SqliteConnection * connection_in,
+                                           const string &sql_in)
+   : sql(sql_in), connection(connection_in)
 {
     init_sql();
 }
-
+//-----------------------------------------------------------------------------
 SqliteArgListBuilder::~SqliteArgListBuilder()
 {
     sqlite3_finalize( statement );
 }
-
+//-----------------------------------------------------------------------------
 void SqliteArgListBuilder::clear_args( void )
 {
     sqlite3_finalize( statement );
     init_sql();
 }
-
-static void free_text_arg( void *arg )
+//-----------------------------------------------------------------------------
+static void
+free_text_arg( void *arg )
 {
-    free( arg );
+    free(arg);
 }
-
-void SqliteArgListBuilder::append_string( const string &arg, int pos )
+//-----------------------------------------------------------------------------
+void
+SqliteArgListBuilder::append_string( const string &arg, int pos )
 {
     char *text = strdup( arg.c_str() );
     if( text == NULL ) {
@@ -67,61 +72,60 @@ void SqliteArgListBuilder::append_string( const string &arg, int pos )
     }
     sqlite3_bind_text( statement, pos + 1, text, -1, free_text_arg );
 }
-
-void SqliteArgListBuilder::append_long( long arg, int pos )
+//-----------------------------------------------------------------------------
+void
+SqliteArgListBuilder::append_long( long arg, int pos )
 {
     sqlite3_bind_int64( statement, pos + 1, arg );
 }
-
-void SqliteArgListBuilder::append_double( double arg, int pos )
+//-----------------------------------------------------------------------------
+void
+SqliteArgListBuilder::append_double( double arg, int pos )
 {
     sqlite3_bind_double( statement, pos + 1, arg );
 }
-
-void SqliteArgListBuilder::append_null( int pos )
+//-----------------------------------------------------------------------------
+void
+SqliteArgListBuilder::append_null(int pos)
 {
-    sqlite3_bind_null( statement, pos + 1 );
+    sqlite3_bind_null(statement, pos + 1);
 }
-
-Value_P SqliteArgListBuilder::run_query( bool ignore_result )
+//-----------------------------------------------------------------------------
+Value_P
+SqliteArgListBuilder::run_query(bool ignore_result)
 {
-    vector<ResultRow> results;
-    int result;
-    while( (result = sqlite3_step( statement )) != SQLITE_DONE ) {
-        if( result != SQLITE_ROW ) {
-            connection->raise_sqlite_error( "Error reading sql result" );
-        }
+vector<ResultRow> result_rows;
+
+   for (;;)
+      {
+        const int result = sqlite3_step(statement);
+        if (result == SQLITE_DONE)   break;
+        if (result != SQLITE_ROW)
+           {
+             connection->raise_sqlite_error("Error reading sql result");
+           }
 
         ResultRow row;
-        row.add_values( statement );
-        results.push_back( row );
-    }
+        row.add_values(statement);
+        result_rows.push_back(row);
+      }
 
-Value_P db_result_value;
-int row_count = results.size();
-    if (row_count > 0 )
+    if (const int row_count = result_rows.size())
        {
-         int col_count = results[0].get_values().size();
-         Shape result_shape( row_count, col_count );
-         db_result_value = Value_P(result_shape, LOC);
-         for (vector<ResultRow>::iterator row_iterator = results.begin();
-              row_iterator != results.end(); row_iterator++ )
+         const ShapeItem col_count = result_rows[0].get_values().size();
+         const Shape shape_Z(row_count, col_count);
+         Value_P Z = Value_P(shape_Z, LOC);
+         loop(r, row_count)
+         loop(c, col_count)
              {
-               const vector<const ResultValue *> & row =
-                            row_iterator->get_values();
-               for (vector<const ResultValue *>::const_iterator col_iterator
-                                                                = row.begin();
-                    col_iterator != row.end() ; col_iterator++)
-                   {
-                     (*col_iterator)->update(*db_result_value);
-                   }
+               (result_rows[r].get_values())[c]->update(*Z);
              }
+         Z->check_value(LOC);
+         return Z;
        }
     else
        {
-         db_result_value = Idx0(LOC);
+         return Idx0(LOC);
        }
-
-    db_result_value->check_value(LOC);
-    return db_result_value;
 }
+//-----------------------------------------------------------------------------

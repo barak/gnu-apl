@@ -594,7 +594,7 @@ const APL_Integer tz = the_workspace.v_Quad_TZ.get_offset();
    the_workspace.v_Quad_TZ.set_offset(tz);
 
    // close open windows in ⎕GTK
-   Quad_GTK::clear();
+   Quad_GTK::close_all_windows();
 
    // close open files in ⎕FIO
    Quad_FIO::clear();

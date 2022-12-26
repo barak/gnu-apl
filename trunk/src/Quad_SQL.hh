@@ -27,6 +27,8 @@
 #include "QuadFunction.hh"
 #include "Value.hh"
 
+class Connection;
+
 //----------------------------------------------------------------------------
 /**
    The system function ⎕SQL
@@ -60,7 +62,23 @@ protected:
    /// overloaded Function::eval_XB().
    virtual Token eval_XB(Value_P X, Value_P B) const;
 
-// virtual Token eval_AB(Value_P A, Value_P B) const;
+   /// list ⎕SQL functions
+   static Value_P list_functions(ostream & out);
+
+   /// open a database, return its handle
+   static Value_P open_database(Value_P A, Value_P B);
+
+   /// run a (read-only) database query
+   static Value_P run_query(Connection * conn, Value_P A, Value_P B);
+
+   /// run a (read/write) database update
+   static Value_P run_update(Connection * conn, Value_P A, Value_P B);
+
+   /// return the names of the database columns
+   static Value_P column_names(Value_P A, Value_P B);
+
+   static Value_P run_generic(Connection * conn, Value_P A, Value_P B,
+                              bool query);
 
 };
 //----------------------------------------------------------------------------

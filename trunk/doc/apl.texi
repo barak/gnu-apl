@@ -784,6 +784,17 @@ There are a few hopefully useful features in GNU APL:
 @node    Section 2.1
 @section APL Scripting
 
+@menu
+* Subsection 2.1.1::  Redirect the script file to the stdin of the GNU APL interpreter
+* Subsection 2.1.2::  Make the script file executable
+* Subsection 2.1.3::  How command line arguments are handled
+* Subsection 2.1.4::  Helpful Features for Scripting
+* Subsection 2.1.5::  Double-quoted Strings
+* Subsection 2.1.6::  Multi-Line Strings
+* Subsection 2.1.7::  Automatic )MORE
+* Subsection 2.1.8::  Script Example
+@end menu
+
 As already mentioned, it is possible to write APL scripts. Similar to other
 script languages, an APL script is a text file whose first line is a
 "shebang line", i.e. a line starting with @option{#!}, followed by the
@@ -800,7 +811,8 @@ file to stdin of the interpreter or making the script executable and indicate
 apl as the script interpreter (followed by some command line arguments for
 apl).
 
-@subsection redirect the script file the stdin of the GNU APL interpreter
+@node Subsection 2.1.1
+@subsection Redirect the script file to the stdin of the GNU APL interpreter
 
 A file, say SCRIPT.apl, can be redirected to apl by redirection of the shell:
 
@@ -818,6 +830,7 @@ Both ways of redirecting the file are almost identical; in the first case
 redirection was performed by the shell running apl, while in the second case
 the redirecting of the file was performed by apl itself.
 
+@node Subsection 2.1.2
 @subsection Make the script file executable
 
 Alternatively the script can be made executable, mentioning apl as the
@@ -836,6 +849,7 @@ If the path to the interpreter is relative (which might be useful if you
 do not know in advance where the APL interpreter will be installed) then
 it must be in $PATH of the shell that runs the script.
 
+@node Subsection 2.1.3
 @subsection How command line arguments are handled
 
 As we have seen, GNU APL can be started directly (by entering the name
@@ -990,6 +1004,7 @@ which contain no whitespace:
 @item @b{...}
 @end itemize
 
+@node Subsection 2.1.4
 @subsection Helpful Features for Scripting
 
 GNU APL provides three system variables and functions that are particularly
@@ -1109,6 +1124,7 @@ strings compared to standard APL, it has come to age and these days an even
 simpler feature - Multi-line strings as described below - is provided for the
 same purpose. The monadic ⎕INP has therefore become obsolete.
 
+@node Subsection 2.1.5
 @subsection Double-quoted Strings
 
 Standard APL literals (aka. strings) such as 'Hello' are single quoted. As a
@@ -1128,6 +1144,7 @@ for control character, such as \n for ASCII line feed, \t for ASCII TAB etc.
 @end itemize
 
 
+@node Subsection 2.1.6
 @subsection Multi-Line Strings
 
 A substantial disadvantage of ⎕INP is that it only works in immediate execution
@@ -1310,6 +1327,7 @@ Hello world
 │└──────┘ └────────┘│
 └ϵ──────────────────┘
 
+      ⍝ provoke an error...
       8 ⎕CR «««
 →      Line 1
 →        Line 2
@@ -1323,7 +1341,16 @@ Hello world
 
 @end verbatim
 
+Another advantage of ««« ... »»» over """ ... """ is that a decent text
+editor (read: vi/vim) may jump back and forth between the corresponding
+opening « and closing » with a single key stroke (character % in vi/vim).
+For this to work, add the following line to /etc/vim/vimrc (or ~/.vimrc):
 
+@verbatim
+set matchpairs+=«:»
+@end verbatim
+
+@node Subsection 2.1.7
 @subsection Automatic )MORE
 
 The GNU APL command )MORE provides, in some cases, additional information
@@ -1377,6 +1404,7 @@ If ON/OFF is omitted then the automatic )MORE mode is toggled. The additional
 )MORE information is displayed before the standard 3-line APL error message.
 
 
+@node Subsection 2.1.8
 @subsection Script Example
 
 Note that the two different ways of running an APL script have an impact on
@@ -3454,7 +3482,7 @@ few hours, though, so that creating it will not pay off for most mortals.
 @node    Section 2.28
 @section ⎕GTK - GTK Interface
 
-GTK (Gimp Toolkit) is a rather powerful library for creating graphical user
+GTK (Gimp ToolKit) is a rather powerful library for creating graphical user
 interfaces (GUIs). ⎕GTK makes a subset of the almost 10000 functions in the
 different GTK libraries available to GNU APL programs. With ⎕GTK a GNU APL
 program can, for example, replace the somewhat crude ⎕ or ⍞ input methods

@@ -102,7 +102,8 @@ Quad_SQL::~Quad_SQL()
    loop(p, providers.size())   delete providers[p];
 }
 //----------------------------------------------------------------------------
-static Token list_functions( ostream &out )
+Value_P
+Quad_SQL::list_functions(ostream & out)
 {
     out << "Available function numbers:" << endl
 << "type  ⎕SQL[1] file      - open a database file,"
@@ -115,7 +116,7 @@ static Token list_functions( ostream &out )
 << "      ⎕SQL[7] ref       - rollback current transaction" << endl
 << "      ⎕SQL[8] ref       - list tables" << endl
 << "ref   ⎕SQL[9] table     - list columns for table" << endl;
-    return Token(TOK_APL_VALUE1, Str0( LOC ) );
+    return Str0(LOC);
 }
 //----------------------------------------------------------------------------
 static int find_free_connection( void )
@@ -129,35 +130,37 @@ static int find_free_connection( void )
     return connections.size() - 1;
 }
 //----------------------------------------------------------------------------
-Token open_database(Value_P A, Value_P B)
+Value_P
+Quad_SQL::open_database(Value_P A, Value_P B)
 {
     if(!A->is_apl_char_vector() ){
         MORE_ERROR() << "A ⎕SQL[1] B: Illegal database name B";
         VALUE_ERROR;
     }
 
-string type = to_string(A->get_UCS_ravel());
+const string type = to_string(A->get_UCS_ravel());
    loop(p, providers.size())
        {
          if (providers[p]->get_name() == type)
             {
-              const int connection_index = find_free_connection();
+              const APL_Integer connection_index = find_free_connection();
               connections[connection_index] = providers[p]->open_database(B);
-              return Token(TOK_APL_VALUE1, IntScalar(connection_index, LOC));
+              return IntScalar(connection_index, LOC);
             }
        }
 
-   UCS_string & more = MORE_ERROR();
+UCS_string & more = MORE_ERROR();
    more << "⎕SQL: Unknown database provider type: " << type.c_str() << "\n"
-        << "      Supported providers are:";
+           "      Supported providers are:";
    loop(p, providers.size())   more << " " << providers[p]->get_name().c_str();
 
-   VALUE_ERROR;
+   DOMAIN_ERROR;
 }
 //----------------------------------------------------------------------------
-static void throw_illegal_db_id( void )
+static void
+throw_illegal_db_id()
 {
-    MORE_ERROR() << "Illegal database id";
+    MORE_ERROR() << "⎕SQL: Illegal database id";
     DOMAIN_ERROR;
 }
 //----------------------------------------------------------------------------
@@ -178,13 +181,12 @@ Connection * conn = connections[db_id];
     return conn;
 }
 //----------------------------------------------------------------------------
-static Connection *value_to_db_id( Value_P value )
+static Connection *
+value_to_db_id(Value_P value)
 {
-    if( !value->is_int_scalar( ) ) {
-        throw_illegal_db_id();
-    }
+   if (!value->is_int_scalar())   throw_illegal_db_id();
 
-    const int db_id = value->get_cfirst().get_int_value();
+const APL_Integer db_id = value->get_cfirst().get_int_value();
     return db_id_to_connection(db_id);
  }
 //----------------------------------------------------------------------------
@@ -205,7 +207,7 @@ int db_id = B->get_cfirst().get_int_value();
         }
 
 Connection *conn = connections[db_id];
-    if(conn == 0)
+    if (conn == 0)
       {
         throw_illegal_db_id();
       }
@@ -213,145 +215,163 @@ Connection *conn = connections[db_id];
     connections[db_id] = NULL;
     delete conn;
 
-    return Token( TOK_APL_VALUE1, Str0( LOC ) );
+    return Token(TOK_APL_VALUE1, Str0(LOC));
 }
 //----------------------------------------------------------------------------
 static Value_P
-run_generic_one_query(ArgListBuilder *arg_list, Value_P B, int start,
+run_generic_one_query(ArgListBuilder * arg_list, Value_P B, int start,
                       int num_args, bool ignore_result )
 {
-    for( int i = 0 ; i < num_args ; i++ ) {
-        const Cell &cell = B->get_cravel( start + i );
-        if( cell.is_integer_cell() ) {
-            arg_list->append_long( cell.get_int_value(), i );
-        }
-        else if( cell.is_float_cell() ) {
-            arg_list->append_double( cell.get_real_value(), i );
-        }
-        else {
-            Value_P value = cell.to_value( LOC );
-            if( value->get_shape().get_volume() == 0 ) {
-                arg_list->append_null( i );
-            }
-            else if( value->is_char_string() ) {
-                arg_list->append_string( to_string( value->get_UCS_ravel() ), i );
-            }
-            else {
-                MORE_ERROR() << "Illegal data type in argument "
-                             << i << " of arglist";
-                VALUE_ERROR;
-            }
-        }
-    }
+    loop (i, num_args)
+         {
+           const Cell & cell = B->get_cravel(start + i);
+           if (cell.is_integer_cell())
+              {
+                arg_list->append_long(cell.get_int_value(), i);
+              }
+           else if(cell.is_float_cell())
+              {
+                arg_list->append_double(cell.get_real_value(), i);
+              }
+           else
+              {
+                Value_P value = cell.to_value(LOC);
+                if (value->get_shape().get_volume() == 0)
+                   {
+                     arg_list->append_null( i );
+                   }
+                else if(value->is_char_string())
+                   {
+                     arg_list->append_string(to_string(value->get_UCS_ravel()),
+                                             i);
+                   }
+               else {
+                      MORE_ERROR() << "Illegal data type in argument "
+                                   << i << " of arglist";
+                      VALUE_ERROR;
+                    }
+             }
+         }
 
-    return arg_list->run_query( ignore_result );
+    return arg_list->run_query(ignore_result);
 }
 //----------------------------------------------------------------------------
-static Value_P
-run_generic(Connection *conn, Value_P A, Value_P B, bool query)
+Value_P
+Quad_SQL::run_generic(Connection * conn, Value_P A, Value_P B, bool query)
 {
    if (!A->is_char_string())
       {
         MORE_ERROR() << "Illegal query argument type";
-        VALUE_ERROR;
+        DOMAIN_ERROR;
       }
 
-string statement = conn->replace_bind_args(to_string( A->get_UCS_ravel()));
-ArgListBuilder * builder;
-    if (query)   builder = conn->make_prepared_query( statement );
-    else         builder = conn->make_prepared_update( statement );
+    if (B->get_rank() > 2)
+       {
+         MORE_ERROR() << "⎕SQL: Bind params have illegal rank";
+         RANK_ERROR;
+       }
 
-const Shape &shape = B->get_shape();
-    if (shape.get_rank() == 0 || shape.get_rank() == 1) {
-        int num_args = shape.get_volume();
-        Value_P result = run_generic_one_query( builder, B, 0, num_args, false);
-        delete builder;
-        return result;
-    }
+const string statement = conn->replace_bind_args(to_string(A->get_UCS_ravel()));
+ArgListBuilder * builder = query ? conn->make_prepared_query(statement)
+                                 : conn->make_prepared_update(statement);
 
-    if (shape.get_rank() == 2) {
-        int rows = shape.get_rows();
-        int cols = shape.get_cols();
-        if( rows == 0 ) {
-            delete builder;
-            return Idx0( LOC );
-        }
-        else {
-            Assert_fatal( rows > 0 );
-            Value_P result;
-            loop (row, rows)
-                 {
-                   const bool not_last = row < rows - 1;
-                   result = run_generic_one_query(builder, B, row * cols,
-                                                  cols, not_last );
-                   if (not_last)   builder->clear_args();
-                 }
-            delete builder;
-            return result;
-        }
-    }
+    if (B->get_rank() < 2)
+       {
+         const int num_args = B->element_count();
+         Value_P Z = run_generic_one_query(builder, B, 0, num_args, false);
+         delete builder;
+         return Z;
+       }
 
-   delete builder;
-   MORE_ERROR() << "Bind params have illegal rank";
-   RANK_ERROR;
-}
-//----------------------------------------------------------------------------
-static Token run_query( Connection *conn, Value_P A, Value_P B )
-{
-    return Token( TOK_APL_VALUE1, run_generic( conn, A, B, true ) );
-}
-//----------------------------------------------------------------------------
-static Token run_update( Connection *conn, Value_P A, Value_P B )
-{
-    return Token( TOK_APL_VALUE1, run_generic( conn, A, B, false ) );
-}
-//----------------------------------------------------------------------------
-static Token run_transaction_begin( Value_P B )
-{
-    Connection *conn = value_to_db_id( B );
-    conn->transaction_begin();
-    return Token( TOK_APL_VALUE1, Idx0( LOC ) );
-}
-//----------------------------------------------------------------------------
-static Token run_transaction_commit( Value_P B )
-{
-    Connection *conn = value_to_db_id( B );
-    conn->transaction_commit();
-    return Token( TOK_APL_VALUE1, Idx0( LOC ) );
-}
-//----------------------------------------------------------------------------
-static Token run_transaction_rollback( Value_P B )
-{
-    Connection *conn = value_to_db_id( B );
-    conn->transaction_rollback();
-    return Token( TOK_APL_VALUE1, Idx0( LOC ) );
-}
-//----------------------------------------------------------------------------
-static Token show_tables( Value_P B )
-{
-    Connection *conn = value_to_db_id( B );
-    vector<string> tables;
-    conn->fill_tables( tables );
-
-    Value_P value;
-    if( tables.size() == 0 ) {
-        value = Idx0( LOC );
-    }
-    else {
-        Shape shape( tables.size () );
-        value = Value_P( shape, LOC );
-        for (vector<string>::iterator i = tables.begin();i != tables.end(); i++)
+    if (B->get_rank() == 2)   // matrix B
+       {
+         if (const int rows = B->get_rows())
             {
-              value->next_ravel_Pointer(make_string_cell(*i, LOC).get());
+              const int cols = B->get_cols();
+              Assert_fatal(rows > 0);
+              Value_P Z;
+              loop (row, rows)
+                   {
+                    const bool not_last = row < rows - 1;
+                    Z = run_generic_one_query(builder, B, row * cols,
+                                              cols, not_last);
+                    if (not_last)   builder->clear_args();
+                   }
+             delete builder;
+             return Z;
             }
-    }
-
-    value->check_value( LOC );
-    return Token( TOK_APL_VALUE1, value );
+         else
+            {
+              delete builder;
+              return Idx0(LOC);
+           }
+       }
+}
+//----------------------------------------------------------------------------
+Value_P
+Quad_SQL::run_query(Connection * conn, Value_P A, Value_P B)
+{
+    return run_generic(conn, A, B, true);
+}
+//----------------------------------------------------------------------------
+Value_P
+Quad_SQL::run_update(Connection * conn, Value_P A, Value_P B)
+{
+    return run_generic(conn, A, B, false);
 }
 //----------------------------------------------------------------------------
 static Token
-show_cols(Value_P A, Value_P B)
+run_transaction_begin(Value_P B)
+{
+Connection *conn = value_to_db_id(B);
+    conn->transaction_begin();
+    return Token(TOK_APL_VALUE1, Idx0(LOC));
+}
+//----------------------------------------------------------------------------
+static Token
+run_transaction_commit(Value_P B)
+{
+    Connection *conn = value_to_db_id( B );
+    conn->transaction_commit();
+    return Token(TOK_APL_VALUE1, Idx0(LOC));
+}
+//----------------------------------------------------------------------------
+static Token
+run_transaction_rollback(Value_P B)
+{
+Connection * conn = value_to_db_id(B);
+   conn->transaction_rollback();
+   return Token(TOK_APL_VALUE1, Idx0(LOC));
+}
+//----------------------------------------------------------------------------
+static Token
+show_tables(Value_P B)
+{
+Connection *conn = value_to_db_id(B);
+vector<string> tables;
+   conn->fill_tables(tables);
+
+Value_P value;
+   if (tables.size() == 0 )
+     {
+       value = Idx0(LOC);
+     }
+   else
+     {
+       Shape shape(tables.size());
+       value = Value_P( shape, LOC );
+       for (vector<string>::iterator i = tables.begin();i != tables.end(); i++)
+            {
+             value->next_ravel_Pointer(make_string_cell(*i, LOC).get());
+           }
+     }
+
+   value->check_value( LOC );
+   return Token( TOK_APL_VALUE1, value );
+}
+//----------------------------------------------------------------------------
+Value_P
+Quad_SQL::column_names(Value_P A, Value_P B)
 {
 Connection * conn = value_to_db_id(A);
 vector<ColumnDescriptor> cols;
@@ -359,13 +379,13 @@ vector<ColumnDescriptor> cols;
    if (!B->is_apl_char_vector())
       {
         MORE_ERROR() << "Illegal table name";
-        VALUE_ERROR;
+        DOMAIN_ERROR;
       }
 
 string name = to_string(B->get_UCS_ravel());
    conn->fill_cols(name, cols);
 
-   if (cols.size() == 0)   return Token(TOK_APL_VALUE1, Idx0(LOC));
+   if (cols.size() == 0)   return Idx0(LOC);
 
 Shape shape(cols.size(), 2);
 Value_P Z(shape, LOC);
@@ -388,21 +408,21 @@ Value_P Z(shape, LOC);
        }
 
     Z->check_value( LOC );
-    return Token(TOK_APL_VALUE1, Z);
+    return Z;
 }
 //----------------------------------------------------------------------------
 Token
 Quad_SQL::eval_B(Value_P B) const
 {
    CHECK_SECURITY(disable_Quad_SQL);
-   return list_functions(COUT);
+   return Token(TOK_APL_VALUE1, list_functions(COUT));
 }
 //----------------------------------------------------------------------------
 Token
 Quad_SQL::eval_AB(Value_P A, Value_P B) const
 {
    CHECK_SECURITY(disable_Quad_SQL);
-   return list_functions(COUT);
+   return Token(TOK_APL_VALUE1, list_functions(COUT));
 }
 //----------------------------------------------------------------------------
 Token
@@ -414,7 +434,7 @@ const int function_number = X->get_cfirst().get_near_int( );
 
     switch(function_number)
        {
-         case 0: return list_functions(CERR);
+         case 0: return Token(TOK_APL_VALUE1, list_functions(CERR));
          case 2: return close_database(B);
          case 5: return run_transaction_begin(B);
          case 6: return run_transaction_commit(B);
@@ -441,20 +461,19 @@ Quad_SQL::eval_AXB(const Value_P A, const Value_P X, const Value_P B) const
 {
    CHECK_SECURITY(disable_Quad_SQL);
 
-const int function_number = X->get_cfirst().get_near_int();
+const APL_Integer function_number = X->get_cfirst().get_near_int();
 
    switch(function_number)
       {
-        case 0: return list_functions(CERR);
-        case 1: return open_database(A, B);
-        case 3: return run_query(param_to_db(X), A, B);
-        case 4: return run_update(param_to_db(X), A, B);
-        case 9: return show_cols(A, B);
-
-        default: MORE_ERROR() << "A ⎕SQL[X] B: Illegal function number X="
-                              << function_number;
-                 DOMAIN_ERROR;
+        case 0: return Token(TOK_APL_VALUE1, list_functions(CERR));
+        case 1: return Token(TOK_APL_VALUE1, open_database(A, B));
+        case 3: return Token(TOK_APL_VALUE1, run_query(param_to_db(X), A, B));
+        case 4: return Token(TOK_APL_VALUE1, run_update(param_to_db(X), A, B));
+        case 9: return Token(TOK_APL_VALUE1, column_names(A, B));
       }
+
+   MORE_ERROR() << "A ⎕SQL[X] B: Illegal function number X=" << function_number;
+   DOMAIN_ERROR;
 }
 //----------------------------------------------------------------------------
 static const UCS_string

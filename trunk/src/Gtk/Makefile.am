@@ -2,7 +2,7 @@
 bin_PROGRAMS = Gtk_server
 noinst_DATA = Gtk_functions.asciidoc Gtk_events1.asciidoc Gtk_events2.asciidoc
 
-Gtk_server_SOURCES = Gtk_server.cc Gtk_map.def Gtk_enums.hh
+Gtk_server_SOURCES = Gtk_server.cc Gtk_map.def Gtk_enum_map.def Gtk_enums.hh
 
 AM_CXXFLAGS = $(GTK_CFLAGS) $(GTK_LIBS) -rdynamic
 AM_LDFLAGS  = $(GTK_LDFLAGS) -lX11

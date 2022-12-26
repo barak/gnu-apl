@@ -44,7 +44,7 @@ public:
    static Quad_GTK  _fun;          ///< Built-in function.
 
    /// close all open windows
-   static void clear();
+   static void close_all_windows();
 
 protected:
    /// the type of a function parameter or return value
@@ -55,6 +55,18 @@ protected:
         gtype_I = 2,   ///< integer
         gtype_F = 3,   ///< float
       };
+
+   /// convert 1-character generic type names (V, I, S, or F) or longer
+   /// enum types to the corresponding Gtype.
+   static Gtype get_gtype(const char * str)
+      {
+        if (str[1])        return gtype_I;   // enum -> int
+        if (*str == 'V')   return gtype_V;
+        if (*str == 'I')   return gtype_I;
+        if (*str == 'S')   return gtype_S;
+        if (*str == 'F')   return gtype_F;
+        FIXME;
+      }
 
 #include "Gtk/Gtk_enums.hh"
 
@@ -125,6 +137,9 @@ protected:
 
    /// event queue for events from the GTK windows
    static UCS_string_vector event_queue;
+
+   /// whether the next new window shall grab the focus
+   static bool focus_on_map;
 };
 
 #endif // __Quad_GTK_DEFINED__

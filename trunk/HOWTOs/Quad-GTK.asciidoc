@@ -3,6 +3,21 @@
 :page-width: 90em
 :toclevels: 4
 
+////
+make window visible, then
+
+scrot --border -d 5 -u
+
+and move mouse to window witin 5 seconds
+
+-or- for glade XML:
+
+{ cat << ENDCAT
+<?xml version= ...
+ENDCAT
+} | glade-previewer -f /dev/stdin --screenshot glad-XXX.png
+////
+
 == Abstract
 
 ⎕GTK is a GNU APL system function that allows an APL program to create and
@@ -170,7 +185,7 @@ The architecture above leads to the following work-flow.
     ║ ──────────────────── ║
     ║      GUI start       ║   → loads my-application.ui and my-application.css
     ║ ──────────────────── ║
-    ║   GUI event loop     ║   × polls and reacts to events (user actions)
+    ║   GUI event loop     ║   → polls and reacts to events (user actions)
     ╚══════════════════════╝
 -----
 
@@ -277,6 +292,10 @@ The four areas are:
 2. A *GUI visualization* in the middle (empty)
 3. A *GUI structure* on the (top-) right (empty), and
 4. A *widget property area* on the (bottom-) right (empty).
+
+NOTE: newer glade versions behave slightly different, but the description
+given here should suffice to explain glade. For *glade alternatives*, see also
+<<TAG_programmatically, Chapter 8 Specifying GUIs Programmatically>> below.
 
 The *widget selection area* is divided into several widget groups named
 
@@ -997,16 +1016,822 @@ The following notes may be helpful when creating custom drawings.
   CSS2 (i.e. *serif*, *sans-serif*, *cursive*, *fantasy*, *monospace* are
   supposed to work,
 
-[[TAG_appendix]]
-== Appendix
-=== The ⎕GTK Cheat Sheet
+[[TAG_programmatically]]
+== 8 Specifying GUIs Programmatically
 
-In dwhe Table 2 below, it is assumed that:
+A GUI builder like *glade* can give you a quick head start if you are
+not yet familiar with the development of GUIs with GTK. However, it also
+has some limitations and disadvantages, for example:
+
+* not all GTK widgets or objects have an XML representation (this is actually
+  a limitation of GTK class GtkBuilder which reads the .ui files produced by
+  glade).
+* workspaces that depend on additional files (XML or CSS) are more difficult
+  to distribute than self-contained (i.e. single-file) workspaces
+* regular structures like horizontally or vertically aligned sets of widgets
+  are cumbersome to create or maintain.
+
+For this reason the filename (APL string) arguments *A* and *B* of dyadic
+*A ⎕GTK B* and monadic *⎕GTK B* can also be the contents of the files instead
+of the file names. Most *.ui* files (as produced by glade) and in particular
+the .css (if any) files are reasonablt small. It makes therefore a lot of
+sense, to construct the contents (i.e. strings) of these files directly in
+APL rather than loading them from external files produced elsewhere. GNU APL
+is shipped with an example workspace *workspaces/SQL_GUI.apl* that could serve
+as a starting point for your own, self-contained GUI. Thios workspqace is
+resonably well documented, but some related concepts may be helpful note
+before looking into the APL code of that workspace.
+
+=== 8.1 What glade actually does
+
+In short, glade produces an XML string that is understood by ⎕GTK. It
+normally stores it in some file, say *my-gui.xml*, that can later be
+loaded with *⎕GTK "my-gui.xml"* or with *CSS ⎕GTK "my-gui.xml"* where
+CSS is a string produced elsewhere (and not of concern here).
+
+Lets start with:
+
+1. start *glade*,
+2. → Create a new project,
+3. → add a new *Toplevel* widget of type *GtkWindow*, and
+4. → select the new window and set the (topmost) property *ID*
+     in tab *Genera* to *window1*
+   
+5. → *Save as* the project a *my-gui*.
+
+This produces a file named *my-gui.glade* in the current directory.
+Opening this file with a text editor shows its content:
 
 ----
-      ⍝ H is a window handle (from H ← Zh←⎕GTK "filename.ui")
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated with glade 3.22.1 -->
+<interface>
+  <requires lib="gtk+" version="3.20"/>
+  <object class="GtkWindow" id="window1">
+    <property name="can_focus">False</property>
+    <child>
+      <placeholder/>
+    </child>
+    <child>
+      <placeholder/>
+    </child>
+  </object>
+</interface>
+----
+
+Comparing step 4. above with line 5 of *my-gui.glade*, i.e.
+
+----
+  <object class="GtkWindow" id="window1">
+----
+
+exposes the primary functionality of *glade*: producing XML temlates and filling
+in fields in those templates according to choices made by the user (the window
+ID *window1* in this simple example). The two *<child>* tags with content
+*<placeholder/>* are used by *glade* to simplify a later replacement with
+other widgets and have no effect.
+
+File *my-gui.glade* is already a fully functional (albeit empty and thus boring)
+GUI that can be used in APL via ⎕GTK:
+
+----
+      ⎕GTK "my-gui.glade"
+6
+----
+
+This returns GTK handle 6 and opens the following GUI:
+
+image::glade-7.png[]
+
+Now, lets test the claim above: _the filename (APL string) arguments *A*
+and *B* of dyadic *A ⎕GTK B* and monadic *⎕GTK B* can also be the contents
+of the files instead of the file names_:
+
+----
+      )CLEAR
+      CLEAR WS
+
+      XML←"""
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated with glade 3.22.1 -->
+<interface>
+  <requires lib="gtk+" version="3.20"/>
+  <object class="GtkWindow" id="window1">
+    <property name="can_focus">False</property>
+    <child>
+      <placeholder/>
+    </child>
+    <child>
+      <placeholder/>
+    </child>
+  </object>
+</interface>
+          """
+
+      ⍴XML   ⍝ number of nested APL strings between """ ... """
+14
+
+      ⎕GTK 36 ⎕CR XML
+6
+----
+
+Voila, the same window as above pops up:
+
+image::glade-7.png[]
+
+To see why, we note the following:
+
+* The text lines between the first and the second """ above constitutes a
+  multi-line string (a non-standard GNU APL feature, see *info apl* for details).
+* Every line becomes a nested (string) item of the multi-line string. The
+  multi-line string is then assigned to variable *XML*. Therefore *⍴XML*
+  is 14 for the 14 lines of text between """ and """.
+* *⎕GTK B* expects B to be a simple APL vector (aka. APL string) where
+  multiple lines are separated by newline characters and not a vector of
+  nested APL strings.  *36 ⎕CR XML* does the required conversion from
+  nested APL strings to a simple APL string with *\n* aka. *ASCII LF* as
+  line separator.
+* the XML standard treats newlines and blanks alike, therefore the string
+  lines could have been separated by blanks (or tabs etc.) as well. However,
+  no according ⎕CR conversion exists, so *36 ⎕CR* was used and long XML
+  strings using \n are easier to read than those using blanks or TABs.
+
+
+All properties of the new windows, like its size, caption, etc. are set to
+their defaults. We will, by means of examples, explain in the following how
+to change that.
+
+=== 8.2 Some GTK (and glade) details
+
+As already meantioned, *glade* produces an XML file that describes the desired
+GUI on the one hand, and GTK, more precisely a GTK object (of type
+*GtkBuilder*) on the other. The GtkBuilder provides functions that read the
+XML file or string and creates (instantiates) the widget objects needed to
+do so. This works by means of a naming convention between the XML text file
+(produced by glade or, as here, by APL) and the C source files (actually C
+header files) that come with the GTK libraries. The GTK header files are
+usually installed in either */usr/include/gtk-3.0/gtk/* or else in
+*/usr/local/include/gtk-3.0/gtk/*.
+
+You can use *⎕GTK* without any C/C++ knowledge, but looking at some of the
+header files (i.e. files with extension *.h*) may help in understanding the
+naming conventions between XML and GTK. Understanding (and following) this
+naming convention is essential for producing a proper XML description for
+a GUI.
+
+In variable XML above, we have already seen the first (an so far only)
+GTK widget, i.e. *window*:
+
+----
+  <object class="GtkWindow" id="window1">
+    ...
+  </object>
+----
+
+To fully understand the naming conventions we use two more widgets with
+more complex names: *gtktextview* and *gtktreeviewcolumn*. We call the
+names *window*, *gtktextview*, and *gtktreeviewcolumn* the *core name*s
+of the widgets. Every relevant naming convertion (XML use only some of
+them but we will explain them all) start with the core name of a widget
+and produces similar looking names as described in the following sections.
+
+==== Core Name
+
+A core name is a sequence of lowercase (!) ASCII characters a..z.
+
+Neither digits 0..9, nor underscore (_), nor minus (-) or other non-alphabetic
+characters are part of a core name. These characters are instead used to derivw
+other name variants from a core name.
+
+As already mentioned, the examples discussed here use the core names *window*,
+*gtktextview*, and *gtktreeviewcolumn*. The other core names then follow suit.
+iut.
+
+==== Header File Name
+
+The name of the header file for *corename* is *gtkcorename.h*. Therefore, the
+header files in our example are: *gtkwindow.h*, *gtktextview.h*, and
+*gtktreeviewcolumn.h* 
+
+Depending on the platform, all these header file are most likely located in
+directory */usr/include/gtk-3.0/gtk/* or .*/usr/local/include/gtk-3.0/gtk/*,
+or sometimes below /opt.
+
+The user is normally not concerned with these header files. They are sometimes
+helpful to disambiguate core names. For example, to decide (below) if
+*treeviewcolumn* should mean 3 words *tree-view-column* or 2 words
+*treeview-column*.
+
+==== Object Class
+
+Every widget is an instance of an assoctiated class which is declared in the
+corresponding header file. The class for *corename* is either *GtkCoreName* or
+GtkCorename*. In our example the class names are *GtkWidget*, *GtkTextView*,
+and *GtkTreeViewColumn*.
+
+Confusingly, many widget not only declare the class name as described, but
+in addition another class with suffix *Class*. For instance both
+*GtkTreeViewColumn* and *GtkTreeViewColumnClass* in *gtktreeviewcolumn.h*.
+
+The name variant with the *Class* suffix is not used by *⎕GTK*.
+
+As of this writing it is not entirely clear if the XML attribute
+*class="GtkWindow"* above refers to a GTK object class or to a CSS style class
+(since both exist). For the moment we assume a GTK object class; GtkServer
+does not use it, but the *GtkBuilder* may in some way.
+
+==== Object ID
+
+The <object ...> tag in XML may or may not contain the optional XML
+attribute *id=* (see above). In many cases the ID is not needed and should
+then not be mentioned in the XML. The relevant execeptions (in which cases
+the ID is mandatory) are:
+
+* top-level windows. ⎕GTK uses the ID of the top-level window to find the
+GTK object with that ID.
+* widgets for which APL calls widget functions (i.e. *Z←⎕GTK[H_ID]
+  "function-name"* or *Z←A ⎕GTK[H_ID] "function-name"*.
+
+The object ID of a widge consists of an *ID-prefix* and an *ID-suffix*
+according to these rules:
+
+* The *ID-prefix* are the leading lowercase ASCII characters a..z of some name,
+* The *ID-suffix* are the trailing characters of that name, i.e. the suffix
+  does NOT start with a lowercase ASCII character a..z.
+* The *ID-prefix* should be the same as the function name prefix explained below.
+
+The purpose of the *ID-suffix* is to distinguish different instances of the
+same widget, e.g multiple buttons in the same window.
+
+In older glade versions, the *ID-suffixes* were automatically set to 0, 1, 2,
+... for multiple instances of the same widget class (but could be changed by
+the user). In newer glade versions the ID is left empty by default. For that
+reason we had to do Step 4:
+
+----
+→ select the new window and set the (topmost) property ID in tab Genera to window1
+----
+
+above.
+
+==== Widget Function Prefix
+
+Every widget has a number of associated functions. The same function name
+may be used for different widget classes. For example. many widgets have a
+*get_value()* function.
+
+In C++ interfaces to GTK a widget like *window* is declared in header file
+*window.h*, declare a *namespace Gtk*, a C++ class *Window* inside namespace
+*Gtk*, and member functions fun1, fun2, ... of that class.
+
+⎕GTK uses the C interface instead and the C++ luxury of namespaces and classes
+become function name prefixes. This makes
+
+----
+    Gtk::Window::fun1(args...)                in C++, and
+    gtk_window_fun1(gtk_window *, args...)    in C
+----
+
+essentially the same. Coming back to our example, the widget name prefixes are
+*gtk_window_*, *gtk_text_view_*, and *gtk_tree_view_column*.
+
+=== 8.3 How (A) ⎕GTX[H_ID] B works
+
+Let:
+
+----
+H←⎕GTK 36 ⎕CR XML                     ⍝ i.e. 6 as above
+H_ID← H, "window1"                    ⍝ handle and widget ID
+"MY-TITLE" ⎕GTK[H_ID] "set_title"     ⍝
+----
+
+Then the second ⎕GTK call hopefully does this:
+
+1. The first ⎕GTK call opens a new GUI window according to XML
+2. The second ⎕GTK call splits *H_ID* into the numeric handle *H* (a
+   connection to a separate process that handles the events of the window)
+   and a string *ID* which is the Object ID of a widget in that window.
+3. The widget class (= the ID prefix *window* of the ID *window1* and the
+   right ⎕GTK argument (= *set_title*) are combined into the window function
+   name *gtk_window_set_title*. This function (in the GTK library) is called
+   and its result is returned.
+4. In step 3. the function arguments and the function result (if any) are being
+   transcoded between APL values and C values. For this reason, only widget
+   function whose arguments and/or result are integer (including enums) or
+   strings can be supported by ⎕GTK. This is fortunately the case for the
+   majority of widget functions.
+
+Adding the second ⎕GTK call to our code gives:
+
+----
+      )CLEAR
+      CLEAR WS
+
+      XML←"""
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated with glade 3.22.1 -->
+<interface>
+  <requires lib="gtk+" version="3.20"/>
+  <object class="GtkWindow" id="window1">
+    <property name="can_focus">False</property>
+    <child>
+      <placeholder/>
+    </child>
+    <child>
+      <placeholder/>
+    </child>
+  </object>
+</interface>
+          """
+
+      H←⎕GTK 36 ⎕CR XML                     ⍝ display GUI defined by XML
+      H_ID← H, "window1"                    ⍝ handle and widget ID (in XML)
+      "MY-TITLE" ⎕GTK[H_ID] "set_title"     ⍝ calls gtk_window_set_title()
+----
+
+and, when executed, this GUI:
+
+image::glade-8.png[]
+
+A little quirk in this example (which is beyond the control of ⎕GTK or
+Gtk_server) is that the new window title *MY-TITLE* does not show immeidately
+but only after the window obtains the focus again. This is most likely platform
+dependent.
+
+=== 8.4 Adding Window Properties
+
+The XML for a widget in GUI defines how the widget looks initially.
+In our previous example above:
+
+* the top-level *window* was created with its default title *Gtk)server*,
+* the default title was then changed to *MY-TITLE* by calling widget function
+  *set_title*.
+
+A better approach, which works for most but maybe not all properties is
+to specify them in XML *before* the widget is created and not by calling
+a corresponding widget function *after* the widget was created. This
+is achieved by XML tag <property>/ In the case of the windiw title the
+property is called *title* (another GTK naming conventions).:
+
+----
+    <property name="title">MY-TITLE</property>
+----
+
+Our complete code is now (observe how MY-PROPERTY has moved from APL to XML:
+
+----
+      )CLEAR
+      CLEAR WS
+
+      XML←"""
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated with glade 3.22.1 -->
+<interface>
+  <requires lib="gtk+" version="3.20"/>
+  <object class="GtkWindow" id="window1">
+    <property name="title">MY-TITLE</property>
+    <property name="can_focus">False</property>
+    <child>
+      <placeholder/>
+    </child>
+    <child>
+      <placeholder/>
+    </child>
+  </object>
+</interface>
+          """
+
+      H←⎕GTK 36 ⎕CR XML                     ⍝ display GUI defined by XML
+----
+
+The GUI looks as before but the focus quirk has disappeared since
+the proper *MY-TITLE* was set *before* the *window* was created. Properies
+are somewhat widget-specific, but most widget have at least the XML <PROPERTY>
+tags with XML attributes *name="width_request"*, *name="height_request*",
+or *name="visible"*. The value of each property is the entire text between the
+XML start tag <PROPERTY> and the corresponding XML end tag </PROPERTY>.
+
+WARNING: blanks in a property value are preserved and may cause problems
+for certain data types like numbers or the booleans *True* and *False*.
+
+Gtk widgets have a fairly large number of properties that allow for a very
+fine-tuned control of how the widget will behave. However, most properties
+have suitable default values so that in most cases only a few of them need
+to be specified in XML.
+
+
+=== 8.5 Adding Child Widgets
+
+An obvious problem with our current *window* is that it can not be closed.
+We can fix that by adding an OK button to it. The button itself is defined
+by the following XML snipplet:
+
+----
+        <child>
+          <object class="GtkButton">
+            <property name="label">OK</property>
+            <property name="visible">True</property>
+            <property name="width_request">80</property>
+            <property name="height_request">30</property>
+          </object>
+        </child>
+
+----
+
+The entire code is now:
+
+----
+      )CLEAR
+      CLEAR WS
+
+      XML←"""
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated with glade 3.22.1 -->
+<interface>
+  <requires lib="gtk+" version="3.20"/>
+  <object class="GtkWindow" id="window1">
+    <property name="title">MY-TITLE</property>
+    <property name="can_focus">False</property>
+    <property name="width_request">400</property>
+    <property name="height_request">200</property>
+    <child>
+      <object class="GtkButton">
+        <property name="label">OK</property>
+        <property name="visible">True</property>
+        <property name="width_request">80</property>
+        <property name="height_request">30</property>
+        <property name="halign">start</property>
+        <property name="valign">start</property>
+      </object>
+    </child>
+  </object>
+</interface>
+          """
+
+      H←⎕GTK 36 ⎕CR XML                     ⍝ display GUI defined by XML
+----
+
+and produces:
+
+image::glade-9.png[]
+
+To explain the the above:
+
+* the properties *width_request* and *height_request* specify the desired
+  sizes of the parent widget *window1* and its (so far) anonynmous child
+  of type *GtkButton*.
+* the properties *halign* and *valign* of the button with value *start* tell
+  the parent widget that the button shall be placed at the start (= left
+  horizontally resp. top vercically) of the parent. Without them the button
+  would have grabbed the entire available space of the parent, making the
+  button almost as big as the parent.
+
+=== 8.6 Placing Child Widgets
+
+Of course the position of the button at the top left corner of the window is
+still somewhat unusual. We would assume that either the GtkWindow or the
+GtkButton class have a property or a widget function that could place the
+button at a different offset, say *x* pixels rigght and *y* pixels down from
+the top-left corner. Unfortunately no such property or function exists and
+an attempt to specify one yields an error, e.g.:
+
+----
+(Gtk_server:17553): Gtk-WARNING **: 17:17:39.760: GtkWindow does not have a child property called y
+----
+
+GTK handles the placement of child widgets a parent widget by means of
+an intermediate widget that provides the missing properties. There exist
+several suitable intermediate widgets (*GtkFixed*, *GtkBox*, *GtkGrid*,
+*GtkLayout*, ...) with different capabilities as to how the children
+are being placed into their common parent. We use the simplest of them:
+*GtkFixed*.
+
+Out current XML has an two-level widget structure like:
+
+----
+GtkWindow ⊃ GtkButton
+----
+
+where A ⊃ B should mean that B is a child of A. We replace that by
+a three-level widget structure like this:
+
+----
+GtkWindow ⊃ GtkFixed ⊃ GtkButton
+                │
+                └──────────── <packing>
+                                <property name="x">pos_x</property>
+                                <property name="y">pos_x</property>
+                              </packing>
+----
+
+The widget placement belongs to class *GtkFixed*, happens in a separate
+XML Tag named *<packing>*, which has properties named *x* and *y*. That
+is, the positions are specified _next to_ the child rather than _inside_
+the child (or _inside the parent_ for that matter).
+
+Our APL code becomes:
+----
+      )CLEAR
+CLEAR WS
+
+      XML←"""
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated with glade 3.22.1 -->
+<interface>
+  <requires lib="gtk+" version="3.20"/>
+  <object class="GtkWindow" id="window1">
+    <property name="title">MY-TITLE</property>
+    <property name="can_focus">False</property>
+    <property name="width_request">400</property>
+    <property name="height_request">200</property>
+    <child>
+      <object class="GtkFixed">
+        <property name="visible">True</property>
+        <child>
+          <object class="GtkButton">
+            <property name="label">OK</property>
+            <property name="visible">True</property>
+            <property name="width_request">80</property>
+            <property name="height_request">30</property>
+            <property name="halign">start</property>
+            <property name="valign">start</property>
+          </object>
+          <packing>
+            <property name="x">160</property>
+            <property name="y">150</property>
+          </packing>
+
+        </child>
+      </object>
+    </child>
+  </object>
+</interface>
+          """
+
+      H←⎕GTK 36 ⎕CR XML                     ⍝ display GUI defined by XML
+----
+
+And the GUI:
+
+image::glade-10.png[]
+
+=== 8.7 Adding Style
+
+In the early days of HTML, a green button would have looked something
+like this:
+
+----
+<BUTTON name="Bn-OK" bgcolor="green">"OK"</BUTTON>
+----
+
+These days that button would maybe look more like:
+
+----
+<BUTTON name="Bn-OK">"OK"</BUTTON>
+----
+
+and some CSS file or style somewhere else would e.g. say:
+
+----
+#OK-button { background-color: green }
+----
+
+Nowadays the size of style files has grown to an extent that makes it
+impossible to specify the style of a button or other HTML widget inline
+as attributes of the widget.
+
+This division into form on the one hand and style on the other was
+therefore necessary and fruitful, even though it is not entirely clear
+if the enormous growth of style information has pushed CSS or if CSS
+has pushed the growth of style information. Anyway, GTK has adopted
+CSS as well, although with some subtle differences:
+
+* In HTML/CSS size related and position properties (like height and width)
+  could be defined in HTML as well as in CSS. In GTK these properties can
+  only be defined in XML but not in CSS.
+* In HTML/CSS style related and position properties (like colors)
+  could be defined in HTML as well as in CSS. In GTK these properties can
+  only be defined in CSS but not in XML.
+
+The use of CSS with ⎕GTK requires 3 things:
+
+1. a suitable APL string CSS (either a filename or file content as for XML),
+2. dyadic *H←CSS ⎕GTK XML* instead of monadic *H←⎕GTK XML*, and
+3. possibly a relation between the widgets defined in XML and the styles
+   defined in CSS.
+
+The CSS is a sequence of statements with the following simple syntax:
+
+----
+Selector(s) { style attrbutes... }
+----
+
+The style attributes define how a widget looks like (color, borders, etc.),
+while the selectors define which widgets should have the style attributes.
+The selectors as well as the style attributes can be used in multiple CSS
+statments. The key to success with CSS is to keep matters simple, and
+therefore it is better to have fewer selectors and style attributes
+than more by splitting bigger statements into a sequence of smaller ones.
+More details can be found here:
+
+https://docs.gtk.org/gtk3/css-overview.html
+
+Lets start simple (with variable XML as above):
+
+----
+      CSS ← """
+window { background: #FF0; }
+
+/* all widgets of (style-) class button */
+button       { color: white; background-color: blue }
+            """
+
+     (36 ⎕CR CSS) ⎕GTK (36 ⎕CR XML)
+----
+
+Not too surprisingly this shows:
+
+image::glade-11.png[]
+
+The selectors *window* and *button* in the CSS above are (style-) class
+selectors, which means that all widgets of the respective class will have
+the dtylr (i.e. colors) above. For the top-level window that is normally
+not a problem because there is only one. For buttons it is more likely
+that there is more than one (e.g. a CANCEL button in a different color).
+
+In order to have different colors for different buttons, we need a way
+to distinguish them. The simplest way to distinguish widgets is to give
+them names (in XML). Naming a widget uses the property called "name" in
+XML, the value of that property (e.g. *Bn-OK* below) must then be prefixed
+with *#* in CSS to refer to the widget with that name:
+
+----
+In XML:
+          <object class="GtkButton">
+            <property name="label">OK</property>
+            <property name="name">Bn-OK</property>
+            ...                   ──┬──
+          </object>                 │
+                                    │
+In CSS:                             │
+   ┌────────────────────────────────┘
+   │
+ ──┴──
+#Bn-OK           { color: #000; background-color: #3E3; }   /* button */
+#Bn-OK label     { color: #000; background-color: #3E3; }   /* button label */
+----
+
+You may wonder why there are CSS lines for the green OK button but only one
+for the blue class button. The reason is a little quirk in GTK (which will
+probably disappear at some point in time. A *button* is a widget that has an
+internal sub-widget of type *label* which holds the button text. As it
+happens, using a widget class as CSS selector selects the widgets of that
+class *inluding their sub-widgests* while a widget name as  CSS selector
+selects the widget(s) with that name *exluding their sub-widgests*.
+
+
+The entire application is now:
+
+----
+      )CLEAR
+CLEAR WS
+
+      XML←"""
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Generated with glade 3.22.1 -->
+<interface>
+  <requires lib="gtk+" version="3.20"/>
+  <object class="GtkWindow" id="window1">
+    <property name="title">MY-TITLE</property>
+    <property name="can_focus">False</property>
+    <property name="width_request">400</property>
+    <property name="height_request">200</property>
+    <child>
+      <object class="GtkFixed">
+        <property name="visible">True</property>
+        <child>
+          <object class="GtkButton">
+            <property name="name">Bn-OK</property>
+            <property name="label">OK</property>
+            <property name="visible">True</property>
+            <property name="width_request">80</property>
+            <property name="height_request">30</property>
+            <property name="halign">start</property>
+            <property name="valign">start</property>
+          </object>
+          <packing>
+            <property name="x">160</property>
+            <property name="y">150</property>
+          </packing>
+        </child>
+      </object>
+    </child>
+  </object>
+</interface>
+          """
+
+      CSS ← """
+window { background: #FFF; }
+
+/* all buttons of class button */
+button       { color: white; background-color: blue }
+button:hover { font-weight: bold;    }
+
+#Bn-OK           { color: #000; background-color: #3E3; }   /* button */
+#Bn-OK label     { color: #000; background-color: #3E3; }   /* button label */
+            """
+
+   ⎕GTK 3 ◊ ⊣ (36 ⎕CR CSS) ⎕GTK (36 ⎕CR XML) ◊ ⊣ ⎕DL 2.0
+----
+
+It produces:
+
+image::glade-12.png[]
+
+=== 8.8 Handling Events
+
+A button defined so far is alive in the sense that it changes its font weight
+when the mouse is moved over it (by virtue of the CSS *button:hover* style,
+but has no connectin to APL yet. Let's say we want to close the window when
+the OK button is being pushed. This almost inevitably requires some sort of
+waiting loop (where APL waits for the user to press the OK button).
+
+Before APL can receive events such as user clicks on a button, these event.
+must be forwarded to APL. Without that, events remain inside GTK (so the
+button looks alive and, with the CSS above, changes its font when the mouse
+moves over it) but APL will not be notified. We therefore have to connect the
+event we are interested in to a handler that forwards it to APL. This is done
+in the same way as in glade:
+
+----
+          <object class="GtkButton">
+            <property name="label">OK</property>
+            <property name="name">Bn-OK</property>
+            ...
+            <signal name="clicked" handler="clicked"/>
+          </object>
+----
+
+NOTE: At least the author frequently forgets the <signal ... /> entry in the
+XML of the object that sends the event and then wonders what is wrong.
+
+After that, there are a number of ways as to how to process the events
+received from the GUI in APL. A rather simple but crude way is to way for
+any event from GTK without checking it. A general problem with events is
+that if you wait for a specific event, then before that event there could
+be other events so that the waiting must be repeated. This repetition
+almost inevitably requires a defined function (or at least a lambda) because
+loops cannot be defined in immediate execution mode (and hence in APL
+scripts). At least in standard APL (but see below for GNU APL).
+
+----
+      Event←⎕GTK 1   ⍝ blocking wait for any (!) event from GTK
+      H ⎕GTK 0       ⍝ close the window
+----
+
+The event received from a button click is a 3-item vector like this:
+
+----
+┌→──────────────────┐
+│7 ┌→────┐ ┌→──────┐│
+│  │Bn-OK│ │clicked││
+│  └─────┘ └───────┘│
+└ϵ──────────────────┘
+----
+
+The components are:
+
+* The handle for the Gtk window (integer)
+* the name of the widget sending the event (APL string), and
+* the name of the event.
+
+
+----
+      4 ⎕CR Event
+
+----
+
+=== 8.9 Summary
+
+The sections above have hopefully touched upon all topics that may occur when
+designing GUIs with ⎕GTK. By combining these simple steps it should be
+straightforward to construct more advanced GUIs. Before starting from scratch,
+though, it may be worthwile to have a look at the workspace
+*workspaces/SQL_GUI.apl* which is shipped with GNU APL. This workspace
+contains several examples of using ⎕GTK (and also ⎕SQL) that could be
+copied into your own application.
+
+
+[[TAG_appendix]]
+== A. Appendix
+=== A.1 The ⎕GTK Cheat Sheet
+
+In the Table 2 below, it is assumed that:
+
+----
+      ⍝ H is a window handle (from some H ← Zh←⎕GTK "filename.ui")
       ⍝ ID is a string containing the id= property of some widget in filename.ui
-      H_ID ← H, ID   ⍝ e.g.  6,"entry1"; H_ID uniquely identifies a widget
+      ⍝ H_ID ← H, ID   ⍝ e.g.  6,"entry1". H_ID uniquely identifies a widget
 ----
 
 [[Tag_table2]]
@@ -1048,25 +1873,53 @@ include::../src/Gtk/Gtk_functions.asciidoc[]
 
 |===============
 
-*⎕GTK 1* and *⎕GTK 2* return events according to Table 3 below. The elements
-of the events have the following meaning:
+WARNING: In Table 2 above, ⎕GTK functions with axis argument, are *widget
+functions*. The axis argument *H_ID* combines the numeric handle *H* (returned
+from some *H←⎕GTK filename.ui* with a widget id *ID* specified in that
+*filename.ui* as to uniquely identify a widget on the screen (either a top-level
+window or a widget inside some other widget).  The functions without axis
+arguments are *generic* and control ⎕GTK itself rather than a widget
+displayed by ⎕GTK. The mandatory right argument B of almost all ⎕GTK calls
+is either a function number (APL integer scalar) or a function name (APL
+string). The function numbers of generic functions are assigned by GNU APL
+and will be maintained in a backward-compatible fashion. In contrst, the
+numbers for widget functions, are automatically generated from the source
+files of the GTK libraries and are highly volatile. These numbers differ
+on different platforms, between different GTK library versions, and even
+between different SVN versions of GNU APL. For this reason (and for the sake
+of portability of GNU APL workspaces, you should *never use numbers for widget
+functions* even though they are somewhat easier to enter. BTW: the Gtk_server
+can be started from the command line like: *Gtk_server --numbers* and then
+displays the mapping between widget functioin numbers and function names (of
+that Gtk_server).
 
-* Gi (integer): the handle (= Gtk_server instance) on which the event was
-  received (the handle was returned by *⎕GTK "file.ui"*).
-* Ns (string): the widget property *Widget Name* (if provided in the glade tab
-  *Common*), or *""* if not provided.
-* Es (string): The event (callback name), for example "clicked"
-* Is (string): The ID of the widget that has sent the event (in glade tab
-  *General*)
-* Cs (string): The Gtk class of the widget that has sent the event
+The functions *⎕GTK 1* and *⎕GTK 2* return an event vector according to
+Table 3 below. The elements of this event vector have the following meaning:
+
+* *Hi* (APL integer): the handle (= Gtk_server instance) on which the event was
+  received. The handle was returned by some *⎕GTK "file.ui"* or
+  *CSS ⎕GTK "file.ui").
+* *Ns* (nested APL string): the *Widget Name* (if provided: in glade tab
+  *Common* or by object property *name* in XML). *""* if not provided.
+* *Es* (APL string): The event (callback name), for example: *"clicked"* when
+  a button was pushed.
+* *Is* (APL string): The ID of the widget that has sent the event (if
+  provided: in glade tab *General* or XML attribute *"id="* in the start tag
+  <object ...> of the widget). *""* if not provided.
+* *Cs* (string): The *Gtk class* of the widget that has sent the event, for
+ example: *"GtkButton"*.
+* *Xi* (APL integer): Mouse position X (pixels) of a mouse click
+* *Yi* (APL integer): Mouse position Y (pixels) of a mouse click
+* *Bi* (APL integer): Mouse button (1, 2, or 3) of a mouse click
+* *Li* (APL integer): Text row number of a mouse click (GtkTextView)
 
 [[Tag_table3]]
 .⎕GTK Events
 [options="header"]
-[cols="25, ^5, 28, 40"]
+[cols="15, 25, 45"]
 |===============
-| Callback (specified in *glade*) | argc
-| APL Structure of the *⎕GTK 1* Result
+| Callback (in *glade* or *XML*)
+| Items of *Z←⎕GTK 1*
 | APL Example of a *⎕GTK 1* Result
 include::../src/Gtk/Gtk_events2.asciidoc[]
 
@@ -1141,7 +1994,7 @@ commands.
 With *glade* it is possible to design a single GUI that contains multiple
 top-level windows or no top-level window. However, ⎕GTK currently supports
 only GUIs with one top-level widget of type "Window (the first widget in the
-top-level group).
+top-level group in glade).
 
 
 === References

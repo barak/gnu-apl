@@ -75,24 +75,24 @@ ul.no-bullet {list-style: none}
   <ul class="no-bullet">
     <li><a name="toc-APL-Scripting" href="#Section-2_002e1">2.1 APL Scripting</a>
     <ul class="no-bullet">
-      <li><a name="toc-redirect-the-script-file-the-stdin-of-the-GNU-APL-interpreter" href="#redirect-the-script-file-the-stdin-of-the-GNU-APL-interpreter">2.1.1 redirect the script file the stdin of the GNU APL interpreter</a></li>
-      <li><a name="toc-Make-the-script-file-executable" href="#Make-the-script-file-executable">2.1.2 Make the script file executable</a></li>
-      <li><a name="toc-How-command-line-arguments-are-handled" href="#How-command-line-arguments-are-handled">2.1.3 How command line arguments are handled</a></li>
-      <li><a name="toc-Helpful-Features-for-Scripting" href="#Helpful-Features-for-Scripting">2.1.4 Helpful Features for Scripting</a>
+      <li><a name="toc-Redirect-the-script-file-to-the-stdin-of-the-GNU-APL-interpreter" href="#Subsection-2_002e1_002e1">2.1.1 Redirect the script file to the stdin of the GNU APL interpreter</a></li>
+      <li><a name="toc-Make-the-script-file-executable" href="#Subsection-2_002e1_002e2">2.1.2 Make the script file executable</a></li>
+      <li><a name="toc-How-command-line-arguments-are-handled" href="#Subsection-2_002e1_002e3">2.1.3 How command line arguments are handled</a></li>
+      <li><a name="toc-Helpful-Features-for-Scripting" href="#Subsection-2_002e1_002e4">2.1.4 Helpful Features for Scripting</a>
       <ul class="no-bullet">
         <li><a name="toc-_005b_003f_005dARG" href="#g_t_005b_003f_005dARG">2.1.4.1 ⎕ARG</a></li>
         <li><a name="toc-_005b_003f_005dENV" href="#g_t_005b_003f_005dENV">2.1.4.2 ⎕ENV</a></li>
         <li><a name="toc-_005b_003f_005dINP" href="#g_t_005b_003f_005dINP">2.1.4.3 ⎕INP</a></li>
       </ul></li>
-      <li><a name="toc-Double_002dquoted-Strings" href="#Double_002dquoted-Strings">2.1.5 Double-quoted Strings</a></li>
-      <li><a name="toc-Multi_002dLine-Strings" href="#Multi_002dLine-Strings">2.1.6 Multi-Line Strings</a>
+      <li><a name="toc-Double_002dquoted-Strings" href="#Subsection-2_002e1_002e5">2.1.5 Double-quoted Strings</a></li>
+      <li><a name="toc-Multi_002dLine-Strings" href="#Subsection-2_002e1_002e6">2.1.6 Multi-Line Strings</a>
       <ul class="no-bullet">
         <li><a name="toc-Old_002dstyle-Multi_002dLine-Strings" href="#Old_002dstyle-Multi_002dLine-Strings">2.1.6.1 Old-style Multi-Line Strings</a></li>
         <li><a name="toc-New_002dstyle-Multi_002dLine-Strings" href="#New_002dstyle-Multi_002dLine-Strings">2.1.6.2 New-style Multi-Line Strings</a></li>
         <li><a name="toc-_00ab-_00bb-Strings" href="#g_t_00ab-_00bb-Strings">2.1.6.3 « » Strings</a></li>
       </ul></li>
-      <li><a name="toc-Automatic-_0029MORE" href="#Automatic-_0029MORE">2.1.7 Automatic )MORE</a></li>
-      <li><a name="toc-Script-Example" href="#Script-Example">2.1.8 Script Example</a></li>
+      <li><a name="toc-Automatic-_0029MORE" href="#Subsection-2_002e1_002e7">2.1.7 Automatic )MORE</a></li>
+      <li><a name="toc-Script-Example" href="#Subsection-2_002e1_002e8">2.1.8 Script Example</a></li>
     </ul></li>
     <li><a name="toc-Axis-argument-in-defined-functions" href="#Section-2_002e2">2.2 Axis argument in defined functions</a></li>
     <li><a name="toc-Colored-Output" href="#Section-2_002e3">2.3 Colored Output</a></li>
@@ -277,7 +277,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Chapter 1</a>, Up: <a href="
 <a name="GNU-APL"></a>
 <h1 class="top">GNU APL</h1>
 
-<p>December 8, 2022
+<p>December 24, 2022
 </p>
 <p>This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
@@ -1023,6 +1023,25 @@ Next: <a href="#Section-2_002e2" accesskey="n" rel="next">Section 2.2</a>, Up: <
 <a name="APL-Scripting"></a>
 <h3 class="section">2.1 APL Scripting</h3>
 
+<table class="menu" border="0" cellspacing="0">
+<tr><td align="left" valign="top">&bull; <a href="#Subsection-2_002e1_002e1" accesskey="1">Subsection 2.1.1</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Redirect the script file to the stdin of the GNU APL interpreter
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="#Subsection-2_002e1_002e2" accesskey="2">Subsection 2.1.2</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Make the script file executable
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="#Subsection-2_002e1_002e3" accesskey="3">Subsection 2.1.3</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">How command line arguments are handled
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="#Subsection-2_002e1_002e4" accesskey="4">Subsection 2.1.4</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Helpful Features for Scripting
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="#Subsection-2_002e1_002e5" accesskey="5">Subsection 2.1.5</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Double-quoted Strings
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="#Subsection-2_002e1_002e6" accesskey="6">Subsection 2.1.6</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Multi-Line Strings
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="#Subsection-2_002e1_002e7" accesskey="7">Subsection 2.1.7</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Automatic )MORE
+</td></tr>
+<tr><td align="left" valign="top">&bull; <a href="#Subsection-2_002e1_002e8" accesskey="8">Subsection 2.1.8</a>:</td><td>&nbsp;&nbsp;</td><td align="left" valign="top">Script Example
+</td></tr>
+</table>
+
 <p>As already mentioned, it is possible to write APL scripts. Similar to other
 script languages, an APL script is a text file whose first line is a
 &quot;shebang line&quot;, i.e. a line starting with <samp>#!</samp>, followed by the
@@ -1037,8 +1056,14 @@ file to stdin of the interpreter or making the script executable and indicate
 apl as the script interpreter (followed by some command line arguments for
 apl).
 </p>
-<a name="redirect-the-script-file-the-stdin-of-the-GNU-APL-interpreter"></a>
-<h4 class="subsection">2.1.1 redirect the script file the stdin of the GNU APL interpreter</h4>
+<hr>
+<a name="Subsection-2_002e1_002e1"></a>
+<div class="header">
+<p>
+Next: <a href="#Subsection-2_002e1_002e2" accesskey="n" rel="next">Subsection 2.1.2</a>, Up: <a href="#Section-2_002e1" accesskey="u" rel="up">Section 2.1</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+</div>
+<a name="Redirect-the-script-file-to-the-stdin-of-the-GNU-APL-interpreter"></a>
+<h4 class="subsection">2.1.1 Redirect the script file to the stdin of the GNU APL interpreter</h4>
 
 <p>A file, say SCRIPT.apl, can be redirected to apl by redirection of the shell:
 </p>
@@ -1052,6 +1077,12 @@ apl).
 redirection was performed by the shell running apl, while in the second case
 the redirecting of the file was performed by apl itself.
 </p>
+<hr>
+<a name="Subsection-2_002e1_002e2"></a>
+<div class="header">
+<p>
+Next: <a href="#Subsection-2_002e1_002e3" accesskey="n" rel="next">Subsection 2.1.3</a>, Previous: <a href="#Subsection-2_002e1_002e1" accesskey="p" rel="prev">Subsection 2.1.1</a>, Up: <a href="#Section-2_002e1" accesskey="u" rel="up">Section 2.1</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+</div>
 <a name="Make-the-script-file-executable"></a>
 <h4 class="subsection">2.1.2 Make the script file executable</h4>
 
@@ -1069,6 +1100,12 @@ echoing of stdin to stdout, automatic loading of a )CONTINUE workspaces,
 do not know in advance where the APL interpreter will be installed) then
 it must be in $PATH of the shell that runs the script.
 </p>
+<hr>
+<a name="Subsection-2_002e1_002e3"></a>
+<div class="header">
+<p>
+Next: <a href="#Subsection-2_002e1_002e4" accesskey="n" rel="next">Subsection 2.1.4</a>, Previous: <a href="#Subsection-2_002e1_002e2" accesskey="p" rel="prev">Subsection 2.1.2</a>, Up: <a href="#Section-2_002e1" accesskey="u" rel="up">Section 2.1</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+</div>
 <a name="How-command-line-arguments-are-handled"></a>
 <h4 class="subsection">2.1.3 How command line arguments are handled</h4>
 
@@ -1214,6 +1251,12 @@ which contain no whitespace:
 </li><li> <b>...</b>
 </li></ul>
 
+<hr>
+<a name="Subsection-2_002e1_002e4"></a>
+<div class="header">
+<p>
+Next: <a href="#Subsection-2_002e1_002e5" accesskey="n" rel="next">Subsection 2.1.5</a>, Previous: <a href="#Subsection-2_002e1_002e3" accesskey="p" rel="prev">Subsection 2.1.3</a>, Up: <a href="#Section-2_002e1" accesskey="u" rel="up">Section 2.1</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+</div>
 <a name="Helpful-Features-for-Scripting"></a>
 <h4 class="subsection">2.1.4 Helpful Features for Scripting</h4>
 
@@ -1325,6 +1368,12 @@ strings compared to standard APL, it has come to age and these days an even
 simpler feature - Multi-line strings as described below - is provided for the
 same purpose. The monadic ⎕INP has therefore become obsolete.
 </p>
+<hr>
+<a name="Subsection-2_002e1_002e5"></a>
+<div class="header">
+<p>
+Next: <a href="#Subsection-2_002e1_002e6" accesskey="n" rel="next">Subsection 2.1.6</a>, Previous: <a href="#Subsection-2_002e1_002e4" accesskey="p" rel="prev">Subsection 2.1.4</a>, Up: <a href="#Section-2_002e1" accesskey="u" rel="up">Section 2.1</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+</div>
 <a name="Double_002dquoted-Strings"></a>
 <h4 class="subsection">2.1.5 Double-quoted Strings</h4>
 
@@ -1344,6 +1393,12 @@ for control character, such as \n for ASCII line feed, \t for ASCII TAB etc.
 </li></ul>
 
 
+<hr>
+<a name="Subsection-2_002e1_002e6"></a>
+<div class="header">
+<p>
+Next: <a href="#Subsection-2_002e1_002e7" accesskey="n" rel="next">Subsection 2.1.7</a>, Previous: <a href="#Subsection-2_002e1_002e5" accesskey="p" rel="prev">Subsection 2.1.5</a>, Up: <a href="#Section-2_002e1" accesskey="u" rel="up">Section 2.1</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+</div>
 <a name="Multi_002dLine-Strings"></a>
 <h4 class="subsection">2.1.6 Multi-Line Strings</h4>
 
@@ -1517,6 +1572,7 @@ Hello world
 │└──────┘ └────────┘│
 └ϵ──────────────────┘
 
+      ⍝ provoke an error...
       8 ⎕CR «««
 →      Line 1
 →        Line 2
@@ -1529,7 +1585,19 @@ Hello world
 └ϵ──────────────────┘
 
 </pre>
-
+<p>Another advantage of ««« ... »»» over &quot;&quot;&quot; ... &quot;&quot;&quot; is that a decent text
+editor (read: vi/vim) may jump back and forth between the corresponding
+opening « and closing » with a single key stroke (character % in vi/vim).
+For this to work, add the following line to /etc/vim/vimrc (or ~/.vimrc):
+</p>
+<pre class="verbatim">set matchpairs+=«:»
+</pre>
+<hr>
+<a name="Subsection-2_002e1_002e7"></a>
+<div class="header">
+<p>
+Next: <a href="#Subsection-2_002e1_002e8" accesskey="n" rel="next">Subsection 2.1.8</a>, Previous: <a href="#Subsection-2_002e1_002e6" accesskey="p" rel="prev">Subsection 2.1.6</a>, Up: <a href="#Section-2_002e1" accesskey="u" rel="up">Section 2.1</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+</div>
 <a name="Automatic-_0029MORE"></a>
 <h4 class="subsection">2.1.7 Automatic )MORE</h4>
 
@@ -1582,6 +1650,12 @@ INDEX ERROR+
 )MORE information is displayed before the standard 3-line APL error message.
 </p>
 
+<hr>
+<a name="Subsection-2_002e1_002e8"></a>
+<div class="header">
+<p>
+Previous: <a href="#Subsection-2_002e1_002e7" accesskey="p" rel="prev">Subsection 2.1.7</a>, Up: <a href="#Section-2_002e1" accesskey="u" rel="up">Section 2.1</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+</div>
 <a name="Script-Example"></a>
 <h4 class="subsection">2.1.8 Script Example</h4>
 
@@ -3709,7 +3783,7 @@ Next: <a href="#Section-2_002e29" accesskey="n" rel="next">Section 2.29</a>, Pre
 <a name="g_t_005b_003f_005dGTK-_002d-GTK-Interface"></a>
 <h3 class="section">2.28 ⎕GTK - GTK Interface</h3>
 
-<p>GTK (Gimp Toolkit) is a rather powerful library for creating graphical user
+<p>GTK (Gimp ToolKit) is a rather powerful library for creating graphical user
 interfaces (GUIs). ⎕GTK makes a subset of the almost 10000 functions in the
 different GTK libraries available to GNU APL programs. With ⎕GTK a GNU APL
 program can, for example, replace the somewhat crude ⎕ or ⍞ input methods

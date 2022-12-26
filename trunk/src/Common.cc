@@ -36,6 +36,7 @@
 #include "Output.hh"
 #include "Parallel.hh"
 #include "ProcessorID.hh"
+#include "Quad_GTK.hh"
 #include "Quad_WA.hh"
 #include "Svar_DB.hh"
 #include "Symbol.hh"
@@ -181,6 +182,8 @@ cleanup(bool soft)
         Thread_context::cleanup();
 
         ID::cleanup();
+
+        Quad_GTK::close_all_windows();
       }
    else        // minimal clean-up
       {

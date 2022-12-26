@@ -25,6 +25,10 @@ dist_doc_DATA = \
     glade-2.png          \
     glade-3.png          \
     glade-4.png          \
+    glade-5.png          \
+    glade-6.png          \
+    glade-7.png          \
+    glade-8.png          \
     APL1.png             \
     APL2.png             \
     APL3.png             \
