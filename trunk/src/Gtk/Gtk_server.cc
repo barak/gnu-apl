@@ -308,7 +308,6 @@ const bool from_file = !strchr(gui, UNI_LF);
 
    // insert objects into id_db...
    //
-GtkWidget * clicker = 0;
    for (_ID_DB * entry = id_db; entry; entry = entry->next)
        {
          const char * id = entry->xml_id;
@@ -316,38 +315,35 @@ GtkWidget * clicker = 0;
          // the id= attribute of an object is optional (e.g. not needed for
          // read-only labels). Ignore such objects.
          //
-         if (!*id)   continue;
-         if (!strncmp(id, "adjustment", 10))   continue;   // ignore
+         if (!*id)                             continue;   // ignore
 
-          if (GObject * obj = gtk_builder_get_object(builder, id))
-             {
-               // a widget name xxx-MOUSE indicates that mouse clicks shall
-               // be reported to APL
-               if (strstr(gtk_widget_get_name(GTK_WIDGET(obj)), "-MOUSE"))
-                  {
-                    clicker = GTK_WIDGET(obj);
-                  }
-               verbosity > 0 && cerr <<
+         if (GObject * obj = gtk_builder_get_object(builder, id))
+            {
+              // Ignore non-widgets
+              //
+              if (!GTK_IS_WIDGET(obj))        continue;   // ignore
+
+              // enable mouse click events (they wont do anything unless
+              // connected with <signal ...> in XML
+              //
+              gtk_widget_add_events(GTK_WIDGET(obj), GDK_BUTTON_PRESS_MASK);
+
+              verbosity > 0 && cerr <<
                   "map glade id= '" << id << "' to GObject "
                                  << reinterpret_cast<const void *>(obj) << endl;
-               entry->obj = obj;
-               adjust_object(obj);
-             }
-           else
-             {
-               cerr << "Gtk_server: object '" << id
-                    << "' not found (by gtk_builder)" << endl;
-             }
+              entry->obj = obj;
+              adjust_object(obj);
+            }
+         else
+            {
+              cerr << "Gtk_server: object '" << id
+                   << "' not found (by gtk_builder)" << endl;
+            }
        }
 
    // connect the <signal ...>  in .ui
    //
    gtk_builder_connect_signals(builder, /* user_data */ NULL);
-
-   if (clicker)
-      {
-        gtk_widget_add_events(clicker, GDK_BUTTON_PRESS_MASK);
-      }
 
    verbosity > 0 && cerr << "GUI signals connected.\n";
 }
@@ -532,8 +528,8 @@ static cmd_6_select_widget(const char * id)
 {
   assert(builder);
   selected = gtk_builder_get_object(builder, id);
-   if (!selected)
-      cerr << "cmd_6_select_widget(id='" << id << "') failed" << endl;
+  if (!selected)
+     cerr << "cmd_6_select_widget(id='" << id << "') failed" << endl;
 }
 //-----------------------------------------------------------------------------
 enum Gtype
@@ -708,43 +704,57 @@ char TLV[TLV_len + 1];
 inline gdouble S2F(const gchar * s) { return strtod(s, 0); }
 inline long    S2I(const gchar * s) { return strtol(s, 0, 10); }
 
-static gchar * F2S(gdouble d)
+//-----------------------------------------------------------------------------
+static const gchar *
+S2S(const gchar * str)
+{
+static gchar buffer[100];
+unsigned int len = snprintf(buffer, sizeof(buffer) - 1, "s%s", str);
+   buffer[len] = 0;   // just in case
+   return buffer;
+}
+static const gchar *
+F2S(gdouble d)
 {
 static gchar buffer[40];
-unsigned int len = snprintf(buffer, sizeof(buffer) - 1, "%lf", d);
+unsigned int len = snprintf(buffer, sizeof(buffer) - 1, "f%lf", d);
    if (len >= sizeof(buffer))   len = sizeof(buffer) - 1;
-   buffer[len] = 0;
+   buffer[len] = 0;   // just in case
 
  return buffer;
 }
 
-static gchar * I2S(gint i)
+static const gchar *
+I2S(gint i)
 {
 static gchar buffer[40];
-unsigned int len = snprintf(buffer, sizeof(buffer) - 1, "%ld",
+unsigned int len = snprintf(buffer, sizeof(buffer) - 1, "f%ld",
                             static_cast<long>(i));
    if (len >= sizeof(buffer))   len = sizeof(buffer) - 1;
-   buffer[len] = 0;
+   buffer[len] = 0;   // just in case
 
  return buffer;
 }
-
+//-----------------------------------------------------------------------------
 // APL string → Gtk type
 #define arg_V(X)
 #define arg_S(X) , X
 #define arg_F(X) , S2F(X)
 #define arg_I(X) , S2I(X)
 
-// GTK enums (#defines arg_XXX for every enum XXXX
+// GTK enums (#lso defines arg_XXX for every enum XXXX
 #include "Gtk_enum_map.def"
 
+/// macros to convert string argument declarations in macro gtk_fun_def()
+/// into C function call arguments
 #define TLV_arg_V , ""
 #define TLV_arg_S , res
 #define TLV_arg_F , res
 #define TLV_arg_I , res
 
+/// macros to convert C function results in macro gtk_fun_def() into string
 #define result_V(fcall) fcall;
-#define result_S(fcall) const gchar * res = fcall;
+#define result_S(fcall) const gchar * res = S2S(fcall);
 #define result_F(fcall) const gchar * res = F2S(fcall);
 #define result_I(fcall) const gchar * res = I2S(fcall);
 
@@ -945,10 +955,21 @@ char * V = TLV + 8;                  // the V part of the TLV buffer
     _help                                     (in asciidoc, not used here)
                 ***/
 
-#define gtk_fun_def(glade_ID, gtk_class, gtk_function,  Z, A)                 \
+/*
+  #define one switch case, e.g.
+
+  gtk_fun_def(button, GtkButton, get_label, S, V)
+
+  case Command_GtkButton_get_label:
+       { GtkButton * widget = reinterpret_cast<GtkButton *>(selected);
+         result_S(gtk_ button_get_label(widget arg_V));
+         send_TLV(response_tag TLV_arg_S);
+       } continue;
+*/
+#define gtk_fun_def(ID_prefix, gtk_class, gtk_function,  Z, A)                 \
          case Command_ ## gtk_class ## _ ## gtk_function:                     \
 { gtk_class * widget = reinterpret_cast<gtk_class *>(selected);               \
-  result_ ## Z(gtk_ ## glade_ID ## _ ## gtk_function(widget arg_ ## A(V)));   \
+  result_ ## Z(gtk_ ## ID_prefix ## _ ## gtk_function(widget arg_ ## A(V)));   \
   send_TLV(response_tag TLV_arg_ ## Z);                                       \
 }               continue;
 
@@ -1448,7 +1469,7 @@ const int line = gtk_text_iter_get_line(&iter_buffer_Y);
    gtk_text_buffer_get_iter_at_line(buffer, &iter_buffer_Y1, line + 1);
    gtk_text_buffer_select_range(buffer, &iter_buffer_Y, &iter_buffer_Y1);
 
-   // send the event to APL...
+   // send the event to APL... Receiver is Quad_GTK::read_fd()
    //
 char data[100];
 const char * name = gtk_widget_get_name(GTK_WIDGET(tview));

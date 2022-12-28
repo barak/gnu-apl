@@ -288,15 +288,13 @@ SymbolTable::write_all_symbols(FILE * out, uint64_t & seq) const
 void
 SymbolTable::erase_symbols(ostream & out, const UCS_string_vector & symbols)
 {
-int error_count = 0;
+size_t error_count = 0;
    loop(s, symbols.size())
        {
-         const bool error = erase_one_symbol(symbols[s]);
-         if (error)
+         if (erase_one_symbol(symbols[s]))
             {
+              if (error_count == 0)   out << "NOT ERASED:";
               ++error_count;
-              if (error_count == 1)   // first error
-                 out << "NOT ERASED:";
               out << " " << symbols[s];
             }
        }
@@ -377,7 +375,7 @@ Symbol * symbol = lookup_existing_symbol(sym);
    if (symbol->value_stack.size() != 1)
       {
         MORE_ERROR() << "Can't )ERASE symbol '" << sym
-                     << "': symbol is pushed (localized)";
+                     << "': symbol is localized";
         return true;
       }
 

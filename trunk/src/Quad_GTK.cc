@@ -60,8 +60,9 @@ Quad_GTK::eval_AB(Value_P A, Value_P B) const
 
    if (!B->is_int_scalar())
       {
-        MORE_ERROR() << "A ⎕GTK B expects B to be an integer scalar"
-                        " or a text vector";
+        MORE_ERROR() <<
+"A ⎕GTK B expects an integer scalar B (function number)\n"
+"      or a text vector B (XML filename or string";
         DOMAIN_ERROR;
       }
 
@@ -94,6 +95,18 @@ int fd = -1;
                 }
              return Token(TOK_APL_VALUE1, IntScalar(0, LOC));
 
+        case 5: // function name for function number A
+             if (A->is_scalar())
+                return Token(TOK_APL_VALUE1, fnum_to_function_name(
+                                     Fnum(A->get_cscalar().get_int_value())));
+             RANK_ERROR;
+
+        case 6: // widget class for function number A
+             if (A->is_scalar())
+                return Token(TOK_APL_VALUE1, fnum_to_widget_class(
+                                     Fnum(A->get_cscalar().get_int_value())));
+             RANK_ERROR;
+
         default: MORE_ERROR() << "Invalid function number Bi=" << function
                               << " in A ⎕GTK Bi";
                  DOMAIN_ERROR;
@@ -115,21 +128,24 @@ Quad_GTK::eval_B(Value_P B) const
 
    if (B->get_rank() > 1)   RANK_ERROR;
 
-   if (B->element_count() == 0)   // GTK gelp
+   if (B->element_count() == 0)   // empty B: print GTK help
       {
         COUT <<
 "   ⎕GTK Usage:\n"
 "\n"
 "   H←    ⎕GTK XML   ⍝ with string XML (filename or content): open window\n"
 "   H←CSS ⎕GTK XML   ⍝ with strings CSS and XML: open window with styles CSS\n"
-"       H ⎕GTK 0     ⍝ close the window with handle H\n"
-"       H ⎕GTK 3     ⍝ increase the (debug-) for the window with handle H\n"
-"       H ⎕GTK 3     ⍝ decrease the (debug-) for the window with handle H\n"
+"       H ⎕GTK 0     ⍝ close the ⎕GTK window with handle H\n"
+"       H ⎕GTK 3     ⍝ increase the (debug-) verbosity for window handle H\n"
+"       H ⎕GTK 4     ⍝ decrease the (debug-) verbosity for window handle H\n"
+"   Z←  A ⎕GTK 5     ⍝ Z is the function name for function number A\n"
+"   Z←  A ⎕GTK 6     ⍝ Z is the widget class for function number A\n"
 "   Z←    ⎕GTK 0     ⍝ list Z of open ⎕GTK handles\n"
-"   E←    ⎕GTK 1     ⍝ wait for GTK Event E (blocking)\n"
-"   E←    ⎕GTK 2     ⍝ poll for GTK Event E (non-blocking)\n"
-"         ⎕GTK 3     ⍝ focus_on_map (subsequent windows will have the focus)\n"
-"         ⎕GTK 4     ⍝ clear focus_on_map\n"
+"   E←    ⎕GTK 1     ⍝ wait for next GTK Event E (blocking)\n"
+"   E←    ⎕GTK 2     ⍝ poll for next GTK Event E (non-blocking)\n"
+"         ⎕GTK 3     ⍝ close all open ⎕GTK windows"
+"         ⎕GTK 4     ⍝ focus_on_map (subsequent windows will grab the focus)\n"
+"         ⎕GTK 5     ⍝ clear focus_on_map (APL will remain focused)\n"
              ;
 
         return Token(TOK_APL_VALUE1, Idx0(LOC));
@@ -144,8 +160,9 @@ Quad_GTK::eval_B(Value_P B) const
 
    if (!B->is_int_scalar())
       {
-        MORE_ERROR() << "⎕GTK B expects B to be an integer scalar"
-                        " or a text vector";
+        MORE_ERROR() <<
+"⎕GTK B expects an integer scalar B (function number)\n"
+"      or a text vector B (XML filename or string";
         DOMAIN_ERROR;
       }
 
@@ -215,11 +232,21 @@ const int function = B->get_cfirst().get_int_value();
                return Token(TOK_APL_VALUE1, Z);
              }
 
-        case 3: // set focus_on_map
+        case 3: // close all open windowa
+             {
+               Value_P Z(open_windows.size(), LOC);
+               loop(w, open_windows.size())
+                  Z->next_ravel_Int(open_windows[w].fd);
+               close_all_windows();
+               Z->check_value(LOC);
+               return Token(TOK_APL_VALUE1, Z);
+             }
+
+        case 4: // set focus_on_map
              focus_on_map = true;
              return Token(TOK_APL_VALUE1, IntScalar(0, LOC));
 
-        case 4: // clear focus_on_map (default)
+        case 5: // clear focus_on_map (default)
              focus_on_map = false;
              return Token(TOK_APL_VALUE1, IntScalar(0, LOC));
 
@@ -273,8 +300,9 @@ Fnum fun = FNUM_INVALID;
    else if (B->is_char_string())   fun = resolve_fun_name(widget_id, B.get());
    else
       {
-        MORE_ERROR() << "A ⎕GTK[X] B expects B to be an integer scalar"
-                        " or a text vector";
+        MORE_ERROR() <<
+"A ⎕GTK B expects an integer scalar B (function number)\n"
+"      or a text vector B (XML filename or string";
         DOMAIN_ERROR;
       }
 
@@ -286,22 +314,22 @@ Gtype Atype = gtype_V;   // assume void
 
    switch(fun)
       {
-         case FNUM_INVALID: DOMAIN_ERROR;
-         case FNUM_0:   return Token(TOK_APL_VALUE1, IntScalar(fd, LOC));
+        case FNUM_INVALID: DOMAIN_ERROR;
+        case FNUM_0:   return Token(TOK_APL_VALUE1, IntScalar(fd, LOC));
 
 #define gtk_event_def(ev_ename, ...)
-#define gtk_fun_def(glade_ID, gtk_class, gtk_function, _Z, A)               \
-         case FNUM_ ## gtk_class ## _ ## gtk_function:                      \
-              command_tag = Command_ ## gtk_class ## _ ## gtk_function;     \
-              response_tag = Response_ ## gtk_class ## _ ## gtk_function;   \
-              Atype = get_gtype(#A);                                        \
-              break;
+#define gtk_fun_def(ID_prefix, gtk_class, gtk_function, _Z, A)               \
+        case FNUM_ ## gtk_class ## _ ## gtk_function:                      \
+             command_tag = Command_ ## gtk_class ## _ ## gtk_function;     \
+             response_tag = Response_ ## gtk_class ## _ ## gtk_function;   \
+             Atype = get_gtype(#A);                                        \
+             break;
 #include "Gtk/Gtk_map.def"
 
-         default:
-              MORE_ERROR() << "Bad function B in A ⎕GTK B (B='"
-                           << *B << ", fun=" << fun;
-              DOMAIN_ERROR;
+        default:
+             MORE_ERROR() << "Bad function B in A ⎕GTK B (B='"
+                          << *B << ", fun=" << fun;
+             DOMAIN_ERROR;
       }
 
    if (Atype == gtype_V)    VALENCE_ERROR;
@@ -371,7 +399,7 @@ Gtype Atype = gtype_V;
            return Token(TOK_APL_VALUE1, IntScalar(fd, LOC));
 
 #define gtk_event_def(ev_ename, ...)
-#define gtk_fun_def(glade_ID, gtk_class, gtk_function, _Z, A)               \
+#define gtk_fun_def(ID_prefix, gtk_class, gtk_function, _Z, A)               \
          case FNUM_ ## gtk_class ## _ ## gtk_function:                      \
               command_tag = Command_ ## gtk_class ## _ ## gtk_function;     \
               response_tag = Response_ ##gtk_class ## _ ## gtk_function;   \
@@ -382,7 +410,7 @@ Gtype Atype = gtype_V;
 
    if (Atype != gtype_V)   VALENCE_ERROR;
 
-   write_TL0(fd, command_tag);   // command
+   write_TL0(fd, command_tag);   // send command to TLV_server
    return Token(TOK_APL_VALUE1, poll_response(fd, response_tag));
 }
 //----------------------------------------------------------------------------
@@ -408,15 +436,21 @@ const int TLV_tag = (TLV[0] & 0xFF) << 24 | (TLV[1] & 0xFF) << 16
                   | (TLV[2] & 0xFF) <<  8 | (TLV[3] & 0xFF);
 
 
-const int V_len = (TLV[4] & 0xFF) << 24 | (TLV[5] & 0xFF) << 16
-                | (TLV[6] & 0xFF) <<  8 | (TLV[7] & 0xFF);
+const uint32_t V_len = (TLV[4] & 0xFF) << 24 | (TLV[5] & 0xFF) << 16
+                     | (TLV[6] & 0xFF) <<  8 | (TLV[7] & 0xFF);
 
    Assert(rx_len == (V_len + 8));
 
 char * V = TLV + 8;
-   V[V_len] = 0;
+   V[V_len] = 0;   // avoid trouble
 
-   // 1. check for events from generic_callback()
+   // 1. check for events from generic_callback() or other callbacks
+   //    in Gtk_serverc.cc. The cases are:
+   //
+   // 1a. a widget without an ID,
+   // 1b. a widget with ID and class,
+   // 1c. the top-level windows was closed, or
+   // 1d. a row_selected in a textview
    //
    if (TLV_tag == Event_widget_fun           ||   // "H:button1:clicked"
        TLV_tag == Event_widget_fun_id_class  ||   // dito + :id:class
@@ -424,28 +458,37 @@ char * V = TLV + 8;
        TLV_tag == Event_widget_ev_X_Y_B_L)        // dito + X/Y, Button, Line
       {
         // V is a string of the form H%s:%s:%s:% where H is a placeholder
-        // for the fd over which we have received V.
+        // for the fd over which we have received V (which Gtk_server cannot
+        // know).
         //
-        // replace H by the actual fd and store the result in event_queue.
+        // replace placeholder H with the actual fd and store the result
+        // in event_queue.
         //
         UTF8_string data_utf;   // H:widget:callback
         loop(v, V_len)   data_utf += V[v];
         UCS_string data_ucs(data_utf);
-        data_ucs[0] = (Unicode(fd));
+        data_ucs[0] = Unicode(fd);
 
         event_queue.push_back(data_ucs);
 
         return Value_P();   // i.e. NULL
       }
 
-   if (tag == -1)   // not waiting for a specific tag
+   if (tag == -1)   // we not waiting for a specific tag (= function result)
       {
+        // unexpected, so we complain unconditionally.
         CERR << "*** ⎕GTK: ignoring event: " << V << endl;
         return Value_P();   // i.e. NULL
       }
 
+   if (V_len == 0)   // result of void function()
+      {
+        return Idx0(LOC);   // fo not: Value_P()
+      }
+
    if (TLV_tag != tag)
       {
+        // unexpected, so we complain unconditionally.
         CERR << "Got unexpected tag " << TLV_tag
              << " when waiting for response " << tag << endl;
         return Value_P();
@@ -455,15 +498,94 @@ char * V = TLV + 8;
    // Response_0 (= 2000) from the TLV_tag to get the function number
    // and return APL vector function,"result-value"
    //
-UTF8_string utf;
-   loop(u, V_len)   utf += V[u];
-   UCS_string ucs(utf);
+const UTF8 Z_type = V[0];   // s, d, or f like conversion char in sprintf()
+   if (Z_type == 'd')   // integer
+      {
+        Value_P Z(2, LOC);
+        Z->next_ravel_Int(TLV_tag - Response_0);   // function that sent V
+        Z->next_ravel_Int(strtol(V + 1, 0, 10));   // function result
+        Z->check_value(LOC);
+        return  Z;
+      }
 
-Value_P Z(1 + ucs.size(), LOC);
-   Z->next_ravel_Int(TLV_tag - Response_0);
-   loop(u, ucs.size())   Z->next_ravel_Char(ucs[u]);
-   Z->check_value(LOC);
-   return  Z;
+   if (Z_type == 'f')   // double
+      {
+        Value_P Z(2, LOC);
+        Z->next_ravel_Int(TLV_tag - Response_0);   // function that sent V
+        Z->next_ravel_Float(strtod(V + 1, 0));     // function result
+        Z->check_value(LOC);
+        return  Z;
+      }
+
+   if (Z_type == 's')   // string
+      {
+        const UTF8_string utf(V + 1);
+        const UCS_string ucs(utf);
+
+        Value_P Z(1 + ucs.size(), LOC);
+        Z->next_ravel_Int(TLV_tag - Response_0);
+        loop(u, ucs.size())   Z->next_ravel_Char(ucs[u]);
+        Z->check_value(LOC);
+        return  Z;
+      }
+
+  FIXME;
+}
+//----------------------------------------------------------------------------
+Value_P
+Quad_GTK::fnum_to_function_name(Fnum fnum)
+{
+const char * fname = 0;
+   switch(fnum)
+      {
+        case FNUM_INVALID:         break;
+        case FNUM_0:               break;
+#define gtk_event_def(ev_ename, ...)
+#define gtk_fun_def(_ID_prefix, gtk_class, gtk_function, _Z,_A)   \
+        case FNUM_ ## gtk_class ## _ ## gtk_function:             \
+           fname = #gtk_function;   break;
+#include "Gtk/Gtk_map.def"
+      }
+
+   if (fname)   // found
+      {
+        const UTF8_string fname_utf(fname);
+        const UCS_string fname_ucs(fname_utf);
+
+        Value_P Z(fname_ucs, LOC);
+        return Z;
+      }
+
+   MORE_ERROR() << "A ⎕GTK 5: Invalid function number A=" << fnum;
+   DOMAIN_ERROR;
+}
+//----------------------------------------------------------------------------
+Value_P
+Quad_GTK::fnum_to_widget_class(Fnum fnum)
+{
+const char * cname = 0;
+   switch(fnum)
+      {
+        case FNUM_INVALID:         break;
+        case FNUM_0:               break;
+#define gtk_event_def(ev_ename, ...)
+#define gtk_fun_def(_ID_prefix, gtk_class, gtk_function, _Z,_A)   \
+        case FNUM_ ## gtk_class ## _ ## gtk_function:             \
+           cname = #gtk_class;   break;
+#include "Gtk/Gtk_map.def"
+      }
+
+   if (cname)   // found
+      {
+        const UTF8_string cname_utf(cname);
+        const UCS_string cname_ucs(cname_utf);
+
+        Value_P Z(cname_ucs, LOC);
+        return Z;
+      }
+
+   MORE_ERROR() << "A ⎕GTK 6: Invalid function number A=" << fnum;
+   DOMAIN_ERROR;
 }
 //----------------------------------------------------------------------------
 void
@@ -490,7 +612,7 @@ const int ready = poll(fds, count, 0);
         loop(w, count)
             {
               if (fds[w].revents)   read_fd(fds[w].fd, -1);
-             }
+            }
       }
    else
       {
@@ -523,7 +645,7 @@ const int ready = poll(&pfd, 1, 0);
    if (ready > 0 && pfd.revents)
       {
         Value_P Z = read_fd(fd, tag);
-        if (!Z)   goto again;
+        if (!Z)   goto again;   // unexpected
         return Z;
       }
 
@@ -583,8 +705,8 @@ bool window_valid = false;
 Quad_GTK::Fnum
 Quad_GTK::resolve_fun_name(UTF8_string & widget_id, const Value * B)
 {
-   // By convention, widget_id is a class prefix (lowercase a-z),i
-   // possibly followed // by an instance number (if glade is used),
+   // By convention, widget_id is a class prefix (lowercase a-z),
+   // possibly followed by an instance number (if glade is used),
    // or something else (typically -suffix or _suffix).
    // Compute the length of the class prefix.
    //
@@ -593,12 +715,33 @@ int wid_len = 0;
 
 const UCS_string ucs_B(*B);
 UTF8_string utf_B(ucs_B);
-const char * wid_class = widget_id.c_str();
-const char * fun_name = utf_B.c_str();
+const char * wid_class = widget_id.c_str();   // e.g. button-OK
+const char * fun_name = utf_B.c_str();        // gtk_widget_get_state_flags
+
+   /* normally the user has to specify only the function name (without the
+      class prefix and we math both to obtain the FNUM_. Sometimes, for
+      example when the user calls a function in a parent class of a widget,
+      she may alternatively provide the GTK class. For example:
+
+      gtk_fun_def(button, GtkButton, clicked,        V,V)
+      gtk_fun_def(widget, GtkWidget, get_state_flags,I,V)
+
+                     wid_class   fun_name
+                     ---------   --------
+      Normal case:   GtkButton   foo             → FNUM_GtkButton_foo
+      Special case:      -       GtkWidget::foo  → FNUM_GtkWidget_foo
+
+   */
+   if (const char * fun = strstr(fun_name, "::"))   // special case
+      {
+        wid_class = fun_name;
+        fun_name  = fun + 2;
+        wid_len   = (fun - fun_name) + 2;   // e.g. GtkButton → gtk_button_
+      }
 
 #define gtk_event_def(ev_ename, ...)
-#define gtk_fun_def(glade_ID, gtk_class, gtk_function, _Z,_A)         \
-   if (!(strncmp(wid_class, #glade_ID, wid_len) ||                    \
+#define gtk_fun_def(ID_prefix, gtk_class, gtk_function, _Z,_A)         \
+   if (!(strncmp(wid_class, #ID_prefix, wid_len) ||                    \
          strcmp(fun_name,   #gtk_function)))                          \
       return FNUM_ ## gtk_class ## _ ## gtk_function;
 

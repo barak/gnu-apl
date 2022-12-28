@@ -2848,7 +2848,7 @@ become function name prefixes. This makes</p></div>
 </div>
 </div>
 <div class="sect2">
-<h3 id="_8_3_how_a_gtx_h_id_b_works">8.3 How (A) ⎕GTX[H_ID] B works</h3>
+<h3 id="_8_3_how_a_gtk_h_id_b_works">8.3 How (A) ⎕GTK[H_ID] B works</h3>
 <div class="paragraph"><p>Let:</p></div>
 <div class="listingblock">
 <div class="content">
@@ -2860,7 +2860,7 @@ H_ID← H, "window1"                    ⍝ handle and widget ID
 
 </pre>
 </div></div>
-<div class="paragraph"><p>Then the second ⎕GTK call hopefully does this:</p></div>
+<div class="paragraph"><p>Then the ⎕GTK calls above hopefully do this:</p></div>
 <div class="olist arabic"><ol class="arabic">
 <li>
 <p>
@@ -2930,9 +2930,51 @@ In step 3. the function arguments and the function result (if any) are being
 </div>
 </div>
 <div class="paragraph"><p>A little quirk in this example (which is beyond the control of ⎕GTK or
-Gtk_server) is that the new window title <strong>MY-TITLE</strong> does not show immeidately
+Gtk_server) is that the new window title <strong>MY-TITLE</strong> does not show immediately
 but only after the window obtains the focus again. This is most likely platform
 dependent.</p></div>
+<div class="paragraph"><p>At this point, two issues related to widget functions may be worthwhile
+to mention:</p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+In most cases the widget function is a function of the widget itself.
+   Sometimes, however, the desired function is not a function of the widget
+   itself (such functions have the widget as their first argument in C), but
+   a function of some ancestor class of the widget. The GTK documentation
+   for a widget usually lists the ancestor(s) of the widet under the topic
+   <strong>Hierarchy</strong> and/or <strong>Ancestors</strong>. Note that the parent/child relation in
+   XML refers to (visual) containment (<em>buttons A and B are contained (placed
+   inside) window W</em>) while the ancestor relation refers to class containment
+   (<em>GtkButton A can also call the functions of its ancestor classes, in
+   particular of its ancestor GtkWidget</em>).+
+  <br />
+   For example. we use widgets of class <strong>GtkButton</strong> for buttons, If we were
+   interested in the state (pushed or not pushed) of some button, then we
+   would maybe like to call the widget functions that tells us, which is
+   function <strong>get_state_flags</strong>. Unfortunately <strong>get_state_flags</strong> is not a
+   widget function of class <strong>GtkButton</strong>, but a widget function of its
+   ancestor class <strong>GtkWidget</strong><br />
+  <br />
+   If we would try to call monadic <strong>⎕GTK[H_ID]'get_state_flags'</strong> with the
+   <strong>H_ID</strong> for some button, then this would ask the Gtk_server to call the
+   C function <strong>gtk_button_get_state_flags()</strong>, which is wrong because no such
+   function exists. Instead we should have ask the Gtk_server to call the
+   C function <strong>gtk_widget_get_state_flags()</strong>.<br />
+  <br />
+   Such cases are resolved by prefixing the function name with the name of the
+   ancestor class that actualy defines the function, separated by ::.
+   In this example, the proper APL code would have been
+   <strong>⎕GTK[H_ID]'GtkWidget::get_state_flags'</strong>.<br />
+</p>
+</li>
+</ol></div>
+<div class="paragraph"><p>Most widget functions of interest are used to construct the GUI and return
+no value. Some, like <strong>GtkWidget::get_state_flags</strong>, do return a value. In
+that case the result Z is a (possibly mixed) vector. The first vector item
+<strong>↑Z</strong> is the function number (APL integer) of the function that has returned
+the result. The rest <strong>1↓Z</strong> is the result result itself (an APL integer,
+APL Float, or a (not enclosed) string.</p></div>
 </div>
 <div class="sect2">
 <h3 id="_8_4_adding_window_properties">8.4 Adding Window Properties</h3>
@@ -3415,16 +3457,69 @@ button:hover { font-weight: bold;    }
 <div class="sect2">
 <h3 id="_8_8_handling_events">8.8 Handling Events</h3>
 <div class="paragraph"><p>A button defined so far is alive in the sense that it changes its font weight
-when the mouse is moved over it (by virtue of the CSS <strong>button:hover</strong> style,
-but has no connectin to APL yet. Let&#8217;s say we want to close the window when
-the OK button is being pushed. This almost inevitably requires some sort of
-waiting loop (where APL waits for the user to press the OK button).</p></div>
-<div class="paragraph"><p>Before APL can receive events such as user clicks on a button, these event.
-must be forwarded to APL. Without that, events remain inside GTK (so the
-button looks alive and, with the CSS above, changes its font when the mouse
-moves over it) but APL will not be notified. We therefore have to connect the
-event we are interested in to a handler that forwards it to APL. This is done
-in the same way as in glade:</p></div>
+when the mouse is moved over it (by virtue of the CSS <strong>button:hover</strong> style),
+but has no connection to APL yet. Let&#8217;s say we want to close the window when
+the OK button is being pushed. There are then a number of possibilities how
+that can be achieved, each with its own characteristics in terms of
+functionality and simplicity.</p></div>
+<div class="paragraph"><p>More complex situations typically require looping in APL and are then not
+directly usable in immediate execution mode (and consequently not in scripts).</p></div>
+<div class="sect3">
+<h4 id="_direct_polling_of_widgets_from_apl">Direct Polling of Widgets from APL</h4>
+<div class="paragraph"><p>Widgets like buttons or checkboxes have widget functions that can be used to
+determine (in an APL loop) when their state changes and to return only when
+a particular widget state was reached (by an action of the user):</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>∇WAIT_FOR_BUTTON_DOWN H_ID;FLAGS
+ ⍝
+ ⍝ /usr/include/gtk-3.0/gtk/gtkenums.h : odd state flags ←→ button down
+ ⍝
+LOOP: FLAGS←⎕GTK[H_ID]'GtkWidget::get_state_flags'
+  → (2∣¯1↑FLAGS)⍴0   ⍝ return when button "pushed"
+  ⎕DL 0.1 ◊ → LOOP   ⍝ and wait if not
+∇</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>Of course, more than one widget (Cancel button, Help button, &#8230;) can
+be polled inside such a loop.</p></div>
+</div>
+<div class="sect3">
+<h4 id="_waiting_for_any_event">Waiting for any Event</h4>
+<div class="paragraph"><p>In simple cases, for example a GUI with only one (OK-) button, one can simply
+wait for the next ⎕GTK event. Since only one kind of event can occur, checking
+the parameters of that event is mere overhead. Also, the APL code is trivial
+(assuming we want to close window when the button is pushed):</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>      ⊣ ⎕GTK 1   ⍝ blocking wait for the next GTK event; discard the result
+      H ⎕GTK 0   ⍝ close the window with handle H</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>and it may, since no APL loop is required, even be use in immediate execution
+mode or in APL scripts.</p></div>
+<div class="paragraph"><p>Sometimes you want to do something else while waiting for a user action, for
+example updating a progress bar. In that case you could use <strong>⎕GTK 2</strong> (the
+non-blocking companion of <strong>⎕GTK 1</strong>) in the loop.</p></div>
+<div class="paragraph"><p>By default, GTK widgets send events (signals) to each other as to achieve
+visual effects, but these events are not forwarded to APL.</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<img src="./images/icons/note.png" alt="Note" />
+</td>
+<td class="content">As an important consequence, <strong>⎕GTK 1</strong> blocks forever by default.</td>
+</tr></table>
+</div>
+<div class="paragraph"><p>To change that, the XML for every widget that shall forward events such as
+user clicks on buttons to APL need to specify which events shall be forwarded.
+For example:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre>
@@ -3438,6 +3533,53 @@ in the same way as in glade:</p></div>
 
 </pre>
 </div></div>
+<div class="ulist"><ul>
+<li>
+<p>
+The <strong>signal=</strong> value shall be a valid signal for the widget class (select
+  some widget in <strong>glade</strong> and see <strong>glade</strong> tab named <strong>Signals</strong> to see the list
+  of signals that the widget or its ancestors can send).
+</p>
+</li>
+<li>
+<p>
+The <strong>handler=</strong> value is an existing signal handler in the Gtk_server:
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+clicked
+</p>
+</li>
+<li>
+<p>
+activate
+</p>
+</li>
+<li>
+<p>
+changed
+</p>
+</li>
+<li>
+<p>
+draw
+</p>
+</li>
+<li>
+<p>
+destroy
+</p>
+</li>
+<li>
+<p>
+row_selected
+</p>
+</li>
+</ul></div>
+</li>
+</ul></div>
+<div class="paragraph"><p>See <a href="#Tag_table3">Table 3 in the Appendix</a>  for a list of handlers.</p></div>
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
@@ -3447,23 +3589,30 @@ in the same way as in glade:</p></div>
 XML of the object that sends the event and then wonders what is wrong.</td>
 </tr></table>
 </div>
-<div class="paragraph"><p>After that, there are a number of ways as to how to process the events
-received from the GUI in APL. A rather simple but crude way is to way for
-any event from GTK without checking it. A general problem with events is
-that if you wait for a specific event, then before that event there could
-be other events so that the waiting must be repeated. This repetition
-almost inevitably requires a defined function (or at least a lambda) because
-loops cannot be defined in immediate execution mode (and hence in APL
-scripts). At least in standard APL (but see below for GNU APL).</p></div>
+<div class="paragraph"><p>Even though this method is somewhat crude, it has the advantage that
+no loop (which repeates if the wrong signal was received) is required
+and can therefore also be used in immediate execution mode with out a
+defined function that contains the loop.</p></div>
+</div>
+<div class="sect3">
+<h4 id="_waiting_for_specific_event">Waiting for specific Event</h4>
+<div class="paragraph"><p>In more complex cases, it might be needed to decode which
+widget has send which event:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre>
 
-<code>      Event←⎕GTK 1   ⍝ blocking wait for any (!) event from GTK
-      H ⎕GTK 0       ⍝ close the window</code>
+<code>LOOP: Event←⎕GTK 1        ⍝ blocking wait for next event, then decode it
+      (H W E) ← 3↑Event   ⍝ common event header
+      → (W ≢ "Bn-OK")/LOOP     ⍝ not from Bn-OK
+      → (E ≢ "clicked")/LOOP   ⍝ not button click
+ H ⎕GTK 0       ⍝ OK button clicked: close the window</code>
 
 </pre>
 </div></div>
+<div class="paragraph"><p>The same &lt;signal&gt; line as in the example before is required. The parameters
+of an event are defined by the handler, but all start with the 3 described
+in the following example (button click).</p></div>
 <div class="paragraph"><p>The event received from a button click is a 3-item vector like this:</p></div>
 <div class="listingblock">
 <div class="content">
@@ -3477,32 +3626,25 @@ scripts). At least in standard APL (but see below for GNU APL).</p></div>
 
 </pre>
 </div></div>
-<div class="paragraph"><p>The components are:</p></div>
+<div class="paragraph"><p>The 3 components are:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-The handle for the Gtk window (integer)
+The handle for the Gtk window (small integer)
 </p>
 </li>
 <li>
 <p>
-the name of the widget sending the event (APL string), and
+the name (APL string) of the widget sending the event, and
 </p>
 </li>
 <li>
 <p>
-the name of the event.
+the name (APL string) of the event.
 </p>
 </li>
 </ul></div>
-<div class="listingblock">
-<div class="content">
-<pre>
-
-<code>      4 ⎕CR Event</code>
-
-</pre>
-</div></div>
+</div>
 </div>
 <div class="sect2">
 <h3 id="_8_9_summary">8.9 Summary</h3>
@@ -3917,7 +4059,7 @@ top-level group in glade).</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2022-12-26 15:45:58 CET
+ 2022-12-28 17:08:54 CET
 </div>
 </div>
 </body>

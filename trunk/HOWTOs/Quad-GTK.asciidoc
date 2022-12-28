@@ -1295,7 +1295,7 @@ become function name prefixes. This makes
 essentially the same. Coming back to our example, the widget name prefixes are
 *gtk_window_*, *gtk_text_view_*, and *gtk_tree_view_column*.
 
-=== 8.3 How (A) ⎕GTX[H_ID] B works
+=== 8.3 How (A) ⎕GTK[H_ID] B works
 
 Let:
 
@@ -1305,7 +1305,7 @@ H_ID← H, "window1"                    ⍝ handle and widget ID
 "MY-TITLE" ⎕GTK[H_ID] "set_title"     ⍝
 ----
 
-Then the second ⎕GTK call hopefully does this:
+Then the ⎕GTK calls above hopefully do this:
 
 1. The first ⎕GTK call opens a new GUI window according to XML
 2. The second ⎕GTK call splits *H_ID* into the numeric handle *H* (a
@@ -1354,9 +1354,49 @@ and, when executed, this GUI:
 image::glade-8.png[]
 
 A little quirk in this example (which is beyond the control of ⎕GTK or
-Gtk_server) is that the new window title *MY-TITLE* does not show immeidately
+Gtk_server) is that the new window title *MY-TITLE* does not show immediately
 but only after the window obtains the focus again. This is most likely platform
 dependent.
+
+At this point, two issues related to widget functions may be worthwhile
+to mention:
+
+1. In most cases the widget function is a function of the widget itself.
+   Sometimes, however, the desired function is not a function of the widget
+   itself (such functions have the widget as their first argument in C), but
+   a function of some ancestor class of the widget. The GTK documentation
+   for a widget usually lists the ancestor(s) of the widet under the topic
+   *Hierarchy* and/or *Ancestors*. Note that the parent/child relation in
+   XML refers to (visual) containment ('buttons A and B are contained (placed
+   inside) window W') while the ancestor relation refers to class containment
+   ('GtkButton A can also call the functions of its ancestor classes, in
+   particular of its ancestor GtkWidget').+
+   +
+   For example. we use widgets of class *GtkButton* for buttons, If we were
+   interested in the state (pushed or not pushed) of some button, then we
+   would maybe like to call the widget functions that tells us, which is
+   function *get_state_flags*. Unfortunately *get_state_flags* is not a
+   widget function of class *GtkButton*, but a widget function of its
+   ancestor class *GtkWidget* +
+   +
+   If we would try to call monadic *⎕GTK[H_ID]\'get_state_flags'* with the
+   *H_ID* for some button, then this would ask the Gtk_server to call the
+   C function *gtk_button_get_state_flags()*, which is wrong because no such
+   function exists. Instead we should have ask the Gtk_server to call the
+   C function *gtk_widget_get_state_flags()*. +
+   +
+   Such cases are resolved by prefixing the function name with the name of the
+   ancestor class that actualy defines the function, separated by ::.
+   In this example, the proper APL code would have been
+   *⎕GTK[H_ID]\'GtkWidget::get_state_flags'*. +
+
+Most widget functions of interest are used to construct the GUI and return
+no value. Some, like *GtkWidget::get_state_flags*, do return a value. In
+that case the result Z is a (possibly mixed) vector. The first vector item
+*↑Z* is the function number (APL integer) of the function that has returned
+the result. The rest *1↓Z* is the result result itself (an APL integer,
+APL Float, or a (not enclosed) string.
+
 
 === 8.4 Adding Window Properties
 
@@ -1751,17 +1791,63 @@ image::glade-12.png[]
 === 8.8 Handling Events
 
 A button defined so far is alive in the sense that it changes its font weight
-when the mouse is moved over it (by virtue of the CSS *button:hover* style,
-but has no connectin to APL yet. Let's say we want to close the window when
-the OK button is being pushed. This almost inevitably requires some sort of
-waiting loop (where APL waits for the user to press the OK button).
+when the mouse is moved over it (by virtue of the CSS *button:hover* style),
+but has no connection to APL yet. Let's say we want to close the window when
+the OK button is being pushed. There are then a number of possibilities how
+that can be achieved, each with its own characteristics in terms of
+functionality and simplicity.
 
-Before APL can receive events such as user clicks on a button, these event.
-must be forwarded to APL. Without that, events remain inside GTK (so the
-button looks alive and, with the CSS above, changes its font when the mouse
-moves over it) but APL will not be notified. We therefore have to connect the
-event we are interested in to a handler that forwards it to APL. This is done
-in the same way as in glade:
+More complex situations typically require looping in APL and are then not
+directly usable in immediate execution mode (and consequently not in scripts).
+
+==== Direct Polling of Widgets from APL
+
+Widgets like buttons or checkboxes have widget functions that can be used to
+determine (in an APL loop) when their state changes and to return only when
+a particular widget state was reached (by an action of the user):
+
+----
+∇WAIT_FOR_BUTTON_DOWN H_ID;FLAGS
+ ⍝
+ ⍝ /usr/include/gtk-3.0/gtk/gtkenums.h : odd state flags ←→ button down
+ ⍝
+LOOP: FLAGS←⎕GTK[H_ID]'GtkWidget::get_state_flags'
+  → (2∣¯1↑FLAGS)⍴0   ⍝ return when button "pushed"
+  ⎕DL 0.1 ◊ → LOOP   ⍝ and wait if not
+∇
+----
+
+Of course, more than one widget (Cancel button, Help button, ...) can
+be polled inside such a loop.
+
+==== Waiting for any Event
+
+In simple cases, for example a GUI with only one (OK-) button, one can simply
+wait for the next ⎕GTK event. Since only one kind of event can occur, checking
+the parameters of that event is mere overhead. Also, the APL code is trivial
+(assuming we want to close window when the button is pushed):
+
+----
+      ⊣ ⎕GTK 1   ⍝ blocking wait for the next GTK event; discard the result
+      H ⎕GTK 0   ⍝ close the window with handle H
+----
+
+and it may, since no APL loop is required, even be use in immediate execution
+mode or in APL scripts.
+
+Sometimes you want to do something else while waiting for a user action, for
+example updating a progress bar. In that case you could use *⎕GTK 2* (the
+non-blocking companion of *⎕GTK 1*) in the loop.
+
+By default, GTK widgets send events (signals) to each other as to achieve
+visual effects, but these events are not forwarded to APL.
+
+NOTE: As an important consequence, *⎕GTK 1* blocks forever by default.
+
+
+To change that, the XML for every widget that shall forward events such as
+user clicks on buttons to APL need to specify which events shall be forwarded.
+For example:
 
 ----
           <object class="GtkButton">
@@ -1772,22 +1858,38 @@ in the same way as in glade:
           </object>
 ----
 
+* The *signal=* value shall be a valid signal for the widget class (select
+  some widget in *glade* and see *glade* tab named *Signals* to see the list
+  of signals that the widget or its ancestors can send).
+* The *handler=* value is an existing signal handler in the Gtk_server:
+include::../src/Gtk/Gtk_events1.asciidoc[]
+
+See <<Tag_table3, Table 3 in the Appendix>>  for a list of handlers.
+
 NOTE: At least the author frequently forgets the <signal ... /> entry in the
 XML of the object that sends the event and then wonders what is wrong.
 
-After that, there are a number of ways as to how to process the events
-received from the GUI in APL. A rather simple but crude way is to way for
-any event from GTK without checking it. A general problem with events is
-that if you wait for a specific event, then before that event there could
-be other events so that the waiting must be repeated. This repetition
-almost inevitably requires a defined function (or at least a lambda) because
-loops cannot be defined in immediate execution mode (and hence in APL
-scripts). At least in standard APL (but see below for GNU APL).
+Even though this method is somewhat crude, it has the advantage that
+no loop (which repeates if the wrong signal was received) is required
+and can therefore also be used in immediate execution mode with out a
+defined function that contains the loop.
+
+==== Waiting for specific Event
+
+In more complex cases, it might be needed to decode which
+widget has send which event:
 
 ----
-      Event←⎕GTK 1   ⍝ blocking wait for any (!) event from GTK
-      H ⎕GTK 0       ⍝ close the window
+LOOP: Event←⎕GTK 1        ⍝ blocking wait for next event, then decode it
+      (H W E) ← 3↑Event   ⍝ common event header
+      → (W ≢ "Bn-OK")/LOOP     ⍝ not from Bn-OK
+      → (E ≢ "clicked")/LOOP   ⍝ not button click
+ H ⎕GTK 0       ⍝ OK button clicked: close the window
 ----
+
+The same <signal> line as in the example before is required. The parameters
+of an event are defined by the handler, but all start with the 3 described
+in the following example (button click).
 
 The event received from a button click is a 3-item vector like this:
 
@@ -1799,17 +1901,12 @@ The event received from a button click is a 3-item vector like this:
 └ϵ──────────────────┘
 ----
 
-The components are:
+The 3 components are:
 
-* The handle for the Gtk window (integer)
-* the name of the widget sending the event (APL string), and
-* the name of the event.
+* The handle for the Gtk window (small integer)
+* the name (APL string) of the widget sending the event, and
+* the name (APL string) of the event.
 
-
-----
-      4 ⎕CR Event
-
-----
 
 === 8.9 Summary
 

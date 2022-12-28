@@ -365,7 +365,7 @@ Quad_PLOT::window_control(APL_Integer B0) const
         return Idx0(LOC);
       }
 
-   if (B0 == -3)   // close all windows, return their handles
+   if (B0 == -3)   // close all ⎕PLOT windows, return their handles
       {
         Value_P Z = window_control(-6);   // get all open handles, see below
 

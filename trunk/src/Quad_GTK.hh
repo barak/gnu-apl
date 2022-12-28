@@ -132,6 +132,12 @@ protected:
     **/
    static Value_P read_fd(int fd, int tag);
 
+   /// return the function name for function number fnum.
+   static Value_P fnum_to_function_name(Fnum fnum);
+
+   /// return the class name for function number fnum.
+   static Value_P fnum_to_widget_class(Fnum fnum);
+
    /// the currently open GTK windows
    static std::vector<window_entry> open_windows;
 
