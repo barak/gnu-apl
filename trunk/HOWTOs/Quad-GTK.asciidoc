@@ -8,7 +8,7 @@ make window visible, then
 
 scrot --border -d 5 -u
 
-and move mouse to window witin 5 seconds
+and move mouse to window within 5 seconds
 
 -or- for glade XML:
 
@@ -995,7 +995,7 @@ The following notes may be helpful when creating custom drawings.
 ** A line color (called the *pen* color in other places), and
 ** A fill color (called "brush* color elsewhere).
 ** The opaqueness of the line and fill colors can be used to control how a
-  2-dmensional object is being painted:
+  2-dimensional object is being painted:
 *** Fill color opacity = 0: (only) the border (in line color), or
 *** Line color opacity = 0: (only) the area inside the border (in fill color),
    or else
@@ -1034,12 +1034,12 @@ has some limitations and disadvantages, for example:
 For this reason the filename (APL string) arguments *A* and *B* of dyadic
 *A ⎕GTK B* and monadic *⎕GTK B* can also be the contents of the files instead
 of the file names. Most *.ui* files (as produced by glade) and in particular
-the .css (if any) files are reasonablt small. It makes therefore a lot of
+the .css (if any) files are reasonably small. It makes therefore a lot of
 sense, to construct the contents (i.e. strings) of these files directly in
 APL rather than loading them from external files produced elsewhere. GNU APL
 is shipped with an example workspace *workspaces/SQL_GUI.apl* that could serve
-as a starting point for your own, self-contained GUI. Thios workspqace is
-resonably well documented, but some related concepts may be helpful note
+as a starting point for your own, self-contained GUI. This workspace is
+reasonably well documented, but some related concepts may be helpful note
 before looking into the APL code of that workspace.
 
 === 8.1 What glade actually does
@@ -1085,7 +1085,7 @@ Comparing step 4. above with line 5 of *my-gui.glade*, i.e.
   <object class="GtkWindow" id="window1">
 ----
 
-exposes the primary functionality of *glade*: producing XML temlates and filling
+exposes the primary functionality of *glade*: producing XML templates and filling
 in fields in those templates according to choices made by the user (the window
 ID *window1* in this simple example). The two *<child>* tags with content
 *<placeholder/>* are used by *glade* to simplify a later replacement with
@@ -1149,7 +1149,7 @@ To see why, we note the following:
 * *⎕GTK B* expects B to be a simple APL vector (aka. APL string) where
   multiple lines are separated by newline characters and not a vector of
   nested APL strings.  *36 ⎕CR XML* does the required conversion from
-  nested APL strings to a simple APL string with *\n* aka. *ASCII LF* as
+  nested APL strings to a simple APL string with *\n* aka. *ASCII FL* as
   line separator.
 * the XML standard treats newlines and blanks alike, therefore the string
   lines could have been separated by blanks (or tabs etc.) as well. However,
@@ -1163,7 +1163,7 @@ to change that.
 
 === 8.2 Some GTK (and glade) details
 
-As already meantioned, *glade* produces an XML file that describes the desired
+As already mentioned, *glade* produces an XML file that describes the desired
 GUI on the one hand, and GTK, more precisely a GTK object (of type
 *GtkBuilder*) on the other. The GtkBuilder provides functions that read the
 XML file or string and creates (instantiates) the widget objects needed to
@@ -1191,7 +1191,7 @@ GTK widget, i.e. *window*:
 To fully understand the naming conventions we use two more widgets with
 more complex names: *gtktextview* and *gtktreeviewcolumn*. We call the
 names *window*, *gtktextview*, and *gtktreeviewcolumn* the *core name*s
-of the widgets. Every relevant naming convertion (XML use only some of
+of the widgets. Every relevant naming convention (XML use only some of
 them but we will explain them all) start with the core name of a widget
 and produces similar looking names as described in the following sections.
 
@@ -1200,12 +1200,12 @@ and produces similar looking names as described in the following sections.
 A core name is a sequence of lowercase (!) ASCII characters a..z.
 
 Neither digits 0..9, nor underscore (_), nor minus (-) or other non-alphabetic
-characters are part of a core name. These characters are instead used to derivw
+characters are part of a core name. These characters are instead used to derive
 other name variants from a core name.
 
 As already mentioned, the examples discussed here use the core names *window*,
 *gtktextview*, and *gtktreeviewcolumn*. The other core names then follow suit.
-iut.
+..
 
 ==== Header File Name
 
@@ -1224,7 +1224,7 @@ helpful to disambiguate core names. For example, to decide (below) if
 
 ==== Object Class
 
-Every widget is an instance of an assoctiated class which is declared in the
+Every widget is an instance of an associated class which is declared in the
 corresponding header file. The class for *corename* is either *GtkCoreName* or
 GtkCorename*. In our example the class names are *GtkWidget*, *GtkTextView*,
 and *GtkTreeViewColumn*.
@@ -1244,7 +1244,7 @@ does not use it, but the *GtkBuilder* may in some way.
 
 The <object ...> tag in XML may or may not contain the optional XML
 attribute *id=* (see above). In many cases the ID is not needed and should
-then not be mentioned in the XML. The relevant execeptions (in which cases
+then not be mentioned in the XML. The relevant exceptions (in which cases
 the ID is mandatory) are:
 
 * top-level windows. ⎕GTK uses the ID of the top-level window to find the
@@ -1252,7 +1252,7 @@ GTK object with that ID.
 * widgets for which APL calls widget functions (i.e. *Z←⎕GTK[H_ID]
   "function-name"* or *Z←A ⎕GTK[H_ID] "function-name"*.
 
-The object ID of a widge consists of an *ID-prefix* and an *ID-suffix*
+The object ID of a widget consists of an *ID-prefix* and an *ID-suffix*
 according to these rules:
 
 * The *ID-prefix* are the leading lowercase ASCII characters a..z of some name,
@@ -1316,7 +1316,7 @@ Then the ⎕GTK calls above hopefully do this:
    name *gtk_window_set_title*. This function (in the GTK library) is called
    and its result is returned.
 4. In step 3. the function arguments and the function result (if any) are being
-   transcoded between APL values and C values. For this reason, only widget
+   trans-coded between APL values and C values. For this reason, only widget
    function whose arguments and/or result are integer (including enums) or
    strings can be supported by ⎕GTK. This is fortunately the case for the
    majority of widget functions.
@@ -1365,7 +1365,7 @@ to mention:
    Sometimes, however, the desired function is not a function of the widget
    itself (such functions have the widget as their first argument in C), but
    a function of some ancestor class of the widget. The GTK documentation
-   for a widget usually lists the ancestor(s) of the widet under the topic
+   for a widget usually lists the ancestor(s) of the widget under the topic
    *Hierarchy* and/or *Ancestors*. Note that the parent/child relation in
    XML refers to (visual) containment ('buttons A and B are contained (placed
    inside) window W') while the ancestor relation refers to class containment
@@ -1386,7 +1386,7 @@ to mention:
    C function *gtk_widget_get_state_flags()*. +
    +
    Such cases are resolved by prefixing the function name with the name of the
-   ancestor class that actualy defines the function, separated by ::.
+   ancestor class that actually defines the function, separated by ::.
    In this example, the proper APL code would have been
    *⎕GTK[H_ID]\'GtkWidget::get_state_flags'*. +
 
@@ -1410,7 +1410,7 @@ In our previous example above:
 A better approach, which works for most but maybe not all properties is
 to specify them in XML *before* the widget is created and not by calling
 a corresponding widget function *after* the widget was created. This
-is achieved by XML tag <property>/ In the case of the windiw title the
+is achieved by XML tag <property>/ In the case of the window title the
 property is called *title* (another GTK naming conventions).:
 
 ----
@@ -1445,14 +1445,14 @@ Our complete code is now (observe how MY-PROPERTY has moved from APL to XML:
 ----
 
 The GUI looks as before but the focus quirk has disappeared since
-the proper *MY-TITLE* was set *before* the *window* was created. Properies
+the proper *MY-TITLE* was set *before* the *window* was created. Properties
 are somewhat widget-specific, but most widget have at least the XML <PROPERTY>
 tags with XML attributes *name="width_request"*, *name="height_request*",
 or *name="visible"*. The value of each property is the entire text between the
 XML start tag <PROPERTY> and the corresponding XML end tag </PROPERTY>.
 
 WARNING: blanks in a property value are preserved and may cause problems
-for certain data types like numbers or the booleans *True* and *False*.
+for certain data types like numbers or the Boolean *True* and *False*.
 
 Gtk widgets have a fairly large number of properties that allow for a very
 fine-tuned control of how the widget will behave. However, most properties
@@ -1518,11 +1518,11 @@ image::glade-9.png[]
 To explain the the above:
 
 * the properties *width_request* and *height_request* specify the desired
-  sizes of the parent widget *window1* and its (so far) anonynmous child
+  sizes of the parent widget *window1* and its (so far) anonymous child
   of type *GtkButton*.
 * the properties *halign* and *valign* of the button with value *start* tell
   the parent widget that the button shall be placed at the start (= left
-  horizontally resp. top vercically) of the parent. Without them the button
+  horizontally resp. top vertically) of the parent. Without them the button
   would have grabbed the entire available space of the parent, making the
   button almost as big as the parent.
 
@@ -1531,7 +1531,7 @@ To explain the the above:
 Of course the position of the button at the top left corner of the window is
 still somewhat unusual. We would assume that either the GtkWindow or the
 GtkButton class have a property or a widget function that could place the
-button at a different offset, say *x* pixels rigght and *y* pixels down from
+button at a different offset, say *x* pixels Right and *y* pixels down from
 the top-left corner. Unfortunately no such property or function exists and
 an attempt to specify one yields an error, e.g.:
 
@@ -1663,13 +1663,13 @@ The use of CSS with ⎕GTK requires 3 things:
 The CSS is a sequence of statements with the following simple syntax:
 
 ----
-Selector(s) { style attrbutes... }
+Selector(s) { style attributes... }
 ----
 
 The style attributes define how a widget looks like (color, borders, etc.),
 while the selectors define which widgets should have the style attributes.
 The selectors as well as the style attributes can be used in multiple CSS
-statments. The key to success with CSS is to keep matters simple, and
+statements. The key to success with CSS is to keep matters simple, and
 therefore it is better to have fewer selectors and style attributes
 than more by splitting bigger statements into a sequence of smaller ones.
 More details can be found here:
@@ -1695,7 +1695,7 @@ image::glade-11.png[]
 
 The selectors *window* and *button* in the CSS above are (style-) class
 selectors, which means that all widgets of the respective class will have
-the dtylr (i.e. colors) above. For the top-level window that is normally
+the style (i.e. colors) above. For the top-level window that is normally
 not a problem because there is only one. For buttons it is more likely
 that there is more than one (e.g. a CANCEL button in a different color).
 
@@ -1726,8 +1726,8 @@ for the blue class button. The reason is a little quirk in GTK (which will
 probably disappear at some point in time. A *button* is a widget that has an
 internal sub-widget of type *label* which holds the button text. As it
 happens, using a widget class as CSS selector selects the widgets of that
-class *inluding their sub-widgests* while a widget name as  CSS selector
-selects the widget(s) with that name *exluding their sub-widgests*.
+class *including their sub-widgets* while a widget name as  CSS selector
+selects the widget(s) with that name *excluding their sub-widgets*.
 
 
 The entire application is now:
@@ -1870,7 +1870,7 @@ NOTE: At least the author frequently forgets the <signal ... /> entry in the
 XML of the object that sends the event and then wonders what is wrong.
 
 Even though this method is somewhat crude, it has the advantage that
-no loop (which repeates if the wrong signal was received) is required
+no loop (which repeats if the wrong signal was received) is required
 and can therefore also be used in immediate execution mode with out a
 defined function that contains the loop.
 
@@ -1913,7 +1913,7 @@ The 3 components are:
 The sections above have hopefully touched upon all topics that may occur when
 designing GUIs with ⎕GTK. By combining these simple steps it should be
 straightforward to construct more advanced GUIs. Before starting from scratch,
-though, it may be worthwile to have a look at the workspace
+though, it may be worthwhile to have a look at the workspace
 *workspaces/SQL_GUI.apl* which is shipped with GNU APL. This workspace
 contains several examples of using ⎕GTK (and also ⎕SQL) that could be
 copied into your own application.
@@ -1979,7 +1979,7 @@ arguments are *generic* and control ⎕GTK itself rather than a widget
 displayed by ⎕GTK. The mandatory right argument B of almost all ⎕GTK calls
 is either a function number (APL integer scalar) or a function name (APL
 string). The function numbers of generic functions are assigned by GNU APL
-and will be maintained in a backward-compatible fashion. In contrst, the
+and will be maintained in a backward-compatible fashion. In contrast, the
 numbers for widget functions, are automatically generated from the source
 files of the GTK libraries and are highly volatile. These numbers differ
 on different platforms, between different GTK library versions, and even
@@ -1987,7 +1987,7 @@ between different SVN versions of GNU APL. For this reason (and for the sake
 of portability of GNU APL workspaces, you should *never use numbers for widget
 functions* even though they are somewhat easier to enter. BTW: the Gtk_server
 can be started from the command line like: *Gtk_server --numbers* and then
-displays the mapping between widget functioin numbers and function names (of
+displays the mapping between widget function numbers and function names (of
 that Gtk_server).
 
 The functions *⎕GTK 1* and *⎕GTK 2* return an event vector according to
