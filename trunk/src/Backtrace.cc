@@ -138,11 +138,11 @@ int64_t prev_pc = NO_PC;
          if (slen && buffer[slen - 1] == '\n')   buffer[--slen] = 0;
          if (slen && buffer[slen - 1] == '\r')   buffer[--slen] = 0;
 
-         /* we look for 3 types of lines:
+         /* the file supposedly contains 3 types of lines:
 
-            the (single) <main> line,
-            absolute source file path lines, and
-            code lines.
+            case 1: the (single) <main> line,
+            case 2: absolute source file path lines, and
+            case 3: code lines.
 
             For example:
 
@@ -157,12 +157,13 @@ main():
 
             CXXFLAGS='-rdynamic -gdwarf-2' ./configure ...
 
-            since newer compilers strip location information by default.
+            since newer g++ compiler versions strip location information
+            by default.
           */
 
-         if (strstr(s, "<main>:"))   // <main line>
+         if (strstr(s, "<main>:"))   // case 1: <main line>
             {
-              const int64_t main_funct = reinterpret_cast<long long>(main);
+              const int64_t main_funct = int64_t(main);
               const int64_t main_loc = strtoll(s, 0, 16);
               main_offset = main_funct - main_loc;
 
@@ -173,7 +174,7 @@ main():
                    << dec;
             }
 
-         if (s[0] == '/')   // source file path
+         if (s[0] == '/')            // case 2: source file path
             {
               src_line = strdup(strrchr(s, '/') + 1);
               new_line = true;
@@ -182,11 +183,16 @@ main():
 
          if (!new_line)   continue;
 
-         if (s[8] == ':')   // opcode address
+         if (s[8] == ':')   // case 3: code line
             {
               ++asm_lines;
-              long long pc = NO_PC;
-              if (1 == sscanf(s, " %llx:", &pc))
+              errno = 0;
+              long long pc = strtoll(s, 0, 16);   // opcode address
+              if (errno)   // strtoll() failed
+                 {
+                   pc = NO_PC;
+                 }
+              else         // strtoll() succeeded
                  {
                    if (pc < prev_pc)
                       {
@@ -219,27 +225,27 @@ Backtrace::show_item(int idx, char * s)
 {
 #ifdef HAVE_EXECINFO_H
   //
-  // s looks like this:
+  // string s looks like this:
   //
   // ./apl(_ZN10APL_parser9nextTokenEv+0x1dc) [0x80778dc]
+  //                                   │││││   │││││││││
+  //                                   │││││   └┴┴┴┴┴┴┴┴───── abs_addr
+  //                                   └┴┴┴┴───────────────── asm_offset
   //
 
-   // split off address from s.
+   // split off abs_addr from s.
    //
-const char * addr = "????????";
+const char * abs_addr = "????????";
 int64_t pc = NO_PC;
-   {
-     char * space = strchr(s, ' ');
-     if (space)
-        {
-          *space = 0;
-          addr = space + 2;
-          char * e = strchr(space + 2, ']');
-          if (e)   *e = 0;
-          pc = strtoll(addr, 0, 16);
-          pc -= main_offset;
-        }
-   }
+
+   if (char * space = strchr(s, ' '))   // the space before [abs_addr]
+      {
+        *space = 0;
+        abs_addr = space + 2;
+        if (char * e = strchr(space + 2, ']'))   *e = 0;
+        pc = strtoll(abs_addr, 0, 16);
+        pc -= main_offset;
+      }
 
 const char * src_loc = find_src(pc);
 
@@ -257,17 +263,17 @@ char * fun = 0;
        }
    }
 
-   // split off offset from fun.
+   // split off +asm_offset from fun.
    //
-int offs = 0;
    if (fun)
       {
-       char * plus = strchr(fun, '+');
-       if (plus)
+       int asm_offset = 0;
+       if (char * plus = strchr(fun, '+'))
           {
             *plus++ = 0;
-            sscanf(plus, "%X", &offs);
+            asm_offset = strtoll(plus, 0, 16);
           }
+       if (asm_offset)   { /* to avoid warning */ }
       }
 
 char obuf[200] = "@@@@";

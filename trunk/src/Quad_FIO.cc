@@ -574,33 +574,33 @@ public:
    File_or_String(FILE * f)
    : file(f),
      string(0),
-     next(Invalid_Unicode),
-     out_len(0)
-   { sidx = ftell(f);  }
+     lookahead(Invalid_Unicode),
+     unicodes_read(0)
+   { offset = ftell(f);  }
 
    /// constructor: from string
    File_or_String(const UCS_string * u)
    : file(0),
      string(u),
-     sidx(0),
-     next(Invalid_Unicode),
-     out_len(0)
+     offset(0),
+     lookahead(Invalid_Unicode),
+     unicodes_read(0)
    {}
 
    /// return the number of characters
    ShapeItem get_count() const
       {
-        if (file)    return ftell(file) - sidx;
-        return out_len;
+        if (file)    return ftell(file) - offset;
+        return unicodes_read;
       }
 
    /// get the next character
    Unicode get_next()
       {
-        if (next != Invalid_Unicode)   // there is an ungotten char
+        if (lookahead != Invalid_Unicode)   // there is an ungotten char
            {
-             const Unicode ret = next;
-             next = Invalid_Unicode;
+             const Unicode ret = lookahead;
+             lookahead = Invalid_Unicode;
              // counted already, so don't count it twice
              return ret;
            }
@@ -609,99 +609,104 @@ public:
             {
               ShapeItem utf8_len = 0;
               const Unicode ret = Quad_FIO::fget_utf8(file, utf8_len);
-              if (ret != UNI_EOF)   ++out_len;
+              if (ret != UNI_EOF)   ++unicodes_read;
               return ret;
             }
-         else   // data comes from a UCS_string
+         else        // data comes from a UCS_string
             {
-              if (sidx >= string->size())   return UNI_EOF;
-              ++out_len;
-              return (*string)[sidx++];
+              if (offset >= string->size())   return UNI_EOF;
+              ++unicodes_read;
+              return (*string)[offset++];
             }
       }
 
    /// unget uni. At most one Unicode (= lookahead char) can be ungotten.
    void unget(Unicode uni)
       {
-        Assert(next == Invalid_Unicode);
-        next = uni;
+        Assert(lookahead == Invalid_Unicode);
+        lookahead = uni;
       }
 
-   /// scan a long long in a string or in a file. Return either 0 or 1 for
-   /// the number of successful conversions.
-   int scanf_long_long(const char * fmt, long long * val)
+   /// scan a long long in a string or in a file. Return either 0 ion error,
+   /// or 1 on success (for /// the number of successful conversions).
+   int scanf_long_long(const char conv, long long & value)
       {
          if (file)
             {
               // if we have read the next character from a file, then we
               // need to push it back so that fscanf() will get it.
               //
-              if (next != Invalid_Unicode)
+              if (lookahead != Invalid_Unicode)
                  {
-                   ungetc(next, file);
-                   next = Invalid_Unicode;
+                   ungetc(lookahead, file);
+                   lookahead = Invalid_Unicode;
                  }
-              return fscanf(file, fmt, val);
+              const char fmt[] = { '%', 'l', 'l', conv, 0 };
+              return fscanf(file, fmt, &value);
             }
 
          // string input...
          //
          char cc[40];
          unsigned int cidx = 0;
-         if (next == UNI_OVERBAR)
+         if (lookahead == UNI_OVERBAR)
             {
               cc[cidx++] = '-';
-              next = Invalid_Unicode;
+              lookahead = Invalid_Unicode;
             }
-         else if (next != Invalid_Unicode)
+         else if (lookahead != Invalid_Unicode)
             {
-              cc[cidx++] = next;
-              next = Invalid_Unicode;
+              cc[cidx++] = lookahead;
+              lookahead = Invalid_Unicode;
             }
 
-         while (cidx < (sizeof(cc) - 1) && sidx < string->size())
+         while (cidx < (sizeof(cc) - 1) && offset < string->size())
             {
               const Unicode uni = get_next();
-              if (Avec::is_digit(uni))           cc[cidx++] = uni;   // 0-9
-              else if (uni == UNI_OVERBAR)       cc[cidx++] = '-';   // ¯
-              else if (uni == UNI_MINUS)   cc[cidx++] = '-';   // -
+              if (Avec::is_digit(uni))       cc[cidx++] = uni;   // 0-9
+              else if (uni == UNI_OVERBAR)   cc[cidx++] = '-';   // ¯
+              else if (uni == UNI_MINUS)     cc[cidx++] = '-';   // -
               else { unget(uni);   break; }
             }
 
          cc[cidx] = 0;
-         return sscanf(cc, fmt, val);
+         const int base =  (conv == 'X') || (conv == 'x') ? 16 : 10;
+         errno = 0;
+         value = strtoll(cc, 0, base);
+         return errno ? 0 : 1;
       }
 
    /// scan a double in string or file. Return either 0 or 1 for
    /// the number of successful conversions.
-   int scanf_double(const char * fmt, APL_Float * val)
+   int scanf_double(const char conv, APL_Float & value)
       {
          if (file)
             {
-              if (next != Invalid_Unicode)
+              if (lookahead != Invalid_Unicode)
                  {
-                   ungetc(next, file);
-                   next = Invalid_Unicode;
+                   ungetc(lookahead, file);
+                   lookahead = Invalid_Unicode;
                  }
-              return fscanf(file, fmt, val);
+              const char fmt[] = { '%', 'l', conv, 0 };
+              return fscanf(file, fmt, &value);
             }
 
          // string input...
          //
          char cc[40];
          unsigned int cidx = 0;
-         if (next == UNI_OVERBAR)
+         if (lookahead == UNI_OVERBAR)
             {
               cc[cidx++] = '-';
-              next = Invalid_Unicode;
+              lookahead = Invalid_Unicode;
             }
-         else if (next != Invalid_Unicode)
+         else if (lookahead != Invalid_Unicode)
             {
-              cc[cidx++] = next;
-              next = Invalid_Unicode;
+              cc[cidx++] = lookahead;
+              lookahead = Invalid_Unicode;
             }
 
-         while (cidx < (sizeof(cc)) - 1 && sidx < string->size())
+         while (cidx < (sizeof(cc)) - 1 && offset < string->size())
             {
               const Unicode uni = get_next();
               if (uni == UNI_OVERBAR)                  cc[cidx++] = '-';   // ¯
@@ -710,7 +715,9 @@ public:
             }
 
          cc[cidx] = 0;
-         return sscanf(cc, fmt, val);
+         errno = 0;
+         value = strtod(cc, 0);
+         return errno ? 0 : 1;
       }
 
 protected:
@@ -720,14 +727,14 @@ protected:
    /// UCS_string source (or 0 for file source)
    const UCS_string * string;
 
-   /// next character in string
-   ShapeItem sidx;
+   /// the next character in a string input
+   ShapeItem offset;
 
    /// ungotten char
-   Unicode next;
+   Unicode lookahead;
 
    /// number of chars consumed thus far
-   ShapeItem out_len;
+   ShapeItem unicodes_read;
 };
 //----------------------------------------------------------------------------
 Token
@@ -824,11 +831,10 @@ Unicode lookahead = input.get_next();
 
         if (strchr("dDiouxX", conv))  // integer conversion
            {
-             input.unget(lookahead);   // let scanf_long_long() read it
-             const char fmt[] = { '%', 'l', 'l', char(conv), 0 };
-             long long val = 0;
-             const int count = input.scanf_long_long(fmt, & val);
-             if (count == 1 && !suppress)   Z->next_ravel_Int(val);
+             input.unget(lookahead);   // so that scanf_long_long() can read it
+             long long value = 0;
+             const int count = input.scanf_long_long(conv, value);
+             if (count == 1 && !suppress)   Z->next_ravel_Int(value);
              else                           goto out;
 
              lookahead = input.get_next();
@@ -837,10 +843,9 @@ Unicode lookahead = input.get_next();
         else if (strchr("fFeg", conv))  // float conversion
            {
              input.unget(lookahead);   // let scanf_double() read it
-             const char fmt[] = { '%', 'l', char(conv), 0 };
-             APL_Float val = 0;
-             const int count = input.scanf_double(fmt, &val);
-             if (count == 1 && !suppress)   Z->next_ravel_Float(val);
+             APL_Float value = 0;
+             const int count = input.scanf_double(conv, value);
+             if (count == 1 && !suppress)   Z->next_ravel_Float(value);
              else                           goto out;
 
              lookahead = input.get_next();

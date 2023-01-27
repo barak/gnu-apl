@@ -490,7 +490,7 @@ const Unicode uni = src.get();
 UCS_string string_value;
 bool got_end = false;
 
-   while (src.rest_len())
+   while (src.more())
        {
          const Unicode uni = src.get();
 
@@ -578,7 +578,7 @@ BACKTRACE
 UCS_string string_value;
 bool got_end = false;
 
-   while (src.rest_len())
+   while (src.more())
        {
          const Unicode uni = src.get();
 
@@ -643,137 +643,122 @@ Tokenizer::tokenize_number(Unicode_source & src, Token_string & tos,
    // real 'D' real   // magnitude + angle in degrees
    // real 'R' real   // magnitude + angle in radian
 
-APL_Float   real_flt = 0.0;   // always valid
-APL_Integer real_int = 0;     // valid if need_float is false
-bool real_need_float = false;
-const bool real_valid = tokenize_real(src, real_need_float, real_flt, real_int);
-   if (!real_need_float)   real_flt = real_int;
-   if (!real_valid)
+const Int_or_Double real_val = tokenize_real(src);
+   if (!real_val.is_valid)
       {
         rest_2 = src.rest_len();
         Error::throw_parse_error(E_BAD_NUMBER, LOC, loc);
       }
 
-   if (src.rest_len() && (*src == UNI_J || *src == UNI_j))
+   if (src.skip_if(UNI_J) || src.skip_if(UNI_j))   // e.g. 3J4
       {
-        ++src;   // skip 'J'
-
-        APL_Float   imag_flt = 0.0;   // always valid
-        APL_Integer imag_int = 0;     // valid if imag_need_float is false
-        bool imag_need_float = false;
-        const bool imag_valid = tokenize_real(src, imag_need_float,
-                                              imag_flt, imag_int);
-        if (!imag_need_float)   imag_flt = imag_int;
-
-        if (!imag_valid)
+        const Int_or_Double imag_val = tokenize_real(src);
+        if (!imag_val.is_valid)   // not a complex number
            {
              --src;   // undo skip 'J'
-             if (real_need_float)
+             if (real_val.is_double)
                 {
-                  tos.push_back(Token(TOK_REAL,    real_flt));
+                  tos.push_back(Token(TOK_REAL, real_val.value.APL_flt));
                   Log(LOG_tokenize)
-                     CERR << "  tokenize_number: real " << real_flt << endl;
+                     CERR << "  tokenize_number: real "
+                          << real_val.value.APL_flt << endl;
                 }
              else
                 {
-                  tos.push_back(Token(TOK_INTEGER, real_int));
+                  tos.push_back(Token(TOK_INTEGER, real_val.value.APL_int));
                   Log(LOG_tokenize)
-                     CERR << "  tokenize_number: integer " << real_int << endl;
+                     CERR << "  tokenize_number: integer "
+                          << real_val.value.APL_int << endl;
                 }
-             goto done;;
+             goto done;
            }
 
-        tos.push_back(Token(TOK_COMPLEX, real_flt, imag_flt));
-        Log(LOG_tokenize)   CERR << "  tokenize_number: complex "
-                                 << real_flt << "J" << imag_flt << endl;
+        tos.push_back(Token(TOK_COMPLEX, real_val.get_double(),
+                                         imag_val.get_double()));
+        Log(LOG_tokenize)
+           CERR << "  tokenize_number: complex " << real_val.get_double()
+                << "J" << imag_val.get_double() << endl;
       }
-   else if (src.rest_len() && (*src == UNI_D || *src == UNI_d))
+   else if (src.skip_if(UNI_D) || src.skip_if(UNI_d))   // e.g. 1D90 → 0J1
       {
-        ++src;   // skip 'D'
-
-        APL_Float   degrees_flt = 0;  // always valid
-        APL_Integer degrees_int = 0;  // valid if imag_floating is true
-        bool imag_need_float = false;
-        const bool imag_valid = tokenize_real(src, imag_need_float,
-                                              degrees_flt, degrees_int);
-        if (!imag_need_float)   degrees_flt = degrees_int;
-
-        if (!imag_valid)
+        const Int_or_Double degrees = tokenize_real(src);
+        if (!degrees.is_valid)   // not a complex number
            {
              --src;   // undo skip 'D'
-             if (real_need_float)
+             if (real_val.is_double)
                 {
-                  tos.push_back(Token(TOK_REAL,    real_flt));
+                 tos.push_back(Token(TOK_REAL, real_val.value.APL_flt));
                   Log(LOG_tokenize)
-                     CERR << "  tokenize_number: real " << real_flt << endl;
+                     CERR << "  tokenize_number: real "
+                          << real_val.value.APL_flt << endl;
+
                 }
              else
                 {
-                  tos.push_back(Token(TOK_INTEGER, real_int));
+                  tos.push_back(Token(TOK_INTEGER, real_val.value.APL_int));
                   Log(LOG_tokenize)
-                     CERR << "  tokenize_number: integer " << real_int << endl;
+                     CERR << "  tokenize_number: integer "
+                          << real_val.value.APL_int << endl;
                 }
-             goto done;;
+             goto done;
            }
 
         // real_flt is the magnitude and the angle is in degrees.
         //
-        APL_Float real = real_flt * cos(M_PI*degrees_flt / 180.0);
-        APL_Float imag = real_flt * sin(M_PI*degrees_flt / 180.0);
+        const APL_Float real = real_val.get_double()
+                             * cos(M_PI*degrees.get_double() / 180.0);
+        const APL_Float imag = real_val.get_double()
+                             * sin(M_PI*degrees.get_double() / 180.0);
         tos.push_back(Token(TOK_COMPLEX, real, imag));
         Log(LOG_tokenize)   CERR << "  tokenize_number: complex " << real
                                  << "J" << imag << endl;
       }
-   else if (src.rest_len() && (*src == UNI_R || *src == UNI_r))
+   else if (src.skip_if(UNI_R) || src.skip_if(UNI_r))   // 1r3.141592654 → ¯1J0
       {
-        ++src;   // skip 'R'
-
-        APL_Float radian_flt;     // always valid
-        APL_Integer radian_int;   // valid if imag_floating is true
-        bool radian_need_float = false;
-        const bool imag_valid = tokenize_real(src, radian_need_float,
-                                              radian_flt, radian_int);
-        if (!radian_need_float)   radian_flt = radian_int;
-
-        if (!imag_valid)
+        const Int_or_Double radian = tokenize_real(src);
+        if (!radian.is_valid)   // not a complex number
            {
              --src;   // undo skip 'R'
-             if (real_need_float)
+             if (radian.is_double)
                 {
-                  tos.push_back(Token(TOK_REAL,    real_flt));
+                  tos.push_back(Token(TOK_REAL, real_val.value.APL_flt));
                   Log(LOG_tokenize)
-                     CERR << "  tokenize_number: real " << real_flt << endl;
+                     CERR << "  tokenize_number: real "
+                          << real_val.value.APL_flt << endl;
                 }
              else
                 {
-                  tos.push_back(Token(TOK_INTEGER, real_int));
+                  tos.push_back(Token(TOK_INTEGER, real_val.value.APL_int));
                   Log(LOG_tokenize)
-                     CERR << "  tokenize_number: integer " << real_int << endl;
+                     CERR << "  tokenize_number: integer "
+                          << real_val.value.APL_int << endl;
                 }
              goto done;;
            }
 
         // real_flt is the magnitude and the angle is in radian.
         //
-        APL_Float real = real_flt * cos(radian_flt);
-        APL_Float imag = real_flt * sin(radian_flt);
+        APL_Float real = real_val.get_double() * cos(radian.get_double());
+        APL_Float imag = real_val.get_double() * sin(radian.get_double());
         tos.push_back(Token(TOK_COMPLEX, real, imag));
         Log(LOG_tokenize)   CERR << "  tokenize_number: complex " << real
                                  << "J" << imag << endl;
       }
-   else 
+   else   // neither XjY not XdY nor XrY
       {
-        if (real_need_float)
+        if (real_val.is_double)
            {
-             tos.push_back(Token(TOK_REAL,    real_flt));
+             tos.push_back(Token(TOK_REAL, real_val.value.APL_flt));
              Log(LOG_tokenize)
-                CERR << "  tokenize_number: real " << real_flt << endl;
+                CERR << "  tokenize_number: real "
+                     << real_val.value.APL_flt << endl;
            }
         else
            {
-             tos.push_back(Token(TOK_INTEGER, real_int));
+             tos.push_back(Token(TOK_INTEGER, real_val.value.APL_int));
              Log(LOG_tokenize)
-                CERR << "  tokenize_number: integer " << real_int << endl;
+                CERR << "  tokenize_number: integer "
+                     << real_val.value.APL_int << endl;
            }
       }
 
@@ -789,246 +774,230 @@ done:
    // remaining to be checked are a numeric scalar literal followed by ¯
    // or by . (page 42)
    //
-   if (src.rest_len())
+   if (src.more())
       {
         if (*src == UNI_OVERBAR || *src == '.')
            Error::throw_parse_error(E_BAD_NUMBER, LOC, loc);
       }
 }
 //----------------------------------------------------------------------------
-
-enum { MAX_TOKENIZE_DIGITS_1 = 20,                       // incl. rounding digit
-       MAX_TOKENIZE_DIGITS = MAX_TOKENIZE_DIGITS_1 - 1   // excl. rounding digit
-     };
-
-#define exp_0_9(x) x ## 0, x ## 1, x ## 2, x ## 3, x ## 4,  \
-                           x ## 5, x ## 6, x ## 7, x ## 8, x ## 9,
-
-static const long double expo_tab[309] = 
+Tokenizer::Int_or_Double
+Tokenizer::tokenize_hex(Unicode_source & src)
 {
-   exp_0_9(1E)   exp_0_9(1E1)  exp_0_9(1E2)  exp_0_9(1E3)  exp_0_9(1E4)
-   exp_0_9(1E5)  exp_0_9(1E6)  exp_0_9(1E7)  exp_0_9(1E8)  exp_0_9(1E9)
-   exp_0_9(1E10) exp_0_9(1E11) exp_0_9(1E12) exp_0_9(1E13) exp_0_9(1E14)
-   exp_0_9(1E15) exp_0_9(1E16) exp_0_9(1E17) exp_0_9(1E18) exp_0_9(1E19)
-   exp_0_9(1E20) exp_0_9(1E21) exp_0_9(1E22) exp_0_9(1E23) exp_0_9(1E24)
-   exp_0_9(1E25) exp_0_9(1E26) exp_0_9(1E27) exp_0_9(1E28) exp_0_9(1E29)
-   1E300, 1E301, 1E302, 1E303, 1E304, 1E305, 1E306, 1E307, 1E308
-};
+   src.get();   // skip $
+   if (!Avec::is_hex_digit(*src))   return Int_or_Double();   // no hex after $
 
-static const long double nexpo_tab[310] = 
+APL_Integer hex_val = 0;
+   while (src.more())
+         {
+           int digit;
+           if      (*src <  UNI_0)   break;
+           else if (*src <= UNI_9)   digit = src.get() - UNI_0;
+           else if (*src <  UNI_A)   break;
+           else if (*src <= UNI_F)   digit = 10 + src.get() - UNI_A;
+           else if (*src <  UNI_a)   break;
+           else if (*src <= UNI_f)   digit = 10 + src.get() - UNI_a;
+           else                            break;
+           hex_val = hex_val << 4 | digit;
+         }
+
+   return Int_or_Double(APL_Integer(hex_val));
+}
+//----------------------------------------------------------------------------
+
+Tokenizer::Int_or_Double
+Tokenizer::tokenize_real(Unicode_source & src)
 {
-   exp_0_9(1E-)   exp_0_9(1E-1)  exp_0_9(1E-2)  exp_0_9(1E-3)  exp_0_9(1E-4)
-   exp_0_9(1E-5)  exp_0_9(1E-6)  exp_0_9(1E-7)  exp_0_9(1E-8)  exp_0_9(1E-9)
-   exp_0_9(1E-10) exp_0_9(1E-11) exp_0_9(1E-12) exp_0_9(1E-13) exp_0_9(1E-14)
-   exp_0_9(1E-15) exp_0_9(1E-16) exp_0_9(1E-17) exp_0_9(1E-18) exp_0_9(1E-19)
-   exp_0_9(1E-20) exp_0_9(1E-21) exp_0_9(1E-22) exp_0_9(1E-23) exp_0_9(1E-24)
-   exp_0_9(1E-25) exp_0_9(1E-26) exp_0_9(1E-27) exp_0_9(1E-28) exp_0_9(1E-29)
-   exp_0_9(1E-30)
-};
-
-bool
-Tokenizer::tokenize_real(Unicode_source & src, bool & need_float,
-                         APL_Float & flt_val, APL_Integer & int_val) const
-{
-   int_val = 0;
-   need_float = false;
-
-UTF8_string int_digits;
-UTF8_string fract_digits;
-UTF8_string expo_digits;
-bool negative = false;
-bool expo_negative = false;
-bool skipped_0 = false;
-bool dot_seen = false;
-
    // hexadecimal ?
    //
    if (src.rest_len() > 1 && *src == UNI_DOLLAR_SIGN)
-      {
-        src.get();   // skip $
-        if (!Avec::is_hex_digit(*src))   return false;   // no hex after $
-        while (src.rest_len())
-           {
-             int digit;
-             if      (*src <  UNI_0)   break;
-             else if (*src <= UNI_9)   digit = src.get() - '0';
-             else if (*src <  UNI_A)   break;
-             else if (*src <= UNI_F)   digit = 10 + src.get() - 'A';
-             else if (*src <  UNI_a)   break;
-             else if (*src <= UNI_f)   digit = 10 + src.get() - 'a';
-             else                            break;
-             int_val = int_val << 4 | digit;
-           }
-        flt_val = int_val;
-        return true;   // OK
-      }
+      return tokenize_hex(src);
 
-   // 1. split src into integer, fractional, and exponent parts, removing:
-   // 1a. a leading sign of the integer part
-   // 1b. leading zeros of the integer part
-   // 1c. the . between the integer and fractional parts
-   // 1d. trailing zeros of the fractional part
-   // 1e. the E between the fractional and exponent parts
-   // 1f. a sign of the exponent part
-   //
-   if (src.rest_len() && *src == UNI_OVERBAR)   // 1a.
+enum { MAX_TOKENIZE_DIGITS = 19 };   // == atrlen("9223372036854775807")
+
+UTF8_string int_digits;     // the digits left of . (if any)
+UTF8_string fract_digits;   // the digits right of . (if any)
+UTF8_string expo_digits;    // the digits  right of E (if any)
+bool need_float = false;
+bool mant_negative = false;   // mantissa is negative
+bool expo_negative = false;   // exponent is negative
+bool skipped_0 = false;     // some leading 0 in the integer part were skipped
+bool dot_seen = false;      // the decimal . was seen
+
+
+   /* 1. split src into integer, fractional, and exponent parts,
+         thereby removing (skipping):
+
+      1a. a leading sign of the integer part,         (sets mant_negative)
+      1b. leading zeros of the integer part,
+      1c. the . between the integer and fractional parts,
+      1d. trailing zeros of the fractional part,
+      1e. the E between the fractional and exponent parts, and/or
+      1f. a sign of the exponent part                 (sets expo_negative)
+    */
+   if (src.more() && *src == UNI_OVERBAR)   // 1a.
       {
-        negative = true;
+        mant_negative = true;
         ++src;
       }
 
-   // 1b. skip leading zeros in integer part
+   // 1b. discard leading zeros in the integer part
    //
-   while (src.rest_len() && *src == '0')   { ++src;   skipped_0 = true; }
+   while (src.skip_if(UNI_0))   { skipped_0 = true; }
 
    // integer part
    //
-   while (src.rest_len() && Avec::is_digit(*src))   int_digits += src.get();
+   while (src.more() && Avec::is_digit(*src))   int_digits += src.get();
 
-   // fractional part
+   // fractional part...
    //
-   if (src.rest_len() && *src == UNI_FULLSTOP)   // fract part present
+   if (src.skip_if(UNI_FULLSTOP))   // fract part present
       {
-        ++src;   // 1c. skip '.'
         dot_seen = true;
-        while (src.rest_len() && Avec::is_digit(*src))
+        while (src.more() && Avec::is_digit(*src))
            {
              fract_digits += src.get();
            }
 
-        while (fract_digits.size() && fract_digits.back() == '0')   // 1d.
+        while (fract_digits.size() && fract_digits.back() == UNI_0)   // 1d.
            fract_digits.pop_back();
       }
 
-   // require at least one integer or fractional digit
+   // APL syntax requires at least one (integer or fractional) digit
    //
-   if (int_digits.size() == 0    &&
-       fract_digits.size() == 0  &&
-       !skipped_0)   return false;   // error
+   if (int_digits.size()   == 0  &&   // empty integer part, and
+       fract_digits.size() == 0)      // empty fractional part
+      {
+        // mantisssa is empty. This is either a syntax error (by the user)
+        // or caused by discarding leading 0s in int_digits. If the mantissa
+        // is 0 here, then the exponent does not matter.
+        //
+        return skipped_0 ? Int_or_Double(APL_Integer(0))   // valid 0
+                         : Int_or_Double();                // syntax error
+      }
 
    // exponent part (but could also be a name starting with E or e)
    //
-   if (src.rest_len() >= 2 &&   // at least E and a digit or ¯
-       (*src == UNI_E || *src == UNI_e))   // maybe exponent
+   if (src.rest_len() >= 2 &&              // at least E and a digit or ¯
+       (*src == UNI_E || *src == UNI_e))   // and maybe exponent
       {
         expo_negative = (src[1] == UNI_OVERBAR);
-        if (expo_negative   &&
+        if (expo_negative       &&
             src.rest_len() >= 3 &&
             Avec::is_digit(src[2]))                    // E¯nnn
            {
              need_float = true;
              ++src;                        // skip e/E
              ++src;                        // skip ¯
-             while (src.rest_len() && Avec::is_digit(*src))
+             while (src.more() && Avec::is_digit(*src))
                   expo_digits += src.get();
            }
         else if (Avec::is_digit(src[1]))               // Ennn
            {
              need_float = true;
              ++src;                        // skip e/E
-             while (src.rest_len() && Avec::is_digit(*src))
+             while (src.more() && Avec::is_digit(*src))
                   expo_digits += src.get();
            }
       }
 
-   // second dot ?
-   if (dot_seen && src.rest_len() && *src == UNI_FULLSTOP)
-      return false;   // error
+   // second dot (which id a syntax error)?
+   if (src.skip_if(UNI_FULLSTOP) && dot_seen)   return Int_or_Double();
 
-int expo = 0;
-   loop(d, expo_digits.size())   expo = 10*expo + (expo_digits[d] - '0');
-   if (expo_negative)   expo = - expo;
-   expo += int_digits.size();
-
-UTF8_string digits = int_digits;
-   digits.append_UTF8(fract_digits);
-
-   // at this point, digits is the fractional part ff... of 0.ff... ×10⋆expo
-   // discard leading fractional 0s and adjust expo accordingly
+   // set expo to the optional Ennn (if any) in iii.fff.Ennn)
    //
-   while (digits.size() && digits[0] == '0')
+   Log(LOG_tokenize)
       {
-        digits.erase(0);   // discard '0'
-        --expo;
+        Q1(int_digits.size());
+        Q1(int_digits);
+        Q1(fract_digits);
+        Q1(expo_digits);
       }
 
-   // at this point, digits is the fractional part ff... of 0.ff... ×10⋆expo
-   // from 0.1000... to 0.9999... Discard digits beyond integer precision.
+   // construct a C string according to the APL string
    //
-   // The largest 64-bit integer is 0x7FFFFFFFFFFFFFFF = 9223372036854775807
-   // which has 19 decimal digits. Discard all after first 20 digits and
-   // round according to the last digit.
-   //
-   if (digits.size() > MAX_TOKENIZE_DIGITS_1)
-      digits.resize(MAX_TOKENIZE_DIGITS_1);
+char buffer[int_digits.size() + fract_digits.size() + expo_digits.size() + 20];
+char * b = buffer;
+   if (mant_negative)   *b++ = '-';
+   loop(i, int_digits.size())   *b++ = int_digits[i];
 
-   if (digits.size() == MAX_TOKENIZE_DIGITS_1)
+   if (int_digits.size() > MAX_TOKENIZE_DIGITS)   // very big mantissa
       {
-        if (digits.round_0_1())   ++expo;
+        need_float = true;
+        fract_digits.clear();   // ignore fract digits
       }
-
-   // special cases: all digits 0 or very small number
-   //
-   if (digits.size() == 0)   return true;   // OK: all digits were 0
-   if (expo <= -307)         return true;   // OK: very small number
-
-   Assert(digits.size() <= MAX_TOKENIZE_DIGITS);
-
-   if (expo > MAX_TOKENIZE_DIGITS)   need_float = true;   /// large integer
-
-   // special case: integer between 9223372036854775807 and 9999999999999999999
-   //
-   if (expo == MAX_TOKENIZE_DIGITS && digits[0] == '9')
+   else if (int_digits.size() == MAX_TOKENIZE_DIGITS &&
+            int_digits[0] == UNI_9 &&
+            int_digits[1] >= UNI_2)   // 9200000000000000000 or more
       {
-        // a uint64_t compare might overflow, so we compare the digit string
-        const char * maxint = "9223372036854775807";
-        loop(j, digits.size())
+        // the max. APL integer is 0x7FFFFFFFFFFFFFFF aka. 9223372036854775807
+        // with 19 deciman digits. int_digits has 19  and starts with 92. The
+        // 2 in 92 somewhat simplifies rounding up of aby fractional digits.
+        // It thus may or may not fit into an APL integer.
+        // This happens rarely so we can afford some extra effort as to figure
+        // precisely whether int_digits is real or integer).
+        //
+        if (fract_digits.size() && fract_digits[0] >= UNI_5)   // round up
+           {
+             for (int d = int_digits.size();;)
+                 {
+                   const UTF8 digit = int_digits[--d];
+                   if (digit == UNI_9)   // propagate carry
+                      {
+                        int_digits[d] = UNI_0;       // 9 → 0 and continue
+                      }
+                   else
+                      {
+                        int_digits[d] = digit + 1;   // ++N and stop
+                        break;
+                      }
+                 }
+           }
+        fract_digits.clear();
+
+        const UTF8_string max_int("9223372036854775807");
+        loop(j, MAX_TOKENIZE_DIGITS)
             {
-               if (digits[j] < maxint[j])    break;
-               if (digits[j] == maxint[j])   continue;
-               need_float = true;
-               break;
+              if (int_digits[j] < max_int[j])   break;   // small (int is OK).
+              if (int_digits[j] > max_int[j])            // float needed
+                 {
+                   need_float = true;
+                   // float precisionm is lower than integer precision, we can
+                   // therefore discard any fractional digits.
+                   fract_digits.clear();   // ignore fract digits
+                   break;
+                 }
             }
       }
 
-   if (int(digits.size()) > expo)   need_float = true;
+   if (fract_digits.size())
+      {
+         need_float = true;
+         *b++ = '.';
+         loop(f, fract_digits.size())   *b++ = fract_digits[f];
+      }
+
+   if (expo_digits.size())
+      {
+         need_float = true;
+         *b++ = 'e';
+         if (expo_negative)   *b++ = '-';
+         loop(e, expo_digits.size())   *b++ = expo_digits[e];
+      }
+   *b = 0;
 
    if (need_float)
       {
-        if (digits.size() > 17)   digits.resize(17);
-
-       int64_t v = 0;
-        loop(j, digits.size())
-          {
-            v = 10*v + (digits[j] - '0');
-            --expo;
-          }
-
-        if (expo > 0)
-           {
-             if (expo > 308)   return false;
-             if (negative)   flt_val = - v * expo_tab[expo];
-             else            flt_val =   v * expo_tab[expo];
-             return true;   // OK
-           }
-        else if (expo < 0)
-           {
-             if (negative)   flt_val = - v * nexpo_tab[-expo];
-             else            flt_val =   v * nexpo_tab[-expo];
-             return true;   // OK
-           }
-
-        if (negative)   flt_val = - v;
-        else            flt_val =   v;
-        return true;   // OK
+        return Int_or_Double(APL_Float(strtod(buffer, 0)));
       }
    else
       {
-        int_val = 0;
-        loop(j, digits.size())   int_val = 10*int_val + (digits[j] - '0');
-        if (negative)   int_val = - int_val;
-        flt_val = int_val;
-        return true;   // OK
+        errno = 0;
+        const long long  result = strtoll(buffer, 0, 10);   // may set errno
+        if (errno)   // strtoll() failed (int_digits too large)
+           return Int_or_Double(APL_Float(strtod(buffer, 0)));
+        else
+           return Int_or_Double(APL_Integer(result));
       }
 }
 //----------------------------------------------------------------------------
@@ -1045,7 +1014,7 @@ UCS_string symbol;
       }
    symbol.append(src.get());
 
-   while (src.rest_len())
+   while (src.more())
        {
          const Unicode uni = *src;
          if (!Avec::is_symbol_char(uni))   break;
@@ -1058,7 +1027,7 @@ UCS_string symbol;
       {
         // S∆ or T∆
 
-        while (src.rest_len() && *src <= UNI_SPACE)   src.get();   // spaces
+        while (src.more() && *src <= UNI_SPACE)   src.get();   // spaces
         UCS_string symbol1(symbol, 2, symbol.size() - 2);   // without S∆/T∆
         Value_P AB(symbol1, LOC);
         Function_P ST = 0;

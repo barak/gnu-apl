@@ -361,6 +361,14 @@ bool got_tag = false;
    return in_HTML;
 }
 //----------------------------------------------------------------------------
+uint64_t
+UTF8_string::long_value() const
+{
+uint64_t ret = 0;
+   loop(j, size())   ret = 10*ret + (at(j) - UNI_0);
+   return ret;
+}
+//----------------------------------------------------------------------------
 bool
 UTF8_string::round_0_1()
 {

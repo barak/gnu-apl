@@ -783,7 +783,7 @@ double dval = 0;
         Z.next_ravel_Float(dval);
         return;
       }
-   else if (have_expo)   // so strtoll wont work
+   else if (have_expo)   // so strtoll() won't work
       {
         if (dval < 0)   Z.next_ravel_Int(dval - 0.5);   // round negative → 0
         else            Z.next_ravel_Int(dval + 0.5);   // round positive → 0
@@ -873,7 +873,7 @@ char cc[5];
    cc[3] = ucs_B[b++];
    cc[4] = 0;
 
-   return Unicode(strtol(cc, 0, 16));
+   return Unicode(strtoll(cc, 0, 16));
 }
 //----------------------------------------------------------------------------
 void

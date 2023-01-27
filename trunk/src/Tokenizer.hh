@@ -42,7 +42,7 @@ public:
    {}
 
    /// constructor: iterate from \b from to \b to
-   Unicode_source(const Unicode_source & src, int32_t from, int32_t to)
+   Unicode_source(const Unicode_source & src, int from, int to)
    : str(src.str),
      idx(src.idx + from),
      end(src.idx + from + to)
@@ -52,12 +52,23 @@ public:
    }
 
    /// return the number of remaining items
-   int32_t rest_len() const
+   int rest_len() const
       { return end - idx; }
 
+   /// return true iff there arer any remaining items
+   bool more() const
+      { return idx < end; }
+
+   /// if the next char is \b uni then skip it and return true, otherwise false.
+   bool skip_if(Unicode uni)
+      {
+        if (!more() || str[idx] != uni)   return false;
+        ++idx;   return true;
+      }
+
    /// lookup next item
-   const Unicode & operator[](int32_t i) const
-      { i += idx;   Assert(uint32_t(i) < uint32_t(end));   return str[i]; }
+   const Unicode & operator[](int i) const
+      { i += idx;   Assert(i < end);   return str[i]; }
 
    /// get next item
    const Unicode & get()
@@ -76,11 +87,11 @@ public:
       { Assert(idx > 0);   --idx; }
 
    /// shrink the source to rest \b new_rest
-   void set_rest(int32_t new_rest)
+   void set_rest(int new_rest)
       { Assert(new_rest <= rest_len());   end = idx + new_rest; }
 
    /// skip \b count elements
-   void skip(int32_t count)
+   void skip(int count)
       { idx += count;   if (idx > end)   idx = end; }
 
 protected:
@@ -88,10 +99,10 @@ protected:
    const UCS_string & str;
 
    /// the current position
-   int32_t idx;
+   int idx;
 
    /// the end position (excluding)
-   int32_t end;
+   int end;
 };
 //----------------------------------------------------------------------------
 /// The converter from APL input characters to APL tokens
@@ -104,6 +115,40 @@ public:
      macro(mac),
      loc(_loc)
    {}
+
+   /// an APL_Integer or a APL_Float.
+   struct Int_or_Double
+      {
+         // default constructor for uninitialized Int_or_Double
+         Int_or_Double()
+            : is_double(false),
+              is_valid(false)
+            {   value.APL_int = 0; }
+
+         // constructor for integer
+         Int_or_Double(APL_Integer aint)
+            : is_double(false),
+              is_valid(true)
+            {   value.APL_int = aint; }
+
+         // constructor for double
+         Int_or_Double(APL_Float aflt)
+            : is_double(true),
+              is_valid(true)
+            {   value.APL_flt = aflt; }
+
+         const bool is_double;   ///< true if so.
+         const bool is_valid;    ///< true if so.
+
+        double get_double() const
+           { return is_double ? value.APL_flt : value.APL_int; }
+
+         union
+            {
+              APL_Integer APL_int;
+              APL_Float   APL_flt;
+            } value;
+      };
 
    /// tokenize UTF-8 string \b input into token string \b tos.
    ErrorCode tokenize(const UCS_string & input, Token_string & tos) const;
@@ -134,9 +179,11 @@ protected:
    void tokenize_number(Unicode_source & src, Token_string & tos,
                         size_t & rest_2) const;
 
+   /// tokenize a hex number (integer).
+   static Int_or_Double tokenize_hex(Unicode_source &src);
+
    /// tokenize a real number (integer or floating point).
-   bool tokenize_real(Unicode_source &src, bool & need_float,
-                      APL_Float & flt_val, APL_Integer & int_val) const;
+   static Int_or_Double tokenize_real(Unicode_source &src);
 
    /// a locale-independent sscanf()
    static int scan_real(const char * strg, APL_Float & result, 

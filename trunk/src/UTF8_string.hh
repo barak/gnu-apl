@@ -124,6 +124,10 @@ public:
    /// skip over < ... > and expand &lt; and friends
    int un_HTML(int in_HTML);
 
+
+   /// essentially strtol(this, 0, 10)
+   uint64_t long_value() const;
+
    /// round a digit string is the fractional part of a number between
    /// 0.0... and 0.9... up or down according to its last digit, return true
    /// if the exponent shall be increased (because 1.0 -> 0.1)

@@ -230,15 +230,14 @@ const char * loc = 0;
               char * e = s + strlen(s);
               while (e > s && *e > 0 && *e < ' ')   *--e = 0;
 
-              for (unsigned int id; s;)
+              for (errno = 0; s && !errno; s = strchr(s, ','))
                   {
                     ++s;   // skip comma
-                    if (1 != sscanf(s, "%u", &id))   break;
+                    const unsigned int id = strtoll(s, 0, 10);
 
                     procauth.rsvopid.push_back(id);
-                    s = strchr(s, ',');
                   }
-              continue;
+              continue;   // for (line = 1;; ++line)
             }
 
          // invalid tag (probably next entry). restore file position

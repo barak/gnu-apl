@@ -503,7 +503,7 @@ const UTF8 Z_type = V[0];   // s, d, or f like conversion char in sprintf()
       {
         Value_P Z(2, LOC);
         Z->next_ravel_Int(TLV_tag - Response_0);   // function that sent V
-        Z->next_ravel_Int(strtol(V + 1, 0, 10));   // function result
+        Z->next_ravel_Int(strtoll(V + 1, 0, 10));   // function result
         Z->check_value(LOC);
         return  Z;
       }

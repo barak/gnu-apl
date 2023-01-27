@@ -181,6 +181,7 @@ dist_noinst_DATA =                              \
         Subtract.tc                             \
         Take.tc                                 \
         Take_with_axis.tc                       \
+        Tokenizer.tc                            \
         Trace.tc                                \
         Transpose_reversed_axes.tc              \
         Transpose.tc                            \
@@ -240,7 +241,7 @@ dist_noinst_DATA =                              \
         ZZ53_Regression.tc                      \
         ZZ54_Regression.tc                      \
         ZZ55_Regression.tc                      \
-        ZZZ0_Standard_08x,tc                    \
+        ZZZ0_Standard_08x.tc                    \
         ZZZ0_Standard_09x.tc                    \
         ZZZ0_Standard_10x.tc                    \
         ZZZ0_Standard_20x.tc                    \
