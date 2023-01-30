@@ -860,7 +860,10 @@ bool dot_seen = false;      // the decimal . was seen
            }
 
         while (fract_digits.size() && fract_digits.back() == UNI_0)   // 1d.
-           fract_digits.pop_back();
+           {
+             fract_digits.pop_back();
+             skipped_0 = true;
+           }
       }
 
    // APL syntax requires at least one (integer or fractional) digit

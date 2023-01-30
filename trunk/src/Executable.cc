@@ -145,8 +145,7 @@ Executable::parse_body_line(Function_Line line, const UCS_string & ucs_line,
 
 Token_string in;
 const Parser parser(get_parse_mode(), loc, macro);
-ErrorCode ec = parser.parse(ucs_line, in);
-   if (ec)
+   if (const ErrorCode ec = parser.parse(ucs_line, in))
       {
         if (tolerant)   return ec;
 
