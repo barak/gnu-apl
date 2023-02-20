@@ -44,12 +44,17 @@ const sAxis axis = Value::get_single_axis(X.get(), B->get_rank());
 Value_P
 Bif_F12_PARTITION::do_eval_B(Value_P B)
 {
-   if (B->is_simple_scalar())   return B;
+Value_P Z(LOC);   // Z ← ⊂B is always a scalar
 
-Value_P Z(LOC);
-Value_P B0 = CLONE_P(B, LOC);
-
-   Z->next_ravel_Pointer(B0.get());
+   if (B->is_simple_scalar())   // B is not nested: copy ↑B
+      {
+        Z->next_ravel_Cell(B->get_cscalar());
+      }
+   else                         // B is nested: clone and copy
+      {
+        Value_P Z0 = B->clone(LOC);
+        Z->next_ravel_Pointer(Z0.get());
+      }
    Z->check_value(LOC);
    return Z;
 }
