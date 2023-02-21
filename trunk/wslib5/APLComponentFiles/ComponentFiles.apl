@@ -1,10 +1,10 @@
-#!/usr/local/bin/apl --script --
+#!/usr/local/bin/apl --script
+ ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝
+⍝
+⍝ ComponentFiles 2023-01-16  07:04:57 (GMT-5)
+ ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝
 
- ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝
-⍝
-⍝ ComponentFiles 2014-07-14 12:26:28 (GMT-5)
-⍝
- ⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝⍝
+)COPY 5 SQL
 
 ∇cid←data CF_APPEND fh;r;tbl;⎕IO;i;n;data2
  ⎕IO←1
@@ -164,55 +164,6 @@
  BIG∆NEW:'⎕ES''WRITE ERROR'''⎕EA'r←(''insert into '',tbl,'' (ikey, ldata) values (?, ?);'')SQL∆Exec[_CF_DB] cfi[2] data2'
 ∇
 
-∇Z←SQL∆Begin Y
- Z←SQL[5] Y
-∇
-
-∇Z←SQL∆Commit Y
- Z←SQL[6] Y
-∇
-
-∇Z←X SQL∆Connect Y
- Z←X SQL[1] Y
-∇
-
-∇Z←SQL∆Disconnect Y
- Z←SQL[2] Y
-∇
-
-∇Z←X SQL∆Exec[db] Y
- Z←X SQL[4,db] Y
-∇
-
-∇Z←SQL∆Rollback Y
- Z←SQL[7] Y
-∇
-
-∇Z←X SQL∆Select[db] Y
- Z←X SQL[3,db] Y
-∇
-
-∇Z←SQL∆Tables Y
- Z←SQL[8] Y
-∇
-
-∇Z←X (F SQL∆WithTransaction FINDDB) Y;result
- SQL∆Begin FINDDB
- →(0≠⎕NC 'X')/dyadic
- result ← '→rollback' ⎕EA 'F Y'
- →commit
- dyadic:
- result ← '→rollback' ⎕EA 'X F Y'
- commit:
- SQL∆Commit FINDDB
- Z ← result
- →end
- rollback:
- SQL∆Rollback FINDDB
- ⎕ES "Transaction rolled back"
- end:
-∇
-
 ∇r←fh _CF_ADD fnm
  ⍎(2≠⎕NC 'fh')/'fh←1+⌈/0,_CF_MAP[;⎕IO]'
  _CF_MAP←_CF_MAP⍪(r←fh),(⊂fnm),_CF_NEXT fnm
@@ -237,20 +188,20 @@
 
 ⎕CT←1E¯13
 
-⎕FC←6⍴(,⎕UCS 46 44 8902 48 95 175)
+⎕FC←,⎕UCS 46 44 8902 48 95 175
 
 ⎕IO←1
 
 ⎕L←0
 
-⎕LX←' '
-  ⎕LX←0⍴⎕LX
+⎕LX←' ' ⍝ proto 1
+⎕LX←0⍴⎕LX ⍝ proto 2
 
 ⎕PP←10
 
-⎕PR←1⍴' '
+⎕PR←,' '
 
-⎕PS←0
+⎕PS←0 0
 
 ⎕PW←80
 
@@ -258,7 +209,7 @@
 
 ⎕RL←1
 
-⎕TZ←-5
+⎕TZ←¯5
 
 ⎕X←0
 
