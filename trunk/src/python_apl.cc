@@ -195,7 +195,7 @@ UCS_string line_ucs(line_utf8);
 
    if (exec_result == 0)   // error or defined function without return value
       {
-        if (const StateIndicator * si = Workspace::SI_top_error())
+        if (const StateIndicator * si = Workspace::SI_top_error(false))
            {
              const Error & err = StateIndicator::get_error(si);
              const ErrorCode ec = err.get_error_code();
