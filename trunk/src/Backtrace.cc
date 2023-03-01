@@ -76,6 +76,19 @@ Backtrace::find_src(int64_t pc)
    return 0;   // not found
 }
 //----------------------------------------------------------------------------
+#if defined(apl_TARGET_PYTHON) || defined(apl_TARGET_LIBAPL) || defined(apl_TARGET_ERLANG)
+
+// the extern int main() declaration in the regular Backtrace::open_lines_file()
+// below may cause problems when loadingi GNU APL as an .so file. We therefore
+// use a dummy function here (and source line numbers will not work then).
+void
+Backtrace::open_lines_file()
+{
+   lines_status = LINES_valid;   // pretend that we have read the lines file
+}
+
+#else   // extern int main() exists
+
 void
 Backtrace::open_lines_file()
 {
@@ -219,6 +232,7 @@ main():
         << "source line numbers found:    " << pc_2_src.size() << endl;
    lines_status = LINES_valid;
 }
+#endif
 //----------------------------------------------------------------------------
 void
 Backtrace::show_item(int idx, char * s)

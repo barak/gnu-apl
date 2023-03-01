@@ -17,6 +17,15 @@ your Python version is 3.4, and NOTICE THE DIFFERENT NAME OF THE .so FILE):
     sudo cp /usr/local/lib/apl/lib_gnu_apl.so \
             /usr/lib/python3.4/lib-dynload/gnu_apl.cpython-34m.so
 
+NOTA BENE: The python3.4 directory in the example above could either be
+/usr/lib/python3.4 or else /usr/local/lib/python3.4. The rules as to whether
+libgnu_apl.so shall live below /usr/lib or below /usr/local/lib are somewhat
+dubious. If you get ai error like:
+
+ModuleNotFoundError: No module named 'gnu_apl'
+
+in Python then you have picked the wrong one.
+
 After that, one can import GNU APL in Python and call Python functions
 provided by gnu_apl:
 
