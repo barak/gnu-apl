@@ -83,6 +83,10 @@ using namespace std;
 /// true when a WINCH (window size changed) signal was received
 extern bool got_WINCH;
 
+/// return the address of main(int argc, char * argv[]) if preset (apl binary)
+/// or 0 (for shared libraries) as to avoid that the main symbol is undefined.
+extern int64_t get_main();
+
 /// interpreter capabilities (for ]NEXTFILE)
 #define  apl_CAPABILITIES  "⎕FFT", "GTK",  "GUI", "⎕PNG", "POSTGRES", "⎕PLOT", \
  "⎕RE", "⎕SQL", "SQLITE3", "X11",  "XCB",

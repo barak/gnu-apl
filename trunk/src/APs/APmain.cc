@@ -442,6 +442,11 @@ cerr << "APnnn got " << signal->get_sigName() << endl;
 
    return 0;
 }
+
+int64_t get_main()
+{
+   return reinterpret_cast<int64_t>(&main);
+}
 //-----------------------------------------------------------------------------
 ostream & operator << (ostream & out, const AP_num3 & ap3)
 {

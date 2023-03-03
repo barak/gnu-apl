@@ -46,8 +46,7 @@
 
 using namespace std;
 
-Backtrace::_lines_status 
-       Backtrace::lines_status = Backtrace::LINES_not_checked;
+Backtrace::APL_lines_status Backtrace::lines_status = LINES_not_checked;
 
 std::vector<Backtrace::PC_src> Backtrace::pc_2_src;
 
@@ -76,26 +75,22 @@ Backtrace::find_src(int64_t pc)
    return 0;   // not found
 }
 //----------------------------------------------------------------------------
-#if defined(apl_TARGET_PYTHON) || defined(apl_TARGET_LIBAPL) || defined(apl_TARGET_ERLANG)
-
-// the extern int main() declaration in the regular Backtrace::open_lines_file()
-// below may cause problems when loadingi GNU APL as an .so file. We therefore
-// use a dummy function here (and source line numbers will not work then).
 void
 Backtrace::open_lines_file()
 {
-   lines_status = LINES_valid;   // pretend that we have read the lines file
-}
+   if (lines_status != LINES_not_checked)   return;   // already called
 
-#else   // extern int main() exists
-
-void
-Backtrace::open_lines_file()
-{
-extern int main(int argc, const char *argv[]);
-
-   if (lines_status != LINES_not_checked)   return;
-
+   // line numbers work only if ./configure was called with CXXFLAGS set
+   // to (at least) -rdynamic -gdwarf-2. Give up if this was not the case.
+   //
+   if (0 == strstr(cfg_CONFIGURE_ARGS, "-rdynamic") ||
+       0 == strstr(cfg_CONFIGURE_ARGS, "-gdwarf-2"))
+      {
+        cerr << "*** useless apl.lines "
+                "(no CXXFLAGS=-rdynamic -gdwarf-2)" << endl;
+         lines_status = LINES_unusable;
+         return;
+      }
    // we are here for the first time.
    // Assume that apl.lines is outdated until proven otherwise.
    //
@@ -146,14 +141,15 @@ int64_t prev_pc = NO_PC;
          if (s == 0)   break;   // end of file.
          ++file_lines;
 
-         buffer[sizeof(buffer) - 1] = 0;
+         buffer[sizeof(buffer) - 1] = 0;   // just in case
          int slen = strlen(buffer);
          if (slen && buffer[slen - 1] == '\n')   buffer[--slen] = 0;
          if (slen && buffer[slen - 1] == '\r')   buffer[--slen] = 0;
+         if (slen == 0)   continue;   // empty line
 
-         /* the file supposedly contains 3 types of lines:
+         /* the file supposedly contains only 3 types of non-empty lines:
 
-            case 1: the (single) <main> line,
+            case 1: the (single) <main>: line,
             case 2: absolute source file path lines, and
             case 3: code lines.
 
@@ -166,7 +162,7 @@ main():
   14c7aa:»······48 89 e5             »··mov    %rsp,%rbp   [code line]
   ...
 
-            NOTE: this only works with:
+            NOTE: case 2 only works with:
 
             CXXFLAGS='-rdynamic -gdwarf-2' ./configure ...
 
@@ -176,11 +172,11 @@ main():
 
          if (strstr(s, "<main>:"))   // case 1: <main line>
             {
-              const int64_t main_funct = int64_t(main);
+              const int64_t main_funct = get_main();
               const int64_t main_loc = strtoll(s, 0, 16);
               main_offset = main_funct - main_loc;
 
-              0 && cerr << hex << setfill(' ')
+              cerr << hex << setfill(' ')
                    << "main() in apl.lines  " << setw(16) << main_loc    << endl
                    << "main() offset:      +" << setw(16) << main_offset << endl
                    << "main() start:       =" << setw(16) << main_funct  << endl
@@ -209,6 +205,12 @@ main():
                  {
                    if (pc < prev_pc)
                       {
+                         cerr << endl
+                              << "in file apl.lines:" << file_lines << endl
+                              << lhex << "prev_pc was: " << prev_pc << endl
+                              << "pc is:       " << pc << nohex     << endl
+                              << "line is:     '" << s << "'"       << endl
+                              << endl;
                          assert(0 && "file apl.lines is not ordered by PC");
                          break;
                       }
@@ -232,7 +234,6 @@ main():
         << "source line numbers found:    " << pc_2_src.size() << endl;
    lines_status = LINES_valid;
 }
-#endif
 //----------------------------------------------------------------------------
 void
 Backtrace::show_item(int idx, char * s)
@@ -316,7 +317,10 @@ char obuf[200] = "@@@@";
 
 // cerr << setw(2) << idx << ": ";
 
-   cerr << HEX(pc);
+   // we normally prefer uppercase hex, but 'objcopy' and friends produce
+   // lowercase hex and we follow suit as to simplify searching in their files.
+   //
+   cerr << "0x" << lhex << pc << nohex;
 
 // cerr << left << setw(20) << s << right << " ";
 
@@ -327,7 +331,14 @@ char obuf[200] = "@@@@";
 
 // if (offs)   cerr << " +" << offs;
 
-   if (src_loc)   cerr << " at " << src_loc;
+   if (src_loc)
+      {
+        char cc[200];
+        snprintf(cc, sizeof(cc), "%s", src_loc);
+        cc[sizeof(cc) - 1] = 0;
+        if (char * disc = strstr(cc, "discriminator"))   disc[-1] = 0;
+         cerr << " at " << cc;
+      }
    cerr << endl;
 #endif
 }
@@ -372,7 +383,7 @@ char ** strings = backtrace_symbols(buffer, size);
 
    for (int i = 1; i < size - 1; ++i)
        {
-         // make a copy of strings[i] that can be
+         // make a copy cc of strings[i] that can be
          // messed up in show_item().
          //
          const char * si = strings[size - i - 1];

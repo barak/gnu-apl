@@ -865,9 +865,16 @@ eval__L_oper_R_X_B(APL_function fL, APL_function fun, APL_function fR,
        } catch (...)   { return 0; }
 }
 //----------------------------------------------------------------------------
-void disable_safe_mode()
+void
+disable_safe_mode()
 {
    uprefs.safe_mode = false;
+}
+//----------------------------------------------------------------------------
+int64_t get_main()
+{
+   return 0;
+
 }
 //----------------------------------------------------------------------------
 

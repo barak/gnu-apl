@@ -990,6 +990,12 @@ char * V = TLV + 8;                  // the V part of the TLV buffer
    __sem_destroy(drawarea_sema);
    return 0;
 }
+
+int64_t get_main()
+{
+   return reinterpret_cast<int64_t>(&main);
+
+}
 //-----------------------------------------------------------------------------
 static void
 generic_callback(GtkWidget * widget, const char * callback, const char * sig)

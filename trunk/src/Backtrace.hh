@@ -54,15 +54,16 @@ protected:
    static void show_item(int idx, char * s);
 
    /// the status of file apl.lines
-   enum _lines_status
+   enum APL_lines_status
       {
         LINES_not_checked,   ///< status is unknown
-        LINES_outdated,      ///< file is outdated
-        LINES_valid          ///< file is up-to-date
+        LINES_outdated,      ///< file is OK, but outdated
+        LINES_unusable,      ///< file is not usable for some reason
+        LINES_valid          ///< file is OK and up-to-date
       };
 
    /// the status of file apl.lines
-   static _lines_status lines_status;
+   static APL_lines_status lines_status;
 
    /// a mapping from PCs to source lines.
    struct PC_src
