@@ -63,7 +63,7 @@ class Value;
 typedef Value * APL_value;
 
 class Function;
-typedef const Function * APL_function;
+typedef Function const * APL_function;
 extern "C" {
 
 #else   // C
@@ -72,7 +72,7 @@ struct Value;
 typedef struct Value * APL_value;
 
 struct Function;
-typedef struct const Function * APL_function;
+typedef struct Function const * APL_function;
 
 #endif
 
