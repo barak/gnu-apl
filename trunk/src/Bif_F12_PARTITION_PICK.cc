@@ -333,7 +333,7 @@ Bif_F12_PICK::disclose_item(Value & Z, ShapeItem b,
          // it to item_shape, and store it in Z.
          //
         const Value & vB = *B_item.get_pointer_value();
-        Bif_F12_TAKE::fill(item_shape, Z, vB, false);
+        Bif_F12_TAKE::fill(item_shape, Z, vB, 0);
         if (vB.is_member())   Z.set_member();
       }
    else if (B_item.is_lval_cell())
@@ -367,8 +367,8 @@ Bif_F12_PICK::disclose_item(Value & Z, ShapeItem b,
         else if (target->is_pointer_cell())        // case 2.
            {
              Value_P subval = target->get_pointer_value();
-             const Value & subrefs = *subval->get_cellrefs(LOC);
-             Bif_F12_TAKE::fill(item_shape, Z, subrefs, false);
+             Value_P subrefs = subval->get_cellrefs(LOC);
+             Bif_F12_TAKE::fill(item_shape, Z, *subrefs, 0);
            }
         else                                       // case 3.
            {
@@ -666,10 +666,19 @@ const Cell * cB = &B->get_cravel(offset);
         return Z;
       }
 
-   if (cB->is_lval_cell())   // e.g. (A⊃B) ← C
+   if (cB->is_lval_cell())   // selective assignment, e.g. (A⊃B) ← C
       {
         Cell * target = cB->get_lval_value();
         Assert(target);
+
+#if 0
+
+if the target is nested, then GNU APL used used to assign to the items in
+the target (possibly scalar-extending or filling the value B as to match the
+the shape of B. However, neither IBM APL2 nor Dyalog do do that and therefore,
+being overruled by the majority, we follow suit.
+
+See bug-apl@gnu.org, 3/4/2023 (Mr. Sunday).
 
         if (target->is_pointer_cell())
            {
@@ -682,6 +691,7 @@ const Cell * cB = &B->get_cravel(offset);
              Value_P subrefs = subval->get_cellrefs(LOC);
              return subrefs;
            }
+#endif
 
         Value_P Z(LOC);
         Value * cell_owner = B->get_lval_cellowner();
