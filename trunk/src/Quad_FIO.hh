@@ -196,8 +196,8 @@ protected:
    /// fprintf A to file \b out
    static Token do_fprintf(FILE * out, Value_P A);
 
-   /// sprintf with format string A and Data items B
-   static void do_sprintf(UCS_string & UZ, const UCS_string & A_format,
+   /// snprintf with format string A and Data items B
+   static void do_snprintf(UCS_string & UZ, const UCS_string & A_format,
                    const Value * B, int B_start, const char * funname);
 
    /// perform an fscanf() from file

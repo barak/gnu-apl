@@ -929,7 +929,7 @@ Symbol::list(ostream & out) const
 void
 Symbol::write_OUT(FILE * out, uint64_t & seq) const
 {
-char buffer[128];   // a little bigger than needed - don't use sizeof(buffer)
+char buffer[128];   // a little bigger than needed (we need 80 + 2)
 UCS_string data;
 
    switch(value_stack[0].get_NC())
@@ -951,14 +951,17 @@ UCS_string data;
                //
                Function_P fun = value_stack[0].get_function();
                const YMDhmsu ymdhmsu(fun->get_creation_time());
-               sprintf(buffer, "*(%d %d %d %d %d %d %d)",
+               snprintf(buffer, sizeof(buffer), "*(%d %d %d %d %d %d %d)",
                        ymdhmsu.year, ymdhmsu.month, ymdhmsu.day,
                        ymdhmsu.hour, ymdhmsu.minute, ymdhmsu.second,
                        ymdhmsu.micro/1000);
 
                for (char * cp = buffer + strlen(buffer);
                     cp < (buffer + 72); )   *cp++ = ' ';
-                sprintf(buffer + 72, "%8.8lld\r\n", long_long(seq++));
+                snprintf(buffer + 72,
+                         sizeof(buffer) - 72,
+                         "%8.8lld\r\n",
+                         static_cast<long long>(seq++));
                 fwrite(buffer, 1, 82, out);
 
                // write function record(s)
@@ -985,7 +988,10 @@ UCS_string data;
              buffer[1 + uu] = cc;
            }
 
-        sprintf(buffer + 72, "%8.8lld\r\n", long_long(seq++));
+        snprintf(buffer + 72,
+                 sizeof(buffer) - 72,
+                 "%8.8lld\r\n",
+                 static_cast<long long>(seq++));
         fwrite(buffer, 1, 82, out);
       }
 }
@@ -1051,7 +1057,7 @@ int count = 0;
                         {
                           char cc[100];
                           snprintf(cc, sizeof(cc), "    VS[%lld] ",
-                                   long_long(v));
+                                   static_cast<long long>(v));
                           count += ufun->show_owners(cc, out, value);
                         }
                    }

@@ -401,10 +401,10 @@ public:
                             const void *)
       { return u1 > u2; }
 
-   /// convert a signed integer value to an UCS_string (like sprintf())
+   /// convert a signed integer value to an UCS_string (like snprintf("%d"))
    static UCS_string from_int(int64_t value);
 
-   /// convert an unsigned integer value to an UCS_string (like sprintf())
+   /// convert an unsigned integer value to an UCS_string (like snprintf("%u"))
    static UCS_string from_uint(uint64_t value);
 
    /// convert the integer part of value to an UCS_string and remove it

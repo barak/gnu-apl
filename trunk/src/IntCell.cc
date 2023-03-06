@@ -906,7 +906,7 @@ IntCell::character_representation(const PrintContext & pctx) const
       }
 
 char cc[40];
-int len = snprintf(cc, sizeof(cc), "%lld", long_long(value.ival));
+int len = snprintf(cc, sizeof(cc), "%lld", static_cast<long long>(value.ival));
 
 UCS_string ucs;
 

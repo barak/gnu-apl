@@ -268,7 +268,7 @@ char cc[80];
         case CT_INT:   // uses UNI_PAD_U3
              space -= leave_char_mode();
              snprintf(cc, sizeof(cc), "%lld",
-                      long_long(cell.get_int_value()));
+                      static_cast<long long>(cell.get_int_value()));
              NEED(1 + strlen(cc)) << UNI_PAD_U3 << decr(--space, cc);
              break;
 

@@ -1,3 +1,12 @@
+/* WARNING: this file is generated, don't edit it directly.
+
+  The generator is make_map.py, with the help of the following input files:
+
+  Gtk_map.header                        (template copied verbatim)
+  /usr/include/gtk-3.0/gtk/ *.h         (various Gtk header files)
+  Gtk_map.footer                        (template copied verbatim)
+ */
+
 #ifdef gtk_fun_def
 /* a mapping from ⎕GTK function names (right string argument Bs in ⎕GTK Bs) to Gtk functions.
 

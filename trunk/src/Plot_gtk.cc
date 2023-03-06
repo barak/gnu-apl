@@ -333,7 +333,8 @@ const Pixel_XY T(S.x + TIP*Ux, S.y + TIP*Uy);
 /// format \b val according to \b format (with \b percent pointing to % in
 /// format, e.g. %d or %f like in printf()).
 const char *
-format_user_tick(double val, int tidx, const char * format, const char * percent)
+format_user_tick(double val, int tidx, const char * format,
+                 const char * percent)
 {
 static char cc[60] = "";   // should suffice
 
@@ -348,7 +349,7 @@ static char cc[60] = "";   // should suffice
                  {
                    CERR << "⎕PLOT: too few tick texts in " << percent
                                 << " (at tick " << tidx << ")";
-                   sprintf(cc, "Tick-%d", tidx);
+                   snprintf(cc, sizeof(cc), "Tick-%d", tidx);
                    return cc;
                  }
               tick_text = tick_end + 1;
@@ -363,7 +364,7 @@ static char cc[60] = "";   // should suffice
         if (tick_len >= (sizeof(cc) - 1))
            {
              CERR << "⎕PLOT: tick text too long";
-             sprintf(cc, "Tick-%d", tidx);
+             snprintf(cc, sizeof(cc), "Tick-%d", tidx);
              return cc;
            }
 

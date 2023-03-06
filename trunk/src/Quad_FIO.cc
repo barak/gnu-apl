@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -252,19 +252,19 @@ Quad_FIO::do_fprintf(FILE * outf, Value_P A)
 UCS_string UZ;
 const Value & A1 = *A->get_cfirst().get_pointer_value();
 UCS_string A_format(A1);
-   do_sprintf(UZ, A_format, A.get(), 1, "⎕FIO.fprintf B");
+   do_snprintf(UZ, A_format, A.get(), 1, "⎕FIO.fprintf B");
 UTF8_string utf(UZ);
    fwrite(utf.c_str(), 1, utf.size(), outf);
    return Token(TOK_APL_VALUE1, IntScalar(UZ.size(), LOC));
 }
 //----------------------------------------------------------------------------
 void
-Quad_FIO::do_sprintf(UCS_string & UZ, const UCS_string & A_format,
+Quad_FIO::do_snprintf(UCS_string & UZ, const UCS_string & A_format,
                     const Value * B, int off_B, const char * funname)
 {
    // A is the format string, B the nested APL values for each % field in A.
    // The result UZ is the formatted string. off_B is the starting point (1
-   // for fprintf(A, ...) and 0 for sprintf(format, B ...).
+   // for fprintf(A, ...) and 0 for snprintf(format, B ...).
    //
 char numbuf[50];
 const int arg_count_B = B->element_count() - off_B;
@@ -363,7 +363,7 @@ int conversion_count_A = 0;   // the number of conversions (in A_format)
                                  else            int_val = int(fv);
                                }
                             fmt[fm++] = uni_1;   fmt[fm] = 0;
-                            sprintf(numbuf, fmt, int_val);
+                            snprintf(numbuf, sizeof(numbuf), fmt, int_val);
                             if (thousands)  group_thousands(UZ, numbuf, false);
                             else            UZ.append_UTF8(numbuf);
                           }
@@ -376,7 +376,7 @@ int conversion_count_A = 0;   // the number of conversions (in A_format)
                             const APL_Float float_val =
                                   B->get_cravel(off_B++).get_real_value();
                             fmt[fm++] = uni_1;   fmt[fm] = 0;
-                            sprintf(numbuf, fmt, float_val);
+                            snprintf(numbuf, sizeof(numbuf), fmt, float_val);
                             if (thousands)
                                {
                                  group_thousands(UZ, numbuf, true);
@@ -418,7 +418,8 @@ int conversion_count_A = 0;   // the number of conversions (in A_format)
 
                      case 'm':
                           COUNT_ARG;
-                          sprintf(numbuf, "%s", strerror(errno));
+                          snprintf(numbuf, sizeof(numbuf), "%s",
+                                   strerror(errno));
                           UZ.append_UTF8(numbuf);
                           goto field_done;
 
@@ -462,7 +463,7 @@ missing_arg:
 void
 Quad_FIO::group_thousands(UCS_string & dest, char * buffer, bool flt)
 {
-   // buffer is the 0-terminated and ASCII-only output of some sprintf("%..."),
+   // buffer is the 0-terminated and ASCII-only output of some snprintf("%..."),
    // and the user has requested thousands' separators in the integer part of
    // buffer.
 
@@ -1135,7 +1136,7 @@ Quad_FIO::list_functions(ostream & out, bool mapping)
 "   Ze ← Af ⎕FIO[55] Bs    sscanf(Bs, Af) Af is the format string\n"
 "   Zs ← As ⎕FIO[56] Bs    write nested lines As to file named Bs\n"
 "   Zh ←    ⎕FIO[57] Bs    fork() and execve(Bs, { Bs, 0}, {0})\n"
-"   Zs ← Af ⎕FIO[58] B     sprintf(Af, B...) As is the format string\n"
+"   Zs ← Af ⎕FIO[58] B     snprintf(Af, B...) As is the format string\n"
 "   Zi ← Ai ⎕FIO[59] Bh    fcntl(Bh, Ai...) file control\n"
 "   Zi ←    ⎕FIO[60] Bi    return a Bi-byte random integer (for setting ⎕RL)\n"
 "   Zi ← 0  ⎕FIO[60] Bi    same as monadic ⎕FIO[60] Bi (random scalar, Bi≤8)\n"
@@ -2891,11 +2892,11 @@ int function_number = -1;
                 return Token(TOK_APL_VALUE1, IntScalar(items_written, LOC));
               }
 
-         case 58:   // sprintf(Af, B...)
+         case 58:   // snprintf(Af, B...)
               {
                 const UCS_string A_format(*A);
                 UCS_string UZ;
-                do_sprintf(UZ, A_format, B.get(), 0, "A ⎕FIO.sprintf B");
+                do_snprintf(UZ, A_format, B.get(), 0, "A ⎕FIO.snprintf B");
                 Value_P Z(UZ, LOC);
                 return Token(TOK_APL_VALUE1, Z);
               }

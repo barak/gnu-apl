@@ -154,7 +154,8 @@ Quad_JSON::APL_to_JSON_string(UCS_string & result, const Cell & cell,
    if (cell.is_integer_cell())
       {
         char cc[40];
-        snprintf(cc, sizeof(cc), "%lld", long_long(cell.get_int_value()));
+        snprintf(cc, sizeof(cc), "%lld",
+                 static_cast<long long>(cell.get_int_value()));
         result.append_UTF8(cc);
         return;
       }

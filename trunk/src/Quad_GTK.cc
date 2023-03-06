@@ -498,7 +498,7 @@ char * V = TLV + 8;
    // Response_0 (= 2000) from the TLV_tag to get the function number
    // and return APL vector function,"result-value"
    //
-const UTF8 Z_type = V[0];   // s, d, or f like conversion char in sprintf()
+const UTF8 Z_type = V[0];   // s, d, or f (like conversion char in snprintf())
    if (Z_type == 'd')   // integer
       {
         Value_P Z(2, LOC);
@@ -902,13 +902,17 @@ int envp_idx = 0;
          const char * var = evars[c];
          if (char * val = getenv(var))
             {
-              char * env = new char[strlen(var) + 2 + strlen(val)];
-              sprintf(env, "%s=%s", var, val);
+              const size_t len = strlen(var) + 1 + strlen(val) + 1;
+              char * env = new char[len];
+              snprintf(env, len, "%s=%s", var, val);
               envp[envp_idx++] = env;
-              envp[envp_idx] = 0;
             }
        }
-   return Quad_FIO::do_FIO_57(path, envp);
+   envp[envp_idx] = 0;   // 0-terminator
+
+const int fd = Quad_FIO::do_FIO_57(path, envp);
+   loop(c, evar_count)   delete envp[c];
+   return fd;
 }
 //----------------------------------------------------------------------------
 void

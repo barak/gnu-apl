@@ -965,11 +965,11 @@ void
 UCS_string::append_number(ShapeItem num)
 {
 char cc[40];
-   snprintf(cc, sizeof(cc) - 1, "%lld", long_long(num));
+   snprintf(cc, sizeof(cc) - 1, "%lld", static_cast<long long>(num));
    loop(c, sizeof(cc))
       {
-        if (cc[c])   append(Unicode(cc[c]));
-        else         break;
+        if (char digit = cc[c])   append(Unicode(digit));
+        else                      break;
       }
 }
 //----------------------------------------------------------------------------
@@ -978,10 +978,10 @@ UCS_string::append_hex(ShapeItem num, bool uppercase)
 {
 const char * format = uppercase ? "%llX" : "%llx";
 char cc[40];
-   snprintf(cc, sizeof(cc) - 1, format, long_long(num));
+   snprintf(cc, sizeof(cc) - 1, format, static_cast<long long>(num));
    loop(c, sizeof(cc))
       {
-        if (cc[c])   append(Unicode(cc[c]));
+        if (char hex_digit = cc[c])   append(Unicode(hex_digit));
         else         break;
       }
 }
