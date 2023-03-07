@@ -447,25 +447,46 @@ gtk_fun_doc(text_view     ,GtkTextView    ,add_row         ,Text      ,V,S, add 
 #ifdef gtk_event_def
 /* a mapping from GTK events (signals) to Gtk_server callbacks...
 
-             ╔═════════════════════════════════════════════════════════════════════════════════════════════╗
-             ║                                     Macro Argument                                          ║
-╔════════════╬══════════════╤═════╤════════╤══════════════╤═════════════════╤═════════════╤════════════════╣
-║            ║              │ arg │optional│     event    │   widget name   │   glade_ID  │       Gtk      ║
-║ Used By    ║ ev_name      │count│  args  │   signature  │    (example)    │    prefix   │      class     ║
-╠════════════╬══════════════╪═════╪════════╪══════════════╪═════════════════╪═════════════╪════════════════╣
-║ Quad_GTK   ║    ✓         │     │        │              │                 │             │                ║
-║ Gtk_server ║    ✓         │     │   ✓    │      ✓       │                 │             │                ║
-║ asciidoc   ║    ✓         │  ✓  │   ✓    │      ✓       │       ✓         │      ✓      │       ✓        ║
-╚════════════╬══════════════╪═════╪════════╪══════════════╪═════════════════╪═════════════╪════════════════╣
- *///        ║              │     │        │              │                 │             │                ║
-gtk_event_def( clicked      ,  1  ,        ,HiNsEsIsCs    , OK-button       , button      , GtkButton      )
-gtk_event_def( activate     ,  1  ,        ,HiNsEsIsCs    , Text-entry      , entry       , GtkEntry       )
-gtk_event_def( changed      ,  1  ,        ,HiNsEsIsCs    , Select-box      , combobox    , GtkComboBox    )
-gtk_event_def( draw         ,  1  ,        ,HiNsEsIsCs    , Canvas          , drawingarea , GtkDrawingArea )
-gtk_event_def( destroy      ,  1  ,        ,HiNsEsIsCs    , Main-Window     , window      , GtkWindow      )
-gtk_event_def( row_selected ,  1  ,        ,HiNsEsXiYiBiLi, text_view-Mouse , text_view   , GtkTextView    )
-//           ║              │     │        │              │                 │             │                ║
-//           ╚══════════════╧═════╧════════╧══════════════╧═════════════════╧═════════════╧════════════════╝
+             ╔═════════════════════════════════════════════════════════════════════════════════════════════════════╗
+             ║                                       Macro Argument                                                ║
+╔════════════╬══════════════════════╤═════╤════════╤══════════════╤═════════════════╤═════════════╤════════════════╣
+║            ║                      │ arg │optional│     event    │   widget name   │   glade_ID  │       Gtk      ║
+║ Used By    ║ ev_name              │count│  args  │   signature  │    (example)    │    prefix   │      class     ║
+╠════════════╬══════════════════════╪═════╪════════╪══════════════╪═════════════════╪═════════════╪════════════════╣
+║ Quad_GTK   ║    ✓                 │     │        │              │                 │             │                ║
+║ Gtk_server ║    ✓                 │     │   ✓    │      ✓       │                 │             │                ║
+║ asciidoc   ║    ✓                 │  ✓  │   ✓    │      ✓       │       ✓         │      ✓      │       ✓        ║
+╚════════════╬══════════════════════╪═════╪════════╪══════════════╪═════════════════╪═════════════╪════════════════╣
+ *///        ║                      │     │        │              │                 │             │                ║
+gtk_event_def( draw                 ,  1  ,        ,HiNsEsIsCs    , Canvas          , drawingarea , GtkDrawingArea )
+gtk_event_def( destroy              ,  1  ,        ,HiNsEsIsCs    , Main-Window     , window      , GtkWindow      )
+gtk_event_def( row_selected         ,  1  ,        ,HiNsEsXiYiBiLi, text_view-Mouse , text_view   , GtkTextView    )
+gtk_event_def( clicked              ,  1  ,        ,HiNsEsIsCs    , OK-button       , button      , GtkButton      )
+gtk_event_def( changed              ,  1  ,        ,HiNsEsIsCs    , Select-box      , combobox    , GtkComboBox    )
+gtk_event_def( check_resize         ,  1  ,        ,HiNsEsIsCs    , -               , -           , GtkContainer   )
+gtk_event_def( activate             ,  1  ,        ,HiNsEsIsCs    , Text-entry      , entry       , GtkEntry       )
+gtk_event_def( backspace            ,  1  ,        ,HiNsEsIsCs    , -               , entry       , GtkEntry       )
+gtk_event_def( cut_clipboard        ,  1  ,        ,HiNsEsIsCs    , -               , entry       , GtkEntry       )
+gtk_event_def( copy_clipboard       ,  1  ,        ,HiNsEsIsCs    , -               , entry       , GtkEntry       )
+gtk_event_def( paste_clipboard      ,  1  ,        ,HiNsEsIsCs    , -               , entry       , GtkEntry       )
+gtk_event_def( toggle_overwrite     ,  1  ,        ,HiNsEsIsCs    , -               , entry       , GtkEntry       )
+gtk_event_def( activate_cursor_row  ,  1  ,        ,HiNsEsIsCs    , -               , listbox     , GtkListBox     )
+gtk_event_def( toggle_cursor_row    ,  1  ,        ,HiNsEsIsCs    , -               , listbox     , GtkListBox     )
+gtk_event_def( selected_rows_changed,  1  ,        ,HiNsEsIsCs    , -               , listbox     , GtkListBox     )
+gtk_event_def( select_all           ,  1  ,        ,HiNsEsIsCs    , -               , listbox     , GtkListBox     )
+gtk_event_def( unselect_all         ,  1  ,        ,HiNsEsIsCs    , -               , listbox     , GtkListBox     )
+gtk_event_def( toggled              ,  1  ,        ,HiNsEsIsCs    , -               , -           , GtkToggleToolButton)
+gtk_event_def( show                 ,  1  ,        ,HiNsEsIsCs    , -               , -           , GtkWidget      )
+gtk_event_def( hide                 ,  1  ,        ,HiNsEsIsCs    , -               , -           , GtkWidget      )
+gtk_event_def( map                  ,  1  ,        ,HiNsEsIsCs    , -               , -           , GtkWidget      )
+gtk_event_def( unmap                ,  1  ,        ,HiNsEsIsCs    , -               , -           , GtkWidget      )
+gtk_event_def( realize              ,  1  ,        ,HiNsEsIsCs    , -               , -           , GtkWidget      )
+gtk_event_def( unrealize            ,  1  ,        ,HiNsEsIsCs    , -               , -           , GtkWidget      )
+gtk_event_def( composited_changed   ,  1  ,        ,HiNsEsIsCs    , -               , -           , GtkWidget      )
+gtk_event_def( style_updated        ,  1  ,        ,HiNsEsIsCs    , -               , -           , GtkWidget      )
+gtk_event_def( keys_changed         ,  1  ,        ,HiNsEsIsCs    , -               , window      , GtkWindow      )
+//           ║                      │     │        │              │                 │             │                ║
+//           ╚══════════════════════╧═════╧════════╧══════════════╧═════════════════╧═════════════╧════════════════╝
 //
 // ev_name: handler= as in <signal ... entry in .ui file or string
 //

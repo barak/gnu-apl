@@ -610,6 +610,8 @@ static void
 print_ev2(const char * ev_name, int _argc, const char * signature,
           const char * wid_name, const char * wid_id, const char *  wid_class)
 {
+   if (0 == strcmp(wid_name, "-"))   return;
+
    // signature defines the (uppercase) Fields and (lowercase) types of an
    // event vector, for example: HiNsEsIsCs or HiNsEsXiYiBiLi
 
