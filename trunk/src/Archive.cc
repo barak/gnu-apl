@@ -283,8 +283,9 @@ char cc[80];
                     // a non-zero denominator indicates a rational quotient)
                     //
                     const APL_Integer numer = flt.get_numerator();
-                    snprintf(cc, sizeof(cc), "%lld÷%lld", long_long(numer),
-                                                          long_long(denom));
+                    snprintf(cc, sizeof(cc), "%lld÷%lld",
+                             static_cast< long long>(numer),
+                             static_cast<long long>(denom));
                     NEED(1 + strlen(cc)) << UNI_PAD_U8 << decr(--space, cc);
                     break;
                   }
