@@ -57,7 +57,7 @@ enum LIBAPL_error
 #include "Error.def"
 };
 
-#ifdef __cplusplus
+#ifdef __cplusplus   // libapl used from C++
 
 class Value;
 typedef Value * APL_value;
@@ -66,7 +66,7 @@ class Function;
 typedef Function const * APL_function;
 extern "C" {
 
-#else   // C
+#else                // libapl used from C
 
 struct Value;
 typedef struct Value * APL_value;
@@ -74,7 +74,7 @@ typedef struct Value * APL_value;
 struct Function;
 typedef struct Function const * APL_function;
 
-#endif
+#endif               // C++ vs. C
 
 /* Application Program Interface for GNU APL...
    See

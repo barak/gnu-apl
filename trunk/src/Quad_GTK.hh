@@ -56,6 +56,26 @@ protected:
         gtype_F = 3,   ///< float
       };
 
+   /// true iff tag is a Gtk command without response (as opposed to
+   /// response tags or event classes
+   static inline bool is_command_without_response(int tag)
+      { return tag > 0 && tag < Command_0; }
+
+   /// true iff tag is a Gtk command with response (as opposed to
+   /// response tags or event classes
+   static inline bool is_command_with_response(int tag)
+      { return tag > Command_0 && tag < Command_max; }
+
+   /// true iff tag is a Gtk response (as opposed to command tags or
+   /// event class
+   static inline bool is_response(int tag)
+      { return tag > Response_0 && tag < Response_max; }
+
+   /// true iff tag is a Gtk event class (as opposed to command tags or
+   /// response tags
+   static inline bool is_event_class(int tag)
+      { return tag > Event_0 && tag < Event_max; }
+
    /// convert 1-character generic type names (V, I, S, or F) or longer
    /// enum types to the corresponding Gtype.
    static Gtype get_gtype(const char * str)

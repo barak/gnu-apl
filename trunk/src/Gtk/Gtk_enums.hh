@@ -18,6 +18,7 @@ enum Gtk_Command_Tag
    Command_ ## gtk_class ## _ ## gtk_function,
 
 #include "Gtk_map.def"
+   Command_max
 };
 
 /// Tx tags (command responses) for function numbers: 2001, 2002, ...
@@ -28,9 +29,10 @@ enum Gtk_Response_Tag
    Response_ ## gtk_class ## _ ## gtk_function,
 
 #include "Gtk_map.def"
+   Response_max
 };
 
-/// tags specifying events (
+/// tags specifying event classes (encodings)
 enum Event_tag
 {
    Event_0 = 3000,
@@ -38,5 +40,6 @@ enum Event_tag
    Event_widget_fun_id_class,    ///< H:widget:fun:glade_id:name
    Event_toplevel_window_done,   ///< H:Done
    Event_widget_ev_X_Y_B_L,      ///< H:widget:fun:mouse-X:mouse-Y:button:line
+   Event_max
 };
 

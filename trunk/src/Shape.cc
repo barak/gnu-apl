@@ -176,6 +176,25 @@ ShapeItem axes = 0;   // a bitmap of axes
    return true;
 }
 //----------------------------------------------------------------------------
+bool
+Shape::conforms_to(const Shape & other) const
+{
+int other_idx = 0;
+const int other_rank = other.get_rank();
+   loop(r, get_rank())
+      {
+        const int this_len = get_shape_item(r);
+        if (this_len == 1)   continue;                                // ignore length 1 axes of this
+        while (other_idx < other_rank &&
+               other.get_shape_item(other_idx) == 1)   ++other_idx;   // ignore length 1 axes of other
+        if (other_idx == other_rank)   return false;   // non-1 axis in this and no axis in other
+        const int other_len = other.get_shape_item(other_idx++);
+        if (this_len != other_len)   return false;                    // length mismatch
+      }
+
+   return other_idx == other_rank;
+}
+//----------------------------------------------------------------------------
 ostream &
 operator <<(ostream & out, const Shape & shape)
 {

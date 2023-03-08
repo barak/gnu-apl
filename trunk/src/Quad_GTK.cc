@@ -415,7 +415,7 @@ Gtype Atype = gtype_V;
 }
 //----------------------------------------------------------------------------
 Value_P
-Quad_GTK::read_fd(int fd, int tag)
+Quad_GTK::read_fd(int fd, int expected_tag)
 {
    // tag == -1 indicates a poll for ANY tag (= an event as opposed to a
    // command response). In that case the poll is non-blocking.
@@ -444,18 +444,15 @@ const uint32_t V_len = (TLV[4] & 0xFF) << 24 | (TLV[5] & 0xFF) << 16
 char * V = TLV + 8;
    V[V_len] = 0;   // avoid trouble
 
-   // 1. check for events from generic_callback() or other callbacks
-   //    in Gtk_serverc.cc. The cases are:
-   //
-   // 1a. a widget without an ID,
-   // 1b. a widget with ID and class,
-   // 1c. the top-level windows was closed, or
-   // 1d. a row_selected in a textview
-   //
-   if (TLV_tag == Event_widget_fun           ||   // "H:button1:clicked"
-       TLV_tag == Event_widget_fun_id_class  ||   // dito + :id:class
-       TLV_tag == Event_toplevel_window_done ||
-       TLV_tag == Event_widget_ev_X_Y_B_L)        // dito + X/Y, Button, Line
+   /* 1. check for events from generic_callback() or other callbacks
+         in Gtk_serverc.cc. The TLV_tags are:
+
+      3001: a widget without an ID in XML,
+      3002: a widget with ID and class in XML,
+      3003: the top-level windows was closed, or
+      3004: a row_selected in a textview
+    */
+   if (is_event_class(TLV_tag))
       {
         // V is a string of the form H%s:%s:%s:% where H is a placeholder
         // for the fd over which we have received V (which Gtk_server cannot
@@ -474,7 +471,7 @@ char * V = TLV + 8;
         return Value_P();   // i.e. NULL
       }
 
-   if (tag == -1)   // we not waiting for a specific tag (= function result)
+   if (expected_tag == -1)   // not waiting for a specific tag (function result)
       {
         // unexpected, so we complain unconditionally.
         CERR << "*** ⎕GTK: ignoring event: " << V << endl;
@@ -486,11 +483,11 @@ char * V = TLV + 8;
         return Idx0(LOC);   // fo not: Value_P()
       }
 
-   if (TLV_tag != tag)
+   if (TLV_tag != expected_tag)
       {
         // unexpected, so we complain unconditionally.
         CERR << "Got unexpected tag " << TLV_tag
-             << " when waiting for response " << tag << endl;
+             << " when waiting for response " << expected_tag << endl;
         return Value_P();
       }
 

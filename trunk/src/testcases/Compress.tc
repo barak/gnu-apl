@@ -18,8 +18,7 @@ STY
 
 ⍝ selective spec ----------------------------------
 
-      M←3 2ρι6
-      M
+      ⊢M←3 2ρι6
 1 2
 3 4
 5 6
@@ -28,3 +27,16 @@ STY
 A 2
 B 4
 C 6
+
+      (1 1/M)←3 2⍴'ABCD' ◊ M     ⍝ shall succeed
+AB
+CD
+AB
+
+      (1 1/M)←2 3⍴'ABCD'         ⍝ shall fail (like IBM APL2)
+LENGTH ERROR+
+      (1 1/M)←2 3⍴'ABCD'
+      ^      ^
+
+      )SIC
+

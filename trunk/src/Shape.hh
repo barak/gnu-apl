@@ -245,7 +245,7 @@ public:
    bool is_empty() const
       { loop(r, rho_rho)   if (rho[r] == 0)   return true;   return false; }
 
-   /// return \b reue iff this shape is a permutation of 0, 1, ... rank-1
+   /// return \b true iff this shape is a permutation of 0, 1, ... rank-1
    bool is_permutation() const;
 
    /// return the position of \b idx in the ravel.
@@ -253,6 +253,9 @@ public:
 
    /// the inverse of \b ravel_pos()
    Shape offset_to_index(ShapeItem offset, int quad_io) const;
+
+   /// return true if shapes this and other differ only by axes of length 1
+   bool conforms_to(const Shape & other) const;
 
 protected:
    /// the rank (number of valid shape items)

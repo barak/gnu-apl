@@ -609,6 +609,10 @@ public:
             || same_shape(other);
       }
 
+   /// return true if shapes of this and other differ only by axes of length 1
+   bool conforms_to(const Value & other) const
+      { return get_shape().conforms_to(other.get_shape()); }
+
    /// returen true if \b sub == \b val or sub is contained in \b val
    static bool is_or_contains(const Value * val, const Value * sub);
 

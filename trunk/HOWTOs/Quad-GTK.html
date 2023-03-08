@@ -1169,7 +1169,9 @@ Sending of a TLV from APL to Gtk_server is done by encoding the TLV with 33
 </li>
 <li>
 <p>
-3001-3999: events
+3001-3999: event classes. They tell <strong>⎕GTK</strong> how to decode the data supplied
+   with the tag and how to present that data (event name, widget, possibly
+   X/Y coordinates of mouse events, etc.) to APL.
 </p>
 </li>
 </ul></div>
@@ -4291,7 +4293,7 @@ top-level group in glade).</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2023-03-07 13:38:28 CET
+ 2023-03-07 14:19:39 CET
 </div>
 </div>
 </body>

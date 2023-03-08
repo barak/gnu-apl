@@ -267,7 +267,9 @@ widget.
 ** -1999...-1000  error indications for commands 1000...1999. If command
    1xxx fails in Gtk_server, then Gtk_server sends -1xxx to APL.
 ** 2001-2999: responses (2xxx is the response for command 1xxx)
-** 3001-3999: events
+** 3001-3999: event classes. They tell *⎕GTK* how to decode the data supplied
+   with the tag and how to present that data (event name, widget, possibly
+   X/Y coordinates of mouse events, etc.) to APL.
 
 * Receiving from Gtk_server is done with single read() call (like ⎕FIO[43])
   from the handle followed by decoding the received bytes with 34 ⎕CR.

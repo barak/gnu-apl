@@ -487,15 +487,27 @@ Value_P Z(get_shape(), loc);
 void
 Value::assign_cellrefs(Value_P new_value)
 {
-const ShapeItem dest_count = element_count();
-   if (dest_count == 0)   return;   // nothing to assign
-
-const int dest_incr = (dest_count == 1) ? 0 : 1;
+   // (recursively) assign new_value to this left value
 
 const ShapeItem value_count = new_value->nz_element_count();
-const int src_incr = (new_value->nz_element_count() == 1) ? 0 : 1;
+const ShapeItem dest_count  = element_count();
+   if (dest_count == 0)   return;   // nothing to assign
 
-   if (src_incr && dest_incr && (dest_count != value_count))   LENGTH_ERROR;
+const int dest_incr = (dest_count == 1)                    ? 0 : 1;
+const int src_incr  = (new_value->nz_element_count() == 1) ? 0 : 1;
+
+   if (src_incr  &&   // this is not a acalar or 1-element value, and
+       dest_incr &&   // new_value  is not a acalar or 1-element value, and
+       !this->conforms_to(*new_value))   // non-trivial shape mismatch
+      {
+        // NOTE:  M←3 2ρι6 ◊ (1 0/M) ← 'abc' succeeds in IBM APL2, even
+        //        though the shapes of 1 0/M and 'abc' differ. We therefore
+        //
+        MORE_ERROR() << "in (f Z)←B: length(X⊃F Z) is " << dest_count
+                     << ", but length(X⊃V) is " << value_count
+                     << " (for some X)";
+        LENGTH_ERROR;
+      }
 
    /* this: a value containing LvalCells and possibly PointerCells.
 
@@ -511,9 +523,9 @@ const int src_incr = (new_value->nz_element_count() == 1) ? 0 : 1;
    //
    check_lval_consistency();
 
-   if (is_scalar() && !new_value->is_scalar())
+   if (is_scalar_or_len1_vector() && !new_value->is_scalar())
       {
-        Cell * const C0 = &get_wscalar();
+        const Cell * C0 = &get_cscalar();
         if (!C0->is_lval_cell())   LEFT_SYNTAX_ERROR;
         const LvalCell * LVC0 = reinterpret_cast<const LvalCell *>(C0);
         Cell * target = LVC0->get_lval_value();   // can be 0!
