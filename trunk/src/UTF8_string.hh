@@ -36,7 +36,10 @@ class UCS_string;
 class Value;
 
 //----------------------------------------------------------------------------
-/// one byte of a UTF8 encoded Unicode (RFC 3629) string
+/// one byte (= 7-bit character !) of an ASCII string
+typedef char ASCII;
+
+/// one byte (not character !( of a UTF8 encoded Unicode (RFC 3629) string
 typedef uint8_t UTF8;
 
 //----------------------------------------------------------------------------
@@ -49,7 +52,7 @@ utf8P(const void * vp)
 //----------------------------------------------------------------------------
 /// frequently used cast to UTF8 *
 inline UTF8 *
-utf8P(char * cp)
+utf8P(ASCII * cp)
 {
   return reinterpret_cast<UTF8 *>(cp);
 }
@@ -63,14 +66,15 @@ public:
    {}
 
    /// constructor: UTF8_string from 0-terminated C string.
-   UTF8_string(const char * str)
-      { while (*str)   *this += *str++; }
+   UTF8_string(const ASCII * str)
+      { while (const ASCII cc = *str++)   *this += cc; }
 
-   /// constructor: copy of C string, but at most len bytes
+   /// constructor: copy of C string, at most len bytes, possibly less if
+   /// \b str is 0-terminated.
    UTF8_string(const UTF8 * str, size_t len)
       {
         loop(l, len)
-            if (*str)   *this += *str++;
+            if (const UTF8 cc = *str++)   *this += cc;
             else        break;
       }
 

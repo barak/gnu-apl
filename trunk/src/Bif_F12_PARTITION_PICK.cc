@@ -671,14 +671,14 @@ const Cell * cB = &B->get_cravel(offset);
         Cell * target = cB->get_lval_value();
         Assert(target);
 
-#if 0
+#if 1
 
-if the target is nested, then GNU APL used used to assign to the items in
-the target (possibly scalar-extending or filling the value B as to match the
-the shape of B. However, neither IBM APL2 nor Dyalog do do that and therefore,
-being overruled by the majority, we follow suit.
+// if the target is nested, then GNU APL used used to assign to the items in
+// the target (possibly scalar-extending or filling the value B as to match the
+// the shape of B. However, neither IBM APL2 nor Dyalog do do that and hence,
+// being overruled by the majority, we follow suit.
 
-See bug-apl@gnu.org, 3/4/2023 (Mr. Sunday).
+// See bug-apl@gnu.org, 3/4/2023 (Mr. Sunday).
 
         if (target->is_pointer_cell())
            {

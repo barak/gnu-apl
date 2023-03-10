@@ -28,10 +28,10 @@
 #include "Value.hh"
 
 //----------------------------------------------------------------------------
-LvalCell::LvalCell(Cell * cell, Value * cell_owner)
+LvalCell::LvalCell(Cell * target, Value * target_owner)
 {
-   value.lval = cell;
-   value.pval.owner = cell_owner;
+   value.lval = target;
+   value.pval.owner = target_owner;
    check_consistency();
 }
 //----------------------------------------------------------------------------

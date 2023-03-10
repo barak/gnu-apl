@@ -460,9 +460,14 @@ Value::get_cellrefs(const char * loc)
       Z has the same shape and consists entirely of LvalCells that point
       to the corresponding cells of this value.
 
-      NOTE that if a cell of this value is PointerCell, then get_cellrefs()
-      will simply point to that cell rather than recursing into its sub-value
-      (which may happen at a later point in time, though).
+      NOTE that any PointerCell in this are NOT handled differently than
+      simple cells (and get_cellrefs() will simply point to them)
+      rather than recursing into its sub-value. For that reason:
+
+      1. the result Z below is flat (not nested), and
+      2. assign_cellrefs() below must (at its later point in time),call
+         get_cellrefs() when it encounters an LvalCell whose target is a
+         PointerCell.
 
       The reson for delaying the recursion into sub-values is that the
       subsequent processing of Z may erase those sub-values and therefore
@@ -471,6 +476,7 @@ Value::get_cellrefs(const char * loc)
 
 Value_P Z(get_shape(), loc);
 
+   // next_ravel_Cell() is 0 for empty values
    if (const ShapeItem ec = element_count())
       {
         loop(e, ec)   Z->next_ravel_Cell(LvalCell(&get_wravel(e), this));
@@ -487,7 +493,7 @@ Value_P Z(get_shape(), loc);
 void
 Value::assign_cellrefs(Value_P new_value)
 {
-   // (recursively) assign new_value to this left value
+   // assign new_value to this left value
 
 const ShapeItem value_count = new_value->nz_element_count();
 const ShapeItem dest_count  = element_count();
@@ -523,7 +529,7 @@ const int src_incr  = (new_value->nz_element_count() == 1) ? 0 : 1;
    //
    check_lval_consistency();
 
-   if (is_scalar_or_len1_vector() && !new_value->is_scalar())
+   if (is_scalar() && !new_value->is_scalar())
       {
         const Cell * C0 = &get_cscalar();
         if (!C0->is_lval_cell())   LEFT_SYNTAX_ERROR;
@@ -539,22 +545,22 @@ const int src_incr  = (new_value->nz_element_count() == 1) ? 0 : 1;
 const Cell * src = &new_value->get_cfirst();
    loop(d, dest_count)
       {
-        Cell & C = get_wravel(d);
-        if (C.is_pointer_cell())
+        Cell & left_C = get_wravel(d);
+        if (left_C.is_pointer_cell())
            {
              /*
-                NOTE: At this point C is one of the left cell in a selective
-                      assignment, say:
+                NOTE: At this point left_C is one of the left cells in a
+                      selective assignment, say:
 
                       (f1 f2 ... fn VAR) ← new_value.
 
-                The initial cellrefs (i.e. of VAR) contain no PointerCells
+                The initial cellrefs (i.e. of VAR) contains no PointerCells
                 (though possibly Lval cells pointing to PointerCells).
 
-                Therefore C must have been created by one of the fi and then
-                all sub-values C must also be Lval Cells.
+                Therefore left_C must have been created by one of the fi and
+                then all sub-values of left_C must also be Lval Cells.
               */
-              Value * sub = C.get_pointer_value().get();   // right-value
+              Value * sub = left_C.get_pointer_value().get();   // right-value
               loop(s, sub->nz_element_count())
                   {
                     Cell * Csub = &sub->get_wravel(s);
@@ -573,10 +579,10 @@ const Cell * src = &new_value->get_cfirst();
                        }
                   }
            }
-        else if (C.is_lval_cell())
+        else if (left_C.is_lval_cell())
            {
-             const LvalCell & LVC = reinterpret_cast<const LvalCell &>(C);
-             if (Cell * target = C.get_lval_value())   // target can be 0!
+             const LvalCell & LVC = reinterpret_cast<const LvalCell &>(left_C);
+             if (Cell * target = left_C.get_lval_value())   // target can be 0!
                 {
                   target->release(LOC);   // free sub-values etc (if any)
 
@@ -1407,7 +1413,7 @@ Value::enlist_left(Value & Z) const
 
               */
 
-              // cannot use Z.>next_ravel_Cell() since then the cell owner
+              // cannot use Z->next_ravel_Cell() since then the cell owner
               // would be Z and not this!
               //
               LvalCell z(const_cast<Cell *>(&cell),

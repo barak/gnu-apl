@@ -114,6 +114,33 @@ libapl functions such as get_rank(), get_axis(), etc.
 <dd><p>These are the possible eval functions. The APL_value returned by an eval__XXX() function shall be released with release_value() by the caller.
 </p>
 </dd>
+<dt><code>fix_function(const char ** function_lines_utf8)</code></dt>
+<dt><code>fix_function_NL(const char * function_lines_utf8)</code></dt>
+<dd><p>These functions create a new defined APL function in the workspace, which
+can then be called in APL, or with suitable eval_XXX() functions in C/C++.
+fix_function() expects an array of strings, one string per APL line, and
+terminated with NULL. fix_function() is a front-end for fix_function_NL().
+fix_function_NL() expects a signle string with function lines separated by
+newline (line feed, 0x0A). In both cases the first line becomes the function
+header and the subsequent lines become the function body. Existing functions
+with the same name in the function header will be replaced without warning.
+Examples:
+</p>
+<pre class="verbatim">const char * foo[] = { &quot;Z←A FOO B&quot;,     // function header
+                       &quot;Z←A ⍴ B&quot;,       // one body line
+                       NULL             // sentinel
+                     };
+  fix_function(foo);
+
+const char * bar = &quot;Z←A BAR B\n&quot;        // function header
+                   &quot;Z←A ≠ B\n&quot;;         // one body line
+  fix_function_NL(bar);
+</pre>
+<p>should create dyadic defined functions FOO and BAR. fix_function_NL() is
+easier to use with e.g. C string literals, while fix_function() is more
+convenient if (some of) the function lines are being computed.
+</p>
+</dd>
 <dt><code>get_var_value(const char * var_name_utf8, const char * loc)</code></dt>
 <dd><p>return an APL value pointing to the contents of a variable in the current workspace.
 </p>

@@ -74,7 +74,7 @@ public:
    UCS_string(const UTF8_string & utf);
 
    /// constructor: UCS_string from 0-terminated C string. Do NOT use it
-   /// for non-ASCII strings.
+   /// for non-ASCII strings like C-literals containing APL characters !!!
    UCS_string(const char * cstring);
 
    /// constructor: UCS_string from print buffer

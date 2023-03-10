@@ -70,6 +70,7 @@ extern "C" {
 
 struct Value;
 typedef struct Value * APL_value;
+typedef enum LIBAPL_error LIBAPL_error;
 
 struct Function;
 typedef struct Function const * APL_function;
@@ -119,6 +120,16 @@ extern const char * apl_command(const char * command_utf8);
 /// is a 0-terminated string of unicode integers (and so is the result)
 /// caller shall free() the returned unsigned int *.
 extern const unsigned int * apl_command_ucs(const unsigned int * command_ucs);
+
+/// define an APL function with header function_lines[0] and body
+/// function_lines[1...N]. function_lines must be 0-terminated, i.e.
+/// function_lines[N+1] == NULL. fix_function() is a front-end for
+/// fix_function_NL() which is ofter more convenient to use.
+extern LIBAPL_error fix_function(const char ** function_lines_utf8);
+
+/// define an APL function with \b function_lines_utf8 being the header and
+/// function lines, separated by UNI_LF (= 0x0A).
+extern LIBAPL_error fix_function_NL(const char * function_lines_utf8);
 
 /// print \b string_ucs to \b out (for debugging purposes)
 extern void print_ucs(FILE * out, const unsigned int * string_ucs);

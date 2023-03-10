@@ -52,6 +52,9 @@ Shape shape_B = B->get_shape();
 
 const ShapeItem len_B = shape_B.get_shape_item(axis);
 ShapeItem len_A = A->element_count();
+
+   // compute len_Z ← +/A
+   //
 ShapeItem len_Z = 0;
 std::vector<ShapeItem> rep_counts;
    rep_counts.reserve(len_B);
@@ -60,22 +63,22 @@ std::vector<ShapeItem> rep_counts;
         len_A = len_B;
         APL_Integer rep_A = A->get_cfirst().get_near_int();
         loop(a, len_A)   rep_counts.push_back(rep_A);
-        if (rep_A > 0)        len_Z =  rep_A*len_B;
-        else if (rep_A < 0)   len_Z = -rep_A*len_B;
+        if (rep_A < 0)   len_Z = -rep_A*len_B;   // replicate ↑B
+        else             len_Z =  rep_A*len_B;   // replicat B[a]
       }
-   else
+   else              // normal A
       {
-        ShapeItem geq_A = 0;   // number of items >= 0 in A
+        ShapeItem nonneg_A = 0;   // number of items >= 0 in A
         loop(a, len_A)
            {
-             APL_Integer rep_A = A->get_cravel(a).get_near_int();
+             const APL_Integer rep_A = A->get_cravel(a).get_near_int();
              rep_counts.push_back(rep_A);
-             if (rep_A > 0)        { len_Z += rep_A;   ++geq_A; }
-             else if (rep_A < 0)   len_Z -= rep_A;
-             else                  ++geq_A;
+             len_Z += rep_A;   ++nonneg_A;        // most likely:  rep_A >= 0
+             if (rep_A < 0)    { len_Z -= 2*rep_A;  --nonneg_A; }   // rare
            }
 
-        if (len_B != 1 && geq_A != len_B)   LENGTH_ERROR;
+        // the B axis shall have an item for every non-negative A
+        if (len_B != 1 && nonneg_A != len_B)   LENGTH_ERROR;
       }
 
 Shape shape_Z(shape_B);

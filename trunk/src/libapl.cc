@@ -425,6 +425,44 @@ unsigned int * ret = reinterpret_cast<unsigned int *>
    return ret;
 }
 //----------------------------------------------------------------------------
+class Quad_FX
+{
+public:
+    static Token  do_quad_FX(const int * exec_props, const UCS_string & text,
+                             const UTF8_string & creator, bool tolerant);
+};
+
+extern LIBAPL_error
+fix_function_NL(const char * text)
+{
+const UTF8_string text_utf(text);
+const UCS_string text_ucs(text_utf);
+
+const int eprops[] = { 0, 0, 0, 0 };   // execution properties
+const UTF8_string creator("libapl:fix_function_ucs");
+const Token tok = Quad_FX::do_quad_FX(eprops, text_ucs, creator, true);
+
+   return LIBAPL_error(tok.get_tag() == TOK_ERROR ? tok.get_int_val()
+                                                  : E_NO_ERROR);
+}
+
+LIBAPL_error
+fix_function(const char ** function_lines_utf8)
+{
+ShapeItem len = 1;   // terminating 0
+   for (const char ** f = function_lines_utf8; *f; ++f)   len += strlen(*f) + 1;
+
+UTF8_string text;
+   text.reserve(len);
+   for (const char ** f = function_lines_utf8; *f; ++f)
+      {
+        text.append(reinterpret_cast<const UTF8 *>(*f));
+        text += UNI_LF;
+      }
+
+   return fix_function_NL(text.c_str());
+}
+//----------------------------------------------------------------------------
 int
 get_owner_count(APL_value val)
 {
