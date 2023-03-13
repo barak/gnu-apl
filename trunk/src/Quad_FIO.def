@@ -51,6 +51,7 @@
  fiodef(37, recv        )
  fiodef(27, rename      )
  fiodef(21, rmdir       )
+ fiodef(61, secs_epoch  )
  fiodef(40, select      )
  fiodef(38, send        )
  fiodef(39, send_UNI    )

@@ -129,3 +129,9 @@ A
       ↑A
 0
 
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+

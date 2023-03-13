@@ -26,6 +26,7 @@
 #include "PrintOperator.hh"
 #include "UTF8_string.hh"
 #include "Value.hh"
+#include "ValueHistory.hh"
 
 //----------------------------------------------------------------------------
 LvalCell::LvalCell(Cell * target, Value * target_owner)
@@ -33,6 +34,13 @@ LvalCell::LvalCell(Cell * target, Value * target_owner)
    value.lval = target;
    value.pval.owner = target_owner;
    check_consistency();
+}
+//----------------------------------------------------------------------------
+LvalCell::LvalCell(const LvalCell & other)
+{
+   value.lval = other.value.lval;
+   value.pval.owner = other.value.pval.owner;
+   // check_consistency();   supposedly not needed, since other should be OK.
 }
 //----------------------------------------------------------------------------
 void
@@ -77,6 +85,7 @@ LvalCell::check_consistency() const
             Q1(C0)
             Q1(value.lval)
             Q1(CN)
+            VH_entry::print_history(cerr, *value.pval.owner, LOC);
             Assert(0 && "LvalCell::check_consistency() failed");
             BACKTRACE;
           }

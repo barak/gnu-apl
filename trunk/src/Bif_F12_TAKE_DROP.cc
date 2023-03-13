@@ -40,56 +40,38 @@ Bif_F12_DROP      * Bif_F12_DROP     ::fun = &Bif_F12_DROP     ::_fun;
 Value_P
 Bif_F12_TAKE::first(const Value & B)
 {
+   /*
+      lrm p. 131: ⍴ Z ← ↑ B depends on the shape of the first item.
+
+      IBM APL2:
+          A.  ↑'DO' 'RE' 'MI'   is: 'DO' with shape 2
+          B.  ↑⊂'DO'       also is: 'DO' with shape 2
+
+      Therefore: S ≡ ↑S ≡ ↑⊃S for simple scalars S,
+            but: V ≢ ↑V ≡ ⊃V[⎕IO]
+
+      We handle the nested first_B case first because all others return scalars
+    */
 const Cell & first_B = B.get_cfirst();
-   if (B.element_count() == 0)   // empty value: return prototype
+   if (first_B.is_pointer_cell())   // first item is nested
       {
-        if (first_B.is_lval_cell())   // (↑...)←V
-            {
-              Value_P Z(LOC);
-              Z->next_ravel_Cell(first_B);
-              return Z;
-            }
+        Value_P sub = first_B.get_pointer_value();
+        return CLONE_P(sub, LOC);
+      }
 
-        // normal (right-) value
-        //
-        Value_P Z = B.prototype(LOC);
+   if (B.element_count() ||      // the normal case,         e.g. Z ← ↑ 1 2 3
+       first_B.is_lval_cell())   // selective specification, e.g. (↑ B) ← V
+      {
+        Value_P Z(LOC);   // the (always) scalar result of ↑B
+        Z->next_ravel_Cell(first_B);
         Z->check_value(LOC);
         return Z;
       }
 
-   if (!first_B.is_pointer_cell())   // simple cell
-      {
-        Value_P Z(LOC);
-        Z->get_wscalar().init(first_B, *Z, LOC);
-        Z->check_value(LOC);
-        return Z;
-      }
-
-Value_P v1 = first_B.get_pointer_value();
-Value * v1_owner = v1->get_lval_cellowner();
-   if (v1_owner)   // B is a left value
-      {
-        Value_P B1(LOC);
-        B1->next_ravel_Pointer(v1.get());
-        B1->check_value(LOC);
-
-        Value_P Z(LOC);
-        Z->next_ravel_Lval(&B1->get_wscalar(), v1_owner);
-
-        Z->check_value(LOC);
-        return Z;
-      }
-   else
-      {
-        const ShapeItem ec = v1->element_count();
-        Value_P Z(v1->get_shape(), LOC);
-        if (ec == 0)   Z->set_default(*v1, LOC);
-
-        loop(e, ec)   Z->next_ravel_Cell(v1->get_cravel(e));
-
-        Z->check_value(LOC);
-        return Z;
-      }
+   // ↑ '' or ↑ ⍬ : return prototype
+   //
+   if (first_B.is_character_cell())   return CharScalar(UNI_SPACE, LOC);
+   else                               return IntScalar(0, LOC);
 }
 //----------------------------------------------------------------------------
 Token

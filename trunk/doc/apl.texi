@@ -2517,7 +2517,7 @@ Note: for Boolean arguments the APL functions ≠ resp. = can be used to compute
 the more customary Boolean functions XOR and XNOR. In this context = and ≠ are
 treated as Boolean functions even though they accept non-Boolean arguments,
 
-For example (using  5 ⎕CR (4⍴256)⊤X to display X in hex):
+For example, using  5 ⎕CR (4⍴256)⊤X to display X in hex:
 
 @verbatim
       5 ⎕CR (4⍴256)⊤   A←$ABBADEAD
@@ -3077,7 +3077,7 @@ The purpose of ¯4 ⎕DLX is:
 @item
 To demonstrate how Knuth's algorithm works, and/or
 @item
-To preset some initial values in B. For example one can first initialize
+To preset some initial values in B. For example, one can first initialize
 the constraints for an empty Sudoku (which is the same matrix for all Sudokus)
 and then enter the initial digits of a particular Sudoku using 4 ⎕DLX. If there are, say, 20 initial digits in the Sudoku then A has 21 elements (¯4 plus the
 20 rows representing the 20 initial digits. The result of ¯4 ⎕DLX B has the
@@ -3640,8 +3640,8 @@ shown in the examples below.
 ┃┗━━━┛ ┗━━━┛ ┗━━━┛┃
 ┗∊━━━━━━━━━━━━━━━━┛
 
-
 @end verbatim
+
 
 @node    Section 2.31
 @section ⎕PLOT - Plot Data
@@ -3743,6 +3743,7 @@ For example:
 
 @verbatim
 
+
    ⎕PLOT Usage:
 
    ⎕PLOT B     plot B with default attribute values
@@ -3782,6 +3783,7 @@ axisY_label:        Y              (Y-axis label)
 axisZ_arrow:        0              (Z-axis arrow)
 axisZ_label:        Z              (Z-axis label)
 gridX_pixels:       44 pixel       (pixels between X grid lines)
+gridX_variable:     0              (draw X grid (only) at plot points)
 gridX_line_width:   1 pixel        (thickness of the X-grid lines)
 gridX_color:        #000000        (color of the X-grid lines)
 gridY_style:        1              (Y grid style, see gridX_style above)
@@ -3806,9 +3808,20 @@ rangeZ_min:         0.0            (the start of the Z range to be plotted)
 rangeZ_max:         0.0            (the end of the Z range to be plotted)
 origin_X:           100 pixel      (X position offset of the origin)
 origin_Y:           100 pixel      (Y position offset of the origin)
-format_X:                          (number format for the X-axis)
-format_Y:                          (number format for the Y-axis)
-format_Z:                          (number format for the Z-axis)
+format_X:           (none)         (format for X-axis ticks (GTK only))
+                    %sT1%T2...%Tn  (static texts for ticks)
+                    %G, %g         grid line number (starting at 1 or )
+                    %v             value
+                    %S             (seconds SS)
+                    %I             (minutes MM)
+                    %H, %h         (hours HH or h/hh)
+                    %D, %d         (day DD or d/dd)
+                    %M, %m         (month MM or m/mm)
+                    %q             (quarter 0..3)
+                    %Q             (quater 1..4)
+                    %Y, %y         (year YYYY or yy)
+format_Y:                          (format for Y-axis (dito))
+format_Z:                          (format for Z-axis (dito))
 
 color_level-P:      (none)         (color gradient at P% (surface plots only))
 
@@ -3895,6 +3908,88 @@ For example:
 Attributes.line_width   ← 2   ⍝ all plot lines:     2 pixels thick,
 Attributes.line_width-2 ← 4   ⍝ except plot line 2: 4 pixels thick
 @end verbatim
+
+@subsubsection Tick formatting (GTK only)
+
+By default, the ticks on the X, Y, and Z axes show the naked value
+of the corresponding coordinates. Sometimes you may want them to look a
+litte nocht, e.g. by adding units to the numbers. This can be achived
+with window proterties @b{format_X/Y/Z}, possibly accompanied by property
+@b{gridX_variable}.
+
+The properties @b{format_X/Y/Z} may be set to a format string that allows
+the value that is being displayed at the ticks. The format is a string that
+is a mix of static text and @b{tick items}. A @b{tick item} is computed
+from the displayed value or ifrom its position on the axis. There are
+two different types of tick items: static and dynamic.
+
+A @b{static tick item} starts with @b{%s}, followed by one or more texts,
+separated by %. The texts are displayed in the same order starting from
+the origin and proceeding along the axis. For example:
+
+ATT.format_X ← '%sT1%T2%T3'
+
+will name X-axis ticks @b{T1}, @b{T2}, and @b{T3}, regardless of the X
+coordinate. @b{static tick items} are the fallbacks for those cases where
+@b{dynamic tick items} can not produce the desired result. In other
+words, @b{static tick items} must be constructed in APL beforehand.
+
+In contrast, @b{dynamic tick items} are computed from the value at the
+axis, which is often simpler than computing them beforehand in APL. A
+format string may contain 0 or more tick items which are used in a printf()
+like manner.
+
+Most of the @b{dynamic tick items} (see @b{⎕PLOT ''} for a complete list)
+are related to points in time (years, quarters, months, days, hours, minutes,
+and seconds). For them the X coordinate (time) is, according to the *nix time
+conventions, seconds since midnigth 1970. Since this number of seconds is not
+easy to compute in APL, @b{⎕FIO.secs_epoch} comes to rescue:
+
+@verbatim
+Q1  ← ⎕FIO.secs_epoch 2023 2 15   ⍝ Feb. 15 (middle of Q1) 00:00:00
+@end verbatim
+
+A problem with @b{dynamic tick items} could be that, due to rounding, the
+X coordinates of the ticks do not nicely match the X coordinates of the plot
+points, making the tick values more confusing than helpful. For example,
+plotting quarterly data may cause different quarters to have different
+numbers of ticks, even though every quarter has roughly the same number of
+seconds. This effect, which is entirely caused by rounding the @b{seconds from
+1970/1/1} to even values, and which becomes worse as the number fof ticks
+in the plot decreases, can be avoided by synchronizing the plot points with
+the grid lines, using property @b{gridX_variable}. This property, which is
+only available for the X axis (i.e. the axis normally used for time-related
+plots), draws a grid lines for every plot point rather than at fixed intervals.
+As a consequence, the X-tick coordinates are not rounded to some
+@b{1 2 5×10⋆N} (which is even in terms of seconds since 1970/1/1 but odd in
+terms of months or quarters) the value printed at an X-axis tick displays
+the X-coordinate that reflects exactly the value of the plot point.
+
+A complete example for plotting the quaterly values @b{1 3 4 2} is the
+fo (you
+may want to try it with both 0 and 1 for ATT.gridX_variable):
+
+@verbatim
+      )CLEAR
+
+SPQ ← 91×24×60×60                 ⍝ seconds per quarter
+Q1  ← ⎕FIO.secs_epoch 2023 2 15   ⍝ Feb. 15 (middle of Q1) 00:00:00
+
+X ← Q1 + SPQ×0 1 2 3              ⍝ middles of Q1, Q2, Q3, and Q4
+Y ← 1 3 2 4                       ⍝ values for Q1, Q2, Q3, and Q4
+
+ATT.format_X ← "Q-%Q/%y"          ⍝ X-axis ticks: quarter and year
+ATT.gridX_variable ← 1            ⍝ draw X-grid from plot points
+
+ATT ⎕PLOT X + 0J1×Y
+
+@end verbatim
+
+
+
+
+
+
 
 @subsection Plot Window Handling
 

@@ -1016,6 +1016,9 @@ Quad_FIO::list_functions(ostream & out, bool mapping)
 {
    if (mapping)
       {
+         // ⎕FIO "": print the number to name mappings like:
+         //
+         // ⎕FIO[20]  ←→  ⎕FIO['mkdir']        ←→  ⎕FIO.mkdir
          out <<
 "      With a small performance penalty, ⎕FIO also accepts the following "
 "strings\n      instead of function numbers as axis argument:\n\n";
@@ -1141,6 +1144,7 @@ Quad_FIO::list_functions(ostream & out, bool mapping)
 "   Zi ←    ⎕FIO[60] Bi    return a Bi-byte random integer (for setting ⎕RL)\n"
 "   Zi ← 0  ⎕FIO[60] Bi    same as monadic ⎕FIO[60] Bi (random scalar, Bi≤8)\n"
 "   Zb ← 1  ⎕FIO[60] Bi    return a vector of random bytes, (Bi ≥ ⍴Zi)\n"
+"   Zi ←    ⎕FIO[61] Bv    seconds since 1/1/1970; Bv←YYYY [MM DD [HH MM SS]]\n"
 "\n"
 "Benchmarking functions:\n"
 "\n"
@@ -1332,6 +1336,74 @@ out_errno:
    MORE_ERROR() << "⎕FIO[" << function_number
               << "] B failed: " << strerror(errno);
    return Token(TOK_APL_VALUE1, IntScalar(-errno, LOC));
+}
+//----------------------------------------------------------------------------
+APL_Integer
+Quad_FIO::secs_epoch(const Value & B)
+{
+   // B is a time/date like YYYY [MM [DD [HH [MM [SS]]]]]
+   if (B.get_rank() > 1)   RANK_ERROR;
+const int len_B = B.element_count();
+   if (len_B < 1 || len_B > 6)   LENGTH_ERROR;
+
+const struct {
+               const char * name;
+               int min_val;
+               int max_val;
+             } range[6] =
+             {
+               { "year",   0, 2037 },
+               { "month",  1,   11 },
+               { "day",    1,   31 },
+               { "hour",   0,   23 },
+               { "minute", 0,   59 },
+               { "second", 0,   60 },
+             };
+
+int Bv[6];  // values as provided in B
+   loop(b, 6)
+       {
+         if (len_B <= b)   Bv[b] = range[b].min_val;
+         else              Bv[b] = B.get_cravel(b).get_int_value();
+         if (Bv[b] < range[b].min_val)
+            {
+              MORE_ERROR() << "In ⎕FX.secs_epoch : B["
+                           << (b + Workspace::get_IO())
+                           <<  "] (aka. " << range[b].name
+                           << ") is too small (the valid range is "
+                           << range[b].min_val << "-"
+                           << range[b].max_val << ")";
+              DOMAIN_ERROR;
+            }
+         else if (Bv[b] > range[b].max_val)
+            {
+              MORE_ERROR() << "In ⎕FX.secs_epoch : B["
+                           << (b + Workspace::get_IO())
+                           <<  "] (aka. " << range[b].name
+                           << ") is too large (the valid range is "
+                           << range[b].min_val << "-"
+                           << range[b].max_val << ")";
+              DOMAIN_ERROR;
+            }
+       }
+
+   if (Bv[0] < 100)   Bv[0] += 2000;   // interpret year xx as 20xx
+
+tm tm;
+
+                                  //                   APL B[]    mktime
+   tm.tm_sec  = Bv[5];            // Seconds           0-60       (0-60)
+   tm.tm_min  = Bv[4];            // Minutes           0-59       (0-59)
+   tm.tm_hour = Bv[3];            // Hours             0-23       (0-23)
+   tm.tm_mday = Bv[2];            // Day of the month  1-31       (1-31)
+   tm.tm_mon  = Bv[1] - 1;        // Month             1-12       (0-11)
+   tm.tm_year = Bv[0] - 1900;     // Year              2000...    1900...
+
+const time_t z = mktime(&tm);
+   if (z != time_t(-1))   return APL_Integer(z);
+
+   MORE_ERROR() << "⎕FIO B: bad B";
+   DOMAIN_ERROR;
 }
 //----------------------------------------------------------------------------
 Token
@@ -2303,6 +2375,9 @@ int function_number = -1;
 
                  return Token(TOK_APL_VALUE1, IntScalar(old_threshold, LOC));
               }
+
+         case 61:   // secs_epoch(Bh)
+              return Token(TOK_APL_VALUE1, IntScalar(secs_epoch(*B), LOC));
 
         default: break;
       }

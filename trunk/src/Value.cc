@@ -456,38 +456,46 @@ const ShapeItem length = nz_element_count();
 Value_P
 Value::get_cellrefs(const char * loc)
 {
-   /* Create a non-nested (!) (left-) value Z from this value.
-      Z has the same shape and consists entirely of LvalCells that point
+   /* Create a non-nested (!) (left-) value left_Z from this (right-)value.
+      left_Z has the same shape and consists entirely of LvalCells that point
       to the corresponding cells of this value.
 
       NOTE that any PointerCell in this are NOT handled differently than
       simple cells (and get_cellrefs() will simply point to them)
       rather than recursing into its sub-value. For that reason:
 
-      1. the result Z below is flat (not nested), and
+      1. the result left_Z below is flat (not nested), and
       2. assign_cellrefs() below must (at its later point in time),call
          get_cellrefs() when it encounters an LvalCell whose target is a
          PointerCell.
 
-      The reson for delaying the recursion into sub-values is that the
-      subsequent processing of Z may erase those sub-values and therefore
+      The reason for delaying the recursion into sub-values is that the
+      subsequent processing of left_Z may erase those sub-values and therefore
       doing it now may render useless later.
    */
 
-Value_P Z(get_shape(), loc);
+Value_P left_Z(get_shape(), loc);
 
-   // next_ravel_Cell() is 0 for empty values
+   // next_ravel_Cell() is 0 for empty values.
+   // Therefore empty values (with element_count == 0) must use
+   // set_ravel_Cell() instead of next_ravel_Cell() !
+   //
    if (const ShapeItem ec = element_count())
       {
-        loop(e, ec)   Z->next_ravel_Cell(LvalCell(&get_wravel(e), this));
+        loop(e, ec)
+            {
+              Cell & right_cell = get_wravel(e);
+              const LvalCell left_cell(&right_cell, this);
+              left_Z->next_ravel_Cell(left_cell);
+            }
       }
    else   // prototype
       {
-        Z->set_ravel_Cell(0, LvalCell(&get_wproto(), this));
+        left_Z->set_ravel_Cell(0, LvalCell(&get_wproto(), this));
       }
 
-   Z->check_value(LOC);
-   return Z;
+   left_Z->check_value(LOC);
+   return left_Z;
 }
 //----------------------------------------------------------------------------
 void
@@ -534,11 +542,12 @@ const int src_incr  = (new_value->nz_element_count() == 1) ? 0 : 1;
         const Cell * C0 = &get_cscalar();
         if (!C0->is_lval_cell())   LEFT_SYNTAX_ERROR;
         const LvalCell * LVC0 = reinterpret_cast<const LvalCell *>(C0);
-        Cell * target = LVC0->get_lval_value();   // can be 0!
-        Value * owner = LVC0->get_cell_owner();
-        if (target)   target->release(LOC);   // free sub-values etc (if any)
-
-        new (target)   PointerCell(new_value.get(), *owner);
+        if (Cell * target = LVC0->get_lval_value())   // valid right Cell
+           {
+             Value * owner = LVC0->get_cell_owner();
+             target->release(LOC);   // free sub-values etc (if any)
+             new (target)   PointerCell(new_value.get(), *owner);
+           }
         return;
       }
 
@@ -2836,7 +2845,9 @@ ShapeItem lval_count = 0;
    if (lval_count)
       {
         out << "*** Warning: value " << voidP(this)
-            << " has " << lval_count << "Lval Cells" << endl;
+            << " has " << lval_count << " Lval Cells" << endl;
+        VH_entry::print_history(cerr, *this, LOC);
+
         ++errors;
       }
 

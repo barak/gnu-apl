@@ -24,7 +24,7 @@
 
 //      command       , implementation                                , arguments                   , tab expansion hint
 //----------------------------------------------------------------------------------------------------------------------
-cmd_def( ")CHECK"     , cmd_CHECK(out);                               , ""                          , EH_NO_PARAM)
+cmd_def( ")CHECK"     , cmd_CHECK(out, arg);                          , "[BRIEF]"                   , EH_NO_PARAM)
 cmd_def( ")CLEAR"     , Workspace::clear_WS(out, false);              , ""                          , EH_NO_PARAM)
 cmd_def( ")CONTINUE"  , cmd_CONTINUE(out);                            , ""                          , EH_NO_PARAM)
 cmd_def( ")COPY_ONCE" , Command::cmd_COPY_ONCE(out, args);            , "[[lib] wsname]"            , EH_oLIB_WSNAME)

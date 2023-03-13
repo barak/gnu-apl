@@ -25,6 +25,7 @@ gdef(String,   axisY_label,        "Y", "Y-axis label")
 gdef(uint32_t, axisZ_arrow,          0, "Z-axis arrow")
 gdef(String,   axisZ_label,        "Z", "Z-axis label")
 gdef(Pixel_X,  gridX_pixels,        44, "pixels between X grid lines")
+gdef(uint32_t, gridX_variable,       0, "draw X grid (only) at plot points")
 gdef(Pixel_Y,  gridX_line_width,     1, "thickness of the X-grid lines")
 gdef(Color,    gridX_color,   0x000000, "color of the X-grid lines")
 gdef(uint32_t, gridY_style,          1, "Y grid style, see gridX_style above")
@@ -49,9 +50,20 @@ gdef(double,   rangeZ_min,           0, "the start of the Z range to be plotted"
 gdef(double,   rangeZ_max,           0, "the end of the Z range to be plotted")
 gdef(Pixel_X,  origin_X,           100, "X position offset of the origin")
 gdef(Pixel_Y,  origin_Y,           100, "Y position offset of the origin")
-gdef(String,   format_X,            "", "number format for the X-axis")
-gdef(String,   format_Y,            "", "number format for the Y-axis")
-gdef(String,   format_Z,            "", "number format for the Z-axis")
+gdef(String,   format_X,      "(none)", "format for X-axis ticks (GTK only))\n"
+"                    %sT1%T2...%Tn  (static texts for ticks)\n"
+"                    %G, %g         grid line number (starting at 1 or )\n"
+"                    %v             value\n"
+"                    %S             (seconds SS)\n"
+"                    %I             (minutes MM)\n"
+"                    %H, %h         (hours HH or h/hh)\n"
+"                    %D, %d         (day DD or d/dd)\n"
+"                    %M, %m         (month MM or m/mm)\n"
+"                    %q             (quarter 0..3)\n"
+"                    %Q             (quater 1..4)\n"
+"                    %Y, %y         (year YYYY or yy")
+gdef(String,   format_Y,            "", "format for Y-axis (dito)")
+gdef(String,   format_Z,            "", "format for Z-axis (dito)")
 #endif
 
 #ifdef ldef

@@ -697,8 +697,14 @@ const void * Bv = reinterpret_cast<const val_val *>(B)->child;
 }
 //----------------------------------------------------------------------------
 void
-Command::cmd_CHECK(ostream & out)
+Command::cmd_CHECK(ostream & out, const UCS_string & arg)
 {
+bool show_OK = true;
+   if (arg.size())
+      {
+        const UCS_string brief("BRIEF");
+        show_OK = arg.compare(brief) != COMP_EQ;   // not BRIEF
+      }
    // 1. erase stale functions from failed ⎕EX
    //
    {
@@ -708,7 +714,7 @@ Command::cmd_CHECK(ostream & out)
           out << "WARNING - " << stale << " stale functions ("
                << (erased ? "" : "not ") << "erased)" << endl;
         }
-     else
+     else if (show_OK)
         {
           out << "OK      - no stale functions" << endl;
         }
@@ -722,7 +728,7 @@ Command::cmd_CHECK(ostream & out)
           out << "ERROR   - " << stale << " stale values" << endl;
           IO_Files::apl_error(LOC);
         }
-     else
+     else if (show_OK)
         {
           out << "OK      - no stale values" << endl;
         }
@@ -735,7 +741,7 @@ Command::cmd_CHECK(ostream & out)
           out << "ERROR   - " << stale << " stale indices" << endl;
           IO_Files::apl_error(LOC);
         }
-     else
+     else if (show_OK)
         {
           out << "OK      - no stale indices" << endl;
         }
@@ -814,10 +820,10 @@ Command::cmd_CHECK(ostream & out)
                 << " duplicate parents" << endl;
             IO_Files::apl_error(LOC);
           }
-     else
 #endif
           {
-            out << "OK      - no duplicate parents" << endl;
+            if (show_OK)
+               out << "OK      - no duplicate parents" << endl;
           }
    }
 

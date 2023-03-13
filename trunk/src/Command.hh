@@ -94,7 +94,7 @@ public:
       };
 
    /// check workspace integrity (stale Value and IndexExpr objects, etc)
-   static void cmd_CHECK(ostream & out);
+   static void cmd_CHECK(ostream & out, const UCS_string & arg);
 
    /// a helper for finding sub-values with two parents
    struct val_val

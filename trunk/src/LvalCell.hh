@@ -38,8 +38,12 @@ public:
    /// Constructor: a cell pointing to another cell
    LvalCell(Cell * cell, Value * cell_owner);
 
+   /// Constructor: copy from other LvalCell
+   LvalCell(const LvalCell & other);
+
    /// overloaded Cell::init_other
-   virtual void init_other(void * other, Value & cell_owner, const char * loc) const;
+   virtual void init_other(void * other, Value & cell_owner,
+                           const char * loc) const;
 
    /// Overloaded Cell::is_lval_cell()
    virtual bool is_lval_cell()  const   { return true; }

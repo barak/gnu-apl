@@ -8,6 +8,8 @@
       )CLEAR
 CLEAR WS
 
+      COMMENT←{0 0⍴⍵}
+
 ⍝ -----------------------------------------------------------------------------
 ∇L EQUIV R
 ⍝⍝ check that L ≡ R and complain if not, detailing L and R
@@ -179,18 +181,24 @@ CLEAR WS
 
 ⍝ lrm 188:   (0≠L)/R   ←→    ⊃,/L⊂R
 
-      ⍝ first of all, the above invariant is wrong for some L and R.
-      ⍝ For example:
+COMMENT «««
+
+      first of all, lrm p.188 says: "For any appropriate L and R:". Thus the
+      above invariant stated on is wrong for some L and R. The most
+      problematic cases seem to be those with empty results
+
+      For example:
+
+      L←1 0 0 1 ◊ R ← 0 2 4⍴42
       ⍝
-      ⍝ L←1 0 0 1 ◊ R ← 0 2 4⍴42
-      ⍝
-      ⍝ In IBM APL2 we get:
-      ⍝
-      ⍝ ⍴ (0≠L)/R  gives 0 2 2
-      ⍝ ⍴ ⊃,/L⊂R   gives 0 2 0
-      ⍝
-      ⍝ The mismatch apparently occurs for empty L⊂R and we map these
-      ⍝ case to non-empty R below.
+      In IBM APL2 we get:
+
+      ⍴ (0≠L)/R  gives 0 2 2
+      ⍴ ⊃,/L⊂R   gives 0 2 0
+
+      The mismatch apparently occurs for empty L⊂R and we map these
+      case to non-empty R below.
+        »»»
 
       R←ANY_I ∣ 1000   ⍝ avoid large ints to make errors more readable
       R←((1⌈⍴⍴R)↑(⍴R),0)⍴R   ⍝ non-scalar R
@@ -213,10 +221,23 @@ CLEAR WS
 ³
 
       Z←L⊂R
-      ⍝ the left and/or right side of the invariant (0≠L)/R  ←→  ⊃,/L⊂R might
-      ⍝ fail while L⊂R has succeeded. Catch and pretend success in these cases.
+COMMENT «««
+      the left and/or right side of the invariant (0≠L)/R  ←→  ⊃,/L⊂R might
+      fail while L⊂R has succeeded. Catch and pretend success in these cases.
+        »»»
+
       (Z1 Z2)← '1 1' ⎕EA '((0≠L)/R) (⊃,/Z)'
+
+COMMENT «««
+      empty results are also misterious. For L←0 or L←, and R←,1 both
+      GNU APL and IBM APL 2 return the same result, but the invariant
+      does not hold. In this case the right side Z2 should be 0⍴⊂Z2 instead.
+        »»»
+
+      (Z1 Z2) ← Z1 Z2 ⊢[(0ϵ⍴Z2) ∨ (0≡Z2) ] 1 1   ⍝ fix empty Z2
       Z1 EQUIV Z2
+
+      )CHECK BRIEF
 
       )CLEAR
 CLEAR WS

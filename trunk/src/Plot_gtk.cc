@@ -336,11 +336,13 @@ const char *
 format_user_tick(double val, int tidx, const char * format,
                  const char * percent)
 {
-static char cc[60] = "";   // should suffice
+static char cc[100] = "";   // should suffice
 
    if (percent[1] == 's')   // %s: inline tick texts separated by %
       {
-        // e.g. '%sTick0%Tick1%...TickN"
+        // static tick texts, e.g. '%sTick0%Tick1%...TickN'. 
+        // They depend on tidx (which selects one of them)
+        //
         const char * tick_text = percent + 2;   // e.g. Tick0
         for (int idx = tidx; idx > 0; --idx)   // skip texts < idx
             {
@@ -369,6 +371,96 @@ static char cc[60] = "";   // should suffice
            }
 
         strncpy(cc, tick_text, tick_len);
+        return cc;
+      }
+   else if (strchr("gvSIHhDdMmQqYy", percent[1]))   // some kind of date
+      {
+        // dynamic tick text (a subset of those in "man date")
+        //
+        const time_t when = time_t(val);
+        const tm * tm = localtime(&when);
+        if (tm == 0)   // error in localtime()
+           {
+             MORE_ERROR() << "bad value in formatted ⎕PLOT tick";
+             DOMAIN_ERROR;
+           }
+        const int year    = tm->tm_year + 1900;   // tm 0-100 → APL
+        const int month   = tm->tm_mon  + 1;      // tm 0-11  → APL
+        const int quarter = tm->tm_mon / 3;       // tm 0-11  → APL
+
+        int cc_pos = 0;
+        enum { cc_max = sizeof(cc) - 1 };
+        while (const char chr = *format++)
+           {
+             if (chr != '%')
+                {
+                  if (cc_pos < cc_max)   cc[cc_pos++] = chr;
+                  continue;   // next char in format
+                }
+
+             // chr is % (start of field).
+             //
+             char item[20];
+             enum { ILEN = sizeof(item) - 1 };
+             switch (*format++)
+                {
+                  case 'S': snprintf(item, ILEN, "%2.2d", tm->tm_sec);
+                            break;
+
+                  case 'G': snprintf(item, ILEN, "%d", tidx + 1);
+                            break;
+
+                  case 'g': snprintf(item, ILEN, "%d", tidx);
+                            break;
+
+                  case 'v': snprintf(item, ILEN, "%d", int(val));
+                            break;
+
+                  case 'I': snprintf(item, ILEN, "%2.2d", tm->tm_min);
+                            break;
+
+                  case 'H': snprintf(item, ILEN, "%2.2d", tm->tm_hour);
+                            break;
+
+                  case 'h': snprintf(item, ILEN, "%d", tm->tm_hour);
+                            break;
+
+                  case 'D': snprintf(item, ILEN, "%2.2d", tm->tm_mday);
+                            break;
+
+                  case 'd': snprintf(item, ILEN, "%d", tm->tm_mday);
+                            break;
+
+                  case 'M': snprintf(item, ILEN, "%2.2d", month);
+                            break;
+
+                  case 'm': snprintf(item, ILEN, "%d", month);
+                            break;
+
+                  case 'Q': snprintf(item, ILEN, "%d", quarter + 1);
+                            break;
+
+                  case 'q': snprintf(item, ILEN, "%d", quarter);
+                            break;
+
+                  case 'Y': snprintf(item, ILEN, "%4.4d", year);
+                            break;
+
+                  case 'y': snprintf(item, ILEN, "%2.2d", year%100);
+                            break;
+
+                   default: // invalid/unsupported; copy cc1
+                            snprintf(item, ILEN, "%%%c", format[-1]);
+                            break;
+                }
+
+             // copy item
+             //
+             item[sizeof(item) - 1] = 0;
+             for (const char * i = item; *i; ++i)
+                 if (cc_pos < cc_max)   cc[cc_pos++] = *i;
+           }
+        cc[cc_pos] = 0;   // 0-terminator fpr cc.
         return cc;
       }
 
@@ -748,7 +840,8 @@ const vector<level_color> & color_steps = w_props.get_gradient();
       }
 }
 //----------------------------------------------------------------------------
-/// draw the (vertical) X grid-lines of the plot (starting from the X axis)
+/// draw the (vertical) X grid-lines of the plot (starting from the Y axis)
+/// and proceeding with equal distances w_props.get_value_per_tile_X().
 void
 draw_X_grid(cairo_t * cr, const GTK_context & pctx, bool surface_plot)
 {
@@ -785,7 +878,92 @@ const int grid_style = w_props.get_gridX_style();
          string format = w_props.get_format_X();
          const char * cc = format_tick(v, dV, ix, format.c_str());
          double cc_width, cc_height;
-         cairo_multiline_size(cc_width, cc_height, cr, cc, FONT_NAME, FONT_SIZE);
+         cairo_multiline_size(cc_width, cc_height, cr, cc,
+                              FONT_NAME, FONT_SIZE);
+
+         Pixel_XY cc_pos(px0 - 0.5*cc_width, py0 + cc_height + 8);
+         if (surface_plot)
+            {
+              cc_pos.x -= w_props.get_origin_X();
+              cc_pos.y += w_props.get_origin_Y();
+            }
+         draw_multiline(cr, cc, cc_pos, cc_width);
+       }
+
+   if (w_props.get_axisX_arrow())
+      {
+        const Pixel_XY origin = w_props.get_origin(surface_plot);
+        const Pixel_X px = w_props.valX2pixel(dv) + w_props.get_origin_X();
+
+        Pixel_XY P(px, origin.y);
+        draw_arrow(cr, origin, P, grid_color);
+
+        const string arrow_label = w_props.get_axisX_label();
+        if (arrow_label.size())
+           {
+             draw_text(cr, arrow_label.c_str(), Pixel_XY(P.x + 40, P.y + 5));
+           }
+      }
+}
+//----------------------------------------------------------------------------
+/// draw (vertical) X grid-lines where plot points exist.
+void
+draw_X_vargrid(cairo_t * cr, const GTK_context & pctx, bool surface_plot)
+{
+const Plot_window_properties & w_props = pctx.w_props;
+const int line_width = w_props.get_gridX_line_width();
+const Color grid_color = w_props.get_gridX_color();
+
+const Pixel_Y py0 = w_props.valY2pixel(0);
+const double dv = w_props.get_max_Y() - w_props.get_min_Y();
+const Pixel_Y py1 = w_props.valY2pixel(dv);
+const int grid_style = w_props.get_gridX_style();
+
+   // draw the first and last grid line solid
+   {
+     const double dV = w_props.get_value_per_tile_X();
+     double v = w_props.get_min_X();
+     int px0 = w_props.valX2pixel(v - w_props.get_min_X())
+                       + w_props.get_origin_X();
+     draw_line(cr, grid_color, /* solid */ 1, line_width,
+               Pixel_XY(px0, py0 + 5), Pixel_XY(px0, py1));
+
+     v = w_props.get_min_X() + w_props.get_gridX_last()*dV;
+     px0 = w_props.valX2pixel(v - w_props.get_min_X())
+                       + w_props.get_origin_X();
+     draw_line(cr, grid_color, /* solid */ 1, line_width,
+               Pixel_XY(px0, py0 + 5), Pixel_XY(px0, py1));
+   }
+
+vector<double> xvals;
+const Plot_data & data = w_props.get_plot_data();
+   loop(r, data.get_row_count())
+      {
+        const Plot_data_row & row = data[r];
+        loop(col, row.get_N())
+            {
+              const double val = row.get_X(col);
+              xvals.push_back(val);
+            }
+      }
+
+   loop(ix, xvals.size())
+       {
+         const double dV = w_props.get_value_per_tile_X();
+         const double v = xvals[ix];
+         const int px0 = w_props.valX2pixel(v - w_props.get_min_X())
+                       + w_props.get_origin_X();
+
+         // draw the first other lines with the desired line style.
+         //
+         draw_line(cr, grid_color, grid_style, line_width,
+                        Pixel_XY(px0, py0 + 5), Pixel_XY(px0, py1));
+
+         string format = w_props.get_format_X();
+         const char * cc = format_tick(v, dV, ix, format.c_str());
+         double cc_width, cc_height;
+         cairo_multiline_size(cc_width, cc_height, cr, cc,
+                              FONT_NAME, FONT_SIZE);
 
          Pixel_XY cc_pos(px0 - 0.5*cc_width, py0 + cc_height + 8);
          if (surface_plot)
@@ -848,7 +1026,8 @@ const int grid_style = w_props.get_gridY_style();
          string format = w_props.get_format_Y();
          const char * cc = format_tick(v, dV, iy, format.c_str());
          double cc_width, cc_height;
-         cairo_multiline_size(cc_width, cc_height, cr, cc, FONT_NAME, FONT_SIZE);
+         cairo_multiline_size(cc_width, cc_height, cr, cc,
+                              FONT_NAME, FONT_SIZE);
 
          Pixel_XY cc_pos(px0 - cc_width - 8, py0 + 0.5 * cc_height - 1);
          if (surface_plot)
@@ -959,7 +1138,8 @@ int grid_style = w_props.get_gridZ_style();
          string format = w_props.get_format_Z();
          const char * cc = format_tick(v, dV, iz, format.c_str());
          double cc_width, cc_height;
-         cairo_multiline_size(cc_width, cc_height, cr, cc, FONT_NAME, FONT_SIZE);
+         cairo_multiline_size(cc_width, cc_height, cr, cc,
+                              FONT_NAME, FONT_SIZE);
          const Pixel_XY cc_pos(px1 + 10, py0 + 0.5*cc_height - 1);
          draw_multiline(cr, cc, cc_pos, cc_width);
        }
@@ -1253,7 +1433,8 @@ const Color canvas_color = w_props.get_canvas_color();
    //
 const bool surface_plot = w_props.get_plot_data().is_surface_plot();
 
-  draw_X_grid(cr, pctx, surface_plot);
+   if (w_props.get_gridX_variable())   draw_X_vargrid(cr, pctx, surface_plot);
+   else                                draw_X_grid(cr, pctx, surface_plot);
   draw_Y_grid(cr, pctx, surface_plot);
   if (surface_plot)    draw_Z_grid(cr, pctx);
 

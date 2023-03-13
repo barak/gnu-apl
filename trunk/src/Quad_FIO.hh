@@ -210,6 +210,9 @@ protected:
    /// find function number for function name, -1 if not found
    static int function_name_to_int(const char * function_name);
 
+   /// for Date/Time Bv. return its seconds since midnight Jan 1, 1970
+   static APL_Integer secs_epoch(const Value & B);
+
    /// the open files
    static std::vector<file_entry> open_files;
 };

@@ -1081,7 +1081,8 @@ ShapeItem idx = 0;
                              << "Call stack:" << endl;
                              BACKTRACE
                         CERR << endl << " Running )CHECK..." << endl;
-                        Command::cmd_CHECK(CERR);
+                        UCS_string no_arg;
+                        Command::cmd_CHECK(CERR, no_arg);
                         CERR << endl;
 
 #if cfg_VALUE_HISTORY_WANTED
