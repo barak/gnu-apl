@@ -605,7 +605,7 @@ shared variables.
 </li><li> <b><tt>-p N</tt></b>
 
 <p>use profile number N in preferences files. A preference file may contain
-several sets of settings for different purposes; the profile number selectes
+several sets of settings for different purposes; the profile number selects
 one of these sets.
 </p>
 </li><li> <b><tt>--par pproc</tt></b>
@@ -1152,7 +1152,7 @@ special format which specifies how the subsequent lines of the script file
 shall be processed, see <b>man execve</b> for details.
 </p>
 <p>A GNU APL script is then a script whose shebang indicates the apl binary as
-the intepreter for the subsequent lines where those subsequent lines are
+the interpreter for the subsequent lines where those subsequent lines are
 either APL commands or APL statements. With some limitations, executing such
 an APL script yields the same result as entering the subsequent lines in
 immediate execution mode.
@@ -1196,7 +1196,7 @@ as seen by ⎕ARG, is produced:
 sarg1             
 sarg2 
 </pre>
-<p>This suggests that the options and option argments are constructed by execve()
+<p>This suggests that the options and option arguments are constructed by execve()
 (the function that is eventually responsible for processing scripts in shells
 and other executables) in the following order:
 </p>
@@ -1241,7 +1241,7 @@ subsequent options on the shebang line from being interpreted as APL options
 starts). At least under GNU/Linux with <b>bash</b> the subsequent options will
 be passed to the APL application via ⎕ARG.
 </p>
-<p>Depending on this exact behaviour cannot be recommended. A cleaner approach is
+<p>Depending on this exact behavior cannot be recommended. A cleaner approach is
 to use options starting with - or <b><tt>--</tt></b> only for the interpreter
 options, and options starting with + for application options. This should
 work on all platforms because for strings, say, APLOPT, ARG1, ARG2, ...,
@@ -1292,11 +1292,11 @@ vector:
 </li><li> by means of environment variables
 </li></ul>
 
-<p>Just like the system variable ⎕ARG makes the command line optios used available
-to APL, does the system function ⎕ENV make the environment variables available
-to APL. Since there normally exist far more environment variables than command
-line options, ⎕ENV is a monadic function whose argument is a filter for the
-name(s) of the variable(s) to be retrieved.
+<p>Just like the system variable ⎕ARG makes the command line options used
+available to APL, does the system function ⎕ENV make the environment
+variables available to APL. Since there normally exist far more
+environment variables than command line options, ⎕ENV is a monadic function
+whose argument is a filter for the name(s) of the variable(s) to be retrieved.
 </p>
 <p>⎕ENV B returns all environment variables whose name starts with B.
 If ⍴B is 0, like:
@@ -1630,9 +1630,9 @@ out what exactly went wrong. In a script, however, the standard )MORE command
 
 @itemize
 @item An human user has a chance to issue the )MORE command interactively
-after an error has occurredi, while a script continues after displaying the
+after an error has occurred, while a script continues after displaying the
 error message, and
-@item It is rather difficult to predict where the next errors will occure,
+@item It is rather difficult to predict where the next errors will occur,
 i.e. where to place the )MORE command in the script.
 @end itemize
 
@@ -3532,7 +3532,7 @@ to the constraints matrix Q8:
       1  1        2                   2       
        1    1       2             2           
 
-      ⍝ all primary contraints met?
+      ⍝ all primary constraints met?
       ⍝
       +⌿ ' '≠ Q8[⊃Z[1];] 
 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 1 0 1 1 1 1 0 1 0 1 1 0 0 0 0 0 1 1 1 1 1 1 
@@ -3842,7 +3842,7 @@ value to a JSON string.
 
 </li><li> <b>Z←3 ⎕JSON B</b> is like 2 ⎕JSON B, except that the member names
 (keys) of all JSON objects are sorted alphabetically. That is of little use
-(but costs perfomance) if Z is not displayed but processed further, but
+(but costs performance) if Z is not displayed but processed further, but
 it could help troubleshooting when Z is displayed and the number of keys in Z
 is large.
 </li></ul>
@@ -3861,7 +3861,7 @@ table provided as its left argument. Let Z←A ⎕MAP B.
 </p>
 <p>The left argument A of Z←A ⎕MAP B shall be a N×2 matrix. Each 2-element row of
 A, say A[J;], specifies a separate mapping A[J;1] → A[J;2]. The result Z has
-the same shape as the right argument B. The items Z[...] iof ther result are
+the same shape as the right argument B. The items Z[...] of their result are
 constructed from their corresponding items B[...] in B as follows:
 </p>
 <ul>
@@ -3928,7 +3928,7 @@ By default the mapping of B is non-recursive, i.e. the top-level items of
 B are compared with the top-level keys A[;1], and nested keys and items of B
 are handled as described above.
 
-<p>Sometrimes, however, it is desirable to recursively descend into the nested
+<p>Sometimes, however, it is desirable to recursively descend into the nested
 sub-values of B (though never of A). This can be achieved by enclosing A as
 shown in the examples below.
 </p></li></ul>
@@ -4130,7 +4130,7 @@ format_X:           (none)         (format for X-axis ticks (GTK only))
                     %D, %d         (day DD or d/dd)
                     %M, %m         (month MM or m/mm)
                     %q             (quarter 0..3)
-                    %Q             (quater 1..4)
+                    %Q             (quarter 1..4)
                     %Y, %y         (year YYYY or yy)
 format_Y:                          (format for Y-axis (dito))
 format_Z:                          (format for Z-axis (dito))
@@ -4172,7 +4172,7 @@ legend_name-2: Random Row 2
 </pre>
 <p>While specifying the plot attributes A in one place is most convenient for
 a single plot window or when the attributes are read from some external
-test file, its is somretimes simpler to specify the plot attributes
+test file, its is sometimes simpler to specify the plot attributes
 individually. This can be done by using a structured APL variable as left
 argument A:
 </p>
@@ -4216,9 +4216,9 @@ Attributes.line_width-2 ← 4   ⍝ except plot line 2: 4 pixels thick
 <h4 class="subsubsection">2.31.2.1 Tick formatting (GTK only)</h4>
 
 <p>By default, the ticks on the X, Y, and Z axes show the naked value
-of the corresponding coordinates. Sometimes you may want them to look a
-litte nocht, e.g. by adding units to the numbers. This can be achived
-with window proterties <b>format_X/Y/Z</b>, possibly accompanied by property
+of their corresponding coordinates. Sometimes you may want them to look a
+litte differen, e.g. by adding units to the numbers. This can be achieved
+with window properties <b>format_X/Y/Z</b>, possibly accompanied by property
 <b>gridX_variable</b>.
 </p>
 <p>The properties <b>format_X/Y/Z</b> may be set to a format string that allows
@@ -4246,7 +4246,7 @@ like manner.
 <p>Most of the <b>dynamic tick items</b> (see <b>⎕PLOT &rdquo;</b> for a complete list)
 are related to points in time (years, quarters, months, days, hours, minutes,
 and seconds). For them the X coordinate (time) is, according to the *nix time
-conventions, seconds since midnigth 1970. Since this number of seconds is not
+conventions, seconds since midnight 1970. Since this number of seconds is not
 easy to compute in APL, <b>⎕FIO.secs_epoch</b> comes to rescue:
 </p>
 <pre class="verbatim">Q1  ← ⎕FIO.secs_epoch 2023 2 15   ⍝ Feb. 15 (middle of Q1) 00:00:00
@@ -4267,7 +4267,7 @@ As a consequence, the X-tick coordinates are not rounded to some
 terms of months or quarters) the value printed at an X-axis tick displays
 the X-coordinate that reflects exactly the value of the plot point.
 </p>
-<p>A complete example for plotting the quaterly values <b>1 3 4 2</b> is the
+<p>A complete example for plotting the quarterly values <b>1 3 4 2</b> is the
 fo (you
 may want to try it with both 0 and 1 for ATT.gridX_variable):
 </p>
@@ -4338,7 +4338,7 @@ file formats.
 </p>
 <p><b>libxcb</b> is the older of the two libraries and it therefore produces the
 older file format <b>.bmp</b> (bitmaps). <b>libgtk-3</b> is the newer
-library and it procuces the somewhat newer file format <b>.png</b>
+library and it produces the somewhat newer file format <b>.png</b>
 (portable network graphics). There are tools like <b>convert</b> from package
 <b>imagemagick</b> that can be used to convert different image file formats
 into each other and therefore this incompatibility should not cause too much 
@@ -4386,14 +4386,14 @@ are red, green and blue (or RGB for short), and
 RGBA format) defines how transparent a pixel is; lower values cause the
 background of a pixel to shine through while larger values make the pixel
 more opaque. One important use of the alpha channel is images that shall
-not appear rectangular (even though theirunderlying colour matrix is).
-For example, to display a red circle on top of somerhing else, one can set
+not appear rectangular (even though their underlying color matrix is).
+For example, to display a red circle on top of something else, one can set
 the opacity of the pixels inside the circle to their maximum (as to making
-them fully opaque and competely hiding the background or some other image
+them fully opaque and completely hiding the background or some other image
 below) and the pixels outside the circle to 0 (making them fully transparent).
 </p>
 <p>Since every pixel of an image may have 1, 2, 3, or 4 color components, the
-representation of an image in APL is a three dimenstional Array
+representation of an image in APL is a three dimensional array
 <strong>Image</strong> where:
 </p>
 <ul>
@@ -4437,7 +4437,7 @@ these 15 combinations further to the 4 general types types with the following
 rules:
 </p>
 <ul>
-<li> On input, i.e. when reading a PNG image file and producting the APL
+<li> On input, i.e. when reading a PNG image file and producing the APL
 array described above, the different resolutions allowed by the PNG standard
 are normalized to a single range of real numbers between 0.0 and 1.0 (this
 is by chance also the range used in the GTK standard used in ⎕PNG and ⎕PLOT).
@@ -4506,7 +4506,7 @@ the screen (interactive used of PNG), and
 
 <ul>
 <li> ⎕PNG N with N ≥ 1 (as returned in the case above) closes the window 
-       with handle N programatically.
+       with handle N programmatically.
 
 </li><li> ⎕PNG 0 disables all debug printouts related to ⎕PNG.
 </li><li> ⎕PNG ¯1 turns on a debug printout related to ⎕PNG (X events).
@@ -5018,7 +5018,7 @@ can later be restored to the same state like this:
 </pre>
 <p>Restoring the state is needed when the same sequence of random value shall
 be generated again. The random number generators of ? and ⎕RVAL are
-indepentent; generating a random number or random value with one does not
+independent; generating a random number or random value with one does not
 change the state of the other.
 </p>
 <a name="g_t1-_005b_003f_005dRVAL-B_003a-Control-of-the-ranks"></a>
@@ -5106,7 +5106,7 @@ longer vectors will raise a LENGTH error.
 <ul>
 <li> for type CHARACTER: a random character with ⎕UCS between 0 and $3000
 (excluding). Larger Unicodes typically cause display problems. If you need
-larget Unicodes, use ⎕UCS with random integers.
+larger Unicodes, use ⎕UCS with random integers.
 
 </li><li> for type INTEGER: a random integer with ⎕UCS between -$80000000 and
 $7FFFFFFF.
@@ -5165,7 +5165,7 @@ the properties have the following defaults:
       3 ⎕RVAL ⍬    ⍝ types (integer)
 0 1 0 0 0
 
-      4 ⎕RVAL ⍬    ⍝ max. depth (not used since probasbility of NESTED = 0)
+      4 ⎕RVAL ⍬    ⍝ max. depth (not used since probability of NESTED = 0)
 4
 </pre>
 <p>That is, by default ⎕RVAL ⍬ produces random integer scalars.
@@ -5557,7 +5557,7 @@ Hello
   string that are not (yet) handled by ⎕XML; this means that the user of ⎕XML
   shall be able to handle advanced XML aspects (like document type
   declarations (DTDs), document validation, etc.) herself in APL and without
-  much ovehead.
+  much overhead.
 </li></ul>
 
 <a name="Some-XML-Terminology"></a>
@@ -5599,9 +5599,9 @@ is:
 <p>Non-markup is sometimes referred to as &quot;unstructured text&quot;. The producer of
 an XML document has a principal choice as to where to put the information
 that the document contains is located: in the unstructured text or in the
-atttribute values inside the tags. For that reason the XML standard is somewhat
+attribute values inside the tags. For that reason the XML standard is somewhat
 picky about keeping the unstructured text as well as attribute values intact
-and requires that whitespace in non-markup (the only allowed whitspace
+and requires that whitespace in non-markup (the only allowed whitespace
 characters in XML being TAB, CR, LF, and SPACE) is preserved in non-markup
 strings.
 </p>
@@ -5640,7 +5640,7 @@ preserved.
 </li></ul>
 
 <p>Processing instructions and declarations are typically located at the
-beginnning of the XML document and at the same level as the root of the tree.
+beginning of the XML document and at the same level as the root of the tree.
 defined by the document. Document type declarations are being preserved (so
 that they can be processed in APL), but are currently ignored by ⎕XML. As a
 consequence, entity declarations have no effect and only the predefined XML
@@ -5754,7 +5754,7 @@ synthesized names are produced by ⎕XML:
 </li><li> <b>∆NNdeclaration</b> for XML declarations, i.e. &lt;? ... ?&gt; in XML,
 </li><li> <b>∆NNdoctype</b> for document type declarations, i.e.i
     &lt;!DOCTYPE ... &gt; in XML
-</li><li> <b>∆NNtext</b> for unstructured (and hence untagged) text segemnts
+</li><li> <b>∆NNtext</b> for unstructured (and hence untagged) text segements
   in XML.
 </li></ul>
 
@@ -5800,7 +5800,7 @@ be suppressed in 2 ways:
 <h4 class="subsection">2.39.5 Dyadic ⎕XML</h4>
 
 <p><b>Z ← A ⎕XML B</b> provides a number of convenience functions. Its left
-argument A is an interger function number, possibly followed by arguments
+argument A is an integer function number, possibly followed by arguments
 of the function number ↑A.
 </p>
 
@@ -5935,7 +5935,7 @@ filter out items along the way).
 ._3_Document._2_Tag1._4_Subtag._2∆comment
 ._3_Document._2_Tag1._4_Subtag._3∆text   
 </pre>
-</li><li> <b>Z←8 ⎕XML B</b> is like Z←7 ⎕XML B, except that only the aubset of
+</li><li> <b>Z←8 ⎕XML B</b> is like Z←7 ⎕XML B, except that only the subset of
 those members that are related to tags (the tag name ⍙ and tag attributes)
 are returned:
 
@@ -5999,7 +5999,7 @@ the tags. an empty member name returns the first member:
 
 <pre class="verbatim">      APL ← ⎕XML XML←&quot;&lt;ROOT&gt;&lt;A/&gt;&lt;B/&gt;&lt;C/&gt;&lt;/ROOT&gt;&quot;
 
-      (14 &quot;&quot;) ⎕XML APL._1ROOT   ⍝ get first memebr in APL._1ROOT
+      (14 &quot;&quot;) ⎕XML APL._1ROOT   ⍝ get first member in APL._1ROOT
 ⍙1
       (14 &quot;⍙1&quot;) ⎕XML APL._1ROOT   ⍝ next member after APL._1ROOT.⍙1
 _1A
@@ -6213,7 +6213,7 @@ directory determines, which optional components shall be included on the build.
         ├── Gtk                     ⎕GTK (graphical user interface)
         ├── native                  templates for native functions
         ├── sql                     ⎕SQL
-        ├── testcaseses             dito
+        ├── testcases               dito
 </pre>
 <p>GNU APL comes with an automated test suite, the testcases are
 contained in subdirectory src/testcases

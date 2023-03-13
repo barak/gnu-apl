@@ -341,7 +341,7 @@ GNU APL understands the following command line options:
 
      use profile number N in preferences files.  A preference file may
      contain several sets of settings for different purposes; the
-     profile number selectes one of these sets.
+     profile number selects one of these sets.
 
    • --par pproc
 
@@ -831,10 +831,10 @@ a special format which specifies how the subsequent lines of the script
 file shall be processed, see man execve for details.
 
    A GNU APL script is then a script whose shebang indicates the apl
-binary as the intepreter for the subsequent lines where those subsequent
-lines are either APL commands or APL statements.  With some limitations,
-executing such an APL script yields the same result as entering the
-subsequent lines in immediate execution mode.
+binary as the interpreter for the subsequent lines where those
+subsequent lines are either APL commands or APL statements.  With some
+limitations, executing such an APL script yields the same result as
+entering the subsequent lines in immediate execution mode.
 
    When APL is started directly, then there is only one (possibly empty)
 set of command lines options, which are processed by the shell and then
@@ -874,8 +874,8 @@ options as seen by ⎕ARG, is produced:
 sarg1             
 sarg2 
 
-   This suggests that the options and option argments are constructed by
-execve() (the function that is eventually responsible for processing
+   This suggests that the options and option arguments are constructed
+by execve() (the function that is eventually responsible for processing
 scripts in shells and other executables) in the following order:
 
    1.  Interpreter name (the first name in the shebang, here:
@@ -920,7 +920,7 @@ options (and, more importantly, from causing unknown option errors when
 GNU APL starts).  At least under GNU/Linux with bash the subsequent
 options will be passed to the APL application via ⎕ARG.
 
-   Depending on this exact behaviour cannot be recommended.  A cleaner
+   Depending on this exact behavior cannot be recommended.  A cleaner
 approach is to use options starting with - or -- only for the
 interpreter options, and options starting with + for application
 options.  This should work on all platforms because for strings, say,
@@ -964,10 +964,10 @@ There are usually at least two ways of passing parameters to a script:
    • as command line options, and/or
    • by means of environment variables
 
-   Just like the system variable ⎕ARG makes the command line optios used
-available to APL, does the system function ⎕ENV make the environment
-variables available to APL. Since there normally exist far more
-environment variables than command line options, ⎕ENV is a monadic
+   Just like the system variable ⎕ARG makes the command line options
+used available to APL, does the system function ⎕ENV make the
+environment variables available to APL. Since there normally exist far
+more environment variables than command line options, ⎕ENV is a monadic
 function whose argument is a filter for the name(s) of the variable(s)
 to be retrieved.
 
@@ -1299,9 +1299,9 @@ out what exactly went wrong. In a script, however, the standard )MORE command
 
 @itemize
 @item An human user has a chance to issue the )MORE command interactively
-after an error has occurredi, while a script continues after displaying the
+after an error has occurred, while a script continues after displaying the
 error message, and
-@item It is rather difficult to predict where the next errors will occure,
+@item It is rather difficult to predict where the next errors will occur,
 i.e. where to place the )MORE command in the script.
 @end itemize
 
@@ -3146,7 +3146,7 @@ relates to the constraints matrix Q8:
       1  1        2                   2       
        1    1       2             2           
 
-      ⍝ all primary contraints met?
+      ⍝ all primary constraints met?
       ⍝
       +⌿ ' '≠ Q8[⊃Z[1];] 
 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 1 0 0 1 0 1 1 1 1 0 1 0 1 1 0 0 0 0 0 1 1 1 1 1 1 
@@ -3427,7 +3427,7 @@ Z←A ⎕JSON B performs one of the following conversions:
 
    • Z←3 ⎕JSON B is like 2 ⎕JSON B, except that the member names (keys)
      of all JSON objects are sorted alphabetically.  That is of little
-     use (but costs perfomance) if Z is not displayed but processed
+     use (but costs performance) if Z is not displayed but processed
      further, but it could help troubleshooting when Z is displayed and
      the number of keys in Z is large.
 
@@ -3443,7 +3443,7 @@ mapping table provided as its left argument.  Let Z←A ⎕MAP B.
    The left argument A of Z←A ⎕MAP B shall be a N×2 matrix.  Each
 2-element row of A, say A[J;], specifies a separate mapping A[J;1] →
 A[J;2].  The result Z has the same shape as the right argument B. The
-items Z[...]  iof ther result are constructed from their corresponding
+items Z[...]  of their result are constructed from their corresponding
 items B[...]  in B as follows:
 
    • if B[...]  ≡ A[J;1] for some J then Z[...]  is A[J;2].
@@ -3508,9 +3508,9 @@ HAlloWEEn
      items of B are compared with the top-level keys A[;1], and nested
      keys and items of B are handled as described above.
 
-     Sometrimes, however, it is desirable to recursively descend into
-     the nested sub-values of B (though never of A). This can be
-     achieved by enclosing A as shown in the examples below.
+     Sometimes, however, it is desirable to recursively descend into the
+     nested sub-values of B (though never of A). This can be achieved by
+     enclosing A as shown in the examples below.
 
       A←5 2⍴'eEwWaAzZ92'
       B←'Hal' 'low' 'een'   ⍝ nested B
@@ -3706,7 +3706,7 @@ format_X:           (none)         (format for X-axis ticks (GTK only))
                     %D, %d         (day DD or d/dd)
                     %M, %m         (month MM or m/mm)
                     %q             (quarter 0..3)
-                    %Q             (quater 1..4)
+                    %Q             (quarter 1..4)
                     %Y, %y         (year YYYY or yy)
 format_Y:                          (format for Y-axis (dito))
 format_Z:                          (format for Z-axis (dito))
@@ -3748,7 +3748,7 @@ legend_name-2: Random Row 2
 
    While specifying the plot attributes A in one place is most
 convenient for a single plot window or when the attributes are read from
-some external test file, its is somretimes simpler to specify the plot
+some external test file, its is sometimes simpler to specify the plot
 attributes individually.  This can be done by using a structured APL
 variable as left argument A:
 
@@ -3792,10 +3792,10 @@ Attributes.line_width-2 ← 4   ⍝ except plot line 2: 4 pixels thick
 ...................................
 
 By default, the ticks on the X, Y, and Z axes show the naked value of
-the corresponding coordinates.  Sometimes you may want them to look a
-litte nocht, e.g.  by adding units to the numbers.  This can be achived
-with window proterties format_X/Y/Z, possibly accompanied by property
-gridX_variable.
+their corresponding coordinates.  Sometimes you may want them to look a
+litte differen, e.g.  by adding units to the numbers.  This can be
+achieved with window properties format_X/Y/Z, possibly accompanied by
+property gridX_variable.
 
    The properties format_X/Y/Z may be set to a format string that allows
 the value that is being displayed at the ticks.  The format is a string
@@ -3822,7 +3822,7 @@ printf() like manner.
    Most of the dynamic tick items (see ⎕PLOT ” for a complete list) are
 related to points in time (years, quarters, months, days, hours,
 minutes, and seconds).  For them the X coordinate (time) is, according
-to the *nix time conventions, seconds since midnigth 1970.  Since this
+to the *nix time conventions, seconds since midnight 1970.  Since this
 number of seconds is not easy to compute in APL, ⎕FIO.secs_epoch comes
 to rescue:
 
@@ -3845,8 +3845,8 @@ consequence, the X-tick coordinates are not rounded to some 1 2 5×10⋆N
 months or quarters) the value printed at an X-axis tick displays the
 X-coordinate that reflects exactly the value of the plot point.
 
-   A complete example for plotting the quaterly values 1 3 4 2 is the fo
-(you may want to try it with both 0 and 1 for ATT.gridX_variable):
+   A complete example for plotting the quarterly values 1 3 4 2 is the
+fo (you may want to try it with both 0 and 1 for ATT.gridX_variable):
 
       )CLEAR
 
@@ -3906,7 +3906,7 @@ formats.
 
    libxcb is the older of the two libraries and it therefore produces
 the older file format .bmp (bitmaps).  libgtk-3 is the newer library and
-it procuces the somewhat newer file format .png (portable network
+it produces the somewhat newer file format .png (portable network
 graphics).  There are tools like convert from package imagemagick that
 can be used to convert different image file formats into each other and
 therefore this incompatibility should not cause too much trouble.
@@ -3949,16 +3949,16 @@ components, or short colors, as follows:
 in the RGBA format) defines how transparent a pixel is; lower values
 cause the background of a pixel to shine through while larger values
 make the pixel more opaque.  One important use of the alpha channel is
-images that shall not appear rectangular (even though theirunderlying
-colour matrix is).  For example, to display a red circle on top of
-somerhing else, one can set the opacity of the pixels inside the circle
-to their maximum (as to making them fully opaque and competely hiding
+images that shall not appear rectangular (even though their underlying
+color matrix is).  For example, to display a red circle on top of
+something else, one can set the opacity of the pixels inside the circle
+to their maximum (as to making them fully opaque and completely hiding
 the background or some other image below) and the pixels outside the
 circle to 0 (making them fully transparent).
 
    Since every pixel of an image may have 1, 2, 3, or 4 color
-components, the representation of an image in APL is a three
-dimenstional Array *Image* where:
+components, the representation of an image in APL is a three dimensional
+array *Image* where:
 
    • *(COLORS HEIGHT WIDTH) ← ⍴ IMAGE*,
    • *COLORS* is a number that determines *_general format_* of the
@@ -3998,11 +3998,11 @@ standard allows only 15 of them, in particular by permitting 1-bit,
 channel.  The GNU APL color model reduces these 15 combinations further
 to the 4 general types types with the following rules:
 
-   • On input, i.e.  when reading a PNG image file and producting the
-     APL array described above, the different resolutions allowed by the
-     PNG standard are normalized to a single range of real numbers
-     between 0.0 and 1.0 (this is by chance also the range used in the
-     GTK standard used in ⎕PNG and ⎕PLOT).
+   • On input, i.e.  when reading a PNG image file and producing the APL
+     array described above, the different resolutions allowed by the PNG
+     standard are normalized to a single range of real numbers between
+     0.0 and 1.0 (this is by chance also the range used in the GTK
+     standard used in ⎕PNG and ⎕PLOT).
    • Also on input, images that use color tables (for compressing the
      image as to reduce the file size) are automatically expanded.  The
      resulting APL value is therefore independent of the use of color
@@ -4063,7 +4063,7 @@ Monadic ⎕PNG, i.e.  ⎕PNG B is used for 3 purposes:
      behaviour:
 
         • ⎕PNG N with N ≥ 1 (as returned in the case above) closes the
-          window with handle N programatically.
+          window with handle N programmatically.
 
         • ⎕PNG 0 disables all debug printouts related to ⎕PNG.
         • ⎕PNG ¯1 turns on a debug printout related to ⎕PNG (X events).
@@ -4568,7 +4568,7 @@ generator can later be restored to the same state like this:
 
    Restoring the state is needed when the same sequence of random value
 shall be generated again.  The random number generators of ?  and ⎕RVAL
-are indepentent; generating a random number or random value with one
+are independent; generating a random number or random value with one
 does not change the state of the other.
 
 2.35.2.2 1 ⎕RVAL B: Control of the ranks
@@ -4652,7 +4652,7 @@ will not occur) and longer vectors will raise a LENGTH error.
 
    • for type CHARACTER: a random character with ⎕UCS between 0 and
      $3000 (excluding).  Larger Unicodes typically cause display
-     problems.  If you need larget Unicodes, use ⎕UCS with random
+     problems.  If you need larger Unicodes, use ⎕UCS with random
      integers.
 
    • for type INTEGER: a random integer with ⎕UCS between -$80000000 and
@@ -4713,7 +4713,7 @@ made then the properties have the following defaults:
       3 ⎕RVAL ⍬    ⍝ types (integer)
 0 1 0 0 0
 
-      4 ⎕RVAL ⍬    ⍝ max. depth (not used since probasbility of NESTED = 0)
+      4 ⎕RVAL ⍬    ⍝ max. depth (not used since probability of NESTED = 0)
 4
 
    That is, by default ⎕RVAL ⍬ produces random integer scalars.
@@ -5084,7 +5084,7 @@ Hello
      XML string that are not (yet) handled by ⎕XML; this means that the
      user of ⎕XML shall be able to handle advanced XML aspects (like
      document type declarations (DTDs), document validation, etc.)
-     herself in APL and without much ovehead.
+     herself in APL and without much overhead.
 
 2.39.2 Some XML Terminology
 ---------------------------
@@ -5118,10 +5118,10 @@ sub-string is:
    Non-markup is sometimes referred to as "unstructured text".  The
 producer of an XML document has a principal choice as to where to put
 the information that the document contains is located: in the
-unstructured text or in the atttribute values inside the tags.  For that
+unstructured text or in the attribute values inside the tags.  For that
 reason the XML standard is somewhat picky about keeping the unstructured
 text as well as attribute values intact and requires that whitespace in
-non-markup (the only allowed whitspace characters in XML being TAB, CR,
+non-markup (the only allowed whitespace characters in XML being TAB, CR,
 LF, and SPACE) is preserved in non-markup strings.
 
    As a consequence, many non-markup strings begin with LF because the
@@ -5154,7 +5154,7 @@ needs to be preserved.
      nodes.
 
    Processing instructions and declarations are typically located at the
-beginnning of the XML document and at the same level as the root of the
+beginning of the XML document and at the same level as the root of the
 tree.  defined by the document.  Document type declarations are being
 preserved (so that they can be processed in APL), but are currently
 ignored by ⎕XML. As a consequence, entity declarations have no effect
@@ -5263,7 +5263,8 @@ synthesized names are produced by ⎕XML:
    • ∆NNdeclaration for XML declarations, i.e.  <?  ...  ?> in XML,
    • ∆NNdoctype for document type declarations, i.e.i <!DOCTYPE ...  >
      in XML
-   • ∆NNtext for unstructured (and hence untagged) text segemnts in XML.
+   • ∆NNtext for unstructured (and hence untagged) text segements in
+     XML.
 
    Every XML name (of a tag or attribute) is also a valid APL name, but
 valid APL names may also contain the characters ¯, ∆, and ⍙ which are
@@ -5307,8 +5308,8 @@ suppressed in 2 ways:
 ------------------
 
 Z ← A ⎕XML B provides a number of convenience functions.  Its left
-argument A is an interger function number, possibly followed by
-arguments of the function number ↑A.
+argument A is an integer function number, possibly followed by arguments
+of the function number ↑A.
 
    In the following examples, let
 
@@ -5441,7 +5442,7 @@ APL←⎕XML XML
      ._3_Document._2_Tag1._4_Subtag._2∆comment
      ._3_Document._2_Tag1._4_Subtag._3∆text   
 
-   • Z←8 ⎕XML B is like Z←7 ⎕XML B, except that only the aubset of those
+   • Z←8 ⎕XML B is like Z←7 ⎕XML B, except that only the subset of those
      members that are related to tags (the tag name ⍙ and tag
      attributes) are returned:
 
@@ -5505,7 +5506,7 @@ APL←⎕XML XML
 
            APL ← ⎕XML XML←"<ROOT><A/><B/><C/></ROOT>"
      
-           (14 "") ⎕XML APL._1ROOT   ⍝ get first memebr in APL._1ROOT
+           (14 "") ⎕XML APL._1ROOT   ⍝ get first member in APL._1ROOT
      ⍙1
            (14 "⍙1") ⎕XML APL._1ROOT   ⍝ next member after APL._1ROOT.⍙1
      _1A
@@ -5703,7 +5704,7 @@ included on the build.
         ├── Gtk                     ⎕GTK (graphical user interface)
         ├── native                  templates for native functions
         ├── sql                     ⎕SQL
-        ├── testcaseses             dito
+        ├── testcases               dito
 
    GNU APL comes with an automated test suite, the testcases are
 contained in subdirectory src/testcases
@@ -7041,72 +7042,72 @@ please read <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 Tag Table:
 Node: Top383
 Node: Chapter 11573
-Node: Chapter 223283
-Node: Section 2.125232
-Node: Subsection 2.1.126454
-Node: Subsection 2.1.227085
-Node: Subsection 2.1.327916
+Node: Chapter 223282
+Node: Section 2.125231
+Node: Subsection 2.1.126453
+Node: Subsection 2.1.227084
+Node: Subsection 2.1.327915
 Node: Subsection 2.1.433721
-Node: Subsection 2.1.537519
-Node: Subsection 2.1.638377
-Node: Subsection 2.1.746500
-Node: Subsection 2.1.848252
-Node: Section 2.251567
-Node: Section 2.352326
-Node: Section 2.453601
-Node: Section 2.558046
-Node: Section 2.658219
-Node: Section 2.758849
-Node: Section 2.862802
-Node: Section 2.964337
-Node: Section 2.1066429
-Node: Section 2.1167983
-Node: Section 2.1269768
-Node: Section 2.1371708
-Node: Section 2.1472649
-Node: Section 2.1572901
-Node: Section 2.1674297
-Node: Section 2.1784766
-Node: Section 2.1887288
-Node: Section 2.1993994
-Node: Section 2.2095439
-Node: Section 2.21101100
-Node: Section 2.22106134
-Node: Section 2.23109415
-Node: Section 2.24109706
+Node: Subsection 2.1.537520
+Node: Subsection 2.1.638378
+Node: Subsection 2.1.746501
+Node: Subsection 2.1.848251
+Node: Section 2.251566
+Node: Section 2.352325
+Node: Section 2.453600
+Node: Section 2.558045
+Node: Section 2.658218
+Node: Section 2.758848
+Node: Section 2.862801
+Node: Section 2.964336
+Node: Section 2.1066428
+Node: Section 2.1167982
+Node: Section 2.1269767
+Node: Section 2.1371707
+Node: Section 2.1472648
+Node: Section 2.1572900
+Node: Section 2.1674296
+Node: Section 2.1784765
+Node: Section 2.1887287
+Node: Section 2.1993993
+Node: Section 2.2095438
+Node: Section 2.21101099
+Node: Section 2.22106133
+Node: Section 2.23109414
+Node: Section 2.24109705
 Node: Section 2.25120532
 Node: Section 2.26120804
 Node: Section 2.27127382
 Node: Section 2.28129842
 Node: Section 2.29130511
-Node: Section 2.30132162
+Node: Section 2.30132163
 Node: Section 2.31135950
-Node: Output File Format152689
-Node: Section 2.32153864
-Node: Section 2.33163262
-Node: Section 2.34164289
-Node: Section 2.35179005
-Node: Section 2.36189072
-Node: Section 2.37193191
-Node: Section 2.38195286
-Node: Section 2.39199711
-Node: Chapter 3221060
-Node: Chapter 4223561
-Node: Chapter 5224687
-Node: Section 5.1226224
-Node: Section 5.2227504
-Node: Section 5.3227864
-Node: Section 5.4228106
-Node: Section 5.5228768
-Node: Section 5.6229246
-Node: Section 5.7230018
-Node: Section 5.8230475
-Node: Chapter 6230877
-Node: Section 6.1231296
-Node: Section 6.2231983
-Node: Chapter 7232814
-Node: Section 7.1233317
-Node: Section 7.2258631
+Node: Output File Format152696
+Node: Section 2.32153871
+Node: Section 2.33163269
+Node: Section 2.34164296
+Node: Section 2.35179012
+Node: Section 2.36189078
+Node: Section 2.37193197
+Node: Section 2.38195292
+Node: Section 2.39199717
+Node: Chapter 3221071
+Node: Chapter 4223572
+Node: Chapter 5224698
+Node: Section 5.1226235
+Node: Section 5.2227515
+Node: Section 5.3227875
+Node: Section 5.4228117
+Node: Section 5.5228779
+Node: Section 5.6229257
+Node: Section 5.7230029
+Node: Section 5.8230486
+Node: Chapter 6230888
+Node: Section 6.1231307
+Node: Section 6.2231994
+Node: Chapter 7232825
+Node: Section 7.1233328
+Node: Section 7.2258642
 
 End Tag Table
 

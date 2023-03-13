@@ -60,7 +60,7 @@ gdef(String,   format_X,      "(none)", "format for X-axis ticks (GTK only))\n"
 "                    %D, %d         (day DD or d/dd)\n"
 "                    %M, %m         (month MM or m/mm)\n"
 "                    %q             (quarter 0..3)\n"
-"                    %Q             (quater 1..4)\n"
+"                    %Q             (quarter 1..4)\n"
 "                    %Y, %y         (year YYYY or yy")
 gdef(String,   format_Y,            "", "format for Y-axis (dito)")
 gdef(String,   format_Z,            "", "format for Z-axis (dito)")
