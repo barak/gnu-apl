@@ -252,24 +252,24 @@ const double half = 0.5*size;
 //----------------------------------------------------------------------------
 /// draw a point with given \b point_style and \b size around P
 static void
-draw_point(cairo_t * cr, Pixel_XY P0, int point_style,
+draw_point(cairo_t * cr, Pixel_XY P, int point_style,
            const Color outer_color, int outer_dia,
            const Color inner_color, int inner_dia)
 {
 const bool es = ! (point_style & 1);   // even style
    switch(point_style)
       {
-        case 0:                                                    return;
-        case 1: draw_circle(cr, P0,     outer_color, outer_dia);   break;    // ●
-        case 2:                                                              // ▲
-        case 3: draw_delta( cr, P0, es, outer_color, outer_dia);   break;    // ▼
-        case 4:                                                              // ◆
-        case 5: draw_quad(  cr, P0, es, outer_color, outer_dia);   break;    // ■
-        case 6:                                                              // 🞤
-        case 7: draw_cross( cr, P0, es, outer_color, outer_dia,
-                                                    inner_dia);    return;   // 🞫
-        default: MORE_ERROR() << "Invalid point style: "
-                              << point_style;                      return;
+        case 0:                                                   return;
+        case 1: draw_circle(cr, P,     outer_color, outer_dia);   break;   // ●
+        case 2:                                                            // ▲
+        case 3: draw_delta( cr, P, es, outer_color, outer_dia);   break;   // ▼
+        case 4:                                                            // ◆
+        case 5: draw_quad(  cr, P, es, outer_color, outer_dia);   break;   // ■
+        case 6:                                                            // 🞤
+        case 7: draw_cross( cr, P, es, outer_color, outer_dia,
+                                                    inner_dia);   return; // 🞫
+        default: cerr << "⎕PLOT: Invalid point style: "
+                      << point_style << endl;                     return;
       }
 
    // at this point, point_style is one of those that requires (though may not
@@ -277,11 +277,11 @@ const bool es = ! (point_style & 1);   // even style
    //
    if (inner_dia)   switch(point_style)
       {
-        case 1: draw_circle(cr, P0,     inner_color, inner_dia);  return;   // ●
+        case 1: draw_circle(cr, P,     inner_color, inner_dia);   return;   // ●
         case 2:                                                             // ▲
-        case 3: draw_delta( cr, P0, es, inner_color, inner_dia);  return;   // ▼
+        case 3: draw_delta( cr, P, es, inner_color, inner_dia);   return;   // ▼
         case 4:                                                             // ◆
-        case 5: draw_quad(  cr, P0, es, inner_color, inner_dia);  return;   // ■
+        case 5: draw_quad(  cr, P, es, inner_color, inner_dia);   return;   // ■
       }
 }
 //----------------------------------------------------------------------------
@@ -381,8 +381,8 @@ static char cc[100] = "";   // should suffice
         const tm * tm = localtime(&when);
         if (tm == 0)   // error in localtime()
            {
-             MORE_ERROR() << "bad value in formatted ⎕PLOT tick";
-             DOMAIN_ERROR;
+             cerr << "bad value in formatted ⎕PLOT tick";
+             return format;
            }
         const int year    = tm->tm_year + 1900;   // tm 0-100 → APL
         const int month   = tm->tm_mon  + 1;      // tm 0-11  → APL
@@ -489,8 +489,8 @@ format_tick(double val, double dV, int idx, const char * format)
         if (const char * percent = strchr(format, '%'))
            return format_user_tick(val, idx, format, percent);
 
-        MORE_ERROR() << "⎕PLOT: no % in user-defined format string";
-        DOMAIN_ERROR;
+        cerr << "⎕PLOT: no % in user-defined format string" << endl;
+        return format;
       }
 
    if (val == 0)   return "0";

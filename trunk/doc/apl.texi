@@ -3654,7 +3654,7 @@ colors for plot lines, points, and grids, etc.
 The general syntax of ⎕PLOT is:
 
 @verbatim
-   ⎕PLOT ''      ⍝ show a list of attributes and their default values
+   ⎕PLOT ⍬       ⍝ show a list of attributes and their default values
    H←⎕PLOT B     ⍝ plot B with all attributes set to their default values
    H←A ⎕PLOT B   ⍝ plot B with some of the default attributes overridden
    ⎕PLOT H       ⍝ close the plot window with handle H
@@ -3738,7 +3738,7 @@ etc. that control how the resulting plot will look like.
 
 Similar to ⎕CR and ⎕FIO, an empty argument B in ⎕PLOT B displays a list of
 the arguments. The list of arguments grows over time and therefore the list
-displayed by ⎕PLOT '' may be more up-to-date than this description.
+displayed by @b{⎕PLOT ⍬} may be more up-to-date than this description.
 For example:
 
 @verbatim
@@ -3939,7 +3939,7 @@ axis, which is often simpler than computing them beforehand in APL. A
 format string may contain 0 or more tick items which are used in a printf()
 like manner.
 
-Most of the @b{dynamic tick items} (see @b{⎕PLOT ''} for a complete list)
+Most of the @b{dynamic tick items} (see @b{⎕PLOT ⍬} for a complete list)
 are related to points in time (years, quarters, months, days, hours, minutes,
 and seconds). For them the X coordinate (time) is, according to the *nix time
 conventions, seconds since midnight 1970. Since this number of seconds is not
@@ -3949,25 +3949,7 @@ easy to compute in APL, @b{⎕FIO.secs_epoch} comes to rescue:
 Q1  ← ⎕FIO.secs_epoch 2023 2 15   ⍝ Feb. 15 (middle of Q1) 00:00:00
 @end verbatim
 
-A problem with @b{dynamic tick items} could be that, due to rounding, the
-X coordinates of the ticks do not nicely match the X coordinates of the plot
-points, making the tick values more confusing than helpful. For example,
-plotting quarterly data may cause different quarters to have different
-numbers of ticks, even though every quarter has roughly the same number of
-seconds. This effect, which is entirely caused by rounding the @b{seconds from
-1970/1/1} to even values, and which becomes worse as the number fof ticks
-in the plot decreases, can be avoided by synchronizing the plot points with
-the grid lines, using property @b{gridX_variable}. This property, which is
-only available for the X axis (i.e. the axis normally used for time-related
-plots), draws a grid lines for every plot point rather than at fixed intervals.
-As a consequence, the X-tick coordinates are not rounded to some
-@b{1 2 5×10⋆N} (which is even in terms of seconds since 1970/1/1 but odd in
-terms of months or quarters) the value printed at an X-axis tick displays
-the X-coordinate that reflects exactly the value of the plot point.
-
-A complete example for plotting the quarterly values @b{1 3 4 2} is the
-fo (you
-may want to try it with both 0 and 1 for ATT.gridX_variable):
+An example for plotting the quarterly values @b{1 3 4 2} is:
 
 @verbatim
       )CLEAR
@@ -3979,16 +3961,17 @@ X ← Q1 + SPQ×0 1 2 3              ⍝ middles of Q1, Q2, Q3, and Q4
 Y ← 1 3 2 4                       ⍝ values for Q1, Q2, Q3, and Q4
 
 ATT.format_X ← "Q-%Q/%y"          ⍝ X-axis ticks: quarter and year
-ATT.gridX_variable ← 1            ⍝ draw X-grid from plot points
 
 ATT ⎕PLOT X + 0J1×Y
 
 @end verbatim
 
-
-
-
-
+Sometimes it is more convenient to display the exact X coordinates of the
+plot points along the X axis instead of drawing an X-grid and visually
+guessing the X-values between the vertical grid lines. This can be achieved
+with setting @b{gridX_variable} to 1. Usually the X-coordinates are evenly
+distributed alone their axis while the Y and Z-coordinates are not. For this
+reason there is no @b{gridY_variable} or @b{gridZ_variable}.
 
 
 @subsection Plot Window Handling
@@ -4308,7 +4291,7 @@ Z ← A ⎕RE[X] B   (long form, with axis X)
 The short form is equivalent to the long form with an empty axis:
 
 @verbatim
-    A ⎕RE B   ←→   A ⎕RE[''] B
+    A ⎕RE B   ←→   A ⎕RE['] B
 @end verbatim
 
 It therefore suffices to explain the long form. The long form has 3 different

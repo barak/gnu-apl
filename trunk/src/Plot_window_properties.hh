@@ -310,7 +310,17 @@ protected:
    vector<level_color> gradient;
 
    /// round val up to the next higher 1/2/5×10^N
-   static double round_up_125(double val);
+   static double round_up_1_2_5(double val);
+
+   /// round val (< 24) up to the next higher divisor of 24
+   static int round_up_24(int val);
+
+   /// round val (<= 60) up to the next higher divisor of 60
+   static int round_up_60(int val);
+
+   /// round a time_t up or down to the next minute, hour, day, month, or year.
+   /// positive diff round up, negative round down.
+   static double round_up_seconds(double val);
 
    /// return true unless property \b propnum was already set in plot
    /// line \b line

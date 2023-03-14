@@ -50,7 +50,7 @@ gdef(double,   rangeZ_min,           0, "the start of the Z range to be plotted"
 gdef(double,   rangeZ_max,           0, "the end of the Z range to be plotted")
 gdef(Pixel_X,  origin_X,           100, "X position offset of the origin")
 gdef(Pixel_Y,  origin_Y,           100, "Y position offset of the origin")
-gdef(String,   format_X,      "(none)", "format for X-axis ticks (GTK only))\n"
+gdef(String,   format_X,            "", "format for X-axis ticks (GTK only))\n"
 "                    %sT1%T2...%Tn  (static texts for ticks)\n"
 "                    %G, %g         grid line number (starting at 1 or )\n"
 "                    %v             value\n"

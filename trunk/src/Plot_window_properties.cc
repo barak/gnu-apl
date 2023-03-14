@@ -111,6 +111,10 @@ Plot_window_properties::update(int verbosity)
    // In both cases the caller has most likely changed pa_width or pa_height,
    // and this function recomputes all variables that depend on them.
    //
+   // Some variables, e.g. min/max_X/Y/Z have not changed in case 2, but
+   // it is simpler to recompute them rather than usng different functions
+   // for the two cases.
+   //
    window_width  = pa_border_L + origin_X + pa_width  + pa_border_R;
    window_height = pa_border_T + origin_Y + pa_height + pa_border_B;
 
@@ -121,35 +125,39 @@ Plot_window_properties::update(int verbosity)
    min_Z = plot_data.get_min_Z();
    max_Z = plot_data.get_max_Z();
 
-   // at this point the plot variables were computed from ionly the plot data
+   // at this point the plot variables were computed from only the plot data
    // (aka. auto-scaled). Now override them with user preferences from the plot
    // attributes A (of A ⎕PLOT B). The XXX_valid() functions tell us whether
    // or not an attribute was provided in A.
    //
-   if (rangeX_min_valid())   min_X = rangeX_min;
-   if (rangeX_max_valid())   max_X = rangeX_max;
-   if (rangeY_min_valid())   min_Y = rangeY_min;
-   if (rangeY_max_valid())   max_Y = rangeY_max;
-   if (rangeZ_min_valid())   min_Z = rangeZ_min;
-   if (rangeZ_max_valid())   max_Z = rangeZ_max;
+#define overwrite_if_provided(src, dest)  if (src ## _valid()) dest = src;
+
+   overwrite_if_provided(rangeX_min, min_X);
+   overwrite_if_provided(rangeX_max, max_X);
+   overwrite_if_provided(rangeY_min, min_Y);
+   overwrite_if_provided(rangeY_max, max_Y);
+   overwrite_if_provided(rangeZ_min, min_Z);
+   overwrite_if_provided(rangeZ_max, max_Z);
 
    if (min_X >= max_X)
       {
-        MORE_ERROR() << "empty X range in A ⎕PLOT B";
-        return true;
+        MORE_ERROR() << "empty X range [" << min_X << ":" << max_X
+                     << "] in data B of A ⎕PLOT B";
+        return true;   // error
       }
 
    if (min_Y >= max_Y)
       {
-        MORE_ERROR() << "empty Y range " << min_Y << ":" << max_Y
-                     << " in A ⎕PLOT B";
-        return true;
+        MORE_ERROR() << "empty Y range [" << min_Y << ":" << max_Y
+                     << "] in data B of A ⎕PLOT B";
+        return true;   // error
       }
 
    if (min_Z >= max_Z)
       {
-        MORE_ERROR() << "empty Z range in A ⎕PLOT B";
-        return true;
+        MORE_ERROR() << "empty Z range [" << min_Z << ":" << max_Z
+                     << "] in data B of A ⎕PLOT B";
+        return true;   // error
       }
 
 double delta_X = max_X - min_X;
@@ -183,9 +191,20 @@ const double tile_Z_raw = gridZ_pixels / scale_Z;
            << setw(20) << "tile_Z_raw: " << tile_Z_raw
                                          << "(∆Z between grid lines)" << endl;
 
-   tile_X = round_up_125(tile_X_raw);
-   tile_Y = round_up_125(tile_Y_raw);
-   tile_Z = round_up_125(tile_Z_raw);
+   tile_X = round_up_1_2_5(tile_X_raw);   // assume neither time nor var. grid
+   if (gridX_variable)  // maybe there is a time item in format_X
+      {
+        for (const char * p = format_X.c_str(); (p = strchr(p, '%')); ++p)
+            {
+              if (strchr("SIHhDdMmQqYy", p[1]))   // see strchr() in Plot_gtk.cc
+                 {
+                   tile_X = round_up_seconds(tile_X_raw);
+                 }
+            }
+      }
+
+   tile_Y = round_up_1_2_5(tile_Y_raw);
+   tile_Z = round_up_1_2_5(tile_Z_raw);
 
 const int min_Xi = floor(min_X / tile_X);
 const int min_Yi = floor(min_Y / tile_Y);
@@ -433,7 +452,7 @@ const char * attname_cp = attname_utf.c_str();
 }
 //----------------------------------------------------------------------------
 double
-Plot_window_properties::round_up_125(double val)
+Plot_window_properties::round_up_1_2_5(double val)
 {
 int expo = 0;
    while (val >= 10)    { val /= 10;   ++expo; }
@@ -458,6 +477,85 @@ int expo = 0;
         if (val <= 5.0)   return  expo < 0 ? 5.0/expo_val : 5.0*expo_val;
         return  expo < 0 ? 10.0/expo_val : 10.0*expo_val;
       }
+}
+//----------------------------------------------------------------------------
+int
+Plot_window_properties::round_up_24(int val)
+{
+   if (val <  5)   return val;   //  1..4 evenly divide 24
+   if (val <  6)   return 6;     //  6 evenly divides 24
+   if (val <  8)   return 8;     //  8 evenly divides 24
+   if (val < 12)   return 12;    // 12 evenly divides 24
+   return 24;
+}
+//----------------------------------------------------------------------------
+int
+Plot_window_properties::round_up_60(int val)
+{
+   if (val <  7)   return val;   //  1..6 evenly divide 60
+   if (val < 10)   return 10;    // 10 evenly divides 60
+   if (val < 12)   return 12;    // 12 evenly divides 60
+   if (val < 15)   return 15;    // 15 evenly divides 60
+   if (val < 20)   return 20;    // 20 evenly divides 60
+   if (val < 30)   return 30;    // 30 evenly divides 60
+   return 60;
+}
+//----------------------------------------------------------------------------
+double
+Plot_window_properties::round_up_seconds(double val)
+{
+const time_t seconds(val);
+const tm * tile = localtime(&seconds);
+   if (tile == 0)   return round_up_1_2_5(val);   // localtime() failed
+
+   // call broken-down 'tm tile' odd if more than one of its primary units
+   // (year/month/day/hour/minute/second) is set
+   //
+int nz = 0;
+   if (tile->tm_year)   ++nz;
+   if (tile->tm_mon)    ++nz;
+   if (tile->tm_mday)   ++nz;
+   if (tile->tm_hour)   ++nz;
+   if (tile->tm_min)    ++nz;
+   if (tile->tm_sec)    ++nz;
+const int odd = nz > 1 ? 1 : 0;
+
+tm rounded;   // tile rounded up
+   memset(&rounded, 0, sizeof(rounded));
+
+   /* NOTE (man mktime):
+
+       The mktime() function modifies the fields of the tm structure  as  fol‐
+       lows:  tm_wday  and  tm_yday are set to values determined from the con‐
+       tents of the other fields; if structure members are outside their valid
+       interval,  they will be normalized (so that, for example, 40 October is
+       changed into 9 November); tm_isdst is set (regardless  of  its  initial
+
+      We therefore need not care for overflows caused by + inc.
+    */
+
+   if (int year = tile->tm_year)         // round up to full year
+      {
+        rounded.tm_year = round_up_1_2_5(year + odd);
+      }
+   else if (int month = tile->tm_mon)     // round up to full month
+      {
+        rounded.tm_mon  = month + odd;
+      }
+   else if (int mday = tile->tm_mday)     // round up to full day
+      {
+        rounded.tm_mday = mday + odd;
+      }
+   else if (int hour = tile->tm_hour)     // round up to full hour
+      {
+        rounded.tm_hour = round_up_24(hour + odd);
+      }
+   else if (int minute = tile->tm_min)   // round up to full minute
+      {
+        rounded.tm_min = round_up_60(minute + odd);
+      }
+
+   return mktime(&rounded);   // back to seconds
 }
 //----------------------------------------------------------------------------
 uint32_t
@@ -517,7 +615,4 @@ const Pixel_X py = valY2pixel(Y - get_min_Y())                  + pz*sin(phi);
    return Pixel_XY(px, py);
 }
 //----------------------------------------------------------------------------
-
-
-
 

@@ -45,21 +45,22 @@ using namespace std;
 // A. typedefs                                              //
 //////////////////////////////////////////////////////////////
 
-/// The (signed) rank of an APL value.
+/// The (signed) rank or axis of an APL value.
 typedef int16_t sRank;
 typedef sRank sAxis;
 
-/// The (unsigned) rank of an APL value.
+/// The (unsigned) rank or axis of an APL value.
 typedef uint32_t uRank;
 typedef uRank uAxis;
 
 /// A bitmap for axes (in fun[X] arguments) normalized to ⎕IO←0.
 typedef uint16_t AxesBitmap;
 
-/// One dimension length (axis length) of an APL shape.
+/// The length of one dimension (axis) of an APL shape.
 typedef int64_t ShapeItem;
 
-/// The SI level, 0 = global (oldest), caller at level N called function at N+1
+/// The SI level, 0 = global (oldest), the caller at SI level N calls the
+/// functions at SI level N+1
 typedef int SI_level;
 
 /// One APL character value.
@@ -82,7 +83,7 @@ Hswap(APL_Integer & i1, APL_Integer & i2)
 
 inline void release_APL_Float(APL_Float * x)   { x->~APL_Float(); }
 
-#else   // APL_Float is a POD (double)
+#else                  // APL_Float is a POD (double)
 
 typedef double APL_Float_Base;
 typedef APL_Float_Base APL_Float;
@@ -506,8 +507,19 @@ enum AP_num
   AP_FIRST_USER  = 1001,   ///< the first AP for APL users
 };
 //----------------------------------------------------------------------------
-/// longest filename
+/// supposedly the longest possible filename
 enum {  APL_PATH_MAX = 4096 };
+//----------------------------------------------------------------------------
+enum TimeScale
+{
+  SECONDS_PER_MINUTE  =     60 * 1,                      ///<         60
+  SECONDS_PER_HOUR    =     60 * SECONDS_PER_MINUTE,     ///<      3,600
+  SECONDS_PER_DAY     =     24 * SECONDS_PER_HOUR,       ///<     86,400
+  SECONDS_PER_WEEK    =      7 * SECONDS_PER_DAY,        ///<    604,800
+  SECONDS_PER_MONTH   =     30 * SECONDS_PER_DAY,        ///<  2,592,000
+  SECONDS_PER_YEAR    =    365 * SECONDS_PER_DAY,        ///< 31,536,000
+  SECONDS_PER_QUARTER =          SECONDS_PER_YEAR / 4,   ///<  7,884,000
+};
 //----------------------------------------------------------------------------
 
 //////////////////////////////////////////////////////////////

@@ -280,7 +280,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Chapter 1</a>, Up: <a href="
 <a name="GNU-APL"></a>
 <h1 class="top">GNU APL</h1>
 
-<p>March 13, 2023
+<p>March 14, 2023
 </p>
 <p>This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
@@ -3967,7 +3967,7 @@ colors for plot lines, points, and grids, etc.
 </p>
 <p>The general syntax of ⎕PLOT is:
 </p>
-<pre class="verbatim">   ⎕PLOT ''      ⍝ show a list of attributes and their default values
+<pre class="verbatim">   ⎕PLOT ⍬       ⍝ show a list of attributes and their default values
    H←⎕PLOT B     ⍝ plot B with all attributes set to their default values
    H←A ⎕PLOT B   ⍝ plot B with some of the default attributes overridden
    ⎕PLOT H       ⍝ close the plot window with handle H
@@ -4051,7 +4051,7 @@ etc. that control how the resulting plot will look like.
 </p>
 <p>Similar to ⎕CR and ⎕FIO, an empty argument B in ⎕PLOT B displays a list of
 the arguments. The list of arguments grows over time and therefore the list
-displayed by ⎕PLOT &rdquo; may be more up-to-date than this description.
+displayed by <b>⎕PLOT ⍬</b> may be more up-to-date than this description.
 For example:
 </p>
 <pre class="verbatim">
@@ -4243,7 +4243,7 @@ axis, which is often simpler than computing them beforehand in APL. A
 format string may contain 0 or more tick items which are used in a printf()
 like manner.
 </p>
-<p>Most of the <b>dynamic tick items</b> (see <b>⎕PLOT &rdquo;</b> for a complete list)
+<p>Most of the <b>dynamic tick items</b> (see <b>⎕PLOT ⍬</b> for a complete list)
 are related to points in time (years, quarters, months, days, hours, minutes,
 and seconds). For them the X coordinate (time) is, according to the *nix time
 conventions, seconds since midnight 1970. Since this number of seconds is not
@@ -4251,25 +4251,7 @@ easy to compute in APL, <b>⎕FIO.secs_epoch</b> comes to rescue:
 </p>
 <pre class="verbatim">Q1  ← ⎕FIO.secs_epoch 2023 2 15   ⍝ Feb. 15 (middle of Q1) 00:00:00
 </pre>
-<p>A problem with <b>dynamic tick items</b> could be that, due to rounding, the
-X coordinates of the ticks do not nicely match the X coordinates of the plot
-points, making the tick values more confusing than helpful. For example,
-plotting quarterly data may cause different quarters to have different
-numbers of ticks, even though every quarter has roughly the same number of
-seconds. This effect, which is entirely caused by rounding the <b>seconds from
-1970/1/1</b> to even values, and which becomes worse as the number fof ticks
-in the plot decreases, can be avoided by synchronizing the plot points with
-the grid lines, using property <b>gridX_variable</b>. This property, which is
-only available for the X axis (i.e. the axis normally used for time-related
-plots), draws a grid lines for every plot point rather than at fixed intervals.
-As a consequence, the X-tick coordinates are not rounded to some
-<b>1 2 5×10⋆N</b> (which is even in terms of seconds since 1970/1/1 but odd in
-terms of months or quarters) the value printed at an X-axis tick displays
-the X-coordinate that reflects exactly the value of the plot point.
-</p>
-<p>A complete example for plotting the quarterly values <b>1 3 4 2</b> is the
-fo (you
-may want to try it with both 0 and 1 for ATT.gridX_variable):
+<p>An example for plotting the quarterly values <b>1 3 4 2</b> is:
 </p>
 <pre class="verbatim">      )CLEAR
 
@@ -4280,16 +4262,17 @@ X ← Q1 + SPQ×0 1 2 3              ⍝ middles of Q1, Q2, Q3, and Q4
 Y ← 1 3 2 4                       ⍝ values for Q1, Q2, Q3, and Q4
 
 ATT.format_X ← &quot;Q-%Q/%y&quot;          ⍝ X-axis ticks: quarter and year
-ATT.gridX_variable ← 1            ⍝ draw X-grid from plot points
 
 ATT ⎕PLOT X + 0J1×Y
 
 </pre>
-
-
-
-
-
+<p>Sometimes it is more convenient to display the exact X coordinates of the
+plot points along the X axis instead of drawing an X-grid and visually
+guessing the X-values between the vertical grid lines. This can be achieved
+with setting <b>gridX_variable</b> to 1. Usually the X-coordinates are evenly
+distributed alone their axis while the Y and Z-coordinates are not. For this
+reason there is no <b>gridY_variable</b> or <b>gridZ_variable</b>.
+</p>
 
 <a name="Plot-Window-Handling"></a>
 <h4 class="subsection">2.31.3 Plot Window Handling</h4>
@@ -4634,7 +4617,7 @@ Z ← A ⎕RE[X] B   (long form, with axis X)
 </pre>
 <p>The short form is equivalent to the long form with an empty axis:
 </p>
-<pre class="verbatim">    A ⎕RE B   ←→   A ⎕RE[''] B
+<pre class="verbatim">    A ⎕RE B   ←→   A ⎕RE['] B
 </pre>
 <p>It therefore suffices to explain the long form. The long form has 3 different
 arguments A, B, and X.

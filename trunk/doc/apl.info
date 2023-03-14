@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-March 13, 2023
+March 14, 2023
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
@@ -3542,7 +3542,7 @@ window size, colors for plot lines, points, and grids, etc.
 
    The general syntax of ⎕PLOT is:
 
-   ⎕PLOT ''      ⍝ show a list of attributes and their default values
+   ⎕PLOT ⍬       ⍝ show a list of attributes and their default values
    H←⎕PLOT B     ⍝ plot B with all attributes set to their default values
    H←A ⎕PLOT B   ⍝ plot B with some of the default attributes overridden
    ⎕PLOT H       ⍝ close the plot window with handle H
@@ -3627,7 +3627,7 @@ etc.  that control how the resulting plot will look like.
 
    Similar to ⎕CR and ⎕FIO, an empty argument B in ⎕PLOT B displays a
 list of the arguments.  The list of arguments grows over time and
-therefore the list displayed by ⎕PLOT ” may be more up-to-date than this
+therefore the list displayed by ⎕PLOT ⍬ may be more up-to-date than this
 description.  For example:
 
 
@@ -3819,7 +3819,7 @@ axis, which is often simpler than computing them beforehand in APL. A
 format string may contain 0 or more tick items which are used in a
 printf() like manner.
 
-   Most of the dynamic tick items (see ⎕PLOT ” for a complete list) are
+   Most of the dynamic tick items (see ⎕PLOT ⍬ for a complete list) are
 related to points in time (years, quarters, months, days, hours,
 minutes, and seconds).  For them the X coordinate (time) is, according
 to the *nix time conventions, seconds since midnight 1970.  Since this
@@ -3828,25 +3828,7 @@ to rescue:
 
 Q1  ← ⎕FIO.secs_epoch 2023 2 15   ⍝ Feb. 15 (middle of Q1) 00:00:00
 
-   A problem with dynamic tick items could be that, due to rounding, the
-X coordinates of the ticks do not nicely match the X coordinates of the
-plot points, making the tick values more confusing than helpful.  For
-example, plotting quarterly data may cause different quarters to have
-different numbers of ticks, even though every quarter has roughly the
-same number of seconds.  This effect, which is entirely caused by
-rounding the seconds from 1970/1/1 to even values, and which becomes
-worse as the number fof ticks in the plot decreases, can be avoided by
-synchronizing the plot points with the grid lines, using property
-gridX_variable.  This property, which is only available for the X axis
-(i.e.  the axis normally used for time-related plots), draws a grid
-lines for every plot point rather than at fixed intervals.  As a
-consequence, the X-tick coordinates are not rounded to some 1 2 5×10⋆N
-(which is even in terms of seconds since 1970/1/1 but odd in terms of
-months or quarters) the value printed at an X-axis tick displays the
-X-coordinate that reflects exactly the value of the plot point.
-
-   A complete example for plotting the quarterly values 1 3 4 2 is the
-fo (you may want to try it with both 0 and 1 for ATT.gridX_variable):
+   An example for plotting the quarterly values 1 3 4 2 is:
 
       )CLEAR
 
@@ -3857,10 +3839,17 @@ X ← Q1 + SPQ×0 1 2 3              ⍝ middles of Q1, Q2, Q3, and Q4
 Y ← 1 3 2 4                       ⍝ values for Q1, Q2, Q3, and Q4
 
 ATT.format_X ← "Q-%Q/%y"          ⍝ X-axis ticks: quarter and year
-ATT.gridX_variable ← 1            ⍝ draw X-grid from plot points
 
 ATT ⎕PLOT X + 0J1×Y
 
+
+   Sometimes it is more convenient to display the exact X coordinates of
+the plot points along the X axis instead of drawing an X-grid and
+visually guessing the X-values between the vertical grid lines.  This
+can be achieved with setting gridX_variable to 1.  Usually the
+X-coordinates are evenly distributed alone their axis while the Y and
+Z-coordinates are not.  For this reason there is no gridY_variable or
+gridZ_variable.
 
 2.31.3 Plot Window Handling
 ---------------------------
@@ -4184,7 +4173,7 @@ Z ← A ⎕RE[X] B   (long form, with axis X)
 
    The short form is equivalent to the long form with an empty axis:
 
-    A ⎕RE B   ←→   A ⎕RE[''] B
+    A ⎕RE B   ←→   A ⎕RE['] B
 
    It therefore suffices to explain the long form.  The long form has 3
 different arguments A, B, and X.
@@ -7082,32 +7071,32 @@ Node: Section 2.28129842
 Node: Section 2.29130511
 Node: Section 2.30132163
 Node: Section 2.31135950
-Node: Output File Format152696
-Node: Section 2.32153871
-Node: Section 2.33163269
-Node: Section 2.34164296
-Node: Section 2.35179012
-Node: Section 2.36189078
-Node: Section 2.37193197
-Node: Section 2.38195292
-Node: Section 2.39199717
-Node: Chapter 3221071
-Node: Chapter 4223572
-Node: Chapter 5224698
-Node: Section 5.1226235
-Node: Section 5.2227515
-Node: Section 5.3227875
-Node: Section 5.4228117
-Node: Section 5.5228779
-Node: Section 5.6229257
-Node: Section 5.7230029
-Node: Section 5.8230486
-Node: Chapter 6230888
-Node: Section 6.1231307
-Node: Section 6.2231994
-Node: Chapter 7232825
-Node: Section 7.1233328
-Node: Section 7.2258642
+Node: Output File Format151868
+Node: Section 2.32153043
+Node: Section 2.33162441
+Node: Section 2.34163468
+Node: Section 2.35178183
+Node: Section 2.36188249
+Node: Section 2.37192368
+Node: Section 2.38194463
+Node: Section 2.39198888
+Node: Chapter 3220242
+Node: Chapter 4222743
+Node: Chapter 5223869
+Node: Section 5.1225406
+Node: Section 5.2226686
+Node: Section 5.3227046
+Node: Section 5.4227288
+Node: Section 5.5227950
+Node: Section 5.6228428
+Node: Section 5.7229200
+Node: Section 5.8229657
+Node: Chapter 6230059
+Node: Section 6.1230478
+Node: Section 6.2231165
+Node: Chapter 7231996
+Node: Section 7.1232499
+Node: Section 7.2257813
 
 End Tag Table
 
