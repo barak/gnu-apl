@@ -1602,22 +1602,42 @@ cairo_surface_t * surface = gdk_window_create_similar_surface(
    return TRUE;   // event handled by this handler
 }
 //----------------------------------------------------------------------------
-/// make gtk_main() suitable for pthread_create() and warn if it returns
-/// (which is not expected to happen).
+/** gtk_main_wrapper() makes gtk_main() suitable for pthread_create()
+    and warn if it returns (which is not expected to happen).
+
+    gtk_main_wrapper() is the top-level main() functions of a thread
+    created in plot_main_GTK() which is called from ⎕PLOT::do_plot_data():
+
+   ⎕PLOT → eval_AB(), eval_B()
+             → do_plot_data()
+                 → plot_main_GTK()
+                   ↓   → pthread_create(gtk_main_wrapper) → return immediately
+                   ↓                            ↓
+            ┌─────────────┐           ┌────── thread ──────┐
+            │ GTK_context │           │ gtk_main_wrapper() │
+            └─────────────┘           │ → gtk_main()       │
+                   ↓                  └────────────────────┘
+                   ↓                            ↓
+                   ↓ → → gtk_window_new() → → event
+                   ↓                            ↓
+           all_PLOT_windows → GTK_context → → window
+
+   NOTE that gtk_main_wrapper() is called only once (and not per window).
+   Therefore the functions called from it must not throw any APL ERRORs.
+ */
+
 static void *
 gtk_main_wrapper(void *)
 {
    gtk_main();
 
-   // not reached
+   // supposedly not reached
 
    CERR << "*** gtk_main() thread done." << endl;
 
    return 0;
 }
 //----------------------------------------------------------------------------
-
-#include "Focus.icc"
 
 void
 Quad_PLOT::plot_main_GTK(void * vp_props, Handle handle)
@@ -1632,8 +1652,6 @@ Plot_window_properties & w_props =
    verbosity = w_props.get_verbosity();
 
    XInitThreads();
-
-   push_focus();
 
    if (!gtk_init_done)
       {
@@ -1697,25 +1715,19 @@ GTK_context * pctx = new GTK_context(w_props, handle);
                         w_props.get_pw_pos_Y() + 50*(pctx->handle - 1));
       }
 
+   // do not steal the keyboard focus (whicj annoys when working interactively)
+   gtk_window_set_focus_on_map(GTK_WINDOW(pctx->window), false);
+
+   // but stay on top even though not focused
+   gtk_window_set_keep_above(GTK_WINDOW(pctx->window), true);
+
    gtk_widget_show_all(pctx->window);
-
-   // prevent the new pctx->window window from obtaining the focus (must
-   // only be called AFTER gtk_widget_show_all(), since otherwise gdk_win
-   // below would be 0.
-   {
-     GdkWindow * gdk_win = gtk_widget_get_window(pctx->window);
-     Assert(gdk_win);
-     gdk_window_set_focus_on_map(gdk_win, false);
-   }
-
 
    g_signal_connect(pctx->window, "destroy",
                     G_CALLBACK(plot_destroyed), pctx);
 
    g_signal_connect(pctx->drawing_area, "draw",
                     G_CALLBACK(draw_callback), pctx);
-
-   pop_focus();
 
    sem_post(Quad_PLOT::expose_sema);   // unleash the APL interpreter
 }

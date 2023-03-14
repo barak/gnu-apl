@@ -747,7 +747,7 @@ Quad_PLOT::do_plot_data(Plot_window_properties * w_props,
    verbosity > 0 && w_props->print(CERR);
 
    // check (possibly again) for empty plot ranges which could be caused
-   // by bad plot data but also by bad properties.
+   // by bad plot data but also by bad window properties.
    //
    if (w_props->get_min_X() >= w_props->get_max_X())
       {
