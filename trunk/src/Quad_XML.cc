@@ -433,7 +433,7 @@ ShapeItem dest_B = 0;
          else                             // invalid XML character
            {
              char uni_cc[20];
-             snprintf(uni_cc, sizeof(uni_cc), "U+%4.4X", uni);
+             SPRINTF(uni_cc, "U+%4.4X", uni);
              MORE_ERROR() << "⎕XML B: Invalid XML character " << uni_cc
                           << " at B[" << (src_B + Workspace::get_IO()) << "]";
              DOMAIN_ERROR;
@@ -1017,7 +1017,8 @@ UCS_string ret;
             {
               case 0x00 ... 0x1F:
                    {
-                     char cc[20];   snprintf(cc, sizeof(cc), "&#x%X;", uni);
+                     char cc[20];
+                     SPRINTF(cc, "&#x%X;", uni);
                      ret.append_UTF8(cc);
                    }
                    continue;

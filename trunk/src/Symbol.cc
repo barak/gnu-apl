@@ -951,7 +951,7 @@ UCS_string data;
                //
                Function_P fun = value_stack[0].get_function();
                const YMDhmsu ymdhmsu(fun->get_creation_time());
-               snprintf(buffer, sizeof(buffer), "*(%d %d %d %d %d %d %d)",
+               SPRINTF(buffer, "*(%d %d %d %d %d %d %d)",
                        ymdhmsu.year, ymdhmsu.month, ymdhmsu.day,
                        ymdhmsu.hour, ymdhmsu.minute, ymdhmsu.second,
                        ymdhmsu.micro/1000);
@@ -961,8 +961,9 @@ UCS_string data;
                 snprintf(buffer + 72,
                          sizeof(buffer) - 72,
                          "%8.8lld\r\n",
-                         static_cast<long long>(seq++));
-                fwrite(buffer, 1, 82, out);
+                         long_long(seq++));
+               NULL_TERMINATE(buffer)
+               fwrite(buffer, 1, 82, out);
 
                // write function record(s)
                //
@@ -992,6 +993,7 @@ UCS_string data;
                  sizeof(buffer) - 72,
                  "%8.8lld\r\n",
                  static_cast<long long>(seq++));
+        NULL_TERMINATE(buffer)
         fwrite(buffer, 1, 82, out);
       }
 }
@@ -1056,8 +1058,7 @@ int count = 0;
                      if (ufun)
                         {
                           char cc[100];
-                          snprintf(cc, sizeof(cc), "    VS[%lld] ",
-                                   static_cast<long long>(v));
+                          SPRINTF(cc, "    VS[%lld] ", long_long(v));
                           count += ufun->show_owners(cc, out, value);
                         }
                    }

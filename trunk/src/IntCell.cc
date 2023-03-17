@@ -906,21 +906,23 @@ IntCell::character_representation(const PrintContext & pctx) const
       }
 
 char cc[40];
-int len = snprintf(cc, sizeof(cc), "%lld", static_cast<long long>(value.ival));
+   SPRINTF(cc, "%lld", long_long(value.ival));
 
 UCS_string ucs;
 
-   loop(l, len)
+   loop(c, sizeof(cc))
        {
-         if (cc[l] == '-')   ucs.append(UNI_OVERBAR);
-         else                ucs.append(Unicode(cc[l]));
+         const char q = cc[c];
+         if (q == 0)   break;
+         if (q == '-')   ucs.append(UNI_OVERBAR);
+         else            ucs.append(Unicode(q));
        }
 
 ColInfo info;
    info.flags |= CT_INT;
    info.real_len = ucs.size();
    info.int_len = ucs.size();
-   
+
    return PrintBuffer(ucs, info);
 }
 //----------------------------------------------------------------------------

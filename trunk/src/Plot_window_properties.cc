@@ -265,7 +265,7 @@ Plot_window_properties::print(ostream & out) const
    loop(g, gradient.size())
        {
          char cc[30];
-         snprintf(cc, sizeof(cc), "color_level-%u: ", gradient[g].level);
+         SPRINTF(cc, "color_level-%u: ", gradient[g].level);
          out << setw(20) << cc
              << Plot_data::Color_to_str(gradient[g].rgb) << endl;
        }
@@ -431,8 +431,7 @@ const char * attname_cp = attname_utf.c_str();
    if (val.is_integer_cell())   // integer attribute value
       {
         const int ival = val.get_int_value();
-        snprintf(att_and_value, sizeof(att_and_value),
-                 "%s: %d", attname_cp, ival);
+        SPRINTF(att_and_value, "%s: %d", attname_cp, ival);
         return set_attribute(att_and_value);
       }
    else if (val.is_pointer_cell())   // string value
@@ -440,8 +439,7 @@ const char * attname_cp = attname_utf.c_str();
         UCS_string val_ucs = val.get_pointer_value()->get_UCS_ravel();
         UTF8_string attval_utf(val_ucs);
         const char * attval_cp = attval_utf.c_str();
-        snprintf(att_and_value, sizeof(att_and_value),
-                 "%s: %s", attname_cp, attval_cp);
+        SPRINTF(att_and_value, "%s: %s", attname_cp, attval_cp);
         return set_attribute(att_and_value);
       }
    else

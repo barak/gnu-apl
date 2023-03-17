@@ -351,7 +351,7 @@ static char cc[100] = "";   // should suffice
                  {
                    CERR << "⎕PLOT: too few tick texts in " << percent
                                 << " (at tick " << tidx << ")";
-                   snprintf(cc, sizeof(cc), "Tick-%d", tidx);
+                   SPRINTF(cc, "Tick-%d", tidx);
                    return cc;
                  }
               tick_text = tick_end + 1;
@@ -366,7 +366,7 @@ static char cc[100] = "";   // should suffice
         if (tick_len >= (sizeof(cc) - 1))
            {
              CERR << "⎕PLOT: tick text too long";
-             snprintf(cc, sizeof(cc), "Tick-%d", tidx);
+             SPRINTF(cc, "Tick-%d", tidx);
              return cc;
            }
 
@@ -401,57 +401,25 @@ static char cc[100] = "";   // should suffice
              // chr is % (start of field).
              //
              char item[20];
-             enum { ILEN = sizeof(item) - 1 };
              switch (*format++)
                 {
-                  case 'S': snprintf(item, ILEN, "%2.2d", tm->tm_sec);
-                            break;
+                  case 'S': SPRINTF(item, "%2.2d", tm->tm_sec);    break;
+                  case 'G': SPRINTF(item, "%d", tidx + 1);         break;
+                  case 'g': SPRINTF(item, "%d", tidx);             break;
+                  case 'v': SPRINTF(item, "%d", int(val));         break;
+                  case 'I': SPRINTF(item, "%2.2d", tm->tm_min);    break;
+                  case 'H': SPRINTF(item, "%2.2d", tm->tm_hour);   break;
+                  case 'h': SPRINTF(item, "%d", tm->tm_hour);      break;
+                  case 'D': SPRINTF(item, "%2.2d", tm->tm_mday);   break;
+                  case 'd': SPRINTF(item, "%d", tm->tm_mday);      break;
+                  case 'M': SPRINTF(item, "%2.2d", month);         break;
+                  case 'm': SPRINTF(item, "%d", month);            break;
+                  case 'Q': SPRINTF(item, "%d", quarter + 1);      break;
+                  case 'q': SPRINTF(item, "%d", quarter);          break;
+                  case 'Y': SPRINTF(item, "%4.4d", year);          break;
+                  case 'y': SPRINTF(item, "%2.2d", year%100);      break;
 
-                  case 'G': snprintf(item, ILEN, "%d", tidx + 1);
-                            break;
-
-                  case 'g': snprintf(item, ILEN, "%d", tidx);
-                            break;
-
-                  case 'v': snprintf(item, ILEN, "%d", int(val));
-                            break;
-
-                  case 'I': snprintf(item, ILEN, "%2.2d", tm->tm_min);
-                            break;
-
-                  case 'H': snprintf(item, ILEN, "%2.2d", tm->tm_hour);
-                            break;
-
-                  case 'h': snprintf(item, ILEN, "%d", tm->tm_hour);
-                            break;
-
-                  case 'D': snprintf(item, ILEN, "%2.2d", tm->tm_mday);
-                            break;
-
-                  case 'd': snprintf(item, ILEN, "%d", tm->tm_mday);
-                            break;
-
-                  case 'M': snprintf(item, ILEN, "%2.2d", month);
-                            break;
-
-                  case 'm': snprintf(item, ILEN, "%d", month);
-                            break;
-
-                  case 'Q': snprintf(item, ILEN, "%d", quarter + 1);
-                            break;
-
-                  case 'q': snprintf(item, ILEN, "%d", quarter);
-                            break;
-
-                  case 'Y': snprintf(item, ILEN, "%4.4d", year);
-                            break;
-
-                  case 'y': snprintf(item, ILEN, "%2.2d", year%100);
-                            break;
-
-                   default: // invalid/unsupported; copy cc1
-                            snprintf(item, ILEN, "%%%c", format[-1]);
-                            break;
+                   default: break;   // invalid/unsupported; copy cc1
                 }
 
              // copy item
@@ -473,9 +441,9 @@ bool round = false;
         if (cc == 'u')  { round = true;   break; }   // %u
       }
 
-   if (!round)         snprintf(cc, sizeof(cc), format, val);
-   else if (val > 0)   snprintf(cc, sizeof(cc), format, int(rint(val) + 0.5));
-   else                snprintf(cc, sizeof(cc), format, int(rint(val) - 0.5));
+   if (!round)         SPRINTF(cc, format, val)
+   else if (val > 0)   SPRINTF(cc, format, int(rint(val) + 0.5))
+   else                SPRINTF(cc, format, int(rint(val) - 0.5))
 
    return cc;
 }
@@ -512,8 +480,8 @@ static char cc[40];   // should suffice
 char fmt[10];
 short digits = 0;
    while (dV < 0.9)   { ++digits;   dV *= 10.0; }
-   snprintf(fmt, sizeof(fmt), "%%.%uf", digits);   // e.g. %.2f
-   snprintf(cc,  sizeof(cc) - 1, fmt, val);
+   SPRINTF(fmt, "%%.%uf", digits);   // e.g. %.2f
+   SPRINTF(cc,  fmt, val);
 
    // skip leading 0 in 0.xxx
    if (cc[1] == '.' && cc[0] == '0')   return cc + 1;
@@ -1683,9 +1651,8 @@ GTK_context * pctx = new GTK_context(w_props, handle);
    else   // default caption ("⎕PLOT": add the handle
      {
        char cc[50];
-       snprintf(cc, sizeof(cc),
-                "%s %d", w_props.get_caption().c_str(), pctx->handle);
-        gtk_window_set_title(GTK_WINDOW(pctx->window), cc);
+       SPRINTF(cc, "%s %d", w_props.get_caption().c_str(), pctx->handle);
+       gtk_window_set_title(GTK_WINDOW(pctx->window), cc);
      }
 
    gtk_window_set_resizable(GTK_WINDOW(pctx->window), true);

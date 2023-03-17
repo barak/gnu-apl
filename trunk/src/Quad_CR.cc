@@ -55,7 +55,7 @@ Quad_CR::list_functions(ostream & out, bool mapping)
          loop(f, sizeof(sub_functions)/sizeof(_sub_fun))
              {
                const int N = sub_functions[f].val;
-               char NN[4];   snprintf(NN, sizeof(NN), "%2d", N);
+               char NN[10];   SPRINTF(NN, "%2d", N);
                const char * name = sub_functions[f].key;
                out << "      " << NN << " ⎕CR  ←→"
                    << UCS_string(24 - strlen(name), UNI_SPACE)

@@ -1076,8 +1076,8 @@ Doxy::gv_to_png(const char * gv_filename, const char * out_filename, bool cmapx)
 
 const char * out_type = cmapx ? "cmapx" : "png";
 char cmd[200];
-   snprintf(cmd, sizeof(cmd), "dot -T%s %s -o%s",
-            out_type, gv_filename, out_filename);
+   SPRINTF(cmd, "dot -T%s %s -o%s", out_type, gv_filename, out_filename);
+
    errno = 0;
 FILE * dot = popen(cmd, "r");
    if (dot == 0)

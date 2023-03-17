@@ -157,12 +157,12 @@ done:
 bool
 LibPaths::is_lib_root(const char * dir)
 {
-char filename[APL_PATH_MAX + 1];
+char filename[APL_PATH_MAX];
 
-   snprintf(filename, sizeof(filename), "%s/workspaces", dir);
+   SPRINTF(filename, "%s/workspaces", dir);
    if (access(filename, F_OK))   return false;
 
-   snprintf(filename, sizeof(filename), "%s/wslib1", dir);
+   SPRINTF(filename, "%s/wslib1", dir);
    if (access(filename, F_OK))   return false;
 
    return true;

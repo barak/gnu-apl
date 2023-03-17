@@ -37,14 +37,12 @@ static bool asserting = false;
 void
 do_Assert(const char * cond, const char * fun, const char * file, int line)
 {
-const int loc_len = strlen(file) + 40;
-char * loc = new char[loc_len + 1];
+char loc[FILENAME_MAX + 20];
 
    Log(LOG_delete)
       get_CERR() << "new    " << voidP(loc) << " at " LOC << endl;
 
-   snprintf(loc, loc_len, "%s:%d", file, line);
-   loc[loc_len] = 0;
+   SPRINTF(loc, "%s:%d", file, line);
 
    get_CERR() << endl
         << "======================================="

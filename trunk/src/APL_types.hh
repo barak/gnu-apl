@@ -59,6 +59,12 @@ typedef uint16_t AxesBitmap;
 /// The length of one dimension (axis) of an APL shape.
 typedef int64_t ShapeItem;
 
+/// for long_long(x) instead of  static_cast<long long>(x)
+typedef long long long_long;
+
+/// for ulong_long(x) instead of  static_cast<unsigned long long>(x)
+typedef unsigned long long ulong_long;   // dito.
+
 /// The SI level, 0 = global (oldest), the caller at SI level N calls the
 /// functions at SI level N+1
 typedef int SI_level;

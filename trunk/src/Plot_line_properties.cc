@@ -30,10 +30,10 @@ using namespace std;
 int
 Plot_line_properties::print(std::ostream & out) const
 {
-char cc[40];
-# define ldef(ty,  na,  _val, _descr)                   \
-   snprintf(cc, sizeof(cc), #na "-%d:  ",              \
-            int(line_number + Workspace::get_IO()));   \
+char cc[100];
+# define ldef(ty,  na,  _val, _descr)                 \
+   SPRINTF(cc, #na "-%d:  ",                          \
+           int(line_number + Workspace::get_IO()));   \
    CERR << setw(20) << cc << Plot_data::ty ## _to_str(na) << endl;
 # include "Quad_PLOT.def"
 

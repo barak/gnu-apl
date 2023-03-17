@@ -334,8 +334,7 @@ char obuf[200] = "@@@@";
    if (src_loc)
       {
         char cc[200];
-        snprintf(cc, sizeof(cc), "%s", src_loc);
-        cc[sizeof(cc) - 1] = 0;
+        SPRINTF(cc, "%s", src_loc);
         if (char * disc = strstr(cc, "discriminator"))   disc[-1] = 0;
          cerr << " at " << cc;
       }

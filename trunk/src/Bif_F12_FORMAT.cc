@@ -407,7 +407,7 @@ const UCS_string data = int_part.insert_int_commas(data_int, overflow);
 
    if (overflow)   return UCS_string();
 
-   Assert(int_part.size() >= data.size());
+   Assert(int_part.size() >= size_t(data.size()));
 const Unicode pad_char = int_part.pad_char(Workspace::get_FC(2));
 const UCS_string pad(int_part.size() - data.size(), pad_char);
 
@@ -443,7 +443,7 @@ UCS_string ucs;
    if (fract_part.out_len)
       {
         const UCS_string data = fract_part.insert_fract_commas(data_fract);
-        Assert(fract_part.size() >= data.size());
+        Assert(fract_part.size() >= size_t(data.size()));
         pad_count += fract_part.size() - data.size();
 
         // print nothing instead of .
@@ -715,12 +715,8 @@ char * fract_end = 0;
       {
         // create a format like %.5E (if fract_part has 5 digits)
         //
-        const int flen = snprintf(format, sizeof(format), "%%.%luE",
-                                static_cast<unsigned long>(fract_part.size()));
-        Assert(flen < int(sizeof(format)));   // format was big enough.
-
-        const int dlen = snprintf(&data_buf[0], data_buf_len, format, value);
-        Assert(dlen < data_buf_len);
+        SPRINTF(format, "%%.%luE", fract_part.size());
+        SPRINTF(data_buf, format, value);
 
         char * ep = strchr(&data_buf[0], 'E');
         Assert(ep);
@@ -739,18 +735,15 @@ char * fract_end = 0;
       }
    else   // no exponent in format string.
       {
-        const int flen = snprintf(format, sizeof(format), "%%.%luf",
-                                static_cast<unsigned long>(fract_part.size()));
-        Assert(flen < int(sizeof(format)));   // assume no snprintf() overflow
+        SPRINTF(format, "%%.%luf", fract_part.size());
 
-        const int dlen = snprintf(&data_buf[0], data_buf_len, format, value);
-        data_buf[data_buf_len - 1] = 0;
+        const int dlen = snprintf(data_buf, data_buf_len, format, value);
+        NULL_TERMINATE(data_buf)
 
         // the int part could be longer than allowed by the example string.
         //
         const char * dot = strchr(data_buf, '.');
-        const int ilen = dot ? (dot - data_buf)
-                             : strlen(data_buf);
+        const int ilen = dot ? (dot - data_buf) : strlen(data_buf);
         if (ilen > int_part.out_len)
            {
              if (Workspace::get_FC(3) == UNI_0)
@@ -766,7 +759,7 @@ char * fract_end = 0;
         fract_end = &data_buf[dlen];
       }
 
-char * int_end = strchr(&data_buf[0], '.');
+char * int_end = strchr(data_buf, '.');
    if (fract_part.size() == 0)
       {
         Assert(int_end == 0);
@@ -780,6 +773,7 @@ char * int_end = strchr(&data_buf[0], '.');
         int flen = fract_end - fract_digits;
 
         // remove trailing zeros, but leave at least min_len chars.
+        //
         while (fract_digits[flen - 1] == '0' && flen > fract_part.min_len)
                fract_digits[--flen] = 0;
 

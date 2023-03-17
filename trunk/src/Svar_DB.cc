@@ -81,19 +81,14 @@ Svar_DB::start_APserver(const char * server_sockname,
    // set APserver_path to the case that applies.
    //
 char APserver_path[APL_PATH_MAX + 1];
-const int slen = snprintf(APserver_path, APL_PATH_MAX, "%s/APserver", bin_dir);
-   if (slen >= APL_PATH_MAX)   APserver_path[APL_PATH_MAX] = 0;
-   else APserver_path[slen] = 0;
+   SPRINTF(APserver_path, "%s/APserver", bin_dir);
    if (access(APserver_path, X_OK) != 0)   // no APserver in bin_dir
       {
         logit && get_CERR() << "    Executable " << APserver_path
                  << " not found (this is OK when apl was started\n"
                     "    from the src directory): " << strerror(errno) << endl;
 
-        const int slen = snprintf(APserver_path, APL_PATH_MAX,
-                                  "%s/APs/APserver", bin_dir);
-        if (slen >= APL_PATH_MAX)   APserver_path[APL_PATH_MAX] = 0;
-        else APserver_path[slen] = 0;
+        SPRINTF(APserver_path, "%s/APs/APserver", bin_dir);
         if (access(APserver_path, X_OK) != 0)   // no APs/APserver either
            {
              get_CERR() << "Executable " << APserver_path << " not found.\n"
@@ -108,16 +103,14 @@ const int slen = snprintf(APserver_path, APL_PATH_MAX, "%s/APserver", bin_dir);
 
    logit && get_CERR() << "Found " << APserver_path << endl;
 
-char popen_args[APL_PATH_MAX + 1];
+char popen_args[APL_PATH_MAX + 50];
    {
-     int slen;
      if (server_sockname)
-        slen = snprintf(popen_args, APL_PATH_MAX,
-                 "%s --path %s --auto", APserver_path, server_sockname);
+        SPRINTF(popen_args, "%s --path %s --auto",
+                            APserver_path, server_sockname)
      else
-        slen = snprintf(popen_args, APL_PATH_MAX,
-                 "%s --port %u --auto", APserver_path, APserver_port);
-     if (slen >= APL_PATH_MAX)   popen_args[APL_PATH_MAX] = 0;
+        SPRINTF(popen_args, "%s --port %u --auto",
+                            APserver_path, APserver_port)
    }
 
    logit && get_CERR() << "Starting " << popen_args << "..." << endl;
@@ -177,9 +170,7 @@ char peer[100];
              return NO_TCP_SOCKET;
            }
 
-        const unsigned int slen = snprintf(peer, sizeof(peer),
-                                           "%s", server_sockname);
-        if (slen >= sizeof(peer))   peer[sizeof(peer) - 1] = 0;
+        SPRINTF(peer, "%s", server_sockname);
       }
 #else // use TCP
       {
@@ -216,9 +207,7 @@ char peer[100];
              return NO_TCP_SOCKET;
            }
 
-        const unsigned int slen = snprintf(peer, sizeof(peer),
-                                  "127.0.0.1 TCP port %d", APserver_port);
-        if (slen >= sizeof(peer))   peer[sizeof(peer) - 1] = 0;
+        SPRINTF(peer, "127.0.0.1 TCP port %d", APserver_port);
       }
 #endif
 

@@ -965,7 +965,7 @@ void
 UCS_string::append_number(ShapeItem num)
 {
 char cc[40];
-   snprintf(cc, sizeof(cc) - 1, "%lld", static_cast<long long>(num));
+   SPRINTF(cc, "%lld", static_cast<long long>(num));
    loop(c, sizeof(cc))
       {
         if (char digit = cc[c])   append(Unicode(digit));
@@ -978,7 +978,7 @@ UCS_string::append_hex(ShapeItem num, bool uppercase)
 {
 const char * format = uppercase ? "%llX" : "%llx";
 char cc[40];
-   snprintf(cc, sizeof(cc) - 1, format, static_cast<long long>(num));
+   SPRINTF(cc, format, static_cast<long long>(num));
    loop(c, sizeof(cc))
       {
         if (char hex_digit = cc[c])   append(Unicode(hex_digit));
@@ -1022,7 +1022,7 @@ void
 UCS_string::append_float(APL_Float num)
 {
 char cc[60];
-   snprintf(cc, sizeof(cc) - 1, "%lf", double(num));
+   SPRINTF(cc, "%lf", double(num));
    loop(c, sizeof(cc))
       {
         if (cc[c])   append(Unicode(cc[c]));

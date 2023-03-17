@@ -164,7 +164,7 @@ CharCell::get_byte_value() const
    if (value.aval < -128)
       {
         char cc[20];
-        snprintf(cc, sizeof(cc), "' = U+%4.4X", value.aval & 0x0FFFF);
+        SPRINTF(cc, "' = U+%4.4X", value.aval & 0x0FFFF);
         MORE_ERROR() << "Unicode character '" << value.aval << cc
                      << " is too small (< U+FF80) for a byte value";
         DOMAIN_ERROR;
@@ -173,7 +173,7 @@ CharCell::get_byte_value() const
    if (value.aval > 255)
       {
         char cc[20];
-        snprintf(cc, sizeof(cc), "' = U+%4.4X", value.aval & 0x0FFFF);
+        SPRINTF(cc, "' = U+%4.4X", value.aval & 0x0FFFF);
         MORE_ERROR() << "Unicode character '" << value.aval << cc
                      << " is too large (> U+00FF) for a byte value";
         DOMAIN_ERROR;

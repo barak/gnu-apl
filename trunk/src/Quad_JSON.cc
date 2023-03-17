@@ -154,8 +154,7 @@ Quad_JSON::APL_to_JSON_string(UCS_string & result, const Cell & cell,
    if (cell.is_integer_cell())
       {
         char cc[40];
-        snprintf(cc, sizeof(cc), "%lld",
-                 static_cast<long long>(cell.get_int_value()));
+        SPRINTF(cc, "%lld", static_cast<long long>(cell.get_int_value()));
         result.append_UTF8(cc);
         return;
       }
@@ -163,7 +162,7 @@ Quad_JSON::APL_to_JSON_string(UCS_string & result, const Cell & cell,
    if (cell.is_float_cell())
       {
         char cc[40];
-        snprintf(cc, sizeof(cc), "%lg", cell.get_real_value());
+        SPRINTF(cc, "%lg", cell.get_real_value());
         result.append_UTF8(cc);
         return;
       }
@@ -171,8 +170,7 @@ Quad_JSON::APL_to_JSON_string(UCS_string & result, const Cell & cell,
    if (cell.is_complex_cell())
       {
         char cc[50];
-        snprintf(cc, sizeof(cc), "%lgJ%lg", cell.get_real_value(),
-                                            cell.get_imag_value());
+        SPRINTF(cc, "%lgJ%lg", cell.get_real_value(), cell.get_imag_value());
         result.append_UTF8(cc);
         return;
       }
@@ -241,8 +239,7 @@ Quad_JSON::APL_to_JSON_string(UCS_string & result, const Value & B,
                    default: if (uni < UNI_SPACE)
                                {
                                  char cc[10];
-                                 snprintf(cc, sizeof(cc), "\\u%4.4X",
-                                                          int(uni));
+                                 SPRINTF(cc, "\\u%4.4X", int(uni));
                                  result.append_UTF8(cc);
                                }
                             else

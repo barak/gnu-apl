@@ -363,7 +363,7 @@ int conversion_count_A = 0;   // the number of conversions (in A_format)
                                  else            int_val = int(fv);
                                }
                             fmt[fm++] = uni_1;   fmt[fm] = 0;
-                            snprintf(numbuf, sizeof(numbuf), fmt, int_val);
+                            SPRINTF(numbuf, fmt, int_val);
                             if (thousands)  group_thousands(UZ, numbuf, false);
                             else            UZ.append_UTF8(numbuf);
                           }
@@ -376,7 +376,7 @@ int conversion_count_A = 0;   // the number of conversions (in A_format)
                             const APL_Float float_val =
                                   B->get_cravel(off_B++).get_real_value();
                             fmt[fm++] = uni_1;   fmt[fm] = 0;
-                            snprintf(numbuf, sizeof(numbuf), fmt, float_val);
+                            SPRINTF(numbuf, fmt, float_val);
                             if (thousands)
                                {
                                  group_thousands(UZ, numbuf, true);
@@ -418,8 +418,7 @@ int conversion_count_A = 0;   // the number of conversions (in A_format)
 
                      case 'm':
                           COUNT_ARG;
-                          snprintf(numbuf, sizeof(numbuf), "%s",
-                                   strerror(errno));
+                          SPRINTF(numbuf, "%s", strerror(errno));
                           UZ.append_UTF8(numbuf);
                           goto field_done;
 
@@ -1026,12 +1025,12 @@ Quad_FIO::list_functions(ostream & out, bool mapping)
          loop(f, sizeof(sub_functions)/sizeof(_sub_fun))
              {
                const int N = sub_functions[f].val;
-               char NN[4];   snprintf(NN, sizeof(NN), "%2d", N);
+               char NN[10];   SPRINTF(NN, "%2d", N);
                const char * name = sub_functions[f].key;
-             out << "      ⎕FIO[" << NN
-                 << "]  ←→  ⎕FIO['" << name << "']"
-                 << UCS_string(13 - strlen(name), UNI_SPACE)
-                 << "←→  ⎕FIO." << name << endl;
+               out << "      ⎕FIO[" << NN
+                   << "]  ←→  ⎕FIO['" << name << "']"
+                   << UCS_string(13 - strlen(name), UNI_SPACE)
+                   << "←→  ⎕FIO." << name << endl;
              }
 
          out << "\n      For a more detailed description of all functions:\n\n"

@@ -289,9 +289,7 @@ UserFunction_header hdr(fun_header, false);
    if (hdr.get_error())
       {
          static char cc[200];
-         snprintf(cc, sizeof(cc), "Bad function header (%s)",
-                  hdr.get_error_info());
-         cc[sizeof(cc) - 1] = 0;
+         SPRINTF(cc, "Bad function header (%s)", hdr.get_error_info());
          return cc;
       }
 

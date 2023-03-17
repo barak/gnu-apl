@@ -644,7 +644,7 @@ Token::tag_name() const
       }
 
 char cc[40];
-   snprintf(cc, sizeof(cc), "0x%X", get_tag());
+   SPRINTF(cc, "0x%X", get_tag());
 UCS_string ucs(cc);
    return ucs;
 }

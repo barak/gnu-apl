@@ -512,7 +512,7 @@ int count = 0;
        {
          char cc[100];
          const long long lf(f);
-         snprintf(cc, sizeof(cc), "    ⎕EX[%lld] ", lf);
+         SPRINTF(cc, "    ⎕EX[%lld] ", lf);
          count += the_workspace.expunged_functions[f]
                                ->show_owners(cc, out, value);
        }

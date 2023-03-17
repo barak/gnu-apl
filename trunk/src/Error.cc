@@ -41,8 +41,7 @@ Error::Error(ErrorCode ec, const char * loc)
      print_loc(0)
 {
 const char more = Workspace::more_error().size() ? '+' : 0;
-   snprintf(error_message_1, sizeof(error_message_1), "%s%c",
-            error_name(error_code), more);
+   SPRINTF(error_message_1, "%s%c", error_name(error_code), more);
 
    if (more && Command::auto_MORE)
       CERR << Workspace::more_error() << endl;
@@ -254,8 +253,8 @@ Error::throw_symbol_error(const UCS_string & sym_name, const char * loc)
 
 Error err(E_VALUE_ERROR, loc);
 UTF8_string sym_name_utf(sym_name);
-   snprintf(err.symbol_name, sizeof(err.symbol_name), "%s",
-            sym_name_utf.c_str());
+   SPRINTF(err.symbol_name, "%s", sym_name_utf.c_str());
+
    if (StateIndicator * si = Workspace::SI_top())   err.update_error_info(si);
 
 Error & eref = err;
@@ -277,12 +276,10 @@ Error::throw_define_error(const UCS_string & fun_name, const UCS_string & cmd,
 Error err(E_DEFN_ERROR, loc);
 Error & eref = err;
 UTF8_string fun_name_utf(fun_name);
-   snprintf(err.symbol_name, sizeof(err.symbol_name), "%s",
-            fun_name_utf.c_str());
+   SPRINTF(err.symbol_name, "%s", fun_name_utf.c_str());
 
 UTF8_string cmd_utf(cmd);   // cmd is something like ∇FUN[⎕]∇
-   snprintf(err.error_message_2, sizeof(err.error_message_2),
-            " aaa  %s", cmd_utf.c_str());
+   SPRINTF(err.error_message_2, " aaa  %s", cmd_utf.c_str());
    eref.left_caret = 5 + cmd.size();
    if (Workspace::SI_top())   *Workspace::get_error() = eref;
    throw eref;

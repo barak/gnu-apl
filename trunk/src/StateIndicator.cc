@@ -382,10 +382,10 @@ int count = 0;
 
    Assert(executable);
 char cc[100];
-   snprintf(cc, sizeof(cc), "    SI[%d] ", level);
+   SPRINTF(cc, "    SI[%d] ", level);
    count += executable->show_owners(cc, out, value);
 
-   snprintf(cc, sizeof(cc), "    SI[%d] ", level);
+   SPRINTF(cc, "    SI[%d] ", level);
    count += current_stack.show_owners(cc, out, value);
 
    return count;

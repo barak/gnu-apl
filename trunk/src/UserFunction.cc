@@ -984,9 +984,8 @@ void
 UserFunction::load(const char * workspace, const char * function,
                    UserFunction * & fun)
 {
-char filename[FILENAME_MAX + 10];
-   snprintf(filename, FILENAME_MAX + 5,
-            "workspaces/%s/%s.fun", workspace, function);
+char filename[FILENAME_MAX + 1];
+   SPRINTF(filename, "workspaces/%s/%s.fun", workspace, function);
 
    if (strlen(filename) > FILENAME_MAX)
       {
@@ -1444,9 +1443,9 @@ UCS_string
 UserFunction::line_prefix(Function_Line l) const
 {
 char cc[40];
-   if      (text.size() > 100)   snprintf(cc, sizeof(cc), "[%3d] ", l);
-   else if (text.size() > 10)    snprintf(cc, sizeof(cc), "[%2d] ", l);
-   else                          snprintf(cc, sizeof(cc), "[%d] ",  l);
+   if      (text.size() > 100)   SPRINTF(cc, "[%3d] ", l)
+   else if (text.size() > 10)    SPRINTF(cc, "[%2d] ", l)
+   else                          SPRINTF(cc, "[%d] ",  l)
    return UCS_string(cc);
 }
 //----------------------------------------------------------------------------

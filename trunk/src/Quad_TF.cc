@@ -678,7 +678,7 @@ Quad_TF::tf2_value(int level, UCS_string & ucs, const Value & value,
    Log(LOG_Quad_TF)
       {
         char cc[100];
-        snprintf(cc, sizeof(cc), "tf2_value() initial level %u\n", level);
+        SPRINTF(cc, "tf2_value() initial level %u\n", level);
         CERR << "tf2_value(): ucs before at level " << level << ": "
              << ucs << endl << cc;
         value.print_boxed(CERR, 0);

@@ -302,8 +302,9 @@ xcb_void_cookie_t textCookie = xcb_image_text_8_checked(pctx.conn,
 char *
 format_tick(double val)
 {
-static char cc[40];
+static char cc[80];
 char * cp = cc;
+const char * end = cc + sizeof(cc);
    if (val == 0)
       {
         *cp++ = '0';
@@ -338,15 +339,17 @@ const char * unit = 0;
 
    if (unit == 0)   // very large or very small
       {
-        snprintf(cp, sizeof(cc) - 1, "%.2E", val);
+        snprintf(cp, end - cc, "%.2E", val);
+        NULL_TERMINATE(cc)
         return cc;
       }
 
    // at this point: 1 ≤ val < 1000
    //
-   if      (val < 10)    snprintf(cp, sizeof(cc) - 1, "%.2f%s", val, unit);
-   else if (val < 100)   snprintf(cp, sizeof(cc) - 1, "%.1f%s", val, unit);
-   else                  snprintf(cp, sizeof(cc) - 1, "%.0f%s", val, unit);
+   if      (val < 10)    snprintf(cp, end - cc, "%.2f%s", val, unit);
+   else if (val < 100)   snprintf(cp, end - cc, "%.1f%s", val, unit);
+   else                  snprintf(cp, end - cc, "%.0f%s", val, unit);
+   NULL_TERMINATE(cc)
    return cc;
 }
 //----------------------------------------------------------------------------
@@ -1382,10 +1385,8 @@ const xcb_setup_t * setup = xcb_get_setup(pctx.conn);
    else   // default caption: ⎕PLOT
       {
        char cc[50];
-       snprintf(cc, sizeof(cc), "%s %d",
-                w_props.get_caption().c_str(), handle);
-
-        pctx.caption = strdup(cc);
+       SPRINTF(cc, "%s %d", w_props.get_caption().c_str(), handle);
+       pctx.caption = strdup(cc);
       }
 
    {

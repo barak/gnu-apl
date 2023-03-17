@@ -118,7 +118,7 @@ Unicode_source src(input);
                           << " in  Tokenizer" << endl;
 
                      char cc[20];
-                     snprintf(cc, sizeof(cc), "U+%4.4X (", uni);
+                     SPRINTF(cc, "U+%4.4X (", uni);
                      MORE_ERROR() << "Tokenizer: No token for Unicode "
                                   <<  cc << uni << ")\nInput: " << input;
                      Error error(E_NO_TOKEN, LOC);

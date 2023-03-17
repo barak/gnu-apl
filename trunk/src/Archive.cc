@@ -149,7 +149,7 @@ XML_Saving_Archive::emit_unicode(Unicode uni, int & space)
       {
         space -= leave_char_mode();
         char cc[40];
-        snprintf(cc, sizeof(cc), "%X", uni);
+        SPRINTF(cc, "%X", uni);
         NEED(1 + strlen(cc)) << UNI_PAD_U1 << decr(space, cc);
         space--;   // PAD_U1
       }
@@ -215,7 +215,7 @@ int space = do_indent();
         // print the start of the XML element
         {
           char cc[80];   // output line buffer
-          snprintf(cc, sizeof(cc), "<Ravel vid=\"%d\" bytes=\"", vid);
+          SPRINTF(cc, "<Ravel vid=\"%d\" bytes=\"", vid);
           out << cc;
         }
 
@@ -237,7 +237,7 @@ int space = do_indent();
         // print the start of the XML element
         {
           char cc[80];   // output line buffer
-          snprintf(cc, sizeof(cc), "<Ravel vid=\"%d\" cells=\"", vid);
+          SPRINTF(cc, "<Ravel vid=\"%d\" cells=\"", vid);
           out << decr(space, cc);
         }
 
@@ -267,8 +267,7 @@ char cc[80];
 
         case CT_INT:   // uses UNI_PAD_U3
              space -= leave_char_mode();
-             snprintf(cc, sizeof(cc), "%lld",
-                      static_cast<long long>(cell.get_int_value()));
+             SPRINTF(cc, "%lld", static_cast<long long>(cell.get_int_value()));
              NEED(1 + strlen(cc)) << UNI_PAD_U3 << decr(--space, cc);
              break;
 
@@ -283,24 +282,20 @@ char cc[80];
                     // a non-zero denominator indicates a rational quotient)
                     //
                     const APL_Integer numer = flt.get_numerator();
-                    snprintf(cc, sizeof(cc), "%lld÷%lld",
-                             static_cast< long long>(numer),
-                             static_cast<long long>(denom));
+                    SPRINTF(cc, "%lld÷%lld", static_cast< long long>(numer),
+                                             static_cast<long long>(denom));
                     NEED(1 + strlen(cc)) << UNI_PAD_U8 << decr(--space, cc);
                     break;
                   }
              }
 #endif
-             snprintf(cc, sizeof(cc), "%.17g",
-                      double(cell.get_real_value()));
+             SPRINTF(cc, "%.17g", double(cell.get_real_value()));
              NEED(1 + strlen(cc)) << UNI_PAD_U4 << decr(--space, cc);
              break;
 
         case CT_COMPLEX:   // uses UNI_PAD_U5
              space -= leave_char_mode();
-             snprintf(cc, sizeof(cc), "%17gJ%17g",
-                      double(cell.get_real_value()),
-                      double(cell.get_imag_value()));
+             SPRINTF(cc, "%17gJ%17g", double(cell.get_real_value()),                                                  double(cell.get_imag_value()));
              NEED(1 + strlen(cc)) << UNI_PAD_U5 << decr(--space, cc);
              break;
 
@@ -308,7 +303,7 @@ char cc[80];
              space -= leave_char_mode();
              {
                const Vid vid = find_vid(cell.get_pointer_value().get());
-               snprintf(cc, sizeof(cc), "%d", vid);
+               SPRINTF(cc, "%d", vid);
                NEED(1 + strlen(cc)) << UNI_PAD_U6 << decr(--space, cc);
              }
              break;
@@ -322,12 +317,12 @@ char cc[80];
                   const Value * owner = lv.get_cell_owner();
                   const long long offset = owner->get_offset(&lv);
                   const Vid vid = find_vid(owner);
-                  snprintf(cc, sizeof(cc), "%d[%lld]", vid, offset);
+                  SPRINTF(cc, "%d[%lld]", vid, offset);
                   NEED(1 + strlen(cc)) << UNI_PAD_U7 << decr(--space, cc);
                 }
              else     // 0-cell-pointer (from selective assignment)
                 {
-                  snprintf(cc, sizeof(cc), "0");
+                  SPRINTF(cc, "0");
                   NEED(2) << UNI_PAD_U7 << "0" << decr(--space, cc);
                 }
              }
@@ -1729,7 +1724,7 @@ Shape sh_value;
    loop(r, rk)
       {
         char sh[20];
-        snprintf(sh, sizeof(sh), "sh-%d", int(r));
+        SPRINTF(sh, "sh-%d", int(r));
         const UTF8 * sh_r = find_mandatory_attr(sh);
         sh_value.add_shape_item(atoll(charP(sh_r)));
       }

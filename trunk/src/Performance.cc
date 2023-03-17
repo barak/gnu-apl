@@ -298,7 +298,7 @@ Statistics_record::print5(ostream & out, uint64_t num)
 char cc[40];
    if (num < 100000)   // special case: no multiplier
       {
-        snprintf(cc, sizeof(cc), "%5u", uint32_t(num));
+        SPRINTF(cc, "%5u", uint32_t(num));
         out << cc;
         return;
       }
@@ -315,7 +315,7 @@ double fnum = num;
         fnum = fnum / 1000.0;
       }
 
-   snprintf(cc, sizeof(cc), "%f", fnum);
+   SPRINTF(cc, "%f", fnum);
    if (cc[3] == '.')    { cc[3] = 0;   out << " " << cc << *units; }
    else                 { cc[4] = 0;   out << cc << *units;        }
 }
@@ -342,7 +342,7 @@ void
 FunctionStatistics::save_data(ostream & outf, const char * perf_name)
 {
 char cc[100];
-   snprintf(cc, sizeof(cc), "%s,", perf_name);
+   SPRINTF(cc, "%s,", perf_name);
    outf << "prf_3 (PFS_" << left << setw(12) << cc << right;
    vec_cycles.save_record(outf);
    outf << ")" << endl;
@@ -367,7 +367,7 @@ void
 CellFunctionStatistics::save_data(ostream & outf, const char * perf_name)
 {
 char cc[100];
-   snprintf(cc, sizeof(cc), "%s,", perf_name);
+   SPRINTF(cc, "%s,", perf_name);
    outf << "prf_12(PFS_" << left << setw(12) << cc << right;
    first.save_record(outf);
    outf << ",";

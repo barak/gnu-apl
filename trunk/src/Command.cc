@@ -1470,9 +1470,8 @@ FILE * in = fopen(filename.c_str(), "r");
              << " failed: " << strerror(errno) << endl;
 
         char cc[200];
-        snprintf(cc, sizeof(cc),
-                 "command )IN: could not open file %s for reading: %s",
-                 fname_utf8.c_str(), strerror(errno));
+        SPRINTF(cc, "command )IN: could not open file %s for reading: %s",
+                    fname_utf8.c_str(), strerror(errno));
         Workspace::more_error() << cc;
         return;
       }
@@ -1595,7 +1594,7 @@ Command::cmd_LIBS(ostream & out, const UCS_string_vector & args)
         else
            {
              char cc[10];
-             snprintf(cc, sizeof(cc), "(%u)", errno);
+             SPRINTF(cc, "(%u)", errno);
              out << " missing " << setw(4) << cc << "│ ";
            }
 

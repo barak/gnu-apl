@@ -217,8 +217,8 @@ show_welcome(ostream & out, const char * argv0)
 {
 char c1[200];
 char c2[200];
-   snprintf(c1, sizeof(c1), "Welcome to GNU APL version %s", build_tag[1]);
-   snprintf(c2, sizeof(c2), "for details run: %s --gpl.", argv0);
+   SPRINTF(c1, "Welcome to GNU APL version %s", build_tag[1]);
+   SPRINTF(c2, "for details run: %s --gpl.", argv0);
 
 const char * lines[] =
 {

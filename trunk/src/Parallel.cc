@@ -86,7 +86,7 @@ Parallel::init(bool logit)
 
          // pthread_setname_np() fails for names ≥ 16 chars (including \0).
          char worker_name[40];   // max 16 chars!
-         snprintf(worker_name, sizeof(worker_name) - 1, "apl/pool-%d", w);
+         SPRINTF(worker_name, "apl/pool-%d", w);
          pthread_setname_np(tctx->thread, worker_name);
          // wait until new thread has reached its work loop
          sem_wait(pthread_create_sema);

@@ -40,7 +40,7 @@
 #endif
 
 #ifdef HAVE_DIRENT_H
-# include <dirent.h>
+# include <dirent.h>   // typedefs DIR as struct __dirstream
 #else
   typedef struct __dirstream DIR;
 #endif
@@ -495,5 +495,12 @@ charP(const void * vp)
 
 /// cast to a const void *
 inline const void * voidP(const void * addr) { return addr; }
+
+/// set the last byte in buffer to 0 (so that string functions won't fail
+/// even if the  buffer was not 0-terminated for some reason.
+#define NULL_TERMINATE(buffer)   { buffer[sizeof(buffer) - 1] = 0; }
+
+#define SPRINTF(buffer, ...) \
+{ snprintf(buffer, sizeof(buffer), __VA_ARGS__); NULL_TERMINATE(buffer) }
 
 #endif // __COMMON_HH_DEFINED__

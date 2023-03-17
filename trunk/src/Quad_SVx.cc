@@ -122,11 +122,10 @@ char filename[APL_PATH_MAX + 1];
 bool found_executable = false;
    for (int d = 0; d < dircount; ++d)
        {
-         const int slen = snprintf(filename, APL_PATH_MAX,
+         SPRINTF(filename,
                   "%s%s/AP%u --id %u --par %u --gra %u --auto%s",
                   LibPaths::get_APL_bin_path(), dirs[d], ap, ap,
                   own_ID, par_ID, verbose);
-         if (slen >= APL_PATH_MAX)   filename[APL_PATH_MAX] = 0;
 
          found_executable = is_executable(filename);
          if (found_executable)   break;
@@ -535,9 +534,7 @@ const char * dirs[] = { "", "/APs" };
    for (int d = 0; d < dircount; ++d)
        {
          char dirname[APL_PATH_MAX + 1];
-         int slen = snprintf(dirname, APL_PATH_MAX, "%s%s", LibPaths::get_APL_bin_path(),
-                  dirs[d]);
-         if (slen >= APL_PATH_MAX)   dirname[APL_PATH_MAX] = 0;
+         SPRINTF(dirname, "%s%s", LibPaths::get_APL_bin_path(), dirs[d]);
 
          dirname[APL_PATH_MAX] = 0;
          DIR * dir = opendir(dirname);
@@ -565,10 +562,8 @@ const char * dirs[] = { "", "/APs" };
                 if (entry->d_type != DT_REG)   continue; // not a regular file
 #endif
 
-                char filename[APL_PATH_MAX + 1];
-                int slen = snprintf(filename, APL_PATH_MAX, "%s/%s",
-                                    dirname, entry->d_name);
-                if (slen >= APL_PATH_MAX)   filename[APL_PATH_MAX] = 0;
+                char filename[2*APL_PATH_MAX + 1];   // to avoid bogus warning
+                SPRINTF(filename, "%s/%s", dirname, entry->d_name);
 
                 if (!is_executable(filename))   continue;
 
@@ -576,8 +571,7 @@ const char * dirs[] = { "", "/APs" };
                 if (sscanf(entry->d_name, "AP%u", &apnum) != 1)   continue;
 
                 char expected[APL_PATH_MAX + 1];
-                slen = snprintf(expected, sizeof(expected), "AP%u", apnum);
-                if (slen >= APL_PATH_MAX)   expected[APL_PATH_MAX] = 0;
+                SPRINTF(expected, "AP%u", apnum);
                 if (strcmp(entry->d_name, expected))   continue;
 
                 processors.push_back(AP_num(apnum));

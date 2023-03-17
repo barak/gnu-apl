@@ -338,8 +338,7 @@ IO_Files::open_next_file()
            if (!InputFile::current_file())   break;   // no more files
 
            char log_name[FILENAME_MAX];
-           snprintf(log_name, FILENAME_MAX - 1,  "%s.log",
-                    InputFile::current_filename());
+           SPRINTF(log_name, "%s.log", InputFile::current_filename());
 
            if (InputFile::current_file()->test)
               {

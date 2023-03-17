@@ -1118,7 +1118,7 @@ const APL_time_us offset = get_offset();
 const YMDhmsu time(when + 1000000*offset);
 
 char gmt[40];
-   snprintf(gmt, sizeof(gmt), "(GMT%+2d)", int(offset/3600));
+   SPRINTF(gmt, "(GMT%+2d)", int(offset/3600));
 
 ostringstream os;
    os << setfill('0') << time.year  << "-"

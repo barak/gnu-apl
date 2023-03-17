@@ -874,10 +874,8 @@ Quad_GTK::start_Gtk_server()
 char path1[APL_PATH_MAX + 1 + 8];
 char path2[APL_PATH_MAX + 1 + 8];
 const char * bin_dir = LibPaths::get_APL_bin_path();
-int slen = snprintf(path1, APL_PATH_MAX, "%s/Gtk/Gtk_server", bin_dir);
-   if (slen >= APL_PATH_MAX)   path1[APL_PATH_MAX] = 0;
-   slen = snprintf(path2, APL_PATH_MAX, "%s/Gtk_server", bin_dir);
-   if (slen >= APL_PATH_MAX)   path2[APL_PATH_MAX] = 0;
+   SPRINTF(path1, "%s/Gtk/Gtk_server", bin_dir);
+   SPRINTF(path2, "%s/Gtk_server", bin_dir);
 
 const char * path = 0;
    if      (!access(path1, X_OK))   path = path1;
@@ -902,6 +900,7 @@ int envp_idx = 0;
               const size_t len = strlen(var) + 1 + strlen(val) + 1;
               char * env = new char[len];
               snprintf(env, len, "%s=%s", var, val);
+              env[len - 1] = 0;
               envp[envp_idx++] = env;
             }
        }

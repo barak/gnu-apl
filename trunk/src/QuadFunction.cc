@@ -581,9 +581,9 @@ const ErrorCode ec = get_error_code(B);
    else                                   //  ⎕ES B with unknown major/minor B
       {
         char cc[58];
-        snprintf(cc, sizeof(cc), "Unkown error (major %d, minor %d) in ⎕ES B",
-                 error.get_error_code() >> 16,
-                 error.get_error_code() & 0xFFFF);
+        SPRINTF(cc, "Unkown error (major %d, minor %d) in ⎕ES B",
+                    error.get_error_code() >> 16,
+                    error.get_error_code() & 0xFFFF);
         error.set_error_line_1(cc);
       }
 
