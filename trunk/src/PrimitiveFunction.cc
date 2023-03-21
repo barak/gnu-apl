@@ -412,27 +412,36 @@ Bif_F12_TRANSPOSE::eval_AB(Value_P A, Value_P B) const
 {
    // A should be a scalar or vector.
    //
-   if (A->get_rank() > 1)   RANK_ERROR;
+   if (A->get_rank() > 1)
+      {
+        MORE_ERROR() << "A⍉B: A is not a vector or scalar.";
+        RANK_ERROR;
+      }
+
+const Shape shape_A(*A, Workspace::get_IO());   // rank(shape_A) = length(A)
+   if (shape_A.get_rank() != B->get_rank())
+      {
+        MORE_ERROR() << "A⍉B: ⍴A is " << shape_A.get_rank()
+                     << ", but ⍴⍴B is " << B->get_rank()
+                     << " (i.e. ≠ ⍴A)";
+        LENGTH_ERROR;
+      }
 
    if (B->is_scalar())   // B is a scalar (so A should be empty)
       {
-        if (A->element_count() != 0)   LENGTH_ERROR;
         Value_P Z = CLONE_P(B, LOC);
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
 
-const Shape shape_A(*A, Workspace::get_IO());
-   if (shape_A.get_rank() != B->get_rank())   LENGTH_ERROR;
-
-   // the elements in A shall be valid axes of B->
-   loop(r, A->get_rank())
+   // shape_A is normalized to ⎕IO←- and shall only contain valid axes of B.
+   loop(r, shape_A.get_rank())
       {
         if (shape_A.get_shape_item(r) < 0)                DOMAIN_ERROR;
         if (shape_A.get_shape_item(r) >= B->get_rank())   DOMAIN_ERROR;
       }
 
-Value_P Z = (shape_A.get_rank() == B->get_rank() && shape_A.is_permutation())
+Value_P Z = shape_A.get_rank() == B->get_rank() && shape_A.is_permutation()
           ? transpose(shape_A, B.get())
           : transpose_diag(shape_A, B.get());
 
@@ -443,21 +452,21 @@ Value_P Z = (shape_A.get_rank() == B->get_rank() && shape_A.is_permutation())
 }
 //----------------------------------------------------------------------------
 Value_P
-Bif_F12_TRANSPOSE::transpose(const Shape & A, const Value * B)
+Bif_F12_TRANSPOSE::transpose(const Shape & sh_A, const Value * B)
 {
-   // some simple to optimize cases beforehand...
+   // some frequent and simple to optimize cases beforehand...
    //
-   if (A.get_rank() <= 2)
+   if (sh_A.get_rank() <= 2)   // transpose matrix or vectors
       {
-        if (A.get_rank() <= 1)   // scalar or vector B:
+        if (sh_A.get_rank() <= 1)   // scalar or vector B:
            {
               return CLONE(B, LOC);
            }
 
-        // 2-dimensional matrix
+        // 2-dimensional matrix (probably the most frequent case).
         //
-        if (A.get_shape_item(0) == 0 &&
-            A.get_shape_item(1) == 1)   return CLONE(B, LOC);   // identity
+        if (sh_A.get_shape_item(0) == 0 &&
+            sh_A.get_shape_item(1) == 1)   return CLONE(B, LOC);   // identity
 
         const ShapeItem rows_B = B->get_shape_item(0);
         const ShapeItem cols_B = B->get_shape_item(1);
@@ -471,21 +480,31 @@ Bif_F12_TRANSPOSE::transpose(const Shape & A, const Value * B)
       }
 
    /*
-      A specifies an axis permutation in the "forward" direction, i.e.
+      Z←A ⍉ B could be reasonably implemented in 2 ways
 
-      B[i] → Z[A[i]]
+      1. loop over (source) B and ArrayIterator for (destination) Z, or
+      2. ArrayIterator for (source) B and loop over (destination) Z.
 
-      For our next_ravel_XXX() mechanism we need the "backward" direction:
+      sh_A specifies an axis permutation in the "forward" direction, i.e.
 
-      Z[i] ← B[A⁻¹[i]]
+      B[i] → Z[A[i]]   for all indices i.
 
-      We therefore use the inverse permutation for A, which exchanges
-      source and destination
+      which implies alternative 1. above. However, Z->check_value() below
+      takes O(length(Z)) in alternative 1. above but only O(2) in
+      alternative 2. above because then next_ravel_Cell() can be used.
 
-      A is already normalized to ⎕IO←0 so its axes are 0, 1, ... in some order
+      For alternative 2. we used the inverse mapping:
+
+      Z[i] ← B[A⁻¹[i]]   for all indices i.
+
+      which is achieved by using the inverse permutation for sh_A (which
+      exchanges the source and the destination).
+
+      The caller is supposed to normalized sh_A to to ⎕IO←0, therefore
+      the shape items of sh_A are the axes 0, 1, ... (in some order).
     */
 
-const Shape   shape_inv_A = inverse_permutation(A);
+const Shape   shape_inv_A = inverse_permutation(sh_A);
 const Shape & shape_B     = B->get_shape();
 const Shape   shape_Z     = permute(shape_B, shape_inv_A);
 
@@ -497,7 +516,7 @@ Value_P Z(shape_Z, LOC);
          return Z;
       }
 
-   for (ArrayIterator b(shape_Z, A); b.more(); ++b)
+   for (ArrayIterator b(shape_Z, sh_A); b.more(); ++b)
        {
          Z->next_ravel_Cell(B->get_cravel(b.get_ravel_offset()));
        }
@@ -507,45 +526,77 @@ Value_P Z(shape_Z, LOC);
 }
 //----------------------------------------------------------------------------
 Value_P
-Bif_F12_TRANSPOSE::transpose_diag(const Shape & A, const Value * B)
+Bif_F12_TRANSPOSE::transpose_diag(const Shape & sh_A, const Value * B)
 {
-   // check that: ∧/(⍳⌈/0,A)ϵA
+   // A⍉B with repeated items in A. The caller has normalized sh_A to ⎕IO←0.
+
+   // 1. compute rank_Z ← 1 + ⌈/sh_A.
    //
-   // I.e. 0, 1, ... max_A are in A
-   // we search sequentially, since A is small.
-   // we construct shape_Z as we go.
+ShapeItem rank_Z = 0;
+const Shape & sh_B = B->get_shape();
+   loop(a, sh_A.get_rank())
+       {
+         const ShapeItem s_A = sh_A.get_shape_item(a);
+         if (rank_Z < s_A)   rank_Z = s_A;
+       }
+   ++rank_Z;
+
+   // compute the B-weights of the untransposed B axes
+   //
+const Shape weights_B = sh_B.get_weights();
+
+   // compute the B-weights of the transposed B axes. transpose_diag() is
+   // called rarely, and if so with small ranks. We can therefore afford
+   // a rank_Z² algorithm. We also create shape_Z as we go.
+   //
+   // A unit step in Z[z] is a weight_Z[z] step in B, where weight_Z is the
+   // sum of weights that map to z.
    //
 Shape shape_Z;
-   {
-     // check that 0 ≤ A[a] ≤ ⍴⍴B, and compute max_A = ⌈/A
-     // i.e. ∧/(ι/0,L)∈L   lrm p. 253
-     ShapeItem max_A = 0;   // the largest index in A (- qio).
-     loop(ra, A.get_rank())
-         {
-           if (A.get_shape_item(ra) < 0)                DOMAIN_ERROR;
-           if (A.get_shape_item(ra) >= B->get_rank())   DOMAIN_ERROR;
-           if (max_A < A.get_shape_item(ra))   max_A = A.get_shape_item(ra);
-         }
+ShapeItem weight_Z[rank_Z];
+   loop(z, rank_Z)
+       {
+         weight_Z[z] = 0;
+         ShapeItem min_len_B = LARGE_INT;
+         loop(a, sh_A.get_rank())
+             {
+               if (z == sh_A.get_shape_item(a))   // B-axis a maps to Z-axis z
+                  {
+                    const ShapeItem len_b = sh_B.get_shape_item(a);
+                    if (min_len_B > len_b)   min_len_B = len_b;
+                    weight_Z[z] += weights_B.get_shape_item(a);
+                  }
+             }
 
-     // check that every m < max_A is in A.
-     // the smallest axis in B found is added to shape_Z.
-     //
-     loop(m, max_A + 1)
-         {
-           ShapeItem min_Bm = -1;
-           loop(ra, A.get_rank())
-               {
-                if (m != A.get_shape_item(ra))   continue;
-                const ShapeItem B_ra = B->get_shape_item(ra);
-                if (min_Bm == -1)   min_Bm = B_ra;
-                else if (min_Bm > B_ra)   min_Bm = B_ra;
-               }
+         if (weight_Z[z] == 0)
+            {
+              /* weight_Z[z] == 0 is rather unlikely and may have 2 reasons:
 
-           if (min_Bm == -1)   DOMAIN_ERROR;   // m not in A
+                 1. none of the A items is z (which raises DOMAIN ERROR), or
+                 2. all B axes for z are 0.(which continues below).
+               */
+              bool z_in_A = false;
+              loop(a, sh_A.get_rank())
+                  {
+                    if (sh_A.get_shape_item(a) == z)   // hence not case 1.
+                       {
+                         z_in_A = true;
+                         break;   // no need to search further
+                       }
+                  }
 
-           shape_Z.add_shape_item(min_Bm);
-         }
-   }
+              if (!z_in_A)   // z is missing in A
+                 {
+                   const APL_Integer qio = Workspace::get_IO();
+                   MORE_ERROR() << "A⍉B: axis " << (qio + z)
+                                << " is missing in A; "
+                                   "A should contain all integers " << qio
+                                << "..." << (qio + rank_Z) << ".";
+                   DOMAIN_ERROR;
+                 }
+            }
+         shape_Z.add_shape_item(min_len_B);
+       }
 
 Value_P Z(shape_Z, LOC);
    if (Z->is_empty())
@@ -554,13 +605,11 @@ Value_P Z(shape_Z, LOC);
         return Z;
       }
 
-const Cell * cB = &B->get_cfirst();
-
-   for (ArrayIterator z(shape_Z); z.more(); ++z)
+   for (ArrayIterator iZ(shape_Z); iZ.more(); ++iZ)
        {
-         const Shape idx_B = permute(z.get_shape_offsets(), A);
-         const ShapeItem b = B->get_shape().ravel_pos(idx_B);
-         Z->next_ravel_Cell(cB[b]);
+         const Cell * cB = &B->get_cfirst();
+         loop(z, rank_Z)   cB += iZ.get_shape_offset(z) * weight_Z[z];
+         Z->next_ravel_Cell(*cB);
        }
 
    Z->check_value(LOC);

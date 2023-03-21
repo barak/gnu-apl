@@ -162,15 +162,24 @@ Shape::check_same(const Shape & B, ErrorCode rank_err, ErrorCode len_err,
 bool
 Shape::is_permutation() const
 {
-ShapeItem axes = 0;   // a bitmap of axes
+   /* this shape is supposedly normalized to ⎕IO←0. We figure if the items
+      of this shape are 0, 1, ... in some order (i.e. a permutation) or not.
+
+      This shape is a permutation iff:
+
+      (i)  all shape items are between 0 (including) and get_rank() (excluding),
+      (ii) and no shape item occurs more than once.
+    */
+
+AxesBitmap axes = 0;   // a bitmap of axes
 
    loop(r, get_rank())
        {
          const ShapeItem ax = get_shape_item(r);
-         if (ax < 0)                return false;
-         if (ax >= get_rank())      return false;
-         if (axes & 1 << ax)        return false;
-          axes |= 1 << ax;
+         if (ax < 0)             return false;   // ax out of range
+         if (ax >= get_rank())   return false;   // ax out of range
+         if (axes & 1 << ax)     return false;   // ax already used
+          axes |= 1 << ax;                       // remember that ax is used.
        }
 
    return true;

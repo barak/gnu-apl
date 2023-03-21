@@ -400,7 +400,7 @@ Bif_F12_PICK::disclose_item(Value & Z, ShapeItem b,
 Value_P
 Bif_F12_PICK::disclose_with_axis(const Shape & sh_X, Value_P B)
 {
-   // disclose with axis: Z←⊃[Z] B
+   // disclose with axis: Z←⊃[X] B
    // implemented as: cB ← ⊃ B ◊ cX ← ((⍳⍴⍴cB)∼X),X ◊ Z←cX ⍉ B
 
    // Note: axes_X is already normalized to ⎕IO←0
@@ -409,12 +409,12 @@ Value_P cB = disclose(B, true);   // cB ← ⊃ B
 
 AxesBitmap axes_X = 0;   // axes in axes_X with ⎕IO←0
 
-   loop(x, sh_X.get_rank())
+   loop(x, sh_X.get_rank())   // rank(sh_X) is length(X)
        {
           const ShapeItem ax = sh_X.get_shape_item(x);
           if (axes_X & 1 << ax)
              {
-               MORE_ERROR() << "In ⊃[X]B: duplicated axis "
+               MORE_ERROR() << "⊃[X]B: duplicated axis "
                             << (ax + Workspace::get_IO())
                             << " in X";
                 AXIS_ERROR;

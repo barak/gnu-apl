@@ -80,8 +80,8 @@ public:
      loop(r, MAX_RANK)   rho[r] = other.rho[r];
    }
 
-   /// constructor: shape defined by the ravel of an APL value \b A
-   /// throw RANK or LENGTH error where needed. Negative values are allowed
+   /// constructor: shape defined by the ravel of APL value \b A.
+   /// Throw RANK or LENGTH error where needed. Negative values are allowed
    /// in order to support e.g. ¯4 ↑ B
    Shape(const Value & A, int qio_A);
 
@@ -243,9 +243,10 @@ public:
 
    /// return \b true iff \b this shape is empty (some dimension is 0).
    bool is_empty() const
-      { loop(r, rho_rho)   if (rho[r] == 0)   return true;   return false; }
+      { loop(r, rho_rho)   if (rho[r] == 0) return true;   return false; }
 
-   /// return \b true iff this shape is a permutation of 0, 1, ... rank-1
+   /// return \b true iff this shape is a permutation of 0, 1, ... rank-1.
+   /// made inline since used only once.
    bool is_permutation() const;
 
    /// return the position of \b idx in the ravel.
