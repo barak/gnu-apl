@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -109,7 +109,7 @@ Value_P Z(shape_Z, LOC);
          return Z;
       }
 
-   for (ArrayIterator it_Z(shape_Z); it_Z.more(); ++it_Z)
+   for (ArrayIterator it_Z(shape_Z); it_Z.has_more(); ++it_Z)
       {
         const Shape it_Z_sh = it_Z.get_shape_offsets();
         ShapeItem off_Z = 0;
@@ -126,7 +126,7 @@ Value_P Z(shape_Z, LOC);
            }
         else
            {
-             for (ArrayIterator it_it(item_shape); it_it.more(); ++it_it)
+             for (ArrayIterator it_it(item_shape); it_it.has_more(); ++it_it)
                  {
                     const Shape it_sh = it_it.get_shape_offsets();
                     ShapeItem off_B = 0;

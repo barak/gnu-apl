@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -516,7 +516,7 @@ Value_P Z(shape_Z, LOC);
          return Z;
       }
 
-   for (ArrayIterator b(shape_Z, sh_A); b.more(); ++b)
+   for (ArrayIterator b(shape_Z, sh_A); b.has_more(); ++b)
        {
          Z->next_ravel_Cell(B->get_cravel(b.get_ravel_offset()));
        }
@@ -605,7 +605,7 @@ Value_P Z(shape_Z, LOC);
         return Z;
       }
 
-   for (ArrayIterator iZ(shape_Z); iZ.more(); ++iZ)
+   for (ArrayIterator iZ(shape_Z); iZ.has_more(); ++iZ)
        {
          const Cell * cB = &B->get_cfirst();
          loop(z, rank_Z)   cB += iZ.get_shape_offset(z) * weight_Z[z];

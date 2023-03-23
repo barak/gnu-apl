@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -333,7 +333,7 @@ const ShapeItem ec_B = B->element_count();
 const Cell * cB = &B->get_cfirst();
 const int incr_B = (ec_B == 1) ? 0 : 1;
 
-   while (mult.more())
+   while (mult.has_more())
       {
         const ShapeItem offset_Z = mult++;
         if (offset_Z < 0)                     INDEX_ERROR;

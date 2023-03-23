@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -249,7 +249,7 @@ UCS_string::iterator c(first_command);
 
    // skip leading nabla.
    //
-   if (c.more() && c.next() != UNI_NABLA)   return "Bad ∇-command (no ∇)";
+   if (c.has_more() && c.next() != UNI_NABLA)   return "Bad ∇-command (no ∇)";
 
    // skip leading spaces
    //
@@ -257,7 +257,7 @@ UCS_string::iterator c(first_command);
 
    // function header.
    //
-   while (c.more() && c.lookup() != UNI_L_BRACK)
+   while (c.has_more() && c.lookup() != UNI_L_BRACK)
          fun_header.append(c.next());
 
    /* at this point there could be an axis specification [X] that
@@ -269,14 +269,14 @@ UCS_string::iterator c(first_command);
           ∇FOO[X] B : [ starts axis
           ∇FOO[⎕]   : [ starts ∇operation [⎕] (display)
     */
-   if (c.more() && c.lookup() == UNI_L_BRACK)   // [
+   if (c.has_more() && c.lookup() == UNI_L_BRACK)   // [
       {
         c.next();   // the [
         c.skip_white();
-        if (c.more() && Avec::is_first_symbol_char(c.lookup()))   // axis
+        if (c.has_more() && Avec::is_first_symbol_char(c.lookup()))   // axis
            {
              fun_header.append(UNI_L_BRACK);   //  copy the [
-             while (c.more() && c.lookup() != UNI_L_BRACK)
+             while (c.has_more() && c.lookup() != UNI_L_BRACK)
                    fun_header.append(c.next());
            }
         else                                                      // ∇-command
@@ -300,13 +300,13 @@ UserFunction_header hdr(fun_header, false);
 
    // optional operation
    //
-   if (c.more() && c.lookup() == UNI_L_BRACK)
+   if (c.has_more() && c.lookup() == UNI_L_BRACK)
       {
         UCS_string oper;
         Unicode cc;
         do
           {
-            if (!c.more())   return "no ] in ∇-command";
+            if (!c.has_more())   return "no ] in ∇-command";
             oper.append(cc = c.next());
           } while (cc != UNI_R_BRACK);
 
@@ -364,7 +364,7 @@ UserFunction_header hdr(fun_header, false);
    // immediate close (only show command is allowed here),
    // e.g. ∇fun[⎕]∇
    //
-   if (c.more() && c.lookup() == UNI_NABLA)
+   if (c.has_more() && c.lookup() == UNI_NABLA)
       {
         if (ecmd != ECMD_SHOW)   return "illegal command between ∇ ... ∇";
         if (const char * loc = execute_oper())
@@ -408,7 +408,7 @@ Nabla::parse_oper(UCS_string & oper, bool initial)
    if (oper.size() == 0 && do_close)   return 0;
 
 UCS_string::iterator c(oper);
-Unicode cc = c.more() ? c.next() : Invalid_Unicode;
+Unicode cc = c.has_more() ? c.next() : Invalid_Unicode;
 UCS_string text = oper;
    while (cc == ' ')   cc = c.next();   // skip leading whitespace
 
@@ -425,7 +425,7 @@ UCS_string text = oper;
         ecmd = ECMD_EDIT;
         edit_from = current_line;
         current_text = text;
-//      for (; c.more(); cc = c.next())   current_text.append(cc);
+//      for (; c.has_more(); cc = c.next())   current_text.append(cc);
         return 0;
       }
 
@@ -445,7 +445,7 @@ command_loop:
 
    // set optional edit_from (if present)
    //
-   if (c.more() && (Avec::is_digit(c.lookup()) ||    // N.M
+   if (c.has_more() && (Avec::is_digit(c.lookup()) ||    // N.M
                     c.lookup() == UNI_FULLSTOP))     //  .M
       {
         edit_from = parse_lineno(c);
@@ -458,7 +458,7 @@ command_loop:
    // [∆   delete
    // [→   abandon
    //
-   if (!c.more())   return "Bad ∇-command";
+   if (!c.has_more())   return "Bad ∇-command";
    switch (c.lookup())
       {
         case UNI_Quad_Quad:
@@ -481,9 +481,9 @@ command_loop:
 again:
    // set optional edit_to (if present)
    //
-   if (c.more() && Avec::is_digit(c.lookup()))   edit_to = parse_lineno(c);
+   if (c.has_more() && Avec::is_digit(c.lookup()))   edit_to = parse_lineno(c);
 
-   if (c.more() && c.lookup() == UNI_MINUS)   // range
+   if (c.has_more() && c.lookup() == UNI_MINUS)   // range
       {
         if (got_minus)   return "error: second -  in ∇-range";
         got_minus = true;
@@ -492,7 +492,7 @@ again:
         goto again;
       }
 
-   if (c.more() && c.next() != UNI_R_BRACK)   return "missing ] in ∇-range";
+   if (c.has_more() && c.next() != UNI_R_BRACK)   return "missing ] in ∇-range";
 
    // at this point we have parsed an editor command, like:
    //
@@ -502,7 +502,7 @@ again:
 
    c.skip_white();
 
-   if (c.more() && c.lookup() == UNI_L_BRACK)   // another command: ignore previous
+   if (c.has_more() && c.lookup() == UNI_L_BRACK)   // another command: ignore previous
       {
          c.next();   // eat the [
          goto command_loop;
@@ -511,7 +511,7 @@ again:
    // copy the rest to current_text. Set do_close if ∇ or ⍫ is seen
    // unless inside strings.
    //
-   while (c.more())
+   while (c.has_more())
       {
         switch(cc = c.next())
            {
@@ -528,7 +528,7 @@ again:
                   current_text.append(cc);
                   for (;;)
                       {
-                        if (!c.more())   // premature end of input
+                        if (!c.has_more())   // premature end of input
                            {
                              current_text.append(UNI_DOUBLE_QUOTE);
                              return 0;
@@ -539,7 +539,7 @@ again:
                         if (cc == UNI_DOUBLE_QUOTE)   break; // string end
                         if (cc == UNI_BACKSLASH)      // \x
                            {
-                             if (!c.more())   // premature end of input
+                             if (!c.has_more())   // premature end of input
                                 {
                                   current_text.append(UNI_BACKSLASH);
                                   current_text.append(UNI_DOUBLE_QUOTE);
@@ -559,7 +559,7 @@ again:
                         // handle ' ... '' ... ' like two adjacent strings
                         // instead of a string containing a (doubled) quote.
                         //
-                        if (!c.more())   // premature end of input
+                        if (!c.has_more())   // premature end of input
                            {
                              current_text.append(UNI_SINGLE_QUOTE);
                              return 0;
@@ -583,16 +583,16 @@ Nabla::parse_lineno(UCS_string::iterator & c)
 {
 LineLabel ret(0);
 
-   while (c.more() && Avec::is_digit(c.lookup()))
+   while (c.has_more() && Avec::is_digit(c.lookup()))
       {
         ret.ln_major *= 10;
         ret.ln_major += c.next() - UNI_0;
       }
 
-   if (c.more() && c.lookup() == UNI_FULLSTOP)
+   if (c.has_more() && c.lookup() == UNI_FULLSTOP)
       {
         c.next();   // eat the .
-        while (c.more() && Avec::is_digit(c.lookup()))
+        while (c.has_more() && Avec::is_digit(c.lookup()))
               ret.ln_minor.append(c.next());
       }
 

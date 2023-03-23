@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -139,8 +139,9 @@ public:
    int compute_chunk_length(int quad_PW, int col) const;
 
    /// skip leading whitespaces starting at idx, append the following
-   /// non-whitespaces (if any) to \b dest, and skip trailing whitespaces
-   void copy_black(UCS_string & dest, int & idx) const;
+   /// non-whitespaces (if any) to \b dest, and skip trailing whitespaces.
+   /// return the idx after that.
+   size_t copy_black(UCS_string & dest, int idx) const;
 
    /// return the FNV (Fowler-Noll-Vo) hash of \b this_string
    uint32_t FNV_hash() const
@@ -370,7 +371,7 @@ public:
               { Assert(pos);   --pos; }
 
            /// return true iff there are more chars available
-           bool more() const
+           bool has_more() const
               { return pos < s.size(); }
 
         /// skip whitespace

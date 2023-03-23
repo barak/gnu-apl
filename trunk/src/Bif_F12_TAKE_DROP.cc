@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -164,7 +164,7 @@ void
 Bif_F12_TAKE::fill(const Shape & shape_Zi, Value & Z,
                    const Value & B, AxesBitmap axes)
 {
-   for (TakeDropIterator i(true, shape_Zi, B.get_shape()); i.more(); ++i)
+   for (TakeDropIterator i(true, shape_Zi, B.get_shape()); i.has_more(); ++i)
        {
          const ShapeItem offset = i();
          if (offset != -1)                          // valid cell
@@ -243,7 +243,7 @@ Value_P Z(shape_Z, LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
 
-   for (TakeDropIterator i(false, ravel_A, B->get_shape()); i.more(); ++i)
+   for (TakeDropIterator i(false, ravel_A, B->get_shape()); i.has_more(); ++i)
       {
         const ShapeItem offset = i();
         Z->next_ravel_Cell(B->get_cravel(offset));

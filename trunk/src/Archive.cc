@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -2023,7 +2023,7 @@ Value_P Z = values[vid];
         return;
       }
 
-   if (Z->element_count() == 0)   // then Z->more() is 0 and can't be used
+   if (Z->element_count() == 0)   // then Z->has_more() is 0 and can't be used
       {
         Value_P Z0(LOC);   // a scalar to read the prototype
         read_Cells(*Z0, cells_utf);   // prototype

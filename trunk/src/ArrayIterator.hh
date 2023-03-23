@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -29,15 +29,21 @@
 #include "SystemLimits.hh"
 
 //----------------------------------------------------------------------------
-/// An iterator counting 0, 1, 2, ... ⍴[N-1] along one axis of length N
+/// An iterator counting 0, 1, 2, ... N (excluding) along an axis of length N
 class AxisIterator
 {
 public:
-   /// default constructor for arrays. Initializes only the counters.
+   /// default constructor (for arrays).
+   /// Will be re-initialized with placement new.
    AxisIterator()
+   : axis_length(0),
+     axis_weight(0),
+     wrap(0)
    {}
 
-   /// constructor for placement new. A weight of 0 indicates a scalar
+   /// constructor for placement new. The weight is the step size in
+   /// the associated ravel ehrn the iterator is incremented.
+   /// A weight of 0 indicates a scalar
    AxisIterator(ShapeItem len, ShapeItem weight, bool _wrap)
    : axis_length(len),
      axis_weight(weight),
@@ -60,11 +66,11 @@ public:
 
         // carry has occurred.
         if (wrap)   shape_offset = ravel_offset = 0;
-        return true;   // carry: increment next (if any) iterator
+        return true;   // carry: increment next higher (if any) iterator
       }
 
    /// true if more items coming
-   bool more() const
+   bool has_more() const
       { return is_scalar_iterator() ? shape_offset == 0   // before next()
                                     : shape_offset < axis_length; }
 
@@ -89,12 +95,13 @@ public:
       { return axis_weight == 0; }
 
 protected:
-   /// the length of the axis; the interator counts 0, 1, ... axis_length-1.
-   ShapeItem axis_length;
+   /// the length of the axis; the interator counts 0, 1, ... axis_length
+   /// (excluding).
+   const ShapeItem axis_length;
 
    /// the weight (ravel increment) of this itertor (product of lower iterator
-   /// weights). IMPORTANT: Scalars are flagged with an axis_weight of 0 here.
-   ShapeItem axis_weight;
+   /// weights). IMPORTANT: Scalars are have an axis_weight of 0 here.
+   const ShapeItem axis_weight;
 
    /// the current offset, 0, 1, ... axis_len (excluding)
    ShapeItem shape_offset;
@@ -106,7 +113,7 @@ protected:
    /// more() of the entire array to be fast, we wrap all iterators except
    /// the first at the end so that more() of the first iterator becomes false
    /// when iterating over entire array is done.
-   bool wrap;
+   const bool wrap;
 };
 //----------------------------------------------------------------------------
 /// An iterator counting along all axes of \b shape
@@ -167,9 +174,9 @@ public:
    // if the entire iteration is done.
    //
    /// return true iff this iterator has more items to come.
-   bool more() const
+   bool has_more() const
       {
-        return get_iterator(0).more();
+        return get_iterator(0).has_more();
       }
 
    /// the work-horse of this iterator.

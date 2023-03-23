@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -173,11 +173,11 @@ Command::process_line(UCS_string & line)
 bool
 Command::do_APL_command(ostream & out, UCS_string & line)
 {
-   if (line.contains(UNI_COMMENT))   // unlikely
+   if (line.contains(UNI_COMMENT))   // unlikely, but valid
       {
         loop(l, line.size())   // find ⍝
             {
-              if (line[l] == UNI_COMMENT)   // found
+              if (line[l] == UNI_COMMENT)   // found ⍝
                  {
                    line.resize(l);
                    line.remove_trailing_whitespaces();
@@ -186,20 +186,22 @@ Command::do_APL_command(ostream & out, UCS_string & line)
             }
       }
 
-const UCS_string line1(line);   // the original line
+const UCS_string orig_line(line);   // the original line
 
-   // split line into command and arguments
+   // split line into command and command arguments
    //
 UCS_string cmd;   // the command without arguments
-int len = 0;
-   line.copy_black(cmd, len);
+const size_t len = line.copy_black(cmd, 0);   // line w/o leading/trailing ws
 
 UCS_string arg(line, len, line.size() - len);
 UCS_string_vector args = split_arg(arg);
    line.clear();
-   if (!cmd.starts_iwith(")MORE")) 
+
+   // clear the )MORE info, unless the command itself is )MORE
+   //
+   if (!cmd.starts_iwith(")MORE"))   // command is not )MORE.
       {
-        // clear )MORE info unless command is )MORE
+        // clear )MORE info unless cmd itself is )MORE
         //
         Workspace::more_error().clear();
       }
@@ -216,7 +218,7 @@ UCS_string_vector args = split_arg(arg);
        {
          if (cmd.starts_iwith(Workspace::get_user_commands()[u].prefix))
             {
-              do_USERCMD(out, line, line1, cmd, args, u);
+              do_USERCMD(out, line, orig_line, cmd, args, u);
               return true;
             }
        }
@@ -634,13 +636,13 @@ UCS_string_vector
 Command::split_arg(const UCS_string & arg)
 {
 UCS_string_vector result;
-   for (int idx = 0; ; )
+   for (size_t idx = 0; ; )
       {
-        UCS_string next;
-        arg.copy_black(next, idx);
-        if (next.size() == 0)   return result;
+        UCS_string token;
+        idx = arg.copy_black(token, idx);
+        if (token.size() == 0)   return result;
 
-        result.push_back(next);
+        result.push_back(token);
       }
 }
 //----------------------------------------------------------------------------
@@ -700,10 +702,16 @@ void
 Command::cmd_CHECK(ostream & out, const UCS_string & arg)
 {
 bool show_OK = true;
-   if (arg.size())
+   if (arg.size())   // check with argument (supposedly BRIEF).
       {
         const UCS_string brief("BRIEF");
         show_OK = arg.compare(brief) != COMP_EQ;   // not BRIEF
+        if (show_OK)   // still show_OK
+           {
+             out << arg << "? Expecting BRIEF." << endl;
+             return;
+
+           }
       }
    // 1. erase stale functions from failed ⎕EX
    //
@@ -930,8 +938,9 @@ UCS_string lib_wsname(Unicode(libref + UNI_0));
 
    // add it to the table;
    //
-   out << "NEW )COPY_ONCE workspace: "
-       << Unicode(libref + UNI_0) << " " << wsname << endl;
+   out << "NEW )COPY_ONCE workspace: ";
+   if (libref)   out << libref << " ";
+   out << wsname << endl;
 
    copy_once_table.push_back(lib_wsname);
    Workspace::copy_WS(out, libref, wsname, args, false);

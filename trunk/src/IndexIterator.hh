@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -49,7 +49,7 @@ public:
    void operator ++();
 
    /// return true if more indices are coming
-   bool more() const   { return count && pos < count; }
+   bool has_more() const   { return count && pos < count; }
 
    /// return the current index
    virtual ShapeItem get_ivalue() const = 0;
@@ -143,8 +143,8 @@ public:
    ShapeItem operator ++(int);
 
    /// return true if more indices are coming
-   bool more() const
-      { return highest_it && highest_it->more(); }
+   bool has_more() const
+      { return highest_it && highest_it->has_more(); }
 
 protected:
    /// the iterator for the highest dimension

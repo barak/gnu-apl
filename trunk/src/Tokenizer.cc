@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -490,7 +490,7 @@ const Unicode uni = src.get();
 UCS_string string_value;
 bool got_end = false;
 
-   while (src.more())
+   while (src.has_more())
        {
          const Unicode uni = src.get();
 
@@ -578,7 +578,7 @@ BACKTRACE
 UCS_string string_value;
 bool got_end = false;
 
-   while (src.more())
+   while (src.has_more())
        {
          const Unicode uni = src.get();
 
@@ -774,7 +774,7 @@ done:
    // remaining to be checked are a numeric scalar literal followed by ¯
    // or by . (page 42)
    //
-   if (src.more())
+   if (src.has_more())
       {
         if (*src == UNI_OVERBAR || *src == '.')
            Error::throw_parse_error(E_BAD_NUMBER, LOC, loc);
@@ -788,7 +788,7 @@ Tokenizer::tokenize_hex(Unicode_source & src)
    if (!Avec::is_hex_digit(*src))   return Int_or_Double();   // no hex after $
 
 APL_Integer hex_val = 0;
-   while (src.more())
+   while (src.has_more())
          {
            int digit;
            if      (*src <  UNI_0)   break;
@@ -835,7 +835,7 @@ bool dot_seen = false;      // the decimal . was seen
       1e. the E between the fractional and exponent parts, and/or
       1f. a sign of the exponent part                 (sets expo_negative)
     */
-   if (src.more() && *src == UNI_OVERBAR)   // 1a.
+   if (src.has_more() && *src == UNI_OVERBAR)   // 1a.
       {
         mant_negative = true;
         ++src;
@@ -847,14 +847,14 @@ bool dot_seen = false;      // the decimal . was seen
 
    // integer part
    //
-   while (src.more() && Avec::is_digit(*src))   int_digits += src.get();
+   while (src.has_more() && Avec::is_digit(*src))   int_digits += src.get();
 
    // fractional part...
    //
    if (src.skip_if(UNI_FULLSTOP))   // fract part present
       {
         dot_seen = true;
-        while (src.more() && Avec::is_digit(*src))
+        while (src.has_more() && Avec::is_digit(*src))
            {
              fract_digits += src.get();
            }
@@ -892,14 +892,14 @@ bool dot_seen = false;      // the decimal . was seen
              need_float = true;
              ++src;                        // skip e/E
              ++src;                        // skip ¯
-             while (src.more() && Avec::is_digit(*src))
+             while (src.has_more() && Avec::is_digit(*src))
                   expo_digits += src.get();
            }
         else if (Avec::is_digit(src[1]))               // Ennn
            {
              need_float = true;
              ++src;                        // skip e/E
-             while (src.more() && Avec::is_digit(*src))
+             while (src.has_more() && Avec::is_digit(*src))
                   expo_digits += src.get();
            }
       }
@@ -1017,7 +1017,7 @@ UCS_string symbol;
       }
    symbol.append(src.get());
 
-   while (src.more())
+   while (src.has_more())
        {
          const Unicode uni = *src;
          if (!Avec::is_symbol_char(uni))   break;
@@ -1030,7 +1030,7 @@ UCS_string symbol;
       {
         // S∆ or T∆
 
-        while (src.more() && *src <= UNI_SPACE)   src.get();   // spaces
+        while (src.has_more() && *src <= UNI_SPACE)   src.get();   // spaces
         UCS_string symbol1(symbol, 2, symbol.size() - 2);   // without S∆/T∆
         Value_P AB(symbol1, LOC);
         Function_P ST = 0;

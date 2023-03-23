@@ -3,7 +3,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2022  Dr. Jürgen Sauermann
+    Copyright (C) 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -882,7 +882,7 @@ Value_P Z(B->get_shape(), LOC);
 
 const Cell * cB = &B->get_cfirst();
 
-   for (ArrayIterator it_B(B->get_shape()); it_B.more(); ++it_B)
+   for (ArrayIterator it_B(B->get_shape()); it_B.has_more(); ++it_B)
        {
          ShapeItem wA = 0;   // weigth of the A axes in X
          sRank rA = 0;
@@ -964,7 +964,7 @@ const ShapeItem len_Z = Z->element_count();
             }
        }
 
-   for (ArrayIterator zi(B->get_shape()); zi.more(); ++zi)
+   for (ArrayIterator zi(B->get_shape()); zi.has_more(); ++zi)
        {
 PERFORMANCE_START(start_2)
          if (contained(shape_A, &A->get_cfirst(), B, zi.get_shape_offsets(), qct))
@@ -1002,7 +1002,7 @@ Bif_F2_FIND::contained(const Shape & shape_A, const Cell * cA,
 
 const Shape weights_B = B->get_shape().get_weights();
 
-   for (ArrayIterator ai(shape_A); ai.more(); ++ai)
+   for (ArrayIterator ai(shape_A); ai.has_more(); ++ai)
        {
          const Shape & pos_A = ai.get_shape_offsets();
          ShapeItem pos_B = 0;
