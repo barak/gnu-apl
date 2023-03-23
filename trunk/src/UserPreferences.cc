@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -145,7 +145,7 @@ UserPreferences::show_GPL(ostream & out)
 "    This program is GNU APL, a free implementation of the\n"
 "    ISO/IEC Standard 13751, \"Programming Language APL, Extended\"\n"
 "\n"
-"    Copyright (C) 2008-2023  Dr. Jürgen Sauermann\n"
+"    Copyright © 2008-2023  Dr. Jürgen Sauermann\n"
 "\n"
 "    This program is free software: you can redistribute it and/or modify\n"
 "    it under the terms of the GNU General Public License as published by\n"

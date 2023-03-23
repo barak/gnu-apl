@@ -2,7 +2,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright (C) 2015  Dr. Dirk Laurie
+    Copyright © 2015  Dr. Dirk Laurie
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
