@@ -36,6 +36,7 @@
 vector<InputFile> InputFile::files_todo;
 vector<InputFile> InputFile::files_orig;
 int InputFile::stdin_line_no = 1;
+int64_t InputFile::next_file_seq = 0;
 
 //----------------------------------------------------------------------------
 void

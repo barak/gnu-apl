@@ -230,14 +230,18 @@ UCS_string u("xxx");
 }
 //----------------------------------------------------------------------------
 void
-LineHistory::print_history(ostream & out) const
+LineHistory::print_history(ostream & out, const UCS_string & filter) const
 {
-   for (size_t p = put + 1; p < hist_lines.size(); ++p)
+   // hist_lines is a ring buffer. first print its tail, then its head.
+
+   for (size_t p = put + 1; p < hist_lines.size(); ++p)   // tail
       {
+        if (filter.size() && !hist_lines[p].starts_iwith(filter))   continue;
         out << "      " << hist_lines[p] << endl;
       }
-   for (int p = 0; p < put; ++p)
+   for (int p = 0; p < put; ++p)                          // head
       {
+        if (filter.size() && !hist_lines[p].starts_iwith(filter))   continue;
         out << "      " << hist_lines[p] << endl;
       }
 }

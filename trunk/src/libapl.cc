@@ -33,6 +33,8 @@
 #include <DiffOut.hh>
 #include <Error.hh>
 #include <FloatCell.hh>
+#include <InputFile.hh>
+#include <IO_Files.hh>
 #include <LineInput.hh>
 #include <PointerCell.hh>
 #include <Tokenizer.hh>
@@ -367,7 +369,7 @@ apl_exec(const char* line)
 UTF8_string line_utf8(line);
 UCS_string line_ucs(line_utf8);
 const StateIndicator * si = Workspace::SI_top();
-  Command::process_line(line_ucs);
+  Command::process_line(line_ucs, 0);
    if (si == Workspace::SI_top())   return LAE_NO_ERROR;
 
    si = Workspace::SI_top_error(false);
@@ -383,7 +385,7 @@ UCS_string line;
    while (*line_ucs)   line.append(Unicode(*line_ucs++));
 
 const StateIndicator * si = Workspace::SI_top();
-  Command::process_line(line);
+  Command::process_line(line, 0);
    if (si == Workspace::SI_top())   return LAE_NO_ERROR;
 
    si = Workspace::SI_top_error(false);
@@ -401,6 +403,79 @@ ostringstream out;
   Command::do_APL_command(out, command_ucs);
 
   return strndup(out.str().data(), out.str().size());
+}
+//----------------------------------------------------------------------------
+extern void sync_apl_scripts()
+{
+  do {} while(repl(0, 0, 0, 0, 0));
+
+}
+//----------------------------------------------------------------------------
+long
+repl(char * input_buffer,  int * input_bufsize,
+     char * output_buffer, int * output_bufsize,
+     LIBAPL_error * error)
+{
+  // init sizes
+  //
+  if (input_bufsize)   *input_bufsize  = 0;
+  if (output_bufsize)  *output_bufsize = 0;
+  if (input_buffer)    *input_buffer   = 0;
+  if (output_buffer)   *output_buffer  = 0;
+  if (error)           *error          = LAE_NO_ERROR;
+
+const long ret = InputFile::get_file_seq();
+// cerr << "seq=" << ret << " ";
+   if (ret == 0)   return ret;   // no file
+
+  // get and maybe store one line
+  //
+UTF8_string file_line;
+  {
+    bool file_eof = false;
+    IO_Files::get_file_line(file_line, file_eof);
+    // cerr << "inp: '" << file_line.data() << "'" << endl;
+    if (input_buffer && input_bufsize)   // caller requests a copy of the input
+       {
+         const size_t max_len = *input_bufsize - 1;   // 1 for trailing 0.
+         const size_t inp_len = file_line.size();
+         if (inp_len > max_len)   // overflow
+            {
+              if (error)   *error = LAE_IN_BUFFER_OVERFLOW;
+              strncpy(input_buffer, "--input buffer overflow--", max_len);
+              input_buffer[max_len - 1] = 0;
+            }
+
+         const char * bytes = reinterpret_cast<const char *>(file_line.data());
+         strncpy(input_buffer, bytes, *input_bufsize);
+         input_buffer[*input_bufsize - 1] = 0;   // just in case
+         *input_bufsize = inp_len;               // may increase input_bufsize
+       }
+  }
+
+UCS_string command_UCS(file_line);
+ostringstream out;
+  Command::process_line(command_UCS, &out);
+
+  // cerr << "out: '" << out.str() << "'" << endl;
+
+  // maybe store one output line
+  //
+  if (output_buffer && output_bufsize)   // caller requests a copy of the output
+     {
+       const size_t max_len = *output_bufsize - 1;   // 1 for trailing 0.
+       const size_t out_len = out.str().size();
+       if (out_len > max_len)
+            {
+              if (error)   *error = LAE_OUT_BUFFER_OVERFLOW;
+              strncpy(input_buffer, "--output buffer overflow--", max_len);
+            }
+       strncpy(output_buffer, out.str().data(), out_len);
+       output_buffer[max_len - 1] = 0;   // just in case
+       *output_bufsize = out_len;        // may increase input_bufsize
+     }
+
+   return ret;
 }
 //----------------------------------------------------------------------------
 const unsigned int *
@@ -909,10 +984,10 @@ disable_safe_mode()
    uprefs.safe_mode = false;
 }
 //----------------------------------------------------------------------------
+const int libapl_version = 0;   // not standard interpreter
 int64_t get_main()
 {
    return 0;
-
 }
 //----------------------------------------------------------------------------
 

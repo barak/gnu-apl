@@ -3,6 +3,15 @@
 " Maintainer:   Jürgen Sauermann <bug-apl@gnu.org>
 " Last Change:  2012 Mar 3
 
+" for this file to work, you may want to, for example:
+" 1. copy this file to /etv/vim, and
+" 2. add the following lines (uncommented) to file /etc/vim/vimrc
+"
+" Source a GNU APL syntax checking if available
+" if filereadable("/etc/vim/apl.vim")
+"   source /etc/vim/apl.vim
+" endif
+
 " standard APL comment
 syn region aplComment     start="⍝" end="$"
 

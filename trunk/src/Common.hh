@@ -83,6 +83,9 @@ using namespace std;
 /// true when a WINCH (window size changed) signal was received
 extern bool got_WINCH;
 
+/// libapl_version > 0, or 0 if not using libapl
+extern const int libapl_version;
+
 /// return the address of main(int argc, char * argv[]) if preset (apl binary)
 /// or 0 (for shared libraries) as to avoid that the main symbol is undefined.
 extern int64_t get_main();

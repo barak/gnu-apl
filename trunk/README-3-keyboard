@@ -75,6 +75,7 @@ option, currently:
     support-files/Dirk,
     support-files/Dyalog-Keyboard,
     support-files/Jürgen-Mint-19,
+    support-files/Jürgen-Mint-21,
     support-files/old-Keyboard,
     support-files/OS-X-Keyboard,
     support-files/Unicomp-Keyboard, and
@@ -186,6 +187,9 @@ GNOME desktop). For those who used xmodmap with a Dyalog keyboard layout,
 a 1:1 replacement based on setxkbmap exists, see file README in directory
 support-files/Jürgen-Mint-19. This file is a hack that is somewhat easier
 to use than "proper" setxkbmap/xkbcomp setup explained in the next section.
+
+EVEN LATER NEWS: as of Mint-21 xmodmap is working again. (at least with the
+GNOME desktop). See file support-files/Jürgen-Mint-21.
 
 4. setxkbmap/xkbcomp
 ====================

@@ -73,7 +73,7 @@ IO_Files::get_file_line(UTF8_string & line, bool & eof)
                   UCS_string LX = Workspace::get_LX();
                   if (LX.size())   // ⎕LX pending
                      {
-                       Command::process_line(LX);
+                       Command::process_line(LX, 0);
                        eof = false;
                        return;
                      }

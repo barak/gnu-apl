@@ -85,8 +85,8 @@ configure_options="$0 $configure_args"
 
 m4_include([m4/apl_sugar.m4])
 
-AC_PREREQ([2.65])
-AC_INIT([GNU APL], [1.8], [bug-apl@gnu.org])
+AC_PREREQ([2.71])
+AC_INIT([GNU APL],[1.8],[bug-apl@gnu.org])
 AC_PREFIX_DEFAULT( /usr/local )
 AC_CONFIG_AUX_DIR([.])
 
@@ -126,7 +126,7 @@ AC_PROG_CXX
 AC_PROG_CC
 # AC_PROG_RANLIB   obsolteted by LT_INIT
 
-AC_GNU_SOURCE
+AC_USE_SYSTEM_EXTENSIONS
 
 # add the current directory (i.e. from where ./configure was called) to the
 # include path, so that the files created by ./configure are found. This
@@ -464,6 +464,7 @@ AC_CONFIG_FILES([Makefile
                  support-files/Dirk/Makefile
                  support-files/Dyalog-Keyboard/Makefile
                  support-files/Juergen-Mint-19/Makefile
+                 support-files/Juergen-Mint-21/Makefile
                  support-files/old-Keyboard/Makefile
                  support-files/OS-X-Keyboard/Makefile
                  support-files/Unicomp-Keyboard/Makefile

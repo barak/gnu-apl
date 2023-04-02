@@ -116,6 +116,35 @@ extern LIBAPL_error apl_exec_ucs(const unsigned int * line_ucs);
 /// was allocated with strndup(), therefore the caller must free() it.
 extern const char * apl_command(const char * command_utf8);
 
+/** perform one step (line) of a REPL loop. Return the file sequence
+    number > 0 from where the line was read, or 0 if all files in
+    InputFile::files_todo were read. Called with:
+
+    input_buffer:  a buffer allocated by the caller, or NULL if the
+                   APL input is not of interest
+    input_bufsize" size of the \b input_buffer
+    output_buffer: a buffer allocated by the caller, or NULL if the
+                    APL output is not of interest.
+    output_bufsize" size of the \b output_buffer
+
+   On return:
+
+    input_buffer:  APL input passed to APL. Always 0-terminated, but possibly
+                   truncted to fit the input_bufsize
+    input_bufsize: size of the \b input_buffer (before being truncated)
+    output_buffer: APL output from APL. Always 0-terminated, but possibly
+                   truncted to fit the output_bufsize
+    output_bufsize: size of the \b input_buffer (before being truncated)
+    error:         an error (typically IN/OUT_BUFFER_OVERFLOW).
+
+ **/
+extern long repl(char * input_buffer, int * input_bufsize,
+                 char * output_buffer, int * output_bufsize,
+                 LIBAPL_error * error);
+
+/// call repl() until all scripts were processed.
+#define SYNC_APL_SCRIPTS() { do ; while(repl(0, 0, 0, 0, 0)); }
+
 /// Pass `command` to the command processor and return its output. line_ucs
 /// is a 0-terminated string of unicode integers (and so is the result)
 /// caller shall free() the returned unsigned int *.

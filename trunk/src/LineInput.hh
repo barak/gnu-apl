@@ -63,8 +63,8 @@ public:
    /// clear history
    void clear_history(ostream & out);
 
-   /// print history to \b out
-   void print_history(ostream & out) const;
+   /// print history to \b out, maybe filter wirh filter
+   void print_history(ostream & out, const UCS_string & filter) const;
 
    /// start a new up/down sequence
    void next()
@@ -336,8 +336,8 @@ public:
       {  the_line_input->history.clear_history(out); }
 
    /// print history to \b out
-   static void print_history(ostream & out)
-      {  the_line_input->history.print_history(out); }
+   static void print_history(ostream & out, const UCS_string & filter)
+      {  the_line_input->history.print_history(out, filter); }
 
    /// add a line to the history
    static void add_history_line(const UCS_string & line)

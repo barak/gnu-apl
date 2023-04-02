@@ -1,4 +1,4 @@
-This is libapl.info, produced by makeinfo version 6.5 from libapl.texi.
+This is libapl.info, produced by makeinfo version 6.8 from libapl.texi.
 
 INFO-DIR-SECTION GNU programming tools
 START-INFO-DIR-ENTRY
@@ -129,6 +129,9 @@ Unicodes.
      note that LF expansion may be triggered in other places, therefore
      expand_LF_to_CRLF(0) alone does not guarantee that no CR characters
      are being printed.
+
+‘SYNC_APL_SCRIPTS’ and ‘repl’
+     See *note Non-atomic Operations: #non-atomic-operations.
 
 No other GNU APL header is exposed.
 
@@ -424,9 +427,10 @@ cc myprog.c -lapl -lstdc++ -o myprog
 * Menu:
 
 * The loc parameter and LOC macro::
+* Non-atomic Operations::
 
 
-File: libapl.info,  Node: The loc parameter and LOC macro,  Up: Programming notes
+File: libapl.info,  Node: The loc parameter and LOC macro,  Next: Non-atomic Operations,  Up: Programming notes
 
 3.1 The ‘loc’ parameter and ‘LOC’ macro
 =======================================
@@ -438,32 +442,170 @@ certain debugging services.  You can put in anything you like, but most
 convenient is ‘LOC’, a macro that expands to the file name and line
 number.
 
+
+File: libapl.info,  Node: Non-atomic Operations,  Prev: The loc parameter and LOC macro,  Up: Programming notes
+
+3.2 Non-atomic Operations
+=========================
+
+3.2.1 Architecture of the GNU APL interpreter
+---------------------------------------------
+
+The "normal" GNU APL interpreter has, simplified, the following
+architecture:
+
+              ╔═══════════╗               ╔════════════════╗
+              ║ Frontend  ║               ║    File-I/O    ║
+              ║           ║    .apl       ║                ║
+  stdin  ─────╢  ┌────┐   ╠═══════════════╣ .apl Scripts   ║ 
+  stdout ─────╢  │REPL│   ║               ║ .xml Snapshots ║
+              ║  └────┘   ║               ║                ║
+              ╚═════╤═════╝               ╚═══════╦════════╝
+                    │                             ║
+              ╔═════╧═════╗                       ║
+              ║  Backend  ║    .xml               ║
+              ║───────────╠═══════════════════════╝
+              ║ (APL Core)║
+              ╚═══════════╝
+
+The backend handles most of the APL commands and the interpretation of
+APL programs.  By definition (e.g.  in the ISO APL standard) the backend
+works in a strict line-by-line fashion.
+
+The frontend is responsible for:
+
+   • pushing individual lines from stdin into the backend, and/or
+   • chopping apl scripts into individual lines and pushing them,
+     line-by-line, into the backend, and after that
+   • displaying the output from the backend (if any) on stdout.
+
+3.2.2 Architecture of the libapl library
+----------------------------------------
+
+3.2.3 Consequences
+------------------
+
+The vast majority of GNU APL commands (and, for that matter, APL
+expressions that execute (⍎) GNU APL commands) are atomic, which shall
+mean that the command is a single line passed to the APL core (with
+libapl function apl_command() or apl_command_ucs()) and the result is a
+(typically short) response string.
+
+Some commands, most importantly )COPY of .apl files, are not atomic
+since they have to pass multiple lines (of the .apl file or files) to
+the APL core and the combined output of all these commands may become
+large.  Note that, in contrast, )COPY of .xml files is atomic and
+therefore )COPY of .xml files is usually a simpler and thus better
+choice than )COPY of .apl files.  Another noteworthy example of
+non-atomic operations is the ∇-editor into which, after opening it,
+several body lines of APL functions need to be passed.
+
+It is essential to understand that, in the case of )COPY with .apl
+functions), the )COPY command itself merely opens the .apl file but does
+NOT pass the lines of the just opened .apl file to the interpreter.  The
+"normal" GNU APL interpreter has a so-called REPL (for
+Read/Evaluate/Print/Loop) which causes the lines of .apl files to be
+passed into the APL core and their result to be displayed.  In contrast,
+libapl cannot use the REPL loop of the interpreter; instead the caller
+of non-atomic libapl commands is responsible for fetching the lines of
+.apl files and passing them to the APL core.
+
+Since this can be somewhat tricky, libapl.h #defines the convenience
+macro SYNC_APL_SCRIPTS() which is a loop around the more fine-grained
+libapl function repl():
+
+#define SYNC_APL_SCRIPTS() { do ; while(repl(0, 0, 0, 0, 0)); }
+
+The libapl function repl() fetches one line of APL and passes it to the
+APL core.  The caller of repl() may, primarily for debugging purposes,
+provide buffers into which repl() will store the input to and the output
+of the APL core.
+
+The overall purpose and effect of SYNC_APL_SCRIPTS() is that all open
+APL scripts are bein executes line-by-line.
+
+The following rules apply to SYNC_APL_SCRIPTS() and repl().  They may be
+important for C/C++ programmers that are using libapl:
+
+   • every non-atomic operation requires SYNC_APL_SCRIPTS() immediatly
+     after it.  For example:
+       apl_command(")COPY ./foo.apl");   /* open the script foo.apl  */
+       SYNC_APL_SCRIPTS();               /* execute lines in foo.apl */
+
+   • SYNC_APL_SCRIPTS() does no harm; using it after an atomic command
+     is far better than not using it after a non-atomic command.
+   • repl() essentially performs one iteration of a REPL loop and
+     therefore SYNC_APL_SCRIPTS() is an entire REPL loop.
+   • repl() returns 0 if there are no more .apl files to process and
+     otherwise an identifier > 0 that identifies an .apl file (in the
+     order discovered).
+
+The declaration of repl() is:
+
+extern long repl(char * input_buffer,  int * input_bufsize,
+                 char * output_buffer, int * output_bufsize,
+                 LIBAPL_error * error);
+
+and the following rules apply:
+
+   • a non-zero input_buffer causes repl() to copy the input line that
+     is passed to the APL core into input_buffer.  In that case
+     input_bufsize must also be non-zero and point to an integer that is
+     the size of the input_buffer.  Many programmers follow the GNU APL
+     Coding Standard which suggests that source code lines should not
+     have more than 79 charaters.  In that case an input_buffer of 400
+     bytes should suffice (considering that the input buffer is
+     UTF8-encoded so that an 80-character line may require more than 80
+     bytes).
+   • input_bufsize is initially the size of the input_buffer.  Calling
+     repl() will update it to the size of the line that was read from
+     some .apl file and passed to the APL core.
+   • a non-zero output_buffer causes repl() to copy the output line(s)
+     of the APL core into output_buffer.  In that case output_bufsize
+     must also be non-zero and point to an integer that is the size of
+     the output_buffer.  If ⎕PW is known beforehand then 4×⎕PW might be
+     a proper value for the size of the output_buffer (considering that
+     the output buffer is UTF8-encoded).
+   • after repl() returns, the input and output buffers are 0-terminated
+     and the sizes are the numbers of valid bytes (not characters!)  in
+     the respective buffer.
+   • a non-zero LIBAPL_error * error causes repl() to store an error
+     code in that location.  The error (if any) refers to repl() itself
+     (possibly LAE_IN_BUFFER_OVERFLOW or LAE_OUT_BUFFER_OVERFLOW if the
+     buffers were truncated).  In that case input_bufsize and
+     output_bufsize are the sizes that, similar to snprinf(), would have
+     been returned if the buffers were large enough.
+   • Errors detected by the APL core are NOT set in *error; the caller
+     may decode output_buffer in order to detect them.
+
 
 
 Tag Table:
 Node: Top215
-Node: Vague details of the GNU APL implementation6615
-Ref: #vague-details-of-the-gnu-apl-implementation6832
-Node: Lifespan of Values9488
-Ref: #lifespan-of-values9633
-Node: Summary of functions11304
-Ref: #summary-of-functions11489
-Node: Constructor functions12303
-Ref: #constructor-functions12464
-Node: Read access to Values13099
-Ref: #read-access-to-values13290
-Node: Write access to cells14320
-Ref: #write-access-to-cells14518
-Node: Interface to APL interpreter14850
-Ref: #interface-to-apl-interpreter15060
-Node: Destructor function16432
-Ref: #destructor-function16616
-Node: Print support16755
-Ref: #print-support16890
-Node: Programming notes17288
-Ref: #programming-notes17415
-Node: The loc parameter and LOC macro17739
-Ref: #the-loc-parameter-and-loc-macro17913
+Node: Vague details of the GNU APL implementation6716
+Ref: #vague-details-of-the-gnu-apl-implementation6933
+Node: Lifespan of Values9589
+Ref: #lifespan-of-values9734
+Node: Summary of functions11405
+Ref: #summary-of-functions11590
+Node: Constructor functions12404
+Ref: #constructor-functions12565
+Node: Read access to Values13200
+Ref: #read-access-to-values13391
+Node: Write access to cells14421
+Ref: #write-access-to-cells14619
+Node: Interface to APL interpreter14951
+Ref: #interface-to-apl-interpreter15161
+Node: Destructor function16533
+Ref: #destructor-function16717
+Node: Print support16856
+Ref: #print-support16991
+Node: Programming notes17389
+Ref: #programming-notes17516
+Node: The loc parameter and LOC macro17866
+Ref: #the-loc-parameter-and-loc-macro18070
+Node: Non-atomic Operations18448
+Ref: #non-atomic-operations18616
 
 End Tag Table
 

@@ -38,6 +38,8 @@ err_def(ASSERTION_FAILED,    "Assertion failed"                ,   0, 0x0A01 )
 err_def(DEFN_ERROR,          "DEFN ERROR"                      ,   0, 0x0B01 )
 err_def(INTERNAL_ERROR,      "Internal Error"                  ,   0, 0x0C01 )
 err_def(UNKNOWN_ERROR,       "Unknown Error"                   ,   0, 0x0D01 )
+err_def(IN_BUFFER_OVERFLOW,  "Input buffer overflow"           ,   0, 0x0D02 )
+err_def(OUT_BUFFER_OVERFLOW, "Output buffer overflow"          ,   0, 0x0D03 )
 
 err_def(INTERRUPT,           "INTERRUPT"                       ,   1,      1 )
 err_def(SYSTEM_ERROR,        "SYSTEM ERROR"                    ,   1,      2 )

@@ -980,7 +980,7 @@ UTF8_string filename = LibPaths::get_lib_filename(libref, WS_name, true,
 int dump_fd = -1;
 XML_Loading_Archive in(out, filename.c_str(), dump_fd);
 
-   if (dump_fd != -1)   // WS_name.apl
+   if (dump_fd != -1)   // probably not a WS.xml, assume WS_name.apl
       {
         the_workspace.clear_WS(out, true);
 

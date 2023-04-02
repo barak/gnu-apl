@@ -46,7 +46,7 @@ public:
    static void process_line();
 
    /// process \b line which contains a command or statements
-   static void process_line(UCS_string & line);
+   static void process_line(UCS_string & line, ostream * out);
 
    /// process \b line which contains an APL command. Return true iff the
    /// command was user-defined (and then the function for that command is

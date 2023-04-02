@@ -46,8 +46,8 @@
 #include "IO_Files.hh"
 #include "LibPaths.hh"
 #include "Macro.hh"
-#include "Output.hh"
 #include "NativeFunction.hh"
+#include "Output.hh"
 #include "Workspace.hh"
 #include "UserPreferences.hh"
 
@@ -550,7 +550,7 @@ const bool log_startup = uprefs.parse_argv_1() || log_startup0;
         if (log_startup)
            CERR << "executing --LX '" << lx << "'" << endl;
 
-        Command::process_line(lx);
+        Command::process_line(lx, 0);
       }
 
    // maybe )LOAD the CONTINUE or SETUP workspace. Do that unless the user 
@@ -571,7 +571,7 @@ const bool log_startup = uprefs.parse_argv_1() || log_startup0;
               // CONTINUE workspace exists and was not inhibited by --noCONT
               //
               UCS_string load_cmd(")LOAD CONTINUE");
-              Command::process_line(load_cmd);
+              Command::process_line(load_cmd, 0);
               return 0;
             }
 
@@ -586,7 +586,7 @@ const bool log_startup = uprefs.parse_argv_1() || log_startup0;
               // SETUP workspace exists and was not inhibited by --noCONT
               //
               UCS_string load_cmd(")LOAD SETUP");
-              Command::process_line(load_cmd);
+              Command::process_line(load_cmd, 0);
               return 0;
             }
       }
@@ -599,7 +599,7 @@ const bool log_startup = uprefs.parse_argv_1() || log_startup0;
          const char * cmd = uprefs.silent ? ")QLOAD " : ")LOAD ";
          UCS_string load_cmd(cmd);
          load_cmd.append(init_ws);
-         Command::process_line(load_cmd);
+         Command::process_line(load_cmd, 0);
       }
 
    Quad_TZ::compute_offset();
@@ -619,7 +619,7 @@ main(int argc, const char *argv[])
               const char * expr = uprefs.eval_exprs[e];
               const UTF8_string expr_utf(expr);
               UCS_string expr_ucs(expr_utf);
-              Command::process_line(expr_ucs);
+              Command::process_line(expr_ucs, 0);
             }
         Command::cmd_OFF(0);
         return 0;
@@ -639,6 +639,7 @@ main(int argc, const char *argv[])
    return 0;
 }
 
+const int libapl_version = 0;
 int64_t get_main()
 {
    return reinterpret_cast<int64_t>(&main);

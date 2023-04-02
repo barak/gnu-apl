@@ -28,7 +28,7 @@ dnl @license AllPermissive
 AC_DEFUN([AX_LIB_SQLITE3],
 [
     AC_ARG_WITH([sqlite3],
-        AC_HELP_STRING(
+        AS_HELP_STRING(
             [--with-sqlite3=@<:@PATH@:>@],
             m4_join([], [use SQLite 3 library @<:@default=yes@:>@, ],
                         [optionally specify the PATH for sqlite3 library])

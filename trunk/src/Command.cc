@@ -106,18 +106,18 @@ int count = 0;
                        {
                          const UTF8_string empty("0⍴⊂\"\"");   // 0⍴⊂""
                          prefix << UCS_string(empty);
-                         process_line(prefix);
+                         process_line(prefix, 0);
                        }
                     else if (count == 1)   // a single "string" would not nest
                        {
                          const UTF8_string encl("(,⊂");  // enclose accu...
                          prefix << UCS_string(encl) << accu << ")";
-                         process_line(prefix);
+                         process_line(prefix, 0);
                        }
                     else                   // true multi-string
                        {
                          prefix << accu;
-                         process_line(prefix);
+                         process_line(prefix, 0);
                        }
                     return;
                   }
@@ -131,14 +131,14 @@ int count = 0;
             }
          else                   // normal input line
             {
-              process_line(line);
+              process_line(line, 0);
               return;
             }
        }
 }
 //----------------------------------------------------------------------------
 void
-Command::process_line(UCS_string & line)
+Command::process_line(UCS_string & line, ostream * out)
 {
    line.remove_leading_whitespaces();
    if (line.size() == 0)           return;   // empty input line
@@ -146,12 +146,14 @@ Command::process_line(UCS_string & line)
    switch(line[0])
       {
          case UNI_R_PARENT:      // regular command, e.g. )SI
-              do_APL_command(COUT, line);
+              if (out == 0)   out = &COUT;
+              do_APL_command(*out, line);
               if (line.size())   break;
               return;
 
          case UNI_R_BRACK:       // debug command, e.g. ]LOG
-              do_APL_command(CERR, line);
+              if (out == 0)   out = &CERR;
+              do_APL_command(*out, line);
               if (line.size())   break;
               return;
 
@@ -526,7 +528,7 @@ check_EOC:
                  {
                    Workspace::pop_SI(LOC);
                    UCS_string pushed_command = Workspace::get_pushed_Command();
-                   process_line(pushed_command);
+                   process_line(pushed_command, 0);
                    pushed_command.clear();
                    Workspace::push_Command(pushed_command);   // clear in
                    return;
@@ -1411,9 +1413,16 @@ bool left_col = true;
 void
 Command::cmd_HISTORY(ostream & out, const UCS_string & arg)
 {
-   if      (arg.size() == 0)             LineInput::print_history(out);
-   else if (arg.starts_iwith("CLEAR"))   LineInput::clear_history(out);
-   else                                  out << "BAD COMMAND" << endl;
+   if (arg.size())   // )HISTORY  CLEAR (or else line filter)
+      {
+        if (arg.starts_iwith("CLEAR"))   LineInput::clear_history(out);
+        else                             LineInput::print_history(out, arg);
+      }
+   else              // )HISTORY (with no argument/filter)
+      {
+        UCS_string no_filter;
+        LineInput::print_history(out, no_filter);
+      }
 }
 //----------------------------------------------------------------------------
 void

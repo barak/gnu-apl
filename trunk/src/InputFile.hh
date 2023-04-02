@@ -38,7 +38,7 @@ struct InputFile
 {
    friend class IO_Files;
 
-   /// empty constructor
+   /// default constructor (for vector<InputFile>).
    InputFile() {}
 
    /// Normal constructor
@@ -57,7 +57,8 @@ struct InputFile
      in_function(false),
      in_variable(false),
      in_matched(false),
-     from_COPY(false)
+     from_COPY(false),
+     file_seq(++next_file_seq)
    {}
 
    /// set the from_COPY flag
@@ -83,6 +84,10 @@ struct InputFile
    /// return the current HTML mode
    int get_html() const
       { return in_html; }
+
+   /// return the sequence number of the current file (if any), 0 if not.
+   static int32_t get_file_seq()
+      { return files_todo.size() ? files_todo[0].file_seq : 0; }
 
    /// the current file
    static InputFile * current_file()
@@ -194,8 +199,14 @@ protected:
    /// true if this file comes from a )COPY XXX.apl (but not XXX.xml
    bool from_COPY;
 
+   /// a unique number for this (instance of) file.
+   int64_t file_seq;
+
    /// line number in stdin
    static int stdin_line_no;
+
+   /// the next unique file number
+   static int64_t next_file_seq;
 };
 
 #endif // __INPUT_FILE_HH_DEFINED__
