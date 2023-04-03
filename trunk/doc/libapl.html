@@ -405,7 +405,7 @@ Previous: <a href="#The-loc-parameter-and-LOC-macro" accesskey="p" rel="prev">Th
 <span id="g_t_0023non_002datomic_002doperations"></span><ul class="section-toc">
 <li><a href="#Architecture-of-the-GNU-APL-interpreter" accesskey="1">Architecture of the GNU APL interpreter</a></li>
 <li><a href="#Architecture-of-the-libapl-library" accesskey="2">Architecture of the libapl library</a></li>
-<li><a href="#Consequences" accesskey="3">Consequences</a></li>
+<li><a href="#Atomic-vs_002e-Non_002dAtomic-Operations" accesskey="3">Atomic vs. Non-Atomic Operations</a></li>
 </ul>
 <div class="subsection" id="Architecture-of-the-GNU-APL-interpreter">
 <h4 class="subsection">3.2.1 Architecture of the GNU APL interpreter</h4>
@@ -426,52 +426,88 @@ Previous: <a href="#The-loc-parameter-and-LOC-macro" accesskey="p" rel="prev">Th
               ║ (APL Core)║
               ╚═══════════╝
 </pre>
-<p>The <b>backend</b> handles most of the APL commands and the interpretation of APL programs. By definition (e.g. in the ISO APL standard) the backend works in a strict line-by-line fashion.
+<p>The <b>backend</b> handles most of the APL commands and the interpretation of APL programs. By definition (e.g. in the ISO APL standard) the backend works in a strict line-by-line fashion. <b>REPL</b> is an abbreviation for <b>R</b>ead/<b>E</b>valuate/<b>P</b>rint/<b>L</b>oop, a construct present in almost every interactive interpreter.
 </p>
 <p>The <b>frontend</b> is responsible for:
 </p>
 <ul>
 <li> pushing individual lines from <b>stdin</b> into the backend, and/or
-</li><li> chopping apl scripts into individual lines and pushing them, line-by-line,  into the backend, and after that
+</li><li> chopping .apl scripts into individual lines and pushing them, line-by-line,  into the backend, and after that
 </li><li> displaying the output from the backend (if any) on <b>stdout</b>.
 </li></ul>
 
+<p>In the special case of a <b>)COPY</b> command of an .apl file (as opposed to an .xml file) the backend opens the .apl file whereas the frontend then pushes the content of the file into the backend. For that reason, )COPY of an .xml files is atomic in the sense defined below, while )COPY of an .apl file is not. <i>This subtle difference is sometimes missed by libapl users</i>.
+</p>
 </div>
 <div class="subsection" id="Architecture-of-the-libapl-library">
 <h4 class="subsection">3.2.2 Architecture of the libapl library</h4>
 
-</div>
-<div class="subsection" id="Consequences">
-<h4 class="subsection">3.2.3 Consequences</h4>
-<p>The vast majority of GNU APL commands (and, for that matter, APL expressions that execute (⍎) GNU APL commands) are <b>atomic</b>, which shall mean that the command is a single line passed to the APL core (with libapl function apl_command() or apl_command_ucs()) and the result is a (typically short) response string.
+<p><b>libapl</b> is a thin API towards the backend. It can be used by applications written in other languages (primarily C/C++) to obtain services from the backend. Every such application replaces the frontend and must therefore follow the same as the (now removed) frontend:
 </p>
-<p>Some commands, most importantly )COPY of .apl files, are not atomic since they have to pass multiple lines (of the .apl file or files) to the APL core and the combined output of all these commands may become large. Note that, in contrast, )COPY of .xml files is atomic and therefore )COPY of .xml files is usually a simpler and thus better choice than )COPY of .apl files. Another noteworthy example of non-atomic operations is the ∇-editor into which, after opening it, several body lines of APL functions need to be passed.
-</p>
-<p>It is essential to understand that, in the case of )COPY with .apl functions), the )COPY command itself merely opens the .apl file but does NOT pass the lines of the just opened .apl file to the interpreter. The &quot;normal&quot; GNU APL interpreter has a so-called REPL (for Read/Evaluate/Print/Loop) which causes the lines of .apl files to be passed into the APL core and their result to be displayed. In contrast, libapl cannot use the REPL loop of the interpreter; instead the caller of non-atomic libapl commands is responsible for fetching the lines of .apl files and passing them to the APL core.
-</p>
-<p>Since this can be somewhat tricky, libapl.h <b>#define</b>s the convenience macro SYNC_APL_SCRIPTS() which is a loop around the more fine-grained libapl function <b>repl()</b>:
-</p>
-<pre class="verbatim">#define SYNC_APL_SCRIPTS() { do ; while(repl(0, 0, 0, 0, 0)); }
+<pre class="verbatim">              ╔═════════════╗               ╔════════════════╗
+              ║ Application ║               ║    File-I/O    ║
+              ║──────┬──────║    .apl       ║                ║
+              ║      │      ╠═══════════════╣ .apl Scripts   ║ 
+              ║  ┌───┴──┐   ║               ║ .xml Snapshots ║
+              ║  │libapl│   ║               ║                ║
+              ╚══╧═══╤══╧═══╝               ╚═══════╦════════╝
+                     │                              ║
+              ╔══════╧══════╗                       ║
+              ║   Backend   ║    .xml               ║
+              ║─────────────╠═══════════════════════╝
+              ║  (APL Core) ║
+              ╚═════════════╝
 </pre>
-<p>The libapl function <b>repl()</b> fetches one line of APL and passes it to the APL core. The caller of <b>repl()</b> may, primarily for debugging purposes, provide buffers into which <b>repl()</b> will store the input to and the output of the APL core.
+<p>In particular, every application may or may not need to provide its own REPL loop. This may be tricky for programmers that are not entirely familiar with the internals of the GNU APL code. Therefore libapl also provides functions that simplify the construction of a suitable REPL loop.
 </p>
-<p>The overall purpose and effect of SYNC_APL_SCRIPTS() is that all open APL
-scripts are bein executes line-by-line.
+</div>
+<div class="subsection" id="Atomic-vs_002e-Non_002dAtomic-Operations">
+<h4 class="subsection">3.2.3 Atomic vs. Non-Atomic Operations</h4>
+
+<p>The vast majority of GNU APL commands are <b>atomic</b>, which shall mean that the command is a single line passed to the APL core (by means of the libapl functions <b>apl_command()</b> or <b>apl_command_ucs()</b>) and the result is a (typically short) response string. An atomic command ends before any other command or APL code is being executed.
 </p>
-<p>The following rules apply to <b>SYNC_APL_SCRIPTS()</b> and <b>repl()</b>. They may be  important for C/C++ programmers that are using libapl:
+<p>Also, lines entered in immediate execution mode are atomic (unless, of course,  they execute (⍎) a non-atomic GNU APL command). Note that ⍎ of commands is a non-standard GNU APL feature.
+</p>
+<p>Some commands, most importantly )COPY of .apl files, are not atomic since the (top-level) )COPY command may invoke other commands before it completes. That is:
 </p>
 <ul>
-<li> every non-atomic operation requires SYNC_APL_SCRIPTS() immediatly after it. For example:
-<pre class="verbatim">  apl_command(&quot;)COPY ./foo.apl&quot;);   /* open the script foo.apl  */
-  SYNC_APL_SCRIPTS();               /* execute lines in foo.apl */
-</pre>
-</li><li> <b>SYNC_APL_SCRIPTS()</b> does no harm; using it after an atomic command is far better than not using it after a non-atomic command.
-</li><li> <b>repl()</b> essentially performs one iteration of a REPL loop and therefore
-SYNC_APL_SCRIPTS() is an entire REPL loop.
-</li><li> <b>repl()</b> returns 0 if there are no more .apl files to process and otherwise an identifier &gt; 0 that identifies an .apl file (in the order discovered).
+<li> )COPY of .xml files is atomic,
+</li><li> )COPY of .apl files is non-atomic,
+</li><li> The ∇-editor is is non-atomic,
+</li><li> ⎕FX is atomic, and
+</li><li> )SAVE, )DUMP, and )DUMP-HTML are atomic.
 </li></ul>
 
-<p>The declaration of <b>repl()</b> is:
+<p>It is essential to keep in mind that, in the case of )COPY with .apl files, the )COPY command itself merely opens the .apl file but does NOT pass the lines of the just opened .apl file to the interpreter. The REPL loop of a &quot;normal&quot; GNU APL interpreter pushes the lines of .apl files into and displays their result. In contrast, libapl has no REPL loop itself but instead provides a helper macro and a helper function for constructing proper REPL loops in the application that
+uses libapl.
+</p>
+<p>First of all, libapl.h <b>#define</b>s the convenience macro <b>SYNC_APL_SCRIPTS</b> which is a loop around the more fine-grained libapl function <b>repl()</b>:
+</p>
+<pre class="verbatim">#define SYNC_APL_SCRIPTS   { do ; while(repl(0, 0, 0, 0, 0)); }
+</pre>
+<p>The libapl function <b>repl()</b> fetches one line of APL and passes it to the APL core. It returns non-zero as long as there are more APL lines available. The caller of <b>repl()</b> may, primarily for debugging purposes, provide buffers into which <b>repl()</b> will store the input to and the output of the APL core.
+</p>
+<p>Normally REPL loops are flat (non-recursive) and run forever. In contrast, SYNC_APL_SCRIPTS is a per file REPL loop that is recursive. If, for example, a )COPY opens an .apl  file that contains another )COPY command, then SYNC_APL_SCRIPTS returns only after both files were processed) and stops at the end of the first (top-level) .apl file.
+</p>
+<p>The overall purpose and effect of <b>SYNC_APL_SCRIPTS</b> is that all open APL
+scripts are being executed line-by-line.
+</p>
+<p>The rules for <b>SYNC_APL_SCRIPTS</b> and <b>repl()</b> are:
+</p>
+<ul>
+<li> every non-atomic operation requires SYNC_APL_SCRIPTS immediatly after it. For example:
+<pre class="verbatim">  apl_command(&quot;)COPY ./foo.apl&quot;);   /* open the script foo.apl  */
+  SYNC_APL_SCRIPTS                  /* execute lines in foo.apl */
+</pre>
+</li><li> <b>SYNC_APL_SCRIPTS</b> does no harm; using it after an atomic command is far better than not using it after a non-atomic command.
+</li><li> <b>repl()</b> essentially performs one iteration of a REPL loop and therefore
+SYNC_APL_SCRIPTS is an entire REPL loop.
+</li><li> <b>repl()</b> returns 0 if there are no more .apl files to process and otherwise an identifier &gt; 0 that identifies an .apl file (in the order discovered).
+</li><li> the libapl can avoid the need for <b>SYNC_APL_SCRIPTS</b> entirely by using only .xml workspaces instead of .apl scripts.
+</li><li> the )LOAD command is essentially )CLEAR followed by )COPY, therefore the difference between .apl and .xml files applies as well.
+</li></ul>
+
+<p>The declaration of function <b>repl()</b> is:
 </p>
 <pre class="verbatim">extern long repl(char * input_buffer,  int * input_bufsize,
                  char * output_buffer, int * output_bufsize,

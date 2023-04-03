@@ -143,7 +143,7 @@ extern long repl(char * input_buffer, int * input_bufsize,
                  LIBAPL_error * error);
 
 /// call repl() until all scripts were processed.
-#define SYNC_APL_SCRIPTS() { do ; while(repl(0, 0, 0, 0, 0)); }
+#define SYNC_APL_SCRIPTS   { do ; while(repl(0, 0, 0, 0, 0)); }
 
 /// Pass `command` to the command processor and return its output. line_ucs
 /// is a 0-terminated string of unicode integers (and so is the result)
