@@ -1004,7 +1004,7 @@ help:
 #
 .PHONY: develop
 develop:
-	CXXFLAGS="-Wno-parentheses -fstrict-aliasing -rdynamic -gdwarf-2" \
+	CXXFLAGS="-fstrict-aliasing -rdynamic -gdwarf-2" \
         ./configure  --enable-maintainer-mode DEVELOP_WANTED=yes CXX_WERROR=yes
 	make all
 

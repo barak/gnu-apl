@@ -1406,6 +1406,7 @@ Prefix::MM_is_FM(Function_PC pc)
 
               case TC_R_PARENT:
                    pc = Function_PC(int(pc) + 1);
+                   continue;
 
               default: CERR << "next: " << tc_next << endl;
                        TODO;

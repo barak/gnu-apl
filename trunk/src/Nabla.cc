@@ -805,8 +805,8 @@ Nabla::execute_edit()
    //
    if (current_text.size() == 0)   // empty line (we MAY need it)
       {
-        if (!uprefs.multi_line_strings_3)   return 0;   // we fo not
-        if (out_of_order)                   return 0;   // we fo not;
+        if (!uprefs.multi_line_strings_3)   return 0;   // we do not
+        if (out_of_order)                   return 0;   // we do not;
       }
 
    // check that current_text is valid
