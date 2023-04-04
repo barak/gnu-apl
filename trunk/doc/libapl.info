@@ -497,15 +497,15 @@ services from the backend.  Every such application replaces the frontend
 and must therefore follow the same as the (now removed) frontend:
 
               ╔═════════════╗               ╔════════════════╗
-              ║ Application ║               ║    File-I/O    ║
-              ║──────┬──────║    .apl       ║                ║
+              ║ Application ║      ← ←      ║    File-I/O    ║
+              ║──────┬──────║     .apl      ║                ║
               ║      │      ╠═══════════════╣ .apl Scripts   ║ 
               ║  ┌───┴──┐   ║               ║ .xml Snapshots ║
               ║  │libapl│   ║               ║                ║
               ╚══╧═══╤══╧═══╝               ╚═══════╦════════╝
                      │                              ║
-              ╔══════╧══════╗                       ║
-              ║   Backend   ║    .xml               ║
+              ╔══════╧══════╗     ← →     → →       ║
+              ║   Backend   ║    .xml    .apl       ║
               ║─────────────╠═══════════════════════╝
               ║  (APL Core) ║
               ╚═════════════╝
@@ -533,19 +533,23 @@ Some commands, most importantly )COPY of .apl files, are not atomic
 since the (top-level) )COPY command may invoke other commands before it
 completes.  That is:
 
-   • )COPY of .xml files is atomic,
    • )COPY of .apl files is non-atomic,
+   • )COPY of .xml files is atomic,
    • The ∇-editor is is non-atomic,
    • ⎕FX is atomic, and
    • )SAVE, )DUMP, and )DUMP-HTML are atomic.
 
+As the list above shows, every non-atomic operation has an atomic
+alternative.
+
 It is essential to keep in mind that, in the case of )COPY with .apl
 files, the )COPY command itself merely opens the .apl file but does NOT
-pass the lines of the just opened .apl file to the interpreter.  The
-REPL loop of a "normal" GNU APL interpreter pushes the lines of .apl
-files into and displays their result.  In contrast, libapl has no REPL
-loop itself but instead provides a helper macro and a helper function
-for constructing proper REPL loops in the application that uses libapl.
+pass the lines of the just opened .apl file to the backend.  The REPL
+loop of a "normal" GNU APL interpreter pushes the lines of .apl files
+into the backeend and displays their result.  In contrast, libapl has no
+REPL loop itself but instead provides a helper macro and a helper
+function for constructing proper REPL loops in the application that uses
+libapl.
 
 First of all, libapl.h #defines the convenience macro SYNC_APL_SCRIPTS
 which is a loop around the more fine-grained libapl function repl():
@@ -600,7 +604,7 @@ and the following rules apply:
      input_bufsize must also be non-zero and point to an integer that is
      the size of the input_buffer.  Many programmers follow the GNU APL
      Coding Standard which suggests that source code lines should not
-     have more than 79 charaters.  In that case an input_buffer of 400
+     have more than 79 characters.  In that case an input_buffer of 400
      bytes should suffice (considering that the input buffer is
      UTF8-encoded so that an 80-character line may require more than 80
      bytes).

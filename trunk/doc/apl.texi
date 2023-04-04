@@ -3030,7 +3030,7 @@ system function ⎕FIO. The syntax of ⎕FIO is the same as for FILE_IO. The
 @section ⎕DLX - Knuth's Dancing Links Algorithm
 
 ⎕DLX is an implementation of Donald Knuth's Dancing Links Algorithm (called
-DLX by Knuth himself, but is sometimes also referred to as Knuth's Algorithm X)
+DLX by Knuth himself, but is sometimes also referred to as Knuth's Algorithm X).
 ⎕DLX is a generic backtracking machinery that can be used to dramatically
 simplify problems like the 8 queens problem on a chess board or sudokus.
 

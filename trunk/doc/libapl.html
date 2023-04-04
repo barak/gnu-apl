@@ -445,15 +445,15 @@ Previous: <a href="#The-loc-parameter-and-LOC-macro" accesskey="p" rel="prev">Th
 <p><b>libapl</b> is a thin API towards the backend. It can be used by applications written in other languages (primarily C/C++) to obtain services from the backend. Every such application replaces the frontend and must therefore follow the same as the (now removed) frontend:
 </p>
 <pre class="verbatim">              ╔═════════════╗               ╔════════════════╗
-              ║ Application ║               ║    File-I/O    ║
-              ║──────┬──────║    .apl       ║                ║
+              ║ Application ║      ← ←      ║    File-I/O    ║
+              ║──────┬──────║     .apl      ║                ║
               ║      │      ╠═══════════════╣ .apl Scripts   ║ 
               ║  ┌───┴──┐   ║               ║ .xml Snapshots ║
               ║  │libapl│   ║               ║                ║
               ╚══╧═══╤══╧═══╝               ╚═══════╦════════╝
                      │                              ║
-              ╔══════╧══════╗                       ║
-              ║   Backend   ║    .xml               ║
+              ╔══════╧══════╗     ← →     → →       ║
+              ║   Backend   ║    .xml    .apl       ║
               ║─────────────╠═══════════════════════╝
               ║  (APL Core) ║
               ╚═════════════╝
@@ -471,15 +471,16 @@ Previous: <a href="#The-loc-parameter-and-LOC-macro" accesskey="p" rel="prev">Th
 <p>Some commands, most importantly )COPY of .apl files, are not atomic since the (top-level) )COPY command may invoke other commands before it completes. That is:
 </p>
 <ul>
-<li> )COPY of .xml files is atomic,
-</li><li> )COPY of .apl files is non-atomic,
+<li> )COPY of .apl files is non-atomic,
+</li><li> )COPY of .xml files is atomic,
 </li><li> The ∇-editor is is non-atomic,
 </li><li> ⎕FX is atomic, and
 </li><li> )SAVE, )DUMP, and )DUMP-HTML are atomic.
 </li></ul>
 
-<p>It is essential to keep in mind that, in the case of )COPY with .apl files, the )COPY command itself merely opens the .apl file but does NOT pass the lines of the just opened .apl file to the interpreter. The REPL loop of a &quot;normal&quot; GNU APL interpreter pushes the lines of .apl files into and displays their result. In contrast, libapl has no REPL loop itself but instead provides a helper macro and a helper function for constructing proper REPL loops in the application that
-uses libapl.
+<p>As the list above shows, every non-atomic operation has an atomic alternative.
+</p>
+<p>It is essential to keep in mind that, in the case of )COPY with .apl files, the )COPY command itself merely opens the .apl file but does NOT pass the lines of the just opened .apl file to the backend. The REPL loop of a &quot;normal&quot; GNU APL interpreter pushes the lines of .apl files into the backeend and displays their result. In contrast, libapl has no REPL loop itself but instead provides a helper macro and a helper function for constructing proper REPL loops in the application that uses libapl.
 </p>
 <p>First of all, libapl.h <b>#define</b>s the convenience macro <b>SYNC_APL_SCRIPTS</b> which is a loop around the more fine-grained libapl function <b>repl()</b>:
 </p>
@@ -516,7 +517,7 @@ SYNC_APL_SCRIPTS is an entire REPL loop.
 <p>and the following rules apply:
 </p>
 <ul>
-<li> a non-zero <b>input_buffer</b> causes <b>repl()</b> to copy the input line that is passed to the APL core into <b>input_buffer</b>. In that case <b>input_bufsize</b> must also be non-zero and point to an integer that is the size of the <b>input_buffer</b>. Many programmers follow the <b>GNU APL Coding Standard</b> which suggests that source code lines should not have more than 79 charaters. In that case an input_buffer of 400 bytes should suffice (considering that the input buffer is UTF8-encoded so that an 80-character line may require more than 80 bytes).
+<li> a non-zero <b>input_buffer</b> causes <b>repl()</b> to copy the input line that is passed to the APL core into <b>input_buffer</b>. In that case <b>input_bufsize</b> must also be non-zero and point to an integer that is the size of the <b>input_buffer</b>. Many programmers follow the <b>GNU APL Coding Standard</b> which suggests that source code lines should not have more than 79 characters. In that case an input_buffer of 400 bytes should suffice (considering that the input buffer is UTF8-encoded so that an 80-character line may require more than 80 bytes).
 </li><li> <b>input_bufsize</b> is initially the size of the <b>input_buffer</b>. Calling <b>repl()</b> will update it to the size of the line that was read from some .apl file and passed to the APL core.
 </li><li> a non-zero <b>output_buffer</b> causes <b>repl()</b> to copy the output line(s) of the APL core into <b>output_buffer</b>. In that case <b>output_bufsize</b> must also be non-zero and point to an integer that is the size of the <b>output_buffer</b>. If <b>⎕PW</b> is known beforehand then <b>4×⎕PW</b> might be a proper value for the size of the <b>output_buffer</b> (considering that the output buffer is UTF8-encoded).
 </li><li> after <b>repl()</b> returns, the input and output buffers are 0-terminated and the sizes are the numbers of valid bytes (not characters!) in the respective buffer.

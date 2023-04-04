@@ -1416,11 +1416,12 @@ Prefix::MM_is_FM(Function_PC pc)
 void
 Prefix::reduce_M_M__()
 {
+   action = RA_PUSH_NEXT;   // normally the left M is an operator
    if (is_SLASH_or_BACKSLASH(at0().get_tag()))
       {
         if (MM_is_FM(PC))
            {
-             CERR << "/ is function" << endl;
+             // CERR << "/ is function" << endl;
              enum { OPER1_TO_FUN2 = TC_OPER1 - TC_FUN2 };
              const TokenTag tfun = TokenTag(at0().get_tag() - OPER1_TO_FUN2);
              at0().ChangeTag(tfun);
@@ -1428,13 +1429,9 @@ Prefix::reduce_M_M__()
            }
         else
            {
-             CERR << "/ is operator" << endl;
-             action = RA_PUSH_NEXT;
+             // CERR << "/ is operator" << endl;
            }
-        return;
       }
-
-   action = RA_PUSH_NEXT;
 }
 //----------------------------------------------------------------------------
 void

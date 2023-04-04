@@ -373,15 +373,15 @@ In the special case of a @b{)COPY} command of an .apl file (as opposed to an .xm
 
 @verbatim
               ╔═════════════╗               ╔════════════════╗
-              ║ Application ║               ║    File-I/O    ║
-              ║──────┬──────║    .apl       ║                ║
+              ║ Application ║      ← ←      ║    File-I/O    ║
+              ║──────┬──────║     .apl      ║                ║
               ║      │      ╠═══════════════╣ .apl Scripts   ║ 
               ║  ┌───┴──┐   ║               ║ .xml Snapshots ║
               ║  │libapl│   ║               ║                ║
               ╚══╧═══╤══╧═══╝               ╚═══════╦════════╝
                      │                              ║
-              ╔══════╧══════╗                       ║
-              ║   Backend   ║    .xml               ║
+              ╔══════╧══════╗     ← →     → →       ║
+              ║   Backend   ║    .xml    .apl       ║
               ║─────────────╠═══════════════════════╝
               ║  (APL Core) ║
               ╚═════════════╝
@@ -398,15 +398,16 @@ Also, lines entered in immediate execution mode are atomic (unless, of course,  
 Some commands, most importantly )COPY of .apl files, are not atomic since the (top-level) )COPY command may invoke other commands before it completes. That is:
 
 @itemize
-@item )COPY of .xml files is atomic,
 @item )COPY of .apl files is non-atomic,
+@item )COPY of .xml files is atomic,
 @item The ∇-editor is is non-atomic,
 @item ⎕FX is atomic, and
 @item )SAVE, )DUMP, and )DUMP-HTML are atomic.
 @end itemize
 
-It is essential to keep in mind that, in the case of )COPY with .apl files, the )COPY command itself merely opens the .apl file but does NOT pass the lines of the just opened .apl file to the interpreter. The REPL loop of a "normal" GNU APL interpreter pushes the lines of .apl files into and displays their result. In contrast, libapl has no REPL loop itself but instead provides a helper macro and a helper function for constructing proper REPL loops in the application that
-uses libapl.
+As the list above shows, every non-atomic operation has an atomic alternative.
+
+It is essential to keep in mind that, in the case of )COPY with .apl files, the )COPY command itself merely opens the .apl file but does NOT pass the lines of the just opened .apl file to the backend. The REPL loop of a "normal" GNU APL interpreter pushes the lines of .apl files into the backeend and displays their result. In contrast, libapl has no REPL loop itself but instead provides a helper macro and a helper function for constructing proper REPL loops in the application that uses libapl.
 
 First of all, libapl.h @b{#define}s the convenience macro @b{SYNC_APL_SCRIPTS} which is a loop around the more fine-grained libapl function @b{repl()}:
 
@@ -449,7 +450,7 @@ extern long repl(char * input_buffer,  int * input_bufsize,
 and the following rules apply:
 
 @itemize
-@item a non-zero @b{input_buffer} causes @b{repl()} to copy the input line that is passed to the APL core into @b{input_buffer}. In that case @b{input_bufsize} must also be non-zero and point to an integer that is the size of the @b{input_buffer}. Many programmers follow the @b{GNU APL Coding Standard} which suggests that source code lines should not have more than 79 charaters. In that case an input_buffer of 400 bytes should suffice (considering that the input buffer is UTF8-encoded so that an 80-character line may require more than 80 bytes).
+@item a non-zero @b{input_buffer} causes @b{repl()} to copy the input line that is passed to the APL core into @b{input_buffer}. In that case @b{input_bufsize} must also be non-zero and point to an integer that is the size of the @b{input_buffer}. Many programmers follow the @b{GNU APL Coding Standard} which suggests that source code lines should not have more than 79 characters. In that case an input_buffer of 400 bytes should suffice (considering that the input buffer is UTF8-encoded so that an 80-character line may require more than 80 bytes).
 @item @b{input_bufsize} is initially the size of the @b{input_buffer}. Calling @b{repl()} will update it to the size of the line that was read from some .apl file and passed to the APL core.
 @item a non-zero @b{output_buffer} causes @b{repl()} to copy the output line(s) of the APL core into @b{output_buffer}. In that case @b{output_bufsize} must also be non-zero and point to an integer that is the size of the @b{output_buffer}. If @b{⎕PW} is known beforehand then @b{4×⎕PW} might be a proper value for the size of the @b{output_buffer} (considering that the output buffer is UTF8-encoded).
 @item after @b{repl()} returns, the input and output buffers are 0-terminated and the sizes are the numbers of valid bytes (not characters!) in the respective buffer.

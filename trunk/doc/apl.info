@@ -1,4 +1,4 @@
-This is apl.info, produced by makeinfo version 6.5 from apl.texi.
+This is apl.info, produced by makeinfo version 6.8 from apl.texi.
 
 This is the manual for GNU APL, an implementation of ISO standard 13751
 "Programming Language APL, Extended"
@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-March 14, 2023
+April 4, 2023
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
@@ -1259,7 +1259,7 @@ Hello world
 └ϵ──────────────────┘
 
 
-   Another advantage of ««« ...  »»» over """ ...  """ is that a decent
+   Another advantage of ««« ...  »»» over """ ...  """  is that a decent
 text editor (read: vi/vim) may jump back and forth between the
 corresponding opening « and closing » with a single key stroke
 (character % in vi/vim).  For this to work, add the following line to
@@ -2932,7 +2932,7 @@ File: apl.info,  Node: Section 2.24,  Next: Section 2.25,  Prev: Section 2.23,  
 
 ⎕DLX is an implementation of Donald Knuth’s Dancing Links Algorithm
 (called DLX by Knuth himself, but is sometimes also referred to as
-Knuth’s Algorithm X) ⎕DLX is a generic backtracking machinery that can
+Knuth’s Algorithm X). ⎕DLX is a generic backtracking machinery that can
 be used to dramatically simplify problems like the 8 queens problem on a
 chess board or sudokus.
 
@@ -3592,6 +3592,7 @@ document; in text mode see file doc/PLOT_circle.png):
 
  [image src="PLOT_circle.png" ]
 
+
 2.31.1.2 Real Plot Data B
 .........................
 
@@ -3613,6 +3614,7 @@ Ymax ← ⌈/,B            ⍝ largest value in B
 document; in text mode see file doc/PLOT_zigzag.png):
 
  [image src="PLOT_zigzag.png" ]
+
 
    NOTE: In theory one can also mix real and complex values, even though
 doing so makes little sense.  If at least one item of the plot data B is
@@ -7030,15 +7032,15 @@ please read <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 
 Tag Table:
 Node: Top383
-Node: Chapter 11573
-Node: Chapter 223282
-Node: Section 2.125231
-Node: Subsection 2.1.126453
-Node: Subsection 2.1.227084
-Node: Subsection 2.1.327915
-Node: Subsection 2.1.433721
-Node: Subsection 2.1.537520
-Node: Subsection 2.1.638378
+Node: Chapter 11572
+Node: Chapter 223281
+Node: Section 2.125230
+Node: Subsection 2.1.126452
+Node: Subsection 2.1.227083
+Node: Subsection 2.1.327914
+Node: Subsection 2.1.433720
+Node: Subsection 2.1.537519
+Node: Subsection 2.1.638377
 Node: Subsection 2.1.746501
 Node: Subsection 2.1.848251
 Node: Section 2.251566
@@ -7064,39 +7066,39 @@ Node: Section 2.21101099
 Node: Section 2.22106133
 Node: Section 2.23109414
 Node: Section 2.24109705
-Node: Section 2.25120532
-Node: Section 2.26120804
-Node: Section 2.27127382
-Node: Section 2.28129842
-Node: Section 2.29130511
-Node: Section 2.30132163
-Node: Section 2.31135950
-Node: Output File Format151868
-Node: Section 2.32153043
-Node: Section 2.33162441
-Node: Section 2.34163468
-Node: Section 2.35178183
-Node: Section 2.36188249
-Node: Section 2.37192368
-Node: Section 2.38194463
-Node: Section 2.39198888
-Node: Chapter 3220242
-Node: Chapter 4222743
-Node: Chapter 5223869
-Node: Section 5.1225406
-Node: Section 5.2226686
-Node: Section 5.3227046
-Node: Section 5.4227288
-Node: Section 5.5227950
-Node: Section 5.6228428
-Node: Section 5.7229200
-Node: Section 5.8229657
-Node: Chapter 6230059
-Node: Section 6.1230478
-Node: Section 6.2231165
-Node: Chapter 7231996
-Node: Section 7.1232499
-Node: Section 7.2257813
+Node: Section 2.25120533
+Node: Section 2.26120805
+Node: Section 2.27127383
+Node: Section 2.28129843
+Node: Section 2.29130512
+Node: Section 2.30132164
+Node: Section 2.31135951
+Node: Output File Format151871
+Node: Section 2.32153046
+Node: Section 2.33162444
+Node: Section 2.34163471
+Node: Section 2.35178186
+Node: Section 2.36188252
+Node: Section 2.37192371
+Node: Section 2.38194466
+Node: Section 2.39198891
+Node: Chapter 3220245
+Node: Chapter 4222746
+Node: Chapter 5223872
+Node: Section 5.1225409
+Node: Section 5.2226689
+Node: Section 5.3227049
+Node: Section 5.4227291
+Node: Section 5.5227953
+Node: Section 5.6228431
+Node: Section 5.7229203
+Node: Section 5.8229660
+Node: Chapter 6230062
+Node: Section 6.1230481
+Node: Section 6.2231168
+Node: Chapter 7231999
+Node: Section 7.1232502
+Node: Section 7.2257816
 
 End Tag Table
 
