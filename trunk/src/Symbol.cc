@@ -489,9 +489,9 @@ ValueStackItem vs;
    Log(LOG_SYMBOL_push_pop)
       {
         CERR << "+push-value " << name << " flags ";
-        print_flags(CERR, get_value()->get_flags()) << " ";
+        print_flags(CERR, get_var_value()->get_flags()) << " ";
         if (value_stack.size() == 0)   CERR << " (initial)";
-        CERR << " addr " << voidP(get_value().get()) << endl;
+        CERR << " addr " << voidP(get_var_value().get()) << endl;
       }
 }
 //----------------------------------------------------------------------------
@@ -518,7 +518,7 @@ const int sym_stack_size = value_stack_size();
 }
 //----------------------------------------------------------------------------
 Value_P
-Symbol::get_value()
+Symbol::get_var_value()
 {
    if (value_stack.size() && get_NC() == NC_VARIABLE)
       {
@@ -659,10 +659,10 @@ int has_result = 0;   // no result
 }
 //----------------------------------------------------------------------------
 void
-Symbol::resolve(Token & tok, bool left_sym)
+Symbol::resolve_left(Token & tok) const
 {
    Log(LOG_SYMBOL_resolve)
-      CERR << "resolve(" << left_sym << ") symbol " << get_name() << endl; 
+      CERR << "resolve_left() symbol " << get_name() << endl; 
 
    Assert1(value_stack.size());
 
@@ -670,32 +670,17 @@ const ValueStackItem & vs = value_stack.back();
    switch(vs.get_NC())
       {
         case NC_UNUSED_USER_NAME:
-             if (!left_sym)   Error::throw_symbol_error(get_name(), LOC);
              return;   // leave symbol as is
 
         case NC_LABEL:
-             if (left_sym)   SYNTAX_ERROR;   // assignment to (read-only) label
-
-             {
-               Value_P value = IntScalar(vs.get_label(), LOC);
-               Token t(TOK_APL_VALUE1, value);
-               tok.move_1(t, LOC);
-             }
-             return;
+             SYNTAX_ERROR;   // assignment to (read-only) label
 
         case NC_VARIABLE:
-             if (left_sym)   return;   // leave symbol as is
-
-             // if we resolve a variable. the value is considered grouped.
-             {
-               Token t(TOK_APL_VALUE1, CLONE_P(get_apl_value(), LOC));
-               tok.move_1(t, LOC);
-             }
-             return;
+             return;   // leave symbol as is
 
         case NC_FUNCTION:
         case NC_OPERATOR:
-             if (left_sym && vs.get_function()->is_lambda())
+             if (vs.get_function()->is_lambda())
                 {
                   // lambda re-assign, e.g. SYM←{ ... }
                   //
@@ -705,7 +690,51 @@ const ValueStackItem & vs = value_stack.back();
              return;
 
         case NC_SYSTEM_VAR:
-             if (left_sym)   return;   // leave symbol as is
+             return;   // leave symbol as is
+             return;
+
+        default:
+             CERR << "Symbol is '" << get_name() << "' at " << LOC << endl;
+             SYNTAX_ERROR;
+      }
+}
+//----------------------------------------------------------------------------
+void
+Symbol::resolve_right(Token & tok) const
+{
+   Log(LOG_SYMBOL_resolve)
+      CERR << "resolve_right() symbol " << get_name() << endl; 
+
+   Assert1(value_stack.size());
+
+const ValueStackItem & vs = value_stack.back();
+   switch(vs.get_NC())
+      {
+        case NC_UNUSED_USER_NAME:
+             Error::throw_symbol_error(get_name(), LOC);
+
+        case NC_LABEL:
+             {
+               Value_P value = IntScalar(vs.get_label(), LOC);
+               Token t(TOK_APL_VALUE1, value);
+               tok.move_1(t, LOC);
+             }
+             return;
+
+        case NC_VARIABLE:
+             // if we resolve a variable. the value is considered grouped.
+             {
+               Token t(TOK_APL_VALUE1, CLONE_P(get_apl_value(), LOC));
+               tok.move_1(t, LOC);
+             }
+             return;
+
+        case NC_FUNCTION:
+        case NC_OPERATOR:
+             tok.move_2(vs.get_function()->get_token(), LOC);
+             return;
+
+        case NC_SYSTEM_VAR:
              resolve_shared_variable(tok);
              return;
 
@@ -726,7 +755,7 @@ Symbol::resolve_lv(const char * loc)
    if (value_stack.back().get_NC() == NC_VARIABLE)
       {
         value_stack.back().isolate(loc);
-        Value_P Z = get_value();
+        Value_P Z = get_var_value();
         return Token(TOK_APL_VALUE1, Z->get_cellrefs(loc));
       }
 
@@ -738,7 +767,7 @@ Symbol::resolve_lv(const char * loc)
 }
 //----------------------------------------------------------------------------
 TokenClass
-Symbol::resolve_class(bool left)
+Symbol::resolve_class(bool left) const
 {
    Assert1(value_stack.size());
 
@@ -1367,7 +1396,7 @@ const ErrorCode ec = ErrorCode(response->get__SVAR_ASSIGNED__error());
 }
 //----------------------------------------------------------------------------
 void
-Symbol::resolve_shared_variable(Token & tok)
+Symbol::resolve_shared_variable(Token & tok) const
 {
    // wait for shared variable to be ready
    //

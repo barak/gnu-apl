@@ -6,6 +6,13 @@
 
    X←⎕UL
    ⎕UL←333
+SYNTAX ERROR+
+      ⎕UL←333
+      ^  ^
+
+      )more
+Assignment to read-only system variable ⎕UL
+
    ⎕UL=X
 1
 

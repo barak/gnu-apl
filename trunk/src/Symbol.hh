@@ -108,7 +108,7 @@ public:
       { return apl_val.get(); }
 
    /// return the APL value  of \b this ValueStackItem, or 0 if it has none
-   /// Only used in ⎕RL for quick in-place uopdate of the current ⎕RL.
+   /// Only used in ⎕RL for quick in-place update of the current ⎕RL.
    Value * get_val_wptr()
       { return apl_val.get(); }
 
@@ -211,16 +211,19 @@ public:
    void write_OUT(FILE * out, uint64_t & seq) const;
 
    /// set \b token according to the current NC/sym_val of \b this \b Symbol
-   virtual void resolve(Token & token, bool left);
+   virtual void resolve_left(Token & token) const;
+
+   /// set \b token according to the current NC/sym_val of \b this \b Symbol
+   virtual void resolve_right(Token & token) const;
 
    /// set \b token according to the current NC/sym_val of \b this shared var
-   void resolve_shared_variable(Token & token);
+   void resolve_shared_variable(Token & token) const;
 
-   /// resolve a variable name for an assignment
+   /// resolve a variable name for an assignment (left of ←)
    virtual Token resolve_lv(const char * loc);
 
    /// return the token class of \b this \b Symbol WITHOUT calling resolve()
-   TokenClass resolve_class(bool left);
+   TokenClass resolve_class(bool left) const;
 
    /// set current NameClass of this Symbol to NC_UNUSED_USER_NAME and remove
    /// any values associated with this symbol
@@ -322,11 +325,11 @@ public:
    /// overloaded NamedObject::get_name_ptr()
    const UCS_string * get_name_ptr() const   { return &name; }
 
-   /// overloaded NamedObject::get_function()
+   /// overloaded NamedObject::get_function(), 0 for non-functions
    virtual Function_P get_function();
 
-   /// overloaded NamedObject::get_value()
-   virtual Value_P get_value();
+   /// get the value if a variable, 0 if none
+   Value_P get_var_value();
 
    /// return a const pointer to the current APL value
    const Value * get_val_cptr() const

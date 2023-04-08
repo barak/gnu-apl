@@ -85,7 +85,7 @@ void
 print_phrase(FILE * out, int ph)
 {
 const _phrase & e = phrase_table[ph];
-int len = fprintf(out, "   phrase %2d: ", ph);
+int len = fprintf(out, "   ║  %2d  │ ", ph);
 int hash_len = 0;
 
    for (int ll = 0; ll < MAX_PHRASE_LEN; ++ll)
@@ -119,10 +119,10 @@ int hash_len = 0;
             }
        }
 
-   while (len < 40)   len += fprintf(out, " ");
-   fprintf(out, "%d", hash_len);
-   if (*e.alias)   fprintf(out, " %s", e.alias);
-   fprintf(out, "\n");
+   while (len < 36)   len += fprintf(out, " ");
+   fprintf(out, " │ %d │", hash_len);
+   fprintf(out, " %-14s", e.alias);
+   fprintf(out, "║\n");
 }
 //-----------------------------------------------------------------------------
 /// a function that prints the entire large comment at the start of
@@ -130,16 +130,26 @@ int hash_len = 0;
 void
 print_phrases(FILE * out)
 {
-   fprintf(out, "\n   /*** phrase table ***\n"
-                "\n"
-                "   phrase ##:  phrase              length alias\n"
-                "   ---------------------------------------------\n");
+   fprintf(out,
+"\n"
+"/* WARNING: this file is generated:\n"
+"\n"
+"   Generator:       tools/phrase_gen\n"
+"   Generator input: tools/phrase_gen.def\n"
+"\n"
+"   USAGE: cd tools ; make gen\n"
+"\n"
+"   ╔══════╤═════ PHRASE TABLE ═══╤═══╤═══════════════╗\n"
+"   ║number│ phrase               │len│ alias         ║\n"
+"   ╟──────┼──────────────────────┼───┼───────────────╢\n"
+          );
 
    for (int ph = 0; ph < PHRASE_COUNT; ++ph)   print_phrase(out, ph);
 
-   fprintf(out, "   ---------------------------------------------\n"
-                "\n"
-                "   *** phrase table ***/\n\n");
+   fprintf(out,
+"   ╚══════╧══════════════════════╧═══╧═══════════════╝\n"
+" */\n"
+"\n"      );
 }
 //-----------------------------------------------------------------------------
 int
@@ -201,18 +211,19 @@ int name_len = snprintf(phrase_name, sizeof(phrase_name), "%s %s %s %s",
    while (name_len && phrase_name[name_len - 1] == ' ')
          phrase_name[--name_len] = 0;
 
-   // suffix is the suffix of the reduce function. Similar to phrase_name, but
-   // the token classes are separated by '_' rather than ' '.
+   // suffix is the suffix XXX of the reduce_XXX() function. Similar to
+   // phrase_name, but the token classes are separated by '_' rather than ' '.
    //
 char suffix[100];   snprintf(suffix, sizeof(suffix), "%s_%s_%s_%s();", 
                              rn0, e.names[1], e.names[2], e.names[3]);
 
+   // member function declaration (Prefix.hh)
    fprintf(out, "   void reduce_%-20s  ///< reduce phrase %s\n",
            suffix, phrase_name);
 }
 //-----------------------------------------------------------------------------
 void
-print_entry_macro(FILE * out, const _phrase & e)
+print_PH_macro(FILE * out, const _phrase & e)
 {
    // the first argument (phrase name) of the PH() macro in Prefix.def
    //
@@ -227,14 +238,14 @@ char suffix[100];   snprintf(suffix, sizeof(suffix), "%s_%s_%s_%s",
 
    if (*e.alias)   snprintf(suffix, sizeof(suffix), "%s", e.alias);
 
-   fprintf(out, "  PH( %-14s , 0x%5.5X,   %2d,   %d,  %d, %-12s )\n",
-                phrase_name, e.hash, e.prio, e.misc, e.len, suffix);
+   fprintf(out, "  PH( %-14s , %-14s, 0x%5.5X ,  %2d  ,  %2d  ,  %1d )\n",
+                phrase_name, suffix, e.hash, e.prio, e.misc, e.len);
 }
 //-----------------------------------------------------------------------------
 void
 print_table(FILE * out)
 {
-   // find smallest modulus for wrapping hash_table.
+   // find the smallest modulus for a collision-free hash_table of all prefixes
    //
 int MODU = TC_MAX_PHRASE;
    for (;; ++MODU)
@@ -244,8 +255,7 @@ int MODU = TC_MAX_PHRASE;
 
    fprintf(out,
 "\n"
-"#ifndef PH\n"
-"\n");
+"#ifndef PH   // declarations (Prefix.hh)\n");
 
    for (int ph = 0; ph < PHRASE_COUNT; ++ph)
        {
@@ -262,27 +272,27 @@ int MODU = TC_MAX_PHRASE;
 
    fprintf(out,
 "\n"
-"   /// one phrase in the phrase table\n"
+"   /// one phrase in the       phrase table\n"
 "   struct Phrase\n"
 "      {\n"
 "        const char *   phrase_name;     ///< phrase name\n"
+"        const char *   reduce_name;     ///< reduce function name\n"
+"        void (Prefix::*reduce_fun)();   ///< reduce function\n"
 "        int            phrase_hash;     ///< phrase hash\n"
 "        int            prio;            ///< phrase priority\n"
 "        int            misc;            ///< 1 if MISC phrase\n"
 "        int            phrase_len;      ///< phrase length\n"
-"        void (Prefix::*reduce_fun)();   ///< reduce function\n"
-"        const char *   reduce_name;     ///< reduce function name\n"
 "      };\n"
 "\n"
 "      /// a hash table with all valid phrases (and many invalid entries)\n"
 "      static const Phrase hash_table[PHRASE_MODU];\n"
 "\n"
-"#else  // PH defined\n"
+"#else  // PH(...) defined: table instantiation (in Prefix.cc)\n"
 "\n"
 "const Prefix::Phrase Prefix::hash_table[PHRASE_MODU] =\n"
 "{\n"
-"  //  phrase_name      hash     prio misc len  reduce_XXX()\n"
-"  //  -----------------------------------------------------\n");
+"//PH( phrase_name    , reduce_XXX()  ,   hash  , prio , misc , len)\n"
+"//═════════════════════════════════════════════════════════════════\n");
 
    {
      const _phrase ** table = new const _phrase *[MODU];
@@ -296,7 +306,7 @@ int MODU = TC_MAX_PHRASE;
 
      for (int i = 0; i < MODU; ++i)
          {
-           print_entry_macro(out, *table[i]);
+           print_PH_macro(out, *table[i]);
          }
       delete [] table;
    }
@@ -307,7 +317,7 @@ int MODU = TC_MAX_PHRASE;
 "\n"
 "#undef PH\n"
 "\n"
-"#endif   // PH defined\n"
+"#endif   // PH(...) defined/not defined\n"
 "\n");
 }
 //-----------------------------------------------------------------------------

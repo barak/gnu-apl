@@ -40,7 +40,10 @@ enum { MAX_REDUCTION_LEN = 6 };
 /// how to continue after return from a reduce_XXX() function
 enum R_action
 {
-   /// repeat phrase matching with current stack
+   /** repeat phrase matching with current stack. Called after the current
+       stack was changed and phrase matching should be repeated without
+       fetching a new token. This is the "normal" case after a phrase has
+       reduced the stack. **/
    RA_CONTINUE = 0,
 
    /// push next token and repeat phrase matching with current stack
@@ -165,7 +168,7 @@ public:
       { Assert1(size() > 3);   return content[put - 4].tok; }
 
    /// return true if the next token binds stronger than the best match
-   bool dont_reduce(TokenClass next) const;
+   bool do_shift(TokenClass next) const;
 
    /// return the current assignment state
    Assign_state get_assign_state() const
@@ -176,8 +179,8 @@ public:
       { assign_state = new_state; }
 
    /// return the highest PC seen in the current statement
-   Function_PC get_lookahead_high() const
-      { return lookahead_high; }
+   Function_PC get_PC_range_high() const
+      { return PC_range_high; }
 
    /// read one more token (don't store yet)
    Token_loc lookahead()
@@ -194,6 +197,13 @@ public:
         if (size() >= MAX_CONTENT_1)   LIMIT_ERROR_PREFIX;
         content[put++].copy(tl, LOC);
       }
+
+   /// pop \b prefix_len items
+   void pop_args()
+        {
+          Assert1(size() >= prefix_len);
+          put -= prefix_len;
+        }
 
    /// pop \b prefix_len items and push \b result
    void pop_args_push_result(const Token & result)
@@ -219,7 +229,7 @@ public:
    /// reset statement to empty state (e.g. after →N)
    void reset(const char * loc)
       { clean_up();   put = 0;   assign_state = ASS_none;
-        lookahead_high = Function_PC_invalid;
+        PC_range_high = Function_PC_invalid;
         saved_lookahead.tok.clear(LOC); }
 
    /// print the current stack
@@ -296,8 +306,36 @@ public:
        { Assert1(idx < put);   return content[put - idx - 1]; }
 
 protected:
+   /// push the next token onto the stack. Return \b true iff )SI was pushed.
+   //  called often but from the same place in reduce_statements()
+   inline bool push_next_token();
+
+   /// find a phrase that matches the current stack. Return \b true iff found.
+   //  called often but from the same place in reduce_statements()
+   inline bool find_phrase();
+
+   /// return true iff the next token binds stronger (so we need to shift).
+   inline bool check_next_binding();
+
+   /// check if ^C or attention was raised (and throw if so)
+   void check_interrupt_or_attention(bool end_of_line);
+
+   /// perform a branch within a function. 
+   void branch_within_function(bool end_of_line)
+      {
+        check_interrupt_or_attention(end_of_line);
+        action = RA_PUSH_NEXT;
+      }
+
+   /// construct the )MORE info for a SYNTAX_ERROR.
+   //  called rarely, so not inlined
+   void push_END_error();
+
+   /// push a symbol token (of class TC_SYMBOL). Return true iff )SI was pushed.
+   inline bool push_Symbol(Token_loc & tl);
+
    /// return true if the left (back-)slash in M M means F M.
-   bool MM_is_FM(Function_PC PC);
+   inline bool MM_is_FM(Function_PC PC);
 
    /// a unique identifier
    const uint64_t instance;
@@ -305,6 +343,8 @@ protected:
    /// the StateIndicator that contains this parser
    StateIndicator & si;
 
+   // void reduct_XXX() member declarations
+   //
 #include "Prefix.def"
 
    /// put pointer (for the next token at PC)
@@ -316,7 +356,7 @@ protected:
    /// the X token (leftmost token in MISC phrase, if any)
    Token_loc saved_lookahead;
 
-   /// the function body. This parser parses tokens body[pc_from] ...
+   /// the function body. \b this parser parses tokens body[pc_from] ...
    const Token_string & body;
 
    /// the current pc (+1)
@@ -326,7 +366,7 @@ protected:
    Assign_state assign_state;
 
    /// the highest PC seen in the current statement
-   Function_PC lookahead_high;
+   Function_PC PC_range_high;
 
    /// length of matched prefix (before calling a reduce_XXX() function)
    int prefix_len;
@@ -334,7 +374,7 @@ protected:
    /// the action to be taken after returning from a reduce_XXX() function
    R_action action;
 
-   /// the phrase being reduced (only valid if a phrase was matched)
+   /// the phrase being reduced (or 0 if no phrase was matched)
    const Phrase * best;
 
    /// a generator for unique identifiers

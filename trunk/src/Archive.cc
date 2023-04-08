@@ -474,7 +474,7 @@ const Prefix & prefix = si.current_stack;
     out << "<Parser size=\""      << prefix.size()
         << "\" assign-pending=\"" << prefix.get_assign_state()
         << "\" action=\""         << prefix.action
-        << "\" lookahead-high=\"" << prefix.get_lookahead_high()
+        << "\" lookahead-high=\"" << prefix.get_PC_range_high()
         << "\">" << endl;
 
    ++indent;
@@ -2682,7 +2682,7 @@ Prefix & parser = si.current_stack;
 
    parser.set_assign_state(Assign_state(ass_state));
    parser.action = R_action(action);
-   parser.lookahead_high = Function_PC(lah_high);
+   parser.PC_range_high = Function_PC(lah_high);
 
    // read derived functions cache
    //

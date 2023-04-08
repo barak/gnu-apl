@@ -59,6 +59,9 @@ typedef uint16_t AxesBitmap;
 /// The length of one dimension (axis) of an APL shape.
 typedef int64_t ShapeItem;
 
+/// for ulong(x) instead of  static_cast<unsigned long>(x)
+typedef unsigned long ulong;
+
 /// for long_long(x) instead of  static_cast<long long>(x)
 typedef long long long_long;
 
@@ -258,6 +261,7 @@ enum Bitmask
 enum Function_Line
 {
    Function_Retry   = -2,   // →'' in immediate execution
+   Function_Return  = -1,   // →N with N≤0 or large
    Function_Line_0  =  0,
    Function_Line_1  =  1,
    Function_Line_10 = 10,

@@ -263,7 +263,7 @@ public:
 
    /// remove the last character in \b this string
    void pop_back()
-   { Assert(size() > 0);   resize(size() - 1); }
+   { Assert(size() > 0);   std::basic_string<Unicode>::pop_back(); }
 
    /// append UCS_string other to this string
    void append(const UCS_string & other)

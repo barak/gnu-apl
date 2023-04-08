@@ -119,10 +119,17 @@ protected:
    /// overloaded Symbol::is_readonly()
    virtual bool is_readonly() const   { return true; }
 
-   /// overloaded Symbol::resolve(). Since push(), pop(), and assign()
-   /// do nothing, we can call get_apl_value() directly.
-   virtual void resolve(Token & token, bool left)
-      { if (!left)   new (&token) Token(TOK_APL_VALUE1, get_apl_value()); }
+   /// overloaded Symbol:resolve_left(). Invalid for read-only variables
+   virtual void resolve_left(Token & token) const
+      { MORE_ERROR() << "Assignment to read-only system variable "
+                     << get_name();
+        SYNTAX_ERROR; }
+
+   /// overloaded Symbol::resolve_right(). Since this variable is read-only,
+   /// push(), pop(), and assign() do nothing, and therefore we may call
+   /// get_apl_value() directly.
+   virtual void resolve_right(Token & token) const
+      { new (&token) Token(TOK_APL_VALUE1, get_apl_value()); }
 };
 //----------------------------------------------------------------------------
 /**
@@ -490,8 +497,11 @@ public:
    /// Constructor.
    Quad_Quad();
 
-   /// overloaded Symbol::resolve().
-   virtual void resolve(Token & token, bool left);
+   /// overloaded Symbol::resolve_left().
+   virtual void resolve_left(Token & token) const   { }   // ⎕←xxx
+
+   /// overloaded Symbol::resolve_right().
+   virtual void resolve_right(Token & token) const;
 
 protected:
    virtual void assign(Value_P B, bool clone, const char * loc);

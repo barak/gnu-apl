@@ -94,8 +94,11 @@ public:
    ParseMode get_parse_mode() const
       { return executable->get_parse_mode(); }
 
-   /// evaluate a →N statement. Update pc, return true iff context has changed
-   Token jump(Value_P val);
+   /// evaluate a →N statement. Update PC if needed, maybe do nothing (→⍬)
+   Token jump(const Value * val);
+
+   /// do a jump to function line \b line
+   Token jump_to_line(Function_Line line);
 
    /// return the nesting level (oldest SI has level 0, next has level 1, ...)
    SI_level get_level() const   { return level; };

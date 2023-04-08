@@ -786,7 +786,7 @@ Line_status current = APL_text;
          const int start = li;
          Assert1(status[li] == Start_of_string);
          UCS_string prefix = get_text(li++);
-         prefix.resize(prefix.size() - 3);   // remove the trailing """
+         prefix.resize(int(prefix.size() - 3));   // remove the trailing """
          UCS_string accu("");
          int count = 0;
          while (status[li] == Inside_string)

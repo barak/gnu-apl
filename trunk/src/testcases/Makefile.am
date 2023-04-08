@@ -15,6 +15,7 @@ dist_noinst_DATA =                              \
         AP210.tc                                \
         APnnn.tc                                \
         Binding.tc                              \
+        Branch.tc                               \
         Binomial.tc                             \
         BobSmithChars.tc                        \
         Boolean.tc                              \

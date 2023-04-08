@@ -703,11 +703,13 @@ const void * Bv = reinterpret_cast<const val_val *>(B)->child;
 void
 Command::cmd_CHECK(ostream & out, const UCS_string & arg)
 {
-bool show_OK = true;
+bool show_OK = true;   // assume more verbose output
    if (arg.size())   // check with argument (supposedly BRIEF).
       {
+        UCS_string arg0(arg);
+        arg0.remove_leading_and_trailing_whitespaces();
         const UCS_string brief("BRIEF");
-        show_OK = arg.compare(brief) != COMP_EQ;   // not BRIEF
+        show_OK = arg0.compare(brief) != COMP_EQ;   // not BRIEF
         if (show_OK)   // still show_OK
            {
              out << arg << "? Expecting BRIEF." << endl;

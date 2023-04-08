@@ -732,10 +732,8 @@ Quad_Quad::assign(Value_P B, bool clone, const char * loc)
 }
 //----------------------------------------------------------------------------
 void
-Quad_Quad::resolve(Token & token, bool left)
+Quad_Quad::resolve_right(Token & token) const
 {
-   if (left)   return;   // ⎕←xxx
-
    // write pending LF from  ⍞ (if any)
    Quad_QUOTE::done(true, LOC);
 

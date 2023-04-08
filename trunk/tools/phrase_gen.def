@@ -114,7 +114,7 @@ phrase(BS_ANY+2      , END  , VOID ,      ,      , DITO )
 phrase(BS_ANY+2      , END  , B    ,      ,      , DITO )
 phrase(BS_ANY+2      , END  , GOTO ,      ,      , DITO )
 phrase(BS_ANY+3      , END  , GOTO , B    ,      , DITO )
-phrase(BS_ANY+4      , END  , A    , GOTO , B    , DITO )
+phrase(BS_ANY+3      , A    , GOTO , B    ,      , DITO )
 
 // end of user defined function, ⍎, or ◊ context
 //

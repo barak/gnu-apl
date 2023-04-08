@@ -56,7 +56,9 @@ enum TokenClass
 
    TC_MAX_PERM,               ///< permanent token are < TC_MAX_PERM
 
-   // token class aliases
+   // token class aliases. We sometimes want to use TC_FUN1 or TC_FUN2
+   // for clarification, but both are TC_FUN12.
+   //
    TC_FUN1          = TC_FUN12,   ///< monadic function
    TC_FUN2          = TC_FUN12,   ///< dyadic function
 
@@ -85,7 +87,7 @@ enum TokenClass
    TC_MASK          = 0xFF,
    TC_INVALID       = 0xFF,
 
-   // shorter token class names for phrase table
+   // shorter token class aliases for phrase table
    //
    SN_A             = TC_VALUE,
    SN_ASS           = TC_ASSIGN,
@@ -108,6 +110,33 @@ enum TokenClass
    SN_VOID          = TC_VOID,
    SN_              = TC_INVALID
 };
+
+   /// return true if \b tcl is a niladic, monadic or dyadic function
+   inline bool is_function_class(TokenClass tcl)
+      {
+        enum { bits = 1 << TC_FUN0
+                      | 1 << TC_FUN1
+                      | 1 << TC_FUN2 };
+        return 0 != (bits & 1 << tcl);
+      }
+
+   /// return true if \b tcl is a monadic or dyadic operator
+   inline bool is_operator_class(TokenClass tcl)
+      {
+        enum { bits = 1 << TC_OPER1
+                    | 1 << TC_OPER2 };
+        return 0 != (bits & 1 << tcl);
+      }
+
+   inline bool is_function_or_operator_class(TokenClass tcl)
+      {
+        enum { bits = 1 << TC_FUN0
+                      | 1 << TC_FUN1
+                      | 1 << TC_FUN2
+                      | 1 << TC_OPER1
+                      | 1 << TC_OPER2 };
+        return 0 != (bits & 1 << tcl);
+      }
 
    /// binding strengths between token classes
 enum Binding_Strength

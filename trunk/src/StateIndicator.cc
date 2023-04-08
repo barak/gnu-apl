@@ -314,10 +314,10 @@ StateIndicator::indent(ostream & out) const
 }
 //----------------------------------------------------------------------------
 Token
-StateIndicator::jump(Value_P value)
+StateIndicator::jump(const Value * value)
 {
    // perform a jump. We either remain in the current function (and then
-   // return TOK_VOID), or we (want to) jump into back into the calling
+   // return TOK_VOID), or we (want to) jump back into the calling
    // function (and then return TOK_BRANCH.). The jump itself (if any)
    // is executed in Prefix.cc.
    //
@@ -335,16 +335,21 @@ StateIndicator::jump(Value_P value)
       }
 
 const Function_Line line = value->get_line_number();
-
-const UserFunction * ufun = get_executable()->get_exec_ufun();
-
-   if (ufun)   // →N in user defined function
+   return jump_to_line(line);
+}
+//----------------------------------------------------------------------------
+Token
+StateIndicator::jump_to_line(Function_Line line)
+{
+   if (const UserFunction * ufun = get_executable()->get_exec_ufun())
       {
+        // →N in ∇ context
+        //
         set_PC(ufun->pc_for_line(line));   // →N to valid line in user function
         return Token(TOK_VOID);         // stay in context
       }
 
-   // →N in ⍎ or ◊
+   // →N in ⍎ or ◊ context (i.e. to start of line 0)
    //
    return Token(TOK_BRANCH, int64_t(line < 0 ? Function_Line_0 : line));
 }

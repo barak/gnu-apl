@@ -735,7 +735,7 @@ Symbol * symbol = Workspace::lookup_existing_symbol(*members.back());
    if (symbol == 0)     goto cleanup;
 
    {
-     Value_P toplevel_val = symbol->get_value();
+     Value_P toplevel_val = symbol->get_var_value();
      if (!toplevel_val)   goto cleanup;
      Value * owner = 0;   // not used
      if (Cell * cell = toplevel_val->get_member(members, owner, false, false))
