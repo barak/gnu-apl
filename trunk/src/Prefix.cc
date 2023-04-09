@@ -1003,7 +1003,7 @@ Token result = at1();   // B or F
    if (result.get_tag() == TOK_APL_VALUE3)   result.ChangeTag(TOK_APL_VALUE1);
 
    pop_args_push_result(result);
-   set_action(result);
+   set_action(RA_CONTINUE);
 }
 //----------------------------------------------------------------------------
 void
@@ -1020,11 +1020,11 @@ Prefix::reduce_LPAR_F_C_RPAR()
    // before: ( F C )
    // after:  F C
    //
-   at3().move_1(at2(), LOC);
-   at2().move_1(at1(), LOC);
-   pop_and_discard();    // pop old RPAR
-   pop_and_discard();    // pop old C
-   action = RA_CONTINUE;
+   at3().move_1(at2(), LOC);   // move C left
+   at2().move_1(at1(), LOC);   // move F left
+   pop_and_discard();          // discard old C
+   pop_and_discard();          // discard old RPAR
+   set_action(RA_CONTINUE);   // match again (w/o SHIFT)
 }
 //----------------------------------------------------------------------------
 void
@@ -1037,12 +1037,12 @@ Token result = at0().get_function()->eval_();
       {
         Token_loc tl(result, get_range_low());
         push(tl);
-        action = RA_RETURN;
+        set_action(RA_RETURN);            // return from context;
         return;
       }
 
    pop_args_push_result(result);
-   set_action(result);
+   set_action(RA_CONTINUE);
 }
 //----------------------------------------------------------------------------
 void
@@ -1058,7 +1058,7 @@ Prefix::reduce_MISC_F_B_()
              //
              push(saved_lookahead);
              saved_lookahead.tok.clear(LOC);
-             action = RA_PUSH_NEXT;
+             set_action(RA_PUSH_NEXT);   // aka. SHIFT
              return;
            }
       }
@@ -1184,7 +1184,7 @@ Token result = at0().get_function()->eval_B(at1().get_apl_val());
            {
              Token_loc tl(result, get_range_low());
              push(tl);
-             action = RA_RETURN;
+             set_action(RA_RETURN);            // return from context;
              return;
            }
 
@@ -1211,7 +1211,7 @@ Prefix::reduce_MISC_F_C_B()
              //
              push(saved_lookahead);
              saved_lookahead.tok.clear(LOC);
-             action = RA_PUSH_NEXT;
+             set_action(RA_PUSH_NEXT);   // aka. SHIFT
              return;
            }
       }
@@ -1242,7 +1242,7 @@ Prefix::reduce_MISC_F_C_B()
         saved_lookahead.tok.clear(LOC);
         prefix_len = 2;   // only f ⎕FIO
         pop_args_push_result(Token(TOK_FUN2, derived));
-        action = RA_CONTINUE;
+        set_action(RA_CONTINUE);   // match again (w/o SHIFT)
         return;
       }
 
@@ -1252,7 +1252,7 @@ Token result = at0().get_function()->eval_XB(at1().get_apl_val(),
       {
         Token_loc tl(result, get_range_low());
         push(tl);
-        action = RA_RETURN;
+        set_action(RA_RETURN);            // return from context;
         return;
       }
 
@@ -1271,7 +1271,7 @@ Token result = at1().get_function()->eval_AB(at0().get_apl_val(),
       {
         Token_loc tl(result, get_range_low());
         push(tl);
-        action = RA_RETURN;
+        set_action(RA_RETURN);            // return from context;
         return;
       }
 
@@ -1301,7 +1301,7 @@ Token result = at1().get_function()->eval_AXB(at0().get_apl_val(),
       {
         Token_loc tl(result, get_range_low());
         push(tl);
-        action = RA_RETURN;
+        set_action(RA_RETURN);            // return from context;
         return;
       }
 
@@ -1326,7 +1326,7 @@ DerivedFunction * derived =
    new (derived) DerivedFunction(at0(), at1().get_function(), LOC);
 
    pop_args_push_result(Token(TOK_FUN2, derived));
-   action = RA_CONTINUE;
+   set_action(RA_CONTINUE);   // match again (w/o SHIFT)
 }
 //----------------------------------------------------------------------------
 bool
@@ -1437,7 +1437,7 @@ Prefix::MM_is_FM(Function_PC pc)
 void
 Prefix::reduce_M_M__()
 {
-   action = RA_PUSH_NEXT;   // normally the left M is an operator
+   set_action(RA_PUSH_NEXT);   // normally the left M is an operator. SHIFT
    if (is_SLASH_or_BACKSLASH(at0().get_tag()))
       {
         if (MM_is_FM(PC))
@@ -1446,7 +1446,7 @@ Prefix::reduce_M_M__()
              enum { OPER1_TO_FUN2 = TC_OPER1 - TC_FUN2 };
              const TokenTag tfun = TokenTag(at0().get_tag() - OPER1_TO_FUN2);
              at0().ChangeTag(tfun);
-             action = RA_CONTINUE;
+             set_action(RA_CONTINUE);   // match again (w/o SHIFT)
            }
         else
            {
@@ -1464,7 +1464,7 @@ DerivedFunction * derived = Workspace::SI_top()->fun_oper_cache.get(LOC);
    new (derived) DerivedFunction(at0(), at1().get_function(), LOC);
 
    pop_args_push_result(Token(TOK_FUN1, derived));
-   action = RA_CONTINUE;
+   set_action(RA_CONTINUE);   // match again (w/o SHIFT)
 }
 //----------------------------------------------------------------------------
 void
@@ -1486,7 +1486,7 @@ DerivedFunction * derived =
                                  at2().get_axes(), LOC);
 
    pop_args_push_result(Token(TOK_FUN2, derived));
-   action = RA_CONTINUE;
+   set_action(RA_CONTINUE);   // match again (w/o SHIFT)
 }
 //----------------------------------------------------------------------------
 void
@@ -1512,7 +1512,7 @@ DerivedFunction * derived =
    new (derived) DerivedFunction(tok_F_C, at2().get_function(), LOC);
 
    pop_args_push_result(Token(TOK_FUN2, derived));
-   action = RA_CONTINUE;
+   set_action(RA_CONTINUE);   // match again (w/o SHIFT)
 }
 //----------------------------------------------------------------------------
 void
@@ -1544,7 +1544,7 @@ DerivedFunction * derived =
                                           at3().get_axes(), LOC);
 
    pop_args_push_result(Token(TOK_FUN2, derived));
-   action = RA_CONTINUE;
+   set_action(RA_CONTINUE);   // match again (w/o SHIFT)
 }
 //----------------------------------------------------------------------------
 void
@@ -1592,7 +1592,7 @@ Token result = Token(TOK_FUN2, derived);
         push(tl_derived);
       }
 
-   action = RA_CONTINUE;
+   set_action(RA_CONTINUE);   // match again (w/o SHIFT)
 }
 //----------------------------------------------------------------------------
 void
@@ -1692,7 +1692,7 @@ Symbol * top_sym = 0;
 
                      pop_args_push_result(Token(TOK_AXIS,
                                                 IntScalar(axis, LOC)));
-                     action = RA_CONTINUE;
+                     set_action(RA_CONTINUE);   // match again (w/o SHIFT)
                      return;
                    }
 
@@ -1794,7 +1794,7 @@ Cell * member_cell = top_val->get_member(members, member_owner,
            }
       }
 
-   action = RA_CONTINUE;
+   set_action(RA_CONTINUE);   // match again (w/o SHIFT)
 }
 //----------------------------------------------------------------------------
 void
@@ -1805,7 +1805,7 @@ DerivedFunction * derived =
    new (derived) DerivedFunction(at0(), at1().get_function(), at2(), LOC);
 
    pop_args_push_result(Token(TOK_FUN2, derived));
-   action = RA_CONTINUE;
+   set_action(RA_CONTINUE);   // match again (w/o SHIFT)
 }
 //----------------------------------------------------------------------------
 void
@@ -1827,7 +1827,7 @@ Prefix::reduce_F_D_C_B()
 
           if (next == TC_OPER2)
              {
-               action = RA_PUSH_NEXT;
+               set_action(RA_PUSH_NEXT);   // aka. SHIFT
                return;
              }
         }
@@ -1875,7 +1875,7 @@ Token result = Token(TOK_FUN2, derived);
         push(tl_derived);
       }
 
-   action = RA_CONTINUE;
+   set_action(RA_CONTINUE);   // match again (w/o SHIFT)
 }
 //----------------------------------------------------------------------------
 void
@@ -1923,7 +1923,7 @@ Symbol * V = at0().get_sym_ptr();
 Token tok = V->resolve_lv(LOC);
    at0().move_1(tok, LOC);
    set_assign_state(ASS_var_seen);
-   action = RA_CONTINUE;
+   set_action(RA_CONTINUE);   // match again (w/o SHIFT)
 }
 //----------------------------------------------------------------------------
 void
@@ -1991,7 +1991,7 @@ Symbol * V = at1().get_sym_ptr();
 Token tok = V->resolve_lv(LOC);
    at1().move_1(tok, LOC);
    set_assign_state(ASS_var_seen);
-   action = RA_CONTINUE;
+   set_action(RA_CONTINUE);   // match again (w/o SHIFT)
 }
 //----------------------------------------------------------------------------
 void
@@ -2006,7 +2006,7 @@ Token result = Token(TOK_APL_VALUE2, B);
    pop_args_push_result(result);
 
    set_assign_state(ASS_none);
-   action = RA_CONTINUE;
+   set_action(RA_CONTINUE);   // match again (w/o SHIFT)
 }
 //----------------------------------------------------------------------------
 void
@@ -2031,7 +2031,7 @@ Symbol * V = at0().get_sym_ptr();
    at0().ChangeTag(TOK_APL_VALUE2);   // change value to committed value
 
    set_assign_state(ASS_none);
-   action = RA_CONTINUE;
+   set_action(RA_CONTINUE);   // match again (w/o SHIFT)
 
    V->assign(B, clone, LOC);
 }
@@ -2052,7 +2052,7 @@ Token result = Token(TOK_APL_VALUE2, Z);
    pop_args_push_result(result);
 
    set_assign_state(ASS_none);
-   action = RA_CONTINUE;
+   set_action(RA_CONTINUE);   // match again (w/o SHIFT)
 }
 //----------------------------------------------------------------------------
 void
@@ -2070,7 +2070,7 @@ IndexExpr * idx = new IndexExpr(get_assign_state(), LOC);
 
    new (&at0()) Token(TOK_PINDEX, *idx);
    set_assign_state(ASS_none);
-   action = RA_CONTINUE;
+   set_action(RA_CONTINUE);   // match again (w/o SHIFT)
 }
 //----------------------------------------------------------------------------
 void
@@ -2088,7 +2088,7 @@ const bool last_index = (at0().get_tag() == TOK_L_BRACK);
         assign_state = idx.get_assign_state();
         Token result = Token(TOK_INDEX, idx);
         pop_args_push_result(result);
-        action = RA_CONTINUE;
+        set_action(RA_CONTINUE);   // match again (w/o SHIFT)
         Log(LOG_delete)   CERR << "delete " << voidP(&idx)
                                << " at " LOC << endl;
         delete &idx;
@@ -2113,7 +2113,7 @@ Token result = at1();
       }
 
    pop_args_push_result(result);
-   action = RA_CONTINUE;
+   set_action(RA_CONTINUE);   // match again (w/o SHIFT)
 }
 //----------------------------------------------------------------------------
 void
@@ -2153,7 +2153,7 @@ const bool last_index = (at0().get_tag() == TOK_L_BRACK);   // ; vs. [
       }
 
    pop_args_push_result(I);
-   action = RA_CONTINUE;
+   set_action(RA_CONTINUE);   // match again (w/o SHIFT)
 }
 //----------------------------------------------------------------------------
 void
@@ -2229,7 +2229,7 @@ const int count = vector_ass_count();
         Token result = V->resolve_lv(LOC);
         set_assign_state(ASS_var_seen);
         at0().move_1(result, LOC);
-        action = RA_CONTINUE;
+        set_action(RA_CONTINUE);   // match again (w/o SHIFT)
         return;
       }
 
@@ -2258,7 +2258,7 @@ Token result(TOK_APL_VALUE2, at3().get_apl_val());
 Token_loc tl = lookahead();
    if (tl.tok.get_Class() != TC_L_PARENT)   syntax_error(LOC);
 
-   action = RA_CONTINUE;
+   set_action(RA_CONTINUE);   // match again (w/o SHIFT)
 }
 //----------------------------------------------------------------------------
 void
@@ -2276,7 +2276,7 @@ const bool trace = (at0().get_int_val() & 1) != 0;
 
 Token Void(TOK_VOID);
    si.statement_result(Void, trace);
-   action = RA_PUSH_NEXT;
+   set_action(RA_PUSH_NEXT);   // aka. SHIFT
    if (attention_is_raised() && end_of_line)
       {
         const bool int_raised = interrupt_is_raised();
@@ -2302,7 +2302,7 @@ Token B = pop().tok;    // pop B
    si.fun_oper_cache.reset();
    si.statement_result(B, trace);
 
-   action = RA_PUSH_NEXT;
+   set_action(RA_PUSH_NEXT);   // aka. SHIFT
    if (attention_is_raised() && end_of_line)
       {
         const bool int_raised = interrupt_is_raised();
@@ -2339,9 +2339,8 @@ const bool condition = B0.get_near_bool();
    if (!condition)  // the branch is not taken
       {
         const Token result(TOK_APL_VALUE2, Idx0(LOC));
-        const Token_loc tl_END = at(0);   // keep then END token
         pop_args_push_result(result);
-        action = RA_CONTINUE;
+        set_action(RA_CONTINUE);   // match again (w/o SHIFT)
         return;
       }
 
@@ -2356,9 +2355,20 @@ const APL_Integer jump_offset = A->get_cfirst().get_near_int();
         // we have to use the PC BEFORE the branch.
         //
         const int function_line = ufun->get_line(PC - prefix_len) + jump_offset;
-        si.jump_to_line(Function_Line(function_line));   // may change the PC
-        branch_within_function(true);   // check ^C, set action = RA_PUSH_NEXT
-        reset(LOC);
+        si.jump_to_line(Function_Line(function_line));   // changes the PC
+        branch_within_function(true);   // check ^C and set_action(RA_PUSH_NEXT)
+        reset(LOC);                     // abort the current statement
+
+        // branch_within_function() MAY have set the PC to the end of the
+        // function (token ENDL). However, that skips the return of the
+        // ∇-result. Fix it.
+        //
+        if (ulong(PC + 1) == body.size())           // PC at end of function
+           {
+             Assert(body[PC].get_tag() == TOK_ENDL);
+             Assert(body[PC-1].get_Class() == TC_RETURN);
+             --PC;
+           }
       }
    else         // ⍎ or ◊ context
       {
@@ -2376,8 +2386,20 @@ const APL_Integer jump_offset = A->get_cfirst().get_near_int();
         // jump to same line (but outside a defined function)
         //
         set_PC(Function_PC_0);   // calls reset(), so don't pop_args() !
-        action = RA_PUSH_NEXT;
+        set_action(RA_PUSH_NEXT);   // aka. SHIFT
       }
+}
+//----------------------------------------------------------------------------
+void
+Prefix::reduce_F_GOTO_B_()
+{
+   reduce_END_GOTO_B_();
+}
+//----------------------------------------------------------------------------
+void
+Prefix::reduce_M_GOTO_B_()
+{
+   reduce_END_GOTO_B_();
 }
 //----------------------------------------------------------------------------
 void
@@ -2389,7 +2411,8 @@ Prefix::reduce_END_GOTO_B_()
 
    si.fun_oper_cache.reset();
 
-   // at0() is either TOK_END (end of a statement) or TOK_ENDL (end of line).
+   // at0() is either TOK_ENDL (end of line), or one of TOK_END, TOK_FUN12,
+   //       or TOK_OPER1
    //
 const bool end_of_line = at0().get_tag() == TOK_ENDL;
 const bool trace = at0().get_Class() == TC_END && (at0().get_int_val() & 1);
@@ -2415,25 +2438,29 @@ const Token result = si.jump(line);   // may change the PC
            }
 
         pop_args_push_result(result);
-        action = RA_RETURN;
+        set_action(RA_RETURN);            // return from context;
         return;
       }
 
-   // StateIndicator::jump may have called set_PC() which resets the Prefix.
-   // We do not call pop_args_push_result(result) (which would fail due
-   // to the now incorrect prefix_len), but discard the entire statement.
-   //
-   reset(LOC);
 
    if (result.get_tag() == TOK_NOBRANCH)   // branch not taken, e.g. →⍬
       {
-        Token bra(TOK_NOBRANCH);
-        si.statement_result(bra, trace);
+        const Token_loc tl_END = pop();   // END
+        pop_and_discard();                // →
+        pop_and_discard();                // B
+        const Token result(TOK_APL_VALUE2, Idx0(LOC));
+        const Token_loc tl_result(result, tl_END.pc + 1);
+        push(tl_result);
+        push(tl_END);
 
-        // not a backward branch, therefore no need to check INT or ATT.
-        action = RA_PUSH_NEXT;
+        // not a backward branch, therefore no need to check INT or ATT,
+        // or to ⎕STOP or ⎕TRACE.
+        //
+        set_action(RA_CONTINUE);   // aka. SHIFT
         return;
       }
+
+   reset(LOC);   // branch taken: terminate current statement
 
    /* NOTE: the →N cases with N≤0 or N≥↑⍴⎕CR 'FUNCTION' are handled in 
       UserFunction::pc_for_line(). pc_for_line() sets the PC to the end
@@ -2444,7 +2471,7 @@ const Token result = si.jump(line);   // may change the PC
           └── UserFunction::pc_for_line()
     */
    Assert(result.get_tag() == TOK_VOID);   // branch taken, i.e. →N in ∇-context
-   branch_within_function(end_of_line);    // sets action = RA_PUSH_NEXT
+   branch_within_function(end_of_line);    // does set_action(RA_PUSH_NEXT)
 }
 //----------------------------------------------------------------------------
 void
@@ -2488,31 +2515,36 @@ const bool trace = at0().get_Class() == TC_END && (at0().get_int_val() & 1);
               //
               pop_and_discard();   // pop END
               pop_and_discard();   // pop GOTO
-              action = RA_CONTINUE;
+              set_action(RA_CONTINUE);   // match again (w/o SHIFT)
               return;
            }
 
         COUT << si.function_name() << "[" << si.get_line() << "]" << endl;
         Token result(TOK_ERROR, E_STOP_LINE);
         pop_args_push_result(result);
-        action = RA_RETURN;
+        set_action(RA_RETURN);            // return from context;
       }
    else
       {
         Token result(TOK_ESCAPE);
         pop_args_push_result(result);
-        action = RA_RETURN;
+        set_action(RA_RETURN);            // return from context;
       }
 }
 //----------------------------------------------------------------------------
 void
 Prefix::reduce_RETC_VOID__()
 {
+   // e.g.      ⎕FX 'qio' '⎕IO' ◊ ⍎'qio'
+   //
+   // execute of a defined function without result. Im[pssible for lambdas
+   // since they always have a result λ←.
+
    Assert1(prefix_len == 2);
 
-Token result = Token(TOK_VOID);
+Token result = Token(TOK_VOID);   // function result is VOID
    pop_args_push_result(result);
-   action = RA_RETURN;
+   set_action(RA_RETURN);            // return from context;
 }
 //----------------------------------------------------------------------------
 void
@@ -2537,14 +2569,14 @@ Prefix::reduce_RETC___()
              Log(LOG_prefix_parser)
                 CERR << "- end of ⍎ context (no result)" << endl;
              at0().clear(LOC);
-             action = RA_RETURN;
+             set_action(RA_RETURN);            // return from context;
              return;
 
         case TOK_RETURN_STATS:   // immediate execution context
              Log(LOG_prefix_parser)
                 CERR << "- end of ◊ context" << endl;
              at0().clear(LOC);
-             action = RA_RETURN;
+             set_action(RA_RETURN);            // return from context;
              return;
 
         case TOK_RETURN_VOID:   // user-defined function not returning a value
@@ -2557,7 +2589,7 @@ Prefix::reduce_RETC___()
                Assert1(ufun);
                at0().clear(LOC);
              }
-             action = RA_RETURN;
+             set_action(RA_RETURN);            // return from context;
              return;
 
         case TOK_RETURN_SYMBOL:   // user-defined function returning a value
@@ -2582,7 +2614,7 @@ Prefix::reduce_RETC___()
                     new (&at0()) Token(TOK_APL_VALUE1, Z);
                   }
              }
-             action = RA_RETURN;
+             set_action(RA_RETURN);            // return from context;
              return;
 
         default: break;
@@ -2612,7 +2644,7 @@ Prefix::reduce_RETC_B__()
 Token B = at1();
    pop_args_push_result(B);
 
-   action = RA_RETURN;
+   set_action(RA_RETURN);            // return from context;
 }
 //----------------------------------------------------------------------------
 // Note: reduce_RETC_GOTO_B__ happens only for context ⍎, since
@@ -2647,7 +2679,7 @@ Prefix::reduce_RETC_GOTO_B_()
         push(tl);
       }
 
-   action = RA_RETURN;
+   set_action(RA_RETURN);            // return from context;
 }
 //----------------------------------------------------------------------------
 // Note: reduce_RETC_ESC___ happens only for context ⍎,

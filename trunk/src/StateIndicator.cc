@@ -346,7 +346,7 @@ StateIndicator::jump_to_line(Function_Line line)
         // →N in ∇ context
         //
         set_PC(ufun->pc_for_line(line));   // →N to valid line in user function
-        return Token(TOK_VOID);         // stay in context
+        return Token(TOK_VOID);            // stay in context
       }
 
    // →N in ⍎ or ◊ context (i.e. to start of line 0)

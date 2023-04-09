@@ -21,7 +21,7 @@
    END:      TC_END
    LPAR:     (
    RBRA:     ]
-   MISC:     ← → FUN ; [ END ( ]   (any of the above)
+   MISC:     ← → FUN ; [ END ( ]   (i.e. any of the above)
    RPAR:     )
    A, B:     TC_VALUE
    C:        TC_INDEX
@@ -114,6 +114,8 @@ phrase(BS_ANY+2      , END  , VOID ,      ,      , DITO )
 phrase(BS_ANY+2      , END  , B    ,      ,      , DITO )
 phrase(BS_ANY+2      , END  , GOTO ,      ,      , DITO )
 phrase(BS_ANY+3      , END  , GOTO , B    ,      , DITO )
+phrase(BS_ANY+3      , F    , GOTO , B    ,      , DITO )
+phrase(BS_ANY+3      , M    , GOTO , B    ,      , DITO )
 phrase(BS_ANY+3      , A    , GOTO , B    ,      , DITO )
 
 // end of user defined function, ⍎, or ◊ context

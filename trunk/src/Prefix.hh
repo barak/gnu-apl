@@ -191,7 +191,8 @@ public:
         return Token_loc(Token(), --PC);   // end of function
       }
 
-   /// store one more token
+   /// store one more token. push(A) in e.g. F B would produce A F B.
+   /// IOW, push() works right-to-left of XXX in reduce_XXX().
    void push(const Token_loc & tl)
       {
         if (size() >= MAX_CONTENT_1)   LIMIT_ERROR_PREFIX;
@@ -214,7 +215,9 @@ public:
           put -= prefix_len - 1;
         }
 
-   /// remove the leftmost token (e,g, A in A←B) from the stack and return it
+   /// remove the leftmost token (e,g, A in A←B) from the stack and return it.
+   /// In e.g. reduce_A_F_B_(), the first pop() would remove A.
+   /// IOW, pop() works left-to-right of XXX in reduce_XXX().
    Token_loc & pop()
       {  Assert1(size() > 0);   return content[--put]; }
 
@@ -230,7 +233,9 @@ public:
    void reset(const char * loc)
       { clean_up();   put = 0;   assign_state = ASS_none;
         PC_range_high = Function_PC_invalid;
-        saved_lookahead.tok.clear(LOC); }
+        saved_lookahead.tok.clear(LOC);
+        prefix_len = 0;
+      }
 
    /// print the current stack
    void print_stack(ostream & out, const char * loc) const;
@@ -253,7 +258,10 @@ public:
         action = ra;
       }
 
-   /// set the prefix parser action according to (result-) Token type
+   /// set the prefix parser action according to (result-) Token type.
+   // Called (typically after some eval_XXX()) if the return class can not
+   // be predicted
+   // token classes.
    void set_action(const Token & result)
       {
         switch(result.get_Class())
@@ -262,28 +270,28 @@ public:
              case TC_VOID:
              case TC_END:
              case TC_FUN2:
-                  action = RA_CONTINUE;
+                  set_action(RA_CONTINUE);
                   return;
 
              case TC_RETURN:
-                  // result was TOK_RETURN_EXEC, TOK_RETURN_STATS,
-                  // TOK_RETURN_VOID, or TOK_RETURN_SYMBOL. The current
-                  // context is xomplete and may or may not have produced
-                  // a value.
+                  // result was one of TOK_RETURN_EXEC, TOK_RETURN_STATS,
+                  // TOK_RETURN_VOID, or TOK_RETURN_SYMBOL.
+                  // The current context is complete and may or may not
+                  // have produced a value.
                   //
-                  action = RA_RETURN;
+                  set_action(RA_RETURN);
                   return;
 
              case TC_SI_LEAVE:
                   //
                   // result was TOK_SI_PUSHED or TOK_ERROR
-                  if (result.get_tag() == TOK_ERROR)   action = RA_RETURN;
-                  else                                 action = RA_SI_PUSHED;
+                  if (result.get_tag() == TOK_ERROR)   set_action(RA_RETURN);
+                  else                                 set_action(RA_SI_PUSHED);
                   return;
 
              default: CERR << "CLASS = " << result.get_Class()
                            << " at " << LOC << endl;
-                      TODO;
+                      FIXME;
            }
       }
 
@@ -324,7 +332,7 @@ protected:
    void branch_within_function(bool end_of_line)
       {
         check_interrupt_or_attention(end_of_line);
-        action = RA_PUSH_NEXT;
+        set_action(RA_PUSH_NEXT);
       }
 
    /// construct the )MORE info for a SYNTAX_ERROR.

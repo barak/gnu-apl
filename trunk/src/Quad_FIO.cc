@@ -1750,6 +1750,7 @@ int function_number = -1;
                 const UCS_string path_ucs(*B.get());
                 const UTF8_string path(path_ucs);
                 mkdir(path.c_str(), 0777);
+                if (errno == EEXIST)   errno = 0;   // frequent non-error
               }
               goto out_errno;
 
@@ -2630,6 +2631,7 @@ int function_number = -1;
                 const UCS_string path_ucs(*B.get());
                 const UTF8_string path(path_ucs);
                 mkdir(path.c_str(), mask);
+                if (errno == EEXIST)   errno = 0;   // frequent non-error
               }
               goto out_errno;
 
