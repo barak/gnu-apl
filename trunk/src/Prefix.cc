@@ -2318,25 +2318,25 @@ Prefix::reduce_A_GOTO_B_()
 {
    Assert1(prefix_len == 3);
 
-const Value * A = at0().get_apl_val().get();   // the jump offset
-const Value * B = at2().get_apl_val().get();   // the condition
+   // we want this to be fast, therefore we don't check the shape but
+   // rather use ↑A and ↑B,
+   //
+const Cell & A0 = at0().get_apl_val()->get_cfirst();   // the jump offset
+const Cell & B0 = at2().get_apl_val()->get_cfirst();   // the condition
 
-   if (B->element_count() != 1)
+   if (!A0.is_near_int())
       {
-        MORE_ERROR() << "A → B: bad condition B with 1≠⍴,B";
-        if (B->get_rank() > 1)   RANK_ERROR;
-        else                     LENGTH_ERROR;
-      }
-
-const Cell & B0 =  B->get_cfirst();
-   if (!B0.is_near_bool())
-      {
-        MORE_ERROR() << "A → B: bad (non-Boolean) B ";
+        MORE_ERROR() << "A → B: bad (non-Integer) ↑A ";
         DOMAIN_ERROR;
       }
 
-const bool condition = B0.get_near_bool();
-   if (!condition)  // the branch is not taken
+   if (!B0.is_near_int())
+      {
+        MORE_ERROR() << "A → B: bad (non-Integer) ↑B ";
+        DOMAIN_ERROR;
+      }
+
+   if (B0.get_near_int() == 0)  // the branch is not taken
       {
         const Token result(TOK_APL_VALUE2, Idx0(LOC));
         pop_args_push_result(result);
@@ -2344,7 +2344,7 @@ const bool condition = B0.get_near_bool();
         return;
       }
 
-const APL_Integer jump_offset = A->get_cfirst().get_near_int();
+const APL_Integer jump_offset = A0.get_near_int();
 
    if (const UserFunction * ufun = si.get_executable()->get_exec_ufun())
       {

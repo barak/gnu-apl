@@ -575,36 +575,38 @@ UCS_string message_2(UTF8_string(error.get_error_line_2()));
 }
 //----------------------------------------------------------------------------
 void
-UserFunction::set_trace_stop(std::vector<Function_Line> & lines, bool stop)
+UserFunction::set_trace_stop(std::vector<Function_Line> & B, bool stop)
 {
-   // Sort lines
+   // Sort B, so that stop_lines resp. trace_lines will be sorted.
    //
 std::vector<bool> ts_lines;
 
+   // clear all bits in ts_lines
    loop(ts, line_starts.size())   ts_lines.push_back(false);
-   loop(ll, lines.size())
+
+   // set all bits in B, ignorin invalid ones.
+   loop(b, B.size())
       {
-        Function_Line line = lines[ll];
-        if (line >= 1 && line < int(line_starts.size()))
-           ts_lines[line] = true;
+        const Function_Line Bb = B[b];
+        if (Bb < 1)                          continue;   // not valid
+        if (Bb >= int(line_starts.size()))   continue;   // not valid
+        ts_lines[Bb] = true;
       }
 
-   if (stop)
+   if (stop)   // ⎕STOP or S∆
       {
         stop_lines.clear();
-        loop(ts, line_starts.size())
+        loop(ts, ts_lines.size())
            {
-             if (ts_lines[ts])
-                stop_lines.push_back(Function_Line(ts));
+             if (ts_lines[ts])   stop_lines.push_back(Function_Line(ts));
            }
       }
-   else
+   else        // ⎕TRACE or T∆
       {
         trace_lines.clear();
-        loop(ts, line_starts.size())
+        loop(ts, ts_lines.size())
            {
-             if (ts_lines[ts])
-                trace_lines.push_back(Function_Line(ts));
+             if (ts_lines[ts])   trace_lines.push_back(Function_Line(ts));
            }
       }
 

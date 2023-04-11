@@ -751,8 +751,8 @@ LineInput::~LineInput()
 #ifndef apl_TARGET_LIBAPL
 # ifndef apl_TARGET_PYTHON
    tcsetattr(STDIN_FILENO, TCSANOW, &initial_termios);
-# endif // apl_TARGET_PYTHON
-#endif // apl_TARGET_LIBAPL
+# endif // not apl_TARGET_PYTHON
+#endif // not apl_TARGET_LIBAPL
 }
 //----------------------------------------------------------------------------
 void

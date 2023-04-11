@@ -1571,9 +1571,9 @@ std::vector<Function_Line> lines;
 
    loop(l, new_value.element_count())
       {
-         APL_Integer line = new_value.get_cravel(l).get_near_int();
-         if (line < 1)   continue;
-         lines.push_back(Function_Line(line));
+        APL_Integer line = new_value.get_cravel(l).get_near_int();
+        if (line < 1)   continue;
+        lines.push_back(Function_Line(line));
       }
 
    ufun->set_trace_stop(lines, stop);
@@ -1587,8 +1587,7 @@ Quad_STOP::eval_AB(Value_P A, Value_P B) const
    // 1. called via S∆   then A is the function and B are the lines.
    // 2. called directly then B is the function and A are the lines.
    //
-const UserFunction * ufun = locate_fun(*A);
-   if (ufun)   // case 1.
+   if (const UserFunction * ufun = locate_fun(*A))   // case 1.
       {
         assign(const_cast<UserFunction *>(ufun), *B, true);
         return reference(ufun->get_stop_lines(), true);
@@ -1596,20 +1595,22 @@ const UserFunction * ufun = locate_fun(*A);
 
    // case 2.
    //
-   ufun = locate_fun(*B);
-   if (ufun == 0)   DOMAIN_ERROR;
+   if (const UserFunction * ufun = locate_fun(*B))   // case 2.
+      {
+        assign(const_cast<UserFunction *>(ufun), *A, true);
+        return reference(ufun->get_stop_lines(), true);
+     }
 
-   assign(const_cast<UserFunction *>(ufun), *A, true);
-   return reference(ufun->get_stop_lines(), true);
+   DOMAIN_ERROR;
 }
 //----------------------------------------------------------------------------
 Token
 Quad_STOP::eval_B(Value_P B) const
 {
-const UserFunction * ufun = locate_fun(*B);
-   if (ufun == 0)   DOMAIN_ERROR;
+   if (const UserFunction * ufun = locate_fun(*B))
+      return reference(ufun->get_stop_lines(), false);
 
-   return reference(ufun->get_stop_lines(), false);
+   DOMAIN_ERROR;
 }
 //============================================================================
 Token
@@ -1620,29 +1621,28 @@ Quad_TRACE::eval_AB(Value_P A, Value_P B) const
    // 1. called via S∆   then A is the function and B are the lines.
    // 2. called directly then B is the function and A are the lines.
    //
-const UserFunction * ufun = locate_fun(*A);
-   if (ufun)   // case 1.
+   if (const UserFunction * ufun = locate_fun(*A))   // case 1.
       {
         assign(const_cast<UserFunction *>(ufun), *B, false);
         return reference(ufun->get_trace_lines(), true);
       }
 
-   // case 2.
-   //
-   ufun = locate_fun(*B);
-   if (ufun == 0)   DOMAIN_ERROR;
+   if (const UserFunction * ufun = locate_fun(*B))   // case 2.
+      {
+        assign(const_cast<UserFunction *>(ufun), *A, false);
+        return reference(ufun->get_trace_lines(), true);
+      }
 
-   assign(const_cast<UserFunction *>(ufun), *A, false);
-   return reference(ufun->get_trace_lines(), true);
+   DOMAIN_ERROR;
 }
 //----------------------------------------------------------------------------
 Token
 Quad_TRACE::eval_B(Value_P B) const
 {
-const UserFunction * ufun = locate_fun(*B);
-   if (ufun == 0)   DOMAIN_ERROR;
+   if (const UserFunction * ufun = locate_fun(*B))
+      return reference(ufun->get_trace_lines(), false);
 
-   return reference(ufun->get_trace_lines(), false);
+   DOMAIN_ERROR;
 }
 //============================================================================
 

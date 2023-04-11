@@ -4,24 +4,26 @@
       )ERASE foo
 
 ∇foo;T
- 'Vector Line 1'
- T←'Assigned Vector Line 2'
-
- 2 6⍴'MatrixLine 4'
- T←2 6⍴'MatrixLine 5'
+ 'Vector Line 1'              ⍝ print value "Vector Line 1"
+ T←'Assigned Vector Line 2'   ⍝ print nothing (comitted value)
+ 2 6⍴'MatrixLine 3'           ⍝ print 2 lines "Matrix" and "Line 3"
+ T←2 6⍴'MatrixLine 4'         ⍝ print nothing (comitted value)
 ∇
 
-      foo   ⍝ run foo
-Vector Line 1
-Matrix
-Line 4
+      ⎕CR 'foo'
+foo;T                                                             
+'Vector Line 1'              ⍝ print value "Vector Line 1"        
+T←'Assigned Vector Line 2'   ⍝ print nothing (comitted value)     
+2 6⍴'MatrixLine 3'           ⍝ print 2 lines "Matrix" and "Line 3"
+T←2 6⍴'MatrixLine 4'         ⍝ print nothing (comitted value)     
+
 
       T∆foo←1 5 6
       foo
 foo[1] Vector Line 1
 Vector Line 1
 Matrix
-Line 4
+Line 3
 
       ⍝ T∆ sorts items and discards invalid lines
       ⍝

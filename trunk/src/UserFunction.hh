@@ -299,7 +299,7 @@ protected:
    /** Offsets to the first token in every line (for jumps).
        lines[0] points to the last line, which is automatically
        added and is TOK_RETURN_VOID for void functions
-       and TOK_RETURN_VALUET for functions returning a value.
+       and TOK_RETURN_VALUE for functions returning a value.
 
        An N line function:
 
