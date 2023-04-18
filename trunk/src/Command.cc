@@ -55,9 +55,10 @@
 #include "UserFunction.hh"
 #include "UserPreferences.hh"
 #include "ValueHistory.hh"
+#include "Value.hh"
 #include "Workspace.hh"
 
-#include "Value.hh"
+#include "Workspace.icc"
 
 bool Command::auto_MORE = false;
 

@@ -73,6 +73,7 @@
 #include "Quad_SQL.hh"
 #include "Quad_TF.hh"
 #include "Quad_XML.hh"
+#include "StateIndicator.hh"
 #include "Symbol.hh"
 #include "Token.hh"
 #include "UCS_string.hh"
@@ -80,6 +81,8 @@
 #include "Value.hh"
 #include "ValueHistory.hh"
 #include "Workspace.hh"
+
+#include "Workspace.icc"
 
 using namespace std;
 

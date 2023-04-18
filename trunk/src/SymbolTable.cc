@@ -39,6 +39,8 @@
 #include "Value.hh"
 #include "Workspace.hh"
 
+#include "Workspace.icc"
+
 //----------------------------------------------------------------------------
 Symbol *
 SymbolTable::lookup_symbol(const UCS_string & sym_name)

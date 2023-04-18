@@ -52,6 +52,8 @@
 #include "Value.hh"
 #include "Workspace.hh"
 
+#include "Workspace.icc"
+
 UCS_string Quad_QUOTE::buffer;
 
 ShapeItem Quad_SYL::si_depth_limit = 0;

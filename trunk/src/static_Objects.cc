@@ -29,6 +29,7 @@
 #include "DynamicObject.hh"
 #include "Logging.hh"
 #include "Macro.hh"
+#include "StateIndicator.hh"
 #include "static_Objects.hh"
 #include "Workspace.hh"
 

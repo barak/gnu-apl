@@ -36,10 +36,11 @@
 class DerivedFunction : public Function
 {
 public:
-   /// Constructor for DerivedFunctionCache
+   /// default constructor (for DerivedFunctionCache)
    DerivedFunction() : Function(TOK_FUN0)   {}
 
-   /// Constructor (dyadic operator)
+   /// constructor (dyadic operator). Normally lf and rf are functions, but
+   /// APL2 explicitly permits values.
    DerivedFunction(Token & lf, Function_P dyop, Token & rf, const char * loc);
 
    /// Constructor (dyadic operator with axis: fun ⍤[] rval)

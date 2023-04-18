@@ -38,6 +38,9 @@
 #include "UserPreferences.hh"
 #include "Workspace.hh"
 
+struct termios LineInput::initial_termios = { 0 };
+int LineInput::initial_termios_errno = 0;
+
 // hooks for external editors (emacs)
 extern void (*start_input)();
 void (*start_input)() = 0;
@@ -742,17 +745,24 @@ LineInput::LineInput(bool do_read_history)
 #endif // apl_TARGET_LIBAPL
 }
 //----------------------------------------------------------------------------
-LineInput::~LineInput()
+void
+LineInput::restore_termios()
 {
-   if (initial_termios_errno)   return;
-
-   if (write_history)   history.save_history(uprefs.line_history_path.c_str());
-
+   if (initial_termios_errno == 0)
+      {
 #ifndef apl_TARGET_LIBAPL
 # ifndef apl_TARGET_PYTHON
-   tcsetattr(STDIN_FILENO, TCSANOW, &initial_termios);
+        tcsetattr(STDIN_FILENO, TCSANOW, &initial_termios);
 # endif // not apl_TARGET_PYTHON
 #endif // not apl_TARGET_LIBAPL
+      }
+   initial_termios_errno = 1;   // prevent multiple calls
+}
+//----------------------------------------------------------------------------
+LineInput::~LineInput()
+{
+   restore_termios();
+   if (write_history)   history.save_history(uprefs.line_history_path.c_str());
 }
 //----------------------------------------------------------------------------
 void

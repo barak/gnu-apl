@@ -114,9 +114,8 @@ public:
    static void set_PW(int PW, const char * loc)
       { the_workspace.v_Quad_PW.assign(IntScalar(PW, loc), false, loc); }
 
-   /// the number of SI entries
-   static int SI_entry_count()
-      { return SI_top() ? (SI_top()->get_level() + 1) : 0; }
+   /// the number of )SI stack entries
+   static inline int SI_entry_count();
 
    /// the top of the SI stack (the SI pushed last)
    static StateIndicator * SI_top()
@@ -136,8 +135,7 @@ public:
       { the_workspace.v_Quad_AI.add_wait(diff); }
 
    /// return information in SI_top()
-   static Error * get_error()
-      { return &StateIndicator::get_error(SI_top()); }
+   static inline Error * get_error();
 
    /// return reference to more info about last error
    static UCS_string & more_error()
@@ -276,8 +274,11 @@ public:
 
    // access to system variables.
    //
+/// read-only system variable
 #define ro_sv_def(x, _str, _txt) /** return x **/ static x & get_v_ ## x() \
    { return the_workspace.v_ ## x; }
+
+/// read/write system variable
 #define rw_sv_def(x, _str, _txt) /** return ## x **/ static x& get_v_ ## x() \
    { return the_workspace.v_ ## x; }
    rw_sv_def(Quad_Quad,  "", "⎕")
@@ -299,7 +300,9 @@ protected:
 
    // system variables.
    //
+/// read-only system variable
 #define ro_sv_def(x, _str, _txt) /** x **/ x v_ ## x;
+/// read/write system variable
 #define rw_sv_def(x, _str, _txt) /** x **/ x v_ ## x;
    rw_sv_def(Quad_Quad,  "", "⎕")
    rw_sv_def(Quad_QUOTE, "", "⍞")

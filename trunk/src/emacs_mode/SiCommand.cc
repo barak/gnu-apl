@@ -21,9 +21,10 @@
 /** @file
 */
 
+#include "emacs.hh"
 #include "NetworkConnection.hh"
 #include "SiCommand.hh"
-#include "emacs.hh"
+#include "../StateIndicator.hh"
 
 #include <sstream>
 

@@ -30,6 +30,8 @@
 #include "UserFunction.hh"
 #include "Workspace.hh"
 
+#include "Workspace.icc"
+
 //----------------------------------------------------------------------------
 Error::Error(ErrorCode ec, const char * loc)
    : error_code(ec),

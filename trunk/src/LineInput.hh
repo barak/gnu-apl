@@ -325,6 +325,9 @@ public:
    /// initialize the input subsystem
    static void init(bool do_read_history);
 
+   /// undo init()
+   static void restore_termios();
+
    /// close this line input, maybe updating the history
    static void close(bool do_not_write_hist)
       { if (the_line_input && do_not_write_hist)
@@ -363,19 +366,19 @@ protected:
 
    /// the stdin termios at startup of the interpreter. Will be restored
    /// when the interpreter exits.
-   struct termios initial_termios;
-
-   /// the current stdin termios.
-   struct termios current_termios;
-
-   /// the first tcgetattr() errno (or 0 if none)
-   int initial_termios_errno;
+   static struct termios initial_termios;
 
    /// write history when done
    bool write_history;
 
    /// interrupt-safe fgetc()
    static int safe_fgetc();
+
+   /// the first tcgetattr() errno (or 0 if none)
+   static int initial_termios_errno;
+
+   /// the current stdin termios.
+   struct termios current_termios;
 
    /// get one character from user
    static Unicode get_uni();

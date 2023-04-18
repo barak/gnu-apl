@@ -45,6 +45,7 @@
 #include "Common.hh"
 #include "IO_Files.hh"
 #include "LibPaths.hh"
+#include "LineInput.hh"
 #include "Macro.hh"
 #include "NativeFunction.hh"
 #include "Output.hh"
@@ -99,6 +100,9 @@ signal_SEGV_handler(int)
 
    // count errors
    IO_Files::assert_error();
+
+   // restore terminal setting and
+   LineInput::restore_termios();
 
    Command::cmd_OFF(3);
 }

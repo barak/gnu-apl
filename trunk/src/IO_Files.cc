@@ -33,6 +33,8 @@
 #include "UserPreferences.hh"
 #include "Workspace.hh"
 
+#include "Workspace.icc"
+
 int IO_Files::testcase_count = 0;
 int IO_Files::testcases_done = 0;
 int IO_Files::total_errors = 0;

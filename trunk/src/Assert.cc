@@ -30,6 +30,8 @@
 #include "IO_Files.hh"
 #include "Workspace.hh"
 
+#include "Workspace.icc"
+
 /// prevent recursive do_Assert() calls.
 static bool asserting = false;
 

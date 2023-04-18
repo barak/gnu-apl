@@ -46,11 +46,25 @@ using namespace std;
 #include "Quad_SQL.hh"
 #include "Quad_TF.hh"
 #include "Quad_XML.hh"
+#include "StateIndicator.hh"
 #include "SystemVariable.hh"
 #include "UserFunction.hh"
 #include "UserPreferences.hh"
 #include "Workspace.hh"
 
+// first of all: inline functions...
+//----------------------------------------------------------------------------
+Error *
+Workspace::get_error()
+{
+   return &StateIndicator::get_error(SI_top());
+}
+//----------------------------------------------------------------------------
+int
+Workspace::SI_entry_count()
+{
+   return SI_top() ? (SI_top()->get_level() + 1) : 0;
+}
 //----------------------------------------------------------------------------
 Workspace::Workspace()
    : WS_name("CLEAR WS"),
@@ -1123,6 +1137,7 @@ Workspace::wsid(ostream & out, UCS_string arg, LibRef lib, bool silent)
    the_workspace.WS_name = arg;
 }
 //----------------------------------------------------------------------------
+/// start a new )MORE error info (overriding the previous one).
 UCS_string &
 MORE_ERROR()
 {

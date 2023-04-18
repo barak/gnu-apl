@@ -22,6 +22,7 @@
 */
 
 #include "Bif_F12_COMMA.hh"
+#include "StateIndicator.hh"
 #include "Workspace.hh"
 
 Bif_F12_COMMA  Bif_F12_COMMA ::_fun;    // ,

@@ -42,12 +42,15 @@
 #include "Parallel.hh"
 #include "PrintOperator.hh"
 #include "Quad_XML.hh"
+#include "StateIndicator.hh"
 #include "SystemVariable.hh"
 #include "UCS_string.hh"
 #include "UserFunction.hh"
 #include "Value.hh"
 #include "ValueHistory.hh"
 #include "Workspace.hh"
+
+#include "Workspace.icc"
 
 extern uint64_t top_of_memory();
 

@@ -29,6 +29,7 @@
 #include "Logging.hh"
 #include "NativeFunction.hh"
 #include "PrintOperator.hh"
+#include "StateIndicator.hh"
 #include "UserFunction.hh"
 #include "UTF8_string.hh"
 #include "Workspace.hh"

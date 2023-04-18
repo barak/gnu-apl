@@ -786,6 +786,9 @@ uninstall-am:
 gen:	phrase_gen
 	./phrase_gen > ../src/Prefix.def
 
+gen2:	phrase_gen
+	./phrase_gen -t > ../src/Prefix.def
+
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
 .NOEXPORT:

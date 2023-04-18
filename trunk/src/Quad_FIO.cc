@@ -45,6 +45,7 @@
 #include "Quad_FIO.hh"
 #include "Performance.hh"
 #include "Security.hh"
+#include "StateIndicator.hh"
 #include "Tokenizer.hh"
 #include "Workspace.hh"
 

@@ -27,7 +27,6 @@
 #include <vector>
 
 #include "PrimitiveFunction.hh"
-#include "StateIndicator.hh"
 
 //----------------------------------------------------------------------------
 /** The various Quad functions.  */

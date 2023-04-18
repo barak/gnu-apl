@@ -25,6 +25,8 @@
 #include "Quad_FFT.hh"
 #include "Workspace.hh"
 
+#include "Workspace.icc"
+
 Quad_FFT   Quad_FFT::_fun;
 Quad_FFT * Quad_FFT::fun = &Quad_FFT::_fun;
 

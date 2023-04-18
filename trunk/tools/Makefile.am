@@ -38,3 +38,6 @@ phrase_gen_SOURCES = phrase_gen.cc phrase_gen.def
 gen:	phrase_gen
 	./phrase_gen > ../src/Prefix.def
 
+gen2:	phrase_gen
+	./phrase_gen -t > ../src/Prefix.def
+

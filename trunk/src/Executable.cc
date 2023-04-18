@@ -30,6 +30,8 @@
 #include "Value.hh"
 #include "Workspace.hh"
 
+#include "Workspace.icc"
+
 //----------------------------------------------------------------------------
 Executable::Executable(const UCS_string & ucs,  bool multi_line,
                        ParseMode pm, const char * loc)

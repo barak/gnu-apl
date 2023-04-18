@@ -1,14 +1,19 @@
 
 /*
-   phrase(prio, a0, a1, a2, a3, inl) defines a sequence of token classes
-   with a priority and a Boolean property inline
+   phrase(prio, a0, a1, a2, a3, suffix) defines a sequence of 1..4 token
+  classes with a priority  and a reduce function suffix.
+
+   If suffix is "" (aka. DITO below) then the reduce function is
+   reduce_a0_a1_a2_a3(), otherwise reduce_suffix(). The suffix is used to
+   map different phrases to the same reduce function, as to avoid trivial
+   reduce functions that only call some other reduce function.
 
    prio is a priority for resolving reduce/reduce conflicts.
    a0, a1, ... are groups of token classes:
-   inlis true for trivial wrappers
+   inl is true for trivial wrappers
 
    group     token class(es)
-   -------------------------
+   ─────────────────────────
    ASS:      ←
    GOTO:     →
    ESC:      →
@@ -28,16 +33,15 @@
    V:        TC_SYMBOL
    I:        TC_PINDEX
    RETC:     TC_RETURN
-   -------------------------
+   ─────────────────────────
 
    Normally the priority is the priority of the prefix plus the number of items
-   so that the longest match of the same prefix wins
+   so that the longest match of the same prefix wins.
  */
 
 #define DITO ""
 
 //    (prio          , TC0  , TC1  , TC2  , TC3  ,  reduce_ suffix)
-//                                                  or override
 //=================================================================
 // remove parentheses
 //
@@ -87,10 +91,10 @@ phrase(BS_ANY_BRA+4  , V    , C    , ASS  , B    , DITO )
 phrase(BS_F_B+2,       F    , V    ,     ,       , DITO )
 
 // (reference) and assignment
-phrase(BS_V_ASS+3    , A    , ASS  , B    ,      , DITO )   // selective ass.
-phrase(BS_V_ASS+3    , V    , ASS  , B    ,      , DITO )   // V←B
-phrase(BS_V_ASS+4    , D    , V    , ASS  , B    , DITO )   // .MEMBER ← B
-phrase(BS_V_ASS+3    , V    , ASS  , F    ,      , DITO )   // λ: V ← { ... } ⍺ ⍵
+phrase(BS_V_ASS+3    , A    , ASS  , B    ,      , DITO )       // selective ass.
+phrase(BS_V_ASS+3    , V    , ASS  , B    ,      , DITO )       // V←B
+phrase(BS_V_ASS+4    , D    , V    , ASS  , B    , DITO )       // .MEMBER ← B
+phrase(BS_V_ASS+3    , V    , ASS  , F    ,      , DITO )       // λ: V ← { ... } ⍺ ⍵
 phrase(BS_V_ASS+3    , V    , ASS  , N    ,      , "V_ASS_F_")  // λ: V ← { ... }
 phrase(BS_V_ASS+3    , V    , ASS  , M    ,      , "V_ASS_F_")  // λ: V ← { ... } ⍶
 phrase(BS_V_ASS+3    , V    , ASS  , D    ,      , "V_ASS_F_")  // λ: V ← { ... } ⍶ ⍹
@@ -114,15 +118,15 @@ phrase(BS_ANY+2      , END  , VOID ,      ,      , DITO )
 phrase(BS_ANY+2      , END  , B    ,      ,      , DITO )
 phrase(BS_ANY+2      , END  , GOTO ,      ,      , DITO )
 phrase(BS_ANY+3      , END  , GOTO , B    ,      , DITO )
-phrase(BS_ANY+3      , F    , GOTO , B    ,      , DITO )
-phrase(BS_ANY+3      , M    , GOTO , B    ,      , DITO )
+phrase(BS_ANY+3      , F    , GOTO , B    ,      , "END_GOTO_B_")
+phrase(BS_ANY+3      , M    , GOTO , B    ,      , "END_GOTO_B_")
 phrase(BS_ANY+3      , A    , GOTO , B    ,      , DITO )
 
 // end of user defined function, ⍎, or ◊ context
 //
 phrase(BS_ANY+1      , RETC ,      ,      ,      , DITO )
 phrase(BS_ANY+2      , RETC , VOID ,      ,      , DITO )
-phrase(BS_ANY+2      , RETC , B    ,      ,      , DITO )
+phrase(BS_ANY+2      , RETC , A    ,      ,      , DITO )
 phrase(BS_ANY+2      , RETC , GOTO ,      ,      , DITO )
 phrase(BS_ANY+3      , RETC , GOTO , B    ,      , DITO )
 phrase(BS_ANY+4      , RETC , A    , GOTO , B    , DITO )

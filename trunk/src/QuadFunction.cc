@@ -49,10 +49,13 @@
 #include "Quad_SQL.hh"
 #include "Quad_TF.hh"
 #include "Quad_XML.hh"
+#include "StateIndicator.hh"
 #include "Tokenizer.hh"
 #include "UserFunction.hh"
 #include "Value.hh"
 #include "Workspace.hh"
+
+#include "Workspace.icc"
 
 extern char **environ;
 

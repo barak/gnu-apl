@@ -25,7 +25,6 @@
 #define __PRIMITIVE_OPERATOR_HH_DEFINED__
 
 #include "PrimitiveFunction.hh"
-#include "StateIndicator.hh"
 
 class BeamIterator;
 

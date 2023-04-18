@@ -35,6 +35,9 @@
 #include "ValueHistory.hh"
 #include "Workspace.hh"
 
+/// prefix search mode (hash table vs. search tree
+// #define PREFIX_HASH
+
 uint64_t Prefix::instance_counter = 0;
 
 //----------------------------------------------------------------------------
@@ -331,7 +334,7 @@ Prefix::get_range_high() const
 Function_PC high = PC_range_high;
    if (high == Function_PC_invalid)   high = at(0).pc;
 
-   if (best && best->misc)   --high;
+   if (best_phrase && best_phrase->misc)   --high;
    return high;
 }
 //----------------------------------------------------------------------------
@@ -618,57 +621,123 @@ const TokenClass tcl = tloc.tok.get_Class();
    return false;   // )SI not pushed
 }
 //----------------------------------------------------------------------------
-bool
-Prefix::find_phrase()
+#ifdef PREFIX_HASH
+void
+Prefix::find_best_phrase()
 {
 const int hash_0 = at0().get_Class();
 
-  if (size() >= 3)   // size if 3 or 4
+  if (size() >= 3)   // at2() and maybe at3() is valid
      {
        const int hash_01  = hash_0  | at1().get_Class() <<  5;
        const int hash_012 = hash_01 | at2().get_Class() << 10;
 
-       if (size() >= 4)   // therefore at3() is valid
+       if (size() >= 4)   // at3() is valid
           {
             const int hash_0123 = hash_012 | at3().get_Class() << 15;
-            best = hash_table + hash_0123 % PHRASE_MODU;
-            if (best->phrase_hash == hash_0123)   return true;   // found
+            best_phrase = hash_table + hash_0123 % PHRASE_MODU;
+            if (best_phrase->phrase_hash == hash_0123)   return;   // found
           }
 
-       best = hash_table + hash_012 % PHRASE_MODU;
-       if (best->phrase_hash == hash_012)   return true;         // found
+       best_phrase = hash_table + hash_012 % PHRASE_MODU;
+       if (best_phrase->phrase_hash == hash_012)   return;         // found
 
-       best = hash_table + hash_01 % PHRASE_MODU;
-       if (best->phrase_hash == hash_01)   return true;          // found
+       best_phrase = hash_table + hash_01 % PHRASE_MODU;
+       if (best_phrase->phrase_hash == hash_01)   return;          // found
 
-       best = hash_table + hash_0 % PHRASE_MODU;
-       if (best->phrase_hash != hash_0)   return false;          // not found
+       best_phrase = hash_table + hash_0 % PHRASE_MODU;
+       if (best_phrase->phrase_hash == hash_0)   return;           // found
      }
-  else               // size() is 1 or 2
+  else               // at0() and maybe at1() is valid
      {
-       if (size() == 2)   // therefore at1() is valid
+       if (size() == 2)   // at1() is valid
           {
             const int hash_01 = hash_0 | at1().get_Class() << 5;
-            best = hash_table + hash_01 % PHRASE_MODU;
-            if (best->phrase_hash == hash_01)   return true;     // found
+            best_phrase = hash_table + hash_01 % PHRASE_MODU;
+            if (best_phrase->phrase_hash == hash_01)   return;     // found
           }
 
        // no len 2 phrase match
-       best = hash_table + hash_0 % PHRASE_MODU;
-       if (best->phrase_hash != hash_0)   return false;          // not found
+       best_phrase = hash_table + hash_0 % PHRASE_MODU;
+       if (best_phrase->phrase_hash == hash_0)   return;           // found
      }
 
-   return true;   // phrase not found
+   best_phrase = 0;   // not found
 }
+#endif
+
+#ifdef PREFIX_TREE
+void
+Prefix::find_best_phrase()
+{
+   best_phrase = 0;   // assume nbothing found
+
+// CERR << "\nfind_best_phrase(): size=" << size() << endl;
+// print_stack(CERR, LOC);
+
+int idx = 0;
+   loop(s, size())
+       {
+// CERR << "s=" << s << " idx=" << HEX2(idx) << endl;
+
+         const TokenClass tc = at(s).tok.get_Class();
+// CERR << " TokenClass tc=" << HEX2(tc) << " aka. " << Token::class_name(tc) << endl;
+
+         idx = hash_table[idx].sub_nodes[tc];
+         const Phrase & phrase = hash_table[idx];
+// CERR << " phrase now #" << HEX2(idx) << ": " << phrase.phrase_name << endl;
+// CERR << " reduce name: " << phrase.reduce_name << endl;
+
+         {
+// CERR << "  ├── best_phrase before=" << voidP(best_phrase) << endl;
+         if (phrase.reduce_fun)   best_phrase = &phrase;
+// CERR << "  └── best_phrase after=" << voidP(best_phrase) << endl;
+         }
+
+// if (idx)   CERR << "  now idx=" << HEX2(idx) << " : " << hash_table[idx].reduce_name << endl;
+// else       CERR << "  no child" << endl;
+         if (idx == 0)
+            {
+// CERR << "end of tree" << endl;
+              return;
+            }
+       }
+// CERR << "end of prefix" << endl;
+}
+#endif
 //----------------------------------------------------------------------------
 
-/// one entry of a hast table for all prefixes that can be reduced.
+// one entry of a hash table for all prefixes that can be reduced.
 // Used in Prefix.def
-#define PH(name, suffix, idx, prio, misc, len) \
-   { #name, #suffix, &Prefix::reduce_ ## suffix, idx, prio, misc, len },
+//
+# define reduce_none 0
 
-// the entire hash table with all prefixes that can be reduced...
+#ifdef PREFIX_HASH
+# define PH(name, suffix, idx, prio, misc, len)                         \
+   { #name, #suffix, &Prefix::reduce_ ## suffix, idx, prio, misc, len }
+#endif   // PREFIX_HASH
+
+#ifdef PREFIX_TREE
+
+# define PH(name, suffix, idx, prio, misc, len,                               \
+           t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,tA,tB,tC,tD,tE,tF,tG,tH)             \
+  { #name, #suffix, &Prefix::reduce_ ## suffix, idx, prio, misc, len,         \
+    { 0x##t0, 0x##t1, 0x##t2, 0x##t3, 0x##t4, 0x##t5, 0x##t6, 0x##t7, 0x##t8, \
+      0x##t9, 0x##tA, 0x##tB, 0x##tC, 0x##tD, 0x##tE, 0x##tF, 0x##tG, 0x##tH }}
+
+// dito, but without reduce function.
+#define P0(name, suffix, idx, prio, misc, len,                          \
+           t0,t1,t2,t3,t4,t5,t6,t7,t8,t9,tA,tB,tC,tD,tE,tF,tG,tH)       \
+   { #name, #suffix, 0, idx, prio, misc, len,                           \
+    { 0x##t0, 0x##t1, 0x##t2, 0x##t3, 0x##t4, 0x##t5, 0x##t6, 0x##t7, 0x##t8, \
+      0x##t9, 0x##tA, 0x##tB, 0x##tC, 0x##tD, 0x##tE, 0x##tF, 0x##tG, 0x##tH }}
+#endif   // PREFIX_TREE
+
+const Prefix::Phrase Prefix::hash_table[] =
+{
+// the entire hash table or tree with all prefixes that can be reduced...
 #include "Prefix.def"   // the hash table
+};
 
 Token
 Prefix::reduce_statements()
@@ -694,23 +763,24 @@ again:   // aka. REDUCE
 
    // search longest prefixes in phrase table...
    //
-   if (!find_phrase())   goto grow;
+   find_best_phrase();   // set best_phrase
+   if (best_phrase == 0)   goto grow;
 
    // found a reducible prefix. See if the next token class binds stronger
-   // than best->prio
+   // than best_phrase->prio
    //
    if (check_next_binding())   goto grow;
 
    Log(LOG_prefix_parser)  CERR
-      << "   phrase #" <<  (best - hash_table)
-      << ": " << best->phrase_name
-      << " matches, prio " << best->prio
-      << ", calling reduce_" << best->reduce_name
+      << "   phrase #" <<  (best_phrase - hash_table)
+      << ": " << best_phrase->phrase_name
+      << " matches, prio " << best_phrase->prio
+      << ", calling reduce_" << best_phrase->reduce_name
       << "()" << endl;
 
    action = RA_FIXME;   // to detect missing action = in a reduce_XXX()
-   prefix_len = best->phrase_len;
-   if (best->misc)   // MISC phrase: save X and remove it
+   prefix_len = best_phrase->phrase_len;
+   if (best_phrase->misc)   // MISC phrase: save X and remove it
       {
         Assert(saved_lookahead.tok.get_tag() == TOK_VOID);
         saved_lookahead.copy(pop(), LOC);
@@ -718,7 +788,7 @@ again:   // aka. REDUCE
       }
 
 const uint64_t inst = instance;
-   (this->*best->reduce_fun)();
+   (this->*best_phrase->reduce_fun)();
 
    if (inst != Workspace::SI_top()->get_prefix().instance)
       {
@@ -730,7 +800,7 @@ const uint64_t inst = instance;
       }
 
    Log(LOG_prefix_parser)
-      CERR << "   reduce_" << best->reduce_name << "() returned: ";
+      CERR << "   reduce_" << best_phrase->reduce_name << "() returned: ";
 
    // handle action
    //
@@ -772,7 +842,7 @@ TokenClass next = TC_INVALID;
             }
        }
 
-    if (best->misc && (at0().get_Class() == TC_R_BRACK))
+    if (best_phrase->misc && (at0().get_Class() == TC_R_BRACK))
        {
          // the next symbol is a ] and the matching phrase is a MISC
          // phrase (monadic call of a possibly dyadic function).
@@ -807,10 +877,10 @@ TokenClass next = TC_INVALID;
    if (do_shift(next))   // i.e. shift
       {
         Log(LOG_prefix_parser)  CERR
-             << "   phrase #" << (best - hash_table)
-             << ": " << best->phrase_name
-             << " matches, but prio " << best->prio
-             << " is too small to call " << best->reduce_name
+             << "   phrase #" << (best_phrase - hash_table)
+             << ": " << best_phrase->phrase_name
+             << " matches, but prio " << best_phrase->prio
+             << " is too small to call " << best_phrase->reduce_name
              << "()" << endl;
         return true;
       }
@@ -830,13 +900,13 @@ Prefix::do_shift(TokenClass next) const
                 }
              else if (next == TC_VALUE)      // A B
                 {
-                  return best->prio < BS_VAL_VAL;
+                  return best_phrase->prio < BS_VAL_VAL;
                 }
              else if (next == TC_R_PARENT)   // ) B
                 {
                   if (is_value_parenthesis(PC))     // e.g. (X+Y) B
                      {
-                       return best->prio < BS_VAL_VAL;
+                       return best_phrase->prio < BS_VAL_VAL;
                      }
                    else                      // e.g. (+/) B
                      {
@@ -1335,23 +1405,24 @@ Prefix::MM_is_FM(Function_PC pc)
    /*
       dis-ambiguate / ⌿ \ or ⍀.
       return true if M M shall actually be F M in reduce_M_M__().
+      PC was alredy incremented and points to the token left of M M:
 
        On entry;
                              ┌─────────────────── PC
-                             │      ┌──────────── PC-1
-                             │      │        ┌─── PC-2
+                             │      ┌──────────── PC-1   i.e. M1
+                             │      │        ┌─── PC-2   i.e. M2
        ┌────────┬───   ───┬──────┬──────┬──────────┬───
-       │ TC_END │   ...   │ NEXT │ /⌿\⍀ | TC_OPER1 │   ...
+       │ TC_END │   ...   │ NEXT │ /⌿\⍀ | TC_OPER1 │  (B...)
        └────────┴───   ───┴──────┴──────┴──────────┴───
 
        token in metaclass MISC, i.e. ← → ; [ END ( may not be left of M M.
     */
    for (;;)
        {
-         const Token & next = body[pc];
-         switch(const TokenClass tc_next = next.get_Class())
+         const Token & NEXT = body[pc];
+         switch(const TokenClass tc_NEXT = NEXT.get_Class())
             {
-                   // Examples:                     ┌─────── next
+                   // Examples:                     ┌─────── NEXT
                    //                               │ ┌───── M1 is / ⌿ \ or ⍀
                    //                               │ │ ┌─── M2 any operator
                    //                               │ │ │
@@ -1375,7 +1446,7 @@ Prefix::MM_is_FM(Function_PC pc)
                    // resolve the symbol which will normally lead to one of the
                    // one of the other cases.
                    //
-                   switch(const NameClass nc = next.get_sym_ptr()->get_NC())
+                   switch(const NameClass nc = NEXT.get_sym_ptr()->get_NC())
                        {
                          // A. unknown/unassigned symbols...
                          //
@@ -1404,8 +1475,8 @@ Prefix::MM_is_FM(Function_PC pc)
                          // D. function or value
                          //
                          case NC_OPERATOR:
-                              Assert(next.get_function());
-                              return next.get_function()
+                              Assert(NEXT.get_function());
+                              return NEXT.get_function()
                                         ->get_oper_valence() == 2;
 
                          // E. missed cases (internal error)
@@ -1425,10 +1496,10 @@ Prefix::MM_is_FM(Function_PC pc)
                     continue;
 
               case TC_R_PARENT:
-                   pc = Function_PC(int(pc) + 1);
+                   pc = Function_PC(pc + 1);
                    continue;
 
-              default: CERR << "next: " << tc_next << endl;
+              default: CERR << "NEXT: " << tc_NEXT << endl;
                        TODO;
             }
        }
@@ -1437,21 +1508,13 @@ Prefix::MM_is_FM(Function_PC pc)
 void
 Prefix::reduce_M_M__()
 {
-   set_action(RA_PUSH_NEXT);   // normally the left M is an operator. SHIFT
-   if (is_SLASH_or_BACKSLASH(at0().get_tag()))
+   if (is_SLASH_or_BACKSLASH(at0().get_tag()) && MM_is_FM(PC))
       {
-        if (MM_is_FM(PC))
-           {
-             // CERR << "/ is function" << endl;
-             enum { OPER1_TO_FUN2 = TC_OPER1 - TC_FUN2 };
-             const TokenTag tfun = TokenTag(at0().get_tag() - OPER1_TO_FUN2);
-             at0().ChangeTag(tfun);
-             set_action(RA_CONTINUE);   // match again (w/o SHIFT)
-           }
-        else
-           {
-             // CERR << "/ is operator" << endl;
-           }
+        reduce_F_M__();
+      }
+   else   // the normal case: the left M is an operator. SHIFT
+      {
+        set_action(RA_PUSH_NEXT);
       }
 }
 //----------------------------------------------------------------------------
@@ -2316,6 +2379,8 @@ Token B = pop().tok;    // pop B
 void
 Prefix::reduce_A_GOTO_B_()
 {
+   // dyadic LABEL → CONDITION.
+
    Assert1(prefix_len == 3);
 
    // we want this to be fast, therefore we don't check the shape but
@@ -2391,23 +2456,11 @@ const APL_Integer jump_offset = A0.get_near_int();
 }
 //----------------------------------------------------------------------------
 void
-Prefix::reduce_F_GOTO_B_()
-{
-   reduce_END_GOTO_B_();
-}
-//----------------------------------------------------------------------------
-void
-Prefix::reduce_M_GOTO_B_()
-{
-   reduce_END_GOTO_B_();
-}
-//----------------------------------------------------------------------------
-void
 Prefix::reduce_END_GOTO_B_()
 {
-   Assert1(prefix_len == 3);
+   // monadic →LABEL. Preserves the at0() token and reduces only GOTO_B.
 
-   if (size() != 3)   syntax_error(LOC);
+   Assert1(prefix_len == 3);
 
    si.fun_oper_cache.reset();
 
@@ -2561,7 +2614,7 @@ Prefix::reduce_RETC___()
    // TOK_RETURN_VOID:   end of ∇ (no result)
    // TOK_RETURN_SYMBOL: end of ∇ (result in Z)
    //
-   // case TOK_RETURN_EXEC (end of ⍎ context) is handled in reduce_RETC_B___()
+   // case TOK_RETURN_EXEC (end of ⍎ context) is handled in reduce_RETC_A___()
    //
    switch(at0().get_tag())
       {
@@ -2625,11 +2678,11 @@ Prefix::reduce_RETC___()
    Q1(at0().get_tag())   FIXME;
 }
 //----------------------------------------------------------------------------
-// Note: reduce_RETC_B___ happens only for context ⍎,
+// Note: reduce_RETC_A___ happens only for context ⍎,
 //       since contexts ◊ and ∇ use reduce_END_B___ instead.
 //
 void
-Prefix::reduce_RETC_B__()
+Prefix::reduce_RETC_A__()
 {
    Assert1(prefix_len == 2);
 

@@ -313,6 +313,19 @@ public:
    const Token_loc & at(int idx) const
        { Assert1(idx < put);   return content[put - idx - 1]; }
 
+   /// one phrase in the phrase table
+   struct Phrase
+      {
+        const char *   phrase_name;     ///< phrase name
+        const char *   reduce_name;     ///< reduce function name
+        void (Prefix::*reduce_fun)();   ///< reduce function
+        int            phrase_hash;     ///< phrase hash
+        int            prio;            ///< phrase priority
+        int            misc;            ///< 1 if MISC phrase
+        int            phrase_len;      ///< phrase length
+        uint8_t        sub_nodes[TC_MAX_PHRASE+1];   ///< parent nodes
+      };
+
 protected:
    /// push the next token onto the stack. Return \b true iff )SI was pushed.
    //  called often but from the same place in reduce_statements()
@@ -320,7 +333,7 @@ protected:
 
    /// find a phrase that matches the current stack. Return \b true iff found.
    //  called often but from the same place in reduce_statements()
-   inline bool find_phrase();
+   inline void find_best_phrase();
 
    /// return true iff the next token binds stronger (so we need to shift).
    inline bool check_next_binding();
@@ -348,12 +361,13 @@ protected:
    /// a unique identifier
    const uint64_t instance;
 
+   // member declarations of all 'void reduce_XXX()' functions...
+   //
+#define P_(_name, _suffix, _idx, _prio, _misc, _len)
+#include "Prefix.def"
+
    /// the StateIndicator that contains this parser
    StateIndicator & si;
-
-   // void reduct_XXX() member declarations
-   //
-#include "Prefix.def"
 
    /// put pointer (for the next token at PC)
    int put;
@@ -382,8 +396,9 @@ protected:
    /// the action to be taken after returning from a reduce_XXX() function
    R_action action;
 
-   /// the phrase being reduced (or 0 if no phrase was matched)
-   const Phrase * best;
+   /// the best (longest) phrase that matches the current stack,
+   /// or 0 if no phrase matches (so the parser will SHIFT)
+   const Phrase * best_phrase;
 
    /// a generator for unique identifiers
    static uint64_t instance_counter;
