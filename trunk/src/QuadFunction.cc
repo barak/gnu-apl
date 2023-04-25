@@ -386,7 +386,7 @@ Value_P Z(3, LOC);
 
         PrintBuffer pb;
         pb.append_ucs(Error::error_name(ec));
-        pb.append_ucs(UCS_string(UTF8_string(err.get_error_line_2())));
+        pb.append_ucs(err.get_error_line_2());
         pb.append_ucs(err.get_error_line_3());
 
         Value_P Z2(2, LOC);
@@ -1432,12 +1432,10 @@ Value_P Z(len, LOC);
 
              case 4:  if (StateIndicator::get_error(si).get_error_code())
                          {
-                           const Error & error = StateIndicator::get_error(si);
-                           const char * error_cp = error.get_error_line_2();
-                           const UTF8_string error_utf(error_cp);
-                           const UCS_string error_ucs(error_utf);
-                           Value_P error_val(error_ucs, LOC);
-                           Z->next_ravel_Pointer(error_val.get());
+                           const Error & e = StateIndicator::get_error(si);
+                           const UCS_string ucs = e.get_error_line_2();
+                           Value_P ZZ(ucs, LOC);
+                           Z->next_ravel_Pointer(ZZ.get());
                          }
                       else   // no error in context si
                          {

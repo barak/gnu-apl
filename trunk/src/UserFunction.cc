@@ -527,7 +527,7 @@ Value_P Z = CLONE_P(B, LOC);
 void
 UserFunction::set_locked_error_info(Error & error) const
 {
-UCS_string message_2(UTF8_string(error.get_error_line_2()));
+UCS_string message_2(error.get_error_line_2());
 
 #define SHORT 0
    if (header.A())

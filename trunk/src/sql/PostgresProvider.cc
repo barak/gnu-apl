@@ -31,9 +31,10 @@ static PostgresConnection *create_postgres_connection( Value_P B )
         DOMAIN_ERROR;
     }
 
-    string connect_args = to_string( B->get_UCS_ravel() );
+     const UTF8_string B_utf(B->get_UCS_ravel());
+    string connect_args = B_utf.c_str();
 
-    const char *keywords[] = { "dbname", NULL };
+    const char * keywords[] = { "dbname", NULL };
     const char *values[] = { connect_args.c_str(), NULL };
     PGconn *db = PQconnectdbParams( keywords, values, 1 );
 

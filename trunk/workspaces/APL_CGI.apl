@@ -293,8 +293,8 @@ There is a growing group of people that are using GNU APL and that would like
 to share their APL code with other APL programmers.
 We have created a
 <?apl  'Community.html' HTML∆A '<b>GNU APL Community Web page</b>' ?>
-that aims at collectinf and preserving <B>links</B> this code to avoid that
-it get lost.
+that aims at collecting and preserving <B>links</B> to the code provided
+by GNU APL users as to avoid that it gets lost.
 <BR><BR>
 In addition, we maintain a 
 <?apl  'Bits_and_Pieces/' HTML∆A '<b>Bits-and-Pieces</b>' ?> directory

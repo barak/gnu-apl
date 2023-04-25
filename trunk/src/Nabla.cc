@@ -387,7 +387,7 @@ Nabla::parse_oper(UCS_string & oper, bool initial)
 
    // skip trailing spaces
    //
-   while (oper.size() > 0 && oper.back() <= ' ')   oper.pop_back();
+   oper.remove_trailing_whitespaces();
    if (oper.size() > 0 && oper.back() == UNI_NABLA)
       {
         do_close = true;
@@ -467,7 +467,8 @@ command_loop:
         case UNI_DELTA:         ecmd = ECMD_DELETE;   c.next();   break;
         case UNI_RIGHT_ARROW:   ecmd = ECMD_ESCAPE;   c.next();   break;
 
-        default: UERR << "Bad edit op '" << c.lookup() << "'" << endl;
+        default: UERR << "Bad edit op '" << c.lookup() << "'"
+                      << " in line " << current_line << endl;
                  return "Bad ∇-command";
       }
 

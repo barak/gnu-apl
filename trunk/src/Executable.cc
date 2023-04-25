@@ -344,7 +344,7 @@ void
 Executable::set_error_info(Error & error, Function_PC2 pc_from_to) const
 {
 const ErrorCode ec = error.get_error_code();
-UCS_string message_2(UTF8_string(error.get_error_line_2()));
+UCS_string message_2(error.get_error_line_2());
 
    // for value errors we point to the failed symbol itself.
    //
@@ -406,6 +406,10 @@ Function_PC end = start;
    //
 int len_left = 0;      // characters before the first caret
 int len_between = 0;   // distance between the carets
+
+   // every statement is stored right to left. In order to print it
+   // left to right we have to move backwards from the end.
+   //
    for (int q = end - 1; q >= start; --q)
        {
          // avoid duplicate ∘ in ∘.f

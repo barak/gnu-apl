@@ -652,10 +652,10 @@ UCS_string ucs(cc);
 int
 Token::error_info(UCS_string & ucs) const
 {
-UCS_string can = canonical(PR_APL_FUN).remove_pad();
+UCS_string canon = canonical(PR_APL_FUN).remove_pad();
 
 const Unicode c1 = ucs.back();
-const Unicode c2 = can.size() ? can[0] : Invalid_Unicode;
+const Unicode c2 = canon.size() ? canon[0] : Invalid_Unicode;
 
    // conditions when we don't need a space
    //
@@ -663,8 +663,8 @@ bool need_space = ! (Avec::no_space_after(c1) || Avec::no_space_before(c2));
 
    if (need_space)   ucs.append(UNI_SPACE);
 
-   ucs.append(can);
-   return need_space ? -can.size() : can.size();
+   ucs.append(canon);
+   return need_space ? -canon.size() : canon.size();
 }
 //----------------------------------------------------------------------------
 const char * 

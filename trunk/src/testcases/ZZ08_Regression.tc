@@ -84,7 +84,7 @@ SYNTAX ERROR+
 ∇
 
       10 z 20
-VALUE ERROR
+VALUE ERROR+
 z[1]  foo
       ^
 

@@ -1437,17 +1437,25 @@ Bif_F1_EXECUTE::execute_command(UCS_string & command)
         throw error;
       }
 
-UTF8_ostream out;
-const bool user_cmd = Command::do_APL_command(out, command);
+UTF8_ostream out;   // the APL output (like stdout) of the command
+
+   // check for user-defined commands (they are defined APL functions)
+   //
+const bool user_cmd = Command::do_APL_command(out, command);   // writes to out
    if (user_cmd)   return execute_statement(command);
 
+   // system command. Append linefeed if needed.
+   // To accommodate line_starts below.
+   //
 UTF8_string result_utf8 = out.get_data();
    if (result_utf8.size() == 0 ||
        result_utf8.back() != UNI_LF)
       result_utf8 += '\n';
 
+   // result_utf8 may have multiple lines. Remember where the lines start.
+   //
 std::vector<ShapeItem> line_starts;
-   line_starts.push_back(0);
+   line_starts.push_back(0);   // the first line
    loop(r, result_utf8.size())
       {
         if (result_utf8[r] == UNI_LF)   line_starts.push_back(r + 1);

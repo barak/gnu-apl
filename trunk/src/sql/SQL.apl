@@ -1,5 +1,15 @@
 #!apl -f
 
+⍝
+⍝ WARNING: this workspace is obsolete. It uses 'lib_sql' ⎕FX 'SQL' (aka.
+⍝ native functions) which was the method of choice before ⎕SQL was
+⍝ introduced in GNU APL. These days you should use the system function ⎕SQL
+⍝ (a lower level interface to SQL servers) and/or workspace Simple_SQL
+⍝ (higher level interface to SQL servers) instead.
+⍝
+⍝ Sooner or later this workspace will be removed.
+⍝
+
 ⍝  This file contains helper definititions to make the SQL API more
 ⍝  easy to use. Example use:
 ⍝

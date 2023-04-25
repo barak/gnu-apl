@@ -26,6 +26,7 @@
 class PostgresProvider : public Provider {
 public:
     virtual ~PostgresProvider() {}
-    virtual const string get_name( void ) { return "postgresql"; }
-    virtual Connection *open_database( Value_P B );
+    virtual const char * get_provider_name() { return "postgreSQL"; }
+    virtual Connection * open_database(Value_P B);
 };
+

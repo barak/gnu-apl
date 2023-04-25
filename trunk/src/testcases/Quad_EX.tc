@@ -7,7 +7,7 @@
 1
 
       RUNS
-VALUE ERROR
+VALUE ERROR+
       RUNS
       ^
 
@@ -74,7 +74,7 @@ SQUARE[1]  Z←R⋆2
    ^
 
       SQUARE 5
-VALUE ERROR
+VALUE ERROR+
       SQUARE 5
       ^
 
@@ -83,7 +83,7 @@ VALUE ERROR
 25
 
       SQUARE 5
-VALUE ERROR
+VALUE ERROR+
       SQUARE 5
       ^
 

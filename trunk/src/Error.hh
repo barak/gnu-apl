@@ -64,8 +64,8 @@ public:
    /// return ⎕EM[1;]. This is the first of 3 error lines. It contains the
    /// error name (like SYNTAX ERROR, DOMAIN ERROR, etc) and is subject
    /// to translation
-   const char * get_error_line_1() const
-      { return error_message_1; }
+   UCS_string get_error_line_1() const
+      { return UCS_string(UTF8_string(error_message_1)); }
 
    /// clear error line 1
    void clear_error_line_1()
@@ -73,8 +73,8 @@ public:
 
    /// return error_message_2. This is the second of 3 error lines.
    /// It contains the failed statement and is NOT subject to translation.
-   const char * get_error_line_2() const
-      { return error_message_2; }
+   UCS_string get_error_line_2() const
+      { return UCS_string(UTF8_string(error_message_2)); }
 
    /// return the major class (⎕ET) of the error
    static int error_major(ErrorCode err)

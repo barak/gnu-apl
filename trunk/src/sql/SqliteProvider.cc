@@ -24,32 +24,43 @@
 #include "SqliteProvider.hh"
 #include "SqliteConnection.hh"
 
+//-----------------------------------------------------------------------------
 SqliteProvider::~SqliteProvider()
-{}
-
+{
+}
+//-----------------------------------------------------------------------------
 static SqliteConnection *
 create_sqlite_connection(Value_P B)
 {
-    if( !B->is_char_string() ) {
-        Workspace::more_error() = "SQLite database connect argument must be a single string";
-        DOMAIN_ERROR;
-    }
+    if (!B->is_char_string())
+       {
+         MORE_ERROR() << "SQLite database connect argument "
+                         "must be a simple string (filename)";
+         DOMAIN_ERROR;
+       }
 
-    string filename = to_string( B->get_UCS_ravel() );
-    sqlite3 *db;
-    if( sqlite3_open( filename.c_str(), &db ) != SQLITE_OK ) {
-        stringstream out;
-        out << "Error opening database: " << sqlite3_errmsg( db );
-        Workspace::more_error() = out.str().c_str();
-        DOMAIN_ERROR;
-    }
+const UTF8_string filename(B->get_UCS_ravel());
 
-    return new SqliteConnection( db );
+sqlite3 * db;
+    if (sqlite3_open(filename.c_str(), &db) == SQLITE_OK)
+       {
+         SqliteConnection * conn = new SqliteConnection(db);
+//       char ATTACH[200];
+//       snprintf(ATTACH, sizeof(ATTACH), "ATTACH DATABASE '%s' AS '%s';",
+//                filename.c_str(), "DUMMY");
+//       conn->run_simple(ATTACH);
+         return conn;
+       }
+
+   MORE_ERROR() << "Error opening database " << filename << ": "
+                << sqlite3_errmsg(db);
+   DOMAIN_ERROR;
 }
-
+//-----------------------------------------------------------------------------
 Connection *
 SqliteProvider::open_database(Value_P B)
 {
-Connection * connection = create_sqlite_connection(B);
-    return connection;
+Connection * conn = create_sqlite_connection(B);
+    return conn;
 }
+//-----------------------------------------------------------------------------

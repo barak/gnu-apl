@@ -35,7 +35,7 @@
 ⍝⍝ using other SQL functions. This value should be seen as an opaque
 ⍝⍝ handle. It is, however, guaranteed that the handle is a scalar
 ⍝⍝ value.
-  Z←type ⎕SQL[1] arg
+  Z←type SQL[1] arg
 ∇
 
 ∇Z←SQL∆Disconnect db
@@ -45,7 +45,7 @@
 ⍝⍝ function has been called, no further operations are to be performed
 ⍝⍝ on this handle. Future calls to SQL∆Connect may reuse previously
 ⍝⍝ disconnected handles.
-  Z←⎕SQL[2] db
+  Z←SQL[2] db
 ∇
 
 ∇Z←statement SQL∆Select[db] args
@@ -63,7 +63,7 @@
 ⍝⍝ The return value is a rank-2 array representing the result of the
 ⍝⍝ select statement. Null values are returned as ⍬ and empty strings
 ⍝⍝ are returned as ''.
-  Z←statement ⎕SQL[3,db] args
+  Z←statement SQL[3,db] args
 ∇
 
 ∇Z←statement SQL∆Exec[db] args
@@ -71,27 +71,27 @@
 ⍝⍝
 ⍝⍝ This function is identical to SQL∆Select with the exception that it
 ⍝⍝ is used on statements which do not return a result table.
-  Z←statement ⎕SQL[4,db] args
+  Z←statement SQL[4,db] args
 ∇
 
 ∇Z←SQL∆Begin db
 ⍝⍝ Begin a transaction.
-  Z←⎕SQL[5] db
+  Z←SQL[5] db
 ∇
 
 ∇Z←SQL∆Commit db
 ⍝⍝ Commit a transaction.
-  Z←⎕SQL[6] db
+  Z←SQL[6] db
 ∇
 
 ∇Z←SQL∆Rollback db
 ⍝⍝ Rolls back the current transaction.
-  Z←⎕SQL[7] db
+  Z←SQL[7] db
 ∇
 
 ∇Z←SQL∆Tables db
 ⍝⍝ Return an array containing the name of all tables.
-  Z←⎕SQL[8] db
+  Z←SQL[8] db
 ∇
 
 ∇Z←db SQL∆Columns table
@@ -103,7 +103,7 @@
 ⍝⍝
 ⍝⍝ More columns containing extra information may be added in a future
 ⍝⍝ release.
-  Z←db ⎕SQL[9] table
+  Z←db SQL[9] table
 ∇
 
 ∇Z←db (F SQL∆WithTransaction) R;result
@@ -141,3 +141,19 @@ end:
   Z ← Z,[1] 'Version' '1.0'
 ∇
 
+⍝
+⍝  Load the native library
+⍝
+
+∇sql⍙load_library;result
+  →(0≠⎕NC 'SQL')/skip
+  result ← 'lib_sql' ⎕FX 'SQL'
+  →('SQL'≡result)/skip
+  ⎕ES 'Error loading native library'
+skip:
+∇
+
+sql⍙load_library
+)erase sql⍙load_library
+
+⎕←'SQL lib loaded'

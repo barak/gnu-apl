@@ -35,12 +35,7 @@
 #pragma GCC diagnostic ignored "-Woverloaded-virtual"
 #include "Native_interface.hh"
 
-inline std::string to_string(const UCS_string & ucs)
-{
-    UTF8_string utf(ucs);
-    return string(utf.c_str(), utf.size());
-}
-
-Value_P make_string_cell( const std::string &string, const char *loc );
+/// convert string \b str to the corresponding APL character vector.
+Value_P make_string_cell(const std::string & str, const char * loc);
 
 #endif

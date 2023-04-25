@@ -107,8 +107,8 @@ Quad_CR::list_functions(ostream & out, bool mapping)
 "   Zm ← 24 ⎕CR B     20 ⎕CR B using thin lines + extra frame\n"
 "   Zm ← 25 ⎕CR B     20 ⎕CR B with double-line extra frame\n"
 "   Zi ← 26 ⎕CR B     Zi is the cell types of corresponding items in B\n"
-"   Zi ← 27 ⎕CR B     Zi is the primary values of Z items as integer\n"
-"   Zi ← 28 ⎕CR B     Zi is the secondary values of Z items as integer\n"
+"   Zi ← 27 ⎕CR B     Zi is the primary values of Z items as integers\n"
+"   Zi ← 28 ⎕CR B     Zi is the secondary values of Z items as integers\n"
 "   Zm ← 29 ⎕CR B     4 ⎕CR B with strings being quoted + extra frame\n"
 "   Z  ← 30 ⎕CR B     Z is B with all items expanded to the same shape\n"
 "   Zn ← 31 ⎕CR Bn    internal helper function for the ⎕INP macro\n"
@@ -1224,7 +1224,7 @@ Value_P
 Quad_CR::do_CR26(const Value * B)
 {
 const ShapeItem len = B->element_count();
-Value_P Z(len, LOC);
+Value_P Z(B->get_shape(), LOC);
    loop(l, len)
       {
         const Cell & cB = B->get_cravel(l);
@@ -1248,10 +1248,10 @@ Value_P
 Quad_CR::do_CR27_28(int A_27_28, const Value * B)
 {
 const ShapeItem len = B->element_count();
-Value_P Z(len, LOC);
-   loop(l, len)
+Value_P Z(B->get_shape(), LOC);
+   loop(z, len)
        {
-         const Cell & cB = B->get_cravel(l);
+         const Cell & cB = B->get_cravel(z);
          if (cB.is_pointer_cell())
             {
               Value_P B_sub = cB.get_pointer_value();

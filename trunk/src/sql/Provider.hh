@@ -30,8 +30,8 @@
 class Provider {
 public:
     virtual ~Provider() {}
-    virtual const string get_name( void ) = 0;
-    virtual Connection *open_database( Value_P B ) = 0;
+    virtual const char * get_provider_name()      = 0;
+    virtual Connection * open_database(Value_P B) = 0;
 };
 
 #endif

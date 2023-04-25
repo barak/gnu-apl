@@ -46,9 +46,10 @@ public:
     void raise_sqlite_error( const string &message );
     sqlite3 *get_db( void ) { return db; }
 
-private:
-    sqlite3 *db;
     void run_simple( const string &sql );
+
+protected:
+    sqlite3 * db;
 };
 
 class SqliteStmtWrapper {
@@ -57,8 +58,8 @@ public:
     virtual ~SqliteStmtWrapper() { sqlite3_finalize( statement ); }
     sqlite3_stmt *get_statement( void ) { return statement; }
 
-private:
-    sqlite3_stmt *statement;
+protected:
+    sqlite3_stmt * statement;
 };
 
 #endif

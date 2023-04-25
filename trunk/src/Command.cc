@@ -318,7 +318,7 @@ Executable * statements = 0;
         UERR << Error::error_name(err.get_error_code());
         if (Workspace::more_error().size())   UERR << UNI_PLUS;
         UERR << endl;
-        if (*err.get_error_line_2())
+        if (err.get_error_line_2().size())
            {
              COUT << "      " << err.get_error_line_2() << endl
                   << "      " << err.get_error_line_3() << endl;

@@ -6377,7 +6377,7 @@ patch:
 .PHONY:	git-pull
 git-pull:
 	make -C emacs_mode $@
-	make -C sql $@
+#	make -C sql $@   ══ possibly not up-to-dat e══
 
 .PHONY:	help
 help:

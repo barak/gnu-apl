@@ -151,9 +151,9 @@ Error::is_syntax_or_value_error() const
 UCS_string
 Error::get_error_line_3() const
 {
-   if (error_code == E_NO_ERROR)   return UCS_string();
+   if (error_code == E_NO_ERROR)   return UCS_string();   // no error
 
-   if (left_caret < 0)   return UCS_string();
+   if (left_caret < 0)   return UCS_string();             // no ^ position
 
 UCS_string ret;
    if (left_caret > 0)   ret.append(UCS_string(left_caret, UNI_SPACE));
@@ -180,7 +180,7 @@ Error::print_em(ostream & out, const char * loc)
       }
 
    print_loc = loc;
-   if (*get_error_line_1())   out << get_error_line_1() << endl;
+   out << get_error_line_1() << endl;
 
    out << get_error_line_2() << endl
        << get_error_line_3() << endl;
@@ -191,7 +191,7 @@ throw_apl_error(ErrorCode code, const char * loc)
 {
    ADD_EVENT(0, VHE_Error, code, loc);
 
-StateIndicator * si = Workspace::SI_top();
+StateIndicator * si = Workspace::SI_top();   // the current )SI entry
 
    Log(LOG_error_throw)
       {
@@ -251,13 +251,19 @@ Error::throw_symbol_error(const UCS_string & sym_name, const char * loc)
         CERR << endl;
       }
 
+   if (Workspace::more_error().size() == 0)   // no )MORE info provided
+      {
+        MORE_ERROR() << "Offending symbol: " << sym_name;
+      }
+
    Log(LOG_verbose_error)     BACKTRACE
 
 Error err(E_VALUE_ERROR, loc);
 UTF8_string sym_name_utf(sym_name);
    SPRINTF(err.symbol_name, "%s", sym_name_utf.c_str());
 
-   if (StateIndicator * si = Workspace::SI_top())   err.update_error_info(si);
+   if (StateIndicator * si = Workspace::SI_top())   // )SI not empty
+      err.update_error_info(si);
 
 Error & eref = err;
    throw eref;
@@ -267,6 +273,9 @@ void
 Error::throw_define_error(const UCS_string & fun_name, const UCS_string & cmd,
                           const char * loc)
 {
+   // this error is thrown if the ∇-editor detects an invalid function header,
+   // for example: "∇FOO 2"
+
    Log(LOG_error_throw)   
       {   
         CERR << "throwing DEFN ERROR at " << loc
@@ -281,8 +290,8 @@ UTF8_string fun_name_utf(fun_name);
    SPRINTF(err.symbol_name, "%s", fun_name_utf.c_str());
 
 UTF8_string cmd_utf(cmd);   // cmd is something like ∇FUN[⎕]∇
-   SPRINTF(err.error_message_2, " aaa  %s", cmd_utf.c_str());
-   eref.left_caret = 5 + cmd.size();
+   SPRINTF(err.error_message_2, "PROMPT%s", cmd_utf.c_str());
+   eref.left_caret = 5 + cmd.size();   // last Unicode of error_message_2
    if (Workspace::SI_top())   *Workspace::get_error() = eref;
    throw eref;
 }
@@ -290,67 +299,69 @@ UTF8_string cmd_utf(cmd);   // cmd is something like ∇FUN[⎕]∇
 void
 Error::update_error_info(StateIndicator * si)
 {
-bool locked = false;
-const UserFunction * ufun = si->get_executable()->get_exec_ufun();
+   /*
+      construct lines 2 and 3 of the standard 3-line APL error info.
+      Line 1 was already constructed in Error::Error(ErrorCode ec...).
+      For eample: Let
+
+            ∇FOO
+      [1] 1 2 3 ◊ Q←Q++
+      [2] ∇
+
+      Then:
+
+            FOO                   ⍝ APL code producing the error
+      1 2 3                       ⍝ first (correct) statement
+      VALUE ERROR                 ⍝ error line 1
+      FOO[1]  Q←Q++               ⍝ error line 2: failed statement
+                ^                 ⍝ error line 3: caret line (error position)
+
+       There is no error_message_3; the third line is constructed from
+       left_caret and right_caret when needed.
+    */
+
+   set_error_line_2("      ");   // the APL prompt
+   set_right_caret(-1);
+   set_left_caret(6);            // first char after the APL prompt
 
    // prepare second error line (failed statement)
    //
-   if (ufun)
+   if (const UserFunction * ufun = si->get_executable()->get_exec_ufun())
       {
         if (get_show_locked() || ufun->get_exec_properties()[1])
            {
-             locked = true;
-             set_error_line_2("      ");
-             set_left_caret(6);
+             set_error_line_2("      ");   // the APL prompt
+             set_left_caret(6);            // first char after the APL prompt
+             ufun->set_locked_error_info(*this);
+             goto out;   // maybe print
            }
-        else
-           {
-             UCS_string ucs(ufun->get_name_and_line(si->get_PC()));
-             ucs.append(UNI_SPACE);
-             ucs.append(UNI_SPACE);
-             UTF8_string utf(ucs);
-             set_error_line_2(utf.c_str());
-             set_left_caret(ucs.size());
-           }
-      }
-   else
-      {
-        set_error_line_2("      ");
-        set_left_caret(6);
+
+        UCS_string ucs(ufun->get_name_and_line(si->get_PC()));
+        ucs.append(UNI_SPACE);
+        ucs.append(UNI_SPACE);
+        UTF8_string utf(ucs);
+        set_error_line_2(utf.c_str());
+        set_left_caret(ucs.size());
       }
 
-   // prepare third line (carets)
-   //
-   set_right_caret(-1);
-
-   if (locked)
-      {
-        si->get_executable()->get_exec_ufun()->set_locked_error_info(*this);
-      }
-   else
-      {
-        const Function_PC from = si->get_prefix().get_range_low();
-        Function_PC to   = si->get_prefix().get_range_high();
-        const Function_PC2 error_range(from, to);
-        si->get_executable()->set_error_info(*this, error_range);
-      }
+   {
+     const Function_PC from = si->get_prefix().get_range_low();
+     const Function_PC to   = si->get_prefix().get_range_high();
+     const Function_PC2 error_range(from, to);
+     si->get_executable()->set_error_info(*this, error_range);
+   }
 
    // print error, unless we are in safe execution mode.
    //
-   {
-     bool print_error = true;
-     for (const StateIndicator * si1 = si; si1; si1 = si1->get_parent())
-         {
-           if (si1->get_safe_execution())
-              {
-                print_error = false;
-                break;
-              }
-         }
-     if (print_error)   print_em(UERR, LOC);
-   }
-
+out:
    StateIndicator::get_error(si) = *this;
+
+   // )SI entries below a ⎕ES entry must not print anything but simply return
+   for (const StateIndicator * si1 = si; si1; si1 = si1->get_parent())
+       {
+         if (si1->get_safe_execution()) return;
+       }
+   print_em(UERR, LOC);
 }
 //----------------------------------------------------------------------------
 

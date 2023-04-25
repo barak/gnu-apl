@@ -173,7 +173,7 @@ endif
 if apl_SQLITE3
 common_CXXFLAGS += $(SQLITE3_CFLAGS)
 common_LDFLAGS  += $(SQLITE3_LDFLAGS)
-common_SOURCES += sql/SqliteArgListBuilder.cc			sql/SqliteArgListBuilder.hh
+common_SOURCES  += sql/SqliteArgListBuilder.cc		sql/SqliteArgListBuilder.hh
 common_SOURCES += sql/SqliteConnection.cc			sql/SqliteConnection.hh
 common_SOURCES += sql/SqliteResultValue.cc			sql/SqliteResultValue.hh
 common_SOURCES += sql/SqliteProvider.cc				sql/SqliteProvider.hh
@@ -275,7 +275,7 @@ patch:
 .PHONY:	git-pull
 git-pull:
 	make -C emacs_mode $@
-	make -C sql $@
+#	make -C sql $@   ══ possibly not up-to-dat e══
 
 .PHONY:	help
 help:

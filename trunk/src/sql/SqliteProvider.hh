@@ -27,6 +27,6 @@ class SqliteProvider : public Provider
 {
 public:
     virtual ~SqliteProvider();
-    virtual const string get_name()   { return "sqlite"; }
+    virtual const char * get_provider_name()   { return "SQLite"; }
     virtual Connection * open_database(Value_P B);
 };
