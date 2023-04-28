@@ -65,7 +65,7 @@ public:
    : tag(TOK_VOID)
       {
         // the pointer in value.apl_val must always be initialized
-        // as to avoid deleting of an un-initialized pointer
+        // as to avoid deleting an un-initialized pointer
         value.apl_val.init_pointer();
         copy(other, "Token::Token(const Token & other)");
       }
@@ -83,38 +83,40 @@ public:
    /// copy Token \b src into \b this token.
    void copy(const Token & src, const char * loc)
       {
-         clear(loc);   // clears Value_P
-         if (src.is_apl_val())
+         clear(loc);   // clear our Value_P
+
+#ifdef cfg_VALUE_HISTORY_WANTED
+
+         if (src.is_apl_val())   // according to its get_ValueType()
             {
-              if (+src.value.apl_val)
-                 {
-                   ADD_EVENT(val, VHE_TokCopy, src.value_use_count(), loc);
-                 }
-              else
-                 {
-                   ADD_EVENT(0, VHE_TokCopy, -1, loc);
-                 }
+              int use_count = -1;   // assume this token has no Value *
+              const Value * valp = src.value.apl_val.get();
+              if (valp)   use_count = valp->get_owner_count();
+              ADD_EVENT(valp, VHE_TokCopy, use_count, loc);
             }
 
+#endif
          copy_N(src);
       }
-
 
    /// move the mutable (!) \b src into \b this token. If \b src is an APL
    /// value, then it is properly cleared. and an event is added.
    void move(Token & src, const char * loc)
       {
-         clear(loc);
+         clear(loc);   // clear our Value_P
          copy_N(src);
 
-         if (src.is_apl_val())
-            { 
-              if (const Value * val = src.value.apl_val.get())
-                 {
-                   ADD_EVENT(val, VHE_TokMove, src.value_use_count() - 1, loc);
-                   src.clear(loc);
-                 }  
+#ifdef cfg_VALUE_HISTORY_WANTED
+
+         if (src.is_apl_val())   // according to its get_ValueType()
+            {
+              const Value * valp = src.value.apl_val.get();
+              const int use_count = valp ? valp->get_owner_count() - 1 : -1;
+              ADD_EVENT(valp, VHE_TokMove, use_count, loc);
             }
+
+#endif
+         src.clear(loc);
       }
 
    /// Construct a token without a value

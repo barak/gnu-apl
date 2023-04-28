@@ -251,9 +251,9 @@ Token::ChangeTag(TokenTag new_tag)
 int
 Token::value_use_count() const
 {
-   if (!is_apl_val())    return 0;
-   if (!value.apl_val)   return -98;
-   return value.apl_val->get_owner_count();
+   if (!is_apl_val())    return 0;            // token is not a TV_VALUE token
+   if (!value.apl_val)   return -98;          // it is, but its Value * is -
+   return value.apl_val->get_owner_count();   // non-zero Value *
 }
 //----------------------------------------------------------------------------
 void
