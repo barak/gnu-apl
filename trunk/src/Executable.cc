@@ -627,7 +627,8 @@ UserFunction * ufun = new UserFunction(signature, lambda_num,
    // A←{ ... }   by:
    // A←UFUN      UFUN being a user-defined function with body { ... }
    //
-   body[bend].move_2(ufun->get_token(), LOC);
+Token tok_ufun = ufun->get_token();
+   body[bend].move(tok_ufun, LOC);
 
    return bend + 1;
 }
@@ -642,7 +643,7 @@ int level = 0;
    for (; b < bend; ++b)
        {
          Token t;
-         t.move_1(body[b], LOC);
+         t.move(body[b], LOC);
          body[b].clear(LOC);   // invalidate in main body
 
          // figure the signature by looking for ⍺, ⍶, ⍵, ⍹, and χ

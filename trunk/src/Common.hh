@@ -399,11 +399,13 @@ extern std::ostream & get_CERR();
 #define Loc(f, l) f ":" STR(l)
 
 /// print x and its source code location
-#define Q(x) get_CERR() << std::left << setw(20) << #x ":" << " '" << x << "' at " LOC << endl;
+#define Q(x) get_CERR() << std::left << setw(20) << #x ":" \
+                        << " '" << x << "' at " LOC << endl;
 
 /// same as Q1 (for printouts guarded by Log macros). Unlike Q () which MUST
 /// NOT REMAIN IN THE CODE, Q1() SHOULD remain in the code.
-#define Q1(x) get_CERR() << std::left << setw(20) << #x ":" << " '" << x << "' at " LOC << endl;
+#define Q1(x) get_CERR() << std::left << setw(20) << #x ":" \
+                         << " '" << x << "' at " LOC << endl;
 
 //----------------------------------------------------------------------------
 

@@ -2574,7 +2574,7 @@ Even though Or-ing a Boolean vector with 0 itself has no effect, the
 monadic ⊤∨ and ⊤⍱ are still useful due to their side effects: conversion
 from near-integer float values to integers (monadic @b{⊤∨} and inversion
 of the bits (monadic @b{⊤⍱}, The latter is needed since ∼ has a monadic
-form and as a consequence ⊤∼ was not an option for a bit-wise @b{Not}
+form and, as a consequence, ⊤∼ was not an option for a bit-wise @b{Not}
 function.
 
 Monadic @b{⊤⍱ B} is the bit-wise @b{Not} function of its argument:
@@ -2653,9 +2653,9 @@ as well. This can be useful for masking purposes such as extracting the lower
 The characters involved are treated as 32 bit quantities:
 
 @verbatim
-      5 ⎕CR 'A'
+      5⎕CR 'A'
 41
-      5 ⎕CR ⊤⍱'A'                       ⍝ Note that 5 ⎕CR ANDs with $FF
+      5⎕CR ⊤⍱'A'                 ⍝ Note that 5⎕CR aka. ⎕CR.to_HEX ANDs with $FF
 BE
 
       256 256 256 256⊤ ⎕UCS ⊤⍱ 'A'      ⍝ ⊤⍱ 'A' is FFFFFFBE

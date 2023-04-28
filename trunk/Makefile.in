@@ -1183,6 +1183,10 @@ am--refresh:
 git-pull:
 	make -C src $@
 	make -C wslib5 $@
+	git clone https://git.code.sf.net/p/gnu-apl-library/code /tmp/DALY
+	cp /tmp/DALY/doc/DALY/*     doc/DALY/
+	cp /tmp/DALY/wslib3/DALY/*  wslib3/DALY/
+	cp /tmp/DALY/wslib5/DALY/*  wslib5/DALY/
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.

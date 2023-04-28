@@ -28,6 +28,7 @@
 #include "ComplexCell.hh"
 #include "Common.hh"
 #include "FloatCell.hh"
+#include "IndexExpr.hh"
 #include "IntCell.hh"
 #include "Output.hh"
 #include "Parser.hh"
@@ -114,7 +115,7 @@ std::vector<Token_string *> statements;
         loop(t, stat->size())
            {
              tos.push_back(Token());
-             tos[tos.size() - 1].move_1((*stat)[t], LOC);
+             tos[tos.size() - 1].move((*stat)[t], LOC);
            }
         delete stat;
       }
@@ -155,6 +156,7 @@ Parser::parse_statement(Token_string & tos)
    // 3. convert vectors like 1 2 3 or '1' 2 '3' into single APL values
    //
    collect_constants(tos);
+   replace_literal_axes(tos);
    remove_void_token(tos);
 
    // special case: single APL value (to speed up ⍎)
@@ -472,7 +474,7 @@ Parser::remove_nongrouping_parantheses(Token_string & tos)
                // If X is non-scalar, enclose it
                //
                progress = true;
-               tos[t + 2].move_1(tos[t + 1], LOC);
+               tos[t + 2].move(tos[t + 1], LOC);
 
                // we "remember" the nongrouping parantheses to disambiguate
                // e,g, SYM/xxx from (SYM)/xxx
@@ -579,6 +581,87 @@ Parser::check_if_value(const Token_string & tos, int pos)
    return false;   // tos[pos] is at the end of a function
 }
 //----------------------------------------------------------------------------
+Assign_state
+Parser::get_assign_state(Token_string & tos, ShapeItem pos)
+{
+   // this function is called by an optimization for static [] or [N] cases.
+   // The benefit is somewhat marginal, we therefore leave the more
+   // complicated cases (i.e. those involving ←) to the prefix parser
+   // and return ASS_unknown instead of a more precise result.
+   //
+   while (pos < int(tos.size()))
+       {
+         if (tos[pos++].get_Class() == TC_ASSIGN)   return ASS_unknown;
+       }
+
+   return ASS_none;
+}
+//----------------------------------------------------------------------------
+void
+Parser::replace_literal_axes(Token_string & tos)
+{
+   // replace [ ] or [ N ] by their complete index or axis, as to relieve
+   // the Prefix parser.
+
+   loop(src, tos.size() - 1)
+       {
+         if (tos[src].get_tag() != TOK_L_BRACK)   continue;
+
+         const Assign_state assign_state = get_assign_state(tos, src);
+         if (assign_state == ASS_unknown)   continue;
+
+         // case 1: [ ] 
+         //
+         const Token & T1 = tos[src + 1];
+         if (T1.get_tag() == TOK_R_BRACK)   // empty index [ ]
+            {
+              IndexExpr * idx = new IndexExpr(assign_state, LOC);
+              Log(LOG_delete)
+                 CERR << "new    " << voidP(idx) << " at " LOC << endl;
+              new (&tos[src++]) Token(TOK_INDEX, *idx);   // replace [
+              new (&tos[src]) Token(TOK_VOID);            // replace ]
+              continue;
+            }
+
+         /* case 2: [N]. This case has two subcases:
+
+            2a. f[B] with (system-) function f, or
+            2b. V[B] with unknown V (most likely a SYMBOL or a Value
+
+            case 2a. is fairly frequent with f being ⎕FIO or ⎕CR.
+          */
+         if (size_t(src + 2) < tos.size()          &&   // tos[src+2] exists
+             tos[src + 2].get_tag() == TOK_R_BRACK &&   // and is ]
+             T1.get_Class() == TC_VALUE            &&   // value N
+             T1.get_apl_val()->is_int_scalar())
+            {
+              /* at this point we either have a function axis f[N] or else a
+                 vector index V[N]. In some cases (system functions, APL
+                 primitives) we can decide that here; if not then we have
+                 to defer the decision to the Prefix parser.
+               */
+              if (src > 0 && tos[src - 1].is_function())
+                 {
+                   Value_P function_axis = T1.get_apl_val();
+                   Token tok_axis(TOK_AXIS, function_axis);
+                   new (&tos[src++]) Token(TOK_VOID);   // invalidate [
+                   tos[src++].move(tok_axis, LOC);
+                   new (&tos[src])   Token(TOK_VOID);   // invalidate ]
+                 }
+              else
+                 {
+                   IndexExpr * idx = new IndexExpr(assign_state, LOC);
+                   idx->add_index(T1.get_apl_val());
+                   
+                   // T1 is an axis [ N ].
+                   new (&tos[src++]) Token(TOK_VOID);   // invalidate [
+                   new (&tos[src++]) Token(TOK_INDEX, *idx);
+                   new (&tos[src])   Token(TOK_VOID);   // invalidate ]
+                 }
+            }
+       }
+}
+//----------------------------------------------------------------------------
 void
 Parser::remove_void_token(Token_string & tos)
 {
@@ -586,8 +669,8 @@ size_t dst = 0;
 
    loop(src, tos.size())
        {
-         if (tos[src].get_tag() == TOK_VOID)   continue;
-         if (src != ShapeItem(dst))   tos[dst].move_1(tos[src], LOC);
+         if (tos[src].get_tag() == TOK_VOID)   continue;   // ignore (skip)
+         if (src != ShapeItem(dst))   tos[dst].move(tos[src], LOC);
          ++dst;
        }
 
@@ -686,14 +769,14 @@ Parser::create_scalar_value(Token & output)
                scalar->next_ravel_Char(output.get_char_val());
                scalar->check_value(LOC);
                Token tok(TOK_APL_VALUE3, scalar);
-               output.move_1(tok, LOC);
+               output.move(tok, LOC);
              }
              return;
 
         case TOK_INTEGER:
              {
                Token tok(TOK_APL_VALUE3, IntScalar(output.get_int_val(), LOC));
-               output.move_1(tok, LOC);
+               output.move(tok, LOC);
              }
              return;
 
@@ -701,7 +784,7 @@ Parser::create_scalar_value(Token & output)
              {
                Token tok(TOK_APL_VALUE3,
                          FloatScalar(output.get_flt_val(), LOC));
-               output.move_1(tok, LOC);
+               output.move(tok, LOC);
              }
              return;
 
@@ -710,7 +793,7 @@ Parser::create_scalar_value(Token & output)
                Token tok(TOK_APL_VALUE3,
                          ComplexScalar(output.get_cpx_real(),
                                        output.get_cpx_imag(), LOC));
-               output.move_1(tok, LOC);
+               output.move(tok, LOC);
              }
              return;
 
@@ -770,7 +853,7 @@ Value_P Z(count, LOC);
    Z->check_value(LOC);
 Token tok(TOK_APL_VALUE3, Z);
 
-   tos[pos].move_1(tok, LOC);
+   tos[pos].move(tok, LOC);
 
    Log(LOG_create_value)
       {

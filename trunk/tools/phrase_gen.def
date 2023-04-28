@@ -58,24 +58,24 @@ phrase_MISC (BS_F_B+2,        F    , B    ,      , DITO )
 phrase_MISC (BS_F_B+3,        F    , C    , B    , DITO )
 
 // function called dyadically
-//
+//                                                             examples
 phrase(BS_A_F+3      , A    , F    , B    ,      , DITO )
-phrase(BS_A_F+3      , A    , M    , B    ,      , DITO )   // e.g. A / B
+phrase(BS_A_F+3      , A    , M    , B    ,      , DITO )   // A / B
 phrase(BS_A_F+4      , A    , F    , C    , B    , DITO )
-phrase(BS_A_F+4      , A    , M    , C    , B    , DITO )   // e.g. A /[X] B
+phrase(BS_A_F+4      , A    , M    , C    , B    , DITO )   // A /[X] B
 
 // monadic operator
 //
-phrase(BS_LO_OP+2    , F    , M    ,      ,      , DITO )   // e.g. +/
-phrase(BS_LO_OP+2    , M    , M    ,      ,      , DITO )   // e.g. /¨
-phrase(BS_LO_OP+3    , F    , M    , C    ,      , DITO )   // e.g. +/[2]
-phrase(BS_LO_OP+3    , F    , C    , M    ,      , DITO )   // e.g. ,[2]/
-phrase(BS_LO_OP+4    , F    , C    , M    , C    , DITO )   // e.g. ,[2]/[2]
-phrase(BS_LO_OP+2    , A    , M    ,      ,      , DITO )   // e.g. A/
+phrase(BS_LO_OP+2    , F    , M    ,      ,      , DITO )   // +/
+phrase(BS_LO_OP+2    , M    , M    ,      ,      , DITO )   // /¨
+phrase(BS_LO_OP+3    , F    , M    , C    ,      , DITO )   // +/[2]
+phrase(BS_LO_OP+3    , F    , C    , M    ,      , DITO )   // ,[2]/
+phrase(BS_LO_OP+4    , F    , C    , M    , C    , DITO )   // ,[2]/[2]
+phrase(BS_LO_OP+2    , A    , M    ,      ,      , DITO )   // A/
 
 // dyadic operator
 //
-phrase(BS_OP_RO+2    , D    , V    ,      ,      , DITO )   // e.g. .MEMBER
+phrase(BS_OP_RO+2    , D    , V    ,      ,      , DITO )   // .MEMBER
 phrase(BS_OP_RO+3    , A    , D    , B    ,      , "F_D_G_")
 phrase(BS_OP_RO+3    , A    , D    , G    ,      , "F_D_G_")
 phrase(BS_OP_RO+3    , F    , D    , B    ,      , DITO )
@@ -91,7 +91,7 @@ phrase(BS_ANY_BRA+4  , V    , C    , ASS  , B    , DITO )
 phrase(BS_F_B+2,       F    , V    ,     ,       , DITO )
 
 // (reference) and assignment
-phrase(BS_V_ASS+3    , A    , ASS  , B    ,      , DITO )       // selective ass.
+phrase(BS_V_ASS+3    , A    , ASS  , B    ,      , DITO )       // sel. ass.
 phrase(BS_V_ASS+3    , V    , ASS  , B    ,      , DITO )       // V←B
 phrase(BS_V_ASS+4    , D    , V    , ASS  , B    , DITO )       // .MEMBER ← B
 phrase(BS_V_ASS+3    , V    , ASS  , F    ,      , DITO )       // λ: V ← { ... } ⍺ ⍵

@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-April 4, 2023
+April 26, 2023
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
@@ -2464,7 +2464,7 @@ monadic ⊤∨ resp, ⊤⍱ are dyadic ⊤∨ resp, ⊤⍱ with a left argument 
 monadic ⊤∨ and ⊤⍱ are still useful due to their side effects: conversion
 from near-integer float values to integers (monadic ⊤∨ and inversion of
 the bits (monadic ⊤⍱, The latter is needed since ∼ has a monadic form
-and as a consequence ⊤∼ was not an option for a bit-wise Not function.
+and, as a consequence, ⊤∼ was not an option for a bit-wise Not function.
 
    Monadic ⊤⍱ B is the bit-wise Not function of its argument:
 
@@ -2538,9 +2538,9 @@ extracting the lower 7 bits of 8-bit bytes containing ASCII characters.
 
    The characters involved are treated as 32 bit quantities:
 
-      5 ⎕CR 'A'
+      5⎕CR 'A'
 41
-      5 ⎕CR ⊤⍱'A'                       ⍝ Note that 5 ⎕CR ANDs with $FF
+      5⎕CR ⊤⍱'A'                 ⍝ Note that 5⎕CR aka. ⎕CR.to_HEX ANDs with $FF
 BE
 
       256 256 256 256⊤ ⎕UCS ⊤⍱ 'A'      ⍝ ⊤⍱ 'A' is FFFFFFBE
@@ -7032,73 +7032,73 @@ please read <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 
 Tag Table:
 Node: Top383
-Node: Chapter 11572
-Node: Chapter 223281
-Node: Section 2.125230
-Node: Subsection 2.1.126452
-Node: Subsection 2.1.227083
-Node: Subsection 2.1.327914
-Node: Subsection 2.1.433720
-Node: Subsection 2.1.537519
-Node: Subsection 2.1.638377
-Node: Subsection 2.1.746501
-Node: Subsection 2.1.848251
-Node: Section 2.251566
-Node: Section 2.352325
-Node: Section 2.453600
-Node: Section 2.558045
-Node: Section 2.658218
-Node: Section 2.758848
-Node: Section 2.862801
-Node: Section 2.964336
-Node: Section 2.1066428
-Node: Section 2.1167982
-Node: Section 2.1269767
-Node: Section 2.1371707
-Node: Section 2.1472648
-Node: Section 2.1572900
-Node: Section 2.1674296
-Node: Section 2.1784765
-Node: Section 2.1887287
-Node: Section 2.1993993
-Node: Section 2.2095438
-Node: Section 2.21101099
-Node: Section 2.22106133
-Node: Section 2.23109414
-Node: Section 2.24109705
-Node: Section 2.25120533
-Node: Section 2.26120805
-Node: Section 2.27127383
-Node: Section 2.28129843
-Node: Section 2.29130512
-Node: Section 2.30132164
-Node: Section 2.31135951
-Node: Output File Format151871
-Node: Section 2.32153046
-Node: Section 2.33162444
-Node: Section 2.34163471
-Node: Section 2.35178186
-Node: Section 2.36188252
-Node: Section 2.37192371
-Node: Section 2.38194466
-Node: Section 2.39198891
-Node: Chapter 3220245
-Node: Chapter 4222746
-Node: Chapter 5223872
-Node: Section 5.1225409
-Node: Section 5.2226689
-Node: Section 5.3227049
-Node: Section 5.4227291
-Node: Section 5.5227953
-Node: Section 5.6228431
-Node: Section 5.7229203
-Node: Section 5.8229660
-Node: Chapter 6230062
-Node: Section 6.1230481
-Node: Section 6.2231168
-Node: Chapter 7231999
-Node: Section 7.1232502
-Node: Section 7.2257816
+Node: Chapter 11573
+Node: Chapter 223282
+Node: Section 2.125231
+Node: Subsection 2.1.126453
+Node: Subsection 2.1.227084
+Node: Subsection 2.1.327915
+Node: Subsection 2.1.433721
+Node: Subsection 2.1.537520
+Node: Subsection 2.1.638378
+Node: Subsection 2.1.746502
+Node: Subsection 2.1.848252
+Node: Section 2.251567
+Node: Section 2.352326
+Node: Section 2.453601
+Node: Section 2.558046
+Node: Section 2.658219
+Node: Section 2.758849
+Node: Section 2.862802
+Node: Section 2.964337
+Node: Section 2.1066429
+Node: Section 2.1167983
+Node: Section 2.1269768
+Node: Section 2.1371708
+Node: Section 2.1472649
+Node: Section 2.1572901
+Node: Section 2.1674297
+Node: Section 2.1784766
+Node: Section 2.1887288
+Node: Section 2.1994005
+Node: Section 2.2095450
+Node: Section 2.21101111
+Node: Section 2.22106145
+Node: Section 2.23109426
+Node: Section 2.24109717
+Node: Section 2.25120545
+Node: Section 2.26120817
+Node: Section 2.27127395
+Node: Section 2.28129855
+Node: Section 2.29130524
+Node: Section 2.30132176
+Node: Section 2.31135963
+Node: Output File Format151883
+Node: Section 2.32153058
+Node: Section 2.33162456
+Node: Section 2.34163483
+Node: Section 2.35178198
+Node: Section 2.36188264
+Node: Section 2.37192383
+Node: Section 2.38194478
+Node: Section 2.39198903
+Node: Chapter 3220257
+Node: Chapter 4222758
+Node: Chapter 5223884
+Node: Section 5.1225421
+Node: Section 5.2226701
+Node: Section 5.3227061
+Node: Section 5.4227303
+Node: Section 5.5227965
+Node: Section 5.6228443
+Node: Section 5.7229215
+Node: Section 5.8229672
+Node: Chapter 6230074
+Node: Section 6.1230493
+Node: Section 6.2231180
+Node: Chapter 7232011
+Node: Section 7.1232514
+Node: Section 7.2257828
 
 End Tag Table
 

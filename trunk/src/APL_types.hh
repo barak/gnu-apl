@@ -205,15 +205,13 @@ enum VH_event
   VHE_Error,       ///< some APL error has occurred
   VHE_PtrNew,      ///< new Value_P created
   VHE_PtrNew0,     ///< new Value_P with 0-pointer created
-  VHE_PtrCopy1,    ///< Value_P copied with constructor(Value_P)
-  VHE_PtrCopy2,    ///< Value_P copied with constructor(Value_P, loc)
+  VHE_PtrCopy,     ///< Value_P copied with constructor(Value_P)
   VHE_PtrCopy3,    ///< Value_P copied with operator =()
   VHE_PtrClr,      ///< Value_P cleared
   VHE_PtrDel,      ///< Value_P deleted
   VHE_PtrDel0,     ///< Value_P deleted (with 0 pointer)
-  VHE_TokCopy1,    ///< token with Value_P copied
-  VHE_TokMove1,    ///< token with Value_P moved
-  VHE_TokMove2,    ///< token with Value_P moved
+  VHE_TokCopy,     ///< token with Value_P copied
+  VHE_TokMove,     ///< token with Value_P moved
   VHE_Completed,   ///< incomplete ravel set to 42424242
   VHE_Stale,       ///< stale value erased
   VHE_Visit,       ///< test point
@@ -459,6 +457,7 @@ enum Assign_state
    ASS_none       = 0,   ///< no assignment (right of ←)
    ASS_arrow_seen = 1,   ///< ← seen but no variable yet
    ASS_var_seen   = 2,   ///< var and ← seen
+   ASS_unknown    = 3,   ///< not known (too much effort to figure it)
 };
 //----------------------------------------------------------------------------
 /// the cause for something

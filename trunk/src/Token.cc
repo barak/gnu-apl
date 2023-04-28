@@ -31,18 +31,6 @@
 #include "Workspace.hh"
 
 //----------------------------------------------------------------------------
-Token::Token(const Token & other)
-   : tag(TOK_VOID)
-{
-   copy_1(other, "Token::Token(const Token & other)");
-}
-//----------------------------------------------------------------------------
-Token::Token(const Token & other, const char * loc)
-   : tag(TOK_VOID)
-{
-   copy_1(other, loc);
-}
-//----------------------------------------------------------------------------
 Token::Token(TokenTag t, IndexExpr & idx)
 {
    /* construct a token for an index expressions. There are 3 cases which
@@ -608,7 +596,6 @@ UCS_string ucs;
              ucs.append(get_sym_ptr()->get_name());
              break;
 
-
         case TC_R_PARENT:
         case TC_L_PARENT:
         case TC_R_CURLY:
@@ -621,6 +608,16 @@ UCS_string ucs;
         case TC_OPER2:
              if (get_Id() == ID_No_ID)   return get_function()->get_name();
              return ID::get_name_UCS(get_Id());
+
+        case TC_INDEX:
+             if (get_tag() == TOK_AXIS)
+             {
+               UCS_string ret;
+               ret << "["
+                   << ShapeItem(get_apl_val()->get_cfirst().get_int_value())
+                   << "]";
+               return ret;
+             }
 
         default:
              CERR << "Token: " << HEX4(tag) << " " << *this
@@ -763,84 +760,6 @@ Token::class_name(TokenClass tc)
       }
 
    return "*** Obscure token class ***";
-}
-//----------------------------------------------------------------------------
-inline void
-Token::copy_N(const Token & src)
-{
-   tag = src.tag;
-   switch(src.get_ValueType())
-      {
-        case TV_NONE:  value.int_vals[0]   = 0;
-                       value.int_vals[1]   = src.value.int_vals[1];     break;
-
-        case TV_CHAR:  value.char_val      = src.value.char_val;        break;
-        case TV_INT:   value.int_vals[0]   = src.value.int_vals[0];
-                       value.int_vals[1]   = src.value.int_vals[1];     break;
-        case TV_FLT:   value.float_vals[0] = src.value.float_vals[0];   break;
-        case TV_CPX:   value.float_vals[0] = src.value.float_vals[0];
-                       value.float_vals[1] = src.value.float_vals[1];   break;
-        case TV_SYM:   value.sym_ptr       = src.value.sym_ptr;         break;
-        case TV_LIN:   value.fun_line      = src.value.fun_line;        break;
-        case TV_VAL:   value._apl_val()    = src.value._apl_val();      break;
-        case TV_INDEX: value.index_val     = src.value.index_val;       break;
-        case TV_FUN:   value.function      = src.value.function;        break;
-        default:       FIXME;
-      }
-}
-//----------------------------------------------------------------------------
-void
-Token::copy_1(const Token & src, const char * loc)
-{
-   clear(loc);
-   if (src.is_apl_val())
-      {
-        const Value * val = src.value.apl_val.get();
-        if (val)
-           {
-             ADD_EVENT(val, VHE_TokCopy1, src.value_use_count(), loc);
-           }
-        else
-           {
-             ADD_EVENT(val, VHE_TokCopy1, -1, loc);
-           }
-      }
-
-   copy_N(src);
-}
-//----------------------------------------------------------------------------
-void
-Token::move_1(Token & src, const char * loc)
-{
-   clear(loc);
-   copy_N(src);
-
-   if (src.is_apl_val())
-      {
-        const Value * val = src.value.apl_val.get();
-        if (val)
-           {
-             ADD_EVENT(val, VHE_TokMove1, src.value_use_count() - 1, loc);
-             src.clear(loc);
-           }
-      }
-}
-//----------------------------------------------------------------------------
-void
-Token::move_2(const Token & src, const char * loc)
-{
-   clear(loc);
-   copy_N(src);
-
-   if (src.is_apl_val())
-      {
-        const Value * val = src.value.apl_val.get();
-        if (val)
-           {
-             ADD_EVENT(val, VHE_TokMove2, src.value_use_count() - 1, loc);
-             const_cast<Token &>(src).clear(loc);
-           }
-      }
 }
 //----------------------------------------------------------------------------
 void

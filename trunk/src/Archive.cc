@@ -496,7 +496,7 @@ const Prefix & prefix = si.current_stack;
 
    // write the remaining token
    //
-   save_token_loc(prefix.saved_lookahead);
+   save_token_loc(prefix.saved_MISC);
 
    --indent;
 
@@ -2711,7 +2711,7 @@ Prefix & parser = si.current_stack;
               read_Token(tl);
 
               if (parser.size() < stack_size)   parser.push(tl);
-              else                    parser.saved_lookahead.copy(tl, LOC);
+              else                    parser.saved_MISC.copy(tl, LOC);
             }
        }
 

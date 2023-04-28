@@ -501,9 +501,10 @@ check_phrases()
 
          if (same)
             {
-              fprintf(stderr, "phrases %d and %d are the same\n", ph, ph1);
+              fprintf(stderr, "phrases %d (%s) and %d (%s) are the same\n",
+              ph, phrase_table[ph].get_suffix().c_str(),
+              ph1, phrase_table[ph1].get_suffix().c_str());
               assert(0);
-
             }
        }
 

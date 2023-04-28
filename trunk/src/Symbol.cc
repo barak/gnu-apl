@@ -576,6 +576,42 @@ Symbol::get_SV_key() const
    return value_stack.back().get_key();
 }
 //----------------------------------------------------------------------------
+bool
+Symbol::M_is_F() const
+{
+   // this is a symbol left of an ambiguous operator (i.e. / ⌿ \ or ⍀).
+   // return true if the operator shall be downgraded to a function and
+   // false if it should remain an operator.
+
+   // NC class bitmaps
+   enum {
+          NC_variables =  NC_VARIABLE | NC_SYSTEM_VAR        & NC_bool_mask,
+          NC_values    = (NC_LABEL    | NC_variables)        & NC_bool_mask,
+          NC_functions = (NC_FUNCTION | NC_SYSTEM_FUN)       & NC_bool_mask,
+          NC_unknown   = (NC_INVALID  | NC_UNUSED_USER_NAME) & NC_bool_mask,
+        };
+
+const NameClass nc = get_NC();
+   if (nc & NC_values)      return true;
+   if (nc & NC_functions)   return false;
+   if (nc == NC_OPERATOR)
+      {
+        Assert(get_function());
+        return get_function()->get_oper_valence() == 2;
+      }
+   if (nc & NC_unknown)   // user error
+      {
+        MORE_ERROR() << "unassigned symbol " << get_name()
+                     << "when resolving the function argument "
+                         "of a monadic operator";
+        SYNTAX_ERROR;
+      }
+
+   CERR << "TODO: Nameclass " << nc << endl;
+   FIXME;
+   return false;
+}
+//----------------------------------------------------------------------------
 void
 Symbol::set_SV_key(SV_key key)
 {
@@ -687,8 +723,12 @@ const ValueStackItem & vs = value_stack.back();
                   //
                   return;
                 }
-             tok.move_2(vs.get_function()->get_token(), LOC);
-             return;
+             else
+                {
+                  Token tok_fun = vs.get_function()->get_token();
+                  tok.move(tok_fun, LOC);
+                  return;
+                }
 
         case NC_SYSTEM_VAR:
              return;   // leave symbol as is
@@ -718,21 +758,24 @@ const ValueStackItem & vs = value_stack.back();
              {
                Value_P value = IntScalar(vs.get_label(), LOC);
                Token t(TOK_APL_VALUE1, value);
-               tok.move_1(t, LOC);
+               tok.move(t, LOC);
              }
              return;
 
         case NC_VARIABLE:
              // if we resolve a variable. the value is considered grouped.
              {
-               Token t(TOK_APL_VALUE1, CLONE_P(get_apl_value(), LOC));
-               tok.move_1(t, LOC);
+               Token tok_val(TOK_APL_VALUE1, CLONE_P(get_apl_value(), LOC));
+               tok.move(tok_val, LOC);
              }
              return;
 
         case NC_FUNCTION:
         case NC_OPERATOR:
-             tok.move_2(vs.get_function()->get_token(), LOC);
+             {
+               Token tok_function(vs.get_function()->get_token());
+               tok.move(tok_function, LOC);
+             }
              return;
 
         case NC_SYSTEM_VAR:

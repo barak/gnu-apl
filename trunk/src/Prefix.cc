@@ -45,7 +45,7 @@ Prefix::Prefix(StateIndicator & _si, const Token_string & _body)
    : instance(++instance_counter),
      si(_si),
      put(0),
-     saved_lookahead(Token(TOK_VOID), Function_PC_invalid),
+     saved_MISC(Token(TOK_VOID), Function_PC_invalid),
      body(_body),
      PC(Function_PC_0),
      assign_state(ASS_none),
@@ -135,8 +135,8 @@ Prefix::uses_function(const UserFunction * ufun) const
             tok.get_function() == ufun)   return true;
       }
 
-   if (saved_lookahead.tok.get_ValueType() == TV_FUN &&
-            saved_lookahead.tok.get_function() == ufun)   return true;
+   if (saved_MISC.tok.get_ValueType() == TV_FUN &&
+            saved_MISC.tok.get_function() == ufun)   return true;
 
    return false;
 }
@@ -356,27 +356,27 @@ Prefix::get_range_low() const
 bool
 Prefix::value_expected()
 {
-   /* on entry: saved_lookahead.get_Class() == TC_INDEX token.
-                body[PC] is the token left of saved_lookahead.
+   /* on entry: saved_MISC.get_Class() == TC_INDEX token.
+                body[PC] is the token left of saved_MISC.
 
-      return true if the token left of saved_lookahead must be a value (so
-      that saved_lookahead is the index of a value) or false if the token
-      left of saved_lookahead must be a function or operator (so that
-      saved_lookahead is the axis of a  function or operator).
+      return true if the token left of saved_MISC must be a value (so
+      that saved_MISC is the index of a value) or false if the token
+      left of saved_MISC must be a function or operator (so that
+      saved_MISC is the axis of a  function or operator).
 
        See also: "Additional Requirement" at the bottom of page 48 in the
        ISO standard.
     */
-   Assert1(saved_lookahead.tok.get_Class() == TC_INDEX);
-   Assert1(saved_lookahead.pc == (PC - 1));
+   Assert1(saved_MISC.tok.get_Class() == TC_INDEX);
+   Assert1(saved_MISC.pc == (PC - 1));
 
-   // function axes cannot contain semicolons. Therefore, if saved_lookahead
+   // function axes cannot contain semicolons. Therefore, if saved_MISC
    // contains semicolons then its get_ValueType() is TV_INDEX and
-   // saved_lookahead  MUST be the index of a value. The converse is not
+   // saved_MISC  MUST be the index of a value. The converse is not
    // true: a get_ValueType() of TC_VALUE only indicates the lack of semicolons,
    // which is valid for both functions and values.
    //
-   if (saved_lookahead.tok.get_ValueType() == TV_INDEX)   return true;   // value
+   if (saved_MISC.tok.get_ValueType() == TV_INDEX)   return true;   // value
 
    // look ahead further until value index vs. function axis can be decided.
    //
@@ -514,7 +514,7 @@ Symbol * sym = tl.tok.get_sym_ptr();
              if (+val && !is_left_sym)
                 {
                   Token tok(TOK_APL_VALUE1, val);
-                  tl.tok.move_1(tok, LOC);
+                  tl.tok.move(tok, LOC);
                   resolved = true;
                 }
            }
@@ -581,13 +581,13 @@ Prefix::push_END_error()
 bool
 Prefix::push_next_token()
 {
-   if (saved_lookahead.tok.get_tag() != TOK_VOID)   // valid lookahead token
+   if (saved_MISC.tok.get_tag() != TOK_VOID)   // valid lookahead token
       {
         // there is a stored MISC token from a MISC phrase. Symbol resolution
         // was already performed, so we can push it now and are done.
         //
-        push(saved_lookahead);
-        saved_lookahead.tok.clear(LOC);   // saved_lookahead = TOK_VOID
+        push(saved_MISC);
+        saved_MISC.tok.clear(LOC);   // saved_MISC = TOK_VOID
         return false;
       }
 
@@ -782,8 +782,8 @@ again:   // aka. REDUCE
    prefix_len = best_phrase->phrase_len;
    if (best_phrase->misc)   // MISC phrase: save X and remove it
       {
-        Assert(saved_lookahead.tok.get_tag() == TOK_VOID);
-        saved_lookahead.copy(pop(), LOC);
+        Assert(saved_MISC.tok.get_tag() == TOK_VOID);
+        saved_MISC.copy(pop(), LOC);
         --prefix_len;
       }
 
@@ -828,11 +828,10 @@ const uint64_t inst = instance;
 bool
 Prefix::check_next_binding()
 {
-TokenClass next = TC_INVALID;
+TokenClass next = TC_INVALID;   // assume no bext
     if (PC < Function_PC(body.size()))
        {
          const Token & tok = body[PC];
-
          next = tok.get_Class();
          if (next == TC_SYMBOL)
             {
@@ -1090,8 +1089,8 @@ Prefix::reduce_LPAR_F_C_RPAR()
    // before: ( F C )
    // after:  F C
    //
-   at3().move_1(at2(), LOC);   // move C left
-   at2().move_1(at1(), LOC);   // move F left
+   at3().move(at2(), LOC);   // move C left
+   at2().move(at1(), LOC);   // move F left
    pop_and_discard();          // discard old C
    pop_and_discard();          // discard old RPAR
    set_action(RA_CONTINUE);   // match again (w/o SHIFT)
@@ -1120,14 +1119,14 @@ Prefix::reduce_MISC_F_B_()
 {
    Assert1(prefix_len == 2);
 
-   if (saved_lookahead.tok.get_Class() == TC_INDEX)
+   if (saved_MISC.tok.get_Class() == TC_INDEX)
       {
         if (value_expected())
            {
              // push [...] and read one more token
              //
-             push(saved_lookahead);
-             saved_lookahead.tok.clear(LOC);
+             push(saved_MISC);
+             saved_MISC.tok.clear(LOC);
              set_action(RA_PUSH_NEXT);   // aka. SHIFT
              return;
            }
@@ -1240,7 +1239,7 @@ Token result = at0().get_function()->eval_B(at1().get_apl_val());
              Token result_A = Bif_F1_EXECUTE::execute_statement(statement_A);
              if (result_A.get_Class() == TC_VALUE)   // ⍎ literal
                 {
-                  Workspace::SI_top()->get_prefix().at0().move_1(result_A, LOC);
+                  Workspace::SI_top()->get_prefix().at0().move(result_A, LOC);
                   return;
                 }
              new (&StateIndicator::get_error(top)) Error(ec, LOC);
@@ -1273,14 +1272,14 @@ Prefix::reduce_MISC_F_C_B()
 {
    Assert1(prefix_len == 3);
 
-   if (saved_lookahead.tok.get_Class() == TC_INDEX)
+   if (saved_MISC.tok.get_Class() == TC_INDEX)
       {
         if (value_expected())
            {
              // push [...] and read one more token
              //
-             push(saved_lookahead);
-             saved_lookahead.tok.clear(LOC);
+             push(saved_MISC);
+             saved_MISC.tok.clear(LOC);
              set_action(RA_PUSH_NEXT);   // aka. SHIFT
              return;
            }
@@ -1299,17 +1298,18 @@ Prefix::reduce_MISC_F_C_B()
         at1().clear(LOC);
         SYNTAX_ERROR;
       }
+
    if (!at1().get_apl_val())   SYNTAX_ERROR;
 
    if (at0().get_tag() == TOK_Quad_FIO &&
-       saved_lookahead.tok.get_Class() == TC_FUN12)
+       saved_MISC.tok.get_Class() == TC_FUN12)
       {
         DerivedFunction * derived =
                           Workspace::SI_top()->fun_oper_cache.get(LOC);
-        new (derived)   DerivedFunction(saved_lookahead.tok,
+        new (derived)   DerivedFunction(saved_MISC.tok,
                                         at0().get_function(),
                                         at1().get_apl_val(),  LOC);
-        saved_lookahead.tok.clear(LOC);
+        saved_MISC.tok.clear(LOC);
         prefix_len = 2;   // only f ⎕FIO
         pop_args_push_result(Token(TOK_FUN2, derived));
         set_action(RA_CONTINUE);   // match again (w/o SHIFT)
@@ -1404,6 +1404,7 @@ Prefix::MM_is_FM(Function_PC pc)
 {
    /*
       dis-ambiguate / ⌿ \ or ⍀.
+
       return true if M M shall actually be F M in reduce_M_M__().
       PC was alredy incremented and points to the token left of M M:
 
@@ -1415,17 +1416,21 @@ Prefix::MM_is_FM(Function_PC pc)
        │ TC_END │   ...   │ NEXT │ /⌿\⍀ | TC_OPER1 │  (B...)
        └────────┴───   ───┴──────┴──────┴──────────┴───
 
-       token in metaclass MISC, i.e. ← → ; [ END ( may not be left of M M.
+       NOTE: if M1 is an operator then its left argument must either be a
+             value or a function. Therefore the token in metaclass MISC,
+             i.e. ← → ; [ END or ( imply that M1 shall be a function F
+             (which, unless M1 / ⌿ \ or ⍀) will rise a syntax error in
+             reduce_F_M__().
     */
    for (;;)
        {
          const Token & NEXT = body[pc];
          switch(const TokenClass tc_NEXT = NEXT.get_Class())
             {
-                   // Examples:                     ┌─────── NEXT
-                   //                               │ ┌───── M1 is / ⌿ \ or ⍀
-                   //                               │ │ ┌─── M2 any operator
-                   //                               │ │ │
+                                    // Examples:    ┌─────── NEXT
+                                    //              │ ┌───── M1 is / ⌿ \ or ⍀
+                                    //              │ │ ┌─── M2 any operator
+                                    //              │ │ │
               case TC_ASSIGN:       //            Q ← / ⍨ 1 2 3         (MISC)
               case TC_R_ARROW:      //              → / ⍨ 1 2 3         (MISC)
               case TC_L_BRACK:      //              [ / ⍨ 1 2 3         (MISC)
@@ -1436,64 +1441,22 @@ Prefix::MM_is_FM(Function_PC pc)
               case TC_OPER2:        //            FOO / ¨ ⊂ 'abc
               case TC_RETURN:       //                / ⍨ 1 2 3
               case TC_VALUE:        // (1 0 1)(0 1 1) / ¨ ⊂ 'abc
-                   return true;     //               │ │ │
+                   return true;     // M1 is F       │ │ │
                                     //               │ │ │
               case TC_FUN12:        //               + / ¨ (1 2)(3 4)(5 6)
-              case TC_OPER1:        //               / / ¨ (1 2)(3 4)(5 6)
+              case TC_OPER1:        // M1 is M       / / ¨ (1 2)(3 4)(5 6)
                    return false;
 
               case TC_SYMBOL:
-                   // resolve the symbol which will normally lead to one of the
-                   // one of the other cases.
-                   //
-                   switch(const NameClass nc = NEXT.get_sym_ptr()->get_NC())
-                       {
-                         // A. unknown/unassigned symbols...
-                         //
-                         case NC_INVALID:
-                         case NC_UNUSED_USER_NAME:
-                              MORE_ERROR() << "unassigned symbol "
-                                           << body[pc].get_sym_ptr()->get_name()
-                                           << "when resolving "
-                                           << body[pc - 1]
-                                                 .get_function()->get_name();
-                              syntax_error(LOC);
-
-                         // B. functions (so M1 remains an operator).
-                         //
-                         case NC_FUNCTION:
-                         case NC_SYSTEM_FUN:
-                              return false;
-
-                         // C. values (so M1 is a function
-                         //
-                         case NC_LABEL:
-                         case NC_VARIABLE:
-                         case NC_SYSTEM_VAR:
-                              return true;
-
-                         // D. function or value
-                         //
-                         case NC_OPERATOR:
-                              Assert(NEXT.get_function());
-                              return NEXT.get_function()
-                                        ->get_oper_valence() == 2;
-
-                         // E. missed cases (internal error)
-                         //
-                         default:
-                              CERR << "TODO: Nameclass " << nc << endl;
-                              TODO;
-                              return false;
-                       }
+                   return NEXT.get_sym_ptr()->M_is_F();
 
               // TC_INDEX should not happen here since body[PC]... have
               // not yet been parsed
               case TC_INDEX: FIXME
 
               case TC_R_BRACK:   // skip over [ ... ]
-                    pc = Function_PC(int(pc) + body[pc].get_int_val2());
-                    continue;
+                   pc = Function_PC(int(pc) + body[pc].get_int_val2());
+                   continue;
 
               case TC_R_PARENT:
                    pc = Function_PC(pc + 1);
@@ -1984,7 +1947,7 @@ Prefix::reduce_V_C__()
 {
 Symbol * V = at0().get_sym_ptr();
 Token tok = V->resolve_lv(LOC);
-   at0().move_1(tok, LOC);
+   at0().move(tok, LOC);
    set_assign_state(ASS_var_seen);
    set_action(RA_CONTINUE);   // match again (w/o SHIFT)
 }
@@ -2052,7 +2015,7 @@ Prefix::reduce_F_V__()
    //
 Symbol * V = at1().get_sym_ptr();
 Token tok = V->resolve_lv(LOC);
-   at1().move_1(tok, LOC);
+   at1().move(tok, LOC);
    set_assign_state(ASS_var_seen);
    set_action(RA_CONTINUE);   // match again (w/o SHIFT)
 }
@@ -2139,7 +2102,9 @@ IndexExpr * idx = new IndexExpr(get_assign_state(), LOC);
 void
 Prefix::reduce_LBRA_I__()
 {
-   // [ I or ; I   (elided index)
+   // either [ I (true index) or else ; I (elided index). I is a (partial)
+   // index and LBRA is the left) end of it. The result is either a scalar
+   // axis aka. TOK_AXIS() or a non-scalar index aka. TOK_INDEX().
    //
    Assert1(prefix_len == 2);
 
@@ -2167,8 +2132,16 @@ Token result = at1();
       {
         assign_state = idx.get_assign_state();
 
-        if (idx.is_axis()) result.move_2(Token(TOK_AXIS, idx.values[0]), LOC);
-        else               result.move_2(Token(TOK_INDEX, idx), LOC);
+        if (idx.is_axis())
+           {
+             Token tok_axis(TOK_AXIS, idx.values[0]);
+             result.move(tok_axis, LOC);
+           }
+        else
+           {
+               Token tok_index(TOK_INDEX, idx);
+               result.move(tok_index, LOC);
+           }
       }
    else
       {
@@ -2200,14 +2173,16 @@ const bool last_index = (at0().get_tag() == TOK_L_BRACK);   // ; vs. [
            {
              Value_P X = idx.extract_axis();
              Assert1(+X);   // not [ ]
-             I.move_2(Token(TOK_AXIS, X), LOC);
+             Token tok_axis(TOK_AXIS, X);
+             I.move(tok_axis, LOC);
              Log(LOG_delete)
                 CERR << "delete " << voidP(&idx) << " at " LOC << endl;
              delete &idx;
            }
         else
            {
-             I.move_2(Token(TOK_INDEX, idx), LOC);
+             Token tok_index(TOK_INDEX, idx);
+             I.move(tok_index, LOC);
            }
       }
    else
@@ -2291,7 +2266,7 @@ const int count = vector_ass_count();
         Assert1(V);
         Token result = V->resolve_lv(LOC);
         set_assign_state(ASS_var_seen);
-        at0().move_1(result, LOC);
+        at0().move(result, LOC);
         set_action(RA_CONTINUE);   // match again (w/o SHIFT)
         return;
       }

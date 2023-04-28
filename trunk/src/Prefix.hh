@@ -210,7 +210,7 @@ public:
    void pop_args_push_result(const Token & result)
         {
           Assert1(size() >= prefix_len);
-          content[put - prefix_len].tok.copy_1(result, LOC);
+          content[put - prefix_len].tok.copy(result, LOC);
           content[put - prefix_len].pc = content[put - 1].pc;
           put -= prefix_len - 1;
         }
@@ -233,7 +233,7 @@ public:
    void reset(const char * loc)
       { clean_up();   put = 0;   assign_state = ASS_none;
         PC_range_high = Function_PC_invalid;
-        saved_lookahead.tok.clear(LOC);
+        saved_MISC.tok.clear(LOC);
         prefix_len = 0;
       }
 
@@ -376,7 +376,7 @@ protected:
    Token_loc content[MAX_CONTENT];
 
    /// the X token (leftmost token in MISC phrase, if any)
-   Token_loc saved_lookahead;
+   Token_loc saved_MISC;
 
    /// the function body. \b this parser parses tokens body[pc_from] ...
    const Token_string & body;

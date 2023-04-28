@@ -145,4 +145,9 @@ EXTRA_DIST = config.rpath m4/ChangeLog
 git-pull:
 	make -C src $@
 	make -C wslib5 $@
+	git clone https://git.code.sf.net/p/gnu-apl-library/code /tmp/DALY
+	cp /tmp/DALY/doc/DALY/*     doc/DALY/
+	cp /tmp/DALY/wslib3/DALY/*  wslib3/DALY/
+	cp /tmp/DALY/wslib5/DALY/*  wslib5/DALY/
+ 
 

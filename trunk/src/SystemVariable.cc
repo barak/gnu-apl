@@ -748,7 +748,8 @@ UCS_string line;
 
    line.remove_leading_and_trailing_whitespaces();
 
-   token.move_2(Bif_F1_EXECUTE::execute_statement(line), LOC);
+Token tok_exec(Bif_F1_EXECUTE::execute_statement(line));
+   token.move(tok_exec, LOC);
 }
 //============================================================================
 Quad_QUOTE::Quad_QUOTE()

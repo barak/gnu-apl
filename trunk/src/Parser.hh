@@ -46,6 +46,12 @@ public:
    /// Parse token string \b input into token string \b tos.
    ErrorCode parse(const Token_string & input, Token_string & tos) const;
 
+   /// quick (!_ decision if tos[pos] is right of ←
+   static Assign_state get_assign_state(Token_string & tos, ShapeItem pos);
+
+   /// replace literal axes by their reduction.
+   static void replace_literal_axes(Token_string & tos);
+
    /// remove VOID token from \b tos (compacting \b tos)
    static void remove_void_token(Token_string & tos);
 

@@ -209,7 +209,7 @@ inline Value_P::Value_P(const Value_P & other, const char * loc)
    if (value_p)
       {
         value_p->increment_owner_count(loc);
-        ADD_EVENT(value_p, VHE_PtrCopy1, value_p->owner_count, loc);
+        ADD_EVENT(value_p, VHE_PtrCopy, value_p->owner_count, loc);
       }
 }
 //----------------------------------------------------------------------------
@@ -219,7 +219,7 @@ inline Value_P::Value_P(const Value_P & other)
    if (value_p)
       {
         value_p->increment_owner_count(LOC);
-        ADD_EVENT(value_p, VHE_PtrCopy1, value_p->owner_count, LOC);
+        ADD_EVENT(value_p, VHE_PtrCopy, value_p->owner_count, LOC);
       }
 }
 //----------------------------------------------------------------------------
@@ -270,6 +270,16 @@ Value_P_Base::isolate(const char * loc)
         Z.value_p = 0;
       }
 #endif
+}
+//----------------------------------------------------------------------------
+inline void
+Value_P_Base::move(Value_P_Base & other, const char * loc)
+{
+   if (value_p)   value_p->decrement_owner_count(loc);
+   value_p = other.value_p;
+   if (value_p) ADD_EVENT(value_p, VHE_TokMove, value_p->get_owner_count(), loc);
+
+   other.value_p = 0;
 }
 //----------------------------------------------------------------------------
 

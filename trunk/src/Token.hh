@@ -53,25 +53,69 @@ public:
    /// parsing, and (2) as return values of user defined functions that
    /// do not return values.
    Token()
-   : tag(TOK_VOID) { value.int_vals[0] = 0; }
+   : tag(TOK_VOID)
+      {
+        // the pointer in value.apl_val must always be initialized
+        // as to avoid deleting of an un-initialized pointer
+        value.apl_val.init_pointer();
+      }
 
-   /// copy constructor
-   Token(const Token & other);
+   /// copy constructor without location
+   Token(const Token & other)
+   : tag(TOK_VOID)
+      {
+        // the pointer in value.apl_val must always be initialized
+        // as to avoid deleting of an un-initialized pointer
+        value.apl_val.init_pointer();
+        copy(other, "Token::Token(const Token & other)");
+      }
 
    /// copy constructor with location
-   Token(const Token & other, const char * loc);
+   Token(const Token & other, const char * loc)
+   : tag(TOK_VOID)
+      {
+        // the pointer in value.apl_val must always be initialized
+        // as to avoid deleting of an un-initialized pointer
+        value.apl_val.init_pointer();
+        copy(other, loc);
+      }
 
-   /// copy \b src into \b this token. leaving APL value pointer in
-   /// src (if any) and add events as needed
-   void copy_1(const Token & src, const char * loc);
+   /// copy Token \b src into \b this token.
+   void copy(const Token & src, const char * loc)
+      {
+         clear(loc);   // clears Value_P
+         if (src.is_apl_val())
+            {
+              if (+src.value.apl_val)
+                 {
+                   ADD_EVENT(val, VHE_TokCopy, src.value_use_count(), loc);
+                 }
+              else
+                 {
+                   ADD_EVENT(0, VHE_TokCopy, -1, loc);
+                 }
+            }
 
-   /// move mutable \b src into \b this token. clears APL value pointer in
-   /// src (if any) and add events as needed
-   void move_1(Token & src, const char * loc);
+         copy_N(src);
+      }
 
-   /// move const \b src into \b this token. clears APL value pointer in
-   /// src (if any) and add events as needed
-   void move_2(const Token & src, const char * loc);
+
+   /// move the mutable (!) \b src into \b this token. If \b src is an APL
+   /// value, then it is properly cleared. and an event is added.
+   void move(Token & src, const char * loc)
+      {
+         clear(loc);
+         copy_N(src);
+
+         if (src.is_apl_val())
+            { 
+              if (const Value * val = src.value.apl_val.get())
+                 {
+                   ADD_EVENT(val, VHE_TokMove, src.value_use_count() - 1, loc);
+                   src.clear(loc);
+                 }  
+            }
+      }
 
    /// Construct a token without a value
    Token(TokenTag tg)
@@ -282,7 +326,7 @@ public:
    int error_info(UCS_string & out) const;
 
    /// copy src to \b this token, updating ref counts for APL values
-   void copy_N(const Token & src);
+   inline void copy_N(const Token & src);
 
    /// return a brief token class name for debugging purposes
    static const char * short_class_name(TokenClass cls);
@@ -318,6 +362,29 @@ protected:
    /// helper function to print Quad-function (system function or variable).
    ostream & print_quad(ostream & out) const;
 };
+//----------------------------------------------------------------------------
+inline void
+Token::copy_N(const Token & src)
+{
+   tag = src.tag;
+   switch(src.get_ValueType())
+      {
+        case TV_NONE:  value.int_vals[0]   = 0;
+                       value.int_vals[1]   = src.value.int_vals[1];     break;
+        case TV_CHAR:  value.char_val      = src.value.char_val;        break;
+        case TV_INT:   value.int_vals[0]   = src.value.int_vals[0];
+                       value.int_vals[1]   = src.value.int_vals[1];     break;
+        case TV_FLT:   value.float_vals[0] = src.value.float_vals[0];   break;
+        case TV_CPX:   value.float_vals[0] = src.value.float_vals[0];
+                       value.float_vals[1] = src.value.float_vals[1];   break;
+        case TV_SYM:   value.sym_ptr       = src.value.sym_ptr;         break;
+        case TV_LIN:   value.fun_line      = src.value.fun_line;        break;
+        case TV_VAL:   value._apl_val()    = src.value._apl_val();      break;
+        case TV_INDEX: value.index_val     = src.value.index_val;       break;
+        case TV_FUN:   value.function      = src.value.function;        break;
+        default:       FIXME;
+      }
+}
 //----------------------------------------------------------------------------
 /// A sequence of Token
 class Token_string : public  std::vector<Token>
@@ -374,7 +441,7 @@ struct Token_loc
    void copy(const Token_loc & other, const char * loc)
       {
         pc = other.pc;
-        tok.copy_1(other.tok, loc);
+        tok.copy(other.tok, loc);
       }
 
    /// the token

@@ -60,7 +60,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Installing and Starting GNU 
 </div>
 <span id="GNU-APL"></span><h1 class="top">GNU APL</h1>
 
-<p>April 4, 2023
+<p>April 26, 2023
 </p>
 <p>This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
@@ -2844,7 +2844,7 @@ a left argument of 0:
 monadic ⊤∨ and ⊤⍱ are still useful due to their side effects: conversion
 from near-integer float values to integers (monadic <b>⊤∨</b> and inversion
 of the bits (monadic <b>⊤⍱</b>, The latter is needed since ∼ has a monadic
-form and as a consequence ⊤∼ was not an option for a bit-wise <b>Not</b>
+form and, as a consequence, ⊤∼ was not an option for a bit-wise <b>Not</b>
 function.
 </p>
 <p>Monadic <b>⊤⍱ B</b> is the bit-wise <b>Not</b> function of its argument:
@@ -2920,9 +2920,9 @@ as well. This can be useful for masking purposes such as extracting the lower
 </p>
 <p>The characters involved are treated as 32 bit quantities:
 </p>
-<pre class="verbatim">      5 ⎕CR 'A'
+<pre class="verbatim">      5⎕CR 'A'
 41
-      5 ⎕CR ⊤⍱'A'                       ⍝ Note that 5 ⎕CR ANDs with $FF
+      5⎕CR ⊤⍱'A'                 ⍝ Note that 5⎕CR aka. ⎕CR.to_HEX ANDs with $FF
 BE
 
       256 256 256 256⊤ ⎕UCS ⊤⍱ 'A'      ⍝ ⊤⍱ 'A' is FFFFFFBE

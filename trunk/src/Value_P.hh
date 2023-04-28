@@ -81,6 +81,12 @@ public:
    Value * get()
       { return value_p; }
 
+   /// init the pointer (without adding an event)
+   inline void init_pointer()
+      {
+         value_p = 0;
+      }
+
    /// clear the pointer (and possibly add an event)
    inline void clear_pointer(const char * loc);
 
@@ -94,6 +100,9 @@ public:
 
    /// clone value if more than one Value_P points to it
    inline void isolate(const char * loc);
+
+   /// move the Value * from \b other to \b this.
+   inline void move(Value_P_Base & other, const char * loc);
 
 protected:
    /// pointer to the value

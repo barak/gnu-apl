@@ -401,7 +401,8 @@ Value_P Z(3, LOC);
         Z->next_ravel_Pointer(Z3.get());
 
         Z->check_value(LOC);
-        result.move_2(Token(TOK_APL_VALUE1, Z), LOC);
+        Token tok_Z(TOK_APL_VALUE1, Z);
+        result.move(tok_Z, LOC);
         return;
       }
 
@@ -452,7 +453,8 @@ Value_P Z2(2, LOC);
       }
 
    Z->check_value(LOC);
-   result.move_2(Token(TOK_APL_VALUE1, Z), LOC);
+Token tok_Z(TOK_APL_VALUE1, Z);
+   result.move(tok_Z, LOC);
 }
 //============================================================================
 Token

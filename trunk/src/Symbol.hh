@@ -309,9 +309,14 @@ public:
 
    /// return true, iff this Symbol is not used (i.e. erased)
    bool is_erased() const
-   { return value_stack_size() == 0 ||
-            (value_stack_size() == 1 &&
-             value_stack[0].get_NC() == NC_UNUSED_USER_NAME); }
+      { return value_stack_size() == 0 ||
+              (value_stack_size() == 1 &&
+               value_stack[0].get_NC() == NC_UNUSED_USER_NAME); }
+
+   /// helper function for Prefix::MM_is_FM(). \b this is the symbol left
+   /// of an operator M. Return \b true for function-like name classes and
+   /// \b false for name-like name classes.
+   bool M_is_F() const;
 
    /// Return the current function (or throw a VALUE_ERROR)
    virtual const Function * get_function() const;
