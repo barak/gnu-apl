@@ -219,7 +219,7 @@ Parser::collect_constants(Token_string & tos)
    //
    loop (t, tos.size())
       {
-        size_t to;
+        ShapeItem to;
         switch(tos[t].get_tag())
            {
              case TOK_APL_VALUE1:
@@ -249,7 +249,7 @@ Parser::collect_constants(Token_string & tos)
               // if tos[to + 1] is [ then [ binds stronger than
               // vector notation and we stop collecting.
               //
-              if (size_t(to + 1) < tos.size() &&
+              if ((to + 1) < tos.size() &&
                   tos[to + 1].get_tag() == TOK_L_BRACK)   break;
 #endif
               const TokenTag tag = tos[to].get_tag();
@@ -342,7 +342,7 @@ Parser::find_closing_bracket(const Token_string & tos, int pos)
 
 int others = 0;
 
-   for (size_t p = pos + 1; p < tos.size(); ++p)
+   for (ShapeItem p = pos + 1; p < tos.size(); ++p)
        {
          Log(LOG_find_closing)
             CERR << "find_closing_bracket() sees " << tos[p] << endl;
@@ -388,7 +388,7 @@ Parser::find_closing_parent(const Token_string & tos, int pos)
 
 int others = 0;
 
-   for (size_t p = pos + 1; p < tos.size(); ++p)
+   for (ShapeItem p = pos + 1; p < tos.size(); ++p)
        {
          Log(LOG_find_closing)
             CERR << "find_closing_bracket() sees " << tos[p] << endl;
@@ -630,7 +630,7 @@ Parser::replace_literal_axes(Token_string & tos)
 
             case 2a. is fairly frequent with f being ⎕FIO or ⎕CR.
           */
-         if (size_t(src + 2) < tos.size()          &&   // tos[src+2] exists
+         if ((src + 2) < tos.size()          &&   // tos[src+2] exists
              tos[src + 2].get_tag() == TOK_R_BRACK &&   // and is ]
              T1.get_Class() == TC_VALUE            &&   // value N
              T1.get_apl_val()->is_int_scalar())
@@ -665,12 +665,12 @@ Parser::replace_literal_axes(Token_string & tos)
 void
 Parser::remove_void_token(Token_string & tos)
 {
-size_t dst = 0;
+ShapeItem dst = 0;
 
    loop(src, tos.size())
        {
          if (tos[src].get_tag() == TOK_VOID)   continue;   // ignore (skip)
-         if (src != ShapeItem(dst))   tos[dst].move(tos[src], LOC);
+         if (src != dst)   tos[dst].move(tos[src], LOC);
          ++dst;
        }
 

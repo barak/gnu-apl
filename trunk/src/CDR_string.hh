@@ -74,6 +74,10 @@ public:
    CDR_string(const uint8_t * data, int len)
       { loop(l, len)   push_back(*data++); }
 
+  /// overload basic_string::size() so that it returns a signed length
+   ShapeItem size() const
+      { return  ShapeItem(vector<uint8_t>::size()); }
+
    /// return the bytes of this CDR
    const uint8_t * get_items() const
       { return &front(); }

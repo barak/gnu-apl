@@ -347,7 +347,7 @@ public:
 
    /// overload basic_string::size() so that it returns a signed length
    ShapeItem size() const
-      { return  basic_string<Unicode>::size(); }
+      { return  ShapeItem(basic_string<Unicode>::size()); }
 
    /// an iterator for UCS_strings
    class iterator

@@ -108,6 +108,8 @@
       ⍴A⌹A
 3 3
 
+      ⍝ fails with DOMAIN ERROR for some (linerar dependent) A and B
+      )SIC
 
 ⍝ ==================================
 

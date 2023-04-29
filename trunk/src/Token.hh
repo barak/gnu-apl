@@ -395,6 +395,10 @@ public:
    /// construct an empty string
    Token_string()   {}
 
+   /// make size() signed
+   ShapeItem size() const
+      { return ShapeItem(std::vector<Token>::size()); }
+
    /// construct a string of \b len Token, starting at \b data.
    Token_string(const Token * data, ShapeItem len)
       { loop(l, len)   push_back(data[l]); }

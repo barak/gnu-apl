@@ -171,6 +171,7 @@ AC_CHECK_HEADERS([                      \
    execinfo.h                           \
    ext/atomicity.h                      \
    fcntl.h fenv.h                       \
+   fftw3.h                              \
    inttypes.h                           \
    libpng16/png.h                       \
    locale.h                             \
@@ -178,10 +179,14 @@ AC_CHECK_HEADERS([                      \
    malloc.h                             \
    netdb.h                              \
    netinet/in.h                         \
-   stdint.h stdlib.h string.h strings.h \
+   stdint.h                             \
+   stdlib.h                             \
+   string.h                             \
+   strings.h                            \
    sys/un.h                             \
    termios.h                            \
-   unistd.h utmpx.h                     \
+   unistd.h                             \
+   utmpx.h                              \
    zlib.h                               \
                  ],, apl_missing_headers=$(($apl_missing_headers + 1)))
 

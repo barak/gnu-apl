@@ -200,7 +200,7 @@ UCS_string_vector::max_width(size_t col, size_t column_count) const
 {
 ShapeItem ret = 0;
 
-   for (size_t s = col; s < size(); s += column_count)
+   for (ShapeItem s = col; s < size(); s += column_count)
        {
           const ShapeItem len_s = at(s).size();
           if (ret < len_s)   ret = len_s;
@@ -232,7 +232,7 @@ const UCS_string frame(UTF8_string("╔╤╗╚╧╝═║│"));
 
    // data rows
    //
-   for (size_t d = 0; d < size();)
+   for (ShapeItem d = 0; d < size();)
        {
          out << frame[7];                                  // ║
          loop(col, column_count)

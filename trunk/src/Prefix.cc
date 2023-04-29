@@ -380,7 +380,7 @@ Prefix::value_expected()
 
    // look ahead further until value index vs. function axis can be decided.
    //
-   for (size_t pc = PC; pc < body.size();)
+   for (ShapeItem pc = PC; pc < body.size();)
       {
         const Token & tok = body[pc++];
         switch(tok.get_Class())
@@ -456,7 +456,7 @@ Symbol * sym = tl.tok.get_sym_ptr();
    else   // not TOK_LSYMB2
       {
         const NameClass nc = sym->get_NC();
-        if (size_t(PC + 1) < body.size() &&
+        if ((PC + 1) < body.size() &&
             body[PC + 1].get_tag() == TOK_OPER2_INNER)
            {
              // APL code is .SYM which could be a normal inner product
@@ -1673,7 +1673,7 @@ const bool member_assign = prefix_len == 4;   // assume member reference
 vector<const UCS_string *>members;
 Symbol * top_sym = 0;
    members.push_back(at1().get_sym_ptr()->get_name_ptr());
-   while (size_t(PC) < (body.size() - 1))   // at least 2 more token
+   while (PC < (body.size() - 1))   // at least 2 more token
          {
            if (body[PC].get_Class() == TC_SYMBOL)   // the normal case
               {
@@ -2403,7 +2403,7 @@ const APL_Integer jump_offset = A0.get_near_int();
         // function (token ENDL). However, that skips the return of the
         // ∇-result. Fix it.
         //
-        if (ulong(PC + 1) == body.size())           // PC at end of function
+        if ((PC + 1) == body.size())           // PC at end of function
            {
              Assert(body[PC].get_tag() == TOK_ENDL);
              Assert(body[PC-1].get_Class() == TC_RETURN);

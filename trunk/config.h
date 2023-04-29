@@ -5,7 +5,7 @@
 #define ARCHIVE_SVN " 211"
 
 /* How and when GNU APL was configured */
-#define BUILDTAG PACKAGE_NAME, PACKAGE_VERSION " / SVN: 218", "2023-04-28 13:03:52 UTC", "Linux 5.15.0-70-generic x86_64", "default ./configure options"
+#define BUILDTAG PACKAGE_NAME, PACKAGE_VERSION " / SVN: 221", "2023-04-29 14:32:50 UTC", "Linux 5.15.0-70-generic x86_64", "default ./configure options"
 
 /* Define to 1 iff pthread_setaffinity_np() is available */
 #define HAVE_AFFINITY_NP 1
@@ -36,6 +36,9 @@
 
 /* Define to 1 if you have the <fenv.h> header file. */
 #define HAVE_FENV_H 1
+
+/* Define to 1 if you have the <fftw3.h> header file. */
+#define HAVE_FFTW3_H 1
 
 /* Define to 1 if you have the `floor' function. */
 #define HAVE_FLOOR 1

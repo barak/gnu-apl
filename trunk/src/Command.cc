@@ -2300,7 +2300,7 @@ Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
          // looks like the user command is a lambda function.
          UCS_string result;
          // lambdas could contain spaces, collect all arguments in one string
-         for (size_t i = 1; i < args.size(); ++i)
+         for (ShapeItem i = 1; i < args.size(); ++i)
             {
                result << args[i];
             }
@@ -2636,7 +2636,7 @@ Token_string tos;
      if (tokenizer.tokenize(data1, tos) != E_NO_ERROR)   return;
    }
  
-   if (tos.size() != size_t(shape.get_volume()))   return;
+   if (tos.size() != shape.get_volume())   return;
 
 Value_P Z(shape, LOC);
    Z->set_proto_Int();   // prototype

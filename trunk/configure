@@ -18723,7 +18723,7 @@ fi
 
 
 apl_missing_headers=0
-       for ac_header in dirent.h execinfo.h ext/atomicity.h fcntl.h fenv.h inttypes.h libpng16/png.h locale.h limits.h malloc.h netdb.h netinet/in.h stdint.h stdlib.h string.h strings.h sys/un.h termios.h unistd.h utmpx.h zlib.h
+       for ac_header in dirent.h execinfo.h ext/atomicity.h fcntl.h fenv.h fftw3.h inttypes.h libpng16/png.h locale.h limits.h malloc.h netdb.h netinet/in.h stdint.h stdlib.h string.h strings.h sys/un.h termios.h unistd.h utmpx.h zlib.h
 do :
   as_ac_Header=`printf "%s\n" "ac_cv_header_$ac_header" | $as_tr_sh`
 ac_fn_cxx_check_header_compile "$LINENO" "$ac_header" "$as_ac_Header" "$ac_includes_default"

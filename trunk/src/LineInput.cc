@@ -207,7 +207,7 @@ ofstream outf(filename);
       }
 
 int count = 0;
-   for (size_t p = put + 1; p < hist_lines.size(); ++p)
+   for (ShapeItem p = put + 1; p < hist_lines.size(); ++p)
       {
         outf << hist_lines[p] << endl;
         ++count;
@@ -237,7 +237,7 @@ LineHistory::print_history(ostream & out, const UCS_string & filter) const
 {
    // hist_lines is a ring buffer. first print its tail, then its head.
 
-   for (size_t p = put + 1; p < hist_lines.size(); ++p)   // tail
+   for (ShapeItem p = put + 1; p < hist_lines.size(); ++p)   // tail
       {
         if (filter.size() && !hist_lines[p].starts_iwith(filter))   continue;
         out << "      " << hist_lines[p] << endl;

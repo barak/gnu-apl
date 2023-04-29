@@ -721,8 +721,8 @@ UCS_string lambda_text;
 
 int level = 0;   // {/} nesting level
 bool copying = false;
-size_t tidx = 0;    // the current line in text[]
-size_t tcol = 0;    // the current column in text[tidx];
+ShapeItem tidx = 0;    // the current line in text[]
+ShapeItem tcol = 0;    // the current column in text[tidx];
 bool in_single_quotes = false;
 bool in_double_quotes = false;
 
@@ -737,7 +737,7 @@ bool in_double_quotes = false;
 
          const UCS_string & line = text[tidx];
 
-         if (tcol >= size_t(line.size()))   // end of line: wrap to next line
+         if (tcol >= line.size())   // end of line: wrap to next line
             {
               ++tidx;     // next line
               tcol = 0;   // first column

@@ -326,14 +326,16 @@ ASCIIDOC = \
     Parallel-APL.asciidoc               \
     Quad-GTK.asciidoc                   \
     GNU-APL-Memory-Management.asciidoc  \
-    GNU-APL-Troubleshooting.asciidoc
+    GNU-APL-Troubleshooting.asciidoc    \
+    Tips-For-Mainatiners.asciidoc
 
 HTML = \
     APL-Communication-Cookbook.html \
     Parallel-APL.html               \
     Quad-GTK.html                   \
     GNU-APL-Memory-Management.html  \
-    GNU-APL-Troubleshooting.html
+    GNU-APL-Troubleshooting.html    \
+    Tips-For-Mainatiners.html
 
 dist_doc_DATA = \
     $(HTML)              \
