@@ -1,0 +1,61 @@
+@ifplaintext
+\input texinfo
+@settitle Export to Disk Files
+@setfilename export.txt
+@copying
+This manual is for workspace assert version  0 1 2.
+
+Copyright @copyright{} 2019 Bill Daly
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+@end copying
+
+@titlepage
+@title Export to Disk Files
+@author Bill Daly
+
+@end titlepage
+
+@ifnottex
+@node TOP
+@end ifnottex
+
+@end ifplaintext
+
+@ifnotplaintext
+@node export
+@end ifnotplaintext
+
+@chapter Export to Disk File
+@cindex export
+@cindex delimited files
+@cindex csv
+
+Export is an apl workspace to export an array to a delimited text
+file.
+
+@deffn ∇ array export∆array file_name
+
+Function to create a file delimited by line feeds and tabs from an
+array of two dimensions.
+
+@end deffn
+
+@deffn ∇ array export∆nested file_name
+
+Function to create a file delimited by line feeds and tabs from an
+nested array of vectors.
+
+@end deffn
+

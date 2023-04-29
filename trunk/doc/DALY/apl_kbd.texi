@@ -1,0 +1,71 @@
+@ifplaintext
+\input texinfo
+@settitle apl_kbd
+@setfilename apl_kbd.txt
+@copying
+This manual is for workspace assert version  0 1 2.
+
+Copyright @copyright{} 2019 Bill Daly
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+@end copying
+
+@titlepage
+@title apl_kbd
+@author Bill Daly
+
+@end titlepage
+
+@ifnottex
+@node TOP
+@end ifnottex
+
+@end ifplaintext
+
+@ifnotplaintext
+@node apl_kbd
+@end ifnotplaintext
+
+@chapter apl_kbd
+@cindex apl_kbd
+@cindex utilities
+
+apk_kbd is a workspace to add an additional shift-key to your keyboard
+so that you can type APL functions and operators.  Once activated use
+the new shift-key with other keys to generate apl's functions and
+operators.  To see which key to use type the command )KEYBOARD for a
+keyboard diagram
+
+@deffn ∇ kbd_on shift_key
+Turn the new shift key on.  shift_key is one of
+
+@itemize @bullet
+@item  kbd_opt_win, the Windows key
+@item kbd_opt_rctrl, the right ctrl key
+@item kbd_opt_ralt, the right alt key
+@item kbd_opt_lalt, the left alt key
+@end itemize
+
+@end deffn
+
+@deffn ∇ kbd_off
+Return the keyboard to its original state.
+@end deffn
+
+When choosing which shift key to use be wary of what other programs
+might be using it.  Some window managers will use the Windows key for
+its own purposes. 
+
+
+

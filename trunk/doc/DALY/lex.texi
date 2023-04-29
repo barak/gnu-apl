@@ -1,0 +1,89 @@
+@ifplaintext
+\input texinfo
+@settitle Lex, a name-value store
+@setfilename lex.txt
+@copying
+This manual is for workspace assert version  0 1 2.
+
+Copyright @copyright{} 2019 Bill Daly
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+@end copying
+
+@titlepage
+@title Lex, a name-value store
+@author Bill Daly
+
+@end titlepage
+
+@ifnottex
+@node TOP
+@end ifnottex
+
+@end ifplaintext
+
+@ifnotplaintext
+@node lex
+@end ifnotplaintext
+
+@chapter Lex, a name-value store
+@cindex lex
+@cindex name-value pairs
+
+
+Lex is an implementation of a name-value store for apl. Functions here
+allow one to create such a store, add name and retrieve a value for a
+name.
+
+Functions are:
+
+@deffn ∇ lex ← lex∆init
+
+Returns an empty store
+
+@end deffn
+
+@deffn ∇ lex ← lex lex∆assign name value
+
+Returns a new lexicon with the supplied name--value inserted into the
+supplied lexicon.
+
+@end deffn
+
+@deffn ∇ item ← lex lex∆lookup name
+
+Returns the value of the supplied name.
+
+@end deffn
+
+@deffn ∇ boolean ← lex∆is lex
+
+Predicate to return true if the supplied item is in fact a lexicon
+
+@end deffn
+
+@deffn ∇ array ← lex∆keys lex
+
+Returns the list of names in the supplied lexicon
+
+@end deffn
+
+@deffn ∇ array ← lex∆values lex
+
+Returns a list of values in the supplied lexicon
+
+@end deffn
+
+We use and-dot-equals to do a sequential search of the list of names.
+For other hashing algorithms try lex1.

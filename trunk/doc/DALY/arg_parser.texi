@@ -1,0 +1,166 @@
+@ifplaintext
+\input texinfo
+@settitle arg_parser, Command line arguments
+@setfilename arg_parser.txt
+@copying
+This manual is for workspace assert version  0 1 2.
+
+Copyright @copyright{} 2019 Bill Daly
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License
+along with this program.  If not, see <http://www.gnu.org/licenses/>.
+@end copying
+
+@titlepage
+@title arg_parser, Command line arguments
+@author Bill Daly
+
+@end titlepage
+
+@ifnottex
+@node TOP
+@end ifnottex
+
+@end ifplaintext
+
+@ifnotplaintext
+@node arg_parser
+@end ifnotplaintext
+
+@chapter arg_parser, Command line arguments
+@cindex arguments
+@cindex command line
+@cindex arg_parser
+
+arg_parser parses command line arguments that follow posix long-name
+options.  That is a double dash followed by the argument and,
+optionally, followed by an equals sign and a value.  That is
+@example
+--option[=value].
+@end example
+
+@node Overview
+@section Overview
+
+arg_parser presents an application programming interface:
+
+@enumerate
+@item
+Create a parser object with ap∆init.
+
+@item
+Define options with ap∆new_option.
+
+@item
+Parse the command line with ap∆parse.
+
+@item
+Test for errors with ap∆has_errors.
+
+@item
+Test for help request wtih ap∆has_help.
+
+@item
+Get option values with ap∆get_option_value.
+
+@end enumerate
+
+For instance:
+
+@example
+po←ap∆init 'Bill''s application'
+po←po ap∆new_option 'name' 'first' 'type' 'string' 'help' 'This application is helpless..'
+po←po ap∆new_option 'name' 'second' 'type' 'boolean' 'help' 'Do you agree that it is helpless?'
+po←ap∆parse po
+⍎(ap∆has_errors po)/'⍞←ap∆get_errors  po ◊ →0'
+⍎(ap∆has_help po)/'⍞←ap∆help po ◊ →0'
+First←po ap∇get_option_value 'first'
+Second←po ap∆get_option_value 'second'
+@end example
+
+arg_parser uses both the utl and lex workspace. As shipped the
+arg_parser.apl file copies these utilities into its workspace.  APL
+may not be able to find these utilities at run time.  We recomend
+copying all three apl files into your script file to avoid any
+confusion.
+
+@node API
+@section API
+
+
+@deffn ∇ parser_object ← ap∆init name
+
+Function returns a new parser object
+
+@end deffn
+
+@deffn ∇ parser_object ← parser_object ap∆new_option alist or lexicon
+
+Function adds a new option to the parser instance. The object defined
+in the right argument is a list of name value pairs for the following
+names:
+
+@itemize
+@item name (required)
+@item type (required)
+@item help (optional)
+@item value (provided by the parser)
+@end itemize
+
+@end deffn
+
+@deffn ∇ parser_object ← ap∆parse parser_object
+
+Function examines the command line, confirms that command line options
+have been defined with new_option; that string type options have value
+and that boolen options do not. It then saves the given values.
+
+Function sets errors true when it detects errors and sets help true if
+the operator included --help on the command line.
+
+@end deffn
+
+@deffn ∇ value←parser_object ap∆get_option_value name
+
+Function returns the value of an option.  If a string option was not
+on the command line, ⍬ will be returned. If a boolean option was one
+the command line 1 (True) will be returned, if not, 0 will be
+returned.
+
+@end deffn
+
+@deffn ∇ boolean ← ap∆has_errors parser_object
+
+Functions returns whether or not an error was found on the command
+line.
+
+@end deffn
+
+@deffn ∇ error_msg ← ap∆get_errors parser_object
+
+Function returns an error message about each error found.
+
+@end deffn
+
+@deffn ∇ boolean ← ap∆has_help parser_object
+
+Function returns whether or not help was requested.
+
+@end deffn
+
+@deffn ∇ help_message ap∆help parser_object
+
+Function returns a help message showing each defined object.
+
+@end deffn
+
