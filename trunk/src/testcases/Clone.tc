@@ -1,0 +1,52 @@
+⍝ ----------------------------------
+
+      )CLEAR
+CLEAR WS
+
+
+∇A FOO1 B
+ →(A=0)⍴0
+ B[A] ← '⋆'
+ 'FOO1 ' A 'B1: ' B
+ (A-1) FOO1 B
+ 'FOO1 ' A 'B2: ' B
+∇
+
+∇A FOO2 B
+ →(A=0)⍴0
+ (↑(A-1)↓B) ← '⋆'
+ 'FOO2 ' A 'B1: ' B
+ (A-1) FOO2 B
+ 'FOO2 ' A 'B2: ' B
+∇
+
+      5 FOO1 ⍳5
+ FOO1  5 B1:   1 2 3 4 ⋆ 
+ FOO1  4 B1:   1 2 3 ⋆⋆ 
+ FOO1  3 B1:   1 2 ⋆⋆⋆ 
+ FOO1  2 B1:   1 ⋆⋆⋆⋆ 
+ FOO1  1 B1:  ⋆⋆⋆⋆⋆ 
+ FOO1  1 B2:  ⋆⋆⋆⋆⋆ 
+ FOO1  2 B2:   1 ⋆⋆⋆⋆ 
+ FOO1  3 B2:   1 2 ⋆⋆⋆ 
+ FOO1  4 B2:   1 2 3 ⋆⋆ 
+ FOO1  5 B2:   1 2 3 4 ⋆ 
+
+      5 FOO2 ⍳5
+ FOO2  5 B1:   1 2 3 4 ⋆ 
+ FOO2  4 B1:   1 2 3 ⋆⋆ 
+ FOO2  3 B1:   1 2 ⋆⋆⋆ 
+ FOO2  2 B1:   1 ⋆⋆⋆⋆ 
+ FOO2  1 B1:  ⋆⋆⋆⋆⋆ 
+ FOO2  1 B2:  ⋆⋆⋆⋆⋆ 
+ FOO2  2 B2:   1 ⋆⋆⋆⋆ 
+ FOO2  3 B2:   1 2 ⋆⋆⋆ 
+ FOO2  4 B2:   1 2 3 ⋆⋆ 
+ FOO2  5 B2:   1 2 3 4 ⋆ 
+
+   )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+

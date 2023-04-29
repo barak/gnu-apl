@@ -1,0 +1,857 @@
+= Trouble-Shooting GNU APL
+// vim: et:ts=4:sw=4:tw=78
+
+:Author: Dr. Jürgen Sauermann, GNU APL
+
+:page-width: 120em
+:toc:
+:toclevels: 4
+:iconsdir: /usr/share/asciidoc/icons
+:icons:
+
+== Abstract
+
+This document contains hints for *GNU APL* users who would like to report
+*GNU APL* problems and who want to make the life of the *GNU APL* maintainer(s)
+a little easier by localizing the root cause of a problem.
+
+== Introduction
+
+*GNU APL* is, in terms of source code size, a fairly large program. As of
+this writing the source code for the interpreter, not counting code in
+sub-directories, has more than 110,000 lines of code. Finding faults in
+a code of that size is not as trivial as finding faults in a short program
+of only a few thousand lines. Past experience shows, that after a new fault was
+observed, the time for reproducing and localizing the fault typically takes
+more than 90 % of the total time to fix it.
+
+For this reason, *GNU APL* comes with a handful of built-in trouble-shooting
+capabilities that makes locating a fault easier. Some of these capabilities
+require that *GNU APL* is built and run in a specific way as described in
+this document.
+
+Almost every error that might occur in *GNU APL* falls into one of the
+following 4 categories of increasing severities:
+
+* Errors in User Programs (aka. APL errors),
+* Incorrect APL results,
+* Failed Assertions, and
+* Crashes of the *GNU APL* interpreter.
+
+Each category requires different means and preparations for locating the
+root cause of the error.
+
+== Errors in User Programs (aka. APL errors),
+
+Errors in user programs are reported by the APL intepreter when APL code
+is being executed. Before the interpreter starts it internal computation(s)
+it checks the arguments. These checks depend on the computation required
+and usually occur in the following order:
+
+. Syntax Check (may raise SYNTAX ERROR)
+. Valence Check (may raise VALENCE ERROR or AXIS ERROR)
+. Value Check (may raise VALUE ERROR)
+. Rank Check (may raise RANK ERROR)
+. Shape Check (may raise LENGTH ERROR)
+. Domain Checks (may raise DOMAIN ERROR)
+
+That is, a VALUE error can normally only occur in the absence of SYNTAX
+and VALENCE ERRORs, a LENGTH ERROR can only occur in the absence of SYNTAX,
+VALENCE, AXIS, VALUE, and RANK ERRORs, and so on.
+
+An APL error is displayed immediately and (provided that output colouring
+is enabled) in a different color than the APL output. The first line of the
+error display is the type of error, possibly followed by +. The +, if
+present, indicates that there is more information available about the error
+(and that the additional information can be obtained with command )MORE.
+Example:
+
+      +/[1;2] 3   ⍝ ; is not allowed in function axes.
+AXIS ERROR+
+      +/[1;2]3
+      ^     ^
+      )MORE
+illegal ; in axis
+
+APL errors shall, of course,  not be reported to the *GNU APL* maintainers,
+with the following exceptions:
+
+* An error was raised incorrectly, i.e. for a valid APL input, or
+* the display of )MORE is misleading or could be improved. Many errors
+  create no )MORE information and that is on purpose. If you believe, however,
+  that a particular error case is difficult to grasp and would benefit from
+  a )MORE information, then feel free to propose that in an email to
+  bug-apl@gnu.org
+
+== Incorrect APL results
+
+If *GNU APL* produces an incorrect result, then you should report in in an
+email to bug-apl@gnu.org. People on that mailing list are gentle and helpful,
+so don't be afraid to report an error.
+
+However, please note the following: Even though APL as a language is
+standardized, (ISO Standard 13751 "Programming Language APL, Extended")
+there exist considerable differences (and also errors) between:
+
+* the APL standard, and
+* the APL documentation of different vendors,
+* and the interpreter implementations of different vendors (including *GNU
+  APL*).
+
+In the case of such differences, *GNU APL* usually resolves the issue in the
+following order:
+
+* IBM APL2 PC implementation (highest priority)
+* IBM APL2 language reference manual
+* ISO Standard 13751
+* Other vendors (lowest priority).
+
+Before sending an email to bug-apl@gnu.org it may make sense to check if the
+issue was reported already (and often caused by such differences). However,
+don't be afraid to report the same error twice if you are not sure.
+
+== Failed Assertions
+
+An assertion is an expression in the source code that the programmer assumes
+to be *true* (aka. ≠ 0 in C/C++). It can be very hard to find the origin
+(root cause) of an error, in particular when many CPU instruction we performed
+between the root cause and error being detected.
+
+By making assertions all over place in the source code, the programmer
+introces checks along the execution path in order to reduce the number of
+CPU instructions between a root cause and the point in time where it is
+being detected. In the C/C++ code, assertions are typically made in the
+following places:
+
+* near the beginning of a function (also known as pre-condition) to check
+   the arguments passed to the function,
+* after calling a reasonably complex sub-function, and
+* near the end of a function (post-condition) to check the result returned by
+  the function.
+
+Assertions are implemented as one of C/C++ macros called Assert() and
+Assert1(). As of this writing there are more than 530 Assert() and more
+than 110 Assert1() macros spread across the *GNU APL* source code. The reason
+for having different Assert macros their impact on performance.
+
+Assert1() macros are intended to test more trivial conditions while Assert()
+macros test more complex conditions. Every test performed by a single Assert()
+or Assert1() macro has a (relatively mild) performance impact. However, the
+large number of Assert() macros cululates the total performance impact which
+may be undesirable. To deal with this, the user may *./configure* one of 3
+different assertion levels as follows (see also *README-2-configure*):
+
+* *ASSERT_LEVEL_WANTED = 0*: this disables both the Assert1() and the Assert()
+  macro so that the interpreter will have the maximal performance.
+* *ASSERT_LEVEL_WANTED = 1* (the default): this disables the Assert1() macro and
+  enables and the Assert() macro.
+* *ASSERT_LEVEL_WANTED = 2*: this enables both the Assert1() and the Assert()
+  macro.
+
+We kindly ask the user to:
+
+make develop
+
+which, beside other settings, does *./configure* with ASSERT_LEVEL_WANTED=2,
+this enabling both Assert macros and possibly making it easier to find the
+root cause of a fault.
+
+As confidence with the source code increases over time, Assert() macros will
+eventually be converted to Assert1() macros while new code will initially
+be protected with Assert() macros.
+
+=== Emulating Failed Assertions
+
+Fortunately we can emulate a failed Assert() or Assert1() macro with ⎕FIO:
+
+----
+
+      ⎕FIO ¯16   ⍝ emulate Assert()
+
+      ⎕FIO ¯17   ⍝ emulate Assert1()
+----
+
+If the respective macro is enabled with ASSERT_LEVEL_WANTED as explained
+above, then it produces a stack trace like this:
+
+----
+       ⎕FIO ¯16
+
+
+ ==============================================================================
+ Assertion failed: 0 && "Simulated Assert() (aka. ⎕FIO ¯16)"
+ in Function:      eval_B
+ in file:          Quad_FIO.cc:1085
+
+ C/C++ call stack:
+
+ ----------------------------------------
+ -- Stack trace at Assert.cc:72
+ ----------------------------------------
+ 0x7FBFD71CBBF7 __libc_start_main
+ 0x563D2320B04A  main
+ 0x563D233E822F   Workspace::immediate_execution(bool)
+ 0x563D2327411A    Command::process_line()
+ 0x563D232742DC     Command::process_line(UCS_string&)
+ 0x563D232768A2      Command::do_APL_expression(UCS_string&)
+ 0x563D23276C73       Command::finish_context()
+ 0x563D2329B5D2        Executable::execute_body() const
+ 0x563D2338199C         StateIndicator::run()
+ 0x563D232DAF86          Prefix::reduce_statements()
+ 0x563D232DBE92           Prefix::reduce_MISC_F_B_()
+ 0x563D2332D0CF            Quad_FIO::eval_B(Value_P) const
+ 0x563D2322C2A0             do_Assert(char const*, char const*, char const*, int)
+ ========================================
+
+ SI stack:
+
+ Depth:      0
+ Exec:       0x563d23f9fde0
+ Safe exec:  0
+ Pmode:      ◊  ⎕FIO ¯16
+ PC:         3 (4) RETURN_STATS
+ Stat:       ⎕FIO ¯16
+ err_code:   0x0
+
+ ==============================================================================
+
+----
+
+The C/C++ stack above tell us which assertion has failed and where the
+assertion is located in the C/C++ source code (i.e. file Quad_FIO.cc line 1085),
+while the )SI stack tells us where that location is in the APL code.
+
+This brings us brings us closer to the root cause of a problem. Unfortunately
+the hex addresses numbers on the left side of the C/C++ stack dump are process
+specific, i.e. the same *⎕FIO ¯16* will produce different numbers in a
+different process of the operating system.
+
+=== Line numbers in Stack Traces
+
+If the functions on the right side of the C/C++ stack are relatively small (as
+most functions in the source code of *GNU APL* are) then we can usually find the
+exact source linei for each stack entry rather easilyi using the function name
+displayed. For larger functions, the same function may be called from different
+source code lines in the same function. This can be improved by converting the
+hex addresses on the left into source line numbers as exlained in the
+following.
+
+First of all the C++ compiler must be instructed to not discard line numbers.
+Older g++ versions would always keep line numbers in the object files, but
+newer versions do not. The trick is this:
+
+----
+CXXFLAGS="-rdynamic -gdwarf-2" ./configure ...
+----
+
+*make develop* also does that for you. The CXXFLAGS above tell the *g++*
+compiler to use an older object format in which line numbers are not discarded.
+If your compiler does not accept *-gdwarf-2* then it probably uses it anyway.
+
+The second step is to create a file named *apl.lines*. If *GNU APL* finds this
+file then it uses it to map hex addresses to line numbers. In the src
+directory, the make target *apl.lines* createst this file (which takes quite a
+while and is therefore not created in a standard build). *make apl.lines*
+essentially does:
+
+----
+objdump --section=.text --line-numbers --disassemble apl > apl.lines
+----
+
+which extracts the line numbers from the apl binary (provided that the
+compiler has inserted them - see above). If *GNU APL* finds apl.lines, then
+the stack dump looks a little different:
+
+----
+      ⎕FIO ¯16
+
+ ==============================================================================
+ Assertion failed: 0 && "Simulated Assert() (aka. ⎕FIO ¯16)"
+ in Function:      eval_B
+ in file:          Quad_FIO.cc:1085
+
+ C/C++ call stack:
+ total_lines in apl.lines:     618610
+ assembler lines in apl.lines: 86495
+ source line numbers found:    86495
+
+ ----------------------------------------
+ -- Stack trace at Assert.cc:72
+ ----------------------------------------
+ 0x29465EE76BF7 __libc_start_main
+ 0x14CCD2  main at main.cc:635
+ 0x3166E1   Workspace::immediate_execution(bool) at Workspace.cc:273
+ 0x1B1004    Command::process_line() at Command.cc:103
+ 0x1B11C6     Command::process_line(UCS_string&) at Command.cc:139
+ 0x1B378C      Command::do_APL_expression(UCS_string&) at Command.cc:329
+ 0x1B3B5D       Command::finish_context() at Command.cc:347
+ 0x1D6806        Executable::execute_body() const at Executable.cc:261
+ 0x2B564F         StateIndicator::run() at StateIndicator.cc:362
+ 0x211DA4          Prefix::reduce_statements() at Prefix.cc:723 (discriminator 4)
+ 0x212A79           Prefix::reduce_MISC_F_B_() at Prefix.cc:990
+ 0x261E7F            Quad_FIO::eval_B(Value_P) const at Quad_FIO.cc:1090
+ 0x16CC03             do_Assert(char const*, char const*, char const*, int) at Assert.cc:74
+ ========================================
+
+ SI stack:
+
+ Depth:      0
+ Exec:       0x561c865a4da0
+ Safe exec:  0
+ Pmode:      ◊  ⎕FIO ¯16
+ PC:         3 (4) RETURN_STATS
+ Stat:       ⎕FIO ¯16
+ err_code:   0x0
+
+
+ ==============================================================================
+----
+
+The difference is twofold:
+
+. the hex numbers are now relative to the location of the *main()* function of
+  *GNU APL*, which makes them not only smaller but also identical even in
+  different processes.
+
+. The source line numbers are now displayed for most hex numbers. Some
+  addresses can not be resolved, this could be caused by C/C++ function
+  inlining or calls through function pointers etc.
+
+Needless to say that *GNU APL* trouble-shooters prefer stack traces with hex
+numbers resolved to line numbers.
+
+Occasionally you may get this message:
+
+----
+...
+C/C++ call stack:
+
+Cannot show line numbers, since apl.lines is older than apl.
+Consider running 'make apl.lines' in directory
+/home/eedjsa/apl-1.8 to fix this
+...
+----
+
+This happens if you do *make apl* without a subsequent *make apl.lines*.
+
+=== Summary concerning Assertions
+
+The *GNU APL* configuration for troubleshooting purposes is obtained like this:
+
+----
+cd <top-level-directory>
+make develop
+cd src
+make clean
+make apl.lines
+----
+
+where *top-level-directory* is the directory that contains the *README* files.
+Additional troubleshooting options may be used as well. Consider the *make*
+target *develop:* in file Makefile.incl (around line 41) only as a template
+that can be augmented by other troubleshooting options (see also
+*README-2-configure*).
+
+== The )CHECK command
+
+*GNU APL* provides a command *)CHECK* which is somewhat similar to IBM APL2's
+command *)CHECK WS*. This command performs an internal check of the internal
+data structures of the interpreter.
+
+Under normal circumstances, the output of the *)CHECK* command should be:
+
+----
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+----
+
+If not, then there were inconsistencies (primarily memory leaks) that need to
+be fixed and should therefore be reported to bug-apl@gnu.org. For example,
+a *stale value* is an APL value that has memory allocated but is not reachable
+any longer via either the symbol table of the interpreter (like an APL
+variable) or the body as a defined function (like an APL literal).
+
+If a )CHECK command fails, then it is important to remember, or better write
+down, which sequence of APL operation has lead to the state of the workspace.
+*GNU APL* has a command *)HISTORY* which displays the last lines entered.
+
+An assertion checks the immediate state of the interpreter and can therefore
+not check the entire lifetime of an APL value or function. For this purpose,
+*GNU APL* povides a different debugging tool called *Value history*.
+
+The Value history tracks the locations in the *GNU APL* source code that have
+manipulated a value from its creation (memory allocation) to its destruction
+(memory deallocation). This tracking, when enabled, has performance impacts
+and is therefore disabled by default.
+
+If the )CHECK command indicates stale values, but also under some other error
+conditions, the history of a value at fault is being displayed and helps the
+*GNU APL* maintainers to locate the problem. The value history is enabled in
+*./configure*:
+
+----
+    ./configure VALUE_HISTORY_WANTED=yes ...
+----
+
+and therefore needs recompilation of the interpreter.
+
+
+== Logging facilities
+
+== Crashes of the GNU APL interpreter
+
+Some programming errors bypass all built-in debugging tools of GNU and
+crash the interpreter rather than returning to the interactive immediate
+execution mode of APL.
+
+The crash may be silent or accompanied by an error message and it may or may
+not create a core file. A core file is an important file if no other
+information is printed as to what kind of fault has occurred.
+
+In the good old times core files were always produced when a binary executable
+crashed. These days the creation of core files may need to be enabled before
+the crashing binary is started. In GNU/Linux with its *bash* dhell that means:
+
+----
+ulimit -c unlimited   # enable core files
+----
+
+Instead of *unlimited* you may also use a different file size limit.
+
+After a core file was produced (we always assume the interpreter was started
+in directory src below the top--level-directory) the you can start the
+debugger *gdb* in the src directory with the core file as second argument:
+
+----
+gdb ./apl core
+----
+
+After that, you can use the gdb command *bt* (for 'backtrace') to show a
+stack dump similar to the one discussed eralier. The *GNU APL* maintainer(s)
+will appreciate a copy of that stack dump for problems that are difficult to
+reproduce.
+
+Normally the file is named '*core*' and found in the same directory as the
+binary, but some GNU/Linux distributions use a different directory for storing
+core files. See also *man 5 core*.
+
+Finally, try to nail down the root cause with logging facilities (see below).
+
+== Non-reproducible Errors
+
+The most difficult to fix errors are those that occur on one machine (usually
+your's) and not on others.
+
+The first thing to locate their root cause it to *./configure* with either no
+options or via *make develop* to see if the errors is related to specific
+*./configure* options.
+
+Also, look for compiler warnings when *GNU APL* is built. In the default build,
+compiler warnings can be overlooked easiy. *make develop* turns most warnings
+into errors so you will see at the end if the build was successful.
+
+=== Optimization
+
+As of recently we have seen faults that may have been caused by an overly
+agressive optimization of the C++ code of the interpreter. These faults
+were observed for the same source code but only when compiled with newer
+versions of the same g\+\+ compiler.
+
+By default *GNU APL* compiles with optimization level -O2. If a fault is
+suspect to being caused by optimization, then it could make sense to also test
+the same source code of *GNU APL* without any optimization.
+
+To do that:
+
+----
+cd src
+find and remove or replace the string -O2 in the relevant Makefile(s)
+make clean all
+----
+
+== Logging facilities
+
+The source code of *GNU APL* is populated with more than 380 Log() macros.
+A Log() macro may or may not print some additional information when the
+execution of the APL interpreter reaches them.
+
+If all these Log() macros would output something, then even a trivial
+APL statement would cause a lot of output in which the relevant information
+gets easily lost. For that reason, each Log () macro belongs to one of
+currently over 45 Groups called *logging facilities*. Each logging facility
+can be turned ON or OFF which causes Log() macros belonging the facility
+to print or not to print its information.
+
+The large (and increasing) number of logging facilities could the tests,
+whether Log() macro resp. its logging facility is ON or OFF, have a
+significant performance impacts. For this reason, *GNU APL* privides two
+different methods to control how logging facilities are turned ON or OFF:
+
+. static logging
+. dynamic logging
+
+The method is selected via *./configure* at compile time (more precisely: at
+*./configure* time), see also README-, see also *README-2-configure*.
+
+=== Static Logging
+
+Static logging is used with:
+
+----
+   ./configure DYNAMIC_LOG_WANTED=no
+----
+
+Static logging is also the default, therefore *DYNAMIC_LOG_WANTED=no* is the
+same as not using DYNAMIC_LOG_WANTED= in *./configure*.
+
+With Static logging, the selection which logging facility shalle be ON is
+made by the first argument of the *log_def()* macros in file *src/Logging.def.
+A value of 0 means OFF while 1 means ON for the respective logging facility.
+
+With static logging, the log_def() macro defines an *enum* value for each
+log_def() macro which is a compile-time constant. The compiler will therefore
+remove all code (including the ON/OFF for all log_def(0, ...) macros and
+also all tests for log_def(1, ...) in all Log() macros. That is:
+
+* Advantage: Static Logging has little if any performance impacts (none
+   if all log_def macros are off, and
+* Disadvantage: changes of log_def() macros require re-compilation of GNU
+  APL.
+
+=== Dynamic Logging
+
+Dynamic logging is used with:
+
+----
+   ./configure DYNAMIC_LOG_WANTED=yes
+----
+
+With dynamic logging, the log_def() macro defines the initial value of a
+variable (rather than an enum value) for each logging facility. After the
+interpreter was started, the value of each variable chan be changed from
+OFF to ON (and vice versa) with the *GNU APL* debug command *]LOG* (which
+toggles the state of the respective variable).
+
+* Disadvantage: Dynamic Logging has a small performance impacts (even
+   if all variables are set to OFF) which will cumulate for all Log() macros,
+* Advantage: no re-compilation of *GNU APL* is required.
+
+==== The ]LOG command
+
+GNU APL has a few debug commands, which are like standard APL commands but
+start with ] instead of ). One of these debug commands is *]LOG* which
+controls the logging facilities.
+
+If static logging was *./configure*'d then *]LOG* displays an error message
+because changing the logging facilities at runtime requires dynanic logging.
+
+----
+      ]LOG
+
+Command ]LOG is not available, since dynamic logging was not
+configured for this APL interpreter. To enable dynamic logging (which
+will slightly decrease performance), recompile the interpreter as follows:
+
+   ./configure DYNAMIC_LOG_WANTED=yes (... other configure options)
+   make
+   make install (or try: src/apl)
+
+above the src directory.
+----
+
+If dynamic logging was ./configure'd then *]LOG* without an argument displays
+the current state (i.e. ON or OFF) of all logging facilities:
+
+----
+      ]LOG
+     1: (OFF) AV details
+     2: (OFF) new and delete calls
+     3: (OFF) input from user or testcase file
+     4: (OFF) parser: parsing
+     5: (OFF)  ...    function find_closing()
+     6: (OFF)  ...    tokenization
+     7: (OFF)  ...    function collect_constants()
+     8: (OFF)  ...    create value()
+     9: (OFF) defined function: fix()
+    10: (OFF)  ...              set_line()
+    11: (OFF)  ...              load()
+    12: (OFF)  ...              execute()
+    13: (OFF)  ...              enter/leave
+    14: (OFF) State indicator: enter/leave
+    15: (OFF)   ...            push/pop
+    16: (OFF) Symbol: lookup
+    17: (OFF)   ...   push/pop and )ERASE
+    18: (OFF)   ...   resolve
+    19: (OFF) Value:  glue()
+    20: (OFF)   ...  erase_stale()
+    21: (OFF) APL primitive function format
+    22: (OFF) character conversions
+    23: (OFF) APL system function Quad-FX
+    24: (OFF) commands )LOAD, )SAVE, )IN, and )OUT
+    25: (OFF) more verbose errors
+    26: (OFF) details of error throwing
+    27: (OFF) nabla editor
+    28: (OFF) execute(): state changes
+    29: (OFF) PrintBuffer: align() function
+    30: (OFF) Output: cork() functions
+    31: (OFF) Details of test execution
+    32: (OFF) Prefix parser
+    33: (OFF)  ...   location information
+    34: (OFF) FunOper1 and FunOper2 functions
+    35: (OFF) Shared Variable operations
+    36: (OFF) command line arguments (argc/argv)
+    37: (OFF) interpreter start-up messages
+    38: (OFF) optimization messages
+    39: (OFF) )LOAD and )SAVE details
+    40: (OFF) Svar_DB signals
+    41: (OFF) Parallel (multi-core) execution
+    42: (OFF) EOC handler functionality
+    43: (OFF) ⎕DLX details
+    44: (OFF) command ]DOXY
+    45: (OFF) details of Value allocation
+    46: (OFF) ⎕TF details
+    47: (OFF) ⎕PLOT details
+----
+
+Otherwise *]LOG N* toggles the state of logging facility N, e.g.:
+
+----
+      ]log 25
+    Logging facility 'more verbose errors' is now ON
+
+      ]log 26
+    Logging facility 'details of error throwing' is now ON
+----
+
+=== Logging Facilities of Interest
+
+Many of the currently over 40 logging server a particular purpose for the
+maintainers or have become obsolete and are therefore not too useful for
+the trouble-shooting performed by the user. The others mentioned below.
+
+==== ]Log 2 : new and delete calls
+
+For tracking the allocation and de-allocation of memory.
+To find memo leaks.
+
+==== ]Log 25 and 26 : APL Errors
+
+An APL ERROR provides enough information as to where an error has occurred
+in the APL code, but none as to where that error was detected on the C/C++
+code. These logging facilities add this information.
+
+==== ]Log 32 Prefix Parser
+
+Parsing of APL commands and Expressions. To analyse SYNTAX ERRORs.
+
+==== ]Log 37 : Interpreter Startup
+
+Information when the *GNU APL* interpreter starts. This facility can also be
+enabled from the command line because the output of interest occurs before
+the interpreter accepts commands like *]LOG*.
+
+== Intrusive Troubleshooting
+
+If all the above fails, then it is time for intrusive troubleshooting.
+By intrusive troubleshooting we mean that the source code is modified
+in such a way that it prints troubleshooting information at source code
+locations where no Log() macros have been inserted. The top-level algorithm
+for intrusive troubleshooting is this:
+
+----
+loop:
+   1. modify the source code by adding printouts
+   2. recompile GNU APL
+   3. run apl and reproduce the problem
+   4. repeat until the error (or a least a source code file or function
+      responsible for the error) was found.
+----
+
+All this is usually done in the *src* directory where most of the source
+files are located and where the compile result will be stored.
+
+Alternatively one could use a debugger like gdb for the same purpose,
+setting breakpoints and printing data. However, the author prefers to modify
+the source code, in particular if more than one printout is needed to
+find a fault.
+
+In order to simplify the source code for printouts, *GNU APL* has defined two
+powerful macros *LOC* and *Q()*. The *Q()* macro is used exclusively for
+intrusive troubleshooting while the LOC macro is also used for other purposes
+in the source code (with more than 1700 invocations as of this writing).
+Understanding the LOC macro is therefore a prerequisite for understanding the
+*GNU APL* code.
+
+=== The LOC Macro
+
+The LOC macro is a short but somewhat tricky construction based on two
+other macros *Loc* and *STR*. The LOC macro takes no arguments and is
+therefore used without (), *STR()* takes one argument and *Loc(x) takes
+two arguments.  All three macros *LOC*, *Loc()*, and *STR()* are *#defined*
+in file *Common.hh* which makes them available in practically every source
+file. The definitions are:
+
+----
+#define STR(x) #x
+
+#define LOC Loc(__FILE__, __LINE__)
+
+#define Loc(f, l) f ":" STR(l)
+----
+
+How does this work? Suppose we have a 13-line C++ file *test.cc* like this:
+
+----
+#include <iostream>   // for cout
+
+#define LOC Loc(__FILE__, __LINE__)
+#define Loc(f, l) f ":" STR(l)
+#define STR(x) #x
+
+int
+main()
+{
+   std::cout << LOC << std::endl;   // line 10 of test.cc
+   std::cout << LOC << std::endl;   // line 11 of test.cc
+   std::cout << LOC << std::endl;   // line 12 of test.cc
+}
+----
+
+If we compile and run this file then it produces the following output:
+
+----
+test.cc:10
+test.cc:11
+test.cc:12
+----
+
+That is, LOC expands to a string literal that consists of the filename in
+which LOC was used, followed by a colon, followed by the line number in which
+LOC was used. String literals have the advantage that they are produced
+at compile time and can be passed as function arguments at almost no
+perfomance cost.
+
+Now lets see how *LOC* works. Consider the first *LOC* on line *10* of
+file *test.cc*. Then:
+
+. macro *LOC* expands to *Loc(\_\_FILE\_\_, \_\_LINE__)*
+. *\_\_FILE__* expands to literal *"test.cc"*
+. *\_\_LINE__* expands to the line number *10*, so that (so far)
+. *LOC* expands to *Loc("test.cc", 10)*
+. *Loc("test.cc", 10)* expands to *"test.cc" ":" STR(10)*
+. *STR(10)* expands to *"10"* so that (so far) LOC expands to
+  *"test.cc" ":" "10"*
+. the compiler combines the 3 adjacent string literals *"test.cc"*, *":"*, and
+   *"10"* into the single string literal *"test.cc:10"* which is then printed.
+
+This is quite some work for the compiler, but the result such that the runtime
+cost for *GNU APL* is only ther loading of the string literal when *GNU APL*
+starts.
+
+=== The Q Macro
+
+The second trick is the Q() macro which is defined as
+
+----
+#define Q(x) get_CERR() << std::left << setw(20) << #x ":" << " '" << x << "' at " LOC << endl;
+----
+
+
+In this definition *get_CERR()* is a functions which returns an output channel
+such as *std::cerr* (or *stderr* in C). The operator << is overloaded a lot
+and in such a way that commonly used data types in *GNU APL* are being printed
+nicely. A consequence of the overloading is that *Q()* macro can be used
+with many different data types without the burdon to properly format them
+for the debug output.
+
+*Q(x)* uses the *LOC* macro to get the source file name and line number of its
+invocation and essentially prints *x* in a suitable format and followed by
+its source code location. For example:
+
+----
+#include <iostream>   // for cout
+#include <iomanip>    // for setw
+
+using namespace std;
+
+#define STR(x) #x
+#define LOC Loc(__FILE__, __LINE__)
+#define Loc(f, l) f ":" STR(l)
+
+#define Q(x) cerr << std::left << std::setw(20) << #x ":" << " '" << x << "' at " LOC << std::endl;
+
+int
+main()
+{
+   Q("Hello")   // line 15
+   Q(10)
+   Q(LOC)
+}
+----
+
+which, when compiled, produces:
+
+----
+"Hello":             'Hello' at test.cc:15
+10:                  '10' at test.cc:16
+LOC:                 'test.cc:17' at test.cc:17
+----
+
+With these prerequisites intrusive troubleshooting boils down to spreading
+*Q()* macros in different source files until the fault is found.
+
+A frequent question is not the value of a C++ variable, but rather if (and
+when) a particular source code line of code is reached. To answer this
+question just insert *Q(LOC)* or *Q(0)* on the line of interest.
+
+Another useful helper is *subversion* (svn). After having made multiple
+insertions of *Q()* macros in various sorce files (and hopefully having
+located the fault this way), simply do
+
+----
+svn revert *
+----
+
+in the *src* directory which undoes all changes you made.
+
+== Keep It Short and Simple
+
+The first thing to check before reporting an error is to make sure that you
+have compiled and installed the latest GNU APL version from subbversion (SVN)
+or git.
+
+From a maintainer's perspective, the trouble reports that are appreciated the
+most are the short ones. Locating a fault usually requires multiple
+repetitions of the sequence that causes the fault. Consider two extremes:
+
+A. The fault can be reproduced by executing a handful of APL lines in
+   immediate execution mode, possibly accompanied by one or two ∇-defined
+   functions or lambdas.
+
+B. A tar file contains a workspace, possibly )COPYing other workspaces.
+   In order to reproduce the fault, the workspace has to be )LOADed and
+   started in a specific way in order to reproduce the error.
+
+In case A. the maintainer can simply copy the lines into a small apl script
+created for fixing the fault. That script can then be repeated again and again
+by starting the script from the command line of a shell.
+
+In case B. the maintainer must first install the workspaces that come with the
+fault. Then start apl, )LOAD the workspace and figure out:
+
+* how the workspace shall be started,
+* how the defined function in the workspace look like, how they interact,
+  and which ones are related to the fault,
+* and so non.
+
+Case B. creates a lot of overhead for the maintainer that does very little to
+find the fault. Although sometimes a complex workspace is needed to reproduce
+a fault, this is rather rare and almost all errors reported so far could be
+reduced to a small number of APL lines.
+
+Last but not least, please have a look here:
+
+https://www.gnu.org/software/libc/manual/html_node/Reporting-Bugs.html
+

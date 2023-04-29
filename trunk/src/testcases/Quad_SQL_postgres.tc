@@ -1,0 +1,113 @@
+⍝ Quad_SQL_postgres.tc
+⍝ ----------------------------------
+
+      ]NEXTFILE no-POSTGRES   ⍝ done if POSTGRES is not available
+
+      0 0⍴"""
+NOTE: unlike SQLite, PostgreSAL requires that a user is created before the
+      database can be accessed (from APL or otherwise). For example, for
+      APL user eedjsa one should (as root) do something along the lines of:
+
+      apt install postgresql
+      psql
+        ├─── create database apl_quadSQL
+        └─── \q
+
+      createuser --createdb --createrole --superuser --no-password eedjsa
+
+      Otherwise PostgreSQL will probably produce an error like:
+
+      )MORE
+Error connecting to Postgres database: FATAL:  role "eedjsa" does not exist
+
+      FATAL:  role "eedjsa" does not exist
+
+      For troubleshooting this testcase from the command line,
+      the following PostgreSQL commands may also be useful:
+
+$ createdb --owner=eedjsa --no-password apl_quadSQL   # create database
+$ psql jsadb                               i          # connect to database
+$ dropdb jsadb                                        # delete database
+$ dropuser eedjsa                                     # delete user eedjsa
+          """
+
+      ⍝ erase old database (if any). This fails with 256 (if the database
+      ⍝ was erased already), or succeed (if the database still exists).
+      ⍝
+      )HOST dropdb apl_quadSQL 2>/dev/null
+
+⁰ 
+
+      )HOST createdb -O "eedjsa" -w apl_quadSQL   # create database
+
+0 
+
+      ⍝ SQL create table command
+      create←,⊃"""
+CREATE TABLE COMPANY(
+   ID INT PRIMARY KEY     NOT NULL,
+   NAME           TEXT    NOT NULL,
+   AGE            INT     NOT NULL,
+   ADDRESS        CHAR(50),
+   SALARY         REAL);
+               """
+
+      ⍝ connect to DB and list tables
+      ⍝
+      DB←'postgresql' ⎕SQL[1] 'apl_quadSQL'
+      ⊣create ⎕SQL[3, DB] ''
+
+      )MORE
+NO )MORE ERROR INFO
+
+      ⎕SQL[8] DB
+ company 
+
+      ⍝ list table columns
+      ⍝
+      DB ⎕SQL[9] 'company'
+ id      integer   
+ age     integer   
+ salary  real      
+ name    text      
+ address character 
+
+      ⍝ Add records
+      ⍝
+      insert←'INSERT INTO COMPANY(ID,NAME,AGE,ADDRESS,SALARY) VALUES(?,?,?,?,?)'
+      insert ⎕SQL[3, DB] 1 'Paul'  32 'California' 20000.00
+
+      insert ⎕SQL[3, DB] 2 'Allen' 25 'Texas'      15000.00
+
+      insert←'INSERT INTO COMPANY VALUES(?,?,?,?,?)'
+      insert ⎕SQL[3, DB] 3 'Teddy' 23 'Norway'     20000.00
+
+
+      select←'SELECT ID,NAME,AGE FROM COMPANY'
+      select ⎕SQL[4, DB] ''
+ 1 Paul  32 
+ 2 Allen 25 
+ 3 Teddy 23 
+
+      update←'UPDATE COMPANY SET SALARY=? where ID=?'
+      update ⎕SQL[4, DB] 22000 3
+
+      select←'SELECT ID,NAME,SALARY FROM COMPANY'
+      select ⎕SQL[4, DB] ''
+ 1 Paul  20000 
+ 2 Allen 15000 
+ 3 Teddy 22000 
+
+      ⎕SQL[2] DB   ⍝ close DB
+
+
+      )ERASE DB create insert select
+
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+
+⍝ ==================================
+

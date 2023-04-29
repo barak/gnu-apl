@@ -1,0 +1,4380 @@
+
+<HTML>
+  <HEAD>
+    <TITLE>GNU APL</TITLE>
+    <META name='description' content='APL'>
+    <META http-equiv='Content-Type' content='text/html; charset=UTF-8'>
+    <LINK rel='stylesheet' type='text/css' href='apl-intro.css'>
+  </HEAD>
+
+  <BODY>
+  <H1 class="toc_H1">A Quick Tour of GNU APL</H1>
+    <TABLE>
+<TR class="toc_H2"><TD class="toc_c1"> 1<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_1"> Document Conventions </a>
+
+<TR class="toc_H2"><TD class="toc_c1"> 2<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_2"> Starting and stopping the APL interpreter </a>
+
+<TR class="toc_H2"><TD class="toc_c1"> 3<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3"> APL Statements </a>
+
+<TR class="toc_H3"><TD class="toc_c1"> 3.1<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.1"> Constants (Literals) </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.1.1<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.1.1"> Scalar Constants </a>
+
+<TR class="toc_H5"><TD class="toc_c1"> 3.1.1.1<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.1.1.1"> Scalar Text Constants </a>
+
+<TR class="toc_H5"><TD class="toc_c1"> 3.1.1.2<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.1.1.2"> Numeric Scalar Constants </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.1.2<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.1.2"> Vector Constants </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.1.3<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.1.3"> Mixed Constants </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.1.4<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.1.4"> Nested Constants </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.1.5<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.1.5"> Summary and Remarks </a>
+
+<TR class="toc_H3"><TD class="toc_c1"> 3.2<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.2"> APL Names </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.2.1<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.2.1"> User-defined Names </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.2.2<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.2.2"> Names of System Functions and System Variables </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.2.3<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.2.3"> Names of Primitive APL Functions </a>
+
+<TR class="toc_H3"><TD class="toc_c1"> 3.3<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.3"> Functions and Operators </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.3.1<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.3.1"> Niladic Functions </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.3.2<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.3.2"> Monadic Functions </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.3.3<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.3.3"> Dyadic Functions </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.3.4<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.3.4"> Monadic Operators </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.3.5<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.3.5"> Dyadic Operators </a>
+
+<TR class="toc_H3"><TD class="toc_c1"> 3.4<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.4"> General APL Values </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.4.1<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.4.1"> Reshape and Shape: ⍴ </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.4.2<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.4.2"> Catenate and Ravel: , and ⍪ </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.4.3<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.4.3"> Universal Character Set (monadic ⎕UCS) </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.4.4<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.4.4"> Construction of arbitrary simple values </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.4.5<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.4.5"> Construction of arbitrary nested values </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.4.6<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.4.6"> Displaying the structure of values </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.4.7<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.4.7"> Vector Notation versus Catenation </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.4.8<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.4.8"> Scalar Extension </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.4.9<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.4.9"> List of Built-in Scalar Functions </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.4.10<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.4.10"> List of Other Built-in Functions </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.4.11<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.4.11"> List of Built-in Monadic APL Operator </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.4.12<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.4.12"> List of Built-In Dyadic APL Operator </a>
+
+<TR class="toc_H3"><TD class="toc_c1"> 3.5<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.5"> Variables </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.5.1<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.5.1"> The Variables ⎕ and ⍞ </a>
+
+<TR class="toc_H5"><TD class="toc_c1"> 3.5.1.1<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.5.1.1"> Input and Output with ⍞ </a>
+
+<TR class="toc_H5"><TD class="toc_c1"> 3.5.1.2<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.5.1.2"> Input and Output with ⎕ </a>
+
+<TR class="toc_H5"><TD class="toc_c1"> 3.5.1.3<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.5.1.3"> ⎕ Input in Application Programs </a>
+
+<TR class="toc_H3"><TD class="toc_c1"> 3.6<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.6"> Indexing </a>
+
+<TR class="toc_H3"><TD class="toc_c1"> 3.7<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.7"> Execution of APL Statements </a>
+
+<TR class="toc_H3"><TD class="toc_c1"> 3.8<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.8"> User-defined Functions </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.8.1<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.8.1"> Function Header </a>
+
+<TR class="toc_H5"><TD class="toc_c1"> 3.8.1.1<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.8.1.1"> Creating and displaying user defined functions: ⎕FX and ⎕CR </a>
+
+<TR class="toc_H5"><TD class="toc_c1"> 3.8.1.2<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.8.1.2"> Result Specification </a>
+
+<TR class="toc_H5"><TD class="toc_c1"> 3.8.1.3<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.8.1.3"> Local Variables </a>
+
+<TR class="toc_H5"><TD class="toc_c1"> 3.8.1.4<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.8.1.4"> The Del Editor </a>
+
+<TR class="toc_H5"><TD class="toc_c1"> 3.8.1.5<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.8.1.5"> Function Body </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.8.2<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.8.2"> How Functions and Operators are Evaluated </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.8.3<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.8.3"> Branching </a>
+
+<TR class="toc_H5"><TD class="toc_c1"> 3.8.3.1<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.8.3.1"> Labels </a>
+
+<TR class="toc_H5"><TD class="toc_c1"> 3.8.3.2<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.8.3.2"> Computed Branch (inside a function) </a>
+
+<TR class="toc_H5"><TD class="toc_c1"> 3.8.3.3<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.8.3.3"> Computed Branch (outside a function) </a>
+
+<TR class="toc_H5"><TD class="toc_c1"> 3.8.3.4<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.8.3.4"> Escape (Unwind) </a>
+
+<TR class="toc_H2"><TD class="toc_c1"> 4<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4"> Commands </a>
+
+<TR class="toc_H3"><TD class="toc_c1"> 4.1<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.1"> Standard Commands </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.1.1<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.1.1"> )CLEAR </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.1.2<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.1.2"> )COPY </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.1.3<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.1.3"> )DROP </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.1.4<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.1.4"> )ERASE </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.1.5<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.1.5"> )FNS </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.1.6<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.1.6"> )LIB </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.1.7<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.1.7"> )LOAD </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.1.8<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.1.8"> )NMS </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.1.9<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.1.9"> )OPS </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.1.10<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.1.10"> )SAVE </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.1.11<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.1.11"> )SI </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.1.12<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.1.12"> )SIC </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.1.13<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.1.13"> )SINL </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.1.14<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.1.14"> )VARS </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.1.15<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.1.15"> )WSID </a>
+
+<TR class="toc_H3"><TD class="toc_c1"> 4.2<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.2"> IBM APL2 Commands </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.2.1<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.2.1"> )CHECK </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.2.2<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.2.2"> )CONTINUE </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.2.3<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.2.3"> )HELP </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.2.4<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.2.4"> )HOST </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.2.5<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.2.5"> )IN </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.2.6<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.2.6"> )MORE </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.2.7<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.2.7"> )OUT </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.2.8<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.2.8"> )OFF </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.2.9<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.2.9"> )PCOPY </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.2.10<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.2.10"> )PIN </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.2.11<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.2.11"> )RESET </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.2.12<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.2.12"> )SIS </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.2.13<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.2.13"> )SYMBOLS </a>
+
+<TR class="toc_H3"><TD class="toc_c1"> 4.3<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.3"> Additional GNU APL Commands </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.3.1<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.3.1"> )DUMP </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.3.2<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.3.2"> )DUMP-HTML </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.3.3<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.3.3"> ]HIST [CLEAR] </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.3.4<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.3.4"> )LIBS </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.3.5<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.3.5"> )QLOAD </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.3.6<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.3.6"> )VALUES </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.3.7<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.3.7"> ]BOXING </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.3.8<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.3.8"> ]COLOR [ON|OFF] </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.3.9<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.3.9"> ]DOXY [path] </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.3.10<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.3.10"> ]EXPECT error_count </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.3.11<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.3.11"> ]KEYB </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.3.12<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.3.12"> ]LOG [facility [ON|OFF]] </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.3.13<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.3.13"> ]NEXTFILE </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.3.14<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.3.14"> ]OWNERS </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.3.15<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.3.15"> ]SVARS </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.3.16<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.3.16"> ]SYMBOL </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.3.17<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.3.17"> ]USERCMD </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.3.18<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.3.18"> ]XTERM [ON|OFF] </a>
+
+    </TABLE>
+    <HR>
+
+   
+   
+   <H1>A Quick Tour of GNU APL</H1>
+   
+   Copyright (C) 2013, 2014 Dr. Jürgen Sauermann and friends.
+   <BR>
+   
+   This document is part of GNU APL and may be distributed under the terms of
+   the GNU Free Documentation License, see
+   <A href=http://www.gnu.org/licenses/fdl.html>
+   http://www.gnu.org/licenses/fdl.html</A>
+   
+   <H2><a name="CH_1"></a>
+   1 Document Conventions</H2>
+   
+   Your keyboard input is rendered in bold blue and the response from your
+   computer in black like this:
+   
+   <B><PRE class="input_T">This is what you type on the keyboard</PRE></B>
+   <PRE class="output">and this is the response you get</PRE>
+   
+   <H2><a name="CH_2"></a>
+   2 Starting and stopping the APL interpreter</H2>
+   
+   APL is an easy-to-learn language. This quick start manual is an introduction
+   to APL in a few simple steps. We assume that you are using GNU APL and that
+   you have installed it according to the README files that come with it.
+   <BR>
+   
+   <BR>
+   
+   APL is a normal program and is started like that: by entering its name.
+   <BR>
+   
+   <B><PRE class="input_T">$ apl</PRE></B>
+   <PRE class="output">                    ______ _   __ __  __    ___     ____   __ 
+                   / ____// | / // / / /   /   |   / __ \ / / 
+                  / / __ /  |/ // / / /   / /| |  / /_/ // /  
+                 / /_/ // /|  // /_/ /   / ___ | / ____// /___
+                 \____//_/ |_/ \____/   /_/  |_|/_/    /_____/
+                                       
+                        Welcome to GNU APL version 1.1
+                                       
+                Copyright (C) 2008-2013  Dr. Jürgen Sauermann
+                       Banner by FIGlet: www.figlet.org
+                                       
+                This program comes with ABSOLUTELY NO WARRANTY;
+                         for details run: ./apl --gpl.
+                                       
+     This program is free software, and you are welcome to redistribute it
+         according to the GNU Public License (GPL) version 3 or later.
+                                       
+
+
+   </PRE>
+   
+   The interpreter shows a start-up message and then enters an endless loop which
+   is called <B>immediate execution mode</B>. In immediate execution mode the
+   interpreter reads one input line from the user or from a file (if the standard
+   input of the interpreter was redirected). It then processes the line,
+   possibly creating some output. Depending on the nature of the line entered,
+   the interpreter may remain in immediate execution mode or leave it.
+   <BR>
+   
+   In the first case, i.e. the interpreter remains in immediate execution mode,
+   the whole process starts over again; the next lines is read, processed,
+   and so on.
+   
+   The second case (leaving immediate execution mode) is explained in a later
+   chapter.
+   
+   The first non-blank character of the line entered determines what happens next:
+   
+   <UL>
+   <LI>if the first non-blank is ) then the line is interpreted as an APL
+       command. Commands are discussed in chapter "Commands" below.</LI>
+   <BR>
+   
+   <LI>if the first non-blank is ∇ then a APL function editor is started.
+       Editing of (user-defined) functions are discussed in chapter
+       "User-defined Functions" below.</LI>
+   <BR>
+   
+   <LI>Otherwise the line is considered a sequence of APL statements. The
+       statements executed and may leave immediate execution mode if an error
+       occurs or a user-defined function is called.
+       APL statements are discussed in chapter "APL Statements" below.</LI>
+   </UL>
+   
+   
+   The most important command at the moment is )OFF which ends the apl interpreter:
+   
+   <B><PRE class="input_T">      )OFF</PRE></B>
+   <PRE class="output">Goodbye.
+$</PRE>
+   
+   Pressing control-C or control-D - the normal way to end programs -
+   merely stops the execution of the current APL statement, but does not end
+   the interpreter. This behavior is similar to a shell where control-C
+   stops the current program but does not exit from the shell.
+   
+   <H2><a name="CH_3"></a>
+   3 APL Statements</H2>
+   
+   APL statements are constructed from:
+   <UL>
+   <LI>APL constants (numbers and characters)</LI>
+   <LI>Names (functions and variables)</LI>
+   <LI>other characters: ← → [ ; ] ( ) and :</LI>
+   </UL>
+   
+   
+   Several statements on the same line are separated by the APL character ◊
+   (called Diamond). Before discussing the execution of statements we will
+   introduce their components, i.e. constants and names.
+   
+   <H3><a name="CH_3.1"></a>
+   3.1 Constants (Literals)</H3>
+   
+   Constants, also called literals, are used in APL statements for denoting
+   fixed values,
+   
+   <H4><a name="CH_3.1.1"></a>
+   3.1.1 Scalar Constants</H4>
+   
+   The simplest constants are scalar constants, similar to atoms in Chemistry.
+   From these scalar constants more complex constants can be created. There are
+   also scalar APL values which are not constants; a definition of the term
+   scalar will be given later. For the moment think of a scalar as a single
+   data item.
+   
+   <H5><a name="CH_3.1.1.1"></a>
+   3.1.1.1 Scalar Text Constants</H5>
+   
+   The simplest scalar constants are scalar text constants. A scalar text
+   constant defines a single character.
+   <BR>
+   
+   As we will discuss in more detail later, if you enter a constant
+   (and nothing else) in immediate execution mode then
+   the interpreter will output the same constant, although in a slightly
+   different fashion.
+   <BR>
+   
+   A scalar text constant is entered by enclosing the desired character in
+   single quotes. The character A, for example, is entered as 'A' and
+   the interpreter answers with A (removing the quotes around it):
+   
+<b><PRE class="input_T">      'A'</PRE></b>
+<PRE class="output">A
+</PRE>
+   
+   
+   The quote character itself is entered by doubling it inside the quotes
+   that enclose it:
+   
+<b><PRE class="input_T">      ''''</PRE></b>
+<PRE class="output">'
+</PRE>
+   
+   
+   <H5><a name="CH_3.1.1.2"></a>
+   3.1.1.2 Numeric Scalar Constants</H5>
+   
+   A numeric scalar constant is a single number. The simplest numeric scalar
+   constant is an integer, entered as a sequence of decimal digits:
+   
+<b><PRE class="input_T">      42</PRE></b>
+<PRE class="output">42
+</PRE>
+   
+   
+   Fractional numbers are entered with a decimal point and a fractional part:
+   
+<b><PRE class="input_T">      42.5</PRE></b>
+<PRE class="output">42.5
+</PRE>
+   
+   
+   The integral part can be omitted:
+   
+<b><PRE class="input_T">      .5</PRE></b>
+<PRE class="output">0.5
+</PRE>
+   
+   
+   An optional scaling by a power of 10 (aka. scientific notation) can be applied
+   with the character E followed the exponent:
+   
+<b><PRE class="input_T">      42.5E3</PRE></b>
+<PRE class="output">42500
+</PRE>
+   
+   
+   Negative numbers use a leading ¯ (Overbar); a minus sign is NOT the sign of
+   a number but a function that negates a value. The result is often the same,
+   but you should always use the overbar for negative numbers:
+   
+<b><PRE class="input_T">      ¯42.5E3</PRE></b>
+<PRE class="output">¯42500
+</PRE>
+   
+   
+   The exponent in scientific notation can also be negative (in this case using
+   - gives a different result):
+   
+<b><PRE class="input_T">      42.5E¯3</PRE></b>
+<PRE class="output1">0.0425
+</PRE>
+<b><PRE class="input_">      42.5E-3</PRE></b>
+<PRE class="errput">VALUE ERROR
+      42.5 E-3
+           ^
+</PRE>
+   
+   
+   The error occurs because (1) in APL the minus sign (i.e. - as opposed to ¯)
+   is not part of a number and therefore (2) the 'E' is not an exponent belonging
+   to 42.5. Instead E is taken as the name of a variable (which does not exist
+   in this example) which causes the error. Using - instead of ¯ is a frequent
+   mistake of APL beginners.
+   <BR>
+   
+   <BR>
+   
+   Complex numbers can be entered in 3 different formats. The standard format
+   (standard because is also the format used by the interpreter when printing
+   complex numbers) is to specify the real and imaginary parts of a complex
+   number separated by the letter J:
+   
+<b><PRE class="input_T">      3J4       ⍝ a complex number of magnitude 5</PRE></b>
+<PRE class="output1">3J4
+</PRE>
+<b><PRE class="input_">      0.6J0.8   ⍝ same number scaled to magnitude 1</PRE></b>
+<PRE class="output">0.6J0.8
+</PRE>
+   
+   
+   One alternative format is to specify the number as its magnitude and its
+   angle in degrees, separated by the letter D (for "degrees").
+   Since arccos(0.6) = 53.130102354, we get the same complex numbers:
+   
+<b><PRE class="input_T">      5D53.130102354</PRE></b>
+<PRE class="output1">3J4
+</PRE>
+<b><PRE class="input_">      1D53.130102354</PRE></b>
+<PRE class="output">0.6J0.8
+</PRE>
+   
+   
+   The other alternative format is to specify the number as its magnitude and its
+   the angle in radians, separated by the letter R (for "radians").
+   Since 53.130102354 &pi; / 180 = 0.927295218 we get the same numbers:
+   
+<b><PRE class="input_T">      5R0.927295218</PRE></b>
+<PRE class="output1">3J4
+</PRE>
+<b><PRE class="input_">      1R0.927295218</PRE></b>
+<PRE class="output">0.6J0.8
+</PRE>
+   
+   
+   Please keep in mind that whitespace characters (space, tab, etc.) are NOT
+   permitted in numbers.
+   
+   <H4><a name="CH_3.1.2"></a>
+   3.1.2 Vector Constants</H4>
+   
+   Vector constants are created by writing several scalar constants on the
+   same line, separated by one or more spaces between them. A complex number
+   is a single scalar even if has two components (real and imaginary parts).
+   Multiple separating spaces between scalars are treated like single spaces:
+   
+<b><PRE class="input_T">      1   2 3</PRE></b>
+<PRE class="output1">1 2 3
+</PRE>
+<b><PRE class="input_">      'A' 'B' 'C'</PRE></b>
+<PRE class="output">ABC
+</PRE>
+   
+   
+   Sequences of character scalars can be written with quotes around the sequence
+   rather than quotes around each character. The rules for scalar character
+   constants apply here as well:
+   
+<b><PRE class="input_T">      'ABC'</PRE></b>
+<PRE class="output1">ABC
+</PRE>
+<b><PRE class="input_">      'A''B''C'</PRE></b>
+<PRE class="output1">A'B'C
+</PRE>
+<b><PRE class="input_">      "A'B'C"</PRE></b>
+<PRE class="output">A'B'C
+</PRE>
+   
+   
+   You cannot enter numeric vector constants with less than two elements because
+   numeric vector constants with one element would be a numeric scalar constant,
+   and a numeric vector constants with no elements would be completely empty.
+   
+   You can enter an empty character vector constant (a vector with no elements)
+   like this:
+   
+<b><PRE class="input_T">      ''</PRE></b>
+<PRE class="output1">
+</pre>
+<b><PRE class="input_">      ""</PRE></b>
+<PRE class="output">
+
+</pre>
+   
+   
+   You normally cannot enter character vector constants with one element for
+   the same reason as for numeric vector constants: it would be a scalar
+   constant rather than a vector. This can become cumbersome when dealing with
+   text; if the length of a character sequence is one then the text is a scalar,
+   otherwise it is a vector. For this reason GNU APL provides a non-standard
+   extension using double quotes instead of single quotes. This extension has
+   slightly different and sometimes more convenient rules than texts in single
+   quotes:
+   
+   <UL>
+   <LI>double quoted characters are always vectors (even if their length is 1)</LI>
+   <LI>single quotes stand for themselves and need not be doubled</LI>
+   <LI>for some problematic characters C-like sequences are defined:
+       <UL>
+       <LI>\a produces NUL (null,            ASCII code  0) </LI>
+       <LI>\a produces BEL (bell,            ASCII code  7) </LI>
+       <LI>\b produces BS  (backspace,       ASCII code  8) </LI>
+       <LI>\t produces TAB (tab,             ASCII code  9) </LI>
+       <LI>\n produces NL  (newline,         ASCII code 10) </LI>
+       <LI>\v produces VT  (vertical tab,    ASCII code 11) </LI>
+       <LI>\f produces FF  (form feed,       ASCII code 12) </LI>
+       <LI>\r produces CR  (carriage return, ASCII code 13) </LI>
+       <LI>\[ produces ESC (escape,          ASCII code 27) </LI>
+       <LI>\" produces "   (double quote,    ASCII code 34) </LI>
+       <LI>\\ produces \   (backslash,       ASCII code 92) </LI>
+       </UL>
+   
+   </LI>
+   </UL>
+   
+   
+   Examples:
+   
+<b><PRE class="input_T">      "A"   ⍝ 1-element vector</PRE></b>
+<PRE class="output1">A
+</PRE>
+<b><PRE class="input_">      "'"   ⍝ a quote (')</PRE></b>
+<PRE class="output1">'
+</PRE>
+<b><PRE class="input_">      "A\"B\\C"   ⍝ 'A', double quote, 'B', backslash, 'C'</PRE></b>
+<PRE class="output">A"B\C
+</PRE>
+   
+   
+   <H4><a name="CH_3.1.3"></a>
+   3.1.3 Mixed Constants</H4>
+   
+   The first APL interpreters (and the first APL standard, ISO 8485) only allowed
+   constants and values whose components were either all numeric scalars, or all
+   character scalars. The examples given so far were of that kind,
+   
+   The current APL standard, ISO 13751, allows a mix of characters and
+   numbers in constants and values like these:
+   
+<b><PRE class="input_T">      1 2 'A' 'B' 3 4</PRE></b>
+<PRE class="output">1 2 AB 3 4
+</PRE>
+   
+   
+   Such values are called <B>mixed</B>.
+   
+   <H4><a name="CH_3.1.4"></a>
+   3.1.4 Nested Constants</H4>
+   
+   The vector constants discussed so far were <B>simple</B>, which means that their
+   components were (numeric or character) scalars. Since ISO 13751, another
+   APL value can be used instead of a scalar. Such constants or values are called 
+   <B>nested</B>. The nested components of constants are vectors that are
+   either quoted texts or surrounded by parentheses:
+   
+<b><PRE class="input_T">      1 2 'AB' 3 4</PRE></b>
+<PRE class="output1"> 1 2 AB 3 4 
+</PRE>
+<b><PRE class="input_">      1 2 (10 11) 3 4</PRE></b>
+<PRE class="output"> 1 2  10 11  3 4 
+</PRE>
+   
+   
+   As the examples above show, it is sometimes difficult to distinguish nested
+   and non-nested values, in particular if they are all numeric. Nested values
+   differ from non-nested values comprised of the same scalars only by the
+   number spaces between the scalars, which is difficult to see if the values
+   are long.
+   
+   Most APL interpreters come with built-in or user-defined functions that
+   display the structure of nested values in a better way. If the function is
+   user-defined then it is usually called 'DISPLAY'. If the function is built-in
+   (also called a system function) then the name is different. In GNU APL the
+   function is built-in, is called (dyadic) ⎕CR, and will be explained below.
+   
+   <H4><a name="CH_3.1.5"></a>
+   3.1.5 Summary and Remarks</H4>
+   
+   Constants are used for creating fixed APL values. There are many APL values
+   that cannot be expressed by constants, like numeric vectors with less than
+   2 components, and higher-dimensional values like matrices. These values
+   can only be created using functions (as explained further down).
+   
+   <H3><a name="CH_3.2"></a>
+   3.2 APL Names</H3>
+   
+   APL knows 3 kinds of names:
+   
+   <UL>
+   <LI>user defined names</LI>
+   <LI>names of system functions and variables, and</LI>
+   <LI>names of primitive APL functions</LI>
+   </UL>
+   
+   
+   <H4><a name="CH_3.2.1"></a>
+   3.2.1 User-defined Names</H4>
+   
+   User-defined names start with a letter (A-Z or a-z) or one of the 4 characters
+   ¯ (overbar), _ (underscore), ∆ (delta), or ⍙ (delta-underline. The starting
+   character may be followed by letters, digits, or again one of the characters
+   ¯, _, ∆, or ⍙. The ∆ and ⍙ characters are often used to separate some common
+   prefix (for example the name of a library) from the functions and variables
+   that are somehow related (for example the functions and variables that belong
+   to a library).
+   
+   User-defined names are used to denote variables, functions, operators,
+   or labels.
+   
+   <H4><a name="CH_3.2.2"></a>
+   3.2.2 Names of System Functions and System Variables</H4>
+   
+   The names of system functions start with the APL character ⎕ (quad) followed by
+   a small number of letters.
+   
+   A few system functions and system variables are standardized in ISO standard
+   13751, but those that are not defined in the standard differ considerably
+   between APL interpreters from different vendors.
+   
+   <H4><a name="CH_3.2.3"></a>
+   3.2.3 Names of Primitive APL Functions</H4>
+   
+   The names of primitive functions are single APL characters that different from
+   all characters allowed in user-defined names.
+   
+   Almost all the primitive APL functions (and hence their names) are
+   identical in all APL interpreters and are standardized in ISO standard 13751.
+   
+   Apart from the differences mentioned above, there is no real difference
+   between system functions and primitive APL functions.
+   
+   <H3><a name="CH_3.3"></a>
+   3.3 Functions and Operators</H3>
+   
+   In APL functions can have no, one, or two arguments.
+   Functions with no argument are called <B>niladic</B>, functions with one
+   argument <B>monadic</B>, and functions with two arguments are called
+   <B>dyadic</B>.
+   
+   Monadic and dyadic functions can have another, optional, argument used for
+   specifying an axis (a dimension along which the function is computed).
+   Normally only primitive APL functions can have an axis argument, but GNU
+   APL also supports an axis argument for user defined functions. Even though
+   every primitive APL functions can be called with an axis argument, most of
+   them simply ignore it.
+   
+   Most dyadic functions can be called with only one argument. These functions
+   are called <B>nomadic</B>. This basically means that the same function name is
+   used for two different functions. The two functions are often related. For
+   example the dyadic variant of the nomadic function ÷ divides one of its
+   arguments by the other, while the monadic variant computes the inverse of its
+   sole argument.
+   
+   <H4><a name="CH_3.3.1"></a>
+   3.3.1 Niladic Functions</H4>
+   
+   A niladic function takes no arguments. A niladic function call is simply the
+   name of the niladic function. For example, ⎕TS is a niladic function that
+   returns the current time as year, month, day, hours, minutes, seconds, and
+   milliseconds:
+   
+<b><PRE class="input_T">      ⎕TS</PRE></b>
+<PRE class="output">2022 7 16 18 25 13 904
+</PRE>
+   
+   
+   <H4><a name="CH_3.3.2"></a>
+   3.3.2 Monadic Functions</H4>
+   
+   A monadic function takes one arguments. A monadic function call consists
+   of the name of the function followed by its sole argument. For example, the
+   monadic variant of the nomadic function ÷ computes the inverse of its argument:
+   
+<b><PRE class="input_T">      ÷ 2</PRE></b>
+<PRE class="output1">0.5
+</PRE>
+<b><PRE class="input_">      ÷ 2J2</PRE></b>
+<PRE class="output">0.25J¯0.25
+</PRE>
+   
+   
+   The optional axis argument mentioned above is always placed to the right of
+   the function name. Like most functions, ÷ ignores its axis argument, but it
+   is valid to provide one:
+   
+<b><PRE class="input_T">      ÷[55] 2</PRE></b>
+<PRE class="errput">AXIS ERROR
+      ÷[55]2
+      ^   ^
+</PRE>
+   
+   
+   If an axis is provided then it will be computed even if the function
+   ignores it:
+   
+<b><PRE class="input_T">      ÷[+] 2</PRE></b>
+<PRE class="errput">SYNTAX ERROR
+      ÷[+]2
+      ^  ^
+</PRE>
+   
+   
+   <H4><a name="CH_3.3.3"></a>
+   3.3.3 Dyadic Functions</H4>
+   
+   A dyadic function takes two arguments. A dyadic function call consists
+   of the second (aka. left) argument, followed by the name of the function,
+   followed by its other (aka. right)  argument. For example, the
+   dyadic variant of the nomadic function ÷ computes the left argument divided
+   by the right argument:
+   
+<b><PRE class="input_T">      4 ÷ 2</PRE></b>
+<PRE class="output1">2
+</PRE>
+<b><PRE class="input_">      4J4 ÷ 2J2</PRE></b>
+<PRE class="output">2
+</PRE>
+   
+   
+   As the last example above shows, APL automatically converts numbers to their
+   simplest form, i.e. from complex to real, from floating point to integer,
+   and from integer to Boolean. At least it looks like that. A value that
+   is, for example, printed like an integer may internally still be a real
+   or even a complex number.
+   
+   In older APL interpreters there used to be a function ⎕DR (data representation)
+   that would tell if an APL value was complex, real, integer, or Boolean.
+   For mixed arrays introduced by ISO 13751 that does not make too much sense
+   anymore and the function has disappeared.
+   
+   <H4><a name="CH_3.3.4"></a>
+   3.3.4 Monadic Operators</H4>
+   
+   APL operators are functions that have one or two additional arguments that
+   are other functions rather than APL values.
+   The attribute monadic resp. dyadic of an operator refers to the number of
+   function arguments for the operator and not to the number of value arguments.
+   <BR>
+   
+   <BR>
+   
+   A monadic operator is therefore an operator that has one function argument.
+   All but one built-in operators in APL are monadic. A monadic operator,
+   together with its function, defines a new function, the <B>the derived
+   function</B>. Depending on the operator and its function argument, the derived
+   function can be monadic or dyadic.
+   <BR>
+   
+   <BR>
+   
+   We take the most frequently used operator, reduction, as example. The
+   APL symbol for the reduction operator is / (slash). The function argument
+   of a monadic operator is the function immediately left of the operator
+   symbol. The reduction operator is monadic (taking one function argument),
+   the function provided as function argument must be dyadic, and the derived
+   function is monadic. The derived function of reduction with function argument
+   f is also called f-reduction.
+   <BR>
+   
+   <BR>
+   
+   When the value argument of f-reduction is a vector, then f-reduction computes
+   the result of placing f between the vector elements:
+   <BR>
+   
+   <BR>
+   
+   f-reduction v1 v2 ... vn ↔ v1 f v2 f ... vn
+   <BR>
+   
+   <BR>
+   
+   If function f is + (addition) then f-reduction of a vector is the sum of
+   its elements:
+<b><PRE class="input_T">      +/1 2 3 4 5 6</PRE></b>
+<PRE class="output">21
+</PRE>
+   
+   
+   Likewise, if f is ⌈ (maximum) then f-reduction of a vector is the largest of
+   its elements:
+<b><PRE class="input_T">      ⌈/2 5 12 4 0</PRE></b>
+<PRE class="output">12
+</PRE>
+   
+   
+   The f-reduction of a matrix is a vector with the f-reduction  of each row:
+<b><PRE class="input_T">      3 3⍴1 2 3 4 5 6 7 8 9</PRE></b>
+<PRE class="output1">1 2 3
+4 5 6
+7 8 9
+</PRE>
+<b><PRE class="input_">      +/ (3 3⍴1 2 3 4 5 6 7 8 9)</PRE></b>
+<PRE class="output">6 15 24
+</PRE>
+   
+   
+   f-reduction is one of the functions that do not ignore their axis argument.
+   The axis argument of f-reduction tells along which axis (i.e. rows or columns
+   in the case of a matrix) the f-reduction shall be performed:
+   
+<b><PRE class="input_T">      +/[2] (3 3⍴1 2 3 4 5 6 7 8 9)</PRE></b>
+<PRE class="output1">6 15 24
+</PRE>
+<b><PRE class="input_">      +/[1] (3 3⍴1 2 3 4 5 6 7 8 9)</PRE></b>
+<PRE class="output">12 15 18
+</PRE>
+    
+   
+   In GNU APL, user defined monadic operators can have an axis argument, which
+   is, like for their built-in pendants, placed in brackets right of the operator
+   symbol.
+   
+   <H4><a name="CH_3.3.5"></a>
+   3.3.5 Dyadic Operators</H4>
+   
+   A dyadic operator has two function arguments. There is only one dyadic
+   operator in APL: the inner product.
+   The APL symbol for the inner product operator is . (dot). The function arguments
+   of the inner product are placed immediately left and immediately right of the
+   dot. If A and B are matrices, then A +.× B is the normal matrix product:
+   
+<b><PRE class="input_T">      A←3 3⍴1 2 3 4 5 6 7 8 9</PRE></b>
+<PRE class="output1">
+</pre>
+<b><PRE class="input_">      A</PRE></b>
+<PRE class="output1">1 2 3
+4 5 6
+7 8 9
+</PRE>
+<b><PRE class="input_">      A +.× A</PRE></b>
+<PRE class="output"> 30  36  42
+ 66  81  96
+102 126 150
+</PRE>
+   
+   
+   In general, for two matrices A and B and functions f and g, the inner product
+   f.g is a matrix. The element in row i and column j in that matrix is obtained
+   by applying function g to row i of A and column j of B and then to perform
+   f-reduction of the (row f column) vector.
+   
+   Another way of looking at f.g (or at dyadic operators in general) is to
+   consider (.g) as a derived monadic operator and f.g as f/(.g).
+   However, dyadic operators cannot have an axis argument.
+   
+   <H3><a name="CH_3.4"></a>
+   3.4 General APL Values</H3>
+   
+   The constants introduced so far were examples of APL values. However, many
+   APL values can not be written as constants. In this chapter we will introduce
+   APL values in a more formal way and we will show how arbitrary APL values
+   can be constructed.
+   
+   An APL value is defined by two things: a list of scalars that is called
+   the <B>ravel</B> of the value, and another list that is called the <B>shape</B>
+   of the value. The shape determines how the ravel is arranged in order to
+   produce an APL value.
+   
+   For example, the same ravel <B>1 2 3 4 5 6</B> can be arranged (or "shaped")
+   in 5 different ways:
+   <BR>
+   
+   <BR>
+   
+   1. as a 6-element vector:
+   <B><pre>
+      1 2 3 4 5 6
+   </pre></B>
+   
+   2. as a 1 by 6 matrix:
+   <B><pre>
+      1 2 3 4 5 6
+   </pre></B>
+   
+   3. as a 2 by 3 matrix:
+   <B><pre>
+      1 2 3
+      4 5 6
+   </pre></B>
+   
+   4. as a 3 by 2 matrix:
+   <B><pre>
+      1 2
+      3 4
+      5 6
+   </pre></B>
+   
+   5. as a 6 by 1 matrix:
+   <B><pre>
+      1
+      2
+      3
+      4
+      5
+      6
+   </pre></B>
+   <BR>
+   
+   In this example, the shape selects between the 5 possible arrangements
+   of the ravel. The ravel and the shape are not entirely independent.
+   Instead the following relation is satisfied by every APL value:
+   <BR>
+   
+   <BR>
+   
+   <B>The product of all shape elements is equal to the number of ravel elements</B>
+   <BR>
+   
+   <BR>
+   
+   The number of shape elements, also called the <B>rank</B> of the value,
+   determines into how many elements the shape has:
+   <BR>
+   
+   <BR>
+   
+   <TABLE cellspacing="0" cellpadding="0"><TR> <TH> Rank <TH> Commonly called
+     <TR> <TD class="tab"> 0    <TD class="tab"> Scalar (no shape dimension)
+     <TR> <TD class="tab"> 1    <TD class="tab"> Vector (one shape dimension)
+     <TR> <TD class="tab"> 2    <TD class="tab"> Matrix (two shape dimensions)
+     <TR> <TD class="tab"> 3    <TD class="tab"> Cube   (three shape dimensions)
+     <TR> <TD class="tab"> ...  <TD class="tab"> values with higher ranks (more than 3 shape dimensions)
+   </TABLE>
+   
+   
+   A value also has a depth which tells the level of nesting. Simple scalars have
+   a depth if 0. All other values have a depth of (1 + the maximum depth of all
+   ravel elements). Unlike the shape, which can be imposed on a value, the depth
+   is a consequence of the rank (scalar or not) and the ravel of the value.
+   
+   APL programming is the art of crating new APL values from other APL values.
+   The starting point are the constants discussed above and the new APL values
+   are created from existing APL values by calling functions with the existing
+   APL values as function arguments.
+   
+   You have probably heard that APL has a large number of built-in functions.
+   As a consequence, the same new APL value can usually be created in many
+   different ways. APL programmers tend to prefer the ways that contains the
+   smallest number of function calls, even though that is is not always the
+   "cleanest" way.
+   
+   It is not always obvious how to create a particular APL value. Therefore we
+   present a (somewhat awkward) method that always works. This method uses only
+   a handful of built-in APL functions that - no surprise - belong to the most
+   frequently used functions in APL programs.
+   
+   <H4><a name="CH_3.4.1"></a>
+   3.4.1 Reshape and Shape: ⍴</H4>
+   
+   Reshape is a simple, but powerful, function that creates values of arbitrary
+   shapes. The function call A ⍴ B returns a new APL value Z with shape A and
+   a ravel constructed from the ravel of value B as follows.
+   
+   Let len_B be the number of elements in the ravel of B, and
+   let len_Z be the number of elements in the ravel of Z.
+   
+   <UL>
+   <LI>If len_Z = len_B, then the ravel of Z are the ravel of B.</LI>
+   <LI>If len_Z < len_B, then the ravel of Z are the first len_Z elements
+       of the ravel of B.</LI>
+   <LI>If len_Z > len_B, then the ravel of B is appended to itself until one
+       of the cases above occurs.</LI>
+   </UL>
+   
+   
+   Note that the shape of B plays no role in the computation of function reshape.
+   Most frequently scalars and vectors are being reshaped.
+   
+   We can now enter the 5 examples above (which are all cases where
+   len_Z = len_B) in APL:
+   
+<b><PRE class="input_T">      6 ⍴ 1 2 3 4 5 6</PRE></b>
+<PRE class="output1">1 2 3 4 5 6
+</PRE>
+<b><PRE class="input_">      1 6 ⍴ 1 2 3 4 5 6</PRE></b>
+<PRE class="output1">1 2 3 4 5 6
+</PRE>
+<b><PRE class="input_">      2 3 ⍴ 1 2 3 4 5 6</PRE></b>
+<PRE class="output1">1 2 3
+4 5 6
+</PRE>
+<b><PRE class="input_">      3 2 ⍴ 1 2 3 4 5 6</PRE></b>
+<PRE class="output1">1 2
+3 4
+5 6
+</PRE>
+<b><PRE class="input_">      6 1 ⍴ 1 2 3 4 5 6</PRE></b>
+<PRE class="output">1
+2
+3
+4
+5
+6
+</PRE>
+   
+   
+   An examples with len_Z < len_B) is this:
+   
+<b><PRE class="input_T">      2 2 ⍴ 1 2 3 4 5 6</PRE></b>
+<PRE class="output">1 2
+3 4
+</PRE>
+   
+   
+   The most powerful case is len_Z > len_B, in particular when len_B is small:
+   
+<b><PRE class="input_T">      10 10 ⍴ 1 2</PRE></b>
+<PRE class="output">1 2 1 2 1 2 1 2 1 2
+1 2 1 2 1 2 1 2 1 2
+1 2 1 2 1 2 1 2 1 2
+1 2 1 2 1 2 1 2 1 2
+1 2 1 2 1 2 1 2 1 2
+1 2 1 2 1 2 1 2 1 2
+1 2 1 2 1 2 1 2 1 2
+1 2 1 2 1 2 1 2 1 2
+1 2 1 2 1 2 1 2 1 2
+1 2 1 2 1 2 1 2 1 2
+</PRE>
+   
+   
+   Another illustrative example is the creation of a unity matrix. Will will later
+   repeat the creation of a unity matrix with other functions. Creating a
+   unity matrix with function reshape is somewhat less "clean" than other
+   methods, but short and effective (and therefore frequently seen in APL code):
+   
+<b><PRE class="input_T">      5 5 ⍴ 1 0 0 0 0 0</PRE></b>
+<PRE class="output">1 0 0 0 0
+0 1 0 0 0
+0 0 1 0 0
+0 0 0 1 0
+0 0 0 0 1
+</PRE>
+   
+   
+   The monadic variant of ⍴ is called <B>Shape</B> and returns the shape of its
+   right argument:
+   
+<b><PRE class="input_T">      ⍴ 1 0 0 0 0 0</PRE></b>
+<PRE class="output1">6
+</PRE>
+<b><PRE class="input_">      ⍴ (5 5⍴1 0 0 0 0 0)</PRE></b>
+<PRE class="output">5 5
+</PRE>
+   
+   
+   The parentheses in the last example are not required, but were added for
+   clarity. Like in other languages, expressions in parentheses are evaluated
+   first and the result replaces the parentheses and their content.
+   The Shape of a scalar is an empty vector. Empty vectors produce
+   no APL output:
+   
+<b><PRE class="input_T">      ⍴ 5     ⍝ Shape of a numeric scalar (output is an empty vector)</PRE></b>
+<PRE class="output1">
+</pre>
+<b><PRE class="input_">      ⍴ ' '   ⍝ Shape of a character scalar (output is an empty vector)</PRE></b>
+<PRE class="output1">
+</pre>
+<b><PRE class="input_">      ⍴ ''    ⍝ Shape of an empty vector</PRE></b>
+<PRE class="output">0
+</PRE>
+   
+   
+   <H4><a name="CH_3.4.2"></a>
+   3.4.2 Catenate and Ravel: , and ⍪</H4>
+   
+   The next important function on the way to arbitrary APL values is "catenate",
+   or dyadic , (comma). The function call A , B appends values A and B. If A
+   and B are scalars or vectors then the result is somewhat obvious:
+   
+<b><PRE class="input_T">      1 1 1 , 2 2 2   ⍝ append vector 1 1 1 and vector 2 2 2</PRE></b>
+<PRE class="output1">1 1 1 2 2 2
+</PRE>
+<b><PRE class="input_">      1 1 1 , 'bbb'   ⍝ append vector 1 1 1 and vector 'bbb'</PRE></b>
+<PRE class="output">1 1 1 bbb
+</PRE>
+   
+   
+   If A or B is a matrix or a value with even higher rank, then there are
+   different ways to catenate two values. This is where the optional comes
+   into play. The axis argument determines along which axis
+   the concatenation shall take place:
+   
+<b><PRE class="input_T">      2 2⍴'A'</PRE></b>
+<PRE class="output1">AA
+AA
+</PRE>
+<b><PRE class="input_">      2 2⍴'B'</PRE></b>
+<PRE class="output1">BB
+BB
+</PRE>
+<b><PRE class="input_">      (2 2⍴'A') ,[1] (2 2⍴'B')</PRE></b>
+<PRE class="output1">AA
+AA
+BB
+BB
+</PRE>
+<b><PRE class="input_">      (2 2⍴'A'),[2] (2 2⍴'B')</PRE></b>
+<PRE class="output">AABB
+AABB
+</PRE>
+   
+   
+   The axes of a value are the different elements of its shape vector. A scalar
+   has no axes, a vector has one axis, a matrix has two axes, and so on. When
+   an APL value is printed then the last axis of the value is printed
+   horizontally (on the same output line) while the other axes are printed
+   vertically (on different output lines). The default axis for concatenate,
+   i.e. the axis used when no axis argument is given, is the last axis.
+   There is a companion function of , comma) namely ⍪ (comma-bar) that is
+   identical to comma if an axis is provided, but uses the first axis rather
+   than the last axis if not. Therefore the last two examples could have
+   been written without an axis argument like this:
+   
+<b><PRE class="input_T">      (2 2⍴'A') ⍪ (2 2⍴'B')</PRE></b>
+<PRE class="output1">AA
+AA
+BB
+BB
+</PRE>
+<b><PRE class="input_">      (2 2⍴'A') , (2 2⍴'B')</PRE></b>
+<PRE class="output">AABB
+AABB
+</PRE>
+   
+   <BR>
+   
+   <BR>
+   
+   <B>Note:</B> There are some more function pairs that differ only by their default
+   behavior when no axis argument is given: ⊖ and ⌽, / and ⌿, and  \ and ⍀.
+   The variant with - in the symbol takes the first axis by default while the
+   other variant takes the last axis.
+   
+   The monadic variant of , and ⍪ is a monadic function called "ravel" and
+   returns the ravel of the value. While function reshape can be used,
+   among other things, to create values of higher or lower ranks than vectors,
+   function ravel does the opposite: it brings the rank of values with higher
+   or lower ranks down to rank 1. In other words, function ravel converts a
+   value with arbitrary shape to a vector. If a value is a value already then
+   function ravel returns (a copy of) that vector.
+   
+   <H4><a name="CH_3.4.3"></a>
+   3.4.3 Universal Character Set (monadic ⎕UCS)</H4>
+   
+   Function ⎕UCS is monadic and computes a value with the same shape as its
+   right argument. The right argument must be simple (i.e. not nested) values
+   whose ravel consists of all integers or all characters. Integers are
+   converted to characters with the same Unicode, while characters are converted
+   to an integer with the Unicode of the character.
+   
+   In most cases the characters that you use in strings will be on your
+   keyboard, but function ⎕UCS can be used if they are not.
+   
+   Examples:
+   
+<b><PRE class="input_T">      ⎕UCS 'APL ⍴⍪ $¥£€⍧ ÄÖÜäöüß'    ⍝ Unicode → integer conversion</PRE></b>
+<PRE class="output1">65 80 76 32 9076 9066 32 36 165 163 8364 9063 32 196 214 220 228 246 252 223
+</PRE>
+<b><PRE class="input_">      ⎕UCS 65 80 76 32 9076 9066 32 36 165 163 8364 9063 32 196 214 220 228 246 252 223  ⍝ And back to Unicode</PRE></b>
+<PRE class="output">APL ⍴⍪ $¥£€⍧ ÄÖÜäöüß
+</PRE>
+   
+   
+   <H4><a name="CH_3.4.4"></a>
+   3.4.4 Construction of arbitrary simple values</H4>
+   
+   The functions reshape, concatenate, and occasionally ⎕UCS can be combined in
+   order to constructing arbitrary simple (i.e. not nested) values. We assume,
+   of course, that it is known how the value shall look like. The algorithm
+   for constructing the new value is then:
+   
+   <OL>
+     <LI>construct the shape vector of the new value from smaller items such 
+     as integer scalars or vectors. The integer scalars can be constants or
+     other integer vectors computed elsewhere. Concatenate (dyadic ,) the
+     smaller pieces as needed. Put everything in parentheses (in many cases the
+     parentheses are optional and can be removed, but to be on the safe side we
+     leave them in).</LI>
+   
+     <LI>construct the ravel of the new value from smaller items such as
+     integer scalars, integer vectors, character scalars and character vectors.
+     Possibly use ⎕UCS to create character or vectors using their Unicode.
+     Concatenate (dyadic ,) the smaller pieces as needed.</LI>
+   
+     <LI>reshape the ravel with the shape vector using dyadic ⍴.</LI>
+   </OL>
+   
+   
+   Steps 1 and 2 are independent, so you can do 2 before 1.
+   As an alert reader you will have noticed that you cannot create new
+   scalars because a scalar has a shape vector of length 0, and we
+   have seen earlier that empty integer constants do not exist.
+   
+   In older APL interpreters this was solved by using an empty character
+   vector instead of an empty integer vector:
+   
+<b><PRE class="input_T">      '' ⍴ 1 2 3 4 5 6        ⍝ reshape 1 2 3 4 5 6 to a scalar</PRE></b>
+<PRE class="output1">1
+</PRE>
+<b><PRE class="input_">      ⍴ ('' ⍴ 1 2 3 4 5 6)    ⍝ shape of '' ⍴ 1 2 3 4 5 6</PRE></b>
+<PRE class="output">
+
+</pre>
+   
+   
+   This worked well and you will find ''⍴ all over the place in older APL programs.
+   In newer APL interpreters, including GNU APL, a constant ⍬ (zilde) was
+   introduced. ⍬ is an empty numeric vector. ⍬⍴ is cleaner than ''⍴ because
+   a shape should always be an integer vector, but portability of APL programs
+   using ''⍴ is better than ⍬⍴.
+   <BR>
+   
+   You may also wonder if vectors can be created with the above algorithm (and
+   remembering that there are not only no integer vector constants of length 0,
+   but also no integer vector constants of length 1).
+   The answer is "yes" because the left argument A of A⍴B can be a vector
+   or a scalar (the scalar is then treated like a 1-element vector).
+   Note also, that when creating arbitrary simple vectors, Step 2 alone
+   suffices in most cases. For simple vectors, steps 1 and 3 are only needed
+   if the ravel constructed in step 2 has the wrong length.
+   
+   <H4><a name="CH_3.4.5"></a>
+   3.4.5 Construction of arbitrary nested values</H4>
+   
+   The <B>depth</B> of a nested value is recursively defined as:
+   
+   <UL>
+   <LI>0, if the value is a simple scalar</LI>
+   <LI>1, if the value is a simple vector</LI>
+   <LI>N+1, if the value is nested and N is the depth of its deepest ravel element</LI>
+   </UL>
+   
+   The monadic APL function ≡ (called <B>Depth</B>) returns the depth of an
+   APL value.
+   <BR>
+   
+   In the previous chapter we have seen how arbitrary simple values, i.e.
+   values of depth 0 or 1 are constructed. We can now create a value of depth
+   N + 1 recursively:
+   
+   <UL>
+   <LI>construct the shape vector in the same way as for arbitrary simple values.</LI>
+   
+   <LI>construct the ravel of the new value from smaller items such as
+   integer scalars, integer vectors, character scalars and character vectors,
+   and items with a depth N or less. Enclose non-simple ravel items (i.e. items
+   with depth > 1) in parentheses.</LI>
+   
+   <LI>reshape the ravel with the shape vector using dyadic ⍴.</LI>
+   </UL>
+   
+   
+   Examples:
+   
+<b><PRE class="input_T">      1 2 3        ⍝ three element vector</PRE></b>
+<PRE class="output1">1 2 3
+</PRE>
+<b><PRE class="input_">      ⍴1 2 3       ⍝ how many elements?</PRE></b>
+<PRE class="output1">3
+</PRE>
+<b><PRE class="input_">      ≡1 2 3       ⍝ how deep?</PRE></b>
+<PRE class="output1">1
+</PRE>
+<b><PRE class="input_">      1 (2 3)      ⍝ two (!) element vector with nested second element</PRE></b>
+<PRE class="output1"> 1  2 3 
+</PRE>
+<b><PRE class="input_">      ⍴1 (2 3)     ⍝ how many elements?</PRE></b>
+<PRE class="output1">2
+</PRE>
+<b><PRE class="input_">      ≡1 (2 3)     ⍝ how deep?</PRE></b>
+<PRE class="output1">2
+</PRE>
+<b><PRE class="input_">      1 (2 (3 4))  ⍝ two element vector with nested second element</PRE></b>
+<PRE class="output1"> 1   2  3 4  
+</PRE>
+<b><PRE class="input_">      ⍴1 (2 3)     ⍝ how many elements?</PRE></b>
+<PRE class="output1">2
+</PRE>
+<b><PRE class="input_">      ≡1 (2 3)     ⍝ how deep?</PRE></b>
+<PRE class="output">2
+</PRE>
+   
+   
+   When the APL interpreter prints nested values then it prints extra spaces
+   around them. These spaces distinguish nested values from their simple
+   counterparts with the same ravel elements, but makes it rather difficult
+   to understand values with deeper nesting.
+   
+   <H4><a name="CH_3.4.6"></a>
+   3.4.6 Displaying the structure of values</H4>
+   
+   We have seen n the examples above that that some APL values look the same
+   (e.g. numeric scalars and numeric vectors) or very similar (nested values
+   with the same elements in their ravels, like 1 2 3 vs. 1 (2 3) above).
+   For that reason, APL interpreters that support nested values typically
+   come with a function calls <B>Display</B> that shows the structure of a value
+   in a better way. This function is very useful for analyzing problems that
+   are caused by different values that look similar:
+   
+<b><PRE class="input_T">      1 2 3 + 1 2 3      ⍝ add two 3 element vectors</PRE></b>
+<PRE class="output1">2 4 6
+</PRE>
+<b><PRE class="input_">      1 2 3 + 1 (2 3)    ⍝ add 3 element vector and 2 element vector</PRE></b>
+<PRE class="errput">LENGTH ERROR
+      1 2 3+1 (2 3)
+      ^    ^
+</PRE>
+   
+   
+   Since the Display function is of such importance, GNU APL has made it a
+   built-in function called dyadic ⎕CR. The monadic ⎕CR (character
+   representation) is a standard function in all APL interpreters that converts
+   APL values and user defined functions into character strings. The left
+   argument of dyadic ⎕CR does the same, but its left argument lets you choose
+   one of several formats. Format 4 of ⎕CR selects a format that is very similar
+   to the output of the <B>Display</B> function in other interpreters:
+   
+<b><PRE class="input_T">      8 ⎕CR 1         ⍝ show structure of scalar 1</PRE></b>
+<PRE class="output1">1
+</PRE>
+<b><PRE class="input_">      8 ⎕CR 1 2 3     ⍝ show structure of simple vector 1 2 3</PRE></b>
+<PRE class="output1">┌→────┐
+│1 2 3│
+└─────┘
+</PRE>
+<b><PRE class="input_">      8 ⎕CR 1 (2 3)   ⍝ show structure of nested vector 1 (2 3)</PRE></b>
+<PRE class="output1">┌→──────┐
+│1 ┌→──┐│
+│  │2 3││
+│  └───┘│
+└ϵ──────┘
+</PRE>
+<b><PRE class="input_">      8 ⎕CR 1 (2 (3 4))   ⍝ show structure of nested vector 1 (2 (3 4))</PRE></b>
+<PRE class="output1">┌→──────────┐
+│1 ┌→──────┐│
+│  │2 ┌→──┐││
+│  │  │3 4│││
+│  │  └───┘││
+│  └ϵ──────┘│
+└ϵϵ─────────┘
+</PRE>
+<b><PRE class="input_">      8 ⎕CR (2 2⍴ 1 2 3 4)    ⍝ show structure of simple matrix 2 2 ⍴ 1 2 3 4</PRE></b>
+<PRE class="output1">┌→──┐
+↓1 2│
+│3 4│
+└───┘
+</PRE>
+<b><PRE class="input_">      8 ⎕CR (2 2⍴ 1 2 3 (2 2⍴4))    ⍝ a nested matrix</PRE></b>
+<PRE class="output">┌→──────┐
+↓1     2│
+│       │
+│3 ┌→──┐│
+│  ↓4 4││
+│  │4 4││
+│  └───┘│
+└ϵ──────┘
+</PRE>
+   
+   
+   8 ⎕CR is a character matrix constructed according to the following rules:
+   
+   <UL>
+   <LI>the matrix consists of a <B>frame</B> (solid line) that surrounds
+       its <B>content</B>.</LI>
+   <LI>The content is created from the ravel elements of the value that are
+     arranged according to the shape of the value.i If a ravel element is a
+     nested value then that value is displayed with its own frame (and these rules
+     apply recursively.</LI>
+   <LI>The frame can contain additional indicators. If the rank of the value
+    is ≥ 1 then the the horizontal top line of the frame contains information
+    pertaining to the last dimension of the value. If the rank of the value
+    is ≥ 2 then the the vertical left line of the frame contains information 
+    pertaining to the other dimensions of the value. The horizontal bottom line
+    of the frame is related to the depth of the ravel.</LI>
+   <LI>An arrow (→ on the top line or ↓ on the left line) indicates that the
+       corresponding dimension(s) are present and non-empty.</LI>
+   <LI>An ⊖ on the top line or ⌽ on the left line) indicates that the
+    corresponding dimension(s) are present but empty. In this case the ravel
+    has length 0 and instead of the empty ravel the <B>prototype</B> of the value,
+    a concept explained later on, is shown.</LI>
+   <LI>An ∊ on the bottom line indicates that the ravel contains nested elements;
+     multiple ∊ indicate deeper nesting.</LI>
+   </UL>
+   
+   
+   <H4><a name="CH_3.4.7"></a>
+   3.4.7 Vector Notation versus Catenation</H4>
+   
+   For beginners the difference between vector notation (a sequence of items
+   separated by spaces) and catenation (a sequence of items separated bi commas)
+   can be confusing because often, in particular for simple scalars and vectors,
+   both of them produce the same result:
+   
+<b><PRE class="input_T">      1 2 3</PRE></b>
+<PRE class="output1">1 2 3
+</PRE>
+<b><PRE class="input_">      1,2,3</PRE></b>
+<PRE class="output">1 2 3
+</PRE>
+   
+   
+   In the example above, vector notation executes faster because no function
+   needs to be computed. Sometimes, however, vector notation may produce a
+   result other than expected:
+   
+<b><PRE class="input_T">      1 2 3 (4 5)</PRE></b>
+<PRE class="output1"> 1 2 3  4 5 
+</PRE>
+<b><PRE class="input_">      8 ⎕CR 1 2 3 (4 5)</PRE></b>
+<PRE class="output1">┌→──────────┐
+│1 2 3 ┌→──┐│
+│      │4 5││
+│      └───┘│
+└ϵ──────────┘
+</PRE>
+<b><PRE class="input_">      1 2 3,(4 5)</PRE></b>
+<PRE class="output1">1 2 3 4 5
+</PRE>
+<b><PRE class="input_">      8 ⎕CR 1 2 3,(4 5)</PRE></b>
+<PRE class="output">┌→────────┐
+│1 2 3 4 5│
+└─────────┘
+</PRE>
+   
+   
+   Vector notation starts with the leftmost item and adds one item for every
+   space (or group of spaces). If an item added is not a scalar (like (4 5) in
+   the example above) then the item is automatically converted to a nested
+   value.
+   
+   Catenation works differently; in the above example the two vectors 1 2 3 and
+   (4 5) are simply catenated to form a vector of length 5.
+   
+   The parentheses in (4 5) in in the catenation example were redundant, while
+   the parentheses in the vector notation were not. Once again 8 ⎕CR helped to
+   clarify the matter.
+   
+   <H4><a name="CH_3.4.8"></a>
+   3.4.8 Scalar Extension</H4>
+   
+   Before continuing we need to introduce a fundamental APL mechanism called
+   <B>scalar extension</B>. This mechanism is applied in many places.
+   <BR>
+   
+   Almost all built-in APL functions are partial, which means that there are
+   arguments for which the function returns an error instead of a result. Some
+   of the very few total (i.e. non-partial) functions are monadic ⍴
+   and monadic ≡. Typically dyadic function put more requirements on their
+   arguments than monadic functions. The reason is that not only must the
+   individual left and right arguments satisfy some conditions, but the left
+   and right arguments must also fit to each other. For example:
+   
+<b><PRE class="input_T">      1 2 3 + 1 2 3   ⍝ 1 2 3 is a valid arguments for +</PRE></b>
+<PRE class="output1">2 4 6
+</PRE>
+<b><PRE class="input_">      1 2 + 1 2       ⍝ 1 2 is also a valid arguments for +</PRE></b>
+<PRE class="output1">2 4
+</PRE>
+<b><PRE class="input_">      1 2 + 1 2 3     ⍝ they cannot be mixed, though</PRE></b>
+<PRE class="errput">LENGTH ERROR
+      1 2+1 2 3
+      ^  ^
+</PRE>
+   
+   
+   The most common requirement of dyadic functions is that the left
+   and right argument have the same shape. The sum of two 3 element vectors
+   makes sense, while the sum of a 2 element vector and a 3 element vector
+   does not:
+   
+<b><PRE class="input_T">      1 2 3 + 4 5 6    ⍝ OK to add two 3 element vectors</PRE></b>
+<PRE class="output1">5 7 9
+</PRE>
+<b><PRE class="input_">      1 2 3 + 4 5      ⍝ not OK to add  2 element vector to 3 element vector</PRE></b>
+<PRE class="errput">LENGTH ERROR
+      1 2 3+4 5
+      ^    ^
+</PRE>
+   
+   
+   Now scalar extension is an exception to most matching shape requirements.
+   If one of the arguments of a dyadic function is a scalar, and if the function
+   supports scalar extension, then the scalar argument is automatically reshaped
+   to the shape of the other argument. (If both arguments were scalar, then they
+   have the same shape already and scalar extension would have no noticeable
+   effect).
+   
+<b><PRE class="input_T">      1 2 3 + 4      ⍝ OK by virtue of scalar extension of right argument</PRE></b>
+<PRE class="output1">5 6 7
+</PRE>
+<b><PRE class="input_">      1 + 4 5 6      ⍝ OK by virtue of scalar extension of left argument</PRE></b>
+<PRE class="output">5 6 7
+</PRE>
+   
+   
+   Scalar extension is applied recursively. If a some ravel element of a
+   value A is nested and the corresponding ravel of B is bot (or vice
+   versa) then the non-nested element is scalar extended to the other:
+   
+<b><PRE class="input_T">      1 2 3 4 + 1 2 3      ⍝ expect length error</PRE></b>
+<PRE class="errput1">LENGTH ERROR
+      1 2 3 4+1 2 3
+      ^      ^
+</PRE>
+<b><PRE class="input_">      1 2 (3 4) + 1 2 3    ⍝ 3 is scalar extended to match (3 4)</PRE></b>
+<PRE class="output"> 2 4  6 7 
+</PRE>
+   
+   
+   <H4><a name="CH_3.4.9"></a>
+   3.4.9 List of Built-in Scalar Functions</H4>
+   
+   The power of APL comes from the large number of built-in functions.
+   Most of them belong to a category called scalar functions and below is
+   a list of them. Normally the monadic and the dyadic variants are closely
+   related and are both scalar functions. An exception is ∼ where the monadic
+   form is a scalar function while the dyadic form is not.
+   <BR>
+   
+   <BR>
+   
+   <TABLE class="table1" cellspacing="0" cellpadding="0"> <TR>
+     <TH class="tab12" colspan="2">Dyadic: Z←A FUN B
+     <TH class="tab3"> FUN
+     <TH class="tab45" colspan="2">Monadic: Z←FUN B
+   
+    <TR>
+     <TH class="tab1"> Name/Description
+     <TH class="tab2"> Example
+     <TH class="tab3"> &nbsp;
+     <TH class="tab4"> Name/Description
+     <TH class="tab5" colspan="5"> Example 
+   
+    <TR>
+     <TD class="tab1"><B>Plus</B><BR>
+   Z is A plus B
+     <TD class="tab2"><b><PRE class="input4">       2 + 3</PRE></b>
+<PRE class="output4">5
+</PRE>
+   
+     <TD class="tab3"> +
+     <TD class="tab4"><B>Conjugate</B><BR>
+   Z is the complex conjugate of B
+     <TD class="tab5"><b><PRE class="input4">       + 1J42</PRE></b>
+<PRE class="output4">1J¯42
+</PRE>
+   
+   
+    <TR>
+     <TD class="tab1"><B>Minus</B><BR>
+   Z is A minus B
+     <TD class="tab2"><b><PRE class="input4">       2 - 3</PRE></b>
+<PRE class="output4">¯1
+</PRE>
+   
+     <TD class="tab3"> -
+     <TD class="tab4"><B>Negative</B><BR>
+   Z is the negative of B
+     <TD class="tab5"><b><PRE class="input4">       - ¯2</PRE></b>
+<PRE class="output4">2
+</PRE>
+   
+   
+    <TR>
+     <TD class="tab1"><B>Times</B><BR>
+   Z is A times B
+     <TD class="tab2"><b><PRE class="input4">       2 × 3</PRE></b>
+<PRE class="output4">6
+</PRE>
+   
+     <TD class="tab3"> ×
+     <TD class="tab4"><B>Direction</B><BR>
+   Z is 1, 0, or ¯1 resp. if B > 0, B = 0, or B < 0
+     <TD class="tab5"><b><PRE class="input4">       × ¯5</PRE></b>
+<PRE class="output4">¯1
+</PRE>
+   
+   
+    <TR>
+     <TD class="tab1"><B>Divide</B><BR>
+   Z is A divided by B
+     <TD class="tab2"><b><PRE class="input4">       3÷2</PRE></b>
+<PRE class="output4">1.5
+</PRE>
+   
+     <TD class="tab3"> ÷
+     <TD class="tab4"><B>Reciprocal</B><BR>
+   Z is 1 ÷ B
+     <TD class="tab5"><b><PRE class="input4">       ÷4</PRE></b>
+<PRE class="output4">0.25
+</PRE>
+   
+   
+    <TR>
+     <TD class="tab1"><B>Minimum</B> <BR>
+    Z is the smaller of A and B
+     <TD class="tab2"><b><PRE class="input4">       2 ⌊ 3</PRE></b>
+<PRE class="output4">2
+</PRE>
+   
+     <TD class="tab3"> ⌊
+     <TD class="tab4"><B>Floor</B> <BR>
+    Z is B rounded down
+     <TD class="tab5"><b><PRE class="input4">       ⌊ 4.7</PRE></b>
+<PRE class="output4">4
+</PRE>
+   
+   
+    <TR>
+     <TD class="tab1"><B>Maximum</B> <BR>
+    Z is the larger of A and B
+     <TD class="tab2"><b><PRE class="input4">       2 ⌈ 3</PRE></b>
+<PRE class="output4">3
+</PRE>
+   
+     <TD class="tab3"> ⌈
+     <TD class="tab4"><B>Ceiling</B><BR>
+   Z is B rounded up
+     <TD class="tab5"><b><PRE class="input4">       ⌈ 4.7</PRE></b>
+<PRE class="output4">5
+</PRE>
+   
+   
+    <TR>
+     <TD class="tab1"><B>Power</B><BR>
+   Z is A raised to the B<SUP>th</SUP> power
+     <TD class="tab2"><b><PRE class="input4">       2⋆3</PRE></b>
+<PRE class="output4">8
+</PRE>
+   
+     <TD class="tab3"> ⋆
+     <TD class="tab4"><B>Exponential</B><BR>
+   Z is e to the B<SUP>th</SUP> power
+     <TD class="tab5"><b><PRE class="input4">       ⋆1</PRE></b>
+<PRE class="output4">2.718281828
+</PRE>
+   
+   
+    <TR>
+     <TD class="tab1"><B>Logarithm</B><BR>
+   Z is the logarithm of B to the base A
+     <TD class="tab2"><b><PRE class="input4">       2⍟8</PRE></b>
+<PRE class="output4">3
+</PRE>
+   
+     <TD class="tab3"> ⍟
+     <TD class="tab4"><B>Natural Logarithm</B><BR>
+   Z is the natural logarithm of B
+     <TD class="tab5"><b><PRE class="input4">       ⍟8</PRE></b>
+<PRE class="output4">2.079441542
+</PRE>
+   
+   
+    <TR>
+     <TD class="tab1"><B>Residue</B> <BR>
+    Z is B modulo A
+     <TD class="tab2"><b><PRE class="input4">       10∣13</PRE></b>
+<PRE class="output4">3
+</PRE>
+   
+     <TD class="tab3"> ∣
+     <TD class="tab4"><B>Magnitude</B> <BR>
+    Z is the magnitude of B
+     <TD class="tab5"><b><PRE class="input4">       ∣3J4</PRE></b>
+<PRE class="output4">5
+</PRE>
+   
+   
+    <TR>
+     <TD class="tab1"><B>Binomial</B> <BR>
+    Z is Γ(1+B) ÷ (Γ(1+A) × Γ(1+B-A))<BR>
+   
+    (or (B!) ÷ ((A!) × (B-A)!) if A and B are non-negative integers)
+     <TD class="tab2"><b><PRE class="input4">       3!5</PRE></b>
+<PRE class="output4">10
+</PRE>
+   
+     <TD class="tab3"> !
+     <TD class="tab4"><B>Factorial</B> <BR>
+    Z is Γ(1+B) (aka. B! for non-negative integers)
+     <TD class="tab5"><b><PRE class="input4">       !4</PRE></b>
+<PRE class="output4">24
+</PRE>
+   
+   
+    <TR>
+     <TD class="tab1"><B>Circular Functions</B> <BR>
+    Z is the result of applying a function
+   designated by integer A to B:
+   <BR>
+    A=¯12: exp(iB)
+   <BR>
+    A=¯11: iB
+   <BR>
+    A=¯10: +B
+   <BR>
+    A=¯9: B
+   <BR>
+    A=¯8: sqrt(B<SUP>2</SUP> - 1)
+   <BR>
+    A=¯7: atanh(B)
+   <BR>
+    A=¯6: acosh(B)
+   <BR>
+    A=¯5: asinh(B)
+   <BR>
+    A=¯4: (B+1) × sqrt((B-1)÷(B+1)))
+   <BR>
+    A=¯3: atan(B)
+   <BR>
+    A=¯2: acos(B)
+   <BR>
+    A=¯1: asin(B)
+   <BR>
+    A=0: sqrt(1 - B<SUP>2</SUP>) 
+   <BR>
+    A=1: sin(B)
+   <BR>
+    A=2: cos(B)
+   <BR>
+    A=3: tan(B)
+   <BR>
+    A=4: sqrt(1 + B<SUP>2</SUP>) 
+   <BR>
+    A=5: sinh(B)
+   <BR>
+    A=6: cosh(B)
+   <BR>
+    A=7: tanh(B)
+   <BR>
+    A=8: sqrt(¯1 - B<SUP>2</SUP>) 
+   <BR>
+    A=9: real(B)
+   <BR>
+    A=10: ∣ B
+   <BR>
+    A=11: imag(B)
+   <BR>
+   A=12: arc(B)
+     <TD class="tab2"><b><PRE class="input4">       A,⍪(A←¯13+⍳25) ○ 1.1</PRE></b>
+<PRE class="output4">¯12 0.4535961214J0.8912073601
+¯11            0J1.1
+¯10          1.1
+ ¯9          1.1
+ ¯8            0J1.486606875
+ ¯7  1.522261219J¯1.570796327
+ ¯6 0.4435682544
+ ¯5 0.9503469298
+ ¯4 0.4582575695
+ ¯3 0.8329812667
+ ¯2            0J¯0.4435682544
+ ¯1  1.570796327J¯0.4435682544
+  0            0J0.4582575695
+  1 0.8912073601
+  2 0.4535961214
+  3  1.964759657
+  4  1.486606875
+  5   1.33564747
+  6  1.668518554
+  7 0.8004990218
+  8            0J¯1.486606875
+  9          1.1
+ 10          1.1
+ 11            0
+ 12            0
+</PRE>
+   
+     <TD class="tab3"> ○
+     <TD class="tab4"><B>Pi Times</B> <BR>
+    Z is Pi times B
+     <TD class="tab5"><b><PRE class="input4">       ○1</PRE></b>
+<PRE class="output4">3.141592654
+</PRE>
+<b><PRE class="input4">       ○2</PRE></b>
+<PRE class="output4">6.283185307
+</PRE>
+   
+   
+    <TR>
+     <TD class="tab1"><B>Without</B> <BR>
+    Z are the elements of A that are not in B
+     <TD class="tab2"><b><PRE class="input4">       1 2 3 4 5 6 ∼ 3 4</PRE></b>
+<PRE class="output4">1 2 5 6
+</PRE>
+   
+     <TD class="tab3"> ∼
+     <TD class="tab4"><B>Not</B> <BR>
+    Z is the boolean complement of B
+     <TD class="tab5"><b><PRE class="input4">       ∼ 1 0 1 1 0 0</PRE></b>
+<PRE class="output4">0 1 0 0 1 1
+</PRE>
+   
+   
+    <TR>
+     <TD class="tab1"><B>And/LCM</B> <BR>
+    For boolean A and B is Z the logical AND of A and B<BR>
+   
+           For integer A and B is Z the least common multiple of A and B
+     <TD class="tab2"><b><PRE class="input4">       0 0 1 1 ∧ 0 1 0 1</PRE></b>
+<PRE class="output4">0 0 0 1
+</PRE>
+   
+     <TD class="tab3"> <BR>
+   
+     <TD class="tab4"><B>N/A</B>
+     <TD class="tab5"><b><PRE class="input4">       ∧ 0 1 0 1</PRE></b>
+<PRE class="errput4">VALENCE ERROR
+      ∧0 1 0 1
+      ^
+</PRE>
+   
+   
+    <TR>
+     <TD class="tab1"><B>Or/GCD</B> <BR>
+    For boolean A and B is Z the logical OR of A and B<BR>
+   
+           For integer A and B is Z the gratest common divisor of A and B
+     <TD class="tab2"><b><PRE class="input4">       0 0 1 1 ∨ 0 1 0 1</PRE></b>
+<PRE class="output4">0 1 1 1
+</PRE>
+   
+     <TD class="tab3"> ∨
+     <TD class="tab4"><B>N/A</B>
+     <TD class="tab5"><b><PRE class="input4">       ∨ 0 1 0 1</PRE></b>
+<PRE class="errput4">VALENCE ERROR
+      ∨0 1 0 1
+      ^
+</PRE>
+   
+   
+    <TR>
+     <TD class="tab1"><B>Nand</B> <BR>
+    Z is ∼ (A ∧ B)
+     <TD class="tab2"><b><PRE class="input4">       0 0 1 1 ⍲ 0 1 0 1</PRE></b>
+<PRE class="output4">1 1 1 0
+</PRE>
+   
+     <TD class="tab3"> ⍲
+     <TD class="tab4"><B>N/A</B>
+     <TD class="tab5"><b><PRE class="input4">       ⍲ 0 1 0 1</PRE></b>
+<PRE class="errput4">VALENCE ERROR
+      ⍲0 1 0 1
+      ^
+</PRE>
+   
+   
+    <TR>
+     <TD class="tab1"><B>Nor</B> <BR>
+    Z is ∼ (A ∨ B)
+     <TD class="tab2"><b><PRE class="input4">       0 0 1 1 ⍱ 0 1 0 1</PRE></b>
+<PRE class="output4">1 0 0 0
+</PRE>
+   
+     <TD class="tab3"> ⍱
+     <TD class="tab4"><B>N/A</B>
+     <TD class="tab5"><b><PRE class="input4">       ⍱ 0 1 0 1</PRE></b>
+<PRE class="errput4">VALENCE ERROR
+      ⍱0 1 0 1
+      ^
+</PRE>
+   
+   
+    <TR>
+     <TD class="tab1"><B>Equal</B> <BR>
+    Z is ○○○ A and B
+     <TD class="tab2"><b><PRE class="input4">       1 2 3 = 2</PRE></b>
+<PRE class="output4">0 1 0
+</PRE>
+   
+     <TD class="tab3"> =
+     <TD class="tab4"><B>N/A</B>
+     <TD class="tab5"><b><PRE class="input4">       = 0 1 0 1</PRE></b>
+<PRE class="errput4">VALENCE ERROR
+      =0 1 0 1
+      ^
+</PRE>
+   
+   
+    <TR>
+     <TD class="tab1"><B>Less Than</B> <BR>
+    Z is 1 if A is less than B, and 0 if not
+     <TD class="tab2"><b><PRE class="input4">       1 2 3 < 2</PRE></b>
+<PRE class="output4">1 0 0
+</PRE>
+   
+     <TD class="tab3"> <
+     <TD class="tab4"><B>N/A</B>
+     <TD class="tab5"><b><PRE class="input4">       < 0 1 0 1</PRE></b>
+<PRE class="errput4">VALENCE ERROR
+      <0 1 0 1
+      ^
+</PRE>
+   
+   
+    <TR>
+     <TD class="tab1"><B>Less or Equal</B> <BR>
+    Z is 1 if A s less than or equal to B, and 0 if not
+     <TD class="tab2"><b><PRE class="input4">       1 2 3 ≤ 2</PRE></b>
+<PRE class="output4">1 1 0
+</PRE>
+   
+     <TD class="tab3"> ≤
+     <TD class="tab4"><B>N/A</B>
+     <TD class="tab5"><b><PRE class="input4">       ≤ 0 1 0 1</PRE></b>
+<PRE class="errput4">VALENCE ERROR
+      ≤0 1 0 1
+      ^
+</PRE>
+   
+   
+    <TR>
+     <TD class="tab1"><B>Not Equal</B> <BR>
+    Z is 1 if A is different from B, and 0 if not
+     <TD class="tab2"><b><PRE class="input4">       1 2 3 ≠ 2</PRE></b>
+<PRE class="output4">1 0 1
+</PRE>
+   
+     <TD class="tab3"> ≠
+     <TD class="tab4"><B>N/A</B>
+     <TD class="tab5"><b><PRE class="input4">       ≠ 0 1 0 1</PRE></b>
+<PRE class="errput4">VALENCE ERROR
+      ≠0 1 0 1
+      ^
+</PRE>
+   
+   
+    <TR>
+     <TD class="tab1"><B>Greater or Equal</B> <BR>
+    Z is 1 if A s greater than or equal to B,
+                                 and 0 if not
+     <TD class="tab2"><b><PRE class="input4">       1 2 3 ≥ 2</PRE></b>
+<PRE class="output4">0 1 1
+</PRE>
+   
+     <TD class="tab3"> ≥
+     <TD class="tab4"><B>N/A</B>
+     <TD class="tab5"><b><PRE class="input4">       ≥ 0 1 0 1</PRE></b>
+<PRE class="errput4">VALENCE ERROR
+      ≥0 1 0 1
+      ^
+</PRE>
+   
+   
+    <TR>
+     <TD class="tab1"><B>Greater Than</B><BR>
+   Z is 1 if A is greater than B, and 0 if not
+     <TD class="tab2"><b><PRE class="input4">       1 2 3 > 2</PRE></b>
+<PRE class="output4">0 0 1
+</PRE>
+   
+     <TD class="tab3"> >
+     <TD class="tab4"><B>N/A</B>
+     <TD class="tab5"><b><PRE class="input4">       > 0 1 0 1</PRE></b>
+<PRE class="errput4">VALENCE ERROR
+      >0 1 0 1
+      ^
+</PRE>
+   
+   </TABLE>
+   
+   
+   <H4><a name="CH_3.4.10"></a>
+   3.4.10 List of Other Built-in Functions</H4>
+   
+   In order to have all functions listed in one place, we also provide the
+   remaining build-in APL functions here. These functions are either
+   represented by a single APL character, or by a name that starts with ⎕,
+   followed by one or more letters from A-Z ("quad functions"). There is no
+   big difference between quad functions and other built-in functions, except
+   for the name. Often quad functions are used for services of the
+   underlying operating system, such as time information, user accounting, etc.
+   Note that the non-quad functions are all defined by the ISO APL standard
+   (and identical on all APL interpreters), while very few quad-functions
+   are defined by the standard and the other ones differ considerably between
+   different APL interpreters.
+   <BR>
+   
+   <BR>
+   
+   <B>Note:</B> The table below uses the concept of APL variables which have not
+   been introduced yet (but will be soon). If you are an APL novice then please
+   ignore the table for the moment and return to it after variables have been
+   introduced.
+   <BR>
+   
+   <BR>
+   
+   <TABLE class="table1" cellspacing="0" cellpadding="0"> <TR>
+     <TH class="tab12" colspan="2">Dyadic: Z←A FUN B
+     <TH class="tab3"> FUN
+     <TH class="tab45" colspan="2">Monadic: Z←FUN B
+   
+    <TR>
+     <TH class="tab1"> Name/Description
+     <TH class="tab2"> Example
+     <TH class="tab3"> &nbsp;
+     <TH class="tab4"> Name/Description
+     <TH class="tab5" colspan="5"> Example 
+   
+    <TR>
+     <TD class="tab1"><B>Reshape</B><BR>
+   Z is the ravel of B (possibly shortened or replicated
+   as needed) with shape A
+     <TD class="tab2"><b><PRE class="input4">       2 3⍴1 2 3 4 5 6</PRE></b>
+<PRE class="output4">1 2 3
+4 5 6
+</PRE>
+   
+     <TD class="tab3"> ⍴
+     <TD class="tab4"><B>Shape</B><BR>
+   Z is the shape of B
+     <TD class="tab5"><b><PRE class="input4">       ⍴ (2 3 ⍴ 1 2 3 4 5 6)</PRE></b>
+<PRE class="output4">2 3
+</PRE>
+   
+   
+    <TR>
+     <TD class="tab1"><B>Join</B><BR>
+   Z is the concatenation of A and B
+     <TD class="tab2"><b><PRE class="input4">       A ← 2 3⍴'abcdef' ◊ B ← 2 3⍴1 2 3 4 5 6</PRE></b>
+<PRE class="output4">
+
+</pre>
+<b><PRE class="input4">       A</PRE></b>
+<PRE class="output4">abc
+def
+</PRE>
+<b><PRE class="input4">       B</PRE></b>
+<PRE class="output4">1 2 3
+4 5 6
+</PRE>
+<b><PRE class="input4">       A,B</PRE></b>
+<PRE class="output4">abc 1 2 3
+def 4 5 6
+</PRE>
+   
+   
+     <TD class="tab3"> ,<BR>
+   ⍪
+     <TD class="tab4"><B>Ravel</B><BR>
+   ,B is the ravel of B (a vector with the same elements as B.
+          <BR>
+   <BR>
+   <B>Table</B><BR>
+   ⍪B is a 2-dimensional matrix with the elements of B.)
+     <TD class="tab5"><b><PRE class="input4">       ⎕ ← B ← 2 3 ⍴ 1 2 3 4 5 6</PRE></b>
+<PRE class="output4">1 2 3
+4 5 6
+</PRE>
+   
+          <b><PRE class="input4">       ,B</PRE></b>
+<PRE class="output4">1 2 3 4 5 6
+</PRE>
+   
+          <b><PRE class="input4">       ⎕ ← B ← 1 2 3 4 5</PRE></b>
+<PRE class="output4">1 2 3 4 5
+</PRE>
+   
+          <b><PRE class="input4">       ⍪B</PRE></b>
+<PRE class="output4">1
+2
+3
+4
+5
+</PRE>
+   
+   
+    <TR>
+     <TD class="tab1"><B>Index of</B><BR>
+   Z is the position of B's elements in A
+     <TD class="tab2"><b><PRE class="input4">       'abcdefgh' ⍳ 'hello'</PRE></b>
+<PRE class="output4">8 5 9 9 9
+</PRE>
+   
+   
+     <TD class="tab3"> ⍳
+     <TD class="tab4"><B>Index Generator</B><BR>
+   Z Generate the vector 1 2 ... B
+     <TD class="tab5"><b><PRE class="input4">       ⍳6</PRE></b>
+<PRE class="output4">1 2 3 4 5 6
+</PRE>
+   
+   
+    <TR>
+     <TD class="tab1"><B>Identical</B><BR>
+   Z is 1 if A and B have the same shape and the same
+         ravel elements (including identical nested ravel elements).
+     <TD class="tab2"><b><PRE class="input4">       1 2 3 ≡ 1 2 3</PRE></b>
+<PRE class="output4">1
+</PRE>
+   
+          <b><PRE class="input4">       1  ≡ ,1   ⍝ same ravel, different shapes</PRE></b>
+<PRE class="output4">0
+</PRE>
+   
+          <b><PRE class="input4">       1  = ,1   ⍝ same ravel, left argument is scalar extended</PRE></b>
+<PRE class="output4">1
+</PRE>
+   
+   
+     <TD class="tab3"> ≡
+     <TD class="tab4"><B>Depth</B><BR>
+   Z is the depth (the level of nesting) of B
+     <TD class="tab5"><b><PRE class="input4">       ≡ 1</PRE></b>
+<PRE class="output4">0
+</PRE>
+   
+          <b><PRE class="input4">       ≡ 1 2 3</PRE></b>
+<PRE class="output4">1
+</PRE>
+   
+          <b><PRE class="input4">       ≡ 1 (2 3) 4</PRE></b>
+<PRE class="output4">2
+</PRE>
+   
+   
+    <TR>
+     <TD class="tab1"><B>Member of</B><BR>
+   Z is a Boolean value with the same shape as A.
+              The elements of Z indicate if the corresponding element in A is
+              equal to some element in B.
+     <TD class="tab2"><b><PRE class="input4">       (2 3⍴1 2 3 4 5 6) ϵ 4 5 6 7 8</PRE></b>
+<PRE class="output4">0 0 0
+1 1 1
+</PRE>
+   
+   
+     <TD class="tab3"> ∈
+     <TD class="tab4"><B>Enlist</B><BR>
+   Z is the elements of B listed in depth-first order (all
+                      nested sub-values of a ravel element come before the
+                      next ravel element at the same level).
+     <TD class="tab5"><b><PRE class="input4">       ∈ (1 2 3) (4 5) 6</PRE></b>
+<PRE class="output4">1 2 3 4 5 6
+</PRE>
+   
+   
+    <TR>
+     <TD class="tab1"><B>Deal</B><BR>
+   Z is a subset of ⎕IO ... ⎕IO+B containing A elements
+              chosen at random
+     <TD class="tab2"><b><PRE class="input4">       3 ? 10</PRE></b>
+<PRE class="output4">7 9 4
+</PRE>
+   
+          <b><PRE class="input4">       3 ? 10</PRE></b>
+<PRE class="output4">4 2 10
+</PRE>
+   
+   
+     <TD class="tab3"> ?
+     <TD class="tab4"><B>Roll</B><BR>
+   Z has the same shape as B. The elements of Z are random
+                      numbers between ⎕IO and ⎕IO+b where b is the corresponding
+                      element in B.
+     <TD class="tab5"><b><PRE class="input4">       ? 10 100 1000</PRE></b>
+<PRE class="output4">5 95 697
+</PRE>
+   
+   
+    <TR>
+     <TD class="tab1"><B>Grade Up/Down with collating sequence</B><BR>
+   
+              A is a character array which defines an sorting order for
+              characters. B is a character vector (string) to be sorted.
+              Z is an integer vector such that B[Z] is sorted according to the
+              sorting order defined by A.
+     <TD class="tab2"><b><PRE class="input4">       ⎕IO←1                         ⍝ ⍋ and ⍒ depend on ⎕IO</PRE></b>
+<PRE class="output4">
+
+</pre>
+   
+          <b><PRE class="input4">       ⊢B←5 4⍴'DEADBADECEDEBEADDEE'  ⍝ B: the items to be sorted</PRE></b>
+<PRE class="output4">DEAD
+BADE
+CEDE
+BEAD
+DEED
+</PRE>
+   
+          <b><PRE class="input4">       'ABCDE' ⍋ B                   ⍝ sort B with A < B < C < D < E</PRE></b>
+<PRE class="output4">2 4 3 1 5
+</PRE>
+   
+          <b><PRE class="input4">       B['ABCDE' ⍋ B;]               ⍝ the sorted items</PRE></b>
+<PRE class="output4">BADE
+BEAD
+CEDE
+DEAD
+DEED
+</PRE>
+   
+          <b><PRE class="input4">       B['CBADE' ⍋ B;]               ⍝ same with C < B < A < D < E</PRE></b>
+<PRE class="output4">CEDE
+BADE
+BEAD
+DEAD
+DEED
+</PRE>
+   
+     <TD class="tab3"> ⍋ <BR>
+    ⍒
+     <TD class="tab4"><B>Grade Up/Down</B><BR>
+   Z is a vector of indices such that B[Z] is ordered
+              ascendingly (⍋) or descendingly (⍒). In other words, B[⍋B] is B
+              sorted in ascending order and B[⍒B] is B sorted in descending order.
+     <TD class="tab5"><b><PRE class="input4">       ⍋ B←1 7 4 2 6</PRE></b>
+<PRE class="output4">1 4 3 5 2
+</PRE>
+   
+          <b><PRE class="input4">       B[⍋B]</PRE></b>
+<PRE class="output4">1 2 4 6 7
+</PRE>
+   
+          <b><PRE class="input4">       B[⍒B]</PRE></b>
+<PRE class="output4">7 6 4 2 1
+</PRE>
+   
+   
+    <TR>
+     <TD class="tab1"><B>Representation aka. Encode</B><BR>
+   
+           Z is numbers in B represented in the number system with radices A.
+           ⍴A determines the number of digits in that representation.
+     <TD class="tab2"><b><PRE class="input4">       2 2 2 2 2 2 ⊤ 42   ⍝ 42 in base 2 (aka. binary) with 6 digits</PRE></b>
+<PRE class="output4">1 0 1 0 1 0
+</PRE>
+   
+     <TD class="tab3"> ⊤
+     <TD class="tab4" colspan="2">N/A
+   
+    <TR>
+     <TD class="tab1"><B>Base Value aka. Decode</B><BR>
+   
+           Z is the number corresponding to the digits B in the number system
+           with radices A.
+     <TD class="tab2"><b><PRE class="input4">       2 ⊥ 1 0 1 0 1 0   ⍝ binary 1 0 1 0 1 0 in decimal</PRE></b>
+<PRE class="output4">42
+</PRE>
+   
+     <TD class="tab3"> ⊥
+     <TD class="tab4" colspan="2">N/A
+   
+    <TR>
+     <TD class="tab1"><B>Union</B><BR>
+   Z is A , B (with duplicates of A in B removed)
+     <TD class="tab2"><b><PRE class="input4">       1 2 2 3 'A' ∪ 3 'B' 'C' 'A'</PRE></b>
+<PRE class="output4">1 2 2 3 ABC
+</PRE>
+   
+     <TD class="tab3"> ∪
+     <TD class="tab4"><B>Unique</B><BR>
+   Z is B with duplicate elements removed
+     <TD class="tab5"><b><PRE class="input4">       ∪ 1 2 3 4 3 5</PRE></b>
+<PRE class="output4">1 2 3 4 5
+</PRE>
+   
+   
+    <TR>
+     <TD class="tab1"><B>Format</B><BR>
+   Z is B formatted according to A
+     <TD class="tab2"><b><PRE class="input4">       ⊢B←3 2ρ1 .468987 2 57.276 3 27963</PRE></b>
+<PRE class="output4">1     0.468987
+2    57.276
+3 27963
+</PRE>
+   
+          <b><PRE class="input4">       ⍝ format by specification: (field size + precision)</PRE></b>
+   
+          <b><PRE class="input4">       ⍝ precisions < 0 imply exponential format</PRE></b>
+   
+          <b><PRE class="input4">       4 2 12 ¯5 ⍕ B   ⍝ field sizes 4 and 12, precisions 2 and ¯5</PRE></b>
+<PRE class="output4">1.00   4.6899E¯1
+2.00   5.7276E1 
+3.00   2.7963E4 
+</PRE>
+   
+          <b><PRE class="input4">       ⍝ format by example: (example string A)</PRE></b>
+   
+          <b><PRE class="input4">       ⊢B←234.67 456.23 987.65 34.23</PRE></b>
+<PRE class="output4">234.67 456.23 987.65 34.23
+</PRE>
+   
+          <b><PRE class="input4">       "SUM: $5,555.50" ⍕ +/ B</PRE></b>
+<PRE class="output4">SUM: $1,712.78
+</PRE>
+   
+     <TD class="tab3"> ⍕
+     <TD class="tab4"><B>Format</B><BR>
+   Z is B for strings or otherwise B converted to a character vector or matrix
+     <TD class="tab5">
+   
+    <TR>
+     <TD class="tab1" colspan="2"> N/A
+     <TD class="tab3"> ⍎
+     <TD class="tab4"><B>Execute</B><BR>
+   Z is the result of executing string B as APL expression
+     <TD class="tab5">
+   
+    <TR>
+     <TD class="tab1"><B>Take</B><BR>
+   Z is a rectangular sub-area of B according to A
+     <TD class="tab2"> <b><PRE class="input4">       ⊢V←⍳7</PRE></b>
+<PRE class="output4">1 2 3 4 5 6 7
+</PRE>
+         <b><PRE class="input4">       3↑V</PRE></b>
+<PRE class="output4">1 2 3
+</PRE>
+    <b><PRE class="input4">       ¯3↑V</PRE></b>
+<PRE class="output4">5 6 7
+</PRE>
+   
+           <b><PRE class="input4">       ⊢B←7 7⍴⍳49</PRE></b>
+<PRE class="output4"> 1  2  3  4  5  6  7
+ 8  9 10 11 12 13 14
+15 16 17 18 19 20 21
+22 23 24 25 26 27 28
+29 30 31 32 33 34 35
+36 37 38 39 40 41 42
+43 44 45 46 47 48 49
+</PRE>
+    <b><PRE class="input4">       3 3↑B</PRE></b>
+<PRE class="output4"> 1  2  3
+ 8  9 10
+15 16 17
+</PRE>
+    <b><PRE class="input4">       ¯3 ¯3↑B</PRE></b>
+<PRE class="output4">33 34 35
+40 41 42
+47 48 49
+</PRE>
+   
+     <TD class="tab3"> ↑
+     <TD class="tab4"><B>First</B><BR>
+   Z is a Scalar containing first element of B (or the prototype of B if B is empty)
+     <TD class="tab5">
+   
+    <TR>
+     <TD class="tab1"><B>Drop</B><BR>
+   Z is B rectangular sub-area of B according to A
+     <TD class="tab2"> <b><PRE class="input4">       ⊢V←⍳7</PRE></b>
+<PRE class="output4">1 2 3 4 5 6 7
+</PRE>
+         <b><PRE class="input4">       3↓V</PRE></b>
+<PRE class="output4">4 5 6 7
+</PRE>
+    <b><PRE class="input4">       ¯3↓V</PRE></b>
+<PRE class="output4">1 2 3 4
+</PRE>
+   
+           <b><PRE class="input4">       ⊢B←7 7⍴⍳49</PRE></b>
+<PRE class="output4"> 1  2  3  4  5  6  7
+ 8  9 10 11 12 13 14
+15 16 17 18 19 20 21
+22 23 24 25 26 27 28
+29 30 31 32 33 34 35
+36 37 38 39 40 41 42
+43 44 45 46 47 48 49
+</PRE>
+    <b><PRE class="input4">       3 3↓B</PRE></b>
+<PRE class="output4">25 26 27 28
+32 33 34 35
+39 40 41 42
+46 47 48 49
+</PRE>
+    <b><PRE class="input4">       ¯3 ¯3↓B</PRE></b>
+<PRE class="output4"> 1  2  3  4
+ 8  9 10 11
+15 16 17 18
+22 23 24 25
+</PRE>
+   
+     <TD class="tab3"> ↓
+     <TD class="tab4" colspan="2"> N/A
+   
+    <TR>
+     <TD class="tab1"><B>Find</B><BR>
+   Z[i] is 1 if A starts at B[i] in B and 0 if not.
+     <TD class="tab2"><b><PRE class="input4">       3 4 ⍷ 1 2 3 4 5</PRE></b>
+<PRE class="output4">0 0 1 0 0
+</PRE>
+   
+     <TD class="tab3"> ⋸
+     <TD class="tab4" colspan="2">N/A
+   
+    <TR>
+     <TD class="tab1"><B>Index</B><BR>
+   Z is B[A]
+     <TD class="tab2"><b><PRE class="input4">       2 ⌷ 'Hello'</PRE></b>
+<PRE class="output4">e
+</PRE>
+      ⍝ second character
+     <TD class="tab3"> ⌷
+     <TD class="tab4" colspan="2"> N/A
+   
+    <TR>
+     <TD class="tab1"><B>Right</B><BR>
+   Z is B.
+     <TD class="tab2"><b><PRE class="input4">       'Left' ⊢  'Right'</PRE></b>
+<PRE class="output4">Right
+</PRE>
+   
+     <TD class="tab3"> ⊢
+     <TD class="tab4"><B>Identity</B> <BR>
+    Z is B. ⊢B is a shortcut for ⎕←B
+     <TD class="tab5">
+   
+    <TR>
+     <TD class="tab1"><B>Left</B><BR>
+   Z is A
+     <TD class="tab2"><b><PRE class="input4">       'Left' ⊣  'Right'</PRE></b>
+<PRE class="output4">Left
+</PRE>
+   
+     <TD class="tab3"> ⊣
+     <TD class="tab4"><B>Hide</B> <BR>
+    Z is B as a committed APL value (and iis therefore not
+                     automatically displayed). ⊣B is a shortcut for (⍳0)⍴B.
+     <TD class="tab5">
+   
+    <TR>
+     <TD class="tab1"><B>Partition</B> <BR>
+   
+           Z is B, divided into partitions according to A. Two elements B[b]
+           and B[b+1] of B belong to the same partition if A[b] ≥ A[b+1] > 0.
+           Each partition becomes a nested item of Z where B[b] with A[b] = 0
+           are removed.
+     <TD class="tab2"><b><PRE class="input4">       1 1  2 2  3 3 3 3 ⊂ 'ABCDEFGH'   ⍝ 3 partitions</PRE></b>
+<PRE class="output4"> AB CD EFGH 
+</PRE>
+   
+          <b><PRE class="input4">       1 1  0 0  3 3 3 3 ⊂ 'ABCDEFGH'   ⍝ 2 partitions</PRE></b>
+<PRE class="output4"> AB EFGH 
+</PRE>
+   
+     <TD class="tab3"> ⊂
+     <TD class="tab4"><B>Enclose</B><BR>
+   Z is B for simple scalars B, otherwise a scalar
+                        that contains B as a nested value
+     <TD class="tab5"><b><PRE class="input4">       B←3 4 ⍴5</PRE></b>
+<PRE class="output4">
+
+</pre>
+   
+          <b><PRE class="input4">       8 ⎕CR B</PRE></b>
+<PRE class="output4">┌→──────┐
+↓5 5 5 5│
+│5 5 5 5│
+│5 5 5 5│
+└───────┘
+</PRE>
+   
+          <b><PRE class="input4">       8 ⎕CR ⊂B</PRE></b>
+<PRE class="output4">┌─────────┐
+│┌→──────┐│
+│↓5 5 5 5││
+││5 5 5 5││
+││5 5 5 5││
+│└───────┘│
+└ϵ────────┘
+</PRE>
+   
+   
+    <TR>
+     <TD class="tab1"><B>Pick</B> <BR>
+   
+           Z is a nested sub-value of B, whose position in B is determined by A.
+           Every item of A corresponds to a nesting level of B.
+     <TD class="tab2"><b><PRE class="input4">       8 ⎕CR  S←2 3ρ'AB' 'CD' 'EF' 'GH' 'IJ' 'KL'</PRE></b>
+<PRE class="output4">┌→─────────────┐
+↓┌→─┐ ┌→─┐ ┌→─┐│
+││AB│ │CD│ │EF││
+│└──┘ └──┘ └──┘│
+│┌→─┐ ┌→─┐ ┌→─┐│
+││GH│ │IJ│ │KL││
+│└──┘ └──┘ └──┘│
+└ϵ─────────────┘
+</PRE>
+   
+          <b><PRE class="input4">       (1 3) 2 ⊃ S   ⍝ (1 3) selects 'EF' from S, 2 selects 'F' from 'EF'</PRE></b>
+<PRE class="output4">F
+</PRE>
+   
+          <b><PRE class="input4">       (⊃S[1;3])[2]   ⍝ the same.</PRE></b>
+<PRE class="output4">F
+</PRE>
+   
+   
+     <TD class="tab3"> ⊃
+     <TD class="tab4"><B>Disclose</B><BR>
+   Z is the elements of B with nested sub-values
+                         replaced by arrays padded to the same size
+     <TD class="tab5">
+   
+    <TR>
+     <TD class="tab1"><B>Rotate</B><BR>
+   Z is B rotated according to A
+     <TD class="tab2"><b><PRE class="input4">       ⊢B←3 5⍴⍳5</PRE></b>
+<PRE class="output4">1 2 3 4 5
+1 2 3 4 5
+1 2 3 4 5
+</PRE>
+   
+          <b><PRE class="input4">       1 2 3⌽B       ⍝ rotate along the last axis (columns)</PRE></b>
+<PRE class="output4">2 3 4 5 1
+3 4 5 1 2
+4 5 1 2 3
+</PRE>
+   
+          <b><PRE class="input4">       ¯1 ¯2 ¯3⌽B    ⍝ rotate backwards along the last axis (columns)</PRE></b>
+<PRE class="output4">5 1 2 3 4
+4 5 1 2 3
+3 4 5 1 2
+</PRE>
+   
+          <b><PRE class="input4">       ⊢B←3/⍪⍳5</PRE></b>
+<PRE class="output4">1 1 1
+2 2 2
+3 3 3
+4 4 4
+5 5 5
+</PRE>
+   
+          <b><PRE class="input4">       1 2 3⊖B       ⍝ rotate along the first axis (rows)</PRE></b>
+<PRE class="output4">2 3 4
+3 4 5
+4 5 1
+5 1 2
+1 2 3
+</PRE>
+   
+     <TD class="tab3"> ⊖ <BR>
+    ⌽
+     <TD class="tab4"><B>Reverse</B><BR>
+   
+           Z is B with the items along the first resp. last axis reversed
+     <TD class="tab5">
+   
+    <TR>
+     <TD class="tab1"><B>Transpose (General)</B><BR>
+   Z is B transposed according to A.
+          <BR>
+    A is a permutation of ⍳⍴⍴A (1 2 3... or 0 1 2... depending on ⎕IO)
+     <TD class="tab2"><b><PRE class="input4">       ⊢B←3 4 5⍴20/1 2 3</PRE></b>
+<PRE class="output4">1 1 1 1 1
+1 1 1 1 1
+1 1 1 1 1
+1 1 1 1 1
+
+2 2 2 2 2
+2 2 2 2 2
+2 2 2 2 2
+2 2 2 2 2
+
+3 3 3 3 3
+3 3 3 3 3
+3 3 3 3 3
+3 3 3 3 3
+</PRE>
+   
+          <b><PRE class="input4">       1 3 2⍉B</PRE></b>
+<PRE class="output4">1 1 1 1
+1 1 1 1
+1 1 1 1
+1 1 1 1
+1 1 1 1
+
+2 2 2 2
+2 2 2 2
+2 2 2 2
+2 2 2 2
+2 2 2 2
+
+3 3 3 3
+3 3 3 3
+3 3 3 3
+3 3 3 3
+3 3 3 3
+</PRE>
+   
+     <TD class="tab3"> ⍉
+     <TD class="tab4"><B>Transpose (Reverse Axes)</B><BR>
+   Z is B transposed so that the order
+              of axes is reversed. Z←⍉B ←→ (⌽⍳⍴B)⍉B
+     <TD class="tab5">
+   
+    <TR>
+     <TD class="tab1"><B>Intersection</B><BR>
+   Z is the elements of A that are also in B
+     <TD class="tab2"><b><PRE class="input4">       1 2 3 4 5 6 ∩ 3 4 5 6 7 8</PRE></b>
+<PRE class="output4">3 4 5 6
+</PRE>
+   
+     <TD class="tab3"> ∩
+     <TD class="tab4" colspan="2"> N/A
+   
+    <TR>
+     <TD class="tab1"><B>Compress</B><BR>
+   Z is the elements of B with B[i] repeated A[i] times
+     <TD class="tab2"><b><PRE class="input4">       1 2 3 4 5 / 'ABCDE'</PRE></b>
+<PRE class="output4">ABBCCCDDDDEEEEE
+</PRE>
+<b><PRE class="input4">       1 2 3 4 5 / '1A' '2B' '3C' '4D' '5E'</PRE></b>
+<PRE class="output4"> 1A 2B 2B 3C 3C 3C 4D 4D 4D 4D 5E 5E 5E 5E 5E 
+</PRE>
+   
+     <TD class="tab3"> / <BR>
+    ⌿
+     <TD class="tab4" colspan="2">N/A (note that f/B is an operator that takes one value argument)
+   
+    <TR>
+     <TD class="tab1"><B>Expand</B><BR>
+   A[i] is 0 or 1; if 1 then Z[i] is B[i] and otherwise ↑B.
+     <TD class="tab2"><b><PRE class="input4">       1 0 1 0 0 1\1 2 3   ⍝ 1 at 1, 2 at 3, and 3 at 6. ↑B is 0</PRE></b>
+<PRE class="output4">1 0 2 0 0 3
+</PRE>
+<b><PRE class="input4">       1 0 1 0 0 1 \ 'ABC' ⍝ A at 1, B at 3, and C at 6  ↑B is ' '</PRE></b>
+<PRE class="output4">A B  C
+</PRE>
+   
+     <TD class="tab3"> \ <BR>
+    ⍀
+     <TD class="tab4" colspan="2">N/A (note that f\B is an operator that takes one value argument)
+   
+   </TABLE>
+   
+   
+   <H4><a name="CH_3.4.11"></a>
+   3.4.11 List of Built-in Monadic APL Operator</H4>
+   
+   A monadic APL operator OP1 takes 2 or 3 arguments in the following order:
+   
+   <UL>
+   <LI>a left value <B>A</B> (mandatory or optional, depending on the operator),</LI>
+   <LI>a mandatory left function argument <B>f</B> (followed by the operator itself)</LI>
+   <LI>a mandatory right value <B>B</B>.</LI>
+   </UL>
+   
+   
+   <TABLE class="table1" cellspacing="0" cellpadding="0"> <TR>
+     <TH class="tab12" colspan="2">Used with 2 Value Arguments A and B: Z←A f OP1 B
+     <TH class="tab3"> OP1
+     <TH class="tab45" colspan="2">Used with 1 Value Argument B: Z←f OP1 B
+   
+    <TR>
+     <TH class="tab1"> Name/Description
+     <TH class="tab2"> Example
+     <TH class="tab3"> &nbsp;
+     <TH class="tab4"> Name/Description
+     <TH class="tab5" colspan="5"> Example 
+   
+    <TR>
+     <TD class="tab1"><B>Reduce N-wise</B> <BR>
+   
+           Like <B>f/B</B> and <B>f⌿B</B> except that <B>f</B> is applied to groups
+           C<SUB>1</SUB> C<SUB>2</SUB> ... C<SUB>n</SUB>.
+           Each group C<SUB>n</SUB> has A consecutive items of B and starts at position
+           i of the axis along which the N-wise reductions are computed.
+     <TD class="tab2"><b><PRE class="input4">       ⊢R←1 2 3 4 5 6</PRE></b>
+<PRE class="output4">1 2 3 4 5 6
+</PRE>
+<b><PRE class="input4">       4 +/ R</PRE></b>
+<PRE class="output4">10 14 18
+</PRE>
+<b><PRE class="input4">       +/R[1 2 3 4]   ⍝ group C₁ ←→ Z[1]</PRE></b>
+<PRE class="output4">10
+</PRE>
+<b><PRE class="input4">       +/R[2 3 4 5]   ⍝ group C₂ ←→ Z[2]</PRE></b>
+<PRE class="output4">14
+</PRE>
+<b><PRE class="input4">       +/R[3 4 5 6]   ⍝ group C₃ ←→ Z[3]</PRE></b>
+<PRE class="output4">18
+</PRE>
+   
+           <b><PRE class="input4">       ⊢R←2 6⍴⍳12      ⍝ ⍴⍴R > 1</PRE></b>
+<PRE class="output4">1 2 3  4  5  6
+7 8 9 10 11 12
+</PRE>
+<b><PRE class="input4">       4 +/ R</PRE></b>
+<PRE class="output4">10 14 18
+34 38 42
+</PRE>
+   
+   
+     <TD class="tab3"> / <BR>
+    ⌿
+     <TD class="tab4"> <B>Reduce</B> <BR>
+   
+            <B>Z</B> is computed by applying <B>f</B> repeatedly along the last axis
+            of B, i.e.  Z←[;;1] f B[;;2] f ... f B[;;N] (the number of semicolons
+            is ¯1↑⍴⍴B and N←¯1↑⍴B). f⌿B is the same except that f is computed
+            along the first axis of B.
+     <TD class="tab5"><b><PRE class="input4">       +/ 1 2 3 4 5   ⍝ +/ is the sum of elements</PRE></b>
+<PRE class="output4">15
+</PRE>
+   
+   
+    <TR>
+     <TD class="tab1" colspan="2"> N/A
+     <TD class="tab3"> \ <BR>
+    ⍀
+     <TD class="tab4"> <B>Scan</B> <BR>
+   
+            Z←f\B resp. Z←f⍀B is like Z←f/B resp. Z←f⌿B except that the partial
+            results of the different invocations of function f are not discarded
+            but included in the result Z.
+     <TD class="tab5"><b><PRE class="input4">       +\ 1 2 3 4 5   ⍝ 1, 1+2, 1+2+3, 1+2+3+4, 1+2+3+4+5</PRE></b>
+<PRE class="output4">1 3 6 10 15
+</PRE>
+   
+   
+    <TR>
+     <TD class="tab1"><B>Rank</B><BR>
+   Z is ...
+     <TD class="tab2">
+     <TD class="tab3"> ⍤
+     <TD class="tab4"><B>Rank</B><BR>
+   Z is ...
+     <TD class="tab5">
+   
+   
+    <TR>
+     <TD class="tab1"><B>Commute</B><BR>
+   Z is B f A (the arguments A and B are exchanged)
+     <TD class="tab2">
+     <TD class="tab3"> ⍨
+     <TD class="tab4"><BO Duplicate<BR>
+   Z is B f B (the single argument B is duplicated)
+     <TD class="tab5">
+   
+    <TR>
+     <TD class="tab1"><B>Each (dyadic)</B><BR>
+   Z[i] is A[i] f  B[i] (f is called dyadically
+           for all corresponding items of A and B)
+   
+     <TD class="tab2">
+     <TD class="tab3"> f¨
+     <TD class="tab4"><B>Each (monadic)</B><BR>
+   Z[i] is f B[i] (f called monadically for every item B[i] of B)
+     <TD class="tab5">
+   </TABLE>
+   
+   
+   <H4><a name="CH_3.4.12"></a>
+   3.4.12 List of Built-In Dyadic APL Operator</H4>
+   
+   A dyadic APL operator OP2 takes 3 or 4 arguments in the following order:
+   
+   <UL>
+   <LI>a left value <B>A</B> (mandatory or optional, depending on the operator),</LI>
+   <LI>a mandatory function argument <B>f</B>, (followed by the operator itself)</LI>
+   <LI>a mandatory function argument <B>g</B>, and</LI>
+   <LI>a mandatory right value <B>B</B>.</LI>
+   </UL>
+   
+   
+   <TABLE class="table1" cellspacing="0" cellpadding="0"> <TR>
+     <TH class="tab12" colspan="2">Used with 2 Value Arguments A and B: Z←A f OP2 g B
+     <TH class="tab3"> OP2
+     <TH class="tab45" colspan="2">Used with 1 Value Argument B: Z←f OP2 g B
+   
+    <TR>
+     <TH class="tab1"> Name/Description
+     <TH class="tab2"> Example
+     <TH class="tab3"> &nbsp;
+     <TH class="tab4"> Name/Description
+     <TH class="tab5" colspan="5"> Example 
+   
+    <TR>
+     <TD class="tab1"><B>Inner Product</B><BR>
+   Z[i;j] is f / A[i] g B[j]. Row A[;j] is multiplied
+                              with column B[i;] and the resulting vector V is
+                              then f-reduced to give the scalar Z[i;j] (enclosed
+                              if necessary to yield a scalar).
+                          <BR>
+     For simple numeric matrices A and B of rank 2 this is
+                              the "matrix multiplication" known from linear algebra.
+     <TD class="tab2"><b><PRE class="input4">       ⊢A←2 2⍴1 2 3 4</PRE></b>
+<PRE class="output4">1 2
+3 4
+</PRE>
+<b><PRE class="input4">       ⊢B←2 2⍴1 2 3 4</PRE></b>
+<PRE class="output4">1 2
+3 4
+</PRE>
+<b><PRE class="input4">       ⊢A +.× B</PRE></b>
+<PRE class="output4"> 7 10
+15 22
+</PRE>
+   
+     <TD class="tab3"> f.g
+     <TD class="tab4" colspan="2"> N/A
+   
+    <TR>
+     <TD class="tab1"><B>Outer Product</B><BR>
+   Z[i;j] is A[i] g B[j]. ⍴Z ←→ (⍴A),⍴B)
+     <TD class="tab2"><b><PRE class="input4">       B ∘.× B←⍳10</PRE></b>
+<PRE class="output4"> 1  2  3  4  5  6  7  8  9  10
+ 2  4  6  8 10 12 14 16 18  20
+ 3  6  9 12 15 18 21 24 27  30
+ 4  8 12 16 20 24 28 32 36  40
+ 5 10 15 20 25 30 35 40 45  50
+ 6 12 18 24 30 36 42 48 54  60
+ 7 14 21 28 35 42 49 56 63  70
+ 8 16 24 32 40 48 56 64 72  80
+ 9 18 27 36 45 54 63 72 81  90
+10 20 30 40 50 60 70 80 90 100
+</PRE>
+   
+     <TD class="tab3"> ∘.g
+     <TD class="tab4" colspan="2"> N/A
+   
+    <TR>
+     <TD class="tab1"><B>Rank</B><BR>
+   Z is ...
+     <TD class="tab2">
+     <TD class="tab3"> ⍣
+     <TD class="tab4"><B>Rank</B><BR>
+   Z is ...
+     <TD class="tab5">
+   
+   </TABLE>
+   
+   
+   <BR>
+   <BR>
+   
+   <B>Note</B>: The outer product is considered a dyadic operator here (and also
+   in the APL standard), even though it has only one functional argument and
+   not two. If it were a monadic operator then the function argument g would
+   have to appear left of the operator symbol (.) rather than right of it.
+   In a way one can consider the outer product as the inner product with '∘'
+   being the identity function.
+   
+   <H3><a name="CH_3.5"></a>
+   3.5 Variables</H3>
+   
+   Like most computer languages, APL has variables. Unlike compiled computer
+   languages, variables need not be declared beforehand. Instead variables
+   are created by assigning a value to a name:
+   
+<b><PRE class="input_T">      VAR ← 1 2 3</PRE></b>
+<PRE class="output">
+
+</pre>
+   
+   
+   If the name is in use for something other than a variable (for instance,
+   a user-defined function), then a VALUE ERROR will be reported. After a value
+   has been assigned to a name (and a variable with that name has been created
+   as a side effect) referring to the name returns the last value assigned to 
+   the variable:
+   
+<b><PRE class="input_T">      VAR</PRE></b>
+<PRE class="output1">1 2 3
+</PRE>
+<b><PRE class="input_">      VAR ← 1 2 3 4</PRE></b>
+<PRE class="output1">
+</pre>
+<b><PRE class="input_">      VAR</PRE></b>
+<PRE class="output">1 2 3 4
+</PRE>
+   
+   
+   In the above examples a fundamental APL rule should be explained. Normally
+   a values being computed, for example a constant or the result of a function,
+   is displayed on the screen. If, however, the value is assigned to a variable,
+   then it becomes a <B>committed value</B> which is not displayed. The value is
+   not consumed by the assignment, so that it can be assigned to several variables
+   in one go:
+   
+<b><PRE class="input_T">      V1 ← V2 ← 1 2 3</PRE></b>
+<PRE class="output1">
+</pre>
+<b><PRE class="input_">      V1</PRE></b>
+<PRE class="output1">1 2 3
+</PRE>
+<b><PRE class="input_">      V2</PRE></b>
+<PRE class="output">1 2 3
+</PRE>
+   
+   
+   The lifetime of a variable is normally infinite; such variables are called
+   <B>global</B>. There exist also <B>local variables</B> whose lifetime is as
+   long as the user defined function that declares them executes (this will be
+   explained together with user defined functions).
+   
+   The lifetime of a variable can be explicitly terminated by either the
+   command <B>)ERASE</B> or the APL function <B>⎕EX</B> (expunge):
+   
+<b><PRE class="input_T">      V1</PRE></b>
+<PRE class="output1">1 2 3
+</PRE>
+<b><PRE class="input_">      )ERASE V1</PRE></b>
+<PRE class="output1">
+</pre>
+<b><PRE class="input_">      V1</PRE></b>
+<PRE class="errput1">VALUE ERROR
+      V1
+      ^
+</PRE>
+<b><PRE class="input_">      V1</PRE></b>
+<PRE class="errput1">VALUE ERROR
+      V1
+      ^
+</PRE>
+<b><PRE class="input_">      V2</PRE></b>
+<PRE class="output1">1 2 3
+</PRE>
+<b><PRE class="input_">      ⎕EX 'V2'</PRE></b>
+<PRE class="output1">1
+</PRE>
+<b><PRE class="input_">      V2</PRE></b>
+<PRE class="errput">VALUE ERROR
+      V2
+      ^
+</PRE>
+   
+   
+   The result 1 of ⎕EX indicates successful erasure of the variable. Note
+   that the argument of ⎕EX is not the variable V2 but a character vector
+   'V2' containing the name of the variable.
+   
+   <H4><a name="CH_3.5.1"></a>
+   3.5.1 The Variables ⎕ and ⍞</H4>
+   
+   There are two important system variables, ⎕ (quad) and ⍞ (quote quad),
+   that are used because of their side effects. They are probably the most
+   frequently used system variables in APL programs.
+   
+   <H5><a name="CH_3.5.1.1"></a>
+   3.5.1.1 Input and Output with ⍞</H5>
+   
+   When ⍞ is assigned a value then the value is displayed on the screen:
+<b><PRE class="input_T">      ⍞ ← 1 + 2   ⍝ compute 1 + 2 and display the result</PRE></b>
+<PRE class="output">3</PRE>
+   
+   <BR>
+   
+   <BR>
+   
+   When ⍞ is referenced, then a line of input is read from the keyboard (actually
+   from stdin which is normally the keyboard) and the characters read,
+   excluding the end of line character. The result of referencing ⍞ is always
+   a character vector (the user input is quoted by ⍞, which may explain
+   its name quote quad).
+   
+   <B><PRE class="input_T">      INPUT ← ⍞   ⍝ quote-quad input</PRE></B>
+   <B><PRE class="input_">what we type</PRE></B>
+   <PRE class="output1"></PRE>
+   <B><PRE class="input_">      INPUT</PRE></B>
+   <PRE class="output">what we type</PRE>
+   
+   A special case arises when the assignment of a value to ⍞ (but not ⍞)
+   is immediately (i.e. without another input or output operation) followed
+   by a reference of ⍞. In that case the terminating end-of-line character is
+   suppressed and the input requested on the same line:
+   
+   <B><PRE class="input_T">      ⍞←"ENTER AMOUNT: " ◊ AMOUNT ← ⍞</PRE></B>
+   <B><PRE class="input_">ENTER AMOUNT: 42</PRE></B>
+   
+   <PRE class="output1"></PRE>
+   <B><PRE class="input_">      AMOUNT</PRE></B>
+   <PRE class="output">              42</PRE>
+   
+   This special case is often used in interactive APL programs to print
+   a prompt that tells the user what shall be entered. If this is not desired,
+   then you can use ⎕ instead of ⍞ in the first assignment:
+   
+   <B><PRE class="input_T">      ⎕←"ENTER AMOUNT: " ◊ AMOUNT ← ⍞</PRE></B>
+   <B><PRE class="input_">ENTER AMOUNT: </PRE></B>      
+   <B><PRE class="input_">42</PRE></B>      
+   <PRE class="output1"></PRE>
+   <B><PRE class="input_">      AMOUNT</PRE></B>
+   <PRE class="output">42</PRE>
+   
+   
+   <H5><a name="CH_3.5.1.2"></a>
+   3.5.1.2 Input and Output with ⎕</H5>
+   
+   When a value is assigned to ⎕ then the value is displayed like for ⍞.
+   However, the terminating end of line character is always printed, so that
+   ⎕ cannot display a prompt on the same line as the user input in the way
+   described for ⍞.
+   <BR>
+   
+   <BR>
+   
+   Reference of ⎕ differs from ⍞ in two ways. Firstly, ⎕ displays its own prompt,
+   "⎕:" on a separate line. Secondly, ⎕ evaluates the input line as an APL
+   expression rather than quoting it:
+   
+   Since ⎕ does not quote the input like ⍞ does, the user needs to quote
+   the input:
+   
+   
+   
+<b><PRE class="input_T">      INPUT ← ⎕   ⍝ quad input</PRE></b>
+<PRE class="output1">
+⎕:
+</PRE>
+<PRE class="errput1">SYNTAX ERROR+
+      INPUT←⎕
+            ^
+</PRE>
+<b><PRE class="input_">      INPUT ← ⎕   ⍝ quad input</PRE></b>
+<PRE class="output1">⎕:
+</PRE>
+<b><PRE class="input_">      INPUT       ⍝ show input</PRE></b>
+<PRE class="output">what we type (correct: quoted)
+</PRE>
+   
+   
+   <H5><a name="CH_3.5.1.3"></a>
+   3.5.1.3 ⎕ Input in Application Programs</H5>
+   
+   Input by means of ⎕ can be very powerful while writing APL programs. It
+   should be avoided, however, in finished application programs.
+   The reason is that ⎕ throws an error when the user enters something that
+   is not a valid APL expression. In contrast, input by means of ⍞ never
+   throws an error and is therefore safe to use in application programs.
+   
+   <H3><a name="CH_3.6"></a>
+   3.6 Indexing</H3>
+   
+   Most programming languages provide indexing which either references or
+   updates a part of the value. Most often, however, indexing is restricted
+   to a single item. In APL, indexing is much more powerful and can even be
+   used to create bigger values than the indexed value.
+   
+   An <B>index expression</B>, or <B>index</B>, is a sequence of one or more
+   non-negative simple integer values. The sequence is enclosed in brackets
+   and the elements of the sequence are separated by semicolons (unless the
+   length of the sequence is 1):
+   
+   <B><PRE class="input_T">     [1;2 3]</PRE></B>
+   <PRE class="output"></PRE>
+   
+   The example above shows an index with 2 elements 1 and 2 3. An index can not
+   be used on its own, but is always attached to the value left of it. The value
+   left of an index is then said to be indexed by the index expression. The
+   semantics of indexing a value is that a subset of the ravel of the value
+   is being addressed. This subset is then either referenced (copied) or
+   changed (assigned) depending on whether the indexed value appears on the
+   left of an assignment arrow ← or not. We call a value that is being assigned
+   an <B>lvalue</B> (for left value).
+   
+   The index is most strongly bound to the value on its left, which causes
+   indexing of the value to be  performed as soon as the value is available.
+   If the value is an lvalue (a value subject to an assignment) then the
+   lvalue is updated with some other value; otherwise the value is referenced.
+   
+   Often the item left of the index is a variable and then it looks as if parts
+   the variable are updated or referenced:
+   
+<b><PRE class="input_T">      V←1 2 3 4   ⍝ create a variable</PRE></b>
+<PRE class="output1">
+</pre>
+<b><PRE class="input_">      V[2 3]       ⍝ indexed reference</PRE></b>
+<PRE class="output1">2 3
+</PRE>
+<b><PRE class="input_">      V[2 3]←'x'   ⍝ indexed assignment</PRE></b>
+<PRE class="output1">
+</pre>
+<b><PRE class="input_">      V             ⍝ show result of indexed assignment</PRE></b>
+<PRE class="output">1 xx 4
+</PRE>
+   
+   
+   What happens behind the scene, however, is that the variable V in the above
+   examples is resolved into a value (indexed reference) or into an lvalue
+   (indexed assignment). The value or lvalue is then being indexed.
+   
+   For indexing to be successful, the index must satisfy certain conditions:
+   
+   <UL>
+     <LI>The number of items in the index (i.e. the number of semicolons + 1)
+         must be equal to the rank of the index</LI>
+     <LI>The i<SUP>th</SUP> item in the index must be an integer between 1 and the
+          i<SUP>th</SUP> item of the shape of the value that is being indexed.</LI>
+   </UL>
+   
+   
+   As a consequence of the first condition, scalars cannot be indexed
+   (an index without semicolons would require a rank of 1 for the indexed value).
+   
+   The second condition ensures that the corresponding index items do not exceed
+   the corresponding shape items. As a C programmer or mathematician you will
+   find it more natural if the range of an index starts at 0 rather than 1.
+   In APL this can be achieved by setting the system variable ⎕IO (index origin)
+   to 0:
+   
+<b><PRE class="input_T">      ⎕IO←0</PRE></b>
+<PRE class="output1">
+</pre>
+<b><PRE class="input_">      (1 2 3 4)[2]</PRE></b>
+<PRE class="output1">3
+</PRE>
+<b><PRE class="input_">      ⎕IO←1</PRE></b>
+<PRE class="output1">
+</pre>
+<b><PRE class="input_">      (1 2 3 4)[2]</PRE></b>
+<PRE class="output">2
+</PRE>
+   
+   
+   You should not use ⎕IO←0 too extensively because most APL programmers are
+   used to the default value of 1 for ⎕IO and the readability of your code may
+   suffer.
+   
+   An indexed assignment has the side effect of changing parts of the variable,
+   but the result of it is the value that is assigned, i.e. the right side
+   of the assignment. The result is not displayed. In that respect, indexed
+   assignment behaves like non-indexed assignment.
+   
+<b><PRE class="input_T">      V←1 2 3 4</PRE></b>
+<PRE class="output1">
+</pre>
+<b><PRE class="input_">      V[3 3 3⍴2]←'X'</PRE></b>
+<PRE class="output1">
+</pre>
+<b><PRE class="input_">      V</PRE></b>
+<PRE class="output">1 X 3 4
+</PRE>
+   
+   
+   The example above does not make too much sense because the same index
+   2 is assigned 27 times. We used it to show the difference to indexed
+   reference below.
+   
+   An indexed reference of a variable or value has a result whose shape is
+   the concatenated shape of the index. This can be used to create values that
+   are bigger than the indexed value:
+   
+<b><PRE class="input_T">      (1 2 3 4)[3 3 3⍴2]</PRE></b>
+<PRE class="output">2 2 2
+2 2 2
+2 2 2
+
+2 2 2
+2 2 2
+2 2 2
+
+2 2 2
+2 2 2
+2 2 2
+</PRE>
+   
+   
+   Indexing is one of the favorite operations of APL programmers and fully
+   understanding it is key to understanding APL. Therefore we summarize the
+   rules governing indexed assignment and indexed reference:
+   
+   <UL>
+   <LI>Common Requirements on Z ← A[X<SUB>1</SUB>;...;X<SUB>N</SUB>] and
+         A[X<SUB>1</SUB>;...;X<SUB>N</SUB>] ← B</LI>
+     <UL>
+     <LI>A has rank N > 0 (and there are N-1 ≥ 0 semicolons inside the brackets).</LI>
+     <LI>Each X<SUB>i</SUB> is a non-nested integer value of arbitrary shape.</LI>
+     <LI>For every integer I in the ravel of X<SUB>i</SUB>: ⎕IO ≤ I ≤ ⎕IO + (⍴A)[i]).</LI>
+     </UL>
+   
+   
+   <LI>Indexed Assignment A[X<SUB>1</SUB>;...;X<SUB>N</SUB>] ← B</LI>
+     <UL>
+     <LI>The result of an indexed assignment is B; as a side effect some items
+           in the ravel of A are updated with items in the ravel of B.</LI>
+     <LI>The result is a committed value (and is therefore not displayed).</LI>
+     <LI>If B is a scalar then it is scalar extended according to
+         X<SUB>1</SUB>, ..., X<SUB>N</SUB>.</LI>
+     <LI>repeated values in some X<SUB>i</SUB> are valid, but the result is
+         implementation dependent (unless the corresponding items in B are
+         identical).</LI>
+     <LI>The shape of B can have trivial dimensions (dimensions of length 1). Such
+         dimensions are ignored. The length of any non-trivial dimension (⍴B)[i]
+         must match the number of elements ⍴,X<SUB>i</SUB> in the corresponding index
+         item X<SUB>i</SUB>.</LI>
+     </UL>
+   
+   
+   <LI>Indexed Reference Z ← A[X<SUB>1</SUB>;...;X<SUB>N</SUB>]</LI>
+     <UL>
+       <LI>The rank of the result, i.e. ⍴⍴Z, is the sum of the ranks of items
+           in the index list: ⍴⍴Z ↔ (⍴⍴Z<SUB>1</SUB>) + ... + (⍴⍴Z<SUB>N</SUB>)  </LI>
+       <LI>The shape of the result is the catenation of items in the index
+           list:  ⍴Z ↔ (⍴Z<SUB>1</SUB>), ..., (⍴X<SUB>N</SUB>) </LI>
+     </UL>
+   
+   </UL>
+   
+   
+   A special case of an index item is the "elided index". If no value is given
+   between two brackets or semicolons, then this means that the entire dimension
+   (and not, as you might expect, nothing) is selected by the index item:
+   
+<b><PRE class="input_T">      A←3 4 ⍴ 1 2 3 4 5 6 7 8 9 10 11 12</PRE></b>
+<PRE class="output1">
+</pre>
+<b><PRE class="input_">      A</PRE></b>
+<PRE class="output1">1  2  3  4
+5  6  7  8
+9 10 11 12
+</PRE>
+<b><PRE class="input_">      A[2;]   ⍝ elided index for last dimension, aka. a "row"</PRE></b>
+<PRE class="output1">5 6 7 8
+</PRE>
+<b><PRE class="input_">      A[;2]   ⍝ elided index for first dimension, aka. a "column"</PRE></b>
+<PRE class="output">2 6 10
+</PRE>
+   
+   
+   A final example shows the effect of multiple items in different dimensions:
+   
+<b><PRE class="input_T">      A←6 20⍴'∘'</PRE></b>
+<PRE class="output1">
+</pre>
+<b><PRE class="input_">      A</PRE></b>
+<PRE class="output1">∘∘∘∘∘∘∘∘∘∘∘∘∘∘∘∘∘∘∘∘
+∘∘∘∘∘∘∘∘∘∘∘∘∘∘∘∘∘∘∘∘
+∘∘∘∘∘∘∘∘∘∘∘∘∘∘∘∘∘∘∘∘
+∘∘∘∘∘∘∘∘∘∘∘∘∘∘∘∘∘∘∘∘
+∘∘∘∘∘∘∘∘∘∘∘∘∘∘∘∘∘∘∘∘
+∘∘∘∘∘∘∘∘∘∘∘∘∘∘∘∘∘∘∘∘
+</PRE>
+<b><PRE class="input_">      A[;2 3 9 14]←'║'   ⍝ set columns 2, 3, 9, and 14 to ║</PRE></b>
+<PRE class="output1">
+</pre>
+<b><PRE class="input_">      A</PRE></b>
+<PRE class="output1">∘║║∘∘∘∘∘║∘∘∘∘║∘∘∘∘∘∘
+∘║║∘∘∘∘∘║∘∘∘∘║∘∘∘∘∘∘
+∘║║∘∘∘∘∘║∘∘∘∘║∘∘∘∘∘∘
+∘║║∘∘∘∘∘║∘∘∘∘║∘∘∘∘∘∘
+∘║║∘∘∘∘∘║∘∘∘∘║∘∘∘∘∘∘
+∘║║∘∘∘∘∘║∘∘∘∘║∘∘∘∘∘∘
+</PRE>
+<b><PRE class="input_">      A[1 3 6;]←'═'   ⍝ set rows 1, 3, and 6</PRE></b>
+<PRE class="output1">
+</pre>
+<b><PRE class="input_">      A</PRE></b>
+<PRE class="output1">════════════════════
+∘║║∘∘∘∘∘║∘∘∘∘║∘∘∘∘∘∘
+════════════════════
+∘║║∘∘∘∘∘║∘∘∘∘║∘∘∘∘∘∘
+∘║║∘∘∘∘∘║∘∘∘∘║∘∘∘∘∘∘
+════════════════════
+</PRE>
+<b><PRE class="input_">      A[1 3 6;2 3 9 14]←'╬'   ⍝ set rows 1, 3, and 6 in columns 2, 3, 9, and 14</PRE></b>
+<PRE class="output1">
+</pre>
+<b><PRE class="input_">      A</PRE></b>
+<PRE class="output">═╬╬═════╬════╬══════
+∘║║∘∘∘∘∘║∘∘∘∘║∘∘∘∘∘∘
+═╬╬═════╬════╬══════
+∘║║∘∘∘∘∘║∘∘∘∘║∘∘∘∘∘∘
+∘║║∘∘∘∘∘║∘∘∘∘║∘∘∘∘∘∘
+═╬╬═════╬════╬══════
+</PRE>
+   
+   
+   A disadvantage of the bracket index is that while the shapes of the index items
+   can be freely chosen, the number of semicolons (and therefore the rank of A)
+   is fixed. That makes it impossible to write functions that cope with arbitrary
+   ranks of A.
+   
+   For that reason, a dyadic function X⌷A (called index) is provided where
+   X plays the role of X<SUB>1</SUB>;...;X<SUB>N</SUB> in bracket index. X is a 
+   (typically nested) vector of length N and both reference (Z←X⌷A) and
+   assignment (X⌷A)←B are possible. Unlike bracket index, scalars can be
+   indexed with the index function (X then has length 0), but elided indices
+   are not supported by the index function.
+   
+   <H3><a name="CH_3.7"></a>
+   3.7 Execution of APL Statements</H3>
+   
+   APL statements are entered in immediate execution mode and as the body lines of
+   user defined functions.
+   
+   An APL statements starts out as a sequence of characters other than the
+   statement separator ◊ (which, as the name suggests, separates different
+   statements on the same line) and the end of line character (linefeed).
+   The examples provided above were examples of APL statements.
+   
+   An example of a line with 3 statements (and no output) is this:
+   
+<b><PRE class="input_T">      A←1 ◊ B←2 ◊ C←3</PRE></b>
+<PRE class="output">
+
+</pre>
+   
+   
+   The first thing that the APL interpreter does when a statement is entered
+   is to convert the characters of the statement into an internal format
+   called tokens. The conversion of a sequence of characters into a sequence
+   of tokens, sometimes called lexical analysis, can lead to errors when
+   characters that do not have a meaning in APL, are discovered:
+   
+<b><PRE class="input_T">      ∫ f(x) dx</PRE></b>
+<PRE class="errput">Unknown APL character: ∫ (U+222B)
+Non-APL character+
+</PRE>
+   
+   
+   The rules for tokenizing the input characters are relatively simple:
+   
+   <UL>
+   <LI>APL literals are converted to a token that contains the APL value
+       represented by the literal (as discussed in previous chapters)</LI>       
+   <LI>APL names are converted to a token that contains the name
+       (as discussed in previous chapters)</LI>       
+   <LI>All other characters are converted to a token representing that character</LI>
+   </UL>
+   
+   
+   Tokenization is done because operation at the character level is relatively
+   inefficient, while the internal token format can be parsed more efficiently.
+   In compiled languages tokenization and parsing are both performed by the
+   compiler and the efficiency of the internal representation is not relevant
+   for the efficiency of the compiled program. APL is interpreted, however,
+   part of the parsing is performed at runtime and the purpose of tokenization
+   is to perform as much analysis of a statement as possible when the statement
+   is entered rather than later (and possibly repeatedly) when the statement
+   is executed.
+   
+   As an example, the statement
+   
+<b><PRE class="input_T">      VARIABLE←1 2 'Hello' (2 'world')</PRE></b>
+<PRE class="output">
+
+</pre>
+   
+   
+   is converted into 3 tokens:
+   <BR>
+   
+   <BR>
+   
+   <LABEL class="token">VARIABLE</LABEL><LABEL class="token">←</LABEL><LABEL class="token">1 2 'Hello' (2 'world')</LABEL>
+   <BR>
+   
+   <BR>
+   
+   This is possible because the somewhat complicated looking value
+   1 2 'Hello' (2 'world') consists of literals only and a single nested
+   value can be created at tokenization time. If there were functions or names
+   between the literals then the literals left or right of the functions or
+   names would have shown up in different tokens:
+   
+<b><PRE class="input_T">      VARIABLE←1 2 ⍴ 'Hello' (2 'world')</PRE></b>
+<PRE class="output">
+
+</pre>
+   
+   <BR>
+   
+   <LABEL class="token">VARIABLE</LABEL><LABEL class="token">←</LABEL><LABEL class="token">1 2</LABEL><LABEL class="token">⍴</LABEL><LABEL class="token">'Hello' (2 'world')</LABEL>
+   <BR>
+   
+   <BR>
+   
+   In immediate execution mode, the token sequence created by the tokenization
+   of the input line is immediately executed, and there seems to be no difference
+   between tokenization time and execution time. With user defined functions,
+   however, it pays off to separate lexical analysis from parsing at execution
+   time.
+   
+   The token sequence for the statement is then stored until it is executed.
+   Conceptually, the first step when a statement is executed it to group (also
+   called "bind") certain token to other token. APL has no operator precedence
+   like other languages (the large number of built-in functions and operators
+   in APL would have made that a tedious task). However the binding of token
+   plays a similar role. Unfortunately the ISO standard fails to mention the
+   rules for token binding, but we can refer to the the descriptions of
+   commercial APL vendors. According to those descriptions the binding of token
+   has the following precedences (from strongest binding to weakest binding):
+   
+   <OL>
+   <LI>bracket index to the token on its left</LI>
+   <LI>assignment arrow to the token on its left</LI>
+   <LI>dyadic operator to its right operand (the function right of it)</LI>
+   <LI>items in vector notation</LI>
+   <LI>operator to its left operand (the function left of it)</LI>
+   <LI>function to its left argument (the value left of it)</LI>
+   <LI>function to its right argument (the value right of it)</LI>
+   <LI>assignment arrow to the token on its right</LI>
+   </OL>
+   
+   
+   When we refer to, for example, a "token on its left", then this means when
+   the token becomes available. In the following example:
+   
+<b><PRE class="input_T">      (2 × 1 2 3 4)[2]</PRE></b>
+<PRE class="output">4
+</PRE>
+   
+   
+   the bracket index [2] has the strongest binding. Before that binding can
+   take place, however, the expression in parentheses, (2 × 1 2 3 4), must
+   have been evaluated (yielding 2 4 6 8). The vector 2 4 6 8 is then indexed by
+   bracket index [2] to give the final result 4.
+   <BR>
+   
+   <BR>
+   
+   You may also wonder why operators bind to their operand but not to their
+   arguments. The reason is that:
+   
+   <UL>
+   <LI>when a dyadic operator binds to its right operand, then the bound dyadic
+       operator has become a monadic operator.</LI>
+   <LI>when a monadic operator (or a bound dyadic operator) binds to its left
+       operand, then the bound monadic operator has become a function.</LI>
+   <LI>the bound monadic operator, then binds to its left and right arguments like
+       every other dyadic or monadic function.</LI>
+   </UL>
+   
+   
+   Note also that the actual number of binding strengths is smaller than the list
+   above suggest. This is because some bindings are not in conflict with each
+   other. For example, vector notation binds two or more values to each other,
+   while the next lower binding strength binds an operator to a function.
+   These two bindings could have been given the same binding strength.
+   <BR>
+   
+   <BR>
+   
+   Some bindings merely define the order in which things are evaluated while
+   others produce an intermediate result. For example, the binding of a dyadic
+   function to its left argument forces a left argument in parentheses to be
+   evaluated first and then the result to be passed to the dyadic function.
+   On the other hand, the binding of a bracket index to the value or lvalue
+   on its left forces immediate computation of the bracket index as described
+   above.
+   <BR>
+   
+   <BR>
+   
+   After binding the token, the evaluation of APL statements is performed 
+   according to the "golden rule" of APL:
+   <BR>
+   
+   <BR>
+   
+   <B>The rightmost function whose argument(s) are available is evaluated
+       first.
+       <BR>
+   
+       The function and its argument(s) are then replaced by the result
+       returned by the function, which causes the arguments of other functions
+       to become available.
+   </B>
+   <BR>
+   
+   <BR>
+   
+   In short this means that APL statements are evaluated from right to left.
+   Another consequence is that parentheses around the right argument of a
+   function have no effect, while parentheses around the left argument make
+   a difference:
+   
+<b><PRE class="input_T">      (1 + 2) × (3 + 4)   ⍝ 3 × 7</PRE></b>
+<PRE class="output1">21
+</PRE>
+<b><PRE class="input_">      (1 + 2) × 3 + 4     ⍝ 3 × 7</PRE></b>
+<PRE class="output1">21
+</PRE>
+<b><PRE class="input_">      1 + 2 × (3 + 4)     ⍝ 1 + (2 × 7)</PRE></b>
+<PRE class="output1">15
+</PRE>
+<b><PRE class="input_">      1 + 2 × 3 + 4       ⍝ 1 + (2 × 7)</PRE></b>
+<PRE class="output">15
+</PRE>
+   
+   
+   
+   <H3><a name="CH_3.8"></a>
+   3.8 User-defined Functions</H3>
+   
+   Programming in APL is primarily concerned with the creation and test of
+   user defined functions. The immediate execution mode used so far is helpful
+   to try things out, but not for larger applications.
+   <BR>
+   
+   <BR>
+   
+   For the sake of explanation we define a user defined function to be a
+   non-empty sequence of <B>function lines</B> numbered 0, 1, .... The first
+   line is called function header and determines the following properties of
+   the function:
+   
+   <UL>
+   <LI>if the function returns a value or not</LI>
+   <LI>the valence (number of value arguments): niladic, monadic, or dyadic</LI>
+   <LI>the name of the function or operator</LI>
+   <LI>the number of function arguments: none (normal function),
+       1 (monadic operator), or 2 (dyadic operator)</LI>
+   <LI>the optional axis of the function or monadic operator</LI>
+   <LI>the names of local variables of the function</LI>
+   </UL>
+    
+   
+   <H4><a name="CH_3.8.1"></a>
+   3.8.1 Function Header</H4>
+   
+   The header line of a user defined function consists of several APL names
+   interleaved with some of the characters ←, (, ), [, ], and ;.
+   The names can are freely chosen by the user; we will use the names
+   Z, A, LO, F, X, B, RO, C, and D in our examples with the following meaning:
+   
+   <UL>
+   <LI>Z: the name of the result</LI>
+   <LI>A: the left value argument</LI>
+   <LI>LO: the left function argument of an operator</LI>
+   <LI>RO: the right function argument of a dyadic operator</LI>
+   <LI>F: the name of the function</LI>
+   <LI>X: the axis argument</LI>
+   <LI>B: the right value argument</LI>
+   <LI>C: the first local variable</LI>
+   <LI>D: the second local variable...</LI>
+   </UL>
+    
+   
+   The syntax of the function header is then:
+   <BR>
+   
+   <BR>
+   function-header ::= result-spec function-and-args local-variables
+   <BR>
+   result-spec ::= empty | Z ←
+   <BR>
+   function-and-args ::= function-spec | function-spec B | A function-spec B
+   <BR>
+   function-spec ::= function | ( LO function ) | ( LO function RO )
+   <BR>
+   function ::= F | F [ X ]
+   <BR>
+   local-variables ::= empty | ; C local-variables
+   <BR>
+   
+   <BR>
+   
+   Additional requirements are that all names in the header must be different and
+   that no name (with the exception of names for local variable names) must be
+   user defined names. The names of a local variable may be the name of system
+   variables, but must not be the name of a system function or primitive.
+   <BR>
+   
+   The possible combinations in the syntax above produces 2×3×3×2 = 36
+   different header variants. Of these 36 variants the following 7 combinations
+   are not allowed:
+   
+   <UL>
+   <LI>niladic function with axis</LI>
+   <LI>monadic operator operator with no value argument</LI>
+   <LI>monadic operator operator with axis and no value argument</LI>
+   <LI>dyadic operator operator with no value argument</LI>
+   <LI>dyadic operator operator with axis and no value argument</LI>
+   <LI>dyadic operator operator with axis and one value argument</LI>
+   <LI>dyadic operator operator with axis and two value arguments</LI>
+   </UL>
+   
+   
+   The following sections describe the different fields of the function header.
+   Before that we briefly describe one way to create and display user defined
+   functions.
+   
+   <H5><a name="CH_3.8.1.1"></a>
+   3.8.1.1 Creating and displaying user defined functions: ⎕FX and ⎕CR</H5>
+   
+   The monadic system function ⎕FX creates a new function. The single argument of
+   ⎕FX is either a character matrix (and the first row of that matrix is the
+   function header) or a nested vector of character vectors (and the first
+   character vector is then the header of the function. The remaining rows of
+   the matrix or the remaining character vectors are the body lines of the
+   function being created. On success ⎕FX returns the name of the function
+   that it has created.
+   
+   Monadic ⎕CR displays the header and body lines of a function. The single
+   argument of ⎕CR is the name of the function to be displayed. ⎕CR returns
+   a matrix with the function header and the function body.
+   
+<b><PRE class="input_T">      ⎕FX 'FOO' '1 + 2'</PRE></b>
+<PRE class="output1">FOO
+</PRE>
+<b><PRE class="input_">      ⎕CR 'FOO'</PRE></b>
+<PRE class="output">FOO  
+1 + 2
+</PRE>
+   
+   
+   <H5><a name="CH_3.8.1.2"></a>
+   3.8.1.2 Result Specification</H5>
+   
+   The example above has created a function FOO that had no result specification.
+   Such functions can be executed, but they do not return a result and attempts
+   to use their return fails:
+   
+<b><PRE class="input_T">      ⎕FX 'FOO' '1 + 2'   ⍝ create FOO without result</PRE></b>
+<PRE class="output1">FOO
+</PRE>
+<b><PRE class="input_">      FOO                 ⍝ call FOO</PRE></b>
+<PRE class="output1">3
+</PRE>
+<b><PRE class="input_">      VAR←FOO             ⍝ try to use FOO's result</PRE></b>
+<PRE class="output1">3
+</PRE>
+<PRE class="errput">VALUE ERROR
+      VAR←FOO
+      ^
+</PRE>
+   
+   
+   The reason why some value (3) was displayed is not because FOO has returned
+   the result 3, but because the statement '1 + 2' was not assigned to a variable
+   and therefore printed.
+   
+   For a function to return a result, two conditions must be met:
+   
+   <OL>
+   <LI>the header must contain a result specification, and</LI>
+   <LI>the variable named in the result specification must be assigned during
+       the execution of the function</LI>
+   </OL>
+   
+   
+   The specification is a user defined name followed by the assignment arrow ←:
+   
+<b><PRE class="input_T">      ⎕CR ⎕FX 'Z←FOO' 'Z←1 + 2'   ⍝ define FOO returning result Z</PRE></b>
+<PRE class="errput1">DOMAIN ERROR+
+      ⎕CR ⎕FX 'Z←FOO' 'Z←1 + 2'
+      ^   ^
+</PRE>
+<b><PRE class="input_">      FOO                         ⍝ call FOO</PRE></b>
+<PRE class="output1">3
+</PRE>
+<b><PRE class="input_">      VAR←FOO                     ⍝ try to use FOO's result</PRE></b>
+<PRE class="output1">3
+</PRE>
+<PRE class="errput1">VALUE ERROR
+      VAR←FOO
+      ^
+</PRE>
+<b><PRE class="input_">      VAR   ⍝ show result</PRE></b>
+<PRE class="output">1 2 3 4
+</PRE>
+   
+   
+   The output of simply calling FOO is the same as before. However, the value
+   3 is now the result of FOO and not the result of the statement Z←1 + 2 inside
+   FOO. This is because the assignment Z←1 + 2 is now a committed value which
+   is not printed.
+   
+   If the function header has a result specification, but the result variable is
+   not assigned, then 
+   
+<b><PRE class="input_T">      ⎕CR ⎕FX 'Z←FOO' '1 + 2'   ⍝ define FOO returning Z without assigning Z</PRE></b>
+<PRE class="errput1">DOMAIN ERROR+
+      ⎕CR ⎕FX 'Z←FOO' '1 + 2'
+      ^   ^
+</PRE>
+<b><PRE class="input_">      FOO  ⍝ call FOO</PRE></b>
+<PRE class="output">3
+</PRE>
+   
+   
+<b><PRE class="input_T">      VAR←FOO  ⍝ try to use FOO's result</PRE></b>
+<PRE class="output1">3
+</PRE>
+<PRE class="errput">VALUE ERROR
+      VAR←FOO
+      ^
+</PRE>
+   
+   
+   <H5><a name="CH_3.8.1.3"></a>
+   3.8.1.3 Local Variables</H5>
+   
+   The function header can optionally contain a list of local variables. Every
+   local variable is appended with a semicolon in front of it. For example:
+   
+   <B><PRE class="input_T">A FOO B;C;D</PRE></B>
+   <PRE class="output"></PRE>
+   is the header of a dyadic function (with arguments A and B) and local
+   variables C and D.
+   
+   At this point we should reveal that every user defined name, and also the
+   APL system variables have an associated stack, The stack is created when
+   the name is first mentioned (or from the outset if the name refers to an
+   APL system variable).
+   
+   When a user defined function is called, then the stack of the following
+   names is pushed:
+   
+   <UL>
+   <LI>the function result</LI>
+   <LI>the function arguments</LI>
+   <LI>the local variables, and</LI>
+   <LI>labels (see below)</LI>
+   </UL>
+   
+   
+   After pushing a name, the name refers to nothing, which is usually changed
+   shortly after pushing it. The previous values of the name are now
+   inaccessible. Only the item on the top of a name's stack can be accessed.
+   
+   The name on the top of the stack remains accessible until either another
+   (or the same) function with the same name in its local variables is called,
+   or else until the functions returns. If the function returns then the stacks
+   of all its local variable names are poped and the previous top of the stack
+   becomes accessible again.
+   
+   <H5><a name="CH_3.8.1.4"></a>
+   3.8.1.4 The Del Editor</H5>
+   
+   ⎕FX is not the only way to create user defined functions. ⎕FX is good if
+   the function created is small and is often the only way to create new
+   functions programmatically. An alternative present in many APL interpreters
+   is the interactive 'Del' editor. The Del editor is started by entering
+   the APL character Nabla (∇) and the full header of the new function. The Del
+   editor has simple commands for displaying, inserting, editing, and deleting
+   function lines.
+   
+   The Del editor has a prompt which is the next line to be added or changed;
+   This line is displayed in square bracket. If the user wants to change a
+   different line than the line proposed by the Del editor then the desired
+   is entered (again in square brackets). The following is an overview of
+   Del editor commands:
+   <BR>
+   
+   <BR>
+   
+   <TABLE cellspacing="0" cellpadding="0">
+     <TR>  <TH>Command <TH>Effect
+     <TR>  <TD class="tab">[N]     <TD class="tab">Continue editing with line N
+     <TR>  <TD class="tab">[⎕]     <TD class="tab">display all function lines
+     <TR>  <TD class="tab">[⎕N]    <TD class="tab">display function lines up to to N
+     <TR>  <TD class="tab">[N⎕]    <TD class="tab">display function lines starting at line N
+     <TR>  <TD class="tab">[N⎕M]   <TD class="tab">display function lines from line N to line M
+     <TR>  <TD class="tab">[∆N]    <TD class="tab">delete function lines N
+     <TR>  <TD class="tab">[N∆M]   <TD class="tab">delete function lines from line N to line M
+     <TR>  <TD class="tab">[→]     <TD class="tab">discard changes
+     <TR>  <TD class="tab">∇       <TD class="tab">close the Del editor
+   </TABLE>
+   
+   <BR>
+   
+   <BR>
+   
+   The line numbers N and M are including. Entering a non-existing fractional
+   number, like in [3.5] creates a new line between the closest existing lines
+   (between lines 3 and 4 of there are no other fractional line numbers between
+   2 and 4). When the Del editor is closed then all lines will be renumbered,
+   starting with header line 0.
+   <BR>
+   
+   Normally you will use your own editor like Vim or emacs to edit APL functions
+   and then cut-and-paste them into the window in which APL runs, or start APL
+   with a text file containing function definitions. The commands of the
+   Del editor are then irrelevant, but you still use ∇ to create new functions.
+   <BR>
+   
+   For example, say you have a normal (but UTF8 encoded) text file containing
+   the following:
+   <B><PRE class="input_T">
+∇ Z←FOO
+  1 + 2
+∇</PRE></B>
+   <PRE class="output"></PRE>
+   <BR>
+   
+   That defines the same function as;
+   <B><PRE class="input_T"> ⎕FX 'Z←FOO' '1 + 2'
+   </PRE></B>
+   <PRE class="output"></PRE>
+   <BR>
+   
+   but is more readable, in particular when functions become longer. We will
+   use this format for displaying functions. The above format is also suitable
+   for displaying APL code snippets in emails or on web pages. The reader can
+   simply cut-and-paste then into his interpreter (provided of course, that
+   the interpreter uses UTF8 encoded Unicode and not special APL fonts).
+   
+   <H5><a name="CH_3.8.1.5"></a>
+   3.8.1.5 Function Body</H5>
+   
+   The remaining lines of a function are called the <B>function body</B>.
+   The function body consists of 0 or more <B>function lines</B>. Every
+   function line consists of 0 or more APL statements like those already
+   discussed above.
+   
+   A function line can have an optional <B>label</B>. A label is another kind
+   of local variables that is automatically created, cannot be changed, and
+   has an integer value that is equal to the number of the line on which it
+   was written. For example:
+   
+   <B><PRE class="input_T"> ∇A FOO1 B;C;D
+L1: 'line 1'
+L2: 'line 2'
+ X←L2
+ ∇</PRE></B>
+   <PRE class="output"></PRE>
+   
+   The hypothetical function FOO1 above has two arguments A and B, explicit
+   local variables C and D, and labels L1 and L2. The syntax for a label is a
+   name followed by a colon. The variable X would get the values 2 because
+   label L2 is on line 2. labels are read-only; attempting to change their
+   value yields a SYNTAX ERROR. Labels will be discussed together with branching
+   in functions below.
+   
+   <H4><a name="CH_3.8.2"></a>
+   3.8.2 How Functions and Operators are Evaluated</H4>
+   
+   The execution (or evaluation) of a function starts when the function name
+   is detected in a statement and all its arguments (as defined by the header
+   of the function) are present. Lets assume we define FOO like this:
+   
+<b><PRE class="input_T">      )ERASE FOO</PRE></b>
+<PRE class="output1">
+</pre>
+<b><PRE class="input_B">∇Z←A FOO B;C;D
+L1: 'line 1'
+L2: 'line 2'
+ X←L2
+ Z←42
+ ∇</PRE></b>
+   
+   Then we enter the following in immediate execution mode:
+   
+<b><PRE class="input_T">      (3 + 4) FOO 5</PRE></b>
+<PRE class="output1">3
+</PRE>
+<PRE class="errput">VALUE ERROR
+      (3+4)FOO 5
+      ^
+</PRE>
+   
+   
+   The APL interpreter will see FOO, but it will notice that the left argument
+   of FOO, i.e. (3 + 4,) is not yet available because the result of (3 + 4) has
+   not yet being computed. The interpreter will therefore compute (3 + 4) first
+   and replace it by 7. We have now:
+   
+   <B><PRE class="input_T"> 7 FOO 5</PRE></B>
+   <PRE class="output"></PRE>
+   
+   The interpreter can now evaluate 7 FOO 5 (or some other function in the
+   general case) as follows:
+   
+   <OL>
+     <LI>first the stacks of all names are pushed. In our example, the names
+         being pushed are Z, A, B, C, D, L1, and L2 (but not FOO!)</LI>
+     <LI>next the actual arguments of the function (7 and 5) are assigned to
+         the formal parameters (A and B) of the function. That is, A←7 and B←5.</LI>
+     <LI>the labels are assigned, i.e. L1←1 and L2←2.</LI>
+     <LI>(at this point, the function result Z and the local variables C and D
+         are undefined, while the function arguments A and B and the labels
+         have values)</LI>
+     <LI>the statements in the function body are executed, starting with the
+         first statement in the first line.</LI>
+     <LI>the function result Z, which may or may not be defined is stored in
+         a temporary location.</LI>
+     <LI>all stacks of all names that were pushed above are poped. They now have
+         the value they had when FOO was called.</LI>
+     <LI>the function and its arguments are replaced by the function result in
+         the temporary location.</LI>
+   </OL>
+   
+   
+   In our example, the following output is produced:
+   
+<b><PRE class="input_T">      (3 + 4) FOO 5</PRE></b>
+<PRE class="output1">3
+</PRE>
+<PRE class="errput">VALUE ERROR
+      (3+4)FOO 5
+      ^
+</PRE>
+   
+   
+   The first two output lines ("line 1" and "line 2") are output from lines
+   1 and 2 of FOO, while the last line is the return value from FOO which
+   is displayed <B>after</B> FOO has returned.
+   
+   <H4><a name="CH_3.8.3"></a>
+   3.8.3 Branching</H4>
+   
+   The examples of user defined functions given so far were "linear" by which
+   we mean that the statements in the body of the function were executed one
+   after the other until the end of the function was reached.
+   <BR>
+   
+   In addition to that, APL provides a means to change the order of the
+   normal program flow from the beginning of a function to its end: a
+   computed branch.
+   <BR>
+   
+   <BR>
+   
+   APL has been criticized for having only one way of changing the order of
+   the program flow instead of many (like if/else, for, while, and case in C/C++).
+   However the computed branch in APL is so powerful that it can easily emulate
+   the multiple flow control statements in other languages. And the fact that APL
+   works on larger data structures than scalars makes the low-level loops found
+   in other languages obsolete.
+   <BR>
+   
+   <BR>
+   
+   A <B>computed branch</B> is a statement that consists of a branch arrow (→) and
+   a numeric APL value. A slightly different statement, called <B>Escape</B>
+   consists of the same branch arrow, but without the value. For example:
+   
+   <UL>
+     <LI>→L   ⍝ computed branch (to label L)</LI>
+     <LI>→    ⍝ escape</LI>
+   </UL>
+   
+   <H5><a name="CH_3.8.3.1"></a>
+   3.8.3.1 Labels</H5>
+   
+   The numeric argument of a computed branch is a line number. So →1 is a
+   branch to line 1 of some user defined function. However, absolute line
+   numbers should never be used for branching. The reason is that APL renumbers
+   the lines of a user defined function when new lines are added between
+   existing lines. The line numbers in branches are not renumbered when
+   renumbering lines and as a consequence the absolute line numbers in branches
+   become invalid. This problem can easily be solved by using labels.
+   <BR>
+   
+   A label is an APL name followed by : (colon) at the beginning of a line.
+   The label is an automatically created local variable whose value is
+   the line number on which it was written and the variable is read-only
+   (i.e. one cannot assign a new value to it). Unlike absolute line numbers,
+   labels move with their line when other lines are inserted before them and
+   as a consequence renumbering lines does not harm labels.
+   <BR>
+   
+   Example:
+   
+   <B><PRE class="input_T"></PRE></B>
+   <PRE class="output">∇FOO
+    'line 1' ◊ →3    ⍝ Bad: absolute branch to line 3
+    'line 2' ◊ →L3   ⍝ Good: branch to line 3 with label L3
+L3: 'line 3' ◊ 
+∇</PRE>
+   
+   If another line is inserted before the first line, then FOO becomes:
+   
+   <B><PRE class="input_T"></PRE></B>
+   <PRE class="output">∇FOO
+    'new line before line 1' 
+    'line 1' ◊ →3    ⍝ Bad: absolute branch to line 3
+    'line 2' ◊ →L3   ⍝ Good: branch to line 3 with label L3
+L3: 'line 3' ◊ 
+∇</PRE>
+   
+   The previous line 3 with label L3 is now line 4. The branch to the absolute
+   line number 3, i.e. →3, now branches to the line before the line with label
+   L3 (which is most likely wrong now), while the branch to label L3 remains
+   correct.
+   
+   <H5><a name="CH_3.8.3.2"></a>
+   3.8.3.2 Computed Branch (inside a function)</H5>
+   
+   Inside a function a computed branch →EXPR where EXPR is some APL expression
+   is executed as follows.
+   
+   <UL>
+     <LI>first the expression EXPR is evaluated. If the evaluation of EXPR fails
+         then this is an error and execution of the function stops as described
+         later on.
+     </LI>
+         
+     <LI>Let X be the result of evaluating EXPR. Then:
+       <UL>
+         <LI>if X is empty, then execution continues with the next statement after
+             the branch. This is can be used to emulate if statement in C++</LI>
+         <LI>if X is not empty, then it is expected to be a vector whose first
+             element is an integer L.</LI>
+           <UL>
+              <LI>if L is a valid line number, (a number between 1 and
+                   the number of lines in the function (including)) then
+                  then a branch to that line is performed. That is, execution
+                  continues at the first statement on the new line.</LI>
+              <LI>Otherwise, i.e. L is ≤ 0 or larger than the number of lines
+                  in the function, then execution of the function is ended.</LI>
+           </UL>
+   
+       </UL>
+   
+     </LI>
+   </UL>
+   
+   
+   In the following we explain some examples of frequently used branch patterns
+   and their "equivalents" in C/C++
+   
+   <B><PRE class="input_T"></PRE></B>
+   <PRE class="output">                 ⍝ meaning                C/C++
+
+ →0              ⍝ leave the function     return;
+ →(COND)⍴0       ⍝ dito if COND           if (COND) return;
+ →(COND)↓0       ⍝ dito if not COND       if (!COND) return;
+
+ →LAB            ⍝ goto line LAB          goto LAB;
+ →(COND)⍴LAB     ⍝ dito if COND           if (COND)   goto LAB;
+ →(COND)↓LAB     ⍝ dito if not COND       if (!COND)  goto LAB;
+
+ →⎕LC            ⍝ repeat current line
+ →(COND)⍴⎕LC     ⍝ dito if COND           do { current line } while (COND)
+
+ →⎕LC+1          ⍝ goto next line
+ →(COND)⍴⎕LC+1   ⍝ dito if COND           if (COND)     { rest-of-line }
+
+ →⎕LC-1          ⍝ goto previous line
+ →(COND)⍴⎕LC-1   ⍝ dito if COND
+
+ →(X=V1,V2 ...)/L1, L2, ...)   ⍝          switch(X) { case V1: goto L1; ... }
+   </PRE>
+   
+   In the examples above COND is usually a Boolean expression such as A ≤ B.
+   <BR>
+   
+   <BR>
+   
+   Since all APL comparison operators have negated forms (=/≠, ≤/&gt; &lt; etc.)
+   the (COND)↓ patterns above are far less frequent then the (COND)⍴ patterns.
+   Not also that the (COND)↓ only works for single line numbers (like 0 or LAB
+   above) but NOT for possibly longer vectors like ⎕LC.
+   <BR>
+   
+   <BR>
+   
+   The (COND)⍴ pattern also works for non-Boolean integer expressions (like
+   if (COND) with nob-integer COND in C/C++). The should not be used,
+   however, if the integer COND is large because then the computation of
+   ⍴ takes a long time and all but the first element of COND is discarded.
+   To avoid that, use 0≠COND instead of COND if COND may be a large integer.
+   
+   <H5><a name="CH_3.8.3.3"></a>
+   3.8.3.3 Computed Branch (outside a function)</H5>
+   
+   If a computed branch statement is executed outside a function (for example
+   after an error in a function interrupts the execution of the function and
+   returns to immediate execution mode) then the branch is executed as if it
+   were executed inside the interrupted function. An error is thrown if no
+   interrupted function exists.
+   <BR>
+   
+   <BR>
+   
+   This can be used to jump back (i.e. continue) the execution of a function
+   that was interrupted (typically after removing the cause of the error).
+   
+   <H5><a name="CH_3.8.3.4"></a>
+   3.8.3.4 Escape (Unwind)</H5>
+   
+   
+   <H2><a name="CH_4"></a>
+   4 Commands</H2>
+   
+   Every APL interpreter provides a number of commands that can be entered in
+   immediate execution mode. The ISO standard defines a number of standard
+   commands, and every interpreter adds its own commands for various purposes.
+   
+   Commands do not follow the syntax of the APL language, but are more similar to
+   the input of a shell (a command followed by mandatory or optional arguments).
+   A command starts with the character ) (or ] for some interpreters) followed by
+   a name.
+   
+   <H3><a name="CH_4.1"></a>
+   4.1 Standard Commands</H3>
+   
+   <H4><a name="CH_4.1.1"></a>
+   4.1.1 )CLEAR</H4>
+   
+   <H4><a name="CH_4.1.2"></a>
+   4.1.2 )COPY</H4>
+   
+   <H4><a name="CH_4.1.3"></a>
+   4.1.3 )DROP</H4>
+   
+   <H4><a name="CH_4.1.4"></a>
+   4.1.4 )ERASE</H4>
+   
+   <H4><a name="CH_4.1.5"></a>
+   4.1.5 )FNS</H4>
+   
+   <H4><a name="CH_4.1.6"></a>
+   4.1.6 )LIB</H4>
+   
+   <H4><a name="CH_4.1.7"></a>
+   4.1.7 )LOAD</H4>
+   
+   <H4><a name="CH_4.1.8"></a>
+   4.1.8 )NMS</H4>
+   
+   <H4><a name="CH_4.1.9"></a>
+   4.1.9 )OPS</H4>
+   
+   <H4><a name="CH_4.1.10"></a>
+   4.1.10 )SAVE</H4>
+   
+   <H4><a name="CH_4.1.11"></a>
+   4.1.11 )SI</H4>
+   
+   <H4><a name="CH_4.1.12"></a>
+   4.1.12 )SIC</H4>
+   
+   <H4><a name="CH_4.1.13"></a>
+   4.1.13 )SINL</H4>
+   
+   <H4><a name="CH_4.1.14"></a>
+   4.1.14 )VARS</H4>
+   
+   <H4><a name="CH_4.1.15"></a>
+   4.1.15 )WSID</H4>
+   
+   <H3><a name="CH_4.2"></a>
+   4.2 IBM APL2 Commands</H3>
+   
+   GNU APL also understands most of the IBM APL2 commands.
+   
+   <H4><a name="CH_4.2.1"></a>
+   4.2.1 )CHECK</H4>
+   
+   <H4><a name="CH_4.2.2"></a>
+   4.2.2 )CONTINUE</H4>
+   
+   <H4><a name="CH_4.2.3"></a>
+   4.2.3 )HELP</H4>
+   
+   <H4><a name="CH_4.2.4"></a>
+   4.2.4 )HOST</H4>
+   
+   <H4><a name="CH_4.2.5"></a>
+   4.2.5 )IN</H4>
+   
+   <H4><a name="CH_4.2.6"></a>
+   4.2.6 )MORE</H4>
+   
+   <H4><a name="CH_4.2.7"></a>
+   4.2.7 )OUT</H4>
+   
+   <H4><a name="CH_4.2.8"></a>
+   4.2.8 )OFF</H4>
+   
+   <H4><a name="CH_4.2.9"></a>
+   4.2.9 )PCOPY</H4>
+   
+   <H4><a name="CH_4.2.10"></a>
+   4.2.10 )PIN</H4>
+   
+   <H4><a name="CH_4.2.11"></a>
+   4.2.11 )RESET</H4>
+   
+   <H4><a name="CH_4.2.12"></a>
+   4.2.12 )SIS</H4>
+   
+   <H4><a name="CH_4.2.13"></a>
+   4.2.13 )SYMBOLS</H4>
+   
+   <H3><a name="CH_4.3"></a>
+   4.3 Additional GNU APL Commands</H3>
+   
+   In addition to the commands from the ISO standard and from IBM APL2, GNU
+   has added more commands. These commands are divided into 2 groups: normal
+   commands (that start with the character ")"), and debug commands (that
+   start with the character "]").
+   
+   <H4><a name="CH_4.3.1"></a>
+   4.3.1 )DUMP</H4>
+   
+   <H4><a name="CH_4.3.2"></a>
+   4.3.2 )DUMP-HTML</H4>
+   
+   <H4><a name="CH_4.3.3"></a>
+   4.3.3 ]HIST [CLEAR]</H4>
+   
+   <H4><a name="CH_4.3.4"></a>
+   4.3.4 )LIBS</H4>
+   
+   <H4><a name="CH_4.3.5"></a>
+   4.3.5 )QLOAD</H4>
+   
+   <H4><a name="CH_4.3.6"></a>
+   4.3.6 )VALUES</H4>
+   
+   <H4><a name="CH_4.3.7"></a>
+   4.3.7 ]BOXING</H4>
+   
+   <H4><a name="CH_4.3.8"></a>
+   4.3.8 ]COLOR [ON|OFF]</H4>
+   
+   <H4><a name="CH_4.3.9"></a>
+   4.3.9 ]DOXY [path]</H4>
+   
+   <H4><a name="CH_4.3.10"></a>
+   4.3.10 ]EXPECT error_count</H4>
+   
+   <H4><a name="CH_4.3.11"></a>
+   4.3.11 ]KEYB</H4>
+   
+   <H4><a name="CH_4.3.12"></a>
+   4.3.12 ]LOG [facility [ON|OFF]]</H4>
+   
+   <H4><a name="CH_4.3.13"></a>
+   4.3.13 ]NEXTFILE</H4>
+   
+   <H4><a name="CH_4.3.14"></a>
+   4.3.14 ]OWNERS</H4>
+   
+   <H4><a name="CH_4.3.15"></a>
+   4.3.15 ]SVARS</H4>
+   
+   <H4><a name="CH_4.3.16"></a>
+   4.3.16 ]SYMBOL</H4>
+   
+   <H4><a name="CH_4.3.17"></a>
+   4.3.17 ]USERCMD</H4>
+   
+   <H4><a name="CH_4.3.18"></a>
+   4.3.18 ]XTERM [ON|OFF]</H4>
+   
+  </BODY>
+</HTML>

@@ -1,0 +1,312 @@
+<TR class="toc_H2"><TD class="toc_c1"> 1<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_1"> Document Conventions </a>
+
+<TR class="toc_H2"><TD class="toc_c1"> 2<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_2"> Starting and stopping the APL interpreter </a>
+
+<TR class="toc_H2"><TD class="toc_c1"> 3<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3"> APL Statements </a>
+
+<TR class="toc_H3"><TD class="toc_c1"> 3.1<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.1"> Constants (Literals) </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.1.1<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.1.1"> Scalar Constants </a>
+
+<TR class="toc_H5"><TD class="toc_c1"> 3.1.1.1<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.1.1.1"> Scalar Text Constants </a>
+
+<TR class="toc_H5"><TD class="toc_c1"> 3.1.1.2<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.1.1.2"> Numeric Scalar Constants </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.1.2<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.1.2"> Vector Constants </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.1.3<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.1.3"> Mixed Constants </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.1.4<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.1.4"> Nested Constants </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.1.5<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.1.5"> Summary and Remarks </a>
+
+<TR class="toc_H3"><TD class="toc_c1"> 3.2<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.2"> APL Names </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.2.1<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.2.1"> User-defined Names </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.2.2<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.2.2"> Names of System Functions and System Variables </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.2.3<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.2.3"> Names of Primitive APL Functions </a>
+
+<TR class="toc_H3"><TD class="toc_c1"> 3.3<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.3"> Functions and Operators </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.3.1<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.3.1"> Niladic Functions </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.3.2<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.3.2"> Monadic Functions </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.3.3<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.3.3"> Dyadic Functions </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.3.4<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.3.4"> Monadic Operators </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.3.5<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.3.5"> Dyadic Operators </a>
+
+<TR class="toc_H3"><TD class="toc_c1"> 3.4<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.4"> General APL Values </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.4.1<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.4.1"> Reshape and Shape: ⍴ </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.4.2<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.4.2"> Catenate and Ravel: , and ⍪ </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.4.3<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.4.3"> Universal Character Set (monadic ⎕UCS) </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.4.4<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.4.4"> Construction of arbitrary simple values </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.4.5<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.4.5"> Construction of arbitrary nested values </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.4.6<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.4.6"> Displaying the structure of values </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.4.7<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.4.7"> Vector Notation versus Catenation </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.4.8<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.4.8"> Scalar Extension </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.4.9<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.4.9"> List of Built-in Scalar Functions </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.4.10<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.4.10"> List of Other Built-in Functions </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.4.11<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.4.11"> List of Built-in Monadic APL Operator </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.4.12<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.4.12"> List of Built-In Dyadic APL Operator </a>
+
+<TR class="toc_H3"><TD class="toc_c1"> 3.5<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.5"> Variables </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.5.1<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.5.1"> The Variables ⎕ and ⍞ </a>
+
+<TR class="toc_H5"><TD class="toc_c1"> 3.5.1.1<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.5.1.1"> Input and Output with ⍞ </a>
+
+<TR class="toc_H5"><TD class="toc_c1"> 3.5.1.2<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.5.1.2"> Input and Output with ⎕ </a>
+
+<TR class="toc_H5"><TD class="toc_c1"> 3.5.1.3<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.5.1.3"> ⎕ Input in Application Programs </a>
+
+<TR class="toc_H3"><TD class="toc_c1"> 3.6<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.6"> Indexing </a>
+
+<TR class="toc_H3"><TD class="toc_c1"> 3.7<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.7"> Execution of APL Statements </a>
+
+<TR class="toc_H3"><TD class="toc_c1"> 3.8<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.8"> User-defined Functions </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.8.1<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.8.1"> Function Header </a>
+
+<TR class="toc_H5"><TD class="toc_c1"> 3.8.1.1<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.8.1.1"> Creating and displaying user defined functions: ⎕FX and ⎕CR </a>
+
+<TR class="toc_H5"><TD class="toc_c1"> 3.8.1.2<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.8.1.2"> Result Specification </a>
+
+<TR class="toc_H5"><TD class="toc_c1"> 3.8.1.3<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.8.1.3"> Local Variables </a>
+
+<TR class="toc_H5"><TD class="toc_c1"> 3.8.1.4<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.8.1.4"> The Del Editor </a>
+
+<TR class="toc_H5"><TD class="toc_c1"> 3.8.1.5<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.8.1.5"> Function Body </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.8.2<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.8.2"> How Functions and Operators are Evaluated </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 3.8.3<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.8.3"> Branching </a>
+
+<TR class="toc_H5"><TD class="toc_c1"> 3.8.3.1<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.8.3.1"> Labels </a>
+
+<TR class="toc_H5"><TD class="toc_c1"> 3.8.3.2<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.8.3.2"> Computed Branch (inside a function) </a>
+
+<TR class="toc_H5"><TD class="toc_c1"> 3.8.3.3<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.8.3.3"> Computed Branch (outside a function) </a>
+
+<TR class="toc_H5"><TD class="toc_c1"> 3.8.3.4<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_3.8.3.4"> Escape (Unwind) </a>
+
+<TR class="toc_H2"><TD class="toc_c1"> 4<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4"> Commands </a>
+
+<TR class="toc_H3"><TD class="toc_c1"> 4.1<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.1"> Standard Commands </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.1.1<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.1.1"> )CLEAR </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.1.2<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.1.2"> )COPY </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.1.3<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.1.3"> )DROP </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.1.4<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.1.4"> )ERASE </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.1.5<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.1.5"> )FNS </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.1.6<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.1.6"> )LIB </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.1.7<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.1.7"> )LOAD </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.1.8<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.1.8"> )NMS </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.1.9<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.1.9"> )OPS </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.1.10<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.1.10"> )SAVE </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.1.11<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.1.11"> )SI </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.1.12<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.1.12"> )SIC </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.1.13<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.1.13"> )SINL </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.1.14<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.1.14"> )VARS </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.1.15<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.1.15"> )WSID </a>
+
+<TR class="toc_H3"><TD class="toc_c1"> 4.2<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.2"> IBM APL2 Commands </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.2.1<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.2.1"> )CHECK </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.2.2<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.2.2"> )CONTINUE </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.2.3<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.2.3"> )HELP </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.2.4<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.2.4"> )HOST </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.2.5<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.2.5"> )IN </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.2.6<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.2.6"> )MORE </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.2.7<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.2.7"> )OUT </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.2.8<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.2.8"> )OFF </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.2.9<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.2.9"> )PCOPY </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.2.10<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.2.10"> )PIN </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.2.11<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.2.11"> )RESET </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.2.12<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.2.12"> )SIS </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.2.13<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.2.13"> )SYMBOLS </a>
+
+<TR class="toc_H3"><TD class="toc_c1"> 4.3<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.3"> Additional GNU APL Commands </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.3.1<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.3.1"> )DUMP </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.3.2<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.3.2"> )DUMP-HTML </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.3.3<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.3.3"> ]HIST [CLEAR] </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.3.4<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.3.4"> )LIBS </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.3.5<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.3.5"> )QLOAD </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.3.6<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.3.6"> )VALUES </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.3.7<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.3.7"> ]BOXING </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.3.8<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.3.8"> ]COLOR [ON|OFF] </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.3.9<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.3.9"> ]DOXY [path] </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.3.10<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.3.10"> ]EXPECT error_count </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.3.11<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.3.11"> ]KEYB </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.3.12<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.3.12"> ]LOG [facility [ON|OFF]] </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.3.13<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.3.13"> ]NEXTFILE </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.3.14<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.3.14"> ]OWNERS </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.3.15<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.3.15"> ]SVARS </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.3.16<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.3.16"> ]SYMBOL </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.3.17<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.3.17"> ]USERCMD </a>
+
+<TR class="toc_H4"><TD class="toc_c1"> 4.3.18<TD class="toc_c2">
+    <a class="toc_a2" href="#CH_4.3.18"> ]XTERM [ON|OFF] </a>
+

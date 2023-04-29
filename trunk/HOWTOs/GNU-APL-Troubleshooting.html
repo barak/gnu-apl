@@ -1,0 +1,1837 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.1//EN"
+    "http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+<meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
+<meta name="generator" content="AsciiDoc 10.1.2" />
+<title>Trouble-Shooting GNU APL</title>
+<style type="text/css">
+/* Shared CSS for AsciiDoc xhtml11 and html5 backends */
+
+/* Default font. */
+body {
+  font-family: Georgia,serif;
+}
+
+/* Title font. */
+h1, h2, h3, h4, h5, h6,
+div.title, caption.title,
+thead, p.table.header,
+#toctitle,
+#author, #revnumber, #revdate, #revremark,
+#footer {
+  font-family: Arial,Helvetica,sans-serif;
+}
+
+body {
+  margin: 1em 5% 1em 5%;
+}
+
+a {
+  color: blue;
+  text-decoration: underline;
+}
+a:visited {
+  color: fuchsia;
+}
+
+em {
+  font-style: italic;
+  color: navy;
+}
+
+strong {
+  font-weight: bold;
+  color: #083194;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: #527bbd;
+  margin-top: 1.2em;
+  margin-bottom: 0.5em;
+  line-height: 1.3;
+}
+
+h1, h2, h3 {
+  border-bottom: 2px solid silver;
+}
+h2 {
+  padding-top: 0.5em;
+}
+h3 {
+  float: left;
+}
+h3 + * {
+  clear: left;
+}
+h5 {
+  font-size: 1.0em;
+}
+
+div.sectionbody {
+  margin-left: 0;
+}
+
+hr {
+  border: 1px solid silver;
+}
+
+p {
+  margin-top: 0.5em;
+  margin-bottom: 0.5em;
+}
+
+ul, ol, li > p {
+  margin-top: 0;
+}
+ul > li     { color: #aaa; }
+ul > li > * { color: black; }
+
+.monospaced, code, pre {
+  font-family: "Courier New", Courier, monospace;
+  font-size: inherit;
+  color: navy;
+  padding: 0;
+  margin: 0;
+}
+pre {
+  white-space: pre-wrap;
+}
+
+#author {
+  color: #527bbd;
+  font-weight: bold;
+  font-size: 1.1em;
+}
+#email {
+}
+#revnumber, #revdate, #revremark {
+}
+
+#footer {
+  font-size: small;
+  border-top: 2px solid silver;
+  padding-top: 0.5em;
+  margin-top: 4.0em;
+}
+#footer-text {
+  float: left;
+  padding-bottom: 0.5em;
+}
+#footer-badges {
+  float: right;
+  padding-bottom: 0.5em;
+}
+
+#preamble {
+  margin-top: 1.5em;
+  margin-bottom: 1.5em;
+}
+div.imageblock, div.exampleblock, div.verseblock,
+div.quoteblock, div.literalblock, div.listingblock, div.sidebarblock,
+div.admonitionblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+div.admonitionblock {
+  margin-top: 2.0em;
+  margin-bottom: 2.0em;
+  margin-right: 10%;
+  color: #606060;
+}
+
+div.content { /* Block element content. */
+  padding: 0;
+}
+
+/* Block element titles. */
+div.title, caption.title {
+  color: #527bbd;
+  font-weight: bold;
+  text-align: left;
+  margin-top: 1.0em;
+  margin-bottom: 0.5em;
+}
+div.title + * {
+  margin-top: 0;
+}
+
+td div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content div.title:first-child {
+  margin-top: 0.0em;
+}
+div.content + div.title {
+  margin-top: 0.0em;
+}
+
+div.sidebarblock > div.content {
+  background: #ffffee;
+  border: 1px solid #dddddd;
+  border-left: 4px solid #f0f0f0;
+  padding: 0.5em;
+}
+
+div.listingblock > div.content {
+  border: 1px solid #dddddd;
+  border-left: 5px solid #f0f0f0;
+  background: #f8f8f8;
+  padding: 0.5em;
+}
+
+div.quoteblock, div.verseblock {
+  padding-left: 1.0em;
+  margin-left: 1.0em;
+  margin-right: 10%;
+  border-left: 5px solid #f0f0f0;
+  color: #888;
+}
+
+div.quoteblock > div.attribution {
+  padding-top: 0.5em;
+  text-align: right;
+}
+
+div.verseblock > pre.content {
+  font-family: inherit;
+  font-size: inherit;
+}
+div.verseblock > div.attribution {
+  padding-top: 0.75em;
+  text-align: left;
+}
+/* DEPRECATED: Pre version 8.2.7 verse style literal block. */
+div.verseblock + div.attribution {
+  text-align: left;
+}
+
+div.admonitionblock .icon {
+  vertical-align: top;
+  font-size: 1.1em;
+  font-weight: bold;
+  text-decoration: underline;
+  color: #527bbd;
+  padding-right: 0.5em;
+}
+div.admonitionblock td.content {
+  padding-left: 0.5em;
+  border-left: 3px solid #dddddd;
+}
+
+div.exampleblock > div.content {
+  border-left: 3px solid #dddddd;
+  padding-left: 0.5em;
+}
+
+div.imageblock div.content { padding-left: 0; }
+span.image img { border-style: none; vertical-align: text-bottom; }
+a.image:visited { color: white; }
+
+dl {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+dt {
+  margin-top: 0.5em;
+  margin-bottom: 0;
+  font-style: normal;
+  color: navy;
+}
+dd > *:first-child {
+  margin-top: 0.1em;
+}
+
+ul, ol {
+    list-style-position: outside;
+}
+ol.arabic {
+  list-style-type: decimal;
+}
+ol.loweralpha {
+  list-style-type: lower-alpha;
+}
+ol.upperalpha {
+  list-style-type: upper-alpha;
+}
+ol.lowerroman {
+  list-style-type: lower-roman;
+}
+ol.upperroman {
+  list-style-type: upper-roman;
+}
+
+div.compact ul, div.compact ol,
+div.compact p, div.compact p,
+div.compact div, div.compact div {
+  margin-top: 0.1em;
+  margin-bottom: 0.1em;
+}
+
+tfoot {
+  font-weight: bold;
+}
+td > div.verse {
+  white-space: pre;
+}
+
+div.hdlist {
+  margin-top: 0.8em;
+  margin-bottom: 0.8em;
+}
+div.hdlist tr {
+  padding-bottom: 15px;
+}
+dt.hdlist1.strong, td.hdlist1.strong {
+  font-weight: bold;
+}
+td.hdlist1 {
+  vertical-align: top;
+  font-style: normal;
+  padding-right: 0.8em;
+  color: navy;
+}
+td.hdlist2 {
+  vertical-align: top;
+}
+div.hdlist.compact tr {
+  margin: 0;
+  padding-bottom: 0;
+}
+
+.comment {
+  background: yellow;
+}
+
+.footnote, .footnoteref {
+  font-size: 0.8em;
+}
+
+span.footnote, span.footnoteref {
+  vertical-align: super;
+}
+
+#footnotes {
+  margin: 20px 0 20px 0;
+  padding: 7px 0 0 0;
+}
+
+#footnotes div.footnote {
+  margin: 0 0 5px 0;
+}
+
+#footnotes hr {
+  border: none;
+  border-top: 1px solid silver;
+  height: 1px;
+  text-align: left;
+  margin-left: 0;
+  width: 20%;
+  min-width: 100px;
+}
+
+div.colist td {
+  padding-right: 0.5em;
+  padding-bottom: 0.3em;
+  vertical-align: top;
+}
+div.colist td img {
+  margin-top: 0.3em;
+}
+
+@media print {
+  #footer-badges { display: none; }
+}
+
+#toc {
+  margin-bottom: 2.5em;
+}
+
+#toctitle {
+  color: #527bbd;
+  font-size: 1.1em;
+  font-weight: bold;
+  margin-top: 1.0em;
+  margin-bottom: 0.1em;
+}
+
+div.toclevel0, div.toclevel1, div.toclevel2, div.toclevel3, div.toclevel4 {
+  margin-top: 0;
+  margin-bottom: 0;
+}
+div.toclevel2 {
+  margin-left: 2em;
+  font-size: 0.9em;
+}
+div.toclevel3 {
+  margin-left: 4em;
+  font-size: 0.9em;
+}
+div.toclevel4 {
+  margin-left: 6em;
+  font-size: 0.9em;
+}
+
+span.aqua { color: aqua; }
+span.black { color: black; }
+span.blue { color: blue; }
+span.fuchsia { color: fuchsia; }
+span.gray { color: gray; }
+span.green { color: green; }
+span.lime { color: lime; }
+span.maroon { color: maroon; }
+span.navy { color: navy; }
+span.olive { color: olive; }
+span.purple { color: purple; }
+span.red { color: red; }
+span.silver { color: silver; }
+span.teal { color: teal; }
+span.white { color: white; }
+span.yellow { color: yellow; }
+
+span.aqua-background { background: aqua; }
+span.black-background { background: black; }
+span.blue-background { background: blue; }
+span.fuchsia-background { background: fuchsia; }
+span.gray-background { background: gray; }
+span.green-background { background: green; }
+span.lime-background { background: lime; }
+span.maroon-background { background: maroon; }
+span.navy-background { background: navy; }
+span.olive-background { background: olive; }
+span.purple-background { background: purple; }
+span.red-background { background: red; }
+span.silver-background { background: silver; }
+span.teal-background { background: teal; }
+span.white-background { background: white; }
+span.yellow-background { background: yellow; }
+
+span.big { font-size: 2em; }
+span.small { font-size: 0.6em; }
+
+span.underline { text-decoration: underline; }
+span.overline { text-decoration: overline; }
+span.line-through { text-decoration: line-through; }
+
+div.unbreakable { page-break-inside: avoid; }
+
+
+/*
+ * xhtml11 specific
+ *
+ * */
+
+div.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+div.tableblock > table {
+  border: 3px solid #527bbd;
+}
+thead, p.table.header {
+  font-weight: bold;
+  color: #527bbd;
+}
+p.table {
+  margin-top: 0;
+}
+/* Because the table frame attribute is overridden by CSS in most browsers. */
+div.tableblock > table[frame="void"] {
+  border-style: none;
+}
+div.tableblock > table[frame="hsides"] {
+  border-left-style: none;
+  border-right-style: none;
+}
+div.tableblock > table[frame="vsides"] {
+  border-top-style: none;
+  border-bottom-style: none;
+}
+
+
+/*
+ * html5 specific
+ *
+ * */
+
+table.tableblock {
+  margin-top: 1.0em;
+  margin-bottom: 1.5em;
+}
+thead, p.tableblock.header {
+  font-weight: bold;
+  color: #527bbd;
+}
+p.tableblock {
+  margin-top: 0;
+}
+table.tableblock {
+  border-width: 3px;
+  border-spacing: 0px;
+  border-style: solid;
+  border-color: #527bbd;
+  border-collapse: collapse;
+}
+th.tableblock, td.tableblock {
+  border-width: 1px;
+  padding: 4px;
+  border-style: solid;
+  border-color: #527bbd;
+}
+
+table.tableblock.frame-topbot {
+  border-left-style: hidden;
+  border-right-style: hidden;
+}
+table.tableblock.frame-sides {
+  border-top-style: hidden;
+  border-bottom-style: hidden;
+}
+table.tableblock.frame-none {
+  border-style: hidden;
+}
+
+th.tableblock.halign-left, td.tableblock.halign-left {
+  text-align: left;
+}
+th.tableblock.halign-center, td.tableblock.halign-center {
+  text-align: center;
+}
+th.tableblock.halign-right, td.tableblock.halign-right {
+  text-align: right;
+}
+
+th.tableblock.valign-top, td.tableblock.valign-top {
+  vertical-align: top;
+}
+th.tableblock.valign-middle, td.tableblock.valign-middle {
+  vertical-align: middle;
+}
+th.tableblock.valign-bottom, td.tableblock.valign-bottom {
+  vertical-align: bottom;
+}
+
+
+/*
+ * manpage specific
+ *
+ * */
+
+body.manpage h1 {
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  border-top: 2px solid silver;
+  border-bottom: 2px solid silver;
+}
+body.manpage h2 {
+  border-style: none;
+}
+body.manpage div.sectionbody {
+  margin-left: 3em;
+}
+
+@media print {
+  body.manpage div#toc { display: none; }
+}
+
+
+</style>
+<script type="text/javascript">
+/*<![CDATA[*/
+var asciidoc = {  // Namespace.
+
+/////////////////////////////////////////////////////////////////////
+// Table Of Contents generator
+/////////////////////////////////////////////////////////////////////
+
+/* Author: Mihai Bazon, September 2002
+ * http://students.infoiasi.ro/~mishoo
+ *
+ * Table Of Content generator
+ * Version: 0.4
+ *
+ * Feel free to use this script under the terms of the GNU General Public
+ * License, as long as you do not remove or alter this notice.
+ */
+
+ /* modified by Troy D. Hanson, September 2006. License: GPL */
+ /* modified by Stuart Rackham, 2006, 2009. License: GPL */
+
+// toclevels = 1..4.
+toc: function (toclevels) {
+
+  function getText(el) {
+    var text = "";
+    for (var i = el.firstChild; i != null; i = i.nextSibling) {
+      if (i.nodeType == 3 /* Node.TEXT_NODE */) // IE doesn't speak constants.
+        text += i.data;
+      else if (i.firstChild != null)
+        text += getText(i);
+    }
+    return text;
+  }
+
+  function TocEntry(el, text, toclevel) {
+    this.element = el;
+    this.text = text;
+    this.toclevel = toclevel;
+  }
+
+  function tocEntries(el, toclevels) {
+    var result = new Array;
+    var re = new RegExp('[hH]([1-'+(toclevels+1)+'])');
+    // Function that scans the DOM tree for header elements (the DOM2
+    // nodeIterator API would be a better technique but not supported by all
+    // browsers).
+    var iterate = function (el) {
+      for (var i = el.firstChild; i != null; i = i.nextSibling) {
+        if (i.nodeType == 1 /* Node.ELEMENT_NODE */) {
+          var mo = re.exec(i.tagName);
+          if (mo && (i.getAttribute("class") || i.getAttribute("className")) != "float") {
+            result[result.length] = new TocEntry(i, getText(i), mo[1]-1);
+          }
+          iterate(i);
+        }
+      }
+    }
+    iterate(el);
+    return result;
+  }
+
+  var toc = document.getElementById("toc");
+  if (!toc) {
+    return;
+  }
+
+  // Delete existing TOC entries in case we're reloading the TOC.
+  var tocEntriesToRemove = [];
+  var i;
+  for (i = 0; i < toc.childNodes.length; i++) {
+    var entry = toc.childNodes[i];
+    if (entry.nodeName.toLowerCase() == 'div'
+     && entry.getAttribute("class")
+     && entry.getAttribute("class").match(/^toclevel/))
+      tocEntriesToRemove.push(entry);
+  }
+  for (i = 0; i < tocEntriesToRemove.length; i++) {
+    toc.removeChild(tocEntriesToRemove[i]);
+  }
+
+  // Rebuild TOC entries.
+  var entries = tocEntries(document.getElementById("content"), toclevels);
+  for (var i = 0; i < entries.length; ++i) {
+    var entry = entries[i];
+    if (entry.element.id == "")
+      entry.element.id = "_toc_" + i;
+    var a = document.createElement("a");
+    a.href = "#" + entry.element.id;
+    a.appendChild(document.createTextNode(entry.text));
+    var div = document.createElement("div");
+    div.appendChild(a);
+    div.className = "toclevel" + entry.toclevel;
+    toc.appendChild(div);
+  }
+  if (entries.length == 0)
+    toc.parentNode.removeChild(toc);
+},
+
+
+/////////////////////////////////////////////////////////////////////
+// Footnotes generator
+/////////////////////////////////////////////////////////////////////
+
+/* Based on footnote generation code from:
+ * http://www.brandspankingnew.net/archive/2005/07/format_footnote.html
+ */
+
+footnotes: function () {
+  // Delete existing footnote entries in case we're reloading the footnodes.
+  var i;
+  var noteholder = document.getElementById("footnotes");
+  if (!noteholder) {
+    return;
+  }
+  var entriesToRemove = [];
+  for (i = 0; i < noteholder.childNodes.length; i++) {
+    var entry = noteholder.childNodes[i];
+    if (entry.nodeName.toLowerCase() == 'div' && entry.getAttribute("class") == "footnote")
+      entriesToRemove.push(entry);
+  }
+  for (i = 0; i < entriesToRemove.length; i++) {
+    noteholder.removeChild(entriesToRemove[i]);
+  }
+
+  // Rebuild footnote entries.
+  var cont = document.getElementById("content");
+  var spans = cont.getElementsByTagName("span");
+  var refs = {};
+  var n = 0;
+  for (i=0; i<spans.length; i++) {
+    if (spans[i].className == "footnote") {
+      n++;
+      var note = spans[i].getAttribute("data-note");
+      if (!note) {
+        // Use [\s\S] in place of . so multi-line matches work.
+        // Because JavaScript has no s (dotall) regex flag.
+        note = spans[i].innerHTML.match(/\s*\[([\s\S]*)]\s*/)[1];
+        spans[i].innerHTML =
+          "[<a id='_footnoteref_" + n + "' href='#_footnote_" + n +
+          "' title='View footnote' class='footnote'>" + n + "</a>]";
+        spans[i].setAttribute("data-note", note);
+      }
+      noteholder.innerHTML +=
+        "<div class='footnote' id='_footnote_" + n + "'>" +
+        "<a href='#_footnoteref_" + n + "' title='Return to text'>" +
+        n + "</a>. " + note + "</div>";
+      var id =spans[i].getAttribute("id");
+      if (id != null) refs["#"+id] = n;
+    }
+  }
+  if (n == 0)
+    noteholder.parentNode.removeChild(noteholder);
+  else {
+    // Process footnoterefs.
+    for (i=0; i<spans.length; i++) {
+      if (spans[i].className == "footnoteref") {
+        var href = spans[i].getElementsByTagName("a")[0].getAttribute("href");
+        href = href.match(/#.*/)[0];  // Because IE return full URL.
+        n = refs[href];
+        spans[i].innerHTML =
+          "[<a href='#_footnote_" + n +
+          "' title='View footnote' class='footnote'>" + n + "</a>]";
+      }
+    }
+  }
+},
+
+install: function(toclevels) {
+  var timerId;
+
+  function reinstall() {
+    asciidoc.footnotes();
+    if (toclevels) {
+      asciidoc.toc(toclevels);
+    }
+  }
+
+  function reinstallAndRemoveTimer() {
+    clearInterval(timerId);
+    reinstall();
+  }
+
+  timerId = setInterval(reinstall, 500);
+  if (document.addEventListener)
+    document.addEventListener("DOMContentLoaded", reinstallAndRemoveTimer, false);
+  else
+    window.onload = reinstallAndRemoveTimer;
+}
+
+}
+asciidoc.install();
+/*]]>*/
+</script>
+</head>
+<body class="article">
+<div id="header">
+<h1>Trouble-Shooting GNU APL</h1>
+</div>
+<div id="content">
+<div class="sect1">
+<h2 id="_abstract">Abstract</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>This document contains hints for <strong>GNU APL</strong> users who would like to report
+<strong>GNU APL</strong> problems and who want to make the life of the <strong>GNU APL</strong> maintainer(s)
+a little easier by localizing the root cause of a problem.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_introduction">Introduction</h2>
+<div class="sectionbody">
+<div class="paragraph"><p><strong>GNU APL</strong> is, in terms of source code size, a fairly large program. As of
+this writing the source code for the interpreter, not counting code in
+sub-directories, has more than 110,000 lines of code. Finding faults in
+a code of that size is not as trivial as finding faults in a short program
+of only a few thousand lines. Past experience shows, that after a new fault was
+observed, the time for reproducing and localizing the fault typically takes
+more than 90 % of the total time to fix it.</p></div>
+<div class="paragraph"><p>For this reason, <strong>GNU APL</strong> comes with a handful of built-in trouble-shooting
+capabilities that makes locating a fault easier. Some of these capabilities
+require that <strong>GNU APL</strong> is built and run in a specific way as described in
+this document.</p></div>
+<div class="paragraph"><p>Almost every error that might occur in <strong>GNU APL</strong> falls into one of the
+following 4 categories of increasing severities:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Errors in User Programs (aka. APL errors),
+</p>
+</li>
+<li>
+<p>
+Incorrect APL results,
+</p>
+</li>
+<li>
+<p>
+Failed Assertions, and
+</p>
+</li>
+<li>
+<p>
+Crashes of the <strong>GNU APL</strong> interpreter.
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>Each category requires different means and preparations for locating the
+root cause of the error.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_errors_in_user_programs_aka_apl_errors">Errors in User Programs (aka. APL errors),</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Errors in user programs are reported by the APL intepreter when APL code
+is being executed. Before the interpreter starts it internal computation(s)
+it checks the arguments. These checks depend on the computation required
+and usually occur in the following order:</p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+Syntax Check (may raise SYNTAX ERROR)
+</p>
+</li>
+<li>
+<p>
+Valence Check (may raise VALENCE ERROR or AXIS ERROR)
+</p>
+</li>
+<li>
+<p>
+Value Check (may raise VALUE ERROR)
+</p>
+</li>
+<li>
+<p>
+Rank Check (may raise RANK ERROR)
+</p>
+</li>
+<li>
+<p>
+Shape Check (may raise LENGTH ERROR)
+</p>
+</li>
+<li>
+<p>
+Domain Checks (may raise DOMAIN ERROR)
+</p>
+</li>
+</ol></div>
+<div class="paragraph"><p>That is, a VALUE error can normally only occur in the absence of SYNTAX
+and VALENCE ERRORs, a LENGTH ERROR can only occur in the absence of SYNTAX,
+VALENCE, AXIS, VALUE, and RANK ERRORs, and so on.</p></div>
+<div class="paragraph"><p>An APL error is displayed immediately and (provided that output colouring
+is enabled) in a different color than the APL output. The first line of the
+error display is the type of error, possibly followed by +. The +, if
+present, indicates that there is more information available about the error
+(and that the additional information can be obtained with command )MORE.
+Example:</p></div>
+<div class="literalblock">
+<div class="content">
+<pre>
+
+<code>      +/[1;2] 3   ⍝ ; is not allowed in function axes.
+AXIS ERROR+
+      +/[1;2]3
+      ^     ^
+      )MORE
+illegal ; in axis</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>APL errors shall, of course,  not be reported to the <strong>GNU APL</strong> maintainers,
+with the following exceptions:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+An error was raised incorrectly, i.e. for a valid APL input, or
+</p>
+</li>
+<li>
+<p>
+the display of )MORE is misleading or could be improved. Many errors
+  create no )MORE information and that is on purpose. If you believe, however,
+  that a particular error case is difficult to grasp and would benefit from
+  a )MORE information, then feel free to propose that in an email to
+  <a href="mailto:bug-apl@gnu.org">bug-apl@gnu.org</a>
+</p>
+</li>
+</ul></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_incorrect_apl_results">Incorrect APL results</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>If <strong>GNU APL</strong> produces an incorrect result, then you should report in in an
+email to <a href="mailto:bug-apl@gnu.org">bug-apl@gnu.org</a>. People on that mailing list are gentle and helpful,
+so don&#8217;t be afraid to report an error.</p></div>
+<div class="paragraph"><p>However, please note the following: Even though APL as a language is
+standardized, (ISO Standard 13751 "Programming Language APL, Extended")
+there exist considerable differences (and also errors) between:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+the APL standard, and
+</p>
+</li>
+<li>
+<p>
+the APL documentation of different vendors,
+</p>
+</li>
+<li>
+<p>
+and the interpreter implementations of different vendors (including <strong>GNU
+  APL</strong>).
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>In the case of such differences, <strong>GNU APL</strong> usually resolves the issue in the
+following order:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+IBM APL2 PC implementation (highest priority)
+</p>
+</li>
+<li>
+<p>
+IBM APL2 language reference manual
+</p>
+</li>
+<li>
+<p>
+ISO Standard 13751
+</p>
+</li>
+<li>
+<p>
+Other vendors (lowest priority).
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>Before sending an email to <a href="mailto:bug-apl@gnu.org">bug-apl@gnu.org</a> it may make sense to check if the
+issue was reported already (and often caused by such differences). However,
+don&#8217;t be afraid to report the same error twice if you are not sure.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_failed_assertions">Failed Assertions</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>An assertion is an expression in the source code that the programmer assumes
+to be <strong>true</strong> (aka. ≠ 0 in C/C++). It can be very hard to find the origin
+(root cause) of an error, in particular when many CPU instruction we performed
+between the root cause and error being detected.</p></div>
+<div class="paragraph"><p>By making assertions all over place in the source code, the programmer
+introces checks along the execution path in order to reduce the number of
+CPU instructions between a root cause and the point in time where it is
+being detected. In the C/C++ code, assertions are typically made in the
+following places:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+near the beginning of a function (also known as pre-condition) to check
+   the arguments passed to the function,
+</p>
+</li>
+<li>
+<p>
+after calling a reasonably complex sub-function, and
+</p>
+</li>
+<li>
+<p>
+near the end of a function (post-condition) to check the result returned by
+  the function.
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>Assertions are implemented as one of C/C++ macros called Assert() and
+Assert1(). As of this writing there are more than 530 Assert() and more
+than 110 Assert1() macros spread across the <strong>GNU APL</strong> source code. The reason
+for having different Assert macros their impact on performance.</p></div>
+<div class="paragraph"><p>Assert1() macros are intended to test more trivial conditions while Assert()
+macros test more complex conditions. Every test performed by a single Assert()
+or Assert1() macro has a (relatively mild) performance impact. However, the
+large number of Assert() macros cululates the total performance impact which
+may be undesirable. To deal with this, the user may <strong>./configure</strong> one of 3
+different assertion levels as follows (see also <strong>README-2-configure</strong>):</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+<strong>ASSERT_LEVEL_WANTED = 0</strong>: this disables both the Assert1() and the Assert()
+  macro so that the interpreter will have the maximal performance.
+</p>
+</li>
+<li>
+<p>
+<strong>ASSERT_LEVEL_WANTED = 1</strong> (the default): this disables the Assert1() macro and
+  enables and the Assert() macro.
+</p>
+</li>
+<li>
+<p>
+<strong>ASSERT_LEVEL_WANTED = 2</strong>: this enables both the Assert1() and the Assert()
+  macro.
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>We kindly ask the user to:</p></div>
+<div class="paragraph"><p>make develop</p></div>
+<div class="paragraph"><p>which, beside other settings, does <strong>./configure</strong> with ASSERT_LEVEL_WANTED=2,
+this enabling both Assert macros and possibly making it easier to find the
+root cause of a fault.</p></div>
+<div class="paragraph"><p>As confidence with the source code increases over time, Assert() macros will
+eventually be converted to Assert1() macros while new code will initially
+be protected with Assert() macros.</p></div>
+<div class="sect2">
+<h3 id="_emulating_failed_assertions">Emulating Failed Assertions</h3>
+<div class="paragraph"><p>Fortunately we can emulate a failed Assert() or Assert1() macro with ⎕FIO:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>      ⎕FIO ¯16   ⍝ emulate Assert()
+
+      ⎕FIO ¯17   ⍝ emulate Assert1()</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>If the respective macro is enabled with ASSERT_LEVEL_WANTED as explained
+above, then it produces a stack trace like this:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>       ⎕FIO ¯16
+
+
+ ==============================================================================
+ Assertion failed: 0 &amp;&amp; "Simulated Assert() (aka. ⎕FIO ¯16)"
+ in Function:      eval_B
+ in file:          Quad_FIO.cc:1085
+
+ C/C++ call stack:
+
+ ----------------------------------------
+ -- Stack trace at Assert.cc:72
+ ----------------------------------------
+ 0x7FBFD71CBBF7 __libc_start_main
+ 0x563D2320B04A  main
+ 0x563D233E822F   Workspace::immediate_execution(bool)
+ 0x563D2327411A    Command::process_line()
+ 0x563D232742DC     Command::process_line(UCS_string&amp;)
+ 0x563D232768A2      Command::do_APL_expression(UCS_string&amp;)
+ 0x563D23276C73       Command::finish_context()
+ 0x563D2329B5D2        Executable::execute_body() const
+ 0x563D2338199C         StateIndicator::run()
+ 0x563D232DAF86          Prefix::reduce_statements()
+ 0x563D232DBE92           Prefix::reduce_MISC_F_B_()
+ 0x563D2332D0CF            Quad_FIO::eval_B(Value_P) const
+ 0x563D2322C2A0             do_Assert(char const*, char const*, char const*, int)
+ ========================================
+
+ SI stack:
+
+ Depth:      0
+ Exec:       0x563d23f9fde0
+ Safe exec:  0
+ Pmode:      ◊  ⎕FIO ¯16
+ PC:         3 (4) RETURN_STATS
+ Stat:       ⎕FIO ¯16
+ err_code:   0x0
+
+ ==============================================================================</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>The C/C<code> stack above tell us which assertion has failed and where the
+assertion is located in the C/C</code> source code (i.e. file Quad_FIO.cc line 1085),
+while the )SI stack tells us where that location is in the APL code.</p></div>
+<div class="paragraph"><p>This brings us brings us closer to the root cause of a problem. Unfortunately
+the hex addresses numbers on the left side of the C/C++ stack dump are process
+specific, i.e. the same <strong>⎕FIO ¯16</strong> will produce different numbers in a
+different process of the operating system.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_line_numbers_in_stack_traces">Line numbers in Stack Traces</h3>
+<div class="paragraph"><p>If the functions on the right side of the C/C++ stack are relatively small (as
+most functions in the source code of <strong>GNU APL</strong> are) then we can usually find the
+exact source linei for each stack entry rather easilyi using the function name
+displayed. For larger functions, the same function may be called from different
+source code lines in the same function. This can be improved by converting the
+hex addresses on the left into source line numbers as exlained in the
+following.</p></div>
+<div class="paragraph"><p>First of all the C<code> compiler must be instructed to not discard line numbers.
+Older g</code> versions would always keep line numbers in the object files, but
+newer versions do not. The trick is this:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>CXXFLAGS="-rdynamic -gdwarf-2" ./configure ...</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p><strong>make develop</strong> also does that for you. The CXXFLAGS above tell the <strong>g++</strong>
+compiler to use an older object format in which line numbers are not discarded.
+If your compiler does not accept <strong>-gdwarf-2</strong> then it probably uses it anyway.</p></div>
+<div class="paragraph"><p>The second step is to create a file named <strong>apl.lines</strong>. If <strong>GNU APL</strong> finds this
+file then it uses it to map hex addresses to line numbers. In the src
+directory, the make target <strong>apl.lines</strong> createst this file (which takes quite a
+while and is therefore not created in a standard build). <strong>make apl.lines</strong>
+essentially does:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>objdump --section=.text --line-numbers --disassemble apl &gt; apl.lines</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>which extracts the line numbers from the apl binary (provided that the
+compiler has inserted them - see above). If <strong>GNU APL</strong> finds apl.lines, then
+the stack dump looks a little different:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>      ⎕FIO ¯16
+
+ ==============================================================================
+ Assertion failed: 0 &amp;&amp; "Simulated Assert() (aka. ⎕FIO ¯16)"
+ in Function:      eval_B
+ in file:          Quad_FIO.cc:1085
+
+ C/C++ call stack:
+ total_lines in apl.lines:     618610
+ assembler lines in apl.lines: 86495
+ source line numbers found:    86495
+
+ ----------------------------------------
+ -- Stack trace at Assert.cc:72
+ ----------------------------------------
+ 0x29465EE76BF7 __libc_start_main
+ 0x14CCD2  main at main.cc:635
+ 0x3166E1   Workspace::immediate_execution(bool) at Workspace.cc:273
+ 0x1B1004    Command::process_line() at Command.cc:103
+ 0x1B11C6     Command::process_line(UCS_string&amp;) at Command.cc:139
+ 0x1B378C      Command::do_APL_expression(UCS_string&amp;) at Command.cc:329
+ 0x1B3B5D       Command::finish_context() at Command.cc:347
+ 0x1D6806        Executable::execute_body() const at Executable.cc:261
+ 0x2B564F         StateIndicator::run() at StateIndicator.cc:362
+ 0x211DA4          Prefix::reduce_statements() at Prefix.cc:723 (discriminator 4)
+ 0x212A79           Prefix::reduce_MISC_F_B_() at Prefix.cc:990
+ 0x261E7F            Quad_FIO::eval_B(Value_P) const at Quad_FIO.cc:1090
+ 0x16CC03             do_Assert(char const*, char const*, char const*, int) at Assert.cc:74
+ ========================================
+
+ SI stack:
+
+ Depth:      0
+ Exec:       0x561c865a4da0
+ Safe exec:  0
+ Pmode:      ◊  ⎕FIO ¯16
+ PC:         3 (4) RETURN_STATS
+ Stat:       ⎕FIO ¯16
+ err_code:   0x0
+
+
+ ==============================================================================</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>The difference is twofold:</p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+the hex numbers are now relative to the location of the <strong>main()</strong> function of
+  <strong>GNU APL</strong>, which makes them not only smaller but also identical even in
+  different processes.
+</p>
+</li>
+<li>
+<p>
+The source line numbers are now displayed for most hex numbers. Some
+  addresses can not be resolved, this could be caused by C/C++ function
+  inlining or calls through function pointers etc.
+</p>
+</li>
+</ol></div>
+<div class="paragraph"><p>Needless to say that <strong>GNU APL</strong> trouble-shooters prefer stack traces with hex
+numbers resolved to line numbers.</p></div>
+<div class="paragraph"><p>Occasionally you may get this message:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>...
+C/C++ call stack:
+
+Cannot show line numbers, since apl.lines is older than apl.
+Consider running 'make apl.lines' in directory
+/home/eedjsa/apl-1.8 to fix this
+...</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>This happens if you do <strong>make apl</strong> without a subsequent <strong>make apl.lines</strong>.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_summary_concerning_assertions">Summary concerning Assertions</h3>
+<div class="paragraph"><p>The <strong>GNU APL</strong> configuration for troubleshooting purposes is obtained like this:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>cd &lt;top-level-directory&gt;
+make develop
+cd src
+make clean
+make apl.lines</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>where <strong>top-level-directory</strong> is the directory that contains the <strong>README</strong> files.
+Additional troubleshooting options may be used as well. Consider the <strong>make</strong>
+target <strong>develop:</strong> in file Makefile.incl (around line 41) only as a template
+that can be augmented by other troubleshooting options (see also
+<strong>README-2-configure</strong>).</p></div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_the_check_command">The )CHECK command</h2>
+<div class="sectionbody">
+<div class="paragraph"><p><strong>GNU APL</strong> provides a command <strong>)CHECK</strong> which is somewhat similar to IBM APL2&#8217;s
+command <strong>)CHECK WS</strong>. This command performs an internal check of the internal
+data structures of the interpreter.</p></div>
+<div class="paragraph"><p>Under normal circumstances, the output of the <strong>)CHECK</strong> command should be:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>If not, then there were inconsistencies (primarily memory leaks) that need to
+be fixed and should therefore be reported to <a href="mailto:bug-apl@gnu.org">bug-apl@gnu.org</a>. For example,
+a <strong>stale value</strong> is an APL value that has memory allocated but is not reachable
+any longer via either the symbol table of the interpreter (like an APL
+variable) or the body as a defined function (like an APL literal).</p></div>
+<div class="paragraph"><p>If a )CHECK command fails, then it is important to remember, or better write
+down, which sequence of APL operation has lead to the state of the workspace.
+<strong>GNU APL</strong> has a command <strong>)HISTORY</strong> which displays the last lines entered.</p></div>
+<div class="paragraph"><p>An assertion checks the immediate state of the interpreter and can therefore
+not check the entire lifetime of an APL value or function. For this purpose,
+<strong>GNU APL</strong> povides a different debugging tool called <strong>Value history</strong>.</p></div>
+<div class="paragraph"><p>The Value history tracks the locations in the <strong>GNU APL</strong> source code that have
+manipulated a value from its creation (memory allocation) to its destruction
+(memory deallocation). This tracking, when enabled, has performance impacts
+and is therefore disabled by default.</p></div>
+<div class="paragraph"><p>If the )CHECK command indicates stale values, but also under some other error
+conditions, the history of a value at fault is being displayed and helps the
+<strong>GNU APL</strong> maintainers to locate the problem. The value history is enabled in
+<strong>./configure</strong>:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>    ./configure VALUE_HISTORY_WANTED=yes ...</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>and therefore needs recompilation of the interpreter.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_logging_facilities">Logging facilities</h2>
+<div class="sectionbody">
+</div>
+</div>
+<div class="sect1">
+<h2 id="_crashes_of_the_gnu_apl_interpreter">Crashes of the GNU APL interpreter</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>Some programming errors bypass all built-in debugging tools of GNU and
+crash the interpreter rather than returning to the interactive immediate
+execution mode of APL.</p></div>
+<div class="paragraph"><p>The crash may be silent or accompanied by an error message and it may or may
+not create a core file. A core file is an important file if no other
+information is printed as to what kind of fault has occurred.</p></div>
+<div class="paragraph"><p>In the good old times core files were always produced when a binary executable
+crashed. These days the creation of core files may need to be enabled before
+the crashing binary is started. In GNU/Linux with its <strong>bash</strong> dhell that means:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>ulimit -c unlimited   # enable core files</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>Instead of <strong>unlimited</strong> you may also use a different file size limit.</p></div>
+<div class="paragraph"><p>After a core file was produced (we always assume the interpreter was started
+in directory src below the top&#8212;level-directory) the you can start the
+debugger <strong>gdb</strong> in the src directory with the core file as second argument:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>gdb ./apl core</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>After that, you can use the gdb command <strong>bt</strong> (for <em>backtrace</em>) to show a
+stack dump similar to the one discussed eralier. The <strong>GNU APL</strong> maintainer(s)
+will appreciate a copy of that stack dump for problems that are difficult to
+reproduce.</p></div>
+<div class="paragraph"><p>Normally the file is named <em><strong>core</strong></em> and found in the same directory as the
+binary, but some GNU/Linux distributions use a different directory for storing
+core files. See also <strong>man 5 core</strong>.</p></div>
+<div class="paragraph"><p>Finally, try to nail down the root cause with logging facilities (see below).</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_non_reproducible_errors">Non-reproducible Errors</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>The most difficult to fix errors are those that occur on one machine (usually
+your&#8217;s) and not on others.</p></div>
+<div class="paragraph"><p>The first thing to locate their root cause it to <strong>./configure</strong> with either no
+options or via <strong>make develop</strong> to see if the errors is related to specific
+<strong>./configure</strong> options.</p></div>
+<div class="paragraph"><p>Also, look for compiler warnings when <strong>GNU APL</strong> is built. In the default build,
+compiler warnings can be overlooked easiy. <strong>make develop</strong> turns most warnings
+into errors so you will see at the end if the build was successful.</p></div>
+<div class="sect2">
+<h3 id="_optimization">Optimization</h3>
+<div class="paragraph"><p>As of recently we have seen faults that may have been caused by an overly
+agressive optimization of the C++ code of the interpreter. These faults
+were observed for the same source code but only when compiled with newer
+versions of the same g+\+ compiler.</p></div>
+<div class="paragraph"><p>By default <strong>GNU APL</strong> compiles with optimization level -O2. If a fault is
+suspect to being caused by optimization, then it could make sense to also test
+the same source code of <strong>GNU APL</strong> without any optimization.</p></div>
+<div class="paragraph"><p>To do that:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>cd src
+find and remove or replace the string -O2 in the relevant Makefile(s)
+make clean all</code>
+
+</pre>
+</div></div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_logging_facilities_2">Logging facilities</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>The source code of <strong>GNU APL</strong> is populated with more than 380 Log() macros.
+A Log() macro may or may not print some additional information when the
+execution of the APL interpreter reaches them.</p></div>
+<div class="paragraph"><p>If all these Log() macros would output something, then even a trivial
+APL statement would cause a lot of output in which the relevant information
+gets easily lost. For that reason, each Log () macro belongs to one of
+currently over 45 Groups called <strong>logging facilities</strong>. Each logging facility
+can be turned ON or OFF which causes Log() macros belonging the facility
+to print or not to print its information.</p></div>
+<div class="paragraph"><p>The large (and increasing) number of logging facilities could the tests,
+whether Log() macro resp. its logging facility is ON or OFF, have a
+significant performance impacts. For this reason, <strong>GNU APL</strong> privides two
+different methods to control how logging facilities are turned ON or OFF:</p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+static logging
+</p>
+</li>
+<li>
+<p>
+dynamic logging
+</p>
+</li>
+</ol></div>
+<div class="paragraph"><p>The method is selected via <strong>./configure</strong> at compile time (more precisely: at
+<strong>./configure</strong> time), see also README-, see also <strong>README-2-configure</strong>.</p></div>
+<div class="sect2">
+<h3 id="_static_logging">Static Logging</h3>
+<div class="paragraph"><p>Static logging is used with:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>   ./configure DYNAMIC_LOG_WANTED=no</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>Static logging is also the default, therefore <strong>DYNAMIC_LOG_WANTED=no</strong> is the
+same as not using DYNAMIC_LOG_WANTED= in <strong>./configure</strong>.</p></div>
+<div class="paragraph"><p>With Static logging, the selection which logging facility shalle be ON is
+made by the first argument of the <strong>log_def()</strong> macros in file *src/Logging.def.
+A value of 0 means OFF while 1 means ON for the respective logging facility.</p></div>
+<div class="paragraph"><p>With static logging, the log_def() macro defines an <strong>enum</strong> value for each
+log_def() macro which is a compile-time constant. The compiler will therefore
+remove all code (including the ON/OFF for all log_def(0, &#8230;) macros and
+also all tests for log_def(1, &#8230;) in all Log() macros. That is:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Advantage: Static Logging has little if any performance impacts (none
+   if all log_def macros are off, and
+</p>
+</li>
+<li>
+<p>
+Disadvantage: changes of log_def() macros require re-compilation of GNU
+  APL.
+</p>
+</li>
+</ul></div>
+</div>
+<div class="sect2">
+<h3 id="_dynamic_logging">Dynamic Logging</h3>
+<div class="paragraph"><p>Dynamic logging is used with:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>   ./configure DYNAMIC_LOG_WANTED=yes</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>With dynamic logging, the log_def() macro defines the initial value of a
+variable (rather than an enum value) for each logging facility. After the
+interpreter was started, the value of each variable chan be changed from
+OFF to ON (and vice versa) with the <strong>GNU APL</strong> debug command <strong>]LOG</strong> (which
+toggles the state of the respective variable).</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+Disadvantage: Dynamic Logging has a small performance impacts (even
+   if all variables are set to OFF) which will cumulate for all Log() macros,
+</p>
+</li>
+<li>
+<p>
+Advantage: no re-compilation of <strong>GNU APL</strong> is required.
+</p>
+</li>
+</ul></div>
+<div class="sect3">
+<h4 id="_the_log_command">The ]LOG command</h4>
+<div class="paragraph"><p>GNU APL has a few debug commands, which are like standard APL commands but
+start with ] instead of ). One of these debug commands is <strong>]LOG</strong> which
+controls the logging facilities.</p></div>
+<div class="paragraph"><p>If static logging was <strong>./configure</strong>'d then <strong>]LOG</strong> displays an error message
+because changing the logging facilities at runtime requires dynanic logging.</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>      ]LOG
+
+Command ]LOG is not available, since dynamic logging was not
+configured for this APL interpreter. To enable dynamic logging (which
+will slightly decrease performance), recompile the interpreter as follows:
+
+   ./configure DYNAMIC_LOG_WANTED=yes (... other configure options)
+   make
+   make install (or try: src/apl)
+
+above the src directory.</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>If dynamic logging was ./configure&#8217;d then <strong>]LOG</strong> without an argument displays
+the current state (i.e. ON or OFF) of all logging facilities:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>      ]LOG
+     1: (OFF) AV details
+     2: (OFF) new and delete calls
+     3: (OFF) input from user or testcase file
+     4: (OFF) parser: parsing
+     5: (OFF)  ...    function find_closing()
+     6: (OFF)  ...    tokenization
+     7: (OFF)  ...    function collect_constants()
+     8: (OFF)  ...    create value()
+     9: (OFF) defined function: fix()
+    10: (OFF)  ...              set_line()
+    11: (OFF)  ...              load()
+    12: (OFF)  ...              execute()
+    13: (OFF)  ...              enter/leave
+    14: (OFF) State indicator: enter/leave
+    15: (OFF)   ...            push/pop
+    16: (OFF) Symbol: lookup
+    17: (OFF)   ...   push/pop and )ERASE
+    18: (OFF)   ...   resolve
+    19: (OFF) Value:  glue()
+    20: (OFF)   ...  erase_stale()
+    21: (OFF) APL primitive function format
+    22: (OFF) character conversions
+    23: (OFF) APL system function Quad-FX
+    24: (OFF) commands )LOAD, )SAVE, )IN, and )OUT
+    25: (OFF) more verbose errors
+    26: (OFF) details of error throwing
+    27: (OFF) nabla editor
+    28: (OFF) execute(): state changes
+    29: (OFF) PrintBuffer: align() function
+    30: (OFF) Output: cork() functions
+    31: (OFF) Details of test execution
+    32: (OFF) Prefix parser
+    33: (OFF)  ...   location information
+    34: (OFF) FunOper1 and FunOper2 functions
+    35: (OFF) Shared Variable operations
+    36: (OFF) command line arguments (argc/argv)
+    37: (OFF) interpreter start-up messages
+    38: (OFF) optimization messages
+    39: (OFF) )LOAD and )SAVE details
+    40: (OFF) Svar_DB signals
+    41: (OFF) Parallel (multi-core) execution
+    42: (OFF) EOC handler functionality
+    43: (OFF) ⎕DLX details
+    44: (OFF) command ]DOXY
+    45: (OFF) details of Value allocation
+    46: (OFF) ⎕TF details
+    47: (OFF) ⎕PLOT details</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>Otherwise <strong>]LOG N</strong> toggles the state of logging facility N, e.g.:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>      ]log 25
+    Logging facility 'more verbose errors' is now ON
+
+      ]log 26
+    Logging facility 'details of error throwing' is now ON</code>
+
+</pre>
+</div></div>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_logging_facilities_of_interest">Logging Facilities of Interest</h3>
+<div class="paragraph"><p>Many of the currently over 40 logging server a particular purpose for the
+maintainers or have become obsolete and are therefore not too useful for
+the trouble-shooting performed by the user. The others mentioned below.</p></div>
+<div class="sect3">
+<h4 id="_log_2_new_and_delete_calls">]Log 2 : new and delete calls</h4>
+<div class="paragraph"><p>For tracking the allocation and de-allocation of memory.
+To find memo leaks.</p></div>
+</div>
+<div class="sect3">
+<h4 id="_log_25_and_26_apl_errors">]Log 25 and 26 : APL Errors</h4>
+<div class="paragraph"><p>An APL ERROR provides enough information as to where an error has occurred
+in the APL code, but none as to where that error was detected on the C/C++
+code. These logging facilities add this information.</p></div>
+</div>
+<div class="sect3">
+<h4 id="_log_32_prefix_parser">]Log 32 Prefix Parser</h4>
+<div class="paragraph"><p>Parsing of APL commands and Expressions. To analyse SYNTAX ERRORs.</p></div>
+</div>
+<div class="sect3">
+<h4 id="_log_37_interpreter_startup">]Log 37 : Interpreter Startup</h4>
+<div class="paragraph"><p>Information when the <strong>GNU APL</strong> interpreter starts. This facility can also be
+enabled from the command line because the output of interest occurs before
+the interpreter accepts commands like <strong>]LOG</strong>.</p></div>
+</div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_intrusive_troubleshooting">Intrusive Troubleshooting</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>If all the above fails, then it is time for intrusive troubleshooting.
+By intrusive troubleshooting we mean that the source code is modified
+in such a way that it prints troubleshooting information at source code
+locations where no Log() macros have been inserted. The top-level algorithm
+for intrusive troubleshooting is this:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>loop:
+   1. modify the source code by adding printouts
+   2. recompile GNU APL
+   3. run apl and reproduce the problem
+   4. repeat until the error (or a least a source code file or function
+      responsible for the error) was found.</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>All this is usually done in the <strong>src</strong> directory where most of the source
+files are located and where the compile result will be stored.</p></div>
+<div class="paragraph"><p>Alternatively one could use a debugger like gdb for the same purpose,
+setting breakpoints and printing data. However, the author prefers to modify
+the source code, in particular if more than one printout is needed to
+find a fault.</p></div>
+<div class="paragraph"><p>In order to simplify the source code for printouts, <strong>GNU APL</strong> has defined two
+powerful macros <strong>LOC</strong> and <strong>Q()</strong>. The <strong>Q()</strong> macro is used exclusively for
+intrusive troubleshooting while the LOC macro is also used for other purposes
+in the source code (with more than 1700 invocations as of this writing).
+Understanding the LOC macro is therefore a prerequisite for understanding the
+<strong>GNU APL</strong> code.</p></div>
+<div class="sect2">
+<h3 id="_the_loc_macro">The LOC Macro</h3>
+<div class="paragraph"><p>The LOC macro is a short but somewhat tricky construction based on two
+other macros <strong>Loc</strong> and <strong>STR</strong>. The LOC macro takes no arguments and is
+therefore used without (), <strong>STR()</strong> takes one argument and <strong>Loc(x) takes
+two arguments.  All three macros *LOC</strong>, <strong>Loc()</strong>, and <strong>STR()</strong> are <strong>#defined</strong>
+in file <strong>Common.hh</strong> which makes them available in practically every source
+file. The definitions are:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>#define STR(x) #x
+
+#define LOC Loc(__FILE__, __LINE__)
+
+#define Loc(f, l) f ":" STR(l)</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>How does this work? Suppose we have a 13-line C++ file <strong>test.cc</strong> like this:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>#include &lt;iostream&gt;   // for cout
+
+#define LOC Loc(__FILE__, __LINE__)
+#define Loc(f, l) f ":" STR(l)
+#define STR(x) #x
+
+int
+main()
+{
+   std::cout &lt;&lt; LOC &lt;&lt; std::endl;   // line 10 of test.cc
+   std::cout &lt;&lt; LOC &lt;&lt; std::endl;   // line 11 of test.cc
+   std::cout &lt;&lt; LOC &lt;&lt; std::endl;   // line 12 of test.cc
+}</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>If we compile and run this file then it produces the following output:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>test.cc:10
+test.cc:11
+test.cc:12</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>That is, LOC expands to a string literal that consists of the filename in
+which LOC was used, followed by a colon, followed by the line number in which
+LOC was used. String literals have the advantage that they are produced
+at compile time and can be passed as function arguments at almost no
+perfomance cost.</p></div>
+<div class="paragraph"><p>Now lets see how <strong>LOC</strong> works. Consider the first <strong>LOC</strong> on line <strong>10</strong> of
+file <strong>test.cc</strong>. Then:</p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+macro <strong>LOC</strong> expands to <strong>Loc(__FILE__, __LINE__)</strong>
+</p>
+</li>
+<li>
+<p>
+<strong>__FILE__</strong> expands to literal <strong>"test.cc"</strong>
+</p>
+</li>
+<li>
+<p>
+<strong>__LINE__</strong> expands to the line number <strong>10</strong>, so that (so far)
+</p>
+</li>
+<li>
+<p>
+<strong>LOC</strong> expands to <strong>Loc("test.cc", 10)</strong>
+</p>
+</li>
+<li>
+<p>
+<strong>Loc("test.cc", 10)</strong> expands to <strong>"test.cc" ":" STR(10)</strong>
+</p>
+</li>
+<li>
+<p>
+<strong>STR(10)</strong> expands to <strong>"10"</strong> so that (so far) LOC expands to
+  <strong>"test.cc" ":" "10"</strong>
+</p>
+</li>
+<li>
+<p>
+the compiler combines the 3 adjacent string literals <strong>"test.cc"</strong>, <strong>":"</strong>, and
+   <strong>"10"</strong> into the single string literal <strong>"test.cc:10"</strong> which is then printed.
+</p>
+</li>
+</ol></div>
+<div class="paragraph"><p>This is quite some work for the compiler, but the result such that the runtime
+cost for <strong>GNU APL</strong> is only ther loading of the string literal when <strong>GNU APL</strong>
+starts.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_the_q_macro">The Q Macro</h3>
+<div class="paragraph"><p>The second trick is the Q() macro which is defined as</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>#define Q(x) get_CERR() &lt;&lt; std::left &lt;&lt; setw(20) &lt;&lt; #x ":" &lt;&lt; " '" &lt;&lt; x &lt;&lt; "' at " LOC &lt;&lt; endl;</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>In this definition <strong>get_CERR()</strong> is a functions which returns an output channel
+such as <strong>std::cerr</strong> (or <strong>stderr</strong> in C). The operator &lt;&lt; is overloaded a lot
+and in such a way that commonly used data types in <strong>GNU APL</strong> are being printed
+nicely. A consequence of the overloading is that <strong>Q()</strong> macro can be used
+with many different data types without the burdon to properly format them
+for the debug output.</p></div>
+<div class="paragraph"><p><strong>Q(x)</strong> uses the <strong>LOC</strong> macro to get the source file name and line number of its
+invocation and essentially prints <strong>x</strong> in a suitable format and followed by
+its source code location. For example:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>#include &lt;iostream&gt;   // for cout
+#include &lt;iomanip&gt;    // for setw
+
+using namespace std;
+
+#define STR(x) #x
+#define LOC Loc(__FILE__, __LINE__)
+#define Loc(f, l) f ":" STR(l)
+
+#define Q(x) cerr &lt;&lt; std::left &lt;&lt; std::setw(20) &lt;&lt; #x ":" &lt;&lt; " '" &lt;&lt; x &lt;&lt; "' at " LOC &lt;&lt; std::endl;
+
+int
+main()
+{
+   Q("Hello")   // line 15
+   Q(10)
+   Q(LOC)
+}</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>which, when compiled, produces:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>"Hello":             'Hello' at test.cc:15
+10:                  '10' at test.cc:16
+LOC:                 'test.cc:17' at test.cc:17</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>With these prerequisites intrusive troubleshooting boils down to spreading
+<strong>Q()</strong> macros in different source files until the fault is found.</p></div>
+<div class="paragraph"><p>A frequent question is not the value of a C++ variable, but rather if (and
+when) a particular source code line of code is reached. To answer this
+question just insert <strong>Q(LOC)</strong> or <strong>Q(0)</strong> on the line of interest.</p></div>
+<div class="paragraph"><p>Another useful helper is <strong>subversion</strong> (svn). After having made multiple
+insertions of <strong>Q()</strong> macros in various sorce files (and hopefully having
+located the fault this way), simply do</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>svn revert *</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>in the <strong>src</strong> directory which undoes all changes you made.</p></div>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_keep_it_short_and_simple">Keep It Short and Simple</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>The first thing to check before reporting an error is to make sure that you
+have compiled and installed the latest GNU APL version from subbversion (SVN)
+or git.</p></div>
+<div class="paragraph"><p>From a maintainer&#8217;s perspective, the trouble reports that are appreciated the
+most are the short ones. Locating a fault usually requires multiple
+repetitions of the sequence that causes the fault. Consider two extremes:</p></div>
+<div class="olist upperalpha"><ol class="upperalpha">
+<li>
+<p>
+The fault can be reproduced by executing a handful of APL lines in
+   immediate execution mode, possibly accompanied by one or two ∇-defined
+   functions or lambdas.
+</p>
+</li>
+<li>
+<p>
+A tar file contains a workspace, possibly )COPYing other workspaces.
+   In order to reproduce the fault, the workspace has to be )LOADed and
+   started in a specific way in order to reproduce the error.
+</p>
+</li>
+</ol></div>
+<div class="paragraph"><p>In case A. the maintainer can simply copy the lines into a small apl script
+created for fixing the fault. That script can then be repeated again and again
+by starting the script from the command line of a shell.</p></div>
+<div class="paragraph"><p>In case B. the maintainer must first install the workspaces that come with the
+fault. Then start apl, )LOAD the workspace and figure out:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+how the workspace shall be started,
+</p>
+</li>
+<li>
+<p>
+how the defined function in the workspace look like, how they interact,
+  and which ones are related to the fault,
+</p>
+</li>
+<li>
+<p>
+and so non.
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>Case B. creates a lot of overhead for the maintainer that does very little to
+find the fault. Although sometimes a complex workspace is needed to reproduce
+a fault, this is rather rare and almost all errors reported so far could be
+reduced to a small number of APL lines.</p></div>
+<div class="paragraph"><p>Last but not least, please have a look here:</p></div>
+<div class="paragraph"><p><a href="https://www.gnu.org/software/libc/manual/html_node/Reporting-Bugs.html">https://www.gnu.org/software/libc/manual/html_node/Reporting-Bugs.html</a></p></div>
+</div>
+</div>
+</div>
+<div id="footnotes"><hr /></div>
+<div id="footer">
+<div id="footer-text">
+Last updated
+ 2023-04-28 19:51:16 CEST
+</div>
+</div>
+</body>
+</html>

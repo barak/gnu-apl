@@ -1,0 +1,207 @@
+
+<!DOCTYPE html>
+<HTML>
+  <HEAD>
+    <TITLE>GNU APL</TITLE>
+    <META http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <META name="description" content="Welcome to GNU APL">
+    <LINK rel="stylesheet" type="text/css" href="apl-home.css">
+    <STYLE type="text/css">
+      
+    </STYLE>
+  </HEAD>
+  <BODY>
+    
+    <DIV class="c1">
+     <H1>GNU APL</H1> 
+    <TABLE>
+      <TR>
+        <TD>  <IMG src="http://www.gnu.org/graphics/gnu-head-sm.jpg" alt="Astrid" height="122" width="129"> 
+        <TD style="width:20%">
+        <TD><I> Rho, rho, rho of X<BR>
+             Always equals 1<BR>
+             Rho is dimension, rho rho rank.<BR>
+             APL is fun!</I><BR>
+             <BR>
+             <B>Richard M. Stallman</B>, 1969<BR>
+      </TR>
+    </TABLE>
+    
+    <BR><BR><BR>
+    </DIV>
+    <DIV class="c2">
+    <B>GNU APL</B> is a free interpreter for the programming language APL.
+    <BR><BR>
+    The APL interpreter is an (almost) complete implementation of
+    <I><B>ISO standard 13751</B></I> aka.
+    <I><B>Programming Language APL, Extended.</B></I>
+    <BR>
+    <BR>
+    The APL interpreter has implemented:
+    <UL>                                        <LI> nested arrays and related functions  <LI> complex numbers, and                 <LI> a shared variable interface        </UL>                                     
+    
+    In addition, <B>GNU APL</B> can be scripted. For example, this
+    GNU APL home page was produced by a CGI script written in APL (see
+     <A href="APL_demo.html"><B>APL demo</B></A> ).
+    <BR>
+    <BR>
+    GNU APL was written and is being maintained by Jürgen Sauermann.
+    <A href="http://xn--jrgen-sauermann-zvb.de"></A></DIV>
+    <DIV class="c3">
+    
+     <H2>Downloading and Installing GNU APL</H2> 
+    GNU APL should be available on every 
+    <A href="http://www.gnu.org/prep/ftp.html">GNU mirror</A>
+    (in directory <B>apl</B>) and at
+    <A href="ftp://ftp.gnu.org/gnu/apl">ftp://ftp.gnu.org</A>.
+    
+     <H4>Simple Installation of GNU APL</H4> 
+    The <B>simplest</B> (though not necessarily best) way to install GNU APL is this:
+    
+    <OL>                                                                                                                                                                                                                                                                     <LI> Visit one of the <A href="http://www.gnu.org/prep/ftp.html">GNU mirrors</A> and download the tar file <B>apl-1.8.tar.gz</B> in directory <B>apl</B>.                                                                                                              <LI> Unpack the tar file: <B>tar xzf apl-1.8.tar.gz</B>                                                                                                                                                                                                                <LI> Change to the newly created directory: <B>cd apl-1.8</B>                                                                                                                                                
+                                                                <LI> Read (and follow) the instructions in files <B>INSTALL</B> and <B>README-*</B>                                                                                                                                                                                    <LI> <B>Caveat:</B> GNU APL creates full releases only every 1-2 years. Therefore an interpreter downloaded from a GNU mirror is inevitably outdated and likely contains errors that were fixed already. Consider using <B>git</B> or <B>SVN</B> (see below) instead.</OL>                                                                                                                                                                                                                                                                  
+    
+     <H4>GNU APL for WINDOWs</H4> 
+    
+    GNU APL compiles under CYGWIN, (see
+    <A href="http://www.cygwin.org">www.cygwin.org</A>),
+    provided that the necessary libraries are installed. A 32-bit <B>apl.exe</B>
+    that should run under CYGWIN lives in the download area. Use at your own risk
+    and see <B>README-5-WINDOWS</B> for further information. Building GNU APL under
+    cygwin is the method of choice if you need some of the special purpose system
+    functions (⎕FFT, ⎕PLOT, ⎕RE, etc) that depend on non-default libraries.
+    
+    A compiled 64-bit version of GNU APL (briefly tested under Windows 10)
+    which was built under cygwin, but runs without cygwin being installed,
+    is contained in file <B>apl-1.8-windows.zip</B>. This zip file also contains
+    an installer for an APL keyboard layout.
+    
+     <H4>Subversion (SVN) and Git repositories for GNU APL</H4> 
+    
+    The best supported way of installing GNU APL is to check out its latest version from either its Subversion (preferred)
+    or Git repository on Savannah. The subversion command to do that is:
+    <BR>
+    <BR>
+    <B>svn checkout http://svn.savannah.gnu.org/svn/apl/trunk</B>
+    <BR>
+    <BR>
+    Here is  <A href="https://savannah.gnu.org/svn/?group=apl"><EM>more information</EM></A> 
+    about using Subversion with GNU APL. Likewise, the command for a Git
+    checkout is:
+    <BR>
+    <BR>
+    <B>git clone https://git.savannah.gnu.org/git/apl.git</B>
+    <BR>
+    <BR>
+    and here is  <A href="https://savannah.gnu.org/git/?group=apl"><EM>more information</EM></A> 
+    about using Git with GNU APL.
+    
+     <H4>RPMs for GNU APL</H4> 
+    
+    For RPM based GNU/Linux distributions we have created source and binary RPMs.
+    Look for files <B>apl-1.8-0.i386.rpm</B> (binary RPM for i386) or 
+    <B>apl-1.8-0.src.rpm</B> (source RPM). If you encounter a problem with these
+    RPMs, then please report it, but with a solution, since the maintainer of
+    GNU APL may use a GNU/Linux distribution with a different package manager.
+    
+     <H4>Debian packages for GNU APL</H4> 
+    
+    For Debian based GNU/Linux distributions we have created source and binary 
+    packages for Debian. Look for files <B>apl-1.8-1_i386.deb</B> (binary Debian
+    package for i386) or <B>apl-1.8-1.debian.tar.gz</B> (Debian source package).
+    If you encounter a problem with these packages, then please report it,
+    but with a solution, since the maintainer of GNU APL may use a GNU/Linux
+    distribution with a different package manager.
+    
+     <H4>GNU APL Binary</H4> 
+    
+    If you just want to quickly give GNU APL a try, and if you are very lucky,
+    then you may be able to start the compiled
+    GNU APL binary <B>apl</B> in the directory <B>apl</B> rather than
+    installing the entire packet . The binary MAY run on a 32-bit i686 Ubuntu.
+    Chances are, however, that it does NOT work, Please DO NOT report any
+    problems if the binary does not run on your machine. Instead please use a better
+    supported installation method above.
+    <BR><BR>
+    <B>Note:</B> The programs <B>APxxx</B> and <B>APserver</B> (support programs for
+    shared APL variables) are not provided in binary form. Therefore you should
+    start the <B>apl</B> binary with command line option <B>--noSV</B>. Note as
+    well that the binary <B>apl</B> will not be updated with every GNU APL release.
+    Therefore it will contain errors that have been corrected already.
+    </DIV>
+    
+    <DIV class="c4">
+     <H2>Reporting Bugs</H2> 
+    
+    GNU APL is made up of more than 100,000 lines of C++ code. In a code of that
+    size, programming mistakes are inevitable. Even though mistakes are hardly
+    avoidable, they can be <B>corrected</B> once they are found. In order to
+    improve the quality of GNU APL, we would like to encourage you to report
+    errors that you find in GNU APL to
+     <A href="mailto:bug-apl@gnu.org"><EM>bug-apl@gnu.org</EM></A> .
+    <BR><BR>
+    The emails that we like the most are those that include a small example of
+     how to reproduce the fault. You can see all previous postings to this mailing
+    list at 
+     <A href="http://lists.gnu.org/archive/html/bug-apl/"><B>http://lists.gnu.org/archive/html/bug-apl/</B></A> 
+    or subscribe to it at 
+     <A href="https://lists.gnu.org/mailman/listinfo/bug-apl"><B>https://lists.gnu.org/mailman/listinfo/bug-apl</B></A> 
+    </DIV>
+    <DIV class="c5">
+     <H2>Documentation</H2> 
+    We have an  <A href="apl.html"><B>info manual</B></A>  for GNU APL.
+    
+    We are also looking for <B>free</B> documentation on APL in general
+    (volunteers welcome) that can be published here. A "Quick start" document
+    for APL is planned but the work has not started yet.
+    <BR><BR>
+    The C++ source files for GNU APL are Doxygen documented. You can generate
+    this documentation by running <B>make DOXY</B> in the top level directory
+    of the GNU APL package.
+    </DIV>
+    <DIV class="c6">
+     <H2>GNU APL Community</H2> 
+    There is a growing group of people that are using GNU APL and that have made
+    their own developments related to APL available to the public.
+    We have created a
+    <A href="Community.html"><b>GNU APL Community Web page</b></A>
+    that collects <B>links</B> to those developments to avoid that they get lost.
+    <BR><BR>
+    In addition, we maintain a 
+    <A href="Bits_and_Pieces/"><b>Bits-and-Pieces</b></A> directory
+    where we collect <B>files</B> that contain APL code sniplets, GNU APL
+    workspaces, and other files that were contributed by the GNU APL Community.
+    The Bits-and-Pieces directory is the right place for contributions for which
+    the creation of an own hosting account would be an overkill.
+    
+    </DIV>
+    
+    <DIV class="c7">
+    Return to  <A href="http://www.gnu.org/home.html">GNU's home page</A> .
+    <P>
+    
+    Please send FSF &amp; GNU inquiries &amp; questions to
+    
+     <A href="mailto:gnu@gnu.org"><EM>gnu@gnu.org</EM></A> .
+    There are also
+     <A href="http://www.gnu.org/home.html#ContactInfo">other ways to contact</A> 
+    the FSF.
+    <P>
+    Please send comments on these web pages to
+     <A href="mailto:bug-apl@gnu.org"><EM>bug-apl@gnu.org</EM></A> .
+    send other questions to
+     <A href="mailto:gnu@gnu.org"><EM>gnu@gnu.org</EM></A> .
+    <P>
+    Copyright (C) 2014 Free Software Foundation, Inc.,
+    51 Franklin Street, Fifth Floor, Boston, MA  02110,  USA
+    <P>
+    Verbatim copying and distribution of this entire article is
+    permitted in any medium, provided this notice is preserved.<P>
+    </DIV>
+  </BODY>
+</HTML>
+<!--
+xAPL_TAR    xAPL_VERSION    xCYGWIN     xDEBFILE    xDESCRIPTION    xFTP_APL    xFTP_GNU    xGIT_APL    xGNU_PIC    xHTTP_GNU   xHTTP_JSA   xMAIL_APL   xMAIL_APL_ARCHIVE   xMAIL_APL_SUBSCRIBE     xMAIL_GNU   xMAIL_WEB   xMIRRORS    xRPMFILE    xSDEBFILE   xSRPMFILE   xSVN_APL    xTARFILE    xTITLE  yBODY   yFEATURES
+HTML∆A  HTML∆Assert     HTML∆Body   HTML∆Document   HTML∆H1     HTML∆H2     HTML∆H3     HTML∆H4     HTML∆HTTP_header    HTML∆Head   HTML∆Html   HTML∆Img    HTML∆Li     HTML∆Link   HTML∆Ol     HTML∆Style  HTML∆T  HTML∆TX_B_1     HTML∆TX_B_E     HTML∆TX_B_E_1   HTML∆Title  HTML∆Ul     HTML∆__h_w  HTML∆__rel  HTML∆__src  HTML∆__type     HTML∆__width    HTML∆_alt   HTML∆_content   HTML∆_height    HTML∆_href  HTML∆_http_eq   HTML∆_name  HTML∆attr   HTML∆debug  HTML∆emit   HTML∆emit_1     HTML∆indent     HTML∆indent_2   HTML∆x2y    HTML∆xbox   HTML⍙Author     HTML⍙BugEmail   HTML⍙Documentaion   HTML⍙Download   HTML⍙License    HTML⍙Portability    HTML⍙Provides   HTML⍙Requires   HTML⍙Version    Home    INSTALL
+-->
+

@@ -1,0 +1,67 @@
+
+The default build of GNU APL creates only the APL interpreter binary
+aka. src/apl. This is assumed to be what the majority of GNU APL users
+need in the first place.
+
+This default build places all intermediate files - mostly .o files
+from the corresponding .cc files into the same directory (src) as
+the source files. If GNU APL is re-configured after the first build,
+then the intermediate files from the previous build are overridden with
+- possibly different - intermediate files and th the same names and this
+can, depending on the ./configure options that were used, lead to a
+dubious mix of object files built with different ./configure options.
+
+Also, if the same target, say src/apl, is build several times with
+different ./configure options then the previous src/apl versions are
+lost and the user has to (manually) copy them in some other place where
+they are not being overridden.
+
+In order to avoid the above complications, GNU APL supports the so-called
+"VPATH builds", which are a feature of the Autoconf build system used by
+GNU APL.
+
+The difference between the default build and a VPATH build is this: the
+default build places all object files and the final result (i.e. file apl,
+libapl.so, or lib_gnu_apl.so) into the sub-directory src of the top-level
+directory, while a VPATH build plaaces these files into a sub-directory
+chosen (and created) by the user. As a consequence, if a user wants to
+build different configurations in one go (i.e. without the need to copy
+the build results between differenyt builds) then she can do so by creating
+different directories for the diffferent builds and then executing the
+build in the different directories. The total build time increases a little
+because every object file is recompiled in every build while some of
+them may be re-used in a standard build.
+
+A VPATH build is, in principle, performed like this:
+
+    cd <top-level-apl-directory>
+    mkdir my_build_directory
+    cd my_build_directory
+    ../configure
+    make
+
+However, the following is required:
+
+A. the build directory chosen for the VPATH build needs to be located below
+   the top-level APL directory and not deeper than (currently) 4 directory
+   levels. A commom choice is a directory named 'obj' in the to-level
+   directory.
+
+B. The top-level APL directory and its sub-directory 'src' must be "fresh",
+   i.e. must not have been polluted by non-VPATH builds before a VPATH
+   build. A prior non-VPATH build will cause the subsequent VPATH build to
+   (incorrectly) believe that the object files in the 'src' directory (from
+   the non-VPATH build) need not be recompiled (even though these files should
+   now be in the 'src' directory of the VPATH build directory.
+
+   A "hack" to fix a polluted top-level directory seems to be:
+
+   cd <top-level-apl-directory>
+   ./configure         # so that src/Makefile exists
+   make -C src clean   # otherwise some object files will be missing
+   rm config.status    # otherwise configure will complain
+
+   After a previous (non-VPATH) ./configure (in the top-level GNU APL
+   directory) the same can be achieved with 'make VPATH_clean'
+
+An example for VPATH builds is the script /build/build_all

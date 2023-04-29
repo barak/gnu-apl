@@ -1,0 +1,6 @@
+
+this file exists solely because git refuses to preserve empty directories.
+
+It is common practice is to call this file .gitignore (and leave it empty),
+but that would completely disguise the true purpose of this file.
+
