@@ -199,6 +199,16 @@ uint32_t uni = 0;
    return Unicode(bx | uni);
 }
 //----------------------------------------------------------------------------
+int
+UTF8_string::bytes_chars(const void * string)
+{
+const UTF8 * str = utf8P(string);
+int ret = 0;
+
+   while (*str)   { if (0x80 == (0xC0 & *str++))   ++ret; }
+   return ret;
+}
+//----------------------------------------------------------------------------
 Unicode
 UTF8_string::getc(istream & in)
 {
@@ -401,7 +411,7 @@ UTF8_string::round_0_1()
 }
 //----------------------------------------------------------------------------
 ostream &
-operator<<(ostream & os, const UTF8_string & utf)
+operator <<(ostream & os, const UTF8_string & utf)
 {
    loop(c, utf.size())   os << utf[c];
    return os;

@@ -38,28 +38,28 @@ using namespace std;
  testcase execution. It works like this:
 
        (cin)
-         |
-         |
+         │
+         │
          V
-     +---+---+             +-------------------+
-     | Input | <--------   | testcase files(s) |
-     +---+---+             +---------+---------+
-         |                           |
-         |                           |
-         V                           |
-      +--+--+                        |
-      | APL |                        |
-      +--+--+                        |
-         |                           |
-         |                           |
-         +-----------------------+   |
-         |                       |   |
-         |                       V   V
-         |                    +--+---+--+
-         |                    | compare |
-         |                    +----+----+
-         |                         |
-         |                         |
+     ╔═══════╗             ╔═══════════════════╗
+     ║ Input ║ <────────── ║ testcase files(s) ║
+     ╚═══════╝             ╚═══════════════════╝
+         │                           │
+         │                           │
+         V                           │
+      ╔═════╗                        │
+      ║ APL ║                        │
+      ╚═════╝                        │
+         │                           │
+         │                           │
+         ├───────────────────────┐   │
+         │                       │   │
+         │                       V   V
+         │                    ╔═════════╗
+         │                    ║ compare ║
+         │                    ╚═════════╝
+         │                         │
+         │                         │
          V                         V
        (cout)                (test results)
  
@@ -88,6 +88,10 @@ public:
    /// return the total number of errors
    static int error_count()
       { return apl_errors + assert_errors + diff_errors + parse_errors; }
+
+   /// return \b true iff the interpreter shall exit after a file I/O error
+   static bool exit_on_error()
+      { return test_mode == TM_EXIT_AFTER_FILE_ERROR; }
 
    /// count and report a parse error
    static void syntax_error();
@@ -190,6 +194,12 @@ protected:
 
    /// the current test report
    static ofstream current_testreport;
+
+   /// name of the summary file (same directory as first testcase).
+   static UTF8_string summary_path;
+
+   /// when a .tc file was started
+   static APL_time_us start_usecs;
 };
 
 #endif // __IO_FILES_HH_DEFINED__

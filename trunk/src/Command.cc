@@ -315,8 +315,13 @@ Executable * statements = 0;
       }
    catch (Error err)
       {
-        UERR << Error::error_name(err.get_error_code());
-        if (Workspace::more_error().size())   UERR << UNI_PLUS;
+        bool plus = Workspace::more_error().size();   // assume + needed
+        const char * error_name = Error::error_name(err.get_error_code());
+        if (strchr(error_name, UNI_PLUS))   plus = false;   // not needed
+        if (Workspace::more_error().back() == UNI_PLUS)   plus = false; // dito.
+
+        UERR << error_name;
+        if (plus)   UERR << UNI_PLUS;
         UERR << endl;
         if (err.get_error_line_2().size())
            {
@@ -336,9 +341,12 @@ Executable * statements = 0;
         cmd_OFF(0);
       }
 
-   if (statements == 0)
+   if (statements == 0)   // StatementList::fix() failed
       {
-        COUT << "main: Parse error." << endl;
+        COUT << "main: Parse error";
+        if (Workspace::more_error().size())   COUT << "+";
+        else                                  COUT << ".";
+        COUT << endl;
         return;
       }
 
@@ -2014,6 +2022,23 @@ rlimit rl;
 }
 //----------------------------------------------------------------------------
 void
+Command::cmd_OPTIM(ostream & out, const UCS_string & arg)
+{
+   if (arg.starts_iwith("CLEAR"))
+      {
+        out << "Optimization counters cleared" << endl;
+        OptmizationStatistics::reset_all();
+        return;
+      }
+
+int ulen;
+#define optim(opt, text) ulen = 40 + UTF8_string::bytes_chars(text);   \
+        out << left << setw(ulen) << text << right << " : "            \
+        << setw(6) << OptmizationStatistics::get(OPTI_ ## opt) << endl;
+#include "Performance.def"
+}
+//----------------------------------------------------------------------------
+void
 Command::cmd_NEXTFILE(ostream & out, const UCS_string_vector & args)
 {
    loop(a, args.size())
@@ -2462,7 +2487,7 @@ OOT action = Toggle;
               else
                  CERR << "    Invalid logging facility " << lid
                       << " ignored. Valid logging facilities are: "
-                      << LID_MIN << ".." << LID_MAX << endl;
+                      << LID_MIN << ".." << (LID_MAX - 1) << endl;
             }
        }
 

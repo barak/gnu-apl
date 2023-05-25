@@ -317,19 +317,19 @@ StateIndicator::indent(ostream & out) const
 }
 //----------------------------------------------------------------------------
 Token
-StateIndicator::jump(const Value * value)
+StateIndicator::jump(const Value * B)
 {
    // perform a jump. We either remain in the current function (and then
    // return TOK_VOID), or we (want to) jump back into the calling
    // function (and then return TOK_BRANCH.). The jump itself (if any)
    // is executed in Prefix.cc.
    //
-   if (value->get_rank() > 1)   RANK_ERROR;
+   if (B->get_rank() > 1)   RANK_ERROR;
 
-   if (value->element_count() == 0)     // →''
+   if (B->element_count() == 0)     // →''
       {
-        // →⍬ in immediate execution means resume (retry) suspended function
-        // →⍬ on ⍎ or defined functions means do nothing
+        // →'' in immediate execution means resume (retry) suspended function
+        // →'' on ⍎ or defined functions means do nothing
         //
         if (get_parse_mode() == PM_STATEMENT_LIST)
            return Token(TOK_BRANCH, int64_t(Function_Retry));
@@ -337,7 +337,7 @@ StateIndicator::jump(const Value * value)
         return Token(TOK_NOBRANCH);           // stay in context
       }
 
-const Function_Line line = value->get_line_number();
+const Function_Line line = B->get_line_number();
    return jump_to_line(line);
 }
 //----------------------------------------------------------------------------
@@ -510,6 +510,8 @@ extern bool python_result_callback(Token & result);
 void
 StateIndicator::statement_result(Token & result, bool trace)
 {
+   Log(LOG_IfElse)   usleep(200000);
+
    Log(LOG_StateIndicator__enter_leave)
       CERR << "StateIndicator::statement_result(pmode="
            << get_parse_mode_name() << ", result=" << result << endl;

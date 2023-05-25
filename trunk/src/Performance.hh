@@ -355,5 +355,38 @@ public:
 
 #include "Performance.def"
 };
+//============================================================================
+enum Optimization_ID
+{
+  INVALID_OPTIMIZATION_COUNTER = -1,
+#define optim(tag, _text)  OPTI_ ## tag,
+#include "Performance.def"
+  OPT_COUNTER_COUNT
+};
+//-----------------------------------------------------------------------------
+class OptmizationStatistics
+{
+public:
+   /// return the value of counter \b opt
+   static int64_t get(Optimization_ID opt)
+      {
+        return optimization_counters[opt];
+      }
 
+   // reset all counters
+   static void reset_all()
+      {
+        loop(opt, OPT_COUNTER_COUNT)   optimization_counters[opt] = 0;
+      }
+
+   /// increment counter \b opt
+   static void count(Optimization_ID opt)
+      {
+        ++optimization_counters[opt];
+      }
+
+protected:
+   static int64_t optimization_counters[OPT_COUNTER_COUNT];
+};
+//============================================================================
 #endif // __PERFORMANCE_HH_DEFINED__

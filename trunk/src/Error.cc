@@ -42,11 +42,20 @@ Error::Error(ErrorCode ec, const char * loc)
      right_caret(-1),
      print_loc(0)
 {
-const char more = Workspace::more_error().size() ? '+' : 0;
-   SPRINTF(error_message_1, "%s%c", error_name(error_code), more);
+const bool have_more = Workspace::more_error().size();
+   if (have_more && Workspace::more_error().back() != UNI_PLUS)
+      {
+        SPRINTF(error_message_1, "%s%c", error_name(error_code), UNI_PLUS);
+      }
+   else
+      {
+        SPRINTF(error_message_1, "%s", error_name(error_code));
+      }
 
-   if (more && Command::auto_MORE)
-      CERR << Workspace::more_error() << endl;
+   if (have_more && Command::auto_MORE)
+      {
+        CERR << Workspace::more_error() << endl;
+      }
 
    *symbol_name = 0;
    *error_message_2 = 0;
@@ -84,7 +93,7 @@ Error::print(ostream & out, const char * loc) const
         else
            {
              out << error_name(error_code);
-             if (Workspace::more_error().size())   out << UNI_PLUS;
+             if (Workspace::more_error().back() != UNI_PLUS)   out << UNI_PLUS;
              out << endl;
            }
 

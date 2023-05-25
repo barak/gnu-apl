@@ -37,6 +37,7 @@
 #include <IO_Files.hh>
 #include <LineInput.hh>
 #include <PointerCell.hh>
+#include <StateIndicator.hh>
 #include <Tokenizer.hh>
 #include <UserPreferences.hh>
 #include <Workspace.hh>
@@ -565,7 +566,7 @@ Token_string tos;
            {
              Symbol * sym = tos[j].get_sym_ptr();
              if (sym == 0)   return 0;
-             sym->resolve(tos[j], false);
+             sym->resolve_right(tos[j]);
            }
        }
 
@@ -649,7 +650,7 @@ Symbol * symbol = Workspace::lookup_existing_symbol(var_name_ucs);
    if (symbol == 0)                       return 0;   // unknown name
    if (symbol->get_NC() != NC_VARIABLE)   return 0;   // name is not a variable
 
-Value_P Z = symbol->get_value();
+Value_P Z = symbol->get_apl_value();
    if (!Z)                              return 0;
 
    Z.get()->increment_owner_count(loc);   // keep value

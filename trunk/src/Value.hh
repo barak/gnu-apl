@@ -734,7 +734,7 @@ public:
  **/
 #define NEW_CLONE
 
-#ifdef NEW_CLONE
+#ifdef NEW_CLONE   /* new clone() scheme */
 
 /// clone, given a Value_P. Result is a Value_P.
 # define CLONE_P(B_P, L)   (B_P)

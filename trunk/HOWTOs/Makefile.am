@@ -7,7 +7,7 @@ ASCIIDOC = \
     Quad-GTK.asciidoc                   \
     GNU-APL-Memory-Management.asciidoc  \
     GNU-APL-Troubleshooting.asciidoc    \
-    Tips-For-Mainatiners.asciidoc
+    GNU-APL-Designers-Guide.asciidoc
 
 HTML = \
     APL-Communication-Cookbook.html \
@@ -15,7 +15,7 @@ HTML = \
     Quad-GTK.html                   \
     GNU-APL-Memory-Management.html  \
     GNU-APL-Troubleshooting.html    \
-    Tips-For-Mainatiners.html
+    GNU-APL-Designers-Guide.html
 
 dist_doc_DATA = \
     $(HTML)              \
@@ -41,11 +41,25 @@ dist_doc_DATA = \
     APL4.png             \
     APL5.png
 
+# use asciidoc (if installed) to convert .asciidoc to .html
+# The .html has a stupid <noscript> tag that needs to be removed
+# in order to properly display the Table of Contents.
 .asciidoc.html:
-	if [ -z `which asciidoc` ] ; then touch $@ ;       \
-	else asciidoc -a icons -o $@ $< ;                  \
-             sed -i 's|<pre><code>|<pre>\n\n<code>|' $@ ;  \
-             sed -i 's|</code></pre>|</code>\n\n</pre>|' $@ ; fi
+	@if [ -z `which asciidoc` ] ; then touch $@ ;        \
+	else asciidoc -a icons -o $@ $< ;                    \
+        sed -i 's|Cpp|C++|g'                        $@ ; \
+        sed -i 's|<pre><code>|<pre>\n\n<code>|'     $@ ; \
+        sed -i 's|</code></pre>|</code>\n\n</pre>|' $@ ; \
+	    grep -v -F "<noscript>" $@           > /tmp/$@ ; \
+        mv -f /tmp/$@                               $@ ; \
+    fi
+
+# use LibreOffic Writer (if installed) to convert .html to .pdf
+#
+.html.pdf:
+	@if [ -z `which lowriter` ] ; then touch $@  ; \
+	else lowriter --headless --convert-to pdf $< ; \
+	fi
 
 .PRECIOUS: $(HTML) glade-1.png glade-2.png glade-3.png glade-4.png
 

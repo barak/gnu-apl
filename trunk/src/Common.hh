@@ -141,7 +141,7 @@ extern ostream CERR;
 extern ostream UERR;
 
 class UCS_string;
-extern UCS_string & MORE_ERROR();   // in Workspace.cc
+extern UCS_string & MORE_ERROR();   // in Workspace.cc; clears MORE info.
 
 #define loop(v, e) for (ShapeItem v = 0, __end__ = e; v < __end__; ++v)
 
@@ -425,11 +425,11 @@ extern std::ostream & get_CERR();
 
 //============================================================================
 /// Function_Line ++ (post increment)
-inline int operator ++(Function_Line & fl, int)
+inline Function_Line operator ++(Function_Line & fl, int)
 {
-Function_Line ret = fl;
+const Function_Line before_increment = fl;
    fl = Function_Line(fl + 1);
-   return ret;
+   return before_increment;
 }
 //============================================================================
 inline void skip_spaces(const char * & p)
@@ -453,9 +453,9 @@ operator -(Function_PC pc, int offset)
 inline Function_PC
 operator ++(Function_PC & pc, int)
 {
-const Function_PC before = pc; 
+const Function_PC before_increment = pc; 
    pc = pc + 1;
-   return before;
+   return before_increment;
 }
 //----------------------------------------------------------------------------
 /// Function_PC ++ (pre increment)

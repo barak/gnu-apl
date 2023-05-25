@@ -45,10 +45,11 @@ TD(TOK_OPER2         , TC_OPER2     , TV_FUN  , ID_No_ID        ) // user def'd
 TD(TOK_FIRST_TIME    , TC_VOID      , TV_NONE , ID_FIRST_TIME   )
 TD(TOK_INVALID       , TC_INVALID   , TV_NONE , ID_INVALID      )
 TD(TOK_VOID          , TC_VOID      , TV_NONE , ID_VOID         )
-TD(TOK_END           , TC_END       , TV_INT  , ID_END          )
-TD(TOK_ENDL          , TC_END       , TV_INT  , ID_ENDL         ) // last END
+TD(TOK_END           , TC_END       , TV_INT  , ID_END          ) // end of stat
+TD(TOK_ENDL          , TC_END       , TV_INT  , ID_ENDL         ) // end of line
 TD(TOK_OFF           , TC_OFF       , TV_NONE , ID_OFF          )
 TD(TOK_ESCAPE        , TC_R_ARROW   , TV_NONE , ID_ESCAPE       )
+TD(TOK_GOTO_PC       , TC_R_ARROW   , TV_INT  , ID_GOTO_PC      ) // →literal N
 TD(TOK_SPACE         , TC_SPACE     , TV_NONE , ID_SPACE        )
 TD(TOK_COLON         , TC_COLON     , TV_NONE , ID_COLON        )
 TD(TOK_QUOTE1        , TC_QUOTE     , TV_NONE , ID_QUOTE1       )
@@ -57,6 +58,9 @@ TD(TOK_ASSIGN        , TC_ASSIGN    , TV_NONE , ID_ASSIGN       )
 TD(TOK_ASSIGN1       , TC_ASSIGN    , TV_NONE , ID_ASSIGN1      )
 TD(TOK_R_ARROW       , TC_R_ARROW   , TV_NONE , ID_R_ARROW      )
 TD(TOK_DIAMOND       , TC_DIAMOND   , TV_NONE , ID_DIAMOND      )
+TD(TOK_IF_ELSE       , TC_END       , TV_INT  , ID_IF_ELSE      )
+TD(TOK_IF_END        , TC_END       , TV_INT  , ID_IF_END       )
+TD(TOK_IF_THEN       , TC_END       , TV_INT  , ID_IF_THEN      )
 TD(TOK_RETURN_EXEC   , TC_RETURN    , TV_NONE , ID_RETURN_EXEC  )
 TD(TOK_RETURN_STATS  , TC_RETURN    , TV_NONE , ID_RETURN_STATS )
 TD(TOK_RETURN_VOID   , TC_RETURN    , TV_NONE , ID_RETURN_VOID  )

@@ -633,11 +633,10 @@ main(int argc, const char *argv[])
          pthread_setname_np(pthread_self(), "apl/main");
 #endif
 
-   for (;;)
+   for (const bool exit_on_error = IO_Files::exit_on_error();;)
        {
-         Token t = Workspace::immediate_execution(
-                   IO_Files::test_mode == IO_Files::TM_EXIT_AFTER_FILE_ERROR);
-         if (t.get_tag() == TOK_OFF)   Command::cmd_OFF(0);
+         const Token tok = Workspace::immediate_execution(exit_on_error);
+         if (tok.get_tag() == TOK_OFF)   Command::cmd_OFF(0);
        }
 
    return 0;

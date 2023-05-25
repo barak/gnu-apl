@@ -52,8 +52,9 @@ public:
    /// replace literal axes by their reduction.
    static void replace_literal_axes(Token_string & tos);
 
-   /// remove VOID token from \b tos (compacting \b tos)
-   static void remove_void_token(Token_string & tos);
+   /// remove all TOK_VOID token from \b tos (compacting \b tos).
+   /// @return the number of tpkens removed (and adjust the size of \b tos)/
+   static VoidCount remove_TOK_VOID(Token_string & tos);
 
    /// compute distances between matching (), [], and {}
    static ErrorCode match_par_bra(Token_string & tos, bool backwards);

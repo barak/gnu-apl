@@ -246,6 +246,7 @@ const uint64_t end_1 = cycle_counter();
                                          B->nz_element_count());
 #endif
 
+        OptmizationStatistics::count(OPTI_RT_A_RHO_B);
         return Token(TOK_APL_VALUE1, B);
       }
 

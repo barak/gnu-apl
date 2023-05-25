@@ -452,6 +452,8 @@ const Shape shape_Z(B->element_count());
            CERR << "optimizing ,B (len="
                 << B->nz_element_count() << ")" << endl;
 
+        OptmizationStatistics::count(OPTI_RT_COMMA_B);
+
         B->set_shape(shape_Z);
         return Token(TOK_APL_VALUE1, B);
       }

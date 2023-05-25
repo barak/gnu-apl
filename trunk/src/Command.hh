@@ -68,11 +68,14 @@ public:
    /// or a path containing . or / chars
    static bool is_lib_ref(const UCS_string & lib);
 
+   /// continue with (jump to) next input file.
+   static void cmd_NEXTFILE(ostream & out, const UCS_string_vector & args);
+
    /// clean-up and exit from APL interpreter
    static void cmd_OFF(int exit_val);
 
-   /// continue with (jump to) next input file.
-   static void cmd_NEXTFILE(ostream & out, const UCS_string_vector & args);
+   /// show or clear optimizarion counters
+   static void cmd_OPTIM(ostream & out, const UCS_string & lib);
 
    /// clean-up and exit from APL interpreter
    static void cmd_PUSHFILE();

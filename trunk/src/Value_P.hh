@@ -90,14 +90,6 @@ public:
    /// clear the pointer (and possibly add an event)
    inline void clear_pointer(const char * loc);
 
-   /// decrement the owner count of \b val. The function body of this function
-   /// requires Value.hh and is therefore implemented in Value.icc.
-   static inline void decrement_owner_count(Value * & val, const char * loc);
-
-   /// increment the owner count of \b val. The function body of this function
-   /// requires Value.hh and is therefore implemented in Value.icc.
-   static inline void increment_owner_count(Value * val, const char * loc);
-
    /// clone value if more than one Value_P points to it
    inline void isolate(const char * loc);
 

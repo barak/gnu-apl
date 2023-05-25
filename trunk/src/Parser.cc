@@ -81,16 +81,36 @@ Parser::parse(const Token_string & input, Token_string & tos) const
 std::vector<Token_string *> statements;
    {
      Token_string * stat = new Token_string();
+     int curly_depth = 0;
      loop(idx, input.size())
         {
           const Token & tok = input[idx];
-          if (tok.get_tag() == TOK_DIAMOND)
+          switch(tok.get_tag())
              {
-               statements.push_back(stat);
-               stat = new Token_string();
-             }
-          else
-             {
+               case TOK_L_CURLY:
+                    ++curly_depth;
+                    stat->push_back(tok);
+                    break;
+
+               case TOK_R_CURLY:
+                    if (curly_depth)   --curly_depth;
+                    else               return E_UNBALANCED_R_CURLY;
+                    stat->push_back(tok);
+                    break;
+
+               case TOK_DIAMOND:
+                    if (curly_depth)   // ◊ inside { ... }
+                       {
+               //        return E_ILLEGAL_DIAMOND;  // single statement { ... }
+                         stat->push_back(tok);      // multi  statement { ... }
+                       }
+                    else               // normal ◊
+                       {
+                         statements.push_back(stat);
+                         stat = new Token_string();
+                       }
+                    break;
+          default:
                stat->push_back(tok);
              }
         }
@@ -129,7 +149,7 @@ Parser::parse_statement(Token_string & tos)
    // 1. convert (X) into X and ((X...)) into (X...)
    //
    remove_nongrouping_parantheses(tos);
-   remove_void_token(tos);
+   remove_TOK_VOID(tos);
 
    Log(LOG_parse)
       {
@@ -144,7 +164,7 @@ Parser::parse_statement(Token_string & tos)
    for (int progress = true; progress;)
       {
         progress = collect_groups(tos);
-        if (progress)   remove_void_token(tos);
+        if (progress)   remove_TOK_VOID(tos);
       }
 
    Log(LOG_parse)
@@ -157,7 +177,7 @@ Parser::parse_statement(Token_string & tos)
    //
    collect_constants(tos);
    replace_literal_axes(tos);
-   remove_void_token(tos);
+   remove_TOK_VOID(tos);
 
    // special case: single APL value (to speed up ⍎)
    //
@@ -185,7 +205,7 @@ Parser::parse_statement(Token_string & tos)
    // 5. replace bitwise functons ⊤∧, ⊤∨, ⊤⍲, and ⊤⍱ by their bitwise variant
    //
    replace_bitwise_functions(tos);
-   remove_void_token(tos);
+   remove_TOK_VOID(tos);
    Log(LOG_parse)
       {
         CERR << "parse 6 [" << tos.size() << "]: ";
@@ -662,8 +682,8 @@ Parser::replace_literal_axes(Token_string & tos)
        }
 }
 //----------------------------------------------------------------------------
-void
-Parser::remove_void_token(Token_string & tos)
+VoidCount
+Parser::remove_TOK_VOID(Token_string & tos)
 {
 ShapeItem dst = 0;
 
@@ -674,7 +694,9 @@ ShapeItem dst = 0;
          ++dst;
        }
 
+const VoidCount ret = VoidCount(tos.size() - dst);
    tos.resize(dst);
+   return ret;
 }
 //----------------------------------------------------------------------------
 ErrorCode
@@ -689,24 +711,31 @@ std::vector<ShapeItem> stack;
          switch(tos[t].get_Class())
            {
              // for [ ( or { push the position onto stack
-             case TC_L_BRACK:  if (tos[t].get_tag() != TOK_L_BRACK)   continue;
+             case TC_L_BRACK:
+                  if (tos[t].get_tag() != TOK_L_BRACK)   continue;
+                  /* fall through */
              case TC_L_PARENT:
-             case TC_L_CURLY:  stack.push_back(t);
-                               continue;
+             case TC_L_CURLY:
+                  stack.push_back(t);
+                  continue;
 
-             case TC_R_BRACK:  ec = E_UNBALANCED_BRACKET;
-                               tc_peer = TC_L_BRACK;
-                               break;
+             case TC_R_BRACK:
+                  ec = E_UNBALANCED_R_BRACKET;   // for empty stack below
+                  tc_peer = TC_L_BRACK;
+                  break;
 
-             case TC_R_PARENT: ec = E_UNBALANCED_PARENT;
-                               tc_peer = TC_L_PARENT;
-                               break;
+             case TC_R_PARENT:
+                  ec = E_UNBALANCED_R_PARENT;    // for empty stack below
+                  tc_peer = TC_L_PARENT;
+                  break;
 
-             case TC_R_CURLY:  ec = E_UNBALANCED_CURLY;
-                               tc_peer = TC_L_CURLY;
-                               break;
+             case TC_R_CURLY:
+                  ec = E_UNBALANCED_R_CURLY;     // for empty stack below
+                  tc_peer = TC_L_CURLY;
+                  break;
 
-             default:          continue;
+             default:
+                  continue;
            }
 
           // at this point, a closing ), ], or } was detected
@@ -723,14 +752,16 @@ std::vector<ShapeItem> stack;
           tos[t1].set_int_val2(diff);
        }
 
-   // if there are unmatched items: return syntax error of the outer token
+   // at this point all [ ( or { should have been matced (and therefore
+   // stack shuld be empty. If not:  return syntax error of the outer token
    //
    if (stack.size())
       {
         const TokenClass outer = tos[stack[0]].get_Class();
-        if (outer == TC_L_BRACK)    return E_UNBALANCED_BRACKET;
-        if (outer == TC_L_PARENT)   return E_UNBALANCED_PARENT;
-        return E_UNBALANCED_CURLY;
+        if (outer == TC_L_BRACK)    return E_UNBALANCED_L_BRACKET;
+        if (outer == TC_L_PARENT)   return E_UNBALANCED_L_PARENT;
+        if (outer == TC_L_CURLY)    return E_UNBALANCED_L_CURLY;
+        FIXME;
       }
 
    return E_NO_ERROR;

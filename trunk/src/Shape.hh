@@ -113,27 +113,27 @@ public:
 
    /// return the rank
    uRank get_rank() const
-   { return rho_rho; }
+      { return rho_rho; }
 
    /// return the length of dimension \b r
    ShapeItem get_shape_item(sAxis r) const
-   { Assert(r < rho_rho);   return rho[r]; }
+      { Assert(r < rho_rho);   return rho[r]; }
 
    /// return the length of dimension \b r
    ShapeItem get_transposed_shape_item(sAxis r) const
-   { Assert(r < rho_rho);   return rho[rho_rho - r - 1]; }
+      { Assert(r < rho_rho);   return rho[rho_rho - r - 1]; }
 
    /// return the length of the first axis, or 1 for scalars
    ShapeItem get_first_shape_item() const
-   { return rho_rho ? rho[0] : 1; }
+      { return rho_rho ? rho[0] : 1; }
 
    /// return the length of the last axis, or 1 for scalars
    ShapeItem get_last_shape_item() const
-   { return rho_rho ? rho[rho_rho - 1] : 1; }
+      { return rho_rho ? rho[rho_rho - 1] : 1; }
 
    /// return the length of the last axis, or 1 for scalars
    ShapeItem get_cols() const
-   { return rho_rho ?  rho[rho_rho - 1] : 1; }
+      { return rho_rho ?  rho[rho_rho - 1] : 1; }
 
    /// return the product of all but the the last dimension, or 1 for scalars
    ShapeItem get_rows() const

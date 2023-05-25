@@ -47,6 +47,8 @@ int IO_Files::parse_errors = 0;
 IO_Files::TestMode IO_Files::test_mode = TM_EXIT_AFTER_LAST_FILE;
 bool IO_Files::need_total = false;
 ofstream IO_Files::current_testreport;
+UTF8_string IO_Files::summary_path("testcases/summary.log");
+APL_time_us IO_Files::start_usecs = 0;
 
 //----------------------------------------------------------------------------
 void
@@ -246,8 +248,23 @@ IO_Files::end_of_current_file()
 
    if (InputFile::is_validating())   // running a .tc file
       {
-        ofstream summary("testcases/summary.log", ios_base::app);
-        summary << error_count() << " ";
+        const char * path = charP(summary_path.c_str());
+        ofstream summary(path, ios_base::app);
+        summary << setw(3) << error_count();
+
+        // cannot use SRINTF's ' flag uses locales (which suck).
+        const long long duration_usecs = now() - start_usecs;
+
+        if (duration_usecs >= 1000000)   // ≥ 1 second
+           summary << setw(3) << duration_usecs/1000000
+                   << "," << setfill('0');
+        else summary << "    ";
+
+        if (duration_usecs >= 1000)   // ≥ 1 milli second
+             summary << setw(3) << ((duration_usecs/1000) % 1000)
+                     << "," << setfill('0');
+        else summary << "    ";
+        summary << setw(3) << (duration_usecs % 1000) << setfill(' ') << "  ";
 
         if (error_count())
            {
@@ -293,7 +310,8 @@ IO_Files::end_of_current_file()
 void
 IO_Files::print_summary()
 {
-ofstream summary("testcases/summary.log", ios_base::app);
+const char * path = charP(summary_path.c_str());
+ofstream summary(path, ios_base::app);
 
 int done = testcases_done;
    if (done > testcase_count)   done = testcase_count;
@@ -326,7 +344,8 @@ IO_Files::open_next_file()
         if (InputFile::current_file()->is_pushed_pending())
            {
              InputFile::current_file()->set_pushed_pending(false);
-             CERR << "*** Leaving the pushed immediate execution context" << endl;
+             CERR << "*** Leaving the pushed immediate execution context"
+                  << endl;
            }
         else
            {
@@ -335,22 +354,29 @@ IO_Files::open_next_file()
         return;
       }
 
-     for (;;)
+     while (InputFile::current_file())
          {
-           if (!InputFile::current_file())   break;   // no more files
-
-           char log_name[FILENAME_MAX];
-           SPRINTF(log_name, "%s.log", InputFile::current_filename());
+           char log_file_name[FILENAME_MAX] = "";
 
            if (InputFile::current_file()->test)
               {
+                SPRINTF(log_file_name, "%s.log",
+                        InputFile::current_filename());
+                if (const char * slash = strrchr(log_file_name, '/'))
+                   {
+                     summary_path = UTF8_string(utf8P(log_file_name),
+                                                slash + 1 - log_file_name);
+                     summary_path.append_ASCII("summary.log");
+                   }
+
                 CERR << "  #######################################"
                         "#####################################\n"
                      << " ########################################"
                         "######################################\n"
                      << " ##    Testfile: " << left << setw(60)
                      << InputFile::current_filename() << "##\n"
-                     << " ##    Log file: " << setw(60) << log_name << "##\n"
+                     << " ##    Log file: " << setw(60) << log_file_name
+                     << "##\n"
                      << " ########################################"
                         "######################################" << endl
                      << "  #######################################"
@@ -378,15 +404,20 @@ IO_Files::open_next_file()
 
            if (InputFile::current_file()->test)
               {
-                current_testreport.open(log_name,
+                // open a testcase file
+                //
+                current_testreport.open(log_file_name,
                                         ofstream::out | ofstream::trunc);
                 if (!current_testreport.is_open())
                    {
-                     CERR << "could not open testcase log file " << log_name
+                     CERR << "could not open testcase log file "
+                          << log_file_name
                           << "; producing no .log file" << endl;
                    }
               }
 
+           // remember when test execution was started
+           start_usecs = now();
            return;
          }
 }

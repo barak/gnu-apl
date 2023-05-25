@@ -1,5 +1,35 @@
 #!/bin/bash
 
+# process command line arguments. By default build all configurations
+# (aka. nightly build)
+   #
+   case "$1" in
+
+      "")   # default: build all configurations
+         configs="$configs standard"
+         configs="$configs develop"
+         configs="$configs tar"
+       # configs="$configs git"
+         configs="$configs libxcb"
+         configs="$configs rational"
+         configs="$configs libapl"
+         configs="$configs parallel_bench"
+         configs="$configs erlang"
+         configs="$configs python"
+         ;;
+
+      "clean")   # clean up everything
+         configs=""
+         ;;
+
+      "nightly")   # only refresh /var/www/html/nightly_build_results.html
+         configs=""
+         ;;
+
+      *)
+   esac
+         configs="$*"
+
 # this script builds different GNU APL variants and tests some of them
 
 # First of all, figure and normalize some directory names:
@@ -12,21 +42,32 @@
 # TOP_BUILD_dir:
 #    the top-level directory that contains this script. The different
 #    configurations produced by this script are stored in corresponding
-#    subdirectories, e.n. in builddir_standard for configuration "standard"
+#    subdirectories, e.g. in builddir_standard for configuration "standard"
+#
+#    Example: /home/username/apl-1.8/build
 #
 # TOP_LOG_dir:
-#    the directory where logfiles produced during the builds are stored.
+#    the directory where top-level logfiles produced by the builds are stored.
 #    Normally TOP_LOG_dir is the same as TOP_BUILD_dir
 #
 # ROOT_dir:
 #    the GNU APL top-level directory. This is the one and only
-#    directory than contains the ./configure script for GNU APL. Normally
-#    TOP_BUILD_dir is $ROOT_dir/build.
+#    directory than contains the ./configure script for GNU APL.
+#    Normally #    TOP_BUILD_dir is $ROOT_dir/build.
+#
+#    Example: /home/username/apl-1.8
+#
+# APL_VERSION:
+#    the current version (including the 'apl-' prefix).
+#
+#    Example: apl-1.8
 #
 # VSRC_dir:
 #    this is (despite of its name 'src' the destination directory for a single
 #    configuration. For example: the VSRC_dir for configuration "standard" is:
 #    $TOP_BUILD_dir/build/builddir_standard/src
+#
+#    Example: /home/username/apl-1.8/src
 #
 START_dir=$(pwd)      # e.g. /etc/cron.daily
 
@@ -34,7 +75,8 @@ cd $(dirname $0)      # e.g. /root/apl-1.8
 TOP_BUILD_dir=$(pwd)
 SVN_VERSION=$(svnversion)
 
-# NOTE: -j8 fails with out of memory on small hosts (as used for nightly builds)
+# NOTE: -j8 fails with out of memory on small hosts (like those
+# used for nightly builds). By setting J8="" we avoid that
 J8="-j8"
 J8=""
 
@@ -42,6 +84,7 @@ J8=""
 TOP_LOG_dir="$TOP_BUILD_dir"   # where to store longer build logs
 
 ROOT_dir=$(dirname $TOP_BUILD_dir)
+APL_VERSION=$(basename $ROOT_dir)
 
 # some counters for what happens
 declare -i build_errors=0
@@ -51,11 +94,93 @@ declare -i configs_good=0
 declare -i test_errors=0
 bad_configs=""
 
+# print the.html table row for one build artifact
+# print nothing if the artifact does not exist
+#
+artifact()
+{
+local indent="      " # <TR> indentation
+local htmlname="$1"   # description (TD1)
+local filename="$2"   # anchor text
+local linkname="$3"   # anchor href (name of a symbolic link to $2
+                      # in /var/www/html/
+
+local TD1="<TD><b>$htmlname</b> : </TD>"
+local TD2="<TD><A href=\"$linkname\">$filename</A><$1</TD>"
+local noTD2="<TD>missing (<b>$linkname</b>: No such file or directory)<$1</TD>"
+
+if [ -f $linkname ]
+then
+      echo "
+$indent <TR>
+$indent   $TD1
+$indent   $TD2
+$indent </TR>
+"
+else
+      echo "
+$indent <TR>
+$indent   $TD1
+$indent   $noTD2
+$indent </TR>
+"
+fi
+}
+
+write_nightly_build_results()
+{
+# produce a .html file with the nightly build result. We do not
+# add the </body> and </html> end tags because we (and also the
+# /etc/cron.daily/znightly_build_apl script) will append to the .html
+# file later on
+#
+   if [ -d /var/www/html ]
+   then
+   { 
+echo "<!DOCTYPE html>
+<html>
+<head>
+  <title>Nightly Build Results for GNU APL</title>
+  <meta charset="UTF-8"/>
+</head>
+<body>
+  <H1><center>Nightly Build Results for GNU APL</center></H1>
+  <HR>
+  Build date:  $(date)<br><br>
+  SVN version: $SVN_VERSION<br><br>
+  $build_errors build errors<br>
+  $missing_files missing files (build results)<br>
+  $configs_bad configurations failed: $bad_configs<br>
+  $configs_good configurations succeeded<br>
+  $test_errors testcases failed<br>
+"
+
+echo "<H3>Nightly Build Artifacts (if any)</H3>
+<TABLE>"
+artifact "GNU APL interpreter" "build/apl--standard" "apl"
+artifact "libapl.so (shared library)" "build/xxx" "libapl.so"
+artifact "libapl.a  (static library)" "build/xxx" "libapl.a"
+echo "</TABLE>"
+echo "<H3>Other</H3>"
+
+} > /var/www/html/nightly_build_results.html
+   fi
+}
+# refresh /var/www/html/nightly_build_results.html
+if [ "x$1" = "xnightly" ]
+then
+   write_nightly_build_results
+   exit 0
+fi
+
+# new run (takes a long timr)
+
 # remove old build results and start a fresh summary file
 #
 rm -f "$TOP_BUILD_dir"/apl-*
 rm -f "$TOP_BUILD_dir"/*.so
 rm -f "$TOP_LOG_dir"/*.log
+rm -f "$TOP_LOG_dir"/*.log2
 rm -Rf builddir_*
 
 # the user can clean this directory up by calling this script with
@@ -118,12 +243,15 @@ build_one()
    if [ $make_result -eq 0 ] ; then   # make succeeded
       echo "    make OK for configuration: $1" >> $summ
       if [ -f "$VSRC_dir/apl" ] ; then
+         cp -f "$VSRC_dir/apl" "/var/www/html/apl--$1"
          mv -f "$VSRC_dir/apl" "$TOP_BUILD_dir/apl--$1"
          configs_good=$((configs_good+1))
       elif [ -f "$VSRC_dir/.libs/libapl.so" ] ; then
+         cp -f "$VSRC_dir/.libs/libapl.so" "/var/www/html/libapl.so"
          mv -f "$VSRC_dir/.libs/libapl.so" "$TOP_BUILD_dir/"
          configs_good=$((configs_good+1))
       elif [ -f "$VSRC_dir/.libs/lib_gnu_apl.so" ] ; then
+         cp -f "$VSRC_dir/.libs/lib_gnu_apl.so" "/var/www/html/lib_gnu_apl.so"
          mv -f "$VSRC_dir/.libs/lib_gnu_apl.so" "$TOP_BUILD_dir/"
          configs_good=$((configs_good+1))
       elif [ ! -f $3 ] ; then
@@ -208,6 +336,37 @@ build_standard()
   test_one  "standard"
 }
 
+# build the standard configuration from the GNU APL tar file
+build_tar()
+{
+  echo "building configuration 'standard' from the GNU APL tar file"
+  echo "the APL_VERSION is: $APL_VERSION"
+  cd $TOP_BUILD_dir
+  tar xf $ROOT_dir/$APL_VERSION.tar.gz 
+  mv $APL_VERSION builddir_tar
+  cd builddir_tar
+  ./configure
+  make $J8
+  cd $TOP_BUILD_dir
+}
+
+# build the standard configuration from a git checkout
+build_git()
+{
+  echo "building configuration 'standard' from the git repository"
+  git clone https://git.savannah.gnu.org/git/apl.git builddir_git
+  cd builddir_git
+  ./configure
+  make $J8
+}
+
+#
+build_libxcb()
+{
+  build_one "libxcb" "$STD $XCB" "$VSRC_dir/apl"
+  test_one  "standard"
+}
+
 ################################################################################
 # build the standard configuration with libxcb (even if GTK3 is present)
 #
@@ -262,10 +421,12 @@ build_develop()
 
 # build all relevant configurations
 {
+  # clear the summary files
+  #
   echo "Build Summary:" > "$TOP_LOG_dir/summary.log"
+  echo "Build Summary Errors:" 2> "$TOP_LOG_dir/summary.log2"
 
-  for config in \
-      standard develop libxcb rational libapl parallel_bench erlang python
+  for config in $configs
   do
         echo -n "  ├─── building configuration $config..." > /dev/stderr
         build_$config
@@ -279,29 +440,11 @@ build_develop()
   [ ! -z "$bad_configs" ] && echo "$configs_bad configurations failed: $bad_configs"
   echo  "$configs_good configurations succeeded"
   echo   "$test_errors testcases failed"
-} >> "$TOP_LOG_dir/summary.log"
+} >> "$TOP_LOG_dir/summary.log" 2>> "$TOP_LOG_dir/summary.log2"
 
 cat "$TOP_LOG_dir/summary.log"
 
-   if [ -d /var/www/html ]
-   then echo "<!DOCTYPE html>
-<html>
-<head>
-  <title>Nightly Build Results for GNU APL</title>
-  <meta charset="UTF-8"/>
-</head>
-<body>
-  <H1><center>Nightly Build Results for GNU APL</center></H1>
-  <HR>
-  Build date:  $(date)<br><br>
-  SVN version: $SVN_VERSION<br><br>
-  $build_errors build errors<br>
-  $missing_files missing files (build results)<br>
-  $configs_bad configurations failed: $bad_configs<br>
-  $configs_good configurations succeeded<br>
-  $test_errors testcases failed<br>
-" > /var/www/html/nightly_build_results.html
-   fi
+write_nightly_build_results
 
 cd $START_dir     # undo all cds in this script
 stty sane         # in case some testcase failed badly

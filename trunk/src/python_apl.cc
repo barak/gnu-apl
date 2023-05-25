@@ -10,6 +10,7 @@
 #include "LineInput.hh"
 #include "Macro.hh"
 #include "PointerCell.hh"
+#include "StateIndicator.hh"
 #include "Tokenizer.hh"
 #include "UserPreferences.hh"
 #include "Workspace.hh"
@@ -176,7 +177,7 @@ UTF8_string line_utf8(line);
 UCS_string line_ucs(line_utf8);
 
    exec_result = 0;
-   try { Command::process_line(line_ucs); }
+   try { Command::process_line(line_ucs, &COUT); }
    catch (const Error & error)
       {
         CERR << "cought Error" << endl;

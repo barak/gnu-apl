@@ -2942,7 +2942,7 @@ ShapeItem z = 0;
 }
 //----------------------------------------------------------------------------
 ostream &
-operator<<(ostream & out, const Value & v)
+operator <<(ostream & out, const Value & v)
 {
    v.print(out);
    return out;

@@ -40,8 +40,7 @@
 #include "Workspace.hh"
 
 //=========================================================================
-UserFunction_header::UserFunction_header(const UCS_string & text,
-                                         bool macro)
+UserFunction_header::UserFunction_header(const UCS_string & text, bool macro)
   : error(E_DEFN_ERROR),   // assume bad headr
     error_info("Bad header"),
     sym_Z(0),
@@ -316,6 +315,7 @@ UserFunction_header::init_local_vars(const UCS_string & text, bool macro)
 {
 Token_string tos;
    {
+
      const Tokenizer tokenizer(PM_FUNCTION, LOC, macro);
      if (const ErrorCode err = tokenizer.tokenize(text, tos))
         {

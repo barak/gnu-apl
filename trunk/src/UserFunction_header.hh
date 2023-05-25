@@ -148,6 +148,18 @@ public:
    const Symbol * get_local_var(ShapeItem idx) const
       { return local_vars[idx]; }
 
+   /// return the number fof labels (in the function body).
+   const size_t get_label_count() const
+      { return label_values.size(); }
+
+   /// return the \b idx'th label (not the label of line idx!).
+   const labVal & get_label(int idx) const
+      { return label_values[idx]; }
+
+   // clear the function symbol (after a DEFN_ERROR)
+   void clear_FUN()
+      { sym_FUN = 0; }
+
 protected:
    /// init the signature from text
    const char * init_signature(const UCS_string & text, bool macro);

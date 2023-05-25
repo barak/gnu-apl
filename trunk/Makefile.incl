@@ -103,5 +103,6 @@ parallel1:
 VPATH_clean: clean
 	echo "Making VPATH_clean..."
 	rm -f config.status config.h
+	make make distclean || true
 	echo "Done VPATH_clean..."
 

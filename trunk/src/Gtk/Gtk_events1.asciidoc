@@ -1,5 +1,0 @@
-** clicked
-** activate
-** changed
-** draw
-** destroy

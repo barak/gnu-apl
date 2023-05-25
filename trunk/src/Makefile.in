@@ -6353,9 +6353,11 @@ update-svar_signals:
 apl.lines: apl
 	objdump --section=.text --line-numbers --disassemble $< > $@
 
+# run all testcases, continue after errors
 test: all
 	./apl --id 1010 -T testcases/*tc
 
+# run all testcases, stop after the first error
 test1: all
 	./apl --id 1010 --TM 3 -T testcases/*\.tc
 
@@ -6365,6 +6367,10 @@ test2: all
 # run testcases related to APs
 testAP: all
 	./apl --id 1010 -T testcases/AP*tc
+
+# run all testcases, except slow ones
+test3: all
+	./apl --id 1010 -T testcases_3/*tc
 
 perf: apl
 	./apl --id 1010 --TM 3 -T testcases/Performance.pt

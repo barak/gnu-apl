@@ -258,6 +258,7 @@ enum Bitmask
 /// return from the function).
 enum Function_Line
 {
+   Function_Invalid = -3,   // invalid function line (in →N optimization)
    Function_Retry   = -2,   // →'' in immediate execution
    Function_Return  = -1,   // →N with N≤0 or large
    Function_Line_0  =  0,
@@ -265,10 +266,11 @@ enum Function_Line
    Function_Line_10 = 10,
 };
 //----------------------------------------------------------------------------
-///  What is being parsed (function, immediate execution statements, or ⍎expr)
+///  What is being parsed (defined function, immediate execution statements,
+/// or ⍎expr)
 enum ParseMode
 {
-   PM_FUNCTION       = 0,   ///< function execution
+   PM_FUNCTION       = 0,   ///< defined function
    PM_STATEMENT_LIST = 1,   ///< immediate execution
    PM_EXECUTE        = 2,   ///< execute (⍎)
 };
@@ -340,14 +342,14 @@ enum PrintStyle
 enum Function_PC
 {
    Function_PC_0       =  0,   ///< the first token in a function
-   Function_PC_done    = -1,   ///< goto 0
+   Function_PC_done    = -1,   ///< goto 0 (leave function)
    Function_PC_invalid = -1    ///< dito
 };
 //----------------------------------------------------------------------------
-/// signature of a user defined function
+/// signature of a defined function
 enum Fun_signature
 {
-   // atoms
+   // signature atoms
    //
    SIG_NONE            = 0,      ///< 
    SIG_Z               = 0x01,   ///< function has a result
@@ -528,6 +530,12 @@ enum TimeScale
   SECONDS_PER_MONTH   =     30 * SECONDS_PER_DAY,        ///<  2,592,000
   SECONDS_PER_YEAR    =    365 * SECONDS_PER_DAY,        ///< 31,536,000
   SECONDS_PER_QUARTER =          SECONDS_PER_YEAR / 4,   ///<  7,884,000
+};
+//----------------------------------------------------------------------------
+/// the number of TOK_VOID removed from the body of an \b Executable
+enum VoidCount
+{
+  NO_VOID_TOKEN_REMOVED = 0
 };
 //----------------------------------------------------------------------------
 

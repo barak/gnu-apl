@@ -10,7 +10,7 @@ CLEAR WS
 λ←⍺ λ1 ⍵;LOCAL
 λ←⍺+LOCAL←⍵   
 
-      )WSID TEST
+      )WSID TEST_ZZ44
 WAS CLEAR WS
 
       )DUMP
@@ -18,7 +18,7 @@ WAS CLEAR WS
       )SAVE
 20⁰-⁰-⁰ ⁰:⁰:⁰ (GMT⁵⁰)
 
-      )LOAD TEST.apl
+      )LOAD TEST_ZZ44.apl
 DUMPED 20⁰-⁰-⁰ ⁰:⁰:⁰ (GMT⁵⁰)
 
       ⎕CR 'FOO'
@@ -31,7 +31,7 @@ DUMPED 20⁰-⁰-⁰ ⁰:⁰:⁰ (GMT⁵⁰)
       LOCAL
 local1
 
-      )LOAD TEST.xml
+      )LOAD TEST_ZZ44.xml
 SAVED 20⁰-⁰-⁰ ⁰:⁰:⁰ (GMT⁵⁰)
 
       ⎕CR 'FOO'
@@ -44,6 +44,4 @@ SAVED 20⁰-⁰-⁰ ⁰:⁰:⁰ (GMT⁵⁰)
       LOCAL
 local2
 
-
-  
 

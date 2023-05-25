@@ -23,6 +23,7 @@
 
 
 #include "Executable.hh"
+#include "Parser.hh"
 #include "Output.hh"
 #include "PrintOperator.hh"
 #include "UCS_string.hh"
@@ -94,10 +95,10 @@ ShapeItem last_semi = -1;
             header.append(lambda_text[t]);
         text.push_back(header);
 
-        UCS_string new_body(lambda_text);
-        new_body.resize(last_semi);
-        new_body.remove_trailing_whitespaces();
-        text.push_back(new_body);
+        UCS_string new_text(lambda_text);
+        new_text.resize(last_semi);
+        new_text.remove_trailing_whitespaces();
+        text.push_back(new_text);
       }
    else
       {
@@ -149,7 +150,7 @@ Token_string in;
 const Parser parser(get_parse_mode(), loc, macro);
    if (const ErrorCode ec = parser.parse(ucs_line, in))
       {
-        if (tolerant)   return ec;
+        if (tolerant)   return ec;    // the caller will check ec
 
         if (ec == E_NO_TOKEN)
            {
@@ -165,96 +166,295 @@ const Parser parser(get_parse_mode(), loc, macro);
 //----------------------------------------------------------------------------
 ErrorCode
 Executable::parse_body_line(Function_Line line, const Token_string & input,
-                            bool trace,  bool tolerant, const char * loc)
+                            bool trace, bool tolerant, const char * loc)
 {
 ShapeItem idx = 0;
 const ShapeItem end = input.size();
 
-   // handle labels (if any)
+   // handle label (if any)
    //
-   if (get_parse_mode() == PM_FUNCTION  &&
-       end > 1                          &&
-       input[0].get_tag() == TOK_SYMBOL &&
-       input[1].get_tag() == TOK_COLON)
+   if (get_parse_mode() == PM_FUNCTION &&   // defined function, and
+       end > 1                         &&   // at least 2 token, and
+       input[1].get_tag() == TOK_COLON &&   // second token is :, and
+       input[0].get_tag() == TOK_SYMBOL)    // first token is (label-) name
       {
         Token tok_sym = input[0];   // get the label symbol
-        idx = 2;                   // skip the :
+        idx = 2;                    // skip label :
 
         UserFunction * ufun = get_exec_ufun();
         Assert(ufun);
         ufun->add_label(tok_sym.get_sym_ptr(), line);
       }
 
-Token_string out;
-   while ((end - idx))
+   // each →→ ←→ and →→ bind to the statement left of it,
+   // which must therefore not be empty.
+   //
+   if (idx < end && input[idx].is_COND())
       {
-        // find next diamond. If there is one, copy statement in reverse order,
-        // append TOK_ENDL, and continue.
+        CERR << "NOTE: Invalid ";
+        if      (input[idx].get_tag() == TOK_IF_THEN)   CERR << "→→";
+        else if (input[idx].get_tag() == TOK_IF_ELSE)   CERR << "←→";
+        else if (input[idx].get_tag() == TOK_IF_END)    CERR << "←←";
 
-        // 1. determine statement length
-        //
-        ShapeItem stat_len = 0;   // statement length, not counting ◊
-        int diamond = 0;
-        loop(t, (end - idx))
-            {
-              if (input[idx + t].get_tag() == TOK_DIAMOND)
-                 {
-                   diamond = 1;
-                   break;
-                 }
-              else
-                 {
-                   ++stat_len;
-                 }
-            }
-
-        // 2. check for bad token and append statement to out
-        //
-        loop(s, stat_len)
-            {
-              const Token & tok = input[idx + stat_len - s - 1];
-              if (tok.get_Class() >= TC_MAX_PERM &&
-                  tok.get_tag() != TOK_L_CURLY &&
-                  tok.get_tag() != TOK_R_CURLY)
-                 {
-                   if (tolerant)   return E_SYNTAX_ERROR;
-
-                   CERR << "Line " << line << endl
-                        << "Offending token: (tag > TC_MAX_PERM) "
-                        << tok.get_tag() << " " << tok << endl
-                        << "Statement: ";
-                   loop(t, input.size())   CERR << "`" << input[t] << "  ";
-                   CERR << endl;
-                   SYNTAX_ERROR;
-                 }
-              out.push_back(tok);
-            }
-        idx += stat_len + diamond;   // skip statement and maybe ◊
-
-        // 3. maybe add a TOK_END or TOK_ENDL
-        //
-        if (stat_len && (diamond || get_parse_mode() != PM_EXECUTE))
-           {
-             const int64_t tr = trace ? 1 : 0;
-             out.push_back(Token(TOK_END, tr));
-           }
+        CERR << " at start of line " << line << endl;
+        if (tolerant)   return E_SYNTAX_ERROR;
+        else            SYNTAX_ERROR;
       }
 
-   // replace the trailing TOK_END (if any) into TOK_ENDL
+   /*
+       Convert (APL order) :
+
+       ┌───┐ ┌───┐ ┌───┐     ┌───┐ ┌─────┐ 
+       │ A │ │ B │ │ C │ ... │ Z │ │ END │ 
+       └───┘ └───┘ └───┘     └───┘ └─────┘ 
+
+       To (reverse order) :
+
+       ┌───┐     ┌───┐ ┌───┐ ┌───┐ ┌─────┐ 
+       │ Z │ ... │ C │ │ B │ │ A │ │ END │ 
+       └───┘     └───┘ └───┘ └───┘ └─────┘ 
+
+       The END token may be missing.
+    */
+
+Token_string output;   // in reverse order
+   while (idx < end)   // loop over one line
+      {
+        // 1. determine the number of token (excluding ◊) in the statement
+        //    that starts at idx
+        //
+        ShapeItem stat_len = 0;   // statement length, not counting ◊
+        int diamond_len    = 0;   // ◊ length (if any)
+        TokenTag tag_end   = TOK_END;
+        int64_t tr         = trace ? 1 : 0;
+        loop(t, end - idx)   // loop over one statement
+            {
+              const Token & tok = input[idx + t];
+              const TokenTag tag = tok.get_tag();
+              if (tag == TOK_DIAMOND)   // ◊ is allowed (and discarded)
+                 {
+                   diamond_len = 1;
+                   break;
+                 }
+              else if (tok.is_COND())   // TOK_IF_xxx
+                 {
+                   tr = -2;
+                   diamond_len = 1;
+                   tag_end = tok.get_tag();
+                   break;
+                 }
+              else if (tok.get_Class() >= TC_MAX_PERM &&   // bad class,
+                       tag != TOK_L_CURLY             &&   // but allow {
+                       tag != TOK_R_CURLY)                 // and allow }
+                 {
+                   if (!tolerant)   // then complain
+                      {
+                        CERR << "Line " << line << endl
+                             << "Offending token: (tag > TC_MAX_PERM) "
+                             << tag << " " << tok << "\nStatement: ";
+                        loop(t, input.size())   CERR << "`" << input[t] << "  ";
+                        CERR << endl;
+                      }
+
+                   return E_SYNTAX_ERROR;
+                 }
+
+              // none of the above: count and continue;
+              ++stat_len;
+            }
+
+        // 2. copy input (in APL order) to  output (in reverse order)
+        //
+        for (ShapeItem j = idx + stat_len - 1; j >= idx; --j)
+            {
+              output.push_back(input[j]);
+            }
+        Assert(stat_len + diamond_len);
+
+        // 3. maybe add a TC_END token
+        //
+        if (stat_len == 0)   // empty statement
+           {
+             if (tag_end != TOK_END)
+                {
+                  if (output.size() && output.back().get_tag() == TOK_END)
+                         output.pop_back();
+                   output.push_back(Token(tag_end, tr));
+                }
+              ++idx;
+           }
+        else                 // non-empty statement
+           {
+             if (tr < 0)   // always add COND token
+                {
+                  if (output.size() && output.back().get_tag() == TOK_END)
+                         output.pop_back();
+                  output.push_back(Token(tag_end, tr));
+                }
+             else if (diamond_len || get_parse_mode() != PM_EXECUTE)
+                {
+                  output.push_back(Token(tag_end, tr));
+                }
+
+             idx += stat_len + diamond_len;   // skip statement and (if any) ◊
+           }
+      }   // end of loop over statements of one line
+
+   // replace the trailing TOK_END (if any) with TOK_ENDL
    //
-   if (out.size() && out.back().get_tag() == TOK_END)
-      out.back().ChangeTag(TOK_ENDL);
+   if (output.size() && output.back().get_tag() == TOK_END)
+      {
+        output.back().ChangeTag(TOK_ENDL);
+       }
 
    Log(LOG_UserFunction__set_line)
       {
         CERR << "[final line " << line << "] ";
-        out.print(CERR, false);
-      } 
+        output.print(CERR, false);
+      }
 
-   loop(t, out.size())   body.push_back(out[t]);
+   loop(t, output.size())   body.push_back(output[t]);
    return E_NO_ERROR;
+}
+//----------------------------------------------------------------------------
+bool
+Executable::compute_if_else_targets()
+{
+   Log(LOG_IfElse)
+      {
+         CERR << "initial body[" << body.size() << "]:" << endl;
+         print_token(CERR, 3);
+      }
 
-#undef get
+const char * cause = "";
+Function_Line cause_line = Function_Line_0;
+
+struct conditional
+{
+  Function_PC if_THEN;   // position of the ←← token (end of condition)
+  Function_PC if_ELSE;   // position of the ←→ token (before else clause)
+};
+
+vector<conditional> conditionals;
+
+   for (Function_PC pc = Function_PC_0; pc < body.size(); ++pc)
+       {
+         switch(body[pc].get_tag())
+            {
+              case TOK_IF_THEN:   // →→ (always allowed).
+                   Log(LOG_IfElse)
+                      CERR << "SEE →→ (then)  at [" << pc << "]" << endl;
+          
+                   {
+                     const conditional cond = { pc, Function_PC(-2) };
+                     conditionals.push_back(cond);
+                   }
+                   LOG_IfElse && pc && body[pc-1].get_Class() == TC_END &&
+                     CERR << "\n*** WARNING: TC_END before TOK_IF_THEN" << endl;
+                   continue;
+          
+              case TOK_IF_ELSE:   // ←→
+                   Log(LOG_IfElse)
+                      CERR << "SEE ←→ (else)  at [PC=" << pc << "]" << endl;
+          
+                   if (conditionals.size() == 0)
+                      {
+                        cause = "←→ without →→ (aka. ELSE without IF)";
+                        cause_line = get_line(pc);
+                        goto error;
+                      }
+                   if (conditionals.back().if_ELSE >= 0)
+                      {
+                        cause = "duplicate ←→ (aka. duplicate ELSE)";
+                        cause_line = get_line(pc);
+                        goto error;
+                      }
+                   conditionals.back().if_ELSE = pc;
+                   LOG_IfElse && pc && body[pc-1].get_Class() == TC_END &&
+                     CERR << "\n*** WARNING: TC_END before TOK_IF_ELSE" << endl;
+                   continue;
+          
+              case TOK_IF_END:    // ←←
+                   Log(LOG_IfElse)
+                      CERR << "SEE ←← (endif) at [" << pc << "]" << endl;
+          
+                   if (conditionals.size() == 0)
+                      {
+                        cause = "←← without →→ (aka. ENDIF without IF)";
+                        cause_line = get_line(pc);
+                        goto error;
+                      }
+          
+                   {
+                     const conditional & cond = conditionals.back();
+                    
+                     Log(LOG_IfElse)
+                       CERR << "cond[" << conditionals.size() << "]:"
+                               "\n ├── then:  " << cond.if_THEN
+                            << "\n ├── else:  " << cond.if_ELSE
+                            << "\n └── endif: " << pc
+                            << endl;
+          
+                     if (cond.if_ELSE  == (cond.if_THEN + 1))   // empty THEN
+                        {
+                          cause = "empty →→ ... ←→ (aka. empty THEN)";
+                        cause_line = get_line(pc);
+                          goto error;
+                        }
+          
+                     if (pc == (cond.if_ELSE + 1))   // empty ELSE
+                        {
+                          cause = "empty ←→ ... ←← (aka. empty ELSE)";
+                        cause_line = get_line(pc);
+                          goto error;
+                        }
+          
+                     if (cond.if_ELSE < 0)   // simple if ... endif
+                        {
+                          body[cond.if_THEN].set_int_val(pc + 1);
+                        }
+                     else                    // if ... else ... endif
+                        {
+                          body[cond.if_THEN].set_int_val(cond.if_ELSE + 1);
+                          body[cond.if_ELSE].set_int_val(pc + 1);
+                        }
+                     conditionals.pop_back();
+                   }
+                   LOG_IfElse && pc && body[pc-1].get_Class() == TC_END &&
+                    CERR << "\n*** WARNING: TC_END before TOK_IF_END" << endl;
+          
+                   continue;
+          
+              default:
+                   continue;
+            }
+       }
+
+   if (conditionals.size())
+      {
+        cause = "→→ without ←← (aka. IF without ENDIF)";
+        cause_line = get_line(conditionals.back().if_THEN);
+        goto error;
+      }
+
+   Log(LOG_IfElse)
+      {
+        CERR << "final body[" << body.size() << "]:" << endl;
+        print_token(CERR, 3);
+      }
+   return false;   // OK.
+
+error:
+   MORE_ERROR() << cause;
+   CERR <<  cause << ". First observed on line ["
+        << cause_line << "]." << endl;
+
+   Log(LOG_IfElse)
+      {
+        CERR << "incorrect body[" << body.size() << "]:" << endl;
+        print_token(CERR, 3);
+      }
+   return true;
 }
 //----------------------------------------------------------------------------
 Token
@@ -272,12 +472,13 @@ StateIndicator & si = *Workspace::SI_top();
 }
 //----------------------------------------------------------------------------
 void
-Executable::print_token(ostream & out) const
+Executable::print_token(ostream & out, int details) const
 {
    out << endl
-       <<  "Function body [" << body.size() << " token]:" << endl;
+       <<  "Function body " << &body
+       << " [" << body.size() << " token]:" << endl;
 
-   body.print(out, false);
+   body.print(out, details);
 }
 //----------------------------------------------------------------------------
 void
@@ -316,10 +517,11 @@ int stats_before = 0;
        }
 
 int tidx = 0;
-   while (stats_before)
+   while(tidx < line_txt.size())
       {
-        Assert(tidx < line_txt.size());
-        if (Avec::is_diamond(line_txt[tidx++]))   --stats_before;
+        if (stats_before == 0)   break;
+        if ( Avec::is_diamond(line_txt[tidx++])   // ◊ xxx
+           )   --stats_before;
       }
 
    // skip leading spaces
@@ -338,6 +540,12 @@ UCS_string ret;
    while (ret.size() && ret.back() <= ' ')   ret.pop_back();
 
    return ret;
+}
+//----------------------------------------------------------------------------
+VoidCount
+Executable::remove_TOK_VOID()
+{
+   return Parser::remove_TOK_VOID(body);
 }
 //----------------------------------------------------------------------------
 void
@@ -523,22 +731,12 @@ Executable::setup_lambdas()
    // should have checked for unbalanced { } so we simply look for } (which
    // is the first to occur since the body is reversed.
    //
-bool have_curly = false;
-   loop(b, body.size())
-       {
-         if (body[b].get_tag() == TOK_R_CURLY)
-            {
-              have_curly = true;
-              break;
-            }
-       }
-
-   if (!have_curly)   return;   // no { ... } in this body
+   if (!body_has_curly())   return;   // no { ... } in this body
 
    // undo the token reversion of the body so that the body token and the
    // function text run in the same direction.
    //
-   reverse_statement_token(body);
+   reverse_each_statement(body);
 
 int lambda_num = 0;
    loop(b, body.size())
@@ -546,34 +744,38 @@ int lambda_num = 0;
          if (body[b].get_tag() != TOK_L_CURLY)   continue;   // not {
 
          ShapeItem end = -1;
-         int level = 1;   // since body[b] is {
+         int curly_level = 1;   // since body[b] is {
          for (ShapeItem b1 = b + 1; b1 < ShapeItem(body.size()); ++b1)
              {
                switch(body[b1].get_tag())
                   {
-                    default:                            continue;
-                    case TOK_L_CURLY:   ++level;        continue;
-                    case TOK_R_CURLY:   if (--level)    continue;
-                                        end = b1;
-                                        b1 = body.size();
-                                        break;
-                    case TOK_END:       MORE_ERROR() << "Illegal ◊ in {}";
-                                        DEFN_ERROR;
+                    case TOK_L_CURLY:
+                         ++curly_level;
+                         continue;
+
+                    case TOK_R_CURLY:
+                         if (0 == --curly_level)
+                            {
+                              end = b1;
+                              b1 = body.size();
+                            }
+                         continue;
+
+                    default:
+                         continue;
                   }
-                break;   // for b1...
              }
          Assert(end != -1);
-         b = setup_one_lambda(b, end, ++lambda_num) - 1;   // -1 due to ++b in loop(b) above
+         b = setup_one_lambda(b, end, ++lambda_num);
        }
 
    // redo the token reversion of the body so that the body token and the
    // text run in the same direction.
    //
-   reverse_statement_token(body);
+   reverse_each_statement(body);
 
    Parser::match_par_bra(body, true);
-   adjust_line_starts();
-   Parser::remove_void_token(body);   // do this AFTER adjust_line_starts() !!!
+   remove_TOK_VOID();
 }
 //----------------------------------------------------------------------------
 ShapeItem
@@ -585,42 +787,47 @@ Executable::setup_one_lambda(ShapeItem b, ShapeItem bend, int lambda_num)
    body[bend].clear(LOC);   // invalidate }
 
 Token_string lambda_body;
-
 const Fun_signature signature =
       compute_lambda_body(lambda_body, b, bend);
 
-   // at this point { ... } was copied from body to lambda_body and
-   // bend is at the (now invalidated) { token.
+   // strip off the local variables
    //
+vector<Symbol *> local_vars;
+   while (lambda_body.size() >= 4)
+      {
+        const size_t semi = lambda_body.size() - 4;
+        if (lambda_body[semi]    .get_tag() != TOK_SEMICOL)   break;
+        if (lambda_body[semi + 1].get_Class() != TC_SYMBOL)   break;
+        local_vars.push_back(lambda_body[semi + 1].get_sym_ptr());
+        lambda_body[semi]     = lambda_body[semi + 2];
+        lambda_body[semi + 1] = lambda_body[semi + 3];
+        lambda_body.resize(semi + 2);   // leave ENDL and RETURN_SYMBOL
+      }
+
 const UCS_string lambda_text = extract_lambda_text(signature, lambda_num - 1);
 
-   reverse_statement_token(lambda_body);
+   reverse_each_statement(lambda_body);
    reverse_all_token(lambda_body);
 
-#if 0  // not yet working
-
-UCS_string ufun_text = UserFunction_header::lambda_header(signature,lambda_num);
-   ufun_text.append(UNI_LF);
-   ufun_text.append(lambda_text);
-   ufun_text.append(UNI_LF);
-
-Q1(ufun_text)
-
-int error_line = -1;
-const char * error_loc = 0;
-const UTF8_string creator("Executable::setup_one_lambda()");
-
-UserFunction * ufun = new UserFunction(ufun_text, LOC, creator, false, false);
-
-   ufun->increment_refcount(LOC);
-
-#else
+  {
+    vector<Symbol *> local_vars;
+    while (lambda_body.size() > 4)
+       {
+         const size_t semi = lambda_body.size() - 4;
+         if (lambda_body[semi]    .get_tag() != TOK_SEMICOL)   break;
+         if (lambda_body[semi + 1].get_tag() != TOK_SYMBOL)    break;
+         local_vars.push_back(lambda_body[semi + 1].get_sym_ptr());
+         lambda_body[semi]     = lambda_body[semi + 2];
+         lambda_body[semi + 1] = lambda_body[semi + 3];
+         lambda_body.resize(semi + 2);   // leave ENDL and RETURN_SYMBOL
+       }
+   }
 
 UserFunction * ufun = new UserFunction(signature, lambda_num,
-                                       lambda_text, lambda_body);
+                                       lambda_text, lambda_body, local_vars);
+
    ufun->increment_refcount(LOC);
 
-#endif
    // put a token for the lambda at the place where the { was.
    // That replaces, for example, (in forward notation):
    //
@@ -630,7 +837,7 @@ UserFunction * ufun = new UserFunction(signature, lambda_num,
 Token tok_ufun = ufun->get_token();
    body[bend].move(tok_ufun, LOC);
 
-   return bend + 1;
+   return bend;
 }
 //----------------------------------------------------------------------------
 Fun_signature
@@ -808,21 +1015,26 @@ bool in_double_quotes = false;
 }
 //----------------------------------------------------------------------------
 void
-Executable::reverse_statement_token(Token_string & tos)
+Executable::reverse_each_statement(Token_string & tos)
 {
-ShapeItem from = 0;
-
-   for (ShapeItem to = from + 1; to < ShapeItem(tos.size()); ++to)
+const ShapeItem last = tos.size();
+   for (ShapeItem from = 0, to = 1; to < tos.size(); ++to)
        {
          if (tos[to].get_Class() == TC_END)
             {
-              tos.reverse_from_to(from, to - 1);   // except TC_END
-              from = to + 1;
+              // found ia TC_END token within tos. Reverse the tokens
+              // from...to to - 1, but leave the TC_END token as is.
+              //
+              if (from != to)   tos.reverse_from_to(from, to - 1);
+              from = to + 1;   // continue after the TC_END token.
             }
-         else if (to == ShapeItem(tos.size() - 1))
+         else if (to == (last - 1))
             {
+              // reached the end of tos. from...to is the last statement
+              // in tos. revert then entire statement (no TC_END to preserve).
+              //
               tos.reverse_from_to(from, to);
-              from = to + 1;
+              break;
             }
        }
 }
@@ -927,6 +1139,11 @@ ExecuteList * fun = new ExecuteList(data, loc);
 
    // for ⍎ we do not append TOK_END, but only TOK_RETURN_EXEC.
    fun->body.push_back(Token(TOK_RETURN_EXEC));
+   if (fun->compute_if_else_targets())
+      {
+        delete fun;
+        return 0;
+      }
 
    Log(LOG_UserFunction__fix)   fun->print(CERR);
    return fun;
@@ -965,6 +1182,11 @@ StatementList * fun = new StatementList(data, loc);
       }
 
    fun->body.push_back(Token(TOK_RETURN_STATS));
+   if (fun->compute_if_else_targets())
+      {
+        delete fun;
+        return 0;
+      }
 
    Log(LOG_UserFunction__fix)   fun->print(CERR);
    return fun;

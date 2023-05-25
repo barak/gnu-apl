@@ -141,6 +141,10 @@ public:
    /// setting len to the number of bytes in the UTF8 encoding of the char
    static Unicode toUni(const UTF8 * string, int & len, bool verbose);
 
+   /// return the (always positive) difference between the number of bytes
+   /// and the number of chars in the (UTF8 encoded) \b string.
+   static int bytes_chars(const void * string);
+
    /// return the next UTF8 encoded char from an input file
    static Unicode getc(istream & in);
 };

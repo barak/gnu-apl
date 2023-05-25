@@ -591,13 +591,15 @@ Prefix::push_next_token()
         return false;
       }
 
+again:
+
    // TC_END is the end of the statement (i.e. the leftmost token in APL).
    // The caller wants one more Token, but we may not have any. In that
    /// case: prepare the )MORE info and throw a SYNTAX_ERROR.
    //
    if (size() > 0 && at0().get_Class() == TC_END)   push_END_error();
 
-Token_loc tloc = lookahead();   // possibly changed by Symbol::resolve()
+Token_loc tloc = lookahead();   // tloc is possibly changed by Symbol::resolve()
 const TokenClass tcl = tloc.tok.get_Class();
    Log(LOG_prefix_parser)
       {
@@ -609,9 +611,16 @@ const TokenClass tcl = tloc.tok.get_Class();
 
    PC_range_high = tloc.pc;   // expand the PC range of the stack
 
-   if (tcl == TC_SYMBOL)   // resolve symbol if necessary
+   if (tloc.tok.get_tag() == TOK_GOTO_PC)   // →N
+      {
+        PC = Function_PC(tloc.tok.get_int_val());
+        Assert1(size() == 0);
+        goto again;
+      }
+
+   if (tcl == TC_SYMBOL)          // resolve symbol if necessary
       return push_Symbol(tloc);   // true iff )SI pushed
-   else if (tcl == TC_ASSIGN)   // update assign_state (from right to left)
+   else if (tcl == TC_ASSIGN)     // update assign_state (from right to left)
       {
         if (get_assign_state() != ASS_none)   syntax_error(LOC);
         set_assign_state(ASS_arrow_seen);
@@ -816,7 +825,7 @@ const uint64_t inst = instance;
              return Token(TOK_SI_PUSHED);
 
         case RA_RETURN: LOG_prefix_parser && CERR << "RA_RETURN" << endl;
-             return pop().tok;
+             return pop().tok;   // TOK_VOID from StateIndicator::jump_to_line()
 
         case RA_FIXME: LOG_prefix_parser && CERR << "RA_FIXME" << endl;
              FIXME;
@@ -2307,7 +2316,7 @@ Prefix::reduce_END_VOID__()
    if (size() != 2)   syntax_error(LOC);
 
 const bool end_of_line = at0().get_tag() == TOK_ENDL;
-const bool trace = (at0().get_int_val() & 1) != 0;
+const bool trace = end_of_line && (at0().get_int_val() & 1);
 
    pop_and_discard();   // pop END
    pop_and_discard();   // pop VOID
@@ -2332,11 +2341,76 @@ Prefix::reduce_END_B__()
 
    if (size() != 2)   syntax_error(LOC);
 
-const bool end_of_line = at0().get_tag() == TOK_ENDL;
-const bool trace = (at0().get_int_val() & 1) != 0;
+const Token END = pop().tok;   // pop END
+const bool end_of_line = END.get_tag() == TOK_ENDL;
+const bool trace = end_of_line && (END.get_int_val() & 1);
 
-   pop_and_discard();   // pop END
-Token B = pop().tok;    // pop B
+Token B = pop().tok;   // pop B
+
+   if (END.get_tag() == TOK_IF_THEN)   // end of condition B
+      {
+        // B is supposed to be the Boolean condition of an if/else conditional
+        // END is the token after the condition (PC of the ELSE clause).
+        //
+        // If COND is 1 then continue, wlse jump to the else clause
+        Value_P COND(B.get_apl_val());
+        if (COND->element_count() != 1)
+           {
+             if (COND->element_count())
+                MORE_ERROR() << "In B ←← ... →→ : condition B is too long";
+             else
+                MORE_ERROR() << "In B ←← ... →→ : condition B is empty";
+             LENGTH_ERROR;
+           }
+        const Cell & c0 = COND->get_cfirst();
+         if (c0.is_near_one())         // continue with the THEN clause
+            {
+              Log(LOG_IfElse)   CERR << 
+                  "IF(1) : Proceeding with THEN clause, PC now: " << PC << endl;
+            }
+         else if (c0.is_near_zero())   // continue with the ELSE clause
+            {
+              PC = Function_PC(END.get_int_val());
+              Log(LOG_IfElse)     CERR <<
+                  "IF(0) : Jump to ELSE/ENDIF clause, PC now: " << PC << endl;
+            }
+         else
+            {
+             MORE_ERROR() << "In B ←← ... →→ : condition B is not Boolean";
+             DOMAIN_ERROR;
+            }
+         set_action(RA_PUSH_NEXT);
+         return;
+      }
+
+   // true end of statement. This may be:
+   //
+   // TOK_IF_ELSE: the end of a THEN clause:         adjust the PC
+   // TOK_IF_END:  the end of (or no) ELSE clause:   no op
+   // TOK_END(L):  normal end of statement or line:  no op
+   //
+   if (END.get_tag() == TOK_IF_END)
+      {
+        Log(LOG_IfElse)   CERR << 
+            "ENDIF reached, PC is now: " << PC << endl;
+        while (body[PC].get_tag() == TOK_IF_END)   ++PC;
+        if (body[PC].get_tag() == TOK_IF_ELSE)
+           PC = Function_PC(body[PC].get_int_val());
+        Log(LOG_IfElse)   CERR << 
+            "ENDIF reached, fixed PC is now: " << PC << endl;
+      }
+   else if (END.get_tag() == TOK_IF_ELSE)
+      {
+        PC = Function_PC(END.get_int_val()); 
+        Log(LOG_IfElse)   CERR << 
+            "END of THEN reached, PC is now: " << PC << endl;
+        while (body[PC].get_tag() == TOK_IF_END)   ++PC;   // nested else
+        if (body[PC].get_tag() == TOK_IF_ELSE)
+           PC = Function_PC(body[PC].get_int_val());
+        Log(LOG_IfElse)   CERR << 
+            "END of THEN reached, fixed PC is now: " << PC << endl;
+      }
+
    si.fun_oper_cache.reset();
    si.statement_result(B, trace);
 
@@ -2443,7 +2517,7 @@ Prefix::reduce_END_GOTO_B_()
    //       or TOK_OPER1
    //
 const bool end_of_line = at0().get_tag() == TOK_ENDL;
-const bool trace = at0().get_Class() == TC_END && (at0().get_int_val() & 1);
+const bool trace = end_of_line && (at0().get_int_val() & 1);
 
 const Value * line = at2().get_apl_val().get();
 
@@ -2518,6 +2592,42 @@ Prefix::check_interrupt_or_attention(bool end_of_line)
 void
 Prefix::reduce_END_GOTO__()   // Escape ( → )
 {
+   /*
+       Normally:
+
+       1a. reduce_END_GOTO__ happens for APL → aka. ESC
+       1b. tokens TOK_BRANCH and TOK_NOBRANCH are local result token
+           returned by si.jump(line) in reduce_END_GOTO_B_(), where
+           si.jump() also modifies the PC.
+
+       In UserFunction::optimize_unconditional_branches() we optimize
+       the statements →N (with literal integer N) and →LABEL into a single
+       token TOK_GOTO_PC whose integer value is the new PC, and:
+
+       2a. a value type of TV_INT of the GOTO token indicates that this
+           optimization was performed
+       2b. the int value is the new PC
+       2c. a PC of -1 means: return from the function
+    */
+    if (at1().get_tag() == TOK_GOTO_PC)   // optimized →N
+       {
+              reset(LOC);
+         const Function_PC new_PC = Function_PC(at1().get_int_val());
+         if (new_PC == Function_PC_done)   // →0 etc.
+            {
+              PC = Function_PC(body.size() - 1);
+              const Token result(TOK_VOID);
+              pop_args_push_result(result);
+              set_action(RA_RETURN);      // return from defined function
+            }
+         else                             // normal →N
+            {
+              PC = new_PC;
+              set_action(RA_PUSH_NEXT);
+            }
+         return;
+       }
+
    Assert1(prefix_len == 2);
 
    if (size() != 2)   syntax_error(LOC);

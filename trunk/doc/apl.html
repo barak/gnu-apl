@@ -60,7 +60,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Installing and Starting GNU 
 </div>
 <span id="GNU-APL"></span><h1 class="top">GNU APL</h1>
 
-<p>April 26, 2023
+<p>May 22, 2023
 </p>
 <p>This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
@@ -264,6 +264,11 @@ therefore it must be expanded with e.g.  <b>gunzip</b> before it can be read.
       <li><a id="toc-Monadic-_005b_003f_005dXML" href="#Monadic-_005b_003f_005dXML">2.39.4 Monadic ⎕XML</a></li>
       <li><a id="toc-Dyadic-_005b_003f_005dXML" href="#Dyadic-_005b_003f_005dXML">2.39.5 Dyadic ⎕XML</a></li>
       <li><a id="toc-XML-Queries" href="#XML-Queries">2.39.6 XML Queries</a></li>
+    </ul></li>
+    <li><a id="toc-Conditionals" href="#Section-2_002e40">2.40 Conditionals</a>
+    <ul class="no-bullet">
+      <li><a id="toc-Design-considerations_002e" href="#Design-considerations_002e">2.40.1 Design considerations.</a></li>
+      <li><a id="toc-Syntax-1" href="#Syntax-1">2.40.2 Syntax</a></li>
     </ul></li>
   </ul></li>
   <li><a id="toc-Limitations-and-Missing-Features" href="#Chapter-3">3 Limitations and Missing Features</a>
@@ -965,6 +970,7 @@ Next: <a href="#Chapter-3" accesskey="n" rel="next">Limitations and Missing Feat
 <li><a href="#Section-2_002e37">⎕SI - State Indicator</a></li>
 <li><a href="#Section-2_002e38">⎕SYL - System limits</a></li>
 <li><a href="#Section-2_002e39">⎕XML  - XML Parsing</a></li>
+<li><a href="#Section-2_002e40">Conditionals</a></li>
 </ul>
 <hr>
 <div class="section" id="Section-2_002e1">
@@ -5618,7 +5624,7 @@ is printed instead of VALUE. The shape SH is computed like this:
 <div class="section" id="Section-2_002e39">
 <div class="header">
 <p>
-Previous: <a href="#Section-2_002e38" accesskey="p" rel="prev">⎕SYL - System limits</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Section-2_002e40" accesskey="n" rel="next">Conditionals</a>, Previous: <a href="#Section-2_002e38" accesskey="p" rel="prev">⎕SYL - System limits</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
 <span id="g_t_005b_003f_005dXML-_002d-XML-Parsing"></span><h3 class="section">2.39 ⎕XML  - XML Parsing</h3>
 
@@ -6138,6 +6144,301 @@ follow these top-level steps:
 </li><li> Optionally, convert the modified XML document back to XML (0 ⎕XML
 </li></ol>
 
+<hr>
+</div>
+</div>
+<div class="section" id="Section-2_002e40">
+<div class="header">
+<p>
+Previous: <a href="#Section-2_002e39" accesskey="p" rel="prev">⎕XML  - XML Parsing</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+</div>
+<span id="Conditionals"></span><h3 class="section">2.40 Conditionals</h3>
+
+<p><b>WARNING</b>: GNU APL conditionals are experimental. Use them with care and
+avoid them, wherever possible, in favour of portability. Neither the ISO
+APL standard, nor IBM APL2 provide conditionals.
+</p>
+<ul class="section-toc">
+<li><a href="#Design-considerations_002e" accesskey="1">Design considerations.</a></li>
+<li><a href="#Syntax-1" accesskey="2">Syntax</a></li>
+</ul>
+<div class="subsection" id="Design-considerations_002e">
+<h4 class="subsection">2.40.1 Design considerations.</h4>
+
+<p>The author of GNU APL has, for a long time, hesitated to implement
+conditionalsi in GNU APL. Primarily for the following reasons:
+</p>
+<ul>
+<li> the lack of standardization of conditionals,
+</li><li> the lack of an elegant syntax that fits well into the typical
+      (brief) APL programming style, and in particular
+</li><li> the large number of keywords for flow control used in some other APL
+      interpreters. See below.
+</li></ul>
+
+<p>The C language has 6 keywords for flow control: <b>if</b>, <b>else</b>, <b>for</b>,
+<b>do</b>, Two of them (<b>do</b> and <b>while</b>) are redundant and rarely used,
+leaving only 4 base cases. A quick <b>grep -c</b> over the 90000 top-level C++
+source code lines of GNU APL reveals the following statistics:
+</p>
+<ul>
+<li> 7000 <b>if</b>  statements, 1600 of them two-sided if-then-else-endif,
+  the others one-sided if-them-endi,
+  </li><li> 2000 <b>for</b> statements, 1200 of them trivial iterations over some
+  array (aka. <i>for (int i = 0; i &lt; size; ++i)  ... </i>,
+  </li><li> 200 <b>switch</b> statements with an averge of 8 case clauses per switch,
+  </li><li> 250 <b>while</b> statements, and
+  </li><li> 70 <b>do while</b> statements
+</li></ul>
+
+<p>In contrast, a popular non-free APL interpreter came up with a zoo of 30
+or so keywords for the purpose of flow control in one way or the other:
+</p>
+<p>:If :While :Repeat :For :In :InEach :Select :With :Trap :Hold :Disposable
+:Else :ElseIf :AndIf :OrIf :Until :Case :CaseList :EndIf :EndWhile :EndRepeat
+:EndFor :EndSelect :EndWith :EndTrap :EndHold :EndDisposable
+:GoTo, :Return, :Leave :Continue
+</p>
+<p>This approach, its implementation, and its constraints raise a number of
+serious problems. To name a few:
+</p>
+<ul>
+<li> A rather common APL design practice has it to first debug non-trivial
+  APL statements in immediate execution mode and only transfer them into
+  the body of defined functions when they work properly. However, the keywords 
+  above seem to work only in the bodies of defined functions but <b>not</b> in
+  immediate execution mode. The reason seems to be that their implementation
+  depends on labels which are not available in immediate execution.
+
+</li><li> Another rather common design practice is to limit the length of
+  lines to less than 80 characters (e.g. in the GNU coding conventions,
+  <b> https://gcc.gnu.org/codingconventions.html#Line</b>).
+   Even if it were possible to squeeze an :If :Then :Else :Endif into a 80
+  character line, and using a single whitespace around the keywords for
+  readability, wastes almost 1/3 of the precious 80 characters for keywords.
+  In this example, each of the COND, THEN, and ELSE parts must then be &lt; 20
+  characters on average. Not to talk about indentation to clarify the code.
+
+</li><li> Each of the keywords has rather specific constraints as to how and
+  where it can be used. For example (to quote a simple one from a reference
+  manual):
+
+<p><i>Control words, including qualifiers such as :Else and :ElseIf, may occur
+  only at the beginning of a line or expression in a diamond-separated
+  statement. The only exceptions are :In and :InEach which must appear on
+  the same line within a :For expression.</i>
+</p>
+<p>These constraints suggest that the keywords mentioned are merely syntactic
+  sugar that covers the underlying APL structure, i.e. labels and computed
+  branches. GNU APL does not claim to be fundamentally diffferent in that
+  regard, but the syntax of the syntactic sugar is somewhat simpler.
+</p></li></ul>
+
+<p>Learning from the above, the conclusions for the syntax of GNU APL condionals
+were these:
+</p>
+<ol>
+<li> the syntax shall be easy to understand and consistent,
+  </li><li> the syntax shall work in immediate execution mode (as long as
+  the entire conditional is provided on a single input line),
+  </li><li> in order to support 2., lengthy keywords shall be avoided in
+  favour of the original APL style, and
+  </li><li> the syntax needs to only support those cases where the standard APL
+  flow control (i.e. →N) becomes cumbersome. There is absolutely no benefit in
+  introducing a new (and redundant) syntax  when the standard APL mechanism
+  is already completely adequate.
+</li></ol>
+
+<p>As to the last point, almost every flow control case (in a standards compliant
+APL program) falls into one of the following categories (sorted by
+increasing complexity):
+</p>
+<ol>
+<li> <b>one-sided if</b>: if COND then THEN endif
+</li><li> <b>two-sided if/else</b>: if COND then THEN else ELSE endif
+</li><li> <b>loop</b>: while COND do BODY (or its less frequently used twin do BODY
+while COND)
+</li><li> <b>switch/case</b>: switch ARG case CASE1 case CASE2 case ... CASEn endswitch
+</li></ol>
+
+<p>where THEN, ELSE, CASE1, CASE2, CASEn, and BODY are a sequence of one or more
+statements, while COND or ARG control which of these sequences (if any)
+shall be executed.
+</p>
+<p>Interestingly, the complexity of the above cases, when coded in APL,
+increases in amost the reverse order (compared to other languages).
+For example
+</p>
+<ol>
+<li> <b>switch/case</b>:
+<pre class="verbatim">    →(ARG) / L1  L2 ...  Ln   ⍝ switch(ARG)
+L1: CASE1 ◊ →L_endcase        ⍝ case 1:
+L2: CASE2 ◊ →L_endcase        ⍝ case 2:
+...
+LN: CASEn                     ⍝ case N:
+L_endcase:
+</pre>
+</li><li> <b>loop</b>:
+<pre class="verbatim"> Loop: BODY ◊ →(COND) / Loop   ⍝ repeat BODY while COND
+</pre>
+</li><li> <b>one-sided if</b>:
+<pre class="verbatim">  →(!COND) / L_endif   ⍝ jump over the THEN clause
+  THEN
+L_endif:
+</pre>
+<p>or, not uncommon and shorter, but less portable and less readable:
+</p>
+<pre class="verbatim">  →(!COND) / ↑1+⎕LC ◊ THEN  ⍝ jump over the THEN clause to the next line
+</pre>
+</li><li> <b>two-sided if/else</b>:
+<pre class="verbatim">  →COND ↓ L_else L_then
+L_then: THEN ◊ →L_endif
+L_else: ELSE
+L_endif:
+</pre></li></ol>
+
+<p>A closer look at these case reveals that there is not much room for
+syntax improvements in cases 1. (switch) and 2. (loop). The introduction of
+a new syntax like :Select / :Case for switches or :For / :Endfor for loops
+would therefore only make matters different and incompatible, but not better.
+</p>
+<p>In case 3. (one-sided if) there is also not much to gain. However, case 3. 
+can be seen as a special case of case 4. (with an empty ELSE clause). As
+a matter of consistency, a new syntax for case 4. should also cover case 3.
+</p>
+<p>The only cases where a new syntax could improve matters are therefore
+cases 3. and  4.
+</p>
+<p>Another consideration relates to the end marker <b>L_endif</b> (and would
+likewise relate to <b>L_endcase</b> if we hadn&rsquo;t already ruled that case out).
+There are two reasonable syntax alternatives to handle the branch to the
+end of the conditional:
+</p>
+<ol>
+<li> allow multiple statements in the THEN and ELSE clauses and mark the end
+  of the <b>ELSE</b> clause (or, in the one-sided case 3  of the <b>THEN</b> clause
+  with some <b>ENDIF</b> marker, or
+</li><li> allow only single statement clauses (which implies the <b>ENDIF</b> and
+ makes it obsolete.
+</li></ol>
+
+<p>The design decision made in GNU APL was to go for multiple statements because
+the advantage in 2. (shorter code) looks much smaller than the the advantages of 1. (e.g. insertion of debug printouts into a clause).
+</p>
+
+</div>
+<div class="subsection" id="Syntax-1">
+<h4 class="subsection">2.40.2 Syntax</h4>
+
+<p>With the above considerations in mind, GNU APL decided for the following
+syntax:
+</p>
+<ul>
+<li> <b>one-sided if/else</b>:
+<pre class="verbatim">      COND →→ THEN ←←
+</pre>
+</li><li> <b>two-sided if/else</b>:
+<pre class="verbatim">      COND →→ THEN ←→ ELSE ←←
+</pre>
+</li></ul>
+
+<p>For this syntax to work, the following rules must be followed:
+</p>
+<ul>
+<li> The →→, ←→, and ←← markers must be single tokens (2 adjacent Unicode
+  characters) That is, no whitespace (and in particular no line feed) is
+  permitted between the first and the second arrow. A single → is a valid
+  APL statement (named Escape). A linefeed between two → turns the single
+  token →→ into two valid (though most of the time useless) Escape statements.
+
+</li><li> The →→, ←→, and ←← tokens are <b>end-of statement</b> markers (as opposed
+  to <b>beginning-of statement</b> markers). Each marker binds to the non-empty
+  statement left of it. APL is parsed line by line, so there can never be a
+  valid non-empty APL statement left of the first token of a line. As a
+   consequence, a →→ token, a ←→ token, or a ←← token at the beginning of
+   a line is a SYNTAX ERROR.
+
+</li><li> The COND, THEN, and ELSE clauses shall be non-empty (!) sequences of
+  valid APL statements. In particular:
+  <ul>
+<li> The condition COND shall be a <i>single statement</i> that evaluates to
+  a 1-item Boolean array (of any rank). The statement result of COND is a
+  committed value (and therefore not displayed).
+
+</li><li> The THEN clause shall be <i>one or more valid statements</i>, separated
+  by ◊ for more than one statement.
+
+</li><li> The ELSE clause (if present) shall be <i>one or more valid statements</i>,
+  separated by ◊ for more than one statement.
+  </li></ul>
+</li></ul>
+
+<p>Examples:
+</p><pre class="verbatim">      ⍝ short format. Valid in immediate execution and in defined functions
+      ⍝
+      X←5 ◊ X≥0 →→ X 'is positive' ←→ X 'is negative' ←←
+ 5 is positive 
+
+
+
+      ⍝ long format. Only possible in defined functions because immediate
+      ⍝ execution works line by line (and parsing the first line would fail).
+
+      ⍝ valid split into several lines (in a defined function)
+      ⍝
+      ∇FOO X
+       X≥0             →→
+       X 'is positive' ←→
+       X 'is negative' ←←
+      ∇
+      FOO 5
+ 5 is positive 
+      FOO ¯5
+ ¯5 is negative 
+
+
+
+      ⍝ invalid split into several lines: ←→ spread over 2 lines.
+      ⍝ FOO can be properly parsed, but calling FOO fails.
+      ⍝
+      ∇FOO X
+      X≥0 →→ X 'is positive' ←
+           → X 'is negative' ←←
+      ∇
+      FOO 5
+SYNTAX ERROR
+FOO[1]  X 'is positive'←
+
+
+
+      ⍝ invalid split into several lines:  ←→ is first token in line).
+      ⍝ FOO is invalid and the ∇-editor complains when closing FOO.
+      ⍝
+      ∇FOO X
+       X≥0 →→ X 'is positive'
+           ←→ X 'is negative' ←←
+      ∇
+NOTE: Invalid ←→ at start of line 2
+Error in function body in function line [2] of:
+[0] FOO X
+[1]        X≥0 →→ X 'is positive'
+[2]            ←→ X 'is negative' ←←
+Fatal error in defined function line [2]. You may now:
+    change the faulty line  with:  [2] ..., or 
+    delete the faulty line  with:  [∆2], or
+    cancel editing with:  [→]∇.
+
+</pre>
+<p>The recommended usage of corresponding →→, ←→, and ←← token is to:
+</p>
+<ul>
+<li> either put them on the same line (short format), or else
+  </li><li> align all of them on the same column (long form), but
+  </li><li> never mix the short and long forms
+</li></ul>
+
+<p>Like shown in the examples above.
+</p>
 <hr>
 </div>
 </div>

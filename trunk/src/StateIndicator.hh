@@ -94,8 +94,8 @@ public:
    ParseMode get_parse_mode() const
       { return executable->get_parse_mode(); }
 
-   /// evaluate a →N statement. Update PC if needed, maybe do nothing (→⍬)
-   Token jump(const Value * val);
+   /// evaluate a →B statement. Update PC if needed, maybe do nothing (→'')
+   Token jump(const Value * B);
 
    /// do a jump to function line \b line
    Token jump_to_line(Function_Line line);

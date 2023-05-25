@@ -37,7 +37,7 @@ pp( No_ID3             , ---       , = 3      )
 pp( FUN                , ---       , = 4      )
 pp( VAR                , ---       , = 5      )
 
-qf( AF                 , "⎕AF"     , = 0x4101 )
+qf( AF                 , "⎕AF"     , = 0x4101 )   // A...
 qv( AI                 , "⎕AI"     ,          )
 qv( ARG                , "⎕ARG"    ,          )
 sf( F2_AND             , "∧"       ,          )
@@ -52,10 +52,10 @@ st( ALPHA_U            , "⍶"       ,          )
 st( ASSIGN1            , "←"       ,          )
 sf( F2_AND_B           , "⊤∧"       ,         )
 
-sf( F12_BINOM          , "!"       , = 0x4201 )
+sf( F12_BINOM          , "!"       , = 0x4201 )   // B...
 st( BRANCH             , "→"       ,          )
 
-pp( CHARACTER          , ---       , = 0x4301 )
+pp( CHARACTER          , ---       , = 0x4301 )   // C...
 sf( F12_CIRCLE         , "○"       ,          )
 st( COLON              , ":"       ,          )
 sf( F12_COMMA          , ","       ,          )
@@ -66,7 +66,7 @@ qf( CR                 , "⎕CR"     ,          )
 qv( CT                 , "⎕CT"     ,          )
 st( CHI                , "χ"       ,          )
 
-sf( F12_DECODE         , "⊥"       , = 0x4401 )
+sf( F12_DECODE         , "⊥"       , = 0x4401 )   // D...
 st( DIAMOND            , "◊"       ,          )
 sf( F12_DIVIDE         , "÷"       ,          )
 qf( DL                 , "⎕DL"     ,          )
@@ -74,7 +74,7 @@ sf( F12_DOMINO         , "⌹"       ,          )
 sf( F12_DROP           , "↓"       ,          )
 qf( DLX                , "⎕DLX"    ,          )
 
-qf( EA                 , "⎕EA"     , = 0x4501 )
+qf( EA                 , "⎕EA"     , = 0x4501 )   // E...
 sf( OPER1_EACH         , "¨"       ,          )
 qf( EC                 , "⎕EC"     ,          )
 sf( F12_ELEMENT        , "ϵ"       ,          )
@@ -99,7 +99,7 @@ pp( ES_COM             , ---       ,          )
 pp( ES_ERR             , ---       ,          )
 pp( ES_ESC             , ---       ,          )
 
-qv( FC                 , "⎕FC"     , = 0x4601 )
+qv( FC                 , "⎕FC"     , = 0x4601 )   // F...
 sf( F2_FIND            , "⍷"       ,          )
 pp( FIRST_TIME         , ---       ,          )
 sf( F12_FORMAT         , "⍕"       ,          )
@@ -107,10 +107,11 @@ qf( FX                 , "⎕FX"     ,          )
 qf( FIO                , "⎕FIO"    ,          )
 qf( FFT                , "⎕FFT"    ,          )
 
-sf( F2_GREATER         , ">"       , = 0x4701 )
+sf( F2_GREATER         , ">"       , = 0x4701 )   // G...
 qf( GTK                , "⎕GTK"    ,          )
+st( GOTO_PC            , "→PC"     ,          )
 
-sf( F2_INDEX           , "⌷"       , = 0x4901 )
+sf( F2_INDEX           , "⌷"       , = 0x4901 )   // I...
 sf( F12_INDEX_OF       , "⍳"       ,          )
 pp( INTEGER            , ---       ,          )
 pp( INVALID            , ---       ,          )
@@ -119,11 +120,14 @@ qf( INP                , "⎕INP"    ,          )
 sf( F2_INTER           , "∩"       ,          )
 sf( OPER2_INNER        , "."       ,          )
 sf( F12_INTERVAL_INDEX , "⍸"       ,          )
+st( IF_ELSE            , "←→"      ,          )
+st( IF_END             , "←←"      ,          )
+st( IF_THEN            , "→→"      ,          )
 
-sf( JOT           , "∘"            , = 0x4A01 )
+sf( JOT           , "∘"            , = 0x4A01 )   // C...
 qf( JSON               , "⎕JSON"   ,          )
 
-qv( L                  , "⎕L"      , = 0x4C01 )
+qv( L                  , "⎕L"      , = 0x4C01 )   // L...
 st( L_BRACK            , "["       ,          )
 st( L_CURLY            , "{"       ,          )
 st( L_PARENT           , "("       ,          )
@@ -136,7 +140,7 @@ pp( LVAL               , ---       ,          )
 qv( LX                 , "⎕LX"     ,          )
 st( LAMBDA             , "λ"       ,          )
 
-sf( F2_MEQU            , "≥"       , = 0x4D01 )
+sf( F2_MEQU            , "≥"       , = 0x4D01 )   // M...
 sf( F12_MINUS          , "-"       ,          )
 st( MACRO              , "MACRO"   ,          )
 qf( MAP                , "⎕MAP"    ,          )
@@ -146,20 +150,20 @@ sf( F2_NAND            , "⍲"       ,          )
 qf( NC                 , "⎕NC"     ,          )
 qf( NL                 , "⎕NL"     ,          )
   /**  ⎕NLT removed                       **/
-pp( NO_VALUE           , ---       , = 0x4E06 )
+pp( NO_VALUE           , ---       , = 0x4E06 )   // N...
 sf( F2_NOR             , "⍱"       ,          )
 sf( F12_NEQUIV         , "≢"       ,          )
 sf( F2_NAND_B          , "⊤⍲"      ,          )
 sf( F2_NOR_B            , "⊤⍱"     ,          )
 
-pp( OFF                , ---       , = 0x4F01 )
+pp( OFF                , ---       , = 0x4F01 )   // O...
 sf( F2_OR              , "∨"       ,          )
 st( OMEGA              , "⍵"       ,          )
 st( OMEGA_U            , "⍹"       ,          )
 sf( OPER2_OUTER        , "∘."      ,          )
 sf( F2_OR_B            , "⊤∨"      ,          )
 
-sf( F12_PARTITION      , "⊂"       , = 0x5001 )
+sf( F12_PARTITION      , "⊂"       , = 0x5001 )   // P...
 sf( F12_PICK           , "⊃"       ,          )
 sf( F12_PLUS           , "+"       ,          )
 sf( F12_POWER          , "⋆"       ,          )
@@ -168,18 +172,18 @@ qv( PR                 , "⎕PR"     ,          )
 qv( PS                 , "⎕PS"     ,          )
   /** ⎕PT            removed              **/
   /**  OPER2_PRODUCT removed              **/
-qv( PW                 , "⎕PW"     , = 0x5009 )
+qv( PW                 , "⎕PW"     , = 0x5009 )   // P...
 sf( OPER2_POWER        , "⍣"       ,          )
 qf( PLOT               , "⎕PLOT"   ,          )
 qf( PNG                , "⎕PNG"     ,          )
 
-st( Quad_Quad          , "⎕"       , = 0x5101 )
+st( Quad_Quad          , "⎕"       , = 0x5101 )   // Q...
 st( QUOTE1             , "'"       ,          )
 st( QUOTE2             , "\""      ,          )
 st( QUOTE_Quad         , "⍞"       ,          )
 st( Quad_PREFIX        , ""        ,          )
 
-qv( R                  , "⎕R"      , = 0x5201 )
+qv( R                  , "⎕R"      , = 0x5201 )   // R...
 st( R_ARROW            , "→"       ,          )
 st( R_BRACK            , "]"       ,          )
 st( R_CURLY            , "}"       ,          )
@@ -202,7 +206,7 @@ sf( F12_ROTATE         , "⌽"       ,          )
 sf( F12_ROTATE1        , "⊖"       ,          )
 qf( RVAL               , "⎕RVAL"   ,          )
 
-sf( OPER1_SCAN         , "\\"      , = 0x5301 )
+sf( OPER1_SCAN         , "\\"      , = 0x5301 )   // S...
 sf( OPER1_SCAN1        , "⍀"       ,          )
 st( SEMICOL            , ";"       ,          )
 qf( SI                 , "⎕SI"     ,          )
@@ -225,7 +229,7 @@ pp( STOP_LINE          , ---       ,          )
 qf( STOP               , "⎕STOP"   ,          )
 qf( SQL                , "⎕SQL"    ,          )
 
-sf( F12_TAKE           , "↑"       , = 0x5401 )
+sf( F12_TAKE           , "↑"       , = 0x5401 )   // T...
 qv( TC                 , "⎕TC"     ,          )
 qf( TF                 , "⎕TF"     ,          )
 sf( F12_TIMES          , "×"       ,          )
@@ -234,23 +238,23 @@ qv( TS                 , "⎕TS"     ,          )
 qv( TZ                 , "⎕TZ"     ,          )
 qf( TRACE              , "⎕TRACE"  ,          )
 
-qf( UCS                , "⎕UCS"    , = 0x5501 )
+qf( UCS                , "⎕UCS"    , = 0x5501 )   // U...
 qv( UL                 , "⎕UL"     ,          )
 sf( F2_UNEQU           , "≠"       ,          )
 sf( F12_UNION          , "∪"       ,          )
 pp( FUN_USER           , ---       ,          )
 sf( F2_UNEQ_B          , "⊤≠"      ,          )
 
-pp( VARIABLE           , ---       , = 0x5601 )
+pp( VARIABLE           , ---       , = 0x5601 )   // V...
 pp( VOID               , ---       ,          )
 
-qv( WA                 , "⎕WA"     , = 0x5701 )
+qv( WA                 , "⎕WA"     , = 0x5701 )   // C...
 sf( F12_WITHOUT        , "∼"       ,          )
 
-qv( X                  , "⎕X"      , = 0x5801 )
+qv( X                  , "⎕X"      , = 0x5801 )   // X...
 qf( XML                , "⎕XML"    ,          )
 
-sf( F0_ZILDE           , "⍬"       , = 0x5A01 )
+sf( F0_ZILDE           , "⍬"       , = 0x5A01 )   // Z...
 
 //-----------------------------------------------------------------------------
 

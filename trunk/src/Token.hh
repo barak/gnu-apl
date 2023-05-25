@@ -285,9 +285,17 @@ public:
    IndexExpr & get_index_val() const
       { Assert(get_ValueType() == TV_INDEX);   return *value.index_val; }
 
-   /// return true if \b this token is a function (or operator)
+   /// return b true iff \b this token is a function (or operator)
    bool is_function() const
       { return (get_ValueType() == TV_FUN); }
+
+   /// return \b true iff \b this token is END or ENDL
+   bool is_ENDx() const
+      { return tag == TOK_END || tag == TOK_ENDL; }
+
+   /// return \b true iff \b this token is TOK_IF_THEN/ELSE/END
+   bool is_COND() const
+      { return tag == TOK_IF_THEN || tag == TOK_IF_ELSE || tag == TOK_IF_END; }
 
    /// return the Function_P value of this token
    Function_P get_function() const
@@ -372,7 +380,7 @@ Token::copy_N(const Token & src)
    switch(src.get_ValueType())
       {
         case TV_NONE:  value.int_vals[0]   = 0;
-                       value.int_vals[1]   = src.value.int_vals[1];     break;
+                       value.int_vals[1]   = 0;                         break;
         case TV_CHAR:  value.char_val      = src.value.char_val;        break;
         case TV_INT:   value.int_vals[0]   = src.value.int_vals[0];
                        value.int_vals[1]   = src.value.int_vals[1];     break;
@@ -407,11 +415,15 @@ public:
    Token_string(const Token_string & other, uint32_t pos, uint32_t len)
       { loop(l, len)   push_back(other[pos++]); }
 
-   /// reversde the token order from \b from to \b to (including)
+   /// reverse the token order from \b from to \b to (including)
    void reverse_from_to(ShapeItem from, ShapeItem to);
 
+   /// replace the segment starting a \b pos with \b src. Return the new pos.
+   //
+   ShapeItem replace_segment(const Token_string & src, ShapeItem pos);
+
    /// print this token string
-   void print(ostream & out, bool details) const;
+   void print(ostream & out, int details) const;
 
 private:
    /// prevent accidental copying

@@ -9,6 +9,11 @@
 # undef _AB
 #endif
 
+/// monadic cell performance
+#ifndef perfo_1
+# define perfo_1(_id, _args, _APL, _thres)
+#endif
+
 //      Pfstat_ID name   args   APL         threashold                Pfstat_ID
 perfo_1(F12_PLUS       , _B,  "  + B",      8888888888888888888ULL)   //  0
 perfo_1(F12_MINUS      , _B,  "  - B",      8888888888888888888ULL)   //  1
@@ -23,6 +28,11 @@ perfo_1(F12_LOGA       , _B,  "  ⍟ B",      8888888888888888888ULL)   //  9
 perfo_1(F12_CIRCLE     , _B,  "  ○ B",      8888888888888888888ULL)   // 10
 perfo_1(F12_STILE      , _B,  "  ∣ B",      8888888888888888888ULL)   // 11
 perfo_1(F12_ROLL       , _B,  "  ? B",      8888888888888888888ULL)   // 12
+
+/// dyadic cell performance
+#ifndef perfo_2
+# define perfo_2(_id, _args, _APL, _thres)
+#endif
 
 perfo_2(F12_PLUS       , _AB, "A + B",      8888888888888888888ULL)   // 13
 perfo_2(F12_MINUS      , _AB, "A - B",      8888888888888888888ULL)   // 14
@@ -53,6 +63,16 @@ perfo_2(F12_CIRCLE     , _AB, "A ○ B",      8888888888888888888ULL)   // 38
 perfo_2(F12_STILE      , _AB, "A ∣ B",      8888888888888888888ULL)   // 39
 perfo_2(F2_FIND        , _AB, "A ⋸ B",      8888888888888888888ULL)   // 40
 
+/// APL performance statistics
+#ifndef perfo_3
+# define perfo_3(_id, _args, _APL, _thres)
+#endif
+
+/// other performance statistics
+#ifndef perfo_4
+# define perfo_4(_id, _args, _APL, _thres)
+#endif
+
 perfo_4(SCALAR         , _B,  "  scalar B", 8888888888888888888ULL)   // 41
 perfo_4(SCALAR         , _AB, "A scalar B", 8888888888888888888ULL)   // 42
 perfo_4(clone          , _B,  "clone B",    8888888888888888888ULL)   // 43
@@ -70,6 +90,16 @@ perfo_4(CERR           , _B,  "CERR", -1)                             // 54
 perfo_4(M_join         , _B,  "M_join(AB)", -1)                       // 55
 perfo_4(M_join         , _AB, "M_join(B)",  -1)                       // 56
 
+#ifndef optim
+# define optim(tag, text)
+#endif
+
+optim(FT_LABEL_LITERAL,   "⎕FX Time: Label to integer literal")   // 0
+optim(FT_DIRECT_BRANCHES, "⎕FX Time: Unconditional branches"  )   // 1
+optim(RT_A_RHO_B,         "Run Time: in-place A⍴B"            )   // 2
+optim(RT_COMMA_B,         "Run Time: in-place ,B"             )   // 3
+
+#undef optim
 #undef perfo_1
 #undef perfo_2
 #undef perfo_3

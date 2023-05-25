@@ -186,16 +186,18 @@ operator << (ostream & out, const Token & token)
 
    switch(token.get_Class())
       {
-        case TC_END:      return out << "END";
+        case TC_END:
+             return out << "END";
+
         case TC_RETURN:
              if (token.get_tag() == TOK_RETURN_EXEC)
-                          return out << "RETURN ⍎";
+                return out << "RETURN ⍎";
              if (token.get_tag() == TOK_RETURN_STATS)
-                          return out << "RETURN ◊";
+                return out << "RETURN ◊";
              if (token.get_tag() == TOK_RETURN_VOID)
-                          return out << "RETURN ∇FUN";
+                return out << "RETURN ∇FUN";
              if (token.get_tag() == TOK_RETURN_SYMBOL)
-                          return out << "RETURN Z←FUN";
+                return out << "RETURN Z←FUN";
              return out << "RETURN ???";
 
         case TC_VALUE:    return token.print_value(out);
@@ -204,10 +206,14 @@ operator << (ostream & out, const Token & token)
         case TC_PINDEX:
              if (token.get_tag() == TOK_INDEX)
                 return out << token.get_index_val();
-             else if (token.get_tag() == TOK_AXIS)
-                return out << *token.get_axes();
-             else
-                FIXME;
+             if (token.get_tag() == TOK_AXIS)
+                {
+                  out << "[";
+                  if (const Value * val = token.get_axes().get())
+                     out << *val;
+                  return out << "]";
+                }
+             FIXME;
 
         case TC_SYMBOL:
              if (token.get_tag() == TOK_LSYMB)
@@ -576,6 +582,7 @@ UCS_string ucs;
              break;
 
         case TC_END:
+        case TC_DIAMOND:
              ucs.append(UNI_DIAMOND);
              break;
 
@@ -608,6 +615,7 @@ UCS_string ucs;
         case TC_OPER2:
              if (get_Id() == ID_No_ID)   return get_function()->get_name();
              return ID::get_name_UCS(get_Id());
+
 
         case TC_INDEX:
              if (get_tag() == TOK_AXIS)
@@ -774,19 +782,39 @@ Token * t2 = &at(to);
    while (t1 < t2)   t1++->Hswap(*t2--);
 }
 //----------------------------------------------------------------------------
-void
-Token_string::print(ostream & out, bool details) const
+ShapeItem
+Token_string::replace_segment(const Token_string & src, ShapeItem pos)
 {
-   loop(t, size())
+   loop(s, src.size())
        {
-         const Token & tok = at(t);
+         at(pos).clear(LOC);
+         new (&at(pos++)) Token(src[s], LOC);
+       }
+   return pos;
+}
+//----------------------------------------------------------------------------
+void
+Token_string::print(ostream & out, int details) const
+{
+const bool PC  = details    & 1;
+const bool VAL = details & 2;
+
+   loop(pc, size())
+       {
+         const Token & tok = at(pc);
+         if (PC)   out << "    [PC=" << setw(2) << pc << "] ";
          out << "`" << tok;
-         if (details)   switch(tok.get_ValueType())
+         if (VAL)
             {
-              case TV_FLT: out << " " << tok.get_flt_val();   break;
-              default:                                        break;
+              switch(tok.get_ValueType())
+                 {
+                   case TV_INT: out << ":" << tok.get_int_val();   break;
+                   case TV_FLT: out << ":" << tok.get_flt_val();   break;
+                   default:                                        break;
+                 }
             }
-         out << "  ";
+         if (PC)   out << endl;
+         else      out << "  ";
        }
 
    out << endl;

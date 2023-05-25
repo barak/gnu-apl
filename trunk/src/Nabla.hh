@@ -86,8 +86,9 @@ public:
    /// edit the function specified in \b cmd (e.g. cmd = "∇FUN")
    static void edit_function(const UCS_string & cmd);
 
-   /// return the line label (sucah as [1]) and the line text, Set is_current
-   /// iff \b line is the current line of the editor.
+   /// Return the line label (sucah as [1]) and the line text.
+   /// Set is_current iff \b line is the current line of the editor.
+   /// Return 0 if line > lines.size().
    UCS_string get_label_and_text(int line, bool & is_current) const;
 
    /// return the number of lines

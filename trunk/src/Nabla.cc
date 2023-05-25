@@ -186,7 +186,7 @@ UCS_string creator(InputFile::current_filename());
 UTF8_string creator_utf8(creator);
 
 UserFunction * ufun = UserFunction::fix(fun_text, error_line, false,
-                                        LOC, creator_utf8, false);
+                                        LOC, creator_utf8, true);
 
    if (ufun == 0)   // UserFunction::fix() failed
       {
@@ -195,20 +195,34 @@ UserFunction * ufun = UserFunction::fix(fun_text, error_line, false,
            {
              // the ∇-editor runs from a script, therefore warning the user
              // interactively and asking to fix the fault makes no sense. We
-             // therefore exit with DEFN_ERROR, so that the scrip does not
+             // therefore exit with DEFN_ERROR, so that the script does not
              // hang in a endless try again loop.
              //
              UTF8_string more_utf8(MORE);
              throw_edit_error(more_utf8.c_str());
            }
 
-        COUT << MORE << 
-"Fatal error in defined function line [" << error_line << "].\n"
-"Proceed with [" << error_line << "] ..., [∆" << error_line <<
-"], or [→] before ∇.\n";
+        if (error_line == -1)   /// unknown error line
+           {
+             COUT <<
+             MORE << 
+"\nFatal error in defined function.\n"
+"    You may want to change faulty line(s)\n"
+"    or cancel editing entirely with:   [→]∇\n";
+           }
+        else
+           {
+             COUT <<
+             MORE << "\nFatal error in defined function line [" << error_line
+                  << "]. To fix this you may want to:\n"
+                     "    change the faulty line with:    ["
+                  << error_line << "] ..., or \n"
+                     "    delete the faulty line with:    [∆"
+                  << error_line << "], or\n"
+                     "    cancel editing entirely with:   [→]∇.";
+           }
         do_close = false;
         goto try_again;
-
       }
 
    if (locked)
@@ -957,12 +971,19 @@ const int idx_from = find_line(edit_from);
 const char *
 Nabla::execute_escape()
 {
+   // the user has entered [→].
+   //
+   // Note that fun_symbol and fun_symbol->get_function() may both be valid
+   // even though the function is "fresh". We use function_existed imstead.
+   //
    lines.clear();
 
-const Function * fun = fun_symbol ? fun_symbol->get_function() : 0;
 
-   if (fun)   // existing function
+   if (function_existed)   // existing function
       {
+        Assert(fun_symbol);
+        const Function * fun = fun_symbol->get_function();
+        Assert(fun);
         const UserFunction * ufun = fun->get_func_ufun();
         Assert(ufun);
         loop(l, ufun->get_text_size())
@@ -974,6 +995,7 @@ const Function * fun = fun_symbol ? fun_symbol->get_function() : 0;
    else       // new function: only restore the header
       {
         lines.push_back(FunLine(0, fun_header));
+        current_line = LineLabel(1);
       }
 
    return 0;

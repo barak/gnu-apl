@@ -90,13 +90,16 @@ Tokenizer::do_tokenize(const UCS_string & input, Token_string & tos,
            << input << "»" << endl;
 
 Unicode_source src(input);
-   while ((rest_2 = src.rest_len()) != 0)
+   for(;;)
       {
-        Unicode uni = *src;
-        if (uni == UNI_COMMENT)       break;   // ⍝ comment
-        if (uni == UNI_NUMBER_SIGN)   break;   // # comment
+        rest_2 = src.rest_len();
+        if (rest_2 == 0)   break;   // end of input
 
-        const Token tok = Avec::uni_to_token(uni, LOC);
+        Unicode uni = *src;
+        if (uni == UNI_COMMENT)       break;   // ⍝ comment: discared the rest
+        if (uni == UNI_NUMBER_SIGN)   break;   // # comment: discared the rest
+
+        const Token tok = Avec::uni_to_token(uni, LOC);   // may normalize uni
 
         Log(LOG_tokenize)
            {
@@ -120,7 +123,7 @@ Unicode_source src(input);
                      char cc[20];
                      SPRINTF(cc, "U+%4.4X (", uni);
                      MORE_ERROR() << "Tokenizer: No token for Unicode "
-                                  <<  cc << uni << ")\nInput: " << input;
+                                  <<  cc << uni << ")\nInput was: " << input;
                      Error error(E_NO_TOKEN, LOC);
                      throw error;
                    }
@@ -249,33 +252,62 @@ Unicode_source src(input);
 
                    break;
 
-              case TC_R_ARROW:
-                   ++src;
-                   if (src.rest_len())   tos.push_back(tok);
-                   else              tos.push_back(Token(TOK_ESCAPE));
+              case TC_R_ARROW:   // →
+                   ++src;        // skip →
+                   if (src.rest_len() == 0)                      // single →
+                      {
+                        tos.push_back(Token(TOK_ESCAPE));
+                      }
+                   else if (rest_2 && *src == UNI_RIGHT_ARROW)   // double → (→→)
+                      {
+                        ++src;
+                        tos.push_back(Token(TOK_IF_THEN, int64_t(0)));
+                      }
+                   else
+                      {
+                        tos.push_back(tok);
+                      }
                    break;
 
-              case TC_ASSIGN:
-                   ++src;
-                   {
-                     const bool sym = tos.size() >= 1 &&
-                                tos[tos.size() - 1].get_tag() == TOK_SYMBOL;
-                     const bool dia = tos.size() > 1 &&
-                                tos[tos.size() - 2].get_tag() == TOK_DIAMOND;
-                     const bool col = tos.size() > 1 &&
-                                tos[tos.size() - 2].get_tag() == TOK_COLON;
+              case TC_ASSIGN:    // ←
+                   ++src;        // skip ←
+                   if (rest_2 > 1 && *src == UNI_LEFT_ARROW)         // ←←
+                      {
+                        ++src;
+                        tos.push_back(Token(TOK_IF_END, int64_t(0)));
+                      }
+                   else if (rest_2 > 1 && *src == UNI_RIGHT_ARROW)   // →→
+                      {
+                        ++src;
+                        tos.push_back(Token(TOK_IF_ELSE, int64_t(0)));
+                      }
+                   else
+                      {
+                        const bool sym = tos.size() >= 1 &&
+                                   tos[tos.size() - 1].get_tag() == TOK_SYMBOL;
+                        const bool dia = tos.size() > 1 &&
+                                   tos[tos.size() - 2].get_tag() == TOK_DIAMOND;
+                        const bool col = tos.size() > 1 &&
+                                   tos[tos.size() - 2].get_tag() == TOK_COLON;
+                     
+                      /* change tos.get_tag() from  TOK_R_ARROW to TOK_ASSIGN1
+                         in the following cases:
 
-                   tos.push_back(tok);
+                           SYM ←   (at the start of line),        or
+                         ◊ SYM ←   (at the start of statement),   or
+                         : SYM ←   (at the start of statement after label)
 
-                   // change token tag of ← if:
-                   //
-                   //   SYM ←   (at the start of line),        or
-                   // ◊ SYM ←   (at the start of statement),   or
-                   // : SYM ←   (at the start of statement after label)
-                   //
-                   if (sym && ((tos.size() == 2) || dia || col))
-                      tos.back().ChangeTag(TOK_ASSIGN1);
-                   }
+                         or else leave it as is (.
+                       */
+                      if (sym && ((tos.size() == 2) || dia || col))
+                         {
+                           tos.push_back(TOK_ASSIGN1);
+                         }
+                      else
+                         {
+                           tos.push_back(tok);
+                         }
+                      }
                    break;
 
               case TC_L_PARENT:
@@ -340,7 +372,12 @@ Unicode_source src(input);
       }
 
    Log(LOG_tokenize)
-      CERR << "tokenize() done (no error)" << endl;
+      {
+        CERR << "tokenize() done (no error)." << endl
+             << "   └── tos[" << tos.size() << "] is:";
+        loop(t, tos.size())   CERR << " " << tos[t];
+        CERR << endl;
+      }
 }
 //----------------------------------------------------------------------------
 void

@@ -3,6 +3,8 @@
 
       ⍝ monadic → as expression (GNU APL extension).
       ⍝
+)ERASE FOO
+
 ∇FOO
  N←4
 L: (N⍴'-'),'yes', →(0=N←N-1)/0 ◊ →L

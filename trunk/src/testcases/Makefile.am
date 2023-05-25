@@ -67,6 +67,7 @@ dist_noinst_DATA =                              \
         Grade_down_with_collating_sequence.tc   \
         Grade_up.tc                             \
         Grade_up_with_collating_sequence.tc     \
+        IfElse.tc                               \
         Index_Of.tc                             \
         Index.tc                                \
         Index_with_axis.tc                      \
@@ -95,6 +96,7 @@ dist_noinst_DATA =                              \
         Oper_negative.tc                        \
         OperPower.tc                            \
         Oper_userfun.tc                         \
+        Optimization.tc                         \
         Or.tc                                   \
         OuterProduct.tc                         \
         Parallel.tc                             \

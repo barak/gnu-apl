@@ -732,7 +732,6 @@ const ValueStackItem & vs = value_stack.back();
 
         case NC_SYSTEM_VAR:
              return;   // leave symbol as is
-             return;
 
         default:
              CERR << "Symbol is '" << get_name() << "' at " << LOC << endl;

@@ -777,6 +777,7 @@ in a 'preferences' file still follow the library root scheme.
 * Section 2.37::  ⎕SI   - State Indicator
 * Section 2.38::  ⎕SYL  - System limits
 * Section 2.39::  ⎕XML - XML Parsing
+* Section 2.40::  Conditionals
 @end menu
 
 There are a few hopefully useful features in GNU APL:
@@ -5737,6 +5738,305 @@ follow these top-level steps:
  (with something like MEMBERS←(⊂APL) FUN¨6⎕XML APL←⎕XML followed by MEMBER⊃ )
 @item Optionally, convert the modified XML document back to XML (0 ⎕XML
 @end enumerate
+
+@c ----------------------------------------------------------------------------
+@node    Section 2.40
+@section Conditionals
+
+@b{WARNING}: GNU APL conditionals are experimental. Use them with care and
+avoid them, wherever possible, in favour of portability. Neither the ISO
+APL standard, nor IBM APL2 provide conditionals.
+
+@subsection Design considerations.
+
+The author of GNU APL has, for a long time, hesitated to implement
+conditionalsi in GNU APL. Primarily for the following reasons:
+
+@itemize
+@item the lack of standardization of conditionals,
+@item the lack of an elegant syntax that fits well into the typical
+      (brief) APL programming style, and in particular
+@item the large number of keywords for flow control used in some other APL
+      interpreters. See below.
+@end itemize
+
+The C language has 6 keywords for flow control: @b{if}, @b{else}, @b{for},
+@b{do}, Two of them (@b{do} and @b{while}) are redundant and rarely used,
+leaving only 4 base cases. A quick @b{grep -c} over the 90000 top-level C++
+source code lines of GNU APL reveals the following statistics:
+
+@itemize
+  @item 7000 @b{if}  statements, 1600 of them two-sided if-then-else-endif,
+  the others one-sided if-them-endi,
+  @item 2000 @b{for} statements, 1200 of them trivial iterations over some
+  array (aka. @i{for (int i = 0; i < size; ++i)  ... },
+  @item 200 @b{switch} statements with an averge of 8 case clauses per switch,
+  @item 250 @b{while} statements, and
+  @item 70 @b{do while} statements
+@end itemize
+
+In contrast, a popular non-free APL interpreter came up with a zoo of 30
+or so keywords for the purpose of flow control in one way or the other:
+
+:If :While :Repeat :For :In :InEach :Select :With :Trap :Hold :Disposable
+:Else :ElseIf :AndIf :OrIf :Until :Case :CaseList :EndIf :EndWhile :EndRepeat
+:EndFor :EndSelect :EndWith :EndTrap :EndHold :EndDisposable
+:GoTo, :Return, :Leave :Continue
+
+This approach, its implementation, and its constraints raise a number of
+serious problems. To name a few:
+
+@itemize
+  @item A rather common APL design practice has it to first debug non-trivial
+  APL statements in immediate execution mode and only transfer them into
+  the body of defined functions when they work properly. However, the keywords 
+  above seem to work only in the bodies of defined functions but @b{not} in
+  immediate execution mode. The reason seems to be that their implementation
+  depends on labels which are not available in immediate execution.
+
+  @item Another rather common design practice is to limit the length of
+  lines to less than 80 characters (e.g. in the GNU coding conventions,
+  @b{ https://gcc.gnu.org/codingconventions.html#Line}).
+   Even if it were possible to squeeze an :If :Then :Else :Endif into a 80
+  character line, and using a single whitespace around the keywords for
+  readability, wastes almost 1/3 of the precious 80 characters for keywords.
+  In this example, each of the COND, THEN, and ELSE parts must then be < 20
+  characters on average. Not to talk about indentation to clarify the code.
+
+  @item Each of the keywords has rather specific constraints as to how and
+  where it can be used. For example (to quote a simple one from a reference
+  manual):
+
+  @i{Control words, including qualifiers such as :Else and :ElseIf, may occur
+  only at the beginning of a line or expression in a diamond-separated
+  statement. The only exceptions are :In and :InEach which must appear on
+  the same line within a :For expression.}
+
+  These constraints suggest that the keywords mentioned are merely syntactic
+  sugar that covers the underlying APL structure, i.e. labels and computed
+  branches. GNU APL does not claim to be fundamentally diffferent in that
+  regard, but the syntax of the syntactic sugar is somewhat simpler.
+@end itemize
+
+Learning from the above, the conclusions for the syntax of GNU APL condionals
+were these:
+
+@enumerate
+  @item the syntax shall be easy to understand and consistent,
+  @item the syntax shall work in immediate execution mode (as long as
+  the entire conditional is provided on a single input line),
+  @item in order to support 2., lengthy keywords shall be avoided in
+  favour of the original APL style, and
+  @item the syntax needs to only support those cases where the standard APL
+  flow control (i.e. →N) becomes cumbersome. There is absolutely no benefit in
+  introducing a new (and redundant) syntax  when the standard APL mechanism
+  is already completely adequate.
+@end enumerate
+
+As to the last point, almost every flow control case (in a standards compliant
+APL program) falls into one of the following categories (sorted by
+increasing complexity):
+
+@enumerate
+@item @b{one-sided if}: if COND then THEN endif
+@item @b{two-sided if/else}: if COND then THEN else ELSE endif
+@item @b{loop}: while COND do BODY (or its less frequently used twin do BODY
+while COND)
+@item @b{switch/case}: switch ARG case CASE1 case CASE2 case ... CASEn endswitch
+@end enumerate
+
+where THEN, ELSE, CASE1, CASE2, CASEn, and BODY are a sequence of one or more
+statements, while COND or ARG control which of these sequences (if any)
+shall be executed.
+
+Interestingly, the complexity of the above cases, when coded in APL,
+increases in amost the reverse order (compared to other languages).
+For example
+
+@enumerate
+@item @b{switch/case}:
+@verbatim
+    →(ARG) / L1  L2 ...  Ln   ⍝ switch(ARG)
+L1: CASE1 ◊ →L_endcase        ⍝ case 1:
+L2: CASE2 ◊ →L_endcase        ⍝ case 2:
+...
+LN: CASEn                     ⍝ case N:
+L_endcase:
+@end verbatim
+
+@item @b{loop}:
+@verbatim
+ Loop: BODY ◊ →(COND) / Loop   ⍝ repeat BODY while COND
+@end verbatim
+
+@item @b{one-sided if}:
+@verbatim
+  →(!COND) / L_endif   ⍝ jump over the THEN clause
+  THEN
+L_endif:
+@end verbatim
+
+or, not uncommon and shorter, but less portable and less readable:
+
+@verbatim
+  →(!COND) / ↑1+⎕LC ◊ THEN  ⍝ jump over the THEN clause to the next line
+@end verbatim
+
+@item @b{two-sided if/else}:
+@verbatim
+  →COND ↓ L_else L_then
+L_then: THEN ◊ →L_endif
+L_else: ELSE
+L_endif:
+@end verbatim
+@end enumerate
+
+A closer look at these case reveals that there is not much room for
+syntax improvements in cases 1. (switch) and 2. (loop). The introduction of
+a new syntax like :Select / :Case for switches or :For / :Endfor for loops
+would therefore only make matters different and incompatible, but not better.
+
+In case 3. (one-sided if) there is also not much to gain. However, case 3. 
+can be seen as a special case of case 4. (with an empty ELSE clause). As
+a matter of consistency, a new syntax for case 4. should also cover case 3.
+
+The only cases where a new syntax could improve matters are therefore
+cases 3. and  4.
+
+Another consideration relates to the end marker @b{L_endif} (and would
+likewise relate to @b{L_endcase} if we hadn't already ruled that case out).
+There are two reasonable syntax alternatives to handle the branch to the
+end of the conditional:
+
+@enumerate
+@item allow multiple statements in the THEN and ELSE clauses and mark the end
+  of the @b{ELSE} clause (or, in the one-sided case 3  of the @b{THEN} clause
+  with some @b{ENDIF} marker, or
+@item allow only single statement clauses (which implies the @b{ENDIF} and
+ makes it obsolete.
+@end enumerate
+
+The design decision made in GNU APL was to go for multiple statements because
+the advantage in 2. (shorter code) looks much smaller than the the advantages of 1. (e.g. insertion of debug printouts into a clause).
+
+
+@subsection Syntax
+
+With the above considerations in mind, GNU APL decided for the following
+syntax:
+
+@itemize
+@item @b{one-sided if/else}:
+@verbatim
+      COND →→ THEN ←←
+@end verbatim
+
+@item @b{two-sided if/else}:
+@verbatim
+      COND →→ THEN ←→ ELSE ←←
+@end verbatim
+
+@end itemize
+
+For this syntax to work, the following rules must be followed:
+
+@itemize
+  @item The →→, ←→, and ←← markers must be single tokens (2 adjacent Unicode
+  characters) That is, no whitespace (and in particular no line feed) is
+  permitted between the first and the second arrow. A single → is a valid
+  APL statement (named Escape). A linefeed between two → turns the single
+  token →→ into two valid (though most of the time useless) Escape statements.
+
+  @item The →→, ←→, and ←← tokens are @b{end-of statement} markers (as opposed
+  to @b{beginning-of statement} markers). Each marker binds to the non-empty
+  statement left of it. APL is parsed line by line, so there can never be a
+  valid non-empty APL statement left of the first token of a line. As a
+   consequence, a →→ token, a ←→ token, or a ←← token at the beginning of
+   a line is a SYNTAX ERROR.
+
+  @item The COND, THEN, and ELSE clauses shall be non-empty (!) sequences of
+  valid APL statements. In particular:
+  @itemize
+
+  @item The condition COND shall be a @i{single statement} that evaluates to
+  a 1-item Boolean array (of any rank). The statement result of COND is a
+  committed value (and therefore not displayed).
+
+  @item The THEN clause shall be @i{one or more valid statements}, separated
+  by ◊ for more than one statement.
+
+  @item The ELSE clause (if present) shall be @i{one or more valid statements},
+  separated by ◊ for more than one statement.
+  @end itemize
+@end itemize
+
+Examples:
+@verbatim
+      ⍝ short format. Valid in immediate execution and in defined functions
+      ⍝
+      X←5 ◊ X≥0 →→ X 'is positive' ←→ X 'is negative' ←←
+ 5 is positive 
+
+
+
+      ⍝ long format. Only possible in defined functions because immediate
+      ⍝ execution works line by line (and parsing the first line would fail).
+
+      ⍝ valid split into several lines (in a defined function)
+      ⍝
+      ∇FOO X
+       X≥0             →→
+       X 'is positive' ←→
+       X 'is negative' ←←
+      ∇
+      FOO 5
+ 5 is positive 
+      FOO ¯5
+ ¯5 is negative 
+
+
+
+      ⍝ invalid split into several lines: ←→ spread over 2 lines.
+      ⍝ FOO can be properly parsed, but calling FOO fails.
+      ⍝
+      ∇FOO X
+      X≥0 →→ X 'is positive' ←
+           → X 'is negative' ←←
+      ∇
+      FOO 5
+SYNTAX ERROR
+FOO[1]  X 'is positive'←
+
+
+
+      ⍝ invalid split into several lines:  ←→ is first token in line).
+      ⍝ FOO is invalid and the ∇-editor complains when closing FOO.
+      ⍝
+      ∇FOO X
+       X≥0 →→ X 'is positive'
+           ←→ X 'is negative' ←←
+      ∇
+NOTE: Invalid ←→ at start of line 2
+Error in function body in function line [2] of:
+[0] FOO X
+[1]        X≥0 →→ X 'is positive'
+[2]            ←→ X 'is negative' ←←
+Fatal error in defined function line [2]. You may now:
+    change the faulty line  with:  [2] ..., or 
+    delete the faulty line  with:  [∆2], or
+    cancel editing with:  [→]∇.
+
+@end verbatim
+
+The recommended usage of corresponding →→, ←→, and ←← token is to:
+
+@itemize
+  @item either put them on the same line (short format), or else
+  @item align all of them on the same column (long form), but
+  @item never mix the short and long forms
+@end itemize
+
+Like shown in the examples above.
 
 @c ----------------------------------------------------------------------------
 @node Chapter 3

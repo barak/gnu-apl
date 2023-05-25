@@ -33,8 +33,9 @@
 /* Note:
    perfo_1: monadic cell statistics
    perfo_2: dyadic cell statistics
-   perfo_3: monadic function statistics
-   perfo_4: dyadic function statistics
+   perfo_3: APL statistics
+   perfo_4: misc other statistics
+   optim:   optimization counters
  */
 
 #define perfo_1(id, ab, _name, _thr) \
@@ -46,6 +47,8 @@
 #define perfo_4(id, ab, _name, _thr) \
    FunctionStatistics Performance::fs_ ## id ## ab (PFS_ ## id ## ab);
 #include "Performance.def"
+
+int64_t OptmizationStatistics::optimization_counters[OPT_COUNTER_COUNT];
 
 //----------------------------------------------------------------------------
 Statistics::~Statistics()

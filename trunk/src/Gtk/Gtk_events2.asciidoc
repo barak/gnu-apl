@@ -1,5 +1,0 @@
-| +*clicked*+ | 1| Gi, Ns, Es, Is, Cs |  +6+  +\'OK-button'+  +\'clicked'+  +\'button1\'+  +\'GtkButton'+ 
-| +*activate*+ | 1| Gi, Ns, Es, Is, Cs |  +6+  +\'Text-entry'+  +\'activate'+  +\'entry1\'+  +\'GtkEntry'+ 
-| +*changed*+ | 1| Gi, Ns, Es, Is, Cs |  +6+  +\'Select-box'+  +\'changed'+  +\'combobox1\'+  +\'GtkComboBox'+ 
-| +*draw*+ | 1| Gi, Ns, Es, Is, Cs |  +6+  +\'Canvas'+  +\'draw'+  +\'drawingarea1\'+  +\'GtkDrawingArea'+ 
-| +*destroy*+ | 1| Gi, Ns, Es, Is, Cs |  +6+  +\'Main-Window'+  +\'destroy'+  +\'window1\'+  +\'GtkWindow'+ 

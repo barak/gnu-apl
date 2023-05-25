@@ -62,7 +62,7 @@ enum TokenClass
    TC_FUN1          = TC_FUN12,   ///< monadic function
    TC_FUN2          = TC_FUN12,   ///< dyadic function
 
-   // temporary Token classes. Token of these classes can appear as
+   // temporary Token classes. Token of these classes only appear as
    // intermediate results during tokenization and prefix parsing
    //
    TC_PINDEX        = 0x10,   ///< partial index
@@ -87,7 +87,7 @@ enum TokenClass
    TC_MASK          = 0xFF,
    TC_INVALID       = 0xFF,
 
-   // shorter token class aliases for phrase table
+   // shorter token class aliases for the phrase table
    //
    SN_A             = TC_VALUE,
    SN_ASS           = TC_ASSIGN,
@@ -152,9 +152,8 @@ enum Binding_Strength
    BS_ANY_BRA = 80    ///< ANY []  : [] to what is on its left
 };
 
-/**
-    The value type of a token
- **/
+/// The value type of a token
+
 enum TokenValueType
 {
    // token value types. The token value type defines the type of the

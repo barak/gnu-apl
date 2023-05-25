@@ -1,0 +1,3521 @@
+//vim: et:ts=4:sw=4:tw=78
+
+:Author: Dr. Jürgen Sauermann, GNU APL
+
+:page-width: 120em
+:toc: auto
+:toclevels: 4
+:iconsdir: /usr/share/asciidoc/icons
+:icons:
+
+= An Introduction for Designers and Contributors to the GNU APL Interpreter
+
+== Abstract
+
+This document contains a number of unrelated hints that may be useful to
+understanding the GNU APL source code. Its primary purpose is to support
+the fading memory of the author, but it may be interesting for others as well.
+In addition to the hints there are also a number of rules. These rules
+should be observed by those who contribute C/Cpp source code to the
+GNU APL project (as opposed to those that contribute APL code).
+
+This document is *NOT* aimed at the normal GNU APL user, i.e. at the APL
+programmer. Those users are referred to the various *README* files in the
+top-level GNU APL directory.
+
+== The GNU APL Build System
+
+All commands described below shall executed in the top-level GNU APL directory.
+The top-level GNU APL directory is the directory that contains - after
+unpacking a GNU APL tar file like *apl-1.8.tar.gz* of after fetching the GNU
+APL sourced with SVN or with git - the file named *configure.ac*.
+
+GNU APL uses *automake* and *autoconf* to build the interpreter. The build
+system performs a number of major steps in typically different places and
+by different persons (C/Cpp designer/maintainer vs. user):
+
+=== Step 1: Generate ./configure and a Makefile.in for every Makefile.am
+
+Every directory of the GNU APL source tree contains a file named *Makefile.am*.
+The command *autoreconf*, performed in to top-level directory of the GNU APL
+source tree:
+
+----
+$ autoreconf
+----
+
+Command *autoreconf* generates a file named *Makefile.in* for every
+*Makefile.am*. In addition it creates a script named *configure*. This
+is normally done by the maintainer and the *Makefile.in* files produced
+are shipped with GNU APL (tar file or svn/git repository).
+
+The absolute cool thing of *autoconf* (as opposed to e.g. *Cmake* or GUI based
+IDEs) is that *autoconf* and *automake* itself need not be installed
+by the end users. The *configure* script produced by *autoreconf* is
+self-contained and can be executed by the end user in order to configure
+different aspects of the GNU APL interpreter. To accommodate this, the
+different *Makefile.in* files are shipped with GNU APL even though they
+are somewhat redundant (and, compared to the *Makefile.am*, pretty large).
+
+In essence *Makefile.am* files are easy to read and maintain by humans, while
+*Makefile.is*  are easy to decode by machines, in particular by the *configure*
+script that is produced along with them. In GNU APL the *autoreconf* command
+produces a more than 1,000 line top-level *Makefile.in* from a 150 line
+*Makefile.am* and a 25,000 line ./configures script from its 1,000 line
+*configure.ac*
+
+NOTE: If a maintainer adds a new directory to the source tree, then she needs
+to add the final *Makefile* in the top-level file *configure.ac* (in m4 macro
+*AC_CONFIG_FILES), otherwise the *Makefile.am* will be ignored.
+
+The most important take-away here is that the user or maintainer should never
+edit *Makefile*s or *Makefile.in*s because doing so is cumbersome, error-prone,
+ and useless because *autoreconf* will overwrite the changes made.
+
+=== Step 2: Generate a Makefile for every Makefile.in
+
+The next step is to run the *configure* script produced in the previous step.
+It is performed by the end user (or by the system administrator where
+appropriate) in the top-level directory of the GNU APL source tree:
+
+----
+$ ./configure
+----
+
+The typical end user will run *./configure* without any arguments, while
+experts may run it with additional arguments (see README-2-configure
+for details). The primary task of *./configure* is to convert every
+*Makefile.in* into a corresponding *Makefile*. In doing so, the script tries
+to figure which and where the libraries and header files used by GNU APL are
+installed on the user's system. The system functions and variables of the
+final GNU APL interpreter behaves differently depending on the libraries and
+header files present. For example, *⎕FFT* (Fast Fourier Transforms) depends
+on library *libfftw3* and if that library(or its header files) are missing
+then ⎕FFT will raise a syntax error instead of computing the FFT.
+
+NOTE: On a typical Debian systems, libraries and header files are often
+contained in to different packages that should all be installed.
+
+For example, in the ⎕FFT case there are 3 packages:
+
+* libfftw3-bin      # the library itself
+* libfftw3-dev      # header files for the library, and
+* libfftw3-doc      # documentation related to the library
+
+
+For ⎕FFT to work the first two are needed and the third does not hurt.
+Most of the other libraries follow the same naming scheme for Debian packages.
+
+The configure script produces a lot of output that is useful if a library or
+its header file(s) are missing. The final result of the decisions made by
+configure is collected in file *config.h* so that the compiler can adapt
+itself to the presence or absence of libraries and their header files.
+
+If a library is not detected even though it is installed then either:
+
+* the test performed by ./configure is faulty and then either configure.ac
+  or else a more complex test file in sub-directory *m4* need to be fixed, or
+
+* the library only lives in a non-standard location (e.g. below the user's
+  home and then ./configure hopefully provides ./configure option to
+  specify that location.
+
+=== Step 3: Compile and Link the GNU APL Interpreter
+
+The final step is to compile the interpreter:
+----
+$ make
+----
+
+The code base is quite large, therefore one may prefer to compile several
+source in parallel. For example, on an 8 core CPU:
+
+----
+make -j 7
+----
+
+leaving one core for other purposes. If the compilation is successful then the
+interpreter is named *apl* in directory *src*, i.e. *src/apl*. During
+development, the interpreter can be started from there without installing it:
+
+----
+$ src/apl
+-----
+
+After the development is done, the interpreter is installed properly.
+
+NOTE: The steps described only require write permission in and below the
+top-level directory, for instance below the user's $HOME directory.
+The next step requires write permissions in directories that are normally not
+writable by normal users.
+
+=== Step 4: Install the GNU APL Interpreter
+
+Installation of the interpreter must be performed by root:
+
+----
+$ sudo make install
+----
+
+CAUTION: A common mistake (of the author) is to try to install the interpreter
+after the previous step has failed. The build system will then try to
+recompile missing files, but the resulting files will now be owned by root
+and will no longer be writable by the user. To fix this:
+
+----
+$ sudo chown -R username.username .   # assume user is 'username'
+----
+
+The make install installs a few of files (all owned by root, but with read
+permissions for everybody):
+
+* The APL interpreter itself in */usr/local/bin/apl*,
+* interpreter-related header files */usr/local/include/apl*,
+* interpreter-related libraries */usr/local/lib/apl*,
+* an info file in */usr/local/share/info/apl.info*,
+* a man page in */usr/local/share/man/man1/apl.1*
+
+The default installation prefix */usr/local* can be changed with *./configure*
+options.
+
+=== Summary
+
+The following picture illustrates the different steps of building the GNU APL
+interpreter and the files involved:
+
+----
+     ┌─────────────┐
+    ┌┴────────────┐│     ┌──────────────┐
+   ┌┴────────────┐├┘     │ configure,ac │     autoreconf (GNU APL designer)
+   │ Makefile.am ├┘      └──────────────┘
+   └─────────────┘              ↓
+          ↓                     ↓              ──────────────────────────
+     ┌─────────────┐            ↓
+    ┌┴────────────┐│      ┌───────────┐
+   ┌┴────────────┐├┘      │ configure │
+   │ Makefile.in ├┘       └───────────┘
+   └─────────────┘
+          ↓                                    ./configure (User)
+      ┌──────────┐         ┌──────────┐
+     ┌┴─────────┐│        ┌┴─────────┐│
+    ┌┴─────────┐├┘       ┌┴─────────┐├┘
+    │ Makefile ├┘        │ src/*.cc ├┘ 
+    └──────────┘         └──────────┘
+                               ↓               ──────────────────────────
+                          ┌─────────┐
+                          │ src/apl │          make (User)
+                          └─────────┘
+                               ↓               ──────────────────────────
+                     ╔════════════════════╗
+                     ║ /usr/local/bin/apl ║    make install (root)
+                     ╚════════════════════╝
+                               ↓               ──────────────────────────
+----
+
+
+
+=== Special make targets
+
+The normal user shall simply run 'make' in the top-level directory.
+
+For experts there are some more make targets (defined in *Makefile.incl*),
+again with make run in the top-level directory, unless noted otherwise.
+
+=== make help
+
+Shows all top-level make targets:
+
+----
+In addition to the standard make targets (all, install, clean, ...), 
+the following make targets may be supported (at this level):
+
+    make help        - print this text
+    make DIST        - dist + a Makefile that calls ./configure
+    make DOXY        - create Doxygen documentation
+    make RPM         - create (source and binary) RPMs
+    make DEB         - create Debian packages
+
+    make SVNUP       - update from SVN and ./configure
+
+NOTE: The RPM and DEB targets may fail because they require additional tools
+that may not be present on your machine. Don't worry if that happens, unless
+you really need the RPM and/or Debian packages.
+
+The following targets are shortcuts for lazy developers (like the GNU APL 
+author) and are not very useful for normal users:
+
+    make develop     - enable full dependency tracking
+    make gprof       - make develop + enable gprof profiling
+    make python      - make develop + build python module
+    make parallel    - enable multi-core APL (buggy and experimental!)
+    make parallel1   - make parallel for benchmarking
+    make VPATH_clean - prepare for VPATH build
+----
+
+=== make test
+
+This make target is only available in sub-directory *src*. It builds the
+interpreter and then runs all testcases (= files with extension *.tc*)
+that are present in directory *src/testcases*. The total result of all
+testcases is stored in *src/testcases/summary.log*, and every testcase
+*x* produces a log file *src/testcases/x.tc.log* with details of the test
+execution. 
+
+=== make apl.lines
+
+This make target is only available in sub-directory *src*. It produces a file
+named *src/apl.lines* and must be run right after building the the
+interpreter. When the interpreter produces a stack trace (i.e. it lists
+the Cpp call stack) then:
+
+* If the *apl.lines* file is absent or older than the interpreter, then the
+  stack trace will show function names and code offsets in hex. For short
+  functions that is sort of OK, but for longer ones the hex numbers can make it
+  difficult to find the exact location of the fault that has triggered the
+  stack trace.
+
+* If the *apl.lines* file is up-to-date (i.e. *make apl.lines* was run after
+  the interpreter binary was produced), then the stack traces will show source
+  file line numbers instead of hex numbers. Producing *apl.lines* takes quite
+  a while, therefore it is not built automatically.
+
+=== make gen / gen2
+
+These make targets are only available in sub-directory *tools*. Each produces
+the file *src/Prefix.def*. After every new token it reads, the interpreter has
+to decide if (and which) a new reducible phrase is present. This check is
+executed in the inner loop of the interpreter, therefore the efficiency
+of this check is crucial for the performance of the interpreter.
+
+* GNU APL uses *tools/phrase_gen* to produce *src/Prefix.def*.
+* *src/Prefix.def* is therefore automatically generated and *#included* in
+   *Prefix.hh* and in *Prefix.cc* (= the interpreter source code that performs
+   the phrase matching).
+* The *phrase_gen* tool can produce two types of code:
+** either a collision-free hash table (the default),
+** or else a search tree.
+* After a *make gen* the next compiler build will use the hash table, while
+  after *make gen2 it will use a search tree. Performance tests of both
+  alternatives have shown only a marginal performance difference between
+  both methods, but the technique as such might be of interest.
+
+== Source Code Documentation
+
+GNU APL is fully documented with *Doxygen*. The term *fully* means that every
+class member has a (typically rather brief) Doxygen description and *not* that
+the description is exhaustive. The purpose is primarily to be a memory aid for
+browsing the source code.
+
+The entire *Doxygen* documentation of GNU APL can, provided that *Doxygen*
+itself is installed, be produced like this:
+
+----
+make DOXY
+----
+
+The result are around 6,000 files in directory *html*. After generating them,
+the files can be browsed with e.g.
+
+----
+firefox html/index.html
+----
+
+or with some other browser. The *Doxygen* documentation is a good starting
+point for those that want to get a quick overview of the GNU APL source
+code.
+
+== Source Code File Types
+
+The *Makefile** files belong to the build system and were explained above.
+What remains are:
+
+* C source files (file extension *.c*) are almost never used,
+* C header files (file extension *.h*) almost never used, a noteworthy
+  exception is *config.h* which is produced by the *./configure* script.
+* Cpp source files for inline functions (file extension *.icc*),
+* Cpp source files (file extension *.cc*),
+* Cpp header files (file extension *.hh*), and
+* pure macro files (file extension *.def*).
+
+By and large, the rules for C and Cpp source and header files are:
+
+* Small and many rather than large and few (aka. modularity). Early versions
+  of GNU APL did not follow this rule and some left-overs  still do not (and
+  those will be further modularized in the future.
+* One class per file; the file name reflects the class name. Exceptions are
+* classes that are closely related (e.g. classes *Token* and *Token_string*)
+* The .cc and .hh files names are the same, except for the file name extension
+  and classes with a small (say, < 100 lines) source footprint (e.g. those in 
+  PrimitiveFunction.hh and PrimitiveFunction.cc).
+* Cpp declarations can be made in the .cc file if their scope is local to the
+  .cc file (like static declarations in C), otherwise they go into the
+corresponding .hh file.
+
+=== .def Files
+
+C/Cpp source file primarily contain C/Cpp code and occasionally declarations.
+C/Cpp header files primarily contain C/Cpp declarations and often (inline)
+C/Cpp code. In contrast, .def files contain neither C/Cpp code nor
+C/Cpp declarations, They only contain macro calls whereby the definition of
+the macro is defined outside the .def file. Currently there are about 20 .def
+files in the GNU APL source code so that they deserve an explanation.
+
+==== Why .def Files?
+
+Suppose we have a number of integer error codes:
+
+----
+   enum ErrorCode
+      {
+        NO_ERROR     = 0,
+        SYNTAX_ERROR = 1,
+        RANK_ERROR   = 2,
+        LENGTH_ERROR = 4,
+      };
+----
+
+Sooner or later we need a string that describes the error in a human readable
+format. This requires a mapping between integer error codes and string
+literals. There are 2 standard methods in C/Cpp to define such a mapping.
+
+==== Method 1: struct definition
+
+----
+struct _error_map
+{
+  ErrorCode ecode;
+  const char * ename;
+} error_map =
+{
+  { NO_ERROR,      "OK"           },
+  { SYNTAX_ERROR,  "Syntax Error" },
+  { RANK_ERROR,    "Rank Error"   },
+  { LENGTH_ERROR,  "Length Error" },
+} error_map;
+
+const char *
+get_error_string(ErrorCode ec)
+{
+   return error_map[ec];
+}
+----
+
+==== Method 2: switch statement
+
+----
+const char *
+get_error_string(ErrorCode ec)
+{
+   switch(ec)
+      {
+        case NO_ERROR:      return "OK";
+        case SYNTAX_ERROR:  return "Syntax Error";
+        case RANK_ERROR:    return "Rank Error";
+        case LENGTH_ERROR:  return "Length Error";
+      }
+   return "Unknown error";
+}
+----
+
+Now suppose we add another ErrorCode *DOMAIN_ERROR* to the *enum ErrorCode*.
+Suppose further that we add the new error code to the enum but not to the
+*get_error_string()* function. This is a fairly common mistake, in particular
+because *ErrorCode* is usually declared in a *.hh* file and
+*get_error_string()* is defined in the corresponding *.cc* file. In that case
+Method 1 will most likely produce a segmentation fault at runtime, which is
+about the worst case that may happen. <Method 2 is a little better because a
+smart compiler like g++ will issue a warning in this case. Both methods are,
+however, quite inconvenient for the C/Cpp programmer, in particular if many
+such mappings are needed in a larger program.
+
+In GNU APL this problem is solved in the following way:
+
+* #define a macro that expresses the relationship (between integer error codes
+  and pass:[C/Cpp] literals for the corresponding error text in our example),
+  and
+* call that macro, typically in several different files with the macro
+  defined differently. Calling the macro is performed by \#including the .def
+  file. In our example:
+
+In e.g. *errors.def*:
+----
+   error_def(
+   error_def(NO_ERROR     , 0, OK           )
+   error_def(SYNTAX_ERROR , 1, Syntax Error )
+   error_def(RANK_ERROR:    2, Rank Error   )
+   error_def(LENGTH_ERROR:  3, Length Error )
+
+#undef error_def   /* as to detect missing definitions of the error_def()
+macro */
+----
+
+In, say, *errors.hh*:
+
+----
+   enum ErrorCode
+      {
+#define error_def(enum_name, enum_value, _error_string) \
+   enum_name = enum_value,
+#include "errors.def"
+      };
+----
+
+And finally in *errors.cc*:
+
+----
+const char *
+get_error_string(ErrorCode ec)
+{
+   switch(ec)
+      {
+#define error_def(enum_name, _enum_value, error_string) \
+   case enum_name: return #error_string;
+#include "errors.def"
+      }
+   return "Unknown error";
+}
+----
+
+Note the following:
+
+* the macro invocations of *error_def()* (in the *.def* file) have more
+  arguments than are used in their macro definitions (in the *.hh* or *.cc*
+  files). GNU APL has a naming convention that unused macro arguments of
+  macros (which are typical for the *.cc* and *.hh*  files) start with
+  underscore (_). For this reason the argument lists of the #defines above
+  differ slightly.
+* *error_string* is not quoted in *errors.def* even though *get_error_string()*
+  returns a const char *. The quoting is performed by \# in #error_string
+ (a preprocessor feature).
+* the example above uses a simple 1:1 relation between two types. Some *.def*
+  files use more than two sides, e.g. numeric IDs, string names, and help
+  texts.
+
+=== Rules for .def Files
+
+* The *.def* file should *#undef* all macros that it uses. This is a safeguard
+  against forgetting to *#define* a macro before #including the *.def* file
+  (this may or may not be detectable by the compiler).
+* A *.def* file should normally not use more than one macro. An exception
+  occurs when  macros are very similar (e.g. SystemVariable.def with macro
+* ro_sv_def* (for read-only system variables), *rw_sv_def* (for read/write
+  system variables), and *sf_def* for system functions).
+* item separators such as , in enums or ; in case statements are contained in
+  the macro definitions (i.e. in the *.hh* or *.cc* file) and not in the macro
+  call (i.e. not in the *.def* file). This is because the separators may differ
+  for different macros.
+
+The most important take-away here are:
+
+* *.def* files contain only macro invocations,
+* *.def* files are #included in several files and almost certainly the macro
+   definitions (before #including a *.def* file) differ between the files,
+* the macros are #defined outside the *.def* file but #undef'ed inside the
+  *.def* file. (This is normally a bad programming practice, but on purpose
+  here).
+
+== Coding Style
+
+GNU APL is a GNU project. For the most part it therefore follows the GNU
+coding standard, see: https://www.gnu.org/prep/standards/standards.html
+With some minor deviations as to further improve the readability of the C/Cpp
+code.
+
+=== General
+
+* keep lines short (≤ 78 characters) where possible
+* NEVER use tabs (ASCII 0x09) in the source code
+
+=== Indentation and Blanks
+
+==== Function bodies (.cc files)
+
+* Variable declarations at top-level scope are not indented:
+* Cpp code at the top-level scope are indented with 3 blanks:
+
+----
+void
+foo()
+{
+int x = 0;            // declaration: not indented!
+
+   printf("%d:, x);   // code: indented by 3 spaces
+
+int y = 1;            // another declaration.
+   ...
+}
+----
+
+* Variable declarations below top-level scope are indented with 2 (from the {
+  starting the scope
+* Cpp code below the top-level scope are also indented with 2 blanks:
+
+----
+void
+foo()
+{
+int x = 0;         // declaration: not indented!
+int y = 1;         // another declaration.
+
+   if (x)
+      {                               // start of sub-scope
+        printf("positive x=%d", x);   // code: indented by 2 spaces
+      }
+   else
+      {                               // start of another sub-scope
+        printf("zero x");             // code: indented by 2 spaces
+      }
+}
+----
+
+==== Conditionals
+
+* conditionals are not functions! put 1 blank between the keyword and the
+  condition
+* the body of the conditional is indented according to the opening ( of the
+  condition (for short ones like if, else, or for), but no more than 2 blanks:
+
+----
+void
+foo()
+{
+int x = 0;
+
+   // DO NOT:
+   if(i == 0)
+
+   // DO:
+   if (i == 0)
+      {
+        ...
+      }
+
+   for (int i = 0; i < N; ++i)
+       {
+         ...
+       }
+
+   while (i == 0)
+      {
+        ...
+      }
+}
+----
+
+* you MAY put single statements or very short bodies onto the condition line,
+* but NOT mix single- and multi-line styles for *if* and *else* clauses, and
+* place the { and } of multi-line bodies on the same column, that is:
+* you MUST NEVER NEVER NEVER use K&R style:
+
+----
+   // DO:
+
+   if (x >= 0)   return "positive";
+   else          return "negative";
+
+   // DO NOT:
+
+   if (x >= 0)   { return "positive"; }   // redundant { }
+   else          { return "negative"; }   // redundant { }
+
+   if (x >= 0)   return "positive";   // single-line style
+   else                               // multi-line style
+      {
+        error = true;
+        return "negative";
+      }
+
+   // HEAVEN FORBID (aka. K&R style)
+   if (x >= 0) {
+      return "positive";
+   } else {
+      return "negative";
+   }
+----
+==== Function arguments
+
+* one blank after every comma and between token:
+
+----
+   // DO:
+
+int
+main(int argc, char * argv[])
+{
+   ...
+}
+
+   // DO NOT ANY OF THE FOLLOWING...
+
+int
+main (int argc, char * argv[])   // extra space before arguments
+{
+   ...
+}
+
+int
+main( int argc, char * argv[] )   // extra spaces around arguments
+{
+   ...
+}
+
+int
+main(int argc, char *argv[])   // no space after *
+{
+   ...
+}
+
+int
+main(int argc, char* argv[])   // no space before *
+{
+   ...
+}
+----
+
+==== Class declarations (.hh files)
+
+To the extent possible:
+
+* declare public members (= the external interface) before protected
+  members (= the class implementation),
+* declare members before static members,
+* declare member functions before data members,
+* keep the following declaration order:
+** constructors,
+** destructor,
+** inline functions,
+** non-inline functions
+* always use *protected:* rather than *private:* for the members of a class.
+  GNU APL uses the convention that *private:* members are used to prevent the
+  accidental function calls that are sometimes generated by the Cpp compiler
+  (implicit conversion). In GNU APL, such members are declared, but not
+  defined (so that the linker will complain if the compiler should generate
+  them).
+
+Indentation:
+
+* indent all members with 2 spaces,
+* indent inline function bodies by 3 more spaces
+* do this recursively (nested classes)
+
+And finally: have a look at the existing *.cc* and *.hh* files. Even though
+this will cause some extra work on your part, it simplifies the reading of
+your code for many others. A project with different styles in different files
+looks rather unprofessional, so please respect the style rules above even if
+you do not like them.
+
+== Debugging
+
+GNU APL has a number of built-in means to locate faults. In a code base of
+around 120,000 LOC, locating the fault in the source file takes most of the
+time of fixing it. Many of the GNU APL debugging facilities have performance
+impacts; they need to be enabled. The make target *develop*, i.e.
+
+----
+make develop
+----
+
+will enable a useful set of debugging facilities. *make develop* re-runs
+*./configure*, therefore a normal build must have been performed beforehand
+(otherwise the top-level Makefile would be missing).
+
+=== Assertions
+
+GNU APL has more 600 Assertions spread all over the source code. The
+assertions check internal assumption that the designer has made. If such
+an assumption turns out to be false then a stack dump is produced which
+tells which assumption (and where) was wrong.
+
+Even though every single assertion has a negligible performance impact, the
+accumulation of all assertions might become noticeable. It is therefore possible
+to enable or disable some or all of them. This is done via the ./configure
+argument ASSERT_LEVEL (see also *README-2-configure*):
+
+----
+.configure ASSERT_LEVEL_WANTED=0    (the default, best performance)
+.configure ASSERT_LEVEL_WANTED=1    disable trivial assertions, enable others
+.configure ASSERT_LEVEL_WANTED=2    enable all assertions (worst performance)
+----
+
+The *make develop* target sets, among other things, *ASSERT_LEVEL_WANTED=2*.
+
+
+=== Logging Facilities
+
+Failed assertions primarily reveal major programming mistakes, such as
+changing the code in one place and not considering the impact in other places.
+In many cases the source code is faulty even though no assertion fails.
+To isolate a fault one can enable one or more of almost 50 logging facilities
+from the APL command line. Each logging facility addresses a functional area
+of interest in the source code. When the code comes across such an are then a
+printout is produced which provides additional information for the
+troubleshooter. As of this writing, the following logging facilities exist:
+
+----
+     ]log
+     1: (OFF) AV details 
+     2: (OFF) new and delete calls
+     3: (OFF) input from user or testcase file
+     4: (OFF) parser: parsing
+     5: (OFF)  ...    function find_closing()
+     6: (OFF)  ...    tokenization
+     7: (OFF)  ...    function collect_constants()
+     8: (OFF)  ...    create value()
+     9: (OFF) defined function: fix()
+    10: (OFF)  ...              set_line()
+    11: (OFF)  ...              load()
+    12: (OFF)  ...              execute()
+    13: (OFF)  ...              enter/leave
+    14: (OFF) State indicator: enter/leave
+    15: (OFF)   ...            push/pop
+    16: (OFF) Symbol: lookup
+    17: (OFF)   ...   push/pop and )ERASE
+    18: (OFF)   ...   resolve
+    19: (OFF) Value:  glue()
+    20: (OFF)   ...  erase_stale()
+    21: (OFF) APL primitive function format
+    22: (OFF) character conversions
+    23: (OFF) APL system function Quad-FX
+    24: (OFF) commands )LOAD, )SAVE, )IN, and )OUT
+    25: (OFF) more verbose errors
+    26: (OFF) details of error throwing
+    27: (OFF) nabla editor
+    28: (OFF) execute(): state changes
+    29: (OFF) PrintBuffer: align() function
+    30: (OFF) Output: cork() functions
+    31: (OFF) Details of test execution
+    32: (OFF) Prefix parser
+    33: (OFF)  ...   location information
+    34: (OFF) FunOper1 and FunOper2 functions
+    35: (OFF) Shared Variable operations
+    36: (OFF) command line arguments (argc/argv)
+    37: (OFF) interpreter start-up messages
+    38: (OFF) optimization messages
+    39: (OFF) )LOAD and )SAVE details
+    40: (OFF) Svar_DB signals
+    41: (OFF) Parallel (multi-core) execution
+    42: (OFF) EOC handler functionality
+    43: (OFF) ⎕DLX details
+    44: (OFF) command ]DOXY
+    45: (OFF) details of Value allocation
+    46: (OFF) ⎕TF details
+    47: (OFF) ⎕PLOT details
+----
+
+Like assertions, debugging facilities may have a performance impact. There are
+almost 400 places in the source code where a decision as to if and what
+debug output shall be produced. For this reason, the logging facilities can
+either be enabled/disabled at runtime from the APL command line (called
+*dynamic logging*) or else at compile time (called *static logging*). *dynamic
+logging* is the method of choice for trouble shooting and is therefore chosen
+by *make develop*. In contrast *static logging* is the default and the 
+logging facilities that shall be enabled can be set in file *src/Logging.def*
+(first argument of macro *log_def()*) before compiling the interpreter.
+
+
+=== The )CHECK Command
+
+GNU APL has adopted the )CHECK command from IBM APL2. The check command
+performs an internal check of all data structures inside the interpreter.
+The primary purpose is to find memory leaks:
+
+----
+      )CHECK
+OK      - no stale functions
+OK      - no stale values
+OK      - no stale indices
+OK      - no duplicate parents
+----
+
+A value or function is *stale* if the current workspace cannot reach it
+anymore. The interpreter does a sort of double-entry accounting of APL values
+and defined functions, and the )CHECK triggers a consistency check of that
+accounting. The runtime overhead is low therefore the double-entry accounting
+cannot be disabled.
+
+=== Value Tracing
+
+While every logging facility focuses on a particular functional area of
+interest, value tracing focuses on the life-cycle of individual APL values.
+If )CHECK finds a stale value (stale functions are rather rare) then the
+next question is where the value was lost. An APL value sees a lot of places
+in the source code and the value tracing keeps track of the major steps
+in the lifetime of a value (creation, copying destruction, etc). Value tracing
+is disabled by default (Performance!) but enabled by *make develop*.
+
+
+=== Debug macros
+
+If all debug means above fail, then the last resort is to either start a
+debugger (like *gdb*) or to enter checkpoints in the source code and print the
+information needed to isolate the fault. For this purpose (the author is using
+debuggers only for analyzing core dump files) there are some macros that
+simplify such printouts.
+
+==== The LOC macro
+
+The macro *LOC* expands to the current source file name and line number. Many
+Cpp functions use it for non-debug purposes to see from where they were
+called. The expanded LOC macro is a string literal, therefore the overhead is
+minimal:
+
+----
+#define STR(x) #x
+#define Loc(f, l) f ":" STR(l)
+#define LOC Loc(__FILE__, __LINE__)
+----
+
+==== The Q() macro
+
+The macro *Q(x)) prints the value of *x*  and source file name and line number
+at which the values of *x* was printed:
+
+----
+/// print x and its source code location
+#define Q(x) get_CERR() << std::left << setw(20) << #x ":" \
+                        << " '" << x << "' at " LOC << endl;
+----
+
+The other debug means are somewhat coarse-grained. Dividing around *120,000
+LOC* (lines of source code) by 400 places where logging facilities may
+provide some output yields an average of 300 lines of code between logging
+outputs. The typical troubleshooting process is this:
+
+. find an easy way to reproduce the fault (testcase file, APL script, etc.),
+  then
+. use logging facilities and/or value tracing to narrow the possible locations
+  of the fault (to typically one source code file), and finally
+. insert *Q()* macros if needed to further isolate the fault.
+
+The build system checks that all *Q()* macros were removed before checking the
+code into the Savannah SVN repository. This is because forgetting that used to
+be a frequent mistake.
+
+==== The Q1() macro
+
+The *Q1()* macro does the same as *Q()* but shall remain in the code. It is
+(rarely) used in places of which the designer believes that they cannot be
+reached but has no proof that this is the case. Similar to assertions, but
+only printing values of interest without terminating with a stack dump.
+
+== Top-Down Description of the GNU APL Source Code
+
+The APL interpreter is, like almost any other interpreter, a program that
+reads one line of input after the other. For every line read (the *input*)
+it produces zero or more lines of *output*. In doing so, the interpreter may
+or may not change its internal state.
+
+In the context of APL the internal state of the interpreter is called (the
+current) *workspace*; it an be )SAVEd into a file and later *)LOAD*ed or
+*COPY*ed into another interpreter instance.
+
+The top-level loop of the interpreter described above is commonly referred
+to as *REPL*, an abbreviation for **R**ead-**E**valuate-**P**rint-**L**oop:
+
+----
+   ┌──────┐
+   │ INIT │
+   └──────┘
+     ↓
+     ○← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ← ←
+     ↓                                             ↑
+   ┌──────┐     ┌──────────┐     ┌───────┐     ┌──────┐
+   │ Read │→ → →│ Evaluate │→ → →│ Print │→ → →│ Loop │
+   └──────┘     └──────────┘     └───────┘     └──────┘
+                                                  ↓
+                                                 )OFF
+                                                  ↓
+                                               ┌──────┐
+                                               │ EXIT │
+                                               └──────┘
+----
+
+The *REPL* of GNU APL is located at the end of function *main()* in source
+file *main.cc*:
+----
+   for (const bool exit_on_error = IO_Files::exit_on_error();;)
+       {
+         const Token tok = Workspace::immediate_execution(exit_on_error);
+         if (tok.get_tag() == TOK_OFF)   Command::cmd_OFF(0);
+       }
+----
+The **R**ead, **E**valuate, and **P**rint parts of the *REPL* are performed
+in function *immediate_execution()* which returns *TOK_OFF* if the APL
+command )OFF was processed and something else otherwise.
+
+=== The Workspace::immediate_execution() Function
+
+Function *Workspace::immediate_execution()* processes one line of input,
+in source file file *Workspace.cc*. It simply calls *Command::process_line()*.
+More importantly, it **catch**es Cpp errors that may be thrown and processes
+the errors:
+
+----
+Token
+Workspace::immediate_execution(bool exit_on_error)
+{
+   for (;;)
+       {
+         try
+           {
+              Command::process_line();
+           }
+         catch (Error & err)
+         ...
+----
+
+NOTE: Some lines, notably the ∇-editor and, in certain cases, the )COPY and
+)LOAD commands have their own sub-REPL. They loop themselves until a particular
+condition (the closing ∇ for the ∇-editor or end-of-file for the *)COPY* and
+*)LOAD* commands) has occurred. Therefore:
+
+* process_line() is *atomic* (in the sense that it processing only one input
+  line), but
+* the functions called by process_line() will be called repeatedly until an
+  error is returned. The close of the ∇-editor is also considered an error
+condition here).
+
+This fact is sometimes missed by programmers using *libapl*. *libapl* is a
+library that contains most of the normal interpreter code, *but not* the REPL
+loops of the interpreter. The purpose of *libapl* is to provide a C-API to
+other front-ends like *Erlang*, *Python*, or *Cpp* programs. For example,
+if a front end opens a defined function with a line that starts with ∇, then
+the front-end is responsible for providing the subsequent (defined function-)
+lines including the final ∇ that closes the function definition. The same
+holds for *)LOAD* and *)COPY* of *.apl* scripts, but not for *)LOAD* and
+*)COPY* of workspace snapshots (*.xml* files). To summarize:
+
+[width="30%", options="header"]
+|====
+| Operation  | Atomicity
+| ∇-editor   | non-atomic
+| )SAVE      | atomic
+| )LOAD .apl | non-atomic
+| )LOAD .xml | atomic
+| )COPY .apl | non-atomic
+| )COPY .xml | atomic
+| multi-line string | non-atomic
+|====
+
+=== The Command::process_line() Functions
+
+Function *Command::process_line()* reads the next input line
+(*InputMux::get_line()*), removes leading white-space (blanks) and then
+decides how to proceed. The first non-blank character determines the
+subsequent processing as follows:
+
+. empty line: return
+. ⍝: APL comment: return
+. #: script comment: return
+. ): (regular) APL command: *Command::process_line(line...)*
+. ]: (debug) APL command: *Command::process_line(line...)*
+. """: start of a multi-line string: loop until end of string
+. otherwise: APL expression: *Command::process_line(line)*
+
+Function *Command::process_line()* is overloaded; the variant without arguments
+fetches a line while the variant with a line argument processes the fetched
+line. The decision as to the further processing is done in the latter, i.e. in
+*process_line(line...I)*:
+
+----
+void
+Command::process_line(UCS_string & line, ostream * out)
+{
+   line.remove_leading_white spaces();
+   if (line.size() == 0)           return;   // empty input line
+
+   switch(line[0])
+      {
+         case UNI_R_PARENT:      // regular command, e.g. )SI
+              if (out == 0)   out = &COUT;
+              do_APL_command(*out, line);
+              if (line.size())   break;
+              return;
+
+         case UNI_R_BRACK:       // debug command, e.g. ]LOG
+              if (out == 0)   out = &CERR;
+              do_APL_command(*out, line);
+              if (line.size())   break;
+              return;
+
+         case UNI_NABLA:               // e.g. ∇FUN
+              Nabla::edit_function(line);
+              return;
+
+         case UNI_NUMBER_SIGN:   // e.g. # comment
+         case UNI_COMMENT:             // e.g. ⍝ comment
+                 return;
+
+        default: break;
+      }
+
+   ++APL_expression_count;
+   do_APL_expression(line);
+}
+----
+
+By default the output of process_line() is printed to the console, but a
+non-zero *out* redirects the output to *out*. This is used by functions that
+need to capture the output of a command, e.g. ⍎")COMMAND" (a GNU APL extension,
+normally APL commands cannot be used by ⍎).
+
+As explained depends the further processing of the line on the first
+character:
+
+----
+                  ┌──────────────┐
+                  │ process_line │
+                  └──────┬───────┘
+                         │
+         ┌───────────────┼──────────────────┐
+         │               │                  │
+         ∇              ),]               other
+         │               │                  │
+    ┌────┴─────┐    ┌────┴─────┐    ┌───────┴────────┐
+    │ ∇-editor │    │ )COMMAND │    │ APL expression │
+    └──────────┘    │ ]COMMAND │    └────────────────┘
+                    └──────────┘    
+----
+
+Strictly speaking are the ∇-editor and APL commands not part of the APL
+language (they have their own syntax). At this point it should suffice that
+the implementation of the ∇-editor is found in source file *Nabla*.cc
+(nabla is the name for ∇ in the Greek alphabet) while the implementations
+of most commands are found in *Command.cc*. Most of the functions in
+*Command.cc* are concerned with the decoding of command arguments and
+is not further discussed here. Most commands have a simple implementation
+which is also contained in *Command.cc*. The others have their own source
+file:
+
+[width="40%", options="header"]
+|====
+| Command | Implementation
+| )CLEAR                  | Workspace.cc
+| )MORE                   | Workspace.cc
+| )SAVE .xml              | Archive.cc
+| )COPY .xml              | Archive.cc
+| )LOAD .xml              | Archive.cc
+|====
+
+Consult source file *Command.def* to find the implementation of a particular
+command. Most commands support TAB-completion: the user hits TAB and the
+possible completions are are displayed. Implemented in *TabExpansion.cc*.
+
+== APL Expressions
+
+The most interesting case occurs if the user enters an APL expression, from
+simple ones like *+/⍳10* or complex ones like calling a defined function. The
+behavior in this case is specified in the ISO APL standard and GNU APL
+follows this standard, at least for the most part. The processing of the input
+line is _essentially_ the same for the lines of defined APL functions and for 
+lines entered in immediate execution. The minor differences, e.g. APL labels
+are not allowed in immediate execution, statement separators are not allowed
+in ⍎-strings, etc. are handled via a *ParseMode* declared and defined in
+*APL_types.hh*:
+
+----
+///  What is being parsed (defined function, immediate execution statements,
+/// or ⍎expr)
+enum ParseMode
+{
+   PM_FUNCTION       = 0,   ///< defined function
+   PM_STATEMENT_LIST = 1,   ///< immediate execution
+   PM_EXECUTE        = 2,   ///< execute (⍎)
+};
+----
+
+The *ParseMode* defines the origin of a particular line; the options are:
+
+* The line was entered in immediate execution (as described above), or
+* The line is a line of a defined function (see later), or
+* The line was an APL string (⍎, ⎕EA, ⎕ES ...).
+
+The next steps in the processing of a line are tokenization and pre-parsing:
+
+----
+    ┌───────────────┐
+    │ Tokenization  │
+    └───────┬───────┘
+    ┌───────┴──────┐
+    │ Pre-Parsing  │
+    ├──────────────┤
+    │ Optimization │
+    └──────────────┘
+----
+
+=== Tokenization
+
+Tokenization splits the (APL-) characters of a line into small fixed-sized
+units called *Token*. Token are the machine-readable units equivalents of the
+human readable input characters. For example, a possibly lengthy string like
+"3.14156" is converted into a Token holding a C _double_. The whole purpose of
+tokenization is to convert the APL input into an internal representation that
+can be interpreted significantly faster than the APL characters enters by the
+APL programmer. For example:
+
+----
+      A←1 2 3 ◊ B←'abc'            ⍝ APL input string
+----
+is tokenized into:
+----
+      ┌───┐ ┌───┐ ┌───┐ ┌───┐ ┌───┐ ┌───┐ ┌───┐ ┌───┐ ┌─────┐ ┌─────┐
+      │ A │ │ ← │ │ 1 │ │ 2 │ │ 3 │ │ ◊ │ │ B │ │ ← │ │ abc │ │ EOL │
+      └───┘ └───┘ └───┘ └───┘ └───┘ └───┘ └───┘ └───┘ └─────┘ └─────┘
+---- 
+
+The function that performs the tokenization is:
+
+----
+   ErrorCode tokenize(const UCS_string & input, Token_string & tos) const;
+----
+
+which is a member of *class Tokenizer*, see *Tokenizer.hh*. The result is
+a Token_string:
+
+----
+// A sequence of Token
+class Token_string : public  std::vector<Token>
+{
+   ...
+};
+----
+
+see file *Token.hh*.
+
+=== Pre-parsing
+
+Pre-parsing is primarily an optimization step that performs a number of
+sub-steps, such as:
+
+* splitting multiple statements (separated by ◊ Token) into individual
+  statements (at ◊),
+* grouping multiple scalars into single APL values,
+* reversing the order of individual statements, and
+* performing some optimizations
+
+In the example above, the token string
+----
+      ┌───┐ ┌───┐ ┌───┐ ┌───┐ ┌───┐ ┌───┐ ┌───┐ ┌───┐ ┌─────┐ ┌─────┐
+      │ A │ │ ← │ │ 1 │ │ 2 │ │ 3 │ │ ◊ │ │ B │ │ ← │ │ abc │ │ EOL │
+      └───┘ └───┘ └───┘ └───┘ └───┘ └───┘ └───┘ └───┘ └─────┘ └─────┘
+---- 
+
+is first split into 2 statements:
+
+----
+      ┌───┐ ┌───┐ ┌───┐ ┌───┐ ┌───┐
+      │ A │ │ ← │ │ 1 │ │ 2 │ │ 3 │
+      └───┘ └───┘ └───┘ └───┘ └───┘
+      ┌───┐ ┌───┐ ┌─────┐
+      │ B │ │ ← │ │ abc │
+      └───┘ └───┘ └─────┘
+---- 
+
+The scalars 1, 2, and 3 are then combined into a single APL value (the APL
+value 'abc' is already a single value after tokenization):
+
+----
+      ┌───┐ ┌───┐ ┌───────┐
+      │ A │ │ ← │ │ 1 2 3 │
+      └───┘ └───┘ └───────┘
+      ┌───┐ ┌───┐ ┌─────┐
+      │ B │ │ ← │ │ abc │
+      └───┘ └───┘ └─────┘
+---- 
+
+Next, the individual statements are reversed:
+
+----
+      ┌───────┐ ┌───┐ ┌───┐
+      │ 1 2 3 │ │ ← │ │ A │
+      └───────┘ └───┘ └───┘
+      ┌─────┐ ┌───┐ ┌───┐
+      │ abc │ │ ← │ │ B │
+      └─────┘ └───┘ └───┘
+---- 
+
+and finally combined again:
+
+----
+      ┌───────┐ ┌───┐ ┌───┐ ┌───┐ ┌─────┐ ┌───┐ ┌───┐ ┌────┐
+      │ 1 2 3 │ │ ← │ │ A │ │ ◊ │ │ abc │ │ ← │ │ B │ │ EOL│
+      └───────┘ └───┘ └───┘ └───┘ └─────┘ └───┘ └───┘ └────┘
+---- 
+
+The reason for reversing the tokens of every statement is somewhat subtle: APL
+statements are executed from left to right, but the token inside a statement
+are processed from right to left. Without the reversal the token would need to
+be processed like this:
+----
+    → → → → → → → → → →        → → → → → → → → → → → → → → 
+                      ↓       ↑                          ↓
+      ┌───┐ ┌───┐ ┌───────┐ ┌───┐ ┌───┐ ┌───┐ ┌─────┐ ┌─────┐
+      │ A │←│ ← │←│ 1 2 3 │ │ ◊ │←│ B │←│ ← │←│ abc │ │ EOL │
+      └───┘ └───┘ └───────┘ └───┘ └───┘ └───┘ └─────┘ └─────┘
+        ↓                                        ↑
+         → → → → → → → → → → → → → → → → → → → → 
+
+---- 
+
+By reversing every statement the same processing order now becomes:
+
+----
+      ┌───────┐ ┌───┐ ┌───┐ ┌───┐ ┌─────┐ ┌───┐ ┌───┐ ┌─────┐
+      │ 1 2 3 │→│ ← │→│ A │→│ ◊ │→│ abc │→│ ← │→│ B │→│ EOL │
+      └───────┘ └───┘ └───┘ └───┘ └─────┘ └───┘ └───┘ └─────┘
+----
+
+*DEFINITION*: in source code comments, we refer to the initial token order
+(statement tokens from left to right, statements from left to right,
+and lines from top to bottom) as the *APL order* and to the order after
+reversing the tokens of every statements (statement tokens from right to left,
+statements from left to right, and lines from top to bottom) as the
+*reversed order*. The reversion is performed in *Executable::parse_body_line().
+In other words, function *Tokenizer::tokenize()* produces a *Token_string tos*
+in APL order, which is later reversed into the final function body
+*Token_string Executable::body*.
+
+The reversed order can be processed much faster since the order is now linear
+and no more back and forth jumps are needed when the token string is
+interpreted.
+
+Another trick in the pre-parsing phase is to store the distance between
+opening and closing parentheses and square brackets (curly bracket are removed
+entirely in this phase) in the token itself. Sometimes the prefix-parser
+(*Prefix.cc*)  that finally performs the interpretation has to jump
+over a pair of parentheses or brackets as to find the token left of them.
+Instead of scanning the token string at runtime until a matching parenthesis
+or bracket is found, one can compute its location directly (i.e. in time
+O(1) rather than O(∆) for distance ∆ between the matching parentheses
+or brackets):
+
+----
+    ┌─────┐       ┌─────┐            ┌─────┐       ┌─────┐
+    │ [,∆ │  ...  │ ],∆ │   resp.    │ (,∆ │  ...  │ ),∆ │ 
+    └─────┘       └─────┘            └─────┘       └─────┘
+      │← ← ← ∆ → → →│                  │← ← ← ∆ → → →│   
+----
+The Pre-parser function returns an error code and fills its argument *tos*
+as a side effect:
+----
+  Parser.hh:
+
+  /// Parse token string \b input into token string \b tos.
+   ErrorCode parse(const Token_string & input, Token_string & tos) const;
+----
+The entire conversion (i.e. tokenization and pre-parsing
+happens in function*Executable::parse_body_line(); the result is stored in
+member *body* of class Executable:
+----
+   Executable.hh:
+
+   /// The token to be executed. They are organized line by line and
+   /// statement by statement, but the token within a statement reversed
+   /// due to the right-to-left execution of APL.
+   Token_string body;
+----
+Every defined function, every line entered in immediate execution, and every
+statement from a ⍎ expression is converted into an object of base
+class *Executable*. That object contains some more information such as
+the original line(s) from which it was created, a reference counter to
+delete it if no longer used, etc.
+
+From base class Executable three different classes for the different
+ParseModes are derived:
+----
+class ExecuteList : public Executable { ...}              // in Executable.hh
+class StatementList : public Executable { ... }           // in Executable.hh
+class UserFunction : public Function, public Executable   // in UserFunction.hh
+----
+This is because the minor differences between the ParseModes not only affect
+the parsing of the input line but also some runtime aspects. The base class
+Executable contains the common functionality while the derived classes
+contain the specific functionalities related to the different ParseModes.
+
+Some debug printouts display the ParseMode, like this:
+
+* ∇ for defined functions,
+* ◊ for a list of statements (i.e. immediate execution), and
+* ⍎ for executed APL strings (⍎, ⎕EA, ⎕EB, ⍎ES).
+
+The difference between *◊*  and *⍎* is mostly resolved during pre-parsing,
+therefore classes *StatementList* and *ExecuteList* are almost the same as
+class *Executable*. Both pertain to a single line of APL code and their
+implementation can be found in *Executable.cc*.
+
+In contrast, defined functions are far more complex (multiple lines, labels,
+parameter passing) and have their own implementation file *UserFunction.cc*.
+
+=== Naming of APL objects
+
+To conclude the discussion of pre-parsing we should mention the role of names.
+Ignoring comments and white-space (which are discarded rather early), the
+lines of every every APL program consists of 3 types of objects:
+
+. literals (constants) like 1 2 3 or 'abc', and
+. names of built-in primitives like + and -, system functions like ⎕UCS, and
+  system variables like ⎕IO
+. (user-defined) names of variables and defined functions, in the following
+  called *symbols*.
+
+These objects are processed by the pre-parser according to the following
+rules:
+
+. literals are converted to APL values,
+. every primitive, system function, or system variable has an integer ID which
+  uniquely identifies it, and
+. every user defined name is entered into a symbol table, which is a hash
+  table that contains all user defined names. The conversion from a name
+  (i.e. string) to a user defined object happens during the pre-parsing (and
+  therefore has no runtime overhead).
+
+The IDs of all primitives are *#defined* in *Id.def*. The Ids are sorted by
+the first character in their name (the character after ⎕ for system functions
+and variables) or e.g. "P" for Plus, "M" for Minus etc. These IDs are not only
+used in the body tokens of executables but also in )SAVEd .xml snapshot. It is
+therefore essential that new IDs are added at the end of ID group that starts
+with the same character, and that obsolete IDs are kept (or at least their
+ID are never reused). The first character (upper 8 bits of of the ID are
+chosen in a way that simplifies debugging a Little at no cost.
+
+All user defined symbols have the ID 0x0000 and their token contains a unique
+*Symbol ** pointer. The symbol table (class *SymbolTable* in file
+*SymbolTable.hh*) is only used by the pre-parser (to ensure that all symbols
+have the same *Symbol *) and by some APL commands like *)FNS*, *)VARS*,
+*)OPS*, etc..
+
+The Id.def file classifies the around 200 IDs via 5 macros that indicate their
+porpose or usage:
+
+* macro *pp(...)*: **p**retty   **p**rint. For constructing the name (usually
+  "---") of a token that has no permanent role, e.g. pass C function arguments.
+  E.g. NO_VALUE, VARIABLE, ...
+* macro *qf(...)*: **q**quad    **f**unction. Quad function, 
+  e.g. ⎕DL, ⎕FX, ...
+* macro *qv(...)*: **q**quad    **v**ariable Wuad variable,
+  e.g. ⎕CT, ⎕IO, ...
+* macro *sf(...)*: **s**system  **f**function. An APL priMitive,
+  e.g. ⍴, ⌽,  ...
+ ...
+* macro *st(...)*: **s**system  **t**oken. An ID for other token,
+  e.g. ⍺, →. ...
+
+
+=== Token Structure
+
+With the prerequisites above we can define the structure of a *Token*: 
+
+----
+   Token.hh:
+
+class Token
+{
+   ...
+
+   /// the (optional) value of the token.
+   union sval
+      {
+        Unicode         char_val;        ///< the Unicode for TV_CHAR
+        APL_Integer     int_vals[2];     ///< the integer for TV_INT
+        APL_Float_Base  float_vals[2];   ///< the doubles for TV_FLT and TV_CPX
+        Symbol        * sym_ptr;         ///< the symbol for TV_SYM
+        Function_Line   fun_line;        ///< the function line for TV_LIN
+        IndexExpr     * index_val;       ///< the index for TV_INDEX
+        Function_P      function;        ///< the function for TV_FUN
+        Value_P_Base    apl_val;         ///< the APL value for TV_VAL
+
+        /// a shortcut for accessing apl_val
+        Value_P & _apl_val() const
+           { return reinterpret_cast<Value_P &>
+                    (const_cast<Value_P_Base &>(apl_val)); }
+      };
+
+   ...
+
+   protected:
+
+   /// The tag indicating the type of \b this token
+   TokenTag tag;
+
+   /// The value of \b this token
+   sval value;
+
+   ...
+}
+----
+
+In short this means that:
+
+* a token is a tagged union (named *sval*), and
+* the tag (an *enum TokenTag*) determines which member (if any) of *union sval*
+  a particular token holds.
+
+The APL interpreter can be understood as virtual machine whose opcodes are
+Tokens. In this context the attribute *virtual* of _virtual machine_ must not
+be confused with the attribute *virtual* of _virtual Cpp functions_ or
+_classes_. The tokenization and pre-parsing is then the "compilation" of APL
+source code into machine code of this virtual APL machine.
+The rest of *Token.hh* defines quite a number of constructors and access
+functions of class Token, most of them _inline_ because the manipulation
+of Token is usually simple but performed frequently.
+
+The *TokenTag* is a 32-bit (4 byte) number which has 3 sub-fields:
+----
+                 ------16 bit------ ---8 bit---   ---8 bit--- 
+                ┌────────┬─────────┬────────────┬─────────────┐
+    Token Tag:  │        ID        │ Value-type │ Token-class │
+                └────────┴─────────┴────────────┴─────────────┘
+----
+
+==== The ID of a Token
+
+The 16 bit *ID* is the integer ID of system functions and variables explained
+above. The ID (resp. its access function Token::get_Id() is not used during
+the normal interpretation of APL code but only in error messages and for
+loading and saving of workspaces.
+
+==== The Value-Type of a token
+
+The value type simply defines which of the members of *union sval* the token
+holds. The value type is only used when Token are copied or moved around
+(most likely from the body of a defined function into the prefix parser as
+will be explained below). The knowledge of the type is needed because some
+the *union sval* members have constructors.
+
+The value types are defined in *TokenEnums.hh*:
+----
+TokenEnums.hh:
+
+/// The value type of a token
+ 
+enum TokenValueType
+{
+   // token value types. The token value type defines the type of the
+   // token in the union 'value'.
+   //                              Type              union member
+   TV_MASK          = 0xFF00,
+   TV_NONE          = 0x0000,   // value not used
+   TV_CHAR          = 0x0100,   // Unicode            .char_val
+   TV_INT           = 0x0200,   // uint64_t           .int_val;
+   TV_FLT           = 0x0300,   // APL_Float          .flt_val;
+   TV_CPX           = 0x0400,   // cdouble            .complex_val;
+   TV_SYM           = 0x0500,   // Symbol *           .sym_ptr;
+   TV_LIN           = 0x0600,   // Function_Line      .fun_line;
+   TV_VAL           = 0x0700,   // Value_P            .apl_val;
+   TV_INDEX         = 0x0800,   // IndexExpr *        .index_val;
+   TV_FUN           = 0x0900,   // Function_P         .function;
+};
+----
+
+The typical (inline) function that copies a Token is:
+
+----
+Token.hh:
+
+Token::copy_N(const Token & src)
+{
+   tag = src.tag;
+   switch(src.get_ValueType())
+      {
+        case TV_NONE:  value.int_vals[0]   = 0;
+                       value.int_vals[1]   = 0;                         break;
+        case TV_CHAR:  value.char_val      = src.value.char_val;        break;
+        case TV_INT:   value.int_vals[0]   = src.value.int_vals[0];
+                       value.int_vals[1]   = src.value.int_vals[1];     break;
+        case TV_FLT:   value.float_vals[0] = src.value.float_vals[0];   break;
+        case TV_CPX:   value.float_vals[0] = src.value.float_vals[0];
+                       value.float_vals[1] = src.value.float_vals[1];   break;
+        case TV_SYM:   value.sym_ptr       = src.value.sym_ptr;         break;
+        case TV_LIN:   value.fun_line      = src.value.fun_line;        break;
+        case TV_VAL:   value._apl_val()    = src.value._apl_val();      break;
+        case TV_INDEX: value.index_val     = src.value.index_val;       break;
+        case TV_FUN:   value.function      = src.value.function;        break;
+        default:       FIXME;
+      }
+}
+----
+In *copy_N()*, *src* is a token that is copies into token *this*, and *value*
+is the member (of *union sval*) that is being copied.
+
+==== The TokenClass-Type of a token
+
+The most important part of a *TokenTag* is its class (not to be confused with
+Cpp classes). Like the token value types they are defined in *TokenEnums.hh*.
+There are two different kinds of token classes: **permanent token class**es and
+**temporary token class**es. The permanent classes are:
+
+----
+TokenEnums.hh:
+
+enum TokenClass
+{
+   // token classes.
+   //
+
+   // permanent token classes. Only Token of these classes can appear in
+   // the body of a defined function.
+   //
+   TC_ASSIGN        = 0x01,   ///< ←
+   TC_R_ARROW       = 0x02,   ///< →N
+   TC_L_BRACK       = 0x03,   ///< [ or ;
+   TC_R_BRACK       = 0x04,   ///< ]
+   TC_END           = 0x05,   ///< left end of statement
+   TC_FUN0          = 0x06,   ///< niladic function
+   TC_FUN12         = 0x07,   ///< ambivalent function
+   TC_INDEX         = 0x08,   ///< [...]
+   TC_OPER1         = 0x09,   ///< monadic operator
+   TC_OPER2         = 0x0A,   ///< dyadic operator
+   TC_L_PARENT      = 0x0B,   ///< (
+   TC_R_PARENT      = 0x0C,   ///< )
+   TC_RETURN        = 0x0D,   ///< return from defined function
+   TC_SYMBOL        = 0x0E,   ///< user defined name
+   TC_VALUE         = 0x0F,   ///< APL value
+
+   TC_MAX_PERM,               ///< permanent token are < TC_MAX_PERM
+   ...
+----
+
+In contrast, temporary token are never used in the body of an *Executable*.
+They are short-lived and vanish after some permanent token was created from
+them. For example, prefix parser creates token of class *TC_PINDEX* (for
+partial index) when it sees the closing *]* of an APL index (remember:
+right-to-left) and creates a permanent token of class TC_INDEX when it sees
+the corresponding  opening *[*. Likewise, a defined function without result
+returns a token of class TC_VOID which is passed from one prefix parser to
+another to indicate the result of a defined functions.
+
+In short, temporary token classes are only created and consumed inside the
+prefix parser. The temporary token classes are:
+
+----
+TokenEnums.hh:
+   ...
+   // temporary Token classes. Token of these classes only appear as
+   // intermediate results during tokenization and prefix parsing
+   //
+   TC_PINDEX        = 0x10,   ///< partial index
+   TC_VOID          = 0x11,
+   TC_MAX_PHRASE,             ///< token in phrases are < TC_MAX_PHRASE
+   TC_MAX_PHRASE_2 = TC_MAX_PHRASE*TC_MAX_PHRASE,     // TC_MAX_PHRASE ^ 2
+   TC_MAX_PHRASE_3 = TC_MAX_PHRASE*TC_MAX_PHRASE_2,   // TC_MAX_PHRASE ^ 3
+   TC_MAX_PHRASE_4 = TC_MAX_PHRASE*TC_MAX_PHRASE_3,   // TC_MAX_PHRASE ^ 4
+
+   TC_OFF           = 0x12,
+   TC_SI_LEAVE      = 0x13,
+   TC_LINE          = 0x14,
+   TC_DIAMOND       = 0x15,   // ◊
+   TC_NUMERIC       = 0x16,   // 0-9, ¯
+   TC_SPACE         = 0x17,   // space, tab, CR (but not LF)
+   TC_NEWLINE       = 0x18,   // LF
+   TC_COLON         = 0x19,   // :
+   TC_QUOTE         = 0x1A,   // ' or "
+   TC_L_CURLY       = 0x1B,   // {
+   TC_R_CURLY       = 0x1C,   // }
+----
+
+The phrase table (or phrase tree) described in
+<<_the_phrase_table, The Phrase Table,_the_phrase_table>>
+below maps particular sequences of token classes
+to reduce functions. To make the phrase table a little more readable,
+we define some shorter names (SN_xxx) for token classes that better reflect
+the relation between the APL point of view and the Cpp representation of
+it, and/or abbreviates them:
+----
+TokenEnums.hh:
+   ...
+   // shorter token class aliases for the phrase table
+   //
+   SN_A             = TC_VALUE,
+   SN_ASS           = TC_ASSIGN,
+   SN_B             = TC_VALUE,
+   SN_C             = TC_INDEX,
+   SN_D             = TC_OPER2,
+   SN_END           = TC_END,
+   SN_F             = TC_FUN12,
+   SN_G             = TC_FUN12,
+   SN_GOTO          = TC_R_ARROW,
+   SN_I             = TC_PINDEX,
+   SN_LBRA          = TC_L_BRACK,
+   SN_LPAR          = TC_L_PARENT,
+   SN_M             = TC_OPER1,
+   SN_N             = TC_FUN0,
+   SN_RETC          = TC_RETURN,
+   SN_RBRA          = TC_R_BRACK,
+   SN_RPAR          = TC_R_PARENT,
+   SN_V             = TC_SYMBOL,
+   SN_VOID          = TC_VOID,
+   SN_              = TC_INVALID
+----
+
+For example: the ISO APL standard defines a phrase table of 39 phrases. In
+particular phrase 7 is defined as:
+
+_7 EVALUATE DYADIC FUNCTION (<A F B> R)_
+
+In GNU APL code the the ISO phrase *<A F B>* is represented as 3 short-names
+*SN_A, SN_F, SN_B,*. To further simplify matters, the *SN_* prefix is hidden
+by means of some macro magic, so that the same ISO phrase in the GNU APL
+phrase table (in *Prefix.def*) becomes:
+
+----
+  Prefix.def :
+
+  PH( A F B          , A_F_B_        , 0x03CEF ,  33  ,   0  ,  3),  // [EA]
+
+----
+Given that *SN_A* and *SN B* are both short names for *TC_VALUE*, and that
+*SN_F* the short name for *TC_FUN12*, after expanding macro PH() in the Cpp
+preprocessor this translated to something like:
+
+_If a sequence of token classes TC_VALUE TC_FUN12 TC_VALUE is discovered, then
+call Cpp function reduce_A_F_B()._
+
+== Evaluation of APL Expression
+
+=== The Phrase Table
+
+The IBM APL Language Reference Manual describes the fundamental rule for the
+evaluation of APL expressions as follows:
+
+_All functions execute according to their position within an expression.
+The rightmost function whose arguments are available is evaluated first._
+
+In parser terms, one could as well formulate this as:
+
+* execution of an APL expression starts with an empty sequence of token
+  classes,
+* the token in the sequence are then, from right to left, prepended to the
+  sequence, and
+* whenever a prefix of the current sequence is found in the phrase table:
+** the reduce function in the phrase table entry is called with the token of
+   the prefix as arguments,
+** the prefix in the sequence is replaced with the result of the reduce
+   function.
+
+Since GNU APL stores the token in reverse order as explained earlier, from
+right to left actually means left to right for the token string that is being
+interpreted. The rules above amount to what is commonly called a LALR(1)
+parser (short for **L**eft-**R**ight-**L**ook**A**head-Parser with 1 lookahead
+token). In GNU APL terminology it is the *Prefix parser* in file *Prefix.cc*.
+The somewhat simplified algorithm of the GNU APL prefix parser is:
+
+. Every Prefix parser starts execution at the beginning of some token string,
+  say *body*, which is in most cases the body of a defined function. 
+.. Its integer variable *PC* (actually of type *enum Function_PC*) is 
+   initialized to 0 (start of function), and
+.. the sequence of tokens read so far is cleared. Then:
+. The next token is read and PC is incremented.
+. If the token class is *TC_SYMBOL* (i.e. a name defined by the APL programmer)
+  then the new token is replaced by the current value of the symbol, which is
+  one of:
+.. *TC_VOID*  - symbol name was used (tokenized) but not assigned (e.g.
+   local variables),
+.. *TC_VALUE* - an APL variable,
+.. *TC_FUN0*  - a defined niladic function,
+.. *TC_FUN12* - a defined monadic or dyadic function,
+.. *TC_OPER1* - a defined monadic operator (i.e. 1 function argument), or
+.. *TC_OPER2* - a defined dyadic operator (i.e. 2 function argument).
+  This name resolution step happens in function
+  *Symbol::resolve_right()* for symbols right of *←* or in
+  *Symbol::resolve_left() for symbols left of *←*. The case *TC_VOID* happens
+  when a name was tokenized, but no value or function was assigned to it.
+.. If the new token together with the sequence matches a phrase (as discussed
+  above) then the phrase is reduced (called REDUCE in parser terminology).
+. Otherwise (no phrase matches) the new token is prepended to the sequence and
+  the next token is read (called SHIFT in parser terminology). In this case
+  execution continues with step 2. above.
+. If a phrase with an APL jump, such as *→N* (with integer *N*), is matched,
+  then a new value for the *PC* is computed so that *body[PC]* is the first
+  token of line N. If no such line exists, then the Prefix parser returns its
+  result (either TOK_VOID for functions that return no result or TOK_VALUE
+  otherwise.
+. If the parser sees a closing parenthesis *)* or bracket *]* then the parser
+  creates a sub-parser (again with *PC=0* etc.) and execution is continued in
+  the sub-parser until the corresponding opening parenthesis *(* or racked
+  *[* is reached. The result of the sub-parser, typically a token with class
+  *TC_VALUE* for parentheses and *TC_INDEX* for brackets is returned to the
+  calling parser,
+. an end of statement token (class TC_END) does not stop the parser. The
+  necessary actions, e,g, printing of the value for non-committed APL values
+  is performed in the reduce function (which calls
+  *StateIndicator::statement_result()), and the parser simply continues after
+  the reduce function returns. Only the end of the *body* stops the parser,
+  and the last token in the *body* performs the transfer of the value computed
+  by a defined APL function to its caller.
+
+The token in the current sequence are of Cpp type *Token_loc* instead of
+type *Token*. *Token_loc* is a Token and a range in the *body*. When a
+token is first fetched from, say, *body[PC]*) then the range of its
+*Token_loc* is *[PC:PC+1]*. As more and more consecutive tokens are being
+reduced, that range grows and contains all tokens that have contributed to
+the creation of every token. This is needed for proper error reporting.
+
+NOTE: Our prefixes are called *pattern* or *phrases* in the ISO standard.
+The token sequence above is called *stack* in the ISO standard and also in
+some of GNU APL debug printouts.
+
+The main implementation of the algorithm above is Cpp function
+*Prefix::reduce_statements(). It returns a *Token*. The function
+uses C/Cpp goto statements because that leads to much clearer code than the
+so called "structured programming" would. The labels are:
+
+* *grow:* do a SHIFT (if no phrase has matched),
+* *again:* repeat phrase matching (after a reduce function was called), and
+* *done:* the parser returns.
+`
+The point of *again:* is that the reduction of some phrases, for example an
+expression in parentheses, may produce a stack that could not be reduced
+before but now can without reading another token.
+
+=== An Example
+
+Consider the APL code from our example above, for simplicity in immediate
+execution:
+
+   A←1 2 3
+
+The tokenizer produces:
+
+      ┌───────┐ ┌───┐ ┌───┐  ┌────────┐
+      │ 1 2 3 │ │ ← │ │ A │  │ RETURN │
+      └───────┘ └───┘ └───┘  └────────┘
+
+To be precise, the *RETURN* token is actually appended by StatementList::fix()
+and not by the Tokenizer itself. Then:
+
+. The prefix parser reads (the single) token *1 2 3* and shifts
+  Pattern is now: *value(1 2 3)*.
+. The prefix parser reads *←* and shifts. Pattern is now: *← value(1 2 3)*.
+. The prefix parser reads *A*. The pattern matches and the parser
+  reduces with *Prefix::reduce_A_ASS_B_()*. The result is
+  *committed_value(1 2 3)* and the new pattern is also:
+  *committed_value(1 2 3)*
+. The prefix parser reads *RETURN*. The pattern matches and the parser
+  reduces with *Prefix::reduce_END_B__()*, which calls
+   *StateIndicator::statement_result() and clears the pattern to empty.
+. The parser has no more token to read and returns.
+
+=== Another Example
+
+   (1 + 2) FOO 4   ⍝ with dyadic defined function FOO
+
+The tokenizer produces:
+
+      ┌───┐ ┌─────┐ ┌───┐ ┌───┐ ┌───┐ ┌───┐ ┌───┐  ┌────────┐
+      │ 4 │ │ FOO │ │ ) │ │ 2 │ │ + │ │ 1 │ │ ( │  │ RETURN │
+      └───┘ └─────┘ └───┘ └───┘ └───┘ └───┘ └───┘  └────────┘
+
+. The parser shifts *1* and *FOO* and creates a sub-parser for ).
+. The sub-parser reduces *(1+3)* and returns *3*.
+. The parser reads the result *3* and computes *3 FOO 4*.
+
+==== Properties of the reduce_XXX() functions
+
+* In GNU APL there is a total of 67 phrases and consequently 67 reduce
+  functions.
+* reduce functions are typically short. Nevertheless they cannot be inlined
+  since they are being called via a function pointer.
+* reduce functions have return type *void* and no arguments. They access the
+  token which they reduce directly from a ring-buffer named *Prefix::content*
+  and also store the result there (function *Prefix::pop_args_push_result()*)
+* accessing the token is performed via functions *at0()*, *at1()*, *at2()*, or
+  *at3()*, where *at0()* is the leftmost (in APL code order) resp rightmost
+  (in reversed order) token. For example, in *reduce_V_ASS_B()* corresponds *V*
+  to *at0()*,  *ASS* to *at1()*, and *B* to *at2()*.
+* the lookahead token of the LALR(1) parser is always a token in the body of a
+  defined function. It therefore needs not (yet) to be copied at the time of
+  the lookahead. It is instead accessed with *Prefix::lookahead(), which
+  returns *TOK_VOID* if no lookahead token exists.
+
+The principal structure of a reduce function is always:
+
+. obtain the arguments (at0(), at1(), ...)
+. compute the desired side effect (assign a variable, evaluate a function,
+  perform a branch, etc)
+. remove (pop) the arguments from the stack and push the result on the stack,
+  in most cases with *Prefix::pop_args_push_result()*, and finally
+. set member *Prefix::action* to the next action that the prefix parser shall
+  perform. The possible actions are (enum *R_action* in *Prefix.hh*)
+.. *RA_CONTINUE*: repeat the phrase matching with the current stack (after a
+   reduce_XXX() has modified it, e.g. with *pop_args_push_result()*.
+.. *RA_PUSH_NEXT*: push the next token onto the stack (aka. SHIFT)
+.. RA_RETURN*: return from the current (sub-) parser and push its result onto
+   the stack of the calling parser, or
+.. *RA_SI_PUSHED*: like RA_RETURN but without a result (called a *future* in
+   esoteric computer languages). It indicates that a new parser with a new
+   defined function was started and will or will not return a result. This
+   case is slightly different from simply calling a sub-parser, because a
+   sub-parser (e.g. for parentheses) remains in the same function body, while a
+   new defined function has its own body.
+
+===  Construction of the phrase table (or tree)
+
+The large number of phrases makes it error prone and cumbersome to handle
+them. For that reason the declaration of all *reduce_XXX()* functions (in
+*Prefix.hh*, as well as the instantiation of a hash table for fast lookup of
+phrases (or, alternatively a search tree) in *Prefix.cc* are realized by
+including *src/Prefix.def*. That is, *Prefix.def* is, with the help of the Cpp
+preprocessor,  a code generator for *Prefix.hh* and *Prefix.cc*. *Prefix.def*
+itself is also generated (with *tools/phrase_gen*). *tools/phrase_gen* itself
+*#includes* file *tools/phrase_gen*.def which contains the primary definition
+of all phrases (similar to the phrase table in the ISO standard. This
+machinery is hidden behind *tools/makefile* with targets: *gen* (for a hash
+table) and *gen2* (for a search tree). Note the lowercase *makefile*; the tools
+directory also contains an (uppercase) *Makefile* which belongs to the build
+system. The full picture is this:
+
+----
+
+    ╔═════════════════════╗    ╔══════════════════════╗
+    ║ tools/phrase_gen.cc ║    ║ tools/phrase_gen.def ║
+    ╚══════════╤══════════╝    ╚══════════╤═══════════╝
+               │                          │
+      ┌────────┴───────┐                  │
+      │ tools/Makefile │                  ↓
+      └────────┬───────┘                  │
+               │                          │
+              g++ ─────── #include ───────┘
+               │
+      ╔════════╧═════════╗
+      ║ tools/phrase_gen ║                                 ./configure
+      ╚═════════╤════════╝
+                │                                          ══════════════════
+       ┌────────┴───────┐
+       │ tools/makefile │                                  make
+       └────────┬───────┘
+                │
+              write
+                │
+       ┌────────┴────────┐                            ┌───────────────┐
+       │  src/Prefix.def ├───────── #include ────→────┤ src/Prefix.hh │
+       └────────┬────────┘                            └───────┬───────┘
+                │                                             │
+                ↓                                             ↓
+                │              ┌───────────────┐              │
+                └── #include ──┤ src/Prefix.cc ├── #include ──┘
+                               └───────┬───────┘
+                                       │
+                                      g++
+                                       │
+                             ┌─────────┴────────┐
+                             │ src/apl-Prefix.o │
+                             └──────────────────┘
+----
+
+NOTE: GNU APL is shipped with *src/Prefix.def* already produced, so that the
+"normal" designer is rarely concerned with the above. Unless she needs to
+change the GNU APL phrase table.
+
+If, however, *tools/phrase_gen.def* was modified, then
+
+----
+    make gen    # generate new src/Prefix.def with a phrase table, or
+    make gen2   # generate new src/Prefix.def with a phrase tree
+----
+
+needs to be performed once. The build system will then note the changed
+*src/Prefix.def* and a top-level make will recompile the affected files in
+directory *src*.
+
+
+== Noteworthy Classes
+
+=== String Classes
+
+The GNU APL source code has more than 1000 places where strings are used.
+These strings come in 2 flavors:
+
+. strings of 32-bit Unicodes (sometimes referred to as UCS-32),
+. strings of bytes in UTF8 encoding.
+
+GNU APL uses 2 classes for these strings: class *UCS_string* for 32-bit 
+Unicodes and *UTF8_string* for UTF8-encoded strings. In general:
+
+* UCS_strings are far easier to use that UTF8_strings because UTF8 is a
+  variable-length encoding, which makes indexing or iterating over them
+  cumbersome and error-prone. For this reason all strings used internally
+  in GNU APL are UCS_strings.
+* UTF8_strings are commonly used between GNU APL and its environment. They are
+  shorter when transported over the internet, therefore most web pages are
+  UTF8-encoded. Also, filenames in the operating systems are UTF8 encoded.
+  Finally, most terminal emulators, in particular those that support APL in
+  some way, send and expect all characters to be UTF8-encoded.
+
+
+==== UCS_strings
+
+The starting point is:
+
+----
+   Unicode.hh:
+
+   enum Unicode
+   {
+#define char_def(name, uni, _tag, _flags, _av_pos) UNI_ ## name = uni,
+#define char_uni(name, uni, _tag, _flags)          UNI_ ## name = uni,
+#include "Avec.def"
+
+     Unicode_0       = 0,            ///< End of unicode string
+     Invalid_Unicode = 0x55AA55AA,   ///< An invalid Unicode.
+   };
+----
+
+where:
+
+* The *char_def()* macro defines all Unicodes that are contained in the 256
+  character *⎕AV* of GNU APL. In old APL1 the ⎕AV and its derivates (⎕FC, ⎕A,
+  ⎕D, ...). These days, the ⎕AV is only maintained for backward compatibility
+  with APL1. In APL2 it has been entirely obsolete by ⎕UCS. Keep in mind,
+  however, that:
+** The encoding of files produced with )OUT or read with )IN are still based
+   on ⎕AV. To be precise: based on some IBM ⎕AV defined in the IBM APL2
+   reference manual, not on the GNU APL ⎕AV. Generally ⎕AVs as well as their
+   encodings are machine specific, some mainframes even used EBCDIC and older
+   PC operating systems used special APL code pages which corresponded to the
+   ⎕AV.
+** GNU APL has two helper functions for such conversions.
+** class *Avec contains numerous static functions for handling and classifying
+   of Unicodes contained in the ⎕AV.
+* In contrast, the *char_uni()* macro defines Unicodes that can are used in
+  the GNU APL source code but that are not in ⎕AV.
+* In short:
+** any Unicode with APL significance (primitives etc.) are (and
+   must be) contained in the⎕AV (and then defined with ,*char_def()*  while
+** any Unicode used in the GNU APL Cpp source code, must be defined with
+   *char_uni()*. Noteworthy examples of the latter are the sub- and
+   superscripts (⁰, ¹, ², ..., ⁹, ₀, ₁, ₂, ..., ₉).
+
+The helpers mentioned above are:
+
+----
+   Avec.hh:
+   /// a pointer to 256 Unicode characters that are exactly the APL2 character
+   /// set (⎕AV) shown in lrm Appendix A page 470. The ⎕AV of GNU APL is
+   /// similar, but contains characters like ≢ that are not in IBM's ⎕AV
+   /// IBM's ⎕AV is used in the )IN command
+   static const Unicode * IBM_quad_AV();
+
+  /// recompute \b inverse_ibm_av from \b ibm_av and print it
+   static void print_inverse_IBM_quad_AV();
+----
+
+After this digression into Unicodes we can now:
+
+----
+   UCS_string.hh:
+
+class UCS_string : public std::basic_string<Unicode>
+{
+   ...
+   UCS_string(const UTF8_string & utf);
+   ...
+}
+----
+
+UCS_string has many constructors, most importantly the constructor from a
+UTF8_string which converts the UTF8_string into a UCS_string. In addition the
+UCS_string string class defines numerous convenience functions for the
+processing of UCS_strings.
+
+==== UTF8_strings
+
+In good old C, there were C literals like *"Hello*, world". At that time the
+only relevant encoding of such literals was the 7-bit ASCII code and all
+literals contained only positive (signed) characters.
+
+Next, Cpp defined a template class *std::basic_string<>* which provides
+numerous string processing methods (indexing ,iteration) for *basic_string*
+that are also used in our derived classes *UCS_string* and *UTF8_string*.
+So far so good.
+
+But now comes the problem. The Cpp standard string library says:
+
+----
+   class string : public basic_string<char> { }
+----
+
+On almost all platforms (read: compilers), a *char* is *signed* as
+opposed to type *unsigned char*. Often this does not hurt because C and Cpp
+automatically convert between the signed and unsigned variants and not every
+programmer is always aware of the dire consequences of signedness. Like, for
+example:
+
+----
+              !
+    char(-56) = char(200) < char(100) = unsigned char(100) < unsigned char(200).
+----
+
+to make things worse, UTF8 encoding works on (unsigned) bytes while C/Cpp
+literals in compilers are, without specific qualifiers, signed. As a
+consequence, the APL character *'←'* has Unicode 8592 aka. 0x2190, and a UTF8
+encoding of (hex) *E2 86 90* which makes the string literal "→" a
+(0-terminated) sequence of 3 signed (!) and unfortunately negative (!)
+characters. Early versions of GNU APL were using *std::string* instead of
+*UTF8_strings*, and the problems caused by that were numerous. These days
+GNU APL itself is clean when it comes to signed vs. unsigned chars, but some
+older contributions may still suffer. Comparisons for equality works well for
+mixed signed/unsigned operands, but < and > do not, and, as a consequence,
+*strcmp()* and friends frequently return the wrong order when used for sorting
+UTF-encoded strings.
+
+Like *UCS_string* has a constructor from a *UTF8_string* has *UTF8_string* a
+constructor from a *UCS_string*:
+
+----
+   UTF8_string.hh:
+
+/// one byte (not character !( of a UTF8 encoded Unicode (RFC 3629) string
+typedef uint8_t UTF8;
+
+class UTF8_string : public std::basic_string<UTF8>
+{
+   ...
+   /// constructor: copy of UCS string. The Unicodes in ucs
+   /// will be UTF8-encoded
+   UTF8_string(const UCS_string & ucs);
+};
+----
+
+The take-aways for designers and contributors are:
+
+* prefer UCS_string over UTF8_string where possible (efficiency),
+* never use std::string, but
+* instead use UTF8_string
+* do not write your own conversion functions but use the constructors instead.
+
+
+=== APL Values
+
+The primary business of an APL interpreter is to manipulate APL values.
+An APL is simply a *Shape* and a *Ravel*, although simplicity ends here.
+
+In that, *Shape* is a class of its own, defined in *Shape.hh*. It has a bunch
+of constructors for various purposes and also numerous inline convenience
+functions that makes the code that deals with shapes more readable.
+
+Many of the Shape methods have trivial wrappers in class Value, because almost
+every shape is accessed in the context of a value. For example:
+----
+   Shape.hh:
+
+   ...
+  /// return the rank
+  uRank get_rank() const
+     { return rho_rho; }
+
+   Value.hh:
+
+   ...
+   /// return the rank of \b this value
+   uRank get_rank() const
+     { return shape.get_rank(); }
+   ...
+   Shape shape;
+   ...
+----
+
+The ravel is simply a C++ array of type *Cell*:
+
+----
+   Value.hh:
+
+   ...
+   /// The ravel of \b this value.
+   Cell * ravel;
+
+   /// the cells of a short (i.e. ⍴,value ≤ cfg_SHORT_VALUE_LENGTH_WANTED) value
+   Cell short_value[cfg_SHORT_VALUE_LENGTH_WANTED];
+----
+
+Many real-life APL values are short. To avoid unnecessary memory allocations,
+GNU APL allocates short ravels inside the class instance and longer ravels
+outside (which then requires an additional new/delete for the ravel). Put
+differently, a short value has *ravel == &short_value*, while *ravel* in
+a long values points to a separately allocated memory area. The border between
+short and long values can be changed with *./configure*; larger values of
+*SHORT_VALUE_LENGTH_WANTED* have a (marginally) better performance, but the
+price is a (less marginal) increase in memory consumption.
+
+Similar to *class Shape*, numerous constructors and (mostly trivial) access
+functions for various purposes. For example, a Value can be constructed from a
+UCS_string (and conversely a UCS_string can be constructed from a Value
+(provided that its rank and Cell types are correct). Most values are
+constructed sequentially and to simplify that, every value has a built-in
+iterator *Value::next_ravel()* which returns a pointer to the next
+not-yet-initialized Cell (if any) and 0 after the last Cell of the ravel
+was returned.
+
+TIP: A frequent pitfall related to the *Value::next_ravel()* iterator is to
+(mistakenly) use it for empty values.
+
+Empty APL values like *0⍴0* are never empty at the Cpp level because every APL
+value *V* has a _prototype_ *↑V* whose ravel has one item stored in *ravel[0]*.
+An old APL joke says _How many empty arrays does it take to fill a
+workspace? One, if it's big enough._ If a value *V* is empty, then *⍴V* is 0
+(i.e. its ravel has length 0) but length 1 at Cpp level (due to its prototype).
+For this reason, a *Value* has a *Value::element_count()*, which is the ravel
+length in APL, and a *Value::nz_element_count()* which is the ravel length in
+Cpp. The *Value::next_ravel()* iterator uses the former, which causes a
+segfault when used with an empty value. In short this means that APL values
+may be empty, but their Cpp implementation are never empty _and need to be
+properly initialized_. 
+
+CAUTION: This implies that a proper source code *loop()* over a ravel MUST
+either use *Value::nz_element_count()* (so that the prototype is being
+  initialized inside the loop), or else must have ruled out the empty
+case beforehand (and may then use *Value::element_count()* safely). 
+
+The typical design patterns are:
+
+----
+Value_P Z(...);   // may be empty
+
+   loop(z, Z->nz_element_count())   // not element_count() !!!
+       {
+         new (Z->get_wravel(z)) XxxCell(...));   // safe, but (next_ravel_XXX() is not)
+       }
+----
+
+and:
+
+----
+Value_P Z(...);   // may be empty
+
+   if (Z->element_count())   // not Z->nz_element_count() !!!
+      {
+        // Z is not empty
+        loop(z, Z->element_count())   Z->next_ravel_XXX(...)
+      }
+   else
+      {
+        new (Z->get_wproto()) XxxCell(...));   // init prototype
+      }
+----
+
+*Z->get_wproto()* is the same as *Z->get_wravel(0)* and is used here to make
+the role of *get_wravel(0)* as the prototype of Z explicit.
+
+==== class Value_P
+
+APL values are rarely copied but pointers to APL values are passed back and
+forth a lot in the interpreter (in more than 1200 source code locations),
+It is therefore easy to loose a Value, which then causes a memory leak. These
+memory leaks were a real plague in early GNU APL versions, but are now fixed
+by several counter-measures:
+
+* Cpp overloading of operators ::new() and ::delete(). Every newly allocated
+  Value, no matter if long or short, is tracked in a link list called
+  *DynamicObject::all_values*, see *DynamicObject.hh*
+* The APL command )CHECK compares the values that are are reachable from APL,
+  e.g. via token of class TC_Value, with the values in
+  *DynamicObject::all_values* and reports any mismatches as *stale values*.
+*  Every value tracks itself with a *ValueHistory* which is, for performance
+   reasons, disabled by default but can be enabled with *./configure*,
+   or with *make develop*.
+* a reference counter named *Value::owner_count* in combination with class
+  Value_P. A value is automatically deleted when its last owner (typically a
+  *Token* is deleted.
+* member *Value:: check_ptr* to detect double deletion or incorrect
+* overwriting or double deletion of a value. Every *Value* constructor sets
+  *check_ptr* to *(this * * 7)* which points into the middle of a *uint64*
+  (of member Value::shape). The destructor later checks that *check_ptr*
+  is still *(this * * 7)* (to detect overwriting) and clears it (to detect
+  double deletion). The *check_ptr*  is:
+** is different for every Value,
+** is a pointer that cannot occur otherwise,
+** becomes incorrect when the Value is incorrectly moved (e.g. with
+   *memcpy()*)
+
+Value_P is essentially a smart pointer (aka. shared pointer). A "normal" smart
+pointer typically consists of 2 pointers:
+* one pointing to the object itself, and
+* one to the reference counter that keeps track of the object's ownership
+  (aka. the reference counter)
+
+In contrast, the Value_P is a single pointer (to a Value), and the reference
+counter is allocated inside the value rather than somewhere else. The small
+advantage of a "normal" smart pointer is that they are not intrusive, which
+means that they can be used without any modifications of the object that they
+point to. But since we are in control of the Value class, this benefit does
+not really count and the smaller size of a Value_P outweighs the benefit of
+standard smart pointers. The Value_Ps are also more decoupled from each other;
+one can always construct a Value_P from a Value * (and vice versa). The
+most important member functions of Value_P are:
+
+* *Value_P()* : default constructor (points to no value)
+* *Value_P(Value * val, const char * loc)* : construct Value_P from a Value *
+* *Value_P(const Value_P & other, const char * loc)* : construct from *other*
+* *Value_P(const Shape & sh, const char * loc)* : construct Value_P to a new
+  value with shape *sh*. The ravel of that value is not (yet) initialized.
+* *inline Value_P(const UCS_string & ucs, const char * loc)* : construct an APL
+  text vector whose ravel Cells are initialized from the UCS_string,
+* *inline Value_P(const UTF8_string & utf, const char * loc)* : construct an APL
+  text vector whose ravel Cells are initialized from the UTF8_string. ⍴Value
+  is utf.size(), i.e. the UTF8 bytes are kept and no decoding into Unicodes is
+  performed
+* *void reset()* : decrement the owner-count and clear the pointer
+* *init_pointer()* reset() without decrementing the owner-count 
+* *void clear()* : reset and add an event to the ValueHistory (if enabled)
+* *bool operator +()* : *true* iff the pointer is valie (non-zero)
+* *bool operator !()* : *true* iff the pointer is invalie (zero)
+* *Value * operator->()* : return the Value * (to the Value)
+* *Value & operator*()* : return the Value & reference (of the Value)
+* *void increment_owner_count()* : dito.
+* *void decrement_owner_count()* : dito.
+* *void isolate(const char * loc)* : if the value has more than one owner then
+   clone (deep copy) the value and set pointer to the new copy.
+* *void move(Value_P_Base & other, const char * loc)* :
+** release ownership of the current pointer,
+** take ownership of other's pointer, and
+** reset other's pointer. This operation does not change the owner_count of
+  the object.
+
+All functions are inline an some can throw exceptions (primarily *WS FULL*).
+Note that some Value_P constructors above (e.g.
+*Value_P(const UCS_string & ucs, ...) initialize the entire Value (shape
+and ravel) while other (e.g. Value_P(const Shape & sh) only initialize the
+shape and leave the initialization of the ravel to the caller. In fact, the
+construction of a Value is always a two-step process (initializations of the
+shape followed by the initializations of the ravel) and the constructors that
+do both are mere convenience constructors for frequent cases. The following
+design pattern can found in many places:
+
+----
+Value_P Z(...);   // construct Z (with un-initialized ravel)
+   loop(x, z.element_count())   Z->next_ravel_XXX(...);   // initialize the ravel
+   Z->check_value(LOC)   // set checked flag, detect un-initialized ravel items
+   return Z;
+----
+
+The constructors for *Value*s are protected (with friend *Value_P*) to enforce
+that values are always constructed via *Value_P::Value_P(...)* rather than the
+corresponding *Value::Value(...)**. On the other hand, many functions use
+*const Value *" (note the const!) instead of *Value_P*, primarily for passing
+function arguments. This is safe and slightly more efficient if the called
+function does not modify the Value (and hence its ownership) passed as argument.
+
+==== Cloning of Values
+
+The cloning (deep aka. recursive) copying of a Value is somewhat expensive in
+terms of performance. Cloning is, however, only needed if the close is
+modified later (which would corrupt the original). When a *Value* is assigned
+to a Symbol (i.e. a variable) then it must be cloned because the variable may
+or may not be changed later. Think of a literal in a function body:
+
+----
+      ∇Z←FOO
+Z←1 2 3
+      ∇
+
+X←FOO ◊ X←4 5 6
+----
+
+If we would not clone the result of FOO, not be cloned before assigning it to
+X, then the subsequent assignment to X would modify the body of FOO and the
+next call of FOO would return 4 5 6.
+
+On the other hand:
+
+----
+      ∇Z←FOO
+Z←1 2 3
+      ∇
+
+X←1 + FOO ◊ X←4 5 6
+----
+
+is safe because the addition + does not modify the result of FOO but rather
+discard it immediately. GNU APL versions have always cloned values before
+assigning them (to be on the safe side). Current versions check how many
+owners a value has before coning them:
+
+----
+   Value.hh
+
+#define NEW_CLONE
+
+#ifdef NEW_CLONE   /* new clone() scheme */
+
+/// clone, given a Value_P. Result is a Value_P.
+# define CLONE_P(B_P, L)   (B_P)
+
+/// clone, given a const Value *. Result is a Value_P.
+# define CLONE(pB, L)      Value_P(const_cast<Value *>(pB), L)
+
+#else   /* old clone() scheme */
+
+/// clone, given a Value_P. Result is a Value_P.
+# define CLONE_P(B_P, L)   (B_P).get()->clone(L)
+
+/// clone, given a Value *. Result is a Value_P.
+# define CLONE(pB, L)      (pB)->clone(L)
+
+#endif
+----
+
+The rules are:
+
+* If a Cpp function knows from its context that cloning is not needed (like in
+  the second example above) then it may CLONE() and CLONE_P(). The behavior as
+  to if the cloning is actually performed, then depends on whether *NEW_CLONE*
+  is *#defined* or not. This could be a mistake and then not *#define*'ing
+  *NEW_CLONE* is a quick way to fall back to the old scheme.
+* Otherwise, _in particular if *#define NEW_CLONE* makes a difference_, the
+  function shall use Value->clone()* which clones unconditionally.
+
+== Symbols
+
+A symbol identifies an APL object, i.e. a defined function, a user defined
+variable, or a system variable (⎕-variable, e.g. ⎕IO). In GNU APL, system
+functions (⎕-functions, e.g. ⎕FX) are NOT symbols but *APL primitives*. The
+commonality between ⎕-functions and primitive is larger than the similarity
+between ⎕-variables and ⎕-functions. The primary difference between APL
+primitives and ⎕-functions is their name and the fact that the APL primitives
+are defined in the APL standard, while most ⎕-functions and ⎕-variables are
+not. They are used by APL interpreter vendors to extend their functionality
+(and to lock-in their customers). The C++ class hierarchy in GNU APL
+(excerpts, the full picture is shown in the .png files) are:
+
+----
+    html/classSystemVariable__inherit__graph.png:
+
+        ┌─────────────┐
+        │ NamedObject │
+        └─────────────┘
+               ↑
+           ┌────────┐
+           │ Symbol │
+           └────────┘
+               ↑
+      ┌────────────────┐
+      │ SystemVariable │
+      └────────────────┘
+               ↑
+     ┌───────────────────┐
+     │ NL-SystemVariable │
+     └───────────────────┘
+               ↑
+     ╔═══════════════════╗
+     ║ RO-SystemVariable ║
+     ╚═══════════════════╝
+----
+
+and:
+
+----
+    html/classFunction__inherit__graph.png:
+
+                                         ┌─────────────────────────────────┐
+                                         │           NamedObject           │
+                                         └─────────────────────────────────┘
+                                           ↑                             ↑
+                          ┌────────────────────────────────────┐     ┌────────┐
+                          │             Function               │     │ Symbol │
+                          └────────────────────────────────────┘     └────────┘
+                            ↑                                 ↑          ↑
+    ┌─────────────────────────────────────────────────────┐ ┌──────────────┐
+    │               PrimitiveFunction                     │ │ UserFunction │
+    └─────────────────────────────────────────────────────┘ └──────────────┘
+            ↑               ↑                   ↑                  ↑
+    ╔══════════════╗┌────────────────┐┌───────────────────┐    ┌───────┐
+    ║ QuadFunction ║│ ScalarFunction ││ NonscalarFunction │    │ Macro │
+    ╚══════════════╝└────────────────┘└───────────────────┘    └───────┘
+----
+
+Some explanations:
+
+*  the common base class *NamedObject*:
+** provides *virtual UCS_string get_name()* to obtain the name of the object.
+** virtual const Function * NamedObject::get_function() returns a
+   valid *Function ** for functions, otherwise 0.
+** virtual Symbol * NamedObject::get_symbol() returns a valid *Symbol ** for
+   symbols, otherwise 0.
+*  **SystemVariable**s are variables like *⎕IO*, *⎕FC*, ...
+*  **NL_SystemVariable**s are **N**on-**L**ocal system variables (for which
+   localizing is permitted, but has no effect): *⎕L*, *⎕R*, ...
+*  **RO_SystemVariable**s are **R**ead-**O**nly global system variables
+   (for which localizing makes no sense): *⎕AI*, *⎕ARG*, ...
+*  base class *Function* defines default behavior of (virtual eval_B(),
+   eval_XB(), eval_AB(), eval_AXB()...). The default behaviour is to throw a
+   *VALENCE ERROR*, and derived classes simply overload the eval_XXX()
+   functions that they implement.
+*  *QuadFunction*, *ScalarFunction*, and *NonscalarFunction* are groupings
+   that simplify the implementation. For example, all scalar functions are
+   implemented in the same way and only differ by their details at the Cell
+   level.
+*  **UserFunction**s are the only functions that are also Symbols (so that
+   their name appears in the symbol table. The system functions get their
+   name via their ID.
+*  *Macro* is a *UserFunction* that is defined and can only be used by the
+   interpreter itself. It cannot be called from APL programs and simplifies
+   built-in operators when they are called with *UserFunction* arguments
+   considerably. 
+
+
+Symbols are created when the tokenizer detects a name for the first time
+*SymbolTable::lookup_symbol()*, *SymbolTable::lookup_existing_symbol()*,
+and *SymbolTable::add_symbol()*. Every symbol has a stack
+*Symbol::value_stack* of *ValueStackItem*s, which is pushed when the
+symbol is localized (at the beginning of a defined function) and popped
+when the execution of the defined function ends. The *ValueStackItem* at the
+top of the *Symbol::value_stack*  defines the role (scope) that the symbol
+currently has. The possibilities are:
+
+----
+    NamedObject.hh:
+
+enum NameClass
+{
+  NC_INVALID          =  0x0100,   ///< invalid name class.
+  NC_UNUSED_USER_NAME =  0x0200,   ///< unused user name, not yet assigned
+  NC_LABEL            =  0x0401,   ///< Label.
+  NC_VARIABLE         =  0x0802,   ///< (assigned) variable.
+  NC_FUNCTION         =  0x1003,   ///< (defined) function.
+  NC_OPERATOR         =  0x2004,   ///< (defined) operator.
+  NC_SYSTEM_VAR       =  0x4005,   ///< system variable.
+  NC_SYSTEM_FUN       =  0x8006,   ///< system function.
+  NC_case_mask        =  0x00FF,   ///< almost ⎕NC
+  NC_bool_mask        =  0xFF00,   ///< for fast selection
+
+  NC_FUN_OPER         = (NC_FUNCTION | NC_OPERATOR) & NC_bool_mask,
+  NC_left             = (NC_VARIABLE         |
+                         NC_UNUSED_USER_NAME |
+                         NC_SYSTEM_VAR       |
+                         NC_INVALID          //  ⎕, ⍞, ⎕xx
+                        ) & NC_bool_mask
+};
+----
+
+The *NameClass* is equally well suited for C/Cpp *switch* statements (by using
+the lower byte) and for testing groups of **NameClass**es (by using the upper
+byte). After the tokenization (or localization) of a symbol it has has the
+NameClass *NC_UNUSED_USER_NAME*; this changes to e.g. *NC_VARIABLE* when a
+value is assigned to the symbol, or to *NC_FUNCTION* when a defined function
+with the name of the symbol is defined with *⎕FX* or the ∇-editor.
+
+The actual role of a user defined symbol can change over time, while the role
+of a system name is fixed and can not be changed. E.g. *⎕IO* is always a
+variable and *⎕UCS* is always a function.
+
+== Executables
+
+Every APL input line is first tokenized, and the result of this tokenization
+is an *Executable*. The primary content of any *Executable* is a *TokenString*
+named *body*:
+
+----
+   Token.hh:
+
+class Token_string : public  std::vector<Token> { ... }
+
+    Executable.hh:
+
+// Base class for ExecuteList, StatementList, and UserFunction
+class Executable
+{
+   ...
+   Token_string body;
+   ...
+}
+----
+
+The rest of class *Executable* are helper functions that support the
+execution of the raw *body*.
+
+There are 3 cases where **Executable**s are produced (in order of decreasing
+relevance):
+
+. The definition of a defined function, either interactively with the
+  ∇-editor, or programmatically in APL with *⎕FX*.
+. The evaluation of a single input line in immediate execution, and
+. The evaluation of an APL string with APL primitive ⍎ (aka. Execute).
+
+For each of these 3 cases (which also correspond to the *ParseMode* mentioned
+above), a corresponding class for that case is derived:
+
+----
+    Executable.hh:
+    ...
+class UserFunction : public Function, public Executable { ... }
+class StatementList : public Executable { ... }
+class ExecuteList : public Executable { ... }
+    ....
+----
+
+In some debug outputs, as well as in some commands and in ⎕SI, the derived
+class of a particular *Executable* is displayed as a single character like
+this:
+
+* class UserFunction: ∇
+* class StatementList: ◊
+* class ExecuteList: ⍎
+
+Each of a derived class has a static function *fix()* which creates an
+instance of that class. The *fix()* function acts as a constructor for
+the derived class. Unlike a normal constructor (which either returns a
+valid object of the class or else throws an execption, the *fix()*  function
+returns 0 if the construction fails (typically due to some SYNTAX ERROR in
+the input line(s) passed to it. The *fix()* functon of class  *UserFunction*
+is essentially the implementation of *monadic ⎕FX*, and is also called after
+the ∇-editor finalizes a function definition (trailing ∇).
+
+The main differences between the 3 classes are:
+
+[cols="<,^,^,^,^,^", options="header,autowidth"]
+|====
+| Derived Class | Number of lines | Statements/Line | Jumps/Labels +
+                | Arguments | Result
+| ExecuteList          | single line    | one     | no  | no  | yes
+| StatementList        | single line    | several | no  | no  | no
+| UserFunction ∇, ⎕FX  | multiple lines | several | yes | yes | yes
+| UserFunction { ... } | single line    | one     | no  | yes | yes
+|====
+
+=== The classes ExecuteList and StatementList
+
+The execution of **ExecuteList**s and **StatementList**s is rather simple:
+the tokens of their body are intepreter from the start of the body to its end,
+no arguments can be passed to the body, no change of the execution with
+branches (→N), etc..
+
+=== The class UserFunction
+
+Defined functions (class UserFunction) are far more complex. As can be seen
+above, class UserFunction inherits from the two classes *Function* and
+*Executable*.
+
+The inheritance from *Function* overrides its various virtual *eval_XXX()*
+functions, so that a defined function can be called like an APL primitive,
+The arity of a defined function (monadic, dyadic, operator etc.)
+is determined by the function header and since class UserFunction cannot know
+it before the header is parsed, it must overload all possible virtual
+*eval_XXX()* declared in base class *Function*.
+
+The inheritance from *Executable* provides the construction of the body
+(tokenization of the function lines (in class *Tokenizer*), pre-parsing (in
+class *Parser*), and some optimizations (also in class *Parser*).
+
+There are two aspects of class *UserFunction* that are not considered in 
+either of its base classes:
+
+* Local variables, and
+* Branches (→N)
+
+These aspects are implemented by means of two member variables
+* *vector<Function_PC> UserFunction::line_starts* is a jump table that
+  tells, for every function line N, which token is the start of line N in
+  the (linear) body of the executable. For APL jump statement, say *→N*,
+  *line_starts[N]* is the first token in line N and its execution simply
+  continues at token *body[line_starts[N]*.
+* when a defined function is called then its arguments (if any) are assigned
+  to the formal arguments declared in the function header and the local
+  variables in the header are pushed. This happens in member
+  *UserFunction::UserFunction_header header*, which is a functional grouping
+  of the somewhat large class *UserFunction*.
+
+Let:
+
+----
+∇Z←A SUM B;C;D
+ Z←A + B
+∇
+----
+
+The typical life-cycle of Userfunction SUM is then:
+
+. The *Userfunction* named *SUM*,  is created with the ∇-editor or with *⎕FX*
+  (which calls *Userfunction::fix()*).
+. The APL pattern matching (*Prefix.cc*) detects a call of *SUM*,
+  say pattern *3 SUM 42*.
+. The function is called:
+.. Symbols *Z*, *A*, *B*, *C*, and *D* are pushed (and become, at this
+   point in time, temporarily undefined).
+.. The actual arguments *2* and *42* of *SUM* are assigned to the formal
+   arguments *A* and *B* of *SUM*. that is, *A←3 ◊ B←42*; *C* and *D* remain
+   unassigned.
+.. The *Executable::body* is executed. This computes *Z←45*.
+. At some point in time *SUM* returns (either when the end of the body is
+  reached, or the when execution is stopped explitly (e.g. *→0*).
+.. The current value of *Z* (if any) is set aside (and will later be
+   returned to the caller).
+.. The Symbols *Z*, *A*, *B*, *C*, and *D* are poped again (restored).
+.. The pattern matched above (*3 FOO 42*) is replaced by former value
+   of *Z* (i.e. *45*).
+
+
+=== Ravel Cells
+
+The ravel of every *Value* is simple C array and not a Cpp
+*std::vector<Cell>*. The alternative std::vector<Cell>* has some performance
+penalties when used for the ravel of a *Value*:
+* destructor calls for every Cell when the vector<> is destructed, and
+* no support for short values.
+The other alternative, linked list of *Cell*s, was also not an option due to
+their overhead in memory allocation (one *new()* *delete()* per Cell. The
+huge number of Cells in a typical APL program on the one hand, and the typical
+operations performed with the Cells on the other, result in in the following,
+somewhat conflicting requirements:
+
+* fixed *Cell* size
+* different cell contents (character, integer, float, complex, and nested) to
+  support mixed APL values. In the old APL1 all values were homogeneous (and
+  the type was a property of the value resp. its ravel). In APL2 the type
+  became a property of the ravel Cells. Some APL interpreters optimize for
+  the case of homogeneous ravels (probably a fair guess for APL2 programs
+  inherited from an APL1 code base) while GNU APL assumes mixed APL values as
+  the default. Both assumptions (homogeneous vs. mixed) have advantages and
+  drawbacks:
+** homogeneous arrays are faster to process, but this fires back when the
+   automatic type conversion of APL (bool to integer, integer to float, float
+   to complex takes place.
+** loops in the mixed case for scalar functions become much simpler because
+   the different combinations of types (e.g. Boolean + Boolean, Boolean +
+   integer, integer + integer, ...). Making e.g. dyadic *+(A, B)* a
+   virtual member function *B.+(A)* of *B* and monadic +(B) a virtual member
+   function *(B.+()* of *B*, removes two case statements (with the dyadic
+   one being quite ugly).
+
+The base class *Cell* therefore defines a pretty large number of virtual
+functions (a monadic and a dyadic one for each of the scalar APL functions:
+
+----
+   Cell.hh:
+
+   ...
+   virtual ErrorCode bif_ceiling(Cell * Z) const
+   virtual ErrorCode bif_conjugate(Cell * Z) const
+   virtual ErrorCode bif_direction(Cell * Z) const
+   ...
+   virtual ErrorCode bif_add(Cell * Z, const Cell * A) const
+   virtual ErrorCode bif_and(Cell * Z, const Cell * A) const
+   virtual ErrorCode bif_and_bitwise(Cell * Z, const Cell * A) const
+   ...
+----
+
+The base class *Cell* is inherited by the following derived classes:
+
+* *CharCell*, their relevant content is a single 32-bit Unicode,
+* *IntCell*, their relevant content is a single 64-bit signed integer,
+* *RealCell*, their relevant content is a 64-bit floating point numbers,
+* *ComplexCell*, their relevant content is two 64-bit floating point numbers
+* *NumericCell*, the base class of *IntCell*, *RealCell*, and *ComplexCell*.
+   Many Cell functions are almost identical for these base classes and these
+   functions are implemented in *NumericCell* rather than implementing a
+   copy in each base class. The simple trick that replaces hundreds of
+   C/Cpp *switch* statements and *case*s is this:
+** base class *Cell* implements virtual functions that either throws a 
+   *DOMAIN ERROR* (e.g. for a character to  integer conversion) or else
+   return the desired type:
+*** virtual Unicode get_char_value() const   { DOMAIN_ERROR; }
+*** virtual APL_Integer get_int_value() const   { DOMAIN_ERROR; }
+*** virtual APL_Float get_real_value() const   { DOMAIN_ERROR; }
+*** virtual APL_Float get_imag_value() const   { DOMAIN_ERROR; }
+*** virtual Value_P get_pointer_value()  const   { DOMAIN_ERROR }
+*** virtual Cell * get_lval_value() const   { LEFT_SYNTAX_ERROR; }
+** the derived classes then overload all access functions that they support.
+   For example,
+*** *CharCell* overload only *get_char_value()*
+*** all *NumericCell*s overload *get_int_value()*, *get_real_value()*,
+    and *get_imag_value()* but not *get_char_value()*,
+*** etc.
+
+* *PointerCell*, their relevant content is a (nested) APL sub value.
+* *LvalCell*, their relevant content is a *Cell* pointer. These *Cell*s are
+  used to implement "selective specification*. A selective specification like
+  *(2⍴1↓A)←B* starts with (all *Cell*s of) its the rightmost variable *A*,
+  which is then more and more reduced (by *1↓* and *2⍴*) before the new
+  value B can be assigned to the Cells that survive.
+
+Instead of declaring the data members of Cells in the derived class (the
+normal approach, i.e. APL_Integers as member of  IntCells, APL_Float members
+in FloatCells, etc. they are declared as a union in the base Class Cell:
+----
+   Cell.hh:
+   ...
+   /// A union containing all possible cell values for the different Cell types
+   union SomeValue
+      {
+        Unicode        aval;      ///< for CharCell
+        APL_Float_Base cval[2];   ///< for ComplexCell
+        ErrorCode      eval;      ///< an error code
+        APL_Integer    ival;      ///< for IntCell
+        Cell          *lval;        ///< for LvalCell (selective assignment)
+        ...
+      };
+----
+
+This union ensures that all derived classes have the same size.
+
+Now back to the Cell functions. We take dyadic *A + B* and monadic *+ B*
+as an example, all other scalar APL functions follow suit:
+
+. Every scalar APL function is implemented in a separate associated class,
+  derived from base *class ScalarFunction*. GNU APL uses the naming convention
+  that the class name starts with *Bif_*, followed by the function arity
+   (*F12_* for nomadic functions, *F2_* for purely dyadic functions).
+. The interpreter creates a single static instance of each function (such
+  static instances are initialized by the compiler before main() is executed).
+  The instance is always called *fun*, here *Bif_F12_PLUS::fun*. At the same
+  time, a pointer *_fun* is created.
+. The single instance of the class is needed because the base class
+  *Function* of class *ScalarFunction* has virtual functions (which is
+  impossible for fully static classes). See <<_functions, Functions>> below
+  for details.
+. The *eval_XXX()* functions like *Bif_F12_PLUS::eval_AB()* are implemented
+  an inline function calls to ScalarFunction::eval_scalar_AB() which takes
+  the  Cell function *Cell::bif_add* that distinguishes the behaviors of the
+  (in total many) single instances of the classes derived from
+  *ScalarFunction*.
+. The naming convention is that the virtual *Cell* functions is
+  *Cell::bif_YYY*.
+. In short: base class *ScalarFunction* is essentially an iterator over the
+  ravels the value arguments provided, and the difference between the derived
+  functions are handled at the Cell level by means of different Cell
+  functions.
+. While this may look a little complicated at the first glance, it is fairly
+  efficient at runtime and saves a lot of mindless work for the GNU APL
+  designer.
+. To summarize the example:
+----
+   ScalarFunction.hh:
+   ...
+   ///
+class Bif_F12_PLUS : public ScalarFunction
+{
+   ...
+  /// overloaded Function::eval_B().
+   virtual Token eval_B(Value_P B) const
+      { return eval_scalar_B(B, &Cell::bif_conjugate); }
+
+   /// overloaded Function::eval_AB().
+   virtual Token eval_AB(Value_P A, Value_P B) const
+      { return eval_scalar_AB(A, B,
+               inverse ? &Cell::bif_add_inverse : &Cell::bif_add); }
+   ...
+   static Bif_F12_PLUS * fun;           ///< Built-in function.
+   static Bif_F12_PLUS  _fun;           ///< Built-in function.
+};
+
+----
+
+=== APL Functions
+
+APL knows two types of functions:
+
+* APL primitives (functions and operator) and system functions. They are
+  defined by the interpreter itself and are implemented in Cpp, and
+* defined functions, They are defined by the APL programmer.
+
+Every function has a *signature* that defines the combination of arguments
+that the function can be called with.  The total number of possible
+signatures is somewhat large, but a single functions only implement a
+rather small subset of them and returns a *VALENCE ERROR* when
+the *Prefix* parser calls a function with a signature that the called
+function does hot support. In GNU APL the signature is a bitmap
+of *signature atoms* where every atom corresponds to a possible
+position of an argument in a *Prefix* pattern. However, not all
+possible bitmaps are valid signatures (e.g. a function with a left
+argument but no right argument):
+
+----
+   APL_types.hh:
+   ...
+/// signature of a defined function
+enum Fun_signature
+{
+   // signature atoms
+   //
+   SIG_NONE            = 0,      ///< 
+   SIG_Z               = 0x01,   ///< function has a result
+   SIG_A               = 0x02,   ///< function has a left argument
+   SIG_LO              = 0x04,   ///< operator left operand
+   SIG_FUN             = 0x08,   ///< function (always set)
+   SIG_RO              = 0x10,   ///< operator right operand
+   SIG_X               = 0x20,   ///< RO has an axis
+   SIG_B               = 0x40,   ///< function has a right argument
+
+  // operator variants
+   //
+   SIG_FUN_X           = SIG_FUN | SIG_X,     ///< function with axis
+   SIG_OP1             = SIG_LO  | SIG_FUN,   ///< monadic operator
+   SIG_OP1_X           = SIG_OP1 | SIG_X,     ///< monadic operator with axis
+   SIG_OP2             = SIG_OP1 | SIG_RO,    ///< dyadic operator
+   SIG_LORO            = SIG_LO  | SIG_RO,    ///< monadic or dyadic operator
+
+   // argument variants
+   //
+   SIG_NIL             = SIG_NONE,            ///< niladic function
+   SIG_MON             = SIG_B,               ///< monadic function or operator
+   SIG_DYA             = SIG_A | SIG_B,       ///< dyadic function or operator
+
+   // allowed combinations of operator variants and argument variants...
+
+   // niladic
+   //
+   SIG_F0              = SIG_FUN | SIG_NIL,             ///< dito
+
+   SIG_Z_F0            = SIG_Z   | SIG_F0,              ///< dito
+
+   // monadic
+   //
+   SIG_F1_B            = SIG_MON | SIG_FUN,             ///< dito
+   SIG_F1_X_B          = SIG_MON | SIG_FUN_X,           ///< dito
+   SIG_LO_OP1_B        = SIG_MON | SIG_OP1,             ///< dito
+   SIG_LO_OP1_X_B      = SIG_MON | SIG_OP1_X,           ///< dito
+   SIG_LO_OP2_RO_B     = SIG_MON | SIG_OP2,             ///< dito
+
+   SIG_Z_F1_B          = SIG_Z   | SIG_F1_B,            ///< dito
+   SIG_Z_F1_X_B        = SIG_Z   | SIG_F1_X_B,          ///< dito
+   SIG_Z_LO_OP1_B      = SIG_Z   | SIG_LO_OP1_B,        ///< dito
+   SIG_Z_LO_OP1_X_B    = SIG_Z   | SIG_LO_OP1_X_B,      ///< dito
+   SIG_Z_LO_OP2_RO_B   = SIG_Z   | SIG_LO_OP2_RO_B,     ///< dito
+
+   // dyadic
+   //
+   SIG_A_F2_B          = SIG_DYA | SIG_FUN,             ///< dito
+   SIG_A_F2_X_B        = SIG_DYA | SIG_FUN_X,           ///< dito
+   SIG_A_LO_OP1_B      = SIG_DYA | SIG_OP1,             ///< dito
+   SIG_A_LO_OP1_X_B    = SIG_DYA | SIG_OP1_X,           ///< dito
+   SIG_A_LO_OP2_RO_B   = SIG_DYA | SIG_OP2,             ///< dito
+
+   SIG_Z_A_F2_B        = SIG_Z   | SIG_A_F2_B,          ///< dito
+   SIG_Z_A_F2_X_B      = SIG_Z   | SIG_A_F2_X_B,        ///< dito
+   SIG_Z_A_LO_OP1_B    = SIG_Z   | SIG_A_LO_OP1_B,      ///< dito
+   SIG_Z_A_LO_OP1_X_B  = SIG_Z   | SIG_A_LO_OP1_X_B,    ///< dito
+   SIG_Z_A_LO_OP2_RO_B = SIG_Z   | SIG_A_LO_OP2_RO_B,   ///< dito
+};
+   ...
+----
+
+There are 0x80 = 128 possible signature bitmaps of which 22 are valid.
+
+The base class *Function* of all functions has a non-virtual function
+*get_signature()* which is computed from some virtual functions related to
+signature atoms:
+
+----
+   Function.cc:
+   ,,,
+un_signature
+Function::get_signature() const
+{
+int sig = SIG_FUN;
+   if (has_result())   sig |= SIG_Z;
+   if (has_axis())     sig |= SIG_X;
+
+   if (get_oper_valence() == 2)   sig |= SIG_RO;
+   if (get_oper_valence() >= 1)   sig |= SIG_LO;
+
+   if (get_fun_valence() == 2)    sig |= SIG_A;
+   if (get_fun_valence() >= 1)    sig |= SIG_B;
+
+   return Fun_signature(sig);
+}
+
+----
+
+System functions do not use signatures because their classes know the
+signatures that they support already at compile time. Defined functions
+are different because all are handled by the same class UserFunction
+even though the signatures of the different are defined by the user in
+the function header and the signatures differ. The only class that cares
+for the signature (of its left function argument) is *Bif_OPER1_EACH*.
+
+For every signature *XXX* that a function class supports it must overload
+the corresponding *eval_XXX()* function. In our example, primitive '*+*'
+supports monadic *+B* and dyadic *A+B*. It therefore  overloads
+*eval_B()* and *eval_AB()*. Likewise is the axis variant A[X] overloaded
+with *eval_AB()* and then delegated to their companions in class
+*ScalarFunction*.
+
+----
+   ScalarFunction.hh:
+   ...
+   class Bif_F12_PLUS : public ScalarFunction
+   {
+   ...
+  virtual Token eval_B(Value_P B) const
+      { return eval_scalar_B(B, &Cell::bif_conjugate); }
+
+   /// overloaded Function::eval_AB().
+   virtual Token eval_AB(Value_P A, Value_P B) const
+      { return eval_scalar_AB(A, B,
+               inverse ? &Cell::bif_add_inverse : &Cell::bif_add); }
+   ...
+   }
+----
+
+NOTE You may wonder what the matter with *bif_add_inverse()* is. Some
+primitives have an inverse function which, if present, can be used by the
+dyadic operator *⍣* (power operator, not to be confused with the power
+function *⋆*) for negative power arguments. The inverse of *A+B* is
+*A-B* because A = (A+B)-B. Most of the circular functions "A○B" have
+inverse functions while most others do not. The power operatir is, for good
+reasons, neither defined in the ISO APL standard, nor in the IBM APL2 language
+reference, but implemented in GNU APL. Avoid it where possible.
+
+To summary the execution of APL functions:
+
+. The Prefix parser matches a pattern, for example *A F B*.
+. The reduce function for the pattern A F B is *reduce_A_F_B()*.
+.  The *Function ** in token *F* is e.g. *Bif_F12_PLUS::fun*.
+. The pattern also implies that the eval_AB() function of *F*, i.e.
+  Bif_F12_PLUS::fun->eval_AB(A, B) shall be called in order to prduce the
+  reduction result.
+. *Bif_F12_PLUS::fun->eval_AB()* is inlined and calls
+  *ScalarFunction::eval_AB()*  with argument *Cell::bif_add*. It returns
+  some result Z.
+. The Prefix parser replaces *A F B* with *Z* which finalizes the execution of
+  Z.
+
+All other derivates of class *Function* are executed in the same fashion.
+
+== Parallel (Multi-Core) Execution
+
+Parallel execution of APL has a longer history.
+
+=== Background
+
+In the early 1980s the author learned APL (after ALGOL, Assembler, and BASIC,
+and before C. Cpp was in its early days and not (yet) commercially available.
+The platform was an IBM 5110 desktop, a precursor of the IBM PC which came
+later. C compilers and APL interpreters were expensive and the IBM 5110 was
+slow, in particular in comparison with Assembler or compiled languages like C
+on comparable platforms.
+
+Shortly after the owner of the IBM 5110 replaced it with a faster 16-bit
+machine (a Motorola 68000 CPU with an APL 68000 interpreter (today named APL-X)
+and multi-user capabilities). APL performance was still an issue.
+
+To address the performance issue, the author undertook the construction of a
+parallel APL computer. The first draft architectur was based on
+**Transputer***, a brand new CPU technology at that time (which died out
+shortly after). The advantage of Transputers was that every CPU had 4 fast
+communication channels which could be connected to neighboring Transputers.
+The resulting topology is then a torus (a mesh with the leftmost Transputers
+connected to the corresponding rightmost Transputers and the top Transputers
+connected to the bottom Transputers):
+
+----
+    4×4 Transputer Torus
+
+    ┌─────┐   ┌───┐   ┌───┐   ┌───┐ 
+    │ ┌───────────────────────────────┐
+    │ │ ╔═╧═╗   ╔═╧═╗   ╔═╧═╗   ╔═╧═╗ │
+    │ └─╢ T ╟───╢ T ╟───╢ T ╟───╢ T ╟─┘
+    │   ╚═╤═╝   ╚═╤═╝   ╚═╤═╝   ╚═╤═╝  
+    │ ┌─  │       │       │       │  ─┐
+    │ │ ╔═╧═╗   ╔═╧═╗   ╔═╧═╗   ╔═╧═╗ │
+    │ └─╢ T ╟───╢ T ╟───╢ T ╟───╢ T ╟─┘
+    │   ╚═╤═╝   ╚═╤═╝   ╚═╤═╝   ╚═╤═╝  
+    │ ┌─  │       │       │       │  ─┐
+    │ │ ╔═╧═╗   ╔═╧═╗   ╔═╧═╗   ╔═╧═╗ │
+    │ └─╢ T ╟───╢ T ╟───╢ T ╟───╢ T ╟─┘
+    │   ╚═╤═╝   ╚═╤═╝   ╚═╤═╝   ╚═╤═╝  
+    │ ┌─  │       │       │       │  ─┐
+    │ │ ╔═╧═╗   ╔═╧═╗   ╔═╧═╗   ╔═╧═╗ │
+    │ └─╢ T ╟───╢ T ╟───╢ T ╟───╢ T ╟─┘
+    │   ╚═╤═╝ │ ╚═╤═╝ │ ╚═╤═╝ │ ╚═╤═╝  
+    └─────┘   └───┘   └───┘   └───┘    
+----
+
+Another architecture that was initially considered was the Intel Hypercube.
+However, neither the Transputer torus nor the Intel Hypercube seemed to fit
+APL very well. We therefore decided to develop our own architecture named
+DATIS-P (derived from the first names of the students that developed the
+hardware and software development of the DATIS-P and probably the last name
+of the author. The developers were (in DATIS-P order):
+**D**ieter Scheerer <<Sch>>,
+**A**ndreas Gergen <<Ger>>,
+**T**homas Mörsdorf <<Mör>>, and last but not least
+**I**na Gläs <<Glä>>.
+The DATIS-P was prepared for 256 CPUs, but for budget reasons our
+prototype had only 32 CPUS. The power consumption was about 50 Ampere
+at 5 Volts (which blew the fuses of our lab when we turned it on for
+the first time). The size was 3 19 inch cabinets (roughly the size of
+a mainframe at that time).
+
+The most challenging part of the DATIS-P was its communication network. Its
+structure was a 3-stage permutation network as invented by *Waksman*. Since
+no suitable technology existed at that time we developed an ASIC (a 1-bit wide
+8×8 crossbar; the network for 32 CPUs was 8-bit wide and was comprized of
+8-bit × 3 stages × 4 width = 96 such ASICs. The 3 stages were pipelined,
+a reconfiguration of the network to an arbitrary permutation of the inputs
+was done in parallel by all CPUs and took only 3 CPU instriuctions. The
+communication bandwith was 2 CPU instructions per byte (one MOVE.B instruction
+to write into the network and one MOVE.B to read the byte (written by some
+other CPU) back. The total bandwidth of the network of our 32-CPU machine was
+therefore (16 MHz clock) ÷ (3 clocks per MOVE.B) ÷ (2 MOVE.B per transfer) =
+2.6 MByte/s or 21 MBit/s per CPU = 670 MBit/s for the entire network (a lot
+at that time). The bandwidth of the DATIS-P scales linearly with the number
+of CPUs, therefore a 256 CPU machine would have had a total communication
+bandwidth of 5.3 Gigabit/s.
+
+The architecture of the DATIS-P is:
+----
+           Entire DATIS-P                      One CPU
+           ──────────────                      ───────
+
+    ┌──────────────────────────┐               network       ┌───┐
+    │   Permutation Network    │                  │        ┌─┤CP1│
+    └──┬────────┬───────────┬──┘           ╔══════╧══════╗ │ └───┘
+       │        │           │              ║ MC68020 CPU ╟─┤ ┌───┐ 
+    ╔══╧══╗  ╔══╧══╗     ╔══╧══╗           ║    16 MHz   ║ ├─┤CP2│
+    ║ CPU ║  ║ CPU ║ ... ║ CPU ║           ╚══════╤══════╝ │ └───┘
+    ╚══╤══╝  ╚══╤══╝     ╚══╤══╝                  │        │  ...
+       │        │           │              ┌──────┴──────┐ │ ┌───┐
+       └────────┴─┬─────────┘              │ static RAM  │ └─┤CP8│
+                  │                        │   1 MByte   │   └───┘
+               ╔══╧══╗                     └──────┬──────┘ 
+               ║ CPU ║                            │
+               ╚═════╝                          Master
+----
+
+An entire DATIS-P consists of:
+
+* The permutation network,
+* 32 worker CPUs, and
+* one master CPU. This master CPU does the APL interpretation and delegates
+  all ravel computations to the worker CPUs. To support scalar extensions
+  like *1 + 2 3 4 5* ... the master was avle to broadcast the scalar 1 into
+  the dual port memories of the worker in a single instruction.
+
+Every CPU of the DATIS-P:
+
+* was a Mototola 68020 processor (the cutting edge when the development
+  of DATIS-P started),
+* had up to 8 numerical co-prozessors MC 68881 to boost the floating point
+  performance
+* A dual-port 1 MByte static memory; one port connected to the local CPU the
+  other to the Master CPU.
+
+The development of the hardware (PCB designs, ASIC design) and the sortware
+took from 1985 to 1989; the author was managing the hardware development
+and finished a Ph.D thesis about the parallel algorithms for the DATIS-P in
+1990 <<Sau>>.
+
+The main result of the thesis was:
+
+───────────────────────────────────────────────────────────────────────────────
+
+On the DATIS-P architecture with P processors:
+
+* All scalar APL functions can be computed in parallel with a speedup
+  of *O(P)*. That is, the performance of every scalar function scales linearly.
+* Most of the non-scalar  APL function can be computed in parallel with
+  speedup *O(P÷log P)*. That is, the other functions scale almost linearly.
+* The remaining non-scalar functions are those that require sorting.
+  Their speedup is *O(P÷log²P)* (using Batcher's Bitonic Sort).
+* There is one exception which may happen for particular index vectors *X* in
+  the indexed assignment *A[X]←B*, in the indexed reference *A←B[X]*, and
+  functions derived from them, e.g. *X/B*. If the index vector *X* is such
+  that all ravel items of A are concentrated on the same worker CPU, then
+  the speedup can degrade down to *O(1)* beause that worker CPU has to do
+  all of the work while the others are idle. Usually, though, the speedup
+  is *O(P÷log²P)* i.e. like the sorting functions ⍋ and ⍒. These days one
+  can use P-RAM machines that do not suffer from this problem, but at that
+  time P-RAMs were not available.
+
+───────────────────────────────────────────────────────────────────────────────
+
+The benchmarks perfomed on the DATIS-P essentially confirmed the predictions
+of the Ph.D. thesis. Since we had no APL interpreter at that time, we only
+implemented the most important parallel algorithms performed by the workers.
+The implementation languages were C on the master and Assembler on the workers.
+
+These result were also submitted to the 1990 APL conference in Copenhagen,
+Denmark. Without any feedback. The author therefore pursued a career in
+tetecommunications.
+
+Around 2000, the author came across a PC demo version of IBM APL2 and
+played a little with it. However, the license cost for a full version
+was entirely out of range for a private user. At about the same time
+he worked with Unicode, UTF8-encodings and the like and discovered that
+all APL characters were available in Unicode. Probably at that time the
+idea of writing an own APL interpreter began to mature.
+
+Around 2008, the first version of the interpreter was ready. It was not
+yet a GNU project and not very stable either.
+
+In 2013 the interpreter was accepted by the GNU project and became GNU APL.
+Version 1.0 was sort of stable (i.e. crashed not immediately), but still
+buggy (primarily suffering from memory leaks).
+
+In 2014, multi-core support (parallel APL) was added. However, only the
+APL workhorses (i.e. scalar functions and their outer products) were
+parallelized and benchmarked. The results were somewhat disappointing
+and suggested that non-scalar functions will not gain much by parallization.
+They are memory bound (as opposed to the more compute bound scalar functions)
+The main reason seems to be that the interface between the CPU cores and
+the memory does not scale with the number of cores so that the cores are
+competing for memory access. In contrast, the DATIS-P had only local
+memories whose total bandwidth grows linearly with the number of CPUs.
+
+=== Programming
+
+NOTE: Parallel APL is a purely experimental feature that should not be used
+for production code; expect crashes from time o time.
+
+The details are described in a separate document *Parallel-APL.html*, which
+is shipped with GNU APL in the same directory as this document.
+
+== Exercise 1
+
+We conclude our journey throgh the GNU APL source code with a little exercise
+for the alert reader:
+
+_Add a new monadic system function named *⎕FOO* to GNU APL. *⎕FOO* takes a
+ 1-item integer argument *B* and returns the APL value (string) "FOO-B"._
+
+You may look backwards in this document and consult the GNU APL source code,
+but not peek into the solution scetch below, If you stuble over something that
+is not properly described above then please report that on
+mailto:bug-apl@gnu.org.
+
+=== Solution (sketch with comments)
+
+. Add a symbol *FOO* to *src/Id.def:*
++
+----
+qf( FOO                , "⎕FOO"    ,          )
+----
++
+The proper position of *FOO* in *Id.def* is important (after the last
+⎕-symbol group that starts with *F*, i.e. after the *⎕FFT* line.
+
+. Add a header file *src/Quad_FOO.hh* like this:
++
+----
+#ifndef __Quad_FOO_HH_DEFINED__
+#define __Quad_FOO_HH_DEFINED__
+
+#include "QuadFunction.hh"
+...
+
+class Quad_FOO : public QuadFunction
+{
+public:
+   /// Constructor.
+   Quad_FOO()
+      : QuadFunction(TOK_Quad_FOO),
+        system_wisdom_loaded(false)
+   {}
+
+   static Quad_FOO * fun;          ///< Built-in function.
+   static Quad_FOO  _fun;          ///< Built-in function.
+
+protected:
+   /// overloaded Function::eval_B()
+   Token eval_B(Value_P B) const;
+
+   ...
+};
+
+#endif // __Quad_FOO_HH_DEFINED__
+----
++
+Since *⎕FOO* is monadic, we have one handler eval_B(Value_P B), which
+overloads *virtual Function::eval_B()* iin *Function.hh* and causes our
+*Quad_FOO::eval_B* to be called instead of *eval_B()* of the base class. If
+*⎕FOO* should support more signatures then it is better to add them at a later
+point in time.
+
+. Add a Cpp source file *src/Quad_FOO.cc* like this:
++
+----
+#include "Quad_FOO.hh"
+
+Quad_FOO  Quad_FOO::_fun;
+Quad_FOO * Quad_FOO::fun = &Quad_FOO::_fun;
+
+//-----------------------------------------------------------------------------
+Token
+Quad_FOO::eval_B(Value_P B) const
+{
+Value_P Z(LOC);                       // makes Z an APL scalar,
+   Z->next_ravel_int(42);             // which is the integer 42
+   Z->check_value(LOC);               // check Z and set its Z->VF_complete flag
+   return Token(TOK_APL_VALUE1, Z);   // return the result.
+}
+//-----------------------------------------------------------------------------
+----
++
+We have not (yet) implemented the requested functionality in
+*Quad_FOO::eval_B()*. It makes life easier to first integrate *⎕FOO* into the
+GNU APL frameworki (and test the intergarion), and to add the funvtionality
+later on.
+
+. When using SVN then add the new files to the repository:
++
+----
+$ svn add Quad_FOO.cc Quad_FOO.hh
+$ svn commit -m "new file"
+----
+
+. Add the following line to several source files:
++
+----
+#include "Quad_FOO.hh"
+----
++
+This makes the new declarations available in the *.cc* files that need it.
+The files concerned are:
++
+.. src/Archive.cc
+.. src/Id.cc
+.. src/QuadFunction.cc
+.. src/Workspace.cc
+
+. update *Makefile.am*.
+.. add the new files *Quad_FOO.cc* and *Quad_FOO.hh* to the make variable
+   *common_SOURCES* in *src/Makefile.am*:
++
+----
+   Quad_FOO.cc Quad_FOO.hh
+----
++
+keep *src/Makefile.am* sorted alphabetically and indented in the same way as
+the other files.
+
+.. (re-)run *autoreconf* (in the GNU APL top-level directory)
++
+----
+ $ autoreconf
+----
++
+This creates a new *src/Makefile.in* from *src/Makefile.am*, and
+
+.. (re-)run *./configure* (also in the GNU APL top-level directory).
++
+----
+ $ ./configure
+----
++
+This includes the new files in *src/Makefile* so that they are being
+properly compiled and linked.
+
+. Add a *TD()* macro for *⎕FOO* in *src/Token.def*:
++
+----
+TD(TOK_Quad_FOO      , TC_FUN1      , TV_FUN  , ID::Quad_FOO     )
+----
++
+This defines a new Token with token class *TC_FUN1*, value type *TV_FUN* i.e.
+ *Function* (-pointer), and ID *ID::Quad_FOO*. Note that:
++
+.. *TC_FUN1* is an alias for *TC_FUN12* (and so is *TC_FUN2*. These aliases
+ are used to make explicit that ⎕FOO is monadic. If you should add a dyadic
+ signatore later on then change the token class to *TC_FUN12*.
++
+.. Since *src/Token.def* is a *.def* file, it will be *#inluded* by several
+  *.cc* files and magically insert the new token in several source files.
+
+. Add a *sf_def()* macro to *src/SystemVariable.def*:
++
+----
+  sf_def(Quad_FOO,   "FOO",   "Definitely not ⎕BAR"          )
+----
++
+This takes care of a number of things:
++
+.. )SAVE of functions in *.xml* workspace snapshots,
+.. Tab expansion of ⎕-function names,
+.. update of the *)HELP* command (short help text), and
+.. Instatiation in workspaces.
++
+. and finally: increment *ASX_MINOR* minor in *enum ArchiveSyntax* in file
+  *src/Archive.hh*. Adding ⎕-functions to GNU is a backward compatible change
+  of the *.xml* file format. The new interpreter can *)LOAD* files that were
+  **)SAVE**d with older versions, but not vice versa. Incrementing *ASX_MINOR*
+  will then issue a warning in older (and not too old) interpreters.
+
+. After these changes you can build and test if the new intepreter compiles
+  and works (if not then the author has missed something above).
++
+----
+$ make
+$ src/apl
+
+      ⎕FOO 5
+42
+----
+
+. If so, then we can add some more beef into *Quad_FOO::eval_B()*:
++
+----
+#include "Quad_FOO.hh"
+
+Quad_FOO  Quad_FOO::_fun;
+Quad_FOO * Quad_FOO::fun = &Quad_FOO::_fun;
+
+//-----------------------------------------------------------------------------
+Token
+Quad_FOO::eval_B(Value_P B) const
+{
+   // check that B is a 1-item integer 
+   //
+   if (B->element_count() != 1)   // rank or length error
+      {
+        if (B->get_ranke() != 1)   RANK_ERROR;
+        else                       LENGTH_ERROR;
+      }
+
+const Cell & B0 = B->get_cfirst();          // first item in B
+const APL_Integer b = B0.get_int_value();   // DOMAIN_ERROR for non integers
+UCS_string z("FOO-");                       // z is string "FOO-"
+   z.append_number(b);                      // now z is e.g. "FOO-42"
+
+Value_P Z(z);                         // constructor: APL value from string
+   return Token(TOK_APL_VALUE1, Z);   // return the result.
+}
+//-----------------------------------------------------------------------------
+----
+
+== Exercise 2
+
+This exercise is similar to <<Exercise 1>> above, but this time we want to
+create a system variable instead of a system function:
+
+_Add a new system variable named *⎕FOO* to GNU APL so that:_
+
+* _*⎕FOO←B* with 1-item integer B shall remember B, while_
+* _*Z←⎕FOO* shall be the APL value (string) "FOO-B"._
+
+System variables are inherently more complex than system variables because 
+most system functions are stateless, while system variables typically have
+state that needs to be )SAVEd in workspaces.
+
+=== Solution (sketch with comments)
+
+The solution is for the most part, similar to the previoius example. We
+therefore only discuss the differences.
+
+*  System variables are (directly or indirectly) derived from class
+   *SystemVariable*, while system functions are derived from class *Function*.
+   System functions overload one or more (virtual) *eval_XXX()*, while system
+   variables overload the virtual;
+** *Value_P get_apl_value() const*, used when the variable is referenced,
+** *assign(Value_P B, ...)*, used when the variable is assigned,
+** possibly **assign_indexed()* for indexed assignment (if the variable
+   supportes it), and
+** possibly *push()* and *pop()* functions if the variable can be localized.
+** Therefore *Quad_FOO.hh* reads:
+----
+//----------------------------------------------------------------------------
+#ifndef __Quad_FOO_HH_DEFINED__
+#define __Quad_FOO_HH_DEFINED__
+
+/**
+   System variable Quad-FOO.
+ */
+/// The class implementing ⎕FOO
+class Quad_FOO : public SystemVariable
+{
+public:
+   /// Constructor.
+   Quad_IO()
+   : SystemVariable(ID_Quad_IO)
+      {
+         Symbol::assign(IntScalar(0, LOC), false, LOC);
+      }
+
+
+protected:
+  /// overloaded Symbol::assign().
+   virtual void assign(Value_P B, bool clone, const char * loc);
+
+   // overloaded Symbol::push()
+   virtual void push()
+      {
+        Symbol::push();
+        Symbol::assign(IntScalar(0, LOC), false, LOC);
+      }
+};
+
+#endif // __Quad_FOO_HH_DEFINED__
+----
+* and the *TD()* macro now becomes:
++
+----
+TD(TOK_Quad_FOO      , TC_SYMBOL    , TV_SYM  , ID_Quad_FOO     )
+----
++
+* The *sf_def()* macro (*sf* stands for **s**ystem **f**unction) above in
+  *SystemVariable.def*  now becomes:
++
+----
+  rw_sv_def(Quad_FOO,  "FOO",    "not BAR "                 )
+----
++
+where *rw_sv_def* stands for **r**ead/**w**rite **s**ystem **v**ariable. If
+⎕FOO* were read-only (which implies that localizing it has no effect), then
+macro *ro_sv_def* would have been used instead.
+
+The name *SystemVariable.def* is a little misleading because it contains the
+macros for both variables and functions.
+
+
+
+[bibliography]
+== References
+
+* [[[ISO]]] ISO/IEC Standard 13751.
+_Programming Language APL, Extended_
++
+*www.math.uwaterloo.ca/~ljdickey/apl-rep/docs/is13751.pdf*
++
+NOTE: This file is, despite of its *.pdf* extension, a *gzip* compressed
+file which will ionly expand into a proper *.pdf* file after uncompressed
+it (with *gunzip*).
+{nbsp} +
+{nbsp} +
+
+* [[[IBM]]] IBM Corp.
+_APL2: Language Reference_
++
+*www.ibm.com/downloads/cas/ZOKMYKOY*.
++
+NOTE: The exact download location seems to change every now and then.
+{nbsp} +
+{nbsp} +
+
+* [[[Sau]]] Dr. Jürgen Sauermann
+_Ein Paralleler APL Rechner (A Parallel APL Computer)_.
++
+Ph.D Thesis 1990, Universität des Saarlandes.
+{nbsp} +
+{nbsp} +
+
+* [[[Sch]]] Dipl. inf. Dieter Scheerer
+_Entwurf und Realisierung eines Verbindungsnetzwerks als Teil des
+ Multiprozerssorsystems DATIS-P-256._
++
+Masters Thesis 1989, Universität des Saarlandes.
+{nbsp} +
+{nbsp} +
+
+* [[[Ger]]] Dipl. inf. Andreas Gergen 
+_Entwurf und Realisierung einer Master-Slave Kommunikation im
+Multiprozerssorsystem DATIS-P-256_
++
+Masters Thesis 1989, Universität des Saarlandes.
+{nbsp} +
+{nbsp} +
+
+* [[[Mör]]] Dipl. inf. Thomas Mörsdorf
+_Entwurf, Bau, und Test einer 32-bit CPU als Teil des
+Multiprozerssorsystems DATIS-P-256._
++
+Masters Thesis 1989, Universität des Saarlandes.
+{nbsp} +
+{nbsp} +
+
+* [[[Glä]]]] Dipl. inf. Ina Gläs
+_Die Lösung spezieller Probleme bei der Realisierung eines
+Permutationsnetzwerkes als Teil des Multiprozerssorsystems DATIS-P-256._
++
+Masters Thesis 1989, Universität des Saarlandes.
+{nbsp} +
+{nbsp} +
+
+

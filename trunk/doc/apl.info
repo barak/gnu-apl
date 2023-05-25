@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-April 26, 2023
+May 22, 2023
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
@@ -711,6 +711,7 @@ File: apl.info,  Node: Chapter 2,  Next: Chapter 3,  Prev: Chapter 1,  Up: Top
 * Section 2.37::  ⎕SI   - State Indicator
 * Section 2.38::  ⎕SYL  - System limits
 * Section 2.39::  ⎕XML - XML Parsing
+* Section 2.40::  Conditionals
 
 There are a few hopefully useful features in GNU APL:
 
@@ -5040,7 +5041,7 @@ this:
 
 
 
-File: apl.info,  Node: Section 2.39,  Prev: Section 2.38,  Up: Chapter 2
+File: apl.info,  Node: Section 2.39,  Next: Section 2.40,  Prev: Section 2.38,  Up: Chapter 2
 
 2.39 ⎕XML - XML Parsing
 =======================
@@ -5525,6 +5526,280 @@ their details, but usually follow these top-level steps:
      something like MEMBERS←(⊂APL) FUN¨6⎕XML APL←⎕XML followed by
      MEMBER⊃ )
   5. Optionally, convert the modified XML document back to XML (0 ⎕XML
+
+
+File: apl.info,  Node: Section 2.40,  Prev: Section 2.39,  Up: Chapter 2
+
+2.40 Conditionals
+=================
+
+WARNING: GNU APL conditionals are experimental.  Use them with care and
+avoid them, wherever possible, in favour of portability.  Neither the
+ISO APL standard, nor IBM APL2 provide conditionals.
+
+2.40.1 Design considerations.
+-----------------------------
+
+The author of GNU APL has, for a long time, hesitated to implement
+conditionalsi in GNU APL. Primarily for the following reasons:
+
+   • the lack of standardization of conditionals,
+   • the lack of an elegant syntax that fits well into the typical
+     (brief) APL programming style, and in particular
+   • the large number of keywords for flow control used in some other
+     APL interpreters.  See below.
+
+   The C language has 6 keywords for flow control: if, else, for, do,
+Two of them (do and while) are redundant and rarely used, leaving only 4
+base cases.  A quick grep -c over the 90000 top-level C++ source code
+lines of GNU APL reveals the following statistics:
+
+   • 7000 if statements, 1600 of them two-sided if-then-else-endif, the
+     others one-sided if-them-endi,
+   • 2000 for statements, 1200 of them trivial iterations over some
+     array (aka.  for (int i = 0; i < size; ++i) ...  ,
+   • 200 switch statements with an averge of 8 case clauses per switch,
+   • 250 while statements, and
+   • 70 do while statements
+
+   In contrast, a popular non-free APL interpreter came up with a zoo of
+30 or so keywords for the purpose of flow control in one way or the
+other:
+
+   :If :While :Repeat :For :In :InEach :Select :With :Trap :Hold
+:Disposable :Else :ElseIf :AndIf :OrIf :Until :Case :CaseList :EndIf
+:EndWhile :EndRepeat :EndFor :EndSelect :EndWith :EndTrap :EndHold
+:EndDisposable :GoTo, :Return, :Leave :Continue
+
+   This approach, its implementation, and its constraints raise a number
+of serious problems.  To name a few:
+
+   • A rather common APL design practice has it to first debug
+     non-trivial APL statements in immediate execution mode and only
+     transfer them into the body of defined functions when they work
+     properly.  However, the keywords above seem to work only in the
+     bodies of defined functions but not in immediate execution mode.
+     The reason seems to be that their implementation depends on labels
+     which are not available in immediate execution.
+
+   • Another rather common design practice is to limit the length of
+     lines to less than 80 characters (e.g.  in the GNU coding
+     conventions, https://gcc.gnu.org/codingconventions.html#Line).
+     Even if it were possible to squeeze an :If :Then :Else :Endif into
+     a 80 character line, and using a single whitespace around the
+     keywords for readability, wastes almost 1/3 of the precious 80
+     characters for keywords.  In this example, each of the COND, THEN,
+     and ELSE parts must then be < 20 characters on average.  Not to
+     talk about indentation to clarify the code.
+
+   • Each of the keywords has rather specific constraints as to how and
+     where it can be used.  For example (to quote a simple one from a
+     reference manual):
+
+     Control words, including qualifiers such as :Else and :ElseIf, may
+     occur only at the beginning of a line or expression in a
+     diamond-separated statement.  The only exceptions are :In and
+     :InEach which must appear on the same line within a :For
+     expression.
+
+     These constraints suggest that the keywords mentioned are merely
+     syntactic sugar that covers the underlying APL structure, i.e.
+     labels and computed branches.  GNU APL does not claim to be
+     fundamentally diffferent in that regard, but the syntax of the
+     syntactic sugar is somewhat simpler.
+
+   Learning from the above, the conclusions for the syntax of GNU APL
+condionals were these:
+
+  1. the syntax shall be easy to understand and consistent,
+  2. the syntax shall work in immediate execution mode (as long as the
+     entire conditional is provided on a single input line),
+  3. in order to support 2., lengthy keywords shall be avoided in favour
+     of the original APL style, and
+  4. the syntax needs to only support those cases where the standard APL
+     flow control (i.e.  →N) becomes cumbersome.  There is absolutely no
+     benefit in introducing a new (and redundant) syntax when the
+     standard APL mechanism is already completely adequate.
+
+   As to the last point, almost every flow control case (in a standards
+compliant APL program) falls into one of the following categories
+(sorted by increasing complexity):
+
+  1. one-sided if: if COND then THEN endif
+  2. two-sided if/else: if COND then THEN else ELSE endif
+  3. loop: while COND do BODY (or its less frequently used twin do BODY
+     while COND)
+  4. switch/case: switch ARG case CASE1 case CASE2 case ...  CASEn
+     endswitch
+
+   where THEN, ELSE, CASE1, CASE2, CASEn, and BODY are a sequence of one
+or more statements, while COND or ARG control which of these sequences
+(if any) shall be executed.
+
+   Interestingly, the complexity of the above cases, when coded in APL,
+increases in amost the reverse order (compared to other languages).  For
+example
+
+  1. switch/case:
+         →(ARG) / L1  L2 ...  Ln   ⍝ switch(ARG)
+     L1: CASE1 ◊ →L_endcase        ⍝ case 1:
+     L2: CASE2 ◊ →L_endcase        ⍝ case 2:
+     ...
+     LN: CASEn                     ⍝ case N:
+     L_endcase:
+
+  2. loop:
+      Loop: BODY ◊ →(COND) / Loop   ⍝ repeat BODY while COND
+
+  3. one-sided if:
+       →(!COND) / L_endif   ⍝ jump over the THEN clause
+       THEN
+     L_endif:
+
+     or, not uncommon and shorter, but less portable and less readable:
+
+       →(!COND) / ↑1+⎕LC ◊ THEN  ⍝ jump over the THEN clause to the next line
+
+  4. two-sided if/else:
+       →COND ↓ L_else L_then
+     L_then: THEN ◊ →L_endif
+     L_else: ELSE
+     L_endif:
+
+   A closer look at these case reveals that there is not much room for
+syntax improvements in cases 1.  (switch) and 2.  (loop).  The
+introduction of a new syntax like :Select / :Case for switches or :For /
+:Endfor for loops would therefore only make matters different and
+incompatible, but not better.
+
+   In case 3.  (one-sided if) there is also not much to gain.  However,
+case 3.  can be seen as a special case of case 4.  (with an empty ELSE
+clause).  As a matter of consistency, a new syntax for case 4.  should
+also cover case 3.
+
+   The only cases where a new syntax could improve matters are therefore
+cases 3.  and 4.
+
+   Another consideration relates to the end marker L_endif (and would
+likewise relate to L_endcase if we hadn’t already ruled that case out).
+There are two reasonable syntax alternatives to handle the branch to the
+end of the conditional:
+
+  1. allow multiple statements in the THEN and ELSE clauses and mark the
+     end of the ELSE clause (or, in the one-sided case 3 of the THEN
+     clause with some ENDIF marker, or
+  2. allow only single statement clauses (which implies the ENDIF and
+     makes it obsolete.
+
+   The design decision made in GNU APL was to go for multiple statements
+because the advantage in 2.  (shorter code) looks much smaller than the
+the advantages of 1.  (e.g.  insertion of debug printouts into a
+clause).
+
+2.40.2 Syntax
+-------------
+
+With the above considerations in mind, GNU APL decided for the following
+syntax:
+
+   • one-sided if/else:
+           COND →→ THEN ←←
+
+   • two-sided if/else:
+           COND →→ THEN ←→ ELSE ←←
+
+   For this syntax to work, the following rules must be followed:
+
+   • The →→, ←→, and ←← markers must be single tokens (2 adjacent
+     Unicode characters) That is, no whitespace (and in particular no
+     line feed) is permitted between the first and the second arrow.  A
+     single → is a valid APL statement (named Escape).  A linefeed
+     between two → turns the single token →→ into two valid (though most
+     of the time useless) Escape statements.
+
+   • The →→, ←→, and ←← tokens are end-of statement markers (as opposed
+     to beginning-of statement markers).  Each marker binds to the
+     non-empty statement left of it.  APL is parsed line by line, so
+     there can never be a valid non-empty APL statement left of the
+     first token of a line.  As a consequence, a →→ token, a ←→ token,
+     or a ←← token at the beginning of a line is a SYNTAX ERROR.
+
+   • The COND, THEN, and ELSE clauses shall be non-empty (!)  sequences
+     of valid APL statements.  In particular:
+
+        • The condition COND shall be a single statement that evaluates
+          to a 1-item Boolean array (of any rank).  The statement result
+          of COND is a committed value (and therefore not displayed).
+
+        • The THEN clause shall be one or more valid statements,
+          separated by ◊ for more than one statement.
+
+        • The ELSE clause (if present) shall be one or more valid
+          statements, separated by ◊ for more than one statement.
+
+   Examples:
+      ⍝ short format. Valid in immediate execution and in defined functions
+      ⍝
+      X←5 ◊ X≥0 →→ X 'is positive' ←→ X 'is negative' ←←
+ 5 is positive 
+
+
+
+      ⍝ long format. Only possible in defined functions because immediate
+      ⍝ execution works line by line (and parsing the first line would fail).
+
+      ⍝ valid split into several lines (in a defined function)
+      ⍝
+      ∇FOO X
+       X≥0             →→
+       X 'is positive' ←→
+       X 'is negative' ←←
+      ∇
+      FOO 5
+ 5 is positive 
+      FOO ¯5
+ ¯5 is negative 
+
+
+
+      ⍝ invalid split into several lines: ←→ spread over 2 lines.
+      ⍝ FOO can be properly parsed, but calling FOO fails.
+      ⍝
+      ∇FOO X
+      X≥0 →→ X 'is positive' ←
+           → X 'is negative' ←←
+      ∇
+      FOO 5
+SYNTAX ERROR
+FOO[1]  X 'is positive'←
+
+
+
+      ⍝ invalid split into several lines:  ←→ is first token in line).
+      ⍝ FOO is invalid and the ∇-editor complains when closing FOO.
+      ⍝
+      ∇FOO X
+       X≥0 →→ X 'is positive'
+           ←→ X 'is negative' ←←
+      ∇
+NOTE: Invalid ←→ at start of line 2
+Error in function body in function line [2] of:
+[0] FOO X
+[1]        X≥0 →→ X 'is positive'
+[2]            ←→ X 'is negative' ←←
+Fatal error in defined function line [2]. You may now:
+    change the faulty line  with:  [2] ..., or 
+    delete the faulty line  with:  [∆2], or
+    cancel editing with:  [→]∇.
+
+
+   The recommended usage of corresponding →→, ←→, and ←← token is to:
+
+   • either put them on the same line (short format), or else
+   • align all of them on the same column (long form), but
+   • never mix the short and long forms
+
+   Like shown in the examples above.
 
 
 File: apl.info,  Node: Chapter 3,  Next: Chapter 4,  Prev: Chapter 2,  Up: Top
@@ -7032,73 +7307,74 @@ please read <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 
 Tag Table:
 Node: Top383
-Node: Chapter 11573
-Node: Chapter 223282
-Node: Section 2.125231
-Node: Subsection 2.1.126453
-Node: Subsection 2.1.227084
-Node: Subsection 2.1.327915
-Node: Subsection 2.1.433721
-Node: Subsection 2.1.537520
-Node: Subsection 2.1.638378
-Node: Subsection 2.1.746502
-Node: Subsection 2.1.848252
-Node: Section 2.251567
-Node: Section 2.352326
-Node: Section 2.453601
-Node: Section 2.558046
-Node: Section 2.658219
-Node: Section 2.758849
-Node: Section 2.862802
-Node: Section 2.964337
-Node: Section 2.1066429
-Node: Section 2.1167983
-Node: Section 2.1269768
-Node: Section 2.1371708
-Node: Section 2.1472649
-Node: Section 2.1572901
-Node: Section 2.1674297
-Node: Section 2.1784766
-Node: Section 2.1887288
-Node: Section 2.1994005
-Node: Section 2.2095450
-Node: Section 2.21101111
-Node: Section 2.22106145
-Node: Section 2.23109426
-Node: Section 2.24109717
-Node: Section 2.25120545
-Node: Section 2.26120817
-Node: Section 2.27127395
-Node: Section 2.28129855
-Node: Section 2.29130524
-Node: Section 2.30132176
-Node: Section 2.31135963
-Node: Output File Format151883
-Node: Section 2.32153058
-Node: Section 2.33162456
-Node: Section 2.34163483
-Node: Section 2.35178198
-Node: Section 2.36188264
-Node: Section 2.37192383
-Node: Section 2.38194478
-Node: Section 2.39198903
-Node: Chapter 3220257
-Node: Chapter 4222758
-Node: Chapter 5223884
-Node: Section 5.1225421
-Node: Section 5.2226701
-Node: Section 5.3227061
-Node: Section 5.4227303
-Node: Section 5.5227965
-Node: Section 5.6228443
-Node: Section 5.7229215
-Node: Section 5.8229672
-Node: Chapter 6230074
-Node: Section 6.1230493
-Node: Section 6.2231180
-Node: Chapter 7232011
-Node: Section 7.1232514
-Node: Section 7.2257828
+Node: Chapter 11571
+Node: Chapter 223280
+Node: Section 2.125260
+Node: Subsection 2.1.126482
+Node: Subsection 2.1.227113
+Node: Subsection 2.1.327944
+Node: Subsection 2.1.433750
+Node: Subsection 2.1.537549
+Node: Subsection 2.1.638407
+Node: Subsection 2.1.746531
+Node: Subsection 2.1.848281
+Node: Section 2.251596
+Node: Section 2.352355
+Node: Section 2.453630
+Node: Section 2.558075
+Node: Section 2.658248
+Node: Section 2.758878
+Node: Section 2.862831
+Node: Section 2.964366
+Node: Section 2.1066458
+Node: Section 2.1168012
+Node: Section 2.1269797
+Node: Section 2.1371737
+Node: Section 2.1472678
+Node: Section 2.1572930
+Node: Section 2.1674326
+Node: Section 2.1784795
+Node: Section 2.1887317
+Node: Section 2.1994034
+Node: Section 2.2095479
+Node: Section 2.21101140
+Node: Section 2.22106174
+Node: Section 2.23109455
+Node: Section 2.24109746
+Node: Section 2.25120574
+Node: Section 2.26120846
+Node: Section 2.27127424
+Node: Section 2.28129884
+Node: Section 2.29130553
+Node: Section 2.30132205
+Node: Section 2.31135992
+Node: Output File Format151912
+Node: Section 2.32153087
+Node: Section 2.33162485
+Node: Section 2.34163512
+Node: Section 2.35178227
+Node: Section 2.36188293
+Node: Section 2.37192412
+Node: Section 2.38194507
+Node: Section 2.39198932
+Node: Section 2.40220307
+Node: Chapter 3231195
+Node: Chapter 4233696
+Node: Chapter 5234822
+Node: Section 5.1236359
+Node: Section 5.2237639
+Node: Section 5.3237999
+Node: Section 5.4238241
+Node: Section 5.5238903
+Node: Section 5.6239381
+Node: Section 5.7240153
+Node: Section 5.8240610
+Node: Chapter 6241012
+Node: Section 6.1241431
+Node: Section 6.2242118
+Node: Chapter 7242949
+Node: Section 7.1243452
+Node: Section 7.2268766
 
 End Tag Table
 

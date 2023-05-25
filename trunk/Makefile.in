@@ -1066,6 +1066,7 @@ parallel1:
 VPATH_clean: clean
 	echo "Making VPATH_clean..."
 	rm -f config.status config.h
+	make make distclean || true
 	echo "Done VPATH_clean..."
 
 .PHONY: check_sources
@@ -1123,7 +1124,7 @@ SYNC:	DIST
     ../savannah-repo-apl/trunk/exported_from
 	rm -Rf apl-$(VERSION)
 	cd ../savannah-repo-apl ; svn add . --force -q 
-	cd ../savannah-repo-apl ; git add --update
+	cd ../savannah-repo-apl ; git add
 	cd ../savannah-repo-apl ; git commit -m "sync from SVN"
 
 # build all packages and SYNC
