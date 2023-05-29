@@ -91,13 +91,16 @@ perfo_4(M_join         , _B,  "M_join(AB)", -1)                       // 55
 perfo_4(M_join         , _AB, "M_join(B)",  -1)                       // 56
 
 #ifndef optim
-# define optim(tag, text)
+# define optim(_ena, _tag, _text)
 #endif
 
-optim(FT_LABEL_LITERAL,   "⎕FX Time: Label to integer literal")   // 0
-optim(FT_DIRECT_BRANCHES, "⎕FX Time: Unconditional branches"  )   // 1
-optim(RT_A_RHO_B,         "Run Time: in-place A⍴B"            )   // 2
-optim(RT_COMMA_B,         "Run Time: in-place ,B"             )   // 3
+optim(0, FT_LABEL_LITERAL,   "⎕FX Time: Label to integer literal")   // 0
+optim(0, FT_DIRECT_BRANCHES, "⎕FX Time: Unconditional branches"  )   // 1
+optim(0, FT_LITERAL_AXIS,    "⎕FX Time: Literal axis [X]"        )   // 2
+optim(0, FT_LITERAL_INDEX,   "⎕FX Time: Literal index [X1;...]"  )   // 3
+optim(0, FT_SHORT_PRIMITIVE, "⎕FX Time: Short A⍴B"               )   // 4
+optim(1, RT_A_RHO_B,         "Run Time: In-place A⍴B"            )   // 5
+optim(1, RT_COMMA_B,         "Run Time: In-place ,B"             )   // 6
 
 #undef optim
 #undef perfo_1

@@ -528,7 +528,7 @@ Token_string tos;
       {
         UCS_string ucs1 = no_UCS(ravel);
         const Parser parser(PM_EXECUTE, LOC, false);
-        parser.parse(ucs1, tos);
+        parser.parse(ucs1, tos, true);
       }
    catch(...)
       {

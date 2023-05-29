@@ -1,0 +1,12 @@
+⍝ ZZ58_Regression.tc
+⍝ ------------------
+
+      ⍝ bug-apl@gnu.org, 4/4/2023 (Robert Haberkorn) ...
+
+      )CLEAR
+CLEAR WS
+
+      Perm ← {(X/⍨⍺=+/¨X←(⊂2⍴⍨⍵)⊤¨⍳2*⍵) /¨ ⊂⍳⍵; X}
+      2 Perm 3
+ 2 3  1 3  1 2 
+

@@ -913,7 +913,7 @@ UCS_string parse_text = current_text;   // a copy that can be modified.
         const Parser parser(PM_FUNCTION, LOC, false);
         Token_string in;
 
-        ErrorCode ec = parser.parse(parse_text, in);
+        ErrorCode ec = parser.parse(parse_text, in, true);
         if (ec == E_NO_STRING_END && uprefs.multi_line_strings)
            {
              ec = E_NO_ERROR;

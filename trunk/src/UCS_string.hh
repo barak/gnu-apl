@@ -266,9 +266,9 @@ public:
    void pop_back()
    { Assert(size() > 0);   std::basic_string<Unicode>::pop_back(); }
 
-   /// append UCS_string other to this string
-   void append(const UCS_string & other)
-      {  basic_string<Unicode>::append(other); }
+   /// append UCS_string suffix to \b this string
+   void append(const UCS_string & suffix)
+      {  basic_string<Unicode>::append(suffix); }
 
    /// append 0-terminated ASCII string \b str to this string.
    /// \b str is NOT interpreted as UTF8 string (use append_UTF8() instead of

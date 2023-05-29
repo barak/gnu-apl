@@ -50,6 +50,8 @@ ofstream IO_Files::current_testreport;
 UTF8_string IO_Files::summary_path("testcases/summary.log");
 APL_time_us IO_Files::start_usecs = 0;
 
+static  ios_base::openmode summary_flags = ofstream::trunc;
+
 //----------------------------------------------------------------------------
 void
 IO_Files::get_file_line(UTF8_string & line, bool & eof)
@@ -249,7 +251,8 @@ IO_Files::end_of_current_file()
    if (InputFile::is_validating())   // running a .tc file
       {
         const char * path = charP(summary_path.c_str());
-        ofstream summary(path, ios_base::app);
+        ofstream summary(path, summary_flags);
+        summary_flags = ofstream::app;
         summary << setw(3) << error_count();
 
         // cannot use SRINTF's ' flag uses locales (which suck).

@@ -160,6 +160,21 @@ Shape::check_same(const Shape & B, ErrorCode rank_err, ErrorCode len_err,
 }
 //----------------------------------------------------------------------------
 bool
+Shape::fits_into(ShapeItem max_ravel) const
+{
+ShapeItem volume = 1;
+   loop(r, rho_rho)
+       {
+         const ShapeItem sr = rho[r];
+         if (sr > 0)         volume *= r;
+         else if (sr == 0)   return true;
+         else DOMAIN_ERROR;
+       }
+
+   return volume <= max_ravel;
+}
+//----------------------------------------------------------------------------
+bool
 Shape::is_permutation() const
 {
    /* this shape is supposedly normalized to ⎕IO←0. We figure if the items

@@ -73,7 +73,7 @@ public:
         makes some workspaces 3 times faster. The slower code with no warning
         would be:
 
-        loop(r, rhorho)   rho[r] = other.rho[r];
+        loop(r, rho_rho)   rho[r] = other.rho[r];
 
         but that prevents loop-unrolling.
      */
@@ -245,8 +245,11 @@ public:
    bool is_empty() const
       { loop(r, rho_rho)   if (rho[r] == 0) return true;   return false; }
 
+   /// return \b true iff a value with this shape fits into a ravel of length
+   /// max_ravel. DOMAIN ERROR id any shape item is < 0.
+   bool fits_into(ShapeItem max_ravel) const;
+
    /// return \b true iff this shape is a permutation of 0, 1, ... rank-1.
-   /// made inline since used only once.
    bool is_permutation() const;
 
    /// return the position of \b idx in the ravel.

@@ -1,0 +1,46 @@
+⍝ ZZ59_Regression.tc
+⍝ ══════════════════
+
+      ⍝ bug-apl@gnu.org, 5/27/2023 (Christian Rober) ...
+
+      )CLEAR
+CLEAR WS
+
+∇df;names;func;lambda;⎕pw;t;sort_order
+ ⎕pw←10000 ⋄ sort_order←,⍉2 26⍴(⎕ucs 65+⎕IO-⍨⍳26),(⎕ucs 97+⎕IO-⍨⍳26)
+ names←(⊂[⎕io+1]⎕nl 3 4)~¨' '
+ names←names ∼ ⊂"vi"   ⍝ if only one eg: "vi" then use ⊂"
+ lambda←({'λ'=↑⎕cr ⍵}¨names)/names
+ →(2>⍴lambda)/nosrtl
+ lambda←{⍵[sort_order⍋⊃⍵]} lambda
+nosrtl: func←names~lambda
+ →(2>⍴func)/nosrtf
+ func←{⍵[sort_order⍋⊃⍵]} func
+nosrtf: func←{⍵ (22 ⎕cr ⎕cr ⍵)} ¨ func
+ lambda←{⍵,'←{',({⌽ {(+/^\' '=⍵)↓⍵} ⌽ ⍵} 2↓((⎕cr ⍵)[1+⎕io;])),({{⌽ {(+/^\' '=⍵)↓⍵} ⌽ ⍵} {(∨\t=';')/t←(⎕cr ⍵)[⎕io;]} ⍵} ⍵),'}'} ¨ lambda
+ ⎕←,[⍳0] {((⍴,⍵)⌊(¯2+⎕fio ¯8))↑,⍵} ¨ ⊂[⎕io+1]⍕ ,[⍳0] ,func,(⊂' '),lambda,(⊂' ')
+∇ 
+
+df
+   df  ╔══════════════════════════════════════════════════════════════════════════════════ 
+       ║df;names;func;lambda;⎕pw;t;sort_order                                              
+       ║⎕pw←10000 ⋄ sort_order←,⍉2 26⍴(⎕ucs 65+⎕IO-⍨⍳26),(⎕ucs 97+⎕IO-⍨⍳26)                
+       ║names←(⊂[⎕io+1]⎕nl 3 4)~¨' '                                                       
+       ║names←names ∼ ⊂"vi"   ⍝ if only one eg: "vi" then use ⊂"                           
+       ║lambda←({'λ'=↑⎕cr ⍵}¨names)/names                                                  
+       ║→(2>⍴lambda)/nosrtl                                                                
+       ║lambda←{⍵[sort_order⍋⊃⍵]} lambda                                                   
+       ║nosrtl: func←names~lambda                                                          
+       ║→(2>⍴func)/nosrtf                                                                  
+       ║func←{⍵[sort_order⍋⊃⍵]} func                                                       
+       ║nosrtf: func←{⍵ (22 ⎕cr ⎕cr ⍵)} ¨ func                                             
+       ║lambda←{⍵,'←{',({⌽ {(+/^\' '=⍵)↓⍵} ⌽ ⍵} 2↓((⎕cr ⍵)[1+⎕io;])),({{⌽ {(+/^\' '=⍵)↓⍵}  
+       ║⎕←,[⍳0] {((⍴,⍵)⌊(¯2+⎕fio ¯8))↑,⍵} ¨ ⊂[⎕io+1]⍕ ,[⍳0] ,func,(⊂' '),lambda,(⊂' ')     
+       ╚══════════════════════════════════════════════════════════════════════════════════ 
+                                                                                           
+                                                                                           
+
+
+      )CLEAR
+CLEAR WS
+

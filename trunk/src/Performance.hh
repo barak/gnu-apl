@@ -359,10 +359,18 @@ public:
 enum Optimization_ID
 {
   INVALID_OPTIMIZATION_COUNTER = -1,
-#define optim(tag, _text)  OPTI_ ## tag,
+#define optim(_enabled, tag, _text)  OPTI_ ## tag,
 #include "Performance.def"
   OPT_COUNTER_COUNT
 };
+
+enum Do_Optimization
+{
+#define optim(enabled, tag, __text)  \
+   DO_ ## tag = enabled, DONT_ ## tag = 1 - enabled,
+#include "Performance.def"
+};
+
 //-----------------------------------------------------------------------------
 class OptmizationStatistics
 {

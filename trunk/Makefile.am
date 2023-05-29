@@ -83,10 +83,10 @@ SYNC:	DIST
     ../savannah-repo-apl/trunk/exported_from
 	rm -Rf apl-$(VERSION)
 	cd ../savannah-repo-apl ; svn add . --force -q 
-	cd ../savannah-repo-apl ; git add
+	cd ../savannah-repo-apl ; git add .
 	cd ../savannah-repo-apl ; git commit -m "sync from SVN"
 
-# build all packages and SYNC
+# build all packages and SYNC the repos
 #
 .PHONY:	EXPO
 EXPO:

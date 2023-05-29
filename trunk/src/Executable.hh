@@ -133,11 +133,21 @@ public:
    /// Return the number of tokens removed
    virtual VoidCount remove_TOK_VOID();
 
-   /// compute lines 2 and 3 in \b error
+   /// compute error lines 2 and 3 in \b error
    void set_error_info(Error & error, Function_PC2 range) const;
 
+   /// helper for set_error_info(Error & error, Function_PC2 range).
+   void set_error_info(Error & error, const Token_string & failed_statement,
+                       Function_PC2 range) const;
+
+   /// restore the original (un-optimized) tokens for a failed statement
+   void reparse(Token_string & original, Function_PC2 range) const;
+
+   /// return the end of the statement (excluding) to which pc belongs
+   Function_PC get_statement_end(Function_PC pc) const;
+
    /// return the start of the statement to which pc belongs
-   Function_PC get_statement_start(int pc) const;
+   Function_PC get_statement_start(Function_PC pc) const;
 
    /// clear marked flag in all body token
    void unmark_all_values() const;

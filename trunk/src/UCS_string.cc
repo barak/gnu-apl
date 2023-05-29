@@ -1409,7 +1409,7 @@ UCS_string ret;
    if (v < 0.0)   { ret.append(UNI_OVERBAR);   v = -v; }
 
 int expo = 0;
-   while (v >= 1.0E1)
+   while (v >= 1.0E1)   // scale large v ≥ 10 down to [1:10)
       {
         if (v >= 1.0E9)
            if (v >= 1.0E13)
@@ -1443,16 +1443,16 @@ int expo = 0;
                  else /* v >= 1.0E1 */     { v = v * 1.0E-1;    expo += 1;  }
       }
 
-   while (v < 1.0E0)
+   while (v < 1.0E0)   // scale small v < 1 down to [1:10)
       {
         if (v < 1.0E-8)
            if (v < 1.0E-12)
               if (v < 1.0E-14)
-                 if     (v < 1.0E-15)      { v = v * 1.0E-16;   expo += 16; }
-                 else /* v < 1.0E-14 */    { v = v * 1.0E-15;   expo += 15; }
+                 if     (v < 1.0E-15)      { v = v * 1.0E16;   expo += -16; }
+                 else /* v < 1.0E-14 */    { v = v * 1.0E15;   expo += -15; }
               else
-                 if     (v < 1.0E-13)      { v = v * 1.0E-14;   expo += 14; }
-                 else /* v < 1.0E-12 */    { v = v * 1.0E-13;   expo += 13; }
+                 if     (v < 1.0E-13)      { v = v * 1.0E14;   expo += -14; }
+                 else /* v < 1.0E-12 */    { v = v * 1.0E13;   expo += -13; }
            else
               if (v < 1.0E-10)
                  if     (v < 1.0E-11)      { v = v * 1.0E12;   expo += -12; }

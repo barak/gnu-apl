@@ -318,7 +318,9 @@ Executable * statements = 0;
         bool plus = Workspace::more_error().size();   // assume + needed
         const char * error_name = Error::error_name(err.get_error_code());
         if (strchr(error_name, UNI_PLUS))   plus = false;   // not needed
-        if (Workspace::more_error().back() == UNI_PLUS)   plus = false; // dito.
+        if (Workspace::more_error().size() &&
+               Workspace::more_error().back() == UNI_PLUS)
+           plus = false; // dito.
 
         UERR << error_name;
         if (plus)   UERR << UNI_PLUS;
@@ -2032,9 +2034,11 @@ Command::cmd_OPTIM(ostream & out, const UCS_string & arg)
       }
 
 int ulen;
-#define optim(opt, text) ulen = 40 + UTF8_string::bytes_chars(text);   \
-        out << left << setw(ulen) << text << right << " : "            \
-        << setw(6) << OptmizationStatistics::get(OPTI_ ## opt) << endl;
+#define optim(ena, opt, text) ulen = 40 + UTF8_string::bytes_chars(text);   \
+   out << left << setw(ulen) << text << right << " : ";                     \
+   if (ena) out << setw(6) << OptmizationStatistics::get(OPTI_ ## opt);     \
+   else     out << "disabled";                                              \
+   out << endl;
 #include "Performance.def"
 }
 //----------------------------------------------------------------------------

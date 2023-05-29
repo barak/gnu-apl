@@ -43,7 +43,8 @@
 
 //----------------------------------------------------------------------------
 ErrorCode
-Parser::parse(const UCS_string & input, Token_string & tos) const
+Parser::parse(const UCS_string & input, Token_string & tos,
+              bool optimize) const
 {
    // convert input characters into token
    //
@@ -58,16 +59,17 @@ Token_string tos1;
    //
    if (tos1.size() == 1)
       {
-        const ErrorCode err = parse_statement(tos1);
+        const ErrorCode err = parse_statement(tos1, optimize);
         if (err == E_NO_ERROR)   tos.push_back(tos1[0]);
         return err;
       }
 
-   return parse(tos1, tos);
+   return parse(tos1, tos, optimize);
 }
 //----------------------------------------------------------------------------
 ErrorCode
-Parser::parse(const Token_string & input, Token_string & tos) const
+Parser::parse(const Token_string & input, Token_string & tos,
+              bool optimize) const
 {
    Log(LOG_parse)
       {
@@ -120,7 +122,7 @@ std::vector<Token_string *> statements;
    loop(s, statements.size())
       {
         Token_string * stat = statements[s];
-        if (const ErrorCode err = parse_statement(*stat))
+        if (const ErrorCode err = parse_statement(*stat, optimize))
            {
              while (size_t(s) < statements.size())
                {
@@ -144,7 +146,7 @@ std::vector<Token_string *> statements;
 }
 //----------------------------------------------------------------------------
 ErrorCode
-Parser::parse_statement(Token_string & tos)
+Parser::parse_statement(Token_string & tos, bool optimize)
 {
    // 1. convert (X) into X and ((X...)) into (X...)
    //
@@ -175,9 +177,23 @@ Parser::parse_statement(Token_string & tos)
 
    // 3. convert vectors like 1 2 3 or '1' 2 '3' into single APL values
    //
-   collect_constants(tos);
-   replace_literal_axes(tos);
-   remove_TOK_VOID(tos);
+   if (collect_constants(tos))           remove_TOK_VOID(tos);
+
+   // parse_statement() is normally called with optimize == true; However,
+   // Executable::reparse() calls it with optimize == false in order to
+   // restore the body before it was optimized.
+   //
+   // To disable optimizations you must set the enable arg(s) in
+   // Performance.def to 0 (as opposed to setting optimize to false.
+   //
+   if (optimize)
+      {
+        if (DO_FT_LITERAL_AXIS && optimize_literal_axes(tos))
+           remove_TOK_VOID(tos);
+
+        if (DO_FT_SHORT_PRIMITIVE && optimize_short_primitives(tos))
+           remove_TOK_VOID(tos);
+      }
 
    // special case: single APL value (to speed up ⍎)
    //
@@ -202,7 +218,7 @@ Parser::parse_statement(Token_string & tos)
         tos.print(CERR, true);
       }
 
-   // 5. replace bitwise functons ⊤∧, ⊤∨, ⊤⍲, and ⊤⍱ by their bitwise variant
+   // 5. replace bitwise functions ⊤∧, ⊤∨, ⊤⍲, and ⊤⍱ by their bitwise variant
    //
    replace_bitwise_functions(tos);
    remove_TOK_VOID(tos);
@@ -226,9 +242,10 @@ Parser::parse_statement(Token_string & tos)
    return E_NO_ERROR;
 }
 //----------------------------------------------------------------------------
-void
+bool
 Parser::collect_constants(Token_string & tos)
 {
+bool progress = false;
    Log(LOG_collect_constants)
       {
         CERR << "collect_constants [" << tos.size() << " token] in: ";
@@ -287,6 +304,7 @@ Parser::collect_constants(Token_string & tos)
             }
 
         create_value(tos, t, to - t);
+        if (to > (t + 1))   progress = true;
       }
 
    Log(LOG_collect_constants)
@@ -294,6 +312,8 @@ Parser::collect_constants(Token_string & tos)
         CERR << "collect_constants [" << tos.size() << " token] out: ";
         tos.print(CERR, true);
       }
+
+   return progress;
 }
 //----------------------------------------------------------------------------
 bool
@@ -617,11 +637,14 @@ Parser::get_assign_state(Token_string & tos, ShapeItem pos)
    return ASS_none;
 }
 //----------------------------------------------------------------------------
-void
-Parser::replace_literal_axes(Token_string & tos)
+bool
+Parser::optimize_literal_axes(Token_string & tos)
 {
+   if (!(DO_FT_LITERAL_AXIS && DO_FT_LITERAL_INDEX))   return false;
+
    // replace [ ] or [ N ] by their complete index or axis, as to relieve
    // the Prefix parser.
+bool progress = false;
 
    loop(src, tos.size() - 1)
        {
@@ -640,6 +663,8 @@ Parser::replace_literal_axes(Token_string & tos)
                  CERR << "new    " << voidP(idx) << " at " LOC << endl;
               new (&tos[src++]) Token(TOK_INDEX, *idx);   // replace [
               new (&tos[src]) Token(TOK_VOID);            // replace ]
+              OptmizationStatistics::count(OPTI_FT_LITERAL_AXIS);
+              progress = true;
               continue;
             }
 
@@ -667,6 +692,8 @@ Parser::replace_literal_axes(Token_string & tos)
                    new (&tos[src++]) Token(TOK_VOID);   // invalidate [
                    tos[src++].move(tok_axis, LOC);
                    new (&tos[src])   Token(TOK_VOID);   // invalidate ]
+                   OptmizationStatistics::count(OPTI_FT_LITERAL_AXIS);
+                   progress = true;
                  }
               else
                  {
@@ -677,9 +704,91 @@ Parser::replace_literal_axes(Token_string & tos)
                    new (&tos[src++]) Token(TOK_VOID);   // invalidate [
                    new (&tos[src++]) Token(TOK_INDEX, *idx);
                    new (&tos[src])   Token(TOK_VOID);   // invalidate ]
+                   OptmizationStatistics::count(OPTI_FT_LITERAL_INDEX);
+                   progress = true;
                  }
             }
        }
+
+   return progress;
+}
+//----------------------------------------------------------------------------
+bool
+Parser::optimize_short_primitives(Token_string & tos)
+{
+   if (DONT_FT_SHORT_PRIMITIVE)   return false;
+
+   // replace primitives with short literal results and arguments,
+   // such as 4⍴0 with their result. The scope of tos is one statement.
+   //
+bool progress = false;
+   if (tos.size() < 2)   return false;   // too short to optimize
+
+// CERR << endl << "tos: ";   tos.print(CERR, false);
+
+   // create a list of 'terminal literals' from where the optimization
+   //  may restart. For example:
+   //
+   //  (2⍴5) ⍴ 6
+   //
+   // The optimization starts at 6 (end of statement) and restarts at ).
+   //
+vector<ShapeItem> ends;
+   ends.push_back(tos.size());
+
+   // tos is in forward (aka. APL) order. We move backwards from the end
+   //
+   for (int pc = tos.size() - 1; pc >= 0; --pc)
+       {
+         const TokenTag tag = tos[pc].get_tag();
+         if (tag == TOK_R_BRACK || tag == TOK_R_PARENT)   ends.push_back(pc);
+       }
+
+   loop(e, ends.size())
+       {
+         const ShapeItem src_B = ends[e] - 1;
+         const ShapeItem src_F = src_B - 1;          // ends[e] - 2
+         const ShapeItem src_A = src_F - 1;          // ends[e] - 3
+
+         Token & tok_F = tos[src_F];
+         Token & tok_B = tos[src_B];
+
+         if (tok_B.get_tag() != TOK_APL_VALUE3)    continue;
+         if (tok_F.get_Class() != TC_FUN2)         continue;
+
+         Function_P fun = tok_F.get_function();
+
+         if (src_A >= 0 && tos[src_A].get_tag() == TOK_APL_VALUE3)
+             {
+               // dyadic primitive
+               //
+               Token & tok_A = tos[src_A];
+               if (fun == Bif_F12_RHO::fun)
+                  {
+                    // NOTE: we use Bif_F12_RHO::do_reshape() instead of
+                    // Bif_F12_RHO::eval_AB() as to bypass the ⍴ optimization
+                    // (which won't work well here)
+                    //
+                    const Shape sh_A(*tok_A.get_apl_val(), /* qio */ 0);
+                    if (sh_A.fits_into(cfg_SHORT_VALUE_LENGTH_WANTED))
+                       {
+                         Token tZ = Bif_F12_RHO::fun->do_reshape(sh_A,
+                                                 *tok_B.get_apl_val());
+                         tok_A.clear(LOC);   // sets it to TOK_VOID
+                         tok_F.clear(LOC);   // sets it to TOK_VOID
+                         tok_B.clear(LOC);
+                         tok_B.move(tZ, LOC);
+                         OptmizationStatistics::count(OPTI_FT_SHORT_PRIMITIVE);
+                         progress = true;
+                       }
+                  }
+             }
+          else
+             {
+               // monadic
+             }
+       }
+   return progress;
 }
 //----------------------------------------------------------------------------
 VoidCount
@@ -706,12 +815,13 @@ std::vector<ShapeItem> stack;
    loop(s, tos.size())
        {
          const ShapeItem t = backwards ? (tos.size() - 1) - s : s;
-         ErrorCode ec;
+         ErrorCode ec;   // anticipated error code, not used in most cases
          TokenClass tc_peer;
          switch(tos[t].get_Class())
            {
-             // for [ ( or { push the position onto stack
-             case TC_L_BRACK:
+             // for [, (, or {, push the position onto stack.
+             //
+             case TC_L_BRACK:   // NOTE: also includes TOK_SEMICOL, so we check
                   if (tos[t].get_tag() != TOK_L_BRACK)   continue;
                   /* fall through */
              case TC_L_PARENT:

@@ -982,6 +982,8 @@ UserFunction * fun = 0;
 bool
 UserFunction::resolve_labels()
 {
+   if (DONT_FT_LABEL_LITERAL)   return false;
+
 const int label_count = header.get_label_count();
    if (label_count == 0)   return false;   // no labels defined
 
@@ -1042,7 +1044,7 @@ bool void_inserted = false;
                if (tag_1 == TOK_F12_COMMA && tag_2 == TOK_INTEGER)
                   {
                     // case 3. : INT , INT
-                    labels.push_back(body[pc_1].get_int_val());
+                    labels.push_back(body[pc_2].get_int_val());
                     body[pc_1] = Token();
                     body[pc_2] = Token();
                     void_inserted = true;
@@ -1078,12 +1080,14 @@ bool void_inserted = false;
 
    if (void_inserted)   remove_TOK_VOID();
 
-   return true;
+   return void_inserted;
 }
 //----------------------------------------------------------------------------
 void
 UserFunction::optimize_unconditional_branches()
 {
+   if (DONT_FT_DIRECT_BRANCHES)   return;
+
    /* check for: VALUE → ENDL      e.g. → 4
       or:        SYMBOL → ENDL     e.g. → LABEL
 
@@ -1390,7 +1394,7 @@ Token_string body;
       }
 
 const Parser parser(PM_FUNCTION, LOC, false);
-   if (const ErrorCode ec = parser.parse(body_text, body))
+   if (const ErrorCode ec = parser.parse(body_text, body, true))
       {
         CERR << "Parsing '" << body_text << "' failed" << endl;
         return 0;

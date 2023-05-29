@@ -26,6 +26,8 @@
 
 #include "Token.hh"
 
+class Executable;
+
 /*!
      Functions related to parsing of input lines and defined functions.
  */
@@ -41,16 +43,23 @@ public:
    {}
 
    /// Parse UCS_string \b input into token string \b tos.
-   ErrorCode parse(const UCS_string & input, Token_string & tos) const;
+   ErrorCode parse(const UCS_string & input, Token_string & tos,
+                   bool optimize) const;
 
    /// Parse token string \b input into token string \b tos.
-   ErrorCode parse(const Token_string & input, Token_string & tos) const;
+   ErrorCode parse(const Token_string & input, Token_string & tos,
+                   bool optimize) const;
 
-   /// quick (!_ decision if tos[pos] is right of ←
+   /// quick (!) decision if tos[pos] is right of ←
    static Assign_state get_assign_state(Token_string & tos, ShapeItem pos);
 
-   /// replace literal axes by their reduction.
-   static void replace_literal_axes(Token_string & tos);
+   /// substitute literal axes like [ VAL ] with their reduction (i.e.
+   /// TOK_AXIS or TOK_INDEX, depending on VAL. Return \b true if so.
+   static bool optimize_literal_axes(Token_string & tos);
+
+   /// substitute some primitives with short arguments and short result,
+   /// like 4⍴0 in place.
+   static bool optimize_short_primitives(Token_string & tos);
 
    /// remove all TOK_VOID token from \b tos (compacting \b tos).
    /// @return the number of tpkens removed (and adjust the size of \b tos)/
@@ -61,7 +70,7 @@ public:
 
 protected:
    /// Parse token string \b tos (a statement without diamonds).
-   static ErrorCode parse_statement(Token_string & tos);
+   static ErrorCode parse_statement(Token_string & tos, bool optimize);
 
    /// find opening bracket; throw error if not found
    static int find_opening_bracket(const Token_string & tos, int pos);
@@ -76,7 +85,7 @@ protected:
    static int find_closing_parent(const Token_string & tos, int pos);
 
    /// Collect consecutive smaller APL values or value token into vectors
-   static void collect_constants(Token_string & tos);
+   static bool collect_constants(Token_string & tos);
 
    /// mark next symbol left of ← on the same level as LSYMB
    static void mark_lsymb(Token_string & tos);

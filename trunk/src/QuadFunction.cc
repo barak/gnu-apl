@@ -913,7 +913,7 @@ Parser parser(PM_EXECUTE, LOC, false);
          if (end_pos != -1)  break;
 
          Token_string tos;
-         ErrorCode ec = parser.parse(line, tos);
+         ErrorCode ec = parser.parse(line, tos, true);
          if (ec != E_NO_ERROR)
             {
               throw_apl_error(ec, LOC);
@@ -944,7 +944,7 @@ Value_P Z(lines.size(), LOC);
    loop(z, lines.size())
       {
          Token_string tos;
-         parser.parse(lines[z], tos);
+         parser.parse(lines[z], tos, true);
          const ShapeItem val_count = (tos.size() + 1)/2;
          Value_P ZZ(val_count, LOC);
          loop(v, val_count)

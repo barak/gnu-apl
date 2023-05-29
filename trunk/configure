@@ -22535,7 +22535,7 @@ fi
 
   # locate pkg-config
     if test "x$PKG_CONFIG" = "xyes"; then             # we have pkg-config
-       if $PKG_CONFIG --exists python; then   # and pkg-config knows python
+       if $PKG_CONFIG --exists python3; then   # and pkg-config knows python3
             PYTHON_CFLAGS=$( $PKG_CONFIG --cflags python3 )
        fi
    fi
