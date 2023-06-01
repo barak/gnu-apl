@@ -445,7 +445,8 @@ Bif_F12_COMMA::eval_B(Value_P B) const
 {
 const Shape shape_Z(B->element_count());
 
-   if (B->get_owner_count() == 2 &&
+   if (DO_RT_COMMA_B              &&
+       B->get_owner_count() == 2  &&
        this == Workspace::SI_top()->get_prefix().get_monadic_fun())
       {
         Log(LOG_optimization)
@@ -522,10 +523,13 @@ ShapeItem c2 = 1;   // assume B is scalar;
       }
 
 Shape shape_Z(c1, c2);
-   if (B->get_owner_count() == 2 &&
+   if (DO_RT_COMMA1_B            &&
+       B->get_owner_count() == 2 &&
        this == Workspace::SI_top()->get_prefix().get_monadic_fun())
       {
         Log(LOG_optimization) CERR << "optimizing ,B" << endl;
+
+        OptmizationStatistics::count(OPTI_RT_COMMA1_B);
 
         B->set_shape(shape_Z);
         return Token(TOK_APL_VALUE1, B);

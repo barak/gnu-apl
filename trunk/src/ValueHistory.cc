@@ -122,13 +122,16 @@ const VH_entry * previous = 0;
    out << endl;
 }
 //----------------------------------------------------------------------------
+/// return the letters of some \b flags set
 static UCS_string
 flags_name(ValueFlags flags)
 {
 UCS_string ret;
 
-  if (flags & VF_marked)   ret.append(UNI_M);
-  if (flags & VF_complete) ret.append(UNI_C);
+  if (flags & VF_marked)     ret.append(UNI_M);
+  if (flags & VF_complete)   ret.append(UNI_C);
+  if (flags & VF_packed)     ret.append(UNI_P);
+  if (flags & VF_member)     ret.append(UNI_m);
 
    while (ret.size() < 4)   ret.append(UNI_SPACE);
    return ret;

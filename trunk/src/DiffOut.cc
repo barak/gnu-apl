@@ -105,8 +105,8 @@ DiffOut::different(const UTF8 * apl, const UTF8 * ref, size_t & pos)
 
          const Unicode a = UTF8_string::toUni(apl, len_apl, true);
          const Unicode r = UTF8_string::toUni(ref, len_ref, true);
-         apl += len_apl;
-         ref += len_ref;
+         apl += len_apl;   // skip a in apl
+         ref += len_ref;   // skip r in ref
 
          if (a == r)   // same char
             {
@@ -191,15 +191,15 @@ DiffOut::different(const UTF8 * apl, const UTF8 * ref, size_t & pos)
             }
          if (r == UNI_PAD_Un)   // ⁿ: optional unit multiplier
             {
-              // ⁿ shall match an optional  unit multiplier, ie.
-              // m, n, u, or μ
+              // ⁿ shall match an optional unit (milli, micro, or nano)
+              // multiplier i.e. m, n, u, or μ
               //
               if (a == 'm')       continue;
               if (a == 'n')       continue;
               if (a == 'u')       continue;
               if (a == UNI_MUE)   continue;
 
-              // no unit matches as well
+              // no unit multiplier matches
               apl -= len_apl;
               continue;
             }
@@ -207,6 +207,8 @@ DiffOut::different(const UTF8 * apl, const UTF8 * ref, size_t & pos)
          return true;   // different
        }
 
-   return false;   // not different
+   // not reached
+   //
+   return true;
 }
 //----------------------------------------------------------------------------

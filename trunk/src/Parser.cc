@@ -24,6 +24,7 @@
 #include <string.h>
 #include <vector>
 
+#include "Bif_F12_COMMA.hh"
 #include "CharCell.hh"
 #include "ComplexCell.hh"
 #include "Common.hh"
@@ -191,7 +192,7 @@ Parser::parse_statement(Token_string & tos, bool optimize)
         if (DO_FT_LITERAL_AXIS && optimize_literal_axes(tos))
            remove_TOK_VOID(tos);
 
-        if (DO_FT_SHORT_PRIMITIVE && optimize_short_primitives(tos))
+        while (DO_FT_SHORT_PRIMITIVE && optimize_short_primitives(tos))
            remove_TOK_VOID(tos);
       }
 
@@ -261,6 +262,7 @@ bool progress = false;
            {
              case TOK_APL_VALUE1:
              case TOK_APL_VALUE3:
+             case TOK_APL_VALUE4:
              case TOK_CHARACTER:
              case TOK_COMPLEX:
              case TOK_INTEGER:
@@ -297,6 +299,7 @@ bool progress = false;
               if (tag == TOK_COMPLEX)      continue;
               if (tag == TOK_APL_VALUE1)   continue;
               if (tag == TOK_APL_VALUE3)   continue;
+              if (tag == TOK_APL_VALUE4)   continue;
 
               // no more values: stop collecting
               //
@@ -336,6 +339,7 @@ int opening = -1;
               case TOK_COMPLEX:
               case TOK_APL_VALUE1:
               case TOK_APL_VALUE3:
+              case TOK_APL_VALUE4:
                    continue;
 
               case TOK_L_PARENT:
@@ -355,7 +359,7 @@ int opening = -1;
 
                    // we removed parantheses, so we close the value.
                    //
-                   if (tos[opening + 1].get_tag() == TOK_APL_VALUE3)
+                   if (tos[opening + 1].get_Class() == TC_VALUE)
                       tos[opening + 1].ChangeTag(TOK_APL_VALUE1);
 
                    Log(LOG_collect_constants)
@@ -722,7 +726,7 @@ Parser::optimize_short_primitives(Token_string & tos)
    // such as 4⍴0 with their result. The scope of tos is one statement.
    //
 bool progress = false;
-   if (tos.size() < 2)   return false;   // too short to optimize
+   if (tos.size() < 3)   return false;   // too short to optimize
 
 // CERR << endl << "tos: ";   tos.print(CERR, false);
 
@@ -731,63 +735,133 @@ bool progress = false;
    //
    //  (2⍴5) ⍴ 6
    //
-   // The optimization starts at 6 (end of statement) and restarts at ).
+   // The optimization starts at "6" (end of statement) and restarts at ")".
    //
 vector<ShapeItem> ends;
    ends.push_back(tos.size());
 
    // tos is in forward (aka. APL) order. We move backwards from the end
    //
-   for (int pc = tos.size() - 1; pc >= 0; --pc)
+   rev_loop(pc, tos.size())
        {
-         const TokenTag tag = tos[pc].get_tag();
-         if (tag == TOK_R_BRACK || tag == TOK_R_PARENT)   ends.push_back(pc);
+         if (pc < 3)   break;   // to few tokens remaining in tos
+
+         // at this point we have at least:
+         //
+         // in APL order:
+         //
+         // END A F B   (dyadic function call)
+         // END F B     (monadic function call)
+         //
+         // in reverse order:
+         //
+         // B F A END   (dyadic function call)
+         // B F END     (monadic function call)
+         //
+         // That is A, F, and B are valid, and END must be checked
+         // for the dyadic cases
+         //
+         if ((1 << tos[pc].get_Class()) & TCG_R_PAR_BRA)   ends.push_back(pc);
        }
 
    loop(e, ends.size())
        {
-         const ShapeItem src_B = ends[e] - 1;
-         const ShapeItem src_F = src_B - 1;          // ends[e] - 2
-         const ShapeItem src_A = src_F - 1;          // ends[e] - 3
+         // set shortcuts for relevant positions (PCs) in tos.
+         //
+         const ShapeItem src_Q  =                 ends[e] - 4;
+         const ShapeItem src_AQ = src_Q + 1;    // ends[e] - 3
+         const ShapeItem src_F  = src_AQ + 1;   // ends[e] - 2
+         const ShapeItem src_B  = src_F + 1;    // ends[e] - 1
+
+         Token & tok_B = tos[src_B];
+         if (tok_B.get_Class() != TC_VALUE)   continue;
 
          Token & tok_F = tos[src_F];
-         Token & tok_B = tos[src_B];
-
-         if (tok_B.get_tag() != TOK_APL_VALUE3)    continue;
-         if (tok_F.get_Class() != TC_FUN2)         continue;
-
+         if (tok_F.get_Class() != TC_FUN2)    continue;
          Function_P fun = tok_F.get_function();
 
-         if (src_A >= 0 && tos[src_A].get_tag() == TOK_APL_VALUE3)
-             {
-               // dyadic primitive
-               //
-               Token & tok_A = tos[src_A];
-               if (fun == Bif_F12_RHO::fun)
-                  {
+          // check if the function call can only be monadic adic and rule
+          // out strand notation cases. For example (by Elias Mårtenson
+          // and checked with IBM APL2):
+          //
+          // X←2 ◊ X 1 ⍴ 10 11
+          //
+          // Although tail "1 ⍴ 10 11" qualifies for optimization,
+          // the X binds stronger than "⍴ 10 11" and undermines it.
+          //
+         Token & tok_Q = tos[src_Q];
+         const bool may_glue = (src_Q >= 0)  &&
+                               ((1 << tok_Q.get_Class()) & TCG_MAY_GLUE);
+
+         // NOTE: 'not_dyadic' does not mean monadic. It merely means that
+         //       a dyadic optimization would be incorrect. IOW: not_dyadic
+         //       shall only prevent dyadic optimization, but not allow
+         //       monadic optimizations.
+         //
+         //
+         const bool not_dyadic = src_Q < 0 ||    // no A
+                                 may_glue;       // Q 1
+
+         const bool no_A = (src_AQ < 0) ||
+                           ((1 << tos[src_AQ].get_Class()) & TCG_NO_A);
+         // specific optimization cases (functions)...
+         //
+         if (fun == Bif_F12_RHO::fun)   // maybe A⍴B
+            {
+              if (not_dyadic)   continue;
+
+              if (tos[src_AQ].get_Class() == TC_VALUE)
+                 {
+                   Token & tok_A = tos[src_AQ];
                     // NOTE: we use Bif_F12_RHO::do_reshape() instead of
                     // Bif_F12_RHO::eval_AB() as to bypass the ⍴ optimization
                     // (which won't work well here)
                     //
                     const Shape sh_A(*tok_A.get_apl_val(), /* qio */ 0);
+                    Value_P val_B = tok_B.get_apl_val();
+
                     if (sh_A.fits_into(cfg_SHORT_VALUE_LENGTH_WANTED))
                        {
-                         Token tZ = Bif_F12_RHO::fun->do_reshape(sh_A,
-                                                 *tok_B.get_apl_val());
+                         Token tZ = Bif_F12_RHO::fun->do_reshape(sh_A, *val_B);
                          tok_A.clear(LOC);   // sets it to TOK_VOID
                          tok_F.clear(LOC);   // sets it to TOK_VOID
                          tok_B.clear(LOC);
-                         tok_B.move(tZ, LOC);
+                         new (&tok_B) Token(TOK_APL_VALUE4, tZ.get_apl_val());
                          OptmizationStatistics::count(OPTI_FT_SHORT_PRIMITIVE);
                          progress = true;
                        }
-                  }
-             }
-          else
-             {
-               // monadic
-             }
+                 }
+            }
+         else if (fun == Bif_F12_COMMA::fun)   // maybe ,B
+            {
+              if (no_A)   // not dyadic A,B
+                 {
+                   Value_P B = tok_B.get_apl_val();
+                   const Shape new_shape(B->element_count());
+                   B->set_shape(new_shape);
+                   tok_F.clear(LOC);   // set , to TOK_VOID
+                   OptmizationStatistics::count(OPTI_FT_SHORT_PRIMITIVE);
+                   progress = true;
+                 }
+            }
+         else if (fun == Bif_F12_COMMA1::fun)   // maybe ⍪B
+            {
+              if (no_A)   // not dyadic A,B
+                 {
+                   Value_P B = tok_B.get_apl_val();
+                   const Shape & sh_B = B->get_shape();
+                   ShapeItem low_volume = 1;   // ×/1↓⍴B
+                   for (ShapeItem r = 1; r <sh_B.get_rank(); ++r)
+                       low_volume *= sh_B.get_shape_item(r);
+                   const Shape new_shape(1, low_volume);
+                   B->set_shape(new_shape);
+                   tok_F.clear(LOC);   // set ⍪ to TOK_VOID
+                   OptmizationStatistics::count(OPTI_FT_SHORT_PRIMITIVE);
+                   progress = true;
+                 }
+            }
        }
+
    return progress;
 }
 //----------------------------------------------------------------------------
@@ -983,6 +1057,7 @@ Value_P Z(count, LOC);
 
             case TOK_APL_VALUE1:
             case TOK_APL_VALUE3:
+            case TOK_APL_VALUE4:
                  Z->next_ravel_Value(tok.get_apl_val().get());
                  tok.clear(LOC);   // invalidate token
                  break;
@@ -1033,7 +1108,7 @@ Parser::mark_lsymb(Token_string & tos)
                         break;
                       }
                    if (tc == TC_SYMBOL)     continue; 
-                   if (tc == TC_FUN12 || tc == TC_OPER1 || tc == TC_OPER2)
+                   if ((1 << tc) & TCG_FUN12_OPER12)
                       {
                         is_selective_spec = true;
                         is_vector_spec = false;

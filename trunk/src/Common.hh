@@ -143,7 +143,11 @@ extern ostream UERR;
 class UCS_string;
 extern UCS_string & MORE_ERROR();   // in Workspace.cc; clears MORE info.
 
-#define loop(v, e) for (ShapeItem v = 0, __end__ = e; v < __end__; ++v)
+/// loop from (including) 0 up to (excluding) e
+#define loop(v, e)       for (ShapeItem v = 0, __end__ = e; v < __end__; ++v)
+
+/// loop from (excluding) e down to (including) 0
+#define rev_loop(v, e)   for (ShapeItem v = e; --v >= 0;)
 
 // #define TROUBLESHOOT_NEW_DELETE
 

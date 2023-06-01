@@ -72,14 +72,17 @@ Workspace::Workspace()
      prompt("      "),
      top_SI(0)
 {
+/// Read-Only System Variable
 #define ro_sv_def(x, str, _txt)                                   \
    if (*str) { UCS_string q(UNI_Quad_Quad);   q.append_UTF8(str); \
    distinguished_names.add_variable(q, ID_ ## x, &v_ ## x); }
 
+/// Read/Write System Variable
 #define rw_sv_def(x, str, _txt)                                   \
    if (*str) { UCS_string q(UNI_Quad_Quad);   q.append_UTF8(str); \
    distinguished_names.add_variable(q, ID_ ## x, &v_ ## x); }
 
+/// System Function
 #define sf_def(x, str, _txt)                                      \
    if (*str) { UCS_string q(UNI_Quad_Quad);   q.append_UTF8(str); \
    distinguished_names.add_function(q, ID_ ## x, x::fun); }
@@ -485,7 +488,9 @@ Workspace::unmark_all_values()
 
    // unmark system variables
    //
+/// Read/Write System Variable
 #define rw_sv_def(x, _str, _txt) the_workspace.v_ ## x.unmark_all_values();
+/// Read-Only System Variable
 #define ro_sv_def(x, _str, _txt) the_workspace.v_ ## x.unmark_all_values();
 #include "SystemVariable.def"
    the_workspace.v_Quad_Quad .unmark_all_values();
@@ -513,7 +518,9 @@ int count = 0;
 
    // system variabes
    //
+/// Read/Write System Variable
 #define rw_sv_def(x, _str, _txt) count += get_v_ ## x().show_owners(out, value);
+/// Read-Only System Variable
 #define ro_sv_def(x, _str, _txt) count += get_v_ ## x().show_owners(out, value);
 #include "SystemVariable.def"
    count += the_workspace.v_Quad_Quad .show_owners(out, value);
@@ -589,7 +596,9 @@ const APL_Integer tz = the_workspace.v_Quad_TZ.get_offset();
 
    // clear the value stacks of read/write system variables...
    //
+/// Read/Write System Variable
 #define rw_sv_def(x, _str, _txt) get_v_ ## x().clear_vs();
+/// Read-Only System Variable
 #define ro_sv_def(x, _str, _txt)
 #include "SystemVariable.def"
 
@@ -598,8 +607,10 @@ const APL_Integer tz = the_workspace.v_Quad_TZ.get_offset();
    //
 // Value::erase_all(out);
 
+/// Read/Write System Variable
 #define rw_sv_def(x, _str, _txt) \
    { get_v_ ##x().~x();   new (&get_v_ ##x()) x; }
+/// Read-Only System Variable
 #define ro_sv_def(x, _str, _txt)
 #include "SystemVariable.def"
 
@@ -939,7 +950,9 @@ int variable_count = 0;
 
    // system variables
    //
+/// Read/Write System Variable
 #define ro_sv_def(x, _str, _txt)
+/// Read-Only System Variable
 #define rw_sv_def(x, _str, _txt) if (ID_ ## x != ID_Quad_SYL) \
    { get_v_ ## x().dump(*sout);   ++variable_count; }
 #include "SystemVariable.def"

@@ -129,6 +129,12 @@ public:
    static bool auto_MORE;
 
 protected:
+   /// On, Off, or Toggle
+   enum OOT { Off = 0, On = 1, Toggle = 2 };
+
+   /// a logging ID and an action (On/Off/Toggle) to be performed with it
+   struct lid_OOT { LogId lid;   OOT on_off_toggle; };
+
    /// )BOXING command
    static void cmd_BOXING(ostream & out, const UCS_string & arg);
 

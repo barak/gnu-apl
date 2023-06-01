@@ -167,6 +167,14 @@ public:
    void decrement_refcount(const char * loc);
 
 protected:
+   /// the body positions of the ←← and ←→ tokens of a congitional
+   struct conditional
+      {
+        Function_PC if_THEN;   // position of the ←← token (end of condition)
+        Function_PC if_ELSE;   // position of the ←→ token (before else clause)
+      };
+
+
    /// return true if the body contains { ... }. The parser has already
    /// complained if the curly brackets do not match, therefore we only check
    /// for } (which comes  last in APL, but first in the (reversed) body.

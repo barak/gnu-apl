@@ -152,6 +152,33 @@ enum Binding_Strength
    BS_ANY_BRA = 80    ///< ANY []  : [] to what is on its left
 };
 
+   /// token class groups (class bitmaps)
+enum TokenClassGroup
+{
+   /// function with arguments
+   TCG_FUN12_OPER12 = 1 << TC_FUN12
+                    | 1 << TC_OPER1
+                    | 1 << TC_OPER2,
+
+   ///  something that has (or may produce) a value
+   TCG_MAY_GLUE     = 1 << TC_SYMBOL   // variable
+                    | 1 << TC_FUN0     // niladic function
+                    | 1 << TC_VALUE,   // value
+
+   /// ) or ]
+   TCG_R_PAR_BRA    = 1 << TC_R_PARENT
+                    | 1 << TC_R_BRACK,
+
+   /// classes X for which FUN in "X FUN B" can only be monadic.
+   TCG_NO_A         = 1 << TC_ASSIGN            //  ← FUN B
+                    | 1 << TC_R_ARROW           //  → FUN B
+                    | 1 << TC_L_BRACK           //  [ FUN B
+                    | 1 << TC_END               //  ◊ FUN B
+                    | 1 << TC_FUN12             //  + FUN B
+                    | 1 << TC_OPER1             // f/ FUN B
+                    | 1 << TC_L_PARENT,         // ( FUN B
+};
+   
 /// The value type of a token
 
 enum TokenValueType

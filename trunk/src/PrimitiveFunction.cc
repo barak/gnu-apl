@@ -53,22 +53,22 @@
 
 // primitive function instances
 //
-Bif_F0_ZILDE      Bif_F0_ZILDE     ::_fun;    // ⍬
+Bif_F12_DECODE    Bif_F12_DECODE   ::_fun;    // ⊥
+Bif_F12_ELEMENT   Bif_F12_ELEMENT  ::_fun;    // ϵ
+Bif_F12_ENCODE    Bif_F12_ENCODE   ::_fun;    // ⊤
+Bif_F12_EQUIV     Bif_F12_EQUIV    ::_fun;    // ≡
 Bif_F1_EXECUTE    Bif_F1_EXECUTE   ::_fun;    // ⍎
 Bif_F2_INDEX      Bif_F2_INDEX     ::_fun;    // ⌷
-Bif_F12_ELEMENT   Bif_F12_ELEMENT  ::_fun;    // ϵ
-Bif_F12_EQUIV     Bif_F12_EQUIV    ::_fun;    // ≡
+Bif_F2_INTER      Bif_F2_INTER     ::_fun;    // ∩
+Bif_F2_LEFT       Bif_F2_LEFT      ::_fun;    // ⊣
 Bif_F12_NEQUIV    Bif_F12_NEQUIV   ::_fun;    // ≢
-Bif_F12_ENCODE    Bif_F12_ENCODE   ::_fun;    // ⊤
-Bif_F12_DECODE    Bif_F12_DECODE   ::_fun;    // ⊥
+Bif_F2_RIGHT      Bif_F2_RIGHT     ::_fun;    // ⊢
+Bif_F12_RHO       Bif_F12_RHO      ::_fun;    // ⍴
 Bif_F12_ROTATE    Bif_F12_ROTATE   ::_fun;    // ⌽
 Bif_F12_ROTATE1   Bif_F12_ROTATE1  ::_fun;    // ⊖
 Bif_F12_TRANSPOSE Bif_F12_TRANSPOSE::_fun;    // ⍉
-Bif_F12_RHO       Bif_F12_RHO      ::_fun;    // ⍴
-Bif_F2_INTER      Bif_F2_INTER     ::_fun;    // ∩
 Bif_F12_UNION     Bif_F12_UNION    ::_fun;    // ∪
-Bif_F2_LEFT       Bif_F2_LEFT      ::_fun;    // ⊣
-Bif_F2_RIGHT      Bif_F2_RIGHT     ::_fun;    // ⊢
+Bif_F0_ZILDE      Bif_F0_ZILDE     ::_fun;    // ⍬
 
 // primitive function pointers
 //
@@ -193,7 +193,8 @@ const Shape shape_Z(*A, 0);
 
 const ShapeItem len_Z = shape_Z.get_volume();
 
-   if (len_Z <= B->element_count() &&   // 1.   Z is not longer than B
+   if (DO_RT_A_RHO_B               &&
+       len_Z <= B->element_count() &&   // 1.   Z is not longer than B
        B->get_owner_count() == 2   &&   // 2.   B is a temporary value
        this == Workspace::SI_top()->get_prefix().get_dyadic_fun())   // 3. below
       {

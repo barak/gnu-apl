@@ -417,6 +417,7 @@ Value_P Z2(2, LOC);
       {
         case TOK_APL_VALUE1:
         case TOK_APL_VALUE3:
+        case TOK_APL_VALUE4:
              Z->next_ravel_1();
              Z->next_ravel_Pointer(Z2.get());
              Z->next_ravel_Value(result.get_apl_val().get());

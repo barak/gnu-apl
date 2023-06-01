@@ -547,9 +547,9 @@ const TokenTag tag = result.get_tag();
 Value_P B(result.get_apl_val());
    Assert(+B);
 
-   // print TOK_APL_VALUE and TOK_APL_VALUE1, but not TOK_APL_VALUE2
+   // print values, but not TOK_APL_VALUE2 (comited value)
    //
-bool print_value = tag == TOK_APL_VALUE1 || tag == TOK_APL_VALUE3;
+bool print_value = result.get_Class() == TC_VALUE && tag != TOK_APL_VALUE2;
 
 #ifdef apl_TARGET_LIBAPL
    if (res_callback)   // callback installed

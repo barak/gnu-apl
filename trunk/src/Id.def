@@ -51,6 +51,7 @@ st( ALPHA              , "⍺"       ,          )
 st( ALPHA_U            , "⍶"       ,          )
 st( ASSIGN1            , "←"       ,          )
 sf( F2_AND_B           , "⊤∧"       ,         )
+pp( APL_VALUE4         , ---       ,          )
 
 sf( F12_BINOM          , "!"       , = 0x4201 )   // B...
 st( BRANCH             , "→"       ,          )

@@ -367,7 +367,7 @@ public:
            Unicode next()
               { Assert(pos < s.size());   return s[pos++]; }
 
-           // undo a prio next();
+           /// undo a prior next();
            void un_next()
               { Assert(pos);   --pos; }
 

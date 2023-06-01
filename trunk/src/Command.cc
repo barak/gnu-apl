@@ -2468,14 +2468,11 @@ UCS_string_vector args = split_arg(arg);
         return;
       }
 
-   // at this point args is a sequence of numbers (LIDss) and actions (ON or
+   // at this point args is a sequence of numbers (LIDs) and actions (ON or
    // OFF). We parse args back to front. to acreate a vector of actions
    // which is then executed from front to back.
    //
-   enum OOT { Off = 0, On = 1, Toggle = 2 };
-struct lid_OOT { LogId lid;   OOT on_off_toggle; };
 vector<struct lid_OOT> lid_OOTs;
-
 OOT action = Toggle;
    loop(a, args.size())
        {

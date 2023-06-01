@@ -162,13 +162,15 @@ Shape::check_same(const Shape & B, ErrorCode rank_err, ErrorCode len_err,
 bool
 Shape::fits_into(ShapeItem max_ravel) const
 {
+   // must not throw!
+
 ShapeItem volume = 1;
    loop(r, rho_rho)
        {
          const ShapeItem sr = rho[r];
          if (sr > 0)         volume *= r;
          else if (sr == 0)   return true;
-         else DOMAIN_ERROR;
+         else                return false;
        }
 
    return volume <= max_ravel;

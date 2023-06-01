@@ -1005,7 +1005,7 @@ Prefix::locate_X(UCS_string & function)
    // either at0() (for monadic f X B) or at1() (for dyadic A f X B) must
    // be a function or operator
    //
-   for (int x = size() - 1; x >= 0; --x)
+   rev_loop(x, size())
        {
          if (content[x].tok.get_ValueType() == TV_FUN)
             {
@@ -1078,7 +1078,7 @@ Prefix::reduce_LPAR_B_RPAR_()
    Assert1(prefix_len == 3);
 
 Token result = at1();   // B or F
-   if (result.get_tag() == TOK_APL_VALUE3)   result.ChangeTag(TOK_APL_VALUE1);
+   if (result.get_Class() == TC_VALUE)   result.ChangeTag(TOK_APL_VALUE1);
 
    pop_args_push_result(result);
    set_action(RA_CONTINUE);
@@ -2231,7 +2231,7 @@ const int count = vector_ass_count();
         // false around line 820 in Parser.cc). We fix this case here.
         //
         TokenClass tc = body[PC].get_Class();
-        if (tc != TC_FUN12 && tc != TC_OPER1 && tc != TC_OPER2)
+        if (!((1 << tc) & TCG_FUN12_OPER12))
            {
              // this case is rather rare, so we can afford a little time
              // to verify that we have at least one function in the supposed
@@ -2240,7 +2240,7 @@ const int count = vector_ass_count();
              for (int pc = PC + 1;;)
                  {
                    tc = body[pc++].get_Class();
-                   if (tc == TC_FUN12 || tc == TC_OPER1 || tc == TC_OPER2)
+                   if ((1 << tc) & TCG_FUN12_OPER12)
                       {
                         selective_spec = true;
                         break;

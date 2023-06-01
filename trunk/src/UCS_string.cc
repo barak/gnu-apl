@@ -1566,18 +1566,18 @@ const bool round_down = back() <= UNI_4;   // remember direction
 
 bool carry = true;   // from the rounded up digit
 
-   for (int q = size() - 1; q >= 0; --q)
+   rev_loop (q, size())
        {
-         const Unicode cc = at(q);
-         if (cc < UNI_0)   continue;   // not a digit, e.g. ¯ or .
-         if (cc > UNI_9)   continue;   // not a digit, e.g. ¯ or .
-         if (cc == UNI_9)
+         const Unicode uni = at(q);
+         if (uni < UNI_0)   continue;   // not a digit, e.g. ¯ or .
+         if (uni > UNI_9)   continue;   // not a digit, e.g. ¯ or .
+         if (uni == UNI_9)
             {
               at(q) = UNI_0;   // 9 → 0 and keep carry
             }
          else
             {
-              at(q) = Unicode(cc + 1);   // round cc up and clear carry
+              at(q) = Unicode(uni + 1);   // round cc up and clear carry
               carry = false;
               break;
             }

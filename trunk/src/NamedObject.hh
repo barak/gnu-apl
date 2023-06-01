@@ -47,12 +47,29 @@ enum NameClass
   NC_case_mask        =  0x00FF,   ///< almost ⎕NC
   NC_bool_mask        =  0xFF00,   ///< for fast selection
 
+  /// name of a function or operator
   NC_FUN_OPER         = (NC_FUNCTION | NC_OPERATOR) & NC_bool_mask,
+
+   // NC class bitmaps...
+
+  /// name allowed left of ←
   NC_left             = (NC_VARIABLE         |
                          NC_UNUSED_USER_NAME |
                          NC_SYSTEM_VAR       |
                          NC_INVALID          //  ⎕, ⍞, ⎕xx
-                        ) & NC_bool_mask
+                        ) & NC_bool_mask,
+
+  /// name of a variable
+  NC_variables        = (NC_VARIABLE | NC_SYSTEM_VAR)       & NC_bool_mask,
+
+  /// name that has a value
+  NC_values           = (NC_LABEL    | NC_variables)        & NC_bool_mask,
+
+  /// name of a function
+  NC_functions        = (NC_FUNCTION | NC_SYSTEM_FUN)       & NC_bool_mask,
+
+  /// name whose class may be changed
+  NC_unknown          = (NC_INVALID  | NC_UNUSED_USER_NAME) & NC_bool_mask,
 };
 //----------------------------------------------------------------------------
 /**

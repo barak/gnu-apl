@@ -121,18 +121,18 @@ python_result_callback(Token & result)
 const TokenTag tag = result.get_tag();
 bool do_display = false;
 
-   if (tag == TOK_APL_VALUE1 || tag == TOK_APL_VALUE3)   // non-committed value
+   if (tag == TOK_APL_VALUE2)                       // committed value
+      {
+        do_display = display_mode > 1;
+        exec_result = PyTuple_Pack(2, PyLong_FromLong(2),
+                                   apl_to_python(result.get_apl_val().get()));
+      }
+   else if (result.get_Class() == TC_APL_VALUE1)   // non-committed value
       {
         do_display = display_mode > 0;
         exec_result = PyTuple_Pack(2, PyLong_FromLong(1),
                                    apl_to_python(result.get_apl_val().get()));
 
-      }
-   else if (tag == TOK_APL_VALUE2)                       // committed value
-      {
-        do_display = display_mode > 1;
-        exec_result = PyTuple_Pack(2, PyLong_FromLong(2),
-                                   apl_to_python(result.get_apl_val().get()));
       }
    else if (tag == TOK_VOID)                            // void
       {

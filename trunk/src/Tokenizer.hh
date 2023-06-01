@@ -119,19 +119,19 @@ public:
    /// an APL_Integer or a APL_Float.
    struct Int_or_Double
       {
-         // default constructor for uninitialized Int_or_Double
+         /// default constructor for uninitialized Int_or_Double
          Int_or_Double()
             : is_double(false),
               is_valid(false)
             {   value.APL_int = 0; }
 
-         // constructor for integer
+         /// constructor for integer
          Int_or_Double(APL_Integer aint)
             : is_double(false),
               is_valid(true)
             {   value.APL_int = aint; }
 
-         // constructor for double
+         /// constructor for double
          Int_or_Double(APL_Float aflt)
             : is_double(true),
               is_valid(true)
@@ -140,9 +140,11 @@ public:
          const bool is_double;   ///< true if so.
          const bool is_valid;    ///< true if so.
 
+        /// return value as APL_Float
         double get_double() const
            { return is_double ? value.APL_flt : value.APL_int; }
 
+         /// an APL_Float or an APL_Float
          union
             {
               APL_Integer APL_int;

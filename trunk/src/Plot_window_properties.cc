@@ -409,12 +409,12 @@ Plot_window_properties::set_attribute(const UCS_string & att, const Cell & val)
    //
 UCS_string att1 = att;
 bool trailing_NNN = false;
-   for (int a = att1.size() - 1; a >= 0; --a)
+   rev_loop(a, att1.size())
        {
-         const Unicode cc = att1[a];
-         if (!Avec::is_digit(cc))
+         const Unicode uni = att1[a];
+         if (!Avec::is_digit(uni))
             {
-               trailing_NNN = cc == UNI_UNDERSCORE;
+               trailing_NNN = uni == UNI_UNDERSCORE;
                if (trailing_NNN)   att1[a] = UNI_MINUS;
                break;
             }

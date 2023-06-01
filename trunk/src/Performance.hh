@@ -366,6 +366,9 @@ enum Optimization_ID
 
 enum Do_Optimization
 {
+  FT_ANY = 0,   ///< all ⎕FX time optimizations
+  RT_ANY = 1,   ///< all run time optimizations
+
 #define optim(enabled, tag, __text)  \
    DO_ ## tag = enabled, DONT_ ## tag = 1 - enabled,
 #include "Performance.def"

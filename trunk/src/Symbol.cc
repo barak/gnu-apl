@@ -583,14 +583,6 @@ Symbol::M_is_F() const
    // return true if the operator shall be downgraded to a function and
    // false if it should remain an operator.
 
-   // NC class bitmaps
-   enum {
-          NC_variables =  NC_VARIABLE | NC_SYSTEM_VAR        & NC_bool_mask,
-          NC_values    = (NC_LABEL    | NC_variables)        & NC_bool_mask,
-          NC_functions = (NC_FUNCTION | NC_SYSTEM_FUN)       & NC_bool_mask,
-          NC_unknown   = (NC_INVALID  | NC_UNUSED_USER_NAME) & NC_bool_mask,
-        };
-
 const NameClass nc = get_NC();
    if (nc & NC_values)      return true;
    if (nc & NC_functions)   return false;

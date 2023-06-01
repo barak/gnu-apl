@@ -79,7 +79,7 @@ UCS_string header = UserFunction_header::lambda_header(sig, lambda_num);
    // remove local vars from lambda_text and add them to the header
    //
 ShapeItem last_semi = -1;
-   for (ShapeItem t = lambda_text.size() - 1; t >= 0; --t)
+   rev_loop(t,lambda_text.size())
        {
          const Unicode cc = lambda_text[t];
          if (cc == UNI_SPACE)      continue;
@@ -328,12 +328,6 @@ Executable::compute_if_else_targets()
 
 const char * cause = "";
 Function_Line cause_line = Function_Line_0;
-
-struct conditional
-{
-  Function_PC if_THEN;   // position of the ←← token (end of condition)
-  Function_PC if_ELSE;   // position of the ←→ token (before else clause)
-};
 
 vector<conditional> conditionals;
 
@@ -590,75 +584,81 @@ Function_PC end = get_statement_end(body_from_to.high);
    // extract the token of the failed statement and adjust the PCs so that
    // they refer to the failed statement (as opposed to body).
    //
-Token_string after_opt(body, start, end - start);
+const Token_string stat_after(body, start, end - start);
 
-const Function_PC2 after_from_to = { body_from_to.low  - start,
-                                    body_from_to.high - start };
+const Function_PC2 after_from_to(body_from_to.low  - start,
+                                 body_from_to.high - start );
 
    // expand any optimizations that were performed with the failed line
    //
-   if (0)
+   if (1)
    {
-     Token_string before_opt;
-     reparse(before_opt, body_from_to);
-     before_opt.reverse_from_to(0, before_opt.size() - 1);
-
-CERR << "before opt: ";   before_opt.print(CERR, false);
-CERR << "after opt : ";   after_opt .print(CERR, false);
-Q1(after_from_to.low)
-Q1(after_from_to.high)
-CERR << endl;
+     Token_string stat_before;
+     reparse(stat_before, body_from_to);
 
      bool optimized = false;
      Function_PC2 before_from_to = after_from_to;
-     {
-       int pc_after = 0;
-       loop(pc_before, before_opt.size())
+     /*
+          compute vector 'before_ranges', whose items correspond to
+          stat_before, so that if stat_after[j] is the optimization of
+          (before_ranges = J)/stat_before.
+
+          That is, for example:
+
+           stat_after is:  [ a0  a1     a2     a3 ... ] and
+                             │   │      │      │
+                             │   │   ┌──┼──┐   │
+                             │   │   │  │  │   │
+           stat_before is: [ b0  b1  b2 b2 b2  b3 ... ]  and then
+                             ^       ^
+
+           before_ranges should be:  0 1 2 2 2 3
+           
+      */
+       vector<int>ranges_before;   ranges_before.reserve(stat_before.size());
+
+       Function_PC PC_before = Function_PC_0;
+       Function_PC PC_after  = Function_PC_0;
+       while (int(ranges_before.size()) < stat_before.size()) 
+          {
+            if (stat_after[PC_after].get_tag() == TOK_APL_VALUE4)
+               {
+                 // optimized value
+                 //
+                 ranges_before.push_back(PC_after);
+                 ranges_before.push_back(PC_after);
+                 ranges_before.push_back(PC_after);
+                 optimized = true;
+               }
+            else
+               {
+                 ranges_before.push_back(PC_after);
+               }
+            ++PC_before;
+            ++PC_after;
+          }
+
+       rev_loop(PC_before, ranges_before.size())
            {
-             const Token & tok_before = before_opt[pc_before];
-             const Token & tok_after  = after_opt[pc_after];
+             const Function_PC after = Function_PC(ranges_before[PC_before]);
+             if (after == after_from_to.low)
+                before_from_to.low  = Function_PC(PC_before);
+             if (after == after_from_to.high)
+                before_from_to.high = Function_PC(PC_before);
 
-             // map from_to
-             //
-             if (pc_after == after_from_to.low)
-                {
-                   CERR << "low:  after pc " << pc_after
-                        << " → before pc "   << pc_before << endl;
-                   before_from_to.low = Function_PC(pc_before);
-                }
-             if (pc_after == after_from_to.high)
-                {
-                   CERR << "high: after pc " << pc_after
-                        << " → pc_before "   << pc_before << endl;
-                   before_from_to.high = Function_PC(pc_before);
-                }
-
-             if (tok_before.get_Class() != tok_after.get_Class())
-                   {
-                     optimized = true;
-                     pc_before += 2;
-Q1(pc_after)
-Q1(pc_before)
-Q1(tok_before)
-Q1(tok_after)
-                   }
-
-             ++pc_after;
+             // skip subsequent items within the same range
+             while (PC_before > 0 &&
+                    ranges_before[PC_before - 1] == after)   --PC_before;
            }
-     }
 
      if (optimized)   // optimized !
         {
-          Q1("OPTIMIZED");
-          Q1(before_from_to.low)
-          Q1(before_from_to.high)
-
-          set_error_info(error, before_opt, before_from_to);
+          set_error_info(error, stat_before, before_from_to);
           return;
         }
    }   // optimization check
 
-   set_error_info(error, after_opt, after_from_to);
+   set_error_info(error, stat_after, after_from_to);
 }
 //--------------------------------------------------------------------------
 void
@@ -683,21 +683,6 @@ Executable::set_error_info(Error & error,
 
    // Line 2: statement
    //
-/*
-    The statement is stored in reverse order in the body:
-
-    Body:  
-          start ... pc_low      ...       pc_high ... end
-                    ^                     ^
-                    |                     |
-                    +--- failed action ---+
-
-    Display:
-          end ... pc_high      ...      pc_low ... start ◊ next statement
-                  ^                     ^
-                  |                     |
-                  +--- failed action ---+
- */
 
 int len_left = 0;      // characters before the left caret
 int len_between = 0;   // distance between the left and the right caret
@@ -706,7 +691,7 @@ int len_between = 0;   // distance between the left and the right caret
    // left to right we have to move backwards from the end.
    //
 UCS_string message_2(error.get_error_line_2());
-   for (int q = failed_statement.size() - 1; q >= 0; --q)
+   rev_loop(q, failed_statement.size())
        {
          // avoid duplicate ∘ in ∘.f
          //
@@ -787,9 +772,16 @@ UCS_string failed_statement;
          }
    }
 
+   // reparse failed_statement without optimization into orig (in APL order)
 const Parser parser(get_parse_mode(), LOC, false);
-const ErrorCode ec = parser.parse(failed_statement, original, false);
+Token_string orig;
+const ErrorCode ec = parser.parse(failed_statement, orig, false);
    Assert(ec == E_NO_ERROR);
+
+   // revert orig, starting after label (if eny)
+   //
+const int end = orig.size() > 1 && orig[1].get_tag() == TOK_COLON ? 2 : 0;
+   for (int j = orig.size() - 1; j >= end; --j)   original.push_back(orig[j]);
 }
 //----------------------------------------------------------------------------
 Function_PC

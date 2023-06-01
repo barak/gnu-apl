@@ -28,9 +28,9 @@
 
 enum
 {
-#define syl1(_n, e, v) e = v,
-#define syl2(_n, e, v)
-#define syl3(_n, e, v)
+#define syl1(_n, e, v) e = v,   /** < constant ( ./configure'able ) */
+#define syl2(_n, e, v)          /** < variable */
+#define syl3(_n, e, v)          /** < constant ( not ./configure'able ) */
 #include "SystemLimits.def"
 
    DEFAULT_Quad_PP = 10,
