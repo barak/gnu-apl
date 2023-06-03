@@ -704,18 +704,18 @@ const APL_Complex one(1.0, 0.0);
                     const APL_Complex root = complex_sqrt(square);
                     if (b.real()  > 0.0)
                        {
-                         if (b.imag() > 0.0)    return ComplexCell::zC(Z,  root);
-                         else                   return ComplexCell::zC(Z, -root);
+                         if (b.imag() > 0.0)   return ComplexCell::zC(Z,  root);
+                         else                  return ComplexCell::zC(Z, -root);
                        }
                    else if (b.real() == 0.0)
                        {
-                         if (b.imag() > 1.0)    return ComplexCell::zC(Z,  root);
-                         else                   return ComplexCell::zC(Z, -root);
+                         if (b.imag() > 1.0)   return ComplexCell::zC(Z,  root);
+                         else                  return ComplexCell::zC(Z, -root);
                        }
                    else   // b.real() < 0,0;
                        {
-                         if (b.imag() >= 0.0)   return ComplexCell::zC(Z,  root);
-                         else                   return ComplexCell::zC(Z, -root);
+                         if (b.imag() >= 0.0)  return ComplexCell::zC(Z,  root);
+                         else                  return ComplexCell::zC(Z, -root);
                        }
                   }
 

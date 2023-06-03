@@ -188,7 +188,7 @@ uint64_t result = 0xC0000000;   // assume ~3 GB on error
 void
 Quad_WA::parse_mem(bool log_startup)
 {
-const char * mem_arg = uprefs.mem_arg;
+const char * mem_arg = UserPreferences::uprefs.mem_arg;
 
    if (mem_arg == 0)   // no --mem option given
       {

@@ -88,7 +88,7 @@ UserFunction::UserFunction(const UCS_string txt, const char * loc,
         return;
       }
 
-   if (uprefs.discard_indentation)   // really ?
+   if (UserPreferences::uprefs.discard_indentation)   // really ?
       {
         loop(l, get_text_size())
             {
@@ -472,7 +472,8 @@ UserFunction::eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const
 }
 //----------------------------------------------------------------------------
 Token
-UserFunction::eval_ALRXB(Value_P A, Token & LO, Token & RO, Value_P X, Value_P B) const
+UserFunction::eval_ALRXB(Value_P A, Token & LO, Token & RO,
+                         Value_P X, Value_P B) const
 {
    Log(LOG_UserFunction__enter_leave)
       {
@@ -840,7 +841,7 @@ UCS_string_vector original_text;
    //
    clear_body();
 
-   if (uprefs.multi_line_strings_3)   // new-style multi-line strings allowed
+   if (UserPreferences::uprefs.multi_line_strings_3)   // new-style multi-line
       {
         for (int li = 1; li < get_text_size(); ++li)
             {
@@ -860,7 +861,7 @@ UCS_string_vector original_text;
             }
       }
 
-   if (uprefs.multi_line_strings)     // old-style multi-line strings allowed
+   if (UserPreferences::uprefs.multi_line_strings)     // old-style multi-line
       {
         for (int li = 1; li < get_text_size(); ++li)
             {
@@ -984,109 +985,139 @@ UserFunction::resolve_labels()
 {
    if (DONT_FT_LABEL_LITERAL)   return false;
 
-const int label_count = header.get_label_count();
-   if (label_count == 0)   return false;   // no labels defined
+const int labels_declared = header.get_label_count();
+   if (labels_declared == 0)   return false;   // no labels defined
 
-int count = 0;
+int labels_seen = 0;
+
+   // pass 1: replace all labels in the body with integers. At this point
+   //         the parser has removed all TOK_INTEGER, so we can temporarily
+   //         use them as markers.
+   //
    loop(pc, body.size())
        {
          const Token & tok = body[pc];
          if (tok.get_tag() != TOK_SYMBOL)   continue;
          const Symbol * symbol = tok.get_sym_ptr();
-         loop(idx, label_count)
+         loop(idx, labels_declared)
              {
                const labVal & label = header.get_label(idx);
                if (symbol == label.sym)
                   {
-                    // do not (yet) create a Value since we may collect
-                    // several labels below.
+                    // do not (yet) create a Value since we may need to
+                    // collect several labels below.
                     //
                     body[pc] = Token(TOK_INTEGER, int64_t(label.line));
                     OptmizationStatistics::count(OPTI_FT_LABEL_LITERAL);
 
-                    ++count;
+                    ++labels_seen;
                   }
              }
        }
 
-   if (count == 0)   return false;
+   if (labels_seen == 0)   return false;   // no labels in body
 
-   // now collect the integers. The typical use cases are:
+   // pass 2: optimize frequent branch cases.
+   //
+   //         The typical branch cases are:
    //
    // case 1:   → N                 branch to single label
    // case 2:   → SEL/N1 N2 N3...   switch with strand notation
    // case 3:   → SEL/N1,N2,N3...   switch with comma separated labels
    // case 4:   a mix of cases 2 and 3
    //
-bool void_inserted = false;
+bool VOID_inserted = false;
+int line = 1;
    loop(pc, body.size())
        {
-         if (body[pc].get_tag() != TOK_INTEGER)   continue;
+         if (body[pc].get_tag() == TOK_ENDL)   { ++line; continue; }
+         if (body[pc].get_tag() != TOK_INTEGER)          continue;
 
-         // see collect labels, starting at pc. Remember that the labels
-         // run bacwards (i.e. start with the rightmost label).
-         vector<int> labels;
-         for (int pc_1 = pc; pc_1 < body.size(); ++pc_1)
+         // collect multiple labels (if any), starting at pc. Remember that
+         // the labels run backwards (i.e. start with the rightmost label).
+
+         // at this point, pc is the first label (of one or more).
+         // Collect all of them and invalidate their token.
+
+         vector<int> labels_in_statement;
+         labels_in_statement.push_back(body[pc].get_int_val());
+         body[pc] = Token();
+         for (int pc_1 = pc + 1; pc_1 < body.size(); ++pc_1)
              {
-               const TokenTag tag_1 = body[pc_1].get_tag();
-               if (tag_1 == TOK_INTEGER)   // label (set above)
-                  {
-                    // case 2. : INT INT
-                    labels.push_back(body[pc_1].get_int_val());
-                    body[pc_1] = Token();
-                    void_inserted = true;
-                    continue;   // nexct pc_1
-                  }
+               const int pc_2 = pc_1 + 1;
 
-               const int pc_2 = pc + 2;
+               const Token & tok_1 = body[pc_1];
+               if (tok_1.get_Class() == TC_END)   break;   // end of statement
+
+               const TokenTag tag_1 = tok_1.get_tag();
                const TokenTag tag_2 = pc_2 < body.size()
                                     ? body[pc_2].get_tag() : TOK_INVALID;
-               if (tag_1 == TOK_F12_COMMA && tag_2 == TOK_INTEGER)
+
+
+               if (tag_1 == TOK_INTEGER)   // former label (set above)
+                  {
+                    // case 2. : INT INT
+                    labels_in_statement.push_back(body[pc_1].get_int_val());
+                    body[pc_1] = Token();
+                    VOID_inserted = true;
+                    continue;   // next pc_1
+                  }
+               else if (tag_1 == TOK_F12_COMMA && tag_2 == TOK_INTEGER)
                   {
                     // case 3. : INT , INT
-                    labels.push_back(body[pc_2].get_int_val());
+                    labels_in_statement.push_back(body[pc_2].get_int_val());
                     body[pc_1] = Token();
                     body[pc_2] = Token();
-                    void_inserted = true;
+                    VOID_inserted = true;
                     continue;   // next pc_1
+                  }
+               else   // end of label vector
+                  {
+                    break;
                   }
              }
 
-         Assert(labels.size());   // since body[pc]
+         const int label_count = labels_in_statement.size();
+         Assert(label_count);   // since body[tok_1] is one
 
-         if (labels.size() == 1)   // single label
+         if (label_count == 1)   // single label (case 1 above)
             {
-              Value_P value = IntScalar(labels[0], LOC);
-              Token tok(TOK_APL_VALUE1, value);
+              Value_P single = IntScalar(labels_in_statement[0], LOC);
+              Token tok(TOK_APL_VALUE1, single);
               body[pc].move(tok, LOC);
-              Log(LOG_optimization) CERR << "optimizing scalar label" << endl;
+              Log(LOG_optimization) CERR << "optimizing scalar label"
+                                         << " on line [" << line << "]"
+                                         << endl;
             }
-         else                      // multiple labels
+         else                    // multiple labels (cases 2 and 3 above)
             {
-              Value_P value(labels.size(), LOC);
-              loop(l, labels.size())   value->next_ravel_Int(labels[l]);
+              Value_P value(label_count, LOC);
+              loop(l, label_count)
+                  value->next_ravel_Int(labels_in_statement[l]);
               value->check_value(LOC);
               Token tok(TOK_APL_VALUE1, value);
               body[pc].move(tok, LOC);
               Log(LOG_optimization)
                  {
-                   CERR << "optimizing label vector[" << labels.size() << "] =";
-                   loop(l, labels.size())
-                       CERR << " [" << labels[labels.size() - l - 1] << "]";
-                   CERR << endl;
+                   CERR << "optimizing label vector["
+                        << label_count << "] =";
+                   loop(l, label_count)
+                       CERR << " ["
+                            << labels_in_statement[label_count - l - 1]
+                            << "]" << " on line [" << line << "]" << endl;
                  }
             }
        }
 
-   if (void_inserted)   remove_TOK_VOID();
+   if (VOID_inserted)   remove_TOK_VOID();
 
-   return void_inserted;
+   return VOID_inserted;
 }
 //----------------------------------------------------------------------------
-void
+bool
 UserFunction::optimize_unconditional_branches()
 {
-   if (DONT_FT_DIRECT_BRANCHES)   return;
+   if (DONT_FT_DIRECT_BRANCHES)   return false;
 
    /* check for: VALUE → ENDL      e.g. → 4
       or:        SYMBOL → ENDL     e.g. → LABEL
@@ -1098,6 +1129,7 @@ UserFunction::optimize_unconditional_branches()
       ⎕FX "FOO" "X←2" "LABEL: Z←3 ◊ →LABEL" "Y←5"
 
     */
+bool VOID_inserted = false;
    for (Function_PC pc = Function_PC_0; pc < body.size() - 3; ++pc)
       {
         if (body[pc].get_Class()   != TC_END)       continue;
@@ -1139,10 +1171,15 @@ UserFunction::optimize_unconditional_branches()
              body[pc + 1].clear(LOC);   // release B
              body[pc + 1] = Token(TOK_GOTO_PC, target);   // B with →PC
              body[pc + 2].copy_N(body[pc + 3]);           // → with ENDL
-          // body[pc + 3] does not hurt, so we leave it as is
+             body[pc + 3] = Token();
+             VOID_inserted = true;
              OptmizationStatistics::count(OPTI_FT_DIRECT_BRANCHES);
            }
       }
+
+   if (VOID_inserted)   remove_TOK_VOID();
+
+   return VOID_inserted;
 }
 //----------------------------------------------------------------------------
 void

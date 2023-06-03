@@ -88,11 +88,12 @@ vector<AP3_fd> connected_procs;
 //-----------------------------------------------------------------------------
 struct key_value
 {
+   /// constructor
    key_value(SV_key k)
    : key(k)
    {}
 
-   /// the key for the variable
+   /// the key that identifies the variable
   SV_key key;
 
    /// the value of the variable

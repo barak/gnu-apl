@@ -32,6 +32,20 @@ nosrtf: func←{⍵ (22 ⎕cr ⎕cr ⍵)} ¨ func
           ╚════════════════════════════╝   
                                            
                                            
+      )DROP test.xml
+³
+      )SAVE test.xml
+³
+      )LOAD test.xml
+SAVED 20⁰-⁰-⁰ ⁰:⁰:⁰ (GMT⁵⁰)
+
+      df
+   alpha  ╔════════════════════════════╗   
+          ║z←alpha                     ║   
+          ║z←,⎕ucs 65+(0 32)∘.+⎕io-⍨⍳26║   
+          ╚════════════════════════════╝   
+                                           
+                                           
 
 
       )CLEAR

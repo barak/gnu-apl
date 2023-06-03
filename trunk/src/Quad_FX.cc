@@ -257,7 +257,7 @@ Value_P Z(fun_name, LOC);
 Value_P
 Quad_FX::do_native_FX(const Value * A, sAxis axis, const Value * B)
 {
-   if (uprefs.safe_mode)   DOMAIN_ERROR;
+   if (UserPreferences::uprefs.safe_mode)   DOMAIN_ERROR;
 
 const UCS_string so_name       = A->get_UCS_ravel();
 const UCS_string function_name = B->get_UCS_ravel();

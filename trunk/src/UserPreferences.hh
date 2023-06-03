@@ -256,6 +256,10 @@ struct UserPreferences
    /// true if the WINCH signal shall modify ⎕PW
    bool WINCH_sets_pw;
 
+   /// the combined user preferences (from command line arguments and from
+   /// \b preferences files) for the APL interpreter instance
+   static UserPreferences uprefs;
+
 protected:
    /// decode a byte in a preferences file. The byte can be given as ASCII name
    /// (currently only ESC is understood), a single char (that stands for
@@ -275,7 +279,5 @@ protected:
    static void set_threshold(Function_P fun, int padic, int macn,
                              ShapeItem threshold);
 };
-
-extern UserPreferences uprefs;
 
 #endif // __USER_PREFERENCES_HH_DEFINED__

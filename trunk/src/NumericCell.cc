@@ -1436,7 +1436,8 @@ const double qct = Workspace::get_CT();
                                            get_complex_value(), qct);
         if (err)   return err;
 
-        return ComplexCell::zC(Z, A->get_complex_value() * (get_complex_value()/gcd));
+        return ComplexCell::zC(Z, A->get_complex_value() *
+                                  (get_complex_value()/gcd));
       }
 
    // if both args are int then return the least common multiple of them

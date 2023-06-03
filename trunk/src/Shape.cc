@@ -101,9 +101,11 @@ Shape ret;
       }
    else
       {
-        loop(a, axis)                ret.add_shape_item(get_shape_item(a));
+        loop(a, axis)
+            ret.add_shape_item(get_shape_item(a));
         ret.add_shape_item(len);
-        loop(a, get_rank() - axis)   ret.add_shape_item(get_shape_item(a + axis));
+        loop(a, get_rank() - axis)
+            ret.add_shape_item(get_shape_item(a + axis));
       }
 
    return ret;
@@ -210,12 +212,14 @@ const int other_rank = other.get_rank();
    loop(r, get_rank())
       {
         const int this_len = get_shape_item(r);
-        if (this_len == 1)   continue;                                // ignore length 1 axes of this
+        if (this_len == 1)   continue;   // ignore length 1 axes of this
         while (other_idx < other_rank &&
-               other.get_shape_item(other_idx) == 1)   ++other_idx;   // ignore length 1 axes of other
-        if (other_idx == other_rank)   return false;   // non-1 axis in this and no axis in other
+               other.get_shape_item(other_idx) == 1)
+              ++other_idx;   // ignore length 1 axes of other
+        if (other_idx == other_rank)
+           return false;   // non-1 axis in this and no axis in other
         const int other_len = other.get_shape_item(other_idx++);
-        if (this_len != other_len)   return false;                    // length mismatch
+        if (this_len != other_len)   return false;   // length mismatch
       }
 
    return other_idx == other_rank;

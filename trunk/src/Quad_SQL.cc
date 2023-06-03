@@ -379,7 +379,7 @@ Value_P value;
        Shape shape(tables.size());
        value = Value_P( shape, LOC );
        for (vector<string>::iterator i = tables.begin();i != tables.end(); i++)
-            {
+           {
              value->next_ravel_Pointer(make_string_cell(*i, LOC).get());
            }
      }
@@ -503,7 +503,8 @@ const APL_Integer function_number = X->get_cfirst().get_near_int();
 Value_P
 make_string_cell(const std::string &str, const char *loc)
 {
-UCS_string ucs(str.c_str());
+UTF8_string utf(str.c_str());
+UCS_string ucs(utf);
 Value_P Z(ucs, loc);
     return Z;
 }

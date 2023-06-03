@@ -303,7 +303,8 @@ IO_Files::end_of_current_file()
 
    InputFile::files_todo.erase(InputFile::files_todo.begin());
 
-   if (uprefs.auto_OFF && !InputFile::files_todo.size())   Command::cmd_OFF(0);
+   if (UserPreferences::uprefs.auto_OFF &&
+       ! InputFile::files_todo.size())   Command::cmd_OFF(0);
 
    Output::reset_dout();
    reset_errors();

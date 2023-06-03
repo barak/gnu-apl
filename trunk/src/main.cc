@@ -273,11 +273,11 @@ const int left_pad = (80 - len)/2;
 }
 //----------------------------------------------------------------------------
 /// maybe remap stdin, stdout, and stderr to an incoming TCP connection to
-/// port uprefs.tcp_port on localhost
+/// port UserPreferences::uprefs.tcp_port on localhost
 void
 remap_stdio()
 {
-   if (uprefs.tcp_port <= 0)   return;
+   if (UserPreferences::uprefs.tcp_port <= 0)   return;
 
 const int listen_socket = socket(AF_INET, SOCK_STREAM, 0);
    if (listen_socket == -1)
@@ -290,7 +290,7 @@ sockaddr_in local;
    memset(&local, 0, sizeof(local));
    local.sin_family = AF_INET;
    local.sin_addr.s_addr = htonl(0x7F000001);   // localhost (127.0.0.1)
-   local.sin_port = htons(uprefs.tcp_port);
+   local.sin_port = htons(UserPreferences::uprefs.tcp_port);
 
    // fix bind() error when listening socket is openend too quickly
    {
@@ -317,7 +317,7 @@ sockaddr_in local;
       }
 
    0 && CERR << "The GNU APL server is listening on TCP port "
-             << uprefs.tcp_port << endl;
+             << UserPreferences::uprefs.tcp_port << endl;
 
    for (;;)   // connection server loop
        {
@@ -379,20 +379,21 @@ init_apl(int argc, const char * argv[])
      if (term == 0 || *term == 0)   setenv("TERM", "dumb", 1);
    }
 
-const bool log_startup0 = uprefs.parse_argv_0(argc, argv);
+const bool log_startup0 = UserPreferences::uprefs.parse_argv_0(argc, argv);
    if (LOG_argc_argv || log_startup0)
       {
          CERR << "argc/argv before expansion:\n";
          show_argv(argc, argv);
       }
 
-   uprefs.expand_argv(argc, argv);
+   UserPreferences::uprefs.expand_argv(argc, argv);
 
-const bool log_startup = uprefs.parse_argv_1() || log_startup0;
+const bool log_startup = UserPreferences::uprefs.parse_argv_1() || log_startup0;
    if (LOG_argc_argv || log_startup)
       {
          CERR << "argc/argv after expansion:\n";
-         show_argv(uprefs.expanded_argv.size(), &uprefs.expanded_argv[0]);
+         show_argv(UserPreferences::uprefs.expanded_argv.size(),
+                  &UserPreferences::uprefs.expanded_argv[0]);
       }
 
 
@@ -402,10 +403,17 @@ const bool log_startup = uprefs.parse_argv_1() || log_startup0;
 
    init_1(argv[0], log_startup);
 
-   uprefs.read_config_file(true,  log_startup);   // in /etc/gnu-apl.d/
-   uprefs.read_config_file(false, log_startup);   // in $HOME/.config/gnu_apl/
-   uprefs.read_threshold_file(true,  log_startup);  // dito parallel_thresholds
-   uprefs.read_threshold_file(false, log_startup);  // dito parallel_thresholds
+   // read /etc/gnu-apl.d/preferences
+   UserPreferences::uprefs.read_config_file(true,  log_startup);
+
+   // read $HOME/.config/gnu_apl/preferences
+   UserPreferences::uprefs.read_config_file(false, log_startup);
+
+  // read /etc/gnu-apl.d/parallel_thresholds
+   UserPreferences::uprefs.read_threshold_file(true, log_startup);
+
+  // read $HOME/.config/gnu_apl/parallel_thresholds
+   UserPreferences::uprefs.read_threshold_file(false, log_startup);
 
    // NOTE: struct sigaction differs between GNU/Linux and other systems,
    // which causes compile errors for direct curly bracket assignment on
@@ -434,14 +442,14 @@ const bool log_startup = uprefs.parse_argv_1() || log_startup0;
    sigaction(SIGTERM,  &new_TERM_action,      &old_TERM_action);
    sigaction(SIGHUP,   &new_HUP_action,       &old_HUP_action);
    signal(SIGCHLD, SIG_IGN);   // do not create zombies
-   if (uprefs.WINCH_sets_pw)
+   if (UserPreferences::uprefs.WINCH_sets_pw)
       {
         sigaction(SIGWINCH, &new_WINCH_action, &old_WINCH_action);
         signal_WINCH_handler(0);   // pretend window size change
       }
    else
       {
-        Workspace::set_PW(uprefs.initial_pw, LOC);
+        Workspace::set_PW(UserPreferences::uprefs.initial_pw, LOC);
       }
 
 #if PARALLEL_ENABLED
@@ -450,27 +458,27 @@ const bool log_startup = uprefs.parse_argv_1() || log_startup0;
    sigaction(SIGQUIT, &new_control_BSL_action, &old_control_BSL_action);
 #endif
 
-   uprefs.parse_argv_2(log_startup);
+   UserPreferences::uprefs.parse_argv_2(log_startup);
 
    // maybe use TCP connection instead of stdin/stderr. This function blocks
    // until a TCP connections was received.
    //
    remap_stdio();
 
-   if (uprefs.CPU_limit_secs)
+   if (UserPreferences::uprefs.CPU_limit_secs)
       {
         rlimit rl;
         getrlimit(RLIMIT_CPU, &rl);
-        rl.rlim_cur = uprefs.CPU_limit_secs;
+        rl.rlim_cur = UserPreferences::uprefs.CPU_limit_secs;
         setrlimit(RLIMIT_CPU, &rl);
       }
 
-   if (uprefs.emacs_mode)
+   if (UserPreferences::uprefs.emacs_mode)
       {
         UCS_string info;
-        if (uprefs.emacs_arg)
+        if (const char * emacs_arg = UserPreferences::uprefs.emacs_arg)
            {
-             info = NativeFunction::load_emacs_library(uprefs.emacs_arg);
+             info = NativeFunction::load_emacs_library(emacs_arg);
            }
 
         if (info.size())   // problems loading library
@@ -512,7 +520,7 @@ const bool log_startup = uprefs.parse_argv_1() || log_startup0;
            }
       }
 
-   if (uprefs.daemon)
+   if (UserPreferences::uprefs.daemon)
       {
         const pid_t pid = fork();
         if (pid)   // parent
@@ -528,11 +536,11 @@ const bool log_startup = uprefs.parse_argv_1() || log_startup0;
            CERR << "child forked (pid" << getpid() << ")" << endl;
       }
 
-   if (uprefs.wait_ms)   usleep(1000*uprefs.wait_ms);
+   if (const int wait = UserPreferences::uprefs.wait_ms)   usleep(1000*wait);
 
    init_2(log_startup);
 
-   if (!uprefs.silent)   show_welcome(cout, argv[0]);
+   if (!UserPreferences::uprefs.silent)   show_welcome(cout, argv[0]);
 
    if (log_startup)   CERR << "PID is " << getpid() << endl;
    Log(LOG_argc_argv || log_startup)   show_argv(argc, argv);
@@ -543,13 +551,13 @@ const bool log_startup = uprefs.parse_argv_1() || log_startup0;
         return 8;
       }
 
-   if (uprefs.do_Color)   Output::toggle_color("ON");
+   if (UserPreferences::uprefs.do_Color)   Output::toggle_color("ON");
 
-   if (uprefs.latent_expression.size())
+   if (UserPreferences::uprefs.latent_expression.size())
       {
         // there was a --LX expression on the command line
         //
-        UCS_string lx(uprefs.latent_expression);
+        UCS_string lx(UserPreferences::uprefs.latent_expression);
 
         if (log_startup)
            CERR << "executing --LX '" << lx << "'" << endl;
@@ -564,7 +572,8 @@ const bool log_startup = uprefs.parse_argv_1() || log_startup0;
    // (2) --script (which implies --noCONT), or
    // (3)  -L wsname
    //
-   if (uprefs.do_CONT && !uprefs.initial_workspace.size())
+   if (UserPreferences::uprefs.do_CONT &&
+       !UserPreferences::uprefs.initial_workspace.size())
       {
          UCS_string cont("CONTINUE");
          UTF8_string filename =
@@ -595,12 +604,13 @@ const bool log_startup = uprefs.parse_argv_1() || log_startup0;
             }
       }
 
-   if (uprefs.initial_workspace.size())
+   if (UserPreferences::uprefs.initial_workspace.size())
       {
          // the user has provided a workspace name via -L
          //
-         UCS_string init_ws(uprefs.initial_workspace);
-         const char * cmd = uprefs.silent ? ")QLOAD " : ")LOAD ";
+         UCS_string init_ws(UserPreferences::uprefs.initial_workspace);
+         const char * cmd = UserPreferences::uprefs.silent
+                          ? ")QLOAD " : ")LOAD ";
          UCS_string load_cmd(cmd);
          load_cmd.append(init_ws);
          Command::process_line(load_cmd, 0);
@@ -616,11 +626,11 @@ main(int argc, const char *argv[])
 {
    if (const int ret = init_apl(argc, argv))   return ret;
 
-   if (uprefs.eval_exprs.size())
+   if (UserPreferences::uprefs.eval_exprs.size())
       {
-         loop(e, uprefs.eval_exprs.size())
+         loop(e, UserPreferences::uprefs.eval_exprs.size())
             {
-              const char * expr = uprefs.eval_exprs[e];
+              const char * expr = UserPreferences::uprefs.eval_exprs[e];
               const UTF8_string expr_utf(expr);
               UCS_string expr_ucs(expr_utf);
               Command::process_line(expr_ucs, 0);

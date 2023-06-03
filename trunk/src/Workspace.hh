@@ -281,8 +281,9 @@ public:
 /// read/write system variable
 #define rw_sv_def(x, _str, _txt) /** return ## x **/ static x& get_v_ ## x() \
    { return the_workspace.v_ ## x; }
-   rw_sv_def(Quad_Quad,  "", "⎕")
-   rw_sv_def(Quad_QUOTE, "", "⍞")
+
+   rw_sv_def(Quad_Quad,  "", "⎕")   /**< ⎕ (Quad) */
+   rw_sv_def(Quad_QUOTE, "", "⍞")   /**< ⍞⎕ (QuoteQuad) */
 #include "SystemVariable.def"
 
    /// push a command. This is done when ⍎Command is performed and the command

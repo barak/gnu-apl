@@ -586,13 +586,15 @@ NativeFunction::eval_LRXB(Token & LO, Token & RO, Value_P X, Value_P B) const
 }
 //----------------------------------------------------------------------------
 Token
-NativeFunction::eval_ALRXB(Value_P A, Token & LO, Token & RO, Value_P X, Value_P B) const
+NativeFunction::eval_ALRXB(Value_P A, Token & LO, Token & RO, Value_P X,
+                           Value_P B) const
 {
    // call axis variant if present, or else the non-axis variant.
    //
-   if (f_eval_ALRXB)   return (*f_eval_ALRXB)(A, *LO.get_function(),
-                                                 *RO.get_function(), X, B, this);
-   else                return eval_ALRB(A, LO, RO, B);
+   if (f_eval_ALRXB)
+      return (*f_eval_ALRXB)(A, *LO.get_function(), *RO.get_function(),
+                             X, B, this);
+   return eval_ALRB(A, LO, RO, B);
 }
 //----------------------------------------------------------------------------
 Token

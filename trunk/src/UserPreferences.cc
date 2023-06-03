@@ -40,7 +40,7 @@
 #include "Value.hh"
 
 static const char * build_tag[] = { BUILDTAG, 0 };
-UserPreferences uprefs;
+UserPreferences UserPreferences::uprefs;
 
 /// CYGWIN defines _B
 

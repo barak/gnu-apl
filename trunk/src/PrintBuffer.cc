@@ -314,7 +314,8 @@ const bool nested = !value.is_simple();
                  const ShapeItem srows = separator_rows(y, value, nested,
                                                         max_row_ranks[y],
                                                         Rk_y_1);
-                 const ShapeItem irows = item_matrix[y*cols + x].get_row_count();
+                 const ShapeItem irows =
+                                 item_matrix[y*cols + x].get_row_count();
                  Assert(irows);
                  dest_height += srows + irows;
                }
@@ -952,27 +953,31 @@ PrintBuffer::append_col(const PrintBuffer & pb1)
 void
 PrintBuffer::append_ucs(const UCS_string & ucs)
 {
-   if (buffer.size() == 0)   // empty buffer (no lines yet)
+   if (buffer.size() == 0)   // empty buffer (no lines yet) : add ucs
       {
         buffer.push_back(ucs);
+        return;
       }
-   else if (ucs.size() < get_column_count())  // new line is shorter: pad it)
+
+const int size = ucs.size();
+   if (size < get_column_count())  // new line is shorter: pad it)
       {
         UCS_string ucs1(ucs);
-        UCS_string pad(get_column_count() - ucs.size(), UNI_iPAD_L1);
+        UCS_string pad(get_column_count() - size, UNI_iPAD_L1);
         ucs1.append(pad);
         buffer.push_back(ucs1);
+        return;
       }
-   else if (ucs.size() > get_column_count())   // new line is longer: pad PrintBufer
+
+   if (size > get_column_count())   // new line is longer: pad PrintBufer
       {
         UCS_string pad(ucs.size() - get_column_count(), UNI_iPAD_L2);
         loop(h, get_row_count())   buffer[h].append(pad);
         buffer.push_back(ucs);
+        return;
       }
-   else
-      {
-        buffer.push_back(ucs);
-      }
+
+   buffer.push_back(ucs);
 }
 //----------------------------------------------------------------------------
 void

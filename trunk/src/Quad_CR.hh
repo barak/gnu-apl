@@ -252,7 +252,8 @@ protected:
    static void close_mode(UCS_string & line, V_mode mode);
 
    /// print item separator
-   static void item_separator(UCS_string & line, V_mode from_mode, V_mode to_mode);
+   static void item_separator(UCS_string & line,
+                              V_mode from_mode, V_mode to_mode);
 };
 //----------------------------------------------------------------------------
 

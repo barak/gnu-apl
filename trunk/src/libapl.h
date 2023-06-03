@@ -191,7 +191,8 @@ extern APL_value int_scalar(int64_t val, const char * loc);
 extern APL_value double_scalar(APL_Float val, const char * loc);
 
 /// A new complex scalar.
-extern APL_value complex_scalar(APL_Float real, APL_Float imag, const char * loc);
+extern APL_value complex_scalar(APL_Float real, APL_Float imag,
+                                const char * loc);
 
 /// A new character scalar.
 extern APL_value char_scalar(int unicode, const char * loc);
@@ -306,7 +307,8 @@ extern void set_int(int64_t new_double, APL_value val, uint64_t idx);
 extern void set_double(APL_Float new_real, APL_value val, uint64_t idx);
 
 /// val[idx]←new_real J new_imag
-extern void set_complex(APL_Float new_real, APL_Float new_imag, APL_value val, uint64_t idx);
+extern void set_complex(APL_Float new_real, APL_Float new_imag,
+                        APL_value val, uint64_t idx);
 
 /// val[idx]←new_value
 extern void set_value(APL_value new_value, APL_value val, uint64_t idx);

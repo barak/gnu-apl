@@ -424,7 +424,8 @@ protected:
    static const UserFunction * locate_fun(const Value & fun_name);
 
    /// return integers in lines
-   static Token reference(const std::vector<Function_Line> & lines, bool assigned);
+   static Token reference(const std::vector<Function_Line> & lines,
+                          bool assigned);
 
    /// return assign lines in new_value to stop or trace vector in ufun
    static void assign(UserFunction * ufun, const Value & new_value, bool stop);

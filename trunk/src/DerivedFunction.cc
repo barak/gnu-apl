@@ -119,7 +119,8 @@ DerivedFunction::destroy_derived(const char * loc)
 {
    Log(LOG_FunOperX)
       {
-        CERR << "DerivedFunction::destroy_derived(" << get_name() << ")" << endl;
+        CERR << "DerivedFunction::destroy_derived("
+             << get_name() << ")" << endl;
       }
 
    left_arg.clear(loc);

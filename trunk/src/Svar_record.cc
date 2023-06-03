@@ -307,7 +307,7 @@ const int restriction = control & state;
       {
         if ((restriction & USE_BY_ACC) == 0)   return true;   // no restriction
 
-        if (offering.is_active() && (attempt == 0))   // maybe send event to peer
+        if (offering.is_active() && !attempt)   // maybe send event to peer
            {
              offering.events = Svar_event(offering.events |
                                           SVE_USE_BY_ACC_FAILED);
@@ -331,7 +331,7 @@ const int restriction = control & state;
       {
         if ((restriction & SET_BY_OFF) == 0)   return true;   // no restriction
 
-        if (accepting.is_active() && (attempt == 0))   // maybe send event to peer
+        if (accepting.is_active() && !attempt)   // maybe send event to peer
            {
              accepting.events = Svar_event(accepting.events |
                                            SVE_SET_BY_OFF_FAILED);
@@ -343,7 +343,7 @@ const int restriction = control & state;
       {
         if ((restriction & SET_BY_ACC) == 0)   return true;   // no restriction
 
-        if (offering.is_active() && (attempt == 0))   // maybe send event to peer
+        if (offering.is_active() && !attempt)   // maybe send event to peer
            {
              offering.events = Svar_event(offering.events |
                                           SVE_SET_BY_ACC_FAILED);

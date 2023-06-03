@@ -170,8 +170,8 @@ protected:
    /// the body positions of the ←← and ←→ tokens of a congitional
    struct conditional
       {
-        Function_PC if_THEN;   // position of the ←← token (end of condition)
-        Function_PC if_ELSE;   // position of the ←→ token (before else clause)
+        Function_PC if_THEN;   ///< position of the ←← token (end of condition)
+        Function_PC if_ELSE;   ///< position of the ←→ token (before else)
       };
 
 

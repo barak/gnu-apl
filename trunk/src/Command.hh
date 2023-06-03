@@ -130,10 +130,19 @@ public:
 
 protected:
    /// On, Off, or Toggle
-   enum OOT { Off = 0, On = 1, Toggle = 2 };
+   enum OOT
+      {
+        Off    = 0,   ///< Off
+        On     = 1,   ///< On
+        Toggle = 2,   ///< Toggle
+      };
 
    /// a logging ID and an action (On/Off/Toggle) to be performed with it
-   struct lid_OOT { LogId lid;   OOT on_off_toggle; };
+   struct lid_OOT
+      {
+        LogId lid;           ///< the logging ID
+        OOT on_off_toggle;   ///< turn lid On, Off, or Toggle it
+      };
 
    /// )BOXING command
    static void cmd_BOXING(ostream & out, const UCS_string & arg);

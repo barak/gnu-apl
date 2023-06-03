@@ -518,7 +518,8 @@ cairo_text_extents_t extends;
 /// printed with font \b font_name of size \b font_size
 void
 cairo_multiline_size(double & len_x, double & len_y, cairo_t * cr,
-                     const char * lines, const char * font_name, double font_size)
+                     const char * lines, const char * font_name,
+                     double font_size)
 {
   len_x = 0;
   len_y = 0;

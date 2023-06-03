@@ -152,11 +152,14 @@ rlimit rl;
 void
 init_2(bool log_startup)
 {
-const int retry_max = uprefs.emacs_mode ? 15 : 5;
+const int retry_max = UserPreferences::uprefs.emacs_mode ? 15 : 5;
 
    Output::init(log_startup);
-   Svar_DB::init(LibPaths::get_APL_bin_path(), LibPaths::get_APL_bin_name(),
-                 retry_max, log_startup, uprefs.system_do_svars);
+   Svar_DB::init(LibPaths::get_APL_bin_path(),
+                 LibPaths::get_APL_bin_name(),
+                 retry_max,
+                 log_startup,
+                 UserPreferences::uprefs.system_do_svars);
 
    LineInput::init(true);
 

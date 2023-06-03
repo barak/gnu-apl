@@ -138,7 +138,8 @@ protected:
         /// was detected.
         TM_EXIT_AFTER_LAST_FILE_IF_OK = 1 << 1,
 
-        /// remain in APL interpreter after the last testcase file was processed.
+        /// remain in APL interpreter after the last testcase
+        /// file was processed.
         TM_STAY_AFTER_LAST_FILE       = 1 << 2,
 
         /// stop test execution after the first testcase file failed (but

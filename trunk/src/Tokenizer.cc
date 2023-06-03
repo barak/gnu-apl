@@ -184,7 +184,8 @@ Unicode_source src(input);
                         // this could be λ like in λ← ...
                         // or λ1 or λ2 or ... as in ... ⍺ λ1 ⍵
                         //
-                        if (src.rest_len() > 1 && Avec::is_digit(src[1]))   // λn
+                        if (src.rest_len() > 1 &&
+                            Avec::is_digit(src[1]))   // λn
                            {
                              tokenize_symbol(src, tos);
                            }
@@ -258,7 +259,8 @@ Unicode_source src(input);
                       {
                         tos.push_back(Token(TOK_ESCAPE));
                       }
-                   else if (rest_2 && *src == UNI_RIGHT_ARROW)   // double → (→→)
+                   else if (rest_2 &&
+                            *src == UNI_RIGHT_ARROW)   // double → (→→)
                       {
                         ++src;
                         tos.push_back(Token(TOK_IF_THEN, int64_t(0)));

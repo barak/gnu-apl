@@ -1081,12 +1081,14 @@ Command::cmd_KEYB(ostream & out)
 {
    // maybe print user-supplied keyboard layout file
    //
-   if (uprefs.keyboard_layout_file.size())
+   if (UserPreferences::uprefs.keyboard_layout_file.size())
       {
-        FILE * layout = fopen(uprefs.keyboard_layout_file.c_str(), "r");
+        FILE * layout =
+               fopen(UserPreferences::uprefs.keyboard_layout_file.c_str(), "r");
         if (layout == 0)
            {
-             out << "Could not open " << uprefs.keyboard_layout_file
+             out << "Could not open "
+                 << UserPreferences::uprefs.keyboard_layout_file
                  << ": " << strerror(errno) << endl
                  << "Showing default layout instead" << endl;
            }
@@ -1441,7 +1443,7 @@ Command::cmd_HISTORY(ostream & out, const UCS_string & arg)
 void
 Command::cmd_HOST(ostream & out, const UCS_string & arg)
 {
-   if (uprefs.safe_mode)
+   if (UserPreferences::uprefs.safe_mode)
       {
         out << 
 "This interpreter was started in \"safe mode\" (command line option --safe,\n"
@@ -1994,13 +1996,13 @@ void
 Command::cmd_OFF(int exit_val)
 {
    COUT << endl;
-   if (!uprefs.silent)
+   if (!UserPreferences::uprefs.silent)
       {
 
         timeval end;
         gettimeofday(&end, 0);
-        end.tv_sec -= uprefs.session_start.tv_sec;
-        end.tv_usec -= uprefs.session_start.tv_usec;
+        end.tv_sec -= UserPreferences::uprefs.session_start.tv_sec;
+        end.tv_usec -= UserPreferences::uprefs.session_start.tv_usec;
         if (end.tv_usec < 1000000)   { end.tv_usec += 1000000;   --end.tv_sec; }
         COUT << "Goodbye." << endl
              << "Session duration: " << (end.tv_sec + 0.000001*end.tv_usec)

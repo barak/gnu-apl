@@ -690,7 +690,8 @@ int idx = 0;
 // CERR << "s=" << s << " idx=" << HEX2(idx) << endl;
 
          const TokenClass tc = at(s).tok.get_Class();
-// CERR << " TokenClass tc=" << HEX2(tc) << " aka. " << Token::class_name(tc) << endl;
+// CERR << " TokenClass tc=" << HEX2(tc) << " aka. "
+//      << Token::class_name(tc) << endl;
 
          idx = hash_table[idx].sub_nodes[tc];
          const Phrase & phrase = hash_table[idx];
@@ -703,7 +704,8 @@ int idx = 0;
 // CERR << "  └── best_phrase after=" << voidP(best_phrase) << endl;
          }
 
-// if (idx)   CERR << "  now idx=" << HEX2(idx) << " : " << hash_table[idx].reduce_name << endl;
+// if (idx)   CERR << "  now idx=" << HEX2(idx) << " : "
+//                 << hash_table[idx].reduce_name << endl;
 // else       CERR << "  no child" << endl;
          if (idx == 0)
             {
@@ -1816,7 +1818,8 @@ Cell * member_cell = top_val->get_member(members, member_owner,
                  }
               else
                  {
-                   Value_P Z(CLONE_P(member_cell->get_pointer_value(),LOC), LOC);
+                   Value_P Z(CLONE_P(member_cell->get_pointer_value(), LOC),
+                                     LOC);
                    pop_args_push_result(Token(TOK_APL_VALUE1, Z));
                  }
             }

@@ -1532,7 +1532,8 @@ Value::equal_string(const UCS_string & ucs) const
         const ShapeItem len = element_count();
         if (ucs.size() != len)   return false;   // wrong length
         loop(u, len)
-            if (ucs[u] != get_cravel(u).get_char_value())   return false; // mismatch
+            if (ucs[u] != get_cravel(u).get_char_value())   // mismatch
+               return false;
         return true;
       }
    else if (get_rank() == 0)   // rarely: char scalar

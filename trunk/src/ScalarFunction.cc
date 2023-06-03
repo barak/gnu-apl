@@ -486,7 +486,8 @@ PERFORMANCE_END(fs_M_join_AB, start_M_join, 1);
                                               0x6B616769);
 
                               const PJob_scalar_AB j1(Z1, A1, B1);
-                              Thread_context::get_master().joblist_AB.add_job(j1);
+                              Thread_context::get_master().joblist_AB
+                                                          .add_job(j1);
                            }
                       }
                    else if (cell_B.is_pointer_cell())
@@ -517,7 +518,8 @@ PERFORMANCE_END(fs_M_join_AB, start_M_join, 1);
                                              0x6B616769);
 
                              const PJob_scalar_AB j1(Z1, A1, B1);
-                             Thread_context::get_master().joblist_AB.add_job(j1);
+                             Thread_context::get_master().joblist_AB
+                                                         .add_job(j1);
                           }
                       }
                    else
@@ -530,7 +532,8 @@ PERFORMANCE_START(start_2)
                         ec = (cell_B.*fun)(&cell_Z, &cell_A);
                         if (ec != E_NO_ERROR)
                            {
-                             job_AB->~PJob_scalar_AB();   // ownership of A, B, Z.
+                             // give up the ownership of A, B, Z.
+                             job_AB->~PJob_scalar_AB();
                              job_AB = 0;
                              return Value_P();
                            }
@@ -967,7 +970,8 @@ const ShapeItem len_Z = Z->element_count();
    for (ArrayIterator zi(B->get_shape()); zi.has_more(); ++zi)
        {
 PERFORMANCE_START(start_2)
-         if (contained(shape_A, &A->get_cfirst(), B, zi.get_shape_offsets(), qct))
+         if (contained(shape_A, &A->get_cfirst(),
+                       B, zi.get_shape_offsets(), qct))
             Z->next_ravel_1();
          else
             Z->next_ravel_0();

@@ -97,7 +97,8 @@ SymbolTable::find_lambda_name(const UserFunction * lambda)
          for (Symbol * sym = symbol_table[s]; sym; sym = sym->next)
              {
                if (sym->is_erased())   continue;
-               if (sym->get_exec_ufun_depth(lambda) != -1)   return sym->get_name();
+               if (sym->get_exec_ufun_depth(lambda) != -1)
+                  return sym->get_name();
              }
        }
 

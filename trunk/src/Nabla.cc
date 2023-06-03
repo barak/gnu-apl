@@ -96,7 +96,7 @@ try_again:
          const UCS_string prompt = current_line.print_prompt(0);
          bool eof = false;
          UCS_string line;
-         if (uprefs.raw_cin)
+         if (UserPreferences::uprefs.raw_cin)
             {
               LineHistory lh(10);
               InputMux::get_line(LIM_Nabla, prompt, line, eof, lh);
@@ -147,9 +147,11 @@ UCS_string fun_text;
 
    // maybe copy function into the history
    //
-   if (!uprefs.raw_cin && !InputFile::running_script() &&
-       ((uprefs.nabla_to_history ==  /* always     */ 2) ||
-        ((uprefs.nabla_to_history == /* if changed */ 1) && modified)))
+   if (!UserPreferences::uprefs.raw_cin &&
+       !InputFile::running_script() &&
+       ((UserPreferences::uprefs.nabla_to_history ==  /* always     */ 2) ||
+        ((UserPreferences::uprefs.nabla_to_history == /* if changed */ 1) &&
+       modified)))
       {
         // create a history entry that can be re-entered and replace
         // the last history line (which contained some ∇foo ...)
@@ -517,7 +519,8 @@ again:
 
    c.skip_white();
 
-   if (c.has_more() && c.lookup() == UNI_L_BRACK)   // another command: ignore previous
+   if (c.has_more() &&
+       c.lookup() == UNI_L_BRACK)   // another command: ignore the previous one
       {
          c.next();   // eat the [
          goto command_loop;
@@ -820,8 +823,10 @@ Nabla::execute_edit()
    //
    if (current_text.size() == 0)   // empty line (we MAY need it)
       {
-        if (!uprefs.multi_line_strings_3)   return 0;   // we do not
-        if (out_of_order)                   return 0;   // we do not;
+        if (!UserPreferences::uprefs.multi_line_strings_3)
+           return 0;   // we do not
+        if (out_of_order)
+           return 0;   // we do not;
       }
 
    // check that current_text is valid
@@ -878,7 +883,7 @@ const char *
 Nabla::edit_body_line()
 {
 UCS_string parse_text = current_text;   // a copy that can be modified.
-   if (uprefs.multi_line_strings_3)
+   if (UserPreferences::uprefs.multi_line_strings_3)
       {
         // figure the multi-line status from all lines before current_line
         bool multi = false;
@@ -914,7 +919,7 @@ UCS_string parse_text = current_text;   // a copy that can be modified.
         Token_string in;
 
         ErrorCode ec = parser.parse(parse_text, in, true);
-        if (ec == E_NO_STRING_END && uprefs.multi_line_strings)
+        if (ec == E_NO_STRING_END && UserPreferences::uprefs.multi_line_strings)
            {
              ec = E_NO_ERROR;
              Workspace::more_error().clear();
@@ -934,7 +939,7 @@ UCS_string parse_text = current_text;   // a copy that can be modified.
 
    // some users prefer the removal of leading and trailing whitespace
    //
-   if (uprefs.discard_indentation)
+   if (UserPreferences::uprefs.discard_indentation)
       current_text.remove_leading_and_trailing_whitespaces();
 
    modified = true;

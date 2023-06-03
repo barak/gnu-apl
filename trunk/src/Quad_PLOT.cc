@@ -125,9 +125,10 @@ Token
 Quad_PLOT::eval_B(Value_P B) const
 {
    MORE_ERROR() <<
-"⎕PLOT is not available because some of its build prerequisites (in particular\n"
-MISSING1 MISSING2 MISSING3 MISSING4 ") were either missing,\n"
-" or were explicitly disabled in ./configure.";
+      "⎕PLOT is not available because some of its build prerequisites "
+      "(in particular\n" MISSING1 MISSING2 MISSING3 MISSING4
+      ") were either missing,\n" 
+      " or were explicitly disabled in ./configure.";
 
    SYNTAX_ERROR;
    return Token();

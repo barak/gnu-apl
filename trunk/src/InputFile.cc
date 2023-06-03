@@ -132,7 +132,8 @@ bool
 InputFile::echo_current_file()
 {
    if (files_todo.size()) return files_todo[0].echo;
-   return uprefs.echo_CIN || !uprefs.do_not_echo;
+   return UserPreferences::uprefs.echo_CIN ||
+          ! UserPreferences::uprefs.do_not_echo;
 }
 //----------------------------------------------------------------------------
 bool

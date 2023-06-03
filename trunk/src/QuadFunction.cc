@@ -574,7 +574,8 @@ const ErrorCode ec = get_error_code(B);
         UTF8_string msg1_utf(msg1_ucs);
         error.set_error_line_1(msg1_utf.c_str());
       }
-   else if (error.get_error_code() == E_USER_DEFINED_ERROR)   // ⎕ES with character B
+   else if (error.get_error_code() ==
+            E_USER_DEFINED_ERROR)   // ⎕ES with character B
       {
         UCS_string msg1_ucs(*B.get());
         UTF8_string msg1_utf(msg1_ucs);
@@ -669,7 +670,8 @@ Quad_EX::eval_B(Value_P B) const
          const Cell & cell = B->get_cravel(b);
          if (!cell.is_character_cell())
             {
-              MORE_ERROR() << "⎕EX B: non-character in list B (of symbol names)";
+              MORE_ERROR() << "⎕EX B: non-character in list B "
+                              "(of symbol names)";
               break;
             }
 

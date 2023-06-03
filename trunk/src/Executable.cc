@@ -322,12 +322,13 @@ Executable::compute_if_else_targets()
 {
    Log(LOG_IfElse)
       {
-         CERR << "initial body[" << body.size() << "]:" << endl;
+         CERR << "initial body at " << LOC ":" << endl;
          print_token(CERR, 3);
       }
 
 const char * cause = "";
 Function_Line cause_line = Function_Line_0;
+Function_PC2 cause_PC(Function_PC_invalid, Function_PC_invalid);
 
 vector<conditional> conditionals;
 
@@ -355,12 +356,15 @@ vector<conditional> conditionals;
                       {
                         cause = "←→ without →→ (aka. ELSE without IF)";
                         cause_line = get_line(pc);
+                        cause_PC.low = pc;
                         goto error;
                       }
                    if (conditionals.back().if_ELSE >= 0)
                       {
                         cause = "duplicate ←→ (aka. duplicate ELSE)";
                         cause_line = get_line(pc);
+                        cause_PC.low = conditionals.back().if_ELSE;
+                        cause_PC.high = pc;
                         goto error;
                       }
                    conditionals.back().if_ELSE = pc;
@@ -376,6 +380,7 @@ vector<conditional> conditionals;
                       {
                         cause = "←← without →→ (aka. ENDIF without IF)";
                         cause_line = get_line(pc);
+                        cause_PC.low = pc;
                         goto error;
                       }
           
@@ -393,13 +398,18 @@ vector<conditional> conditionals;
                         {
                           cause = "empty →→ ... ←→ (aka. empty THEN)";
                         cause_line = get_line(pc);
+                        cause_PC.low = pc - 1;
+                        cause_PC.high = pc;
                           goto error;
                         }
           
                      if (pc == (cond.if_ELSE + 1))   // empty ELSE
                         {
                           cause = "empty ←→ ... ←← (aka. empty ELSE)";
-                        cause_line = get_line(pc);
+                          cause_line = get_line(pc);
+                          cause_PC.low = pc - 1;
+                          cause_PC.low = pc - 1;
+                          cause_PC.high = pc;
                           goto error;
                         }
           
@@ -428,6 +438,7 @@ vector<conditional> conditionals;
       {
         cause = "→→ without ←← (aka. IF without ENDIF)";
         cause_line = get_line(conditionals.back().if_THEN);
+        cause_PC.low = conditionals.back().if_THEN;
         goto error;
       }
 
@@ -441,11 +452,15 @@ vector<conditional> conditionals;
 error:
    MORE_ERROR() << cause;
    CERR <<  cause << ". First observed on line ["
-        << cause_line << "]." << endl;
+        << cause_line << "]";
+   if (cause_PC.low  != Function_PC_invalid)   CERR << ", PC=" << cause_PC.low;
+   if (cause_PC.high != Function_PC_invalid)   CERR << "-" << cause_PC.high;
+
+   CERR << "." << endl;
 
    Log(LOG_IfElse)
       {
-        CERR << "incorrect body[" << body.size() << "]:" << endl;
+        CERR << "incorrect body at " <<  LOC "]:" << endl;
         print_token(CERR, 3);
       }
    return true;
@@ -842,7 +857,8 @@ Executable::unmark_all_values() const
 }
 //----------------------------------------------------------------------------
 int
-Executable::show_owners(const char * prefix, ostream & out, const Value & value) const
+Executable::show_owners(const char * prefix, ostream & out,
+                        const Value & value) const
 {
 int count = 0;
 

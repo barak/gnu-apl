@@ -277,7 +277,8 @@ Value_P_Base::move(Value_P_Base & other, const char * loc)
 {
    if (value_p)   value_p->decrement_owner_count(loc);
    value_p = other.value_p;
-   if (value_p) ADD_EVENT(value_p, VHE_TokMove, value_p->get_owner_count(), loc);
+   if (value_p)
+      ADD_EVENT(value_p, VHE_TokMove, value_p->get_owner_count(), loc);
 
    other.value_p = 0;
 }

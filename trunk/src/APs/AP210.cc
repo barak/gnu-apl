@@ -45,14 +45,16 @@ static int var_count_210 = 0;
 
 enum { ALL_RW = S_IRUSR | S_IWUSR | S_IRGRP | S_IWGRP | S_IROTH | S_IWOTH };
 
+/// data related to one AP210 instance
 struct SVAR_context
 {
+   /// constructor
    SVAR_context(FILE * f, int c, Coupled_var & vC, Coupled_var & vD, bool wr)
    : file(f),
      var_C(vC),
      var_D(vD),
      write(wr),
-     code(c),
+     encoding(c),
      rec_num(0),
      rec_size(128),
      filepos(0),
@@ -71,9 +73,11 @@ struct SVAR_context
    /// the (shared) DAT variable for the file
    Coupled_var & var_D;
 
-   /// true if file is to be written
+   /// true if file is to be written (as opposed to being read).
    const bool write;
-   int code;
+
+   /// file encoding (as per IBM APL2 User's Guide, p. 345) 
+   int encoding;
 
    /// the record size of the file
    int rec_num;
@@ -353,7 +357,7 @@ const int nelm = cdr.header().get_nelm();
                       return;
                     }
 
-                 result = read_variable(ctx.file, ctx.code, ctx.var_D,
+                 result = read_variable(ctx.file, ctx.encoding, ctx.var_D,
                                         ctx.filepos, ctx.rec_num,
                                         ctx.rec_size, false);
                  set_ACK(ctx.var_C, result);
@@ -370,7 +374,7 @@ const int nelm = cdr.header().get_nelm();
                       return;
                     }
 
-                 result = write_variable(ctx.file, ctx.code, ctx.var_D,
+                 result = write_variable(ctx.file, ctx.encoding, ctx.var_D,
                                         ctx.filepos, ctx.rec_num, ctx.rec_size);
                  set_ACK(ctx.var_C, result);
                  ctx.state_D = SVS_IDLE;

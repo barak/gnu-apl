@@ -624,7 +624,8 @@ public:
    static void init();
 
 /// maybe enable LOC for set/clear of flags
-#if defined(cfg_VF_TRACING_WANTED) || defined(cfg_VALUE_HISTORY_WANTED)  // enable LOC
+#if defined(cfg_VF_TRACING_WANTED) || \
+    defined(cfg_VALUE_HISTORY_WANTED)  // enable LOC
 # define _LOC LOC
 # define _loc loc
 # define _loc_type const char *

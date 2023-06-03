@@ -139,7 +139,8 @@ protected:
    virtual Token eval_LRXB(Token & LO, Token & RO, Value_P X, Value_P B) const;
 
    /// Overloaded Function::eval_ALRXB()
-   virtual Token eval_ALRXB(Value_P A, Token & LO, Token & RO, Value_P X, Value_P B) const;
+   virtual Token eval_ALRXB(Value_P A, Token & LO, Token & RO,
+                            Value_P X, Value_P B) const;
 
    /// Overloaded Function::eval_fill_B()
    virtual Token eval_fill_B(Value_P B) const;

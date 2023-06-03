@@ -695,8 +695,11 @@ LineEditContext::cursor_SEARCH()
     const UCS_string * ucs = history.search(user_line_before_history);
     if (ucs == 0)   // no line above
     {
-        Log(LOG_get_line)   CERR << "hit top of history()" << endl;
-        Log(LOG_get_line)   history.info(CERR << "cursor_SEARCH() done" << endl);
+        Log(LOG_get_line)
+           {
+             CERR << "hit top of history()" << endl;
+             history.info(CERR << "cursor_SEARCH() done" << endl);
+           }
         return;
     }
 
@@ -710,7 +713,7 @@ LineEditContext::cursor_SEARCH()
 }
 //============================================================================
 LineInput::LineInput(bool do_read_history)
-   : history(uprefs.line_history_len),
+   : history(UserPreferences::uprefs.line_history_len),
      write_history(false)
 {
    initial_termios_errno = 0;
@@ -720,7 +723,7 @@ LineInput::LineInput(bool do_read_history)
 
    if (do_read_history)
       {
-        history.read_history(uprefs.line_history_path.c_str());
+        history.read_history(UserPreferences::uprefs.line_history_path.c_str());
         write_history = true;
       }
 
@@ -762,7 +765,8 @@ LineInput::restore_termios()
 LineInput::~LineInput()
 {
    restore_termios();
-   if (write_history)   history.save_history(uprefs.line_history_path.c_str());
+   if (write_history)
+      history.save_history(UserPreferences::uprefs.line_history_path.c_str());
 }
 //----------------------------------------------------------------------------
 void
@@ -839,7 +843,7 @@ bool interactive = (mode == LIM_Quote_Quad) || (mode == LIM_Quad_Quad);
 
    // no (more) input from files: get line from terminal
    //
-   if (uprefs.raw_cin)
+   if (UserPreferences::uprefs.raw_cin)
       {
         Quad_QUOTE::done(mode != LIM_Quote_Quad, LOC);
         CIN << '\r' << prompt;
@@ -882,15 +886,15 @@ const APL_time_us from = now();
          ++control_D_count;
 
          // ^D or end of file
-         if (uprefs.control_Ds_to_exit)   // there is a ^D limit
+         if (UserPreferences::uprefs.control_Ds_to_exit)   // ^D limit desired
             {
-              if (control_D_count >= uprefs.control_Ds_to_exit)
+              if (control_D_count >= UserPreferences::uprefs.control_Ds_to_exit)
                  {
                    CIN << endl;
 #if PARALLEL_ENABLED
                    Thread_context::kill_pool();
 #endif // PARALLEL_ENABLED
-                   uprefs.silent = true;   // exit silently
+                   UserPreferences::uprefs.silent = true;   // exit silently
                    Command::cmd_OFF(4);    // exit()s
                    return;  // not reached
                  }
@@ -929,7 +933,7 @@ const APL_time_us from = now();
    Workspace::add_wait(now() - from);
    if (end_input)   (*end_input)();
 
-   if (uprefs.echo_CIN)   COUT << prompt << line << endl;
+   if (UserPreferences::uprefs.echo_CIN)   COUT << prompt << line << endl;
 }
 //============================================================================
 void
@@ -1225,8 +1229,11 @@ const int b0 = safe_fgetc();
              case UNI_DLE: return UNI_CursorUp;      // ^P
              case UNI_DC2: return UNI_DC2;           // ^R
              case UNI_EM:  return UNI_EM;            // ^Y
+
 #ifdef cfg_WANT_CTRLD_DEL
-             case UNI_SUB: return UNI_SUB;     // ^Z (as alt EOT, allowing ^D as delete-char)
+             // the user prefers to delete with ^D
+             // and to mark the end a file with ^Z.
+             case UNI_SUB: return UNI_SUB;           // ^Z
 #endif
 
              default: goto again;

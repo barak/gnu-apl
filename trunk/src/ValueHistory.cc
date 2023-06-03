@@ -55,6 +55,7 @@ void * h = history;
    memset(h, 0, sizeof(history));
 }
 //----------------------------------------------------------------------------
+/// add event \b ev with event argumant \b ia to the history of \b val
 void
 add_event(const Value * val, VH_event ev, int ia, const char * loc)
 {

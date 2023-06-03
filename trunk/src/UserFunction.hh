@@ -299,7 +299,7 @@ protected:
    bool resolve_labels();
 
    /// optimize unconditional (→N) branches.
-   void optimize_unconditional_branches();
+   bool optimize_unconditional_branches();
 
    /// the header (line [0]) of the user-defined function
    UserFunction_header header;

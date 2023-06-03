@@ -77,9 +77,9 @@ protected:
    /// return the names of the database columns
    static Value_P column_names(Value_P A, Value_P B);
 
+   /// perform a generic query
    static Value_P run_generic(Connection * conn, Value_P A, Value_P B,
                               bool query);
-
 };
 //----------------------------------------------------------------------------
 

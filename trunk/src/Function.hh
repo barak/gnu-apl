@@ -225,7 +225,8 @@ public:
       { AXIS_ERROR; }
 
    /// dyadic operator, 2 arguments, with axis
-   virtual Token eval_ALRXB(Value_P A, Token & LO, Token & RO, Value_P X, Value_P B) const
+   virtual Token eval_ALRXB(Value_P A, Token & LO, Token & RO,
+                            Value_P X, Value_P B) const
       { AXIS_ERROR; }
 
    /// plain function, 1 argument

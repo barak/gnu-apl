@@ -196,12 +196,12 @@ Quad_ARG::Quad_ARG()
 Value_P
 Quad_ARG::get_apl_value() const
 {
-const int argc = uprefs.expanded_argv.size();
+const int argc = UserPreferences::uprefs.expanded_argv.size();
 
 Value_P Z(argc, LOC);
    loop(a, argc)
       {
-        const char * arg = uprefs.expanded_argv[a];
+        const char * arg = UserPreferences::uprefs.expanded_argv[a];
         UTF8_string utf(arg);
         UCS_string ucs(utf);
         Value_P sub(ucs, LOC);
@@ -702,7 +702,8 @@ Value_P Z(2, LOC);
 Quad_PW::Quad_PW()
    : SystemVariable(ID_Quad_PW)
 {
-   Symbol::assign(IntScalar(uprefs.initial_pw, LOC), false, LOC);
+   Symbol::assign(IntScalar(UserPreferences::uprefs.initial_pw, LOC),
+                  false, LOC);
 }
 //----------------------------------------------------------------------------
 void
@@ -972,7 +973,8 @@ const APL_Integer qio = Workspace::get_IO();
         else if (x == SYL_RAVEL_BYTES_LIMIT)   // ravel bytes limit
            {
              const int cells = b / sizeof(Cell);
-             if (cells && (cells < APL_Integer(Value::total_ravel_count + 1000)))
+             if (cells &&
+                 cells < APL_Integer(Value::total_ravel_count + 1000))
                 DOMAIN_ERROR;
 
              ravel_count_limit = cells;

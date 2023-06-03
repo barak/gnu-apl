@@ -231,7 +231,8 @@ const ShapeItem B3_lm = shape_B3.l() * shape_B3.m();
        {
          const ShapeItem partition_start = partitions[m].start;
          const ShapeItem partition_len   = partitions[m].length();
-         const ShapeItem start_B = l + partition_start * shape_B3.l() + h * B3_lm;
+         const ShapeItem start_B =
+                         l + partition_start * shape_B3.l() + h * B3_lm;
          const Cell * src_B = &B->get_cravel(start_B);
 
          Value_P ZZ(partition_len, LOC);   // the m'th partition

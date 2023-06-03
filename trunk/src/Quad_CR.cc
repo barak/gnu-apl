@@ -612,7 +612,7 @@ bool nested = false;
         V_mode mode = Vm_NONE;
         UCS_string rhs;
         ShapeItem count = 0;                // the number of items on this line
-        ShapeItem todo = value->nz_element_count();  // the number of items to do
+        ShapeItem todo = value->nz_element_count();  // number of items to do
 
         loop(p, todo)
            {

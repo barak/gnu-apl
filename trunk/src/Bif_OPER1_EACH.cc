@@ -242,8 +242,9 @@ Bif_OPER1_EACH::do_eval_LB(Token & _LO, Value_P B)
 Function_P LO = _LO.get_function();
    Assert1(LO);
 
-   if (LO->is_operator() && !is_SLASH_or_BACKSLASH(_LO.get_tag()))  SYNTAX_ERROR;
-   if (!(LO->get_signature() & SIG_B))   VALENCE_ERROR;
+   if (LO->is_operator() &&
+       !is_SLASH_or_BACKSLASH(_LO.get_tag()))   SYNTAX_ERROR;
+   if (!(LO->get_signature() & SIG_B))          VALENCE_ERROR;
 
    if (B->is_empty())
       {

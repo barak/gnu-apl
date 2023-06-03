@@ -49,9 +49,9 @@ TabExpansion::expand_tab(UCS_string & user_input)
    user_input.remove_leading_and_trailing_whitespaces();
 
    if (user_input.size() == 0)                      // nothing entered yet
-      return expand_user_name(user_input);          // assume user-defined nam
+      return expand_user_name(user_input);          // assume defined name
 
-   if (Avec::is_first_symbol_char(user_input[0]))   // start of user-defined name
+   if (Avec::is_first_symbol_char(user_input[0]))   // start of -defined name
       return expand_user_name(user_input);
 
    if (user_input[0] == ')' || user_input[0] == ']')   // APL command
@@ -209,7 +209,8 @@ TabExpansion::expand_command_arg(UCS_string & user_input,
 ExpandResult
 TabExpansion::expand_help_topics(UCS_string & user_input)
 {
-   if (user_input.size() <= 5)   return expand_help_topics();   // initial display
+   if (user_input.size() <= 5)
+      return expand_help_topics();   // initial display
 
 const UCS_string help(user_input, 0, 6);
 UCS_string prefix(user_input, 5, user_input.size() - 5);   // the name prefix

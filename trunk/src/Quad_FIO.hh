@@ -179,7 +179,7 @@ protected:
    /// throw a DOMAIN error if the interpreter runs in safe mode.
    static void UNSAFE(const char * funname, int funnum)
       {
-        if (uprefs.safe_mode)
+        if (UserPreferences::uprefs.safe_mode)
            {
              MORE_ERROR() << "⎕FIO[" << funnum
                           << " is not permitted in safe mode (see ⎕ARGi)";

@@ -677,7 +677,8 @@ const bool file_exists = access(filename.c_str(), W_OK) == 0;
            }
       }
 
-   if (uprefs.backup_before_save && backup_existing_file(filename.c_str()))
+   if (UserPreferences::uprefs.backup_before_save &&
+       backup_existing_file(filename.c_str()))
       {
         COUT << "NOT SAVED: COULD NOT CREATE BACKUP FILE "
              << filename << endl;
@@ -858,7 +859,8 @@ UTF8_string filename = LibPaths::get_lib_filename(libref, WS_name, false,
         return;
       }
 
-   if (uprefs.backup_before_save && backup_existing_file(filename.c_str()))
+   if (UserPreferences::uprefs.backup_before_save &&
+       backup_existing_file(filename.c_str()))
       {
         COUT << "NOT DUMPED: COULD NOT CREATE BACKUP FILE "
              << filename << endl;

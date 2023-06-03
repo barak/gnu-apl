@@ -58,7 +58,8 @@ public:
                                  const Value & B);
 
    /// Prepend scalar cell_B to A along axis
-   static Value_P append_scalar(const Value & A, uAxis axis, const Cell & cell_B);
+   static Value_P append_scalar(const Value & A, uAxis axis,
+                                const Cell & cell_B);
 };
 //----------------------------------------------------------------------------
 /** primitive functions catenate, laminate, and ravel along last axis */

@@ -89,9 +89,9 @@ const char * end = strchr(file_and_args, ' ');
 void
 Quad_SVx::start_AP(AP_num ap)
 {
-   if (!uprefs.system_do_svars)   // something went wrong
+   if (!UserPreferences::uprefs.system_do_svars)   // something went wrong
       {
-        if (uprefs.user_do_svars)   // user wanted APs
+        if (UserPreferences::uprefs.user_do_svars)   // user wanted APs
            {
              // user wanted APs, but something went wrong
              //

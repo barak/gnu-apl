@@ -229,7 +229,9 @@ protected:
    /// true iff this function shall be locked
    bool locked;
 
-   // true if the user has (most likely interactively) entered a line number
+   /// \b true if the user has (most likely interactively) entered a line
+   /// number (so that the input lines are out of order, as opposed to
+   /// scripts where the lines are usually entered in order)
    bool out_of_order;
 
    /// the line number for the currently edited line

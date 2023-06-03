@@ -438,9 +438,9 @@ const uint8_t * ravel = data + 16 + 4*rank;
                       {
                         Z->next_ravel_Complex(
                                         *reinterpret_cast<const APL_Float *>
-                                                                (sub_ravel),
+                                                         (sub_ravel),
                                         *reinterpret_cast<const APL_Float *>
-                                                                (sub_ravel + 8));
+                                                          (sub_ravel + 8));
                         continue;   // next n
                       }
 

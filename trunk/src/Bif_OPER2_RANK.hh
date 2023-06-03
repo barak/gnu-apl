@@ -40,7 +40,8 @@ public:
    virtual Token eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const;
 
    /// overloaded Function::eval_ALRXB()
-   virtual Token eval_ALRXB(Value_P A, Token & LO, Token & RO, Value_P X, Value_P B) const;
+   virtual Token eval_ALRXB(Value_P A, Token & LO, Token & RO,
+                            Value_P X, Value_P B) const;
 
    /// the 'normalized' implementation of all eval_ALxxx*( functions
    static Token do_ALyXB(Value_P A, sRank rk_chunk_A, Token & LO,

@@ -205,7 +205,7 @@ CoreCount count = CoreCount(cfg_CORE_COUNT_WANTED);
 
 #elif cfg_CORE_COUNT_WANTED == -1   // handled below
 # if ! HAVE_AFFINITY_NP
-#  error "CORE_COUNT_WANTED == -1 cannot be used on platforms without pthread_getaffinity_np"
+#  error "CORE_COUNT_WANTED == -1 on platform without pthread_getaffinity_np"
 # endif
 
 #elif cfg_CORE_COUNT_WANTED == -2   // --cc N
@@ -216,7 +216,7 @@ CoreCount count = CoreCount(cfg_CORE_COUNT_WANTED);
 
 #elif cfg_CORE_COUNT_WANTED == -3   // handled below
 # if ! HAVE_AFFINITY_NP
-#  error "CORE_COUNT_WANTED == -3 cannot be used on platforms without pthread_getaffinity_np"
+#  error "CORE_COUNT_WANTED == -3 on platform without pthread_getaffinity_np"
 # endif
 
 #else  // cfg_CORE_COUNT_WANTED == xxx

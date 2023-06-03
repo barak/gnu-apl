@@ -356,6 +356,7 @@ public:
 #include "Performance.def"
 };
 //============================================================================
+/// The (unique) ID of an optimization
 enum Optimization_ID
 {
   INVALID_OPTIMIZATION_COUNTER = -1,
@@ -364,9 +365,11 @@ enum Optimization_ID
   OPT_COUNTER_COUNT
 };
 
+/// Whether a group of optimizations shall be enabled (1) or disabled (0).
+/// Individual optimiizations can be enabled/disabled in Performance.def
 enum Do_Optimization
 {
-  FT_ANY = 0,   ///< all ⎕FX time optimizations
+  FT_ANY = 1,   ///< all ⎕FX time optimizations
   RT_ANY = 1,   ///< all run time optimizations
 
 #define optim(enabled, tag, __text)  \
@@ -384,7 +387,7 @@ public:
         return optimization_counters[opt];
       }
 
-   // reset all counters
+   /// reset all counters
    static void reset_all()
       {
         loop(opt, OPT_COUNTER_COUNT)   optimization_counters[opt] = 0;
@@ -397,6 +400,7 @@ public:
       }
 
 protected:
+   /// an array of counters (one for each \b Optimization_ID)
    static int64_t optimization_counters[OPT_COUNTER_COUNT];
 };
 //============================================================================

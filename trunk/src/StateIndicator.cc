@@ -230,7 +230,8 @@ StateIndicator::list(ostream & out, SI_mode mode) const
              Assert(executable);
              if (mode == SIM_SI)   // )SI
                 {
-                  out << executable->get_exec_ufun()->get_name_and_line(get_PC());
+                  out << executable->get_exec_ufun()
+                                   ->get_name_and_line(get_PC());
                   break;
                 }
 
@@ -244,7 +245,8 @@ StateIndicator::list(ostream & out, SI_mode mode) const
                   else
                      {
                        const UCS_string name_and_line =
-                            executable->get_exec_ufun()->get_name_and_line(get_PC());
+                            executable->get_exec_ufun()
+                                      ->get_name_and_line(get_PC());
                        out << name_and_line
                            << "  " << executable->statement_text(get_PC())
                            << endl
@@ -256,7 +258,8 @@ StateIndicator::list(ostream & out, SI_mode mode) const
              if (mode & SIM_name_list)   // )SINL
                 {
                   const UCS_string name_and_line =
-                        executable->get_exec_ufun()->get_name_and_line(get_PC());
+                        executable->get_exec_ufun()
+                                  ->get_name_and_line(get_PC());
                        out << name_and_line << " ";
                        executable->get_exec_ufun()->print_local_vars(out);
                 }

@@ -750,13 +750,15 @@ const double dy = w_props.get_max_Y() - w_props.get_min_Y();
 const Pixel_Y py1 = w_props.valY2pixel(dy);
    for (int ix = 0; ix <= w_props.get_gridX_last(); ++ix)
        {
-         const double v = w_props.get_min_X() + ix*w_props.get_value_per_tile_X();
+         const double v = w_props.get_min_X() +
+                          ix*w_props.get_value_per_tile_X();
          const int px0 = w_props.valX2pixel(v - w_props.get_min_X())
                       + w_props.get_origin_X();
          if (ix == 0 || ix == w_props.get_gridX_last() ||
              w_props.get_gridX_style() == 1)
             {
-              draw_line(pctx, pctx.line, Pixel_XY(px0, py0), Pixel_XY(px0, py1));
+              draw_line(pctx, pctx.line, Pixel_XY(px0, py0),
+                                         Pixel_XY(px0, py1));
             }
          else if (w_props.get_gridX_style() == 2)
             {
@@ -798,7 +800,8 @@ const double dx = w_props.get_max_X() - w_props.get_min_X();
 const Pixel_X px1 = w_props.valX2pixel(dx) + w_props.get_origin_X();
    for (int iy = 0; iy <= w_props.get_gridY_last(); ++iy)
        {
-         const double v = w_props.get_min_Y() + iy*w_props.get_value_per_tile_Y();
+         const double v = w_props.get_min_Y() +
+                          iy*w_props.get_value_per_tile_Y();
          const Pixel_Y py0 = w_props.valY2pixel(v - w_props.get_min_Y());
          if (iy == 0 || iy == w_props.get_gridY_last() ||
                w_props.get_gridY_style() == 1)
@@ -818,7 +821,8 @@ const Pixel_X px1 = w_props.valX2pixel(dx) + w_props.get_origin_X();
            {
               const Pixel_X px2 = px0 - w_props.get_origin_X();
               const Pixel_Y py2 = py0 + w_props.get_origin_Y();
-              draw_line(pctx, pctx.line, Pixel_XY(px0, py0), Pixel_XY(px2, py2));
+              draw_line(pctx, pctx.line, Pixel_XY(px0, py0),
+                                         Pixel_XY(px2, py2));
 
              draw_text(pctx, cc,
                        Pixel_XY(px0 - wh.width - 5 - w_props.get_origin_X(),
