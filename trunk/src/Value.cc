@@ -2303,7 +2303,7 @@ const Cell & cell_0 = get_cfirst();
 ostream &
 Value::print(ostream & out) const
 {
-   if (is_member())   return print_member(out, UCS_string(""));
+   if (is_member())   return print_member(out, UCS_string());
 
 PrintContext pctx = Workspace::get_PrintContext(PR_APL);
    if (get_rank() == 0)   // scalar

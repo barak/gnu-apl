@@ -58,7 +58,7 @@ std::string TcpListener::start( void )
     if( ret != 0 ) {
         stringstream errmsg;
         errmsg << "Error looking up listener host: " << gai_strerror( ret );
-        Workspace::more_error() = UCS_string( errmsg.str().c_str() );
+        MORE_ERROR() << errmsg.str().c_str();
         DOMAIN_ERROR;
     }
 
@@ -68,7 +68,7 @@ std::string TcpListener::start( void )
     if( server_socket == -1 ) {
         stringstream errmsg;
         errmsg << "Error creating socket: " << strerror( errno );
-        Workspace::more_error() = UCS_string( errmsg.str().c_str() );
+        MORE_ERROR() << errmsg.str().c_str();
         DOMAIN_ERROR;
     }
 
@@ -77,15 +77,15 @@ std::string TcpListener::start( void )
         stringstream errmsg;
         errmsg << "Error setting SO_REUSEADDR parameter: " << strerror( errno );
         close( server_socket );
-        Workspace::more_error() = UCS_string( errmsg.str().c_str() );
+        MORE_ERROR() << errmsg.str().c_str();
         DOMAIN_ERROR;        
     }
 
     if( ::bind( server_socket, addr->ai_addr, addr->ai_addrlen ) == -1 ) {
         stringstream errmsg;
-        errmsg << "Unable to bind to port " << port << ": " << strerror( errno );
+        errmsg << "Unable to bind to port " << port << ": " << strerror(errno);
         close( server_socket );
-        Workspace::more_error() = UCS_string( errmsg.str().c_str() );
+        MORE_ERROR() << errmsg.str().c_str();
         DOMAIN_ERROR;
     }
 
@@ -93,7 +93,7 @@ std::string TcpListener::start( void )
         stringstream errmsg;
         errmsg << "Error calling accept: " << strerror( errno ) << endl;
         close( server_socket );
-        Workspace::more_error() = UCS_string( errmsg.str().c_str() );
+        MORE_ERROR() << errmsg.str().c_str();
         DOMAIN_ERROR;
     }
 
@@ -103,7 +103,7 @@ std::string TcpListener::start( void )
         stringstream errmsg;
         errmsg << "Error getting port number of socket: " << strerror( errno ) << endl;
         close( server_socket );
-        Workspace::more_error() = UCS_string( errmsg.str().c_str() );
+        MORE_ERROR() << errmsg.str().c_str();
         DOMAIN_ERROR;
     }
 

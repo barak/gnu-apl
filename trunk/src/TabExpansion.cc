@@ -115,7 +115,7 @@ UCS_string_vector matches;
    if (have_trailing_blank || arg.size())   // cmd is a complete command
       {
 #define cmd_def(cmd_str, code, arg, hint)                           \
-   { UCS_string ustr(cmd_str);                                      \
+   { UCS_string ustr(UTF8_string(cmd_str));                         \
      if (cmd.size() == strlen(cmd_str) && ustr.starts_iwith(cmd))   \
         { matches.push_back(ustr); ehint = hint; shint = arg; } }
 #include "Command.def"
@@ -124,7 +124,7 @@ UCS_string_vector matches;
    else                       // command prefix
       {
 #define cmd_def(cmd_str, code, arg, hint)                           \
-   { UCS_string ustr(cmd_str);                                      \
+   { UCS_string ustr(UTF8_string(cmd_str));                         \
      if (ustr.starts_iwith(cmd))                                    \
         { matches.push_back(ustr); ehint = hint; shint = arg; } }
 #include "Command.def"
@@ -381,13 +381,13 @@ int qpos = -1;   // the position of ⎕ in user_input
         UCS_string qxx(user_input, qpos, user_input.size() - qpos);
         UCS_string_vector matches;
 
-#define ro_sv_def(_q, str, _txt) { UCS_string ustr(str);   \
+#define ro_sv_def(_q, str, _txt) { UCS_string ustr(UTF8_string(str));  \
    if (ustr.size() && ustr.starts_iwith(qxx)) matches.push_back(ustr); }
 
-#define rw_sv_def(_q, str, _txt) { UCS_string ustr(str);   \
+#define rw_sv_def(_q, str, _txt) { UCS_string ustr(UTF8_string(str));  \
    if (ustr.size() && ustr.starts_iwith(qxx)) matches.push_back(ustr); }
 
-#define sf_def(_q, str, _txt) { UCS_string ustr(str);   \
+#define sf_def(_q, str, _txt) { UCS_string ustr(UTF8_string(str));     \
    if (ustr.size() && ustr.starts_iwith(qxx)) matches.push_back(ustr); }
 
 #include "SystemVariable.def"
@@ -486,14 +486,14 @@ UCS_string prefix = user_input.drop(prefix_len);
         (prefix.size() == 3 && prefix.starts_iwith("HAV")) ||
         (prefix.size() == 4 && prefix.starts_iwith("HAVE")))
       {
-        user_input = stem + UCS_string("HAVE-");
+        user_input = stem + UCS_string(UTF8_string("HAVE-"));
         return ER_REPLACE;
       }
 
    if ( (prefix.size() == 1 && prefix.starts_iwith("N" )) ||
         (prefix.size() == 2 && prefix.starts_iwith("NO")))
       {
-        user_input = stem + UCS_string("NO-");
+        user_input = stem + UCS_string(UTF8_string("NO-"));
         return ER_REPLACE;
       }
 
@@ -616,19 +616,19 @@ TabExpansion::expand_filename(UCS_string & user_input,
         {
           const char * pwd = getenv("PWD");
           if (pwd == 0)   goto nothing;
-          dir_ucs = UCS_string(pwd);
+          dir_ucs = UCS_string(UTF8_string(pwd));
           dir_ucs.append(arg.drop(1));
         }
      else if (tilde_at_0 && slash_at_1)                 // user's home ~/
         {
           const char * home = getenv("HOME");
           if (home == 0)   goto nothing;
-          dir_ucs = UCS_string(home);
+          dir_ucs = UCS_string(UTF8_string(home));
           dir_ucs.append(arg.drop(1));
         }
      else if (tilde_at_0)                               // somebody's home
         {
-          dir_ucs = UCS_string("/home/");
+          dir_ucs = UCS_string(UTF8_string("/home/"));
           dir_ucs.append(arg.drop(1));
         }
      else goto nothing;
@@ -778,7 +778,7 @@ const bool only_workspaces = (ehint == EH_oLIB_WSNAME) ||
 
           if (strncmp(dent->d_name, prefix.c_str(), prefix.size()))   continue;
 
-          UCS_string name(dent->d_name);
+          UCS_string name(UTF8_string(dent->d_name));
 
           const bool is_dir = Command::is_directory(dent, dirname);
           if (is_dir)   name.append(UNI_SLASH);

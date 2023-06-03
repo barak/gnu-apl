@@ -41,9 +41,7 @@ struct fcall_edge
    /// default constructor
    fcall_edge()
    : caller(0),
-     caller_name(0),
      callee(0),
-     callee_name(0),
      value(0)
    {}
 

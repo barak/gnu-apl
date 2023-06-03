@@ -30,7 +30,7 @@ void SqliteConnection::raise_sqlite_error( const string &message )
 {
     stringstream out;
     out << message << ": " << sqlite3_errmsg( db );
-    Workspace::more_error() = out.str().c_str();
+    MORE_ERROR() << out.str().c_str();
     DOMAIN_ERROR;
 }
 

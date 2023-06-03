@@ -73,11 +73,6 @@ public:
    /// constructor: UCS_string from UTF8_string
    UCS_string(const UTF8_string & utf);
 
-   /// constructor: UCS_string from 0-terminated C string. Do NOT use it
-   /// for non-ASCII strings like C-literals containing (UTF8-encoded) APL
-   /// characters !!!
-   UCS_string(const char * cstring);
-
    /// constructor: UCS_string from print buffer
    UCS_string(const PrintBuffer & pb, sRank rank, int quad_PW);
 
@@ -461,6 +456,11 @@ private:
    /// prevent accidental usage of the rather dangerous default len parameter
    /// in basic_strng::erase(pos, len = npos)
     basic_string<Unicode> & erase(size_type pos, size_type len);
+
+   /// constructor: UCS_string from 0-terminated C string.
+   /// Made private because it was far too often used incorrectly.
+
+   UCS_string(const char * cstring);
 };
 //----------------------------------------------------------------------------
 inline void

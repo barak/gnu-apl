@@ -134,7 +134,7 @@ update_int_cell(Value & Z, char * content)
 {
     if (*content == 0)
        {
-         Workspace::more_error() = "Numeric content from database was empty";
+         MORE_ERROR() << "Numeric content from database was empty";
          DOMAIN_ERROR;
        }
 
@@ -142,7 +142,7 @@ update_int_cell(Value & Z, char * content)
     const APL_Integer N = strtol(content, &endptr, 10);
     if (*endptr != 0)   // some rest after number (if any)
        {
-         Workspace::more_error() =
+         MORE_ERROR() <<
                      "Error parsing values returned from database";
          DOMAIN_ERROR;
        }
@@ -259,7 +259,7 @@ vector<int>          formats(array_len, 0);
          ostringstream out;
          out << "Error executing query: " << PQresStatus( status ) << endl
              << "Message: " << PQresultErrorMessage(result.get_result());
-         Workspace::more_error() = out.str().c_str();
+         MORE_ERROR() << out.str().c_str();
          DOMAIN_ERROR;
        }
 

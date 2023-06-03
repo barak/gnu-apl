@@ -198,9 +198,9 @@ FIXME;
       }
 
 const UCS_string lit_ucs(*Z);
-   if (lit_ucs.compare(UCS_string("null"))  == COMP_EQ ||
-       lit_ucs.compare(UCS_string("true"))  == COMP_EQ ||
-       lit_ucs.compare(UCS_string("false")) == COMP_EQ)
+   if (lit_ucs.compare(UCS_string(UTF8_string("null")))  == COMP_EQ ||
+       lit_ucs.compare(UCS_string(UTF8_string("true")))  == COMP_EQ ||
+       lit_ucs.compare(UCS_string(UTF8_string("false"))) == COMP_EQ)
       {
         result.append(lit_ucs);
         return;
@@ -254,11 +254,11 @@ Quad_JSON::APL_to_JSON_string(UCS_string & result, const Value & B,
 
    if (B.get_rank() == 1)   // JSON array
       {
-        UCS_string array("[ ");
+        UCS_string array(UTF8_string("[ "));
         const ShapeItem ec = B.element_count();
         loop(e, ec)
             {
-              if (e)   array.append(", ");
+              if (e)   array.append_ASCII(", ");
               if (array.size() > 60)
                  {
                    array.back() = UNI_LF;

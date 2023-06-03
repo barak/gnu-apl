@@ -551,7 +551,8 @@ const bool log_startup = UserPreferences::uprefs.parse_argv_1() || log_startup0;
         return 8;
       }
 
-   if (UserPreferences::uprefs.do_Color)   Output::toggle_color("ON");
+   if (UserPreferences::uprefs.do_Color)
+      Output::toggle_color(UTF8_string("ON"));
 
    if (UserPreferences::uprefs.latent_expression.size())
       {
@@ -575,7 +576,7 @@ const bool log_startup = UserPreferences::uprefs.parse_argv_1() || log_startup0;
    if (UserPreferences::uprefs.do_CONT &&
        !UserPreferences::uprefs.initial_workspace.size())
       {
-         UCS_string cont("CONTINUE");
+         UCS_string cont(UTF8_string("CONTINUE"));
          UTF8_string filename =
             LibPaths::get_lib_filename(LIB0, cont, true, ".xml", ".apl");
 
@@ -583,14 +584,14 @@ const bool log_startup = UserPreferences::uprefs.parse_argv_1() || log_startup0;
             {
               // CONTINUE workspace exists and was not inhibited by --noCONT
               //
-              UCS_string load_cmd(")LOAD CONTINUE");
+              UCS_string load_cmd(UTF8_string(")LOAD CONTINUE"));
               Command::process_line(load_cmd, 0);
               return 0;
             }
 
          // no CONTINUE workspace but maybe SETUP
          //
-         cont = UCS_string("SETUP");
+         cont = UCS_string(UTF8_string("SETUP"));
          filename =
             LibPaths::get_lib_filename(LIB0, cont, true, ".xml", ".apl");
 
@@ -598,7 +599,7 @@ const bool log_startup = UserPreferences::uprefs.parse_argv_1() || log_startup0;
             {
               // SETUP workspace exists and was not inhibited by --noCONT
               //
-              UCS_string load_cmd(")LOAD SETUP");
+              UCS_string load_cmd(UTF8_string(")LOAD SETUP"));
               Command::process_line(load_cmd, 0);
               return 0;
             }
@@ -611,7 +612,8 @@ const bool log_startup = UserPreferences::uprefs.parse_argv_1() || log_startup0;
          UCS_string init_ws(UserPreferences::uprefs.initial_workspace);
          const char * cmd = UserPreferences::uprefs.silent
                           ? ")QLOAD " : ")LOAD ";
-         UCS_string load_cmd(cmd);
+         const UTF8_string utf(cmd);
+         UCS_string load_cmd(utf);
          load_cmd.append(init_ws);
          Command::process_line(load_cmd, 0);
       }

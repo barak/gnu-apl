@@ -27,7 +27,7 @@
 static PostgresConnection *create_postgres_connection( Value_P B )
 {
     if( !B->is_char_string() ) {
-        Workspace::more_error() = "Argument must be a single string";
+        MORE_ERROR() << "Argument must be a single string";
         DOMAIN_ERROR;
     }
 
@@ -42,7 +42,7 @@ static PostgresConnection *create_postgres_connection( Value_P B )
     if( status != CONNECTION_OK ) {
         stringstream out;
         out << "Error connecting to Postgres database: " << PQerrorMessage( db );
-        Workspace::more_error() = out.str().c_str();
+        MORE_ERROR() << out.str().c_str();
         PQfinish( db );
         DOMAIN_ERROR;
     }
@@ -51,7 +51,7 @@ static PostgresConnection *create_postgres_connection( Value_P B )
     if( result != 0 ) {
         stringstream out;
         out << "Unable to set encoding to UTF-8: " << PQerrorMessage( db );
-        Workspace::more_error() = out.str().c_str();
+        MORE_ERROR() << out.str().c_str();
         PQfinish( db );
         DOMAIN_ERROR;
     }

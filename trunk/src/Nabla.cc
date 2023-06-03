@@ -157,7 +157,7 @@ UCS_string fun_text;
         // the last history line (which contained some ∇foo ...)
         //
         {
-          UCS_string line_0("    ");
+          UCS_string line_0(UTF8_string("    "));
           line_0.append(UNI_NABLA);
           line_0.append(lines[0].text);
           line_0.remove_trailing_whitespaces();
@@ -166,7 +166,7 @@ UCS_string fun_text;
 
         for (size_t l = 1; l < lines.size(); ++l)
             {
-              UCS_string line_l("[");
+              UCS_string line_l(UTF8_string("["));
               line_l.append_number(l);
               line_l.append_UTF8("]  ");
               while (line_l.size() < 6)   line_l.append(UNI_SPACE);
@@ -176,13 +176,13 @@ UCS_string fun_text;
               LineInput::add_history_line(line_l);
            }
 
-        UCS_string line_N("   ");
+        UCS_string line_N(UTF8_string("   "));
         line_N.append(UNI_NABLA);
         LineInput::add_history_line(line_N);
       }
 
 int error_line = 0;
-UCS_string creator(InputFile::current_filename());
+UCS_string creator(UTF8_string(InputFile::current_filename()));
    creator.append(UNI_COLON);
    creator.append_number(defn_line_no);
 UTF8_string creator_utf8(creator);
@@ -1030,7 +1030,7 @@ Nabla::FunLine::print(ostream & out) const
 void
 LineLabel::print(ostream & out) const
 {
-UCS_string ucs("[");
+UCS_string ucs(UTF8_string("["));
    ucs.append_number(ln_major);
    if (ln_minor.size())
       {
@@ -1046,7 +1046,7 @@ UCS_string ucs("[");
 UCS_string
 LineLabel::print_prompt(int min_size) const
 {
-UCS_string ret("[");
+UCS_string ret(UTF8_string("["));
    ret.append_number(ln_major);
 
    if (ln_minor.size())

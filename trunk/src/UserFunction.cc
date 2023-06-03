@@ -784,7 +784,7 @@ Line_status current = APL_text;
          Assert1(status[li] == Start_of_string);
          UCS_string prefix = get_text(li++);
          prefix.resize(int(prefix.size() - 3));   // remove the trailing """
-         UCS_string accu("");
+         UCS_string accu;
          int count = 0;
          while (status[li] == Inside_string)
                {
@@ -920,7 +920,7 @@ UCS_string_vector original_text;
 
               if (tolerant && ec != E_NO_ERROR)
                  {
-                   UCS_string new_line = "## ";
+                   UCS_string new_line(UTF8_string("## "));
                    new_line.append(line);
                    text[l] = new_line;
                    CERR << "WARNING: SYNTAX ERROR in function "
@@ -1674,6 +1674,6 @@ char cc[40];
    if      (text.size() > 100)   SPRINTF(cc, "[%3d] ", l)
    else if (text.size() > 10)    SPRINTF(cc, "[%2d] ", l)
    else                          SPRINTF(cc, "[%d] ",  l)
-   return UCS_string(cc);
+   return UCS_string(UTF8_string(cc));
 }
 //----------------------------------------------------------------------------

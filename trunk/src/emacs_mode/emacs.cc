@@ -110,12 +110,13 @@ Token eval_XB(Value_P X, Value_P B)
         }
 
         try {
-            start_listener( port );
-        }
-        catch( InitProtocolError &error ) {
-            Workspace::more_error() = error.get_message().c_str();
-            DOMAIN_ERROR;
-        }
+              start_listener( port );
+            }
+        catch(InitProtocolError &error)
+           {
+             MORE_ERROR() << error.get_message().c_str();
+             DOMAIN_ERROR;
+           }
         return Token(TOK_APL_VALUE1, Str0(LOC));
     }
 

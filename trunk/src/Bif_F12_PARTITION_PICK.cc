@@ -559,7 +559,7 @@ const Cell & cA = A0[idx_A];
                   DOMAIN_ERROR;
                 }
 
-             const UCS_string top_level("B");
+             const UCS_string top_level(UNI_B);
              const UCS_string member(A);
              vector<const UCS_string *> members;
              members.push_back(&member);

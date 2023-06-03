@@ -76,30 +76,6 @@ UCS_string::UCS_string(const UCS_string & ucs, size_t pos, size_t len)
    create(LOC);
 }
 //----------------------------------------------------------------------------
-UCS_string::UCS_string(const char * cstring)
-{
-   // calling this constructor with and utf8-encoded C string is usually wrong.
-   //
-   // Instead of:   UCS_string(const char * utf8_string)
-   // one should:   UCS_string(UTF8_string(utf8_string))
-   //
-   // so that the constructor below takes care of the utf8-decoding.
-   //
-   // For ASCII C strings this constuctor is fine.
-   //
-   create(LOC);
-
-   for (const char * str = cstring; *str; ++str)
-      {
-        if (0x80 & *cstring)   // ASCII
-           {
-             CERR << "non-ASCII char in C-String '" << cstring << "'" << endl;
-             Assert(0 && "Bad C-string");
-           }
-        *this += Unicode(*str);
-      }
-}
-//----------------------------------------------------------------------------
 UCS_string::UCS_string(const UTF8_string & utf)
 {
    create(LOC);
@@ -1344,7 +1320,7 @@ UCS_string ret(UNI_OVERBAR);
 UCS_string
 UCS_string::from_uint(uint64_t value)
 {
-   if (value == 0)   return UCS_string("0");
+   if (value == 0)   return UCS_string(UNI_0);
 
 int digits[40];
 int * d = digits;

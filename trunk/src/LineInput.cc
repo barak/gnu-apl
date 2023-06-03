@@ -133,10 +133,9 @@ LineHistory::LineHistory(int maxl)
    : current_line(0),
      put(0),
      max_lines(maxl),
-     cur_search_substr( "" ),
      last_search_line(0)
 {
-   UCS_string u("xxx");
+   UCS_string u(UTF8_string("xxx"));
    add_line(u);
 }
 //----------------------------------------------------------------------------
@@ -144,10 +143,9 @@ LineHistory::LineHistory(const Nabla & nabla)
    : current_line(0),
      put(0),
      max_lines(1000),
-     cur_search_substr( "" ),
      last_search_line(0)
 {
-   UCS_string u("xxx");
+   UCS_string u(UTF8_string("xxx"));
    add_line(u);
 int cl = -1;
    loop(l, nabla.get_line_count())
@@ -228,7 +226,7 @@ LineHistory::clear_history(ostream & out)
    current_line = 0;
    put = 0;
    hist_lines.clear();
-UCS_string u("xxx");
+UCS_string u((UTF8_string("xxx")));
    add_line(u);
 }
 //----------------------------------------------------------------------------
@@ -326,7 +324,7 @@ int new_current_line = current_line + 1;
 const void
 LineHistory::clear_search(void)
 {
-    cur_search_substr = "";
+    cur_search_substr.clear();
 }
 //----------------------------------------------------------------------------
 const void

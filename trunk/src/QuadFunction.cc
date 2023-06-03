@@ -385,7 +385,7 @@ Value_P Z(3, LOC);
         const ErrorCode ec = ErrorCode(result.get_int_val());
 
         PrintBuffer pb;
-        pb.append_ucs(Error::error_name(ec));
+        pb.append_ucs(UTF8_string(Error::error_name(ec)));
         pb.append_ucs(err.get_error_line_2());
         pb.append_ucs(err.get_error_line_3());
 
@@ -606,7 +606,7 @@ const ErrorCode ec = get_error_code(B);
              // and B is not empty, the event action is generated as though
              // the function were primitive.
              //
-             UCS_string ufun_name("      ");
+             UCS_string ufun_name(UTF8_string("      "));
              ufun_name.append(ufun->get_name());
              error.set_error_line_2(ufun_name, 6, -1);
              Workspace::pop_SI(LOC);
@@ -773,7 +773,7 @@ Quad_INP::eval_AB(Value_P A, Value_P B) const
 {
    if (Quad_INP_running)
       {
-        MORE_ERROR() = "⎕INP called recursively";
+        MORE_ERROR() << "⎕INP called recursively";
         SYNTAX_ERROR;
       }
 

@@ -301,7 +301,8 @@ int conversion_count_A = 0;   // the number of conversions (in A_format)
                     // A_format is somewhat mal-formed (e.g. "ab %555"),
                     // but the C/C++ printf() functions accept it.
                     //
-                    UCS_string ufmt(fmt);
+                    UTF8_string utf(fmt);
+                    UCS_string ufmt(utf);
                     UZ.append(ufmt);
                     return;
                   }
@@ -313,7 +314,8 @@ int conversion_count_A = 0;   // the number of conversions (in A_format)
                     // forgotten it. In theory the format string could be
                     // proper, but we assumt it is mal-formed.
                     //
-                    UCS_string ufmt(fmt);
+                    UTF8_string utf(fmt);
+                    UCS_string ufmt(utf);
                     UZ.append(ufmt);
                     goto field_done;
                   }
@@ -1199,7 +1201,7 @@ const APL_Integer function_number = B->get_cfirst().get_int_value();
 #define perfo_2(id, b, name, thr) perfo_1(id, b, name, thr)
 #define perfo_1(id, ab, name, _thr)         \
    { Z->next_ravel_Int(PFS_ ## id ## ab);   \
-     UCS_string ucs(#id #ab);               \
+     UCS_string ucs(UTF8_string(#id #ab));  \
      Value_P uZ(ucs, LOC);                  \
      Z->next_ravel_Pointer(uZ.get());       }
 #include "Performance.def"
@@ -1320,8 +1322,9 @@ const APL_Integer function_number = B->get_cfirst().get_int_value();
                char * success = getcwd(buffer, APL_PATH_MAX);
                if (!success)   goto out_errno;
 
-               buffer[APL_PATH_MAX] = 0;
-               UCS_string cwd(buffer);
+               buffer[APL_PATH_MAX] = 0;   // just in case
+               UTF8_string buffer_utf(buffer);
+               UCS_string cwd(buffer_utf);
 
                Value_P Z(cwd, LOC);
                Z->set_proto_Spc();
@@ -1909,7 +1912,7 @@ int function_number = -1;
 #endif
                         }   // function_number == 28
 
-                     UCS_string filename(dent.d_name);
+                     UCS_string filename(UTF8_string(dent.d_name));
                      Value_P Z_name(filename, LOC);
                      Z->next_ravel_Pointer(Z_name.get());
                    }
@@ -2310,7 +2313,7 @@ int function_number = -1;
                 // get statistics
                 //
                  const int t = Performance::get_statistics_type(b);
-                 UCS_string stat_name(stat->get_name());
+                 UCS_string stat_name(UTF8_string(stat->get_name()));
                  Value_P Zsub(stat_name, LOC);
                  if (t <= 2)   // cell function statistics
                     {

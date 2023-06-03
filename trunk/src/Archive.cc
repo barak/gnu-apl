@@ -1673,7 +1673,7 @@ bool mismatch = false;
    // old (SVN-version based) compatibility mechanism
 
 UCS_string saving_SVN;   // from the XML file
-UCS_string current_SVN(ARCHIVE_SVN);
+UCS_string current_SVN(UTF8_string(ARCHIVE_SVN));
    {
      const UTF8 * saving = find_optional_attr("saving_SVN");
      while (saving && *saving != '"')   saving_SVN.append(Unicode(*saving++));
@@ -2206,7 +2206,8 @@ UCS_string text;
    else
       {
         int err = 0;
-        UCS_string creator_UCS(filename);
+        UTF8_string filename_utf(filename);
+        UCS_string creator_UCS(filename_utf);
         creator_UCS.append(UNI_COLON);
         creator_UCS.append_number(line_no);
         UTF8_string creator(creator_UCS);

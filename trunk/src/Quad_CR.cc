@@ -246,7 +246,7 @@ int function_number = -1;
       {
         UCS_string ucs_A(*A);
         UTF8_string utf_A(ucs_A);
-        function_number = subfun_to_axis(utf_A.c_str());
+        function_number = subfun_to_axis(UTF8_string(utf_A.c_str()));
         if (function_number == -1)
            {
              MORE_ERROR() << "Bad function name X in ⎕FIO[X]B (X is '"
@@ -480,7 +480,7 @@ const Symbol * symbol = Workspace::lookup_existing_symbol(symbol_name);
                   }
                else
                   {
-                    UCS_string res("∇");
+                    UCS_string res(UTF8_string("∇"));
 
                     loop(u, text.size())
                        {

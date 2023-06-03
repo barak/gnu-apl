@@ -60,8 +60,9 @@ void PostgresConnection::transaction_begin( void )
     PostgresResultWrapper result( PQexec( db, "begin" ) );
     if( PQresultStatus( result.get_result() ) != PGRES_COMMAND_OK ) {
         stringstream out;
-        out << "Error when calling begin: " << PQresultErrorMessage( result.get_result() );
-        Workspace::more_error() = out.str().c_str();
+        out << "Error when calling begin: "
+            << PQresultErrorMessage( result.get_result() );
+        MORE_ERROR() << out.str().c_str();
         DOMAIN_ERROR;
     }
 }
@@ -72,7 +73,7 @@ void PostgresConnection::transaction_commit( void )
     if( PQresultStatus( result.get_result() ) != PGRES_COMMAND_OK ) {
         stringstream out;
         out << "Error when calling commit: " << PQresultErrorMessage( result.get_result() );
-        Workspace::more_error() = out.str().c_str();
+        MORE_ERROR() << out.str().c_str();
         DOMAIN_ERROR;
     }
 }
@@ -83,7 +84,7 @@ void PostgresConnection::transaction_rollback( void )
     if( PQresultStatus( result.get_result() ) != PGRES_COMMAND_OK ) {
         stringstream out;
         out << "Error when calling rollback: " << PQresultErrorMessage( result.get_result() );
-        Workspace::more_error() = out.str().c_str();
+        MORE_ERROR() << out.str().c_str();
         DOMAIN_ERROR;
     }
 }
@@ -95,7 +96,7 @@ void PostgresConnection::fill_tables( vector<string> &tables )
     if( status != PGRES_TUPLES_OK ) {
         stringstream out;
         out << "Error getting list of tables: " << PQresultErrorMessage( result.get_result() );
-        Workspace::more_error() = out.str().c_str();
+        MORE_ERROR() << out.str().c_str();
         DOMAIN_ERROR;            
     }
 
@@ -124,7 +125,7 @@ ExecStatusType status = PQresultStatus( result.get_result() );
          stringstream out;
          out << "Error getting list of columns: "
              << PQresultErrorMessage(result.get_result());
-         Workspace::more_error() = out.str().c_str();
+         MORE_ERROR() << out.str().c_str();
          DOMAIN_ERROR;
        }
 

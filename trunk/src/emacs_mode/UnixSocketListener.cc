@@ -48,7 +48,7 @@ std::string UnixSocketListener::start( void )
     if( server_socket == -1 ) {
         stringstream errmsg;
         errmsg << "Error creating unix domain socket: " << strerror( errno ) << endl;
-        Workspace::more_error() = UCS_string( errmsg.str().c_str() );
+        MORE_ERROR() << errmsg.str().c_str();
         DOMAIN_ERROR;
     }
 
@@ -65,7 +65,7 @@ std::string UnixSocketListener::start( void )
         stringstream errmsg;
         errmsg << "Error binding unix domain socket: " << strerror( errno ) << endl;
         close( server_socket );
-        Workspace::more_error() = UCS_string( errmsg.str().c_str() );
+        MORE_ERROR() << errmsg.str().c_str();
         DOMAIN_ERROR;
     }
 
@@ -75,7 +75,7 @@ std::string UnixSocketListener::start( void )
         stringstream errmsg;
         errmsg << "Error setting permissions: " << strerror( errno ) << endl;
         close( server_socket );
-        Workspace::more_error() = UCS_string( errmsg.str().c_str() );
+        MORE_ERROR() << errmsg.str().c_str();
         DOMAIN_ERROR;
     }
 
@@ -83,7 +83,7 @@ std::string UnixSocketListener::start( void )
         stringstream errmsg;
         errmsg << "Error starting listener on unix domain socket: " << strerror( errno ) << endl;
         close( server_socket );
-        Workspace::more_error() = UCS_string( errmsg.str().c_str() );
+        MORE_ERROR() <<  errmsg.str().c_str();
         DOMAIN_ERROR;
     }
 

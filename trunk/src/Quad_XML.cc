@@ -1451,9 +1451,9 @@ Quad_XML::tree(const Value & B, int flags)
         DOMAIN_ERROR;
       }
 
-UCS_string z = "XML\n";
-UCS_string prefix = "";
-const UCS_string name_prefix = "";
+UCS_string z(UTF8_string("XML\n"));
+UCS_string prefix;
+const UCS_string name_prefix;
    tree(B, z, prefix, name_prefix, flags);
 
    return Value_P(z, LOC);
@@ -1618,7 +1618,7 @@ Quad_XML::all_members(const Value & B, int flags)
         DOMAIN_ERROR;
       }
 
-const UCS_string name_prefix = "";
+const UCS_string name_prefix;
 UCS_string_vector result;
    result.reserve(B.get_all_members_count());
 

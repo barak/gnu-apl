@@ -246,7 +246,8 @@ int brackets = 0;
 bool in_param = false;
 bool many = false;
 
-UCS_string args_ucs(args);
+UTF8_string args_utf(args);
+UCS_string args_ucs(args_utf);
    loop (a, args_ucs.size())   switch(args_ucs[a])
        {
          case '[': ++brackets;   in_param = false;   continue;
@@ -719,7 +720,7 @@ bool show_OK = true;   // assume more verbose output
       {
         UCS_string arg0(arg);
         arg0.remove_leading_and_trailing_whitespaces();
-        const UCS_string brief("BRIEF");
+        const UCS_string brief(UTF8_string("BRIEF"));
         show_OK = arg0.compare(brief) != COMP_EQ;   // not BRIEF
         if (show_OK)   // still show_OK
            {
@@ -858,7 +859,7 @@ bool show_OK = true;   // assume more verbose output
 void
 Command::cmd_CONTINUE(ostream & out)
 {
-UCS_string wsname("CONTINUE");
+UCS_string wsname(UTF8_string("CONTINUE"));
    Workspace::wsid(out, wsname, LIB0, false);     // )WSID CONTINUE
    Workspace::save_WS(out, LIB0, wsname, true);   // )SAVE
    cmd_OFF(0);                                    // )OFF
@@ -1057,8 +1058,10 @@ UCS_string wsid_name = Workspace::get_WS_name();
         wsid_name.remove_leading_whitespaces();
       }
 
-   if (wsid_name.compare(UCS_string("CLEAR WS")) == 0)   // don't dump CLEAR WS
-      {
+   if (wsid_name.compare(UCS_string(UTF8_string("CLEAR WS"))) == 0)
+      { 
+        // don't dump CLEAR WS
+        //
         COUT << "NOT DUMPED: THIS WS IS CLEAR WS" << endl;
         MORE_ERROR() <<
         "the workspace was not dumped because 'CLEAR WS' is a special\n"
@@ -1361,7 +1364,7 @@ UCS_string_vector commands;
 
    out << left << "APL Commands:" << endl;
 #define cmd_def(cmd_str, _cod, arg, _hint) \
-   { UCS_string c(cmd_str " " arg);   commands.push_back(c); }
+   { UCS_string c(UTF8_string(cmd_str " " arg));   commands.push_back(c); }
 #include "Command.def"
 
 bool left_col = true;
@@ -1659,7 +1662,7 @@ Command::open_LIB_dir(UTF8_string & path, ostream & out,
    // 3.  )LIB directory-name      )LIB /usr/lib/...
    //
 
-UCS_string arg("0");
+UCS_string arg(UNI_0);
    if (args.size())   arg = args[0];
 
    if (args.size() == 0)                       // case 1.
@@ -2215,8 +2218,9 @@ UCS_string wsid_name = Workspace::get_WS_name();
         wsid_name.remove_leading_whitespaces();
       }
 
-   if (wsid_name.compare(UCS_string("CLEAR WS")) == 0)   // don't save CLEAR WS
+   if (wsid_name.compare(UCS_string(UTF8_string("CLEAR WS"))) == 0)
       {
+        // don't save CLEAR WS
         COUT << "NOT SAVED: THIS WS IS CLEAR WS" << endl;
         MORE_ERROR() <<
         "the workspace was not saved because 'CLEAR WS' is a special\n"
@@ -2396,7 +2400,7 @@ Command::cmd_USERCMD(ostream & out, const UCS_string & cmd,
    // check conflicts with existing commands
    //
 #define cmd_def(cmd_str, _cod, _arg, _hint) \
-   if (check_name_conflict(out, cmd_str, command_name))   return;
+   if (check_name_conflict(out, UTF8_string(cmd_str), command_name))   return;
 #include "Command.def"
    if (check_redefinition(out, command_name, apl_fun, mode))
      {

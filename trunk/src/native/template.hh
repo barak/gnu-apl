@@ -108,7 +108,7 @@ get_function_mux(const char * function_name)
 Token
 eval_(const NativeFunction * caller)
 {
-UCS_string ucs("eval_() called");
+UCS_string ucs(UTF8_string("eval_() called"));
 Value_P Z(ucs, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
@@ -150,7 +150,7 @@ get_function_mux(const char * function_name)
 Token
 eval_B(Value_P B, const NativeFunction * caller)
 {
-UCS_string ucs("eval_B() called");
+UCS_string ucs(UTF8_string(UTF8_string("eval_B() called")));
 Value_P Z(ucs, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
@@ -159,7 +159,7 @@ Value_P Z(ucs, LOC);
 Token
 eval_AB(Value_P A, Value_P B, const NativeFunction * caller)
 {
-UCS_string ucs("eval_AB() called");
+UCS_string ucs(UTF8_string("eval_AB() called"));
 Value_P Z(ucs, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
@@ -168,7 +168,7 @@ Value_P Z(ucs, LOC);
 Token
 eval_XB(Value_P X, Value_P B, const NativeFunction * caller)
 {
-UCS_string ucs("eval_XB() called");
+UCS_string ucs(UTF8_string("eval_XB() called"));
 Value_P Z(ucs, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
@@ -177,7 +177,7 @@ Value_P Z(ucs, LOC);
 Token
 eval_AXB(Value_P A, Value_P X, Value_P B, const NativeFunction * caller)
 {
-UCS_string ucs("eval_AXB() called");
+UCS_string ucs(UTF8_string("eval_AXB() called"));
 Value_P Z(ucs, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
@@ -221,7 +221,7 @@ get_function_mux(const char * function_name)
 Token
 eval_LB(Function & LO, Value_P B, const NativeFunction * caller)
 {
-UCS_string ucs("eval_LB() called");
+UCS_string ucs(UTF8_string("eval_LB() called"));
 Value_P Z(ucs, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
@@ -230,7 +230,7 @@ Value_P Z(ucs, LOC);
 Token
 eval_ALB(Value_P A, Function & LO, Value_P B, const NativeFunction * caller)
 {
-UCS_string ucs("eval_ALB() called");
+UCS_string ucs(UTF8_string("eval_ALB() called"));
 Value_P Z(ucs, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
@@ -239,7 +239,7 @@ Value_P Z(ucs, LOC);
 Token
 eval_LXB(Function & LO, Value_P X, Value_P B, const NativeFunction * caller)
 {
-UCS_string ucs("eval_LXB() called");
+UCS_string ucs(UTF8_string("eval_LXB() called"));
 Value_P Z(ucs, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
@@ -249,7 +249,7 @@ Token
 eval_ALXB(Value_P A, Function & LO, Value_P X, Value_P B,
           const NativeFunction * caller)
 {
-UCS_string ucs("eval_ALXB() called");
+UCS_string ucs(UTF8_string("eval_ALXB() called"));
 Value_P Z(ucs, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
@@ -295,7 +295,7 @@ Token
 eval_LRB(Function & LO, Function & RO, Value_P B,
          const NativeFunction * caller)
 {
-UCS_string ucs("eval_LRB() called");
+UCS_string ucs(UTF8_string("eval_LRB() called"));
 Value_P Z(ucs, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
@@ -305,7 +305,7 @@ Token
 eval_ALRB(Value_P A, Function & LO, Function & RO, Value_P B,
           const NativeFunction * caller)
 {
-UCS_string ucs("eval_ALRB() called");
+UCS_string ucs(UTF8_string("eval_ALRB() called"));
 Value_P Z(ucs, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
@@ -316,7 +316,7 @@ Token
 eval_LRXB(Function & LO, Function & RO, Value_P X, Value_P B,
           const NativeFunction * caller)
 {
-UCS_string ucs("eval_LRXB() called");
+UCS_string ucs(UTF8_string("eval_LRXB() called"));
 Value_P Z(ucs, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
@@ -326,7 +326,7 @@ Token
 eval_ALRXB(Value_P A, Function & LO, Function & RO, Value_P X, Value_P B,
            const NativeFunction * caller)
 {
-UCS_string ucs("eval_ALRXB() called");
+UCS_string ucs(UTF8_string("eval_ALRXB() called"));
 Value_P Z(ucs, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
@@ -351,7 +351,7 @@ bool (*close_fun_is_unused)(Cause, const NativeFunction *) = &close_fun;
 Token
 eval_fill_B(Value_P B, const NativeFunction * caller)
 {
-UCS_string ucs("eval_fill_B() called");
+UCS_string ucs(UTF8_string("eval_fill_B() called"));
 Value_P Z(ucs, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
@@ -360,7 +360,7 @@ Value_P Z(ucs, LOC);
 Token
 eval_fill_AB(Value_P A, Value_P B, const NativeFunction * caller)
 {
-UCS_string ucs("eval_fill_B() called");
+UCS_string ucs(UTF8_string("eval_fill_B() called"));
 Value_P Z(ucs, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
@@ -369,7 +369,7 @@ Value_P Z(ucs, LOC);
 Token
 eval_ident_Bx(Value_P B, sAxis x, const NativeFunction * caller)
 {
-UCS_string ucs("eval_ident_Bx() called");
+UCS_string ucs(UTF8_string("eval_ident_Bx() called"));
 Value_P Z(ucs, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);

@@ -758,7 +758,7 @@ Quad_QUOTE::Quad_QUOTE()
 {
    // we assign a dummy value so that ⍞ is not undefined.
    //
-Value_P dummy(UCS_string(LOC), LOC);
+Value_P dummy(UCS_string(UTF8_string(LOC)), LOC);
    dummy->set_complete();
    Symbol::assign(dummy, false, LOC);
 }

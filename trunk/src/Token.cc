@@ -643,14 +643,15 @@ Token::tag_name() const
 {
    switch(get_tag())
       {
-#define TD(tag, _tc, _tv, _id) case tag: return UCS_string( #tag );
+#define TD(tag, _tc, _tv, _id) case tag: return UCS_string(UTF8_string(#tag));
 #include "Token.def"
-        case TOK_NONE:   return UCS_string("???Bad-Tah???");
+        case TOK_NONE:   return UCS_string(UTF8_string("???Bad-Tah???"));
       }
 
 char cc[40];
    SPRINTF(cc, "0x%X", get_tag());
-UCS_string ucs(cc);
+const UTF8_string utf(cc);
+UCS_string ucs(utf);
    return ucs;
 }
 //----------------------------------------------------------------------------

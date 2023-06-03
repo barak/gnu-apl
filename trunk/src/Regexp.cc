@@ -147,7 +147,7 @@ union _u_pcre
 const int len = pcre2_get_error_message_32(ec, buffer.pbuff, 256);
    if (len > 0)   return UCS_string(buffer.ubuff, len);
 
-UCS_string ret("Unknown libpcre error ");
+UCS_string ret(UTF8_string("Unknown libpcre error "));
    ret.append_number(ec);
    return ret;
 }

@@ -179,7 +179,7 @@ Value_P Z;
    else if (A->is_int_array())    Z = format_by_specification(A, B);
    else
       {
-        MORE_ERROR() = "Bad left argument of ⍕";
+        MORE_ERROR() << "Bad left argument of ⍕";
         DOMAIN_ERROR;
       }
 

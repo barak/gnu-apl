@@ -53,8 +53,8 @@ Doxy::Doxy(ostream & cout, const UCS_string & dest_dir)
      errors(0)
 {
    ws_name = Workspace::get_WS_name();
-   if (ws_name.compare(UCS_string("CLEAR WS")) == 0)
-      ws_name = UCS_string("CLEAR-WS");
+   if (ws_name.compare(UCS_string(UTF8_string("CLEAR WS"))) == 0)
+      ws_name = UCS_string(UTF8_string("CLEAR-WS"));
    else if (Avec::is_digit(ws_name[0]))
       {
          // workspace name starts with a library reference number. Skip the
@@ -193,7 +193,7 @@ ofstream page(index_filename.c_str());
    SI_table(page);
 
    set_call_graph_root(0);
-const UCS_string alias = "all_functions";
+const UCS_string alias = UTF8_string("all_functions");
    if (write_call_graph(0, alias, false) == 0)
       {
         page <<
@@ -541,7 +541,7 @@ Doxy::native_page(Function_P fun, const UCS_string & alias)
    Assert(fun->is_native());
 
 const NativeFunction * nat = reinterpret_cast<const NativeFunction *>(fun);
-UCS_string Z("    <TR><TD class=center>");
+UCS_string Z(UTF8_string("    <TR><TD class=center>"));
    if (nat->has_result())
       {
         Z += UNI_Z;
@@ -861,7 +861,7 @@ void
 Doxy::set_call_graph_root(Function_P fun)
 {
 const int MAX = 2 * call_graph.size();   // MAX means unreachable
-UCS_string root_name("all");
+UCS_string root_name(UTF8_string("all"));
    if (fun)   root_name = fun->get_name();
 
    if (call_graph.size() == 0)
@@ -1117,7 +1117,7 @@ char buffer[1000];
 UCS_string
 Doxy::fun_anchor(const UCS_string & name)
 {
-UCS_string anchor = "<A href=f_";
+UCS_string anchor = UTF8_string("<A href=f_");
    anchor.append(name);
    anchor.append_ASCII(".html>");
    anchor.append(name);

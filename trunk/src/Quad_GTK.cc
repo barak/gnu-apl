@@ -906,7 +906,7 @@ int envp_idx = 0;
        }
    envp[envp_idx] = 0;   // 0-terminator
 
-const int fd = Quad_FIO::do_FIO_57(path, envp);
+const int fd = Quad_FIO::do_FIO_57(UTF8_string(path), envp);
    loop(c, evar_count)   delete envp[c];
    return fd;
 }

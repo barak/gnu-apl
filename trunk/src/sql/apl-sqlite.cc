@@ -108,7 +108,7 @@ static int find_free_connection( void )
 static Token open_database( Value_P A, Value_P B )
 {
     if( !A->is_apl_char_vector() ) {
-        Workspace::more_error() = "Illegal database name";
+        MORE_ERROR() << "Illegal database name";
         VALUE_ERROR;
     }
     UTF8_string type(A->get_UCS_ravel());
@@ -118,7 +118,7 @@ static Token open_database( Value_P A, Value_P B )
        {
          stringstream out;
          out << "Unknown database type: " << type;
-         Workspace::more_error() = out.str().c_str();
+         MORE_ERROR() << out.str().c_str();
          VALUE_ERROR;
        }
 
@@ -130,7 +130,7 @@ static Token open_database( Value_P A, Value_P B )
 
 static void throw_illegal_db_id( void )
 {
-    Workspace::more_error() = "Illegal database id";
+    MORE_ERROR() << "Illegal database id";
     DOMAIN_ERROR;
 }
 
@@ -160,7 +160,7 @@ static Connection *value_to_db_id( Value_P value )
 static Token close_database( Value_P B )
 {
     if( !B->is_int_scalar( ) ) {
-        Workspace::more_error() = "Close database command requires database id as argument";
+        MORE_ERROR() << "Close database command requires database id as argument";
         DOMAIN_ERROR;
     }
 
@@ -221,7 +221,7 @@ run_generic_one_query(ArgListBuilder *arg_list, Value_P B,
 static Value_P run_generic( Connection *conn, Value_P A, Value_P B, bool query )
 {
     if( !A->is_char_string() ) {
-        Workspace::more_error() = "Illegal query argument type";
+        MORE_ERROR() << "Illegal query argument type";
         VALUE_ERROR;
     }
 
@@ -336,7 +336,7 @@ static Token show_cols( Value_P A, Value_P B )
     vector<ColumnDescriptor> cols;
 
     if( !B->is_apl_char_vector() ) {
-        Workspace::more_error() = "Illegal table name";
+        MORE_ERROR() << "Illegal table name";
         VALUE_ERROR;
     }
 
@@ -407,7 +407,7 @@ const int function_number = X->get_cfirst().get_near_int( );
          case 6:  return run_transaction_commit(B);
          case 7:  return run_transaction_rollback(B);
          case 8:  return show_tables(B);
-         default: Workspace::more_error() = "Illegal function number";
+         default: MORE_ERROR() << "Illegal function number";
                   DOMAIN_ERROR;
        }
 }
@@ -417,7 +417,7 @@ param_to_db( Value_P X)
 {
     const Shape &shape = X->get_shape();
     if( shape.get_volume() != 2 ) {
-        Workspace::more_error() = "Database id missing from axis parameter";
+        MORE_ERROR() << "Database id missing from axis parameter";
         RANK_ERROR;
     }
     return db_id_to_connection( X->get_cravel( 1 ).get_near_int( ) );
@@ -444,7 +444,7 @@ Token eval_AXB(const Value_P A, const Value_P X, const Value_P B)
         return show_cols( A, B );
 
     default:
-        Workspace::more_error() = "Illegal function number";
+        MORE_ERROR() << "Illegal function number";
         DOMAIN_ERROR;
     }
 }
@@ -464,7 +464,7 @@ get_function_mux( const char *function_name )
 Value_P
 make_string_cell(const std::string &str, const char * loc)
 {
-const UCS_string ucs(str.c_str());
+const UCS_string ucs(UTF8_string(str.c_str()));
 Value_P Z(ucs, loc);
    return Z;
 }
