@@ -43,9 +43,9 @@ struct InputFile
 
    /// Normal constructor
    InputFile(const UTF8_string & _filename, FILE * _file,
-                     bool _test, bool _echo, bool _is_script, LX_mode LX)
+             bool _test, bool _echo, bool _is_script, LX_mode LX)
    : file     (_file),
-     filename (&_filename[0], _filename.size()),
+     filename (_filename),
      test     (_test),
      pushed_IE(false),
      pushed_pending(false),

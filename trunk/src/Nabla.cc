@@ -182,10 +182,9 @@ UCS_string fun_text;
       }
 
 int error_line = 0;
-UCS_string creator(UTF8_string(InputFile::current_filename()));
-   creator.append(UNI_COLON);
-   creator.append_number(defn_line_no);
-UTF8_string creator_utf8(creator);
+char creator[APL_PATH_MAX+20];
+   SPRINTF(creator, "%s:%d", InputFile::current_filename(), defn_line_no)
+const UTF8_string creator_utf8(creator);
 
 UserFunction * ufun = UserFunction::fix(fun_text, error_line, false,
                                         LOC, creator_utf8, true);
