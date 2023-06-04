@@ -1633,7 +1633,8 @@ const char * tz_sign = (offset < 0) ? "" : "+";
         const UTF8 * end = wsid;
         while (*end != '"')   ++end;
 
-        Workspace::set_WS_name(UCS_string(UTF8_string(wsid, end - wsid)));
+        const UTF8_string wsname_utf(wsid, end - wsid);
+        Workspace::set_WS_name(UCS_string(wsname_utf));
       }
 
    if (have_allowed_objects && allowed_objects.size())

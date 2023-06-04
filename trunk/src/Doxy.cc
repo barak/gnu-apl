@@ -53,8 +53,8 @@ Doxy::Doxy(ostream & cout, const UCS_string & dest_dir)
      errors(0)
 {
    ws_name = Workspace::get_WS_name();
-   if (ws_name.compare(UCS_string(UTF8_string("CLEAR WS"))) == 0)
-      ws_name = UCS_string(UTF8_string("CLEAR-WS"));
+   if (ws_name.compare(UCS_ASCII_string("CLEAR WS")) == COMP_EQ)
+      ws_name = UCS_ASCII_string("CLEAR-WS");
    else if (Avec::is_digit(ws_name[0]))
       {
          // workspace name starts with a library reference number. Skip the

@@ -591,7 +591,7 @@ const bool log_startup = UserPreferences::uprefs.parse_argv_1() || log_startup0;
 
          // no CONTINUE workspace but maybe SETUP
          //
-         cont = UCS_string(UTF8_string("SETUP"));
+         cont = UCS_ASCII_string("SETUP");
          filename =
             LibPaths::get_lib_filename(LIB0, cont, true, ".xml", ".apl");
 

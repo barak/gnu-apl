@@ -1251,7 +1251,7 @@ const bool funs = requested_NCs & 1 << 6;
         names.push_back(symbol->get_name()); }
 
 #define sf_def(_x, str, _txt)                               \
-   { if (funs)   names.push_back(UCS_string(UTF8_string("⎕" str))); }
+   { if (funs)   names.push_back(UCS_ASCII_string("⎕" str)); }
 #include "SystemVariable.def"
       }
 

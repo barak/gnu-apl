@@ -626,7 +626,7 @@ const APL_Integer tz = the_workspace.v_Quad_TZ.get_offset();
 
    Quad_SQL::close_all_connections();
 
-   set_WS_name(UCS_string(UTF8_string("CLEAR WS")));
+   set_WS_name(UCS_ASCII_string("CLEAR WS"));
    if (!silent)   out << "CLEAR WS" << endl;
 }
 //----------------------------------------------------------------------------
@@ -850,8 +850,10 @@ Workspace::dump_WS(ostream & out, LibRef libref, const UCS_string & WS_name,
 const char * extension = html ? ".html" : ".apl";
 UTF8_string filename = LibPaths::get_lib_filename(libref, WS_name, false,
                                                   extension, 0);
-   if (WS_name.compare(UCS_string(UTF8_string("CLEAR WS"))) == 0)   // don't save CLEAR WS
+   if (WS_name.compare(UCS_ASCII_string("CLEAR WS")) == COMP_EQ)
       {
+        // don't save CLEAR WS
+        //
         COUT << "NOT DUMPED: THIS WS IS " << WS_name << endl;
         MORE_ERROR() <<
         "the workspace was not dumped because 'CLEAR WS' is a special\n"

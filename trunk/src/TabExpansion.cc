@@ -486,14 +486,14 @@ UCS_string prefix = user_input.drop(prefix_len);
         (prefix.size() == 3 && prefix.starts_iwith("HAV")) ||
         (prefix.size() == 4 && prefix.starts_iwith("HAVE")))
       {
-        user_input = stem + UCS_string(UTF8_string("HAVE-"));
+        user_input = stem + UCS_ASCII_string("HAVE-");
         return ER_REPLACE;
       }
 
    if ( (prefix.size() == 1 && prefix.starts_iwith("N" )) ||
         (prefix.size() == 2 && prefix.starts_iwith("NO")))
       {
-        user_input = stem + UCS_string(UTF8_string("NO-"));
+        user_input = stem + UCS_ASCII_string("NO-");
         return ER_REPLACE;
       }
 
@@ -616,19 +616,21 @@ TabExpansion::expand_filename(UCS_string & user_input,
         {
           const char * pwd = getenv("PWD");
           if (pwd == 0)   goto nothing;
-          dir_ucs = UCS_string(UTF8_string(pwd));
+          const UTF8_string dir_utf(pwd);
+          dir_ucs = UCS_string(dir_utf);
           dir_ucs.append(arg.drop(1));
         }
      else if (tilde_at_0 && slash_at_1)                 // user's home ~/
         {
           const char * home = getenv("HOME");
           if (home == 0)   goto nothing;
-          dir_ucs = UCS_string(UTF8_string(home));
+          const UTF8_string home_utf(home);
+          dir_ucs = UCS_string(home_utf);
           dir_ucs.append(arg.drop(1));
         }
      else if (tilde_at_0)                               // somebody's home
         {
-          dir_ucs = UCS_string(UTF8_string("/home/"));
+          dir_ucs = UCS_ASCII_string("/home/");
           dir_ucs.append(arg.drop(1));
         }
      else goto nothing;

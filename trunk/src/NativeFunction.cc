@@ -53,7 +53,7 @@ UCS_string t4;
          return;
       }
 
-   t4 = UCS_string(UTF8_string("shared library "));
+   t4 = UCS_ASCII_string("shared library ");
    t4 << so_name << " ";
 
    // get the function multiplexer
@@ -454,7 +454,7 @@ UCS_string t4;
 void * handle = open_so_file(t4, so_path);
    if (handle == 0)   return t4;
 
-   t4 = UCS_string(UTF8_string("found emacs library "));
+   t4 = UCS_ASCII_string("found emacs library ");
    t4.append(so_path);
 
 void * emacs_start = dlsym(handle, "emacs_start");

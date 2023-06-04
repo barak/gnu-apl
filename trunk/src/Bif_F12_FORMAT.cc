@@ -731,7 +731,8 @@ char * fract_end = 0;
         //
         for (; elen < exponent.min_len; ++elen)   data_expo.append(UNI_0);
 
-        data_expo.append(UCS_string(UTF8_string(ep)));
+        const UTF8_string ep_utf(ep);
+        data_expo.append((UCS_string(ep_utf)));
       }
    else   // no exponent in format string.
       {

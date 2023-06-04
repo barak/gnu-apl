@@ -29,10 +29,9 @@
 Macro * Macro::all_macros[MAC_COUNT];
 
 //----------------------------------------------------------------------------
-Macro::Macro(Macro_num num, const char * text)
-   : UserFunction(UCS_string(UTF8_string(text)), LOC, "Macro::Macro()",
-                  false, true),
-     macro_number(num)
+Macro::Macro(Macro_num num, const UTF8_string & text)
+   : UserFunction(UCS_string(text), LOC, "Macro::Macro()",
+                  false, true), macro_number(num)
 {
 // CERR << "MACRO: " << endl << text;
 

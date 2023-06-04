@@ -1058,7 +1058,7 @@ UCS_string wsid_name = Workspace::get_WS_name();
         wsid_name.remove_leading_whitespaces();
       }
 
-   if (wsid_name.compare(UCS_string(UTF8_string("CLEAR WS"))) == 0)
+   if (wsid_name.compare(UCS_ASCII_string("CLEAR WS")) == COMP_EQ)
       { 
         // don't dump CLEAR WS
         //
@@ -2218,7 +2218,7 @@ UCS_string wsid_name = Workspace::get_WS_name();
         wsid_name.remove_leading_whitespaces();
       }
 
-   if (wsid_name.compare(UCS_string(UTF8_string("CLEAR WS"))) == 0)
+   if (wsid_name.compare(UCS_ASCII_string("CLEAR WS")) == COMP_EQ)
       {
         // don't save CLEAR WS
         COUT << "NOT SAVED: THIS WS IS CLEAR WS" << endl;

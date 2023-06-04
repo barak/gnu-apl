@@ -41,7 +41,7 @@ public:
       };
 
    /// constructor
-   Macro(Macro_num num, const char * text);
+   Macro(Macro_num num, const UTF8_string & text);
 
    /// overloaded Function::is_macro()
    virtual bool is_macro() const   { return true; }

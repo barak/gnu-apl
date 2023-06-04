@@ -198,9 +198,9 @@ FIXME;
       }
 
 const UCS_string lit_ucs(*Z);
-   if (lit_ucs.compare(UCS_string(UTF8_string("null")))  == COMP_EQ ||
-       lit_ucs.compare(UCS_string(UTF8_string("true")))  == COMP_EQ ||
-       lit_ucs.compare(UCS_string(UTF8_string("false"))) == COMP_EQ)
+   if (lit_ucs.compare(UCS_ASCII_string("null"))  == COMP_EQ ||
+       lit_ucs.compare(UCS_ASCII_string("true"))  == COMP_EQ ||
+       lit_ucs.compare(UCS_ASCII_string("false")) == COMP_EQ)
       {
         result.append(lit_ucs);
         return;

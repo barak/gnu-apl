@@ -987,7 +987,7 @@ Prefix::locate_L(UCS_string & function)
       }
    else if (size() == 2 && at1().get_Class() == TC_INDEX)   // B[X]
       {
-        function = UCS_string(UTF8_string("[]"));
+        function = UCS_ASCII_string("[]");
         return at0().get_apl_valp();
       }
 
@@ -1037,7 +1037,7 @@ Prefix::locate_R(UCS_string & function)
 
    if (size() == 2 && at1().get_Class() == TC_INDEX)   // B[X]
       {
-        function = UCS_string(UTF8_string("[]"));   // valid function
+        function = UCS_ASCII_string("[]");   // valid function
         return 0;                      // but no ⎕R.
       }
 

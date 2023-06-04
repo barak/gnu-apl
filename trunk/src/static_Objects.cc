@@ -91,6 +91,6 @@ INFO(CPU_pool::the_CPUs, __LINE__);
 std::vector<CPU_Number> CPU_pool::the_CPUs;
 
 INFO(Macro::all_macros, __LINE__)
-#define mac_def(name, txt) Macro Macro::name(MAC_ ## name, txt);
+#define mac_def(name, txt) Macro Macro::name(MAC_ ## name, UTF8_string(txt));
 #include "Macro.def"
 

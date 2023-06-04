@@ -1674,6 +1674,6 @@ char cc[40];
    if      (text.size() > 100)   SPRINTF(cc, "[%3d] ", l)
    else if (text.size() > 10)    SPRINTF(cc, "[%2d] ", l)
    else                          SPRINTF(cc, "[%d] ",  l)
-   return UCS_string(UTF8_string(cc));
+   return UCS_ASCII_string(cc);
 }
 //----------------------------------------------------------------------------

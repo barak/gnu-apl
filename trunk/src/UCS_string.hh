@@ -463,6 +463,16 @@ private:
    UCS_string(const char * cstring);
 };
 //----------------------------------------------------------------------------
+/// an UCS_string that contains only ASCII characters,
+class UCS_ASCII_string : public UCS_string
+{
+public:
+   /// constructor. The caller MUST have checked that all characters in
+   /// cstring are ASCII. Only use it with C literals, not with const char *s.
+   UCS_ASCII_string(const char * ascii)
+      { append_ASCII(ascii); }
+};
+//----------------------------------------------------------------------------
 inline void
 Hswap(const UCS_string * & u1, const UCS_string * & u2)
 {

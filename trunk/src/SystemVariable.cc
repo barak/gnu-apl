@@ -758,7 +758,7 @@ Quad_QUOTE::Quad_QUOTE()
 {
    // we assign a dummy value so that ⍞ is not undefined.
    //
-Value_P dummy(UCS_string(UTF8_string(LOC)), LOC);
+Value_P dummy(UCS_ASCII_string(LOC), LOC);
    dummy->set_complete();
    Symbol::assign(dummy, false, LOC);
 }
@@ -1025,9 +1025,9 @@ Value_P Z(sh, LOC);
 
 #define syl2(n, e, v) syl1(n, e, v)
 #define syl3(n, e, v) syl1(n, e, v)
-#define syl1(n, _e, v)                                                   \
-  Z->next_ravel_Pointer(Value_P(UCS_string(UTF8_string(n)), LOC).get()); \
-  Z->next_ravel_Int(v);
+#define syl1(n, _e, v) { const UTF8_string utf(n);              \
+  Z->next_ravel_Pointer(Value_P(UCS_string(utf), LOC).get());   \
+  Z->next_ravel_Int(v); }
 #include "SystemLimits.def"
 
    Z->check_value(LOC);
