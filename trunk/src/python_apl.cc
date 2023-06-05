@@ -31,14 +31,17 @@ do_init()
 const bool log_startup = false;
 
 //      uprefs.safe_mode = true;
-   uprefs.user_do_svars = false;
-   uprefs.system_do_svars = false;
-   uprefs.requested_id = 3000;
+   UserPreferences::uprefs.user_do_svars = false;
+   UserPreferences::uprefs.system_do_svars = false;
+   UserPreferences::uprefs.requested_id = 3000;
 
    init_1("apl", log_startup);
 
-   uprefs.read_config_file(true,  log_startup);   // in /etc/gnu-apl.d/
-   uprefs.read_config_file(false, log_startup);   // in $HOME/.config/gnu_apl/
+   // /etc/gnu-apl.d/preferences or /usr/local/etc/gnu-apl.d/preferences
+   UserPreferences::uprefs.read_config_file(true, log_startup);
+
+   // in $HOME/.config/gnu_apl/preferences
+   UserPreferences::uprefs.read_config_file(false, log_startup);
 
    init_2(log_startup);
 }
@@ -127,7 +130,7 @@ bool do_display = false;
         exec_result = PyTuple_Pack(2, PyLong_FromLong(2),
                                    apl_to_python(result.get_apl_val().get()));
       }
-   else if (result.get_Class() == TC_APL_VALUE1)   // non-committed value
+   else if (result.get_Class() == TC_VALUE)   // non-committed value
       {
         do_display = display_mode > 0;
         exec_result = PyTuple_Pack(2, PyLong_FromLong(1),
