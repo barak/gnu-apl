@@ -30,7 +30,7 @@ do_init()
 {
 const bool log_startup = false;
 
-//      uprefs.safe_mode = true;
+//      UserPreferences::uprefs.safe_mode = true;
    UserPreferences::uprefs.user_do_svars = false;
    UserPreferences::uprefs.system_do_svars = false;
    UserPreferences::uprefs.requested_id = 3000;

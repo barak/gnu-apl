@@ -739,15 +739,18 @@ extern void init_2(bool log_startup);
 void
 init_libapl(const char * progname, int log_startup)
 {
-   uprefs.safe_mode       = true;
-   uprefs.user_do_svars   = false;
-   uprefs.system_do_svars = false;
-   uprefs.requested_id    = 2000;
+   UserPreferences::uprefs.safe_mode       = true;
+   UserPreferences::uprefs.user_do_svars   = false;
+   UserPreferences::uprefs.system_do_svars = false;
+   UserPreferences::uprefs.requested_id    = 2000;
 
    init_1(progname, log_startup);
 
-   uprefs.read_config_file(true,  log_startup);   // in /etc/gnu-apl.d/
-   uprefs.read_config_file(false, log_startup);   // in $HOME/.config/gnu_apl/
+   // in /etc/gnu-apl.d/ or in /usr/local/etc/gnu-apl.d/
+   UserPreferences::uprefs.read_config_file(true,  log_startup);
+
+   // in $HOME/.config/gnu_apl/
+   UserPreferences::uprefs.read_config_file(false, log_startup);
 
    init_2(log_startup);
 }
@@ -982,7 +985,7 @@ eval__L_oper_R_X_B(APL_function fL, APL_function fun, APL_function fR,
 void
 disable_safe_mode()
 {
-   uprefs.safe_mode = false;
+   UserPreferences::uprefs.safe_mode = false;
 }
 //----------------------------------------------------------------------------
 const int libapl_version = 0;   // not standard interpreter

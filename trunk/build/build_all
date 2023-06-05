@@ -27,8 +27,10 @@
          ;;
 
       *)
-   esac
          configs="$*"
+   esac
+
+echo "configs requested: $configs"
 
 # this script builds different GNU APL variants and tests some of them
 
@@ -157,7 +159,7 @@ echo "<!DOCTYPE html>
 
 echo "<H3>Nightly Build Artifacts (if any)</H3>
 <TABLE>"
-artifact "GNU APL interpreter" "build/apl--standard" "apl"
+artifact "GNU APL interpreter" "apl" "apl"
 artifact "libapl.so (shared library)" "build/xxx" "libapl.so"
 artifact "libapl.a  (static library)" "build/xxx" "libapl.a"
 echo "</TABLE>"

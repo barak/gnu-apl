@@ -210,8 +210,8 @@ CoreCount count = CoreCount(cfg_CORE_COUNT_WANTED);
 
 #elif cfg_CORE_COUNT_WANTED == -2   // --cc N
 
-   Parallel::run_parallel = uprefs.requested_cc > 0;
-   loop(c, uprefs.requested_cc)   add_CPU(CPU_Number(c));
+   Parallel::run_parallel = UserPreferences::uprefs.requested_cc > 0;
+   loop(c, UserPreferences::uprefs.requested_cc)   add_CPU(CPU_Number(c));
    return;
 
 #elif cfg_CORE_COUNT_WANTED == -3   // handled below

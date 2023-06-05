@@ -45,13 +45,13 @@ ProcessorID::init(bool log_startup)
 {
    if (log_startup)
       {
-        CERR << "uprefs.user_do_svars:   "
+        CERR << "UserPreferences::uprefs.user_do_svars:   "
              << UserPreferences::uprefs.user_do_svars << endl
-             << "uprefs.system_do_svars: "
+             << "UserPreferences::uprefs.system_do_svars: "
              << UserPreferences::uprefs.system_do_svars << endl
-             << "uprefs.requested_id:    "
+             << "UserPreferences::uprefs.requested_id:    "
              << UserPreferences::uprefs.requested_id    << endl
-             << "uprefs.requested_par:   "
+             << "UserPreferences::uprefs.requested_par:   "
              << UserPreferences::uprefs.requested_par   << endl;
       }
 
