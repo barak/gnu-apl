@@ -980,10 +980,27 @@ PrintBuffer pb;
               precision = A->get_cravel(2*col + 1).get_near_int();
             }
 
+         // pb_col is the PrintBuffer for one numeric column.
+         //
          PrintBuffer pb_col(format_one_col_by_spec(col_width, precision,
-                                         &B->get_cravel(col), cols_B, rows_B));
+                                                   &B->get_cravel(col),
+                                                   cols_B, rows_B));
 
-         if (col_width == 0)   pb_col.pad_l(UNI_SPACE, 1);
+         bool insert_space_left = col_width == 0;   // automatic col width
+
+         if (col)   // subsequent column: insert space if needed
+            {
+              loop(y, pb_col.get_row_count())
+                  {
+                    if (pb_col.get_char(0, y) != UNI_SPACE)
+                       {
+                         insert_space_left = true;
+                         break;
+                       }
+                  }
+            }
+
+         if (insert_space_left)   pb_col.pad_l(UNI_SPACE, 1);
 
          if (col)   pb.append_col(pb_col);
          else       pb = pb_col;
