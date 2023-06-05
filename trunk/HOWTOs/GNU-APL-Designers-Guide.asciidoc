@@ -812,6 +812,15 @@ by *make develop*. In contrast *static logging* is the default and the
 logging facilities that shall be enabled can be set in file *src/Logging.def*
 (first argument of macro *log_def()*) before compiling the interpreter.
 
+The logging Facility 37, _interpreter start-up messages_ is somewhat special.
+Logging messages produced in the start up of the interpreter occur before
+the user has a chance to enter a *]LOG 37* command that enables them. For that
+reason, the logging of start up messages can be enables from the command
+line (option *-l 37*). None of the other logging facility can be enabled
+from the command line. In the supposedly rare cases where other facilities
+are needed before the interpreter has fully initialized itself, static
+logging can be used instead.
+
 
 === The )CHECK Command
 

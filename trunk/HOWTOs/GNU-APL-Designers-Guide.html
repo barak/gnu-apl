@@ -1933,6 +1933,14 @@ logging</strong> is the method of choice for trouble shooting and is therefore c
 by <strong>make develop</strong>. In contrast <strong>static logging</strong> is the default and the
 logging facilities that shall be enabled can be set in file <strong>src/Logging.def</strong>
 (first argument of macro <strong>log_def()</strong>) before compiling the interpreter.</p></div>
+<div class="paragraph"><p>The logging Facility 37, <em>interpreter start-up messages</em> is somewhat special.
+Logging messages produced in the start up of the interpreter occur before
+the user has a chance to enter a <strong>]LOG 37</strong> command that enables them. For that
+reason, the logging of start up messages can be enables from the command
+line (option <strong>-l 37</strong>). None of the other logging facility can be enabled
+from the command line. In the supposedly rare cases where other facilities
+are needed before the interpreter has fully initialized itself, static
+logging can be used instead.</p></div>
 </div>
 <div class="sect2">
 <h3 id="_the_check_command">The )CHECK Command</h3>
@@ -6046,7 +6054,7 @@ Permutationsnetzwerkes als Teil des Multiprozerssorsystems DATIS-P-256.</em>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2023-05-22 20:53:03 CEST
+ 2023-06-05 12:08:54 CEST
 </div>
 </div>
 </body>
