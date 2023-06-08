@@ -113,14 +113,10 @@ public:
    void print(ostream & out, const char * loc) const;
 
    /// set the first error line
-   void set_error_line_1(const char * msg_1)
-      { strncpy(error_message_1, msg_1, sizeof(error_message_1) - 1);
-        error_message_1[sizeof(error_message_1) - 1] = 0; }
+   void set_error_line_1(const char * msg_1);
 
-   /// set the second error line
-   void set_error_line_2(const char * msg_2)
-      { strncpy(error_message_2, msg_2, sizeof(error_message_2) - 1);
-        error_message_2[sizeof(error_message_2) - 1] = 0; }
+   /// set the second error line to \b msg_2
+   void set_error_line_2(const char * msg_2);
 
    /// set error line 2, left caret, and right caret
    void set_error_line_2(const UCS_string & ucs, int lcaret, int rcaret);
@@ -182,10 +178,10 @@ protected:
 
    /// an optional error text. this text is provided for non-APL errors,
    // for example in ⎕ES
-   char error_message_1[60];
+   char error_message_1[200];
 
    /// second line of error message (only valid if error_code != _NO_ERROR)
-   char error_message_2[60];
+   char error_message_2[200];
 
    /// display user function and line rather than ⎕ES instruction
    bool show_locked;

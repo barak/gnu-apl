@@ -731,7 +731,7 @@ UCS_string message_2(error.get_error_line_2());
        }
 
    {
-     UTF8_string utf(message_2);
+     const UTF8_string utf(message_2);
      error.set_error_line_2(utf.c_str());
    }
 

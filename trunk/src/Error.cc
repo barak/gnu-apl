@@ -140,6 +140,30 @@ Error::is_known() const
 }
 //----------------------------------------------------------------------------
 void
+Error::set_error_line_1(const char * msg_1)
+{
+   enum { MAX_len = sizeof(error_message_1) - 1 };
+
+size_t len = strlen(msg_1);
+   if (len > MAX_len)   len = MAX_len;
+
+   strncpy(error_message_1, msg_1, len);
+   error_message_1[len] = 0;
+}
+//----------------------------------------------------------------------------
+void
+Error::set_error_line_2(const char * msg_2)
+{
+   enum { MAX_len = sizeof(error_message_2) - 1 };
+
+size_t len = strlen(msg_2);
+   if (len > MAX_len)   len = MAX_len;
+
+   strncpy(error_message_2, msg_2, len);
+   error_message_2[len] = 0;
+}
+//----------------------------------------------------------------------------
+void
 Error::set_error_line_2(const UCS_string & ucs, int lcaret, int rcaret)
 {
 UTF8_string utf(ucs);
