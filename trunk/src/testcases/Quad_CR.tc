@@ -385,6 +385,8 @@ foo
  2 
   3
 
+      )erase foo
+
      ⍴38 ⎕CR 50
 64 2
 
@@ -393,18 +395,131 @@ foo
       Q ≡ 40 ⎕CR QP
 1
 
-      )erase foo
 
-      ⍝ trigger a domain error if new left arguments are implemented
-      ⍝ without adding a testcase above
+      ⊢STAT←"Z←2 2⍴5 6.6 7J8"      ⍝ a statement
+Z←2 2⍴5 6.6 7J8
+
+      ⊢⊃TOKs← 42 ⎕CR STAT          ⍝ the tokenized for statement
+       1294     Z 
+ 1091043329   0   
+ 1224933903   2   
+ 1224933903   2   
+ 1376651527   0   
+ 1224933903   5   
+ 1376191247 6.6   
+ 1124533263   7J8 
+
+      ⊢TAGs←⍪↑¨TOKs                ⍝ the token tags (decimal)
+      1294
+1091043329
+1224933903
+1224933903
+1376651527
+1224933903
+1376191247
+1124533263
+
+      ⊢VALs←⍪0 1↓(⊃TOKs)           ⍝ the token values (if any)
+     Z 
+   0   
+   2   
+   2   
+   0   
+   5   
+ 6.6   
+   7J8 
+
+      ⊢B8←⍉5 ⎕CR¨ (4⍴256)⊤,TAGs    ⍝ the token tags (4 hex bytes)
+ 00 00 05 0E 
+ 41 08 00 01 
+ 49 03 02 0F 
+ 49 03 02 0F 
+ 52 0E 09 07 
+ 49 03 02 0F 
+ 52 07 03 0F 
+ 43 07 04 0F 
+
+      ⊢B32←⊃,/B8                   ⍝ the token tags (8 hex sigits)
+0000050E
+41080001
+4903020F
+4903020F
+520E0907
+4903020F
+5207030F
+4307040F
+
+⍝     ┌─┬─┬─┬──────────────────── 16 bit ID (0 for user defined names)
+⍝     │ │ │ │   ┌─┬──────────────  8 bit value type
+⍝     │ │ │ │   │ │   ┌─┬────────  8 bit token type
+⍝     │ │ │ │   │ │   │ │
+      1 1 1 1 0 1 1 0 1 1 \ B32
+0000 05 0E
+4108 00 01
+4903 02 0F
+4903 02 0F
+520E 09 07
+4903 02 0F
+5207 03 0F
+4307 04 0F
+
+
+      ⊢STAT←"Z←2 2⍴5 6.6 7J8"      ⍝ a statement
+Z←2 2⍴5 6.6 7J8
+
+      ⊢⊃TOKs← 43 ⎕CR STAT          ⍝ the parsed statement
+      66830         Z 
+ 1091043329         0 
+
+ 1091503887   5   6.6 
+              7J8 5   
+
+      ⊢TAGs←⍪↑¨TOKs                ⍝ the token tags (decimal)
+     66830
+1091043329
+1091503887
+
+      ⊢VALs←⍪0 1↓(⊃TOKs)           ⍝ the token values (if any)
+       Z 
+       0 
+
+ 5   6.6 
+ 7J8 5   
+
+      ⊢B8←⍉5 ⎕CR¨ (4⍴256)⊤,TAGs    ⍝ the token tags (4 hex bytes)
+ 00 01 05 0E 
+ 41 08 00 01 
+ 41 0F 07 0F 
+
+      ⊢B32←⊃,/B8                   ⍝ the token tags (8 hex digits)
+0001050E
+41080001
+410F070F
+
+⍝     ┌─┬─┬─┬──────────────────── 16 bit ID (0 for user defined names)
+⍝     │ │ │ │   ┌─┬──────────────  8 bit value type
+⍝     │ │ │ │   │ │   ┌─┬────────  8 bit token type
+⍝     │ │ │ │   │ │   │ │
+      1 1 1 1 0 1 1 0 1 1 \ B32
+0001 05 0E
+4108 00 01
+410F 07 0F
+
+
+      )ERASE B32 B8 STAT TAGs TOKs VALs
+
+
+
+      ⍝ trigger a domain error if new left arguments were implemented
+      ⍝ without adding a testcase for them above
       ⍝
-      42 ⎕CR A
+      44 ⎕CR A
 DOMAIN ERROR+
-      42 ⎕CR A
+      44 ⎕CR A
       ^      ^
 
       )MORE
-A ⎕CR B with invalid A (=42)
+A ⎕CR B with invalid A (=44)
       →
 
       ⍝ control characters
@@ -418,6 +533,8 @@ A ⎕CR B with invalid A (=42)
 31
 
       )SIC
+      )ERASE Q Q1 Q2 Q3 A4
+
 
       )CHECK
 OK      - no stale functions

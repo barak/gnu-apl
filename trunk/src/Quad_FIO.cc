@@ -1553,7 +1553,7 @@ const ShapeItem function_number = X->get_cfirst().get_int_value();
    MORE_ERROR() <<
 "Bad function number (axis X) " << function_number << " in LO ⎕FIO[X] B.\n"
 "Chances are that you meant to use ⎕FIO[X] B and not LO ⎕FIO[X] B. In that\n"
-"case use (⎕FIO[X]) or H←⎕FIO[X]\n";
+"case use (⎕FIO[X]) or H←⎕FIO[X]";
    DOMAIN_ERROR;
 }
 //----------------------------------------------------------------------------
@@ -2392,7 +2392,7 @@ int function_number = -1;
                    " in Quad_FIO::eval_XB()";
 
    CERR << "Bad eval_XB() function number: " << function_number << endl;
-   DOMAIN_ERROR;
+   VALENCE_ERROR;
 
 out_errno:
    return Token(TOK_APL_VALUE1, IntScalar(-errno, LOC));
@@ -3058,10 +3058,10 @@ int function_number = -1;
       }
 
    MORE_ERROR() << "bad function number " << function_number <<
-                   " in Quad_FIO::eval_AXB()";
+                   " in Quad_FIO::eval_AXB(). The monadic ⎕FIO[X] B is valid.";
 
    CERR << "eval_AXB() function number: " << function_number << endl;
-   DOMAIN_ERROR;
+   VALENCE_ERROR;
 
 out_errno:
    MORE_ERROR() << "A ⎕FIO[" << function_number

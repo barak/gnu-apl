@@ -560,8 +560,23 @@ Executable::remove_TOK_VOID()
 void
 Executable::set_error_info(Error & error, Function_PC2 body_from_to) const
 {
-   // called rarely, so we have time.
-   //
+   /* called rarely, so we have time.
+   
+      error: the error whose info shall be set
+      body_from_to: the body region containing the the error.
+     
+      NOTE:
+     
+      body_from_to     are the absolute positions (PCs) in the body (!),
+                       i.e. the offsets from the first token of the body, while
+     
+      after_from_to    are the offsets of the first and last token in
+                       the failed statement (!) after any optimization, and
+     
+      before_from_to   are the offsets of the first and last token in
+                         the failed statement (before amy optimization).
+    */
+
 
    // for value errors we point to the failed symbol itself.
    //
@@ -604,76 +619,74 @@ const Token_string stat_after(body, start, end - start);
 const Function_PC2 after_from_to(body_from_to.low  - start,
                                  body_from_to.high - start );
 
-   // expand any optimizations that were performed with the failed line
+   // undo any optimizations that were performed with the failed line
    //
-   if (1)
-   {
-     Token_string stat_before;
-     reparse(stat_before, body_from_to);
+Token_string stat_before;
+   reparse(stat_before, body_from_to);
+Function_PC2 before_from_to = after_from_to;
 
-     bool optimized = false;
-     Function_PC2 before_from_to = after_from_to;
-     /*
-          compute vector 'before_ranges', whose items correspond to
-          stat_before, so that if stat_after[j] is the optimization of
-          (before_ranges = J)/stat_before.
+   // transform the range 'after_from'_to in the (possibly optimized) body back
+   // to the range 'before_from'_in the body before optimization.
+   //
+bool optimized = false;
 
-          That is, for example:
+   /*
+    compute the vector 'before_ranges', whose items correspond to
+    stat_before, so that if stat_after[j] is the optimization of
+    (before_ranges = J)/stat_before.
 
-           stat_after is:  [ a0  a1     a2     a3 ... ] and
-                             │   │      │      │
-                             │   │   ┌──┼──┐   │
-                             │   │   │  │  │   │
-           stat_before is: [ b0  b1  b2 b2 b2  b3 ... ]  and then
-                             ^       ^
+      That is, for example:
 
-           before_ranges should be:  0 1 2 2 2 3
-           
-      */
-       vector<int>ranges_before;   ranges_before.reserve(stat_before.size());
+       stat_after is:  [ a0  a1     a2     a3 ... ] and
+                         │   │      │      │
+                         │   │   ┌──┼──┐   │
+                         │   │   │  │  │   │
+       stat_before is: [ b0  b1  b2 b2 b2  b3 ... ]  and then:
+                         ^       ^
 
-       Function_PC PC_before = Function_PC_0;
-       Function_PC PC_after  = Function_PC_0;
-       while (int(ranges_before.size()) < stat_before.size()) 
-          {
-            if (stat_after[PC_after].get_tag() == TOK_APL_VALUE4)
-               {
-                 // optimized value
-                 //
-                 ranges_before.push_back(PC_after);
-                 ranges_before.push_back(PC_after);
-                 ranges_before.push_back(PC_after);
-                 optimized = true;
-               }
-            else
-               {
-                 ranges_before.push_back(PC_after);
-               }
-            ++PC_before;
-            ++PC_after;
-          }
+       before_ranges should be:  0 1 2 2 2 3
+   */
+vector<int>ranges_before;   ranges_before.reserve(stat_before.size());
 
-       rev_loop(PC_before, ranges_before.size())
+   for (Function_PC PC_before = Function_PC_0, PC_after  = Function_PC_0;
+        int(ranges_before.size()) < stat_before.size();
+          ++PC_before, ++PC_after) 
+      {
+        if (stat_after[PC_after].get_tag() == TOK_APL_VALUE4)
            {
-             const Function_PC after = Function_PC(ranges_before[PC_before]);
-             if (after == after_from_to.low)
-                before_from_to.low  = Function_PC(PC_before);
-             if (after == after_from_to.high)
-                before_from_to.high = Function_PC(PC_before);
-
-             // skip subsequent items within the same range
-             while (PC_before > 0 &&
-                    ranges_before[PC_before - 1] == after)   --PC_before;
+             // optimized value. Only set in
+             // Parser::optimize_short_primitives() to replace
+             // e.g. A⍴B with small results. The monadic case is not (yet)
+             // handled properly !!!
+             //
+             ranges_before.push_back(PC_after);   // A
+             ranges_before.push_back(PC_after);   // ⍴
+             ranges_before.push_back(PC_after);   // B
+             optimized = true;
            }
+        else
+           {
+             ranges_before.push_back(PC_after);   // (A⍴B)
+           }
+      }
 
-     if (optimized)   // optimized !
-        {
-          set_error_info(error, stat_before, before_from_to);
-          return;
-        }
-   }   // optimization check
+   rev_loop(PC_before, ranges_before.size())
+      {
+        const Function_PC after = Function_PC(ranges_before[PC_before]);
+        if (after == after_from_to.low)
+           before_from_to.low  = Function_PC(PC_before);
+        if (after == after_from_to.high)
+           before_from_to.high = Function_PC(PC_before);
 
-   set_error_info(error, stat_after, after_from_to);
+        // skip subsequent items within the same range
+        while (PC_before > 0 &&
+           ranges_before[PC_before - 1] == after)   --PC_before;
+      }
+
+   if (optimized)
+      set_error_info(error, stat_before, before_from_to);
+   else
+      set_error_info(error, stat_after, after_from_to);
 }
 //--------------------------------------------------------------------------
 void

@@ -42,6 +42,7 @@
   crdef( 6, to_hex                 )
   crdef( 5, to_HEX                 )
   crdef(38, to_structure           )
+  crdef(42, tokenize               )
   crdef(33, TV_to_TLV_bytes        )
   crdef(41, unpack                 )
   crdef(19, UTF8_to_string         )

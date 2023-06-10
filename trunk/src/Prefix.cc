@@ -1703,8 +1703,12 @@ Symbol * top_sym = 0;
               }
            else   // body[PC] is not a symbol: the special ⎕CR/⎕FIO case
               {
-                if (members.size() == 1 &&
-                    body[PC].get_Class() == TC_FUN12 &&
+                // this case is normally optimized away in
+                // Parser::replace_static_patterns, but may slip through
+                // for non-static patterns.
+                //
+                if (members.size() == 1                  &&
+                    body[PC].get_Class() == TC_FUN12     &&
                     body[PC].get_function()->has_subfuns())
                    {
                      /* at this point we have ⎕CR.subfun B or ⎕FIO.subfun B.

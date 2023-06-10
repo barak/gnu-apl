@@ -211,7 +211,7 @@ Parser::parse_statement(Token_string & tos, bool optimize)
         tos.print(CERR, true);
       }
 
-   // 4. mark symbol left of ← as LSYMB
+   // 5. mark symbol left of ← as LSYMB
    //
    mark_lsymb(tos);
    Log(LOG_parse)
@@ -220,17 +220,20 @@ Parser::parse_statement(Token_string & tos, bool optimize)
         tos.print(CERR, true);
       }
 
-   // 5. replace bitwise functions ⊤∧, ⊤∨, ⊤⍲, and ⊤⍱ by their bitwise variant
+   // 6. replace bitwise functions ⊤∧, ⊤∨, ⊤⍲, and ⊤⍱ by their bitwise variant
    //
-   replace_bitwise_functions(tos);
-   remove_TOK_VOID(tos);
-   Log(LOG_parse)
+   if (optimize)
       {
-        CERR << "parse 6 [" << tos.size() << "]: ";
-        tos.print(CERR, true);
+        optimize_static_patterns(tos);
+        Log(LOG_parse)
+           {
+             CERR << "parse 6 [" << tos.size() << "]: ";
+             tos.print(CERR, true);
+           }
       }
 
-   // 6. update distances between (), [], and {}
+   // 7. update the distances between ( and ), [ and ], or { and }. After
+   //    that, tos.size() must not be changed anymore.
    //
    {
      const ErrorCode ec = match_par_bra(tos, false);
@@ -481,7 +484,7 @@ Parser::remove_nongrouping_parantheses(Token_string & tos)
    //
    for (bool progress = true; progress; progress = false)
        {
-         loop(t, int(tos.size()) - 2)
+         loop(t, tos.size() - 2)
              {
                if (tos[t].get_Class() != TC_L_PARENT)   continue;
 
@@ -534,13 +537,38 @@ Parser::remove_nongrouping_parantheses(Token_string & tos)
 }
 //----------------------------------------------------------------------------
 void
-Parser::replace_bitwise_functions(Token_string & tos)
+Parser::optimize_static_patterns(Token_string & tos)
 {
-   // replace bitwise functions (⊤∧ ⊤∨ ⊤⍲ ⊤⍱ ⊤= or ⊤≠) by their
-   // own token
-   //
-   loop(t, int(tos.size()) - 1)
+   /* Replace:
+
+       ∧∧, ∨∨, ⍲⍲, and ⍱⍱    with their bitwise token variant,
+       ⎕FIO.function_name    with ⎕FIO[X] (via subfun_to_axis(function_name))
+    */
+
+bool TOK_VOID_inserted = false;
+   loop(t, tos.size() - 1)   // -1 since we need tos[t + 1]
        {
+         if (tos[t].get_tag() == TOK_OPER2_INNER    &&   // some f.g
+             t                                      &&   // f exists
+             tos[t-1].get_Class() == TC_FUN2        &&   // f is function
+             tos[t-1].get_function()                &&   // f is valid
+             tos[t-1].get_function()->has_subfuns() &&   // f is ⎕FIO or ⎕CR
+             tos[t+1].get_tag() == TOK_SYMBOL)           // g is (sub-) name
+            {
+              const Symbol * symbol = tos[t+1].get_sym_ptr();   // subfun name
+              Function_P fun = tos[t-1].get_function();
+              const sAxis axis = fun->subfun_to_axis(symbol->get_name());
+              if (axis != -1)   // subfunction is valid
+                 {
+                   Value_P function_axis = IntScalar(axis, LOC);
+                   Token tok_axis(TOK_AXIS, function_axis);
+                   tos[t++].move(tok_axis, LOC);      // replace . with [X]
+                   tos[t++].clear(LOC);               // invalidate g
+                   TOK_VOID_inserted = true;
+                 }
+              continue;
+            }
+
          if (tos[t].get_tag() != TOK_F12_ENCODE)   continue;
 
          switch(tos[t+1].get_tag())
@@ -548,36 +576,44 @@ Parser::replace_bitwise_functions(Token_string & tos)
               case TOK_F2_AND:
                    tos[t] = Token(TOK_F2_AND_B, &Bif_F2_AND_B::_fun);
                    tos[++t].clear(LOC);
+                   TOK_VOID_inserted = true;
                    continue;
 
               case TOK_F2_OR:
                    tos[t] = Token(TOK_F2_OR_B, &Bif_F2_OR_B::_fun);
                    tos[++t].clear(LOC);
+                   TOK_VOID_inserted = true;
                    continue;
 
               case TOK_F2_NAND:
                    tos[t] = Token(TOK_F2_NAND_B,&Bif_F2_NAND_B::_fun);
                    tos[++t].clear(LOC);
+                   TOK_VOID_inserted = true;
                    continue;
 
               case TOK_F2_NOR:
                    tos[t] = Token(TOK_F2_NOR_B, &Bif_F2_NOR_B::_fun);
                    tos[++t].clear(LOC);
+                   TOK_VOID_inserted = true;
                    continue;
 
               case TOK_F2_EQUAL:
                    tos[t] = Token(TOK_F2_EQUAL_B, &Bif_F2_EQUAL_B::_fun);
                    tos[++t].clear(LOC);
+                   TOK_VOID_inserted = true;
                    continue;
 
               case TOK_F2_UNEQU:
                    tos[t] = Token(TOK_F2_UNEQ_B, &Bif_F2_UNEQ_B::_fun);
                    tos[++t].clear(LOC);
+                   TOK_VOID_inserted = true;
                    continue;
 
               default: break;
             }
        }
+
+   if (TOK_VOID_inserted)   remove_TOK_VOID(tos);
 }
 //----------------------------------------------------------------------------
 bool
@@ -634,7 +670,7 @@ Parser::get_assign_state(Token_string & tos, ShapeItem pos)
    // complicated cases (i.e. those involving ←) to the prefix parser
    // and return ASS_unknown instead of a more precise result.
    //
-   while (pos < int(tos.size()))
+   while (pos < tos.size())
        {
          if (tos[pos++].get_Class() == TC_ASSIGN)   return ASS_unknown;
        }

@@ -27,6 +27,7 @@
 #include "PointerCell.hh"
 #include "Quad_CR.hh"
 #include "Symbol.hh"
+#include "Tokenizer.hh"
 #include "Workspace.hh"
 
 //----------------------------------------------------------------------------
@@ -85,8 +86,8 @@ Quad_CR::list_functions(ostream & out, bool mapping)
 "   Zm ←  2 ⎕CR B     Zm is B boxed using ASCII characters\n"
 "   Zm ←  3 ⎕CR B     Zm is B boxed using line-drawing characters\n"
 "   Zm ←  4 ⎕CR B     3 ⎕CR B + extra frame\n"
-"   Zs ←  5 ⎕CR B     Zs is B in (uppercase) HEX\n"
-"   Zs ←  6 ⎕CR B     Zs is B in (lowercase) hex\n"
+"   Zs ←  5 ⎕CR Bb    Zs is Bb in (uppercase) HEX\n"
+"   Zs ←  6 ⎕CR Bb    Zs is Bb in (lowercase) hex\n"
 "   Zm ←  7 ⎕CR B     like 3 ⎕CR B with thin lines\n"
 "   Zm ←  8 ⎕CR B     like 4 ⎕CR B with thin lines\n"
 "   Zm ←  9 ⎕CR B     like 4 ⎕CR B with double-line outer frame\n"
@@ -358,6 +359,8 @@ bool extra_frame = false;
         case 39: return do_CR39(B);            // structure → plain
         case 40: return do_CR40(B);            // boolean → packed
         case 41: return do_CR41(B);            // packed → boolean
+        case 42: return do_CR42_43(B, false);  // tokenize B
+        case 43: return do_CR42_43(B, true);   // parse B
 
         default: MORE_ERROR() << "A ⎕CR B with invalid A (=" << a << ")";
                  DOMAIN_ERROR;
@@ -1805,6 +1808,124 @@ const uint8_t * bits = reinterpret_cast<const uint8_t *>(&B->get_cfirst());
    loop(b, B_len)   Z->next_ravel_Int((bits[b >> 3] & 1ULL << (b & 7)) ? 1 : 0);
 
    return Idx0(LOC);
+}
+//----------------------------------------------------------------------------
+Value_P
+Quad_CR::do_CR42_43(const Value * B, bool parse)
+{
+const UCS_string ucs(*B);
+Token_string tos;
+
+   if (parse)   // parse ucs
+      {
+        Parser parser(PM_EXECUTE, LOC, false);
+        if (const ErrorCode ec = parser.parse(ucs, tos, /* optimize */ true))
+           {
+             MORE_ERROR() << "the parser returned error code: " << ec;
+             DOMAIN_ERROR;
+           }
+      }
+   else          // tokenize ucs
+      {
+        Tokenizer tokenizer(PM_FUNCTION, LOC, /* macro */ false);
+
+        if (const ErrorCode ec = tokenizer.tokenize(ucs, tos))
+           {
+             MORE_ERROR() << "the tokenizer returned error code: " << ec;
+             DOMAIN_ERROR;
+           }
+      }
+
+Value_P Z(tos.size(), LOC);
+   loop(t, tos.size())
+       {
+         const Token & tok = tos[t];
+         const TokenTag tag = tok.get_tag();
+         switch(tok.get_ValueType())
+            {
+              case TV_CHAR:
+                   {
+                     Value_P ZZ(2, LOC);
+                     ZZ->next_ravel_Int(tag);   // the token tag
+
+                     ZZ->next_ravel_Char(tok.get_char_val());
+                     ZZ->check_value(LOC);
+                     Z->next_ravel_Pointer(ZZ.get());
+                   }
+                   break;
+
+              case TV_INT:
+                   {
+                     Value_P ZZ(2, LOC);
+                     ZZ->next_ravel_Int(tag);   // the token tag
+
+                     ZZ->next_ravel_Int(tok.get_int_val());
+                     ZZ->check_value(LOC);
+                     Z->next_ravel_Pointer(ZZ.get());
+                   }
+                   break;
+
+              case TV_FLT:
+                   {
+                     Value_P ZZ(2, LOC);
+                     ZZ->next_ravel_Int(tag);   // the token tag
+
+                     ZZ->next_ravel_Float(tok.get_flt_val());
+                     ZZ->check_value(LOC);
+                     Z->next_ravel_Pointer(ZZ.get());
+                   }
+                   break;
+
+              case TV_CPX:
+                   {
+                     Value_P ZZ(2, LOC);
+                     ZZ->next_ravel_Int(tag);   // the token tag
+
+                     ZZ->next_ravel_Complex(tok.get_cpx_real(),
+                                            tok.get_cpx_imag());
+                     ZZ->check_value(LOC);
+                     Z->next_ravel_Pointer(ZZ.get());
+                   }
+                   break;
+
+              case TV_SYM:
+                   {
+                     Value_P ZZ(2, LOC);
+                     ZZ->next_ravel_Int(tag);   // the token tag
+
+                     const Symbol * sym = tok.get_sym_ptr();
+                     Value_P Z2(sym->get_name(), LOC);
+                     ZZ->next_ravel_Pointer(Z2.get());
+                     ZZ->check_value(LOC);
+                     Z->next_ravel_Pointer(ZZ.get());
+                   }
+                   break;
+
+              case TV_VAL:
+                   {
+                     Value_P ZZ(2, LOC);
+                     ZZ->next_ravel_Int(tag);   // the token tag
+
+                     Value_P Z2 = tok.get_apl_val();
+                     if (!Z2)   // null APL value
+                        {
+                          ZZ->next_ravel_0();
+                        }
+                     else
+                        {
+                          ZZ->next_ravel_Pointer(Z2.get());
+                        }
+
+                     ZZ->check_value(LOC);
+                     Z->next_ravel_Pointer(ZZ.get());
+                   }
+                   break;
+
+              default: Z->next_ravel_Int(tag);   // only the token tag
+            }
+       }
+
+   return Z;
 }
 //----------------------------------------------------------------------------
 

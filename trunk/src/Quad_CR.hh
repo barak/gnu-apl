@@ -44,7 +44,8 @@ public:
    /// overloaded Function::eval_AB()
    virtual Token eval_AB(Value_P A, Value_P B) const;
 
-   /// overloaded Function::eval_XB()
+   /// overloaded Function::eval_XB().
+   /// ⎕CR[X] B  ←→  X ⎕CR B
    virtual Token eval_XB(Value_P X, Value_P B) const
       { return eval_AB(X, B); }
 
@@ -167,6 +168,9 @@ protected:
 
    /// compute \b 41 ⎕CR \b B
    static Value_P do_CR41(const Value * B);
+
+   /// compute \b 42 ⎕CR \b B (tokenize) or 43 ⎕CR \b B (parse); return tags
+   static Value_P do_CR42_43(const Value * B, bool parse);
 
    /// the left argument of Pick (⊃) which selects a sub-item of a variable
    /// being constructed

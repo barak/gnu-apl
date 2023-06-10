@@ -11,6 +11,7 @@ dist_wslib5_DALY_DATA = README.md               \
                         from-ods.apl            \
                         import.apl              \
                         lpr.apl                 \
+                        parse_json.apl          \
                         pref.apl                \
                         prompt.apl              \
                         pw.apl                  \
