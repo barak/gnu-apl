@@ -65,6 +65,12 @@ A ┏→━┓ 1 ┏→━━┓ ┏→━━━━━━━━┓
 ┃               ┗ϵ━━━━━━━━┛┃
 ┗ϵϵ━━━━━━━━━━━━━━━━━━━━━━━━┛
 
+      ⍝ control characters
+      4 ⎕CR "--\a--"
+┏→━━━━┓
+┃--␇--┃
+┗━━━━━┛
+
       5 ⎕CR 'ABCDEFGHIJKLMNO'
 4142434445464748494A4B4C4D4E4F
 
@@ -404,7 +410,7 @@ Z←2 2⍴5 6.6 7J8
  1091043329   0   
  1224933903   2   
  1224933903   2   
- 1376651527   0   
+ 1376651527     ⍴ 
  1224933903   5   
  1376191247 6.6   
  1124533263   7J8 
@@ -424,7 +430,7 @@ Z←2 2⍴5 6.6 7J8
    0   
    2   
    2   
-   0   
+     ⍴ 
    5   
  6.6   
    7J8 
@@ -506,6 +512,72 @@ Z←2 2⍴5 6.6 7J8
 410F 07 0F
 
 
+      ⊢STAT←"Z←2 2⍴5 6.6 7J8"      ⍝ a statement
+Z←2 2⍴5 6.6 7J8
+
+      ⊢⊃TOKs← 42 ⎕CR STAT          ⍝ the tokenized statement
+       1294     Z 
+ 1091043329   0   
+ 1224933903   2   
+ 1224933903   2   
+ 1376651527     ⍴ 
+ 1224933903   5   
+ 1376191247 6.6   
+ 1124533263   7J8 
+
+      ⊢TAGs←↑¨TOKs                ⍝ the token tags (decimal)
+1294 1091043329 1224933903 1224933903 1376651527 1224933903 1376191247
+      1124533263
+
+
+   ⍪44 ⎕CR TAGs
+ TOK_SYMBOL(TC_SYMBOL, TV_SYM)  
+ TOK_ASSIGN(TC_ASSIGN, TV_NONE) 
+ TOK_INTEGER(TC_VALUE, TV_INT)  
+ TOK_INTEGER(TC_VALUE, TV_INT)  
+ TOK_F12_RHO(TC_FUN12, TV_FUN)  
+ TOK_INTEGER(TC_VALUE, TV_INT)  
+ TOK_REAL(TC_VALUE, TV_FLT)     
+ TOK_COMPLEX(TC_VALUE, TV_CPX)  
+
+
+   ⍪44 ⎕CR TOKs
+ TOK_SYMBOL( Z )    
+ TOK_ASSIGN( ← )  
+ TOK_INTEGER( 2 )   
+ TOK_INTEGER( 2 )   
+ TOK_F12_RHO( ⍴ )   
+ TOK_INTEGER( 5 )   
+ TOK_REAL( 6.6 )    
+ TOK_COMPLEX( 7J8 ) 
+
+      ⊢STAT←"Z←2 2⍴5 6.6 7J8"      ⍝ a statement
+Z←2 2⍴5 6.6 7J8
+
+
+      ⊢⊃TOKs← 43 ⎕CR STAT          ⍝ the parsed statement
+      66830         Z 
+ 1091043329         0 
+
+ 1091503887   5   6.6 
+              7J8 5   
+
+
+     ⍪44 ⎕CR TOKs
+ TOK_LSYMB( Z )                    
+ TOK_ASSIGN( ← )                 
+ TOK_APL_VALUE4( 2 2⍴5 6.6 7J8 5 ) 
+
+
+      ⊢TAGs←↑¨TOKs                 ⍝ the token tags (decimal)
+66830 1091043329 1091503887
+
+         ⍪44 ⎕CR TAGs
+ TOK_LSYMB(TC_SYMBOL, TV_SYM)     
+ TOK_ASSIGN(TC_ASSIGN, TV_NONE)   
+ TOK_APL_VALUE4(TC_VALUE, TV_VAL) 
+
+
       )ERASE B32 B8 STAT TAGs TOKs VALs
 
 
@@ -513,27 +585,20 @@ Z←2 2⍴5 6.6 7J8
       ⍝ trigger a domain error if new left arguments were implemented
       ⍝ without adding a testcase for them above
       ⍝
-      44 ⎕CR A
+      45 ⎕CR A
 DOMAIN ERROR+
-      44 ⎕CR A
+      45 ⎕CR A
       ^      ^
 
       )MORE
-A ⎕CR B with invalid A (=44)
+A ⎕CR B with invalid A (=45)
       →
-
-      ⍝ control characters
-      4 ⎕CR "--\a--"
-┏→━━━━┓
-┃--␇--┃
-┗━━━━━┛
 
       ⍝ regression
       5 ⎕CR '1'
 31
 
       )SIC
-      )ERASE Q Q1 Q2 Q3 A4
 
 
       )CHECK
@@ -543,5 +608,4 @@ OK      - no stale indices
 OK      - no duplicate parents
 
 ⍝ ==================================
-
 

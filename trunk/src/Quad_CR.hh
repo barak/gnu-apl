@@ -172,6 +172,15 @@ protected:
    /// compute \b 42 ⎕CR \b B (tokenize) or 43 ⎕CR \b B (parse); return tags
    static Value_P do_CR42_43(const Value * B, bool parse);
 
+   /// compute \b 44 ⎕CR \b B
+   static Value_P do_CR44(const Value * B);
+
+   /// decode token or token tag \b cB into \b result
+   static void decode_CR44(UCS_string & result, const Cell & cB);
+
+   /// append \b value to result
+   static void value_CR44(UCS_string & result, const Value & value);
+
    /// the left argument of Pick (⊃) which selects a sub-item of a variable
    /// being constructed
    class Picker

@@ -645,7 +645,7 @@ Token::tag_name() const
       {
 #define TD(tag, _tc, _tv, _id) case tag: return UCS_ASCII_string(#tag);
 #include "Token.def"
-        case TOK_NONE:   return UCS_ASCII_string("???Bad-Tah???");
+        case TOK_NONE:   return UCS_ASCII_string("???Bad-Tag???");
       }
 
 char cc[40];

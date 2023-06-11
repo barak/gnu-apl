@@ -73,13 +73,14 @@ Quad_CR::list_functions(ostream & out, bool mapping)
 "\n"
 "   Legend: b - byte vector (vector of integers between -128 and 255)\n"
 "           h - hex string (characters 0-9 or A-F resp. a-f)\n"
+"           i - integer vector\n"
 "           l - string of (\\n-terminated) lines\n"
 "           m - character matrix\n"
 "           n - nested vector of strings\n"
-"           i - integer vector\n"
 "           r - base64 string according to RFC 4648\n"
-"           v - T,V (integer tag T and byte vector V)\n"
 "           s - string\n"
+"           t - token\n"
+"           v - T,V (integer tag T and byte vector V)\n"
 "\n"
 "   Zm ←  0 ⎕CR B     Zm is B in APL output format\n"
 "   Zs ←  1 ⎕CR B     Zs is B in APL input format\n"
@@ -123,6 +124,9 @@ Quad_CR::list_functions(ostream & out, bool mapping)
 "   Z  ← 39 ⎕CR Bi    structured variable capacity Bi\n"
 "   Zi ← 40 ⎕CR Bi    pack boolean Bi (experimental, don't use!)\n"
 "   Zi ← 41 ⎕CR Bi    unpack boolean Bi (experimental, don't use!)\n"
+"   Zt ← 42 ⎕CR Bs    tokenize APL statement(s) Bs\n"
+"   Zt ← 43 ⎕CR Bs    parse APL statement(s) Bs\n"
+"   Zs ← 44 ⎕CR Bt    decode token(s) or token tag(s) Bt\n"
 "\n"
 "   if N ⎕CR has an inverse M ⎕CR then -N can be used instead of M\n";
       }
@@ -361,6 +365,7 @@ bool extra_frame = false;
         case 41: return do_CR41(B);            // packed → boolean
         case 42: return do_CR42_43(B, false);  // tokenize B
         case 43: return do_CR42_43(B, true);   // parse B
+        case 44: return do_CR44(B);            // decode token ir tags
 
         default: MORE_ERROR() << "A ⎕CR B with invalid A (=" << a << ")";
                  DOMAIN_ERROR;
@@ -1841,71 +1846,54 @@ Value_P Z(tos.size(), LOC);
        {
          const Token & tok = tos[t];
          const TokenTag tag = tok.get_tag();
+         Value_P ZZ(2, LOC);
+         ZZ->next_ravel_Int(tag);   // the token tag
+
          switch(tok.get_ValueType())
             {
               case TV_CHAR:
                    {
-                     Value_P ZZ(2, LOC);
-                     ZZ->next_ravel_Int(tag);   // the token tag
-
                      ZZ->next_ravel_Char(tok.get_char_val());
-                     ZZ->check_value(LOC);
-                     Z->next_ravel_Pointer(ZZ.get());
                    }
                    break;
 
               case TV_INT:
                    {
-                     Value_P ZZ(2, LOC);
-                     ZZ->next_ravel_Int(tag);   // the token tag
-
                      ZZ->next_ravel_Int(tok.get_int_val());
-                     ZZ->check_value(LOC);
-                     Z->next_ravel_Pointer(ZZ.get());
                    }
                    break;
 
               case TV_FLT:
                    {
-                     Value_P ZZ(2, LOC);
-                     ZZ->next_ravel_Int(tag);   // the token tag
-
                      ZZ->next_ravel_Float(tok.get_flt_val());
-                     ZZ->check_value(LOC);
-                     Z->next_ravel_Pointer(ZZ.get());
                    }
                    break;
 
               case TV_CPX:
                    {
-                     Value_P ZZ(2, LOC);
-                     ZZ->next_ravel_Int(tag);   // the token tag
-
                      ZZ->next_ravel_Complex(tok.get_cpx_real(),
                                             tok.get_cpx_imag());
-                     ZZ->check_value(LOC);
-                     Z->next_ravel_Pointer(ZZ.get());
                    }
                    break;
 
               case TV_SYM:
                    {
-                     Value_P ZZ(2, LOC);
-                     ZZ->next_ravel_Int(tag);   // the token tag
-
                      const Symbol * sym = tok.get_sym_ptr();
                      Value_P Z2(sym->get_name(), LOC);
                      ZZ->next_ravel_Pointer(Z2.get());
-                     ZZ->check_value(LOC);
-                     Z->next_ravel_Pointer(ZZ.get());
+                   }
+                   break;
+
+              case TV_FUN:
+                   {
+                     Function_P fun = tok.get_function();
+                     Value_P Z2(fun->get_name(), LOC);
+                     ZZ->next_ravel_Pointer(Z2.get());
                    }
                    break;
 
               case TV_VAL:
                    {
-                     Value_P ZZ(2, LOC);
-                     ZZ->next_ravel_Int(tag);   // the token tag
-
                      Value_P Z2 = tok.get_apl_val();
                      if (!Z2)   // null APL value
                         {
@@ -1915,17 +1903,199 @@ Value_P Z(tos.size(), LOC);
                         {
                           ZZ->next_ravel_Pointer(Z2.get());
                         }
-
-                     ZZ->check_value(LOC);
-                     Z->next_ravel_Pointer(ZZ.get());
                    }
                    break;
 
-              default: Z->next_ravel_Int(tag);   // only the token tag
+              default: ZZ->next_ravel_0();       // only the token tag
             }
+
+         ZZ->check_value(LOC);
+         Z->next_ravel_Pointer(ZZ.get());
        }
 
    return Z;
+}
+//----------------------------------------------------------------------------
+Value_P
+Quad_CR::do_CR44(const Value * B)
+{
+Value_P Z(B->get_shape(), LOC);
+
+   if (B->get_rank() > 1)         RANK_ERROR;
+   if (B->element_count() == 0)   LENGTH_ERROR;
+
+   loop(b, B->element_count())
+       {
+          UCS_string ucs_z;
+          decode_CR44(ucs_z, B->get_cravel(b));
+          Value_P ZZ(ucs_z, LOC);
+          Z->next_ravel_Pointer(ZZ.get());
+       }
+
+   return Z;
+}
+//----------------------------------------------------------------------------
+void
+Quad_CR::decode_CR44(UCS_string & result, const Cell & cB)
+{
+   if (cB.is_integer_cell())         // token tag
+      {
+        const APL_Integer b      = cB.get_int_value();
+        const TokenTag tag       = TokenTag(b);
+        const TokenClass cls     = TokenClass(tag & TC_MASK);
+        const TokenValueType typ = TokenValueType(tag & TV_MASK);
+
+        const UCS_ASCII_string tag_name(tag);
+        const UCS_ASCII_string class_name(cls);
+        const UCS_ASCII_string type_name(typ);
+        result.append(tag_name);
+        result.append_ASCII("(");
+        result.append(class_name);
+        result.append_ASCII(", ");
+        result.append(type_name);
+        result.append_ASCII(")");
+      }
+   else if (cB.is_pointer_cell())    // token ←→ (tag, value)
+      {
+        Value_P B2 = cB.get_pointer_value();
+        if (B2->get_rank() > 1)   RANK_ERROR;
+
+        if (B2->element_count() != 2)   LENGTH_ERROR;
+
+        const Cell & cVal        = B2->get_cravel(1);
+        const Cell & cTag        = B2->get_cravel(0);   // the tag
+        const TokenTag tag       = TokenTag(cTag.get_int_value());
+        const TokenClass cls     = TokenClass(tag & TC_MASK);
+        const TokenValueType typ = TokenValueType(tag & TV_MASK);
+
+        const UCS_ASCII_string tag_name(tag);
+        result.append(tag_name);
+        result.append_ASCII("( ");
+
+        switch(typ)
+            {
+               case TV_NONE:  switch(cls)
+                                 {
+                                   case TC_ASSIGN: result.append_ASCII("←");
+                                                   break;
+                                   default:        result.append_ASCII("-");
+                                 }
+                              break;
+
+               case TV_CHAR:  result += cVal.get_char_value();
+                              break;
+
+               case TV_INT:   result.append_number(cVal.get_int_value());
+                              break;
+
+               case TV_FLT:   result.append_double(cVal.get_real_value());
+                              break;
+
+               case TV_CPX:   result.append_double(cVal.get_real_value());
+                              result += UNI_J;
+                              result.append_double(cVal.get_imag_value());
+                              break;
+
+               case TV_FUN:   
+               case TV_SYM:   if (!cVal.is_pointer_cell())   DOMAIN_ERROR;
+                              {
+                                Value_P symbol = cVal.get_pointer_value();
+                                const UCS_string sym_name(*symbol);
+                                result.append(sym_name);
+                              }
+                              break;
+
+               case TV_LIN:   result.append_ASCII("[");
+                              result.append_number(cVal.get_int_value());
+                              result.append_ASCII("]");
+                              break;
+
+               case TV_VAL:   // optional shape
+                              value_CR44(result, *cVal.get_pointer_value());
+                              break;
+
+               case TV_INDEX: result.append_ASCII("[index]");
+                              break;
+
+
+               default:       DOMAIN_ERROR;
+            }
+
+        result.append_ASCII(" )");
+      }
+   else
+      {
+        MORE_ERROR() <<
+        "Invalid item in 44 ⎕CR B. Expect integer (tag) or (tag value) (token)";
+        DOMAIN_ERROR;
+      }
+}
+//----------------------------------------------------------------------------
+void
+Quad_CR::value_CR44(UCS_string & result, const Value & value)
+{
+   // 1. shape prefix (unless scalar or vector)
+   //
+const uRank rank = value.get_rank();
+const ShapeItem ec = value.element_count();
+   if (rank > 1 || ec == 1)
+      {
+        loop(r, rank)
+           {
+             result.append_number(value.get_shape_item(r));
+             result += UNI_SPACE;
+             
+           }
+         result.back() = UNI_RHO;
+      }
+
+   loop(e, ec)
+       {
+         if (result.size() > 60)   // long
+            {
+              result.append_ASCII(" ...");
+              break;
+            }
+
+          const  Cell & cell = value.get_cravel(e);
+          if (cell.is_character_cell())   // string or char
+             {
+               result += UNI_SINGLE_QUOTE;
+               result += cell.get_char_value();
+               result += UNI_SINGLE_QUOTE;
+             }
+          else if (cell.is_integer_cell())
+             {
+               result.append_number(cell.get_int_value());
+             }
+          else if (cell.is_float_cell())
+             {
+               result.append_double(cell.get_real_value());
+             }
+          else if (cell.is_complex_cell())
+             {
+               result.append_double(cell.get_real_value());
+               result += UNI_J;
+               result.append_double(cell.get_imag_value());
+             }
+          else if (cell.is_pointer_cell())
+             {
+               result.append_ASCII("(...)");
+             }
+          else if (cell.is_lval_cell())
+             {
+               result.append_ASCII("(...)←");
+             }
+          else
+             {
+               FIXME;
+             }
+
+         result += UNI_SPACE;
+       }
+
+   result.pop_back();   // trailing blanf
+
 }
 //----------------------------------------------------------------------------
 

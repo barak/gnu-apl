@@ -951,6 +951,18 @@ char cc[40];
 }
 //----------------------------------------------------------------------------
 void
+UCS_string::append_double(double num)
+{
+char cc[40];
+   SPRINTF(cc, "%g", num);
+   loop(c, sizeof(cc))
+      {
+        if (char digit = cc[c])   append(Unicode(digit));
+        else                      break;
+      }
+}
+//----------------------------------------------------------------------------
+void
 UCS_string::append_hex(ShapeItem num, bool uppercase)
 {
 const char * format = uppercase ? "%llX" : "%llx";
@@ -1644,3 +1656,89 @@ void UCS_string::create(const char * loc)
 
 #endif
 //============================================================================
+UCS_ASCII_string::UCS_ASCII_string(TokenTag tag)
+{
+   switch(tag)
+      {
+        case TOK_NONE:   append_ASCII("TOK_NONE");             return;
+#define TD(tag, _tc, _tv, _id) case tag: append_ASCII(#tag);   return;
+#include "Token.def"
+      }
+
+   // tag was not defined
+   //
+char cc[40];
+   SPRINTF(cc, "TOK_%4.4X", tag);
+   append_ASCII(cc);
+}
+//----------------------------------------------------------------------------
+UCS_ASCII_string::UCS_ASCII_string(TokenClass tc)
+{
+   switch(tc)
+      {
+        case TC_ASSIGN:   append_ASCII("TC_ASSIGN");     return;
+        case TC_R_ARROW:  append_ASCII("TC_R_ARROW");    return;
+        case TC_L_BRACK:  append_ASCII("TC_L_BRACK");    return;
+        case TC_R_BRACK:  append_ASCII("TC_R_BRACK");    return;
+        case TC_END:      append_ASCII("TC_END");        return;
+        case TC_FUN0:     append_ASCII("TC_FUN0");       return;
+        case TC_FUN12:    append_ASCII("TC_FUN12");      return;
+        case TC_INDEX:    append_ASCII("TC_INDEX");      return;
+        case TC_OPER1:    append_ASCII("TC_OPER1");      return;
+        case TC_OPER2:    append_ASCII("TC_OPER2");      return;
+        case TC_L_PARENT: append_ASCII("TC_L_PARENT");   return;
+        case TC_R_PARENT: append_ASCII("TC_R_PARENT");   return;
+        case TC_RETURN:   append_ASCII("TC_RETURN");     return;
+        case TC_SYMBOL:   append_ASCII("TC_SYMBOL");     return;
+        case TC_VALUE:    append_ASCII("TC_VALUE");      return;
+        case TC_PINDEX:   append_ASCII("TC_PINDEX");     return;
+        case TC_VOID:     append_ASCII("TC_VOID");       return;
+        case TC_OFF:      append_ASCII("TC_OFF");        return;
+        case TC_SI_LEAVE: append_ASCII("TC_SI_LEAVE");   return;
+        case TC_LINE:     append_ASCII("TC_LINE");       return;
+        case TC_DIAMOND:  append_ASCII("TC_DIAMOND");    return;
+        case TC_NUMERIC:  append_ASCII("TC_NUMERIC");    return;
+        case TC_SPACE:    append_ASCII("TC_SPACE");      return;
+        case TC_NEWLINE:  append_ASCII("TC_NEWLINE");    return;
+        case TC_COLON:    append_ASCII("TC_COLON");      return;
+        case TC_QUOTE:    append_ASCII("TC_QUOTE");      return;
+        case TC_L_CURLY:  append_ASCII("TC_L_CURLY");    return;
+        case TC_R_CURLY:  append_ASCII("TC_R_CURLY");    return;
+
+         default: ;
+      }
+
+   // tc was not defined
+   //
+char cc[40];
+   SPRINTF(cc, "TC_%4.4X", tc);
+   append_ASCII(cc);
+}
+//----------------------------------------------------------------------------
+UCS_ASCII_string::UCS_ASCII_string(TokenValueType tvt)
+{
+   switch(tvt)
+      {
+        case TV_MASK:  append_ASCII("TV_MASK" );   return;
+        case TV_NONE:  append_ASCII("TV_NONE" );   return;
+        case TV_CHAR:  append_ASCII("TV_CHAR" );   return;
+        case TV_INT:   append_ASCII("TV_INT"  );   return;
+        case TV_FLT:   append_ASCII("TV_FLT"  );   return;
+        case TV_CPX:   append_ASCII("TV_CPX"  );   return;
+        case TV_SYM:   append_ASCII("TV_SYM"  );   return;
+        case TV_LIN:   append_ASCII("TV_LIN"  );   return;
+        case TV_VAL:   append_ASCII("TV_VAL"  );   return;
+        case TV_INDEX: append_ASCII("TV_INDEX");   return;
+        case TV_FUN:   append_ASCII("TV_FUN"  );   return;
+
+         default: ;
+      }
+
+   // tvt was not defined
+   //
+char cc[40];
+   SPRINTF(cc, "TV_%4.4X", tvt);
+   append_ASCII(cc);
+}
+//----------------------------------------------------------------------------
+

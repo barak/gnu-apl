@@ -32,6 +32,7 @@
 #include "Avec.hh"
 #include "Common.hh"
 #include "Heapsort.hh"
+#include "TokenEnums.hh"
 #include "Unicode.hh"
 #include "UTF8_string.hh"
 
@@ -327,6 +328,9 @@ public:
    /// append number (in ASCII encoding like %d) to this string
    void append_number(ShapeItem num);
 
+   /// append floating a point number (in ASCII encoding like %f) to this string
+   void append_double(double num);
+
    /// append number (in ASCII encoding like %X or %x) to this string
    void append_hex(ShapeItem num, bool uppercase);
 
@@ -471,6 +475,15 @@ public:
    /// cstring are ASCII. Only use it with C literals, not with const char *s.
    UCS_ASCII_string(const char * ascii)
       { append_ASCII(ascii); }
+
+   /// return \b tag in a readable form (e.g. TOK_LINE, TOK_SYMBOL, ...).
+   UCS_ASCII_string(TokenTag tag);
+
+   /// return \b tc in a readable form (e.g. TC_ASSIGN, TC_R_ARROW, ...).
+   UCS_ASCII_string(TokenClass tc);
+
+   /// return \b tvt in a readable form (e.g. TV_NONE, TV_CHAR, ...).
+   UCS_ASCII_string(TokenValueType tvt);
 };
 //----------------------------------------------------------------------------
 inline void
