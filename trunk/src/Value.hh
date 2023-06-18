@@ -1018,8 +1018,10 @@ Value_P FloatScalar(APL_Float val, const char * loc);
 /// character scalar
 Value_P CharScalar(Unicode uni, const char * loc);
 
-/// complex scalars
+/// complex scalars (from APL_Complex)
 Value_P ComplexScalar(APL_Complex cpx, const char * loc);
+
+/// complex scalars (from real and imag parts)
 Value_P ComplexScalar(APL_Float real, APL_Float imag, const char * loc);
 
 /// ⍳0 (aka. ⍬)

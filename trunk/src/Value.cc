@@ -3048,7 +3048,9 @@ Value_P Z(shape_Z, loc);
    return Z;
 }
 //----------------------------------------------------------------------------
-ostream & operator << (ostream & out, const AP_num3 & ap3)
+/// declared in PrintOperator.hh
+ostream &
+operator << (ostream & out, const AP_num3 & ap3)
 {
    return out << ap3.proc << "." << ap3.parent << "." << ap3.grand;
 }

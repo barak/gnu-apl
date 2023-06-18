@@ -156,7 +156,7 @@ public:
    const labVal & get_label(int idx) const
       { return label_values[idx]; }
 
-   // clear the function symbol (after a DEFN_ERROR)
+   /// clear the function symbol (e.g. after a DEFN_ERROR)
    void clear_FUN()
       { sym_FUN = 0; }
 

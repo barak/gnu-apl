@@ -360,20 +360,20 @@ Symbol * symbol = lookup_existing_symbol(sym);
         return true;
       }
 
-      if (symbol->is_erased())
-         {
-           if (symbol->value_stack.size() == 1)
-              {
-                MORE_ERROR() << "Can't )ERASE symbol '"
-                             << sym << "': already erased";
-                return true;
-              }
-           else   // still holding a value
-              {
-                symbol->clear_vs();
-                return false;
-              }
-         }
+   if (symbol->is_erased())
+      {
+        if (symbol->value_stack.size() == 1)
+           {
+             MORE_ERROR() << "Can't )ERASE symbol '"
+                          << sym << "': already erased";
+             return true;
+           }
+        else   // still holding a value
+           {
+             symbol->clear_vs();
+             return false;
+           }
+      }
 
    if (symbol->value_stack.size() != 1)
       {

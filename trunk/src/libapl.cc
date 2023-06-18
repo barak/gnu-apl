@@ -504,7 +504,9 @@ unsigned int * ret = reinterpret_cast<unsigned int *>
 class Quad_FX
 {
 public:
-    static Token  do_quad_FX(const int * exec_props, const UCS_string & text,
+   /// do ⎕FX \b text with some meta information (exec properties, creator,
+   /// etc. The meta information is used by ⎕AT.
+   static Token  do_quad_FX(const int * exec_props, const UCS_string & text,
                              const UTF8_string & creator, bool tolerant);
 };
 

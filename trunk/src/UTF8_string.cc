@@ -410,6 +410,7 @@ UTF8_string::round_0_1()
    return true;   // 1.0 → 0.1
 }
 //----------------------------------------------------------------------------
+/// declared in PrintOperator.hh
 ostream &
 operator <<(ostream & os, const UTF8_string & utf)
 {

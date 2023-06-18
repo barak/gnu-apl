@@ -83,6 +83,9 @@ public:
 
            /// destructor (shall clean up the GUI-dependent context)
            virtual ~PLOT_context() {}
+
+           /// z unique number that identifies \b this PLOT_context (in
+           /// \b all_PLOT_windows).
            const Handle handle;
 
            /// close \b hnadle from all_PLOT_windows
