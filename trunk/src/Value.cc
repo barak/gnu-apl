@@ -1980,7 +1980,7 @@ AxesBitmap ret = 0;
 }
 //----------------------------------------------------------------------------
 void
-Value::glue(Token & result, Token & token_A, Token & token_B, const char * loc)
+Value::glue(Token & result, const Token & token_A, const Token & token_B, const char * loc)
 {
 Value_P A = token_A.get_apl_val();
 Value_P B = token_B.get_apl_val();

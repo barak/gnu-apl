@@ -476,7 +476,7 @@ check_EOC:
                          Workspace::SI_top()->get_prefix();
                 Assert(prefix.at0().get_tag() == TOK_SI_PUSHED);
 
-                new (&prefix.tos().tok) Token(token);
+                new (&prefix.tos().get_token()) Token(token);
               }
               if (attention_is_raised())
                  {
@@ -555,19 +555,19 @@ check_EOC:
               // have the same safe_execution_count, except the last
               // unroll the SI stack.
               //
-              if (Workspace::SI_top()->get_safe_execution())
+              if (Workspace::SI_top()->get_safe_execution_count())
                  {
                    // SI_top() is in save execution mode. Pop it and all
-                   // callers with the same get_safe_execution() level.
+                   // callers with the same get_safe_execution_count().
                    //
                    // after pop'ing the SI entries only the original SI
                    // (which has set the save execution mode) shall remain
                    // the SI stack.
                    //
                    StateIndicator * si = Workspace::SI_top();
-                   const int sex_level = si->get_safe_execution();
+                   const int sex_level = si->get_safe_execution_count();
                    while (si->get_parent() && sex_level ==
-                          si->get_parent()->get_safe_execution())
+                          si->get_parent()->get_safe_execution_count())
                       {
                         si = si->get_parent();
                         Workspace::pop_SI(LOC);

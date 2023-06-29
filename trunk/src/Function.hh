@@ -180,7 +180,7 @@ public:
    virtual const UserFunction * get_func_ufun() const   { return 0; }
 
    /// return true if this function has a name with alphabetic chars,
-   /// i.e. the function is user defined or a quad function
+   /// i.e. the function is either a defined function or a ⎕-function
    virtual bool has_alpha() const   { return false; }
 
    /// Print \b this function.

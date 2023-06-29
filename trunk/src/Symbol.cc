@@ -688,7 +688,7 @@ int has_result = 0;   // no result
 }
 //----------------------------------------------------------------------------
 void
-Symbol::resolve_left(Token & tok) const
+Symbol::resolve_left(Token & tok, Function_PC & PC) const
 {
    Log(LOG_SYMBOL_resolve)
       CERR << "resolve_left() symbol " << get_name() << endl; 
@@ -702,6 +702,7 @@ const ValueStackItem & vs = value_stack.back();
              return;   // leave symbol as is
 
         case NC_LABEL:
+             --PC;
              SYNTAX_ERROR;   // assignment to (read-only) label
 
         case NC_VARIABLE:
@@ -727,12 +728,13 @@ const ValueStackItem & vs = value_stack.back();
 
         default:
              CERR << "Symbol is '" << get_name() << "' at " << LOC << endl;
+             --PC;
              SYNTAX_ERROR;
       }
 }
 //----------------------------------------------------------------------------
 void
-Symbol::resolve_right(Token & tok) const
+Symbol::resolve_right(Token & tok, Function_PC & PC) const
 {
    Log(LOG_SYMBOL_resolve)
       CERR << "resolve_right() symbol " << get_name() << endl; 
@@ -743,6 +745,7 @@ const ValueStackItem & vs = value_stack.back();
    switch(vs.get_NC())
       {
         case NC_UNUSED_USER_NAME:
+             --PC;
              Error::throw_symbol_error(get_name(), LOC);
 
         case NC_LABEL:
@@ -775,6 +778,7 @@ const ValueStackItem & vs = value_stack.back();
 
         default:
              CERR << "Symbol is '" << get_name() << "' at " << LOC << endl;
+             --PC;
              SYNTAX_ERROR;
       }
 }

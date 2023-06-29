@@ -90,9 +90,9 @@ Dyadic
       ≡(⊂⍣4)⍣6⊢'hello'
 25
       ≡⊂⍣(4⍣6)⊢'hello'
-SYNTAX ERROR
+SYNTAX ERROR+
       ≡⊂⍣(4⍣6)⊢'hello'
-       ^      ^
+          ^^
 
       →
       )CHECK

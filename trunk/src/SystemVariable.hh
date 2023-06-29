@@ -120,7 +120,7 @@ protected:
    virtual bool is_readonly() const   { return true; }
 
    /// overloaded Symbol:resolve_left(). Invalid for read-only variables
-   virtual void resolve_left(Token & token) const
+   virtual void resolve_left(Token & token, Function_PC & PC) const
       { MORE_ERROR() << "Assignment to read-only system variable "
                      << get_name();
         SYNTAX_ERROR; }
@@ -128,7 +128,7 @@ protected:
    /// overloaded Symbol::resolve_right(). Since this variable is read-only,
    /// push(), pop(), and assign() do nothing, and therefore we may call
    /// get_apl_value() directly.
-   virtual void resolve_right(Token & token) const
+   virtual void resolve_right(Token & token, Function_PC & PC) const
       { new (&token) Token(TOK_APL_VALUE1, get_apl_value()); }
 };
 //----------------------------------------------------------------------------
@@ -498,10 +498,10 @@ public:
    Quad_Quad();
 
    /// overloaded Symbol::resolve_left().
-   virtual void resolve_left(Token & token) const   { }   // ⎕←xxx
+   virtual void resolve_left(Token & token, Function_PC & PC) const   { }   // ⎕←xxx
 
    /// overloaded Symbol::resolve_right().
-   virtual void resolve_right(Token & token) const;
+   virtual void resolve_right(Token & token, Function_PC & PC) const;
 
 protected:
    virtual void assign(Value_P B, bool clone, const char * loc);

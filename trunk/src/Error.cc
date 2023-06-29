@@ -152,6 +152,21 @@ size_t len = strlen(msg_1);
 }
 //----------------------------------------------------------------------------
 void
+Error::add_MORE_indicator(bool have_more)
+{
+   if (have_more)   // )MORE info available
+      {
+        const size_t len = strlen(error_message_1);
+        if (error_message_1[len - 1] != UNI_PLUS &&
+            len < sizeof(error_message_1) - 1)
+           {
+             error_message_1[len]     = '+';
+             error_message_1[len + 1] = 0;
+           }
+      }
+}
+//----------------------------------------------------------------------------
+void
 Error::set_error_line_2(const char * msg_2)
 {
    enum { MAX_len = sizeof(error_message_2) - 1 };
@@ -235,7 +250,7 @@ StateIndicator * si = Workspace::SI_top();   // the current )SI entry
 
    Log(LOG_verbose_error)
       {
-        if (!(si && si->get_safe_execution()))   BACKTRACE
+        if (!(si && si->get_safe_execution_count()))   BACKTRACE
       }
 
    // maybe map error to DOMAIN ERROR.
@@ -333,7 +348,7 @@ void
 Error::update_error_info(StateIndicator * si)
 {
    /*
-      construct lines 2 and 3 of the standard 3-line APL error info.
+      construct lines 2 and 3 of the standard 3-line APL error message.
       Line 1 was already constructed in Error::Error(ErrorCode ec...).
       For eample: Let
 
@@ -347,10 +362,15 @@ Error::update_error_info(StateIndicator * si)
       1 2 3                       ⍝ first (correct) statement
       VALUE ERROR                 ⍝ error line 1
       FOO[1]  Q←Q++               ⍝ error line 2: failed statement
-                ^                 ⍝ error line 3: caret line (error position)
+                ^                 ⍝ error line 3: caret line (error range)
 
        There is no error_message_3; the third line is constructed from
        left_caret and right_caret when needed.
+
+       lrm: "The left caret indicates how far execution of the expression
+             progressed before the suspension occurred.
+             The right caret indicates the likely point of the error. (On
+             occasion, the two carets overlap so that only one is displayed.)"
     */
 
    set_error_line_2("      ");   // the APL prompt
@@ -378,9 +398,11 @@ Error::update_error_info(StateIndicator * si)
       }
 
    {
-     const Function_PC from = si->get_prefix().get_range_low();
-     const Function_PC to   = si->get_prefix().get_range_high();
+     const Prefix & prefix = si->get_prefix();
+     const Function_PC from = prefix.get_range_low();
+     const Function_PC to   = prefix.get_range_high();
      const Function_PC2 error_range(from, to);
+
      si->get_executable()->set_error_info(*this, error_range);
    }
 
@@ -392,7 +414,7 @@ out:
    // )SI entries below a ⎕ES entry must not print anything but simply return
    for (const StateIndicator * si1 = si; si1; si1 = si1->get_parent())
        {
-         if (si1->get_safe_execution()) return;
+         if (si1->get_safe_execution_count()) return;
        }
 
    print_em(UERR, LOC);

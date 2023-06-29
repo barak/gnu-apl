@@ -326,7 +326,7 @@ ExecuteList * fun = 0;
    Log(LOG_UserFunction__execute)   fun->print(CERR);
 
    Workspace::push_SI(fun, LOC);
-   Workspace::SI_top()->set_safe_execution();
+   Workspace::SI_top()->set_safe_execution_count();
 
    return Token(TOK_SI_PUSHED);
 }
@@ -533,7 +533,7 @@ Quad_ES::eval_B(Value_P B) const
 Error error(E_NO_ERROR, LOC);
 const Token ret = event_simulate(0, B, error);
    if (error.get_error_code() == E_NO_ERROR)              return ret;
-   if (Workspace::SI_top()->get_safe_execution())   return ret;
+   if (Workspace::SI_top()->get_safe_execution_count())   return ret;
 
    throw error;
 }
@@ -1405,7 +1405,7 @@ Value_P Z(len, LOC);
    //
    for (const StateIndicator * parent = 0; parent != Workspace::SI_top();)
        {
-         const StateIndicator * si = StateIndicator::find_child(parent);
+         const StateIndicator * si = parent->find_child();
          parent = si;   // for the next iteration
 
          const Function_PC PC = Function_PC(si->get_PC() - 1);

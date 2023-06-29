@@ -88,11 +88,6 @@ public:
    const char * get_print_loc() const
       { return print_loc; }
 
-   /// compute the caret line. This is the third of the 3 error lines.
-   /// It contains the failure position the statement and is NOT subject
-   /// to translation.
-   UCS_string get_error_line_3() const;
-
    /// return the source code location where the error was thrown
    const char * get_throw_loc() const
       { return throw_loc; }
@@ -114,6 +109,15 @@ public:
 
    /// set the first error line
    void set_error_line_1(const char * msg_1);
+
+   /// add a '+' to error_message_1 unless it hast one already. The caller
+   /// has checked that 
+   void add_MORE_indicator(bool have_more);
+
+   /// compute the caret line. This is the third of the 3 error lines.
+   /// It contains the failure position the statement and is NOT subject
+   /// to translation.
+   UCS_string get_error_line_3() const;
 
    /// set the second error line to \b msg_2
    void set_error_line_2(const char * msg_2);
@@ -186,13 +190,13 @@ protected:
    /// display user function and line rather than ⎕ES instruction
    bool show_locked;
 
-   /// the left caret position (-1 if none) for the error display
+   /// the left caret position (-1 if none) for the error line 3
    int left_caret;
 
-   /// the right caret position (-1 if none) for the error display
+   /// the right caret position (-1 if none) for the error line 3
    int right_caret;
 
-   /// where this error was printed (0 if not)
+   /// where this error was printed (0 if not yet printed)
    const char * print_loc;
 
 private:

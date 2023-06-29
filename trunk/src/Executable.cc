@@ -123,7 +123,7 @@ Executable::clear_body()
 {
    loop(b, body.size())
       {
-        body[b].extract_apl_val(LOC);
+        body[b].release_apl_val(LOC);
 
         if (body[b].is_function())
            {
@@ -694,12 +694,26 @@ Executable::set_error_info(Error & error,
                            const Token_string & failed_statement, 
                            Function_PC2 range) const
 {
-   // if the error was caused by some function being executed then
-   // the right arg of the function was OK and we skip it
-   //
+   /* if the error was caused by some function being executed, say f in
+      A f B then the right arg B of the function f was OK and we skip 
+
+      Thus:     A f B
+                ^   ^
+
+      becomes:  A f B
+                ^ ^
+
+      IOW: a Value B can never be wrong.
+    */
    if (failed_statement[range.low].get_Class() == TC_VALUE)
       {
          ++range.low;
+      }
+
+   if (error.get_error_code() == E_SYNTAX_ERROR)
+      {
+        Prefix::adjust_right_caret(range, failed_statement);
+        error.add_MORE_indicator(Workspace::more_error().size());
       }
 
    Log(LOG_prefix__location_info)

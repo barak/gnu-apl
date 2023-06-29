@@ -98,9 +98,9 @@ J LINE 3
 J LINE 4
 J LINE 5
 J:  6 5 3 1 1
-SYNTAX ERROR
+SYNTAX ERROR+
 J[7]  ∘∘∘∘∘∘
-      ^    ^
+          ^^
 
       ⎕LC
 7 5 3 1 1
@@ -112,7 +112,7 @@ WAS ³
 
       )SIS
 J[7]  ∘∘∘∘∘∘
-      ^    ^
+          ^^
 H[5]  J
       ^
 G[3]  H

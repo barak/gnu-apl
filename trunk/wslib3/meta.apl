@@ -9,7 +9,7 @@
 ∇meta∆make_function Package;Tags;Vals;Fun;Qu
  Qu←{ ((1=⍴⍵)/'(,') , '''' , ⍵ , '''' , (1=⍴⍵)/')' }
  Tags ← meta∆tags ◊ LEN←4 + ⌈⌿⊃⍴¨Tags
- Vals ← { (LEN↓⍞ ⊣ ⍞← LEN↑(⊃⍵),':') } ¨ Tags   ⍝ read tag values
+ Vals ← { (⍞ ⊣ ⍞← LEN↑(⊃⍵),':') } ¨ Tags   ⍝ read tag values
  Fun ← ⊂'Z←',Package,'⍙metadata' 
  Fun ← Fun , ⊂'Z←0 2⍴⍬'
  ⊣ Tags { Fun ← Fun , ⊂'Z←Z⍪', (LEN ↑ Qu ⍺), ' ', Qu ⍵ } ¨ Vals
@@ -31,7 +31,8 @@
  Z←Z,⊂ 'Portability'
  Z←Z,⊂ 'Provides'
  Z←Z,⊂ 'Requires'
- Z←Z,⊂ 'Version'
+  Z←Z,⊂ 'Version'
+  Z←Z,⊂ 'Last update'
 ∇
 
 ∇Z←meta⍙metadata

@@ -59,8 +59,12 @@ public:
    /// deallocate resources held by this DerivedFunction
    void destroy_derived(const char * loc);
 
+   /// overloaded NamedObject::get_name()
+   virtual UCS_string get_name() const;
+
    /// overloaded Function::print();
-   virtual ostream & print(ostream & out) const;
+   virtual ostream & print(ostream & out) const
+      { return out << get_name(); }
 
    /// overloaded Function::is_derived();
    virtual bool is_derived() const
@@ -140,7 +144,6 @@ protected:
 private:
    /// destructor
    ~DerivedFunction();
-
 };
 //============================================================================
 /// a small cache for storing a few DerivedFunction objects

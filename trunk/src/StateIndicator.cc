@@ -86,11 +86,11 @@ const Function_PC pc = get_executable()->get_exec_ufun()->pc_for_line(new_line);
         // execution, that was entered with ⎕STOP or S∆. We then don't
         // want to stop (again) but continue after the stop token.
         //
-        set_PC(pc + 2);
+        current_stack.goto_PC(pc + 2);
       }
    else  // the "normal" case
       {
-        set_PC(pc);
+        current_stack.goto_PC(pc);
       }
 
    Log(LOG_prefix_parser)   CERR << "GOTO [" << get_line() << "]" << endl;
@@ -351,7 +351,7 @@ StateIndicator::jump_to_line(Function_Line line)
       {
         // →N in ∇ context
         //
-        set_PC(ufun->pc_for_line(line));   // →N to valid line in user function
+        current_stack.goto_PC(ufun->pc_for_line(line));   // →N to valid line in user function
         return Token(TOK_VOID);            // stay in context
       }
 
@@ -412,21 +412,21 @@ StateIndicator::info(ostream & out, const char * loc) const
 }
 //----------------------------------------------------------------------------
 Value_P
-StateIndicator::get_L(UCS_string & function)
+StateIndicator::get_L(UCS_string & function) const
 {
    if (Value_P * L = current_stack.locate_L(function))   return *L;
    return Value_P();
 }
 //----------------------------------------------------------------------------
 Value_P
-StateIndicator::get_R(UCS_string & function)
+StateIndicator::get_R(UCS_string & function) const
 {
    if (Value_P * R = current_stack.locate_R(function))   return *R;
    return Value_P();
 }
 //----------------------------------------------------------------------------
 Value_P
-StateIndicator::get_X(UCS_string & function)
+StateIndicator::get_X(UCS_string & function) const
 {
    if (Value_P * X = current_stack.locate_X(function))   return *X;
    return Value_P();
@@ -454,12 +454,12 @@ UCS_string function;
 }
 //----------------------------------------------------------------------------
 const StateIndicator *
-StateIndicator::find_child(const StateIndicator * parent)
+StateIndicator::find_child() const
 {
    for (const StateIndicator * si = Workspace::SI_top();
         si; si = si->get_parent())
        {
-         if (parent == si->get_parent())   return si;   // found child si
+         if (this == si->get_parent())   return si;   // found child si
        }
 
    return 0;   // si is Workspace::SI_top()

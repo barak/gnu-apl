@@ -259,25 +259,30 @@ DerivedFunction::eval_AXB(Value_P A, Value_P X, Value_P B) const
       }
 }
 //----------------------------------------------------------------------------
-ostream &
-DerivedFunction::print(ostream & out) const
+UCS_string
+DerivedFunction::get_name() const
 {
-   out << "(";
-   if (left_arg.is_function())   left_arg.get_function()->print(out);
-   else                          out << "VAL";
-   out << " ";
+UCS_string name;
+   name << "(";
 
-   oper->print(out);
-   if (+axis)   out << "[]";
+   if (left_arg.is_function())   name << left_arg.get_function()->get_name();
+   else                          name << "VAL";
+   name << " ";
+
+   name << oper->get_name();
+   if (+axis)   name << "[]";
 
    if (right_fun.get_tag() != TOK_VOID)   // dyadic operator
       {
-        out << " ";
-        if (right_fun.is_function())   right_fun.get_function()->print(out);
-        else                           out << "VAL";
+        name << " ";
+        if (right_fun.is_function())
+           name << right_fun.get_function()->get_name();
+        else
+           name << "VAL";
       }
 
-   return out << ")";
+   name << ")";
+   return name;
 }
 //----------------------------------------------------------------------------
 bool

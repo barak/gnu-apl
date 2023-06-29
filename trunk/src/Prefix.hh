@@ -79,7 +79,7 @@ public:
    /// return true if ufun is on the stack
    bool uses_function(const UserFunction * ufun) const;
 
-   /// return true if the state of \b this Prefix has ⎕R (and maybe ⎕L or ⎕X).
+   /// return true if the content of \b this Prefix has ⎕R (and maybe ⎕L or ⎕X).
    bool has_quad_LRX() const;
 
    /// print the state of this parser
@@ -98,30 +98,28 @@ public:
    int show_owners(const char * prfx, ostream & out, const Value & value) const;
 
    /// highest PC in current statement
-   Function_PC get_range_high() const;
+   Function_PC get_range_high() const
+      { return put ? content[put- 1].get_PC() : get_lookahead_PC(); }
 
    /// lowest PC in current statement
-   Function_PC get_range_low() const;
+   Function_PC get_range_low() const
+      { return put ? content[0].get_PC() : get_lookahead_PC(); }
 
-   /// lookahead is a complete index. return true if it belongs to a value
-   /// and is not a function axis.
-   bool value_expected();
+   /// lookahead is a complete index. return \b true if it belongs to a value
+   /// (as opposed to a function axis).
+   bool value_expected() const;
 
    /// print the current range (PC from - PC to) on out
    void print_range(ostream & out) const;
 
-   /// replace the left or right argument of a function (for retry) and
-   /// return true on success
-   bool replace_AB(Value_P old_value, Value_P new_value);
-
    /// return the left argument of a failed primitive function (if any)
-   Value_P * locate_L(UCS_string & function);
-
-   /// return the axis argument of a failed primitive function (if any)
-   Value_P * locate_X(UCS_string & function);
+   Value_P * locate_L(UCS_string & function) const;
 
    /// return the right argument of a failed primitive function (if any)
-   Value_P * locate_R(UCS_string & function);
+   Value_P * locate_R(UCS_string & function) const;
+
+   /// return the axis argument of a failed primitive function (if any)
+   Value_P * locate_X(UCS_string & function) const;
 
    /// return the current monadic function (if any)
    const Function * get_dyadic_fun() const
@@ -139,33 +137,29 @@ public:
    int size() const
       { return put; }
 
-   /// return the leftmost token (e.g. A in A←B)
-   const Token & _at0() const
-      { Assert1(size() > 0);   return content[put - 1].tok; }
-
-   /// return the leftmost token (e.g. A in A←B)
+   /// return the leftmost token (in APL order, e.g. A in A←B or in A+B)
    const Token & at0() const
-      { Assert1(size() > 0);   return content[put - 1].tok; }
+      { Assert1(put);   return content[put - 1].get_token(); }
 
-   /// return the leftmost token (e.g. A in A←B)
+   /// return the leftmost token (in APL order, e.g. A in A←B or in A+B)
    Token & at0()
-      { Assert1(size() > 0);   return content[put - 1].tok; }
+      { Assert1(put);   return content[put - 1].get_token(); }
 
    /// return the second token from the left (e.g. ← in A←B)
    const Token & at1() const
-      { Assert1(size() > 1);   return content[put - 2].tok; }
+      { Assert1(put >= 2);   return content[put - 2].get_token(); }
 
    /// return the second token from the left (e.g. ← in A←B)
    Token & at1()
-      { Assert1(size() > 1);   return content[put - 2].tok; }
+      { Assert1(put >= 2);   return content[put - 2].get_token(); }
 
    /// return the third token from the left (e.g. B in A←B)
    Token & at2()
-      { Assert1(size() > 2);   return content[put - 3].tok; }
+      { Assert1(put >= 3);   return content[put - 3].get_token(); }
 
    /// return the fourth token from the left (e.g. B in A+/B)
    Token & at3()
-      { Assert1(size() > 3);   return content[put - 4].tok; }
+      { Assert1(put >= 4);   return content[put - 4].get_token(); }
 
    /// return true if the next token binds stronger than the best match
    bool do_shift(TokenClass next) const;
@@ -178,69 +172,100 @@ public:
    void set_assign_state(Assign_state new_state)
       { assign_state = new_state; }
 
-   /// return the highest PC seen in the current statement
-   Function_PC get_PC_range_high() const
-      { return PC_range_high; }
+   /* return the highest PC seen in the current statement. This includes the
+      lookahead token, therefore it could be (a little) > get_range_high().
+      More importantly, it can be Function_PC_invalid.
+    */
+   Function_PC get_lookahead_PC() const
+      { return saved_MISC.get_PC(); }
+
+   /// set the lookahead PC
+   void set_lookahead_PC(Function_PC pc)
+      { saved_MISC.set_PC(pc); }
 
    /// read one more token (don't store yet)
    Token_loc lookahead()
       {
-        const Function_PC old_pc = PC++;
-        if (old_pc < body.size())   return Token_loc(body[old_pc], old_pc);
-        return Token_loc(Token(), --PC);   // end of function
+        if (PC >= body.size())   return Token_loc(Token(), PC);  // end of fun
+        const Function_PC old_PC = PC++;
+        return Token_loc(body[old_PC], old_PC);
       }
 
    /// store one more token. push(A) in e.g. F B would produce A F B.
    /// IOW, push() works right-to-left of XXX in reduce_XXX().
    void push(const Token_loc & tl)
       {
-        if (size() >= MAX_CONTENT_1)   LIMIT_ERROR_PREFIX;
+        if (put >= MAX_CONTENT_1)   LIMIT_ERROR_PREFIX;
         content[put++].copy(tl, LOC);
+      }
+
+   /// if \b tok is an error token (from some eval_XXX() function) then
+   /// push its Token_loc and return \b true. Otherwise return \b false.
+   bool push_error(const Token & tok)
+      {
+        if (tok.get_tag() != TOK_ERROR)   return false;   // no error pushed
+        const Token_loc tl(tok, get_range_low());
+        push(tl);
+        set_action(RA_RETURN);   // return from context;
+        return true;             // error pushed
       }
 
    /// pop \b prefix_len items
    void pop_args()
         {
-          Assert1(size() >= prefix_len);
+          Assert1(put >= prefix_len);
           put -= prefix_len;
         }
 
-   /// pop \b prefix_len items and push \b result
+   /// pop \b prefix_len items and push \b result.
+   /* For example:
+
+      Before:   A + B    prefix_len=3, put→A,
+                └─PC─┐
+      After:         Z   prefix_len=1, put→Z, PC(Z_ = PC(A)
+    */
    void pop_args_push_result(const Token & result)
         {
-          Assert1(size() >= prefix_len);
-          content[put - prefix_len].tok.copy(result, LOC);
-          content[put - prefix_len].pc = content[put - 1].pc;
-          put -= prefix_len - 1;
+          Assert1(put >= prefix_len);
+          const int ZB = put - prefix_len;             // positions of B and Z
+          content[ZB].get_token().copy(result, LOC);   // replace B with Z
+          content[ZB].set_PC(at(0).get_PC());          // PC(Z) = PC(A)
+          put -= prefix_len - 1;                       // discard A and +
         }
 
    /// remove the leftmost token (e,g, A in A←B) from the stack and return it.
    /// In e.g. reduce_A_F_B_(), the first pop() would remove A.
    /// IOW, pop() works left-to-right of XXX in reduce_XXX().
    Token_loc & pop()
-      {  Assert1(size() > 0);   return content[--put]; }
+      {  Assert1(put);   return content[--put]; }
 
    /// discard the leftmost token (e,g, A in A←B) from the stack
    void pop_and_discard()
-      {  Assert1(size() > 0);   --put; }
+      {  Assert1(put);   --put; }
 
    /// the number of TOK_LSYMB2 tokens ahead (excluding the leftmost one
    /// already read into content)
    int vector_ass_count() const;
 
+   /// clear the saved_MISC token
+   void clear_MISC(const char * loc)
+      {
+        saved_MISC.set_PC(Function_PC_invalid);
+        saved_MISC.get_token().clear(loc);
+      }
+
    /// reset statement to empty state (e.g. after →N)
    void reset(const char * loc)
       { clean_up();   put = 0;   assign_state = ASS_none;
-        PC_range_high = Function_PC_invalid;
-        saved_MISC.tok.clear(LOC);
+        clear_MISC(loc);
         prefix_len = 0;
       }
 
    /// print the current stack
    void print_stack(ostream & out, const char * loc) const;
 
-   /// set a new PC
-   void set_PC(Function_PC new_pc)
+   /// jump to new PC
+   void goto_PC(Function_PC new_pc)
       { reset(LOC);   PC = new_pc; }
 
    /// return the current PC
@@ -249,7 +274,7 @@ public:
 
    /// return the PC that has caused an error
    Function_PC get_error_PC() const
-      { return content[put - 1].pc; } 
+      { return content[put - 1].get_PC(); } 
 
    /// set the prefix parser action
    void set_action(R_action ra)
@@ -294,8 +319,12 @@ public:
            }
       }
 
-   /// read and resolve the token class left of [ ... ], PC is at ]
+   /// read and resolve the token class left of [ ... ], PC is at ']'
    bool is_value_bracket() const;
+
+   /// reeturn true if \b this prefix has a valid lookahead token
+   int has_MISC() const
+      { return saved_MISC.get_token().get_tag() == TOK_VOID ? 0 : 1; }
 
    /// read and resolve the token class left of )
    bool is_value_parenthesis(int pc) const;
@@ -308,6 +337,11 @@ public:
    Token_loc & at(int idx)
        { Assert1(idx < put);   return content[put - idx - 1]; }
 
+   /// return the TokenClass of \b at(idx)
+   const TokenClass Class_at(int idx) const
+       { Assert1(idx < put);
+         return content[put - idx - 1].get_token().get_Class(); }
+ 
    /// return the idx'th Token_loc (from put position)
    const Token_loc & at(int idx) const
        { Assert1(idx < put);   return content[put - idx - 1]; }
@@ -318,12 +352,16 @@ public:
         const char *   phrase_name;     ///< phrase name
         const char *   reduce_name;     ///< reduce function name
         void (Prefix::*reduce_fun)();   ///< reduce function
-        int            phrase_hash;     ///< phrase hash
+        unsigned int   phrase_hash;     ///< phrase hash
         int            prio;            ///< phrase priority
         int            misc;            ///< 1 if MISC phrase
         int            phrase_len;      ///< phrase length
         uint8_t        sub_nodes[TC_MAX_PHRASE+1];   ///< parent nodes
       };
+
+   /// adjust the right caret after a SYNTAX_ERROR
+   static void adjust_right_caret(Function_PC2 & range,
+                                  const Token_string & failed_statement);
 
 protected:
    /// push the next token onto the stack. Return \b true iff )SI was pushed.
@@ -368,10 +406,14 @@ protected:
    /// the StateIndicator that contains this parser
    StateIndicator & si;
 
-   /// put pointer (for the next token at PC)
+   /// put pointer (for the next token at PC). Since content is a stack,
+   /// its put position is also its size.
    int put;
 
-   /// the lookahead tokens (tokens that were read but not yet reduced)
+   /** the lookahead tokens (tokens that were shifted but not yet reduced).
+       \b content is in body order, that is, content[0] is the oldest 
+       (= rightmost in APL order) token and content[put - 1] is the latest.
+    **/
    Token_loc content[MAX_CONTENT];
 
    /// the X token (leftmost token in MISC phrase, if any)
@@ -385,9 +427,6 @@ protected:
 
    /// assignment state
    Assign_state assign_state;
-
-   /// the highest PC seen in the current statement
-   Function_PC PC_range_high;
 
    /// length of matched prefix (before calling a reduce_XXX() function)
    int prefix_len;

@@ -451,7 +451,7 @@ public:
       }
 
    /// glue two values.
-   static void glue(Token & token, Token & token_A, Token & token_B,
+   static void glue(Token & token, const Token & token_A, const Token & token_B,
                     const char * loc);
 
    /// glue strands A and B

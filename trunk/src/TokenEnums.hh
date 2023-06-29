@@ -114,28 +114,30 @@ enum TokenClass
    /// return true if \b tcl is a niladic, monadic or dyadic function
    inline bool is_function_class(TokenClass tcl)
       {
-        enum { bits = 1 << TC_FUN0
-                      | 1 << TC_FUN1
-                      | 1 << TC_FUN2 };
-        return 0 != (bits & 1 << tcl);
+        enum { BITS = 1 << TC_FUN0 | 1 << TC_FUN1 | 1 << TC_FUN2 };
+        return BITS & 1 << tcl;
       }
 
    /// return true if \b tcl is a monadic or dyadic operator
    inline bool is_operator_class(TokenClass tcl)
       {
-        enum { bits = 1 << TC_OPER1
-                    | 1 << TC_OPER2 };
-        return 0 != (bits & 1 << tcl);
+        enum { BITS = 1 << TC_OPER1 | 1 << TC_OPER2 };
+        return BITS & 1 << tcl;
       }
 
    inline bool is_function_or_operator_class(TokenClass tcl)
       {
-        enum { bits = 1 << TC_FUN0
-                      | 1 << TC_FUN1
-                      | 1 << TC_FUN2
-                      | 1 << TC_OPER1
-                      | 1 << TC_OPER2 };
-        return 0 != (bits & 1 << tcl);
+        enum { BITS = 1 << TC_FUN0  | 1 << TC_FUN1 | 1 << TC_FUN2
+                    | 1 << TC_OPER1 | 1 << TC_OPER2 };
+        return BITS & 1 << tcl;
+      }
+
+   /// return if tcl is a token class that needs a right argument
+   inline bool needs_B(TokenClass tcl)
+      {
+        enum { BITS = 1 << TC_FUN1  | 1 << TC_FUN2
+                    | 1 << TC_OPER1 | 1 << TC_OPER2 };
+        return BITS & 1 << tcl;
       }
 
    /// binding strengths between token classes

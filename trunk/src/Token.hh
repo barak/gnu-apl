@@ -173,7 +173,7 @@ public:
 
    /// destructor
    ~Token()
-     { extract_apl_val("~Token()");  }
+     { release_apl_val("~Token()");  }
 
    /// swap this and \b other
    inline void Hswap(Token & other)
@@ -306,11 +306,7 @@ public:
 
    /// clear the Value_P value (if any) of this token, updating
    /// its refcount as needed
-   void extract_apl_val(const char * loc);
-
-   /// clear the Value_P (if any) without updating its refcount. Return 
-   /// the old Value * that was overridden
-   Value * extract_and_keep(const char * loc);
+   void release_apl_val(const char * loc);
 
    /// change the tag (within the same TokenValueType)
    void ChangeTag(TokenTag new_tag);
@@ -437,8 +433,10 @@ private:
     A Token and its position (in a Token_string)
  */
 /// A Token and its location information (position in a Token_string)
-struct Token_loc
+class Token_loc
 {
+public:
+
    /// constructor: invalid Token_loc
    Token_loc()
    : pc(Function_PC_invalid)
@@ -451,19 +449,51 @@ struct Token_loc
 
    /// constructor: valid Token with valid loc
    Token_loc(const Token & t, Function_PC _pc)
-   : tok(t),
+   : token(t),
      pc(_pc)
    {}
+
+   /// return the position of token in the body that contains it
+   const Function_PC get_PC() const
+      { return pc; }
+
+   /// set the position of token in the body that contains it
+   void set_PC(Function_PC new_pc)
+      { pc = new_pc; }
+
+   /// return the token
+   const Token & get_token() const
+      { return token; }
+
+   /// return the token
+   Token & get_token()
+      { return token; }
+
+   /// return the tag of the token
+   TokenTag get_tag() const
+      { return token.get_tag(); }
+
+   /// return the class of the token
+   TokenClass get_Class() const
+      { return token.get_Class(); }
+
+   Function_P get_function() const
+      { return token.get_function(); }
+
+   /// return the token value type of token
+   TokenValueType get_ValueType() const
+      { return token.get_ValueType(); }
 
    /// copy \b other to this Token_loc
    void copy(const Token_loc & other, const char * loc)
       {
         pc = other.pc;
-        tok.copy(other.tok, loc);
+        token.copy(other.token, loc);
       }
 
+protected:
    /// the token
-   Token tok;
+   Token token;
 
    /// the PC of the leftmost (highest PC) token
    Function_PC pc;

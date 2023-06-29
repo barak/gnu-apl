@@ -3596,7 +3596,7 @@ In GNU APL there is a total of 67 phrases and consequently 67 reduce
 <p>
 reduce functions are typically short. Nevertheless they cannot be inlined
   since they are being called via the function pointer
-  <strong>Prefix::Phrase::reduce_fun()</strong>  in the phrase table (or tree).
+  <strong>Prefix::Phrase::reduce_fun</strong>  in the phrase table (or tree).
 </p>
 </li>
 <li>
@@ -5557,6 +5557,472 @@ The pattern matched above (<strong>3 FOO 42</strong>) is replaced by former valu
 </div>
 </div>
 <div class="sect2">
+<h3 id="_class_stateindicator">Class StateIndicator</h3>
+<div class="paragraph"><p>An <strong>Executable</strong>, as described above, is a static object that is essentially
+the tokenization of some APL source code string(s). An Executable is created
+once and deleted if no longer needed. Between the creation and the detetion of
+an Executable it remains unchanged (aka. static). An Executable is therefore
+comparable to the object code (binary) of a compiled language.</p></div>
+<div class="paragraph"><p>In order to produce a result, an Executable must be <em>executed</em>. While the
+Executable itself remains unchanged, the different executions of the same
+Executable  can have rather different results, e.g. an APL value in one
+execution and an error in another.</p></div>
+<div class="paragraph"><p>Every execution of an Executable is performed in a context which tracks the
+state and the progress of the execution. This context is an object of class
+<strong>StateIndicator</strong>. The complete execution of an Executable consists of the
+following principle steps:</p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+Creation of a new StateIndicator, then
+</p>
+</li>
+<li>
+<p>
+Execution of the Tokens in the body of the executable, then
+</p>
+</li>
+<li>
+<p>
+returning the result of the execution (if any) to the initiator of the
+  execution, and finally
+</p>
+</li>
+<li>
+<p>
+Destruction of the StateIndicator.
+</p>
+</li>
+</ol></div>
+<div class="paragraph"><p>In step 2. above, the execution of (the same or a different) executable is
+started, i.e. before the current execution has completed. To accomplish this,
+the different contexts of different executions, regardless of whether the
+execution concerns the same Executable (direct recursion) or different ones
+(function call, possibly indirect recursion), are organized as a stack, iknown
+as the <em>)SI stack</em>. In GNU APL the )SI stack is a singly-linked list of
+StateIndicator objects, the link between adjacent StateIndicator objects
+in the )SI stack is member <strong>StateIndicator::parent</strong>.</p></div>
+<div class="paragraph"><p>The constructor of StateIndicator has two arguments: the executable to be
+executed and the parent that has initiated the execution:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>StateIndicator.hh:
+   ...
+  /// constructor
+   StateIndicator(const Executable * exec, StateIndicator * _par);
+   ...</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>The constructor innitializes <strong>StateIndicator::parent</strong>, which does not change
+thereafter. Since the )SI stack is a linked list, it can be represented as a
+single pointer to the most recent StateIndicator object. This pointer is
+stored in class <strong>Workspace</strong>:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>Workspace.hh:
+   ...
+   /// the SI stack. Initially top_SI is 0 (empty stack)
+   StateIndicator * top_SI;</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>The full picture is something like this:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>╔═══ Workspace ═══╗     ╔═════ StateIndicator ═══╗
+║        ┌──────┐ ║     ║┌──────┐                ║
+║        │top_SI├─╫─ → ─╢│  0   │                ║    (latest )SI entry)
+║        └──────┘ ║     ║└──────┘                ║
+╚═════════════════╝     ╚╤═══════════════════════╝
+                         ↑
+                     ╔═══╪═ StateIndicator ═══╗
+                     ║┌──┴───┐                ║
+                     ║│parent│                ║
+                     ║└──────┘                ║
+                     ╚╤═══════════════════════╝
+                      ↑
+                               ...
+                      ↑
+                  ╔═══╪═ StateIndicator ═══╗
+                  ║┌──┴───┐                ║
+                  ║│parent│                ║
+                  ║└──────┘                ║
+                  ╚╤═══════════════════════╝
+                   ↑
+               ╔═══╪═ StateIndicator ═══╗
+               ║┌──┴───┐                ║
+               ║│parent│                ║    (oldest )SI entry)
+               ║└──────┘                ║
+               ╚════════════════════════╝</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>By and large the only active StateIndicator is the topmost one. The
+StateIndicators below it are relatively passive and only come back
+to life when the topmost StateIndicator, sometimes refered to as <strong>TOS</strong>
+(for <strong>T</strong>op <strong>O</strong>f <strong>S</strong>tack has finalized step 4. above. An error in the
+execution of TOS normally does not end it, but pushed another StateIndicator
+(with mode immediate execution) onto the stack. The only cases that
+remove (pop) one or more items from the SI stack are:</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+the executable in TOS reaches the end of the body of its Executable.
+  This is the normal case,
+</p>
+</li>
+<li>
+<p>
+the user issues  )SIC command (in immediate execution mode)&gt; This clears
+  the entire )SI stack,
+</p>
+</li>
+<li>
+<p>
+the executable in TOS performs a → statement (aka. Escape), which rolls back
+  the stack until the pop&#8217;ed StateIndicator was an Executable with mode
+  immediate execution. That Executable was the one pushed above (i.e. due to
+  an error). This pops the topmost item(s) until the TOS is an immediate
+  execution context,
+</p>
+</li>
+<li>
+<p>
+the execution of TOS had an error and TOS was under the control of
+  ⎕EA, ⎕EB, or ⎕EC. This pops the topmost item(s) until TOS has the
+  ⎕EA, ⎕EB, or ⎕EC that catches the error (as opposed to the normal
+  error handling which would have pushed another StateIndicator onto
+  the stack rather than poping items of it).
+</p>
+</li>
+</ul></div>
+<div class="paragraph"><p>The TOS is needed in many different situations, therefore class <strong>Workspace</strong>
+provides, for convenience, a number of static wrapper functions that access
+frequently used members of its <strong>top_SI</strong>.</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<img src="/usr/share/asciidoc/icons/note.png" alt="Note" />
+</td>
+<td class="content">Strictly speaking does the <em>APL )SI stack</em> refer to the entire linked
+list of contexts, i.e. to <strong>Workspace::top_SI</strong>. In GNU APL, though, the
+StateIndicator class implements an individual entry in that linked list.</td>
+</tr></table>
+</div>
+<div class="paragraph"><p>Class has two more members of interest:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>StateIndicator.hh:
+   ...
+   /// details of the last error in this context.
+   Error error;
+
+   /// the current-stack of this context.
+   Prefix current_stack;
+   ...</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p><strong>StateIndicator::error</strong> contains the error information (if any) for the
+StateIndicator, e.g. for ⎕EM. There can be several StateIndicators on the
+stack that were (temporarily) suspended and can be continued later
+(by some →N back into the failed Executable and therefore several error
+informations may be present in the different StateIndicator objects.</p></div>
+<div class="paragraph"><p><strong>StateIndicator::current_stack</strong> is far more interesting. It manages
+the inner loop that runs along the body of the Executable of the
+StateIndicator. See below.</p></div>
+</div>
+<div class="sect2">
+<h3 id="_class_prefix">Class Prefix</h3>
+<div class="paragraph"><p>Class <strong>Prefix</strong> is an iterator over the body of an Executable. Its most
+important member is a stack named <strong>content</strong>:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>Prefix.hh:
+
+   ...
+   /// put pointer (for the next token at PC). Since content is a stack,
+   /// its put position is also its size.
+   int put;
+
+   /** the lookahead tokens (tokens that were shifted but not yet reduced).
+       \b content is in body order, that is, content[0] is the oldest
+       (= rightmost in APL order) token and content[put - 1] is the latest.
+    **/
+   Token_loc content[MAX_CONTENT];
+   ...
+   /// one phrase in the phrase table
+   struct Phrase
+      {
+        const char *   phrase_name;     ///&lt; phrase name
+        const char *   reduce_name;     ///&lt; reduce function name
+        void (Prefix::*reduce_fun)();   ///&lt; reduce function
+        unsigned int   phrase_hash;     ///&lt; phrase hash
+        int            prio;            ///&lt; phrase priority
+        int            misc;            ///&lt; 1 if MISC phrase
+        int            phrase_len;      ///&lt; phrase length
+        uint8_t        sub_nodes[TC_MAX_PHRASE+1];   ///&lt; parent nodes
+      };</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>Member <strong>Prefix::content</strong> is by and large processed as follows:</p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+The constructor <strong>Prefix::Prefix()</strong> starts with an empty stack.
+</p>
+</li>
+<li>
+<p>
+If the stack starts with a valid phrase, then:
+</p>
+<div class="olist loweralpha"><ol class="loweralpha">
+<li>
+<p>
+The function <strong>Phrase::reduce_fun</strong> in the phrase is called;
+</p>
+</li>
+<li>
+<p>
+The <strong>reduce_fun()</strong> is a non-static member of class <strong>Prefix</strong> and can
+   therefore access the content in order to produce a result.
+   The <strong>reduce_fun()</strong> has no arguments because accessing <strong>content</strong> directly
+   is far more efficient than using (C++) function arguments.
+</p>
+</li>
+<li>
+<p>
+The <strong>reduce_fun()</strong> will then:
+</p>
+<div class="olist lowerroman"><ol class="lowerroman">
+<li>
+<p>
+extract the relevant data from the tokens <strong>Prefix::content</strong>,
+    remove (pop) the tokens from the <strong>Prefix::content</strong>, and
+</p>
+</li>
+<li>
+<p>
+push the result (if any) onto the <strong>Prefix::content</strong>.
+</p>
+</li>
+</ol></div>
+</li>
+</ol></div>
+</li>
+<li>
+<p>
+Otherwise  the stack does not start with a valid phrase. In this case
+  the next <strong>Token_loc</strong> is fetched from the body of the <strong>Executable</strong>.
+</p>
+</li>
+</ol></div>
+<div class="paragraph"><p>The following picture may illustrate the above (the entire algorithm is
+somewhat more complex):</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>      ╔══ StateIndicator::Executable-&gt;body ═════╗
+      ║                                         ║
+      ║ PC=0  ... PC=k=1  PC=k   ...            ║   PC is Prefix::PC
+      ║┌────┐     ┌─────┐ ┌───┐ ┌───┐ ┌───┐     ║
+      ║│ T0 │ ... │ Tₖ₋₁│ │ Tₖ│ │ T │ │ T │ ... ║   body
+      ║└────┘     └─────┘ └─┬─┘ └───┘ └───┘     ║
+      ╚═════════════════════│═══════════════════╝
+                            │
+                            ↓ Prefix::push_next_token()
+                            │
+                        ╔═══│══ Prefix::content ═════════╗
+                        ║ ┌─┴─┐┌─────┐ ┌─────┐ ┌───┐     ║
+                ┌─── → ───│ Tₖ││ Tₖ₋₁│ │ Tₖ₋₂│ │ T │ ... ║
+                │       ║ └─┬─┘└──┬──┘ └──┬──┘ └───┘     ║
+                │       ╚═══│═════│═══════│══════════════╝
+                │           │     │       │
+                ↑         at0() at1()   at2()
+                │           │     │       │
+                │         ┌─┴─────┴───────┴─┐
+                │         │  reduce_XXX()   │   i.e. (*Phrase::reduce_fun)()
+                │         └───────┬─────────┘
+                │                 │
+                └──── result ─────┘
+                Prefix::pop_args_push_result(result)</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>Apart from <strong>Prefix::content</strong>, Prefix has the following members of interest
+(the others just helpers that make the code more readable):</p></div>
+<div class="ulist"><ul>
+<li>
+<p>
+The Functions <strong>Prefix::at0()</strong>, <strong>Prefix::at1()</strong>, <strong>Prefix::at2()</strong>, and
+  <strong>Prefix::at3()</strong> are primarily used by the different
+  <strong>Phrase::reduce_fun</strong>s in order to acess the (up to) 4 leftmost items
+  in <strong>Prefix::content</strong>. The phrases have different lengths (from 1 to 4)
+  and the matching of a phrase guarantees that sufficiently many
+  <strong>Token_loc</strong>s exist on the stack. It is important
+  to note that, although the body of the <strong>Executable</strong> is in reversed order as
+  explained earlier, at0(), at1(), at2(), at3() are in APL order (to make the
+  code easier to understand). For example the items in phrase <strong>A + B</strong> are:
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+at0() ←→ <strong>A</strong>,
+</p>
+</li>
+<li>
+<p>
+at1() ←→ <strong>+</strong>, and
+</p>
+</li>
+<li>
+<p>
+at2() ←→ <strong>B</strong>.
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+Put differently, <strong>Prefix::content</strong>, has a "hot end" that is manipulated
+with Prefix::push_next_token() and the various reduce_XXX() functions and
+a "cold end" containing tokens that are put on ice for a while.
+</p>
+</li>
+<li>
+<p>
+<strong>Prefix::PC</strong> is the <strong>P</strong>rogram <strong>C</strong>ounter. The APL interpreter can be
+  considered as a (lightweight) virtual machine whose opcodes are Tokens
+  and whose program(s) are lists of Tokens (=  <strong>Executable</strong>s). In this
+  model is <strong>PC</strong> the program counter of the virtual machine.
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+The excution of an executable starts with PC=0 (= start of the body)
+   in constructor <strong>Prefix::Prefix()</strong>.
+</p>
+</li>
+<li>
+<p>
+Whenever a new <strong>Token_loc</strong> is needed (in Step 3. above) then the new
+   <strong>Token_loc</strong> is: <strong>Token_loc(body[PC], PC)</strong> and PC is incremented.
+</p>
+</li>
+<li>
+<p>
+The execution is complete when <strong>PC == body.size()</strong> (or after <strong>→0</strong> in defined
+   functions).
+</p>
+</li>
+</ul></div>
+</li>
+<li>
+<p>
+<strong>saved_MISC</strong>: many APL functions are <em>nomadic</em>, which means that they
+  can be called monadically or dyadically. This includes <em>most</em> APL primitives
+  and <em>all</em> non-niladic  defined functions.
+</p>
+<div class="ulist"><ul>
+<li>
+<p>
+There is a fixed set of <em>MISC</em> tokens (more precisely: <strong>TokenClass</strong>es)
+   that cause a nomadic function to be evaluated monadically: ← → [ ◊ F C M
+   and (.
+</p>
+</li>
+<li>
+<p>
+All phrases that start with a MISC token (and differ only by that token)
+   use the same <strong>Phrase::reduce_fun</strong>. For example, the two APL statements
+   <strong>X←⌊1.5</strong> and <strong>-⌊1.5</strong> will both first match phrase MISC_F_B. This is because -
+   (aka. F) and ← are MISC tokens. Therefore both phrases will first compute
+   <strong>⌊1.5</strong> in <strong>Prefix::reduce_MISC_F_B_()</strong> and result <strong>1</strong>.
+</p>
+</li>
+<li>
+<p>
+In contrast, in APL statement <strong>2⌊1.5</strong> the leftmost value <strong>2</strong> is NOT a MISC
+   token and therefore  <strong>Prefix::reduce_A_F_B_()</strong> will be called.
+</p>
+</li>
+<li>
+<p>
+Unfortunately the decision as to whether <strong>Prefix::reduce_MISC_F_B_()</strong>  or
+   <strong>Prefix::reduce_A_F_B_()</strong> matches can only be made <em>after</em> either <strong>MISC</strong>
+   or <strong>A</strong> was fetched. IOW: this decision requires a lookahead of 1 token (and
+   Prefix is therefore essentially a so-called LALR(1) parser). If the
+   decision is in favour of <strong>Prefix::reduce_A_F_B_()</strong>, then everything is just
+   fine. However, for <strong>Prefix::reduce_MISC_F_B_()</strong> the MISC token is not used
+   and must be considered somehow. The solution is to store the MISC token in
+   C++ variable <strong>Prefix::saved_MISC</strong>. Note that one cannot simply decrement
+   the PC in order to <em>undo</em> the fetching of the MISC token. Decrementing the
+   PC looks much simpler at first glance, but would only work if the MISC
+   token came directly from the body of the <strong>Executable</strong>.
+   Sometimes, though, (defined function <strong>F</strong>, defined operator <strong>M</strong>,
+   or complete index <strong>C</strong>) the MISC token is the result of a Symbol
+   resolution (cases <strong>F</strong> and <strong>M</strong>) or even of a prior computation with
+   side effects (case complete index <strong>C</strong>).
+</p>
+</li>
+</ul></div>
+</li>
+</ul></div>
+<div class="paragraph"><p>The following picture is a slightly more detailed version of the previous one:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>      ╔══ StateIndicator::Executable-&gt;body ═════╗
+      ║                                         ║
+      ║ PC=0  ... PC=k=1  PC=k   ...            ║   PC is Prefix::PC
+      ║┌────┐     ┌─────┐ ┌───┐ ┌───┐ ┌───┐     ║
+      ║│ T0 │ ... │ Tₖ₋₁│ │ Tₖ│ │ T │ │ T │ ... ║   body
+      ║└────┘     └─────┘ └─┬─┘ └───┘ └───┘     ║
+      ╚═════════════════════│═══════════════════╝
+                            ↓
+    Prefix::saved_MISC      │
+                 ┌────┐     │
+             ┌───┤ Tₖ ├─ → ─┤ saved_MISC ≠ TOK_VOID, otherwise body[PC++]
+             │   └─┬──┘     ↓       in: Prefix::push_next_token()
+             │     │        │
+             │     ↑    ╔═══│══ Prefix::content ═════════╗
+             │     └──MISC──┤                            ║
+             │          ║   ↓                            ║
+             ↑          ║ ┌─┴─┐┌─────┐ ┌─────┐ ┌───┐     ║
+             │  ┌─── → ───│ Tₖ││ Tₖ₋₁│ │ Tₖ₋₂│ │ T │ ... ║
+             │  │       ║ └─┬─┘└──┬──┘ └──┬──┘ └───┘     ║
+             │  │       ╚═══│═════│═══════│══════════════╝
+             │  │           │     │       │
+             │  ↑         at0() at1()   at2()
+             │  │           │     │       │
+             │  │         ┌─┴─────┴───────┴─┐
+             │  │         │  reduce_XXX()   │   i.e. (*Phrase::reduce_fun)()
+             │  │         └──────┬──┬───────┘
+             │  │                │  │
+             │  └──── result ────┘  │    in: Prefix::reduce_XXX()
+             │                      │           └─── pop_args_push_result()
+             │                      │
+             └──── clear_MISC() ────┘    in: Prefix::reduce_A_XXX()
+                                 but not in: Prefix::reduce_MISC_XXX()</code>
+
+</pre>
+</div></div>
+</div>
+<div class="sect2">
 <h3 id="_apl_functions">APL Functions</h3>
 <div class="paragraph"><p>APL knows two types of functions:</p></div>
 <div class="ulist"><ul>
@@ -7252,7 +7718,7 @@ Permutationsnetzwerkes als Teil des Multiprozerssorsystems DATIS-P-256.</em>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2023-06-18 18:20:25 CEST
+ 2023-06-28 18:42:13 CEST
 </div>
 </div>
 </body>

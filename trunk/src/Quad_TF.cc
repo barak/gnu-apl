@@ -924,7 +924,7 @@ ShapeItem skipped = 0;
         {
           const Value & aval = *tos[s].get_apl_val();
           sh = Shape(aval, /* ⎕IO */ 0);
-          tos[s].extract_apl_val(LOC);
+          tos[s].release_apl_val(LOC);
         }
         s += 2;     skipped += 2;    // skip ( A
 
@@ -1288,7 +1288,7 @@ ShapeItem skipped = 0;
                   Value_P B = dest.get_apl_val();
                   if (!B->is_simple_scalar())   // unless simple scalar
                      {
-                       dest.extract_apl_val(LOC);    // we will override it
+                       dest.release_apl_val(LOC);    // we will override it
                        Value_P Z(LOC);
                        Z->next_ravel_Pointer(B.get());
                        Z->check_value(LOC);

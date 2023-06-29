@@ -477,7 +477,7 @@ const Prefix & prefix = si.current_stack;
     out << "<Parser size=\""      << prefix.size()
         << "\" assign-pending=\"" << prefix.get_assign_state()
         << "\" action=\""         << prefix.action
-        << "\" lookahead-high=\"" << prefix.get_PC_range_high()
+        << "\" lookahead-high=\"" << prefix.get_lookahead_PC()
         << "\">" << endl;
 
    ++indent;
@@ -689,9 +689,9 @@ void
 XML_Saving_Archive::save_token_loc(const Token_loc & tloc)
 {
    do_indent();
-   out << "<Token pc=\"" << tloc.pc
-       << "\" tag=\"" << HEX(tloc.tok.get_tag()) << "\"";
-   emit_token_val(tloc.tok);
+   out << "<Token pc=\"" << tloc.get_PC()
+       << "\" tag=\"" << HEX(tloc.get_token().get_tag()) << "\"";
+   emit_token_val(tloc.get_token());
 
    out << "/>" << endl;
 }
@@ -2568,7 +2568,7 @@ const Executable * exec = 0;
    Workspace::push_SI(exec, LOC);
 StateIndicator * si = Workspace::SI_top();
    Assert(si);
-   si->set_PC(Function_PC(pc));
+   si->get_prefix().goto_PC(Function_PC(pc));
    read_Parser(*si, lev);
 
    for (;;)
@@ -2687,7 +2687,7 @@ Prefix & parser = si.current_stack;
 
    parser.set_assign_state(Assign_state(ass_state));
    parser.action = R_action(action);
-   parser.PC_range_high = Function_PC(lah_high);
+   parser.set_lookahead_PC(Function_PC(lah_high));
 
    // read derived functions cache
    //
@@ -2731,34 +2731,34 @@ XML_Loading_Archive::read_Token(Token_loc & tloc)
 {
    expect_tag("Token", LOC);
 
-   tloc.pc  = Function_PC(find_int_attr("pc", false, 10));
+   tloc.set_PC(Function_PC(find_int_attr("pc", false, 10)));
 
 const TokenTag tag = TokenTag(find_int_attr("tag", false, 16));
 
    switch(tag & TV_MASK)   // cannot call get_ValueType() yet
       {
         case TV_NONE: 
-               new (&tloc.tok) Token(tag);
+               new (&tloc.get_token()) Token(tag);
              break;
 
         case TV_CHAR:
              {
                const Unicode uni = Unicode(find_int_attr("char", false, 10));
-               new (&tloc.tok) Token(tag, uni);
+               new (&tloc.get_token()) Token(tag, uni);
              }
              break;
 
         case TV_INT:   
              {
                const int64_t ival = find_int_attr("int", false, 10);
-               new (&tloc.tok) Token(tag, ival);
+               new (&tloc.get_token()) Token(tag, ival);
              }
              break;
 
         case TV_FLT:   
              {
                const APL_Float val = find_float_attr("float");
-               new (&tloc.tok) Token(tag, val);
+               new (&tloc.get_token()) Token(tag, val);
              }
              break;
 
@@ -2766,7 +2766,7 @@ const TokenTag tag = TokenTag(find_int_attr("tag", false, 16));
              {
                const APL_Float real = find_float_attr("real");
                const APL_Float imag = find_float_attr("imag");
-               new (&tloc.tok) Token(tag, real, imag);
+               new (&tloc.get_token()) Token(tag, real, imag);
              }
              break;
 
@@ -2781,14 +2781,14 @@ const TokenTag tag = TokenTag(find_int_attr("tag", false, 16));
                Symbol * symbol = Avec::is_quad(name_UCS[0])
                                ? Workspace::lookup_existing_symbol(name_UCS)
                                : Workspace::lookup_symbol(name_UCS);
-               new (&tloc.tok) Token(tag, symbol);
+               new (&tloc.get_token()) Token(tag, symbol);
              }
              break;
 
         case TV_LIN:   
              {
                const int ival = find_int_attr("line", false, 10);
-               new (&tloc.tok) Token(tag, Function_Line(ival));
+               new (&tloc.get_token()) Token(tag, Function_Line(ival));
              }
              break;
 
@@ -2796,7 +2796,7 @@ const TokenTag tag = TokenTag(find_int_attr("tag", false, 16));
              {
                const int vid = find_int_attr("vid", false, 10);
                Assert(vid < int(values.size()));
-               new (&tloc.tok) Token(tag, values[vid]);
+               new (&tloc.get_token()) Token(tag, values[vid]);
              }
              break;
 
@@ -2824,7 +2824,7 @@ const TokenTag tag = TokenTag(find_int_attr("tag", false, 16));
                          vids = utf8P(end);
                        }
                   }
-               new (&tloc.tok) Token(tag, idx);
+               new (&tloc.get_token()) Token(tag, idx);
              }
              break;
 
@@ -2832,7 +2832,7 @@ const TokenTag tag = TokenTag(find_int_attr("tag", false, 16));
              {
                Function_P fun = read_Function_name();
                Assert(fun);
-               new (&tloc.tok) Token(tag, fun);
+               new (&tloc.get_token()) Token(tag, fun);
              }
              break;
 

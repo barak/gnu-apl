@@ -86,10 +86,6 @@ public:
    Function_PC get_PC() const
       { return current_stack.get_PC(); }
 
-   /// set the current PC
-   void set_PC(Function_PC new_pc)
-      { current_stack.set_PC(new_pc); }
-
    /// return the mode of this entry
    ParseMode get_parse_mode() const
       { return executable->get_parse_mode(); }
@@ -135,35 +131,36 @@ public:
        { return si ? si->error : top_level_error; }
 
    /// return left arg (and set \b function)
-   Value_P get_L(UCS_string & function);
+   Value_P get_L(UCS_string & function) const;
 
-   /// change left arg
+   /// change the left argument (if any) of a failed primitive
    void set_L(Value_P value);
 
-   /// return right arg (and set \b function)
-   Value_P get_R(UCS_string & function);
+   /// return the right arg (and set \b function)
+   Value_P get_R(UCS_string & function) const;
 
-   /// change right arg
+   /// change right argument of a failed primitive
    void set_R(Value_P value);
 
    /// return axis arg (and set \b function)
-   Value_P get_X(UCS_string & function);
+   Value_P get_X(UCS_string & function) const;
 
-   /// change axis arg
+   /// change the axis left argument (if any) of a failed primitive
    void set_X(Value_P value);
 
-   /// return true if this SI entry has entered safe execution mode (via ⎕EC)
+   /// return true if \b this )SI entry has entered safe execution mode.
+   /// That is, \b this )SI entry has initiated  ⎕EC)
    bool is_safe_execution_start() const
       { if (!parent)   return safe_execution_count > 0;
         return safe_execution_count > parent->safe_execution_count;
       }
 
    /// return the number of pending ⎕ECs (or other safe execution contexts)
-   int get_safe_execution() const
+   int get_safe_execution_count() const
       { return safe_execution_count; }
 
    /// set safe_execution mode
-   void set_safe_execution()
+   void set_safe_execution_count()
       {
         if (parent)  safe_execution_count = parent->safe_execution_count + 1;
         else         safe_execution_count = 1;
@@ -184,12 +181,12 @@ public:
    const Prefix & get_prefix() const
       { return current_stack; }
 
-   /// return the SI that has called \b this one
+   /// return the SI entry that has called \b this one
    StateIndicator * get_parent() const
       { return parent; }
 
-   /// return the child SI (if any) that \b parent has called
-   static const StateIndicator * find_child(const StateIndicator * parent);
+   /// return the immediate child SI (if any) of \b this )SI entry
+   const StateIndicator * find_child() const;
 
    /// return the level at which sym is pushed for the nth. time
    SI_level nth_push(const Symbol * sym, int from_tos) const;
@@ -204,7 +201,14 @@ protected:
    /// the user function that is being executed
    const Executable * executable;
 
-   /// the number of pending ⎕EC calles
+   /** track ⎕EC calls. The first )SI entry that calls ⎕ES sets
+       \b safe_execution_count to 1 and every child )SI increments it.
+       Therefore:
+
+       1. safe_execution_count != 0 tells if ⎕ES is in effect, and the
+       2. the parent with safe_execution_count == 1 is the one that has
+          initiated ⎕ES (and to which the )SI stack shall be popped on error.
+    */
    int safe_execution_count;
 
    /// The nesting level (of sub-executions)
@@ -217,7 +221,7 @@ protected:
    Prefix current_stack;
 
    /// the StateIndicator that has called this one
-   StateIndicator * parent;
+   StateIndicator * const parent;
 };
 //----------------------------------------------------------------------------
 
