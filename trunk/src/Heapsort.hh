@@ -26,8 +26,6 @@
 
 #include <stdint.h>
 
-#include <vector>
-
 /// heapsort an array of items of type \b T
 template<typename T>
 class Heapsort
@@ -134,16 +132,6 @@ public:
             }
 
         return 0;
-      }
-
-   /// binary search for \b key (of type KEY) in vector \b vec of type T).
-   /// The key is typically a member of T. If not then 0 is returned.
-   template<typename KEY>
-   static const T * search(const KEY & key, std::vector<T> & vec,
-                           int (*compare)(const KEY & key, const T & item,
-                                const void * comp_ctx), const void * ctx)
-      {
-        return search<KEY>(key, &vec[0], vec.size(), compare, ctx);
       }
 
 protected:

@@ -23,7 +23,7 @@
 
 #include <stdint.h>
 
-#include <vector>
+#include "../Vector.hh"    // GNU vs. Clang <vector> wrapper
 
 #include "Svar_record.hh"
 

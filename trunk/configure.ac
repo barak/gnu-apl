@@ -187,6 +187,7 @@ AC_CHECK_HEADERS([                      \
    termios.h                            \
    unistd.h                             \
    utmpx.h                              \
+   vector                               \
    zlib.h                               \
                  ],, apl_missing_headers=$(($apl_missing_headers + 1)))
 

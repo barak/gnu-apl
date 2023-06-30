@@ -21,8 +21,6 @@
 /** @file
 */
 
-#include <vector>
-
 #include <iomanip>
 
 #include "Common.hh"

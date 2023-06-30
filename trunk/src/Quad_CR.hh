@@ -25,7 +25,6 @@
 #ifndef __Quad_CR_HH_DEFINED__
 #define __Quad_CR_HH_DEFINED__
 
-#include <vector>
 #include "QuadFunction.hh"
 
 /**

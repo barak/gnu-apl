@@ -163,6 +163,7 @@ common_SOURCES += UTF8_string.cc				UTF8_string.hh
 common_SOURCES += Value.cc		Value.icc		Value.hh
 common_SOURCES += 			    Value_P.icc		Value_P.hh
 common_SOURCES += ValueHistory.cc				ValueHistory.hh
+common_SOURCES +=								Vector.hh
 common_SOURCES += Workspace.cc	Workspace.icc	Workspace.hh
 common_SOURCES += static_Objects.cc				static_Objects.hh
 

@@ -24,8 +24,6 @@
 #ifndef __PROCESSOR_ID_HH_DEFINED__
 #define __PROCESSOR_ID_HH_DEFINED__
 
-#include <vector>
-
 using namespace std;
 
 #ifdef AP_NUM

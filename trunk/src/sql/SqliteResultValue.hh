@@ -28,7 +28,7 @@
 
 #include <string>
 #include <sqlite3.h>
-#include <vector>
+#include "../Vector.hh"    // GNU vs. Clang <vector> wrapper
 
 class ResultValue
 {

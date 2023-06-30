@@ -25,7 +25,6 @@
 #define __TOKEN_HH_DEFINED__
 
 #include <ostream>
-#include <vector>
 
 #include "Avec.hh"
 #include "Common.hh"

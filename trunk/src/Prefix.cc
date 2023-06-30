@@ -1026,8 +1026,11 @@ Prefix::adjust_right_caret(Function_PC2 & range,
                            const Token_string & failed_statement)
                            
 {
-   // range (of failed_statement) contains a SYNTAX_ERROR, but the right
-   // caret may be too far right (in APL order). Try to narrow the range.
+   // called after a SYNTAX ERROR. The right caret may be too far right
+   // (in APL order). Try to narrow the range.
+   //
+   // range.low is the right (in APL order) end of the statement,
+   // range.high is the left (in APL order) end of the statement,
    //
    for (Function_PC pc = range.low; (pc + 1) < range.high; ++pc)
        {

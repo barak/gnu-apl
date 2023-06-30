@@ -21,8 +21,6 @@
 /** @file
 */
 
-#include <vector>
-
 #include "Avec.hh"
 #include "Bif_F12_FORMAT.hh"
 #include "CDR.hh"

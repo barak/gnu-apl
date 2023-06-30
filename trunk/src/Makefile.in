@@ -239,8 +239,8 @@ am__lib_gnu_apl_la_SOURCES_DIST = Plot_xcb.cc Plot_gtk.cc ../config.h \
 	UserFunction_header.hh UserPreferences.cc UserPreferences.hh \
 	UTF8_string.cc UTF8_string.hh Value.cc Value.icc Value.hh \
 	Value_P.icc Value_P.hh ValueHistory.cc ValueHistory.hh \
-	Workspace.cc Workspace.icc Workspace.hh static_Objects.cc \
-	static_Objects.hh Regexp.cc Regexp.hh \
+	Vector.hh Workspace.cc Workspace.icc Workspace.hh \
+	static_Objects.cc static_Objects.hh Regexp.cc Regexp.hh \
 	sql/SqliteArgListBuilder.cc sql/SqliteArgListBuilder.hh \
 	sql/SqliteConnection.cc sql/SqliteConnection.hh \
 	sql/SqliteResultValue.cc sql/SqliteResultValue.hh \
@@ -408,8 +408,8 @@ am__libapl_la_SOURCES_DIST = Plot_xcb.cc Plot_gtk.cc ../config.h \
 	UserFunction_header.hh UserPreferences.cc UserPreferences.hh \
 	UTF8_string.cc UTF8_string.hh Value.cc Value.icc Value.hh \
 	Value_P.icc Value_P.hh ValueHistory.cc ValueHistory.hh \
-	Workspace.cc Workspace.icc Workspace.hh static_Objects.cc \
-	static_Objects.hh Regexp.cc Regexp.hh \
+	Vector.hh Workspace.cc Workspace.icc Workspace.hh \
+	static_Objects.cc static_Objects.hh Regexp.cc Regexp.hh \
 	sql/SqliteArgListBuilder.cc sql/SqliteArgListBuilder.hh \
 	sql/SqliteConnection.cc sql/SqliteConnection.hh \
 	sql/SqliteResultValue.cc sql/SqliteResultValue.hh \
@@ -557,8 +557,8 @@ am__apl_SOURCES_DIST = main.cc Plot_xcb.cc Plot_gtk.cc ../config.h \
 	UserFunction_header.hh UserPreferences.cc UserPreferences.hh \
 	UTF8_string.cc UTF8_string.hh Value.cc Value.icc Value.hh \
 	Value_P.icc Value_P.hh ValueHistory.cc ValueHistory.hh \
-	Workspace.cc Workspace.icc Workspace.hh static_Objects.cc \
-	static_Objects.hh Regexp.cc Regexp.hh \
+	Vector.hh Workspace.cc Workspace.icc Workspace.hh \
+	static_Objects.cc static_Objects.hh Regexp.cc Regexp.hh \
 	sql/SqliteArgListBuilder.cc sql/SqliteArgListBuilder.hh \
 	sql/SqliteConnection.cc sql/SqliteConnection.hh \
 	sql/SqliteResultValue.cc sql/SqliteResultValue.hh \
@@ -1325,9 +1325,9 @@ common_SOURCES = $(plot_SOURCES) ../config.h APL_Float_as_class.hh \
 	UserFunction_header.hh UserPreferences.cc UserPreferences.hh \
 	UTF8_string.cc UTF8_string.hh Value.cc Value.icc Value.hh \
 	Value_P.icc Value_P.hh ValueHistory.cc ValueHistory.hh \
-	Workspace.cc Workspace.icc Workspace.hh static_Objects.cc \
-	static_Objects.hh $(am__append_3) $(am__append_6) \
-	$(am__append_7) $(am__append_10)
+	Vector.hh Workspace.cc Workspace.icc Workspace.hh \
+	static_Objects.cc static_Objects.hh $(am__append_3) \
+	$(am__append_6) $(am__append_7) $(am__append_10)
 pkglib_LTLIBRARIES = $(am__append_11) $(am__append_12)
 @apl_TARGET_LIBAPL_TRUE@pkginclude_HEADERS = libapl.h Error.def
 @apl_TARGET_LIBAPL_TRUE@libapl_la_SOURCES = $(common_SOURCES) libapl.h libapl.cc

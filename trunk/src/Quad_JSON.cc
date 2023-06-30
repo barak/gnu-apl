@@ -27,8 +27,6 @@
 #include <sys/fcntl.h>   // for O_RDONLY
 #include <sys/stat.h>
 
-#include <vector>
-
 #include "Avec.hh"
 #include "Quad_FIO.hh"
 #include "Quad_JSON.hh"

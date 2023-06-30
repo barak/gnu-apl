@@ -24,8 +24,6 @@
 #ifndef __PRIMITIVE_FUNCTION_HH_DEFINED__
 #define __PRIMITIVE_FUNCTION_HH_DEFINED__
 
-#include <vector>
-
 #include "Common.hh"
 #include "Function.hh"
 #include "Performance.hh"

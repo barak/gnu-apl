@@ -22,7 +22,6 @@
 */
 
 #include <string.h>
-#include <vector>
 
 #include "Bif_F12_COMMA.hh"
 #include "Bif_F12_PARTITION_PICK.hh"

@@ -25,7 +25,6 @@
 
 #include <fstream>
 #include <string.h>
-#include <vector>
 
 #include "DerivedFunction.hh"
 #include "SystemLimits.hh"

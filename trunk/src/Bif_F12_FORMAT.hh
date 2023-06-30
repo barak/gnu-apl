@@ -24,8 +24,6 @@
 #ifndef __BIF_F12_FORMAT_HH_DEFINED__
 #define __BIF_F12_FORMAT_HH_DEFINED__
 
-#include <vector>
-
 #include "PrimitiveFunction.hh"
 
 /** A helper struct for Bif_F12_FORMAT

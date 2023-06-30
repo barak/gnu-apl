@@ -21,8 +21,6 @@
 /** @file
 */
 
-#include <vector>
-
 #include "UCS_string.hh"
 
 #ifndef __UCS_STRING_VECTOR_HH_DEFINED__

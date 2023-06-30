@@ -24,8 +24,6 @@
 #ifndef __WORKSPACE_HH_DEFINED__
 #define __WORKSPACE_HH_DEFINED__
 
-#include <vector>
-
 #include "Command.hh"
 #include "PrimitiveOperator.hh"
 #include "PrintContext.hh"

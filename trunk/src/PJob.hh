@@ -26,8 +26,6 @@
 
 class PrimitiveFunction;
 
-#include <vector>
-
 #include "Assert.hh"
 #include "ConstCell_P.hh"
 #include "PrimitiveFunction.hh"

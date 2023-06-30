@@ -66,8 +66,13 @@ Backtrace::find_src(int64_t pc)
 
    if (pc_2_src.size())   // database was properly set up.
       {
-        if (const PC_src * posp = Heapsort<Backtrace::PC_src>
-                           ::search<const int64_t &>(pc, pc_2_src, &pc_cmp, 0))
+        typedef Heapsort<Backtrace::PC_src> HS;
+        if (const PC_src * posp = HS::search<const int64_t &>
+                                            (pc,                // key
+                                             pc_2_src.data(),   // array
+                                             pc_2_src.size(),   // array size
+                                             &pc_cmp,           // compare fun
+                                             0))                // compare arg
         return posp->src_loc;   // found
       }
 

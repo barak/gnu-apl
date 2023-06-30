@@ -24,7 +24,7 @@
 #ifndef UTIL_HH
 #define UTIL_HH
 
-#include <vector>
+#include "../Vector.hh"    // GNU vs. Clang <vector> wrapper
 #include <string>
 
 std::vector<std::string> split(const std::string &s, char delim);

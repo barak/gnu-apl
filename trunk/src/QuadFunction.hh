@@ -24,8 +24,6 @@
 #ifndef __Quad_FUNCTION_HH_DEFINED__
 #define __Quad_FUNCTION_HH_DEFINED__
 
-#include <vector>
-
 #include "PrimitiveFunction.hh"
 
 //----------------------------------------------------------------------------

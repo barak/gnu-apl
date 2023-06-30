@@ -23,7 +23,6 @@
 
 #include <math.h>
 #include <string.h>
-#include <vector>
 
 #include "Backtrace.hh"
 #include "Common.hh"

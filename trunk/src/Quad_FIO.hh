@@ -26,8 +26,6 @@
 
 #include <signal.h>
 
-#include <vector>
-
 #include "Error_macros.hh"
 #include "PrimitiveOperator.hh"
 #include "QuadFunction.hh"

@@ -5,7 +5,7 @@
 #define ARCHIVE_SVN " 468"
 
 /* How and when GNU APL was configured */
-#define BUILDTAG PACKAGE_NAME, PACKAGE_VERSION " / SVN: 494", "2023-06-29 14:10:23 UTC", "Linux 5.15.0-75-generic x86_64", "default ./configure options"
+#define BUILDTAG PACKAGE_NAME, PACKAGE_VERSION " / SVN: 503", "2023-06-30 17:55:02 UTC", "Linux 5.15.0-75-generic x86_64", "default ./configure options"
 
 /* Define to 1 iff pthread_setaffinity_np() is available */
 #define HAVE_AFFINITY_NP 1
@@ -299,6 +299,9 @@
 
 /* Define to 1 if you have the <utmpx.h> header file. */
 #define HAVE_UTMPX_H 1
+
+/* Define to 1 if you have the <vector> header file. */
+#define HAVE_VECTOR 1
 
 /* Define to 1 if you have the `vfork' function. */
 #define HAVE_VFORK 1

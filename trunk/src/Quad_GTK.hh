@@ -25,7 +25,6 @@
 #define __Quad_GTK_DEFINED__
 
 #include <math.h>
-#include <vector>
 
 #include "QuadFunction.hh"
 #include "Value.hh"

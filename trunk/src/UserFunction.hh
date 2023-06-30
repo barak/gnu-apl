@@ -25,7 +25,6 @@
 #define __USERFUNCTION_HH_DEFINED__
 
 #include <sys/types.h>
-#include <vector>
 
 #include "Error.hh"
 #include "Executable.hh"

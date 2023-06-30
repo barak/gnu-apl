@@ -25,7 +25,6 @@
 #define __SVAR_DB_HH_DEFINED__
 
 #include <iostream>
-#include <vector>
 
 #include "Common.hh"
 #include "ProcessorID.hh"

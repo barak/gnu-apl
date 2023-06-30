@@ -21,8 +21,6 @@
 /** @file
 */
 
-#include <vector>
-
 #include "Logging.hh"
 #include "PointerCell.hh"
 #include "Quad_DLX.hh"

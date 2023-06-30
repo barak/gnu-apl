@@ -28,8 +28,6 @@
 #include <sys/mman.h>
 #include <errno.h>
 
-#include <vector>
-
 #include "Bif_F12_TAKE_DROP.hh"
 #include "Error.hh"
 #include "Output.hh"

@@ -26,7 +26,6 @@
 
 #include <sys/time.h>
 #include <string>
-#include <vector>
 
 #include "Parallel.hh"
 #include "UTF8_string.hh"

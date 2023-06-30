@@ -24,8 +24,6 @@
 #ifndef __PRINT_BUFFER_HH__DEFINED__
 #define __PRINT_BUFFER_HH__DEFINED__
 
-#include <vector>
-
 #include "Avec.hh"
 #include "Common.hh"
 #include "PrintContext.hh"

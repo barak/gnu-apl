@@ -472,7 +472,7 @@ std::vector<const StateIndicator *> stack;
           if (si->get_parse_mode() == PM_FUNCTION)
              {
                Assert(ufun);
-               const Function_PC PC = si->get_prefix().get_error_PC();
+               const Function_PC PC = si->get_prefix().get_range_high();
                if (const ErrorCode ec =
                          StateIndicator::get_error(si).get_error_code())
                   {

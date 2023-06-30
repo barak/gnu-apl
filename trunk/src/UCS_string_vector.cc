@@ -21,8 +21,6 @@
 /** @file
 */
 
-#include <vector>
-
 #include "Avec.hh"
 #include "UCS_string_vector.hh"
 #include "Value.hh"

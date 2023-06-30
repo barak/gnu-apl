@@ -88,9 +88,6 @@ public:
    /// throw an E_LEFT_SYNTAX_ERROR or an E_SYNTAX_ERROR
    void syntax_error(const char * loc);
 
-   /// prevent or allow erase() of values on vstacks
-   void lock_values(bool lock);
-
    /// clear the mark flag of all values in \b this Prefix
    void unmark_all_values() const;
 
@@ -271,10 +268,6 @@ public:
    /// return the current PC
    Function_PC get_PC() const
       { return PC; }
-
-   /// return the PC that has caused an error
-   Function_PC get_error_PC() const
-      { return content[put - 1].get_PC(); } 
 
    /// set the prefix parser action
    void set_action(R_action ra)

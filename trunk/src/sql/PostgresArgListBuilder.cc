@@ -24,7 +24,7 @@
 #include "PostgresArgListBuilder.hh"
 
 #include <string.h>
-#include <vector>
+#include "../Vector.hh"    // GNU vs. Clang <vector> wrapper
 
 template<class T>
 PostgresBindArg<T>::~PostgresBindArg()

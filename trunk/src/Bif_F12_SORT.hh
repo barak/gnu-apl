@@ -24,8 +24,6 @@
 #ifndef __COLLATING_CACHE_HH_DEFINED__
 #define __COLLATING_CACHE_HH_DEFINED__
 
-#include <vector>
-
 #include "Common.hh"
 #include "PrimitiveFunction.hh"
 #include "Token.hh"

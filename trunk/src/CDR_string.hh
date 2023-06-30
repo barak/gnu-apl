@@ -24,8 +24,6 @@
 #ifndef __CDR_STRING_HH_DEFINED__
 #define __CDR_STRING_HH_DEFINED__
 
-#include <vector>
-
 #include "UTF8_string.hh"
 
 /// the header of a CDR record
@@ -63,7 +61,7 @@ struct CDR_header
 };
 
 /// a string containing a CDR record
-class CDR_string : public std::vector<uint8_t>
+class CDR_string : public UTF8_string
 {
 public:
    /// Constructor: An uninitialized CDR structure
@@ -76,7 +74,7 @@ public:
 
   /// overload basic_string::size() so that it returns a signed length
    ShapeItem size() const
-      { return  ShapeItem(vector<uint8_t>::size()); }
+      { return  UTF8_string::size(); }
 
    /// return the bytes of this CDR
    const uint8_t * get_items() const

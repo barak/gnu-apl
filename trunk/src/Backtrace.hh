@@ -25,7 +25,6 @@
 #define __BACKTRACE_HH_DEFINED__
 
 #include <stdint.h>
-#include <vector>
 
 #include "Common.hh"
 #include "PrintOperator.hh"

@@ -24,8 +24,6 @@
 #ifndef __Quad_RVAL_DEFINED__
 #define __Quad_RVAL_DEFINED__
 
-#include <vector>
-
 using namespace std;
 
 #include "QuadFunction.hh"

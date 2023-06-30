@@ -21,8 +21,6 @@
 /** @file
 */
 
-#include <vector>
-
 #include "Bif_OPER1_REDUCE.hh"
 #include "Macro.hh"
 #include "PointerCell.hh"

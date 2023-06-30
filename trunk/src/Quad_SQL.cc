@@ -23,7 +23,6 @@
 
 #include <string.h>
 #include <typeinfo>
-#include <vector>
 
 #include "Common.hh"
 

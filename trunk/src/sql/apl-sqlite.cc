@@ -21,10 +21,11 @@
 /** @file
 */
 
+#include "../Vector.hh"    // GNU vs. Clang <vector> wrapper
+
 #include "apl-sqlite.hh"
 #include "NativeFunction.hh"
 
-#include <vector>
 #include <map>
 #include <typeinfo>
 

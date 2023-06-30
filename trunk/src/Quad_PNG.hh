@@ -26,7 +26,6 @@
 
 #include <pthread.h>
 #include <semaphore.h>
-#include <vector>
 
 #include "QuadFunction.hh"
 

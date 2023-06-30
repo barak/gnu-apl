@@ -28,7 +28,6 @@
 #include "UTF8_string.hh"
 
 #include <ostream>
-#include <vector>
 
 using namespace std;
 

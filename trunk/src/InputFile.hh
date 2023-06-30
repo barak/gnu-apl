@@ -24,8 +24,6 @@
 #ifndef __INPUT_FILE_HH_DEFINED__
 #define __INPUT_FILE_HH_DEFINED__
 
-#include <vector>
-
 #include "UTF8_string.hh"
 #include "UCS_string_vector.hh"
 

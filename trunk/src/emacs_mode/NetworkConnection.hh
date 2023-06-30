@@ -26,7 +26,7 @@
 
 #include <pthread.h>
 #include <string>
-#include <vector>
+#include "../Vector.hh"    // GNU vs. Clang <vector> wrapper
 #include <map>
 
 #include "NetworkCommand.hh"

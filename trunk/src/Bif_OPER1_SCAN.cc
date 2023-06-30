@@ -21,8 +21,6 @@
 /** @file
 */
 
-#include <vector>
-
 #include "Bif_OPER1_REDUCE.hh"
 #include "Bif_OPER1_SCAN.hh"
 #include "LvalCell.hh"

@@ -43,7 +43,7 @@
 
 #include <iostream>
 #include <sstream>
-#include <vector>
+#include "../Vector.hh"    // GNU vs. Clang <vector> wrapper
 #include <sys/types.h>
 #include <sys/socket.h>
 #include <netinet/in.h>

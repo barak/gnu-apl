@@ -27,8 +27,6 @@
 #include <iostream>
 #include <iomanip>
 
-#include <vector>
-
 #include "Common.hh"
 
 // always require libX11

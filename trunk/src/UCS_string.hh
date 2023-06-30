@@ -35,6 +35,7 @@
 #include "TokenEnums.hh"
 #include "Unicode.hh"
 #include "UTF8_string.hh"
+#include "Vector.hh"    // GNU vs. Clang <vector> wrapper
 
 using namespace std;
 

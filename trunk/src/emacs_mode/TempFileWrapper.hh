@@ -24,7 +24,7 @@
 #ifndef TEMP_FILE_WRAPPER_HH
 #define TEMP_FILE_WRAPPER_HH
 
-#include <vector>
+#include "../Vector.hh"    // GNU vs. Clang <vector> wrapper
 #include <string>
 
 class FileWrapper {

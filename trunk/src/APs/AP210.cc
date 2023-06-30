@@ -30,7 +30,7 @@
 #include <cassert>
 #include <iomanip>
 #include <iostream>
-#include <vector>
+#include "../Vector.hh"    // GNU vs. Clang <vector> wrapper
 
 #include "CDR_string.hh"
 #include "APmain.hh"

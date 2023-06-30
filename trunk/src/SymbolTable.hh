@@ -25,7 +25,6 @@
 #define __SYMBOLTABLE_HH_DEFINED__
 
 #include <stdint.h>
-#include <vector>
 
 #include "UCS_string.hh"
 

@@ -22,7 +22,6 @@
 */
 
 #include <sys/types.h>
-#include <vector>
 
 #include "Bif_F12_PARTITION_PICK.hh"
 #include "CDR_string.hh"

@@ -26,7 +26,7 @@
 
 #include "NetworkCommand.hh"
 #include "emacs.hh"
-#include <vector>
+#include "../Vector.hh"    // GNU vs. Clang <vector> wrapper
 
 // help command returns the entries from Help.def in
 // form of S-expressions.
