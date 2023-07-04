@@ -34,8 +34,7 @@
 #include "Tokenizer.hh"
 #include "Workspace.hh"
 
-Quad_TF   Quad_TF::_fun;
-Quad_TF * Quad_TF::fun = &Quad_TF::_fun;
+Quad_TF   Quad_TF::fun;
 
 enum { Quad_PP_TF = 17 };
 

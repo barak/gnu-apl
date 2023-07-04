@@ -76,19 +76,16 @@ INFO(StateIndicator::top_level_error, __LINE__)
 Error StateIndicator::top_level_error(E_NO_ERROR, LOC);
 
 INFO(Quad_CR::fun, __LINE__)
-Quad_CR Quad_CR   ::_fun;
-Quad_CR * Quad_CR ::fun = &Quad_CR ::_fun;
+Quad_CR Quad_CR   ::fun;
 
 INFO(Quad_EC::fun, __LINE__)
-Quad_EC Quad_EC   ::_fun;
-Quad_EC * Quad_EC ::fun = &Quad_EC ::_fun;
+Quad_EC Quad_EC   ::fun;
 
 INFO(Quad_ES::fun, __LINE__)
-Quad_ES Quad_ES   ::_fun;
-Quad_ES * Quad_ES ::fun = &Quad_ES ::_fun;
+Quad_ES Quad_ES   ::fun;
 
 INFO(CPU_pool::the_CPUs, __LINE__);
-std::vector<CPU_Number> CPU_pool::the_CPUs;
+std::basic_string<CPU_Number> CPU_pool::the_CPUs;
 
 INFO(Macro::all_macros, __LINE__)
 #define mac_def(name, txt) Macro Macro::name(MAC_ ## name, UTF8_string(txt));

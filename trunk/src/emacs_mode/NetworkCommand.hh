@@ -25,7 +25,7 @@
 #define NETWORK_COMMAND_HH
 
 #include <string>
-#include "../Vector.hh"    // GNU vs. Clang <vector> wrapper
+#include <vector>
 
 class NetworkConnection;
 

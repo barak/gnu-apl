@@ -125,8 +125,7 @@ public:
    : NonscalarFunction(TOK_F0_ZILDE)
    {}
 
-   static Bif_F0_ZILDE * fun;   ///< Built-in function
-   static Bif_F0_ZILDE  _fun;   ///< Built-in function
+   static Bif_F0_ZILDE  fun;   ///< Built-in function
 
    /// overladed Function::eval_()
    virtual Token eval_() const;
@@ -146,8 +145,7 @@ public:
    : NonscalarFunction(TOK_F1_EXECUTE)
    {}
 
-   static Bif_F1_EXECUTE * fun;   ///< Built-in function
-   static Bif_F1_EXECUTE  _fun;   ///< Built-in function
+   static Bif_F1_EXECUTE  fun;   ///< Built-in function
 
    /// execute string containing an APL expression or an APL command
    static Token execute_statement(UCS_string & statement);
@@ -182,8 +180,7 @@ public:
    /// overloaded Function::eval_AXB()
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
 
-   static Bif_F2_INDEX * fun;   ///< Built-in function
-   static Bif_F2_INDEX  _fun;   ///< Built-in function
+   static Bif_F2_INDEX  fun;   ///< Built-in function
 protected:
 };
 //----------------------------------------------------------------------------
@@ -204,8 +201,7 @@ public:
    /// overloaded Function::eval_AB()
    virtual Token eval_AB(Value_P A, Value_P B) const;
 
-   static Bif_F12_ELEMENT * fun;   ///< Built-in function
-   static Bif_F12_ELEMENT  _fun;   ///< Built-in function
+   static Bif_F12_ELEMENT  fun;   ///< Built-in function
 
    /// implementation of eval_B()
    static Value_P do_eval_B(const Value * B);
@@ -229,8 +225,7 @@ public:
    /// overloaded Function::eval_AB()
    virtual Token eval_AB(Value_P A, Value_P B) const;
 
-   static Bif_F12_EQUIV * fun;   ///< Built-in function
-   static Bif_F12_EQUIV  _fun;   ///< Built-in function
+   static Bif_F12_EQUIV  fun;   ///< Built-in function
 
 protected:
    /// return the depth of B
@@ -253,8 +248,7 @@ public:
    /// overloaded Function::eval_AB()
    virtual Token eval_AB(Value_P A, Value_P B) const;
 
-   static Bif_F12_NEQUIV * fun;   ///< Built-in function
-   static Bif_F12_NEQUIV  _fun;   ///< Built-in function
+   static Bif_F12_NEQUIV  fun;   ///< Built-in function
 };
 //----------------------------------------------------------------------------
 /** System function encode */
@@ -270,8 +264,7 @@ public:
    /// overloaded Function::eval_AB()
    virtual Token eval_AB(Value_P A, Value_P B) const;
 
-   static Bif_F12_ENCODE * fun;   ///< Built-in function
-   static Bif_F12_ENCODE  _fun;   ///< Built-in function
+   static Bif_F12_ENCODE  fun;   ///< Built-in function
 
 protected:
    /// encode *ib() according to A (integer A and b)
@@ -303,8 +296,7 @@ public:
    /// overloaded Function::eval_AB()
    virtual Token eval_AB(Value_P A, Value_P B) const;
 
-   static Bif_F12_DECODE * fun;   ///< Built-in function
-   static Bif_F12_DECODE  _fun;   ///< Built-in function
+   static Bif_F12_DECODE  fun;   ///< Built-in function
 
 protected:
    /// decode B according to len_A and cA (integer A, B and Z)
@@ -362,8 +354,7 @@ public:
    /// overloaded Function::eval_AXB()
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
 
-   static Bif_F12_ROTATE * fun;   ///< Built-in function
-   static Bif_F12_ROTATE  _fun;   ///< Built-in function
+   static Bif_F12_ROTATE  fun;   ///< Built-in function
 protected:
 };
 //----------------------------------------------------------------------------
@@ -391,8 +382,7 @@ public:
    /// overloaded Function::eval_AXB()
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
 
-   static Bif_F12_ROTATE1 * fun;   ///< Built-in function
-   static Bif_F12_ROTATE1  _fun;   ///< Built-in function
+   static Bif_F12_ROTATE1  fun;   ///< Built-in function
 protected:
 };
 //----------------------------------------------------------------------------
@@ -413,8 +403,7 @@ public:
    /// overloaded Function::eval_AB()
    virtual Token eval_AB(Value_P A, Value_P B) const;
 
-   static Bif_F12_TRANSPOSE * fun;   ///< Built-in function
-   static Bif_F12_TRANSPOSE  _fun;   ///< Built-in function
+   static Bif_F12_TRANSPOSE  fun;   ///< Built-in function
 
    /// Transpose B according to axes A (without diagonals)
    static Value_P transpose(const Shape & A, const Value * B);
@@ -453,8 +442,7 @@ public:
    /// Reshape B according to rank and shape
    static Token do_reshape(const Shape & shape, const Value & B);
 
-   static Bif_F12_RHO * fun;   ///< Built-in function
-   static Bif_F12_RHO  _fun;   ///< Built-in function
+   static Bif_F12_RHO  fun;   ///< Built-in function
 protected:
 };
 //----------------------------------------------------------------------------
@@ -475,10 +463,9 @@ public:
    virtual Token eval_B(Value_P B) const;
 
    /// pointer to _fun
-   static Bif_F12_UNION * fun;
 
    /// Built-in function
-   static Bif_F12_UNION  _fun;
+   static Bif_F12_UNION  fun;
 
 protected:
    /// a range of indices (including \b from, excluding \b to)
@@ -524,8 +511,7 @@ public:
    /// overloaded Function::eval_AB()
    virtual Token eval_AB(Value_P A, Value_P B) const;
 
-   static Bif_F2_INTER  _fun;   ///< Built-in function
-   static Bif_F2_INTER * fun;   ///< pointer to _fun
+   static Bif_F2_INTER  fun;   ///< Built-in function
 
 protected:
 };
@@ -548,8 +534,7 @@ public:
    virtual Token eval_AB(Value_P A, Value_P B) const
       { return Token(TOK_APL_VALUE1, A->clone(LOC)); }
 
-   static Bif_F2_LEFT * fun;   ///< Built-in function
-   static Bif_F2_LEFT  _fun;   ///< Built-in function
+   static Bif_F2_LEFT  fun;   ///< Built-in function
 protected:
 };
 //----------------------------------------------------------------------------
@@ -574,8 +559,7 @@ public:
    /// overloaded Function::eval_AXB()
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
 
-   static Bif_F2_RIGHT * fun;   ///< Built-in function
-   static Bif_F2_RIGHT  _fun;   ///< Built-in function
+   static Bif_F2_RIGHT  fun;   ///< Built-in function
 protected:
 };
 //----------------------------------------------------------------------------

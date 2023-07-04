@@ -30,10 +30,10 @@
 
 #include "Quad_PNG.hh"
 
-Quad_PNG  Quad_PNG::_fun;
-Quad_PNG * Quad_PNG::fun = &Quad_PNG::_fun;
+Quad_PNG  Quad_PNG::fun;
 
-#if defined( apl_GTK3             ) && \
+#if apl_X11                         && \
+    defined( apl_GTK3             ) && \
     defined( HAVE_LIBGTK_3        ) && \
     defined( HAVE_LIBZ            ) && \
     defined( HAVE_ZLIB_H          ) && \
@@ -109,7 +109,7 @@ struct PNG_context
 int PNG_context::next_handle = 0;
 
 /// all PNG_contexts (= all open windows) for ⎕PNG
-static vector<PNG_context *> all_PNG_contexts;
+static basic_string<PNG_context *> all_PNG_contexts;
 //-----------------------------------------------------------------------------
 Quad_PNG::Quad_PNG()
   : QuadFunction(TOK_Quad_PNG)

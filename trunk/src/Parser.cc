@@ -81,7 +81,7 @@ Parser::parse(const Token_string & input, Token_string & tos,
 
    // split input line into statements (separated by ◊)
    //
-std::vector<Token_string *> statements;
+std::basic_string<Token_string *> statements;
    {
      Token_string * stat = new Token_string();
      int curly_depth = 0;
@@ -573,37 +573,37 @@ bool TOK_VOID_inserted = false;
          switch(tos[t+1].get_tag())
             {
               case TOK_F2_AND:
-                   tos[t] = Token(TOK_F2_AND_B, &Bif_F2_AND_B::_fun);
+                   tos[t] = Token(TOK_F2_AND_B, &Bif_F2_AND_B::fun);
                    tos[++t].clear(LOC);
                    TOK_VOID_inserted = true;
                    continue;
 
               case TOK_F2_OR:
-                   tos[t] = Token(TOK_F2_OR_B, &Bif_F2_OR_B::_fun);
+                   tos[t] = Token(TOK_F2_OR_B, &Bif_F2_OR_B::fun);
                    tos[++t].clear(LOC);
                    TOK_VOID_inserted = true;
                    continue;
 
               case TOK_F2_NAND:
-                   tos[t] = Token(TOK_F2_NAND_B,&Bif_F2_NAND_B::_fun);
+                   tos[t] = Token(TOK_F2_NAND_B,&Bif_F2_NAND_B::fun);
                    tos[++t].clear(LOC);
                    TOK_VOID_inserted = true;
                    continue;
 
               case TOK_F2_NOR:
-                   tos[t] = Token(TOK_F2_NOR_B, &Bif_F2_NOR_B::_fun);
+                   tos[t] = Token(TOK_F2_NOR_B, &Bif_F2_NOR_B::fun);
                    tos[++t].clear(LOC);
                    TOK_VOID_inserted = true;
                    continue;
 
               case TOK_F2_EQUAL:
-                   tos[t] = Token(TOK_F2_EQUAL_B, &Bif_F2_EQUAL_B::_fun);
+                   tos[t] = Token(TOK_F2_EQUAL_B, &Bif_F2_EQUAL_B::fun);
                    tos[++t].clear(LOC);
                    TOK_VOID_inserted = true;
                    continue;
 
               case TOK_F2_UNEQU:
-                   tos[t] = Token(TOK_F2_UNEQ_B, &Bif_F2_UNEQ_B::_fun);
+                   tos[t] = Token(TOK_F2_UNEQ_B, &Bif_F2_UNEQ_B::fun);
                    tos[++t].clear(LOC);
                    TOK_VOID_inserted = true;
                    continue;
@@ -773,7 +773,7 @@ bool progress = false;
    //
    // The optimization starts at "6" (end of statement) and restarts at ")".
    //
-vector<ShapeItem> ends;
+basic_string<ShapeItem> ends;
    ends.push_back(tos.size());
 
    // tos is in forward (aka. APL) order. We move backwards from the end
@@ -842,7 +842,7 @@ vector<ShapeItem> ends;
          if (is_dyadic)
             {
               Token & tok_A = tos[src_AQ];
-              if (fun == Bif_F12_RHO::fun)   // dyadic A⍴B
+              if (fun == &Bif_F12_RHO::fun)   // dyadic A⍴B
                  {
                     // NOTE: we use Bif_F12_RHO::do_reshape() instead of
                     //       Bif_F12_RHO::eval_AB() as to bypass the A⍴B
@@ -853,7 +853,7 @@ vector<ShapeItem> ends;
             
                     if (sh_A.fits_into(cfg_SHORT_VALUE_LENGTH_WANTED))
                        {
-                         Token tZ = Bif_F12_RHO::fun->do_reshape(sh_A, *B);
+                         Token tZ = Bif_F12_RHO::fun.do_reshape(sh_A, *B);
                          tok_A.clear(LOC);   // set A to TOK_VOID
                          tok_F.clear(LOC);   // set F to TOK_VOID
                          tok_B.clear(LOC);   // set F to TOK_VOID
@@ -866,7 +866,7 @@ vector<ShapeItem> ends;
             }
          else if (is_monadic)
             {
-              if (fun == Bif_F12_COMMA::fun)            // monadic ,B
+              if (fun == &Bif_F12_COMMA::fun)            // monadic ,B
                  {
                    const Shape new_shape(B->element_count());
                    B->set_shape(new_shape);
@@ -874,7 +874,7 @@ vector<ShapeItem> ends;
                    OptmizationStatistics::count(OPTI_FT_SHORT_PRIMITIVE);
                    progress = true;
                  }
-              else if (fun == Bif_F12_COMMA1::fun)      // monadic ⍪B
+              else if (fun == &Bif_F12_COMMA1::fun)      // monadic ⍪B
                  {
                    const Shape & sh_B = B->get_shape();
                    ShapeItem low_volume = 1;   // ×/1↓⍴B
@@ -886,7 +886,7 @@ vector<ShapeItem> ends;
                         OptmizationStatistics::count(OPTI_FT_SHORT_PRIMITIVE);
                         progress = true;
                  }
-              else if (fun == Bif_F12_PARTITION::fun)   // monadic ⊂B
+              else if (fun == &Bif_F12_PARTITION::fun)   // monadic ⊂B
                  {
                    if (!B->is_simple_scalar())   // otherwise ⊂B is B
                       {
@@ -928,7 +928,7 @@ const VoidCount ret = VoidCount(tos.size() - dst);
 ErrorCode
 Parser::match_par_bra(Token_string & tos, bool backwards)
 {
-std::vector<ShapeItem> stack;
+std::basic_string<ShapeItem> stack;
    loop(s, tos.size())
        {
          const ShapeItem t = backwards ? (tos.size() - 1) - s : s;

@@ -25,11 +25,8 @@
 #include "StateIndicator.hh"
 #include "Workspace.hh"
 
-Bif_F12_COMMA  Bif_F12_COMMA ::_fun;    // ,
-Bif_F12_COMMA1 Bif_F12_COMMA1::_fun;    // ⍪
-
-Bif_F12_COMMA  * Bif_F12_COMMA ::fun = &Bif_F12_COMMA    ::_fun;
-Bif_F12_COMMA1 * Bif_F12_COMMA1::fun = &Bif_F12_COMMA1   ::_fun;
+Bif_F12_COMMA  Bif_F12_COMMA ::fun;    // ,
+Bif_F12_COMMA1 Bif_F12_COMMA1::fun;    // ⍪
 
 //============================================================================
 Token

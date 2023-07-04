@@ -20877,6 +20877,9 @@ test "x$apl_have_opt_lib" = "xno" && return
 
 apl_X11=yes
 } }
+
+# call dash_test_X11() above and set result variables...
+#
 dash_test_X11   # set apl_X11 to yes or no.
 
 # export apl_X11 to config.h
@@ -22055,9 +22058,13 @@ printf "%s\n" "no (says pkg-config)" >&6; }
 fi
 
 } }
+
+# call dash_test_GTK() above and set result variables...
+#
 dash_test_GTK   # set apl_GTK3 to yes or no.
 
 # export apl_GTK3 to config.h
+#
 if test "x$apl_GTK3" = "xyes"; then
 
 printf "%s\n" "#define apl_GTK3 1" >>confdefs.h

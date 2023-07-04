@@ -48,7 +48,6 @@ public:
    PJob_scalar_B()
    : len_Z(0),
      error(E_NO_ERROR),
-     fun(0),
      fun1(0)
    {}
 
@@ -58,7 +57,6 @@ public:
      value_Z(Z, LOC),
      len_Z(Z->nz_element_count()),
      error(E_NO_ERROR),
-     fun(0),
      fun1(0)
    {}
 
@@ -80,9 +78,6 @@ public:
 
    /// an error detected during computation of, eg. fun1 or fun2
    ErrorCode error;
-
-   /// the APL function being computed
-   const PrimitiveFunction * fun;   // not initialized by constructor!
 
    /// the monadic cell function to be computed
    prim_f1 fun1;   // not initialized by constructor!
@@ -106,7 +101,6 @@ public:
      inc_A(0),
      inc_B(0),
      error(E_NO_ERROR),
-     fun(0),
      fun2(0)
    {}
 
@@ -119,7 +113,6 @@ public:
      inc_A(A->get_increment()),
      inc_B(B->get_increment()),
      error(E_NO_ERROR),
-     fun(0),
      fun2(0)
    {}
 
@@ -151,9 +144,6 @@ public:
 
    /// an error detected during computation of, eg. fun1 or fun2
    ErrorCode error;
-
-   /// the APL function being computed
-   const PrimitiveFunction * fun;   // not initialized by constructor!
 
    /// the dyadic cell function to be computed
    prim_f2 fun2;   // not initialized by constructor!

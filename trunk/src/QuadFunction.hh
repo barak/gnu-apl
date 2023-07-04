@@ -61,8 +61,7 @@ public:
    /// overloaded Function::eval_B().
    virtual Token eval_B(Value_P B) const;
 
-   static Quad_AF * fun;          ///< Built-in function.
-   static Quad_AF  _fun;          ///< Built-in function.
+   static Quad_AF  fun;          ///< Built-in function.
 
 protected:
 };
@@ -78,8 +77,7 @@ public:
    /// overloaded Function::eval_AB().
    virtual Token eval_AB(Value_P A, Value_P B) const;
 
-   static Quad_AT * fun;          ///< Built-in function.
-   static Quad_AT  _fun;          ///< Built-in function.
+   static Quad_AT  fun;          ///< Built-in function.
 
 protected:
 };
@@ -92,8 +90,7 @@ public:
    /// Constructor.
    Quad_DL() : QuadFunction(TOK_Quad_DL) {}
 
-   static Quad_DL * fun;          ///< Built-in function.
-   static Quad_DL  _fun;          ///< Built-in function.
+   static Quad_DL  fun;          ///< Built-in function.
 
 protected:
    /// overloaded Function::eval_B().
@@ -113,8 +110,7 @@ public:
    /// overladed Function::may_push_SI()
    virtual bool may_push_SI() const   { return true; }
 
-   static Quad_EA * fun;          ///< Built-in function.
-   static Quad_EA  _fun;          ///< Built-in function.
+   static Quad_EA  fun;          ///< Built-in function.
 
 protected:
    /// overloaded Function::eval_AB().
@@ -134,8 +130,7 @@ public:
    /// overladed Function::may_push_SI()
    virtual bool may_push_SI() const   { return true; }
 
-   static Quad_EB * fun;          ///< Built-in function.
-   static Quad_EB  _fun;          ///< Built-in function.
+   static Quad_EB  fun;          ///< Built-in function.
 
 protected:
    /// overloaded Function::eval_AB().
@@ -155,8 +150,7 @@ public:
    /// overladed Function::may_push_SI()
    virtual bool may_push_SI() const   { return true; }
 
-   static Quad_EC * fun;          ///< Built-in function.
-   static Quad_EC  _fun;          ///< Built-in function.
+   static Quad_EC  fun;          ///< Built-in function.
 
    /// end of context handler for ⎕EC
    static void eoc(Token & token);
@@ -179,8 +173,7 @@ public:
    /// Constructor.
    Quad_ENV() : QuadFunction(TOK_Quad_ENV) {}
 
-   static Quad_ENV * fun;          ///< Built-in function.
-   static Quad_ENV  _fun;          ///< Built-in function.
+   static Quad_ENV  fun;          ///< Built-in function.
 
 protected:
    /// overloaded Function::eval_B().
@@ -197,8 +190,7 @@ public:
    /// Constructor.
    Quad_ES() : QuadFunction(TOK_Quad_ES) {}
 
-   static Quad_ES * fun;          ///< Built-in function.
-   static Quad_ES  _fun;          ///< Built-in function.
+   static Quad_ES  fun;          ///< Built-in function.
 
 protected:
    /// overloaded Function::eval_AB().
@@ -224,8 +216,7 @@ public:
    /// Constructor.
    Quad_EX() : QuadFunction(TOK_Quad_EX) {}
 
-   static Quad_EX * fun;          ///< Built-in function.
-   static Quad_EX  _fun;          ///< Built-in function.
+   static Quad_EX  fun;          ///< Built-in function.
 
    /// disassociate name from value, return 0 on failure or 1 on success.
    static int expunge(const UCS_string & name);
@@ -249,8 +240,7 @@ public:
        Quad_INP_running = false;
      }
 
-   static Quad_INP * fun;          ///< Built-in function.
-   static Quad_INP  _fun;          ///< Built-in function.
+   static Quad_INP  fun;          ///< Built-in function.
 
 protected:
    /// overloaded Function::eval_AB().
@@ -307,8 +297,7 @@ public:
    /// Constructor.
    Quad_NA() : QuadFunction(TOK_Quad_NA) {}
 
-   static Quad_NA * fun;          ///< Built-in function.
-   static Quad_NA  _fun;          ///< Built-in function.
+   static Quad_NA  fun;          ///< Built-in function.
 
 protected:
    /// overloaded Function::eval_AB()
@@ -336,8 +325,7 @@ public:
    /// return the ⎕NC for variable name \b var
    static APL_Integer get_NC(const UCS_string var);
 
-   static Quad_NC * fun;          ///< Built-in function.
-   static Quad_NC  _fun;          ///< Built-in function.
+   static Quad_NC  fun;          ///< Built-in function.
 
 protected:
 };
@@ -360,8 +348,7 @@ public:
    virtual Token eval_AB(Value_P A, Value_P B) const
       { return do_quad_NL(A, B); }
 
-   static Quad_NL * fun;          ///< Built-in function.
-   static Quad_NL  _fun;          ///< Built-in function.
+   static Quad_NL  fun;          ///< Built-in function.
 
 protected:
    /// return A ⎕NL B
@@ -384,8 +371,7 @@ public:
    /// overloaded Function::eval_AB().
    virtual Token eval_B(Value_P B) const;
 
-   static Quad_SI * fun;          ///< Built-in function.
-   static Quad_SI  _fun;          ///< Built-in function.
+   static Quad_SI  fun;          ///< Built-in function.
 
 protected:
 };
@@ -403,8 +389,7 @@ public:
    /// overloaded Function::eval_B().
    virtual Token eval_B(Value_P B) const;
 
-   static Quad_UCS * fun;          ///< Built-in function.
-   static Quad_UCS  _fun;          ///< Built-in function.
+   static Quad_UCS  fun;          ///< Built-in function.
 
 protected:
 };
@@ -422,7 +407,7 @@ protected:
    static const UserFunction * locate_fun(const Value & fun_name);
 
    /// return integers in lines
-   static Token reference(const std::vector<Function_Line> & lines,
+   static Token reference(const std::basic_string<Function_Line> & lines,
                           bool assigned);
 
    /// return assign lines in new_value to stop or trace vector in ufun
@@ -444,8 +429,7 @@ public:
    /// Overloaded Function::eval_B()
    virtual Token eval_B(Value_P B) const;
 
-   static Quad_STOP * fun;          ///< Built-in function.
-   static Quad_STOP  _fun;          ///< Built-in function.
+   static Quad_STOP  fun;          ///< Built-in function.
 };
 //----------------------------------------------------------------------------
 /// The class implementing ⎕TRACE
@@ -463,8 +447,7 @@ public:
    /// Overloaded Function::eval_B()
    virtual Token eval_B(Value_P B) const;
 
-   static Quad_TRACE * fun;          ///< Built-in function.
-   static Quad_TRACE  _fun;          ///< Built-in function.
+   static Quad_TRACE  fun;          ///< Built-in function.
 };
 //----------------------------------------------------------------------------
 

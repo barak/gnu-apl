@@ -25,8 +25,7 @@
 #include "Quad_RE.hh"
 #include "Workspace.hh"
 
-Quad_RE Quad_RE::_fun;
-Quad_RE * Quad_RE::fun = &Quad_RE::_fun;
+Quad_RE Quad_RE::fun;
 
 #if HAVE_LIBPCRE2_32
 

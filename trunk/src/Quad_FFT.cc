@@ -27,8 +27,7 @@
 
 #include "Workspace.icc"
 
-Quad_FFT   Quad_FFT::_fun;
-Quad_FFT * Quad_FFT::fun = &Quad_FFT::_fun;
+Quad_FFT   Quad_FFT::fun;
 
 bool Quad_FFT::system_wisdom_loaded = false;
 

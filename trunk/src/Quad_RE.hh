@@ -37,8 +37,7 @@ public:
    Quad_RE() : QuadFunction(TOK_Quad_RE)
    {}
 
-   static Quad_RE * fun;          ///< Built-in function.
-   static Quad_RE  _fun;          ///< Built-in function.
+   static Quad_RE  fun;          ///< Built-in function.
 
 protected:
    /// the type of result

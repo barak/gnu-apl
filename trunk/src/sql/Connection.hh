@@ -29,7 +29,7 @@
 
 #include <stdlib.h>
 
-#include "../Vector.hh"    // GNU vs. Clang <vector> wrapper
+#include <vector>
 
 class ColumnDescriptor {
 public:

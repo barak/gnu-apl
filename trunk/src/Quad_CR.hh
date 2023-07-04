@@ -67,8 +67,7 @@ public:
    static UCS_string compute_prolog(int pick_level, const UCS_string & left,
                                     const Value * value);
 
-   static Quad_CR * fun;          ///< Built-in function.
-   static Quad_CR  _fun;          ///< Built-in function.
+   static Quad_CR  fun;          ///< Built-in function.
 
    /// portable variable encoding of value \b name (varname or varname ⊂)
    static void do_CR10_variable(UCS_string_vector & result,
@@ -222,7 +221,7 @@ protected:
            std::vector<Shape> shapes;
 
            /// the indices along the pick
-           std::vector<ShapeItem> indices;
+           std::basic_string<ShapeItem> indices;
       };
 
    /// compute 10 ⎕CR recursively

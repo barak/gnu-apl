@@ -209,8 +209,7 @@ public:
       : QuadFunction(TOK_Quad_XML)
    {}
 
-   static Quad_XML * fun;          ///< Built-in function.
-   static Quad_XML  _fun;          ///< Built-in function.
+   static Quad_XML  fun;          ///< Built-in function.
 
    /// return \b ucs with leading _NNN (position) skipped.
    static UCS_string skip_pos_prefix(const UCS_string & ucs);
@@ -227,7 +226,7 @@ protected:
    static Value_P APL_to_XML(const Value & B);
 
    /// return the entities in B, sorted by their position prefix
-   static void add_sorted_entities(vector<const UCS_string *> & entities,
+   static void add_sorted_entities(basic_string<const UCS_string *> & entities,
                                    const Value & B);
 
    /// convert XML string to APL associative array

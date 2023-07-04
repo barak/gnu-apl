@@ -87,8 +87,7 @@ public:
       { return Token(TOK_APL_VALUE1,
                catenate_or_laminate(*A, *X, *B)); }
 
-   static Bif_F12_COMMA * fun;   ///< Built-in function
-   static Bif_F12_COMMA  _fun;   ///< Built-in function
+   static Bif_F12_COMMA  fun;   ///< Built-in function
 
 protected:
 };
@@ -117,8 +116,7 @@ public:
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const
       { return Token(TOK_APL_VALUE1, catenate_or_laminate(*A, *X, *B)); }
 
-   static Bif_F12_COMMA1 * fun;   ///< Built-in function
-   static Bif_F12_COMMA1  _fun;   ///< Built-in function
+   static Bif_F12_COMMA1  fun;   ///< Built-in function
 
 protected:
 };

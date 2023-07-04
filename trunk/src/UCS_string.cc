@@ -365,7 +365,7 @@ const int total_width = pb.get_column_count();
    // All subsequent rows are aligned to the first row, therefore the first
    // row can be taken as a prototype for all rows.
 size_t chunk_len = 0;
-std::vector<int> chunk_lengths;
+std::basic_string<int> chunk_lengths;
    chunk_lengths.reserve(2*total_width/quad_PW);
    for (int col = 0; col < total_width; col += chunk_len)
        {
@@ -997,7 +997,8 @@ UCS_string::append_shape(const Shape & shape)
 }
 //----------------------------------------------------------------------------
 void
-UCS_string::append_members(const vector<const UCS_string *> & members, int m)
+UCS_string::append_members(const basic_string<const UCS_string *> & members,
+                           int m)
 {
    for (int mm = members.size() - 1; mm >= m; --mm)
        {

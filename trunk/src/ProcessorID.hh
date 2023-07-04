@@ -85,7 +85,7 @@ struct ProcAuth
    AP_num3 id;
 
    /// the allowed remote processors
-   std::vector<int> rsvopid;   ///< left argument(s) of remote ⎕SVO and ⎕SVQ
+   std::basic_string<int> rsvopid;   // left arg of remote ⎕SVO and ⎕SVQ
 };
 
 /// A network profile

@@ -27,6 +27,9 @@ apl_NO($apl_have_opt_lib) && return
 
 apl_X11=yes
 } }
+
+# call dash_test_X11() above and set result variables...
+#
 dash_test_X11   # set apl_X11 to yes or no.
 
 # export apl_X11 to config.h

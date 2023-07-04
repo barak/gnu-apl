@@ -672,6 +672,40 @@ main(int argc, char* argv[])   // no space before *
 }
 ----
 
+=== Naming Conventions
+
+==== Cpp Class Names
+
+Class names should be in *CamelCase*. That is:
+
+* No '_' between multiple words like in *CamelCase*,
+* First letter of each word shall be uppercase, the rest lowercase,
+* Abbreviations shall be all uppercase (in that case _ is allowed if it
+  improves readability or groups classes). E.g. Quad_XML.
+
+
+==== Cpp File Names
+
+* class name and file names shall be the same (except for the .cc and .hh
+  extensions).
+* file names: always use .cc (not .cxx or .cpp) and .hh (not .hxx or hpp).
+* Pure C (as opposed to Cpp) files should use .c and .h as usual.
+
+=== Some Coding Conventions
+
+* Use *(const) char \** for ASCII characters (i.e. 0x00...0x7F)
+  and *(const) UTF \** for UTF8 encoded strings. Keep in mind that
+  Cpp literals with APL characters (e.g. "A∆B") are automatically
+  UTF8 encoded by the compiler even though their type is *const char **.
+* Use *basic_string<typename>* for simple C types (char, int, char *, ...) and
+  *vector<typename>* for structs and classes, in particular for those with
+  constructors.
+* Use *const* where possible.
+
+These conventions have developed over time. Some old code does not follow them,
+but new or updated code should.
+
+
 ==== Class declarations (.hh files)
 
 To the extent possible:

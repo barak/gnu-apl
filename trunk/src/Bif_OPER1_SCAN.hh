@@ -71,8 +71,7 @@ public:
    /// Overloaded Function::eval_LXB().
    virtual Token eval_LXB(Token & LO, Value_P X, Value_P B) const;
 
-   static Bif_OPER1_SCAN * fun;      ///< Built-in function.
-   static Bif_OPER1_SCAN  _fun;      ///< Built-in function.
+   static Bif_OPER1_SCAN  fun;      ///< Built-in function.
 
 protected:
    /// overloaded Function::may_push_SI()
@@ -104,8 +103,7 @@ public:
    /// Overloaded Function::eval_ALXB().
    virtual Token eval_LXB(Token & LO, Value_P X, Value_P B) const;
 
-   static Bif_OPER1_SCAN1 * fun;     ///< Built-in function.
-   static Bif_OPER1_SCAN1  _fun;     ///< Built-in function.
+   static Bif_OPER1_SCAN1  fun;     ///< Built-in function.
 
 protected:
 };

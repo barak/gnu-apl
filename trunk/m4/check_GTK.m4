@@ -64,9 +64,13 @@ else                                     # package gtk+-3.0 missing
 fi
 
 } }
+
+# call dash_test_GTK() above and set result variables...
+#
 dash_test_GTK   # set apl_GTK3 to yes or no.
 
 # export apl_GTK3 to config.h
+#
 if apl_YES($apl_GTK3); then
    AC_DEFINE_UNQUOTED(apl_GTK3, 1, [GTK+ version 3 installed ?])
 else

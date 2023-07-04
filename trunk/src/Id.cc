@@ -144,9 +144,9 @@ ID::get_system_function(Id id)
    switch(id)
       {
 #define pp(i, _u, _v)
-#define qf(i, _u, _v) case ID_Quad_ ## i:   return Quad_ ## i::fun;
+#define qf(i, _u, _v) case ID_Quad_ ## i:   return &Quad_ ## i::fun;
 #define qv(i, _u, _v)
-#define sf(i, _u, _v) case ID_ ## i:        return Bif_ ## i::fun;
+#define sf(i, _u, _v) case ID_ ## i:        return &Bif_ ## i::fun;
 #define st(i, _u, _v)
 
 #include "Id.def"

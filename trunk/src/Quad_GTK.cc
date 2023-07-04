@@ -33,15 +33,14 @@
 #include "Security.hh"
 #include "Workspace.hh"
 
-Quad_GTK  Quad_GTK::_fun;
-Quad_GTK * Quad_GTK::fun = &Quad_GTK::_fun;
+Quad_GTK Quad_GTK::fun;
 
 std::vector<Quad_GTK::window_entry> Quad_GTK::open_windows;
 UCS_string_vector Quad_GTK::event_queue;
 
 bool Quad_GTK::focus_on_map = false;   // focus for new windows
 
-#if apl_GTK3
+#if apl_GTK3 && apl_X11
 //----------------------------------------------------------------------------
 Token
 Quad_GTK::eval_AB(Value_P A, Value_P B) const
@@ -948,7 +947,7 @@ const size_t wlen = write(fd, path, TLV_len);
 }
 //----------------------------------------------------------------------------
 
-#else   // ! apl_GTK3
+#else   // ! apl_GTK3 or ! apl_X11
 
 extern Token missing_files(const char * qfun,  const char ** libs,
                            const char ** hdrs, const char ** pkgs);

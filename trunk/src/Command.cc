@@ -1873,7 +1873,7 @@ UCS_string_vector directories;
    //
    enum { tabsize = 4 };
 
-std::vector<int> col_widths;
+std::basic_string<int> col_widths;
    directories.compute_column_width(tabsize, col_widths);
 
    loop(c, directories.size())

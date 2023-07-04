@@ -24,9 +24,7 @@
 #include "Bif_F12_INDEX_OF.hh"
 #include "Workspace.hh"
 
-Bif_F12_INDEX_OF Bif_F12_INDEX_OF ::_fun;    // ⍳
-
-Bif_F12_INDEX_OF * Bif_F12_INDEX_OF ::fun = &Bif_F12_INDEX_OF ::_fun;
+Bif_F12_INDEX_OF Bif_F12_INDEX_OF ::fun;    // ⍳
 
 //============================================================================
 Token

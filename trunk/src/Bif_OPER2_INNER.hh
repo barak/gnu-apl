@@ -39,8 +39,7 @@ public:
    /// Overloaded Function::eval_ALRB().
    virtual Token eval_ALRB(Value_P A, Token & LO, Token & RO, Value_P B) const;
 
-   static Bif_OPER2_INNER * fun;   ///< Built-in function.
-   static Bif_OPER2_INNER  _fun;   ///< Built-in function.
+   static Bif_OPER2_INNER  fun;   ///< Built-in function.
 
 protected:
    /// overloaded Function::may_push_SI()

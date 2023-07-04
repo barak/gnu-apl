@@ -30,7 +30,7 @@
 /// debug verbosity
 static int verbosity = 0;
 
-#if apl_GTK3
+#if apl_GTK3 && apl_X11
 
 #include <X11/Xlib.h>
 #include <gtk/gtk.h>
@@ -904,7 +904,7 @@ const int grid_style = w_props.get_gridX_style();
                Pixel_XY(px0, py0 + 5), Pixel_XY(px0, py1));
    }
 
-vector<double> xvals;
+basic_string<double> xvals;
 const Plot_data & data = w_props.get_plot_data();
    loop(r, data.get_row_count())
       {
@@ -1700,4 +1700,4 @@ GTK_context * pctx = new GTK_context(w_props, handle);
    sem_post(Quad_PLOT::expose_sema);   // unleash the APL interpreter
 }
 //----------------------------------------------------------------------------
-#endif // apl_GTK3
+#endif // apl_GTK3 && apl_X11

@@ -59,39 +59,21 @@ extern char **environ;
 
 // ⎕-function instances
 //
-Quad_AF    Quad_AF   ::_fun;
-Quad_AT    Quad_AT   ::_fun;
-Quad_DL    Quad_DL   ::_fun;
-Quad_EA    Quad_EA   ::_fun;
-Quad_EB    Quad_EB   ::_fun;
-Quad_ENV   Quad_ENV  ::_fun;
-Quad_EX    Quad_EX   ::_fun;
-Quad_INP   Quad_INP  ::_fun;
-Quad_NA    Quad_NA   ::_fun;
-Quad_NC    Quad_NC   ::_fun;
-Quad_NL    Quad_NL   ::_fun;
-Quad_SI    Quad_SI   ::_fun;
-Quad_UCS   Quad_UCS  ::_fun;
-Quad_STOP  Quad_STOP ::_fun;            // S∆
-Quad_TRACE Quad_TRACE::_fun;           // T∆
-
-// ⎕-function pointers
-//
-Quad_AF    * Quad_AF   ::fun = &Quad_AF   ::_fun;
-Quad_AT    * Quad_AT   ::fun = &Quad_AT   ::_fun;
-Quad_DL    * Quad_DL   ::fun = &Quad_DL   ::_fun;
-Quad_EA    * Quad_EA   ::fun = &Quad_EA   ::_fun;
-Quad_EB    * Quad_EB   ::fun = &Quad_EB   ::_fun;
-Quad_ENV   * Quad_ENV  ::fun = &Quad_ENV  ::_fun;
-Quad_EX    * Quad_EX   ::fun = &Quad_EX   ::_fun;
-Quad_INP   * Quad_INP  ::fun = &Quad_INP  ::_fun;
-Quad_NA    * Quad_NA   ::fun = &Quad_NA   ::_fun;
-Quad_NC    * Quad_NC   ::fun = &Quad_NC   ::_fun;
-Quad_NL    * Quad_NL   ::fun = &Quad_NL   ::_fun;
-Quad_SI    * Quad_SI   ::fun = &Quad_SI   ::_fun;
-Quad_UCS   * Quad_UCS  ::fun = &Quad_UCS  ::_fun;
-Quad_STOP  * Quad_STOP ::fun = &Quad_STOP ::_fun;
-Quad_TRACE * Quad_TRACE::fun = &Quad_TRACE::_fun;
+Quad_AF    Quad_AF   ::fun;
+Quad_AT    Quad_AT   ::fun;
+Quad_DL    Quad_DL   ::fun;
+Quad_EA    Quad_EA   ::fun;
+Quad_EB    Quad_EB   ::fun;
+Quad_ENV   Quad_ENV  ::fun;
+Quad_EX    Quad_EX   ::fun;
+Quad_INP   Quad_INP  ::fun;
+Quad_NA    Quad_NA   ::fun;
+Quad_NC    Quad_NC   ::fun;
+Quad_NL    Quad_NL   ::fun;
+Quad_SI    Quad_SI   ::fun;
+Quad_UCS   Quad_UCS  ::fun;
+Quad_STOP  Quad_STOP ::fun;   // S∆
+Quad_TRACE Quad_TRACE::fun;   // T∆
 
 //============================================================================
 Token
@@ -463,7 +445,7 @@ Quad_ENV::eval_B(Value_P B) const
 
 const ShapeItem ec_B = B->element_count();
 
-std::vector<const char *> evars;
+std::basic_string<const char *> evars;
 
    for (char **e = environ; *e; ++e)
        {
@@ -721,7 +703,7 @@ int ret = 0;   // assume ⎕EX failure
 
    // build vector of member names in reverse order
    //
-vector<const UCS_string *>members;
+basic_string<const UCS_string *>members;
    {
      int dot = name.size();
      for (int from = dot - 1; from >= 0; --from)
@@ -1208,7 +1190,7 @@ int requested_NCs = 0;
    //
 UCS_string_vector names;
    {
-     std::vector<const Symbol *> symbols = Workspace::get_all_symbols();
+     std::basic_string<const Symbol *> symbols = Workspace::get_all_symbols();
 
      loop(s, symbols.size())
         {
@@ -1557,7 +1539,8 @@ const UserFunction * ufun = fun->get_func_ufun();
 }
 //----------------------------------------------------------------------------
 Token
-Stop_Trace::reference(const std::vector<Function_Line> & lines, bool assigned)
+Stop_Trace::reference(const std::basic_string<Function_Line> & lines,
+                      bool assigned)
 {
 Value_P Z(lines.size(), LOC);
 
@@ -1570,7 +1553,7 @@ Value_P Z(lines.size(), LOC);
 void
 Stop_Trace::assign(UserFunction * ufun, const Value & new_value, bool stop)
 {
-std::vector<Function_Line> lines;
+std::basic_string<Function_Line> lines;
    lines.reserve(new_value.element_count());
 
    loop(l, new_value.element_count())

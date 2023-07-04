@@ -54,8 +54,7 @@ uint64_t Quad_FIO::benchmark_cycles_from = 0;
 
 std::vector<Quad_FIO::file_entry> Quad_FIO::open_files;
 
-Quad_FIO  Quad_FIO::_fun;
-Quad_FIO * Quad_FIO::fun = &Quad_FIO::_fun;
+Quad_FIO  Quad_FIO::fun;
 
 // A union holding a sockaddr and a sockaddr_in as to avoid casting
 /// between sockaddr and a sockaddr_in
@@ -2357,9 +2356,9 @@ int function_number = -1;
                      if (oper == UNI_FULLSTOP)
                         {
                           if (lfun == UNI_RING_OPERATOR)   // ∘.g
-                             fun = Bif_OPER2_OUTER::fun;
+                             fun = &Bif_OPER2_OUTER::fun;
                           else                             // f.g
-                             fun = Bif_OPER2_INNER::fun;
+                             fun = &Bif_OPER2_INNER::fun;
                         }
                    }
                 else
@@ -3028,7 +3027,7 @@ int function_number = -1;
                    {
                      const Unicode oper = B->get_cravel(1).get_char_value();
                      if (oper != UNI_FULLSTOP)   DOMAIN_ERROR;
-                     fun = Bif_OPER2_INNER::fun;
+                     fun = &Bif_OPER2_INNER::fun;
                    }
                 else
                    {

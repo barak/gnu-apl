@@ -27,11 +27,8 @@
 #include "Bif_OPER1_EACH.hh"
 #include "Workspace.hh"
 
-Bif_F12_PARTITION Bif_F12_PARTITION::_fun;    // ⊂
-Bif_F12_PICK      Bif_F12_PICK     ::_fun;    // ⊃
-
-Bif_F12_PARTITION * Bif_F12_PARTITION::fun = &Bif_F12_PARTITION::_fun;
-Bif_F12_PICK      * Bif_F12_PICK     ::fun = &Bif_F12_PICK     ::_fun;
+Bif_F12_PARTITION Bif_F12_PARTITION::fun;    // ⊂
+Bif_F12_PICK      Bif_F12_PICK     ::fun;    // ⊃
 
 //============================================================================
 Token
@@ -97,7 +94,7 @@ AxesBitmap axes_X = 0;   // axes in axes_X with ⎕IO←0
    if (item_shape.get_rank() == 0)   // empty axes
       {
         //  ⊂[⍳0]B   ←→   ⊂¨B
-        Token part(TOK_FUN1, Bif_F12_PARTITION::fun);
+        Token part(TOK_FUN1, &Bif_F12_PARTITION::fun);
         return Bif_OPER1_EACH::do_eval_LB(part, B).get_apl_val();
       }
 
@@ -561,7 +558,7 @@ const Cell & cA = A0[idx_A];
 
              const UCS_string top_level(UNI_B);
              const UCS_string member(A);
-             vector<const UCS_string *> members;
+             basic_string<const UCS_string *> members;
              members.push_back(&member);
              members.push_back(&top_level);   // dummy, must be last
              Value * val_B = B.get();

@@ -54,8 +54,7 @@ public:
    /// Constructor.
    Quad_SVC() : QuadFunction(TOK_Quad_SVC) {}
 
-   static Quad_SVC * fun;         ///< Built-in function.
-   static Quad_SVC  _fun;         ///< Built-in function.
+   static Quad_SVC  fun;         ///< Built-in function.
 
 protected:
    /// Overloaded Function::eval_AB().
@@ -96,8 +95,7 @@ public:
    /// Constructor.
    Quad_SVO() : QuadFunction(TOK_Quad_SVO) {}
 
-   static Quad_SVO * fun; ///< Built-in function.
-   static Quad_SVO  _fun; ///< Built-in function.
+   static Quad_SVO  fun; ///< Built-in function.
 
 protected:
    /// Overloaded Function::eval_AB().
@@ -121,8 +119,7 @@ public:
    /// Constructor.
    Quad_SVQ () : QuadFunction(TOK_Quad_SVQ) {}
 
-   static Quad_SVQ * fun;         ///< Built-in function.
-   static Quad_SVQ _fun;         ///< Built-in function.
+   static Quad_SVQ fun;         ///< Built-in function.
 
 protected:
    /// Overloaded Function::eval_AB().
@@ -145,8 +142,7 @@ public:
    /// Constructor.
    Quad_SVR() : QuadFunction(TOK_Quad_SVR) {}
 
-   static Quad_SVR * fun;         ///< Built-in function.
-   static Quad_SVR  _fun;         ///< Built-in function.
+   static Quad_SVR  fun;         ///< Built-in function.
 
 protected:
    /// Overloaded Function::eval_AB().
@@ -163,8 +159,7 @@ public:
    /// Constructor.
    Quad_SVS() : QuadFunction(TOK_Quad_SVS) {}
 
-   static Quad_SVS * fun;         ///< Built-in function.
-   static Quad_SVS _fun;         ///< Built-in function.
+   static Quad_SVS fun;         ///< Built-in function.
 
 protected:
    /// Overloaded Function::eval_AB().

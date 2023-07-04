@@ -38,8 +38,7 @@ public:
    /// Constructor.
    Quad_DLX() : QuadFunction(TOK_Quad_DLX) {}
 
-   static Quad_DLX * fun;          ///< Built-in function.
-   static Quad_DLX  _fun;          ///< Built-in function.
+   static Quad_DLX  fun;          ///< Built-in function.
 
 protected:
    /// overloaded Function::eval_AB().

@@ -96,8 +96,7 @@ public:
    /// A character array with B formatted by specification
    static Value_P format_by_specification(Value_P A, Value_P B);
 
-   static Bif_F12_FORMAT * fun;   ///< Built-in function
-   static Bif_F12_FORMAT  _fun;   ///< Built-in function
+   static Bif_F12_FORMAT  fun;   ///< Built-in function
 
    /// Return true iff uni is '0' .. '9', comma, or full-stop
    static bool is_control_char(Unicode uni);
@@ -168,7 +167,7 @@ protected:
 
    /// split entire format string string into \b column format strings
    static void split_example_into_columns(const UCS_string & format,
-                                   std::vector<UCS_string> & col_formats);
+                                   UCS_string_vector & col_formats);
 
    /// A character array with one column of B formatted by specification
    static PrintBuffer format_one_col_by_spec(int width, int precision,

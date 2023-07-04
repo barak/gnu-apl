@@ -24,10 +24,7 @@
 #include "Bif_F12_INTERVAL_INDEX.hh"
 #include "Workspace.hh"
 
-Bif_F12_INTERVAL_INDEX Bif_F12_INTERVAL_INDEX::_fun;    // ⍳
-
-Bif_F12_INTERVAL_INDEX *
-Bif_F12_INTERVAL_INDEX::fun = &Bif_F12_INTERVAL_INDEX::_fun;
+Bif_F12_INTERVAL_INDEX Bif_F12_INTERVAL_INDEX::fun;    // ⍳
 
 //============================================================================
 /** return { (,⍵) / ,⍳⍴⍵ }. ⍸B is similar to ⍳B except that:

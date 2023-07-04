@@ -32,8 +32,7 @@
 #include "Value.hh"
 #include "Workspace.hh"
 
-Bif_F12_FORMAT   Bif_F12_FORMAT::_fun;       // ⍕
-Bif_F12_FORMAT * Bif_F12_FORMAT::fun = &Bif_F12_FORMAT::_fun;
+Bif_F12_FORMAT   Bif_F12_FORMAT::fun;       // ⍕
 
 //----------------------------------------------------------------------------
 Token
@@ -235,7 +234,7 @@ const ShapeItem rows = B->get_rows();
    // split string all_formats into individual format fields, one per column.
    // If there is only one format field, then repeat it cols times.
    //
-vector<UCS_string> col_formats;
+UCS_string_vector col_formats;
    split_example_into_columns(all_formats, col_formats);
    if (col_formats. size() == 1)
       {
@@ -323,7 +322,7 @@ Value_P Z(shape_Z, LOC);
 //----------------------------------------------------------------------------
 void
 Bif_F12_FORMAT::split_example_into_columns(const UCS_string & all_formats,
-                                   vector<UCS_string> & col_formats)
+                                   UCS_string_vector & col_formats)
 {
    // split string 'all_formats' into fields, where:
    //

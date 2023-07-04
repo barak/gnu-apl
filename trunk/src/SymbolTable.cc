@@ -150,7 +150,7 @@ UCS_string to;
 
    // put those symbols into 'list' that satisfy 'which'
    //
-std::vector<Symbol *> list;
+std::basic_string<Symbol *> list;
 int symbol_count = 0;
    loop(s, SYMBOL_HASH_TABLE_SIZE)
        {
@@ -226,7 +226,7 @@ UCS_string_vector names;
    // figure column widths
    //
    enum { tabsize = 4 };
-std::vector<int> col_widths;
+std::basic_string<int> col_widths;
    names.compute_column_width(tabsize, col_widths);
 
    loop(c, count)
@@ -441,10 +441,10 @@ ValueStackItem & tos = symbol->value_stack[0];   // APL top-level
    return true;
 }
 //----------------------------------------------------------------------------
-std::vector<const Symbol *>
+std::basic_string<const Symbol *>
 SymbolTable::get_all_symbols() const
 {
-std::vector<const Symbol *> ret;
+std::basic_string<const Symbol *> ret;
    ret.reserve(1000);
 
    loop(hash, SYMBOL_HASH_TABLE_SIZE)
@@ -461,7 +461,7 @@ std::vector<const Symbol *> ret;
 void
 SymbolTable::dump(ostream & out, int & fcount, int & vcount) const
 {
-std::vector<const Symbol *> symbols;
+std::basic_string<const Symbol *> symbols;
    loop(hash, SYMBOL_HASH_TABLE_SIZE)
       {
         for (const Symbol * sym = symbol_table[hash]; sym; sym = sym->next)

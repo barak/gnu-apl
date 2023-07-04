@@ -223,7 +223,7 @@ protected:
    bool char_mode;
 
    /// functions saved so far
-   vector<const Function *> saved_Functions;
+   basic_string<const Function *> saved_Functions;
 
    /// return true iff (the definition of) \b fun was already saved.
    bool is_saved(const Function * fun) const;
@@ -463,7 +463,7 @@ protected:
    bool reading_vids;
 
    /// the vids to be copied (empty if all)
-   std::vector<Vid> vids_COPY;
+   std::basic_string<Vid> vids_COPY;
 
    /// the names of objects (empty if all)
    UCS_string_vector allowed_objects;
@@ -479,7 +479,7 @@ protected:
      };
 
    /// parents[vid] is the parent of vid, or NO_VID if vid is a top-level value
-   std::vector<Vid> parents;
+   std::basic_string<Vid> parents;
 
    /// the file name from which this archive was read
    const char * filename;

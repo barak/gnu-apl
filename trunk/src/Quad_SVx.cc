@@ -42,19 +42,11 @@ extern char **environ;
 
 // shared variable function instances
 //
-Quad_SVC Quad_SVC::_fun;
-Quad_SVO Quad_SVO::_fun;
-Quad_SVQ Quad_SVQ::_fun;
-Quad_SVR Quad_SVR::_fun;
-Quad_SVS Quad_SVS::_fun;
-
-// shared variable function pointers
-//
-Quad_SVC * Quad_SVC::fun = & Quad_SVC::_fun;
-Quad_SVO * Quad_SVO::fun = & Quad_SVO::_fun;
-Quad_SVQ * Quad_SVQ::fun = & Quad_SVQ::_fun;
-Quad_SVR * Quad_SVR::fun = & Quad_SVR::_fun;
-Quad_SVS * Quad_SVS::fun = & Quad_SVS::_fun;
+Quad_SVC Quad_SVC::fun;
+Quad_SVO Quad_SVO::fun;
+Quad_SVQ Quad_SVQ::fun;
+Quad_SVR Quad_SVR::fun;
+Quad_SVS Quad_SVS::fun;
 
 APL_time_us Quad_SVE::timer_end = 0;
 
@@ -524,7 +516,7 @@ Quad_SVQ::get_processors()
    //
    // 2. running processors that have offered variables in Svar_DB.
    //
-std::vector<AP_num> processors;
+std::basic_string<AP_num> processors;
 
    // case 1...
    //
@@ -586,7 +578,7 @@ const char * dirs[] = { "", "/APs" };
 
    // sort and remove duplicates
    //
-std::vector<int32_t> sorted;
+std::basic_string<int32_t> sorted;
    while (processors.size())
       {
         // find smallest
@@ -623,12 +615,12 @@ Value_P Z(sorted.size(), LOC);
 Value_P
 Quad_SVQ::get_variables(AP_num proc)
 {
-std::vector<uint32_t> varnames;
+std::basic_string<uint32_t> varnames;
    Svar_DB::get_offered_variables(ProcessorID::get_own_ID(), proc, varnames);
 
    // varnames is a sequence of 0-terminated Unicodes
    //
-std::vector<int> var_lengths;   // including terminating 0
+std::basic_string<int> var_lengths;   // including terminating 0
 int last_zero = -1;
    loop(v, varnames.size())
       {

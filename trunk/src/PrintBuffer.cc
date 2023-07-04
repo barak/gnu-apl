@@ -215,7 +215,7 @@ const bool nested = !value.is_simple();
      //    therefore we have (⍴,value) items. Items are rectangular.
      //
      PERFORMANCE_START(start_2)
-     vector<sRank> max_row_ranks;
+     basic_string<sRank> max_row_ranks;
      max_row_ranks.reserve(rows);
      loop(y, rows)
         {
@@ -454,7 +454,7 @@ PrintBuffer::print_interruptible(ostream & out, sRank rank, int quad_PW)
    //
 const int total_width = get_column_count();
 
-vector<ShapeItem> chunk_lengths;
+basic_string<ShapeItem> chunk_lengths;
    if (quad_PW)   // APL folding of lines near ⎕PW
       {
         const int max_breaks = 2 + total_width/quad_PW;   // a first guess

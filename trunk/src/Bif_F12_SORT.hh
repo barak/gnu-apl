@@ -180,8 +180,7 @@ public:
    virtual Token eval_AB(Value_P A, Value_P B) const
       { return sort_collating(A, B, SORT_ASCENDING); }
 
-   static Bif_F12_SORT_ASC * fun;   ///< Built-in function
-   static Bif_F12_SORT_ASC  _fun;   ///< Built-in function
+   static Bif_F12_SORT_ASC  fun;   ///< Built-in function
 protected:
 };
 //----------------------------------------------------------------------------
@@ -207,8 +206,7 @@ public:
    virtual Token eval_AB(Value_P A, Value_P B) const
       { return sort_collating(A, B, SORT_DESCENDING); }
 
-   static Bif_F12_SORT_DES * fun;   ///< Built-in function
-   static Bif_F12_SORT_DES  _fun;   ///< Built-in function
+   static Bif_F12_SORT_DES  fun;   ///< Built-in function
 protected:
 };
 //----------------------------------------------------------------------------

@@ -85,16 +85,16 @@ Workspace::Workspace()
 /// System Function
 #define sf_def(x, str, _txt)                                      \
    if (*str) { UCS_string q(UNI_Quad_Quad);   q.append_UTF8(str); \
-   distinguished_names.add_function(q, ID_ ## x, x::fun); }
+   distinguished_names.add_function(q, ID_ ## x, &x::fun); }
 
 #include "SystemVariable.def"
 
    // (re-) instantiate ⎕CR, ⎕EC, and ⎕ES needed by macros...
    // This is (in theory) not needed, but may be for some compilers
    //
-   new (&Quad_CR::_fun)   Quad_CR;   Quad_CR::fun = &Quad_CR ::_fun;
-   new (&Quad_EC::_fun)   Quad_EC;   Quad_EC::fun = &Quad_EC ::_fun;
-   new (&Quad_ES::_fun)   Quad_ES;   Quad_ES::fun = &Quad_ES ::_fun;
+   new (&Quad_CR::fun)   Quad_CR;
+   new (&Quad_EC::fun)   Quad_EC;
+   new (&Quad_ES::fun)   Quad_ES;
 }
 //----------------------------------------------------------------------------
 void

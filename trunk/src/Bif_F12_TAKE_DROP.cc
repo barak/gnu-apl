@@ -28,13 +28,8 @@
 
 // primitive function instances
 //
-Bif_F12_TAKE      Bif_F12_TAKE     ::_fun;    // ↑
-Bif_F12_DROP      Bif_F12_DROP     ::_fun;    // ↓
-
-// primitive function pointers
-//
-Bif_F12_TAKE      * Bif_F12_TAKE     ::fun = &Bif_F12_TAKE     ::_fun;
-Bif_F12_DROP      * Bif_F12_DROP     ::fun = &Bif_F12_DROP     ::_fun;
+Bif_F12_TAKE      Bif_F12_TAKE     ::fun;    // ↑
+Bif_F12_DROP      Bif_F12_DROP     ::fun;    // ↓
 
 //============================================================================
 Value_P

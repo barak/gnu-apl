@@ -39,8 +39,7 @@ public:
       : QuadFunction(TOK_Quad_GTK)
    {}
 
-   static Quad_GTK * fun;          ///< Built-in function.
-   static Quad_GTK  _fun;          ///< Built-in function.
+   static Quad_GTK  fun;          ///< Built-in function.
 
    /// close all open windows
    static void close_all_windows();

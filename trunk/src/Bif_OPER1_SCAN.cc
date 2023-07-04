@@ -27,11 +27,8 @@
 #include "Macro.hh"
 #include "Workspace.hh"
 
-Bif_OPER1_SCAN    Bif_OPER1_SCAN ::_fun;
-Bif_OPER1_SCAN1   Bif_OPER1_SCAN1::_fun;
-
-Bif_OPER1_SCAN  * Bif_OPER1_SCAN ::fun = &Bif_OPER1_SCAN ::_fun;
-Bif_OPER1_SCAN1 * Bif_OPER1_SCAN1::fun = &Bif_OPER1_SCAN1::_fun;
+Bif_OPER1_SCAN    Bif_OPER1_SCAN ::fun;
+Bif_OPER1_SCAN1   Bif_OPER1_SCAN1::fun;
 
 //----------------------------------------------------------------------------
 Token
@@ -52,7 +49,7 @@ Shape shape_B = B->get_shape();
 
 const ShapeItem ec_A = A->element_count();
 ShapeItem ones_A = 0;
-std::vector<ShapeItem> rep_counts;
+std::basic_string<ShapeItem> rep_counts;
    rep_counts.reserve(ec_A);
    loop(a, ec_A)
       {

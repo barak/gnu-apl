@@ -84,11 +84,11 @@ public:
    void gen();
 
    /// HTML-print a table containing all defined functions to \b page
-   void functions_table(const std::vector<const Symbol *> & functions,
+   void functions_table(const std::basic_string<const Symbol *> & functions,
                        ofstream & page);
 
    /// HTML-print a table with all variables to 'page'
-   void variables_table(const std::vector<const Symbol *> & variables,
+   void variables_table(const std::basic_string<const Symbol *> & variables,
                         ofstream & page);
 
    /// HTML-print a table with the SI stack to 'page'
@@ -118,7 +118,7 @@ protected:
    void native_page(const Function * fun, const UCS_string & alias);
 
    /// create the call graph
-   void make_call_graph(const std::vector<const Symbol *> & all_funs);
+   void make_call_graph(const std::basic_string<const Symbol *> & all_funs);
 
    /// add one symbol to the call graph. Note that one symbol can have
    /// different UserFunctions (at different SI levels).
@@ -154,10 +154,10 @@ protected:
    UTF8_string root_dir;
 
    /// the nodes for the current root.
-   std::vector<const Function *> nodes;
+   std::basic_string<const Function *> nodes;
 
    /// the nodes for all function symbols (independent of the current root).
-   std::vector<const Symbol *> all_functions;
+   std::basic_string<const Symbol *> all_functions;
 
    /// the real names for the current root.
    UCS_string_vector aliases;

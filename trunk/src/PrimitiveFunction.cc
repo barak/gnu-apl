@@ -53,41 +53,22 @@
 
 // primitive function instances
 //
-Bif_F12_DECODE    Bif_F12_DECODE   ::_fun;    // ⊥
-Bif_F12_ELEMENT   Bif_F12_ELEMENT  ::_fun;    // ϵ
-Bif_F12_ENCODE    Bif_F12_ENCODE   ::_fun;    // ⊤
-Bif_F12_EQUIV     Bif_F12_EQUIV    ::_fun;    // ≡
-Bif_F1_EXECUTE    Bif_F1_EXECUTE   ::_fun;    // ⍎
-Bif_F2_INDEX      Bif_F2_INDEX     ::_fun;    // ⌷
-Bif_F2_INTER      Bif_F2_INTER     ::_fun;    // ∩
-Bif_F2_LEFT       Bif_F2_LEFT      ::_fun;    // ⊣
-Bif_F12_NEQUIV    Bif_F12_NEQUIV   ::_fun;    // ≢
-Bif_F2_RIGHT      Bif_F2_RIGHT     ::_fun;    // ⊢
-Bif_F12_RHO       Bif_F12_RHO      ::_fun;    // ⍴
-Bif_F12_ROTATE    Bif_F12_ROTATE   ::_fun;    // ⌽
-Bif_F12_ROTATE1   Bif_F12_ROTATE1  ::_fun;    // ⊖
-Bif_F12_TRANSPOSE Bif_F12_TRANSPOSE::_fun;    // ⍉
-Bif_F12_UNION     Bif_F12_UNION    ::_fun;    // ∪
-Bif_F0_ZILDE      Bif_F0_ZILDE     ::_fun;    // ⍬
-
-// primitive function pointers
-//
-Bif_F0_ZILDE      * Bif_F0_ZILDE     ::fun = &Bif_F0_ZILDE     ::_fun;
-Bif_F1_EXECUTE    * Bif_F1_EXECUTE   ::fun = &Bif_F1_EXECUTE   ::_fun;
-Bif_F2_INDEX      * Bif_F2_INDEX     ::fun = &Bif_F2_INDEX     ::_fun;
-Bif_F12_ELEMENT   * Bif_F12_ELEMENT  ::fun = &Bif_F12_ELEMENT  ::_fun;
-Bif_F12_EQUIV     * Bif_F12_EQUIV    ::fun = &Bif_F12_EQUIV    ::_fun;
-Bif_F12_NEQUIV    * Bif_F12_NEQUIV   ::fun = &Bif_F12_NEQUIV   ::_fun;
-Bif_F12_ENCODE    * Bif_F12_ENCODE   ::fun = &Bif_F12_ENCODE   ::_fun;
-Bif_F12_DECODE    * Bif_F12_DECODE   ::fun = &Bif_F12_DECODE   ::_fun;
-Bif_F12_ROTATE    * Bif_F12_ROTATE   ::fun = &Bif_F12_ROTATE   ::_fun;
-Bif_F12_ROTATE1   * Bif_F12_ROTATE1  ::fun = &Bif_F12_ROTATE1  ::_fun;
-Bif_F12_TRANSPOSE * Bif_F12_TRANSPOSE::fun = &Bif_F12_TRANSPOSE::_fun;
-Bif_F12_RHO       * Bif_F12_RHO      ::fun = &Bif_F12_RHO      ::_fun;
-Bif_F2_INTER      * Bif_F2_INTER     ::fun = &Bif_F2_INTER     ::_fun;
-Bif_F12_UNION     * Bif_F12_UNION    ::fun = &Bif_F12_UNION    ::_fun;
-Bif_F2_LEFT       * Bif_F2_LEFT      ::fun = &Bif_F2_LEFT      ::_fun;
-Bif_F2_RIGHT      * Bif_F2_RIGHT     ::fun = &Bif_F2_RIGHT     ::_fun;
+Bif_F12_DECODE    Bif_F12_DECODE   ::fun;    // ⊥
+Bif_F12_ELEMENT   Bif_F12_ELEMENT  ::fun;    // ϵ
+Bif_F12_ENCODE    Bif_F12_ENCODE   ::fun;    // ⊤
+Bif_F12_EQUIV     Bif_F12_EQUIV    ::fun;    // ≡
+Bif_F1_EXECUTE    Bif_F1_EXECUTE   ::fun;    // ⍎
+Bif_F2_INDEX      Bif_F2_INDEX     ::fun;    // ⌷
+Bif_F2_INTER      Bif_F2_INTER     ::fun;    // ∩
+Bif_F2_LEFT       Bif_F2_LEFT      ::fun;    // ⊣
+Bif_F12_NEQUIV    Bif_F12_NEQUIV   ::fun;    // ≢
+Bif_F2_RIGHT      Bif_F2_RIGHT     ::fun;    // ⊢
+Bif_F12_RHO       Bif_F12_RHO      ::fun;    // ⍴
+Bif_F12_ROTATE    Bif_F12_ROTATE   ::fun;    // ⌽
+Bif_F12_ROTATE1   Bif_F12_ROTATE1  ::fun;    // ⊖
+Bif_F12_TRANSPOSE Bif_F12_TRANSPOSE::fun;    // ⍉
+Bif_F12_UNION     Bif_F12_UNION    ::fun;    // ∪
+Bif_F0_ZILDE      Bif_F0_ZILDE    ::fun;    // ⍬
 
 int Bif_F1_EXECUTE::copy_pending = 0;
 
@@ -897,7 +878,7 @@ Bif_F12_ENCODE::eval_AB(Value_P A, Value_P B) const
    // A⊤B: every number in B is represented in a number system with
    // radix A. ⍴Z ←→ (⍴A, ⍴B) and Z[...;...b...] = A⊤B[...b...]
 
-   if (A->is_scalar())   return Bif_F12_STILE::fun->eval_AB(A, B);
+   if (A->is_scalar())   return Bif_F12_STILE::fun.eval_AB(A, B);
 
 const ShapeItem ec_A = A->element_count();
 const ShapeItem ec_B = B->element_count();
@@ -1456,7 +1437,7 @@ UTF8_string result_utf8 = out.get_data();
 
    // result_utf8 may have multiple lines. Remember where the lines start.
    //
-std::vector<ShapeItem> line_starts;
+std::basic_string<ShapeItem> line_starts;
    line_starts.push_back(0);   // the first line
    loop(r, result_utf8.size())
       {
@@ -1758,7 +1739,7 @@ Bif_F12_UNION::eval_AB(Value_P A, Value_P B) const
 
    // A ∪ B ←→ A,B∼A
    //
-Token BwoA = Bif_F12_WITHOUT::fun->eval_AB(B, A);
+Token BwoA = Bif_F12_WITHOUT::fun.eval_AB(B, A);
 
 const ShapeItem len_A = A->element_count();
 const ShapeItem len_B = BwoA.get_apl_val()->element_count();
@@ -1768,7 +1749,7 @@ Value_P Z(len_A + len_B, LOC);
    loop(b, len_B)   Z->next_ravel_Cell(B->get_cravel(b));
    Z->set_default(*B, LOC);
    Z->check_value(LOC);
-   return Bif_F12_COMMA::fun->eval_AB(A, BwoA.get_apl_val());
+   return Bif_F12_COMMA::fun.eval_AB(A, BwoA.get_apl_val());
 }
 //============================================================================
 Token

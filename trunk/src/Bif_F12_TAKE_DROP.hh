@@ -59,8 +59,7 @@ public:
    static void fill(const Shape & shape_Zi, Value & Z_owner,
                     const Value & B, AxesBitmap axes);
 
-   static Bif_F12_TAKE * fun;   ///< Built-in function
-   static Bif_F12_TAKE  _fun;   ///< Built-in function
+   static Bif_F12_TAKE  fun;   ///< Built-in function
 
    /// ↑B
    static Value_P first(const Value & B);
@@ -86,8 +85,7 @@ public:
    /// overloaded Function::eval_AXB()
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
 
-   static Bif_F12_DROP * fun;   ///< Built-in function
-   static Bif_F12_DROP  _fun;   ///< Built-in function
+   static Bif_F12_DROP  fun;   ///< Built-in function
 
 protected:
 

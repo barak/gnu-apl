@@ -40,75 +40,39 @@
 
 // scalar function instances
 //
-Bif_F2_AND      Bif_F2_AND     ::_fun;                // ∧
-Bif_F2_AND_B    Bif_F2_AND_B   ::_fun;                // ∧∧
-Bif_F12_BINOM   Bif_F12_BINOM  ::_fun;                // !
-Bif_F12_CIRCLE  Bif_F12_CIRCLE ::_fun(false);         // ○
-Bif_F12_CIRCLE  Bif_F12_CIRCLE ::_fun_inverse(true);  // A inverted
-Bif_F12_DIVIDE  Bif_F12_DIVIDE ::_fun;                // ÷
-Bif_F2_EQUAL    Bif_F2_EQUAL   ::_fun;                // =
-Bif_F2_EQUAL_B  Bif_F2_EQUAL_B ::_fun;                // ==
-Bif_F2_FIND     Bif_F2_FIND    ::_fun;                // ⍷ (almost scalar)
-Bif_F2_GREATER  Bif_F2_GREATER ::_fun;                // >
-Bif_F2_LEQU     Bif_F2_LEQU    ::_fun;                // ≤
-Bif_F2_LESS     Bif_F2_LESS    ::_fun;                // <
-Bif_F12_LOGA    Bif_F12_LOGA   ::_fun;                // ⍟
-Bif_F2_MEQU     Bif_F2_MEQU    ::_fun;                // ≥
-Bif_F12_MINUS   Bif_F12_MINUS  ::_fun;                // -
-Bif_F2_NAND     Bif_F2_NAND    ::_fun;                // ⍲
-Bif_F2_NAND_B   Bif_F2_NAND_B  ::_fun;                // ⍲⍲
-Bif_F2_NOR      Bif_F2_NOR     ::_fun;                // ⍱
-Bif_F2_NOR_B    Bif_F2_NOR_B   ::_fun;                // ⍱⍱
-Bif_F2_OR       Bif_F2_OR      ::_fun;                // ∨
-Bif_F2_OR_B     Bif_F2_OR_B    ::_fun;                // ∨∨
-Bif_F12_PLUS    Bif_F12_PLUS   ::_fun(false);         // +
-Bif_F12_PLUS    Bif_F12_PLUS   ::_fun_inverse(true);  // +
-Bif_F12_POWER   Bif_F12_POWER  ::_fun;                // ⋆
-Bif_F12_RND_UP  Bif_F12_RND_UP ::_fun;                // ⌈
-Bif_F12_RND_DN  Bif_F12_RND_DN ::_fun;                // ⌊
-Bif_F12_ROLL    Bif_F12_ROLL   ::_fun;                // ? (monadic is scalar)
-Bif_F12_STILE   Bif_F12_STILE  ::_fun;                // ∣
-Bif_F12_TIMES   Bif_F12_TIMES  ::_fun(false);         // ×
-Bif_F12_TIMES   Bif_F12_TIMES  ::_fun_inverse(true);  // ×
-Bif_F2_UNEQU    Bif_F2_UNEQU   ::_fun;                // ≠
-Bif_F2_UNEQ_B   Bif_F2_UNEQ_B  ::_fun;                // ≠
-Bif_F12_WITHOUT Bif_F12_WITHOUT::_fun;                // ∼ (monadic is scalar)
-
-// scalar function pointers
-//
-Bif_F2_AND      * Bif_F2_AND     ::fun         = &Bif_F2_AND     ::_fun;
-Bif_F2_AND_B    * Bif_F2_AND_B   ::fun         = &Bif_F2_AND_B   ::_fun;
-Bif_F12_BINOM   * Bif_F12_BINOM  ::fun         = &Bif_F12_BINOM  ::_fun;
-Bif_F12_CIRCLE  * Bif_F12_CIRCLE ::fun         = &Bif_F12_CIRCLE ::_fun;
-Bif_F12_CIRCLE  * Bif_F12_CIRCLE ::fun_inverse = &Bif_F12_CIRCLE ::_fun_inverse;
-Bif_F12_DIVIDE  * Bif_F12_DIVIDE ::fun         = &Bif_F12_DIVIDE ::_fun;
-Bif_F2_EQUAL    * Bif_F2_EQUAL   ::fun         = &Bif_F2_EQUAL   ::_fun;
-Bif_F2_EQUAL_B  * Bif_F2_EQUAL_B ::fun         = &Bif_F2_EQUAL_B ::_fun;
-Bif_F2_FIND     * Bif_F2_FIND    ::fun         = &Bif_F2_FIND    ::_fun;
-Bif_F2_GREATER  * Bif_F2_GREATER ::fun         = &Bif_F2_GREATER ::_fun;
-Bif_F2_LESS     * Bif_F2_LESS    ::fun         = &Bif_F2_LESS    ::_fun;
-Bif_F2_LEQU     * Bif_F2_LEQU    ::fun         = &Bif_F2_LEQU    ::_fun;
-Bif_F12_LOGA    * Bif_F12_LOGA   ::fun         = &Bif_F12_LOGA   ::_fun;
-Bif_F2_MEQU     * Bif_F2_MEQU    ::fun         = &Bif_F2_MEQU    ::_fun;
-Bif_F12_MINUS   * Bif_F12_MINUS  ::fun         = &Bif_F12_MINUS  ::_fun;
-Bif_F2_NAND     * Bif_F2_NAND    ::fun         = &Bif_F2_NAND    ::_fun;
-Bif_F2_NAND_B   * Bif_F2_NAND_B  ::fun         = &Bif_F2_NAND_B  ::_fun;
-Bif_F2_NOR      * Bif_F2_NOR     ::fun         = &Bif_F2_NOR     ::_fun;
-Bif_F2_NOR_B    * Bif_F2_NOR_B   ::fun         = &Bif_F2_NOR_B   ::_fun;
-Bif_F2_OR       * Bif_F2_OR      ::fun         = &Bif_F2_OR      ::_fun;
-Bif_F2_OR_B     * Bif_F2_OR_B    ::fun         = &Bif_F2_OR_B    ::_fun;
-Bif_F12_PLUS    * Bif_F12_PLUS   ::fun         = &Bif_F12_PLUS   ::_fun;
-Bif_F12_PLUS    * Bif_F12_PLUS   ::fun_inverse = &Bif_F12_PLUS   ::_fun_inverse;
-Bif_F12_POWER   * Bif_F12_POWER  ::fun         = &Bif_F12_POWER  ::_fun;
-Bif_F12_RND_UP  * Bif_F12_RND_UP ::fun         = &Bif_F12_RND_UP ::_fun;
-Bif_F12_RND_DN  * Bif_F12_RND_DN ::fun         = &Bif_F12_RND_DN ::_fun;
-Bif_F12_ROLL    * Bif_F12_ROLL   ::fun         = &Bif_F12_ROLL   ::_fun;
-Bif_F12_TIMES   * Bif_F12_TIMES  ::fun         = &Bif_F12_TIMES  ::_fun;
-Bif_F12_TIMES   * Bif_F12_TIMES  ::fun_inverse = &Bif_F12_TIMES  ::_fun_inverse;
-Bif_F12_STILE   * Bif_F12_STILE  ::fun         = &Bif_F12_STILE  ::_fun;
-Bif_F2_UNEQU    * Bif_F2_UNEQU   ::fun         = &Bif_F2_UNEQU   ::_fun;
-Bif_F2_UNEQ_B   * Bif_F2_UNEQ_B  ::fun         = &Bif_F2_UNEQ_B  ::_fun;
-Bif_F12_WITHOUT * Bif_F12_WITHOUT::fun         = &Bif_F12_WITHOUT::_fun;
+Bif_F2_AND      Bif_F2_AND     ::fun;                // ∧
+Bif_F2_AND_B    Bif_F2_AND_B   ::fun;                // ∧∧
+Bif_F12_BINOM   Bif_F12_BINOM  ::fun;                // !
+Bif_F12_CIRCLE  Bif_F12_CIRCLE ::fun(false);         // ○
+Bif_F12_CIRCLE  Bif_F12_CIRCLE ::fun_inverse(true);  // A inverted
+Bif_F12_DIVIDE  Bif_F12_DIVIDE ::fun;                // ÷
+Bif_F2_EQUAL    Bif_F2_EQUAL   ::fun;                // =
+Bif_F2_EQUAL_B  Bif_F2_EQUAL_B ::fun;                // ==
+Bif_F2_FIND     Bif_F2_FIND    ::fun;                // ⍷ (almost scalar)
+Bif_F2_GREATER  Bif_F2_GREATER ::fun;                // >
+Bif_F2_LEQU     Bif_F2_LEQU    ::fun;                // ≤
+Bif_F2_LESS     Bif_F2_LESS    ::fun;                // <
+Bif_F12_LOGA    Bif_F12_LOGA   ::fun;                // ⍟
+Bif_F2_MEQU     Bif_F2_MEQU    ::fun;                // ≥
+Bif_F12_MINUS   Bif_F12_MINUS  ::fun;                // -
+Bif_F2_NAND     Bif_F2_NAND    ::fun;                // ⍲
+Bif_F2_NAND_B   Bif_F2_NAND_B  ::fun;                // ⍲⍲
+Bif_F2_NOR      Bif_F2_NOR     ::fun;                // ⍱
+Bif_F2_NOR_B    Bif_F2_NOR_B   ::fun;                // ⍱⍱
+Bif_F2_OR       Bif_F2_OR      ::fun;                // ∨
+Bif_F2_OR_B     Bif_F2_OR_B    ::fun;                // ∨∨
+Bif_F12_PLUS    Bif_F12_PLUS   ::fun(false);         // +
+Bif_F12_PLUS    Bif_F12_PLUS   ::fun_inverse(true);  // +
+Bif_F12_POWER   Bif_F12_POWER  ::fun;                // ⋆
+Bif_F12_RND_UP  Bif_F12_RND_UP ::fun;                // ⌈
+Bif_F12_RND_DN  Bif_F12_RND_DN ::fun;                // ⌊
+Bif_F12_ROLL    Bif_F12_ROLL   ::fun;                // ? (monadic is scalar)
+Bif_F12_STILE   Bif_F12_STILE  ::fun;                // ∣
+Bif_F12_TIMES   Bif_F12_TIMES  ::fun(false);         // ×
+Bif_F12_TIMES   Bif_F12_TIMES  ::fun_inverse(true);  // ×
+Bif_F2_UNEQU    Bif_F2_UNEQU   ::fun;                // ≠
+Bif_F2_UNEQ_B   Bif_F2_UNEQ_B  ::fun;                // ≠
+Bif_F12_WITHOUT Bif_F12_WITHOUT::fun;                // ∼ (monadic is scalar)
 
 const IntCell ScalarFunction::integer_0(0);
 const IntCell ScalarFunction::integer_1(1);
@@ -1245,81 +1209,77 @@ Value_P Z(len_Z, LOC);
 Function_P
 Bif_F12_POWER::get_monadic_inverse() const
 {
-   return Bif_F12_LOGA::fun;
+   return &Bif_F12_LOGA::fun;
 }
 //----------------------------------------------------------------------------
 Function_P
 Bif_F12_POWER::get_dyadic_inverse() const
 {
-   return Bif_F12_LOGA::fun;
+   return &Bif_F12_LOGA::fun;
 }
 //----------------------------------------------------------------------------
 Function_P
 Bif_F12_LOGA::get_monadic_inverse() const
 {
-   return Bif_F12_POWER::fun;
+   return &Bif_F12_POWER::fun;
 }
 //----------------------------------------------------------------------------
 Function_P
 Bif_F12_LOGA::get_dyadic_inverse() const
 {
-   return Bif_F12_POWER::fun;
+   return &Bif_F12_POWER::fun;
 }
 //----------------------------------------------------------------------------
 Function_P
 Bif_F12_TIMES::get_dyadic_inverse() const
 {
-   if (this == fun)   return fun_inverse;
-   else               return fun;
+   return this == &fun ? &fun_inverse : &fun;
 }
 //----------------------------------------------------------------------------
 Function_P
 Bif_F12_DIVIDE::get_monadic_inverse() const
 {
    // ÷ is self-inverse: B = ÷÷B
-   return Bif_F12_DIVIDE::fun;
+   return &Bif_F12_DIVIDE::fun;
 }
 //----------------------------------------------------------------------------
 Function_P
 Bif_F12_DIVIDE::get_dyadic_inverse() const
 {
    // ÷ is self-inverse: B = (A÷(A÷B))
-   return Bif_F12_DIVIDE::fun;
+   return &Bif_F12_DIVIDE::fun;
 }
 //----------------------------------------------------------------------------
 Function_P
 Bif_F12_PLUS::get_dyadic_inverse() const
 {
-   if (this == fun)   return fun_inverse;
-   else               return fun;
+   return this == &fun ? &fun_inverse : &fun;
 }
 //----------------------------------------------------------------------------
 Function_P
 Bif_F12_MINUS::get_monadic_inverse() const
 {
    // - is self-inverse: B = --B
-   return Bif_F12_PLUS::fun;
+   return &Bif_F12_PLUS::fun;
 }
 //----------------------------------------------------------------------------
 Function_P
 Bif_F12_MINUS::get_dyadic_inverse() const
 {
    // - is self-inverse: B = (A-(A-B))
-   return Bif_F12_PLUS::fun;
+   return &Bif_F12_PLUS::fun;
 }
 //----------------------------------------------------------------------------
 Function_P
 Bif_F12_CIRCLE::get_monadic_inverse() const
 {
-   if (this == fun)   return fun_inverse;
-   else               return fun;
+   return this == &fun ? &fun_inverse : &fun;
 }
 //----------------------------------------------------------------------------
 Function_P
 Bif_F12_CIRCLE::get_dyadic_inverse() const
 {
-   if (this == fun)   return fun_inverse;
-   else               return fun;
+   return this == &fun ? &fun_inverse : &fun;
 }
 //============================================================================
 

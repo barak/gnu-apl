@@ -43,8 +43,7 @@ public:
    /// overloaded Function::eval_AB()
    virtual Token eval_AB(Value_P A, Value_P B) const;
 
-   static Bif_F12_INDEX_OF * fun;   ///< Built-in function
-   static Bif_F12_INDEX_OF  _fun;   ///< Built-in function
+   static Bif_F12_INDEX_OF  fun;   ///< Built-in function
 
 protected:
    /// find Cell B in the ravel A (of length len_A). Return the position

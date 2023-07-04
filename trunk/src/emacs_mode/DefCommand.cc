@@ -64,13 +64,13 @@ void DefCommand::run_command( NetworkConnection &conn, const std::vector<std::st
             tag->next_ravel_Int(0);
             tag->next_ravel_Pointer(make_string_cell(args[1], LOC ).get());
             function_list_value->check_value(LOC);
-            Token result = Quad_FX::fun->eval_AB( tag, function_list_value);
+            Token result = Quad_FX::fun.eval_AB( tag, function_list_value);
             out << "function defined\n"
                 << to_string(result.canonical(PST_CS_NONE));
            }
         else
            {
-             Token result = Quad_FX::fun->eval_B( function_list_value );
+             Token result = Quad_FX::fun.eval_B( function_list_value );
              if (result.is_apl_val())
                 {
                   Value_P value = result.get_apl_val();

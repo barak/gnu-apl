@@ -32,7 +32,7 @@
 #include <iomanip>
 #include <iostream>
 #include <fstream>
-#include "../Vector.hh"    // GNU vs. Clang <vector> wrapper
+#include <vector>
 
 #include "APmain.hh"
 #include "Common.hh"

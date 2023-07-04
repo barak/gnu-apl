@@ -34,11 +34,10 @@
 #include "Security.hh"
 
 // !!! declare providers before Quad_SQL::_fun !!!
-static std::vector<Provider *> providers;
-static std::vector<Connection *> connections;
+static std::basic_string<Provider *> providers;
+static std::basic_string<Connection *> connections;
 
-Quad_SQL  Quad_SQL::_fun;
-Quad_SQL * Quad_SQL::fun = &Quad_SQL::_fun;
+Quad_SQL  Quad_SQL::fun;
 
 #if apl_SQLITE3
 # include "sql/SqliteResultValue.hh"
@@ -364,7 +363,7 @@ Connection * conn = value_to_db_id(B);
 static Token
 show_tables(Value_P B)
 {
-Connection *conn = value_to_db_id(B);
+Connection * conn = value_to_db_id(B);
 vector<string> tables;
    conn->fill_tables(tables);
 

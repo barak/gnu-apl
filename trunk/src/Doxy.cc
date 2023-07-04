@@ -130,8 +130,8 @@ Doxy::gen()
 {
 const SymbolTable & symtab = Workspace::get_symbol_table();
 
-std::vector<const Symbol *> all_symbols = symtab.get_all_symbols();
-std::vector<const Symbol *> variables;
+std::basic_string<const Symbol *> all_symbols = symtab.get_all_symbols();
+std::basic_string<const Symbol *> variables;
 
    loop(a, all_symbols.size())
       {
@@ -235,7 +235,7 @@ const UCS_string alias = UTF8_string("all_functions");
 }
 //----------------------------------------------------------------------------
 void
-Doxy::functions_table(const std::vector<const Symbol *> & functions,
+Doxy::functions_table(const std::basic_string<const Symbol *> & functions,
                       ofstream & page)
 {
    if (functions.size() == 0)   return;
@@ -363,7 +363,7 @@ int total_lines = 0;
 }
 //----------------------------------------------------------------------------
 void
-Doxy::variables_table(const std::vector<const Symbol *> & variables,
+Doxy::variables_table(const std::basic_string<const Symbol *> & variables,
                        ofstream & page)
 {
    if (variables.size() == 0)   return;
@@ -437,7 +437,7 @@ Doxy::SI_table(ofstream & page)
 {
    // collect SI entries in reverse order...
    //
-std::vector<const StateIndicator *> stack;
+std::basic_string<const StateIndicator *> stack;
 
    for (const StateIndicator * si = Workspace::SI_top();
         si; si = si->get_parent())
@@ -777,7 +777,7 @@ const char * bold = "<span style='font-weight: bold'>";
 }
 //----------------------------------------------------------------------------
 void
-Doxy::make_call_graph(const std::vector<const Symbol *> & all_fns)
+Doxy::make_call_graph(const std::basic_string<const Symbol *> & all_fns)
 {
    loop(f, all_fns.size())
       {

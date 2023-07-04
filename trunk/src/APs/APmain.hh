@@ -18,7 +18,7 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-#include "../Vector.hh"    // GNU vs. Clang <vector> wrapper
+#include <vector>
 
 #include "../Common.hh"
 #include "../Svar_DB.hh"

@@ -21,7 +21,7 @@
 /** @file
 */
 
-#include "../Vector.hh"    // GNU vs. Clang <vector> wrapper
+#include <vector>
 
 #include "apl-sqlite.hh"
 #include "NativeFunction.hh"

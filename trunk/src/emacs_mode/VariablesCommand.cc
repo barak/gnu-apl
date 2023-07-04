@@ -57,8 +57,8 @@ void VariablesCommand::run_command( NetworkConnection &conn, const std::vector<s
         }
     }
 
-    std::vector<const Symbol *> symbols = Workspace::get_all_symbols();
-    for (int i = 0 ; i < symbols.size() ; i++)
+    std::basic_string<const Symbol *> symbols = Workspace::get_all_symbols();
+    loop(i, symbols.size())
         {
           const Symbol * symbol = symbols[i];
           if (symbol->is_erased())   continue;  // hide erased symbols

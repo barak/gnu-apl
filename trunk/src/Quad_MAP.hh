@@ -36,8 +36,7 @@ public:
       : QuadFunction(TOK_Quad_MAP)
    {}
 
-   static Quad_MAP * fun;          ///< Built-in function.
-   static Quad_MAP  _fun;          ///< Built-in function.
+   static Quad_MAP  fun;          ///< Built-in function.
 
 protected:
    /// overloaded Function::eval_AB()

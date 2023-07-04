@@ -66,8 +66,7 @@ public:
    /// fork(), execve(), and return a connection to fd 3 of forked process
    static int do_FIO_57(const UCS_string & B, char * const * envp);
 
-   static Quad_FIO * fun;   ///< Built-in function.
-   static Quad_FIO  _fun;   ///< Built-in function.
+   static Quad_FIO  fun;   ///< Built-in function.
 
    /// get one Unicode from file
    static Unicode fget_utf8(FILE * file, ShapeItem & fget_count);

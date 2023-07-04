@@ -51,8 +51,7 @@ public:
    /// overloaded Function::eval_AB()
    virtual Token eval_AB(Value_P A, Value_P B) const;
 
-   static Bif_F12_DOMINO * fun;   ///< Built-in function
-   static Bif_F12_DOMINO  _fun;   ///< Built-in function
+   static Bif_F12_DOMINO  fun;   ///< Built-in function
 
    /// overloaded Function::eval_fill_B()
    virtual Token eval_fill_B(Value_P B) const;

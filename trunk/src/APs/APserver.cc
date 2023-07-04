@@ -46,7 +46,7 @@
 #include <iostream>
 #include <iomanip>
 #include <sstream>
-#include "../Vector.hh"    // GNU vs. Clang <vector> wrapper
+#include <vector>
 
 #define __COMMON_HH_DEFINED__ // to avoid #error in APL_types.hh
 #define AP_NUM /* simple AP_NUM */

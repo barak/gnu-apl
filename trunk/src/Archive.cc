@@ -342,8 +342,8 @@ XML_Saving_Archive::save_functions()
    //
    do_indent();
    out << "<!-- system functions and primitives... -->" << endl;
-#define sf_def(x, _str, _txt)   save_Function(x::_fun);
-#define pf_def(x, _str, _txt)   save_Function(x::_fun);
+#define sf_def(x, _str, _txt)   save_Function(x::fun);
+#define pf_def(x, _str, _txt)   save_Function(x::fun);
 #include "SystemVariable.def"
 
    out << endl;
@@ -519,7 +519,7 @@ XML_Saving_Archive::save_symtab(const SymbolTable & symtab)
 {
    Log(LOG_archive)   CERR << "save_symtab()" << endl;
 
-std::vector<const Symbol *> symbols = symtab.get_all_symbols();
+std::basic_string<const Symbol *> symbols = symtab.get_all_symbols();
 
    // remove erased symbols
    //

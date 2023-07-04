@@ -27,6 +27,7 @@
 #include <stdint.h>
 #include <stdio.h>
 #include <string>
+#include <vector>
 
 #include "Assert.hh"
 #include "Avec.hh"
@@ -35,7 +36,6 @@
 #include "TokenEnums.hh"
 #include "Unicode.hh"
 #include "UTF8_string.hh"
-#include "Vector.hh"    // GNU vs. Clang <vector> wrapper
 
 using namespace std;
 
@@ -340,7 +340,7 @@ public:
 
    /// append members (like x.y.z) starting at members[m] and going backwards
    /// from the end of \b members to \b this string.
-   void append_members(const vector<const UCS_string *> & members, int m);
+   void append_members(const basic_string<const UCS_string *> & members, int m);
 
    /// append number (in ASCII encoding like %lf) to this string
    void append_float(APL_Float num);

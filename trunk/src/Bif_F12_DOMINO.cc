@@ -34,8 +34,7 @@ extern void divide_matrix(Value & Z, bool need_complex,
                           ShapeItem cols_B, const Cell * cB);
 
 
-Bif_F12_DOMINO   Bif_F12_DOMINO   ::_fun;    // ⌹
-Bif_F12_DOMINO * Bif_F12_DOMINO::fun = &Bif_F12_DOMINO::_fun;
+Bif_F12_DOMINO   Bif_F12_DOMINO   ::fun;    // ⌹
 
 #ifndef DOMINO_DEBUG
 # undef Q1
@@ -266,7 +265,7 @@ Value_P Z = Bif_F12_FORMAT::format_by_specification(A, B);
 #endif // DOMINO_DEBUG
 }
 //----------------------------------------------------------------------------
-/// inver a real upper-triangle matrix
+/// invert a real upper-triangular matrix
 template<>
 Value_P Bif_F12_DOMINO::invert_upper_triangle_matrix<false>(const ShapeItem M,
                                                             const ShapeItem N,

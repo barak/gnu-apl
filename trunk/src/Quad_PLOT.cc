@@ -92,10 +92,9 @@
 
 using namespace std;
 
-Quad_PLOT  Quad_PLOT::_fun;
-Quad_PLOT * Quad_PLOT::fun = &Quad_PLOT::_fun;
+Quad_PLOT  Quad_PLOT::fun;
 
-vector<Quad_PLOT::PLOT_context *> Quad_PLOT::all_PLOT_windows;
+basic_string<Quad_PLOT::PLOT_context *> Quad_PLOT::all_PLOT_windows;
 
 Quad_PLOT::Handle Quad_PLOT::next_handle = 0;
 

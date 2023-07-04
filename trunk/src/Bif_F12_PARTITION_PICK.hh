@@ -63,8 +63,7 @@ public:
    /// overloaded Function::eval_AXB()
    virtual Token eval_AXB(Value_P A, Value_P X, Value_P B) const;
 
-   static Bif_F12_PARTITION * fun;   ///< Built-in function
-   static Bif_F12_PARTITION  _fun;   ///< Built-in function
+   static Bif_F12_PARTITION  fun;   ///< Built-in function
 
    /// enclose_with_axes
    static Value_P enclose_with_axes(const Shape & shape_X, Value_P B);
@@ -123,8 +122,7 @@ public:
    /// ⊃[X]B
    static Value_P disclose_with_axis(const Shape & axes_X, Value_P B);
 
-   static Bif_F12_PICK * fun;   ///< Built-in function
-   static Bif_F12_PICK  _fun;   ///< Built-in function
+   static Bif_F12_PICK  fun;   ///< Built-in function
 
 protected:
    /// the shape of the items being disclosed

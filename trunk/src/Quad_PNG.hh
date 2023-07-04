@@ -36,8 +36,7 @@ public:
    /// Constructor.
    Quad_PNG();
 
-   static Quad_PNG * fun;          ///< Built-in function.
-   static Quad_PNG  _fun;          ///< Built-in function.
+   static Quad_PNG  fun;          ///< Built-in function.
 
    /// a semaphore blocking until gtk_widget_show_all() was called
    static sem_t * PNG_window_sema;

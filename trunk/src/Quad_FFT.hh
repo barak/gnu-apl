@@ -44,8 +44,7 @@ public:
         system_wisdom_loaded = false;
       }
 
-   static Quad_FFT * fun;          ///< Built-in function.
-   static Quad_FFT  _fun;          ///< Built-in function.
+   static Quad_FFT  fun;          ///< Built-in function.
 
 protected:
    /// overloaded Function::eval_AB()

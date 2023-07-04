@@ -24,8 +24,7 @@
 #include "Quad_MAP.hh"
 #include "Workspace.hh"
 
-Quad_MAP  Quad_MAP::_fun;
-Quad_MAP * Quad_MAP::fun = &Quad_MAP::_fun;
+Quad_MAP  Quad_MAP::fun;
 
 //----------------------------------------------------------------------------
 /*

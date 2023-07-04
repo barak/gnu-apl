@@ -43,8 +43,7 @@ public:
    /// overloaded Function::eval_AB()
    virtual Token eval_AB(Value_P A, Value_P B) const;
 
-   static Bif_F12_INTERVAL_INDEX * fun;   ///< Built-in function
-   static Bif_F12_INTERVAL_INDEX  _fun;   ///< Built-in function
+   static Bif_F12_INTERVAL_INDEX  fun;   ///< Built-in function
 
 protected:
    /// find cell in ranges defined by ranges and range_count

@@ -52,8 +52,7 @@ public:
    /// eval_ALRB() or eval_LRB() for numeric RO (aka. Form 1)
    static Token eval_form_2(Value_P A, Token & LO, Token & RO, Value_P B);
 
-   static Bif_OPER2_POWER * fun;      ///< Built-in function
-   static Bif_OPER2_POWER  _fun;      ///< Built-in function
+   static Bif_OPER2_POWER  fun;      ///< Built-in function
 
 protected:
 };

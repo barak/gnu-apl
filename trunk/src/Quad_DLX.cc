@@ -28,8 +28,7 @@
 #include "Token.hh"
 #include "Workspace.hh"
 
-Quad_DLX  Quad_DLX::_fun;
-Quad_DLX * Quad_DLX::fun = &Quad_DLX::_fun;
+Quad_DLX  Quad_DLX::fun;
 
 //============================================================================
 /// one '1' in a sparse constraint matrix
@@ -277,7 +276,7 @@ public:
    ShapeItem get_cover_count() const      { return cover_count; }
 
    /// all solutions as len rows... len rows ...
-   std::vector<ShapeItem> all_solutions;
+   std::basic_string<ShapeItem> all_solutions;
 
 protected:
    /// the max. number of solutions to produce, 0 = all

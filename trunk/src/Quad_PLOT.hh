@@ -49,8 +49,7 @@ public:
    /// Constructor.
    Quad_PLOT();
 
-   static Quad_PLOT * fun;          ///< Built-in function.
-   static Quad_PLOT  _fun;          ///< Built-in function.
+   static Quad_PLOT  fun;          ///< Built-in function.
 
    /// a semaphore blocking until the plot window has been EXPOSED
    static sem_t * expose_sema;
@@ -92,7 +91,7 @@ public:
       };
 
    /// all open ⎕PLOT windows
-   static vector<PLOT_context *> all_PLOT_windows;
+   static basic_string<PLOT_context *> all_PLOT_windows;
 
 #if apl_GTK3   // GTK
 

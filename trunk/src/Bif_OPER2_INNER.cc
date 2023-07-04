@@ -29,8 +29,7 @@
 #include "PointerCell.hh"
 #include "Workspace.hh"
 
-Bif_OPER2_INNER   Bif_OPER2_INNER::_fun;
-Bif_OPER2_INNER * Bif_OPER2_INNER::fun = &Bif_OPER2_INNER::_fun;
+Bif_OPER2_INNER   Bif_OPER2_INNER::fun;
 
 Bif_OPER2_INNER::PJob_product Bif_OPER2_INNER::job;
 
