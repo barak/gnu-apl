@@ -42,8 +42,8 @@ using namespace std;
 /// the implementation of Z←A⌹B.
 /// Z[;j] is the solution of A[;j] = B +.× Z[j]
 void
-divide_matrix(Value & Z, bool need_complex,
-              ShapeItem rows, ShapeItem cols_A, const Cell * cA,
+divide_matrix(Value & Z, bool need_complex, ShapeItem rows,
+              ShapeItem cols_A, const Cell * cA,
               ShapeItem cols_B, const Cell * cB)
 {
    // the following has been checked by the caller:
@@ -52,95 +52,108 @@ divide_matrix(Value & Z, bool need_complex,
    // rows_A == rows_B  (aka. rows below)
    //
 const APL_Float rcond = Workspace::get_CT();
-   loop(c, cols_A)
+const size_t items_A = rows * cols_A;
+const size_t items_B = rows * cols_B;
+const int FpI = need_complex ? 2 : 1;   // Floats per Item
+
+void * free_A = malloc(items_A * FpI * sizeof(APL_Float));
+void * free_B = malloc(items_B * FpI * sizeof(APL_Float));
+   if (free_A == 0 || free_B == 0)
+      {
+         free(free_A);
+         free(free_B);
+         WS_FULL
+      }
+
+APL_Float * fpA = reinterpret_cast<APL_Float *>(free_A);
+APL_Float * fpB = reinterpret_cast<APL_Float *>(free_B);
+
+#define FREE_AB(ERROR) { free(free_A);   free(free_B);   ERROR; }
+
+   ALL_COLS(cols_A)
        {
          if (need_complex)
             {
-              APL_Float * ad = reinterpret_cast<APL_Float *>(
-                               malloc(rows * cols_A * 2*sizeof(APL_Float)));
-              if (ad == 0)   WS_FULL
-              LA_pack::ZZ * const a = reinterpret_cast<LA_pack::ZZ *>(ad);
-              loop(r, rows)
+              LA_pack::ZZ * const a = reinterpret_cast<LA_pack::ZZ *>(fpA);
+              ALL_ROWS(rows)
                   {
-                    new (a + r) LA_pack::ZZ(cA[r*cols_A + c].get_real_value(),
-                                   cA[r*cols_A + c].get_imag_value());
+                    const Cell & src_A = cA[row * cols_A + col];
+                    new (a + row) LA_pack::ZZ(src_A.get_real_value(),
+                                              src_A.get_imag_value());
                   }
 
-              APL_Float * bd = reinterpret_cast<APL_Float *>(
-                               malloc(rows * cols_B * 2*sizeof(APL_Float)));
-              if (bd == 0)   { free(a);   WS_FULL }
-
-              LA_pack::ZZ * const b = reinterpret_cast<LA_pack::ZZ *>(bd);
+              LA_pack::ZZ * const b = reinterpret_cast<LA_pack::ZZ *>(fpB);
               LA_pack::ZZ * bb = b;
-              loop(rr, cols_B)
-              loop(cc, rows)
+
+              // initialize b[] in FORTRAN (aka. column major) order,
+              // which is ⍉ APL (aka. row major) order. I.e. use ⍉B.
+              //
+              ALL_COLS(cols_B)
+              ALL_ROWS(rows)
                  {
-                   new (bb++) LA_pack::ZZ(cB[rr + cc*cols_B].get_real_value(),
-                                 cB[rr + cc*cols_B].get_imag_value());
+                   const Cell & src_B = cB[col + row*cols_B];
+                   new (bb++) LA_pack::ZZ(src_B.get_real_value(),
+                                          src_B.get_imag_value());
                  }
 
-              {
-                LA_pack::Matrix<LA_pack::ZZ> B(b, rows, cols_B, /* LDB */ rows);
-                LA_pack::Matrix<LA_pack::ZZ> A(a, rows, 1,      /* LDA */ rows);
-                const ShapeItem rk = LA_pack::Zgelsy(B, A, rcond);
-                free(bd);
-                if (rk != cols_B)
-                   {
-                     free(ad);
-                     DOMAIN_ERROR;
-                   }
-              }
+              LA_pack::Matrix<LA_pack::ZZ> B(b, rows, cols_B, /* LDB */ rows);
+              LA_pack::Matrix<LA_pack::ZZ> A(a, rows, 1,      /* LDA */ rows);
+              const sRank rank = LA_pack::Zgelsy(B, A, rcond);
+              if (rank != cols_B)
+                 {
+                   MORE_ERROR() << "A⌹B : linear dependent (complex) B?";
+                   FREE_AB(DOMAIN_ERROR)
+                 }
 
               // cols_A = rows_Z. We have computed the result for col c of A
               // which is row c of Z.
               //
-              loop(r, cols_B)
-                  Z.set_ravel_Complex(r*cols_A + c, a[r].real(), a[r].imag());
-              free(ad);
+              ALL_ROWS(cols_B)
+                  Z.set_ravel_Complex(row*cols_A + col, a[row].real(),
+                                                        a[row].imag());
             }
          else   // real
             {
-              APL_Float * a = reinterpret_cast<APL_Float *>(
-                              malloc(rows * cols_A * sizeof(APL_Float)));
-              if (a == 0)   WS_FULL
-              loop(r, rows)
+              ALL_ROWS(rows)
                  {
-                   a[r] = cA[r*cols_A + c].get_real_value();
+                    const Cell & src_A = cA[row*cols_A + col];
+                    fpA[row] = src_A.get_real_value();
                  }
 
-              APL_Float * b = reinterpret_cast<APL_Float *>(
-                              malloc(rows * cols_B * sizeof(APL_Float)));
-              if (b == 0)   { free(a);   WS_FULL }
+              APL_Float * bb = fpB;
 
-              APL_Float * bb = b;
-              loop(rr, cols_B)
-              loop(cc, rows)
+              // initialize b[] in FORTRAN (aka. column major) order,
+              // which is ⍉ APL (aka. row major) order. I.e. use ⍉B.
+              //
+              ALL_COLS(cols_B)
+              ALL_ROWS(rows)
                  {
-                   *bb++ = cB[rr + cc*cols_B].get_real_value();
+                   const Cell & src_B = cB[col + row*cols_B];
+                   *bb++ = src_B.get_real_value();
                  }
 
               {
                 const APL_Float rcond = Workspace::get_CT();
 
-                LA_pack::Matrix<LA_pack::DD> B(b, rows, cols_B, /* LDB */ rows);
-                LA_pack::Matrix<LA_pack::DD> A(a, rows, 1,      /* LDA */ rows);
-                const ShapeItem rk = LA_pack::Dgelsy(B, A, rcond);
-                free(b);
-                if (rk != cols_B)
+                LA_pack::Matrix<LA_pack::DD> B(fpB, rows, cols_B, /*LDB*/ rows);
+                LA_pack::Matrix<LA_pack::DD> A(fpA, rows, 1,    /* LDA */ rows);
+                const sRank rank = LA_pack::Dgelsy(B, A, rcond);
+                if (rank != cols_B)
                    {
-                     free(a);
-                     DOMAIN_ERROR;
+                     MORE_ERROR() << "A⌹B : linear dependent (real) B?";
+                     FREE_AB(DOMAIN_ERROR)
                    }
               }
 
               // cols_A = rows_Z. We have computed the result for col c of A
               // which is row c of Z.
               //
-
-              loop(r, cols_B)   Z.set_ravel_Float(r*cols_A + c, a[r]);
-              free(a);
+              ALL_ROWS(cols_B)   Z.set_ravel_Float(row*cols_A + col, fpA[row]);
             }
        }
+
+   free(free_A);
+   free(free_B);
 }
 
    // numerical limits
@@ -151,20 +164,20 @@ const APL_Float rcond = Workspace::get_CT();
 #define dlamch_E 1.11022e-16
 #define dlamch_S 2.22507e-308
 #define dlamch_P 2.22045e-16
-static const APL_Float small_number = dlamch_S / dlamch_P;
-static const APL_Float big_number   = 1.0 / small_number;
-static const APL_Float safe_min     =  dlamch_S / dlamch_E;
-static const APL_Float inv_safe_min = 1.0 / safe_min;
-static const APL_Float tol3z        = sqrt(dlamch_E);
+static const APL_Float small_number = dlamch_S / dlamch_P;    // 1.00208E¯292
+static const APL_Float big_number   = 1.0 / small_number;     // 9.97923E291
+static const APL_Float safe_min     =  dlamch_S / dlamch_E;   // 2.00417E¯292
+static const APL_Float inv_safe_min = 1.0 / safe_min;         // 4.98959E291
+static const APL_Float tol3z        = sqrt(dlamch_E);         // 1.05367E¯8
 
 //----------------------------------------------------------------------------
 ///  DGELSY solves overdetermined or underdetermined systems for GE matrices 
 template<typename T>
 int LA_pack::gelsy(Matrix<T> & A, Matrix<T> &B, APL_Float rcond)
 {
-const ShapeItem M    = A.get_row_count();
-const ShapeItem N    = A.get_column_count();
-const ShapeItem NRHS = B.get_column_count();
+const Crow M    = A.get_row_count();
+const Ccol N    = A.get_column_count();
+const Ccol NRHS = B.get_column_count();
 
    // APL is responsible for handling the empty cases
    //
@@ -225,28 +238,30 @@ int LA_pack::scaled_gelsy(Matrix<T> & A, Matrix<T> & B, double rcond)
    // 0 < N <= M  →  min_NM = N and max_MN = M
    // 0 < NRHS
    //
-const ShapeItem N    = A.get_column_count();
-const ShapeItem NRHS = B.get_column_count();
+const Ccol N    = A.get_column_count();
+const Ccol NRHS = B.get_column_count();
 
    // Compute QR factorization with column pivoting of A:
    // A * P = Q * R
    //
-   // pivot_tau_tmp is a vector of ShapeItem pivot, complex tau, and
-   // complex tmp in a single memory allcoation.
+   // pivot_tau_tmp is a vector of Ccol pivot, real or complex tau, and
+   // real or complex tmp in a single memory allcoation.
    //
-char * pivot_tau_tmp = new char[N*(sizeof(ShapeItem) + 4*sizeof(APL_Float))];
+char * pivot_tau_tmp = new char[N * (  sizeof(Ccol) +   // pivot[N]
+                                       sizeof(T)    +   // tau[N]
+                                       sizeof(T))];     // tmp[N]
 
   // N pivot items
   //
-ShapeItem * pivot = reinterpret_cast<ShapeItem *>(pivot_tau_tmp);
+Ccol * pivot = reinterpret_cast<Ccol *>(pivot_tau_tmp);   // N pivots
 
    // N tau items (complex = double[2],
    //
-T * tau = reinterpret_cast<T *>(pivot + N);       // N complex tau items
+T * tau = reinterpret_cast<T *>(pivot + N);               // N tau items
 
    // and N tmp items (complex = double[2]).
    //
-T * tmp = tau + N;                                // N complex tmp1 items
+T * tmp = tau + N;                                        // N tmp1 items
 
    geqp3<T>(A, pivot, tau);
 
@@ -279,21 +294,21 @@ T * tmp = tau + N;                                // N complex tmp1 items
    // 
    unm2r<T>(N, A, tau, B);
 
-   // B(1:RANK, 1:NRHS) := inv(T11) * B(1:RANK,1:NRHS)
+   // B(1:RANK, 1:NRHS) := reciprocal(T11) * B(1:RANK,1:NRHS)
    //
    {
      Matrix<T> B1 = B.sub_len(B.get_dx(), NRHS);
-     trsm<T>(N, NRHS, A, B1);
+     trsm<T>(A, B1);
    }
 
    // workspace: 2*MN+NRHS
    //
    // B(1:N,1:NRHS) := P * B(1:N,1:NRHS)
    //
-   loop(j, NRHS)
+   ALL_COLS(NRHS)
       {
-        loop(i, N)   tmp[pivot[i]] = B.at(i, j);
-        loop(i, N)   B.at(i, j) = tmp[i];
+        ALL_ROWS(N)   tmp[pivot[row]] = B.at(row, col);
+        ALL_ROWS(N)   B.at(row, col) = tmp[row];
       }
 
    delete[] pivot_tau_tmp;
@@ -306,9 +321,9 @@ int LA_pack::estimate_rank(const Matrix<T> & A, APL_Float rcond)
 {
    // Determine RANK using incremental condition estimation...
 
-const ShapeItem N = A.get_column_count();
+const Ccol N = A.get_column_count();
 
-APL_Float smax = ABS(A.diag(0));
+APL_Float smax = abs(A.diag(0));
 APL_Float smin = smax;
    if (smax == 0.0)   return 0;
 
@@ -324,22 +339,22 @@ T * work_max = work_min + N;
 
    for (int RANK = 1; RANK < N; ++RANK)
        {
-         T s1(0.0);
-         T s2(0.0);
-         T c1(0.0);
-         T c2(0.0);
+         T sin_min(0.0);
+         T sin_max(0.0);
+         T cos_min(0.0);
+         T cos_max(0.0);
          const T gamma(A.diag(RANK));
 
          T alpha_min = 0.0;
          T alpha_max = 0.0;
-         for (int r = 0; r < RANK; ++r)
+         loop(r, RANK)
              {
-               alpha_min = alpha_min + DZ::CONJ(work_min[r] * A.at(r, RANK));
-               alpha_max = alpha_max + DZ::CONJ(work_max[r] * A.at(r, RANK));
+               alpha_min += conjugated(work_min[r]* A.at(r, RANK));
+               alpha_max += conjugated(work_max[r]* A.at(r, RANK));
              }
 
-        laic1_min<T>(smin, alpha_min, gamma, s1, c1);
-         laic1_max<T>(smax, alpha_max, gamma, s2, c2);
+         laic1_MIN<T>(smin, alpha_min, gamma, sin_min, cos_min);
+         laic1_MAX<T>(smax, alpha_max, gamma, sin_max, cos_max);
 
          if (smax*rcond > smin)   // done
             {
@@ -349,12 +364,12 @@ T * work_max = work_min + N;
 
          loop(i, RANK)
               {
-                work_min[i] = work_min[i] * s1;
-                work_max[i] = work_max[i] * s2;
+                work_min[i] = work_min[i] * sin_min;
+                work_max[i] = work_max[i] * sin_max;
               }
 
-         work_min[RANK] = c1;
-         work_max[RANK] = c2;
+         work_min[RANK] = cos_min;
+         work_max[RANK] = cos_max;
        }
 
    delete[] work_1;
@@ -363,65 +378,61 @@ T * work_max = work_min + N;
 //----------------------------------------------------------------------------
 // LApack function geqp3
 template<typename T>
-void LA_pack::geqp3(Matrix<T> & A, ShapeItem * pivot, T * tau)
+void LA_pack::geqp3(Matrix<T> & A, Ccol * pivot, T * tau)
 {
-const ShapeItem M = A.get_row_count();
-const ShapeItem N = A.get_column_count();
+const Crow M = A.get_row_count();
+const Ccol N = A.get_column_count();
 
-   // init column permutaion for pivoting
-   // so we simply create the identical permutation
+   // init the column permutation for pivoting.
+   // start with the identical permutation
    //
-   loop(j, N)   pivot[j] = j;
+   ALL_COLS(N)   pivot[col] = col;
 
    // (no fixed columns)
 
-   // Factorize free columns
-   // ======================
+   // Factorize free columns...
+   // =========================
    //
-   {
-     // Initialize partial column norms.
-     // the first N elements of WORK store the exact column norms.
-     //
-     APL_Float * vn12 = new APL_Float[2*N];
-     loop(j, N)
+
+   // Initialize partial column norms.
+   // the first N elements of WORK store the exact column norms,
+   // and the next N elements are a copy of the first N elements
+   //
+APL_Float * work = new APL_Float[2*N];
+   ALL_COLS(N)
          {
-           Vector<T> x(&A.at(0, j), M);
-           vn12[N + j] = vn12[j] = x.norm();
+           Vector<T> x(&A.at(0, col), M);
+           work[N + col] = work[col] = x.norm();
          }
 
-     // Use unblocked code to factor the last or only block
-     //
-     laqp2<T>(A, pivot, tau, vn12);
-     delete[] vn12;
-   }
+   laqp2<T>(A, pivot, tau, work);
+   delete[] work;
 }
 //----------------------------------------------------------------------------
 template<typename T>
-void LA_pack::unm2r(ShapeItem K, Matrix<T> & A, const T * tau, Matrix<T> & c)
+void LA_pack::unm2r(Crow K, Matrix<T> & A, const T * tau, Matrix<T> & C)
 {
-const ShapeItem M = c.get_row_count();
+const Crow M = C.get_row_count();
 
-   // only SIDE == "Left" is implemented
-   // only TRANS = 'T' or 'C' is implemented
-   // thus NOTRANS is always false
+   // only SIDE == "Left" is implemented, and
+   // only TRANS = 'T' or 'C' is implemented.
+   // thus NOTRANS is always false.
    //
-   loop(i, K)
+   ALL_ROWS(K)
        {
          // H(i) or H(i)**H is applied to C(i:m,1:n)
          //
-         const int MM = M - i;
+         const int MM = M - row;
 
         //
-         const T tau_i = DZ::CONJ(tau[i]);
+         const T tau_i = conjugated(tau[row]);
 
-         const T Aii = A.diag(i);   // remember A(i, i)
-         {
-           A.diag(i) = APL_Float(1.0);
-           Vector<T> v(&A.diag(i), MM);
-           Matrix<T> c1 = c.sub_yx(i, 0);
-           larf<T>(v, tau_i, c1);
-         }
-         A.diag(i) = Aii;   // restore A(i, i);
+         const T Aii = A.diag(row);   // remember A(row, row)
+           A.diag(row) = APL_Float(1.0);
+           Vector<T> v(&A.diag(row), MM);
+           Matrix<T> SUB = C.sub_matrix(row, 0);
+           larf<T>(v, tau_i, SUB);
+         A.diag(row) = Aii;           // restore A(row, row);
        }
 }
 //----------------------------------------------------------------------------
@@ -431,12 +442,12 @@ const ShapeItem M = c.get_row_count();
      SEST: largest estimated singular value of \b this matrix
  **/
 template<typename T>
-void LA_pack::laic1_max(APL_Float & SEST, T alpha, T GAMMA, T & SIN, T & COS)
+void LA_pack::laic1_MAX(APL_Float & SEST, T alpha, T GAMMA, T & SIN, T & COS)
 {
 const APL_Float eps = dlamch_E;
-const APL_Float abs_alpha = ABS(alpha);
-const APL_Float abs_gamma = ABS(GAMMA);
-const APL_Float abs_estimate = ABS(SEST);
+const APL_Float abs_alpha = abs(alpha);
+const APL_Float abs_gamma = abs(GAMMA);
+const APL_Float abs_estimate = abs(SEST);
 
    //    Estimating largest singular value ...
 
@@ -444,7 +455,7 @@ const APL_Float abs_estimate = ABS(SEST);
    //
    if (SEST == 0.0)
       {
-        const APL_Float s1 = MAX(abs_gamma, abs_alpha);
+        const APL_Float s1 = max(abs_gamma, abs_alpha);
         if (s1 == 0.0)
            {
              SIN = T(0.0);
@@ -456,7 +467,7 @@ const APL_Float abs_estimate = ABS(SEST);
              SIN = alpha / s1;
              COS = GAMMA / s1;
 
-             const APL_Float tmp = sqrt(ABS_2(SIN) + ABS_2(COS));
+             const APL_Float tmp = hypotenuse(SIN, COS);
              SIN = SIN / tmp;
              COS = COS / tmp;
              SEST = s1*tmp;
@@ -468,10 +479,10 @@ const APL_Float abs_estimate = ABS(SEST);
       {
         SIN = T(1.0);
         COS = T(0.0);
-        APL_Float tmp = MAX(abs_estimate, abs_alpha);
+        APL_Float tmp = max(abs_estimate, abs_alpha);
         const APL_Float s1 = abs_estimate / tmp;
         const APL_Float s2 = abs_alpha / tmp;
-        SEST = tmp*sqrt(s1*s1 + s2*s2);
+        SEST = tmp * hypotenuse(s1, s2);
         return;
       }
 
@@ -501,18 +512,18 @@ const APL_Float abs_estimate = ABS(SEST);
         if (s1 <= s2)
            {
              const APL_Float tmp = s1 / s2;
-             const APL_Float scl = sqrt(1.0 + tmp*tmp);
-             SEST = s2*scl;
-             SIN = (alpha / s2) / scl;
-             COS = (GAMMA / s2) / scl;
+             const APL_Float scale = hypotenuse(1.0, tmp);
+             SEST = s2*scale;
+             SIN = (alpha / s2) / scale;
+             COS = (GAMMA / s2) / scale;
            }
         else
            {
              const APL_Float tmp = s2 / s1;
-             const APL_Float scl = sqrt(1.0 + tmp*tmp);
-             SEST = s1*scl;
-             SIN = (alpha / s1) / scl;
-             COS = (GAMMA / s1) / scl;
+             const APL_Float scale = hypotenuse(1.0, tmp);
+             SEST = s1*scale;
+             SIN = (alpha / s1) / scale;
+             COS = (GAMMA / s1) / scale;
            }
         return;
       }
@@ -522,17 +533,16 @@ const APL_Float abs_estimate = ABS(SEST);
 const APL_Float zeta1 = abs_alpha / abs_estimate;
 const APL_Float zeta2 = abs_gamma / abs_estimate;
 const APL_Float b = (1.0 - zeta1*zeta1 - zeta2*zeta2)*0.5;
-const APL_Float zeta1_2 = zeta1*zeta1;
 APL_Float t;
 
-   if (b > 0.0)  t = zeta1_2 / (b + sqrt(b*b + zeta1_2));
-   else          t = sqrt(b*b + zeta1_2) - b;
+   if (b > 0.0)  t = zeta1 * zeta1 / (b + hypotenuse(b, zeta1));
+   else          t = hypotenuse(b, zeta1) - b;
 
-const T sine = -( alpha / abs_estimate ) / t;
-const T cosine = -( GAMMA / abs_estimate ) / ( 1.0 + t);
-const APL_Float tmp = sqrt(ABS_2(sine) + ABS_2(cosine));
+const T sine = -(alpha / abs_estimate) / t;
+const T cosi = -(GAMMA / abs_estimate) / (1.0 + t);
+const APL_Float tmp = hypotenuse(sine, cosi);
    SIN = sine / tmp;
-   COS = cosine / tmp;
+   COS = cosi / tmp;
    SEST = sqrt(t + 1.0) * abs_estimate;
 }
 //----------------------------------------------------------------------------
@@ -540,15 +550,15 @@ const APL_Float tmp = sqrt(ABS_2(sine) + ABS_2(cosine));
       Results are: SEST, SIN, and COS
      apply one step of incremental condition estimation.
 
-     SEST: smallest estimated singularvalue of \b this matrix
+     SEST: smallest estimated singular value of \b this matrix
  **/
 template<typename T>
-void LA_pack::laic1_min(APL_Float & SEST, T alpha, T GAMMA, T & SIN, T & COS)
+void LA_pack::laic1_MIN(APL_Float & SEST, T ALPHA, T GAMMA, T & SIN, T & COS)
 {
 const APL_Float eps = dlamch_E;
-const APL_Float abs_alpha = ABS(alpha);
-const APL_Float abs_gamma = ABS(GAMMA);
-const APL_Float abs_estimate = ABS(SEST);
+const APL_Float abs_alpha = abs(ALPHA);
+const APL_Float abs_gamma = abs(GAMMA);
+const APL_Float abs_estimate = abs(SEST);
 
    //    Estimating smallest singular value ...
    //
@@ -559,21 +569,21 @@ const APL_Float abs_estimate = ABS(SEST);
       {
         SEST = 0.0;
         T sine(1.0);
-        T cosine(0.0);
+        T cosi(0.0);
         if (abs_gamma > 0.0 || abs_alpha > 0.0)
            {
-             sine   = -DZ::CONJ(GAMMA);
-             cosine =  DZ::CONJ(alpha);
+             sine = -conjugated(GAMMA);
+             cosi =  conjugated(ALPHA);
            }
 
-        const APL_Float abs_sine = ABS(sine);
-        const APL_Float abs_cosine = ABS(cosine);
-        const APL_Float s1 = MAX(abs_sine, abs_cosine);
+        const APL_Float abs_sine = abs(sine);
+        const APL_Float abs_cosi = abs(cosi);
+        const APL_Float s1 = max(abs_sine, abs_cosi);
         const T sine_s1 = sine / s1;
-        const T cosine_s1 = cosine / s1;
+        const T cosi_s1 = cosi / s1;
         SIN = sine_s1;
-        COS = cosine_s1;
-        const APL_Float tmp = sqrt(ABS_2(sine_s1) + ABS_2(cosine_s1));
+        COS = cosi_s1;
+        const APL_Float tmp = hypotenuse(sine_s1, cosi_s1);
         SIN = SIN / tmp;
         COS = COS / tmp;
         return;
@@ -611,27 +621,27 @@ const APL_Float abs_estimate = ABS(SEST);
       {
         const APL_Float s1 = abs_gamma;
         const APL_Float s2 = abs_alpha;
-        const T conj_gamma = DZ::CONJ(GAMMA);
-        const T conj_alpha = DZ::CONJ(alpha);
+        const T conj_gamma = conjugated(GAMMA);
+        const T conj_alpha = conjugated(ALPHA);
 
         if (s1 <= s2)
            {
              const APL_Float tmp = s1 / s2;
-             const APL_Float scl = sqrt(1.0 + tmp*tmp);
-             const APL_Float tmp_scl = tmp / scl;
+             const APL_Float scale = hypotenuse(1.0, tmp);
+             const APL_Float tmp_scale = tmp / scale;
 
-             SEST = abs_estimate * tmp_scl;
-             SIN = -(conj_gamma / s2 ) / scl;
-             COS =  (conj_alpha / s2 ) / scl;
+             SEST = abs_estimate * tmp_scale;
+             SIN = - (conj_gamma / s2) / scale;
+             COS =   (conj_alpha / s2) / scale;
            }
         else
            {
              const APL_Float tmp = s2 / s1;
-             const APL_Float scl = sqrt(1.0 + tmp*tmp);
+             const APL_Float scale = hypotenuse(1.0, tmp);
 
-             SEST = abs_estimate / scl;
-             SIN = -( conj_gamma / s1 ) / scl;
-             COS = ( conj_alpha  / s1 ) / scl;
+             SEST = abs_estimate / scale;
+             SIN = - (conj_gamma / s1) / scale;
+             COS =   (conj_alpha / s1) / scale;
            }
         return;
       }
@@ -640,101 +650,122 @@ const APL_Float abs_estimate = ABS(SEST);
    //
 const APL_Float zeta1 = abs_alpha / abs_estimate;
 const APL_Float zeta2 = abs_gamma / abs_estimate;
+const APL_Float zeta12 = zeta1 * zeta2;
 
-const APL_Float norma_1 = 1.0 + zeta1*zeta1 + zeta1*zeta2;
-const APL_Float norma_2 = zeta1*zeta2 + zeta2*zeta2;
-const APL_Float norma = MAX(norma_1, norma_2);
+const APL_Float norma_1 = 1.0 + square(zeta1) + zeta12;
+const APL_Float norma_2 =       square(zeta2) + zeta12;
+const APL_Float norma = max(norma_1, norma_2);
 
-const APL_Float test = 1.0 + 2.0*(zeta1-zeta2)*(zeta1+zeta2);
+const APL_Float test = 1.0 + 2.0 * (zeta1 - zeta2) * (zeta1 + zeta2);
 T sine;
-T cosine;
+T cosi;
    if (test >= 0.0 )
       {
         // root is close to zero, compute directly
         //
         const APL_Float b = (zeta1*zeta1 + zeta2*zeta2 + 1.0)*0.5;
         const APL_Float zeta2_2 = zeta2*zeta2;
-        const APL_Float t = zeta2_2 / (b + sqrt(ABS(b*b - zeta2_2)));
-        sine = (alpha / abs_estimate) / (1.0 - t);
-        cosine = -( GAMMA / abs_estimate ) / t;
+        const APL_Float t = zeta2_2 / (b + sqrt(abs(b*b - zeta2_2)));
+        sine =   (ALPHA / abs_estimate) / (1.0 - t);
+        cosi = - (GAMMA / abs_estimate) / t;
         SEST = sqrt(t + 4.0*eps*eps*norma)*abs_estimate;
       }
    else
       {
         // root is closer to ONE, shift by that amount
         //
-        const APL_Float b = (zeta2*zeta2 + zeta1*zeta1 - 1.0)*0.5;
-        const APL_Float zeta1_2 = zeta1*zeta1;
+        const APL_Float b = (square(zeta2) + square(zeta1) - 1.0)*0.5;
         APL_Float t;
-        if (b >= 0.0)   t = -zeta1_2 / (b+sqrt(b*b + zeta1_2));
-        else            t = b - sqrt(b*b + zeta1_2);
+        if (b >= 0.0)   t = -zeta1 * zeta1 / (b + hypotenuse(b, zeta1));
+        else            t = b - hypotenuse(b, zeta1);
 
-        sine = -( alpha / abs_estimate ) / t;
-        cosine = -( GAMMA / abs_estimate ) / (1.0 + t);
-        SEST = sqrt(1.0 + t + 4.0*eps*eps*norma)*abs_estimate;
+        sine = - (ALPHA / abs_estimate) / t;
+        cosi = - (GAMMA / abs_estimate) / (1.0 + t);
+        SEST = sqrt(1.0 + t + 4.0*eps*eps*norma) * abs_estimate;
       }
 
-const APL_Float tmp = sqrt(ABS_2(sine) + ABS_2(cosine));
-   SIN = sine / tmp;
-   COS = cosine / tmp;
+   // normalize SIN and COS
+   //
+const APL_Float hypo = hypotenuse(sine, cosi);
+   SIN = sine / hypo;
+   COS = cosi / hypo;
 }
 //----------------------------------------------------------------------------
 /** LApack function larfg. It generates an elementary reflector
-    (aka. Householder matrix)
+    (aka. a Householder matrix)
+
+   Let v be a K-by-1 vector (a column vector), and 
+   let v° ←→ -⍉v ←→ -⍪v (a 1-by-K a row vector) aka, the conjugate
+   transpose of v. NOTE: We use ° instead of * to avoid confusion with ×.
 
    Consider the linear transformation of a point x:
 
-   x → x - 2(x,v)v = x - 2v(v* x)  (v* ←→ complex conjugate of v = -⍉v)
+   x → x - 2 × (x,v) × v = x - 2 × v × (v° x)
 
-   The Householder matrix P is then
+   The Householder matrix H (aka. elementary reflector) is then:
 
-   P = I - 2 v v*   (where I is the identity matrix.
+   H = I - 2 × v × v° , where I is the identity matrix
+
+   Since H is completely determined by v, LA_pack uses vector v instead of H.
+
+   H has the following properties:
+
+       H is hermetian,   i.e. H  = H°
+       H is unitary,     i.e. H° = H⁻¹
+       H is involutory,  i.e. H  = H⁻¹
+
+       Therefore, for every (column vector) x:
+
+       y = H x   ←→   H y = x
  */
 template<typename T>
-T LA_pack::larfg(ShapeItem N, T & ALPHA, Vector<T> &x)
+T LA_pack::larfg(Ccol N, Vector<T> & X)
 {
    assert(N > 0);
 
    if (N == 1)   return T(0.0);
 
-APL_Float xnorm = x.norm();
-APL_Float alpha_r = REAL(ALPHA);
-APL_Float alpha_i = IMAG(ALPHA);
+T & ALPHA = X.at(-1);
 
-   if (xnorm == 0.0 && alpha_i == 0.0)   return T(0.0);
+APL_Float alpha_r = get_real(ALPHA);
+APL_Float alpha_i = get_imag(ALPHA);
 
-APL_Float beta = -SIGN(sqrt(alpha_r*alpha_r + alpha_i*alpha_i + xnorm*xnorm),
-                    alpha_r);
+   if (X.norm_2() == 0.0 && alpha_i == 0.0)   return T(0.0);
+
+APL_Float beta_abs = hypotenuse(ALPHA, X);
+APL_Float beta = alpha_r < 0.0 ? beta_abs : -beta_abs;
 
    // scale small beta so it can be used safely
    //
 int kcnt = 0;
-   if (ABS(beta) < safe_min)
+   if (abs(beta) < safe_min)
        {
-         while (ABS(beta) < safe_min)
+         while (abs(beta) < safe_min)
             {
               ++kcnt;
-              x.scale(inv_safe_min);     // scale x
+              X.scale(inv_safe_min);     // scale x
               beta *= inv_safe_min;      // scale beta
               alpha_r *= inv_safe_min;   // scale real(ALPHA)
               alpha_i *= inv_safe_min;   // scale imag(ALPHA)
             }
 
-         xnorm = x.norm();                  // update xnorm
-         Sri<T>(ALPHA, alpha_r, alpha_i);   // update ALPHA
-         beta = -SIGN(sqrt(alpha_r*alpha_r + alpha_i*alpha_i + xnorm*xnorm),
-                      alpha_r);
+         set_real(ALPHA, alpha_r);   // update ALPHA
+         set_imag(ALPHA, alpha_i);   // update ALPHA
+         beta_abs = hypotenuse(ALPHA, X);
+         beta = alpha_r < 0.0 ? beta : -beta;
        }
 
 T tau;
-   Sri<T>(tau, (beta - alpha_r)/beta, -alpha_i/beta);
+   set_real(tau, (beta - alpha_r) / beta);
+   set_imag(tau, -alpha_i         / beta);
 
-const T factor = DZ::inv(ALPHA - beta);
-   x.scale(factor);
+const T factor = reciprocal(ALPHA - beta);
+   X.scale(factor);
 
-   loop(k, kcnt)   beta = beta * safe_min;   // unscale beta
+   loop(k, kcnt)   beta *= safe_min;   // unscale beta
 
-   Sri<T>(ALPHA, beta);
+   set_real(ALPHA, beta);
+   set_imag(ALPHA, 0.0);
 
    return tau;
 }
@@ -742,7 +773,7 @@ const T factor = DZ::inv(ALPHA - beta);
 /// LApack function trsm. Solves op(A) * X = alpha * B
 
 template<typename T>
-void LA_pack::trsm(int M, int N, const Matrix<T> & A, Matrix<T> & B)
+void LA_pack::trsm(const Matrix<T> & A, Matrix<T> & B)
 {
    // only: SIDE   = 'Left'              - lside == true
    //       UPLO   = 'Upper'             - upper = true
@@ -750,198 +781,225 @@ void LA_pack::trsm(int M, int N, const Matrix<T> & A, Matrix<T> & B)
    //       DIAG   = 'Non-unit' and      - nounit = true
    //       ALPHA  = 1.0 is implemented!
    //
-   loop(j, N)
-       {
-         rev_loop(k, M)
-             {
-               T & B_kj = B.at(k, j);
-               if (B_kj != 0.0)
-                  {
-                    B_kj = B_kj / A.diag(k);
-                    loop(i, k)   B.at(i, j) = B.at(i, j) - B_kj * A.at(i, k);
-                  }
-             }
-       }
+   ALL_COLS(B.get_column_count())
+   REV_COLS(A.get_column_count())
+      {
+        T & B_kj = B.at(k, col);
+        if (is_nonzero(B_kj))
+           {
+             B_kj /= A.diag(k);
+             ALL_ROWS(k)   B.at(row, col) -= B_kj * A.at(row, k);
+           }
+      }
 }
 //----------------------------------------------------------------------------
 /// LApack function ila_lc
 template<typename T>
-int LA_pack::ila_lc(ShapeItem M, ShapeItem N, const Matrix<T> & A)
+Fcol LA_pack::ila_lc(Crow M, const Matrix<T> & C)
 {
-   for (ShapeItem col = N - 1; col > 0; --col)
+   /* return the (FORTRAN index of the) rightmost column of C which
+      has a non-zero item in its first M rows.
+
+       ├──────── N ────────┤
+       ╔═════════════╤═════╗ ┬
+       ║             │     ║ │
+       ║             │  0  ║ M
+       ║      C<T>   │     ║ │
+       ║             └─────╢ ┴
+       ║                   ║
+       ╚═══════════════════╝
+                    ↑
+                    ila_lc(M, N, C)
+    */
+
+const Ccol N = C.get_column_count();
+
+   rev_loop(col, N)
        {
-         const Vector<T> column = A.get_column(col);
-         if (!column.is_zero(M))   return col + 1;
+         const Vector<T> column = C.get_column(col);
+         if (!column.is_null(M))   return col + 1;
 
          /* the above is the same as:
 
-         for (ShapeItem row = 0; row < M; ++row)
+         ALL_ROWS(M)
              {
-               if (REAL(A[row + col*LDA]) != 0)   return col + 1;
-               if (IMAG(A[row + col*LDA]) != 0)   return col + 1;
+               if (get_real(A[row + col*LDA]) != 0)   return col + 1;
+               if (get_imag(A[row + col*LDA]) != 0)   return col + 1;
              }
-
           */
        }
 
    return 1;
 }
 //----------------------------------------------------------------------------
-/// LApack function gemv. y := alpha*A*x + beta*y or y := alpha*A**T*x + beta*y
+/** LApack function gemv. Compute one of:
+
+    y := alpha × A      × x + beta × y   or
+    y := alpha × A* × T × x + beta × y   or
+    y := alpha × A* × H × x + beta × y
+
+   constants like 1.0 were removed and only the case needed is implemented
+ */
 template<typename T>
-inline void LA_pack::gemv(int M, int N, const Matrix<T> & A, const Vector<T> &x,
-                 Vector<T> &y)
+inline void LA_pack::gemv(int M, int N, const Matrix<T> & A,
+                          const Vector<T> & x, Vector<T> & y)
 {
-   loop(j, N)
+   ALL_COLS(N)
        {
-         T temp(0.0);
-         loop(i, M)   temp = temp + DZ::CONJ(A.at(i, j)) * x.at(i);
-         y.at(j) = temp;
+         T tmp(0.0);
+         ALL_ROWS(M)   tmp += conjugated(A.at(row, col)) * x.at(row);
+         y.at(col) = tmp;
        }
 }
 //----------------------------------------------------------------------------
-/// LApack function gerc: A := alpha * x * y* * H + A,
+/// LApack function gerc: C := alpha * x * y* * H + C.
 template<typename T>
-void LA_pack::gerc(int M, int N, T ALPHA, const Vector<T> &x, const Vector<T> &y,
-          Matrix<T> & A)
+void LA_pack::gerc(int M, int N, T ALPHA,
+                  const Vector<T> &x, const Vector<T> &y, Matrix<T> & C)
 {
-   if (M == 0 || N == 0 || ALPHA == 0.0)   return;
-
-   loop(j, N)
+   if (M && N && is_nonzero(ALPHA))
       {
-        T Y_j = y.at(j);
-        if (Y_j != 0.0)
+        ALL_COLS(N)
            {
-             DZ::conjugate(Y_j);
-             Y_j = Y_j * ALPHA;
-             loop(i, M)   A.at(i, j) = A.at(i, j) + Y_j * x.at(i);
+             const T & Y = y.at(col);
+             if (is_nonzero(Y))
+                {
+                  const T YY = conjugated(Y) * ALPHA;
+                  ALL_ROWS(M)   C.at(row, col) += YY * x.at(row);
+                }
            }
       }
 }
 //----------------------------------------------------------------------------
-/// LApack function larf: applies an elementary reflector to a general
-/// rectangular matrix
+/** LApack function larf: applies an elementary reflector to a general
+    rectangular matrix C.
+
+   LARF applies a elementary reflector H to an M-by-N matrix C,
+   from either the left or the right. H is represented in the
+   form
+
+       H = I - tau * v * v**H
+
+   where tau is a scalar and v is a vector.
+
+   If tau = 0, then H is taken to be the unit matrix.
+
+   To apply H**H, supply conjg(tau) instead.
+
+   C is overwritten by the matrix H * C.
+ */
 template<typename T>
-void LA_pack::larf(Vector<T> & v, T tau, Matrix<T> & c)
+void LA_pack::larf(Vector<T> & v, T tau, Matrix<T> & C)
 {
-const ShapeItem M = c.get_row_count();
-const ShapeItem N = c.get_column_count();
+const Crow M = C.get_row_count();
+const Ccol N = C.get_column_count();
 
-   // only SIDE == "Left" is implemented
+   // NOTE only SIDE == "Left" is needed (and implemented here).
    //
-ShapeItem  lastv = 0;
-ShapeItem  lastc = 0;
+Crow lastV = 0;   // index of the last non-zero item in v.
+Ccol lastC = 0;   // rightmost column COL with a nonzero item in M↑COL
 
-   if (tau != 0.0)
+   if (is_nonzero(tau))   // if H is not the unit matrix
      {
-       // Look for the last non-zero row in V
+       // Look for the last non-zero item (row) in vector V
        //
-       lastv = M;
-       while (lastv > 0 && v.at(lastv - 1) == 0.0)   --lastv;
+       lastV = M;
+       while (lastV && is_zero(v.at(lastV - 1)))   --lastV;
 
        // Scan for the last non-zero column in C(1:lastv,:)
        //
-       lastc = ila_lc<T>(lastv, N, c);
+       lastC = ila_lc<T>(lastV, C);
      }
 
-   if (lastv)
+   if (lastV)
       {
         APL_Float * gemv_data = new APL_Float[2*N];   // N double or N complex
         Vector<T> gemv_result(reinterpret_cast<T *>(gemv_data), N);
 
-        gemv<T>(lastv, lastc, c, v, gemv_result);
-        gerc<T>(lastv, lastc, -tau, v, gemv_result, c);
+        gemv<T>(lastV, lastC, C,    v, gemv_result);
+        gerc<T>(lastV, lastC, -tau, v, gemv_result, C);
         delete[] gemv_data;
       }
 }
 //----------------------------------------------------------------------------
-/// LApack function laqp2: computes a QR factorization with column pivoting
-/// of the matrix block
+/*  LApack function laqp2: computes a QR factorization with column pivoting
+    of the matrix block
+
+   work is the concatenation WORK, RWORK in FORTRAN
+ */
 template<typename T>
-void LA_pack::laqp2(Matrix<T> & A, ShapeItem * pivot, T * tau, APL_Float * vn1)
+void LA_pack::laqp2(Matrix<T> & A, Ccol * pivot, T * tau, APL_Float * work)
 {
-const ShapeItem M = A.get_row_count();
-const ShapeItem N = A.get_column_count();
+const Crow M = A.get_row_count();
+const Ccol N = A.get_column_count();
 
-APL_Float * vn2 = vn1 + N;
+#define vn1 work   /* work = vn1, vn2 */
+APL_Float * const vn2 = work + N;
 
-   loop(i, N)
+   ALL_COLS(N)
       {
-        T & tau_i = tau[i];
+        const int col_A1 = col + 1;   // the column right of col
+        T & tau_i = tau[col];
 
-        // Determine the i'th pivot column and swap if necessary.
+        // pvt_0 is the column right of col that has the largesr vn1
         //
-        const int pvt_0 = i + max_pos(vn1 + i, N - i);
+        const int pvt_0 = col + max_pos(vn1 + col, N - col);
 
-        if (pvt_0 != i)
+        if (pvt_0 != col)   // unless col already is the pivot column
            {
-             A.exchange_columns(pvt_0, i);
-             exchange(pivot[pvt_0], pivot[i]);
-             vn1[pvt_0] = vn1[i];
-             vn2[pvt_0] = vn2[i];
+             A.exchange_columns(pvt_0, col);
+             exchange(pivot[pvt_0], pivot[col]);
+             vn1[pvt_0] = vn1[col];
+             vn2[pvt_0] = vn2[col];
            }
 
         // Generate elementary reflector H(i).
         //
-        {
-          if (i < (M - 1))
-             {
-               Vector<T> x(&A.at(i + 1, i), M - i - 1);
-               T & alpha = *(&x.at(0) - 1);   // one before x
-               tau_i = larfg<T>(M - i, alpha, x);
-             }
-          else
-             {
-               Vector<T> x(&A.at(M - 1, i), 1);
-               T & alpha = x.at(0);           // at x
-               tau_i = larfg<T>(1, alpha, x);
-             }
-        }
+        tau_i = 0.0;      // assume col is last (and then col_A1 is invalid)
+        if (col_A1 < M)   // no, col_A1 valid
+           {
+             const int len_X = M - col_A1;   // cols right of col
+             Vector<T> X(&A.at(col_A1, col), len_X);
+             tau_i = larfg<T>(M - col, X);
+           }
 
-        if (i < (N - 1))
+        if (col_A1 < N)   // unless last column
            {
              // Apply H(i)**H to A(offset+i:m,i+1:n) from the left.
              //
-             const T Aii = A.diag(i);   // save diag
-             A.diag(i) = APL_Float(1.0);
-                Vector<T> v(&A.diag(i), M - i);
-                Matrix<T> c = A.sub_yx(i, i + 1);
-                larf<T>(v, DZ::CONJ(tau_i), c);
-             A.diag(i) = Aii;           // restore diag
+             const T Aii = A.diag(col);   // save diag
+             A.diag(col) = APL_Float(1.0);
+                Vector<T> v(&A.diag(col), M - col);
+                Matrix<T> C = A.sub_matrix(col, col_A1);
+                larf<T>(v, conjugated(tau_i), C);
+             A.diag(col) = Aii;           // restore diag
            }
 
-        // Update partial column norms.
+        // Update partial column norms vn1 and vn2.
         //
-        for (ShapeItem j = i + 1; j < N; ++j)
+        for (int c = col_A1; c < N; ++c)
             {
-              if (vn1[j] != 0.0)
-                 {
-                   APL_Float temp = ABS(A.at(i, j)) / vn1[j];
-                   temp = 1.0 - temp*temp;
-                   temp = MAX(temp, APL_Float(0.0));
+              if (vn1[c] == 0.0)   continue;
 
-                   APL_Float temp2 = vn1[j] / vn2[j];
-                   temp2 = temp * temp2 * temp2;
-                   if (temp2 <= tol3z)
+              const APL_Float abs_A = abs(A.at(col, c)) / vn1[c];
+              const APL_Float temp = max(1.0 - square(abs_A), 0.0);
+              const APL_Float temp2 = square(vn1[c] / vn2[c]);
+              if (temp * temp2 <= tol3z)   // temp and/or temp2 too small
+                 {
+                   vn1[c] = 0.0;     // assume invalid col_A1
+                   if (col_A1 < M)   // valid col_A1
                       {
-                        if (i < (M - 1))
-                           {
-                             Vector<T> x(&A.at(i + 1, j), M - i - 1);
-                             vn1[j] = x.norm();
-                             vn2[j] = vn1[j];
-                           }
-                        else
-                           {
-                             vn1[j] = 0.0;
-                             vn2[j] = 0.0;
-                           }
+                        Vector<T> x(&A.at(col_A1, c), M - col_A1);
+                        vn1[c] = x.norm();
                       }
-                   else
-                      {
-                        vn1[j] = vn1[j] * sqrt(temp);
-                      }
+                   vn2[c] = vn1[c];
+                 }
+              else                                 // "normal" temp2
+                 {
+                   vn1[c] *= sqrt(temp);
                  }
             }
       }
+#undef vn1
 }
 //============================================================================

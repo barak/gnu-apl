@@ -876,15 +876,21 @@ basic_string<ShapeItem> ends;
                  }
               else if (fun == &Bif_F12_COMMA1::fun)      // monadic ⍪B
                  {
+                   // 1↑⍴⍪B  ←→  1↑⍴B
+                   // 1↓⍴⍪B  ←→  ×/1↓⍴B
+                   //
                    const Shape & sh_B = B->get_shape();
+                   const ShapeItem rows = B->get_rank() ? B->get_shape_item(0)
+                                                        : 1;
                    ShapeItem low_volume = 1;   // ×/1↓⍴B
-                   for (ShapeItem r = 1; r <sh_B.get_rank(); ++r)
+                   for (ShapeItem r = 1; r < sh_B.get_rank(); ++r)
                        low_volume *= sh_B.get_shape_item(r);
-                   const Shape new_shape(1, low_volume);
+                   const Shape new_shape(rows, low_volume);
                    B->set_shape(new_shape);
-                        tok_F.clear(LOC);   // set ⍪ to TOK_VOID
-                        OptmizationStatistics::count(OPTI_FT_SHORT_PRIMITIVE);
-                        progress = true;
+
+                   tok_F.clear(LOC);   // set ⍪ to TOK_VOID
+                   OptmizationStatistics::count(OPTI_FT_SHORT_PRIMITIVE);
+                   progress = true;
                  }
               else if (fun == &Bif_F12_PARTITION::fun)   // monadic ⊂B
                  {

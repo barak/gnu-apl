@@ -21,9 +21,6 @@
 /** @file
 */
 
-/// a macro to enable debug printouts
-// #define DOMINO_DEBUG
-
 #include "Bif_F12_DOMINO.hh"
 #include "Bif_F12_FORMAT.hh"
 #include "ComplexCell.hh"
@@ -33,13 +30,7 @@ extern void divide_matrix(Value & Z, bool need_complex,
                           ShapeItem rows, ShapeItem cols_A, const Cell * cA,
                           ShapeItem cols_B, const Cell * cB);
 
-
-Bif_F12_DOMINO   Bif_F12_DOMINO   ::fun;    // ⌹
-
-#ifndef DOMINO_DEBUG
-# undef Q1
-# define Q1(x)
-#endif
+Bif_F12_DOMINO Bif_F12_DOMINO   ::fun;    // ⌹
 
 //----------------------------------------------------------------------------
 Token
@@ -97,7 +88,11 @@ Bif_F12_DOMINO::eval_B(Value_P B) const
 
 const ShapeItem rows = B->get_shape_item(0);
 const ShapeItem cols = B->get_shape_item(1);
-   if (cols > rows)   LENGTH_ERROR;
+   if (cols > rows)
+      {
+        MORE_ERROR() << "÷B : B is under-specified (has more cols than rows)";
+        LENGTH_ERROR;
+      }
 
    // create an identity matrix I and call eval_AB(I, B).
    //
@@ -124,7 +119,12 @@ const double EPS = X->get_cfirst().get_real_value();
    //
 const ShapeItem rows_B = B->get_rows();
 const ShapeItem cols_B = B->get_cols();
-   if (rows_B <  cols_B)   LENGTH_ERROR;
+   if (rows_B < cols_B)
+      {
+        MORE_ERROR() << "A÷B : B is under-specified (has more cols than rows)";
+        LENGTH_ERROR;
+      }
+
    if (rows_B*cols_B == 0)   LENGTH_ERROR;
 
 
@@ -180,8 +180,17 @@ ShapeItem cols_B = 1;
          default: RANK_ERROR;
       }
 
-   if (rows_B <  cols_B)   LENGTH_ERROR;
-   if (rows_A != rows_B)   LENGTH_ERROR;
+   if (rows_B <  cols_B)
+      {
+        MORE_ERROR() << "A÷B : B is under-specified (has more cols than rows)";
+        LENGTH_ERROR;
+       }
+
+   if (rows_A != rows_B)
+      {
+        MORE_ERROR() << "A÷B : number of rows in A ≠ number of rows in B";
+        LENGTH_ERROR;
+      }
 
 const bool need_complex = A->is_complex(true) || B->is_complex(true);
 Value_P Z(shape_Z, LOC);
