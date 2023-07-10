@@ -29,15 +29,22 @@
 #include "Common.hh"
 #include "ComplexCell.hh"
 #include "FloatCell.hh"
-#include "Output.hh"
 #include "Value.hh"
 #include "Workspace.hh"
 
 using namespace std;
 
-// the implementation of gelsy<T>
 #include "LApack.hh"
 
+char * LA_pack::work_gelsy = 0;
+char * LA_pack::work_geqp3 = 0;
+char * LA_pack::work_larf = 0;
+
+/*
+   Notation: in the literature the conjujate transpose of a vector v resp.
+   a matrix M is usually v* resp. M*. To avoid confusion with * we use
+   v° resp, M° for the conjujate transpose and the APL × for *.
+ */
 //----------------------------------------------------------------------------
 /// the implementation of Z←A⌹B.
 /// Z[;j] is the solution of A[;j] = B +.× Z[j]
@@ -56,19 +63,14 @@ const size_t items_A = rows * cols_A;
 const size_t items_B = rows * cols_B;
 const int FpI = need_complex ? 2 : 1;   // Floats per Item
 
+#define FREE_AB(ERROR) { free(free_A);   free(free_B);   ERROR; }
+
 void * free_A = malloc(items_A * FpI * sizeof(APL_Float));
 void * free_B = malloc(items_B * FpI * sizeof(APL_Float));
-   if (free_A == 0 || free_B == 0)
-      {
-         free(free_A);
-         free(free_B);
-         WS_FULL
-      }
+   if (free_A == 0 || free_B == 0)   FREE_AB(WS_FULL)
 
 APL_Float * fpA = reinterpret_cast<APL_Float *>(free_A);
 APL_Float * fpB = reinterpret_cast<APL_Float *>(free_B);
-
-#define FREE_AB(ERROR) { free(free_A);   free(free_B);   ERROR; }
 
    ALL_COLS(cols_A)
        {
@@ -132,8 +134,7 @@ APL_Float * fpB = reinterpret_cast<APL_Float *>(free_B);
                    *bb++ = src_B.get_real_value();
                  }
 
-              {
-                const APL_Float rcond = Workspace::get_CT();
+              const APL_Float rcond = Workspace::get_CT();
 
                 LA_pack::Matrix<LA_pack::DD> B(fpB, rows, cols_B, /*LDB*/ rows);
                 LA_pack::Matrix<LA_pack::DD> A(fpA, rows, 1,    /* LDA */ rows);
@@ -143,7 +144,6 @@ APL_Float * fpB = reinterpret_cast<APL_Float *>(free_B);
                      MORE_ERROR() << "A⌹B : linear dependent (real) B?";
                      FREE_AB(DOMAIN_ERROR)
                    }
-              }
 
               // cols_A = rows_Z. We have computed the result for col c of A
               // which is row c of Z.
@@ -156,22 +156,32 @@ APL_Float * fpB = reinterpret_cast<APL_Float *>(free_B);
    free(free_B);
 }
 
-   // numerical limits
-   //
-   // DLAMCH determines double precision machine parameters.
-   // We (only) #define those that we need.
+   /* numerical limits
+     
+      DLAMCH determines double precision machine parameters.
+      We (only) #define those that we need. Precision is not cruical
+      as long as rounding is done in the right direction.
+    */
 
+/// aka. \b eps: relative machine precision. About 1 LSB of 1.0
 #define dlamch_E 1.11022e-16
-#define dlamch_S 2.22507e-308
+
+/// base (=2 for binary) * dlamch_E
 #define dlamch_P 2.22045e-16
+
+/// aka. \b sfmin: smallest (positive) number with a valid reciprocal
+#define dlamch_S 2.22507e-308
+
 static const APL_Float small_number = dlamch_S / dlamch_P;    // 1.00208E¯292
 static const APL_Float big_number   = 1.0 / small_number;     // 9.97923E291
 static const APL_Float safe_min     =  dlamch_S / dlamch_E;   // 2.00417E¯292
 static const APL_Float inv_safe_min = 1.0 / safe_min;         // 4.98959E291
 static const APL_Float tol3z        = sqrt(dlamch_E);         // 1.05367E¯8
+#undef dlamch_S
+#undef dlamch_P
 
 //----------------------------------------------------------------------------
-///  DGELSY solves overdetermined or underdetermined systems for GE matrices 
+///  DGELSY solves (possibly overdetermined) systems for GE matrices 
 template<typename T>
 int LA_pack::gelsy(Matrix<T> & A, Matrix<T> &B, APL_Float rcond)
 {
@@ -187,45 +197,76 @@ const Ccol NRHS = B.get_column_count();
    // between small_number and big_number. Then call scaled_gelsy() and
    // scale the result back by the same factors.
    //
-APL_Float scale_A = 1.0;
+APL_Float un_scale_A = 1.0;
    {
      const APL_Float norm_A = A.max_norm();
 
      if (norm_A == 0.0)                return 0;   // A is rank-deficient
-     else if (norm_A < small_number)   A.scale(scale_A = big_number);
-     else if (norm_A > big_number)     A.scale(scale_A = small_number);
+     else if (norm_A < small_number)   A.scale(un_scale_A = big_number);
+     else if (norm_A > big_number)     A.scale(un_scale_A = small_number);
    }
 
-APL_Float scale_B = 1.0;
+APL_Float un_scale_B = 1.0;
    {
      const APL_Float norm_B = B.max_norm();
 
      if (norm_B == 0.0)                /* OK */ ;
-     else if (norm_B < small_number)   B.scale(scale_B = big_number);
-     else if (norm_B > big_number)     B.scale(scale_B = small_number);
+     else if (norm_B < small_number)   B.scale(un_scale_B = big_number);
+     else if (norm_B > big_number)     B.scale(un_scale_B = small_number);
    }
+
+   // memory allocation
+   //
+   enum Bytes_per_N
+      {
+        bytes_gelsy         = sizeof(Ccol)   // pivot
+                            + sizeof(T)      // tau
+                            + sizeof(T),     // tmp
+        bytes_geqp3         = sizeof(T)      // vn1
+                            + sizeof(T),     // vn2
+        bytes_estimate_rank = sizeof(T)      // min
+                            + sizeof(T),     // max
+        bytes_shared        = bytes_geqp3 > bytes_estimate_rank
+                            ? bytes_geqp3 : bytes_estimate_rank,
+        bytes_larf          = sizeof(T),     // y
+        bytes_per_N         = bytes_gelsy
+                            + bytes_shared    // geqp3() or estimate_rank()
+                            + bytes_larf
+      };
+
+char * work = new char[N * bytes_per_N];
+   if (work == 0)   WS_FULL;
+
+   work_gelsy = work;
+   work_geqp3 = work_gelsy + N * bytes_gelsy;
+   work_larf  = work_geqp3 + N * bytes_geqp3;
 
    {
      const int RANK = scaled_gelsy(A, B, rcond);
-     if (RANK < N)   return RANK;   // this is an error
+     if (RANK < N)   // this is an error
+        {
+          delete[] work;
+          return RANK;
+        }
    }
 
    // Undo scaling
    //
-   if (scale_A != 1.0)
+   if (un_scale_A != 1.0)
       {
         Matrix<T> A1 = A.sub_len(N, N);
         Matrix<T> B1 = B.sub_len(N, NRHS);
-        B1.scale(APL_Float(1.0/scale_A));
-        A1.scale(scale_A);
+        B1.scale(APL_Float(1.0/un_scale_A));
+        A1.scale(un_scale_A);
       }
 
-   if (scale_B != 1.0)
+   if (un_scale_B != 1.0)
       {
         Matrix<T> B1 = B.sub_len(N, NRHS);
-        B1.scale(scale_B);
+        B1.scale(un_scale_B);
       }
 
+   delete[] work;
    return N;   // success
 }
 //----------------------------------------------------------------------------
@@ -242,26 +283,11 @@ const Ccol N    = A.get_column_count();
 const Ccol NRHS = B.get_column_count();
 
    // Compute QR factorization with column pivoting of A:
-   // A * P = Q * R
+   // A × P = Q × R
    //
-   // pivot_tau_tmp is a vector of Ccol pivot, real or complex tau, and
-   // real or complex tmp in a single memory allcoation.
-   //
-char * pivot_tau_tmp = new char[N * (  sizeof(Ccol) +   // pivot[N]
-                                       sizeof(T)    +   // tau[N]
-                                       sizeof(T))];     // tmp[N]
-
-  // N pivot items
-  //
-Ccol * pivot = reinterpret_cast<Ccol *>(pivot_tau_tmp);   // N pivots
-
-   // N tau items (complex = double[2],
-   //
-T * tau = reinterpret_cast<T *>(pivot + N);               // N tau items
-
-   // and N tmp items (complex = double[2]).
-   //
-T * tmp = tau + N;                                        // N tmp1 items
+Ccol * const pivot = reinterpret_cast<Ccol *>(work_gelsy);   // pivot[N]
+T * const tau = reinterpret_cast<T *>(pivot + N);      // tau[N] (after pivot)
+T * tmp = tau + N;                                     // tmp[N] (after tau)
 
    geqp3<T>(A, pivot, tau);
 
@@ -271,11 +297,7 @@ T * tmp = tau + N;                                        // N tmp1 items
    //
    {
      const int RANK = estimate_rank(A, rcond);
-     if (RANK < N)
-        {
-          delete[] pivot_tau_tmp;
-          return RANK;
-        }
+     if (RANK < N)   return RANK;
    }
 
    // from here on, RANK == N. We leave RANK in the comments but use N in
@@ -283,14 +305,13 @@ T * tmp = tau + N;                                        // N tmp1 items
 
    // Logically partition R = [ R11 R12 ]
    //                         [  0  R22 ]
-   // where R11 = R(1:RANK,1:RANK)
-   // [R11,R12] = [ T11, 0 ] * Y
+   // where R11 = R(1:RANK, 1:RANK)
+   // [R11, R12] = [ T11, 0 ] × Y
    //
 
    // Details of Householder rotations stored in WORK(MN+1:2*MN)
    // 
-   // B(1:M, 1:NRHS) := Q* * H * B(1:M,1:NRHS) where
-   // Q* is the conjujate transpose (aka. -⍉Q) of Q
+   // B(1:M, 1:NRHS) := Q° × H × B(1:M, 1:NRHS)
    // 
    unm2r<T>(N, A, tau, B);
 
@@ -301,17 +322,12 @@ T * tmp = tau + N;                                        // N tmp1 items
      trsm<T>(A, B1);
    }
 
-   // workspace: 2*MN+NRHS
-   //
-   // B(1:N,1:NRHS) := P * B(1:N,1:NRHS)
-   //
    ALL_COLS(NRHS)
       {
         ALL_ROWS(N)   tmp[pivot[row]] = B.at(row, col);
         ALL_ROWS(N)   B.at(row, col) = tmp[row];
       }
 
-   delete[] pivot_tau_tmp;
    return N;
 }
 //----------------------------------------------------------------------------
@@ -330,12 +346,16 @@ APL_Float smin = smax;
    // store minima in work_min[ 0 ... N]
    // store maxima in work_max == work_min[N ... 2N]
    //
-APL_Float * work_1 = new APL_Float[4*N];
-T * work_min = reinterpret_cast<T *>(work_1);
+T * work_min = reinterpret_cast<T *>(work_estimate_rank);
 T * work_max = work_min + N;
 
-   work_min[0] = T(1.0);
-   work_max[0] = T(1.0);
+   // work_min and work_max will grow in the RANK loop, so only work_min[0]
+   // and work_max[0] need to be initialized. The last item in work_min/max is
+   // always cos_min/max (from laic1_MIN/MAX()) while the items before are the
+   // the products of the prior sin_min/max (also from laic1_MIN/MAX()).
+   //
+   work_min[0] = T(1.0);   // cos 90°
+   work_max[0] = T(1.0);   // cos 90°
 
    for (int RANK = 1; RANK < N; ++RANK)
        {
@@ -343,40 +363,41 @@ T * work_max = work_min + N;
          T sin_max(0.0);
          T cos_min(0.0);
          T cos_max(0.0);
-         const T gamma(A.diag(RANK));
 
          T alpha_min = 0.0;
          T alpha_max = 0.0;
+         const T gamma(A.diag(RANK));
          loop(r, RANK)
              {
-               alpha_min += conjugated(work_min[r]* A.at(r, RANK));
-               alpha_max += conjugated(work_max[r]* A.at(r, RANK));
+               const T Ar = A.at(r, RANK);
+               alpha_min += conjugated(work_min[r] * Ar);
+               alpha_max += conjugated(work_max[r] * Ar);
              }
 
          laic1_MIN<T>(smin, alpha_min, gamma, sin_min, cos_min);
          laic1_MAX<T>(smax, alpha_max, gamma, sin_max, cos_max);
 
-         if (smax*rcond > smin)   // done
+         if (smax*rcond > smin)   // done (rank of A is < N).
             {
-              delete[] work_1;
               return RANK;
             }
 
-         loop(i, RANK)
+         loop(r, RANK)
               {
-                work_min[i] = work_min[i] * sin_min;
-                work_max[i] = work_max[i] * sin_max;
+                work_min[r] *= sin_min;
+                work_max[r] *= sin_max;
               }
 
-         work_min[RANK] = cos_min;
-         work_max[RANK] = cos_max;
+         work_min[RANK] = cos_min;   // for the next iteration
+         work_max[RANK] = cos_max;   // for the next iteration
        }
 
-   delete[] work_1;
    return N;
 }
 //----------------------------------------------------------------------------
-// LApack function geqp3
+/* LApack function geqp3. Computes a QR factorization with column pivoting
+   of matrix A:  A × P = Q × R
+ */
 template<typename T>
 void LA_pack::geqp3(Matrix<T> & A, Ccol * pivot, T * tau)
 {
@@ -398,40 +419,51 @@ const Ccol N = A.get_column_count();
    // the first N elements of WORK store the exact column norms,
    // and the next N elements are a copy of the first N elements
    //
-APL_Float * work = new APL_Float[2*N];
+APL_Float * const vn1_vn2 = reinterpret_cast<APL_Float *>(work_geqp3);
+
+   // initialize work with column norms
+   //
    ALL_COLS(N)
          {
            Vector<T> x(&A.at(0, col), M);
-           work[N + col] = work[col] = x.norm();
+           vn1_vn2[N + col] = vn1_vn2[col] = x.norm();
          }
 
-   laqp2<T>(A, pivot, tau, work);
-   delete[] work;
+   laqp2<T>(A, pivot, tau, vn1_vn2);
 }
 //----------------------------------------------------------------------------
+/* LApack function UNM2R. Overwrite the general complex m-by-n matrix C with:
+
+   Q × C         if SIDE = 'L' and TRANS = 'N', or   (case 1)
+   Q° × H × C    if SIDE = 'L' and TRANS = 'C', or   (case 2)
+   C × Q         if SIDE = 'R' and TRANS = 'N', or   (case 3)
+   C × Q° × ×    if SIDE = 'R' and TRANS = 'C',      (case 4)
+
+   where Q is a unitary matrix defined as the product of k
+   elementary reflectors:
+
+   Q = H(1) H(2) ... H(k)
+ */
+
 template<typename T>
 void LA_pack::unm2r(Crow K, Matrix<T> & A, const T * tau, Matrix<T> & C)
 {
 const Crow M = C.get_row_count();
 
-   // only SIDE == "Left" is implemented, and
-   // only TRANS = 'T' or 'C' is implemented.
-   // thus NOTRANS is always false.
+   // only case 2 (SIDE == "L" and TRANS = 'T' or 'C' is implemented,
+   // thus NOTRAN is false (and then tau[row] is conjugated).
    //
    ALL_ROWS(K)
        {
-         // H(i) or H(i)**H is applied to C(i:m,1:n)
+         // H(i) or H(i)° × H is applied to C(i:m,1:n)
          //
          const int MM = M - row;
-
-        //
-         const T tau_i = conjugated(tau[row]);
-
+         const T tau_row = conjugated(tau[row]);
          const T Aii = A.diag(row);   // remember A(row, row)
-           A.diag(row) = APL_Float(1.0);
-           Vector<T> v(&A.diag(row), MM);
-           Matrix<T> SUB = C.sub_matrix(row, 0);
-           larf<T>(v, tau_i, SUB);
+             A.diag(row) = APL_Float(1.0);
+             Vector<T> v(&A.diag(row), MM);
+             Matrix<T> SUB = C.sub_matrix(row, 0);
+             larf<T>(v, tau_row, SUB);
          A.diag(row) = Aii;           // restore A(row, row);
        }
 }
@@ -442,11 +474,10 @@ const Crow M = C.get_row_count();
      SEST: largest estimated singular value of \b this matrix
  **/
 template<typename T>
-void LA_pack::laic1_MAX(APL_Float & SEST, T alpha, T GAMMA, T & SIN, T & COS)
+void LA_pack::laic1_MAX(APL_Float & SEST, T ALPHA, T GAMMA, T & SIN, T & COS)
 {
-const APL_Float eps = dlamch_E;
-const APL_Float abs_alpha = abs(alpha);
-const APL_Float abs_gamma = abs(GAMMA);
+const APL_Float abs_alpha    = abs(ALPHA);
+const APL_Float abs_gamma    = abs(GAMMA);
 const APL_Float abs_estimate = abs(SEST);
 
    //    Estimating largest singular value ...
@@ -455,8 +486,8 @@ const APL_Float abs_estimate = abs(SEST);
    //
    if (SEST == 0.0)
       {
-        const APL_Float s1 = max(abs_gamma, abs_alpha);
-        if (s1 == 0.0)
+        const APL_Float smax = max(abs_gamma, abs_alpha);
+        if (smax == 0.0)
            {
              SIN = T(0.0);
              COS = T(1.0);
@@ -464,86 +495,82 @@ const APL_Float abs_estimate = abs(SEST);
            }
         else
            {
-             SIN = alpha / s1;
-             COS = GAMMA / s1;
+             SIN = ALPHA / smax;
+             COS = GAMMA / smax;
 
-             const APL_Float tmp = hypotenuse(SIN, COS);
-             SIN = SIN / tmp;
-             COS = COS / tmp;
-             SEST = s1*tmp;
+             // normalize SIN and COS so that SIN² + COS² = 1.0
+             const APL_Float hypo = hypotenuse(SIN, COS);
+             SIN /= hypo;
+             COS /= hypo;
+             SEST = smax * hypo;
            }
         return;
       }
 
-   if (abs_gamma <= eps*abs_estimate)
+   if (abs_gamma <= dlamch_E * abs_estimate)   // if /tmp overflow
       {
-        SIN = T(1.0);
-        COS = T(0.0);
-        APL_Float tmp = max(abs_estimate, abs_alpha);
-        const APL_Float s1 = abs_estimate / tmp;
-        const APL_Float s2 = abs_alpha / tmp;
-        SEST = tmp * hypotenuse(s1, s2);
+        SIN = T(1.0);   // 90⁰
+        COS = T(0.0);   // 90⁰
+        const APL_Float abs_max = max(abs_estimate, abs_alpha);
+        const APL_Float s1 = abs_estimate / abs_max;
+        const APL_Float s2 = abs_alpha    / abs_max;
+        SEST = abs_max * hypotenuse(s1, s2);
         return;
       }
 
-   if (abs_alpha <= eps*abs_estimate)
+   if (abs_alpha <= dlamch_E * abs_estimate)   // small abs_alpha
       {
-        const APL_Float s1 = abs_gamma;
-        const APL_Float s2 = abs_estimate;
-        if (s1 <= s2)
+        if (abs_gamma <= abs_estimate)
            {
-             SIN = T(1.0);
-             COS = T(0.0);
-             SEST = s2;
+             SIN = T(1.0);   // 90⁰
+             COS = T(0.0);   // 90⁰
+             SEST = abs_estimate;
            }
         else
            {
-             SIN = T(0.0);
-             COS = T(1.0);
-             SEST = s1;
+             SIN = T(0.0);   // 0⁰
+             COS = T(1.0);   // 0⁰
+             SEST = abs_gamma;
            }
         return;
       }
 
-   if (abs_estimate <= eps*abs_alpha || abs_estimate <= eps*abs_gamma)
+   if (abs_estimate <= dlamch_E * abs_alpha ||   // small abs_estimate
+       abs_estimate <= dlamch_E * abs_gamma)     // small abs_estimate
       {
-        const APL_Float s1 = abs_gamma;
-        const APL_Float s2 = abs_alpha;
-        if (s1 <= s2)
+        if (abs_gamma <= abs_alpha)
            {
-             const APL_Float tmp = s1 / s2;
-             const APL_Float scale = hypotenuse(1.0, tmp);
-             SEST = s2*scale;
-             SIN = (alpha / s2) / scale;
-             COS = (GAMMA / s2) / scale;
+             const APL_Float quot = abs_gamma / abs_alpha;
+             const APL_Float scale = hypotenuse(1.0, quot);
+
+             SEST = abs_alpha * scale;
+             SIN = (ALPHA / abs_alpha) / scale;
+             COS = (GAMMA / abs_alpha) / scale;
            }
         else
            {
-             const APL_Float tmp = s2 / s1;
-             const APL_Float scale = hypotenuse(1.0, tmp);
-             SEST = s1*scale;
-             SIN = (alpha / s1) / scale;
-             COS = (GAMMA / s1) / scale;
+             const APL_Float quot = abs_alpha / abs_gamma;
+             const APL_Float scale = hypotenuse(1.0, quot);
+             SEST = abs_gamma * scale;
+             SIN = (ALPHA / abs_gamma) / scale;
+             COS = (GAMMA / abs_gamma) / scale;
            }
         return;
       }
 
-   // normal case
+   // the normal case
    //
 const APL_Float zeta1 = abs_alpha / abs_estimate;
 const APL_Float zeta2 = abs_gamma / abs_estimate;
-const APL_Float b = (1.0 - zeta1*zeta1 - zeta2*zeta2)*0.5;
-APL_Float t;
+const APL_Float b = 0.5*(1.0 - square(zeta1) - square(zeta2));
+const APL_Float t = b > 0.0 ? square(zeta1) / (b + hypotenuse(b, zeta1))
+                            : hypotenuse(b, zeta1) - b;
 
-   if (b > 0.0)  t = zeta1 * zeta1 / (b + hypotenuse(b, zeta1));
-   else          t = hypotenuse(b, zeta1) - b;
+   SIN = -(ALPHA / abs_estimate) / t;
+   COS = -(GAMMA / abs_estimate) / (1.0 + t);
 
-const T sine = -(alpha / abs_estimate) / t;
-const T cosi = -(GAMMA / abs_estimate) / (1.0 + t);
-const APL_Float tmp = hypotenuse(sine, cosi);
-   SIN = sine / tmp;
-   COS = cosi / tmp;
    SEST = sqrt(t + 1.0) * abs_estimate;
+   normalize(SIN, COS);
 }
 //----------------------------------------------------------------------------
 /** LApack function laic1 (estimate smallest singular value).
@@ -555,7 +582,6 @@ const APL_Float tmp = hypotenuse(sine, cosi);
 template<typename T>
 void LA_pack::laic1_MIN(APL_Float & SEST, T ALPHA, T GAMMA, T & SIN, T & COS)
 {
-const APL_Float eps = dlamch_E;
 const APL_Float abs_alpha = abs(ALPHA);
 const APL_Float abs_gamma = abs(GAMMA);
 const APL_Float abs_estimate = abs(SEST);
@@ -568,80 +594,70 @@ const APL_Float abs_estimate = abs(SEST);
    if (SEST == 0.0)
       {
         SEST = 0.0;
-        T sine(1.0);
-        T cosi(0.0);
+        SIN = 1.0;   // 90°
+        COS = 0.0;   // 90°
         if (abs_gamma > 0.0 || abs_alpha > 0.0)
            {
-             sine = -conjugated(GAMMA);
-             cosi =  conjugated(ALPHA);
+             SIN = -conjugated(GAMMA);
+             COS =  conjugated(ALPHA);
            }
 
-        const APL_Float abs_sine = abs(sine);
-        const APL_Float abs_cosi = abs(cosi);
-        const APL_Float s1 = max(abs_sine, abs_cosi);
-        const T sine_s1 = sine / s1;
-        const T cosi_s1 = cosi / s1;
-        SIN = sine_s1;
-        COS = cosi_s1;
-        const APL_Float tmp = hypotenuse(sine_s1, cosi_s1);
-        SIN = SIN / tmp;
-        COS = COS / tmp;
+        const APL_Float abs_max = max(abs(SIN), abs(COS));
+        SIN /= abs_max;
+        COS /= abs_max;
+        normalize(SIN, COS);
         return;
       }
 
-   if (abs_gamma <= eps*abs_estimate)
+   if (abs_gamma <= dlamch_E * abs_estimate)
       {
-        SIN = T(0.0);
-        COS = T(1.0);
+        SIN = T(0.0);   // 0°
+        COS = T(1.0);   // 0°
         SEST = abs_gamma;
         return;
       }
 
-   if (abs_alpha <= eps*abs_estimate)
+   if (abs_alpha <= dlamch_E * abs_estimate)
       {
-        const APL_Float s1 = abs_gamma;
-        const APL_Float s2 = abs_estimate;
-
-        if (s1 <= s2)
+        if (abs_gamma <= abs_estimate)
           {
-            SIN = T(0.0);
-            COS = T(1.0);
-            SEST = s1;
+            SIN = T(0.0);   // 0°
+            COS = T(1.0);   // 0°
+            SEST = abs_gamma;
           }
         else
           {
             SIN = T(1.0);
             COS = T(0.0);
-            SEST = s2;
+            SEST = abs_estimate;
           }
         return;
       }
 
-   if (abs_estimate <= eps*abs_alpha || abs_estimate <= eps*abs_gamma)
+   if (abs_estimate <= dlamch_E * abs_alpha ||   // small abs_estimate
+       abs_estimate <= dlamch_E * abs_gamma)     // small abs_estimate
       {
-        const APL_Float s1 = abs_gamma;
-        const APL_Float s2 = abs_alpha;
         const T conj_gamma = conjugated(GAMMA);
         const T conj_alpha = conjugated(ALPHA);
 
-        if (s1 <= s2)
+        if (abs_gamma <= abs_alpha)
            {
-             const APL_Float tmp = s1 / s2;
-             const APL_Float scale = hypotenuse(1.0, tmp);
-             const APL_Float tmp_scale = tmp / scale;
+             const APL_Float quot = abs_gamma / abs_alpha;
+             const APL_Float scale = hypotenuse(1.0, quot);
+             const APL_Float tmp_scale = quot / scale;
 
              SEST = abs_estimate * tmp_scale;
-             SIN = - (conj_gamma / s2) / scale;
-             COS =   (conj_alpha / s2) / scale;
+             SIN = - (conj_gamma / abs_alpha) / scale;
+             COS =   (conj_alpha / abs_alpha) / scale;
            }
         else
            {
-             const APL_Float tmp = s2 / s1;
+             const APL_Float tmp = abs_alpha / abs_gamma;
              const APL_Float scale = hypotenuse(1.0, tmp);
 
              SEST = abs_estimate / scale;
-             SIN = - (conj_gamma / s1) / scale;
-             COS =   (conj_alpha / s1) / scale;
+             SIN = - (conj_gamma / abs_gamma) / scale;
+             COS =   (conj_alpha / abs_gamma) / scale;
            }
         return;
       }
@@ -650,45 +666,39 @@ const APL_Float abs_estimate = abs(SEST);
    //
 const APL_Float zeta1 = abs_alpha / abs_estimate;
 const APL_Float zeta2 = abs_gamma / abs_estimate;
-const APL_Float zeta12 = zeta1 * zeta2;
+const APL_Float prod = zeta1 * zeta2;
 
-const APL_Float norma_1 = 1.0 + square(zeta1) + zeta12;
-const APL_Float norma_2 =       square(zeta2) + zeta12;
+const APL_Float norma_1 = 1.0 + square(zeta1) + prod;
+const APL_Float norma_2 =       square(zeta2) + prod;
 const APL_Float norma = max(norma_1, norma_2);
 
 const APL_Float test = 1.0 + 2.0 * (zeta1 - zeta2) * (zeta1 + zeta2);
-T sine;
-T cosi;
    if (test >= 0.0 )
       {
         // root is close to zero, compute directly
         //
-        const APL_Float b = (zeta1*zeta1 + zeta2*zeta2 + 1.0)*0.5;
-        const APL_Float zeta2_2 = zeta2*zeta2;
+        const APL_Float zeta2_2 = square(zeta2);
+        const APL_Float b = 0.5*(square(zeta1) + zeta2_2 + 1.0);
         const APL_Float t = zeta2_2 / (b + sqrt(abs(b*b - zeta2_2)));
-        sine =   (ALPHA / abs_estimate) / (1.0 - t);
-        cosi = - (GAMMA / abs_estimate) / t;
-        SEST = sqrt(t + 4.0*eps*eps*norma)*abs_estimate;
+        SIN =   (ALPHA / abs_estimate) / (1.0 - t);
+        COS = - (GAMMA / abs_estimate) / t;
+        SEST = sqrt(t + square(2.0*dlamch_E) * norma) * abs_estimate;
       }
    else
       {
         // root is closer to ONE, shift by that amount
         //
-        const APL_Float b = (square(zeta2) + square(zeta1) - 1.0)*0.5;
+        const APL_Float b = 0.5 * (square(zeta2) + square(zeta1) - 1.0);
         APL_Float t;
-        if (b >= 0.0)   t = -zeta1 * zeta1 / (b + hypotenuse(b, zeta1));
+        if (b >= 0.0)   t = -square(zeta1) / (b + hypotenuse(b, zeta1));
         else            t = b - hypotenuse(b, zeta1);
 
-        sine = - (ALPHA / abs_estimate) / t;
-        cosi = - (GAMMA / abs_estimate) / (1.0 + t);
-        SEST = sqrt(1.0 + t + 4.0*eps*eps*norma) * abs_estimate;
+        SIN = - (ALPHA / abs_estimate) / t;
+        COS = - (GAMMA / abs_estimate) / (1.0 + t);
+        SEST = sqrt(1.0 + t + 4.0*dlamch_E*dlamch_E*norma) * abs_estimate;
       }
 
-   // normalize SIN and COS
-   //
-const APL_Float hypo = hypotenuse(sine, cosi);
-   SIN = sine / hypo;
-   COS = cosi / hypo;
+   normalize(SIN, COS);
 }
 //----------------------------------------------------------------------------
 /** LApack function larfg. It generates an elementary reflector
@@ -725,7 +735,7 @@ T LA_pack::larfg(Ccol N, Vector<T> & X)
 
    if (N == 1)   return T(0.0);
 
-T & ALPHA = X.at(-1);
+T & ALPHA = X[-1];
 
 APL_Float alpha_r = get_real(ALPHA);
 APL_Float alpha_i = get_imag(ALPHA);
@@ -832,13 +842,17 @@ const Ccol N = C.get_column_count();
    return 1;
 }
 //----------------------------------------------------------------------------
-/** LApack function gemv. Compute one of:
+/** LApack function gemv. Normally computes one of:
 
-    y := alpha × A      × x + beta × y   or
-    y := alpha × A* × T × x + beta × y   or
-    y := alpha × A* × H × x + beta × y
+    y := alpha × A      × x + beta × y   (case 1) or
+    y := alpha × A° × T × x + beta × y   (case 2) or
+    y := alpha × A° × H × x + beta × y   (case 3)
 
-   constants like 1.0 were removed and only the case needed is implemented
+   Constants alpha=1.0 and beta=0.0 were removed, and only the case 3
+   is needed (and implemented). That is:
+
+   y := A° × H × x
+
  */
 template<typename T>
 inline void LA_pack::gemv(int M, int N, const Matrix<T> & A,
@@ -847,26 +861,24 @@ inline void LA_pack::gemv(int M, int N, const Matrix<T> & A,
    ALL_COLS(N)
        {
          T tmp(0.0);
-         ALL_ROWS(M)   tmp += conjugated(A.at(row, col)) * x.at(row);
-         y.at(col) = tmp;
+         ALL_ROWS(M)   tmp += conjugated(A.at(row, col)) * x[row];
+         y[col] = tmp;
        }
 }
 //----------------------------------------------------------------------------
-/// LApack function gerc: C := alpha * x * y* * H + C.
+/// LApack function gerc: C := alpha × x × y° × H + C.
 template<typename T>
-void LA_pack::gerc(int M, int N, T ALPHA,
+void LA_pack::gerc(Crow M, Ccol N, T ALPHA,
                   const Vector<T> &x, const Vector<T> &y, Matrix<T> & C)
 {
    if (M && N && is_nonzero(ALPHA))
       {
         ALL_COLS(N)
            {
-             const T & Y = y.at(col);
-             if (is_nonzero(Y))
-                {
-                  const T YY = conjugated(Y) * ALPHA;
-                  ALL_ROWS(M)   C.at(row, col) += YY * x.at(row);
-                }
+             if (is_zero(y[col]))   continue;
+
+             const T Ay = conjugated(y[col]) * ALPHA;       // alpha * y°
+             ALL_ROWS(M)   C.at(row, col) += Ay * x[row];   //
            }
       }
 }
@@ -878,15 +890,15 @@ void LA_pack::gerc(int M, int N, T ALPHA,
    from either the left or the right. H is represented in the
    form
 
-       H = I - tau * v * v**H
+       H = I - tau × v × v° × H
 
    where tau is a scalar and v is a vector.
 
    If tau = 0, then H is taken to be the unit matrix.
 
-   To apply H**H, supply conjg(tau) instead.
+   To apply H° × H, supply conjg(tau) instead.
 
-   C is overwritten by the matrix H * C.
+   C is overwritten in place by the matrix H * C.
  */
 template<typename T>
 void LA_pack::larf(Vector<T> & v, T tau, Matrix<T> & C)
@@ -904,7 +916,7 @@ Ccol lastC = 0;   // rightmost column COL with a nonzero item in M↑COL
        // Look for the last non-zero item (row) in vector V
        //
        lastV = M;
-       while (lastV && is_zero(v.at(lastV - 1)))   --lastV;
+       while (lastV && is_zero(v[lastV - 1]))   --lastV;
 
        // Scan for the last non-zero column in C(1:lastv,:)
        //
@@ -913,65 +925,65 @@ Ccol lastC = 0;   // rightmost column COL with a nonzero item in M↑COL
 
    if (lastV)
       {
-        APL_Float * gemv_data = new APL_Float[2*N];   // N double or N complex
-        Vector<T> gemv_result(reinterpret_cast<T *>(gemv_data), N);
+        Vector<T> y(reinterpret_cast<T *>(work_larf), N);
 
-        gemv<T>(lastV, lastC, C,    v, gemv_result);
-        gerc<T>(lastV, lastC, -tau, v, gemv_result, C);
-        delete[] gemv_data;
+        gemv<T>(lastV, lastC, C,    v, y);      // y := A° × H × x
+        gerc<T>(lastV, lastC, -tau, v, y, C);   // y := alpha * x * y × H + C
       }
 }
 //----------------------------------------------------------------------------
-/*  LApack function laqp2: computes a QR factorization with column pivoting
+/*  LApack function laqp2. Compute a QR factorization with column pivoting
     of the matrix block
 
-   work is the concatenation WORK, RWORK in FORTRAN
+   vn1_vn2 (aka. work) is the concatenation WORK, RWORK in FORTRAN
  */
 template<typename T>
-void LA_pack::laqp2(Matrix<T> & A, Ccol * pivot, T * tau, APL_Float * work)
+void LA_pack::laqp2(Matrix<T> & A, Ccol * pivot, T * tau, APL_Float * vn1_vn2)
 {
 const Crow M = A.get_row_count();
 const Ccol N = A.get_column_count();
 
-#define vn1 work   /* work = vn1, vn2 */
-APL_Float * const vn2 = work + N;
+#define vn1 vn1_vn2   /* vn1_vn2 = vn1, vn2 */
+APL_Float * const vn2 = vn1 + N;
 
    ALL_COLS(N)
       {
-        const int col_A1 = col + 1;   // the column right of col
-        T & tau_i = tau[col];
+        const int col_A1 = col + 1;   // the next column (right of col)
+        T & tau_col = tau[col];
 
-        // pvt_0 is the column right of col that has the largesr vn1
+        // pvt_0 is the column at or right of col that has the largest vn1.
+        // If col already has the largest norm: OK, otherwise exchange
+        // columns col and pvt_0 of a and their column norms
         //
         const int pvt_0 = col + max_pos(vn1 + col, N - col);
 
         if (pvt_0 != col)   // unless col already is the pivot column
            {
              A.exchange_columns(pvt_0, col);
-             exchange(pivot[pvt_0], pivot[col]);
+             exchange(pivot[pvt_0], pivot[col]);   // remember the exchange
              vn1[pvt_0] = vn1[col];
              vn2[pvt_0] = vn2[col];
            }
 
         // Generate elementary reflector H(i).
         //
-        tau_i = 0.0;      // assume col is last (and then col_A1 is invalid)
+        tau_col = 0.0;      // assume col is the last (then col_A1 is invalid)
         if (col_A1 < M)   // no, col_A1 valid
            {
              const int len_X = M - col_A1;   // cols right of col
              Vector<T> X(&A.at(col_A1, col), len_X);
-             tau_i = larfg<T>(M - col, X);
+             tau_col = larfg<T>(M - col, X);
            }
 
         if (col_A1 < N)   // unless last column
            {
-             // Apply H(i)**H to A(offset+i:m,i+1:n) from the left.
+             // Apply H(i)° × H to A(offset+i:m, i+1:n) from the left.
              //
              const T Aii = A.diag(col);   // save diag
              A.diag(col) = APL_Float(1.0);
                 Vector<T> v(&A.diag(col), M - col);
                 Matrix<T> C = A.sub_matrix(col, col_A1);
-                larf<T>(v, conjugated(tau_i), C);
+                larf<T>(v, conjugated(tau_col), C);
              A.diag(col) = Aii;           // restore diag
            }
 
@@ -983,18 +995,18 @@ APL_Float * const vn2 = work + N;
 
               const APL_Float abs_A = abs(A.at(col, c)) / vn1[c];
               const APL_Float temp = max(1.0 - square(abs_A), 0.0);
-              const APL_Float temp2 = square(vn1[c] / vn2[c]);
-              if (temp * temp2 <= tol3z)   // temp and/or temp2 too small
+              const APL_Float quot = vn1[c] / vn2[c];
+              if (temp * quot * quot <= tol3z)   // temp and/or quot too small
                  {
-                   vn1[c] = 0.0;     // assume invalid col_A1
+                   vn1[c] = 0.0;   // assume invalid col_A1 (so col_A is last)
                    if (col_A1 < M)   // valid col_A1
                       {
-                        Vector<T> x(&A.at(col_A1, c), M - col_A1);
+                        const Vector<T> x(&A.at(col_A1, c), M - col_A1);
                         vn1[c] = x.norm();
                       }
                    vn2[c] = vn1[c];
                  }
-              else                                 // "normal" temp2
+              else                                 // "normal" quot
                  {
                    vn1[c] *= sqrt(temp);
                  }

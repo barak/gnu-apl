@@ -184,11 +184,11 @@ public:
   static DD max(DD x, DD y)
      { return  x < y ? y : x; }
   
-   /// set dd to 0.0
+   /// set real dd to 0.0
    static void clear(DD & dd)
       { dd = 0.0; }
 
-   /// set zz to 0.0j0.0
+   /// set complex zz to 0.0j0.0
    static void clear(ZZ & zz)
       { zz = ZZ(); }
 
@@ -208,7 +208,7 @@ public:
        x = y;
        y = tmp;
      }
-  
+
   //----------------------------------------------------------------------------
   /// A vector of real or complex numbers. Actually a vector view of some data
   template<typename T>
@@ -216,7 +216,7 @@ public:
      {
      public:
 
-         /// constructor: vector of length _len, with values _data.
+         /// constructor: vector of length \b_len, with values _data.
          /// Unlike for std::vector<T>, \b _data must outlive \b this!
          Vector(T * _data, ShapeItem _len)
            : data(_data),
@@ -288,11 +288,11 @@ public:
             }
        
          /// return \b this[i]
-         T & at(ShapeItem i)
+         const T & operator[](ShapeItem i) const
             { assert(i < len);  return *(data + i); }
       
          /// return \b this[i]
-         const T & at(ShapeItem i) const
+         T & operator[](ShapeItem i)
             { assert(i < len);  return *(data + i); }
       
      protected:
@@ -320,6 +320,15 @@ public:
   template<typename T1, typename T2>
   static APL_Float hypotenuse(const T1 & kath_A, const T2 & kath_B)
      { return sqrt(square(kath_A) + square(kath_B)); }
+
+  // scale SIN and COS so that SIN² + COS² = 1.0
+  template<typename T>
+  static void normalize(T & SIN, T & COS)
+     {
+        const APL_Float hypo = hypotenuse(SIN, COS);
+        SIN /= hypo;
+        COS /= hypo;
+     }
  
   //----------------------------------------------------------------------------
   /// A double or complex matrix. Actually a matrix view of some data
@@ -383,14 +392,14 @@ public:
              return Vector<T>(data + col*dx, rows);
            }
      
+        /// return const \b this[i, j]
+        const T & at(Crow i, Ccol j) const
+           { assert(i < rows);   assert(j < cols);
+             return *(data + i + j*dx); }
+     
         /// return \b this[i, j]
         T & at(Crow i, Ccol j)
            { assert(i < rows);   assert(j < cols); return *(data + i + j*dx); }
-     
-        /// return \b this[i, j]
-        const T & at(ShapeItem i, ShapeItem j) const
-           { assert(i < rows);   assert(j < cols);
-             return *(data + i + j*dx); }
      
         /// return \b this[i, i]
         T & diag(ShapeItem i) const
@@ -552,7 +561,7 @@ public:
          { zz.set_imag(-zz.imag()); }
 
       /// return real dd conjugated
-      static DD conjugated(const DD & dd)
+      static DD conjugated(DD dd)
          { return dd; }
 
       /// return complex zz conjugated
@@ -641,5 +650,27 @@ public:
      template<typename T>
      static void laqp2(Matrix<T> & A, Ccol * pivot,
                        T * tau, APL_Float * work);
+
+   /* workspace pointers... We allocate a single char * work for all of them.
+      The function call structure is somethink like:
+
+      ┌─── scaled_gelsy(N)              // uses work_scaled_gelsy
+      │       │
+      │       ├─── geqp3(N)             // uses work_geqp3
+      └───────┘      ││
+                     │├─── larf(N)      // uses work_larf
+                     ││     ...
+                     │└─── larf(1)      // uses work_larf
+                     │
+                   estimate_rank(N)     // uses work_geqp3
+
+      Therefore geqp3() and estimate_rank() can use the same memory, while
+      scaled_gelsy and and larf() needs a separate memories
+    */
+
+   static char * work_gelsy;   ///< workspace for scaled_gelsy()
+   static char * work_geqp3;   ///< workspace for geqp3() and estimate_rank()
+#define work_estimate_rank work_geqp3   /* shared */
+   static char * work_larf;    ///< workspace for larf()
 };
 //============================================================================
