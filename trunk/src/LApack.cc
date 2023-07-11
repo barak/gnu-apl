@@ -175,7 +175,6 @@ APL_Float * fpB = reinterpret_cast<APL_Float *>(free_B);
 static const APL_Float small_number = dlamch_S / dlamch_P;    // 1.00208E¯292
 static const APL_Float big_number   = 1.0 / small_number;     // 9.97923E291
 static const APL_Float safe_min     =  dlamch_S / dlamch_E;   // 2.00417E¯292
-static const APL_Float inv_safe_min = 1.0 / safe_min;         // 4.98959E291
 static const APL_Float tol3z        = sqrt(dlamch_E);         // 1.05367E¯8
 #undef dlamch_S
 #undef dlamch_P
@@ -254,15 +253,15 @@ char * work = new char[N * bytes_per_N];
    //
    if (un_scale_A != 1.0)
       {
-        Matrix<T> A1 = A.sub_len(N, N);
-        Matrix<T> B1 = B.sub_len(N, NRHS);
+        Matrix<T> A1 = A.take(N, N);
+        Matrix<T> B1 = B.take(N, NRHS);
         B1.scale(APL_Float(1.0/un_scale_A));
         A1.scale(un_scale_A);
       }
 
    if (un_scale_B != 1.0)
       {
-        Matrix<T> B1 = B.sub_len(N, NRHS);
+        Matrix<T> B1 = B.take(N, NRHS);
         B1.scale(un_scale_B);
       }
 
@@ -318,7 +317,7 @@ T * tmp = tau + N;                                     // tmp[N] (after tau)
    // B(1:RANK, 1:NRHS) := reciprocal(T11) * B(1:RANK,1:NRHS)
    //
    {
-     Matrix<T> B1 = B.sub_len(B.get_dx(), NRHS);
+     Matrix<T> B1 = B.take(B.get_dx(), NRHS);
      trsm<T>(A, B1);
    }
 
@@ -476,9 +475,9 @@ const Crow M = C.get_row_count();
 template<typename T>
 void LA_pack::laic1_MAX(APL_Float & SEST, T ALPHA, T GAMMA, T & SIN, T & COS)
 {
-const APL_Float abs_alpha    = abs(ALPHA);
-const APL_Float abs_gamma    = abs(GAMMA);
-const APL_Float abs_estimate = abs(SEST);
+const APL_Float abs_ALPHA = abs(ALPHA);
+const APL_Float abs_GAMMA = abs(GAMMA);
+const APL_Float abs_SEST  = abs(SEST);
 
    //    Estimating largest singular value ...
 
@@ -486,7 +485,7 @@ const APL_Float abs_estimate = abs(SEST);
    //
    if (SEST == 0.0)
       {
-        const APL_Float smax = max(abs_gamma, abs_alpha);
+        const APL_Float smax = max(abs_GAMMA, abs_ALPHA);
         if (smax == 0.0)
            {
              SIN = T(0.0);
@@ -497,80 +496,74 @@ const APL_Float abs_estimate = abs(SEST);
            {
              SIN = ALPHA / smax;
              COS = GAMMA / smax;
-
-             // normalize SIN and COS so that SIN² + COS² = 1.0
-             const APL_Float hypo = hypotenuse(SIN, COS);
-             SIN /= hypo;
-             COS /= hypo;
-             SEST = smax * hypo;
+             SEST = smax * normalize(SIN, COS);
            }
         return;
       }
 
-   if (abs_gamma <= dlamch_E * abs_estimate)   // if /tmp overflow
+   if (abs_GAMMA <= dlamch_E * abs_SEST)   // if /tmp overflow
       {
         SIN = T(1.0);   // 90⁰
         COS = T(0.0);   // 90⁰
-        const APL_Float abs_max = max(abs_estimate, abs_alpha);
-        const APL_Float s1 = abs_estimate / abs_max;
-        const APL_Float s2 = abs_alpha    / abs_max;
+        const APL_Float abs_max = max(abs_SEST, abs_ALPHA);
+        const APL_Float s1 = abs_SEST / abs_max;
+        const APL_Float s2 = abs_ALPHA    / abs_max;
         SEST = abs_max * hypotenuse(s1, s2);
         return;
       }
 
-   if (abs_alpha <= dlamch_E * abs_estimate)   // small abs_alpha
+   if (abs_ALPHA <= dlamch_E * abs_SEST)   // small abs_ALPHA
       {
-        if (abs_gamma <= abs_estimate)
+        if (abs_GAMMA <= abs_SEST)
            {
              SIN = T(1.0);   // 90⁰
              COS = T(0.0);   // 90⁰
-             SEST = abs_estimate;
+             SEST = abs_SEST;
            }
         else
            {
              SIN = T(0.0);   // 0⁰
              COS = T(1.0);   // 0⁰
-             SEST = abs_gamma;
+             SEST = abs_GAMMA;
            }
         return;
       }
 
-   if (abs_estimate <= dlamch_E * abs_alpha ||   // small abs_estimate
-       abs_estimate <= dlamch_E * abs_gamma)     // small abs_estimate
+   if (abs_SEST <= dlamch_E * abs_ALPHA ||   // small abs_SEST
+       abs_SEST <= dlamch_E * abs_GAMMA)     // small abs_SEST
       {
-        if (abs_gamma <= abs_alpha)
+        if (abs_GAMMA <= abs_ALPHA)
            {
-             const APL_Float quot = abs_gamma / abs_alpha;
+             const APL_Float quot = abs_GAMMA / abs_ALPHA;
              const APL_Float scale = hypotenuse(1.0, quot);
 
-             SEST = abs_alpha * scale;
-             SIN = (ALPHA / abs_alpha) / scale;
-             COS = (GAMMA / abs_alpha) / scale;
+             SEST = abs_ALPHA * scale;
+             SIN = (ALPHA / abs_ALPHA) / scale;
+             COS = (GAMMA / abs_ALPHA) / scale;
            }
         else
            {
-             const APL_Float quot = abs_alpha / abs_gamma;
+             const APL_Float quot = abs_ALPHA / abs_GAMMA;
              const APL_Float scale = hypotenuse(1.0, quot);
-             SEST = abs_gamma * scale;
-             SIN = (ALPHA / abs_gamma) / scale;
-             COS = (GAMMA / abs_gamma) / scale;
+             SEST = abs_GAMMA * scale;
+             SIN = (ALPHA / abs_GAMMA) / scale;
+             COS = (GAMMA / abs_GAMMA) / scale;
            }
         return;
       }
 
    // the normal case
    //
-const APL_Float zeta1 = abs_alpha / abs_estimate;
-const APL_Float zeta2 = abs_gamma / abs_estimate;
+const APL_Float zeta1 = abs_ALPHA / abs_SEST;
+const APL_Float zeta2 = abs_GAMMA / abs_SEST;
 const APL_Float b = 0.5*(1.0 - square(zeta1) - square(zeta2));
 const APL_Float t = b > 0.0 ? square(zeta1) / (b + hypotenuse(b, zeta1))
                             : hypotenuse(b, zeta1) - b;
 
-   SIN = -(ALPHA / abs_estimate) / t;
-   COS = -(GAMMA / abs_estimate) / (1.0 + t);
-
-   SEST = sqrt(t + 1.0) * abs_estimate;
+   SIN = -(ALPHA / abs_SEST) / t;
+   COS = -(GAMMA / abs_SEST) / (1.0 + t);
    normalize(SIN, COS);
+   SEST = sqrt(t + 1.0) * abs_SEST;
 }
 //----------------------------------------------------------------------------
 /** LApack function laic1 (estimate smallest singular value).
@@ -582,21 +575,19 @@ const APL_Float t = b > 0.0 ? square(zeta1) / (b + hypotenuse(b, zeta1))
 template<typename T>
 void LA_pack::laic1_MIN(APL_Float & SEST, T ALPHA, T GAMMA, T & SIN, T & COS)
 {
-const APL_Float abs_alpha = abs(ALPHA);
-const APL_Float abs_gamma = abs(GAMMA);
-const APL_Float abs_estimate = abs(SEST);
-
-   //    Estimating smallest singular value ...
+   // Estimating the smallest singular value...
    //
+const APL_Float abs_ALPHA = abs(ALPHA);
+const APL_Float abs_GAMMA = abs(GAMMA);
+const APL_Float abs_SEST  = abs(SEST);
 
    //    special cases
    //
    if (SEST == 0.0)
       {
-        SEST = 0.0;
         SIN = 1.0;   // 90°
         COS = 0.0;   // 90°
-        if (abs_gamma > 0.0 || abs_alpha > 0.0)
+        if (abs_GAMMA > 0.0 || abs_ALPHA > 0.0)
            {
              SIN = -conjugated(GAMMA);
              COS =  conjugated(ALPHA);
@@ -609,70 +600,70 @@ const APL_Float abs_estimate = abs(SEST);
         return;
       }
 
-   if (abs_gamma <= dlamch_E * abs_estimate)
+   if (abs_GAMMA <= dlamch_E * abs_SEST)
       {
         SIN = T(0.0);   // 0°
         COS = T(1.0);   // 0°
-        SEST = abs_gamma;
+        SEST = abs_GAMMA;
         return;
       }
 
-   if (abs_alpha <= dlamch_E * abs_estimate)
+   if (abs_ALPHA <= dlamch_E * abs_SEST)
       {
-        if (abs_gamma <= abs_estimate)
+        if (abs_GAMMA <= abs_SEST)
           {
             SIN = T(0.0);   // 0°
             COS = T(1.0);   // 0°
-            SEST = abs_gamma;
+            SEST = abs_GAMMA;
           }
         else
           {
             SIN = T(1.0);
             COS = T(0.0);
-            SEST = abs_estimate;
+            SEST = abs_SEST;
           }
         return;
       }
 
-   if (abs_estimate <= dlamch_E * abs_alpha ||   // small abs_estimate
-       abs_estimate <= dlamch_E * abs_gamma)     // small abs_estimate
+   if (abs_SEST <= dlamch_E * abs_ALPHA ||   // small abs_SEST
+       abs_SEST <= dlamch_E * abs_GAMMA)     // small abs_SEST
       {
         const T conj_gamma = conjugated(GAMMA);
         const T conj_alpha = conjugated(ALPHA);
 
-        if (abs_gamma <= abs_alpha)
+        if (abs_GAMMA <= abs_ALPHA)
            {
-             const APL_Float quot = abs_gamma / abs_alpha;
+             const APL_Float quot = abs_GAMMA / abs_ALPHA;
              const APL_Float scale = hypotenuse(1.0, quot);
              const APL_Float tmp_scale = quot / scale;
 
-             SEST = abs_estimate * tmp_scale;
-             SIN = - (conj_gamma / abs_alpha) / scale;
-             COS =   (conj_alpha / abs_alpha) / scale;
+             SIN = - (conj_gamma / abs_ALPHA) / scale;
+             COS =   (conj_alpha / abs_ALPHA) / scale;
+             SEST = abs_SEST * tmp_scale;
            }
         else
            {
-             const APL_Float tmp = abs_alpha / abs_gamma;
+             const APL_Float tmp = abs_ALPHA / abs_GAMMA;
              const APL_Float scale = hypotenuse(1.0, tmp);
 
-             SEST = abs_estimate / scale;
-             SIN = - (conj_gamma / abs_gamma) / scale;
-             COS =   (conj_alpha / abs_gamma) / scale;
+             SIN = - (conj_gamma / abs_GAMMA) / scale;
+             COS =   (conj_alpha / abs_GAMMA) / scale;
+             SEST = abs_SEST / scale;
            }
         return;
       }
 
    // normal case
    //
-const APL_Float zeta1 = abs_alpha / abs_estimate;
-const APL_Float zeta2 = abs_gamma / abs_estimate;
+const APL_Float zeta1 = abs_ALPHA / abs_SEST;
+const APL_Float zeta2 = abs_GAMMA / abs_SEST;
 const APL_Float prod = zeta1 * zeta2;
 
 const APL_Float norma_1 = 1.0 + square(zeta1) + prod;
 const APL_Float norma_2 =       square(zeta2) + prod;
 const APL_Float norma = max(norma_1, norma_2);
 
-const APL_Float test = 1.0 + 2.0 * (zeta1 - zeta2) * (zeta1 + zeta2);
+const APL_Float test = 1.0 + 2.0*(zeta1 - zeta2)*(zeta1 + zeta2);
    if (test >= 0.0 )
       {
         // root is close to zero, compute directly
@@ -680,9 +671,9 @@ const APL_Float test = 1.0 + 2.0 * (zeta1 - zeta2) * (zeta1 + zeta2);
         const APL_Float zeta2_2 = square(zeta2);
         const APL_Float b = 0.5*(square(zeta1) + zeta2_2 + 1.0);
         const APL_Float t = zeta2_2 / (b + sqrt(abs(b*b - zeta2_2)));
-        SIN =   (ALPHA / abs_estimate) / (1.0 - t);
-        COS = - (GAMMA / abs_estimate) / t;
-        SEST = sqrt(t + square(2.0*dlamch_E) * norma) * abs_estimate;
+        SIN =   (ALPHA / abs_SEST) / (1.0 - t);
+        COS = - (GAMMA / abs_SEST) / t;
+        SEST *= sqrt(t + square(2.0*dlamch_E) * norma);
       }
    else
       {
@@ -693,9 +684,9 @@ const APL_Float test = 1.0 + 2.0 * (zeta1 - zeta2) * (zeta1 + zeta2);
         if (b >= 0.0)   t = -square(zeta1) / (b + hypotenuse(b, zeta1));
         else            t = b - hypotenuse(b, zeta1);
 
-        SIN = - (ALPHA / abs_estimate) / t;
-        COS = - (GAMMA / abs_estimate) / (1.0 + t);
-        SEST = sqrt(1.0 + t + 4.0*dlamch_E*dlamch_E*norma) * abs_estimate;
+        SIN = - (ALPHA / abs_SEST) / t;
+        COS = - (GAMMA / abs_SEST) / (1.0 + t);
+        SEST *= sqrt(1.0 + t + square(2.0*dlamch_E) * norma);
       }
 
    normalize(SIN, COS);
@@ -745,11 +736,12 @@ APL_Float alpha_i = get_imag(ALPHA);
 APL_Float beta_abs = hypotenuse(ALPHA, X);
 APL_Float beta = alpha_r < 0.0 ? beta_abs : -beta_abs;
 
-   // scale small beta so it can be used safely
+   // scale small beta (and, with it, X) so that it can be used safely
    //
 int kcnt = 0;
    if (abs(beta) < safe_min)
        {
+         const APL_Float inv_safe_min = 1.0 / safe_min;   // 4.98959E291
          while (abs(beta) < safe_min)
             {
               ++kcnt;
@@ -769,10 +761,10 @@ T tau;
    set_real(tau, (beta - alpha_r) / beta);
    set_imag(tau, -alpha_i         / beta);
 
-const T factor = reciprocal(ALPHA - beta);
-   X.scale(factor);
-
-   loop(k, kcnt)   beta *= safe_min;   // unscale beta
+   // un-scale X and small beta
+   //
+   X.scale(reciprocal(ALPHA - beta));
+   loop(k, kcnt)   beta *= safe_min;
 
    set_real(ALPHA, beta);
    set_imag(ALPHA, 0.0);
@@ -805,29 +797,30 @@ void LA_pack::trsm(const Matrix<T> & A, Matrix<T> & B)
 //----------------------------------------------------------------------------
 /// LApack function ila_lc
 template<typename T>
-Fcol LA_pack::ila_lc(Crow M, const Matrix<T> & C)
+Ccol LA_pack::ila_lc(Crow M, const Matrix<T> & C)
 {
-   /* return the (FORTRAN index of the) rightmost column of C which
-      has a non-zero item in its first M rows.
+   /* return the smallest col so that C(1:M, col:N) is the null matrix:
+ 
 
        ├──────── N ────────┤
        ╔═════════════╤═════╗ ┬
        ║             │     ║ │
-       ║             │  0  ║ M
+       ║           ≠0│  0  ║ M
        ║      C<T>   │     ║ │
        ║             └─────╢ ┴
-       ║                   ║
-       ╚═══════════════════╝
-                    ↑
-                    ila_lc(M, N, C)
+       ║            ↑ ↑    ║
+       ╚════════════│═│════╝
+                    │ │
+                    │ └── ila_lc(M, N, C)
+                    └──── !column.is_null(M)   (last non-0 column
     */
 
 const Ccol N = C.get_column_count();
 
-   rev_loop(col, N)
+   REV_COLS(N)
        {
-         const Vector<T> column = C.get_column(col);
-         if (!column.is_null(M))   return col + 1;
+         const Vector<T> column = C.get_column(k);   // C( col:N, 1:M )
+         if (!column.is_null(M))   return k + 1;
 
          /* the above is the same as:
 
@@ -839,7 +832,9 @@ const Ccol N = C.get_column_count();
           */
        }
 
-   return 1;
+   // all columns are 0
+   //
+   return 0;
 }
 //----------------------------------------------------------------------------
 /** LApack function gemv. Normally computes one of:
@@ -901,7 +896,7 @@ void LA_pack::gerc(Crow M, Ccol N, T ALPHA,
    C is overwritten in place by the matrix H * C.
  */
 template<typename T>
-void LA_pack::larf(Vector<T> & v, T tau, Matrix<T> & C)
+void LA_pack::larf(const Vector<T> & v, T tau, Matrix<T> & C)
 {
 const Crow M = C.get_row_count();
 const Ccol N = C.get_column_count();
@@ -911,7 +906,7 @@ const Ccol N = C.get_column_count();
 Crow lastV = 0;   // index of the last non-zero item in v.
 Ccol lastC = 0;   // rightmost column COL with a nonzero item in M↑COL
 
-   if (is_nonzero(tau))   // if H is not the unit matrix
+   if (is_nonzero(tau))   // unless H is the unit matrix
      {
        // Look for the last non-zero item (row) in vector V
        //
@@ -967,7 +962,7 @@ APL_Float * const vn2 = vn1 + N;
 
         // Generate elementary reflector H(i).
         //
-        tau_col = 0.0;      // assume col is the last (then col_A1 is invalid)
+        tau_col = 0.0;    // assume col is the last (then col_A1 is invalid)
         if (col_A1 < M)   // no, col_A1 valid
            {
              const int len_X = M - col_A1;   // cols right of col
