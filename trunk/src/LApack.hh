@@ -70,8 +70,8 @@
 # define assert(x)
 #endif
 
+typedef int Crow;   ///< a row number:      0..M (excluding M)
 typedef int Ccol;   ///< a column number:   0..N (excluding N)
-typedef int Crow;   ///< a row number:      0..N (excluding N)
 
 #define ALL_ROWS(M)   for (Crow row = 0; row < (M); ++row)
 #define ALL_COLS(N)   for (Ccol col = 0; col < (N); ++col)
@@ -93,8 +93,8 @@ typedef int Crow;   ///< a row number:      0..N (excluding N)
    LDC ... (aka. the Leading Dimension of A, B, C, ..., which is the number of
    rows in the matrix.
 
-   In C/C++ the LDA, LDB, LDC, ... are the member 'dx' of the corresponging
-   Matrix<T> classes A, B, C, ....
+   In C/C++ the FORTRAN LDA, LDB, LDC, ... are the member 'dx' of the
+   corresponging Matrix<T> classes A, B, C, ....
  */
 class LA_pack
 {
@@ -191,8 +191,8 @@ public:
      public:
 
          /// constructor: vector of length \b_len, with values _data.
-         /// Unlike std::vector<T> (whick copies data), \b _data must
-         /// outlive \b this and modifying items modifies \b data!
+         /// Unlike std::vector<T> (whick copies \b data), \b _data must
+         /// outlive \b this, and modifying items also modifies \b _data!
          //
          Vector(T * _data, ShapeItem _len)
            : data(_data),
@@ -264,8 +264,10 @@ public:
   class Matrix
      {
      public:
-        /// constructor: _rows by _cols matrix values from _data
-        /// _CAUTION: data must outlive \b this!
+        /// constructor: _rows × _cols matrix with values _data.
+         /// Unlike e.g. std::vector<T> (whick copies \b data), \b _data must
+         /// outlive \b this, and modifying items also modifies \b _data!
+         //
         Matrix(T * _data, ShapeItem _rows, ShapeItem _cols, ShapeItem _dx)
           : data(_data),
             rows(_rows),
