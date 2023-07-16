@@ -4619,21 +4619,22 @@ In general, monadic ⎕RVAL B, returns a single random APL value Z,
 while dyadic A RVAL B is used to control the properties of
 subsequently generated random APL values returned by monadic ⎕RVAL.
 
-The typical use of ⎕RVAL is to firzt call A ⎕RVAL B zero or more times to
+The typical use of ⎕RVAL is to first call A ⎕RVAL B zero or more times to
 override individual default properties of the subsequently produced values,
 followed by one or more calls of monadic ⎕RVAL B.
 
-The default properties, i.e. the properties used unless they were overridden by
-A ⎕RVAL B are:
+The default properties, i.e. the properties used unless they were overwritten
+by dyadic A ⎕RVAL B, are:
 
 @verbatim
 Rank:  0
-Shape: 1 1 1 1 1 1 1 1 (unused since Rank = 0)
-Type:  0 1 0 0 0       (only integers
-Max. Depth: 4
+Shape: 1 1 1 1 1 1 1 1 (initially irrelevant since Rank = 0)
+Type:  0 1 0 0 0       (only integer random values)
+Max. Depth: 4          (initially irrelevant since type = 0 1 0 0 0)
 @end verbatim
 
-The default properties therefore return an integer scalar for every call of ⎕RVAL B.
+With these the default properties every call of monadic ⎕RVAL B returns an
+integer scalar.
 
 @subsection Dyadic ⎕RVAL
 
@@ -4659,7 +4660,7 @@ A=4 controls a maximum depth of the subsequent random APL values.
 
 @end itemize
 
-@subsubsection 0 ⎕RVAL B: Control of the underlying random number generator
+@subsubsection Control of the underlying random number generator: 0 ⎕RVAL B
 
 ⎕RVAL uses the standard C function random_r(). For this reason ⎕RVAL is
 only available on platforms which use glibc, for example all GNU/Linux
@@ -4692,7 +4693,7 @@ be generated again. The random number generators of ? and ⎕RVAL are
 independent; generating a random number or random value with one does not
 change the state of the other.
 
-@subsubsection 1 ⎕RVAL B: Control of the ranks
+@subsubsection Control of the ranks: 1 ⎕RVAL B
 
 The rank of subsequently generated random values can be controlled with
 1 ⎕RVAL B as follows.
@@ -4737,7 +4738,7 @@ with probability 30%, and a matrices with probability 20%. The numbers
 need not add up to 100, but will be scaled accordingly.
 @end itemize
 
-@subsubsection 2 ⎕RVAL B: Control of the shapes
+@subsubsection Control of the shapes: 2 ⎕RVAL B
 
 The shapes of subsequently generated random values can be controlled with
 2 ⎕RVAL B as follows.
@@ -4768,7 +4769,7 @@ Example:
 This will produce scalars, vectors with a fixed length of 3 and matrices
 with 3 rows and between 0 and 10 columns.
 
-@subsubsection 3 ⎕RVAL B: Control of the data types
+@subsubsection Control of the data types: 3 ⎕RVAL B
 
 The types (i.e. CHARACTER, INTEGER, REAL, COMPLEX, or NESTED) of subsequently
 generated random values can be controlled with 3 ⎕RVAL B as follows.
@@ -4816,7 +4817,7 @@ Example:
 7677327503669503253 2152001972871424768
 @end verbatim
 
-@subsubsection 4 ⎕RVAL B: Control of a maximum depth
+@subsubsection Control of a maximum depth: 4 ⎕RVAL B
 
 If the probability of generating a nested value is > 0 then the depth of
 random values can become arbitrarily large and could therefore exceed the

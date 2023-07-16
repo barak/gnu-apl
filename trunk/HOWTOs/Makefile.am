@@ -7,7 +7,8 @@ ASCIIDOC = \
     Quad-GTK.asciidoc                   \
     GNU-APL-Memory-Management.asciidoc  \
     GNU-APL-Troubleshooting.asciidoc    \
-    GNU-APL-Designers-Guide.asciidoc
+    GNU-APL-Designers-Guide.asciidoc    \
+    GNU-APL-Performance.asciidoc
 
 HTML = \
     APL-Communication-Cookbook.html \
@@ -15,7 +16,8 @@ HTML = \
     Quad-GTK.html                   \
     GNU-APL-Memory-Management.html  \
     GNU-APL-Troubleshooting.html    \
-    GNU-APL-Designers-Guide.html
+    GNU-APL-Designers-Guide.html    \
+    GNU-APL-Performance.html
 
 dist_doc_DATA = \
     $(HTML)              \

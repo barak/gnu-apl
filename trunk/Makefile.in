@@ -1024,7 +1024,9 @@ python:
 #
 .PHONY: gprof
 gprof:
-	./configure  --enable-maintainer-mode DEVELOP_WANTED=yes GPROF_WANTED=yes
+	./configure  --enable-maintainer-mode        \
+                 PERFORMANCE_COUNTERS_WANTED=yes \
+                 GPROF_WANTED=yes
 	make all
 
 ###############################################################################

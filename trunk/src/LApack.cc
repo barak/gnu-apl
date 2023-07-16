@@ -26,7 +26,6 @@
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <string.h>
 
 #include "Common.hh"
 #include "ComplexCell.hh"
@@ -39,13 +38,39 @@ using namespace std;
 #include "LApack.hh"
 
 char * LA_pack::work_gelsy = 0;
-char * LA_pack::work_geqp3 = 0;
+char * LA_pack::work_geqp3 = 0;   // geqp3() and estimate_rank()
 char * LA_pack::work_larf = 0;
 
 /*
    Notation: in the literature the conjujate transpose of a vector v resp.
    a matrix M is usually v* resp. M*. To avoid confusion with * we use
    v° resp, M° for the conjujate transpose and the APL × for *.
+
+   Call tree:
+
+   divide_matrix(Z, A, B)
+      │
+      └─── gelsy<T>(A, B, rcond)
+               │
+               └─── scaled_gelsy(A, B, rcond)
+                       │
+                       ├─── geqp3<T>(A, pivot, tau)
+                       │       │
+                       │       └─── laqp2<T>(A, pivot, tau, vn1_vn2)
+                       │               │
+                       │               ├─── larfg<T>(N, X)
+                       │               └─── larf<T>(v, len_v, tau, C)
+                       │
+                       ├─── estimate_rank(A, rcond)
+                       │
+                       ├─── unm2r<T>(N, A, tau, B)
+                       │       │
+                       │       ├─── larf<T>(v, 1, tau, C)
+                       │       ├─── ...
+                       │       └─── larf<T>(v, N, tau, C)
+                       │
+                       └─── trsm<T>(A, B1)
+                   
  */
 //----------------------------------------------------------------------------
 /// the implementation of Z←A⌹B.
@@ -182,17 +207,67 @@ static const APL_Float tol3z        = sqrt(dlamch_E);         // 1.05367E¯8
 #undef dlamch_P
 
 //----------------------------------------------------------------------------
-///  DGELSY solves (possibly overdetermined) systems for GE matrices 
+/**
+    LApack functions dgelsy and zgelsy:
+
+    GELSY computes the minimum-norm solution to a complex linear least
+    squares problem:
+
+    minimize ║ A × X - B ║
+
+    using a complete orthogonal factorization of A.  A is an M-by-N
+    matrix which may be rank-deficient.
+
+    Several right hand side vectors b and solution vectors x can be
+    handled in a single call; they are stored as the columns of the
+    M-by-NRHS right hand side matrix B and the N-by-NRHS solution
+    matrix X.
+
+    The routine first computes a QR factorization with column pivoting:
+
+    A × P = Q × ⎡ R₁₁ R₁₂ ⎤
+                ⎣  0  R₂₂ ⎦
+
+    with R₁₁ defined as the largest leading submatrix whose estimated
+    condition number is less than 1/RCOND. The order of R11, i.e. RANK,
+    is the effective rank of A.
+
+    Then, R22 is considered to be negligible, and R12 is annihilated
+    by unitary transformations from the right, arriving at the
+    complete orthogonal factorization:
+
+    A × P = Q × ⎡ T₁₁ 0 ⎤ × Z
+                ⎣  0  0 ⎦
+
+    The minimum-norm solution is then
+
+    X = P × Z° × H [ inv(T11) × Q1 * × H × B ]
+                     [        0         ]
+
+    where Q₁ consists of the first RANK columns of Q.
+
+     This routine is basically identical to the original xGELSX except
+     three differences:
+
+       • The permutation of matrix B (the right hand side) is faster and
+         more simple.
+
+       • The call to the subroutine xGEQPF has been substituted by the
+         the call to the subroutine xGEQP3. This subroutine is a Blas-3
+         version of the QR factorization with column pivoting.
+
+       • Matrix B (the right hand side) is updated with Blas-3.
+
+ */
 template<typename T>
-int LA_pack::gelsy(Matrix<T> & A, Matrix<T> &B, APL_Float rcond)
+int LA_pack::gelsy(Matrix<T> & A, Matrix<T> & B, APL_Float rcond)
 {
-const Crow M    = A.get_row_count();
-const Ccol N    = A.get_column_count();
-const Ccol NRHS = B.get_column_count();
+const Crow M = A.get_row_count();
+const Ccol N = A.get_column_count();
 
    // APL is responsible for handling the empty cases
    //
-   Assert(M && N && NRHS && N <= M);
+   Assert(M && N && B.get_column_count() && N <= M);
 
    // For a better precision, scale A and B so that their max. element lies
    // between small_number and big_number. Then call scaled_gelsy() and
@@ -200,20 +275,23 @@ const Ccol NRHS = B.get_column_count();
    //
 APL_Float un_scale_A = 1.0;
    {
-     const APL_Float norm_A = A.max_norm();
+     T * const A00 = &A.diag(0);
+     const size_t MN = M * N;
+     const APL_Float max_A = max_item(A00, MN);
 
-     if (norm_A == 0.0)                return 0;   // A is rank-deficient
-     else if (norm_A < small_number)   A.scale(un_scale_A = big_number);
-     else if (norm_A > big_number)     A.scale(un_scale_A = small_number);
+     if (max_A == 0.0)              return 0;   // A is the 0-matrix
+     if (max_A < small_number)      scale(A00, MN, un_scale_A = big_number);
+     else if (max_A > big_number)   scale(A00, MN, un_scale_A = small_number);
    }
 
 APL_Float un_scale_B = 1.0;
    {
-     const APL_Float norm_B = B.max_norm();
+     T * const B00 = &B.diag(0);
+     const size_t MN = B.get_row_count() * B.get_column_count();
+     const APL_Float max_B = max_item(B00, MN);
 
-     if (norm_B == 0.0)                /* OK */ ;
-     else if (norm_B < small_number)   B.scale(un_scale_B = big_number);
-     else if (norm_B > big_number)     B.scale(un_scale_B = small_number);
+     if (max_B < small_number)      scale(B00, MN, un_scale_B = big_number);
+     else if (max_B > big_number)   scale(B00, MN, un_scale_B = small_number);
    }
 
    // memory allocation
@@ -221,8 +299,7 @@ APL_Float un_scale_B = 1.0;
    enum Bytes_per_N
       {
         bytes_gelsy         = sizeof(Ccol)   // pivot
-                            + sizeof(T)      // tau
-                            + sizeof(T),     // tmp
+                            + sizeof(T),     // tau
         bytes_geqp3         = sizeof(T)      // vn1
                             + sizeof(T),     // vn2
         bytes_estimate_rank = sizeof(T)      // min
@@ -235,7 +312,12 @@ APL_Float un_scale_B = 1.0;
                             + bytes_larf
       };
 
-char * work = new char[N * bytes_per_N];
+   //  we allocate the total workspace for every function (i.e. gelsy,
+   //  geqp3, and larf) at this level; each function then further divides
+   //  its worksapace further. For example: we allocate N * bytes_gelsy
+   //  here and gelsy() divides it further into pivot, tau, and tmp.
+   //
+char * const work = new char[N * bytes_per_N];
    if (work == 0)   WS_FULL;
 
    work_gelsy = work;
@@ -256,22 +338,22 @@ char * work = new char[N * bytes_per_N];
    if (un_scale_A != 1.0)
       {
         Matrix<T> A1 = A.take(N, N);
-        Matrix<T> B1 = B.take(N, NRHS);
-        B1.scale(APL_Float(1.0/un_scale_A));
-        A1.scale(un_scale_A);
+        Matrix<T> B1 = B.take(N, B.get_column_count());
+        scale(&B1.diag(0), APL_Float(1.0/un_scale_A), N*B.get_column_count());
+        scale(&A1.diag(0), un_scale_A, N*N);
       }
 
    if (un_scale_B != 1.0)
       {
-        Matrix<T> B1 = B.take(N, NRHS);
-        B1.scale(un_scale_B);
+        Matrix<T> B1 = B.take(N, B.get_column_count());
+        scale(&B1.diag(0), un_scale_B, N * B.get_column_count());
       }
 
    delete[] work;
    return N;   // success
 }
 //----------------------------------------------------------------------------
-///  scaled_gelsy() computes computes gelsy() with A and B scaled nicely
+///  scaled_gelsy() computes gelsy() with A and B scaled nicely
 template<typename T>
 int LA_pack::scaled_gelsy(Matrix<T> & A, Matrix<T> & B, double rcond)
 {
@@ -286,13 +368,15 @@ const Ccol NRHS = B.get_column_count();
    // Compute QR factorization with column pivoting of A:
    // A × P = Q × R
    //
+
+   // split work_gelsy into pivot, tau, and tmp
+   //
 Ccol * const pivot = reinterpret_cast<Ccol *>(work_gelsy);   // pivot[N]
-T * const tau = reinterpret_cast<T *>(pivot + N);      // tau[N] (after pivot)
-T * tmp = tau + N;                                     // tmp[N] (after tau)
+T    * const tau   = reinterpret_cast<T *>(pivot + N);       // tau[N]
 
    geqp3<T>(A, pivot, tau);
 
-   // Details of Householder rotations stored in WORK(1:MN).
+   // Details of Householder rotations stored in WORK(1:MN)...
    //
    // Determine RANK using incremental condition estimation
    //
@@ -319,25 +403,47 @@ T * tmp = tau + N;                                     // tmp[N] (after tau)
    // B(1:RANK, 1:NRHS) := reciprocal(T11) * B(1:RANK,1:NRHS)
    //
    {
-     Matrix<T> B1 = B.take(B.get_dx(), NRHS);
+     Matrix<T> B1 = B.take(B.get_row_count(), NRHS);
      trsm<T>(A, B1);
    }
 
-   ALL_COLS(NRHS)
+   // tmp[N]: A column of B, permuted by pivot. FORTRAN uses a separate tmp[N]. 
+   // However, tau is no longer needed, so we can reuse it here. The loop below
+   // undoes the sorting of columns performed in geqp3() / laqp2().
+   //
+   ALL_COLS(NRHS)   // for every column of B
       {
-        ALL_ROWS(N)   tmp[pivot[row]] = B.at(row, col);
-        ALL_ROWS(N)   B.at(row, col) = tmp[row];
+        ALL_ROWS(N)   tau[pivot[row]] = B.at(row, col);
+        ALL_ROWS(N)   B.at(row, col) = tau[row];
       }
 
    return N;
 }
 //----------------------------------------------------------------------------
-/// LApack function estimating the rank of \b A
+/// function estimating the rank of \b A. (simplified part of GELSY)
 template<typename T>
 int LA_pack::estimate_rank(const Matrix<T> & A, APL_Float rcond)
 {
-   // Determine RANK using incremental condition estimation...
+   /* Determine RANK using incremental condition estimation...
+     
+      most likely this is pretty much an inlined GESVD with not used cases
+      removed. As to GESVD:
 
+      GESVD computes the singular value decomposition (SVD) of an
+      M-by-N matrix A, optionally computing the left and/or right singular
+      vectors. The SVD is written
+
+      A = U × SIGMA × conjugate-transpose(V)  (i.e. A = U × SIGMA × V°)
+
+      where SIGMA is an M-by-N matrix which is zero except for its
+      min(m,n) diagonal elements, U is an M-by-M unitary matrix, and
+      V is an N-by-N unitary matrix.  The diagonal elements of SIGMA
+      are the singular values of A; they are real and non-negative, and
+      are returned in descending order.  The first min(m,n) columns of
+      U and V are the left and right singular vectors of A.
+
+      Note that the routine returns V°*H, not V.
+    */
 const Ccol N = A.get_column_count();
 
 APL_Float smax = abs(A.diag(0));
@@ -347,8 +453,8 @@ APL_Float smin = smax;
    // store minima in work_min[ 0 ... N]
    // store maxima in work_max == work_min[N ... 2N]
    //
-T * work_min = reinterpret_cast<T *>(work_estimate_rank);
-T * work_max = work_min + N;
+T * const work_min = reinterpret_cast<T *>(work_estimate_rank);
+T * const work_max = work_min + N;
 
    // work_min and work_max will grow in the RANK loop, so only work_min[0]
    // and work_max[0] need to be initialized. The last item in work_min/max is
@@ -358,7 +464,7 @@ T * work_max = work_min + N;
    work_min[0] = T(1.0);   // cos 90°
    work_max[0] = T(1.0);   // cos 90°
 
-   for (int RANK = 1; RANK < N; ++RANK)
+   for (int RANK = 1; RANK < N; ++RANK)   // loop over columns of A
        {
          T sin_min(0.0);
          T sin_max(0.0);
@@ -368,11 +474,12 @@ T * work_max = work_min + N;
          T alpha_min = 0.0;
          T alpha_max = 0.0;
          const T gamma(A.diag(RANK));
-         loop(r, RANK)
+
+         ALL_ROWS(RANK)
              {
-               const T Ar = A.at(r, RANK);
-               alpha_min += conjugated(work_min[r] * Ar);
-               alpha_max += conjugated(work_max[r] * Ar);
+               const T Ar = A.at(row, RANK);
+               alpha_min += conjugated(work_min[row] * Ar);
+               alpha_max += conjugated(work_max[row] * Ar);
              }
 
          laic1_MIN<T>(smin, alpha_min, gamma, sin_min, cos_min);
@@ -383,10 +490,10 @@ T * work_max = work_min + N;
               return RANK;
             }
 
-         loop(r, RANK)
+         ALL_ROWS(RANK)
               {
-                work_min[r] *= sin_min;
-                work_max[r] *= sin_max;
+                work_min[row] *= sin_min;
+                work_max[row] *= sin_max;
               }
 
          work_min[RANK] = cos_min;   // for the next iteration
@@ -422,12 +529,11 @@ const Ccol N = A.get_column_count();
    //
 APL_Float * const vn1_vn2 = reinterpret_cast<APL_Float *>(work_geqp3);
 
-   // initialize work with column norms
+   // initialize vn1 and vn2 with column norms
    //
    ALL_COLS(N)
          {
-           Vector<T> x(&A.at(0, col), M);
-           vn1_vn2[N + col] = vn1_vn2[col] = x.norm();
+           vn1_vn2[N + col] = vn1_vn2[col] = sqrt(norm_2(&A.at(0, col), M));
          }
 
    laqp2<T>(A, pivot, tau, vn1_vn2);
@@ -462,9 +568,8 @@ const Crow M = C.get_row_count();
          const T tau_row = conjugated(tau[row]);
          const T Aii = A.diag(row);   // remember A(row, row)
              A.diag(row) = APL_Float(1.0);
-             Vector<T> v(&A.diag(row), MM);
              Matrix<T> SUB = C.sub_matrix(row, 0);
-             larf<T>(v, tau_row, SUB);
+             larf<T>(&A.diag(row), MM, tau_row, SUB);
          A.diag(row) = Aii;           // restore A(row, row);
        }
 }
@@ -473,6 +578,9 @@ const Crow M = C.get_row_count();
      apply one step of incremental condition estimation.
 
      SEST: largest estimated singular value of \b this matrix
+
+     See laic1_MIN() below. laic1_MAX is laic1 with JOB=1,
+                      while laic1_MIN is laic1 with JOB = 2.
  **/
 template<typename T>
 void LA_pack::laic1_MAX(APL_Float & SEST, T ALPHA, T GAMMA, T & SIN, T & COS)
@@ -573,6 +681,42 @@ const APL_Float t = b > 0.0 ? square(zeta1) / (b + hypotenuse(b, zeta1))
      apply one step of incremental condition estimation.
 
      SEST: smallest estimated singular value of \b this matrix
+
+     LAIC1 applies one step of incremental condition estimation in
+     its simplest version:
+
+     Let x, twonorm(x) = 1, be an approximate singular vector of an j-by-j
+     lower triangular matrix L, such that
+
+          twonorm(L × x) = sest
+
+     Then LAIC1 computes sestpr, s, c such that the vector
+
+                 [ s × x ]
+
+
+     x^ = [  c  ]
+
+     is an approximate singular vector of
+
+     [ L 0 ]
+
+     L^ = [ w° × H gamma ]
+
+
+     in the sense that twonorm(L^ × x^) = sestpr.
+
+     Depending on JOB (_MIN resp, _MAX), an estimate for the largest or
+     smallest singular value is computed.
+
+
+    Note that [s c]° × H and sestpr° × 2 is an eigenpair of the system
+
+    diag(sest*sest, 0) + [alpha  gamma] * [ conjg(alpha) ]
+                                          [ conjg(gamma) ]
+
+    where  alpha =  x° × H × w.
+
  **/
 template<typename T>
 void LA_pack::laic1_MIN(APL_Float & SEST, T ALPHA, T GAMMA, T & SIN, T & COS)
@@ -583,7 +727,7 @@ const APL_Float abs_ALPHA = abs(ALPHA);
 const APL_Float abs_GAMMA = abs(GAMMA);
 const APL_Float abs_SEST  = abs(SEST);
 
-   //    special cases
+   // special cases
    //
    if (SEST == 0.0)
       {
@@ -659,10 +803,10 @@ const APL_Float abs_SEST  = abs(SEST);
    //
 const APL_Float zeta1 = abs_ALPHA / abs_SEST;
 const APL_Float zeta2 = abs_GAMMA / abs_SEST;
-const APL_Float prod = zeta1 * zeta2;
+const APL_Float zeta = zeta1 + zeta2;
 
-const APL_Float norma_1 = 1.0 + square(zeta1) + prod;
-const APL_Float norma_2 =       square(zeta2) + prod;
+const APL_Float norma_1 = 1.0 + zeta1 * zeta;
+const APL_Float norma_2 =       zeta2 * zeta;
 const APL_Float norma = max(norma_1, norma_2);
 
 const APL_Float test = 1.0 + 2.0*(zeta1 - zeta2)*(zeta1 + zeta2);
@@ -722,7 +866,7 @@ const APL_Float test = 1.0 + 2.0*(zeta1 - zeta2)*(zeta1 + zeta2);
        y = H x   ←→   H y = x
  */
 template<typename T>
-T LA_pack::larfg(Ccol N, Vector<T> & X)
+T LA_pack::larfg(Ccol N, T * X, size_t len_X)
 {
    assert(N > 0);
 
@@ -732,10 +876,11 @@ T & ALPHA = X[-1];
 
 APL_Float alpha_r = get_real(ALPHA);
 APL_Float alpha_i = get_imag(ALPHA);
+const APL_Float norm2_X = norm_2(X, len_X);
 
-   if (X.norm_2() == 0.0 && alpha_i == 0.0)   return T(0.0);
+   if (alpha_i == 0.0 && norm2_X == 0.0)   return T(0.0);
 
-APL_Float beta_abs = hypotenuse(ALPHA, X);
+APL_Float beta_abs = hypotenuse(ALPHA, sqrt(norm2_X));
 APL_Float beta = alpha_r < 0.0 ? beta_abs : -beta_abs;
 
    // scale small beta (and, with it, X) so that it can be used safely
@@ -747,7 +892,7 @@ int kcnt = 0;
          while (abs(beta) < safe_min)
             {
               ++kcnt;
-              X.scale(inv_safe_min);     // scale x
+              scale(X, len_X, inv_safe_min);    // scale x
               beta *= inv_safe_min;      // scale beta
               alpha_r *= inv_safe_min;   // scale real(ALPHA)
               alpha_i *= inv_safe_min;   // scale imag(ALPHA)
@@ -755,7 +900,7 @@ int kcnt = 0;
 
          set_real(ALPHA, alpha_r);   // update ALPHA
          set_imag(ALPHA, alpha_i);   // update ALPHA
-         beta_abs = hypotenuse(ALPHA, X);
+         beta_abs = hypotenuse(ALPHA, sqrt(norm_2(X, len_X)));
          beta = alpha_r < 0.0 ? beta : -beta;
        }
 
@@ -765,7 +910,7 @@ T tau;
 
    // un-scale X and small beta
    //
-   X.scale(reciprocal(ALPHA - beta));
+   scale(X, len_X, reciprocal(ALPHA - beta));
    loop(k, kcnt)   beta *= safe_min;
 
    set_real(ALPHA, beta);
@@ -820,19 +965,8 @@ Ccol LA_pack::ila_lc(Crow M, const Matrix<T> & C)
 const Ccol N = C.get_column_count();
 
    REV_COLS(N)
-       {
-         const Vector<T> column = C.get_column(k);   // C( col:N, 1:M )
-         if (!column.is_null(M))   return k + 1;
-
-         /* the above is the same as:
-
-         ALL_ROWS(M)
-             {
-               if (get_real(A[row + col*LDA]) != 0)   return col + 1;
-               if (get_imag(A[row + col*LDA]) != 0)   return col + 1;
-             }
-          */
-       }
+   ALL_ROWS(M)
+      if (is_nonzero(C.at(row, k)))   return k + 1;
 
    // all columns are 0
    //
@@ -853,7 +987,7 @@ const Ccol N = C.get_column_count();
  */
 template<typename T>
 inline void LA_pack::gemv(int M, int N, const Matrix<T> & A,
-                          const Vector<T> & x, Vector<T> & y)
+                          const T * x, size_t len_x, T * y, size_t len_Y)
 {
    ALL_COLS(N)
        {
@@ -865,8 +999,8 @@ inline void LA_pack::gemv(int M, int N, const Matrix<T> & A,
 //----------------------------------------------------------------------------
 /// LApack function gerc: C := alpha × x × y° × H + C.
 template<typename T>
-void LA_pack::gerc(Crow M, Ccol N, T ALPHA,
-                  const Vector<T> &x, const Vector<T> &y, Matrix<T> & C)
+void LA_pack::gerc(Crow M, Ccol N, T ALPHA, const T * x, size_t len_X,
+                   const T * y, size_t len_Y, Matrix<T> & C)
 {
    if (M && N && is_nonzero(ALPHA))
       {
@@ -898,7 +1032,7 @@ void LA_pack::gerc(Crow M, Ccol N, T ALPHA,
    C is overwritten in place by the matrix H * C.
  */
 template<typename T>
-void LA_pack::larf(const Vector<T> & v, T tau, Matrix<T> & C)
+void LA_pack::larf(const T * v, size_t len_v, T tau, Matrix<T> & C)
 {
 const Crow M = C.get_row_count();
 const Ccol N = C.get_column_count();
@@ -922,10 +1056,10 @@ Ccol lastC = 0;   // rightmost column COL with a nonzero item in M↑COL
 
    if (lastV)
       {
-        Vector<T> y(reinterpret_cast<T *>(work_larf), N);
+        T * y = reinterpret_cast<T *>(work_larf);
 
-        gemv<T>(lastV, lastC, C,    v, y);      // y := A° × H × x
-        gerc<T>(lastV, lastC, -tau, v, y, C);   // y := alpha * x * y × H + C
+        gemv<T>(lastV, lastC, C,    v, len_v, y, N);      // y := A° × H × x
+        gerc<T>(lastV, lastC, -tau, v, len_v, y, N, C);
       }
 }
 //----------------------------------------------------------------------------
@@ -933,6 +1067,8 @@ Ccol lastC = 0;   // rightmost column COL with a nonzero item in M↑COL
     of the matrix block
 
    vn1_vn2 (aka. work) is the concatenation WORK, RWORK in FORTRAN
+
+   Temporarily modifies A (for performance reasons), but does not change it.
  */
 template<typename T>
 void LA_pack::laqp2(Matrix<T> & A, Ccol * pivot, T * tau, APL_Float * vn1_vn2)
@@ -946,7 +1082,6 @@ APL_Float * const vn2 = vn1 + N;
    ALL_COLS(N)
       {
         const int col_A1 = col + 1;   // the next column (right of col)
-        T & tau_col = tau[col];
 
         // pvt_0 is the column at or right of col that has the largest vn1.
         // If col already has the largest norm: OK, otherwise exchange
@@ -964,12 +1099,11 @@ APL_Float * const vn2 = vn1 + N;
 
         // Generate elementary reflector H(i).
         //
-        tau_col = 0.0;    // assume col is the last (then col_A1 is invalid)
+        tau[col] = 0.0;    // assume col is the last (then col_A1 is invalid)
         if (col_A1 < M)   // no, col_A1 valid
            {
              const int len_X = M - col_A1;   // cols right of col
-             Vector<T> X(&A.at(col_A1, col), len_X);
-             tau_col = larfg<T>(M - col, X);
+             tau[col] = larfg<T>(M - col, &A.at(col_A1, col), len_X);
            }
 
         if (col_A1 < N)   // unless last column
@@ -978,9 +1112,8 @@ APL_Float * const vn2 = vn1 + N;
              //
              const T Aii = A.diag(col);   // save diag
              A.diag(col) = APL_Float(1.0);
-                Vector<T> v(&A.diag(col), M - col);
                 Matrix<T> C = A.sub_matrix(col, col_A1);
-                larf<T>(v, conjugated(tau_col), C);
+                larf<T>(&A.diag(col), M - col, conjugated(tau[col]), C);
              A.diag(col) = Aii;           // restore diag
            }
 
@@ -998,8 +1131,7 @@ APL_Float * const vn2 = vn1 + N;
                    vn1[c] = 0.0;   // assume invalid col_A1 (so col_A is last)
                    if (col_A1 < M)   // valid col_A1
                       {
-                        const Vector<T> x(&A.at(col_A1, c), M - col_A1);
-                        vn1[c] = x.norm();
+                        vn1[c] = sqrt(norm_2(&A.at(col_A1, c), M - col_A1));
                       }
                    vn2[c] = vn1[c];
                  }

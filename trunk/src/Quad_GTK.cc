@@ -438,7 +438,7 @@ const int TLV_tag = (TLV[0] & 0xFF) << 24 | (TLV[1] & 0xFF) << 16
 const uint32_t V_len = (TLV[4] & 0xFF) << 24 | (TLV[5] & 0xFF) << 16
                      | (TLV[6] & 0xFF) <<  8 | (TLV[7] & 0xFF);
 
-   Assert(rx_len == (V_len + 8));
+   Assert(rx_len == ssize_t(V_len + 8));
 
 char * V = TLV + 8;
    V[V_len] = 0;   // avoid trouble

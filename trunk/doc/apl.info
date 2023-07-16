@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-May 22, 2023
+July 16, 2023
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
@@ -4499,20 +4499,20 @@ In general, monadic ⎕RVAL B, returns a single random APL value Z, while
 dyadic A RVAL B is used to control the properties of subsequently
 generated random APL values returned by monadic ⎕RVAL.
 
-   The typical use of ⎕RVAL is to firzt call A ⎕RVAL B zero or more
+   The typical use of ⎕RVAL is to first call A ⎕RVAL B zero or more
 times to override individual default properties of the subsequently
 produced values, followed by one or more calls of monadic ⎕RVAL B.
 
    The default properties, i.e.  the properties used unless they were
-overridden by A ⎕RVAL B are:
+overwritten by dyadic A ⎕RVAL B, are:
 
 Rank:  0
-Shape: 1 1 1 1 1 1 1 1 (unused since Rank = 0)
-Type:  0 1 0 0 0       (only integers
-Max. Depth: 4
+Shape: 1 1 1 1 1 1 1 1 (initially irrelevant since Rank = 0)
+Type:  0 1 0 0 0       (only integer random values)
+Max. Depth: 4          (initially irrelevant since type = 0 1 0 0 0)
 
-   The default properties therefore return an integer scalar for every
-call of ⎕RVAL B.
+   With these the default properties every call of monadic ⎕RVAL B
+returns an integer scalar.
 
 2.35.2 Dyadic ⎕RVAL
 -------------------
@@ -4532,7 +4532,7 @@ scalar:
 
    • A=4 controls a maximum depth of the subsequent random APL values.
 
-2.35.2.1 0 ⎕RVAL B: Control of the underlying random number generator
+2.35.2.1 Control of the underlying random number generator: 0 ⎕RVAL B
 .....................................................................
 
 ⎕RVAL uses the standard C function random_r().  For this reason ⎕RVAL is
@@ -4563,7 +4563,7 @@ shall be generated again.  The random number generators of ?  and ⎕RVAL
 are independent; generating a random number or random value with one
 does not change the state of the other.
 
-2.35.2.2 1 ⎕RVAL B: Control of the ranks
+2.35.2.2 Control of the ranks: 1 ⎕RVAL B
 ........................................
 
 The rank of subsequently generated random values can be controlled with
@@ -4598,7 +4598,7 @@ to query the current setting for 1 ⎕RVAL.
      vectors with probability 30%, and a matrices with probability 20%.
      The numbers need not add up to 100, but will be scaled accordingly.
 
-2.35.2.3 2 ⎕RVAL B: Control of the shapes
+2.35.2.3 Control of the shapes: 2 ⎕RVAL B
 .........................................
 
 The shapes of subsequently generated random values can be controlled
@@ -4629,7 +4629,7 @@ used to query the current setting for 2 ⎕RVAL.
    This will produce scalars, vectors with a fixed length of 3 and
 matrices with 3 rows and between 0 and 10 columns.
 
-2.35.2.4 3 ⎕RVAL B: Control of the data types
+2.35.2.4 Control of the data types: 3 ⎕RVAL B
 .............................................
 
 The types (i.e.  CHARACTER, INTEGER, REAL, COMPLEX, or NESTED) of
@@ -4672,7 +4672,7 @@ to query the current setting for 3 ⎕RVAL.
 ¯975954163190248487                   0.5892132425
 7677327503669503253 2152001972871424768
 
-2.35.2.5 4 ⎕RVAL B: Control of a maximum depth
+2.35.2.5 Control of a maximum depth: 4 ⎕RVAL B
 ..............................................
 
 If the probability of generating a nested value is > 0 then the depth of
@@ -7307,74 +7307,74 @@ please read <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 
 Tag Table:
 Node: Top383
-Node: Chapter 11571
-Node: Chapter 223280
-Node: Section 2.125260
-Node: Subsection 2.1.126482
-Node: Subsection 2.1.227113
-Node: Subsection 2.1.327944
-Node: Subsection 2.1.433750
-Node: Subsection 2.1.537549
-Node: Subsection 2.1.638407
-Node: Subsection 2.1.746531
-Node: Subsection 2.1.848281
-Node: Section 2.251596
-Node: Section 2.352355
-Node: Section 2.453630
-Node: Section 2.558075
-Node: Section 2.658248
-Node: Section 2.758878
-Node: Section 2.862831
-Node: Section 2.964366
-Node: Section 2.1066458
-Node: Section 2.1168012
-Node: Section 2.1269797
-Node: Section 2.1371737
-Node: Section 2.1472678
-Node: Section 2.1572930
-Node: Section 2.1674326
-Node: Section 2.1784795
-Node: Section 2.1887317
-Node: Section 2.1994034
-Node: Section 2.2095479
-Node: Section 2.21101140
-Node: Section 2.22106174
-Node: Section 2.23109455
-Node: Section 2.24109746
-Node: Section 2.25120574
-Node: Section 2.26120846
-Node: Section 2.27127424
-Node: Section 2.28129884
-Node: Section 2.29130553
-Node: Section 2.30132205
-Node: Section 2.31135992
-Node: Output File Format151912
-Node: Section 2.32153087
-Node: Section 2.33162485
-Node: Section 2.34163512
-Node: Section 2.35178227
-Node: Section 2.36188293
-Node: Section 2.37192412
-Node: Section 2.38194507
-Node: Section 2.39198932
-Node: Section 2.40220307
-Node: Chapter 3231195
-Node: Chapter 4233696
-Node: Chapter 5234822
-Node: Section 5.1236359
-Node: Section 5.2237639
-Node: Section 5.3237999
-Node: Section 5.4238241
-Node: Section 5.5238903
-Node: Section 5.6239381
-Node: Section 5.7240153
-Node: Section 5.8240610
-Node: Chapter 6241012
-Node: Section 6.1241431
-Node: Section 6.2242118
-Node: Chapter 7242949
-Node: Section 7.1243452
-Node: Section 7.2268766
+Node: Chapter 11572
+Node: Chapter 223281
+Node: Section 2.125261
+Node: Subsection 2.1.126483
+Node: Subsection 2.1.227114
+Node: Subsection 2.1.327945
+Node: Subsection 2.1.433751
+Node: Subsection 2.1.537550
+Node: Subsection 2.1.638408
+Node: Subsection 2.1.746532
+Node: Subsection 2.1.848282
+Node: Section 2.251597
+Node: Section 2.352356
+Node: Section 2.453631
+Node: Section 2.558076
+Node: Section 2.658249
+Node: Section 2.758879
+Node: Section 2.862832
+Node: Section 2.964367
+Node: Section 2.1066459
+Node: Section 2.1168013
+Node: Section 2.1269798
+Node: Section 2.1371738
+Node: Section 2.1472679
+Node: Section 2.1572931
+Node: Section 2.1674327
+Node: Section 2.1784796
+Node: Section 2.1887318
+Node: Section 2.1994035
+Node: Section 2.2095480
+Node: Section 2.21101141
+Node: Section 2.22106175
+Node: Section 2.23109456
+Node: Section 2.24109747
+Node: Section 2.25120575
+Node: Section 2.26120847
+Node: Section 2.27127425
+Node: Section 2.28129885
+Node: Section 2.29130554
+Node: Section 2.30132206
+Node: Section 2.31135993
+Node: Output File Format151913
+Node: Section 2.32153088
+Node: Section 2.33162486
+Node: Section 2.34163513
+Node: Section 2.35178228
+Node: Section 2.36188392
+Node: Section 2.37192511
+Node: Section 2.38194606
+Node: Section 2.39199031
+Node: Section 2.40220406
+Node: Chapter 3231294
+Node: Chapter 4233795
+Node: Chapter 5234921
+Node: Section 5.1236458
+Node: Section 5.2237738
+Node: Section 5.3238098
+Node: Section 5.4238340
+Node: Section 5.5239002
+Node: Section 5.6239480
+Node: Section 5.7240252
+Node: Section 5.8240709
+Node: Chapter 6241111
+Node: Section 6.1241530
+Node: Section 6.2242217
+Node: Chapter 7243048
+Node: Section 7.1243551
+Node: Section 7.2268865
 
 End Tag Table
 

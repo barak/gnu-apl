@@ -1028,9 +1028,8 @@ protected:
 
    /// overloaded Function::eval_AB().
    virtual Token eval_AB(Value_P A, Value_P B) const
-      { return eval_scalar_AB(A, B,
-                              inverse ? &Cell::bif_circle_fun_inverse
-                                      : &Cell::bif_circle_fun); }
+      { return eval_scalar_AB(A, B, inverse ? &Cell::bif_circle_fun_inverse
+                                            : &Cell::bif_circle_fun); }
 
    /// overloaded Function::get_scalar_f2
    virtual prim_f2 get_scalar_f2() const

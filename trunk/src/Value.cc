@@ -2558,7 +2558,7 @@ const Cell * c = &get_cfirst();
 Value_P
 Value::clone(const char * loc) const
 {
-#ifdef PERFORMANCE_COUNTERS_WANTED
+#ifdef cfg_PERFORMANCE_COUNTERS_WANTED
 const uint64_t start_1 = cycle_counter();
 #endif
 
@@ -2580,7 +2580,7 @@ Value_P Z(get_shape(), loc);
 
    Z->check_value(LOC);
 
-#ifdef PERFORMANCE_COUNTERS_WANTED
+#ifdef cfg_PERFORMANCE_COUNTERS_WANTED
 const uint64_t end_1 = cycle_counter();
 const uint64_t count1 = nz_element_count();
    Performance::fs_clone_B.add_sample(end_1 - start_1, count1);

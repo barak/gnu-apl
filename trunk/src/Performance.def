@@ -1,5 +1,6 @@
 
-// windows seems to #define _B and/or _AB. We therefore #undef it just in case
+// windows seems to #define _B and/or _AB. We therefore #undef it here to be
+// on the safe side.
 //
 #ifdef _B
 # undef _B

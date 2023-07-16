@@ -83,11 +83,10 @@ typedef int Ccol;   ///< a column number:   0..N (excluding N)
 
    DD:   a single real number
    ZZ:   a single complex number
-   Vector<T> a vector of T (where T is DD or ZZ)
    Matrix<T> a matrix of T (where T is DD or ZZ)
 
-   Vector<T>  and Matrix<T> are actually views of an underlying T* so that
-   sub-vectors and matrices can be accessed without copying them.
+   Matrix<T> is actually a view of an underlying T* so that makes it possible
+   to access sub-matrices without copying them (in-place modification).
 
    In FORTRAN, every Matrix A, B, C... is accompanied by an integer LDA, LDB,
    LDC ... (aka. the Leading Dimension of A, B, C, ..., which is the number of
@@ -148,7 +147,7 @@ public:
           { return ZZ(_r - zz._r, _i - zz._i); }
 
        /// subtract complex \b zz from \b this
-       void operator -= (const ZZ & zz)
+       void operator -=(const ZZ & zz)
           { _r -= zz._r; _i -= zz._i; }
 
        /// multiply complex \b z1 with complex \b zz
@@ -156,7 +155,7 @@ public:
           { return ZZ(_r*zz._r - _i*zz._i, _i*zz._r + _r*zz._i); }
 
        /// multiply *this with real \b dd
-       void operator *= (ZZ & zz)
+       void operator *=(const ZZ & zz)
           { *this = *this * zz; }
 
        /// divide complex \b this by complex \b zz
@@ -168,12 +167,16 @@ public:
           }
 
        /// divide *this by complex \b zz
-       void operator /= (const ZZ & zz)
+       void operator /=(const ZZ & zz)
           { *this = *this / zz; }
 
        /// divide complex \b this by real \b z2
        ZZ operator /(const APL_Float & dd) const
           { return ZZ(_r/dd, _i/dd); }
+
+       /// the square of the hypotenuse 
+       APL_Float hypo_2() const
+          { return _r*_r + _i*_i; }
 
      protected:
        /// the real part
@@ -182,84 +185,10 @@ public:
        /// the imaginary part
        APL_Float _i;
      };
-  
-  //----------------------------------------------------------------------------
-  /// A vector of real or complex numbers. Actually a vector view of some data
-  template<typename T>
-  class Vector
-     {
-     public:
-
-         /// constructor: vector of length \b_len, with values _data.
-         /// Unlike std::vector<T> (whick copies \b data), \b _data must
-         /// outlive \b this, and modifying items also modifies \b _data!
-         //
-         Vector(T * _data, ShapeItem _len)
-           : data(_data),
-             len (_len)
-         {}
-      
-         /// return the norm² of \b this Vector
-         APL_Float norm_2() const
-            {
-              APL_Float ret = 0.0;
-              const T * d = data;
-              loop(j, len)
-                 {
-                   ret += square(get_real(*d));
-                   ret += square(get_imag(*d++));
-                 }
-              return ret;
-            }
-      
-         /// return the norm of \b this Vector
-         APL_Float norm() const
-            { return sqrt(norm_2()); }
  
-         /// multiply \b this Vector by \b factor
-         void scale(T factor)
-            {
-              T * dj = data;
-              loop(j, len)   *dj++ *= factor;
-            }
-      
-         /// set all elemens of \b this Vector to 0
-         void clear()
-            {
-              T * dj = data;
-              loop(j, len)   *dj++.clear();
-            }
-      
-         /// return true if \b this Vector is the 0-vector
-         bool is_null(ShapeItem count) const
-            {
-              const T * dj = data;
-              loop(j, count)
-                 {
-                   if (0.0 != get_real(*dj))     return false;
-                   if (0.0 != get_imag(*dj++))   return false;
-                 }
-              return true;
-            }
-       
-         /// return \b this[i]
-         const T & operator[](ShapeItem i) const
-            { assert(i < len);  return *(data + i); }
-      
-         /// return \b this[i]
-         T & operator[](ShapeItem i)
-            { assert(i < len);  return *(data + i); }
-      
-     protected:
-         /// the elements of \b this vector
-         T * const data;
-      
-         ///  the length of this vector
-         const ShapeItem len;
-     };
-
   //----------------------------------------------------------------------------
-  /// A double or complex matrix. Actually a matrix view of some data
+  /// A double or complex matrix. Actually a matrix view of some data (where
+  /// data is similar to an APL ravel)
   template<typename T>
   class Matrix
      {
@@ -310,18 +239,6 @@ public:
         const ShapeItem get_column_count() const
            { return cols; }
      
-        /// return column \b col of \b this Matrix
-        Vector<T> get_column(Ccol col) 
-           {
-             return Vector<T>(data + col*dx, rows);
-           }
-     
-        /// return column \b col of \b this Matrix
-        const Vector<T> get_column(Ccol col) const
-           {
-             return Vector<T>(data + col*dx, rows);
-           }
-     
         /// return const \b this[row, col]
         const T & at(Crow row, Ccol col) const
            { assert(row < rows);
@@ -350,44 +267,6 @@ public:
              loop(r, rows)   exchange(*p1++, *p2++);
            }
      
-        /// return the distance between two adjacent columns in \b data
-        ShapeItem get_dx() const   { return dx; }
-     
-        /// return the length of the largest element
-        APL_Float max_norm() const
-           {
-             const ShapeItem len = rows * cols;
-             if (is_ZZ(*data))   // complex max. norm
-                {
-                  APL_Float ret2 = 0;
-                  loop(l, len)
-                     {
-                       const APL_Float a2 = square(data[l]);
-                       if (ret2 < a2)   ret2 = a2;
-                     }
-                  return sqrt(ret2);
-                }
-             else                // real max norm
-                {
-                  APL_Float ret = 0;
-                  loop(l, len)
-                     {
-                       const APL_Float a = get_real(data[l]);
-                       if (ret < a)         ret = a;
-                       else if (ret < -a)   ret = -a;
-                     }
-                  return ret;
-                }
-           }
-     
-        /// multiply \b this by \b factor
-        void scale(T factor)
-           {
-             T * dj = data;
-             const ShapeItem len = rows * cols;
-             loop(j, len)   *dj++ *= factor;
-           }
-     
      protected:
         /// the elements of \b this matrix
         T * const data;
@@ -405,20 +284,15 @@ public:
      };
   //==========================================================================
 
-  // static real and complex functions
+  // static real and complex functions. Most functions exist in 2 variants:
+  // one for real (DD) and one for complex (ZZ) argumments.
+  // The template<typename T> expansion of type T will later pick the
+  // appropriate variant.
 
   /// the maximum of \b x and \b y
   static DD max(DD x, DD y)
      { return  x < y ? y : x; }
   
-   /// set real dd to 0.0
-   static void clear(DD & dd)
-      { dd = 0.0; }
-
-   /// set complex zz to 0.0j0.0
-   static void clear(ZZ & zz)
-      { zz = ZZ(); }
-
   /// return the absolute value (=length) of real dd
   static DD abs(DD dd)
      { return dd < 0.0 ? -dd : dd; }
@@ -444,11 +318,6 @@ public:
   static DD square(ZZ zz)
      { return square(zz.real()) + square(zz.imag()); }
   
-  /// return the square of the length of Vector \b vec
-  template<typename  T>
-  static DD square(const Vector<T> vec)
-     { return vec.norm_2(); }
-
   // A² + B² = C²
   template<typename T1, typename T2>
   static APL_Float hypotenuse(const T1 & kath_A, const T2 & kath_B)
@@ -478,8 +347,40 @@ public:
      
         return imax;
      }
+
+   /// return (the length of) the largest item in data. Always ≥ 0.
+   static APL_Float max_item(const DD * data, size_t len)
+      {
+        APL_Float ret = 0;
+        loop(l, len)
+            {
+              const APL_Float a = get_real(data[l]);
+              if      (ret < a)   ret = a;    // larger a ≥ 0
+              else if (ret < -a)  ret = -a;   // larger a < 0
+            }
+        return ret;
+      }
+
+   /// return (the length of) the largest item in data. Always ≥ 0.
+   static APL_Float max_item(const ZZ * data, size_t len)
+      {
+        APL_Float ret_2 = 0;
+        loop(l, len)
+            {
+              const APL_Float c_2 = data++->hypo_2();
+              if (ret_2 < c_2)   ret_2 = c_2;
+            }
+        return sqrt(ret_2);
+      }
+
+  static void scale(DD * data, size_t len, APL_Float factor)
+     { loop(l, len)   data[l] *= factor; }
+
+  static void scale(ZZ * data, size_t len, const ZZ & factor)
+     { loop(l, len)   data[l] *= factor; }
+
   //============================================================================
-  // (static) functions ported from LAPACK (FORTRAN) .f files
+  // (static) functions ported from LAPACK (FORTRAN) .f files...
   public:
      /// LAPACK dgelse (for real matrices A and B)
      static int Dgelsy(Matrix<DD> & A, Matrix<DD> &B, APL_Float rcond)
@@ -534,15 +435,7 @@ public:
    static bool is_zero(const ZZ & zz)
       { return zz.real() == 0.0 && zz.imag() == 0.0; }
 
-   /// never
-   static bool is_ZZ(const DD & dd)
-      { return false; }
-
-   /// always
-   static bool is_ZZ(const ZZ & zz)
-      { return true; }
-
-   /// dd is not 0.0
+   /// zz is not 0.0
    static bool is_nonzero(const ZZ & zz)
       { return zz.real() != 0.0 || zz.imag() != 0.0; }
 
@@ -571,6 +464,26 @@ public:
         {
           const APL_Float denom = zz.real() * zz.real() + zz.imag() * zz.imag();
           return ZZ(zz.real()/denom, - zz.imag()/denom);
+        }
+
+     /// return ║ vec ║²
+     static APL_Float norm_2(const DD * vec, size_t len)
+        {
+              APL_Float norm = 0.0;
+              loop(j, len)   norm += square(get_real(*vec++));
+              return norm;
+        }
+
+     /// return ║ vec ║²
+     static APL_Float norm_2(const ZZ * vec, size_t len)
+        {
+              APL_Float norm = 0.0;
+              loop(j, len)
+                 {
+                   norm += square(get_real(*vec));
+                   norm += square(get_imag(*vec++));
+                 }
+              return norm;
         }
 
      /// dgelsy and zgelsy
@@ -614,7 +527,7 @@ public:
      /// LApack function larfg. It generates an elementary reflector
      /// (aka. a Householder matrix). Return tau.
      template<typename T>
-     static T larfg(Ccol N, Vector<T> &x);
+     static T larfg(Ccol N, T * X, size_t len_X);
   
      /// LApack function trsm. Solves op(A) * X = alpha * B
      template<typename T>
@@ -628,18 +541,18 @@ public:
      /// LApack function gemv. y := alpha*A*x + beta*y
      ///                    or y := alpha*A**T*x + beta*y
      template<typename T>
-     static inline void gemv(int M, int N, const Matrix<T> & A,
-                             const Vector<T> &x, Vector<T> &y);
+     static inline void gemv(int M, int N, const Matrix<T> & C,
+                             const T * v, size_t len_v, T * y, size_t len_Y);
   
      /// LApack function gerc: A := alpha * x * y* * H + A,
      template<typename T>
-     static void gerc(int M, int N, T ALPHA, const Vector<T> &x,
-                      const Vector<T> &y, Matrix<T> & A);
+     static void gerc(int M, int N, T ALPHA, const T * x, size_t len_X,
+                      const T * y, size_t len_Y, Matrix<T> & C);
   
      // LApack function larf: applies an elementary reflector to a general
      /// rectangular matrix
      template<typename T>
-     static void larf(const Vector<T> & v, T tau, Matrix<T> & c);
+     static void larf(const T * v, size_t len_v, T tau, Matrix<T> & C);
   
      /// LApack function laqp2: computes a QR factorization with column pivoting
      /// of the matrix block

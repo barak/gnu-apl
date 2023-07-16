@@ -60,7 +60,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Installing and Starting GNU 
 </div>
 <span id="GNU-APL"></span><h1 class="top">GNU APL</h1>
 
-<p>May 22, 2023
+<p>July 16, 2023
 </p>
 <p>This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
@@ -227,11 +227,11 @@ therefore it must be expanded with e.g.  <b>gunzip</b> before it can be read.
       <li><a id="toc-General" href="#General">2.35.1 General</a></li>
       <li><a id="toc-Dyadic-_005b_003f_005dRVAL" href="#Dyadic-_005b_003f_005dRVAL">2.35.2 Dyadic ⎕RVAL</a>
       <ul class="no-bullet">
-        <li><a id="toc-0-_005b_003f_005dRVAL-B_003a-Control-of-the-underlying-random-number-generator" href="#g_t0-_005b_003f_005dRVAL-B_003a-Control-of-the-underlying-random-number-generator">2.35.2.1 0 ⎕RVAL B: Control of the underlying random number generator</a></li>
-        <li><a id="toc-1-_005b_003f_005dRVAL-B_003a-Control-of-the-ranks" href="#g_t1-_005b_003f_005dRVAL-B_003a-Control-of-the-ranks">2.35.2.2 1 ⎕RVAL B: Control of the ranks</a></li>
-        <li><a id="toc-2-_005b_003f_005dRVAL-B_003a-Control-of-the-shapes" href="#g_t2-_005b_003f_005dRVAL-B_003a-Control-of-the-shapes">2.35.2.3 2 ⎕RVAL B: Control of the shapes</a></li>
-        <li><a id="toc-3-_005b_003f_005dRVAL-B_003a-Control-of-the-data-types" href="#g_t3-_005b_003f_005dRVAL-B_003a-Control-of-the-data-types">2.35.2.4 3 ⎕RVAL B: Control of the data types</a></li>
-        <li><a id="toc-4-_005b_003f_005dRVAL-B_003a-Control-of-a-maximum-depth" href="#g_t4-_005b_003f_005dRVAL-B_003a-Control-of-a-maximum-depth">2.35.2.5 4 ⎕RVAL B: Control of a maximum depth</a></li>
+        <li><a id="toc-Control-of-the-underlying-random-number-generator_003a-0-_005b_003f_005dRVAL-B" href="#Control-of-the-underlying-random-number-generator_003a-0-_005b_003f_005dRVAL-B">2.35.2.1 Control of the underlying random number generator: 0 ⎕RVAL B</a></li>
+        <li><a id="toc-Control-of-the-ranks_003a-1-_005b_003f_005dRVAL-B" href="#Control-of-the-ranks_003a-1-_005b_003f_005dRVAL-B">2.35.2.2 Control of the ranks: 1 ⎕RVAL B</a></li>
+        <li><a id="toc-Control-of-the-shapes_003a-2-_005b_003f_005dRVAL-B" href="#Control-of-the-shapes_003a-2-_005b_003f_005dRVAL-B">2.35.2.3 Control of the shapes: 2 ⎕RVAL B</a></li>
+        <li><a id="toc-Control-of-the-data-types_003a-3-_005b_003f_005dRVAL-B" href="#Control-of-the-data-types_003a-3-_005b_003f_005dRVAL-B">2.35.2.4 Control of the data types: 3 ⎕RVAL B</a></li>
+        <li><a id="toc-Control-of-a-maximum-depth_003a-4-_005b_003f_005dRVAL-B" href="#Control-of-a-maximum-depth_003a-4-_005b_003f_005dRVAL-B">2.35.2.5 Control of a maximum depth: 4 ⎕RVAL B</a></li>
         <li><a id="toc-monadic-_005b_003f_005dRVAL-B_003a-Return-a-new-random-value" href="#monadic-_005b_003f_005dRVAL-B_003a-Return-a-new-random-value">2.35.2.6 monadic ⎕RVAL B: Return a new random value</a></li>
       </ul></li>
     </ul></li>
@@ -5010,19 +5010,20 @@ useful for other purposes as well.
 while dyadic A RVAL B is used to control the properties of
 subsequently generated random APL values returned by monadic ⎕RVAL.
 </p>
-<p>The typical use of ⎕RVAL is to firzt call A ⎕RVAL B zero or more times to
+<p>The typical use of ⎕RVAL is to first call A ⎕RVAL B zero or more times to
 override individual default properties of the subsequently produced values,
 followed by one or more calls of monadic ⎕RVAL B.
 </p>
-<p>The default properties, i.e. the properties used unless they were overridden by
-A ⎕RVAL B are:
+<p>The default properties, i.e. the properties used unless they were overwritten
+by dyadic A ⎕RVAL B, are:
 </p>
 <pre class="verbatim">Rank:  0
-Shape: 1 1 1 1 1 1 1 1 (unused since Rank = 0)
-Type:  0 1 0 0 0       (only integers
-Max. Depth: 4
+Shape: 1 1 1 1 1 1 1 1 (initially irrelevant since Rank = 0)
+Type:  0 1 0 0 0       (only integer random values)
+Max. Depth: 4          (initially irrelevant since type = 0 1 0 0 0)
 </pre>
-<p>The default properties therefore return an integer scalar for every call of ⎕RVAL B.
+<p>With these the default properties every call of monadic ⎕RVAL B returns an
+integer scalar.
 </p>
 </div>
 <div class="subsection" id="Dyadic-_005b_003f_005dRVAL">
@@ -5046,15 +5047,15 @@ and
 </li></ul>
 
 <ul class="section-toc">
-<li><a href="#g_t0-_005b_003f_005dRVAL-B_003a-Control-of-the-underlying-random-number-generator" accesskey="1">0 ⎕RVAL B: Control of the underlying random number generator</a></li>
-<li><a href="#g_t1-_005b_003f_005dRVAL-B_003a-Control-of-the-ranks" accesskey="2">1 ⎕RVAL B: Control of the ranks</a></li>
-<li><a href="#g_t2-_005b_003f_005dRVAL-B_003a-Control-of-the-shapes" accesskey="3">2 ⎕RVAL B: Control of the shapes</a></li>
-<li><a href="#g_t3-_005b_003f_005dRVAL-B_003a-Control-of-the-data-types" accesskey="4">3 ⎕RVAL B: Control of the data types</a></li>
-<li><a href="#g_t4-_005b_003f_005dRVAL-B_003a-Control-of-a-maximum-depth" accesskey="5">4 ⎕RVAL B: Control of a maximum depth</a></li>
+<li><a href="#Control-of-the-underlying-random-number-generator_003a-0-_005b_003f_005dRVAL-B" accesskey="1">Control of the underlying random number generator: 0 ⎕RVAL B</a></li>
+<li><a href="#Control-of-the-ranks_003a-1-_005b_003f_005dRVAL-B" accesskey="2">Control of the ranks: 1 ⎕RVAL B</a></li>
+<li><a href="#Control-of-the-shapes_003a-2-_005b_003f_005dRVAL-B" accesskey="3">Control of the shapes: 2 ⎕RVAL B</a></li>
+<li><a href="#Control-of-the-data-types_003a-3-_005b_003f_005dRVAL-B" accesskey="4">Control of the data types: 3 ⎕RVAL B</a></li>
+<li><a href="#Control-of-a-maximum-depth_003a-4-_005b_003f_005dRVAL-B" accesskey="5">Control of a maximum depth: 4 ⎕RVAL B</a></li>
 <li><a href="#monadic-_005b_003f_005dRVAL-B_003a-Return-a-new-random-value" accesskey="6">monadic ⎕RVAL B: Return a new random value</a></li>
 </ul>
-<div class="subsubsection" id="g_t0-_005b_003f_005dRVAL-B_003a-Control-of-the-underlying-random-number-generator">
-<h4 class="subsubsection">2.35.2.1 0 ⎕RVAL B: Control of the underlying random number generator</h4>
+<div class="subsubsection" id="Control-of-the-underlying-random-number-generator_003a-0-_005b_003f_005dRVAL-B">
+<h4 class="subsubsection">2.35.2.1 Control of the underlying random number generator: 0 ⎕RVAL B</h4>
 
 <p>⎕RVAL uses the standard C function random_r(). For this reason ⎕RVAL is
 only available on platforms which use glibc, for example all GNU/Linux
@@ -5084,8 +5085,8 @@ independent; generating a random number or random value with one does not
 change the state of the other.
 </p>
 </div>
-<div class="subsubsection" id="g_t1-_005b_003f_005dRVAL-B_003a-Control-of-the-ranks">
-<h4 class="subsubsection">2.35.2.2 1 ⎕RVAL B: Control of the ranks</h4>
+<div class="subsubsection" id="Control-of-the-ranks_003a-1-_005b_003f_005dRVAL-B">
+<h4 class="subsubsection">2.35.2.2 Control of the ranks: 1 ⎕RVAL B</h4>
 
 <p>The rank of subsequently generated random values can be controlled with
 1 ⎕RVAL B as follows.
@@ -5125,8 +5126,8 @@ need not add up to 100, but will be scaled accordingly.
 </li></ul>
 
 </div>
-<div class="subsubsection" id="g_t2-_005b_003f_005dRVAL-B_003a-Control-of-the-shapes">
-<h4 class="subsubsection">2.35.2.3 2 ⎕RVAL B: Control of the shapes</h4>
+<div class="subsubsection" id="Control-of-the-shapes_003a-2-_005b_003f_005dRVAL-B">
+<h4 class="subsubsection">2.35.2.3 Control of the shapes: 2 ⎕RVAL B</h4>
 
 <p>The shapes of subsequently generated random values can be controlled with
 2 ⎕RVAL B as follows.
@@ -5156,8 +5157,8 @@ query the current setting for 2 ⎕RVAL.
 with 3 rows and between 0 and 10 columns.
 </p>
 </div>
-<div class="subsubsection" id="g_t3-_005b_003f_005dRVAL-B_003a-Control-of-the-data-types">
-<h4 class="subsubsection">2.35.2.4 3 ⎕RVAL B: Control of the data types</h4>
+<div class="subsubsection" id="Control-of-the-data-types_003a-3-_005b_003f_005dRVAL-B">
+<h4 class="subsubsection">2.35.2.4 Control of the data types: 3 ⎕RVAL B</h4>
 
 <p>The types (i.e. CHARACTER, INTEGER, REAL, COMPLEX, or NESTED) of subsequently
 generated random values can be controlled with 3 ⎕RVAL B as follows.
@@ -5199,8 +5200,8 @@ query the current setting for 3 ⎕RVAL.
 7677327503669503253 2152001972871424768
 </pre>
 </div>
-<div class="subsubsection" id="g_t4-_005b_003f_005dRVAL-B_003a-Control-of-a-maximum-depth">
-<h4 class="subsubsection">2.35.2.5 4 ⎕RVAL B: Control of a maximum depth</h4>
+<div class="subsubsection" id="Control-of-a-maximum-depth_003a-4-_005b_003f_005dRVAL-B">
+<h4 class="subsubsection">2.35.2.5 Control of a maximum depth: 4 ⎕RVAL B</h4>
 
 <p>If the probability of generating a nested value is &gt; 0 then the depth of
 random values can become arbitrarily large and could therefore exceed the

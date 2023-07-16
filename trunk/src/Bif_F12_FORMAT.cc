@@ -714,7 +714,7 @@ char * fract_end = 0;
       {
         // create a format like %.5E (if fract_part has 5 digits)
         //
-        SPRINTF(format, "%%.%luE", fract_part.size());
+        SPRINTF(format, "%%.%luE", ulong(fract_part.size()));
         SPRINTF(data_buf, format, value);
 
         char * ep = strchr(&data_buf[0], 'E');
@@ -735,7 +735,7 @@ char * fract_end = 0;
       }
    else   // no exponent in format string.
       {
-        SPRINTF(format, "%%.%luf", fract_part.size());
+        SPRINTF(format, "%%.%luf", ulong(fract_part.size()));
 
         const int dlen = snprintf(data_buf, data_buf_len, format, value);
         NULL_TERMINATE(data_buf)

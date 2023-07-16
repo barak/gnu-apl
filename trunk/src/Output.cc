@@ -139,7 +139,7 @@ PERFORMANCE_START(cerr_perf)
 
    Output::set_color_mode(Output::COLM_ERROR);
    if (UserPreferences::uprefs.output_to_cout)   cout << char(c);
-   else                         cerr << char(c);
+   else                                          cerr << char(c);
 PERFORMANCE_END(fs_CERR_B, cerr_perf, 1)
 
    return 0;
