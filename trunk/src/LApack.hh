@@ -101,9 +101,37 @@ public:
   /// a real number
   typedef APL_Float DD;
   
+#if 1
+
+#include <complex>
+  /// a complex number
+  class ZZ: public std::complex<APL_Float>
+     {
+     public:
+       ZZ()
+          { real(0.0); imag(0.0); }
+
+       ZZ(APL_Float re, APL_Float im)
+          { real(re); imag(im); }
+
+       ZZ(APL_Float re)
+          { real(re); imag(0.0); }
+
+       ZZ(const std::complex<APL_Float> & cpx)
+          { real(cpx.real()); imag(cpx.imag()); }
+
+#else
+
   /// a complex number
   class ZZ
      {
+     protected:
+       /// the real part
+       APL_Float _r;
+     
+       /// the imaginary part
+       APL_Float _i;
+
      public:
        /// constructor: 0.0J0.0   (real 0.0)
        ZZ() : _r(0.0), _i(0.0) {}
@@ -123,11 +151,11 @@ public:
           { return _i; }
      
        /// set the real part of \b this ZZ
-       void set_real(APL_Float value)
+       void real(APL_Float value)
           { _r = value; }
      
        /// set the imag part of \b this ZZ
-       void set_imag(APL_Float value)
+       void imag(APL_Float value)
           { _i = value; }
      
        /// add complex \b this and complex \b zz
@@ -174,16 +202,11 @@ public:
        ZZ operator /(const APL_Float & dd) const
           { return ZZ(_r/dd, _i/dd); }
 
+#endif   // std::complex vs. class ZZ
+
        /// the square of the hypotenuse 
        APL_Float hypo_2() const
-          { return _r*_r + _i*_i; }
-
-     protected:
-       /// the real part
-       APL_Float _r;
-     
-       /// the imaginary part
-       APL_Float _i;
+          { return real()*real() + imag()*imag(); }
      };
  
   //----------------------------------------------------------------------------
@@ -376,6 +399,9 @@ public:
   static void scale(DD * data, size_t len, APL_Float factor)
      { loop(l, len)   data[l] *= factor; }
 
+  static void scale(ZZ * data, size_t len, APL_Float factor)
+     { loop(l, len)   data[l] *= factor; }
+
   static void scale(ZZ * data, size_t len, const ZZ & factor)
      { loop(l, len)   data[l] *= factor; }
 
@@ -413,7 +439,7 @@ public:
 
    /// set the real part of complex zz
    static void set_real(ZZ & zz, APL_Float value)
-      { zz.set_real(value); }
+      { zz.real(value); }
 
    /// set the imag part of real dd
    static void set_imag(DD & dd, APL_Float value)
@@ -421,7 +447,7 @@ public:
 
    /// set the real part of complex zz
    static void set_imag(ZZ & zz, APL_Float value)
-      { zz.set_imag(value); }
+      { zz.imag(value); }
 
    /// dd is 0.0
    static bool is_zero(const DD & dd)
@@ -445,7 +471,7 @@ public:
 
       /// conjugate complex zz in place
       static void conjugate(ZZ & zz)
-         { zz.set_imag(-zz.imag()); }
+         { zz.imag(-zz.imag()); }
 
       /// return real dd conjugated
       static DD conjugated(DD dd)

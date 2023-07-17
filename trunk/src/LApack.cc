@@ -567,7 +567,7 @@ const Crow M = C.get_row_count();
          const int MM = M - row;
          const T tau_row = conjugated(tau[row]);
          const T Aii = A.diag(row);   // remember A(row, row)
-             A.diag(row) = APL_Float(1.0);
+             A.diag(row) = T(1.0);
              Matrix<T> SUB = C.sub_matrix(row, 0);
              larf<T>(&A.diag(row), MM, tau_row, SUB);
          A.diag(row) = Aii;           // restore A(row, row);
