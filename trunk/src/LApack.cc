@@ -20,6 +20,13 @@
     See also file LApack.hh for additional copyright notices.
 */
 
+/*
+   The mathematical background for the below is nicely described in:
+
+   "The Householder transformation in numerical linear algebra"
+   by: John Kerl February 3, 2008
+ */
+
 /** @file
 */
 
@@ -43,35 +50,98 @@ char * LA_pack::work_larf = 0;
 
 /*
    Notation: in the literature the conjujate transpose of a vector v resp.
-   a matrix M is usually v* resp. M*. To avoid confusion with * we use
-   v° resp, M° for the conjujate transpose and the APL × for *.
+   a matrix M is usually (and also in LApack) denoted by v* resp. M*.
+
+  To avoid confusion with * we use v° resp, M° for the conjujate transpose
+  and the APL × for *.
 
    Call tree:
 
    divide_matrix(Z, A, B)
-      │
-      └─── gelsy<T>(A, B, rcond)
-               │
-               └─── scaled_gelsy(A, B, rcond)
-                       │
-                       ├─── geqp3<T>(A, pivot, tau)
-                       │       │
-                       │       └─── laqp2<T>(A, pivot, tau, vn1_vn2)
-                       │               │
-                       │               ├─── larfg<T>(N, X)
-                       │               └─── larf<T>(v, len_v, tau, C)
-                       │
-                       ├─── estimate_rank(A, rcond)
-                       │
-                       ├─── unm2r<T>(N, A, tau, B)
-                       │       │
-                       │       ├─── larf<T>(v, 1, tau, C)
-                       │       ├─── ...
-                       │       └─── larf<T>(v, N, tau, C)
-                       │
-                       └─── trsm<T>(A, B1)
-                   
+   │
+   └─── gelsy<T>(A, B, rcond)
+        │
+        └─── scaled_gelsy(A, B, rcond)
+             │
+             ├─── geqp3<T>(A, pivot, tau)
+             │    │
+             │    └─── laqp2<T>(A, pivot, tau, vn1_vn2)
+             │            │
+             │            ├─── larfg<T>('Left', N, X)
+             │            └─── larf<T>(v, len_v, tau, C)
+             │
+             ├─── estimate_rank(A, rcond)
+             │
+             ├─── trsm<T>('Left', 'Upper', 'No transp.' N, A, tau, B)
+             │
+             ├─── unmqr<T>('Left', 'Conj. transp.', N, A, tau, B)
+             │    │
+             │    ├─── unm2r<T>('Left', 'Conj transp', N, A, tau, B)
+             │    │    │
+             │    │    ├─── larft('Forward', 'Columnwise')
+             │    │    └─── larfb('Forward', 'Columnwise')
+             │    │
+             │    ├─── larf<T>('Left', v, 1, tau, C)
+             │    ├─── ...
+             │    └─── larf<T>('Left', v, N, tau, C)
+             │
+             └─── trsm<T>('Left', 'Upper', 'No trans', A, B1)
+
+   in the complex A/B case.  The FORTRAN naming in the real case is:
+
+           Complex A/B │ Real A/B │ file names
+           ────────────┼──────────┼───────────────────
+            ZUNMQR     │ DORMQR   │ zunmqr.f, dormqr.f
+            ZUNM2R     │ DORM2R   │ zunm2r.f, dorm2r.f
+           ────────────┴──────────┴───────────────────
+  
+   Other notes/conventions:
+
+   * The FORTRAN function names are UPPERCASE, their filename lowercase.f,
+   * The C/C++ functions are lowercase (static members of class LApack),
+   * All complex FORTRAN functions start with Z, all real FORTRAN functions
+     with D (omitted above and in C/C++).
+
  */
+//----------------------------------------------------------------------------
+/// a debug function
+inline void
+print_matrix(const char * title, const LA_pack::Matrix<LA_pack::DD> & A)
+{
+const Crow M = A.get_row_count();
+const Ccol N = A.get_column_count();
+  CERR << title << "[" << M << ":" << N << "]:" << endl << setprecision(2);
+  ALL_ROWS(M)
+     {
+       CERR << "    ";
+       ALL_COLS(N)
+          {
+            CERR << "  " << setw(6) << A.at(row, col);
+          }
+       CERR << endl;
+     }
+}
+
+/// a debug function
+inline void
+print_matrix(const char * title, const LA_pack::Matrix<LA_pack::ZZ> & A)
+{
+const Crow M = A.get_row_count();
+const Ccol N = A.get_column_count();
+  CERR << title << "[" << M << ":" << N << "]:" << endl << setprecision(2);
+  ALL_ROWS(M)
+     {
+       CERR << "    ";
+       ALL_COLS(N)
+          {
+            char cc[100];
+            const LA_pack::ZZ & AA = A.at(row, col);
+            SPRINTF(cc, "%.2fj%.2f", AA.real(), AA.imag());
+            CERR << "  " << setw(12) << cc;
+          }
+       CERR << endl;
+     }
+}
 //----------------------------------------------------------------------------
 /// the implementation of Z←A⌹B.
 /// Z[;j] is the solution of A[;j] = B +.× Z[j]
@@ -244,7 +314,7 @@ static const APL_Float tol3z        = sqrt(dlamch_E);         // 1.05367E¯8
     X = P × Z° × H [ inv(T11) × Q1 * × H × B ]
                      [        0         ]
 
-    where Q₁ consists of the first RANK columns of Q.
+    where q₁ consists of the first rank columns of q.
 
      This routine is basically identical to the original xGELSX except
      three differences:
@@ -269,7 +339,7 @@ const Ccol N = A.get_column_count();
    //
    Assert(M && N && B.get_column_count() && N <= M);
 
-   // For a better precision, scale A and B so that their max. element lies
+   // For a better precision, scale A and B so that their max. norm lies
    // between small_number and big_number. Then call scaled_gelsy() and
    // scale the result back by the same factors.
    //
@@ -277,21 +347,21 @@ APL_Float un_scale_A = 1.0;
    {
      T * const A00 = &A.diag(0);
      const size_t MN = M * N;
-     const APL_Float max_A = max_item(A00, MN);
+     const APL_Float norm_A = max_item(A00, MN);
 
-     if (max_A == 0.0)              return 0;   // A is the 0-matrix
-     if (max_A < small_number)      scale(A00, MN, un_scale_A = big_number);
-     else if (max_A > big_number)   scale(A00, MN, un_scale_A = small_number);
+     if (norm_A == 0.0)              return 0;   // A is the 0-matrix
+     if (norm_A < small_number)      scale(A00, MN, un_scale_A = big_number);
+     else if (norm_A > big_number)   scale(A00, MN, un_scale_A = small_number);
    }
 
 APL_Float un_scale_B = 1.0;
    {
      T * const B00 = &B.diag(0);
      const size_t MN = B.get_row_count() * B.get_column_count();
-     const APL_Float max_B = max_item(B00, MN);
+     const APL_Float norm_B = max_item(B00, MN);
 
-     if (max_B < small_number)      scale(B00, MN, un_scale_B = big_number);
-     else if (max_B > big_number)   scale(B00, MN, un_scale_B = small_number);
+     if (norm_B < small_number)      scale(B00, MN, un_scale_B = big_number);
+     else if (norm_B > big_number)   scale(B00, MN, un_scale_B = small_number);
    }
 
    // memory allocation
@@ -312,10 +382,10 @@ APL_Float un_scale_B = 1.0;
                             + bytes_larf
       };
 
-   //  we allocate the total workspace for every function (i.e. gelsy,
-   //  geqp3, and larf) at this level; each function then further divides
-   //  its worksapace further. For example: we allocate N * bytes_gelsy
-   //  here and gelsy() divides it further into pivot, tau, and tmp.
+   // we allocate the total workspace for every function (i.e. gelsy,
+   // geqp3, and larf) at this level; each function then further divides
+   // its worksapace. For example: we allocate N * bytes_gelsy here and
+   // gelsy() divides it further into pivot, tau, and tmp.
    //
 char * const work = new char[N * bytes_per_N];
    if (work == 0)   WS_FULL;
@@ -353,10 +423,17 @@ char * const work = new char[N * bytes_per_N];
    return N;   // success
 }
 //----------------------------------------------------------------------------
-///  scaled_gelsy() computes gelsy() with A and B scaled nicely
+/// scaled_gelsy() computes gelsy() with A and B scaled nicely.
+//
+// A is the matrix to be inverted, and
+// B is one or more column vectors for which we want to solve A × X[;i] = B[;i]
+//
 template<typename T>
 int LA_pack::scaled_gelsy(Matrix<T> & A, Matrix<T> & B, double rcond)
 {
+   // print_matrix("A", A);
+   // print_matrix("B", B);
+
    // this gelsy is optimized for (and restricted to) the following conditions:
    //
    // 0 < N <= M  →  min_NM = N and max_MN = M
@@ -365,7 +442,7 @@ int LA_pack::scaled_gelsy(Matrix<T> & A, Matrix<T> & B, double rcond)
 const Ccol N    = A.get_column_count();
 const Ccol NRHS = B.get_column_count();
 
-   // Compute QR factorization with column pivoting of A:
+   // Compute QR factorization of A with column pivoting:
    // A × P = Q × R
    //
 
@@ -398,7 +475,7 @@ T    * const tau   = reinterpret_cast<T *>(pivot + N);       // tau[N]
    // 
    // B(1:M, 1:NRHS) := Q° × H × B(1:M, 1:NRHS)
    // 
-   unm2r<T>(N, A, tau, B);
+   unm2r<T>(N, A, tau, B);   // called with SIDE = 'Left'
 
    // B(1:RANK, 1:NRHS) := reciprocal(T11) * B(1:RANK,1:NRHS)
    //
@@ -539,17 +616,24 @@ APL_Float * const vn1_vn2 = reinterpret_cast<APL_Float *>(work_geqp3);
    laqp2<T>(A, pivot, tau, vn1_vn2);
 }
 //----------------------------------------------------------------------------
-/* LApack function UNM2R. Overwrite the general complex m-by-n matrix C with:
+/* LApack function UNM2R. Overwrite the general complex m-by-n matrix C:
 
-   Q × C         if SIDE = 'L' and TRANS = 'N', or   (case 1)
-   Q° × H × C    if SIDE = 'L' and TRANS = 'C', or   (case 2)
-   C × Q         if SIDE = 'R' and TRANS = 'N', or   (case 3)
-   C × Q° × ×    if SIDE = 'R' and TRANS = 'C',      (case 4)
+   C ← Q × C         if SIDE = 'L' and TRANS = 'N', or   (case 1)
+   C ← Q° × H × C    if SIDE = 'L' and TRANS = 'C', or   (case 2)   <---
+   C ← C × Q         if SIDE = 'R' and TRANS = 'N', or   (case 3)
+   C ← C × Q° × ×    if SIDE = 'R' and TRANS = 'C',      (case 4)
 
    where Q is a unitary matrix defined as the product of k
    elementary reflectors:
 
    Q = H(1) H(2) ... H(k)
+
+   Q is defined by tau
+
+   NOTE: in LApack, the real version is DORM2R, while
+                    the complex version is ZUNM2R.
+
+         We use unm2r for both.
  */
 
 template<typename T>
@@ -557,20 +641,30 @@ void LA_pack::unm2r(Crow K, Matrix<T> & A, const T * tau, Matrix<T> & C)
 {
 const Crow M = C.get_row_count();
 
-   // only case 2 (SIDE == "L" and TRANS = 'T' or 'C' is implemented,
-   // thus NOTRAN is false (and then tau[row] is conjugated).
+   // only case 2 (SIDE == "L" and TRANS = 'C') is needed and implemented,
+   // thus NOTRAN is false (and then tau[row] (Q°) is conjugated).
    //
    ALL_ROWS(K)
        {
-         // H(i) or H(i)° × H is applied to C(i:m,1:n)
-         //
-         const int MM = M - row;
-         const T tau_row = conjugated(tau[row]);
-         const T Aii = A.diag(row);   // remember A(row, row)
+         /* H(i) or H°(i) × H is applied to SUB = C(i:m, 1:n)
+
+          ┬        ╔════════════════╗       ╔═════════╗
+          │        ║ \              ║   0   ║         ║
+          │        ║  \    A        ║   ↓   ║    C    ║
+          │        ║   \            ║   ↓   ║         ║ 
+          M   ┬    ╟─── ○  v ... v ─╫─ row ─╫─────────╢ ○: Arr = := 1.0
+          │   │    ║                ║   ↓   ║         ║ 
+          │ M-row  ║                ║   K   ║   SUB   ║ 
+          │   │    ║                ║       ║         ║ 
+          ┴   ┴    ╚════════════════╝       ╚═════════╝
+          */
+         const T tau_row = conjugated(tau[row]);   // must copy tau[row] !
+
+         const T Arr = A.diag(row);   // remember A(row, row)
              A.diag(row) = T(1.0);
              Matrix<T> SUB = C.sub_matrix(row, 0);
-             larf<T>(&A.diag(row), MM, tau_row, SUB);
-         A.diag(row) = Aii;           // restore A(row, row);
+             larf<T>(&A.diag(row), M - row, tau_row, SUB);
+         A.diag(row) = Arr;           // restore A(row, row);
        }
 }
 //----------------------------------------------------------------------------
@@ -841,6 +935,8 @@ const APL_Float test = 1.0 + 2.0*(zeta1 - zeta2)*(zeta1 + zeta2);
 /** LApack function larfg. It generates an elementary reflector
     (aka. a Householder matrix)
 
+   BACKGROUND:
+
    Let v be a K-by-1 vector (a column vector), and 
    let v° ←→ -⍉v ←→ -⍪v (a 1-by-K a row vector) aka, the conjugate
    transpose of v. NOTE: We use ° instead of * to avoid confusion with ×.
@@ -864,11 +960,36 @@ const APL_Float test = 1.0 + 2.0*(zeta1 - zeta2)*(zeta1 + zeta2);
        Therefore, for every (column vector) x:
 
        y = H x   ←→   H y = x
+
+   END OF BACKGROUND
+
+   LARFG generates a elementary reflector H of order n, such that
+
+               ⎛alpha⎞   ⎛beta⎞
+      H° × H × ⎜     ⎟ = ⎜    ⎟ ,   H° × H × H = I.
+               ⎝  x  ⎠   ⎝  0 ⎠
+
+   where alpha and beta are scalars, with beta real, and x is an (n-1)-element
+   vector.
+
+   H is represented in the form
+                    ⎛ 1 ⎞
+      H = I - tau × ⎜   ⎟ × ( 1 v° ) × H ) ,
+                    ⎝ v ⎠
+
+   where tau is a complex scalar and v is a complex (n-1)-element vector.
+   Note that H is not hermitian (not H⁻¹ = H°). If the elements of x are
+   all zero and alpha is real, then tau = 0 (and therefore H is the unit
+   matrix I). Otherwise 1 <= real(tau) <= 2 and abs(tau-1) <= 1 . 
+
+   Note also: The caller of larfg() i.e. laqp2() sets ALPHA = X[-1]. We
+   set ALPHA inside larfg() rather than setting it before calling larfg()
+   and passing it as parameter.
  */
 template<typename T>
 T LA_pack::larfg(Ccol N, T * X, size_t len_X)
 {
-   assert(N > 0);
+   Assert(N > 0);
 
    if (N == 1)   return T(0.0);
 
@@ -878,7 +999,8 @@ APL_Float alpha_r = get_real(ALPHA);
 APL_Float alpha_i = get_imag(ALPHA);
 const APL_Float norm2_X = norm_2(X, len_X);
 
-   if (alpha_i == 0.0 && norm2_X == 0.0)   return T(0.0);
+   if (alpha_i == 0.0 &&                  // alpha is real, and
+       norm2_X == 0.0)   return T(0.0);   // all x are 0, then H = I.
 
 APL_Float beta_abs = hypotenuse(ALPHA, sqrt(norm2_X));
 APL_Float beta = alpha_r < 0.0 ? beta_abs : -beta_abs;
@@ -905,8 +1027,8 @@ int kcnt = 0;
        }
 
 T tau;
-   set_real(tau, (beta - alpha_r) / beta);
-   set_imag(tau, -alpha_i         / beta);
+   set_real(tau, (  beta     - alpha_r) / beta);
+   set_imag(tau, ( /* 0.- */ - alpha_i) / beta);   // imag(beta) = 0.0
 
    // un-scale X and small beta
    //
@@ -1014,7 +1136,7 @@ void LA_pack::gerc(Crow M, Ccol N, T ALPHA, const T * x, size_t len_X,
       }
 }
 //----------------------------------------------------------------------------
-/** LApack function larf: applies an elementary reflector to a general
+/** LApack function larf: applies the elementary reflector H to the
     rectangular matrix C.
 
    LARF applies a elementary reflector H to an M-by-N matrix C,
@@ -1025,7 +1147,7 @@ void LA_pack::gerc(Crow M, Ccol N, T ALPHA, const T * x, size_t len_X,
 
    where tau is a scalar and v is a vector.
 
-   If tau = 0, then H is taken to be the unit matrix.
+   NOTE: If tau = 0, then H is the unit matrix.
 
    To apply H° × H, supply conjg(tau) instead.
 
@@ -1049,7 +1171,7 @@ Ccol lastC = 0;   // rightmost column COL with a nonzero item in M↑COL
        lastV = M;
        while (lastV && is_zero(v[lastV - 1]))   --lastV;
 
-       // Scan for the last non-zero column in C(1:lastv,:)
+       // Scan for the last non-zero column in C(1:lastV,:)
        //
        lastC = ila_lc<T>(lastV, C);
      }
@@ -1067,21 +1189,20 @@ Ccol lastC = 0;   // rightmost column COL with a nonzero item in M↑COL
     of the matrix block
 
    vn1_vn2 (aka. work) is the concatenation WORK, RWORK in FORTRAN
-
-   Temporarily modifies A (for performance reasons), but does not change it.
  */
 template<typename T>
 void LA_pack::laqp2(Matrix<T> & A, Ccol * pivot, T * tau, APL_Float * vn1_vn2)
 {
 const Crow M = A.get_row_count();
 const Ccol N = A.get_column_count();
+   Assert(M >= N);
 
-#define vn1 vn1_vn2   /* vn1_vn2 = vn1, vn2 */
+#define vn1 vn1_vn2   /* since vn1_vn2 = vn1, vn2 */
 APL_Float * const vn2 = vn1 + N;
 
    ALL_COLS(N)
       {
-        const int col_A1 = col + 1;   // the next column (right of col)
+        const int rc_A1 = col + 1;   // the next column (right of col)
 
         // pvt_0 is the column at or right of col that has the largest vn1.
         // If col already has the largest norm: OK, otherwise exchange
@@ -1099,27 +1220,39 @@ APL_Float * const vn2 = vn1 + N;
 
         // Generate elementary reflector H(i).
         //
-        tau[col] = 0.0;    // assume col is the last (then col_A1 is invalid)
-        if (col_A1 < M)   // no, col_A1 valid
+        tau[col] = 0.0;   // assume row rc_A1 is invalid
+        if (rc_A1 < M)    // no, row rc_A1 is valid
            {
-             const int len_X = M - col_A1;   // cols right of col
-             tau[col] = larfg<T>(M - col, &A.at(col_A1, col), len_X);
+             const int len_X = M - rc_A1;   // cols right of col
+             tau[col] = larfg<T>(M - col, &A.at(rc_A1, col), len_X);
            }
 
-        if (col_A1 < N)   // unless last column
+        if (rc_A1 < N)   // unless rc_A1 is the last column
            {
-             // Apply H(i)° × H to A(offset+i:m, i+1:n) from the left.
-             //
-             const T Aii = A.diag(col);   // save diag
+             /* Apply H(i)° × H to A(offset+i:m, i+1:n) from the left.
+
+                0→ → → col → → N
+                ↓  ╔════╪═══════╗
+                ↓  ║ \          ║
+                ↓  ║  \    A    ║
+                ↓  ║   \        ║ 
+               col ║    ○┌──────╢   ○: Acc = A.diag(col) := 1.0
+                ↓  ║     │      ║ 
+                ↓  ║     │ SUB  ║ 
+                N  ║     │      ║ 
+                M  ╚═════╪══════╝
+                       col+1
+             */
+             const T Acc = A.diag(col);   // save diag
              A.diag(col) = APL_Float(1.0);
-                Matrix<T> C = A.sub_matrix(col, col_A1);
-                larf<T>(&A.diag(col), M - col, conjugated(tau[col]), C);
-             A.diag(col) = Aii;           // restore diag
+                Matrix<T> SUB = A.sub_matrix(col, rc_A1);
+                larf<T>(&A.diag(col), M - col, conjugated(tau[col]), SUB);
+             A.diag(col) = Acc;           // restore diag
            }
 
         // Update partial column norms vn1 and vn2.
         //
-        for (int c = col_A1; c < N; ++c)
+        for (Ccol c = rc_A1; c < N; ++c)
             {
               if (vn1[c] == 0.0)   continue;
 
@@ -1128,10 +1261,13 @@ APL_Float * const vn2 = vn1 + N;
               const APL_Float quot = vn1[c] / vn2[c];
               if (temp * quot * quot <= tol3z)   // temp and/or quot too small
                  {
-                   vn1[c] = 0.0;   // assume invalid col_A1 (so col_A is last)
-                   if (col_A1 < M)   // valid col_A1
+                   vn1[c] = 0.0;    // assume invalid row rc_A1
+                   if (rc_A1 < M)   // valid row rc_A1
                       {
-                        vn1[c] = sqrt(norm_2(&A.at(col_A1, c), M - col_A1));
+                        // vn1[c] = length of the row vector in A that
+                        // starts at row rc_A1 and columns c.
+                        //
+                        vn1[c] = sqrt(norm_2(&A.at(rc_A1, c), M - rc_A1));
                       }
                    vn2[c] = vn1[c];
                  }
@@ -1141,6 +1277,6 @@ APL_Float * const vn2 = vn1 + N;
                  }
             }
       }
-#undef vn1
+#undef vn1   // alias for vn1_vn2
 }
 //============================================================================

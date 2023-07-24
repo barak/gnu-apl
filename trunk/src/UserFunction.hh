@@ -300,6 +300,9 @@ protected:
    /// optimize unconditional (→N) branches.
    bool optimize_unconditional_branches();
 
+   // debug function: print the body tokens line by line.
+   void print_body_by_line(const char * where) const;
+
    /// the header (line [0]) of the user-defined function
    UserFunction_header header;
 

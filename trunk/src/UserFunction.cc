@@ -1606,38 +1606,60 @@ UCS_string ucs;
    return ucs;
 }
 //----------------------------------------------------------------------------
+void
+UserFunction::print_body_by_line(const char * where) const
+{
+   CERR << where << endl;
+   loop(line, line_starts.size())
+      {
+        CERR << "[" << line << "]:";
+        ShapeItem next = body.size();   // assume last line
+        if ((line + 1) < int(line_starts.size()))
+           next = line_starts[line + 1];
+        loop(offset, next - line_starts[line])
+            CERR << " " << body[int(line_starts[line]) + offset].get_Class();
+        CERR << endl;
+      }
+}
+//----------------------------------------------------------------------------
 VoidCount
 UserFunction::remove_TOK_VOID()
 {
-   if (line_starts.size() == 0)   // line_starts not yet initialized
+   // if line_starts is empty (= not yet initialized )then line_starts need
+   // not be updated. Only the TOK_VOID need to be removed, and we pretend
+   // that no token were removed (so the caller needs not care),
+   //
+   if (line_starts.size() == 0)
       {
         Parser::remove_TOK_VOID(body);
         return NO_VOID_TOKEN_REMOVED;
       }
 
-size_t current_line = Function_Line_0;
-Function_PC next_PC = Function_PC_0;
-Function_PC dst     = Function_PC_0;
+   // line_starts was initialized.
+   // 
+size_t src_line    = Function_Line_1;
+Function_PC dst_PC = Function_PC_0;
 
-   loop(src, body.size())
+   // be careful not to increment src_PC if a line is empty!
+
+   loop(src_PC, body.size())
       {
-        if (src == next_PC)   // start of next line reached
+        while (src_PC == line_starts[src_line + 1])
            {
-             ++current_line;
-             if (current_line < line_starts.size())
-                line_starts[current_line] = Function_PC(dst);
-             if ((current_line + 1) < line_starts.size())
-                next_PC = line_starts[current_line + 1];
+             // src_PC is the first token of the next line
+             ++src_line;
+             line_starts[src_line] = Function_PC(dst_PC);
            }
 
-        if (body[src].get_tag() == TOK_VOID)   continue;   // ignore (skip)
-        if (src != dst)   body[dst].move(body[src], LOC);
-         ++dst;
+        if (body[src_PC].get_tag() == TOK_VOID)   continue;   // ignore (skip)
+        if (src_PC != dst_PC)   body[dst_PC].move(body[src_PC], LOC);
+         ++dst_PC;
       }
 
-const VoidCount ret = VoidCount(body.size() - dst);
-   body.resize(dst);
-   line_starts[0] = dst;   // convention: line_starts[0] is end of body
+const VoidCount ret = VoidCount(body.size() - dst_PC);
+   body.resize(dst_PC);
+   line_starts[0] = dst_PC;   // convention: line_starts[0] is the end of body
+
    return ret;
 }
 //----------------------------------------------------------------------------

@@ -86,6 +86,11 @@ oneByte:
  txt←⎕ucs txt
 ∇
 
+∇txt← utf8∆nested∆read fname
+  ⍝ Function returns a nested array of all lines from a text file.
+  txt←⎕tc[3] utl∆split utf8∆read fname
+∇
+
 ∇c←utf8∆fourBytes bytes
   ⍝ Function converst four bytes into the unicaode character at that
   ⍝ code point
@@ -129,13 +134,15 @@ oneByte:
   Z←0 2⍴⍬
   Z←Z⍪'Author'          'Bill Daly'
   Z←Z⍪'BugEmail'        'bugs@dalywebandedit.com'
-  Z←Z⍪'Documentation'   'commments in file.'
+  Z←Z⍪'Documentation'   'info apl-library'
   Z←Z⍪'Download'        'https://sourceforge.net/projects/apl-library'
   Z←Z⍪'License'         'GPL v3.0'
   Z←Z⍪'Portability'     'L3'
   Z←Z⍪'Provides'        'Functions to read and write utf8 files.'
-  Z←Z⍪'Requires'        ''
-  Z←Z⍪'Version'                           '1 1 0'
-  Z←Z⍪'Last update'              '2020-04-19'
+  Z←Z⍪'Requires'        'utl'
+  Z←Z⍪'File name'	'utf8.apl'
+  Z←Z⍪'Location'	'5 DALY'
+  Z←Z⍪'Version'         '1 3 0'
+  Z←Z⍪'Last update'     '2023 07 15'
 ∇
 

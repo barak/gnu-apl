@@ -446,7 +446,7 @@ Bif_F12_DOMINO::QR_factorization(Value_P Z, bool need_complex, ShapeItem rows,
       for storing numbers 42.0, 43.0, ...51.0. These numbers are used to check
       for overrides of the allocated space.
 
-      Complex numbers are stored as real followed by imag part.
+      Complex numbers are stored as their real part followed by imag part.
 
       The variables are B, Q, and R with B = Q +.× R, with Q real orthogonal
       and R real or complex upper triangular. Since being R is computed after
