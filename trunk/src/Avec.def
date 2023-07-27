@@ -168,7 +168,7 @@ char_def(YEN               , 0x00A5 , END          , NO_SPACE , 080) /* ¥ */
 char_def(DIAERESIS         , 0x00A8 , OPER1_EACH   , NO_SPACE ,  FE) /* ¨ */
 char_def(LEFT_DAQ          , 0x00AB , QUOTE2       , NO_SPACE ,  85) /* « */
 char_def(OVERBAR           , 0x00AF , NUMERIC      , SYMBOL   ,  FD) /* ¯ */
-char_uni(PAD_U2            , 0x00B2 , END          , NO_SPACE      ) /* ² */
+char_def(PAD_U2            , 0x00B2 , SYMBOL       , SYMBOL   , 089) /* ² */
 char_uni(PAD_U3            , 0x00B3 , END          , NO_SPACE      ) /* ³ */
 char_uni(PAD_U1            , 0x00B9 , END          , NO_SPACE      ) /* ¹ */
 char_def(RIGHT_DAQ         , 0x00BB , QUOTE2       , NO_SPACE ,  8D) /* » */
@@ -179,7 +179,7 @@ char_def(MUE               , 0x03BC , END          , SYMBOL   ,  8B) /* μ */
 char_def(CHI               , 0x03C7 , SYMBOL       , SYMBOL   ,  A2) /* χ */
 char_def(ELEMENT           , 0x03F5 , F12_ELEMENT  , NO_SPACE ,  EE) /* ϵ */
 char_uni(AV_MAX            , 0x0461 , END          , NO_SPACE      ) /* ѡ */
-char_uni(SINGLE_QUOTE1     , 0x2018 , QUOTE1       , NONE          ) /* ⁰ */
+char_uni(SINGLE_QUOTE1     , 0x2018 , QUOTE1       , NONE          ) /* ‘ */
 char_uni(SINGLE_QUOTE2     , 0x2019 , QUOTE1       , NONE          ) /* ‘ */
 char_uni(PAD_U0            , 0x2070 , END          , NO_SPACE      ) /* ⁰ */
 char_uni(PAD_U4            , 0x2074 , END          , NO_SPACE      ) /* ⁴ */
@@ -242,7 +242,7 @@ char_def(I_BEAM            , 0x2336 , END          , NO_SPACE ,  9F) /* ⌶ */
 char_def(SQUISH_Quad       , 0x2337 , F2_INDEX     , NO_SPACE ,  D3) /* ⌷ */
 char_def(Quad_EQUAL        , 0x2338 , END          , NO_SPACE , 088) /* ⌸ */
 char_def(Quad_DIVIDE       , 0x2339 , F12_DOMINO   , NO_SPACE ,  92) /* ⌹ */
-char_def(Quad_DIAMOND      , 0x233A , END          , NO_SPACE , 089) /* ⌺ */
+char_uni(Quad_DIAMOND      , 0x233A , END          , NO_SPACE      ) /* ⌺ */
 char_def(Quad_JOT          , 0x233B , END          , NO_SPACE ,  D5) /* ⌻ */
 char_def(Quad_CIRCLE       , 0x233C , END          , NO_SPACE , 08A) /* ⌼ */
 char_def(CIRCLE_STILE      , 0x233D , F12_ROTATE   , NO_SPACE ,  E8) /* ⌽ */

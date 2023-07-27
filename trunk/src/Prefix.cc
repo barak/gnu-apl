@@ -2494,11 +2494,11 @@ const APL_Integer jump_offset = A0.get_near_int();
         // function (token ENDL). However, that skips the return of the
         // ∇-result. Fix it.
         //
-        if (PC == body.size())           // PC at end of function
+        if (PC >= body.size())           // PC at or past end of function
            {
              Assert(body[PC-1].get_tag() == TOK_ENDL);
              Assert(body[PC].get_Class() == TC_RETURN);
-             --PC;
+             PC = Function_PC(body.size() -1);
            }
       }
    else         // ⍎ or ◊ context

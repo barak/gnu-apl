@@ -1,15 +1,16 @@
 
 # noinst_PROGRAMS will be compiled (in this subdirectory 'tools')
-# but not installed (in e.g. /usr/bind or /usr/local/bin).
+# but will not be installed (in e.g. /usr/bin or /usr/local/bin).
 #
-noinst_PROGRAMS =	APL_keyboard		\
-			APL_keyboard_learn	\
-			APL_keyboard_show	\
-			apl2html		\
-			phrase_gen		\
-			sockconst		\
-			TLV_server		\
-			ncurses_emul
+noinst_PROGRAMS = APL_keyboard       \
+                  APL_keyboard_learn \
+                  APL_keyboard_show  \
+                  apl2html           \
+                  lines              \
+                  ncurses_emul       \
+                  phrase_gen         \
+                  sockconst          \
+                  TLV_server
 
 
 # fails on cygwin, therefore moved to dist_noinst_SCRIPTS
@@ -29,6 +30,7 @@ APL_keyboard_SOURCES       = APL_keyboard.cc        APL_keyboard.def
 APL_keyboard_learn_SOURCES = APL_keyboard_learn.cc  APL_keyboard.orig.def
 APL_keyboard_show_SOURCES  = APL_keyboard_show.cc
 apl2html_SOURCES           = apl2html.cc
+lines_SOURCES              = lines.cc
 TLV_server_SOURCES         = TLV_server.c
 ncurses_emul_SOURCES       = ncurses_emul.cc
 ncurses_emul_LIBS          = -lncurses -ltinfo

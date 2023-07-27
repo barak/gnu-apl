@@ -218,11 +218,15 @@ Avec::get_av_pos(CHT_Index av)
 Token
 Avec::uni_to_token(Unicode & uni, const char * loc)
 {
+   // almost always...
    {
      const CHT_Index idx = find_char(uni);   // search uni in character_table
      if (idx != Invalid_CHT)
         return Token(character_table[idx].token_tag, uni);
    }
+
+   // almost never...
+   //
 
    // not found: try alternative characters.
 const CHT_Index idx = map_alternative_char(uni);

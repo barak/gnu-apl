@@ -90,9 +90,9 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 noinst_PROGRAMS = APL_keyboard$(EXEEXT) APL_keyboard_learn$(EXEEXT) \
-	APL_keyboard_show$(EXEEXT) apl2html$(EXEEXT) \
-	phrase_gen$(EXEEXT) sockconst$(EXEEXT) TLV_server$(EXEEXT) \
-	ncurses_emul$(EXEEXT)
+	APL_keyboard_show$(EXEEXT) apl2html$(EXEEXT) lines$(EXEEXT) \
+	ncurses_emul$(EXEEXT) phrase_gen$(EXEEXT) sockconst$(EXEEXT) \
+	TLV_server$(EXEEXT)
 subdir = tools
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/depend.m4 \
@@ -134,6 +134,9 @@ TLV_server_LDADD = $(LDADD)
 am_apl2html_OBJECTS = apl2html.$(OBJEXT)
 apl2html_OBJECTS = $(am_apl2html_OBJECTS)
 apl2html_LDADD = $(LDADD)
+am_lines_OBJECTS = lines.$(OBJEXT)
+lines_OBJECTS = $(am_lines_OBJECTS)
+lines_LDADD = $(LDADD)
 am_ncurses_emul_OBJECTS = ncurses_emul.$(OBJEXT)
 ncurses_emul_OBJECTS = $(am_ncurses_emul_OBJECTS)
 ncurses_emul_LDADD = $(LDADD)
@@ -162,8 +165,9 @@ am__maybe_remake_depfiles = depfiles
 am__depfiles_remade = ./$(DEPDIR)/APL_keyboard.Po \
 	./$(DEPDIR)/APL_keyboard_learn.Po \
 	./$(DEPDIR)/APL_keyboard_show.Po ./$(DEPDIR)/TLV_server.Po \
-	./$(DEPDIR)/apl2html.Po ./$(DEPDIR)/ncurses_emul.Po \
-	./$(DEPDIR)/phrase_gen.Po ./$(DEPDIR)/sockconst.Po
+	./$(DEPDIR)/apl2html.Po ./$(DEPDIR)/lines.Po \
+	./$(DEPDIR)/ncurses_emul.Po ./$(DEPDIR)/phrase_gen.Po \
+	./$(DEPDIR)/sockconst.Po
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -203,11 +207,11 @@ am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
 SOURCES = $(APL_keyboard_SOURCES) $(APL_keyboard_learn_SOURCES) \
 	$(APL_keyboard_show_SOURCES) $(TLV_server_SOURCES) \
-	$(apl2html_SOURCES) $(ncurses_emul_SOURCES) \
+	$(apl2html_SOURCES) $(lines_SOURCES) $(ncurses_emul_SOURCES) \
 	$(phrase_gen_SOURCES) sockconst.c
 DIST_SOURCES = $(APL_keyboard_SOURCES) $(APL_keyboard_learn_SOURCES) \
 	$(APL_keyboard_show_SOURCES) $(TLV_server_SOURCES) \
-	$(apl2html_SOURCES) $(ncurses_emul_SOURCES) \
+	$(apl2html_SOURCES) $(lines_SOURCES) $(ncurses_emul_SOURCES) \
 	$(phrase_gen_SOURCES) sockconst.c
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
@@ -407,6 +411,7 @@ APL_keyboard_SOURCES = APL_keyboard.cc        APL_keyboard.def
 APL_keyboard_learn_SOURCES = APL_keyboard_learn.cc  APL_keyboard.orig.def
 APL_keyboard_show_SOURCES = APL_keyboard_show.cc
 apl2html_SOURCES = apl2html.cc
+lines_SOURCES = lines.cc
 TLV_server_SOURCES = TLV_server.c
 ncurses_emul_SOURCES = ncurses_emul.cc
 ncurses_emul_LIBS = -lncurses -ltinfo
@@ -474,6 +479,10 @@ apl2html$(EXEEXT): $(apl2html_OBJECTS) $(apl2html_DEPENDENCIES) $(EXTRA_apl2html
 	@rm -f apl2html$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(apl2html_OBJECTS) $(apl2html_LDADD) $(LIBS)
 
+lines$(EXEEXT): $(lines_OBJECTS) $(lines_DEPENDENCIES) $(EXTRA_lines_DEPENDENCIES) 
+	@rm -f lines$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(lines_OBJECTS) $(lines_LDADD) $(LIBS)
+
 ncurses_emul$(EXEEXT): $(ncurses_emul_OBJECTS) $(ncurses_emul_DEPENDENCIES) $(EXTRA_ncurses_emul_DEPENDENCIES) 
 	@rm -f ncurses_emul$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(ncurses_emul_OBJECTS) $(ncurses_emul_LDADD) $(LIBS)
@@ -497,6 +506,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/APL_keyboard_show.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TLV_server.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl2html.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lines.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ncurses_emul.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/phrase_gen.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sockconst.Po@am__quote@ # am--include-marker
@@ -690,6 +700,7 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/APL_keyboard_show.Po
 	-rm -f ./$(DEPDIR)/TLV_server.Po
 	-rm -f ./$(DEPDIR)/apl2html.Po
+	-rm -f ./$(DEPDIR)/lines.Po
 	-rm -f ./$(DEPDIR)/ncurses_emul.Po
 	-rm -f ./$(DEPDIR)/phrase_gen.Po
 	-rm -f ./$(DEPDIR)/sockconst.Po
@@ -743,6 +754,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/APL_keyboard_show.Po
 	-rm -f ./$(DEPDIR)/TLV_server.Po
 	-rm -f ./$(DEPDIR)/apl2html.Po
+	-rm -f ./$(DEPDIR)/lines.Po
 	-rm -f ./$(DEPDIR)/ncurses_emul.Po
 	-rm -f ./$(DEPDIR)/phrase_gen.Po
 	-rm -f ./$(DEPDIR)/sockconst.Po

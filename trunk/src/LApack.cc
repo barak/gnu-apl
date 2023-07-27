@@ -52,8 +52,8 @@ char * LA_pack::work_larf = 0;
    Notation: in the literature the conjujate transpose of a vector v resp.
    a matrix M is usually (and also in LApack) denoted by v* resp. M*.
 
-  To avoid confusion with * we use v° resp, M° for the conjujate transpose
-  and the APL × for *.
+  To avoid confusion with * we use v° resp, M° for the conjujate transpose *
+  and the APL × for the multiplication *.
 
    Call tree:
 

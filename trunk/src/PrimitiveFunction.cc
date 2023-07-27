@@ -1784,21 +1784,26 @@ const int inc_X = X->is_scalar_extensible() ? 0 : 1;
         else                                  LENGTH_ERROR;
       }
 
-Value_P Z(X->get_shape(), LOC);
-   loop(z, Z->nz_element_count())
+const Shape * shape_Z = &A->get_shape();   // last resort if X and B are scalar
+   if (inc_X)        shape_Z = &X->get_shape();
+   else if (inc_B)   shape_Z = &B->get_shape();
+
+Value_P Z(*shape_Z, LOC);
+   loop(z, shape_Z->get_volume())
        {
-        const APL_Integer xz = X->get_cravel(z).get_int_value();   // X[z]
+        const APL_Integer xz = X->get_cravel(z*inc_X).get_int_value();   // X[z]
         if (xz == 0)        // take A[z]
            Z->next_ravel_Cell(A->get_cravel(z*inc_A));
         else if (xz == 1)   // take B[z]
            Z->next_ravel_Cell(B->get_cravel(z*inc_B));
         else
            {
-             MORE_ERROR() << "X not boolean in A⊢[X]B";
+             MORE_ERROR() << "non-Boolean X in A⊢[X]B";
              DOMAIN_ERROR;
            }
        }
 
+   Z->set_default(*B, LOC);
    Z->check_value(LOC);
    return Token(TOK_APL_VALUE1, Z);
 }
