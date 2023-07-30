@@ -74,13 +74,18 @@ Function_P RO = _RO.get_function();
    Assert1(LO);
    Assert1(RO);
 
-   if (LO->get_fun_valence() != 2 || RO->get_fun_valence() != 2)   SYNTAX_ERROR;
-   if (!LO->has_result() || !RO->has_result())   DOMAIN_ERROR;
+   // LO and RO must both be dyadic and must return a result.
+   //
+   if (LO->get_fun_valence() + RO->get_fun_valence() != 4)   SYNTAX_ERROR;
+   if (!LO->has_result() || !RO->has_result())               DOMAIN_ERROR;
 
-   if (!A->is_scalar_extensible() && !B->is_scalar_extensible() &&
-       A->get_rank() > 1          && B->get_rank() > 1 && 
+   if (!A->is_scalar_extensible() &&
+       !B->is_scalar_extensible() &&
+       A->get_rank() > 1          &&
+       B->get_rank() > 1          && 
        A->get_shape().get_last_shape_item() !=
-       B->get_shape().get_shape_item(0))   LENGTH_ERROR;
+       B->get_shape().get_shape_item(0)
+      )   LENGTH_ERROR;
 
 const Shape shape_A1 =A->get_shape().without_last_axis();
 const ShapeItem len_A = A->get_last_shape_item();

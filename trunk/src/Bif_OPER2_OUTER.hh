@@ -37,16 +37,15 @@ public:
    /// Constructor.
    Bif_JOT() : PrimitiveFunction(TOK_JOT) {}
  
-   virtual int get_oper_valence() const   { return 2; }
- 
+   /// overloaded Function::eval_AB().
+   virtual Token eval_AB(Value_P A, Value_P B) const;
+
    static Bif_JOT  fun;             ///< Built-in function.
  
 protected:
    /// overloaded Function::may_push_SI()
    virtual bool may_push_SI() const
       { return false; }
-
-
 };
 //----------------------------------------------------------------------------
 /** Primitive operator outer product.

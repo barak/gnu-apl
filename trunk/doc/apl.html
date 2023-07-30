@@ -60,7 +60,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Installing and Starting GNU 
 </div>
 <span id="GNU-APL"></span><h1 class="top">GNU APL</h1>
 
-<p>July 16, 2023
+<p>July 30, 2023
 </p>
 <p>This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
@@ -270,6 +270,7 @@ therefore it must be expanded with e.g.  <b>gunzip</b> before it can be read.
       <li><a id="toc-Design-considerations_002e" href="#Design-considerations_002e">2.40.1 Design considerations.</a></li>
       <li><a id="toc-Syntax-1" href="#Syntax-1">2.40.2 Syntax</a></li>
     </ul></li>
+    <li><a id="toc-Matrix-Product" href="#Section-2_002e41">2.41 Matrix Product</a></li>
   </ul></li>
   <li><a id="toc-Limitations-and-Missing-Features" href="#Chapter-3">3 Limitations and Missing Features</a>
   <ul class="no-bullet">
@@ -407,9 +408,8 @@ of the the process running GNU APL to files in or below directory new_root, and
 it also changes the current directory (which could have resided above new_root
 before the chroot() was executed).
 </p>
-<p>The -C option is intended to be a security
-feature for GNU APL interpreters that are facing a hostile environment like
-the public internet.
+<p>The -C option is intended to be a security feature for GNU APL interpreters
+that are facing a hostile environment like the public internet.
 </p>
 <p>NOTES:
 </p><ul>
@@ -971,6 +971,7 @@ Next: <a href="#Chapter-3" accesskey="n" rel="next">Limitations and Missing Feat
 <li><a href="#Section-2_002e38">⎕SYL - System limits</a></li>
 <li><a href="#Section-2_002e39">⎕XML  - XML Parsing</a></li>
 <li><a href="#Section-2_002e40">Conditionals</a></li>
+<li><a href="#Section-2_002e41">Matrix Product</a></li>
 </ul>
 <hr>
 <div class="section" id="Section-2_002e1">
@@ -6151,7 +6152,7 @@ follow these top-level steps:
 <div class="section" id="Section-2_002e40">
 <div class="header">
 <p>
-Previous: <a href="#Section-2_002e39" accesskey="p" rel="prev">⎕XML  - XML Parsing</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Section-2_002e41" accesskey="n" rel="next">Matrix Product</a>, Previous: <a href="#Section-2_002e39" accesskey="p" rel="prev">⎕XML  - XML Parsing</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
 <span id="Conditionals"></span><h3 class="section">2.40 Conditionals</h3>
 
@@ -6443,12 +6444,80 @@ Fatal error in defined function line [2]. You may now:
 <hr>
 </div>
 </div>
+<div class="section" id="Section-2_002e41">
+<div class="header">
+<p>
+Previous: <a href="#Section-2_002e40" accesskey="p" rel="prev">Conditionals</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+</div>
+<span id="Matrix-Product"></span><h3 class="section">2.41 Matrix Product</h3>
+
+<p>In standard APL, the inner product Z of two matrices A and B as known from
+linear algebra, is:
+</p>
+<pre class="verbatim">      Z←A +.× B      ⍝ the most frequent special case of A f.g B
+</pre>
+<p>However, the inner product in APL is more generic than the inner product in
+linear algebra. In the general case <b>A f.g B</b> may the functions <b>f</b>
+and <b>b</b> also be non-scalar APL primitives or even defined functions.
+This generality is occasionally helpful, but comes with a performance
+penalty since many argument checks are duplicated. At the same time is
+<b>A +.× B</b> the by far most frequent case of operator &rsquo;.&rsquo;.
+</p>
+<p>For this reason GNU APL also provides a more efficient dyadic function
+<b>∘</b> (Matrix Product) for the special case <b>+.×</b> of the dyadic
+operator &rsquo;.&rsquo;. This function ∘ has been optimized for numeric arguments
+and computes the matrix product as known from linear algebra.
+</p>
+<p>For two-dimensional matrices A and B is function ∘ the same as +.×:
+</p>
+<p>A∘B ←→ A   +.×   B
+</p>
+<p>Otherwise there are some subtle differences between ∘ and +.×:
+</p>
+<ul>
+<li> <b>A +.× B</b> allows A and B to be of any rank, while <b>A∘B</b> raises a
+ RANK ERROR if the rank of A or B is more than 2.
+</li><li> With operator +.× is the product of e.g. a vector and a matrix (or
+ vice versa) a vector, usually understood as row-vector.
+ In contrast (and more similar to linear algebra) A∘B is always a matrix,
+ as to preserve the distinction between row vectors and column vectors:
+
+<pre class="verbatim">      M←2 2⍴1 2 3 4   ⍝ a matrix
+      V←10 11         ⍝ a vector
+
+      M +.× V
+32 74
+
+      M∘V
+32
+74
+
+      V +.× M
+43 64
+
+      V∘M
+43 64
+
+
+      ⍴M +.× V   ⍝ vector
+2
+      ⍴V +.× M   ⍝ vector
+2
+      ⍴V∘M       ⍝ row vector
+2 1
+      ⍴M∘V       ⍝ column vector
+2 1
+</pre></li></ul>
+
+<hr>
+</div>
 </div>
 <div class="chapter" id="Chapter-3">
 <div class="header">
 <p>
 Next: <a href="#Chapter-4" accesskey="n" rel="next">Internationalization</a>, Previous: <a href="#Chapter-2" accesskey="p" rel="prev">Non-standard GNU APL Features</a>, Up: <a href="#Top" accesskey="u" rel="up">GNU APL</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
+
 <span id="Limitations-and-Missing-Features"></span><h2 class="chapter">3 Limitations and Missing Features</h2>
 
 <p>GNU APL is an almost full implementation of the ISO standard 13751.

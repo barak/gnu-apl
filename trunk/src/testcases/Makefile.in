@@ -375,6 +375,7 @@ dist_noinst_DATA = \
         Match.tc                                \
         MatrixDivide.tc                         \
         MatrixInverse.tc                        \
+        MatrixProduct.tc                        \
         Maximum.tc                              \
         Member.tc                               \
         Minimum.tc                              \

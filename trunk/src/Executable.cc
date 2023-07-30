@@ -961,23 +961,37 @@ int lambda_num = 0;
 ShapeItem
 Executable::setup_one_lambda(ShapeItem b, ShapeItem bend, int lambda_num)
 {
+   // called with this->body in forward (APL-) order, i.e  { ... }
+   //
+   Assert(body[b].get_tag()    == TOK_L_CURLY);
    Assert(body[bend].get_tag() == TOK_R_CURLY);
 
-   body[b++].clear(LOC);    // invalidate {
-   body[bend].clear(LOC);   // invalidate }
+   body[b++].clear(LOC);    // invalidate the leading  {
+   body[bend].clear(LOC);   // invalidate the trailing }
 
 Token_string lambda_body;
-const Fun_signature signature =
-      compute_lambda_body(lambda_body, b, bend);
+const Fun_signature signature = compute_lambda_body(lambda_body, b, bend);
 
-   // strip off the local variables
-   //
-basic_string<Symbol *> local_vars;
+   /* strip off the trailing local variables.
+
+      The function body ends with ENDL RETURN.
+      To strip off a local variable we have to:
+
+      body[-4]        body[-3]        body[-2]        body[-1] 
+      ─────────────────────────────────────────────────────────────
+      ';'             SYMBOL          ENDL            RETURN
+                                      │               │
+      ┌─────────────── ← ─────────────┘               │
+      │               ┌─────────────── ← ─────────────┘
+      │               │
+      ENDL            RETURN
+    */
+basic_string<Symbol *> local_vars;   // collector for local variables
    while (lambda_body.size() >= 4)
       {
-        const size_t semi = lambda_body.size() - 4;
-        if (lambda_body[semi]    .get_tag() != TOK_SEMICOL)   break;
-        if (lambda_body[semi + 1].get_Class() != TC_SYMBOL)   break;
+        const size_t semi = lambda_body.size() - 4;   // maybe ';' SYMBOL ?
+        if (lambda_body[semi]  .get_tag() != TOK_SEMICOL)   break;   // no
+        if (lambda_body[semi+1].get_Class() != TC_SYMBOL)   break;   // no
         local_vars.push_back(lambda_body[semi + 1].get_sym_ptr());
         lambda_body[semi]     = lambda_body[semi + 2];
         lambda_body[semi + 1] = lambda_body[semi + 3];
@@ -1027,6 +1041,17 @@ Executable::compute_lambda_body(Token_string & lambda_body,
 int signature = SIG_FUN;
 int level = 0;
 
+   /* find the insertion point for λ←. for single statement lambda the
+      insertion point is the first body token lambda_body[b].
+      For a multi-statement lambda it is the last ◊ before lambda_body[bend].
+    */
+
+ShapeItem insertion_point = b;
+   for (ShapeItem j = b; j < bend; ++j)
+       {
+         if (body[j].get_tag() == TOK_END)   insertion_point = j + 1;
+       }
+
    for (; b < bend; ++b)
        {
          Token t;
@@ -1052,9 +1077,9 @@ int level = 0;
               default: break;
             }
 
-         if (lambda_body.size() == 0)
+         if (b == insertion_point)
             {
-              // first token: prepend λ ← tokens
+              // insert  λ ← tokens
               //
               Symbol * sym_Z = &Workspace::get_v_LAMBDA();
               lambda_body.push_back(Token(TOK_LAMBDA, sym_Z));
@@ -1080,10 +1105,10 @@ int level = 0;
         DEFN_ERROR;
       }
 
-   // if the lambda has at least one token, then it is supposedly returns λ.
+   // if the lambda has at least one token, then it supposedly returns λ.
    // Otherwise the lambda is empty (and result-less)
    //
-   if (signature & SIG_Z)
+   if (signature & SIG_Z)   // result
       {
         const int64_t trace = 0;
         lambda_body.push_back(Token(TOK_ENDL, trace));
@@ -1103,8 +1128,10 @@ int level = 0;
 UCS_string
 Executable::extract_lambda_text(Fun_signature signature, int skip) const
 {
+   // this->text is the text of this Executable. Extract the text of
+   // the skip'th lambda in this->text (and return it).
+   //
 UCS_string lambda_text;
-   if (signature & SIG_Z)   lambda_text.append_UTF8("λ←");
 
 int level = 0;   // {/} nesting level
 bool copying = false;
@@ -1183,15 +1210,40 @@ bool in_double_quotes = false;
                    if (!copying)  continue;
 
                    lambda_text.pop_back();       // the last }
-                   return lambda_text;
+                   goto out;
 
               default: continue;
             }
        }
 
-   // not reached
-   //
-   FIXME;
+out:
+   
+   if (signature & SIG_Z)  // insert λ ←
+      {
+        ShapeItem insertion_point = 0;
+        rev_loop(j, lambda_text.size())
+           {
+             if (lambda_text[j] == UNI_DIAMOND)
+                {
+                  insertion_point = j + 1;
+                  while (lambda_text[insertion_point] <= UNI_SPACE)
+                         ++insertion_point;
+                  break;
+                }
+           }
+        UCS_string ret;
+        loop(j, lambda_text.size())
+            {
+              if (j == insertion_point)
+                 {
+                   ret += UNI_LAMBDA;       // insert λ
+                   ret += UNI_LEFT_ARROW;   // insert ←
+                 }
+              ret += lambda_text[j];
+            }
+        return ret;
+      }
+    return lambda_text;
 }
 //----------------------------------------------------------------------------
 void

@@ -68,7 +68,7 @@ Bif_F12_ROTATE    Bif_F12_ROTATE   ::fun;    // ⌽
 Bif_F12_ROTATE1   Bif_F12_ROTATE1  ::fun;    // ⊖
 Bif_F12_TRANSPOSE Bif_F12_TRANSPOSE::fun;    // ⍉
 Bif_F12_UNION     Bif_F12_UNION    ::fun;    // ∪
-Bif_F0_ZILDE      Bif_F0_ZILDE    ::fun;    // ⍬
+Bif_F0_ZILDE      Bif_F0_ZILDE     ::fun;    // ⍬
 
 int Bif_F1_EXECUTE::copy_pending = 0;
 

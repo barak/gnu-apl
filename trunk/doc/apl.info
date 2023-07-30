@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-July 16, 2023
+July 30, 2023
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
@@ -712,6 +712,7 @@ File: apl.info,  Node: Chapter 2,  Next: Chapter 3,  Prev: Chapter 1,  Up: Top
 * Section 2.38::  ⎕SYL  - System limits
 * Section 2.39::  ⎕XML - XML Parsing
 * Section 2.40::  Conditionals
+* Section 2.41::  Matrix Product
 
 There are a few hopefully useful features in GNU APL:
 
@@ -5528,7 +5529,7 @@ their details, but usually follow these top-level steps:
   5. Optionally, convert the modified XML document back to XML (0 ⎕XML
 
 
-File: apl.info,  Node: Section 2.40,  Prev: Section 2.39,  Up: Chapter 2
+File: apl.info,  Node: Section 2.40,  Next: Section 2.41,  Prev: Section 2.39,  Up: Chapter 2
 
 2.40 Conditionals
 =================
@@ -5800,6 +5801,69 @@ Fatal error in defined function line [2]. You may now:
    • never mix the short and long forms
 
    Like shown in the examples above.
+
+
+File: apl.info,  Node: Section 2.41,  Prev: Section 2.40,  Up: Chapter 2
+
+2.41 Matrix Product
+===================
+
+In standard APL, the inner product Z of two matrices A and B as known
+from linear algebra, is:
+
+      Z←A +.× B      ⍝ the most frequent special case of A f.g B
+
+   However, the inner product in APL is more generic than the inner
+product in linear algebra.  In the general case A f.g B may the
+functions f and b also be non-scalar APL primitives or even defined
+functions.  This generality is occasionally helpful, but comes with a
+performance penalty since many argument checks are duplicated.  At the
+same time is A +.× B the by far most frequent case of operator ’.’.
+
+   For this reason GNU APL also provides a more efficient dyadic
+function ∘ (Matrix Product) for the special case +.× of the dyadic
+operator ’.’.  This function ∘ has been optimized for numeric arguments
+and computes the matrix product as known from linear algebra.
+
+   For two-dimensional matrices A and B is function ∘ the same as +.×:
+
+   A∘B ←→ A +.× B
+
+   Otherwise there are some subtle differences between ∘ and +.×:
+
+   • A +.× B allows A and B to be of any rank, while A∘B raises a RANK
+     ERROR if the rank of A or B is more than 2.
+   • With operator +.× is the product of e.g.  a vector and a matrix (or
+     vice versa) a vector, usually understood as row-vector.  In
+     contrast (and more similar to linear algebra) A∘B is always a
+     matrix, as to preserve the distinction between row vectors and
+     column vectors:
+
+           M←2 2⍴1 2 3 4   ⍝ a matrix
+           V←10 11         ⍝ a vector
+     
+           M +.× V
+     32 74
+     
+           M∘V
+     32
+     74
+     
+           V +.× M
+     43 64
+     
+           V∘M
+     43 64
+     
+     
+           ⍴M +.× V   ⍝ vector
+     2
+           ⍴V +.× M   ⍝ vector
+     2
+           ⍴V∘M       ⍝ row vector
+     2 1
+           ⍴M∘V       ⍝ column vector
+     2 1
 
 
 File: apl.info,  Node: Chapter 3,  Next: Chapter 4,  Prev: Chapter 2,  Up: Top
@@ -7309,72 +7373,73 @@ Tag Table:
 Node: Top383
 Node: Chapter 11572
 Node: Chapter 223281
-Node: Section 2.125261
-Node: Subsection 2.1.126483
-Node: Subsection 2.1.227114
-Node: Subsection 2.1.327945
-Node: Subsection 2.1.433751
-Node: Subsection 2.1.537550
-Node: Subsection 2.1.638408
-Node: Subsection 2.1.746532
-Node: Subsection 2.1.848282
-Node: Section 2.251597
-Node: Section 2.352356
-Node: Section 2.453631
-Node: Section 2.558076
-Node: Section 2.658249
-Node: Section 2.758879
-Node: Section 2.862832
-Node: Section 2.964367
-Node: Section 2.1066459
-Node: Section 2.1168013
-Node: Section 2.1269798
-Node: Section 2.1371738
-Node: Section 2.1472679
-Node: Section 2.1572931
-Node: Section 2.1674327
-Node: Section 2.1784796
-Node: Section 2.1887318
-Node: Section 2.1994035
-Node: Section 2.2095480
-Node: Section 2.21101141
-Node: Section 2.22106175
-Node: Section 2.23109456
-Node: Section 2.24109747
-Node: Section 2.25120575
-Node: Section 2.26120847
-Node: Section 2.27127425
-Node: Section 2.28129885
-Node: Section 2.29130554
-Node: Section 2.30132206
-Node: Section 2.31135993
-Node: Output File Format151913
-Node: Section 2.32153088
-Node: Section 2.33162486
-Node: Section 2.34163513
-Node: Section 2.35178228
-Node: Section 2.36188392
-Node: Section 2.37192511
-Node: Section 2.38194606
-Node: Section 2.39199031
-Node: Section 2.40220406
-Node: Chapter 3231294
-Node: Chapter 4233795
-Node: Chapter 5234921
-Node: Section 5.1236458
-Node: Section 5.2237738
-Node: Section 5.3238098
-Node: Section 5.4238340
-Node: Section 5.5239002
-Node: Section 5.6239480
-Node: Section 5.7240252
-Node: Section 5.8240709
-Node: Chapter 6241111
-Node: Section 6.1241530
-Node: Section 6.2242217
-Node: Chapter 7243048
-Node: Section 7.1243551
-Node: Section 7.2268865
+Node: Section 2.125294
+Node: Subsection 2.1.126516
+Node: Subsection 2.1.227147
+Node: Subsection 2.1.327978
+Node: Subsection 2.1.433784
+Node: Subsection 2.1.537583
+Node: Subsection 2.1.638441
+Node: Subsection 2.1.746565
+Node: Subsection 2.1.848315
+Node: Section 2.251630
+Node: Section 2.352389
+Node: Section 2.453664
+Node: Section 2.558109
+Node: Section 2.658282
+Node: Section 2.758912
+Node: Section 2.862865
+Node: Section 2.964400
+Node: Section 2.1066492
+Node: Section 2.1168046
+Node: Section 2.1269831
+Node: Section 2.1371771
+Node: Section 2.1472712
+Node: Section 2.1572964
+Node: Section 2.1674360
+Node: Section 2.1784829
+Node: Section 2.1887351
+Node: Section 2.1994068
+Node: Section 2.2095513
+Node: Section 2.21101174
+Node: Section 2.22106208
+Node: Section 2.23109489
+Node: Section 2.24109780
+Node: Section 2.25120608
+Node: Section 2.26120880
+Node: Section 2.27127458
+Node: Section 2.28129918
+Node: Section 2.29130587
+Node: Section 2.30132239
+Node: Section 2.31136026
+Node: Output File Format151946
+Node: Section 2.32153121
+Node: Section 2.33162519
+Node: Section 2.34163546
+Node: Section 2.35178261
+Node: Section 2.36188425
+Node: Section 2.37192544
+Node: Section 2.38194639
+Node: Section 2.39199064
+Node: Section 2.40220439
+Node: Section 2.41231348
+Node: Chapter 3233354
+Node: Chapter 4235855
+Node: Chapter 5236981
+Node: Section 5.1238518
+Node: Section 5.2239798
+Node: Section 5.3240158
+Node: Section 5.4240400
+Node: Section 5.5241062
+Node: Section 5.6241540
+Node: Section 5.7242312
+Node: Section 5.8242769
+Node: Chapter 6243171
+Node: Section 6.1243590
+Node: Section 6.2244277
+Node: Chapter 7245108
+Node: Section 7.1245611
+Node: Section 7.2270925
 
 End Tag Table
 

@@ -33,6 +33,108 @@ Bif_OPER2_OUTER  Bif_OPER2_OUTER::fun;
 Bif_OPER2_OUTER::PJob_product Bif_OPER2_OUTER::job;
 
 //----------------------------------------------------------------------------
+Token Bif_JOT::eval_AB(Value_P A, Value_P B) const
+{
+   // compute A∘B ←→ A +.× B
+   //
+   if (A->get_rank() > 2)   RANK_ERROR;
+   if (B->get_rank() > 2)   RANK_ERROR;
+
+   // ranks are valid. check that A and B are numeric (so that we can depend
+   // on it below instead of testing it multiple times.
+   //
+   loop(a, A->nz_element_count())
+       {
+         if (!A->get_cravel(a).is_numeric())   DOMAIN_ERROR;
+       }
+
+   loop(b, B->nz_element_count())
+       {
+         if (!B->get_cravel(b).is_numeric())   DOMAIN_ERROR;
+       }
+
+ShapeItem rows_A;
+ShapeItem cols_A;
+ShapeItem rows_B;
+ShapeItem cols_B;
+   if (A->get_rank() == 1)   // (row-)vector A ∘ matrix B
+      {
+        rows_A = 1;
+        cols_A = A->element_count();
+        rows_B = B->get_rows();
+        cols_B = B->get_cols();
+      }
+   else if (B->get_rank() == 1)   // matrix A ∘ (column-)vector B
+      {
+        rows_A = A->get_rows();
+        cols_A = A->get_cols();
+        rows_B = B->element_count();
+        cols_B = 1;
+      }
+   else
+      {
+        rows_A = A->get_rows();
+        cols_A = A->get_cols();
+        rows_B = B->get_rows();
+        cols_B = B->get_cols();
+      }
+
+   if (cols_A !=rows_B)
+      {
+        MORE_ERROR() << "A∘B: A has " << cols_A <<
+                        " rows, but B has " << rows_B << " rows";
+        LENGTH_ERROR;
+      }
+
+const ShapeItem len_AB = cols_A;
+
+Shape shape_Z(rows_A, cols_B);
+Value_P Z(shape_Z, LOC);
+
+   loop(a, rows_A)
+       {
+         const Cell * cA = &A->get_cravel(a * cols_A);   // start of row A[a;]
+         loop(b, cols_B)
+             {
+               const Cell * cB = &B->get_cravel(b);   // start of column V];b]
+               APL_Float real = 0;
+               APL_Float imag = 0;
+               bool need_complex = false;
+               loop(ab, len_AB)   // column of A and row of B
+                  {
+                    const Cell & aa = *(cA  + ab);
+                    const Cell & bb = *(cB + ab*cols_B);
+                    real += aa.get_real_value() * bb.get_real_value();
+                    if (aa.is_complex_cell())
+                       {
+                         need_complex = true;
+                         if (bb.is_complex_cell())   // complex aa and bb
+                            {
+                              real -= aa.get_imag_value() * bb.get_imag_value();
+                              imag += aa.get_real_value() * bb.get_imag_value();
+                              imag += aa.get_imag_value() * bb.get_real_value();
+                            }
+                         else                        // complex aa and real bb
+                            {
+                              imag += aa.get_imag_value() * bb.get_real_value();
+                            }
+                       }
+                    else if (bb.is_complex_cell())   // real aa and complex bb
+                       {
+                         need_complex = true;
+                         imag += aa.get_real_value() * bb.get_imag_value();
+                       }
+                  }
+               if (need_complex)   Z->next_ravel_Number(real, imag);
+               else                Z->next_ravel_Number(real);
+             }
+       }
+
+   Z->set_default(*B.get(), LOC);
+   Z->check_value(LOC);
+   return Token(TOK_APL_VALUE1, Z);
+}
+//----------------------------------------------------------------------------
 Token
 Bif_OPER2_OUTER::eval_ALRB(Value_P A, Token & LO, Token & _RO, Value_P B) const
 {

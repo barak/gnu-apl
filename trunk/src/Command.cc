@@ -1141,7 +1141,7 @@ Command::cmd_PSTAT(ostream & out, const UCS_string & arg)
 << "other configure options"
 << ")\n"
 "   make\n"
-"   make install (or try: src/apl)\n"
+"   make install (or try: src/apl to test without installing)\n"
 "\n"
 
 << "above the src directory."
@@ -1941,7 +1941,7 @@ Command::cmd_LOG(ostream & out, const UCS_string & arg)
 "\n"
 "   ./configure DYNAMIC_LOG_WANTED=yes (... other configure options)\n"
 "   make\n"
-"   make install (or try: src/apl)\n"
+"   make install (or try: src/apl to test without installing)\n"
 "\n"
 "above the src directory."
 "\n";

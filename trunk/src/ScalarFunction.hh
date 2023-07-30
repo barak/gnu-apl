@@ -930,15 +930,15 @@ public:
    static Bif_F12_TIMES  fun;           ///< Built-in function.
    static Bif_F12_TIMES  fun_inverse;   ///< Built-in function.
 
-protected:
-   /// overloaded Function::eval_B().
-   virtual Token eval_B(Value_P B) const
-      { return eval_scalar_B(B, &Cell::bif_direction); }
-
    /// overloaded Function::eval_AB().
    virtual Token eval_AB(Value_P A, Value_P B) const
       { return eval_scalar_AB(A, B,
                inverse ? &Cell::bif_multiply_inverse : &Cell::bif_multiply); }
+
+protected:
+   /// overloaded Function::eval_B().
+   virtual Token eval_B(Value_P B) const
+      { return eval_scalar_B(B, &Cell::bif_direction); }
 
    /// overloaded Function::get_scalar_f2()
    virtual prim_f2 get_scalar_f2() const

@@ -177,9 +177,8 @@ of the the process running GNU APL to files in or below directory new_root, and
 it also changes the current directory (which could have resided above new_root
 before the chroot() was executed).
 
-The -C option is intended to be a security
-feature for GNU APL interpreters that are facing a hostile environment like
-the public internet.
+The -C option is intended to be a security feature for GNU APL interpreters
+that are facing a hostile environment like the public internet.
 
 NOTES:
 @itemize @bullet
@@ -778,6 +777,7 @@ in a 'preferences' file still follow the library root scheme.
 * Section 2.38::  ⎕SYL  - System limits
 * Section 2.39::  ⎕XML - XML Parsing
 * Section 2.40::  Conditionals
+* Section 2.41::  Matrix Product
 @end menu
 
 There are a few hopefully useful features in GNU APL:
@@ -6040,7 +6040,74 @@ The recommended usage of corresponding →→, ←→, and ←← token is to:
 Like shown in the examples above.
 
 @c ----------------------------------------------------------------------------
+@node    Section 2.41
+@section Matrix Product
+
+In standard APL, the inner product Z of two matrices A and B as known from
+linear algebra, is:
+
+@verbatim
+      Z←A +.× B      ⍝ the most frequent special case of A f.g B
+@end verbatim
+
+However, the inner product in APL is more generic than the inner product in
+linear algebra. In the general case @b{A f.g B} may the functions @b{f}
+and @b{b} also be non-scalar APL primitives or even defined functions.
+This generality is occasionally helpful, but comes with a performance
+penalty since many argument checks are duplicated. At the same time is
+@b{A +.× B} the by far most frequent case of operator '.'.
+
+For this reason GNU APL also provides a more efficient dyadic function
+@b{∘} (Matrix Product) for the special case @b{+.×} of the dyadic
+operator '.'. This function ∘ has been optimized for numeric arguments
+and computes the matrix product as known from linear algebra.
+
+For two-dimensional matrices A and B is function ∘ the same as +.×:
+
+A∘B ←→ A   +.×   B
+
+Otherwise there are some subtle differences between ∘ and +.×:
+
+@itemize
+@item @b{A +.× B} allows A and B to be of any rank, while @b{A∘B} raises a
+ RANK ERROR if the rank of A or B is more than 2.
+@item With operator +.× is the product of e.g. a vector and a matrix (or
+ vice versa) a vector, usually understood as row-vector.
+ In contrast (and more similar to linear algebra) A∘B is always a matrix,
+ as to preserve the distinction between row vectors and column vectors:
+
+@verbatim
+      M←2 2⍴1 2 3 4   ⍝ a matrix
+      V←10 11         ⍝ a vector
+
+      M +.× V
+32 74
+
+      M∘V
+32
+74
+
+      V +.× M
+43 64
+
+      V∘M
+43 64
+
+
+      ⍴M +.× V   ⍝ vector
+2
+      ⍴V +.× M   ⍝ vector
+2
+      ⍴V∘M       ⍝ row vector
+2 1
+      ⍴M∘V       ⍝ column vector
+2 1
+@end verbatim
+@end itemize
+
+@c ----------------------------------------------------------------------------
 @node Chapter 3
+
 @chapter Limitations and Missing Features
 
 GNU APL is an almost full implementation of the ISO standard 13751.
