@@ -1,13 +1,15 @@
 ⍝ MatrixDivide.tc
 ⍝ ----------------------------------
 
-      R←2 2ρ1 0 0 2
-      R
+      ⍝ lrm p. 175
+
+      ⍝ real L, R
+      ⍝
+      ⊢R←2 2ρ1 0 0 2
 1 0
 0 2
 
-      L←2 2ρ1 2 4 8
-      L
+      ⊢L←2 2ρ1 2 4 8
 1 2
 4 8
 
@@ -18,6 +20,8 @@
 1 2
 2 4
 
+      ⍝ complex R
+      ⍝
       R←2 2ρ 0J1 0 0 2
       R
 0J1 0
@@ -108,8 +112,10 @@
       ⍴A⌹A
 3 3
 
-      ⍝ fails with DOMAIN ERROR for some (linerar dependent) A and B
-      )SIC
+      ⍝ fails with DOMAIN ERROR for some (linear dependent) A and B
+
+      )CLEAR
+CLEAR WS
 
 ⍝ ==================================
 

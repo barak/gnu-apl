@@ -79,7 +79,7 @@ ShapeItem cols_B;
         cols_B = B->get_cols();
       }
 
-   if (cols_A !=rows_B)
+   if (cols_A != rows_B)
       {
         MORE_ERROR() << "A∘B: A has " << cols_A <<
                         " rows, but B has " << rows_B << " rows";
@@ -96,16 +96,16 @@ Value_P Z(shape_Z, LOC);
          const Cell * cA = &A->get_cravel(a * cols_A);   // start of row A[a;]
          loop(b, cols_B)
              {
-               const Cell * cB = &B->get_cravel(b);   // start of column V];b]
+               const Cell * cB = &B->get_cravel(b);   // start of column B];b]
                APL_Float real = 0;
                APL_Float imag = 0;
                bool need_complex = false;
                loop(ab, len_AB)   // column of A and row of B
                   {
-                    const Cell & aa = *(cA  + ab);
+                    const Cell & aa = *(cA + ab);
                     const Cell & bb = *(cB + ab*cols_B);
                     real += aa.get_real_value() * bb.get_real_value();
-                    if (aa.is_complex_cell())
+                    if (aa.is_complex_cell())   // complex aa and any b
                        {
                          need_complex = true;
                          if (bb.is_complex_cell())   // complex aa and bb
@@ -125,7 +125,7 @@ Value_P Z(shape_Z, LOC);
                          imag += aa.get_real_value() * bb.get_imag_value();
                        }
                   }
-               if (need_complex)   Z->next_ravel_Number(real, imag);
+               if (need_complex)   Z->next_ravel_Complex(real, imag);
                else                Z->next_ravel_Number(real);
              }
        }

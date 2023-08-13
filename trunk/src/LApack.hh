@@ -258,9 +258,18 @@ public:
         const ShapeItem get_row_count() const
            { return rows; }
      
-        /// return the number of columns of \b this Matrox
+        /// return the number of columns of \b this Matrix
         const ShapeItem get_column_count() const
            { return cols; }
+     
+        /// return the number of items of \b this Matrix
+        const ShapeItem get_item_count() const
+           { return rows * cols; }
+     
+        /// return the distance between 2 adjacent columns (of the same row)
+        /// in FORTRAN this is LDA (aka. the Leading Dimension) of matrix A
+        const ShapeItem get_dx() const
+           { return dx; }
      
         /// return const \b this[row, col]
         const T & at(Crow row, Ccol col) const
@@ -275,12 +284,17 @@ public:
              return data[row + col*dx]; }
      
         /// return \b this[i, i]
-        T & diag(ShapeItem i) const
+        T & diag(ShapeItem i)
            { assert(i < rows);
              assert(i < cols);
              return data[i*(1 + dx)]; }
      
-        /// swap columns c1 and c2
+        /// return \b this[i, i]
+        const T & diag(ShapeItem i) const
+           { assert(i < rows);
+             assert(i < cols);
+             return data[i*(1 + dx)]; }
+     
         void exchange_columns(ShapeItem c1, ShapeItem c2)
            {
              assert(c1 < cols);
@@ -290,7 +304,7 @@ public:
              loop(r, rows)   exchange(*p1++, *p2++);
            }
      
-     protected:
+     protected:                        // Matrix<T>
         /// the elements of \b this matrix
         T * const data;
      
@@ -304,6 +318,36 @@ public:
         /// this distance is usually called LDx (Leading Dimension of x)
         /// in FORTRAN, e.g. LDA for a FORTRAN matrix A with LDA rows.
         const ShapeItem dx;
+     };                                // Matrix<T>
+
+  /// a clone of matrix that destroys itself (used for debugging purpoases)
+  template<typename T>
+  class TempMatrix : public Matrix<T>
+     {
+     public:
+        TempMatrix(const Matrix<T> & other)
+          : Matrix<T>(allocate(&other.diag(0),   // = other.data()
+                                other.get_item_count()),
+                      other.get_row_count(),
+                      other.get_column_count(),
+                      other.get_dx())
+           {
+           }
+       
+        ~TempMatrix()
+           {
+             delete[] Matrix<T>::data;
+           }
+
+         static T * const allocate(const T * src, int item_count)
+            {
+             const int bytes = item_count * sizeof(T);
+             char * dest = new char[bytes];
+             memcpy(dest, src, bytes);
+             return reinterpret_cast<T *>(dest);
+            }
+
+
      };
   //==========================================================================
 
@@ -346,7 +390,7 @@ public:
   static APL_Float hypotenuse(const T1 & kath_A, const T2 & kath_B)
      { return sqrt(square(kath_A) + square(kath_B)); }
 
-  // scale SIN and COS so that SIN² + COS² = 1.0
+  /// scale SIN and COS so that SIN² + COS² = 1.0
   template<typename T>
   static APL_Float normalize(T & SIN, T & COS)
      {
@@ -408,15 +452,74 @@ public:
   //============================================================================
   // (static) functions ported from LAPACK (FORTRAN) .f files...
   public:
-     /// LAPACK dgelse (for real matrices A and B)
-     static int Dgelsy(Matrix<DD> & A, Matrix<DD> &B, APL_Float rcond)
-        { return gelsy<DD>(A, B, rcond); }
+     /// return ║ vec ║²
+     static APL_Float norm_2(const DD * vec, size_t len)
+        {
+          APL_Float norm = 0.0;
+          loop(j, len)   norm += square(get_real(*vec++));
+          return norm;
+        }
+
+     /// return ║ vec ║²
+     static APL_Float norm_2(const ZZ * vec, size_t len)
+        {
+              APL_Float norm = 0.0;
+              loop(j, len)
+                 {
+                   norm += square(get_real(*vec));
+                   norm += square(get_imag(*vec++));
+                 }
+              return norm;
+        }
+
+     /// LApack function unm2r
+     template<typename T>
+     static void unm2r(Crow K,
+                       const Matrix<T> & A, const T * tau,
+                       Matrix<T> & C);
   
-     /// LAPACK dgelse (for complex matrices A and B)
-     static int Zgelsy(Matrix<ZZ> & A, Matrix<ZZ> &B, APL_Float rcond)
-        { return gelsy<ZZ>(A, B, rcond); }
+     /// LApack function ung2r: convert reflectors (in A) to
+     /// orthogonal Q (returned in A)
+     template<typename T>
+     static void ung2r(Matrix<T> & A, const T * tau);
+
+     /// dgelsy and zgelsy
+     template<typename T>
+     static int gelsy(Matrix<T> & A, Matrix<T> &B, APL_Float rcond,
+                      char * work);
   
-  protected:
+   /// dd is 0.0
+   static bool is_zero(const DD & dd)
+      { return dd == 0.0; }
+
+   /// zz is 0.0
+   static bool is_zero(const ZZ & zz)
+      { return zz.real() == 0.0 && zz.imag() == 0.0; }
+
+   /// never
+   static bool is_complex(const DD &)
+      { return false; }
+
+   /// always
+   static bool is_complex(const ZZ &)
+      { return true; }
+
+   /// workspace for gelsy(). Conceptionally protected,
+   /// but needed fpr debugging purposes.
+   static char * work_gelsy;
+
+   static void divide_matrix(Value & Z, bool need_complex, ShapeItem rows,
+                             ShapeItem cols_A, const Cell * cA,
+                             ShapeItem cols_B, const Cell * cB);
+
+   static void factorize_matrix(Value & Z, bool need_complex, ShapeItem rows,
+                                ShapeItem cols, const Cell * cB,
+                                APL_Float rcond);
+
+   // undo pivoting of col in pivot of length \n len
+   static Ccol un_pivot(const Ccol * pivot, int len, Ccol col);
+
+protected:   // class LA_pack
    /// return the real part of dd (= dd)
    static DD get_real(const DD & dd)
       { return dd; }
@@ -449,17 +552,9 @@ public:
    static void set_imag(ZZ & zz, APL_Float value)
       { zz.imag(value); }
 
-   /// dd is 0.0
-   static bool is_zero(const DD & dd)
-      { return dd == 0.0; }
-
    /// dd is not 0.0
    static bool is_nonzero(const DD & dd)
       { return dd != 0.0; }
-
-   /// zz is 0.0
-   static bool is_zero(const ZZ & zz)
-      { return zz.real() == 0.0 && zz.imag() == 0.0; }
 
    /// zz is not 0.0
    static bool is_nonzero(const ZZ & zz)
@@ -481,44 +576,10 @@ public:
       static ZZ conjugated(const ZZ & zz)
          { return ZZ(zz.real(), - zz.imag()); }
 
-      /// return 1.0 / real dd
-      static DD reciprocal(const DD & dd)
-         { return 1.0 / dd; }
-
-      /// return 1.0 / complex zz
-      static ZZ reciprocal(const ZZ & zz)
-        {
-          const APL_Float denom = zz.real() * zz.real() + zz.imag() * zz.imag();
-          return ZZ(zz.real()/denom, - zz.imag()/denom);
-        }
-
-     /// return ║ vec ║²
-     static APL_Float norm_2(const DD * vec, size_t len)
-        {
-              APL_Float norm = 0.0;
-              loop(j, len)   norm += square(get_real(*vec++));
-              return norm;
-        }
-
-     /// return ║ vec ║²
-     static APL_Float norm_2(const ZZ * vec, size_t len)
-        {
-              APL_Float norm = 0.0;
-              loop(j, len)
-                 {
-                   norm += square(get_real(*vec));
-                   norm += square(get_imag(*vec++));
-                 }
-              return norm;
-        }
-
-     /// dgelsy and zgelsy
-     template<typename T>
-     static int gelsy(Matrix<T> & A, Matrix<T> &B, APL_Float rcond);
-  
      /// dgelsy and zgelsy with nicely scaled A and B
      template<typename T>
-     static int scaled_gelsy(Matrix<T> & A, Matrix<T> & B, double rcond);
+     static int scaled_gelsy(Matrix<T> & A, Matrix<T> & B, double rcond,
+                             char * work);
   
      /// estimate the rank of matrix A
      template<typename T>
@@ -528,10 +589,12 @@ public:
      template<typename T>
      static void geqp3(Matrix<T> & A, Ccol * pivot, T * tau);
   
-     /// LApack function unm2r
+     /// LApack function laqp2: computes a QR factorization with column pivoting
+     /// pivoting of the matrix A
      template<typename T>
-     static void unm2r(Crow K, Matrix<T> & A, const T * tau, Matrix<T> & C);
-  
+     static void laqp2(Matrix<T> & A, Ccol * pivot,
+                       T * tau, APL_Float * vn1_vn2);
+
      /** LApack function laic1 (estimate largest singular value).
          apply one step of incremental condition estimation.
   
@@ -551,13 +614,13 @@ public:
                            T & SIN, T & COS);
   
      /// LApack function larfg. It generates an elementary reflector
-     /// (aka. a Householder matrix). Return tau.
+     /// (aka. a Householder matrix). Return the scalar tau.
      template<typename T>
      static T larfg(Ccol N, T * X, size_t len_X);
   
-     /// LApack function trsm. Solves op(A) * X = alpha * B
+     /// LApack function trsm. Solve A ∘ X[;1:NRHS] = B[;1:NRHS]
      template<typename T>
-     static void trsm(const Matrix<T> & A, Matrix<T> & B);
+     static void trsm(const Matrix<T> & A, Matrix<T> & B, Ccol NRHS);
   
     /// LApack functions iladlc and ilaclc.
     /// Scan matrix A for its last non-zero column (+ 1).
@@ -569,30 +632,35 @@ public:
      template<typename T>
      static inline void gemv(int M, int N, const Matrix<T> & C,
                              const T * v, size_t len_v, T * y, size_t len_Y);
-  
+ 
      /// LApack function gerc: A := alpha * x * y* * H + A,
      template<typename T>
      static void gerc(int M, int N, T ALPHA, const T * x, size_t len_X,
                       const T * y, size_t len_Y, Matrix<T> & C);
-  
-     // LApack function larf: applies an elementary reflector to a general
-     /// rectangular matrix
+ 
+     /// split the result of a QR factorization into Z[1] = Q, Z[1] = R,
+     /// and Z[2] = R⁻¹.
      template<typename T>
-     static void larf(const T * v, size_t len_v, T tau, Matrix<T> & C);
-  
-     /// LApack function laqp2: computes a QR factorization with column pivoting
-     /// of the matrix block
+     static void split_HR(Value & Z, const LA_pack::Matrix<T> & HR,
+                                     const Ccol * pivot, const T * tau);
+
+     // LApack function larf: apply one elementary reflector v to matrix C
      template<typename T>
-     static void laqp2(Matrix<T> & A, Ccol * pivot,
-                       T * tau, APL_Float * vn1_vn2);
+     static void larf(const T * v, size_t len_v,   // reflector
+                      T tau, Matrix<T> & C);
+
+   /// return the LApack workspace size (in bytes) needed by gelsy and its
+   /// subfunctions.
+   template<typename T>
+   static char * allocate_workspace(Ccol N);
 
    /* workspace pointers... We allocate a single char * work for all of them.
       The function call structure is something like:
 
-      ┌─── scaled_gelsy(N)               uses: work_scaled_gelsy
-      │       │
-      │       ├─── geqp3(N)              uses: work_geqp3
-      └───────┘      ││
+       ┌── scaled_gelsy(N)               uses: work_scaled_gelsy
+       │     ││
+       │     │└─── geqp3(N)              uses: work_geqp3
+       └──←──┘       ││
                      │├─── larf(N)       uses: work_larf
                      ││     ...
                      │└─── larf(1)       uses: work_larf
@@ -600,10 +668,9 @@ public:
                    estimate_rank(N)      uses: work_geqp3
 
       Therefore geqp3() and estimate_rank() can use the same memory,
-      while scaled_gelsy and and larf() need a separate memories
+      while scaled_gelsy() and and larf() need a separate memories
     */
 
-   static char * work_gelsy;   ///< workspace for scaled_gelsy()
    static char * work_geqp3;   ///< workspace for geqp3() and estimate_rank()
 #define work_estimate_rank work_geqp3   /**< alias */
    static char * work_larf;    ///< workspace for larf()

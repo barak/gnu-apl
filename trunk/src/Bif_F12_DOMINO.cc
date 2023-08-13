@@ -26,11 +26,12 @@
 #include "ComplexCell.hh"
 #include "Value.hh"
 #include "Workspace.hh"
-extern void divide_matrix(Value & Z, bool need_complex,
-                          ShapeItem rows, ShapeItem cols_A, const Cell * cA,
-                          ShapeItem cols_B, const Cell * cB);
+
+#include "LApack.hh"
 
 Bif_F12_DOMINO Bif_F12_DOMINO   ::fun;    // ⌹
+
+// #define DOMINO_DEBUG
 
 //----------------------------------------------------------------------------
 Token
@@ -109,10 +110,13 @@ Token result = eval_AB(I, B);
 Token
 Bif_F12_DOMINO::eval_XB(Value_P X, Value_P B) const
 {
+   // X: the scalar rcond for B = P∘Q
+   //
    if (!X->is_scalar())   RANK_ERROR;
+
 const double EPS = X->get_cfirst().get_real_value();
 
-   if (B->get_rank() != 2)        RANK_ERROR;
+   if (B->get_rank() != 2)   RANK_ERROR;
 
    // if rank of A or B is < 2 then treat it as a
    // 1 by n (or 1 by 1) matrix..
@@ -125,12 +129,12 @@ const ShapeItem cols_B = B->get_cols();
         LENGTH_ERROR;
       }
 
-   if (rows_B*cols_B == 0)   LENGTH_ERROR;
-
+   if (rows_B*cols_B == 0)   LENGTH_ERROR;   // empty B
 
 const bool need_complex = B->is_complex(true);
 Value_P Z(3, LOC);
    QR_factorization(Z, need_complex, rows_B, cols_B, &B->get_cfirst(), EPS);
+// LA_pack::factorize_matrix(*Z, need_complex, rows_B, cols_B, &B->get_cfirst(), EPS);
 
    Z->set_default(*B.get(), LOC);   // not needed
    Z->check_value(LOC);
@@ -194,8 +198,8 @@ ShapeItem cols_B = 1;
 
 const bool need_complex = A->is_complex(true) || B->is_complex(true);
 Value_P Z(shape_Z, LOC);
-   divide_matrix(*Z, need_complex, rows_A, cols_A, &A->get_cfirst(),
-                                                   cols_B, &B->get_cfirst());
+   LA_pack::divide_matrix(*Z, need_complex, rows_A, cols_A, &A->get_cfirst(),
+                                            cols_B, &B->get_cfirst());
 
    Z->set_default(*B.get(), LOC);
 
@@ -274,75 +278,50 @@ Value_P Z = Bif_F12_FORMAT::format_by_specification(A, B);
 #endif // DOMINO_DEBUG
 }
 //----------------------------------------------------------------------------
-/// invert a real upper-triangular matrix
-template<>
-Value_P Bif_F12_DOMINO::invert_upper_triangle_matrix<false>(const ShapeItem M,
-                                                            const ShapeItem N,
-                                                            double * utm,
-                                                            double * tmp)
+/// invert an upper-triangle matrix. Input is an upper triangle matrix
+//  utm (whose items below the diagonal are ignored but pretended to be 0).
+//  Result is the inverse M×N matrix aug.
+//
+template<typename T, bool cplx>
+Value_P Bif_F12_DOMINO::invert_UTM(ShapeItem M, ShapeItem N, T * utm, T * aug)
 {
-   // ignore rows ≥ N; they are 0 and then cols ≥ N of the result as well.
-   // the 0s will be filled in at the end.
-
 matrix_assert(M >= N);
-Matrix<false> UTM(utm, N, N);   // the matrix to be inverted
-Matrix<false> AUG(tmp, N, N);   // the augmented matrix for the result
 
-   AUG.init_identity(N);   // start with the identity matrix
-
-UTM.debug("UTM orig");
-AUG.debug("AUG orig");
-
-   // divide every row by its diagonal element, so that the diagonal
-   // elements of UTM become 1.0.
+   // ignore cols ≥ N. In a UTM they are 0 and thus rows ≥ N of the result
+   // are 0 as well. as well. The 0s of the result will be initialized at
+   // the end. Until then we treat UTM as a quadratic N×N matrix.
    //
-   loop(y, N)   // for every row y
-       {
-         const double diag_y = UTM.real(y, y);
-         if (diag_y == 0.0)   DOMAIN_ERROR;
+   invert_QUTM<T>(N, utm, aug);
 
-         // divide off-diagonal UTM | AUG[y;] by diag_y
-         for (ShapeItem x = y + 1; x < N; ++x)   UTM.real(y, x) /= diag_y;
-
-         // divide diagonal of UTM | AUG by diag_y
-         UTM.real(y, y) = 1.0;
-         AUG.real(y, y) /= diag_y;
-       }
-
-UTM.debug("UTM unity " LOC);
-AUG.debug("AUG unity " LOC);
-
-   // subtract a multiple of the diagonal element from the items above it
-   // so that the item becomes 0.0
-   //
-   loop(y, N)       // for every row y
-   loop (y1, y)     // for every row y1 above y
-       {
-Q1(y) Q1(y1)
-         const double factor = UTM.real(y1, y);
-         if (factor == 0)   continue;   // already 0.0
-Q1(factor)
-         for (ShapeItem x1 = y1; x1 < N; ++x1)
-             {
-               // make UTM[y1;x1] zero by subtracting UTM[y;x] × UTM[y;]
-               UTM.real(y1, x1) -= UTM.real(y, x1) * factor;
-               AUG.real(y1, x1) -= AUG.real(y, x1) * factor;
-             }
-UTM.debug("UTM at " LOC);
-AUG.debug("AUG at " LOC);
-       }
-
-AUG.debug("AUG at " LOC);
+Matrix<cplx> AUG(reinterpret_cast<double *>(aug), N, N);   // augmented result
 
    // create the result value
-const Shape shape_INV(N, M);
+   //
+const Shape shape_INV(N, M);   // INV has the transposed shape!
 Value_P INV(shape_INV, LOC);
-   loop(y, N)   // for every row y
+   ALL_ROWS(N)   // for every row
+   ALL_COLS(M)   // for every column x
        {
-         loop(x, M)   // for every column y
-             {
-               const double flt = (x < N) ? AUG.real(y, x) : 0.0;
-               if (!isfinite(flt))   DOMAIN_ERROR;
+         if (cplx)
+            {
+              double re = 0.0;
+              double im = 0.0;
+              if (col < N && col >= row)   // diagonal or above
+                 {
+                   re = AUG.real(row, col);
+                   im = AUG.imag(row, col);
+                   if (!(isfinite(re) && isfinite(im)))   DOMAIN_ERROR;
+                 }
+              INV->next_ravel_Complex(re, im);
+            }
+         else
+            {
+               double flt = 0.0;
+               if (col < N && col >= row)   // diagonal or above
+                  {
+                    flt = AUG.real(row, col);
+                    if (!isfinite(flt))   DOMAIN_ERROR;
+                  }
                INV->next_ravel_Float(flt);
              }
        }
@@ -351,90 +330,96 @@ Value_P INV(shape_INV, LOC);
    return INV;
 }
 //----------------------------------------------------------------------------
-/// inver a complex upper-triangle matrix
-template<>
-Value_P Bif_F12_DOMINO::invert_upper_triangle_matrix<true>(ShapeItem M,
-                                                           ShapeItem N,
-                                                           double * utm,
-                                                           double * tmp)
+template<typename T>
+void Bif_F12_DOMINO::invert_QUTM(ShapeItem N, T * utm, T * aug)
 {
-   // ignore rows ≥ N; they are 0 and then cols ≥ N of the result as well.
-   // the 0s will be filled in at the end.
+#define AT(x, y) at(y,x)   // transposed FORTRAN matrix
 
-matrix_assert(M >= N);
-Matrix<true> UTM(utm, N, N);   // the matrix to be inverted
-Matrix<true> AUG(tmp, N, N);   // the augmented matrix for the result
+LA_pack::Matrix<T>UTM(utm, N, N, N);   // the matrix to be inverted
+LA_pack::Matrix<T>AUG(aug, N, N, N);   // the augmented result matrix
 
-   AUG.init_identity(N);   // start with the identity matrix
-
-UTM.debug("UTM orig");
-AUG.debug("AUG orig");
-
-   // divide every row by its diagonal element, so that the diagonal
-   // elements of UTM become 1.0.
+   // start with empty aug. 
    //
-   loop(y, N)   // for every row y
+   ALL_ROWS(N)
+   ALL_COLS(N)   AUG.AT(row, col) = T(0.0);
+
+   // divide every row of UTM by its diagonal element, so that the diagonal
+   // elements of UTM become 1.0. Also initialize the diagonal of AUG.
+   //
+   ALL_ROWS(N)
        {
-         const complex<double> diag_y = UTM.get_Z(y, y);
-         if (diag_y.real() == 0.0 && diag_y.imag())   DOMAIN_ERROR;
+         const T diag = UTM.diag(row);
+         if (diag == 0.0)
+            {
+              MORE_ERROR() << "⌹[X]B: 0 on the main diagonal of R";
+              DOMAIN_ERROR;
+            }
 
-         // divide off-diagonal UTM | AUG[y;] by diag_y
-         for (ShapeItem x = y + 1; x < N; ++x)
-             UTM.div_Z(y, x, diag_y);
+         // divide all items right of UTM[row;row] as well as the entire
+         // AUG[row;] by diag. Conceptually the entire diagonal of UTM is
+         // set to 1.0. However, we do not use the diagonal of UTM after
+         // this loop and therefore don't bother to set it to 1.0.
+         //
+         for (Ccol col = row + 1; col < N; ++col)   UTM.AT(row, col) /= diag;
 
-         // divide diagonal of UTM | AUG by diag_y
-         UTM.set_Z(y, y, complex<double>(1.0, 0.0));
-         AUG.div_Z(y, y, diag_y);
+         // divide diagonal items of UTM | AUG by diag_y
+         //
+         AUG.diag(row) = 1.0 / diag;
        }
 
-UTM.debug("UTM unity " LOC);
-AUG.debug("AUG unity " LOC);
+   /* at this point the diagonal of UTM is normalized to 1.0 and AUG is
+      zero except on its diagonal:
+
+       ┌────UTM────┐         ┌────AUG────┐
+       │ 1 u u u u │         │ a         │
+       │   1 u u u │         │   a    0  │ aⱼⱼ = 1.0 ÷ uⱼⱼ
+       │     1 u u │         │     a     │ uⱼⱼ = 1.0
+       │  0    1 u │         │  0    a   │
+       │         1 │         │         a │
+       └───────────┘         └───────────┘
+    */
 
    // subtract a multiple of the diagonal element from the items above it
    // so that the item becomes 0.0
    //
-   loop(y, N)       // for every row y
-   loop (y1, y)     // for every row y1 above y
+   REV_COLS(N)      // for every row k
+   loop (row1, k)   // for every row1 above row k
        {
-Q1(y) Q1(y1)
-         const complex<double> factor = UTM.get_Z(y1, y);
-         if (factor.real() == 0 && factor.imag() == 0)   continue;
-Q1(factor)
-         for (ShapeItem x1 = y1; x1 < N; ++x1)
-             {
-               // make UTM[y1;x1] zero by subtracting UTM[y;x] × UTM[y;]
-               UTM.sub_Z(y1, x1, UTM.get_Z(y, x1) * factor);
-               AUG.sub_Z(y1, x1, AUG.get_Z(y, x1) * factor);
-             }
-UTM.debug("UTM at " LOC);
-AUG.debug("AUG at " LOC);
-       }
+         /* subtract (factor1×k) from row1. factor1 is the element of
+            row1 that is above the diagonal item of k. This makes
+            AT(row1, k) == 0.0 and updates the columns right of it
+            in both UTM and AUG:
 
-AUG.debug("AUG at " LOC);
+                   0 ←   ← k ← N-1 ──────────── outer loop (row k=N-1:0)
+                           ↓
+                   ┌────UTM────┐   0     ┌────UTM────┐
+                   │ 1 u u u 0 │   ↓     │ 1 u u u 0 │
+                   │   1 u ⍺ 0 │← row1 → │   1 u 0 0 │  ⍺ ← 0
+                   │     1 0 0 │   ↓     │     1 0 0 │
+                   │  0    1 0 │   k     │  0    1 0 │
+                   │         1 │   │     │         1 │
+                   └───────────┘   │     └───────────┘
+                           ↑       │             ↑
+                          col→     │            col→
+                                   │
+                                   └─────────── inner loop (row1=0:k)
 
-   // create the result value
-const Shape shape_INV(N, M);
-Value_P INV(shape_INV, LOC);
-   loop(y, N)   // for every row y
-       {
-         loop(x, M)   // for every column y
+            In this double loop, every item ⍺ above the diagonal is
+            visited and set to 0, updating UTM and AUG simultaneously.
+          */
+
+         const T alpha = UTM.AT(row1, k);
+         if (LA_pack::is_zero(alpha))   continue;   // already 0.0
+
+         for (Ccol col = row1; col < N; ++col)
              {
-               if (x < N)   // diagonal or above
-                  {
-                    const double re = AUG.real(y, x);
-                    const double im = AUG.imag(y, x);
-                    if (!(isfinite(re) && isfinite(im)))   DOMAIN_ERROR;
-                    INV->next_ravel_Complex(re, im);
-                  }
-               else   // below diagonal
-                  {
-                    INV->next_ravel_Complex(0.0, 0.0);
-                  }
+               // make UTM[k;col] zero by subtracting UTM[y;x] × alpha
+               //
+               UTM.AT(row1, col) -= UTM.AT(k, col) * alpha;
+               AUG.AT(row1, col) -= AUG.AT(k, col) * alpha;
              }
        }
-
-   INV->check_value(LOC);
-   return INV;
+#undef AT
 }
 //----------------------------------------------------------------------------
 void
@@ -475,6 +460,13 @@ double * data = new double[end*CPLX];   if (data == 0)   WS_FULL;
    data[base_R - 1]  = 48.0;   data[base_R  + CPLX*len]   = 49.0;
    data[base_S - 1]  = 50.0;   data[base_S  + CPLX*len]   = 51.0;
 
+   // compute the QR factorization of B. That is:
+   //
+   // B = Q∘R where:
+   //
+   // ⍴B ←→ M N,
+   // ⍴Q ←→ N N  (since M≥N) and orthogonal,
+   // ⍴R is M N  (since ⍴B ←→ ⍴Q+.×R) and upper triangular
    if (need_complex)   // complex B
       {
         setup_complex_B(cB, data + base_B, len_B);
@@ -519,68 +511,79 @@ double * data = new double[end*CPLX];   if (data == 0)   WS_FULL;
    Assert(data[base_S - 1]          == 50.0);
    Assert(data[base_S + CPLX*len]   == 51.0);
 
+   // Z[1] aka. Q
    {
      const Shape Q_shape(rows, rows);
      Value_P Qv(Q_shape, LOC);
      if (need_complex)
         {
-          loop(q, len)
-              {
-                const double re = data[base_Q + 2*q];
-                const double im = data[base_Q + 2*q + 1];
-                if (!(isfinite(re) && isfinite(im)))   DOMAIN_ERROR;
-                Qv->next_ravel_Complex(re, im);
-              }
+          ALL_COLS(rows)   // FORTRAN order
+          ALL_ROWS(rows)
+             {
+               const ShapeItem offset = 2*(col + row*rows);
+               const double real = data[base_Q + offset];
+               const double imag = data[base_Q + offset + 1];
+               if (!(isfinite(real) && isfinite(imag)))   DOMAIN_ERROR;
+               Qv->next_ravel_Complex(real, imag);
+             }
         }
      else
         {
-          loop(q, len)
-              {
-                const double re = data[base_Q + q];
-                if (!isfinite(re))   DOMAIN_ERROR;
-                Qv->next_ravel_Float(re);
-              }
+          ALL_COLS(rows)   // FORTRAN order
+          ALL_ROWS(rows)
+             {
+               const ShapeItem offset = col + row*rows;
+               const double real = data[base_Q + offset];
+               if (!isfinite(real))   DOMAIN_ERROR;
+               Qv->next_ravel_Float(real);
+             }
         }
      Qv->check_value(LOC);
      Z->next_ravel_Pointer(Qv.get());
    }
+
+   // Z[2] aka. R
    {
      const Shape shape_R(rows, cols);
      Value_P vR(shape_R, LOC);
      if (need_complex)
         {
-          loop(r, rows*cols)
+          loop(offset, rows*cols)
               {
-                const double re = data[base_R + 2*r];
-                const double im = data[base_R + 2*r + 1];
-                if (!(isfinite(re) && isfinite(im)))   DOMAIN_ERROR;
-                vR->next_ravel_Complex(re, im);
+                const double real = data[base_R + 2*offset];
+                const double imag = data[base_R + 2*offset + 1];
+                if (!(isfinite(real) && isfinite(imag)))   DOMAIN_ERROR;
+                vR->next_ravel_Complex(real, imag);
               }
         }
      else
         {
-          loop(r, rows*cols)
+          loop(offset, rows*cols)
               {
-                const double re = data[base_R + r];
-                if (!isfinite(re))   DOMAIN_ERROR;
-                vR->next_ravel_Float(re);
+                const double real = data[base_R + offset];
+                if (!isfinite(real))   DOMAIN_ERROR;
+                vR->next_ravel_Float(real);
               }
         }
      vR->check_value(LOC);
      Z->next_ravel_Pointer(vR.get());
+   }
+
+   // Z[3] aka. Rinv
+   {
 
       if (need_complex)
          {
-           Value_P INV = invert_upper_triangle_matrix<true>(rows, cols,
-                                                            data + base_R,
-                                                            data + base_Q);
+           LA_pack::ZZ * pR = reinterpret_cast<LA_pack::ZZ *>(data + base_R);
+           LA_pack::ZZ * pQ = reinterpret_cast<LA_pack::ZZ *>(data + base_Q);
+           Value_P INV = invert_UTM<LA_pack::ZZ, true>(rows, cols, pR, pQ);
            Z->next_ravel_Pointer(INV.get());
          }
       else
          {
-           Value_P INV = invert_upper_triangle_matrix<false>(rows, cols,
-                                                             data + base_R,
-                                                             data + base_Q);
+           LA_pack::DD * pR = reinterpret_cast<LA_pack::DD *>(data + base_R);
+           LA_pack::DD * pQ = reinterpret_cast<LA_pack::DD *>(data + base_Q);
+           Value_P INV = invert_UTM<LA_pack::DD, false>(rows, cols, pR, pQ);
            Z->next_ravel_Pointer(INV.get());
          }
    }
@@ -591,6 +594,8 @@ double * data = new double[end*CPLX];   if (data == 0)   WS_FULL;
 void
 Bif_F12_DOMINO::setup_complex_B(const Cell * cB, double * D, ShapeItem count)
 {
+   // initialize the homogeneous complex vector D from the mixed APL ravel cB
+   //
    loop(b, count)
       {
         const Cell & cell = *cB++;
@@ -607,6 +612,8 @@ Bif_F12_DOMINO::setup_complex_B(const Cell * cB, double * D, ShapeItem count)
 void
 Bif_F12_DOMINO::setup_real_B(const Cell * cB, double * D, ShapeItem count)
 {
+   // initialize the homogeneous real vector D from the mixed APL ravel cB
+   //
    loop(b, count)
       {
         const Cell & cell = *cB++;
@@ -646,7 +653,7 @@ Matrix<cplx> mQi(pQi, rows, rows);   // keeps size
 
    // [2]  →(0=(1↓⍴B),BMAX←⌈/∣,B)/0   ⍝ done if no or only near-0 columns
 
-   Q1(cols)
+//    Q1(cols)
    if (cols == 0)   return pQ;
    loop(y, rows)
    loop(x, cols)
@@ -657,7 +664,7 @@ Matrix<cplx> mQi(pQi, rows, rows);   // keeps size
    BMAX = sqrt(BMAX);
    if (BMAX < qct)
       {
-        Q1("B is 0")
+//         Q1("B is 0")
         return pQ;   // all B[x;y] = 0
       }
 
@@ -674,8 +681,8 @@ mB.debug("[3] B");
         Matrix<cplx> mCOL1 (pB,  rows, 1, mB.dY);   // COL1←B[;1]
 mCOL1.debug("[4] COL1");
         norm_result L;   mB.col1_norm(L);
-Q1(L.norm2_real)
-Q1(L.norm2_imag)
+// Q1(L.norm2_real)
+// Q1(L.norm2_imag)
         const bool significant = mCOL1.significant(BMAX, EPS);
 
    // [5]  IMBED → L2=0
@@ -683,7 +690,7 @@ Q1(L.norm2_imag)
 
         if (significant || (L.norm2_real + L.norm2_imag) > qct2)
            {
-Q1("SIGNIFICANT")
+// Q1("SIGNIFICANT")
    // [7]  B[1;1]←(↑B) + (L2⋆÷2)×(0≤↑B)-0>↑B
 
 #if 0
@@ -693,17 +700,17 @@ Q1("SIGNIFICANT")
              double * B11_imag = B11_real + 1;
              if (*B11_real < 0)
                 {
-Q1("SIGN ¯1")
-Q1(*B11_real)
-Q1(*B11_imag)
+// Q1("SIGN ¯1")
+// Q1(*B11_real)
+// Q1(*B11_imag)
                   *B11_real -= L.norm_real;
                   *B11_imag -= L.norm_imag;
                 }
              else
                 {
-Q1("SIGN 1")
-Q1(*B11_real)
-Q1(*B11_imag)
+// Q1("SIGN 1")
+// Q1(*B11_real)
+// Q1(*B11_imag)
                   *B11_real += L.norm_real;
                   *B11_imag += L.norm_imag;
                 }
@@ -722,8 +729,8 @@ Q1(*B11_imag)
 mCOL1.debug("[8] COL1");
              norm_result scale;   mCOL1.col1_norm(scale);
              mS.init_outer_product(scale, mCOL1);
-Q1(scale.norm__2_real)
-Q1(scale.norm__2_imag)
+// Q1(scale.norm__2_real)
+// Q1(scale.norm__2_imag)
              loop(y, rows)   mS.real(y, y) -= 1.0;   // subtract 1.0
            }
         else   // →IMBED but do [3] here

@@ -59,6 +59,11 @@ public:
    /// overloaded Function::eval_fill_AB()
    virtual Token eval_fill_AB(Value_P A, Value_P B) const;
 
+   /// compute the inverse of the upper trianle matrix  \b utm.
+   /// On return: inverse in aug and utm destroyed.
+   template<typename T, bool cplx>
+   static Value_P invert_UTM(ShapeItem M, ShapeItem N, T * utm, T * aug);
+
 protected:
    /// compute the Q matrix of B = QR
    static void QR_factorization(Value_P Z, bool need_complex, ShapeItem rows,
@@ -70,10 +75,20 @@ protected:
                            double * Q, double * Q1, double * R, double * S,
                            double EPS);
 
-   /// compute the inverse of \b utm (utm will be destroyed in the process).
-   template<bool cplx>
-   static Value_P invert_upper_triangle_matrix(ShapeItem M, ShapeItem N,
-                                               double * utm, double * tmp);
+   /// compute the inverse of the upper triangle matrix \b utm.
+   /// On return: the inverse of qutm is stored in qaug and utm was destroyed.
+   /*  NOTES:
+       1.  Matrix utm is actually M×N but rows N..M are 0 so that inverting
+           the upper N×N matix suffices.
+
+       2.  The items below the diagonal of utm are only conceptionaly 0 and
+           may in fact be ≠ 0 (e.g. the Q portion of a QR factorization).
+           However, invert_QUTM() does not access these items and only
+           sets columns 1..N of qaug. The caller is responsible for setting
+           columns N..M to 0.
+    */
+   template<typename T>
+   static void invert_QUTM(ShapeItem N, T * qutm, T * qaug);
 
    /// initialize complex D with Cells cB
    static void setup_complex_B(const Cell * cB, double * D, ShapeItem count);

@@ -1803,12 +1803,12 @@ char **pend = reinterpret_cast<char **>(&end);
 
    switch (type)
       {
-        case UNI_PAD_U0: // end of UNI_PAD_U2
+        case UNI_PAD_U0: // end of UNI_PAD_U2,      e.g. ²ASCII⁰
         case '\n':       // end of UNI_PAD_U2 (fix old bug)
              return input;;
 
-        case UNI_PAD_U1: // hex Unicode
-        case UNI_PAD_U2: // printable ASCII
+        case UNI_PAD_U1: // hex Unicode:            e.g. ¹
+        case UNI_PAD_U2: // printable ASCII,        e.g. ²ASCII⁰
              {
                // read_XML_string() needs type, so we restore it.
                input -= type_len;
@@ -1822,7 +1822,7 @@ char **pend = reinterpret_cast<char **>(&end);
              }
              return input;
 
-        case UNI_PAD_U3: // integer
+        case UNI_PAD_U3: // integer,                e.g. ³
              {
                const APL_Integer val = strtoll(charP(input), pend, 10);
                Z.next_ravel_Int(val);
@@ -1830,7 +1830,7 @@ char **pend = reinterpret_cast<char **>(&end);
              }
              return input;
 
-        case UNI_PAD_U4: // real
+        case UNI_PAD_U4: // real,                   e.g. ⁴6675.79
              {
                const APL_Float val = strtod(charP(input), pend);
                Z.next_ravel_Float(val);
@@ -1838,7 +1838,7 @@ char **pend = reinterpret_cast<char **>(&end);
              }
              return input;
 
-        case UNI_PAD_U5: // complex
+        case UNI_PAD_U5: // complex,                e.g. ⁵
              {
                const APL_Float real = strtod(charP(input), pend);
                input = utf8P(end);
@@ -1850,7 +1850,7 @@ char **pend = reinterpret_cast<char **>(&end);
              }
              return input;
 
-        case UNI_PAD_U6: // pointer
+        case UNI_PAD_U6: // pointer,                e.g. ⁶1525 (vid)
              {
                const int vid = strtoll(charP(input), pend, 10);
                Assert(vid >= 0);
@@ -1860,7 +1860,7 @@ char **pend = reinterpret_cast<char **>(&end);
              }
              return input;
 
-        case UNI_PAD_U7: // cellref
+        case UNI_PAD_U7: // cellref,                e.g. ⁷ 
              if (input[0] == '0')    // 0-cell-pointer
                 {
                   Z.next_ravel_Lval(0, 0);
@@ -1880,7 +1880,7 @@ char **pend = reinterpret_cast<char **>(&end);
                 }
              return input;
 
-        case UNI_PAD_U8: // rational quotient
+        case UNI_PAD_U8: // rational quotient,      e.g. ⁸
              //
              // we should understand rational quotients even if we are
              // not ./configured for them.
@@ -1903,7 +1903,7 @@ char **pend = reinterpret_cast<char **>(&end);
              }
              return input;
 
-        case UNI_PAD_U9: // packed boolean
+        case UNI_PAD_U9: // packed boolean,         e.g. ⁹
              Assert(Z.is_packed());
              for (;;)
                  {
@@ -1942,18 +1942,23 @@ XML_Loading_Archive::read_XML_string(UCS_string & ucs, const UTF8 * utf)
    while (*utf <= ' ')   ++utf;   // skip leading whitespace
 
    // char mode is controlled by delimiters:
+   //
    // ² (UNI_PAD_U2 = start of char mode),
    // ¹ (UNI_PAD_U1 = start of hex mode = implicit end of char mode), and
    // ⁰ (UNI_PAD_U0 = end of char mode).
    //
+   // This function processes a sequence of ²strings⁰ and ¹unicodes.
+   // It returns at the end of the XML attribute (") or a the next
+   // micro-tag (³ ⁴ ⁵ ⁶ ⁷ ⁸ ⁹)
 
-   for (bool char_mode = false; *utf != '"';)
+   for (bool char_mode = false; *utf && (*utf != '"');)
        {
          // get next Unicode and advance utf
          //
-         int len = 0;
+         const UTF8 * from = utf;
+         int len = 0;   // length of uni
          const Unicode uni = UTF8_string::toUni(utf, len, true);
-         utf += len;
+         utf += len;     // skip uni
 
           if (char_mode && uni != '\n' && uni != UNI_PAD_U0)
              {
@@ -1977,7 +1982,7 @@ XML_Loading_Archive::read_XML_string(UCS_string & ucs, const UTF8 * utf)
               continue;
             }
 
-         if (uni == UNI_PAD_U0)   // end of char_mode
+         if (uni == UNI_PAD_U0)   // end of ²char_mode⁰
             {
               char_mode = false;
               continue;
@@ -1999,6 +2004,17 @@ XML_Loading_Archive::read_XML_string(UCS_string & ucs, const UTF8 * utf)
               continue;
             }
 
+         if (!char_mode)   // outside of ²char_mode⁰
+            {
+              if (uni == UNI_PAD_U3 ||
+                  uni == UNI_PAD_U4 ||
+                  uni == UNI_PAD_U5 ||
+                  uni == UNI_PAD_U6 ||
+                  uni == UNI_PAD_U7 ||
+                  uni == UNI_PAD_U8 ||
+                  uni == UNI_PAD_U9)    return from;
+            }
+
          FIXME   // not reached
        }
 
@@ -2014,16 +2030,23 @@ const int vid = find_int_attr("vid", false, 10);
 const UTF8 * cells_utf = find_optional_attr("cells");
    if (!cells_utf)   cells_utf = find_mandatory_attr("bytes");
 
-   Log(LOG_archive)   CERR << "    read_Ravel() vid=" << vid << endl;
+   Log(LOG_archive)
+      CERR << "    read_Ravel() vid=" << vid
+           << ", XML line " << line_no << " - ";
 
    Assert(vid < int(values.size()));
 Value_P Z = values[vid];
 
-   if (!Z)   return;   // )COPY with vids_COPY or static value
+   if (!Z)
+      {
+        Log(LOG_archive) CERR << "NO (vids_COPY or static)" << endl;
+        return;   // )COPY with vids_COPY or static value
+      }
 
    if (Z->is_packed())   // so it can't be short and ravel is a utf8_t *
       {
         read_Cells(*Z, cells_utf);
+        Log(LOG_archive) CERR << "YES (packed)" << endl;
         return;
       }
 
@@ -2032,6 +2055,7 @@ Value_P Z = values[vid];
         Value_P Z0(LOC);   // a scalar to read the prototype
         read_Cells(*Z0, cells_utf);   // prototype
         Z->set_default(*Z0, LOC);
+        Log(LOG_archive) CERR << "YES (empty)" << endl;
       }
    else
       {
@@ -2040,6 +2064,8 @@ Value_P Z = values[vid];
               cells_utf = read_Cells(*Z, cells_utf);
            // while (*cells_utf <= ' ')   ++cells_utf;   // trailing whitespace
             }
+        Log(LOG_archive) CERR << "YES (" << Z->element_count()
+                              << " items)" << endl;
          }
    Z->check_value(LOC);
 }
