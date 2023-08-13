@@ -526,7 +526,6 @@ Prefix::push_END_error()
    Log(LOG_prefix_parser)   print_stack(CERR, LOC);
 
 UCS_string & more = MORE_ERROR();
-print_stack(CERR, LOC);
    more << "Invalid phrase (at left end of statement):";
    loop(j, 4)
        {
