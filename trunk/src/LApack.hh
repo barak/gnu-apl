@@ -66,16 +66,25 @@
 /** @file
  */
 
+/// use (1) or don't (0) Garry Hetzer's QR ifactorization algorithm
+//
+#define QR_HELZER     1   /* in Bif_F12_DOMINO.cc */
+# define LA_DEBUG     0   /* LApack.cc */
+# define DOMINO_DEBUG 0   /* Bif_F12_DOMINO::householder */
+
 #ifndef assert
 # define assert(x)
 #endif
 
 typedef int Crow;   ///< a row number:      0..M (excluding M)
 typedef int Ccol;   ///< a column number:   0..N (excluding N)
+typedef int Cdia;   ///< a diagonal (row == col) number:   0..N (excluding N)
 
 #define ALL_ROWS(M)   for (Crow row = 0; row < (M); ++row)
 #define ALL_COLS(N)   for (Ccol col = 0; col < (N); ++col)
+#define ALL_DIAS(N)   for (Cdia dia = 0; dia < (N); ++dia)
 #define REV_COLS(N)   for (Ccol k = (N); k--;)
+#define REV_DIAG(N)   for (Cdia d = (N); d--;)
 
 /** A class that implements Dgelsy() and Zgelsy(), bundled with the helper
     functions that the implementation needs. Class LA_pack uses the following
@@ -83,17 +92,17 @@ typedef int Ccol;   ///< a column number:   0..N (excluding N)
 
    DD:   a single real number
    ZZ:   a single complex number
-   Matrix<T> a matrix of T (where T is DD or ZZ)
+   fMatrix<T> a matrix of T (where T is DD or ZZ)
 
-   Matrix<T> is actually a view of an underlying T* so that makes it possible
+   fMatrix<T> is actually a view of an underlying T* so that makes it possible
    to access sub-matrices without copying them (in-place modification).
 
-   In FORTRAN, every Matrix A, B, C... is accompanied by an integer LDA, LDB,
+   In FORTRAN, every fMatrix A, B, C... is accompanied by an integer LDA, LDB,
    LDC ... (aka. the Leading Dimension of A, B, C, ..., which is the number of
    rows in the matrix.
 
    In C/C++ the FORTRAN LDA, LDB, LDC, ... are the member 'dx' of the
-   corresponging Matrix<T> classes A, B, C, ....
+   corresponging fMatrix<T> classes A, B, C, ....
  */
 class LA_pack
 {
@@ -180,7 +189,8 @@ public:
 
        /// multiply complex \b z1 with complex \b zz
        ZZ operator *(const ZZ & zz) const
-          { return ZZ(_r*zz._r - _i*zz._i, _i*zz._r + _r*zz._i); }
+          { return ZZ(_r*zz._r - _i*zz._i,
+                      _i*zz._r + _r*zz._i); }
 
        /// multiply *this with real \b dd
        void operator *=(const ZZ & zz)
@@ -207,29 +217,29 @@ public:
        /// the square of the hypotenuse 
        APL_Float hypo_2() const
           { return real()*real() + imag()*imag(); }
-     };
+     };   // class ZZ
  
   //----------------------------------------------------------------------------
   /// A double or complex matrix. Actually a matrix view of some data (where
   /// data is similar to an APL ravel)
   template<typename T>
-  class Matrix
+  class fMatrix
      {
      public:
-        /// constructor: _rows × _cols matrix with values _data.
-         /// Unlike e.g. std::vector<T> (whick copies \b data), \b _data must
-         /// outlive \b this, and modifying items also modifies \b _data!
+        /// constructor: _rows × _cols matrix with values vdata.
+         /// Unlike e.g. std::vector<T> (whick copies \b data), \b vdata must
+         /// outlive \b this, and modifying items also modifies \b vdata!
          //
-        Matrix(T * _data, ShapeItem _rows, ShapeItem _cols, ShapeItem _dx)
-          : data(_data),
-            rows(_rows),
-            cols(_cols),
+        fMatrix(void * vdata, Crow M, Ccol N, ShapeItem _dx)
+          : data(reinterpret_cast<T *>(vdata)),
+            rows(M),
+            cols(N),
             dx(_dx)
         {}
      
         /// constructor: sub-matrix of \b other with \b new_col_count columns
         /// CAUTION: other must outlive \b this!
-        Matrix(const Matrix & other, ShapeItem new_col_count)
+        fMatrix(const fMatrix & other, ShapeItem new_col_count)
           : data(other.data),
             rows(other.rows),
             cols(new_col_count),
@@ -238,31 +248,31 @@ public:
      
         /// return the sub-matrix starting at row and col.
         /// I.e. \b row col↓this
-        Matrix sub_matrix(Crow row, Crow col)
+        fMatrix sub_matrix(Crow row, Crow col)
            {
              assert(col <= cols && row <= rows);
-             return Matrix(&at(row, col), rows - row, cols - col, dx);
+             return fMatrix(&at(row, col), rows - row, cols - col, dx);
            }
      
         /// return the sub-matrix of size new_len_y: new_len_x.
         /// I.e. \b new_rows new_rows↑this
         /// starting at row 0 and column 0
-        Matrix take(ShapeItem new_rows, ShapeItem new_cols)
+        fMatrix take(ShapeItem new_rows, ShapeItem new_cols)
            {
              assert(new_rows <= rows);
              assert(new_cols <= cols);
-             return Matrix(data, new_rows, new_cols, dx);
+             return fMatrix(data, new_rows, new_cols, dx);
            }
      
         /// return the number of rows of \b this Matrox
         const ShapeItem get_row_count() const
            { return rows; }
      
-        /// return the number of columns of \b this Matrix
+        /// return the number of columns of \b this fMatrix
         const ShapeItem get_column_count() const
            { return cols; }
      
-        /// return the number of items of \b this Matrix
+        /// return the number of items of \b this fMatrix
         const ShapeItem get_item_count() const
            { return rows * cols; }
      
@@ -294,7 +304,8 @@ public:
            { assert(i < rows);
              assert(i < cols);
              return data[i*(1 + dx)]; }
-     
+
+        /// exchange columns \b c1 and \b c2
         void exchange_columns(ShapeItem c1, ShapeItem c2)
            {
              assert(c1 < cols);
@@ -303,8 +314,20 @@ public:
              T * p2 = data + c2*dx;
              loop(r, rows)   exchange(*p1++, *p2++);
            }
+
+           /// transpose member data
+           void transpose_data()
+              {
+                ALL_ROWS(rows)
+                for (Ccol col = row + 1; col < cols; ++col)
+                    {
+                      const T item = at(row, col);
+                      at(row, col) = at(col, row);
+                      at(col, row) = item;
+                    }
+              }
      
-     protected:                        // Matrix<T>
+     protected:                        // fMatrix<T>
         /// the elements of \b this matrix
         T * const data;
      
@@ -318,15 +341,15 @@ public:
         /// this distance is usually called LDx (Leading Dimension of x)
         /// in FORTRAN, e.g. LDA for a FORTRAN matrix A with LDA rows.
         const ShapeItem dx;
-     };                                // Matrix<T>
+     };                                // fMatrix<T>
 
   /// a clone of matrix that destroys itself (used for debugging purpoases)
   template<typename T>
-  class TempMatrix : public Matrix<T>
+  class TempMatrix : public fMatrix<T>
      {
      public:
-        TempMatrix(const Matrix<T> & other)
-          : Matrix<T>(allocate(&other.diag(0),   // = other.data()
+        TempMatrix(const fMatrix<T> & other)
+          : fMatrix<T>(allocate(&other.diag(0),   // = other.data()
                                 other.get_item_count()),
                       other.get_row_count(),
                       other.get_column_count(),
@@ -336,7 +359,7 @@ public:
        
         ~TempMatrix()
            {
-             delete[] Matrix<T>::data;
+             delete[] fMatrix<T>::data;
            }
 
          static T * const allocate(const T * src, int item_count)
@@ -349,6 +372,28 @@ public:
 
 
      };
+
+   /// FORTRAN work memories
+   template<typename T>
+   struct PTVVy
+      {
+        PTVVy(Ccol N);            ///< constructor for N columns
+        ~PTVVy();                 ///< destructor
+        Ccol *      pivot;        ///< column pivot
+        T *         tau;          ///< diagonal elements
+        APL_Float * vn1;          ///< column norms 1
+        APL_Float * vn2;          ///< column norms 2
+        T *         y;            ///< y for larf()
+        T *         work_min;     ///< work_min
+        T *         work_max;     ///< work_max
+
+        /// print the column permutation, Returns \b len
+        int print_pivot(ostream & out, Ccol len, const char * loc) const;
+
+        /// print the diagonal factors, Returns \b len
+        int print_tau(ostream & out, Ccol len, const char * loc) const;
+      };
+
   //==========================================================================
 
   // static real and complex functions. Most functions exist in 2 variants:
@@ -472,22 +517,41 @@ public:
               return norm;
         }
 
-     /// LApack function unm2r
-     template<typename T>
-     static void unm2r(Crow K,
-                       const Matrix<T> & A, const T * tau,
-                       Matrix<T> & C);
+   /// LApack function unm2r. Apply reflectors A(i) to matrix C.
+   template<typename T>
+   static void unm2r(Crow K, const fMatrix<T> & A, PTVVy<T> & ptvvy,
+                     fMatrix<T> & C);
   
+     /// template instantiation wrapper
+     static Value_P invert_DD_UTM(Crow M, Ccol N,
+                                  fMatrix<DD> & QUTM, fMatrix<DD> & QAUG);
+
+     /// template instantiation wrapper
+     static Value_P invert_ZZ_UTM(Crow M, Ccol N,
+                                  fMatrix<ZZ> & QUTM, fMatrix<ZZ> & QAUG);
+
+   template<typename T>
+   static void invert_QUTM(Crow M, Ccol N,
+                           fMatrix<T> & QUTM, fMatrix<T> & QAUG);
+
      /// LApack function ung2r: convert reflectors (in A) to
      /// orthogonal Q (returned in A)
      template<typename T>
-     static void ung2r(Matrix<T> & A, const T * tau);
+     static void ung2r(fMatrix<T> & A, const PTVVy<T> & ptvvy);
 
-     /// dgelsy and zgelsy
+     /// store the orthogonal factor Q HR in Z[1]
      template<typename T>
-     static int gelsy(Matrix<T> & A, Matrix<T> &B, APL_Float rcond,
-                      char * work);
-  
+     static void grab_Q (Value & Z, const fMatrix<T> & B,
+                                    const fMatrix<T> & Rinv,
+                                    const PTVVy<T> & ptvvy);
+
+     /// store the upper triangle matrix UTM of HR in Z[2] and UTM⁻¹ in Z[3]
+     /// return UTM⁻¹ in Rinv,
+     template<typename T>
+     static void grab_R(fMatrix<T> & HR,      // input
+                        Value & Z,            // set Z[2 3]
+                        fMatrix<T> & Rinv);   // R⁻¹ from R
+
    /// dd is 0.0
    static bool is_zero(const DD & dd)
       { return dd == 0.0; }
@@ -504,22 +568,40 @@ public:
    static bool is_complex(const ZZ &)
       { return true; }
 
-   /// workspace for gelsy(). Conceptionally protected,
-   /// but needed fpr debugging purposes.
-   static char * work_gelsy;
-
    static void divide_matrix(Value & Z, bool need_complex, ShapeItem rows,
                              ShapeItem cols_A, const Cell * cA,
                              ShapeItem cols_B, const Cell * cB);
 
-   static void factorize_matrix(Value & Z, bool need_complex, ShapeItem rows,
-                                ShapeItem cols, const Cell * cB,
-                                APL_Float rcond);
+   /// template instantiation wrapper
+   static void factorize_DD_matrix(Value & Z, ShapeItem rows, ShapeItem cols,
+                                   const Cell * cB, APL_Float rcond);
 
-   // undo pivoting of col in pivot of length \n len
-   static Ccol un_pivot(const Ccol * pivot, int len, Ccol col);
+   /// template instantiation wrapper
+   static void factorize_ZZ_matrix(Value & Z, ShapeItem rows, ShapeItem cols,
+                                   const Cell * cB, APL_Float rcond);
 
 protected:   // class LA_pack
+   /// compute the inverse of the upper triangular matrix \b utm.
+   /// On return: the inverse of qutm is stored in qaug and utm was destroyed.
+   /*  NOTES:
+       1.  fMatrix utm is actually M×N but rows N..M are 0 so that inverting
+           the upper N×N matix suffices.
+
+       2.  The items below the diagonal of utm are only conceptionaly 0 and
+           may in fact be ≠ 0 (e.g. the Q portion of a QR factorization).
+           However, invert_QUTM() does not access these items and only
+           sets columns 1..N of qaug. The caller is responsible for setting
+           columns N..M to 0.
+    */
+   template<typename T>
+   static Value_P invert_UTM(Crow M, Ccol N,
+                             fMatrix<T> & QUTM, fMatrix<T> & QAUG);
+
+   // factorize B
+   template<typename T>
+   static void factorize_matrix(Value & Z, ShapeItem rows, ShapeItem cols,
+                                const Cell * cB, APL_Float rcond);
+
    /// return the real part of dd (= dd)
    static DD get_real(const DD & dd)
       { return dd; }
@@ -576,24 +658,28 @@ protected:   // class LA_pack
       static ZZ conjugated(const ZZ & zz)
          { return ZZ(zz.real(), - zz.imag()); }
 
+     /// dgelsy and zgelsy
+     template<typename T>
+     static int gelsy(fMatrix<T> & A, fMatrix<T> &B, APL_Float rcond);
+  
      /// dgelsy and zgelsy with nicely scaled A and B
      template<typename T>
-     static int scaled_gelsy(Matrix<T> & A, Matrix<T> & B, double rcond,
-                             char * work);
+     static int scaled_gelsy(fMatrix<T> & A, fMatrix<T> & B, double rcond);
   
      /// estimate the rank of matrix A
      template<typename T>
-     static int estimate_rank(const Matrix<T> & A, APL_Float rcond);
+     static int estimate_rank(const fMatrix<T> & A, APL_Float rcond,
+                              PTVVy<T> & ptvvy);
   
-     /// LApack function geqp3
-     template<typename T>
-     static void geqp3(Matrix<T> & A, Ccol * pivot, T * tau);
-  
-     /// LApack function laqp2: computes a QR factorization with column pivoting
+     /// LApack function laqp2: computes a QR factorization with
+     /// column pivoting
      /// pivoting of the matrix A
      template<typename T>
-     static void laqp2(Matrix<T> & A, Ccol * pivot,
-                       T * tau, APL_Float * vn1_vn2);
+     static void laqp2(fMatrix<T> & A, const PTVVy<T> & ptvvy);
+
+     /// something like laqp2() without column pivoting
+     template<typename T>
+     static void geqp3(fMatrix<T> & A, const PTVVy<T> & ptvvy);
 
      /** LApack function laic1 (estimate largest singular value).
          apply one step of incremental condition estimation.
@@ -620,59 +706,27 @@ protected:   // class LA_pack
   
      /// LApack function trsm. Solve A ∘ X[;1:NRHS] = B[;1:NRHS]
      template<typename T>
-     static void trsm(const Matrix<T> & A, Matrix<T> & B, Ccol NRHS);
+     static void trsm(const fMatrix<T> & A, fMatrix<T> & B, Ccol NRHS);
   
     /// LApack functions iladlc and ilaclc.
     /// Scan matrix A for its last non-zero column (+ 1).
      template<typename T>
-     static Ccol ila_lc(Crow M, const Matrix<T> & A);
+     static Ccol ila_lc(Crow M, const fMatrix<T> & A);
   
-     /// LApack function gemv. y := alpha*A*x + beta*y
-     ///                    or y := alpha*A**T*x + beta*y
+     /// LApack function gemv. y := alpha × A  × x   + beta × y
+     ///                    or y := alpha × A° × T*x + beta × y
      template<typename T>
-     static inline void gemv(int M, int N, const Matrix<T> & C,
+     static inline void gemv(int M, int N, const fMatrix<T> & C,
                              const T * v, size_t len_v, T * y, size_t len_Y);
  
-     /// LApack function gerc: A := alpha * x * y* * H + A,
+     /// LApack function gerc: A := alpha * x * y° * H + A,
      template<typename T>
      static void gerc(int M, int N, T ALPHA, const T * x, size_t len_X,
-                      const T * y, size_t len_Y, Matrix<T> & C);
+                      const T * y, size_t len_Y, fMatrix<T> & C);
  
-     /// split the result of a QR factorization into Z[1] = Q, Z[1] = R,
-     /// and Z[2] = R⁻¹.
-     template<typename T>
-     static void split_HR(Value & Z, const LA_pack::Matrix<T> & HR,
-                                     const Ccol * pivot, const T * tau);
-
      // LApack function larf: apply one elementary reflector v to matrix C
      template<typename T>
      static void larf(const T * v, size_t len_v,   // reflector
-                      T tau, Matrix<T> & C);
-
-   /// return the LApack workspace size (in bytes) needed by gelsy and its
-   /// subfunctions.
-   template<typename T>
-   static char * allocate_workspace(Ccol N);
-
-   /* workspace pointers... We allocate a single char * work for all of them.
-      The function call structure is something like:
-
-       ┌── scaled_gelsy(N)               uses: work_scaled_gelsy
-       │     ││
-       │     │└─── geqp3(N)              uses: work_geqp3
-       └──←──┘       ││
-                     │├─── larf(N)       uses: work_larf
-                     ││     ...
-                     │└─── larf(1)       uses: work_larf
-                     │
-                   estimate_rank(N)      uses: work_geqp3
-
-      Therefore geqp3() and estimate_rank() can use the same memory,
-      while scaled_gelsy() and and larf() need a separate memories
-    */
-
-   static char * work_geqp3;   ///< workspace for geqp3() and estimate_rank()
-#define work_estimate_rank work_geqp3   /**< alias */
-   static char * work_larf;    ///< workspace for larf()
+                      T tau, fMatrix<T> & C, const PTVVy<T> & ptvvy);
 };
 //============================================================================

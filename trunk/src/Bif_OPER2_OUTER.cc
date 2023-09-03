@@ -100,7 +100,7 @@ Value_P Z(shape_Z, LOC);
                APL_Float real = 0;
                APL_Float imag = 0;
                bool need_complex = false;
-               loop(ab, len_AB)   // column of A and row of B
+               loop(ab, len_AB)   // column of A × row of B
                   {
                     const Cell & aa = *(cA + ab);
                     const Cell & bb = *(cB + ab*cols_B);
@@ -110,13 +110,17 @@ Value_P Z(shape_Z, LOC);
                          need_complex = true;
                          if (bb.is_complex_cell())   // complex aa and bb
                             {
-                              real -= aa.get_imag_value() * bb.get_imag_value();
-                              imag += aa.get_real_value() * bb.get_imag_value();
-                              imag += aa.get_imag_value() * bb.get_real_value();
+                              real -= aa.get_imag_value() *
+                                      bb.get_imag_value();
+                              imag += aa.get_real_value() *
+                                      bb.get_imag_value();
+                              imag += aa.get_imag_value() *
+                                      bb.get_real_value();
                             }
                          else                        // complex aa and real bb
                             {
-                              imag += aa.get_imag_value() * bb.get_real_value();
+                              imag += aa.get_imag_value() *
+                                      bb.get_real_value();
                             }
                        }
                     else if (bb.is_complex_cell())   // real aa and complex bb

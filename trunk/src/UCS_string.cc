@@ -1512,6 +1512,8 @@ UCS_string::from_double_to_fixed(APL_Float v, int fract_digits)
 UCS_string ret;
    if (v < 0.0)   { ret.append(UNI_OVERBAR);   v = - v; }
 
+   Assert(v >= 0.0);
+
    // store the integer part of v in ret, leaving the fract part in v.
    //
    ret.append(from_big(v));   // from_big() leaves fractional part of v in v

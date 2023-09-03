@@ -6,8 +6,10 @@
 ErrorCode
 NumericCell::zV(Cell * Z, APL_Float flt)
 {
-   return is_near_int64_t(flt) ? IntCell::zI(Z, flt)
-                               : FloatCell::zF(Z, flt);
+   if (!is_near_int64_t(flt))   return FloatCell::zF(Z, flt);
+
+   return flt < 0 ? IntCell::zI(Z, -int64_t(0.5 - flt))
+                  : IntCell::zI(Z,  int64_t(0.5 + flt));
 }
 //----------------------------------------------------------------------------
 ErrorCode

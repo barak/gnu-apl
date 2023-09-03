@@ -8,7 +8,8 @@ ASCIIDOC = \
     GNU-APL-Memory-Management.asciidoc  \
     GNU-APL-Troubleshooting.asciidoc    \
     GNU-APL-Designers-Guide.asciidoc    \
-    GNU-APL-Performance.asciidoc
+    GNU-APL-Performance.asciidoc        \
+    LApack-primer.asciidoc
 
 HTML = \
     APL-Communication-Cookbook.html \
@@ -17,12 +18,17 @@ HTML = \
     GNU-APL-Memory-Management.html  \
     GNU-APL-Troubleshooting.html    \
     GNU-APL-Designers-Guide.html    \
-    GNU-APL-Performance.html
+    GNU-APL-Performance.html        \
+    LApack-primer.html
 
+# Makefile.am produces all .pdf and .html files, but not all of them
+# shall be distributed...
+#
 dist_doc_DATA = \
     $(HTML)              \
     $(ASCIIDOC)          \
     APL-on-Macintosh.pdf \
+    LApack-primer.pdf    \
     Parallel-APL.pdf     \
     glade-0.png          \
     glade-1.png          \
@@ -42,6 +48,10 @@ dist_doc_DATA = \
     APL3.png             \
     APL4.png             \
     APL5.png
+
+# internal documentation (build but do not sidtribute)
+#
+all: LApack-primer.pdf
 
 # use asciidoc (if installed) to convert .asciidoc to .html
 # The .html has a stupid <noscript> tag that needs to be removed

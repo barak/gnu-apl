@@ -1120,6 +1120,12 @@ bool has_complex = false;
         if (!cell.is_real_cell())   DOMAIN_ERROR;
 
         APL_Float value = cB[r*cols].get_real_value();
+        if (!isfinite(value))
+           {
+             MORE_ERROR() << "infinite number: "
+                          << value << " in A⍕B (by specification)";
+             DOMAIN_ERROR;
+           }
 
         if (precision >= 0)   // integer or floating format
           {
