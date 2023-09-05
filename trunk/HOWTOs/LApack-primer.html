@@ -1670,123 +1670,166 @@ In the QR factorization: for every column of <strong>B</strong>:
 <div class="sect1">
 <h2 id="_with_axis_qr_factorization">⌹ with axis: QR factorization</h2>
 <div class="sectionbody">
+<div class="paragraph"><p>The first non-trivial thing that happens in monadic <strong>⌹B</strong> and in dyadic <strong>A⌹B</strong>
+is a <em>QR-factorization</em> of matrix <strong>B</strong>. A QR factorization of a matrix B is
+a pair <strong>(Q R)</strong> of matrices with the following properties:</p></div>
+<div class="olist arabic"><ol class="arabic">
+<li>
+<p>
+<strong>Q</strong> is orthogonal (resp. Hermitian if B is complex),
+</p>
+</li>
+<li>
+<p>
+<strong>R</strong> is upper triangular, and
+</p>
+</li>
+<li>
+<p>
+<strong>B ≡ Q ∘ R</strong>
+</p>
+</li>
+</ol></div>
+<div class="paragraph"><p>The same matrix <strong>B</strong> may have different QR factorizations with the above
+properties. And different factorization algorithms may produce different
+pairs <strong>(Q R)</strong> for the same matrix <strong>B</strong>.</p></div>
 <div class="paragraph"><p>Often the orthogonal <strong>Q</strong> and/or the upper triangular <strong>R</strong> of a factorization
 <strong>B=Q∘R</strong> is more valuable than the final result <strong>B⁻¹=R⁻¹∘Q⁻¹</strong> of <strong>⌹B</strong> or
 <strong>A⌹B</strong>. For this reason GNU APL provides <strong>⌹[X]</strong> as to obtain the matrices
-<strong>Q</strong>  and <strong>R</strong> without applying them (i.e. in order to solve <strong>A∘X=B</strong>).</p></div>
-<div class="paragraph"><p>The result of <strong>⌹[X] B</strong> is a triple</p></div>
-<div class="listingblock">
-<div class="content">
-<pre>
-
-<code>      (Q R Rinv) ← ⌹[X] B</code>
-
-</pre>
-</div></div>
-<div class="paragraph"><p>where:</p></div>
-<div class="ulist"><ul>
-<li>
-<p>
-<strong>Q</strong> is orthogonal (resp. Hermitian), i.e. <strong>Q⁻¹ = +⍉Q</strong>
-</p>
-</li>
-<li>
-<p>
-<strong>R</strong> is upper triangular, i.e. <strong>R[i;j] = 0</strong> for all <strong>i &gt; j</strong>, and
-</p>
-</li>
-<li>
-<p>
-<strong>Rinv</strong> is <strong>R⁻¹</strong> as a matter of convenience for the programmer.
-</p>
-</li>
-</ul></div>
-<div class="paragraph"><p>GNU APL currently provides two different implementations with slightly
-different properties:</p></div>
+<strong>Q</strong>  and <strong>R</strong> without applying them (i.e. in order to solve <strong>A∘X=B</strong>). As
+a matter of convenience for the programmer, GNU APL not only computes
+the pair <strong>(Q R)</strong>, but a triple <strong>(Q, R, Rinv)</strong> where <strong>Rinv ≡ ⌹R</strong>. One could,
+of course, compute <strong>Rinv</strong> from <strong>R</strong> in APL with ⌹. But <strong>Rinv</strong> is anyhow
+computed in the QR factorization of <strong>B</strong> and therefore it is more efficient
+to return it together with <strong>R</strong> rather than computing it after <strong>R</strong> (which
+would QR-factorize <strong>B</strong> one more time).</p></div>
+<div class="paragraph"><p>GNU APL has implemented two different algorithms for the QR-factorization
+of a matrix <strong>B</strong>, which produce slightly diffferent results.</p></div>
 <div class="olist arabic"><ol class="arabic">
 <li>
 <p>
-The implementation used by default is a direct translation from an APL
-  algorithm to C++. The APL algorithm was published by <strong>Garry Helzer</strong> in
-  <strong>APL Quote Quad, Volume 9, Issue 3, 1979</strong>. The GNU APL C++ function
-  that implements the Helzer algorithm is <strong>Bif_F12_DOMINO::householder()</strong>.
+The first algorithm is based on a factorization algorithm publiashed by
+  <strong>Garry Helzer</strong> in <strong>APL Quote Quad, Volume 9, Issue 3, 1979</strong>, and
 </p>
 </li>
 <li>
 <p>
-The other implemnation uses the LApack function <strong>geqp3()</strong>, which is,
-  in GNU APL, function <strong>laqp2()</strong> with the column pivoting removed.
-</p>
-</li>
-<li>
-<p>
-The selection as to which algorith shall be used is controlled by macro
-  <strong>QR_HELZER</strong> at the beginning of file <strong>LApack.hh</strong>.
+the second algorithm is, like monadic and dyadic ⌹, based on LApack
+  function <strong>laqp2()</strong>  but with column privoting disabled.
 </p>
 </li>
 </ol></div>
-<div class="paragraph"><p>In theory a purely LApack based QR factorization should have a slightly
-better performance and/or numerical stability. This is because LApack has
-put a considerable effort into numerical border cases (while the Helzer
-algorithm merely sets near-0 matrix items to 0). Reusing that effort
-could be beneficial for QR factorization as well.</p></div>
-<div class="paragraph"><p>There are some subtle differences between the the Helzer algorithm and the
-LApack based version:</p></div>
+<div class="paragraph"><p>The algorithm to be used is selected with axis argument <strong>X</strong> as follows:</p></div>
 <div class="olist arabic"><ol class="arabic">
 <li>
 <p>
-Both compute a factorization <strong>B=Q∘R</strong> as required. If the matrix <strong>B</strong> is
-  quadratic, i.e. <strong>⍴B ←→ N N</strong>, then they produce essentially the same
-  result. However, let <strong>⍴B ←→ M N</strong> with <strong>M≠N</strong>. Then:
-</p>
-<div class="olist loweralpha"><ol class="loweralpha">
-<li>
-<p>
-The Helzer algorithm computes a matrix <strong>Q</strong> with <strong>Q∘⍉Q ←→ ID(n)</strong> and
-  <strong>(Q∘⍉Q) ←→ ID(n)</strong>.
+Integer scalar 1 selects Garry Helzer&#8217;s algorithm,
 </p>
 </li>
 <li>
 <p>
-The Lapack algorithm computes a matrix <strong>Q</strong> with <strong>(⍉Q)∘Q ←→ ID(n)</strong> but
-   <em>not</em> <strong>(Q∘⍉Q) ←→ ID(n)</strong>.
+Integer scalar 2 selects the laqp2() algorithm, and
+</p>
+</li>
+<li>
+<p>
+(obsolete) a small real scalar like ⎕CT also selects Garry Helzer&#8217;s
+  algorithm. This is for backward compatibility with older GNU APL
+  versions (that always used Garry Helzer&#8217;s algorithm).
 </p>
 </li>
 </ol></div>
-</li>
-<li>
-<p>
-These differences are apparently caused caused by differen rsult shapes
-  and zero-padding:
-</p>
-<div class="olist loweralpha"><ol class="loweralpha">
-<li>
-<p>
-<strong>⍴Q ←→ M M</strong> for Helzer and <strong>⍴Q ←→ M N</strong> for LApack,
-</p>
-</li>
-<li>
-<p>
-<strong>⍴R ←→ M N</strong> for Helzer and <strong>⍴Q ←→ N N</strong> for LApack. The additional
-   items in Helzer are 0 (since <strong>R</strong> is upper triangualar.
-</p>
-</li>
-<li>
-<p>
-As a consequence, <strong>⍴Rinv ←→ N M</strong> for Helzer and <strong>⍴Q ←→ N N</strong> for LApack.
-</p>
-</li>
-</ol></div>
-</li>
-<li>
-<p>
-Apart from that are the matrix items that are present in both cases the
-  same.
-</p>
-</li>
-</ol></div>
-<div class="paragraph"><p>In the non-quadratic case one can simply <strong>M N↑Q</strong> and <strong>N N↑R</strong> to convert the
-the Helzer <strong>Q</strong> and <strong>R</strong> into the LApack <strong>Q</strong> and <strong>R</strong>, but not vice versa.</p></div>
+<div class="paragraph"><p>For quadratic matrices <strong>B</strong>, i.e. for <strong>⍴B ←→ N N</strong>,  are the results of the
+two algorithms, apart from rounding errors, identical.</p></div>
+<div class="paragraph"><p>For non-quadratic matrices <strong>B</strong> with shapes <strong>⍴B ←→ M N</strong> with M &gt; N,
+the results differ as follows:</p></div>
+<div class="tableblock">
+<table rules="all"
+width="100%"
+frame="border"
+cellspacing="0" cellpadding="4">
+<col width="11%" />
+<col width="22%" />
+<col width="22%" />
+<col width="44%" />
+<thead>
+<tr>
+<th align="center" valign="top">                </th>
+<th align="center" valign="top"> Helzer   </th>
+<th align="center" valign="top"> laqp2() </th>
+<th align="left" valign="top"> Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td align="center" valign="top"><p class="table"><strong>axis X</strong></p></td>
+<td align="center" valign="top"><p class="table">1</p></td>
+<td align="center" valign="top"><p class="table">2</p></td>
+<td align="left" valign="top"><p class="table"></p></td>
+</tr>
+<tr>
+<td align="center" valign="top"><p class="table"><strong>⍴Q</strong></p></td>
+<td align="center" valign="top"><p class="table">M M</p></td>
+<td align="center" valign="top"><p class="table">M N</p></td>
+<td align="left" valign="top"><p class="table">rows N+1 .. M non-zero</p></td>
+</tr>
+<tr>
+<td align="center" valign="top"><p class="table"><strong>⍴R</strong></p></td>
+<td align="center" valign="top"><p class="table">M N</p></td>
+<td align="center" valign="top"><p class="table">N N</p></td>
+<td align="left" valign="top"><p class="table">rows N+1 .. M padded with 0</p></td>
+</tr>
+<tr>
+<td align="center" valign="top"><p class="table"><strong>⍴Rinv</strong></p></td>
+<td align="center" valign="top"><p class="table">N M</p></td>
+<td align="center" valign="top"><p class="table">N N</p></td>
+<td align="left" valign="top"><p class="table">columns N+1 .. M padded with 0</p></td>
+</tr>
+<tr>
+<td align="center" valign="top"><p class="table"><strong>⍴Q∘R</strong></p></td>
+<td colspan="2" align="center" valign="top"><p class="table">⍴B</p></td>
+<td align="left" valign="top"><p class="table"></p></td>
+</tr>
+<tr>
+<td align="center" valign="top"><p class="table"><strong>N N↑R</strong></p></td>
+<td colspan="2" align="center" valign="top"><p class="table">Same</p></td>
+<td align="left" valign="top"><p class="table"></p></td>
+</tr>
+<tr>
+<td align="center" valign="top"><p class="table"><strong>N N↑Rinv</strong></p></td>
+<td colspan="2" align="center" valign="top"><p class="table">Same</p></td>
+<td align="left" valign="top"><p class="table"></p></td>
+</tr>
+<tr>
+<td align="center" valign="top"><p class="table"><strong>(⍉Q)∘Q</strong></p></td>
+<td colspan="2" align="center" valign="top"><p class="table">ID N</p></td>
+<td align="left" valign="top"><p class="table">ID N ←→ (⍳N)∘.=(⍳N)</p></td>
+</tr>
+<tr>
+<td align="center" valign="top"><p class="table"><strong>Q∘(⍉Q)</strong></p></td>
+<td align="center" valign="top"><p class="table">ID N</p></td>
+<td align="center" valign="top"><p class="table">≠ ID N</p></td>
+<td align="left" valign="top"><p class="table"></p></td>
+</tr>
+<tr>
+<td align="center" valign="top"><p class="table"><strong>Rinv∘R</strong></p></td>
+<td colspan="2" align="center" valign="top"><p class="table">ID N</p></td>
+<td align="left" valign="top"><p class="table"></p></td>
+</tr>
+<tr>
+<td align="center" valign="top"><p class="table"><strong>R∘Rinv</strong></p></td>
+<td align="center" valign="top"><p class="table">M M↑ID N</p></td>
+<td align="center" valign="top"><p class="table">ID N</p></td>
+<td align="left" valign="top"><p class="table"></p></td>
+</tr>
+</tbody>
+</table>
+</div>
+<div class="paragraph"><p>For bread and butter applications is Helzer probably the alternative
+that is simpler to use. Lapack puts quite some effort into performance
+optimizations and numerical border cases.  Therefore the LApack alternative
+might be better suited for large matrices or when precision should become
+an issue.</p></div>
 </div>
 </div>
 </div>
@@ -1794,7 +1837,7 @@ the Helzer <strong>Q</strong> and <strong>R</strong> into the LApack <strong>Q</
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2023-09-03 20:00:28 CEST
+ 2023-09-05 16:20:53 CEST
 </div>
 </div>
 </body>

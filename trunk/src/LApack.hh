@@ -68,7 +68,7 @@
 
 /// use (1) or don't (0) Garry Hetzer's QR ifactorization algorithm
 //
-#define QR_HELZER     1   /* in Bif_F12_DOMINO.cc */
+#define QR_HELZER     0   /* in Bif_F12_DOMINO.cc */
 # define LA_DEBUG     0   /* LApack.cc */
 # define DOMINO_DEBUG 0   /* Bif_F12_DOMINO::householder */
 
@@ -377,7 +377,8 @@ public:
    template<typename T>
    struct PTVVy
       {
-        PTVVy(Ccol N);            ///< constructor for N columns
+        /// constructor for N column matrices
+        PTVVy(Ccol N, bool with_pivot);
         ~PTVVy();                 ///< destructor
         Ccol *      pivot;        ///< column pivot
         T *         tau;          ///< diagonal elements
@@ -519,7 +520,7 @@ public:
 
    /// LApack function unm2r. Apply reflectors A(i) to matrix C.
    template<typename T>
-   static void unm2r(Crow K, const fMatrix<T> & A, PTVVy<T> & ptvvy,
+   static void unm2r(Crow K, const fMatrix<T> & A, const PTVVy<T> & ptvvy,
                      fMatrix<T> & C);
   
      /// template instantiation wrapper
@@ -599,7 +600,7 @@ protected:   // class LA_pack
 
    // factorize B
    template<typename T>
-   static void factorize_matrix(Value & Z, ShapeItem rows, ShapeItem cols,
+   static sRank factorize_matrix(Value & Z, ShapeItem rows, ShapeItem cols,
                                 const Cell * cB, APL_Float rcond);
 
    /// return the real part of dd (= dd)
@@ -660,26 +661,21 @@ protected:   // class LA_pack
 
      /// dgelsy and zgelsy
      template<typename T>
-     static int gelsy(fMatrix<T> & A, fMatrix<T> &B, APL_Float rcond);
+     static sRank gelsy(fMatrix<T> & A, fMatrix<T> &B, APL_Float rcond);
   
      /// dgelsy and zgelsy with nicely scaled A and B
      template<typename T>
-     static int scaled_gelsy(fMatrix<T> & A, fMatrix<T> & B, double rcond);
+     static sRank scaled_gelsy(fMatrix<T> & A, fMatrix<T> & B, double rcond);
   
      /// estimate the rank of matrix A
      template<typename T>
-     static int estimate_rank(const fMatrix<T> & A, APL_Float rcond,
-                              PTVVy<T> & ptvvy);
+     static sRank estimate_rank(const fMatrix<T> & A, APL_Float rcond,
+                                PTVVy<T> & ptvvy);
   
      /// LApack function laqp2: computes a QR factorization with
-     /// column pivoting
-     /// pivoting of the matrix A
+     /// column pivoting of the matrix A
      template<typename T>
-     static void laqp2(fMatrix<T> & A, const PTVVy<T> & ptvvy);
-
-     /// something like laqp2() without column pivoting
-     template<typename T>
-     static void geqp3(fMatrix<T> & A, const PTVVy<T> & ptvvy);
+     static void laqp2(fMatrix<T> & A, PTVVy<T> & ptvvy);
 
      /** LApack function laic1 (estimate largest singular value).
          apply one step of incremental condition estimation.
@@ -702,31 +698,31 @@ protected:   // class LA_pack
      /// LApack function larfg. It generates an elementary reflector
      /// (aka. a Householder matrix). Return the scalar tau.
      template<typename T>
-     static T larfg(Ccol N, T * X, size_t len_X);
+     static T larfg(Ccol N, T * X, Crow len_X);
   
      /// LApack function trsm. Solve A ∘ X[;1:NRHS] = B[;1:NRHS]
      template<typename T>
      static void trsm(const fMatrix<T> & A, fMatrix<T> & B, Ccol NRHS);
   
-    /// LApack functions iladlc and ilaclc.
-    /// Scan matrix A for its last non-zero column (+ 1).
+    /// LApack functions ILADLC (double) and ILACLC (complex).
+    /// Scan matrix \b A for its last non-zero column in its first \b M rows
      template<typename T>
-     static Ccol ila_lc(Crow M, const fMatrix<T> & A);
+     static inline Ccol ila_lc(Crow M, const fMatrix<T> & A);
   
-     /// LApack function gemv. y := alpha × A  × x   + beta × y
-     ///                    or y := alpha × A° × T*x + beta × y
+     /// LApack functions DGEMV and ZGEMV. Let CC←M N↑C. Multiply every column
+     /// of CC with v and add up the products.
      template<typename T>
-     static inline void gemv(int M, int N, const fMatrix<T> & C,
-                             const T * v, size_t len_v, T * y, size_t len_Y);
+     static inline void gemv(const fMatrix<T> & C, Crow M, Ccol N,
+                             const T * v, T * y);
  
-     /// LApack function gerc: A := alpha * x * y° * H + A,
+     /// LApack function gerc. Multiply the submatrix M N↑C of C with:
+     /// scalar ALPHA, row vector y, and column vector x.
      template<typename T>
-     static void gerc(int M, int N, T ALPHA, const T * x, size_t len_X,
-                      const T * y, size_t len_Y, fMatrix<T> & C);
+     static void gerc(fMatrix<T> & C, Crow M, Ccol N,
+                      T ALPHA, const T * x, const T * y);
  
      // LApack function larf: apply one elementary reflector v to matrix C
      template<typename T>
-     static void larf(const T * v, size_t len_v,   // reflector
-                      T tau, fMatrix<T> & C, const PTVVy<T> & ptvvy);
+     static void larf(const T * v, T tau, fMatrix<T> & C, T * y);
 };
 //============================================================================

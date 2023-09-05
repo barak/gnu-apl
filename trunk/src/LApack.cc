@@ -79,7 +79,7 @@ inline void next_Cell(Value_P & value, const LA_pack::ZZ & zz)
              ├─── laqp2<T>(A, pivot, tau)
              │    │
              │    ├─── larfg<T>('Left', N, X)
-             │    └─── larf<T>(v, len_v, tau, C)
+             │    └─── larf<T>(v, tau, C)
              │
              ├─── estimate_rank(A, rcond)
              │
@@ -136,7 +136,8 @@ inline void next_Cell(Value_P & value, const LA_pack::ZZ & zz)
 
 static const APL_Float small_number = dlamch_S / dlamch_P;    // 1.00208E¯292
 static const APL_Float big_number   = 1.0 / small_number;     // 9.97923E291
-static const APL_Float safe_min     =  dlamch_S / dlamch_E;   // 2.00417E¯292
+static const APL_Float pos_safe_min =  dlamch_S / dlamch_E;   // 2.00417E¯292
+static const APL_Float neg_safe_min =  -dlamch_S / dlamch_E;  // -2.00417E¯292
 static const APL_Float tol3z        = sqrt(dlamch_E);         // 1.05367E¯8
 #undef dlamch_S
 #undef dlamch_P
@@ -284,7 +285,7 @@ void LA_pack::factorize_ZZ_matrix(Value & Z, ShapeItem rows, ShapeItem cols,
 /// the implementation of Z←⌹[X]B, where Z is (Q T T⁻¹) and B = T∘Q.
 //
 template<typename T>
-void LA_pack::factorize_matrix(Value & Z, ShapeItem M, ShapeItem N,
+sRank LA_pack::factorize_matrix(Value & Z, ShapeItem M, ShapeItem N,
                                const Cell * cB, APL_Float rcond)
 {
    // work sizes...
@@ -327,16 +328,23 @@ const bool cplx = is_complex(*bb);
    // work_HR is a copy of B, subject to in-place modification by LApack,
    // and C allocated but not initialized,
    //
-PTVVy<T> ptvvy(M);   // M !!
+PTVVy<T> ptvvy(M, false);   // M !!
    LA_DEBUG && ptvvy.print_pivot(CERR, N, LOC);
 
 #if LA_DEBUG
-DebugMatrix HR_before("HR_before geqp3()", HR);
-   geqp3<T>(HR, ptvvy);
-   print_QR("HR after geqp3() at " LOC, HR_before, HR, ptvvy);
+DebugMatrix HR_before("HR_before laqp2()", HR);
+   laqp2<T>(HR, ptvvy.y);
+   print_QR("HR after laqp2() at " LOC, HR_before, HR, ptvvy);
 #else
-   geqp3<T>(HR, ptvvy);
+   laqp2<T>(HR, ptvvy);
 #endif
+
+   // Determine the RANK of HR using incremental condition estimation
+   //
+   {
+     const int RANK_HR = estimate_rank(HR, rcond, ptvvy);
+     if (RANK_HR < N)   return RANK_HR;
+   }
 
    // extract the upper triangular matrix R of HR into Z[2] and its
    // inverse R⁻¹ into Z[3].  Return R⁻¹ in Ri (destroys R).
@@ -346,6 +354,7 @@ DebugMatrix HR_before("HR_before geqp3()", HR);
    grab_Q<T>(Z, B, Ri, ptvvy);
 
    delete work_B;
+   return N;
 }
 //----------------------------------------------------------------------------
 template<typename T>
@@ -361,8 +370,6 @@ void LA_pack::grab_Q (Value & Z, const fMatrix<T> & B,
       Q CMP ((B∘P)∘Rinv)               ⍝ → Same
 
       Q[row;col] CMP  +/(,B[row;]∘P) × Rinv[;col]   ⍝ Same
-
-
     */
 const Crow M = B.get_row_count();
 const Crow N = B.get_column_count();
@@ -586,15 +593,16 @@ print_matrix("  QUTM before invert_QUTM()", QUTM);
    print_matrix("QAUG after invert_T_UTM()", QAUG);
 }
 //----------------------------------------------------------------------------
-/*  LApack function laqp2. Compute a QR factorization with column pivoting
-    of matrix A:
+/*  LApack function laqp2. Compute a QR factorization with or without
+ *    column pivoting of matrix A:
 
     A ∘ P = Q ∘ R
+    A     = Q ∘ R
 
     P is the permutation of columns produced by the pivoting.
  */
 template<typename T>
-void LA_pack::laqp2(fMatrix<T> & A, const PTVVy<T> & ptvvy)
+void LA_pack::laqp2(fMatrix<T> & A, PTVVy<T> & ptvvy)
 {
    print_matrix("laqp2() input", A);
 
@@ -605,25 +613,31 @@ const Ccol N = A.get_column_count();
    // Initialize the pivot and the partial column norms. Moved from geqp3()
    // which no longer exists.
    //
-   ALL_COLS(N)
+   if (ptvvy.pivot)
       {
-        ptvvy.pivot[col] = col;
-        ptvvy.vn1[col] = ptvvy.vn2[col] = sqrt(norm_2(&A.at(0, col), M));
+        ALL_COLS(N)
+           {
+             ptvvy.pivot[col] = col;
+             ptvvy.vn1[col] = ptvvy.vn2[col] = sqrt(norm_2(&A.at(0, col), M));
+           }
       }
 
    ALL_DIAS(N)
       {
-        // pvt_0 is the column at or right of col that has the largest vn1.
-        // If col already has the largest norm: OK, otherwise exchange
-        // columns col and pvt_0 of a and their column norms
-        //
-        const int pvt_0 = dia + max_pos(ptvvy.vn1 + dia, N - dia);
-        if (pvt_0 != dia)   // unless dia already is the pivot column
+        if (ptvvy.pivot)
            {
-             A.exchange_columns(pvt_0, dia);
-             exchange(ptvvy.pivot[pvt_0], ptvvy.pivot[dia]);
-             ptvvy.vn1[pvt_0] = ptvvy.vn1[dia];
-             ptvvy.vn2[pvt_0] = ptvvy.vn2[dia];
+             // pvt_0 is the column at or right of col that has the largest vn1.
+             // If col already has the largest norm: OK, otherwise exchange
+             // columns col and pvt_0 of a and their column norms
+             //
+             const int pvt_0 = dia + max_pos(ptvvy.vn1 + dia, N - dia);
+             if (pvt_0 != dia)   // unless dia already is the pivot column
+                {
+                  A.exchange_columns(pvt_0, dia);
+                  exchange(ptvvy.pivot[pvt_0], ptvvy.pivot[dia]);
+                  ptvvy.vn1[pvt_0] = ptvvy.vn1[dia];
+                  ptvvy.vn2[pvt_0] = ptvvy.vn2[dia];
+                }
            }
 
        /* Generate the elementary reflector H(dia) that annihilates the
@@ -668,8 +682,10 @@ const Ccol N = A.get_column_count();
         const T alpha = ALPHA;           // remember ⍺ = A(dia, dia)
            ALPHA = T(1.0);
            fMatrix<T> SUB = A.sub_matrix(dia, s_X);
-           larf<T>(&A.diag(dia), M - dia, conjugated(tau), SUB, ptvvy);
+           larf<T>(&A.diag(dia),conjugated(tau), SUB, ptvvy.y);
         ALPHA = alpha;                   // restore ⍺ = A(dia, dia)
+
+        if (!ptvvy.pivot)   continue;
 
         // Update the partial column norms vn1 and vn2.
         //
@@ -697,62 +713,6 @@ const Ccol N = A.get_column_count();
                    ptvvy.vn1[c] *= sqrt(temp);
                  }
             }
-      }
-}
-template<typename T>
-void LA_pack::geqp3(fMatrix<T> & A, const PTVVy<T> & ptvvy)
-{
-   print_matrix("geqp3() input", A);
-
-const Crow M = A.get_row_count();
-const Ccol N = A.get_column_count();
-   Assert(M >= N);
-
-   ALL_DIAS(N)
-      {
-       /* Generate the elementary reflector H(dia) that annihilates the
-           column vector X= A(s_X:M, dia), where s_X = dia+1.
-
-               0 → → → dia → → N
-               ↓    ╔═══│═A════╗
-               ↓    ║ \ │      ║
-               ↓    ║  \│      ║
-              dia ──╫───⍺      ║   ⍺: ALPHA aka. X[-1] of reflector X
-           ┬  s_X ──╫   ▒\     ║      len_X is the reflector length
-           │   ↓    ║   ▒ \    ║      (=number fo items below ALPHA)
-           │   ↓    ║   ▒  \   ║ 
-         len   ↓    ║   X   \  ║ 
-           │   ↓    ║   ▒    \ ║
-           │   N  ──╫───▒──────╫── N
-           │        ║   ▒      ║ 
-           ┴   M    ╚═══╪══════╝
-                       dia     
-         */
-        const Crow s_X   = dia + 1;   // start of X = row below diag(dia)
-        const Crow len_X = M - s_X;   // length of reflector X
-        const T tau = len_X ? larfg<T>(M - dia, &A.at(s_X, dia), len_X) : 0.0;
-
-        /* Apply H(dia)° × H to A(offset+i:m, i+1:n) from the left.
-
-           0→ → → dia → → N
-           ↓  ╔════╪═A═════╗
-           ↓  ║ \  │       ║
-           ↓  ║  \ │       ║
-           ↓  ║   \│       ║ 
-          dia ║    ⍺┌──────╢   ⍺: Acc = A.diag(dia) := 1.0
-           ↓  ║     │      ║ 
-           ↓  ║     │ SUB  ║ 
-           N  ║     │      ║ 
-              ║     │      ║ 
-           M  ╚═════╪══════╝
-                  dia+1     
-         */
-        T & ALPHA = A.diag(dia);
-        const T alpha = ALPHA;           // remember ⍺ = A(dia, dia)
-           ALPHA = T(1.0);
-           fMatrix<T> SUB = A.sub_matrix(dia, s_X);
-           larf<T>(&A.diag(dia), M - dia, conjugated(tau), SUB, ptvvy);
-        ALPHA = alpha;                   // restore ⍺ = A(dia, dia)
       }
 }
 //----------------------------------------------------------------------------
@@ -816,7 +776,7 @@ const Ccol N = A.get_column_count();
     computed and returned.
  */
 template<typename T>
-int LA_pack::gelsy(fMatrix<T> & A, fMatrix<T> & B, APL_Float rcond)
+sRank LA_pack::gelsy(fMatrix<T> & A, fMatrix<T> & B, APL_Float rcond)
 {
 const Crow M = B.get_row_count();
 const Ccol N = B.get_column_count();
@@ -853,7 +813,7 @@ APL_Float un_scale_A = 1.0;
    // do the work.
    //
    {
-     const int RANK = scaled_gelsy(B, A, rcond);
+     const sRank RANK = scaled_gelsy(B, A, rcond);
      if (RANK < N)   return RANK;   // this is an error
    }
 
@@ -890,7 +850,7 @@ APL_Float un_scale_A = 1.0;
    On return: result X stored in B and items of A overwritten.
  */ 
 template<typename T>
-int LA_pack::scaled_gelsy(fMatrix<T> & B, fMatrix<T> & A, double rcond)
+sRank LA_pack::scaled_gelsy(fMatrix<T> & B, fMatrix<T> & A, double rcond)
 {
 
    // print_matrix<T>("B", B);
@@ -903,7 +863,7 @@ int LA_pack::scaled_gelsy(fMatrix<T> & B, fMatrix<T> & A, double rcond)
    //
 const Ccol NRHS = A.get_column_count();   // right hand side (of B ∘ X = A)
 const Ccol N    = B.get_column_count();
-PTVVy<T> ptvvy(NRHS > N ? NRHS : N);
+PTVVy<T> ptvvy(NRHS > N ? NRHS : N, true);
    LA_DEBUG && ptvvy.print_pivot(CERR, N, LOC);
 
 /* Compute QR factorization of B with column pivoting: B ∘ P = Q ∘ R
@@ -941,7 +901,7 @@ DebugMatrix B_before("B_before laqp2()", B);
    laqp2<T>(B, ptvvy);
 #endif
 
-   // Determine RANK (of B) using incremental condition estimation
+   // Determine the RANK of B using incremental condition estimation
    //
    {
      const int RANK_B = estimate_rank(B, rcond, ptvvy);
@@ -998,7 +958,7 @@ DebugMatrix B_before("B_before laqp2()", B);
 //----------------------------------------------------------------------------
 /// function estimating the rank of \b A. (simplified part of GELSY)
 template<typename T>
-int LA_pack::estimate_rank(const fMatrix<T> & A, APL_Float rcond,
+sRank LA_pack::estimate_rank(const fMatrix<T> & A, APL_Float rcond,
                            PTVVy<T> & ptvvy)
 {
    /* Determine RANK using incremental condition estimation...
@@ -1097,11 +1057,9 @@ APL_Float smin = smax;
          We use the name unm2r<T> for both.
  */
 template<typename T>
-void LA_pack::unm2r(Crow K, const fMatrix<T> & A, PTVVy<T> & ptvvy,
+void LA_pack::unm2r(Crow K, const fMatrix<T> & A, const PTVVy<T> & ptvvy,
                     fMatrix<T> & C)
 {
-const Crow M = C.get_row_count();
-
    // only case 2 (SIDE == "L" and TRANS = 'C') is needed and implemented.
    // thus NOTRAN is false (and then tau[row] (Q°) is conjugated).
    //
@@ -1128,7 +1086,7 @@ const Crow M = C.get_row_count();
          const T alpha = ALPHA;   // remember A(dia, dia)
              ALPHA = T(1.0);
              fMatrix<T> SUB = C.sub_matrix(dia, 0);
-             larf<T>(&A.diag(dia), M - dia, tau, SUB, ptvvy);
+             larf<T>(&A.diag(dia), tau, SUB, ptvvy.y);
          ALPHA = alpha;           // restore A(dia, dia);
        }
 }
@@ -1265,17 +1223,18 @@ const APL_Float t = b > 0.0 ? square(zeta1) / (b + hypotenuse(b, zeta1))
 
      in the sense that twonorm(L^ × x^) = sestpr.
 
-     Depending on JOB (_MIN resp, _MAX), an estimate for the largest or
-     smallest singular value is computed.
-
+     Depending on JOB (_MIN resp, _MAX), an estimate for the largest resp.
+     smallest singular value is computed (in FORTRAN). To make the code more
+     readable, GNU APL has split the FORTRAN laic1(JOB) into two separate
+     functions laic1_MIN() and laic1_MAX().
 
     Note that [s c]° × H and sestpr° × 2 is an eigenpair of the system
 
-    diag(sest*sest, 0) + [alpha  gamma] * [ conjg(alpha) ]
-                                          [ conjg(gamma) ]
+                                          ⎡ conjg(alpha) ⎤
+    diag(sest*sest, 0) + [alpha  gamma] × ⎢              ⎥
+                                          ⎣ conjg(gamma) ⎦
 
     where  alpha =  x° × H × w.
-
  **/
 template<typename T>
 void LA_pack::laic1_MIN(APL_Float & SEST, T ALPHA, T GAMMA, T & SIN, T & COS)
@@ -1378,7 +1337,7 @@ const APL_Float test = 1.0 + 2.0*(zeta1 - zeta2)*(zeta1 + zeta2);
         const APL_Float t = zeta2_2 / (b + sqrt(abs(b*b - zeta2_2)));
         SIN =   (ALPHA / abs_SEST) / (1.0 - t);
         COS = - (GAMMA / abs_SEST) / t;
-        SEST *= sqrt(t + square(2.0*dlamch_E) * norma);
+        SEST *= sqrt(t + square(2.0 * dlamch_E) * norma);
       }
    else
       {
@@ -1432,7 +1391,7 @@ const APL_Float test = 1.0 + 2.0*(zeta1 - zeta2)*(zeta1 + zeta2);
    and passing it as parameter to larfg.
  */
 template<typename T>
-T LA_pack::larfg(Ccol N, T * X, size_t len_X)
+T LA_pack::larfg(Ccol N, T * X, Crow len_X)
 {
    Assert(N > 0);
    if (N == 1)   return T(0.0);
@@ -1449,37 +1408,37 @@ const APL_Float norm2_X = norm_2(X, len_X);   // ║X║²
    if (ALPHA_i == 0.0 &&                  // ALPHA is real, and
        norm2_X == 0.0)   return T(0.0);   // all x are 0, then H = I.
 
-APL_Float BETA_abs = sqrt(square(ALPHA) + norm2_X);   // length of ║ALPHA, X║
-APL_Float BETA = ALPHA_r < 0.0 ? BETA_abs : -BETA_abs;
+APL_Float BETA_r = sqrt(square(ALPHA) + norm2_X);   // length of ║ALPHA, X║
+   if (ALPHA_r > 0.0)   BETA_r = -BETA_r;           // opposite sign of ALPHA
 
    // scale small BETA (and, with it, X) so that it can be used safely
    //
 int kcnt = 0;
-   if (abs(BETA) < safe_min)
+   if (BETA_r > neg_safe_min && BETA_r < pos_safe_min)
       {
-        const APL_Float inv_safe_min = 1.0 / safe_min;   // 4.98959E291
-        while (abs(BETA) < safe_min)
+        const APL_Float inv_safe_min = 1.0 / pos_safe_min;   // 4.98959E291
+        while (BETA_r > neg_safe_min && BETA_r < pos_safe_min)
            {
              ++kcnt;
              scale(X, len_X, inv_safe_min);    // scale X
-             BETA    *= inv_safe_min;          // scale BETA
+             BETA_r  *= inv_safe_min;          // scale BETA_r
              ALPHA_r *= inv_safe_min;          // scale real(ALPHA)
              ALPHA_i *= inv_safe_min;          // scale imag(ALPHA)
            }
 
         set_real(ALPHA, ALPHA_r);   // update ALPHA
         set_imag(ALPHA, ALPHA_i);   // update ALPHA
-        BETA_abs = sqrt(square(ALPHA) + norm_2(X, len_X));
-        BETA = ALPHA_r < 0.0 ? BETA : -BETA;
+        BETA_r = sqrt(square(ALPHA) + norm_2(X, len_X));
+        if (ALPHA_r > 0.0)   BETA_r = -BETA_r;           // opposite sign of ⍺
       }
 
-T           tau( (  BETA   - ALPHA_r) / BETA);
-   set_imag(tau, ( /*0.0*/ - ALPHA_i) / BETA);   // imag(real BETA) = 0.0
+T           tau( (  BETA_r - ALPHA_r) / BETA_r);
+   set_imag(tau, ( /*0.0*/ - ALPHA_i) / BETA_r);   // BETA_i is 0
 
-   scale(X, len_X, T(1.0) / (ALPHA - BETA));   // scale X
-   loop(k, kcnt)   BETA *= safe_min;           // un-scale small beta
+   scale(X, len_X, T(1.0) / (ALPHA - BETA_r));   // scale X
+   loop(k, kcnt)   BETA_r *= pos_safe_min;       // un-scale small beta
 
-   ALPHA = T(BETA);
+   ALPHA = T(BETA_r);
 
    return tau;
 }
@@ -1537,10 +1496,10 @@ Ccol LA_pack::ila_lc(Crow M, const fMatrix<T> & C)
  
 
        ├──────── N ────────┤
-       ╔═════════════╤═════╗ ┬
+       ╔═════════C═══╤═════╗ ┬
        ║             │     ║ │
        ║           ≠0│  0  ║ M
-       ║      C<T>   │     ║ │
+       ║             │     ║ │
        ║             └─────╢ ┴
        ║            ↑ ↑    ║
        ╚════════════│═│════╝
@@ -1548,47 +1507,89 @@ Ccol LA_pack::ila_lc(Crow M, const fMatrix<T> & C)
                     │ └── ila_lc(M, N, C)
                     └──── !column.is_null(M)   (last non-0 column
     */
-
 const Ccol N = C.get_column_count();
 
    REV_COLS(N)
-   ALL_ROWS(M)
-      if (is_nonzero(C.at(row, k)))   return k + 1;
+   ALL_ROWS(M)   if (is_nonzero(C.at(row, k)))   return k + 1;
 
-   // all columns are 0
-   //
+   /* at this point all columns in the first M rows of C are 0.
+
+       ├──────── N ────────┤
+       ╔═════════C═════════╗ ┬
+       ║                   ║ │
+       ║         0         ║ M
+       ║                   ║ │
+       ╟───────────────────╢ ┴
+       ║ c c c c c c c c c ║
+       ╚═══════════════════╝
+    */
    return 0;
 }
 //----------------------------------------------------------------------------
-/** LApack function gemv. Normally computes one of:
+/* LApack function gemv. Multiply every (conjugated) row vector (+C)[row;]
+   of C with the scalar x[row] and set the scalar y[row] of the result y
+   to the sum of the products.
 
-    y := alpha × A      × x + beta × y   (case 1) or
-    y := alpha × A° × T × x + beta × y   (case 2) or
-    y := alpha × A° × H × x + beta × y   (case 3)   <---
+      ├──────N──────┤            
+    ┬ ╔════╤═╤═+C╤══╤═══╗   ┌───┐
+    │ ║    │ │   │  │   ║   │   │
+    │ ║    │ │   │  │   ║   │   │
+    M ║    │∑│   │  │   ║ × │ x │
+    │ ║    │ │   │  │ 0 ║   │   │
+    │ ║    │ │   │  │   ║   │   │
+    ┴ ╟────┴─┴───┴──┘   ║   └───┘
+      ║     ↓           ║     0  
+      ╚═════↓═══════════╝        
+            ↓    
+      ┌─────────────┐            
+      │      y      │ 0
+      └─────────────┘            
 
-   Constants alpha=1.0 and beta=0.0 were removed, and only the case 3
-   above is needed (and implemented). That is:
+   NOTE: in order to avoid useless sums and products with 0, the caller has
+         computed a submatrix M N↑C of C with non-zero items in C and x.
+         Therefore, in general, M N≤⍴C but N↓y is 0.
 
-   y := A° × H × x
 
+   gemv() is simply one step of some matrix multiplication +/ A[row;]×B[;col].
+   x is the row of some other matrix which is multiplied with every column
+   of C, and the products are then cumulated to produce Y.
  */
 template<typename T>
-inline void LA_pack::gemv(int M, int N, const fMatrix<T> & A,   // A°
-                          const T * x, size_t len_x,           // H 
-                          T * y, size_t len_Y)                 // resilt
+inline void LA_pack::gemv(const fMatrix<T> & C, Crow M, Ccol N,
+                          const T * x, T * y)
 {
    ALL_COLS(N)
        {
-         T tmp(0.0);
-         ALL_ROWS(M)   tmp += conjugated(A.at(row, col)) * x[row];
-         y[col] = tmp;
+         T sum(0.0);
+         ALL_ROWS(M)   sum += conjugated(C.at(row, col)) * x[row];
+         y[col] = sum;
        }
 }
 //----------------------------------------------------------------------------
-/// LApack function gerc: C := alpha × x × y° × H + C.
+/* LApack function gerc. Multiply (scale) every column C[;col]
+   of matrix C with the factor ALPHA × (+y[col]) × x[row].
+
+
+            ├────N────┤            
+            ┌─────────┐            
+            │   +y    │ 0          
+            └─────────┘            
+                  ×                
+                ALPHA
+                  ×                
+            ╔══════C══╤═══╗   ┌───┐ ┬
+            ║         │   ║   │   │ │
+            ║         │   ║   │   │ │
+        C ← ║         │   ║ × │ x │ M
+            ║         │   ║   │   │ │
+            ║         │   ║   │   │ │
+            ╟─────────┘   ║   └───┘ ┴
+            ║             ║     0  
+            ╚═════════════╝        
+ */
 template<typename T>
-void LA_pack::gerc(Crow M, Ccol N, T ALPHA, const T * x, size_t len_X,
-                   const T * y, size_t len_Y, fMatrix<T> & C)
+void LA_pack::gerc(fMatrix<T> & C, Crow M, Ccol N,
+                   T ALPHA, const T * x, const T * y)
 {
    if (!(M && N && is_nonzero(ALPHA)))   return;
 
@@ -1604,95 +1605,119 @@ void LA_pack::gerc(Crow M, Ccol N, T ALPHA, const T * x, size_t len_X,
 /** LApack function larf: applies the elementary reflector H to the
     rectangular matrix C.
 
-   LARF applies a elementary reflector H to an M-by-N matrix C,
-   from either the left or the right. H is represented in the
-   form
+   LARF applies an elementary reflector H to an M-by-N matrix C,
+   from either the left or the right. The Householder matrix H
+   is represented by the scalar tau and the vector v in the form:
 
-       H = I - tau × v × v° × H
+       H = I - tau × v ∘ v°
 
-   where tau is a scalar and v is a vector.
+   That is:
 
-   NOTE: If tau = 0, then H is the unit matrix.
+             ⎧ 1.0 - tau × v²   if i=j
+       Hᵢⱼ = ⎨
+             ⎩  tau × vᵢ × vⱼ   if i≠j
 
-   To apply H° × H, supply conjg(tau) instead.
+   where tau is a scalar and v is a vector. Instead of creating the entire
+   matrix H beforehand, LApack generally uses the vector v instead and
+   computes Hᵢⱼ when needed).
 
-   C is overwritten in place by the matrix H * C.
+   NOTE: If tau = 0, then H is the unit matrix I and applying H is a no-op.
+
+   C is overwritten in place by the matrix H ∘ C.
  */
 template<typename T>
-void LA_pack::larf(const T * v, size_t len_v, T tau,
-                   fMatrix<T> & C, const PTVVy<T> & ptvvy)
+void LA_pack::larf(const T * v, T tau, fMatrix<T> & C, T * y)
 {
    if (is_zero(tau))   return;   // H is I.
 
 const Crow M = C.get_row_count();
-const Ccol N = C.get_column_count();
 
-   // NOTE only SIDE == "Left" is needed (and implemented here).
+   // NOTE: only SIDE == "Left" in FORTRAN is needed (and implemented here).
 
    /*
                   ├──────N──────┤
-          ┌─┐     ╔══════C═╤════╗ ┬
-          │v│     ║        │0 0 ║ │
-          │v│     ║       c│0 0 ║ │
-          │v│     ║        │0 0 ║ M   v≠0, c≠0
-    lastV→│v│ → → ╟────────┘0 0 ║ │
-      ↑   │0│     ║       │     ║ │
-      ↑   │0│     ║       │     ║ │
-      M   └─┘     ╚═══════│═════╝ ┴
+          ┬ ┌─┐     ╔══════C═╤════╗ ┬
+          │ │v│     ║        │0 0 ║ │
+      len_v │v│     ║       c│0 0 ║ │
+          │ │v│     ║        │0 0 ║ M   v≠0, c≠0
+          ┴ │v│ → → ╟────────┘0 0 ║ │
+        ↑   │0│     ║       │     ║ │
+        ↑   │0│     ║       │     ║ │
+        M   └─┘     ╚═══════│═════╝ ┴
                         lastC ← N
     */
 
-Crow lastV = M;   // index of the last non-zero item in v.
-
-   // find the last non-zero item (row) in vector v
+   // compute len_v = the length of v without trailing zeroes. Using len_v
+   // instead of M speeds up the computation by not adding terms that are
+   // obviously 0 (as for rows ≥ len_v of v and for columns ≥ lastC of C.
    //
-   while (lastV && is_zero(v[lastV - 1]))   --lastV;
-   if (lastV == 0)   return;   // if v is the null vector
+Crow len_v = M;   // index of the last non-zero item in v.
+   while (len_v && is_zero(v[len_v - 1]))   --len_v;
 
-   // Scan for the last non-zero column in C(1:lastV,1:lastV)
+   if (len_v == 0)   return;   // no-op if v is the null vector
+
+   // in the quadratic sub-matrix C(1:len_v, 1:len_v): compute the
+   // last column lastC that has a nonzero item.
    //
-const Ccol lastC = ila_lc<T>(lastV, C);
-   gemv<T>(lastV, lastC, C,    v, len_v, ptvvy.y, N);      // y := A° × H × x
-   gerc<T>(lastV, lastC, -tau, v, len_v, ptvvy.y, N, C);
+const Ccol lastC = ila_lc<T>(len_v, C);
+   gemv<T>(C, len_v, lastC,       v, y);
+   gerc<T>(C, len_v, lastC, -tau, v, y);
 }
 //----------------------------------------------------------------------------
 template<typename T>
-LA_pack::PTVVy<T>::PTVVy(Ccol N)
+LA_pack::PTVVy<T>::PTVVy(Ccol N, bool with_pivot)
 {
    enum
       {
-        bytes_per_N = sizeof(*pivot)
-                    + sizeof(*tau)
+        bytes_per_N1 = sizeof(*tau)
+                     + sizeof(*y)
+                     + sizeof(*work_min)
+                     + sizeof(*work_max),
+        bytes_per_N2 = bytes_per_N1
+                    + sizeof(*pivot)
                     + sizeof(*vn1)
                     + sizeof(*vn2)
-                    + sizeof(*y)
-                    + sizeof(*work_min)
-                    + sizeof(*work_max)
       };
 
-char * work = new char[N*bytes_per_N];
-   pivot    = reinterpret_cast<typeof(pivot)>(work);
-   tau      = reinterpret_cast<typeof(tau)>     (pivot   + N);
-   vn1      = reinterpret_cast<typeof(vn1)>     (tau     + N);
-   vn2      = reinterpret_cast<typeof(vn2)>     (vn1     + N);
-   y        = reinterpret_cast<typeof(y)>       (vn2     + N);
-   work_min = reinterpret_cast<typeof(work_min)>(y       + N);
-   work_max = reinterpret_cast<typeof(work_max)>(work_min + N);
+   if (with_pivot)
+      {
+        char * work = new char[N*bytes_per_N2];
+        tau      = reinterpret_cast<typeof(tau)>      (work);
+        y        = reinterpret_cast<typeof(y)>        (tau      + N);
+        work_min = reinterpret_cast<typeof(work_min)> (y        + N);
+        work_max = reinterpret_cast<typeof(work_max)> (work_min + N);
+        pivot    = reinterpret_cast<typeof(pivot)>    (work_max + N);
+        vn1      = reinterpret_cast<typeof(vn1)>      (pivot    + N);
+        vn2      = reinterpret_cast<typeof(vn2)>      (vn1      + N);
 
-   // init the pivot
-   loop(n, N)   pivot[n] = n;
+        // init the pivot
+        loop(n, N)   pivot[n] = n;
+      }
+   else
+      {
+        char * work = new char[N*bytes_per_N1];
+        tau      = reinterpret_cast<typeof(tau)>      (work);
+        y        = reinterpret_cast<typeof(y)>        (tau      + N);
+        work_min = reinterpret_cast<typeof(work_min)> (y        + N);
+        work_max = reinterpret_cast<typeof(work_max)> (work_min + N);
+        pivot    = 0;
+        vn1      = 0;
+        vn2      = 0;
+      }
 }
 //----------------------------------------------------------------------------
 template<typename T>
 LA_pack::PTVVy<T>::~PTVVy()
 {
-   delete reinterpret_cast<char *>(pivot);
+   delete reinterpret_cast<char *>(tau);
 }
 //----------------------------------------------------------------------------
 template<typename T>
 int LA_pack::PTVVy<T>::print_pivot(ostream & out,
                                     Ccol N, const char * loc) const
 {
+   if (!pivot)   return 0;
+
    out << "PIVOT:";
    loop(n, N)   out << " " << pivot[n];
    out << "   at " << loc << endl;

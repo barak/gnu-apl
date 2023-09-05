@@ -110,11 +110,34 @@ Token result = eval_AB(I, B);
 Token
 Bif_F12_DOMINO::eval_XB(Value_P X, Value_P B) const
 {
-   // X: the scalar rcond for B = P ∘ Q
+   // X shall be a scalar with:
+   //
+   // a. real EPS < 1 (aka. rcond) for backward compatibility (not used),
+   // b. integer 0 for the QR factorization with the Helzer algorithm, or
+   // c. integer 1 for the QR factorization with LApack
    //
    if (!X->is_scalar())   RANK_ERROR;
 
-const double EPS = X->get_cfirst().get_real_value();
+enum { ALGO_BAD, ALGO_HELZER, ALGO_LAPACK } algo = ALGO_BAD;
+const Cell & X0 = X->get_cscalar();
+double EPS = Workspace::get_CT();
+
+   if (X0.is_float_cell())   // a.
+      {
+        EPS = X0.get_real_value();
+        if (EPS < 0.1)   algo = ALGO_HELZER;
+      }
+   else if (X0.is_integer_cell())   // b. or c.
+      {
+        if      (X0.get_int_value() <= 1)   algo = ALGO_HELZER;
+        else if (X0.get_int_value() == 2)   algo = ALGO_LAPACK;
+      }
+
+   if (algo == ALGO_BAD)
+      {
+        MORE_ERROR() << "Bad algorithm in X of ⌹[X]B";
+        DOMAIN_ERROR;
+      }
 
    if (B->get_rank() != 2)   RANK_ERROR;
 
@@ -134,20 +157,19 @@ const ShapeItem N = B->get_cols();
 const bool need_complex = B->is_complex(true);
 Value_P Z(3, LOC);
 
-#if QR_HELZER   /* Garry Helzer's algorithm, APL Quote Quad */
-    LA_DEBUG && CERR << "QR factorization with Garry Helzer's algorithm...\n";
-   QR_factorization(Z, need_complex, M, N, &B->get_cfirst(), EPS);
-
-#else   /* direct LA_pack function */
-
-   LA_DEBUG && CERR << "QR factorization with LA_pack::laqp4()...\n";
-
-   if (need_complex)
-      LA_pack::factorize_ZZ_matrix(*Z, M, N, &B->get_cfirst(), EPS);
+   if (algo == ALGO_HELZER)
+      {
+        LA_DEBUG && CERR << "QR factorization with G. Helzer's algorithm...\n";
+        QR_factorization(Z, need_complex, M, N, &B->get_cfirst(), EPS);
+      }
    else
-      LA_pack::factorize_DD_matrix(*Z, M, N, &B->get_cfirst(), EPS);
-
-#endif
+      {
+        LA_DEBUG && CERR << "QR factorization with LA_pack::laqp4()...\n";
+        if (need_complex)
+           LA_pack::factorize_ZZ_matrix(*Z, M, N, &B->get_cfirst(), EPS);
+        else
+           LA_pack::factorize_DD_matrix(*Z, M, N, &B->get_cfirst(), EPS);
+      }
 
    Z->set_proto_Int();   // never since M*cols__B ≠ 0. Just for clarity
    Z->check_value(LOC);

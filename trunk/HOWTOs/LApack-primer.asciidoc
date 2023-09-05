@@ -629,60 +629,71 @@ In this call tree:
 
 == ⌹ with axis: QR factorization
 
+The first non-trivial thing that happens in monadic *⌹B* and in dyadic *A⌹B*
+is a _QR-factorization_ of matrix *B*. A QR factorization of a matrix B is
+a pair *(Q R)* of matrices with the following properties:
+
+. *Q* is orthogonal (resp. Hermitian if B is complex),
+. *R* is upper triangular, and
+. *B ≡ Q ∘ R*
+
+The same matrix *B* may have different QR factorizations with the above
+properties. And different factorization algorithms may produce different
+pairs *(Q R)* for the same matrix *B*.
+
 Often the orthogonal *Q* and/or the upper triangular *R* of a factorization
 *B=Q∘R* is more valuable than the final result *B⁻¹=R⁻¹∘Q⁻¹* of *⌹B* or
 *A⌹B*. For this reason GNU APL provides *⌹[X]* as to obtain the matrices
-*Q*  and *R* without applying them (i.e. in order to solve *A∘X=B*).
+*Q*  and *R* without applying them (i.e. in order to solve *A∘X=B*). As
+a matter of convenience for the programmer, GNU APL not only computes
+the pair *(Q R)*, but a triple *(Q, R, Rinv)* where *Rinv ≡ ⌹R*. One could,
+of course, compute *Rinv* from *R* in APL with ⌹. But *Rinv* is anyhow
+computed in the QR factorization of *B* and therefore it is more efficient
+to return it together with *R* rather than computing it after *R* (which
+would QR-factorize *B* one more time).
 
-The result of *⌹[X] B* is a triple
+GNU APL has implemented two different algorithms for the QR-factorization
+of a matrix *B*, which produce slightly diffferent results.
 
-----
-      (Q R Rinv) ← ⌹[X] B
-----
+. The first algorithm is based on a factorization algorithm publiashed by
+  *Garry Helzer* in *APL Quote Quad, Volume 9, Issue 3, 1979*, and
+. the second algorithm is, like monadic and dyadic ⌹, based on LApack
+  function *laqp2()*  but with column privoting disabled.
 
-where:
+The algorithm to be used is selected with axis argument *X* as follows:
 
-* *Q* is orthogonal (resp. Hermitian), i.e. *Q⁻¹ = +⍉Q*
-* *R* is upper triangular, i.e. *R[i;j] = 0* for all *i > j*, and
-* *Rinv* is *R⁻¹* as a matter of convenience for the programmer.
+. Integer scalar 1 selects Garry Helzer's algorithm,
+. Integer scalar 2 selects the laqp2() algorithm, and
+. (obsolete) a small real scalar like ⎕CT also selects Garry Helzer's
+  algorithm. This is for backward compatibility with older GNU APL
+  versions (that always used Garry Helzer's algorithm).
 
-GNU APL currently provides two different implementations with slightly
-different properties:
+For quadratic matrices *B*, i.e. for *⍴B ←→ N N*,  are the results of the
+two algorithms, apart from rounding errors, identical.
 
-. The implementation used by default is a direct translation from an APL
-  algorithm to Cpp. The APL algorithm was published by *Garry Helzer* in
-  *APL Quote Quad, Volume 9, Issue 3, 1979*. The GNU APL Cpp function
-  that implements the Helzer algorithm is *Bif_F12_DOMINO::householder()*.
-. The other implemnation uses the LApack function *geqp3()*, which is,
-  in GNU APL, function *laqp2()* with the column pivoting removed.
-. The selection as to which algorith shall be used is controlled by macro
-  *QR_HELZER* at the beginning of file *LApack.hh*.
+For non-quadratic matrices *B* with shapes *⍴B ←→ M N* with M > N,
+the results differ as follows:
 
-In theory a purely LApack based QR factorization should have a slightly
-better performance and/or numerical stability. This is because LApack has
-put a considerable effort into numerical border cases (while the Helzer
-algorithm merely sets near-0 matrix items to 0). Reusing that effort
-could be beneficial for QR factorization as well.
+[options="header"]
+[cols="^1,^2,^2,4"]
+|====
+|                | Helzer   | laqp2() | Notes
+| *axis X*       | 1        | 2       |
+| *⍴Q*           | M M      | M N     | rows N+1 .. M non-zero
+| *⍴R*           | M N      | N N     | rows N+1 .. M padded with 0
+| *⍴Rinv*        | N M      | N N     | columns N+1 .. M padded with 0
+| *⍴Q∘R*       2+| ⍴B                 |
+| *N N↑R*      2+| Same               |
+| *N N↑Rinv*   2+| Same               |
+| *(⍉Q)∘Q*     2+| ID N               | ID N ←→ (⍳N)∘.=(⍳N)
+| *Q∘(⍉Q)*       | ID N     | ≠ ID N  |
+| *Rinv∘R*     2+| ID N               |
+| *R∘Rinv*       | M M↑ID N | ID N    |
+|====
 
-There are some subtle differences between the the Helzer algorithm and the
-LApack based version:
-
-. Both compute a factorization *B=Q∘R* as required. If the matrix *B* is
-  quadratic, i.e. *⍴B ←→ N N*, then they produce essentially the same
-  result. However, let *⍴B ←→ M N* with *M≠N*. Then:
-.. The Helzer algorithm computes a matrix *Q* with *Q∘⍉Q ←→ ID(n)* and
-  *(Q∘⍉Q) ←→ ID(n)*.
-.. The Lapack algorithm computes a matrix *Q* with *(⍉Q)∘Q ←→ ID(n)* but
-   _not_ *(Q∘⍉Q) ←→ ID(n)*.
-. These differences are apparently caused caused by differen rsult shapes
-  and zero-padding:
-.. *⍴Q ←→ M M* for Helzer and *⍴Q ←→ M N* for LApack,
-.. *⍴R ←→ M N* for Helzer and *⍴Q ←→ N N* for LApack. The additional
-   items in Helzer are 0 (since *R* is upper triangualar.
-.. As a consequence, *⍴Rinv ←→ N M* for Helzer and *⍴Q ←→ N N* for LApack.
-. Apart from that are the matrix items that are present in both cases the
-  same.
-
-In the non-quadratic case one can simply *M N↑Q* and *N N↑R* to convert the
-the Helzer *Q* and *R* into the LApack *Q* and *R*, but not vice versa.
+For bread and butter applications is Helzer probably the alternative
+that is simpler to use. Lapack puts quite some effort into performance
+optimizations and numerical border cases.  Therefore the LApack alternative
+might be better suited for large matrices or when precision should become
+an issue.
 
