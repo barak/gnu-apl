@@ -959,7 +959,7 @@ DebugMatrix B_before("B_before laqp2()", B);
 /// function estimating the rank of \b A. (simplified part of GELSY)
 template<typename T>
 sRank LA_pack::estimate_rank(const fMatrix<T> & A, APL_Float rcond,
-                           PTVVy<T> & ptvvy)
+                             PTVVy<T> & ptvvy)
 {
    /* Determine RANK using incremental condition estimation...
      
@@ -979,59 +979,71 @@ sRank LA_pack::estimate_rank(const fMatrix<T> & A, APL_Float rcond,
       are returned in descending order.  The first min(m,n) columns of
       U and V are the left and right singular vectors of A.
 
-      Note that the routine returns V°×H, not V.
+      Note that the routine returns V° ∘ H, not V.
     */
 const Ccol N = A.get_column_count();
 
+   // let s be some singular value of A. smax is an upper bound that approaches
+   // s from below and smin is a lower bound thaty approaches from above. If
+   // some smax*rcond > smin below then matrix A is rank-deficient.
+   //
 APL_Float smax = abs(A.diag(0));
 APL_Float smin = smax;
    if (smax == 0.0)   return 0;
 
-   // store minima in work_min[]
-   // store maxima in work_max[]
-   //
-   // work_min and work_max will grow in the RANK loop, so only work_min[0]
-   // and work_max[0] need to be initialized. The last item in work_min/max is
-   // always cos_min/max (from laic1_MIN/MAX()) while the items before are the
-   // the products of the prior sin_min/max (also from laic1_MIN/MAX()).
-   //
-   ptvvy.work_min[0] = T(1.0);   // cos 90°
-   ptvvy.work_max[0] = T(1.0);   // cos 90°
+T * work_min = ptvvy.work_min;
+T * work_max = ptvvy.work_max;
 
-   for (Ccol RANK = 1; RANK < N; ++RANK)   // loop over columns of A
+   /*
+      store minima in work_min[]
+      store maxima in work_max[]
+
+      work_min and work_max will grow in the 'dia' loop, so only work_min[0]
+      and work_max[0] need to be initialized beforehand.
+
+      The last item in work_minx resp. work_max is always COS_min resp. COS_max
+     (from laic1_MIN/MAX()), while the items before are the the products
+     of the prior SIN_min/SON_max (also from laic1_MIN/MAX().
+    */
+   work_min[0] = T(1.0);   // cos 90°
+   work_max[0] = T(1.0);   // cos 90°
+
+   for (Cdia dia = 1; dia < N; ++dia)   // loop over the diagonal of A
        {
-         T sin_min(0.0);
-         T sin_max(0.0);
-         T cos_min(0.0);
-         T cos_max(0.0);
+         T SIN_min(0.0);
+         T SIN_max(0.0);
+         T COS_min(0.0);
+         T COS_max(0.0);
 
-         T alpha_min = 0.0;
-         T alpha_max = 0.0;
-         const T gamma(A.diag(RANK));
-
-         ALL_ROWS(RANK)
+         // accumulate the rows of A above (but excluding) the diagonal,
+         // scaled with the diagonal item A.diag(row). 
+         //
+         T alpha_min = 0.0;   // accumulator for work_min
+         T alpha_max = 0.0;   // accumulator for work_max
+         ALL_ROWS(dia)   // all rows above the diagonal
             {
-              const T Ar = A.at(row, RANK);
-              alpha_min += conjugated(ptvvy.work_min[row] * Ar);
-              alpha_max += conjugated(ptvvy.work_max[row] * Ar);
+              const T Ard = A.at(row, dia);   // row 'row' above the diagonal
+              alpha_min += conjugated(work_min[row] * Ard);
+              alpha_max += conjugated(work_max[row] * Ard);
             }
 
-         laic1_MIN<T>(smin, alpha_min, gamma, sin_min, cos_min);
-         laic1_MAX<T>(smax, alpha_max, gamma, sin_max, cos_max);
+         const T gamma(A.diag(dia));
+         laic1_MIN<T>(smin, alpha_min, gamma, SIN_min, COS_min);
+         laic1_MAX<T>(smax, alpha_max, gamma, SIN_max, COS_max);
 
          if (smax*rcond > smin)   // done (error). The rank of A is < N.
             {
-              return RANK;
+              return dia;
             }
 
-         ALL_ROWS(RANK)
+         ALL_ROWS(dia)
             {
-              ptvvy.work_min[row] *= sin_min;
-              ptvvy.work_max[row] *= sin_max;
+              work_min[row] *= SIN_min;
+              work_max[row] *= SIN_max;
             }
 
-         ptvvy.work_min[RANK] = cos_min;   // for the next iteration
-         ptvvy.work_max[RANK] = cos_max;   // for the next iteration
+         work_min[dia] = COS_min;   // for the next iteration
+         work_max[dia] = COS_max;   // for the next iteration
        }
 
    return N;   // OK
@@ -1092,12 +1104,17 @@ void LA_pack::unm2r(Crow K, const fMatrix<T> & A, const PTVVy<T> & ptvvy,
 }
 //----------------------------------------------------------------------------
 /** LApack function laic1 (estimate largest singular value).
-     apply one step of incremental condition estimation.
+    apply one step of incremental condition estimation.
 
-     SEST: largest estimated singular value of \b this matrix
+    SEST: a lower bound for the largest estimated singular value of some matrix
 
-     See laic1_MIN() below. laic1_MAX is laic1 with JOB=1,
-                      while laic1_MIN is laic1 with JOB = 2.
+    In the end (i.e. after repeating laic1_MAX() along the diagonal of some
+    matrix A) is SEST a lower bound for the largest singular value of A.
+
+    See also: laic1_MIN() below.
+
+    laic1_MAX() is FORTRAN laic1 with JOB = 1, while
+    laic1_MIN() is FORTRAN laic1 with JOB = 2.
  **/
 template<typename T>
 void LA_pack::laic1_MAX(APL_Float & SEST, T ALPHA, T GAMMA, T & SIN, T & COS)
@@ -1115,8 +1132,8 @@ const APL_Float abs_SEST  = abs(SEST);
         const APL_Float smax = max(abs_GAMMA, abs_ALPHA);
         if (smax == 0.0)
            {
-             SIN = T(0.0);
-             COS = T(1.0);
+             SIN = T(0.0);   // 0°
+             COS = T(1.0);   // 0°
              SEST = 0.0;
            }
         else
@@ -1194,9 +1211,12 @@ const APL_Float t = b > 0.0 ? square(zeta1) / (b + hypotenuse(b, zeta1))
 }
 //----------------------------------------------------------------------------
 /** LApack function laic1 (estimate smallest singular value).
-      Results are: SEST, SIN, and COS
-     apply one step of incremental condition estimation.
+    Results are: SEST, SIN, and COS, updated in place (i.e. IN/OUT
+    parameters in FORTRAN). Apply one step of incremental condition
+    estimation.
+ */
 
+/*
      SEST: smallest estimated singular value of \b this matrix
 
      LAIC1 applies one step of incremental condition estimation in
@@ -1235,6 +1255,9 @@ const APL_Float t = b > 0.0 ? square(zeta1) / (b + hypotenuse(b, zeta1))
                                           ⎣ conjg(gamma) ⎦
 
     where  alpha =  x° × H × w.
+
+    In the end (i.e. after repeating laic1_MIN() along the diagonal of some
+    matrix A) is SEST an upper bound for the smallest singular value of A.
  **/
 template<typename T>
 void LA_pack::laic1_MIN(APL_Float & SEST, T ALPHA, T GAMMA, T & SIN, T & COS)
@@ -1501,16 +1524,19 @@ Ccol LA_pack::ila_lc(Crow M, const fMatrix<T> & C)
        ║           ≠0│  0  ║ M
        ║             │     ║ │
        ║             └─────╢ ┴
-       ║            ↑ ↑    ║
-       ╚════════════│═│════╝
-                    │ │
-                    │ └── ila_lc(M, N, C)
-                    └──── !column.is_null(M)   (last non-0 column
+       ║           ↑  ↑    ║
+       ╚═══════════│══│════╝
+                   │  │
+                   │  └── ila_lc(M, N, C): first column of a trailing 0-block
+                   └───── !column.is_null(M)   (last non-0 column of C)
     */
 const Ccol N = C.get_column_count();
 
-   REV_COLS(N)
-   ALL_ROWS(M)   if (is_nonzero(C.at(row, k)))   return k + 1;
+   REV_COLS(N)   // backards from the last column
+   ALL_ROWS(M)   // down from the first row
+      {
+        if (is_nonzero(C.at(row, k)))   return k + 1;
+      }
 
    /* at this point all columns in the first M rows of C are 0.
 
@@ -1647,11 +1673,11 @@ const Crow M = C.get_row_count();
                         lastC ← N
     */
 
-   // compute len_v = the length of v without trailing zeroes. Using len_v
-   // instead of M speeds up the computation by not adding terms that are
-   // obviously 0 (as for rows ≥ len_v of v and for columns ≥ lastC of C.
+   // compute len_v = the length of v without trailing zeroes of v.
+   // Decreasing M to len_v speeds up the computation by not adding up
+   // products v×Cᵢⱼ that are obviously 0.
    //
-Crow len_v = M;   // index of the last non-zero item in v.
+Crow len_v = M;   // significant length of v, len_v ≤ M
    while (len_v && is_zero(v[len_v - 1]))   --len_v;
 
    if (len_v == 0)   return;   // no-op if v is the null vector

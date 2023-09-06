@@ -370,6 +370,12 @@ dist_doc_DATA = \
     APL4.png             \
     APL5.png
 
+
+# asciidoctor has more features that asciidoc, but ASCII line graphics
+# (used a  lot in our documents) look well in asciidoc but pretty bad
+# in asciidoctor.
+#
+ADOC = asciidoc                # use asciidoc
 all: all-am
 
 .SUFFIXES:
@@ -589,8 +595,9 @@ uninstall-am: uninstall-dist_docDATA
 
 .PRECIOUS: Makefile
 
+# ADOC = asciidoctor           # use asciidoctor
 
-# internal documentation (build but do not sidtribute)
+# internal documentation (build but do not distribute)
 #
 all: LApack-primer.pdf
 

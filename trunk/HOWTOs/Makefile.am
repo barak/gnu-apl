@@ -49,7 +49,14 @@ dist_doc_DATA = \
     APL4.png             \
     APL5.png
 
-# internal documentation (build but do not sidtribute)
+# asciidoctor has more features that asciidoc, but ASCII line graphics
+# (used a  lot in our documents) look well in asciidoc but pretty bad
+# in asciidoctor.
+#
+ADOC = asciidoc                # use asciidoc
+# ADOC = asciidoctor           # use asciidoctor
+
+# internal documentation (build but do not distribute)
 #
 all: LApack-primer.pdf
 

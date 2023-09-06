@@ -769,7 +769,7 @@ dyadic <strong>A⌹B</strong>.</p></div>
 <div class="sect1">
 <h2 id="_dyadic_a_b_matrix_divide">Dyadic A⌹B: Matrix Divide</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>In APL, <strong>A⌹B</strong> for a N-column matrix <strong>A</strong> is defined im terms of each column
+<div class="paragraph"><p>In APL, <strong>A⌹B</strong> for a N-column matrix <strong>A</strong> is defined in terms of each column
 of <strong>A</strong>:</p></div>
 <div class="listingblock">
 <div class="content">
@@ -824,7 +824,7 @@ and <strong>R</strong> which have the following properties:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-<strong>Q</strong> is orthogonal (resp. Hermitian for complex <strong>B</strong>). That is: <strong>Q⁻¹ ≡ \+⍉Q</strong>,
+<strong>Q</strong> is orthogonal (resp. Hermitian for complex <strong>B</strong>). That is: <strong>Q⁻¹ ≡ ⍉+Q</strong>,
 </p>
 </li>
 <li>
@@ -843,22 +843,24 @@ and <strong>R</strong> which have the following properties:</p></div>
 <div class="content">
 <pre>
 
-<code>      B⁻¹ = (Q∘R)⁻¹ = R⁻¹∘Q⁻¹ = R⁻¹∘⍉Q.</code>
+<code>      B⁻¹ = (Q∘R)⁻¹ = R⁻¹∘Q⁻¹ = R⁻¹∘⍉+Q.</code>
 
 </pre>
 </div></div>
-<div class="paragraph"><p>The inverse of an upper triangular matrix (such as R⁻¹) is far easier
-to compute than the inverse of a general matrix (such as B⁻¹). See below.
+<div class="paragraph"><p>The inverse of an upper triangular matrix (such as <strong>R⁻¹</strong>) is far easier
+to compute than the inverse of a general matrix (such as <strong>B⁻¹</strong>). See below.
 What remains is therefore the computation of a QR factorization of an
-arbitrary matrix B.</p></div>
+arbitrary matrix <strong>B</strong>.</p></div>
 <div class="sect2">
 <h3 id="_inversion_of_an_orthogonal_q">Inversion of an orthogonal Q</h3>
-<div class="paragraph"><p>The inversion of an orthogonal <strong>Q</strong> matrix <strong>Q</strong> means transposition of <strong>Q</strong>.
+<div class="paragraph"><p>The inversion of an orthogonal matrix <strong>Q</strong> means transposition of <strong>Q</strong> (and, in
+the complex case, conjugation of the complex items).
 However, unlike in APL where <strong>⍉Q</strong> is a new value computed from <strong>Q</strong>, this
 transposition is never computed in C++ or in FORTRAN. Instead, where <strong>⍉Q</strong> is
-needed, the matrix <strong>Q</strong> is simply accessed with the row and column interchanged.
-IOW, with a little care as to what are rows and what are columns is ⍉Q
-no-op. In GNU APL three typedefs are used to distinguish rows and columns:</p></div>
+needed, the items of matrix <strong>Q</strong> are simply accessed with the row and column
+interchanged. IOW, with a little bit of care as to what are rows and what
+are columns is <strong>⍉Q</strong> no-op. In GNU APL three typedefs are used to distinguish
+rows and columns throughout the code:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre>
@@ -888,14 +890,14 @@ FORTRAN matrices are stored in column-major order (i.e. adjacent items
 </ol></div>
 </div>
 <div class="sect2">
-<h3 id="_inverting_an_upper_trianguar_matrix_r">Inverting an upper trianguar matrix R</h3>
+<h3 id="_inverting_an_upper_triangular_matrix_r">Inverting an upper triangular matrix R</h3>
 <div class="paragraph"><p>Suppose <strong>R = op₁ ∘ op₂ ∘ &#8230; ∘ opₙ ∘ ID</strong> where every <strong>opₖ</strong> adds a multiple of
 some row of R to some other row of R. Then, as we learn in school,
 <strong>R⁻¹ = ID ∘ op₁ ∘ op₂ ∘ &#8230; ∘ opₙ</strong>. In other words, if the operations
 <strong>op₁</strong>, <strong>op₂</strong>, &#8230;, <strong>opₙ</strong> turn a matrix <strong>R</strong> into the identity matrix, then
 the same operations (in the same order) turn the the identity matrix into
 the inverse <strong>R⁻¹</strong> of <strong>R</strong>.</p></div>
-<div class="paragraph"><p>The operations that turn an upper trianguar matrix <strong>R</strong> into the identity matrix
+<div class="paragraph"><p>The operations that turn an upper triangular matrix <strong>R</strong> into the identity matrix
 ID are fairly simple:</p></div>
 <div class="olist arabic"><ol class="arabic">
 <li>
@@ -989,7 +991,7 @@ All this happens in functions <strong>LA_pack::invert_UTM()</strong> and
   <strong>LA_pack::invert_QUTM()</strong>. The term <strong>QUTM</strong> stands for <strong>Q</strong>uadratic <strong>U</strong>pper
   <strong>T</strong>riangular <strong>M</strong>atrix and takes advantage of the fact that the inversion
   of a non-quadratic upper triangular M×N matrix is essentially the inversion
-  of its upper N×N submatrix. The rows N+1..M are all zero and become zero
+  of its upper N×N sub-matrix. The rows N+1..M are all zero and become zero
   columns in the inverse.
 </p>
 </li>
@@ -1000,7 +1002,7 @@ All this happens in functions <strong>LA_pack::invert_UTM()</strong> and
 <div class="sect3">
 <h4 id="_householder_matrix">Householder matrix</h4>
 <div class="paragraph"><p>For the moment we consider only real matrices; the complex case is almost
-identical, except that <strong>⍉X</strong> becomes <strong>+⍉X</strong> in the complex case. <strong>\+⍉X</strong> is
+identical, except that <strong>⍉X</strong> becomes <strong>⍉+X</strong> in the complex case. <strong>⍉+X</strong> is
 called the <em>conjugate transpose</em> of <strong>X</strong> which is the same as the "normal"
 transpose if <strong>X</strong> is real.</p></div>
 <div class="paragraph"><p>Let <strong>B</strong> be an arbitrary M×N matrix.</p></div>
@@ -1024,7 +1026,7 @@ diagonal item <strong>B[1;1]</strong>.</p></div>
 <pre>
 
 <code>             ⎧ 1.0 - 2×V[i]×V[i]     if i=j , and
-H = (h)ᵢⱼ =  ⎨
+H = (H)ᵢⱼ =  ⎨
              ⎩ - 2×V[i]×V[j]         otherwise.</code>
 
 </pre>
@@ -1033,7 +1035,7 @@ H = (h)ᵢⱼ =  ⎨
 <div class="olist arabic"><ol class="arabic">
 <li>
 <p>
-<strong>H</strong> is <em>Hermitian</em> (aka. <em>symmetric</em> if <strong>H</strong> is real). I.e. <strong>H = +⍉H</strong>,
+<strong>H</strong> is <em>Hermitian</em> (aka. <em>symmetric</em> if <strong>H</strong> is real). I.e. <strong>H = ⍉+H</strong>,
 </p>
 </li>
 <li>
@@ -1154,7 +1156,7 @@ by example (aka. <em>incomplete induction</em>):</p></div>
 <code>      MN←(M N)←4 3)                ⍝ choose a matrix size (M≥N)
       ⎕RL←+/⎕TS ◊ B←?(2, MN)⍴18    ⍝ prepare for random B
       B←+⌿9 0J9×[1]B               ⍝ some complex M×N random matrix B
-      B11←↑B1←B[;1]                ⍝ B1 is column 1 of B, B11 its first item</code>
+      B11←↑B1←B[;1]                ⍝ vector B1 is column 1 of matrix B, and scalar B11 its first item</code>
 
 </pre>
 </div></div>
@@ -1172,6 +1174,8 @@ by example (aka. <em>incomplete induction</em>):</p></div>
 
 </pre>
 </div></div>
+<div class="paragraph"><p>Then the first columns of matrices <strong>B∘H1</strong> and of <strong>B∘H2</strong> are 0 below the
+top-left item <strong>B11</strong> of <strong>B</strong>.</p></div>
 <div class="paragraph"><p><strong>Proofs</strong> (by APL examples <strong>B</strong>):</p></div>
 <div class="listingblock">
 <div class="content">
@@ -1191,7 +1195,7 @@ by example (aka. <em>incomplete induction</em>):</p></div>
       H1←Householder B1+L11×M↑LB1
       H2←Householder B1-L11×M↑LB1
 
-      H = +⍉H               ⍝ H is Hermitian
+      H = ⍉+H               ⍝ H is Hermitian
 1 1 1
 1 1 1
 1 1 1
@@ -1212,13 +1216,13 @@ by example (aka. <em>incomplete induction</em>):</p></div>
 117J81  117J108   9J54
 135J27  117J18  117J90
 
-      2⍕H1 ∘ B   ⍝ notice the first column
+      2⍕H1 ∘ B   ⍝ notice the zeros in first column
  ¯61.12J¯264.83 ¯33.28J¯233.03  ¯8.67J¯203.23
     .00J.00     ¯52.41J25.80    86.09J69.90
     .00J.00      19.00J47.42   ¯54.44J¯1.31
     .00J.00       6.71J1.84     39.43J65.25
 
-      2⍕H2 ∘ B   ⍝ notice the first column
+      2⍕H2 ∘ B   ⍝ notice zeros in the first column
  61.12J264.83  33.28J233.03   8.67J203.23
    .00J.00    ¯19.79J¯30.51  73.02J¯12.81
    .00J.00     29.70J¯16.77 ¯95.79J¯74.13
@@ -1236,24 +1240,42 @@ upper triangular form:</p></div>
 <div class="olist arabic"><ol class="arabic">
 <li>
 <p>
-Set B₁ = B and find a reflector H₁ that sets the items below the first
-   column of B to 0.
+Set <strong>B₁ = B</strong> and find a reflector <strong>H₁</strong> that sets the items below the first
+   column of <strong>B₁</strong> to <strong>0</strong>.
 </p>
 </li>
 <li>
 <p>
-Repeat that step for B₂ = 1 1↓B₁, B₃ = 1 1↓B₂, &#8230; Bₙ = 1 1↓Bₙ ₁ which
-  computes reflectors a sequence H₁, H₂, &#8230; Hₙ. The matrices Bₖ and Hₖ become
-  smaller and smaller in this process.
+Repeat that step for <strong>B₂ = 1 1↓B₁, B₃ = 1 1↓B₂, &#8230; Bₙ = 1 1↓Bₙ₋₁</strong> which,
+  in the end, computes a sequence of reflectors <strong>H₁, H₂, &#8230; Hₙ</strong>.
+  In this process:
+</p>
+<div class="olist lowerroman"><ol class="lowerroman">
+<li>
+<p>
+the matrices Bₖ become smaller and smaller,
+</p>
+</li>
+<li>
+<p>
+the reflectors Hₖ become shorter and shorter, and
+</p>
+</li>
+<li>
+<p>
+the upper triangular result matrix result becomes more and more complete.
 </p>
 </li>
 </ol></div>
-<div class="paragraph"><p>After n steps matrix B looks like this:</p></div>
+</li>
+</ol></div>
+<div class="paragraph"><p>After all, say <strong>n</strong>, steps matrix <strong>B</strong> looks like this:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre>
 
-<code>      ╔═════════════╗   ╔══╤═══════════╗   ╔══╤═══════════╗     ╔══╤═══════════╗
+<code>      Initial B         B after 1 step     B after 2 steps      B after n steps
+      ╔═════════════╗   ╔══╤═══════════╗   ╔══╤═══════════╗     ╔══╤═══════════╗
       ║             ║   ║⍺₁│    R1     ║   ║⍺₁│    R1     ║     ║⍺₁│    R1     ║
       ║             ║   ╟──┤           ║   ╟──┼──┐  R2    ║     ╟──┼──┐  R2    ║
       ║             ║   ║  │           ║   ║  │⍺₂│        ║     ║  │⍺₂│   ...  ║
@@ -1272,21 +1294,21 @@ Repeat that step for B₂ = 1 1↓B₁, B₃ = 1 1↓B₂, &#8230; Bₙ = 1 1↓
 </td>
 <td class="content">For lack of space we show <strong>⍺₁ &#8230; ⍺ₙ</strong> on the diagonal above, but in
 reality the diagonal is <strong>R₁₁, R₂₂, &#8230; Rₙₙ</strong>. The sequence <strong>⍺₁ &#8230; ⍺ₙ</strong>  is
-stored in <strong>tau</strong> as explained above.</td>
+stored in <strong>tau</strong> as will be explained below.</td>
 </tr></table>
 </div>
 <div class="paragraph"><p>Now:</p></div>
 <div class="olist arabic"><ol class="arabic">
 <li>
 <p>
-R is upper triangular (where the items below the diagonal are 0 by
-  definition and therefore need not be stored in B)
+<strong>R</strong> is upper triangular (where the items below the diagonal are <strong>0</strong> by
+  definition and therefore need not be stored in <strong>B</strong>)
 </p>
 </li>
 <li>
 <p>
 <strong>H ← H₁ ∘ H₂ ∘ &#8230; ∘ Hₙ</strong> is unitary resp. orthogonal since it is the
-  product of n unitary resp. orthogonal matrices <strong>Hₖ</strong>.
+  product of <strong>n</strong> unitary resp. orthogonal matrices <strong>Hₖ</strong>.
 </p>
 </li>
 </ol></div>
@@ -1431,7 +1453,7 @@ the unblocked FORTRAN functions survived in the GNU APL code.</p></div>
 computation. Instead of passing the argument of a function in one variable and
 storing the result in a another variable, the same variable was used for the
 largest input variable and the result. For example, function <strong>laqp2()</strong>
-comnputes the QR factorization of an arbitrary matrix <strong>B</strong> and the result is
+computes the QR factorization of an arbitrary matrix <strong>B</strong> and the result is
 stored at the same memory location. However, the result <strong>QR</strong> is split in two
 pieces along the diagonal, taking advantage of the fact that <strong>Q</strong> is symmetric
 (so its upper half can be derived directly from its lower half, and that <strong>R</strong>
@@ -1441,12 +1463,12 @@ not of interest):</p></div>
 <div class="content">
 <pre>
 
-<code>      Input matrix B       Result Q and R
+<code>      Input matrix B       Results Q and R
       ╔══════════════╗     ╔════╤═══════════╗
       ║              ║     ║R₁₁ │           ║
       ║              ║     ╟────┼───┐       ║
-      ║              ║     ║    │R₂₂│   R   ║
-      ║              ║  →  ║    └───┘       ║
+      ║              ║     ║    │R₂₂│  Rᵢⱼ  ║
+      ║     Bᵢⱼ      ║  →  ║    └───┘       ║
       ║              ║     ║         ...    ║
       ║              ║     ║  Q         ┌───╢
       ║              ║     ║            │Rₙₙ║
@@ -1502,9 +1524,9 @@ therefore it makes little sense to store it in a large matrix.</p></div>
 </div>
 <div class="sect2">
 <h3 id="_lapack_function_names">LApack function names</h3>
-<div class="paragraph"><p>The names of LApack functions look somewhat acary at first glance. For example
+<div class="paragraph"><p>The names of LApack functions look somewhat scary at first glance. For example
 the name of function <strong>zungqr()</strong> may not be too obvious. However these names
-follow a naming scheme that rougly looks as follows:</p></div>
+follow a naming scheme that roughly looks as follows:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre>
@@ -1518,13 +1540,13 @@ follow a naming scheme that rougly looks as follows:</p></div>
 
 </pre>
 </div></div>
-<div class="paragraph"><p>With this nameing scheme function <strong>zungqr()</strong> for complex matrices becomes
+<div class="paragraph"><p>With this naming scheme function <strong>zungqr()</strong> for complex matrices becomes
 <strong>dorqr2()</strong> for real matrices.</p></div>
 <div class="paragraph"><p>In FORTRAN every complex function (like <strong>zungqr()</strong> has a real counterpart
 <strong>dorqr2()</strong> for real matrices. In fact there are even more variants because
 there are different precisions (like 32-bit <strong>float</strong> and 64-bit <strong>double</strong>
 in C++) and each has its own FORTRAN functions. That made a lot of sense
-in the FORTRAN days where it made a considerable diference in performance.</p></div>
+in the FORTRAN days where it made a considerable difference in performance.</p></div>
 <div class="paragraph"><p>A closer look at these functions revealed, however, that the difference
 between data types are actually rather small. The GNU APL version of these
 functions make the data type a template parameter so that every group of
@@ -1617,7 +1639,7 @@ We look at its call tree, which is roughly this:</p></div>
 <li>
 <p>
 <strong>Q</strong> is orthogonal (for real <strong>A</strong> and <strong>B</strong>) or Hermitian (for complex
-   <strong>A</strong> or <strong>B</strong>). <strong>Q</strong> is easy to invert since <strong>Q⁻¹ ←→ +⍉Q</strong>, and
+   <strong>A</strong> or <strong>B</strong>). <strong>Q</strong> is easy to invert since <strong>Q⁻¹ ←→ ⍉+Q</strong>, and
 </p>
 </li>
 <li>
@@ -1639,7 +1661,7 @@ In the QR factorization: for every column of <strong>B</strong>:
 </li>
 <li>
 <p>
-<strong>larf&lt;T&gt;()</strong>  applies that reflector to a  submatrix of <strong>B</strong>
+<strong>larf&lt;T&gt;()</strong>  applies that reflector to a  sub-matrix of <strong>B</strong>
 </p>
 </li>
 </ul></div>
@@ -1690,7 +1712,7 @@ a pair <strong>(Q R)</strong> of matrices with the following properties:</p></di
 </p>
 </li>
 </ol></div>
-<div class="paragraph"><p>The same matrix <strong>B</strong> may have different QR factorizations with the above
+<div class="paragraph"><p>The same matrix <strong>B</strong> may have different QR factorization with the above
 properties. And different factorization algorithms may produce different
 pairs <strong>(Q R)</strong> for the same matrix <strong>B</strong>.</p></div>
 <div class="paragraph"><p>Often the orthogonal <strong>Q</strong> and/or the upper triangular <strong>R</strong> of a factorization
@@ -1704,18 +1726,18 @@ computed in the QR factorization of <strong>B</strong> and therefore it is more 
 to return it together with <strong>R</strong> rather than computing it after <strong>R</strong> (which
 would QR-factorize <strong>B</strong> one more time).</p></div>
 <div class="paragraph"><p>GNU APL has implemented two different algorithms for the QR-factorization
-of a matrix <strong>B</strong>, which produce slightly diffferent results.</p></div>
+of a matrix <strong>B</strong>, which produce slightly different results.</p></div>
 <div class="olist arabic"><ol class="arabic">
 <li>
 <p>
-The first algorithm is based on a factorization algorithm publiashed by
+The first algorithm is based on a factorization algorithm published by
   <strong>Garry Helzer</strong> in <strong>APL Quote Quad, Volume 9, Issue 3, 1979</strong>, and
 </p>
 </li>
 <li>
 <p>
 the second algorithm is, like monadic and dyadic ⌹, based on LApack
-  function <strong>laqp2()</strong>  but with column privoting disabled.
+  function <strong>laqp2()</strong>  but with column pivoting disabled.
 </p>
 </li>
 </ol></div>
@@ -1745,7 +1767,7 @@ two algorithms, apart from rounding errors, identical.</p></div>
 the results differ as follows:</p></div>
 <div class="tableblock">
 <table rules="all"
-width="100%"
+width="80%"
 frame="border"
 cellspacing="0" cellpadding="4">
 <col width="11%" />
@@ -1765,30 +1787,35 @@ cellspacing="0" cellpadding="4">
 <td align="center" valign="top"><p class="table"><strong>axis X</strong></p></td>
 <td align="center" valign="top"><p class="table">1</p></td>
 <td align="center" valign="top"><p class="table">2</p></td>
-<td align="left" valign="top"><p class="table"></p></td>
+<td align="left" valign="top"><p class="table">algorithm selector</p></td>
+</tr>
+<tr>
+<td align="center" valign="top"><p class="table"><strong>⍴B</strong></p></td>
+<td colspan="2" align="center" valign="top"><p class="table">M N</p></td>
+<td align="left" valign="top"><p class="table">M ≥ N (else LENGTH ERROR)</p></td>
 </tr>
 <tr>
 <td align="center" valign="top"><p class="table"><strong>⍴Q</strong></p></td>
 <td align="center" valign="top"><p class="table">M M</p></td>
 <td align="center" valign="top"><p class="table">M N</p></td>
-<td align="left" valign="top"><p class="table">rows N+1 .. M non-zero</p></td>
+<td align="left" valign="top"><p class="table">rows N+1 &#8230; M are non-zero</p></td>
 </tr>
 <tr>
 <td align="center" valign="top"><p class="table"><strong>⍴R</strong></p></td>
 <td align="center" valign="top"><p class="table">M N</p></td>
 <td align="center" valign="top"><p class="table">N N</p></td>
-<td align="left" valign="top"><p class="table">rows N+1 .. M padded with 0</p></td>
+<td align="left" valign="top"><p class="table">rows N+1 &#8230; M are padded with 0</p></td>
 </tr>
 <tr>
 <td align="center" valign="top"><p class="table"><strong>⍴Rinv</strong></p></td>
 <td align="center" valign="top"><p class="table">N M</p></td>
 <td align="center" valign="top"><p class="table">N N</p></td>
-<td align="left" valign="top"><p class="table">columns N+1 .. M padded with 0</p></td>
+<td align="left" valign="top"><p class="table">columns N+1 &#8230; M are padded with 0</p></td>
 </tr>
 <tr>
 <td align="center" valign="top"><p class="table"><strong>⍴Q∘R</strong></p></td>
 <td colspan="2" align="center" valign="top"><p class="table">⍴B</p></td>
-<td align="left" valign="top"><p class="table"></p></td>
+<td align="left" valign="top"><p class="table">since B≡Q∘R</p></td>
 </tr>
 <tr>
 <td align="center" valign="top"><p class="table"><strong>N N↑R</strong></p></td>
@@ -1826,10 +1853,79 @@ cellspacing="0" cellpadding="4">
 </table>
 </div>
 <div class="paragraph"><p>For bread and butter applications is Helzer probably the alternative
-that is simpler to use. Lapack puts quite some effort into performance
+that is simpler to use. LApack puts quite some effort into performance
 optimizations and numerical border cases.  Therefore the LApack alternative
 might be better suited for large matrices or when precision should become
 an issue.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_usage_of_cr">Usage of ⎕CR</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>All ⌹-functions use <strong>⎕CT</strong> although in different ways.</p></div>
+<div class="sect2">
+<h3 id="_ct_in_the_helzer_algorithm">⎕CT in the Helzer Algorithm</h3>
+<div class="paragraph"><p>To quote Garry Helzer:</p></div>
+<div class="paragraph"><p><em>For this reason, whenever it is necessary to check an array for zeros below,
+the check is always made relative to another array and with a specified
+tolerance.</em></p></div>
+<div class="paragraph"><p>In GNU APL this comparison of small items with exact 0.0 can be
+controlled with ⎕CT. The original Helzer algorithm used two APL functions
+<strong>CPR</strong> (for compare) and <strong>TOL</strong> (tolerance) to check for zeros:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>      O ^.= (I+V) CPR L TOL DCT</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>which have been inlined in GNU APL, see <strong>Bif_F12_DOMINO::significant()</strong>.</p></div>
+<div class="admonitionblock">
+<table><tr>
+<td class="icon">
+<img src="/usr/share/asciidoc/icons/note.png" alt="Note" />
+</td>
+<td class="content">the Helzer Algorithm in GNU APL, i.e. <strong>⌹[1]B</strong>, does not use any
+of the LApack functions.</td>
+</tr></table>
+</div>
+</div>
+<div class="sect2">
+<h3 id="_ct_in_the_lapack_functions">⎕CT in the LApack functions</h3>
+<div class="paragraph"><p>The LApack based functions in GNU APL, i.e. <strong>A⌹B</strong>, <strong>⌹B</strong>, and <strong>⌹[2]B</strong>,
+use the C++ function <strong>LApack::estimate_rank()</strong> to compute the effective
+rank of the right argument <strong>B</strong>. Matrices with fewer rows than columns are
+<em>under-specified</em> and always yield a RANK ERROR. However a matrix can
+be under-specified even if the number of rows is suffiently large. This is
+the case if the rows are not linearly independent. Put differently,
+a large number of rows alone does not guarantee sufficient information
+because a linear dependent row is as good as no row.</p></div>
+<div class="paragraph"><p>Function <strong>estimate_rank()</strong> has no corresponding FORTRAN function but was
+a somewhat lengthy section of <strong>LApack::gelsy()</strong> that was factored out into
+<strong>estimate_rank()</strong> in order to improve the readability of the C++ code.</p></div>
+<div class="paragraph"><p>Function <strong>estimate_rank()</strong> iteratively computes two values <strong>smin</strong> (an upper
+bound for the smallest singular value of <strong>B</strong>) and <strong>smax</strong> (a lower bound for
+the largest singular value of <strong>B</strong>), and considers matrix <strong>B</strong> as rank-deficient
+if:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>      smax * ⎕CT &gt; smin</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>If that happens then GNU APL reports a <strong>RANK ERROR</strong>. It means that the
+matrix <strong>B</strong> (i.e. of <strong>A⌹B</strong>, <strong>⌹B</strong>, or <strong>⌹[2]B</strong>) is either truly rank-deficient,
+or at least close to a rank-deficient matrix. Increasing <strong>⎕CT</strong> may or may not
+solve that problem. Unlike "normal" RANK ERRORs, the meaning of this type
+of RANK ERROR is that, even though the shape of the matrix <strong>B</strong> is correct
+in the APL sense, the rows of <strong>B</strong> are at least close to being linearly
+dependent. In such cases the precision of the result is rather questionable
+and the RANK ERROR indicates that problem rather than continuing with the
+computation and producing a incorrect result.</p></div>
+</div>
 </div>
 </div>
 </div>
@@ -1837,7 +1933,7 @@ an issue.</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2023-09-05 16:20:53 CEST
+ 2023-09-06 20:57:01 CEST
 </div>
 </div>
 </body>

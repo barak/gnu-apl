@@ -1,7 +1,7 @@
 = LA_pack primer
 // vim: et:ts=4:sw=4
 
-:Author: Jürgen Sauermann, GNU APL
+:Author: Dr. Jürgen Sauermann, GNU APL
 :page-width: 120em
 :toc:
 :toclevels: 4
@@ -32,7 +32,7 @@ dyadic *A⌹B*.
 
 == Dyadic A⌹B: Matrix Divide
 
-In APL, *A⌹B* for a N-column matrix *A* is defined im terms of each column
+In APL, *A⌹B* for a N-column matrix *A* is defined in terms of each column
 of *A*:
 
 ----
@@ -65,29 +65,31 @@ near the end of function *LA_pack::gelsy()* in function *trsm<T>()*.
 In order to compute *B⁻¹*, matrix *B* is factorized into two matrices *Q*
 and *R* which have the following properties:
 
-* *Q* is orthogonal (resp. Hermitian for complex *B*). That is: *Q⁻¹ ≡ \+⍉Q*,
+* *Q* is orthogonal (resp. Hermitian for complex *B*). That is: *Q⁻¹ ≡ ⍉+Q*,
 * *R* is upper triangular, i.e. *Rᵢⱼ = 0* for all *i > j*,
 * *B = Q∘R*,
 
 Once *Q* and *R* are found, *B⁻¹* can be computed easily with:
 
 ----
-      B⁻¹ = (Q∘R)⁻¹ = R⁻¹∘Q⁻¹ = R⁻¹∘⍉Q.
+      B⁻¹ = (Q∘R)⁻¹ = R⁻¹∘Q⁻¹ = R⁻¹∘⍉+Q.
 ----
 
-The inverse of an upper triangular matrix (such as R⁻¹) is far easier
-to compute than the inverse of a general matrix (such as B⁻¹). See below.
+The inverse of an upper triangular matrix (such as *R⁻¹*) is far easier
+to compute than the inverse of a general matrix (such as *B⁻¹*). See below.
 What remains is therefore the computation of a QR factorization of an
-arbitrary matrix B.
+arbitrary matrix *B*.
 
 === Inversion of an orthogonal Q
 
-The inversion of an orthogonal *Q* matrix *Q* means transposition of *Q*.
+The inversion of an orthogonal matrix *Q* means transposition of *Q* (and, in
+the complex case, conjugation of the complex items).
 However, unlike in APL where *⍉Q* is a new value computed from *Q*, this
 transposition is never computed in Cpp or in FORTRAN. Instead, where *⍉Q* is
-needed, the matrix *Q* is simply accessed with the row and column interchanged.
-IOW, with a little care as to what are rows and what are columns is ⍉Q
-no-op. In GNU APL three typedefs are used to distinguish rows and columns:
+needed, the items of matrix *Q* are simply accessed with the row and column
+interchanged. IOW, with a little bit of care as to what are rows and what
+are columns is *⍉Q* no-op. In GNU APL three typedefs are used to distinguish
+rows and columns throughout the code:
 
 ----
    In LApack.hh:
@@ -104,7 +106,7 @@ The translation from FORTRAN to Cpp is somewhat tricky for two reasons:
   in memory belong to the same column) while Cpp matrices are stored in
   row-major order (i.e. adjacent items in memory belong to the same row).
 
-=== Inverting an upper trianguar matrix R
+=== Inverting an upper triangular matrix R
 
 Suppose *R = op₁ ∘ op₂ ∘ ... ∘ opₙ ∘ ID* where every *opₖ* adds a multiple of
 some row of R to some other row of R. Then, as we learn in school,
@@ -113,7 +115,7 @@ some row of R to some other row of R. Then, as we learn in school,
 the same operations (in the same order) turn the the identity matrix into
 the inverse *R⁻¹* of *R*.
 
-The operations that turn an upper trianguar matrix *R* into the identity matrix
+The operations that turn an upper triangular matrix *R* into the identity matrix
 ID are fairly simple:
 
 . *R* is upper triangular. Therefore the last row of *R*, say row *n*,
@@ -153,7 +155,7 @@ consequently also in GNU APL) these operations are not performed on *R* first
   *LA_pack::invert_QUTM()*. The term *QUTM* stands for **Q**uadratic **U**pper
   **T**riangular **M**atrix and takes advantage of the fact that the inversion
   of a non-quadratic upper triangular M×N matrix is essentially the inversion
-  of its upper N×N submatrix. The rows N+1..M are all zero and become zero
+  of its upper N×N sub-matrix. The rows N+1..M are all zero and become zero
   columns in the inverse.
 
 === QR factorization
@@ -161,7 +163,7 @@ consequently also in GNU APL) these operations are not performed on *R* first
 ==== Householder matrix
 
 For the moment we consider only real matrices; the complex case is almost
-identical, except that *⍉X* becomes *\+⍉X* in the complex case. *\+⍉X* is
+identical, except that *⍉X* becomes *⍉+X* in the complex case. *⍉+X* is
 called the _conjugate transpose_ of *X* which is the same as the "normal"
 transpose if *X* is real.
 
@@ -184,13 +186,13 @@ That is:
 
 ----
              ⎧ 1.0 - 2×V[i]×V[i]     if i=j , and
-H = (h)ᵢⱼ =  ⎨
+H = (H)ᵢⱼ =  ⎨
              ⎩ - 2×V[i]×V[j]         otherwise.
 ----
 
 It follows immediately that:
 
-. *H* is _Hermitian_ (aka. _symmetric_ if *H* is real). I.e. *H = +⍉H*,
+. *H* is _Hermitian_ (aka. _symmetric_ if *H* is real). I.e. *H = ⍉+H*,
 . *H* is _unitary_ (aka. _orthogonal_ if *H* is real). I.e. *H⁻¹ = ⍉H*, and
 . *H* is _involutary_. I.e. *H* = *H⁻¹*
 
@@ -263,7 +265,7 @@ by example (aka. _incomplete induction_):
       MN←(M N)←4 3)                ⍝ choose a matrix size (M≥N)
       ⎕RL←+/⎕TS ◊ B←?(2, MN)⍴18    ⍝ prepare for random B
       B←+⌿9 0J9×[1]B               ⍝ some complex M×N random matrix B
-      B11←↑B1←B[;1]                ⍝ B1 is column 1 of B, B11 its first item
+      B11←↑B1←B[;1]                ⍝ vector B1 is column 1 of matrix B, and scalar B11 its first item
 ----
 
 With these prerequisites we can "prove" the following
@@ -277,6 +279,9 @@ With these prerequisites we can "prove" the following
       H1←Householder V1←B1 + L11×M↑LB1   ⍝ a Householder matrix (from V1)
       H2←Householder V2←B1 - L11×M↑LB1   ⍝ another Householder matrix (from V2)
 ----
+
+Then the first columns of matrices *B∘H1* and of *B∘H2* are 0 below the
+top-left item *B11* of *B*.
 
 *Proofs* (by APL examples *B*):
 
@@ -295,7 +300,7 @@ With these prerequisites we can "prove" the following
       H1←Householder B1+L11×M↑LB1
       H2←Householder B1-L11×M↑LB1
 
-      H = +⍉H               ⍝ H is Hermitian
+      H = ⍉+H               ⍝ H is Hermitian
 1 1 1
 1 1 1
 1 1 1
@@ -316,13 +321,13 @@ With these prerequisites we can "prove" the following
 117J81  117J108   9J54
 135J27  117J18  117J90
 
-      2⍕H1 ∘ B   ⍝ notice the first column
+      2⍕H1 ∘ B   ⍝ notice the zeros in first column
  ¯61.12J¯264.83 ¯33.28J¯233.03  ¯8.67J¯203.23
     .00J.00     ¯52.41J25.80    86.09J69.90
     .00J.00      19.00J47.42   ¯54.44J¯1.31
     .00J.00       6.71J1.84     39.43J65.25
 
-      2⍕H2 ∘ B   ⍝ notice the first column
+      2⍕H2 ∘ B   ⍝ notice zeros in the first column
  61.12J264.83  33.28J233.03   8.67J203.23
    .00J.00    ¯19.79J¯30.51  73.02J¯12.81
    .00J.00     29.70J¯16.77 ¯95.79J¯74.13
@@ -335,16 +340,20 @@ Once we know how to set the first column of some arbitrary matrix *B*
 to *0* (below the diagonal) we can now turn the entire matrix into an
 upper triangular form:
 
-. Set B₁ = B and find a reflector H₁ that sets the items below the first
-   column of B to 0.
-. Repeat that step for B₂ = 1 1↓B₁, B₃ = 1 1↓B₂, ... Bₙ = 1 1↓Bₙ ₁ which
-  computes reflectors a sequence H₁, H₂, ... Hₙ. The matrices Bₖ and Hₖ become
-  smaller and smaller in this process.
+. Set *B₁ = B* and find a reflector *H₁* that sets the items below the first
+   column of *B₁* to *0*.
+. Repeat that step for *B₂ = 1 1↓B₁, B₃ = 1 1↓B₂, ... Bₙ = 1 1↓Bₙ₋₁* which,
+  in the end, computes a sequence of reflectors *H₁, H₂, ... Hₙ*.
+  In this process:
+... the matrices Bₖ become smaller and smaller,
+... the reflectors Hₖ become shorter and shorter, and
+... the upper triangular result matrix result becomes more and more complete.
 
-After n steps matrix B looks like this:
+
+After all, say *n*, steps matrix *B* looks like this:
 
 ----
-
+      Initial B         B after 1 step     B after 2 steps      B after n steps
       ╔═════════════╗   ╔══╤═══════════╗   ╔══╤═══════════╗     ╔══╤═══════════╗
       ║             ║   ║⍺₁│    R1     ║   ║⍺₁│    R1     ║     ║⍺₁│    R1     ║
       ║             ║   ╟──┤           ║   ╟──┼──┐  R2    ║     ╟──┼──┐  R2    ║
@@ -358,14 +367,14 @@ After n steps matrix B looks like this:
 
 NOTE: For lack of space we show *⍺₁ ... ⍺ₙ* on the diagonal above, but in
 reality the diagonal is *R₁₁, R₂₂, ... Rₙₙ*. The sequence *⍺₁ ... ⍺ₙ*  is
-stored in *tau* as explained above. 
+stored in *tau* as will be explained below. 
 
 Now:
 
-. R is upper triangular (where the items below the diagonal are 0 by
-  definition and therefore need not be stored in B)
+. *R* is upper triangular (where the items below the diagonal are *0* by
+  definition and therefore need not be stored in *B*)
 . *H ← H₁ ∘ H₂ ∘ ... ∘ Hₙ* is unitary resp. orthogonal since it is the
-  product of n unitary resp. orthogonal matrices *Hₖ*.
+  product of *n* unitary resp. orthogonal matrices *Hₖ*.
 
 The iteration above takes place in function *LA_pack::laqp2()* which starts
 with matrix *B* and ends with *R* in the upper half (including the diagonal),
@@ -465,7 +474,7 @@ Another heavily used trick to reduce memory consumption is in-place
 computation. Instead of passing the argument of a function in one variable and
 storing the result in a another variable, the same variable was used for the
 largest input variable and the result. For example, function *laqp2()*
-comnputes the QR factorization of an arbitrary matrix *B* and the result is
+computes the QR factorization of an arbitrary matrix *B* and the result is
 stored at the same memory location. However, the result *QR* is split in two
 pieces along the diagonal, taking advantage of the fact that *Q* is symmetric
 (so its upper half can be derived directly from its lower half, and that *R*
@@ -473,12 +482,12 @@ is upper triangular (so its lower half is implicitly *0* and therefore
 not of interest):
 
 ----
-      Input matrix B       Result Q and R
+      Input matrix B       Results Q and R
       ╔══════════════╗     ╔════╤═══════════╗
       ║              ║     ║R₁₁ │           ║
       ║              ║     ╟────┼───┐       ║
-      ║              ║     ║    │R₂₂│   R   ║
-      ║              ║  →  ║    └───┘       ║
+      ║              ║     ║    │R₂₂│  Rᵢⱼ  ║
+      ║     Bᵢⱼ      ║  →  ║    └───┘       ║
       ║              ║     ║         ...    ║
       ║              ║     ║  Q         ┌───╢
       ║              ║     ║            │Rₙₙ║
@@ -527,9 +536,9 @@ therefore it makes little sense to store it in a large matrix.
 
 === LApack function names
 
-The names of LApack functions look somewhat acary at first glance. For example
+The names of LApack functions look somewhat scary at first glance. For example
 the name of function *zungqr()* may not be too obvious. However these names
-follow a naming scheme that rougly looks as follows:
+follow a naming scheme that roughly looks as follows:
 
 ----
    ┌───────── data type (i←→integer, d←→double, z←→complex)
@@ -540,14 +549,14 @@ follow a naming scheme that rougly looks as follows:
    zungqr()
 ----
  
-With this nameing scheme function *zungqr()* for complex matrices becomes
+With this naming scheme function *zungqr()* for complex matrices becomes
 *dorqr2()* for real matrices.
 
 In FORTRAN every complex function (like *zungqr()* has a real counterpart
 *dorqr2()* for real matrices. In fact there are even more variants because
 there are different precisions (like 32-bit *float* and 64-bit *double*
 in Cpp) and each has its own FORTRAN functions. That made a lot of sense
-in the FORTRAN days where it made a considerable diference in performance.
+in the FORTRAN days where it made a considerable difference in performance.
 
 A closer look at these functions revealed, however, that the difference
 between data types are actually rather small. The GNU APL version of these
@@ -613,11 +622,11 @@ In this call tree:
 * *scaled_gelsy()* computes *Z←A⌹B* for the now properly scaled *A* and *B*
 * *laqp2()* computes a QR factorization *B=Q∘R* of *B*. In the result:
 ** *Q* is orthogonal (for real *A* and *B*) or Hermitian (for complex
-   *A* or *B*). *Q* is easy to invert since *Q⁻¹ ←→ +⍉Q*, and
+   *A* or *B*). *Q* is easy to invert since *Q⁻¹ ←→ ⍉+Q*, and
 ** *R* is upper triangular (so that *R∘X=C* is simple to solve)
 * In the QR factorization: for every column of *B*:
 ** *larfg<T>()* generates one reflector (i.e. for one column of *B*)
-** *larf<T>()*  applies that reflector to a  submatrix of *B*
+** *larf<T>()*  applies that reflector to a  sub-matrix of *B*
 * *estimate_rank()* checks that the system *A=B∘X* of linear equations is
    not under-determined and raises a DOMAIN ERROR if it is. In contrast,
    over-determination (more equations than variables) is accepted and
@@ -637,7 +646,7 @@ a pair *(Q R)* of matrices with the following properties:
 . *R* is upper triangular, and
 . *B ≡ Q ∘ R*
 
-The same matrix *B* may have different QR factorizations with the above
+The same matrix *B* may have different QR factorization with the above
 properties. And different factorization algorithms may produce different
 pairs *(Q R)* for the same matrix *B*.
 
@@ -653,12 +662,12 @@ to return it together with *R* rather than computing it after *R* (which
 would QR-factorize *B* one more time).
 
 GNU APL has implemented two different algorithms for the QR-factorization
-of a matrix *B*, which produce slightly diffferent results.
+of a matrix *B*, which produce slightly different results.
 
-. The first algorithm is based on a factorization algorithm publiashed by
+. The first algorithm is based on a factorization algorithm published by
   *Garry Helzer* in *APL Quote Quad, Volume 9, Issue 3, 1979*, and
 . the second algorithm is, like monadic and dyadic ⌹, based on LApack
-  function *laqp2()*  but with column privoting disabled.
+  function *laqp2()*  but with column pivoting disabled.
 
 The algorithm to be used is selected with axis argument *X* as follows:
 
@@ -674,15 +683,15 @@ two algorithms, apart from rounding errors, identical.
 For non-quadratic matrices *B* with shapes *⍴B ←→ M N* with M > N,
 the results differ as follows:
 
-[options="header"]
-[cols="^1,^2,^2,4"]
+[width="80%",cols="^1,^2,^2,4",options="header"]
 |====
 |                | Helzer   | laqp2() | Notes
-| *axis X*       | 1        | 2       |
-| *⍴Q*           | M M      | M N     | rows N+1 .. M non-zero
-| *⍴R*           | M N      | N N     | rows N+1 .. M padded with 0
-| *⍴Rinv*        | N M      | N N     | columns N+1 .. M padded with 0
-| *⍴Q∘R*       2+| ⍴B                 |
+| *axis X*       | 1        | 2       | algorithm selector
+| *⍴B*         2+| M N                | M ≥ N (else LENGTH ERROR)
+| *⍴Q*           | M M      | M N     | rows N+1 ... M are non-zero
+| *⍴R*           | M N      | N N     | rows N+1 ... M are padded with 0
+| *⍴Rinv*        | N M      | N N     | columns N+1 ... M are padded with 0
+| *⍴Q∘R*       2+| ⍴B                 | since B≡Q∘R
 | *N N↑R*      2+| Same               |
 | *N N↑Rinv*   2+| Same               |
 | *(⍉Q)∘Q*     2+| ID N               | ID N ←→ (⍳N)∘.=(⍳N)
@@ -692,8 +701,69 @@ the results differ as follows:
 |====
 
 For bread and butter applications is Helzer probably the alternative
-that is simpler to use. Lapack puts quite some effort into performance
+that is simpler to use. LApack puts quite some effort into performance
 optimizations and numerical border cases.  Therefore the LApack alternative
 might be better suited for large matrices or when precision should become
 an issue.
+
+
+== Usage of ⎕CR
+
+All ⌹-functions use *⎕CT* although in different ways.
+
+=== ⎕CT in the Helzer Algorithm
+
+To quote Garry Helzer:
+
+_For this reason, whenever it is necessary to check an array for zeros below,
+the check is always made relative to another array and with a specified
+tolerance._
+
+In GNU APL this comparison of small items with exact 0.0 can be
+controlled with ⎕CT. The original Helzer algorithm used two APL functions
+*CPR* (for compare) and *TOL* (tolerance) to check for zeros:
+
+----
+      O ^.= (I+V) CPR L TOL DCT
+----
+
+which have been inlined in GNU APL, see *Bif_F12_DOMINO::significant()*.
+
+NOTE: the Helzer Algorithm in GNU APL, i.e. *⌹[1]B*, does not use any
+of the LApack functions.
+
+=== ⎕CT in the LApack functions
+
+
+The LApack based functions in GNU APL, i.e. *A⌹B*, *⌹B*, and *⌹[2]B*,
+use the Cpp function *LApack::estimate_rank()* to compute the effective
+rank of the right argument *B*. Matrices with fewer rows than columns are
+_under-specified_ and always yield a RANK ERROR. However a matrix can
+be under-specified even if the number of rows is suffiently large. This is
+the case if the rows are not linearly independent. Put differently,
+a large number of rows alone does not guarantee sufficient information
+because a linear dependent row is as good as no row.
+
+Function *estimate_rank()* has no corresponding FORTRAN function but was
+a somewhat lengthy section of *LApack::gelsy()* that was factored out into
+*estimate_rank()* in order to improve the readability of the Cpp code.
+
+Function *estimate_rank()* iteratively computes two values *smin* (an upper
+bound for the smallest singular value of *B*) and *smax* (a lower bound for
+the largest singular value of *B*), and considers matrix *B* as rank-deficient
+if:
+
+----
+      smax * ⎕CT > smin
+----
+
+If that happens then GNU APL reports a *RANK ERROR*. It means that the
+matrix *B* (i.e. of *A⌹B*, *⌹B*, or *⌹[2]B*) is either truly rank-deficient,
+or at least close to a rank-deficient matrix. Increasing *⎕CT* may or may not
+solve that problem. Unlike "normal" RANK ERRORs, the meaning of this type
+of RANK ERROR is that, even though the shape of the matrix *B* is correct
+in the APL sense, the rows of *B* are at least close to being linearly
+dependent. In such cases the precision of the result is rather questionable
+and the RANK ERROR indicates that problem rather than continuing with the
+computation and producing a incorrect result.
 
