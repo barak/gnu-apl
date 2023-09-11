@@ -638,7 +638,7 @@ In this call tree:
 
 == ⌹ with axis: QR factorization
 
-The first non-trivial thing that happens in monadic *⌹B* and in dyadic *A⌹B*
+The first non-trivial computation in monadic *⌹B* and in dyadic *A⌹B*
 is a _QR-factorization_ of matrix *B*. A QR factorization of a matrix B is
 a pair *(Q R)* of matrices with the following properties:
 
@@ -652,62 +652,233 @@ pairs *(Q R)* for the same matrix *B*.
 
 Often the orthogonal *Q* and/or the upper triangular *R* of a factorization
 *B=Q∘R* is more valuable than the final result *B⁻¹=R⁻¹∘Q⁻¹* of *⌹B* or
-*A⌹B*. For this reason GNU APL provides *⌹[X]* as to obtain the matrices
-*Q*  and *R* without applying them (i.e. in order to solve *A∘X=B*). As
+*A⌹B*. For this reason GNU APL provides *⌹[X]* which returns the matrices
+*Q*  and *R* before applying them (i.e. in order to solve *A∘X=B*). As
 a matter of convenience for the programmer, GNU APL not only computes
-the pair *(Q R)*, but a triple *(Q, R, Rinv)* where *Rinv ≡ ⌹R*. One could,
-of course, compute *Rinv* from *R* in APL with ⌹. But *Rinv* is anyhow
-computed in the QR factorization of *B* and therefore it is more efficient
-to return it together with *R* rather than computing it after *R* (which
-would QR-factorize *B* one more time).
+the pair *(Q R)*, but a triple *(Q R Rinv)* where *Rinv ≡ ⌹R*.xi
+
+One could, of course, compute *Rinv* from *R* in APL with *Rinv←⌹R*.
+However, *⌹R* in APL can not easily take advantage of the fact that *⌹R* is
+upper triangular, which makes it more efficient to use an inversion algorithm
+that is tailored to the upper triangular case *⌹R* as opposed to the general
+*B* case. Also, using computing *Rinv←⌹R* after returning (Q R) would
+factorize R a second time for no reason.
 
 GNU APL has implemented two different algorithms for the QR-factorization
 of a matrix *B*, which produce slightly different results.
 
 . The first algorithm is based on a factorization algorithm published by
   *Garry Helzer* in *APL Quote Quad, Volume 9, Issue 3, 1979*, and
-. the second algorithm is, like monadic and dyadic ⌹, based on LApack
-  function *laqp2()*  but with column pivoting disabled.
+. the second algorithm is, like monadic and dyadic *⌹*, based on LApack
+  function *laqp2()* but with column pivoting disabled.
 
 The algorithm to be used is selected with axis argument *X* as follows:
 
 . Integer scalar 1 selects Garry Helzer's algorithm,
-. Integer scalar 2 selects the laqp2() algorithm, and
+. Integer scalar 2 selects the *laqp2()* algorithm, and
 . (obsolete) a small real scalar like ⎕CT also selects Garry Helzer's
   algorithm. This is for backward compatibility with older GNU APL
   versions (that always used Garry Helzer's algorithm).
 
-For quadratic matrices *B*, i.e. for *⍴B ←→ N N*,  are the results of the
-two algorithms, apart from rounding errors, identical.
+== Quadratic B
 
-For non-quadratic matrices *B* with shapes *⍴B ←→ M N* with M > N,
-the results differ as follows:
+If *B* is quaratic, i.e. *⍴B ←→ N N*, then *Q*, *R*, and *Ri* have the same
+shape as *B*. Since the same *B* han have different factorizations, the
+ravels of the results usually differ, For example:
 
-[width="80%",cols="^1,^2,^2,4",options="header"]
-|====
-|                | Helzer   | laqp2() | Notes
-| *axis X*       | 1        | 2       | algorithm selector
-| *⍴B*         2+| M N                | M ≥ N (else LENGTH ERROR)
-| *⍴Q*           | M M      | M N     | rows N+1 ... M are non-zero
-| *⍴R*           | M N      | N N     | rows N+1 ... M are padded with 0
-| *⍴Rinv*        | N M      | N N     | columns N+1 ... M are padded with 0
-| *⍴Q∘R*       2+| ⍴B                 | since B≡Q∘R
-| *N N↑R*      2+| Same               |
-| *N N↑Rinv*   2+| Same               |
-| *(⍉Q)∘Q*     2+| ID N               | ID N ←→ (⍳N)∘.=(⍳N)
-| *Q∘(⍉Q)*       | ID N     | ≠ ID N  |
-| *Rinv∘R*     2+| ID N               |
-| *R∘Rinv*       | M M↑ID N | ID N    |
-|====
+----
+      
+      (Q R Ri) ← ⌹[1]B ← ?4 4⍴9   ⍝ Helzer, B quadratic
+      8 ⎕CR ¨⍴¨Q R Ri
+ ┌→──┐  ┌→──┐  ┌→──┐ 
+ │4 4│  │4 4│  │4 4│ 
+ └───┘  └───┘  └───┘ 
+      B=Q∘R     ⍝ Q R is a factorization of B
+1 1 1 1
+1 1 1 1
+1 1 1 1
+1 1 1 1
+      Q∘⍉Q      ⍝ Q is orthogonal
+1 0 0 0
+0 1 0 0
+0 0 1 0
+0 0 0 1
+      (⍉Q)∘Q    ⍝ Q is orthogonal
+1 0 0 0
+0 1 0 0
+0 0 1 0
+0 0 0 1
+      R∘Ri      ⍝ Ri is the inverse of R
+1 0 0 0
+0 1 0 0
+0 0 1 0
+0 0 0 1
+      Ri∘R      ⍝ Ri is the inverse of R
+1 0 0 0
+0 1 0 0
+0 0 1 0
+0 0 0 1
+0 0 0 1
+      8 ⎕CR¨2⍕¨Q R Ri
+ ┌→──────────────────┐  ┌→──────────────────────┐  ┌→────────────────────┐ 
+ ↓ .37  .00  .57  .73│  ↓ 13.38 10.69 9.87 12.71│  ↓ .07 ¯.48   .64 ¯1.12│ 
+ │ .60 ¯.24  .43 ¯.63│  │   .00  1.66 6.95 ¯1.69│  │ .00  .60 ¯1.04   .68│ 
+ │ .22  .97  .02 ¯.13│  │   .00   .00 4.04   .10│  │ .00  .00   .25  ¯.01│ 
+ │ .67 ¯.11 ¯.70  .20│  │   .00   .00  .00  1.64│  │ .00  .00   .00   .61│ 
+ └───────────────────┘  └───────────────────────┘  └─────────────────────┘ 
 
-For bread and butter applications is Helzer probably the alternative
-that is simpler to use. LApack puts quite some effort into performance
-optimizations and numerical border cases.  Therefore the LApack alternative
-might be better suited for large matrices or when precision should become
-an issue.
+      (Q R Ri) ← ⌹[2]B ← ?4 4⍴9   ⍝ LApack, B quadratic
+      8 ⎕CR ¨⍴¨Q R Ri
+ ┌→──┐  ┌→──┐  ┌→──┐ 
+ │4 4│  │4 4│  │4 4│ 
+ └───┘  └───┘  └───┘ 
+
+      B=Q∘R     ⍝ Q R is a factorization of B
+1 1 1 1
+1 1 1 1
+1 1 1 1
+1 1 1 1
+
+      Q∘⍉Q      ⍝ Q is orthogonal
+1 0 0 0
+0 1 0 0
+0 0 1 0
+0 0 0 1
+
+      (⍉Q)∘Q    ⍝ Q is orthogonal
+1 0 0 0
+0 1 0 0
+0 0 1 0
+0 0 0 1
+
+      R∘Ri      ⍝ Ri is the inverse of R
+1 0 0 0
+0 1 0 0
+0 0 1 0
+0 0 0 1
+
+      Ri∘R      ⍝ Ri is the inverse of R
+1 0 0 0
+0 1 0 0
+0 0 1 0
+0 0 0 1
+
+      8 ⎕CR¨2⍕¨Q R Ri
+ ┌→───────────────────┐  ┌→───────────────────────┐  ┌→───────────────────┐ 
+ ↓ ¯.14  .64 ¯.71  .26│  ↓ ¯7.14 ¯9.38 ¯7.98 ¯7.14│  ↓ ¯.14 ¯.50  .45  .89│ 
+ │ ¯.56  .28  .08 ¯.77│  │   .00  2.64  ¯.71  2.27│  │  .00  .38 ¯.08 ¯.46│ 
+ │ ¯.70 ¯.59 ¯.30  .26│  │   .00   .00 ¯3.28 ¯5.36│  │  .00  .00 ¯.30 ¯.58│ 
+ │ ¯.42  .40  .63  .52│  │   .00   .00   .00  2.84│  │  .00  .00  .00  .35│ 
+ └────────────────────┘  └────────────────────────┘  └────────────────────┘ 
+----
+
+Notice the differences in the *8 ⎕CR¨2⍕¨Q R Ri* lines above.
+
+== Under-under-determined B
+
+If *B* is under-determined, i.e. *⍴B ←→ M N* with *M < N*,
+then matters become a little more complicated. Due to conformity
+constraints (LENGTH ERROR), *R* can only be multiplied from the
+left or from the right with *(⍴Ri)↑R* and not with *R* itself:
+
+----
+      (Q R Ri) ← ⌹[1]B ← ?2 4⍴9   ⍝ Helzer, B under-determined
+      8 ⎕CR ¨⍴¨Q R Ri
+ ┌→──┐  ┌→──┐  ┌→──┐ 
+ │2 2│  │2 4│  │2 2│ 
+ └───┘  └───┘  └───┘ 
+      B=Q∘R     ⍝ Q R is a factorization of B
+1 1 1 1
+1 1 1 1
+      Q∘⍉Q      ⍝ Q is orthogonal
+1 0
+0 1
+      (⍉Q)∘Q    ⍝ Q is orthogonal
+1 0
+0 1
+      ((⍴Ri)↑R)∘Ri      ⍝ Ri is the inverse of R
+1 0
+0 1
+      Ri∘((⍴Ri)↑R)      ⍝ Ri is the inverse of R
+1 0
+0 1
+      8 ⎕CR¨2⍕¨Q R Ri
+ ┌→────────┐  ┌→──────────────────────┐  ┌→────────┐ 
+ ↓ .87  .49│  ↓ 10.30  5.15 9.32  7.38│  ↓ .10  .10│ 
+ │ .49 ¯.87│  │   .00 ¯5.15 1.75 ¯5.05│  │ .00 ¯.19│ 
+ └─────────┘  └───────────────────────┘  └─────────┘ 
+----
+
+== Over-determined B
+
+If *B* is over-determined, i.e. *⍴B ←→ M N* with *M > N*, then matters
+are similar to the under-determined case. Again, due to conformity
+constraints (LENGTH ERROR), *R* can only be multiplied from the left
+or from the right with *(⍴Ri)↑R* and not with *R* itself:
+
+----
+      (Q R Ri) ← ⌹[1]B ← ?4 2⍴9   ⍝ Helzer, B over-determined
+      8 ⎕CR ¨⍴¨Q R Ri
+ ┌→──┐  ┌→──┐  ┌→──┐ 
+ │4 4│  │4 2│  │2 2│ 
+ └───┘  └───┘  └───┘ 
+      B=Q∘R     ⍝ Q R is a factorization of B
+1 1
+1 1
+1 1
+1 1
+      Q∘⍉Q      ⍝ Q is orthogonal
+1 0 0 0
+0 1 0 0
+0 0 1 0
+0 0 0 1
+      ((⍴Ri)↑R)∘Ri      ⍝ Ri is the inverse of (⍴Ri)↑R
+1 0
+0 1
+      Ri∘((⍴Ri)↑R)      ⍝ Ri is the inverse of (⍴Ri)↑R
+1 0
+0 1
+      8 ⎕CR¨2⍕¨Q R Ri
+ ┌→──────────────────┐  ┌→───────────┐  ┌→────────┐ 
+ ↓ .69 ¯.17 ¯.19 ¯.67│  ↓ 11.53 10.67│  ↓ .09  .10│ 
+ │ .09 ¯.85 ¯.33  .39│  │   .00 ¯9.45│  │ .00 ¯.11│ 
+ │ .17 ¯.33  .93  .00│  │   .00   .00│  └─────────┘ 
+ │ .69  .36 ¯.00  .62│  │   .00   .00│              
+ └───────────────────┘  └────────────┘              
 
 
-== Usage of ⎕CR
+      (Q R Ri) ← ⌹[2]B ← ?4 2⍴9   ⍝ LApack, B over-determined
+      8 ⎕CR ¨⍴¨Q R Ri
+ ┌→──┐  ┌→──┐  ┌→──┐ 
+ │2 2│  │4 2│  │2 2│ 
+ └───┘  └───┘  └───┘ 
+      ((⍴Ri)↑B) = Q∘(⍴Ri)↑R      ⍝ Q (⍴Ri)↑R is a factorization of (⍴Ri)↑B
+1 1
+1 1
+      Q∘⍉Q      ⍝ Q is NOT orthogonal
+0.4996560422 0.4895666132
+0.4895666132 0.5168539326
+      (⍉Q)∘Q    ⍝ Q is NOT orthogonal
+0.387434555  0.4745016688
+0.4745016688 0.6290754198
+      ((⍴Ri)↑R)∘Ri      ⍝ Ri is the inverse of R
+1 0
+0 1
+      8 ⎕CR¨2⍕¨Q R Ri
+ ┌→─────────┐  ┌→─────────────┐  ┌→─────────┐ 
+ ↓ ¯.51 ¯.49│  ↓ ¯13.82 ¯11.14│  ↓ ¯.07  .17│ 
+ │ ¯.36 ¯.62│  │    .00  ¯4.78│  │  .00 ¯.21│ 
+ └──────────┘  │    .00    .00│  └──────────┘ 
+               │    .00    .00│               
+               └──────────────┘ 
+----
+
+Note that above *Q* is orthogonal in the Helzer case but not in the LApack
+case. This is most likely caused by the fact that in an over-determined *B*
+the LApack functions computes a least-square solution instead of an exact one.
+Note also the different *⍴Q* in both cases.
+
+== Impact of ⎕CR
 
 All ⌹-functions use *⎕CT* although in different ways.
 
@@ -734,12 +905,11 @@ of the LApack functions.
 
 === ⎕CT in the LApack functions
 
-
 The LApack based functions in GNU APL, i.e. *A⌹B*, *⌹B*, and *⌹[2]B*,
 use the Cpp function *LApack::estimate_rank()* to compute the effective
 rank of the right argument *B*. Matrices with fewer rows than columns are
-_under-specified_ and always yield a RANK ERROR. However a matrix can
-be under-specified even if the number of rows is suffiently large. This is
+_under-determined_ and always yield a RANK ERROR. However a matrix can
+be under-determined even if the number of rows is suffiently large. This is
 the case if the rows are not linearly independent. Put differently,
 a large number of rows alone does not guarantee sufficient information
 because a linear dependent row is as good as no row.

@@ -91,7 +91,8 @@ const ShapeItem rows = B->get_shape_item(0);
 const ShapeItem cols = B->get_shape_item(1);
    if (cols > rows)
       {
-        MORE_ERROR() << "÷B : B is under-specified (has more cols than rows)";
+        MORE_ERROR() <<
+        "⌹B : B is under-specified (B has more columns than rows)";
         LENGTH_ERROR;
       }
 
@@ -146,12 +147,6 @@ double EPS = Workspace::get_CT();
    //
 const ShapeItem M = B->get_rows();
 const ShapeItem N = B->get_cols();
-   if (M < N)
-      {
-        MORE_ERROR() << "A÷B : B is under-specified (has more cols than rows)";
-        LENGTH_ERROR;
-      }
-
    if (M*N == 0)   LENGTH_ERROR;   // empty B
 
 const bool need_complex = B->is_complex(true);
@@ -160,11 +155,11 @@ Value_P Z(3, LOC);
    if (algo == ALGO_HELZER)
       {
         LA_DEBUG && CERR << "QR factorization with G. Helzer's algorithm...\n";
-        QR_factorization(Z, need_complex, M, N, &B->get_cfirst(), EPS);
+        QR_Helzer(Z, need_complex, M, N, &B->get_cfirst(), EPS);
       }
    else
       {
-        LA_DEBUG && CERR << "QR factorization with LA_pack::laqp4()...\n";
+        LA_DEBUG && CERR << "QR factorization with LA_pack::laqp2()...\n";
         if (need_complex)
            LA_pack::factorize_ZZ_matrix(*Z, M, N, &B->get_cfirst(), EPS);
         else
@@ -218,9 +213,10 @@ Shape shape_Z;   // ⍴Z ←→ (¯1↓⍴A), (1↓⍴B)
          default: RANK_ERROR;
       }
 
-   if (rows_B <  cols_B)
+   if (rows_B < cols_B)
       {
-        MORE_ERROR() << "A÷B : B is under-specified (has more cols than rows)";
+        MORE_ERROR() <<
+        "A⌹B : B is under-specified (B has more columns than rows)";
         LENGTH_ERROR;
        }
 
@@ -313,8 +309,8 @@ Value_P Z = Bif_F12_FORMAT::format_by_specification(A, B);
 }
 //----------------------------------------------------------------------------
 void
-Bif_F12_DOMINO::QR_factorization(Value_P Z, bool need_complex, ShapeItem M,
-                                 ShapeItem N, const Cell * cB, double EPS)
+Bif_F12_DOMINO::QR_Helzer(Value_P Z, bool need_complex, ShapeItem M,
+                          ShapeItem N, const Cell * cB, double EPS)
 {
    /* We want to store all floating point variables (including complex ones)
       in a single double[]. Before and after each variable we leave one double
@@ -333,23 +329,24 @@ Bif_F12_DOMINO::QR_factorization(Value_P Z, bool need_complex, ShapeItem M,
    // allocated as M * M so that we can freely rorate them...
    //
 const int CPLX = need_complex ? 2 : 1;   // number of doubles per variable item
+const ShapeItem max_MN  = M > N ? M : N;
 const ShapeItem len_B   = M * N;
-const ShapeItem len     = M * M;
+const ShapeItem len_QR  = max_MN * max_MN;
 const ShapeItem base_B  = 1;
-const ShapeItem base_Q  = 1 + base_B  + CPLX*len + 1;
-const ShapeItem base_Qi = 1 + base_Q  + CPLX*len + 1;
-const ShapeItem base_R  = 1 + base_Qi + CPLX*len + 1;
-const ShapeItem base_S  = 1 + base_R  + CPLX*len + 1;
-const ShapeItem end     = 1 + base_S  + CPLX*len + 1;
+const ShapeItem base_Q  = 1 + base_B  + CPLX*len_QR + 1;
+const ShapeItem base_Qi = 1 + base_Q  + CPLX*len_QR + 1;
+const ShapeItem base_R  = 1 + base_Qi + CPLX*len_QR + 1;
+const ShapeItem base_S  = 1 + base_R  + CPLX*len_QR + 1;
+const ShapeItem end     = 1 + base_S  + CPLX*len_QR + 1;
 #define base_AUG  base_Q   /* reuse Q */
 
 double * data = new double[end*CPLX];   if (data == 0)   WS_FULL;
    memset(data, 0, end*sizeof(double));
    data[base_B - 1]  = 42.0;   data[base_B  + CPLX*len_B] = 43.0;
-   data[base_Q - 1]  = 44.0;   data[base_Q  + CPLX*len]   = 45.0;
-   data[base_Qi - 1] = 46.0;   data[base_Qi + CPLX*len]   = 47.0;
-   data[base_R - 1]  = 48.0;   data[base_R  + CPLX*len]   = 49.0;
-   data[base_S - 1]  = 50.0;   data[base_S  + CPLX*len]   = 51.0;
+   data[base_Q - 1]  = 44.0;   data[base_Q  + CPLX*len_QR]   = 45.0;
+   data[base_Qi - 1] = 46.0;   data[base_Qi + CPLX*len_QR]   = 47.0;
+   data[base_R - 1]  = 48.0;   data[base_R  + CPLX*len_QR]   = 49.0;
+   data[base_S - 1]  = 50.0;   data[base_S  + CPLX*len_QR]   = 51.0;
 
    // compute the QR factorization of B. That is:
    //
@@ -392,21 +389,21 @@ double * data = new double[end*CPLX];   if (data == 0)   WS_FULL;
 
    // check that the memory areas were not overridden
    //
-   Assert(data[base_B - 1]          == 42.0);
-   Assert(data[base_B + CPLX*len_B] == 43.0);
-   Assert(data[base_Q - 1]          == 44.0);
-   Assert(data[base_Q + CPLX*len]   == 45.0);
-   Assert(data[base_Qi - 1]         == 46.0);
-   Assert(data[base_Qi + CPLX*len]  == 47.0);
-   Assert(data[base_R - 1]          == 48.0);
-   Assert(data[base_R + CPLX*len]   == 49.0);
-   Assert(data[base_S - 1]          == 50.0);
-   Assert(data[base_S + CPLX*len]   == 51.0);
+   Assert(data[base_B - 1]            == 42.0);
+   Assert(data[base_B + CPLX*len_B]   == 43.0);
+   Assert(data[base_Q - 1]            == 44.0);
+   Assert(data[base_Q + CPLX*len_QR]  == 45.0);
+   Assert(data[base_Qi - 1]           == 46.0);
+   Assert(data[base_Qi + CPLX*len_QR] == 47.0);
+   Assert(data[base_R - 1]            == 48.0);
+   Assert(data[base_R + CPLX*len_QR]  == 49.0);
+   Assert(data[base_S - 1]            == 50.0);
+   Assert(data[base_S + CPLX*len_QR]  == 51.0);
 
    // Z[1] aka. Q
    {
-     const Shape Q_shape(M, M);
-     Value_P Qv(Q_shape, LOC);
+     const Shape shape_Z1(M, M);
+     Value_P Z1(shape_Z1, LOC);
      if (need_complex)
         {
           ALL_COLS(M)   // FORTRAN order
@@ -416,7 +413,7 @@ double * data = new double[end*CPLX];   if (data == 0)   WS_FULL;
                const double real = data[base_Q + offset];
                const double imag = data[base_Q + offset + 1];
                if (!(isfinite(real) && isfinite(imag)))   DOMAIN_ERROR;
-               Qv->next_ravel_Complex(real, imag);
+               Z1->next_ravel_Complex(real, imag);
              }
         }
      else
@@ -427,27 +424,32 @@ double * data = new double[end*CPLX];   if (data == 0)   WS_FULL;
                const ShapeItem offset = col + row*M;
                const double real = data[base_Q + offset];
                if (!isfinite(real))   DOMAIN_ERROR;
-               Qv->next_ravel_Float(real);
+               Z1->next_ravel_Float(real);
              }
         }
-     Qv->check_value(LOC);
-     Z->next_ravel_Pointer(Qv.get());
+     Z1->check_value(LOC);
+     Z->next_ravel_Pointer(Z1.get());
    }
 
    // Z[2] aka. R
    {
-     const Shape shape_R(M, N);
-     Value_P vR(shape_R, LOC);
+     const Shape shape_Z2(M, N);
+     Value_P Z2(shape_Z2, LOC);
      if (need_complex)
         {
           ALL_ROWS(M)   // APL order
           ALL_COLS(N)   // APL order
              {
                const ShapeItem offset = col + row*N;   // APL order
+               if (row > col)   // below diagonal: force 0.0
+                  {
+                     data[base_R + 2*offset]     = 0;
+                     data[base_R + 2*offset + 1] = 0;
+                  }
                const double real = data[base_R + 2*offset];
                const double imag = data[base_R + 2*offset + 1];
                if (!(isfinite(real) && isfinite(imag)))   DOMAIN_ERROR;
-               vR->next_ravel_Complex(real, imag);
+               Z2->next_ravel_Complex(real, imag);
               }
         }
      else
@@ -456,43 +458,79 @@ double * data = new double[end*CPLX];   if (data == 0)   WS_FULL;
           ALL_COLS(N)   // APL order
              {
                const ShapeItem offset = col + row*N;   // APL order
+               if (row > col)   // below diagonal: force 0.0
+                  {
+                     data[base_R + offset]     = 0;
+                  }
                const double real = data[base_R + offset];
                if (!isfinite(real))   DOMAIN_ERROR;
-               vR->next_ravel_Float(real);
+               Z2->next_ravel_Float(real);
               }
         }
-     vR->check_value(LOC);
-     Z->next_ravel_Pointer(vR.get());
+     Z2->check_value(LOC);
+     Z->next_ravel_Pointer(Z2.get());
    }
 
-   // Z[3] aka. Rinv...
+
+const ShapeItem D = M < N ? M : N;   // length of the diagonal
+
+   // function householder above has computed R aka. UTM in APL order.
+   // Function LA_pack::invert_T_UTM() wants it in FORTRAN order.
+   // We therefore need to ⍉ R and possibly fix UTM
    //
-   // function householder above has computed R in APL order. Function
-   // LA_pack::invert_T_UTM() wants it in FORTRAN order. We therefore need
-   // to ⍉ R.
-   //
-   {
-      if (need_complex)
-         {
-           LA_pack::fMatrix<LA_pack::ZZ >UTM(data + base_R, N, N, N);
-           LA_pack::fMatrix<LA_pack::ZZ >AUG(data + base_AUG, N, N, N);
+   if (M < N)   // fix UTM
+      {
+        /* R is under-specified. We want to invert only M M↑R,
+           which requires some re-ordering of R:
+          
+              ├──────── N ────────┤        ├────── M ──────┤
+           ┬  ╔═════════C═════════╗     ┬  ╔═════════C═════╗
+           │  ║               │   ║     │  ║               ║
+           │  ║               │   ║     │  ║               ║
+           M  ║               │   ║  →  M  ║               ║
+           │  ║               │   ║     │  ║               ║
+           │  ║               │   ║     │  ║               ║
+           ┴  ╚═══════════════════╝     ┴  ╚═══════════════╝
+              ├────── M ──────┤
+         */
+          ALL_ROWS(M)   // APL order
+          ALL_COLS(M)   // APL order
+             {
+               const ShapeItem offset_from = col + N*row;
+               const ShapeItem offset_to   = col + M*row;
+               if (need_complex)
+                  {
+                    data[base_R + 2*offset_to] = data[base_R + 2*offset_from];
+                    data[base_R + 2*offset_to + 1] =
+                                             data[base_R + 2*offset_from + 1];
+                  }
+               else
+                  {
+                    data[base_R + offset_to] = data[base_R + offset_from];
+                  }
+             }
+      }
 
-           UTM.transpose_data();
+   if (need_complex)
+      {
+        LA_pack::fMatrix<LA_pack::ZZ >UTM(data + base_R,   D, D, D);
+        LA_pack::fMatrix<LA_pack::ZZ >AUG(data + base_AUG, D, D, D);
 
-           Value_P INV = LA_pack::invert_ZZ_UTM(M, N, UTM, AUG);
-           Z->next_ravel_Pointer(INV.get());
-         }
-      else
-         {
-           LA_pack::fMatrix<LA_pack::DD>UTM(data + base_R, N, N, N);
-           LA_pack::fMatrix<LA_pack::DD>AUG(data + base_AUG, N, N, N);
+        UTM.set_transpose();   // ⍉R
 
-           UTM.transpose_data();
+        Value_P Z3 = LA_pack::invert_ZZ_UTM(M, N, UTM, AUG);
+        Z->next_ravel_Pointer(Z3.get());
+      }
+   else
+      {
+        LA_pack::fMatrix<LA_pack::DD>UTM(data + base_R,   D, D, D);
+        LA_pack::fMatrix<LA_pack::DD>AUG(data + base_AUG, D, D, D);
 
-           Value_P INV = LA_pack::invert_DD_UTM(M, N, UTM, AUG);
-           Z->next_ravel_Pointer(INV.get());
-         }
-   }
+        UTM.set_transpose();   // ⍉R
+
+        Value_P Z3 = LA_pack::invert_DD_UTM(D, D, UTM, AUG);
+        Z->next_ravel_Pointer(Z3.get());
+      }
 
    delete[] data;
 #undef base_AUG
@@ -543,6 +581,7 @@ Bif_F12_DOMINO::householder(double * pB, ShapeItem rows, ShapeItem cols,
    // "THE HOUSEHOLDER ALGORITHM AND APPLICATIONS" but using complex numbers
    // when needed.
 
+ShapeItem dias = rows < cols ? rows : cols;   // number of diagonals
 const double qct = Workspace::get_CT();
 const double qct2 = qct*qct;
 double BMAX = 0.0;
@@ -664,7 +703,7 @@ mQ.debug("[12] Q after Q←Q+.×QI");
 
    // since we are only interested in Q we can skip the final B←1 1↓S+.×B
    //
-   if (0 == --cols)
+   if (0 == --dias)
       {
         mQ.debug("[end] Q");
         return pQ;

@@ -194,6 +194,10 @@ const Ccol N = A.get_column_count();
 inline Ccol
 un_pivot(const Ccol * pivot, int len, Ccol col)
 {
+   if (pivot == 0)   return col;   // no pivoting
+
+   if (col >= len)   return col;
+
    loop(j, len)   if (pivot[j] == col)   return j;
 
    // explain why col was nor found.
@@ -214,7 +218,7 @@ print_product(const char * title,
 {
 const Crow MA = A.get_row_count();
 const Ccol NA =  A.get_column_count();
-#define    MB  (get_row_count() )
+#define    MB  (B.get_row_count() )
 const Ccol NB = B.get_column_count();
    assert(NA == MB);
 
@@ -228,7 +232,10 @@ const Ccol NB = B.get_column_count();
             Ccol pcol = un_pivot(pivot, NB, col);
 
             T sum(0);
-            loop(j, NA)   sum += A.at(row, j) * B.at(j, pcol);
+            loop(j, NA)
+                {
+                  sum += A.at(row, j) * B.at(j, pcol);
+                }
             print_item(sum);
           }
        CERR << endl;
@@ -254,7 +261,7 @@ const Ccol NB = B.get_column_count();
 template<class T>
 void
 print_QR(const char * title, const LA_pack::fMatrix<T> & B,
-         const LA_pack::fMatrix<T> & HR, const LA_pack::PTVVy<T> & ptvvy)
+         const LA_pack::fMatrix<T> & HR, LA_pack::PTVVy<T> & ptvvy)
 {
 const Ccol N = HR.get_column_count();
 
@@ -277,108 +284,18 @@ DebugMatrix<T> R("R", N, N);   // the upper triangle R of Q∘R
 
    print_matrix("\nThe upper triangular factor R of HR", R);
 
-DebugMatrix<T> C("C", HR);        // a mutable copy of HR
-   print_matrix("print_product(): matrix C before ung2r() = H", C);
-   LA_pack::ung2r<T>(C, ptvvy);
-   print_matrix("print_product(): matrix C after ung2r() = factor Q of Q∘R", C);
+DebugMatrix<T> QC("C", HR);        // a mutable copy of HR
+   print_matrix("print_product(): reflectors before ung2r() = H", QC);
+   LA_pack::ung2r<T>(QC, ptvvy);
+   print_matrix("print_product(): factor Q of Q∘R after ung2r()", QC);
    print_vector("print_product(): vector tau after ung2r()", ptvvy.tau, N);
 
 // DebugMatrix<T> QB("Q", B);
 // ALL_ROWS(N)
 // ALL_COLS(N) if (row < col)   QB.at(row, col) = QB.at(col, row);
 
-   print_product("the product Q∘R (supposedly Q∘R=B)", C, R, ptvvy.pivot);
+   print_product("the product Q∘R (supposedly Q∘R=B)", QC, R, ptvvy.pivot);
    CERR << "──────────────────────────────────────────" << endl;
-}
-//--------------------------------------------------------------------------
-/** LApack function UNG2R.
-
-   A is a matrix whose upper triangle matrix (including its diagonal) is
-   not used (the result of laqp2()). The lower triangle of A contains
-   elementary reflecors, and tau[] the diagonal (as returned by larfg()).
-
-   Only K=N is needed and therefore FORTRAN argument K skipped and set to N.
-   On exit, A is Q = H(1)∘H(2)∘...∘H(K).
-
-   In FORTRAN: real DORG2R and complex ZUNG2R
-
-   ung2r() is essentially unm2r() applied to the unit matrix
-
-   Only used by LAdebug.icc
- **/
-template<typename T>
-void LA_pack::ung2r(fMatrix<T> & A, const PTVVy<T> & ptvvy)
-{
-const Ccol N = A.get_column_count();
-const Crow M = A.get_row_count();
-   Assert(N <= M);
-
-   // Initialise columns k+1:n to columns of the unit matrix.
-   // JSA: We have K=N, therefore nothing to do here.
-
-   /* apply reflector loop along the diagonal of A. Something like:
-
-          0 ← ← ← k ← ← ← N
-          0 ← ← ← k ← ← ← N
-          ↑  ╔═A══╪═══════╗
-          ↑  ║ \  │       ║
-          ↑  ║  \ │       ║
-          ↑  ║   \│       ║ 
-          k  ╟────⍺┌──────╢   ⍺: Aₖₖ = A.diag(k) := 1.0
-          ↑  ║     │┌─────╢ 
-          ↑  ║     ││┌────╢ 
-          ↑  ║     │││┌───╢
-          ↑  ║     ││││ S ║ 
-          N ─╫─────││││ U ║ 
-             ║     ││││ B ║ 
-          M  ╚═════╧╧╧╧═══╝
-    */
-   REV_COLS(N)   // i in FORTRAN comments is k in C++.
-      {
-        /* Apply reflector H(col) to A(col:m,col:n)
-           (aka. (-col, col)↑A) from the left
-
-                   0 ← ← ← k ← ← ← N
-                   ↑  ╔═A══╪═══════╗
-                   ↑  ║ \  │       ║
-                   ↑  ║  \ │       ║
-                   ↑  ║   \│       ║ 
-            ┬      k  ╟────⍺┌──────╢   ⍺: Akk = A.diag(k) := 1.0
-            │      ↑  ║    ▒│      ║ 
-            │      ↑  ║    ▒│      ║ 
-          len_X    ↑  ║    X│ SUB  ║ 
-            │      N  ║    ▒│      ║ 
-            │         ║    ▒│      ║ 
-            ┴      M  ╚═════╪══════╝
-                           S_X     
-         */
-
-        const Crow s_X   = k + 1;   // start of X = the row below diag(k)
-        const Crow len_X = M - k;   // reflector length
-
-        // apply reflector H(k) to A...
-        //
-        A.diag(k) = T(1.0);          // set ⍺ to 1.0
-        fMatrix<T> SUB = A.sub_matrix(k, s_X);
-        larf<T>(&A.diag(k), len_X, conjugated(ptvvy.tau[k]), SUB, ptvvy);
-
-        /*
-           Update the entire column k of A as follows:
-
-           (a) items above the diagonal:   set to 0.0,
-           (b) items on the diagonal:      set to 1.0 - tau[k];
-           (c) items below the diagonal:   multiply by -tau[k]
-         */
-
-
-        ALL_ROWS(M)   // for the entire column k
-           {
-             T & Ar = A.at(row, k);
-             if      (row < k)   Ar = T(0.0);                // case (a)
-             else if (row > k)   Ar *=      -ptvvy.tau[k];   // case (c)
-             else                Ar = T(1.0)-ptvvy.tau[k];   // case (b)
-           }
-      }
 }
 //--------------------------------------------------------------------------
 

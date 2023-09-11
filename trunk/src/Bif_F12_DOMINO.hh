@@ -61,8 +61,8 @@ public:
 
 protected:
    /// compute the Q matrix of B = QR
-   static void QR_factorization(Value_P Z, bool need_complex, ShapeItem rows,
-                                ShapeItem cols, const Cell * cB, double EPS);
+   static void QR_Helzer(Value_P Z, bool need_complex, ShapeItem rows,
+                         ShapeItem cols, const Cell * cB, double EPS);
 
    /// compute the householder transformation Q of B = QR
    template<bool cplx>

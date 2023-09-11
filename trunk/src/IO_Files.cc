@@ -252,22 +252,44 @@ IO_Files::end_of_current_file()
       {
         const char * path = charP(summary_path.c_str());
         ofstream summary(path, summary_flags);
-        summary_flags = ofstream::app;
+        if (summary_flags == ofstream::trunc)   // first file
+           {
+             summary << "Errors   Time File\n-------------------------"
+                        "---------------------------------------------" << endl;
+             summary_flags = ofstream::app;
+           }
+        if (error_count())   summary << endl;   // to find it quickly
         summary << setw(3) << error_count();
 
         // cannot use SRINTF's ' flag uses locales (which suck).
-        const long long duration_usecs = now() - start_usecs;
+        const long long duration      = now() - start_usecs;
+        const long long duration_usec = duration % 1000;
+        const long long duration_msec = duration / 1000 % 1000;
+        const long long duration_secs = duration  / 1000000 % 1000;
 
-        if (duration_usecs >= 1000000)   // ≥ 1 second
-           summary << setw(3) << duration_usecs/1000000
-                   << "," << setfill('0');
-        else summary << "    ";
-
-        if (duration_usecs >= 1000)   // ≥ 1 milli second
-             summary << setw(3) << ((duration_usecs/1000) % 1000)
-                     << "," << setfill('0');
-        else summary << "    ";
-        summary << setw(3) << (duration_usecs % 1000) << setfill(' ') << "  ";
+        // print seconds if nonzero, else blanks
+        //
+        if (duration >= 1000000)     // ≥ 1 second
+           {
+             // sss.mmm
+             // 
+             summary << setw(3) << duration_secs << "."
+                     << setfill('0') << setw(3) << duration_msec << " s  ";
+           }
+        else if (duration >= 1000)   // ≥ 1 milli second
+           {
+             // mmm.uuu
+             //
+             summary << setw(3) << duration_msec << "."
+                     << setfill('0') << setw(3) << duration_usec << " ms ";
+           }
+        else
+           {
+             // uuu
+             //
+             summary << "    " << setw(3) << duration_usec << " μs ";
+           }
+        summary << setfill(' ');   // restore fill
 
         if (error_count())
            {

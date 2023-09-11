@@ -1692,7 +1692,7 @@ In the QR factorization: for every column of <strong>B</strong>:
 <div class="sect1">
 <h2 id="_with_axis_qr_factorization">⌹ with axis: QR factorization</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>The first non-trivial thing that happens in monadic <strong>⌹B</strong> and in dyadic <strong>A⌹B</strong>
+<div class="paragraph"><p>The first non-trivial computation in monadic <strong>⌹B</strong> and in dyadic <strong>A⌹B</strong>
 is a <em>QR-factorization</em> of matrix <strong>B</strong>. A QR factorization of a matrix B is
 a pair <strong>(Q R)</strong> of matrices with the following properties:</p></div>
 <div class="olist arabic"><ol class="arabic">
@@ -1717,14 +1717,16 @@ properties. And different factorization algorithms may produce different
 pairs <strong>(Q R)</strong> for the same matrix <strong>B</strong>.</p></div>
 <div class="paragraph"><p>Often the orthogonal <strong>Q</strong> and/or the upper triangular <strong>R</strong> of a factorization
 <strong>B=Q∘R</strong> is more valuable than the final result <strong>B⁻¹=R⁻¹∘Q⁻¹</strong> of <strong>⌹B</strong> or
-<strong>A⌹B</strong>. For this reason GNU APL provides <strong>⌹[X]</strong> as to obtain the matrices
-<strong>Q</strong>  and <strong>R</strong> without applying them (i.e. in order to solve <strong>A∘X=B</strong>). As
+<strong>A⌹B</strong>. For this reason GNU APL provides <strong>⌹[X]</strong> which returns the matrices
+<strong>Q</strong>  and <strong>R</strong> before applying them (i.e. in order to solve <strong>A∘X=B</strong>). As
 a matter of convenience for the programmer, GNU APL not only computes
-the pair <strong>(Q R)</strong>, but a triple <strong>(Q, R, Rinv)</strong> where <strong>Rinv ≡ ⌹R</strong>. One could,
-of course, compute <strong>Rinv</strong> from <strong>R</strong> in APL with ⌹. But <strong>Rinv</strong> is anyhow
-computed in the QR factorization of <strong>B</strong> and therefore it is more efficient
-to return it together with <strong>R</strong> rather than computing it after <strong>R</strong> (which
-would QR-factorize <strong>B</strong> one more time).</p></div>
+the pair <strong>(Q R)</strong>, but a triple <strong>(Q R Rinv)</strong> where <strong>Rinv ≡ ⌹R</strong>.xi</p></div>
+<div class="paragraph"><p>One could, of course, compute <strong>Rinv</strong> from <strong>R</strong> in APL with <strong>Rinv←⌹R</strong>.
+However, <strong>⌹R</strong> in APL can not easily take advantage of the fact that <strong>⌹R</strong> is
+upper triangular, which makes it more efficient to use an inversion algorithm
+that is tailored to the upper triangular case <strong>⌹R</strong> as opposed to the general
+<strong>B</strong> case. Also, using computing <strong>Rinv←⌹R</strong> after returning (Q R) would
+factorize R a second time for no reason.</p></div>
 <div class="paragraph"><p>GNU APL has implemented two different algorithms for the QR-factorization
 of a matrix <strong>B</strong>, which produce slightly different results.</p></div>
 <div class="olist arabic"><ol class="arabic">
@@ -1736,8 +1738,8 @@ The first algorithm is based on a factorization algorithm published by
 </li>
 <li>
 <p>
-the second algorithm is, like monadic and dyadic ⌹, based on LApack
-  function <strong>laqp2()</strong>  but with column pivoting disabled.
+the second algorithm is, like monadic and dyadic <strong>⌹</strong>, based on LApack
+  function <strong>laqp2()</strong> but with column pivoting disabled.
 </p>
 </li>
 </ol></div>
@@ -1750,7 +1752,7 @@ Integer scalar 1 selects Garry Helzer&#8217;s algorithm,
 </li>
 <li>
 <p>
-Integer scalar 2 selects the laqp2() algorithm, and
+Integer scalar 2 selects the <strong>laqp2()</strong> algorithm, and
 </p>
 </li>
 <li>
@@ -1761,106 +1763,223 @@ Integer scalar 2 selects the laqp2() algorithm, and
 </p>
 </li>
 </ol></div>
-<div class="paragraph"><p>For quadratic matrices <strong>B</strong>, i.e. for <strong>⍴B ←→ N N</strong>,  are the results of the
-two algorithms, apart from rounding errors, identical.</p></div>
-<div class="paragraph"><p>For non-quadratic matrices <strong>B</strong> with shapes <strong>⍴B ←→ M N</strong> with M &gt; N,
-the results differ as follows:</p></div>
-<div class="tableblock">
-<table rules="all"
-width="80%"
-frame="border"
-cellspacing="0" cellpadding="4">
-<col width="11%" />
-<col width="22%" />
-<col width="22%" />
-<col width="44%" />
-<thead>
-<tr>
-<th align="center" valign="top">                </th>
-<th align="center" valign="top"> Helzer   </th>
-<th align="center" valign="top"> laqp2() </th>
-<th align="left" valign="top"> Notes</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td align="center" valign="top"><p class="table"><strong>axis X</strong></p></td>
-<td align="center" valign="top"><p class="table">1</p></td>
-<td align="center" valign="top"><p class="table">2</p></td>
-<td align="left" valign="top"><p class="table">algorithm selector</p></td>
-</tr>
-<tr>
-<td align="center" valign="top"><p class="table"><strong>⍴B</strong></p></td>
-<td colspan="2" align="center" valign="top"><p class="table">M N</p></td>
-<td align="left" valign="top"><p class="table">M ≥ N (else LENGTH ERROR)</p></td>
-</tr>
-<tr>
-<td align="center" valign="top"><p class="table"><strong>⍴Q</strong></p></td>
-<td align="center" valign="top"><p class="table">M M</p></td>
-<td align="center" valign="top"><p class="table">M N</p></td>
-<td align="left" valign="top"><p class="table">rows N+1 &#8230; M are non-zero</p></td>
-</tr>
-<tr>
-<td align="center" valign="top"><p class="table"><strong>⍴R</strong></p></td>
-<td align="center" valign="top"><p class="table">M N</p></td>
-<td align="center" valign="top"><p class="table">N N</p></td>
-<td align="left" valign="top"><p class="table">rows N+1 &#8230; M are padded with 0</p></td>
-</tr>
-<tr>
-<td align="center" valign="top"><p class="table"><strong>⍴Rinv</strong></p></td>
-<td align="center" valign="top"><p class="table">N M</p></td>
-<td align="center" valign="top"><p class="table">N N</p></td>
-<td align="left" valign="top"><p class="table">columns N+1 &#8230; M are padded with 0</p></td>
-</tr>
-<tr>
-<td align="center" valign="top"><p class="table"><strong>⍴Q∘R</strong></p></td>
-<td colspan="2" align="center" valign="top"><p class="table">⍴B</p></td>
-<td align="left" valign="top"><p class="table">since B≡Q∘R</p></td>
-</tr>
-<tr>
-<td align="center" valign="top"><p class="table"><strong>N N↑R</strong></p></td>
-<td colspan="2" align="center" valign="top"><p class="table">Same</p></td>
-<td align="left" valign="top"><p class="table"></p></td>
-</tr>
-<tr>
-<td align="center" valign="top"><p class="table"><strong>N N↑Rinv</strong></p></td>
-<td colspan="2" align="center" valign="top"><p class="table">Same</p></td>
-<td align="left" valign="top"><p class="table"></p></td>
-</tr>
-<tr>
-<td align="center" valign="top"><p class="table"><strong>(⍉Q)∘Q</strong></p></td>
-<td colspan="2" align="center" valign="top"><p class="table">ID N</p></td>
-<td align="left" valign="top"><p class="table">ID N ←→ (⍳N)∘.=(⍳N)</p></td>
-</tr>
-<tr>
-<td align="center" valign="top"><p class="table"><strong>Q∘(⍉Q)</strong></p></td>
-<td align="center" valign="top"><p class="table">ID N</p></td>
-<td align="center" valign="top"><p class="table">≠ ID N</p></td>
-<td align="left" valign="top"><p class="table"></p></td>
-</tr>
-<tr>
-<td align="center" valign="top"><p class="table"><strong>Rinv∘R</strong></p></td>
-<td colspan="2" align="center" valign="top"><p class="table">ID N</p></td>
-<td align="left" valign="top"><p class="table"></p></td>
-</tr>
-<tr>
-<td align="center" valign="top"><p class="table"><strong>R∘Rinv</strong></p></td>
-<td align="center" valign="top"><p class="table">M M↑ID N</p></td>
-<td align="center" valign="top"><p class="table">ID N</p></td>
-<td align="left" valign="top"><p class="table"></p></td>
-</tr>
-</tbody>
-</table>
-</div>
-<div class="paragraph"><p>For bread and butter applications is Helzer probably the alternative
-that is simpler to use. LApack puts quite some effort into performance
-optimizations and numerical border cases.  Therefore the LApack alternative
-might be better suited for large matrices or when precision should become
-an issue.</p></div>
 </div>
 </div>
 <div class="sect1">
-<h2 id="_usage_of_cr">Usage of ⎕CR</h2>
+<h2 id="_quadratic_b">Quadratic B</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>If <strong>B</strong> is quaratic, i.e. <strong>⍴B ←→ N N</strong>, then <strong>Q</strong>, <strong>R</strong>, and <strong>Ri</strong> have the same
+shape as <strong>B</strong>. Since the same <strong>B</strong> han have different factorizations, the
+ravels of the results usually differ, For example:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>      (Q R Ri) ← ⌹[1]B ← ?4 4⍴9   ⍝ Helzer, B quadratic
+      8 ⎕CR ¨⍴¨Q R Ri
+ ┌→──┐  ┌→──┐  ┌→──┐
+ │4 4│  │4 4│  │4 4│
+ └───┘  └───┘  └───┘
+      B=Q∘R     ⍝ Q R is a factorization of B
+1 1 1 1
+1 1 1 1
+1 1 1 1
+1 1 1 1
+      Q∘⍉Q      ⍝ Q is orthogonal
+1 0 0 0
+0 1 0 0
+0 0 1 0
+0 0 0 1
+      (⍉Q)∘Q    ⍝ Q is orthogonal
+1 0 0 0
+0 1 0 0
+0 0 1 0
+0 0 0 1
+      R∘Ri      ⍝ Ri is the inverse of R
+1 0 0 0
+0 1 0 0
+0 0 1 0
+0 0 0 1
+      Ri∘R      ⍝ Ri is the inverse of R
+1 0 0 0
+0 1 0 0
+0 0 1 0
+0 0 0 1
+0 0 0 1
+      8 ⎕CR¨2⍕¨Q R Ri
+ ┌→──────────────────┐  ┌→──────────────────────┐  ┌→────────────────────┐
+ ↓ .37  .00  .57  .73│  ↓ 13.38 10.69 9.87 12.71│  ↓ .07 ¯.48   .64 ¯1.12│
+ │ .60 ¯.24  .43 ¯.63│  │   .00  1.66 6.95 ¯1.69│  │ .00  .60 ¯1.04   .68│
+ │ .22  .97  .02 ¯.13│  │   .00   .00 4.04   .10│  │ .00  .00   .25  ¯.01│
+ │ .67 ¯.11 ¯.70  .20│  │   .00   .00  .00  1.64│  │ .00  .00   .00   .61│
+ └───────────────────┘  └───────────────────────┘  └─────────────────────┘
+
+      (Q R Ri) ← ⌹[2]B ← ?4 4⍴9   ⍝ LApack, B quadratic
+      8 ⎕CR ¨⍴¨Q R Ri
+ ┌→──┐  ┌→──┐  ┌→──┐
+ │4 4│  │4 4│  │4 4│
+ └───┘  └───┘  └───┘
+
+      B=Q∘R     ⍝ Q R is a factorization of B
+1 1 1 1
+1 1 1 1
+1 1 1 1
+1 1 1 1
+
+      Q∘⍉Q      ⍝ Q is orthogonal
+1 0 0 0
+0 1 0 0
+0 0 1 0
+0 0 0 1
+
+      (⍉Q)∘Q    ⍝ Q is orthogonal
+1 0 0 0
+0 1 0 0
+0 0 1 0
+0 0 0 1
+
+      R∘Ri      ⍝ Ri is the inverse of R
+1 0 0 0
+0 1 0 0
+0 0 1 0
+0 0 0 1
+
+      Ri∘R      ⍝ Ri is the inverse of R
+1 0 0 0
+0 1 0 0
+0 0 1 0
+0 0 0 1
+
+      8 ⎕CR¨2⍕¨Q R Ri
+ ┌→───────────────────┐  ┌→───────────────────────┐  ┌→───────────────────┐
+ ↓ ¯.14  .64 ¯.71  .26│  ↓ ¯7.14 ¯9.38 ¯7.98 ¯7.14│  ↓ ¯.14 ¯.50  .45  .89│
+ │ ¯.56  .28  .08 ¯.77│  │   .00  2.64  ¯.71  2.27│  │  .00  .38 ¯.08 ¯.46│
+ │ ¯.70 ¯.59 ¯.30  .26│  │   .00   .00 ¯3.28 ¯5.36│  │  .00  .00 ¯.30 ¯.58│
+ │ ¯.42  .40  .63  .52│  │   .00   .00   .00  2.84│  │  .00  .00  .00  .35│
+ └────────────────────┘  └────────────────────────┘  └────────────────────┘</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>Notice the differences in the <strong>8 ⎕CR¨2⍕¨Q R Ri</strong> lines above.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_under_under_determined_b">Under-under-determined B</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>If <strong>B</strong> is under-determined, i.e. <strong>⍴B ←→ M N</strong> with <strong>M &lt; N</strong>,
+then matters become a little more complicated. Due to conformity
+constraints (LENGTH ERROR), <strong>R</strong> can only be multiplied from the
+left or from the right with <strong>(⍴Ri)↑R</strong> and not with <strong>R</strong> itself:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>      (Q R Ri) ← ⌹[1]B ← ?2 4⍴9   ⍝ Helzer, B under-determined
+      8 ⎕CR ¨⍴¨Q R Ri
+ ┌→──┐  ┌→──┐  ┌→──┐
+ │2 2│  │2 4│  │2 2│
+ └───┘  └───┘  └───┘
+      B=Q∘R     ⍝ Q R is a factorization of B
+1 1 1 1
+1 1 1 1
+      Q∘⍉Q      ⍝ Q is orthogonal
+1 0
+0 1
+      (⍉Q)∘Q    ⍝ Q is orthogonal
+1 0
+0 1
+      ((⍴Ri)↑R)∘Ri      ⍝ Ri is the inverse of R
+1 0
+0 1
+      Ri∘((⍴Ri)↑R)      ⍝ Ri is the inverse of R
+1 0
+0 1
+      8 ⎕CR¨2⍕¨Q R Ri
+ ┌→────────┐  ┌→──────────────────────┐  ┌→────────┐
+ ↓ .87  .49│  ↓ 10.30  5.15 9.32  7.38│  ↓ .10  .10│
+ │ .49 ¯.87│  │   .00 ¯5.15 1.75 ¯5.05│  │ .00 ¯.19│
+ └─────────┘  └───────────────────────┘  └─────────┘</code>
+
+</pre>
+</div></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_over_determined_b">Over-determined B</h2>
+<div class="sectionbody">
+<div class="paragraph"><p>If <strong>B</strong> is over-determined, i.e. <strong>⍴B ←→ M N</strong> with <strong>M &gt; N</strong>, then matters
+are similar to the under-determined case. Again, due to conformity
+constraints (LENGTH ERROR), <strong>R</strong> can only be multiplied from the left
+or from the right with <strong>(⍴Ri)↑R</strong> and not with <strong>R</strong> itself:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>      (Q R Ri) ← ⌹[1]B ← ?4 2⍴9   ⍝ Helzer, B over-determined
+      8 ⎕CR ¨⍴¨Q R Ri
+ ┌→──┐  ┌→──┐  ┌→──┐
+ │4 4│  │4 2│  │2 2│
+ └───┘  └───┘  └───┘
+      B=Q∘R     ⍝ Q R is a factorization of B
+1 1
+1 1
+1 1
+1 1
+      Q∘⍉Q      ⍝ Q is orthogonal
+1 0 0 0
+0 1 0 0
+0 0 1 0
+0 0 0 1
+      ((⍴Ri)↑R)∘Ri      ⍝ Ri is the inverse of (⍴Ri)↑R
+1 0
+0 1
+      Ri∘((⍴Ri)↑R)      ⍝ Ri is the inverse of (⍴Ri)↑R
+1 0
+0 1
+      8 ⎕CR¨2⍕¨Q R Ri
+ ┌→──────────────────┐  ┌→───────────┐  ┌→────────┐
+ ↓ .69 ¯.17 ¯.19 ¯.67│  ↓ 11.53 10.67│  ↓ .09  .10│
+ │ .09 ¯.85 ¯.33  .39│  │   .00 ¯9.45│  │ .00 ¯.11│
+ │ .17 ¯.33  .93  .00│  │   .00   .00│  └─────────┘
+ │ .69  .36 ¯.00  .62│  │   .00   .00│
+ └───────────────────┘  └────────────┘
+
+
+      (Q R Ri) ← ⌹[2]B ← ?4 2⍴9   ⍝ LApack, B over-determined
+      8 ⎕CR ¨⍴¨Q R Ri
+ ┌→──┐  ┌→──┐  ┌→──┐
+ │2 2│  │4 2│  │2 2│
+ └───┘  └───┘  └───┘
+      ((⍴Ri)↑B) = Q∘(⍴Ri)↑R      ⍝ Q (⍴Ri)↑R is a factorization of (⍴Ri)↑B
+1 1
+1 1
+      Q∘⍉Q      ⍝ Q is NOT orthogonal
+0.4996560422 0.4895666132
+0.4895666132 0.5168539326
+      (⍉Q)∘Q    ⍝ Q is NOT orthogonal
+0.387434555  0.4745016688
+0.4745016688 0.6290754198
+      ((⍴Ri)↑R)∘Ri      ⍝ Ri is the inverse of R
+1 0
+0 1
+      8 ⎕CR¨2⍕¨Q R Ri
+ ┌→─────────┐  ┌→─────────────┐  ┌→─────────┐
+ ↓ ¯.51 ¯.49│  ↓ ¯13.82 ¯11.14│  ↓ ¯.07  .17│
+ │ ¯.36 ¯.62│  │    .00  ¯4.78│  │  .00 ¯.21│
+ └──────────┘  │    .00    .00│  └──────────┘
+               │    .00    .00│
+               └──────────────┘</code>
+
+</pre>
+</div></div>
+<div class="paragraph"><p>Note that above <strong>Q</strong> is orthogonal in the Helzer case but not in the LApack
+case. This is most likely caused by the fact that in an over-determined <strong>B</strong>
+the LApack functions computes a least-square solution instead of an exact one.
+Note also the different <strong>⍴Q</strong> in both cases.</p></div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="_impact_of_cr">Impact of ⎕CR</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>All ⌹-functions use <strong>⎕CT</strong> although in different ways.</p></div>
 <div class="sect2">
@@ -1896,8 +2015,8 @@ of the LApack functions.</td>
 <div class="paragraph"><p>The LApack based functions in GNU APL, i.e. <strong>A⌹B</strong>, <strong>⌹B</strong>, and <strong>⌹[2]B</strong>,
 use the C++ function <strong>LApack::estimate_rank()</strong> to compute the effective
 rank of the right argument <strong>B</strong>. Matrices with fewer rows than columns are
-<em>under-specified</em> and always yield a RANK ERROR. However a matrix can
-be under-specified even if the number of rows is suffiently large. This is
+<em>under-determined</em> and always yield a RANK ERROR. However a matrix can
+be under-determined even if the number of rows is suffiently large. This is
 the case if the rows are not linearly independent. Put differently,
 a large number of rows alone does not guarantee sufficient information
 because a linear dependent row is as good as no row.</p></div>
@@ -1933,7 +2052,7 @@ computation and producing a incorrect result.</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2023-09-06 20:57:01 CEST
+ 2023-09-10 20:49:29 CEST
 </div>
 </div>
 </body>

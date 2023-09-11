@@ -121,7 +121,7 @@ LENGTH ERROR+
       ^ ^
 
       )MORE
-A÷B : B is under-specified (has more cols than rows)
+A⌹B : B is under-specified (B has more columns than rows)
 
 
       ⍝ row count V ≠ row count MM

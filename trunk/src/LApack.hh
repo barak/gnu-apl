@@ -66,9 +66,6 @@
 /** @file
  */
 
-/// use (1) or don't (0) Garry Hetzer's QR ifactorization algorithm
-//
-#define QR_HELZER     0   /* in Bif_F12_DOMINO.cc */
 # define LA_DEBUG     0   /* LApack.cc */
 # define DOMINO_DEBUG 0   /* Bif_F12_DOMINO::householder */
 
@@ -234,6 +231,7 @@ public:
           : data(reinterpret_cast<T *>(vdata)),
             rows(M),
             cols(N),
+            transpose(false),
             dx(_dx)
         {}
      
@@ -243,9 +241,19 @@ public:
           : data(other.data),
             rows(other.rows),
             cols(new_col_count),
+            transpose(other.transpose),
             dx(other.dx)
         { assert(new_col_count <= other.cols); }
-     
+
+        /// copy from \b other
+        void operator =(const fMatrix & other)
+           {
+             transpose = other.transpose;
+             assert(rows*cols == other.rows*other.cols);
+             ALL_ROWS(rows)
+             ALL_COLS(cols)   at(row, col) = other.at(row, col);
+           }
+
         /// return the sub-matrix starting at row and col.
         /// I.e. \b row col↓this
         fMatrix sub_matrix(Crow row, Crow col)
@@ -253,7 +261,16 @@ public:
              assert(col <= cols && row <= rows);
              return fMatrix(&at(row, col), rows - row, cols - col, dx);
            }
-     
+
+        void set_rows(Ccol new_rows)
+           { const_cast<Crow &>(rows) = new_rows; }
+
+        void set_columns(Ccol new_cols)
+           { const_cast<Ccol &>(cols) = new_cols; }
+
+        void set_transpose()
+           { transpose = true; }
+
         /// return the sub-matrix of size new_len_y: new_len_x.
         /// I.e. \b new_rows new_rows↑this
         /// starting at row 0 and column 0
@@ -293,6 +310,18 @@ public:
              assert(col < cols);
              return data[row + col*dx]; }
      
+        /// return \b this[row, col] or this[col, row]
+        const T & AT(Crow row, Ccol col) const
+           { assert(row < rows);   assert(col < cols);
+             return transpose ? data[col + row*dx] : data[row + col*dx];
+           }
+     
+        /// return \b this[row, col] or this[col, row]
+        T & AT(Crow row, Ccol col)
+           { assert(row < rows);   assert(col < cols);
+             return transpose ? data[col + row*dx] : data[row + col*dx];
+           }
+     
         /// return \b this[i, i]
         T & diag(ShapeItem i)
            { assert(i < rows);
@@ -315,18 +344,6 @@ public:
              loop(r, rows)   exchange(*p1++, *p2++);
            }
 
-           /// transpose member data
-           void transpose_data()
-              {
-                ALL_ROWS(rows)
-                for (Ccol col = row + 1; col < cols; ++col)
-                    {
-                      const T item = at(row, col);
-                      at(row, col) = at(col, row);
-                      at(col, row) = item;
-                    }
-              }
-     
      protected:                        // fMatrix<T>
         /// the elements of \b this matrix
         T * const data;
@@ -337,6 +354,9 @@ public:
         /// the number of columns of \b this matrix
         const Ccol cols;
      
+        /// whether AT() shall transpose
+        bool transpose;
+
         /// return the distance between two adjacent columns in \b data.
         /// this distance is usually called LDx (Leading Dimension of x)
         /// in FORTRAN, e.g. LDA for a FORTRAN matrix A with LDA rows.
@@ -369,8 +389,6 @@ public:
              memcpy(dest, src, bytes);
              return reinterpret_cast<T *>(dest);
             }
-
-
      };
 
    /// FORTRAN work memories
@@ -538,16 +556,14 @@ public:
      /// LApack function ung2r: convert reflectors (in A) to
      /// orthogonal Q (returned in A)
      template<typename T>
-     static void ung2r(fMatrix<T> & A, const PTVVy<T> & ptvvy);
+     static void ung2r(fMatrix<T> & A, PTVVy<T> & ptvvy);
 
-     /// store the orthogonal factor Q HR in Z[1]
+     /// store the orthogonal factor Q of some HR in Z[1]. On entry is Q a copy
+     /// of HR, on exit is Q the reflectors in HR applied to the unit matrix.
      template<typename T>
-     static void grab_Q (Value & Z, const fMatrix<T> & B,
-                                    const fMatrix<T> & Rinv,
-                                    const PTVVy<T> & ptvvy);
+     static void grab_Q (Value & Z, fMatrix<T> & Q, PTVVy<T> & ptvvy);
 
      /// store the upper triangle matrix UTM of HR in Z[2] and UTM⁻¹ in Z[3]
-     /// return UTM⁻¹ in Rinv,
      template<typename T>
      static void grab_R(fMatrix<T> & HR,      // input
                         Value & Z,            // set Z[2 3]
