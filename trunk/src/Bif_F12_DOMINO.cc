@@ -228,8 +228,17 @@ Shape shape_Z;   // ⍴Z ←→ (¯1↓⍴A), (1↓⍴B)
 
 const bool need_complex = A->is_complex(true) || B->is_complex(true);
 Value_P Z(shape_Z, LOC);
-   LA_pack::divide_matrix(*Z, need_complex, rows_A, cols_A, &A->get_cfirst(),
-                                            cols_B, &B->get_cfirst());
+const sRank rank = LA_pack::divide_matrix(*Z, need_complex,
+                                          rows_A, cols_A, &A->get_cfirst(),
+                                          cols_B, &B->get_cfirst());
+   if (rank < cols_B)
+      {
+        const char * type = need_complex ? "complex" : "real";
+        MORE_ERROR() << "A⌹B : linearly dependent (" << type << ") B?"
+                        " ⍴B is " << rows_A << " " << cols_B
+                     << ", but the estimated rank is " << rank;
+        DOMAIN_ERROR;
+      }
 
    Z->set_default(*B.get(), LOC);
 

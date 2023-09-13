@@ -764,12 +764,13 @@ the C++ code as much as possible.</p></div>
 of monadic ⌹, simply constructs a unit matrix <strong>I</strong> of proper size and then
 returns <strong>eval_AB(I, B)</strong>, i.e. the result of the implementation of
 dyadic <strong>A⌹B</strong>.</p></div>
+<div style="page-break-after:always"></div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_dyadic_a_b_matrix_divide">Dyadic A⌹B: Matrix Divide</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>In APL, <strong>A⌹B</strong> for a N-column matrix <strong>A</strong> is defined in terms of each column
+<div class="paragraph"><p>In APL, <strong>A⌹B</strong> for an N-column matrix <strong>A</strong> is defined in terms of each column
 of <strong>A</strong>:</p></div>
 <div class="listingblock">
 <div class="content">
@@ -1720,7 +1721,7 @@ pairs <strong>(Q R)</strong> for the same matrix <strong>B</strong>.</p></div>
 <strong>A⌹B</strong>. For this reason GNU APL provides <strong>⌹[X]</strong> which returns the matrices
 <strong>Q</strong>  and <strong>R</strong> before applying them (i.e. in order to solve <strong>A∘X=B</strong>). As
 a matter of convenience for the programmer, GNU APL not only computes
-the pair <strong>(Q R)</strong>, but a triple <strong>(Q R Rinv)</strong> where <strong>Rinv ≡ ⌹R</strong>.xi</p></div>
+the pair <strong>(Q R)</strong>, but a triple <strong>(Q R Rinv)</strong> where <strong>Rinv ≡ ⌹R</strong>.</p></div>
 <div class="paragraph"><p>One could, of course, compute <strong>Rinv</strong> from <strong>R</strong> in APL with <strong>Rinv←⌹R</strong>.
 However, <strong>⌹R</strong> in APL can not easily take advantage of the fact that <strong>⌹R</strong> is
 upper triangular, which makes it more efficient to use an inversion algorithm
@@ -1763,212 +1764,237 @@ Integer scalar 2 selects the <strong>laqp2()</strong> algorithm, and
 </p>
 </li>
 </ol></div>
-</div>
-</div>
-<div class="sect1">
-<h2 id="_quadratic_b">Quadratic B</h2>
-<div class="sectionbody">
-<div class="paragraph"><p>If <strong>B</strong> is quaratic, i.e. <strong>⍴B ←→ N N</strong>, then <strong>Q</strong>, <strong>R</strong>, and <strong>Ri</strong> have the same
-shape as <strong>B</strong>. Since the same <strong>B</strong> han have different factorizations, the
-ravels of the results usually differ, For example:</p></div>
+<div class="sect2">
+<h3 id="_quadratic_b">Quadratic B</h3>
+<div class="paragraph"><p>The simplest cases are those where <strong>B</strong> is quadratic, i.e. <strong>⍴B ←→ N N</strong>. In
+those cases <strong>Q</strong>, <strong>R</strong>, and <strong>Ri</strong> have the same shape as <strong>B</strong>. The same <strong>B</strong> can
+have different QR factorizations, therefore the ravels of the results
+usually differ between different algorithms.  For example:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre>
 
-<code>      (Q R Ri) ← ⌹[1]B ← ?4 4⍴9   ⍝ Helzer, B quadratic
-      8 ⎕CR ¨⍴¨Q R Ri
- ┌→──┐  ┌→──┐  ┌→──┐
- │4 4│  │4 4│  │4 4│
- └───┘  └───┘  └───┘
-      B=Q∘R     ⍝ Q R is a factorization of B
-1 1 1 1
-1 1 1 1
-1 1 1 1
-1 1 1 1
-      Q∘⍉Q      ⍝ Q is orthogonal
-1 0 0 0
-0 1 0 0
-0 0 1 0
-0 0 0 1
-      (⍉Q)∘Q    ⍝ Q is orthogonal
-1 0 0 0
-0 1 0 0
-0 0 1 0
-0 0 0 1
-      R∘Ri      ⍝ Ri is the inverse of R
-1 0 0 0
-0 1 0 0
-0 0 1 0
-0 0 0 1
-      Ri∘R      ⍝ Ri is the inverse of R
-1 0 0 0
-0 1 0 0
-0 0 1 0
-0 0 0 1
-0 0 0 1
-      8 ⎕CR¨2⍕¨Q R Ri
- ┌→──────────────────┐  ┌→──────────────────────┐  ┌→────────────────────┐
- ↓ .37  .00  .57  .73│  ↓ 13.38 10.69 9.87 12.71│  ↓ .07 ¯.48   .64 ¯1.12│
- │ .60 ¯.24  .43 ¯.63│  │   .00  1.66 6.95 ¯1.69│  │ .00  .60 ¯1.04   .68│
- │ .22  .97  .02 ¯.13│  │   .00   .00 4.04   .10│  │ .00  .00   .25  ¯.01│
- │ .67 ¯.11 ¯.70  .20│  │   .00   .00  .00  1.64│  │ .00  .00   .00   .61│
- └───────────────────┘  └───────────────────────┘  └─────────────────────┘
+<code>      MN←4 4 ◊ B←?MN⍴9                 ⍝ B quadratic (M=N)
+      Q_R_Ri←(Q R Ri) ← ⌹[1]B          ⍝ Helzer algorithm
 
-      (Q R Ri) ← ⌹[2]B ← ?4 4⍴9   ⍝ LApack, B quadratic
-      8 ⎕CR ¨⍴¨Q R Ri
- ┌→──┐  ┌→──┐  ┌→──┐
- │4 4│  │4 4│  │4 4│
- └───┘  └───┘  └───┘
+      8 ⎕CR¨(⊂B), 2⍕¨Q_R_Ri            ⍝ argument B and results Q R Ri
+ ┌→──────┐  ┌→──────────────────┐  ┌→──────────────────────┐  ┌→──────────────────┐
+ ↓4 4 9 5│  ↓ .34  .19 ¯.68  .62│  ↓ 11.70 9.23 11.36 13.50│  ↓ .09 ¯.17  .17  .59│
+ │6 1 6 7│  │ .51 ¯.82  .20  .18│  │   .00 4.57 ¯2.16 ¯1.00│  │ .00  .22 ¯.06 ¯.05│
+ │7 8 1 6│  │ .60  .54  .57  .14│  │   .00  .00 ¯8.08 ¯2.29│  │ .00  .00 ¯.12  .18│
+ │6 5 9 9│  │ .51  .06 ¯.41 ¯.75│  │   .00  .00   .00 ¯1.60│  │ .00  .00  .00 ¯.62│
+ └───────┘  └───────────────────┘  └───────────────────────┘  └───────────────────┘
 
-      B=Q∘R     ⍝ Q R is a factorization of B
-1 1 1 1
-1 1 1 1
-1 1 1 1
-1 1 1 1
+      8 ⎕CR¨(⊂B), (2⍕¨Q R Ri)          ⍝ argument B and results Q R Ri
+ ┌→──────┐  ┌→──────────────────┐  ┌→──────────────────────┐  ┌→──────────────────┐
+ ↓4 4 9 5│  ↓ .34  .19 ¯.68  .62│  ↓ 11.70 9.23 11.36 13.50│  ↓ .09 ¯.17  .17  .59│
+ │6 1 6 7│  │ .51 ¯.82  .20  .18│  │   .00 4.57 ¯2.16 ¯1.00│  │ .00  .22 ¯.06 ¯.05│
+ │7 8 1 6│  │ .60  .54  .57  .14│  │   .00  .00 ¯8.08 ¯2.29│  │ .00  .00 ¯.12  .18│
+ │6 5 9 9│  │ .51  .06 ¯.41 ¯.75│  │   .00  .00   .00 ¯1.60│  │ .00  .00  .00 ¯.62│
+ └───────┘  └───────────────────┘  └───────────────────────┘  └───────────────────┘
 
-      Q∘⍉Q      ⍝ Q is orthogonal
-1 0 0 0
-0 1 0 0
-0 0 1 0
-0 0 0 1
+      8 ⎕CR¨ ⍴¨B R Ri Q                ⍝ argument and results shapes
+ ┌→──┐  ┌→──┐  ┌→──┐  ┌→──┐
+ │4 4│  │4 4│  │4 4│  │4 4│
+ └───┘  └───┘  └───┘  └───┘
 
-      (⍉Q)∘Q    ⍝ Q is orthogonal
-1 0 0 0
-0 1 0 0
-0 0 1 0
-0 0 0 1
+      8 ⎕CR B=Q∘R                      ⍝ Q R is a factorization of B
+┌→──────┐
+↓1 1 1 1│
+│1 1 1 1│
+│1 1 1 1│
+│1 1 1 1│
+└───────┘
 
-      R∘Ri      ⍝ Ri is the inverse of R
-1 0 0 0
-0 1 0 0
-0 0 1 0
-0 0 0 1
+      8 ⎕CR¨ (Q∘⍉Q) ((⍉Q)∘Q)           ⍝ Q is orthogonal
+ ┌→──────┐  ┌→──────┐
+ ↓1 0 0 0│  ↓1 0 0 0│
+ │0 1 0 0│  │0 1 0 0│
+ │0 0 1 0│  │0 0 1 0│
+ │0 0 0 1│  │0 0 0 1│
+ └───────┘  └───────┘
 
-      Ri∘R      ⍝ Ri is the inverse of R
-1 0 0 0
-0 1 0 0
-0 0 1 0
-0 0 0 1
+      8 ⎕CR¨ (R∘Ri) (Ri∘R)             ⍝ Ri is the inverse of R
+ ┌→──────┐  ┌→──────┐
+ ↓1 0 0 0│  ↓1 0 0 0│
+ │0 1 0 0│  │0 1 0 0│
+ │0 0 1 0│  │0 0 1 0│
+ │0 0 0 1│  │0 0 0 1│
+ └───────┘  └───────┘
 
-      8 ⎕CR¨2⍕¨Q R Ri
- ┌→───────────────────┐  ┌→───────────────────────┐  ┌→───────────────────┐
- ↓ ¯.14  .64 ¯.71  .26│  ↓ ¯7.14 ¯9.38 ¯7.98 ¯7.14│  ↓ ¯.14 ¯.50  .45  .89│
- │ ¯.56  .28  .08 ¯.77│  │   .00  2.64  ¯.71  2.27│  │  .00  .38 ¯.08 ¯.46│
- │ ¯.70 ¯.59 ¯.30  .26│  │   .00   .00 ¯3.28 ¯5.36│  │  .00  .00 ¯.30 ¯.58│
- │ ¯.42  .40  .63  .52│  │   .00   .00   .00  2.84│  │  .00  .00  .00  .35│
- └────────────────────┘  └────────────────────────┘  └────────────────────┘</code>
+
+      MN←4 4 ◊ B←?MN⍴9                 ⍝ B quadratic (M=N)
+      Q_R_Ri←(Q R Ri) ← ⌹[2]B          ⍝ LApack algorithm
+      8 ⎕CR¨(⊂B), 2⍕¨Q_R_Ri            ⍝ argument B and results Q R Ri
+ ┌→──────┐  ┌→───────────────────┐  ┌→─────────────────────────┐  ┌→───────────────────┐
+ ↓2 5 5 7│  ↓ ¯.22  .41  .64  .61│  ↓ ¯9.22 ¯12.91 ¯5.10 ¯11.50│  ↓ ¯.11 ¯.26  .16  .22│
+ │8 9 2 8│  │ ¯.87 ¯.41 ¯.21  .18│  │   .00   5.33  4.17   7.24│  │  .00  .19 ¯.23 ¯.43│
+ │4 8 5 5│  │ ¯.43  .45  .27 ¯.73│  │   .00    .00  3.41  ¯1.40│  │  .00  .00  .29  .10│
+ │1 5 1 8│  │ ¯.11  .68 ¯.69  .23│  │   .00    .00   .00   3.92│  │  .00  .00  .00  .25│
+ └───────┘  └────────────────────┘  └──────────────────────────┘  └────────────────────┘
+
+      8 ⎕CR¨ ⍴¨B R Ri Q                ⍝ argument and results shapes
+ ┌→──┐  ┌→──┐  ┌→──┐  ┌→──┐
+ │4 4│  │4 4│  │4 4│  │4 4│
+ └───┘  └───┘  └───┘  └───┘
+
+      8 ⎕CR B=Q∘R                      ⍝ Q R is a factorization of B
+┌→──────┐
+↓1 1 1 1│
+│1 1 1 1│
+│1 1 1 1│
+│1 1 1 1│
+└───────┘
+
+      8 ⎕CR¨ (Q∘⍉Q) ((⍉Q)∘Q)           ⍝ Q is orthogonal
+ ┌→──────┐  ┌→──────┐
+ ↓1 0 0 0│  ↓1 0 0 0│
+ │0 1 0 0│  │0 1 0 0│
+ │0 0 1 0│  │0 0 1 0│
+ │0 0 0 1│  │0 0 0 1│
+ └───────┘  └───────┘
+      8 ⎕CR¨ (R∘Ri) (Ri∘R)             ⍝ Ri is the inverse of R
+ ┌→──────┐  ┌→──────┐
+ ↓1 0 0 0│  ↓1 0 0 0│
+ │0 1 0 0│  │0 1 0 0│
+ │0 0 1 0│  │0 0 1 0│
+ │0 0 0 1│  │0 0 0 1│
+ └───────┘  └───────┘</code>
 
 </pre>
 </div></div>
-<div class="paragraph"><p>Notice the differences in the <strong>8 ⎕CR¨2⍕¨Q R Ri</strong> lines above.</p></div>
+<div class="paragraph"><p>Notice the differences between the Helzer and the LAack algorithm
+in the <strong>8 ⎕CR¨2⍕¨Q R Ri</strong> lines above.</p></div>
 </div>
-</div>
-<div class="sect1">
-<h2 id="_under_under_determined_b">Under-under-determined B</h2>
-<div class="sectionbody">
+<div class="sect2">
+<h3 id="_under_determined_b">Under-determined B</h3>
 <div class="paragraph"><p>If <strong>B</strong> is under-determined, i.e. <strong>⍴B ←→ M N</strong> with <strong>M &lt; N</strong>,
 then matters become a little more complicated. Due to conformity
-constraints (LENGTH ERROR), <strong>R</strong> can only be multiplied from the
-left or from the right with <strong>(⍴Ri)↑R</strong> and not with <strong>R</strong> itself:</p></div>
+constraints (LENGTH ERROR), only <strong>(⍴Ri)↑R</strong> only be multiplied
+ from the left or from the right, but not <strong>R</strong> itself:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre>
 
-<code>      (Q R Ri) ← ⌹[1]B ← ?2 4⍴9   ⍝ Helzer, B under-determined
-      8 ⎕CR ¨⍴¨Q R Ri
- ┌→──┐  ┌→──┐  ┌→──┐
- │2 2│  │2 4│  │2 2│
- └───┘  └───┘  └───┘
-      B=Q∘R     ⍝ Q R is a factorization of B
-1 1 1 1
-1 1 1 1
-      Q∘⍉Q      ⍝ Q is orthogonal
-1 0
-0 1
-      (⍉Q)∘Q    ⍝ Q is orthogonal
-1 0
-0 1
-      ((⍴Ri)↑R)∘Ri      ⍝ Ri is the inverse of R
-1 0
-0 1
-      Ri∘((⍴Ri)↑R)      ⍝ Ri is the inverse of R
-1 0
-0 1
-      8 ⎕CR¨2⍕¨Q R Ri
- ┌→────────┐  ┌→──────────────────────┐  ┌→────────┐
- ↓ .87  .49│  ↓ 10.30  5.15 9.32  7.38│  ↓ .10  .10│
- │ .49 ¯.87│  │   .00 ¯5.15 1.75 ¯5.05│  │ .00 ¯.19│
- └─────────┘  └───────────────────────┘  └─────────┘</code>
+<code>      MM←2/↑(M N)←MN←2 4 ◊ B←?MN⍴9     ⍝ Helzer, B under-determined (M&lt;N)
+      Q_R_Ri←(Q R Ri) ← ⌹[1]B          ⍝ Helzer algorithm
+
+      8 ⎕CR¨(⊂B), 2⍕¨Q_R_Ri            ⍝ argument B and results Q R Ri
+ ┌→──────┐  ┌→────────┐  ┌→────────────────────┐  ┌→─────────┐
+ ↓2 5 3 5│  ↓ .89  .45│  ↓ 2.24 5.81  4.02 4.92│  ↓ .45  5.81│
+ │1 3 3 1│  │ .45 ¯.89│  │  .00 ¯.45 ¯1.34 1.34│  │ .00 ¯2.24│
+ └───────┘  └─────────┘  └─────────────────────┘  └──────────┘
+
+      8 ⎕CR¨ ⍴¨B R Ri Q                ⍝ argument and results shapes
+ ┌→──┐  ┌→──┐  ┌→──┐  ┌→──┐
+ │2 4│  │2 4│  │2 2│  │2 2│
+ └───┘  └───┘  └───┘  └───┘
+
+      8 ⎕CR B=Q∘R                      ⍝ Q R is a factorization of B
+┌→──────┐
+↓1 1 1 1│
+│1 1 1 1│
+└───────┘
+
+      8 ⎕CR¨ (Q∘⍉Q) ((⍉Q)∘Q)           ⍝ Q is orthogonal
+ ┌→──┐  ┌→──┐
+ ↓1 0│  ↓1 0│
+ │0 1│  │0 1│
+ └───┘  └───┘
+
+      8 ⎕CR¨ ((MM↑R)∘Ri) (Ri∘(MM↑R))   ⍝ Ri is the inverse of R
+ ┌→──┐  ┌→──┐
+ ↓1 0│  ↓1 0│
+ │0 1│  │0 1│
+ └───┘  └───┘</code>
 
 </pre>
 </div></div>
 </div>
-</div>
-<div class="sect1">
-<h2 id="_over_determined_b">Over-determined B</h2>
-<div class="sectionbody">
-<div class="paragraph"><p>If <strong>B</strong> is over-determined, i.e. <strong>⍴B ←→ M N</strong> with <strong>M &gt; N</strong>, then matters
-are similar to the under-determined case. Again, due to conformity
-constraints (LENGTH ERROR), <strong>R</strong> can only be multiplied from the left
-or from the right with <strong>(⍴Ri)↑R</strong> and not with <strong>R</strong> itself:</p></div>
+<div class="sect2">
+<h3 id="_over_determined_b">Over-determined B</h3>
+<div class="paragraph"><p>The most complicated cases are those where <strong>B</strong> is over-determined,
+i.e. <strong>⍴B ←→ M N</strong> with <strong>M &gt; N</strong>. The conformity constraints are similar
+to those of the under-determined cases.</p></div>
 <div class="listingblock">
 <div class="content">
 <pre>
 
-<code>      (Q R Ri) ← ⌹[1]B ← ?4 2⍴9   ⍝ Helzer, B over-determined
-      8 ⎕CR ¨⍴¨Q R Ri
- ┌→──┐  ┌→──┐  ┌→──┐
- │4 4│  │4 2│  │2 2│
- └───┘  └───┘  └───┘
-      B=Q∘R     ⍝ Q R is a factorization of B
-1 1
-1 1
-1 1
-1 1
-      Q∘⍉Q      ⍝ Q is orthogonal
-1 0 0 0
-0 1 0 0
-0 0 1 0
-0 0 0 1
-      ((⍴Ri)↑R)∘Ri      ⍝ Ri is the inverse of (⍴Ri)↑R
-1 0
-0 1
-      Ri∘((⍴Ri)↑R)      ⍝ Ri is the inverse of (⍴Ri)↑R
-1 0
-0 1
-      8 ⎕CR¨2⍕¨Q R Ri
- ┌→──────────────────┐  ┌→───────────┐  ┌→────────┐
- ↓ .69 ¯.17 ¯.19 ¯.67│  ↓ 11.53 10.67│  ↓ .09  .10│
- │ .09 ¯.85 ¯.33  .39│  │   .00 ¯9.45│  │ .00 ¯.11│
- │ .17 ¯.33  .93  .00│  │   .00   .00│  └─────────┘
- │ .69  .36 ¯.00  .62│  │   .00   .00│
- └───────────────────┘  └────────────┘
+<code>      NN←2/1↓(M N)←MN←4 2 ◊ B←?MN⍴9    ⍝ B over-determined (M&gt;N)
+      Q_R_Ri←(Q R Ri) ← ⌹[1]B          ⍝ Helzer algorithm
+
+      8 ⎕CR¨(⊂B), (2⍕¨Q R Ri)          ⍝ argument B and results Q R Ri
+ ┌→──┐  ┌→──────────────────┐  ┌→───────────┐  ┌→────────┐
+ ↓9 3│  ↓ .65  .31 ¯.54  .44│  ↓ 13.82  6.51│  ↓ .07  .12│
+ │7 3│  │ .51  .08 ¯.04 ¯.86│  │   .00 ¯3.95│  │ .00 ¯.25│
+ │6 2│  │ .43  .21  .84  .24│  │   .00   .00│  └─────────┘
+ │5 6│  │ .36 ¯.92  .01  .13│  │   .00   .00│
+ └───┘  └───────────────────┘  └────────────┘
+
+      8 ⎕CR¨ ⍴¨B R Ri Q                ⍝ argument and results shapes
+ ┌→──┐  ┌→──┐  ┌→──┐  ┌→──┐
+ │4 2│  │4 2│  │2 2│  │4 4│
+ └───┘  └───┘  └───┘  └───┘
+
+      8 ⎕CR B=Q∘R                      ⍝ Q R is a factorization of B
+┌→──┐
+↓1 1│
+│1 1│
+│1 1│
+│1 1│
+└───┘
+
+      8 ⎕CR¨ (Q∘⍉Q) ((⍉Q)∘Q)           ⍝ Q is orthogonal
+ ┌→──────┐  ┌→──────┐
+ ↓1 0 0 0│  ↓1 0 0 0│
+ │0 1 0 0│  │0 1 0 0│
+ │0 0 1 0│  │0 0 1 0│
+ │0 0 0 1│  │0 0 0 1│
+ └───────┘  └───────┘
+
+      8 ⎕CR¨ ((NN↑R)∘Ri) (Ri∘(NN↑R))   ⍝ Ri is the inverse of R
+ ┌→──┐  ┌→──┐
+ ↓1 0│  ↓1 0│
+ │0 1│  │0 1│
+ └───┘  └───┘
 
 
-      (Q R Ri) ← ⌹[2]B ← ?4 2⍴9   ⍝ LApack, B over-determined
-      8 ⎕CR ¨⍴¨Q R Ri
- ┌→──┐  ┌→──┐  ┌→──┐
- │2 2│  │4 2│  │2 2│
- └───┘  └───┘  └───┘
-      ((⍴Ri)↑B) = Q∘(⍴Ri)↑R      ⍝ Q (⍴Ri)↑R is a factorization of (⍴Ri)↑B
-1 1
-1 1
-      Q∘⍉Q      ⍝ Q is NOT orthogonal
-0.4996560422 0.4895666132
-0.4895666132 0.5168539326
-      (⍉Q)∘Q    ⍝ Q is NOT orthogonal
-0.387434555  0.4745016688
-0.4745016688 0.6290754198
-      ((⍴Ri)↑R)∘Ri      ⍝ Ri is the inverse of R
-1 0
-0 1
-      8 ⎕CR¨2⍕¨Q R Ri
- ┌→─────────┐  ┌→─────────────┐  ┌→─────────┐
- ↓ ¯.51 ¯.49│  ↓ ¯13.82 ¯11.14│  ↓ ¯.07  .17│
- │ ¯.36 ¯.62│  │    .00  ¯4.78│  │  .00 ¯.21│
- └──────────┘  │    .00    .00│  └──────────┘
-               │    .00    .00│
-               └──────────────┘</code>
+      NN←2/1↓(M N)←MN←4 2 ◊ B←?MN⍴9    ⍝ B over-determined (M&gt;N)
+      Q_R_Ri←(Q R Ri) ← ⌹[2]B          ⍝ LApack algorithm
+
+      8 ⎕CR¨(⊂B), 2⍕¨Q_R_Ri            ⍝ argument B and results Q R Ri
+ ┌→──┐  ┌→─────────┐  ┌→────────────┐  ┌→─────────┐
+ ↓5 3│  ↓ ¯.48  .09│  ↓ ¯10.34 ¯5.51│  ↓ ¯.10 ¯.14│
+ │8 3│  │ ¯.77 ¯.34│  │    .00  3.69│  │  .00  .27│
+ │3 1│  │ ¯.29 ¯.16│  └─────────────┘  └──────────┘
+ │3 5│  │ ¯.29  .92│
+ └───┘  └──────────┘
+
+      8 ⎕CR¨ ⍴¨B R Ri Q                ⍝ argument and results shapes
+ ┌→──┐  ┌→──┐  ┌→──┐  ┌→──┐
+ │4 2│  │2 2│  │2 2│  │4 2│
+ └───┘  └───┘  └───┘  └───┘
+      8 ⎕CR B=Q∘R                      ⍝ Q R is a factorization of B
+┌→──┐
+↓1 1│
+│1 1│
+│1 1│
+│1 1│
+└───┘
+
+      8 ⎕CR¨ (2⍕Q∘⍉Q) ((⍉Q)∘Q)         ⍝ Q is orthogonal ?
+ ┌→──────────────────┐  ┌→──┐
+ ↓ .24  .34  .13  .22│  ↓1 0│
+ │ .34  .71  .28 ¯.09│  │0 1│
+ │ .13  .28  .11 ¯.07│  └───┘
+ │ .22 ¯.09 ¯.07  .93│
+ └───────────────────┘
+
+      8 ⎕CR¨ ((NN↑R)∘Ri) (Ri∘(NN↑R))   ⍝ Ri is the inverse of NN↑R
+ ┌→──┐  ┌→──┐
+ ↓1 0│  ↓1 0│
+ │0 1│  │0 1│
+ └───┘  └───┘</code>
 
 </pre>
 </div></div>
@@ -1976,6 +2002,7 @@ or from the right with <strong>(⍴Ri)↑R</strong> and not with <strong>R</stro
 case. This is most likely caused by the fact that in an over-determined <strong>B</strong>
 the LApack functions computes a least-square solution instead of an exact one.
 Note also the different <strong>⍴Q</strong> in both cases.</p></div>
+</div>
 </div>
 </div>
 <div class="sect1">
@@ -2012,17 +2039,18 @@ of the LApack functions.</td>
 </div>
 <div class="sect2">
 <h3 id="_ct_in_the_lapack_functions">⎕CT in the LApack functions</h3>
-<div class="paragraph"><p>The LApack based functions in GNU APL, i.e. <strong>A⌹B</strong>, <strong>⌹B</strong>, and <strong>⌹[2]B</strong>,
-use the C++ function <strong>LApack::estimate_rank()</strong> to compute the effective
-rank of the right argument <strong>B</strong>. Matrices with fewer rows than columns are
-<em>under-determined</em> and always yield a RANK ERROR. However a matrix can
-be under-determined even if the number of rows is suffiently large. This is
-the case if the rows are not linearly independent. Put differently,
-a large number of rows alone does not guarantee sufficient information
-because a linear dependent row is as good as no row.</p></div>
-<div class="paragraph"><p>Function <strong>estimate_rank()</strong> has no corresponding FORTRAN function but was
-a somewhat lengthy section of <strong>LApack::gelsy()</strong> that was factored out into
-<strong>estimate_rank()</strong> in order to improve the readability of the C++ code.</p></div>
+<div class="paragraph"><p>The LApack based functions <strong>A⌹B</strong> and <strong>⌹B</strong> in GNU APL use the C++ function
+<strong>LApack::estimate_rank()</strong> to compute the effective rank of the right
+argument <strong>B</strong>. Matrices with fewer rows than columns are <em>under-determined</em>
+and always yield a RANK ERROR. However a matrix can be under-determined even
+if the number of rows is suffiently large. This is the case if the rows are
+not linearly independent. Put differently, a large number of rows alone
+does not guarantee a sufficient matrix rank because a linear dependent row
+is as good as no row.</p></div>
+<div class="paragraph"><p>Function <strong>estimate_rank()</strong> has no corresponding FORTRAN function in LApack,
+but used to be a somewhat lengthy section of <strong>LApack::gelsy()</strong>. That section
+was factored out into <strong>estimate_rank()</strong> in order to improve the readability
+of the GNU APL C++ code.</p></div>
 <div class="paragraph"><p>Function <strong>estimate_rank()</strong> iteratively computes two values <strong>smin</strong> (an upper
 bound for the smallest singular value of <strong>B</strong>) and <strong>smax</strong> (a lower bound for
 the largest singular value of <strong>B</strong>), and considers matrix <strong>B</strong> as rank-deficient
@@ -2036,14 +2064,14 @@ if:</p></div>
 </pre>
 </div></div>
 <div class="paragraph"><p>If that happens then GNU APL reports a <strong>RANK ERROR</strong>. It means that the
-matrix <strong>B</strong> (i.e. of <strong>A⌹B</strong>, <strong>⌹B</strong>, or <strong>⌹[2]B</strong>) is either truly rank-deficient,
+matrix <strong>B</strong> (i.e. of <strong>A⌹B</strong>, <strong>⌹B</strong>) is either truly rank-deficient,
 or at least close to a rank-deficient matrix. Increasing <strong>⎕CT</strong> may or may not
 solve that problem. Unlike "normal" RANK ERRORs, the meaning of this type
-of RANK ERROR is that, even though the shape of the matrix <strong>B</strong> is correct
-in the APL sense, the rows of <strong>B</strong> are at least close to being linearly
-dependent. In such cases the precision of the result is rather questionable
-and the RANK ERROR indicates that problem rather than continuing with the
-computation and producing a incorrect result.</p></div>
+of RANK ERROR is that, even though <strong>↑⍴B</strong> is large enough, the rows of <strong>B</strong>
+are at least close to being linearly dependent. In such cases the precision
+of the result is rather questionable and the RANK ERROR indicates that
+problem rather than continuing with the computation and producing a
+incorrect result.</p></div>
 </div>
 </div>
 </div>
@@ -2052,7 +2080,7 @@ computation and producing a incorrect result.</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2023-09-10 20:49:29 CEST
+ 2023-09-13 18:50:54 CEST
 </div>
 </div>
 </body>

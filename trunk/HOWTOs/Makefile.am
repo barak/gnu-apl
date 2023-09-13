@@ -28,7 +28,6 @@ dist_doc_DATA = \
     $(HTML)              \
     $(ASCIIDOC)          \
     APL-on-Macintosh.pdf \
-    LApack-primer.pdf    \
     Parallel-APL.pdf     \
     glade-0.png          \
     glade-1.png          \

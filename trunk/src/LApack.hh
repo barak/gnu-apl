@@ -66,8 +66,8 @@
 /** @file
  */
 
-# define LA_DEBUG     0   /* LApack.cc */
-# define DOMINO_DEBUG 0   /* Bif_F12_DOMINO::householder */
+#define LA_DEBUG     0   /* LApack.cc */
+#define DOMINO_DEBUG 0   /* Bif_F12_DOMINO::householder */
 
 #ifndef assert
 # define assert(x)
@@ -80,6 +80,8 @@ typedef int Cdia;   ///< a diagonal (row == col) number:   0..N (excluding N)
 #define ALL_ROWS(M)   for (Crow row = 0; row < (M); ++row)
 #define ALL_COLS(N)   for (Ccol col = 0; col < (N); ++col)
 #define ALL_DIAS(N)   for (Cdia dia = 0; dia < (N); ++dia)
+
+#define REV_ROWS(M)   for (Crow j = (M); j--;)
 #define REV_COLS(N)   for (Ccol k = (N); k--;)
 #define REV_DIAG(N)   for (Cdia d = (N); d--;)
 
@@ -224,7 +226,7 @@ public:
      {
      public:
         /// constructor: _rows × _cols matrix with values vdata.
-         /// Unlike e.g. std::vector<T> (whick copies \b data), \b vdata must
+         /// Unlike e.g. std::vector<T> (which copies \b data), \b vdata must
          /// outlive \b this, and modifying items also modifies \b vdata!
          //
         fMatrix(void * vdata, Crow M, Ccol N, ShapeItem _dx)
@@ -263,7 +265,10 @@ public:
            }
 
         void set_rows(Ccol new_rows)
-           { const_cast<Crow &>(rows) = new_rows; }
+           {
+             const_cast<ShapeItem &>(dx) = dx + new_rows - rows;
+             const_cast<Crow &>(rows) = new_rows;
+           }
 
         void set_columns(Ccol new_cols)
            { const_cast<Ccol &>(cols) = new_cols; }
@@ -585,9 +590,9 @@ public:
    static bool is_complex(const ZZ &)
       { return true; }
 
-   static void divide_matrix(Value & Z, bool need_complex, ShapeItem rows,
-                             ShapeItem cols_A, const Cell * cA,
-                             ShapeItem cols_B, const Cell * cB);
+   static sRank divide_matrix(Value & Z, bool need_complex, ShapeItem rows,
+                              ShapeItem cols_A, const Cell * cA,
+                              ShapeItem cols_B, const Cell * cB);
 
    /// template instantiation wrapper
    static void factorize_DD_matrix(Value & Z, ShapeItem rows, ShapeItem cols,

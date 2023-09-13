@@ -88,8 +88,18 @@ public:
    /// destructor
    ~DebugMatrix()
       {
-        // CERR << "deleting " << name << endl;
-        delete[] LA_pack::fMatrix<T>::data;
+        const Crow M = LA_pack::fMatrix<T>::get_row_count();
+        const Ccol N = LA_pack::fMatrix<T>::get_column_count();
+        T & end = LA_pack::fMatrix<T>::data[M*N];
+        if (name != reinterpret_cast<const char * &>(end))
+           CERR << "*** Corrupt DebugMatrix " << name << endl;
+
+        if (LA_pack::fMatrix<T>::data)
+           {
+             CERR << "deleting DebugMatrix '" << name << "'" << endl;
+             delete[] LA_pack::fMatrix<T>::data;
+             const_cast<T * &>(LA_pack::fMatrix<T>::data) = 0;
+           }
       }
 
    /// the matrix item at (row, col)
@@ -118,10 +128,13 @@ protected:
    static T * const allocate(const char * nm, const T * src, Crow M, Ccol N)
       {
         // CERR << "allocating " << nm << "[" << M << "×" << N << "]" << endl;
-        const int bytes = M * N * sizeof(T);
+        const int bytes = M * N * sizeof(T) + sizeof(const char *);
         char * dest = new char[bytes];
         if (src)   memcpy(dest, src, bytes);
-        return reinterpret_cast<T *>(dest);
+        T * ret = reinterpret_cast<T *>(dest);
+        T & end  = ret[M * N];
+        reinterpret_cast<const char * &>(end) = nm;
+        return ret;
       }
 
    const char * name;
@@ -214,7 +227,8 @@ void
 print_product(const char * title,
               const LA_pack::fMatrix<T> & A,   // Q
               const LA_pack::fMatrix<T> & B,   // R
-              const Ccol * pivot)
+              const Ccol * pivot,
+              bool transpose_B)
 {
 const Crow MA = A.get_row_count();
 const Ccol NA =  A.get_column_count();
@@ -234,7 +248,8 @@ const Ccol NB = B.get_column_count();
             T sum(0);
             loop(j, NA)
                 {
-                  sum += A.at(row, j) * B.at(j, pcol);
+                  if (transpose_B)   sum += A.at(row, j) * B.at(pcol, j);
+                  else               sum += A.at(row, j) * B.at(j, pcol);
                 }
             print_item(sum);
           }
@@ -263,6 +278,7 @@ void
 print_QR(const char * title, const LA_pack::fMatrix<T> & B,
          const LA_pack::fMatrix<T> & HR, LA_pack::PTVVy<T> & ptvvy)
 {
+const Ccol M = HR.get_row_count();
 const Ccol N = HR.get_column_count();
 
    // convert reflectors in B to orthogonal matrix Q
@@ -277,24 +293,35 @@ DebugMatrix<T> R("R", N, N);   // the upper triangle R of Q∘R
       }
 
    CERR << "──────────────────────────────────────────" << endl;
-   print_matrix("print_product(): the laqp2() input B", B);
+   print_matrix("print_QR(): the laqp2() input B", B);
    ptvvy.print_pivot(CERR, N, LOC);
-   print_matrix("print_product(): the laqp2() output HR", HR);
+   print_matrix("print_QR(): the laqp2() output HR", HR);
    ptvvy.print_pivot(CERR, N, LOC);
 
    print_matrix("\nThe upper triangular factor R of HR", R);
 
-DebugMatrix<T> QC("C", HR);        // a mutable copy of HR
-   print_matrix("print_product(): reflectors before ung2r() = H", QC);
+const size_t max_MN = M > N ? M : N;
+DebugMatrix<T> QC("C", max_MN, max_MN);        // a mutable copy of HR
+   ALL_ROWS(N)
+   ALL_COLS(N)
+      {
+        if (row < M && col < N)   QC.at(row, col) = HR.at(row, col);
+        else if (row == col)      QC.at(row, col) = T(1.0);
+        else                      QC.at(row, col) = T(0.0);
+      }
+
+   print_matrix("print_QR(): reflectors before ung2r() = H", QC);
    LA_pack::ung2r<T>(QC, ptvvy);
-   print_matrix("print_product(): factor Q of Q∘R after ung2r()", QC);
-   print_vector("print_product(): vector tau after ung2r()", ptvvy.tau, N);
+   print_matrix("print_QR(): factor Q of Q∘R after ung2r()", QC);
+   print_vector("print_QR(): vector tau after ung2r()", ptvvy.tau, N);
+   print_product("print_QR(): Q∘⍉Q", QC, QC, ptvvy.pivot, true);
 
 // DebugMatrix<T> QB("Q", B);
 // ALL_ROWS(N)
 // ALL_COLS(N) if (row < col)   QB.at(row, col) = QB.at(col, row);
 
-   print_product("the product Q∘R (supposedly Q∘R=B)", QC, R, ptvvy.pivot);
+   print_product("print_QR(): the product Q∘R (supposedly Q∘R=B)",
+                 QC, R, ptvvy.pivot, false);
    CERR << "──────────────────────────────────────────" << endl;
 }
 //--------------------------------------------------------------------------
@@ -310,7 +337,8 @@ template<class T> inline void print_matrix(const char * title,
 template<class T>inline  void print_product(const char * title,
                                             const LA_pack::fMatrix<T> & A,
                                             const LA_pack::fMatrix<T> & B,
-                                            const Ccol * pivot) {}
+                                            const Ccol * pivot,
+                                            bool transpose_B) {}
 
 template<class T> inline void print_QR(const char * title,
                                        const LA_pack::fMatrix<T> & B,

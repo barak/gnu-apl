@@ -144,7 +144,7 @@ static const APL_Float tol3z        = sqrt(dlamch_E);         // 1.05367E¯8
 /// the implementation of Z←A⌹B, where
 /// Z[;j] is the solution of A[;j] = B +.× Z[j]   (if rows == cols_B),
 /// or else: A[;j] - B +.× Z[j] is minimal         (if rows > cols_B)
-void
+sRank
 LA_pack::divide_matrix(Value & Z, bool need_complex, ShapeItem rows,
                        ShapeItem cols_A, const Cell * cA,
                        ShapeItem cols_B, const Cell * cB)
@@ -205,12 +205,10 @@ APL_Float * fpB = reinterpret_cast<APL_Float *>(work_B);
               fMatrix<ZZ> B(b, rows, cols_B, /* LDB */ rows);
 
               const sRank rank = gelsy<ZZ>(A, B, rcond);
-
-              if (rank != cols_B)
+              if (rank < cols_B)
                  {
-                   MORE_ERROR() << "A⌹B : linear dependent (complex) B?";
                    delete work_AB;
-                   DOMAIN_ERROR;
+                   return rank;
                  }
 
               // cols_A = rows_Z. We have computed the result for col c of A
@@ -247,11 +245,10 @@ APL_Float * fpB = reinterpret_cast<APL_Float *>(work_B);
               fMatrix<DD> A(fpA, rows, 1,      /*LDA*/ rows);
               fMatrix<DD> B(fpB, rows, cols_B, /*LDB*/ rows);
               const sRank rank = gelsy<DD>(A, B, rcond);
-              if (rank != cols_B)
+              if (rank < cols_B)
                  {
-                   MORE_ERROR() << "A⌹B : linear dependent (real) B?";
                    delete work_AB;
-                   DOMAIN_ERROR;
+                   return rank;
                  }
 
               // cols_A = rows_Z. We have computed the result for col c of A
@@ -262,6 +259,7 @@ APL_Float * fpB = reinterpret_cast<APL_Float *>(work_B);
        }
 
    delete work_AB;
+   return cols_B;
 }
 //----------------------------------------------------------------------------
 void LA_pack::factorize_DD_matrix(Value & Z, ShapeItem rows, ShapeItem cols,
@@ -284,9 +282,10 @@ sRank LA_pack::factorize_matrix(Value & Z, ShapeItem M, ShapeItem N,
 {
    // work sizes...
    //
+const ShapeItem max_MN = M > N ? M : N;
 const size_t bytes_B  = M * N * sizeof(T);   // size of work_B
 const size_t bytes_HR = M * N * sizeof(T);   // size of work_HR
-const size_t bytes_R  = M * N * sizeof(T);   // size of work_R
+const size_t bytes_R  = max_MN * max_MN * sizeof(T);   // size of work_R
 const size_t bytes_Ri = N * M * sizeof(T);   // size of work_Ri
 
    // work memories
@@ -337,6 +336,7 @@ DebugMatrix HR_before("HR_before laqp2()", HR);
    // use it a work area.
    //
    R = HR;   // copy items of HR into R (no allocate)
+
    grab_Q<T>(Z, R, ptvvy);
 
    // extract the upper triangular matrix R of HR into Z[2] and
@@ -350,18 +350,45 @@ DebugMatrix HR_before("HR_before laqp2()", HR);
 template<typename T>
 void LA_pack::grab_Q (Value & Z, fMatrix<T> & C, PTVVy<T> & ptvvy)
 {
-print_matrix("C before grab_Q ()", C);
 
 const Crow M = C.get_row_count();
 const Ccol N = C.get_column_count();
 
-   ung2r<T>(C, ptvvy);
+   if (M < N)   // C is under-determined
+      {
+        /*   ├────N────┤    ├────N────┤    
+           ┬ ╔════C════╗    ╔════C════╗ ┬
+           M ║   src   ║ →  ║   dst   ║ │
+           ┴ ╚═════════╝    ║     1 0 ║ N  ┬
+                            ║     0 1 ║ │ N-M
+                            ╚═════════╝ ┴  ┴
+                                ├─N-M─┤
+         */
 
-const Cdia min_MN = M < N ? M : N;
-const Shape shape_Z1(min_MN, min_MN);   // the orthogonal matrix Q
+        print_matrix("C before expansion in grab_Q ()", C);
+        C.set_rows(N);   // expand M→N
+        T * data = &C.diag(0);
+
+        REV_ROWS(N)   // j
+        REV_COLS(N)   // k
+           {
+             T & dest =                data[k + N * j];
+             if (k < M)         dest = data[k + M * j];   // valid
+             else if (j == k)   dest = T(1.0);            // ID diag
+             else               dest = T(0.0);            // ID other
+           }
+      }
+
+print_matrix("C before ung2r() in grab_Q ()", C);
+
+   ung2r<T>(C, ptvvy);
+print_matrix("C after ung2r() in grab_Q ()", C);
+
+const Ccol min_MN = min(M, N);
+const Shape shape_Z1(M, min_MN);   // the orthogonal matrix Q
 Value_P Z1(shape_Z1, LOC);
 
-   ALL_ROWS(min_MN)   // APL rows    of Z1
+   ALL_ROWS(M)   // APL rows    of Z1
    ALL_COLS(min_MN)   // APL columns of Z1
       {
         next_Cell(Z1, C.at(row, col));
@@ -379,12 +406,13 @@ print_matrix("HR in grab_R()", HR);
 const Crow M = HR.get_row_count();
 const Ccol N = HR.get_column_count();
 
-const Shape shape_Z2(M, N);   // the upper triangular N×N matrix R
+const Crow min_MN = min(M, N);
+const Shape shape_Z2(min_MN, N);   // the upper triangular N×N matrix R
 Value_P Z2(shape_Z2, LOC);
 
    // copy the upper triangle of HR to UTM (aka. R)
    //
-   ALL_ROWS(M)   // APL rows
+   ALL_ROWS(min_MN)   // APL rows
    ALL_COLS(N)   // APL columns
       {
         if (row <= col)   // on or above diagonal: HR is valid
@@ -430,8 +458,16 @@ template<typename T>
 Value_P LA_pack::invert_UTM(Crow M, Ccol N,
                             fMatrix<T> & UTM, fMatrix<T> & AUG)
 {
-print_matrix("  UTM before invert_UTM()", UTM);
-   invert_QUTM<T>(M, N, UTM, AUG);
+   if (M < N)   // UTM under-specified
+      {
+        print_matrix("(under-specified) UTM before invert_UTM()", UTM);
+        invert_QUTM<T>(M, M, UTM, AUG);
+      }
+   else
+      {
+        print_matrix("  UTM before invert_UTM()", UTM);
+        invert_QUTM<T>(M, N, UTM, AUG);
+      }
 
    // create the result value
    //
@@ -712,6 +748,8 @@ void LA_pack::ung2r(fMatrix<T> & A, PTVVy<T> & ptvvy)
 const Ccol N = A.get_column_count();
 const Crow M = A.get_row_count();
 
+// Assert(M >= N);
+
    // Initialise columns k+1:n to columns of the unit matrix.
    // JSA: We have K=N, therefore nothing to do here.
 
@@ -719,7 +757,7 @@ const Crow M = A.get_row_count();
 
           0 ← ← ← k ← ← ← N
           0 ← ← ← k ← ← ← N
-          ↑  ╔═A══╪═══════╗
+          ↑  ╔═══╪══A═════╗
           ↑  ║ \  │       ║
           ↑  ║  \ │       ║
           ↑  ║   \│       ║
@@ -744,13 +782,12 @@ const Crow M = A.get_row_count();
                    ↑  ║  \ │       ║
                    ↑  ║   \│       ║
             ┬      k  ╟────⍺┌──────╢   ⍺: Akk = A.diag(k) := 1.0
-            │      ↑  ║    ▒│      ║
+            │     S_X ║    ▒│      ║   Z: reflector H(k)
             │      ↑  ║    ▒│      ║
           len_X    ↑  ║    X│ SUB  ║
             │      N  ║    ▒│      ║
             │         ║    ▒│      ║
-            ┴      M  ╚═════╪══════╝
-                           S_X
+            ┴      M  ╚═════╧══════╝
          */
 
         const Crow s_X   = k + 1;   // start of X = the row below diag(k)
