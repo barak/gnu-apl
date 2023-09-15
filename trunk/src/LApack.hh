@@ -108,7 +108,7 @@ class LA_pack
 public:
   /// a real number
   typedef APL_Float DD;
-  
+
 #if 1
 
 #include <complex>
@@ -366,7 +366,7 @@ public:
         /// this distance is usually called LDx (Leading Dimension of x)
         /// in FORTRAN, e.g. LDA for a FORTRAN matrix A with LDA rows.
         const ShapeItem dx;
-     };                                // fMatrix<T>
+     };                                // class fMatrix<T>
 
   /// a clone of matrix that destroys itself (used for debugging purpoases)
   template<typename T>
@@ -394,7 +394,7 @@ public:
              memcpy(dest, src, bytes);
              return reinterpret_cast<T *>(dest);
             }
-     };
+     };                                // class TempMatrix<T>
 
    /// FORTRAN work memories
    template<typename T>
@@ -416,7 +416,7 @@ public:
 
         /// print the diagonal factors, Returns \b len
         int print_tau(ostream & out, Ccol len, const char * loc) const;
-      };
+      };                               // struct PTVVy<T>
 
   //==========================================================================
 
@@ -454,7 +454,7 @@ public:
   static DD square(ZZ zz)
      { return square(zz.real()) + square(zz.imag()); }
   
-  // A² + B² = C²
+  /// A² + B² = C²
   template<typename T1, typename T2>
   static APL_Float hypotenuse(const T1 & kath_A, const T2 & kath_B)
      { return sqrt(square(kath_A) + square(kath_B)); }
@@ -520,25 +520,25 @@ public:
 
   //============================================================================
   // (static) functions ported from LAPACK (FORTRAN) .f files...
-  public:
-     /// return ║ vec ║²
-     static APL_Float norm_2(const DD * vec, size_t len)
-        {
-          APL_Float norm = 0.0;
-          loop(j, len)   norm += square(get_real(*vec++));
-          return norm;
-        }
+public:
+  /// return ║ vec ║²
+  static APL_Float norm_2(const DD * vec, size_t len)
+     {
+        APL_Float norm = 0.0;
+        loop(j, len)   norm += square(get_real(*vec++));
+        return norm;
+     }
 
      /// return ║ vec ║²
-     static APL_Float norm_2(const ZZ * vec, size_t len)
+  static APL_Float norm_2(const ZZ * vec, size_t len)
         {
-              APL_Float norm = 0.0;
-              loop(j, len)
-                 {
-                   norm += square(get_real(*vec));
-                   norm += square(get_imag(*vec++));
-                 }
-              return norm;
+          APL_Float norm = 0.0;
+          loop(j, len)
+             {
+               norm += square(get_real(*vec));
+               norm += square(get_imag(*vec++));
+             }
+          return norm;
         }
 
    /// LApack function unm2r. Apply reflectors A(i) to matrix C.
@@ -546,39 +546,27 @@ public:
    static void unm2r(Crow K, const fMatrix<T> & A, const PTVVy<T> & ptvvy,
                      fMatrix<T> & C);
   
-     /// template instantiation wrapper
-     static Value_P invert_DD_UTM(Crow M, Ccol N,
-                                  fMatrix<DD> & QUTM, fMatrix<DD> & QAUG);
+   /// template instantiation wrapper
+   static Value_P invert_DD_UTM(Crow M, Ccol N,
+                                fMatrix<DD> & QUTM, fMatrix<DD> & QAUG);
 
-     /// template instantiation wrapper
-     static Value_P invert_ZZ_UTM(Crow M, Ccol N,
-                                  fMatrix<ZZ> & QUTM, fMatrix<ZZ> & QAUG);
+   /// template instantiation wrapper
+   static Value_P invert_ZZ_UTM(Crow M, Ccol N,
+                                fMatrix<ZZ> & QUTM, fMatrix<ZZ> & QAUG);
 
    template<typename T>
-   static void invert_QUTM(Crow M, Ccol N,
-                           fMatrix<T> & QUTM, fMatrix<T> & QAUG);
+   static void invert_QUTM(Ccol N, fMatrix<T> & QUTM, fMatrix<T> & QAUG);
 
-     /// LApack function ung2r: convert reflectors (in A) to
-     /// orthogonal Q (returned in A)
-     template<typename T>
-     static void ung2r(fMatrix<T> & A, PTVVy<T> & ptvvy);
-
-     /// store the orthogonal factor Q of some HR in Z[1]. On entry is Q a copy
-     /// of HR, on exit is Q the reflectors in HR applied to the unit matrix.
-     template<typename T>
-     static void grab_Q (Value & Z, fMatrix<T> & Q, PTVVy<T> & ptvvy);
-
-     /// store the upper triangle matrix UTM of HR in Z[2] and UTM⁻¹ in Z[3]
-     template<typename T>
-     static void grab_R(fMatrix<T> & HR,      // input
-                        Value & Z,            // set Z[2 3]
-                        fMatrix<T> & Rinv);   // R⁻¹ from R
+   /// LApack function ung2r: convert reflectors (in A) to
+   /// orthogonal Q (returned in A)
+   template<typename T>
+   static void ung2r(fMatrix<T> & A, PTVVy<T> & ptvvy);
 
    /// dd is 0.0
    static bool is_zero(const DD & dd)
       { return dd == 0.0; }
 
-   /// zz is 0.0
+   /// zz is 0.0j0.0
    static bool is_zero(const ZZ & zz)
       { return zz.real() == 0.0 && zz.imag() == 0.0; }
 
@@ -590,19 +578,44 @@ public:
    static bool is_complex(const ZZ &)
       { return true; }
 
-   static sRank divide_matrix(Value & Z, bool need_complex, ShapeItem rows,
+   /// compute Z←A⌹B (real A, B, and Z). Instatiation wrapper.
+   static sRank divide_DD_matrix(Value & Z, ShapeItem rows,
                               ShapeItem cols_A, const Cell * cA,
                               ShapeItem cols_B, const Cell * cB);
 
-   /// template instantiation wrapper
+   /// compute Z←A⌹B (complex A or B, and Z). Instatiation wrapper.
+   static sRank divide_ZZ_matrix(Value & Z, ShapeItem rows,
+                              ShapeItem cols_A, const Cell * cA,
+                              ShapeItem cols_B, const Cell * cB);
+
+   /// template instantiation wrapper. This wrapper forces the instantiation of
+   /// factorize_matrix<DD>() which is defined in a different object file and
+   /// may not be instantiated otherwise.
    static void factorize_DD_matrix(Value & Z, ShapeItem rows, ShapeItem cols,
                                    const Cell * cB, APL_Float rcond);
 
-   /// template instantiation wrapper
+   /// template instantiation wrapper. This wrapper forces the instantiation of
+   /// factorize_matrix<ZZ>() which is defined in a different object file and
+   /// may not be instantiated otherwise.
    static void factorize_ZZ_matrix(Value & Z, ShapeItem rows, ShapeItem cols,
                                    const Cell * cB, APL_Float rcond);
 
 protected:   // class LA_pack
+   /// compute Z←A⌹B
+   template<typename T>
+   static sRank divide_matrix(Value & Z, ShapeItem rows_AB,
+                              ShapeItem cols_A, const Cell * cA,
+                              ShapeItem cols_B, const Cell * cB);
+
+   /// store the orthogonal factor Q of some HR in Z[1]. On entry is Q a copy
+   /// of HR, on exit is Q the reflectors in HR applied to the unit matrix.
+   template<typename T>
+   static void grab_Q (Value & Z, fMatrix<T> & Q, PTVVy<T> & ptvvy);
+
+   /// store the upper triangle matrix UTM of HR in Z[2] and UTM⁻¹ in Z[3]
+   template<typename T>
+   static void grab_R(fMatrix<T> & HR, Value & Z, fMatrix<T> & Rinv);
+
    /// compute the inverse of the upper triangular matrix \b utm.
    /// On return: the inverse of qutm is stored in qaug and utm was destroyed.
    /*  NOTES:
@@ -617,7 +630,7 @@ protected:   // class LA_pack
     */
    template<typename T>
    static Value_P invert_UTM(Crow M, Ccol N,
-                             fMatrix<T> & QUTM, fMatrix<T> & QAUG);
+                             fMatrix<T> & UTM, fMatrix<T> & AUG);
 
    // factorize B
    template<typename T>
@@ -745,5 +758,5 @@ protected:   // class LA_pack
      // LApack function larf: apply one elementary reflector v to matrix C
      template<typename T>
      static void larf(const T * v, T tau, fMatrix<T> & C, T * y);
-};
+};                                     // class LA_pack
 //============================================================================

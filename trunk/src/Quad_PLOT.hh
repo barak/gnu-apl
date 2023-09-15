@@ -90,19 +90,16 @@ public:
            static Handle remove_handle(Handle handle);   // GTK only
       };
 
-   /// all open ⎕PLOT windows
+   /// all open ⎕PLOT windows.
    static basic_string<PLOT_context *> all_PLOT_windows;
 
-#if apl_GTK3   // GTK
-
-   /// the GTK window that handles one plot window.
+   /// the GTK window that handles one plot window. Always declared here
+   /// (to make doxygen happy, but only implemented if apl_GTK3
    static void plot_main_GTK(void * vp_props, Handle handle);
 
-#else         // XCB
-
-   /// the pthread that handles one plot window.
+   /// the pthread that handles all XCB plot windows. Always declared here
+   /// (to make doxygen happy, but only implemented if NOT apl_GTK3
    static void * plot_main_XCB(void * vp_props);
-#endif
 
 protected:
    /// Destructor.

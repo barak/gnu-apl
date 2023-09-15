@@ -760,11 +760,10 @@ the C++ code as much as possible.</p></div>
 
 </pre>
 </div></div>
-<div class="paragraph"><p><strong>Bif_F12_DOMINO::eval_B(Value_P B) const</strong>, i.e. the implementation
-of monadic ⌹, simply constructs a unit matrix <strong>I</strong> of proper size and then
-returns <strong>eval_AB(I, B)</strong>, i.e. the result of the implementation of
-dyadic <strong>A⌹B</strong>.</p></div>
-<div style="page-break-after:always"></div>
+<div class="paragraph"><p><strong>Bif_F12_DOMINO::eval_B(Value_P B) const</strong>, implementats
+monadic <strong>⌹</strong>. It simply constructs a unit matrix <strong>I</strong> of proper
+size and then returns <strong>Bif_F12_DOMINO::eval_AB(I, B)</strong>, i.e. the result of
+the implementation of dyadic <strong>A⌹B</strong>. See below.</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -776,7 +775,7 @@ of <strong>A</strong>:</p></div>
 <div class="content">
 <pre>
 
-<code>      If  X←A⌹B  then  X[;J] ←→ A[;J]⌹B for all (scalar) columns J∈⍳¯1↑⍴A.</code>
+<code>      Let  X←A⌹B. Then  X[;J] ←→ A[;J]⌹B for all (scalar) columns J∈⍳¯1↑⍴A.</code>
 
 </pre>
 </div></div>
@@ -796,14 +795,14 @@ column vector a of <strong>A</strong>, the result is a column vector <strong>x</
 <td class="icon">
 <img src="/usr/share/asciidoc/icons/note.png" alt="Note" />
 </td>
-<td class="content">In GNU APL: <strong>A +.× B ←→ A ∘ B</strong>. The vast majority of inner products
-in real-life APL programs is used for matrix multiplication aka. <strong>A +.×B</strong>.
-The GNU APL function <strong>A∘B</strong> is an optimized version of the special case
-<strong>A +.× B</strong> of the more general inner product <strong>A f.g B</strong>.</td>
+<td class="content">GNU APL has a dyadic function <strong>A∘B</strong> ←→ <strong>A +.× B</strong>. Usage statistics of
+APL show that the vast majority of inner products is the matrix multiplication
+aka. <strong>A +.×B</strong>. The GNU APL function <strong>A∘B</strong> is an optimized version of this
+important special case <strong>A +.× B</strong> of the more general inner product <strong>A f.g B</strong>.</td>
 </tr></table>
 </div>
-<div class="paragraph"><p>Since <strong>B</strong> is the same for all columns a of <strong>A</strong> (and their corresponding result
-columns <strong>x</strong> of <strong>X</strong>), is the result <strong>X</strong> of <strong>X←A⌹B</strong> computed in two steps:</p></div>
+<div class="paragraph"><p>Because <strong>B</strong> is the same for all columns a of <strong>A</strong> (and their corresponding
+result columns <strong>x</strong> of <strong>X</strong>), the result <strong>X</strong> of <strong>X←A⌹B</strong> is computed in two steps:</p></div>
 <div class="olist arabic"><ol class="arabic">
 <li>
 <p>
@@ -819,7 +818,7 @@ compute <strong>X←A∘B⁻¹</strong>
 <div class="paragraph"><p>The second step <strong>X←A∘B⁻¹</strong> is simple, therefore only the first step,
 the computation of <strong>B⁻¹</strong> is of concern here.</p></div>
 <div class="paragraph"><p>BTW. the iteration over the columns of <strong>A</strong> in the second step above occurs
-near the end of function <strong>LA_pack::gelsy()</strong> in function <strong>trsm&lt;T&gt;()</strong>.</p></div>
+near the end of function <strong>LA_pack::gelsy()</strong> in function <strong>trsm()</strong>.</p></div>
 <div class="paragraph"><p>In order to compute <strong>B⁻¹</strong>, matrix <strong>B</strong> is factorized into two matrices <strong>Q</strong>
 and <strong>R</strong> which have the following properties:</p></div>
 <div class="ulist"><ul>
@@ -897,7 +896,22 @@ some row of R to some other row of R. Then, as we learn in school,
 <strong>R⁻¹ = ID ∘ op₁ ∘ op₂ ∘ &#8230; ∘ opₙ</strong>. In other words, if the operations
 <strong>op₁</strong>, <strong>op₂</strong>, &#8230;, <strong>opₙ</strong> turn a matrix <strong>R</strong> into the identity matrix, then
 the same operations (in the same order) turn the the identity matrix into
-the inverse <strong>R⁻¹</strong> of <strong>R</strong>.</p></div>
+the inverse <strong>R⁻¹</strong> of <strong>R</strong>:</p></div>
+<div class="listingblock">
+<div class="content">
+<pre>
+
+<code>    ┬ ╔═════R═════╤════AUG════╗     ╔════ID═════╤═══R⁻¹═════╗ ┬
+    │ ║           │ 1         ║     ║ 1         │           ║ │
+    │ ║           │   1   0   ║     ║   1   0   │           ║ │
+    N ║           │     1     ║  →  ║     1     │           ║ N
+    │ ║           │   0   1   ║     ║   0   1   │           ║ │
+    │ ║           │         1 ║     ║         1 │           ║ │
+    ┴ ╚═══════════╧═══════════╝     ╚═══════════╧═══════════╝ ┴
+    ├ ─────N─────┼─────N─────┤     ├─────N─────┼─────N─────┤</code>
+
+</pre>
+</div></div>
 <div class="paragraph"><p>The operations that turn an upper triangular matrix <strong>R</strong> into the identity matrix
 ID are fairly simple:</p></div>
 <div class="olist arabic"><ol class="arabic">
@@ -1853,6 +1867,7 @@ usually differ between different algorithms.  For example:</p></div>
  │0 0 1 0│  │0 0 1 0│
  │0 0 0 1│  │0 0 0 1│
  └───────┘  └───────┘
+
       8 ⎕CR¨ (R∘Ri) (Ri∘R)             ⍝ Ri is the inverse of R
  ┌→──────┐  ┌→──────┐
  ↓1 0 0 0│  ↓1 0 0 0│
@@ -1870,7 +1885,7 @@ in the <strong>8 ⎕CR¨2⍕¨Q R Ri</strong> lines above.</p></div>
 <h3 id="_under_determined_b">Under-determined B</h3>
 <div class="paragraph"><p>If <strong>B</strong> is under-determined, i.e. <strong>⍴B ←→ M N</strong> with <strong>M &lt; N</strong>,
 then matters become a little more complicated. Due to conformity
-constraints (LENGTH ERROR), only <strong>(⍴Ri)↑R</strong> only be multiplied
+constraints (LENGTH ERROR), only <strong>(MM←⍴Ri)↑R</strong> can be multiplied
  from the left or from the right, but not <strong>R</strong> itself:</p></div>
 <div class="listingblock">
 <div class="content">
@@ -2063,15 +2078,13 @@ if:</p></div>
 
 </pre>
 </div></div>
-<div class="paragraph"><p>If that happens then GNU APL reports a <strong>RANK ERROR</strong>. It means that the
+<div class="paragraph"><p>If that happens then GNU APL raises a <strong>DOMAIN ERROR</strong>. It means that the
 matrix <strong>B</strong> (i.e. of <strong>A⌹B</strong>, <strong>⌹B</strong>) is either truly rank-deficient,
-or at least close to a rank-deficient matrix. Increasing <strong>⎕CT</strong> may or may not
-solve that problem. Unlike "normal" RANK ERRORs, the meaning of this type
-of RANK ERROR is that, even though <strong>↑⍴B</strong> is large enough, the rows of <strong>B</strong>
-are at least close to being linearly dependent. In such cases the precision
-of the result is rather questionable and the RANK ERROR indicates that
-problem rather than continuing with the computation and producing a
-incorrect result.</p></div>
+or at least close to a rank-deficient matrix. Increasing <strong>⎕CT</strong> may
+or may not solve that problem.</p></div>
+<div class="paragraph"><p>In such cases the precision of the result is rather questionable and
+the DOMAIN ERROR indicates that problem rather than continuing with
+the computation and producing a incorrect result.</p></div>
 </div>
 </div>
 </div>
@@ -2080,7 +2093,7 @@ incorrect result.</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2023-09-13 18:50:54 CEST
+ 2023-09-13 20:11:19 CEST
 </div>
 </div>
 </body>

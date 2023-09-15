@@ -9,6 +9,7 @@
 :icons:
 
 == Abstract
+
 GNU APL implements the APL functions monadic ⌹ (aka. *Matrix Inverse*) and
  dyadic ⌹ (aka. *Matrix Divide*) by means of _LApack functions_. These LApack
 functions were originally written in FORTRAN, but then manually translated
@@ -24,12 +25,10 @@ Monadic *⌹* is the special case of dyadic *A⌹B* where A is the unit matrix:
       Let A←(↑⍴B) ∘.= (↑⍴B). Then ⌹B ←→ A⍴B.
 ----
 
-*Bif_F12_DOMINO::eval_B(Value_P B) const*, i.e. the implementation
-of monadic ⌹, simply constructs a unit matrix *I* of proper size and then
-returns *eval_AB(I, B)*, i.e. the result of the implementation of
-dyadic *A⌹B*.
-
-<<<
+*Bif_F12_DOMINO::eval_B(Value_P B) const*, implementats
+monadic *⌹*. It simply constructs a unit matrix *I* of proper
+size and then returns *Bif_F12_DOMINO::eval_AB(I, B)*, i.e. the result of
+the implementation of dyadic *A⌹B*. See below.
 
 == Dyadic A⌹B: Matrix Divide
 
@@ -37,7 +36,7 @@ In APL, *A⌹B* for an N-column matrix *A* is defined in terms of each column
 of *A*:
 
 ----
-      If  X←A⌹B  then  X[;J] ←→ A[;J]⌹B for all (scalar) columns J∈⍳¯1↑⍴A.
+      Let  X←A⌹B. Then  X[;J] ←→ A[;J]⌹B for all (scalar) columns J∈⍳¯1↑⍴A.
 ----
 
 In other words, computing *A⌹B* for a matrix *A* boils down to computing
@@ -46,13 +45,13 @@ column vector a of *A*, the result is a column vector *x* of *X*:
 
    B ∘ x ≡ a   ←→   x ≡ a ⌹ B   ←→   x ≡ a ∘ B⁻¹
 
-NOTE: In GNU APL: *A +.× B ←→ A ∘ B*. The vast majority of inner products
-in real-life APL programs is used for matrix multiplication aka. *A +.×B*.
-The GNU APL function *A∘B* is an optimized version of the special case
-*A +.× B* of the more general inner product *A f.g B*.
+NOTE: GNU APL has a dyadic function *A∘B* ←→ *A +.× B*. Usage statistics of
+APL show that the vast majority of inner products is the matrix multiplication
+aka. *A +.×B*. The GNU APL function *A∘B* is an optimized version of this
+important special case *A +.× B* of the more general inner product *A f.g B*.
 
-Since *B* is the same for all columns a of *A* (and their corresponding result
-columns *x* of *X*), is the result *X* of *X←A⌹B* computed in two steps:
+Because *B* is the same for all columns a of *A* (and their corresponding
+result columns *x* of *X*), the result *X* of *X←A⌹B* is computed in two steps:
 
 . compute *B⁻¹*
 . compute *X←A∘B⁻¹*
@@ -61,7 +60,7 @@ The second step *X←A∘B⁻¹* is simple, therefore only the first step,
 the computation of *B⁻¹* is of concern here.
 
 BTW. the iteration over the columns of *A* in the second step above occurs
-near the end of function *LA_pack::gelsy()* in function *trsm<T>()*.
+near the end of function *LA_pack::gelsy()* in function *trsm()*.
 
 In order to compute *B⁻¹*, matrix *B* is factorized into two matrices *Q*
 and *R* which have the following properties:
@@ -114,7 +113,18 @@ some row of R to some other row of R. Then, as we learn in school,
 *R⁻¹ = ID ∘ op₁ ∘ op₂ ∘ ... ∘ opₙ*. In other words, if the operations
 *op₁*, *op₂*, ..., *opₙ* turn a matrix *R* into the identity matrix, then
 the same operations (in the same order) turn the the identity matrix into
-the inverse *R⁻¹* of *R*.
+the inverse *R⁻¹* of *R*:
+
+----
+    ┬ ╔═════R═════╤════AUG════╗     ╔════ID═════╤═══R⁻¹═════╗ ┬
+    │ ║           │ 1         ║     ║ 1         │           ║ │
+    │ ║           │   1   0   ║     ║   1   0   │           ║ │
+    N ║           │     1     ║  →  ║     1     │           ║ N
+    │ ║           │   0   1   ║     ║   0   1   │           ║ │
+    │ ║           │         1 ║     ║         1 │           ║ │
+    ┴ ╚═══════════╧═══════════╝     ╚═══════════╧═══════════╝ ┴
+    ├ ─────N─────┼─────N─────┤     ├─────N─────┼─────N─────┤
+----
 
 The operations that turn an upper triangular matrix *R* into the identity matrix
 ID are fairly simple:
@@ -768,6 +778,7 @@ usually differ between different algorithms.  For example:
  │0 0 1 0│  │0 0 1 0│ 
  │0 0 0 1│  │0 0 0 1│ 
  └───────┘  └───────┘ 
+
       8 ⎕CR¨ (R∘Ri) (Ri∘R)             ⍝ Ri is the inverse of R
  ┌→──────┐  ┌→──────┐ 
  ↓1 0 0 0│  ↓1 0 0 0│ 
@@ -784,7 +795,7 @@ in the *8 ⎕CR¨2⍕¨Q R Ri* lines above.
 
 If *B* is under-determined, i.e. *⍴B ←→ M N* with *M < N*,
 then matters become a little more complicated. Due to conformity
-constraints (LENGTH ERROR), only *(⍴Ri)↑R* only be multiplied
+constraints (LENGTH ERROR), only *(MM←⍴Ri)↑R* can be multiplied
  from the left or from the right, but not *R* itself:
 
 ----
@@ -961,13 +972,12 @@ if:
       smax * ⎕CT > smin
 ----
 
-If that happens then GNU APL reports a *RANK ERROR*. It means that the
+If that happens then GNU APL raises a *DOMAIN ERROR*. It means that the
 matrix *B* (i.e. of *A⌹B*, *⌹B*) is either truly rank-deficient,
-or at least close to a rank-deficient matrix. Increasing *⎕CT* may or may not
-solve that problem. Unlike "normal" RANK ERRORs, the meaning of this type
-of RANK ERROR is that, even though *↑⍴B* is large enough, the rows of *B*
-are at least close to being linearly dependent. In such cases the precision
-of the result is rather questionable and the RANK ERROR indicates that
-problem rather than continuing with the computation and producing a
-incorrect result.
+or at least close to a rank-deficient matrix. Increasing *⎕CT* may
+or may not solve that problem.
+
+In such cases the precision of the result is rather questionable and
+the DOMAIN ERROR indicates that problem rather than continuing with
+the computation and producing a incorrect result.
 

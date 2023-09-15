@@ -228,9 +228,13 @@ Shape shape_Z;   // ⍴Z ←→ (¯1↓⍴A), (1↓⍴B)
 
 const bool need_complex = A->is_complex(true) || B->is_complex(true);
 Value_P Z(shape_Z, LOC);
-const sRank rank = LA_pack::divide_matrix(*Z, need_complex,
-                                          rows_A, cols_A, &A->get_cfirst(),
+const sRank rank = need_complex ?  LA_pack::divide_ZZ_matrix(*Z, rows_A,
+                                          cols_A, &A->get_cfirst(),
+                                          cols_B, &B->get_cfirst())
+                                :  LA_pack::divide_DD_matrix(*Z, rows_A,
+                                          cols_A, &A->get_cfirst(),
                                           cols_B, &B->get_cfirst());
+
    if (rank < cols_B)
       {
         const char * type = need_complex ? "complex" : "real";

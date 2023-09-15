@@ -56,7 +56,8 @@ inline void next_Cell(Value_P & value, const LA_pack::ZZ & zz)
    a matrix M is usually (and also in LApack) denoted by v* resp. M*.
 
    Since Unicode has no superscript-* and to avoid confusion as to
-   what * means, we normally use:
+   what * in FORTRAN comments shall mean, we normally use the following
+   conventions in this file:
 
      v° resp. M° to denote the conjugate transposes (v* resp. M* in FORTRAN),
      A∘B for the inner product of A and B (aka. matrix multiplication), and
@@ -64,7 +65,7 @@ inline void next_Cell(Value_P & value, const LA_pack::ZZ & zz)
 
    Call trees:
 
-   divide_matrix(Z, A, B)
+   divide_matrix<T>(Z, A, B)
    │
    └─── gelsy<T>(A, B, rcond)
         │
@@ -95,7 +96,10 @@ inline void next_Cell(Value_P & value, const LA_pack::ZZ & zz)
    ├─── grab_Q ()
    └─── grab_R ()
 
-   in the complex A/B case.  The FORTRAN naming in the real case is:
+   The FORTRAN code of LApack uses a naming convention where the first
+   character of a function name indicates the data type (I for integer,
+   D for real double, Z for complex double, and some more that are not
+   of interest here. For example:
 
            Complex A/B │ Real A/B │ file names
            ────────────┼──────────┼───────────────────
@@ -109,7 +113,6 @@ inline void next_Cell(Value_P & value, const LA_pack::ZZ & zz)
    * The C/C++ functions are lowercase (static members of class LApack),
    * All complex FORTRAN functions start with Z, all real FORTRAN functions
      with D (omitted above and in C/C++).
-
  */
 //----------------------------------------------------------------------------
 /* numerical limits
@@ -141,11 +144,26 @@ static const APL_Float tol3z        = sqrt(dlamch_E);         // 1.05367E¯8
 # include "LAdebug.icc"   // print_matrix() etc.
 
 //----------------------------------------------------------------------------
+sRank LA_pack::divide_DD_matrix(Value & Z, ShapeItem rows,
+                                ShapeItem cols_A, const Cell * cA,
+                                ShapeItem cols_B, const Cell * cB)
+{
+   return divide_matrix<DD>(Z, rows, cols_A, cA, cols_B, cB);
+}
+//----------------------------------------------------------------------------
+sRank LA_pack::divide_ZZ_matrix(Value & Z, ShapeItem rows,
+                                ShapeItem cols_A, const Cell * cA,
+                                ShapeItem cols_B, const Cell * cB)
+{
+   return divide_matrix<ZZ>(Z, rows, cols_A, cA, cols_B, cB);
+}
+//----------------------------------------------------------------------------
 /// the implementation of Z←A⌹B, where
 /// Z[;j] is the solution of A[;j] = B +.× Z[j]   (if rows == cols_B),
 /// or else: A[;j] - B +.× Z[j] is minimal         (if rows > cols_B)
+template<typename T>
 sRank
-LA_pack::divide_matrix(Value & Z, bool need_complex, ShapeItem rows,
+LA_pack::divide_matrix(Value & Z, ShapeItem rows,
                        ShapeItem cols_A, const Cell * cA,
                        ShapeItem cols_B, const Cell * cB)
 {
@@ -154,13 +172,14 @@ LA_pack::divide_matrix(Value & Z, bool need_complex, ShapeItem rows,
    // rows_B >= cols_B and
    // rows_A == rows_B  (aka. rows)
    //
+const T t0(0.0);
+const bool need_complex = is_complex(t0);
 const APL_Float rcond = Workspace::get_CT();
-const size_t items_A = rows * cols_A;
+const size_t items_A = rows;
 const size_t items_B = rows * cols_B;
-const int FpI = need_complex ? 2 : 1;   // Floats per Item
 
-const size_t bytes_A = items_A * FpI * sizeof(APL_Float);
-const size_t bytes_B = items_B * FpI * sizeof(APL_Float);
+const size_t bytes_A = items_A * sizeof(t0);
+const size_t bytes_B = items_B * sizeof(t0);
 
    // allocate storage for A and B
    //
@@ -170,111 +189,75 @@ char * work_AB = new char[bytes_A + bytes_B];
 char * work_A = work_AB;
 char * work_B = work_A + bytes_A;
 
-APL_Float * fpA = reinterpret_cast<APL_Float *>(work_A);
-APL_Float * fpB = reinterpret_cast<APL_Float *>(work_B);
+   ALL_COLS(cols_A)   // APL columns
+      {
+        // initialize one column of A...
+        //
+        // a[] is  one column A[;col] on entry and one column Z[; col] on exit.
+        // Therefore a must not be changed.
+        //
+        T * const a = reinterpret_cast<T *>(work_A);
+        fMatrix<T> A(a, rows, 1,      /* LDA */ rows);   // rows × 1
 
-   ALL_COLS(cols_A)
-       {
-         if (need_complex)   // complex A or B
-            {
-              ZZ * const a = reinterpret_cast<ZZ *>(fpA);
-              ALL_ROWS(rows)
-                  {
-                    const Cell & src_A = cA[row * cols_A + col];
-                    new (a + row) ZZ(src_A.get_real_value(),
-                                     src_A.get_imag_value());
-                  }
+        ALL_ROWS(rows)   // APL rows
+           {
+             const Cell & src_A = cA[row * cols_A + col];
+             set_real(a[row], src_A.get_real_value());
+             set_imag(a[row], src_A.get_imag_value());
+           }
 
-              // initialize complex b[] in FORTRAN (aka. column major) order,
-              // which is ⍉ APL (aka. row major) order. I.e. use ⍉B.
-              //
-              ZZ * const b = reinterpret_cast<ZZ *>(fpB);
-              ZZ * bb = b;
+        // initialize entire b[] in FORTRAN (aka. column major) order,
+        // which is ⍉ APL (aka. row major) order. I.e. use ⍉B.
+        //
+        T * b = reinterpret_cast<T *>(work_B);
+        fMatrix<T> B(b, rows, cols_B, /* LDB */ rows);   // rows × cols_B
 
-              ALL_COLS(cols_B)
-              ALL_ROWS(rows)
-                 {
-                   const Cell & src_B = cB[col + row*cols_B];
-                   new (bb++) ZZ(src_B.get_real_value(),
-                                 src_B.get_imag_value());
-                 }
+        ALL_COLS(cols_B)   // APL columns
+        ALL_ROWS(rows)     // APL rows
+           {
+             const Cell & src_B = cB[col + row*cols_B];
+             set_real(*b,   src_B.get_real_value());
+             set_imag(*b++, src_B.get_imag_value());
+           }
 
-              // create complex fMatrix<ZZ> views A and B of a and b
-              //
-              fMatrix<ZZ> A(a, rows, 1,      /* LDA */ rows);
-              fMatrix<ZZ> B(b, rows, cols_B, /* LDB */ rows);
+        const sRank rank = gelsy<T>(A, B, rcond);
+        if (rank < cols_B)
+           {
+             delete[] work_AB;
+             return rank;
+           }
 
-              const sRank rank = gelsy<ZZ>(A, B, rcond);
-              if (rank < cols_B)
-                 {
-                   delete work_AB;
-                   return rank;
-                 }
+        // cols_A = rows_Z. We have computed the result for col c of A
+        // which is row c of Z.
+        //
+        if (need_complex)
+           ALL_ROWS(cols_B)   // row ←→ col since ⍉
+              Z.set_ravel_Complex(row*cols_A + col, get_real(a[row]),
+                                                    get_imag(a[row]));
+        else
+           ALL_ROWS(cols_B)   // row ←→ col since ⍉
+              Z.set_ravel_Float(row*cols_A + col, get_real(a[row]));
+      }
 
-              // cols_A = rows_Z. We have computed the result for col c of A
-              // which is row c of Z.
-              //
-              ALL_ROWS(cols_B)
-                  Z.set_ravel_Complex(row*cols_A + col, a[row].real(),
-                                                        a[row].imag());
-            }
-         else   // real A and B
-            {
-              ALL_ROWS(rows)
-                 {
-                    const Cell & src_A = cA[row*cols_A + col];
-                    fpA[row] = src_A.get_real_value();
-                 }
-
-              // initialize real b[] in FORTRAN (aka. column major) order,
-              // which is ⍉ APL (aka. row major) order. I.e. use ⍉B.
-              //
-              DD * const b = reinterpret_cast<DD *>(fpB);
-              APL_Float * bb = b;
-              ALL_COLS(cols_B)
-              ALL_ROWS(rows)
-                 {
-                   const Cell & src_B = cB[col + row*cols_B];
-                   *bb++ = src_B.get_real_value();
-                 }
-
-              const APL_Float rcond = Workspace::get_CT();
-
-              // create real fMatrix<DD> views A and B of a and b
-              //
-              fMatrix<DD> A(fpA, rows, 1,      /*LDA*/ rows);
-              fMatrix<DD> B(fpB, rows, cols_B, /*LDB*/ rows);
-              const sRank rank = gelsy<DD>(A, B, rcond);
-              if (rank < cols_B)
-                 {
-                   delete work_AB;
-                   return rank;
-                 }
-
-              // cols_A = rows_Z. We have computed the result for col c of A
-              // which is row c of Z.
-              //
-              ALL_ROWS(cols_B)   Z.set_ravel_Float(row*cols_A + col, fpA[row]);
-            }
-       }
-
-   delete work_AB;
+   delete[] work_AB;
    return cols_B;
 }
 //----------------------------------------------------------------------------
+// instantiate factorize_matrix<DD>()
 void LA_pack::factorize_DD_matrix(Value & Z, ShapeItem rows, ShapeItem cols,
                                   const Cell * cB, APL_Float rcond)
 {
    factorize_matrix<DD>(Z, rows, cols, cB, rcond);
 }
-
+//----------------------------------------------------------------------------
+// instantiate factorize_matrix<ZZ>()
 void LA_pack::factorize_ZZ_matrix(Value & Z, ShapeItem rows, ShapeItem cols,
                                   const Cell * cB, APL_Float rcond)
 {
    factorize_matrix<ZZ>(Z, rows, cols, cB, rcond);
 }
-
-/// the implementation of Z←⌹[X]B, where Z is (Q T T⁻¹) and B = T∘Q.
+//----------------------------------------------------------------------------
+/// the implementation of Z←⌹[2]B, where Z is (Q T T⁻¹) and B = T∘Q.
 //
 template<typename T>
 sRank LA_pack::factorize_matrix(Value & Z, ShapeItem M, ShapeItem N,
@@ -282,7 +265,7 @@ sRank LA_pack::factorize_matrix(Value & Z, ShapeItem M, ShapeItem N,
 {
    // work sizes...
    //
-const ShapeItem max_MN = M > N ? M : N;
+const ShapeItem max_MN = max(M, N);
 const size_t bytes_B  = M * N * sizeof(T);   // size of work_B
 const size_t bytes_HR = M * N * sizeof(T);   // size of work_HR
 const size_t bytes_R  = max_MN * max_MN * sizeof(T);   // size of work_R
@@ -343,7 +326,7 @@ DebugMatrix HR_before("HR_before laqp2()", HR);
    // store its inverse R⁻¹ into Z[3].  Return R⁻¹ in Ri (destroys R).
    grab_R<T>(HR, Z, Ri);   // HR → R, R⁻¹
 
-   delete work_B;
+   delete[] work_B;
    return N;
 }
 //----------------------------------------------------------------------------
@@ -461,17 +444,17 @@ Value_P LA_pack::invert_UTM(Crow M, Ccol N,
    if (M < N)   // UTM under-specified
       {
         print_matrix("(under-specified) UTM before invert_UTM()", UTM);
-        invert_QUTM<T>(M, M, UTM, AUG);
+        invert_QUTM<T>(M, UTM, AUG);
       }
-   else
+   else   // M >= N
       {
         print_matrix("  UTM before invert_UTM()", UTM);
-        invert_QUTM<T>(M, N, UTM, AUG);
+        invert_QUTM<T>(N, UTM, AUG);
       }
 
    // create the result value
    //
-const Cdia min_MN = M < N ? M : N;
+const Cdia min_MN = min(M, N);
 const Shape shape_Z3(min_MN, min_MN);   // INV has the transposed shape!
 Value_P Z3(shape_Z3, LOC);
 const bool cplx = is_complex(UTM.diag(0));
@@ -515,21 +498,19 @@ const bool cplx = is_complex(UTM.diag(0));
 }
 //----------------------------------------------------------------------------
 template<typename T>
-void LA_pack::invert_QUTM(Crow M, Ccol N, fMatrix<T> & QUTM, fMatrix<T> & QAUG)
+void LA_pack::invert_QUTM(Ccol N, fMatrix<T> & QUTM, fMatrix<T> & QAUG)
 {
-const Cdia min_MN = M < N ? M : N;
-
 print_matrix("  QUTM before invert_QUTM()", QUTM);
 
    // start with empty qaug. 
    //
-   ALL_ROWS(M)
+   ALL_ROWS(N)
    ALL_COLS(N)   QAUG.at(row, col) = T(0.0);
 
    // divide every row of UTM by its diagonal element, so that the diagonal
    // elements of UTM become 1.0. Also initialize the diagonal of AUG.
    //
-   ALL_ROWS(min_MN)
+   ALL_ROWS(N)
        {
          const T diag = QUTM.diag(row);
          if (diag == 0.0)
@@ -634,7 +615,7 @@ const Ccol N = A.get_column_count();
            }
       }
 
-const Cdia D = M < N ? M : N;
+const Cdia D = min(M, N);
    ALL_DIAS(D)
       {
         if (ptvvy.pivot)
@@ -756,8 +737,7 @@ const Crow M = A.get_row_count();
    /* apply reflector loop along the diagonal of A. Something like:
 
           0 ← ← ← k ← ← ← N
-          0 ← ← ← k ← ← ← N
-          ↑  ╔═══╪══A═════╗
+          ↑  ╔════╪═A═════╗
           ↑  ║ \  │       ║
           ↑  ║  \ │       ║
           ↑  ║   \│       ║
@@ -766,9 +746,8 @@ const Crow M = A.get_row_count();
           ↑  ║     ││┌────╢
           ↑  ║     │││┌───╢
           ↑  ║     ││││ S ║
-          N ─╫─────││││ U ║
+          N ─╫─    ││││ U ║
              ║     ││││ B ║
-          M  ╚═════╧╧╧╧═══╝
           M  ╚═════╧╧╧╧═══╝
     */
    REV_COLS(N)   // i in FORTRAN comments is k in C++.
@@ -963,7 +942,7 @@ sRank LA_pack::scaled_gelsy(fMatrix<T> & B, fMatrix<T> & A, double rcond)
    //
 const Ccol NRHS = A.get_column_count();   // right hand side (of B ∘ X = A)
 const Ccol N    = B.get_column_count();
-PTVVy<T> ptvvy(NRHS > N ? NRHS : N, true);
+PTVVy<T> ptvvy(max(NRHS, N), true);
    LA_DEBUG && ptvvy.print_pivot(CERR, N, LOC);
 
 /* Compute QR factorization of B with column pivoting: B ∘ P = Q ∘ R
@@ -1834,7 +1813,7 @@ LA_pack::PTVVy<T>::PTVVy(Ccol N, bool with_pivot)
 template<typename T>
 LA_pack::PTVVy<T>::~PTVVy()
 {
-   delete reinterpret_cast<char *>(tau);
+   delete[] reinterpret_cast<char *>(tau);
 }
 //----------------------------------------------------------------------------
 template<typename T>
