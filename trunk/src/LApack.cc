@@ -45,11 +45,11 @@ using namespace std;
 
 #include "LApack.hh"
 
-inline void next_Cell(Value_P & value, const LA_pack::DD & dd)
-   { value->next_ravel_Float(real(dd)); }
+inline void next_Cell(Value & value, const LA_pack::DD & dd)
+   { value.next_ravel_Float(real(dd)); }
 
-inline void next_Cell(Value_P & value, const LA_pack::ZZ & zz)
-   { value->next_ravel_Complex(real(zz), imag(zz)); }
+inline void next_Cell(Value & value, const LA_pack::ZZ & zz)
+   { value.next_ravel_Complex(real(zz), imag(zz)); }
 
 /*
    Notation: in the literature the conjujate transpose of a vector v resp.
@@ -73,7 +73,7 @@ inline void next_Cell(Value_P & value, const LA_pack::ZZ & zz)
              │
              ├─── laqp2<T>(A, pivot, tau)
              │    │
-             │    ├─── larfg<T>('Left', N, X)
+             │    ├─── larfg<T>('Left', X)
              │    └─── larf<T>(v, tau, C)
              │
              ├─── estimate_rank(A, rcond)
@@ -90,7 +90,7 @@ inline void next_Cell(Value_P & value, const LA_pack::ZZ & zz)
    │
    ├─── laqp2<T>(A, pivot, tau)
    │    │
-   │    ├─── larfg<T>('Left', N, X)
+   │    ├─── larfg<T>('Left', X)
    │    └─── larf<T>(v, len_v, tau, C)
    │
    ├─── grab_Q ()
@@ -144,18 +144,18 @@ static const APL_Float tol3z        = sqrt(dlamch_E);         // 1.05367E¯8
 # include "LAdebug.icc"   // print_matrix() etc.
 
 //----------------------------------------------------------------------------
-sRank LA_pack::divide_DD_matrix(Value & Z, ShapeItem rows,
-                                ShapeItem cols_A, const Cell * cA,
-                                ShapeItem cols_B, const Cell * cB)
+sRank LA_pack::divide_DD_matrix(Value & Z, Crow M,
+                                Ccol cols_A, const Cell * cA,
+                                Ccol cols_B, const Cell * cB)
 {
-   return divide_matrix<DD>(Z, rows, cols_A, cA, cols_B, cB);
+   return divide_matrix<DD>(Z, M, cols_A, cA, cols_B, cB);
 }
 //----------------------------------------------------------------------------
-sRank LA_pack::divide_ZZ_matrix(Value & Z, ShapeItem rows,
-                                ShapeItem cols_A, const Cell * cA,
-                                ShapeItem cols_B, const Cell * cB)
+sRank LA_pack::divide_ZZ_matrix(Value & Z, Crow M,
+                                Ccol cols_A, const Cell * cA,
+                                Ccol cols_B, const Cell * cB)
 {
-   return divide_matrix<ZZ>(Z, rows, cols_A, cA, cols_B, cB);
+   return divide_matrix<ZZ>(Z, M, cols_A, cA, cols_B, cB);
 }
 //----------------------------------------------------------------------------
 /// the implementation of Z←A⌹B, where
@@ -163,9 +163,9 @@ sRank LA_pack::divide_ZZ_matrix(Value & Z, ShapeItem rows,
 /// or else: A[;j] - B +.× Z[j] is minimal         (if rows > cols_B)
 template<typename T>
 sRank
-LA_pack::divide_matrix(Value & Z, ShapeItem rows,
-                       ShapeItem cols_A, const Cell * cA,
-                       ShapeItem cols_B, const Cell * cB)
+LA_pack::divide_matrix(Value & Z, Crow rows,
+                       Ccol cols_A, const Cell * cA,
+                       Ccol cols_B, const Cell * cB)
 {
    // the following has been checked by the caller:
    //
@@ -173,7 +173,6 @@ LA_pack::divide_matrix(Value & Z, ShapeItem rows,
    // rows_A == rows_B  (aka. rows)
    //
 const T t0(0.0);
-const bool need_complex = is_complex(t0);
 const APL_Float rcond = Workspace::get_CT();
 const size_t items_A = rows;
 const size_t items_B = rows * cols_B;
@@ -230,7 +229,7 @@ char * work_B = work_A + bytes_A;
         // cols_A = rows_Z. We have computed the result for col c of A
         // which is row c of Z.
         //
-        if (need_complex)
+        if (is_complex(t0))
            ALL_ROWS(cols_B)   // row ←→ col since ⍉
               Z.set_ravel_Complex(row*cols_A + col, get_real(a[row]),
                                                     get_imag(a[row]));
@@ -244,23 +243,23 @@ char * work_B = work_A + bytes_A;
 }
 //----------------------------------------------------------------------------
 // instantiate factorize_matrix<DD>()
-void LA_pack::factorize_DD_matrix(Value & Z, ShapeItem rows, ShapeItem cols,
+void LA_pack::factorize_DD_matrix(Value & Z, Crow M, Ccol N,
                                   const Cell * cB, APL_Float rcond)
 {
-   factorize_matrix<DD>(Z, rows, cols, cB, rcond);
+   factorize_matrix<DD>(Z, M, N, cB, rcond);
 }
 //----------------------------------------------------------------------------
 // instantiate factorize_matrix<ZZ>()
-void LA_pack::factorize_ZZ_matrix(Value & Z, ShapeItem rows, ShapeItem cols,
+void LA_pack::factorize_ZZ_matrix(Value & Z, Crow M, Ccol N,
                                   const Cell * cB, APL_Float rcond)
 {
-   factorize_matrix<ZZ>(Z, rows, cols, cB, rcond);
+   factorize_matrix<ZZ>(Z, M, N, cB, rcond);
 }
 //----------------------------------------------------------------------------
 /// the implementation of Z←⌹[2]B, where Z is (Q T T⁻¹) and B = T∘Q.
 //
 template<typename T>
-sRank LA_pack::factorize_matrix(Value & Z, ShapeItem M, ShapeItem N,
+sRank LA_pack::factorize_matrix(Value & Z, Crow M, Ccol N,
                                const Cell * cB, APL_Float rcond)
 {
    // work sizes...
@@ -287,8 +286,8 @@ fMatrix<T> Ri(work_Ri, N, M, /* LDB */ M);
 T * bb = &B.diag(0);
 T * hr = &HR.diag(0);
 
-   // initialize bb[] and hr in FORTRAN (aka. column major) order,
-   // which is ⍉ APL (aka. row major) order. I.e. use ⍉B to init bb and hr.
+   // initialize bb[] and hr[] in FORTRAN (.e. in column major) order,
+   // which is ⍉ APL (i.e. row major) order. I.e. use ⍉B to init bb and hr.
    //
 const bool cplx = is_complex(*bb);
 
@@ -337,7 +336,7 @@ void LA_pack::grab_Q (Value & Z, fMatrix<T> & C, PTVVy<T> & ptvvy)
 const Crow M = C.get_row_count();
 const Ccol N = C.get_column_count();
 
-   if (M < N)   // C is under-determined
+   if (M < N)   // C is under-determined. Pad it to the unity matrix
       {
         /*   ├────N────┤    ├────N────┤    
            ┬ ╔════C════╗    ╔════C════╗ ┬
@@ -352,18 +351,19 @@ const Ccol N = C.get_column_count();
         C.set_rows(N);   // expand M→N
         T * data = &C.diag(0);
 
+        // this is an inplace copy so we copy downwards from the end
+        // to avoid that source items overwritten before they were used.
         REV_ROWS(N)   // j
         REV_COLS(N)   // k
            {
              T & dest =                data[k + N * j];
-             if (k < M)         dest = data[k + M * j];   // valid
+             if (k < M)         dest = data[k + M * j];   // valid source
              else if (j == k)   dest = T(1.0);            // ID diag
              else               dest = T(0.0);            // ID other
            }
       }
 
 print_matrix("C before ung2r() in grab_Q ()", C);
-
    ung2r<T>(C, ptvvy);
 print_matrix("C after ung2r() in grab_Q ()", C);
 
@@ -371,10 +371,10 @@ const Ccol min_MN = min(M, N);
 const Shape shape_Z1(M, min_MN);   // the orthogonal matrix Q
 Value_P Z1(shape_Z1, LOC);
 
-   ALL_ROWS(M)   // APL rows    of Z1
+   ALL_ROWS(M)        // APL rows    of Z1
    ALL_COLS(min_MN)   // APL columns of Z1
       {
-        next_Cell(Z1, C.at(row, col));
+        next_Cell(*Z1, C.at(row, col));
       }
 
    Z1->check_value(LOC);
@@ -400,13 +400,13 @@ Value_P Z2(shape_Z2, LOC);
       {
         if (row <= col)   // on or above diagonal: HR is valid
            {
-             next_Cell(Z2, HR.at(row, col));
+             next_Cell(*Z2, HR.at(row, col));
            }
         else
            {
              const T Zero(0.0);
              HR.at(row, col) = Zero;
-             next_Cell(Z2, Zero);
+             next_Cell(*Z2, Zero);
            }
       }
 
@@ -461,36 +461,25 @@ const bool cplx = is_complex(UTM.diag(0));
    ALL_ROWS(min_MN)   // APL row
    ALL_COLS(min_MN)   // APL col
        {
-         double re = 0.0;   // assume item is below the diagonal
-         double im = 0.0;   // dito.
-         if (cplx)
+         if (col < N && col >= row)   // item is on or above diagonal 
             {
-              if (col < N && col >= row)   // item is on or above diagonal 
+              const T & item = AUG.AT(row, col);
+              if (!(isfinite(real(item)) && isfinite(imag(item))))
                  {
-                   const T & item = AUG.AT(row, col);
-                   re = real(item);
-                   im = imag(item);
-                   if (!(isfinite(re) && isfinite(im)))   DOMAIN_ERROR;
-                 }
-              Z3->next_ravel_Complex(re, im);
-            }
-         else
-            {
-              if (col < N && col >= row)   // item is on or above diagonal
-                 {
-                   const T & item = AUG.AT(row, col);
-                   re = real(item);
-                   if (!isfinite(re))
-                      {
-                        MORE_ERROR() << "non-finite real AUG["
-                                     << row << ";" << col << "]:" << re
-                                     << " in invert_T_UTM()";
+                   UCS_string & more = MORE_ERROR();
+                   more << "non-finite AUG[" << row << ";" << col << "]:";
+                   if (!(isfinite(real(item))))
+                      more << " real " << real(item);
+                   else
+                      more << " imag " << imag(item);
+                   more << " in " << __FUNCTION__;
 
-                        DOMAIN_ERROR;
-                      }
+                   DOMAIN_ERROR;
                  }
-               Z3->next_ravel_Float(re);
-             }
+              next_Cell(*Z3, item);
+            }
+         else if (cplx)   Z3->next_ravel_Complex(0.0, 0.0);
+         else             Z3->next_ravel_Float(0.0);
        }
 
    Z3->check_value(LOC);
@@ -655,7 +644,7 @@ const Cdia D = min(M, N);
         T & tau = ptvvy.tau[dia];
         const Crow s_X   = dia + 1;   // start of X = row below diag(dia)
         const Crow len_X = M - s_X;   // length of reflector X
-        tau = len_X ? larfg<T>(M - dia, &A.at(s_X, dia), len_X) : 0.0;
+        tau = len_X ? larfg<T>(&A.at(s_X, dia), len_X) : 0.0;
 
         /* Apply H(dia)° × H to A(offset+i:m, i+1:n) from the left.
 
@@ -665,19 +654,22 @@ const Cdia D = min(M, N);
            ↓  ║  \ │       ║
            ↓  ║   \│       ║ 
           dia ║    ⍺┌──────╢   ⍺: Acc = A.diag(dia) := 1.0
-           ↓  ║     │      ║ 
-           ↓  ║     │ SUB  ║ 
-           N  ║     │      ║ 
-              ║     │      ║ 
-           M  ╚═════╪══════╝
-                  dia+1     
+        ┬ s_X ║     │      ║ 
+        │  ↓  ║     │ SUB  ║ 
+    len_X  ↓  ║     │      ║ 
+        │  N  ║     │      ║ 
+        ╩  M  ╚═════╪══════╝
+                  dia+1 == s_X
          */
-        T & ALPHA = A.diag(dia);
-        const T alpha = ALPHA;           // remember ⍺ = A(dia, dia)
-           ALPHA = T(1.0);
-           fMatrix<T> SUB = A.sub_matrix(dia, s_X);
-           larf<T>(&A.diag(dia),conjugated(tau), SUB, ptvvy.y);
-        ALPHA = alpha;                   // restore ⍺ = A(dia, dia)
+        if (s_X < D)
+           {
+             T & ALPHA = A.diag(dia);
+             const T alpha = ALPHA;           // remember ⍺ = A(dia, dia)
+                ALPHA = T(1.0);
+                fMatrix<T> SUB = A.sub_matrix(dia, s_X);
+                larf<T>(&A.diag(dia),conjugated(tau), SUB, ptvvy.y);
+             ALPHA = alpha;                   // restore ⍺ = A(dia, dia)
+           }
 
         if (!ptvvy.pivot)   continue;
 
@@ -1493,10 +1485,9 @@ const APL_Float test = 1.0 + 2.0*(zeta1 - zeta2)*(zeta1 + zeta2);
    and passing it as parameter to larfg.
  */
 template<typename T>
-T LA_pack::larfg(Ccol N, T * X, Crow len_X)
+T LA_pack::larfg(T * X, Crow len_X)
 {
-// Assert(N > 0);
-   if (N == 1)   return T(0.0);
+   if (len_X == 0)   return T(0.0);
 
    // ALPHA: the geometrical length of vector X (i.e. NOT len_X!)
    // BETA:  the geometrical length of vector ALPHA,X
@@ -1630,9 +1621,9 @@ const Ccol N = C.get_column_count();
    return 0;
 }
 //----------------------------------------------------------------------------
-/* LApack function gemv. Multiply every (conjugated) row vector (+C)[row;]
-   of C with the scalar x[row] and set the scalar y[row] of the result y
-   to the sum of the products.
+/* LApack function gemv. Multiply every (conjugated) partial column vector
+   M↑(+C)[;col] of C with vector x. Set the row vector y to the sums
+   of the products.
 
       ├──────N──────┤            
     ┬ ╔════╤═╤═+C╤══╤═══╗   ┌───┐
@@ -1663,28 +1654,29 @@ inline void LA_pack::gemv(const fMatrix<T> & C, Crow M, Ccol N,
                           const T * x, T * y)
 {
    ALL_COLS(N)
-       {
-         T sum(0.0);
-         ALL_ROWS(M)   sum += conjugated(C.at(row, col)) * x[row];
-         y[col] = sum;
-       }
+      {
+        T sum(0.0);   // column sum
+        ALL_ROWS(M)   sum += conjugated(C.at(row, col)) * x[row];
+        y[col] = sum;
+      }
 }
 //----------------------------------------------------------------------------
-/* LApack function gerc. Multiply (scale) every column C[;col]
-   of matrix C with the factor ALPHA × (+y[col]) × x[row].
+/* LApack function gerc. Let SUB←M N↑C.
+
+   C[m; n] ← ALPHA × x[m] × y[n] × C[m; n] for SUB ←→ M N↑C
 
 
             ├────N────┤            
             ┌─────────┐            
             │   +y    │ 0          
             └─────────┘            
-                  ×                
-                ALPHA
-                  ×                
+                 ×                
+               ALPHA
+                 ×                
             ╔══════C══╤═══╗   ┌───┐ ┬
             ║         │   ║   │   │ │
             ║         │   ║   │   │ │
-        C ← ║         │   ║ × │ x │ M
+        C ← ║   SUB   │   ║ × │ x │ M
             ║         │   ║   │   │ │
             ║         │   ║   │   │ │
             ╟─────────┘   ║   └───┘ ┴
@@ -1740,15 +1732,15 @@ const Crow M = C.get_row_count();
 
    /*
                   ├──────N──────┤
-          ┬ ┌─┐     ╔══════C═╤════╗ ┬
-          │ │v│     ║        │0 0 ║ │
-      len_v │v│     ║       c│0 0 ║ │
-          │ │v│     ║        │0 0 ║ M   v≠0, c≠0
-          ┴ │v│ → → ╟────────┘0 0 ║ │
-        ↑   │0│     ║       │     ║ │
-        ↑   │0│     ║       │     ║ │
-        M   └─┘     ╚═══════│═════╝ ┴
-                        lastC ← N
+          ┬ ┌─┐   ╔══════C═╤════╗ ┬
+          │ │v│   ║        │0 0 ║ │
+      len_v │v│   ║       c│0 0 ║ │
+          │ │v│   ║        │0 0 ║ M   v≠0, c≠0
+          ┴ │v│ → ╟────────┘0 0 ║ │
+        ↑   │0│   ║       │     ║ │
+        ↑   │0│   ║       │     ║ │
+        M   └─┘   ╚═══════│═════╝ ┴
+                      lastC ← N
     */
 
    // compute len_v = the length of v without trailing zeroes of v.
@@ -1764,8 +1756,11 @@ Crow len_v = M;   // significant length of v, len_v ≤ M
    // last column lastC that has a nonzero item.
    //
 const Ccol lastC = ila_lc<T>(len_v, C);
-   gemv<T>(C, len_v, lastC,       v, y);
-   gerc<T>(C, len_v, lastC, -tau, v, y);
+
+   // (len_v lastC)↑C is the submatrix SUB of concern in gemv() and gerc()
+   //
+   gemv<T>(C, len_v, lastC,       v, y);   // set y[]
+   gerc<T>(C, len_v, lastC, -tau, v, y);   // use y[]
 }
 //----------------------------------------------------------------------------
 template<typename T>
@@ -1783,7 +1778,7 @@ LA_pack::PTVVy<T>::PTVVy(Ccol N, bool with_pivot)
                     + sizeof(*vn2)
       };
 
-   if (with_pivot)
+   if (with_pivot)   // ⌹B or A⌹B but not ⌹[X]B
       {
         char * work = new char[N*bytes_per_N2];
         tau      = reinterpret_cast<typeof(tau)>      (work);
@@ -1797,14 +1792,14 @@ LA_pack::PTVVy<T>::PTVVy(Ccol N, bool with_pivot)
         // init the pivot
         loop(n, N)   pivot[n] = n;
       }
-   else
+   else              // only ⌹[X]B
       {
         char * work = new char[N*bytes_per_N1];
         tau      = reinterpret_cast<typeof(tau)>      (work);
         y        = reinterpret_cast<typeof(y)>        (tau      + N);
         work_min = reinterpret_cast<typeof(work_min)> (y        + N);
         work_max = reinterpret_cast<typeof(work_max)> (work_min + N);
-        pivot    = 0;
+        pivot    = 0;   // as to figure with_pivot later on
         vn1      = 0;
         vn2      = 0;
       }

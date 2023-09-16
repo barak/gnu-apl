@@ -3,15 +3,15 @@
     (and of the functions that they call) from liblapack to C++.
 
     liblapack has the following license/copyright notices,
-    see http://www.netlib.org/lapack/LICENSE:
+    see also http://www.netlib.org/lapack/LICENSE:
 
     Copyright (c) 1992-2011 The University of Tennessee and The University
-                            of Tennessee Research Foundation.  All rights
-                            reserved.
-    Copyright (c) 2000-2011 The University of California Berkeley. All
-                            rights reserved.
-    Copyright (c) 2006-2011 The University of Colorado Denver.  All rights
-                            reserved.
+                            of Tennessee Research Foundation.
+                            All rights reserved.
+    Copyright (c) 2000-2011 The University of California Berkeley.
+                            All rights reserved.
+    Copyright (c) 2006-2011 The University of Colorado Denver.
+                            All rights reserved.
 
 
     Redistribution and use in source and binary forms, with or without
@@ -69,10 +69,6 @@
 #define LA_DEBUG     0   /* LApack.cc */
 #define DOMINO_DEBUG 0   /* Bif_F12_DOMINO::householder */
 
-#ifndef assert
-# define assert(x)
-#endif
-
 typedef int Crow;   ///< a row number:      0..M (excluding M)
 typedef int Ccol;   ///< a column number:   0..N (excluding N)
 typedef int Cdia;   ///< a diagonal (row == col) number:   0..N (excluding N)
@@ -101,7 +97,7 @@ typedef int Cdia;   ///< a diagonal (row == col) number:   0..N (excluding N)
    rows in the matrix.
 
    In C/C++ the FORTRAN LDA, LDB, LDC, ... are the member 'dx' of the
-   corresponging fMatrix<T> classes A, B, C, ....
+   corresponding fMatrix<T> classes A, B, C, ....
  */
 class LA_pack
 {
@@ -245,13 +241,13 @@ public:
             cols(new_col_count),
             transpose(other.transpose),
             dx(other.dx)
-        { assert(new_col_count <= other.cols); }
+        { Assert(new_col_count <= other.cols); }
 
         /// copy from \b other
         void operator =(const fMatrix & other)
            {
              transpose = other.transpose;
-             assert(rows*cols == other.rows*other.cols);
+             Assert(rows*cols == other.rows*other.cols);
              ALL_ROWS(rows)
              ALL_COLS(cols)   at(row, col) = other.at(row, col);
            }
@@ -260,7 +256,7 @@ public:
         /// I.e. \b row col↓this
         fMatrix sub_matrix(Crow row, Crow col)
            {
-             assert(col <= cols && row <= rows);
+             Assert(col <= cols && row <= rows);
              return fMatrix(&at(row, col), rows - row, cols - col, dx);
            }
 
@@ -281,8 +277,8 @@ public:
         /// starting at row 0 and column 0
         fMatrix take(ShapeItem new_rows, ShapeItem new_cols)
            {
-             assert(new_rows <= rows);
-             assert(new_cols <= cols);
+             Assert(new_rows <= rows);
+             Assert(new_cols <= cols);
              return fMatrix(data, new_rows, new_cols, dx);
            }
      
@@ -305,45 +301,45 @@ public:
      
         /// return const \b this[row, col]
         const T & at(Crow row, Ccol col) const
-           { assert(row < rows);
-             assert(col < cols);
+           { Assert(row < rows);
+             Assert(col < cols);
              return data[row + col*dx]; }
      
         /// return \b this[row, col]
         T & at(Crow row, Ccol col)
-           { assert(row < rows);
-             assert(col < cols);
+           { Assert(row < rows);
+             Assert(col < cols);
              return data[row + col*dx]; }
      
         /// return \b this[row, col] or this[col, row]
         const T & AT(Crow row, Ccol col) const
-           { assert(row < rows);   assert(col < cols);
+           { Assert(row < rows);   Assert(col < cols);
              return transpose ? data[col + row*dx] : data[row + col*dx];
            }
      
         /// return \b this[row, col] or this[col, row]
         T & AT(Crow row, Ccol col)
-           { assert(row < rows);   assert(col < cols);
+           { Assert(row < rows);   Assert(col < cols);
              return transpose ? data[col + row*dx] : data[row + col*dx];
            }
      
         /// return \b this[i, i]
         T & diag(ShapeItem i)
-           { assert(i < rows);
-             assert(i < cols);
+           { Assert(i < rows);
+             Assert(i < cols);
              return data[i*(1 + dx)]; }
      
         /// return \b this[i, i]
         const T & diag(ShapeItem i) const
-           { assert(i < rows);
-             assert(i < cols);
+           { Assert(i < rows);
+             Assert(i < cols);
              return data[i*(1 + dx)]; }
 
         /// exchange columns \b c1 and \b c2
         void exchange_columns(ShapeItem c1, ShapeItem c2)
            {
-             assert(c1 < cols);
-             assert(c2 < cols);
+             Assert(c1 < cols);
+             Assert(c2 < cols);
              T * p1 = data + c1*dx;
              T * p2 = data + c2*dx;
              loop(r, rows)   exchange(*p1++, *p2++);
@@ -579,33 +575,33 @@ public:
       { return true; }
 
    /// compute Z←A⌹B (real A, B, and Z). Instatiation wrapper.
-   static sRank divide_DD_matrix(Value & Z, ShapeItem rows,
-                              ShapeItem cols_A, const Cell * cA,
-                              ShapeItem cols_B, const Cell * cB);
+   static sRank divide_DD_matrix(Value & Z, Crow rows,
+                              Ccol cols_A, const Cell * cA,
+                              Ccol cols_B, const Cell * cB);
 
    /// compute Z←A⌹B (complex A or B, and Z). Instatiation wrapper.
-   static sRank divide_ZZ_matrix(Value & Z, ShapeItem rows,
-                              ShapeItem cols_A, const Cell * cA,
-                              ShapeItem cols_B, const Cell * cB);
+   static sRank divide_ZZ_matrix(Value & Z, Crow rows,
+                              Ccol cols_A, const Cell * cA,
+                              Ccol cols_B, const Cell * cB);
 
    /// template instantiation wrapper. This wrapper forces the instantiation of
    /// factorize_matrix<DD>() which is defined in a different object file and
    /// may not be instantiated otherwise.
-   static void factorize_DD_matrix(Value & Z, ShapeItem rows, ShapeItem cols,
+   static void factorize_DD_matrix(Value & Z, Crow M, Ccol N,
                                    const Cell * cB, APL_Float rcond);
 
    /// template instantiation wrapper. This wrapper forces the instantiation of
    /// factorize_matrix<ZZ>() which is defined in a different object file and
    /// may not be instantiated otherwise.
-   static void factorize_ZZ_matrix(Value & Z, ShapeItem rows, ShapeItem cols,
+   static void factorize_ZZ_matrix(Value & Z, Crow M, Ccol N,
                                    const Cell * cB, APL_Float rcond);
 
 protected:   // class LA_pack
    /// compute Z←A⌹B
    template<typename T>
-   static sRank divide_matrix(Value & Z, ShapeItem rows_AB,
-                              ShapeItem cols_A, const Cell * cA,
-                              ShapeItem cols_B, const Cell * cB);
+   static sRank divide_matrix(Value & Z, Crow M,
+                              Ccol cols_A, const Cell * cA,
+                              Ccol cols_B, const Cell * cB);
 
    /// store the orthogonal factor Q of some HR in Z[1]. On entry is Q a copy
    /// of HR, on exit is Q the reflectors in HR applied to the unit matrix.
@@ -634,7 +630,7 @@ protected:   // class LA_pack
 
    // factorize B
    template<typename T>
-   static sRank factorize_matrix(Value & Z, ShapeItem rows, ShapeItem cols,
+   static sRank factorize_matrix(Value & Z, Crow M, Ccol N,
                                 const Cell * cB, APL_Float rcond);
 
    /// return the real part of dd (= dd)
@@ -732,7 +728,7 @@ protected:   // class LA_pack
      /// LApack function larfg. It generates an elementary reflector
      /// (aka. a Householder matrix). Return the scalar tau.
      template<typename T>
-     static T larfg(Ccol N, T * X, Crow len_X);
+     static T larfg(T * X, Crow len_X);
   
      /// LApack function trsm. Solve A ∘ X[;1:NRHS] = B[;1:NRHS]
      template<typename T>
