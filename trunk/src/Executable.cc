@@ -588,6 +588,7 @@ Executable::set_error_info(Error & error, Function_PC2 body_from_to) const
         Q1(body.size())
         Q1(body_from_to.low)
         Q1(body_from_to.high)
+        if (body.size())   Q1(body[0])
       }
 
    // decrement body_from_to.high if it points to the end of

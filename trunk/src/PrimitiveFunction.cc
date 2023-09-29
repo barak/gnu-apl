@@ -1354,6 +1354,12 @@ UCS_string statement(*B.get());
 }
 //----------------------------------------------------------------------------
 Token
+Bif_F1_EXECUTE::eval_fill_B(Value_P B) const
+{
+   return Token(TOK_VOID);
+}
+//----------------------------------------------------------------------------
+Token
 Bif_F1_EXECUTE::execute_statement(UCS_string & statement)
 {
    statement.remove_leading_and_trailing_whitespaces();

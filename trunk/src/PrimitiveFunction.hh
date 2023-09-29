@@ -156,6 +156,9 @@ public:
    /// overladed Function::eval_B()
    virtual Token eval_B(Value_P B) const;
 
+   /// overloaded Function::eval_fill_B()
+   virtual Token eval_fill_B(Value_P B) const;
+
    /// the number of outstanding )COPYs with APL scipts
    static int copy_pending;
 

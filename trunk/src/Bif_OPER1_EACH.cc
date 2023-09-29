@@ -62,8 +62,8 @@ Function_P LO = _LO.get_function();
       {
         if (!LO->has_result())   return Token(TOK_VOID);
 
-        Value_P First_A = Bif_F12_TAKE::first(*A);
-        Value_P First_B = Bif_F12_TAKE::first(*B);
+        Value_P proto_A = Bif_F12_TAKE::first(*A);
+        Value_P proto_B = Bif_F12_TAKE::first(*B);
         Shape shape_Z;   // will be ⍴A or ⍴B and therefore empty
 
         if (A->is_empty())          shape_Z = A->get_shape();
@@ -72,12 +72,19 @@ Function_P LO = _LO.get_function();
         if (B->is_empty())          shape_Z = B->get_shape();
         else if (!B->is_scalar())   DOMAIN_ERROR;
 
-        Value_P Z1 = LO->eval_fill_AB(First_A, First_B).get_apl_val();
+        Token tZ1 = LO->eval_fill_AB(proto_A, proto_B);
+        if (tZ1.get_Class() != TC_VALUE)   return tZ1;
+
+        Value_P Z1 = tZ1.get_apl_val();
         Value_P Z(shape_Z, LOC);
-        if (Z1->is_simple_scalar())
+
+        // Z1 is the prototype of the empty Z
+        //
+        if (Z1->is_simple_scalar())     // then ⊂Z1 is Z1
            Z->set_ravel_Cell(0, Z1->get_cscalar());
         else   // need to encose Z1
            Z->set_ravel_Pointer(0, Z1.get());
+
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
@@ -246,20 +253,22 @@ Function_P LO = _LO.get_function();
 
    if (B->is_empty())
       {
-        if (!LO->has_result())   return Token(TOK_VOID);
+        if (!LO->has_result())   return Token(TOK_VOID);    // no-op
 
-        Value_P First_B = Bif_F12_TAKE::first(*B);
-        Token tZ = LO->eval_fill_B(First_B);
-        Value_P Z1 = tZ.get_apl_val();
+        Value_P proto_B = Bif_F12_TAKE::first(*B);
+        Token tZ1 = LO->eval_fill_B(proto_B);
+        if (tZ1.get_Class() != TC_VALUE)   return tZ1;
 
-        if (Z1->is_simple_scalar())
-           {
-             Z1->set_shape(B->get_shape());
-             return Token(TOK_APL_VALUE1, Z1);
-           }
-
+        Value_P Z1 = tZ1.get_apl_val();
         Value_P Z(B->get_shape(), LOC);
-        Z->set_ravel_Pointer(0, Z1.get());
+
+        // Z1 is the prototype of the empty Z
+        //
+        if (Z1->is_simple_scalar())     // then ⊂Z1 is Z1
+           Z->set_ravel_Cell(0, Z1->get_cscalar());
+        else   // need to encose Z1
+           Z->set_ravel_Pointer(0, Z1.get());
+
         Z->check_value(LOC);
         return Token(TOK_APL_VALUE1, Z);
       }
