@@ -263,6 +263,9 @@ public:
    const UCS_string current() const
       { return UCS_string(*get_apl_value()); }
 
+   // overloaded Symbol::push()
+   virtual void push();
+
 protected:
    /// overloaded Symbol::assign().
    virtual void assign(Value_P B, bool clone, const char * loc);
@@ -272,9 +275,6 @@ protected:
 
    /// overloaded Symbol::assign_indexed().
    virtual void assign_indexed(const IndexExpr & IX, Value_P B);
-
-   // overloaded Symbol::push()
-   virtual void push();
 };
 //----------------------------------------------------------------------------
 /**

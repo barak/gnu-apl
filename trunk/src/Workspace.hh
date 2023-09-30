@@ -81,6 +81,18 @@ public:
    static APL_Char get_FC(int p)
       { return the_workspace.v_Quad_FC.current()[p]; }
 
+   /// push ⎕FC
+   static void push_FC()
+      {
+        the_workspace.v_Quad_FC.push();
+      }
+
+   /// pop ⎕FC
+   static void pop_FC()
+      {
+        the_workspace.v_Quad_FC.pop();
+      }
+
    /// return the current ⎕IO
    static APL_Integer get_IO()
       { return the_workspace.v_Quad_IO.current(); }

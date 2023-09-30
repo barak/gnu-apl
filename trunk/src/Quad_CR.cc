@@ -522,6 +522,8 @@ Quad_CR::do_CR10_variable(UCS_string_vector & result,
                           const UCS_string & var_name,
                           const Value * value)
 {
+   Workspace::push_FC();
+
    if (value->is_member())   // normal variable
       {
         if (const char * error = do_CR10_structured(result, var_name, value))
@@ -532,6 +534,7 @@ Quad_CR::do_CR10_variable(UCS_string_vector & result,
              goto not_structured;
            }
 
+        Workspace::pop_FC();
         return;   // OK
       }
 
@@ -539,6 +542,7 @@ not_structured:
 
 Picker picker(var_name);
    do_CR10_value(result, value, picker, -99);
+   Workspace::pop_FC();
 }
 //----------------------------------------------------------------------------
 void
