@@ -680,7 +680,11 @@ Parser::get_assign_state(Token_string & tos, ShapeItem pos)
 bool
 Parser::optimize_literal_axes(Token_string & tos)
 {
-   if (!(DO_FT_LITERAL_AXIS && DO_FT_LITERAL_INDEX))   return false;
+   // stupid macOS warns about DO_FT_LITERAL_AXIS && DO_FT_LITERAL_INDEX,
+   // so we split it.
+   //
+   if (!DO_FT_LITERAL_AXIS)    return false;
+   if (!DO_FT_LITERAL_INDEX)   return false;
 
    // replace [ ] or [ N ] by their complete index or axis, as to relieve
    // the Prefix parser.

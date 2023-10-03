@@ -171,7 +171,6 @@ FILE * hist = fopen(filename, "r");
         return;
       }
 
-int count = 0;
    for (;;)
        {
          char buffer[4000];
@@ -182,7 +181,7 @@ int count = 0;
          int slen = strlen(buffer);
          if (slen && (buffer[slen - 1] == '\n'))   buffer[--slen] = 0;
          if (slen && (buffer[slen - 1] == '\r'))   buffer[--slen] = 0;
-         ++count;
+
          UTF8_string utf(buffer);
          UCS_string ucs(utf);
          add_line(ucs);

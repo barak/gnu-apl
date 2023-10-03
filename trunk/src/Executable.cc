@@ -847,11 +847,11 @@ Executable::get_statement_start(Function_PC pc) const
 
    // if we are at the end of the statement, move back.
    //
-   if (pc < 2)   return Function_PC_0;
+   if (int(pc) < 2)   return Function_PC_0;
    if (body[pc].get_Class() == TC_RETURN)   --pc;
    if (body[pc].get_Class() == TC_END)      --pc;
 
-   for (; pc > 0; --pc)
+   for (; int(pc) > 0; --pc)
       {
         if (body[pc-1].get_Class() == TC_END)          return pc;
         if (body[pc-1].get_tag() == TOK_RETURN_EXEC)   return pc;

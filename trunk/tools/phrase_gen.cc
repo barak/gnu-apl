@@ -49,8 +49,9 @@ struct _phrase
       {
         char buffer[40];
         char * b = buffer;
-        loop(l, len)   b += sprintf(b, "_%s", names[l]);
-        sprintf(b, "[%d]", len);
+        const char * end = buffer + sizeof(buffer) - 1;
+        loop(l, len)   b += snprintf(b, end - b, "_%s", names[l]);
+        snprintf(b, end - b, "[%d]", len);
         return string(buffer);
       }
 

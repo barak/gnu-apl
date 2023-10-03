@@ -547,7 +547,6 @@ bool
 XML_node::translate(XML_node & anchor, XML_node & garbage)
 {
 int level = 0;
-ShapeItem count = 0;
 
    // reduce text and leaf nodes...
    //
@@ -587,8 +586,6 @@ ShapeItem count = 0;
               case NT_error:
                    return true;
             }
-
-         ++count;
        }
 
    return false;   // OK
