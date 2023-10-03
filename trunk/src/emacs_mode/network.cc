@@ -32,16 +32,13 @@ static std::vector<Listener *> registered_listeners;
 static pthread_mutex_t registered_listeners_lock = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t registered_listeners_cond = PTHREAD_COND_INITIALIZER;
 
-void *
-connection_loop(void * arg)
+void *connection_loop( void *arg )
 {
-    std::auto_ptr<NetworkConnection> connection( (NetworkConnection *)arg );
-    try
-       {
-         connection->run();
-       }
-    catch(DisconnectedError &disconnected_error)
-  {
+    std::unique_ptr<NetworkConnection> connection( (NetworkConnection *)arg );
+    try {
+        connection->run();
+    }
+    catch( DisconnectedError &disconnected_error ) {
         // Do nothing here
     }
     catch( ProtocolError &protocol_error ) {
@@ -63,23 +60,24 @@ static void *listener_loop( void *arg )
     return NULL;
 }
 
-void start_listener( int port )
+void start_listener(int port)
 {
-    pthread_t thread_id;
+pthread_t thread_id;
 
-    auto_ptr<Listener> listener( Listener::create_listener( port ) );
+unique_ptr<Listener> listener( Listener::create_listener( port ) );
 
-    string conninfo = listener->start();
+string conninfo = listener->start();
     
-    int res = pthread_create( &thread_id, NULL, listener_loop, listener.get() );
-    if( res != 0 ) {
-        throw InitProtocolError( "Unable to start network connection thread" );
-    }
+   if (int res = pthread_create(&thread_id, 0, listener_loop, listener.get()))
+      {
+        throw InitProtocolError("Unable to start network connection thread");
+      }
 
-    listener->set_thread( thread_id );
-    listener.release();
+   listener->set_thread( thread_id );
+   listener.release();
 
-    COUT << "Network listener started. Connection information: " << conninfo << endl;
+   COUT << "Network listener started. Connection information: "
+        << conninfo << endl;
 }
 
 void register_listener( Listener *listener )
