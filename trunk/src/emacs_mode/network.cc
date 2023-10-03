@@ -32,13 +32,16 @@ static std::vector<Listener *> registered_listeners;
 static pthread_mutex_t registered_listeners_lock = PTHREAD_MUTEX_INITIALIZER;
 static pthread_cond_t registered_listeners_cond = PTHREAD_COND_INITIALIZER;
 
-void *connection_loop( void *arg )
+void *
+connection_loop(void * arg)
 {
     std::auto_ptr<NetworkConnection> connection( (NetworkConnection *)arg );
-    try {
-        connection->run();
-    }
-    catch( DisconnectedError &disconnected_error ) {
+    try
+       {
+         connection->run();
+       }
+    catch(DisconnectedError &disconnected_error)
+  {
         // Do nothing here
     }
     catch( ProtocolError &protocol_error ) {

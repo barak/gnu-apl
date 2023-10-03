@@ -1781,13 +1781,13 @@ LA_pack::PTVVy<T>::PTVVy(Ccol N, bool with_pivot)
    if (with_pivot)   // ⌹B or A⌹B but not ⌹[X]B
       {
         char * work = new char[N*bytes_per_N2];
-        tau      = reinterpret_cast<typeof(tau)>      (work);
-        y        = reinterpret_cast<typeof(y)>        (tau      + N);
-        work_min = reinterpret_cast<typeof(work_min)> (y        + N);
-        work_max = reinterpret_cast<typeof(work_max)> (work_min + N);
-        pivot    = reinterpret_cast<typeof(pivot)>    (work_max + N);
-        vn1      = reinterpret_cast<typeof(vn1)>      (pivot    + N);
-        vn2      = reinterpret_cast<typeof(vn2)>      (vn1      + N);
+        tau      = reinterpret_cast<T *>        (work);
+        y        = reinterpret_cast<T *>        (tau      + N);
+        work_min = reinterpret_cast<T *>        (y        + N);
+        work_max = reinterpret_cast<T *>        (work_min + N);
+        pivot    = reinterpret_cast<Ccol *>     (work_max + N);
+        vn1      = reinterpret_cast<APL_Float *>(pivot    + N);
+        vn2      = reinterpret_cast<APL_Float *>(vn1      + N);
 
         // init the pivot
         loop(n, N)   pivot[n] = n;
@@ -1795,10 +1795,10 @@ LA_pack::PTVVy<T>::PTVVy(Ccol N, bool with_pivot)
    else              // only ⌹[X]B
       {
         char * work = new char[N*bytes_per_N1];
-        tau      = reinterpret_cast<typeof(tau)>      (work);
-        y        = reinterpret_cast<typeof(y)>        (tau      + N);
-        work_min = reinterpret_cast<typeof(work_min)> (y        + N);
-        work_max = reinterpret_cast<typeof(work_max)> (work_min + N);
+        tau      = reinterpret_cast<T *>(work);
+        y        = reinterpret_cast<T *>(tau      + N);
+        work_min = reinterpret_cast<T *>(y        + N);
+        work_max = reinterpret_cast<T *>(work_min + N);
         pivot    = 0;   // as to figure with_pivot later on
         vn1      = 0;
         vn2      = 0;
