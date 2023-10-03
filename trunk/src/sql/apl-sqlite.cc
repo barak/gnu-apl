@@ -236,12 +236,12 @@ static Value_P run_generic( Connection *conn, Value_P A, Value_P B, bool query )
     else {
            builder = conn->make_prepared_update(statement);
          }
-    auto_ptr<ArgListBuilder> arg_list(builder);
+    unique_ptr<ArgListBuilder> arg_list(builder);
 
     const Shape & shape = B->get_shape();
     if (shape.get_rank() == 0 || shape.get_rank() == 1)
        {
-         int num_args = shape.get_volume();
+         const int num_args = shape.get_volume();
          return run_generic_one_query( arg_list.get(), B, 0, num_args, false );
        }
     else if (shape.get_rank() == 2)

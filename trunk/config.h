@@ -5,7 +5,7 @@
 #define ARCHIVE_SVN " 883"
 
 /* How and when GNU APL was configured */
-#define BUILDTAG PACKAGE_NAME, PACKAGE_VERSION " / SVN: 1142", "2023-10-03 11:08:12 UTC", "Linux 5.15.0-78-generic x86_64", "default ./configure options"
+#define BUILDTAG PACKAGE_NAME, PACKAGE_VERSION " / SVN: 1143", "2023-10-03 11:54:17 UTC", "Linux 5.15.0-78-generic x86_64", "default ./configure options"
 
 /* Define to 1 iff pthread_setaffinity_np() is available */
 #define HAVE_AFFINITY_NP 1
