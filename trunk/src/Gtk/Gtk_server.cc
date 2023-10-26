@@ -482,12 +482,18 @@ void
 static cmd_3_show_GUI()
 {
    assert(builder);
-   if (top_level_widget)
-      window = gtk_builder_get_object(builder, top_level_widget);
-   else
-      window = gtk_builder_get_object(builder, "window1");
-
-   assert(window);
+const char * top_level_id = "window1";
+   if (top_level_widget)   top_level_id = top_level_widget;
+   window = gtk_builder_get_object(builder, top_level_id);
+   if (window == 0)   // not found
+      {
+        cerr << "*** Could not find the top-level widget (window) '"
+             << top_level_id <<  "' in the GTK\n"
+   "      GUI specification. Check your XML string or .ui file "
+          "for a line like:\n\n"
+   "      <object class=\"GtkWindow\" id=\"window1\">" << endl;
+        return;
+      }
 
    gtk_window_set_type_hint(GTK_WINDOW(window), GDK_WINDOW_TYPE_HINT_DIALOG);
    gtk_window_set_deletable(GTK_WINDOW(window), false);
