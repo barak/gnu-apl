@@ -304,7 +304,7 @@ UserFunction_header hdr(fun_header, false);
    if (hdr.get_error())
       {
          static char cc[200];
-         SPRINTF(cc, "Bad function header (%s)", hdr.get_error_info());
+         SPRINTF(cc, "Bad function header: %s", hdr.get_error_info());
          return cc;
       }
 

@@ -232,6 +232,9 @@ public:
    /// for blanks
    UCS_string to_HTML(int offset, bool preserve_ws) const;
 
+   /// remove comment (if any) from \b this string
+   void remove_comment();
+
    /// remove trailing pad characters
    void remove_trailing_padchars();
 

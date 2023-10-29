@@ -485,6 +485,20 @@ int pos = col + chunk_len;
 }
 //----------------------------------------------------------------------------
 void
+UCS_string::remove_comment()
+{
+   loop(j, size())
+      {
+        if (at(j) == UNI_COMMENT || at(j) == UNI_NUMBER_SIGN)
+           {
+             resize(j);
+             remove_trailing_whitespaces();
+             break;
+           }
+      }
+}
+//----------------------------------------------------------------------------
+void
 UCS_string::remove_trailing_padchars()
 {
    // remove trailing pad chars from align() and append_string(),

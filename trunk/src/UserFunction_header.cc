@@ -40,7 +40,7 @@
 #include "Workspace.hh"
 
 //=========================================================================
-UserFunction_header::UserFunction_header(const UCS_string & text, bool macro)
+UserFunction_header::UserFunction_header(const UCS_string & text0, bool macro)
   : error(E_DEFN_ERROR),   // assume bad headr
     error_info("Bad header"),
     sym_Z(0),
@@ -51,6 +51,9 @@ UserFunction_header::UserFunction_header(const UCS_string & text, bool macro)
     sym_X(0),
     sym_B(0)
 {
+UCS_string text(text0);
+   text.remove_comment();
+
 UCS_string signature_text;
 UCS_string lvar_text;
 
