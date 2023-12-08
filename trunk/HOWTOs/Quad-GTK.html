@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.10" />
+<meta name="generator" content="AsciiDoc 10.1.2" />
 <title>The GNU APL <strong>⎕GTK</strong> Cookbook</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -436,7 +436,7 @@ thead, p.table.header {
 p.table {
   margin-top: 0;
 }
-/* Because the table frame attribute is overriden by CSS in most browsers. */
+/* Because the table frame attribute is overridden by CSS in most browsers. */
 div.tableblock > table[frame="void"] {
   border-style: none;
 }
@@ -728,14 +728,16 @@ install: function(toclevels) {
 }
 
 }
-asciidoc.install();
+asciidoc.install(4);
 /*]]>*/
 </script>
 </head>
 <body class="article">
 <div id="header">
 <h1>The GNU APL <strong>⎕GTK</strong> Cookbook</h1>
-<span id="author">Jürgen Sauermann, GNU APL</span><br />
+<div id="toc">
+  <div id="toctitle">Table of Contents</div>
+</div>
 </div>
 <div id="content">
 <div class="sect1">
@@ -946,7 +948,7 @@ The <strong>Gtk_server</strong> is started by <strong>⎕GTK</strong>, and after
                                                           ║  ↓  ↓   │    GTK GUI    │  ║
     ╔════════════════╗      Commands                      ║  ↓  ↓   └─┬─────────┬┬──┘  ║
     ║ GNU APL     ┌──╨───┐  33⎕CR → → →         socket    ║┌──────────┴─┐   ┌───┼┴────┐║
-    ║ application │ *⎕GTK* ├───────────────────────-----────╫┤ Gtk_server │ ┌─┴───┴────┐│║
+    ║ application │ ⎕GTK ├───────────────────────-----────╫┤ Gtk_server │ ┌─┴───┴────┐│║
     ║ program.apl └───╥──┘  34⎕CR ← ← ←          pair     ║└────────────┘ │ GTK libs ├┘║
     ╚═════════════════╝     Responses, Events             ║               └──────────┘ ║
                                                           ╚════════════════════════════╝</code>
@@ -4293,7 +4295,7 @@ top-level group in glade).</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2023-03-07 14:19:39 CET
+ 2023-12-01 17:30:44 CET
 </div>
 </div>
 </body>

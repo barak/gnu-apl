@@ -1,7 +1,12 @@
+
+// vim: et:ts=4:sw=4
+
 = The GNU APL *⎕GTK* Cookbook
+:toc:
+:toclevels: 4
+
 :Author: Jürgen Sauermann, GNU APL
 :page-width: 90em
-:toclevels: 4
 
 ////
 make window visible, then
@@ -142,7 +147,7 @@ libraries, so that Gtk itself remains outside GNU APL.
                                                           ║  ↓  ↓   │    GTK GUI    │  ║
     ╔════════════════╗      Commands                      ║  ↓  ↓   └─┬─────────┬┬──┘  ║
     ║ GNU APL     ┌──╨───┐  33⎕CR → → →         socket    ║┌──────────┴─┐   ┌───┼┴────┐║
-    ║ application │ *⎕GTK* ├───────────────────────-----────╫┤ Gtk_server │ ┌─┴───┴────┐│║
+    ║ application │ ⎕GTK ├───────────────────────-----────╫┤ Gtk_server │ ┌─┴───┴────┐│║
     ║ program.apl └───╥──┘  34⎕CR ← ← ←          pair     ║└────────────┘ │ GTK libs ├┘║
     ╚═════════════════╝     Responses, Events             ║               └──────────┘ ║
                                                           ╚════════════════════════════╝

@@ -79,7 +79,8 @@ ShapeItem cols_B;
         cols_B = B->get_cols();
       }
 
-   if (cols_A != rows_B)
+   if (cols_A != rows_B &&
+       !(A->is_scalar_or_len1_vector() || B->is_scalar_or_len1_vector()))
       {
         MORE_ERROR() << "A∘B: A has " << cols_A <<
                         " rows, but B has " << rows_B << " rows";

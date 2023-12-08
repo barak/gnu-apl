@@ -157,9 +157,9 @@ const uint32_t b0 = *string++;
 uint32_t bx = b0;   // the "significant" bits in b0
    if      ((b0 & 0xE0) == 0xC0)   { len = 2;   bx &= 0x1F; }
    else if ((b0 & 0xF0) == 0xE0)   { len = 3;   bx &= 0x0F; }
-   else if ((b0 & 0xF8) == 0xF0)   { len = 4;   bx &= 0x0E; }
-   else if ((b0 & 0xFC) == 0xF8)   { len = 5;   bx &= 0x0E; }
-   else if ((b0 & 0xFE) == 0xFC)   { len = 6;   bx &= 0x0E; }
+   else if ((b0 & 0xF8) == 0xF0)   { len = 4;   bx &= 0x07; }
+   else if ((b0 & 0xFC) == 0xF8)   { len = 5;   bx &= 0x03; }
+   else if ((b0 & 0xFE) == 0xFC)   { len = 6;   bx &= 0x01; }
    else if (verbose)
       {
         CERR << "Bad UTF8 sequence: " << HEX(b0);

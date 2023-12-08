@@ -25,7 +25,8 @@ AC_MSG_RESULT([$apl_TARGET_ANDROID])
 ###############################################################################
 # check if the user wants the Erlang interface (and therefore also libapl)
 #
-AC_MSG_CHECKING([if the build target is the Erlang interface (implies libapl.so)])
+AC_MSG_CHECKING(
+   [if the build target is the Erlang interface (also requires libapl.so)])
 AC_ARG_WITH( [erlang],
              [AS_HELP_STRING([--with-erlang],
                              [enable to build the Erlang interface])],

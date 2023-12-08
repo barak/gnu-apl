@@ -1,10 +1,13 @@
-= LA_pack primer
+
 // vim: et:ts=4:sw=4
+
+= LA_pack primer
+:doctype: book
+:toc:
+:toclevels: 4
 
 :Author: Dr. Jürgen Sauermann, GNU APL
 :page-width: 120em
-:toc:
-:toclevels: 4
 :iconsdir: /usr/share/asciidoc/icons
 :icons:
 

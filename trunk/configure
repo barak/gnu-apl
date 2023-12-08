@@ -22412,8 +22412,8 @@ printf "%s\n" "$apl_TARGET_ANDROID" >&6; }
 ###############################################################################
 # check if the user wants the Erlang interface (and therefore also libapl)
 #
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking if the build target is the Erlang interface (implies libapl.so)" >&5
-printf %s "checking if the build target is the Erlang interface (implies libapl.so)... " >&6; }
+{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking if the build target is the Erlang interface (also requires libapl.so)" >&5
+printf %s "checking if the build target is the Erlang interface (also requires libapl.so)... " >&6; }
 
 # Check whether --with-erlang was given.
 if test ${with_erlang+y}
