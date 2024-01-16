@@ -2748,16 +2748,16 @@ linearly independent, but not the other way around.
 raises a DOMAIN ERROR caused by the supposedly linearly dependent
 columns of some matrix B then there are two possibilities:
 
-  1. the columns of are indeed linearly dependent, e.g.  ⌹B←2 2⍴3 4.  In
-     this case there is no way to compute ⌹B.
-  2. the columns of are only close (as controlled by ⎕CT) to some other
-     strictly linearly dependent matrix.  In this case (which is far
-     more likely than the other), one may decrease ⎕CT until the matrix
-     becomes linearly independent.  For example, ⌹B may raise a DOMAIN
-     ERROR with the default ⎕CT←1E¯13 but not with ⎕CT←1E¯15.  However,
-     one should use this technique with great care because matrices that
-     are nearly linearly dependent tend to produce significant rounding
-     errors in the result.
+  1. the columns of B are indeed linearly dependent, e.g.  ⌹B←2 2⍴3 4.
+     In this case there is no way to compute ⌹B.
+  2. the columns of B are only close (as controlled by ⎕CT) to some
+     other strictly linearly dependent matrix.  In this case (which is
+     far more likely than the other), one may decrease ⎕CT until the
+     matrix becomes linearly independent.  For example, ⌹B may raise a
+     DOMAIN ERROR with the default ⎕CT←1E¯13 but not with ⎕CT←1E¯15.
+     However, one should use this technique with great care because
+     matrices that are nearly linearly dependent tend to produce
+     significant rounding errors in the result.
 
 2.20.1.2 ⌹[X] B
 ...............
@@ -7475,45 +7475,45 @@ Node: Section 2.1784967
 Node: Section 2.1887489
 Node: Section 2.1994206
 Node: Section 2.2095651
-Node: Section 2.21104932
-Node: Section 2.22109966
-Node: Section 2.23113247
-Node: Section 2.24113538
-Node: Section 2.25124366
-Node: Section 2.26124638
-Node: Section 2.27131216
-Node: Section 2.28133676
-Node: Section 2.29134345
-Node: Section 2.30135997
-Node: Section 2.31139784
-Node: Output File Format155704
-Node: Section 2.32156879
-Node: Section 2.33166277
-Node: Section 2.34167304
-Node: Section 2.35182019
-Node: Section 2.36192183
-Node: Section 2.37196302
-Node: Section 2.38198397
-Node: Section 2.39202822
-Node: Section 2.40224197
-Node: Section 2.41235106
-Node: Chapter 3237112
-Node: Chapter 4239613
-Node: Chapter 5240739
-Node: Section 5.1242276
-Node: Section 5.2243556
-Node: Section 5.3243916
-Node: Section 5.4244158
-Node: Section 5.5244820
-Node: Section 5.6245298
-Node: Section 5.7246070
-Node: Section 5.8246527
-Node: Chapter 6246929
-Node: Section 6.1247348
-Node: Section 6.2248035
-Node: Chapter 7248866
-Node: Section 7.1249369
-Node: Section 7.2274683
+Node: Section 2.21104934
+Node: Section 2.22109968
+Node: Section 2.23113249
+Node: Section 2.24113540
+Node: Section 2.25124368
+Node: Section 2.26124640
+Node: Section 2.27131218
+Node: Section 2.28133678
+Node: Section 2.29134347
+Node: Section 2.30135999
+Node: Section 2.31139786
+Node: Output File Format155706
+Node: Section 2.32156881
+Node: Section 2.33166279
+Node: Section 2.34167306
+Node: Section 2.35182021
+Node: Section 2.36192185
+Node: Section 2.37196304
+Node: Section 2.38198399
+Node: Section 2.39202824
+Node: Section 2.40224199
+Node: Section 2.41235108
+Node: Chapter 3237114
+Node: Chapter 4239615
+Node: Chapter 5240741
+Node: Section 5.1242278
+Node: Section 5.2243558
+Node: Section 5.3243918
+Node: Section 5.4244160
+Node: Section 5.5244822
+Node: Section 5.6245300
+Node: Section 5.7246072
+Node: Section 5.8246529
+Node: Chapter 6246931
+Node: Section 6.1247350
+Node: Section 6.2248037
+Node: Chapter 7248868
+Node: Section 7.1249371
+Node: Section 7.2274685
 
 End Tag Table
 

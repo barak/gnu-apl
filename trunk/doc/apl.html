@@ -3160,16 +3160,17 @@ a <b>DOMAIN ERROR</b> caused by the supposedly linearly dependent columns of som
 matrix <b>B</b> then there are two possibilities:
 </p>
 <ol>
-<li> the columns of are indeed linearly dependent, e.g. <b>⌹B←2 2⍴3 4</b>.
+<li> the columns of <b>B</b> are indeed linearly dependent, e.g. <b>⌹B←2 2⍴3 4</b>.
       In this case there is no way to compute <b>⌹B</b>.
-</li><li> the columns of are only close (as controlled by <b>⎕CT</b>) to some other
-      strictly linearly dependent matrix. In this case (which is far more
-      likely than the other), one may decrease <b>⎕CT</b> until the matrix
-      becomes linearly independent. For example, <b>⌹B</b> may raise a
-      DOMAIN ERROR with the default <b>⎕CT←1E¯13</b> but not with <b>⎕CT←1E¯15</b>.
-      However, one should use this technique with great care because matrices
-      that are nearly linearly dependent tend to produce significant
-      rounding errors in the result.
+</li><li> the columns of <b>B</b> are only close (as controlled by <b>⎕CT</b>) to
+      some other strictly linearly dependent matrix. In this case (which
+      is far more likely than the other), one may decrease <b>⎕CT</b>
+      until the matrix becomes linearly independent. For example, <b>⌹B</b>
+      may raise a DOMAIN ERROR with the default <b>⎕CT←1E¯13</b> but not
+      with <b>⎕CT←1E¯15</b>.
+      However, one should use this technique with great care because
+      matrices that are nearly linearly dependent tend to produce
+      significant rounding errors in the result.
 </li></ol>
 
 </div>
