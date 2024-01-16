@@ -16,7 +16,7 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-July 30, 2023
+January 16, 2024
 
    This manual briefly documents GNU APL, an interpreter for APL as
 described in ISO standard 13751, aka.  "Programming Language APL,
@@ -91,11 +91,13 @@ command )OFF (on a separate line) like this:
    )OFF
 
    If APL is computing a function (and possibly caught in an endless
-loop), then you may have to press ^C (called ATTENTION in APL) in order
-to return to APL’s command mode and then give the )OFF command.
+loop), then you may have to press ^C (this is called ATTENTION in APL)
+in order to return to APL’s command mode and then give the )OFF command.
+In some circumstances it may be necessary to press ^C twice within a
+short time interval (this is called INTERRUPT in APL).
 
-   Having that said, APL is started like every other program - entering
-its name and optional command line parameters, for example:
+   Having that said, APL is started like every other program - by
+entering its name and optional command line parameters, for example:
 
    $ apl
 
@@ -2711,6 +2713,78 @@ not needed.
 
    Please note as well that QR factorization is currently experimental.
 So please double-check its results before using it in production code.
+
+2.20.1 The Impact of ⎕CR for ⌹
+------------------------------
+
+Due to the lack of a better place we describe here how ⎕CT is used in
+the various ⌹ functions.
+
+2.20.1.1 A⌹B and ⌹B
+...................
+
+The first step in the computation of A⌹B or ⌹B is the estimation of the
+the number of linearly independent columns of B. If that number is
+smaller than the total number of columns (IOW some columns of B are
+linearly dependent) then a DOMAIN ERROR is raised before the computation
+of ⌹B starts.  Although B may be over-determined (so it may have more
+rows than columns and in that case the rows of B can not be linearly
+independent) it may not have linearly dependent columns.
+
+   Now, for every real or complex number ⍺ does ⎕CT define a range of
+nearby numbers that are considered equal to ⍺ even though they are,
+strictly speaking, different.
+
+   In the same fashion, let B be a matrix with linearly dependent
+columns.  For every such B does ⎕CT define a range of nearby matrices
+that are also considered linearly dependent even though they are,
+strictly speaking, linearly independent.  As a matter of fact, the
+probability that the columns of B are strictly linearly independent
+decreases as the size of the matrix grows.  If a matrix has linearly
+dependent columns, then every new row added to the matrix can make it
+linearly independent, but not the other way around.
+
+   The consequence for the user of GNU APL is the following.  If GNU APL
+raises a DOMAIN ERROR caused by the supposedly linearly dependent
+columns of some matrix B then there are two possibilities:
+
+  1. the columns of are indeed linearly dependent, e.g.  ⌹B←2 2⍴3 4.  In
+     this case there is no way to compute ⌹B.
+  2. the columns of are only close (as controlled by ⎕CT) to some other
+     strictly linearly dependent matrix.  In this case (which is far
+     more likely than the other), one may decrease ⎕CT until the matrix
+     becomes linearly independent.  For example, ⌹B may raise a DOMAIN
+     ERROR with the default ⎕CT←1E¯13 but not with ⎕CT←1E¯15.  However,
+     one should use this technique with great care because matrices that
+     are nearly linearly dependent tend to produce significant rounding
+     errors in the result.
+
+2.20.1.2 ⌹[X] B
+...............
+
+The integer scalar X chooses one of currently two different algorithms
+that compute a QR factorization of a matrix B:
+
+   • ⌹[1]B uses the algorithm published by Garry Helzer in APL Quote
+     Quad in 1990.
+   • ⌹[2]B uses a LApack algorithm (xGELSY). This algorithm uses ⎕CT in
+     the same way as described above for ⌹B and A⌹B.
+   • for backward compatibility with older versions of GNU APL, a real
+     scalar X in ⌹[X]B uses ⌹[1]B if X < 0.1 and ⌹[2]B otherwise.  The
+     scalar X is used instead of ⎕CT. Do not use this case in new code.
+
+   The Helzer algorithm recursively factors a N×N matrix, a (N-1)×(N-1)
+matrix, a (N-2)×(N-2) matrix, and so forth.  After every step of that
+recursion, all matrix items close to 0.0 are set to exactly 0.0.
+
+   GNU APL uses ⎕CT in the same way as the Helzer alogrithm, i.e.  to
+decide if a matrix item close to 0.0 shall be set to 0.0 or not (APL
+functions A TOL X and A CPR B, where Helzer leaves it open how to
+implement A TOL X and A CPR B). GNU APL uses the example implementation
+given in the Helzer paper.  The TOL and CPR functions seem to be related
+to what is elsewhere known as the condition number of the matrix that is
+being factorized.  In the LApack case, the parameter RCOND of FORTRAN
+function xcDGELSY is set to ⎕CT.
 
 
 File: apl.info,  Node: Section 2.21,  Next: Section 2.22,  Prev: Section 2.20,  Up: Chapter 2
@@ -7371,75 +7445,75 @@ please read <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 
 Tag Table:
 Node: Top383
-Node: Chapter 11572
-Node: Chapter 223281
-Node: Section 2.125294
-Node: Subsection 2.1.126516
-Node: Subsection 2.1.227147
-Node: Subsection 2.1.327978
-Node: Subsection 2.1.433784
-Node: Subsection 2.1.537583
-Node: Subsection 2.1.638441
-Node: Subsection 2.1.746565
-Node: Subsection 2.1.848315
-Node: Section 2.251630
-Node: Section 2.352389
-Node: Section 2.453664
-Node: Section 2.558109
-Node: Section 2.658282
-Node: Section 2.758912
-Node: Section 2.862865
-Node: Section 2.964400
-Node: Section 2.1066492
-Node: Section 2.1168046
-Node: Section 2.1269831
-Node: Section 2.1371771
-Node: Section 2.1472712
-Node: Section 2.1572964
-Node: Section 2.1674360
-Node: Section 2.1784829
-Node: Section 2.1887351
-Node: Section 2.1994068
-Node: Section 2.2095513
-Node: Section 2.21101174
-Node: Section 2.22106208
-Node: Section 2.23109489
-Node: Section 2.24109780
-Node: Section 2.25120608
-Node: Section 2.26120880
-Node: Section 2.27127458
-Node: Section 2.28129918
-Node: Section 2.29130587
-Node: Section 2.30132239
-Node: Section 2.31136026
-Node: Output File Format151946
-Node: Section 2.32153121
-Node: Section 2.33162519
-Node: Section 2.34163546
-Node: Section 2.35178261
-Node: Section 2.36188425
-Node: Section 2.37192544
-Node: Section 2.38194639
-Node: Section 2.39199064
-Node: Section 2.40220439
-Node: Section 2.41231348
-Node: Chapter 3233354
-Node: Chapter 4235855
-Node: Chapter 5236981
-Node: Section 5.1238518
-Node: Section 5.2239798
-Node: Section 5.3240158
-Node: Section 5.4240400
-Node: Section 5.5241062
-Node: Section 5.6241540
-Node: Section 5.7242312
-Node: Section 5.8242769
-Node: Chapter 6243171
-Node: Section 6.1243590
-Node: Section 6.2244277
-Node: Chapter 7245108
-Node: Section 7.1245611
-Node: Section 7.2270925
+Node: Chapter 11575
+Node: Chapter 223419
+Node: Section 2.125432
+Node: Subsection 2.1.126654
+Node: Subsection 2.1.227285
+Node: Subsection 2.1.328116
+Node: Subsection 2.1.433922
+Node: Subsection 2.1.537721
+Node: Subsection 2.1.638579
+Node: Subsection 2.1.746703
+Node: Subsection 2.1.848453
+Node: Section 2.251768
+Node: Section 2.352527
+Node: Section 2.453802
+Node: Section 2.558247
+Node: Section 2.658420
+Node: Section 2.759050
+Node: Section 2.863003
+Node: Section 2.964538
+Node: Section 2.1066630
+Node: Section 2.1168184
+Node: Section 2.1269969
+Node: Section 2.1371909
+Node: Section 2.1472850
+Node: Section 2.1573102
+Node: Section 2.1674498
+Node: Section 2.1784967
+Node: Section 2.1887489
+Node: Section 2.1994206
+Node: Section 2.2095651
+Node: Section 2.21104932
+Node: Section 2.22109966
+Node: Section 2.23113247
+Node: Section 2.24113538
+Node: Section 2.25124366
+Node: Section 2.26124638
+Node: Section 2.27131216
+Node: Section 2.28133676
+Node: Section 2.29134345
+Node: Section 2.30135997
+Node: Section 2.31139784
+Node: Output File Format155704
+Node: Section 2.32156879
+Node: Section 2.33166277
+Node: Section 2.34167304
+Node: Section 2.35182019
+Node: Section 2.36192183
+Node: Section 2.37196302
+Node: Section 2.38198397
+Node: Section 2.39202822
+Node: Section 2.40224197
+Node: Section 2.41235106
+Node: Chapter 3237112
+Node: Chapter 4239613
+Node: Chapter 5240739
+Node: Section 5.1242276
+Node: Section 5.2243556
+Node: Section 5.3243916
+Node: Section 5.4244158
+Node: Section 5.5244820
+Node: Section 5.6245298
+Node: Section 5.7246070
+Node: Section 5.8246527
+Node: Chapter 6246929
+Node: Section 6.1247348
+Node: Section 6.2248035
+Node: Chapter 7248866
+Node: Section 7.1249369
+Node: Section 7.2274683
 
 End Tag Table
 

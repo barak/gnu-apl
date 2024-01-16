@@ -60,7 +60,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Installing and Starting GNU 
 </div>
 <span id="GNU-APL"></span><h1 class="top">GNU APL</h1>
 
-<p>July 30, 2023
+<p>January 16, 2024
 </p>
 <p>This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
@@ -170,7 +170,14 @@ therefore it must be expanded with e.g.  <b>gunzip</b> before it can be read.
       <li><a id="toc-Generalized-monadic-_005b_003f_005d" href="#Generalized-monadic-_005b_003f_005d">2.19.1 Generalized monadic ⍳</a></li>
       <li><a id="toc-Generalized-dyadic-_005b_003f_005d" href="#Generalized-dyadic-_005b_003f_005d">2.19.2 Generalized dyadic ⍳</a></li>
     </ul></li>
-    <li><a id="toc-_005b_003f_005d_005bX_005d-_002d-QR-Factorization" href="#Section-2_002e20">2.20 ⌹[X] - QR Factorization</a></li>
+    <li><a id="toc-_005b_003f_005d_005bX_005d-_002d-QR-Factorization" href="#Section-2_002e20">2.20 ⌹[X] - QR Factorization</a>
+    <ul class="no-bullet">
+      <li><a id="toc-The-Impact-of-_005b_003f_005dCR-for-_005b_003f_005d" href="#The-Impact-of-_005b_003f_005dCR-for-_005b_003f_005d">2.20.1 The Impact of ⎕CR for ⌹</a>
+      <ul class="no-bullet">
+        <li><a id="toc-A_005b_003f_005dB-and-_005b_003f_005dB" href="#A_005b_003f_005dB-and-_005b_003f_005dB">2.20.1.1 A⌹B and ⌹B</a></li>
+        <li><a id="toc-_005b_003f_005d_005bX_005d-B" href="#g_t_005b_003f_005d_005bX_005d-B">2.20.1.2 ⌹[X] B</a></li>
+      </ul></li>
+    </ul></li>
     <li><a id="toc-Dyadic-_005b_003f_005dCR" href="#Section-2_002e21">2.21 Dyadic ⎕CR</a></li>
     <li><a id="toc-Dyadic-_005b_003f_005dFX-_0028Native-Functions_0029" href="#Section-2_002e22">2.22 Dyadic ⎕FX (Native Functions)</a></li>
     <li><a id="toc-_005b_003f_005dARG-_002d-Interpreter-command-line-arguments" href="#Section-2_002e23">2.23 ⎕ARG - Interpreter command line arguments</a></li>
@@ -359,10 +366,12 @@ remember how to stop (i.e. exit) it. Neither ^C nor ^D will stop APL
 <p>)OFF
 </p>
 <p>If APL is computing a function (and possibly caught in an endless loop),
-then you may have to press ^C (called ATTENTION in APL) in order to
-return to APL&rsquo;s command mode and then give the )OFF command.
+then you may have to press <b>^C</b> (this is called <i>ATTENTION</i> in APL) in
+order to return to APL&rsquo;s command mode and then give the <b>)OFF</b> command.
+In some circumstances it may be necessary to press <b>^C</b> twice within a
+short time interval (this is called <i>INTERRUPT</i> in APL).
 </p>
-<p>Having that said, APL is started like every other program - entering its
+<p>Having that said, APL is started like every other program - by entering its
 name and optional command line parameters, for example:
 </p>
 <p>$ apl
@@ -3109,7 +3118,96 @@ returned Q matrix. This first transpose step is therefore not needed.
 <p>Please note as well that QR factorization is currently experimental. So
 please double-check its results before using it in production code.
 </p>
+<ul class="section-toc">
+<li><a href="#The-Impact-of-_005b_003f_005dCR-for-_005b_003f_005d" accesskey="1">The Impact of ⎕CR for ⌹</a></li>
+</ul>
+<div class="subsection" id="The-Impact-of-_005b_003f_005dCR-for-_005b_003f_005d">
+<h4 class="subsection">2.20.1 The Impact of ⎕CR for ⌹</h4>
+
+<p>Due to the lack of a better place we describe here how <b>⎕CT</b> is used
+in the various <b>⌹</b> functions.
+</p>
+<ul class="section-toc">
+<li><a href="#A_005b_003f_005dB-and-_005b_003f_005dB" accesskey="1">A⌹B and ⌹B</a></li>
+<li><a href="#g_t_005b_003f_005d_005bX_005d-B" accesskey="2">⌹[X] B</a></li>
+</ul>
+<div class="subsubsection" id="A_005b_003f_005dB-and-_005b_003f_005dB">
+<h4 class="subsubsection">2.20.1.1 A⌹B and ⌹B</h4>
+
+<p>The first step in the computation of <b>A⌹B</b> or <b>⌹B</b> is the estimation of
+the the number of linearly independent columns of <b>B</b>. If that number is
+smaller than the total number of columns (IOW some columns of <b>B</b> are
+linearly dependent) then a <b>DOMAIN ERROR</b> is raised before the computation
+of <b>⌹B</b> starts. Although <b>B</b> may be over-determined (so it may have more
+rows than columns and in that case the rows of <b>B</b> can not be linearly
+independent) it may <i>not</i> have linearly dependent columns.
+</p>
+<p>Now, for every real or complex number <b>⍺</b> does <b>⎕CT</b> define a range
+of nearby numbers that are considered equal to <b>⍺</b> even though they are,
+strictly speaking, different.
+</p>
+<p>In the same fashion, let <b>B</b> be a matrix with linearly dependent columns.
+For every such <b>B</b> does <b>⎕CT</b> define a range of nearby matrices that
+are also considered linearly dependent even though they are, strictly
+speaking, linearly independent. As a matter of fact, the probability
+that the columns of <b>B</b> are strictly linearly independent decreases
+as the size of the matrix grows. If a matrix has linearly dependent
+columns, then every new row added to the matrix can make it linearly
+independent, but not the other way around.
+</p>
+<p>The consequence for the user of GNU APL is the following. If GNU APL raises
+a <b>DOMAIN ERROR</b> caused by the supposedly linearly dependent columns of some
+matrix <b>B</b> then there are two possibilities:
+</p>
+<ol>
+<li> the columns of are indeed linearly dependent, e.g. <b>⌹B←2 2⍴3 4</b>.
+      In this case there is no way to compute <b>⌹B</b>.
+</li><li> the columns of are only close (as controlled by <b>⎕CT</b>) to some other
+      strictly linearly dependent matrix. In this case (which is far more
+      likely than the other), one may decrease <b>⎕CT</b> until the matrix
+      becomes linearly independent. For example, <b>⌹B</b> may raise a
+      DOMAIN ERROR with the default <b>⎕CT←1E¯13</b> but not with <b>⎕CT←1E¯15</b>.
+      However, one should use this technique with great care because matrices
+      that are nearly linearly dependent tend to produce significant
+      rounding errors in the result.
+</li></ol>
+
+</div>
+<div class="subsubsection" id="g_t_005b_003f_005d_005bX_005d-B">
+<h4 class="subsubsection">2.20.1.2 ⌹[X] B</h4>
+
+<p>The integer scalar <b>X</b> chooses one of currently two different algorithms
+that compute a QR factorization of a matrix <b>B</b>:
+</p>
+<ul>
+<li> <b>⌹[1]B</b> uses the algorithm published by Garry Helzer in APL Quote
+      Quad in 1990.
+</li><li> <b>⌹[2]B</b> uses a LApack algorithm (xGELSY). This algorithm uses
+      <b>⎕CT</b> in the same way as described above for <b>⌹B</b> and <b>A⌹B</b>.
+</li><li> for backward compatibility with older versions of GNU APL, a real 
+      scalar <b>X</b> in <b>⌹[X]B</b> uses <b>⌹[1]B</b> if <b>X &lt; 0.1</b> and
+      <b>⌹[2]B</b> otherwise. The scalar <b>X</b> is used instead of <b>⎕CT</b>.
+      Do not use this case in new code.
+</li></ul>
+
+<p>The Helzer algorithm recursively factors a N×N matrix, a (N-1)×(N-1) matrix,
+a (N-2)×(N-2) matrix, and so forth. After every step of that recursion,
+all matrix items close to 0.0 are set to exactly 0.0.
+</p>
+<p>GNU APL uses <b>⎕CT</b> in the same way as the Helzer alogrithm, i.e. to decide
+if a matrix item close to 0.0 shall be set to 0.0 or not (APL functions
+<b>A TOL X</b> and <b>A CPR B</b>, where Helzer leaves it open how to
+implement <b>A TOL X</b> and <b>A CPR B</b>). GNU APL uses the example
+implementation given in the Helzer paper. The <b>TOL</b> and <b>CPR</b>
+functions seem to be related to what is elsewhere known as the
+ <i>condition number</i> of the matrix that is being factorized. In the LApack
+case, the parameter <b>RCOND</b> of FORTRAN function <b>xcDGELSY</b> is set
+to <b>⎕CT</b>.
+</p>
+
 <hr>
+</div>
+</div>
 </div>
 <div class="section" id="Section-2_002e21">
 <div class="header">

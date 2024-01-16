@@ -288,6 +288,7 @@ Avec::map_alternative_char(Unicode alt_av)
         case 0x005E: return AV_AND;              //  map ^ to ∧
         case 0x007C: return AV_DIVIDES;          //  map | to ∣
         case 0x007E: return AV_TILDE_OPERATOR;   //  map ~ to ∼
+        case 0x00B5: return AV_MUE;              //  map µ to μ
         case 0x03B1: return AV_ALPHA;            //  map α to ⍺
         case 0x03B5: return AV_ELEMENT;          //  map ϵ to itself
         case 0x03B9: return AV_IOTA;             //  map ι to ⍳

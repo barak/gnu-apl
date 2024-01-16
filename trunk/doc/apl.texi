@@ -128,10 +128,12 @@ remember how to stop (i.e. exit) it. Neither ^C nor ^D will stop APL
       )OFF
 
 If APL is computing a function (and possibly caught in an endless loop),
-then you may have to press ^C (called ATTENTION in APL) in order to
-return to APL's command mode and then give the )OFF command.
+then you may have to press @b{^C} (this is called @i{ATTENTION} in APL) in
+order to return to APL's command mode and then give the @b{)OFF} command.
+In some circumstances it may be necessary to press @b{^C} twice within a
+short time interval (this is called @i{INTERRUPT} in APL).
 
-Having that said, APL is started like every other program - entering its
+Having that said, APL is started like every other program - by entering its
 name and optional command line parameters, for example:
 
 $ apl
@@ -2819,6 +2821,82 @@ Example 2 (complex over-determined B)
 
 Please note as well that QR factorization is currently experimental. So
 please double-check its results before using it in production code.
+
+@subsection The Impact of ⎕CR for ⌹
+
+Due to the lack of a better place we describe here how @b{⎕CT} is used
+in the various @b{⌹} functions.
+
+@subsubsection A⌹B and ⌹B
+
+The first step in the computation of @b{A⌹B} or @b{⌹B} is the estimation of
+the the number of linearly independent columns of @b{B}. If that number is
+smaller than the total number of columns (IOW some columns of @b{B} are
+linearly dependent) then a @b{DOMAIN ERROR} is raised before the computation
+of @b{⌹B} starts. Although @b{B} may be over-determined (so it may have more
+rows than columns and in that case the rows of @b{B} can not be linearly
+independent) it may @i{not} have linearly dependent columns.
+
+Now, for every real or complex number @b{⍺} does @b{⎕CT} define a range
+of nearby numbers that are considered equal to @b{⍺} even though they are,
+strictly speaking, different.
+
+In the same fashion, let @b{B} be a matrix with linearly dependent columns.
+For every such @b{B} does @b{⎕CT} define a range of nearby matrices that
+are also considered linearly dependent even though they are, strictly
+speaking, linearly independent. As a matter of fact, the probability
+that the columns of @b{B} are strictly linearly independent decreases
+as the size of the matrix grows. If a matrix has linearly dependent
+columns, then every new row added to the matrix can make it linearly
+independent, but not the other way around.
+
+The consequence for the user of GNU APL is the following. If GNU APL raises
+a @b{DOMAIN ERROR} caused by the supposedly linearly dependent columns of some
+matrix @b{B} then there are two possibilities:
+
+@enumerate
+@item the columns of are indeed linearly dependent, e.g. @b{⌹B←2 2⍴3 4}.
+      In this case there is no way to compute @b{⌹B}.
+@item the columns of are only close (as controlled by @b{⎕CT}) to some other
+      strictly linearly dependent matrix. In this case (which is far more
+      likely than the other), one may decrease @b{⎕CT} until the matrix
+      becomes linearly independent. For example, @b{⌹B} may raise a
+      DOMAIN ERROR with the default @b{⎕CT←1E¯13} but not with @b{⎕CT←1E¯15}.
+      However, one should use this technique with great care because matrices
+      that are nearly linearly dependent tend to produce significant
+      rounding errors in the result.
+@end enumerate
+
+@subsubsection ⌹[X] B
+
+The integer scalar @b{X} chooses one of currently two different algorithms
+that compute a QR factorization of a matrix @b{B}:
+
+@itemize
+@item @b{⌹[1]B} uses the algorithm published by Garry Helzer in APL Quote
+      Quad in 1990.
+@item @b{⌹[2]B} uses a LApack algorithm (xGELSY). This algorithm uses
+      @b{⎕CT} in the same way as described above for @b{⌹B} and @b{A⌹B}.
+@item for backward compatibility with older versions of GNU APL, a real 
+      scalar @b{X} in @b{⌹[X]B} uses @b{⌹[1]B} if @b{X < 0.1} and
+      @b{⌹[2]B} otherwise. The scalar @b{X} is used instead of @b{⎕CT}.
+      Do not use this case in new code.
+@end itemize
+
+The Helzer algorithm recursively factors a N×N matrix, a (N-1)×(N-1) matrix,
+a (N-2)×(N-2) matrix, and so forth. After every step of that recursion,
+all matrix items close to 0.0 are set to exactly 0.0.
+
+GNU APL uses @b{⎕CT} in the same way as the Helzer alogrithm, i.e. to decide
+if a matrix item close to 0.0 shall be set to 0.0 or not (APL functions
+@b{A TOL X} and @b{A CPR B}, where Helzer leaves it open how to
+implement @b{A TOL X} and @b{A CPR B}). GNU APL uses the example
+implementation given in the Helzer paper. The @b{TOL} and @b{CPR}
+functions seem to be related to what is elsewhere known as the
+ @i{condition number} of the matrix that is being factorized. In the LApack
+case, the parameter @b{RCOND} of FORTRAN function @b{xcDGELSY} is set
+to @b{⎕CT}.
+
 
 @node    Section 2.21
 @section Dyadic ⎕CR
