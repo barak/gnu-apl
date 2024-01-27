@@ -376,12 +376,22 @@ help_def(2, "⍸", "Interval Index",
          "")
 
 help_def(1, "⌹", "Matrix inverse",
-         "Inverse of matrix B",
+         "Z is the inverse of matrix B",
          "")
 
 help_def(2, "⌹", "Matrix divide",
          "Z is a minimal (least square) solution of the system of linear equations A = B +.× Z",
          "")
+
+help_def(3, "⌹", "QR Factorization",
+         "Z←⌹[X] B computes a QR factorization of the real or complex matrix B.\n",
+         "      The axis argument X selects the algorithm to be used:\n"
+         "          ⌹[1] B: Garry Helzer's algorithm (APL Quote Wuad 1990)\n"
+         "          ⌹[2] B: LApack based algorithm.\n"
+         "      Z is (Q R I) where: B ≡ Q∘R, Q is orthogonal,\n"
+        "       R is upper triangular, and I is R⁻¹.\n"
+         "      For more information run 'info apl' or visit\n"
+         "      https://www.gnu.org/software/apl/apl.html#Section-2_002e20\n")
 
 help_def(1, "⌽", "Reversal",
          "Reverse elements of B along last axis",
@@ -587,6 +597,10 @@ help_def(-5, "∘",  "Outer Product",
 
 help_def(-5, ".",  "Outer Product",
          "Z[i;j] is A[i] G B[j] for all valid indices i of A and j of B\n",
+         "")
+
+help_def(2, "∘",  "Matrix multiplication",
+         "A∘B is essentially A +.× B optimized for space and speed.\n",
          "")
 
 help_def(-4, ".",  "Inner Product",

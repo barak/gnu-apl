@@ -1207,6 +1207,8 @@ Command::primitive_help(ostream & out, const char * arg, int arity,
                         " Z ← " << prim << " B";            break;
         case  2: out << "   dyadic primitive function:"
                         "  Z ← A " << prim << " B";         break;
+        case  3: out << "   monadic primitive function (with axis):"
+                        "  Z ← " << prim << "[X] B";      break;
 
         default: FIXME;
       }
