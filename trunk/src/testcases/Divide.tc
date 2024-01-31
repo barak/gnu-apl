@@ -145,7 +145,8 @@ DOMAIN ERROR+
       ^ ^
 
       )MORE
-A⌹B : linearly dependent (complex) B? ⍴B is 5 5, but the estimated rank is 4
+A⌹B : linearly dependent (complex) B? ⍴B is 5 5, but the estimated rank is 4.
+      NOTE that the estimated rank is controlled by ⎕CT.
 
       )SIC
 

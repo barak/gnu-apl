@@ -1056,32 +1056,49 @@ ShapeItem idx = 0;
         loop(e, ec)   // for every ravel cell of the (parent-) value
             {
               const Cell & cP = parent.get_cravel(e);
-              if (cP.is_pointer_cell())
+              if (cP.is_lval_cell())
                  {
-                   const Value * sub = cP.get_pointer_value().get();
-                   Assert1(sub);
-                   const Vid sub_idx = find_vid(sub);
-                   Assert(sub_idx < value_count);
-                   if (values[sub_idx]._par != INVALID_VID)
-                      {
-                        // sub already has a parent, which supposedly cannot
-                        // happen. print out some more information about this
-                        // case.
-                        //
-                        CERR << "*** Sub-Value "
-                             << voidP(sub) << " has two parents." << endl
-                             << "Child: vid=" << sub_idx << ", _val="
-                             << values[sub_idx]._val << "_par="
-                             << values[sub_idx]._par << endl
-                             << "Parent 2: vid=" << p <<  ", _val="
-                             << values[p]._val << "_par="
-                             << values[p]._par << endl
-                             << "Call stack:" << endl;
-                             BACKTRACE
-                        CERR << endl << " Running )CHECK..." << endl;
-                        UCS_string no_arg;
-                        Command::cmd_CHECK(CERR, no_arg);
-                        CERR << endl;
+                   Log(LOG_archive)
+                      CERR << "LVAL CELL in " << p << " at " LOC << endl;
+                   continue;
+                 }
+
+              if (!cP.is_pointer_cell())   continue;
+
+              // from here on, cp is a PointerCell of the parent...
+              //
+              const Value * sub = cP.get_pointer_value().get();
+              Assert1(sub);
+              const Vid sub_idx = find_vid(sub);
+              Assert(sub_idx < value_count);
+
+              // check for multiple parents of the same value. This is an
+              // error in the old cloning sheme, but not in the new one.
+              //
+#ifdef NEW_CLONE
+              if (false)   // never (new scheme)
+#else
+              if (values[sub_idx]._par != INVALID_VID)
+#endif
+                 {
+                   // sub already has a parent, which supposedly cannot
+                   // happen. print out some more information about this
+                   // case.
+                   //
+                   CERR << "*** Sub-Value "
+                        << voidP(sub) << " has two parents." << endl
+                        << "Child: vid=" << sub_idx << ", _val="
+                        << values[sub_idx]._val << ", _par="
+                        << values[sub_idx]._par << endl
+                        << "Parent 2: vid=" << p <<  ", _val="
+                        << values[p]._val << "_par="
+                        << values[p]._par << endl
+                        << "Call stack:" << endl;
+                        BACKTRACE
+                   CERR << endl << " Running )CHECK..." << endl;
+                   UCS_string no_arg;
+                   Command::cmd_CHECK(CERR, no_arg);
+                   CERR << endl;
 
 #if cfg_VALUE_HISTORY_WANTED
 VH_entry::print_history(CERR, *sub, 0);
@@ -1091,19 +1108,13 @@ VH_entry::print_history(CERR, *values[p]._val, 0);
 
    CERR << endl <<
 "The workspace will be )SAVEd, but using it for anything other than for\n"
-" recovering its content (i.e. defined functions or variables) means asking\n"
-" for BIG trouble!" << endl;
-                      }
+" recovering its content (i.e. defined functions or variables) means\n"
+" asking for BIG trouble!" << endl;
+                 }
 
-                   values[sub_idx] = _val_par(values[sub_idx]._val, Vid(p));
-                 }
-              else if (cP.is_lval_cell())
-                 {
-                   Log(LOG_archive)
-                      CERR << "LVAL CELL in " << p << " at " LOC << endl;
-                 }
-            }
-      }
+              values[sub_idx] = _val_par(values[sub_idx]._val, Vid(p));
+            } //   end of loop(e, ec)   (parent ravel cells_
+      }   // end of loop(p, value_count) (parent values)
 
 
    // save all values (without their ravel)

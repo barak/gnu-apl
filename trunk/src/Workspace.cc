@@ -664,15 +664,16 @@ const bool file_exists = access(filename.c_str(), W_OK) == 0;
       {
         if (WS_name.compare(the_workspace.WS_name) != 0)   // names differ
            {
-             out << "NOT SAVED: THIS WS IS "
-                 << the_workspace.WS_name << endl;
+             const UCS_string & wsid = the_workspace.WS_name;
+             out << "NOT SAVED: THIS WS IS " << wsid << endl;
 
-             MORE_ERROR() << "the workspace was not saved because:\n"
-                  << "   the workspace name '" << the_workspace.WS_name
-                  << "' of )WSID\n   does not match the name '" << WS_name
-                  << "' used in the )SAVE command\n"
-                  << "   and the workspace file\n   " << filename
-                  << "\n   already exists. Use )WSID " << WS_name << " first."; 
+             MORE_ERROR() <<
+                "the workspace was not saved because"
+                " the workspace name '" << wsid << "' according\n"
+                "   to )WSID does not match the name '" << WS_name
+             << "' in the )SAVE command, AND the\n"
+                "   workspace file " << filename << " already exists.\n"
+                "   Use )WSID " << WS_name << " first."; 
              return;
            }
       }

@@ -242,7 +242,7 @@ const sRank rank = need_complex ?  LA_pack::divide_ZZ_matrix(*Z, rows_A,
                         " ⍴B is " << rows_A << " " << cols_B
                      << ", but the estimated rank is " << rank << ".\n"
                      << "      NOTE that the estimated rank "
-                        "is controlled by ⎕CT";
+                        "is controlled by ⎕CT.";
         DOMAIN_ERROR;
       }
 
