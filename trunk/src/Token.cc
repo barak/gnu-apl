@@ -547,7 +547,6 @@ UCS_string
 Token::canonical(PrintStyle style) const
 {
 UCS_string ucs;
-
    switch(get_Class())
       {
         case TC_ASSIGN:
@@ -609,13 +608,19 @@ UCS_string ucs;
 
         case TC_INDEX:
              if (get_tag() == TOK_AXIS)
-             {
-               UCS_string ret;
-               ret << "["
-                   << ShapeItem(get_apl_val()->get_cfirst().get_int_value())
-                   << "]";
-               return ret;
-             }
+                {
+                  UCS_string ret;
+                  ret << "[";
+
+                  // caution: get_apl_val() may be 0 (for index []).
+                  //
+                  if (const Value * axis = get_apl_val().get())
+                     {
+                      ret << ShapeItem(axis->get_cfirst().get_int_value());
+                     }
+                  ret << "]";
+                  return ret;
+                }
 
         default:
              CERR << "Token: " << HEX4(tag) << " " << *this
