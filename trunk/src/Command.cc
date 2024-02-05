@@ -1289,7 +1289,7 @@ UCS_string arg;
 
              case NC_FUNCTION:
                   {
-                    Function_P fun = sym->get_function();
+                    cFunction_P fun = sym->get_function();
                     Assert(fun);
                     if (fun->is_native())
                        {
@@ -1316,7 +1316,7 @@ UCS_string arg;
 
              case NC_OPERATOR:
                   {
-                    Function_P fun = sym->get_function();
+                    cFunction_P fun = sym->get_function();
                     Assert(fun);
                     CERR << "is a ";
                     if (fun->get_oper_valence() == 2)   CERR << "dyadic";

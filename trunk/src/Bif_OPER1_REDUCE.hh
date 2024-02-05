@@ -38,7 +38,7 @@ public:
 
    /// common implementation of reduce() and reduce_n_wise.
    static Token do_reduce(const Shape & shape_Z, const Shape3 & Z3,
-                          ShapeItem a, Function_P LO, Value_P B, ShapeItem bm);
+                          ShapeItem a, cFunction_P LO, Value_P B, ShapeItem bm);
 
    bool has_result() const
       { return true; }

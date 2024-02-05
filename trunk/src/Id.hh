@@ -59,11 +59,11 @@ public:
 
    /// If \b id is the ID of primitive function, primitive operator, or
    /// quad function, then return a pointer to it. Otherwise return 0.
-   static Function_P get_system_function(Id id);
+   static cFunction_P get_system_function(Id id);
 
    /// If \b tag is the tag of primitive function, primitive operator, or
    /// quad function, then return a pointer to it. Otherwise return 0.
-   static Function_P get_system_function(TokenTag tag)
+   static cFunction_P get_system_function(TokenTag tag)
       { return get_system_function(Id(tag >> 16)); }
 
    /// If \b id is the ID of a quad variable, then return a pointer to its

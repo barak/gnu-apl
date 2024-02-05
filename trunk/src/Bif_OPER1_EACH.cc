@@ -50,7 +50,7 @@ Bif_OPER1_EACH::eval_ALB(Value_P A, Token & _LO, Value_P B) const
            }
       }
 
-Function_P LO = _LO.get_function();
+cFunction_P LO = _LO.get_function();
    Assert1(LO);
 
    // for the ambiguous operators /. ⌿, \, and ⍀ is_operator() returns true,
@@ -244,7 +244,7 @@ Bif_OPER1_EACH::do_eval_LB(Token & _LO, Value_P B)
 {
    // monadic EACH: call _LO for every item of B
 
-Function_P LO = _LO.get_function();
+cFunction_P LO = _LO.get_function();
    Assert1(LO);
 
    if (LO->is_operator() &&

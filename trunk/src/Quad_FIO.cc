@@ -1476,7 +1476,7 @@ const ShapeItem function_number = X->get_cfirst().get_int_value();
 
              // doit...
              //
-             Function_P fun = LO.get_function();
+             cFunction_P fun = LO.get_function();
              Assert(fun);
              const uint64_t from = cycle_counter();
              Token result = fun->eval_AB(A, B);
@@ -1530,7 +1530,7 @@ const ShapeItem function_number = X->get_cfirst().get_int_value();
 
              // doit...
              //
-             Function_P fun = LO.get_function();
+             cFunction_P fun = LO.get_function();
              Assert(fun);
              const uint64_t from = cycle_counter();
              Workspace::SI_top()->set_safe_execution_count();   // pretend ⎕ES
@@ -3023,7 +3023,7 @@ int function_number = -1;
          case 203:   // set dyadicadic parallel threshold
               {
                 const APL_Integer threshold = A->get_cfirst().get_int_value();
-                Function_P fun = 0;
+                cFunction_P fun = 0;
                 if (B->element_count() == 3)   // dyadic operator
                    {
                      const Unicode oper = B->get_cravel(1).get_char_value();

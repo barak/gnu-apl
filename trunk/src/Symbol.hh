@@ -72,11 +72,11 @@ public:
       { return sym_val.label; }
 
    /// return the function (caller must have checked NC_FUNOPER).
-   Function_P get_function() const
+   cFunction_P get_function() const
       { return sym_val.function; }
 
    /// set function to \b fun
-   void set_function(Function_P fun)
+   void set_function(cFunction_P fun)
       {
         name_class = fun->is_operator() ? NC_OPERATOR : NC_FUNCTION;
         sym_val.function = fun;
@@ -90,7 +90,7 @@ public:
       }
 
    /// return the address of function (caller must have checked NC_FUNOPER).
-   Function_P * get_function_P()
+   cFunction_P * get_function_P()
       { return & sym_val.function; }
 
    /// return the shared variable key (caller must have checked NC_SYSTEM_VAR).
@@ -170,9 +170,9 @@ protected:
    /// the possible "values" of a symbol
    union _sym_val
       {
-        Function_P    function;   ///< if \b Symbol is a function
-        Function_Line label;      ///< if \b Symbol is a label
-        SV_key        sv_key;     ///< if \b Symbol is a shared variable
+        cFunction_P    function;   ///< if \b Symbol is a function
+        Function_Line label;       ///< if \b Symbol is a label
+        SV_key        sv_key;      ///< if \b Symbol is a shared variable
       };
 
    /// the (current) value of this symbol (unless variable)
@@ -233,7 +233,7 @@ public:
    void set_NC(NameClass nc);
 
    /// Set current NameClass of this Symbol to \b nc and function fun
-   void set_NC(NameClass nc, Function_P fun);
+   void set_NC(NameClass nc, cFunction_P fun);
 
    /// share variable with \b proc
    void share_var(SV_key key);
@@ -265,7 +265,7 @@ public:
    virtual void assign_indexed(const Value * X, Value_P value);
 
    /// assign lambda, eg. V←{ ... }
-   virtual bool assign_named_lambda(Function_P lambda, const char * loc);
+   virtual bool assign_named_lambda(cFunction_P lambda, const char * loc);
 
    /// Print \b this \b Symbol to \b out
    virtual ostream & print(ostream & out) const;
@@ -283,7 +283,7 @@ public:
    virtual void push_label(Function_Line label);
 
    /// push a function onto the stack of \b this \b Symbol
-   virtual void push_function(Function_P function);
+   virtual void push_function(cFunction_P function);
 
    /// Push an APL value onto the stack of \b this \b Symbol
    virtual void push_value(Value_P value);
@@ -322,7 +322,7 @@ public:
    virtual const Function * get_function() const;
 
    /// Return the function at SI level si, or 0 if none.
-   Function_P get_function(unsigned int si) const;
+   cFunction_P get_function(unsigned int si) const;
 
    /// The name of \b this \b Symbol
    virtual UCS_string get_name() const   { return name; }
@@ -331,7 +331,7 @@ public:
    const UCS_string * get_name_ptr() const   { return &name; }
 
    /// overloaded NamedObject::get_function(), 0 for non-functions
-   virtual Function_P get_function();
+   virtual cFunction_P get_function();
 
    /// get the value if a variable, 0 if none
    Value_P get_var_value();
@@ -405,7 +405,7 @@ public:
       { return (name.compare(ucs) == COMP_EQ); }
 
    /// return the level of fun on the stack of \b this Symbol) on the SI stack
-   int get_SI_level(Function_P fun) const;
+   int get_SI_level(cFunction_P fun) const;
 
    /// return the SI stack level of val on the stack of \b this Symbol)
    int get_SI_level(const Value & val) const;

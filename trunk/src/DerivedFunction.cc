@@ -30,7 +30,7 @@
 #include "Workspace.hh"
 
 //============================================================================
-DerivedFunction::DerivedFunction(Token & larg, Function_P dyop, Token & rfun,
+DerivedFunction::DerivedFunction(Token & larg, cFunction_P dyop, Token & rfun,
                                  const char * loc)
    : Function(ID_USER_SYMBOL, TOK_FUN2),
      left_arg(larg),
@@ -47,7 +47,7 @@ DerivedFunction::DerivedFunction(Token & larg, Function_P dyop, Token & rfun,
      }
 }
 //----------------------------------------------------------------------------
-DerivedFunction::DerivedFunction(Token & lfun, Function_P dyop, Value_P X,
+DerivedFunction::DerivedFunction(Token & lfun, cFunction_P dyop, Value_P X,
                                  Token & rfun, const char * loc)
    : Function(ID_USER_SYMBOL, TOK_FUN2),
      left_arg(lfun, loc),
@@ -57,7 +57,8 @@ DerivedFunction::DerivedFunction(Token & lfun, Function_P dyop, Value_P X,
 {
 }
 //----------------------------------------------------------------------------
-DerivedFunction::DerivedFunction(Token & LO, Function_P monop, const char * loc)
+DerivedFunction::DerivedFunction(Token & LO, cFunction_P monop,
+                                 const char * loc)
    : Function(ID_USER_SYMBOL, TOK_FUN2),
      left_arg(LO, loc),
      oper(monop),
@@ -73,7 +74,7 @@ DerivedFunction::DerivedFunction(Token & LO, Function_P monop, const char * loc)
      }
 }
 //----------------------------------------------------------------------------
-DerivedFunction::DerivedFunction(Token & lfun, Function_P monop,
+DerivedFunction::DerivedFunction(Token & lfun, cFunction_P monop,
                                  Value_P X, const char * loc)
    : Function(ID_USER_SYMBOL, TOK_FUN2),
      left_arg(lfun, loc),
@@ -90,7 +91,7 @@ DerivedFunction::DerivedFunction(Token & lfun, Function_P monop,
      }
 }
 //----------------------------------------------------------------------------
-DerivedFunction::DerivedFunction(Function_P fun, Value_P X, const char * loc)
+DerivedFunction::DerivedFunction(cFunction_P fun, Value_P X, const char * loc)
    : Function(ID_USER_SYMBOL, TOK_FUN2),
      left_arg(TOK_VOID),
      oper(fun),

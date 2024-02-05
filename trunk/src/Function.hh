@@ -153,10 +153,10 @@ public:
    virtual const Function * get_function() const   { return this; }
 
    /// the monadic inverse function of \b this function (if any)
-   virtual Function_P get_monadic_inverse() const   { return 0; }
+   virtual cFunction_P get_monadic_inverse() const   { return 0; }
 
    /// the dyadic inverse function of \b this function (if any)
-   virtual Function_P get_dyadic_inverse() const   { return 0; }
+   virtual cFunction_P get_dyadic_inverse() const   { return 0; }
 
    /// GMT when this function was created; 0 for system functions
    APL_time_us get_creation_time() const

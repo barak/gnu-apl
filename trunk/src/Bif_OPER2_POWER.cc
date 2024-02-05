@@ -52,8 +52,8 @@ Bif_OPER2_POWER::eval_LRB(Token & LO, Token & RO, Value_P B) const
 Token
 Bif_OPER2_POWER::eval_form_2(Value_P A, Token & _LO, Token & _RO, Value_P B)
 {
-Function_P LO = _LO.get_function();   Assert(LO);
-Function_P RO = _RO.get_function();   Assert(RO);
+cFunction_P LO = _LO.get_function();   Assert(LO);
+cFunction_P RO = _RO.get_function();   Assert(RO);
 
    if (!LO->has_result())   DOMAIN_ERROR;
    if (!RO->has_result())   DOMAIN_ERROR;
@@ -103,7 +103,7 @@ Function_P RO = _RO.get_function();   Assert(RO);
 Token
 Bif_OPER2_POWER::eval_form_1(Value_P A, Token & _LO, Value_P N, Value_P B)
 {
-Function_P LO = _LO.get_function();
+cFunction_P LO = _LO.get_function();
    Assert(LO);
 
    Assert(+N);
@@ -126,7 +126,7 @@ ShapeItem repeat_cnt = N->get_cfirst().get_checked_near_int();
 
    if (repeat_cnt < 0)   // inverse
       {
-        Function_P inverse = LO->get_dyadic_inverse();
+        cFunction_P inverse = LO->get_dyadic_inverse();
         if (inverse == 0)   DOMAIN_ERROR;   // no inverse for LO
 
         LO = inverse;

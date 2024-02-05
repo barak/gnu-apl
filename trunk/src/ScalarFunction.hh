@@ -749,10 +749,10 @@ protected:
       { return eval_scalar_AXB(A, X, B, &Cell::bif_power); }
 
    /// overloaded Function::get_monadic_inverse()
-   virtual Function_P get_monadic_inverse() const;
+   virtual cFunction_P get_monadic_inverse() const;
 
    /// overloaded Function::get_dyadic_inverse()
-   virtual Function_P get_dyadic_inverse() const;
+   virtual cFunction_P get_dyadic_inverse() const;
 };
 //----------------------------------------------------------------------------
 /** Scalar functions add and conjugate.
@@ -796,7 +796,7 @@ protected:
       { return eval_scalar_AXB(A, X, B, &Cell::bif_add); }
 
    /// overloaded Function::get_dyadic_inverse()
-   virtual Function_P get_dyadic_inverse() const;
+   virtual cFunction_P get_dyadic_inverse() const;
 
    /// true if the inverse shall be computed. This allows Bif_F12_CIRCLE to
    /// be instantiated twice: once for non-inverted operation and once for
@@ -839,10 +839,10 @@ protected:
       { return eval_scalar_AXB(A, X, B, &Cell::bif_subtract); }
 
    /// overloaded Function::get_monadic_inverse()
-   virtual Function_P get_monadic_inverse() const;
+   virtual cFunction_P get_monadic_inverse() const;
 
    /// overloaded Function::get_dyadic_inverse()
-   virtual Function_P get_dyadic_inverse() const;
+   virtual cFunction_P get_dyadic_inverse() const;
 };
 //----------------------------------------------------------------------------
 /** Scalar function roll and non-scalar function dial.
@@ -956,7 +956,7 @@ protected:
       { return eval_scalar_AXB(A, X, B, &Cell::bif_multiply); }
 
    /// overloaded Function::get_dyadic_inverse()
-   virtual Function_P get_dyadic_inverse() const;
+   virtual cFunction_P get_dyadic_inverse() const;
 
    /// true if the inverse shall be computed. This allows Bif_F12_CIRCLE to
    /// be instantiated twice: once for non-inverted operation and once for
@@ -999,10 +999,10 @@ protected:
       { return eval_scalar_AXB(A, X, B, &Cell::bif_divide); }
 
    /// overloaded Function::get_monadic_inverse()
-   virtual Function_P get_monadic_inverse() const;
+   virtual cFunction_P get_monadic_inverse() const;
 
    /// overloaded Function::get_dyadic_inverse()
-   virtual Function_P get_dyadic_inverse() const;
+   virtual cFunction_P get_dyadic_inverse() const;
 };
 //----------------------------------------------------------------------------
 /** Scalar functions circle functions and pi times.
@@ -1037,10 +1037,10 @@ protected:
                        : &Cell::bif_circle_fun; }
 
    /// overloaded Function::get_monadic_inverse()
-   virtual Function_P get_monadic_inverse() const;
+   virtual cFunction_P get_monadic_inverse() const;
 
    /// overloaded Function::get_dyadic_inverse()
-   virtual Function_P get_dyadic_inverse() const;
+   virtual cFunction_P get_dyadic_inverse() const;
 
    /// true if the inverse shall be computed. This allows Bif_F12_CIRCLE to
    /// be instantiated twice: once for non-inverted operation and once for
@@ -1190,10 +1190,10 @@ protected:
       { return eval_scalar_AXB(A, X, B, &Cell::bif_logarithm); }
 
    /// overloaded Function::get_monadic_inverse()
-   virtual Function_P get_monadic_inverse() const;
+   virtual cFunction_P get_monadic_inverse() const;
 
    /// overloaded Function::get_dyadic_inverse()
-   virtual Function_P get_dyadic_inverse() const;
+   virtual cFunction_P get_dyadic_inverse() const;
 };
 //----------------------------------------------------------------------------
 

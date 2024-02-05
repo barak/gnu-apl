@@ -275,7 +275,7 @@ protected:
                          bool sys, bool log_startup);
 
    /// set the parallel threshold of function \b fun to \b threshold
-   static void set_threshold(Function_P fun, int padic, int macn,
+   static void set_threshold(cFunction_P fun, int padic, int macn,
                              ShapeItem threshold);
 };
 

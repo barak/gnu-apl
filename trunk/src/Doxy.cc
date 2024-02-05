@@ -54,16 +54,18 @@ Doxy::Doxy(ostream & cout, const UCS_string & dest_dir)
 {
    ws_name = Workspace::get_WS_name();
    if (ws_name.compare(UCS_ASCII_string("CLEAR WS")) == COMP_EQ)
-      ws_name = UCS_ASCII_string("CLEAR-WS");
+      {
+        ws_name = UCS_ASCII_string("CLEAR-WS");
+      }
    else if (Avec::is_digit(ws_name[0]))
       {
          // workspace name starts with a library reference number. Skip the
-         // library reference number and whitespace directly after it
+         // library reference number and the whitespace directly after it
          //
          int pos = 1;   // first blank after the library reference number
          while (pos < ws_name.size() && Avec::is_white(ws_name[pos]))   ++pos;
          ws_name = UCS_string(ws_name, pos, ws_name.size() - pos);
-   }
+      }
 
    root_dir.append_ASCII("/");
    root_dir.append_UTF8(UTF8_string(ws_name));
@@ -238,7 +240,7 @@ void
 Doxy::functions_table(const std::basic_string<const Symbol *> & functions,
                       ofstream & page)
 {
-   if (functions.size() == 0)   return;
+   if (functions.size() == 0)   return;   // no functions in the workspace
 
    page <<
 "   <H3>Defined Functions</H3>"                                           CRLF
@@ -251,51 +253,65 @@ Doxy::functions_table(const std::basic_string<const Symbol *> & functions,
 "      <TH>Header"                                                        CRLF
 "      <TH class=doxy_comment>Doxy Comments"                              CRLF;
 
-int total_lines = 0;
+size_t total_lines = 0;
    loop(f, functions.size())
-      {
-        const Symbol * fun_sym = functions[f];
-        loop(si, fun_sym->value_stack_size())
-            {
-              Function_P fp = fun_sym->get_function(si);
-              const UserFunction * ufun = fp->get_func_ufun();
-              if (fp == 0)   continue;
+       {
+         functions_table_entry(functions[f], page, total_lines);
+       }
 
-              const int si_level = fun_sym->get_SI_level(fp);
+   // summary line
+   //
+   page <<
+"      <TR><TD><TD colspan=2 class='code center'>Total<TD class='code center'>"
+        << total_lines <<                                                 CRLF
+"   </TABLE>"                                                             CRLF;
+}
+//----------------------------------------------------------------------------
+void
+Doxy::functions_table_entry(const Symbol * fun_sym, ofstream & page,
+                            size_t & total_lines)
+{
+   loop(si, fun_sym->value_stack_size())
+       {
+         cFunction_P fun = fun_sym->get_function(si);
+         const UserFunction * ufun = fun->get_func_ufun();
+         if (fun == 0)   continue;
 
-              // colunm 1: function name/link
-              //
-              page <<
+         const int si_level = fun_sym->get_SI_level(fun);
+
+         // colunm 1: function name/link
+         //
+         page <<
 "     <TR>"                                                               CRLF
 "      <TD class=code>";
 
-              int line_count = 0;
-              if (fp->is_native())
-                 {
-                   native_page(fp, fun_sym->get_name());
-                   page << fun_anchor(fun_sym->get_name()) << " (native)" CRLF;
-                 }
-              else if (fp->is_lambda())
-                 {
-                   line_count = 1;
-                   function_page(ufun, fun_sym->get_name());
-                   page << fun_anchor(fun_sym->get_name()) <<             CRLF;
-                 }
-              else if (ufun)
-                 {
-                   line_count = ufun->get_text_size();
-                   const UserFunction * ufun = fp->get_func_ufun();
-                   function_page(ufun, ufun->get_name());
-                   page << fun_anchor(fun_sym->get_name()) <<             CRLF;
-                 }
-              else
-                 {
-                   page << fun_sym->get_name() <<                         CRLF;
-                 }
+         int line_count = 0;
+         if (fun->is_native())
+            {
+              native_page(fun, fun_sym->get_name());
+              page << fun_anchor(fun_sym->get_name()) << " (native)"      CRLF;
+            }
+         else if (fun->is_lambda())
+            {
+              line_count = 1;
+              function_page(ufun, fun_sym->get_name());
+              page << fun_anchor(fun_sym->get_name()) <<                  CRLF;
+            }
+         else if (ufun)
+            {
+              line_count = ufun->get_text_size();
+              const UserFunction * ufun = fun->get_func_ufun();
+              function_page(ufun, ufun->get_name());
+              page << fun_anchor(fun_sym->get_name()) <<                  CRLF;
+            }
+         else
+            {
+              page << fun_sym->get_name() <<                              CRLF;
+            }
 
-              // column 2: local stack depth
-              //
-              page <<
+         // column 2: local stack depth
+         //
+         page <<
 "      <TD class='code center'>" << si <<                                 CRLF;
 
               // column 3: SI level
@@ -315,10 +331,10 @@ int total_lines = 0;
               //
               page <<
 "      <TD class=code>";
-              if (fp->is_native())
+              if (fun->is_native())
                  page << reinterpret_cast<const NativeFunction *>
-                                               (fp)->get_so_path();
-              else if (fp->is_lambda())
+                                               (fun)->get_so_path();
+              else if (fun->is_lambda())
                  {
                    Assert(ufun);
                    const UCS_string & text = ufun->get_text(1);
@@ -331,35 +347,31 @@ int total_lines = 0;
                  page << "-";
               page <<                                                     CRLF;
 
-              // column 6: Doxygen comments
-              //
-              page <<
+         // column 6: Doxygen comments
+         //
+         page <<
 "      <TD class=doxy_comment>";
-              if (fp->is_lambda())
-                 page << "(named λ)"                                      CRLF;
-              else if (ufun && !fp->is_native())
-                 {
-                   loop(l, ufun->get_text_size())
-                      {
-                        UCS_string line = ufun->get_text(l);
-                        line.remove_leading_and_trailing_whitespaces();
-                        if (line.size() >= 2 &&
-                            line[0] == UNI_COMMENT &&
-                            line[1] == UNI_COMMENT)
-                           page << line.to_HTML(2, false)  <<             CRLF;
-                      }
-                 }
-              else
-                 page << "-"                                              CRLF;
+         if (fun->is_lambda())
+            {
+              page << "(named λ)"                                         CRLF;
             }
-      }
-
-   // summary line
-   //
-   page <<
-"      <TR><TD><TD colspan=2 class='code center'>Total<TD class='code center'>"
-        << total_lines <<                                                 CRLF
-"   </TABLE>"                                                             CRLF;
+         else if (ufun && !fun->is_native())
+            {
+              loop(l, ufun->get_text_size())
+                  {
+                    UCS_string text = ufun->get_text(l);
+                    text.remove_leading_and_trailing_whitespaces();
+                    if (text.size() >= 2 &&
+                        text[0] == UNI_COMMENT &&
+                        text[1] == UNI_COMMENT)
+                       page << text.to_HTML(2, false) <<                  CRLF;
+                  }
+            }
+         else
+            {
+              page << "-"                                                 CRLF;
+            }
+       }
 }
 //----------------------------------------------------------------------------
 void
@@ -472,7 +484,7 @@ std::basic_string<const StateIndicator *> stack;
           if (si->get_parse_mode() == PM_FUNCTION)
              {
                Assert(ufun);
-               const Function_PC PC = si->get_prefix().get_range_high();
+               Function_PC PC = si->get_prefix().get_range_high();
                if (const ErrorCode ec =
                          StateIndicator::get_error(si).get_error_code())
                   {
@@ -536,7 +548,7 @@ std::basic_string<const StateIndicator *> stack;
 }
 //----------------------------------------------------------------------------
 void
-Doxy::native_page(Function_P fun, const UCS_string & alias)
+Doxy::native_page(cFunction_P fun, const UCS_string & alias)
 {
    Assert(fun->is_native());
 
@@ -784,10 +796,10 @@ Doxy::make_call_graph(const std::basic_string<const Symbol *> & all_fns)
         const Symbol & fun_sym = *(all_fns[f]);
         loop(si, fun_sym.value_stack_size())
             {
-              if (Function_P fp = fun_sym.get_function(si))
+              if (cFunction_P fun = fun_sym.get_function(si))
                  {
-                   const UserFunction * ufun = fp->get_func_ufun();
-                   if (ufun)   add_fun_to_call_graph(&fun_sym, ufun);
+                   if (const UserFunction * ufun = fun->get_func_ufun())
+                      add_fun_to_call_graph(&fun_sym, ufun);
                  }
             }
       }
@@ -822,11 +834,11 @@ const Token_string & body = ufun->get_body();
         const Symbol & callee_sym = *callee_ptr;
         loop(si, callee_sym.value_stack_size())
             {
-              if (Function_P fp = callee_sym.get_function(si))
+              if (cFunction_P fun = callee_sym.get_function(si))
                  {
-                   Assert(fp);
-                   const UserFunction * callee = fp->get_func_ufun();
-                   if (!(callee || fp->is_native()))   continue;
+                   Assert(fun);
+                   const UserFunction * callee = fun->get_func_ufun();
+                   if (!(callee || fun->is_native()))   continue;
 
                     // ignore multiple calls of the same callee from the
                     // same caller...
@@ -835,7 +847,7 @@ const Token_string & body = ufun->get_body();
                     loop(cg, call_graph.size())
                         {
                           if (call_graph[cg].caller == ufun &&
-                              call_graph[cg].callee == fp)
+                              call_graph[cg].callee == fun)
                              {
                                have_call = true;
                                break;   // loop(cg, ...
@@ -845,12 +857,12 @@ const Token_string & body = ufun->get_body();
                     if (!have_call)
                        {
                          const fcall_edge edge(ufun, caller_sym->get_name(),
-                                               fp,   callee_sym.get_name());
+                                               fun,   callee_sym.get_name());
 
                          call_graph.push_back(edge);
                          Log(LOG_command_DOXY)
                             out << "    " << caller_sym->get_name()
-                                << " calls " << fp->get_name() << endl;
+                                << " calls " << fun->get_name() << endl;
                        }
                  }
             }
@@ -858,7 +870,7 @@ const Token_string & body = ufun->get_body();
 }
 //----------------------------------------------------------------------------
 void
-Doxy::set_call_graph_root(Function_P fun)
+Doxy::set_call_graph_root(cFunction_P fun)
 {
 const int MAX = 2 * call_graph.size();   // MAX means unreachable
 UCS_string root_name(UTF8_string("all"));
@@ -877,7 +889,7 @@ UCS_string root_name(UTF8_string("all"));
              loop(f, all_functions.size())
                  {
                    const Symbol * sym = all_functions[f];
-                   Function_P fun = sym->get_function();
+                   cFunction_P fun = sym->get_function();
                    nodes.push_back(fun);
                    aliases.push_back(fun->get_name());
                  }
@@ -968,7 +980,7 @@ bool progress = true;
 }
 //----------------------------------------------------------------------------
 int
-Doxy::write_call_graph(Function_P fun, const UCS_string & alias, bool caller)
+Doxy::write_call_graph(cFunction_P fun, const UCS_string & alias, bool caller)
 {
 UTF8_string cg_filename(root_dir);
    if (caller)   cg_filename.append_ASCII("/gc_");
@@ -1048,7 +1060,7 @@ int ret = gv_to_png(cg_filename.c_str(), png_filename.c_str(), false);
    return ret;
 }
 //----------------------------------------------------------------------------
-int Doxy::node_ID(Function_P fun)
+int Doxy::node_ID(cFunction_P fun)
 {
    loop(n, nodes.size())
       if (nodes[n] == fun)   return n;

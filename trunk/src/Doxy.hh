@@ -45,8 +45,8 @@ struct fcall_edge
    {}
 
    /// constructor
-   fcall_edge(Function_P cer, const UCS_string & cer_name,
-              Function_P cee, const UCS_string & cee_name )
+   fcall_edge(cFunction_P cer, const UCS_string & cer_name,
+              cFunction_P cee, const UCS_string & cee_name )
    : caller(cer),
      caller_name(cer_name),
      callee(cee),
@@ -55,13 +55,13 @@ struct fcall_edge
    {}
 
    /// the calling function
-   Function_P caller;
+   cFunction_P caller;
 
    /// the (Symbol-) name of the calling function
    UCS_string caller_name;
 
    /// the called function
-   Function_P callee;
+   cFunction_P callee;
 
    /// the (Symbol-) name of called function
    UCS_string callee_name;
@@ -86,6 +86,11 @@ public:
    /// HTML-print a table containing all defined functions to \b page
    void functions_table(const std::basic_string<const Symbol *> & functions,
                        ofstream & page);
+
+   /// HTML-print one line og a table containing all defined functions
+   /// to \b page
+   void functions_table_entry(const Symbol * function, ofstream & page,
+                              size_t & total_lines);
 
    /// HTML-print a table with all variables to 'page'
    void variables_table(const std::basic_string<const Symbol *> & variables,
@@ -126,16 +131,16 @@ protected:
 
    /// make the call graph start from function \b ufun and set \b nodes to
    /// those nodes that are reachable from ufun
-   void set_call_graph_root(Function_P fun);
+   void set_call_graph_root(cFunction_P fun);
 
    /// write the call graph (if caller == false), or else the caller graph
-   int write_call_graph(Function_P fun, const UCS_string & alias, bool caller);
+   int write_call_graph(cFunction_P fun, const UCS_string & alias, bool caller);
 
    /// swap callers and callees (reverse the direction of an edge)
    void swap_caller_calee();
 
    /// return the index of \b ufun in \b nodes[] or -1 if not found
-   int node_ID(Function_P fun);
+   int node_ID(cFunction_P fun);
 
    /// return an HTML-anchor for function \b name (in the output files)
    static UCS_string fun_anchor(const UCS_string & name);

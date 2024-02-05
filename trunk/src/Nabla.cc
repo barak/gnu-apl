@@ -641,7 +641,7 @@ Nabla::open_existing_function()
    if (InputFile::running_script())
       return "∇-edit existing function from a script";
 
-Function_P function = fun_symbol->get_function();
+cFunction_P function = fun_symbol->get_function();
    Assert(function);
 
    if (function->get_exec_properties()[0])

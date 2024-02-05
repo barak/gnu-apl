@@ -79,7 +79,7 @@ typedef Unicode APL_Char;
 typedef int64_t APL_Integer;
 
 class Function;
-typedef const Function * Function_P;
+typedef const Function * cFunction_P;
 
 inline void
 Hswap(APL_Integer & i1, APL_Integer & i2)

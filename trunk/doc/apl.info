@@ -1782,6 +1782,21 @@ explain what a function is supposed to do.
  Z←A + B
 ∇
 
+   But please note the following: in the original doxygen program (for
+C, C++, or other languages) may source code lines be a mix of code and
+comments (including doxygen comments).  In the ]DOXY command of GNU APL
+a line of a defined function shall either be APL code or else a doxygen
+comment (i.e.  start with ⍝⍝).  Indentation with blanks is allowed (for
+the sake of readability).
+
+   Since a doxygen comment is also a valid APL comment, it is perfectly
+legal to put a doxygen comment at the end of a line that starts with APL
+code.  However, such lines will be ignored by the ]DOXY command.
+
+   The parser generates no extra code from the doxygen comments, and
+therefore the use of many doxygen comments causes no performance problem
+(and nor do regular APL comments).
+
 
 File: apl.info,  Node: Section 2.9,  Next: Section 2.10,  Prev: Section 2.8,  Up: Chapter 2
 
@@ -7457,57 +7472,57 @@ Node: Section 2.558209
 Node: Section 2.658382
 Node: Section 2.759012
 Node: Section 2.862975
-Node: Section 2.964519
-Node: Section 2.1066608
-Node: Section 2.1168155
-Node: Section 2.1269953
-Node: Section 2.1371882
-Node: Section 2.1472823
-Node: Section 2.1573075
-Node: Section 2.1674471
-Node: Section 2.1784936
-Node: Section 2.1887433
-Node: Section 2.1994159
-Node: Section 2.2095604
-Node: Section 2.21104883
-Node: Section 2.22109921
-Node: Section 2.23113179
-Node: Section 2.24113470
-Node: Section 2.25124309
-Node: Section 2.26124581
-Node: Section 2.27131160
-Node: Section 2.28133620
-Node: Section 2.29134289
-Node: Section 2.30135940
-Node: Section 2.31139721
-Node: Output File Format155623
-Node: Section 2.32156798
-Node: Section 2.33166166
-Node: Section 2.34167193
-Node: Section 2.35181888
-Node: Section 2.36192045
-Node: Section 2.37196164
-Node: Section 2.38198260
-Node: Section 2.39202678
-Node: Section 2.40224012
-Node: Section 2.41234905
-Node: Chapter 3236902
-Node: Chapter 4239411
-Node: Chapter 5240537
-Node: Section 5.1242074
-Node: Section 5.2243354
-Node: Section 5.3243714
-Node: Section 5.4243956
-Node: Section 5.5244618
-Node: Section 5.6245096
-Node: Section 5.7245869
-Node: Section 5.8246323
-Node: Chapter 6246725
-Node: Section 6.1247144
-Node: Section 6.2247831
-Node: Chapter 7248662
-Node: Section 7.1249165
-Node: Section 7.2274479
+Node: Section 2.965297
+Node: Section 2.1067386
+Node: Section 2.1168933
+Node: Section 2.1270731
+Node: Section 2.1372660
+Node: Section 2.1473601
+Node: Section 2.1573853
+Node: Section 2.1675249
+Node: Section 2.1785714
+Node: Section 2.1888211
+Node: Section 2.1994937
+Node: Section 2.2096382
+Node: Section 2.21105661
+Node: Section 2.22110699
+Node: Section 2.23113957
+Node: Section 2.24114248
+Node: Section 2.25125087
+Node: Section 2.26125359
+Node: Section 2.27131938
+Node: Section 2.28134398
+Node: Section 2.29135067
+Node: Section 2.30136718
+Node: Section 2.31140499
+Node: Output File Format156401
+Node: Section 2.32157576
+Node: Section 2.33166944
+Node: Section 2.34167971
+Node: Section 2.35182666
+Node: Section 2.36192823
+Node: Section 2.37196942
+Node: Section 2.38199038
+Node: Section 2.39203456
+Node: Section 2.40224790
+Node: Section 2.41235683
+Node: Chapter 3237680
+Node: Chapter 4240189
+Node: Chapter 5241315
+Node: Section 5.1242852
+Node: Section 5.2244132
+Node: Section 5.3244492
+Node: Section 5.4244734
+Node: Section 5.5245396
+Node: Section 5.6245874
+Node: Section 5.7246647
+Node: Section 5.8247101
+Node: Chapter 6247503
+Node: Section 6.1247922
+Node: Section 6.2248609
+Node: Chapter 7249440
+Node: Section 7.1249943
+Node: Section 7.2275257
 
 End Tag Table
 

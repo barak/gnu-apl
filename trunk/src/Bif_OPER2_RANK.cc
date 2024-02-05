@@ -63,7 +63,7 @@ sRank rank_chunk_B = B->get_rank();
 Token
 Bif_OPER2_RANK::do_LyXB(Token & _LO, Value_P X, Value_P B, sRank rank_chunk_B)
 {
-Function_P LO = _LO.get_function();
+cFunction_P LO = _LO.get_function();
    Assert(LO);
    if (!LO->has_result())   DOMAIN_ERROR;
 
@@ -138,7 +138,7 @@ Token
 Bif_OPER2_RANK::do_ALyXB(Value_P A, sRank rank_chunk_A, Token & _LO,
                          Value_P X, Value_P B, sRank rank_chunk_B)
 {
-Function_P LO = _LO.get_function();
+cFunction_P LO = _LO.get_function();
    Assert(LO);
    if (!LO->has_result())   DOMAIN_ERROR;
 

@@ -44,7 +44,7 @@ protected:
    Token scan(Token & LO, Value_P B, uAxis axis) const;
 
    /// Compute one scan item and store result in Z.
-   static void scan_item(Cell * Z, Function_P LO, const Cell * B,
+   static void scan_item(Cell * Z, cFunction_P LO, const Cell * B,
                          uint32_t m_len, uint32_t l_len);
 };
 //----------------------------------------------------------------------------

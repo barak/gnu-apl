@@ -98,7 +98,7 @@ Prefix::syntax_error(const char * loc)
           }
         else if (tok.get_Class() == TC_FUN2)
           {
-            Function_P fun = tok.get_function();
+            cFunction_P fun = tok.get_function();
             if (fun && fun->is_derived())
                {
                  Function * fp = const_cast<Function *>(fun);
@@ -994,7 +994,7 @@ Prefix::locate_X(UCS_string & function) const
        {
          if (content[x].get_ValueType() == TV_FUN)
             {
-              if (Function_P fun = content[x].get_function())
+              if (cFunction_P fun = content[x].get_function())
                  {
                    function = fun->get_name();
                    // locate_X() always returns 0 for non-derived functions
@@ -1731,7 +1731,7 @@ Symbol * top_sym = 0;
                         below) then we replace e.g. ⎕FIO.subfun with the
                         corresponding axis function ⎕FIO[axis];
                       */
-                     Function_P fun = body[PC].get_function();
+                     cFunction_P fun = body[PC].get_function();
                      const sAxis axis = fun->subfun_to_axis(*members[0]);
                      if (axis == -1)   // no sub0function with that name
                         {
@@ -2094,7 +2094,7 @@ Prefix::reduce_V_ASS_F_()
 {
    // named lambda: V ← { ... }
    //
-Function_P F = at2().get_function();
+cFunction_P F = at2().get_function();
    if (!F->is_lambda())   SYNTAX_ERROR;
 
 Symbol * V = at0().get_sym_ptr();

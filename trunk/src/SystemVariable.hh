@@ -88,7 +88,7 @@ protected:
    virtual void push_label(Function_Line label) {}
 
    /// overloaded Symbol::push_function()
-   virtual void push_function(Function_P function) {}
+   virtual void push_function(cFunction_P function) {}
 
    /// overloaded Symbol::push_value()
    virtual void push_value(Value_P B) {}

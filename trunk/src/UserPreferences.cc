@@ -1663,7 +1663,7 @@ int line = 0;
 }
 //----------------------------------------------------------------------------
 void
-UserPreferences::set_threshold(Function_P fun, int ab, int i_ab,
+UserPreferences::set_threshold(cFunction_P fun, int ab, int i_ab,
                                ShapeItem threshold)
 {
    if (fun == 0)    return;

@@ -555,7 +555,7 @@ bool TOK_VOID_inserted = false;
              tos[t+1].get_tag() == TOK_SYMBOL)           // g is (sub-) name
             {
               const Symbol * symbol = tos[t+1].get_sym_ptr();   // subfun name
-              Function_P fun = tos[t-1].get_function();
+              cFunction_P fun = tos[t-1].get_function();
               const sAxis axis = fun->subfun_to_axis(symbol->get_name());
               if (axis != -1)   // subfunction is valid
                  {
@@ -821,7 +821,7 @@ basic_string<ShapeItem> ends;
 
          Token & tok_F = tos[src_F];
          if (tok_F.get_Class() != TC_FUN2)    continue;   // no function F
-         Function_P fun = tok_F.get_function();
+         cFunction_P fun = tok_F.get_function();
 
          // check if the function call can only be monadic and rule out strand
          // notation cases. For example (by Elias Mårtenson and verified with

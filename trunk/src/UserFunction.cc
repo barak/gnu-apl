@@ -1281,7 +1281,7 @@ const bool bad_function = info || err_line != -1;
       }
 
 Symbol * symbol = Workspace::lookup_symbol(ufun->header.get_name());
-Function_P old_function = symbol->get_function();
+cFunction_P old_function = symbol->get_function();
    if (old_function && keep_existing)
       {
         Log(LOG_UserFunction__fix)

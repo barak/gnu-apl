@@ -1890,7 +1890,7 @@ Value_P Z(tos.size(), LOC);
 
               case TV_FUN:
                    {
-                     Function_P fun = tok.get_function();
+                     cFunction_P fun = tok.get_function();
                      Value_P Z2(fun->get_name(), LOC);
                      ZZ->next_ravel_Pointer(Z2.get());
                    }

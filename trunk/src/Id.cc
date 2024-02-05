@@ -138,7 +138,7 @@ operator << (ostream & out, Id id)
    return out << ID::get_name(id);
 }
 //----------------------------------------------------------------------------
-Function_P
+cFunction_P
 ID::get_system_function(Id id)
 {
    switch(id)

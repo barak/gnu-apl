@@ -2105,6 +2105,22 @@ typically one-liners that briefly explain what a function is supposed to do.
  Z←A + B
 ∇
 </pre>
+<p>But please <b>note the following</b>: in the original <b>doxygen</b> program
+(for C, C++, or other languages) may source code lines be a mix of code
+and comments (including doxygen comments). In the <b>]DOXY command</b> of GNU
+APL a line of a defined function shall either be APL code or else a
+doxygen comment (i.e. start with ⍝⍝). Indentation with blanks is
+allowed (for the sake of readability).
+</p>
+<p>Since a doxygen comment is also a valid APL comment, it is perfectly legal
+to put a doxygen comment at the end of a line that starts with APL code.
+However, such lines will be ignored by the ]DOXY command.
+</p>
+<p>The parser generates no extra code from the doxygen comments, and therefore
+the use of many doxygen comments causes no performance problem (and nor do
+regular APL comments).
+</p>
+
 <hr>
 </div>
 <div class="section" id="Section-2_002e9">

@@ -133,7 +133,7 @@ Bif_REDUCE::reduce(Token & tok_LO, Value_P B, uAxis axis)
         DOMAIN_ERROR;
       }
 
-Function_P LO = tok_LO.get_function();
+cFunction_P LO = tok_LO.get_function();
    Assert1(LO);
    if (!LO->has_result())
       {
@@ -198,7 +198,7 @@ Bif_REDUCE::reduce_n_wise(Value_P A, Token & tok_LO,
         DOMAIN_ERROR;
       }
 
-Function_P LO = tok_LO.get_function();
+cFunction_P LO = tok_LO.get_function();
    if (!LO->has_result())
       {
         MORE_ERROR() << "In A " << LO->get_name() << get_name() << " B: "
@@ -303,7 +303,7 @@ const Shape3 B3(B->get_shape(), axis);
 //----------------------------------------------------------------------------
 Token
 Bif_REDUCE::do_reduce(const Shape & shape_Z, const Shape3 & Z3, ShapeItem nwise,
-                      Function_P LO, Value_P B, ShapeItem bm)
+                      cFunction_P LO, Value_P B, ShapeItem bm)
 {
 Value_P Z(shape_Z, LOC);
 

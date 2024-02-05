@@ -1206,77 +1206,77 @@ Value_P Z(len_Z, LOC);
 // Inverse functions...
 
 //----------------------------------------------------------------------------
-Function_P
+cFunction_P
 Bif_F12_POWER::get_monadic_inverse() const
 {
    return &Bif_F12_LOGA::fun;
 }
 //----------------------------------------------------------------------------
-Function_P
+cFunction_P
 Bif_F12_POWER::get_dyadic_inverse() const
 {
    return &Bif_F12_LOGA::fun;
 }
 //----------------------------------------------------------------------------
-Function_P
+cFunction_P
 Bif_F12_LOGA::get_monadic_inverse() const
 {
    return &Bif_F12_POWER::fun;
 }
 //----------------------------------------------------------------------------
-Function_P
+cFunction_P
 Bif_F12_LOGA::get_dyadic_inverse() const
 {
    return &Bif_F12_POWER::fun;
 }
 //----------------------------------------------------------------------------
-Function_P
+cFunction_P
 Bif_F12_TIMES::get_dyadic_inverse() const
 {
    return this == &fun ? &fun_inverse : &fun;
 }
 //----------------------------------------------------------------------------
-Function_P
+cFunction_P
 Bif_F12_DIVIDE::get_monadic_inverse() const
 {
    // ÷ is self-inverse: B = ÷÷B
    return &Bif_F12_DIVIDE::fun;
 }
 //----------------------------------------------------------------------------
-Function_P
+cFunction_P
 Bif_F12_DIVIDE::get_dyadic_inverse() const
 {
    // ÷ is self-inverse: B = (A÷(A÷B))
    return &Bif_F12_DIVIDE::fun;
 }
 //----------------------------------------------------------------------------
-Function_P
+cFunction_P
 Bif_F12_PLUS::get_dyadic_inverse() const
 {
    return this == &fun ? &fun_inverse : &fun;
 }
 //----------------------------------------------------------------------------
-Function_P
+cFunction_P
 Bif_F12_MINUS::get_monadic_inverse() const
 {
    // - is self-inverse: B = --B
    return &Bif_F12_PLUS::fun;
 }
 //----------------------------------------------------------------------------
-Function_P
+cFunction_P
 Bif_F12_MINUS::get_dyadic_inverse() const
 {
    // - is self-inverse: B = (A-(A-B))
    return &Bif_F12_PLUS::fun;
 }
 //----------------------------------------------------------------------------
-Function_P
+cFunction_P
 Bif_F12_CIRCLE::get_monadic_inverse() const
 {
    return this == &fun ? &fun_inverse : &fun;
 }
 //----------------------------------------------------------------------------
-Function_P
+cFunction_P
 Bif_F12_CIRCLE::get_dyadic_inverse() const
 {
    return this == &fun ? &fun_inverse : &fun;

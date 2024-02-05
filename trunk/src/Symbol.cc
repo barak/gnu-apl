@@ -105,7 +105,7 @@ Symbol::print_verbose(ostream & out) const
               case NC_FUNCTION:
               case NC_OPERATOR:
                    {
-                     Function_P fun = item.get_function();
+                     cFunction_P fun = item.get_function();
                      Assert(fun);
 
                      fun->print_properties(out, 4);
@@ -349,7 +349,7 @@ const int incr_B = (ec_B == 1) ? 0 : 1;
 }
 //----------------------------------------------------------------------------
 bool
-Symbol::assign_named_lambda(Function_P lambda, const char * loc)
+Symbol::assign_named_lambda(cFunction_P lambda, const char * loc)
 {
 ValueStackItem & vs = value_stack.back();
 const UserFunction * ufun = lambda->get_func_ufun();
@@ -362,7 +362,7 @@ const Executable * uexec = ufun;
         case NC_FUNCTION:
         case NC_OPERATOR:
              {
-               Function_P old_fun = vs.get_function();
+               cFunction_P old_fun = vs.get_function();
                Assert(old_fun);
                if (!old_fun->is_lambda())   SYNTAX_ERROR;
                const UserFunction * old_ufun = old_fun->get_func_ufun();
@@ -464,7 +464,7 @@ Symbol::push_label(Function_Line label)
 }
 //----------------------------------------------------------------------------
 void
-Symbol::push_function(Function_P function)
+Symbol::push_function(cFunction_P function)
 {
    Log(LOG_SYMBOL_push_pop)
       {
@@ -610,7 +610,7 @@ Symbol::set_SV_key(SV_key key)
    value_stack.back().set_key(key);
 }
 //----------------------------------------------------------------------------
-Function_P
+cFunction_P
 Symbol::get_function() const
 {
    Assert(value_stack.size() > 0);
@@ -619,7 +619,7 @@ Symbol::get_function() const
    return 0;
 }
 //----------------------------------------------------------------------------
-Function_P
+cFunction_P
 Symbol::get_function(unsigned int si) const
 {
    Assert(value_stack.size() > 0);
@@ -628,7 +628,7 @@ Symbol::get_function(unsigned int si) const
    return 0;
 }
 //----------------------------------------------------------------------------
-Function_P
+cFunction_P
 Symbol::get_function()
 {
 const ValueStackItem & vs = value_stack.back();
@@ -954,7 +954,7 @@ const SV_Coupling old_coupling = Svar_DB::get_coupling(key);
 }
 //----------------------------------------------------------------------------
 void
-Symbol::set_NC(NameClass nc, Function_P fun)
+Symbol::set_NC(NameClass nc, cFunction_P fun)
 {
 ValueStackItem & vs = value_stack.back();
 
@@ -1017,7 +1017,7 @@ UCS_string data;
              {
                // write a timestamp record
                //
-               Function_P fun = value_stack[0].get_function();
+               cFunction_P fun = value_stack[0].get_function();
                const YMDhmsu ymdhmsu(fun->get_creation_time());
                SPRINTF(buffer, "*(%d %d %d %d %d %d %d)",
                        ymdhmsu.year, ymdhmsu.month, ymdhmsu.day,
@@ -1120,7 +1120,7 @@ int count = 0;
               case NC_FUNCTION:
               case NC_OPERATOR:
                    {
-                     Function_P fun = item.get_function();
+                     cFunction_P fun = item.get_function();
                      const Executable * ufun = fun->get_func_ufun();
                      Assert(ufun || fun->is_native());
                      if (ufun)
@@ -1193,7 +1193,7 @@ const ValueStackItem & vs = value_stack[0];
       }
    else if (vs.get_NC() & NC_FUN_OPER)
       {
-        Function_P fun = vs.get_function();
+        cFunction_P fun = vs.get_function();
         if (fun == 0)
            {
              out << "⍝ function " << get_name() << " has function pointer 0!"
@@ -1266,7 +1266,7 @@ const ValueStackItem & vs = value_stack[0];
 }
 //----------------------------------------------------------------------------
 int
-Symbol::get_SI_level(Function_P fun) const
+Symbol::get_SI_level(cFunction_P fun) const
 {
    loop(v, value_stack.size())
        {

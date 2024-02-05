@@ -68,7 +68,7 @@ protected:
       {
         ASX_MAJOR = 1,   ///< ++ if XML file format change (incompatible)
         ASX_MINOR = 3,   ///< ++ if XML file format change (backward compatible)
-        ASX_OTHER = 5,   ///< ++ XML file format not changed (e.g. code cleanup)
+        ASX_OTHER = 6,   ///< ++ XML file format not changed (e.g. code cleanup)
       };
 };
 //----------------------------------------------------------------------------
@@ -360,10 +360,10 @@ protected:
 
    /// read a system function with attribute id_prefix-id or a user defined
    /// functions with attributes 'ufun_prefix-ufun' and 'level_prefix-prefix'
-   Function_P read_Function_name();
+   cFunction_P read_Function_name();
 
    /// find a lambda in the current SI entry
-   Function_P find_lambda(const UCS_string & lambda);
+   cFunction_P find_lambda(const UCS_string & lambda);
 
    /// return true iff there is more data in the file
    bool more() const   { return data < file_end; }
@@ -491,9 +491,9 @@ protected:
    /// address in the new (LOADing) workspace
    struct fun_map
       {
-        Fid old_fid;          ///< the fid in the )SAVEed workspace
-        Function_P new_fun;   ///< address in the )LOADing workspace
-        const char * loc;     ///< where allocated
+        Fid old_fid;           ///< the fid in the )SAVEed workspace
+        cFunction_P new_fun;   ///< address in the )LOADing workspace
+        const char * loc;      ///< where allocated
       };
 
    /// all mappings from fids to functions
@@ -503,23 +503,23 @@ protected:
    fun_map * find_fun_map(Fid fid);
 
    /// return function for fid, or 0 if not found.
-   Function_P find_function(Fid fid);
+   cFunction_P find_function(Fid fid);
 
    /// add fid and function to find_fun_map. Either fid must be new, or else
    /// an existing fid must have its new_fun == 0 (forward declaration).
-   void add_fid_function(Fid fid, Function_P new_fun, const char * loc);
+   void add_fid_function(Fid fid, cFunction_P new_fun, const char * loc);
 
    /// properties of a derived function
    struct _derived_todo
       {
-        Function * cache;      ///< the new()-address of the function
-        Function_P * symptr;   ///< the address of a function * to be set
-        Fid fid;               ///< the address of \b this derived function
-        Fid LO_fid;            ///< the address of \b LO of this function
-        Fid OPER_fid;          ///< the address of \b OPER of this function
-        Fid RO_fid;            ///< the address of \b RO of this function
-        Vid AXIS_vid;          ///< the AXIS of \b this function
-        const char * loc;      ///< where \b this was initialized
+        Function * cache;       ///< the new()-address of the function
+        cFunction_P * symptr;   ///< the address of a function * to be set
+        Fid fid;                ///< the address of \b this derived function
+        Fid LO_fid;             ///< the address of \b LO of this function
+        Fid OPER_fid;           ///< the address of \b OPER of this function
+        Fid RO_fid;             ///< the address of \b RO of this function
+        Vid AXIS_vid;           ///< the AXIS of \b this function
+        const char * loc;       ///< where \b this was initialized
       };
 
       /// derived functions that need to be instantiated

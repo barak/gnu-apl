@@ -1072,7 +1072,7 @@ UCS_string symbol;
         while (src.has_more() && *src <= UNI_SPACE)   src.get();   // spaces
         UCS_string symbol1(symbol, 2, symbol.size() - 2);   // without S∆/T∆
         Value_P AB(symbol1, LOC);
-        Function_P ST = 0;
+        cFunction_P ST = 0;
         if (symbol[0] == UNI_S) ST = &Quad_STOP::fun;
         else                    ST = &Quad_TRACE::fun;
 

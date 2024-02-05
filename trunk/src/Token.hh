@@ -123,7 +123,7 @@ public:
    : tag(tg) { Assert(get_ValueType() == TV_NONE);   value.int_vals[0] = 0; }
 
    /// Construct a token for a \b Function.
-   Token(TokenTag tg, Function_P fun)
+   Token(TokenTag tg, cFunction_P fun)
    : tag(tg) { Assert(get_ValueType() == TV_FUN);   value.function = fun; }
 
    /// Construct a token for a \b line number
@@ -296,8 +296,8 @@ public:
    bool is_COND() const
       { return tag == TOK_IF_THEN || tag == TOK_IF_ELSE || tag == TOK_IF_END; }
 
-   /// return the Function_P value of this token
-   Function_P get_function() const
+   /// return the cFunction_P value of this token
+   cFunction_P get_function() const
       { if (!is_function())   SYNTAX_ERROR;   return value.function; }
 
    /// return value usage counter
@@ -345,7 +345,7 @@ public:
         Symbol        * sym_ptr;         ///< the symbol for TV_SYM
         Function_Line   fun_line;        ///< the function line for TV_LIN
         IndexExpr     * index_val;       ///< the index for TV_INDEX
-        Function_P      function;        ///< the function for TV_FUN
+        cFunction_P      function;       ///< the function for TV_FUN
         Value_P_Base    apl_val;         ///< the APL value for TV_VAL
 
         /// a shortcut for accessing apl_val
@@ -476,7 +476,7 @@ public:
    TokenClass get_Class() const
       { return token.get_Class(); }
 
-   Function_P get_function() const
+   cFunction_P get_function() const
       { return token.get_function(); }
 
    /// return the token value type of token

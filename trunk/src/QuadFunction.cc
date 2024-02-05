@@ -1520,7 +1520,7 @@ Symbol * fun_symbol = Workspace::lookup_existing_symbol(fun_name_ucs);
         return 0;
       }
 
-Function_P fun = fun_symbol->get_function();
+cFunction_P fun = fun_symbol->get_function();
    if (fun == 0)
       {
         CERR << "symbol " << fun_name_ucs << " is not a function" << endl;

@@ -127,7 +127,7 @@ Executable::clear_body()
 
         if (body[b].is_function())
            {
-             Function_P fun = body[b].get_function();
+             cFunction_P fun = body[b].get_function();
              const UserFunction * ufun = fun->get_func_ufun();
              if (ufun && ufun->is_lambda())
                 const_cast<UserFunction *>(ufun)->decrement_refcount(LOC);
@@ -874,7 +874,7 @@ Executable::unmark_all_values() const
 
         if (tok.get_ValueType() == TV_FUN)
            {
-             Function_P fun = tok.get_function();
+             cFunction_P fun = tok.get_function();
              const UserFunction * ufun = fun->get_func_ufun();
              if (ufun && ufun->is_lambda())
                 {

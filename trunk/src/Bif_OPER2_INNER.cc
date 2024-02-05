@@ -35,7 +35,7 @@ Bif_OPER2_INNER::PJob_product Bif_OPER2_INNER::job;
 
 //----------------------------------------------------------------------------
 Token
-Bif_OPER2_INNER::fill(const Shape shape_Z, Value_P A, Function_P fun,
+Bif_OPER2_INNER::fill(const Shape shape_Z, Value_P A, cFunction_P fun,
                       Value_P B, const char * loc)
 {
    // this function is called from A f.g B when A fun B is called with an
@@ -69,8 +69,8 @@ Bif_OPER2_INNER::eval_ALRB(Value_P A, Token & _LO, Token & _RO, Value_P B) const
 {
    if (!_LO.is_function() || !_RO.is_function())   SYNTAX_ERROR;
 
-Function_P LO = _LO.get_function();
-Function_P RO = _RO.get_function();
+cFunction_P LO = _LO.get_function();
+cFunction_P RO = _RO.get_function();
    Assert1(LO);
    Assert1(RO);
 

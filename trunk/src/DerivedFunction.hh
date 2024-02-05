@@ -41,20 +41,20 @@ public:
 
    /// constructor (dyadic operator). Normally lf and rf are functions, but
    /// APL2 explicitly permits values.
-   DerivedFunction(Token & lf, Function_P dyop, Token & rf, const char * loc);
+   DerivedFunction(Token & lf, cFunction_P dyop, Token & rf, const char * loc);
 
    /// Constructor (dyadic operator with axis: fun ⍤[] rval)
-   DerivedFunction(Token & lf, Function_P dyop, Value_P X, Token & rval,
+   DerivedFunction(Token & lf, cFunction_P dyop, Value_P X, Token & rval,
                    const char * loc);
 
    /// Constructor (monadic operator, no axis)
-   DerivedFunction(Token & lfun, Function_P monop, const char * loc);
+   DerivedFunction(Token & lfun, cFunction_P monop, const char * loc);
 
    /// Constructor (monadic operator, with axis)
-   DerivedFunction(Token & lf, Function_P monop, Value_P X, const char * loc);
+   DerivedFunction(Token & lf, cFunction_P monop, Value_P X, const char * loc);
 
    /// Constructor (function with axis)
-   DerivedFunction(Function_P func, Value_P X, const char * loc);
+   DerivedFunction(cFunction_P func, Value_P X, const char * loc);
 
    /// deallocate resources held by this DerivedFunction
    void destroy_derived(const char * loc);
@@ -71,7 +71,7 @@ public:
       { return true; }
 
    /// return the left operand of this derived function
-   Function_P get_LO() const
+   cFunction_P get_LO() const
       { return left_arg.get_function(); }
 
    /// return the value (if any) bound to an operator (that allows it)
@@ -81,11 +81,11 @@ public:
       }
 
    /// return the operator of this derived function
-   Function_P get_OPER() const
+   cFunction_P get_OPER() const
       { return oper; }
 
    /// return the right operand (or 0) of this derived function
-   Function_P get_RO() const
+   cFunction_P get_RO() const
       {
         return right_fun.get_tag() == TOK_VOID ? 0 : right_fun.get_function();
       }
@@ -131,7 +131,7 @@ protected:
    Token left_arg;
 
    /// the monadic operator (to the right of the function)
-   Function_P oper;
+   cFunction_P oper;
 
    /// the (normally) function on the right of the (dyadic) operator (if any).
    //  Acording to lrm p. 35, the right operand is a function or array (even

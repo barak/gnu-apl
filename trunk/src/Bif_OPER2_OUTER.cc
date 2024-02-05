@@ -145,7 +145,7 @@ Bif_OPER2_OUTER::eval_ALRB(Value_P A, Token & LO, Token & _RO, Value_P B) const
 {
    if (!_RO.is_function())    SYNTAX_ERROR;
 
-Function_P RO = _RO.get_function();
+cFunction_P RO = _RO.get_function();
    Assert(RO);
 
    if (!RO->has_result())   DOMAIN_ERROR;

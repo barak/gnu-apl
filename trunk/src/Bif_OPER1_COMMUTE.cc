@@ -31,7 +31,7 @@ Token
 Bif_OPER1_COMMUTE::eval_LB(Token & LO, Value_P B) const
 {
    if (!LO.is_function())   SYNTAX_ERROR;
-Function_P fun_LO = LO.get_function();
+cFunction_P fun_LO = LO.get_function();
 
 /*
    Under "normal" circumstances, eval_LB() is called with a dyadic function LO
@@ -73,7 +73,7 @@ Function_P fun_LO = LO.get_function();
         Value_P    A = A_LO->get_bound_LO_value();
         if (+A)   // definitelt special case
            {
-              Function_P LO = A_LO->get_OPER();
+              cFunction_P LO = A_LO->get_OPER();
               return LO->eval_AB(B, A);
            }
       }

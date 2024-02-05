@@ -135,7 +135,7 @@ Bif_SCAN::scan(Token & tok_LO, Value_P B, uAxis axis) const
         DOMAIN_ERROR;
       }
 
-Function_P LO = tok_LO.get_function();
+cFunction_P LO = tok_LO.get_function();
 
    if (!LO->has_result())
       {
