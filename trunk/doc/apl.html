@@ -60,7 +60,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Installing and Starting GNU 
 </div>
 <span id="GNU-APL"></span><h1 class="top">GNU APL</h1>
 
-<p>January 16, 2024
+<p>February 5, 2024
 </p>
 <p>This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
@@ -158,7 +158,7 @@ therefore it must be expanded with e.g.  <b>gunzip</b> before it can be read.
       <li><a id="toc-Associative-Arrays" href="#Associative-Arrays">2.16.2 Associative Arrays</a></li>
     </ul></li>
     <li><a id="toc-Monadic-_005b_003f_005d-and-_22a3_002c-dyadic-_005b_003f_005d-with-Axis" href="#Section-2_002e17">2.17 Monadic ⊢ and ⊣, dyadic ⊢ with Axis</a></li>
-    <li><a id="toc-Bit_002dwise-Logical-Functions-_005b_003f_005d_005b_003f_005d_002c-_005b_003f_005d_005b_003f_005d_002c-_005b_003f_005d_005b_003f_005d_002c-_005b_003f_005d_005b_003f_005d_002c-T_005b_003f_005d_002c-and-T_003d" href="#Section-2_002e18">2.18 Bit-wise Logical Functions ⊤∧, ⊤∨, ⊤⍲, ⊤⍱, T≠, and T=</a>
+    <li><a id="toc-Bit_002dwise-Logical-Functions-_005b_003f_005d_005b_003f_005d_002c-_005b_003f_005d_005b_003f_005d_002c-_005b_003f_005d_005b_003f_005d_002c-_005b_003f_005d_005b_003f_005d_002c-_005b_003f_005d_005b_003f_005d_002c-and-_005b_003f_005d_003d" href="#Section-2_002e18">2.18 Bit-wise Logical Functions ⊤∧, ⊤∨, ⊤⍲, ⊤⍱, ⊤≠, and ⊤=</a>
     <ul class="no-bullet">
       <li><a id="toc-Dyadic-_005b_003f_005d_005b_003f_005d_002c-_005b_003f_005d_005b_003f_005d_002c-_005b_003f_005d_005b_003f_005d_002c-_005b_003f_005d_005b_003f_005d_002c-_005b_003f_005d_003d_002c-and-_005b_003f_005d_005b_003f_005d" href="#Dyadic-_005b_003f_005d_005b_003f_005d_002c-_005b_003f_005d_005b_003f_005d_002c-_005b_003f_005d_005b_003f_005d_002c-_005b_003f_005d_005b_003f_005d_002c-_005b_003f_005d_003d_002c-and-_005b_003f_005d_005b_003f_005d">2.18.1 Dyadic ⊤∧, ⊤∨, ⊤⍲, ⊤⍱, ⊤=, and ⊤≠</a></li>
       <li><a id="toc-Monadic-_005b_003f_005d_005b_003f_005d-and-_005b_003f_005d_005b_003f_005d" href="#Monadic-_005b_003f_005d_005b_003f_005d-and-_005b_003f_005d_005b_003f_005d">2.18.2 Monadic ⊤∨ and ⊤⍱</a></li>
@@ -188,8 +188,8 @@ therefore it must be expanded with e.g.  <b>gunzip</b> before it can be read.
     <li><a id="toc-_005b_003f_005dGTK-_002d-GTK-Interface" href="#Section-2_002e28">2.28 ⎕GTK - GTK Interface</a></li>
     <li><a id="toc-_005b_003f_005dJSON-_002d-JSON-Parsing" href="#Section-2_002e29">2.29 ⎕JSON - JSON Parsing</a>
     <ul class="no-bullet">
-      <li><a id="toc-Monadic-_005b_003f_005dJSON" href="#Monadic-_005b_003f_005dJSON">2.29.1 Monadic  ⎕JSON</a></li>
-      <li><a id="toc-Dyadic-_005b_003f_005dJSON" href="#Dyadic-_005b_003f_005dJSON">2.29.2 Dyadic  ⎕JSON</a></li>
+      <li><a id="toc-Monadic-_005b_003f_005dJSON" href="#Monadic-_005b_003f_005dJSON">2.29.1 Monadic ⎕JSON</a></li>
+      <li><a id="toc-Dyadic-_005b_003f_005dJSON" href="#Dyadic-_005b_003f_005dJSON">2.29.2 Dyadic ⎕JSON</a></li>
     </ul></li>
     <li><a id="toc-_005b_003f_005dMAP-_002d-Map-Value" href="#Section-2_002e30">2.30 ⎕MAP  - Map Value</a></li>
     <li><a id="toc-_005b_003f_005dPLOT-_002d-Plot-Data" href="#Section-2_002e31">2.31 ⎕PLOT - Plot Data</a>
@@ -333,10 +333,10 @@ Next: <a href="#Chapter-2" accesskey="n" rel="next">Non-standard GNU APL Feature
 <li> download the tar file containing GNU APL, from
  <a href="ftp://ftp.gnu.org/gnu/apl">ftp://ftp.gnu.org/gnu/apl</a> or from one of its mirrors
  (see <a href="http://www.gnu.org/prep/ftp.html">http://www.gnu.org/prep/ftp.html</a>), and
-un-tar the file.
+ un-tar the file.
 
-</li><li> read (and follow) the instructions given in file README in the unpacked
-directory
+</li><li> read (and follow) the instructions given in file README in the
+ unpacked directory
 </li></ul>
 
 <p>For the experienced, but impatient reader: it is the usual sequence
@@ -349,7 +349,7 @@ directory
 </li><li> make install
 </li></ul>
 
-<p>On success, an executable file called &rsquo;apl&rsquo; will have been produced
+<p>On success, an executable file named &rsquo;apl&rsquo; will have been produced
 in the sub-directory &rsquo;src&rsquo;.
 </p>
 <p>File README contains further instructions about the installation GNU APL.
@@ -359,7 +359,7 @@ in the sub-directory &rsquo;src&rsquo;.
 <h3 class="section">1.2 Starting APL</h3>
 
 <p>Last things first: before explaining how to start APL, it is important to
-remember how to stop (i.e. exit) it. Neither ^C nor ^D will stop APL
+ remember how to stop (i.e. exit) it. Neither ^C nor ^D will stop APL
  - they serve other purposes. Instead, you leave APL with the command
  )OFF (on a separate line) like this:
 </p>
@@ -393,15 +393,15 @@ directory):
 </p>
 <p>The path to the &rsquo;apl&rsquo; binary can be missing (like in the first example),
 relative, or absolute (second example). The exact details of how the first
-line of a GNU APL script shall look like varies slightly among operating
-systems. Please consult the info (or man) pages for &rsquo;path_resolution&rsquo; and/or
-&rsquo;execve&rsquo; on your operating system. After the the name of the binary, optional
-GNU APL command line options, usually &ndash;script, can be provided.
+line of a GNU APL script shall look vary slightly among operating systems.
+Please consult the info (or man) pages for &rsquo;path_resolution&rsquo; and/or &rsquo;execve&rsquo;
+on your operating system. After the name of the binary, optional GNU APL
+command line options, usually &ndash;script, can be provided.
 </p>
 <p>The text file must, of course, have execute permission, and should be ASCII
-or, more likely, UTF-8 encoded. The APL characters in the script
-shall be those defined in the Unicode character set (most of them in the
-U+2200 - U+23FF range).
+or, more likely, UTF-8 encoded. The APL characters in the script shall be
+those defined in the Unicode character set (most of them in the U+2200 -
+U+23FF range).
 </p>
 </div>
 <div class="section" id="Command-Line-Options">
@@ -413,23 +413,23 @@ U+2200 - U+23FF range).
 <li> <b><tt>-C new_root</tt></b>
 
 <p>perform chroot(&quot;new_root&quot;) followed by chdir(&quot;/&quot;). This restricts the access
-of the the process running GNU APL to files in or below directory new_root, and
-it also changes the current directory (which could have resided above new_root
-before the chroot() was executed).
+of the process running GNU APL to files in or below directory new_root, and
+it also changes the current directory (which could have resided above
+new_root before the chroot() was executed).
 </p>
 <p>The -C option is intended to be a security feature for GNU APL interpreters
 that are facing a hostile environment like the public internet.
 </p>
 <p>NOTES:
 </p><ul>
-<li> For -C to work, new_root needs to contain minimal set of binaries, in
+<li> For -C to work, new_root needs to contain a minimal set of binaries, in
 particular a shell, and possibly libraries needed by the shell. Consult
 &rsquo;info chroot invocation&rsquo; for issues to consider and common pitfalls.
 
 </li><li> GNU APL processes the -C option (i.e. it calls chroot(&quot;new_root&quot;)) before
 all other command line options. As a consequence, file names in other command
 line options of GNU APL are also affected by -C. That means that the file
-names in command line options arr being interpreted relative to new_root
+names in command line options are being interpreted relative to new_root
 and <b>not</b> relative to the current directory of the process that had
 started GNU APL.
 
@@ -438,7 +438,8 @@ after processing the -C option. These processes (and the libraries that they
 depend on) should reside in the proper directory below new_root. For example,
 with the default configuration of GNU APL, GNU APL installs itself in
 /usr/local/bin and also expects APserver in the same directory. After -C
-new_root. however, /usr/local/bin is no longer accessible and one would need to copy /usr/local/bin/APserver to new_root/usr/local/bin/APserver
+new_root, however, /usr/local/bin is no longer accessible and one would need
+to copy /usr/local/bin/APserver to new_root/usr/local/bin/APserver
 
 </li><li> Depending on your platform, the process using -C may need root privileges.
 
@@ -455,8 +456,8 @@ new_root. however, /usr/local/bin is no longer accessible and one would need to 
 </li><li> <b><tt>-d</tt></b>
 
 <p>run the APL interpreter (or APL script) in the background (i.e. as a daemon).
-For this to work you need to provide some input to the background process, e.g.
-via the -f option.
+For this to work you need to provide some input to the background process,
+e.g. via the -f option.
 </p>
 </li><li> <b><tt>--emacs</tt></b>
 
@@ -466,7 +467,6 @@ via the -f option.
 
 <p>run in (new) Emacs mode with argument arg.
 </p>
-
 </li><li> <b><tt>--eval line</tt></b>
 
 <p>evaluate one APL line and exit. This option can be given several times; in
@@ -498,7 +498,7 @@ for example, to start the same workspace with different start-up values.
 </p>
 </li><li> <b><tt>-h</tt></b>, <b><tt>--help</tt></b>
 
-<p>print all command line options with a brief hint what they do.
+<p>print all command line options with a brief hint about what they do.
 </p>
 </li><li> <b><tt>--id proc</tt></b>
 
@@ -516,7 +516,7 @@ was not ./configure&rsquo;d.
 </p>
 </li><li> <b><tt>--mem [memory-limit]</tt></b>
 
-<p>tell the interpreter to not use more than memory-limit bytes of RAM. By
+<p>tell the interpreter not to use more than memory-limit bytes of RAM. By
 using this option, the user is fully responsible for ensuring that the
 specified amount of memory will always be available. The following rules
 should be observed.
@@ -563,20 +563,20 @@ copy the input line (after editing) to stdout. For creating session logs.
 </li><li> <b><tt>--noCIN</tt></b>
 
 <p>do not echo stdin to stdout. Almost a must for scripting (unless you
-troubleshoot a script).
+intend to troubleshoot a script).
 </p>
 </li><li> <b><tt>--to_COUT</tt></b>
 
 <p>normally GNU APL writes its output to stderr (i.e. file descriptor 2) so that,
-when GNU APL is started in a script, the output of the script appears on stdout
-(i.e. file descriptor 1) while the output of GNU APL appears on stderr.
+when GNU APL is started in a script, the output of the script appears on
+stdout (i.e. file descriptor 1) while the output of GNU APL appears on stderr.
 </p>
 <p>This option redirects the stderr output of GNU APL to stdout. The same effect
 can be achieved with the option &quot;OUTPUT-TO-COUT   Yes&quot; in a preferences file.
 </p>
 </li><li> <b><tt>--tcp_port PORT</tt></b>
 
-<p>this option starts GNU APL as server that listens on TCP port PORT.
+<p>this option starts GNU APL as a server that listens on TCP port PORT.
 Every TCP connection accepted by the server forks a new GNU APL instance
 which has its stdin, stdout, and stderr redirected to the TCP connection.
 </p>
@@ -615,7 +615,7 @@ one of these sets.
 
 <p>do not emit ESC sequences. Normally ESC sequences are emitted for colored
 output and during line editing. In scripts, however, ESC sequences usually
-not wanted and can be turned off with this option.
+are not wanted and can be turned off with this option.
 </p>
 </li><li> <b><tt>-s</tt></b>, <b><tt>--script</tt></b>
 
@@ -631,7 +631,6 @@ which is a typical combination of options for APL scripts.
 
 <p>disable shared variables and native functions
 </p>
-
 </li><li> <b><tt>--show_bin_dir</tt></b>
 
 <p>display the binary directory (where, according to ./configure,  the programs
@@ -639,22 +638,19 @@ apl, APserver, AP100, and AP210 are supposed to be installed. Then exit.
 </p>
 </li><li> <b><tt>--show_doc_dir</tt></b>
 
-<p>display the directory where, according to ./configure,  documentation files
+<p>display the directory where, according to ./configure, documentation files
 for GNU APL are installed. Then exit.
 </p>
-
 </li><li> <b><tt>--show_etc_dir</tt></b>
 
 <p>display the system configuration directory where, according to ./configure,
 the preferences file for GNU APL is installed. Then exit.
 </p>
-
 </li><li> <b><tt>--show_lib_dir</tt></b>
 
-<p>display the library directory where, according to ./configure, shared
-library files and the workspaces shipped with GNU APL are installed. Then exit.
+<p>display the library directory where, according to ./configure, shared library
+files and the workspaces shipped with GNU APL are installed. Then exit.
 </p>
-
 </li><li> <b><tt>--show_src_dir</tt></b>
 
 <p>display the source directory where, according to ./configure, GNU APL
@@ -662,12 +658,10 @@ was compiled. Then exit. This can be used, for example, by native functions
 that are built outside the GNU APL source tree to find GNU APL header files
 that are needed to compile the native function.
 </p>
-
 </li><li> <b><tt>--show_all_dirs</tt></b>
 
 <p>display all the directories above. Then exit.
 </p>
-
 </li><li> <b><tt>-T testcases ...</tt></b>
 run testcases. Testcases are text files that contain both input to the APL
 interpreter and the expected response from the interpreter. The output from
@@ -675,10 +669,9 @@ the interpreter is compared with the expected output in the testcase file(s)
 and differences are marked. In addition a summary file is created that tells
 whether or not each of the testcases was successful.
 
-</li><li> 
-<b><tt>--TM mode</tt></b>
+</li><li> <b><tt>--TM mode</tt></b>
 
-<p>test mode. This option how the interpreter shall behave
+<p>test mode. This option specifies how the interpreter shall behave
 when running a number of testcases (as specified with the <b><tt>-T</tt></b> option)
 </p>
 <p><b><tt>--TM 0</tt></b> (default) run all testcases and exit after the last testcase.
@@ -689,15 +682,15 @@ does not exit so that the user can investigate the state of APL
 (SI, variable values, etc.).
 </p>
 <p><b><tt>--TM 2</tt></b> like <b><tt>--TM 1</tt></b>, but stay in the interpreter even if
-all testcases have passed. This can be useful in order to quickly bring
-the interpreter into a specific state and continue manual troubleshooting
+all testcases have passed. This can be useful for quickly bringing the
+interpreter into a specific state and continue manual troubleshooting
 from that state.
 </p>
 <p><b><tt>--TM 3</tt></b> like <b><tt>--TM 1</tt></b>, but stop testcase execution after the
 first failed testcase (i.e. do not exit).
 </p>
 <p><b><tt>--TM 4</tt></b> like <b><tt>--TM 3</tt></b>, but exit after the first failed
-testcase. The is useful for automatic regression tests, where no errors
+testcase. This is useful for automatic regression tests, where no errors
 are expected.
 </p>
 </li><li> <b><tt>--TR</tt></b>
@@ -707,9 +700,9 @@ are expected.
 </li><li> <b><tt>--TS</tt></b>
 
 <p>Normally, when the interpreter is run with the <b><tt>-T</tt></b> option,
-then an existing summary.log file is overridden without notice.
+an existing summary.log file is overwritten without notice.
 This option causes new test results to be appended to a possibly
-existing summary.log instead of overriding it.
+existing summary.log instead of overwriting it.
 </p>
 </li><li> <b><tt>-v</tt></b>, <b><tt>--version</tt></b>,
 
@@ -734,7 +727,7 @@ started together with this interpreter time to initialize themselves.
    GNU APL binary and their arguments must follow the description given for
    them. In addition the interpreter also accepts command line options that
    start with +. However, these options are not checked by the interpreter
-   in any way, but are but merely copied to ⎕ARG (see below). In these options,
+   in any way, but are merely copied to ⎕ARG (see below). In these options,
    APPOPT, ARG1, ARG2, ... are arbitrary strings that should not contain any
    whitespace characters. The purpose of these options is to control aspects
    of the APL application from the command line.
@@ -777,13 +770,13 @@ $HOME).
 </li></ul>
 
 <p>The system configuration directory is usually /etc or /usr/local/etc and is
-configurable via <samp>./configure --sysconfdir</samp>. An empty (i.e. all
-settings commented out) preferences file is being installed in the
+configurable via <samp>./configure --sysconfdir</samp>. An empty (i.e. most
+settings commented out) preferences file is also installed in the
 system configuration directory when GNU APL is installed. You can edit
-it or use it as a template to see which options can be controlled.
+it, use it as a template or read it to see which options can be controlled.
 </p>
-<p>If file &rsquo;preferences&rsquo; exists in both directories, then the settings in
-$HOME/.gnu-apl/preferences override settings in, for example,
+<p>If file &rsquo;preferences&rsquo; exists in both directories, the settings in
+$HOME/.config/gnu-apl/preferences override settings in, for example,
 /etc/gnu-apl.d/preferences.
 </p>
 <p>Command line options in turn override settings in &rsquo;preferences&rsquo; files.
@@ -792,9 +785,9 @@ $HOME/.gnu-apl/preferences override settings in, for example,
 <div class="section" id="File-Names-and-Paths">
 <h3 class="section">1.5 File Names and Paths</h3>
 
-<p>The GNU APL interpreter is a binary file named apl. It is usually
+<p>The GNU APL interpreter is a binary file named &rsquo;apl&rsquo;. It is usually
 installed in directory /usr/bin/ or in /usr/local/bin/. The location
-where apl is installed can be changed via ./configure options
+where &rsquo;apl&rsquo; is installed can be changed via ./configure options
 (see file INSTALL).
 </p>
 <p>GNU APL understands 4 file types:
@@ -802,16 +795,16 @@ where apl is installed can be changed via ./configure options
 <ol>
 <li> APL workspaces that can be manipulated with the )LOAD, )SAVE,
  )COPY, and )DROP commands. APL workspaces are XML files and must have a
- file extension of .xml in order to be accepted by GNU APL. APL workspaces
- can only be exchanged between machines that all run GNU APL.
+ file extension of .xml to be accepted by GNU APL. APL workspaces can only
+ be exchanged between machines that all run GNU APL.
 
 </li><li> APL exchange files can be manipulated with the )IN and )OUT
  commands. APL exchange files are text files in ⎕TF format defined by IBM
  (basically APL expressions that create variables or functions)
- and must have a file extension of .atf in order to be accepted by GNU APL.
- APL exchange files can be exchanged between machines running APL interpreters from
- different vendors. The ⎕TF format can be easily emulated on machines not
- providing compatible )IN and )OUT commands.
+ and must have a file extension of .atf to be accepted by GNU APL.
+ APL exchange files can be exchanged between machines running APL
+ interpreters from different vendors. The ⎕TF format can be easily emulated
+ on machines not providing compatible )IN and )OUT commands.
 
 </li><li> APL scripts consist of APL commands and APL expressions (including
  function definition via ∇) like they would be entered by the user.
@@ -821,9 +814,9 @@ where apl is installed can be changed via ./configure options
  format with the )DUMP command.
 
 </li><li> APL testcase files are similar to APL scripts, but in addition to
- the APL commands and expression they also contain the expected output from
- from the commands 
- APL testcase files normally have have a file extension of .tc for normal
+ the APL commands and expressions they also contain the expected output
+ from the commands.
+ APL testcase files normally have a file extension of .tc for normal
  (functional) testcases and .pt for performance testcases.
  APL testcase files are, for example, the files expected for the
  -T command line option.
@@ -856,7 +849,7 @@ where apl is installed can be changed via ./configure options
 </p>
 <p>)WSID       [name]
 </p>
-<p>The rules how file names are constructed from the argument(s) of an APL
+<p>The rules for how file names are constructed from the argument(s) of an APL
 command are:
 </p>
 <ol>
@@ -866,7 +859,7 @@ command are:
 as default.
 
 </li><li> if the name is optional and missing then the workspace ID (the name
-set with )WSID) is used.
+set with the )WSID command) is used.
 
 </li><li> if the file extension (i.e. .xml or .atf) is missing then it is
 appended automatically to name.
@@ -957,7 +950,7 @@ Next: <a href="#Chapter-3" accesskey="n" rel="next">Limitations and Missing Feat
 <li><a href="#Section-2_002e15">User-defined Commands</a></li>
 <li><a href="#Section-2_002e16">Structured Variables and Associative Arrays</a></li>
 <li><a href="#Section-2_002e17">Monadic ⊢ and ⊣, dyadic ⊢ with Axis</a></li>
-<li><a href="#Section-2_002e18">Bit-wise Logical Functions ⊤∧, ⊤∨, ⊤⍲, ⊤⍱, T≠, and T=</a></li>
+<li><a href="#Section-2_002e18">Bit-wise Logical Functions ⊤∧, ⊤∨, ⊤⍲, ⊤⍱, ⊤≠, and ⊤=</a></li>
 <li><a href="#Section-2_002e19">Generalized ⍳</a></li>
 <li><a href="#Section-2_002e20">⌹[X] - QR Factorization</a></li>
 <li><a href="#Section-2_002e21">Dyadic ⎕CR</a></li>
@@ -1051,8 +1044,8 @@ work, the first line of the script must have a special format
 <pre class="verbatim">    #! /usr/local/bin/apl --script
 </pre>
 <p><b><tt>--script</tt></b> prevents: printing of a welcome banner, 
-echoing of stdin to stdout, automatic loading of a )CONTINUE workspaces,
- and prevents starting of a thread for shared variable communication.
+echoing of stdin to stdout, automatic loading of a )CONTINUE workspace,
+and prevents starting of a thread for shared variable communication.
 </p>
 <p>If the path to the interpreter is relative (which might be useful if you
 do not know in advance where the APL interpreter will be installed) then
@@ -1076,17 +1069,17 @@ passed on to APL. We briefly discuss both cases:
 </p>
 <p>0. General Remark
 </p>
-<p>There is a convention in (not only) GNU APL, that the command line options (and
-possibly an optional option argument) that occur left of <b><tt>--</tt></b> are options
-directed to (and understood by) the APL interpreter while the options right
-of <b><tt>--</tt></b> are passed to the APL application (and their exact format is then
-defined by the APL application). All command line options that were used to
-start APL can later be retrieved with the system variable ⎕ARG in APL.
+<p>There is a convention in (not only) GNU APL, that the command line options
+(and possibly an optional option argument) that occur left of <b><tt>--</tt></b> are
+options directed to (and understood by) the APL interpreter while the options
+right of <b><tt>--</tt></b> are passed to the APL application (and their exact format is
+then defined by the APL application). All command line options that were used
+to start APL can later be retrieved with the system variable ⎕ARG in APL.
 </p>
 <p>Example 1: APL started directly
 </p>
 <p>We start APL with some command line options and display them with ⎕ARG.
-The command line options for the interpreter are &ndash;silent, &ndash;id, and 1010,
+The command line options for the interpreter are &ndash;silent, -l, and 37,
 while the options app1 and app2 are for the APL application:
 </p>
 <pre class="verbatim">$ apl --silent -l 37 -- app1 app2
@@ -1101,7 +1094,7 @@ app2
 </pre>
 <p>Example 2: APL started indirectly
 </p>
-<p>A script is is a text file file which as execute permissions. The first line
+<p>A script is is a text file which as execute permissions. The first line
 of a script, commonly known as the <b>shebang</b> of the script, has a
 special format which specifies how the subsequent lines of the script file
 shall be processed, see <b>man execve</b> for details.
@@ -1112,8 +1105,8 @@ either APL commands or APL statements. With some limitations, executing such
 an APL script yields the same result as entering the subsequent lines in
 immediate execution mode.
 </p>
-<p>When APL is started directly, then there is only one (possibly empty) set
- of command lines options, which are processed by the shell and then passed
+<p>When APL is started directly, there is only one (possibly empty) set of
+command line options, which are processed by the shell and then passed
 to the apl binary.
 </p>
 <p>Starting APL indirectly refers to executing an APL script. In this case
@@ -1121,10 +1114,10 @@ there are two sets of command line options:
 </p>
 <ul>
 <li> those passed to the script as command line arguments, and
-</li><li> those on the shebang line of the scripts
+</li><li> those on the shebang line of the script
 </li></ul>
 
-<p>When the APL script is started, possibly with command line arguments, then the
+<p>When the APL script is started, possibly with command line arguments, the
 command line arguments entered by the user are combined with the arguments
 on the shebang line of the script in a way that is described in &rsquo;man 2 execve&rsquo;.
 </p>
@@ -1133,7 +1126,7 @@ with GNU APL):
 </p>
 <pre class="verbatim">#! /usr/local/bin/apl --id 1010 --script
 
-      ⊃⎕ARG      ⍝ show command line options
+      ⊃⎕ARG     ⍝ show command line options
       )OFF      ⍝ leave the interpreter
 
 </pre>
@@ -1157,7 +1150,7 @@ and other executables) in the following order:
 </p>
 <p>1. Interpreter name (the first name in the shebang, here: /usr/local/bin/apl)
 </p>
-<p>2. Optional Interpreter arguments (here: &mdash;-script)
+<p>2. Optional Interpreter arguments (here: &ndash;script)
 </p>
 <p>3. Script filename (here: ./SCRIPT.apl)
 </p>
@@ -1180,12 +1173,12 @@ understood:
 <p>The recommended form is: <tt>/usr/local/bin/apl --script</tt>.
 </p>
 <p>Note that <b><tt>--</tt></b> and any options that follow it on the shebang line
-MAY OR MAY NOT be occur in ⎕ARG (this depends on the platform used). In
-contrast,  options that follow <b><tt>--</tt></b> on the script command line
+MAY OR MAY NOT be included in ⎕ARG (this depends on the platform used).
+In contrast, options that follow <b><tt>--</tt></b> on the script command line
 WILL BE shown since this is controlled by GNU APL and not by the platform.
 There is normally no point in passing any application options on the shebang
 line to APL because such parameters can more easily be provided directly
-further down in the script. However in cases where the script has only
+further down in the script. However, in cases where the script has only
 application options it may be convenient to make <b><tt>--</tt></b> the last
 option of the shebang so that the user of the script need not specify it
 manually.
@@ -1196,8 +1189,8 @@ subsequent options on the shebang line from being interpreted as APL options
 starts). At least under GNU/Linux with <b>bash</b> the subsequent options will
 be passed to the APL application via ⎕ARG.
 </p>
-<p>Depending on this exact behavior cannot be recommended. A cleaner approach is
-to use options starting with - or <b><tt>--</tt></b> only for the interpreter
+<p>Depending on this exact behavior cannot be recommended. A cleaner approach
+is to use options starting with - or <b><tt>--</tt></b> only for the interpreter
 options, and options starting with + for application options. This should
 work on all platforms because for strings, say, APLOPT, ARG1, ARG2, ...,
 which contain no whitespace:
@@ -1253,8 +1246,8 @@ vector:
 </li><li> by means of environment variables
 </li></ul>
 
-<p>Just like the system variable ⎕ARG makes the command line options used
-available to APL, does the system function ⎕ENV make the environment
+<p>Just as the system variable ⎕ARG makes the command line options used
+available to APL, so does the system function ⎕ENV make the environment
 variables available to APL. Since there normally exist far more
 environment variables than command line options, ⎕ENV is a monadic function
 whose argument is a filter for the name(s) of the variable(s) to be retrieved.
@@ -1295,7 +1288,7 @@ BODY ← BODY , ⊂ 'Third line'
    ...
 </pre>
 <p>The above is obviously not very handy for longer texts. Instead you may
-write the following in a GNU  APL script:
+write the following in a GNU APL script:
 </p>
 <pre class="verbatim">BODY←⎕INP 'END-OF-⎕INP'
 First line
@@ -1327,9 +1320,8 @@ Time is now: 2022 8 4 15 15 2 177
 Third line                       
 ...         
 </pre>
-
 <p>It should be noted that, while ⎕INP simplifies the construction of multi-line
-strings compared to standard APL, it has come to age and these days an even
+strings compared to standard APL, it has come of age and these days an even
 simpler feature - Multi-line strings as described below - is provided for the
 same purpose. The monadic ⎕INP has therefore become obsolete.
 </p>
@@ -1353,11 +1345,10 @@ scalar if its length is = 1. This is sometimes inconvenient and therefore
 double-quoted strings are more consistent in always being vectors regardless
 of their length. In other words, &rsquo;A&rsquo; is a scalar while &quot;A&quot; is a vector.
 
-</li><li> doubly quoted strings understand the standard C escape sequences
-for control character, such as \n for ASCII line feed, \t for ASCII TAB etc.
+</li><li> Double-quoted strings understand the standard C escape sequences
+for control character, such as \n for ASCII line feed, \t for ASCII TAB, etc.
 
 </li></ul>
-
 
 <hr>
 </div>
@@ -1368,8 +1359,8 @@ Next: <a href="#Subsection-2_002e1_002e7" accesskey="n" rel="next">Automatic )MO
 </div>
 <span id="Multi_002dLine-Strings"></span><h4 class="subsection">2.1.6 Multi-Line Strings</h4>
 
-<p>A substantial disadvantage of ⎕INP is that it only works in immediate execution
-mode (and consequently also in .apl scripts), but not the bodies of
+<p>A substantial disadvantage of ⎕INP is that it only works in immediate
+execution mode (and consequently also in .apl scripts), but not the bodies of
 defined functions. Multi-line strings fill this gap for string literals that
 span several lines of text <b>inside</b> the body of a defined functions.
 Multi-Line Strings have become more and more advanced (and elegant) over time.
@@ -1384,9 +1375,9 @@ ones will disappear in the long run).
 <div class="subsubsection" id="Old_002dstyle-Multi_002dLine-Strings">
 <h4 class="subsubsection">2.1.6.1 Old-style Multi-Line Strings</h4>
 
-<p>Old-style multi-line strings were the first attempt to provide long strings for
-defined functions. The idea for the old-style multi-line strings was adopted
-from shells like <b>bash</b> where, for example,
+<p>Old-style multi-line strings were the first attempt to provide long strings
+for defined functions. The idea for the old-style multi-line strings was
+adopted from shells like <b>bash</b> where, for example,
 </p>
 <pre class="verbatim">echo &quot;Line1
    Line2&quot;
@@ -1405,9 +1396,9 @@ because they could easily be entered by mistake (by simply forgetting the
 terminating &quot; or &rsquo; of a standard string) and that would have obscured the
 familiar behavior of immediate execution mode. In function definition
 mode, the total number of function lines is known and it can therefore
-checked if a multi-line string inside the function is properly terminated.
+check if a multi-line string inside the function is properly terminated.
 Immediate execution mode, however, is open-ended and therefore a forgotten
-closing &quot;&quot;&quot; can lead to a fatal misinterpretation of (intended) string
+closing &quot; can lead to a fatal misinterpretation of (intended) string
 content as (unintended) APL code, with lots of nonsense error messages.
 </p>
 <p>Like in <b>bash</b> and also other shells, an old-style multi-line string starts
@@ -1458,15 +1449,15 @@ ABC
 <div class="subsubsection" id="New_002dstyle-Multi_002dLine-Strings">
 <h4 class="subsubsection">2.1.6.2 New-style Multi-Line Strings</h4>
 
-<p>The combination of <b>⎕INP</b> for immediate execution mode and multi-line strings
-for defined functions achieved, at least in principle, the goal of
+<p>The combination of <b>⎕INP</b> for immediate execution mode and multi-line
+strings for defined functions achieved, at least in principle, the goal of
 specifying large amounts of text in a simpler manner than in standard APL.
 However, having different methods for creating multi-line string literals
 in different APL modes could not convince entirely.
 </p>
-<p>The search for a more intuitive and more consistent solution was then
-leading to new-style multi-line strings. These strings adopted the triple
-quote (&quot;&quot;&quot;) syntax know from e.g. the Python language. The syntax of new-style
+<p>The search for a more intuitive and more consistent solution then led to
+new-style multi-line strings. These strings adopted the triple quote (&quot;&quot;&quot;)
+syntax known from e.g. the Python language. The syntax of new-style
 multi-line strings is cleaner: empty lines are handled more consistently and
 the string lines are completely separated from the APL code lines.
 More importantly, new-style multi-line strings work alike in immediate
@@ -1480,8 +1471,8 @@ An old-style string starts with APL code and ends with the first line of
 the string, while a new-style string starts with an APL code line and
 the string itself begins at the following line.
 
-</li><li> the ending &quot;&quot;&quot; must be placed at the end of a separate lines with only
-spaces allowed before the &quot;&quot;&quot; (to horizontally align indent) it with the
+</li><li> the ending &quot;&quot;&quot; must be placed at the end of a separate line with only
+spaces allowed before the &quot;&quot;&quot; (to horizontally indent-align it with the
 leading &quot;&quot;&quot; if so  desired). In old-style strings the text up to the
 termination &quot; is part of the string while in new-style strings it is not.
 
@@ -1503,25 +1494,25 @@ ABC
 ┃┗━━━┛ ┗━━━━┛ ┗━┛ ┗━━━━━━━┛┃
 ┗∊━━━━━━━━━━━━━━━━━━━━━━━━━┛
 </pre>
-<p>When entering a new-style multi-line strings then the prompt is prefixed by
-→ to indicate that a Multi-Line String is being entered.
+<p>When entering new-style multi-line strings, the prompt is prefixed by → to
+indicate that a Multi-Line String is being entered.
 </p>
-<p>⎕INP and old-style strings will coexist for a while, but may disappear at some
-point in time.
+<p>⎕INP and old-style strings will coexist for a while, but may eventually
+disappear at some point in time.
 </p>
 </div>
 <div class="subsubsection" id="g_t_00ab-_00bb-Strings">
 <h4 class="subsubsection">2.1.6.3 « » Strings</h4>
 
 <p>When new-style multi-line strings are used in scripts then the related error
-reporting (if the syntax used incorrectly) can become cumbersome. For example,
-if one forgets the closing &quot;&quot;&quot; of a multi-line string then the next &quot;&quot;&quot;
-(which was meant as the start of a new multi-line string) is mistaken as the
-(forgotten) end of the previous one. The often long content of
+reporting (if the syntax is used incorrectly) can become cumbersome. For
+example, if one forgets the closing &quot;&quot;&quot; of a multi-line string then the next
+&quot;&quot;&quot; (which was meant as the start of a new multi-line string) is mistaken as
+the (forgotten) end of the previous one. The often long content of
 the new string is then parsed as APL code and will usually produce many
 error messages, all of them nonsense. Things get worse if the script itself
-is long because the odd/even nature of the quotes will then persists until
-then end of the string (or at least until the next forgotten quote, if any).
+is long because the odd/even nature of the quotes will then persist until
+the end of the string (or at least until the next forgotten quote, if any).
 </p>
 <p>To deal with this problem, GNU APL also allows strings whose contents are
 enclosed in double angle quotation marks « and ». In inline strings &rsquo;...&rsquo;
@@ -1592,26 +1583,24 @@ min index=⎕IO (=1), offending index=4, max index=⎕IO+2 (=3)
       )MORE
 NO )MORE ERROR INFO
 
-@verbatim
-
-This is rather useful in purely interactive mode where the user can issue
-the )MORE command directly after an APL error has occurred, as to figure
+</pre>
+<p>This is rather useful in purely interactive mode where the user can issue
+the )MORE command directly after an APL error has occurred to help figure
 out what exactly went wrong. In a script, however, the standard )MORE command
 (as inherited from IBM APL2) is fairly useless for two reasons:
-
-@itemize
-@item An human user has a chance to issue the )MORE command interactively
+</p>
+<ul>
+<li> A human user has a chance to issue the )MORE command interactively
 after an error has occurred, while a script continues after displaying the
 error message, and
-@item It is rather difficult to predict where the next errors will occur,
+</li><li> It is rather difficult to predict where the next errors will occur,
 i.e. where to place the )MORE command in the script.
-@end itemize
+</li></ul>
 
-To make the )MORE command more useful for scripts, it can in GNU APL be
+<p>To make the )MORE command more useful for scripts, in GNU APL it can be
 augmented with an optional argument AUTO like this:
-
-@verbatim
-      )MORE AUTO ON
+</p>
+<pre class="verbatim">      )MORE AUTO ON
 Automatic )MORE is now: ON
       
       &quot;ABC&quot;[4]
@@ -1623,7 +1612,6 @@ INDEX ERROR+
 <p>If ON/OFF is omitted then the automatic )MORE mode is toggled. The additional
 )MORE information is displayed before the standard 3-line APL error message.
 </p>
-
 <hr>
 </div>
 <div class="subsection" id="Subsection-2_002e1_002e8">
@@ -1635,15 +1623,15 @@ Previous: <a href="#Subsection-2_002e1_002e7" accesskey="p" rel="prev">Automatic
 
 <p>Note that the two different ways of running an APL script have an impact on
 how ⎕ARG looks like. If stdin is redirected then there is only one (possibly
-empty) set of command line options. Otherwise there are two set of command line
-options: command line options for the apl interpreter and command line options
-for the script.
+empty) set of command line options. Otherwise there are two sets of command
+line options: command line options for the apl interpreter and command line
+options for the script.
 </p>
 <p>Consider the following simple script called SCRIPT.apl in directory workspaces:
 </p>
 <pre class="verbatim">#! /usr/local/bin/apl --script
 
-⊃⎕ARG    ⍝ show command line options
+⊃⎕ARG   ⍝ show command line options
 )OFF    ⍝ leave the interpreter
 </pre>
 <p>If SCRIPT.apl is redirected to stdin of the APL interpreter:
@@ -1664,9 +1652,8 @@ is not indented.
 </p>
 <pre class="verbatim">      #! /usr/local/bin/apl --script
       
-      ⎕ARG      ⍝ show command line options
+      ⊃⎕ARG     ⍝ show command line options
       )OFF      ⍝ leave the interpreter
-
 
 </pre>
 <p>If we run the same script directly:
@@ -1681,7 +1668,7 @@ is not indented.
 </pre>
 <p>The <b><tt>--script</tt></b> implies <b><tt>--noCIN</tt></b> so that the
 input lines for the interpreter are no longer echoed to the output.
-That is most likely what you want when writing a script.
+This is most likely what you want when writing a script.
 </p>
 <p>Also, the first line of the script is no longer ignored as a comment,
 but controls the command line argument (and thus ⎕ARG) of the interpreter.
@@ -1718,13 +1705,13 @@ attempt to ∇-open existing function with new function header
 <p>In contrast to a user who can react to the DEFN ERROR, a script cannot detect
 this situation and would continue to push lines (which were intended to be
 the body of the defined function) into the APL interpreter. That would most
-likely cause a fairly undesirable behavior.  For example, if the lines of
+likely cause fairly undesirable behavior.  For example, if the lines of a
 defined function start with line numbers (like [1], [2], ...) then every
 such line would give a SYNTAX ERROR, and other errors can be expected as
 well.
 </p>
 <p>For that reason, if the ∇-editor is used in a script and attempts to redefine
-an existing defined function then the existing function is simply overridden
+an existing defined function then the existing function is simply overwritten
 with the new one and no DEFN ERROR is raised.
 </p>
 <hr>
@@ -1773,7 +1760,7 @@ Next: <a href="#Section-2_002e4" accesskey="n" rel="next">Comparison Rules</a>, 
 <p>The APL interpreter gets its input from the standard input (stdin),
 which is normally connected to the user&rsquo;s keyboard,
 but can also be a file if APL scripting, the <b><tt>-f</tt></b> option,
- or the <b><tt>-T</tt></b> option is used.
+or the <b><tt>-T</tt></b> option is used.
 </p>
 <p>The APL interpreter prints its results on either the standard output (stdout)
 for normal APL output, or to the error output (stderr) for additional
@@ -1805,57 +1792,57 @@ Next: <a href="#Section-2_002e5" accesskey="n" rel="next">Complex Numbers</a>, P
 
 <p>Both IBM APL2 and the ISO standard require that the arguments of &lt;, ≤, ≥,
 and &gt; (but not of = or ≠) are integer or real numbers. As a consequence,
-the argument(s) of ⍋ or ⍒ (which require comparison) must also a vector of
-integer or real numbers.
+the argument(s) of ⍋ or ⍒ (which require comparison) must also be a vector
+of integer or real numbers.
 </p>
 <p>In contrast, GNU APL also allows the comparison of characters and numbers or
 the comparison of complex numbers according to the following, more general,
 rules.
 </p>
-<p>Let A and B two APL values to be compared. Then the final result of comparing
-A and B is the first verdict (i.e. either A &lt; B, or A &gt; B, or A = B) obtained
-when following the rules below (and in that order):
+<p>Let A and B be two APL values to be compared. The final result of comparing
+A and B is the first verdict (i.e. either A &lt; B, or A &gt; B, or A = B)
+obtained when following the rules below in the indicated order:
 </p>
 <ol>
-<li> Comparison by rank: if (⍴⍴A) &lt; (⍴⍴B) then A &lt; B. And vice versa.
+<li> Comparison by rank: if (⍴⍴A) &lt; (⍴⍴B) then A &lt; B and vice versa.
 
-</li><li> Comparison by shape: if (⍴A) &lt; (⍴B) then A &lt; B. And vice versa. The
+</li><li> Comparison by shape: if (⍴A) &lt; (⍴B) then A &lt; B and vice versa. The
 first differing shape item (from the left) decides.
 
 </li><li> Comparison of ravel elements: at this point (⍴A) ≡ (⍴B). If all
 corresponding ravel elements of A and B are equal (i.e. tolerantly equal
 within ⎕CT as defined in the ISO standard) then A = B.
 
-<p>Otherwise let A1 and B1 the first corresponding ravel elements of A and B
+<p>Otherwise let A1 and B1 be the first corresponding ravel elements of A and B
 with A1 ≠ B1. If A1 &lt; B1 then A &lt; B and vice versa. The comparison A1 &lt; B1
-is made according to the following rules 4. - 7. below.
+is made according to the following rules 4 - 8 below.
 </p>
 </li><li> Comparison by depth:
 
 <ul>
-<li> If A1 and B1 are both nested: the rules 1. - 4. above are (recursively)
+<li> If A1 and B1 are both nested: the rules 1 - 3 above are (recursively)
 applied to corresponding ravel elements of ⊃A1 and ⊃B1 until a verdict is
 obtained.
 
-</li><li> if A1 is simple and B1 is nested then A &lt; B. And vice versa.
+</li><li> if A1 is simple and B1 is nested then A &lt; B and vice versa.
 
-</li><li> otherwise (i.e.  A1 and B1 are both simple): A &lt; B if A1 &lt; B1 according to
-rules 5. - 8. below. And vice versa.
+</li><li> otherwise (i.e. A1 and B1 are both simple): A &lt; B if A1 &lt; B1 according to
+rules 5 - 8 below and vice versa.
 </li></ul>
 
 </li><li> Comparison by Unicode: if A1 and B1 are both character values and
-(⎕UCS A1) &lt; (⎕UCS B1) then A &lt; B. And vice versa.
+(⎕UCS A1) &lt; (⎕UCS B1) then A &lt; B and vice versa.
 
-</li><li> Comparison by type: If A1 is a character and B1 is numeric, then A &lt; B.
-And vice versa.
+</li><li> Comparison by type: If A1 is a character and B1 is numeric, then A &lt; B
+and vice versa.
 
 </li><li> Comparison by numeric value: if A1 and B1 are both numeric values then:
 
 <ul>
-<li> Comparison by real part: if (9○A1) &lt; (9○B1) then A &lt; B. And vice versa.
+<li> Comparison by real part: if (9○A1) &lt; (9○B1) then A &lt; B and vice versa.
 
-</li><li> Comparison by imaginary part: otherwise if (11○A1) &lt; (11○B1) then A &lt; B.
-And vice versa.
+</li><li> Comparison by imaginary part: otherwise if (11○A1) &lt; (11○B1) then A &lt; B
+and vice versa.
 </li></ul>
 
 </li><li> Otherwise: A = B.
@@ -1876,7 +1863,7 @@ following order:
 </li><li> the imaginary parts of numeric values,
 </li></ul>
 
-<p>Note: Rules 1. and 2. above are only relevant for comparisons made in the
+<p>Note: Rules 1 and 2 above are only relevant for comparisons made in the
 context of sorting (i.e. for ⍋ or ⍒). This is because for =, ≠, &lt;, ≤, ≥,
 or &gt; either a RANK ERROR or a LENGTH ERROR is raised if the ranks or shapes
 of A and B do not match:
@@ -1894,7 +1881,7 @@ by their imaginary part and not, for example, first by their magnitude and
 then by their angle is that the chosen order gives more consistent results
 when comparing near-complex numbers or their true real companions. For
 example, a magnitude first comparison of complex numbers would make
-¯2 &lt; ¯1 &lt; ¯2J0E¯20 for the near-complex number ¯2J0E¯20.
+¯2 &lt; ¯1 &lt; ¯2J1E¯20 for the near-complex number ¯2J1E¯20.
 </p>
 <p><b>CAUTION</b>: The comparison of two strings (i.e. nested character
 vectors) may give unexpected results because shorter strings come before
@@ -1928,7 +1915,6 @@ Next: <a href="#Section-2_002e6" accesskey="n" rel="next">Debug Commands</a>, Pr
 
 <p>Complex numbers are fully supported.
 </p>
-
 <hr>
 </div>
 <div class="section" id="Section-2_002e6">
@@ -1972,14 +1958,14 @@ limited form.
 </p>
 <pre class="verbatim">      FUN ← { body_statement } 
 </pre>
-<p>creates a named lambda. body_statement can contain variable names ⍺ and ⍵
+<p>creates a named lambda. A body_statement can contain variable names ⍺ and ⍵
 as well as function names ⍶ and ⍹ which are replaced by the actual arguments
 of the lambda. If both ⍺ and ⍵ are present in body_statement then the lambda
 is dyadic. If only ⍵ is present then it is monadic, and if neither ⍺ nor ⍵ is
 present then the lambda is niladic.
 </p>
 <p>Likewise, if ⍶ and ⍹ are present then the lambda is a dyadic operator. If only
- ⍶ is present then it is a monadic operator, and if neither ⍶ nor ⍹ is present
+⍶ is present then it is a monadic operator, and if neither ⍶ nor ⍹ is present
 then the lambda is a normal function.
 </p>
 <p>GNU APL supports an axis argument in normal user defined functions and
@@ -1988,7 +1974,7 @@ name for an axis argument.
 </p>
 <p>The way a named lambda is implemented in GNU APL is that the expression
 </p>
-<pre class="verbatim">      FUN ← { body_expression }
+<p>both </p><pre class="verbatim">      FUN ← { body_expression }
 </pre>
 <p>is translated to a two-line function ⎕FX &rsquo;lambda_header&rsquo; &rsquo;body_expression&rsquo;.
 </p>
@@ -2093,21 +2079,21 @@ between them.
 dest/WSNAME/index.html         ⍝ for e.g. ]DOXY dest
 </pre></div>
 
-<p>The index.html files above usually corresponds to the following URIs in your
+<p>The index.html files above usually correspond to the following URIs in your
 browser:
 </p>
 <div class="example">
-<pre class="example">file:///tmp/WSNAME   resp.
-file:///absolute-path-to-dest/WSNAME
+<pre class="example">file:///tmp/WSNAME or
+file:///absolute-path-to-dest/WSNAME respectively.
 </pre></div>
 
-<p>In the above examples is WSNAME the )WSID of the workspace in which the ]DOXY
+<p>In the above examples WSNAME is the )WSID of the workspace in which the ]DOXY
 command was executed.
 </p>
 <p>One can (and should make it a habit to) insert special comments into defined
-function which are copied into proper places inside the documentation that is
+functions which are copied into proper places inside the documentation that is
 generated by the ]DOXY command. These &quot;Doxy&quot; comments begin with ⍝⍝ (as opposed
-to  &quot;normal&quot; APL comments that start with a single ⍝. Doxy comments are
+to &quot;normal&quot; APL comments that start with a single ⍝. Doxy comments are
 typically one-liners that briefly explain what a function is supposed to do.
 </p>
 <p>For example:
@@ -2119,7 +2105,6 @@ typically one-liners that briefly explain what a function is supposed to do.
  Z←A + B
 ∇
 </pre>
-
 <hr>
 </div>
 <div class="section" id="Section-2_002e9">
@@ -2140,8 +2125,8 @@ Next: <a href="#Section-2_002e10" accesskey="n" rel="next">]NEXTFILE and ]PUSHFI
 <div class="subsection" id="g_t_0029DUMP-Command">
 <h4 class="subsection">2.9.1 )DUMP Command</h4>
 
-<p>GNU APL has a command )DUMP that saves a workspace to disk, similar to command
- )OUT.  The difference to command )OUT is the file format being produced.
+<p>GNU APL has a command )DUMP that saves a workspace to disk, similar to the
+)OUT command.  The difference between them is the file format being produced.
 While )OUT produces a file in IBM&rsquo;s workspace interchange format (aka. an
 .atf file), )DUMP produces a file in GNU APL&rsquo;s script format (i.e. readable
 APL statements). Files written with )DUMP can be edited with normal text
@@ -2156,8 +2141,7 @@ scripting).
 is similar to the )DUMP command, the difference is that those characters
 that need HTML-escaping (e.g. &rsquo;&lt;&rsquo; becomes &amp;lt;, &rsquo;&gt;&rsquo; becomes &rsquo;&amp;gt;) are being
 HTML-escaped. The output of the )DUMP-HTML command can therefore be directly
-used by a web server to display workspace listings (in order to share the
-code).
+used by a web server to display workspace listings (to share the code).
 </p>
 <p>The files written with command )DUMP-HTML have the extension <b>.html</b>.
 </p>
@@ -2175,7 +2159,7 @@ from some other workspace into the current workspace similar to )COPY.
 However, )COPY_ONCE does this only once; a second invocation of
 )COPY_ONCE with the same workspace (and the same library reference number)
 is silently being ignored. This speeds up the )COPYing of libraries that
-occur in several )DUMPed or )SAVEd workspace.
+occur in several )DUMP-ed or )SAVE-ed workspaces.
 </p>
 <hr>
 </div>
@@ -2223,13 +2207,13 @@ This workspace does the following...
 <div class="subsection" id="g_t_005dPUSHFILE">
 <h4 class="subsection">2.10.2 ]PUSHFILE</h4>
 
-<p>The debug command ]PUSHFILE is similar to ]NEXTFILE in that it terminates the
-processing of the current script file. Unlike ]NEXTFILE, ]PUSHFILE does
+<p>The debug command ]PUSHFILE is similar to ]NEXTFILE in that it terminates
+the processing of the current script file. Unlike ]NEXTFILE, ]PUSHFILE does
 not proceed to the next script file but enters a new immediate execution
 context in which the user can interact with the interpreter. This context
-can be processes input until a ]NEXTFILE command is given. After the
-]NEXTFILE that leaves the immediate execution context processing proceeds
-at the next line after the ]PUSHFILE command.
+processes user input until a ]NEXTFILE command is given. After a ]NEXTFILE
+command, the immediate execution context processing proceeds at the next
+line after the ]PUSHFILE command.
 </p>
 <hr>
 </div>
@@ -2247,15 +2231,15 @@ key would expand file names) and history (the cursor up/down keys would recall
 previously entered lines).
 </p>
 <p>Since SVN 465 libreadline was removed and the standard TAB expansion and
-history of libreadline were replaced by more context sensitive (i.e. APL
+histoSection 2.12ry of libreadline were replaced by more context sensitive (i.e. APL
 aware) implementations:
 </p>
 <p>1. Instead of simply recalling the last line entered by the user, there are
-   now different histories for different input contexts:
+now different histories for different input contexts:
 </p>
 <p>1a. The input history in immediate execution recalls the last line entered
- in immediate execution (and not, for example, lines entered in function
- editing mode or ⍞ input.
+in immediate execution (and not, for example, lines entered in function
+editing mode or ⍞ input.
 </p>
 <p>1b. Likewise, ⍞ recalls the last line entered for ⍞-input
 </p>
@@ -2266,20 +2250,19 @@ can be recalled. This is far more handy than the ∇-editor commands for
 recalling function lines (and which are not fully supported in GNU APL).
 </p>
 <p>2. Instead of always TAB-completing file names, the tab character now
-  understands different TAB-completion contexts:
+understands different TAB-completion contexts:
 </p>
 <p>2a. Input starting with . or / is completed as a filename like readline did.
 </p>
 <p>2b. Input starting with ) or ] is completed as command name name or, to some
-   extent, as command arguments.
+extent, as command arguments.
 </p>
 <p>2c. Input starting with ⎕ is completed as a system function name or a
-    system variable name.
+system variable name.
 </p>
 <p>2d. Input starting with letters, ∆, or ⍙ is completed as a user defined
-    function or variable name.
+function or variable name.
 </p>
-
 <hr>
 </div>
 <div class="section" id="Section-2_002e12">
@@ -2291,13 +2274,13 @@ Next: <a href="#Section-2_002e13" accesskey="n" rel="next">Rational Numbers</a>,
 
 <p>The APL interpreter has over 30 logging facilities. Each logging facility
 can be ON (and then produces some logging output on stderr) or OFF. The
-decision which logging facility shall be ON and which shall be  OFF can be
+decision which logging facility shall be ON and which shall be OFF can be
 made at compile time (of the APL interpreter) or at run-time. 
 </p>
 <p>If the decision is made at compile time - we call that static logging - then
 it cannot be changed later on. Otherwise - we call that dynamic logging -
-there is a debug command ]LOG that allows to turn logging facilities to be
-turned ON or OFF.
+there is a debug command ]LOG that allows logging facilities to be turned
+ON or OFF.
 </p>
 <ul class="section-toc">
 <li><a href="#Static-Logging" accesskey="1">Static Logging</a></li>
@@ -2309,12 +2292,11 @@ turned ON or OFF.
 <p>By default the logging facilities that shall be turned ON are defined
 statically. To change the logging facilities that shall be turned ON,
 you can edit the file src/Logging.def which defines the different logging
-facilities. The first argument of macro log_def() tells if the logging
-facility shall be ON (1) or OFF (0).
+facilities. The first argument of macro log_def() specifies that the
+indicated logging facility shall be ON (1) or OFF (0).
 </p>
 <p>Static logging results in a faster interpreter than dynamic logging because
-the decision if something shall be logged or not is made at compile time
-and not at run-time.
+the decision to log something is made at compile time and not at run-time.
 </p>
 <p>If you benchmark the APL interpreter, then ./configure Static Logging by
 NOT setting DYNAMIC_LOG_WANTED=yes.
@@ -2368,7 +2350,6 @@ in most cases it is slower.
 <p>For that reason support for rational numbers is disabled by default and must
 be enabled via ./configure (see README-2-configure).
 </p>
-
 <hr>
 </div>
 <div class="section" id="Section-2_002e14">
@@ -2434,8 +2415,8 @@ Next: <a href="#Section-2_002e17" accesskey="n" rel="next">Monadic ⊢ and ⊣, 
 </div>
 <span id="Structured-Variables-and-Associative-Arrays"></span><h3 class="section">2.16 Structured Variables and Associative Arrays</h3>
 
-<p>GNU APL has implemented two features that are closely related because, under the
-hood, they share the same implementation: <b>structured variables</b> and
+<p>GNU APL has implemented two features that are closely related because, under
+the hood, they share the same implementation: <b>structured variables</b> and
 <b>associative arrays</b>.
 </p>
 <ul class="section-toc">
@@ -2465,20 +2446,20 @@ a member <b>street</b>.
 normal variables apply. They can be created, erased, and even passed as
 arguments to functions. <b>Nota bene</b>: Some GNU APL operators are implemented
 as macros (i.e. internal defined APL functions). The macros may call APL
-primitives that invalidate fact that a value is structured, and as a
-consequence the operator results may become plain APL values. If this happens,
-then the structured nature of a plain APL value can be restored with 38 ⎕CR.
+primitives that invalidate the fact that a value is structured and, as a
+consequence, the operator results may become plain APL values. If this happens,
+the structured nature of a plain APL value can be restored with 38 ⎕CR.
 </p>
 <p>A structured variable is created by assigning a value to one of its members.
 For example:
 </p>
-<pre class="verbatim">      PERSON.firstname ← 'Jane'   ⍝ create variable PERSON with member 'firstname'
-      PERSON.lastname  ← 'Doe'    ⍝ add a second member 'lastname' to PERSON
+<pre class="verbatim">      PERSON.firstname ← 'Jane' ⍝ create variable PERSON with member 'firstname'
+      PERSON.lastname  ← 'Doe'  ⍝ add a second member 'lastname' to PERSON
 </pre>
 <p>The depth of a newly created member can be more than one. In this case the
 intermediate members are created automatically. For example:
 </p>
-<pre class="verbatim">      PERSON.address.street ←  '42 Main Street'   ⍝ implicitly creates PERSON.address
+<pre class="verbatim">      PERSON.address.street ← '42 Main Street' ⍝ implicitly creates PERSON.address
 </pre>
 <p>Empty structured variables can be created with <b>38 ⎕CR</b>:
 </p>
@@ -2488,11 +2469,11 @@ intermediate members are created automatically. For example:
 added to it. From time to time this expansion exceeds the space allocated
 for the members of the variable and then the existing members need to be
 copied into a new, larger structure. The overhead caused by this reorganization
-can be avoided by specifying a sufficiently large capacity when the structure is
-created (with <b>38 ⎕CR</b>).
+can be avoided by specifying a sufficiently large capacity when the structure
+is created (with <b>38 ⎕CR</b>).
 </p>
 <p>An entire structured variable can be erased with <b>⎕EX</b> or with
-<b>)ERASE</b> just like other variables. That erases the variable along
+<b>)ERASE</b> just like other variables. They erase the variable along
 with all its members. In addition to erasing an entire structured variable,
 individual members at any depth can also be erased with <b>⎕EX</b> or
 <b>)ERASE</b>:
@@ -2501,14 +2482,14 @@ individual members at any depth can also be erased with <b>⎕EX</b> or
       )ERASE PERSON.address      ⍝ error: PERSON.address does not exist anymore
 NOT ERASED: PERSON.address
 </pre>
-<p>After having been created, the members of a structured variable can be referenced
-and overridden just like normal variables:
+<p>After having been created, the members of a structured variable can be
+referenced and overwritten just like normal variables:
 </p>
 <pre class="verbatim">      PERSON.address.street ←  '42 Main Street'   ⍝ create member address.street
       PERSON.address.street   ⍝ reference member address.street of PERSON
 42 Main Street
 
-      PERSON.address.street ←  '44 Main Street'   ⍝ override address.street
+      PERSON.address.street ←  '44 Main Street'   ⍝ overwrite address.street
       PERSON.address.street
 44 Main Street
 </pre>
@@ -2521,12 +2502,12 @@ to the file system on a computer. This tree has:
 </li><li> zero or more non-leafs (like sub-directories of the top-level root
   directory), and
 
-</li><li> zero or more leafs. The case of zero non-leafs occurs, for example, directly
-  after a new empty variable was created with <b>38 ⎕CR</b>.
+</li><li> zero or more leafs. The case of zero non-leafs occurs, for example,
+directly after a new empty variable was created with <b>38 ⎕CR</b>.
 </li></ul>
 
-<p>Due to their tree-like structure, structured variables need to be printed somewhat
-different than normal APL variables. For example:
+<p>Due to their tree-like structure, structured variables need to be printed
+somewhat differently than normal APL variables. For example:
 </p>
 <pre class="verbatim">      PERSON
 .firstname: ┌→───┐
@@ -2566,7 +2547,7 @@ structured variable is valid and concatenates the members:
 <pre class="verbatim">      )ERASE A
       A.b.c ← 'leaf-Abc'      ⍝ variable A with leaf A.b.c
       C.d.e ← 'leaf-cde'      ⍝ variable C with leaf C.d.e
-      A.b.c ← C               ⍝ override leaf A.b.c of A
+      A.b.c ← C               ⍝ overwrite leaf A.b.c of A
       A.b.c.d.e
 leaf-cde
 </pre>
@@ -2577,11 +2558,11 @@ above (and more)
 <div class="subsection" id="Associative-Arrays">
 <h4 class="subsection">2.16.2 Associative Arrays</h4>
 
-<p>APL arrays are primarily indexed with numbers (or arrays of numbers), which is
-also the most efficient method. Many other languages provide, in either addition
-or else alternatively, a method to index arrays by <b>keys</b>, where the keys
-are frequently characters strings. Such arrays are commonly referred to
-as <b>associative arrays</b>.
+<p>APL arrays are primarily indexed with numbers (or arrays of numbers), which
+is also the most efficient method. Many other languages provide, either in
+addition or else alternatively, a method to index arrays by <b>keys</b>, where
+the keys are frequently character strings. Such arrays are commonly referred
+to as <b>associative arrays</b>.
 </p>
 <p>APL has no associative array per se, but the structured variables in GNU APL
 can be used for the same purpose. The only limitation is (currently) that the
@@ -2613,8 +2594,8 @@ DOMAIN ERROR
       D['key' 'key']
 
 </pre>
-<p>Strings that do not follow the rules for variable names can be used with bracket
-index, but not with the .member syntax:
+<p>Strings that do not follow the rules for variable names can be used with
+bracket index, but not with the .member syntax:
 </p>
 <pre class="verbatim">      ASSOC ← 38 ⎕CR 8
       KEY←'key.dot'   ⍝ works, but avoid such keys
@@ -2660,7 +2641,7 @@ member access: member b.c was not found. The valid members are:
 
       ⍝ alternatively: use PICK
       ⍝
-      'b' 'c' ⊃ D   ⍝ fails: 'b' 'c' is 'ab'
+      'b' 'c' ⊃ D   ⍝ fails: 'b' 'c' is 'bc'
       &quot;b&quot; &quot;c&quot; ⊃ D   ⍝ works
 42
 
@@ -2706,7 +2687,7 @@ is ⍴ASSOC_ARRAY[;1] and the capacity is ↑⍴ASSOC_ARRAY.
 <div class="section" id="Section-2_002e17">
 <div class="header">
 <p>
-Next: <a href="#Section-2_002e18" accesskey="n" rel="next">Bit-wise Logical Functions ⊤∧, ⊤∨, ⊤⍲, ⊤⍱, T≠, and T=</a>, Previous: <a href="#Section-2_002e16" accesskey="p" rel="prev">Structured Variables and Associative Arrays</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Section-2_002e18" accesskey="n" rel="next">Bit-wise Logical Functions ⊤∧, ⊤∨, ⊤⍲, ⊤⍱, ⊤≠, and ⊤=</a>, Previous: <a href="#Section-2_002e16" accesskey="p" rel="prev">Structured Variables and Associative Arrays</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
 <span id="Monadic-_005b_003f_005d-and-_22a3_002c-dyadic-_005b_003f_005d-with-Axis"></span><h3 class="section">2.17 Monadic ⊢ and ⊣, dyadic ⊢ with Axis</h3>
 
@@ -2718,25 +2699,24 @@ non-committed) right argument and returns a committed integer scalar 0.
 </p>
 <p>For the most part there is no difference between a committed value (= a value
 that was assigned to a variable, including ⎕ and ⍞) and a non-committed value.
-The point where it does make a difference is when the value the final result
+The point where it does make a difference is when the value is the final result
 of a statement (as opposed to an intermediate result inside a statement). In
 that situation (and only there) a non-committed value is being printed while
 a committed value is not.
 </p>
-<p>You can use ⊢ is a similar fashion as ⎕← at the left end of a statement,
-in order to print a value even though it was previously assigned to a
-variable.
+<p>You can use ⊢ in a similar fashion as ⎕← at the left end of a statement,
+to print a value even though it was previously assigned to a variable.
 </p>
 <p>The main motivation for ⊣ is that, at least in GNU APL, lambdas always return
-a value. However, if a lambda is used only for the sake of its side effects, say
-to print something, then the value returned by the lambda is often of no
+a value. However, if a lambda is used only for the sake of its side effects,
+say to print something, then the value returned by the lambda is often of no
 interest and only messes up the APL output. In that situation ⊣ can be used
 to suppress the printing of undesired return values from lambdas.
 </p>
 <p>In earlier GNU APL versions, ⊣B and ⊢B would both return B; with ⊣ as committed
 value and with ⊢ as non-committed value. But since the only real-life purpose
 of ⊣ is to suppress the printing of B, the implementation of ⊣ was changed to
-returning an committed integer scalar 0 instead of committed B. That reduced
+returning a committed integer scalar 0 instead of committed B. That reduced
 the run-time of ⊣B from O(,B) to O(1). Also, ⊢B is marginally faster than ⎕←B.
 </p>
 <p>Dyadic ⊢ with axis is a selection function that generalizes ⊣ and ⊢.
@@ -2746,10 +2726,9 @@ the run-time of ⊣B from O(,B) to O(1). Also, ⊢B is marginally faster than �
 <ul>
 <li> if X is a one-element vector and ↑X is 0 then Z ≡ A,
 </li><li> if X is a one-element vector and ↑X is 1 then Z ≡ B,
-</li><li> otherwise X selects corresponding items of A resp. B if the correspondent
- elements of X are 0 or 1 respectively. In that case, the shapes of A and B
- must match the shape of X, but one-element A or B are scalar extended to the
- shape of X.
+</li><li> otherwise X selects items of A or B if the corresponding elements of
+X are 0 or 1 respectively. In that case, the shapes of A and B must match
+the shape of X, but one-element A or B are scalar extended to the shape of X.
 </li></ul>
 
 <p>Example:
@@ -2778,13 +2757,12 @@ a*c
 <p>
 Next: <a href="#Section-2_002e19" accesskey="n" rel="next">Generalized ⍳</a>, Previous: <a href="#Section-2_002e17" accesskey="p" rel="prev">Monadic ⊢ and ⊣, dyadic ⊢ with Axis</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
-<span id="Bit_002dwise-Logical-Functions-_005b_003f_005d_005b_003f_005d_002c-_005b_003f_005d_005b_003f_005d_002c-_005b_003f_005d_005b_003f_005d_002c-_005b_003f_005d_005b_003f_005d_002c-T_005b_003f_005d_002c-and-T_003d"></span><h3 class="section">2.18 Bit-wise Logical Functions ⊤∧, ⊤∨, ⊤⍲, ⊤⍱, T≠, and T=</h3>
+<span id="Bit_002dwise-Logical-Functions-_005b_003f_005d_005b_003f_005d_002c-_005b_003f_005d_005b_003f_005d_002c-_005b_003f_005d_005b_003f_005d_002c-_005b_003f_005d_005b_003f_005d_002c-_005b_003f_005d_005b_003f_005d_002c-and-_005b_003f_005d_003d"></span><h3 class="section">2.18 Bit-wise Logical Functions ⊤∧, ⊤∨, ⊤⍲, ⊤⍱, ⊤≠, and ⊤=</h3>
 
 <p>The APL functions And (∧), Or (∨), Nand (⍲), and Nor (⍱) operate primarily on
-Boolean integers. Primarily means that the the LCM variant for ∧
-and the GCD variant for ∨ are not considered in this context. (The LCM and
-GCD variants are defined in the ISO standard and supported in GNU APL but
-not in IBM APL2).
+Boolean integers. Primarily means that the LCM variant for ∧ and the GCD
+variant for ∨ are not considered in this context. (The LCM and GCD variants
+are defined in the ISO standard and supported in GNU APL but not in IBM APL2).
 </p>
 <p>However, probably more often than not one needs to compute Boolean functions
 between the bits of arbitrary (non-Boolean) integers and not between entire
@@ -2798,9 +2776,10 @@ and
 </li><li> convert the Boolean result vector R back to the integer result Z←2⊥R
 </li></ul>
 
-<p>Note: for Boolean arguments the APL functions ≠ resp. = can be used to compute
-the more customary Boolean functions XOR and XNOR. In this context = and ≠ are
-treated as Boolean functions even though they accept non-Boolean arguments,
+<p>Note: for Boolean arguments the APL functions ≠ and = can be used to compute
+the more customary Boolean functions XOR and XNOR respectively. In this context
+= and ≠ are treated as Boolean functions even though they accept non-Boolean
+arguments,
 </p>
 <p>For example, using  5 ⎕CR (4⍴256)⊤X to display X in hex:
 </p>
@@ -2813,7 +2792,7 @@ ABBADEAD
 00BA00AD
 
 </pre>
-<p>With the bit-wise <b>And</b> (∣∧) the same can be achieved in a simpler fashion
+<p>With the bit-wise <b>And</b> (⊤∧) the same can be achieved in a simpler fashion
 and far more efficiently:
 </p>
 <pre class="verbatim">      ⍝ Traditional AND
@@ -2849,8 +2828,9 @@ variants of their Boolean counterparts:
 <div class="subsection" id="Monadic-_005b_003f_005d_005b_003f_005d-and-_005b_003f_005d_005b_003f_005d">
 <h4 class="subsection">2.18.2 Monadic ⊤∨ and ⊤⍱</h4>
 
-<p><b>⊤∧</b> and <b>⊤⍲</b> do not have a monadic form, but <b>⊤∧</b>, <b>⊤∨</b>, and <b>⊤⍱</b> do.
-Formally monadic <b>⊤∨</b> resp, <b>⊤⍱</b> are dyadic <b>⊤∨</b> resp, <b>⊤⍱</b> with
+<p><b>⊤=</b>, <b>⊤≠</b>, and <b>⊤⍲</b> do not have a monadic form, but <b>⊤∧</b>, <b>⊤∨</b>,
+and <b>⊤⍱</b> do.
+Formally monadic <b>⊤∨</b> and <b>⊤⍱</b> are dyadic <b>⊤∨</b> and <b>⊤⍱</b> with
 a left argument of 0:
 </p>
 <pre class="verbatim">      ⊤∨ B    ←→    0 ⊤∨ B      ⍝ real B to nearby integer
@@ -2913,16 +2893,16 @@ be farther away from a nearby integer than smaller numbers). The two concepts
 differ in the same way that absolute and relative errors do.
 </p>
 <p>Now, all bit-wise functions described so far use the first concept, i,e,
-if their their arguments are real or complex, then the smallest distance to
+if their arguments are real or complex, then the smallest distance to
 a (nearby) integer must not exceed the <b>integer tolerance</b>. In some contexts
 that could be difficult to achieve and for that reason GNU APL provides
 monadic ⊤∧ which works like ⊤∨ except that the permitted distance from a
 nearby integer is now controlled by ⎕CT rather than by the integer tolerance.
 </p>
 <p>All bit-wise logical functions throw a DOMAIN ERROR if an argument is not close
-enough to an integer. integer tolerance is typically smaller than ⎕CT and
-in that case is ⊤∧ little more tolerant than ⊤∨ regarding the distance to
-nearby integers. In addition ⊤∧ gives the user (via ⎕CT) more control over
+enough to an integer. The <b>integer tolerance</b> is typically smaller than ⎕CT
+and in that case ⊤∧ is a little more tolerant than ⊤∨ regarding the distance
+to nearby integers. In addition ⊤∧ gives the user (via ⎕CT) more control over
 the permitted tolerance for real numbers in the neighborhood of integers.
 </p>
 </div>
@@ -2938,7 +2918,7 @@ as well. This can be useful for masking purposes such as extracting the lower
 </p>
 <pre class="verbatim">      5⎕CR 'A'
 41
-      5⎕CR ⊤⍱'A'                 ⍝ Note that 5⎕CR aka. ⎕CR.to_HEX ANDs with $FF
+      5⎕CR ⊤⍱'A'            ⍝ Note that 5⎕CR aka. ⎕CR.to_HEX ANDs with $FF
 BE
 
       256 256 256 256⊤ ⎕UCS ⊤⍱ 'A'      ⍝ ⊤⍱ 'A' is FFFFFFBE
@@ -2952,7 +2932,7 @@ BE
 <div class="section" id="Section-2_002e19">
 <div class="header">
 <p>
-Next: <a href="#Section-2_002e20" accesskey="n" rel="next">⌹[X] - QR Factorization</a>, Previous: <a href="#Section-2_002e18" accesskey="p" rel="prev">Bit-wise Logical Functions ⊤∧, ⊤∨, ⊤⍲, ⊤⍱, T≠, and T=</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
+Next: <a href="#Section-2_002e20" accesskey="n" rel="next">⌹[X] - QR Factorization</a>, Previous: <a href="#Section-2_002e18" accesskey="p" rel="prev">Bit-wise Logical Functions ⊤∧, ⊤∨, ⊤⍲, ⊤⍱, ⊤≠, and ⊤=</a>, Up: <a href="#Chapter-2" accesskey="u" rel="up">Non-standard GNU APL Features</a> &nbsp; [<a href="#SEC_Contents" title="Table of contents" rel="contents">Contents</a>]</p>
 </div>
 <span id="Generalized-_005b_003f_005d"></span><h3 class="section">2.19 Generalized ⍳</h3>
 
@@ -3006,7 +2986,7 @@ computation. Set X←⎕CT if unsure.
 <p>The result Z is a triple (QT R Ri)←Z with the following properties.
 Let ⍴B=(M, N).
 </p>
-<p>* QT is an orthogonal M×M matrix, i.e QT<sup>-1</sup> = QT<sup>T</sup>, resp. QT +.× ⍉QT
+<p>* QT is an orthogonal M×M matrix, i.e QT<sup>-1</sup> = QT<sup>T</sup>, and QT +.× ⍉QT
  is the M×M identity matrix I<sub>M</sub> (with I<sub>M</sub>←∘.=⍨⍳M).
 </p>
 <p>* R is an upper triangular M×N matrix, i.e. R[m;n] = 0 for n &lt; m, and
@@ -3139,7 +3119,7 @@ the the number of linearly independent columns of <b>B</b>. If that number is
 smaller than the total number of columns (IOW some columns of <b>B</b> are
 linearly dependent) then a <b>DOMAIN ERROR</b> is raised before the computation
 of <b>⌹B</b> starts. Although <b>B</b> may be over-determined (so it may have more
-rows than columns and in that case the rows of <b>B</b> can not be linearly
+rows than columns and in that case the rows of <b>B</b> cannot be linearly
 independent) it may <i>not</i> have linearly dependent columns.
 </p>
 <p>Now, for every real or complex number <b>⍺</b> does <b>⎕CT</b> define a range
@@ -3201,7 +3181,7 @@ if a matrix item close to 0.0 shall be set to 0.0 or not (APL functions
 implement <b>A TOL X</b> and <b>A CPR B</b>). GNU APL uses the example
 implementation given in the Helzer paper. The <b>TOL</b> and <b>CPR</b>
 functions seem to be related to what is elsewhere known as the
- <i>condition number</i> of the matrix that is being factorized. In the LApack
+<i>condition number</i> of the matrix that is being factorized. In the LApack
 case, the parameter <b>RCOND</b> of FORTRAN function <b>xcDGELSY</b> is set
 to <b>⎕CT</b>.
 </p>
@@ -3237,8 +3217,8 @@ vectors are frequently used arguments and results of ⎕FIO functions.
 <p>A=0-4 or 7-9, or 29: various formatting styles (boxed, APL input/output, etc.).
 Just try them out.
 </p>
-<p>A=5 resp. A=6: convert byte vector B to a string of uppercase resp. lowercase
-hex digits. Every byte in B becomes 2 characters in Z.
+<p>A=5 or 6: convert byte vector B to a string of uppercase or lowercase
+hex digits respectively. Every byte in B becomes 2 characters in Z.
 </p>
 <p>A=10: convert variable named in B to an APL expression producing it.
 </p>
@@ -3281,14 +3261,14 @@ part of a complex number, or the denominator of a rational number) of B[I].
 </p>
 <p>A=30: Z is B with all top-level elements conformed to a common rank and
 shape (as required by the ⍤ operator). This conversion is primarily used 
-internally bu the GNU APL interpreter.
+internally by the GNU APL interpreter.
 </p>
 <p>A=31 or A=32: These conversions are used internally by ⎕INP.
 </p>
 <p>A=33: convert tagged byte vector to a TLV (Tag/Length/Value) buffer. The TLV
 buffer can be sent over a byte stream (socket) and easily decoded at the other
 end. Say B = B[1], B[2], ..., B[n] such that B1 is an Integer (the tag) and
-B[j] is a character in the range 0.255 for j &gt; 1. Let Z←33 ⎕CR B with
+B[j] is a character in the range 0-255 for j &gt; 1. Let Z←33 ⎕CR B with
 Z = Z[1], Z[2], ... Z[m]. Then Z[1 2 3 4] is the 4 byte tag, Z[5 6 7 8]
 is the 4 byte data length (n-1) == (m - 8) and 1↓B == 8 ↓ Z. In other words,
 the first 4 bytes of Z are the tag in big endian byte order, the next 4 bytes
@@ -3394,24 +3374,23 @@ Unicode strings.
 </p>
 <p>The GNU APL package also contains other shared libraries as templates
 for your own native functions. Copy one of the files
- src/native/template_F0.cc (for
-niladic native functions), src/native/template_F12.cc (for nomadic native
-functions), src/native/template_OP1.cc (for monadic native operators),
+src/native/template_F0.cc (for niladic native functions),
+src/native/template_F12.cc (for nomadic native functions),
+src/native/template_OP1.cc (for monadic native operators),
 or src/native/template_OP2/cc (for dyadic native operators) to your own
 .cc file and adjust src/native/Makefile.am accordingly.
 </p>
 <p>Note: The )IN and )OUT commands of GNU APL support native functions, but
-in order to do so they have to use dyadic ⎕FX. This renders the workspace
+to do so they have to use dyadic ⎕FX. This renders the workspace
 interchange file (.atf files) written by )OUT incompatible with all other
 APL interpreters if the workspace contains native functions. The )OUT 
-command prints a warning when the )OUT command is used with a
-workspace that contains native functions.
+command prints a warning when it is used with a workspace that contains
+native functions.
 </p>
 <p>Note: As of GNU APL 1.6, the native function FILE_IO has been turned into the
 system function ⎕FIO. The syntax of ⎕FIO is the same as for FILE_IO. The
 )CLEAR workspace command will close all open files. 
 </p>
-
 <hr>
 </div>
 <div class="section" id="Section-2_002e23">
@@ -3424,7 +3403,6 @@ Next: <a href="#Section-2_002e24" accesskey="n" rel="next">⎕DLX - Knuth&rsquo;
 <p>⎕ARG contains the command line arguments with which GNU APL was invoked.
 See <a href="#Section-2_002e1">APL Scripting</a>.
 </p>
-
 <hr>
 </div>
 <div class="section" id="Section-2_002e24">
@@ -3436,14 +3414,14 @@ Next: <a href="#Section-2_002e25" accesskey="n" rel="next">⎕ENV - Environment 
 
 <p>⎕DLX is an implementation of Donald Knuth&rsquo;s Dancing Links Algorithm (called
 DLX by Knuth himself, but is sometimes also referred to as Knuth&rsquo;s Algorithm X).
-⎕DLX is a generic backtracking machinery that can be used to dramatically
+⎕DLX is a generic backtracking machine that can be used to dramatically
 simplify problems like the 8 queens problem on a chess board or sudokus.
 </p>
 <p>The monadic form of ⎕DLX, i.e. ⎕DLX B, is a shortcut for 0 ⎕DLX B. It
 computes the first solution for the constraint matrix B.
 </p>
-<p>The dyadic form of ⎕DLX, i.e. A ⎕DLX B, has a integer scalar A as left argument
-which determines the details of the computation as follows:
+<p>The dyadic form of ⎕DLX, i.e. A ⎕DLX B, has an integer scalar A as left
+argument which determines the details of the computation as follows:
 </p>
 <p>A &gt; 0: The algorithm tries to find all solutions, but stops when A solutions
 have been found. This is handy while debugging code using ⎕DLX. The
@@ -3459,10 +3437,10 @@ solutions (i.e. 0 or 1), the number of backtracks, and the number of
 link dances is returned as a 3-element numeric vector.
 </p>
 <p>A = ¯3: like A = ¯1 but instead of returning all solutions, the number of
-solutions, the number of backtracks, and the number of
-link dances is returned as a 3-element numeric vector.
+solutions, the number of backtracks, and the number of link dances is
+returned as a 3-element numeric vector.
 </p>
-<p>A = ¯4: A number of single step in Knuth&rsquo;s Algorithm are performed. Let e.g.
+<p>A = ¯4: A number of single steps in Knuth&rsquo;s Algorithm are performed. Let e.g.
 A←¯4 r1 r2 r3. Then Z←A ⎕DLX B is the matrix B after 3 steps r1, r2, and r3
 have been performed. r1, r2, and r3 are valid (as per ⎕IO) row numbers of B,
 and a step with a given row changes B as follows:
@@ -3541,10 +3519,10 @@ last solution above.
 <p>The constraint matrix Q8 is the key to success. The matrix has 64 rows - one
 row for every field of the chess board. And it has 8 + 8 + 15 + 15 columns.
 The first 8 columns of Q8 are constraints that prevent more than one Queen
-to be placed in the same row of the chess board (the argument ⍵ is the field
-number counting from left to right and from bottom to top).
+from being placed in the same row of the chess board (the argument ⍵ is the
+field number counting from left to right and from bottom to top).
 The next 8 columns of Q8 are constraints that prevent more than one Queen
-to be placed in the same column of the chess board.
+from being placed in the same column of the chess board.
 </p>
 <p>If we would call ⎕DLX with only these constraints, i.e. ⎕DLX T8←64 16↑Q8,
 then we would get the solutions of the 8 tower problem. However, we continue
@@ -3618,7 +3596,7 @@ constraint matrix Q8 is this:
        1      1       2         2             
        1       1       2       2              
 </pre>
-<p>To see how, for example, the first solution looks like and how it relates
+<p>To see what, for example, the first solution looks like and how it relates
 to the constraints matrix Q8:
 </p>
 <pre class="verbatim">
@@ -3651,7 +3629,6 @@ to the constraints matrix Q8:
       1 0 0 0 0 1
 
 </pre>
-
 <p>And that&rsquo;s it: call ⎕DLX to get the solution(s). In general all problems that
 can be solved by ⎕DLX contain 3 steps:
 </p>
@@ -3678,7 +3655,6 @@ Next: <a href="#Section-2_002e26" accesskey="n" rel="next">⎕FIO - File I/O Fun
 <p>⎕ENV contains the environment variables of the process that is running
 GNU APL. See <a href="#Section-2_002e1">APL Scripting</a>.
 </p>
-
 <hr>
 </div>
 <div class="section" id="Section-2_002e26">
@@ -3691,8 +3667,8 @@ Next: <a href="#Section-2_002e27" accesskey="n" rel="next">⎕FFT - Fast Fourier
 <p>As of GNU APL 1.6, the native function FILE_IO has been replaced by the
 system function ⎕FIO. ⎕FIO normally takes a numeric axis argument which
 selects one of many different functions, most of which are contained in
-the standard C library. The arguments for these function are usually the same
-as the corresponding C function and the man page for each functions describes
+the standard C library. The arguments for these functions are usually the same
+as the corresponding C functions and the man page for each function describes
 the meaning of the arguments.
 </p>
 <p>For example, ⎕FIO[3] corresponds to fopen() and &rsquo;man fopen&rsquo; explains what fopen does (opening a file).
@@ -3804,7 +3780,6 @@ Benchmarking functions:
         Ai ⎕FIO[203] Bs    set dyadic parallel threshold for primitive Bs
 
 </pre>
-
 <p>A new feature of ⎕FIO (which is not available with the native function FILE_IO)
 is ⎕FIO[49]. ⎕FIO[49] is a monadic operator which takes a monadic conversion
 function as function argument. For example:
@@ -3826,7 +3801,6 @@ In other words,
 <div class="example">
 <pre class="example">Z F¨Z←⎕FIO[49] 'filename'
 </pre></div>
-
 
 <hr>
 </div>
@@ -3881,7 +3855,7 @@ multiplies B with a window function and then computes the FFT:
 
 <p>⍴⍴B can be 1 (one-dimensional FFT, the most common case) or more. The
 implementation of ⎕FFT uses libfftw3, aka. &quot;The fastest Fourier Transform in
-the West&quot;. GNU APL checks the presence of libfftw3 when it is ./configure&rsquo;d.
+the West.&quot; GNU APL checks the presence of libfftw3 when it is ./configure&rsquo;d.
 If libfftw3 is present then ⎕FFT will hopefully return the expected result;
 if not then a DOMAIN ERROR will be raised when ⎕FFT is being used.
 </p>
@@ -3931,11 +3905,11 @@ A (valid) JSON string is mapped to an APL value as follows:
 </li></ul>
 
 <ul class="section-toc">
-<li><a href="#Monadic-_005b_003f_005dJSON" accesskey="1">Monadic  ⎕JSON</a></li>
-<li><a href="#Dyadic-_005b_003f_005dJSON" accesskey="2">Dyadic  ⎕JSON</a></li>
+<li><a href="#Monadic-_005b_003f_005dJSON" accesskey="1">Monadic ⎕JSON</a></li>
+<li><a href="#Dyadic-_005b_003f_005dJSON" accesskey="2">Dyadic ⎕JSON</a></li>
 </ul>
 <div class="subsection" id="Monadic-_005b_003f_005dJSON">
-<h4 class="subsection">2.29.1 Monadic  ⎕JSON</h4>
+<h4 class="subsection">2.29.1 Monadic ⎕JSON</h4>
 
 <p>Z←⎕JSON B converts the string B into an APL value according to the mapping
 above. If that fails then command )MORE provides information about the error
@@ -3943,7 +3917,7 @@ and where in B the error was detected.
 </p>
 </div>
 <div class="subsection" id="Dyadic-_005b_003f_005dJSON">
-<h4 class="subsection">2.29.2 Dyadic  ⎕JSON</h4>
+<h4 class="subsection">2.29.2 Dyadic ⎕JSON</h4>
 
 <p>Z←A ⎕JSON B performs one of the following conversions:
 </p>
@@ -3951,8 +3925,7 @@ and where in B the error was detected.
 <li> <b>Z←0 ⎕JSON B</b> is the same as monadic Z←⎕JSON B.
 
 </li><li> <b>Z←1 ⎕JSON B</b> is like Z←0 ⎕XML B, except that B is not the JSON
-string itself but the name of a file from which an JSON string
-is read.
+string itself but the name of a file from which a JSON string is read.
 
 </li><li> <b>Z←2 ⎕JSON B</b> is the inverse of Z←0 ⎕XML B. It converts an APL
 value to a JSON string.
@@ -3992,13 +3965,12 @@ constructed from their corresponding items B[...] in B as follows:
 <p>In other words, Z is B, but with items of B found in A[;1] replaced by their
 mapped item A[;2].
 </p>
-<p>In practice th left argument A is frequently created from a literal APL value
-such as 5 2⍴&rsquo;eEwWaAzZ92&rsquo; in the example below. To simplify these cases, A ⎕MAP B
-also accepts a vector instead of a N×2 matrix:
+<p>In practice the left argument A is frequently created from a literal APL value
+such as 5 2⍴&rsquo;eEwWaAzZ92&rsquo; in the example below. To simplify these cases,
+A ⎕MAP B also accepts a vector instead of a N×2 matrix:
 </p>
 <p>A ⎕MAP B   ←→   ((N 2)⍴A) ⎕MAP B   if (2×N)   ←→    ⍴A
 </p>
-
 <p>Examples:
 </p>
 <pre class="verbatim">      ⍝ the map A
@@ -4037,12 +4009,11 @@ corresponding item in the result is the item in B.
 also nested) item in B, then the corresponding item in the result will be
 A[N;2] (which may or may not be nested). If a (nested or not nested) key A[N;1]
 is equal to an item in B, then the corresponding item in the result will be
-nested iff A[N;2] is nested. If, for some N, the depths of A[N;1] and A[N;2]
+nested if A[N;2] is nested. If, for some N, the depths of A[N;1] and A[N;2]
 differ, then then depths of B and A ⎕MAP B may differ as well. That is, ⎕MAP
 conserves the shape of B, but not necessarily the depth of B.
 
-</li><li> 
-By default the mapping of B is non-recursive, i.e. the top-level items of
+</li><li> By default the mapping of B is non-recursive, i.e. the top-level items of
 B are compared with the top-level keys A[;1], and nested keys and items of B
 are handled as described above.
 
@@ -4068,7 +4039,6 @@ shown in the examples below.
 ┗∊━━━━━━━━━━━━━━━━┛
 
 </pre>
-
 <hr>
 </div>
 <div class="section" id="Section-2_002e31">
@@ -4147,7 +4117,7 @@ in text mode see file <b>doc/PLOT_circle.png</b>):
 <p>On the other hand, if a data item B[N] or B[row;N] is <b>real</b>, then it is
 placed at position (N, x) of the plot. The X-range is then
 [⎕IO ... ⎕IO + ¯1↑⍴B] and the Y-range [Y<sub>min</sub> ... Y<sub>max</sub>] of the
-plot is determined by the values parts of B. That is:
+plot is determined by the values of B. That is:
 </p>
 <pre class="verbatim">Xmin ← ⎕IO             ⍝ smallest real part of B
 Xmax ← ¯1 + ⎕IO + ⍴B   ⍝ largest real part of B
@@ -4173,7 +4143,7 @@ all real items in B are taken as complex with imaginary part 0.
 <h4 class="subsection">2.31.2 The Plot Attributes A</h4>
 
 <p>There are a number of attributes like colors, point sizes, line widths,
-etc. that control how the resulting plot will look like.
+etc. that control how the resulting plot will look.
 </p>
 <p>Similar to ⎕CR and ⎕FIO, an empty argument B in ⎕PLOT B displays a list of
 the arguments. The list of arguments grows over time and therefore the list
@@ -4181,7 +4151,6 @@ displayed by <b>⎕PLOT ⍬</b> may be more up-to-date than this description.
 For example:
 </p>
 <pre class="verbatim">
-
    ⎕PLOT Usage:
 
    ⎕PLOT B     plot B with default attribute values
@@ -4322,21 +4291,21 @@ See <a href="#Output-File-Format">Output File Format</a> below.
 </pre>
 <p>writes the plot of a a zigzag curve to file <b>/tmp/bitmap.png</b>.
 </p>
-<p><b>Caution</b>: ⎕PLOT with attribute <b>output_filename</b> overrides existing
+<p><b>Caution</b>: ⎕PLOT with attribute <b>output_filename</b> overwrites existing
 files without any warning). Errors, most likely lack of permissions to write
 the output file, raises a DOMAIN ERROR with )MORE possibly providing details
-as to while the file could not be written.
+as to why the file could not be written.
 </p>
-<p>Some line attributes such as <b>line_width</b> or <b>point size</b> are
+<p>Some line attributes such as <b>line_width</b> or <b>point_size</b> are
 frequently the same for several or even all plot lines. In that case one can
-use the line attribute without a -N resp. _N suffix which is then used as the
-default for all lines (unless overridden by the same attribute with -N resp.
+use the line attribute without a -N or _N suffix which is then used as the
+default for all lines (unless overridden by the same attribute with -N or
 _N suffix.
 </p>
 <p>For example:
 </p>
 <pre class="verbatim">Attributes.line_width   ← 2   ⍝ all plot lines:     2 pixels thick,
-Attributes.line_width-2 ← 4   ⍝ except plot line 2: 4 pixels thick
+Attributes.line_width_2 ← 4   ⍝ except plot line 2: 4 pixels thick
 </pre>
 <ul class="section-toc">
 <li><a href="#Tick-formatting-_0028GTK-only_0029" accesskey="1">Tick formatting (GTK only)</a></li>
@@ -4346,14 +4315,14 @@ Attributes.line_width-2 ← 4   ⍝ except plot line 2: 4 pixels thick
 
 <p>By default, the ticks on the X, Y, and Z axes show the naked value
 of their corresponding coordinates. Sometimes you may want them to look a
-litte differen, e.g. by adding units to the numbers. This can be achieved
+little different, e.g. by adding units to the numbers. This can be achieved
 with window properties <b>format_X/Y/Z</b>, possibly accompanied by property
 <b>gridX_variable</b>.
 </p>
 <p>The properties <b>format_X/Y/Z</b> may be set to a format string that allows
 the value that is being displayed at the ticks. The format is a string that
 is a mix of static text and <b>tick items</b>. A <b>tick item</b> is computed
-from the displayed value or ifrom its position on the axis. There are
+from the displayed value or from its position on the axis. There are
 two different types of tick items: static and dynamic.
 </p>
 <p>A <b>static tick item</b> starts with <b>%s</b>, followed by one or more texts,
@@ -4399,7 +4368,7 @@ ATT ⎕PLOT X + 0J1×Y
 plot points along the X axis instead of drawing an X-grid and visually
 guessing the X-values between the vertical grid lines. This can be achieved
 with setting <b>gridX_variable</b> to 1. Usually the X-coordinates are evenly
-distributed alone their axis while the Y and Z-coordinates are not. For this
+distributed along their axis while the Y and Z-coordinates are not. For this
 reason there is no <b>gridY_variable</b> or <b>gridZ_variable</b>.
 </p>
 
@@ -4410,11 +4379,11 @@ reason there is no <b>gridY_variable</b> or <b>gridZ_variable</b>.
 
 <p>Each call of ⎕PLOT with some plot data <b>B</b> opens a separate window in the X
 server (which implies that ⎕PLOT requires X). That window runs in its own
-thread until it is being closed. A plot window can be closed in different ways:
+thread until it is closed. A plot window can be closed in different ways:
 </p>
 <ul>
 <li> interactively by clicking on the close button (often located near the
-      top-right corner)  of the plot window,
+      top-right corner) of the plot window,
 </li><li> interactively by opening the drop down menu (if any) of the window
       (near the top left-of the window) and selecting the menu option named
       <b>Close</b>,
@@ -4427,9 +4396,9 @@ thread until it is being closed. A plot window can be closed in different ways:
 </li></ul>
 
 <p>Note that the exact method for closing a plot window interactively with the
-mouse or the keyboard (as opposed to programmatically <b>⎕PLOT ¯3</b> or
+mouse or the keyboard (as opposed to programmatically with <b>⎕PLOT ¯3</b> or
 <b>⎕PLOT H</b> from APL) differs between different window managers. The above
-stands for the typical method(s) for closing windows on most systems.
+corresponds to the typical method(s) for closing windows on most systems.
 </p>
 <hr>
 </div>
@@ -4451,16 +4420,15 @@ or in plot line legends.
 file formats.
 </p>
 <p><b>libxcb</b> is the older of the two libraries and it therefore produces the
-older file format <b>.bmp</b> (bitmaps). <b>libgtk-3</b> is the newer
-library and it produces the somewhat newer file format <b>.png</b>
-(portable network graphics). There are tools like <b>convert</b> from package
-<b>imagemagick</b> that can be used to convert different image file formats
-into each other and therefore this incompatibility should not cause too much 
-trouble.
+older file format <b>.bmp</b> (bitmaps). <b>libgtk-3</b> is the newer library and
+it produces the somewhat newer file format <b>.png</b> (portable network
+graphics). There are tools like <b>convert</b> from package <b>imagemagick</b>
+that can be used to convert different image file formats into each other
+and therefore this incompatibility should not cause too much trouble.
 </p>
 <p>For backward compatibility, the <b>libxcb</b> option for ⎕PLOT will continue
-to exist for some time, but bug fixes and new features will only be made for the
-<b>libgtk-3</b> option.
+to exist for some time, but bug fixes and new features will only be made for
+the <b>libgtk-3</b> option.
 </p>
 <hr>
 </div>
@@ -4495,7 +4463,7 @@ or short colors, as follows:
 <ul>
 <li> a pixel with <strong>one</strong> color defines an uncolored (grayscale)
 pixel between black and white,
-</li><li> a pixel with <strong>two</strong> colors defines a grayscale pixels between
+</li><li> a pixel with <strong>two</strong> colors defines a grayscale pixel between
 black and white, and its opacity (see below),
 </li><li> a pixel with <strong>three</strong> colors defines a colored pixel whose colors
 are red, green and blue (or RGB for short), and
@@ -4554,8 +4522,7 @@ allowed for all images except those with a color table, and so on.
 5 resolutions of the color components. However, the PNG standard allows only
 15 of them, in particular by permitting 1-bit, 2-bit, 4-bit resolutions only
 for grayscale images without alpha channel. The GNU APL color model reduces
-these 15 combinations further to the 4 general types types with the following
-rules:
+these 15 combinations further to the 4 general types with the following rules:
 </p>
 <ul>
 <li> On input, i.e. when reading a PNG image file and producing the APL
@@ -4563,7 +4530,7 @@ array described above, the different resolutions allowed by the PNG standard
 are normalized to a single range of real numbers between 0.0 and 1.0 (this
 is by chance also the range used in the GTK standard used in ⎕PNG and ⎕PLOT).
 </li><li> Also on input, images that use color tables (for compressing the
-image as to reduce the file size) are automatically expanded. The resulting
+image to reduce the file size) are automatically expanded. The resulting
 APL value is therefore independent of the use of color tables.
 </li><li> On output, i.e. when storing the APL array in a PNG file, the
 resolution is 8-bit by default. 8-bit is the only resolution which is valid
@@ -4589,7 +4556,7 @@ would instead have either:
 </li></ul>
 
 <p>It may be useful to note that the human eye can only distinguish around 120
-different colors, i.e. around 7-bit (for all color planes together). For this
+different colors, i.e. about 7 bits (for all color planes together). For this
 reason 16-bit color components are quite an overkill and the 8-bit default
 therefore should be more than sufficient for most purposes.
 </p>
@@ -4610,21 +4577,20 @@ the screen (interactive used of PNG), and
 </p>
 <ul>
 <li> Any APL text vector (i.e. a string) <strong>B</strong> is taken as the name of
-   a file that supposedly contains an image in the PNG format. ⎕PNG will
-  read the file and return the pixels in it as a numeric APL array with rank 3.
-  The array containing the color components of the image in the file as
+  a file that supposedly contains an image in the PNG format. ⎕PNG will
+  read the file and return the pixels in it as a numeric APL array of rank 3.
+  The array contains the color components of the image in the file as
   described above.
 </li><li> Any array <strong>B</strong> with rank 3 must be numeric (with values from
   0.0 to 1.0) and is then assumed to be an array in the GNU APL color model
-  (such as the result of the case above). This image is is being displayed
-  in a new window on the screen; the windows survives even after
-  ⎕PNG has returned.  The result returned by ⎕PNG is a window handle
-  (a positive integer identifying the window) which may later be used
-  (in the case described below) to close the window programmatically
-  from APL.  Alternatively the window can also be closed interactively by
-  the user via its close button.
-</li><li> Finally, if <strong>B</strong> is a numeric scalar then it fine-tunes the
-  ⎕PNG behaviour:
+  (such as the result of the case above). This image is displayed in a new
+  window on the screen; the window survives even after ⎕PNG has returned.
+  The result returned by ⎕PNG is a window handle (a positive integer
+  identifying the window) which may later be used (in the case described
+  below) to close the window programmatically from APL.  Alternatively the
+  window can also be closed interactively by the user via its close button.
+</li><li> Finally, if <strong>B</strong> is a numeric scalar it fine-tunes the ⎕PNG
+behaviour:
 
 <ul>
 <li> ⎕PNG N with N ≥ 1 (as returned in the case above) closes the window 
@@ -4644,7 +4610,7 @@ the screen (interactive used of PNG), and
 <div class="subsection" id="Dyadic-_005b_003f_005dPNG">
 <h4 class="subsection">2.32.3 Dyadic ⎕PNG</h4>
 
-<p>Dyadic <strong>A ⎕PNG B</strong> has only one purposes: to store an APL array in
+<p>Dyadic <strong>A ⎕PNG B</strong> has only one purpose: to store an APL array in
 the GNU APL color model into a PNG file.
 </p>
 <ul>
@@ -4653,7 +4619,7 @@ the GNU APL color model into a PNG file.
   resolution is 8 bits for each color component.
 </li><li> If <strong>A</strong> is a 2-element vector, say <strong>(A1 A2) ← A</strong>,
   then the nested <strong>A1</strong> is the name of a PNG file as before and 
-  <strong>A2</strong> is the reolution (1, 2, 4, 8, or 16) to be used for the
+  <strong>A2</strong> is the resolution (1, 2, 4, 8, or 16) to be used for the
   output file. In this case the combination of the general image format
   (as implied by <strong>↑⍴B</strong>) and resolution <strong>A2</strong> must be a valid
   one in the PNG standard.
@@ -4686,7 +4652,7 @@ the GNU APL color model into a PNG file.
       ⍝ paint all pixels of a monochrome image green
       RGB_Green ← 0 1 0 ⍀ Mono
 
-      ⍝ paint all pixels of a monochrome image green
+      ⍝ paint all pixels of a monochrome image blue
       RGB_Blue ← 0 0 1 ⍀ Mono
 
 </pre>
@@ -4722,7 +4688,6 @@ the same values.
 <p>Note: For compatibility with older workspaces, assigning a single value to
 ⎕PS assigns that value to ⎕PS[2] and sets ⎕PS[1] to 0.
 </p>
-
 <hr>
 </div>
 <div class="section" id="Section-2_002e34">
@@ -4768,7 +4733,7 @@ Z ← A ⎕RE[X] B   (long form, with axis X)
 </pre>
 <p>The short form is equivalent to the long form with an empty axis:
 </p>
-<pre class="verbatim">    A ⎕RE B   ←→   A ⎕RE['] B
+<pre class="verbatim">    A ⎕RE B   ←→   A ⎕RE[''] B
 </pre>
 <p>It therefore suffices to explain the long form. The long form has 3 different
 arguments A, B, and X.
@@ -4780,7 +4745,7 @@ arguments A, B, and X.
 <p>A is a simple character vector which is expected to be a regular expression
 as defined for the libpcre2 library. ⎕RE passes its left argument A unmodified
 to libpcre2. The format of A ranges from very simple REs to very complex REs.
-In fact, regular expressions are a language of their own, and it is impossible
+In fact, regular expressions are a language of their own, and it is unnecessary
 to describe them here. The user of ⎕RE is referred to the description that
 comes with libpcre2.
 </p>
@@ -4808,13 +4773,13 @@ the EACH operator had been applied to ⎕RE:
 the matching (of B) speed. As a consequence, if several strings shall be matched
 with the same regular expression A, then it is (sometimes considerably) faster
 to A ⎕RE B once with several items of a nested B, than to A ⎕RE B multiple
-times with the same A but different Bs. This is in particular the case when
-longer text files with many lines shall be matched.
+times with the same A but different Bs. This is especially true when longer
+text files with many lines will be matched.
 </p>
 <p>If multiple (nested) strings B are used then A is compiled once and after that
-the different ⊃B[i] in B are passed unmodified to libpcre2. In that
-case the result Z is nested and (⍴B) ≡ (⍴Z←A ⎕RE[X] B). We can therefore limit
-the description to the case where B is a simple character vector.
+the different ⊃B[i] in B are passed unmodified to libpcre2. In that case the
+result Z is nested and (⍴B) ≡ (⍴Z←A ⎕RE[X] B). We can therefore limit the
+description to the case where B is a simple character vector.
 </p>
 <p>Any string B that is passed to libpcre2 is called &quot;Subject&quot; in the
 libpcre2 documentation.
@@ -4828,8 +4793,8 @@ string X←<b>&quot;&quot;</b> as axis argument, ⎕RE returns the first match o
 expression A in the string B as an APL string.
 </p>
 <p>By means of the optional axis argument <b>X ≢ &quot;&quot;</b> (in the following called
-flags) one can change the default behavior in order to adapt various aspects
-of the matching to satisfy the requirements that the user of ⎕RE may have.
+flags) one may override the default behavior to adapt various aspects of the
+matching to satisfy the requirements that the user of ⎕RE may have.
 </p>
 <p>The X argument of <b>A⎕RE[X] B</b> is a character vector where each character
 is a flag. Each flag is either understood by (and then passed unmodified to)
@@ -4863,21 +4828,21 @@ of these flags.
 
 <p>⎕RE provides different output formats, some of which are tailored to different
 APL functions, so that these other APL functions can use the result of ⎕RE
-without major conversions . There are currently 4 different output formats:
+without major conversions. There are currently 4 different output formats:
 </p>
 <ul>
 <li> no ⎕RE flag: ⎕RE returns the matching sub-string(s) of B.
 
-</li><li> ↓ flag:  ⎕RE returns the position(s) and the length(s) of the matched
+</li><li> ↓ flag: ⎕RE returns the position(s) and the length(s) of the matched
 sub-string of B, Like other left arguments of ↑ or ↓, the string position(s)
 in the result start at 0 (i.e. not at ⎕IO) and can therefore be used directly
-by dyadic ↓ and ↑. For instance to  cut out the matched pieces.
+by dyadic ↓ and ↑. For instance to cut out the matched pieces.
 
-</li><li> ⊂ flag:  ⎕RE returns an integer vector suitable as the left argument of 
-   partition (dyadic ⊂).
+</li><li> ⊂ flag: ⎕RE returns an integer vector suitable as the left argument of 
+partition (dyadic ⊂).
 
-</li><li> / flag:  ⎕RE returns an Boolean vector suitable as the left argument of 
-   compress (dyadic /).
+</li><li> / flag: ⎕RE returns a Boolean vector suitable as the left argument of 
+compress (dyadic /).
 </li></ul>
 
 <p>The following examples may better explain the nature of the output flags:
@@ -5014,8 +4979,8 @@ it is natural to check the length of the result:
 did not have (regular) sub-expressions. In other words, the regular expression
 A did not contain non-literal (unquoted) parentheses. However, the libpcre2
 allows sub-expressions and ⎕RE follows suit to a certain extent. If A contains
-sub-expressions, then the result A ⎕RE becomes deeper, and the structure of
-the result is determined by the structure of the parentheses in A.
+sub-expressions, the result of A ⎕RE B becomes deeper and the structure of the
+result is determined by the structure of the parentheses in A.
 </p>
 <p>The result of a general regular expression A is recursively constructed by ⎕RE
 as follows:
@@ -5030,8 +4995,8 @@ as follows:
 </p>
 <p>Since the sub-matches are contained in their parent matches, it makes no sense
 to handle sub-matches in the partition and compress output formats. For the
-string and pos+len formats, the following examples may give an insight as to
-how the results look like.
+string and pos+len formats, the following examples may give some insight into
+how the results look.
 </p>
 <p>The regular expression A ← &rsquo;f(.)(.)&rsquo; used in the example below is a top-level
 regular expression which contains two 1-character sub-expressions (.).
@@ -5114,7 +5079,7 @@ subsequently generated random APL values returned by monadic ⎕RVAL.
 override individual default properties of the subsequently produced values,
 followed by one or more calls of monadic ⎕RVAL B.
 </p>
-<p>The default properties, i.e. the properties used unless they were overwritten
+<p>The default properties, i.e. the properties used unless they were overridden
 by dyadic A ⎕RVAL B, are:
 </p>
 <pre class="verbatim">Rank:  0
@@ -5122,7 +5087,7 @@ Shape: 1 1 1 1 1 1 1 1 (initially irrelevant since Rank = 0)
 Type:  0 1 0 0 0       (only integer random values)
 Max. Depth: 4          (initially irrelevant since type = 0 1 0 0 0)
 </pre>
-<p>With these the default properties every call of monadic ⎕RVAL B returns an
+<p>With these default properties, every call of monadic ⎕RVAL B returns an
 integer scalar.
 </p>
 </div>
@@ -5159,15 +5124,15 @@ and
 
 <p>⎕RVAL uses the standard C function random_r(). For this reason ⎕RVAL is
 only available on platforms which use glibc, for example all GNU/Linux
-system.
+systems.
 </p>
 <p>Every random number generator has a state (similar to ⎕RL for &rsquo;?&rsquo;). While
 the primitive ? keeps its state in ⎕RL, i.e. in the workspace, ⎕RVAL has
 no associated system variable like ⎕RL which keeps its state. Instead,
 the user needs to store the state of ⎕RVAL in a workspace variable if the
 workspace shall be stored and continued at a later point. This rarely happens,
-therefore no effort was spent for implementing another system variable. For the
-same reason, the state of ⎕RVAL survives )CLEAR.
+therefore no effort was spent for implementing another system variable. For
+the same reason, the state of ⎕RVAL survives )CLEAR.
 </p>
 <p>The current state of ⎕RVAL&rsquo;s random number generator can be retrieved
 with:
@@ -5179,7 +5144,7 @@ can later be restored to the same state like this:
 </p>
 <pre class="verbatim">      0 ⎕RVAL STATE
 </pre>
-<p>Restoring the state is needed when the same sequence of random value shall
+<p>Restoring the state is needed when the same sequence of random values shall
 be generated again. The random number generators of ? and ⎕RVAL are
 independent; generating a random number or random value with one does not
 change the state of the other.
@@ -5189,16 +5154,16 @@ change the state of the other.
 <h4 class="subsubsection">2.35.2.2 Control of the ranks: 1 ⎕RVAL B</h4>
 
 <p>The rank of subsequently generated random values can be controlled with
-1 ⎕RVAL B as follows.
+1 ⎕RVAL B as follows:
 </p>
 <ul>
-<li> If B is a non-negative scalar B with 0 ≤ B &lt; MAX_RANK then the subsequently
+<li> If B is a non-negative scalar with 0 ≤ B &lt; MAX_RANK then the subsequently
 generated random values will have the fixed rank B. MAX_RANK is a 
 ./configurable constant with a default of 8.
 
-</li><li> If B is a negative scalar B with 0 &gt; B &gt; -MAX_RANK then the ranks of the
+</li><li> If B is a negative scalar with 0 &gt; B &gt; -MAX_RANK then the ranks of the
 subsequently generated random values will be chosen at random between
-0 and -B (including). All possible ranks 0 ... B will have the same
+0 and -B (inclusive). All possible ranks 0 ... B will have the same
 probability P = 100÷1-B %.
 
 </li><li> Otherwise B must be a vector of positive integers. The integers are the
@@ -5220,8 +5185,8 @@ query the current setting for 1 ⎕RVAL.
 </li><li> 1 ⎕RVAL ¯2 will produce scalars, vectors or matrices, each with a
 probability of 100÷3 %, and
 
-</li><li> 1 ⎕RVAL 50 30 20 will produce a scalars with probability 50%, vectors
-with probability 30%, and a matrices with probability 20%. The numbers
+</li><li> 1 ⎕RVAL 50 30 20 will produce scalars with probability 50%, vectors
+with probability 30%, and matrices with probability 20%. The numbers
 need not add up to 100, but will be scaled accordingly.
 </li></ul>
 
@@ -5267,20 +5232,20 @@ generated random values can be controlled with 3 ⎕RVAL B as follows.
 Shorter vectors are filled with 0 (the corresponding types will not occur) and
 longer vectors will raise a LENGTH error.
 </p>
-<p>Once the type was chosen, th  ravel item will be:
+<p>Once the type was chosen, the ravel item will be:
 </p>
 <ul>
 <li> for type CHARACTER: a random character with ⎕UCS between 0 and $3000
-(excluding). Larger Unicodes typically cause display problems. If you need
+(exclusive). Larger Unicodes typically cause display problems. If you need
 larger Unicodes, use ⎕UCS with random integers.
 
 </li><li> for type INTEGER: a random integer with ⎕UCS between -$80000000 and
 $7FFFFFFF.
 
-</li><li> for type REAL: a floating point number between 0.0 and 1.0 (excluding)
+</li><li> for type REAL: a floating point number between 0.0 and 1.0 (exclusive)
 
 </li><li> for type COMPLEX: a complex point number with real and imaginaty part
-between 0.0 and 1.0 (excluding), and
+between 0.0 and 1.0 (exclusive), and
 
 </li><li> for type NESTED: a nested APL value with the same properties (rank, shape,
 and type) as their parent.
@@ -5336,7 +5301,7 @@ the properties have the following defaults:
       4 ⎕RVAL ⍬    ⍝ max. depth (not used since probability of NESTED = 0)
 4
 </pre>
-<p>That is, by default ⎕RVAL ⍬ produces random integer scalars.
+<p>That is, by default, ⎕RVAL ⍬ produces random integer scalars.
 </p>
 <p>It is sometimes convenient to be able to change the properties of the next
 random value without modifying (and later restoring) the properties with
@@ -5445,7 +5410,7 @@ value.
 </p>
 <p>B is the database handle that should be disconnected. After this
 function has been called, no further operations are to be performed
-on this handle. Future calls to ⎕SQL[1]  may reuse previously
+on this handle. Future calls to ⎕SQL[1] may reuse previously
 disconnected handles.
 </p>
 </div>
@@ -5599,7 +5564,7 @@ stack).
 <p>If the optional left argument A is provided then it specifies a particular
 level of the SI instead of the entire SI. A should be an integer scalar.
 If A is positive then the level is counted from the oldest entry to the latest,
-while negative A count from the latest to the oldest level.
+while negative A counts from the latest to the oldest level.
 </p>
 <p>For example, ¯1 ⎕SI refers to the currently executing context, ¯2 ⎕SI is
 the caller, and so on.
@@ -5669,7 +5634,7 @@ if:
 
 <p>Whenever a writable limit is reached, a corresponding LIMIT ERROR
 is reported and the limit is reset to 0 (meaning no limit) in order
-to prevent that the interpreter gets locked up.
+to prevent the interpreter from locking up.
 </p>
 <p>The main use of ⎕SYL is to troubleshoot infinite recursion in user-defined
 function that would otherwise cause the machine to start swapping or to
@@ -5683,9 +5648,9 @@ become non-responding.
 count as values (in the number of values limit), but not in the total ravel
 bytes limit (the ravel does not allocate memory in addition to the
 space already in the number of values limit). It is therefore typical to
-set the number of values limits and the total ravel bytes limits together.
+set the number of values limit and the total ravel bytes limit together.
 </p>
-<p>An attempt to set a too small limit, for example one that is  close to the
+<p>An attempt to set a too small limit, for example one that is close to the
 current value, is rejected with a DOMAIN ERROR.
 </p>
 </div>
@@ -5700,7 +5665,7 @@ of GNU APL, but doing so is not recommended.
 <div class="subsection" id="g_t_005b_003f_005dSYL_005b24-25-26_003b_005d">
 <h4 class="subsection">2.38.3 ⎕SYL[24 25 26;]</h4>
 
-<p>These system limits have been added in preparation of multi-core GNU APL.
+<p>These system limits have been added in preparation for multi-core GNU APL.
 They are currently not used.
 </p>
 </div>
@@ -5716,7 +5681,7 @@ is printed instead of VALUE. The shape SH is computed like this:
 </p>
 <pre class="verbatim">
       SH←⍴VALUE
-      while (ravel-length(SH) ≥ ⎕SYL[27;2])   { divide longest axis in SH by 2 }
+      while (ravel-length(SH) ≥ ⎕SYL[27;2]) { divide longest axis in SH by 2 }
 
 </pre>
 <hr>
@@ -5762,12 +5727,11 @@ Hello
 <li> Conversion of (valid) XML strings to associative APL arrays that can be
   more easily processed in APL than the XML strings,
 </li><li> Conversion of associative APL arrays back to valid XML strings,
-</li><li> Simple (at APL level) access to the data contained in the XML strings, and
+</li><li> Simple (at APL level) access to the data contained in XML strings, and
 </li><li> Transparent access to those (mostly XML specific) portions of the XML
   string that are not (yet) handled by ⎕XML; this means that the user of ⎕XML
   shall be able to handle advanced XML aspects (like document type
-  declarations (DTDs), document validation, etc.) herself in APL and without
-  much overhead.
+  declarations (DTDs), document validation, etc.) in APL without much overhead.
 </li></ul>
 
 </div>
@@ -5802,16 +5766,15 @@ is:
 <li> starts either at the beginning of the XML document or else directly
       after a markup string,
 </li><li> end at the end of the document or else directly before a markup
-      string, and
-      therefore
+      string, and therefore
 </li><li> cannot be adjacent to another non-markup string.
 </li></ul>
 
 <p>Non-markup is sometimes referred to as &quot;unstructured text&quot;. The producer of
-an XML document has a principal choice as to where to put the information
-that the document contains is located: in the unstructured text or in the
-attribute values inside the tags. For that reason the XML standard is somewhat
-picky about keeping the unstructured text as well as attribute values intact
+an XML document has a principal choice about where to locate the information
+that the document contains: in the unstructured text or in the attribute
+values inside the tags. For that reason the XML standard is somewhat picky
+about keeping the unstructured text as well as attribute values intact
 and requires that whitespace in non-markup (the only allowed whitespace
 characters in XML being TAB, CR, LF, and SPACE) is preserved in non-markup
 strings.
@@ -5839,12 +5802,12 @@ preserved.
 </p>
 <ul>
 <li> the nodes of the trees are either Empty Tags or else a start tag,
-   followed by a (possibly empty) sequence of non-markup, comments,  and
+   followed by a (possibly empty) sequence of non-markup, comments, and
    sub-nodes (of the tree), followed by an end tag (with the same name
    as the start tag),
 </li><li> the leafs of the trees are either Empty Tags or else a start tag,
    followed by a (possibly empty) sequence of non-markup and comments,
-   followed by an end tag (with the same name as the start tag)&gt; The difference
+   followed by an end tag (with the same name as the start tag). The difference
    between a leaf node and a non-leaf is therefore the absence of sub-nodes
    between a start and an end tag.
 </li><li> optionally non-markup and comments before, after, and between the nodes.
@@ -5866,7 +5829,7 @@ entities (i.e. &amp;, &lt;, &gt;, &rsquo;, and &quot;) are recognized (and trans
 <ul>
 <li> <b>XML document</b> ←→ structured (top-level) APL value or variable
   (= an associative array)
-</li><li> <b>XML node</b>  ←→ structured APL (sub-) value (= an associative (sub-)
+</li><li> <b>XML node</b> ←→ structured APL (sub-) value (= an associative (sub-)
   array of either the top-level value or of another XML node)
 </li><li> <b>XML name</b> ←→ name of a member in a structured APL value
 </li><li> <b>Other</b> ←→ member value
@@ -5877,27 +5840,26 @@ member. Unfortunately, mapping XML names directly to APL member names cannot
 work because:
 </p>
 <ul>
-<li> In any associative array are the names of the members necessarily distinct.
- Assigning a value to an already existing member of a structured value overrides
- the icurrent value of that member instead of creating a second member with
- that value. On the other hand, in XML nodes tags may (and frequently do)
- occur repeatedly. If an XML document contains several nodes with the same tag,
- then the applications usually knows how to interpret the order in which the
- tags occur, but this order may not be detectable at the XML level (i.e. the
- nodes may not only have the same tag names, but also the same attributes and
- attribute values).
+<li> In any associative array the names of the members are necessarily
+ distinct. Assigning a value to an already existing member of a structured
+ value overwrites the current value of that member instead of creating a
+ second member with that value. On the other hand, in XML nodes tags may (and
+ frequently do) occur repeatedly. If an XML document contains several nodes
+ with the same tag, then the applications usually knows how to interpret the
+ order in which the tags occur, but this order may not be detectable at the XML
+ level (i.e. the nodes may not only have the same tag names, but also the same
+ attributes and attribute values).
 
 <p>The applications that use the XML document frequently require that the order
- of XML nodes with the same name remains intact when the document is modified.
+ of XML nodes with the same name remain intact when the document is modified.
  For example, the entries of a telephone book may be sorted alphabetically
  without XML being aware of that. Reading, modifying, and writing back the
  data in the telephone book must therefore not destroy that order.
 </p>
-</li><li> Likewise, at least for readability reasons, the order if XML the order
- of nodes attributes, should not be changed. XML documents are frequently
- processed with text tools like <b>diff</b> which would incorrectly show
- differences between XML documents that are equivalent from an XML perspective.
-
+</li><li> Likewise, at least for readability reasons, the order of node
+ attributes should not be changed. XML documents are frequently processed
+ with text tools like <b>diff</b> which would incorrectly show differences
+ between XML documents that are equivalent from an XML perspective.
 
 </li><li> Conflicts between tag names and attribute names. In XML, the same name
   can designate an attribute in one node and a tag in another node. ⎕XML keeps
@@ -5923,27 +5885,26 @@ name (and therefore a valid member name that is understood by the APL parser):
 <li> A single character ⍙, ∆, or _, that indicates the role of the name in
   the XML document as follows:
   <ul>
-<li> the character ⍙ characterizes an attribute name, i.e. a names that
+<li> the character ⍙ characterizes an attribute name, i.e. a name that
   was used <b>inside</b> (i.e. between &lt; and &gt;) of an XML start or leaf tag.
   The character ⍙ alone is the name of a special member which is present
   in every associative array below the top-level and whose value is the
   original XML tag name of a tag, or
 
 </li><li> the character ∆ characterizes a name that was synthesized by ⎕XML
-  itself in order to tag a text (sub-) segment that has no tag of its own.
+  itself in order to tag a text (sub-) segment that has no tag of its own. The
   corresponding XML entity was not a tag (and therefore had no tag name), or
 
-</li><li> the character _ characterizes the name of an XML entity, i.e. an
-    CML name that occur <b>between</b> the
-  start tag and the corresponding end tag (if any: leaf tags have no such
-  entities
+</li><li> the character _ characterizes the name of an XML entity, i.e. a CML
+  name that occurred <b>between</b> the start tag and the corresponding end tag
+  (if any: leaf tags have no such entities)
   </li></ul>
 
 </li><li> a position prefix of the form <b>NN</b>, where NN is the position
  of the member in relation to the tag to which it belongs. The numbering
  starts at ⎕IO and restarts at every XML start or leaf tag.
 
-</li><li> the attribute name or tag name. For those parts of an XML parts that
+</li><li> the attribute name or tag name. For those parts of an XML entity that
   do not have a tag name, the member name is being synthesized by ⎕XML and the
   member value will be the text in the XML document with predefined XML
   entities replaced by their single characters, i.e.:
@@ -5964,10 +5925,9 @@ synthesized names are produced by ⎕XML:
 <ul>
 <li> <b>∆NNcomment</b> for XML comments, i.e. &lt;!&mdash; ... &mdash;&gt; in XML,
 </li><li> <b>∆NNdeclaration</b> for XML declarations, i.e. &lt;? ... ?&gt; in XML,
-</li><li> <b>∆NNdoctype</b> for document type declarations, i.e.i
+</li><li> <b>∆NNdoctype</b> for document type declarations, i.e.
     &lt;!DOCTYPE ... &gt; in XML
-</li><li> <b>∆NNtext</b> for unstructured (and hence untagged) text segements
-  in XML.
+</li><li> <b>∆NNtext</b> for unstructured (and hence untagged) text segements in XML.
 </li></ul>
 
 <p>Every XML name (of a tag or attribute) is also a valid APL name, but
@@ -5998,11 +5958,11 @@ be contained in a single associative array.
 to an associative APL array Z and vice versa.
 </p>
 <p><b>Note</b>: If you convert an associative APL array back to a an XML document,
-then the result is a possibly very long strings with containing several linefeed
+the result is a possibly very long string containing several linefeed
 characters. That is OK if the string is written to a file, but causes problems
-when the string is being displayed and longer than ⎕PW. The standard APL folding
-of output near ⎕PW make the string then look somewhat garbled. This effect can
-be suppressed in 2 ways:
+when the string is being displayed and longer than ⎕PW. The standard APL
+folding of output near ⎕PW make the string then look somewhat garbled.
+This effect can be suppressed in 2 ways:
 </p>
 <ol>
 <li> set ⎕PW large enough, or
@@ -6017,7 +5977,6 @@ be suppressed in 2 ways:
 argument A is an integer function number, possibly followed by arguments
 of the function number ↑A.
 </p>
-
 <p>In the following examples, let
 </p>
 <pre class="verbatim">      XML←36 ⎕CR &quot;&quot;&quot;
@@ -6045,7 +6004,7 @@ is read.
 
 </li><li> <b>Z←2 ⎕XML B</b> splits an APL member path (a sequence of member names)
 into a vector P of (nested) member names. This vector P is understood by
-the ASPL primitive PICK (i.e. Z←P⊃APL or (P⊃APL←value) and can be used to
+the APL primitive PICK (i.e. Z←P⊃APL or (P⊃APL←value) and can be used to
 address the data in an XML node.
 
 </li><li> <b>Z←3 ⎕XML B</b> splits an APL member name (as produced by e.g.
@@ -6053,10 +6012,9 @@ monadic ⎕XML into a 3-item vector Z. Z[1] is a single character indicating
 the category (i.e. a character scalar ∆, ⍙, or _). Z[2] is the position (an
 integer scalar ≥ ⎕IO). Z[3] is a (nested) APL string. 3 ⎕XML has an
 inverse function ¯3 ⎕XML which converts a 3-item vector as produced by 3 ⎕XML
-back into an APL member name.
+back into an APL member name indicating the category (i.e. _, ∆, or ⍙)
+and the name from the XML tag:
 
-<p>indicating the category (i.e. _, ∆, or ⍙) and the name from the XML tag:
-</p>
 <pre class="verbatim">            8 ⎕CR (C P N)←3 ⎕XML &quot;∆2comment&quot;
 ┌→────────────┐
 │∆ 2 ┌→──────┐│
@@ -6160,7 +6118,7 @@ are returned:
 ._3Document._2Tag1._4Subtag.⍙1····
 ._3Document._2Tag1._4Subtag.⍙2name
 </pre>
-</li><li> <b>Z←9 ⎕XML B</b> is like Z←7 ⎕XML B, except that only the aubset of
+</li><li> <b>Z←9 ⎕XML B</b> is like Z←7 ⎕XML B, except that only the subset of
 synthesized members other than ∆text are returned:
 
 <pre class="verbatim">      ⊃9 ⎕XML APL   ⍝ all synthetic member names (except unstructured text)
@@ -6168,7 +6126,7 @@ synthesized members other than ∆text are returned:
 ._3Document._2Tag1.∆2comment·········
 ._3Document._2Tag1._4Subtag.∆2comment
 </pre>
-</li><li> <b>Z←10 ⎕XML B</b> is like Z←7 ⎕XML B, except that only the aubset of
+</li><li> <b>Z←10 ⎕XML B</b> is like Z←7 ⎕XML B, except that only the subset of
 synthesized ∆text members are returned:
 
 <pre class="verbatim">.∆2text···························
@@ -6190,7 +6148,7 @@ names are returned:
 ._3Document._2Tag1._4Subtag
 </pre>
 </li><li> <b>Z←12 ⎕XML B</b> is like Z←7 ⎕XML B, except that all member
-names of B are returned without descending into sub-tree:
+names of B are returned without descending into the sub-tree:
 
 <pre class="verbatim">      ⊃12 ⎕XML APL   ⍝ all member names (7 ⎕XML, but non-recursive)
 .∆1declaration
@@ -6202,14 +6160,14 @@ names of B are returned without descending into sub-tree:
 created by ⎕XML.
 </p>
 </li><li> <b>Z←13 ⎕XML B</b> shows the (flat) tag names in B, but but does
-not descend into any sub-tree if B.
+not descend into any sub-tree of B.
 
 <pre class="verbatim">     ⊃13 ⎕XML APL   ⍝ all tag members (8 ⎕XML, but non-recursive)
  ._3Document 
 </pre>
-</li><li> <b>Z←(14 &quot;member-name&quot;)  ⎕XML B</b> shows the next member in B
+</li><li> <b>Z←(14 &quot;member-name&quot;) ⎕XML B</b> shows the next member in B
 after &quot;member-name&quot;. It can be used as an iterator that walks through
-the tags. an empty member name returns the first member:
+the tags. An empty member name returns the first member:
 
 <pre class="verbatim">      APL ← ⎕XML XML←&quot;&lt;ROOT&gt;&lt;A/&gt;&lt;B/&gt;&lt;C/&gt;&lt;/ROOT&gt;&quot;
 
@@ -6222,7 +6180,6 @@ _2B
       (14 &quot;_2B&quot;) ⎕XML APL._1ROOT   ⍝ next member after APL._1ROOT._2B
 _3C
       (14 &quot;_3C&quot;) ⎕XML APL._1ROOT   ⍝ last member: will be empty
-
 
 </pre><p>4786
 </p></li></ul>
@@ -6267,7 +6224,7 @@ APL standard, nor IBM APL2 provide conditionals.
 <h4 class="subsection">2.40.1 Design considerations.</h4>
 
 <p>The author of GNU APL has, for a long time, hesitated to implement
-conditionalsi in GNU APL. Primarily for the following reasons:
+conditionals in GNU APL. Primarily for the following reasons:
 </p>
 <ul>
 <li> the lack of standardization of conditionals,
@@ -6284,7 +6241,7 @@ source code lines of GNU APL reveals the following statistics:
 </p>
 <ul>
 <li> 7000 <b>if</b>  statements, 1600 of them two-sided if-then-else-endif,
-  the others one-sided if-them-endi,
+  the others one-sided if-then-endif,
   </li><li> 2000 <b>for</b> statements, 1200 of them trivial iterations over some
   array (aka. <i>for (int i = 0; i &lt; size; ++i)  ... </i>,
   </li><li> 200 <b>switch</b> statements with an averge of 8 case clauses per switch,
@@ -6314,7 +6271,7 @@ serious problems. To name a few:
 </li><li> Another rather common design practice is to limit the length of
   lines to less than 80 characters (e.g. in the GNU coding conventions,
   <b> https://gcc.gnu.org/codingconventions.html#Line</b>).
-   Even if it were possible to squeeze an :If :Then :Else :Endif into a 80
+  Even if it were possible to squeeze an :If :Then :Else :Endif into an 80
   character line, and using a single whitespace around the keywords for
   readability, wastes almost 1/3 of the precious 80 characters for keywords.
   In this example, each of the COND, THEN, and ELSE parts must then be &lt; 20
@@ -6331,7 +6288,7 @@ serious problems. To name a few:
 </p>
 <p>These constraints suggest that the keywords mentioned are merely syntactic
   sugar that covers the underlying APL structure, i.e. labels and computed
-  branches. GNU APL does not claim to be fundamentally diffferent in that
+  branches. GNU APL does not claim to be fundamentally different in that
   regard, but the syntax of the syntactic sugar is somewhat simpler.
 </p></li></ul>
 
@@ -6342,11 +6299,11 @@ were these:
 <li> the syntax shall be easy to understand and consistent,
   </li><li> the syntax shall work in immediate execution mode (as long as
   the entire conditional is provided on a single input line),
-  </li><li> in order to support 2., lengthy keywords shall be avoided in
-  favour of the original APL style, and
+  </li><li> to support 2., lengthy keywords shall be avoided in favour of the
+  original APL style, and
   </li><li> the syntax needs to only support those cases where the standard APL
   flow control (i.e. →N) becomes cumbersome. There is absolutely no benefit in
-  introducing a new (and redundant) syntax  when the standard APL mechanism
+  introducing a new (and redundant) syntax when the standard APL mechanism
   is already completely adequate.
 </li></ol>
 
@@ -6368,7 +6325,7 @@ shall be executed.
 </p>
 <p>Interestingly, the complexity of the above cases, when coded in APL,
 increases in amost the reverse order (compared to other languages).
-For example
+For example,
 </p>
 <ol>
 <li> <b>switch/case</b>:
@@ -6417,16 +6374,16 @@ end of the conditional:
 </p>
 <ol>
 <li> allow multiple statements in the THEN and ELSE clauses and mark the end
-  of the <b>ELSE</b> clause (or, in the one-sided case 3  of the <b>THEN</b> clause
+  of the <b>ELSE</b> clause (or, in the one-sided case 3 of the <b>THEN</b> clause
   with some <b>ENDIF</b> marker, or
 </li><li> allow only single statement clauses (which implies the <b>ENDIF</b> and
  makes it obsolete.
 </li></ol>
 
 <p>The design decision made in GNU APL was to go for multiple statements because
-the advantage in 2. (shorter code) looks much smaller than the the advantages of 1. (e.g. insertion of debug printouts into a clause).
+the advantage in 2. (shorter code) looks much smaller than the advantages
+of 1. (e.g. insertion of debug printouts into a clause).
 </p>
-
 </div>
 <div class="subsection" id="Syntax-1">
 <h4 class="subsection">2.40.2 Syntax</h4>
@@ -6456,8 +6413,8 @@ syntax:
   to <b>beginning-of statement</b> markers). Each marker binds to the non-empty
   statement left of it. APL is parsed line by line, so there can never be a
   valid non-empty APL statement left of the first token of a line. As a
-   consequence, a →→ token, a ←→ token, or a ←← token at the beginning of
-   a line is a SYNTAX ERROR.
+  consequence, a →→ token, a ←→ token, or a ←← token at the beginning of
+  a line is a SYNTAX ERROR.
 
 </li><li> The COND, THEN, and ELSE clauses shall be non-empty (!) sequences of
   valid APL statements. In particular:
@@ -6481,7 +6438,6 @@ syntax:
  5 is positive 
 
 
-
       ⍝ long format. Only possible in defined functions because immediate
       ⍝ execution works line by line (and parsing the first line would fail).
 
@@ -6498,7 +6454,6 @@ syntax:
  ¯5 is negative 
 
 
-
       ⍝ invalid split into several lines: ←→ spread over 2 lines.
       ⍝ FOO can be properly parsed, but calling FOO fails.
       ⍝
@@ -6511,8 +6466,7 @@ SYNTAX ERROR
 FOO[1]  X 'is positive'←
 
 
-
-      ⍝ invalid split into several lines:  ←→ is first token in line).
+      ⍝ invalid split into several lines: ←→ is first token in line).
       ⍝ FOO is invalid and the ∇-editor complains when closing FOO.
       ⍝
       ∇FOO X
@@ -6559,27 +6513,27 @@ linear algebra, is:
 linear algebra. In the general case <b>A f.g B</b> may the functions <b>f</b>
 and <b>b</b> also be non-scalar APL primitives or even defined functions.
 This generality is occasionally helpful, but comes with a performance
-penalty since many argument checks are duplicated. At the same time is
-<b>A +.× B</b> the by far most frequent case of operator &rsquo;.&rsquo;.
+penalty since many argument checks are duplicated. At the same time
+<b>A +.× B</b> is by far the most frequent case of operator &rsquo;.&rsquo;.
 </p>
 <p>For this reason GNU APL also provides a more efficient dyadic function
 <b>∘</b> (Matrix Product) for the special case <b>+.×</b> of the dyadic
 operator &rsquo;.&rsquo;. This function ∘ has been optimized for numeric arguments
 and computes the matrix product as known from linear algebra.
 </p>
-<p>For two-dimensional matrices A and B is function ∘ the same as +.×:
+<p>For two-dimensional matrices A and B function ∘ is the same as +.×:
 </p>
-<p>A∘B ←→ A   +.×   B
+<p>A∘B ←→ A +.× B
 </p>
 <p>Otherwise there are some subtle differences between ∘ and +.×:
 </p>
 <ul>
 <li> <b>A +.× B</b> allows A and B to be of any rank, while <b>A∘B</b> raises a
  RANK ERROR if the rank of A or B is more than 2.
-</li><li> With operator +.× is the product of e.g. a vector and a matrix (or
- vice versa) a vector, usually understood as row-vector.
+</li><li> With operator +.× the product of e.g. a vector and a matrix (or
+ vice versa) is a vector, usually understood as row-vector.
  In contrast (and more similar to linear algebra) A∘B is always a matrix,
- as to preserve the distinction between row vectors and column vectors:
+ to preserve the distinction between row vectors and column vectors:
 
 <pre class="verbatim">      M←2 2⍴1 2 3 4   ⍝ a matrix
       V←10 11         ⍝ a vector
@@ -6597,13 +6551,12 @@ and computes the matrix product as known from linear algebra.
       V∘M
 43 64
 
-
       ⍴M +.× V   ⍝ vector
 2
       ⍴V +.× M   ⍝ vector
 2
       ⍴V∘M       ⍝ row vector
-2 1
+1 2
       ⍴M∘V       ⍝ column vector
 2 1
 </pre></li></ul>
@@ -6636,21 +6589,21 @@ an up-to-date descriptions of limitations.
 <p>GNU APL integers have a guaranteed range from -9200000000000000000 to
 9200000000000000000, which is a slighly smaller range.
 </p>
-<p>A 64-bit integer represents a value between -9223372036854775808L and
+<p>A 64-bit integer represents a value between -9223372036854775808 and
 9223372036854775807.
 </p>
 <p>If the result of a computation is integer by nature, for example +, -, or ×
 with integer arguments, <b>and</b> falls into the guaranteed range, then
-the result will be an APL integer. If the result is to large for a 64-bit signed
-integer then the result will be automatically converted to an APL floating 
-point value. However, if the result is outside the guaranteed range but still
-within the 64-bit integer range, e.g. between i(excluding) 9200000000000000000
-and 9223372036854775807, then GNU APL gives no guarantees as to whether
-the result will be a 64-bit integer or as a 64-bit floating point (and then
-loosing precision). This decision is usually function-specific and driven by
-performance considerations.
+the result will be an APL integer. If the result is too large for a 64-bit
+signed integer then the result will be automatically converted to an APL
+floating point value. However, if the result is outside the guaranteed range
+but still within the 64-bit integer range, e.g. between 9200000000000000000
+and 9223372036854775807 (exclusive), then GNU APL gives no guarantees as to
+whether the result will be a 64-bit integer or a 64-bit floating point (with
+the resulting loss of precision). This decision is usually function-specific
+and driven by performance considerations.
 </p>
-<p>APL values have a maximum rank of 8. However, the maximum range can be
+<p>APL values have a maximum rank of 8. However, the maximum range can be set
 by means of ./configure (see README-2-configure).
 </p>
 </div>
@@ -6665,7 +6618,7 @@ limitations. Two workspaces can only communicate via shared variables if they
 (i.e. their processes) run on the same machine.
 </p>
 <p>However, only two auxiliary processors, AP100 and AP210, are provided as
-examples of how to implementing auxiliary processors in GNU APL.
+examples of how to implement auxiliary processors in GNU APL.
 </p>
 <p>Shared variables for auxiliary processors are provided for some backward
 compatibility. In the past - without access to the source code of the APL
@@ -6674,7 +6627,7 @@ functionality of the interpreter.
 </p>
 <p>With this interpreter - and access to its source code - it is often more
 convenient to add your own commands or your own system variables to the
-APL interpreter rather that adding auxiliary processors.
+APL interpreter rather than adding auxiliary processors.
 </p>
 <hr>
 </div>
@@ -6781,7 +6734,7 @@ also placed in this directory.
 <p>The subdirectory src contains further subdirectories for components of GNU APL
 that are optional and typically require the installation of additional
 libraries on the build machine. The ./configure script in the top-level
-directory determines, which optional components shall be included on the build.
+directory determines, which optional components shall be included in the build.
 </p>
 <pre class="verbatim">    apl-1.8/
     ├── src
@@ -6830,7 +6783,7 @@ Next: <a href="#Section-5_002e5" accesskey="n" rel="next">The subdirectories wor
 <span id="The-subdirectory-HOWTOs"></span><h3 class="section">5.4 The subdirectory HOWTOs</h3>
 
 <p>The subdirectory HOWTOs contains some documents that try to explain how some
-of the non-standard features of GNU APL are supposed to be used. These
+of the non-standard features of GNU APL are intended to be used. These
 documents were written for two different audiences: APL programmers and
 GNU APL hackers. The documents for APL programmers are, by default, installed
 in directory /usr/local/share/doc/apl by <b>make install</b> while the documents
@@ -6862,7 +6815,7 @@ Next: <a href="#Section-5_002e7" accesskey="n" rel="next">The subdirectories rpm
 
 <p>The subdirectory m4 contains macros used by autoconf and automake. In most
 cases the top-level ./configure script can be used as is. If a platform on
-which GNU APL shall be built differs to much from the platform on which the
+which GNU APL shall be built differs too much from the platform on which the
 GNU APL project tar file (e.g. apl-1.8.tar.gz) was created, then it might
 be necessary to re-create the ./configure script on the platform.
 </p>
@@ -6885,7 +6838,7 @@ Next: <a href="#Section-5_002e8" accesskey="n" rel="next">The subdirectory tools
 </div>
 <span id="The-subdirectories-rpm_002c-debian_002c-and-debian_005ftmp"></span><h3 class="section">5.7 The subdirectories rpm, debian, and debian_tmp</h3>
 
-<p>These subdirectories are templates for building (binary) RPM resp. Debian
+<p>These subdirectories are templates for building (binary) RPM or Debian
 packages that contain GNU APL. Subdirectory debian_tmp is initially empty and
 acts as a scratch directory inside which the interpreter is being compiled
 when a Debian package is built.
@@ -6945,7 +6898,6 @@ mean that your contribution was not considered worthwhile to be listed but
 more likely that it was overlooked. Just send an email to bug-apl@gnu.org
 to fix that.
 </p>
-
 <hr>
 </div>
 <div class="section" id="Section-6_002e2">

@@ -84,12 +84,12 @@ of `autoconf'.
      with the distribution.
 
   7. Often, you can also type `make uninstall' to remove the installed
-     files again.  In practice, not all packages have tested that
-     uninstallation works correctly, even though it is required by the
-     GNU Coding Standards.
+     files again.  In practice, not all packages have been tested to
+     verify that uninstall works correctly, even though it is required
+     by the GNU Coding Standards.
 
   8. Some packages, particularly those that use Automake, provide `make
-     distcheck', which can by used by developers to test that all other
+     distcheck', which can be used by developers to test that all other
      targets like `make install' and `make uninstall' work correctly.
      This target is generally not run by end users.
 

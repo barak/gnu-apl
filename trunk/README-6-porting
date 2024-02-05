@@ -84,7 +84,7 @@ GNU APL compiles on CYGWIN, see README-5-WINDOWS for details
 The latest version (SVN) of GNU APL was reported to compile and run on OS-X
 without special measures.
 
-For Macintosh users, Peter Teeson has contributed a very nice installation
-instructions that can be found in the doc/ subdirectory (file
+For Macintosh users, Peter Teeson has contributed very nice installation
+instructions that can be found in the doc/ subdirectory (file:
 APL-on-Macintosh.pdf).
 

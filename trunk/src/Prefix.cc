@@ -1101,6 +1101,7 @@ Prefix::reduce____()
    // this function is a placeholder for invalid phrases and should never be
    // called.
    //
+   print_stack(CERR, LOC);
    FIXME;
 }
 //----------------------------------------------------------------------------

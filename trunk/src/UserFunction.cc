@@ -1130,49 +1130,39 @@ UserFunction::optimize_unconditional_branches()
 bool VOID_inserted = false;
    for (Function_PC pc = Function_PC_0; pc < body.size() - 3; ++pc)
       {
-        if (body[pc].get_Class()   != TC_END)       continue;
-        if (body[pc+2].get_Class() != TC_R_ARROW)   continue;
-        if (body[pc+3].get_Class() != TC_END)       continue;
+        /*
+           1.  look for (and noting that body is in inverse order)
+  
+                PC  +3  +2 +1 +0
+                    ↓   ↓  ↓  ↓
+                   END  →  N END
+         */
+        if (body[pc    ].get_Class() != TC_END)       continue;
+        if (body[pc + 1].get_Class() != TC_VALUE)     continue;
+        if (body[pc + 2].get_Class() != TC_R_ARROW)   continue;
+        if (body[pc + 3].get_Class() != TC_END)       continue;
 
-        // at this point we have →N where N is an integer literal pr a label.
-        // figure the function line (which may ne impossibe)
+        // at this point we have →VALUE.
+        // figure the function line (which may be impossibe)
         //
-        Function_Line function_line = Function_Invalid;
-        if (body[pc+1].get_Class() == TC_VALUE)
-           {
-             // e.g. → 4
-             // 
-             const Value * v_line = body[pc+1].get_apl_val().get();
-             if (v_line->is_int_scalar())
-                {
-                  function_line =
-                          Function_Line(v_line->get_cscalar().get_int_value());
-                }
-             else continue;
-           }
+        const Value & v_line = *body[pc + 1].get_apl_val();
+        if (!v_line.is_int_scalar())                  continue;
 
-        if (function_line != Function_Invalid)   // if line found
-           {
-             // at this point we have found a valid line for the branch.
-             // The line may be before, inside, or past of the body.
-             //
-             int64_t target = Function_PC_done;   // assume →0 or so
-             if (function_line >= Function_Line_1 &&
-                  function_line < Function_Line(line_starts.size()))   // valid
-                {
-                  target = line_starts[function_line];
-                }
+        const APL_Integer line_number = v_line.get_cscalar().get_int_value();
+        if (line_number < Function_Line_1)            continue;   // e.g. →0
+        if (line_number >= int(line_starts.size()))   continue;
 
-             // maybe do it. This optimization does not work well with
-             // conditonals,so we don't if we see one.
-             //
-             body[pc + 1].clear(LOC);   // release B
-             body[pc + 1] = Token(TOK_GOTO_PC, target);   // B with →PC
-             body[pc + 2].copy_N(body[pc + 3]);           // → with ENDL
-             body[pc + 3] = Token();
-             VOID_inserted = true;
-             OptmizationStatistics::count(OPTI_FT_DIRECT_BRANCHES);
-           }
+        const int64_t target_PC = line_starts[line_number];
+
+        // maybe do it. This optimization does not work well with
+        // conditonals,so we don't if we see one.
+        //
+        body[pc + 1].clear(LOC);   // release N
+        body[pc + 1] = Token(TOK_GOTO_PC, target_PC);   // B with →PC
+        body[pc + 2].copy_N(body[pc + 3]);              // → with ENDL
+        body[pc + 3] = Token();
+        VOID_inserted = true;
+        OptmizationStatistics::count(OPTI_FT_DIRECT_BRANCHES);
       }
 
    if (VOID_inserted)   remove_TOK_VOID();
