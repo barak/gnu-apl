@@ -45,17 +45,27 @@ purposes to be used at different times:
   »
 »
 
-All documentation are available on the local machine after GNU APL
+All documentation is available on the local machine after GNU APL
  was successfully installed, and some of it is also available online
 via the GNU APL home page «HREF https://www.gnu.org/software/apl».
 
-«H3 Conventions in this document
+«H3 Conventions in This Document
 »
-Your keyboard input is rendered in bold blue and the response from your
-computer in black like this:
+Your keyboard input is rendered
+in <span style="color:blue">«BO blue»</span>
+and the response from the GNU APL interpreter in «BO black» like this:
 
-«IN7 This is what you type on the keyboard»
-«OU7 and this is the response you get»
+«IN7       This is what you type on the keyboard»
+«OU1 and this is the response you get for a correct input
+
+»
+«APL3 1+    ⍝ In contrast, APL ERROR messages are shown in red:»
+
+Error messages from the interpreter are shown
+in <span style="color:red">«BO red»</span>. This colouring of
+input, output, and error lines above is the default, but it is 
+possible to change the colors, or (e.g. if GNU APL is run as a script)
+to disable the colorization completely.
 
 «H2 Starting and stopping the APL interpreter»
 
@@ -189,14 +199,14 @@ APL statements are constructed from:
 »
 
 Several statements on the same line are separated by the APL character ◊
-(called Diamond). Note that different statements on the same line are
+(called «IT Diamond»). Note that different statements on the same line are
 executed from left to right while each statement is evaluated from right
 to left. Before discussing the execution of statements we will
 introduce their components, i.e. constants and names.
 
 «H3 Constants (Literals)»
 
-Constants, also called literals, are used in APL statements for denoting
+Constants, also called «IT literals», are used in APL statements for denoting
 fixed values.
 
 «H4 Scalar Constants»
@@ -469,7 +479,7 @@ Even though this improves over APL1, it is still cumbersome if the number
 of lines is large or not known beforehand. In that case one often finds,
 even in APL2, constructs like:
 
-«APL TEXT←3⍴0      ⍝ reserve space for 3 lines
+«APL TEXT←3⍴0      ⍝ reserve space for 3 (nested) lines
 TEXT[1]←⊂'Peter'   ⍝ ⊂ turns text vector 'Peter' into a nested scalar
 TEXT[2]←⊂'Paul'
 TEXT[3]←⊂'Mary'
@@ -486,10 +496,9 @@ TEXT ← TEXT, ⊂'Mary'    ⍝ append line 'Mary  (no trailing space needed)
 
 To further improve and simplify the specification of multi-line texts, which
 is a problem that often occurs in real life APL programs, GNU APL has adopted
-the concept
-of multi-line strings from the Python language or from the bash shell.
-A multi-line string starts and ends with triple quotes and the lines
-between become a nested text vector:
+the concept of multi-line strings from the Python language or from
+the bash shell. A multi-line string starts and ends with triple quotes
+and the lines between become a nested text vector:
 
 «IN7       TEXT ←  """
 →      Peter

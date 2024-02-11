@@ -16,7 +16,7 @@
                                                      │    │    │    │
 «APL"     one APL statement and its response         │    │    │    │
 «APL1"    first APL statement and its response       │    │    │    │
-«APL2"    subsequent APL statement its response      │    │    │    │
+«APL2"    subsequent APL statement and its response  │    │    │    │
 «APL3"    last APL statement and its response        │    │    │    │
 «APL1"    first APL statement and its response       │    │    │    │
 «QUAD" ,                                             │    │    │    │
@@ -842,9 +842,9 @@ string response;
 }
 //-----------------------------------------------------------------------------
 int
-IN_handler(const tag_table & tab, Range & r)
+IN_handler(const tag_table & ttab, Range & r)
 {
-const IINFO iinfo = tab.iinfo;
+const IINFO iinfo = ttab.iinfo;
 
    if (iinfo == II0 || iinfo == II1 || iinfo == II8)
       {
@@ -859,17 +859,20 @@ const IINFO iinfo = tab.iinfo;
         r.fcopy(ftc);
       }
 
-   if (iinfo == II0 || iinfo == II1 || iinfo == II2 || iinfo == II7)
+   if (iinfo == II0 ||      // IN:             HTML output  .tc output
+       iinfo == II1 ||      // IN1: continued  HTML output  .tc output
+       iinfo == II2 ||      // IN2: continued  HTML output
+       iinfo == II7)        // IN7:            HTML output
       {
-        assert(tab.cinfo);
-        out.open_PRE(tab.cinfo, LOC, "");
+        assert(ttab.cinfo);
+        out.open_PRE(ttab.cinfo, LOC, "");
         r.copy();
         out.close_PRE(false);
       }
-   else if (iinfo == II3)
+   else if (iinfo == II3)   // IN3:            HTML output
       {
         out.print("<kbd class=");
-        out.print(tab.cinfo);
+        out.print(ttab.cinfo);
         out.print(">");
         r.copy();
         out.print("</kbd>");
