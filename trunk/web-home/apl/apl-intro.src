@@ -1,0 +1,4136 @@
+
+«#
+:imap <F12> «APL »
+»
+
+«H1 A Quick Tour of GNU APL»
+
+Copyright (©) 2013-2024 Dr. Jürgen Sauermann and friends.
+«»
+This document is part of GNU APL and may be distributed under the terms of«»
+the GNU Free Documentation License, see
+<A href=http://www.gnu.org/licenses/fdl.html>
+http://www.gnu.org/licenses/fdl.html</A>
+«»«»
+«H2 Document Conventions»
+
+«H3 The Structure of the GNU APL Documentation»
+
+GNU APL is shipped with different kinds of documentation for different
+purposes to be used at different times:
+
+«OL
+  «LI A number of «BO README» files in the top-level directory. These files
+      shall help with specific issues in the configuration of the interpreter,
+      i.e. before the interpreter is compiled.»
+  «LI «BO man apl» (in a terminal window) displays a list of all command line
+  options understood by GNU APL.»
+  «LI The «BO )HELP» command of the interpreter:
+    «UL
+      «LI )HELP without an argument prints a list of APL commands,
+          APL system functions, and APL system variables known by
+          the interpreter,»
+      «LI «BO )HELP primitive» shows a more detailed help for the given
+              primitive (if such help is available).»
+    »
+  »
+  «LI This document (Quick Tour). It is a little more detailed, with a focus
+    on examples. This is supposedly the best starting point for readers
+    that are new to APL in general or to GNU APL in particular.»
+  «LI «BO info apl» (in a terminal window). More detailed with a focus on only
+      GNU APL specific features that are not available in, or differ from,
+      standard APL.»
+  «LI A number of files in the «BO HOWTOs» directory. These files describe
+   some of the non-trivial GNU APL system functions.
+  »
+»
+
+All documentation are available on the local machine after GNU APL
+ was successfully installed, and some of it is also available online
+via the GNU APL home page «HREF https://www.gnu.org/software/apl».
+
+«H3 Conventions in this document
+»
+Your keyboard input is rendered in bold blue and the response from your
+computer in black like this:
+
+«IN7 This is what you type on the keyboard»
+«OU7 and this is the response you get»
+
+«H2 Starting and stopping the APL interpreter»
+
+APL is an easy-to-learn language. This quick start manual is an introduction
+to APL in a few simple steps. We assume that you are using GNU APL and that
+you have installed it according to the README files that come with it.
+«»
+«»
+The APL interpreter is a normal program and is started like that: by entering
+its name in a shell (preferably «BO bash»).
+«»
+«IN7 $ apl»
+«OU7
+                    ______ _   __ __  __    ___     ____   __ 
+                   / ____// | / // / / /   /   |   / __ \ / / 
+                  / / __ /  |/ // / / /   / /| |  / /_/ // /  
+                 / /_/ // /|  // /_/ /   / ___ | / ____// /___
+                 \____//_/ |_/ \____/   /_/  |_|/_/    /_____/
+                                       
+                        Welcome to GNU APL version 1.8
+                                       
+                Copyright (C) 2008-2022  Dr. Jürgen Sauermann
+                       Banner by FIGlet: www.figlet.org
+                                       
+                This program comes with ABSOLUTELY NO WARRANTY;
+                         for details run: ./apl --gpl.
+                                       
+     This program is free software, and you are welcome to redistribute it
+         according to the GNU Public License (GPL) version 3 or later.
+                                       
+
+
+»
+
+The interpreter prints a start-up banner like above and then enters an endless
+loop which APL programmers refer to as «BO immediate execution mode» and
+others as «BO REPL» (an abbreviation for
+«BO R»ead-«BO E»valuate-«BO P»rint-«BO L»oop).
+«»«»
+In immediate execution mode the interpreter reads one input line, either
+interactively from the user, or from a file if GNU APL is run as a script.
+It then processes (or «BO E»valuates in «BO REPL») the input line and
+prints some result output (which may be empty for some input lines).
+Depending on the details of the processing of the line entered, the
+interpreter will either:
+
+«UL
+«LI remain in immediate execution mode (the «BO L»oop in «BO REPL»), or»
+«LI enter another mode called definition mode, or»
+«LI exit the interpreter»
+»
+
+The following state machine describes this top-level behaviour of an APL
+interpreter, and some user inputs that trigger mode changes:
+
+<pre>
+
+                             ┌───────┐
+                             │ Start │
+                             └───────┘
+                                 ↓
+                                 ↓
+                ╔═══════════════════════════════╗      )OFF      ┌──────┐
+      → → → → → ║   Immediate Execution Mode    ║→ → → → → → → → │ EXIT │
+     ↑          ║        (Read in REPL)         ║                └──────┘
+     ↑          ╚═══════════════════════════════╝
+     ↑             ↓        ↑    ↑           ↓
+     ↑             ↓       ^C    ↑           ∇ (enter definition mode)
+     ↑             ↓        ↑    ↑           ↓
+     ↑   ╔════════════════════╗  ↑  ╔═════════════════╗
+     ↑   ║   Execution Mode   ║  ↑  ║ Definition Mode ║
+     ↑   ║ (Evaluate in REPL) ║  ↑  ║   (∇-editor)    ║
+     ↑   ╟────────────────────╢  ↑  ╚═════════════════╝
+     ↑   ║  (Print in REPL)   ║  ↑           ↓
+     ↑   ╚════════════════════╝  ↓           ∇ (leave definition mode)
+     ↑             ↓             ↓           ↓
+      ← ← ← ← ← ← ←               ← ← ← ← ← ←
+</pre>
+
+In the first case, i.e. the interpreter remains in immediate execution mode,
+the whole process starts over again; the next line is read, processed, printed,
+and so on.
+
+The second case (leaving immediate execution mode) is explained in a later
+chapter.
+
+The first non-blank character of the line entered in immediate execution mode
+determines what happens next:
+
+«UL
+«LI if the first non-blank character is either «BO )» or «BO ]» then the
+    line is interpreted and processed as an APL command. Commands are
+    discussed in chapter "Commands" below. Commands that start with «BO ]»
+    instead of «BO )» are a GNU APL extension of standard APL.»
+«»
+«LI if the first non-blank character is «BO ∇» then an APL function editor
+    (the ∇-editor) is started and editing of a new or already existing
+    user-defined function begins until ∇ is typed again. User-defined
+    functions are simply called «BO defined function»s in APL jargon.
+    The construction and editing of defined functions is discussed in chapter
+    «BO Defined Functions» below.»
+«»
+«LI Otherwise the line is considered a sequence of APL statements and the
+    interpreter enters «BO execution mode» (which corresponds to the
+    «BO E»valuate in «BO REPL») in which APL code is being executed.
+    The execution mode may have its own loops which may be interrupted
+    with ^C. The execution mode is left automatically after the last APL
+    statement was processed, or after an APL error had occurred. APL
+    statements are discussed in chapter "APL Statements" below.»
+»
+
+The most important command at the moment is «BO )OFF» which ends the
+apl interpreter:
+
+«IN7       )OFF»
+«OU7 Goodbye.
+$»
+
+Pressing control-C or control-D (i.e. the standard way to end programs)
+merely stops the execution of the current APL statement in execution mode,
+but does not end the interpreter. This behavior is similar to a shell where
+control-C stops the current program but does not exit from the shell.
+
+«H2 APL Statements»
+
+APL statements are constructed from:
+«UL
+«LI APL constants (numbers and characters)»
+«LI Names (of functions and/or variables)»
+«LI other characters: ← → [ ; ] ( ) and :»
+»
+
+Several statements on the same line are separated by the APL character ◊
+(called Diamond). Note that different statements on the same line are
+executed from left to right while each statement is evaluated from right
+to left. Before discussing the execution of statements we will
+introduce their components, i.e. constants and names.
+
+«H3 Constants (Literals)»
+
+Constants, also called literals, are used in APL statements for denoting
+fixed values.
+
+«H4 Scalar Constants»
+
+The simplest constants are scalar constants, similar to atoms in Chemistry.
+From these scalar constants more complex constants can be created. There are
+also scalar APL values which are not constants; a definition of the term
+scalar will be given later. For the moment think of a scalar as a single
+data item.
+
+«H5 Scalar Text Constants»
+
+The simplest scalar constants are scalar text constants. A scalar text
+constant defines a single character.
+«»
+As we will discuss in more detail later, if you enter a constant
+(and nothing else) in immediate execution mode then
+the interpreter will output the same constant, although in a slightly
+different fashion.
+«»
+A scalar text constant (aka. a single character) is entered by enclosing the
+character in single quotes. The character A, for example, is entered as 'A'
+and the interpreter answers with printing A (removing the quotes around it):
+
+«APL 'A'»
+
+The quote character itself is entered by doubling it inside the quotes
+that enclose it:
+
+«APL ''''»
+
+«H5 Numeric Scalar Constants»
+
+A numeric scalar constant is a single number. The simplest numeric scalar
+constant is an integer, entered as a sequence of decimal digits:
+
+«APL 42»
+
+Fractional numbers are entered with a decimal point and a fractional part:
+
+«APL 42.5»
+
+The integral part can be omitted:
+
+«APL .5»
+
+An optional scaling by a power of 10 (aka. scientific notation) can be applied
+with the character E, followed by the exponent. The E is case insensitive,
+therefore e will also work:
+
+«APL 42.5E3
+     42e3»
+
+Negative numbers use a leading ¯ (Overbar); a minus sign is NOT the sign of
+a number but a function that negates a value. The result is often the same,
+but you should always use the overbar for negative numbers:
+
+«APL ¯42.5E3»
+
+The exponent in scientific notation can also be negative (in this case using
+- gives a different result):
+
+«APL 42.5E¯3
+
+42.5E-3»
+
+The error in the second statement above occurs because:
+«OL
+«LI in APL the minus sign (i.e. - as opposed to ¯) is a primitive function and
+    never part of a number, and therefore»
+«LI the «BO E» is not an exponent belonging to 42.5. Instead «BO E» is taken
+    as the name of a variable (which does not exist in this example) and that
+    causes the error. Using - instead of ¯ is a frequent mistake of APL
+    beginners.»
+»
+Complex numbers can be entered in 3 different formats. The standard format
+(standard because it is also the format used by the interpreter when printing
+complex numbers) is to specify the real and imaginary parts of a complex
+number separated by the letter J (or j):
+
+«APL 3J4       ⍝ a complex number of magnitude 5
+
+0.6j0.8   ⍝ the same, but scaled to magnitude 1»
+
+One alternative format is to specify the number as its magnitude and its
+angle in degrees (from 0° to 360°), separated by the letter D or d (which
+stands for for "degrees"). Since arccos(0.6) = 53.130102354, we get the
+same complex numbers:
+
+«APL 5D53.130102354   ⍝ magnitude 5, angle 53.130102354°
+
+1d53.130102354   ⍝ the same, but scaled to magnitude 1»
+
+The other alternative format is to specify the number as its magnitude and its
+angle in radians (from 0 to 2&pi;), separated by the letter R or r (for "radians").
+Since 53.130102354 &pi; / 180 = 0.927295218 we get the same numbers:
+
+«APL 5R0.927295218   ⍝ magnitude 5, angle 0.927295218 radians
+
+1r0.927295218   ⍝ the same, but scaled to magnitude 1»
+
+Please keep in mind that whitespace characters (space, tab, etc.) are NOT
+permitted in numbers.
+
+«H4 Vector Constants»
+
+Vector constants are created by writing several scalar constants on the
+same line, separated by one or more spaces between them. A single complex
+number is a scalar even if has two components (its real and imaginary parts).
+Multiple separating spaces between scalars are treated like single spaces:
+
+«APL 1   2 3
+'A' 'B' 'C'»
+
+Sequences of character scalars can be written with quotes around the sequence
+rather than quotes around each character. The rules for scalar character
+constants apply here as well:
+
+«APL 'ABC'
+'A''B''C'
+"A'B'C"»
+
+You cannot enter numeric vector constants with less than two elements because
+numeric vector constants with one element would be a numeric scalar constant,
+and numeric vector constants with no elements would be completely empty.
+
+You can enter an empty character vector constant (a vector with no elements)
+like this:
+
+«APL ''
+""»
+
+You normally cannot enter character vector constants with one element for
+the same reason as for numeric vector constants: it would be a scalar
+constant rather than a vector. This can become cumbersome when dealing with
+text; if the length of a character sequence is one then the text is a scalar,
+otherwise it is a vector. For this reason GNU APL provides a non-standard
+extension using double quotes instead of single quotes. This extension has
+slightly different and sometimes more convenient rules than texts in single
+quotes:
+
+«UL
+«LI double quoted characters are always vectors (even if their length is 1)»
+«LI single quotes stand for themselves and need not be doubled»
+«LI for some problematic characters C-like sequences are defined:
+    «UL
+    «LI «BO \0» produces «BO NUL» (null,            ASCII code  0) »
+    «LI «BO \a» produces «BO BEL» (bell,            ASCII code  7) »
+    «LI «BO \b» produces «BO BS»  (backspace,       ASCII code  8) »
+    «LI «BO \t» produces «BO TAB» (tab,             ASCII code  9) »
+    «LI «BO \n» produces «BO NL»  (newline,         ASCII code 10) »
+    «LI «BO \v» produces «BO VT»  (vertical tab,    ASCII code 11) »
+    «LI «BO \f» produces «BO FF»  (form feed,       ASCII code 12) »
+    «LI «BO \r» produces «BO CR»  (carriage return, ASCII code 13) »
+    «LI «BO \[» produces «BO ESC» (escape,          ASCII code 27) »
+    «LI «BO \"» produces «BO "»   (double quote,    ASCII code 34) »
+    «LI «BO \\» produces «BO \»   (backslash,       ASCII code 92) »
+    »
+»
+»
+
+Examples:
+
+«APL "A"   ⍝ 1-element vector
+
+"'"   ⍝ a quote (')
+
+"A\"B\\C"   ⍝ 'A', double quote, 'B', backslash, 'C'»
+
+Finally, in the old APL1 (ISO 8485 standard) there was no way to express
+an empty numeric vector and one had to use expressions like «BO ⍳0» or
+«BO 0⍴0» for them. In modern interpreters, however, the symbol «BO ⍬» may
+be used to denote an empty numeric vector (i.e. of length 0). In APL1 empty
+numeric vectors were often expressed as '', frequently as ''⍴V to get the
+first item of a vector or matrix into a scalar. That worked, but these days
+one would use the cleaner «BO ⍬⍴V» instead.
+
+
+«H4 Mixed Constants»
+
+The first APL interpreters (and the first APL standard, ISO 8485) only allowed
+constants and values whose components were either all numeric scalars, or all
+character scalars. The examples given so far were of that kind.
+
+The current APL standard, ISO 13751, also llows a mix of characters and numbers
+in constants and values, for example:
+
+«APL 1 2 'A' 'B' 3 4»
+
+Such values are called «BO mixed».
+
+«H4 Nested Constants»
+
+The vector constants discussed so far were «BO simple», which means that their
+components were (numeric or character) scalars. Since ISO 13751, another
+APL value can be used instead of a scalar. Such constants or values are called 
+«BO nested». The nested components of constants are vectors that are
+either quoted texts (aka. «BO strings») or, if numeric, surrounded by
+parentheses instead of quotes:
+
+«APL 1 2 'AB' 3 4   ⍝ (nested) string 'AB'
+1 2 (10 11) 3 4     ⍝ nested numeric vector (10 11)»
+
+In the normal output formatting of APL like above, the nesting of items is
+displayed as additional blanks which makes it sometimes difficult to recognize
+the exact nesting structure. The quotes and parentheses that group the items
+of a nested literal on input are replaced by blanks on output. That blurs
+the output, in particular when the nesting becomes deeper (i.e. when a nested
+value contains nested items). Nested values differ from non-nested values
+comprised of the same scalars only by the number spaces between the scalars,
+which is difficult to see if the values are long or dee[ly nested.
+
+For that reason, APL interpreters often come with functions, either built-in
+or defined functions that display the structure of nested values in a better
+way. In IBM APL2 these functions are called DISPLAY and DISPLAYC (in workspace
+DISPLAY, the two functions slightly differ in style). In GNU APL the functions
+are built-in and are several subfunctions of dyadic ⎕CR (e.g. 4 ⎕CR and 8 ⎕CR,
+also slightly differing in style). In GNU APL, ⎕CR is a collection of more
+than 40 subfunctions, some of which play the roles of «BO DISPLAY» in IBM APL2.
+For example:
+
+«APL 1 2 'AB' 3 4       ⍝ standard output formatting
+4 ⎕CR 1 2 'AB' 3 4      ⍝ same value in 4⎕CR style
+8 ⎕CR 1 2 'AB' 3 4      ⍝ same value in 8⎕CR style
+
+1 2 (10 11) 3 4         ⍝ standard output formatting
+4 ⎕CR 1 2 (10 11) 3 4   ⍝ same value in 4⎕CR style
+8 ⎕CR 1 2 (10 11) 3 4   ⍝ same value in 8⎕CR style»
+
+Some users prefer that APL output is always displayed in the format of 8 ⎕CR
+(or in one of the other styles that ⎕CR provides). This can be achived by a
+GNU APL command:
+
+«APL 1 2 'AB' 3 4   ⍝ by default: standard output formatting
+
+⍝ display results automatically in 8 ⎕CR format
+]BOXING 8
+
+1 2 'AB' 3 4
+
+⍝ back to the standard format
+]BOXING OFF
+1 2 'AB' 3 4
+»«OU»
+
+«H4 Multi-Line Strings»
+
+In APL1 a text with several lines would normally be expressed as a two
+dimensional character matrix:
+
+«APL 3 5⍴"Peter", "Paul ", "Mary "   ⍝ 3-line APL1 text matrix»
+
+That approach becomes rather cumbersome and inefficient when the number
+of text rows is large (a single long line would "blow up" the other lines
+to its length, yielding a larger than necessary matrix that consist mostly
+of trailing spaces).  In the days of APL1 that was sort of acceptable
+because the focus was more on numerical computations rather than text
+processing and the rare texts were mostly used as short decorators
+for the numbers displayed.
+
+Things have changed since then and with the advent of nested values in APL2
+one would express long texts as a vector of nested strings rather than as
+character matrices:
+
+«APL1 "Peter" "Paul" "Mary"   ⍝ nested 3-item APL2 vector (note the lack of trailing input spaces and the output indentation)»
+
+«APL3 ⊃ "Peter" "Paul" "Mary"   ⍝ back to APL1 text matrix (not indented)»
+
+Even though this improves over APL1, it is still cumbersome if the number
+of lines is large or not known beforehand. In that case one often finds,
+even in APL2, constructs like:
+
+«APL TEXT←3⍴0      ⍝ reserve space for 3 lines
+TEXT[1]←⊂'Peter'   ⍝ ⊂ turns text vector 'Peter' into a nested scalar
+TEXT[2]←⊂'Paul'
+TEXT[3]←⊂'Mary'
+⊃ TEXT»
+
+Or, even worse (since the execution time increases quadratically with the
+number of lines):
+
+«APL TEXT←⍬        ⍝ start with an empty vector
+TEXT ← TEXT, ⊂'Peter'   ⍝ append line 'Peter'
+TEXT ← TEXT, ⊂'Paul'    ⍝ append line 'Paul' (no trailing space needed)
+TEXT ← TEXT, ⊂'Mary'    ⍝ append line 'Mary  (no trailing space needed)
+⊃ TEXT»
+
+To further improve and simplify the specification of multi-line texts, which
+is a problem that often occurs in real life APL programs, GNU APL has adopted
+the concept
+of multi-line strings from the Python language or from the bash shell.
+A multi-line string starts and ends with triple quotes and the lines
+between become a nested text vector:
+
+«IN7       TEXT ←  """
+→      Peter
+→      Paul
+→      Mary
+→            """
+      8 ⎕CR TEXT»
+«OU ┌→────────────────────┐
+│┌→────┐ ┌→───┐ ┌→───┐│
+││Peter│ │Paul│ │Mary││
+│└─────┘ └────┘ └────┘│
+└ϵ────────────────────┘»
+
+«APL ⊃ TEXT»
+
+Note the → prompt (from APL), which indicates that a multi-line string has
+started but not yet ended. The characters in the triple quotes shall be
+either " or else \« in the leading and \» in the trailing triple quotes
+(the same holds, BTW also for normal GNU APL strings. Intelligent editors
+are able to jump back and forth between matching quotes, but only if the
+leading quote differs from the trailing quote. Use this capability with care,
+since it undermines the portability of APL code written for GNU APL.
+
+
+«H4 Summary and Remarks»
+
+Constants are used for creating fixed APL values. There are many APL values
+that cannot be expressed by constants, for example numeric vectors with only
+one component, or higher-dimensional values like matrices. These values
+can only be created using functions (as explained further down).
+
+«H3 APL Names»
+
+APL knows 3 kinds of names:
+
+«UL
+«LI user defined names,»
+«LI names of system functions and variables, and»
+«LI names of primitive APL functions (or primitives for short)»
+»
+
+«H4 User-defined Names»
+
+User-defined names start with a letter (A-Z or a-z) or one of the 3 characters
+_ (underscore), ∆ (delta), or ⍙ (delta-underline. The starting
+character may be followed by letters, digits, or one of the characters
+¯ (overbar), _, ∆, or ⍙. The ∆ and ⍙ characters are often used to separate
+some common prefix (for example the name of a library) from the functions
+and variables that are somehow related (for example the functions and
+variables that belong to a library). User-defined Names are case-sensitive,
+i.e. «BO Foo» and «BO FOO» are different names.
+
+User-defined names are used to denote APL variables, defined functions,
+defined operators, or labels in defined functions or operators.
+
+«H4 Names of System Functions and System Variables»
+
+The names of system functions start with the APL character ⎕ (quad) followed by
+a small number of letters. System names are case-insensitive, i.e. «BO ⎕IO» is
+the same as «BO ⎕io». Older APL programmers seem to prefer uppercase,
+presumably because the first APL interpreters had no lowercase characters.
+
+Only a handful of system functions and variables are standardized in the ISO
+standards 8485 and 13751, but every APL interpreter adds many more. Those that
+are not defined in the standards differ considerably between APL interpreters
+from different vendors even if their names are the same. Adding non-standard
+system functions and variables are the standard way of adding features to
+the APL language; they usually add functions whose implementation in APL would
+be inefficient or cumbersome.
+
+«H4 Names of Primitive APL Functions»
+
+The names of primitive functions are single APL characters that different from
+all characters allowed in user-defined names.
+
+Almost all the primitive APL functions (and hence their names) are
+identical in all APL interpreters and are standardized in ISO standard 13751.
+
+Apart from the differences mentioned above, there is no real difference
+between system functions and primitive APL functions.
+
+«H3 Functions and Operators»
+
+In APL functions can have none, one, or two arguments.
+Functions with no argument are called «BO niladic», functions with one argument
+are called «BO monadic», and functions with two arguments are called
+«BO dyadic».
+
+Some monadic or dyadic functions can have another, optional, argument used for
+specifying an axis (a dimension along which the function is computed). In
+standard APL, only primitive APL functions can have an axis argument, but
+GNU APL also supports an axis argument for defined functions.
+
+Most dyadic functions can also be called with only one argument. These functions
+are called «BO nomadic». This basically means that the same function name is
+used for two different functions. The two functions are often related. For
+example, ÷ is nomadic; its dyadic variant A ÷ B (called divide) divides A by B
+while its monadic variant (called inverse) divides 1 by B. Another way of
+putting this is: a nomadic function is a dyadic function whose left argument
+is optional (and omitting it changes its behaviour).
+
+«H4 Niladic Functions»
+
+A niladic function takes no arguments. A niladic function call is simply the
+name of the niladic function. For example, ⎕TS is a niladic system function
+that returns the current time as year, month, day, hours, minutes, seconds,
+and milliseconds:
+
+«APL ⎕TS»
+
+«H4 Monadic Functions»
+
+A «BO monadic function» takes one argument. A monadic function call consists
+of the name of the function followed by its sole argument. For example, the
+monadic variant of the nomadic function ÷ computes the inverse of its argument:
+
+«APL ÷ 2
+÷ 2J2»
+
+If the optional axis argument mentioned above is supported, then it is
+placed to the right of the function name.
+
+«H4 Dyadic Functions»
+
+A «BO dyadic function» takes two arguments. A dyadic function call consists
+of the second (aka. left) argument, followed by the name of the function,
+followed by its other (aka. right)  argument. For example, the
+dyadic variant of the nomadic function ÷ computes the left argument divided
+by the right argument:
+
+«APL 4 ÷ 2
+4J4 ÷ 2J2»
+
+As the last example above shows, APL automatically converts numbers to their
+simplest form, i.e. from complex to real, from floating point to integer,
+and from integer to Boolean. At least it looks like that. A value that
+is, for example, printed like an integer may internally still be a real
+or even a complex number.
+
+In older APL interpreters there used to be a function ⎕DR (data representation)
+that would tell if an APL value was complex, real, integer, or Boolean.
+For mixed arrays introduced by ISO 13751 that does not make too much sense
+anymore and the function has disappeared.
+
+«H4 Monadic Operators»
+
+APL operators are functions that have one or two value arguments like monadic
+or dyadic functions, but in addition one or two function arguments.
+The attribute «BO monadic» or «BO dyadic» of an operator refers to the
+number of function arguments for the operator and not to the number of value
+arguments. If «BO OP1» is a monadic operator then «BO (f OP1)» is a so-called
+«BO derived function»; depending on the operator its derived function can
+be monadic or dyadic.
+«»
+«»
+A «BO monadic operator» is therefore an operator that has one function argument,
+and a «BO dyadic operator» is an operator that has two function arguments.
+As far as built-in APL operators are concerned, one of them (the inner/outer
+matrix product .) is dyadic and all others are monadic.
+
+A monadic operator, together with its function, defines a new function: the
+«BO the derived function». Likewise, a dyadic operator, together with both
+its functions, defines a derived function of that operator. Derived functions
+of the same operator but with different function arguments are, of course,
+different, but they are either all monadic functions or all dyadic functions.
+«»
+«»
+We take the presumably most frequently used operator, «BO reduction», as an
+example. The APL symbol for the reduction operator is / (slash). The function
+argument of a monadic operator is the function immediately left of the operator
+symbol. The reduction operator is monadic (taking one function argument),
+the function provided as its function argument must be dyadic, and the derived
+function is monadic. The derived function of reduction with function argument
+f is also called f-reduction.
+«»
+«»
+When the value argument of f-reduction is a vector, then f-reduction computes
+the result of placing f between the vector elements:
+«»
+«»
+f-reduction v1 v2 ... vn ↔ v1 f v2 f ... vn
+«»
+«»
+If function f is + (addition) then f-reduction of a vector is the sum of
+its elements:
+«APL +/1 2 3 4 5 6»
+
+Likewise, if f is ⌈ (maximum) then f-reduction of a vector is the largest of
+its elements:
+«APL ⌈/2 5 12 4 0»
+
+The f-reduction of a matrix is a vector with the f-reduction  of each row:
+«APL 3 3⍴1 2 3 4 5 6 7 8 9
++/ (3 3⍴1 2 3 4 5 6 7 8 9)»
+
+f-reduction is one of the functions that support an axis argument.
+The axis argument of f-reduction tells along which axis (i.e. rows or columns
+in the case of a matrix) the f-reduction shall be performed:
+
+«APL +/[2] (3 3⍴1 2 3 4 5 6 7 8 9)
++/[1] (3 3⍴1 2 3 4 5 6 7 8 9)» 
+
+In GNU APL, user defined monadic operators can have an axis argument, which
+is, like for their built-in pendants, placed in brackets right of the operator
+symbol.
+
+«H4 Dyadic Operators»
+
+A dyadic operator is like a monadic operator but has two function arguments
+instead of one.
+If «BO OP2» is a dyadic operator then «BO (f OP1 g)» is its
+«BO derived function». Depending on the operator, its derived functions
+can be monadic or dyadic. For some dyadic operators their "function
+arguments" may or must be APL values and not functions.
+
+The APL symbol for the inner product operator is . (dot). The function arguments
+of the inner product are placed immediately left and immediately right of the
+dot. If A and B are matrices, then «BO A +.× B» is the normal matrix product:
+
+«APL A←3 3⍴1 2 3 4 5 6 7 8 9
+A
+A +.× A»
+
+In general, for two matrices A and B and functions f and g, the inner product
+f.g is a matrix. The element in row i and column j in that matrix is obtained
+by applying function g to row i of A and column j of B and then to perform
+f-reduction of the (row i column) vector.
+
+Another way of looking at f.g (or at dyadic operators in general) is to
+consider (.g) as a derived monadic operator and f.g as f/(.g).
+However, dyadic operators cannot have an axis argument.
+
+«H3 General APL Values»
+
+The constants introduced so far were examples of APL values. However, many
+APL values can not be written as constants. In this chapter we will introduce
+APL values in a more formal way and we will show how arbitrary APL values
+can be constructed.
+
+An APL value is defined by two things: a list of scalars that is called
+the «BO ravel» of the value, and another list that is called the «BO shape»
+of the value. The shape determines how the ravel is arranged to
+produce an APL value.
+
+For example, the same ravel «BO 1 2 3 4 5 6» can be arranged (or "shaped")
+in 5 different ways:
+«»
+«»
+1. as a 6-element vector:
+«BO <pre>
+   1 2 3 4 5 6
+</pre>»
+
+2. as a 1 by 6 matrix:
+«BO <pre>
+   1 2 3 4 5 6
+</pre>»
+
+3. as a 2 by 3 matrix:
+«BO <pre>
+   1 2 3
+   4 5 6
+</pre>»
+
+4. as a 3 by 2 matrix:
+«BO <pre>
+   1 2
+   3 4
+   5 6
+</pre>»
+
+5. as a 6 by 1 matrix:
+«BO <pre>
+   1
+   2
+   3
+   4
+   5
+   6
+</pre>»
+«»
+In this example, the shape selects between the 5 possible arrangements
+of the ravel. The ravel and the shape are not entirely independent.
+Instead the following relation is satisfied by every APL value:
+«»
+«»
+«BO The product of all shape elements is equal to the number of ravel elements»
+«»
+«»
+The number of shape elements, also called the «BO rank» of the value,
+determines how many elements the shape has:
+«»
+«»
+«TAB
+«TR» «TH» Rank «TH» Commonly called
+«TR» «TD» 0    «TDC» Scalar (no shape dimension)
+«TR» «TD» 1    «TDC» Vector (one shape dimension)
+«TR» «TD» 2    «TDC» Matrix (two shape dimensions)
+«TR» «TD» 3    «TDC» Cube   (three shape dimensions)
+«TR» «TD» ...  «TDC» values with higher ranks (more than 3 shape dimensions)
+»
+«»
+A value also has a «BO depth» which tells the level of nesting. Simple scalars
+have a depth if 0. All other values have a depth of
+(1 + the maximum depth of all ravel elements). Unlike the shape, which can be
+imposed on a value, the depth is a consequence of the rank (scalar or not) and
+the ravel of the value.
+
+APL programming is the art of creating new APL values from other APL values.
+The starting point is the constants discussed above and the new APL values
+are created from existing APL values by calling functions with the existing
+APL values as function arguments.
+
+You have probably heard that APL has a large number of built-in functions.
+As a consequence, the same new APL value can usually be created in many
+different ways. APL programmers tend to prefer the way that contains the
+smallest number of function calls, even though that is is not always the
+"cleanest" way.
+
+It is not always obvious how to create a particular APL value. Therefore we
+present a (somewhat awkward) method that always works. This method uses only
+a handful of built-in APL functions that - no surprise - belong to the most
+frequently used functions in APL programs.
+
+«H4 Reshape and Shape: ⍴»
+
+Reshape is a simple, but powerful, function that creates values of arbitrary
+shapes. The function call A ⍴ B returns a new APL value Z with shape A and
+a ravel constructed from the ravel of value B as follows.
+
+Let len_B be the number of elements in the ravel of B, and
+let len_Z be the number of elements in the ravel of Z.
+
+«UL
+«LI If len_Z = len_B, then the ravel of Z are the ravel of B.»
+«LI If len_Z < len_B, then the ravel of Z are the first len_Z elements
+    of the ravel of B.»
+«LI If len_Z > len_B, then the ravel of B is appended to itself until one
+    of the cases above occurs.»
+»
+
+Note that the shape of B plays no role in the computation of function reshape.
+Most frequently scalars and vectors are being reshaped.
+
+We can now enter the 5 examples above (which are all cases where
+len_Z = len_B) in APL:
+
+«APL 6 ⍴ 1 2 3 4 5 6
+   1 6 ⍴ 1 2 3 4 5 6
+   2 3 ⍴ 1 2 3 4 5 6
+   3 2 ⍴ 1 2 3 4 5 6
+   6 1 ⍴ 1 2 3 4 5 6»
+
+An examples with len_Z < len_B) is this:
+
+«APL 2 2 ⍴ 1 2 3 4 5 6»
+
+The most powerful case is len_Z > len_B, in particular when len_B is small:
+
+«APL 10 10 ⍴ 1 2»
+
+Another illustrative example is the creation of a unity matrix. We will later
+repeat the creation of a unity matrix with other functions. Creating a
+unity matrix with function reshape is somewhat less "clean" than other
+methods, but short and effective (and therefore frequently seen in APL code):
+
+«APL 5 5 ⍴ 1 0 0 0 0 0»
+
+The monadic variant of ⍴ is called «BO Shape» and returns the shape of its
+right argument:
+
+«APL ⍴ 1 0 0 0 0 0
+⍴ (5 5⍴1 0 0 0 0 0)»
+
+The parentheses in the last example are not required, but were added for
+clarity. Like in other languages, expressions in parentheses are evaluated
+first and the result replaces the parentheses and their content.
+The shape of a scalar is an empty vector. Empty vectors produce
+an empty APL output:
+
+«APL ⍴ 5     ⍝ Shape of a numeric scalar (output is an empty vector)
+     ⍴ ' '   ⍝ Shape of a character scalar (output is an empty vector)
+     ⍴ ''    ⍝ Shape of an empty vector»
+
+«H4 Catenate and Ravel: , and ⍪»
+
+The next important function on the way to arbitrary APL values is "catenate",
+or dyadic , (comma). The function call A , B appends values A and B. If A
+and B are scalars or vectors then the result is somewhat obvious:
+
+«APL 1 1 1 , 2 2 2   ⍝ append vector 1 1 1 and vector 2 2 2
+     1 1 1 , 'bbb'   ⍝ append vector 1 1 1 and vector 'bbb'»
+
+If A or B is a matrix or a value with even higher rank, then there are
+different ways to catenate two values. This is where the optional axis comes
+into play. The axis argument determines along which axis
+the concatenation shall take place:
+
+«APL 2 2⍴'A'
+     2 2⍴'B'
+    (2 2⍴'A') ,[1] (2 2⍴'B')
+    (2 2⍴'A'),[2] (2 2⍴'B')»
+
+The axes of a value are the different elements of its shape vector. A scalar
+has no axes, a vector has one axis, a matrix has two axes, and so on. When
+an APL value is printed then the last axis of the value is printed
+horizontally (on the same output line) while the other axes are printed
+vertically (on different output lines). The default axis for concatenate,
+i.e. the axis used when no axis argument is given, is the last axis.
+There is a companion function of , (comma) namely ⍪ (comma-bar) that is
+identical to comma if an axis is provided, but uses the first axis rather
+than the last axis if not. Therefore the last two examples could have
+been written without an axis argument like this:
+
+«APL (2 2⍴'A') ⍪ (2 2⍴'B')
+     (2 2⍴'A') , (2 2⍴'B')»
+«»
+«»
+«BO Note:» There are some more function pairs that differ only by their default
+behavior when no axis argument is given: ⊖ and ⌽, / and ⌿, and  \ and ⍀.
+The variant with - in the symbol takes the first axis by default while the
+other variant takes the last axis.
+
+The monadic variant of , and ⍪ is a monadic function called "ravel" and
+returns the ravel of the value. While function reshape can be used,
+among other things, to create values of higher or lower ranks than vectors,
+function ravel does the opposite: it brings the rank of values with higher
+or lower ranks down to rank 1. In other words, function ravel converts a
+value with arbitrary shape to a vector. If a value is a vector already then
+function ravel returns (a copy of) that vector.
+
+«H4 Universal Character Set (monadic ⎕UCS)»
+
+Function ⎕UCS is monadic and computes a value with the same shape as its
+right argument. The right argument must be simple (i.e. not nested) values
+whose ravel consists of all integers or all characters. Integers are
+converted to characters with the same Unicode, while characters are converted
+to an integer with the Unicode of the character.
+
+In most cases the characters that you use in strings will be on your
+keyboard, but function ⎕UCS can be used if they are not.
+
+Examples:
+
+«APL ⎕UCS 'APL ⍴⍪ $¥£€⍧ ÄÖÜäöüß'    ⍝ Unicode → integer conversion
+⎕UCS 65 80 76 32 9076 9066 32 36 165 163 8364 9063 32 196 214 220 228 246 252 223  ⍝ And back to Unicode»
+
+«H4 Construction of arbitrary simple values»
+
+The functions reshape, concatenate, and occasionally ⎕UCS can be combined
+to construct arbitrary simple (i.e. not nested) values. We assume,
+of course, that it is known how the value shall look. The algorithm
+for constructing the new value is then:
+
+«OL
+  «LI construct the shape vector of the new value from smaller items such 
+  as integer scalars or vectors. The integer scalars can be constants or
+  other integer vectors computed elsewhere. Concatenate (dyadic ,) the
+  smaller pieces as needed. Put everything in parentheses (in many cases the
+  parentheses are optional and can be removed, but to be on the safe side we
+  leave them in).»
+
+  «LI construct the ravel of the new value from smaller items such as
+  integer scalars, integer vectors, character scalars and character vectors.
+  Possibly use ⎕UCS to create single charactera or character vectors using
+  their Unicode.  Concatenate (dyadic ,) the smaller pieces as needed.»
+
+  «LI reshape the ravel with the shape vector using dyadic ⍴.»
+»
+
+Steps 1 and 2 are independent, so you can do 2 before 1.
+As an alert reader you will have noticed that you cannot create new
+scalars because a scalar has a shape vector of length 0, and we
+have seen earlier that empty integer constants do not exist.
+
+In older APL interpreters this was solved by using an empty character
+vector instead of an empty integer vector:
+
+«APL '' ⍴ 1 2 3 4 5 6        ⍝ reshape 1 2 3 4 5 6 to a scalar
+     ⍴ ('' ⍴ 1 2 3 4 5 6)    ⍝ shape of '' ⍴ 1 2 3 4 5 6»
+
+This worked well and you will find ''⍴ all over the place in older APL programs.
+In newer APL interpreters, including GNU APL, a constant ⍬ (zilde) was
+introduced. ⍬ is an empty numeric vector. ⍬⍴ is cleaner than ''⍴ because
+a shape should always be an integer vector, but the portability of APL programs
+using ''⍴ is better than that of ⍬⍴.
+«»
+You may also wonder if vectors can be created with the above algorithm (and
+remembering that there are not only no integer vector constants of length 0,
+but also no integer vector constants of length 1).
+The answer is "yes" because the left argument A of A⍴B can be a vector
+or a scalar (the scalar is then treated like a 1-element vector).
+Note also, that when creating arbitrary simple vectors, Step 2 alone
+suffices in most cases. For simple vectors, steps 1 and 3 are only needed
+if the ravel constructed in step 2 has the wrong length.
+
+«H4 Construction of arbitrary nested values»
+
+The «BO depth» of a nested value is recursively defined as:
+
+«UL
+«LI 0, if the value is a simple scalar»
+«LI 1, if the value is a simple vector»
+«LI N+1, if the value is nested and N is the depth of its deepest ravel element»
+»
+The monadic APL function ≡ (called «BO Depth») returns the depth of an
+APL value.
+«»
+In the previous chapter we have seen how arbitrary simple values, i.e.
+values of depth 0 or 1 are constructed. We can now create a value of depth
+N + 1 recursively:
+
+«UL
+«LI construct the shape vector in the same way as for arbitrary simple values.»
+
+«LI construct the ravel of the new value from smaller items such as
+integer scalars, integer vectors, character scalars and character vectors,
+and items with a depth N or less. Enclose non-simple ravel items (i.e. items
+with depth > 1) in parentheses.»
+
+«LI reshape the ravel with the shape vector using dyadic ⍴.»
+»
+
+Examples:
+
+«APL 1 2 3          ⍝ three element vector
+     ⍴1 2 3         ⍝ how many elements?
+     ≡1 2 3         ⍝ how deep?
+     1 (2 3)        ⍝ two (!) element vector with nested second element
+     ⍴1 (2 3)       ⍝ how many elements?
+     ≡1 (2 3)       ⍝ how deep?
+     1 (2 (3 4))    ⍝ two element vector with nested second element
+     ⍴1 (2 (3 4))   ⍝ how many elements?
+     ≡1 (2 3)       ⍝ how deep?»
+
+When the APL interpreter prints nested values then it prints extra spaces
+around them. These spaces distinguish nested values from their simple
+counterparts with the same ravel elements, but makes it rather difficult
+to understand values with deeper nesting.
+
+«H4 Displaying the structure of values»
+
+We have seen in the examples above that that some APL values look the same
+(e.g. numeric scalars and numeric vectors) or very similar (nested values
+with the same elements in their ravels, like 1 2 3 vs. 1 (2 3) above).
+For that reason, APL interpreters that support nested values typically
+come with a function calls «BO Display» that shows the structure of a value
+in a better way. This function is very useful for analyzing problems that
+are caused by different values that look similar:
+
+«APL 1 2 3 + 1 2 3      ⍝ add two 3 element vectors
+     1 2 3 + 1 (2 3)    ⍝ add 3 element vector and 2 element vector»
+
+Since the Display function is of such importance, GNU APL has made it a
+built-in function called dyadic ⎕CR. The monadic ⎕CR (character
+representation) is a standard function in all APL interpreters that converts
+APL values and user defined functions into character strings. The left
+argument of dyadic ⎕CR does the same, but its left argument lets you choose
+one of several formats. Formats 4 and 8 of ⎕CR select a format that is
+very similar to the output of the «BO Display» function in other interpreters:
+
+«APL 8 ⎕CR 1         ⍝ show structure of scalar 1
+     8 ⎕CR 1 2 3     ⍝ show structure of simple vector 1 2 3
+     8 ⎕CR 1 (2 3)   ⍝ show structure of nested vector 1 (2 3)
+     8 ⎕CR 1 (2 (3 4))   ⍝ show structure of nested vector 1 (2 (3 4))
+     8 ⎕CR (2 2⍴ 1 2 3 4)    ⍝ show structure of simple matrix 2 2 ⍴ 1 2 3 4
+     8 ⎕CR (2 2⍴ 1 2 3 (2 2⍴4))    ⍝ a nested matrix»
+
+8 ⎕CR is a character matrix constructed according to the following rules:
+
+«UL
+«LI the matrix consists of a «BO frame» (solid line) that surrounds
+    its «BO content».»
+«LI The content is created from the ravel elements of the value that are
+  arranged according to the shape of the value. If a ravel element is a
+  nested value then that value is displayed with its own frame (and these rules
+  apply recursively.»
+«LI The frame can contain additional indicators. If the rank of the value
+ is ≥ 1 then the horizontal top line of the frame contains information
+ pertaining to the last dimension of the value. If the rank of the value
+ is ≥ 2 then the vertical left line of the frame contains information 
+ pertaining to the other dimensions of the value. The horizontal bottom line
+ of the frame is related to the depth of the ravel.»
+«LI An arrow (→ on the top line or ↓ on the left line) indicates that the
+    corresponding dimension(s) are present and non-empty.»
+«LI An ⊖ on the top line or ⌽ on the left line) indicates that the
+ corresponding dimension(s) are present but empty. In this case the ravel
+ has length 0 and instead of the empty ravel the «BO prototype» of the value,
+ a concept explained later on, is shown.»
+«LI An ∊ on the bottom line indicates that the ravel contains nested elements;
+  multiple ∊ indicate deeper nesting.»
+»
+
+«H4 Vector Notation versus Catenation»
+
+For beginners the difference between vector notation (a sequence of items
+separated by spaces) and catenation (a sequence of items separated by commas)
+can be confusing because often, in particular for simple scalars and vectors,
+both of them produce the same result:
+
+«APL 1 2 3
+     1,2,3»
+
+In the example above, vector notation executes faster because no function
+needs to be computed. Sometimes, however, vector notation may produce a
+result other than expected:
+
+«APL 1 2 3 (4 5)
+     8 ⎕CR 1 2 3 (4 5)
+     1 2 3,(4 5)
+     8 ⎕CR 1 2 3,(4 5)»
+
+Vector notation starts with the leftmost item and adds one item for every
+space (or group of spaces). If an item added is not a scalar (like (4 5) in
+the example above) then the item is automatically converted to a nested
+value.
+
+Catenation works differently; in the above example the two vectors 1 2 3 and
+(4 5) are simply catenated to form a vector of length 5.
+
+The parentheses in (4 5) in in the catenation example were redundant, while
+the parentheses in the vector notation were not. Once again 8 ⎕CR helped to
+clarify the matter.
+
+«H4 Scalar Extension»
+
+Before continuing we need to introduce a fundamental APL mechanism called
+«BO scalar extension». This mechanism is applied in many places.
+«»
+Almost all built-in APL functions are partial, which means that there are
+arguments for which the function returns an error instead of a result. Some
+of the very few total (i.e. non-partial) functions are monadic ⍴
+and monadic ≡. Typically dyadic functions put more requirements on their
+arguments than monadic functions. The reason is that not only must the
+individual left and right arguments satisfy some conditions, but the left
+and right arguments must also fit to each other. For example:
+
+«APL 1 2 3 + 1 2 3   ⍝ 1 2 3 is a valid arguments for +
+     1 2 + 1 2       ⍝ 1 2 is also a valid arguments for +
+      1 2 + 1 2 3     ⍝ they cannot be mixed, though»
+
+The most common requirement of dyadic functions is that the left
+and right argument have the same shape. The sum of two 3 element vectors
+makes sense, while the sum of a 2 element vector and a 3 element vector
+does not:
+
+«APL 1 2 3 + 4 5 6    ⍝ OK to add two 3 element vectors
+     1 2 3 + 4 5      ⍝ not OK to add  2 element vector to 3 element vector»
+
+Now scalar extension is an exception to most matching shape requirements.
+If one of the arguments of a dyadic function is a scalar, and if the function
+supports scalar extension, then the scalar argument is automatically reshaped
+to the shape of the other argument. (If both arguments were scalar, then they
+have the same shape already and scalar extension would have no noticeable
+effect).
+
+«APL 1 2 3 + 4      ⍝ OK by virtue of scalar extension of right argument
+     1 + 4 5 6      ⍝ OK by virtue of scalar extension of left argument»
+
+Scalar extension is applied recursively. If some ravel element of a
+value A is nested and the corresponding ravel of B is not (or vice
+versa) then the non-nested element is scalar extended to the other:
+
+«APL 1 2 3 4 + 1 2 3      ⍝ expect length error
+     1 2 (3 4) + 1 2 3    ⍝ 3 is scalar extended to match (3 4)»
+
+«H4 List of Built-in Scalar Functions»
+
+The power of APL comes from the large number of built-in functions.
+Most of them belong to a category called scalar functions and below is
+a list of them. Normally the monadic and the dyadic variants are closely
+related and are both scalar functions. An exception is ∼ where the monadic
+form is a scalar function while the dyadic form is not.
+«»
+«»
+«TAB1
+ «TR»
+  «TH12»Dyadic: Z←A FUN B
+  «TH3» FUN
+  «TH45»Monadic: Z←FUN B
+
+ «TR»
+  «TH1» Name/Description
+  «TH2» Example(s)
+  «TH3» «EMPTY»
+  «TH4» Name/Description
+  «TH5» Example(s)
+
+ «TR»
+  «TD1»«BO Plus»«»Z is A plus B
+  «TD2»«APL 2 + 3»
+  «TD3» +
+  «TD4»«BO Conjugate»«»
+        Z is the complex«»
+        conjugate of B
+  «TD5»«APL + 1J42»
+
+ «TR»
+  «TD1»«BO Minus»«»Z is A minus B
+  «TD2»«APL 2 - 3»
+  «TD3» -
+  «TD4»«BO Negative»«»
+        Z is the negative of B
+  «TD5»«APL - ¯2»
+
+ «TR»
+  «TD1»«BO Times»«»Z is A times B
+  «TD2»«APL 2 × 3»
+  «TD3» ×
+  «TD4»«BO Direction»«»
+        Z is 1, 0, or ¯1 resp.
+        if B > 0, B = 0, or B < 0
+  «TD5»«APL × ¯5»
+
+ «TR»
+  «TD1»«BO Divide»«»
+        Z is A divided by B
+  «TD2»«APL 3÷2»
+  «TD3» ÷
+  «TD4»«BO Reciprocal»«»Z is 1 ÷ B
+  «TD5»«APL ÷4»
+
+ «TR»
+  «TD1»«BO Minimum» «»
+        Z is the smaller of A and B
+  «TD2»«APL 2 ⌊ 3»
+  «TD3» ⌊
+  «TD4»«BO Floor» «»
+        Z is B rounded down
+  «TD5»«APL ⌊ 4.7»
+
+ «TR»
+  «TD1»«BO Maximum» «»
+        Z is the larger of A and B
+  «TD2»«APL 2 ⌈ 3»
+  «TD3» ⌈
+  «TD4»«BO Ceiling»«»
+        Z is B rounded up
+  «TD5»«APL ⌈ 4.7»
+
+ «TR»
+  «TD1»«BO Power»«»
+        Z is A raised to«»
+        the B«SU th» power
+  «TD2»«APL 2⋆3»
+  «TD3» ⋆
+  «TD4»«BO Exponential»«»
+        Z is «BO e» to«»
+        the B«SU th» power
+  «TD5»«APL ⋆1»
+
+ «TR»
+  «TD1»«BO Logarithm»«»
+        Z is the logarithm«»
+          of B to base A
+  «TD2»«APL 2⍟8»
+  «TD3» ⍟
+  «TD4»«BO Natural Logarithm»«»
+        Z is the natural«»
+        logarithm of B
+  «TD5»«APL ⍟8»
+
+ «TR»
+  «TD1»«BO Residue» «» Z is B modulo A
+  «TD2»«APL 10∣13»
+  «TD3» ∣
+  «TD4»«BO Magnitude» «»
+        Z is the magnitude of B
+  «TD5»«APL ∣3J4»
+
+ «TR»
+  «TD1»«BO Binomial» «»
+        Z is Γ(1+B) ÷ (Γ(1+A) × Γ(1+B-A))«»«»
+
+        For integers A≥0 and B≥0:«»
+        Z is (B!) ÷ ((A!) × (B-A)!)
+  «TD2»«APL 3!5   ⍝ aka. 5 over 3»
+  «TD3» !
+  «TD4»«BO Factorial»«»
+        Z is Γ(1+B), aka.«»
+        B! for integers B≥0
+  «TD5»«APL !4   ⍝ factorial of B»
+
+ «TR»
+  «TD1»«BO Circular Functions» «»
+        Z is a function, selected«»
+        by integer A, and called«»
+        with argument B:
+        «»
+«» «BO A=¯12»: exp(iB)
+«» «BO A=¯11»: iB
+«» «BO A=¯10»: +B
+«» «BO A=¯9»: B
+«» «BO A=¯8»: sqrt(B«SU 2» - 1)
+«» «BO A=¯7»: atanh(B)
+«» «BO A=¯6»: acosh(B)
+«» «BO A=¯5»: asinh(B)
+«» «BO A=¯4»: (B+1) × sqrt((B-1)÷(B+1)))
+«» «BO A=¯3»: atan(B)
+«» «BO A=¯2»: acos(B)
+«» «BO A=¯1»: asin(B)
+«» «BO A=0»: sqrt(1 - B«SU 2») 
+«» «BO A=1»: sin(B)
+«» «BO A=2»: cos(B)
+«» «BO A=3»: tan(B)
+«» «BO A=4»: sqrt(1 + B«SU 2») 
+«» «BO A=5»: sinh(B)
+«» «BO A=6»: cosh(B)
+«» «BO A=7»: tanh(B)
+«» «BO A=8»: sqrt(¯1 - B«SU 2») 
+«» «BO A=9»: real(B)
+«» «BO A=10»: ∣ B
+«» «BO A=11»: imag(B)
+«» «BO A=12»: arc(B)
+  «TD2»«APL A,⍪(A←¯13+⍳25) ○ 1.1»
+  «TD3» ○
+  «TD4»«BO Pi Times» «»
+        Z is Pi times B
+  «TD5»«APL ○1»
+       «APL ○2»
+
+ «TR»
+  «TD1»«BO Without» «»
+        Z is the elements of A«»
+        that are not in B
+  «TD2»«APL 1 2 3 4 5 6 ∼ 3 4»
+  «TD3» ∼
+  «TD4»«BO Not» «» Z is the boolean«»
+        complement of B
+  «TD5»«APL ∼ 1 0 1 1 0 0»
+
+ «TR»
+  «TD1»«BO And/LCM» «»
+        For boolean A and B is Z the«»
+        logical AND of A and B.
+        «»«»
+        For integer A or B is Z the«»
+        least common multiple of A and B
+  «TD2»«APL 0 0 1 1 ∧ 0 1 0 1»
+  «TD3» ∧
+  «TD4»«BO N/A»
+  «TD5»«APL ∧ 0 1 0 1»
+
+ «TR»
+  «TD1»«BO Or/GCD» «»
+        For boolean A and B is Z the«»
+        logical OR of A and B
+        «»«»
+        For integer A and B is Z the«»
+        gratest common divisor of A and B
+  «TD2»«APL 0 0 1 1 ∨ 0 1 0 1»
+  «TD3» ∨
+  «TD4»«BO N/A»
+  «TD5»«APL ∨ 0 1 0 1»
+
+ «TR»
+  «TD1»«BO Nand» «» Z is ∼ (A ∧ B)
+  «TD2»«APL 0 0 1 1 ⍲ 0 1 0 1»
+  «TD3» ⍲
+  «TD4»«BO N/A»
+  «TD5»«APL ⍲ 0 1 0 1»
+
+ «TR»
+  «TD1»«BO Nor» «» Z is ∼ (A ∨ B)
+  «TD2»«APL 0 0 1 1 ⍱ 0 1 0 1»
+  «TD3» ⍱
+  «TD4»«BO N/A»
+  «TD5»«APL ⍱ 0 1 0 1»
+
+ «TR»
+  «TD1»«BO Equal» «»
+   Z is 1 for equal A and B,«»
+   and 0 otherwise.
+  «TD2»«APL 1 2 3 = 2»
+  «TD3» =
+  «TD4»«BO N/A»
+  «TD5»«APL = 0 1 0 1»
+
+ «TR»
+  «TD1»«BO Less Than» «»
+  Z is 1 if A is less than B,«»
+  and 0 otherwise.
+  «TD2»«APL 1 2 3 < 2»
+  «TD3» <
+  «TD4»«BO N/A»
+  «TD5»«APL < 0 1 0 1»
+
+ «TR»
+  «TD1»«BO Less or Equal» «»
+        Z is 1 if A s less than or«»
+        equal to B, and 0 otherwise
+  «TD2»«APL 1 2 3 ≤ 2»
+  «TD3» ≤
+  «TD4»«BO N/A»
+  «TD5»«APL ≤ 0 1 0 1»
+
+ «TR»
+  «TD1»«BO Not Equal» «»
+        Z is 1 if A  differs from B,«»
+        and 0 otherwise
+  «TD2»«APL 1 2 3 ≠ 2»
+  «TD3» ≠
+  «TD4»«BO N/A»
+  «TD5»«APL ≠ 0 1 0 1»
+
+ «TR»
+  «TD1»«BO Greater or Equal» «»
+        Z is 1 if A s greater than or«»
+        equal to B, and 0 otherwise
+  «TD2»«APL 1 2 3 ≥ 2»
+  «TD3» ≥
+  «TD4»«BO N/A»
+  «TD5»«APL ≥ 0 1 0 1»
+
+ «TR»
+  «TD1»«BO Greater Than»«»
+        Z is 1 if A is greater than B,«»
+        and 0 otherwise
+  «TD2»«APL 1 2 3 > 2»
+  «TD3» >
+  «TD4»«BO N/A»
+  «TD5»«APL > 0 1 0 1»
+»
+
+«H4 List of Other Built-in Functions»
+
+In order to have all functions listed in one place, we also provide the
+remaining build-in APL functions here. These functions are either
+represented by a single APL character, or by a name that starts with ⎕,
+followed by one or more letters from A-Z ("quad functions"). There is no
+big difference between quad functions and other built-in functions, except
+for the name. Often quad functions are used for services of the
+underlying operating system, such as time information, user accounting, etc.
+Note that the non-quad functions are all defined by the ISO APL standard
+(and identical on all APL interpreters), while very few quad-functions
+are defined by the standard and the other ones differ considerably between
+different APL interpreters.
+«»
+«»
+«BO Note:» The table below uses the concept of APL variables which have not
+been introduced yet (but will be soon). If you are an APL novice then please
+ignore the table for the moment and return to it after variables have been
+introduced.
+«»
+«»
+«TAB1
+ «TR»
+  «TH12»Dyadic: Z←A FUN B
+  «TH3» FUN
+  «TH45»Monadic: Z←FUN B
+
+ «TR»
+  «TH1» Name/Description
+  «TH2» Example(s)
+  «TH3» «EMPTY»
+  «TH4» Name/Description
+  «TH5» Example(s)
+
+ «TR»
+  «TD1»«BO Reshape»«»Z is the ravel of B (possibly shortened or replicated
+as needed) with shape A
+  «TD2»«APL 2 3⍴1 2 3 4 5 6»
+  «TD3» ⍴
+  «TD4»«BO Shape»«»Z is the shape of B
+  «TD5»«APL ⍴ (2 3 ⍴ 1 2 3 4 5 6)»
+
+ «TR»
+  «TD1»«BO Join»«»Z is the concatenation of A and B
+  «TD2»«APL A ← 2 3⍴'abcdef' ◊ B ← 2 3⍴1 2 3 4 5 6
+            A
+            B
+            A,B»
+
+  «TD3» ,«»⍪
+  «TD4»«BO Ravel»«»,B is the ravel of B (a vector with the same elements as B.
+       «»«»«BO Table»«»⍪B is a 2-dimensional matrix with the elements of B.)
+  «TD5»«APL ⎕ ← B ← 2 3 ⍴ 1 2 3 4 5 6»
+       «APL ,B»
+       «APL ⎕ ← B ← 1 2 3 4 5»
+       «APL ⍪B»
+
+ «TR»
+  «TD1»«BO Index of»«»Z is the positions of B's elements in A
+  «TD2»«APL 'abcdefgh' ⍳ 'hello'»
+
+  «TD3» ⍳
+  «TD4»«BO Index Generator»«»Z is 1 2 ... B
+  «TD5»«APL ⍳6»
+
+ «TR»
+  «TD1»«BO Identical»«»Z is 1 if A and B have the same shape and the same
+      ravel elements (including identical nested ravel elements), and 0
+      otherwise.
+  «TD2»«APL 1 2 3 ≡ 1 2 3   ⍝ same shapes and ravels»
+       «APL 1 2 3 = 1 2 5   ⍝ for comparison: equal»
+       «APL 1 2 3 ≡ 1 2 5   ⍝ same shapes, different ravels»
+       «APL 1  ≡ ,1   ⍝ same ravel, different shapes»
+
+  «TD3» ≢
+  «TD4»«BO Depth»«»Z is the depth (the level of nesting) of B
+  «TD5»«APL ≡ 1»
+       «APL ≡ 1 2 3»
+       «APL ≡ 1 (2 3) 4»
+
+ «TR»
+  «TD1»«BO Not Identical»«»Z is 0 if A and B have the same shape and the same
+      ravel elements (including identical nested ravel elements), and 1
+      otherwise.
+  «TD2»«APL 1 2 3 ≢ 1 2 3   ⍝ same shapes and ravels»
+       «APL 1 2 3 ≠ 1 2 5   ⍝ for comparison: not equal»
+       «APL 1 2 3 ≢ 1 2 5   ⍝ same shapes, different ravels»
+       «APL 1  ≢ ,1   ⍝ same ravel, different shapes»
+  «TD3» ≢
+  «TD4»«BO Tally»«»
+        Z is the length of the first axis of B
+  «TD5»«APL ≢ 1»
+       «APL ≢ 2 3⍴1 2 3»
+       «APL ≢ 4 3⍴1 2 3»
+       «APL ≢ 1 (2 3) 4»
+
+ «TR»
+  «TD1»«BO Member of»«»Z is a Boolean value with the same shape as A.
+           The elements of Z indicate if the corresponding element in A is
+           equal to some element in B.
+  «TD2»«APL (2 3⍴1 2 3 4 5 6) ϵ 4 5 6 7 8»
+
+  «TD3» ∈
+  «TD4»«BO Enlist»«»Z is the elements of B listed in depth-first order (all
+                   nested sub-values of a ravel element come before the
+                   next ravel element at the same level).
+  «TD5»«APL ∈ (1 2 3) (4 5) 6»
+
+ «TR»
+  «TD1»«BO Deal»«»Z is a subset of ⎕IO ... ⎕IO+B containing A elements
+           chosen at random
+  «TD2»«APL 3 ? 10»
+       «APL 3 ? 10»
+
+  «TD3» ?
+  «TD4»«BO Roll»«»Z has the same shape as B. The elements of Z are random
+                   numbers between ⎕IO and ⎕IO+b where b is the corresponding
+                   element in B.
+  «TD5»«APL ? 10 100 1000»
+
+ «TR»
+  «TD1»«BO Grade Up/Down with collating sequence»«»
+           A is a character array which defines an sorting order for
+           characters. B is a character vector (string) to be sorted.
+           Z is an integer vector such that B[Z] is sorted according to the
+           sorting order defined by A.
+  «TD2»«APL ⎕IO←1                         ⍝ ⍋ and ⍒ depend on ⎕IO»
+       «APL ⊢B←5 4⍴'DEADBADECEDEBEADDEE'  ⍝ B: the items to be sorted»
+       «APL 'ABCDE' ⍋ B                   ⍝ sort B with A < B < C < D < E»
+       «APL B['ABCDE' ⍋ B;]               ⍝ the sorted items»
+       «APL B['CBADE' ⍋ B;]               ⍝ same with C < B < A < D < E»
+  «TD3» ⍋ «» ⍒
+  «TD4»«BO Grade Up/Down»«»Z is a vector of indices such that B[Z] is ordered
+           ascendingly (⍋) or descendingly (⍒). In other words, B[⍋B] is B
+           sorted in ascending order and B[⍒B] is B sorted in descending order.
+  «TD5»«APL ⍋ B←1 7 4 2 6»
+       «APL B[⍋B]»
+       «APL B[⍒B]»
+
+ «TR»
+  «TD1»«BO Representation aka. Encode»«»
+        Z is numbers in B represented in the number system with radices A.
+        ⍴A determines the number of digits in that representation.
+  «TD2»«APL 2 2 2 2 2 2 ⊤ 42   ⍝ 42 in base 2 (aka. binary) with 6 digits»
+  «TD3» ⊤
+  «TD4»N/A
+  «TD5»«APL ⊤ 42»
+
+ «TR»
+  «TD1»«BO Base Value aka. Decode»«»
+        Z is the number corresponding to the digits B in the number system
+        with radices A.
+  «TD2»«APL 2 ⊥ 1 0 1 0 1 0   ⍝ binary 1 0 1 0 1 0 in decimal»
+  «TD3» ⊥
+  «TD4»N/A
+  «TD5»«APL ⊥ 42»
+
+ «TR»
+  «TD1»«BO Union»«»Z is A , B (with duplicates of A in B removed)
+  «TD2»«APL 1 2 2 3 'A' ∪ 3 'B' 'C' 'A'»
+  «TD3» ∪
+  «TD4»«BO Unique»«»Z is B with duplicate elements removed
+  «TD5»«APL ∪ 1 2 3 4 3 5»
+
+ «TR»
+  «TD1»«BO Format»«»Z is B formatted according to A
+  «TD2»«APL ⊢B←3 2ρ1 .468987 2 57.276 3 27963»
+       «APL ⍝ format by specification: (field size + precision)»
+       «APL ⍝ precisions < 0 imply exponential format»
+       «APL 4 2 12 ¯5 ⍕ B   ⍝ field sizes 4 and 12, precisions 2 and ¯5»
+       «APL ⍝ format by example: (example string A)»
+       «APL ⊢B←234.67 456.23 987.65 34.23»
+       «APL "SUM: $5,555.50" ⍕ +/ B»
+  «TD3» ⍕
+  «TD4»«BO Format»«»
+       Z is B for strings; otherwise B converted to a character vector or matrix
+  «TD5»
+
+ «TR»
+  «TD1» N/A
+  «TD2» «APL 2 ⍎ 42»
+  «TD3» ⍎
+  «TD4»«BO Execute»«»Z is the result of executing string B as APL expression
+  «TD5»
+
+ «TR»
+  «TD1»«BO Take»«»Z is a rectangular sub-area of B according to A
+  «TD2» «APL ⊢V←⍳7»      «APL 3↑V» «APL ¯3↑V»
+        «APL ⊢B←7 7⍴⍳49» «APL 3 3↑B» «APL ¯3 ¯3↑B»
+  «TD3» ↑
+  «TD4»«BO First»«»Z is a Scalar containing first element of B (or the prototype of B if B is empty)
+  «TD5»
+
+ «TR»
+  «TD1»«BO Drop»«»Z is B rectangular sub-area of B according to A
+  «TD2» «APL ⊢V←⍳7»      «APL 3↓V» «APL ¯3↓V»
+        «APL ⊢B←7 7⍴⍳49» «APL 3 3↓B» «APL ¯3 ¯3↓B»
+  «TD3» ↓
+  «TD4» N/A
+  «TD5» «APL ↓ 1 2 3»
+
+ «TR»
+  «TD1»«BO Find»«»Z[i] is 1 if A starts at B[i] in B and 0 if not.
+  «TD2»«APL 3 4 ⍷ 1 2 3 4 5»
+  «TD3» ⋸
+  «TD4» N/A
+  «TD5» «APL ⋸ 'abc'»
+
+ «TR»
+  «TD1»«BO Index»«»Z is B[A]
+  «TD2»«APL 2 ⌷ 'Hello'»   ⍝ second character
+  «TD3» ⌷
+  «TD4» N/A
+  «TD5» «APL ⌷ 1 2 3»
+
+ «TR»
+  «TD1»«BO Right»«»Z is B.
+  «TD2»«APL 'Left' ⊢  'Right'»
+  «TD3» ⊢
+  «TD4»«BO Identity» «» Z is B. ⊢B is a shortcut for ⎕←B
+  «TD5»
+
+ «TR»
+  «TD1»«BO Left»«»Z is A
+  «TD2»«APL 'Left' ⊣  'Right'»
+  «TD3» ⊣
+  «TD4»«BO Hide» «» Z is B as a committed APL value (and is therefore not
+                  automatically displayed). ⊣B is a shortcut for (⍳0)⍴B.
+  «TD5» «APL 1 + 3»
+        «APL ⊣ 1 + 3»
+
+ «TR»
+  «TD1»«BO Partition» «»
+        Z is B, divided into partitions according to A. Two elements B[b]
+        and B[b+1] of B belong to the same partition if A[b] ≥ A[b+1] > 0.
+        Each partition becomes a nested item of Z where B[b] with A[b] = 0
+        are removed.
+  «TD2»«APL 1 1  2 2  3 3 3 3 ⊂ 'ABCDEFGH'   ⍝ 3 partitions»
+       «APL 1 1  0 0  3 3 3 3 ⊂ 'ABCDEFGH'   ⍝ 2 partitions»
+  «TD3» ⊂
+  «TD4»«BO Enclose»«»Z is B for simple scalars B, otherwise a scalar
+                     that contains B as a nested value
+  «TD5»«APL B←3 4 ⍴5»
+       «APL 8 ⎕CR B»
+       «APL 8 ⎕CR ⊂B»
+
+ «TR»
+  «TD1»«BO Pick» «»
+        Z is a nested sub-value of B, whose position in B is determined by A.
+        Every item of A corresponds to a nesting level of B.
+  «TD2»«APL 8 ⎕CR  S←2 3ρ'AB' 'CD' 'EF' 'GH' 'IJ' 'KL'»
+       «APL (1 3) 2 ⊃ S   ⍝ (1 3) selects 'EF' from S, 2 selects 'F' from 'EF'»
+       «APL (⊃S[1;3])[2]   ⍝ the same.»
+
+  «TD3» ⊃
+  «TD4»«BO Disclose»«»
+        Z is the elements of B,
+        with nested sub-values
+        replaced by arrays padded
+        to the same common size
+  «TD5» «APL 8 ⎕CR B←2 2⍴'One' 'Two' 'Three' 'Four'»
+        «APL 8 ⎕CR ⊃ B»
+
+ «TR»
+  «TD1»«BO Rotate»«»Z is B rotated according to A
+  «TD2»«APL ⊢B←3 5⍴⍳5»
+       «APL 1 2 3⌽B       ⍝ rotate along the last axis (columns)»
+       «APL ¯1 ¯2 ¯3⌽B    ⍝ rotate backwards along the last axis (columns)»
+       «APL ⊢B←3/⍪⍳5»
+       «APL 1 2 3⊖B       ⍝ rotate along the first axis (rows)»
+  «TD3» ⊖ «» ⌽
+  «TD4»«BO Reverse»«»
+        Z is B with the items along the first resp. last axis reversed
+  «TD5»«APL ⌽1 2 3 4 5»
+
+ «TR»
+  «TD1»«BO Transpose (General)»«»Z is B transposed according to A.
+       «» A is a vector of
+          numbers in«»
+          1 2 3...⌈/A (or in«»
+          0 1 2..., if ⎕IO←0).
+          «»«»
+          Permutations A (of
+          ⍳⍴⍴B) permute the
+          axes of B.
+          «»«»
+          Repeated items in A
+          select diagonals in
+          B and reduce the rank
+          of the result.
+
+  «TD2» «APL ⊢N234←10 ⊥¨ ⍳2 3 4»
+        «APL 1 3 2⍉N234»
+        «APL 1 1 2⍉N234   ⍝ axis 1 repeated»
+  «TD3» ⍉
+  «TD4»«BO Transpose (Reverse Axes)»«»Z is B transposed so that the order
+           of axes is reversed. Z←⍉B ←→ (⌽⍳⍴B)⍉B
+  «TD5» «APL ⊢N234←10 ⊥¨ ⍳2 3 4»
+        «APL ⍉ N234»
+
+ «TR»
+  «TD1»«BO Intersection»«»Z is the elements of A that are also in B
+  «TD2»«APL 1 2 3 4 5 6 ∩ 3 4 5 6 7 8»
+  «TD3» ∩
+  «TD4» N/A
+  «TD5» «APL ∩ 3 4 5 6 7 8»
+
+ «TR»
+  «TD1»«BO Compress»«»Z is the elements of B with B[i] repeated A[i] times
+  «TD2»«APL 1 2 3 4 5 / 'ABCDE'
+           1 2 3 4 5 / '1A' '2B' '3C' '4D' '5E'»
+  «TD3» / «» ⌿
+  «TD4»N/A (note that f/B is an operator that takes one value argument)
+  «TD5» «APL / 'ABCDE'»
+
+ «TR»
+  «TD1»«BO Expand»«»A[i] is 0 or 1; if 1 then Z[i] is B[i] and otherwise ↑B.
+  «TD2»«APL 1 0 1 0 0 1\1 2 3   ⍝ 1 at 1, 2 at 3, and 3 at 6. ↑B is 0
+            1 0 1 0 0 1 \ 'ABC' ⍝ A at 1, B at 3, and C at 6  ↑B is ' '»
+  «TD3» \ «» ⍀
+  «TD4»N/A (note that f\B is an operator that takes one value argument)
+  «TD5» «APL \ 'ABCDE'»
+
+»
+
+«H4 List of Built-in Monadic APL Operator»
+
+A monadic APL operator OP1 takes 2 or 3 arguments in the following order:
+
+«UL
+«LI a left value «BO A» (mandatory or optional, depending on the operator),»
+«LI a mandatory left function argument «BO f» (followed by the operator itself)»
+«LI a mandatory right value «BO B».»
+»
+
+«TAB1
+ «TR»
+  «TH12»Used with 2 Value Arguments A and B: Z←A f OP1 B
+  «TH3» OP1
+  «TH45»Used with 1 Value Argument B: Z←f OP1 B
+
+ «TR»
+  «TH1» Name/Description
+  «TH2» Example(s)
+  «TH3» «EMPTY»
+  «TH4» Name/Description
+  «TH5» Example(s)
+
+ «TR»
+  «TD1»«BO Reduce N-wise» «»
+        Like «BO f/B» and «BO f⌿B» except that «BO f» is applied to groups
+        C«su 1» C«su 2» ... C«su n».
+        Each group C«su n» has A consecutive items of B and starts at position
+        i of the axis along which the N-wise reductions are computed.
+  «TD2»«APL ⊢R←1 2 3 4 5 6
+              4 +/ R
+              +/R[1 2 3 4]   ⍝ group C₁ ←→ Z[1]
+              +/R[2 3 4 5]   ⍝ group C₂ ←→ Z[2]
+              +/R[3 4 5 6]   ⍝ group C₃ ←→ Z[3]»
+        «APL ⊢R←2 6⍴⍳12      ⍝ ⍴⍴R > 1
+              4 +/ R»
+
+  «TD3» / «» ⌿
+  «TD4» «BO Reduce» «»
+         «BO Z» is computed by applying «BO f» repeatedly along the last axis
+         of B, i.e.  Z←[;;1] f B[;;2] f ... f B[;;N] (the number of semicolons
+         is ¯1↑⍴⍴B and N←¯1↑⍴B). f⌿B is the same except that f is computed
+         along the first axis of B.
+  «TD5»«APL +/ 1 2 3 4 5   ⍝ +/ is the sum of elements»
+
+ «TR»
+  «TD1» N/A
+  «TD2» «APL 2 +\ 1 2 3 4»
+  «TD3» \ «» ⍀
+  «TD4» «BO Scan» «»
+         Z←f\B resp. Z←f⍀B is like Z←f/B resp. Z←f⌿B except that the partial
+         results of the different invocations of function f are not discarded
+         but included in the result Z.
+  «TD5»«APL +\ 1 2 3 4 5   ⍝ 1, 1+2, 1+2+3, 1+2+3+4, 1+2+3+4+5»
+
+ «TR»
+  «TD1»«BO Commute»«»Z is B f A (the arguments A and B are exchanged)
+  «TD2»«APL 2 ÷ 1»
+       «APL 2 ÷⍨ 1»
+  «TD3» ⍨
+  «TD4»<BO Duplicate«»Z is B f B (the single argument B is duplicated)
+  «TD5»«APL ×⍨ 1 2 3 4   ⍝ squares»
+
+ «TR»
+  «TD1»«BO Each (dyadic)»«»Z[i] is A[i] f  B[i] (f is called dyadically
+        for all corresponding items of A and B)
+
+  «TD2»«APL 8 ⎕CR  1 2 3 ,10 20 30»
+       «APL 8 ⎕CR  1 2 3 ,¨10 20 30»
+  «TD3» f¨
+  «TD4»«BO Each (monadic)»«»Z[i] is f B[i] (f called monadically for every item B[i] of B)
+  «TD5»«APL 8 ⎕CR , 1 2 3»«APL 8 ⎕CR ,¨ 1 2 3»
+»
+
+«H4 List of Built-In Dyadic APL Operators»
+
+A dyadic APL operator OP2 takes 3 or 4 arguments in the following order:
+
+«UL
+«LI a left value «BO A» (mandatory or optional, depending on the operator),»
+«LI a mandatory function argument «BO f», (followed by the operator itself)»
+«LI a mandatory function argument «BO g», and»
+«LI a mandatory right value «BO B».»
+»
+
+«TAB1
+ «TR»
+  «TH12»Used with 2 Value Arguments A and B: Z←A f OP2 g B
+  «TH3» OP2
+  «TH45»Used with 1 Value Argument B: Z←f OP2 g B
+
+ «TR»
+  «TH1» Name/Description
+  «TH2» Example(s)
+  «TH3» «EMPTY»
+  «TH4» Name/Description
+  «TH5» Example(s)
+
+ «TR»
+  «TD1»«BO Inner Product»«»Z[i;j] is f / A[i] g B[j]. Row A[;j] is multiplied
+                           with column B[i;] and the resulting vector V is
+                           then f-reduced to give the scalar Z[i;j] (enclosed
+                           if necessary to yield a scalar).
+                       «»  For simple numeric matrices A and B this is
+                           the "matrix multiplication" known from linear
+                           algebra.
+  «TD2»«APL ⊢A←2 2⍴1 2 3 4»«APL ⊢B←2 2⍴1 2 3 4»«APL ⊢A +.× B»
+  «TD3» f.g
+  «TD4» N/A
+  «TD5» «APL +.× 2 2⍴1 2 3 4»
+
+ «TR»
+  «TD1»«BO Outer Product»«»Z[i;j] is A[i] g B[j]. ⍴Z ←→ (⍴A),⍴B)
+  «TD2»«APL B ∘.× B←⍳10»
+  «TD3» ∘.g
+  «TD4» N/A
+  «TD5» «APL ∘.× B←⍳10»
+
+ «TR»
+  «TD1»«BO Rank»«»
+         «BO Z←f ⍤ y B» is
+         function «BO f» applied
+         to the rank-«BO m» cells
+         of «BO B» (where «BO m» is
+         defined by «BO y», see
+         below.).
+         «»«»
+         The «BO rank-v cells» of
+         a value «BO V», «BO v≤⍴⍴V»,
+         is «BO V» enclosed along its
+         «BO v» lower axes, i.e.
+         «BO ⊂[(-v)↑⍴V] V»
+         «»«»
+         «IT Conceptually» is «BO y»
+         a 3 item integer vector:
+         «BO y ← m a b».
+         Shorter «BO y» are expanded:
+         «»«»
+         «BO y←m»    ←→  «BO y←m m m»
+         «BO y←a b»  ←→  «BO y←b a b»
+         «»«»
+         This monadic case uses only
+         the first item «BO m» of «BO y»,
+         but not «BO a» or «BO b».
+
+  «TD2»«APL y←0 ◊ ⍳⍤y 1 2 3»
+      «APL1 ⍝ ISO standard 13751 uses arrays like N233 below,»
+   «APL2 ⍝ whose items are unique and reflect their position»
+   «APL2 ⍝ in the array That is, e.g.  N233[i;j;k] ←→ ijk»
+   «APL2 ⍝»
+   «APL3 ⎕ ← N233 ← 10 ⊥¨ ⍳2 3 3»
+       «APL (,⍤2) N233»
+       «APL ⍳⍤0 1 2 3      ⍝ ambiguous, see below»
+       «APL (⍳⍤0) 1 2 3   ⍝ y B ←→ (0) (1 2 3)»
+       «APL (⍳⍤0 1) 2 3   ⍝ y B ←→ (0 1) (2 3)»
+       «APL (⍳⍤0 1 2) 3   ⍝ y B ←→ (0 1 2) (3)»
+  «TD3» ⍤
+  «TD4»«BO Rank»«»
+         «BO Z←A f ⍤ y B» is
+         function «BO f» applied to the
+         rank-«BO a» cells of «BO A»
+         and the rank-«BO b» cells of «BO B»
+         (with «BO a» and «BO b» defined
+         by «BO y», see monadic case).
+         «»«»
+         This dyadic case uses
+         only «BO a» and «BO b» of
+         «BO y←m a b»; the first item «BO m»
+         is used in the monadic case.«»
+         The intention of this somewhat
+         confusing definition was apparently
+         the use of the same «BO y»
+         in the monadic and dyadic cases.
+         However, a two item «BO y←a b»
+         (with «BO a» ignored in the monadic
+         case) would have been more plausible.
+
+
+  «TD5»«APL 0 1 2⌽⍤0 1 'ABC'»
+
+ «TR»
+  «TD1»«BO Power Operator»«»
+         «BO Z←A f ⍣ N B» (N > 0):«»
+           repeat: Z←B←A f B«»
+           (repeats N times).«»«»
+         «BO Z←A f ⍣ N B» (N < 0):«»
+           repeat: Z←B←A f«SU -1» B«»
+           (repeats -N times).«»«»
+         «BO Z←A f ⍣ g B»«»
+         with function «BO g»:
+           repeat: Z←B←A f B«»
+           until (A f B) g B.
+  «TD2»«APL 2 (×⍣ 5) 1   ⍝ 2 × 2 × 2 × 2 × 2 × 1»
+       «APL 2 (×⍣ ¯5) 1   ⍝ ((((1 ÷ 2) ÷ 2) ÷ 2) ÷ 2) ÷ 2»
+       «APL 2 (-⍣≤)  6.4   ⍝ (2 - 6.4) = ¯4.4 and 4.4 ≤ 6.4»
+  «TD3» ⍣
+  «TD4»«BO Power Operator»«»
+         «BO Z←f ⍣ N B» (N > 0):«»
+           repeat: Z←B←f B«»
+           (repeats N times).«»«»
+         «BO Z←f ⍣ N B» (N < 0):«»
+           repeat: Z←B←f«SU -1» B«»
+           (repeats -N times).«»«»
+         «BO Z←f ⍣ g B»«»
+         with function «BO g»:
+           repeat: Z←B←f B«»
+           until (f B) g B.
+  «TD5»«APL (-⍣3) 5    ⍝ - - - 5»
+       «APL (-⍣¯3) 5   ⍝ -<sup>-1</sup> is +»
+»
+
+«»«»
+«BO Notes»: The outer product is considered a dyadic operator here (and also
+in the APL standard), even though it has only one functional argument and
+not two. If it were a monadic operator then the function argument g would
+have to appear left of the operator symbol (.) rather than right of it.
+In a way one can consider the outer product as the inner product with '∘'
+being the identity function.
+«»
+«»
+The ISO standard defines f⍤y as dyadic operator (with a left (function)
+ rgument f and right (numeric) argument y. y is a numeric vector with
+1, 2, or 3 elements, which may be ambiguous in certain cases.
+
+«H4 Functions and Operators with Axis Argument»
+
+As we have seen above, some built-in functions and operators have variants
+that operate along the first or along the last axis. For example:
+
+«APL      ⊢A←2 3 ⍴'A' 
+          ⊢B←2 3⍴'b'
+          A,B   ⍝ catenate along last axis
+          A⍪B   ⍝ catenate along first axis»
+
+For built-in functions and operators the symbol for the the variant that
+works along the first axis is the symbol for the variant that works along
+the last axis but with a '-' overstrike. These days APL uses a keyboard
+layout where every APL character can be entered with the help of the
+Ctrl-key or with the Alt-key, but in the early days of APL the character
+'⍪' was produced by typing ',' then backspace (which moved the input cursor
+back over the ',' just types) and finaly '-'. On a standard ASCII terminal
+this 3 character sequence would have replaced ',' with '-' but on an APL
+terminal it instead would have combined the ',' and the '-' resulting in
+the overstrike character '⍪'.
+
+Coming back to our topic axis arguments: Those built-in functions that
+can operate along the first or along the last axis can also operate along
+any other axis. The desired axis is provided after the function or operator
+symbol and in brackets:
+
+«»
+«APL      ⊢A←2 3 4⍴'A' 
+          ⊢B←2 3 4⍴'b'
+          A,B   ⍝ catenate along last axis
+          A⍪B   ⍝ catenate along first axis
+
+          A,[1]B   ⍝ catenate along first axis
+          A,[2]B   ⍝ catenate along middle axis
+          A,[3]B   ⍝ catenate along last axis»
+«»
+The axis can be given as a numeric literal as above, but also as a 
+variable whose value is a number indicating a valid axis of the arguments.
+
+«H4 System Functions»
+
+The built-in APL functions that we have introduced so far were represented
+by a single character. These functions are commonly referred to as
+"primitive APL functions" (or operators) or simply "APL primitives". There
+is another group of built-in APL functions called "System Functions" which
+are used in the same way as primitives. The distinction between APL
+primitives and system functions is somewhat arbitrary and probably caused
+by a lack of suitable characters or keyboard keys. The few differences
+between primitives and system functions are:
+«»
+«UL
+«LI a primitive is denoted by single character while a system function
+    is denoted by the character ⎕ followed by one or more characters A-Z
+    or a-z (see chapter "Names of System Functions and System Variables"
+    above)»
+«LI The function computed by a APL primitives essentially the same on
+    different APL interpreters while the system functions (and in particular
+    their presence or absence) may differ considerably between different
+    APL interpreters.»
+«LI APL primitives compute APL values from other APL values while system
+    functions typically provide an interface to resources of the underlying
+    operating system on which the interpreter runs.»
+»
+«»
+For a quick tour of GNU APL the details of the GNU APL system functions
+are far to extensive and we refer the reader to the «BO GNU APL info manual»
+where the GNU APL specific system functions are described in more detail,
+and to the ISO standard 13751 for more common system functions. Note that
+some system functions are obsolete these days but maintained only for
+backward-compatibility with older (i.e. APL1) interpreters.
+«»
+
+«H5 Z ← ⎕AF B : Atomic Function»
+
+Monadic, obsolete. In a pure Unicode interpreter like GNU APL «BO ⎕AF B»
+ seems to be the same as «BO ⎕UCS B».
+
+«H5 Z ← A ⎕AT B : Attributes»
+
+Dyadic: For a (user-defined) name «BO FOO» which designates an existing
+defined function or variable, the expression «BO A ⎕AT 'FOO'» yields a
+numeric vector with attributes from a category that is defined by «BO A»:
+
+«UL
+«LI A=1:  result type, function and operator valences»
+«LI A=2:  creation time, valences»
+«LI A=3:  execution peroperties»
+«LI A=4:  object sizes (CDR)»
+»
+
+Note that the name «BO FOO» is quoted to make it a character vector. ⎕AT also
+accepts a character matrix if the attributes of multiple names shall be
+obtained.
+
+«H5 Z ← A ⎕CR B : Character Representation»
+
+Monadic: For a (user-defined) name «BO FOO» which designates an existing
+defined function or operator, the expression «BO ⎕CR 'FOO'» yields the
+character representation for that name. The character representation of a
+function is a character matrix with one line for every line (including
+the header line) of the function or operator.
+«»
+«»
+Dyadic: As a GNU APL specific feature, dyadic «BO A ⎕CR 'FOO'» is one of
+over 40 different conversion functions. The integer scalar A ≥ 0 selects
+one of these functions. «BO A ⎕CR ⍬» and «BO A ⎕CR ''» displays a list of
+the functions implemented so far.
+
+«H5 Z ← ⎕DL B : Delay»
+
+Monadic: «BO ⎕DL N» pauses the operation of the interpreter for N seconds.
+
+«H5 Z ← A ⎕DLX B : Donald Knuth's Dancing Links»
+
+Dyadic: «BO ⎕DLX» implements a powerful backtracking machine known as
+"Dancing links" or "Algorithm X". The algorithm was published by Donald
+Knuth in 2000 and is the algorithm of choice for a class of problems that
+is best soved by means of backtracking. For example the 8 tower and 8
+queens problem on a chess-board or sudokus. Formally «BO ⎕DLX» solves
+the so-called "exact cover problem": given a binary matrix B, find a
+subset Z of ⍳↑⍴B so that (+/[1]B[Z;]) ≡ ((¯1↑⍴B)⍴1). Less formally:
+find a sub-matrix S←B[Z;] of B so that every column of S contains
+exactly one 1. The left argument A of «BO A ⎕DLX B» controls the type
+of result desired such as compute only one solution, conmpute all solutions,
+etc.
+
+«H5 Z ← A ⎕EA B : Execute Alternate»
+
+Dyadic: «BO A ⎕EA B» computes «BO ⍎B» and, if that fails, computes «BO ⍎A».
+A and B are character vectors containing APL expressions. The result of
+ «BO A ⎕EA B» is the result of «BO ⍎A» if it succeeds, otherwise the result of
+«BO ⍎B». If «BO ⍎B» succeeds then «BO ⍎A» is not computed so that either
+«BO ⍎B» or «BO ⍎A» is being computed.
+
+«H5 Z ← A ⎕EB B : Execute Both»
+
+Dyadic: «BO A ⎕EB B» computes «BO ⍎B» and then «BO ⍎A». Errors in «BO ⍎B»
+are ignored, so that «BO ⍎B» and «BO ⍎A» are both computed. Typically
+«BO ⍎A» is an error handler for the case where «BO ⍎B» has failed, e.g.
+for providing a replacement for the missing result of «BO ⍎A».
+
+«BO ⎕EB» is a GNU APL specific feature.
+
+«H5 Z ← ⎕EC B : Execute Controlled»
+
+Monadic: «BO ⎕EC B» computes «BO ⍎B» but does not interupt the APL
+interpreter when an error occurs. Instead the 3-element result vector
+indicates «BO (Z1 Z2 Z3)←⎕EC B» indicates the type of result:
+
+«UL
+«LI Z1=0: Error, e.g. 2+'A'»
+«LI Z1=1: Value, e.g. 2+2»
+«LI Z1=2: Committed Value, e.g. A←2+2»
+«LI Z1=3: No Value, e.g. FOO with FOO returning no result»
+«LI Z1=4: Branch, e.g. → 2»
+«LI Z1=5: Escape, e.g. →»
+»
+
+«BO Z2» is the result that «BO ⎕ET» (see below) would have had if «BO ⍎B»
+were computed without «BO ⎕EC». When computed with «BO ⎕EC» then «BO ⎕ET»
+is not affected.
+
+«BO Z3» is the actual result of «BO ⍎B»:
+
+«UL
+«LI Z1=0: ⎕EM (see below)»
+«LI Z1=1: e.g. 4 for 2+2»
+«LI Z1=2: e.g. 4 for A←2+2»
+«LI Z1=3: 0 0⍴0»
+«LI Z1=4: e.g. 2 for → 2»
+«LI Z1=5: 0 0⍴0»
+»
+
+«H5 Z ← ⎕ENV B : ENvironment Variables»
+
+Monadic: GNU APL feature: return the names and values of the environment
+variables in the operating system at the point in time when the GNU APL
+interpreter was started. The argument «BO B» of «BO ⎕ENV B» is a prefix
+for the names of the environment variables that shall be returned.
+
+«H5 Z ← A ⎕ES B : Event Simulate»
+
+Nomadic: Programmatically simulate an error event. For testing error
+handlers. Monadic «BO ⎕ES B» is «BO ⎕EM ⎕ES B» or «BO B  ⎕ES ⎕ET» depending
+on B being either a character vector (event message) or a 2-item integer
+vector (event type).
+
+«H5 Z ← ⎕EX B : EXpunge»
+
+Monadic: Argument «BO B» of «BO ⎕EX B» specifies one or more name(s) of
+variables, functions, or operators that shall be erased. For each name, the
+corresponding result item is 1 on success or 0 on error.
+
+«H5 Z ← A ⎕FFT B : Fast Fourier Transform»
+
+Nomadic. Compute the fast fourier transform of real or complex «BO B».
+The optional argument «BO A» controls details such as a window function
+to be used for the FFT.
+
+«H5 ⎕FIO[X] B : File I/O functions»
+
+Dyadic: Similar to «BO A ⎕CR B» above, «BO A ⎕FIO B» is a collection of
+over 60 different (sub-) functions. Dyadic «BO A ⎕FIO B» has a mandatory
+axis argument «BO X» which is an integer scalar X ≥ 0 that selects
+one of these sub-functions. The sub-function «BO ⎕FIO[X]» is then monadic,
+dyadic or nomadic.
+
+As a matter of convenience, the functions «BO A ⎕FIO ⍬» and «BO A ⎕FIO ""»
+(i.e. without an axis argument) display lists of the functions implemented
+by «BO A ⎕FIO[X] B» so far in different formats.
+
+The functions in «BO ⎕CR» are conversion functions which means that they
+transform one APL value into another APL value. As a consequence each
+conversion function is monadic and the left argument «BO B» is the value
+that is being converted.
+
+In contrast, the functions in «BO ⎕FIO» constitue an interface to the
+underlying operating system and every function in «BO ⎕FIO» corresponds
+to a C function in library libc. This has two consequences:
+
+«OL
+«LI the corresponding C function in libc has more often than not two or
+    more arguments. For this reason, the function number which selects
+    the individual function is now the numeric axis argument «BO X»
+    of «BO A ⎕FIO[X] B».»
+«LI the now unused left argument «BO A» has now become avaiable as another
+    argument for the selected function «BO ⎕FIO[X]». That is, all functions
+    «BO A ⎕CR» are monadic while most functions «BO ⎕FIO[X]» are dyadic.»
+»
+
+In the early days of GNU APL there were only a few functions «BO ⎕FIO[X]»
+and distinguishing different sub-functions by means of function numbers
+was already common practice (see, for example, ⎕AT above) and was adequate
+as long as the number of sub-functions was small. Over the years, however,
+more and more functions were added to «BO ⎕FIO», and the resulting
+APL code became more and more difficult to read. Therefore at
+some point in time a second mechanism - function names instead of function
+numbers - was added. One could now, for example, write «BO ⎕FIO['fopen']»
+instead of the less intuitive «BO ⎕FIO[3]».
+«»
+«»
+A minor flaw of the new function names was that they needed to be quoted.
+This led to a third syntax variant where the function name became an
+(unquoted) APL name instead of a (quoted) APL string. This is most likely
+the final and most elegant syntax for «BO ⎕FIO» where one can now write
+«BO ⎕FIO.fopen» instead of «BO ⎕FIO['fopen']» or «BO ⎕FIO[3]».
+
+«H5 Z ← ⎕FX B : FiX»
+
+Monadic: «BO B» is either a character matrix or a vector of function lines
+(function header and APL code). «BO ⎕FX B» creates a new defined APL function
+(see the chapter "Defined Functions" below). With monadic ⎕FX one can therefore
+create new defined APL functions at runtime.
+«»
+«»
+Dyadic: As a GNU APL feature one can not only create defined functions that
+consis of lines of APL code, but also defined functions that were written
+in other computer languages, most commonly in C/C++. These so-called
+"native" functions are provided in terms of shared libraries that the user
+has to construct beforehand. In «BO A ⎕FX B» «BO A» is the file name of a
+shared library file and «BO B» the APL name of the function the is implemented
+in the shared library.
+«»
+«»
+GNU APL is shipped with a set of templates for creating native functions
+or operators that are intended as starting points for native functions
+created by the user.
+«»
+«»
+«H5 Z ← ⎕GTK B : Gtk GUI»
+
+«BO ⎕GTK» is an interface to GTK (Graphical Tool Kit) version 3. It implements
+a small subset of the GTK 3 API and is intended for (and limited to)
+creating simple windows on the screen, for example to request input from
+the user in a more intuitive way than the old-fsshioned ⎕ and ⍞ input
+variables.
+
+«H5 Z ← A ⎕JSON B : JSON parser»
+
+Monadic: «BO B» is a text string in JSON (JavaScript Object Notation) format
+which is converted to the corresponding APL value «BO Z».
+«»
+«»
+Dyadic: «BO B» is an APL value which is converted to the corresponding JSON
+string. «BO A» controls some aspect of this conversion, for example to read
+the JSON data string from a file rather than from an APL text vector.
+
+«H5 Z ← A ⎕MAP B : MAP (replace) ravel elements»
+
+«BO Z» is  «BO B» but with every occurance of ravel «BO A[j;1]» replaced
+with «BO A[j;2]».
+
+The same can be achieved with «BO ⎕RE», but «BO ⎕MAP» is optimized for this
+kind of 1:1 replacement while «BO ⎕RE» is more powerful but slower.
+
+«H5 Z ← ⎕INP B : INPut from script»
+
+«BO ⎕INP» is an early attempt to handle multi-line literals in GNU APL.
+It has been obsoleted by GNU APL multi-line literals but is still used
+internally. «BO ⎕INP» should not be used in ordinary APL programs.
+
+«H5 Z ← ⎕NA B : Name Association»
+
+Obsolete. Throws a "NOT YET IMPLEMENTED" exception when called. This function
+ony exists so that workspaces from IBM APL2 that use it can be imported into
+GNU APL.
+
+«H5 Z ← ⎕NC B : Name Class»
+
+«BO B» is a matrix of APL names and «BO Z» is the current category for every
+name:
+
+«UL
+«LI ¯1: name B is not a valid APL name (i.e. B is malformed)»
+«LI  0: name B is a valid APL name but not used»
+«LI  1: name B denotes a label (in a defined function)»
+«LI  2: name B denotes a variable»
+«LI  3: name B denotes a defined function»
+«LI  4: name B denotes a defined operator»
+«LI  5: name B denotes a system variable (NOTE: only in GNU APL)»
+«LI  6: name B denotes a system function (NOTE: only in GNU APL)»
+»
+
+«H5 Z ← A ⎕NL B : Name List»
+
+«BO Z» is a matrix of all (user-defined) names where: every name begins with
+an APL string «BO A» and has one of the name classes in numeric vector «BO B».
+
+«H5 Z ← A ⎕PLOT B : Plot a Value»
+
+Monadic: Simple plot (without attributes). The value «BO B» is plotted
+(i.e. displayed in a separate window) with default parameters for colors,
+line and point sizes, etc.
+«»
+«»
+Dyadic: Simple plot (with attributes). The value «BO B» is plotted with
+user-defined parameters in «BO A».
+
+«H5 Z ← A ⎕PNG B : Process PNG files and Pixel Images»
+
+Monadic:
+   Z ← ⎕PNG B with string B: Convert PNG file B into an array of color planes.
+   monochrome images have one color plane while RGB images have 3 color planes
+   (red, green, and blue). All images may have an additional opacity plane
+   (aka. alpha channel).
+«»
+«»
+   Z[;y;x] is the pixel at position (x, y) in the images, x counting from
+  left to right and y from top to bottom.
+«»
+«»
+   Z[1;;] is the gray plane for monochrome (grayscale) images and the red
+   plane for RGB or RGBA images.
+«»
+«»
+   Z[2;;] is the alpha channel for monochrome (grayscale) images with alpha
+          channel and the green plane for RGB or RGBA images (unless 2 < ↑⍴Z).
+«»
+«»
+   Z[3;;] is the blue plane for RGB or RGBA image (unless 3 < ↑⍴Z).
+«»
+«»
+   Z[4;;] is the alpha channel RGBA images (unless 4 < ↑⍴Z).
+«»
+«»
+   Z ← ⎕PNG B 3-dimensional array as returned above: Display the pixel array
+   B in a window on the screen.
+«»
+«»
+Dyadic:
+   Z ← A ⎕PNG B : Write pixel array B to file named A.
+
+«H5 Z ← A ⎕RE B : Regular expression»
+
+Dyadic: «BO Z» is «BO B» processed according to regular expression «BO A».
+«BO ⎕RE» is an interface to «BO libpcre» (where pcre stands for for
+Perl-compatible regular expression) and the format of «BO A» is described
+in the different man pages shipped with libpcre.
+
+«H5 Z ← A ⎕RVAL B : Random APL value»
+
+APL provides the primitive «BO ? B» which returns an array of (pseudo-)
+random integers. «BO A ⎕RVAL B» generalizes this concept by computing
+(pseudo-) random APL values instead of pseudo-random integers. That
+means that not only the raw items of Z but also the shape, depth, and
+types of the random values is chosen at random.
+
+Monadic: «BO ⎕RVAL B» produces the next random value.
+
+Dyadic: «BO A ⎕RVAL B» controls the parameters (probablities) for subsequenct
+calls of monadic «BO ⎕RVAL B». The numeric scalar «BO A» specifies which
+parameter shall be specified:
+
+«UL
+«LI A=0: change the random number generator state»
+«LI A=1: change the probabilities for ranks»
+«LI A=2: change the probabilities for shapes»
+«LI A=3: change the probabilities for types (character/integer/real/complex)»
+«LI A=3: change the probabilities for depths»
+»
+
+«H5 Z ← [A] ⎕SI B : State Indicator»
+Return components of the State Indicator (see command )SI below) according
+to B:
+«UL
+«LI «BO ⎕SI 1»: The name of the context. This is either the name of a defined
+    function, or '◊' for an immediate execution context, or '⍎' for an execute
+    context»
+«LI «BO ⎕SI 2»: The line number of a defined function, or 0 for for immediate
+    execution and execute contexts.»
+«LI «BO ⎕SI 3»: funcion name and the line number in square brackets»
+«LI «BO ⎕SI 4»: like 3 but augmented like for command )SIS below.»
+«LI «BO ⎕SI 5»: The program counter (= token number) in the function.»
+«LI «BO ⎕SI 6»: The numeric parse mode»
+»
+
+The optional left argument A is an integer scalar that selects one level of
+the )SI stack; if omitted then Z contains all levels of the )SI stack.
+
+«H5 Z ← ⎕SQL[CMD] B : SQL functions»
+
+⎕SQL an interface to a SQL database. See «BO info apl» for details.
+
+«H5 Z ← ⎕SVC B : Shared Variable Control»
+
+Obsolete. Shared variables are an ancient communication concept from the
+mainframe era. They are, to some extent, supported by GNU APL for
+compatibility with IBM APL2. "Normal" APL variables are assigned and referenced
+by the same APL interpreter instance (i.e. process). In contrast, Shared
+variables are assigned and referenced by different processes, making each
+shared variable a communication link between the processes.
+«»«»
+In GNU APL the system function ⎕FIO provides communication channels that are
+simpler to use than shared variables. For that reason, the system functions and
+variables related to shared variables are not described in detail here. Users
+who need them (to run ancient workspaces) supposedly know how they work,
+and users who don't should avoid them.
+
+«H5 Z ← ⎕SVO B : Shared Variable Offer»
+
+Obsolete. See ⎕SVC  above.
+
+«H5 Z ← ⎕SVQ B : Shared Variable Query»
+
+Obsolete. See ⎕SVC  above.
+
+«H5 Z ← ⎕SVR B : Shared Variable Retraction»
+
+Obsolete. See ⎕SVC  above.
+
+«H5 Z ← ⎕SVS B : Shared Variable State»
+
+Obsolete. See ⎕SVC  above.
+
+«H5 Z ← [A] ⎕STOP B : STOP vector»
+
+B is a simple string with the name of a defined function.
+«»
+Z is the stop vector for that defined function.
+«»«»
+if «BO A» is omitted then the stop vector for defined function «BO B» is
+returned. Otherwise the stop vector for the defined function is set to «BO A».
+Setting the stop vector creates breakpoints at the lines in A. When such a
+breakpoint is reached then APL execution stops and a new immediate execution
+context is entered. The user can then examine and/or change variables,
+terminate or continue the APL execution with →, execute comands, etc.
+
+«H5 Z ← A ⎕TF B : Transfer Form»
+
+⎕TF converts an object in the current workspace into an APL string (and vice
+versa).
+«»«»
+The integer scalar «BO A» selects the format for the result «BO Z»; A←1
+produces the «IT migration transfer form» while A←2 produces the
+«IT extended transfer form» of an object.
+
+String «BO B» is the name of an object (i.e. a variable, defined function,
+or (with A←2) a defined operator) in the current workspace.
+
+«BO Z» is a string which is a text encoding of the object that can be stored in
+files, transferred over a network, etc. and that can be converted back to an
+identical object in some other workspace.
+
+The migration transfer form can only be used for old APL1 (aka. ISO standard
+8485) functions and variables because it does not not support APL2 (aka.
+ISO standard 13751) extensions, in particular not: mixed values, nested values,
+and defined operators. The format uses fixed size records of 80 bytes each,
+which makes it compatible with standard 80 column Hollerith punch cards
+(supposedly the prevalent storage medium for APL workspaces in the 1960s
+when APL was invented). For example:
+
+«APL
+)CLEAR
+∇Z←A FOO B
+ Z←1 2 3
+∇
+
+1 ⎕TF 'FOO'   ⍝ the migration transfer form of defined function FOO
+»«OU»
+
+In contrast, the extended transfer form supports these APL2 extensions. It
+uses strings of APL code (primarily APL literals, ⎕FX for defined functions
+and operators, and ← for variables). For example:
+
+«APL
+)CLEAR
+∇Z←A FOO B
+ Z←1 (2 3) 'Hello'   ⍝ nested and mixed
+∇
+
+2 ⎕TF 'FOO'   ⍝ the extended transfer form of defined function FOO
+»«OU»
+If the string «BO B» is the result «BO Z» of some prior ⎕TF conversion, then
+A ⎕TF B creates the corresponding object in the current workspace and Z is
+the name of the object created (or '' if an error occurred).
+
+«»
+
+
+«H5 Z ← ⎕XML B : XML parser»
+
+⎕XML provides a set of functions for parsing XML documents and to extract the
+data contained in them. See «BO info apl» for details.
+
+«H5 Z ← ⎕TRACE B : TRACE vector»
+
+⎕TRACE is similar to ⎕STOP above. The difference is that ⎕STOP stops the
+execution when it hits a breakpoint while ⎕TRACE merely generates a printout
+when it hits a breakpoint.
+
+«H5 Z ← ⎕UCS B : Universal Char Set»
+
+⎕UCS converts APL characters to APL integers (with the codepoint of the
+character), and vice versa. «BO B» can be a mix of characters and the direction
+of the conversion is determined by the type of the item. Example:
+
+«APL
+      ⎕UCS 'Hello ', 119 111 114 108 100»
+
+«H3 Variables»
+
+Like most computer languages, APL has variables. Unlike compiled computer
+languages, variables in APL need not be declared beforehand. Instead,
+variables are simply created by assigning a value to a name:
+
+«APL VAR ← 1 2 3»
+
+If the name is in use for something other than a variable (for instance, a
+defined function), then a VALUE ERROR will be raised. After a value has been
+assigned to a name (and, as a side effect of that assignment, a variable with
+that name has been created) referring to the name returns the most recent value
+that was assigned to the variable:
+
+«APL VAR
+VAR ← 1 2 3 4   ⍝ assignment to name VAR
+VAR             ⍝ reference of name VAR»
+
+In the above examples a fundamental APL rule should be explained. Normally
+a value being computed, for example a constant or the result of a function,
+is displayed on the screen. If, however, the value is assigned to a variable,
+then it becomes a «BO committed value» which is not displayed. The value is
+not consumed by the assignment, so that it can be assigned to several variables
+in one go:
+
+«APL V1 ← V2 ← 1 2 3
+V1
+V2»
+
+The lifetime of a variable (though not the lifetime of their value which can
+change over time) is normally infinite; such variables are called
+«BO global variables». There exist also «BO local variables» whose lifetime
+begins when a defined function is called and ends when that function call
+returns a result. This will be explained together with user defined functions).
+
+The lifetime of a variable can be explicitly terminated by either the
+command «BO )ERASE» or the APL function «BO ⎕EX» (expunge):
+
+«APL V1
+)ERASE V1
+V1
+V2
+⎕EX 'V2'
+V2»
+
+The result 1 of ⎕EX indicates successful erasure of the variable. Note
+that the argument of ⎕EX is not the variable V2 but a character vector
+'V2' containing the name of the variable.
+
+«H4 The Variables ⎕ and ⍞»
+
+There are two important system variables, ⎕ (quad) and ⍞ (quote quad),
+that are used because of their side effects. They are probably the most
+frequently used system variables in APL programs.
+
+«H5 Input and Output with ⍞»
+
+When a value is assigned to ⍞ then the value is displayed on the screen:
+
+«APL ⍞ ← 1 + 2   ⍝ compute 1 + 2 and display the result»
+
+In the example above the «BO ⍞ ←» is redundant, because the result 3
+is not a committed value and would therefore have been displayed anyway.
+However, «BO ⍞ ←» is most useful to display committed values and temporary
+values inside APL expressions, often for debugging purposes.
+«»«»
+When ⍞ is referenced, then a line of input is read from the keyboard (actually
+from stdin which is normally the keyboard) and the characters read,
+excluding the end of line character. The result of referencing ⍞ is always
+a character vector (the user input is quoted by ⍞, which may explain
+its name quote quad).
+
+«IN       INPUT ← ⍞   ⍝ quote-quad input»
+«IN1 what we type»
+«OU1»
+«IN1       INPUT»
+«OU what we type»
+
+An important special case arises when the assignment of a value to ⍞ (but
+not ⎕) is immediately (i.e. without another input or output operation)
+followed by a reference of ⍞. In that case the terminating end-of-line
+character is suppressed and the input requested on the same line:
+
+«IN       ⍞←"ENTER AMOUNT: " ◊ AMOUNT ← ⍞»
+«IN2 ENTER AMOUNT: 42»
+«IN8 ENTER AMOUNT: 42»
+«OU1 »
+«IN1       AMOUNT»
+«OU               42»
+
+This special case is often used in interactive APL programs to print a prompt
+that tells the user what shall be entered. If this is not desired, then you
+can use ⎕ instead of ⍞ in the first assignment:
+
+«IN       ⎕←"ENTER AMOUNT: " ◊ AMOUNT ← ⍞»
+«IN1 ENTER AMOUNT: »      
+«IN1 42»      
+«OU1 »
+«IN1       AMOUNT»
+«OU 42»
+
+
+«H5 Input and Output with ⎕»
+
+When a value is assigned to ⎕ then the value is displayed like for ⍞.
+However, the terminating end of line character is always printed, so that
+⎕ cannot display a prompt on the same line as the user input in the way
+described for ⍞.
+«»
+«»
+Reference to ⎕ differs from referencing ⍞ in two ways:
+«OL
+«LI ⎕ displays its own prompt «BO ⎕:» on a separate line, and»
+«LI ⎕ «IT evaluates» the input line as an APL expression, rather than quoting
+    it automatically like ⍞ does. The evaluation may produce an error if the
+    input entered is not a valid APL expression.»
+»
+
+The following examples may explain the referencing of ⎕.
+«»«»
+«BO Example 1»: The user references ⎕ and assigns the result to a variable
+named INPUT:
+
+«IN       INPUT ← ⎕»
+«OU ⎕:»
+
+After the ⎕: prompt, the user enters the (valid) APL expression «BO 1 + 2»
+which evaluates to «BO 3»:
+
+«IN       1 + 2
+      INPUT»
+«OU 3»
+«»«»
+«BO Example 2»: Like before, the user references ⎕ and assigns the result to a
+variable named INPUT:
+
+«IN       INPUT ← ⎕»
+«OU ⎕:»
+
+After the ⎕: prompt, the user enters the (valid, since quoted) APL string
+«BO 'Hello'» which evaluates to character vector «BO Hello»:
+
+«IN       'Hello'
+      INPUT»
+«OU Hello»
+«»«»
+«BO Example 3»: Like before, the user references ⎕ and assigns the result to
+a variable named INPUT:
+
+«IN       INPUT ← ⎕»
+«OU ⎕:»
+
+After the ⎕: prompt, the user enters the (invalid, since not quoted) «BO Hello».
+«BO Hello» is now an APL name as opposed to an APL string as in example 2.
+If a variable or niladic function with name «BO Hello» were defined, then its
+value would be assigned to a variable named INPUT. In our example, however,
+this is not the case and therefore a «BO VALUE ERROR» is raised:
+
+«IN       Hello»
+<pre class="errput">VALUE ERROR
+   Hello
+   ^</pre>
+
+«H5 ⎕ Input in Application Programs»
+
+Input by means of ⎕ can be very powerful while writing and debugging APL
+programs. It should be avoided, however, in finished application programs.
+The reason is that ⎕ throws an error when the user enters something that
+is not a valid APL expression. In contrast, input by means of ⍞ does not
+throw errors and is therefore safer to use in application programs.
+
+«H3 Indexing»
+
+Most programming languages provide indexing which either references or
+updates a part of the value. Most often, however, indexing is restricted
+to a single item. In APL, indexing is much more powerful and can even be
+used to create bigger values than the indexed value.
+
+An «BO index expression», or «BO index», is a sequence of one or more
+non-negative simple integer values. The sequence is enclosed in brackets
+and the elements of the sequence are separated by semicolons (unless the
+length of the sequence is 1):
+
+«IN7      [1;2 3]»
+«OU»
+
+The example above shows an index with 2 elements 1 and 2 3. An index can not
+be used on its own, but is always bound to the value left of it. The value
+left of an index is then said to be indexed by the index expression. The
+semantics of indexing a value is that a subset of the ravel of the value
+is being addressed. This subset is then either referenced (copied) or
+changed (assigned) depending on whether the indexed value appears on the
+left of an assignment arrow ← or not. We call a value that is being assigned
+an «BO lvalue» (for left value).
+
+The index is most strongly bound to the value on its left, which causes
+indexing of the value to be  performed as soon as the value is available.
+If the value is an lvalue (a value subject to an assignment) then the
+lvalue is updated with some other value; otherwise the value is referenced.
+
+Often the item left of the index is a variable and then it looks as if parts
+the variable are updated or referenced:
+
+«APL V←1 2 3 4   ⍝ create a variable
+V[2 3]       ⍝ indexed reference
+V[2 3]←'x'   ⍝ indexed assignment
+V             ⍝ show result of indexed assignment»
+
+What happens behind the scene, however, is that the variable V in the above
+examples is resolved into a value (indexed reference) or into an lvalue
+(indexed assignment). The value or lvalue is then being indexed.
+
+For indexing to be successful, the index must satisfy certain conditions:
+
+«UL
+  «LI The number of items in the index (i.e. the number of semicolons + 1)
+      must be equal to the rank of the index»
+  «LI The i«SU th» item in the index must be an integer between 1 and the
+       i«SU th» item of the shape of the value that is being indexed.»
+»
+
+As a consequence of the first condition, scalars cannot be indexed
+(an index without semicolons would require a rank of 1 for the indexed value).
+
+The second condition ensures that the corresponding index items do not exceed
+the corresponding shape items. As a C programmer or mathematician you will
+find it more natural if the range of an index starts at 0 rather than 1.
+In APL this can be achieved by setting the system variable ⎕IO (index origin)
+to 0:
+
+«APL ⎕IO←0
+(1 2 3 4)[2]
+⎕IO←1
+(1 2 3 4)[2]»
+
+You should not use ⎕IO←0 too extensively because most APL programmers are
+used to the default value of 1 for ⎕IO and the readability of your code may
+suffer.
+
+An indexed assignment has the side effect of changing parts of the variable,
+but the result of it is the value that is assigned, i.e. the right side
+of the assignment. The result is not displayed. In that respect, indexed
+assignment behaves like non-indexed assignment.
+
+«APL V←1 2 3 4
+V[3 3 3⍴2]←'X'
+V»
+
+The example above does not make too much sense because the same index
+2 is assigned 27 times. We used it to show the difference between indexed
+reference below.
+
+An indexed reference of a variable or value has a result whose shape is
+the concatenated shape of the index. This can be used to create values that
+are bigger than the indexed value:
+
+«APL (1 2 3 4)[3 3 3⍴2]»
+
+Indexing is one of the favorite operations of APL programmers and fully
+understanding it is key to understanding APL. Therefore we summarize the
+rules governing indexed assignment and indexed reference:
+
+«UL
+«LI Common Requirements on Z ← A[X«su 1»;...;X«su N»] and
+      A[X«su 1»;...;X«su N»] ← B»
+  «UL
+  «LI A has rank N > 0 (and there are N-1 ≥ 0 semicolons inside the brackets).»
+  «LI Each X«su i» is a non-nested integer value of arbitrary shape.»
+  «LI For every integer I in the ravel of X«su i»: ⎕IO ≤ I ≤ ⎕IO + (⍴A)[i]).»
+  »
+
+«LI Indexed Assignment A[X«su 1»;...;X«su N»] ← B»
+  «UL
+  «LI The result of an indexed assignment is B; as a side effect some items
+        in the ravel of A are updated with items in the ravel of B.»
+  «LI The result is a committed value (and is therefore not displayed).»
+  «LI If B is a scalar then it is scalar extended according to
+      X«su 1», ..., X«su N».»
+  «LI repeated values in some X«su i» are valid, but the result is
+      implementation dependent (unless the corresponding items in B are
+      identical).»
+  «LI The shape of B can have trivial dimensions (dimensions of length 1). Such
+      dimensions are ignored. The length of any non-trivial dimension (⍴B)[i]
+      must match the number of elements ⍴,X«su i» in the corresponding index
+      item X«su i».»
+  »
+
+«LI Indexed Reference Z ← A[X«su 1»;...;X«su N»]»
+  «UL
+    «LI The rank of the result, i.e. ⍴⍴Z, is the sum of the ranks of items
+        in the index list: ⍴⍴Z ↔ (⍴⍴Z«su 1») + ... + (⍴⍴Z«su N»)  »
+    «LI The shape of the result is the catenation of items in the index
+        list:  ⍴Z ↔ (⍴Z«su 1»), ..., (⍴X«su N») »
+  »
+»
+
+A special case of an index item is the "elided index". If no value is given
+between two brackets or semicolons, then this means that the entire dimension
+(and not, as you might expect, nothing) is selected by the index item:
+
+«APL A←3 4 ⍴ 1 2 3 4 5 6 7 8 9 10 11 12
+A
+A[2;]   ⍝ elided index for last dimension, aka. a "row"
+A[;2]   ⍝ elided index for first dimension, aka. a "column"»
+
+A final example shows the effect of multiple items in different dimensions:
+
+«APL A←6 20⍴'∘'
+A
+A[;2 3 9 14]←'║'   ⍝ set columns 2, 3, 9, and 14 to ║
+A
+A[1 3 6;]←'═'   ⍝ set rows 1, 3, and 6
+A
+A[1 3 6;2 3 9 14]←'╬'   ⍝ set rows 1, 3, and 6 in columns 2, 3, 9, and 14
+A»
+
+A disadvantage of the bracket index is that while the shapes of the index items
+can be freely chosen, the number of semicolons (and therefore the rank of A)
+is fixed. That makes it impossible to write functions that cope with arbitrary
+ranks of A.
+
+For that reason, a dyadic function X⌷A (called index) is provided where
+X plays the role of X«su 1»;...;X«su N» in bracket index. X is a 
+(typically nested) vector of length N and both reference (Z←X⌷A) and
+assignment (X⌷A)←B are possible. Unlike bracket index, scalars can be
+indexed with the index function (X then has length 0), but elided indices
+are not supported by the index function.
+
+«H3 Execution of APL Statements»
+
+APL statements are either entered in immediate execution mode, or else
+as the body lines of user defined functions.
+
+An APL statement starts out as a sequence of characters other than the
+statement separator ◊ (which, as the name suggests, separates different
+statements on the same line) and the end of line character (linefeed).
+The examples provided above were examples of APL statements.
+
+An example of a line with 3 statements (and no output) is this:
+
+«APL A←1 ◊ B←2 ◊ C←3»
+
+The first thing that the APL interpreter does when a statement is entered
+is to convert the characters of the statement into an internal format
+called tokens. The conversion of a sequence of characters into a sequence
+of tokens, commonly called «BO lexical analysis» or «BO tokenization»,
+can lead to errors when characters that do not have a meaning in APL,
+are discovered:
+
+«APL ∫ f(x) dx
+»
+«OU»
+
+The rules for tokenizing the input characters are relatively simple:
+
+«UL
+«LI APL literals are converted to a token that contains the APL value
+    represented by the literal (as discussed in previous chapters)»       
+«LI APL names are converted to a token that contains the name
+    (as discussed in previous chapters)»       
+«LI All other characters are converted to a token representing that character»
+»
+
+Tokenization is done because operation at the character level is relatively
+inefficient, while the internal token format can be parsed more efficiently.
+In compiled languages tokenization and parsing are both performed by the
+compiler and the efficiency of the internal representation is not relevant
+to the efficiency of the compiled program. APL is interpreted, however,
+part of the parsing is performed at runtime and the purpose of tokenization
+is to perform as much analysis of a statement as possible when the statement
+is entered rather than later (and possibly repeatedly) when the statement
+is executed.
+
+As an example, the statement
+
+«APL VARIABLE←1 2 'Hello' (2 'world')»
+
+is converted into 3 tokens:
+«»
+«»
+«TO VARIABLE»«TO ←»«TO 1 2 'Hello' (2 'world')»
+«»
+«»
+This is possible because the somewhat complicated looking value
+«BO 1 2 'Hello' (2 'world')» is entirely comprized of APL literals,
+which can be collapsed into a single (here: nested) value at tokenization
+time. On the other hand, if there are non-literals (such as functions or
+names) between the APL literals, then the literals left or right of the
+non-literals can not be combined and therefore show up in different tokens:
+
+«APL VARIABLE←1 2 ⍴ 'Hello' (2 'world')»
+«»
+«TO VARIABLE»«TO ←»«TO 1 2»«TO ⍴»«TO 'Hello' (2 'world')»
+«»
+«»
+In immediate execution mode, the token sequence created by the tokenization
+of the input line is immediately executed, and there seems to be no difference
+between tokenization time and execution time. With user defined functions,
+however, it pays off to separate lexical analysis from parsing at execution
+time.
+
+The token sequence for the statement is then stored until it is executed.
+Conceptually, the first step when a statement is executed is to group (also
+called "bind") certain tokens to other tokens. APL has no operator precedence
+like other languages (the large number of built-in functions and operators
+in APL would have made that a tedious task). However the binding of tokens
+plays a similar role. Unfortunately the ISO standard fails to mention the
+rules for token binding, but we can refer to the the descriptions of
+commercial APL vendors. According to those descriptions the binding of token
+has the following precedences (from strongest binding to weakest binding):
+
+«OL
+«LI bracket index to the token on its left»
+«LI assignment arrow to the token on its left»
+«LI dyadic operator to its right operand (the function right of it)»
+«LI items in vector notation»
+«LI operator to its left operand (the function left of it)»
+«LI function to its left argument (the value left of it)»
+«LI function to its right argument (the value right of it)»
+«LI assignment arrow to the token on its right»
+»
+
+When we refer to, for example, a "token on its left", then this means when
+the token becomes available. In the following example:
+
+«APL (2 × 1 2 3 4)[2]»
+
+the bracket index [2] has the strongest binding. Before that binding can
+take place, however, the expression in parentheses, (2 × 1 2 3 4), must
+have been evaluated (yielding 2 4 6 8). The vector 2 4 6 8 is then indexed by
+bracket index [2] to give the final result 4.
+«»
+«»
+You may also wonder why operators bind to their operand but not to their
+arguments. The reason is that:
+
+«UL
+«LI when a dyadic operator binds to its right operand, then the bound dyadic
+    operator has become a monadic operator.»
+«LI when a monadic operator (or a bound dyadic operator) binds to its left
+    operand, then the bound monadic operator has become a function.»
+«LI the bound monadic operator, then binds to its left and right arguments like
+    every other dyadic or monadic function.»
+»
+
+Note also that the actual number of binding strengths is smaller than the list
+above suggest. This is because some bindings are not in conflict with each
+other. For example, vector notation binds two or more values to each other,
+while the next lower binding strength binds an operator to a function.
+These two bindings could have been given the same binding strength.
+«»
+«»
+Some bindings merely define the order in which things are evaluated while
+others produce an intermediate result. For example, the binding of a dyadic
+function to its left argument forces a left argument in parentheses to be
+evaluated first and then the result to be passed to the dyadic function.
+On the other hand, the binding of a bracket index to the value or lvalue
+on its left forces immediate computation of the bracket index as described
+above.
+«»
+«»
+After binding the token, the evaluation of APL statements is performed 
+according to the "golden rule" of APL:
+«»
+«»
+«BO The rightmost function whose argument(s) are available is evaluated
+    first.
+    «»
+    The function and its argument(s) are then replaced by the result
+    returned by the function, which causes the arguments of other functions
+    to become available.
+»
+«»
+«»
+In short this means that APL statements are evaluated from right to left.
+Another consequence is that parentheses around the right argument of a
+function have no effect, while parentheses around the left argument make
+a difference:
+
+«APL (1 + 2) × (3 + 4)   ⍝ 3 × 7
+(1 + 2) × 3 + 4     ⍝ 3 × 7
+1 + 2 × (3 + 4)     ⍝ 1 + (2 × 7)
+1 + 2 × 3 + 4       ⍝ 1 + (2 × 7)»
+
+
+«H3 Defined Functions»
+
+Programming in APL is primarily concerned with the creation and testing of
+user defined functions. The immediate execution mode used so far is helpful
+to try things out, but not for larger applications.
+«»
+«»
+For the sake of explanation we define a user defined function to be a
+non-empty sequence of «BO function lines» numbered 0, 1, .... The first
+line is called function header and determines the following properties of
+the function:
+
+«UL
+«LI if the function returns a value or not»
+«LI the valence (number of value arguments): niladic, monadic, or dyadic»
+«LI the name of the function or operator»
+«LI the number of function arguments: none (normal function),
+    1 (monadic operator), or 2 (dyadic operator)»
+«LI the optional axis of the function or monadic operator»
+«LI the names of local variables of the function»
+» 
+
+«H4 Function Header»
+
+The header line of a user defined function consists of several APL names
+interleaved with some of the characters ←, (, ), [, ], and ;.
+The names can be freely chosen by the user; we will use the names
+Z, A, LO, F, X, B, RO, C, and D in our examples with the following meaning:
+
+«UL
+«LI Z: the name of the result»
+«LI A: the left value argument»
+«LI LO: the left function argument of an operator»
+«LI RO: the right function argument of a dyadic operator»
+«LI F: the name of the function»
+«LI X: the axis argument»
+«LI B: the right value argument»
+«LI C: the first local variable»
+«LI D: the second local variable...»
+» 
+
+The syntax of the function header is then:
+«»
+«»function-header ::= result-spec function-and-args local-variables
+«»result-spec ::= empty | Z ←
+«»function-and-args ::= function-spec | function-spec B | A function-spec B
+«»function-spec ::= function | ( LO function ) | ( LO function RO )
+«»function ::= F | F [ X ]
+«»local-variables ::= empty | ; C local-variables
+«»
+«»
+Additional requirements are that all names in the header must be different and
+that no name (with the exception of names for local variable names) must be
+user defined names. The name of a local variable may be the name of system
+variables, but must not be the name of a system function or primitive.
+«»
+The possible combinations in the syntax above produces 2×3×3×2 = 36
+different header variants. Of these 36 variants the following 7 combinations
+are not allowed:
+
+«UL
+«LI niladic function with axis»
+«LI monadic operator operator with no value argument»
+«LI monadic operator operator with axis and no value argument»
+«LI dyadic operator operator with no value argument»
+«LI dyadic operator operator with axis and no value argument»
+«LI dyadic operator operator with axis and one value argument»
+«LI dyadic operator operator with axis and two value arguments»
+»
+
+The following sections describe the different fields of the function header.
+Before that we briefly describe one way to create and display user defined
+functions.
+
+«H5 Creating and displaying defined functions: ⎕FX and ⎕CR»
+
+The monadic system function ⎕FX creates a new function. The single argument of
+⎕FX is either a character matrix (the first row of that matrix is the
+function header) or a nested vector of character vectors (with the first
+character vector is then the header of the function. The remaining rows of
+the matrix or the remaining character vectors are the body lines of the
+function being created. On success ⎕FX returns the name of the function
+that it has created.
+
+Monadic ⎕CR displays the header and body lines of a function. The single
+argument of ⎕CR is the name of the function to be displayed. ⎕CR returns
+a matrix with the function header and the function body.
+
+«APL )CLEAR
+∇FOO
+1 + 2
+∇
+
+⎕CR 'FOO'»
+
+«H5 Result Specification»
+
+The example above has created a function FOO that had no result specification.
+Such functions can be executed, but they do not return a result and attempts
+to use their return fails:
+
+«APL )CLEAR
+∇FOO
+1 + 2
+∇
+
+     FOO                 ⍝ call FOO (that is OK)
+     VAR←FOO             ⍝ try to use FOO's result (that is an error)»
+
+The reason why some value (3) was displayed is not because FOO has returned
+the result 3, but because the statement '1 + 2' was not assigned to a variable
+and therefore printed.
+
+For a function to return a result, two conditions must be met:
+
+«OL
+«LI the header must contain a result specification such as «BO Z←», and»
+«LI the variable named in the result specification must be assigned during
+    the execution of the function»
+»
+
+The result specification is a user-defined name followed by the assignment
+arrow ← :
+
+«APL  )CLEAR
+      ⍝ define FOO returning result Z
+∇Z←FOO
+ Z←1 + 2
+∇
+     FOO                         ⍝ call FOO
+     VAR←FOO                     ⍝ try to use FOO's result
+     VAR   ⍝ show result»
+
+The output of simply calling FOO is the same as before. However, the value
+3 is now the result of FOO and not the result of the statement Z←1 + 2 inside
+FOO. This is because the assignment Z←1 + 2 is now a committed value which
+is not printed.
+
+If the function header has a result specification, but the result variable is
+not assigned, then
+
+«APL )CLEAR
+      ⍝ define FOO returning Z without assigning Z (which is more often than not an error)
+∇Z←FOO
+ 1 + 2
+∇
+      FOO  ⍝ call FOO
+
+      VAR←FOO  ⍝ call FOO (OK) and try to use FOO's result (ERROR)»
+
+Forgetting, as above, to assign the result value inside a defined function
+whose header indicates that the function returns a result is an error that 
+is sometimes hard to discover, in particular when the function contains
+branches (so that some execution paths assign the result and some don't).
+In that case the programmer may be mislead by the fact that the function
+header indicates a result and incorrectly assumes that the result variable
+is actually assigned before the function returns.
+
+«H5 Local Variables»
+
+The function header can optionally contain a list of local variables. Every
+local variable is appended to the function header with a semicolon in front 
+of it. For example:
+
+«IN7 A FOO B;C;D»
+«OU7 »
+is the header of a dyadic function (with arguments A and B) and local
+variables C and D.
+
+At this point we should reveal that every user defined name, and also the
+APL system variables have an associated stack, The stack is created when
+the name is first mentioned (or from the outset if the name refers to an
+APL system variable).
+
+When a user defined function is called, then the stack of the following
+names is pushed:
+
+«UL
+«LI the function result»
+«LI the function arguments»
+«LI the local variables, and»
+«LI labels (see below)»
+»
+
+After pushing a name, the name refers to nothing, which is usually changed
+shortly after pushing it. The previous values of the name are now
+inaccessible. Only the item on the top of a name's stack can be accessed.
+
+The name on the top of the stack remains accessible until either another
+(or the same) function with the same name in its local variables is called,
+or else until the functions returns. If the function returns then the stacks
+of all its local variable names are popped and the previous top of the stack
+becomes accessible again.
+
+«H5 The Del Editor»
+
+⎕FX is not the only way to create user defined functions. ⎕FX is good if
+the function created is small and is often the only way to create new
+functions programmatically. An alternative present in many APL interpreters
+is the interactive 'Del' editor. The Del editor is started by entering
+the APL character Nabla («BO ∇») and the full header of the new function.
+The Del editor has simple commands for displaying, inserting, editing, and
+deleting function lines.
+
+The Del editor has a prompt which is the next line to be added or changed;
+This line is displayed in square bracket. If the user wants to change a
+different line than the line proposed by the Del editor then the desired
+is entered (again in square brackets). The following is an overview of
+Del editor commands:
+«»
+«»
+«TAB
+  «TR»  «TH Command» «TH Effect»
+  «TR»  «TD [N]»     «TD Continue editing with line N»
+  «TR»  «TD [⎕]»     «TD display all function lines»
+  «TR»  «TD [⎕N]»    «TD display the function lines 1 to (including) N»
+  «TR»  «TD [N⎕]»    «TD display the function line N and the following»
+  «TR»  «TD [N⎕M]»   «TD display function lines N to M (including)»
+  «TR»  «TD [∆N]»    «TD delete function lines N»
+  «TR»  «TD [N∆M]»   «TD delete function lines N to M»
+  «TR»  «TD [→]»     «TD discard changes»
+  «TR»  «TD ∇»       «TD close the Del editor»
+»
+«»
+«»
+Entering a non-existing fractional number, like in [3.5] creates a new line
+between the closest existing lines (between lines 3 and 4 if there are no
+other fractional line numbers between 3 and 4). When the Del editor is
+closed then all lines will be renumbered, starting with header line 0.
+«»
+These days you will use your own editor like «BO Vim» or «BO emacs» to edit
+APL functions and then cut-and-paste them into the window in which APL runs,
+or start APL with a text file containing function definitions. However, at
+the time when the Del editor was invented, computer mice were not yet invented
+and terminals were too limited in functionality to support cut-and-paste.
+Most commands of the Del editor are irrelevant today, but the Del editor is
+still the method of choice when defining functions in (non-interactive) APL
+scripts create new APL functions.
+«»
+For example, say you have a normal (UTF8 encoded) text file containing
+the following:
+«IN7
+
+∇ Z←FOO
+  1 + 2
+∇»
+«OU»
+«»
+That defines the same function as;
+«IN7
+ ⎕FX 'Z←FOO' '1 + 2'
+»
+«OU»
+«»
+but is more readable, in particular when functions become longer. We will
+use this format for displaying functions. The above format is also suitable
+for displaying APL code snippets in emails or on web pages. The reader can
+simply cut-and-paste them into his interpreter (provided of course, that
+the interpreter uses UTF8 encoded Unicode and not special APL fonts).
+
+«H5 Function Body»
+
+The remaining lines of a function are called the «BO function body».
+The function body consists of 0 or more «BO function lines». Every
+function line consists of 0 or more APL statements like those already
+discussed above.
+
+A function line can have an optional «BO label». A label is another kind
+of local variable that is automatically created, cannot be changed, and
+has an integer value that is equal to the number of the line on which it
+was written. For example:
+
+«IN7 ∇A FOO1 B;C;D
+L1: 'line 1'
+L2: 'line 2'
+ X←L2
+∇»
+«OU7 »
+
+The hypothetical function FOO1 above has two arguments A and B, explicit
+local variables C and D, and labels L1 and L2. The syntax for a label is a
+name followed by a colon. The variable X would get the value 2 because
+label L2 is on line 2. labels are read-only; attempting to change their
+value yields a SYNTAX ERROR. Labels will be discussed together with branching
+in functions below.
+
+«H4 How Functions and Operators are Evaluated»
+
+The execution (or evaluation) of a function starts when the function name
+is detected in a statement and all its arguments (as defined by the header
+of the function) are present. Lets assume we define FOO like this:
+
+«APL )CLEAR
+
+      ⍝ define dyadic FOO with result Z and arguments A and B
+∇Z←A FOO B;C;D
+L1: 'line 1'
+L2: 'line 2'
+ X←L2
+ Z←42
+ ∇
+
+      ⎕CR 'FOO'   ⍝ check FOO
+»
+«OU»
+
+Then we enter the following in immediate execution mode:
+
+«APL (3 + 4) FOO 5»
+
+The APL interpreter will see FOO, but it will notice that the left argument
+of FOO, i.e. (3 + 4,) is not yet available because the result of (3 + 4) has
+not yet been computed. The interpreter will therefore compute (3 + 4) first
+and replace it by 7. We have now:
+
+«IN7  7 FOO 5»
+«OU»
+
+The interpreter can now evaluate 7 FOO 5 (or some other function in the
+general case) as follows:
+
+«OL
+  «LI first the stacks of all names are pushed. In our example, the names
+      being pushed are Z, A, B, C, D, L1, and L2 (but not FOO!)»
+  «LI next the actual arguments of the function (7 and 5) are assigned to
+      the formal parameters (A and B) of the function. That is, A←7 and B←5.»
+  «LI the labels are assigned, i.e. L1←1 and L2←2.»
+  «LI (at this point, the function result Z and the local variables C and D
+      are undefined, while the function arguments A and B and the labels
+      have values)»
+  «LI the statements in the function body are executed, starting with the
+      first statement in the first line.»
+  «LI the function result Z, which may or may not be defined is stored in
+      a temporary location.»
+  «LI all stacks of all names that were pushed above are popped. They now have
+      the value they had when FOO was called.»
+  «LI the function and its arguments are replaced by the function result in
+      the temporary location.»
+»
+
+In our example, the following output is produced:
+
+«APL (3 + 4) FOO 5»
+
+The first two output lines ("line 1" and "line 2") are output from lines
+1 and 2 of FOO, while the last line is the return value from FOO which
+is displayed «BO after» FOO has returned.
+
+«H4 Branching»
+
+The examples of user defined functions given so far were "linear" by which
+we mean that the statements in the body of the function were executed one
+after the other until the end of the function was reached.
+«»
+In addition to that, APL provides a means to change the order of the
+normal program flow from the beginning of a function to its end: a
+computed branch.
+«»
+«»
+APL has been criticized for having only one way of changing the order of
+the program flow instead of many (like if/else, for, while, and case in C/C++).
+However the computed branch in APL is so powerful that it can easily emulate
+the multiple flow control statements in other languages. And the fact that APL
+works on larger data structures than scalars makes the low-level loops found
+in other languages obsolete.
+«»
+«»
+A «BO computed branch» is a statement that consists of a branch arrow (→) and
+a numeric APL value. A slightly different statement, called «BO Escape»
+consists of the same branch arrow, but without the value. For example:
+
+«UL
+  «LI →L   ⍝ computed branch (to label L)»
+  «LI →    ⍝ escape»
+»
+«H5 Labels»
+
+The numeric argument of a computed branch is a line number. So →1 is a
+branch to line 1 of some user defined function. However, absolute line
+numbers should never be used for branching. The reason is that APL renumbers
+the lines of a user defined function when new lines are added between
+existing lines. The line numbers in branches are not renumbered when
+renumbering lines and as a consequence the absolute line numbers in branches
+become invalid. This problem can easily be solved by using labels.
+«»
+A label is an APL name followed by : (colon) at the beginning of a line.
+The label is an automatically created local variable whose value is
+the line number on which it was written and the variable is read-only
+(i.e. one cannot assign a new value to it). Unlike absolute line numbers,
+labels move with their line when other lines are inserted before them and
+as a subsequent renumbering of lines does not harm labels.
+«»
+Example:
+
+«IN »
+«OU7 ∇FOO
+    'line 1' ◊ →3    ⍝ Bad: absolute branch to line 3
+    'line 2' ◊ →L3   ⍝ Good: branch to line 3 with label L3
+L3: 'line 3' ◊ 
+∇»
+
+If another line is inserted before the first line, then FOO becomes:
+
+«IN »
+«OU7 ∇FOO
+    'new line before line 1' 
+    'line 1' ◊ →3    ⍝ Bad: absolute branch to line 3
+    'line 2' ◊ →L3   ⍝ Good: branch to line 3 with label L3
+L3: 'line 3' ◊ 
+∇»
+
+The previous line 3 with label L3 is now line 4. The branch to the absolute
+line number 3, i.e. →3, now branches to the line before the line with label
+L3 (which is most likely wrong now), while the branch to label L3 remains
+correct.
+
+«H5 Computed Branch (inside a function)»
+
+Inside a function a computed branch →EXPR where EXPR is some APL expression
+is executed as follows.
+
+«UL
+  «LI first the expression EXPR is evaluated. If the evaluation of EXPR fails
+      then this is an error and execution of the function stops as described
+      later on.
+  »
+      
+  «LI Let X be the result of evaluating EXPR. Then:
+    «UL
+      «LI if X is empty, then execution continues with the next statement after
+          the branch. This is can be used to emulate if statement in C++»
+      «LI if X is not empty, then it is expected to be a vector whose first
+          element is an integer L.»
+        «UL
+           «LI if L is a valid line number, (a number between 1 and
+                the number of lines in the function (inclusive)) then
+               then a branch to that line is performed. That is, execution
+               continues at the first statement on the new line.»
+           «LI Otherwise, i.e. L is ≤ 0 or larger than the number of lines
+               in the function, then execution of the function is ended.»
+        »
+    »
+  »
+»
+
+In the following we explain some examples of frequently used branch patterns
+and their "equivalents" in C/C++
+
+«IN »
+«OU7
+                 ⍝ meaning                C/C++
+
+ →0              ⍝ leave the function     return;
+ →(COND)⍴0       ⍝ dito if COND           if (COND) return;
+ →(COND)↓0       ⍝ dito if not COND       if (!COND) return;
+
+ →LAB            ⍝ goto line LAB          goto LAB;
+ →(COND)⍴LAB     ⍝ dito if COND           if (COND)   goto LAB;
+ →(COND)↓LAB     ⍝ dito if not COND       if (!COND)  goto LAB;
+
+ →⎕LC            ⍝ repeat current line
+ →(COND)⍴⎕LC     ⍝ dito if COND           do { current line } while (COND)
+
+ →⎕LC+1          ⍝ goto next line
+ →(COND)⍴⎕LC+1   ⍝ dito if COND           if (COND)     { rest-of-line }
+
+ →⎕LC-1          ⍝ goto previous line
+ →(COND)⍴⎕LC-1   ⍝ dito if COND
+
+ →(X=V1,V2 ...)/L1, L2, ...)   ⍝          switch(X) { case V1: goto L1; ... }
+»
+
+In the examples above COND is usually a Boolean expression such as A ≤ B.
+«»
+«»
+Since all APL comparison operators have negated forms (=/≠, ≤/&gt; &lt; etc.)
+the (COND)↓ patterns above are far less frequent then the (COND)⍴ patterns.
+Note also that the (COND)↓ only works for single line numbers (like 0 or LAB
+above) but NOT for possibly longer vectors like ⎕LC.
+«»
+«»
+The (COND)⍴ pattern also works for non-Boolean integer expressions (like
+if (COND) with non-integer COND in C/C++). It should not be used,
+however, if the integer COND is large because then the computation of
+⍴ takes a long time and all but the first element of its result is discarded.
+To avoid that, use 0≠COND instead of COND if COND may be a large integer.
+
+«H5 Computed Branch (outside a function)»
+
+If a computed branch statement is executed outside a function (for example
+after an error in a function interrupts the execution of the function and
+returns to immediate execution mode) then the branch is executed as if it
+were executed inside the interrupted function. An error is thrown if no
+interrupted function exists.
+«»
+«»
+This can be used to jump back (i.e. continue) the execution of a function
+that was interrupted (typically after removing the cause of the error).
+
+«H5 Escape (Unwind)»
+
+A single → terminates the execution of the current defined function and
+removes it from the )SI stack. After that the caller of the current defined
+function becomes the current defined function.
+
+«H2 Commands»
+
+Every APL interpreter provides a number of commands that can be entered in
+immediate execution mode. The ISO standard defines a small number of standard
+commands, and every interpreter adds its own commands for various purposes.
+
+Commands do not follow the syntax of the APL language, but are more similar to
+the input of a shell (a command, followed by mandatory or optional arguments).
+A command starts with the character ) (or ] for some interpreters) followed by
+a name.
+
+«H3 Standard Commands»
+
+«H4 )CLEAR»
+Syntax: «BO )CLEAR»
+«»«»
+Re-initializes the current workspace. All user-defined functions and
+variables are deleted and all system variables are reset to their default
+values. The workspace name is set to «BO CLEAR WS».
+
+
+«H4 )COPY»
+Syntax: «BO )COPY [lib] wsname [object ...]»
+«»«»
+«BO lib» is an optional library reference number from 0 to 9. If «BO lib»
+is omitted then it is taken to be 0. The library reference number selects
+one of 10 directories (which can be configured elsewhere, see command
+«BO )LIBS» below) that contain workspace files.
+«»«»
+«BO wsname» then selects a workspace file in the directory selected by «BO lib».
+«»«»
+Normally the name of the workspace file is either «BO wsname.apl» or else
+«BO wsname.xml». However, if «BO lib» is omitted, then the workspace file
+need not be contained in the directory corresponding to library reference 0,
+but «BO wsname» may instead be an absolute path to the workspace file that
+shall be copied. This can be useful if the workspace file resides in a
+non-standard (according to «BO )LIBS») directory, or if both «BO wsname.apl»
+and «BO wsname.xml» exist in the same directory.
+«»«»
+«UL
+«LI If «BO object»(s) is omitted, then «BO all» user-defined variables,
+    defined functions, and defined operators in the selected workspace
+    are copied into the current workspace.»
+«LI Otherwise only those user-defined variables, defined functions, and defined
+    operators whose names starts with one of the names in «BO object ...» are
+    copied into the current workspace.»
+»
+
+
+«H4 )COPY_ONCE»
+«»«»
+Like )COPY, but the workspace file is copied at most once. Subsequent
+)COPY_ONCE of the same workspace file will be ignored.
+
+«H4 )DROP»
+Syntax: «BO )DROP [lib] wsname»
+«»«»
+«BO lib» is an optional library reference number as for command «BO )COPY»
+above.
+«»«»
+«BO wsname» selects a workspace in the directory selected by «BO lib». If
+«BO lib» is omitted then an absolute path to the workspace file is accepted
+as «BO wsname».
+«»«»
+
+Delete the workspace («BO CAUTION:» without any warning).
+
+
+«H4 )ERASE»
+Syntax: «BO )ERASE symbol ...»
+«»«»
+The variable, defined function, or defined operator with name «BO symbol»
+is deleted in the current workspace.
+
+
+«H4 )FNS»
+Syntax: «BO )FNS [from-to]»
+«»«»
+Display the names of defined functions in the current workspace.
+«»«»
+For workspaces with many defined functions, characters «BO from» and «BO to»
+can be used as a filter that specifies an alphabetic range of names.
+
+
+«H4 )LIB»
+Syntax: «BO )LIB [lib|path] [from-to] [sort]»
+«»«»
+«BO lib» is an optional library reference number as for command «BO )COPY»
+above.  Alternatively, «BO path» may be the absolute path to a non-standard
+directory that contains workspace files.
+«»«»
+ «BO from-to» is an optional name filter like in «BO )FNS» above.
+«»«»
+«BO sort» is an optional sorting mode, either «BO -size» or else «BO -time».
+«»«»
+
+The workspaces in the selected directory are displayed.
+For directories with many workspace files, characters «BO from» and
+«BO to» can be used as a filter that specifies an alphabetic range of names.
+If no sorting mode is specified then «BO )LIB» shows workspaces names
+(see «BO )WSID» below), i.e. without their «BO ,apl» or «BO .xml»
+file name extension. Otherwise the files names are displayed with
+their «BO .apl» or «BO .xml» extension.
+
+«H4 )LOAD»
+Syntax: «BO )LOAD [lib] wsname»
+«»«»
+«BO lib» is an optional library reference number as for command «BO )COPY»
+above.
+«»«»
+«BO wsname» selects a workspace in the directory selected by «BO lib». If
+«BO lib» is omitted then an absolute path to the workspace file is accepted
+as «BO wsname». The current «BO )WSID» is updated accordingly.
+«»«»
+The current workspace is discarded and the workspace stored in the
+selected workspace file is made the current workspace.
+
+
+«H4 )NMS»
+Syntax: «BO )NMS [from-to]»
+«»«»
+Display the names of variables, defined functions, and defined operators
+in the current workspace.
+«»«»
+For workspaces with many names, characters «BO from» and «BO to» can be
+used as a filter that specifies an alphabetic range of names.
+
+
+«H4 )OPS»
+Syntax: «BO )OPS [from-to]»
+«»«»
+Display the names of defined operators in the current workspace.
+«»«»
+For workspaces with many defined operators, characters «BO from» and «BO to»
+can be used as a filter that specifies an alphabetic range of names.
+
+
+«H4 )SAVE»
+Syntax: «BO )SAVE»
+«»«»
+Save the current workspace in the file «BO wsname.xml» where «BO wsname»
+is defined by the current workspace name (as per «BO )WSID»).
+
+«»«»
+Syntax: «BO )SAVE [lib] wsname»
+«»«»
+«BO lib» is an optional library reference number as for command «BO )COPY»
+above.
+«»«»
+«BO wsname» selects a workspace in the directory selected by «BO lib». If
+«BO lib» is omitted then an absolute path to the workspace file is accepted
+as «BO wsname».
+«»«»
+Save the current workspace in the file «BO wsname.xml» in the directory
+selected by «BO lib».
+
+
+«H4 )SI»
+Syntax: «BO )SI»
+«»«»
+Every workspace contains a so-called «BO State Indicator» similar to the
+stack-trace of a C program when run in a debugger. Every time a defined
+function is called a new entry for the defined function is added, and
+the entry is deleted again when the defined function returns. Due to this
+last-in-first-out nature the «BO State Indicator» is also called the
+«BO )SI stack».
+«»«»
+When the interpreter returns to immediate execution as a result of an
+error, then the command «BO )SI» can be used to display the (recursive)
+set of defined functions that have been called but not yet finished, and
+the line number of the current statement in each function.
+«»«»
+The «BO )SI» command itself displays only the function name and its line
+number. However there exist several variants of the «BO )SI» command that
+provide additional information for debugging purposes. For example:
+«»«»
+«APL
+      ⍝ clear the SI stack
+      )SIC
+
+      ⍝ show the SI stack (which is always empty after )SIC)
+      )SI
+
+∇FOO;A;B;C
+1 + 2
+÷0      ⍝ provoke a DOMAIN ERROR'
+∇
+
+      FOO
+
+      ⍝ show the SI stack again
+      )SI
+»
+«OU»
+
+In the output of command )SI: an immediate execution entry is displayed
+as «BO *» while a defined function is displayed as the function name followed
+by a line number of the function in brackets. In the example above:
+
+«OL
+«LI The first line is the )SI entry for the execution of «BO FOO». The
+execution was stopped in line 2 due to the DOMAIN ERROR, and»
+
+«LI The last * is the )SI entry for the immediate execution context in which
+command )SI was entered. Whenever APL detects an error, it stops execution and
+created a new )SI entry with mode immediate execution in which the user can
+then issue commands like )SI and/or change variables, and/or continue execution
+at the point where the error was detected.»
+»
+
+
+«H4 )SIC»
+Syntax: «BO )SIC»
+«»«»
+Clear the «BO )SI stack» (remove all items and release its resources, in
+particular localized variables).
+
+
+«H4 )SINL»
+Syntax: «BO )SINL»
+«»«»
+)SI with Name List. Same as )SI, but the display of the )SI stack is augmented
+with the local variables of the function called. In the )SI example:
+«»«»
+«APL
+      )SINL
+»
+«OU»
+
+The first line shows that function FOO was called and has localized the names
+A, B, and C. The second line is an immediate execution context (which cannot
+localize variables). )SINL is useful for determining the scope of a variable
+(e.g. which defined function has last localized it).
+
+«H4 )SIS»
+Syntax: «BO )SIS »
+«»«»
+)SI with Statement. Same as )SI, but the display of the )SI stack is augmented
+with the current statement in the function called (and possibly the error
+message if the statement had raised an error). In the )SI example:
+«APL
+      )SIS
+»
+«OU»
+The first line shows the APL statement «BO ÷0» in line 2 of FOO which caused
+the DOMAIN ERROR. The second line shows the statemant «BO FOO» that called
+FOO. The order in the display of the )SI stack is therefore from most recent
+to least recent (or downwards from called function to calling function).
+
+
+«H4 )VARS»
+Syntax: «BO )VARS [from-to]»
+«»«»
+Display the names of user-defined variables in the current workspace.
+«»«»
+For workspaces with many user-defined variables, characters «BO from» and
+«BO to» can be used as a filter that specifies an alphabetic range of names.
+
+
+«H4 )WSID»
+Syntax: «BO )WSID»
+«»«»
+Display the name of the current workspace.
+«»«»
+Syntax: «BO )WSID wsname»
+«»«»
+Set the name of the current workspace to «BO wsname». The name of the
+workspace is used, for example, when )DUMP or )SAVE is used and the
+filename is ommitted.
+
+
+«H3 IBM APL2 Commands»
+
+GNU APL also understands most of the IBM APL2 commands.
+
+
+«H4 )CHECK»
+Syntax: «BO )CHECK»
+«»«»
+Perform an internal check of the internal data structures, primarily to
+detect memory leaks.
+
+
+«H4 )CONTINUE»
+Syntax: «BO )CONTINUE»
+«»«»
+Save the current workspace under the name «BO CONTINUE.xml» and exit. If APL is
+started later on and a workspace named CONTINUE exists, then that workspaces
+is «BO )LOAD»ed automatically. In other words, the APL session is continued
+at the point where it was left with command «BO )CONTINUE».
+
+
+«H4 )HELP»
+Syntax: «BO )HELP»
+«»«»
+Display a list of all GNU APL commands, system variables, and system functions.
+«»«»
+Syntax: «BO )HELP primitive»
+«»«»
+Display a brief help text for the APL primitive «BO primitive».
+
+
+«H4 )HOST»
+Syntax: «BO )HOST command ...»
+«»«»
+Execute command «BO command ...» in the operating system under which GNU APL
+runs.
+
+
+«H4 )IN»
+Syntax: «BO )IN filename [object ...]»
+«»«»
+Like «BO )LOAD filename [object ...]», but for a workspace saved with
+command «BO )OUT» (see below).
+
+«H4 )MORE»
+
+Syntax: «BO )MORE»
+«»«»
+APL errors like «BO DOMAIN ERROR», «BO INDEX ERROR» etc. are displayed
+automatically if they occur. For some of these errors, the interpreter has
+additional information which is, however, not displayed automatically.
+Command «BO )MORE» may display this additional information. Example:
+
+«APL
+      1 2 3 ⎕MAP 1 2 3
+
+      )MORE
+»
+«OU»
+A + character at the end of the APL error indicates that some additional
+information is present and can be displayed with «BO )MORE» but it
+must be invoked before anything else is done.
+
+«H4 )OUT»
+Syntax: «BO )OUT filename [object ...]»
+«»«»
+Like «BO )SAVE» below, but using a different file format. The files have an
+extension of «BO .atf» (for APL Transfer File). Even though the «BO )SAVE»
+command itself is standardized (in the ISO standard), the file format that
+it produces is not. In contrast, the file format produced by «BO )OUT» and
+understood by «BO )IN» is supposed to be understood by different APL
+interpreters of different vendors, so that workspaces can, at least in
+principle, be exchanged using «BO )IN» and «BO )OUT».
+«»«»
+Some vendors have extended the «BO .atf» file format, which undermines its
+primary purpose. GNU APL only supports the original format as described in
+the IBM «IT APL2 Language Reference Manual».
+
+
+«H4 )OFF»
+Syntax: «BO )OFF»
+«»«»
+Exit the APL interpreter with exit code 0.
+«»«»
+Syntax: «BO )OFF [exit_code]»
+«»«»
+Exit the APL interpreter with the given exit code.
+
+
+«H4 )PCOPY»
+Syntax: «BO )PCOPY [lib] wsname [object ...]»
+«»«»
+Protective «BO )COPY». Same as «BO )COPY» above, but not overwriting existing
+defined functions and variables.
+
+
+«H4 )PIN»
+Syntax: «BO )PIN filename [object ...]»
+«»«»
+Protective «BO )IN». Same as «BO )IN» above, but not overwriting existing
+defined functions and variables.
+
+
+«H4 )RESET»
+Syntax: «BO )RESET»
+«»«»
+Same as «BO )CLEAR» above.
+
+
+«H4 )SYMBOLS»
+Syntax: «BO )SYMBOLS [count]»
+«»«»
+If «BO count» is ommitted then display the current number of user-defined
+names (i.e. for variables, labels, defined functions and defined operators).
+Otherwise, increase the size of the symbol table to at least «BO count».
+
+
+«H3 Additional GNU APL Commands»
+
+In addition to the commands from the ISO standard and from IBM APL2, GNU APL
+provides some more commands. These commands are divided into 2 groups: normal
+commands that start with the character «BO )», and debug commands that
+start with the character «BO ]».
+
+
+«H4 )DUMP»
+Syntax: «BO )DUMP [[lib] wsname]»
+«»«»
+Like «BO )SAVE» below, but using a different file format. The files have an
+extension of «BO .apl». The file produced is an APL script which, when executed,
+reconstructs the current workspace (in terms of variables, defined functions,
+and defined operators).
+«»«»
+The .apl files produced by «BO )DUMP» are easier to read (and, if necessary,
+to modify) than the .xml files produced by «BO )SAVE». On the one hand, .apl
+files are more portable than .xml files, both in respect to different versions
+of the GNU APL interpreter and with respect to interpreters from different APL
+vendors. On the other hand, .apl files have limitations when used with
+«BO )COPY» in «BO libapl».
+«»«»
+
+
+«H4 )DUMP-HTML»
+Syntax: «BO )DUMP-HTML [[lib] wsname]»
+«»«»
+«BO lib» is an optional library reference number as for command «BO )COPY»
+above.
+«»«»
+«BO wsname» selects a workspace in the directory selected by «BO lib». If
+«BO lib» is omitted then an absolute path to the workspace file is accepted
+as «BO wsname».
+«»«»
+)DUMP-HTML is similar to )DUMP, but it adds some HTML tagging so that the
+output file (with file extension .html) can be directly displayed by a web
+server. This can be useful for sharing your workspaces on the web in such
+a way that other users can cut-and-paste your code into their GNU APL session.
+
+«H4 )HIST»
+Syntax: «BO )HIST»          ⍝ show entire history
+Syntax: «BO )HIST CLEAR»    ⍝ clear the history
+Syntax: «BO )HIST filter»   ⍝ show only history lines starting with «BO filter»
+«»«»
+)HIST displays previously entered lines. It is sometimes difficult to remember
+the APL input that has lead to an APL error, and this command may help to
+reproduce such errors.
+
+If called with an argument, then argument CLEAR clears the history, while
+any other argument is taken as display filter. Only history lines beginning
+with the given filter are being displayed.
+
+
+«H4 )LIBS»
+Syntax: «BO )LIBS»
+«»«»
+Display the current mapping from library reference numbers to directories. For
+example:
+«APL
+      )LIBS»
+«»«»
+Syntax: «BO )LIBS [lib] path»
+«»«»
+«BO lib» is an optional library reference number as for command «BO )COPY»
+above.
+«»«»
+The directory for library reference number «BO lib» is set to «BO path».
+
+
+«H4 )QLOAD»
+Syntax: «BO )QLOAD [lib] wsname»
+«»«»
+Quiet «BO )LOAD». Like «BO )LOAD») above, but without printing a «BO SAVED...»
+or «BO DUMPED ...» message.
+
+
+«H4 )VALUES»
+Syntax: «BO )VALUES»
+«»«»
+Display a (long) list of all APL values (not variables) currently known
+by the interpreter along with their status (for debug purposes).
+
+«H4 ]BOXING»
+Syntax: «BO ]BOXING [OFF|2|3|4|7|8|9]»
+«»«»
+Changes the default style of the APL output. Example:
+«APL
+      V←1 (2 3) 'Hello'
+
+      ]BOXING OFF
+      V
+
+      ]BOXING 4
+      V
+
+      ]BOXING 8
+      V
+
+      ]BOXING OFF
+»
+«OU»
+
+
+«H4 ]COLOR»
+Syntax: «BO ]COLOR [ON|OFF]»
+«»«»
+Enables or disables the emission of Escape sequences for colors in the APL
+output. Output colouring is typically useful in truly interactive mode but
+requires terminals or terminal windows that support the Escape sequences.
+There are many situations, however, in which these Escape sequences disturb
+more than they help, e.g. copy-and-paste between terminal windows,
+post-processing of APL output.
+
+
+«H4 ]DOXY»
+Syntax: «BO ]DOXY [path]»
+«»«»
+Produce a Doxgen-like documentation of the current workspace. If «BO path»
+is omitted then current directory is used as «BO path». Example:
+
+«APL
+      ⍝ ]DOXY refuses to overwrite existing directories.
+      )HOST rm -Rf /tmp/DOXY_TEST
+
+      )WSID DOXY_TEST
+      ]DOXY /tmp
+»
+«OU»
+«H4 ]EXPECT»
+
+Syntax: «BO ]EXPECT error_count»
+«»«»
+Accept up to «BO error_count» errors before a testcase is considered failed.
+
+
+«H4 ]KEYB»
+Syntax: «BO ]KEYB»
+«»«»
+Display an APL Keyboard that can, for example, be used for cut-and-paste of
+APL characters on keyboards that can not produce them. For example:
+«APL
+      ]KEYB
+»
+«OU»
+The user may change the keyboard that is displayed with «BO ]KEYB», see e.g.
+«BO /usr/local/etc/gnu-apl.d/keyboard1.txt».
+
+«H4 ]LOG»
+Syntax: «BO ]LOG [facility [ON|OFF]]»
+«»«»
+Lists or controls GNU APL logging facilities (if configured to do so).
+
+
+«H4 ]NEXTFILE»
+Syntax: «BO ]NEXTFILE»
+«»«»
+GNU APL can be started with no, one, or muktiple input files. The
+«BO ]NEXTFILE» command abortes the execution of the current input file and
+starts the execution of the next file (if any). If thereis no next file
+then it prints an error message and enters immediate execution mode.
+
+
+«H4 ]OWNERS»
+Syntax: «BO ]OWNERS»
+«»«»
+Displays some debug information related to all APL values.
+
+
+«H4 ]SVARS»
+Syntax: «BO ]SVARS»
+«»«»
+Displays some debug information related to «IT shared variables»
+(an obsolete APL feature that is still supported by GNU APL).
+
+
+«H4 ]SYMBOL»
+Syntax: «BO ]SYMBOL name»
+«»«»
+Displays some debug information related to «BO name».
+
+
+«H4 ]USERCMD»
+GNU APL allows the creation of new APL commands by the user. These commands are
+implemented as APL code, either as lambdas (for simple commands) or as defined
+functions (for more complex commands).
+«»«»
+Syntax: «BO ]USERCMD»
+«»«»
+Display all currently defined user commands.
+«»«»
+Syntax: «BO ]USERCMD )ucmd APL_fun [mode]»
+«»«»
+Syntax: «BO ]USERCMD ]ucmd APL_fun [mode]»
+«»«»
+Define a new user-defined command by means of a defined function. The entire
+command is passed to the defined function as a string, therefore the function
+usually needs to drop the name of the command.
+«»«»
+«UL
+«LI If the optional «BO mode» is 0 (which is the the default) then «BO APL_fun»
+shall be monadic and the command entered by the user is passed to «BO APL_fun»
+as an APL string (starting with the command name). «BO APL_fun» is responsible
+for parsing the string, typically at least dropping the name of the command.»
+«LI If the optional «BO mode» is 1 then «BO APL_fun» shall be dyadic. The right
+argument of «BO APL_fun» is the same as for mode 0, while the left argument
+is a nested vector of APL strings. This vector contains the tokenized right
+argument which somewhat simplifies the processing of the argument(s) with which
+the user-defined command was called. The first item of the vector is the
+command, the next item is the first argument (if provided), and so on.»
+»
+It is possible to use the same defined function for different user-defined
+commands.
+«»«»
+Syntax: «BO ]USERCMD )ucmd { ... }»
+Syntax: «BO ]USERCMD ]ucmd { ... }»
+«»«»
+Define a new user defined command by means of a monadic lambda expression.
+The entire command is passed to the lambda expression as a string, therefore
+the lambda expression needs to drop e.g. the name of the command. Example:
+«»«»
+First define the command:
+
+«APL
+      ]USERCMD )sum { +/⍎4↓⍵ }»
+
+Then use the new command:
+
+«IN
+      )sum 1 2 3»
+«OU 6»
+«»
+Syntax: «BO ]USERCMD REMOVE ]ucmd»
+«»«»
+Delete the previously defined user command «BO ]ucmd». Example:
+«APL
+      ]USERCMD REMOVE )sum»
+
+Syntax: «BO ]USERCMD REMOVE-ALL»
+«»«»
+Delete all currently defined user commands.
+«APL
+      ]USERCMD REMOVE-ALL»
+
+«H4 ]XTERM»
+Syntax: «BO ]XTERM [ON|OFF]»
+«»«»
+GNU APL assumes, by default, that it runs interactively in an xterm compatible
+terminal or terminal emulator such as «BO xterm». In some situations it needs
+to output Escape sequences, e.g. for positioning the cursor or for clearing
+lines. In some situations (see command «BO ]COLOR») these Escape sequences
+are not desired and their emission can be turned off with command «BO XTERM»
+«»«»
+

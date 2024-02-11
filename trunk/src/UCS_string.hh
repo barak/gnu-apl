@@ -163,10 +163,10 @@ public:
    /// return true if \b this string contains any non-whitespace characters
    bool has_black() const;
 
-   /// return true if \b this starts with prefix (ASCII, case matters).
+   /// return true if \b this starts with prefix (ASCII, case sensitive).
    bool starts_with(const char * prefix) const;
 
-   /// return true if \b this ends with suffix (ASCII, case matters).
+   /// return true if \b this ends with suffix (ASCII, case sensitive).
    bool ends_with(const char * suffix) const;
 
    /// return true if \b this starts with \b prefix (case sensitive).
@@ -216,7 +216,7 @@ public:
    /// the inverse of \b un_escape().
    UCS_string do_escape(bool double_quoted) const;
 
-   /// case-sensitive comparison: return true iff \b this comes before \b other
+   /// case-sensitive comparison: Return true iff \b this comes before \b other
    bool lexical_before(const UCS_string other) const;
 
    /// dump \b this string to out (like U+nnn U+mmm ... )

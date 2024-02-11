@@ -117,7 +117,7 @@ public:
       };
 
    /// return true if entry is a directory
-   static bool is_directory(dirent * entry, const UTF8_string & path);
+   static bool is_directory(const dirent * entry, const UTF8_string & path);
 
    /// clear the copy_once_table.
    static void clear_copy_once_table();
@@ -129,6 +129,14 @@ public:
    static bool auto_MORE;
 
 protected:
+   /// sort order
+   enum SORT_ORDER
+      {
+        SORT_NONE = 0,
+        SORT_SIZE = 1,
+        SORT_TIME = 2,
+      };
+
    /// On, Off, or Toggle
    enum OOT
       {
@@ -201,10 +209,24 @@ protected:
    static DIR * open_LIB_dir(UTF8_string & path, ostream & out,
                             const UCS_string_vector & args);
 
-   /// list library: common helper
-   static void lib_common(ostream & out, const UCS_string_vector & args,
-                          int variant);
+   /// list library: common helper. variant tells apart )LIB and ]LIB.
+   static void LIB_common(ostream & out, const UCS_string_vector & args,
+                          bool dbg);
 
+   /// print the workspace names in the LIB directory w/o sorting
+   static void LIB_print_0(ostream & out, const UTF8_string lib_path,
+                           const UCS_string_vector & directories,
+                           const UCS_string_vector & files);
+
+   /// print the workspace names in the LIB directory with sorting
+   static void LIB_print_12(ostream & out, const UTF8_string lib_path,
+                           const UCS_string_vector & directories,
+                           const UCS_string_vector & files, SORT_ORDER sort);
+
+   /// return the property by which file names shall be sorted
+   static size_t sort_property(SORT_ORDER sort, const UTF8_string & lib_path,
+                               const UCS_string & filename);
+                               
    /// list content of workspace and wslib directories: )LIB [N]
    static void cmd_LIB1(ostream & out, const UCS_string_vector & args);
 

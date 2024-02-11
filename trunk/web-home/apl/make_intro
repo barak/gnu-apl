@@ -1,0 +1,42 @@
+#!/bin/bash
+
+{
+   # HTML header...
+   #
+   cat << ENDCAT
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>GNU APL</title>
+    <meta name='description' content='APL'/>
+    <meta http-equiv='Content-Type' content='text/html; charset=UTF-8'/>
+    <link rel='stylesheet' type='text/css' href='apl-intro.css'/>
+  </head>
+ENDCAT
+
+   # HTML body...
+   #
+   ./translate $1 $1.cont $1.toc Book.tc
+
+   # Table of content
+   #
+   echo -n "
+  <body>
+  <h1 class=\"toc_H1\">A Quick Tour of GNU APL</h1>
+    <table>
+<tbody>"
+
+   cat $1.toc
+
+   cat << ENDCAT
+    </tbody></table>
+    <hr>
+ENDCAT
+
+   cat $1.cont
+
+   echo "  </body>"
+   echo "</html>"
+} > apl-intro.html
+
+exit 0
