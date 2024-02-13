@@ -2,7 +2,8 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2008-2023  Dr. Jürgen Sauermann
+    Copyright © 2008-2024  Dr. Jürgen Sauermann,
+    Copyright ©      2024  Paul Rockwell (Apple)
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -76,7 +77,7 @@ Backtrace::find_src(int64_t pc)
         return posp->src_loc;   // found
       }
 
-   0 && cerr << "PC=" << hex << pc << dec << " not found in apl.lines" << endl;
+   (0) && cerr << "PC=" << hex << pc << dec << " not found in apl.lines" << endl;
    return 0;   // not found
 }
 //----------------------------------------------------------------------------
@@ -146,10 +147,10 @@ int64_t prev_pc = NO_PC;
          if (s == 0)   break;   // end of file.
          ++file_lines;
 
-         buffer[sizeof(buffer) - 1] = 0;   // just in case
+         buffer[sizeof(buffer) - 1] = '\0';   // just in case
          int slen = strlen(buffer);
-         if (slen && buffer[slen - 1] == '\n')   buffer[--slen] = 0;
-         if (slen && buffer[slen - 1] == '\r')   buffer[--slen] = 0;
+         if (slen && buffer[slen - 1] == '\n')   buffer[--slen] = '\0';
+         if (slen && buffer[slen - 1] == '\r')   buffer[--slen] = '\0';
          if (slen == 0)   continue;   // empty line
 
          /* the file supposedly contains only 3 types of non-empty lines:
@@ -221,7 +222,7 @@ main():
                       }
 
                    PC_src pcs = { pc, src_line };
-                   0 && cerr << "adding " << uhex << pcs.pc << dec
+                   (0) && cerr << "adding " << uhex << pcs.pc << dec
                              << " aka. " << pcs.src_loc << endl;
                    pc_2_src.push_back(pcs);
                    prev_pc = pc;
@@ -244,42 +245,91 @@ void
 Backtrace::show_item(int idx, char * s)
 {
 #ifdef HAVE_EXECINFO_H
-  //
-  // string s looks like this:
-  //
-  // ./apl(_ZN10APL_parser9nextTokenEv+0x1dc) [0x80778dc]
-  //                                   │││││   │││││││││
-  //                                   │││││   └┴┴┴┴┴┴┴┴───── abs_addr
-  //                                   └┴┴┴┴───────────────── asm_offset
-  //
+    
+// Change this to #define DISPLAY_ASM_OFFSET if you would like the asm_offset
+// displayed in the backtrace the default is not to display
+//
+#undef  DISPLAY_ASM_OFFSET
+    
+int64_t abs_addr = NO_PC;
+char * fun = nullptr;
+long long asm_offset = 0;
+   (void)asm_offset;   // avoid warning if not used
+    
+#ifdef __APPLE__
+/*
+    on macOS/Darwin, string s looks like this:
+
+    0x00000001000a93f0 _ZN9Workspace19immediate_executionEb + 68
+    ││││││││││││││││││ ││││││││││││││││││││││││││││││││││││   ││
+    ││││││││││││││││││ ││││││││││││││││││││││││││││││││││││   └┴─── asm_offset
+    ││││││││││││││││││ └┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴──────── fun
+    └┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴───────────────────────────────────────────── abs_addr
+ */
+
+   // Find the abs_addr by skipping to the first ' 0x'
+
+   if (char * a_a = strstr(s, " 0x") )   // the space before abs_addr
+      {
+          // extract abs_addr now that we found it
+          *a_a = '\0';
+          a_a++;
+          if (char * e = strchr(a_a,' ')) {
+              *e = '\0';
+              fun = e + 1;
+              abs_addr = strtoll(a_a, nullptr, 16);
+              abs_addr -= main_offset;
+          }
+      }
+
+    if (fun)
+    {
+        if (char * e = strchr(fun , ' '))
+        {
+            *e = '\0';
+            e++ ;                                 // skip and look for "+ " ' '
+            if (char * a_o = strstr(e,"+ "))
+            {
+                a_o += 2;
+                asm_offset = strtoll(a_o,nullptr,10);
+            }
+        }
+    }
+    
+#else /* __APPLE__ not defined,  a.k.a. other Linux, etc. platforms */
+
+/*
+    string s looks like this:
+    
+     ./apl(_ZN10APL_parser9nextTokenEv+0x1dc) [0x80778dc]
+           │││││││││││││││││││││││││││ │││││   │││││││││
+           │││││││││││││││││││││││││││ │││││   └┴┴┴┴┴┴┴┴───── abs_addr
+           │││││││││││││││││││││││││││ └┴┴┴┴───────────────── asm_offset
+           └┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴─────────────────────── fun
+   */
 
    // split off abs_addr from s.
    //
-const char * abs_addr = "????????";
-int64_t pc = NO_PC;
 
    if (char * space = strchr(s, ' '))   // the space before [abs_addr]
       {
-        *space = 0;
-        abs_addr = space + 2;
-        if (char * e = strchr(space + 2, ']'))   *e = 0;
-        pc = strtoll(abs_addr, 0, 16);
-        pc -= main_offset;
+        *space = '\0';
+        space += 2;
+        if (char * e = strchr(space, ']'))   *e = 0;
+        abs_addr = strtoll(space, 0, 16);
+        abs_addr -= main_offset;
       }
-
-const char * src_loc = find_src(pc);
 
    // split off function from s.
    //
-char * fun = 0;
    {
     char * opar = strchr(s, '(');
     if (opar)
        {
-         *opar = 0;
+         *opar = '\0';
          fun = opar + 1;
-          char * e = strchr(opar + 1, ')');
-          if (e)   *e = 0;
+         char * e = strchr(opar + 1, ')');
+         if (e)   *e = '\0';
        }
    }
 
@@ -287,20 +337,22 @@ char * fun = 0;
    //
    if (fun)
       {
-       int asm_offset = 0;
        if (char * plus = strchr(fun, '+'))
           {
-            *plus++ = 0;
-            asm_offset = strtoll(plus, 0, 16);
+            *plus++ = '\0';
+            asm_offset = strtoll(plus, nullptr, 16);
           }
-       if (asm_offset)   { /* to avoid warning */ }
       }
+
+# endif /* __APPLE__ */
+
+const char * src_loc = find_src(abs_addr);
 
 char obuf[200] = "@@@@";
    if (fun)
       {
-        strncpy(obuf, fun, sizeof(obuf) - 1);
-        obuf[sizeof(obuf) - 1] = 0;
+       strncpy(obuf, fun, sizeof(obuf) - 1);
+       obuf[sizeof(obuf) - 1] = '\0';
 
        size_t obuflen = sizeof(obuf) - 1;
        int status = 0;
@@ -325,26 +377,29 @@ char obuf[200] = "@@@@";
    // we normally prefer uppercase hex, but 'objcopy' and friends produce
    // lowercase hex and we follow suit as to simplify searching in their files.
    //
-   cerr << "0x" << lhex << pc << nohex;
+   cerr << "0x" << lhex << abs_addr << nohex;
 
 // cerr << left << setw(20) << s << right << " ";
 
    // indent.
+   //
    for (int i = -1; i < idx; ++i)   cerr << " ";
 
    cerr << obuf;
 
-// if (offs)   cerr << " +" << offs;
+# ifdef DISPLAY_ASM_OFFSET
+   if (asm_offset > 0)   cerr << " + " << asm_offset;
+# endif
 
    if (src_loc)
       {
         char cc[200];
         SPRINTF(cc, "%s", src_loc);
-        if (char * disc = strstr(cc, "discriminator"))   disc[-1] = 0;
-         cerr << " at " << cc;
+        if (char * disc = strstr(cc, "discriminator"))   disc[-1] = '\0';
+        cerr << " at " << cc;
       }
    cerr << endl;
-#endif
+#endif   // _APPLE_
 }
 //----------------------------------------------------------------------------
 void
@@ -371,7 +426,7 @@ char ** strings = backtrace_symbols(buffer, size);
         << "-- Stack trace at " << file << ":" << line << endl
         << "----------------------------------------"  << endl;
 
-   if (strings == 0)
+   if (strings == nullptr)
       {
         cerr << "backtrace_symbols() failed. Using backtrace_symbols_fd()"
                 " instead..." << endl << endl;
@@ -385,24 +440,21 @@ char ** strings = backtrace_symbols(buffer, size);
         return;
       }
 
-   for (int i = 1; i < size - 1; ++i)
+   for (int i = 1; i < size - 1; ++i)   // loop over stacktrace lines
        {
-         // make a copy cc of strings[i] that can be
-         // messed up in show_item().
+         // make a copy si of strings[i] that show_item() can mess up
          //
-         const char * si = strings[size - i - 1];
-         char cc[strlen(si) + 1];
-         strcpy(cc, si);
-         cc[sizeof(cc) - 1] = 0;
-         show_item(i - 1, cc);
+         const char * const_si = strings[size - i - 1];
+         char si[strlen(const_si) + 1];
+         strcpy(si, const_si);
+         si[sizeof(si) - 1] = 0;   // 0-terminate (just in case)
+         show_item(i - 1, si);
        }
    cerr << "========================================" << endl;
 
-#if 0
    // crashes at times
    free(strings);   // but not strings[x] !
-#endif
-
+   
 #endif
 }
 //----------------------------------------------------------------------------

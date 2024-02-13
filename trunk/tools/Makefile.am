@@ -6,6 +6,7 @@ noinst_PROGRAMS = APL_keyboard       \
                   APL_keyboard_learn \
                   APL_keyboard_show  \
                   apl2html           \
+                  check_command_def  \
                   lines              \
                   ncurses_emul       \
                   phrase_gen         \
@@ -30,6 +31,7 @@ APL_keyboard_SOURCES       = APL_keyboard.cc        APL_keyboard.def
 APL_keyboard_learn_SOURCES = APL_keyboard_learn.cc  APL_keyboard.orig.def
 APL_keyboard_show_SOURCES  = APL_keyboard_show.cc
 apl2html_SOURCES           = apl2html.cc
+check_command_def_SOURCES  = check_command_def.cc
 lines_SOURCES              = lines.cc
 TLV_server_SOURCES         = TLV_server.c
 ncurses_emul_SOURCES       = ncurses_emul.cc
@@ -37,9 +39,9 @@ ncurses_emul_LIBS          = -lncurses -ltinfo
 
 phrase_gen_SOURCES = phrase_gen.cc phrase_gen.def
 
-gen:	phrase_gen
+gen: phrase_gen
 	./phrase_gen > ../src/Prefix.def
 
-gen2:	phrase_gen
+gen2: phrase_gen
 	./phrase_gen -t > ../src/Prefix.def
 

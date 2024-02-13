@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# this script checks for bad settings when exporting a package
-# this script shall be run in the top-level directory
+# this script checks for bad settings when exporting a package.
+# It shall be run executed the top-level directory.
 
 ################################################################################
 logging_facilities_check()
@@ -15,7 +15,8 @@ if [ $cnt1 != $cnt2 ]
 then
    echo "
 ***
-*** Cannot build packages because some logging facility is ON in src/Logging.def
+*** Cannot build packages because one or more logging facility
+*** is ON in file src/Logging.def
 ***
 "
    exit 1

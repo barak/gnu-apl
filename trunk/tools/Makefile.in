@@ -90,7 +90,8 @@ POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
 noinst_PROGRAMS = APL_keyboard$(EXEEXT) APL_keyboard_learn$(EXEEXT) \
-	APL_keyboard_show$(EXEEXT) apl2html$(EXEEXT) lines$(EXEEXT) \
+	APL_keyboard_show$(EXEEXT) apl2html$(EXEEXT) \
+	check_command_def$(EXEEXT) lines$(EXEEXT) \
 	ncurses_emul$(EXEEXT) phrase_gen$(EXEEXT) sockconst$(EXEEXT) \
 	TLV_server$(EXEEXT)
 subdir = tools
@@ -134,6 +135,9 @@ TLV_server_LDADD = $(LDADD)
 am_apl2html_OBJECTS = apl2html.$(OBJEXT)
 apl2html_OBJECTS = $(am_apl2html_OBJECTS)
 apl2html_LDADD = $(LDADD)
+am_check_command_def_OBJECTS = check_command_def.$(OBJEXT)
+check_command_def_OBJECTS = $(am_check_command_def_OBJECTS)
+check_command_def_LDADD = $(LDADD)
 am_lines_OBJECTS = lines.$(OBJEXT)
 lines_OBJECTS = $(am_lines_OBJECTS)
 lines_LDADD = $(LDADD)
@@ -165,9 +169,9 @@ am__maybe_remake_depfiles = depfiles
 am__depfiles_remade = ./$(DEPDIR)/APL_keyboard.Po \
 	./$(DEPDIR)/APL_keyboard_learn.Po \
 	./$(DEPDIR)/APL_keyboard_show.Po ./$(DEPDIR)/TLV_server.Po \
-	./$(DEPDIR)/apl2html.Po ./$(DEPDIR)/lines.Po \
-	./$(DEPDIR)/ncurses_emul.Po ./$(DEPDIR)/phrase_gen.Po \
-	./$(DEPDIR)/sockconst.Po
+	./$(DEPDIR)/apl2html.Po ./$(DEPDIR)/check_command_def.Po \
+	./$(DEPDIR)/lines.Po ./$(DEPDIR)/ncurses_emul.Po \
+	./$(DEPDIR)/phrase_gen.Po ./$(DEPDIR)/sockconst.Po
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -207,12 +211,14 @@ am__v_CXXLD_0 = @echo "  CXXLD   " $@;
 am__v_CXXLD_1 = 
 SOURCES = $(APL_keyboard_SOURCES) $(APL_keyboard_learn_SOURCES) \
 	$(APL_keyboard_show_SOURCES) $(TLV_server_SOURCES) \
-	$(apl2html_SOURCES) $(lines_SOURCES) $(ncurses_emul_SOURCES) \
-	$(phrase_gen_SOURCES) sockconst.c
+	$(apl2html_SOURCES) $(check_command_def_SOURCES) \
+	$(lines_SOURCES) $(ncurses_emul_SOURCES) $(phrase_gen_SOURCES) \
+	sockconst.c
 DIST_SOURCES = $(APL_keyboard_SOURCES) $(APL_keyboard_learn_SOURCES) \
 	$(APL_keyboard_show_SOURCES) $(TLV_server_SOURCES) \
-	$(apl2html_SOURCES) $(lines_SOURCES) $(ncurses_emul_SOURCES) \
-	$(phrase_gen_SOURCES) sockconst.c
+	$(apl2html_SOURCES) $(check_command_def_SOURCES) \
+	$(lines_SOURCES) $(ncurses_emul_SOURCES) $(phrase_gen_SOURCES) \
+	sockconst.c
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
@@ -411,6 +417,7 @@ APL_keyboard_SOURCES = APL_keyboard.cc        APL_keyboard.def
 APL_keyboard_learn_SOURCES = APL_keyboard_learn.cc  APL_keyboard.orig.def
 APL_keyboard_show_SOURCES = APL_keyboard_show.cc
 apl2html_SOURCES = apl2html.cc
+check_command_def_SOURCES = check_command_def.cc
 lines_SOURCES = lines.cc
 TLV_server_SOURCES = TLV_server.c
 ncurses_emul_SOURCES = ncurses_emul.cc
@@ -479,6 +486,10 @@ apl2html$(EXEEXT): $(apl2html_OBJECTS) $(apl2html_DEPENDENCIES) $(EXTRA_apl2html
 	@rm -f apl2html$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(apl2html_OBJECTS) $(apl2html_LDADD) $(LIBS)
 
+check_command_def$(EXEEXT): $(check_command_def_OBJECTS) $(check_command_def_DEPENDENCIES) $(EXTRA_check_command_def_DEPENDENCIES) 
+	@rm -f check_command_def$(EXEEXT)
+	$(AM_V_CXXLD)$(CXXLINK) $(check_command_def_OBJECTS) $(check_command_def_LDADD) $(LIBS)
+
 lines$(EXEEXT): $(lines_OBJECTS) $(lines_DEPENDENCIES) $(EXTRA_lines_DEPENDENCIES) 
 	@rm -f lines$(EXEEXT)
 	$(AM_V_CXXLD)$(CXXLINK) $(lines_OBJECTS) $(lines_LDADD) $(LIBS)
@@ -506,6 +517,7 @@ distclean-compile:
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/APL_keyboard_show.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/TLV_server.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/apl2html.Po@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/check_command_def.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lines.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/ncurses_emul.Po@am__quote@ # am--include-marker
 @AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/phrase_gen.Po@am__quote@ # am--include-marker
@@ -700,6 +712,7 @@ distclean: distclean-am
 	-rm -f ./$(DEPDIR)/APL_keyboard_show.Po
 	-rm -f ./$(DEPDIR)/TLV_server.Po
 	-rm -f ./$(DEPDIR)/apl2html.Po
+	-rm -f ./$(DEPDIR)/check_command_def.Po
 	-rm -f ./$(DEPDIR)/lines.Po
 	-rm -f ./$(DEPDIR)/ncurses_emul.Po
 	-rm -f ./$(DEPDIR)/phrase_gen.Po
@@ -754,6 +767,7 @@ maintainer-clean: maintainer-clean-am
 	-rm -f ./$(DEPDIR)/APL_keyboard_show.Po
 	-rm -f ./$(DEPDIR)/TLV_server.Po
 	-rm -f ./$(DEPDIR)/apl2html.Po
+	-rm -f ./$(DEPDIR)/check_command_def.Po
 	-rm -f ./$(DEPDIR)/lines.Po
 	-rm -f ./$(DEPDIR)/ncurses_emul.Po
 	-rm -f ./$(DEPDIR)/phrase_gen.Po
@@ -795,10 +809,10 @@ uninstall-am:
 .PRECIOUS: Makefile
 
 
-gen:	phrase_gen
+gen: phrase_gen
 	./phrase_gen > ../src/Prefix.def
 
-gen2:	phrase_gen
+gen2: phrase_gen
 	./phrase_gen -t > ../src/Prefix.def
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.

@@ -29,8 +29,9 @@ dist_noinst_DATA = Doxyfile Makefile.incl config.h
 include Makefile.incl
 
 .PHONY: check_sources
-check_sources: tools/check_src
+check_sources: tools/check_src tools/check_command_def
 	tools/check_src
+	tools/check_command_def
 
 # produce doxygen documentation
 #
@@ -91,6 +92,7 @@ SYNC:	DIST
 .PHONY:	EXPO
 EXPO:
 	tools/check_src
+	tools/check_command_def
 	svn -m "auto-commit by make EXPO, local SVN: `svnversion`" commit
 	svn update
 	svn -m "auto-commit by make EXPO" commit
@@ -105,6 +107,7 @@ EXPO:
 .PHONY:	EXPO1
 EXPO1:
 	tools/check_src
+	tools/check_command_def
 	./configure --disable-maintainer-mode
 	make
 	make dist
