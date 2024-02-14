@@ -31,7 +31,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 
-#include "Common.hh"   // for HAVE_EXECINFO_H
+#include "Common.hh"   // for HAVE_EXECINFO_H et al.
 #ifdef HAVE_EXECINFO_H
 # include <execinfo.h>
 # include <cxxabi.h>
@@ -40,8 +40,52 @@
 #define EXEC(x)
 #endif
 
-#include "Common.hh"
+#if defined(HAVE_LIBDWARF) && defined(HAVE_LIBDWARF_LIBDWARF_H) && \
+    defined(HAVE_LIBELF)  && defined(HAVE_LIBELF_H)
+# define HAVE_DWARF /* ongoing work, set to 1 if it works */ 0
+#endif
+
 #include "Backtrace.hh"
+
+#if HAVE_DWARF
+# include <libelf.h>
+# include <libdwarf/libdwarf.h>
+# include <libdwarf/dwarf.h>
+
+Dwarf_Error error = 0;
+Dwarf_Debug dbg;
+void
+init_DWARF(const char * binary_filename)
+{
+   get_CERR() << " Initializing DWARF for " << binary_filename << "..." << endl;
+
+   if (const int rc = dwarf_init_path(
+       binary_filename,
+       0,            // char *            true_path_out_buffer
+       0,            // unsigned int      true_path_bufferlen
+       0,            // Dwarf_Unsigned    access
+       0,            // unsigned int      groupnumber
+       0,            // Dwarf_Handler     errhand
+       0,            // Dwarf_Ptr         errarg
+       &dbg,         // Dwarf_Debug*      dbg
+       0, 0, 0,      // const char *       reserved1..3
+       &error))      // Dwarf_Error*       error
+      {
+         get_CERR() << "init_DWARF(): rc=" << rc << ", error-" << error << endl
+              << dwarf_errmsg(error) << endl;
+      }
+   else get_CERR() << "OK." << endl;
+}
+
+
+#else   // no dwarf
+
+void init_DWARF(const char * binary_filename)
+{
+   cerr << "init_DWARF(): NO dwarf" << endl;
+}
+
+#endif
 
 #define NO_PC (-1LL)
 
@@ -403,6 +447,115 @@ char obuf[200] = "@@@@";
 }
 //----------------------------------------------------------------------------
 void
+Backtrace::show_dwarf(int idx, const char * s)
+{
+#if HAVE_DWARF
+
+   // loop over CUs
+   //
+   {
+    Dwarf_Unsigned abbrev_offset  = 0;
+    Dwarf_Half     address_size   = 0;
+    Dwarf_Half     version_stamp  = 0;
+    Dwarf_Half     offset_size    = 0;
+    Dwarf_Half     extension_size = 0;
+    Dwarf_Sig8     signature;
+    Dwarf_Unsigned typeoffset     = 0;
+    Dwarf_Unsigned next_cu_header = 0;
+    Dwarf_Half     header_cu_type = 0;
+    Dwarf_Bool     is_info        = true;   // inside .debug_info section
+                                            // otherwise: in .debug_types
+    int            res            = 0;
+
+   for (;;)
+       {
+         Dwarf_Die no_die = 0;
+         Dwarf_Die cu_die = 0;
+         Dwarf_Unsigned cu_header_length = 0;
+         memset(&signature, 0, sizeof(signature));
+         Dwarf_Die in_die;
+         int res = dwarf_next_cu_header_d(dbg, is_info, &cu_header_length,
+                                          &version_stamp, &abbrev_offset,
+                                          &address_size, &offset_size,
+                                          &extension_size, &signature,
+                                          &typeoffset, &next_cu_header,
+                                          &header_cu_type, &error);
+         if (res == DW_DLV_ERROR)   break; // needed ???
+         if (res == DW_DLV_NO_ENTRY)
+            {
+              if (is_info)   // end of .debug_info reached
+                 {
+                   // Done with .debug_info, now in section .debug_types
+                   is_info = false;
+                   continue;
+                 }
+            }
+         res = dwarf_siblingof_b(dbg, no_die, is_info, &cu_die, &error);
+         if (res == DW_DLV_ERROR) {
+            break;
+        }
+
+         if (res == DW_DLV_ERROR)   break;
+
+         /*
+            0x03 = DW_AT_name     = source file name
+            0x1B = DW_AT_comp_dir = source file directory
+            0x25 = DW_AT_producer = compiler and its command line flags
+          */
+
+         char * src_file = 0;
+         char * src_dir  = 0;
+         Dwarf_Attribute att_PC_low = 0;
+         dwarf_die_text(cu_die, DW_AT_name, &src_file, &error);
+         dwarf_die_text(cu_die, DW_AT_comp_dir, &src_dir,  &error);
+         dwarf_attr(cu_die, DW_AT_low_pc, &att_PC_low,  &error);
+         if (src_file && src_dir && att_PC_low)   // got them
+            {
+              Dwarf_Addr low = 0;
+              dwarf_formaddr(att_PC_low, &low, &error);
+              cerr << "See CU " << src_dir
+                   << "/" << src_file
+                   << " PC " << HEX(low) << endl;
+            }
+       }
+   }
+
+int64_t PC = 0;
+#ifdef __APPLE__
+/*
+    on macOS/Darwin, string s looks like this:
+
+    0x00000001000a93f0 _ZN9Workspace19immediate_executionEb + 68
+    ││││││││││││││││││ ││││││││││││││││││││││││││││││││││││   ││
+    ││││││││││││││││││ ││││││││││││││││││││││││││││││││││││   └┴─── asm_offset
+    ││││││││││││││││││ └┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴──────── fun
+    └┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴───────────────────────────────────────────── abs_addr
+ */
+
+   PC = strtoll(s);
+
+#else   // not APPLE
+/*
+    string s looks like this:
+    
+     ./apl(_ZN10APL_parser9nextTokenEv+0x1dc) [0x80778dc]
+           │││││││││││││││││││││││││││ │││││   │││││││││
+           │││││││││││││││││││││││││││ │││││   └┴┴┴┴┴┴┴┴───── abs_addr
+           │││││││││││││││││││││││││││ └┴┴┴┴───────────────── asm_offset
+           └┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴┴─────────────────────── fun
+   */
+   if (const char * bracket = strrchr(s, '['))   PC = strtoll(bracket + 3, 0, 16);
+
+#endif
+
+   cerr << "0x" << lhex << PC << dec << "    ";
+   for (int ind = 0; ind < idx; ++ind)   cerr << "  ";   // print indentation
+   cerr << "xxx" << endl;
+
+#endif   // HAVE_LIBELFIN_ELF_ELF___HH
+}
+//----------------------------------------------------------------------------
+void
 Backtrace::show(const char * file, int line)
 {
    // CYGWIN, for example, has no execinfo.h and the functions declared there
@@ -450,6 +603,17 @@ char ** strings = backtrace_symbols(buffer, size);
          si[sizeof(si) - 1] = 0;   // 0-terminate (just in case)
          show_item(i - 1, si);
        }
+
+   cerr << "========================================" << endl;
+
+   for (int i = 1; i < size - 1; ++i)   // loop over stacktrace lines
+       {
+         // make a copy si of strings[i] that show_item() can mess up
+         //
+         const char * si = strings[size - i - 1];
+         show_dwarf(i - 1, si);
+       }
+
    cerr << "========================================" << endl;
 
    // crashes at times

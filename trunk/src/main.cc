@@ -41,6 +41,7 @@
 #include <sys/socket.h>
 #include <sys/types.h>
 
+#include "Backtrace.hh"   // to pre-init elf_pointer
 #include "Command.hh"
 #include "Common.hh"
 #include "IO_Files.hh"
@@ -51,6 +52,10 @@
 #include "Output.hh"
 #include "Workspace.hh"
 #include "UserPreferences.hh"
+
+#if HAVE_LIBELFIN_ELF_ELF___HH
+# include <libelfin/elf/elf++.hh>
+#endif
 
 /** \mainpage GNU APL
 
@@ -365,7 +370,6 @@ sockaddr_in local;
          close(connection);
          return;
        }
-
 }
 //----------------------------------------------------------------------------
 /// initialize the interpreter
@@ -395,7 +399,6 @@ const bool log_startup = UserPreferences::uprefs.parse_argv_1() || log_startup0;
          show_argv(UserPreferences::uprefs.expanded_argv.size(),
                   &UserPreferences::uprefs.expanded_argv[0]);
       }
-
 
 #ifdef cfg_DYNAMIC_LOG_WANTED
    if (log_startup)   Log_control(LID_startup, true);
@@ -619,6 +622,18 @@ const bool log_startup = UserPreferences::uprefs.parse_argv_1() || log_startup0;
       }
 
    Quad_TZ::compute_offset();
+
+   {
+     // we allocate a mmap'ed elf object beforhand so that we ha
+     // do not need to create it when, for instance, a WS_FULL is thrown.
+     //
+     char apl_filename[FILENAME_MAX + 1];   // directory and binary
+     snprintf(apl_filename, sizeof(apl_filename), "%s/%s",
+              LibPaths::get_APL_bin_path(), LibPaths::get_APL_bin_name());
+     apl_filename[FILENAME_MAX] = 0;
+     init_DWARF(apl_filename);
+   }
+
    return 0;
 }
 //----------------------------------------------------------------------------

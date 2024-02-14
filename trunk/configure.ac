@@ -165,30 +165,34 @@ AC_CHECK_HEADER(
       [ #endif ]
     ])
 
+# keep headers in roughy alphabetical order as to find them more easily
+#
 apl_missing_headers=0
-AC_CHECK_HEADERS([                      \
-   dirent.h                             \
-   execinfo.h                           \
-   ext/atomicity.h                      \
-   fcntl.h fenv.h                       \
-   fftw3.h                              \
-   inttypes.h                           \
-   libpng16/png.h                       \
-   locale.h                             \
-   limits.h                             \
-   malloc.h                             \
-   netdb.h                              \
-   netinet/in.h                         \
-   stdint.h                             \
-   stdlib.h                             \
-   string.h                             \
-   strings.h                            \
-   sys/un.h                             \
-   termios.h                            \
-   unistd.h                             \
-   utmpx.h                              \
-   vector                               \
-   zlib.h                               \
+AC_CHECK_HEADERS([      \
+   dirent.h             \
+   execinfo.h           \
+   ext/atomicity.h      \
+   fcntl.h fenv.h       \
+   fftw3.h              \
+   inttypes.h           \
+   libdwarf/libdwarf.h  \
+   libelf.h             \
+   libpng16/png.h       \
+   limits.h             \
+   locale.h             \
+   malloc.h             \
+   netdb.h              \
+   netinet/in.h         \
+   stdint.h             \
+   stdlib.h             \
+   string.h             \
+   strings.h            \
+   sys/un.h             \
+   termios.h            \
+   unistd.h             \
+   utmpx.h              \
+   vector               \
+   zlib.h               \
                  ],, apl_missing_headers=$(($apl_missing_headers + 1)))
 
 # Checks for typedefs, structures, and compiler characteristics.
@@ -250,6 +254,9 @@ AC_CHECK_FUNCS([                                             \
    uname                                                     \
                ],, apl_missing_functions=$(($apl_missing_functions + 1)))
 
+# keep libraries in inverse-alphabetic order so ./configure prints them
+# in inverse-alphabetic order
+#
 AC_CHECK_LIB([tinfo],     [tparm])
 AC_CHECK_LIB([socket],    [socket])   # for Solaris
 AC_CHECK_LIB([pthread],   [sem_init])
@@ -257,7 +264,6 @@ AC_CHECK_LIB([nsl],       [yp_all])   # for Solaris
 AC_CHECK_LIB([curses],    [setupterm])
 AC_CHECK_LIB([ncurses],   [setupterm])
 AC_CHECK_LIB([m],         [acosh])
-AC_CHECK_LIB([execinfo],  [backtrace])
 AC_CHECK_LIB([dl],        [dlopen])
 AC_CHECK_LIB([c],         [initstate_r])
 AC_CHECK_LIB([atomicity], [__atomic_fetch_add_4])
@@ -296,6 +302,14 @@ m4_include([m4/check_GTK.m4])
 apl_GUI=no
 apl_YES($apl_GTK3) && apl_GUI=yes
 apl_YES($apl_X11)  && apl_GUI=yes
+
+# backtrace() seem to have been moved from libexecinfo to GLIBC_2.2.5,
+# so we do not test fore it anymore.
+#
+# AC_CHECK_LIB([execinfo], [backtrace])
+
+AC_CHECK_LIB([elf],   [elf_version])
+AC_CHECK_LIB([dwarf], [dwarf_package_version])
 
 apl_TOPIC([checks for functions that are missing on some platforms])
 

@@ -5,7 +5,7 @@
 #define ARCHIVE_SVN " 1175"
 
 /* How and when GNU APL was configured */
-#define BUILDTAG PACKAGE_NAME, PACKAGE_VERSION " / SVN: 1232", "2024-02-13 13:07:41 UTC", "Linux 5.15.0-91-generic x86_64", "default ./configure options"
+#define BUILDTAG PACKAGE_NAME, PACKAGE_VERSION " / SVN: 1236", "2024-02-14 17:28:10 UTC", "Linux 5.15.0-91-generic x86_64", "default ./configure options"
 
 /* Define to 1 iff pthread_setaffinity_np() is available */
 #define HAVE_AFFINITY_NP 1
@@ -76,8 +76,17 @@
 /* Define to 1 if you have the `dl' library (-ldl). */
 #define HAVE_LIBDL 1
 
-/* Define to 1 if you have the `execinfo' library (-lexecinfo). */
-/* #undef HAVE_LIBEXECINFO */
+/* Define to 1 if you have the `dwarf' library (-ldwarf). */
+#define HAVE_LIBDWARF 1
+
+/* Define to 1 if you have the <libdwarf/libdwarf.h> header file. */
+#define HAVE_LIBDWARF_LIBDWARF_H 1
+
+/* Define to 1 if you have the `elf' library (-lelf). */
+#define HAVE_LIBELF 1
+
+/* Define to 1 if you have the <libelf.h> header file. */
+#define HAVE_LIBELF_H 1
 
 /* Define to 1 if you have the `fftw3' library (-lfftw3). */
 #define HAVE_LIBFFTW3 1

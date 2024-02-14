@@ -29,6 +29,8 @@
 #include "Common.hh"
 #include "PrintOperator.hh"
 
+extern void init_DWARF(const char * binary_filename);
+
 /// show the current function call stack.
 class Backtrace
 {
@@ -49,8 +51,11 @@ protected:
    /// open file apl.lines
    static void open_lines_file();
 
-   /// show one item in the backtrace
+   /// print one item in the backtrace to cerr. NOTE: modifies s.
    static void show_item(int idx, char * s);
+
+   /// print the dwarf info of one item in the backtrace to cerr.
+   static void show_dwarf(int idx, const char * s);
 
    /// the status of file apl.lines
    enum APL_lines_status

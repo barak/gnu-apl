@@ -2027,7 +2027,12 @@ UTF8_string name(lib_path);   // e.g. /home/workspaces
         if (stat(name.c_str(), &st) == 0)   // got stat
            {
              if (sort == SORT_SIZE)   return st.st_size;
-             if (sort == SORT_TIME)   return st.st_mtim.tv_sec;
+             if (sort == SORT_TIME)
+#ifdef __APPLE__
+             return  st.st_mtimespec.tv_sec;
+#else
+             return st.st_mtim.tv_sec;
+#endif
              else                          FIXME;
            }
       }
