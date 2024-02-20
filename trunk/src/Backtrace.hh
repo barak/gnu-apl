@@ -29,7 +29,8 @@
 #include "Common.hh"
 #include "PrintOperator.hh"
 
-extern void init_DWARF(const char * binary_filename);
+/// (maybe) init a dwarf object for the apl binary
+extern void init_DWARF(const char * bin_dir, const char * bin_file);
 
 /// show the current function call stack.
 class Backtrace
@@ -48,26 +49,15 @@ protected:
    /// find the source for PC \b pc
    static const char * find_src(int64_t pc);
 
-   /// open file apl.lines
-   static void open_lines_file();
+   /// read the file apl.lines (if present) and set main_offset from the
+   /// address of main() in apl.lines.
+   static void read_apl_lines_file();
 
    /// print one item in the backtrace to cerr. NOTE: modifies s.
    static void show_item(int idx, char * s);
 
    /// print the dwarf info of one item in the backtrace to cerr.
    static void show_dwarf(int idx, const char * s);
-
-   /// the status of file apl.lines
-   enum APL_lines_status
-      {
-        LINES_not_checked,   ///< status is unknown
-        LINES_outdated,      ///< file is OK, but outdated
-        LINES_unusable,      ///< file is not usable for some reason
-        LINES_valid          ///< file is OK and up-to-date
-      };
-
-   /// the status of file apl.lines
-   static APL_lines_status lines_status;
 
    /// a mapping from PCs to source lines.
    struct PC_src

@@ -40,9 +40,8 @@
 #define EXEC(x)
 #endif
 
-#if defined(HAVE_LIBDWARF) && defined(HAVE_LIBDWARF_LIBDWARF_H) && \
-    defined(HAVE_LIBELF)  && defined(HAVE_LIBELF_H)
-# define HAVE_DWARF /* ongoing work, set to 1 if it works */ 0
+#if defined(HAVE_LIBDWARF) && defined(HAVE_LIBDWARF_LIBDWARF_H)
+# define HAVE_DWARF 0   /* ongoing work, set to 1 if it works */ 
 #endif
 
 #include "Backtrace.hh"
@@ -52,15 +51,20 @@
 # include <libdwarf/libdwarf.h>
 # include <libdwarf/dwarf.h>
 
+// global Dwarf_Error and Dwarf_Debug variables
 Dwarf_Error error = 0;
-Dwarf_Debug dbg;
+Dwarf_Debug dbg = 0;
 void
-init_DWARF(const char * binary_filename)
+init_DWARF(const char * bin_dir, const char * bin_file)
 {
-   get_CERR() << " Initializing DWARF for " << binary_filename << "..." << endl;
+string filename(bin_dir);
+   filename += '/';
+   filename += bin_file;
+
+   get_CERR() << " Initializing DWARF for file " << filename << "..." << endl;
 
    if (const int rc = dwarf_init_path(
-       binary_filename,
+       filename.c_str(),
        0,            // char *            true_path_out_buffer
        0,            // unsigned int      true_path_bufferlen
        0,            // Dwarf_Unsigned    access
@@ -68,8 +72,8 @@ init_DWARF(const char * binary_filename)
        0,            // Dwarf_Handler     errhand
        0,            // Dwarf_Ptr         errarg
        &dbg,         // Dwarf_Debug*      dbg
-       0, 0, 0,      // const char *       reserved1..3
-       &error))      // Dwarf_Error*       error
+       0, 0, 0,      // const char *      reserved1..3
+       &error))      // Dwarf_Error *     error
       {
          get_CERR() << "init_DWARF(): rc=" << rc << ", error-" << error << endl
               << dwarf_errmsg(error) << endl;
@@ -77,12 +81,11 @@ init_DWARF(const char * binary_filename)
    else get_CERR() << "OK." << endl;
 }
 
-
 #else   // no dwarf
 
-void init_DWARF(const char * binary_filename)
+void
+init_DWARF(const char * bin_dir, const char * bin_file)
 {
-   cerr << "init_DWARF(): NO dwarf" << endl;
 }
 
 #endif
@@ -91,12 +94,41 @@ void init_DWARF(const char * binary_filename)
 
 using namespace std;
 
-Backtrace::APL_lines_status Backtrace::lines_status = LINES_not_checked;
-
 std::vector<Backtrace::PC_src> Backtrace::pc_2_src;
 
-static int64_t main_offset = 0;
+/// the difference between function main() in the result of backtrace_symbol()
+/// and the address of main() in the loaded program. Only valid after the
+/// line <main>: was processes in read_apl_lines_file().
+//
+static int64_t main_offset_0 = 0;
 
+//----------------------------------------------------------------------------
+/** compute \b main_offset_0, which is the difference between:
+
+    a.  the 0-based address of main() in file apl.lines, and
+    b.  the address of main() in memory after loading the apl binary.
+ */
+
+/*
+    main_line comes from apl.line an looks like this:
+
+000000000014cedd <main>:
+
+ */
+static void
+set_main_offset_0(const char * main_line)
+{
+const int64_t backtrace_main = strtoll(main_line, 0, 16);
+const int64_t loaded_main = get_main();
+   main_offset_0 = loaded_main - backtrace_main;
+
+   cerr << hex << setfill(' ')
+        << "      main() in apl.lines: " << setw(16) << backtrace_main << endl
+        << "    + main_offset_0:       " << setw(16) << main_offset_0  << endl
+        << "    ───────────────────────────────────────"               << endl
+        << "    = loaded main():       " << setw(16) << loaded_main    << endl
+        << dec;
+}
 //----------------------------------------------------------------------------
 int
 Backtrace::pc_cmp(const int64_t & key, const PC_src & pc_src, const void *)
@@ -126,8 +158,17 @@ Backtrace::find_src(int64_t pc)
 }
 //----------------------------------------------------------------------------
 void
-Backtrace::open_lines_file()
+Backtrace::read_apl_lines_file()
 {
+  /// the status of file apl.lines
+static enum APL_lines_status
+      {
+        LINES_not_checked,   ///< status is unknown
+        LINES_outdated,      ///< file is present, but outdated
+        LINES_unusable,      ///< file is not usable for some reason
+        LINES_valid          ///< file is OK and up-to-date
+      } lines_status = LINES_not_checked;
+
    if (lines_status != LINES_not_checked)   return;   // already called
 
    // line numbers work only if ./configure was called with CXXFLAGS set
@@ -141,6 +182,7 @@ Backtrace::open_lines_file()
          lines_status = LINES_unusable;
          return;
       }
+
    // we are here for the first time.
    // Assume that apl.lines is outdated until proven otherwise.
    //
@@ -165,11 +207,11 @@ const time_t apl_lines_time = st.st_mtime;
    if (apl_lines_time < apl_time)
       {
         close(fd);
-        get_CERR() << endl
-                   << "Cannot show line numbers, since apl.lines is older "
-                      "than apl." << endl
-                   << "Consider running 'make apl.lines' in directory " << endl
-                   << apl_DIR__src " to fix this" << endl;
+        get_CERR() <<
+"\nNOTE: Cannot show source file line numbers, because the file 'apl.lines'\n"
+"      is older than the file 'apl' (= the GNU APL binary).\n"
+"      To fix this: run 'make apl.lines' in directory:\n"
+"      " << apl_DIR__src << endl;
         return;
       }
 
@@ -191,6 +233,10 @@ int64_t prev_pc = NO_PC;
          if (s == 0)   break;   // end of file.
          ++file_lines;
 
+         // the end of the line depends on the platform. On GNU/Linux it
+         // is '\n' but on other platforms it might be '\r' \'n'. Or missing
+         // completely if the file does not end with EOF.
+         //
          buffer[sizeof(buffer) - 1] = '\0';   // just in case
          int slen = strlen(buffer);
          if (slen && buffer[slen - 1] == '\n')   buffer[--slen] = '\0';
@@ -222,15 +268,7 @@ main():
 
          if (strstr(s, "<main>:"))   // case 1: <main line>
             {
-              const int64_t main_funct = get_main();
-              const int64_t main_loc = strtoll(s, 0, 16);
-              main_offset = main_funct - main_loc;
-
-              cerr << hex << setfill(' ')
-                   << "main() in apl.lines  " << setw(16) << main_loc    << endl
-                   << "main() offset:      +" << setw(16) << main_offset << endl
-                   << "main() start:       =" << setw(16) << main_funct  << endl
-                   << dec;
+              set_main_offset_0(s);
             }
 
          if (s[0] == '/')            // case 2: source file path
@@ -279,9 +317,11 @@ main():
 
    fclose(file);   // also closes fd
 
-   cerr << "total_lines in apl.lines:     " << file_lines      << endl
-        << "assembler lines in apl.lines: " << asm_lines       << endl
-        << "source line numbers found:    " << pc_2_src.size() << endl;
+   cerr << "\n      assembler lines in apl.lines: " << asm_lines
+        << "\n    + source line numbers found:    " << (file_lines - asm_lines)
+        << "\n    ──────────────────────────────────────"
+        << "\n    = total_lines in apl.lines:     " << file_lines
+        << endl;
    lines_status = LINES_valid;
 }
 //----------------------------------------------------------------------------
@@ -322,7 +362,7 @@ long long asm_offset = 0;
               *e = '\0';
               fun = e + 1;
               abs_addr = strtoll(a_a, nullptr, 16);
-              abs_addr -= main_offset;
+              abs_addr -= main_offset 0;
           }
       }
 
@@ -361,7 +401,7 @@ long long asm_offset = 0;
         space += 2;
         if (char * e = strchr(space, ']'))   *e = 0;
         abs_addr = strtoll(space, 0, 16);
-        abs_addr -= main_offset;
+        abs_addr -= main_offset_0;
       }
 
    // split off function from s.
@@ -445,80 +485,577 @@ char obuf[200] = "@@@@";
    cerr << endl;
 #endif   // _APPLE_
 }
+
+#if HAVE_DWARF
+//----------------------------------------------------------------------------
+/// the context of a search in a dwarf file
+struct Dwarf_context
+{
+   Dwarf_context(int64_t _PC, ostream * _out)
+   : PC(_PC),
+     address_of_main(0),
+     out(_out),
+     found_main(false),
+     name(0),
+     pc_low(0),
+     found_PC_range(false),
+     res(DW_DLV_OK)
+   {}
+
+   /// the PC to look for
+   const int64_t PC;
+
+   /// the dwarf address of main()
+   int64_t address_of_main
+;
+   /// output stream, non-zero if debug printouts are requested
+   ostream * out;
+
+   /// found the CU that contains main
+   bool found_main;
+
+   /// the value of the name attribute of a die (at various levels).
+   const char * name;
+
+   /// the low PC of a die (
+   int64_t pc_low;
+
+   /// the address of main()
+   int64_t main_low;
+
+   /// the end of main()
+   int64_t main_high;
+
+   /// found the PC looked for
+   bool found_PC_range;
+
+   /// the last dwarf_xxx() function call result
+   int res;
+};
+//===========================================================================
+class Dwarf
+{
+public:
+   /// decode tag and attributes of \b die, maybe print them to out
+   static void decode_die(Dwarf_context & ctx, const Dwarf_Die die);
+
+protected:
+   /// decode attribute and maybe print it \b to \b out
+   static void decode_attribute(Dwarf_context & ctx,
+                                const Dwarf_Attribute attribute);
+   /// print the tag of \b die to \b out
+   static void print_tag(Dwarf_context & ctx, const Dwarf_Die die);
+
+   /// process a range list (and maybe print it to \b out).
+   /// Return \b true if \b PC was found in one of the ranges
+   static void decode_ranges(Dwarf_context & ctx, const Dwarf_Attribute attr);
+};
+//-----------------------------------------------------------------------------
+void
+Dwarf::print_tag(Dwarf_context & ctx, const Dwarf_Die die)
+{
+   if (!ctx.out)   return;   // no output desired
+      
+Dwarf_Half tag = 0;
+   ctx.res = dwarf_tag(die, &tag, &error);
+   if (ctx.res)
+      {
+        cerr << __FUNCTION__ << "(): " << dwarf_errmsg(error) << endl;
+        return;
+      }
+
+const char * tagname = 0;
+   ctx.res = dwarf_get_TAG_name(tag, &tagname);
+   Assert(ctx.res == DW_DLV_OK && tagname);
+
+   *ctx.out << HEX2(tag) << " - " << tagname;
+}
+//-----------------------------------------------------------------------------
+void
+Dwarf::decode_ranges(Dwarf_context & ctx, const Dwarf_Attribute attribute)
+{
+Dwarf_Rnglists_Head rl_head = 0;
+Dwarf_Unsigned count = 0;
+Dwarf_Unsigned global_offset_of_rle_set = 0;
+
+Dwarf_Unsigned original_off = 0;
+   ctx.res = dwarf_global_formref(attribute, &original_off, &error);
+   Assert(ctx.res == DW_DLV_OK);
+
+   ctx.res = dwarf_rnglists_get_rle_head(attribute,
+                                         DW_FORM_sec_offset,
+                                         original_off,
+                                         &rl_head, &count,
+                                         &global_offset_of_rle_set,
+                                         &error);
+   if (ctx.res != DW_DLV_OK)
+      {
+        ctx.out && *ctx.out << "??? dwarf_rnglists_get_rle_head() ???" << endl;
+        return;
+      }
+
+   // figure the max length of sn index
+int idx_len = 1;
+   for (size_t cnt = count; cnt > 9; cnt /= 10)   ++idx_len;
+
+   ctx.out && *ctx.out << "ranges[" << count << "]:"<< endl;
+   for (size_t r = 0; r < count; ++r)
+       {
+         ctx.out && *ctx.out << "        [" << right << setw(idx_len) << r
+                    << left << "] ";
+         unsigned elen = 0, eout = 0;
+         Dwarf_Unsigned raw1 = 0, raw2 = 0, cooked1 = 0, cooked2 = 0;
+         Dwarf_Bool unavaliable = false;
+         ctx.res = dwarf_get_rnglists_entry_fields_a(rl_head, r,
+                                                      &elen, &eout,
+                                                      &raw1, &raw2,
+                                                      &unavaliable,
+                                                      &cooked1, &cooked2,
+                                                      &error);
+         Assert(ctx.res == DW_DLV_OK);
+         if (unavaliable)
+            {
+              ctx.out && *ctx.out << "    not available"     << endl;
+            }
+         else if (raw1 == 0 && raw2 == 0)
+            {
+              ctx.out && *ctx.out << "    end of list"       << endl;
+            }
+         else
+            {
+              const int64_t end = raw1 + raw2;     // excluding
+              if (int64_t(raw1) <= ctx.PC && ctx.PC < end)
+                 {
+                   ctx.found_PC_range = true;
+                 }
+              ctx.out && *ctx.out << "    " << HEX8(raw1)
+                                  << " - " HEX8(end) << endl;
+            }
+       }
+
+   dwarf_dealloc_rnglists_head(rl_head);
+   ctx.out && *ctx.out << endl;
+}
+//-----------------------------------------------------------------------------
+void
+Dwarf::decode_attribute(Dwarf_context & ctx, const Dwarf_Attribute attribute)
+{
+Dwarf_Half attr_num = 0;
+   ctx.res = dwarf_whatattr(attribute, &attr_num, &error);
+   Assert(ctx.res == DW_DLV_OK);
+
+   // attributes of special interest: name and PC_low
+   //
+   if (attr_num == DW_AT_name)
+      {
+        char * name;
+        ctx.res = dwarf_formstring(attribute, &name, &error);
+        Assert(ctx.res == DW_DLV_OK);
+        ctx.name = name;
+      }
+
+   if (attr_num == DW_AT_low_pc)
+      {
+        Dwarf_Addr addr = 0;
+        ctx.res = dwarf_formaddr(attribute, &addr, &error);
+        Assert(ctx.res == DW_DLV_OK);
+        ctx.pc_low = addr;
+      }
+
+   // attribute name
+   //
+const char * attr_name = 0;
+   ctx.res = dwarf_get_AT_name(attr_num, &attr_name);
+   Assert(ctx.res == DW_DLV_OK);
+   ctx.out && *ctx.out << attr_name;
+
+   // attribute form (data type)
+   //
+Dwarf_Half form = 0;
+   ctx.res = dwarf_whatform(attribute, &form, &error);
+
+Dwarf_Bool hasform = false;
+   ctx.res = dwarf_hasform(attribute, form, &hasform, &error);
+   Assert(ctx.res == DW_DLV_OK);
+
+   if (hasform)
+      {
+          ctx.out && *ctx.out << " = ";
+          switch(form)
+             {
+               case DW_FORM_addr:         // 0x01
+                    {
+                      Dwarf_Addr addr = 0;
+                      ctx.res = dwarf_formaddr(attribute, &addr, &error);
+                      Assert(ctx.res == DW_DLV_OK);
+                      ctx.out && *ctx.out << HEX(addr);
+                    }
+                    break;
+
+               case DW_FORM_data1:        // 0x0B
+               case DW_FORM_data2:        // 0x0B
+               case DW_FORM_data4:        // 0x0B
+               case DW_FORM_data8:        // 0x0B
+                    {
+                      Dwarf_Unsigned data = 0;
+                      ctx.res = dwarf_formudata(attribute, &data, &error);
+                      Assert(ctx.res == DW_DLV_OK);
+                      ctx.out && *ctx.out << data;
+                    }
+                    break;
+
+               case DW_FORM_strp:       // 0x0E
+               case DW_FORM_line_strp:  // 0x1F
+                    {
+                      char * string = 0;
+                      ctx.res = dwarf_formstring(attribute, &string, &error);
+                      Assert(ctx.res == DW_DLV_OK);
+                      ctx.out && *ctx.out << string;
+                    }
+                    break;
+
+               case DW_FORM_sec_offset:   // 0x17
+                    decode_ranges(ctx, attribute);
+                    break;
+
+               default: cerr << "\n\n════ TODO: form " << HEX2(form) << endl;
+                        Assert(0 && "TODO");
+             }
+      }
+}
+//-----------------------------------------------------------------------------
+void
+Dwarf::decode_die(Dwarf_context & ctx, const Dwarf_Die die)
+{
+Dwarf_Half tag;
+   ctx.res = dwarf_tag(die, &tag, &error);
+   Assert(ctx.res == DW_DLV_OK);
+   Assert(tag == DW_TAG_compile_unit);
+
+Dwarf_Attribute * attr_list = 0;
+Dwarf_Signed attr_count = 0;
+   ctx.res = dwarf_attrlist(die, &attr_list, &attr_count, &error);
+   Assert(ctx.res == DW_DLV_OK);
+
+const char * indent = "    ";   // one level of indentation
+   if (ctx.out)
+      {
+        *ctx.out << indent;
+        print_tag(ctx, die);
+        *ctx.out << endl;
+      }
+
+   ctx.name = 0;
+   ctx.pc_low = -1;
+   loop(a, attr_count)
+       {
+         ctx.out && *ctx.out << indent << indent;
+
+         decode_attribute(ctx, attr_list[a]);
+       }
+   if (ctx.out && ctx.name && (ctx.pc_low != -1))   // namea and pc_low
+      {
+        *ctx.out << "\n════════" << ctx.name << " = " << ctx.pc_low << endl;
+      }
+
+   // decode children
+   //
+Dwarf_Die child = 0;
+   dwarf_child(die, &child, &error);
+   Assert(ctx.res == DW_DLV_OK);
+   while (ctx.res == DW_DLV_OK)
+         {
+xxx
+         }
+
+
+   ctx.out && *ctx.out << endl;
+}
+//============================================================================
+
+#if 0
+static Dwarf_Die
+find_child_in_die(Dwarf_Die parent_die, Dwarf_Half sub_tag)
+{
+Dwarf_Die child_die = 0;
+int res = 0;
+
+   res = dwarf_child(parent_die, &child_die, &error);
+   Assert(res == DW_DLV_OK);
+
+   while (child_die)
+      {
+        Dwarf_Half child_tag = 0;
+        res = dwarf_tag(child_die, &child_tag, &error);
+        Assert(res == DW_DLV_OK);
+
+       if (child_tag == sub_tag)   return child_die;
+
+//     cerr << "  skipping tag " << HEX(child_tag) 
+//          << " when looking for " HEX(sub_tag) << endl;
+
+       Dwarf_Die next_child = 0;
+       res = dwarf_siblingof(dbg, child_die, &next_child, &error);
+       if (res == DW_DLV_NO_ENTRY)   break;   // end of children
+       if (res == DW_DLV_ERROR)
+          {
+            cerr << __FUNCTION__ << "(): " << dwarf_errmsg(error) << endl;
+            break;   // end of children
+          }
+        Assert(res == DW_DLV_OK);
+        child_die = next_child;
+      }
+
+   return 0;   // not found
+}
+#endif // 0
+//----------------------------------------------------------------------------
+const Dwarf_Attribute
+find_die_attribute(Dwarf_Die die, Dwarf_Half which)
+{
+Dwarf_Attribute * attr_list = 0;
+Dwarf_Signed attr_cnt = 0;
+int res = 0;
+
+   res = dwarf_attrlist(die, &attr_list, &attr_cnt, &error);
+   Assert(res == DW_DLV_OK);
+
+   loop(a, attr_cnt)
+      {
+        const Dwarf_Attribute & attr = attr_list[a];
+        Dwarf_Half attr_num = 0;
+        res = dwarf_whatattr(attr, &attr_num, &error);
+        Assert(res == DW_DLV_OK);
+        if (attr_num == which)   return attr;
+      }
+
+// cerr << "could not find attribute " << HEX2(which) << endl;
+   return 0;
+}
+//----------------------------------------------------------------------------
+Dwarf_Addr
+get_highpc(Dwarf_Attribute attr, Dwarf_Addr lowpc)
+{
+Dwarf_Half what = 0;
+int res = dwarf_whatattr(attr, &what, &error);
+   Assert(res == DW_DLV_OK);
+
+   if (what == DW_FORM_addr)
+      {
+        Dwarf_Addr PC_high = 0;
+        res = dwarf_formaddr(attr, &PC_high, &error);
+        Assert(res == DW_DLV_OK);
+        return PC_high;
+      }
+
+   // supposedly offset from lowpc
+   //
+   else
+      {
+        Dwarf_Unsigned offset = 0;
+        res = dwarf_formudata(attr, &offset, &error);
+        Assert(res == DW_DLV_OK);
+        return lowpc + offset;
+     }
+}
+//----------------------------------------------------------------------------
+static Dwarf_Die
+find_PC_in_subprogram(Dwarf_Die subprogram_die, int64_t PC)
+{
+int res = DW_DLV_OK;   // = 0. Otherwise DW_DLV_NO_ENTRY=-1 or DW_DLV_ERROR=1
+
+   // double-check tag
+   {
+     Dwarf_Half tag = 0;
+        res = dwarf_tag(subprogram_die, &tag, &error);
+        Assert(res == DW_DLV_OK);
+        Assert(tag == DW_TAG_subprogram);
+   }
+   
+char * function_name = 0;
+Dwarf_Addr PC_low = 0;
+Dwarf_Addr PC_high = 0;
+
+   if (Dwarf_Attribute attr = find_die_attribute(subprogram_die, DW_AT_name))
+      {
+        res = dwarf_formstring(attr, &function_name, &error);
+        Assert(res == DW_DLV_OK);
+      }
+
+   if (Dwarf_Attribute attr = find_die_attribute(subprogram_die, DW_AT_low_pc))
+      {
+        res = dwarf_formaddr(attr, &PC_low, &error);
+        Assert(res == DW_DLV_OK);
+      }
+   if (Dwarf_Attribute attr = find_die_attribute(subprogram_die, DW_AT_high_pc))
+      {
+(void)attr;
+//      PC_high = get_highpc(attr, PC_low);
+      }
+   if (PC_high && PC_low && function_name)
+      {
+        strncmp(function_name, "_GLOBAL__sub_I_", 15) || (function_name += 15);
+        char obuf[200] = "@@@@";
+        size_t obuflen = sizeof(obuf) - 1;
+        int status = 0;
+        __cxxabiv1::__cxa_demangle(function_name, obuf, &obuflen, &status);
+        if (status)   // __cxa_demangle failed
+           {
+             cerr << "    See " << function_name;
+           }
+         else         // __cxa_demangle was OK
+           {
+             if (char * cp = strchr(obuf, '('))
+                {
+                  cp[1] = ')';
+                  cp[2] = 0;
+                }
+            cerr << "    See " << obuf;
+           }
+         cerr << " is " << HEX(PC_low) << " ["
+              << HEX(PC_high - PC_low) << "]" << endl;
+      }
+   return 0;
+}
+//----------------------------------------------------------------------------
+static void
+find_PC_in_CU(Dwarf_Die CU_die, int64_t PC)
+{
+int res = DW_DLV_OK;   // = 0. Otherwise DW_DLV_NO_ENTRY=-1 or DW_DLV_ERROR=1
+
+Dwarf_Half tag = 0;
+   res = dwarf_tag(CU_die, &tag, &error);
+   Assert(res == DW_DLV_OK);
+
+const char * tagname = 0;
+   res = dwarf_get_TAG_name(tag, &tagname);
+   Assert(res == DW_DLV_OK);
+
+#if 0
+   if (tag != DW_TAG_compile_unit)
+      {
+cerr << "    └── Ignore " << tagname << "..." << endl;
+        return;
+      }
+cerr << "    └── See " << tagname << "..." << endl;
+#endif // 0
+
+   // loop over children. process all DW_TAG_subprogram
+   //
+Dwarf_Die child_die = 0;
+
+   res = dwarf_child(CU_die, &child_die, &error);
+   Assert(res == DW_DLV_OK);
+
+   while (child_die)
+      {
+        Dwarf_Half child_tag = 0;
+        res = dwarf_tag(child_die, &child_tag, &error);
+        Assert(res == DW_DLV_OK);
+
+        if (child_tag == DW_TAG_subprogram)
+           {
+   //        cerr << "    found DW_TAG_subprogram in CU_die)" << endl;
+             find_PC_in_subprogram(child_die, PC);
+           }
+
+        Dwarf_Die next_child = 0;
+        res = dwarf_siblingof(dbg, child_die, &next_child, &error);
+        if (res == DW_DLV_NO_ENTRY)   break;   // end of children
+        Assert(res == DW_DLV_OK);
+        child_die = next_child;
+      }
+
+
+   // cleanup
+   //
+// dealloc_local_atlist(dbg, atlist, atcnt);
+}
+//----------------------------------------------------------------------------
+/// find the PC in the entire binary file
+static int
+find_PC_in_file(Dwarf_context ctx, int64_t PC)
+{
+Dwarf_Unsigned abbrev_offset  = 0;
+Dwarf_Half     address_size   = 0;
+Dwarf_Half     version_stamp  = 0;
+Dwarf_Half     offset_size    = 0;
+Dwarf_Half     extension_size = 0;
+Dwarf_Sig8     signature;
+Dwarf_Unsigned typeoffset     = 0;
+Dwarf_Unsigned next_cu_header = 0;
+Dwarf_Half     header_cu_type = 0;
+Dwarf_Bool     is_info        = true;
+int            res            = DW_DLV_OK;
+ 
+   for (size_t CU_count = 0; CU_count < 3; ++CU_count)
+       {
+           Dwarf_Die no_die = 0;
+           Dwarf_Die CU_die = 0;
+           Dwarf_Unsigned cu_header_length = 0;
+       
+           memset(&signature,0, sizeof(signature));
+           res = dwarf_next_cu_header_d(dbg,is_info,&cu_header_length,
+               &version_stamp, &abbrev_offset,
+               &address_size, &offset_size,
+               &extension_size,&signature,
+               &typeoffset, &next_cu_header,
+               &header_cu_type, &error);
+           if (res == DW_DLV_ERROR)
+              {
+                cerr << "dwarf_next_cu_header_d(): res=" << res << ", error-"
+                     << error << endl << dwarf_errmsg(error) << endl;
+                return res;
+              }
+
+           if (res == DW_DLV_NO_ENTRY)
+              {
+                if (is_info == true)   // first DW_DLV_NO_ENTRY
+                   {
+                     //  Done with .debug_info, now check for .debug_types.
+                    is_info = false;
+                     continue;
+                   }
+
+                return res;  // all CUs processed, but PC not found
+              }
+
+           /*  The CU will have a single sibling, a CU_die. 
+               It is essential to call this right after
+               a call to dwarf_next_cu_header_d() because
+               there is no explicit connection provided to
+               dwarf_siblingof_b(), which returns a DIE
+               from whatever CU was last accessed by
+               dwarf_next_cu_header_d()! 
+               The lack of explicit connection was a
+               design mistake in the API (made in 1992).
+            */
+
+           res = dwarf_siblingof_b(dbg, no_die, is_info, &CU_die, &error);
+           if (res == DW_DLV_ERROR)
+              {
+                return res;
+              }
+
+           Assert(res != DW_DLV_NO_ENTRY);   // supposedly impossible
+
+           Dwarf::decode_die(ctx, CU_die);
+           find_PC_in_CU(CU_die, PC);
+       
+           dwarf_dealloc_die(CU_die);
+       }
+
+   cerr << endl << "found range for PC=" << HEX((PC - main_offset_0))
+        << ": " << ctx.found_PC_range << endl;
+
+   /*  Found what we looked for */
+   return DW_DLV_OK;
+}
 //----------------------------------------------------------------------------
 void
 Backtrace::show_dwarf(int idx, const char * s)
 {
-#if HAVE_DWARF
 
-   // loop over CUs
-   //
-   {
-    Dwarf_Unsigned abbrev_offset  = 0;
-    Dwarf_Half     address_size   = 0;
-    Dwarf_Half     version_stamp  = 0;
-    Dwarf_Half     offset_size    = 0;
-    Dwarf_Half     extension_size = 0;
-    Dwarf_Sig8     signature;
-    Dwarf_Unsigned typeoffset     = 0;
-    Dwarf_Unsigned next_cu_header = 0;
-    Dwarf_Half     header_cu_type = 0;
-    Dwarf_Bool     is_info        = true;   // inside .debug_info section
-                                            // otherwise: in .debug_types
-    int            res            = 0;
-
-   for (;;)
-       {
-         Dwarf_Die no_die = 0;
-         Dwarf_Die cu_die = 0;
-         Dwarf_Unsigned cu_header_length = 0;
-         memset(&signature, 0, sizeof(signature));
-         Dwarf_Die in_die;
-         int res = dwarf_next_cu_header_d(dbg, is_info, &cu_header_length,
-                                          &version_stamp, &abbrev_offset,
-                                          &address_size, &offset_size,
-                                          &extension_size, &signature,
-                                          &typeoffset, &next_cu_header,
-                                          &header_cu_type, &error);
-         if (res == DW_DLV_ERROR)   break; // needed ???
-         if (res == DW_DLV_NO_ENTRY)
-            {
-              if (is_info)   // end of .debug_info reached
-                 {
-                   // Done with .debug_info, now in section .debug_types
-                   is_info = false;
-                   continue;
-                 }
-            }
-         res = dwarf_siblingof_b(dbg, no_die, is_info, &cu_die, &error);
-         if (res == DW_DLV_ERROR) {
-            break;
-        }
-
-         if (res == DW_DLV_ERROR)   break;
-
-         /*
-            0x03 = DW_AT_name     = source file name
-            0x1B = DW_AT_comp_dir = source file directory
-            0x25 = DW_AT_producer = compiler and its command line flags
-          */
-
-         char * src_file = 0;
-         char * src_dir  = 0;
-         Dwarf_Attribute att_PC_low = 0;
-         dwarf_die_text(cu_die, DW_AT_name, &src_file, &error);
-         dwarf_die_text(cu_die, DW_AT_comp_dir, &src_dir,  &error);
-         dwarf_attr(cu_die, DW_AT_low_pc, &att_PC_low,  &error);
-         if (src_file && src_dir && att_PC_low)   // got them
-            {
-              Dwarf_Addr low = 0;
-              dwarf_formaddr(att_PC_low, &low, &error);
-              cerr << "See CU " << src_dir
-                   << "/" << src_file
-                   << " PC " << HEX(low) << endl;
-            }
-       }
-   }
 
 int64_t PC = 0;
 #ifdef __APPLE__
@@ -548,12 +1085,29 @@ int64_t PC = 0;
 
 #endif
 
+static int64_t offset = 0;
+   if (offset == 0)
+      {
+         Dwarf_context ctx0(0, &cerr);
+         find_PC_in_file(ctx0, 0);   // once to find main()
+         offset = ctx0.address_of_main;
+      }
+
+Dwarf_context ctx(PC, &cerr);
+   find_PC_in_file(ctx, PC - offset);   //
+
    cerr << "0x" << lhex << PC << dec << "    ";
    for (int ind = 0; ind < idx; ++ind)   cerr << "  ";   // print indentation
    cerr << "xxx" << endl;
 
-#endif   // HAVE_LIBELFIN_ELF_ELF___HH
 }
+//----------------------------------------------------------------------------
+#else   // not HAVE_DWARF
+void
+Backtrace::show_dwarf(int idx, const char * s)
+{
+}
+#endif   // HAVE_DWARF
 //----------------------------------------------------------------------------
 void
 Backtrace::show(const char * file, int line)
@@ -567,7 +1121,8 @@ Backtrace::show(const char * file, int line)
 
 #else
 
-   open_lines_file();
+   main_offset_0 = 0;
+   read_apl_lines_file();   // also calls set_main_offset_0()
 
 void * buffer[200];
 const int size = backtrace(buffer, sizeof(buffer)/sizeof(*buffer));
@@ -595,7 +1150,10 @@ char ** strings = backtrace_symbols(buffer, size);
 
    for (int i = 1; i < size - 1; ++i)   // loop over stacktrace lines
        {
-         // make a copy si of strings[i] that show_item() can mess up
+         // make a copy si of strings[i] that show_item() can mess up.
+         // variable i is the number passed to show_item() and counts
+         // from oldest to latest, while 'strings' runs from latest to
+         // oldest. We want the lines to be displayed from oldest to latest.
          //
          const char * const_si = strings[size - i - 1];
          char si[strlen(const_si) + 1];
@@ -606,6 +1164,8 @@ char ** strings = backtrace_symbols(buffer, size);
 
    cerr << "========================================" << endl;
 
+   // then repeat with dwarf (experimental)
+   //
    for (int i = 1; i < size - 1; ++i)   // loop over stacktrace lines
        {
          // make a copy si of strings[i] that show_item() can mess up

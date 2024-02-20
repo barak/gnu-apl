@@ -18725,7 +18725,7 @@ fi
 # keep headers in roughy alphabetical order as to find them more easily
 #
 apl_missing_headers=0
-       for ac_header in dirent.h execinfo.h ext/atomicity.h fcntl.h fenv.h fftw3.h inttypes.h libdwarf/libdwarf.h libelf.h libpng16/png.h limits.h locale.h malloc.h netdb.h netinet/in.h stdint.h stdlib.h string.h strings.h sys/un.h termios.h unistd.h utmpx.h vector zlib.h
+       for ac_header in dirent.h execinfo.h ext/atomicity.h fcntl.h fenv.h fftw3.h inttypes.h libdwarf/libdwarf.h libpng16/png.h limits.h locale.h malloc.h netdb.h netinet/in.h stdint.h stdlib.h string.h strings.h sys/un.h termios.h unistd.h utmpx.h vector zlib.h
 do :
   as_ac_Header=`printf "%s\n" "ac_cv_header_$ac_header" | $as_tr_sh`
 ac_fn_cxx_check_header_compile "$LINENO" "$ac_header" "$as_ac_Header" "$ac_includes_default"
@@ -22061,48 +22061,6 @@ test "x$apl_X11" = "xyes"  && apl_GUI=yes
 #
 # AC_CHECK_LIB([execinfo], [backtrace])
 
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for elf_version in -lelf" >&5
-printf %s "checking for elf_version in -lelf... " >&6; }
-if test ${ac_cv_lib_elf_elf_version+y}
-then :
-  printf %s "(cached) " >&6
-else $as_nop
-  ac_check_lib_save_LIBS=$LIBS
-LIBS="-lelf  $LIBS"
-cat confdefs.h - <<_ACEOF >conftest.$ac_ext
-/* end confdefs.h.  */
-
-namespace conftest {
-  extern "C" int elf_version ();
-}
-int
-main (void)
-{
-return conftest::elf_version ();
-  ;
-  return 0;
-}
-_ACEOF
-if ac_fn_cxx_try_link "$LINENO"
-then :
-  ac_cv_lib_elf_elf_version=yes
-else $as_nop
-  ac_cv_lib_elf_elf_version=no
-fi
-rm -f core conftest.err conftest.$ac_objext conftest.beam \
-    conftest$ac_exeext conftest.$ac_ext
-LIBS=$ac_check_lib_save_LIBS
-fi
-{ printf "%s\n" "$as_me:${as_lineno-$LINENO}: result: $ac_cv_lib_elf_elf_version" >&5
-printf "%s\n" "$ac_cv_lib_elf_elf_version" >&6; }
-if test "x$ac_cv_lib_elf_elf_version" = xyes
-then :
-  printf "%s\n" "#define HAVE_LIBELF 1" >>confdefs.h
-
-  LIBS="-lelf $LIBS"
-
-fi
-
 { printf "%s\n" "$as_me:${as_lineno-$LINENO}: checking for dwarf_package_version in -ldwarf" >&5
 printf %s "checking for dwarf_package_version in -ldwarf... " >&6; }
 if test ${ac_cv_lib_dwarf_dwarf_package_version+y}
@@ -23088,7 +23046,7 @@ printf "%s\n" "#define apl_DIR__src \"src\"" >>confdefs.h
 
 else   # normal build
 
-printf "%s\n" "#define apl_DIR__src \"$abs_apl_top\"" >>confdefs.h
+printf "%s\n" "#define apl_DIR__src \"$abs_apl_top/src\"" >>confdefs.h
 
 fi
 

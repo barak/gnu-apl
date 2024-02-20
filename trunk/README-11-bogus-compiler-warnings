@@ -1,28 +1,28 @@
 
-C++ Compilers are becoming more and more intelligent (or at least believe so).
-In the last years, GNU APL has been plagued with a growing number of bogus
-C++ compiler warnings that break the build process of GNU APL.
+C++ Compilers are becoming more and more intelligent (or at least apparently
+so). In the last few years, GNU APL has been plagued with a growing number of
+bogus C++ compiler warnings that break the build process of GNU APL.
 
-Some years ago, GNU APL decided to build with -Wall which causes all warnings
-to be treated as errors. It was a lot of effort to get to the point where
-GNU APL would compile on practically all platforms with -Wall, but this was,
-at that time, done as a means to improve GNU APL's code quality.
+Some years ago, it was decided to build GNU APL with -Wall which causes all
+warnings to be treated as errors. It was a lot of effort to get to the point
+where GNU APL would compile on practically all platforms with -Wall and this
+was, at that time, a means to improve GNU APL's code quality.
 
 In general GNU APL tries to deal with newly invented compiler warnings and
 also with bogus ones as long there is a reasonably simple way to fix them
 and the perfomance of GNU APL is not negatively affected.
 
 Sometimes, however, that is not possible. There exist warnings that would
-either require obscuring the code (by #ifdefs all over the place) or by
-unavoidibly impacting the performance of GNU APL. In these cases, instead
-of changing the GNU APL source code, examples of where these warnings have
-occured (and how they can be suppressed) are listed below.
+either require obscuring the code (by #ifdefs all over the place) or by having
+an unavoidable impact on the performance of GNU APL. In these cases, instead
+of changing the GNU APL source code, it is better to suppress the warnings.
+Examples of where these warnings have occured (and how they can be suppressed)
+are listed below.
 
-Note however, that the majority of warnings might make sense in other
-circumstances, therefore suppressing them always has the risk of real
-problems noty being reported. The cases listed below are those where we
-had closely looked at the code and came to the conclusion that the
-warning was bogus.
+Note, however, that the majority of warnings might make sense in other
+circumstances so always suppressing them has the risk of real problems not
+being reported. The cases listed below are those where the code has been
+closely examined and the conclusion was that the warnings were bogus.
 
 In general a bogus compiler warning (we assume the compiler is GNU g++) is
 disabled with a specific compile flag, for example -Werror=maybe-uninitialized.
@@ -34,9 +34,9 @@ the CXXFLAGS. For example:
 
 CXXFLAGS=-Werror=maybe-uninitialized ./configure
 
-Note that the CXXFLAGS= above is not .configure arguments (which appear on
-the right of ./configure) but sets a shell variable inamed CXXFLAGS which
-is considered by .configure (see INSTALL).
+Note that the CXXFLAGS= above is not a .configure argument (those appear on
+the right of ./configure) but sets a shell variable named CXXFLAGS which is
+considered by .configure (see INSTALL).
 
 The bogus warnings reported so far follow...
 

@@ -176,7 +176,6 @@ AC_CHECK_HEADERS([      \
    fftw3.h              \
    inttypes.h           \
    libdwarf/libdwarf.h  \
-   libelf.h             \
    libpng16/png.h       \
    limits.h             \
    locale.h             \
@@ -308,7 +307,6 @@ apl_YES($apl_X11)  && apl_GUI=yes
 #
 # AC_CHECK_LIB([execinfo], [backtrace])
 
-AC_CHECK_LIB([elf],   [elf_version])
 AC_CHECK_LIB([dwarf], [dwarf_package_version])
 
 apl_TOPIC([checks for functions that are missing on some platforms])
@@ -912,7 +910,7 @@ then   # reproducible build
    AC_DEFINE_UNQUOTED(apl_DIR__src, "src",
                       [top-level GNU APL source directory])
 else   # normal build
-   AC_DEFINE_UNQUOTED(apl_DIR__src, "$abs_apl_top",
+   AC_DEFINE_UNQUOTED(apl_DIR__src, "$abs_apl_top/src",
                       [top-level GNU APL source directory])
 fi
 

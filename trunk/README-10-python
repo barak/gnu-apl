@@ -39,12 +39,11 @@ provided by gnu_apl:
 >>> gnu_apl.command(")WSID")
 'IS CLEAR WS\n'
 
-
 The output above is a mix of APL output and Python output, which is more often
-than not a bad idea. A better approach is to generate no APL output (i,e, the
-results of APL computations should be assigned to variables and variables ⎕
+than not a bad idea. A better approach is to generate no APL output (i.e. the
+results of APL expressions should be assigned to variables and the variables ⎕
 and ⍞ should not be used). Alternatively, you can change the default print
-behaviour in Python with gnu_apl.set_display(mode). See, for example,
+behavior in Python with gnu_apl.set_display(mode). See, for example,
 gnu_apl.help('set_display').
 
 After a sucessful installation you can display the documentation of all Python

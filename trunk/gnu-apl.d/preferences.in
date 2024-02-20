@@ -384,7 +384,7 @@ CONTROL-Ds-TO-EXIT 0
 #
 # Old=Multi-Line-Strings are only allowed inside ∇-defined functions; in
 # immediate execution the effect of multi-line functions can be achieved
-#with ⎕INP.
+# with ⎕INP.
 #
 # New-Multi-Line-Strings can be used inside ∇-defined functions and also in
 # immediate execution mode.

@@ -193,7 +193,7 @@ SYNTAX ERROR+
 The possibly missing (or disabled) library needed by ⎕FFT was: libfftw3.so
 ...
 If the problem was caused by a missing library or header file, then (on a
- standard GNU/Linux/Debian system) it can usually be installed with the
+standard GNU/Linux/Debian system) it can usually be installed with the
 following command (as root and in a shell):
 
       apt install libfftw3-dev
@@ -210,4 +210,16 @@ in APL:
      ⎕FFT 1 2 3 4   ⍝ now succeeds
 5 ¯1J1 ¯1 ¯1J¯1
 
+Additionally, neither ./configure nor make will complain if the 'graphviz'
+package providing the 'dot' utility used by the ]DOXY APL debug command is
+missing during the build of GNU APL. This will therefore remain unnoticed
+until ]DOXY is used. The user may easily determine if it is missing with
+the invocation:
 
+  apt list graphviz
+
+on debian based systems and likewise it can be easily installed by invoking:
+
+  sudo apt-get install graphviz
+
+or by using the preferred system package manager.
