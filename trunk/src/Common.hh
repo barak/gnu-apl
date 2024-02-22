@@ -486,6 +486,7 @@ charP(const void * vp)
 //----------------------------------------------------------------------------
 
 #define uhex  std::hex << uppercase << setfill('0')
+#define uhexs  std::hex << uppercase
 #define lhex  std::hex << nouppercase << setfill('0')
 #define nohex std::dec << nouppercase << setfill(' ')
 
@@ -498,6 +499,8 @@ charP(const void * vp)
 #define HEX8(x)    "0x" << uhex << std::right << \
                            setw(8) << int32_t(x) << std::left << nohex
 #define HEX16(x)   "0x" << uhex << std::right << \
+                           setw(16) << int64_t(x) << std::left << nohex
+#define HEX16s(x)          uhexs << std::right << \
                            setw(16) << int64_t(x) << std::left << nohex
 #define UNI(x)     "U+" << uhex <<      setw(4) << int(x) << nohex
 

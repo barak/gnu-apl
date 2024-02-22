@@ -303,7 +303,7 @@ Plot_window_properties::set_attribute(const char * att_and_val)
    // remember if certain properties were set by the users
    //
    if      (!strncmp(att_and_val, "pw_pos_", 7))   user_pw_pos  = true;
-   else if (!strncmp(att_and_val, "pw_pos_", 7))   user_caption = true;
+   else if (!strncmp(att_and_val, "caption", 7))   user_caption = true;
 
    // find ':' which separates the attribute name and the attribute value.
    //

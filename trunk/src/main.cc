@@ -137,7 +137,6 @@ struct winsize wsize;
 
    Workspace::set_PW(wsize.ws_col, LOC);
 }
-
 //----------------------------------------------------------------------------
 /// old sigaction argument for SIGUSR1
 static struct sigaction old_USR1_action;
@@ -667,6 +666,5 @@ const int libapl_version = 0;
 int64_t get_main()
 {
    return reinterpret_cast<int64_t>(&main);
-
 }
 //----------------------------------------------------------------------------

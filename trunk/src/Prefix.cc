@@ -526,21 +526,43 @@ Prefix::push_END_error()
    Log(LOG_prefix_parser)   print_stack(CERR, LOC);
 
 UCS_string & more = MORE_ERROR();
-   more << "Invalid phrase (at left end of statement):";
-   loop(j, 4)
-       {
-         if (j >= size())   break;
+   more << "At the left end of statement: invalid phrase remaining:";
 
+   // print token, but no more than 4
+   //
+   enum { MAX_j = 4 };   // limit for the number of tokens displayed
+   loop(j, MAX_j)
+       {
+         const bool rightmost = (j == size() - 1);   // end of phrase
          const Token & tok = at(j).get_token();
          more << " ";
-         if (tok.is_function())
+         if (tok.is_function())   // token is a function
             {
               const Function * fun = tok.get_function();
               more << fun->get_name();
+              if (rightmost)   // rightmost token is a function
+                 {
+                   if (MAX_j < size())   more << "...";
+
+                   // frequent error: missing right argument of a non-niladic
+                   // function.
+                   more << "\nMissing mandatory right argument of function "
+                        << fun->get_name() << "?";
+                 }
             }
          else
-            more << at(j).get_token().tag_name();
+            {
+              const UCS_string name = at(j).get_token().tag_name();
+              if (name.starts_with("TOK_"))
+                 more << UCS_string(name, 4, name.size() - 4);
+              else
+                 more << name;
+              if (rightmost && MAX_j < size())   more << "...";
+            }
+
+         if (rightmost)   break;
        }
+
    syntax_error(LOC);   // no more token
 }
 //----------------------------------------------------------------------------
