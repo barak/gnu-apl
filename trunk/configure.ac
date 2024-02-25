@@ -175,7 +175,6 @@ AC_CHECK_HEADERS([      \
    fcntl.h fenv.h       \
    fftw3.h              \
    inttypes.h           \
-   libdwarf/libdwarf.h  \
    libpng16/png.h       \
    limits.h             \
    locale.h             \
@@ -306,8 +305,6 @@ apl_YES($apl_X11)  && apl_GUI=yes
 # so we do not test fore it anymore.
 #
 # AC_CHECK_LIB([execinfo], [backtrace])
-
-AC_CHECK_LIB([dwarf], [dwarf_package_version])
 
 apl_TOPIC([checks for functions that are missing on some platforms])
 

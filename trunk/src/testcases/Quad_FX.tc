@@ -93,7 +93,7 @@ bar
 
       foo
 1
-SYNTAX ERROR
+SYNTAX ERROR+
       bar
       ^ ^
 

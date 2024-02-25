@@ -41,7 +41,7 @@
 #endif
 
 #if defined(HAVE_LIBDWARF) && defined(HAVE_LIBDWARF_LIBDWARF_H)
-# define HAVE_DWARF 0   /* ongoing work, set to 1 if it works */ 
+# define HAVE_DWARF 1   /* ongoing work, set to 1 if it works */ 
 #endif
 
 #include "Backtrace.hh"

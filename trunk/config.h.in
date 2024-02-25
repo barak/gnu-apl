@@ -75,12 +75,6 @@
 /* Define to 1 if you have the `dl' library (-ldl). */
 #undef HAVE_LIBDL
 
-/* Define to 1 if you have the `dwarf' library (-ldwarf). */
-#undef HAVE_LIBDWARF
-
-/* Define to 1 if you have the <libdwarf/libdwarf.h> header file. */
-#undef HAVE_LIBDWARF_LIBDWARF_H
-
 /* Define to 1 if you have the `fftw3' library (-lfftw3). */
 #undef HAVE_LIBFFTW3
 
