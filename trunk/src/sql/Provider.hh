@@ -27,11 +27,27 @@
 #include "apl-sqlite.hh"
 #include "Connection.hh"
 
-class Provider {
+/// An abstract provider for a database service
+class Provider
+{
 public:
-    virtual ~Provider() {}
-    virtual const char * get_provider_name()      = 0;
-    virtual Connection * open_database(Value_P B) = 0;
+   /// destructor
+   virtual  ~Provider() {}
+
+   /// return the name of \b this provider (SQLite, postgreSQL, etc.)
+   virtual const char * get_provider_name() const = 0;
+
+   /// return the type of \b this provider (sqlite, postgresql, etc.)
+   virtual const char * get_provider_type() const = 0;
+
+   /// connect to the database
+   virtual Connection * open_database(Value_P B) = 0;
+
+   /// library version_string
+   virtual const char * version_string() const = 0;
+
+   /// library version_number
+   virtual int version_number() const   = 0;
 };
 
 #endif

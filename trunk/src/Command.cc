@@ -612,21 +612,7 @@ check_EOC:
               return;
             }
 
-         if (token.get_tag() == TOK_RETURN_EXEC)
-            {
-              /* this happens (hopefully) only with something like:
- 
-                 ⍎'→⍬'
-                
-                 I.e. ⍎ returns with a branch that was not taken.
-
-                 It might be better to fix this case in Prefix.cc,
-                 but we don't know how.
-               */
-              return;
-            }
-
-         // we should not come here.
+         // supposedly not reached. Display some context
          //
          Q1(token)  Q1(token.get_Class())  Q1(token.get_tag())  FIXME;
        }

@@ -1748,7 +1748,7 @@ name for an axis argument.
 
 The way a named lambda is implemented in GNU APL is that the expression
 
-both @verbatim
+@verbatim
       FUN ← { body_expression }
 @end verbatim
 
@@ -4961,15 +4961,17 @@ selects a sub-function of ⎕SQL.
 @verbatim
       ⎕SQL[0]''
 Available function numbers:
-type  ⎕SQL[1] file      - open a database file, return reference ID for it
-      ⎕SQL[2] ref       - close database
-query ⎕SQL[3,db] params - send SQL query
-query ⎕SQL[4,db] params - send SQL update
-      ⎕SQL[5] ref       - begin a transaction
-      ⎕SQL[6] ref       - commit current transaction
-      ⎕SQL[7] ref       - rollback current transaction
-      ⎕SQL[8] ref       - list tables
-ref   ⎕SQL[9] table     - list columns for table
+type  ⎕SQL[ 1] file      - open a database file, return reference ID for it
+      ⎕SQL[ 2] ref       - close database
+query ⎕SQL[ 3,db] params - send SQL query
+query ⎕SQL[ 4,db] params - send SQL update
+      ⎕SQL[ 5] ref       - begin a transaction
+      ⎕SQL[ 6] ref       - commit current transaction
+      ⎕SQL[ 7] ref       - rollback current transaction
+      ⎕SQL[ 8] ref       - list tables
+ref   ⎕SQL[ 9] table     - list columns for table
+      ⎕SQL[10] type      - return the library version number
+      ⎕SQL[11] type      - return the library version string
 @end verbatim
 
 @subsection ref ← A ⎕SQL[1] B : open database
@@ -5089,6 +5091,17 @@ given table. Currently, the column layout is as follows:
 
 More columns containing extra information may be added in a future
 release.
+
+
+@subsection Z ← ⎕SQL[10] B : library version number
+
+Return the version number (integer scalar) of the library that was used
+to implement the database type @b{B}.
+
+@subsection Z ← ⎕SQL[11] B : library version string
+
+Return the version string of the library that was used to implement the
+database type @b{B}.
 
 
 @node    Section 2.37

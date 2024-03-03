@@ -44,3 +44,20 @@ DONE
       )ERASE N
       )CHECK BRIEF
 
+      ⍝ regression
+      ⍝
+
+      ⍝ exectute (⍎) branch with branch not taken
+      ⍝
+      )ERASE FOO
+∇FOO
+1
+2 ◊ ⍎"→⍬"
+3
+∇
+
+FOO
+1
+2
+3
+

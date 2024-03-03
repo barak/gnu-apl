@@ -24,7 +24,9 @@
 #include "PostgresProvider.hh"
 #include "PostgresConnection.hh"
 
-static PostgresConnection *create_postgres_connection( Value_P B )
+//-----------------------------------------------------------------------------
+static PostgresConnection *
+create_postgres_connection(Value_P B)
 {
     if( !B->is_char_string() ) {
         MORE_ERROR() << "Argument must be a single string";
@@ -56,11 +58,32 @@ static PostgresConnection *create_postgres_connection( Value_P B )
         DOMAIN_ERROR;
     }
 
-    return new PostgresConnection( db );
+   return new PostgresConnection(db);
 }
-
-Connection *PostgresProvider::open_database( Value_P B )
+//-----------------------------------------------------------------------------
+Connection *
+PostgresProvider::open_database( Value_P B )
 {
     Connection *connection = create_postgres_connection( B );
     return connection;
 }
+//-----------------------------------------------------------------------------
+const char *
+PostgresProvider::version_string() const
+{
+const int version_number = PQlibVersion();
+static char version[100];
+   snprintf(version, sizeof(version), "PostgreSQL-%u.%u.%u",
+            version_number/10000,
+            version_number/100 %100,
+            version_number%100);
+   return version;
+}
+//-----------------------------------------------------------------------------
+int
+PostgresProvider::version_number() const
+{
+   return PQlibVersion();
+}
+//-----------------------------------------------------------------------------
+

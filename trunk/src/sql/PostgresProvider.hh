@@ -25,8 +25,23 @@
 
 class PostgresProvider : public Provider {
 public:
-    virtual ~PostgresProvider() {}
-    virtual const char * get_provider_name() { return "postgreSQL"; }
+
+   /// destructor
+   ~PostgresProvider() {}
+
+   /// overloaded Provider::get_provider_name()
+    virtual const char * get_provider_name()  const   { return "postgreSQL"; }
+
+   /// overloaded Provider::get_provider_type()
+    virtual const char * get_provider_type()  const   { return "postgresql"; }
+
+   /// overloaded Provider::open_database()
     virtual Connection * open_database(Value_P B);
+
+   /// overloaded Provider::version_string()
+    virtual const char * version_string() const;
+
+   /// overloaded Provider::version_number()
+    virtual int version_number() const;
 };
 

@@ -64,3 +64,15 @@ Connection * conn = create_sqlite_connection(B);
     return conn;
 }
 //-----------------------------------------------------------------------------
+const char *
+SqliteProvider::version_string() const
+{
+   return "SQLite-" SQLITE_VERSION;
+}
+//-----------------------------------------------------------------------------
+int
+SqliteProvider::version_number() const
+{
+   return SQLITE_VERSION_NUMBER;
+}
+//-----------------------------------------------------------------------------

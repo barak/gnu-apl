@@ -2583,10 +2583,9 @@ const Token result = si.jump(line);   // may change the PC
         return;
       }
 
-
    if (result.get_tag() == TOK_NOBRANCH)   // branch not taken, e.g. →⍬
       {
-        const Token_loc tl_END = pop();   // END
+        const Token_loc tl_END = pop();   // END (or RETURN_EXEC for ⍎)
         pop_and_discard();                // →
         pop_and_discard();                // B
         const Token result(TOK_APL_VALUE2, Idx0(LOC));
@@ -2597,7 +2596,7 @@ const Token result = si.jump(line);   // may change the PC
         // not a backward branch, therefore no need to check INT or ATT,
         // or to ⎕STOP or ⎕TRACE.
         //
-        set_action(RA_CONTINUE);   // aka. SHIFT
+        set_action(RA_CONTINUE);   // again with modified stack
         return;
       }
 
@@ -2824,7 +2823,7 @@ Token B = at1();
    set_action(RA_RETURN);            // return from context;
 }
 //----------------------------------------------------------------------------
-// Note: reduce_RETC_GOTO_B__ happens only for context ⍎, since
+// Note: reduce_RETC_A_GOTO_B happens only for context ⍎, since
 //       the contexts ◊ and ∇ use reduce_END_GOTO_B__ instead.
 //
 void
@@ -2844,17 +2843,7 @@ Prefix::reduce_RETC_GOTO_B_()
 
    reduce_END_GOTO_B_();
 
-   if (action == RA_PUSH_NEXT)
-      {
-        // reduce_END_GOTO_B_() has detected a non-taken branch (e.g. →'')
-        // and wants to continue with the next statement.
-        // We are in ⍎ mode, so there is no next statement and we
-        // RA_RETURN a TOK_VOID instead of RA_PUSH_NEXT.
-        //
-        Token tok(TOK_VOID);
-        Token_loc tl(tok, Function_PC_0);
-        push(tl);
-      }
+   if (action == RA_CONTINUE)   return;   // →''
 
    set_action(RA_RETURN);            // return from context;
 }

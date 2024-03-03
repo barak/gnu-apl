@@ -31,7 +31,9 @@
 
 #include <vector>
 
-class ColumnDescriptor {
+//----------------------------------------------------------------------------
+class ColumnDescriptor
+{
 public:
     ColumnDescriptor( const string &name_in, const string &type_in ) : name( name_in ), type( type_in ) {}
     ColumnDescriptor operator=( ColumnDescriptor &orig ) { return ColumnDescriptor( orig.name, orig.type ); }
@@ -42,7 +44,7 @@ private:
     const string name;
     const string type;
 };
-
+//----------------------------------------------------------------------------
 class Connection
 {
 public:
@@ -58,5 +60,6 @@ public:
 
     virtual const string replace_bind_args( const string &sql );
 };
+//----------------------------------------------------------------------------
 
 #endif

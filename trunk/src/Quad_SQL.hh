@@ -79,6 +79,12 @@ protected:
    /// perform a generic query
    static Value_P run_generic(Connection * conn, Value_P A, Value_P B,
                               bool query);
+
+   /// return the version number of the SQL provider named B
+   static Value_P get_version_number(const UCS_string & ucs_B);
+
+   /// return the version string of the SQL provider (synthesized as needed).
+   static Value_P get_version_string(const UCS_string & ucs_B);
 };
 //----------------------------------------------------------------------------
 

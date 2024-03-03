@@ -60,7 +60,7 @@ Next: <a href="#Chapter-1" accesskey="n" rel="next">Installing and Starting GNU 
 </div>
 <span id="GNU-APL"></span><h1 class="top">GNU APL</h1>
 
-<p>February 5, 2024
+<p>March 3, 2024
 </p>
 <p>This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. &quot;Programming Language APL, Extended&quot;.
@@ -254,6 +254,8 @@ therefore it must be expanded with e.g.  <b>gunzip</b> before it can be read.
       <li><a id="toc-_005b_003f_005dSQL_005b7_005d-B-_003a-rollback-transaction" href="#g_t_005b_003f_005dSQL_005b7_005d-B-_003a-rollback-transaction">2.36.8 ⎕SQL[7] B : rollback transaction</a></li>
       <li><a id="toc-Z_002d_005b_003f_005dSQL_005b8_005d-B-_003a-table-names" href="#Z_002d_005b_003f_005dSQL_005b8_005d-B-_003a-table-names">2.36.9 Z←⎕SQL[8] B : table names</a></li>
       <li><a id="toc-Z_002d_005b_003f_005dSQL_005b9_005d-B-_003a-column-names" href="#Z_002d_005b_003f_005dSQL_005b9_005d-B-_003a-column-names">2.36.10 Z←⎕SQL[9] B : column names</a></li>
+      <li><a id="toc-Z-_002d-_005b_003f_005dSQL_005b10_005d-B-_003a-library-version-number" href="#Z-_002d-_005b_003f_005dSQL_005b10_005d-B-_003a-library-version-number">2.36.11 Z ← ⎕SQL[10] B : library version number</a></li>
+      <li><a id="toc-Z-_002d-_005b_003f_005dSQL_005b11_005d-B-_003a-library-version-string" href="#Z-_002d-_005b_003f_005dSQL_005b11_005d-B-_003a-library-version-string">2.36.12 Z ← ⎕SQL[11] B : library version string</a></li>
     </ul></li>
     <li><a id="toc-_005b_003f_005dSI-_002d-State-Indicator" href="#Section-2_002e37">2.37 ⎕SI - State Indicator</a></li>
     <li><a id="toc-_005b_003f_005dSYL-_002d-System-limits" href="#Section-2_002e38">2.38 ⎕SYL - System limits</a>
@@ -1974,7 +1976,7 @@ name for an axis argument.
 </p>
 <p>The way a named lambda is implemented in GNU APL is that the expression
 </p>
-<p>both </p><pre class="verbatim">      FUN ← { body_expression }
+<pre class="verbatim">      FUN ← { body_expression }
 </pre>
 <p>is translated to a two-line function ⎕FX &rsquo;lambda_header&rsquo; &rsquo;body_expression&rsquo;.
 </p>
@@ -5374,21 +5376,25 @@ selects a sub-function of ⎕SQL.
 <li><a href="#g_t_005b_003f_005dSQL_005b7_005d-B-_003a-rollback-transaction" accesskey="8">⎕SQL[7] B : rollback transaction</a></li>
 <li><a href="#Z_002d_005b_003f_005dSQL_005b8_005d-B-_003a-table-names" accesskey="9">Z←⎕SQL[8] B : table names</a></li>
 <li><a href="#Z_002d_005b_003f_005dSQL_005b9_005d-B-_003a-column-names">Z←⎕SQL[9] B : column names</a></li>
+<li><a href="#Z-_002d-_005b_003f_005dSQL_005b10_005d-B-_003a-library-version-number">Z ← ⎕SQL[10] B : library version number</a></li>
+<li><a href="#Z-_002d-_005b_003f_005dSQL_005b11_005d-B-_003a-library-version-string">Z ← ⎕SQL[11] B : library version string</a></li>
 </ul>
 <div class="subsection" id="g_t_005b_003f_005dSQL_005b0_005d-_003a-display-subfunctions">
 <h4 class="subsection">2.36.1 ⎕SQL[0] : display subfunctions</h4>
 
 <pre class="verbatim">      ⎕SQL[0]''
 Available function numbers:
-type  ⎕SQL[1] file      - open a database file, return reference ID for it
-      ⎕SQL[2] ref       - close database
-query ⎕SQL[3,db] params - send SQL query
-query ⎕SQL[4,db] params - send SQL update
-      ⎕SQL[5] ref       - begin a transaction
-      ⎕SQL[6] ref       - commit current transaction
-      ⎕SQL[7] ref       - rollback current transaction
-      ⎕SQL[8] ref       - list tables
-ref   ⎕SQL[9] table     - list columns for table
+type  ⎕SQL[ 1] file      - open a database file, return reference ID for it
+      ⎕SQL[ 2] ref       - close database
+query ⎕SQL[ 3,db] params - send SQL query
+query ⎕SQL[ 4,db] params - send SQL update
+      ⎕SQL[ 5] ref       - begin a transaction
+      ⎕SQL[ 6] ref       - commit current transaction
+      ⎕SQL[ 7] ref       - rollback current transaction
+      ⎕SQL[ 8] ref       - list tables
+ref   ⎕SQL[ 9] table     - list columns for table
+      ⎕SQL[10] type      - return the library version number
+      ⎕SQL[11] type      - return the library version string
 </pre>
 </div>
 <div class="subsection" id="ref-_002d-A-_005b_003f_005dSQL_005b1_005d-B-_003a-open-database">
@@ -5507,6 +5513,21 @@ given table. Currently, the column layout is as follows:
 </p>
 <p>More columns containing extra information may be added in a future
 release.
+</p>
+
+</div>
+<div class="subsection" id="Z-_002d-_005b_003f_005dSQL_005b10_005d-B-_003a-library-version-number">
+<h4 class="subsection">2.36.11 Z ← ⎕SQL[10] B : library version number</h4>
+
+<p>Return the version number (integer scalar) of the library that was used
+to implement the database type <b>B</b>.
+</p>
+</div>
+<div class="subsection" id="Z-_002d-_005b_003f_005dSQL_005b11_005d-B-_003a-library-version-string">
+<h4 class="subsection">2.36.12 Z ← ⎕SQL[11] B : library version string</h4>
+
+<p>Return the version string of the library that was used to implement the
+database type <b>B</b>.
 </p>
 
 <hr>

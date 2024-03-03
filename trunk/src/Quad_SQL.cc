@@ -386,6 +386,54 @@ Value_P value;
    return Token( TOK_APL_VALUE1, value );
 }
 //----------------------------------------------------------------------------
+Value_P 
+Quad_SQL::get_version_number(const UCS_string & ucs_B)
+{
+const UTF8_string utf_B(ucs_B);
+const char * provider_name = utf_B.c_str();
+   loop(p, providers.size())
+       {
+         const Provider * provider = providers[p];
+         if (!(strcmp(provider_name, provider->get_provider_name()) &&
+               strcmp(provider_name, provider->get_provider_type())))
+            {
+              Value_P Z(LOC);
+              Z->next_ravel_Int(provider->version_number());
+              Z->check_value(LOC);
+              return Z;
+            }
+       }
+
+   // supposedly not reached
+   FIXME;
+}
+//----------------------------------------------------------------------------
+Value_P 
+Quad_SQL::get_version_string(const UCS_string & ucs_B)
+{
+const UTF8_string utf_B(ucs_B);
+const char * provider_name = utf_B.c_str();
+
+   // provider_name could be the provider name (e.g. SQLite) or the
+   // providder type (e.g. sqlite)
+   loop(p, providers.size())
+       {
+         const Provider * provider = providers[p];
+         if (!(strcmp(provider_name, provider->get_provider_name()) &&
+               strcmp(provider_name, provider->get_provider_type())))
+            {
+              const UTF8_string utf(provider->version_string());
+              const UCS_string ucs(utf);
+              Value_P Z(ucs, LOC);
+              Z->check_value(LOC);
+              return Z;
+            }
+       }
+
+   // supposedly not reached
+   FIXME;
+}
+//----------------------------------------------------------------------------
 Value_P
 Quad_SQL::column_names(Value_P A, Value_P B)
 {
@@ -451,12 +499,16 @@ const int function_number = X->get_cfirst().get_near_int( );
 
     switch(function_number)
        {
-         case 0: return Token(TOK_APL_VALUE1, list_functions(CERR));
-         case 2: return close_database(B);
-         case 5: return run_transaction_begin(B);
-         case 6: return run_transaction_commit(B);
-         case 7: return run_transaction_rollback(B);
-         case 8: return show_tables(B);
+         case  0: return Token(TOK_APL_VALUE1, list_functions(CERR));
+         case  2: return close_database(B);
+         case  5: return run_transaction_begin(B);
+         case  6: return run_transaction_commit(B);
+         case  7: return run_transaction_rollback(B);
+         case  8: return show_tables(B);
+         case 10: return Token(TOK_APL_VALUE1,
+                               get_version_number(UCS_string(*B)));
+         case 11: return Token(TOK_APL_VALUE1,
+                               get_version_string(UCS_string(*B)));
 
          default: MORE_ERROR() << "⎕SQL[X] B: Illegal function number X="
                                << function_number;
