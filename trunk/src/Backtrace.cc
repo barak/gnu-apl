@@ -364,7 +364,7 @@ long long asm_offset = 0;
               *e = '\0';
               fun = e + 1;
               abs_addr = strtoll(a_a, nullptr, 16);
-              abs_addr -= main_offset 0;
+              abs_addr -= main_offset_0;
           }
       }
 
