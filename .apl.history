@@ -1,0 +1,5 @@
+⎕CR ''
+⎕CR ⍬
+)off
+⎕FIO -16
+)off

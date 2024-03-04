@@ -32,13 +32,16 @@
 
 Quad_PNG  Quad_PNG::fun;
 
-#if apl_X11                         && \
+#define PNG_GTK	\
+    apl_X11 && \
     defined( apl_GTK3             ) && \
-    defined( HAVE_LIBGTK_3        ) && \
+    defined( HAVE_LIBGTK_3        ) 
+
+#define	PNG_LIBS	\
     defined( HAVE_LIBZ            ) && \
     defined( HAVE_ZLIB_H          ) && \
     defined( HAVE_LIBPNG          ) && \
-    defined ( HAVE_LIBPNG16_PNG_H )
+    defined( HAVE_LIBPNG16_PNG_H )
 
 #include <stdio.h>
 #include <zlib.h>
@@ -60,17 +63,21 @@ enum
 };
 int verbosity = SHOW_NONE;   ///< (Debug-) verbosity of ⎕PNG
 
+#if PNG_GTK
 # include <X11/Xlib.h>
 # include <gtk/gtk.h>
+#endif
 
 /// a context binding window properties and data for one ⎕PNG window
 struct PNG_context
 {
    /// constructor
-   PNG_context(Value_P B)
-   : handle(++next_handle),
+   PNG_context(Value_P B) 
+     : handle(++next_handle),
+#if PNG_GTK
      window(0),
      drawing_area(0),
+#endif
      APL_value(B)
    {}
 
@@ -93,11 +100,13 @@ struct PNG_context
    /// the handle for identifying this PNG_context in APL
    const int handle;
 
+#if PNG_GTK
    /// the top-level window of this PNG_context
    GtkWidget * window;
 
    /// the drawing area in the window of this PNG_context
    GtkWidget * drawing_area;
+#endif
 
    /// the RGB matrix to be displayed
    Value_P APL_value;
@@ -313,6 +322,7 @@ Quad_PNG::eval_B(Value_P B) const
         return Token(TOK_APL_VALUE1, Z);
       }
 
+#if PNG_GTK
    if (B->get_rank() == 3)   // display B (an RGB or RGBA matrix)
       {
         const APL_Integer handle = display_PNG_main(B);
@@ -322,6 +332,7 @@ Quad_PNG::eval_B(Value_P B) const
 
         return Token(TOK_APL_VALUE1, IntScalar(handle, LOC));
       }
+#endif
 
    MORE_ERROR() << "Bad B in ⎕PNG B";
    VALENCE_ERROR;
@@ -351,6 +362,7 @@ Quad_PNG::window_control(APL_Integer B0) const
          return Idx0_0(LOC);
        }
 
+#if PNG_GTK
     if (B0 == -3)   // close all ⎕PNG windows, return their handles
        {
          Value_P Z = window_control(-6);   // get all open handles, see below
@@ -364,6 +376,7 @@ Quad_PNG::window_control(APL_Integer B0) const
          PNG_context::next_handle = 0;
          return Z;
        }
+#endif
 
     if (B0 == -4)                // enable SHOW_DRAW
        {
@@ -412,7 +425,9 @@ Quad_PNG::window_control(APL_Integer B0) const
              {
                all_PNG_contexts[p] = all_PNG_contexts.back();
                all_PNG_contexts.pop_back();
+#if PNG_GTK
                gtk_window_close(GTK_WINDOW(pctx->window));
+#endif
                delete pctx;
 
                if (all_PNG_contexts.size() == 0)   PNG_context::next_handle = 0;
@@ -646,6 +661,7 @@ Quad_PNG::eval_AB(Value_P A, Value_P B) const
 //-----------------------------------------------------------------------------
 /// make gtk_main() suitable for pthread_create() and maybe tell when it is
 /// finished. Executed in the thread named apl/⎕PNG.
+#if PNG_GTK
 static void *
 gtk_main_wrapper(void * w_props)
 {
@@ -870,8 +886,10 @@ PNG_context * pctx = new PNG_context(B);
 }
 //-----------------------------------------------------------------------------
 
-#else
+#endif
 
+
+#if !PNG_GTK && !PNG_LIB
 extern Token missing_files(const char * qfun,  const char ** libs,
                            const char ** hdrs, const char ** pkgs);
 
