@@ -65,7 +65,12 @@ public:
      w_props(pwp),
      window(0),
      drawing_area(0),
-     file_saved(false)
+     file_saved(false),
+     configured(false),
+     prev_X0(0),
+     prev_X1(0),
+     prev_Y0(0),
+     prev_Y1(0)
    {}
 
    // destructor
@@ -115,8 +120,22 @@ public:
 
    /// true if the plot was saved to a file
    bool file_saved;
-};
 
+   /// true after the first configure events
+   bool configured;
+
+   /// previous X0 (at the end of window_resized())
+   int prev_X0;
+
+   /// previous X1 (at the end of window_resized())
+   int prev_X1;
+
+   /// previous Y0 (at the end of window_resized())
+   int prev_Y0;
+
+   /// previous Y1 (at the end of window_resized())
+   int prev_Y1;
+};
 //----------------------------------------------------------------------------
 /// same as standard cairo_set_RGB_source() but with Color instead of double
 /// red, green, and blue values.
@@ -1415,6 +1434,80 @@ const bool surface_plot = w_props.get_plot_data().is_surface_plot();
   draw_legend(cr, pctx, surface_plot);
 }
 //----------------------------------------------------------------------------
+/// callback when the window was resized
+extern "C" gboolean
+window_resized(GtkWindow * window, GdkEvent * event, GTK_context * pctx);
+
+gboolean
+window_resized(GtkWindow * window, GdkEvent * event, GTK_context * pctx)
+{
+   // 1. get the new window coordinates. We always use x/y from window,
+   //    not from event (since that would suffer from mouse movements).
+   //
+int win_X0, win_Y0;   gtk_window_get_position(window, &win_X0, &win_Y0);
+int win_W, win_H;     gtk_window_get_size(window, &win_W, &win_H);
+const int win_X1 = win_X0 + win_W;
+const int win_Y1 = win_Y0 + win_H;
+
+   // 2. if configured then figure which edges were changed.
+   //
+   if (pctx->configured)
+      {
+        0 && cerr << "CONFIG:"
+                  << "    X0=" << setw(3) << win_X0
+                  << "    Y0=" << setw(3) << win_Y0
+                  << "    X1=" << setw(3) << win_X1
+                  << "    Y1=" << setw(3) << win_Y1
+                  << endl;
+
+        const int d_X0 = win_X0 - pctx->prev_X0;
+        const int d_Y0 = win_Y0 - pctx->prev_Y0;
+        const int d_X1 = win_X1 - pctx->prev_X1;
+        const int d_Y1 = win_Y1 - pctx->prev_Y1;
+
+        0 && cerr << "MOVE:  "
+                  << "  d_X0=" << setw(3) << d_X0
+                  << "  d_Y0=" << setw(3) << d_Y0
+                  << "  d_X1=" << setw(3) << d_X1
+                  << "  d_Y1=" << setw(3) << d_Y1
+                  << endl;
+
+        0 && d_X0 && cerr << "left edge moved by "  << d_X0 << endl;
+        0 && d_X1 && cerr << "right edge moved by " << d_X1 << endl;
+        0 && d_Y0 && cerr << "upper edge moved by " << d_Y0 << endl;
+        0 && d_Y1 && cerr << "lower edge moved by " << d_Y1 << endl;
+
+        /* at this point:
+ 
+           d_X0 == d_X1           : the entire window was moved (horizontally)
+           d_X0 == 0, d_X1 != 0   : the right edge of the window was moved
+           d_X0 != 0, d_X1 == 0   : the left edge of the window was moved
+
+           d_Y0 == d_Y1           : the entire window was moved (vertically)
+           d_Y0 == 0, d_Y1 != 0   : the lower edge of the window was moved
+           d_Y0 != 0, d_Y1 == 0   : the upper edge of the window was moved
+         */
+
+       if (d_X1 && !d_X0)   // unless window move
+          {
+            pctx->w_props.set_legend_X( pctx->w_props.get_legend_X() + d_X1);
+          }
+
+       if (d_Y1 && !d_Y0)   // unless window move
+          {
+            pctx->w_props.set_legend_Y( pctx->w_props.get_legend_Y() + d_Y1);
+          }
+      }
+
+   pctx->configured = true;
+   pctx->prev_X0 = win_X0;
+   pctx->prev_X1 = win_X1;
+   pctx->prev_Y0 = win_Y0;
+   pctx->prev_Y1 = win_Y1;
+
+   return FALSE;   // event NOT handled by this handler
+}
+//----------------------------------------------------------------------------
 /// callback when the plot window is destroyed
 extern "C" gboolean
 plot_destroyed(GtkWidget * top_level, gpointer user_data);
@@ -1693,6 +1786,9 @@ GTK_context * pctx = new GTK_context(w_props, handle);
 
    g_signal_connect(pctx->window, "destroy",
                     G_CALLBACK(plot_destroyed), pctx);
+
+   g_signal_connect(pctx->window, "configure-event",
+                    G_CALLBACK(window_resized), pctx);
 
    g_signal_connect(pctx->drawing_area, "draw",
                     G_CALLBACK(draw_callback), pctx);
