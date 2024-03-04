@@ -562,13 +562,13 @@ Token_string tos;
 
    // resolve user defined names to user defined functions
    //
-   for (int j = 0; j < int(tos.size()); ++j)
+   for (Function_PC PC = Function_PC_0; PC < tos.size(); ++PC)
        {
-        if (tos[j].get_ValueType() == TV_SYM)   // user defined function
+        if (tos[PC].get_ValueType() == TV_SYM)   // user defined function
            {
-             Symbol * sym = tos[j].get_sym_ptr();
+             Symbol * sym = tos[PC].get_sym_ptr();
              if (sym == 0)   return 0;
-             sym->resolve_right(tos[j]);
+             sym->resolve_right(tos[PC], PC);
            }
        }
 

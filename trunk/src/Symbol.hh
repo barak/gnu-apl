@@ -210,10 +210,16 @@ public:
    /// write \b this symbol in )OUT format to file \b out
    void write_OUT(FILE * out, uint64_t & seq) const;
 
-   /// set \b token according to the current NC/sym_val of \b this \b Symbol
+   /// set \b token according to the current NC/sym_val of \b this \b Symbol.
+   /// Decrement PC if the name class of \b token is either
+   /// NC_UNUSED_USER_NAME or unexpected (supposedly to re-read the
+   /// the resolved token).
    virtual void resolve_left(Token & token, Function_PC & PC) const;
 
-   /// set \b token according to the current NC/sym_val of \b this \b Symbol
+   /// set \b token according to the current NC/sym_val of \b this \b Symbol.
+   /// Decrement PC if the name class of \b token is either
+   /// NC_UNUSED_USER_NAME or unexpected (supposedly to re-read the
+   /// the resolved token).
    virtual void resolve_right(Token & token, Function_PC & PC) const;
 
    /// set \b token according to the current NC/sym_val of \b this shared var

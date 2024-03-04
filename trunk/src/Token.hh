@@ -303,6 +303,15 @@ public:
    /// return value usage counter
    int value_use_count() const;
 
+  /// clear the Value_P value (if any) of this token, updating
+   /// its refcount as needed. Left-over in libapl?
+   void extract_apl_val(const char * loc);
+
+   /// clear the Value_P (if any) without updating its refcount. Return 
+   /// the old Value * that was overridden. Left-over in libapl?
+   Value * extract_and_keep(const char * loc);
+
+
    /// clear the Value_P value (if any) of this token, updating
    /// its refcount as needed
    void release_apl_val(const char * loc);
