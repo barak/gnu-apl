@@ -781,6 +781,17 @@ pthread_t th;
    sem_post(all_PLOT_windows_sema);
 
    sem_wait(expose_sema);   // blocks until window shown
+
+   if (w_props->get_with_border())
+      {
+        // the user wants window borders, which requires a delay (of 100 ms,
+        // see WM_timeout() in Event_handler 'Draw' in Plot_gtk.cc). We add
+        // twice that timeout at ⎕PLOT level so that the next ⎕PLOT (if any)
+        // does not interfer with the saving of the current plot window.
+        //
+        usleep(2000 * SAVE_BORDER_DELAY_ms);
+      }
+
    return Z;
 }
 //----------------------------------------------------------------------------

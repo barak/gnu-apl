@@ -916,7 +916,7 @@ fi
 if (apl_YES($apl_FFT)); then
    AC_DEFINE_UNQUOTED(apl_FFT, 1, [FFT available ?])
 else
-   AC_DEFINE_UNQUOTED(apl_FFT, 0, [FFT available])
+   AC_DEFINE_UNQUOTED(apl_FFT, 0)
 fi
 
 if (apl_YES($apl_GUI)); then

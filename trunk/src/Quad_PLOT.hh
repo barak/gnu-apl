@@ -42,6 +42,10 @@ enum
    SHOW_DRAW   = 4,   ///< show draw details
 };
 
+/// a shrt delay needed when the user wants window borders to be saved
+//  into a .png file
+enum { SAVE_BORDER_DELAY_ms = 100 };
+
 /// The class implementing ⎕PLOT
 class Quad_PLOT : public QuadFunction
 {

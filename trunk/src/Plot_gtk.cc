@@ -65,12 +65,19 @@ public:
      w_props(pwp),
      window(0),
      drawing_area(0),
-     file_saved(false),
+     surface(0),
      configured(false),
      prev_X0(0),
      prev_X1(0),
      prev_Y0(0),
-     prev_Y1(0)
+     prev_Y1(0),
+     legend_X0(0),
+     legend_X1(0),
+     legend_Y0(0),
+     legend_Y1(0),
+     legend_drag(false),
+     legend_drag_X(0),
+     legend_drag_Y(0)
    {}
 
    // destructor
@@ -84,12 +91,6 @@ public:
       {
         gtk_window_close(GTK_WINDOW(window));
       }
-
-   /// save plot window to a .png file
-   void save_file(cairo_surface_t * surf);
-
-   /// return a new surface, with or without window borders, or 0 on failure
-   cairo_surface_t * add_border(cairo_surface_t * content) const;
 
    /// return the required width of the entire plot area
    int get_total_width() const
@@ -109,6 +110,14 @@ public:
               + w_props.get_pa_border_B();
        }
 
+   /// if file name: write the plot window, including its borders. Must be
+   /// called late (after the window manager has displayed it)
+   void save_to_file_with_border();
+
+   /// if file name: write the plot window, without its borders. May
+   // be called early (in Draw), before the window is displayed,
+   void save_to_file_no_border(cairo_surface_t * surface);
+
    /// the window properties (as choosen by the user)
    Plot_window_properties & w_props;
 
@@ -118,23 +127,31 @@ public:
    /// the drawing area in the window of this GTK_context
    GtkWidget * drawing_area;
 
-   /// true if the plot was saved to a file
-   bool file_saved;
+   /// the cairo surface on which the plat is drawn
+   cairo_surface_t * surface;
 
    /// true after the first configure events
    bool configured;
 
-   /// previous X0 (at the end of window_resized())
-   int prev_X0;
+   /// previous X0, X1 (at the end of window_resized())
+   Pixel_X prev_X0, prev_X1;
 
-   /// previous X1 (at the end of window_resized())
-   int prev_X1;
+   /// previous Y0, Y1 (at the end of window_resized())
+   Pixel_Y prev_Y0, prev_Y1;
 
-   /// previous Y0 (at the end of window_resized())
-   int prev_Y0;
+   /// the left and right edges of the legend rectangle
+   Pixel_X legend_X0, legend_X1;
 
-   /// previous Y1 (at the end of window_resized())
-   int prev_Y1;
+   /// the top and bottom edges of the legend rectangle
+   Pixel_Y legend_Y0, legend_Y1;
+
+   /// true if the legend is being dragged
+   bool legend_drag;
+
+   /// the starting point of a legend drag
+   int legend_drag_X, legend_drag_Y;
+
+protected:
 };
 //----------------------------------------------------------------------------
 /// same as standard cairo_set_RGB_source() but with Color instead of double
@@ -632,7 +649,7 @@ char line[strlen(lines) + 10];
 //----------------------------------------------------------------------------
 /// draw a legend for the different plot lines
 void
-draw_legend(cairo_t * cr, const GTK_context & pctx, bool surface_plot)
+draw_legend(cairo_t * cr, GTK_context & pctx, bool surface_plot)
 {
 const Plot_window_properties & w_props = pctx.w_props;
 const int lx = w_props.get_legend_lX();
@@ -676,19 +693,20 @@ const Color legend_color = w_props.get_legend_color();
   */
 
 const Pixel_XY origin = w_props.get_origin(surface_plot);
-const int x0 = origin.x + w_props.get_legend_X();
-const int y0 = origin.y - w_props.get_pa_height() + w_props.get_legend_Y();
+const Pixel_X x0 = origin.x + w_props.get_legend_X();
+const Pixel_Y y0 = origin.y + w_props.get_legend_Y() - w_props.get_pa_height();
 
-const int x1 = x0 + 30;                              // point o in --o--
-const int x2 = x1 + 30;                              // end of     --o--
-const int xt = x2 + 10;                              // text after --o--
-const int xe = xt + longest_len;                     // end of legend_name
+const Pixel_X x1 = x0 + 30;                              // point o in --o--
+const Pixel_X x2 = x1 + 30;                              // end of     --o--
+const Pixel_X xt = x2 + 10;                              // text after --o--
+const Pixel_X xe = xt + longest_len;                     // end of legend_name
 
-const int dy = w_props.get_legend_dY();
+const Pixel_Y dy = w_props.get_legend_dY();
 
-   // draw legend background
+   // draw the legend background
    {
-     // clear the background with a 10 px border around the items
+     // clear the background and a 10 px BORDER around the items. The BORDER
+     // is between the legend reactangle and the line entries
      //
      const double ly2 = 0.5*ly;
 
@@ -698,10 +716,18 @@ const int dy = w_props.get_legend_dY();
      const double Y0 = y0 - ly2                       - BORDER;
      const double Y1 = y0 + ly2 + dy*(line_count - 1) + BORDER;
 
+     // Remember the legend corners in pctx.
+     //
+     pctx.legend_X0  = X0;
+     pctx.legend_X1  = X1;
+     pctx.legend_Y0  = Y0;
+     pctx.legend_Y1  = Y1;
+
      cairo_set_RGB_source(cr, legend_color);
      cairo_rectangle(cr, X0, Y0, X1 - X0, Y1 - Y0);
-     cairo_fill_preserve(cr);
-     cairo_set_RGB_source(cr, 0x000000);
+
+     cairo_fill_preserve(cr);              // fill the rectangle but keep it
+     cairo_set_RGB_source(cr, 0x000000);   // black brim around the background
      cairo_set_line_width(cr, 2);
      cairo_stroke(cr);
    }
@@ -1403,7 +1429,7 @@ const int point_style  = lp0.get_point_style();
 //----------------------------------------------------------------------------
 /// plot the data
 static void
-do_plot(GtkWidget * drawing_area, const GTK_context & pctx, cairo_t * cr)
+do_plot(GtkWidget * drawing_area, GTK_context & pctx, cairo_t * cr)
 {
 const Plot_window_properties & w_props = pctx.w_props;
 const Color canvas_color = w_props.get_canvas_color();
@@ -1434,12 +1460,16 @@ const bool surface_plot = w_props.get_plot_data().is_surface_plot();
   draw_legend(cr, pctx, surface_plot);
 }
 //----------------------------------------------------------------------------
-/// callback when the window was resized
-extern "C" gboolean
-window_resized(GtkWindow * window, GdkEvent * event, GTK_context * pctx);
+// event handlers (callbacks). They should be declared extern "C" to be
+// linked properly... In our case every event handler has a trailing
+// GTK_context * pctc argument
 
-gboolean
-window_resized(GtkWindow * window, GdkEvent * event, GTK_context * pctx)
+#define Event_handler(name, ...)                                \
+   extern "C" gboolean name(__VA_ARGS__, GTK_context * pctx);   \
+   extern "C" gboolean name(__VA_ARGS__, GTK_context * pctx)
+
+/// the window was resized
+Event_handler(Configure_event, GtkWindow * window, GdkEvent * event)
 {
    // 1. get the new window coordinates. We always use x/y from window,
    //    not from event (since that would suffer from mouse movements).
@@ -1490,12 +1520,12 @@ const int win_Y1 = win_Y0 + win_H;
 
        if (d_X1 && !d_X0)   // unless window move
           {
-            pctx->w_props.set_legend_X( pctx->w_props.get_legend_X() + d_X1);
+            pctx->w_props.set_legend_X(pctx->w_props.get_legend_X() + d_X1);
           }
 
        if (d_Y1 && !d_Y0)   // unless window move
           {
-            pctx->w_props.set_legend_Y( pctx->w_props.get_legend_Y() + d_Y1);
+            pctx->w_props.set_legend_Y(pctx->w_props.get_legend_Y() + d_Y1);
           }
       }
 
@@ -1505,140 +1535,187 @@ const int win_Y1 = win_Y0 + win_H;
    pctx->prev_Y0 = win_Y0;
    pctx->prev_Y1 = win_Y1;
 
-   return FALSE;   // event NOT handled by this handler
+   return FALSE;   // propagate the event further to other handlers
 }
 //----------------------------------------------------------------------------
-/// callback when the plot window is destroyed
-extern "C" gboolean
-plot_destroyed(GtkWidget * top_level, gpointer user_data);
-
-gboolean
-plot_destroyed(GtkWidget * top_level, gpointer user_data)
+/// callback when the mouse button is pressed. This may or may not start
+/// the dragging of the legend.
+Event_handler(Button_press_event, GtkWindow * window, GdkEventButton * ev)
 {
-   if (verbosity & SHOW_EVENTS)   CERR << "PLOT DESTROYED" << endl;
+const int x = ev->x;
+const int y = ev->y;
 
-const GTK_context * pctx = reinterpret_cast<GTK_context *>(user_data);
-   Quad_PLOT::PLOT_context::remove_handle(pctx->handle);
-   delete pctx;
+   if (x <  pctx->legend_X0)   return TRUE;
+   if (x >= pctx->legend_X1)   return TRUE;
+   if (y <  pctx->legend_Y0)   return TRUE;
+   if (y >= pctx->legend_Y1)   return TRUE;
 
-  return TRUE;   // event handled by this handler
+   // cerr << "drag started at " << x << " : " << y << endl;
+
+   pctx->legend_drag = true;
+   pctx->legend_drag_X = x;
+   pctx->legend_drag_Y = y;
+   return TRUE;   // event handled, do not propagate it further
 }
 //----------------------------------------------------------------------------
-cairo_surface_t *
-GTK_context::add_border(cairo_surface_t * content) const
+/// the mouse button was released. This ends the dragging of the
+/// legend (if ongoing)
+Event_handler(Button_release_event, GtkWindow *, GdkEventButton *)
 {
-   // this->window is the larger (outer) GTK window, which includes the borders
-   // created by the window manager.
-   //
-int gtk_x, gtk_y, gtk_w, gtk_h;   // GTK window geometry
-   gtk_window_get_position(GTK_WINDOW(window), &gtk_x, &gtk_y);
-   gtk_window_get_size(GTK_WINDOW(window), &gtk_w, &gtk_h);
+   pctx->legend_drag = false;
+   pctx->legend_drag_X = 0;
+   pctx->legend_drag_Y = 0;
 
-   // gdk_win is the smaller (inner) X11 window, which excludes the borders.
-   //
-GdkWindow * gdk_win = gtk_widget_get_window(window);
-   Assert(gdk_win);
-
-   /* compute the border widths. We may assume that the thin East, South, and
-      West borders are the same. while the thicker North border differs due to
-      the window caption. The geometry of the N/W corner of the smaller gdk_win
-      tells us how thick the West and North borders are.
-    */
-
-int N_border, E_border;
-   // gdk_window_get_geometry() works, gdk_window_get_position() does not.
-   gdk_window_get_geometry(gdk_win, &E_border, &N_border, 0, 0);
-const int S_border = E_border;
-const int W_border = E_border;
-
-   // create a GdkPixbuf. GDK windows cannot access their borders,
-   // we therefore copy from the parent of the (top-level) gdk_win.
-
-const bool outer = w_props.get_with_border();
-
-cairo_surface_t * ret;
-   {
-     GdkWindow * parent = gdk_window_get_parent(gdk_win);
-     GdkPixbuf * pixbuf = gdk_pixbuf_get_from_window(parent,
-                          gtk_x + (outer ? 0 : E_border),
-                          gtk_y + (outer ? 0 : N_border),
-                          gtk_w + (outer ? E_border + W_border : 0),
-                          gtk_h + (outer ? N_border + S_border : 0));
-     ret = gdk_cairo_surface_create_from_pixbuf(pixbuf, 1, gdk_win);
-   }
-
-const int r_x = outer ? E_border : 0;
-const int r_y = outer ? N_border : 0;
-cairo_t * cr = cairo_create(ret);
-   cairo_set_source_surface(cr, content, r_x, r_y);
-   cairo_rectangle(cr, r_x, r_y, gtk_w, gtk_h);
-
-   cairo_fill(cr);
-   cairo_destroy(cr);
-   return ret;
+   return TRUE;   // event handled, do not propagate it further
 }
 //----------------------------------------------------------------------------
-/// save the pixels of the plot window into a file
+/// the mouse was moved.
+Event_handler(Motion_notify_event, GtkWidget * window, GdkEventMotion * ev)
+{
+   if (!pctx->legend_drag)   return TRUE;
+
+   // the legend is being dragged. Compute how much since the first
+   // (start_legend_drag) or previous (move_legend_drag) event.
+   //
+const int x = ev->x;
+const int y = ev->y;
+const int dx = x - pctx->legend_drag_X;
+const int dy = y - pctx->legend_drag_Y;
+
+   // cerr << "MOVE " << dx << " : " << dy << endl;
+
+   pctx->w_props.set_legend_X( pctx->w_props.get_legend_X() + dx);
+   pctx->w_props.set_legend_Y( pctx->w_props.get_legend_Y() + dy);
+   if (dx || dy)
+      {
+        const GdkRectangle rect = { 0, 0, 1000, 1000 };
+        GdkWindow * gdk_win = gtk_widget_get_window(window);
+        gdk_window_invalidate_rect(gdk_win, &rect, FALSE);
+      }
+
+   // let the next move start at x:y
+   pctx->legend_drag_X = x;
+   pctx->legend_drag_Y = y;
+
+   return TRUE;   // event handled, do not propagate it further
+}
+//----------------------------------------------------------------------------
 void
-GTK_context::save_file(cairo_surface_t * surf)
+GTK_context::save_to_file_no_border(cairo_surface_t * surface)
 {
-   if (file_saved)   return;
-   file_saved = true;
-
 UTF8_string fname(w_props.get_output_filename().c_str());
-   if (fname.size() == 0)   return;   // no output_filename or already written
+   if (fname.size() == 0)   return;   // no output_filename: don't save
 
    // append .png unless already there
    //
    if (!fname.ends_with(".png"))   fname.append_ASCII(".png");
 
-cairo_status_t stat = CAIRO_STATUS_SUCCESS;
-
+   // save the plot window without its borders
    errno = 0;
-   if (cairo_surface_t * file_surface = add_border(surf))
-      {
-        stat = cairo_surface_write_to_png(file_surface, fname.c_str());
-        cairo_surface_destroy(file_surface);
-      }
-   else   // adding window border failed (or not desired)
-      {
-        stat = cairo_surface_write_to_png(surf, fname.c_str());
-      }
 
+cairo_status_t stat = cairo_surface_write_to_png(surface, fname.c_str());
    if (stat == CAIRO_STATUS_SUCCESS)
       {
         verbosity && CERR << "wrote output file: " << fname << endl;
-
-        // clear filename so it will be written only once.
-        //
-        string empty;
-        w_props.set_output_filename(empty);
-  //    if (w_props.get_auto_close() == 1)   gtk_main_quit();
+       //    if (w_props.get_auto_close() == 1)   gtk_main_quit();
       }
    else   // error writing file
       {
         CERR << "*** writing output file: '" << fname << "' failed: "
              << strerror(errno) << endl;
-  //    if (w_props.get_auto_close() == 2)   gtk_main_quit();
+       //    if (w_props.get_auto_close() == 2)   gtk_main_quit();
       }
 }
 //----------------------------------------------------------------------------
-/// callback when the plot window shall be redrawn
-extern "C" gboolean
-draw_callback(GtkWidget * drawing_area, cairo_t * cr, gpointer user_data);
-
-gboolean
-draw_callback(GtkWidget * drawing_area, cairo_t * cr, gpointer user_data)
+void
+GTK_context::save_to_file_with_border()
 {
-   // callback from GTK.
+   /* to add the borders of our top-level (but border-less) plot window,
+      we go to its parent (i.e. the entire screen) and cut out the rectangle
+      that contains our window and its borders.
 
+      It appears as if the window sizes returned by gtk_window_get_size()
+      and gdk_window_get_geometry() below are identical, while the window
+      positions returned by gtk_window_get_position() change as the window
+      is moved, while the position in gdk_window_get_geometry() remains the
+      same (and we assume that it is the N/W border.
+    */
+
+UTF8_string fname(w_props.get_output_filename().c_str());
+   if (fname.size() == 0)   return;   // no output_filename: don't save
+
+   // append .png unless already there
+   //
+   if (!fname.ends_with(".png"))   fname.append_ASCII(".png");
+
+
+GdkWindow * gdk_win = gtk_widget_get_window(window);
+GdkWindow * parent = gdk_window_get_parent(gdk_win);
+   Assert(gdk_win);
+
+int gtk_x, gtk_y;   // position of the plot window on the screen
+   gtk_window_get_position(GTK_WINDOW(window), &gtk_x, &gtk_y);
+
+int gtk_w, gtk_h;   // size of the plot window
+   gtk_window_get_size(GTK_WINDOW(window), &gtk_w, &gtk_h);
+
+int gdk_x, gdk_y, gdk_w, gdk_h;
+gdk_window_get_geometry(gdk_win, &gdk_x, &gdk_y, &gdk_w, &gdk_h);
+
+   // create a GdkPixbuf. GDK windows cannot access their borders,
+   // we therefore copy from the parent of the (top-level) gdk_win.
+   //
+
+   // create the result surface by copying parts of the parent window
+   // of the inner window, For a top-level window like ours, its
+   // parent is the entire screen.
+   //
+GdkPixbuf * pixbuf = gdk_pixbuf_get_from_window(parent,
+                          gtk_x, gtk_y, gtk_w, gtk_h + gdk_y - gdk_x);
+
+cairo_surface_t *
+      surface = gdk_cairo_surface_create_from_pixbuf(pixbuf, 1, gdk_win);
+   errno = 0;
+   if (surface)
+      {
+         cairo_surface_write_to_png(surface, fname.c_str());
+         cairo_surface_destroy(surface);
+      }
+   else
+      {
+        CERR << "*** writing output file: '" << fname << "' failed: "
+             << strerror(errno) << endl;
+      }
+}
+//----------------------------------------------------------------------------
+//callback when the plot window is destroyed
+Event_handler(Destroy, GtkWidget * top_level)
+{
+   if (verbosity & SHOW_EVENTS)   CERR << "PLOT DESTROYED" << endl;
+
+   Quad_PLOT::PLOT_context::remove_handle(pctx->handle);
+   delete pctx;
+
+   return TRUE;   // event handled, do not propagate it further
+}
+//----------------------------------------------------------------------------
+gboolean
+WM_timeout(GTK_context * pctx)
+{
+   // cerr << "TIMEOUT " << (void *)pctx << endl;
+   pctx->save_to_file_with_border();
+   return FALSE;   // wsingle shot
+}
+
+/// callback when the plot window shall be redrawn
+Event_handler(Draw, GtkWidget * drawing_area, cairo_t * cr)
+{
 const int new_width  = gtk_widget_get_allocated_width(drawing_area);
 const int new_height = gtk_widget_get_allocated_height(drawing_area);
    if (verbosity & SHOW_EVENTS)
-      CERR << "draw_callback(drawing_area = " << drawing_area << ")  "
+      CERR << "Draw(drawing_area = " << drawing_area << ")  "
            << "width: " << new_width << ", height: " << new_height << endl;
 
-GTK_context * pctx = reinterpret_cast<GTK_context *>(user_data);
    pctx->w_props.set_window_size(new_width, new_height);
 
 cairo_surface_t * surface = gdk_window_create_similar_surface(
@@ -1656,12 +1733,29 @@ cairo_surface_t * surface = gdk_window_create_similar_surface(
    cairo_set_source_surface(cr, surface, 0, 0);
    cairo_paint(cr);
 
-   pctx->save_file(surface);
+// gdk_display_flush(gdk_display_get_default());
+   if (pctx->w_props.get_with_border())
+      {
+        // the user wants the window borders to be printed. At this point in
+        // time, however, the window content has been printed to surface, but
+        // the window manager will add the borders only after we have returned.
+        //
+        // We fix this by adding a timout after which the window and its
+        // borders will be copied from the parent (= the entire screen) to
+        // the output file.
+        g_timeout_add(SAVE_BORDER_DELAY_ms, (GSourceFunc)WM_timeout, pctx);
+
+      }
+   else
+      {
+        pctx->save_to_file_no_border(surface);
+      }
+
 
    cairo_surface_destroy(surface);
 
-   if (verbosity & SHOW_EVENTS)   CERR << "draw_callback() done." << endl;
-   return TRUE;   // event handled by this handler
+   if (verbosity & SHOW_EVENTS)   CERR << "draw_() done." << endl;
+   return TRUE;   // event handled, do not propagate it further
 }
 //----------------------------------------------------------------------------
 /** gtk_main_wrapper() makes gtk_main() suitable for pthread_create()
@@ -1784,14 +1878,15 @@ GTK_context * pctx = new GTK_context(w_props, handle);
 
    gtk_widget_show_all(pctx->window);
 
-   g_signal_connect(pctx->window, "destroy",
-                    G_CALLBACK(plot_destroyed), pctx);
+#define Connect_signal(instance, signal_name, callback)               \
+   g_signal_connect(instance, signal_name, G_CALLBACK(callback), pctx);
 
-   g_signal_connect(pctx->window, "configure-event",
-                    G_CALLBACK(window_resized), pctx);
-
-   g_signal_connect(pctx->drawing_area, "draw",
-                    G_CALLBACK(draw_callback), pctx);
+   Connect_signal(pctx->window,              "destroy", Destroy)
+   Connect_signal(pctx->window,      "configure-event", Configure_event)
+   Connect_signal(pctx->window,   "button-press-event", Button_press_event)
+   Connect_signal(pctx->window, "button-release-event", Button_release_event)
+   Connect_signal(pctx->window,  "motion-notify-event", Motion_notify_event)
+   Connect_signal(pctx->drawing_area, "draw",           Draw)
 
    sem_post(Quad_PLOT::expose_sema);   // unleash the APL interpreter
 }

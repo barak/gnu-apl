@@ -29,9 +29,9 @@
 
 #include "Common.hh"
 
-typedef uint16_t Pixel_X;
-typedef uint16_t Pixel_Y;
-typedef uint16_t Pixel_Z;   // offset in the Z direction
+typedef int16_t Pixel_X;
+typedef int16_t Pixel_Y;
+typedef int16_t Pixel_Z;   // offset in the Z direction
 typedef uint32_t Color;
 
 typedef std::string String;
@@ -81,7 +81,7 @@ public:
      min_Y = max_Y = get_Y(0);
      min_Z = max_Z = get_Z(0);
 
-     for (unsigned int n = 1; n < N; ++n)
+     for (size_t n = 1; n < N; ++n)
          {
              const double Xn = get_X(n);
             if (min_X > Xn)   min_X = Xn;

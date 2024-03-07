@@ -6,7 +6,6 @@
 #
 dash_test_FFT()
 { {
-local ac_cv_lib_fftw3_fftw_plan_dft
 apl_FFT=no   # assume error
 
 AC_CHECK_HEADER([fftw3.h], , return)

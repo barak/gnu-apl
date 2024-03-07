@@ -2585,17 +2585,7 @@ const Token result = si.jump(line);   // may change the PC
 
    if (result.get_tag() == TOK_NOBRANCH)   // branch not taken, e.g. →⍬
       {
-        const Token_loc tl_END = pop();   // END (or RETURN_EXEC for ⍎)
-        pop_and_discard();                // →
-        pop_and_discard();                // B
-        const Token result(TOK_APL_VALUE2, Idx0(LOC));
-        const Token_loc tl_result(result, tl_END.get_PC() + 1);
-        push(tl_result);
-        push(tl_END);
-
-        // not a backward branch, therefore no need to check INT or ATT,
-        // or to ⎕STOP or ⎕TRACE.
-        //
+        reset(LOC);
         set_action(RA_CONTINUE);   // again with modified stack
         return;
       }
@@ -2833,27 +2823,85 @@ Prefix::reduce_RETC_A_GOTO_B()
    syntax_error(LOC);
 }
 //----------------------------------------------------------------------------
-// Note: reduce_RETC_GOTO_B__ happens only for context ⍎, since
-//       the contexts ◊ and ∇ use reduce_END_GOTO_B__ instead.
-//
 void
 Prefix::reduce_RETC_GOTO_B_()
 {
+   // Note: reduce_RETC_GOTO_B__ can only happen for context ⍎, since
+   //       the contexts ◊ and ∇ use reduce_END_GOTO_B__ instead.
+
    if (size() != 3)   syntax_error(LOC);
 
-   reduce_END_GOTO_B_();
+   // monadic →LABEL.
 
-   if (action == RA_CONTINUE)   return;   // →''
+   Assert1(prefix_len == 3);
+
+   si.fun_oper_cache.reset();
+
+   // at0() is either TOK_ENDL (end of line), or one of TOK_END, TOK_FUN12,
+   //       or TOK_OPER1
+   //
+const bool end_of_line = at0().get_tag() == TOK_ENDL;
+const bool trace = end_of_line && (at0().get_int_val() & 1);
+
+const Value * line = at2().get_apl_val().get();
+
+   // produce ⎕TRACE output if enabled and branch is not empty
+   //
+   if (trace && line->element_count() > 0)
+      {
+        const ShapeItem line_num = line->get_line_number();
+        Token bra(TOK_BRANCH, line_num);
+        si.statement_result(bra, true);   // display trace line
+      }
+
+const Token result = si.jump(line);   // may change the PC
+
+   if (result.get_tag() == TOK_BRANCH)   // branch back into a function
+      {
+        Log(LOG_prefix_parser)
+           {
+             CERR << "Leaving context after " << result << endl;
+           }
+
+        pop_args_push_result(result);
+        set_action(RA_RETURN);            // return from context;
+        return;
+      }
+
+   if (result.get_tag() == TOK_NOBRANCH)   // branch not taken, e.g. →⍬
+      {
+        // unlike reduce_END_GOTO_B (which can simply reset(LOC) and then
+        //  RA_CONTINUE with the next token), we need a TOK_VOID token that
+        //  will be returned to the caller of the current ⍎ context.
+        //
+        const Token result(TOK_VOID);   // function result is VOID
+        pop_args_push_result(result);
+        set_action(RA_RETURN);   // again with modified stack
+        return;
+      }
+
+   reset(LOC);   // branch taken: terminate current statement
+
+   /* NOTE: the →N cases with N≤0 or N≥↑⍴⎕CR 'FUNCTION' are handled in 
+      UserFunction::pc_for_line(). pc_for_line() sets the PC to the end
+      of the function (which then returns):
+
+      StateIndicator::jump()   above
+      └── StateIndicator::jump_to_line()
+          └── UserFunction::pc_for_line()
+    */
+   Assert(result.get_tag() == TOK_VOID);   // branch taken, i.e. →N in ∇-context
+   branch_within_function(end_of_line);    // does set_action(RA_PUSH_NEXT)
 
    set_action(RA_RETURN);            // return from context;
 }
 //----------------------------------------------------------------------------
-// Note: reduce_RETC_ESC___ happens only for context ⍎,
-//       since contexts ◊ and ∇ use reduce_END_ESC___ instead.
-//
 void
 Prefix::reduce_RETC_GOTO__()
 {
+   // Note: reduce_RETC_ESC___ can only happen for context ⍎, since
+   //       contexts ◊ and ∇ use reduce_END_ESC___ instead
+
    if (size() != 2)   syntax_error(LOC);
 
    reduce_END_GOTO__();

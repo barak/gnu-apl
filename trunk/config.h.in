@@ -497,7 +497,7 @@
 /* --sysconfdir */
 #undef apl_DIR__sysconf
 
-/* FFT available */
+/* FFT available ? */
 #undef apl_FFT
 
 /* GTK+ version 3 installed ? */

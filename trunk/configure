@@ -20876,7 +20876,6 @@ fi
 #
 dash_test_FFT()
 { {
-local ac_cv_lib_fftw3_fftw_plan_dft
 apl_FFT=no   # assume error
 
 ac_fn_cxx_check_header_compile "$LINENO" "fftw3.h" "ac_cv_header_fftw3_h" "$ac_includes_default"
@@ -21577,7 +21576,6 @@ test "x$apl_POSTGRES" = "xyes" && apl_POSTGRES=yes
 #
 dash_test_PCRE()
 { {
-local ac_cv_lib_pcre2_32_pcre2_compile_32
 apl_PCRE=no
 
 # ===========================================================================
@@ -23014,8 +23012,7 @@ if (test "x$apl_FFT" = "xyes"); then
 printf "%s\n" "#define apl_FFT 1" >>confdefs.h
 
 else
-
-printf "%s\n" "#define apl_FFT 0" >>confdefs.h
+   printf "%s\n" "#define apl_FFT 0" >>confdefs.h
 
 fi
 
