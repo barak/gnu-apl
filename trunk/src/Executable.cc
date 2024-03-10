@@ -490,6 +490,16 @@ Executable::print_token(ostream & out, int details) const
    body.print(out, details);
 }
 //----------------------------------------------------------------------------
+ostream &
+Executable::print_range(ostream & out, Function_PC2 from_to) const
+{
+   for (int pc = from_to.high; pc >= from_to.low; --pc)
+       {
+         out << "    [" << pc << "] " << body[pc] << endl;
+       }
+   return out;
+}
+//----------------------------------------------------------------------------
 void
 Executable::print_text(ostream & out) const
 {
@@ -577,6 +587,7 @@ Executable::set_error_info(Error & error, Function_PC2 body_from_to) const
                          the failed statement (before amy optimization).
     */
 
+   if (0)   print_range(CERR, body_from_to);
 
    // for value errors we point to the failed symbol itself.
    //
@@ -623,7 +634,7 @@ const Function_PC2 after_from_to(body_from_to.low  - start,
    // undo any optimizations that were performed with the failed line
    //
 Token_string stat_before;
-   reparse(stat_before, body_from_to);
+   reparse(stat_before, body_from_to.low);
 Function_PC2 before_from_to = after_from_to;
 
    // transform the range 'after_from'_to in the (possibly optimized) body back
@@ -684,6 +695,9 @@ basic_string<int>ranges_before;   ranges_before.reserve(stat_before.size());
            ranges_before[PC_before - 1] == after)   --PC_before;
       }
 
+   // if the failed statenment was optimized then we want to display the
+   // statement BEFORE the optimization.
+   //
    if (optimized)
       set_error_info(error, stat_before, before_from_to);
    else
@@ -697,7 +711,6 @@ Executable::set_error_info(Error & error,
 {
    /* if the error was caused by some function being executed, say f in
       A f B then the right arg B of the function f was OK and we skip 
-
       Thus:     A f B
                 ^   ^
 
@@ -774,19 +787,17 @@ UCS_string message_2(error.get_error_line_2());
 }
 //----------------------------------------------------------------------------
 void
-Executable::reparse(Token_string & original, Function_PC2 range) const
+Executable::reparse(Token_string & original, Function_PC low_PC) const
 {
-   Assert(range.low <= range.high);
-
-   // compute the failed line and the failed statement in the line
-   // by considering the token before range.low.
+   // compute the failed line and the failed statement in the line by
+   // counting the end-of-statement and the end-of-line token before low_PC.
    //
-int line = 0;
+int line = 1;
 int statement = 0;
-   loop(pc, range.low)
+   loop(pc, low_PC)
        {
          const TokenTag tag = body[pc].get_tag();
-         if (tag == TOK_END)   // end of statement
+         if (tag == TOK_END)         // end of statement
             {
               ++statement;
             }
@@ -797,8 +808,12 @@ int statement = 0;
             }
        }
 
-   Assert(line < text.size());
-UCS_string failed_line = text[line];
+   // Caution: ⍎ and ◊ executables have only line 0.
+   //
+   if (get_parse_mode() != PM_FUNCTION)   line = 0;
+
+   Assert(line <= text.size());
+const UCS_string & failed_line = text[line];
 
    // extract the failed statement text from the failed_line
    //
@@ -815,7 +830,8 @@ UCS_string failed_statement;
          }
    }
 
-   // reparse failed_statement without optimization into orig (in APL order)
+   // reparse the failed_statement before the optimization
+   // into orig (in APL order)
 const Parser parser(get_parse_mode(), LOC, false);
 Token_string orig;
 const ErrorCode ec = parser.parse(failed_statement, orig, false);

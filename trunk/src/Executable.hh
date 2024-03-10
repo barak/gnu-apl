@@ -93,6 +93,9 @@ public:
    virtual ostream & print(ostream & out) const
       { print_token(out, false);   return out; }
 
+   /// print a body range (in APL order)
+   ostream & print_range(ostream & out, Function_PC2 from_to) const;
+
    /// print this user defined executable to \b out
    void print_token(ostream & out, int details) const;
 
@@ -141,7 +144,7 @@ public:
                        Function_PC2 range) const;
 
    /// restore the original (un-optimized) tokens for a failed statement
-   void reparse(Token_string & original, Function_PC2 range) const;
+   void reparse(Token_string & original, Function_PC low_PC) const;
 
    /// return the end of the statement (excluding) to which pc belongs
    Function_PC get_statement_end(Function_PC pc) const;

@@ -354,8 +354,8 @@ Error::update_error_info(StateIndicator * si)
       FOO[1]  Q←Q++               ⍝ error line 2: failed statement
                 ^                 ⍝ error line 3: caret line (error range)
 
-       There is no error_message_3; the third line is constructed from
-       left_caret and right_caret when needed.
+       There is no error_message_3 in class Error; the third error line
+       is constructed from left_caret and right_caret when needed.
 
        lrm: "The left caret indicates how far execution of the expression
              progressed before the suspension occurred.
@@ -371,6 +371,7 @@ Error::update_error_info(StateIndicator * si)
    //
    if (const UserFunction * ufun = si->get_executable()->get_exec_ufun())
       {
+        // ufun->print_line_PCs(LOC);
         if (get_show_locked() || ufun->get_exec_properties()[1])
            {
              set_error_line_2("      ");   // the APL prompt

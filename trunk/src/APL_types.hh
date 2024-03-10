@@ -572,7 +572,8 @@ struct AP_num3
    AP_num grand;    ///< the parent of the parent
 };
 //----------------------------------------------------------------------------
-/// two Function_PCs indication a token range in a user defined function body
+/// two Function_PCs that indicate a token range in the body of a defined
+//  function body
 struct Function_PC2
 {
    /// a PC range

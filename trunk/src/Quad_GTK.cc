@@ -949,6 +949,7 @@ const size_t wlen = write(fd, path, TLV_len);
 
 #else   // ! apl_GTK3 or ! apl_X11
 
+//----------------------------------------------------------------------------
 extern Token missing_files(const char * qfun,  const char ** libs,
                            const char ** hdrs, const char ** pkgs);
 
@@ -961,22 +962,29 @@ const char * pkgs[] = { "libgtk-3-dev", 0 };
 
    return missing_files("⎕GTK", libs, hdrs, pkgs);
 }
-
-Token Quad_GTK::eval_AB(Value_P A, Value_P B) const
+//----------------------------------------------------------------------------
+Token
+Quad_GTK::eval_AB(Value_P A, Value_P B) const
 {
    return eval_B(B);
 }
-
-Token Quad_GTK::eval_AXB(Value_P A, Value_P X, Value_P B) const
+//----------------------------------------------------------------------------
+Token
+Quad_GTK::eval_AXB(Value_P A, Value_P X, Value_P B) const
 {
    return eval_B(B);
 }
-Token Quad_GTK::eval_XB(Value_P X, Value_P B) const
+//----------------------------------------------------------------------------
+Token
+Quad_GTK::eval_XB(Value_P X, Value_P B) const
 {
    return eval_B(B);
 }
-
-void Quad_GTK::close_all_windows() {}
-
+//----------------------------------------------------------------------------
+void
+Quad_GTK::close_all_windows()
+{
+}
+//----------------------------------------------------------------------------
 #endif   // apl_GTK3
 

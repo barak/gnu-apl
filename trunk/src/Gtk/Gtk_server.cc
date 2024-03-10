@@ -1539,7 +1539,6 @@ do_draw(GtkWidget * drawing_area, cairo_t * cr, gpointer user_data)
 
    return false;   // propagate the event further
 }
-
 //-----------------------------------------------------------------------------
 gboolean
 top_level_done(GtkWidget * window, gpointer user_data)

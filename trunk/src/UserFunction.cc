@@ -1612,6 +1612,22 @@ UserFunction::print_body_by_line(const char * where) const
       }
 }
 //----------------------------------------------------------------------------
+void
+UserFunction::print_line_PCs(const char * loc) const
+{
+   CERR << "At " << loc << ":" << endl;
+   for (size_t j = 1; j < line_starts.size(); ++j)
+       {
+         CERR << "   " << get_name() << "[" << j << "]: PC= ";
+         const Function_PC PC_from = line_starts[j];
+
+         // Note: line_starts[0] is the end of the function
+         const int next = j < (line_starts.size() - 1) ? j + 1 : 0;
+         const Function_PC PC_to = line_starts[next];
+         CERR << PC_from << "..." << (PC_to - 1) << endl;
+       }
+}
+//----------------------------------------------------------------------------
 VoidCount
 UserFunction::remove_TOK_VOID()
 {

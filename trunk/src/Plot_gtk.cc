@@ -3,7 +3,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2018-2022  Dr. Jürgen Sauermann
+    Copyright © 2018-2024  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -1460,7 +1460,7 @@ const bool surface_plot = w_props.get_plot_data().is_surface_plot();
   draw_legend(cr, pctx, surface_plot);
 }
 //----------------------------------------------------------------------------
-// event handlers (callbacks). They should be declared extern "C" to be
+// event handlers (callbacks). They should be declared extern "C" as to be
 // linked properly... In our case every event handler has a trailing
 // GTK_context * pctc argument
 
@@ -1469,8 +1469,11 @@ const bool surface_plot = w_props.get_plot_data().is_surface_plot();
    extern "C" gboolean name(__VA_ARGS__, GTK_context * pctx)
 
 /// the window was resized
-Event_handler(Configure_event, GtkWindow * window, GdkEvent * event)
+Event_handler(Configure_event, GtkWidget * widget, GdkEvent *)
 {
+GtkWindow * window = GTK_WINDOW(widget);
+   Assert1(pctx && pctx->window == widget);
+
    // 1. get the new window coordinates. We always use x/y from window,
    //    not from event (since that would suffer from mouse movements).
    //
@@ -1540,17 +1543,24 @@ const int win_Y1 = win_Y0 + win_H;
 //----------------------------------------------------------------------------
 /// callback when the mouse button is pressed. This may or may not start
 /// the dragging of the legend.
-Event_handler(Button_press_event, GtkWindow * window, GdkEventButton * ev)
+Event_handler(Button_press_event, GtkWidget * widget, GdkEventButton * ev)
 {
+   Assert1(pctx && pctx->window == widget);
+
 const int x = ev->x;
 const int y = ev->y;
 
-   if (x <  pctx->legend_X0)   return TRUE;
-   if (x >= pctx->legend_X1)   return TRUE;
-   if (y <  pctx->legend_Y0)   return TRUE;
-   if (y >= pctx->legend_Y1)   return TRUE;
+   if (x <  pctx->legend_X0)   return TRUE;   // left of the legend
+   if (x >= pctx->legend_X1)   return TRUE;   // right of the legend
+   if (y <  pctx->legend_Y0)   return TRUE;   // above the legend
+   if (y >= pctx->legend_Y1)   return TRUE;   // below the legend
 
-   // cerr << "drag started at " << x << " : " << y << endl;
+   // at this point a mouse button was pressed inside the legend. We take
+   // that as the start of dragging the legend. Subsequent moves of the mouse
+   // (with the button held down) will move the legend with it and update
+   // legend_drag_X/Y after every move.
+   //
+   // cerr << "legend drag started at " << x << " : " << y << endl;
 
    pctx->legend_drag = true;
    pctx->legend_drag_X = x;
@@ -1558,10 +1568,11 @@ const int y = ev->y;
    return TRUE;   // event handled, do not propagate it further
 }
 //----------------------------------------------------------------------------
-/// the mouse button was released. This ends the dragging of the
-/// legend (if ongoing)
-Event_handler(Button_release_event, GtkWindow *, GdkEventButton *)
+/// the mouse button was released. Stop any ongoing dragging of the legend
+Event_handler(Button_release_event, GtkWidget * widget, GdkEventButton *)
 {
+   Assert1(pctx && pctx->window == widget);
+
    pctx->legend_drag = false;
    pctx->legend_drag_X = 0;
    pctx->legend_drag_Y = 0;
@@ -1570,8 +1581,10 @@ Event_handler(Button_release_event, GtkWindow *, GdkEventButton *)
 }
 //----------------------------------------------------------------------------
 /// the mouse was moved.
-Event_handler(Motion_notify_event, GtkWidget * window, GdkEventMotion * ev)
+Event_handler(Motion_notify_event, GtkWidget * widget, GdkEventMotion * ev)
 {
+   Assert1(pctx && pctx->window == widget);
+
    if (!pctx->legend_drag)   return TRUE;
 
    // the legend is being dragged. Compute how much since the first
@@ -1589,7 +1602,7 @@ const int dy = y - pctx->legend_drag_Y;
    if (dx || dy)
       {
         const GdkRectangle rect = { 0, 0, 1000, 1000 };
-        GdkWindow * gdk_win = gtk_widget_get_window(window);
+        GdkWindow * gdk_win = gtk_widget_get_window(widget);
         gdk_window_invalidate_rect(gdk_win, &rect, FALSE);
       }
 
@@ -1597,6 +1610,83 @@ const int dy = y - pctx->legend_drag_Y;
    pctx->legend_drag_X = x;
    pctx->legend_drag_Y = y;
 
+   return TRUE;   // event handled, do not propagate it further
+}
+//----------------------------------------------------------------------------
+// the plot window is destroyed
+Event_handler(Destroy, GtkWidget * widget)
+{
+   Assert1(pctx && pctx->window == widget);
+
+   if (verbosity & SHOW_EVENTS)   CERR << "PLOT DESTROYED" << endl;
+
+   Quad_PLOT::PLOT_context::remove_handle(pctx->handle);
+   delete pctx;
+
+   return TRUE;   // event handled, do not propagate it further
+}
+//----------------------------------------------------------------------------
+gboolean
+WM_timeout(GTK_context * pctx)
+{
+   // cerr << "TIMEOUT " << (void *)pctx << endl;
+   pctx->save_to_file_with_border();
+   return FALSE;   // single shot
+}
+//----------------------------------------------------------------------------
+/// callback when the plot window shall be (re-)drawn
+Event_handler(Draw, GtkWidget * widget, cairo_t * cr)
+{
+   Assert1(pctx && pctx->drawing_area == widget);
+
+const int new_width  = gtk_widget_get_allocated_width(widget);
+const int new_height = gtk_widget_get_allocated_height(widget);
+   if (verbosity & SHOW_EVENTS)
+      CERR << "Draw(drawing_area = " << widget << ")  "
+           << "width: " << new_width << ", height: " << new_height << endl;
+
+   pctx->w_props.set_window_size(new_width, new_height);
+
+cairo_surface_t * surface = gdk_window_create_similar_surface(
+                                gtk_widget_get_window(widget),
+                                CAIRO_CONTENT_COLOR, new_width, new_height);
+
+   {
+     cairo_t * cr1 = cairo_create(surface);
+     do_plot(widget, *pctx, cr1);   // plot the data
+     cairo_destroy(cr1);
+   }
+
+   // copy pctx->surface to the cr of the caller
+   //
+   cairo_set_source_surface(cr, surface, 0, 0);
+   cairo_paint(cr);
+
+   if (pctx->w_props.get_with_border())
+      {
+        // the user wants the window borders to be printed around the plot
+        // window. At this point in time, however, the plot window content
+        // has been printed to surface, but the window manager has not yet
+        // added the border to the plot window and will only do so after we
+        // have returned.
+        //
+        // We fix this problem by adding a timout after which the window
+        // and its borders will be copied from the parent (= the entire
+        // screen) to the output file. In the mean time, i.e. between
+        // returning from this event handler and the expiration of the
+        // timeout, the window manager has hopefully enough time to draw
+        // te window borders.
+        //
+        g_timeout_add(SAVE_BORDER_DELAY_ms, (GSourceFunc)WM_timeout, pctx);
+      }
+   else
+      {
+        pctx->save_to_file_no_border(surface);
+      }
+
+   cairo_surface_destroy(surface);
+
+   if (verbosity & SHOW_EVENTS)   CERR << "Draw() done." << endl;
    return TRUE;   // event handled, do not propagate it further
 }
 //----------------------------------------------------------------------------
@@ -1688,86 +1778,17 @@ cairo_surface_t *
       }
 }
 //----------------------------------------------------------------------------
-//callback when the plot window is destroyed
-Event_handler(Destroy, GtkWidget * top_level)
-{
-   if (verbosity & SHOW_EVENTS)   CERR << "PLOT DESTROYED" << endl;
-
-   Quad_PLOT::PLOT_context::remove_handle(pctx->handle);
-   delete pctx;
-
-   return TRUE;   // event handled, do not propagate it further
-}
-//----------------------------------------------------------------------------
-gboolean
-WM_timeout(GTK_context * pctx)
-{
-   // cerr << "TIMEOUT " << (void *)pctx << endl;
-   pctx->save_to_file_with_border();
-   return FALSE;   // wsingle shot
-}
-
-/// callback when the plot window shall be redrawn
-Event_handler(Draw, GtkWidget * drawing_area, cairo_t * cr)
-{
-const int new_width  = gtk_widget_get_allocated_width(drawing_area);
-const int new_height = gtk_widget_get_allocated_height(drawing_area);
-   if (verbosity & SHOW_EVENTS)
-      CERR << "Draw(drawing_area = " << drawing_area << ")  "
-           << "width: " << new_width << ", height: " << new_height << endl;
-
-   pctx->w_props.set_window_size(new_width, new_height);
-
-cairo_surface_t * surface = gdk_window_create_similar_surface(
-                                gtk_widget_get_window(drawing_area),
-                                CAIRO_CONTENT_COLOR, new_width, new_height);
-
-   {
-     cairo_t * cr1 = cairo_create(surface);
-     do_plot(drawing_area, *pctx, cr1);   // plot the data
-     cairo_destroy(cr1);
-   }
-
-   // copy pctx->surface to the cr of the caller
-   //
-   cairo_set_source_surface(cr, surface, 0, 0);
-   cairo_paint(cr);
-
-// gdk_display_flush(gdk_display_get_default());
-   if (pctx->w_props.get_with_border())
-      {
-        // the user wants the window borders to be printed. At this point in
-        // time, however, the window content has been printed to surface, but
-        // the window manager will add the borders only after we have returned.
-        //
-        // We fix this by adding a timout after which the window and its
-        // borders will be copied from the parent (= the entire screen) to
-        // the output file.
-        g_timeout_add(SAVE_BORDER_DELAY_ms, (GSourceFunc)WM_timeout, pctx);
-
-      }
-   else
-      {
-        pctx->save_to_file_no_border(surface);
-      }
-
-
-   cairo_surface_destroy(surface);
-
-   if (verbosity & SHOW_EVENTS)   CERR << "draw_() done." << endl;
-   return TRUE;   // event handled, do not propagate it further
-}
-//----------------------------------------------------------------------------
 /** gtk_main_wrapper() makes gtk_main() suitable for pthread_create()
     and warn if it returns (which is not expected to happen).
 
     gtk_main_wrapper() is the top-level main() functions of a thread
     created in plot_main_GTK() which is called from ⎕PLOT::do_plot_data():
 
-   ⎕PLOT → eval_AB(), eval_B()
+   ⎕PLOT → eval_AB(), or eval_B()
              → do_plot_data()
                  → plot_main_GTK()
-                   ↓   → pthread_create(gtk_main_wrapper) → return immediately
+                   ↓
+                   ↓ → → pthread_create(gtk_main_wrapper) → return immediately
                    ↓                            ↓
             ┌─────────────┐           ┌────── thread ──────┐
             │ GTK_context │           │ gtk_main_wrapper() │

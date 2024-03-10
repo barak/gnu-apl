@@ -2586,7 +2586,7 @@ const Token result = si.jump(line);   // may change the PC
    if (result.get_tag() == TOK_NOBRANCH)   // branch not taken, e.g. →⍬
       {
         reset(LOC);
-        set_action(RA_CONTINUE);   // again with modified stack
+        set_action(RA_PUSH_NEXT);   // again with modified stack
         return;
       }
 

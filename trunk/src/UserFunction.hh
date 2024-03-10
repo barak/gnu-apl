@@ -265,6 +265,9 @@ public:
    const UserFunction_header & get_header() const
       { return header; }
 
+   // debug function: print the PC for every linr
+   void print_line_PCs(const char * loc) const;
+
 protected:
    /// constructor for a normal (i.e. non-lambda) user defined function
    UserFunction(const UCS_string txt, const char * loc,
