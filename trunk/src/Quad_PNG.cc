@@ -3,7 +3,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2018-2022  Dr. Jürgen Sauermann
+    Copyright © 2018-2023  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -22,7 +22,9 @@
 /** @file
 */
 
-#include "Common.hh"   // for HAVE_XXX
+#include <stdio.h>
+
+#include "Common.hh"   // for HAVE_XXX (via #include config.h)
 #include "Common.hh"
 #if HAVE_LOCALE_H
 # include <locale.h>
@@ -32,20 +34,25 @@
 
 Quad_PNG  Quad_PNG::fun;
 
-#define PNG_GTK	\
-    apl_X11 && \
-    defined( apl_GTK3             ) && \
-    defined( HAVE_LIBGTK_3        ) 
+/// PNG_GTK defines whether ⎕PNG B with ⍴⍴B ←→ 3 (display of a PNG file in a
+/// GTK window  shall be supported, Requires libgtk in addition to libnpng.
+#define PNG_GTK	                \
+    apl_X11                  && \
+    defined( apl_GTK3      ) && \
+    defined( HAVE_LIBGTK_3 ) 
 
+/// PNG_LIBS defines if the PNG related libraries (and their header files)
+/// are present
 #define	PNG_LIBS	\
-    defined( HAVE_LIBZ            ) && \
-    defined( HAVE_ZLIB_H          ) && \
-    defined( HAVE_LIBPNG          ) && \
+    defined( HAVE_LIBZ           ) && \
+    defined( HAVE_ZLIB_H         ) && \
+    defined( HAVE_LIBPNG         ) && \
     defined( HAVE_LIBPNG16_PNG_H )
 
-#include <stdio.h>
-#include <zlib.h>
-#include <png.h>
+#if PNG_LIBS
+# include <zlib.h>
+# include <png.h>
+#endif
 
 /// window exposed semaphore
 sem_t __PNG_window_sema;

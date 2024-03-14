@@ -4213,7 +4213,7 @@ Monadic ⎕PNG, i.e. ⎕PNG B is used for 3 purposes:
 @itemize
 @item Conversion of PNG files into the GNU APL color model,
 @item Display of an APL array (in the GNU APL color model) in a window on
-the screen (interactive used of PNG), and
+the screen (interactive use of PNG), and
 @item Controlling of ⎕PNG itself.
 @end itemize
 
