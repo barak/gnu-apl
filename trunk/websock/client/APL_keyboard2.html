@@ -99,7 +99,7 @@
  ║ (CAPS   ║ A⍶ ║ S« ║ D» ║ F  ║ G  ║ H  ║ J⍤ ║ K  ║ L⌷ ║ :≡ ║ "≢ ║       ║
  ║  LOCK)  ║ a⍺ ║ s⌈ ║ d⌊ ║ f_ ║ g∇ ║ h∆ ║ j∘ ║ kλ ║ l⎕ ║ ;⍎ ║ '⍕ ║ LFEED ║
  ╠═════════╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══╦╩═══════╣
- ║             ║ Z  ║ Xχ ║ C¢ ║ V  ║ B£ ║ N  ║ Mμ ║ <⍪ ║ >⍙ ║ ?⍠ ║        ║
+ ║             ║ Z  ║ Xχ ║ C¢ ║ V  ║ B£ ║ N  ║ M  ║ <⍪ ║ >⍙ ║ ?  ║        ║
  ║    SPACE    ║ z⊂ ║ x⊃ ║ c∩ ║ v∪ ║ b⊥ ║ n⊤ ║ m| ║ ,⍝ ║ .⍀ ║ /⌿ ║ SPACE  ║
  ╚═════════════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩════╩════════╝
 -->
@@ -166,8 +166,7 @@
          onclick='pushed(event, "\\|⊢⊣")'   >| ⊣<BR>\ ⊢</BUTTON>
 
     <TR>   <!-- CAPSLOCK(10) + 11*5 + RETURN(8) = 73 -->
-     <TD colspan=10> <BUTTON class="key b10">&nbsp;
-                                                     <BR>&nbsp;</BUTTON>
+     <TD colspan=10> <BUTTON class="key b10">&nbsp;(CAPS<BR>LOCK)</BUTTON>
      <TD colspan=5> <BUTTON class="key b5"
          onclick='pushed(event, "aA⍺⍶")'    >A &nbsp;<BR>a ⍺</BUTTON>
      <TD colspan=5> <BUTTON class="key b5"
@@ -195,7 +194,7 @@
 
     <TR>   <!-- SPACE(14) + 10*5 + SPACE(9) = 73 -->
      <TD colspan=14> <BUTTON class="key b14"
-         onclick='pushed(event,"    ")'    >&nbsp;<BR>&blank;</BUTTON>
+         onclick='pushed(event,"    ")'    >&nbsp;<BR>SHIFT</BUTTON>
      <TD colspan=5> <BUTTON class="key b5"
          onclick='pushed(event, "zZ⊂⊂")'    >Z &nbsp;<BR>z ⊂</BUTTON>
      <TD colspan=5> <BUTTON class="key b5"
@@ -209,7 +208,7 @@
      <TD colspan=5> <BUTTON class="key b5"
          onclick='pushed(event, "nN⊤⊤")'    >N &nbsp;<BR>n ⊤</BUTTON>
      <TD colspan=5> <BUTTON class="key b5"
-         onclick='pushed(event, "mM∣∣")'    >M μ<BR>m ∣</BUTTON>
+         onclick='pushed(event, "mM∣∣")'    >M &nbsp<BR>m ∣</BUTTON>
      <TD colspan=5> <BUTTON class="key b5"
          onclick='pushed(event, ",<⍝⍪")'    >&lt;⍪<BR>, ⍝</BUTTON>
      <TD colspan=5> <BUTTON class="key b5"
@@ -217,7 +216,7 @@
      <TD colspan=5> <BUTTON class="key b5"
          onclick='pushed(event, "/?⌿⌿")'    >? &nbsp;<BR>/ ⌿</BUTTON>
      <TD colspan=9>  <BUTTON class="key b9"
-         onclick='pushed(event, "    ")'    >&nbsp;<BR>&blank;</BUTTON>
+         onclick='pushed(event, "    ")'    >&nbsp;<BR>SHIFT</BUTTON>
    </TABLE>
    <BR>
 

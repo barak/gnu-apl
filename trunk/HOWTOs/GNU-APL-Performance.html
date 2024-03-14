@@ -762,7 +762,7 @@ if <strong>gprof</strong> is desired. The simplest way to set these flags is to 
 <div class="content">
 <pre>
 
-<code>make gprof   # set proper compiler flags in male
+<code>make gprof   # set proper compiler flags in make
 make -C src clean all</code>
 
 </pre>
@@ -801,7 +801,7 @@ Run apl with that workspace, and finally
 <li>
 <p>
 run gprof with the output file created by step 2. above (by convention this
-fine is named <strong>gprof.out</strong>).
+file is named <strong>gprof.out</strong>).
 </p>
 </li>
 </ol></div>
@@ -821,8 +821,8 @@ L: ⊣A⌹B ◊ →(0 &lt; COUNT←COUNT-1)⍴L
       loop_count←1000000         ⍝ keep APL busy with A ⌹ B
       N←10
 
-      A←⎕RVAL 1 (,N) (0 0 0 1)    ⍝ a random 5 element complex vector
-      B←⎕RVAL 2 (N,N) (0 0 0 1)   ⍝ a random 5×5 complex matrix
+      A←⎕RVAL 1 (,N) (0 0 0 1)    ⍝ a random 10 element complex vector
+      B←⎕RVAL 2 (N,N) (0 0 0 1)   ⍝ a random 10×10 complex matrix
 
 
       LOOP loop_count   ⍝ run the loop loop_count times</code>
@@ -834,7 +834,7 @@ L: ⊣A⌹B ◊ →(0 &lt; COUNT←COUNT-1)⍴L
 <div class="content">
 <pre>
 
-<code>./apl -f workspaces/GPROF_LOOP.apl</code>
+<code>./apl -f workspaces/GPROF_LOOP.apl # invoke apl with the above script file</code>
 
 </pre>
 </div></div>
@@ -866,7 +866,7 @@ avoid producing any output (the interpreter blocks on output, which may
 </li>
 <li>
 <p>
-make the loop run long enough, in particular when the profiled footprint is
+make the loop run long enough; particularly when the profiled footprint is
   small. Otherwise some small function may be missing entirely in the profile.
   The longer the loop runs the more reliable is the result. An execution time
   of one minute is a good starting point for a simple APL primitive.
@@ -892,16 +892,16 @@ and therefore have to be enabled explicitly. For example with:</p></div>
 <div class="paragraph"><p>The <strong>./configure</strong> option <strong>DEVELOP_WANTED=yes</strong> automatically sets
 <strong>PERFORMANCE_COUNTERS_WANTED=yes</strong>, but also other debug features that may
 have performance impacts.</p></div>
-<div class="paragraph"><p>The counters are mananged from APL via <strong>⎕FIO</strong>. Every counters has a  unique
+<div class="paragraph"><p>The counters are mananged from APL via <strong>⎕FIO</strong>. Every counter has a unique
 ID and can be cleared (before a measurement is started) and read (after a
 measurement). For example:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre>
 
-<code>    ⊣ ⎕FIO[200] 16            ⍝ clear CPU cycle counter for dyadic A ⌹ B
+<code>    ⊣ ⎕FIO[200] 16            ⍝ clear CPU cycle counter for dyadic A ÷ B
     ⊣ 42.1 ÷ ⍳ 1000           ⍝ perform 1000 divisions
-      8 ⎕CR (⎕FIO[201] 16)    ⍝ read counter for dyadic A ⌹ B
+      8 ⎕CR (⎕FIO[201] 16)    ⍝ read counter for dyadic A ÷ B
 ┌→────────────────────────────────────────────┐
 │2 ┌→────┐ 1 3087 9529569 999 370713 182857673│
 │  │A ÷ B│                                    │
@@ -956,7 +956,7 @@ measurement). For example:</p></div>
 <li>
 <p>
 <strong>Z[4]</strong> the (sum of) CPU cycles of the first APL vector item. Therefore
-  *Z[4] ÷ Z[3] is the average number of CPU cycles  *
+  <strong>Z[4] ÷ Z[3]</strong> is the average number of CPU cycles
 </p>
 </li>
 <li>
@@ -973,7 +973,7 @@ measurement). For example:</p></div>
 </li>
 <li>
 <p>
-<strong>Z[7]</strong> the (sum of) CPU cycles of all subsequent APL vector item,
+<strong>Z[7]</strong> the (sum of) CPU cycles of all subsequent APL vector items,
 </p>
 </li>
 <li>
@@ -987,26 +987,30 @@ measurement). For example:</p></div>
 always used the same number of CPU cycles in every pass. These days, modern
 CPUs feature a number of optimizations (caching, branch prediction, etc.)
 that cause the number of CPU cycles for the same APL operations to differ
-considerably. In order to get a better understanding of the varying CPU cycles:</p></div>
+considerably. To get a better understanding of the varying CPU cycles:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
 Z[2 3 4] are the CPU cycles for the first item of every APL vector while
-  Z[5 * 6 7] are the CPU cycles for all subsequent vector items. The formet is
+</p>
+</li>
+<li>
+<p>
+Z[5 6 7] are the CPU cycles for all subsequent vector items. The former is
   normally considerably larger due to the instruction and data caches of the
   CPU,
 </p>
 </li>
 <li>
 <p>
-<strong>Z[3] ÷ Z[2]</strong> resp. <strong>Z[6] ÷ Z[5]</strong> is the <strong>average number</strong> of CPU cycles for
-  the respective (i.e. first vs. subsequent) measurement, and
+<strong>Z[3] ÷ Z[2]</strong> and <strong>Z[6] ÷ Z[5]</strong> are the <strong>average number</strong> of CPU cycles for
+  the respective (i.e. first vs. subsequent) measurements, and
 </p>
 </li>
 <li>
 <p>
-<strong>(Z[4]⋆0.5) ÷ Z[2]</strong> resp. <strong>Z[7] ÷ Z[5]</strong> is the statistical <strong>variance</strong> of
-   the CPU cycles.
+<strong>(Z[4]⋆0.5) ÷ Z[2]</strong> and <strong>Z[7] ÷ Z[5]</strong> are the statistical <strong>variances</strong> of the
+first and subsequent CPU cycles respectively.
 </p>
 </li>
 </ul></div>
@@ -1025,15 +1029,15 @@ Z[2 3 4] are the CPU cycles for the first item of every APL vector while
 </div></div>
 <div class="paragraph"><p>tells us: The statistics type <strong>Z[1]</strong> was <strong>2</strong> (which, BTW, corresponds to macro
 <strong>perfo_2()</strong> in <strong>Performance.def</strong>. The operation <strong>Z[2]</strong> measured by that
-statisttics was <strong>A ⌹ B</strong>. The first division, i.e. <strong>42.1 ÷ ↑⍳1000 ←→ 42.1 ÷ 1</strong>,
+statistics was <strong>A ÷ B</strong>. The first division, i.e. <strong>42.1 ÷ ↑⍳1000 ←→ 42.1 ÷ 1</strong>,
 took Z[4] ←→ 3087 CPU cycles. The Z[6] ←→ 999 subsequent divisions,
-i.e. <strong>42.1 ÷ 1↓⍳1000  ←→ 42.1 ÷2 3 4 &#8230; 1000</strong> took 370713 CPU in total,
- or 370713 ÷ 999 ←→ 371 CPU cycles per division. The comparison between the
+i.e. <strong>42.1 ÷ 1↓⍳1000 ←→ 42.1 ÷ 2 3 4 &#8230; 1000</strong> took 370713 CPU cycles total,
+or 370713 ÷ 999 ←→ 371 CPU cycles per division. The comparison between the
 first division (3087 CPU cycles) and the average of the subsequent
-divisions (371 CPU cycles) demonstarates the effect of caching etc. Since
+divisions (371 CPU cycles) demonstarates the effect of caching, etc. Since
 there was only one first vector item, the variance is the square of that item,
 i.e. Z[5] ←→ 9529569 ←→ 3087×3087 ←→ Z[4]×Z[4] (a single item always has a
-variance of 0). If we had run <strong>A ⌹ B</strong> in a loop, say N times, then:</p></div>
+variance of 0). If we had run <strong>A ÷ B</strong> in a loop, say N times, then:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1047,7 +1051,7 @@ Z[4] ÷ N ←→ the average CPU cycles for the first item,
 </li>
 <li>
 <p>
-Z[6] ÷ (N×999) ←→ the average CPU cycles forsubsequent item,
+Z[6] ÷ (N×999) ←→ the average CPU cycles for subsequent items,
 </p>
 </li>
 <li>
@@ -1061,7 +1065,7 @@ usually Z[5] ≠ Z[4]×Z[4] because the CPU cycles for the first element (in
 <div class="ulist"><ul>
 <li>
 <p>
-Variance(X) ←→ ExpectationX - Exprectation(X²), and
+Variance(X) ←→ ExpectationX - Expectation(X²), and
 </p>
 </li>
 <li>
@@ -1070,10 +1074,10 @@ StandardDeviation(X) ←→ Variance(X) ⋆ 0.5.
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>The triples <strong>Z[3 4 5]</strong> and <strong>Z[6 7 8]</strong> therefore provide all the information that
-is needed to compute the Exprectation and the Variance of the first and of all
-subsequent vector items. GNU APL ships with a handful of workspaces (search
-for <strong>get_statistics</strong> in the <strong>.apl</strong> files) that measure and plot the
+<div class="paragraph"><p>The triples <strong>Z[3 4 5]</strong> and <strong>Z[6 7 8]</strong> therefore provide all the information
+that is needed to compute the Expectation and the Variance of the first and
+of all subsequent vector items. GNU APL ships with a handful of workspaces
+(search for <strong>get_statistics</strong> in the <strong>.apl</strong> files) that measure and plot the
 benchmarking of some scalar APL functions.</p></div>
 </div>
 <div class="sect2">
@@ -1086,7 +1090,7 @@ benchmarking of some scalar APL functions.</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2023-07-16 19:59:55 CEST
+ 2024-03-14 14:48:59 CET
 </div>
 </div>
 </body>

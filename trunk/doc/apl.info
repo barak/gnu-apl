@@ -16,10 +16,8 @@ File: apl.info,  Node: Top,  Next: Chapter 1,  Up: (dir)
 GNU APL
 *******
 
-March 14, 2024
-
-   This manual briefly documents GNU APL, an interpreter for APL as
-described in ISO standard 13751, aka.  "Programming Language APL,
+March 14, 2024 This manual briefly documents GNU APL, an interpreter for
+APL as described in ISO standard 13751, aka.  "Programming Language APL,
 Extended".
 
    This manual for GNU APL can be distributed under the terms of the GNU
@@ -92,7 +90,7 @@ command )OFF (on a separate line) like this:
 
    If APL is computing a function (and possibly caught in an endless
 loop), then you may have to press ^C (this is called ATTENTION in APL)
-in order to return to APL’s command mode and then give the )OFF command.
+to return to APL’s command mode so that the )OFF command can be entered.
 In some circumstances it may be necessary to press ^C twice within a
 short time interval (this is called INTERRUPT in APL).
 
@@ -109,7 +107,7 @@ entering its name and optional command line parameters, for example:
 (assuming the APL interpreter binary is called ’apl’ and is located in
 the current directory):
 
-   #!  apl
+   #!  ./apl
 
    or (if the APL interpreter binary is not in the current directory but
 in /mypath/apl):
@@ -223,7 +221,7 @@ GNU APL understands the following command line options:
 
    • --LX expr
 
-     execute expr first.  The workspaces behaves as if ⎕LX (latent
+     execute expr first.  The workspace behaves as if ⎕LX (latent
      expression) were set to expr in the workspace.  This can be used,
      for example, to start the same workspace with different start-up
      values.
@@ -485,7 +483,7 @@ GNU APL understands the following command line options:
      end of command line options for the interpreter.  GNU APL provides
      the system variable ⎕ARG that returns all command line options with
      which the GNU APL interpreter was invoked (similar to variable argv
-     in main(int argv, char * argv[]) in C/C++).  Option -- can be used
+     in main(int argc, char * argv[]) in C/C++).  Option -- can be used
      to separate command line options for the APL interpreter from
      command line options understood by APL applications.
 
@@ -831,7 +829,7 @@ app2
 
    Example 2: APL started indirectly
 
-   A script is is a text file which as execute permissions.  The first
+   A script is a text file which has execute permissions.  The first
 line of a script, commonly known as the shebang of the script, has a
 special format which specifies how the subsequent lines of the script
 file shall be processed, see man execve for details.
@@ -896,7 +894,7 @@ scripts in shells and other executables) in the following order:
    CAUTION: as discussed in ’man 2 execve’ the interpretation of the
 optional interpreter arguments (2.  above) is system specific and
 possibly not portable.  For that reason the optional interpreter
-argument should not be missing (you can use —- to provide at least one
+argument should not be missing (you can use – to provide at least one
 argument) and also not more than one argument.  On GNU/Linux systems the
 following shebang lines of the script are understood:
 
@@ -986,9 +984,9 @@ to be retrieved.
 returned.
 
    The result of ⎕ENV is a (possibly empty) N×2 matrix.  The first
-column contains the the name(s) of the environment variable(s), while
-the second column contains their value(s).  The name and the value are
-both strings.
+column contains the name(s) of the environment variable(s), while the
+second column contains their value(s).  The name and the value are both
+strings.
 
    The number N of environment variables returned by ⎕ENV obviously
 depends on the number of environment variables whose name begins with
@@ -1061,8 +1059,8 @@ Standard APL literals (aka.  strings) such as ’Hello’ are single quoted.
 As a matter of convenience, GNU APL also provides double-quoted strings
 which differ from single quoted strings in two ways:
 
-   • A standard single quoted APL is a vector if its length is ≠ 1 but a
-     scalar if its length is = 1.  This is sometimes inconvenient and
+   • A standard single quoted APL string is a vector if its length ≠ 1
+     but a scalar if its length = 1.  This is sometimes inconvenient and
      therefore double-quoted strings are more consistent in always being
      vectors regardless of their length.  In other words, ’A’ is a
      scalar while "A" is a vector.
@@ -1080,11 +1078,11 @@ File: apl.info,  Node: Subsection 2.1.6,  Next: Subsection 2.1.7,  Prev: Subsect
 A substantial disadvantage of ⎕INP is that it only works in immediate
 execution mode (and consequently also in .apl scripts), but not the
 bodies of defined functions.  Multi-line strings fill this gap for
-string literals that span several lines of text inside the body of a
-defined functions.  Multi-Line Strings have become more and more
+string literals that span several lines of text inside the body of
+defined functions.  Multi-Line strings have become more and more
 advanced (and elegant) over time.  For this reason they currently come
-in different flavors (of which the older ones will disappear in the long
-run).
+in different flavors (of which the older ones will eventually
+disappear).
 
 2.1.6.1 Old-style Multi-Line Strings
 ....................................
@@ -1143,8 +1141,8 @@ No string end found+
 ┗∊━━━━━━━━━━━━━━━━━━━━┛
 
    If the first string is empty then the nested value starts with an
-empty string, but completely empty lines in the defined function are
-being ignored:
+empty string, but completely empty lines in defined functions are
+ignored:
 
 ∇Z←FOO
  Z←"
@@ -1219,16 +1217,16 @@ eventually disappear at some point in time.
 2.1.6.3 « » Strings
 ...................
 
-When new-style multi-line strings are used in scripts then the related
-error reporting (if the syntax is used incorrectly) can become
-cumbersome.  For example, if one forgets the closing """ of a multi-line
-string then the next """ (which was meant as the start of a new
-multi-line string) is mistaken as the (forgotten) end of the previous
-one.  The often long content of the new string is then parsed as APL
-code and will usually produce many error messages, all of them nonsense.
-Things get worse if the script itself is long because the odd/even
-nature of the quotes will then persist until the end of the string (or
-at least until the next forgotten quote, if any).
+When new-style multi-line strings are used in scripts the related error
+reporting (if the syntax is used incorrectly) can become cumbersome.
+For example, if one forgets the closing """ of a multi-line string then
+the next """ (which was meant as the start of a new multi-line string)
+is mistaken as the (forgotten) end of the previous one.  The often long
+content of the new string is then parsed as APL code and will usually
+produce many error messages, all of them nonsense.  Things get worse if
+the script itself is long because the odd/even nature of the quotes will
+then persist until the end of the string (or at least until the next
+forgotten quote, if any).
 
    To deal with this problem, GNU APL also allows strings whose contents
 are enclosed in double angle quotation marks « and ».  In inline strings
@@ -1705,10 +1703,10 @@ lambda with local scope.
 
    Please note that the above only describes the current implementation
 of named lambda in GNU APL. A consequence of that implementation is that
-the symbols ⍺, ⍵, ⍶, ⍹, and λ are pretty much behaving like user defined
-variables.  In particular, they can be used outside named or unnamed
-lambdas.  However, that may change in the future and therefore such use
-of ⍺, ⍵, ⍶, ⍹, and λ outside is certainly a bad idea.
+the symbols ⍺, ⍵, χ, ⍶, ⍹, and λ are pretty much behaving like user
+defined variables.  In particular, they can be used outside named or
+unnamed lambdas.  However, that may change in the future and therefore
+such use of ⍺, ⍵, χ, ⍶, ⍹, and λ outside is certainly a bad idea.
 
 2.7.2 Unnamed Lambdas
 ---------------------
@@ -1753,7 +1751,7 @@ and hyperlinks between them.
 
    The starting point for browsing the documentation are the files:
 
-     /tmp/WSNAME/index.html         ⍝ for ]DOXY without arguments, resp.
+     /tmp/WSNAME/index.html         ⍝ for ]DOXY without arguments, or
      dest/WSNAME/index.html         ⍝ for e.g. ]DOXY dest
 
    The index.html files above usually correspond to the following URIs
@@ -1782,11 +1780,11 @@ explain what a function is supposed to do.
 ∇
 
    But please note the following: in the original doxygen program (for
-C, C++, or other languages) may source code lines be a mix of code and
+C, C++, or other languages) source code lines may be a mix of code and
 comments (including doxygen comments).  In the ]DOXY command of GNU APL
-a line of a defined function shall either be APL code or else a doxygen
-comment (i.e.  start with ⍝⍝).  Indentation with blanks is allowed (for
-the sake of readability).
+a line of a defined function shall be either APL code or else a doxygen
+comment (i.e.  starting with ⍝⍝).  Doxygen comments indented with blanks
+are allowed (for the sake of readability).
 
    Since a doxygen comment is also a valid APL comment, it is perfectly
 legal to put a doxygen comment at the end of a line that starts with APL
@@ -1841,8 +1839,8 @@ Command )COPY_ONCE copies all objects (variables, functions and
 operators) from some other workspace into the current workspace similar
 to )COPY. However, )COPY_ONCE does this only once; a second invocation
 of )COPY_ONCE with the same workspace (and the same library reference
-number) is silently being ignored.  This speeds up the )COPYing of
-libraries that occur in several )DUMP-ed or )SAVE-ed workspaces.
+number) is silently ignored.  This speeds up the )COPYing of libraries
+that occur in several )DUMP-ed or )SAVE-ed workspaces.
 
 
 File: apl.info,  Node: Section 2.10,  Next: Section 2.11,  Prev: Section 2.9,  Up: Chapter 2
@@ -1903,8 +1901,8 @@ user input.  libreadline did provide two useful features: tab expansion
 keys would recall previously entered lines).
 
    Since SVN 465 libreadline was removed and the standard TAB expansion
-and histoSection 2.12ry of libreadline were replaced by more context
-sensitive (i.e.  APL aware) implementations:
+and history of libreadline were replaced by more context sensitive (i.e.
+APL aware) implementations:
 
    1.  Instead of simply recalling the last line entered by the user,
 there are now different histories for different input contexts:
@@ -2730,7 +2728,7 @@ not needed.
    Please note as well that QR factorization is currently experimental.
 So please double-check its results before using it in production code.
 
-2.20.1 The Impact of ⎕CR for ⌹
+2.20.1 The Impact of ⎕CT for ⌹
 ------------------------------
 
 Due to the lack of a better place we describe here how ⎕CT is used in
@@ -2740,11 +2738,11 @@ the various ⌹ functions.
 ...................
 
 The first step in the computation of A⌹B or ⌹B is the estimation of the
-the number of linearly independent columns of B. If that number is
-smaller than the total number of columns (IOW some columns of B are
-linearly dependent) then a DOMAIN ERROR is raised before the computation
-of ⌹B starts.  Although B may be over-determined (so it may have more
-rows than columns and in that case the rows of B cannot be linearly
+number of linearly independent columns of B. If that number is smaller
+than the total number of columns (IOW some columns of B are linearly
+dependent) then a DOMAIN ERROR is raised before the computation of ⌹B
+starts.  Although B may be over-determined (so it may have more rows
+than columns and in that case the rows of B cannot be linearly
 independent) it may not have linearly dependent columns.
 
    Now, for every real or complex number ⍺ does ⎕CT define a range of
@@ -3593,8 +3591,8 @@ HAlloWEEn
      (nested or not nested) key A[N;1] is equal to an item in B, then
      the corresponding item in the result will be nested if A[N;2] is
      nested.  If, for some N, the depths of A[N;1] and A[N;2] differ,
-     then then depths of B and A ⎕MAP B may differ as well.  That is,
-     ⎕MAP conserves the shape of B, but not necessarily the depth of B.
+     then depths of B and A ⎕MAP B may differ as well.  That is, ⎕MAP
+     conserves the shape of B, but not necessarily the depth of B.
 
    • By default the mapping of B is non-recursive, i.e.  the top-level
      items of B are compared with the top-level keys A[;1], and nested
@@ -3904,7 +3902,7 @@ the origin and proceeding along the axis.  For example:
 
    will name X-axis ticks T1, T2, and T3, regardless of the X
 coordinate.  static tick items are the fallbacks for those cases where
-dynamic tick items can not produce the desired result.  In other words,
+dynamic tick items cannot produce the desired result.  In other words,
 static tick items must be constructed in APL beforehand.
 
    In contrast, dynamic tick items are computed from the value at the
@@ -4771,7 +4769,7 @@ the system limit for the depth of the random value being produced.  This
 can be prevented by setting a maximum depth for every value generated.
 ⎕RVAL sets the probability of the deepest allowed depth to 0.
 
-   4 ⎕CR B expects B to be a positive integer which is deepest allowed
+   4 ⎕RVAL B expects B to be a positive integer which is deepest allowed
 depth;
 
    An empty B, e.g.  4 ⎕RVAL ⍬, will not change anything and can be used
@@ -4844,17 +4842,17 @@ selects a sub-function of ⎕SQL.
 
       ⎕SQL[0]''
 Available function numbers:
-type  ⎕SQL[ 1] file      - open a database file, return reference ID for it
-      ⎕SQL[ 2] ref       - close database
-query ⎕SQL[ 3,db] params - send SQL query
-query ⎕SQL[ 4,db] params - send SQL update
-      ⎕SQL[ 5] ref       - begin a transaction
-      ⎕SQL[ 6] ref       - commit current transaction
-      ⎕SQL[ 7] ref       - rollback current transaction
-      ⎕SQL[ 8] ref       - list tables
-ref   ⎕SQL[ 9] table     - list columns for table
-      ⎕SQL[10] type      - return the library version number
-      ⎕SQL[11] type      - return the library version string
+type  ⎕SQL[1] file      - open a database file, return reference ID for it
+      ⎕SQL[2] ref       - close database
+query ⎕SQL[3,db] params - send SQL query
+query ⎕SQL[4,db] params - send SQL update
+      ⎕SQL[5] ref       - begin a transaction
+      ⎕SQL[6] ref       - commit current transaction
+      ⎕SQL[7] ref       - rollback current transaction
+      ⎕SQL[8] ref       - list tables
+ref   ⎕SQL[9] table     - list columns for table
+      ⎕SQL[10] type     - return the library version number
+      ⎕SQL[11] type     - return the library version string
 
 2.36.2 ref ← A ⎕SQL[1] B : open database
 ----------------------------------------
@@ -4959,8 +4957,8 @@ table.  Currently, the column layout is as follows:
 
    Name Type
 
-   More columns containing extra information may be added in a future
-release.
+   More columns containing additional information may be added in a
+future release.
 
 2.36.11 Z ← ⎕SQL[10] B : library version number
 -----------------------------------------------
@@ -7467,75 +7465,75 @@ please read <http://www.gnu.org/philosophy/why-not-lgpl.html>.
 
 Tag Table:
 Node: Top383
-Node: Chapter 11573
-Node: Chapter 223440
-Node: Section 2.125453
-Node: Subsection 2.1.126675
-Node: Subsection 2.1.227306
-Node: Subsection 2.1.328136
-Node: Subsection 2.1.433922
-Node: Subsection 2.1.537722
-Node: Subsection 2.1.638581
-Node: Subsection 2.1.746697
-Node: Subsection 2.1.848430
-Node: Section 2.251746
-Node: Section 2.352505
-Node: Section 2.453780
-Node: Section 2.558207
-Node: Section 2.658380
-Node: Section 2.759010
-Node: Section 2.862965
-Node: Section 2.965287
-Node: Section 2.1067376
-Node: Section 2.1168923
-Node: Section 2.1270721
-Node: Section 2.1372650
-Node: Section 2.1473591
-Node: Section 2.1573843
-Node: Section 2.1675239
-Node: Section 2.1785704
-Node: Section 2.1888201
-Node: Section 2.1994927
-Node: Section 2.2096372
-Node: Section 2.21105651
-Node: Section 2.22110689
-Node: Section 2.23113947
-Node: Section 2.24114238
-Node: Section 2.25125077
-Node: Section 2.26125349
-Node: Section 2.27131928
-Node: Section 2.28134388
-Node: Section 2.29135057
-Node: Section 2.30136708
-Node: Section 2.31140489
-Node: Output File Format156391
-Node: Section 2.32157566
-Node: Section 2.33166933
-Node: Section 2.34167960
-Node: Section 2.35182655
-Node: Section 2.36192812
-Node: Section 2.37197465
-Node: Section 2.38199561
-Node: Section 2.39203979
-Node: Section 2.40225313
-Node: Section 2.41236206
-Node: Chapter 3238203
-Node: Chapter 4240712
-Node: Chapter 5241838
-Node: Section 5.1243375
-Node: Section 5.2244655
-Node: Section 5.3245015
-Node: Section 5.4245257
-Node: Section 5.5245919
-Node: Section 5.6246397
-Node: Section 5.7247170
-Node: Section 5.8247624
-Node: Chapter 6248026
-Node: Section 6.1248445
-Node: Section 6.2249132
-Node: Chapter 7249963
-Node: Section 7.1250466
-Node: Section 7.2275780
+Node: Chapter 11569
+Node: Chapter 223437
+Node: Section 2.125450
+Node: Subsection 2.1.126672
+Node: Subsection 2.1.227303
+Node: Subsection 2.1.328133
+Node: Subsection 2.1.433916
+Node: Subsection 2.1.537712
+Node: Subsection 2.1.638572
+Node: Subsection 2.1.746667
+Node: Subsection 2.1.848400
+Node: Section 2.251716
+Node: Section 2.352475
+Node: Section 2.453750
+Node: Section 2.558177
+Node: Section 2.658350
+Node: Section 2.758980
+Node: Section 2.862943
+Node: Section 2.965280
+Node: Section 2.1067363
+Node: Section 2.1168910
+Node: Section 2.1270695
+Node: Section 2.1372624
+Node: Section 2.1473565
+Node: Section 2.1573817
+Node: Section 2.1675213
+Node: Section 2.1785678
+Node: Section 2.1888175
+Node: Section 2.1994901
+Node: Section 2.2096346
+Node: Section 2.21105621
+Node: Section 2.22110659
+Node: Section 2.23113917
+Node: Section 2.24114208
+Node: Section 2.25125047
+Node: Section 2.26125319
+Node: Section 2.27131898
+Node: Section 2.28134358
+Node: Section 2.29135027
+Node: Section 2.30136678
+Node: Section 2.31140454
+Node: Output File Format156355
+Node: Section 2.32157530
+Node: Section 2.33166897
+Node: Section 2.34167924
+Node: Section 2.35182619
+Node: Section 2.36192778
+Node: Section 2.37197425
+Node: Section 2.38199521
+Node: Section 2.39203939
+Node: Section 2.40225273
+Node: Section 2.41236166
+Node: Chapter 3238163
+Node: Chapter 4240672
+Node: Chapter 5241798
+Node: Section 5.1243335
+Node: Section 5.2244615
+Node: Section 5.3244975
+Node: Section 5.4245217
+Node: Section 5.5245879
+Node: Section 5.6246357
+Node: Section 5.7247130
+Node: Section 5.8247584
+Node: Chapter 6247986
+Node: Section 6.1248405
+Node: Section 6.2249092
+Node: Chapter 7249923
+Node: Section 7.1250426
+Node: Section 7.2275740
 
 End Tag Table
 

@@ -28,7 +28,7 @@ ENDCAT
 ⎕GTK is a GNU APL system function that allows an APL program to create and
 control a graphical user interface (GUI). The GUI is based on Gtk+ (Gimp
 Toolkit) version 3+ (aka. GTK 3+). This document describes, by means of
-simple examples, how *⎕GTK* based GUIs can created and managed from GNU APL.
+simple examples, how *⎕GTK* based GUIs can be created and managed from GNU APL.
 
 == Philosophy
 
@@ -67,13 +67,13 @@ symbols in the different libraries represent functions.
 |===============
 
 These numbers suggest that mapping every Gtk function to a corresponding APL
-function would create an almost unusable API at APL level. Even the approach
-used for ⎕FIO or ⎕SQL - using function numbers as APL axis elements - reaches
-its limits when used with almost 10000 functions.
+function would create an almost unusable API at the APL level. Even the
+approach used for ⎕FIO or ⎕SQL - using function numbers as APL axis elements -
+reaches its limits when used with almost 10000 functions.
 
 Now, the huge number of API functions in the different Gtk libraries contrasts
 considerably with the moderate number of widgets (around 80) in a GUI and even
-more with number of actions (like clicking, marking text, typing text, etc.)
+more with the number of actions (like clicking, marking text, typing text, etc.)
 that a user can do with each of the widgets.
 
 If we look at the program *glade*, which is the default tool for constructing
@@ -82,9 +82,9 @@ Gtk based GUIs, then we see that there are 12 top-level widgets
 control widgets (most of them variants of the same base widget, like different
 types of buttons).
 
-This discrepancy between the huge number of functions in provided by Gtk and
+This discrepancy between the huge number of functions provided by Gtk and
 rather small number of things that a user can do (like: click on a button,
-select an item in a selection box, enter text in some text entry, etc)
+select an item in a selection box, enter text in some text entry, etc.)
 or perceive (color, font, etc.) suggests that there might be a clever way to
 control a GUI without mapping each of the almost 10000 Gtk functions to a
 corresponding APL function in a 1:1 fashion.
@@ -92,14 +92,14 @@ corresponding APL function in a 1:1 fashion.
 ⎕GTK uses a rigorous approach to reduce the number of functions:
 
 * Every GUI must be described by a suitable *XML file* or *XML string*.
-** Suitable *XML files* can with the GUI construction tool *glade* (which
-   comes with GTK), while
+** Suitable *XML files* can be created with the GUI construction tool *glade*
+   (which comes with GTK), while
 ** suitable *XML strings* can be constructed programmatically in APL (see
-   workspace *SQL_GUI* which contains examples for *⎕GTK* and ⎕SQL).
+   workspace *SQL_GUI* which contains examples for *⎕GTK* and *⎕SQL*).
 //-
-  This requirement reduces the need for all
-  functions that are concerned with the instantiation of the GUI elements and
-  their properties. It also speeds up the design of the GUI itself.
+  This requirement reduces the need for all functions that are concerned with
+  the instantiation of the GUI elements and their properties. It also speeds
+  up the design of the GUI itself.
 
 * To the extent possible, visual widget aspects that are usually static (i.e.
   that do not change over time) such as colors are required to be specified
@@ -108,7 +108,7 @@ corresponding APL function in a 1:1 fashion.
   aspects, which further reduces the number of Gtk API functions needed.
   It also speeds up the design of the GUI itself. The downside is a somewhat
   static look-and-feel of the GUI, because, for example, colors cannot be
-  changed after the GUI was instantiated.  However, the benefit of fancy
+  changed after the GUI was instantiated. However, the benefit of fancy
   dynamic GUIs (if any) seems not to justify the complexity in the API
   that would be needed to support them.
 
@@ -130,14 +130,14 @@ libraries, so that Gtk itself remains outside GNU APL.
   Gtk_server over a socket pair. The communication consists of a sequence of
   TLV (Tag/Length/Value) buffers encoded with 33 ⎕CR and decoded with 34 ⎕CR
   (aka. ¯33 ⎕CR) at the APL end. A user action (e.g. a button click) results
-  in an "event" (= a TLV buffer) received by APL while an "command" (sent from
+  in an "event" (= a TLV buffer) received by APL while a "command" (sent from
   APL to the Gtk_server results in some change in the GUI. However, many
   details such as a button changing its form or its color when being pressed
-  are handled by the Gtk_server server process (resp. one of the Gtk
-  libraries) and are not communicated to APL. The encoding and decoding of
-  TLVs that are exchanged between *apl* and *Gtk_server) takes place inside
-  *⎕GTK* so that the APL programmer is not concerned with the details of
-  this communication.
+  are handled by the Gtk_server server process (one of the Gtk libraries) and
+  are not communicated to APL. The encoding and decoding of TLVs that are
+  exchanged between *apl* and *Gtk_server*) takes place inside *⎕GTK* so that
+  the APL programmer is not concerned with the details of this communication.
+
 ----
                                                           ╔════════════════════════════╗
                                                           ║ GUI-description.xml file   ║
@@ -163,27 +163,27 @@ libraries, so that Gtk itself remains outside GNU APL.
 The architecture above leads to the following work-flow.
 
 1. The programmer specifies the GUI by means of the *glade* GUI design tool
-   that comes with Gtk. The result is an XML file that describes the GUI, The
+   that comes with Gtk. The result is an XML file that describes the GUI. The
    XML file can be changed later on as needed, so that the programmer can
    start with a subset of the GUI functionality and then extend that
    functionality in an incremental fashion.
 
-2. The programmer writes a CSS specification for the the widgets in the GUI.
+2. The programmer writes a CSS specification for the widgets in the GUI.
    The CSS file specifies the styling (i.e. colors. sizes etc.) of the
-   widgets. In theory, this step is optional, but in practice inevitable for a
-   somewhat good-looking GUI.
+   widgets. In theory, this step is optional, but in practice it is inevitable
+   for a somewhat good-looking GUI.
 
-3. The programmer write a brief start-up code for the GUI in which the files
-   created in steps 1. and 2. above are being loaded into the GUI.
+3. The programmer writes a brief start-up routine for the GUI in which the
+   files created in steps 1. and 2. above are loaded into the GUI.
 
-4. the programmer displays the GUI - either at the start of the APL
-   application if the GUI shall be permanently visible or at some time
-   if the GUI is, for example, only popped up in order to request input
-   from the user of the APL application. In the latter case the GUI is
-   a single window (a "modal dialog") which is polled from APL until some
-   final action of the user has occurred, while the former case the APL
-   application has to poll the GUI for events at rather short intervals.
-   to poll *⎕GTK* at regular intervals.
+4. The programmer displays the GUI - either at the start of the APL
+   application if the GUI shall be permanently visible or at some later time
+   if the GUI is, for example, only popped up to request input from the user
+   of the APL application. In the latter case the GUI is a single window
+   (a "modal dialog") which is polled from APL until some final action of the
+   user has occurred, while the former case the APL application has to poll
+   the GUI for events at rather short intervals. To poll *⎕GTK* at regular
+   intervals:
 
 ----
     ╔══════════════════════╗
@@ -201,7 +201,7 @@ The architecture above leads to the following work-flow.
     ║ ──────────────────── ║
     ║   GUI event loop     ║   → polls and reacts to events (user actions)
     ╚══════════════════════╝
------
+----
 
 The example given below will be a modal dialog with the non-modal case left
 as an exercise for the reader.
@@ -216,9 +216,8 @@ fashion and according to the following rules:
 * Every APL application that has a GUI (and uses *⎕GTK*) starts its own
   Gtk_server(s). In a GUI with several top-level windows, each top-level
   window uses its own Gtk_server which is identified by an integer (handle) in
-  APL. Multiple Gtk_servers are independent of each other, and the
-  coordination of events from between the windows must be performed in the APL
-  application.
+  APL. Multiple Gtk_servers are independent of each other, and the coordination
+  of events between the windows must be performed in the APL application.
 * GNU APL and Gtk_server then send signals (aka, TLV buffers) to each other. A
   signal is a sequence of bytes, starting with a 4-byte tag, followed by a
   4-byte data length, and concluded with 0 or more data bytes as indicated by
@@ -230,35 +229,35 @@ fashion and according to the following rules:
 ** Commands are used to modify the GUI in some way, for example to enter an
   initial value into a text-entry widget.
 ** Events are sent by the Gtk_server upon final user actions such as pushing a
-button, or pressing ENTER after having modified the text in a text-entry
-widget.
+  button, or pressing ENTER after having modified the text in a text-entry
+  widget.
 * Normally larger amounts of data are not sent in events, but in command
-  responses, Assume, for example, a user has entered some (possibly larger)
+  responses. Assume, for example, a user has entered some (possibly larger)
   text into a (hypothetical) text-editor widget and leaves the text-editor.
   The text-editor would then only send an event to APL indicating that some
   new text is available. The new text itself, however, is not packed into that
   event but needs to be fetched from the text-editor widget in the Gtk_server
-  by means of an according retrieval command. The new text is then sent from
+  by means of a corresponding retrieval command. The new text is then sent from
   the Gtk_server to APL in the response to the retrieval command. In other
   words, larger amounts of data are usually pulled by apl from a Gtk_server
   rather than pushed by the Gtk_server into APL. The reasons for this approach
   are:
-** the retrieval commands are usually needed anyway, It is often easier
+** the retrieval commands are usually needed anyway. It is often easier
   to specify the initial content of a widget in *glade* than to set it from
-  the APL application.
-  ** the events become more uniform (not differing by
-  different types of content). This, in turn, allows the same event to be used
-  by different widgets that differ only by the type of data that they produce.
+  the APL application and,
+** the events become more uniform (not differing by different types of
+  content). This, in turn, allows the same event to be used by different
+  widgets that differ only by the type of data that they produce.
 * As a consequence, most events contain only the type of event and the widget
   that has sent the event.
 * Every signal is a TLV buffer whose length is dictated by the length of the
   Value component. Such a TLV buffer is therefore already determined by an
-  integer tags and the value bytes V; the length is then ⍴V. In APL it is
+  integer tag and the value bytes V; the length is then ⍴V. In APL it is
   therefore sufficient to specify only T and V as a vector TV←Tag,Value whose
   first element Tag = ↑TV identifies a particular command or event, and the
-  rest 1↓TV is a (frequently empty) argument of that command or event.  The
-  GNU APL system functions 33 ⎕CR resp. 34 ⎕CR have been tailored to encode
-  resp. decode tag/value vectors TV into/from the TLV buffers exchanged
+  rest 1↓TV is a (frequently empty) argument of that command or event. The
+  GNU APL system functions 33 ⎕CR and 34 ⎕CR have been tailored to encode and
+  decode tag/value vectors TV to/from respectively the TLV buffers exchanged
   between APL and Gtk_server.
 * Sending of a TLV from APL to Gtk_server is done by encoding the TLV with 33
   ⎕FIO TLV, followed by a single write() (similar to ⎕FIO[42]) onto the
@@ -276,7 +275,7 @@ widget.
    with the tag and how to present that data (event name, widget, possibly
    X/Y coordinates of mouse events, etc.) to APL.
 
-* Receiving from Gtk_server is done with single read() call (like ⎕FIO[43])
+* Receiving from Gtk_server is done with a single read() call (like ⎕FIO[43])
   from the handle followed by decoding the received bytes with 34 ⎕CR.
 
 [icon="/usr/share/asciidoc/icons/note.png"]
@@ -285,7 +284,7 @@ completeness and are not needed by the APL programmer.
 
 == Detailed Example
 
-In the following, the Implementation of a simple GUI will be described
+In the following, the implementation of a simple GUI will be described
 step-by-step. The GUI will consist of a window that contains two labels (=
 fixed texts), two text entry boxes, and a button that the user can push to end
 the text entry.
@@ -336,7 +335,7 @@ over the widget, push and hold down the left mouse button, move the mouse
 pointer to the *GUI visualization area* in the middle, and release the
 mouse button.
 
-You will now see a new rectangular are in the *GUI visualization area*,
+You will now see a new rectangular area in the *GUI visualization area*,
 a widget item named *window1* in the *GUI structure*, and
 the properties of the new widget below.
 
@@ -348,8 +347,8 @@ Your GUI now consists of one widget. You see the grid as child *grid1* of
 Next, drag the widget of type *Grid* onto the *window1* in the
 middle and enter 6 rows / 10 columns in the dialog that pops up.
 
-This grid is a helper-widget for controlling the placement of other widget
-inside the *window1*.
+This grid is a helper-widget for controlling the placement of other widgets
+inside *window1*.
 
 === Step 1c: Add labels and text entry widgets to the positioning Grid
 
@@ -378,8 +377,8 @@ Finally, drag the widget of type *Button* from the *Control and Display* group
 to row 5, column 5, then set its *width* to *2*, and its *label* to *OK*
 (you need to scroll down in the General tab to see that property).
 
-Then *SAVE THE GUI !!!* in *glade*'s menu-bar under *File → Save As* and give it
-the filename *my-application.ui*.
+Then *SAVE THE GUI !!!* in *glade*'s menu-bar under *File → Save As* and give
+it the filename *my-application.ui*.
 
 In *glade*, the GUI should now look like this:
 
@@ -424,9 +423,9 @@ You can then stop the GUI with *)CLEAR* before leaving APL with *)OFF*:
 
 === Step 3: Styling the GUI with CSS
 
-There exist numerous functions for controlling how widgets look line (colors,
-fonts, sizes, etc). However, constructing a GUI using these functions is a
-tedious and error-prone task.
+There exist numerous functions for controlling how widgets look (colors, fonts,
+sizes, etc). However, constructing a GUI using these functions is a tedious
+and error-prone task.
 
 For that reason, *⎕GTK* does not provide access to all these functions. Instead,
 one can specify these properties by means of a standard CSS (cascading style
@@ -448,8 +447,8 @@ Consider the following CSS example, (file *my-application.css*):
 #OK-button { color: #F00; background: #4F4; }
 ----
 
-It says that buttons should, in general, have a white background and a red
-foreground (= text color), but that the button with the name *"OK-button"*
+It specifies that buttons should, in general, have a white background and a
+red foreground (= text color), but that the button with the name *"OK-button"*
 in the XML file *my-application.ui* shall have a green background instead.
 It is important to note that the relevant name in CSS (here: *#OK-button*)
 is *not* the ID: in the *General* tab in *glade*, but the property
@@ -475,7 +474,7 @@ closes the window whose handle is *Ah*.
 
 [icon="/usr/share/asciidoc/icons/note.png"]
 NOTE: there is a summary of all *⎕GTK* syntax variants (a *⎕GTK* cheat sheet)
- in the <<TAG_appendix, Appendix>> of this document.
+in the <<TAG_appendix, Appendix>> of this document.
 
 ----
       )CLEAR
@@ -493,12 +492,12 @@ NOTE: there is a summary of all *⎕GTK* syntax variants (a *⎕GTK* cheat sheet
 ----
 
 The handle above (6) can, in theory, also be used with ⎕FIO functions like
-fread() if you now what you are doing. This practice is, however, dangerous
+fread() if you know what you are doing. This practice is, however, dangerous
 because it might create inconsistencies between *⎕GTK* and ⎕FIO. For example,
 closing a *⎕GTK* handle with ⎕FIO is technically possible, but usually bad
 idea.
 
-Please note that a window can normally closed from two ends: from APL with
+Please note that a window can normally be closed from two ends: from APL with
 *Ah *⎕GTK* 0* and from the GUI via *Close* in the top-left window menu.
 The latter may, however, close the window but leave the Gtk_server process
 that was running the window alive. You should therefore aim at always
@@ -507,8 +506,8 @@ closing windows from APL, possibly by connecting window close signals to APL.
 === Step 5: Managing widgets
 
 A window is a (top-level) widget that usually contains other widgets. When you
-place a new widget in *glade*, then *glade* assigns a unique ID to the widget and
-makes sure that the id remains unique.
+place a new widget in *glade*, then *glade* assigns a unique ID to the widget
+and makes sure that the id remains unique.
 
 [icon="/usr/share/asciidoc/icons/caution.png"]
 CAUTION: *⎕GTK* requires that you do not change the ID assigned by *glade* (even
@@ -519,24 +518,21 @@ direction APL → Gtk_server to address widgets, while the *widget name:*
 property is used in the reverse direction APL ← Gtk_server to identify the
 widget that has sent a signal.
 
-The ID consists of class name followed by an instance number, for example
+The ID consists of a class name followed by an instance number, for example
 "window1", *⎕GTK* uses the class name in the ID to construct the function name
 in GTK that shall be called.
 
 ⎕GTK has different function signatures, which follow a simple rule:
 
 * functions that address a GUI (opened with some .ui file) have no axis
-  argument
-* functions that address widgets inside a GUI have an axis argument
-* the axis argument is: H_ID ← H, ID where H is the GUI and ID is the ID
-  discussed above
-
-address a GUI or window) have an axis argument. The axis argument is an
-integer H (which is the window handle returned by 
+  argument,
+* functions that address widgets inside a GUI have an axis argument such that
+* the axis argument is: *H_ID ← H, ID* where H is the GUI handle and ID is
+  the ID discussed above.
 
 All properties are strings, even though the content of some widgets can
 only be numbers. Currently only a small subset of the many existing GTK
-functions implemented in *⎕GTK* resp. Gtk_server. However, the mapping from
+functions are implemented in *⎕GTK* and Gtk_server. However, the mapping from
 *⎕GTK* functions to functions in libGtk can be easily extended by:
 
 * adding new mappings to src/Gtk/Gtk_map.def
@@ -563,11 +559,11 @@ The GUI now looks like this:
 image::glade-4.png[]
 
 Finally, we can read data back from widgets. The following example is rather
-crude (just good enough to demonstrate the access to a widget's content), but we
-will see a smarter way in the next chapter (Managing Events). For the moment
+crude (just good enough to demonstrate the access to a widget's content), but
+we will see a smarter way in the next chapter (Managing Events). For the moment
 we simply give the user 20 seconds time to enter data in the "Position:" entry
-and read the entry data after that time has elapsed (and regardless of
-whether the user has entered any data or not).
+and read the entry data after that time has elapsed (regardless of whether the
+user has entered any data or not).
 
 ----
       )CLEAR
@@ -592,26 +588,26 @@ whether the user has entered any data or not).
 Let *B~int~* be:
 
 * the (positive) function number B if B is a positive integer scalar, or
-* the  function number corresponding to B if B is a function name like
+* the function number corresponding to B if B is a function name like
   "set_text" above.
 
 Then result of *⎕GTK[H_ID] B* is:
 
 * *B~int~* if the corresponding Gtk function was successful but returns no data
-  (which is typical is  for all set_XXX() functions like set_text() above), or
+  (which is typical for all set_XXX() functions like set_text() above), or
 
 * *-B~int~* if the corresponding Gtk function has failed, or
 
 * a vector *B~int~, DATA* if the corresponding Gtk function was successful and
-  has returned the result *DATA* (which is typical is  for all *get_XXX()*
+  has returned the result *DATA* (which is typical for all *get_XXX()*
   functions such as *get_text()* above).
 
-Therefore, even though some Gtk functions (i.e. those having a C/C++ result
+Therefore, even though some Gtk functions (i.e. those having a C/Cpp result
 type of *void*) do not return values, *⎕GTK* always returns a value.
 
 == Step 6: Managing Events
 
-In the example developed so far The transfer of data to and from widgets was
+In the example developed so far the transfer of data to and from widgets was
 initiated from APL. Of course, giving a user 20 seconds time to enter some
 data is a ridiculous approach for a serious application program. What is
 needed instead is a way for the GUI to indicate that something of interest has
@@ -619,11 +615,11 @@ happened, such as the user pressing the OK button after she has finished her
 input. Another option would have been to indicate the end of input by hitting
 the return key.
 
-If an application program having a GUI is written C/C+/+, then events such as
-pressing of a button or a key on the keyboard are usually forwarded to the
+If an application program having a GUI is written in C/Cpp, then events such
+as pressing a button or a key on the keyboard are usually forwarded to the
 application by means of callback functions. Whenever the events used by the
 application change - typically accompanied by a change of the GUI - then the
-application needs to be recompiled so that the callbacks are properly updated,
+application needs to be recompiled so that the callbacks are properly updated.
 
 Since APL normally has no such thing as a callback function, and since we do
 not want to recompile Gtk_server for every APL application, the following
@@ -636,32 +632,32 @@ include::../src/Gtk/Gtk_events1.asciidoc[]
   emitted by a widget then causes the connected callback function to be
   called.
 * every callback inserts a single event into an event queue inside *⎕GTK*.
-* *⎕GTK* is be used poll events out of the event queue. The event queue in
+* *⎕GTK* is then used to poll events out of the event queue. The event queue in
   *⎕GTK* decouples the creation of an event from the handling of the event.
 
 Note: The Gtk widget class can currently emit around 70 different signals,
 while Gtk_server currently provides only a rather small set of callback
 functions. This set is supposed to grow over time as the need for new callbacks
-arises. However, the plan is *not* to end up with 70 callbacks in Gtk_server,
+arises. However, the plan is *not* to end up with 70 callbacks in Gtk_server.
 
 Technically speaking a set of callbacks is sufficient for sending and
 identifying every signal in APL if:
 
 * for every signal with arguments a1, a2, ... aN of type t1, t2, ... tN in Gtk
-  there is at lease one matching callback in Gtk_server to which the signal
+  there is at least one matching callback in Gtk_server to which the signal
   can be connected, and
-* for every widgets that can emit N different signals with the same argument
-  types (i.e.  t1, t2, ... tN) there are N different callbacks to which these
+* for every widget that can emit N different signals with the same argument
+  types (i.e. t1, t2, ... tN) there are N different callbacks to which these
   signals can be connected.
 
 In short this means that every signal can be connected to a callback and all
-signals emitted by a widget can be connected to different callbacks. A set of
-callbacks satisfying the above then:
+signals emitted by a widget can be connected to different callbacks. If a set
+of callbacks satisfy the above then they:
 
-* makes Gtk_server more compact, and
-* reduces the size of the APL function(s) decoding the events, but
-* possibly decreases the readability of the event decoder because a signal
-  name may not reflect its true meaning,
+* make Gtk_server more compact, and
+* reduce the size of the APL function(s) decoding the events, but
+* possibly decrease the readability of the event decoder because a signal
+  name may not reflect its true meaning.
 
 === 6a. The life-cycle of an Event
 
@@ -684,13 +680,13 @@ The entire life-cycle of an event is this:
 . APL *read()s* the event from the connection between APL and
   Gtk_server. and stores it into its event queue.
 
-. the APL application polls the event queue out of the queue. At this point
+. the APL application polls the event out of the queue. At this point
   the event has become an APL data structure in the APL workspace. The
   life-time of the event ends here, but the (application-specific) processing
   of the APL data usually continues a little further. In our example, the OK
   button was meant to let the user tell when her input was finished, so the
   next actions would be to read the contents of the *entry1* and *entry2*
-  widgets as already demonstrated above.
+  widgets as already described above.
 
 Now to the details ...
 
@@ -701,14 +697,14 @@ Every signal of a widget that shall be sent to APL needs to be connected in
 
 
 * start *glade* with our example GUI file:
+
 ----
 $ glade my-application.ui
 ----
 * select the *button1* widget by clicking onto the OK button in the
-  *GUI visualization area*. The single widget
-  *window1* in the widget structure area (top-right of the *glade* window) will
-  open and show its children. One of the children - *button1*  is now shown as
-  being selected.
+  *GUI visualization area*. The single widget *window1* in the widget
+  structure area (top-right of the *glade* window) will open and show its
+  children. One of the children - *button1*  is now shown as being selected.
 
 * select the "Signals" tab in the widget property area (bottom-right of the
   *glade* window)
@@ -756,19 +752,19 @@ Another aspect is the scope of a poll. The APL application can either poll for
 an event from a single GUI, or for an event in any of the GUIs that were
 started from the interpreter instance.
 
-The function for a blocking poll is *Z←⎕GTK 1*; The functions for a
+The invocation for a blocking poll is *Z←⎕GTK 1*; The invocation for a
 non-blocking poll is *Z←⎕GTK 2*.
 
 The return value *Z* of a non-blocking poll is the integer scalar 0 if the
 event queue is empty. In all other cases Z is either a 3-element APL vector
-*Gi,Ws,Es*  or a 4-element APL vector *Gi,Ws,Es,Us* if an event with
+*Gi,Ws,Es* or a 4-element APL vector *Gi,Ws,Es,Us* if an event with
 *User Data:* Us is received, where:
 
-* *G* is an integer scalar for the handle of the GUI handle in which the event
+* *G* is an integer scalar for the handle of the GUI window in which the event
   was created,
 * *Ws* is the name of the widget that has created the event (*button1* in our
   example),
-* *Ws* is the name of the signal in *glade* (*clicked* in our example), and
+* *Es* is the name of the signal in *glade* (*clicked* in our example), and
 * *Us* (if present) is the name of an object specified as *User Data:* in
   *glade*.
 
@@ -779,9 +775,9 @@ more appropriate one: we give the user as much time as she needs to fill out
 the Employee: and Position: fields until she pushes the OK-button to indicate
 that the entry of data is complete.
 
-Since out GUI only has one relevant event (clicking the OK button; the editing
-of the Employee: and Position: fields is managed internally by Gtk),
-we keep things simple and use a blocking poll of the *⎕GTK* event queue.
+Since our GUI only has one relevant event (clicking the OK button; the editing
+of the Employee: and Position: fields is managed internally by Gtk), we keep
+things simple and use a blocking poll of the *⎕GTK* event queue.
 The connection from the OK-button to the GTK callback clicked() was already
 done in Step 6b. above (and we assume that the updated my-application.ui is
 used). All that is needed then is to replace:
@@ -824,8 +820,8 @@ The example therefore becomes:
 === 6e. Wrap-up
 
 The last thing to do is to put our example code into a defined function. We
-remove the H_ID variable (which was only used to make Step 5 above explicit), and
-we hide useless return values from  *⎕GTK 1* and *⎕GTK[] "get_text"* with ⊣:
+remove the H_ID variable (which was only used to make Step 5 above explicit),
+and we hide useless return values from  *⎕GTK 1* and *⎕GTK[] "get_text"* with ⊣:
 
 ----
 ∇Z←get_NAME_and_POSITION;GUI_path;CSS_path;Handle
@@ -844,7 +840,7 @@ we hide useless return values from  *⎕GTK 1* and *⎕GTK[] "get_text"* with �
 
 Gtk provides the widget type GtkDrawingArea that can be used to create, for
 example, a canvas onto which one can draw lines, circles, texts, and so on.
-In order to simplify the drawing onto a canvas from APL, *⎕GTK* provides special
+To simplify the drawing onto a canvas from APL, *⎕GTK* provides special
 functions for this purpose. The simple example described in the following
 explains the steps needed to draw a red circle onto a white background.
 
@@ -884,7 +880,7 @@ A single drawing command is a string starting with a keyword followed by
 parameters.
 An entire drawing is a nested vector of drawing commands. Our simple example
 uses four drawing commands: two for filling the canvas background and two for
-drawing the red circle. A real-world example would, of course, consists of
+drawing the red circle. A real-world example would, of course, consist of
 many more drawing commands. GNU APL provides two convenient methods for
 creating vectors of strings: ⎕INP for strings entered in immediate
 execution mode (and therefore also for apl scripts) and multi-line strings
@@ -917,8 +913,8 @@ ellipse     (200 150) (100 75)"
 
 ----
 
-In both cases is *DrawCmd* a 4-element vector of strings. Once the
-*DrawCmd* are constructed they are send to the drawing area widget:
+In both cases *DrawCmd* is a 4-element vector of strings. Once the
+*DrawCmd* strings are constructed they are sent to the drawing area widget:
 
 ----
 
@@ -1016,7 +1012,7 @@ The following notes may be helpful when creating custom drawings.
 ** A line color (called the *pen* color in other places), and
 ** A fill color (called "brush* color elsewhere).
 ** The opaqueness of the line and fill colors can be used to control how a
-  2-dimensional object is being painted:
+  2-dimensional object is painted:
 *** Fill color opacity = 0: (only) the border (in line color), or
 *** Line color opacity = 0: (only) the area inside the border (in fill color),
    or else
@@ -1025,9 +1021,8 @@ The following notes may be helpful when creating custom drawings.
    for different reasons.
 * Lines are 1-dimensional and therefore have no fill color. They are painted
   with the line color.
-* In order to simplify the drawing of objects, the colors are not assigned to
-  individual objects, but are sent once using the one of the following
-  commands:
+* To simplify the drawing of objects, colors are not assigned to
+  individual objects, but are sent once using one of the following commands:
 ** *background R G B* 
 ** *fill-color R G B [A]*
 ** *fill color R G B [A]*
@@ -1060,7 +1055,7 @@ sense, to construct the contents (i.e. strings) of these files directly in
 APL rather than loading them from external files produced elsewhere. GNU APL
 is shipped with an example workspace *workspaces/SQL_GUI.apl* that could serve
 as a starting point for your own, self-contained GUI. This workspace is
-reasonably well documented, but some related concepts may be helpful note
+reasonably well documented, but some related concepts may be helpful to note
 before looking into the APL code of that workspace.
 
 === 8.1 What glade actually does
@@ -1078,7 +1073,7 @@ Lets start with:
 4. → select the new window and set the (topmost) property *ID*
      in tab *Genera* to *window1*
    
-5. → *Save as* the project a *my-gui*.
+5. → *Save as* the project as *my-gui*.
 
 This produces a file named *my-gui.glade* in the current directory.
 Opening this file with a text editor shows its content:
@@ -1106,14 +1101,14 @@ Comparing step 4. above with line 5 of *my-gui.glade*, i.e.
   <object class="GtkWindow" id="window1">
 ----
 
-exposes the primary functionality of *glade*: producing XML templates and filling
-in fields in those templates according to choices made by the user (the window
-ID *window1* in this simple example). The two *<child>* tags with content
+exposes the primary functionality of *glade*: producing XML templates and
+filling in fields in those templates according to choices made by the user (the
+window ID *window1* in this simple example). The two *<child>* tags with content
 *<placeholder/>* are used by *glade* to simplify a later replacement with
 other widgets and have no effect.
 
-File *my-gui.glade* is already a fully functional (albeit empty and thus boring)
-GUI that can be used in APL via *⎕GTK*:
+File *my-gui.glade* is already a fully functional GUI (albeit empty and thus
+boring) that can be used in APL via *⎕GTK*:
 
 ----
       *⎕GTK* "my-gui.glade"
@@ -1164,23 +1159,23 @@ To see why, we note the following:
 
 * The text lines between the first and the second """ above constitutes a
   multi-line string (a non-standard GNU APL feature, see *info apl* for details).
-* Every line becomes a nested (string) item of the multi-line string. The
+* Every line becomes a nested (string) component of the multi-line string. The
   multi-line string is then assigned to variable *XML*. Therefore *⍴XML*
   is 14 for the 14 lines of text between """ and """.
 * *⎕GTK B* expects B to be a simple APL vector (aka. APL string) where
   multiple lines are separated by newline characters and not a vector of
-  nested APL strings.  *36 ⎕CR XML* does the required conversion from
+  nested APL strings. *36 ⎕CR XML* does the required conversion from
   nested APL strings to a simple APL string with *\n* aka. *ASCII FL* as
   line separator.
 * the XML standard treats newlines and blanks alike, therefore the string
   lines could have been separated by blanks (or tabs etc.) as well. However,
-  no according ⎕CR conversion exists, so *36 ⎕CR* was used and long XML
+  no corrsponding ⎕CR conversion exists, so *36 ⎕CR* was used and long XML
   strings using \n are easier to read than those using blanks or TABs.
 
 
 All properties of the new windows, like its size, caption, etc. are set to
-their defaults. We will, by means of examples, explain in the following how
-to change that.
+their defaults. We will explain, by means of examples, how to change that in
+the following description.
 
 === 8.2 Some GTK (and glade) details
 
@@ -1194,13 +1189,13 @@ header files) that come with the GTK libraries. The GTK header files are
 usually installed in either */usr/include/gtk-3.0/gtk/* or else in
 */usr/local/include/gtk-3.0/gtk/*.
 
-You can use *⎕GTK* without any C/C++ knowledge, but looking at some of the
+You can use *⎕GTK* without any C/Cpp knowledge, but looking at some of the
 header files (i.e. files with extension *.h*) may help in understanding the
 naming conventions between XML and GTK. Understanding (and following) this
 naming convention is essential for producing a proper XML description for
 a GUI.
 
-In variable XML above, we have already seen the first (an so far only)
+In variable XML above, we have already seen the first (and so far only)
 GTK widget, i.e. *window*:
 
 ----
@@ -1210,9 +1205,9 @@ GTK widget, i.e. *window*:
 ----
 
 To fully understand the naming conventions we use two more widgets with
-more complex names: *gtktextview* and *gtktreeviewcolumn*. We call the
+compound names: *gtktextview* and *gtktreeviewcolumn*. We call the
 names *window*, *gtktextview*, and *gtktreeviewcolumn* the *core name*s
-of the widgets. Every relevant naming convention (XML use only some of
+of the widgets. Every relevant naming convention (XML uses only some of
 them but we will explain them all) start with the core name of a widget
 and produces similar looking names as described in the following sections.
 
@@ -1234,7 +1229,7 @@ The name of the header file for *corename* is *gtkcorename.h*. Therefore, the
 header files in our example are: *gtkwindow.h*, *gtktextview.h*, and
 *gtktreeviewcolumn.h* 
 
-Depending on the platform, all these header file are most likely located in
+Depending on the platform, all these header files are most likely located in
 directory */usr/include/gtk-3.0/gtk/* or .*/usr/local/include/gtk-3.0/gtk/*,
 or sometimes below /opt.
 
@@ -1276,8 +1271,8 @@ GTK object with that ID.
 The object ID of a widget consists of an *ID-prefix* and an *ID-suffix*
 according to these rules:
 
-* The *ID-prefix* are the leading lowercase ASCII characters a..z of some name,
-* The *ID-suffix* are the trailing characters of that name, i.e. the suffix
+* The *ID-prefix* is the leading lowercase ASCII characters a..z of some name,
+* The *ID-suffix* is the trailing characters of that name, i.e. the suffix
   does NOT start with a lowercase ASCII character a..z.
 * The *ID-prefix* should be the same as the function name prefix explained below.
 
@@ -1301,15 +1296,15 @@ Every widget has a number of associated functions. The same function name
 may be used for different widget classes. For example. many widgets have a
 *get_value()* function.
 
-In C++ interfaces to GTK a widget like *window* is declared in header file
-*window.h*, declare a *namespace Gtk*, a C++ class *Window* inside namespace
+In Cpp interfaces to GTK a widget like *window* is declared in header file
+*window.h*, declare a *namespace Gtk*, a Cpp class *Window* inside namespace
 *Gtk*, and member functions fun1, fun2, ... of that class.
 
-⎕GTK uses the C interface instead and the C++ luxury of namespaces and classes
+⎕GTK uses the C interface instead and the Cpp luxury of namespaces and classes
 become function name prefixes. This makes
 
 ----
-    Gtk::Window::fun1(args...)                in C++, and
+    Gtk::Window::fun1(args...)                in Cpp, and
     gtk_window_fun1(gtk_window *, args...)    in C
 ----
 
@@ -1336,9 +1331,9 @@ Then the *⎕GTK* calls above hopefully do this:
    right *⎕GTK* argument (= *set_title*) are combined into the window function
    name *gtk_window_set_title*. This function (in the GTK library) is called
    and its result is returned.
-4. In step 3. the function arguments and the function result (if any) are being
+4. In step 3. the function arguments and the function result (if any) are
    trans-coded between APL values and C values. For this reason, only widget
-   function whose arguments and/or result are integer (including enums) or
+   functions whose arguments and/or results are integer (including enums) or
    strings can be supported by *⎕GTK*. This is fortunately the case for the
    majority of widget functions.
 
@@ -1395,7 +1390,7 @@ to mention:
    +
    For example. we use widgets of class *GtkButton* for buttons, If we were
    interested in the state (pushed or not pushed) of some button, then we
-   would maybe like to call the widget functions that tells us, which is
+   would maybe like to call the widget function that tells us, which is
    function *get_state_flags*. Unfortunately *get_state_flags* is not a
    widget function of class *GtkButton*, but a widget function of its
    ancestor class *GtkWidget* +
@@ -1403,7 +1398,7 @@ to mention:
    If we would try to call monadic *⎕GTK[H_ID]\'get_state_flags'* with the
    *H_ID* for some button, then this would ask the Gtk_server to call the
    C function *gtk_button_get_state_flags()*, which is wrong because no such
-   function exists. Instead we should have ask the Gtk_server to call the
+   function exists. Instead we should have asked the Gtk_server to call the
    C function *gtk_widget_get_state_flags()*. +
    +
    Such cases are resolved by prefixing the function name with the name of the
@@ -1413,15 +1408,15 @@ to mention:
 
 Most widget functions of interest are used to construct the GUI and return
 no value. Some, like *GtkWidget::get_state_flags*, do return a value. In
-that case the result Z is a (possibly mixed) vector. The first vector item
+that case the result Z is a (possibly mixed) vector. The first vector component
 *↑Z* is the function number (APL integer) of the function that has returned
-the result. The rest *1↓Z* is the result result itself (an APL integer,
-APL Float, or a (not enclosed) string.
+the result. The rest *1↓Z* is the result itself (an APL integer, APL Float,
+or a (not enclosed) string.
 
 
 === 8.4 Adding Window Properties
 
-The XML for a widget in GUI defines how the widget looks initially.
+The XML for a widget in a GUI defines how the widget looks initially.
 In our previous example above:
 
 * the top-level *window* was created with its default title *Gtk)server*,
@@ -1431,14 +1426,14 @@ In our previous example above:
 A better approach, which works for most but maybe not all properties is
 to specify them in XML *before* the widget is created and not by calling
 a corresponding widget function *after* the widget was created. This
-is achieved by XML tag <property>/ In the case of the window title the
-property is called *title* (another GTK naming conventions).:
+is achieved by XML tag <property>. In the case of the window title the
+property is called *title* (another GTK naming convention):
 
 ----
     <property name="title">MY-TITLE</property>
 ----
 
-Our complete code is now (observe how MY-PROPERTY has moved from APL to XML:
+Our complete code is now (observe how MY-TITLE has moved from APL to XML:
 
 ----
       )CLEAR
@@ -1467,10 +1462,10 @@ Our complete code is now (observe how MY-PROPERTY has moved from APL to XML:
 
 The GUI looks as before but the focus quirk has disappeared since
 the proper *MY-TITLE* was set *before* the *window* was created. Properties
-are somewhat widget-specific, but most widget have at least the XML <PROPERTY>
+are somewhat widget-specific, but most widgets have at least the XML <property>
 tags with XML attributes *name="width_request"*, *name="height_request*",
 or *name="visible"*. The value of each property is the entire text between the
-XML start tag <PROPERTY> and the corresponding XML end tag </PROPERTY>.
+XML start tag <property> and the corresponding XML end tag </property>.
 
 WARNING: blanks in a property value are preserved and may cause problems
 for certain data types like numbers or the Boolean *True* and *False*.
@@ -1542,8 +1537,8 @@ To explain the the above:
   sizes of the parent widget *window1* and its (so far) anonymous child
   of type *GtkButton*.
 * the properties *halign* and *valign* of the button with value *start* tell
-  the parent widget that the button shall be placed at the start (= left
-  horizontally resp. top vertically) of the parent. Without them the button
+  the parent widget that the button shall be placed at the start (= horizontal
+  left and vertical top resp.) of the parent. Without them the button
   would have grabbed the entire available space of the parent, making the
   button almost as big as the parent.
 
@@ -1560,14 +1555,14 @@ an attempt to specify one yields an error, e.g.:
 (Gtk_server:17553): Gtk-WARNING **: 17:17:39.760: GtkWindow does not have a child property called y
 ----
 
-GTK handles the placement of child widgets a parent widget by means of
+GTK handles the placement of child widgets of a parent widget by means of
 an intermediate widget that provides the missing properties. There exist
 several suitable intermediate widgets (*GtkFixed*, *GtkBox*, *GtkGrid*,
 *GtkLayout*, ...) with different capabilities as to how the children
-are being placed into their common parent. We use the simplest of them:
+should be placed into their common parent. We use the simplest of them:
 *GtkFixed*.
 
-Out current XML has an two-level widget structure like:
+Our current XML has a two-level widget structure like:
 
 ----
 GtkWindow ⊃ GtkButton
@@ -1585,12 +1580,13 @@ GtkWindow ⊃ GtkFixed ⊃ GtkButton
                               </packing>
 ----
 
-The widget placement belongs to class *GtkFixed*, happens in a separate
+The widget placement belongs to class *GtkFixed*, and happens in a separate
 XML Tag named *<packing>*, which has properties named *x* and *y*. That
 is, the positions are specified _next to_ the child rather than _inside_
 the child (or _inside the parent_ for that matter).
 
 Our APL code becomes:
+
 ----
       )CLEAR
 CLEAR WS
@@ -1636,6 +1632,7 @@ And the GUI:
 
 image::glade-10.png[]
 
+
 === 8.7 Adding Style
 
 In the early days of HTML, a green button would have looked something
@@ -1657,8 +1654,8 @@ and some CSS file or style somewhere else would e.g. say:
 #OK-button { background-color: green }
 ----
 
-Nowadays the size of style files has grown to an extent that makes it
-impossible to specify the style of a button or other HTML widget inline
+Nowadays the size of style files has grown to such an extent that it is no
+longer possible to specify the style of a button or other HTML widget inline
 as attributes of the widget.
 
 This division into form on the one hand and style on the other was
@@ -1687,7 +1684,7 @@ The CSS is a sequence of statements with the following simple syntax:
 Selector(s) { style attributes... }
 ----
 
-The style attributes define how a widget looks like (color, borders, etc.),
+The style attributes define how a widget looks (color, borders, etc.),
 while the selectors define which widgets should have the style attributes.
 The selectors as well as the style attributes can be used in multiple CSS
 statements. The key to success with CSS is to keep matters simple, and
@@ -1747,7 +1744,7 @@ for the blue class button. The reason is a little quirk in GTK (which will
 probably disappear at some point in time. A *button* is a widget that has an
 internal sub-widget of type *label* which holds the button text. As it
 happens, using a widget class as CSS selector selects the widgets of that
-class *including their sub-widgets* while a widget name as  CSS selector
+class *including their sub-widgets* while a widget name as CSS selector
 selects the widget(s) with that name *excluding their sub-widgets*.
 
 
@@ -1818,7 +1815,7 @@ the OK button is being pushed. There are then a number of possibilities how
 that can be achieved, each with its own characteristics in terms of
 functionality and simplicity.
 
-More complex situations typically require looping in APL and are then not
+More complicated situations typically require looping in APL and are then not
 directly usable in immediate execution mode (and consequently not in scripts).
 
 ==== Direct Polling of Widgets from APL
@@ -1860,7 +1857,7 @@ Sometimes you want to do something else while waiting for a user action, for
 example updating a progress bar. In that case you could use *⎕GTK 2* (the
 non-blocking companion of *⎕GTK 1*) in the loop.
 
-By default, GTK widgets send events (signals) to each other as to achieve
+By default, GTK widgets send events (signals) to each other to achieve
 visual effects, but these events are not forwarded to APL.
 
 NOTE: As an important consequence, *⎕GTK 1* blocks forever by default.
@@ -1885,20 +1882,20 @@ For example:
 * The *handler=* value is an existing signal handler in the Gtk_server:
 include::../src/Gtk/Gtk_events1.asciidoc[]
 
-See <<Tag_table3, Table 3 in the Appendix>>  for a list of handlers.
+See <<Tag_table3, Table 3 in the Appendix>> for a list of handlers.
 
-NOTE: At least the author frequently forgets the <signal ... /> entry in the
+NOTE: The author, at least, frequently forgets the <signal ... /> entry in the
 XML of the object that sends the event and then wonders what is wrong.
 
 Even though this method is somewhat crude, it has the advantage that
 no loop (which repeats if the wrong signal was received) is required
-and can therefore also be used in immediate execution mode with out a
+and can therefore also be used in immediate execution mode without a
 defined function that contains the loop.
 
 ==== Waiting for specific Event
 
-In more complex cases, it might be needed to decode which
-widget has send which event:
+In more complicated cases, it might be needed to decode which widget has sent
+which event:
 
 ----
 LOOP: Event←⎕GTK 1        ⍝ blocking wait for next event, then decode it
@@ -1949,7 +1946,7 @@ In the Table 2 below, it is assumed that:
 ----
       ⍝ H is a window handle (from some H ← Zh←⎕GTK "filename.ui")
       ⍝ ID is a string containing the id= property of some widget in filename.ui
-      ⍝ H_ID ← H, ID   ⍝ e.g.  6,"entry1". H_ID uniquely identifies a widget
+      ⍝ H_ID ← H, ID   ⍝ e.g. 6,"entry1". H_ID uniquely identifies a widget
 ----
 
 [[Tag_table2]]
@@ -1995,7 +1992,7 @@ WARNING: In Table 2 above, *⎕GTK* functions with axis argument, are *widget
 functions*. The axis argument *H_ID* combines the numeric handle *H* (returned
 from some *H←⎕GTK filename.ui* with a widget id *ID* specified in that
 *filename.ui* as to uniquely identify a widget on the screen (either a top-level
-window or a widget inside some other widget).  The functions without axis
+window or a widget inside some other widget). The functions without axis
 arguments are *generic* and control *⎕GTK* itself rather than a widget
 displayed by *⎕GTK*. The mandatory right argument B of almost all *⎕GTK* calls
 is either a function number (APL integer scalar) or a function name (APL

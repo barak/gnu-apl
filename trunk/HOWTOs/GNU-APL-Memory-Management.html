@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.10" />
+<meta name="generator" content="AsciiDoc 10.1.2" />
 <title>Memory Management in GNU APL</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -436,7 +436,7 @@ thead, p.table.header {
 p.table {
   margin-top: 0;
 }
-/* Because the table frame attribute is overriden by CSS in most browsers. */
+/* Because the table frame attribute is overridden by CSS in most browsers. */
 div.tableblock > table[frame="void"] {
   border-style: none;
 }
@@ -742,7 +742,7 @@ asciidoc.install();
 <h2 id="_abstract">Abstract</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>This document describes how memory is being managed in GNU APL and what
-the consequences for a GNU APL programmer are.</p></div>
+the consequences are for a GNU APL programmer.</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -760,7 +760,7 @@ The GNU APL interpreter is an executable that runs in a single process.
 <p>
 Depending on configuration details and user preferences, the interpreter may
   fork additional processes (APserver, GTK_server) whose sizes are so small
-  that they can also be neglected.
+  they can also be neglected.
 </p>
 </li>
 </ul></div>
@@ -782,15 +782,15 @@ cellspacing="0" cellpadding="4">
 <tbody>
 <tr>
 <td align="left" valign="top"><p class="table">GNU APL Interpreter</p></td>
-<td align="left" valign="top"><p class="table">18,960,921</p></td>
+<td align="left" valign="top"><p class="table">44,620,848</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table">APserver</p></td>
-<td align="left" valign="top"><p class="table">832,886</p></td>
+<td align="left" valign="top"><p class="table">1,540,944</p></td>
 </tr>
 <tr>
 <td align="left" valign="top"><p class="table">Gtk_server</p></td>
-<td align="left" valign="top"><p class="table">138,502</p></td>
+<td align="left" valign="top"><p class="table">530,376</p></td>
 </tr>
 </tbody>
 </table>
@@ -801,9 +801,9 @@ cellspacing="0" cellpadding="4">
 After the interpreter has started it requests additional memory from the
   operating system on behalf of APL commands and APL code executed. That
   memory is allocated by malloc(), either directly or indirectly (via C++
-  new()). When the memory is no longer needed, it is returned to the
-  malloc() memory management (for later re-use). The memory kept in the
-  malloc() memory management is only returned to the operating system when the
+  new()). When the memory is no longer needed, it is returned to malloc()
+  memory management (for later re-use). The memory kept in the malloc()
+  memory management is only returned to the operating system when the
   GNU APL interpreter exits.
 </p>
 </li>
@@ -833,7 +833,7 @@ defined functions
 </li>
 <li>
 <p>
-call stack (aka. )SI stack) entries of defined functions
+call stack (aka. <strong>)SI</strong> stack) entries of defined functions
 </p>
 </li>
 </ul></div>
@@ -841,14 +841,14 @@ call stack (aka. )SI stack) entries of defined functions
 </ul></div>
 <div class="paragraph"><p>In the following the sizes of these objects are given. The sizes differ
 slightly between 32-bit and 64-bit systems because 32-bit systems use 4-byte
-pointers and 64-bit systems use 8 byte pointers. In addition to the indicated
-sizes, there is a (very) small overhead in the malloc() library for every object.
-Each of the objects is far bigger than its malloc overhead and therefore the
-overhead can normally be ignored. A typical APL program is assumed to have
-fewer than 1000 APL symbols (i.e. variables or defined functions) and an )SI
-stack depth of less than 100. A typical computer on which GNU APL runs is
-assumed to have 4 GB of memory available to the interpreter and it should
-definitely have at least 1 GB.</p></div>
+pointers and 64-bit systems use 8-byte pointers. In addition to the indicated
+sizes, there is a (very) small overhead in the malloc() library for every
+object. Each of the objects is significantly larger than its malloc overhead
+and therefore the overhead can normally be ignored. A typical APL workspace is
+assumed to have fewer than 1000 APL symbols (i.e. variables or defined
+functions) and an )SI stack depth of less than 100. A typical computer on which
+GNU APL runs is assumed to have 4 GB of memory available to the interpreter and
+it should definitely have at least 1 GB.</p></div>
 <div class="tableblock">
 <table rules="all"
 width="60%"
@@ -913,16 +913,16 @@ cellspacing="0" cellpadding="4">
 contains other objects. For example, the size of a defined function depends
 on the number of function lines and their lengths. Likewise, the size of an
 APL value depends primarily on the number of its ravel elements. The term X
-for the different objects is explained in the following.</p></div>
+for the different objects is explained below.</p></div>
 <div class="sect2">
 <h3 id="_x_for_a_unicode_string_aka_ucs_string">X for a Unicode string (aka. UCS string)</h3>
 <div class="paragraph"><p>X is 4 bytes per Unicode character. For performance reasons at least 16
-characters are being allocated so that X ≥ 64.</p></div>
+characters are allocated so that X ≥ 64.</p></div>
 </div>
 <div class="sect2">
 <h3 id="_x_for_an_apl_symbol">X for an APL Symbol</h3>
-<div class="paragraph"><p>An APL symbol has two variable parts: an UCS string containing the name of the
-symbol (e.g. a variable name or the name of a defined function) and value
+<div class="paragraph"><p>An APL symbol has two variable parts: a UCS string containing the name of the
+symbol (e.g. a variable name or the name of a defined function) and a value
 stack. The value stack of a function is initially empty, but is increased
 when a defined function is called and the symbol is a local variable or a
 label in the defined function and decreased if that function returns. The
@@ -931,12 +931,12 @@ amount of memory by which the stack is increased is the size of a
 </div>
 <div class="sect2">
 <h3 id="_x_for_a_defined_function">X for a Defined Function</h3>
-<div class="paragraph"><p>When a defined function is created, then its textual representation (i.e.
-the argument for ⎕FX or the result produced by the ∇-editor). This textual
-representation is stored in the function object for the purpose of displaying
-error information in case the execution of the function fails.</p></div>
+<div class="paragraph"><p>When a defined function is created, its textual representation (i.e. the
+argument for ⎕FX or the result produced by the ∇-editor) is stored in the
+function object for the purpose of displaying error information in case the
+execution of the function fails.</p></div>
 <div class="paragraph"><p>The textual representation is then converted into an internal representation
-of fixed-sized Token with one token for each lexical unit. A lexical unit is:</p></div>
+of fixed-sized Tokens with one token for each lexical unit. A lexical unit is:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -964,12 +964,12 @@ function. The X for the function is therefore Utx + N×To + L×Jt, where</p></di
 <div class="ulist"><ul>
 <li>
 <p>
-Utx is the size of UCS_string containing the function text,
+Utx is the size of the UCS_string containing the function text,
 </p>
 </li>
 <li>
 <p>
-N is the number of Token,
+N is the number of Tokens,
 </p>
 </li>
 <li>
@@ -1000,8 +1000,8 @@ value can be allocated in a single new() call while a long value needs two
 new() calls: one for the value header (which contains the shape of the value),
 and one for the ravel cells of the value. Looking at the details of malloc()
 one can see that the allocation or deallocation of smaller memory areas is more
-efficient than the allocation or deallocation of larger areas, Finally,
-short APL values occur more frequently in APL programs than long values, and they
+efficient than the allocation or deallocation of larger areas, Finally, short
+APL values occur more frequently in APL programs than long values, and they
 are also more frequently overridden as a whole (which allocates a new value
 and discards the old) as opposed to being updated via indexed assignment
 (which changes an existing value but does not create a newly allocated
@@ -1031,9 +1031,9 @@ Ce is the size of a ravel Cell as above.
 </li>
 </ul></div>
 <div class="paragraph"><p><strong>Note:</strong> In the classical APL world of ISO 8485, all ravel elements of an APL
-value had the same type like bit, 8-bit char, 32-bit integer, or float and the
-ravel was densely packet. Accessing a particular element V[n] of a value V was
-a fast constant time operation, which was internally performed very
+value had the same type such as bit, 8-bit char, 32-bit integer, or float and
+the ravel was densely packed. Accessing a particular element V[n] of a value V
+was a fast constant time operation, which was internally performed very
 frequently. Many APL primitive functions (with the noteworthy exception of
 scalar functions) need to perform multiple computations of V[n] for one
 of their arguments V.</p></div>
@@ -1080,8 +1080,9 @@ Make the ravel elements virtual objects that all have the same size. That
   means instead of primitive functions working with pointers to ravel
   elements, the ravel elements would point to the functions that are
   appropriate for their type. On one hand, this approach wastes quite some
-  memory because the largest possible type (i.e. complex numbers) determines the size of all ravel cells including those that would fit in far fewer
-bytes. On the other hand, there are quite a few advantages:
+  memory because the largest possible type (i.e. complex numbers) determines
+  the size of all ravel cells including those that would fit in far fewer
+  bytes. On the other hand, there are quite a few advantages:
 </p>
 <div class="ulist"><ul>
 <li>
@@ -1125,11 +1126,10 @@ rational number arithmetic for floating point numbers
 </ul></div>
 </li>
 </ul></div>
-<div class="paragraph"><p>Since GNU APL was to be designed from scratch without having a  prior code base,
+<div class="paragraph"><p>Since GNU APL was to be designed from scratch without having a prior code base,
 the first option was ruled out almost immediately. The second option was
-briefly considered, but then ruled out as well because code size for the
-second option was expected to be significantly larger than for the third
-option.</p></div>
+briefly considered, but then ruled out as well because code size for the second
+option was expected to be significantly larger than for the third option.</p></div>
 </div>
 </div>
 </div>
@@ -1161,7 +1161,7 @@ the process could use was simply:</p></div>
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>This value was determined at the start-up of the interpreter (where the mallow()
+<div class="paragraph"><p>This value was determined at the start-up of the interpreter (where the malloc()
 pool was essentially empty) and the interpreter would keep track of the memory
 that it allocated after that, say <strong>memory-used</strong>. So printing ⎕WA at any time
 would essentially show <strong>initial-⎕WA - memory-used</strong>. And that was it.</p></div>
@@ -1186,7 +1186,7 @@ A direct consequence of virtual memory is that the size of it is no longer
   determined by the physical memory available in a computer, but by other
   properties like the number of bits in the virtual memory addresses. This
   makes it impossible to determine initial-⎕WA (more precisely: ⎕WA is no
-  longer a constant but becomes dependent of what happens not only in the APL
+  longer a constant but becomes dependent on what happens not only in the APL
   interpreter itself but also in other processes and/or in the kernel.
 </p>
 </li>
@@ -1240,7 +1240,7 @@ some other (unrelated) process may be killed by a memory request from GNU
 </li>
 <li>
 <p>
-GNU APL is killed by a memory request from itself.
+GNU APL is killed as a result of its own memory request.
 </p>
 </li>
 </ul></div>
@@ -1286,9 +1286,9 @@ a process running on that system.</p></div>
 <div class="paragraph"><p>Instead of disabling the OOM handler, one should use methods that prevent GNU
 APL from requesting too much memory, so that the OOM handler is not invoked
 in the first place (at least not from GNU APL). There are several ⎕SYL (aka.
-system limit) entries that can be set by an APL program in order to prevent
-GNU APL from requesting too much memory. Some of them have to be combined
-with others to achieve full protection.</p></div>
+system limit) entries that can be set by an APL program to prevent GNU APL
+from requesting too much memory. Some of them have to be combined with others
+to achieve full protection.</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1323,7 +1323,7 @@ Finally, ⎕SYL[31 32;] define a safety margin that is is explained below.
 </ul></div>
 <div class="paragraph"><p>In short, ⎕SYL[1;] protects primarily against too deep recursion, which is most
 likely caused by a programming fault. ⎕SYL[2;] protects against too many APL
-values, and ⎕SYL[2;] protects against too large APL values.</p></div>
+values, and ⎕SYL[3;] protects against APL values becoming too large.</p></div>
 <div class="paragraph"><p>Like WS FULL and other APL errors, hitting a system limit brings the
 interpreter back to immediate execution (interactive) mode. If one wants to
 handle the situation programmatically, one can catch the limit error with ⎕EA,
@@ -1352,10 +1352,10 @@ Cached:            54732 kB</code>
 <div class="paragraph"><p>In that case <strong>MemAvailable:</strong> is the value on which the system limits settings
 should be based. On older GNU/Linux machines <strong>MemAvailable:</strong> may not be
 displayed. In that case <strong>MemFree: + Cached:</strong> can be used as a workaround.</p></div>
-<div class="paragraph"><p>The actual implementation of <strong>MemAvailable:</strong> by the kernel is quite complex
+<div class="paragraph"><p>The actual implementation of <strong>MemAvailable:</strong> by the kernel is quite complicated
 (more than simply adding <strong>MemFree:</strong> and <strong>Cached:</strong>). For that reason, even if
-<strong>MemAvailable:</strong> were available on all GNU/Linux machines it would still
-be impossible to call it before each creation of an APL value.</p></div>
+<strong>MemAvailable:</strong> were available on all GNU/Linux machines it would still be
+impossible to call it before each creation of an APL value.</p></div>
 <div class="paragraph"><p>Instead, GNU APL uses the following simple algorithm:</p></div>
 <div class="ulist"><ul>
 <li>
@@ -1366,7 +1366,7 @@ After the interpreter has started, compute <strong>total_memory</strong> as foll
 <li>
 <p>
 If the process that runs the interpreter has a limit set on the amount of
-   its virtual memory, then the interpreter assumes that that amount of memory
+   its virtual memory, then the interpreter assumes that amount of memory
    will be available and sets <strong>total_memory</strong> to that limit. In this case
    <strong>/proc/meminfo</strong> is not used.
 </p>
@@ -1443,9 +1443,8 @@ apl</code>
 
 </pre>
 </div></div>
-<div class="paragraph"><p>The unis is kB, so that the command above will set the limit to 1 GB. The
-limit remains in force for all subsequent commands and can be removed like
-this:</p></div>
+<div class="paragraph"><p>The unit is kB, so that the command above will set the limit to 1 GB. The limit
+remains in force for all subsequent commands and can be removed like this:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre>
@@ -1456,8 +1455,8 @@ apl</code>
 </pre>
 </div></div>
 <div class="paragraph"><p><strong>Note:</strong> setting memory limits via <strong>ulimit</strong> as such does not directly solve the
-problem that a process may have when it reaches the limit. However, it
-helps a procxss in predicting when the limit will be reached.</p></div>
+problem that a process may have when it reaches the limit. However, it helps a
+process to predict when the limit will be reached.</p></div>
 </div>
 </div>
 <div class="sect2">
@@ -1485,7 +1484,7 @@ can obtain is somewhere below 3 GB.</p></div>
 
 </pre>
 </div></div>
-<div class="paragraph"><p>WS FULL can occur in very many places of the interpreter. To find the exact
+<div class="paragraph"><p>WS FULL can occur very many places within the interpreter. To find the exact
 position where a WS FULL was generated, some related logging facilities can be
 turned on:</p></div>
 <div class="listingblock">
@@ -1498,14 +1497,14 @@ turned on:</p></div>
 
 </pre>
 </div></div>
-<div class="paragraph"><p>On a 32-bit machine A WS FULL can be reliably produced like this (the example
+<div class="paragraph"><p>On a 32-bit machine a WS FULL can be reliably produced like this (the example
 was kindly provided by Christian Robert):</p></div>
 <div class="listingblock">
 <div class="content">
 <pre>
 
 <code>      N←5000000    ⍝ 32-bit; use a larger value for 64-bit
-      A←⊂'0123456789ABCDEF
+      A←⊂'0123456789ABCDEF'
       ↑↑ N ⍴ A      ⍝ trigger WS FULL</code>
 
 </pre>
@@ -1515,22 +1514,22 @@ it creates two different challenges for the kernel. One is a big allocation
 when the process is already near starvation and one is a small allocation
 that fails.</p></div>
 <div class="paragraph"><p>In both cases the WS FULL is caused by <strong>N ⍴ A</strong>. Because A is a scalar (due to
-⊂), all ravel elements of the result are nested values. Therefore  the
-computation of <strong>N ⍴ A</strong> creates exactly 1+N values: a big value for the result
-itself and N small nested values the ravel of the result.</p></div>
+⊂), all ravel elements of the result are nested values. Therefore the
+computation of <strong>N ⍴ A</strong> creates exactly 1+N values: a large value for the result
+itself and N small nested values - the ravel of the result.</p></div>
 <div class="paragraph"><p>Referring to Table 2, the variable <strong>A</strong> (and therefore each nested value of the
-result needs <strong>372 + 16*20 = 692</strong> bytes. The top-level of the result requires
-<strong>372 + N*20</strong> bytes. Let <strong>F</strong> be the amount of (free) memory that could be
+result needs <strong>372 + 16×20 = 692</strong> bytes. The top-level of the result requires
+<strong>372 + N×20</strong> bytes. Let <strong>F</strong> be the amount of (free) memory that could be
 obtained from malloc(). Then:</p></div>
 <div class="olist arabic"><ol class="arabic">
 <li>
 <p>
-if <strong>F &lt; 372 + N*20</strong> then the allocation of the top-level value fails,
+if <strong>F &lt; 372 + N×20</strong> then the allocation of the top-level value fails,
 </p>
 </li>
 <li>
 <p>
-else if <strong>F &lt; 372 + N*20 + N*692</strong> then the allocation of the top-level value
+else if <strong>F &lt; 372 + N×20 + N×692</strong> then the allocation of the top-level value
   succeeds, but the allocation of one of the nested sub-values fails,
 </p>
 </li>
@@ -1545,21 +1544,21 @@ amount of free memory at the point in time where the allocation failed:</p></div
 <div class="olist arabic"><ol class="arabic">
 <li>
 <p>
-if the first (big) allocation fails, then the free memory is still F,
+if the first (large) allocation fails, then the free memory is still F,
 </p>
 </li>
 <li>
 <p>
 if one of the subsequent (small) allocations fails then (since the previous
    allocations have succeeded) the free memory is now less than the requested
- size, regardless how large F was initially. In our example F would be less
-  than 692 bytes (in theory) or less than about 1024 (in practice because
+   size, regardless how large F was initially. In our example F would be less
+   than 692 bytes (in theory) or less than about 1024 (in practice because
    malloc allocates the next power of 2).
 </p>
 </li>
 </ol></div>
-<div class="paragraph"><p>Exception handling with only 1024 bytes left can fail as can be demonstrated on a
-32-bit machine quite easily. The following examples show both cases (with
+<div class="paragraph"><p>Exception handling with only 1024 bytes left can fail as can be demonstrated
+on a 32-bit machine quite easily. The following examples show both cases (with
 safety margin disabled in order to allow near-memory-starvation.</p></div>
 </div>
 <div class="sect3">
@@ -1607,7 +1606,7 @@ throwing WS FULL at PrimitiveFunction.cc:230
 0x8245B9A              Value::init_ravel()
 0x80FA35B               throw_apl_error(ErrorCode, char const*)
 ========================================
-WS FULL
+WS FULL+
       ↑↑N⍴A
         ^ ^
 Ravel allocation failed
@@ -1702,7 +1701,7 @@ Execution time: the second example uses noticeably more time before the WS
 The stack dumps differ. The pretty-printing of C++ function names requires
   extra memory, in example 2 that extra memory is not available so that
   backtrace_symbols() fails (and the interpreter then uses a function that
-needs less memory):
+  needs less memory):
 </p>
 </li>
 </ul></div>
@@ -1745,9 +1744,9 @@ The WS FULL is thrown from different locations. PrimitiveFunction.cc:230 is
 <div class="ulist"><ul>
 <li>
 <p>
-The )MORE information&#8217;s in the two examples differ.  The term <strong>Ravel
+The )MORE information in the two examples differ. The term <strong>Ravel
   allocation</strong> in the printout of example 1 refers to the allocation of the
-(big) top-level ravel.
+  (large) top-level ravel.
 </p>
 </li>
 </ul></div>
@@ -1764,14 +1763,14 @@ on bug-apl please consider the following.</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-It helps a lot if you can provide reliable way to reproduce the problem.
+It helps a lot if you can provide a reliable way to reproduce the problem.
   Most of the time for fixing an error is spent on reproducing it.
 </p>
 </li>
 <li>
 <p>
 Check that the problem cannot be fixed by setting memory limits. As explained
-  above there are some boundary conditions from the operating systems that
+  above there are some boundary conditions from the operating system that
   cannot be fixed (or even properly handled) by a process. Remember the
   existing tools for that:
 </p>
@@ -1783,7 +1782,7 @@ ulimit to protect processes from each other,
 </li>
 <li>
 <p>
-⎕SYL[1 2 3;2] to limit what the GNU APL interpreter may try allocate, and
+⎕SYL[1 2 3;2] to limit what the GNU APL interpreter may try to allocate, and
 </p>
 </li>
 <li>
@@ -1804,7 +1803,7 @@ ulimit to protect processes from each other,
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2022-03-23 13:47:49 CET
+ 2024-03-14 14:48:59 CET
 </div>
 </div>
 </body>

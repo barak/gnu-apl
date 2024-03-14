@@ -50,12 +50,11 @@ Copyright @copyright{} 2013 Free Software Foundation, Inc.
 @top GNU APL
 
 @today{}
-
 This manual briefly documents GNU APL, an interpreter for APL as described
 in ISO standard 13751, aka. "Programming Language APL, Extended".
 
 This manual for GNU APL can be distributed under the terms of the
- GNU Free Documentation License, *Note Chapter 6::.
+GNU Free Documentation License, *Note Chapter 6::.
 
 This manual does NOT describe APL itself; there exist a number of good books
 and texts about APL. We would like to refer the reader to the following:
@@ -128,8 +127,8 @@ Last things first: before explaining how to start APL, it is important to
       )OFF
 
 If APL is computing a function (and possibly caught in an endless loop),
-then you may have to press @b{^C} (this is called @i{ATTENTION} in APL) in
-order to return to APL's command mode and then give the @b{)OFF} command.
+then you may have to press @b{^C} (this is called @i{ATTENTION} in APL) to
+return to APL's command mode so that the @b{)OFF} command can be entered.
 In some circumstances it may be necessary to press @b{^C} twice within a
 short time interval (this is called @i{INTERRUPT} in APL).
 
@@ -146,7 +145,7 @@ GNU APL is script-able; a text file whose first line looks like this (assuming
 the APL interpreter binary is called 'apl' and is located in the current
 directory):
 
-#! apl 
+#! ./apl 
 
 or (if the APL interpreter binary is not in the current directory but in
 /mypath/apl):
@@ -269,7 +268,7 @@ show GNU APL license (GPL) and exit.
 @item
 @BOP{-LX expr}
 
-execute @b{expr} first. The workspaces behaves as if ⎕LX (latent
+execute @b{expr} first. The workspace behaves as if ⎕LX (latent
 expression) were set to @b{expr} in the workspace.  This can be used,
 for example, to start the same workspace with different start-up values.
 
@@ -545,7 +544,7 @@ started together with this interpreter time to initialize themselves.
 
 end of command line options for the interpreter. GNU APL provides the system
 variable ⎕ARG that returns all command line options with which the GNU APL
-interpreter was invoked (similar to variable argv in main(int argv,
+interpreter was invoked (similar to variable argv in main(int argc,
 char * argv[]) in C/C++). Option @BOP{-} can be used to separate command line
 options for the APL interpreter from command line options understood by APL
 applications.
@@ -884,7 +883,7 @@ app2
 
 Example 2: APL started indirectly
 
-A script is is a text file which as execute permissions. The first line
+A script is a text file which has execute permissions. The first line
 of a script, commonly known as the @b{shebang} of the script, has a
 special format which specifies how the subsequent lines of the script file
 shall be processed, see @b{man execve} for details.
@@ -955,7 +954,7 @@ and other executables) in the following order:
 CAUTION: as discussed in 'man 2 execve' the interpretation of the optional
 interpreter arguments (2. above) is system specific and possibly not portable.
 For that reason the optional interpreter argument should not be missing (you
-can use ---- to provide at least one argument) and also not more than one
+can use -- to provide at least one argument) and also not more than one
 argument. On GNU/Linux systems the following shebang lines of the script are
 understood:
 
@@ -1049,7 +1048,7 @@ then @b{all} environment variables of the process running GNU APL are
 returned.
 
 The result of ⎕ENV is a (possibly empty) N×2 matrix. The first column
-contains the the name(s) of the environment variable(s), while the second
+contains the name(s) of the environment variable(s), while the second
 column contains their value(s). The name and the value are both strings.
 
 The number N of environment variables returned by ⎕ENV obviously depends on
@@ -1128,8 +1127,8 @@ differ from single quoted strings in two ways:
 
 @itemize
 
-@item A standard single quoted APL is a vector if its length is ≠ 1 but a
-scalar if its length is = 1. This is sometimes inconvenient and therefore
+@item A standard single quoted APL string is a vector if its length ≠ 1 but
+a scalar if its length = 1. This is sometimes inconvenient and therefore
 double-quoted strings are more consistent in always being vectors regardless
 of their length. In other words, 'A' is a scalar while "A" is a vector.
 
@@ -1144,10 +1143,10 @@ for control character, such as \n for ASCII line feed, \t for ASCII TAB, etc.
 A substantial disadvantage of ⎕INP is that it only works in immediate
 execution mode (and consequently also in .apl scripts), but not the bodies of
 defined functions. Multi-line strings fill this gap for string literals that
-span several lines of text @b{inside} the body of a defined functions.
-Multi-Line Strings have become more and more advanced (and elegant) over time.
+span several lines of text @b{inside} the body of defined functions.
+Multi-Line strings have become more and more advanced (and elegant) over time.
 For this reason they currently come in different flavors (of which the older
-ones will disappear in the long run).
+ones will eventually disappear).
 
 @subsubsection Old-style Multi-Line Strings
 
@@ -1212,7 +1211,7 @@ For example:
 @end verbatim
 
 If the first string is empty then the nested value starts with an empty
-string, but completely empty lines in the defined function are being ignored:
+string, but completely empty lines in defined functions are ignored:
 
 @verbatim
 ∇Z←FOO
@@ -1288,7 +1287,7 @@ disappear at some point in time.
 
 @subsubsection « » Strings
 
-When new-style multi-line strings are used in scripts then the related error
+When new-style multi-line strings are used in scripts the related error
 reporting (if the syntax is used incorrectly) can become cumbersome. For
 example, if one forgets the closing """ of a multi-line string then the next
 """ (which was meant as the start of a new multi-line string) is mistaken as
@@ -1348,8 +1347,8 @@ set matchpairs+=«:»
 @subsection Automatic )MORE
 
 The GNU APL command )MORE provides, in some cases, additional information
-about a prior APL error. The availability of such additional information is
-indicated by a + at the end of the error message. The additional
+about a prior APL error. The availability of such additional information
+is indicated by a + at the end of the error message. The additional
 information is automatically discarded when the next non-empty line
 is entered. For example:
 
@@ -1799,9 +1798,9 @@ local scope.
 
 Please note that the above only describes the current implementation of named
 lambda in GNU APL. A consequence of that implementation is that the symbols
-⍺, ⍵, ⍶, ⍹, and λ are pretty much behaving like user defined variables. In
+⍺, ⍵, χ, ⍶, ⍹, and λ are pretty much behaving like user defined variables. In
 particular, they can be used outside named or unnamed lambdas. However, that
-may change in the future and therefore such use of ⍺, ⍵, ⍶, ⍹, and λ outside
+may change in the future and therefore such use of ⍺, ⍵, χ, ⍶, ⍹, and λ outside
 is certainly a bad idea.
 
 @subsection Unnamed Lambdas
@@ -1846,7 +1845,7 @@ between them.
 The starting point for browsing the documentation are the files:
 
 @smallexample
-/tmp/WSNAME/index.html         ⍝ for ]DOXY without arguments, resp.
+/tmp/WSNAME/index.html         ⍝ for ]DOXY without arguments, or
 dest/WSNAME/index.html         ⍝ for e.g. ]DOXY dest
 @end smallexample
 
@@ -1879,15 +1878,15 @@ For example:
 @end verbatim
 
 But please @b{note the following}: in the original @b{doxygen} program
-(for C, C++, or other languages) may source code lines be a mix of code
-and comments (including doxygen comments). In the @b{]DOXY command} of GNU
-APL a line of a defined function shall either be APL code or else a
-doxygen comment (i.e. start with ⍝⍝). Indentation with blanks is
+(for C, C++, or other languages) source code lines may be a mix of code
+and comments (including doxygen comments). In the @b{]DOXY} command of GNU
+APL a line of a defined function shall be either APL code or else a doxygen
+comment (i.e. starting with ⍝⍝). Doxygen comments indented with blanks are
 allowed (for the sake of readability).
 
 Since a doxygen comment is also a valid APL comment, it is perfectly legal
 to put a doxygen comment at the end of a line that starts with APL code.
-However, such lines will be ignored by the ]DOXY command.
+However, such lines will be ignored by the @b{]DOXY} command.
 
 The parser generates no extra code from the doxygen comments, and therefore
 the use of many doxygen comments causes no performance problem (and nor do
@@ -1931,8 +1930,8 @@ Command )COPY_ONCE copies all objects (variables, functions and operators)
 from some other workspace into the current workspace similar to )COPY.
 However, )COPY_ONCE does this only once; a second invocation of
 )COPY_ONCE with the same workspace (and the same library reference number)
-is silently being ignored. This speeds up the )COPYing of libraries that
-occur in several )DUMP-ed or )SAVE-ed workspaces.
+is silently ignored. This speeds up the )COPYing of libraries that occur
+in several )DUMP-ed or )SAVE-ed workspaces.
 
 @node    Section 2.10
 @section ]NEXTFILE and ]PUSHFILE Commands
@@ -1985,7 +1984,7 @@ key would expand file names) and history (the cursor up/down keys would recall
 previously entered lines).
 
 Since SVN 465 libreadline was removed and the standard TAB expansion and
-histoSection 2.12ry of libreadline were replaced by more context sensitive (i.e. APL
+history of libreadline were replaced by more context sensitive (i.e. APL
 aware) implementations:
 
 1. Instead of simply recalling the last line entered by the user, there are
@@ -2820,15 +2819,15 @@ Example 2 (complex over-determined B)
 Please note as well that QR factorization is currently experimental. So
 please double-check its results before using it in production code.
 
-@subsection The Impact of ⎕CR for ⌹
+@subsection The Impact of ⎕CT for ⌹
 
 Due to the lack of a better place we describe here how @b{⎕CT} is used
 in the various @b{⌹} functions.
 
 @subsubsection A⌹B and ⌹B
 
-The first step in the computation of @b{A⌹B} or @b{⌹B} is the estimation of
-the the number of linearly independent columns of @b{B}. If that number is
+The first step in the computation of @b{A⌹B} or @b{⌹B} is the estimation
+of the number of linearly independent columns of @b{B}. If that number is
 smaller than the total number of columns (IOW some columns of @b{B} are
 linearly dependent) then a @b{DOMAIN ERROR} is raised before the computation
 of @b{⌹B} starts. Although @b{B} may be over-determined (so it may have more
@@ -3679,7 +3678,7 @@ also nested) item in B, then the corresponding item in the result will be
 A[N;2] (which may or may not be nested). If a (nested or not nested) key A[N;1]
 is equal to an item in B, then the corresponding item in the result will be
 nested if A[N;2] is nested. If, for some N, the depths of A[N;1] and A[N;2]
-differ, then then depths of B and A ⎕MAP B may differ as well. That is, ⎕MAP
+differ, then depths of B and A ⎕MAP B may differ as well. That is, ⎕MAP
 conserves the shape of B, but not necessarily the depth of B.
 
 @item
@@ -3998,7 +3997,7 @@ ATT.format_X ← '%sT1%T2%T3'
 
 will name X-axis ticks @b{T1}, @b{T2}, and @b{T3}, regardless of the X
 coordinate. @b{static tick items} are the fallbacks for those cases where
-@b{dynamic tick items} can not produce the desired result. In other
+@b{dynamic tick items} cannot produce the desired result. In other
 words, @b{static tick items} must be constructed in APL beforehand.
 
 In contrast, @b{dynamic tick items} are computed from the value at the
@@ -4887,7 +4886,7 @@ system limit for the depth of the random value being produced. This can be
 prevented by setting a maximum depth for every value generated. ⎕RVAL sets
 the probability of the deepest allowed depth to 0.
 
-4 ⎕CR B expects B to be a positive integer which is deepest allowed depth;
+4 ⎕RVAL B expects B to be a positive integer which is deepest allowed depth;
 
 An empty B, e.g. 4 ⎕RVAL ⍬, will not change anything and can be used to
 query the current setting for 4 ⎕RVAL.
@@ -4961,17 +4960,17 @@ selects a sub-function of ⎕SQL.
 @verbatim
       ⎕SQL[0]''
 Available function numbers:
-type  ⎕SQL[ 1] file      - open a database file, return reference ID for it
-      ⎕SQL[ 2] ref       - close database
-query ⎕SQL[ 3,db] params - send SQL query
-query ⎕SQL[ 4,db] params - send SQL update
-      ⎕SQL[ 5] ref       - begin a transaction
-      ⎕SQL[ 6] ref       - commit current transaction
-      ⎕SQL[ 7] ref       - rollback current transaction
-      ⎕SQL[ 8] ref       - list tables
-ref   ⎕SQL[ 9] table     - list columns for table
-      ⎕SQL[10] type      - return the library version number
-      ⎕SQL[11] type      - return the library version string
+type  ⎕SQL[1] file      - open a database file, return reference ID for it
+      ⎕SQL[2] ref       - close database
+query ⎕SQL[3,db] params - send SQL query
+query ⎕SQL[4,db] params - send SQL update
+      ⎕SQL[5] ref       - begin a transaction
+      ⎕SQL[6] ref       - commit current transaction
+      ⎕SQL[7] ref       - rollback current transaction
+      ⎕SQL[8] ref       - list tables
+ref   ⎕SQL[9] table     - list columns for table
+      ⎕SQL[10] type     - return the library version number
+      ⎕SQL[11] type     - return the library version string
 @end verbatim
 
 @subsection ref ← A ⎕SQL[1] B : open database
@@ -5089,7 +5088,7 @@ given table. Currently, the column layout is as follows:
   Name
   Type
 
-More columns containing extra information may be added in a future
+More columns containing additional information may be added in a future
 release.
 
 

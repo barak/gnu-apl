@@ -751,10 +751,10 @@ a little easier by localizing the root cause of a problem.</p></div>
 <div class="paragraph"><p><strong>GNU APL</strong> is, in terms of source code size, a fairly large program. As of
 this writing the source code for the interpreter, not counting code in
 sub-directories, has more than 110,000 lines of code. Finding faults in
-a code of that size is not as trivial as finding faults in a short program
-of only a few thousand lines. Past experience shows, that after a new fault was
-observed, the time for reproducing and localizing the fault typically takes
-more than 90 % of the total time to fix it.</p></div>
+code of that quantity is not as trivial as finding faults in a short program
+of only a few thousand lines. Past experience shows, that after a new fault
+was observed, the time for reproducing and localizing the fault typically
+takes more than 90% of the total time to fix it.</p></div>
 <div class="paragraph"><p>For this reason, <strong>GNU APL</strong> comes with a handful of built-in trouble-shooting
 capabilities that makes locating a fault easier. Some of these capabilities
 require that <strong>GNU APL</strong> is built and run in a specific way as described in
@@ -791,7 +791,7 @@ root cause of the error.</p></div>
 <h2 id="_errors_in_user_programs_aka_apl_errors">Errors in User Programs (aka. APL errors),</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>Errors in user programs are reported by the APL intepreter when APL code
-is being executed. Before the interpreter starts it internal computation(s)
+is being executed. Before the interpreter starts its internal computation(s)
 it checks the arguments. These checks depend on the computation required
 and usually occur in the following order:</p></div>
 <div class="olist arabic"><ol class="arabic">
@@ -829,7 +829,7 @@ Domain Checks (may raise DOMAIN ERROR)
 <div class="paragraph"><p>That is, a VALUE error can normally only occur in the absence of SYNTAX
 and VALENCE ERRORs, a LENGTH ERROR can only occur in the absence of SYNTAX,
 VALENCE, AXIS, VALUE, and RANK ERRORs, and so on.</p></div>
-<div class="paragraph"><p>An APL error is displayed immediately and (provided that output colouring
+<div class="paragraph"><p>An APL error is displayed immediately and (provided that output coloring
 is enabled) in a different color than the APL output. The first line of the
 error display is the type of error, possibly followed by +. The +, if
 present, indicates that there is more information available about the error
@@ -848,12 +848,12 @@ illegal ; in axis</code>
 
 </pre>
 </div></div>
-<div class="paragraph"><p>APL errors shall, of course,  not be reported to the <strong>GNU APL</strong> maintainers,
+<div class="paragraph"><p>APL errors shall, of course, not be reported to the <strong>GNU APL</strong> maintainers,
 with the following exceptions:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-An error was raised incorrectly, i.e. for a valid APL input, or
+An error was raised incorrectly, i.e. for valid APL input, or
 </p>
 </li>
 <li>
@@ -871,7 +871,7 @@ the display of )MORE is misleading or could be improved. Many errors
 <div class="sect1">
 <h2 id="_incorrect_apl_results">Incorrect APL results</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>If <strong>GNU APL</strong> produces an incorrect result, then you should report in in an
+<div class="paragraph"><p>If <strong>GNU APL</strong> produces an incorrect result, then you should report it in an
 email to <a href="mailto:bug-apl@gnu.org">bug-apl@gnu.org</a>. People on that mailing list are gentle and helpful,
 so don&#8217;t be afraid to report an error.</p></div>
 <div class="paragraph"><p>However, please note the following: Even though APL as a language is
@@ -929,10 +929,10 @@ don&#8217;t be afraid to report the same error twice if you are not sure.</p></d
 <div class="sectionbody">
 <div class="paragraph"><p>An assertion is an expression in the source code that the programmer assumes
 to be <strong>true</strong> (aka. ≠ 0 in C/C++). It can be very hard to find the origin
-(root cause) of an error, in particular when many CPU instruction we performed
-between the root cause and error being detected.</p></div>
+(root cause) of an error, in particular when many CPU instructions were
+performed between the root cause and error being detected.</p></div>
 <div class="paragraph"><p>By making assertions all over place in the source code, the programmer
-introces checks along the execution path in order to reduce the number of
+introduces checks along the execution path in order to reduce the number of
 CPU instructions between a root cause and the point in time where it is
 being detected. In the C/C++ code, assertions are typically made in the
 following places:</p></div>
@@ -940,7 +940,7 @@ following places:</p></div>
 <li>
 <p>
 near the beginning of a function (also known as pre-condition) to check
-   the arguments passed to the function,
+  the arguments passed to the function,
 </p>
 </li>
 <li>
@@ -955,14 +955,14 @@ near the end of a function (post-condition) to check the result returned by
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>Assertions are implemented as one of C/C++ macros called Assert() and
-Assert1(). As of this writing there are more than 530 Assert() and more
-than 110 Assert1() macros spread across the <strong>GNU APL</strong> source code. The reason
-for having different Assert macros their impact on performance.</p></div>
+<div class="paragraph"><p>Assertions are implemented as one or the other of two C/C++ macros called
+Assert() and Assert1(). As of this writing there are more than 530 Assert()
+and more than 110 Assert1() macros spread across the <strong>GNU APL</strong> source code.
+The reason for having different Assert macros is their impact on performance.</p></div>
 <div class="paragraph"><p>Assert1() macros are intended to test more trivial conditions while Assert()
 macros test more complex conditions. Every test performed by a single Assert()
 or Assert1() macro has a (relatively mild) performance impact. However, the
-large number of Assert() macros cululates the total performance impact which
+large number of Assert() macros increases the total performance impact which
 may be undesirable. To deal with this, the user may <strong>./configure</strong> one of 3
 different assertion levels as follows (see also <strong>README-2-configure</strong>):</p></div>
 <div class="ulist"><ul>
@@ -974,8 +974,8 @@ different assertion levels as follows (see also <strong>README-2-configure</stro
 </li>
 <li>
 <p>
-<strong>ASSERT_LEVEL_WANTED = 1</strong> (the default): this disables the Assert1() macro and
-  enables and the Assert() macro.
+<strong>ASSERT_LEVEL_WANTED = 1</strong> (the default): this disables the Assert1() macro
+  and enables and the Assert() macro.
 </p>
 </li>
 <li>
@@ -987,8 +987,8 @@ different assertion levels as follows (see also <strong>README-2-configure</stro
 </ul></div>
 <div class="paragraph"><p>We kindly ask the user to:</p></div>
 <div class="paragraph"><p>make develop</p></div>
-<div class="paragraph"><p>which, beside other settings, does <strong>./configure</strong> with ASSERT_LEVEL_WANTED=2,
-this enabling both Assert macros and possibly making it easier to find the
+<div class="paragraph"><p>which, besides other settings, does <strong>./configure</strong> with ASSERT_LEVEL_WANTED=2,
+thus enabling both Assert macros and possibly making it easier to find the
 root cause of a fault.</p></div>
 <div class="paragraph"><p>As confidence with the source code increases over time, Assert() macros will
 eventually be converted to Assert1() macros while new code will initially
@@ -1054,11 +1054,11 @@ above, then it produces a stack trace like this:</p></div>
 
 </pre>
 </div></div>
-<div class="paragraph"><p>The C/C<code> stack above tell us which assertion has failed and where the
-assertion is located in the C/C</code> source code (i.e. file Quad_FIO.cc line 1085),
+<div class="paragraph"><p>The C/C++ stack above tells us which assertion has failed and where the
+assertion is located in the C/C++ source code (i.e. file Quad_FIO.cc line 1085),
 while the )SI stack tells us where that location is in the APL code.</p></div>
-<div class="paragraph"><p>This brings us brings us closer to the root cause of a problem. Unfortunately
-the hex addresses numbers on the left side of the C/C++ stack dump are process
+<div class="paragraph"><p>This brings us closer to the root cause of a problem. Unfortunately the hex
+addresses numbers on the left side of the C/C++ stack dump are process
 specific, i.e. the same <strong>⎕FIO ¯16</strong> will produce different numbers in a
 different process of the operating system.</p></div>
 </div>
@@ -1066,13 +1066,13 @@ different process of the operating system.</p></div>
 <h3 id="_line_numbers_in_stack_traces">Line numbers in Stack Traces</h3>
 <div class="paragraph"><p>If the functions on the right side of the C/C++ stack are relatively small (as
 most functions in the source code of <strong>GNU APL</strong> are) then we can usually find the
-exact source linei for each stack entry rather easilyi using the function name
+exact source line for each stack entry rather easily using the function name
 displayed. For larger functions, the same function may be called from different
 source code lines in the same function. This can be improved by converting the
 hex addresses on the left into source line numbers as exlained in the
 following.</p></div>
-<div class="paragraph"><p>First of all the C<code> compiler must be instructed to not discard line numbers.
-Older g</code> versions would always keep line numbers in the object files, but
+<div class="paragraph"><p>First of all the C++ compiler must be instructed to not discard line numbers.
+Older g++ versions would always keep line numbers in the object files, but
 newer versions do not. The trick is this:</p></div>
 <div class="listingblock">
 <div class="content">
@@ -1087,7 +1087,7 @@ compiler to use an older object format in which line numbers are not discarded.
 If your compiler does not accept <strong>-gdwarf-2</strong> then it probably uses it anyway.</p></div>
 <div class="paragraph"><p>The second step is to create a file named <strong>apl.lines</strong>. If <strong>GNU APL</strong> finds this
 file then it uses it to map hex addresses to line numbers. In the src
-directory, the make target <strong>apl.lines</strong> createst this file (which takes quite a
+directory, the make target <strong>apl.lines</strong> creates this file (which takes quite a
 while and is therefore not created in a standard build). <strong>make apl.lines</strong>
 essentially does:</p></div>
 <div class="listingblock">
@@ -1230,10 +1230,10 @@ OK      - no duplicate parents</code>
 <div class="paragraph"><p>If not, then there were inconsistencies (primarily memory leaks) that need to
 be fixed and should therefore be reported to <a href="mailto:bug-apl@gnu.org">bug-apl@gnu.org</a>. For example,
 a <strong>stale value</strong> is an APL value that has memory allocated but is not reachable
-any longer via either the symbol table of the interpreter (like an APL
-variable) or the body as a defined function (like an APL literal).</p></div>
+any longer via either the symbol table or the interpreter (like an APL
+variable) or the body of a defined function (like an APL literal).</p></div>
 <div class="paragraph"><p>If a )CHECK command fails, then it is important to remember, or better write
-down, which sequence of APL operation has lead to the state of the workspace.
+down, which sequence of APL operations has led to the state of the workspace.
 <strong>GNU APL</strong> has a command <strong>)HISTORY</strong> which displays the last lines entered.</p></div>
 <div class="paragraph"><p>An assertion checks the immediate state of the interpreter and can therefore
 not check the entire lifetime of an APL value or function. For this purpose,
@@ -1254,7 +1254,7 @@ conditions, the history of a value at fault is being displayed and helps the
 
 </pre>
 </div></div>
-<div class="paragraph"><p>and therefore needs recompilation of the interpreter.</p></div>
+<div class="paragraph"><p>and therefore requires recompilation of the interpreter.</p></div>
 </div>
 </div>
 <div class="sect1">
@@ -1273,7 +1273,7 @@ not create a core file. A core file is an important file if no other
 information is printed as to what kind of fault has occurred.</p></div>
 <div class="paragraph"><p>In the good old times core files were always produced when a binary executable
 crashed. These days the creation of core files may need to be enabled before
-the crashing binary is started. In GNU/Linux with its <strong>bash</strong> dhell that means:</p></div>
+the crashing binary is started. In GNU/Linux with its <strong>bash</strong> shell that means:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre>
@@ -1284,8 +1284,8 @@ the crashing binary is started. In GNU/Linux with its <strong>bash</strong> dhel
 </div></div>
 <div class="paragraph"><p>Instead of <strong>unlimited</strong> you may also use a different file size limit.</p></div>
 <div class="paragraph"><p>After a core file was produced (we always assume the interpreter was started
-in directory src below the top&#8212;level-directory) the you can start the
-debugger <strong>gdb</strong> in the src directory with the core file as second argument:</p></div>
+in directory src below the top&#8212;level-directory) you can start the debugger
+<strong>gdb</strong> in the src directory with the core file as its second argument:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre>
@@ -1295,7 +1295,7 @@ debugger <strong>gdb</strong> in the src directory with the core file as second 
 </pre>
 </div></div>
 <div class="paragraph"><p>After that, you can use the gdb command <strong>bt</strong> (for <em>backtrace</em>) to show a
-stack dump similar to the one discussed eralier. The <strong>GNU APL</strong> maintainer(s)
+stack dump similar to the one discussed earlier. The <strong>GNU APL</strong> maintainer(s)
 will appreciate a copy of that stack dump for problems that are difficult to
 reproduce.</p></div>
 <div class="paragraph"><p>Normally the file is named <em><strong>core</strong></em> and found in the same directory as the
@@ -1310,20 +1310,20 @@ core files. See also <strong>man 5 core</strong>.</p></div>
 <div class="paragraph"><p>The most difficult to fix errors are those that occur on one machine (usually
 your&#8217;s) and not on others.</p></div>
 <div class="paragraph"><p>The first thing to locate their root cause it to <strong>./configure</strong> with either no
-options or via <strong>make develop</strong> to see if the errors is related to specific
+options or via <strong>make develop</strong> to see if the error is related to specific
 <strong>./configure</strong> options.</p></div>
 <div class="paragraph"><p>Also, look for compiler warnings when <strong>GNU APL</strong> is built. In the default build,
 compiler warnings can be overlooked easiy. <strong>make develop</strong> turns most warnings
 into errors so you will see at the end if the build was successful.</p></div>
 <div class="sect2">
 <h3 id="_optimization">Optimization</h3>
-<div class="paragraph"><p>As of recently we have seen faults that may have been caused by an overly
-agressive optimization of the C++ code of the interpreter. These faults
-were observed for the same source code but only when compiled with newer
-versions of the same g+\+ compiler.</p></div>
+<div class="paragraph"><p>Recently we have seen faults that may have been caused by an overly aggressive
+optimization of the <strong>GNU APL</strong> C++ source code. These faults were observed for
+the same source code but only when compiled with newer versions of the
+same g++ compiler.</p></div>
 <div class="paragraph"><p>By default <strong>GNU APL</strong> compiles with optimization level -O2. If a fault is
-suspect to being caused by optimization, then it could make sense to also test
-the same source code of <strong>GNU APL</strong> without any optimization.</p></div>
+suspected to be caused by optimization, then it could make sense to also
+test the same source code of <strong>GNU APL</strong> without any optimization.</p></div>
 <div class="paragraph"><p>To do that:</p></div>
 <div class="listingblock">
 <div class="content">
@@ -1350,9 +1350,9 @@ gets easily lost. For that reason, each Log () macro belongs to one of
 currently over 45 Groups called <strong>logging facilities</strong>. Each logging facility
 can be turned ON or OFF which causes Log() macros belonging the facility
 to print or not to print its information.</p></div>
-<div class="paragraph"><p>The large (and increasing) number of logging facilities could the tests,
-whether Log() macro resp. its logging facility is ON or OFF, have a
-significant performance impacts. For this reason, <strong>GNU APL</strong> privides two
+<div class="paragraph"><p>The large (and increasing) number of logging facilities cause the tests,
+whether Log() macro or its respective logging facility is ON or OFF, to have
+significant performance impacts. For this reason, <strong>GNU APL</strong> provides two
 different methods to control how logging facilities are turned ON or OFF:</p></div>
 <div class="olist arabic"><ol class="arabic">
 <li>
@@ -1367,7 +1367,7 @@ dynamic logging
 </li>
 </ol></div>
 <div class="paragraph"><p>The method is selected via <strong>./configure</strong> at compile time (more precisely: at
-<strong>./configure</strong> time), see also README-, see also <strong>README-2-configure</strong>.</p></div>
+<strong>./configure</strong> time), see also <strong>README-2-configure</strong>.</p></div>
 <div class="sect2">
 <h3 id="_static_logging">Static Logging</h3>
 <div class="paragraph"><p>Static logging is used with:</p></div>
@@ -1381,7 +1381,7 @@ dynamic logging
 </div></div>
 <div class="paragraph"><p>Static logging is also the default, therefore <strong>DYNAMIC_LOG_WANTED=no</strong> is the
 same as not using DYNAMIC_LOG_WANTED= in <strong>./configure</strong>.</p></div>
-<div class="paragraph"><p>With Static logging, the selection which logging facility shalle be ON is
+<div class="paragraph"><p>With Static logging, the selection of which logging facility shall be ON is
 made by the first argument of the <strong>log_def()</strong> macros in file *src/Logging.def.
 A value of 0 means OFF while 1 means ON for the respective logging facility.</p></div>
 <div class="paragraph"><p>With static logging, the log_def() macro defines an <strong>enum</strong> value for each
@@ -1392,7 +1392,7 @@ also all tests for log_def(1, &#8230;) in all Log() macros. That is:</p></div>
 <li>
 <p>
 Advantage: Static Logging has little if any performance impacts (none
-   if all log_def macros are off, and
+  if all log_def macros are off, and
 </p>
 </li>
 <li>
@@ -1416,14 +1416,14 @@ Disadvantage: changes of log_def() macros require re-compilation of GNU
 </div></div>
 <div class="paragraph"><p>With dynamic logging, the log_def() macro defines the initial value of a
 variable (rather than an enum value) for each logging facility. After the
-interpreter was started, the value of each variable chan be changed from
+interpreter was started, the value of each variable can be changed from
 OFF to ON (and vice versa) with the <strong>GNU APL</strong> debug command <strong>]LOG</strong> (which
 toggles the state of the respective variable).</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-Disadvantage: Dynamic Logging has a small performance impacts (even
-   if all variables are set to OFF) which will cumulate for all Log() macros,
+Disadvantage: Dynamic Logging has a small performance impact (even
+  if all variables are set to OFF) which will accumulate for all Log() macros,
 </p>
 </li>
 <li>
@@ -1438,16 +1438,16 @@ Advantage: no re-compilation of <strong>GNU APL</strong> is required.
 start with ] instead of ). One of these debug commands is <strong>]LOG</strong> which
 controls the logging facilities.</p></div>
 <div class="paragraph"><p>If static logging was <strong>./configure</strong>'d then <strong>]LOG</strong> displays an error message
-because changing the logging facilities at runtime requires dynanic logging.</p></div>
+because changing the logging facilities at run-time requires dynamic logging.</p></div>
 <div class="listingblock">
 <div class="content">
 <pre>
 
 <code>      ]LOG
 
-Command ]LOG is not available, since dynamic logging was not
-configured for this APL interpreter. To enable dynamic logging (which
-will slightly decrease performance), recompile the interpreter as follows:
+Command ]LOG is not available, since dynamic logging was not configured
+for this APL interpreter. To enable dynamic logging (which will slightly
+decrease performance), recompile the interpreter as follows:
 
    ./configure DYNAMIC_LOG_WANTED=yes (... other configure options)
    make
@@ -1531,9 +1531,9 @@ the current state (i.e. ON or OFF) of all logging facilities:</p></div>
 </div>
 <div class="sect2">
 <h3 id="_logging_facilities_of_interest">Logging Facilities of Interest</h3>
-<div class="paragraph"><p>Many of the currently over 40 logging server a particular purpose for the
-maintainers or have become obsolete and are therefore not too useful for
-the trouble-shooting performed by the user. The others mentioned below.</p></div>
+<div class="paragraph"><p>Many of the currently over 40 logging facilities serve a particular purpose
+for the maintainers or have become obsolete and are therefore not too useful
+for the trouble-shooting performed by the user. The others mentioned below.</p></div>
 <div class="sect3">
 <h4 id="_log_2_new_and_delete_calls">]Log 2 : new and delete calls</h4>
 <div class="paragraph"><p>For tracking the allocation and de-allocation of memory.
@@ -1547,7 +1547,7 @@ code. These logging facilities add this information.</p></div>
 </div>
 <div class="sect3">
 <h4 id="_log_32_prefix_parser">]Log 32 Prefix Parser</h4>
-<div class="paragraph"><p>Parsing of APL commands and Expressions. To analyse SYNTAX ERRORs.</p></div>
+<div class="paragraph"><p>Parsing of APL commands and Expressions. To analyze SYNTAX ERRORs.</p></div>
 </div>
 <div class="sect3">
 <h4 id="_log_37_interpreter_startup">]Log 37 : Interpreter Startup</h4>
@@ -1585,10 +1585,10 @@ files are located and where the compile result will be stored.</p></div>
 setting breakpoints and printing data. However, the author prefers to modify
 the source code, in particular if more than one printout is needed to
 find a fault.</p></div>
-<div class="paragraph"><p>In order to simplify the source code for printouts, <strong>GNU APL</strong> has defined two
-powerful macros <strong>LOC</strong> and <strong>Q()</strong>. The <strong>Q()</strong> macro is used exclusively for
-intrusive troubleshooting while the LOC macro is also used for other purposes
-in the source code (with more than 1700 invocations as of this writing).
+<div class="paragraph"><p>To simplify the source code for printouts, <strong>GNU APL</strong> has defined two powerful
+macros <strong>LOC</strong> and <strong>Q()</strong>. The <strong>Q()</strong> macro is used exclusively for intrusive
+troubleshooting while the LOC macro is also used for other purposes in the
+source code (with more than 1700 invocations as of this writing).
 Understanding the LOC macro is therefore a prerequisite for understanding the
 <strong>GNU APL</strong> code.</p></div>
 <div class="sect2">
@@ -1596,7 +1596,7 @@ Understanding the LOC macro is therefore a prerequisite for understanding the
 <div class="paragraph"><p>The LOC macro is a short but somewhat tricky construction based on two
 other macros <strong>Loc</strong> and <strong>STR</strong>. The LOC macro takes no arguments and is
 therefore used without (), <strong>STR()</strong> takes one argument and <strong>Loc(x) takes
-two arguments.  All three macros *LOC</strong>, <strong>Loc()</strong>, and <strong>STR()</strong> are <strong>#defined</strong>
+two arguments. All three macros *LOC</strong>, <strong>Loc()</strong>, and <strong>STR()</strong> are <strong>#defined</strong>
 in file <strong>Common.hh</strong> which makes them available in practically every source
 file. The definitions are:</p></div>
 <div class="listingblock">
@@ -1647,7 +1647,7 @@ test.cc:12</code>
 which LOC was used, followed by a colon, followed by the line number in which
 LOC was used. String literals have the advantage that they are produced
 at compile time and can be passed as function arguments at almost no
-perfomance cost.</p></div>
+performance cost.</p></div>
 <div class="paragraph"><p>Now lets see how <strong>LOC</strong> works. Consider the first <strong>LOC</strong> on line <strong>10</strong> of
 file <strong>test.cc</strong>. Then:</p></div>
 <div class="olist arabic"><ol class="arabic">
@@ -1689,9 +1689,9 @@ the compiler combines the 3 adjacent string literals <strong>"test.cc"</strong>,
 </p>
 </li>
 </ol></div>
-<div class="paragraph"><p>This is quite some work for the compiler, but the result such that the runtime
-cost for <strong>GNU APL</strong> is only ther loading of the string literal when <strong>GNU APL</strong>
-starts.</p></div>
+<div class="paragraph"><p>This is quite some work for the compiler, but the result is such that the
+run-time cost for <strong>GNU APL</strong> is only the loading of the string literal when
+<strong>GNU APL</strong> starts.</p></div>
 </div>
 <div class="sect2">
 <h3 id="_the_q_macro">The Q Macro</h3>
@@ -1704,7 +1704,7 @@ starts.</p></div>
 
 </pre>
 </div></div>
-<div class="paragraph"><p>In this definition <strong>get_CERR()</strong> is a functions which returns an output channel
+<div class="paragraph"><p>In this definition <strong>get_CERR()</strong> is a function which returns an output channel
 such as <strong>std::cerr</strong> (or <strong>stderr</strong> in C). The operator &lt;&lt; is overloaded a lot
 and in such a way that commonly used data types in <strong>GNU APL</strong> are being printed
 nicely. A consequence of the overloading is that <strong>Q()</strong> macro can be used
@@ -1755,7 +1755,7 @@ LOC:                 'test.cc:17' at test.cc:17</code>
 when) a particular source code line of code is reached. To answer this
 question just insert <strong>Q(LOC)</strong> or <strong>Q(0)</strong> on the line of interest.</p></div>
 <div class="paragraph"><p>Another useful helper is <strong>subversion</strong> (svn). After having made multiple
-insertions of <strong>Q()</strong> macros in various sorce files (and hopefully having
+insertions of <strong>Q()</strong> macros in various source files (and hopefully having
 located the fault this way), simply do</p></div>
 <div class="listingblock">
 <div class="content">
@@ -1773,7 +1773,7 @@ located the fault this way), simply do</p></div>
 <h2 id="_keep_it_short_and_simple">Keep It Short and Simple</h2>
 <div class="sectionbody">
 <div class="paragraph"><p>The first thing to check before reporting an error is to make sure that you
-have compiled and installed the latest GNU APL version from subbversion (SVN)
+have compiled and installed the latest GNU APL version from subversion (SVN)
 or git.</p></div>
 <div class="paragraph"><p>From a maintainer&#8217;s perspective, the trouble reports that are appreciated the
 most are the short ones. Locating a fault usually requires multiple
@@ -1807,13 +1807,13 @@ how the workspace shall be started,
 </li>
 <li>
 <p>
-how the defined function in the workspace look like, how they interact,
+how the defined functions in the workspace appear, how they interact,
   and which ones are related to the fault,
 </p>
 </li>
 <li>
 <p>
-and so non.
+and so on.
 </p>
 </li>
 </ul></div>
@@ -1830,7 +1830,7 @@ reduced to a small number of APL lines.</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2023-04-28 19:51:16 CEST
+ 2024-03-14 14:48:59 CET
 </div>
 </div>
 </body>

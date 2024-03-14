@@ -4,7 +4,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
 <head>
 <meta http-equiv="Content-Type" content="application/xhtml+xml; charset=UTF-8" />
-<meta name="generator" content="AsciiDoc 8.6.10" />
+<meta name="generator" content="AsciiDoc 10.1.2" />
 <title>Parallel GNU APL</title>
 <style type="text/css">
 /* Shared CSS for AsciiDoc xhtml11 and html5 backends */
@@ -436,7 +436,7 @@ thead, p.table.header {
 p.table {
   margin-top: 0;
 }
-/* Because the table frame attribute is overriden by CSS in most browsers. */
+/* Because the table frame attribute is overridden by CSS in most browsers. */
 div.tableblock > table[frame="void"] {
   border-style: none;
 }
@@ -738,7 +738,6 @@ asciidoc.install(4);
 <span id="author">Jürgen Sauermann, GNU APL</span><br />
 <div id="toc">
   <div id="toctitle">Table of Contents</div>
-  <noscript><p><b>JavaScript must be enabled in your browser to display the table of contents.</b></p></noscript>
 </div>
 </div>
 <div id="content">
@@ -753,7 +752,7 @@ asciidoc.install(4);
 <div class="sectionbody">
 <div class="paragraph"><p>Parallel execution of APL primitives needs to be <strong>./configure</strong>'d explicitly.
 Without such configuration GNU APL executes sequentially. In freshly installed
-GNU APL sources (i.e. after a SVN checkout or after unpacking the GNU APL tar
+GNU APL sources (i.e. after an SVN checkout or after unpacking the GNU APL tar
 file), the configuration is:</p></div>
 <div class="listingblock">
 <div class="content">
@@ -769,7 +768,7 @@ file), the configuration is:</p></div>
 
 </pre>
 </div></div>
-<div class="paragraph"><p>If the sources were already ./configure&#8217;d then two make targets achieve
+<div class="paragraph"><p>If the sources were already <strong>./configure</strong>'d then two make targets achieve
 the same:</p></div>
 <div class="listingblock">
 <div class="content">
@@ -784,14 +783,14 @@ make parallel1</code>
 the second make target <strong>parallel1</strong> is like <strong>parallel</strong> but with internal
 performance counters enabled. The performance counters are needed for
 benchmarking of the GNU APL performance via <strong>FIO∆get_statistics</strong> in workspace
-<strong>5 FILE_IO</strong> resp. <strong>⎕FIO[201]</strong>.</p></div>
+<strong>5 FILE_IO</strong> and <strong>⎕FIO[201]</strong> respectively.</p></div>
 <div class="admonitionblock">
 <table><tr>
 <td class="icon">
 <img src="/usr/share/asciidoc/icons/caution.png" alt="Caution" />
 </td>
-<td class="content">Parallel execution is a fully experimental feature that should not
-be used in mission-critical applications. Support for bugs caused by
+<td class="content">Parallel execution is an entirely experimental feature that should
+not be used in mission-critical applications. Support for bugs caused by
 this feature is rather limited.</td>
 </tr></table>
 </div>
@@ -800,12 +799,12 @@ this feature is rather limited.</td>
 <div class="sect1">
 <h2 id="_controlling_the_core_count">Controlling the Core Count</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>The number of cores that are used by the parallel APL execution can be
+<div class="paragraph"><p>The number of cores that are used in parallel APL execution can be
 controlled in several ways.</p></div>
 <div class="sect2">
 <h3 id="_the_configure_option_core_count_wanted">The ./configure Option CORE_COUNT_WANTED</h3>
-<div class="paragraph"><p>The first way to control the (maximum) core count at the point time when the
-interpreter source code is being ./configure&#8217;d. The configure option
+<div class="paragraph"><p>The first way to control the (maximum) core count is at the point in time when
+the interpreter source code is being ./configure&#8217;d. The configure option
 CORE_COUNT_WANTED defines how the interpreter chooses the number of cores
 (see <strong>README-2-configure</strong>):</p></div>
 <div class="ulist"><ul>
@@ -863,14 +862,14 @@ that the desired number of cores actually exist (i.e. this is not checked
 because some platforms cannot do that).</td>
 </tr></table>
 </div>
-<div class="paragraph"><p><strong>CORE_COUNT_WANTED=-3</strong> is the most useful setting, because it allows to change
+<div class="paragraph"><p><strong>CORE_COUNT_WANTED=-3</strong> is the most useful setting, because it allows changing
 the core count at run-time of an APL program (e.g. in a benchmarking workspace
 like <strong>Scalar2.apl</strong>).</p></div>
 </div>
 <div class="sect2">
 <h3 id="_changing_the_core_count_at_run_time">Changing the Core Count at Run-time</h3>
 <div class="paragraph"><p>If <strong>CORE_COUNT_WANTED=-3</strong> (the default) then the system variable <strong>⎕SYL</strong>, in
-particular <strong>⎕SYL[25 26 27;]</strong> control the number of cores being used:</p></div>
+particular <strong>⎕SYL[24 25 26;]</strong> control the number of cores being used:</p></div>
 <div class="listingblock">
 <div class="content">
 <pre>
@@ -910,7 +909,7 @@ computational load over several cores.</td>
 </tr></table>
 </div>
 <div class="paragraph"><p>Setting <strong>⎕SYL[26;2]</strong> with a proper value in APL calls
-<strong>Parallel::set_core_count()</strong> in <strong>Parallel:cc</strong>.</p></div>
+<strong>Parallel::set_core_count()</strong> in <strong>Parallel.cc</strong>.</p></div>
 </div>
 </div>
 </div>
@@ -918,7 +917,7 @@ computational load over several cores.</td>
 <div class="sect1">
 <h2 id="_the_initialization_of_the_parallel_subsystem">The Initialization of the Parallel Subsystem</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>The parallel execution is initialized as follows.</p></div>
+<div class="paragraph"><p>Parallel execution is initialized as follows:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -930,15 +929,15 @@ the initialization is performed automatically when the interpreter is
 </li>
 <li>
 <p>
-<strong>Parallel::init()</strong> initializes semaphores related to the parallel execution
+<strong>Parallel::init()</strong> initializes semaphores related to parallel execution
   and then calls <strong>CPU_pool::init()</strong>. <strong>CPU_pool::init()</strong> determines, which CPUs
-   can be used by the interpreter and stores them in its vector <strong>the_CPUs</strong>.
-   If <strong>CORE_COUNT_WANTED</strong> is <strong>≥ 0</strong> or <strong>-2</strong> then the CPUs in the vector are
-   determined by <strong>CORE_COUNT_WANTED</strong> or by the <strong>-cc</strong> command line option (and
-   no checks are performed in order to check if the CPUs chosen are
-   correct). Otherwise, i.e.  (<strong>CORE_COUNT_WANTED</strong> is -1 or -3) the cores
-   available to the interpreter are determined by <strong>pthread_getaffinity_np()</strong>
-   and all CPUs that are available to the interpreter are stored in the vector.
+  can be used by the interpreter and stores them in its vector <strong>the_CPUs</strong>.
+  If <strong>CORE_COUNT_WANTED</strong> is <strong>≥ 0</strong> or <strong>-2</strong> then the CPUs in the vector are
+  determined by <strong>CORE_COUNT_WANTED</strong> or by the <strong>-cc</strong> command line option
+  (no checks are performed to verify that the CPUs chosen are correct).
+  Otherwise, i.e. (<strong>CORE_COUNT_WANTED</strong> is -1 or -3) the cores available to
+  the interpreter are determined by <strong>pthread_getaffinity_np()</strong> and all CPUs
+  that are available to the interpreter are stored in the vector.
 </p>
 </li>
 <li>
@@ -987,21 +986,21 @@ worker in state <strong>RUN</strong> is not necessarily computing, e.g. if the j
 empty and the worker is busy-waiting for more work.</p></div>
 <div class="paragraph"><p>When the interpreter (i.e. the master) needs to compute a primitive scalar
 function (or an inner or outer product of a primitive scalar function) with
-sufficiently large argument, then it unleashes the workers
+a sufficiently large argument, then it unleashes the workers
 (<strong>Thread_context::M_fork()</strong>), performs its own share of the work, and waits
 for all workers to complete their share of the work
 (<strong>Thread_context::M_join()</strong>).</p></div>
 <div class="paragraph"><p>At the same time, the workers wait for the master&#8217;s <strong>M_fork()</strong> in
 <strong>Thread_context::PF_fork()</strong>, perform their share of the work, indicate that
- their work is complete, and wait for all others to complete as well
+their work is complete, and wait for all others to complete as well
 (<strong>Thread_context::M_join()</strong>).</p></div>
 </div>
 </div>
 <div class="sect1">
 <h2 id="_the_operation_of_the_parallel_subsystem">The Operation of the Parallel Subsystem</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>After initialization, the parallel subsystem works (see <strong>Thread_context.cc/hh</strong>) as
-follows.</p></div>
+<div class="paragraph"><p>After initialization, the parallel subsystem works (see <strong>Thread_context.cc/hh</strong>)
+as follows.</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1012,7 +1011,7 @@ worker thread in state BLKD do nothing. This case can only occur with
 </li>
 <li>
 <p>
-every thread maintains a variable <strong>job_number</strong> which is initially 0 an both
+every thread maintains a variable <strong>job_number</strong> which is initially 0 for both
   the master and every worker:
 </p>
 </li>
@@ -1158,7 +1157,8 @@ the terms β<sub>seq</sub> and β<sub>par</sub> are the per-item times for the c
 <div class="paragraph"><p>Under ideal circumstances one even has</p></div>
 <div class="paragraph"><p>β<sub>par</sub> = β<sub>seq</sub> ÷ C,  or: β<sub>seq</sub> ÷ β<sub>par</sub> = C.</p></div>
 <div class="paragraph"><p>where C is the number of cores involved. The quotient <strong>β<sub>seq</sub> ÷ β<sub>par</sub></strong>  is
-commonly known as the <strong>speed-up</strong> of the parallel execution.  The difference ⍺<sub>par</sub> - ⍺<sub>seq</sub> is primarily caused by functions like M_fork(), PF_fork(),
+commonly known as the <strong>speed-up</strong> of the parallel execution. The difference
+⍺<sub>par</sub> - ⍺<sub>seq</sub> is primarily caused by functions like M_fork(), PF_fork(),
 M_join() and PF_join() above, but also by the overhead caused by the
 joblist mechanism that is required to efficiently parallelize scalar
 operation on nested APL values.</p></div>
@@ -1200,7 +1200,7 @@ ravels it is faster to compute in parallel.</p></div>
 </div>
 </div>
 <div class="paragraph"><p>As one can see, the intersection of the Y-axis (i.e. N=0) and the plot line
-T<sub>seq</sub>(N) resp. T<sub>par</sub>(N) is the start-up time time ⍺<sub>seq</sub> resp. ⍺<sub>par</sub>.
+T<sub>seq</sub>(N) and T<sub>par</sub>(N) is the start-up time ⍺<sub>seq</sub> and ⍺<sub>par</sub> respectively.
 The break-even length in this example is the intersection of the two plot
 lines at N=4.</p></div>
 </div>
@@ -1212,14 +1212,14 @@ between theory and practice, while in practice there is</em>.</p></div>
 some piece of assembler code, it was feasible (and was actually done) to
 compute the number of CPU cycles that the execution of that code would take.</p></div>
 <div class="paragraph"><p>Since then a number of optimizations, both in hardware and in software, have
-made it practically impossible to predict the execution time of a given code.
+made it practically impossible to predict the execution time of any given code.
 Even worse, these days the same code, executed again and again, typically
 results in rather different cycle counts for each execution pass. Even if
 "no" other processes execute on the same CPU on which a benchmark measurement
 is performed (where "no other process" means not counting the typically 250 or
 so operating system processes that are sitting idle on the CPU) the results
 can differ substantially between different measurements of the same code.</p></div>
-<div class="paragraph"><p>As to the practice, lets discuss the results of a benchmark:</p></div>
+<div class="paragraph"><p>So in practice, lets discuss the results of a benchmark:</p></div>
 <div class="imageblock">
 <div class="content">
 <img src="./APL3.png" alt="APL3" />
@@ -1238,12 +1238,12 @@ measurement points).</p></div>
 <img src="./APL4.png" alt="APL4" />
 </div>
 </div>
-<div class="paragraph"><p>This one went less well. One difference to the previous one is that the
+<div class="paragraph"><p>This one went less well. One difference from the previous one is that the
 deviations of the measurement points are considerably larger than in the
 previous run. If one runs the benchmark many times, then it looks like the
 deviations in the sequential execution are larger than in the parallel
 execution. More importantly, the sequential start-up time ⍺<sub>seq</sub> is now
-larger that the parallel start-up time ⍺<sub>par</sub>.</p></div>
+larger than the parallel start-up time ⍺<sub>par</sub>.</p></div>
 <div class="paragraph"><p>These two examples are only meant to highlight some the problems that may occur
 if one tries to determine the parameters ⍺ and β. The following is a summary
 of findings after having performed many such measurements with GNU APL and
@@ -1251,8 +1251,8 @@ different core counts, vector lengths, and primitive functions:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
-every measurement needs to be visualized (plotted) in order to rule out too
-  many or too large outliers.
+every measurement needs to be visualized (plotted) to rule out too many
+  or too large outliers.
 </p>
 </li>
 <li>
@@ -1278,7 +1278,7 @@ scalar functions with a low β (like A+B) tend to give more obscure results
 <li>
 <p>
 The speed-up of additional virtual cores (compared to physical ones) seems
-  to be rather low. That is, for example, the speedup of 12 virtual cores (on
+  to be rather low. That is, for example, the speed-up of 12 virtual cores (on
   a hyper-threaded CPU with 6 physical cores) is only marginally higher than on
   6 physical cores. GNU APL addresses this fact by distributing the load over
   the physical cores before placing hyper-threads on the physical cores.
@@ -1296,7 +1296,7 @@ cycle counter and an instruction to read it (currently only Intel CPUs can use
 this feature). The cycle counter of the CPU is read before and after the
 computation of a scalar function, and the difference can be read in APL via
 <strong>⎕FIO[200]</strong> and <strong>⎕FIO[201]</strong>. Measuring execution times this way is far more
-precise than old-fashioned measurements using ⎕TS at APL level.</p></div>
+precise than old-fashioned measurements using ⎕TS at the APL level.</p></div>
 <div class="paragraph"><p>Scalar2.apl is most conveniently called from the command line, and what is
 being measured can be controlled via command line arguments. For example
 (from the top-level directory of GNU APL):</p></div>
@@ -1383,8 +1383,8 @@ Core #4 computes: 4 + 4              (1 addition)</code>
 
 </pre>
 </div></div>
-<div class="paragraph"><p>Therefore cores #1 and #4 computes one sum, core #2 computes 3 sums, and
-core #3 compute 1000 sums. This is obviously not optimal since cores #1, #2,
+<div class="paragraph"><p>Therefore cores #1 and #4 compute one sum, core #2 computes 3 sums, and
+core #3 computes 1000 sums. This is obviously not optimal since cores #1, #2,
 and #3 are most of the time idle, waiting for core #3 to finish.</p></div>
 <div class="paragraph"><p>To avoid this case, GNU APL parallelizes scalar functions recursively with the
 following algorithm.</p></div>
@@ -1397,8 +1397,8 @@ the interpreter starts with an empty joblist.
 <li>
 <p>
 when the interpreter evaluates a scalar function, then it puts a new job
-   into the joblist  The job describes the relevant parameters (essentially
-   the  scalar function to be computed and the address(es) of its argument(s).
+  into the joblist. The job describes the relevant parameters (essentially
+  the scalar function to be computed and the address(es) of its argument(s).
 </p>
 </li>
 <li>
@@ -1447,8 +1447,8 @@ inner and outer products of them).</p></div>
 <div class="sect1">
 <h2 id="_setting_thresholds">Setting Thresholds</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>One purpose of the benchmarking is to find the break-even lengths for
-scalar functions. After that length was found, one can inform the APL
+<div class="paragraph"><p>One purpose of benchmarking is to find the break-even lengths for
+scalar functions. After that length is found, one can inform the APL
 interpreter about the break-even lengths. This is done via a configuration
 file, normally <strong>/usr/local/etc/gnu-apl.d/parallel_thresholds</strong>.</p></div>
 <div class="paragraph"><p>This file is installed by <em>make install</em>, but the values in the file
@@ -1471,7 +1471,7 @@ never happen for monadic +.</p></div>
 rank) with fewer than 12 ravel items will be computed sequentially, but longer
 arrays in parallel.</p></div>
 <div class="paragraph"><p>The third line sets the break-even point of <strong>dyadic ×</strong> to 33. Arrays (of any
-rank) with fewer than 33 ravel items will be computed sequentially, nut longer
+rank) with fewer than 33 ravel items will be computed sequentially, but longer
 arrays in parallel.</p></div>
 <div class="paragraph"><p>In general, the fewer cycles a function needs, the higher should the threshold
 be set.</p></div>
@@ -1480,7 +1480,7 @@ be set.</p></div>
 <div class="sect1">
 <h2 id="_the_optimal_vs_the_maximal_core_count">The Optimal vs. the Maximal Core Count</h2>
 <div class="sectionbody">
-<div class="paragraph"><p>The last plot window shown by the <strong>Scalar2</strong> workspace summarizes the speedups
+<div class="paragraph"><p>The last plot window shown by the <strong>Scalar2</strong> workspace summarizes the speed-ups
 that were achieved for the different core counts that were selected with the
 -c option.</p></div>
 <div class="imageblock">
@@ -1500,7 +1500,7 @@ usually smart enough to locate an unused core for its own purposes, but that
 must fail if all cores are fully loaded with APL work.</td>
 </tr></table>
 </div>
-<div class="paragraph"><p>The speedups plotted in the last window are usually reasonable if:</p></div>
+<div class="paragraph"><p>The speed-ups plotted in the last window are usually reasonable if:</p></div>
 <div class="ulist"><ul>
 <li>
 <p>
@@ -1510,11 +1510,11 @@ the APL function that is being bench-marked (as selected by the -f option)
 </li>
 <li>
 <p>
-the vector lengths (-d option) is not too short.
+the vector lengths (-d option) are not too short.
 </p>
 </li>
 </ul></div>
-<div class="paragraph"><p>The measurement show above was executed on a 6-core i7-8700 CPU. The CPU has
+<div class="paragraph"><p>The measurement shown above was executed on a 6-core i7-8700 CPU. The CPU has
 6 (physical) cores with 12 (logical) core threads where the 12 core threads
 are mapped to 12 "CPUs" in the operating system as (per <strong>/proc/cpuinfo</strong>).</p></div>
 <div class="paragraph"><p>The benchmark command used was:</p></div>
@@ -1530,8 +1530,8 @@ are mapped to 12 "CPUs" in the operating system as (per <strong>/proc/cpuinfo</s
 <div class="ulist"><ul>
 <li>
 <p>
-<strong>-f 39</strong> : selects <strong>Z←¯6○B</strong> aka. <strong>arccosh(B)</strong> as benchmarking function with
-  a mix of Integer, Real, and Complex numbers,
+<strong>-f 39</strong> : selects <strong>Z←¯6○B</strong> aka. <strong>arccosh(B)</strong> as the benchmarking function
+  with a mix of Integer, Real, and Complex numbers,
 </p>
 </li>
 <li>
@@ -1549,7 +1549,7 @@ are mapped to 12 "CPUs" in the operating system as (per <strong>/proc/cpuinfo</s
 amounted to a total of 220 (= 11×20) individual measurements in the benchmark
 plotted above.</p></div>
 <div class="paragraph"><p>Had we run the benchmark with <strong>-c ⍳12</strong> instead of <strong>-c ⍳11</strong> then the
-measurement with 12 cores would have shown a rather bad speedup (try it
+measurement with 12 cores would have shown a rather bad speed-up (try it
 yourself with <strong>-c</strong> set to the number of cores on your computer).</p></div>
 <div class="paragraph"><p><strong>Corollary:</strong> the optimal performance is achieved when the number of cores used
 for parallel APL is slightly smaller than the number of cores available. The
@@ -1563,7 +1563,7 @@ perform the APL work.</p></div>
 <div id="footer">
 <div id="footer-text">
 Last updated
- 2022-06-20 19:55:57 CEST
+ 2024-03-14 14:48:59 CET
 </div>
 </div>
 </body>

@@ -8,37 +8,36 @@ control other programs or to be controlled by other programs. With these
 communication mechanisms one can construct larger systems in which GNU APL
 is only one component. This document gives an overview of the communication
 mechanisms, so that the reader can choose the most appropriate mechanisms
-for a given problem.
+for a given application.
 
 == Terminology
 
-A *server* is a program or process that is being controlled by one or more
-other programs or processes. A *client* is a program or process that controls
+A *server* is a program or process that is controlled by one or more other
+programs or processes. A *client* is a program or process that controls
 another program or process. A *peer* is a program or process that communicates
 with GNU APL, but is not a client or a server with respect to that
-communication. In a client/server communication, it is the client that
+communication. In client/server communication, it is the client that
 establishes the communication link between the two partners.
 
 In general the communication between a client and a server is somewhat simpler
 than the communication between two peers. The role of one communication
 partner dictates the role of the other:
 
-
 .Communication Roles
 [options="header"]
 [width="60%"]
 |===============
 | GNU APL | Partner 
-|Client |Server 
-|Server |Client 
-|Peer   |Peer 
+| Client  | Server 
+| Server  | Client 
+| Peer    | Peer 
 |===============
 
 If GNU APL is the client or a peer in a communication then the communication
 partner usually needs to exist before GNU APL can connect to the partner.
-Some partners are being started beforehand by the operating system (Web
-servers, SQL servers), some are started automatically by GNU APL (*APserver(
-for shared variables) and some may need to be started by other means before
+Some partners are started beforehand by the operating system (Web servers,
+SQL servers), some are started automatically by GNU APL (*APserver()* for
+shared variables) and some may need to be started by other means before
 a GNU APL program can use them.
 
 == GNU APL Communication Mechanisms Overview
@@ -48,9 +47,9 @@ implemented in GNU APL. Most communication mechanisms are accessed from an APL
 program via system variables. Some system variables need certain libraries and
 if these libraries are not present at the time when GNU APL was
 *./configure'd*, then these system variables will not exist
-(raising a SYNTAX ERROR) or raise a DOMAIN ERROR. The fact that GNU APL is
+(causing a SYNTAX ERROR) or raise a DOMAIN ERROR. The fact that GNU APL is
 in one role, for example as server, does not preclude it from being a client
-in a different communication.
+in a different communication context.
 
 .GNU APL Communication Mechanisms
 [cols="^10,^3,^6,^3,^10",options="header"]
@@ -122,7 +121,7 @@ Role
 how long it takes to get a communication mechanism up and running (APL code
 plus possibly code needed for the communication partner).
 
-== GNU APL Communication Mechanisms Details
+== GNU APL Communication Mechanism Details
 
 In the following, the different communication mechanisms are described in
 some more detail.
@@ -138,7 +137,7 @@ If GNU APL is *./configure'd* with option *--with-libapl*, then GNU APL does not
 build a normal executable that can be started from a script or from a shell,
 but it builds a library *libapl*. That library can then be linked with another
 program that either implements its own *REPL* loop (thus providing some
-interactive mode, but with a different user interface), or only call GNU APL
+interactive mode, but with a different user interface), or only calls GNU APL
 facilities from time to time.
 
 The following is an example C program that demonstrates the use of libapl:
@@ -162,7 +161,7 @@ GNU APL), the following command should create an executable file test_libapl:
 gcc test_libapl.c -L /usr/local/lib/apl -lapl -o test_libapl
 ----
 
-And running the newly created *test_libapl* gives what could be expected:
+And running the newly created *test_libapl* produces what would be expected:
 
 ----
 $ ./test_libapl
@@ -201,19 +200,19 @@ Shared variables come in 2 varieties:
 Those interested in the style of shared variables programming may have a
 look at test cases *AP100.tc* for AP100, *AP210.tc* for AP210, and *APnnn.tc*
 for workspace-to-workspace shared variables in the directory
-*src/test cases/* of GNU APL.
+*src/testcases/* of GNU APL.
 
 The GNU APL implementation of shared variables is a separate process running
 the program *APserver* (which comes with GNU APL). APserver currently
 implements only AP100 and AP210, but the source code of APserver is open, so
 that a user can add more APs. Is seems, however, that most of the APs that
 were not implemented have been superseded by more modern interfaces (most
-of which are sub-functions of ⎕FIO) that are easier to use that shared
+of which are sub-functions of ⎕FIO) that are easier to use than shared
 variables.
 
-For workspace-to-workspace shared variables, the APserver stores
-the shared variables themselves, so that no data is lost if one of the
-connected workspaces exits or *⎕SVR*s a shared variable. APserver also maps the
+For workspace-to-workspace shared variables, the APserver stores the shared
+variables themselves, so that no data is lost if one of the connected
+workspaces exits or *⎕SVR*s a shared variable. APserver also maps the
 peer-to-peer connection between two workspaces onto two client/server
 connections from each workspace (as clients) to APserver (as server). APserver
 is started automatically when an APL workspace uses shared variables for the
@@ -243,7 +242,7 @@ query ⎕SQL[4,db] params - send SQL update
 ref   ⎕SQL[9] table     - list columns for table
 ----
 
-More details on *⎕SQL* can be found in *info apl* (around Section 3.24).
+More details on *⎕SQL* can be found in *info apl* (around Section 2.36).
 
 
 === Server forked by GNU APL
@@ -253,16 +252,16 @@ More details on *⎕SQL* can be found in *info apl* (around Section 3.24).
 and connected to GNU APL over a bidirectional pipe.
 
 The return value *Handle* of *⎕FIO[57] Bs* is a file handle that can be used
-on the APL side of the communication to send data to resp. receive data from
-the spawned program using, for example, *⎕FIO[6] Handle* (aka *fread*) resp.
-*⎕FIO[8] Handle* (aka. *fwrite*). The handle is normally closed with *⎕FIO[4]
-Handle* (aka. *fclose*).
+on the APL side of the communication to send data to or receive data from the
+spawned program using, for example, *⎕FIO[7] Handle* (aka *fwrite*) or
+*⎕FIO[6] Handle* (aka. *fread*) respectively. The handle is normally closed
+with *⎕FIO[4] Handle* (aka. *fclose*).
 
 At the spawned program's end of the communication, the communication with
 GNU APL uses file descriptor 3 which is normally only used to *fdopen()* a
 FILE \*. An *fclose* from the APL side causes an EOF condition (*fread()*
-returns 0) in the spawned program. Under normal circumstances, the communication
-should be closed from the client (= APL) side.
+returns 0) in the spawned program. Under normal circumstances, the
+communication should be closed from the client (= APL) side.
 
 The following is a simple example for a server written in "C", and GNU APL code
 that forks the server and then sends a TLV (Tag-Length-Value) buffer to the
@@ -272,19 +271,18 @@ value bytes mirrored.
 Client side (APL):
 
 ----
-      Path ← '/usr/lib/apl/TLV_server'    ⍝ wherever TLV_server was installed
-      Handle ← ⎕FIO[57] Path              ⍝ start & connect TLV_server
+      Path ← '/usr/lib/apl/TLV_server'   ⍝ or wherever TLV_server was installed
+      Handle ← ⎕FIO[57] Path             ⍝ start & connect TLV_server
 
       ⍝ typically in a loop,,,
-      TLV ← 33 ⎕CR 42,'Forty-Two'         ⍝ encode a TLV buffer
-      ⊣TLV ⎕FIO[43] Handle                ⍝ send TLV buffer to TLV_server
-      TL ← 8 ⎕FIO[6] Handle               ⍝ read tag/length from TLV_server
-      Value ← (256⊥4↓TL) ⎕FIO[6] Handle   ⍝ read value  from TLV_server
-      34 ⎕CR TL,Value                     ⍝ display response tag and value
+      TLV ← 33 ⎕CR 42,'Forty-Two'        ⍝ encode a TLV buffer
+      ⊣ TLV ⎕FIO[43] Handle              ⍝ send TLV buffer to TLV_server
+      TL ← 8 ⎕FIO[6] Handle              ⍝ read tag/length from TLV_server
+      Value ← (256⊥4↓TL) ⎕FIO[6] Handle  ⍝ read value from TLV_server
+      34 ⎕CR TL,Value                    ⍝ display response tag and value
 
       ⍝ cleanup (one time)
-      ⊣(⎕FIO[4] Handle)                   ⍝ close connection (stops
-TLV_server)
+      ⊣ ⎕FIO[4] Handle                   ⍝ close connection (stops TLV_server)
 
 ----
 
@@ -315,7 +313,7 @@ FILE * f = fdopen(TLV_socket, "r");
 "That typically happens if this program is started directly,\n"
 "more precisely: without opening file descriptor 3 first. The anticipated\n"
 "usage is to open this program from GNU APL using ⎕FIO[57] and then to send\n"
-"TLV buffers encoded with 33 ⎕CR and send to this program with ⎕FIO[43]\n"
+"TLV buffers encoded with 33 ⎕CR sent to this program with ⎕FIO[43]\n"
         , strerror(errno));
         return 1;
       }
@@ -327,7 +325,7 @@ FILE * f = fdopen(TLV_socket, "r");
           rx_len = fread(TLV, 1, 8, f);
           if (rx_len != 8)
              {
-               fprintf(stderr, "TLV socked closed (1): %s\n",
+               fprintf(stderr, "TLV socket closed (1): %s\n",
                        strerror(errno));
                fclose(f);
                return 0;
@@ -342,7 +340,7 @@ FILE * f = fdopen(TLV_socket, "r");
                rx_len = fread(V, 1, TLV_len, f);
                if (rx_len != TLV_len)
                   {
-                    fprintf(stderr, "TLV socked closed (2): %s\n",
+                    fprintf(stderr, "TLV socket closed (2): %s\n",
                             strerror(errno));
                     fclose(f);
                     return 0;
@@ -353,9 +351,9 @@ FILE * f = fdopen(TLV_socket, "r");
           // negate the tag
           //
           TLV_tag = -TLV_tag;
-          TLV[0] = TLV_tag >>  24;
-          TLV[1] = TLV_tag >>  16;
-          TLV[2] = TLV_tag >>   8;
+          TLV[0] = TLV_tag >> 24;
+          TLV[1] = TLV_tag >> 16;
+          TLV[2] = TLV_tag >>  8;
           TLV[3] = TLV_tag;
 
           // mirror the value
@@ -372,7 +370,7 @@ FILE * f = fdopen(TLV_socket, "r");
           tx_len = write(TLV_socket, TLV, 8 + TLV_len);
           if (tx_len != (8 + TLV_len))
              {
-               fprintf(stderr, "TLV socked closed (3): %s\n", strerror(errno));
+               fprintf(stderr, "TLV socket closed (3): %s\n", strerror(errno));
                fclose(f);
                return 0;
              }
@@ -390,7 +388,7 @@ above, but with the following differences:
   - either to stdin (file descriptor 0) of the spawned process,
   - or to stdout (file descriptor 1) of the spawned process
 * the pipe is closed with *⎕FIO[24] Handle* (aka. *pclose*) instead of
-  *pclose*.
+  *fclose*.
 
 The following APL code executes the operating system command ls and prints
 its output:
@@ -407,30 +405,30 @@ its output:
 === Sockets
 The *⎕FIO* functions 32...47, i.e. *⎕FIO[32]*, *⎕FIO[33]*, ... *⎕FIO[47]*
 give APL access to the most common socket functions in libstdc. APL can use
-these function to set up sockets in a way that specific low-level properties
+these functions to set up sockets in a way that specific low-level properties
 can be set via socket options, transport protocol options, and the like.
 The use of these functions requires some experience with socket programming.
 
-*info apl* (around section 3.20) provides some more details about ⎕FIO. One
-can do ⎕FIO "" to obtain a list of ⎕FIO sub-function, in particular the names
-of the corresponding functions in the libstdc library.
+*info apl* (around section 2.26) provides some more details about ⎕FIO. One
+can invoke ⎕FIO "" to obtain a list of ⎕FIO sub-functions, in particular the
+names of the corresponding functions in the libstdc library.
 
-That function name can then used with *man* command which explains the
+The function names can then be used with the *man* command which documents the
 expected function arguments. By and large ⎕FIO takes the same arguments as
 the corresponding libc functions, but some of the function arguments (in
-particular those taking pointer arguments) were mapped to APL byte arrays.
+particular those taking pointer arguments) are mapped to APL byte arrays.
 
-The test case file *src/test cases/Quad_FIO.tc* contains APL code for a short
+The test case file *src/testcases/Quad_FIO.tc* contains APL code for a short
 client/server communication between two TCP sockets on Port 22222 (around
 line 170 of the test case file).
 
 === Native functions
 
 If the capabilities provided by sockets are still not enough, then one
-can get complete control by means of GNU APL native function. A native
+can get complete control by means of GNU APL native functions. A native
 function is a function that can be called from APL (and returns results back
 to APL, but has an implementation in a different language (typically C or
-C++).
+Cpp).
 
 Writing native functions is a little more complicated than using communication
 facilities already present in APL like the mechanisms explained so far. The
@@ -441,8 +439,8 @@ for those function signatures that the native function shall support. For
 example, suppose a function FOO shall support the 3 signatures
 
  - dyadic function call, i.e. *Z←A FOO B*, 
- - monadic function call, i.e.  *Z←FOO B*, and
- - monadic function with axis call, i.e.  *Z←FOO[X] B*.
+ - monadic function call, i.e. *Z←FOO B*, and
+ - monadic function with axis call, i.e. *Z←FOO[X] B*.
 
 The native function library then needs to implement 3 functions and make them
 accessible via *dlsym()*.
@@ -458,15 +456,14 @@ That makes the 3 signatures implemented *FOO.so* available in APL (for the
 same signatures). 
 
 *Note:* Native functions were not primarily intended for communication purposes.
-But since they import the full power of C/C++ into GNU APL they are a last
+But since they import the full power of C/Cpp into GNU APL they are a last
 resort if all methods above cannot be used.
 
-The directory *src/native* contains C++ code templates for different APL
+The directory *src/native* contains Cpp code templates for different APL
 function signatures. You can use these templates as a starting point for your
-own native function(s). If you modify a template in-place (i.e.
-you do NOT copy and rename it) then the GNU APL build system will compile
-your changes and create .so files in directory *src/native/.libs* that can
-be ⎕FXed later on.
+own native function(s). If you modify a template in-place (i.e. you do NOT copy
+and rename it) then the GNU APL build system will compile your changes and
+create .so files in directory *src/native/.libs* that can be **⎕FX**ed later on.
 
 
 == Communication over streams
@@ -517,7 +514,7 @@ requires the length field, but the tag is often required to distinguish
 different data types sent over the same stream.
 
 System function *33 ⎕CR* converts *TAG,byte-vector* to a TLV (sender side)
-while its inverse function *¯33 ⎕CR*  converts a TLV back to
+while its inverse function *¯33 ⎕CR* (or *34 ⎕CR*) converts a TLV back to
 *TAG,byte-vector*. Example:
 
 ----
