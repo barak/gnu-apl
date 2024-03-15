@@ -3,7 +3,7 @@
     This file is part of GNU APL, a free implementation of the
     ISO/IEC Standard 13751, "Programming Language APL, Extended"
 
-    Copyright © 2018-2023  Dr. Jürgen Sauermann
+    Copyright © 2018-2024  Dr. Jürgen Sauermann
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
@@ -43,7 +43,7 @@ Quad_PNG  Quad_PNG::fun;
 
 /// PNG_LIBS defines if the PNG related libraries (and their header files)
 /// are present
-#define	PNG_LIBS	\
+#define	PNG_LIBS	                  \
     defined( HAVE_LIBZ           ) && \
     defined( HAVE_ZLIB_H         ) && \
     defined( HAVE_LIBPNG         ) && \
@@ -52,6 +52,10 @@ Quad_PNG  Quad_PNG::fun;
 #if PNG_LIBS
 # include <zlib.h>
 # include <png.h>
+#else
+struct png_struct;
+typedef png_struct * png_structp;
+typedef const char * png_const_charp;
 #endif
 
 /// window exposed semaphore
@@ -139,14 +143,14 @@ Quad_PNG::~Quad_PNG()
 }
 //---------------------------------------------------------------------------
 /// callback for libpng warnings
-static void
+void
 PNG_warn(png_structp png_ptr, png_const_charp reason)
 {
    CERR << "*** libpng warning: " << reason << " ***" << endl;
 }
 //---------------------------------------------------------------------------
 /// callback for libpng errors
-static void
+void
 PNG_err(png_structp png_ptr, png_const_charp reason)
 {
    MORE_ERROR() << "libpng error: " << reason;
@@ -156,6 +160,8 @@ PNG_err(png_structp png_ptr, png_const_charp reason)
 Value_P
 Quad_PNG::read_PNG_file(const UTF8_string & filename1)
 {
+#if PNG_LIBS
+
    // filename1 is the file to be read. It may or may not have a .png extension
    // If opening filename1 fails we try filename2 = filename1.png
    //
@@ -307,6 +313,10 @@ Value_P Z(shape_Z, LOC);
 
    Z->check_value(LOC);
    return Z;
+
+#else   // not PNG_LIBS
+   return Value_P();
+#endif // PNG_LIBS
 }
 //-----------------------------------------------------------------------------
 Token
@@ -448,6 +458,8 @@ Quad_PNG::window_control(APL_Integer B0) const
 bool
 Quad_PNG::valid_type_and_bits(int color_type, int bit_depth)
 {
+#if PNG_LIBS
+
        //        11111110000000000
        //        65432109876543210
 enum { valid = 0b10000000100010110 };  // 16, 8, 4, 2, and 1
@@ -465,12 +477,17 @@ enum { valid = 0b10000000100010110 };  // 16, 8, 4, 2, and 1
 
         default: return false;
       }
+#endif // PNG_LIBS
+
+   return false;
 }
 //---------------------------------------------------------------------------
 void
 Quad_PNG::write_PNG_file(const char * filename, int bit_depth,
                          const Value & B)
 {
+#if PNG_LIBS
+
 const ShapeItem planes = B.get_shape_item(0);
 const ShapeItem height = B.get_shape_item(1);
 const ShapeItem width  = B.get_shape_item(2);
@@ -621,6 +638,8 @@ UTF8 * scanline = RGB;
 
    png_destroy_write_struct(&png_ptr, &info_ptr);
    fclose(out);
+
+#endif // PNG_LIBS
 }
 //-----------------------------------------------------------------------------
 Token
