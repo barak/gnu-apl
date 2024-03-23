@@ -1532,11 +1532,13 @@ const int dy = y - pctx->legend_drag_Y;
 
    // cerr << "MOVE " << dx << " : " << dy << endl;
 
-   pctx->w_props.move_legend(dx, dy);
    if (dx || dy)
       {
-        const GdkRectangle rect = { 0, 0, 1000, 1000 };
+        pctx->w_props.move_legend(dx, dy);
         GdkWindow * gdk_win = gtk_widget_get_window(widget);
+        const gint wx = gdk_window_get_width(gdk_win);
+        const gint hy = gdk_window_get_height(gdk_win);
+        const GdkRectangle rect = { 0, 0, wx, hy };
         gdk_window_invalidate_rect(gdk_win, &rect, FALSE);
       }
 
