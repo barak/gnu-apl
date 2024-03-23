@@ -52,7 +52,8 @@ Plot_window_properties::Plot_window_properties(const Plot_data * data,
      verbosity(0),
      rangeX_type(NO_RANGE),
      rangeY_type(NO_RANGE),
-     rangeZ_type(NO_RANGE)
+     rangeZ_type(NO_RANGE),
+     show_legend(legend_lX != 0)
 {
    if (verbosity & SHOW_DRAW)
       CERR << setw(20) << "min_X: " << min_X << endl

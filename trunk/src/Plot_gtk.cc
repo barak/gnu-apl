@@ -67,17 +67,13 @@ public:
      drawing_area(0),
      surface(0),
      configured(false),
-     prev_X0(0),
-     prev_X1(0),
-     prev_Y0(0),
-     prev_Y1(0),
+     legend_drag(false),
+     legend_drag_X(0),
+     legend_drag_Y(0),
      legend_X0(0),
      legend_X1(0),
      legend_Y0(0),
-     legend_Y1(0),
-     legend_drag(false),
-     legend_drag_X(0),
-     legend_drag_Y(0)
+     legend_Y1(0)
    {}
 
    // destructor
@@ -133,25 +129,28 @@ public:
    /// true after the first configure events
    bool configured;
 
-   /// previous X0, X1 (at the end of window_resized())
-   Pixel_X prev_X0, prev_X1;
-
-   /// previous Y0, Y1 (at the end of window_resized())
-   Pixel_Y prev_Y0, prev_Y1;
-
-   /// the left and right edges of the legend rectangle
-   Pixel_X legend_X0, legend_X1;
-
-   /// the top and bottom edges of the legend rectangle
-   Pixel_Y legend_Y0, legend_Y1;
-
    /// true if the legend is being dragged
    bool legend_drag;
 
    /// the starting point of a legend drag
    int legend_drag_X, legend_drag_Y;
 
+   Pixel_X get_legend_X0(const char * loc) const   { return legend_X0; }
+   Pixel_X get_legend_X1(const char * loc) const   { return legend_X1; }
+   Pixel_Y get_legend_Y0(const char * loc) const   { return legend_Y0; }
+   Pixel_Y get_legend_Y1(const char * loc) const   { return legend_Y1; }
+
+   void set_legend_X0(Pixel_X x0, const char * loc)   { legend_X0 = x0; }
+   void set_legend_X1(Pixel_X x1, const char * loc)   { legend_X1 = x1; }
+   void set_legend_Y0(Pixel_Y y0, const char * loc)   { legend_Y0 = y0; }
+   void set_legend_Y1(Pixel_Y y1, const char * loc)   { legend_Y1 = y1; }
+
 protected:
+   /// the left and right edges of the legend rectangle
+   Pixel_X legend_X0, legend_X1;
+
+   /// the top and bottom edges of the legend rectangle
+   Pixel_Y legend_Y0, legend_Y1;
 };
 //----------------------------------------------------------------------------
 /// same as standard cairo_set_RGB_source() but with Color instead of double
@@ -647,13 +646,28 @@ char line[strlen(lines) + 10];
        }
 }
 //----------------------------------------------------------------------------
+double
+longest_legend_string(cairo_t * cr, int line_count, 
+                      Plot_line_properties const * const * l_props)
+{
+double ly = FONT_SIZE;
+double longest_len = 0.0;
+   for (int l = 0; l < line_count; ++l)
+       {
+         double lx = 0.0;
+         const char * line_name = l_props[l]->get_legend_name().c_str();
+         cairo_string_size(lx, ly, cr, line_name, FONT_NAME, FONT_SIZE);
+         if (longest_len < lx)   longest_len = lx;
+       }
+   return longest_len;
+}
+//----------------------------------------------------------------------------
 /// draw a legend for the different plot lines
 void
 draw_legend(cairo_t * cr, GTK_context & pctx, bool surface_plot)
 {
 const Plot_window_properties & w_props = pctx.w_props;
-const int lx = w_props.get_legend_lX();
-   if (lx <= 0)   return;   // no legend
+   if (!w_props.get_show_legend())   return;   // no legend
 
 Plot_line_properties const * const * l_props = w_props.get_line_properties();
 
@@ -665,16 +679,7 @@ const int line_count = surface_plot ? 1 : w_props.get_line_count();
                                         CAIRO_FONT_WEIGHT_NORMAL);
   cairo_set_font_size(cr, FONT_SIZE);
 
-double ly = FONT_SIZE;
-double longest_len = 0.0;
-   for (int l = 0; l < line_count; ++l)
-       {
-         double lx = 0.0;
-         cairo_string_size(lx, ly, cr,
-                           l_props[l]->get_legend_name().c_str(),
-                           FONT_NAME, FONT_SIZE);
-         if (longest_len < lx)   longest_len = lx;
-       }
+const double longest_len = longest_legend_string(cr, line_count, l_props);
 
 const Color canvas_color = w_props.get_canvas_color();
 const Color legend_color = w_props.get_legend_color();
@@ -708,7 +713,7 @@ const Pixel_Y dy = w_props.get_legend_dY();
      // clear the background and a 10 px BORDER around the items. The BORDER
      // is between the legend reactangle and the line entries
      //
-     const double ly2 = 0.5*ly;
+     const double ly2 = 0.5*FONT_SIZE;
 
      enum { BORDER = 10 };   // border around legend block
      const double X0 = x0                             - BORDER;
@@ -716,12 +721,14 @@ const Pixel_Y dy = w_props.get_legend_dY();
      const double Y0 = y0 - ly2                       - BORDER;
      const double Y1 = y0 + ly2 + dy*(line_count - 1) + BORDER;
 
-     // Remember the legend corners in pctx.
+     // Remember the legend corners in pctx. This is only used to determine
+     // if a mouse button press has occurred inside the legend box. The
+     // of the legend are coordinates are w_props.get_legend_X/Y() instead !
      //
-     pctx.legend_X0  = X0;
-     pctx.legend_X1  = X1;
-     pctx.legend_Y0  = Y0;
-     pctx.legend_Y1  = Y1;
+     pctx.set_legend_X0(X0, LOC);
+     pctx.set_legend_X1(X1, LOC);
+     pctx.set_legend_Y0(Y0, LOC);
+     pctx.set_legend_Y1(Y1, LOC);
 
      cairo_set_RGB_source(cr, legend_color);
      cairo_rectangle(cr, X0, Y0, X1 - X0, Y1 - Y0);
@@ -1468,78 +1475,6 @@ const bool surface_plot = w_props.get_plot_data().is_surface_plot();
    extern "C" gboolean name(__VA_ARGS__, GTK_context * pctx);   \
    extern "C" gboolean name(__VA_ARGS__, GTK_context * pctx)
 
-/// the window was resized
-Event_handler(Configure_event, GtkWidget * widget, GdkEvent *)
-{
-GtkWindow * window = GTK_WINDOW(widget);
-   Assert1(pctx && pctx->window == widget);
-
-   // 1. get the new window coordinates. We always use x/y from window,
-   //    not from event (since that would suffer from mouse movements).
-   //
-int win_X0, win_Y0;   gtk_window_get_position(window, &win_X0, &win_Y0);
-int win_W, win_H;     gtk_window_get_size(window, &win_W, &win_H);
-const int win_X1 = win_X0 + win_W;
-const int win_Y1 = win_Y0 + win_H;
-
-   // 2. if configured then figure which edges were changed.
-   //
-   if (pctx->configured)
-      {
-        0 && cerr << "CONFIG:"
-                  << "    X0=" << setw(3) << win_X0
-                  << "    Y0=" << setw(3) << win_Y0
-                  << "    X1=" << setw(3) << win_X1
-                  << "    Y1=" << setw(3) << win_Y1
-                  << endl;
-
-        const int d_X0 = win_X0 - pctx->prev_X0;
-        const int d_Y0 = win_Y0 - pctx->prev_Y0;
-        const int d_X1 = win_X1 - pctx->prev_X1;
-        const int d_Y1 = win_Y1 - pctx->prev_Y1;
-
-        0 && cerr << "MOVE:  "
-                  << "  d_X0=" << setw(3) << d_X0
-                  << "  d_Y0=" << setw(3) << d_Y0
-                  << "  d_X1=" << setw(3) << d_X1
-                  << "  d_Y1=" << setw(3) << d_Y1
-                  << endl;
-
-        0 && d_X0 && cerr << "left edge moved by "  << d_X0 << endl;
-        0 && d_X1 && cerr << "right edge moved by " << d_X1 << endl;
-        0 && d_Y0 && cerr << "upper edge moved by " << d_Y0 << endl;
-        0 && d_Y1 && cerr << "lower edge moved by " << d_Y1 << endl;
-
-        /* at this point:
- 
-           d_X0 == d_X1           : the entire window was moved (horizontally)
-           d_X0 == 0, d_X1 != 0   : the right edge of the window was moved
-           d_X0 != 0, d_X1 == 0   : the left edge of the window was moved
-
-           d_Y0 == d_Y1           : the entire window was moved (vertically)
-           d_Y0 == 0, d_Y1 != 0   : the lower edge of the window was moved
-           d_Y0 != 0, d_Y1 == 0   : the upper edge of the window was moved
-         */
-
-       if (d_X1 && !d_X0)   // unless window move
-          {
-            pctx->w_props.set_legend_X(pctx->w_props.get_legend_X() + d_X1);
-          }
-
-       if (d_Y1 && !d_Y0)   // unless window move
-          {
-            pctx->w_props.set_legend_Y(pctx->w_props.get_legend_Y() + d_Y1);
-          }
-      }
-
-   pctx->configured = true;
-   pctx->prev_X0 = win_X0;
-   pctx->prev_X1 = win_X1;
-   pctx->prev_Y0 = win_Y0;
-   pctx->prev_Y1 = win_Y1;
-
-   return FALSE;   // propagate the event further to other handlers
-}
 //----------------------------------------------------------------------------
 /// callback when the mouse button is pressed. This may or may not start
 /// the dragging of the legend.
@@ -1550,10 +1485,10 @@ Event_handler(Button_press_event, GtkWidget * widget, GdkEventButton * ev)
 const int x = ev->x;
 const int y = ev->y;
 
-   if (x <  pctx->legend_X0)   return TRUE;   // left of the legend
-   if (x >= pctx->legend_X1)   return TRUE;   // right of the legend
-   if (y <  pctx->legend_Y0)   return TRUE;   // above the legend
-   if (y >= pctx->legend_Y1)   return TRUE;   // below the legend
+   if (x <  pctx->get_legend_X0(LOC))   return TRUE;   // left of the legend
+   if (x >= pctx->get_legend_X1(LOC))   return TRUE;   // right of the legend
+   if (y <  pctx->get_legend_Y0(LOC))   return TRUE;   // above the legend
+   if (y >= pctx->get_legend_Y1(LOC))   return TRUE;   // below the legend
 
    // at this point a mouse button was pressed inside the legend. We take
    // that as the start of dragging the legend. Subsequent moves of the mouse
@@ -1597,8 +1532,7 @@ const int dy = y - pctx->legend_drag_Y;
 
    // cerr << "MOVE " << dx << " : " << dy << endl;
 
-   pctx->w_props.set_legend_X( pctx->w_props.get_legend_X() + dx);
-   pctx->w_props.set_legend_Y( pctx->w_props.get_legend_Y() + dy);
+   pctx->w_props.move_legend(dx, dy);
    if (dx || dy)
       {
         const GdkRectangle rect = { 0, 0, 1000, 1000 };
@@ -1903,7 +1837,6 @@ GTK_context * pctx = new GTK_context(w_props, handle);
    g_signal_connect(instance, signal_name, G_CALLBACK(callback), pctx);
 
    Connect_signal(pctx->window,              "destroy", Destroy)
-   Connect_signal(pctx->window,      "configure-event", Configure_event)
    Connect_signal(pctx->window,   "button-press-event", Button_press_event)
    Connect_signal(pctx->window, "button-release-event", Button_release_event)
    Connect_signal(pctx->window,  "motion-notify-event", Motion_notify_event)

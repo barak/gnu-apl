@@ -225,6 +225,16 @@ public:
    uint32_t get_line_count() const
       { return line_count; }
 
+   bool get_show_legend() const
+      { return show_legend; }
+
+   /// move the legend rectangle by dx:dy
+   void move_legend(Pixel_X dx, Pixel_Y dy)
+      {
+        legend_X += dx;
+        legend_Y += dy;
+      }
+
 protected:
    /// the number of plot lines
    const int line_count;
@@ -325,6 +335,9 @@ protected:
    /// return true unless property \b propnum was already set in plot
    /// line \b line
    bool can_be_set(uint16_t line, uint16_t propnum);
+
+   /// true if the plot window shall have a legend
+   const bool show_legend;
 
    /// a list of properties that have been set alreay (to protect them from
    /// from being overwridden in set_all_XXX() functions. Every 16-bit item
