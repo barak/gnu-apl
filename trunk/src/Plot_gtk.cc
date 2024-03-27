@@ -733,7 +733,9 @@ const Pixel_Y dy = w_props.get_legend_dY();
 
      if (Quad_PLOT::get_verbosity() & SHOW_DRAW)
         CERR << "draw_legend(): X0=" << X0 << " Y0=" << Y0
-             << " W=" << (X1 - X0) << " H=" << (Y1 - Y0) << endl;
+             << " W=" << (X1 - X0) << " H=" << (Y1 - Y0)
+             << " Background: 0:0 to " << pctx.get_total_width()
+             << ":" << pctx.get_total_height() << endl;
      cairo_set_RGB_source(cr, legend_color);
      cairo_rectangle(cr, X0, Y0, X1 - X0, Y1 - Y0);
 
