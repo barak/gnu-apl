@@ -27,9 +27,6 @@
 #include <locale.h>
 #endif
 
-/// debug verbosity
-static int verbosity = 0;
-
 #if apl_GTK3 && apl_X11
 
 #include <X11/Xlib.h>
@@ -721,15 +718,22 @@ const Pixel_Y dy = w_props.get_legend_dY();
      const double Y0 = y0 - ly2                       - BORDER;
      const double Y1 = y0 + ly2 + dy*(line_count - 1) + BORDER;
 
-     // Remember the legend corners in pctx. This is only used to determine
-     // if a mouse button press has occurred inside the legend box. The
-     // of the legend are coordinates are w_props.get_legend_X/Y() instead !
+     // Remember the lest legend corners in in pctx. These corners are only
+     // used in Button_press_event() to quickly determine if the next mouse
+     // button press is inside or outside the currently visibble legend
+     // rectangle (drawn ny this function). Don't confuse
+     // pctx.set_legend_[XY][01]() with w_props.get_legend_[XY]() which is
+     // the initial legend position chosen by the user and which is 
+     // updated in Motion_notify_event() as the legend is being dragged.
      //
      pctx.set_legend_X0(X0, LOC);
      pctx.set_legend_X1(X1, LOC);
      pctx.set_legend_Y0(Y0, LOC);
      pctx.set_legend_Y1(Y1, LOC);
 
+     if (Quad_PLOT::get_verbosity() & SHOW_DRAW)
+        CERR << "draw_legend(): X0=" << X0 << " Y0=" << Y0
+             << " W=" << (X1 - X0) << " H=" << (Y1 - Y0) << endl;
      cairo_set_RGB_source(cr, legend_color);
      cairo_rectangle(cr, X0, Y0, X1 - X0, Y1 - Y0);
 
@@ -1554,7 +1558,8 @@ Event_handler(Destroy, GtkWidget * widget)
 {
    Assert1(pctx && pctx->window == widget);
 
-   if (verbosity & SHOW_EVENTS)   CERR << "PLOT DESTROYED" << endl;
+   if (Quad_PLOT::get_verbosity() & SHOW_EVENTS)
+      CERR << "PLOT DESTROYED" << endl;
 
    Quad_PLOT::PLOT_context::remove_handle(pctx->handle);
    delete pctx;
@@ -1577,7 +1582,7 @@ Event_handler(Draw, GtkWidget * widget, cairo_t * cr)
 
 const int new_width  = gtk_widget_get_allocated_width(widget);
 const int new_height = gtk_widget_get_allocated_height(widget);
-   if (verbosity & SHOW_EVENTS)
+   if (Quad_PLOT::get_verbosity() & SHOW_EVENTS)
       CERR << "Draw(drawing_area = " << widget << ")  "
            << "width: " << new_width << ", height: " << new_height << endl;
 
@@ -1622,7 +1627,8 @@ cairo_surface_t * surface = gdk_window_create_similar_surface(
 
    cairo_surface_destroy(surface);
 
-   if (verbosity & SHOW_EVENTS)   CERR << "Draw() done." << endl;
+   if (Quad_PLOT::get_verbosity() & SHOW_EVENTS)
+      CERR << "Draw() done." << endl;
    return TRUE;   // event handled, do not propagate it further
 }
 //----------------------------------------------------------------------------
@@ -1642,7 +1648,8 @@ UTF8_string fname(w_props.get_output_filename().c_str());
 cairo_status_t stat = cairo_surface_write_to_png(surface, fname.c_str());
    if (stat == CAIRO_STATUS_SUCCESS)
       {
-        verbosity && CERR << "wrote output file: " << fname << endl;
+        Quad_PLOT::get_verbosity() && CERR << "wrote output file: "
+                                           << fname << endl;
        //    if (w_props.get_auto_close() == 1)   gtk_main_quit();
       }
    else   // error writing file

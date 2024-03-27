@@ -105,6 +105,9 @@ public:
    /// (to make doxygen happy, but only implemented if NOT apl_GTK3
    static void * plot_main_XCB(void * vp_props);
 
+   static int get_verbosity()
+      { return verbosity; }
+
 protected:
    /// Destructor.
    ~Quad_PLOT();

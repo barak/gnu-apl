@@ -359,7 +359,7 @@ Quad_PLOT::window_control(APL_Integer B0) const
    if (B0 == -2)                // enable SHOW_DATA
       {
         verbosity |= SHOW_DATA;
-        CERR << "⎕PLOT will  show APL data " << endl;
+        CERR << "⎕PLOT will  show APL data (and debug infos)" << endl;
         return Idx0(LOC);
       }
 
