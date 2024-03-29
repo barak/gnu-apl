@@ -2255,22 +2255,28 @@ Token result;
    set_action(result);
 }
 //----------------------------------------------------------------------------
-/// pattern V ) ← B
+/// pattern V ) ← B.
 void
 Prefix::reduce_V_RPAR_ASS_B()
 {
    Assert1(prefix_len == 4);
 
-const int count = vector_ass_count();
+   /* This pattern, i.e. V ) ← B, is the trailing tokens of one of 2 cases:
 
-   if (count == 0)
+      1. selective specification:   (... FUN V) ← B
+      2. vector assignment;         (C D ... V) ← B
+    */
+
+const int count = vector_ass_count();   // of the remaining symbols C D ...
+
+   if (count == 0)   // case 1: selective specification
       {
         // count == 0 normally indicates a selective specification. However,
         // an incorrect vector assignment such as (A 1 C) ← would also lead
         // to count == 0 (because Parser.cc would set is_vector_spec to
         // false around line 820 in Parser.cc). We fix this case here.
         //
-        TokenClass tc = body[PC].get_Class();
+        const TokenClass tc = body[PC].get_Class();
         if (!((1 << tc) & TCG_FUN12_OPER12))
            {
              // this case is rather rare, so we can afford a little time
@@ -2279,18 +2285,21 @@ const int count = vector_ass_count();
              bool selective_spec = false;
              for (int pc = PC + 1;;)
                  {
-                   tc = body[pc++].get_Class();
-                   if ((1 << tc) & TCG_FUN12_OPER12)
+                   const TokenClass tc1 = body[pc++].get_Class();
+                   if ((1 << tc1) & TCG_FUN12_OPER12)
                       {
                         selective_spec = true;
                         break;
                       }
-                   else if (tc == TC_L_PARENT)   // most likely end of (...)←
+                   else if (tc1 == TC_L_PARENT)   // most likely end of (...)←
                       {
-                        break;
+                        break;   // so selective_spec remains false
                       }
                  }
 
+             // at this point the token left of V ) ← B should form a
+             // selective specification. Complain if not.
+             //
              if (!selective_spec)
                 {
                   MORE_ERROR() <<
@@ -2300,7 +2309,8 @@ const int count = vector_ass_count();
            }
       }
 
-   // vector assignment also matches selective specification, but count
+   // at this point the pattern could still be a selective specification
+   // or a vector assignment. However, the count computed above shall
    // distinguishes them, e.g.
    //
    // (T U V) ← value        count = 2      vector assignment
@@ -2309,28 +2319,33 @@ const int count = vector_ass_count();
    //
    if (count < 1)
       {
-        // selective specification. Convert variable V into a (left-) value
+        // definitively case 1. (selective specification).
+        // Replace variable V by its (left-) value and repeat matching
         //
         Symbol * V = at0().get_sym_ptr();
         Assert1(V);
         Token result = V->resolve_lv(LOC);
         set_assign_state(ASS_var_seen);
         at0().move(result, LOC);
+
+        // at thid point variable name V was resolved to the (left-) value
+        // of V. Repeat matching with the updated phrase.
+        //
         set_action(RA_CONTINUE);   // match again (w/o SHIFT)
         return;
       }
 
-   // vector assignment.
+   // definitively a vector assignment. Collect the variables...
    //
 std::basic_string<Symbol *> symbols;
-   symbols.push_back(at0().get_sym_ptr());
+   symbols.push_back(at0().get_sym_ptr());   // i.e. symbol V
    loop(c, count)
       {
-        const Token & tok = lookahead().get_token();
-        Assert1(tok.get_tag() == TOK_LSYMB2);   // by vector_ass_count()
-        Symbol * V = tok.get_sym_ptr();
-        Assert(V);
-        symbols.push_back(V);
+        const Token & tok_var = lookahead().get_token();
+        Assert1(tok_var.get_tag() == TOK_LSYMB2);   // by vector_ass_count()
+        Symbol * sym_var = tok_var.get_sym_ptr();
+        Assert(sym_var);
+        symbols.push_back(sym_var);
       }
 
 Value_P B = at3().get_apl_val();
