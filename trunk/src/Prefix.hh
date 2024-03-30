@@ -240,9 +240,10 @@ public:
    void pop_and_discard()
       {  Assert1(put);   --put; }
 
-   /// the number of TOK_LSYMB2 tokens ahead (excluding the leftmost one
-   /// already read into content)
-   int vector_ass_count() const;
+   /// return TOK_LSYMB2 tokens ahead (excluding the leftmost one
+   /// already read into \b content). The result \b symbols is empty
+   /// for selective specifications and non-empty for vector specifications.
+   void collect_symbols(basic_string<Symbol *> & symbols);
 
    /// clear the saved_MISC token
    void clear_MISC(const char * loc)

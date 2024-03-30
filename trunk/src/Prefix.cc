@@ -254,24 +254,25 @@ const bool is_left_sym = get_assign_state() == ASS_arrow_seen;
    return sym->resolve_class(is_left_sym) == TC_VALUE;
 }
 //----------------------------------------------------------------------------
-int
-Prefix::vector_ass_count() const
+void
+Prefix::collect_symbols(basic_string<Symbol *> & symbols)
 {
-int count = 0;
-
    // TOKEN ... TOKEN VAR ) ←   (reversed)
    //             ↑
    //             PC
    //
-   // return the number of TOKEN (not including VAR)
+   // return the TOK_LSYMB2 symbols left of \b PC.
    //
    for (Function_PC pc = PC; pc < Function_PC(body.size()); ++pc)
        {
-         if (body[pc].get_tag() != TOK_LSYMB2)   break;
-         ++count;
-       }
+         if (body[pc].get_ValueType() != TV_SYM)   break;
 
-   return count;
+         const Token & tok_var = lookahead().get_token();
+         Symbol * sym_var = tok_var.get_sym_ptr();
+         Assert(sym_var);
+         if (!sym_var->can_be_assigned())   break;   // not a variable
+         symbols.push_back(sym_var);
+       }
 }
 //----------------------------------------------------------------------------
 void
@@ -2267,9 +2268,12 @@ Prefix::reduce_V_RPAR_ASS_B()
       2. vector assignment;         (C D ... V) ← B
     */
 
-const int count = vector_ass_count();   // of the remaining symbols C D ...
+basic_string<Symbol *> symbols;
+   symbols.reserve(10);
+   symbols.push_back(at0().get_sym_ptr());   // i.e. the last symbol V
+   collect_symbols(symbols);   // of the remaining symbols C D ...
 
-   if (count == 0)   // case 1: selective specification
+   if (symbols.size() == 1)   // case 1: selective specification
       {
         // count == 0 normally indicates a selective specification. However,
         // an incorrect vector assignment such as (A 1 C) ← would also lead
@@ -2317,7 +2321,7 @@ const int count = vector_ass_count();   // of the remaining symbols C D ...
    //   (U V) ← value        count = 1      vector assignment
    // (2 ↑ V) ← value        count = 0      selective specification
    //
-   if (count < 1)
+   if (symbols.size() < 2)   // single variable V
       {
         // definitively case 1. (selective specification).
         // Replace variable V by its (left-) value and repeat matching
@@ -2333,19 +2337,6 @@ const int count = vector_ass_count();   // of the remaining symbols C D ...
         //
         set_action(RA_CONTINUE);   // match again (w/o SHIFT)
         return;
-      }
-
-   // definitively a vector assignment. Collect the variables...
-   //
-std::basic_string<Symbol *> symbols;
-   symbols.push_back(at0().get_sym_ptr());   // i.e. symbol V
-   loop(c, count)
-      {
-        const Token & tok_var = lookahead().get_token();
-        Assert1(tok_var.get_tag() == TOK_LSYMB2);   // by vector_ass_count()
-        Symbol * sym_var = tok_var.get_sym_ptr();
-        Assert(sym_var);
-        symbols.push_back(sym_var);
       }
 
 Value_P B = at3().get_apl_val();
