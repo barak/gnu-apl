@@ -36,7 +36,7 @@ using namespace std;
 
    [PC_from - PC_to] src_line
 
-   where  [PC_from - PC_to] is a PC range in the binary file i(apl) and
+   where  [PC_from - PC_to] is a PC range in the binary file (apl) and
    src_line is the line number in the source file that has produced the range.
 
    PC_to is excluding, i.e. the first address after the line. The typical

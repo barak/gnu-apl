@@ -250,6 +250,13 @@ apl_LDADD = $(LIBS)
 apl.lines: apl
 	objdump --section=.text --line-numbers --disassemble $< > $@
 
+apl.lines1: ../tools/filter_apl_lines apl.lines
+	../tools/filter_apl_lines < apl.lines > $@
+
+apl.lines2:	../tools/filter_apl_lines2 apl
+	objdump --line-numbers --dwarf=decodedline ./apl \
+	| ../tools/filter_apl_lines2 | sort | uniq > $@
+
 # run all testcases, continue after errors
 test: all
 	./apl --id 1010 -T testcases/*tc

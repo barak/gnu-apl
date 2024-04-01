@@ -8,6 +8,7 @@ noinst_PROGRAMS = APL_keyboard       \
                   apl2html           \
                   check_command_def  \
                   filter_apl_lines   \
+                  filter_apl_lines2  \
                   lines              \
                   ncurses_emul       \
                   phrase_gen         \
@@ -34,6 +35,7 @@ APL_keyboard_show_SOURCES  = APL_keyboard_show.cc
 apl2html_SOURCES           = apl2html.cc
 check_command_def_SOURCES  = check_command_def.cc
 filter_apl_lines_SOURCES   = filter_apl_lines.cc
+filter_apl_lines2_SOURCES  = filter_apl_lines2.cc
 lines_SOURCES              = lines.cc
 ncurses_emul_SOURCES       = ncurses_emul.cc
 ncurses_emul_LIBS          = -lncurses -ltinfo

@@ -1444,14 +1444,6 @@ const int point_style  = lp0.get_point_style();
 static void
 do_plot(GtkWidget * drawing_area, GTK_context & pctx, cairo_t * cr)
 {
-static bool in_do_plot = false;
-   if (in_do_plot)
-      {
-         CERR << endl << endl << "*** do_plot() called recursively ***"
-              << endl << endl;
-      }
-   in_do_plot = true;
-
 const Plot_window_properties & w_props = pctx.w_props;
 const Color canvas_color = w_props.get_canvas_color();
   cairo_set_RGB_source(cr, canvas_color);
@@ -1479,7 +1471,6 @@ const bool surface_plot = w_props.get_plot_data().is_surface_plot();
   // draw legend...
   //
   draw_legend(cr, pctx, surface_plot);
-   in_do_plot = false;
 }
 //----------------------------------------------------------------------------
 // event handlers (callbacks). They should be declared extern "C" as to be
@@ -1564,6 +1555,15 @@ const int dy = y - pctx->legend_drag_Y;
    return TRUE;   // event handled, do not propagate it further
 }
 //----------------------------------------------------------------------------
+// the plot window is closed
+Event_handler(Hide, GtkWidget * widget)
+{
+   Assert1(pctx && pctx->window == widget);
+
+   if (pctx->w_props.get_with_border())   pctx->save_to_file_with_border();
+   return FALSE;   // propagate this event further further
+}
+//----------------------------------------------------------------------------
 // the plot window is destroyed
 Event_handler(Destroy, GtkWidget * widget)
 {
@@ -1576,14 +1576,6 @@ Event_handler(Destroy, GtkWidget * widget)
    delete pctx;
 
    return TRUE;   // event handled, do not propagate it further
-}
-//----------------------------------------------------------------------------
-gboolean
-WM_timeout(GTK_context * pctx)
-{
-   // cerr << "TIMEOUT " << (void *)pctx << endl;
-   pctx->save_to_file_with_border();
-   return FALSE;   // single shot
 }
 //----------------------------------------------------------------------------
 /// callback when the plot window shall be (re-)drawn
@@ -1629,12 +1621,10 @@ cairo_surface_t * surface = gdk_window_create_similar_surface(
         // timeout, the window manager has hopefully enough time to draw
         // te window borders.
         //
-        g_timeout_add(SAVE_BORDER_DELAY_ms, (GSourceFunc)WM_timeout, pctx);
+        return TRUE;
       }
-   else
-      {
-        pctx->save_to_file_no_border(surface);
-      }
+
+   pctx->save_to_file_no_border(surface);
 
    cairo_surface_destroy(surface);
 
@@ -1691,7 +1681,6 @@ UTF8_string fname(w_props.get_output_filename().c_str());
    // append .png unless already there
    //
    if (!fname.ends_with(".png"))   fname.append_ASCII(".png");
-
 
 GdkWindow * gdk_win = gtk_widget_get_window(window);
 GdkWindow * parent = gdk_window_get_parent(gdk_win);
@@ -1856,6 +1845,7 @@ GTK_context * pctx = new GTK_context(w_props, handle);
 #define Connect_signal(instance, signal_name, callback)               \
    g_signal_connect(instance, signal_name, G_CALLBACK(callback), pctx);
 
+   Connect_signal(pctx->window,                 "hide", Hide)
    Connect_signal(pctx->window,              "destroy", Destroy)
    Connect_signal(pctx->window,   "button-press-event", Button_press_event)
    Connect_signal(pctx->window, "button-release-event", Button_release_event)
